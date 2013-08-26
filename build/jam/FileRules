@@ -328,50 +328,62 @@ rule ObjectReferences
 	}
 }
 
+
 rule CopySetHaikuRevision target : source
 {
 	# CopySetHaikuRevision <target> : <source>
 	#
-	# Copy <source> to <target>, writing the SVN revision of the working root
+	# Copy <source> to <target>, writing the Git revision of the working
 	# directory into the haiku revision section of <target>.
 	#
 	# <target> - Output file target. Gristed and located target.
 	# <source> - ELF object to be copied. Gristed and located target.
 
-	# If existent, make the target depend on the .svn/entries file in the
+	# If existing, make the target depend on the .git/index file in the
 	# root directory, so it gets updated when the revision changes due to
-	# "svn up".
-	if [ Glob [ FDirName $(HAIKU_TOP) .svn ] : entries ] {
-		local svnEntries = <haiku-rootdir-svn>entries ;
-		SEARCH on $(svnEntries) = [ FDirName $(HAIKU_TOP) .svn ] ;
-		Depends $(target) : $(svnEntries) ;
-	} else if [ Glob [ FDirName $(HAIKU_TOP) .git ] : index ] {
-		local gitIndex = <haiku-rootdir-git>index ;
-		SEARCH on $(gitIndex) = [ FDirName $(HAIKU_TOP) .git ] ;
-		Depends $(target) : $(gitIndex) ;
-	} else if [ Glob [ FDirName $(HAIKU_TOP) .hg ] : store ] {
-		local hgStore = <haiku-rootdir-hg>store ;
-		SEARCH on $(hgStore) = [ FDirName $(HAIKU_TOP) .hg ] ;
-		Depends $(target) : $(hgStore) ;
+	# commits or merges.
+	local gitIndex = <haiku-rootdir-git>index ;
+	local revisionFile = <haiku-rootdir-git>haiku-revision ;
+	if ! [ on $(gitIndex) return $(HAIKU_GIT_REVISION_DETERMINED) ] {
+		if [ Glob [ FDirName $(HAIKU_TOP) .git ] : index ] {
+			HAIKU_GIT_REVISION_DETERMINED on $(gitIndex) = 1 ;
+			SEARCH on $(gitIndex) = [ FDirName $(HAIKU_TOP) .git ] ;
+			MakeLocate $(revisionFile) : $(HAIKU_BUILD_OUTPUT_DIR) ;
+			Depends $(revisionFile) : $(gitIndex) ;
+			DetermineHaikuRevision $(revisionFile) : $(gitIndex) ;
+		} else {
+			revisionFile = ;
+		}
 	}
 
 	PropagateContainerUpdateTargetFlags $(target) : $(source) ;
 
-	Depends $(target) : <build>copyattr <build>set_haiku_revision $(source) ;
+	Depends $(target)
+		: <build>copyattr <build>set_haiku_revision $(source) $(revisionFile) ;
 	CopySetHaikuRevision1 $(target)
-		: <build>copyattr <build>set_haiku_revision $(source) ;
+		: <build>copyattr <build>set_haiku_revision $(source) $(revisionFile) ;
 }
+
 
 actions CopySetHaikuRevision1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 
-	. $(HAIKU_TOP)/build/scripts/determine_haiku_revision
-	determineHaikuRevision $(HAIKU_TOP) $(HAIKU_BUILD_OUTPUT_DIR)
+	$(2[1]) --data $(2[3]) $(1) || exit 1
 
-	$(2[1]) --data $(2[3]) $(1) &&
-	$(2[2]) $(1) ${revision}
+	revision=0
+	if [ -n "$(2[4]:E=)" ]; then
+		revision="`cat $(2[4]:E=)`"
+	fi
+	$(2[2]) $(1) "$revision"
 }
+
+
+actions DetermineHaikuRevision
+{
+	$(HAIKU_TOP)/build/scripts/determine_haiku_revision $(HAIKU_TOP) $(1)
+}
+
 
 rule DataFileToSourceFile sourceFile : dataFile : dataVariable : sizeVariable
 {
