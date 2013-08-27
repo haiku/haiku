@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src add-ons kernel bus_managers random ;
+
+UsePrivateKernelHeaders ;
+
+KernelAddon random :
+	driver.cpp
+	yarrow_rng.cpp
+;
