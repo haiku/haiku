@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src bin pkgman ;
 
-UsePrivateHeaders shared support ;
+UsePrivateHeaders shared storage support ;
 
 BinCommand pkgman :
 	Command.cpp

@@ -71,6 +71,12 @@ private:
 			void				_PrintResult();
 			void				_ApplyPackageChanges();
 
+			void				_ClonePackageFile(Repository* repository,
+									const BString& fileName,
+							 		const BEntry& entry) const;
+			int32				_FindBasePackage(const PackageList& packages,
+									const BPackageInfo& info) const;
+
 private:
 			BPackageInstallationLocation fLocation;
 			BSolver*			fSolver;

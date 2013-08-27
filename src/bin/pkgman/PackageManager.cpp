@@ -20,6 +20,7 @@
 #include <package/solver/SolverProblemSolution.h>
 #include <package/solver/SolverResult.h>
 
+#include <CopyEngine.h>
 #include <package/ActivationTransaction.h>
 #include <package/DaemonClient.h>
 
@@ -331,17 +332,23 @@ PackageManager::_AnalyzeResult()
 	if (error != B_OK)
 		DIE(error, "failed to compute packages to un/-install");
 
+	PackageList potentialBasePackages;
+
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
 			i++) {
 		BSolverPackage* package = element->Package();
 
 		switch (element->Type()) {
 			case BSolverResultElement::B_TYPE_INSTALL:
-				if (!fInstalledRepositories.HasItem(package->Repository())) {
-					if (!fPackagesToActivate.AddItem(package))
-						DIE(B_NO_MEMORY, "failed to add package to activate");
-				}
+			{
+				PackageList& packageList
+					= fInstalledRepositories.HasItem(package->Repository())
+						? potentialBasePackages
+						: fPackagesToActivate;
+				if (!packageList.AddItem(package))
+					DIE(B_NO_MEMORY, "failed to add package to activate");
 				break;
+			}
 
 			case BSolverResultElement::B_TYPE_UNINSTALL:
 				if (!fPackagesToDeactivate.AddItem(package))
@@ -353,6 +360,18 @@ PackageManager::_AnalyzeResult()
 	if (fPackagesToActivate.IsEmpty() && fPackagesToDeactivate.IsEmpty()) {
 		printf("Nothing to do.\n");
 		exit(0);
+	}
+
+	// Make sure base packages are installed in the same location.
+	for (int32 i = 0; i < fPackagesToActivate.CountItems(); i++) {
+		BSolverPackage* package = fPackagesToActivate.ItemAt(i);
+		int32 index = _FindBasePackage(potentialBasePackages, package->Info());
+		if (index < 0)
+			continue;
+
+		BSolverPackage* basePackage = potentialBasePackages.RemoveItemAt(index);
+		if (!fPackagesToActivate.AddItem(basePackage))
+			DIE(B_NO_MEMORY, "failed to add package to activate");
 	}
 }
 
@@ -402,27 +421,33 @@ PackageManager::_ApplyPackageChanges()
 		// get package URL and target entry
 		Repository* repository
 			= static_cast<Repository*>(package->Repository());
-		BString url = repository->Config().PackagesURL();
+
 		BString fileName(package->Info().CanonicalFileName());
 		if (fileName.IsEmpty())
 			DIE(B_NO_MEMORY, "failed to allocate file name");
-		url << '/' << fileName;
 
 		BEntry entry;
 		error = entry.SetTo(&transactionDirectory, fileName);
 		if (error != B_OK)
 			DIE(error, "failed to create package entry");
 
-		// download the package
-		DownloadFileRequest downloadRequest(fContext, url, entry,
-			package->Info().Checksum());
-		error = downloadRequest.Process();
-		if (error != B_OK)
-			DIE(error, "failed to download package");
+		if (fInstalledRepositories.HasItem(repository)) {
+			// clone the existing package
+			_ClonePackageFile(repository, fileName, entry);
+		} else {
+			// download the package
+			BString url = repository->Config().PackagesURL();
+			url << '/' << fileName;
+
+			DownloadFileRequest downloadRequest(fContext, url, entry,
+				package->Info().Checksum());
+			error = downloadRequest.Process();
+			if (error != B_OK)
+				DIE(error, "failed to download package");
+		}
 
 		// add package to transaction
-		if (!transaction.AddPackageToActivate(
-				package->Info().CanonicalFileName())) {
+		if (!transaction.AddPackageToActivate(fileName)) {
 			DIE(B_NO_MEMORY,
 				"failed to add package to activate to transaction");
 		}
@@ -457,4 +482,81 @@ PackageManager::_ApplyPackageChanges()
 		|| (error = transactionDirectoryEntry.Remove()) != B_OK) {
 		WARN(error, "failed to remove transaction directory");
 	}
+}
+
+
+void
+PackageManager::_ClonePackageFile(Repository* repository,
+	const BString& fileName, const BEntry& entry) const
+{
+	// get the source and destination file paths
+	directory_which packagesWhich;
+	if (repository == &fSystemRepository) {
+		packagesWhich = B_SYSTEM_PACKAGES_DIRECTORY;
+	} else if (repository == &fCommonRepository) {
+		packagesWhich = B_COMMON_PACKAGES_DIRECTORY;
+	} else {
+		fprintf(stderr, "*** don't know packages directory path for "
+			"installation location \"%s\"", repository->Name().String());
+		exit(1);
+	}
+
+	BPath sourcePath;
+	status_t error = find_directory(packagesWhich, &sourcePath);
+	if (error != B_OK || (error = sourcePath.Append(fileName)) != B_OK) {
+		DIE(error, "failed to get path of package file \"%s\" in installation "
+			"location \"%s\"", fileName.String(), repository->Name().String());
+	}
+
+	BPath destinationPath;
+	error = entry.GetPath(&destinationPath);
+	if (error != B_OK) {
+		DIE(error, "failed to entry path of package file to install \"%s\"",
+			fileName.String());
+	}
+
+	// Copy the package. Ideally we would just hard-link it, but BFS doesn't
+	// support that.
+	error = BCopyEngine().CopyEntry(sourcePath.Path(), destinationPath.Path());
+	if (error != B_OK)
+		DIE(error, "failed to copy package file \"%s\"", sourcePath.Path());
+}
+
+
+int32
+PackageManager::_FindBasePackage(const PackageList& packages,
+	const BPackageInfo& info) const
+{
+	if (info.BasePackage().IsEmpty())
+		return -1;
+
+	// find the requirement matching the base package
+	BPackageResolvableExpression* basePackage = NULL;
+	int32 count = info.RequiresList().CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BPackageResolvableExpression* requires = info.RequiresList().ItemAt(i);
+		if (requires->Name() == info.BasePackage()) {
+			basePackage = requires;
+			break;
+		}
+	}
+
+	if (basePackage == NULL) {
+		printf("warning: package %s-%s doesn't have a matching requires for "
+			"its base package \"%s\"\n", info.Name().String(),
+			info.Version().ToString().String(), info.BasePackage().String());
+		return -1;
+	}
+
+	// find the first package matching the base package requires
+	count = packages.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BSolverPackage* package = packages.ItemAt(i);
+		if (package->Name() == basePackage->Name()
+			&& package->Info().Matches(*basePackage)) {
+			return i;
+		}
+	}
+
+	return -1;
 }
