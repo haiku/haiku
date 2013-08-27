@@ -62,35 +62,12 @@ rule ArchitectureSetup architecture
 	HAIKU_CCFLAGS_$(architecture) += $(gccBaseFlags) -nostdinc ;
 	HAIKU_C++FLAGS_$(architecture) += $(gccBaseFlags) -nostdinc ;
 
-	local cpu = $(HAIKU_CPU_$(architecture)) ;
-	switch $(cpu) {
-		case ppc :
-			HAIKU_DEFINES_$(architecture) += __POWERPC__ ;
-
-		case arm :
-			HAIKU_DEFINES_$(architecture) += __ARM__ ;
-
-		case x86 :
-			HAIKU_DEFINES_$(architecture) += __INTEL__ ;
-
-		case x86_64 :
-			HAIKU_DEFINES_$(architecture) += __x86_64__ ;
-
-		case m68k :
-			HAIKU_DEFINES_$(architecture) += __M68K__ ;
-
-		case mipsel :
-			HAIKU_DEFINES_$(architecture) += __MIPSEL__ ;
-
-		case * :
-			Exit "Currently unsupported target CPU:" $(cpu) ;
-	}
-
 	# strip is required
 	if ! $(HAIKU_STRIP_$(architecture)) {
 		Exit "HAIKU_STRIP_$(architecture) not set. Please re-run configure." ;
 	}
 
+	local cpu = $(HAIKU_CPU_$(architecture)) ;
 	HAIKU_ARCH_$(architecture) = $(cpu) ;
 	HAIKU_ARCH ?= $(cpu) ;
 		# Set only, if not set yet. This way HAIKU_ARCH is set to the primary
