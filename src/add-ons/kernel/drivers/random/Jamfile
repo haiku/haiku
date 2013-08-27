@@ -4,8 +4,8 @@ UsePrivateKernelHeaders ;
 
 KernelAddon random :
 	driver.cpp
+	yarrow_rng.cpp
 ;
 
 # CFLAGS was arch dependent:
 #	-fno-pic -D_KERNEL_MODE -O99 -mpentiumpro -march=pentiumpro -Wno-missing-prototypes
-
