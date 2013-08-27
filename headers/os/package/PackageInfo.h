@@ -105,6 +105,9 @@ public:
 
 			BString				CanonicalFileName() const;
 
+			bool				Matches(const BPackageResolvableExpression&
+									expression) const;
+
 			void				SetName(const BString& name);
 			void				SetSummary(const BString& summary);
 			void				SetDescription(const BString& description);

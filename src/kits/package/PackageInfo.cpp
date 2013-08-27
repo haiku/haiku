@@ -582,6 +582,27 @@ BPackageInfo::CanonicalFileName() const
 }
 
 
+bool
+BPackageInfo::Matches(const BPackageResolvableExpression& expression) const
+{
+	// check for an explicit match on the package
+	if (expression.Name().StartsWith("pkg:")) {
+		return fName == expression.Name().String() + 4
+			&& expression.Matches(fVersion, fVersion);
+	}
+
+	// search for a matching provides
+	int32 count = fProvidesList.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BPackageResolvable* provides = fProvidesList.ItemAt(i);
+		if (expression.Matches(*provides))
+			return true;
+	}
+
+	return false;
+}
+
+
 void
 BPackageInfo::SetName(const BString& name)
 {
