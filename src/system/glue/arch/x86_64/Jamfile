@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system glue arch x86_64 ;
 
+UsePrivateSystemHeaders ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 	on $(architectureObject) {
