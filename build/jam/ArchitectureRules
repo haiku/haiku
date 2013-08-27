@@ -73,6 +73,9 @@ rule ArchitectureSetup architecture
 		case x86 :
 			HAIKU_DEFINES_$(architecture) += __INTEL__ ;
 
+		case x86_64 :
+			HAIKU_DEFINES_$(architecture) += __x86_64__ ;
+
 		case m68k :
 			HAIKU_DEFINES_$(architecture) += __M68K__ ;
 
