@@ -408,7 +408,7 @@ copy_entry(const char *sourcePath, const char *destPath,
 				sizeof(linkTo) - 1);
 			if (bytesRead < 0) {
 				fprintf(stderr, "Error: Failed to read symlink \"%s\": %s\n",
-					sourcePath, strerror(error));
+					sourcePath, strerror(errno));
 				exit(1);
 			}
 
