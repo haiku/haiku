@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 
-extern random_module_info* gRandomModuleInfo;
+extern random_module_info* gYarrowRandomModule;
 
 
 #ifdef __cplusplus

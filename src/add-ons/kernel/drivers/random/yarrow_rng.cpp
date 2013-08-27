@@ -3,6 +3,8 @@
  * All Lefts, Rights, Ups, Downs, Forwards, Backwards, Pasts and Futures Reserved *
  */
 
+/* Made into a BeOS /dev/random and /dev/urandom by Daniel Berlin */
+
 
 #include "yarrow_rng.h"
 
@@ -333,7 +335,7 @@ yarrow_rng_write(const void *buffer, size_t *_numBytes)
 }
 
 
-random_module_info sRandomModuleInfo = {
+random_module_info sYarrowRandomModule = {
 	yarrow_rng_init,
 	yarrow_rng_uninit,
 	yarrow_rng_read,
@@ -341,4 +343,4 @@ random_module_info sRandomModuleInfo = {
 };
 
 
-random_module_info *gRandomModuleInfo = &sRandomModuleInfo;
+random_module_info *gYarrowRandomModule = &sYarrowRandomModule;

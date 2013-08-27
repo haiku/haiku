@@ -188,7 +188,7 @@ SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures acpi_button@x86 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	ata@ata pci ps2@x86,x86_64 isa@x86,x86_64
 	ide@ide scsi config_manager agp_gart@x86 usb firewire@x86 acpi@x86
-	virtio
+	virtio random
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs btrfs cdda exfat ext2 fat iso9660 nfs nfs4
 	attribute_overlay write_overlay ntfs reiserfs@x86 udf googlefs ;
@@ -260,7 +260,7 @@ AddNewDriversToHaikuImage power : acpi_battery@x86 ;
 
 # legacy drivers
 AddDriversToHaikuImage				: console dprintf null
-									  random <driver>tty zero ;
+									  <driver>tty zero ;
 AddDriversToHaikuImage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage audio old	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToHaikuImage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;

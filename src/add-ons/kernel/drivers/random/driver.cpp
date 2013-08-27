@@ -1,125 +1,68 @@
-/* Yarrow Random Number Generator (True Randomness Achieved in Software) *
- * Copyright (c) 1998-2000 by Yarrow Charnot, Identikey <mailto://ycharnot@identikey.com>
- * All Lefts, Rights, Ups, Downs, Forwards, Backwards, Pasts and Futures Reserved *
+/*
+ * Copyright 2002-2013, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval, korli@berlios.de
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		David Reid
  */
-
-/* Made into a BeOS /dev/random and /dev/urandom by Daniel Berlin */
-/* Adapted for Haiku by David Reid, Axel Dörfler */
 
 
 #include <stdio.h>
 
+#include <device_manager.h>
 #include <Drivers.h>
 #include <util/AutoLock.h>
 
 #include "yarrow_rng.h"
 
 
-#define TRACE_DRIVER
+//#define TRACE_DRIVER
 #ifdef TRACE_DRIVER
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf("random: " x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
-
-int32 api_version = B_CUR_DRIVER_API_VERSION;
-
-#define	DRIVER_NAME "random"
-
-static const char *sRandomNames[] = {
-	"random",
-	"urandom",
-	NULL
-};
-
-static status_t random_open(const char *name, uint32 flags, void **cookie);
-static status_t random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes);
-static status_t random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes);
-static status_t random_control(void *cookie, uint32 op, void *arg, size_t length);
-static status_t random_close(void *cookie);
-static status_t random_free(void *cookie);
-static status_t random_select(void *cookie, uint8 event, uint32 ref, selectsync *sync);
-static status_t random_deselect(void *cookie, uint8 event, selectsync *sync);
+#define CALLED() 			TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
-static device_hooks sRandomHooks = {
-	random_open,
-	random_close,
-	random_free,
-	random_control,
-	random_read,
-	random_write,
-	random_select,
-	random_deselect,
-	NULL,
-	NULL
-};
+#define	RANDOM_DRIVER_MODULE_NAME "bus_managers/random/driver_v1"
+#define RANDOM_DEVICE_MODULE_NAME "bus_managers/random/device_v1"
 
 
 static mutex sRandomLock;
+static device_manager_info* sDeviceManager;
 
 
-//	#pragma mark -
-//	device driver
+typedef struct {
+	device_node*			node;
+} random_driver_info;
 
 
-status_t
-init_hardware(void)
+//	#pragma mark - device module API
+
+
+static status_t
+random_init_device(void* _info, void** _cookie)
 {
-	TRACE((DRIVER_NAME ": init_hardware()\n"));
-	return B_OK;
-}
-
-
-status_t
-init_driver(void)
-{
-	TRACE((DRIVER_NAME ": init_driver()\n"));
-
 	mutex_init(&sRandomLock, "/dev/random lock");
-
-	return gRandomModuleInfo->init();
+	return gYarrowRandomModule->init();
 }
 
 
-void
-uninit_driver(void)
+static void
+random_uninit_device(void* _cookie)
 {
-	TRACE((DRIVER_NAME ": uninit_driver()\n"));
-	gRandomModuleInfo->uninit();
+	gYarrowRandomModule->uninit();
 	mutex_destroy(&sRandomLock);
 }
 
 
-const char **
-publish_devices(void)
-{
-	TRACE((DRIVER_NAME ": publish_devices()\n"));
-	return sRandomNames;
-}
-
-
-device_hooks *
-find_device(const char* name)
-{
-	TRACE((DRIVER_NAME ": find_device(\"%s\")\n", name));
-
-	for (int i = 0; sRandomNames[i] != NULL; i++)
-		if (strcmp(name, sRandomNames[i]) == 0)
-			return &sRandomHooks;
-
-	return NULL;
-}
-
-
-//	#pragma mark -
-//	device functions
-
-
 static status_t
-random_open(const char *name, uint32 flags, void **cookie)
+random_open(void *deviceCookie, const char *name, int flags, void **cookie)
 {
-	TRACE((DRIVER_NAME ": open(\"%s\")\n", name));
+	TRACE("open(\"%s\")\n", name);
 	return B_OK;
 }
 
@@ -127,26 +70,26 @@ random_open(const char *name, uint32 flags, void **cookie)
 static status_t
 random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 {
-	TRACE((DRIVER_NAME ": read(%Ld,, %ld)\n", position, *_numBytes));
+	TRACE("read(%Ld,, %ld)\n", position, *_numBytes);
 
 	MutexLocker locker(&sRandomLock);
-	return gRandomModuleInfo->read(_buffer, _numBytes);
+	return gYarrowRandomModule->read(_buffer, _numBytes);
 }
 
 
 static status_t
 random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes)
 {
-	TRACE((DRIVER_NAME ": write(%Ld,, %ld)\n", position, *_numBytes));
+	TRACE("write(%Ld,, %ld)\n", position, *_numBytes);
 	MutexLocker locker(&sRandomLock);
-	return gRandomModuleInfo->write(buffer, _numBytes);
+	return gYarrowRandomModule->write(buffer, _numBytes);
 }
 
 
 static status_t
 random_control(void *cookie, uint32 op, void *arg, size_t length)
 {
-	TRACE((DRIVER_NAME ": ioctl(%ld)\n", op));
+	TRACE("ioctl(%ld)\n", op);
 	return B_ERROR;
 }
 
@@ -154,7 +97,7 @@ random_control(void *cookie, uint32 op, void *arg, size_t length)
 static status_t
 random_close(void *cookie)
 {
-	TRACE((DRIVER_NAME ": close()\n"));
+	TRACE("close()\n");
 	return B_OK;
 }
 
@@ -162,15 +105,15 @@ random_close(void *cookie)
 static status_t
 random_free(void *cookie)
 {
-	TRACE((DRIVER_NAME ": free()\n"));
+	TRACE("free()\n");
 	return B_OK;
 }
 
 
 static status_t
-random_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
+random_select(void *cookie, uint8 event, selectsync *sync)
 {
-	TRACE((DRIVER_NAME ": select()\n"));
+	TRACE("select()\n");
 
 	if (event == B_SELECT_READ) {
 		/* tell there is already data to read */
@@ -194,6 +137,141 @@ random_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
 static status_t
 random_deselect(void *cookie, uint8 event, selectsync *sync)
 {
-	TRACE((DRIVER_NAME ": deselect()\n"));
+	TRACE("deselect()\n");
 	return B_OK;
 }
+
+
+//	#pragma mark - driver module API
+
+
+static float
+random_supports_device(device_node *parent)
+{
+	CALLED();
+	const char *bus;
+
+	// make sure parent is really device root
+	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+		return -1;
+
+	if (strcmp(bus, "root"))
+		return 0.0;
+
+	return 1.0;
+}
+
+
+static status_t
+random_register_device(device_node *node)
+{
+	CALLED();
+
+	// ready to register
+	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "Random" }},
+		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_KEEP_DRIVER_LOADED }},
+		{ NULL }
+	};
+
+	return sDeviceManager->register_node(node, RANDOM_DRIVER_MODULE_NAME,
+		attrs, NULL, NULL);
+}
+
+
+static status_t
+random_init_driver(device_node *node, void **cookie)
+{
+	CALLED();
+
+	random_driver_info* info = (random_driver_info*)malloc(
+		sizeof(random_driver_info));
+	if (info == NULL)
+		return B_NO_MEMORY;
+
+	memset(info, 0, sizeof(*info));
+
+	info->node = node;
+
+	*cookie = info;
+	return B_OK;
+}
+
+
+static void
+random_uninit_driver(void *_cookie)
+{
+	CALLED();
+	random_driver_info* info = (random_driver_info*)_cookie;
+	free(info);
+}
+
+
+static status_t
+random_register_child_devices(void* _cookie)
+{
+	CALLED();
+	random_driver_info* info = (random_driver_info*)_cookie;
+	status_t status = sDeviceManager->publish_device(info->node, "random",
+		RANDOM_DEVICE_MODULE_NAME);
+	if (status == B_OK) {
+		sDeviceManager->publish_device(info->node, "urandom",
+			RANDOM_DEVICE_MODULE_NAME);
+	}
+
+	return status;
+}
+
+
+//	#pragma mark -
+
+
+module_dependency module_dependencies[] = {
+	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager},
+	{}
+};
+
+struct device_module_info sRandomDevice = {
+	{
+		RANDOM_DEVICE_MODULE_NAME,
+		0,
+		NULL
+	},
+
+	random_init_device,
+	random_uninit_device,
+	NULL, // remove,
+
+	random_open,
+	random_close,
+	random_free,
+	random_read,
+	random_write,
+	NULL,
+	random_control,
+
+	random_select,
+	random_deselect,
+};
+
+struct driver_module_info sRandomDriver = {
+	{
+		RANDOM_DRIVER_MODULE_NAME,
+		0,
+		NULL
+	},
+
+	random_supports_device,
+	random_register_device,
+	random_init_driver,
+	random_uninit_driver,
+	random_register_child_devices,
+	NULL,	// rescan
+	NULL,	// removed
+};
+
+module_info* modules[] = {
+	(module_info*)&sRandomDriver,
+	(module_info*)&sRandomDevice,
+	NULL
+};
