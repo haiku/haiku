@@ -32,7 +32,8 @@
 
 
 static mutex sRandomLock;
-static device_manager_info* sDeviceManager;
+static random_sim_interface *sRandomModule;
+device_manager_info* gDeviceManager;
 
 
 typedef struct {
@@ -47,14 +48,13 @@ static status_t
 random_init_device(void* _info, void** _cookie)
 {
 	mutex_init(&sRandomLock, "/dev/random lock");
-	return gYarrowRandomModule->init();
+	return B_OK;
 }
 
 
 static void
 random_uninit_device(void* _cookie)
 {
-	gYarrowRandomModule->uninit();
 	mutex_destroy(&sRandomLock);
 }
 
@@ -73,7 +73,7 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 	TRACE("read(%Ld,, %ld)\n", position, *_numBytes);
 
 	MutexLocker locker(&sRandomLock);
-	return gYarrowRandomModule->read(_buffer, _numBytes);
+	return sRandomModule->read(_buffer, _numBytes);
 }
 
 
@@ -82,7 +82,7 @@ random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes
 {
 	TRACE("write(%Ld,, %ld)\n", position, *_numBytes);
 	MutexLocker locker(&sRandomLock);
-	return gYarrowRandomModule->write(buffer, _numBytes);
+	return sRandomModule->write(buffer, _numBytes);
 }
 
 
@@ -152,7 +152,7 @@ random_supports_device(device_node *parent)
 	const char *bus;
 
 	// make sure parent is really device root
-	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return -1;
 
 	if (strcmp(bus, "root"))
@@ -174,7 +174,7 @@ random_register_device(device_node *node)
 		{ NULL }
 	};
 
-	return sDeviceManager->register_node(node, RANDOM_DRIVER_MODULE_NAME,
+	return gDeviceManager->register_node(node, RANDOM_DRIVER_MODULE_NAME,
 		attrs, NULL, NULL);
 }
 
@@ -212,12 +212,25 @@ random_register_child_devices(void* _cookie)
 {
 	CALLED();
 	random_driver_info* info = (random_driver_info*)_cookie;
-	status_t status = sDeviceManager->publish_device(info->node, "random",
+	status_t status = gDeviceManager->publish_device(info->node, "random",
 		RANDOM_DEVICE_MODULE_NAME);
 	if (status == B_OK) {
-		sDeviceManager->publish_device(info->node, "urandom",
+		gDeviceManager->publish_device(info->node, "urandom",
 			RANDOM_DEVICE_MODULE_NAME);
 	}
+
+	// add the default Yarrow RNG
+	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
+			{ string: "Yarrow RNG" }},
+		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
+			{ string: RANDOM_FOR_CONTROLLER_MODULE_NAME }},
+		{ NULL }
+	};
+
+	device_node* node;
+	return gDeviceManager->register_node(info->node,
+		YARROW_RNG_SIM_MODULE_NAME, attrs, NULL, &node);
 
 	return status;
 }
@@ -226,10 +239,29 @@ random_register_child_devices(void* _cookie)
 //	#pragma mark -
 
 
+status_t
+random_added_device(device_node *node)
+{
+	CALLED();
+
+	void *cookie;
+
+	status_t status = gDeviceManager->get_driver(node,
+		(driver_module_info **)&sRandomModule, &cookie);
+
+	return status;
+}
+
+
+
+//	#pragma mark -
+
+
 module_dependency module_dependencies[] = {
-	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager},
+	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&gDeviceManager},
 	{}
 };
+
 
 struct device_module_info sRandomDevice = {
 	{
@@ -254,6 +286,7 @@ struct device_module_info sRandomDevice = {
 	random_deselect,
 };
 
+
 struct driver_module_info sRandomDriver = {
 	{
 		RANDOM_DRIVER_MODULE_NAME,
@@ -270,8 +303,28 @@ struct driver_module_info sRandomDriver = {
 	NULL,	// removed
 };
 
+
+random_for_controller_interface sRandomForControllerModule = {
+	{
+		{
+			RANDOM_FOR_CONTROLLER_MODULE_NAME,
+			0,
+			NULL
+		},
+
+		NULL, // supported devices
+		random_added_device,
+		NULL,
+		NULL,
+		NULL
+	}
+};
+
+
 module_info* modules[] = {
 	(module_info*)&sRandomDriver,
 	(module_info*)&sRandomDevice,
+	(module_info*)&sRandomForControllerModule,
+	(module_info*)&gYarrowRandomModule,
 	NULL
 };

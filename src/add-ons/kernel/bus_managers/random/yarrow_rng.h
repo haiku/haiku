@@ -14,12 +14,15 @@
 #include "random.h"
 
 
+#define YARROW_RNG_SIM_MODULE_NAME "bus_managers/random/yarrow_rng/device/v1"
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-extern random_module_info* gYarrowRandomModule;
+extern random_module_info gYarrowRandomModule;
 
 
 #ifdef __cplusplus

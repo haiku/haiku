@@ -12,6 +12,15 @@
 #include <thread.h>
 
 
+//#define TRACE_DRIVER
+#ifdef TRACE_DRIVER
+#	define TRACE(x...) dprintf("random: " x)
+#else
+#	define TRACE(x...) ;
+#endif
+#define CALLED() 			TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
+
+
 #define rotr32(x, n) ((((uint32)(x)) >> ((int) ((n) & 31))) | (((uint32)(x)) << ((int) ((32 - ((n) & 31))))))
 #define rotl32(x, n) ((((uint32)(x)) << ((int) ((n) & 31))) | (((uint32)(x)) >> ((int) ((32 - ((n) & 31))))))
 
@@ -335,12 +344,53 @@ yarrow_rng_write(const void *buffer, size_t *_numBytes)
 }
 
 
-random_module_info sYarrowRandomModule = {
+//	#pragma mark -
+
+
+static status_t
+yarrow_init_bus(device_node* node, void** bus_cookie)
+{
+	CALLED();
+	return yarrow_rng_init();
+}
+
+
+static void
+yarrow_uninit_bus(void* bus_cookie)
+{
+	CALLED();
+	yarrow_rng_uninit();
+}
+
+
+static void
+yarrow_bus_removed(void* bus_cookie)
+{
+	return;
+}
+
+
+//	#pragma mark -
+
+
+random_module_info gYarrowRandomModule = {
+	{
+		{
+			YARROW_RNG_SIM_MODULE_NAME,
+			0,
+			NULL
+		},
+
+		NULL, // supports_device,
+		NULL, // register_device,
+		yarrow_init_bus,
+		yarrow_uninit_bus,
+		NULL,	// register child devices
+		NULL,	// rescan
+		yarrow_bus_removed,
+	},
 	yarrow_rng_init,
 	yarrow_rng_uninit,
 	yarrow_rng_read,
 	yarrow_rng_write
 };
-
-
-random_module_info *gYarrowRandomModule = &sYarrowRandomModule;
