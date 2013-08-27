@@ -21,6 +21,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		MergeObject <libbe!$(architecture)>storage_kit.o :
 			AppFileInfo.cpp
+			CopyEngine.cpp
 			Directory.cpp
 			DriverSettings.cpp
 			Entry.cpp
