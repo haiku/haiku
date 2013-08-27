@@ -6,9 +6,10 @@
 #define __BSTRING__
 
 
-#include <BeBuild.h>
-#include <SupportDefs.h>
+#include <stdarg.h>
 #include <string.h>
+
+#include <SupportDefs.h>
 
 
 class BStringList;
@@ -55,6 +56,8 @@ public:
 			BString&		AdoptChars(BString& from, int32 charCount);
 
 			BString&		SetToFormat(const char* format, ...);
+			BString&		SetToFormatVarArgs(const char* format,
+								va_list args);
 
 			// Substring copying
 			BString&		CopyInto(BString& into, int32 fromOffset,
