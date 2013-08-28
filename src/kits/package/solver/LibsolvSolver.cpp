@@ -446,7 +446,7 @@ LibsolvSolver::Update(const BSolverPackageSpecifierList& packages,
 
 
 status_t
-LibsolvSolver::VerifyInstallation()
+LibsolvSolver::VerifyInstallation(uint32 flags)
 {
 	if (fInstalledRepository == NULL)
 		return B_BAD_VALUE;
@@ -467,6 +467,8 @@ LibsolvSolver::VerifyInstallation()
 	_SetJobsSolverMode(SOLVER_VERIFY);
 
 	_InitSolver();
+	if ((flags & B_VERIFY_ALLOW_UNINSTALL) != 0)
+		solver_set_flag(fSolver, SOLVER_FLAG_ALLOW_UNINSTALL, 1);
 	return _Solve();
 }
 

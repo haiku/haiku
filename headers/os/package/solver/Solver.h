@@ -34,6 +34,11 @@ public:
 				B_FIND_INSTALLED_ONLY		= 0x20,
 			};
 
+			// VerifyInstallation() flags
+			enum {
+				B_VERIFY_ALLOW_UNINSTALL	= 0x01,
+			};
+
 public:
 	virtual						~BSolver();
 
@@ -67,7 +72,7 @@ public:
 									bool installNotYetInstalled,
 									const BSolverPackageSpecifier** _unmatched
 										= NULL) = 0;
-	virtual	status_t			VerifyInstallation() = 0;
+	virtual	status_t			VerifyInstallation(uint32 flags = 0) = 0;
 
 			bool				HasProblems() const
 									{ return CountProblems() > 0; }

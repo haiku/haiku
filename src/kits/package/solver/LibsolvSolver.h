@@ -57,7 +57,7 @@ public:
 									bool installNotYetInstalled,
 									const BSolverPackageSpecifier** _unmatched
 										= NULL);
-	virtual	status_t			VerifyInstallation();
+	virtual	status_t			VerifyInstallation(uint32 flags = 0);
 
 	virtual	int32				CountProblems() const;
 	virtual	BSolverProblem*		ProblemAt(int32 index) const;
