@@ -309,6 +309,28 @@ BSolverRepository::AddPackages(BPackageInstallationLocation location)
 }
 
 
+bool
+BSolverRepository::RemovePackage(BSolverPackage* package)
+{
+	if (!fPackages.RemoveItem(package, false))
+		return false;
+
+	fChangeCount++;
+	return true;
+}
+
+
+bool
+BSolverRepository::DeletePackage(BSolverPackage* package)
+{
+	if (!RemovePackage(package))
+		return false;
+
+	delete package;
+	return true;
+}
+
+
 uint64
 BSolverRepository::ChangeCount() const
 {

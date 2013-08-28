@@ -65,6 +65,8 @@ public:
 									BSolverPackage** _package = NULL);
 			status_t			AddPackages(
 									BPackageInstallationLocation location);
+			bool				RemovePackage(BSolverPackage* package);
+			bool				DeletePackage(BSolverPackage* package);
 
 			uint64				ChangeCount() const;
 
