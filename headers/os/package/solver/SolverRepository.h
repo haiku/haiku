@@ -37,7 +37,7 @@ public:
 								BSolverRepository(BAllInstallationLocations);
 								BSolverRepository(
 									const BRepositoryConfig& config);
-								~BSolverRepository();
+	virtual						~BSolverRepository();
 
 			status_t			SetTo(const BString& name);
 			status_t			SetTo(BPackageInstallationLocation location);
