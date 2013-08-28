@@ -116,11 +116,11 @@ ListReposCommand::Execute(int argc, const char* const* argv)
 					repoCache.Info().Summary().String());
 				printf("\t\tarch:      %s\n", BPackageInfo::kArchitectureNames[
 						repoCache.Info().Architecture()]);
-				printf("\t\tpkg-count: %lu\n", repoCache.CountPackages());
+				printf("\t\tpkg-count: %" B_PRIu32 "\n",
+					repoCache.CountPackages());
 				printf("\t\torig-url:  %s\n",
 					repoCache.Info().OriginalBaseURL().String());
 				printf("\t\torig-prio: %u\n", repoCache.Info().Priority());
-
 			} else
 				printf("\t\t<no repository cache found>\n");
 		}
