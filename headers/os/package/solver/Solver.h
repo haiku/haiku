@@ -30,7 +30,8 @@ public:
 				B_FIND_IN_NAME				= 0x02,
 				B_FIND_IN_SUMMARY			= 0x04,
 				B_FIND_IN_DESCRIPTION		= 0x08,
-				B_FIND_IN_PROVIDES			= 0x10
+				B_FIND_IN_PROVIDES			= 0x10,
+				B_FIND_INSTALLED_ONLY		= 0x20,
 			};
 
 public:
@@ -46,6 +47,12 @@ public:
 	virtual	status_t			FindPackages(const char* searchString,
 									uint32 flags,
 									BObjectList<BSolverPackage>& _packages) = 0;
+	virtual	status_t			FindPackages(
+									const BSolverPackageSpecifierList& packages,
+									uint32 flags,
+									BObjectList<BSolverPackage>& _packages,
+									const BSolverPackageSpecifier** _unmatched
+										= NULL) = 0;
 
 	virtual	status_t			Install(
 									const BSolverPackageSpecifierList& packages,

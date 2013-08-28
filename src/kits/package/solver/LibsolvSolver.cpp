@@ -300,21 +300,37 @@ LibsolvSolver::FindPackages(const char* searchString, uint32 flags,
 			queue_push2(&selection, SOLVER_SOLVABLE, iterator.solvid);
 	}
 
-	// get solvables
-	SolvQueue solvables;
-	selection_solvables(fPool, &selection, &solvables);
+	return _GetFoundPackages(selection, flags, _packages);
+}
 
-	// get packages
-	for (int i = 0; i < solvables.count; i++) {
-		BSolverPackage* package = _GetPackage(solvables.elements[i]);
-		if (package == NULL)
-			return B_ERROR;
 
-		if (!_packages.AddItem(package))
-			return B_NO_MEMORY;
-	}
+status_t
+LibsolvSolver::FindPackages(const BSolverPackageSpecifierList& packages,
+	uint32 flags, BObjectList<BSolverPackage>& _packages,
+	const BSolverPackageSpecifier** _unmatched)
+{
+	if (_unmatched != NULL)
+		*_unmatched = NULL;
 
-	return B_OK;
+	if ((flags & B_FIND_INSTALLED_ONLY) != 0 && fInstalledRepository == NULL)
+		return B_BAD_VALUE;
+
+	// add repositories to pool
+	status_t error = _AddRepositories();
+	if (error != B_OK)
+		return error;
+
+	error = _InitJobQueue();
+	if (error != B_OK)
+		return error;
+
+	// add the package specifies to the job queue
+	error = _AddSpecifiedPackages(packages, _unmatched,
+		(flags & B_FIND_INSTALLED_ONLY) != 0 ? SELECTION_INSTALLED_ONLY : 0);
+	if (error != B_OK)
+		return error;
+
+	return _GetFoundPackages(*fJobs, flags, _packages);
 }
 
 
@@ -1248,6 +1264,35 @@ LibsolvSolver::_GetResolvableExpression(Id id,
 		return error == B_BAD_DATA ? B_NOT_SUPPORTED : error;
 
 	_expression.SetTo(name, op, version);
+	return B_OK;
+}
+
+
+status_t
+LibsolvSolver::_GetFoundPackages(SolvQueue& selection, uint32 flags,
+	BObjectList<BSolverPackage>& _packages)
+{
+	// get solvables
+	SolvQueue solvables;
+	selection_solvables(fPool, &selection, &solvables);
+
+	// get packages
+	for (int i = 0; i < solvables.count; i++) {
+		BSolverPackage* package = _GetPackage(solvables.elements[i]);
+		if (package == NULL)
+			return B_ERROR;
+
+		// TODO: Fix handling of SELECTION_INSTALLED_ONLY in libsolv. Despite
+		// passing the flag, we get solvables that aren't installed.
+		if ((flags & B_FIND_INSTALLED_ONLY) != 0
+			&& package->Repository() != fInstalledRepository->Repository()) {
+			continue;
+		}
+
+		if (!_packages.AddItem(package))
+			return B_NO_MEMORY;
+	}
+
 	return B_OK;
 }
 

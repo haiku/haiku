@@ -37,6 +37,12 @@ public:
 	virtual	status_t			FindPackages(const char* searchString,
 									uint32 flags,
 									BObjectList<BSolverPackage>& _packages);
+	virtual	status_t			FindPackages(
+									const BSolverPackageSpecifierList& packages,
+									uint32 flags,
+									BObjectList<BSolverPackage>& _packages,
+									const BSolverPackageSpecifier** _unmatched
+										= NULL);
 
 	virtual	status_t			Install(
 									const BSolverPackageSpecifierList& packages,
@@ -107,6 +113,10 @@ private:
 			status_t			_GetResolvableExpression(Id id,
 									BPackageResolvableExpression& _expression)
 									const;
+
+			status_t			_GetFoundPackages(SolvQueue& selection,
+									uint32 flags,
+									BObjectList<BSolverPackage>& _packages);
 
 			status_t			_Solve();
 			void				_SetJobsSolverMode(int solverMode);
