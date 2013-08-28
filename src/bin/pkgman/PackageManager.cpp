@@ -76,10 +76,14 @@ PackageManager::RemoteRepository::Config() const
 // #pragma mark - InstalledRepository
 
 
-PackageManager::InstalledRepository::InstalledRepository()
+PackageManager::InstalledRepository::InstalledRepository(const char* name,
+	BPackageInstallationLocation location, int32 priority)
 	:
 	BSolverRepository(),
-	fDisabledPackages(10, true)
+	fDisabledPackages(10, true),
+	fInitialName(name),
+	fLocation(location),
+	fInitialPriority(priority)
 {
 }
 
@@ -115,9 +119,12 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 	:
 	fLocation(location),
 	fSolver(NULL),
-	fSystemRepository(new (std::nothrow) InstalledRepository),
-	fCommonRepository(new (std::nothrow) InstalledRepository),
-	fHomeRepository(new (std::nothrow) InstalledRepository),
+	fSystemRepository(new (std::nothrow) InstalledRepository("system",
+		B_PACKAGE_INSTALLATION_LOCATION_SYSTEM, -1)),
+	fCommonRepository(new (std::nothrow) InstalledRepository("common",
+		B_PACKAGE_INSTALLATION_LOCATION_COMMON, -2)),
+	fHomeRepository(new (std::nothrow) InstalledRepository("home",
+		B_PACKAGE_INSTALLATION_LOCATION_HOME, -3)),
 	fInstalledRepositories(10),
 	fOtherRepositories(10, true),
 	fDecisionProvider(),
@@ -145,29 +152,13 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 		// one. Instead any requirement that is already installed in a more
 		// general installation location will turn up as to be installed as
 		// well. But we can easily filter those out.
-		RepositoryBuilder(*fSystemRepository, "system")
-			.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_SYSTEM, "system")
-			.AddToSolver(fSolver, false);
-		fSystemRepository->SetPriority(-1);
+		_AddInstalledRepository(fSystemRepository);
 
-		bool installInHome = location == B_PACKAGE_INSTALLATION_LOCATION_HOME;
-		RepositoryBuilder(*fCommonRepository, "common")
-			.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_COMMON, "common")
-			.AddToSolver(fSolver, !installInHome);
+		if (!fSystemRepository->IsInstalled()) {
+			_AddInstalledRepository(fCommonRepository);
 
-		if (!fInstalledRepositories.AddItem(fSystemRepository)
-			|| !fInstalledRepositories.AddItem(fCommonRepository)) {
-			DIE(B_NO_MEMORY, "failed to add installed repositories to list");
-		}
-
-		if (installInHome) {
-			fCommonRepository->SetPriority(-2);
-			RepositoryBuilder(*fHomeRepository, "home")
-				.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_HOME, "home")
-				.AddToSolver(fSolver, true);
-
-			if (!fInstalledRepositories.AddItem(fHomeRepository))
-				DIE(B_NO_MEMORY, "failed to add home repository to list");
+			if (!fCommonRepository->IsInstalled())
+				_AddInstalledRepository(fHomeRepository);
 		}
 	}
 
@@ -639,4 +630,18 @@ PackageManager::_FindBasePackage(const PackageList& packages,
 	}
 
 	return -1;
+}
+
+
+void
+PackageManager::_AddInstalledRepository(InstalledRepository* repository)
+{
+	const char* name = repository->InitialName();
+	RepositoryBuilder(*repository, name)
+		.AddPackages(repository->Location(), name)
+		.AddToSolver(fSolver, repository->Location() == fLocation);
+	repository->SetPriority(repository->InitialPriority());
+
+	if (!fInstalledRepositories.AddItem(repository))
+		DIE(B_NO_MEMORY, "failed to add %s repository to list", name);
 }

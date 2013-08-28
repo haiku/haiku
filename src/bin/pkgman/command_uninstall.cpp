@@ -35,6 +35,9 @@ static const char* const kLongUsage =
 	"  -H, --home\n"
 	"    Uninstall the packages from the user's home directory. Default is to\n"
 	"    uninstall from the common directory.\n"
+	"  -S, --system\n"
+	"    Uninstall the packages from the system directory. Default is to\n"
+	"    uninstall from the common directory.\n"
 	"\n";
 
 
@@ -45,17 +48,19 @@ DEFINE_COMMAND(UninstallCommand, "uninstall", kShortUsage, kLongUsage,
 int
 UninstallCommand::Execute(int argc, const char* const* argv)
 {
-	bool uninstallFromHome = false;
+	BPackageInstallationLocation location
+		= B_PACKAGE_INSTALLATION_LOCATION_COMMON;
 
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "help", no_argument, 0, 'h' },
 			{ "home", no_argument, 0, 'H' },
+			{ "system", no_argument, 0, 'S' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "hH", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "hHS", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -65,7 +70,11 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 				break;
 
 			case 'H':
-				uninstallFromHome = true;
+				location = B_PACKAGE_INSTALLATION_LOCATION_HOME;
+				break;
+
+			case 'S':
+				location = B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 				break;
 
 			default:
@@ -82,9 +91,6 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 	const char* const* packages = argv + optind;
 
 	// perform the installation
-	BPackageInstallationLocation location = uninstallFromHome
-		? B_PACKAGE_INSTALLATION_LOCATION_HOME
-		: B_PACKAGE_INSTALLATION_LOCATION_COMMON;
 	PackageManager packageManager(location,
 		PackageManager::ADD_INSTALLED_REPOSITORIES);
 	packageManager.Uninstall(packages, packageCount);

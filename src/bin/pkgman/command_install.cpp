@@ -35,6 +35,9 @@ static const char* const kLongUsage =
 	"  -H, --home\n"
 	"    Install the packages in the user's home directory. Default is to\n"
 	"    install in the common directory.\n"
+	"  -S, --system\n"
+	"    Install the packages in the system directory. Default is to\n"
+	"    install in the common directory.\n"
 	"\n";
 
 
@@ -45,17 +48,19 @@ DEFINE_COMMAND(InstallCommand, "install", kShortUsage, kLongUsage,
 int
 InstallCommand::Execute(int argc, const char* const* argv)
 {
-	bool installInHome = false;
+	BPackageInstallationLocation location
+		= B_PACKAGE_INSTALLATION_LOCATION_COMMON;
 
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "help", no_argument, 0, 'h' },
 			{ "home", no_argument, 0, 'H' },
+			{ "system", no_argument, 0, 'S' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "hH", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "hHS", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -65,7 +70,11 @@ InstallCommand::Execute(int argc, const char* const* argv)
 				break;
 
 			case 'H':
-				installInHome = true;
+				location = B_PACKAGE_INSTALLATION_LOCATION_HOME;
+				break;
+
+			case 'S':
+				location = B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 				break;
 
 			default:
@@ -82,9 +91,6 @@ InstallCommand::Execute(int argc, const char* const* argv)
 	const char* const* packages = argv + optind;
 
 	// perform the installation
-	BPackageInstallationLocation location = installInHome
-		? B_PACKAGE_INSTALLATION_LOCATION_HOME
-		: B_PACKAGE_INSTALLATION_LOCATION_COMMON;
 	PackageManager packageManager(location,
 		PackageManager::ADD_INSTALLED_REPOSITORIES
 			| PackageManager::ADD_REMOTE_REPOSITORIES

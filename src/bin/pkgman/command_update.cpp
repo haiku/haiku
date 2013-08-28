@@ -36,6 +36,9 @@ static const char* const kLongUsage =
 	"  -H, --home\n"
 	"    Update the packages in the user's home directory. Default is to\n"
 	"    update in the common directory.\n"
+	"  -S, --system\n"
+	"    Update the packages in the system directory. Default is to\n"
+	"    update in the common directory.\n"
 	"\n";
 
 
@@ -46,17 +49,19 @@ DEFINE_COMMAND(UpdateCommand, "update", kShortUsage, kLongUsage,
 int
 UpdateCommand::Execute(int argc, const char* const* argv)
 {
-	bool installInHome = false;
+	BPackageInstallationLocation location
+		= B_PACKAGE_INSTALLATION_LOCATION_COMMON;
 
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "help", no_argument, 0, 'h' },
 			{ "home", no_argument, 0, 'H' },
+			{ "system", no_argument, 0, 'S' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "hu", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "hHS", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -66,7 +71,11 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 				break;
 
 			case 'H':
-				installInHome = true;
+				location = B_PACKAGE_INSTALLATION_LOCATION_HOME;
+				break;
+
+			case 'S':
+				location = B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 				break;
 
 			default:
@@ -80,9 +89,6 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 	const char* const* packages = argv + optind;
 
 	// perform the update
-	BPackageInstallationLocation location = installInHome
-		? B_PACKAGE_INSTALLATION_LOCATION_HOME
-		: B_PACKAGE_INSTALLATION_LOCATION_COMMON;
 	PackageManager packageManager(location,
 		PackageManager::ADD_INSTALLED_REPOSITORIES
 			| PackageManager::ADD_REMOTE_REPOSITORIES

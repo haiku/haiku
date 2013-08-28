@@ -80,6 +80,9 @@ private:
 			int32				_FindBasePackage(const PackageList& packages,
 									const BPackageInfo& info) const;
 
+			void				_AddInstalledRepository(
+									InstalledRepository* repository);
+
 private:
 			BPackageInstallationLocation fLocation;
 			BSolver*			fSolver;
@@ -110,7 +113,16 @@ private:
 
 
 struct PackageManager::InstalledRepository : public BSolverRepository {
-								InstalledRepository();
+								InstalledRepository(const char* name,
+									BPackageInstallationLocation location,
+									int32 priority);
+
+			BPackageInstallationLocation Location() const
+									{ return fLocation; }
+			const char*			InitialName() const
+									{ return fInitialName; }
+			int32				InitialPriority() const
+									{ return fInitialPriority; }
 
 			void				DisablePackage(BSolverPackage* package);
 
@@ -119,6 +131,9 @@ private:
 
 private:
 			PackageList			fDisabledPackages;
+			const char*			fInitialName;
+			BPackageInstallationLocation fLocation;
+			int32				fInitialPriority;
 };
 
 
