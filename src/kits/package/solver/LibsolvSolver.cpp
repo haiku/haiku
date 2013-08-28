@@ -300,7 +300,7 @@ LibsolvSolver::FindPackages(const char* searchString, uint32 flags,
 			queue_push2(&selection, SOLVER_SOLVABLE, iterator.solvid);
 	}
 
-	// get solvables	
+	// get solvables
 	SolvQueue solvables;
 	selection_solvables(fPool, &selection, &solvables);
 
@@ -817,12 +817,12 @@ LibsolvSolver::_AddSpecifiedPackages(
 				queue_push2(fJobs, SOLVER_SOLVABLE, solvableId);
 				break;
 			}
-			
+
 			case BSolverPackageSpecifier::B_SELECT_STRING:
 			{
 				// find matching packages
 				SolvQueue matchingPackages;
-		
+
 				int flags = SELECTION_NAME | SELECTION_PROVIDES | SELECTION_GLOB
 					| SELECTION_CANON | SELECTION_DOTARCH | SELECTION_REL
 					| additionalFlags;
@@ -834,7 +834,7 @@ LibsolvSolver::_AddSpecifiedPackages(
 					return B_NAME_NOT_FOUND;
 				}
 // TODO: We might want to add support for restricting to certain repositories.
-#if 0		
+#if 0
 				// restrict to the matching repository
 				if (BSolverRepository* repository = specifier.Repository()) {
 					RepositoryInfo* repositoryInfo
