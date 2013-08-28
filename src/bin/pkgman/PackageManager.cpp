@@ -31,10 +31,10 @@
 using namespace BPackageKit::BPrivate;
 
 
-// #pragma mark - Repository
+// #pragma mark - RemoteRepository
 
 
-PackageManager::Repository::Repository()
+PackageManager::RemoteRepository::RemoteRepository()
 	:
 	BSolverRepository()
 {
@@ -42,8 +42,8 @@ PackageManager::Repository::Repository()
 
 
 status_t
-PackageManager::Repository::Init(BPackageRoster& roster, BContext& context,
-	const char* name, bool refresh)
+PackageManager::RemoteRepository::Init(BPackageRoster& roster,
+	BContext& context, const char* name, bool refresh)
 {
 	// get the repository config
 	status_t error = roster.GetRepositoryConfig(name, &fConfig);
@@ -67,9 +67,43 @@ PackageManager::Repository::Init(BPackageRoster& roster, BContext& context,
 
 
 const BRepositoryConfig&
-PackageManager::Repository::Config() const
+PackageManager::RemoteRepository::Config() const
 {
 	return fConfig;
+}
+
+
+// #pragma mark - InstalledRepository
+
+
+PackageManager::InstalledRepository::InstalledRepository()
+	:
+	BSolverRepository(),
+	fDisabledPackages(10, true)
+{
+}
+
+
+void
+PackageManager::InstalledRepository::DisablePackage(BSolverPackage* package)
+{
+	if (fDisabledPackages.HasItem(package)) {
+		fprintf(stderr, "*** package %s already disabled\n",
+			package->VersionedName().String());
+		exit(1);
+	}
+
+	if (package->Repository() != this) {
+		fprintf(stderr, "*** package %s not in repository %s\n",
+			package->VersionedName().String(), Name().String());
+		exit(1);
+	}
+
+	// move to disabled list
+	if (!fDisabledPackages.AddItem(package))
+		DIE(B_NO_MEMORY, "*** failed to add package to list");
+
+	RemovePackage(package);
 }
 
 
@@ -81,9 +115,9 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 	:
 	fLocation(location),
 	fSolver(NULL),
-	fSystemRepository(),
-	fCommonRepository(),
-	fHomeRepository(),
+	fSystemRepository(new (std::nothrow) InstalledRepository),
+	fCommonRepository(new (std::nothrow) InstalledRepository),
+	fHomeRepository(new (std::nothrow) InstalledRepository),
 	fInstalledRepositories(10),
 	fOtherRepositories(10, true),
 	fDecisionProvider(),
@@ -94,6 +128,11 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 	status_t error = BSolver::Create(fSolver);
 	if (error != B_OK)
 		DIE(error, "failed to create solver");
+
+	if (fSystemRepository == NULL || fCommonRepository == NULL
+		|| fHomeRepository == NULL) {
+		DIE(B_NO_MEMORY, "failed to create repositories");
+	}
 
 	// add installation location repositories
 	if ((flags & ADD_INSTALLED_REPOSITORIES) != 0) {
@@ -106,28 +145,28 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 		// one. Instead any requirement that is already installed in a more
 		// general installation location will turn up as to be installed as
 		// well. But we can easily filter those out.
-		RepositoryBuilder(fSystemRepository, "system")
+		RepositoryBuilder(*fSystemRepository, "system")
 			.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_SYSTEM, "system")
 			.AddToSolver(fSolver, false);
-		fSystemRepository.SetPriority(-1);
+		fSystemRepository->SetPriority(-1);
 
 		bool installInHome = location == B_PACKAGE_INSTALLATION_LOCATION_HOME;
-		RepositoryBuilder(fCommonRepository, "common")
+		RepositoryBuilder(*fCommonRepository, "common")
 			.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_COMMON, "common")
 			.AddToSolver(fSolver, !installInHome);
-	
-		if (!fInstalledRepositories.AddItem(&fSystemRepository)
-			|| !fInstalledRepositories.AddItem(&fCommonRepository)) {
+
+		if (!fInstalledRepositories.AddItem(fSystemRepository)
+			|| !fInstalledRepositories.AddItem(fCommonRepository)) {
 			DIE(B_NO_MEMORY, "failed to add installed repositories to list");
 		}
-	
+
 		if (installInHome) {
-			fCommonRepository.SetPriority(-2);
-			RepositoryBuilder(fHomeRepository, "home")
+			fCommonRepository->SetPriority(-2);
+			RepositoryBuilder(*fHomeRepository, "home")
 				.AddPackages(B_PACKAGE_INSTALLATION_LOCATION_HOME, "home")
 				.AddToSolver(fSolver, true);
-	
-			if (!fInstalledRepositories.AddItem(&fHomeRepository))
+
+			if (!fInstalledRepositories.AddItem(fHomeRepository))
 				DIE(B_NO_MEMORY, "failed to add home repository to list");
 		}
 	}
@@ -142,7 +181,7 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 	
 		int32 repositoryNameCount = repositoryNames.CountStrings();
 		for (int32 i = 0; i < repositoryNameCount; i++) {
-			Repository* repository = new(std::nothrow) Repository;
+			RemoteRepository* repository = new(std::nothrow) RemoteRepository;
 			if (repository == NULL || !fOtherRepositories.AddItem(repository))
 				DIE(B_NO_MEMORY, "failed to create/add repository object");
 	
@@ -166,6 +205,9 @@ PackageManager::PackageManager(BPackageInstallationLocation location,
 
 PackageManager::~PackageManager()
 {
+	delete fSystemRepository;
+	delete fCommonRepository;
+	delete fHomeRepository;
 }
 
 
@@ -201,7 +243,7 @@ PackageManager::Install(const char* const* packages, int packageCount)
 void
 PackageManager::Uninstall(const char* const* packages, int packageCount)
 {
-	// solve
+	// find the packages that match the specification
 	BSolverPackageSpecifierList packagesToUninstall;
 	for (int i = 0; i < packageCount; i++) {
 		if (!packagesToUninstall.AppendSpecifier(packages[i]))
@@ -209,8 +251,9 @@ PackageManager::Uninstall(const char* const* packages, int packageCount)
 	}
 
 	const BSolverPackageSpecifier* unmatchedSpecifier;
-	status_t error = fSolver->Uninstall(packagesToUninstall,
-		&unmatchedSpecifier);
+	PackageList foundPackages;
+	status_t error = fSolver->FindPackages(packagesToUninstall,
+		BSolver::B_FIND_INSTALLED_ONLY, foundPackages, &unmatchedSpecifier);
 	if (error != B_OK) {
 		if (unmatchedSpecifier != NULL) {
 			DIE(error, "failed to find a match for \"%s\"",
@@ -219,10 +262,44 @@ PackageManager::Uninstall(const char* const* packages, int packageCount)
 			DIE(error, "failed to compute packages to uninstall");
 	}
 
+	// determine the inverse base package closure for the found packages
+	InstalledRepository* installationRepository
+		= dynamic_cast<InstalledRepository*>(
+			foundPackages.ItemAt(0)->Repository());
+	bool foundAnotherPackage;
+	do {
+		foundAnotherPackage = false;
+		int32 count = installationRepository->CountPackages();
+		for (int32 i = 0; i < count; i++) {
+			BSolverPackage* package = installationRepository->PackageAt(i);
+			if (foundPackages.HasItem(package))
+				continue;
+
+			if (_FindBasePackage(foundPackages, package->Info()) >= 0) {
+				foundPackages.AddItem(package);
+				foundAnotherPackage = true;
+			}
+		}
+	} while (foundAnotherPackage);
+
+	// remove the packages from the repository
+	for (int32 i = 0; BSolverPackage* package = foundPackages.ItemAt(i); i++)
+		installationRepository->DisablePackage(package);
+
+	error = fSolver->VerifyInstallation(BSolver::B_VERIFY_ALLOW_UNINSTALL);
+	if (error != B_OK)
+		DIE(error, "failed to compute packages to uninstall");
+
 	_HandleProblems();
 
 	// install/uninstall packages
 	_AnalyzeResult();
+
+	for (int32 i = foundPackages.CountItems() - 1; i >= 0; i--) {
+		if (!fPackagesToDeactivate.AddItem(foundPackages.ItemAt(i)))
+			DIE(B_NO_MEMORY, "failed to add package to uninstall");
+	}
+
 	_PrintResult();
 	_ApplyPackageChanges();
 }
@@ -342,7 +419,8 @@ PackageManager::_AnalyzeResult()
 			case BSolverResultElement::B_TYPE_INSTALL:
 			{
 				PackageList& packageList
-					= fInstalledRepositories.HasItem(package->Repository())
+					= dynamic_cast<InstalledRepository*>(package->Repository())
+							!= NULL
 						? potentialBasePackages
 						: fPackagesToActivate;
 				if (!packageList.AddItem(package))
@@ -355,11 +433,6 @@ PackageManager::_AnalyzeResult()
 					DIE(B_NO_MEMORY, "failed to add package to deactivate");
 				break;
 		}
-	}
-
-	if (fPackagesToActivate.IsEmpty() && fPackagesToDeactivate.IsEmpty()) {
-		printf("Nothing to do.\n");
-		exit(0);
 	}
 
 	// Make sure base packages are installed in the same location.
@@ -379,6 +452,11 @@ PackageManager::_AnalyzeResult()
 void
 PackageManager::_PrintResult()
 {
+	if (fPackagesToActivate.IsEmpty() && fPackagesToDeactivate.IsEmpty()) {
+		printf("Nothing to do.\n");
+		exit(0);
+	}
+
 	printf("The following changes will be made:\n");
 	for (int32 i = 0; BSolverPackage* package = fPackagesToActivate.ItemAt(i);
 		i++) {
@@ -419,8 +497,6 @@ PackageManager::_ApplyPackageChanges()
 	for (int32 i = 0; BSolverPackage* package = fPackagesToActivate.ItemAt(i);
 		i++) {
 		// get package URL and target entry
-		Repository* repository
-			= static_cast<Repository*>(package->Repository());
 
 		BString fileName(package->Info().CanonicalFileName());
 		if (fileName.IsEmpty())
@@ -431,12 +507,16 @@ PackageManager::_ApplyPackageChanges()
 		if (error != B_OK)
 			DIE(error, "failed to create package entry");
 
-		if (fInstalledRepositories.HasItem(repository)) {
+		RemoteRepository* remoteRepository
+			= dynamic_cast<RemoteRepository*>(package->Repository());
+		if (remoteRepository == NULL) {
 			// clone the existing package
-			_ClonePackageFile(repository, fileName, entry);
+			_ClonePackageFile(
+				dynamic_cast<InstalledRepository*>(package->Repository()),
+				fileName, entry);
 		} else {
 			// download the package
-			BString url = repository->Config().PackagesURL();
+			BString url = remoteRepository->Config().PackagesURL();
 			url << '/' << fileName;
 
 			DownloadFileRequest downloadRequest(fContext, url, entry,
@@ -486,14 +566,14 @@ PackageManager::_ApplyPackageChanges()
 
 
 void
-PackageManager::_ClonePackageFile(Repository* repository,
+PackageManager::_ClonePackageFile(InstalledRepository* repository,
 	const BString& fileName, const BEntry& entry) const
 {
 	// get the source and destination file paths
 	directory_which packagesWhich;
-	if (repository == &fSystemRepository) {
+	if (repository == fSystemRepository) {
 		packagesWhich = B_SYSTEM_PACKAGES_DIRECTORY;
-	} else if (repository == &fCommonRepository) {
+	} else if (repository == fCommonRepository) {
 		packagesWhich = B_COMMON_PACKAGES_DIRECTORY;
 	} else {
 		fprintf(stderr, "*** don't know packages directory path for "

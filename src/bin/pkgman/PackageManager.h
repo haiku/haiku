@@ -26,8 +26,10 @@ using namespace BPackageKit;
 
 class PackageManager {
 public:
-			struct Repository;
-			typedef BObjectList<Repository> RepositoryList;
+			struct RemoteRepository;
+			struct InstalledRepository;
+			typedef BObjectList<RemoteRepository> RemoteRepositoryList;
+			typedef BObjectList<InstalledRepository> InstalledRepositoryList;
 
 			enum {
 				ADD_INSTALLED_REPOSITORIES	= 0x01,
@@ -44,15 +46,15 @@ public:
 			BSolver*			Solver() const
 									{ return fSolver; }
 
-			const BSolverRepository* SystemRepository() const
-									{ return &fSystemRepository; }
-			const BSolverRepository* CommonRepository() const
-									{ return &fCommonRepository; }
-			const BSolverRepository* HomeRepository() const
-									{ return &fHomeRepository; }
-			const BObjectList<BSolverRepository>& InstalledRepositories() const
+			const InstalledRepository* SystemRepository() const
+									{ return fSystemRepository; }
+			const InstalledRepository* CommonRepository() const
+									{ return fCommonRepository; }
+			const InstalledRepository* HomeRepository() const
+									{ return fHomeRepository; }
+			const InstalledRepositoryList& InstalledRepositories() const
 									{ return fInstalledRepositories; }
-			const RepositoryList& OtherRepositories() const
+			const RemoteRepositoryList& OtherRepositories() const
 									{ return fOtherRepositories; }
 
 			void				Install(const char* const* packages,
@@ -71,7 +73,8 @@ private:
 			void				_PrintResult();
 			void				_ApplyPackageChanges();
 
-			void				_ClonePackageFile(Repository* repository,
+			void				_ClonePackageFile(
+									InstalledRepository* repository,
 									const BString& fileName,
 							 		const BEntry& entry) const;
 			int32				_FindBasePackage(const PackageList& packages,
@@ -80,11 +83,11 @@ private:
 private:
 			BPackageInstallationLocation fLocation;
 			BSolver*			fSolver;
-			BSolverRepository	fSystemRepository;
-			BSolverRepository	fCommonRepository;
-			BSolverRepository	fHomeRepository;
-			BObjectList<BSolverRepository> fInstalledRepositories;
-			RepositoryList		fOtherRepositories;
+			InstalledRepository* fSystemRepository;
+			InstalledRepository* fCommonRepository;
+			InstalledRepository* fHomeRepository;
+			InstalledRepositoryList fInstalledRepositories;
+			RemoteRepositoryList fOtherRepositories;
 			DecisionProvider	fDecisionProvider;
 			JobStateListener	fJobStateListener;
 			BContext			fContext;
@@ -93,8 +96,8 @@ private:
 };
 
 
-struct PackageManager::Repository : public BSolverRepository {
-								Repository();
+struct PackageManager::RemoteRepository : public BSolverRepository {
+								RemoteRepository();
 
 			status_t			Init(BPackageRoster& roster, BContext& context,
 									const char* name, bool refresh);
@@ -103,6 +106,19 @@ struct PackageManager::Repository : public BSolverRepository {
 
 private:
 			BRepositoryConfig	fConfig;
+};
+
+
+struct PackageManager::InstalledRepository : public BSolverRepository {
+								InstalledRepository();
+
+			void				DisablePackage(BSolverPackage* package);
+
+private:
+			typedef BObjectList<BSolverPackage> PackageList;
+
+private:
+			PackageList			fDisabledPackages;
 };
 
 

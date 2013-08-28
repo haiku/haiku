@@ -86,8 +86,7 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 		? B_PACKAGE_INSTALLATION_LOCATION_HOME
 		: B_PACKAGE_INSTALLATION_LOCATION_COMMON;
 	PackageManager packageManager(location,
-		PackageManager::ADD_INSTALLED_REPOSITORIES
-			| PackageManager::ADD_REMOTE_REPOSITORIES);
+		PackageManager::ADD_INSTALLED_REPOSITORIES);
 	packageManager.Uninstall(packages, packageCount);
 
 	return 0;
