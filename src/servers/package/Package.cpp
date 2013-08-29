@@ -65,5 +65,8 @@ Package::Init(const entry_ref& entryRef)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
+	if (fFileName != fInfo.CanonicalFileName())
+		fInfo.SetFileName(fFileName);
+
 	return B_OK;
 }
