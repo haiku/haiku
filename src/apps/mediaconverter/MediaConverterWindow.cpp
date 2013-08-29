@@ -44,6 +44,7 @@
 
 
 static const unsigned int kMinSourceWidth = 12;
+static const unsigned int kQualitySliderWidth = 28;
 static const unsigned int kDurationWidth = 10;
 
 
@@ -211,6 +212,8 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 		new BMessage(VIDEO_QUALITY_CHANGED_MESSAGE));
 	fVideoQualitySlider->SetValue(fVideoQuality);
 	fVideoQualitySlider->SetEnabled(false);
+	fVideoQualitySlider->SetExplicitSize(BSize(padding * kQualitySliderWidth,
+		B_SIZE_UNSET));
 
 	// audio quality
 	fAudioQualitySlider = new BSlider("ASlider", "" ,
@@ -219,6 +222,8 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 		new BMessage(AUDIO_QUALITY_CHANGED_MESSAGE));
 	fAudioQualitySlider->SetValue(fAudioQuality);
 	fAudioQualitySlider->SetEnabled(false);
+	fAudioQualitySlider->SetExplicitSize(BSize(padding * kQualitySliderWidth,
+		B_SIZE_UNSET));
 
 	// output format box
 	BView* outputGrid = BLayoutBuilder::Grid<>()
