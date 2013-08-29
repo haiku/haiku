@@ -142,10 +142,10 @@ ZlibDecompressor::DecompressSingleBuffer(const void* input, size_t inputSize,
 	// prepare stream
 	z_stream zStream = {
 		(Bytef*)input,				// next_in
-		inputSize,					// avail_in
+		uInt(inputSize),			// avail_in
 		0,							// total_in
 		(Bytef*)output,				// next_out
-		outputSize,					// avail_out
+		uInt(outputSize),			// avail_out
 		0,							// total_out
 		0,							// msg
 		0,							// state;
