@@ -226,6 +226,8 @@ if $(HAIKU_ATA_STACK) = 1 {
 		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
 }
 
+AddFilesToHaikuImage system add-ons kernel busses random
+	: virtio_rng ;
 AddFilesToHaikuImage system add-ons kernel busses scsi
 	: ahci virtio_scsi ;
 AddFilesToHaikuImage system add-ons kernel busses usb
