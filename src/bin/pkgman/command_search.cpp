@@ -60,7 +60,7 @@ get_terminal_width()
     struct winsize windowSize;
 	if (isatty(fd) == 1 && ioctl(fd, TIOCGWINSZ, &windowSize) == 0)
 		return windowSize.ws_col;
-	
+
     return INT_MAX;
 }
 
@@ -185,11 +185,14 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		BSolverPackage* package = packages.ItemAt(i);
 
 		const char* installed = "";
-		if (package->Repository() == packageManager.SystemRepository())
+		if (package->Repository() == static_cast<const BSolverRepository*>(
+				packageManager.SystemRepository()))
 			installed = "system";
-		else if (package->Repository() == packageManager.CommonRepository())
+		else if (package->Repository() == static_cast<const BSolverRepository*>(
+				packageManager.CommonRepository()))
 			installed = "common";
-		else if (package->Repository() == packageManager.HomeRepository())
+		else if (package->Repository() == static_cast<const BSolverRepository*>(
+				packageManager.HomeRepository()))
 			installed = "home";
 
 		printf("%-*s  %-*s  %-*.*s\n",
