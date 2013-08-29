@@ -1,8 +1,9 @@
 // Copyright 1999, Be Incorporated. All Rights Reserved.
 // Copyright 2000-2004, Jun Suzuki. All Rights Reserved.
 // Copyright 2007, 2010 Stephan Aßmus. All Rights Reserved.
-// Copyright 2010, Haiku, Inc. All Rights Reserved.
+// Copyright 2010-2013, Haiku, Inc. All Rights Reserved.
 // This file may be used under the terms of the Be Sample Code License.
+
 
 #include "MediaConverterWindow.h"
 
