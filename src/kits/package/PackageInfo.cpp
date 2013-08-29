@@ -244,7 +244,8 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 		&& (error = _ExtractStringList(archive, "replaces", fReplacesList))
 			== B_OK
 		&& (error = archive->FindString("checksum", &fChecksum)) == B_OK
-		&& (error = archive->FindString("install-path", &fInstallPath)) == B_OK) {
+		&& (error = archive->FindString("install-path", &fInstallPath)) == B_OK
+		&& (error = archive->FindString("file-name", &fFileName)) == B_OK) {
 		if (architecture >= 0
 			&& architecture <= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
 			fArchitecture = (BPackageArchitecture)architecture;
@@ -442,6 +443,13 @@ const BString&
 BPackageInfo::InstallPath() const
 {
 	return fInstallPath;
+}
+
+
+BString
+BPackageInfo::FileName() const
+{
+	return fFileName.IsEmpty() ? CanonicalFileName() : fFileName;
 }
 
 
@@ -657,6 +665,13 @@ void
 BPackageInfo::SetInstallPath(const BString& installPath)
 {
 	fInstallPath = installPath;
+}
+
+
+void
+BPackageInfo::SetFileName(const BString& fileName)
+{
+	fFileName = fileName;
 }
 
 
@@ -947,6 +962,7 @@ BPackageInfo::Clear()
 	fBasePackage.Truncate(0);
 	fChecksum.Truncate(0);
 	fInstallPath.Truncate(0);
+	fFileName.Truncate(0);
 	fFlags = 0;
 	fArchitecture = B_PACKAGE_ARCHITECTURE_ENUM_COUNT;
 	fVersion.Clear();
@@ -1009,7 +1025,8 @@ BPackageInfo::Archive(BMessage* archive, bool deep) const
 			fFreshensList)) != B_OK
 		|| (error = archive->AddStrings("replaces", fReplacesList)) != B_OK
 		|| (error = archive->AddString("checksum", fChecksum)) != B_OK
-		|| (error = archive->AddString("install-path", fInstallPath)) != B_OK) {
+		|| (error = archive->AddString("install-path", fInstallPath)) != B_OK
+		|| (error = archive->AddString("file-name", fFileName)) != B_OK) {
 		return error;
 	}
 
@@ -1057,7 +1074,7 @@ BPackageInfo::GetConfigString(BString& _string) const
 		.WriteFlags("flags", fFlags)
 		.Write("checksum", fChecksum)
 		.GetString(_string);
-	// Note: fInstallPath can not be specified via .PackageInfo.
+	// Note: fInstallPath and fFileName can not be specified via .PackageInfo.
 }
 
 

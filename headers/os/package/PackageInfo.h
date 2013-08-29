@@ -70,6 +70,9 @@ public:
 			const BString&		BasePackage() const;
 			const BString&		Checksum() const;
 			const BString&		InstallPath() const;
+			BString				FileName() const;
+									// the explicitly set file name, if any, or
+									// CanonicalFileName() otherwise
 
 			uint32				Flags() const;
 
@@ -116,6 +119,7 @@ public:
 			void				SetBasePackage(const BString& basePackage);
 			void				SetChecksum(const BString& checksum);
 			void				SetInstallPath(const BString& installPath);
+			void				SetFileName(const BString& fileName);
 
 			void				SetFlags(uint32 flags);
 
@@ -299,6 +303,7 @@ private:
 
 			BString				fChecksum;
 			BString				fInstallPath;
+			BString				fFileName;
 };
 
 
