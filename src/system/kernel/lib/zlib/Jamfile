@@ -17,7 +17,7 @@ LOCATE on [ FGristFiles $(zlibSources) ] = $(zlibSourceDirectory) ;
 Depends [ FGristFiles $(zlibSources) ]
 	: [ BuildFeatureAttribute zlib : sources ] ;
 
-KernelStaticLibrary kernel_libz.a :
+KernelMergeObject kernel_zlib.o :
 	$(zlibSources)
-	: -fno-pic
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
 	;
