@@ -227,7 +227,7 @@ LibsolvSolver::AddRepository(BSolverRepository* repository)
 
 	// If the repository represents installed packages, check, if we already
 	// have such a repository.
-	if (repository->IsInstalled() && fInstalledRepository != NULL)
+	if (repository->IsInstalled() && _InstalledRepository() != NULL)
 		return B_BAD_VALUE;
 
 	// add the repository info
@@ -239,9 +239,6 @@ LibsolvSolver::AddRepository(BSolverRepository* repository)
 		delete info;
 		return B_NO_MEMORY;
 	}
-
-	if (repository->IsInstalled())
-		fInstalledRepository = info;
 
 	return B_OK;
 }
@@ -312,7 +309,7 @@ LibsolvSolver::FindPackages(const BSolverPackageSpecifierList& packages,
 	if (_unmatched != NULL)
 		*_unmatched = NULL;
 
-	if ((flags & B_FIND_INSTALLED_ONLY) != 0 && fInstalledRepository == NULL)
+	if ((flags & B_FIND_INSTALLED_ONLY) != 0 && _InstalledRepository() == NULL)
 		return B_BAD_VALUE;
 
 	// add repositories to pool
@@ -373,7 +370,7 @@ LibsolvSolver::Uninstall(const BSolverPackageSpecifierList& packages,
 	if (_unmatched != NULL)
 		*_unmatched = NULL;
 
-	if (fInstalledRepository == NULL || packages.IsEmpty())
+	if (_InstalledRepository() == NULL || packages.IsEmpty())
 		return B_BAD_VALUE;
 
 	// add repositories to pool
@@ -448,7 +445,7 @@ LibsolvSolver::Update(const BSolverPackageSpecifierList& packages,
 status_t
 LibsolvSolver::VerifyInstallation(uint32 flags)
 {
-	if (fInstalledRepository == NULL)
+	if (_InstalledRepository() == NULL)
 		return B_BAD_VALUE;
 
 	// add repositories to pool
@@ -742,6 +739,8 @@ LibsolvSolver::_AddRepositories()
 	if (error != B_OK)
 		return error;
 
+	fInstalledRepository = NULL;
+
 	int32 repositoryCount = fRepositoryInfos.CountItems();
 	for (int32 i = 0; i < repositoryCount; i++) {
 		RepositoryInfo* repositoryInfo = fRepositoryInfos.ItemAt(i);
@@ -768,8 +767,10 @@ LibsolvSolver::_AddRepositories()
 
 		repo_internalize(repo);
 
-		if (repository->IsInstalled())
+		if (repository->IsInstalled()) {
+			fInstalledRepository = repositoryInfo;
 			pool_set_installed(fPool, repo);
+		}
 
 		repositoryInfo->SetUnchanged();
 	}
@@ -778,6 +779,20 @@ LibsolvSolver::_AddRepositories()
 	pool_createwhatprovides(fPool);
 
 	return B_OK;
+}
+
+
+LibsolvSolver::RepositoryInfo*
+LibsolvSolver::_InstalledRepository() const
+{
+	int32 repositoryCount = fRepositoryInfos.CountItems();
+	for (int32 i = 0; i < repositoryCount; i++) {
+		RepositoryInfo* repositoryInfo = fRepositoryInfos.ItemAt(i);
+		if (repositoryInfo->Repository()->IsInstalled())
+			return repositoryInfo;
+	}
+
+	return NULL;
 }
 
 

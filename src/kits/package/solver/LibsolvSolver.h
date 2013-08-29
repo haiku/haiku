@@ -92,6 +92,7 @@ private:
 
 			bool				_HaveRepositoriesChanged() const;
 			status_t			_AddRepositories();
+			RepositoryInfo*		_InstalledRepository() const;
 			RepositoryInfo*		_GetRepositoryInfo(
 									BSolverRepository* repository) const;
 			BSolverPackage*		_GetPackage(Id solvableId) const;
@@ -127,6 +128,7 @@ private:
 			SolvQueue*			fJobs;
 			RepositoryInfoList	fRepositoryInfos;
 			RepositoryInfo*		fInstalledRepository;
+									// valid only after _AddRepositories()
 			SolvableMap			fSolvablePackages;
 			PackageMap			fPackageSolvables;
 			ProblemList			fProblems;
