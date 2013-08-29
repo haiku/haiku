@@ -550,7 +550,7 @@ PackageManager::_PrintResult(InstalledRepository& installationRepository)
 	for (int32 i = 0; BSolverPackage* package = packagesToActivate.ItemAt(i);
 		i++) {
 		printf("    install package %s from repository %s\n",
-			package->Info().CanonicalFileName().String(),
+			package->Info().FileName().String(),
 			package->Repository()->Name().String());
 	}
 
@@ -606,7 +606,7 @@ PackageManager::_ApplyPackageChanges(
 		i++) {
 		// get package URL and target entry
 
-		BString fileName(package->Info().CanonicalFileName());
+		BString fileName(package->Info().FileName());
 		if (fileName.IsEmpty())
 			DIE(B_NO_MEMORY, "failed to allocate file name");
 
@@ -644,8 +644,7 @@ PackageManager::_ApplyPackageChanges(
 	for (int32 i = 0; BSolverPackage* package = packagesToDeactivate.ItemAt(i);
 		i++) {
 		// add package to transaction
-		if (!transaction.AddPackageToDeactivate(
-				package->Info().CanonicalFileName())) {
+		if (!transaction.AddPackageToDeactivate(package->Info().FileName())) {
 			DIE(B_NO_MEMORY,
 				"failed to add package to deactivate to transaction");
 		}
