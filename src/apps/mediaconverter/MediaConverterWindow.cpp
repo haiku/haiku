@@ -43,6 +43,10 @@
 #define VERSION "1.3.0"
 
 
+static const unsigned int kMinSourceWidth = 12;
+static const unsigned int kDurationWidth = 10;
+
+
 // #pragma mark - DirectoryFilter
 
 
@@ -107,6 +111,30 @@ CodecMenuItem::~CodecMenuItem()
 }
 
 
+// #pragma mark - OutputBox
+
+
+class OutputBox : public BBox {
+public:
+	OutputBox(border_style border, BView* child);
+	virtual void FrameResized(float width, float height)
+	{
+		MediaConverterWindow* window
+			= dynamic_cast<MediaConverterWindow*>(Window());
+		if (window != NULL)
+			window->TruncateOutputFolderPath();
+		BBox::FrameResized(width, height);
+	}
+};
+
+
+OutputBox::OutputBox(border_style border, BView* child)
+	:
+	BBox(border, child)
+{
+}
+
+
 // #pragma mark - MediaConverterWindow
 
 
@@ -135,34 +163,26 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	float padding = be_control_look->DefaultItemSpacing();
 
 	fListView = new MediaFileListView();
-	fListView->SetExplicitMinSize(BSize(padding * 10, B_SIZE_UNSET));
+	fListView->SetExplicitMinSize(BSize(padding * kMinSourceWidth, B_SIZE_UNSET));
 	BScrollView* scroller = new BScrollView(NULL, fListView, 0, false, true);
 
 	// file list view box
 	fSourcesBox = new BBox(B_FANCY_BORDER, scroller);
 	fSourcesBox->SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
-	// We give fSourcesBox a layout to provide insets for the sources list
-	// said insets are adjusted in _UpdateLabels
+		// fSourcesBox's layout adjusted in _UpdateLabels
 
+	// info box
 	fInfoView = new MediaFileInfoView();
+	fInfoView->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
+		B_ALIGN_VERTICAL_UNSET));
 	fInfoBox = new BBox(B_FANCY_BORDER, fInfoView);
-	fInfoBox->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
-			B_ALIGN_USE_FULL_HEIGHT));
 
-	// Output format box
-	fOutputBox = new BBox(B_FANCY_BORDER, NULL);
-	BGridLayout* outputGrid = new BGridLayout(padding, padding);
-	fOutputBox->SetLayout(outputGrid);
-		// fOutputBox's layout is also adjusted in _UpdateLabels
-	outputGrid->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
-			B_ALIGN_USE_FULL_HEIGHT));
-	fOutputBox->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
-
-	fFormatMenu = new BMenuField(NULL, B_TRANSLATE("File format:"), 
+	// output menu fields
+	fFormatMenu = new BMenuField(NULL, B_TRANSLATE("File format:"),
 		new BPopUpMenu(""));
-	fAudioMenu = new BMenuField(NULL, B_TRANSLATE("Audio encoding:"), 
+	fAudioMenu = new BMenuField(NULL, B_TRANSLATE("Audio encoding:"),
 		new BPopUpMenu(""));
-	fVideoMenu = new BMenuField(NULL, B_TRANSLATE("Video encoding:"), 
+	fVideoMenu = new BMenuField(NULL, B_TRANSLATE("Video encoding:"),
 		new BPopUpMenu(""));
 
 	// output folder
@@ -174,9 +194,17 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 
 	// start/end duration
 	fStartDurationTC = new BTextControl(NULL, "0", NULL);
+	BLayoutItem* startDuration = fStartDurationTC->CreateTextViewLayoutItem();
+	startDuration->SetExplicitSize(BSize(padding * kDurationWidth, B_SIZE_UNSET));
+	startDuration->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_CENTER));
 	fEndDurationTC = new BTextControl(NULL, "0", NULL);
+	BLayoutItem* endDuration = fEndDurationTC->CreateTextViewLayoutItem();
+	endDuration->SetExplicitSize(BSize(padding * kDurationWidth, B_SIZE_UNSET));
+	endDuration->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_CENTER));
 
-	// Video Quality
+	// video quality
 	fVideoQualitySlider = new BSlider("VSlider", "" ,
 		new BMessage(VIDEO_QUALITY_CHANGED_MESSAGE), 1, 100, B_HORIZONTAL);
 	fVideoQualitySlider->SetModificationMessage(
@@ -184,7 +212,7 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fVideoQualitySlider->SetValue(fVideoQuality);
 	fVideoQualitySlider->SetEnabled(false);
 
-	// Audio Quality
+	// audio quality
 	fAudioQualitySlider = new BSlider("ASlider", "" ,
 		new BMessage(AUDIO_QUALITY_CHANGED_MESSAGE), 1, 100, B_HORIZONTAL);
 	fAudioQualitySlider->SetModificationMessage(
@@ -192,8 +220,8 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fAudioQualitySlider->SetValue(fAudioQuality);
 	fAudioQualitySlider->SetEnabled(false);
 
-	BLayoutBuilder::Grid<>(outputGrid)
-		.SetInsets(padding, padding, padding, padding)
+	// output format box
+	BView* outputGrid = BLayoutBuilder::Grid<>()
 		.Add(fFormatMenu->CreateLabelLayoutItem(), 0, 0)
 		.Add(fFormatMenu->CreateMenuBarLayoutItem(), 1, 0)
 		.Add(fAudioMenu->CreateLabelLayoutItem(), 0, 1)
@@ -203,11 +231,17 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 		.Add(fDestButton, 0, 3)
 		.Add(fOutputFolder, 1, 3)
 		.Add(fStartDurationTC->CreateLabelLayoutItem(), 0, 4)
-		.Add(fStartDurationTC->CreateTextViewLayoutItem(), 1, 4)
+		.Add(startDuration, 1, 4)
 		.Add(fEndDurationTC->CreateLabelLayoutItem(), 0, 5)
-		.Add(fEndDurationTC->CreateTextViewLayoutItem(), 1, 5)
+		.Add(endDuration, 1, 5)
 		.Add(fVideoQualitySlider, 0, 6, 2, 1)
-		.Add(fAudioQualitySlider, 0, 7, 2, 1);
+		.Add(fAudioQualitySlider, 0, 7, 2, 1)
+		.View();
+	outputGrid->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
+		B_ALIGN_USE_FULL_HEIGHT));
+	fOutputBox = new OutputBox(B_FANCY_BORDER, outputGrid);
+	fOutputBox->SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
+		// fOutputBox's layout adjusted in _UpdateLabels
 
 	// buttons
 	fPreviewButton = new BButton(B_TRANSLATE("Preview"),
@@ -828,6 +862,21 @@ MediaConverterWindow::SetVideoQualityLabel(const char* label)
 }
 
 
+void
+MediaConverterWindow::TruncateOutputFolderPath()
+{
+	BEntry entry;
+	fOutputDir.GetEntry(&entry);
+	BPath path;
+	entry.GetPath(&path);
+	BString pathString(path.Path());
+	float maxWidth = fVideoMenu->MenuBar()->Frame().Width();
+
+	fOutputFolder->TruncateString(&pathString, B_TRUNCATE_MIDDLE, maxWidth);
+	fOutputFolder->SetText(pathString.String());
+}
+
+
 // #pragma mark -
 
 
@@ -941,11 +990,6 @@ MediaConverterWindow::_CreateMenu()
 void
 MediaConverterWindow::_SetOutputFolder(BEntry entry)
 {
-	BPath path;
-	entry.GetPath(&path);
-	fOutputFolder->SetText(path.Path());
-	fOutputFolder->ResizeToPreferred();
-	fOutputDir.SetTo(path.Path());
+	fOutputDir.SetTo(&entry);
+	TruncateOutputFolderPath();
 }
-
-

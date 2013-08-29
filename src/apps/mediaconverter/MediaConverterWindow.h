@@ -31,8 +31,8 @@ public:
 	virtual						~MediaConverterWindow();
 
 protected:
-	virtual void				MessageReceived(BMessage* message);
-	virtual bool				QuitRequested();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
 
 public:
 			void				LanguageChanged();
@@ -71,6 +71,8 @@ public:
 			void				SetVideoQualityLabel(const char* label);
 
 			BDirectory			OutputDirectory() const;
+
+			void				TruncateOutputFolderPath();
 
 private:
 			void				_UpdateLabels();
