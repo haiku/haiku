@@ -173,11 +173,8 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fOutputFolder->SetExplicitAlignment(labelAlignment);
 
 	// start/end duration
-	fStartDurationTC = new BTextControl(NULL, NULL, NULL);
-	fStartDurationTC->SetText("0");
-
-	fEndDurationTC = new BTextControl(NULL, NULL, NULL);
-	fEndDurationTC->SetText("0");
+	fStartDurationTC = new BTextControl(NULL, "0", NULL);
+	fEndDurationTC = new BTextControl(NULL, "0", NULL);
 
 	// Video Quality
 	fVideoQualitySlider = new BSlider("VSlider", "" ,
