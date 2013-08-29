@@ -134,7 +134,7 @@ rule KernelAddon
 	Depends $(target) : $(beginGlue) $(endGlue) ;
 
 	# compile and link
-	SetupKernel $(sources) : $(TARGET_KERNEL_PIC_FLAGS) : false ;
+	SetupKernel $(sources) : : false ;
 	local linkFlags = -nostdlib -Xlinker --no-undefined
 		-Xlinker -soname=\"$(target:G=)\" $(TARGET_KERNEL_ADDON_LINKFLAGS) ;
 	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ] $(linkFlags) ;
