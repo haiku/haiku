@@ -23,11 +23,9 @@ typedef struct {
 typedef struct random_module_info {
 	driver_module_info info;
 
-	status_t (*init)();
-	void (*uninit)();
-	status_t (*read)(void *_buffer, size_t *_numBytes);
-	status_t (*write)(const void *_buffer, size_t *_numBytes);
-} random_sim_interface;
+	status_t (*read)(void* cookie, void *_buffer, size_t *_numBytes);
+	status_t (*write)(void* cookie, const void *_buffer, size_t *_numBytes);
+} random_module_info;
 
 
 #endif /* _RANDOM_H */

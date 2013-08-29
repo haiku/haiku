@@ -32,7 +32,8 @@
 
 
 static mutex sRandomLock;
-static random_sim_interface *sRandomModule;
+static random_module_info *sRandomModule;
+static void *sRandomCookie;
 device_manager_info* gDeviceManager;
 
 
@@ -73,7 +74,7 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 	TRACE("read(%Ld,, %ld)\n", position, *_numBytes);
 
 	MutexLocker locker(&sRandomLock);
-	return sRandomModule->read(_buffer, _numBytes);
+	return sRandomModule->read(sRandomCookie, _buffer, _numBytes);
 }
 
 
@@ -82,7 +83,11 @@ random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes
 {
 	TRACE("write(%Ld,, %ld)\n", position, *_numBytes);
 	MutexLocker locker(&sRandomLock);
-	return sRandomModule->write(buffer, _numBytes);
+	if (sRandomModule->write == NULL) {
+		*_numBytes = 0;
+		return EINVAL;
+	}
+	return sRandomModule->write(sRandomCookie, buffer, _numBytes);
 }
 
 
@@ -244,10 +249,8 @@ random_added_device(device_node *node)
 {
 	CALLED();
 
-	void *cookie;
-
 	status_t status = gDeviceManager->get_driver(node,
-		(driver_module_info **)&sRandomModule, &cookie);
+		(driver_module_info **)&sRandomModule, &sRandomCookie);
 
 	return status;
 }

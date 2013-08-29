@@ -290,24 +290,7 @@ kill_chrand(ch_randgen *randgen)
 
 
 static status_t
-yarrow_rng_init()
-{
-	sRandomEnv = new_chrand(8);
-	if (sRandomEnv == NULL)
-		return B_NO_MEMORY;
-	return B_OK;
-}
-
-
-static void
-yarrow_rng_uninit()
-{
-	kill_chrand(sRandomEnv);
-}
-
-
-static status_t
-yarrow_rng_read(void *_buffer, size_t *_numBytes)
+yarrow_rng_read(void* cookie, void *_buffer, size_t *_numBytes)
 {
 	sRandomCount += *_numBytes;
 
@@ -333,7 +316,7 @@ yarrow_rng_read(void *_buffer, size_t *_numBytes)
 
 
 static status_t
-yarrow_rng_write(const void *buffer, size_t *_numBytes)
+yarrow_rng_write(void* cookie, const void *buffer, size_t *_numBytes)
 {
 	OCTET* data = (OCTET*)buffer;
 	for (size_t i = 0; i < *_numBytes / sizeof(OCTET); i++) {
@@ -351,7 +334,10 @@ static status_t
 yarrow_init_bus(device_node* node, void** bus_cookie)
 {
 	CALLED();
-	return yarrow_rng_init();
+	sRandomEnv = new_chrand(8);
+	if (sRandomEnv == NULL)
+		return B_NO_MEMORY;
+	return B_OK;
 }
 
 
@@ -359,7 +345,7 @@ static void
 yarrow_uninit_bus(void* bus_cookie)
 {
 	CALLED();
-	yarrow_rng_uninit();
+	kill_chrand(sRandomEnv);
 }
 
 
@@ -389,8 +375,6 @@ random_module_info gYarrowRandomModule = {
 		NULL,	// rescan
 		yarrow_bus_removed,
 	},
-	yarrow_rng_init,
-	yarrow_rng_uninit,
 	yarrow_rng_read,
 	yarrow_rng_write
 };
