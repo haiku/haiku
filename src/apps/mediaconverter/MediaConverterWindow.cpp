@@ -132,8 +132,10 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fMenuBar = new BMenuBar("menubar");
 	_CreateMenu();
 
+	float padding = be_control_look->DefaultItemSpacing();
+
 	fListView = new MediaFileListView();
-	fListView->SetExplicitMinSize(BSize(100, B_SIZE_UNSET));
+	fListView->SetExplicitMinSize(BSize(padding * 10, B_SIZE_UNSET));
 	BScrollView* scroller = new BScrollView(NULL, fListView, 0, false, true);
 
 	// file list view box
@@ -146,8 +148,6 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	fInfoBox = new BBox(B_FANCY_BORDER, fInfoView);
 	fInfoBox->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 			B_ALIGN_USE_FULL_HEIGHT));
-
-	float padding = be_control_look->DefaultItemSpacing();
 
 	// Output format box
 	fOutputBox = new BBox(B_FANCY_BORDER, NULL);
