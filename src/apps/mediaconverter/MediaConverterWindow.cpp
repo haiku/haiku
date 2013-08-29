@@ -179,12 +179,16 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 	// Video Quality
 	fVideoQualitySlider = new BSlider("VSlider", "" ,
 		new BMessage(VIDEO_QUALITY_CHANGED_MESSAGE), 1, 100, B_HORIZONTAL);
+	fVideoQualitySlider->SetModificationMessage(
+		new BMessage(VIDEO_QUALITY_CHANGED_MESSAGE));
 	fVideoQualitySlider->SetValue(fVideoQuality);
 	fVideoQualitySlider->SetEnabled(false);
 
 	// Audio Quality
 	fAudioQualitySlider = new BSlider("ASlider", "" ,
 		new BMessage(AUDIO_QUALITY_CHANGED_MESSAGE), 1, 100, B_HORIZONTAL);
+	fAudioQualitySlider->SetModificationMessage(
+		new BMessage(AUDIO_QUALITY_CHANGED_MESSAGE));
 	fAudioQualitySlider->SetValue(fAudioQuality);
 	fAudioQualitySlider->SetEnabled(false);
 
