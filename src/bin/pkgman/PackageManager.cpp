@@ -81,6 +81,8 @@ PackageManager::InstalledRepository::InstalledRepository(const char* name,
 	:
 	BSolverRepository(),
 	fDisabledPackages(10, true),
+	fPackagesToActivate(),
+	fPackagesToDeactivate(),
 	fInitialName(name),
 	fLocation(location),
 	fInitialPriority(priority)
@@ -105,9 +107,39 @@ PackageManager::InstalledRepository::DisablePackage(BSolverPackage* package)
 
 	// move to disabled list
 	if (!fDisabledPackages.AddItem(package))
-		DIE(B_NO_MEMORY, "*** failed to add package to list");
+		DIE(B_NO_MEMORY, "failed to add package to list");
 
 	RemovePackage(package);
+}
+
+
+bool
+PackageManager::InstalledRepository::HasChanges() const
+{
+	return !fPackagesToActivate.IsEmpty() || !fPackagesToDeactivate.IsEmpty();
+}
+
+
+void
+PackageManager::InstalledRepository::ApplyChanges()
+{
+	// disable packages to deactivate
+	for (int32 i = 0; BSolverPackage* package = fPackagesToDeactivate.ItemAt(i);
+		i++) {
+		if (!fDisabledPackages.HasItem(package))
+			DisablePackage(package);
+	}
+
+	// add packages to activate
+	for (int32 i = 0; BSolverPackage* package = fPackagesToActivate.ItemAt(i);
+		i++) {
+		status_t error = AddPackage(package->Info());
+		if (error != B_OK) {
+			DIE(error, "failed to add package %s to %s repository",
+				package->Name().String(),
+				Name().String());
+		}
+	}
 }
 
 
@@ -254,15 +286,14 @@ PackageManager::Uninstall(const char* const* packages, int packageCount)
 	}
 
 	// determine the inverse base package closure for the found packages
-	InstalledRepository* installationRepository
-		= dynamic_cast<InstalledRepository*>(
-			foundPackages.ItemAt(0)->Repository());
+// TODO: Optimize!
+	InstalledRepository& installationRepository = _InstallationRepository();
 	bool foundAnotherPackage;
 	do {
 		foundAnotherPackage = false;
-		int32 count = installationRepository->CountPackages();
+		int32 count = installationRepository.CountPackages();
 		for (int32 i = 0; i < count; i++) {
-			BSolverPackage* package = installationRepository->PackageAt(i);
+			BSolverPackage* package = installationRepository.PackageAt(i);
 			if (foundPackages.HasItem(package))
 				continue;
 
@@ -275,24 +306,46 @@ PackageManager::Uninstall(const char* const* packages, int packageCount)
 
 	// remove the packages from the repository
 	for (int32 i = 0; BSolverPackage* package = foundPackages.ItemAt(i); i++)
-		installationRepository->DisablePackage(package);
+		installationRepository.DisablePackage(package);
 
-	error = fSolver->VerifyInstallation(BSolver::B_VERIFY_ALLOW_UNINSTALL);
-	if (error != B_OK)
-		DIE(error, "failed to compute packages to uninstall");
+	for (;;) {
+		error = fSolver->VerifyInstallation(BSolver::B_VERIFY_ALLOW_UNINSTALL);
+		if (error != B_OK)
+			DIE(error, "failed to compute packages to uninstall");
 
-	_HandleProblems();
+		_HandleProblems();
 
-	// install/uninstall packages
-	_AnalyzeResult();
+		// (virtually) apply the result to this repository
+		_AnalyzeResult();
 
-	for (int32 i = foundPackages.CountItems() - 1; i >= 0; i--) {
-		if (!fPackagesToDeactivate.AddItem(foundPackages.ItemAt(i)))
-			DIE(B_NO_MEMORY, "failed to add package to uninstall");
+		for (int32 i = foundPackages.CountItems() - 1; i >= 0; i--) {
+			if (!installationRepository.PackagesToDeactivate()
+					.AddItem(foundPackages.ItemAt(i))) {
+				DIE(B_NO_MEMORY, "failed to add package to uninstall");
+			}
+		}
+
+		installationRepository.ApplyChanges();
+
+		// verify the next specific respository
+		if (!_NextSpecificInstallationLocation())
+			break;
+
+		foundPackages.MakeEmpty();
+
+		// NOTE: In theory, after verifying a more specific location, it would
+		// be more correct to compute the inverse base package closure for the
+		// packages we need to uninstall and (if anything changed) verify again.
+		// In practice, however, base packages are always required with an exact
+		// version (ATM). If that base package still exist in a more general
+		// location (the only reason why the package requiring the base package
+		// wouldn't be marked to be uninstalled as well) there shouldn't have
+		// been any reason to remove it from the more specific location in the
+		// first place.
 	}
 
-	_PrintResult();
-	_ApplyPackageChanges();
+	_PrintResult(true);
+	_ApplyPackageChanges(true);
 }
 
 
@@ -400,6 +453,12 @@ PackageManager::_AnalyzeResult()
 	if (error != B_OK)
 		DIE(error, "failed to compute packages to un/-install");
 
+	InstalledRepository& installationRepository = _InstallationRepository();
+	PackageList& packagesToActivate
+		= installationRepository.PackagesToActivate();
+	PackageList& packagesToDeactivate
+		= installationRepository.PackagesToDeactivate();
+
 	PackageList potentialBasePackages;
 
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
@@ -413,57 +472,60 @@ PackageManager::_AnalyzeResult()
 					= dynamic_cast<InstalledRepository*>(package->Repository())
 							!= NULL
 						? potentialBasePackages
-						: fPackagesToActivate;
+						: packagesToActivate;
 				if (!packageList.AddItem(package))
 					DIE(B_NO_MEMORY, "failed to add package to activate");
 				break;
 			}
 
 			case BSolverResultElement::B_TYPE_UNINSTALL:
-				if (!fPackagesToDeactivate.AddItem(package))
+				if (!packagesToDeactivate.AddItem(package))
 					DIE(B_NO_MEMORY, "failed to add package to deactivate");
 				break;
 		}
 	}
 
 	// Make sure base packages are installed in the same location.
-	for (int32 i = 0; i < fPackagesToActivate.CountItems(); i++) {
-		BSolverPackage* package = fPackagesToActivate.ItemAt(i);
+	for (int32 i = 0; i < packagesToActivate.CountItems(); i++) {
+		BSolverPackage* package = packagesToActivate.ItemAt(i);
 		int32 index = _FindBasePackage(potentialBasePackages, package->Info());
 		if (index < 0)
 			continue;
 
 		BSolverPackage* basePackage = potentialBasePackages.RemoveItemAt(index);
-		if (!fPackagesToActivate.AddItem(basePackage))
+		if (!packagesToActivate.AddItem(basePackage))
 			DIE(B_NO_MEMORY, "failed to add package to activate");
 	}
 }
 
 
 void
-PackageManager::_PrintResult()
+PackageManager::_PrintResult(bool fromMostSpecific)
 {
-	if (fPackagesToActivate.IsEmpty() && fPackagesToDeactivate.IsEmpty()) {
+	// check, if there are any changes at all
+	int32 count = fInstalledRepositories.CountItems();
+	bool hasChanges = false;
+	for (int32 i = 0; i < count; i++) {
+		if (fInstalledRepositories.ItemAt(i)->HasChanges()) {
+			hasChanges = true;
+			break;
+		}
+	}
+
+	if (!hasChanges) {
 		printf("Nothing to do.\n");
 		exit(0);
 	}
 
 	printf("The following changes will be made:\n");
-	for (int32 i = 0; BSolverPackage* package = fPackagesToActivate.ItemAt(i);
-		i++) {
-		printf("  install package %s from repository %s\n",
-			package->Info().CanonicalFileName().String(),
-			package->Repository()->Name().String());
-	}
 
-	for (int32 i = 0; BSolverPackage* package = fPackagesToDeactivate.ItemAt(i);
-		i++) {
-		printf("  uninstall package %s\n", package->VersionedName().String());
+	if (fromMostSpecific) {
+		for (int32 i = count - 1; i >= 0; i--)
+			_PrintResult(*fInstalledRepositories.ItemAt(i));
+	} else {
+		for (int32 i = 0; i < count; i++)
+			_PrintResult(*fInstalledRepositories.ItemAt(i));
 	}
-// TODO: Print file/download sizes. Unfortunately our package infos don't
-// contain the file size. Which is probably correct. The file size (and possibly
-// other information) should, however, be provided by the repository cache in
-// some way. Extend BPackageInfo? Create a BPackageFileInfo?
 
 	if (!fDecisionProvider.YesNoDecisionNeeded(BString(), "Continue?", "y", "n",
 			"y")) {
@@ -473,19 +535,74 @@ PackageManager::_PrintResult()
 
 
 void
-PackageManager::_ApplyPackageChanges()
+PackageManager::_PrintResult(InstalledRepository& installationRepository)
 {
+	if (!installationRepository.HasChanges())
+		return;
+
+	printf("  in %s:\n", installationRepository.Name().String());
+
+	PackageList& packagesToActivate
+		= installationRepository.PackagesToActivate();
+	PackageList& packagesToDeactivate
+		= installationRepository.PackagesToDeactivate();
+
+	for (int32 i = 0; BSolverPackage* package = packagesToActivate.ItemAt(i);
+		i++) {
+		printf("    install package %s from repository %s\n",
+			package->Info().CanonicalFileName().String(),
+			package->Repository()->Name().String());
+	}
+
+	for (int32 i = 0; BSolverPackage* package = packagesToDeactivate.ItemAt(i);
+		i++) {
+		printf("    uninstall package %s\n", package->VersionedName().String());
+	}
+// TODO: Print file/download sizes. Unfortunately our package infos don't
+// contain the file size. Which is probably correct. The file size (and possibly
+// other information) should, however, be provided by the repository cache in
+// some way. Extend BPackageInfo? Create a BPackageFileInfo?
+}
+
+
+void
+PackageManager::_ApplyPackageChanges(bool fromMostSpecific)
+{
+	int32 count = fInstalledRepositories.CountItems();
+	if (fromMostSpecific) {
+		for (int32 i = count - 1; i >= 0; i--)
+			_ApplyPackageChanges(*fInstalledRepositories.ItemAt(i));
+	} else {
+		for (int32 i = 0; i < count; i++)
+			_ApplyPackageChanges(*fInstalledRepositories.ItemAt(i));
+	}
+}
+
+
+void
+PackageManager::_ApplyPackageChanges(
+	InstalledRepository& installationRepository)
+{
+
+	if (!installationRepository.HasChanges())
+		return;
+
+	PackageList& packagesToActivate
+		= installationRepository.PackagesToActivate();
+	PackageList& packagesToDeactivate
+		= installationRepository.PackagesToDeactivate();
+
 	// create an activation transaction
 	BDaemonClient daemonClient;
 	BActivationTransaction transaction;
 	BDirectory transactionDirectory;
-	status_t error = daemonClient.CreateTransaction(fLocation, transaction,
-		transactionDirectory);
+	status_t error = daemonClient.CreateTransaction(
+		installationRepository.Location(), transaction, transactionDirectory);
 	if (error != B_OK)
 		DIE(error, "failed to create transaction");
 
 	// download the new packages and prepare the transaction
-	for (int32 i = 0; BSolverPackage* package = fPackagesToActivate.ItemAt(i);
+	for (int32 i = 0; BSolverPackage* package = packagesToActivate.ItemAt(i);
 		i++) {
 		// get package URL and target entry
 
@@ -524,7 +641,7 @@ PackageManager::_ApplyPackageChanges()
 		}
 	}
 
-	for (int32 i = 0; BSolverPackage* package = fPackagesToDeactivate.ItemAt(i);
+	for (int32 i = 0; BSolverPackage* package = packagesToDeactivate.ItemAt(i);
 		i++) {
 		// add package to transaction
 		if (!transaction.AddPackageToDeactivate(
@@ -543,7 +660,8 @@ PackageManager::_ApplyPackageChanges()
 		exit(1);
 	}
 
-	printf("Installation done. Old activation state backed up in \"%s\"\n",
+	printf("Changes applied in \"%s\". Old activation state backed up in "
+		"\"%s\"\n", installationRepository.Name().String(),
 		transactionResult.OldStateDirectory().String());
 
 	printf("Cleaning up ...\n");
@@ -633,6 +751,16 @@ PackageManager::_FindBasePackage(const PackageList& packages,
 }
 
 
+PackageManager::InstalledRepository&
+PackageManager::_InstallationRepository()
+{
+	if (fInstalledRepositories.IsEmpty())
+		DIE(B_ERROR, "no installation repository");
+
+	return *fInstalledRepositories.LastItem();
+}
+
+
 void
 PackageManager::_AddInstalledRepository(InstalledRepository* repository)
 {
@@ -644,4 +772,25 @@ PackageManager::_AddInstalledRepository(InstalledRepository* repository)
 
 	if (!fInstalledRepositories.AddItem(repository))
 		DIE(B_NO_MEMORY, "failed to add %s repository to list", name);
+}
+
+
+bool
+PackageManager::_NextSpecificInstallationLocation()
+{
+	if (fLocation == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
+		fLocation = B_PACKAGE_INSTALLATION_LOCATION_COMMON;
+		fSystemRepository->SetInstalled(false);
+		_AddInstalledRepository(fCommonRepository);
+		return true;
+	}
+
+	if (fLocation == B_PACKAGE_INSTALLATION_LOCATION_COMMON) {
+		fLocation = B_PACKAGE_INSTALLATION_LOCATION_HOME;
+		fCommonRepository->SetInstalled(false);
+		_AddInstalledRepository(fHomeRepository);
+		return true;
+	}
+
+	return false;
 }

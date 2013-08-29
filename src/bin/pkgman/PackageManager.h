@@ -30,6 +30,7 @@ public:
 			struct InstalledRepository;
 			typedef BObjectList<RemoteRepository> RemoteRepositoryList;
 			typedef BObjectList<InstalledRepository> InstalledRepositoryList;
+			typedef BObjectList<BSolverPackage> PackageList;
 
 			enum {
 				ADD_INSTALLED_REPOSITORIES	= 0x01,
@@ -65,13 +66,17 @@ public:
 									int packageCount);
 
 private:
-			typedef BObjectList<BSolverPackage> PackageList;
-
-private:
 			void				_HandleProblems();
 			void				_AnalyzeResult();
-			void				_PrintResult();
-			void				_ApplyPackageChanges();
+			void				_PrintResult(bool fromMostSpecific = false);
+			void				_PrintResult(
+									InstalledRepository&
+										installationRepository);
+			void				_ApplyPackageChanges(
+									bool fromMostSpecific = false);
+			void				_ApplyPackageChanges(
+									InstalledRepository&
+										installationRepository);
 
 			void				_ClonePackageFile(
 									InstalledRepository* repository,
@@ -80,8 +85,11 @@ private:
 			int32				_FindBasePackage(const PackageList& packages,
 									const BPackageInfo& info) const;
 
+			InstalledRepository& _InstallationRepository();
+
 			void				_AddInstalledRepository(
 									InstalledRepository* repository);
+			bool				_NextSpecificInstallationLocation();
 
 private:
 			BPackageInstallationLocation fLocation;
@@ -99,7 +107,8 @@ private:
 };
 
 
-struct PackageManager::RemoteRepository : public BSolverRepository {
+class PackageManager::RemoteRepository : public BSolverRepository {
+public:
 								RemoteRepository();
 
 			status_t			Init(BPackageRoster& roster, BContext& context,
@@ -112,7 +121,11 @@ private:
 };
 
 
-struct PackageManager::InstalledRepository : public BSolverRepository {
+class PackageManager::InstalledRepository : public BSolverRepository {
+public:
+			typedef BObjectList<BSolverPackage> PackageList;
+
+public:
 								InstalledRepository(const char* name,
 									BPackageInstallationLocation location,
 									int32 priority);
@@ -126,11 +139,18 @@ struct PackageManager::InstalledRepository : public BSolverRepository {
 
 			void				DisablePackage(BSolverPackage* package);
 
-private:
-			typedef BObjectList<BSolverPackage> PackageList;
+			PackageList&		PackagesToActivate()
+									{ return fPackagesToActivate; }
+			PackageList&		PackagesToDeactivate()
+									{ return fPackagesToDeactivate; }
+
+			bool				HasChanges() const;
+			void				ApplyChanges();
 
 private:
 			PackageList			fDisabledPackages;
+			PackageList			fPackagesToActivate;
+			PackageList			fPackagesToDeactivate;
 			const char*			fInitialName;
 			BPackageInstallationLocation fLocation;
 			int32				fInitialPriority;
