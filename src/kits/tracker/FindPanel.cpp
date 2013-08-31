@@ -955,7 +955,7 @@ FindPanel::ResizeMenuField(BMenuField* menuField)
 	for (int32 index = menu->CountItems(); index-- > 0; ) {
 		BMenuItem* item = menu->ItemAt(index);
 		if (item->Label() != NULL)
-			width = std::max(width, StringWidth(item->Label()));
+			width = std::max(width, menuField->StringWidth(item->Label()));
 
 		BMenu* submenu = item->Submenu();
 		if (submenu != NULL) {
