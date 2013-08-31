@@ -877,6 +877,10 @@ MediaConverterWindow::TruncateOutputFolderPath()
 
 	fOutputFolder->TruncateString(&pathString, B_TRUNCATE_MIDDLE, maxWidth);
 	fOutputFolder->SetText(pathString.String());
+	if (fOutputFolder->StringWidth(path.Path()) > maxWidth)
+		fOutputFolder->SetToolTip(path.Path());
+	else
+		fOutputFolder->SetToolTip((const char*)NULL);
 }
 
 
