@@ -216,41 +216,57 @@ BMediaTrack::DecodedFormat(media_format* _format, uint32 flags)
 #endif
 
 	if (_format->type == 0) {
+#ifdef TRACE_MEDIA_TRACK
 		printf("BMediaTrack::DecodedFormat: Decoder didn't set output format "
-			"type");
+			"type.\n");
+#endif
 	}
 
 	if (_format->type == B_MEDIA_RAW_AUDIO) {
 		if (_format->u.raw_audio.byte_order == 0) {
+#ifdef TRACE_MEDIA_TRACK
 			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw audio "
 				"output byte order.\n");
+#endif
 		}
 		if (_format->u.raw_audio.format == 0) {
+#ifdef TRACE_MEDIA_TRACK
 			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw audio "
 				"output sample format.\n");
+#endif
 		}
 		if (_format->u.raw_audio.buffer_size <= 0) {
+#ifdef TRACE_MEDIA_TRACK
 			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw audio "
 				"output buffer size.\n");
+#endif
 		}
 	}
 
 	if (_format->type == B_MEDIA_RAW_VIDEO) {
 		if (_format->u.raw_video.display.format == 0) {
+#ifdef TRACE_MEDIA_TRACK
 			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw video "
 				"output color space.\n");
+#endif
 		}
 		if (_format->u.raw_video.display.line_width == 0) {
+#ifdef TRACE_MEDIA_TRACK
 			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw video "
 				"output line_width.\n");
+#endif
 		}
 		if (_format->u.raw_video.display.line_count == 0) {
+#ifdef TRACE_MEDIA_TRACK
 			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw video "
 				"output line_count.\n");
+#endif
 		}
 		if (_format->u.raw_video.display.bytes_per_row == 0) {
+#ifdef TRACE_MEDIA_TRACK
 			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw video "
 				"output bytes_per_row.\n");
+#endif
 		}
 	}
 
