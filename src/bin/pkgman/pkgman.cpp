@@ -11,7 +11,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <package/manager/Exceptions.h>
+
 #include "Command.h"
+
+
+using namespace BPackageKit::BManager::BPrivate;
 
 
 extern const char* __progname;
@@ -85,5 +90,25 @@ main(int argc, const char* const* argv)
 	if (commands.CountItems() != 1)
 		print_usage_and_exit(true);
 
-	return commands.ItemAt(0)->Execute(argc - 1, argv + 1);
+	try {
+		return commands.ItemAt(0)->Execute(argc - 1, argv + 1);
+	} catch (BNothingToDoException&) {
+		fprintf(stderr, "Nothing to do.\n");
+		return 0;
+	} catch (std::bad_alloc&) {
+		fprintf(stderr, "Out of memory!\n");
+		return 1;
+	} catch (BFatalErrorException& exception) {
+		if (!exception.Details().IsEmpty())
+			fprintf(stderr, "%s", exception.Details().String());
+		if (exception.Error() == B_OK) {
+			fprintf(stderr, "*** %s\n", exception.Message().String());
+		} else {
+			fprintf(stderr, "*** %s: %s\n", exception.Message().String(),
+				strerror(exception.Error()));
+		}
+		return 1;
+	} catch (BAbortedByUserException&) {
+		return 0;
+	}
 }

@@ -91,8 +91,7 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 	const char* const* packages = argv + optind;
 
 	// perform the installation
-	PackageManager packageManager(location,
-		PackageManager::ADD_INSTALLED_REPOSITORIES);
+	PackageManager packageManager(location);
 	packageManager.Uninstall(packages, packageCount);
 
 	return 0;

@@ -9,151 +9,58 @@
 #define PACKAGE_MANAGER_H
 
 
-#include <ObjectList.h>
-#include <package/Context.h>
-#include <package/PackageDefs.h>
-#include <package/PackageRoster.h>
-#include <package/RepositoryConfig.h>
-#include <package/solver/Solver.h>
-#include <package/solver/SolverRepository.h>
+#include <package/DaemonClient.h>
+#include <package/manager/PackageManager.h>
 
 #include "DecisionProvider.h"
 #include "JobStateListener.h"
 
 
 using namespace BPackageKit;
+using BPackageKit::BPrivate::BDaemonClient;
+using BManager::BPrivate::BPackageManager;
 
 
-class PackageManager {
-public:
-			struct RemoteRepository;
-			struct InstalledRepository;
-			typedef BObjectList<RemoteRepository> RemoteRepositoryList;
-			typedef BObjectList<InstalledRepository> InstalledRepositoryList;
-			typedef BObjectList<BSolverPackage> PackageList;
-
-			enum {
-				ADD_INSTALLED_REPOSITORIES	= 0x01,
-				ADD_REMOTE_REPOSITORIES		= 0x02,
-				REFRESH_REPOSITORIES		= 0x04,
-			};
-
+class PackageManager : public BPackageManager,
+	private BPackageManager::RequestHandler,
+	private BPackageManager::UserInteractionHandler {
 public:
 								PackageManager(
-									BPackageInstallationLocation location,
-									uint32 flags);
+									BPackageInstallationLocation location);
 								~PackageManager();
 
-			BSolver*			Solver() const
-									{ return fSolver; }
-
-			const InstalledRepository* SystemRepository() const
-									{ return fSystemRepository; }
-			const InstalledRepository* CommonRepository() const
-									{ return fCommonRepository; }
-			const InstalledRepository* HomeRepository() const
-									{ return fHomeRepository; }
-			const InstalledRepositoryList& InstalledRepositories() const
-									{ return fInstalledRepositories; }
-			const RemoteRepositoryList& OtherRepositories() const
-									{ return fOtherRepositories; }
-
-			void				Install(const char* const* packages,
-									int packageCount);
-			void				Uninstall(const char* const* packages,
-									int packageCount);
-			void				Update(const char* const* packages,
-									int packageCount);
+private:
+	// RequestHandler
+	virtual	status_t			RefreshRepository(
+									const BRepositoryConfig& repoConfig);
+	virtual	status_t			DownloadPackage(const BString& fileURL,
+                                    const BEntry& targetEntry,
+                                    const BString& checksum);
 
 private:
-			void				_HandleProblems();
-			void				_AnalyzeResult();
-			void				_PrintResult(bool fromMostSpecific = false);
-			void				_PrintResult(
-									InstalledRepository&
-										installationRepository);
-			void				_ApplyPackageChanges(
-									bool fromMostSpecific = false);
-			void				_ApplyPackageChanges(
-									InstalledRepository&
-										installationRepository);
+	// UserInteractionHandler
+	virtual	void				HandleProblems();
+	virtual	void				ConfirmChanges(bool fromMostSpecific);
 
-			void				_ClonePackageFile(
-									InstalledRepository* repository,
-									const BString& fileName,
-							 		const BEntry& entry) const;
-			int32				_FindBasePackage(const PackageList& packages,
-									const BPackageInfo& info) const;
-
-			InstalledRepository& _InstallationRepository();
-
-			void				_AddInstalledRepository(
-									InstalledRepository* repository);
-			bool				_NextSpecificInstallationLocation();
+	virtual	void				Warn(status_t error, const char* format, ...);
+	virtual	void				ProgressStartApplyingChanges(
+									InstalledRepository& repository);
+	virtual	void				ProgressTransactionCommitted(
+									InstalledRepository& repository,
+									const char* transactionDirectoryName);
+	virtual	void				ProgressApplyingChangesDone(
+									InstalledRepository& repository);
 
 private:
-			BPackageInstallationLocation fLocation;
-			BSolver*			fSolver;
-			InstalledRepository* fSystemRepository;
-			InstalledRepository* fCommonRepository;
-			InstalledRepository* fHomeRepository;
-			InstalledRepositoryList fInstalledRepositories;
-			RemoteRepositoryList fOtherRepositories;
+			void				_PrintResult(InstalledRepository&
+									installationRepository);
+
+private:
 			DecisionProvider	fDecisionProvider;
 			JobStateListener	fJobStateListener;
 			BContext			fContext;
-			PackageList			fPackagesToActivate;
-			PackageList			fPackagesToDeactivate;
-};
-
-
-class PackageManager::RemoteRepository : public BSolverRepository {
-public:
-								RemoteRepository();
-
-			status_t			Init(BPackageRoster& roster, BContext& context,
-									const char* name, bool refresh);
-
-			const BRepositoryConfig& Config() const;
-
-private:
-			BRepositoryConfig	fConfig;
-};
-
-
-class PackageManager::InstalledRepository : public BSolverRepository {
-public:
-			typedef BObjectList<BSolverPackage> PackageList;
-
-public:
-								InstalledRepository(const char* name,
-									BPackageInstallationLocation location,
-									int32 priority);
-
-			BPackageInstallationLocation Location() const
-									{ return fLocation; }
-			const char*			InitialName() const
-									{ return fInitialName; }
-			int32				InitialPriority() const
-									{ return fInitialPriority; }
-
-			void				DisablePackage(BSolverPackage* package);
-
-			PackageList&		PackagesToActivate()
-									{ return fPackagesToActivate; }
-			PackageList&		PackagesToDeactivate()
-									{ return fPackagesToDeactivate; }
-
-			bool				HasChanges() const;
-			void				ApplyChanges();
-
-private:
-			PackageList			fDisabledPackages;
-			PackageList			fPackagesToActivate;
-			PackageList			fPackagesToDeactivate;
-			const char*			fInitialName;
-			BPackageInstallationLocation fLocation;
-			int32				fInitialPriority;
+			BPackageManager::DaemonClientTransactionHandler
+									fDaemonClientTransactionHandler;
 };
 
 

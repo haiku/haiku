@@ -89,10 +89,7 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 	const char* const* packages = argv + optind;
 
 	// perform the update
-	PackageManager packageManager(location,
-		PackageManager::ADD_INSTALLED_REPOSITORIES
-			| PackageManager::ADD_REMOTE_REPOSITORIES
-			| PackageManager::REFRESH_REPOSITORIES);
+	PackageManager packageManager(location);
 	packageManager.Update(packages, packageCount);
 
 	return 0;

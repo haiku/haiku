@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#include <package/manager/RepositoryBuilder.h>
 #include <package/solver/SolverPackageSpecifier.h>
 #include <package/solver/SolverPackageSpecifierList.h>
 #include <package/solver/SolverProblem.h>
@@ -22,13 +23,14 @@
 
 #include "Command.h"
 #include "pkgman.h"
-#include "RepositoryBuilder.h"
 
 
 // TODO: internationalization!
 
 
 using namespace BPackageKit;
+using BManager::BPrivate::BPackagePathMap;
+using BManager::BPrivate::BRepositoryBuilder;
 
 
 static const char* const kShortUsage =
@@ -77,7 +79,7 @@ check_problems(BSolver* solver, const char* errorContext)
 
 static void
 verify_result(const BSolverResult& result,
-	const PackagePathMap& specifiedPackagePaths)
+	const BPackagePathMap& specifiedPackagePaths)
 {
 	// create the solver
 	BSolver* solver;
@@ -88,7 +90,7 @@ verify_result(const BSolverResult& result,
 	// Add an installation repository and add all of the result packages save
 	// the specified packages.
 	BSolverRepository installation;
-	RepositoryBuilder installationBuilder(installation, "installation");
+	BRepositoryBuilder installationBuilder(installation, "installation");
 
 	for (int32 i = 0; const BSolverResultElement* element = result.ElementAt(i);
 			i++) {
@@ -160,7 +162,7 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 		DIE(error, "failed to create solver");
 
 	// add repositories
-	PackagePathMap packagePaths;
+	BPackagePathMap packagePaths;
 	BObjectList<BSolverRepository> repositories(10, true);
 	int32 repositoryIndex = 0;
 	for (int i = 0; i < repositoryDirectoryCount; i++, repositoryIndex++) {
@@ -180,17 +182,18 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 			}
 		}
 
-		RepositoryBuilder(*repository, BString("repository") << repositoryIndex)
+		BRepositoryBuilder(*repository,
+				BString("repository") << repositoryIndex)
 			.SetPackagePathMap(&packagePaths)
 			.AddPackagesDirectory(directoryPath)
 			.AddToSolver(solver);
 	}
 
 	// add a repository with only the specified packages
-	PackagePathMap specifiedPackagePaths;
+	BPackagePathMap specifiedPackagePaths;
 	BSolverRepository dummyRepository;
 	{
-		RepositoryBuilder builder(dummyRepository, "dummy",
+		BRepositoryBuilder builder(dummyRepository, "dummy",
 				"specified packages");
 		builder.SetPackagePathMap(&specifiedPackagePaths);
 
@@ -202,7 +205,7 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 
 	// resolve
 	BSolverPackageSpecifierList packagesToInstall;
-	for (PackagePathMap::const_iterator it = specifiedPackagePaths.begin();
+	for (BPackagePathMap::const_iterator it = specifiedPackagePaths.begin();
 		it != specifiedPackagePaths.end(); ++it) {
 		if (!packagesToInstall.AppendSpecifier(it->first))
 			DIE(B_NO_MEMORY, "failed to add specified package");
@@ -231,7 +234,7 @@ ResolveDependenciesCommand::Execute(int argc, const char* const* argv)
 			continue;
 
 		// resolve and print the path
-		PackagePathMap::const_iterator it = packagePaths.find(package);
+		BPackagePathMap::const_iterator it = packagePaths.find(package);
 		if (it == packagePaths.end()) {
 			DIE(B_ERROR, "ugh, no package %p (%s-%s) not in package path map",
 				package,  package->Info().Name().String(),

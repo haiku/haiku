@@ -67,6 +67,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
+		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
 
 		Includes [ FGristFiles $(HPKG_SOURCES) ]
@@ -111,6 +112,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# hpkg, but only libpackage
 			NoErrorOutput.cpp
 			StandardErrorOutput.cpp
+
+			# manager
+			Exceptions.cpp
+			PackageManager.cpp
+			RepositoryBuilder.cpp
 
 			# solver
 			Solver.cpp

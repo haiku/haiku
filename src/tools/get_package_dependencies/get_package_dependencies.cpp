@@ -14,6 +14,7 @@
 #include <map>
 
 #include <package/RepositoryCache.h>
+#include <package/manager/RepositoryBuilder.h>
 #include <package/solver/Solver.h>
 #include <package/solver/SolverPackageSpecifier.h>
 #include <package/solver/SolverPackageSpecifierList.h>
@@ -22,11 +23,20 @@
 #include <package/solver/SolverRepository.h>
 #include <package/solver/SolverResult.h>
 
-#include "pkgman.h"
-#include "RepositoryBuilder.h"
+
+using namespace BPackageKit;
+using namespace BPackageKit::BManager::BPrivate;
 
 
 static const char* sProgramName = "get_package_dependencies";
+
+
+#define DIE(result, msg...)											\
+do {																\
+	fprintf(stderr, "*** " msg);									\
+	fprintf(stderr, " : %s\n", strerror(result));					\
+	exit(5);														\
+} while(0)
 
 
 void
@@ -74,7 +84,7 @@ main(int argc, const char* const* argv)
 	// add the "installed" repository with the given packages
 	BSolverRepository installedRepository;
 	{
-		RepositoryBuilder installedRepositoryBuilder(installedRepository,
+		BRepositoryBuilder installedRepositoryBuilder(installedRepository,
 			"installed");
 		for (int i = 0; i < packageCount; i++)
 			installedRepositoryBuilder.AddPackage(packages[i]);
@@ -89,7 +99,7 @@ main(int argc, const char* const* argv)
 		error = cache.SetTo(repositories[i]);
 		if (error != B_OK)
 			DIE(error, "failed to read repository file '%s'", repositories[i]);
-		RepositoryBuilder(*repository, cache)
+		BRepositoryBuilder(*repository, cache)
 			.AddToSolver(solver, false);
 		repositoryInfos[repository] = cache.Info();
 	}

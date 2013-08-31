@@ -15,10 +15,8 @@ BinCommand pkgman :
 	command_uninstall.cpp
 	DecisionProvider.cpp
 	JobStateListener.cpp
-	PackageInfoErrorListener.cpp
 	PackageManager.cpp
 	pkgman.cpp
-	RepositoryBuilder.cpp
 	:
 	package be
 	$(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)

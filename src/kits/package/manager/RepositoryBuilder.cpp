@@ -7,7 +7,7 @@
  */
 
 
-#include "RepositoryBuilder.h"
+#include <package/manager/RepositoryBuilder.h>
 
 #include <errno.h>
 #include <dirent.h>
@@ -18,11 +18,46 @@
 
 #include <AutoDeleter.h>
 
-#include "PackageInfoErrorListener.h"
-#include "pkgman.h"
+#include "PackageManagerUtils.h"
 
 
-RepositoryBuilder::RepositoryBuilder(BSolverRepository& repository,
+namespace BPackageKit {
+
+namespace BManager {
+
+namespace BPrivate {
+
+
+namespace {
+
+
+class PackageInfoErrorListener : public BPackageInfo::ParseErrorListener {
+public:
+	PackageInfoErrorListener(const char* context)
+	{
+	}
+
+	virtual void OnError(const BString& message, int line, int column)
+	{
+		fErrors << BString().SetToFormat("%s: parse error in line %d:%d: %s\n",
+			fContext, line, column, message.String());
+	}
+
+	const BString& Errors() const
+	{
+		return fErrors;
+	}
+
+private:
+	const char*	fContext;
+	BString		fErrors;
+};
+
+
+} // unnamed namespace
+
+
+BRepositoryBuilder::BRepositoryBuilder(BSolverRepository& repository,
 	const BString& name, const BString& errorName)
 	:
 	fRepository(repository),
@@ -35,7 +70,7 @@ RepositoryBuilder::RepositoryBuilder(BSolverRepository& repository,
 }
 
 
-RepositoryBuilder::RepositoryBuilder(BSolverRepository& repository,
+BRepositoryBuilder::BRepositoryBuilder(BSolverRepository& repository,
 	const BRepositoryConfig& config)
 	:
 	fRepository(repository),
@@ -48,7 +83,7 @@ RepositoryBuilder::RepositoryBuilder(BSolverRepository& repository,
 }
 
 
-RepositoryBuilder::RepositoryBuilder(BSolverRepository& repository,
+BRepositoryBuilder::BRepositoryBuilder(BSolverRepository& repository,
 	const BRepositoryCache& cache, const BString& errorName)
 	:
 	fRepository(repository),
@@ -62,16 +97,16 @@ RepositoryBuilder::RepositoryBuilder(BSolverRepository& repository,
 }
 
 
-RepositoryBuilder&
-RepositoryBuilder::SetPackagePathMap(PackagePathMap* packagePaths)
+BRepositoryBuilder&
+BRepositoryBuilder::SetPackagePathMap(BPackagePathMap* packagePaths)
 {
 	fPackagePaths = packagePaths;
 	return *this;
 }
 
 
-RepositoryBuilder&
-RepositoryBuilder::AddPackage(const BPackageInfo& info,
+BRepositoryBuilder&
+BRepositoryBuilder::AddPackage(const BPackageInfo& info,
 	const char* packageErrorName, BSolverPackage** _package)
 {
 	status_t error = fRepository.AddPackage(info, _package);
@@ -86,27 +121,28 @@ RepositoryBuilder::AddPackage(const BPackageInfo& info,
 }
 
 
-RepositoryBuilder&
-RepositoryBuilder::AddPackage(const char* path, BSolverPackage** _package)
+BRepositoryBuilder&
+BRepositoryBuilder::AddPackage(const char* path, BSolverPackage** _package)
 {
 	// read a package info from the (HPKG or package info) file
 	BPackageInfo packageInfo;
 
 	size_t pathLength = strlen(path);
 	status_t error;
+	PackageInfoErrorListener errorListener(path);
 	if (pathLength > 5 && strcmp(path + pathLength - 5, ".hpkg") == 0) {
 		// a package file
 		error = packageInfo.ReadFromPackageFile(path);
 	} else {
 		// a package info file (supposedly)
-		PackageInfoErrorListener errorListener(
-			"Error: failed to read package info");
 		error = packageInfo.ReadFromConfigFile(BEntry(path, true),
 			&errorListener);
 	}
 
-	if (error != B_OK)
-		DIE(error, "failed to read package info from \"%s\"", path);
+	if (error != B_OK) {
+		DIE_DETAILS(errorListener.Errors(), error,
+			"failed to read package info from \"%s\"", path);
+	}
 
 	// add the package
 	BSolverPackage* package;
@@ -123,8 +159,8 @@ RepositoryBuilder::AddPackage(const char* path, BSolverPackage** _package)
 }
 
 
-RepositoryBuilder&
-RepositoryBuilder::AddPackages(BPackageInstallationLocation location,
+BRepositoryBuilder&
+BRepositoryBuilder::AddPackages(BPackageInstallationLocation location,
 	const char* locationErrorName)
 {
 	status_t error = fRepository.AddPackages(location);
@@ -136,8 +172,8 @@ RepositoryBuilder::AddPackages(BPackageInstallationLocation location,
 }
 
 
-RepositoryBuilder&
-RepositoryBuilder::AddPackagesDirectory(const char* path)
+BRepositoryBuilder&
+BRepositoryBuilder::AddPackagesDirectory(const char* path)
 {
 	// open directory
 	DIR* dir = opendir(path);
@@ -172,8 +208,8 @@ RepositoryBuilder::AddPackagesDirectory(const char* path)
 }
 
 
-RepositoryBuilder&
-RepositoryBuilder::AddToSolver(BSolver* solver, bool isInstalled)
+BRepositoryBuilder&
+BRepositoryBuilder::AddToSolver(BSolver* solver, bool isInstalled)
 {
 	fRepository.SetInstalled(isInstalled);
 
@@ -184,3 +220,10 @@ RepositoryBuilder::AddToSolver(BSolver* solver, bool isInstalled)
 	}
 	return *this;
 }
+
+
+}	// namespace BPrivate
+
+}	// namespace BManager
+
+}	// namespace BPackageKit

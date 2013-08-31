@@ -119,9 +119,10 @@ SearchCommand::Execute(int argc, const char* const* argv)
 	const char* searchString = listAll ? "" : argv[optind++];
 
 	// create the solver
-	PackageManager packageManager(B_PACKAGE_INSTALLATION_LOCATION_HOME,
-		(!uninstalledOnly ? PackageManager::ADD_INSTALLED_REPOSITORIES : 0)
-			| (!installedOnly ? PackageManager::ADD_REMOTE_REPOSITORIES : 0));
+	PackageManager packageManager(B_PACKAGE_INSTALLATION_LOCATION_HOME);
+	packageManager.Init(
+		(!uninstalledOnly ? PackageManager::B_ADD_INSTALLED_REPOSITORIES : 0)
+			| (!installedOnly ? PackageManager::B_ADD_REMOTE_REPOSITORIES : 0));
 
 	// search
 	BObjectList<BSolverPackage> packages;

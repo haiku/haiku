@@ -5,6 +5,7 @@ UsePrivateBuildHeaders kernel package shared storage ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
 
 USES_BE_API on libpackage_build.so = true ;
@@ -115,6 +116,10 @@ BuildPlatformSharedLibrary libpackage_build.so
 	# hpkg, but only libpackage
 	NoErrorOutput.cpp
 	StandardErrorOutput.cpp
+
+	# manager
+	Exceptions.cpp
+	RepositoryBuilder.cpp
 
 	# solver
 	Solver.cpp

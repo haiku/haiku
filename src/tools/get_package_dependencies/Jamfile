@@ -8,10 +8,6 @@ USES_BE_API on <build>get_package_dependencies = true ;
 
 BuildPlatformMain <build>get_package_dependencies :
 	get_package_dependencies.cpp
-
-	# pkgman sources
-	PackageInfoErrorListener.cpp
-	RepositoryBuilder.cpp
 	:
 	libpackage-add-on-libsolv_build.so
 	libsolvext_build.so libsolv_build.so
