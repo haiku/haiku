@@ -34,10 +34,10 @@ Account settings	AutoConfigWindow		アカウント設定
 E-mail	System name		メール
 never	Config Window	mail checking frequency	手動でチェック
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n一般設定を元に戻せませんでした。\n\n読み取り時に次のエラーが発生しました:\n%s\n
-Real name:	Config Views		本名：
+Real name:	Config Views		本名:
 \t\t· Outgoing	Config Window		\t\t· 送信
 Choose Protocol	E-Mail		プロトコルを選択してください
-Return address:	Config Views		返信先アドレス：
+Return address:	Config Views		返信先アドレス:
 Edit mailbox menu…	Config Window		メールボックスメニューの編集…
 Outgoing	E-Mail		送信
 \t\t· E-mail filters	Config Window		\t\t· メールフィルター
@@ -50,7 +50,7 @@ Incoming mail filters	Config Views		受信メールフィルター
 Account settings	Config Views		アカウント設定
 minutes	Config Window		分ごとにチェック
 Error retrieving general settings: %s\n	Config Window		一般設定の読み取り時に次のエラーが発生しました: %s\n
-Real name:	E-Mail		実名：
+Real name:	E-Mail		実名:
 Apply	Config Window		適用
 Always	Config Window		常に
 OK	AutoConfigWindow		OK

@@ -1,6 +1,6 @@
 1	japanese	x-vnd.Haiku-Devices	865240481
 Manufacturer	DeviceSCSI		製造元
-Order by:	DevicesView		並び順：
+Order by:	DevicesView		並び順:
 ACPI controller	Device		ACPI コントローラー
 Memory controller	Device		メモリコントローラー
 Driver used	DevicePCI		使用されているデバイス
@@ -49,10 +49,10 @@ PCI bus	Device		PCI バス
 ACPI System Indicator	DeviceACPI		ACPI システムインジケーター 
 None	Device		無し
 PCI bus	DevicesView		PCI バス
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		クラス情報：\t\t\t\t: %classInfo%
+Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		クラス情報:\t\t\t\t: %classInfo%
 Basic information	DevicesView		基本情報
 PCI Information	DevicePCI		PCI 情報
-Manufacturer:	Device		メーカー：
+Manufacturer:	Device		メーカー:
 ACPI bus	DevicesView		ACPI バス
 Changer	DeviceSCSI		チェンジャー
 ACPI System Bus	DeviceACPI		ACPI システムバス
@@ -60,7 +60,7 @@ Devices	System name		デバイス
 Worm	DeviceSCSI		Worm
 Multimedia controller	Device		マルチメディアコントローラー
 Unknown	DevicePCI		不明
-Device name:	Device		デバイス名：
+Device name:	Device		デバイス名:
 Computer	DevicesView		コンピューター
 Value	PropertyList		値
 Report compatibility	DevicesView		互換性レポート

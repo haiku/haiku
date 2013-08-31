@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-SMTP	2740407895
-SMTP server:	ConfigView		SMTPサーバー：
+SMTP server:	ConfigView		SMTP サーバー:
 STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		%serv へのログイン中にエラーが発生しました
 Unencrypted	ConfigView		暗号化無し
@@ -8,7 +8,7 @@ ESMTP	ConfigView		ESMTP
 Connecting to server…	smtp		接続中...
 Error while opening connection to %serv	smtp		%serv への接続中にエラーが発生しました
 POP3 authentication failed. The server said:\n	smtp		POP3認証に失敗しました。\n
-Destination:	ConfigView		メッセージの保存先：
+Destination:	ConfigView		メッセージの保存先:
 : Connection refused or host not found.	smtp		接続が拒否されたかサーバーが見つかりません。
 None	ConfigView		無し
 POP3 before SMTP	ConfigView		POP3 before SMTP

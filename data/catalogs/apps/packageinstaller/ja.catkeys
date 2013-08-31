@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-PackageInstaller	1396489627
-Install to:	PackageView		インストール先：
+Install to:	PackageView		インストール先:
 OK	PackageView		OK
 Accept	PackageTextViewer		承認
 Continue	PackageInstall		続ける
@@ -10,7 +10,7 @@ No package selected.	PackageInfo		パッケージが選択されていません�
 Install	PackageView		インストール
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		与えられたパッケージはすでにインストールされているようです。既存のものをアンインストールしてインストールを続けますか?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		この決定を残りのインストール作業のために記憶しますか?\n
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		パッケージファイル中にファイルサイズの不一致があるようです。パッケージが壊れているか、作成後変更されたおそれがあります。インストールをまだ続けますか?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		パッケージファイル中にファイルサイズの不一致があるようです。パッケージが壊れているか、作成後変更されたおそれがあります。インストールを本当に続けますか?
 Error while installing the package\n	PackageView		パッケージをインストール中にエラーが発生しました\n
 Disclaimer	PackageTextViewer		免責条項
 %.1f GiB	PackageView		%.1f GiB
@@ -40,7 +40,7 @@ Installation type:	PackageView		インストールタイプ:
 Error (%s)! Could not open \"%s\".\n	Packageinstaller main		エラー (%s)! \"%s\" を開けませんでした。\n
 Finishing installation	PackageInstall		インストールを終了中
 Installing package	PackageStatus		パッケージをインストール中
-Ask again	PackageView		再び尋ねる
+Ask again	PackageView		次回確認する
 Abort	PackageView		中断
 Replace all	PackageView		すべて置換
 Decline	PackageTextViewer		断る

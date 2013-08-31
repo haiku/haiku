@@ -23,7 +23,7 @@ Page faults	DataSource		ページフォールト数
 Sending	DataSource		送信バイト数
 Cache	DataSource		キャッシュ
 %.1f faults/s	DataSource		%.1f フォールト/s
-Update time interval:	SettingsWindow		更新間隔：
+Update time interval:	SettingsWindow		更新間隔:
 TX	DataSource	Shorter version for Sending	送信
 Quit	ActivityWindow		終了
 Block cache memory	DataSource		ブロックキャッシュメモリ

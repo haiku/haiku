@@ -5,15 +5,15 @@ Settings…	PoorMan		設定…
 Create PoorMan log	PoorMan		PoorMan のログを作成
 Shutting down.\n	PoorMan		シャットダウン中です。\n
 Hits: %lu	PoorMan		ヒット: %lu
-Web folder:	PoorMan		Web フォルダー：
+Web folder:	PoorMan		Web フォルダー:
 Default	PoorMan		デフォルト
 Save log console selection	PoorMan		ログコンソールの選択部を保存
 Run server	PoorMan		サーバーを起動
 PoorMan settings	PoorMan		PoorMan 設定
 Clear hit counter	PoorMan		ヒットカウンタを消去
 Copy	PoorMan		コピー
-Max. simultaneous connections:	PoorMan		最大同時接続数：
-Start page:	PoorMan		スタートページ：
+Max. simultaneous connections:	PoorMan		最大同時接続数:
+Start page:	PoorMan		スタートページ:
 done.\n	PoorMan		完了。\n
 Create	PoorMan		作成
 Shutting down.	PoorMan		シャットダウン中。
@@ -22,7 +22,7 @@ File Name	PoorMan		ファイル名
 Clear console log	PoorMan		コンソールログを消去
 Advanced	PoorMan		詳細設定
 OK	PoorMan		OK
-Status: Stopped	PoorMan		状況： 停止中
+Status: Stopped	PoorMan		状況: 停止中
 Dir Created	PoorMan		ディレクトリが作成されました
 Log to file	PoorMan		ファイルにログを出力
 Quit	PoorMan		終了
@@ -35,7 +35,7 @@ Directory: (none)	PoorMan		ディレクトリ: (無し)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Web に公開するフォルダーを選択してください。\n\nPoorMan にデフォルトの \"public_html\" をホームフォルダー中に作成させることもできます。\nまたは、代わりにユーザーのフォルダーを指定することもできます。
 Log To Console	PoorMan		コンソールにログを出力
 Connections	PoorMan		接続
-Status: Running	PoorMan		状況： 実行中
+Status: Running	PoorMan		状況: 実行中
 connections	PoorMan		接続
 Controls	PoorMan		コントロール
 Send file listing if there's no start page	PoorMan		スタートページがない場合、ファイルリストを送信します
@@ -50,8 +50,8 @@ Logging view	PoorMan		ログビュー
 Logging	PoorMan		ログ
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		デフォルトの web フォルダーが \"/boot/home/public_html.\" に作成されました。\nフォルダー中に \"index.html\" という HTML ファイルがあることを確認してください。
 Clear log file	PoorMan		ログファイルを消去
-Log file name:	PoorMan		ログファイル名：
-Directory: 	PoorMan		ディレクトリ：
+Log file name:	PoorMan		状況: 実行中
+Directory: 	PoorMan		ディレクトリ:
 Log To File	PoorMan		ファイルにログを出力
 Done	PoorMan		完了
 Create log file	PoorMan		作成

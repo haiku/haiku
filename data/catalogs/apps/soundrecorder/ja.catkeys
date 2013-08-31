@@ -15,7 +15,7 @@ Sound List	RecorderWindow		サウンドリスト
 Compression: 	RecorderWindow		圧縮: 
 Rewind	RecorderWindow		巻き戻し
 Sample rate:	RecorderWindow		サンプルレート:
-Invalid audio files	RecorderWindow		不正なオーディオファイル
+Invalid audio files	RecorderWindow		無効なオーディオファイル
  seconds	RecorderWindow		秒
 OK	RecorderWindow		OK
 Cannot open the temporary file created to hold the new recording	RecorderWindow		新規レコーディングを保存する一時ファイルを開けません
@@ -30,13 +30,13 @@ None	RecorderWindow		無し
 Record	RecorderWindow		録音
 Sample size: 	RecorderWindow		ビット深度:
 Cannot recognize this file as a media file	RecorderWindow		ファイルをメディアファイルとして認識できません
-Format: 	RecorderWindow		フォーマット：
+Format: 	RecorderWindow		フォーマット:
 File name: 	RecorderWindow		ファイル名:
 Cannot connect to the selected sound input	RecorderWindow		指定したサウンド出力に接続できません
 Cannot get the file to play	RecorderWindow		再生するファイルが得られません
 Cannot record a sound that long	RecorderWindow		その長さのサウンドは録音できません
 Duration:	RecorderWindow		再生時間:
-Compression:	RecorderWindow		圧縮：
+Compression:	RecorderWindow		圧縮:
 Cannot find an unused name to use for the new recording	RecorderWindow		新規レコーディングに使用する未使用の名前が見つかりません
 Channels: 	RecorderWindow		チャンネル:
 Save	RecorderWindow		保存

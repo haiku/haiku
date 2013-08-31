@@ -8,7 +8,7 @@ Cancel	PrintServerApp		中止
 Retrieve a specific printer	PrintServerApp Scripting		特定のプリンターを取得
 Page %1 to %2	ConfigWindow		ページ %1 からページ %2 まで
 Get name of the printer add-on used for this printer	Printer Scripting		このプリンターが使うプリンターアドオンを取得
-Page setup:	ConfigWindow		ページ設定：
+Page setup:	ConfigWindow		ページ設定:
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	JIS B5 (182 x 257 mm)
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		中止
@@ -25,7 +25,7 @@ There is no default printer set up.	PrintServerApp		デフォルトプリンタ�
 B5	ConfigWindow	ISO 216 paper size	B5 (176 x 250 mm)
 A0	ConfigWindow	ISO 216 paper size	A0 (841 x 1189 mm)
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter (216 x 279 mm)
-Printer:	ConfigWindow		プリンター：
+Printer:	ConfigWindow		プリンター:
 A2	ConfigWindow	ISO 216 paper size	A2 (420 x 594 mm)
 Select a printer	ConfigWindow		プリンターを選択
 Show configuration window	PrintServerApp Scripting		設定ウィンドウを表示
@@ -52,4 +52,4 @@ A5	ConfigWindow	ISO 216 paper size	A5 (148 x 210 mm)
 Would you like to make @ the default printer?	PrintServerApp		@ をデフォルトプリンターに設定しますか？
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid (279 x 432 mm)
 Page setup	ConfigWindow		ページ設定
-Paper setup:	ConfigWindow		用紙設定：
+Paper setup:	ConfigWindow		用紙設定:

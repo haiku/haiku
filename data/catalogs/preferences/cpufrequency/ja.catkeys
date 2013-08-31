@@ -12,10 +12,10 @@ Dynamic performance	Status view		ダイナミックパフォーマンス
 Step up by CPU usage	Color Step View		CPU 負荷に応じてステップアップ
 Dynamic stepping	CPU Frequency View		ダイナミックステッピング
 Stepping policy: 	CPU Frequency View		ステッピングポリシー
-Integration time [ms]: 	CPU Frequency View		積分時間 [ms]：
+Integration time [ms]: 	CPU Frequency View		積分時間 [ms]:
 Open Speedstep preferences…	Status view		Open Speedstep の設定…
 Revert	Pref Window		元に戻す
 Low energy	Status view		省電力モード
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		CPU 周波数の起動に失敗しました。\n\nエラー：
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		CPU 周波数の起動に失敗しました。\n\nエラー:
 CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPU 周波数\n\tClemens Zeidler 作\n\tCopyright 2009, Haiku, Inc.\n
 CPUFrequency	System name		CPU 周波数

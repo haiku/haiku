@@ -7,7 +7,7 @@ Stream settings	MediaPlayer-Main		ストリーム設定
 <unknown>	PlaylistItem-album		<不明>
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		フルスクリーン表示時にコントロールを拡大する
 Video	MediaPlayer-InfoWin		ビデオ
-Subtitle size:	MediaPlayer-SettingsWindow		サブタイトルのサイズ：
+Subtitle size:	MediaPlayer-SettingsWindow		字幕のサイズ:
 Save Playlist	MediaPlayer-PlaylistWindow		プレイリストを保存
 <no media>	MediaPlayer-InfoWin		<メディアはありません>
 (not supported)	MediaPlayer-InfoWin		(サポートされていません)
@@ -16,7 +16,7 @@ Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		プレイリ�
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		新規プレーヤー…
 100% scale	MediaPlayer-Main		100% 表示
-Subtitle placement:	MediaPlayer-SettingsWindow		サブタイトルの位置：
+Subtitle placement:	MediaPlayer-SettingsWindow		字幕の位置:
 Close	MediaPlayer-Main		閉じる
 Display Mode	MediaPlayer-InfoWin		表示モード
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		いくつかのファイルはごみ箱に移動できませんでした。
@@ -32,7 +32,7 @@ Close	MediaPlayer-PlaylistWindow		閉じる
 Stereo	MediaPlayer-InfoWin		ステレオ
 Open…	MediaPlayer-PlaylistWindow		開く…
 Toggle mute.	MediaPlayer-Main		ミュートのオン / オフ
-Undo	MediaPlayer-PlaylistWindow		元に戻す：
+Undo	MediaPlayer-PlaylistWindow		元に戻す
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		可能なら、ハードウェアビデオオーバーレイを使う
 File info…	MediaPlayer-Main		ファイル情報…
 Pause playback.	MediaPlayer-Main		再生を一時停止する。
@@ -80,7 +80,7 @@ Close window after playing video	MediaPlayer-SettingsWindow		ビデオ再生終�
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		ムービーのスムーズな拡大縮小 (オーバーレイモード以外)
 OK	MediaPlayer-RemovePLItemsCmd		OK
 50% scale	MediaPlayer-Main		50% 表示
-Subtitles	MediaPlayer-Main		サブタイトル
+Subtitles	MediaPlayer-Main		字幕
 Prev	MediaPlayer-Main		前に
 Volume	MediaPlayer-Main		ボリューム
 Audio track	MediaPlayer-Main		音声トラック
@@ -99,14 +99,14 @@ Attributes	MediaPlayer-Main		属性
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		すべてのファイルをごみ箱に移動できませんでした。
 <untitled>	PlaylistItem-title		<無題>
 Track	Audio Track Menu		トラック
-unknown format	MediaPlayer-InfoWin		不明なフォーマット：
+unknown format	MediaPlayer-InfoWin		不明なフォーマット
 <nothing to redo>	MediaPlayer-PlaylistWindow		<やり直すものがありません>
 Skip to the next track.	MediaPlayer-Main		次のトラックに飛ぶ
 Play	MediaPlayer-Main		再生
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱に移動
 200% scale	MediaPlayer-Main		200% 表示
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		メディアサーバーが動いていないようです。\n起動してもよろしいですか ?
-Duration	MediaPlayer-InfoWin		時間
+Duration	MediaPlayer-InfoWin		再生時間
 Aspect ratio	MediaPlayer-Main		アスペクト比
 Error: 	MediaPlayer-Main		エラー:
 Large	MediaPlayer-SettingsWindow		大
@@ -124,7 +124,7 @@ Move file to Trash	MediaPlayer-PlaylistWindow		ファイルをごみ箱に移動
 URI	MediaPlayer-Main		URI
 Mute	MediaPlayer-Main		ミュート
 Toggle pause/play.	MediaPlayer-Main		一時停止 / 再生
-Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku メディアキット：
+Haiku Media Kit: 	MediaPlayer-InfoWin		Haiku メディアキット:
 min	MediaPlayer-InfoWin	Minutes	分
 Small	MediaPlayer-SettingsWindow		小
 Randomize	MediaPlayer-PlaylistWindow		ランダムに並べ替え
@@ -145,7 +145,7 @@ Playlist…	MediaPlayer-Main		プレイリスト…
 <unknown>	PlaylistItem-author		<不明>
 Save as…	MediaPlayer-PlaylistWindow		名前を付けて保存…
 Copy Entries	MediaPlayer-CopyPLItemsCmd		項目をコピー
-Redo	MediaPlayer-PlaylistWindow		やり直し：
+Redo	MediaPlayer-PlaylistWindow		やり直し
 Always on top	MediaPlayer-Main		常に最前面
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱へ移動
 Save	MediaPlayer-Main		保存

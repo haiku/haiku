@@ -1,18 +1,18 @@
 1	japanese	x-vnd.Haiku-WebPositive	1786411139
 Show home button	Settings Window		ホームボタンを表示する
-Username:	Authentication Panel		ユーザー名：
+Username:	Authentication Panel		ユーザー名:
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
 Cancel	Settings Window		中止
 Close window	WebPositive Window		ウィンドウを閉じる
 Quit	WebPositive		終了
 The download could not be opened.	Download Window		ダウンロードを開けませんでした。
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	ダウンロードフォルダーを開けませんでした。\n\nエラー： %error
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	ダウンロードフォルダーを開けませんでした。\n\nエラー: %error
 Open location	WebPositive Window		url を開く
 Clear history	WebPositive Window		履歴のクリア
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		昨日
-Default standard font size:	Settings Window		規定の標準フォントサイズ：
-Start page:	Settings Window		スタートページ：
+Default standard font size:	Settings Window		規定の標準フォントサイズ:
+Start page:	Settings Window		スタートページ:
 History	WebPositive Window		履歴
 Error opening downloads folder	Download Window		ダウンロードフォルダーを開く際にエラーが発生しました
 Paste	WebPositive Window		貼り付け
@@ -23,26 +23,26 @@ Settings	Settings Window		設定
 Confirmation	WebPositive Window		確認
 Window	WebPositive Window		ウィンドウ
 Decrease size	WebPositive Window		サイズを小さく
-Serif font:	Settings Window		セリフフォント：
+Serif font:	Settings Window		セリフフォント:
 Loading %url	WebPositive Window		読み込み中 %url
 Page source	WebPositive Window		ページのソース
 Next	WebPositive Window		次へ
 Find next	WebPositive Window		次を検索
-Download folder:	Settings Window		ダウンロードフォルダー：
+Download folder:	Settings Window		ダウンロードフォルダー:
 Edit	WebPositive Window		編集
 Over %hours hours left	Download Window		残り %hours 時間以上
 Cancel	Authentication Panel		中止
 Match case	WebPositive Window		大文字と小文字を区別する
-Search page:	Settings Window		検索ページ：
+Search page:	Settings Window		検索ページ:
 Zoom text only	WebPositive Window		テキストのみ拡大
-Default fixed font size:	Settings Window		規定の固定フォントサイズ：
+Default fixed font size:	Settings Window		規定の固定フォントサイズ:
 Close tab	WebPositive Window		タブを閉じる
 Auto-hide mouse pointer	Settings Window		自動的にマウスポインターを隠す。
 Over 1 hour left	Download Window		残り 1 時間以上
 Quit	WebPositive Window		終了
 Full screen	WebPositive Window		全画面表示
 Open download error	Download Window		ダウンロードを開く際にエラー
-Standard font:	Settings Window		標準フォント：
+Standard font:	Settings Window		標準フォント:
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	文字列を前方へ検索
 Restart	Download Window		再開
 Proxy server	Settings Window		プロキシサーバー
@@ -115,7 +115,7 @@ Remember username and password for this site	Authentication Panel		このサイ�
 Earlier	WebPositive Window		6 日以上前
 Authentication required	Authentication Panel		認証が必要です
 Use proxy server to connect to the internet	Settings Window		インターネット接続にプロキシサーバーを使用する。
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		ダウンロードが進行中です。WebPositive を今終了してもよいですか?
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		ダウンロードが進行中です。WebPositive を今終了しますか?
 Auto-hide interface in full screen mode	Settings Window		全画面表示時に自動的にインターフェイスを隠す。
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url 失敗。
 New tab	WebPositive Window		新規タブ

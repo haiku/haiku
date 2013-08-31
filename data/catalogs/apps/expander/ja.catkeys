@@ -2,7 +2,7 @@
 Expand	ExpanderMenu		解凍
 Close window when done expanding	ExpanderPreferences		解凍終了後ウィンドウを閉じる
 Set destination…	ExpanderMenu		解凍先を指定…
-Use:	ExpanderPreferences		パスを指定：
+Use:	ExpanderPreferences		パスを指定:
 File expanded	ExpanderWindow		ファイル解凍が完了しました
 The destination is read only.	ExpanderWindow		解凍先は読み取り専用です
 Expander: Open	ExpanderWindow		ファイル解凍: 開く
@@ -36,7 +36,7 @@ Leave destination folder path empty	ExpanderPreferences		パスを空にして�
 Failed to create the destination folder.	ExpanderWindow		展開先のフォルダーを作成できませんでした:
 Create	ExpanderWindow		作成
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		指定されたフォルダーが移動されたか、名前が変更されたか、\nサポートされていません。
-The file doesn't exist	ExpanderWindow		ファイルは存在しません
+The file doesn't exist	ExpanderWindow		ファイルがありません
 Stop	ExpanderMenu		中止
 File	ExpanderMenu		ファイル
 Expander	System name		ファイル解凍
