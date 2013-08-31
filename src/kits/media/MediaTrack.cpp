@@ -20,8 +20,6 @@
 
 #include <Roster.h>
 
-#include "debug.h"
-
 #include "MediaExtractor.h"
 #include "MediaWriter.h"
 #include "PluginManager.h"
@@ -217,26 +215,43 @@ BMediaTrack::DecodedFormat(media_format* _format, uint32 flags)
 	printf("BMediaTrack::DecodedFormat: nego: %s\n", s);
 #endif
 
-	if (_format->type == 0)
-		debugger("Decoder didn't set output format type");
+	if (_format->type == 0) {
+		printf("BMediaTrack::DecodedFormat: Decoder didn't set output format "
+			"type");
+	}
 
 	if (_format->type == B_MEDIA_RAW_AUDIO) {
-		if (_format->u.raw_audio.byte_order == 0)
-			debugger("Decoder didn't set raw audio output byte order");
-		if (_format->u.raw_audio.format == 0)
-			debugger("Decoder didn't set raw audio output sample format");
-		if (_format->u.raw_audio.buffer_size <= 0)
-			debugger("Decoder didn't set raw audio output buffer size");
+		if (_format->u.raw_audio.byte_order == 0) {
+			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw audio "
+				"output byte order.\n");
+		}
+		if (_format->u.raw_audio.format == 0) {
+			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw audio "
+				"output sample format.\n");
+		}
+		if (_format->u.raw_audio.buffer_size <= 0) {
+			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw audio "
+				"output buffer size.\n");
+		}
 	}
+
 	if (_format->type == B_MEDIA_RAW_VIDEO) {
-		if (_format->u.raw_video.display.format == 0)
-			debugger("Decoder didn't set raw video output color space");
-		if (_format->u.raw_video.display.line_width == 0)
-			debugger("Decoder didn't set raw video output line_width");
-		if (_format->u.raw_video.display.line_count == 0)
-			debugger("Decoder didn't set raw video output line_count");
-		if (_format->u.raw_video.display.bytes_per_row == 0)
-			debugger("Decoder didn't set raw video output bytes_per_row");
+		if (_format->u.raw_video.display.format == 0) {
+			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw video "
+				"output color space.\n");
+		}
+		if (_format->u.raw_video.display.line_width == 0) {
+			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw video "
+				"output line_width.\n");
+		}
+		if (_format->u.raw_video.display.line_count == 0) {
+			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw video "
+				"output line_count.\n");
+		}
+		if (_format->u.raw_video.display.bytes_per_row == 0) {
+			printf("BMediaTrack::DecodedFormat: Decoder didn't set raw video "
+				"output bytes_per_row.\n");
+		}
 	}
 
 	if ((flags & B_MEDIA_DISABLE_FORMAT_TRANSLATION) == 0) {
