@@ -401,6 +401,7 @@ MediaConverterWindow::MessageReceived(BMessage* message)
 			inEntry.SetTo(&inRef, true);
 			_SetOutputFolder(inEntry);
 			fOutputDirSpecified = true;
+			fSaveFilePanel->Rewind();
 			break;
 
 		case SELECT_THIS_DIR_MESSAGE:
