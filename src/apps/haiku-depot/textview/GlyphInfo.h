@@ -16,23 +16,23 @@ public:
 		x(0.0f),
 		y(0.0f),
 		advanceX(0.0f),
-		maxAscend(0.0f),
-		maxDescend(0.0f),
+		maxAscent(0.0f),
+		maxDescent(0.0f),
 		lineIndex(0),
 		style()
 	{
 	}
 
 	GlyphInfo(uint32 charCode, float x, float y, float advanceX,
-			float maxAscend, float maxDescend, int lineIndex,
+			float maxAscent, float maxDescent, int lineIndex,
 			const TextStyleRef& style)
 		:
 		charCode(charCode),
 		x(x),
 		y(y),
 		advanceX(advanceX),
-		maxAscend(maxAscend),
-		maxDescend(maxDescend),
+		maxAscent(maxAscent),
+		maxDescent(maxDescent),
 		lineIndex(lineIndex),
 		style(style)
 	{
@@ -44,8 +44,8 @@ public:
 		x(other.x),
 		y(other.y),
 		advanceX(other.advanceX),
-		maxAscend(other.maxAscend),
-		maxDescend(other.maxDescend),
+		maxAscent(other.maxAscent),
+		maxDescent(other.maxDescent),
 		lineIndex(other.lineIndex),
 		style(other.style)
 	{
@@ -57,8 +57,8 @@ public:
 		x = other.x;
 		y = other.y;
 		advanceX = other.advanceX;
-		maxAscend = other.maxAscend;
-		maxDescend = other.maxDescend;
+		maxAscent = other.maxAscent;
+		maxDescent = other.maxDescent;
 		lineIndex = other.lineIndex;
 		style = other.style;
 		return *this;
@@ -70,8 +70,8 @@ public:
 			&& x == other.x
 			&& y == other.y
 			&& advanceX == other.advanceX
-			&& maxAscend == other.maxAscend
-			&& maxDescend == other.maxDescend
+			&& maxAscent == other.maxAscent
+			&& maxDescent == other.maxDescent
 			&& lineIndex == other.lineIndex
 			&& style == other.style;
 	}
@@ -88,8 +88,8 @@ public:
 	float					y;
 	float					advanceX;
 
-	float					maxAscend;
-	float					maxDescend;
+	float					maxAscent;
+	float					maxDescent;
 
 	int						lineIndex;
 

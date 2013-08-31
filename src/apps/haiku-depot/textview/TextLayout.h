@@ -82,4 +82,4 @@ private:
 
 };
 
-#endif // FILTER_VIEW_H
+#endif // TEXT_LAYOUT_H

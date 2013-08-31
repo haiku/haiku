@@ -554,8 +554,8 @@ TextLayout::_FinalizeLine(int lineStart, int lineEnd, int lineIndex, float y,
 	fLineInfos.Add(LineInfo(lineStart, y, lineHeight, maxAscent, maxDescent));
 
 	for (int i = lineStart; i <= lineEnd; i++) {
-		fGlyphInfoBuffer[i].maxAscend = maxAscent;
-		fGlyphInfoBuffer[i].maxDescend = maxDescent;
+		fGlyphInfoBuffer[i].maxAscent = maxAscent;
+		fGlyphInfoBuffer[i].maxDescent = maxDescent;
 		fGlyphInfoBuffer[i].lineIndex = lineIndex;
 		fGlyphInfoBuffer[i].y += maxAscent;
 	}
