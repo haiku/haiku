@@ -82,7 +82,7 @@ public:
 	// The data returned through ReadFrames() will be in the format that's
  	// returned by this function.
 
-			status_t			DecodedFormat(media_format* _inOutFormat,
+			status_t			DecodedFormat(media_format* _format,
 									uint32 flags = 0);
 
 	// CountFrames and Duration return the total number of frame and the
@@ -113,15 +113,15 @@ public:
 	// in microseconds, is in the media_header structure.
 
 			status_t			ReadFrames(void* buffer, int64* _frameCount,
-									media_header* mediaHeader = NULL);
+									media_header* header = NULL);
 
 			status_t			ReadFrames(void* buffer, int64* _frameCount,
-									media_header* mediaHeader,
+									media_header* header,
 									media_decode_info* info);
 
 			status_t			ReplaceFrames(const void* buffer,
-									int64* _inOutFrameCount,
-									const media_header* mediaHeader);
+									int64* _frameCount,
+									const media_header* header);
 
 
 	// SeekToTime and SeekToFrame are used for seeking to a particular
@@ -135,14 +135,12 @@ public:
 	// frame or _after_ this frame, pass B_MEDIA_SEEK_CLOSEST_FORWARD or
 	// B_MEDIA_SEEK_CLOSEST_BACKWARD as the flags field.
 
-			status_t			SeekToTime(bigtime_t* _inOutTime,
-									int32 flags = 0);
-			status_t			SeekToFrame(int64* _inOutFrame,
-									int32 flags = 0);
+			status_t			SeekToTime(bigtime_t* _time, int32 flags = 0);
+			status_t			SeekToFrame(int64* _frame, int32 flags = 0);
 
-			status_t			FindKeyFrameForTime(bigtime_t* _inOutTime,
+			status_t			FindKeyFrameForTime(bigtime_t* _time,
 									int32 flags = 0) const;
-			status_t			FindKeyFrameForFrame(int64* _inOutFrame,
+			status_t			FindKeyFrameForFrame(int64* _frame,
 									int32 flags = 0) const;
 
 	// ReadChunk returns, in _buffer, the next _size bytes of
@@ -153,7 +151,7 @@ public:
 	// it with ReadFrames.
 
 			status_t			ReadChunk(char** _buffer, int32* _size,
-									media_header* mediaHeader = NULL);
+									media_header* _header = NULL);
 
 
 	//
