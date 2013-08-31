@@ -57,7 +57,12 @@ public:
 	virtual bool Filter(const entry_ref* ref,
 		BNode* node, struct stat_beos* st, const char* filetype)
 	{
-		return node->IsDirectory();
+		// ToDo: Fix this properly in Tracker
+		// If you create a folder, then rename it, node is NULL.
+		// The BeBook says: "Note that the function is never sent an
+		// abstract entry, so the node, st, and filetype arguments will
+		// always be valid."
+		return node == NULL ? false : node->IsDirectory();
 	}
 };
 
