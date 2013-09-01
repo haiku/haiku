@@ -29,7 +29,8 @@ namespace BManager {
 namespace BPrivate {
 
 
-using namespace BPackageKit::BPrivate;
+using BPackageKit::BPrivate::BActivationTransaction;
+using BPackageKit::BPrivate::BDaemonClient;
 
 
 class BPackageManager {
