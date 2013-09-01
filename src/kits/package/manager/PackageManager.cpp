@@ -49,7 +49,7 @@ BPackageManager::BPackageManager(BPackageInstallationLocation location)
 	fInstalledRepositories(10),
 	fOtherRepositories(10, true),
 	fTransactions(5, true),
-	fTransactionHandler(NULL),
+	fInstallationInterface(NULL),
 	fRequestHandler(NULL),
 	fUserInteractionHandler(NULL)
 {
@@ -399,7 +399,7 @@ BPackageManager::_PreparePackageChanges(
 		throw std::bad_alloc();
 	}
 
-	status_t error = fTransactionHandler->PrepareTransaction(*transaction);
+	status_t error = fInstallationInterface->PrepareTransaction(*transaction);
 	if (error != B_OK)
 		DIE(error, "failed to create transaction");
 
@@ -463,7 +463,7 @@ BPackageManager::_CommitPackageChanges(Transaction& transaction)
 
 	// commit the transaction
 	BDaemonClient::BCommitTransactionResult transactionResult;
-	status_t error = fTransactionHandler->CommitTransaction(transaction,
+	status_t error = fInstallationInterface->CommitTransaction(transaction,
 		transactionResult);
 	if (error != B_OK) {
 		DIE("failed to commit transaction: %s",
@@ -576,9 +576,9 @@ BPackageManager::_InstallationRepository()
 void
 BPackageManager::_AddInstalledRepository(InstalledRepository* repository)
 {
-	const char* name = repository->InitialName();
-	BRepositoryBuilder(*repository, name)
-		.AddPackages(repository->Location(), name)
+	fInstallationInterface->InitInstalledRepository(*repository);
+
+	BRepositoryBuilder(*repository)
 		.AddToSolver(fSolver, repository->Location() == fLocation);
 	repository->SetPriority(repository->InitialPriority());
 
@@ -757,33 +757,41 @@ BPackageManager::Transaction::~Transaction()
 }
 
 
-// #pragma mark - TransactionHandler
+// #pragma mark - InstallationInterface
 
 
-BPackageManager::TransactionHandler::~TransactionHandler()
+BPackageManager::InstallationInterface::~InstallationInterface()
 {
 }
 
 
-// #pragma mark - DaemonClientTransactionHandler
+// #pragma mark - ClientInstallationInterface
 
 
-BPackageManager::DaemonClientTransactionHandler
-	::DaemonClientTransactionHandler()
+BPackageManager::ClientInstallationInterface::ClientInstallationInterface()
 	:
 	fDaemonClient()
 {
 }
 
 
-BPackageManager::DaemonClientTransactionHandler
-	::~DaemonClientTransactionHandler()
+BPackageManager::ClientInstallationInterface::~ClientInstallationInterface()
 {
 }
 
 
+void
+BPackageManager::ClientInstallationInterface::InitInstalledRepository(
+	InstalledRepository& repository)
+{
+	const char* name = repository.InitialName();
+	BRepositoryBuilder(repository, name)
+		.AddPackages(repository.Location(), name);
+}
+
+
 status_t
-BPackageManager::DaemonClientTransactionHandler::PrepareTransaction(
+BPackageManager::ClientInstallationInterface::PrepareTransaction(
 	Transaction& transaction)
 {
 	return fDaemonClient.CreateTransaction(transaction.Repository().Location(),
@@ -793,7 +801,7 @@ BPackageManager::DaemonClientTransactionHandler::PrepareTransaction(
 
 
 status_t
-BPackageManager::DaemonClientTransactionHandler::CommitTransaction(
+BPackageManager::ClientInstallationInterface::CommitTransaction(
 	Transaction& transaction, BDaemonClient::BCommitTransactionResult& _result)
 {
 	return fDaemonClient.CommitTransaction(transaction.ActivationTransaction(),

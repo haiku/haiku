@@ -37,8 +37,8 @@ public:
 			class RemoteRepository;
 			class InstalledRepository;
 			class Transaction;
-			class TransactionHandler;
-			class DaemonClientTransactionHandler;
+			class InstallationInterface;
+			class ClientInstallationInterface;
 			class UserInteractionHandler;
 			class RequestHandler;
 
@@ -122,7 +122,7 @@ protected:
 			TransactionList		fTransactions;
 
 			// must be set by the derived class
-			TransactionHandler*	fTransactionHandler;
+			InstallationInterface* fInstallationInterface;
 			RequestHandler*		fRequestHandler;
 			UserInteractionHandler* fUserInteractionHandler;
 };
@@ -195,9 +195,12 @@ private:
 };
 
 
-class BPackageManager::TransactionHandler {
+class BPackageManager::InstallationInterface {
 public:
-	virtual						~TransactionHandler();
+	virtual						~InstallationInterface();
+
+	virtual	void				InitInstalledRepository(
+									InstalledRepository& repository) = 0;
 
 	virtual	status_t			PrepareTransaction(Transaction& transaction)
 									= 0;
@@ -207,11 +210,14 @@ public:
 };
 
 
-class BPackageManager::DaemonClientTransactionHandler
-	: public TransactionHandler {
+class BPackageManager::ClientInstallationInterface
+	: public InstallationInterface {
 public:
-								DaemonClientTransactionHandler();
-	virtual						~DaemonClientTransactionHandler();
+								ClientInstallationInterface();
+	virtual						~ClientInstallationInterface();
+
+	virtual	void				InitInstalledRepository(
+									InstalledRepository& repository);
 
 	virtual	status_t			PrepareTransaction(Transaction& transaction);
 	virtual	status_t			CommitTransaction(Transaction& transaction,

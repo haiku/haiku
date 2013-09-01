@@ -59,8 +59,8 @@ private:
 			DecisionProvider	fDecisionProvider;
 			JobStateListener	fJobStateListener;
 			BContext			fContext;
-			BPackageManager::DaemonClientTransactionHandler
-									fDaemonClientTransactionHandler;
+			BPackageManager::ClientInstallationInterface
+									fClientInstallationInterface;
 };
 
 

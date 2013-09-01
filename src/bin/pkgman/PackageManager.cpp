@@ -28,9 +28,9 @@ PackageManager::PackageManager(BPackageInstallationLocation location)
 	fDecisionProvider(),
 	fJobStateListener(JobStateListener::EXIT_ON_ABORT),
 	fContext(fDecisionProvider, fJobStateListener),
-	fDaemonClientTransactionHandler()
+	fClientInstallationInterface()
 {
-	fTransactionHandler = &fDaemonClientTransactionHandler;
+	fInstallationInterface = &fClientInstallationInterface;
 	fRequestHandler = this;
 	fUserInteractionHandler = this;
 }
