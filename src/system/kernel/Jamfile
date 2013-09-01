@@ -128,7 +128,6 @@ KernelLd kernel_$(TARGET_ARCH) :
 	kernel_lib_posix.o
 	kernel_lib_posix_arch_$(TARGET_ARCH).o
 	kernel_misc.o
-	kernel_zlib.o
 
 	$(TARGET_KERNEL_LIBSUPC++)
 
@@ -171,7 +170,6 @@ if $(HAIKU_ARCH) = x86_64 {
 		kernel_lib_posix.o
 		kernel_lib_posix_arch_$(TARGET_ARCH).o
 		kernel_misc.o
-		kernel_zlib.o
 
 		$(TARGET_KERNEL_LIBSUPC++)
 

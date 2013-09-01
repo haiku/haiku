@@ -18,4 +18,5 @@ KernelAddon btrfs :
 	DirectoryIterator.cpp
 	Inode.cpp
 	Volume.cpp
+	: kernel_libz.a
 ;
