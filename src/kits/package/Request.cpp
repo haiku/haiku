@@ -18,6 +18,9 @@
 namespace BPackageKit {
 
 
+using BPrivate::JobQueue;
+
+
 BRequest::BRequest(const BContext& context)
 	:
 	fContext(context),

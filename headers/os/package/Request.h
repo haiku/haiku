@@ -18,7 +18,6 @@ class BContext;
 namespace BPrivate {
 	class JobQueue;
 }
-using BPrivate::JobQueue;
 
 
 class BRequest : protected BJobStateListener {
@@ -41,7 +40,7 @@ protected:
 
 protected:
 			status_t			fInitStatus;
-			JobQueue*			fJobQueue;
+			BPrivate::JobQueue*	fJobQueue;
 };
 
 
