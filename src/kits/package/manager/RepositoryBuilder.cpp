@@ -57,6 +57,15 @@ private:
 } // unnamed namespace
 
 
+BRepositoryBuilder::BRepositoryBuilder(BSolverRepository& repository)
+	:
+	fRepository(repository),
+	fErrorName(repository.Name()),
+	fPackagePaths(NULL)
+{
+}
+
+
 BRepositoryBuilder::BRepositoryBuilder(BSolverRepository& repository,
 	const BString& name, const BString& errorName)
 	:

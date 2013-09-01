@@ -30,6 +30,8 @@ typedef std::map<BSolverPackage*, BString> BPackagePathMap;
 class BRepositoryBuilder {
 public:
 								BRepositoryBuilder(
+									BSolverRepository& repository);
+								BRepositoryBuilder(
 									BSolverRepository& repository,
 									const BString& name,
 									const BString& errorName = BString());
