@@ -508,6 +508,10 @@ BUrlProtocolHttp::_MakeRequest()
 				if ((fContext != NULL) && fHeaders.HasHeader("Set-Cookie")) {
 					for (int32 i = 0;  i < fHeaders.CountHeaders(); i++) {
 						if (fHeaders.HeaderAt(i).NameIs("Set-Cookie")) {
+							BNetworkCookie* cookie = new BNetworkCookie();
+							cookie->ParseCookieStringFromUrl(
+								fHeaders.HeaderAt(i).Value(), fUrl);
+							fContext->GetCookieJar().AddCookie(cookie);
 						}
 					}
 				}
