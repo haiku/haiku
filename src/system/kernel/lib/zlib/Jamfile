@@ -17,7 +17,7 @@ LOCATE on [ FGristFiles $(zlibSources) ] = $(zlibSourceDirectory) ;
 Depends [ FGristFiles $(zlibSources) ]
 	: [ BuildFeatureAttribute zlib : sources ] ;
 
+# Build zlib with PIC, such that it can be used by kernel add-ons (filesystems).
 KernelStaticLibrary kernel_libz.a :
 	$(zlibSources)
-	: -fno-pic
 	;
