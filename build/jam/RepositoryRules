@@ -304,6 +304,9 @@ actions BootstrapRepositoryFetchPackage1
 		*_devel|*_doc|*_source|*_debuginfo)
 			portName=`echo $portName | sed 's@_[^_]*$@@'`
 			;;
+		*_source_rigged)
+			portName=`echo $portName | sed 's@_source_rigged$@@'`
+			;;
 	esac
 
 	cd $(HAIKU_REPOSITORY_BUILD_DIRECTORY)
