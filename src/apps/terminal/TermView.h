@@ -81,7 +81,8 @@ public:
 			int					Columns() const;
 			BRect				SetTermSize(int rows, int cols,
 									bool notifyShell);
-			void				SetTermSize(BRect rect);
+			void				SetTermSize(BRect rect,
+									bool notifyShell = false);
 			void				GetTermSizeFromRect(const BRect &rect,
 									int *rows, int *columns);
 
