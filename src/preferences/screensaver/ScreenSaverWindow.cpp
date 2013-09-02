@@ -630,8 +630,9 @@ ModulesView::MessageReceived(BMessage* message)
 			be_roster->StartWatching(BMessenger(this, Looper()),
 				B_REQUEST_QUIT);
 			if (be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.Message(),
-					&fScreenSaverTestTeam) == B_OK)
+					&fScreenSaverTestTeam) == B_OK) {
 				break;
+			}
 
 			// Try really hard to launch it. It's very likely that this fails
 			// when we run from the CD, and there is only an incomplete mime
@@ -809,19 +810,17 @@ ModulesView::_OpenSaver()
 	fSettingsView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fSettingsBox->AddChild(fSettingsView);
 
-	if (saver != NULL) {
-		fSaverRunner->Run();
+	if (saver != NULL && fSaverRunner->Run() == B_OK)
 		saver->StartConfig(fSettingsView);
-	}
 
 	if (fSettingsView->ChildAt(0) == NULL) {
 		// There are no settings at all, we add the module name here to
 		// let it look a bit better at least.
 		BPrivate::BuildScreenSaverDefaultSettingsView(fSettingsView,
-			fSettings.ModuleName()[0] ? fSettings.ModuleName() :
-			B_TRANSLATE("Blackness"), saver || !fSettings.ModuleName()[0]
-				? B_TRANSLATE("No options available") :
-				B_TRANSLATE("Could not load screen saver"));
+			fSettings.ModuleName()[0] ? fSettings.ModuleName()
+			: B_TRANSLATE("Blackness"), saver != NULL && !fSettings.ModuleName()[0]
+				? B_TRANSLATE("No options available")
+				: B_TRANSLATE("Could not load screen saver"));
 	}
 }
 

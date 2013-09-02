@@ -177,20 +177,22 @@ ScreenSaverRunner::_CleanUp()
 }
 
 
-void
-ScreenSaverRunner::_Run() 
+status_t
+ScreenSaverRunner::_Run()
 {
 	static const uint32 kInitialTickRate = 50000;
 
-	if (fWindow->Lock()) {
+	status_t lockStatus = fWindow->LockWithTimeout(kInitialTickRate);
+	if (lockStatus == B_OK) {
 		fView->SetViewColor(0, 0, 0);
 		fView->SetLowColor(0, 0, 0);
 		if (fSaver != NULL)
 			fHasStarted = fSaver->StartSaver(fView, fPreview) == B_OK;
 
 		fWindow->Unlock();
-	}
-	
+	} else
+		return lockStatus;
+
 	// TODO: This code is getting awfully complicated and should
 	// probably be refactored.
 	uint32 tickBase = kInitialTickRate;
@@ -250,6 +252,8 @@ ScreenSaverRunner::_Run()
 
 	if (fSaver != NULL)
 		fSaver->StopSaver();
+
+	return B_OK;
 }
 
 
@@ -257,6 +261,5 @@ status_t
 ScreenSaverRunner::_ThreadFunc(void *data)
 {
 	ScreenSaverRunner* runner = (ScreenSaverRunner*)data;
-	runner->_Run();
-	return B_OK;
+	return runner->_Run();
 }

@@ -41,7 +41,7 @@ private:
 			void				_LoadAddOn();
 			void				_CleanUp();
 	static	status_t			_ThreadFunc(void* data);
-			void				_Run();
+			status_t			_Run();
 
 			BScreenSaver*		fSaver;
 			BWindow*			fWindow;
