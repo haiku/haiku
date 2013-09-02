@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,34 +10,34 @@
 #define PASSWORD_WINDOW_H
 
 
-#include "ScreenSaverSettings.h"
-
-
 #include <Window.h>
 
 
 class BRadioButton;
 class BTextControl;
 
+class ScreenSaverSettings;
+
 
 class PasswordWindow : public BWindow {
-	public:
-						PasswordWindow(ScreenSaverSettings &settings);
+public:
+								PasswordWindow(ScreenSaverSettings& settings);
 
-		virtual void	MessageReceived(BMessage *message);
+	virtual	void				MessageReceived(BMessage* message);
 
-		void			Update();
+			void				Update();
 
-	private:
-		void			_Setup();
-		char * 			_SanitizeSalt(const char *password);
+private:
+			void				_Setup();
+			char*	 			_SanitizeSalt(const char* password);
 
-		BRadioButton	*fUseCustom;
-		BRadioButton	*fUseNetwork;
-		BTextControl	*fConfirmControl;
-		BTextControl	*fPasswordControl;
-		
-		ScreenSaverSettings &fSettings;
+			BRadioButton*		fUseCustom;
+			BRadioButton*		fUseNetwork;
+			BTextControl*		fConfirmControl;
+			BTextControl*		fPasswordControl;
+
+			ScreenSaverSettings& fSettings;
 };
+
 
 #endif	// PASSWORD_WINDOW_H

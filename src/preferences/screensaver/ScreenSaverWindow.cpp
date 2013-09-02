@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2010, Haiku.
+ * Copyright 2003-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Phipps
- *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jérôme Duval, jerome.duval@free.fr
+ *		Michael Phipps
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -40,8 +41,10 @@
 #include "ScreenCornerSelector.h"
 #include "ScreenSaverItem.h"
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ScreenSaver"
+
 
 const uint32 kPreviewMonitorGap = 16;
 const uint32 kMinSettingsWidth = 230;
@@ -135,6 +138,9 @@ private:
 };
 
 
+//	#pragma mark - TimeSlider
+
+
 static const int32 kTimeInUnits[] = {
 	30,    60,   90,
 	120,   150,  180,
@@ -146,6 +152,7 @@ static const int32 kTimeInUnits[] = {
 	7200,  9000, 10800,
 	14400, 18000
 };
+
 static const int32 kTimeUnitCount
 	= sizeof(kTimeInUnits) / sizeof(kTimeInUnits[0]);
 
@@ -217,7 +224,7 @@ TimeSlider::_TimeToString(bigtime_t useconds, BString& string)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - FadeView
 
 
 FadeView::FadeView(BRect rect, const char* name, ScreenSaverSettings& settings)
@@ -382,8 +389,9 @@ ModulesView::MessageReceived(BMessage* message)
 			// database for example...
 			BPath path;
 			if (find_directory(B_SYSTEM_BIN_DIRECTORY, &path) != B_OK
-				|| path.Append("screen_blanker") != B_OK)
+				|| path.Append("screen_blanker") != B_OK) {
 				path.SetTo("/bin/screen_blanker");
+			}
 
 			BEntry entry(path.Path());
 			entry_ref ref;
@@ -393,6 +401,7 @@ ModulesView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+
 		case kMsgAddSaver:
 			fFilePanel->Show();
 			break;
@@ -513,6 +522,7 @@ ModulesView::_CloseSaver()
 
 	if (fSaverRunner != NULL)
 		fSaverRunner->Quit();
+
 	if (saver != NULL)
 		saver->StopConfig();
 
@@ -544,6 +554,7 @@ ModulesView::_OpenSaver()
 	rect.top += 14;
 #endif
 	fSettingsView = new BView(rect, "SettingsView", B_FOLLOW_ALL, B_WILL_DRAW);
+
 	fSettingsView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fSettingsBox->AddChild(fSettingsView);
 
@@ -611,7 +622,7 @@ ModulesView::_OpenSaver()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - ScreenSaverWindow
 
 
 ScreenSaverWindow::ScreenSaverWindow()
@@ -1004,4 +1015,3 @@ ScreenSaverWindow::QuitRequested()
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
-

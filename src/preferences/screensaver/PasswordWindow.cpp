@@ -1,15 +1,16 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
- *		Julun <host.haiku@gmx.de>
+ *		Julun, host.haiku@gmx.de
+ *		Michael Phipps
+ *		John Scipione, jscipione@gmail.com
  */
 
-#include "PasswordWindow.h"
 
+#include "PasswordWindow.h"
 
 #include <Alert.h>
 #include <Box.h>
@@ -138,12 +139,12 @@ PasswordWindow::Update()
 }
 
 
-char *
-PasswordWindow::_SanitizeSalt(const char *password)
+char*
+PasswordWindow::_SanitizeSalt(const char* password)
 {
-	char *salt;
-	
-	uint8 length = strlen(password);	
+	char* salt;
+
+	uint8 length = strlen(password);
 
 	if (length < 2)
 		salt = new char[3];
@@ -174,45 +175,45 @@ PasswordWindow::_SanitizeSalt(const char *password)
 
 
 void 
-PasswordWindow::MessageReceived(BMessage *message) 
+PasswordWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgDone:
 			fSettings.SetLockMethod(fUseCustom->Value() ? "custom" : "network");
 			if (fUseCustom->Value()) {
-				if (strcmp(fPasswordControl->Text(), fConfirmControl->Text())) {
-					BAlert *alert = new BAlert("noMatch",
+				if (strcmp(fPasswordControl->Text(), fConfirmControl->Text())
+						!= 0) {
+					BAlert* alert = new BAlert("noMatch",
 						B_TRANSLATE("Passwords don't match. Please try again."),
 						B_TRANSLATE("OK"));
 					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 					break;
 				}
-				const char *salt = _SanitizeSalt(fPasswordControl->Text());
+				const char* salt = _SanitizeSalt(fPasswordControl->Text());
 				fSettings.SetPassword(crypt(fPasswordControl->Text(), salt));
 				delete[] salt;
-			} else {
+			} else
 				fSettings.SetPassword("");
-			}
+
 			fPasswordControl->SetText("");
 			fConfirmControl->SetText("");
 			fSettings.Save();
 			Hide();
 			break;
 
-	case B_CANCEL:
-		fPasswordControl->SetText("");
-		fConfirmControl->SetText("");
-		Hide();
-		break;
+		case B_CANCEL:
+			fPasswordControl->SetText("");
+			fConfirmControl->SetText("");
+			Hide();
+			break;
 
-	case kMsgPasswordTypeChanged:
-		fSettings.SetLockMethod(fUseCustom->Value() > 0 ? "custom" : "network");
-		Update();
-		break;
+		case kMsgPasswordTypeChanged:
+			fSettings.SetLockMethod(fUseCustom->Value() > 0 ? "custom" : "network");
+			Update();
+			break;
 
-	default:
-		BWindow::MessageReceived(message);
-		break;
+		default:
+			BWindow::MessageReceived(message);
  	}
 }
