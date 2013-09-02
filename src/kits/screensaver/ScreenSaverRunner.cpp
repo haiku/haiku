@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2013, Haiku, Inc. All Rights Reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Phipps
- *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jérôme Duval, jerome.duval@free.fr
+ *		Michael Phipps
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -18,6 +19,7 @@
 #include <View.h>
 
 #include <stdio.h>
+
 
 ScreenSaverRunner::ScreenSaverRunner(BWindow* window, BView* view,
 		bool preview, ScreenSaverSettings& settings)
@@ -62,7 +64,8 @@ ScreenSaverRunner::HasStarted() const
 status_t
 ScreenSaverRunner::Run()
 {
-	fThread = spawn_thread(&_ThreadFunc, "ScreenSaverRenderer", B_LOW_PRIORITY, this);
+	fThread = spawn_thread(&_ThreadFunc, "ScreenSaverRenderer", B_LOW_PRIORITY,
+		this);
 	Resume();
 
 	return fThread >= B_OK ? B_OK : fThread;
@@ -108,7 +111,7 @@ ScreenSaverRunner::_LoadAddOn()
 	}
 	_CleanUp();
 
-	if (!strcmp("", fSettings.ModuleName())) {
+	if (strcmp("", fSettings.ModuleName()) == 0) {
 		Resume();
 		return;
 	}
@@ -137,7 +140,8 @@ ScreenSaverRunner::_LoadAddOn()
 	}
 
 	if (fAddonImage < B_OK) {
-		printf("Unable to open add-on: %s: %s\n", path.Path(), strerror(fAddonImage));
+		printf("Unable to open add-on: %s: %s\n", path.Path(),
+			strerror(fAddonImage));
 	} else {
 		// Look for the one C function that should exist.
 		if (get_image_symbol(fAddonImage, "instantiate_screen_saver",
@@ -150,7 +154,8 @@ ScreenSaverRunner::_LoadAddOn()
 		}
 
 		if (fSaver->InitCheck() != B_OK) {
-			printf("ScreenSaver initialization failed: %s!\n", strerror(fSaver->InitCheck()));
+			printf("ScreenSaver initialization failed: %s!\n",
+				strerror(fSaver->InitCheck()));
 			_CleanUp();
 		}
 	}
@@ -180,8 +185,9 @@ ScreenSaverRunner::_Run()
 	if (fWindow->Lock()) {
 		fView->SetViewColor(0, 0, 0);
 		fView->SetLowColor(0, 0, 0);
-		if (fSaver)
+		if (fSaver != NULL)
 			fHasStarted = fSaver->StartSaver(fView, fPreview) == B_OK;
+
 		fWindow->Unlock();
 	}
 	
@@ -200,25 +206,24 @@ ScreenSaverRunner::_Run()
 		// will result in the screen saver not responding to deactivation
 		// for that length of time
 		snooze(tickBase);
-		if (system_time() - lastTickTime < tick) {
+		if (system_time() - lastTickTime < tick)
 			continue;
-		} else {
-			// re-evaluate the tick time after each successful wakeup - 
+		else {
+			// re-evaluate the tick time after each successful wakeup
 			// screensavers can adjust it on the fly, and we must be
 			// prepared to accomodate that
 			tick = fSaver ? fSaver->TickSize() : tickBase;
-			
+
 			if (tick < tickBase) {
 				if (tick < 0)
 					tick = 0;
 				tickBase = tick;
-			} else if (tickBase < kInitialTickRate && tick >= kInitialTickRate) {
+			} else if (tickBase < kInitialTickRate && tick >= kInitialTickRate)
 				tickBase = kInitialTickRate;
-			}
-			
+
 			lastTickTime = system_time();
 		}
-		
+
 		if (snoozeCount) {
 			// if we are sleeping, do nothing
 			snoozeCount--;
@@ -243,7 +248,7 @@ ScreenSaverRunner::_Run()
 			snoozeCount = 1000;
 	}
 
-	if (fSaver)
+	if (fSaver != NULL)
 		fSaver->StopSaver();
 }
 
@@ -255,4 +260,3 @@ ScreenSaverRunner::_ThreadFunc(void *data)
 	runner->_Run();
 	return B_OK;
 }
-
