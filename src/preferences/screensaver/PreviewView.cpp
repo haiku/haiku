@@ -48,6 +48,13 @@ PreviewView::PreviewView(const char* name)
 	fSaverView(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	float aspectRatio = 4.0f / 3.0f;
+		// 4:3 monitor
+	float previewWidth = 160.0f;
+	float previewHeight = ceil(previewWidth / aspectRatio);
+
+	SetExplicitSize(BSize(previewWidth, previewHeight));
 }
 
 

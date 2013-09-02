@@ -25,12 +25,9 @@
 
 class BButton;
 class BTabView;
-class BTextView;
 
+class FadeView;
 class ModulesView;
-class ScreenCornerSelector;
-class ScreenSaverRunner;
-class TimeSlider;
 
 
 class ScreenSaverWindow : public BWindow {
@@ -43,37 +40,16 @@ public:
 	virtual	bool				QuitRequested();
 
 			void				LoadSettings();
-			void				SetMinimalSizeLimit(float width, float height);
-
-private:
-			void				_SetupFadeTab(BRect frame);
-			void				_UpdateTurnOffScreen();
-			void				_UpdateStatus();
 
 private:
 			float				fMinWidth;
 			float				fMinHeight;
 			ScreenSaverSettings	fSettings;
-			uint32				fTurnOffScreenFlags;
-
-			BView*				fFadeView;
-			ModulesView*		fModulesView;
-			BTabView*			fTabView;
-
-			BCheckBox*			fEnableCheckBox;
-			TimeSlider*			fRunSlider;
-
-			BCheckBox*			fTurnOffCheckBox;
-			TimeSlider*			fTurnOffSlider;
-			BTextView*			fTurnOffNotSupported;
-
-			BCheckBox*			fPasswordCheckBox;
-			TimeSlider*			fPasswordSlider;
-			BButton*			fPasswordButton;
 			PasswordWindow*		fPasswordWindow;
 
-			ScreenCornerSelector* fFadeNow;
-			ScreenCornerSelector* fFadeNever;
+			FadeView*			fFadeView;
+			ModulesView*		fModulesView;
+			BTabView*			fTabView;
 };
 
 
