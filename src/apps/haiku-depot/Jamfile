@@ -27,9 +27,12 @@ Application HaikuDepot :
 	support.cpp
 
 	# textview stuff
+	CharacterStyle.cpp
+	CharacterStyleData.cpp
 	Paragraph.cpp
 	ParagraphStyle.cpp
 	ParagraphStyleData.cpp
+	TextDocument.cpp
 	TextLayout.cpp
 	TextSpan.cpp
 	TextStyle.cpp
