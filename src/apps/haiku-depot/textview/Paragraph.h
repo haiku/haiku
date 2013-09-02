@@ -33,6 +33,8 @@ public:
 			bool				Append(const TextSpan& span);
 			bool				Insert(int32 offset, const TextSpan& span);
 
+			int32				Length() const;
+
 private:
 			ParagraphStyle		fStyle;
 			TextSpanList		fTextSpans;

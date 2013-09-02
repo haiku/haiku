@@ -123,3 +123,16 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 		&& fTextSpans.Add(newSpan, index + 1)
 		&& fTextSpans.Add(spanAfter, index + 2);
 }
+
+
+int32
+Paragraph::Length() const
+{
+	int32 length = 0;
+	for (int32 i = fTextSpans.CountItems() - 1; i >= 0; i--) {
+		const TextSpan& span = fTextSpans.ItemAtFast(i);
+		length += span.CharCount();
+	}
+	return length;
+}
+
