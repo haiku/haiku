@@ -58,93 +58,93 @@ ParagraphStyleData::operator!=(const ParagraphStyleData& other) const
 }
 
 
-ParagraphStyleData*
+ParagraphStyleDataRef
 ParagraphStyleData::SetAlignment(::Alignment alignment)
 {
 	if (fAlignment == alignment)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ParagraphStyleData* ret = new(std::nothrow) ParagraphStyleData(*this);
 	if (ret == NULL)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ret->fAlignment = alignment;
-	return ret;
+	return ParagraphStyleDataRef(ret, true);
 }
 
 
-ParagraphStyleData*
+ParagraphStyleDataRef
 ParagraphStyleData::SetJustify(bool justify)
 {
 	if (fJustify == justify)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ParagraphStyleData* ret = new(std::nothrow) ParagraphStyleData(*this);
 	if (ret == NULL)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ret->fJustify = justify;
-	return ret;
+	return ParagraphStyleDataRef(ret, true);
 }
 
 
-ParagraphStyleData*
+ParagraphStyleDataRef
 ParagraphStyleData::SetFirstLineInset(float inset)
 {
 	if (fFirstLineInset == inset)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ParagraphStyleData* ret = new(std::nothrow) ParagraphStyleData(*this);
 	if (ret == NULL)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ret->fFirstLineInset = inset;
-	return ret;
+	return ParagraphStyleDataRef(ret, true);
 }
 
 
-ParagraphStyleData*
+ParagraphStyleDataRef
 ParagraphStyleData::SetLineInset(float inset)
 {
 	if (fLineInset == inset)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ParagraphStyleData* ret = new(std::nothrow) ParagraphStyleData(*this);
 	if (ret == NULL)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ret->fLineInset = inset;
-	return ret;
+	return ParagraphStyleDataRef(ret, true);
 }
 
 
-ParagraphStyleData*
+ParagraphStyleDataRef
 ParagraphStyleData::SetSpacingTop(float spacing)
 {
 	if (fSpacingTop == spacing)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ParagraphStyleData* ret = new(std::nothrow) ParagraphStyleData(*this);
 	if (ret == NULL)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ret->fSpacingTop = spacing;
-	return ret;
+	return ParagraphStyleDataRef(ret, true);
 }
 
 
-ParagraphStyleData*
+ParagraphStyleDataRef
 ParagraphStyleData::SetSpacingBottom(float spacing)
 {
 	if (fSpacingBottom == spacing)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ParagraphStyleData* ret = new(std::nothrow) ParagraphStyleData(*this);
 	if (ret == NULL)
-		return this;
+		return ParagraphStyleDataRef(this);
 
 	ret->fSpacingBottom = spacing;
-	return ret;
+	return ParagraphStyleDataRef(ret, true);
 }
 
 

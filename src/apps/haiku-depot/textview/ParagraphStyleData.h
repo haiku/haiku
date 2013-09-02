@@ -14,6 +14,11 @@ enum Alignment {
 	ALIGN_RIGHT		= 2,
 };
 
+
+class ParagraphStyleData;
+typedef BReference<ParagraphStyleData>	ParagraphStyleDataRef;
+
+
 // You cannot modify a ParagraphStyleData object once it has been
 // created.
 class ParagraphStyleData : public BReferenceable {
@@ -27,27 +32,27 @@ public:
 			bool				operator!=(
 									const ParagraphStyleData& other) const;
 
-			ParagraphStyleData*	SetAlignment(::Alignment alignment);
+			ParagraphStyleDataRef SetAlignment(::Alignment alignment);
 	inline	::Alignment			Alignment() const
 									{ return fAlignment; }
 
-			ParagraphStyleData*	SetJustify(bool justify);
+			ParagraphStyleDataRef SetJustify(bool justify);
 	inline	bool				Justify() const
 									{ return fJustify; }
 
-			ParagraphStyleData*	SetFirstLineInset(float inset);
+			ParagraphStyleDataRef SetFirstLineInset(float inset);
 	inline	float				FirstLineInset() const
 									{ return fFirstLineInset; }
 
-			ParagraphStyleData*	SetLineInset(float inset);
+			ParagraphStyleDataRef SetLineInset(float inset);
 	inline	float				LineInset() const
 									{ return fLineInset; }
 
-			ParagraphStyleData*	SetSpacingTop(float spacing);
+			ParagraphStyleDataRef SetSpacingTop(float spacing);
 	inline	float				SpacingTop() const
 									{ return fSpacingTop; }
 
-			ParagraphStyleData*	SetSpacingBottom(float spacing);
+			ParagraphStyleDataRef SetSpacingBottom(float spacing);
 	inline	float				SpacingBottom() const
 									{ return fSpacingBottom; }
 
@@ -64,9 +69,6 @@ private:
 			float				fSpacingTop;
 			float				fSpacingBottom;
 };
-
-
-typedef BReference<ParagraphStyleData>	ParagraphDataRef;
 
 
 #endif // PARAGRAPH_STYLE_DATA_H

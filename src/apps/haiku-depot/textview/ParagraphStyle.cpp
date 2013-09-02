@@ -57,48 +57,72 @@ ParagraphStyle::operator!=(const ParagraphStyle& other) const
 bool
 ParagraphStyle::SetAlignment(::Alignment alignment)
 {
-	fStyleData.SetTo(fStyleData->SetAlignment(alignment));
-	return fStyleData->Alignment() == alignment;
+	ParagraphStyleDataRef data = fStyleData->SetAlignment(alignment);
+	if (data == fStyleData)
+		return data->Alignment() == alignment;
+
+	fStyleData = data;
+	return true;
 }
 
 
 bool
 ParagraphStyle::SetJustify(bool justify)
 {
-	fStyleData.SetTo(fStyleData->SetJustify(justify));
-	return fStyleData->Justify() == justify;
+	ParagraphStyleDataRef data = fStyleData->SetJustify(justify);
+	if (data == fStyleData)
+		return data->Justify() == justify;
+
+	fStyleData = data;
+	return true;
 }
 
 
 bool
 ParagraphStyle::SetFirstLineInset(float inset)
 {
-	fStyleData.SetTo(fStyleData->SetFirstLineInset(inset));
-	return fStyleData->FirstLineInset() == inset;
+	ParagraphStyleDataRef data = fStyleData->SetFirstLineInset(inset);
+	if (data == fStyleData)
+		return data->FirstLineInset() == inset;
+
+	fStyleData = data;
+	return true;
 }
 
 
 bool
 ParagraphStyle::SetLineInset(float inset)
 {
-	fStyleData.SetTo(fStyleData->SetLineInset(inset));
-	return fStyleData->LineInset() == inset;
+	ParagraphStyleDataRef data = fStyleData->SetLineInset(inset);
+	if (data == fStyleData)
+		return data->LineInset() == inset;
+
+	fStyleData = data;
+	return true;
 }
 
 
 bool
 ParagraphStyle::SetSpacingTop(float spacing)
 {
-	fStyleData.SetTo(fStyleData->SetSpacingTop(spacing));
-	return fStyleData->SpacingTop() == spacing;
+	ParagraphStyleDataRef data = fStyleData->SetSpacingTop(spacing);
+	if (data == fStyleData)
+		return data->SpacingTop() == spacing;
+
+	fStyleData = data;
+	return true;
 }
 
 
 bool
 ParagraphStyle::SetSpacingBottom(float spacing)
 {
-	fStyleData.SetTo(fStyleData->SetSpacingBottom(spacing));
-	return fStyleData->SpacingBottom() == spacing;
+	ParagraphStyleDataRef data = fStyleData->SetSpacingBottom(spacing);
+	if (data == fStyleData)
+		return data->SpacingBottom() == spacing;
+
+	fStyleData = data;
+	return true;
 }
 
 

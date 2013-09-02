@@ -37,7 +37,7 @@ public:
 
 
 private:
-			ParagraphDataRef	fStyleData;
+			ParagraphStyleDataRef fStyleData;
 };
 
 
