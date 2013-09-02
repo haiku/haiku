@@ -294,6 +294,11 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 			if (msg->FindPointer("color_scheme",
 					(void**)&newScheme) == B_OK) {
 				_ChangeColorScheme(newScheme);
+				const char* label = NULL;
+				if (fColorField->Menu()->FindMarked()->Message()->FindString(
+						"label", &label) == B_OK)
+					fColorControl->SetValue(
+						PrefHandler::Default()->getRGB(label));
 				modified = true;
 			}
 			break;
