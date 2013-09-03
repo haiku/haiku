@@ -1,4 +1,6 @@
 /*
+ * Copyright 2013 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2010-2011 Enrique Medina Gremaldos <quiqueiii@gmail.com>
  * Copyright 2008-2011 Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
@@ -8,7 +10,7 @@
 
 
 #include "Driver.h"
-#include "MouseProtocolHandler.h"
+#include "TabletProtocolHandler.h"
 
 #include "HIDCollection.h"
 #include "HIDDevice.h"
@@ -22,15 +24,23 @@
 #include <keyboard_mouse_driver.h>
 
 
-MouseProtocolHandler::MouseProtocolHandler(HIDReport &report,
+TabletProtocolHandler::TabletProtocolHandler(HIDReport &report,
 	HIDReportItem &xAxis, HIDReportItem &yAxis)
 	:
-	ProtocolHandler(report.Device(), "input/mouse/usb/", 0),
+	ProtocolHandler(report.Device(), "input/tablet/usb", 0),
 	fReport(report),
 
 	fXAxis(xAxis),
 	fYAxis(yAxis),
 	fWheel(NULL),
+
+	fPressure(NULL),
+	fRange(NULL),
+	fTip(NULL),
+	fBarrelSwitch(NULL),
+	fEraser(NULL),
+	fXTilt(NULL),
+	fYTilt(NULL),
 
 	fLastButtons(0),
 	fClickCount(0),
@@ -54,14 +64,41 @@ MouseProtocolHandler::MouseProtocolHandler(HIDReport &report,
 	fWheel = report.FindItem(B_HID_USAGE_PAGE_GENERIC_DESKTOP,
 		B_HID_UID_GD_WHEEL);
 
-	TRACE("mouse device with %lu buttons and %swheel\n", buttonCount,
-		fWheel == NULL ? "no " : "");
+	fPressure = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
+		B_HID_UID_DIG_TIP_PRESSURE);
+
+	fRange = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
+		B_HID_UID_DIG_IN_RANGE);
+		
+	fTip = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
+		B_HID_UID_DIG_TIP_SWITCH);
+
+	fBarrelSwitch = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
+		B_HID_UID_DIG_BARREL_SWITCH);
+
+	fEraser = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
+		B_HID_UID_DIG_ERASER);
+
+	fXTilt = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
+		B_HID_UID_DIG_X_TILT);
+
+	fYTilt = report.FindItem(B_HID_USAGE_PAGE_DIGITIZER,
+		B_HID_UID_DIG_Y_TILT);
+
+	TRACE("tablet device with %lu buttons, %stip, %seraser, "
+		"%spressure, and %stilt\n",
+		buttonCount,
+		fTip == NULL ? "no " : "",
+		fEraser == NULL ? "no " : "",
+		fPressure == NULL ? "no " : "",
+		fXTilt == NULL && fYTilt == NULL ? "no " : "");
+
 	TRACE("report id: %u\n", report.ID());
 }
 
 
 void
-MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
+TabletProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 	ProtocolHandler *&handlerList)
 {
 	bool supported = false;
@@ -71,6 +108,26 @@ MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 			switch (collection.UsageID()) {
 				case B_HID_UID_GD_MOUSE:
 				case B_HID_UID_GD_POINTER:
+					// NOTE: Maybe it is supported if X-axis and Y-axis are
+					// absolute. This is determined below by scanning the
+					// report items for absolute X and Y axis.
+					supported = true;
+					break;
+			}
+
+			break;
+		}
+
+		case B_HID_USAGE_PAGE_DIGITIZER:
+		{
+			switch (collection.UsageID()) {
+				case B_HID_UID_DIG_DIGITIZER:
+				case B_HID_UID_DIG_PEN:
+				case B_HID_UID_DIG_LIGHT_PEN:
+				case B_HID_UID_DIG_TOUCH_SCREEN:
+				case B_HID_UID_DIG_TOUCH_PAD:
+				case B_HID_UID_DIG_WHITE_BOARD:
+					TRACE("found tablet/digitizer\n");
 					supported = true;
 					break;
 			}
@@ -80,7 +137,7 @@ MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 	}
 
 	if (!supported) {
-		TRACE("collection not a mouse\n");
+		TRACE("collection not a tablet/digitizer\n");
 		return;
 	}
 
@@ -100,18 +157,18 @@ MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 		// try to find at least an absolute x and y axis
 		HIDReportItem *xAxis = inputReport->FindItem(
 			B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_X);
-		if (xAxis == NULL || !xAxis->Relative())
+		if (xAxis == NULL || xAxis->Relative())
 			continue;
 
 		HIDReportItem *yAxis = inputReport->FindItem(
 			B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_Y);
-		if (yAxis == NULL || !yAxis->Relative())
+		if (yAxis == NULL || yAxis->Relative())
 			continue;
 
-		ProtocolHandler *newHandler = new(std::nothrow) MouseProtocolHandler(
+		ProtocolHandler *newHandler = new(std::nothrow) TabletProtocolHandler(
 			*inputReport, *xAxis, *yAxis);
 		if (newHandler == NULL) {
-			TRACE("failed to allocated mouse protocol handler\n");
+			TRACE("failed to allocated tablet protocol handler\n");
 			continue;
 		}
 
@@ -122,13 +179,13 @@ MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 
 
 status_t
-MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
+TabletProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 	size_t length)
 {
 	switch (op) {
 		case MS_READ:
 		{
-			if (length < sizeof(mouse_movement))
+			if (length < sizeof(tablet_movement))
 				return B_BUFFER_OVERFLOW;
 
 			while (true) {
@@ -161,7 +218,7 @@ MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 
 
 status_t
-MouseProtocolHandler::_ReadReport(void *buffer)
+TabletProtocolHandler::_ReadReport(void *buffer)
 {
 	status_t result = fReport.WaitForReport(B_INFINITE_TIMEOUT);
 	if (result != B_OK) {
@@ -180,15 +237,15 @@ MouseProtocolHandler::_ReadReport(void *buffer)
 		return B_INTERRUPTED;
 	}
 
-	uint32 axisRelativeData[2];
-	axisRelativeData[0] = 0;
-	axisRelativeData[1] = 0;
+	float axisAbsoluteData[2];
+	axisAbsoluteData[0] = 0.0f;
+	axisAbsoluteData[1] = 0.0f;
 
 	if (fXAxis.Extract() == B_OK && fXAxis.Valid())
-		axisRelativeData[0] = fXAxis.Data();
+		axisAbsoluteData[0] = fXAxis.ScaledFloatData();
 
 	if (fYAxis.Extract() == B_OK && fYAxis.Valid())
-		axisRelativeData[1] = fYAxis.Data();
+		axisAbsoluteData[1] = fYAxis.ScaledFloatData();
 
 	uint32 wheelData = 0;
 	if (fWheel != NULL && fWheel->Extract() == B_OK && fWheel->Valid())
@@ -204,8 +261,30 @@ MouseProtocolHandler::_ReadReport(void *buffer)
 			buttons |= (button->Data() & 1) << (button->UsageID() - 1);
 	}
 
+	float pressure = 1.0f;
+	if (fPressure != NULL && fPressure->Extract() == B_OK
+		&& fPressure->Valid()) {
+		pressure = fPressure->ScaledFloatData();
+	}
+
+	float xTilt = 0.0f;
+	if (fXTilt != NULL && fXTilt->Extract() == B_OK && fXTilt->Valid())
+		xTilt = fXTilt->ScaledFloatData();
+
+	float yTilt = 0.0f;
+	if (fXTilt != NULL && fYTilt->Extract() == B_OK && fYTilt->Valid())
+		yTilt = fYTilt->ScaledFloatData();
+
+	bool inRange = true;
+	if (fRange != NULL)
+		inRange = fRange->Extract() == B_OK && fRange->Valid();
+
+	bool eraser = false;
+	if (fEraser != NULL && fEraser->Extract() == B_OK && fEraser->Valid())
+		eraser = (fEraser->Data() & 1) != 0;
+
 	fReport.DoneProcessing();
-	TRACE("got mouse report\n");
+	TRACE("got tablet report\n");
 
 	int32 clicks = 0;
 	bigtime_t timestamp = system_time();
@@ -223,12 +302,18 @@ MouseProtocolHandler::_ReadReport(void *buffer)
 
 	fLastButtons = buttons;
 
-	mouse_movement *info = (mouse_movement *)buffer;
-	memset(info, 0, sizeof(mouse_movement));
+	tablet_movement *info = (tablet_movement *)buffer;
+	memset(info, 0, sizeof(tablet_movement));
+
+	info->xpos = axisAbsoluteData[0];
+	info->ypos = axisAbsoluteData[1];
+	info->has_contact = inRange;
+	info->pressure = pressure;
+	info->eraser = eraser;
+	info->tilt_x = xTilt;
+	info->tilt_y = yTilt;
 
 	info->buttons = buttons;
-	info->xdelta = axisRelativeData[0];
-	info->ydelta = -axisRelativeData[1];
 	info->clicks = clicks;
 	info->timestamp = timestamp;
 	info->wheel_ydelta = -wheelData;

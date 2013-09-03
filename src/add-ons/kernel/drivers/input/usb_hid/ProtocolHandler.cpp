@@ -14,9 +14,10 @@
 #include "ProtocolHandler.h"
 
 // includes for the different protocol handlers
+#include "JoystickProtocolHandler.h"
 #include "KeyboardProtocolHandler.h"
 #include "MouseProtocolHandler.h"
-#include "JoystickProtocolHandler.h"
+#include "TabletProtocolHandler.h"
 
 
 ProtocolHandler::ProtocolHandler(HIDDevice *device, const char *basePath,
@@ -86,9 +87,19 @@ ProtocolHandler::AddHandlers(HIDDevice &device, ProtocolHandler *&handlerList,
 		TRACE("collection usage page %u usage id %u\n",
 			collection->UsagePage(), collection->UsageID());
 
+		// NOTE: There isn't currently a mechanism in place that figures out the
+		// "best" handler for a device. Consider the case of a tablet input
+		// device: It might advertise itself as regular mouse in one descriptor.
+		// If the MouseProtocolHandler is given a chance to look at the device
+		// first, it might be happy with that descriptor and provide the 
+		// protocol handler. That is why the TabletProtocolHandler and
+		// JostickProtocolHandlers are given a chance first, so they might look
+		// for more interesting descriptors that unlock the specific device
+		// functions best.
 		KeyboardProtocolHandler::AddHandlers(device, *collection, handlerList);
-		MouseProtocolHandler::AddHandlers(device, *collection, handlerList);
 		JoystickProtocolHandler::AddHandlers(device, *collection, handlerList);
+		TabletProtocolHandler::AddHandlers(device, *collection, handlerList);
+		MouseProtocolHandler::AddHandlers(device, *collection, handlerList);
 	}
 
 	ProtocolHandler *handler = handlerList;

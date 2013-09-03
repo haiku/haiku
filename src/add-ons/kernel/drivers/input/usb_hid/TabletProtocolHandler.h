@@ -1,9 +1,11 @@
 /*
+ * Copyright 2013 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2010-2011 Enrique Medina Gremaldos <quiqueiii@gmail.com>
  * Copyright 2008-2011 Michael Lotz <mmlr@mlotz.ch>
  * Distributed under the terms of the MIT license.
  */
-#ifndef USB_MOUSE_PROTOCOL_HANDLER_H
-#define USB_MOUSE_PROTOCOL_HANDLER_H
+#ifndef USB_TABLET_PROTOCOL_HANDLER_H
+#define USB_TABLET_PROTOCOL_HANDLER_H
 
 
 #include <InterfaceDefs.h>
@@ -20,9 +22,9 @@ class HIDReportItem;
 #endif
 
 
-class MouseProtocolHandler : public ProtocolHandler {
+class TabletProtocolHandler : public ProtocolHandler {
 public:
-								MouseProtocolHandler(HIDReport &report,
+								TabletProtocolHandler(HIDReport &report,
 									HIDReportItem &xAxis,
 									HIDReportItem &yAxis);
 
@@ -43,10 +45,18 @@ private:
 			HIDReportItem *		fWheel;
 			HIDReportItem *		fButtons[B_MAX_MOUSE_BUTTONS];
 
+			HIDReportItem *		fPressure;
+			HIDReportItem *		fRange;
+			HIDReportItem *		fTip;
+			HIDReportItem *		fBarrelSwitch;
+			HIDReportItem *		fEraser;
+			HIDReportItem *		fXTilt;
+			HIDReportItem *		fYTilt;
+
 			uint32				fLastButtons;
 			uint32				fClickCount;
 			bigtime_t			fLastClickTime;
 			bigtime_t			fClickSpeed;
 };
 
-#endif // USB_MOUSE_PROTOCOL_HANDLER_H
+#endif // USB_TABLET_PROTOCOL_HANDLER_H
