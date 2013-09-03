@@ -279,7 +279,7 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 	fTurnOffNotSupported = new BTextView("not_supported", be_plain_font,
 		&textColor, B_WILL_DRAW);
 	fTurnOffNotSupported->SetExplicitMinSize(BSize(B_SIZE_UNSET,
-		textHeight * 3));
+		3 + textHeight * 3));
 	fTurnOffNotSupported->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fTurnOffNotSupported->MakeEditable(false);
 	fTurnOffNotSupported->MakeSelectable(false);
@@ -316,7 +316,8 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 	fFadeNow = new ScreenCornerSelector(monitorRect, "FadeNow",
 		new BMessage(kMsgFadeCornerChanged), B_FOLLOW_NONE);
 	BTextView* fadeNowText = new BTextView("FadeNowText", B_WILL_DRAW);
-	fadeNowText->SetExplicitMinSize(BSize(B_SIZE_UNSET, textHeight * 3));
+	fadeNowText->SetExplicitMinSize(BSize(B_SIZE_UNSET,
+		3 + textHeight * 3));
 	fadeNowText->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fadeNowText->MakeEditable(false);
 	fadeNowText->MakeSelectable(false);
@@ -325,7 +326,8 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 	fFadeNever = new ScreenCornerSelector(monitorRect, "FadeNever",
 		new BMessage(kMsgNeverFadeCornerChanged), B_FOLLOW_NONE);
 	BTextView* fadeNeverText = new BTextView("FadeNeverText", B_WILL_DRAW);
-	fadeNeverText->SetExplicitMinSize(BSize(B_SIZE_UNSET, textHeight * 3));
+	fadeNeverText->SetExplicitMinSize(BSize(B_SIZE_UNSET,
+		3 + textHeight * 3));
 	fadeNeverText->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fadeNeverText->MakeEditable(false);
 	fadeNeverText->MakeSelectable(false);
