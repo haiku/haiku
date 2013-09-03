@@ -818,9 +818,10 @@ ModulesView::_OpenSaver()
 		// let it look a bit better at least.
 		BPrivate::BuildScreenSaverDefaultSettingsView(fSettingsView,
 			fSettings.ModuleName()[0] ? fSettings.ModuleName()
-			: B_TRANSLATE("Blackness"), saver != NULL && !fSettings.ModuleName()[0]
-				? B_TRANSLATE("No options available")
-				: B_TRANSLATE("Could not load screen saver"));
+				: B_TRANSLATE("Blackness"),
+				saver != NULL || !fSettings.ModuleName()[0]
+					? B_TRANSLATE("No options available")
+					: B_TRANSLATE("Could not load screen saver"));
 	}
 }
 
