@@ -79,13 +79,14 @@ JoystickProtocolHandler::JoystickProtocolHandler(HIDReport &report)
 					break;
 				}
 
-				uint16 axis = 0;
+// TODO: "axis" is set but not used!
+//				uint16 axis = 0;
 				if (item->UsageID() >= B_HID_UID_GD_X
 					&& item->UsageID() <= B_HID_UID_GD_WHEEL) {
-					axis = item->UsageID() - B_HID_UID_GD_X;
+//					axis = item->UsageID() - B_HID_UID_GD_X;
 				} else if (item->UsageID() >= B_HID_UID_GD_VX
 					&& item->UsageID() <= B_HID_UID_GD_VNO) {
-					axis = item->UsageID() - B_HID_UID_GD_VX;
+//					axis = item->UsageID() - B_HID_UID_GD_VX;
 				} else
 					break;
 
