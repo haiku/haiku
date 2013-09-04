@@ -317,7 +317,7 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 		new BMessage(kMsgFadeCornerChanged), B_FOLLOW_NONE);
 	BTextView* fadeNowText = new BTextView("FadeNowText", B_WILL_DRAW);
 	fadeNowText->SetExplicitMinSize(BSize(B_SIZE_UNSET,
-		3 + textHeight * 3));
+		4 + textHeight * 4));
 	fadeNowText->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fadeNowText->MakeEditable(false);
 	fadeNowText->MakeSelectable(false);
@@ -327,7 +327,7 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 		new BMessage(kMsgNeverFadeCornerChanged), B_FOLLOW_NONE);
 	BTextView* fadeNeverText = new BTextView("FadeNeverText", B_WILL_DRAW);
 	fadeNeverText->SetExplicitMinSize(BSize(B_SIZE_UNSET,
-		3 + textHeight * 3));
+		4 + textHeight * 4));
 	fadeNeverText->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fadeNeverText->MakeEditable(false);
 	fadeNeverText->MakeSelectable(false);
