@@ -77,7 +77,6 @@ ProtocolHandler::AddHandlers(HIDDevice &device, ProtocolHandler *&handlerList,
 	TRACE("root collection holds %lu application collection%s\n",
 		appCollectionCount, appCollectionCount != 1 ? "s" : "");
 
-	handlerCount = 0;
 	for (uint32  i = 0; i < appCollectionCount; i++) {
 		HIDCollection *collection = rootCollection->ChildAtFlat(
 			COLLECTION_APPLICATION, i);
@@ -87,21 +86,19 @@ ProtocolHandler::AddHandlers(HIDDevice &device, ProtocolHandler *&handlerList,
 		TRACE("collection usage page %u usage id %u\n",
 			collection->UsagePage(), collection->UsageID());
 
-		// NOTE: There isn't currently a mechanism in place that figures out the
-		// "best" handler for a device. Consider the case of a tablet input
-		// device: It might advertise itself as regular mouse in one descriptor.
-		// If the MouseProtocolHandler is given a chance to look at the device
-		// first, it might be happy with that descriptor and provide the 
-		// protocol handler. That is why the TabletProtocolHandler and
-		// JostickProtocolHandlers are given a chance first, so they might look
-		// for more interesting descriptors that unlock the specific device
-		// functions best.
+		// NOTE: The driver publishes devices for all added handlers.
+
+		// TODO: How does this work if a device is not a compound device
+		// like a keyboard with built-in touchpad, but allows multiple
+		// alternative configurations like a tablet that works as either
+		// regular (relative) mouse, or (absolute) tablet?
 		KeyboardProtocolHandler::AddHandlers(device, *collection, handlerList);
 		JoystickProtocolHandler::AddHandlers(device, *collection, handlerList);
 		TabletProtocolHandler::AddHandlers(device, *collection, handlerList);
 		MouseProtocolHandler::AddHandlers(device, *collection, handlerList);
 	}
 
+	handlerCount = 0;
 	ProtocolHandler *handler = handlerList;
 	while (handler != NULL) {
 		handler = handler->NextHandler();
