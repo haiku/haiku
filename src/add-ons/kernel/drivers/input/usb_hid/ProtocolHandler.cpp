@@ -94,8 +94,8 @@ ProtocolHandler::AddHandlers(HIDDevice &device, ProtocolHandler *&handlerList,
 		// regular (relative) mouse, or (absolute) tablet?
 		KeyboardProtocolHandler::AddHandlers(device, *collection, handlerList);
 		JoystickProtocolHandler::AddHandlers(device, *collection, handlerList);
-		TabletProtocolHandler::AddHandlers(device, *collection, handlerList);
 		MouseProtocolHandler::AddHandlers(device, *collection, handlerList);
+		TabletProtocolHandler::AddHandlers(device, *collection, handlerList);
 	}
 
 	handlerCount = 0;
