@@ -52,7 +52,7 @@ PreviewView::PreviewView(const char* name)
 	float aspectRatio = 4.0f / 3.0f;
 		// 4:3 monitor
 	float previewWidth = 160.0f;
-	float previewHeight = ceil(previewWidth / aspectRatio);
+	float previewHeight = ceilf(previewWidth / aspectRatio);
 
 	SetExplicitSize(BSize(previewWidth, previewHeight));
 }
