@@ -379,6 +379,7 @@ FadeView::AttachedToWindow()
 {
 	fEnableCheckBox->SetTarget(this);
 	fRunSlider->SetTarget(this);
+	fTurnOffCheckBox->SetTarget(this);
 	fTurnOffSlider->SetTarget(this);
 	fFadeNow->SetTarget(this);
 	fFadeNever->SetTarget(this);
