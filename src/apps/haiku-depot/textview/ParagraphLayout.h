@@ -23,21 +23,16 @@ public:
 		charCode(0),
 		x(0.0f),
 		width(0.0f),
-		advanceX(0.0f),
-		lineIndex(0),
-		style()
+		lineIndex(0)
 	{
 	}
 
-	GlyphInfo(uint32 charCode, float x, float width, float advanceX,
-			int32 lineIndex, const CharacterStyle& style)
+	GlyphInfo(uint32 charCode, float x, float width, int32 lineIndex)
 		:
 		charCode(charCode),
 		x(x),
 		width(width),
-		advanceX(advanceX),
-		lineIndex(lineIndex),
-		style(style)
+		lineIndex(lineIndex)
 	{
 	}
 	
@@ -46,9 +41,7 @@ public:
 		charCode(other.charCode),
 		x(other.x),
 		width(other.width),
-		advanceX(other.advanceX),
-		lineIndex(other.lineIndex),
-		style(other.style)
+		lineIndex(other.lineIndex)
 	{
 	}
 
@@ -57,9 +50,7 @@ public:
 		charCode = other.charCode;
 		x = other.x;
 		width = other.width;
-		advanceX = other.advanceX;
 		lineIndex = other.lineIndex;
-		style = other.style;
 		return *this;
 	}
 
@@ -68,9 +59,7 @@ public:
 		return charCode == other.charCode
 			&& x == other.x
 			&& width == other.width
-			&& advanceX == other.advanceX
-			&& lineIndex == other.lineIndex
-			&& style == other.style;
+			&& lineIndex == other.lineIndex;
 	}
 
 	bool operator!=(const GlyphInfo& other) const
@@ -83,11 +72,8 @@ public:
 
 	float					x;
 	float					width;
-	float					advanceX;
 
 	int32					lineIndex;
-
-	CharacterStyle			style;
 };
 
 

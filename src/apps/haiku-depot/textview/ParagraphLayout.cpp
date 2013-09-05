@@ -320,8 +320,6 @@ ParagraphLayout::_Layout()
 //				advanceX = tabOffset - x;
 //		}
 
-		glyph.advanceX = advanceX;
-
 		if (glyph.charCode == '\n') {
 			nextLine = true;
 			lineBreak = true;
@@ -461,8 +459,7 @@ ParagraphLayout::_AppendGlyphInfo(uint32 charCode, float width,
 
 	width += style.GlyphSpacing();
 	
-	GlyphInfo glyph(charCode, 0.0f, width, width, 0, style);
-	return fGlyphInfos.Add(glyph);
+	return fGlyphInfos.Add(GlyphInfo(charCode, 0.0f, width, 0));
 }
 
 
