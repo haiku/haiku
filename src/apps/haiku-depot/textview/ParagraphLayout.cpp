@@ -198,10 +198,9 @@ ParagraphLayout::ParagraphLayout(const ParagraphLayout& other)
 	fWidth(other.fWidth),
 	fLayoutValid(false),
 
-	fGlyphInfos(),
+	fGlyphInfos(other.fGlyphInfos),
 	fLineInfos()
 {
-	_Init();
 }
 
 
@@ -467,32 +466,66 @@ ParagraphLayout::_AppendGlyphInfo(uint32 charCode, float width,
 }
 
 
-void
+bool
 ParagraphLayout::_FinalizeLine(int lineStart, int lineEnd, int lineIndex,
 	float y, float& lineHeight)
 {
-	lineHeight = 0.0f;
-	float maxAscent = 0.0f;
-	float maxDescent = 0.0f;
+	LineInfo line(lineStart, y, 0.0f, 0.0f, 0.0f);
+
+	int spanIndex = -1;
+	int spanStart = 0;
+	int spanEnd = 0;
 
 	for (int i = lineStart; i <= lineEnd; i++) {
+		// Mark line index in glyph
 		GlyphInfo glyph = fGlyphInfos.ItemAtFast(i);
 		glyph.lineIndex = lineIndex;
 		fGlyphInfos.Replace(i, glyph);
 
-		const CharacterStyle& style = glyph.style;
-		
-		if (style.Font().Size() > lineHeight)
-			lineHeight = style.Font().Size();
-		
-		if (style.Ascent() > maxAscent)
-			maxAscent = style.Ascent();
+		// See if the next sub-span needs to be added to the LineInfo
+		bool addSpan = false;
 
-		if (style.Descent() > maxDescent)
-			maxDescent = style.Descent();
+		while (i >= spanEnd) {
+			spanIndex++;
+			const TextSpan& span = fTextSpans.ItemAt(spanIndex);
+			spanStart = spanEnd;
+			spanEnd += span.CharCount();
+			addSpan = true;
+		}
+
+		if (addSpan) {
+			const TextSpan& span = fTextSpans.ItemAt(spanIndex);
+			TextSpan subSpan = span.SubSpan(i - spanStart,
+				(lineEnd - spanStart) - (i - spanStart));
+			line.layoutedSpans.Add(subSpan);
+			_IncludeStyleInLine(line, span.Style());
+		}
 	}
 
-	fLineInfos.Add(LineInfo(lineStart, y, lineHeight, maxAscent, maxDescent));
+	lineHeight = line.height;
+
+	return fLineInfos.Add(line);
+}
+
+
+void
+ParagraphLayout::_IncludeStyleInLine(LineInfo& line,
+	const CharacterStyle& style)
+{
+	float ascent = style.Ascent();
+	if (ascent > line.maxAscent)
+		line.maxAscent = ascent;
+
+	float descent = style.Descent();
+	if (descent > line.maxDescent)
+		line.maxDescent = descent;
+	
+	float height = ascent + descent;
+	if (style.Font().Size() > height)
+		height = style.Font().Size();
+
+	if (height > line.height)
+		line.height = height;
 }
 
 

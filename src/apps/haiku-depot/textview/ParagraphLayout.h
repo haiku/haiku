@@ -196,8 +196,11 @@ private:
 									float advanceX,
 									const CharacterStyle& style);
 
-			void				_FinalizeLine(int lineStart, int lineEnd,
+			bool				_FinalizeLine(int lineStart, int lineEnd,
 									int lineIndex, float y, float& lineHeight);
+
+			void				_IncludeStyleInLine(LineInfo& line,
+									const CharacterStyle& style);
 
 			void				_DrawLine(BView* view,
 									const LineInfo& line) const;
