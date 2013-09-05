@@ -255,7 +255,7 @@ ParagraphLayout::Draw(BView* view, const BPoint& offset)
 	int lineCount = fLineInfos.CountItems();
 	for (int i = 0; i < lineCount; i++) {
 		const LineInfo& line = fLineInfos.ItemAtFast(i);
-		_DrawLine(view, line);
+		_DrawLine(view, offset, line);
 	}
 }
 
@@ -283,8 +283,10 @@ ParagraphLayout::_Init()
 void
 ParagraphLayout::_ValidateLayout()
 {
-	if (!fLayoutValid)
+	if (!fLayoutValid) {
 		_Layout();
+		fLayoutValid = true;
+	}
 }
 
 
@@ -674,27 +676,28 @@ ParagraphLayout::_IncludeStyleInLine(LineInfo& line,
 
 
 void
-ParagraphLayout::_DrawLine(BView* view, const LineInfo& line) const
+ParagraphLayout::_DrawLine(BView* view, const BPoint& offset,
+	const LineInfo& line) const
 {
 	int textOffset = line.textOffset;
 	int spanCount = line.layoutedSpans.CountItems();
 	for (int i = 0; i < spanCount; i++) {
 		const TextSpan& span = line.layoutedSpans.ItemAtFast(i);
-		_DrawSpan(view, span, textOffset);
+		_DrawSpan(view, offset, span, textOffset);
 		textOffset += span.CharCount();
 	}
 }
 
 
 void
-ParagraphLayout::_DrawSpan(BView* view, const TextSpan& span,
-	int32 textOffset) const
+ParagraphLayout::_DrawSpan(BView* view, BPoint offset,
+	const TextSpan& span, int32 textOffset) const
 {
 	const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
 	const LineInfo& line = fLineInfos.ItemAtFast(glyph.lineIndex);
 	
-	float x = glyph.x;
-	float y = line.y + line.maxAscent;
+	offset.x += glyph.x;
+	offset.y += line.y + line.maxAscent;
 
 	const CharacterStyle& style = span.Style();
 
@@ -708,7 +711,7 @@ ParagraphLayout::_DrawSpan(BView* view, const TextSpan& span,
 	delta.space = line.extraWhiteSpacing;
 
 	// TODO: Fix in app_server: First glyph should not be shifted by delta.
-	x -= delta.nonspace;
+	offset.x -= delta.nonspace;
 
-	view->DrawString(span.Text(), BPoint(x, y), &delta);
+	view->DrawString(span.Text(), offset, &delta);
 }

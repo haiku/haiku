@@ -179,6 +179,8 @@ public:
 	virtual						~ParagraphLayout();
 
 			void				SetParagraph(const Paragraph& paragraph);
+			const ParagraphStyle& Style() const
+									{ return fParagraphStyle; }
 
 			void				SetWidth(float width);
 			float				Width() const
@@ -205,9 +207,10 @@ private:
 			void				_IncludeStyleInLine(LineInfo& line,
 									const CharacterStyle& style);
 
-			void				_DrawLine(BView* view,
+			void				_DrawLine(BView* view, const BPoint& offset,
 									const LineInfo& line) const;
-			void				_DrawSpan(BView* view, const TextSpan& span,
+			void				_DrawSpan(BView* view, BPoint offset,
+									const TextSpan& span,
 									int32 textOffset) const;
 
 private:
@@ -220,5 +223,9 @@ private:
 			GlyphInfoList		fGlyphInfos;
 			LineInfoList		fLineInfos;
 };
+
+
+typedef BReference<ParagraphLayout> ParagraphLayoutRef;
+
 
 #endif // PARAGRAPH_LAYOUT_H
