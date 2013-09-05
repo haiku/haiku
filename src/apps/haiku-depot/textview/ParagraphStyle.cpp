@@ -187,3 +187,22 @@ ParagraphStyle::SpacingBottom() const
 }
 
 
+bool
+ParagraphStyle::SetBullet(const ::Bullet& bullet)
+{
+	ParagraphStyleDataRef data = fStyleData->SetBullet(bullet);
+	if (data == fStyleData)
+		return data->Bullet() == bullet;
+
+	fStyleData = data;
+	return true;
+}
+
+
+const ::Bullet&
+ParagraphStyle::Bullet() const
+{
+	return fStyleData->Bullet();
+}
+
+

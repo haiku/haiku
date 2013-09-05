@@ -5,7 +5,7 @@
 #ifndef PARAGRAPH_STYLE_DATA_H
 #define PARAGRAPH_STYLE_DATA_H
 
-#include <Referenceable.h>
+#include "Bullet.h"
 
 
 enum Alignment {
@@ -60,6 +60,9 @@ public:
 	inline	float				SpacingBottom() const
 									{ return fSpacingBottom; }
 
+			ParagraphStyleDataRef SetBullet(const ::Bullet& bullet);
+	inline	const ::Bullet&		Bullet() const
+									{ return fBullet; }
 private:
 			ParagraphStyleData&	operator=(const ParagraphStyleData& other);
 
@@ -73,6 +76,8 @@ private:
 
 			float				fSpacingTop;
 			float				fSpacingBottom;
+
+			::Bullet			fBullet;
 };
 
 

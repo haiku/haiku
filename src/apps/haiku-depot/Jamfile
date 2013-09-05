@@ -13,6 +13,8 @@ for sourceDir in $(sourceDirs) {
 }
 
 local textDocumentSources =
+	Bullet.cpp
+	BulletData.cpp
 	CharacterStyle.cpp
 	CharacterStyleData.cpp
 	Paragraph.cpp

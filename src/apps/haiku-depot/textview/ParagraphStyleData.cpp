@@ -17,7 +17,9 @@ ParagraphStyleData::ParagraphStyleData()
 	fLineInset(0.0f),
 
 	fSpacingTop(0.0f),
-	fSpacingBottom(0.0f)
+	fSpacingBottom(0.0f),
+
+	fBullet()
 {
 }
 
@@ -31,7 +33,9 @@ ParagraphStyleData::ParagraphStyleData(const ParagraphStyleData& other)
 	fLineInset(other.fLineInset),
 
 	fSpacingTop(other.fSpacingTop),
-	fSpacingBottom(other.fSpacingBottom)
+	fSpacingBottom(other.fSpacingBottom),
+
+	fBullet(other.fBullet)
 {
 }
 
@@ -47,7 +51,8 @@ ParagraphStyleData::operator==(const ParagraphStyleData& other) const
 		&& fFirstLineInset == other.fFirstLineInset
 		&& fLineInset == other.fLineInset
 		&& fSpacingTop == other.fSpacingTop
-		&& fSpacingBottom == other.fSpacingBottom;
+		&& fSpacingBottom == other.fSpacingBottom
+		&& fBullet == other.fBullet;
 }
 
 
@@ -159,6 +164,21 @@ ParagraphStyleData::SetSpacingBottom(float spacing)
 		return ParagraphStyleDataRef(this);
 
 	ret->fSpacingBottom = spacing;
+	return ParagraphStyleDataRef(ret, true);
+}
+
+
+ParagraphStyleDataRef
+ParagraphStyleData::SetBullet(const ::Bullet& bullet)
+{
+	if (fBullet == bullet)
+		return ParagraphStyleDataRef(this);
+
+	ParagraphStyleData* ret = new(std::nothrow) ParagraphStyleData(*this);
+	if (ret == NULL)
+		return ParagraphStyleDataRef(this);
+
+	ret->fBullet = bullet;
 	return ParagraphStyleDataRef(ret, true);
 }
 

@@ -257,6 +257,17 @@ ParagraphLayout::Draw(BView* view, const BPoint& offset)
 		const LineInfo& line = fLineInfos.ItemAtFast(i);
 		_DrawLine(view, offset, line);
 	}
+	
+	const Bullet& bullet = fParagraphStyle.Bullet();
+	if (bullet.Spacing() > 0.0f && bullet.String().Length() > 0) {
+		// Draw bullet at offset
+		view->SetHighColor(0, 0, 0, 255);
+		BPoint bulletPos(offset);
+		bulletPos.x += fParagraphStyle.FirstLineInset()
+			+ fParagraphStyle.LineInset();
+		bulletPos.y += fLineInfos.ItemAt(0).maxAscent;
+		view->DrawString(bullet.String(), bulletPos);
+	}
 }
 
 
@@ -295,7 +306,10 @@ ParagraphLayout::_Layout()
 {
 	fLineInfos.Clear();
 
-	float x = fParagraphStyle.FirstLineInset();
+	const Bullet& bullet = fParagraphStyle.Bullet();
+
+	float x = fParagraphStyle.LineInset() + fParagraphStyle.FirstLineInset()
+		+ bullet.Spacing();
 	float y = 0.0f;
 	int lineIndex = 0;
 	int lineStart = 0;
@@ -388,7 +402,7 @@ ParagraphLayout::_Layout()
 			_FinalizeLine(lineStart, lineEnd, lineIndex, y, lineHeight);
 
 			// Start position of the next line
-			x = fParagraphStyle.LineInset();
+			x = fParagraphStyle.LineInset() + bullet.Spacing();
 			y += lineHeight + fParagraphStyle.LineSpacing();
 
 			if (lineBreak)
@@ -642,7 +656,7 @@ ParagraphLayout::_FinalizeLine(int lineStart, int lineEnd, int lineIndex,
 		if (addSpan) {
 			const TextSpan& span = fTextSpans.ItemAt(spanIndex);
 			TextSpan subSpan = span.SubSpan(i - spanStart,
-				(lineEnd - spanStart) - (i - spanStart));
+				(lineEnd - spanStart + 1) - (i - spanStart));
 			line.layoutedSpans.Add(subSpan);
 			_IncludeStyleInLine(line, span.Style());
 		}

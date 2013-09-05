@@ -38,6 +38,8 @@ public:
 			bool				SetSpacingBottom(float spacing);
 			float				SpacingBottom() const;
 
+			bool				SetBullet(const ::Bullet& bullet);
+			const ::Bullet&		Bullet() const;
 
 private:
 			ParagraphStyleDataRef fStyleData;

@@ -53,9 +53,9 @@ TextDocumentTest::ReadyToRun()
 	TextDocumentRef document(new TextDocument(), true);
 
 	Paragraph paragraph(paragraphStyle);
-	paragraph.Append(TextSpan("This is a ", regularStyle));
-	paragraph.Append(TextSpan("test", bigStyle));
-	paragraph.Append(TextSpan(" to see if ", regularStyle));
+	paragraph.Append(TextSpan("This is a", regularStyle));
+	paragraph.Append(TextSpan(" test ", bigStyle));
+	paragraph.Append(TextSpan("to see if ", regularStyle));
 	paragraph.Append(TextSpan("different", boldStyle));
 	paragraph.Append(TextSpan(" character styles already work.", regularStyle));
 	document->Append(paragraph);
@@ -68,6 +68,22 @@ TextDocumentTest::ReadyToRun()
 	paragraph.Append(TextSpan("Different alignment styles ", regularStyle));
 	paragraph.Append(TextSpan("are", boldStyle));
 	paragraph.Append(TextSpan(" supported as of now!", regularStyle));
+	document->Append(paragraph);
+
+	// Test a bullet list
+	paragraphStyle.SetSpacingTop(8.0f);
+	paragraphStyle.SetAlignment(ALIGN_LEFT);
+	paragraphStyle.SetJustify(true);
+	paragraphStyle.SetBullet(Bullet("•", 12.0f));
+	paragraphStyle.SetLineInset(10.0f);
+
+	paragraph = Paragraph(paragraphStyle);
+	paragraph.Append(TextSpan("Even bullet lists are supported.", regularStyle));
+	document->Append(paragraph);
+
+	paragraph = Paragraph(paragraphStyle);
+	paragraph.Append(TextSpan("The wrapping in this bullet item should "
+		"look visually pleasing. And why should it not?", regularStyle));
 	document->Append(paragraph);
 
 	documentView->SetTextDocument(document);
