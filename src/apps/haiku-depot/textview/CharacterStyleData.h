@@ -46,12 +46,10 @@ public:
 									{ return fFont; }
 
 			CharacterStyleDataRef SetAscent(float ascent);
-	inline	float				Ascent() const
-									{ return fAscent; }
+			float				Ascent() const;
 
 			CharacterStyleDataRef SetDescent(float descent);
-	inline	float				Descent() const
-									{ return fDescent; }
+			float				Descent() const;
 
 			CharacterStyleDataRef SetWidth(float width);
 	inline	float				Width() const

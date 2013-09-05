@@ -110,6 +110,18 @@ CharacterStyleData::SetAscent(float ascent)
 }
 
 
+float
+CharacterStyleData::Ascent() const
+{
+	if (fAscent >= 0.0f)
+		return fAscent;
+
+	font_height fontHeight;
+	fFont.GetHeight(&fontHeight);
+	return fontHeight.ascent;
+}
+
+
 CharacterStyleDataRef
 CharacterStyleData::SetDescent(float descent)
 {
@@ -122,6 +134,18 @@ CharacterStyleData::SetDescent(float descent)
 
 	ret->fDescent = descent;
 	return CharacterStyleDataRef(ret, true);
+}
+
+
+float
+CharacterStyleData::Descent() const
+{
+	if (fDescent >= 0.0f)
+		return fDescent;
+
+	font_height fontHeight;
+	fFont.GetHeight(&fontHeight);
+	return fontHeight.descent;
 }
 
 

@@ -74,6 +74,15 @@ CharacterStyle::Font() const
 
 
 bool
+CharacterStyle::SetFontSize(float size)
+{
+	BFont font(Font());
+	font.SetSize(size);
+	return SetFont(font);
+}
+
+
+bool
 CharacterStyle::SetAscent(float ascent)
 {
 	CharacterStyleDataRef data = fStyleData->SetAscent(ascent);
@@ -150,6 +159,13 @@ CharacterStyle::GlyphSpacing() const
 
 
 bool
+CharacterStyle::SetForegroundColor(uint8 r, uint8 g, uint8 b, uint8 a)
+{
+	return SetForegroundColor((rgb_color){ r, g, b, a });
+}
+
+
+bool
 CharacterStyle::SetForegroundColor(rgb_color color)
 {
 	CharacterStyleDataRef data = fStyleData->SetForegroundColor(color);
@@ -165,6 +181,13 @@ rgb_color
 CharacterStyle::ForegroundColor() const
 {
 	return fStyleData->ForegroundColor();
+}
+
+
+bool
+CharacterStyle::SetBackgroundColor(uint8 r, uint8 g, uint8 b, uint8 a)
+{
+	return SetBackgroundColor((rgb_color){ r, g, b, a });
 }
 
 

@@ -20,6 +20,8 @@ public:
 			bool				SetFont(const BFont& font);
 			const BFont&		Font() const;
 
+			bool				SetFontSize(float size);
+
 			bool				SetAscent(float ascent);
 			float				Ascent() const;
 
@@ -32,9 +34,15 @@ public:
 			bool				SetGlyphSpacing(float spacing);
 			float				GlyphSpacing() const;
 
+			bool				SetForegroundColor(
+									uint8 r, uint8 g, uint8 b,
+									uint8 a = 255);
 			bool				SetForegroundColor(rgb_color color);
 			rgb_color			ForegroundColor() const;
 
+			bool				SetBackgroundColor(
+									uint8 r, uint8 g, uint8 b,
+									uint8 a = 255);
 			bool				SetBackgroundColor(rgb_color color);
 			rgb_color			BackgroundColor() const;
 
