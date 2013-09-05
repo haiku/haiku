@@ -1148,7 +1148,7 @@ KeyboardLayoutView::_KeyAt(BPoint point)
 	keyPoint.x /= fFactor;
 	keyPoint.y /= fFactor;
 
-	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
+	for (int32 i = fLayout->CountKeys() - 1; i >= 0; i--) {
 		Key* key = fLayout->KeyAt(i);
 		if (key->frame.Contains(keyPoint)) {
 			BRect frame = _FrameFor(key);
