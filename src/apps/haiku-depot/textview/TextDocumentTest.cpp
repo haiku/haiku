@@ -39,6 +39,7 @@ TextDocumentTest::ReadyToRun()
 	;
 
 	ParagraphStyle paragraphStyle;
+	paragraphStyle.SetJustify(true);
 	
 	CharacterStyle regularStyle;
 	

@@ -89,6 +89,8 @@ public:
 		height(0.0f),
 		maxAscent(0.0f),
 		maxDescent(0.0f),
+		extraGlyphSpacing(0.0f),
+		extraWhiteSpacing(0.0f),
 		layoutedSpans()
 	{
 	}
@@ -101,6 +103,8 @@ public:
 		height(height),
 		maxAscent(maxAscent),
 		maxDescent(maxDescent),
+		extraGlyphSpacing(0.0f),
+		extraWhiteSpacing(0.0f),
 		layoutedSpans()
 	{
 	}
@@ -112,6 +116,8 @@ public:
 		height(other.height),
 		maxAscent(other.maxAscent),
 		maxDescent(other.maxDescent),
+		extraGlyphSpacing(other.extraGlyphSpacing),
+		extraWhiteSpacing(other.extraWhiteSpacing),
 		layoutedSpans(other.layoutedSpans)
 	{
 	}
@@ -123,6 +129,8 @@ public:
 		height = other.height;
 		maxAscent = other.maxAscent;
 		maxDescent = other.maxDescent;
+		extraGlyphSpacing = other.extraGlyphSpacing;
+		extraWhiteSpacing = other.extraWhiteSpacing;
 		layoutedSpans = other.layoutedSpans;
 		return *this;
 	}
@@ -134,6 +142,8 @@ public:
 			&& height == other.height
 			&& maxAscent == other.maxAscent
 			&& maxDescent == other.maxDescent
+			&& extraGlyphSpacing == other.extraGlyphSpacing
+			&& extraWhiteSpacing == other.extraWhiteSpacing
 			&& layoutedSpans == other.layoutedSpans;
 	}
 
@@ -144,10 +154,15 @@ public:
 
 public:
 	int32			textOffset;
+
 	float			y;
 	float			height;
+
 	float			maxAscent;
 	float			maxDescent;
+
+	float			extraGlyphSpacing;
+	float			extraWhiteSpacing;
 
 	TextSpanList	layoutedSpans;
 };
@@ -173,10 +188,12 @@ public:
 			void				Draw(BView* view, const BPoint& offset);
 
 private:
+			void				_Init();
+
 			void				_ValidateLayout();
 			void				_Layout();
+			void				_ApplyAlignment();
 
-			void				_Init();
 			bool				_AppendGlyphInfos(const TextSpan& span);
 			bool				_AppendGlyphInfo(uint32 charCode,
 									float advanceX,

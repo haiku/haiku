@@ -264,6 +264,23 @@ ParagraphLayout::Draw(BView* view, const BPoint& offset)
 
 
 void
+ParagraphLayout::_Init()
+{
+	fGlyphInfos.Clear();
+
+	int spanCount = fTextSpans.CountItems();
+	for (int i = 0; i < spanCount; i++) {
+		const TextSpan& span = fTextSpans.ItemAtFast(i);
+		if (!_AppendGlyphInfos(span)) {
+			fprintf(stderr, "%p->ParagraphLayout::_Init() - Out of memory\n",
+				this);
+			return;
+		}
+	}
+}
+
+
+void
 ParagraphLayout::_ValidateLayout()
 {
 	if (!fLayoutValid)
@@ -394,21 +411,151 @@ ParagraphLayout::_Layout()
 		float lineHeight;
 		_FinalizeLine(lineStart, glyphCount - 1, lineIndex, y, lineHeight);
 	}
+
+	_ApplyAlignment();
 }
 
 
 void
-ParagraphLayout::_Init()
+ParagraphLayout::_ApplyAlignment()
 {
-	fGlyphInfos.Clear();
+	Alignment alignment = fParagraphStyle.Alignment();
+	bool justify = fParagraphStyle.Justify();
 
-	int spanCount = fTextSpans.CountItems();
-	for (int i = 0; i < spanCount; i++) {
-		const TextSpan& span = fTextSpans.ItemAtFast(i);
-		if (!_AppendGlyphInfos(span)) {
-			fprintf(stderr, "%p->ParagraphLayout::_Init() - Out of memory\n",
-				this);
-			return;
+	if (alignment == ALIGN_LEFT && !justify)
+		return;
+
+	int glyphCount = fGlyphInfos.CountItems();
+	if (glyphCount == 0)
+		return;
+
+	int lineIndex = -1;
+	float spaceLeft = 0.0f;
+	float charSpace = 0.0f;
+	float whiteSpace = 0.0f;
+	bool seenChar = false;
+
+	// Iterate all glyphs backwards. On the last character of the next line,
+	// the position of the character determines the available space to be
+	// distributed (spaceLeft).
+	for (int i = glyphCount - 1; i >= 0; i--) {
+		GlyphInfo glyph = fGlyphInfos.ItemAtFast(i);
+
+		if (glyph.lineIndex != lineIndex) {
+			bool lineBreak = glyph.charCode == '\n' || i == glyphCount - 1;
+			lineIndex = glyph.lineIndex;
+
+			// The position of the last character determines the available
+			// space.
+			spaceLeft = fWidth - glyph.x;
+
+			// If the character is visible, the width of the character needs to
+			// be subtracted from the available space, otherwise it would be
+			// pushed outside the line.
+			uint32 charClassification = get_char_classification(glyph.charCode);
+			if (charClassification != CHAR_CLASS_WHITESPACE)
+				spaceLeft -= glyph.width;
+
+			charSpace = 0.0f;
+			whiteSpace = 0.0f;
+			seenChar = false;
+
+			if (lineBreak || !justify) {
+				if (alignment == ALIGN_CENTER)
+					spaceLeft /= 2.0f;
+				else if (alignment == ALIGN_LEFT)
+					spaceLeft = 0.0f;
+			} else {
+				// Figure out how much chars and white space chars are on the
+				// line. Don't count trailing white space.
+				int charCount = 0;
+				int spaceCount = 0;
+				for (int j = i; j >= 0; j--) {
+					const GlyphInfo& previousGlyph = fGlyphInfos.ItemAtFast(j);
+					if (previousGlyph.lineIndex != lineIndex) {
+						j++;
+						break;
+					}
+					uint32 classification = get_char_classification(
+						previousGlyph.charCode);
+					if (classification == CHAR_CLASS_WHITESPACE) {
+						if (charCount > 0)
+							spaceCount++;
+						else if (j < i)
+							spaceLeft += glyph.width;
+					} else {
+						charCount++;
+					}
+				}
+
+				// The first char is not shifted when justifying, so it doesn't
+				// contribute.
+				if (charCount > 0)
+					charCount--;
+
+				// Check if it looks better if both whitespace and chars get
+				// some space distributed, in case there are only 1 or two
+				// space chars on the line.
+				float spaceLeftForSpace = spaceLeft;
+				float spaceLeftForChars = spaceLeft;
+
+				if (spaceCount > 0) {
+					float spaceCharRatio = (float) spaceCount / charCount;
+					if (spaceCount < 3 && spaceCharRatio < 0.4f) {
+						spaceLeftForSpace = spaceLeft * 2.0f * spaceCharRatio;
+						spaceLeftForChars = spaceLeft - spaceLeftForSpace;
+					} else
+						spaceLeftForChars = 0.0f;
+				}
+
+				if (spaceCount > 0)
+					whiteSpace = spaceLeftForSpace / spaceCount;
+				if (charCount > 0)
+					charSpace = spaceLeftForChars / charCount;
+				
+				LineInfo line = fLineInfos.ItemAtFast(lineIndex);
+				line.extraGlyphSpacing = charSpace;
+				line.extraWhiteSpacing = whiteSpace;
+
+				fLineInfos.Replace(lineIndex, line);
+			}
+		}
+
+		// Each character is pushed towards the right by the space that is
+		// still available. When justification is performed, the shift is
+		// gradually decreased. This works since the iteration is backwards
+		// and the characters on the right are pushed farthest.
+		glyph.x += spaceLeft;
+
+		unsigned classification = get_char_classification(glyph.charCode);
+
+		if (i < glyphCount - 1) {
+			GlyphInfo nextGlyph = fGlyphInfos.ItemAtFast(i + 1);
+			if (nextGlyph.lineIndex == lineIndex) {
+				uint32 nextClassification
+					= get_char_classification(nextGlyph.charCode);
+				if (nextClassification == CHAR_CLASS_WHITESPACE
+					&& classification != CHAR_CLASS_WHITESPACE) {
+					// When a space character is right of a regular character,
+					// add the additional space to the space instead of the
+					// character
+					float shift = (nextGlyph.x - glyph.x) - glyph.width;
+					nextGlyph.x -= shift;
+					fGlyphInfos.Replace(i + 1, nextGlyph);
+				}
+			}
+		}
+
+		fGlyphInfos.Replace(i, glyph);
+
+		// The shift (spaceLeft) is reduced depending on the character
+		// classification.
+		if (classification == CHAR_CLASS_WHITESPACE) {
+			if (seenChar)
+				spaceLeft -= whiteSpace;
+		} else {
+			seenChar = true;
+			spaceLeft -= charSpace;
 		}
 	}
 }
@@ -555,7 +702,13 @@ ParagraphLayout::_DrawSpan(BView* view, const TextSpan& span,
 	view->SetHighColor(style.ForegroundColor());
 
 	// TODO: Implement other style properties
-	// TODO: Implement correct glyph spacing
 
-	view->DrawString(span.Text(), BPoint(x, y));
+	escapement_delta delta;
+	delta.nonspace = line.extraGlyphSpacing;
+	delta.space = line.extraWhiteSpacing;
+
+	// TODO: Fix in app_server: First glyph should not be shifted by delta.
+	x -= delta.nonspace;
+
+	view->DrawString(span.Text(), BPoint(x, y), &delta);
 }
