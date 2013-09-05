@@ -66,6 +66,13 @@ ParagraphStyle::SetAlignment(::Alignment alignment)
 }
 
 
+::Alignment
+ParagraphStyle::Alignment() const
+{
+	return fStyleData->Alignment();
+}
+
+
 bool
 ParagraphStyle::SetJustify(bool justify)
 {
@@ -75,6 +82,13 @@ ParagraphStyle::SetJustify(bool justify)
 
 	fStyleData = data;
 	return true;
+}
+
+
+bool
+ParagraphStyle::Justify() const
+{
+	return fStyleData->Justify();
 }
 
 
@@ -90,6 +104,13 @@ ParagraphStyle::SetFirstLineInset(float inset)
 }
 
 
+float
+ParagraphStyle::FirstLineInset() const
+{
+	return fStyleData->FirstLineInset();
+}
+
+
 bool
 ParagraphStyle::SetLineInset(float inset)
 {
@@ -99,6 +120,32 @@ ParagraphStyle::SetLineInset(float inset)
 
 	fStyleData = data;
 	return true;
+}
+
+
+float
+ParagraphStyle::LineInset() const
+{
+	return fStyleData->LineInset();
+}
+
+
+bool
+ParagraphStyle::SetLineSpacing(float spacing)
+{
+	ParagraphStyleDataRef data = fStyleData->SetLineSpacing(spacing);
+	if (data == fStyleData)
+		return data->LineSpacing() == spacing;
+
+	fStyleData = data;
+	return true;
+}
+
+
+float
+ParagraphStyle::LineSpacing() const
+{
+	return fStyleData->LineSpacing();
 }
 
 
@@ -114,6 +161,13 @@ ParagraphStyle::SetSpacingTop(float spacing)
 }
 
 
+float
+ParagraphStyle::SpacingTop() const
+{
+	return fStyleData->SpacingTop();
+}
+
+
 bool
 ParagraphStyle::SetSpacingBottom(float spacing)
 {
@@ -123,6 +177,13 @@ ParagraphStyle::SetSpacingBottom(float spacing)
 
 	fStyleData = data;
 	return true;
+}
+
+
+float
+ParagraphStyle::SpacingBottom() const
+{
+	return fStyleData->SpacingBottom();
 }
 
 

@@ -48,6 +48,10 @@ public:
 	inline	float				LineInset() const
 									{ return fLineInset; }
 
+			ParagraphStyleDataRef SetLineSpacing(float spacing);
+	inline	float				LineSpacing() const
+									{ return fLineSpacing; }
+
 			ParagraphStyleDataRef SetSpacingTop(float spacing);
 	inline	float				SpacingTop() const
 									{ return fSpacingTop; }
@@ -65,6 +69,7 @@ private:
 
 			float				fFirstLineInset;
 			float				fLineInset;
+			float				fLineSpacing;
 
 			float				fSpacingTop;
 			float				fSpacingBottom;

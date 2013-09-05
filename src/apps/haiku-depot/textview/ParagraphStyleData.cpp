@@ -119,6 +119,21 @@ ParagraphStyleData::SetLineInset(float inset)
 
 
 ParagraphStyleDataRef
+ParagraphStyleData::SetLineSpacing(float spacing)
+{
+	if (fLineSpacing == spacing)
+		return ParagraphStyleDataRef(this);
+
+	ParagraphStyleData* ret = new(std::nothrow) ParagraphStyleData(*this);
+	if (ret == NULL)
+		return ParagraphStyleDataRef(this);
+
+	ret->fLineSpacing = spacing;
+	return ParagraphStyleDataRef(ret, true);
+}
+
+
+ParagraphStyleDataRef
 ParagraphStyleData::SetSpacingTop(float spacing)
 {
 	if (fSpacingTop == spacing)

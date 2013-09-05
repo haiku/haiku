@@ -29,6 +29,9 @@ public:
 			bool				SetLineInset(float inset);
 			float				LineInset() const;
 
+			bool				SetLineSpacing(float spacing);
+			float				LineSpacing() const;
+
 			bool				SetSpacingTop(float spacing);
 			float				SpacingTop() const;
 
