@@ -9,26 +9,117 @@
 #include <Referenceable.h>
 #include <String.h>
 
-#include "GlyphInfo.h"
 #include "Paragraph.h"
+#include "CharacterStyle.h"
 
 
 class BView;
 
 
-class LayoutLine {
+class GlyphInfo {
 public:
-	LayoutLine()
+	GlyphInfo()
+		:
+		charCode(0),
+		x(0.0f),
+		width(0.0f),
+		advanceX(0.0f),
+		lineIndex(0),
+		style()
+	{
+	}
+
+	GlyphInfo(uint32 charCode, float x, float width, float advanceX,
+			int32 lineIndex, const CharacterStyle& style)
+		:
+		charCode(charCode),
+		x(x),
+		width(width),
+		advanceX(advanceX),
+		lineIndex(lineIndex),
+		style(style)
+	{
+	}
+	
+	GlyphInfo(const GlyphInfo& other)
+		:
+		charCode(other.charCode),
+		x(other.x),
+		width(other.width),
+		advanceX(other.advanceX),
+		lineIndex(other.lineIndex),
+		style(other.style)
+	{
+	}
+
+	GlyphInfo& operator=(const GlyphInfo& other)
+	{
+		charCode = other.charCode;
+		x = other.x;
+		width = other.width;
+		advanceX = other.advanceX;
+		lineIndex = other.lineIndex;
+		style = other.style;
+		return *this;
+	}
+
+	bool operator==(const GlyphInfo& other) const
+	{
+		return charCode == other.charCode
+			&& x == other.x
+			&& width == other.width
+			&& advanceX == other.advanceX
+			&& lineIndex == other.lineIndex
+			&& style == other.style;
+	}
+
+	bool operator!=(const GlyphInfo& other) const
+	{
+		return !(*this == other);
+	}
+
+public:
+	uint32					charCode;
+
+	float					x;
+	float					width;
+	float					advanceX;
+
+	int32					lineIndex;
+
+	CharacterStyle			style;
+};
+
+
+typedef List<GlyphInfo, false> GlyphInfoList;
+
+
+class LineInfo {
+public:
+	LineInfo()
 		:
 		textOffset(0),
 		y(0.0f),
 		height(0.0f),
 		maxAscent(0.0f),
-		maxDescent(0.0f)
+		maxDescent(0.0f),
+		layoutedSpans()
 	{
 	}
 	
-	LayoutLine(const LayoutLine& other)
+	LineInfo(int32 textOffset, float y, float height, float maxAscent,
+		float maxDescent)
+		:
+		textOffset(textOffset),
+		y(y),
+		height(height),
+		maxAscent(maxAscent),
+		maxDescent(maxDescent),
+		layoutedSpans()
+	{
+	}
+	
+	LineInfo(const LineInfo& other)
 		:
 		textOffset(other.textOffset),
 		y(other.y),
@@ -39,7 +130,7 @@ public:
 	{
 	}
 
-	LayoutLine& operator=(const LayoutLine& other)
+	LineInfo& operator=(const LineInfo& other)
 	{
 		textOffset = other.textOffset;
 		y = other.y;
@@ -50,23 +141,23 @@ public:
 		return *this;
 	}
 
-	bool operator==(const LayoutLine& other) const
+	bool operator==(const LineInfo& other) const
 	{
 		return textOffset == other.textOffset
 			&& y == other.y
 			&& height == other.height
 			&& maxAscent == other.maxAscent
 			&& maxDescent == other.maxDescent
-			&& layoutedSpans == otner.layoutedSpans;
+			&& layoutedSpans == other.layoutedSpans;
 	}
 
-	bool operator!=(const LayoutLine& other) const
+	bool operator!=(const LineInfo& other) const
 	{
 		return !(*this == other);
 	}
 
 public:
-	int				textOffset;
+	int32			textOffset;
 	float			y;
 	float			height;
 	float			maxAscent;
@@ -76,7 +167,7 @@ public:
 };
 
 
-typedef List<LayoutLine, false> LayoutLineList;
+typedef List<LineInfo, false> LineInfoList;
 
 
 class ParagraphLayout : public BReferenceable {
@@ -86,9 +177,7 @@ public:
 								ParagraphLayout(const ParagraphLayout& other);
 	virtual						~ParagraphLayout();
 
-			void				SetParagraph(const ::Paragraph& paragraph);
-			const ::Paragraph&	Paragraph() const
-									{ return fParagraph; }
+			void				SetParagraph(const Paragraph& paragraph);
 
 			void				SetWidth(float width);
 			float				Width() const
@@ -104,32 +193,26 @@ private:
 			void				_Init();
 			bool				_AppendGlyphInfos(const TextSpan& span);
 			bool				_AppendGlyphInfo(uint32 charCode,
-									const TextStyleRef& span);
+									float advanceX,
+									const CharacterStyle& style);
 
-			void				_GetGlyphAdvance(int offset,
-									float& advanceX, float& advanceY,
-									float escapementArray[]) const;
-			
 			void				_FinalizeLine(int lineStart, int lineEnd,
 									int lineIndex, float y, float& lineHeight);
 
 			void				_DrawLine(BView* view,
-									const LayoutLine& line) const;
+									const LineInfo& line) const;
 			void				_DrawSpan(BView* view, const TextSpan& span,
-									int textOffset) const;
+									int32 textOffset) const;
 
 private:
 			TextSpanList		fTextSpans;
+			ParagraphStyle		fParagraphStyle;
 
 			float				fWidth;
-			
 			bool				fLayoutValid;
 
-			GlyphInfo*			fGlyphInfoBuffer;
-			int					fGlpyhInfoBufferSize;
-			int					fGlyphInfoCount;
-
-			LayoutLineList		fLayoutLines;
+			GlyphInfoList		fGlyphInfos;
+			LineInfoList		fLineInfos;
 };
 
 #endif // PARAGRAPH_LAYOUT_H

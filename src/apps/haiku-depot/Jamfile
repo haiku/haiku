@@ -30,6 +30,7 @@ Application HaikuDepot :
 	CharacterStyle.cpp
 	CharacterStyleData.cpp
 	Paragraph.cpp
+	ParagraphLayout.cpp
 	ParagraphStyle.cpp
 	ParagraphStyleData.cpp
 	TextDocument.cpp
