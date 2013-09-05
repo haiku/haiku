@@ -15,7 +15,7 @@ TextSpan::TextSpan()
 }
 
 
-TextSpan::TextSpan(const BString& text, const TextStyle& style)
+TextSpan::TextSpan(const BString& text, const CharacterStyle& style)
 	:
 	fText(text),
 	fCharCount(text.CountChars()),
@@ -69,7 +69,7 @@ TextSpan::SetText(const BString& text)
 
 
 void
-TextSpan::SetStyle(const TextStyle& style)
+TextSpan::SetStyle(const CharacterStyle& style)
 {
 	fStyle = style;
 }

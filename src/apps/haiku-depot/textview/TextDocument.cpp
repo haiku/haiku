@@ -10,17 +10,17 @@ TextDocument::TextDocument()
 	:
 	fParagraphs(),
 	fEmptyLastParagraph(),
-	fDefaultTextStyle()
+	fDefaultCharacterStyle()
 {
 }
 
 
-TextDocument::TextDocument(const TextStyle& textStyle,
+TextDocument::TextDocument(const CharacterStyle& CharacterStyle,
 	const ParagraphStyle& paragraphStyle)
 	:
 	fParagraphs(),
 	fEmptyLastParagraph(paragraphStyle),
-	fDefaultTextStyle(textStyle)
+	fDefaultCharacterStyle(CharacterStyle)
 {
 }
 
@@ -29,7 +29,7 @@ TextDocument::TextDocument(const TextDocument& other)
 	:
 	fParagraphs(other.fParagraphs),
 	fEmptyLastParagraph(other.fEmptyLastParagraph),
-	fDefaultTextStyle(other.fDefaultTextStyle)
+	fDefaultCharacterStyle(other.fDefaultCharacterStyle)
 {
 }
 
@@ -39,7 +39,7 @@ TextDocument::operator=(const TextDocument& other)
 {
 	fParagraphs = other.fParagraphs;
 	fEmptyLastParagraph = other.fEmptyLastParagraph;
-	fDefaultTextStyle = other.fDefaultTextStyle;
+	fDefaultCharacterStyle = other.fDefaultCharacterStyle;
 
 	return *this;
 }
@@ -52,7 +52,7 @@ TextDocument::operator==(const TextDocument& other) const
 		return true;
 
 	return fEmptyLastParagraph == other.fEmptyLastParagraph
-		&& fDefaultTextStyle == other.fDefaultTextStyle
+		&& fDefaultCharacterStyle == other.fDefaultCharacterStyle
 		&& fParagraphs == other.fParagraphs;
 }
 
@@ -70,12 +70,12 @@ TextDocument::operator!=(const TextDocument& other) const
 status_t
 TextDocument::Insert(int32 offset, const BString& text)
 {
-	return Insert(offset, text, TextStyleAt(offset));
+	return Insert(offset, text, CharacterStyleAt(offset));
 }
 
 
 status_t
-TextDocument::Insert(int32 offset, const BString& text, const TextStyle& style)
+TextDocument::Insert(int32 offset, const BString& text, const CharacterStyle& style)
 {
 	return Insert(offset, text, style, ParagraphStyleAt(offset));
 }
@@ -83,9 +83,9 @@ TextDocument::Insert(int32 offset, const BString& text, const TextStyle& style)
 
 status_t
 TextDocument::Insert(int32 offset, const BString& text,
-	const TextStyle& textStyle, const ParagraphStyle& paragraphStyle)
+	const CharacterStyle& CharacterStyle, const ParagraphStyle& paragraphStyle)
 {
-	return Replace(offset, 0, text, textStyle, paragraphStyle);
+	return Replace(offset, 0, text, CharacterStyle, paragraphStyle);
 }
 
 
@@ -106,13 +106,13 @@ TextDocument::Remove(int32 offset, int32 length)
 status_t
 TextDocument::Replace(int32 offset, int32 length, const BString& text)
 {
-	return Replace(offset, length, text, TextStyleAt(offset));
+	return Replace(offset, length, text, CharacterStyleAt(offset));
 }
 
 
 status_t
 TextDocument::Replace(int32 offset, int32 length, const BString& text,
-	const TextStyle& style)
+	const CharacterStyle& style)
 {
 	return Replace(offset, length, text, style, ParagraphStyleAt(offset));
 }
@@ -120,7 +120,7 @@ TextDocument::Replace(int32 offset, int32 length, const BString& text,
 
 status_t
 TextDocument::Replace(int32 offset, int32 length, const BString& text,
-	const TextStyle& textStyle, const ParagraphStyle& paragraphStyle)
+	const CharacterStyle& CharacterStyle, const ParagraphStyle& paragraphStyle)
 {
 	// TODO: Implement
 	return B_ERROR;
@@ -130,8 +130,8 @@ TextDocument::Replace(int32 offset, int32 length, const BString& text,
 // #pragma mark -
 
 
-const TextStyle&
-TextDocument::TextStyleAt(int32 textOffset) const
+const CharacterStyle&
+TextDocument::CharacterStyleAt(int32 textOffset) const
 {
 	int32 paragraphOffset;
 	const Paragraph& paragraph = ParagraphAt(textOffset, paragraphOffset);
@@ -147,8 +147,7 @@ TextDocument::TextStyleAt(int32 textOffset) const
 		textOffset -= span.CharCount();
 	}
 
-	// TODO: Document should have a default TextStyle?	
-	return fDefaultTextStyle;
+	return fDefaultCharacterStyle;
 }
 
 

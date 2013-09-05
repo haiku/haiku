@@ -8,14 +8,14 @@
 
 #include <String.h>
 
-#include "TextStyle.h"
+#include "CharacterStyle.h"
 
 
 class TextSpan {
 public:
 								TextSpan();
 								TextSpan(const BString& text,
-									const TextStyle& style);
+									const CharacterStyle& style);
 								TextSpan(const TextSpan& other);
 
 			TextSpan&			operator=(const TextSpan& other);
@@ -26,8 +26,8 @@ public:
 	inline	const BString&		Text() const
 									{ return fText; }
 
-			void				SetStyle(const TextStyle& style);
-	inline	const TextStyle&	Style() const
+			void				SetStyle(const CharacterStyle& style);
+	inline	const CharacterStyle& Style() const
 									{ return fStyle; }
 
 	inline	int32				CharCount() const
@@ -46,7 +46,7 @@ private:
 private:
 			BString				fText;
 			int32				fCharCount;
-			TextStyle			fStyle;
+			CharacterStyle		fStyle;
 };
 
 

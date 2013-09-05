@@ -5,6 +5,7 @@
 #ifndef TEXT_DOCUMENT_H
 #define TEXT_DOCUMENT_H
 
+#include "CharacterStyle.h"
 #include "List.h"
 #include "Paragraph.h"
 
@@ -15,7 +16,8 @@ typedef List<Paragraph, false>	ParagraphList;
 class TextDocument {
 public:
 								TextDocument();
-								TextDocument(const TextStyle& textStyle,
+								TextDocument(
+									const CharacterStyle& characterStyle,
 									const ParagraphStyle& paragraphStyle);
 								TextDocument(const TextDocument& other);
 
@@ -26,9 +28,9 @@ public:
 			// Text insertion and removing
 			status_t			Insert(int32 offset, const BString& text);
 			status_t			Insert(int32 offset, const BString& text,
-									const TextStyle& style);
+									const CharacterStyle& style);
 			status_t			Insert(int32 offset, const BString& text,
-									const TextStyle& textStyle,
+									const CharacterStyle& characterStyle,
 									const ParagraphStyle& paragraphStyle);
 
 			status_t			Remove(int32 offset, int32 length);
@@ -37,14 +39,14 @@ public:
 									const BString& text);
 			status_t			Replace(int32 offset, int32 length,
 									const BString& text,
-									const TextStyle& style);
+									const CharacterStyle& style);
 			status_t			Replace(int32 offset, int32 length,
 									const BString& text,
-									const TextStyle& textStyle,
+									const CharacterStyle& characterStyle,
 									const ParagraphStyle& paragraphStyle);
 
 			// Style access
-			const TextStyle&	TextStyleAt(int32 textOffset) const;
+			const CharacterStyle& CharacterStyleAt(int32 textOffset) const;
 			const ParagraphStyle& ParagraphStyleAt(int32 textOffset) const;
 
 			// Paragraph access
@@ -59,7 +61,7 @@ public:
 private:
 			ParagraphList		fParagraphs;
 			Paragraph			fEmptyLastParagraph;
-			TextStyle			fDefaultTextStyle;
+			CharacterStyle		fDefaultCharacterStyle;
 };
 
 
