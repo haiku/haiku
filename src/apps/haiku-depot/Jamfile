@@ -20,6 +20,7 @@ local textDocumentSources =
 	ParagraphStyle.cpp
 	ParagraphStyleData.cpp
 	TextDocument.cpp
+	TextDocumentLayout.cpp
 	TextDocumentView.cpp
 	TextLayout.cpp
 	TextSpan.cpp

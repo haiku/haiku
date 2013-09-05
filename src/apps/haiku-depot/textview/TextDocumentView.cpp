@@ -10,7 +10,7 @@ TextDocumentView::TextDocumentView(const char* name)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 {
-	fParagraphLayout.SetWidth(Bounds().Width());
+	fTextDocumentLayout.SetWidth(Bounds().Width());
 
 	SetViewColor(B_TRANSPARENT_COLOR);
 //	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -28,8 +28,8 @@ TextDocumentView::Draw(BRect updateRect)
 {
 	FillRect(updateRect, B_SOLID_LOW);
 
-	fParagraphLayout.SetWidth(Bounds().Width());
-	fParagraphLayout.Draw(this, B_ORIGIN);
+	fTextDocumentLayout.SetWidth(Bounds().Width());
+	fTextDocumentLayout.Draw(this, B_ORIGIN);
 }
 
 
@@ -45,7 +45,7 @@ TextDocumentView::AttachedToWindow()
 void
 TextDocumentView::FrameResized(float width, float height)
 {
-	fParagraphLayout.SetWidth(width);
+	fTextDocumentLayout.SetWidth(width);
 }
 
 
@@ -81,7 +81,7 @@ void
 TextDocumentView::GetHeightForWidth(float width, float* min, float* max,
 	float* preferred)
 {
-	ParagraphLayout layout(fParagraphLayout);
+	TextDocumentLayout layout(fTextDocumentLayout);
 	layout.SetWidth(width);
 
 	float height = layout.Height() + 1;
@@ -99,7 +99,7 @@ void
 TextDocumentView::SetTextDocument(const TextDocumentRef& document)
 {
 	fTextDocument = document;
-	fParagraphLayout.SetParagraph(fTextDocument->ParagraphAt(0));
+	fTextDocumentLayout.SetTextDocument(fTextDocument);
 	InvalidateLayout();
 }
 

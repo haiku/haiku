@@ -50,14 +50,24 @@ TextDocumentTest::ReadyToRun()
 	bigStyle.SetFontSize(24);
 	bigStyle.SetForegroundColor(255, 50, 50);
 
+	TextDocumentRef document(new TextDocument(), true);
+
 	Paragraph paragraph(paragraphStyle);
 	paragraph.Append(TextSpan("This is a ", regularStyle));
 	paragraph.Append(TextSpan("test", bigStyle));
 	paragraph.Append(TextSpan(" to see if ", regularStyle));
 	paragraph.Append(TextSpan("different", boldStyle));
 	paragraph.Append(TextSpan(" character styles already work.", regularStyle));
+	document->Append(paragraph);
 
-	TextDocumentRef document(new TextDocument(), true);
+	paragraphStyle.SetSpacingTop(8.0f);
+	paragraphStyle.SetAlignment(ALIGN_CENTER);
+	paragraphStyle.SetJustify(false);
+
+	paragraph = Paragraph(paragraphStyle);
+	paragraph.Append(TextSpan("Different alignment styles ", regularStyle));
+	paragraph.Append(TextSpan("are", boldStyle));
+	paragraph.Append(TextSpan(" supported as of now!", regularStyle));
 	document->Append(paragraph);
 
 	documentView->SetTextDocument(document);

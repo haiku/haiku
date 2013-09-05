@@ -8,8 +8,8 @@
 #include <String.h>
 #include <View.h>
 
-#include "ParagraphLayout.h"
 #include "TextDocument.h"
+#include "TextDocumentLayout.h"
 
 
 class TextDocumentView : public BView {
@@ -35,7 +35,7 @@ public:
 
 private:
 			TextDocumentRef		fTextDocument;
-			ParagraphLayout		fParagraphLayout;
+			TextDocumentLayout	fTextDocumentLayout;
 };
 
 #endif // TEXT_DOCUMENT_VIEW_H
