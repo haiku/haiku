@@ -12,6 +12,21 @@ for sourceDir in $(sourceDirs) {
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haiku-depot $(sourceDir) ] ;
 }
 
+local textDocumentSources =
+	CharacterStyle.cpp
+	CharacterStyleData.cpp
+	Paragraph.cpp
+	ParagraphLayout.cpp
+	ParagraphStyle.cpp
+	ParagraphStyleData.cpp
+	TextDocument.cpp
+	TextDocumentView.cpp
+	TextLayout.cpp
+	TextSpan.cpp
+	TextStyle.cpp
+	TextView.cpp
+;
+
 Application HaikuDepot :
 	App.cpp
 	BitmapButton.cpp
@@ -27,17 +42,7 @@ Application HaikuDepot :
 	support.cpp
 
 	# textview stuff
-	CharacterStyle.cpp
-	CharacterStyleData.cpp
-	Paragraph.cpp
-	ParagraphLayout.cpp
-	ParagraphStyle.cpp
-	ParagraphStyleData.cpp
-	TextDocument.cpp
-	TextLayout.cpp
-	TextSpan.cpp
-	TextStyle.cpp
-	TextView.cpp
+	$(textDocumentSources)
 	
 	: be translation libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
 		$(HAIKU_LOCALE_LIBS)
@@ -54,4 +59,11 @@ DoCatalogs HaikuDepot :
 	PackageInfoView.cpp
 	PackageListView.cpp
 	PackageManager.cpp
+;
+
+Application TextDocumentTest :
+	TextDocumentTest.cpp
+	$(textDocumentSources)
+
+	: be translation libshared.a $(TARGET_LIBSUPC++)
 ;
