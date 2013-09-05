@@ -31,6 +31,7 @@
 #include <Font.h>
 #include <Layout.h>
 #include <LayoutBuilder.h>
+#include <ListItem.h>
 #include <ListView.h>
 #include <Path.h>
 #include <Roster.h>
@@ -137,7 +138,9 @@ public:
 	virtual	void				AllAttached();
 	virtual	void				MessageReceived(BMessage* message);
 
+			void				EmptyScreenSaverList();
 			void				PopulateScreenSaverList();
+
 			void				SaveState();
 
 private:
@@ -558,8 +561,6 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 			.End()
 		.Add(fSettingsBox)
 		.End();
-
-	PopulateScreenSaverList();
 }
 
 
@@ -573,6 +574,8 @@ void
 ModulesView::DetachedFromWindow()
 {
 	SaveState();
+	EmptyScreenSaverList();
+
 	_CloseSaver();
 }
 
@@ -580,6 +583,8 @@ ModulesView::DetachedFromWindow()
 void
 ModulesView::AttachedToWindow()
 {
+	PopulateScreenSaverList();
+
 	_OpenSaver();
 
 	fScreenSaversListView->SetTarget(this);
@@ -602,7 +607,7 @@ ModulesView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgSaverSelected:
 		{
-			int selection = fScreenSaversListView->CurrentSelection();
+			int32 selection = fScreenSaversListView->CurrentSelection();
 			if (selection < 0)
 				break;
 
@@ -690,17 +695,21 @@ ModulesView::SaveState()
 
 
 void
+ModulesView::EmptyScreenSaverList()
+{
+	fScreenSaversListView->DeselectAll();
+	while (BListItem* item = fScreenSaversListView->RemoveItem((int32)0))
+		delete item;
+}
+
+
+void
 ModulesView::PopulateScreenSaverList()
 {
- 	fScreenSaversListView->DeselectAll();
-	while (ScreenSaverItem* item
-			= (ScreenSaverItem*)fScreenSaversListView->RemoveItem((int32)0)) {
-		delete item;
-	}
-
 	// Blackness is a built-in screen saver
-	fScreenSaversListView->AddItem(
-		new ScreenSaverItem(B_TRANSLATE("Blackness"), ""));
+	ScreenSaverItem* defaultItem
+		= new ScreenSaverItem(B_TRANSLATE("Blackness"), "");
+	fScreenSaversListView->AddItem(defaultItem);
 
 	// Iterate over add-on directories, and add their files to the list view
 
@@ -709,7 +718,7 @@ ModulesView::PopulateScreenSaverList()
 		B_COMMON_ADDONS_DIRECTORY,
 		B_SYSTEM_ADDONS_DIRECTORY,
 	};
-	ScreenSaverItem* selectItem = NULL;
+	ScreenSaverItem* selectedItem = NULL;
 
 	for (uint32 i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
 		BPath basePath;
@@ -729,17 +738,19 @@ ModulesView::PopulateScreenSaverList()
 			ScreenSaverItem* item = new ScreenSaverItem(name, path.Path());
 			fScreenSaversListView->AddItem(item);
 
-			if (strcmp(fSettings.ModuleName(), item->Text()) != 0
-				|| (strcmp(fSettings.ModuleName(), "") != 0
-					&& strcmp(item->Text(), B_TRANSLATE("Blackness")) != 0)) {
-				selectItem = item;
-			}
+			if (selectedItem != NULL)
+				continue;
+
+			if (strcmp(fSettings.ModuleName(), item->Text()) == 0)
+				selectedItem = item;
 		}
 	}
 
 	fScreenSaversListView->SortItems(_CompareScreenSaverItems);
+	if (selectedItem == NULL)
+		selectedItem = defaultItem;
 
-	fScreenSaversListView->Select(fScreenSaversListView->IndexOf(selectItem));
+	fScreenSaversListView->Select(fScreenSaversListView->IndexOf(selectedItem));
 	fScreenSaversListView->ScrollToSelection();
 }
 
@@ -909,6 +920,7 @@ ScreenSaverWindow::MessageReceived(BMessage *message)
 			break;
 
 		case kMsgUpdateList:
+			fModulesView->EmptyScreenSaverList();
 			fModulesView->PopulateScreenSaverList();
 			break;
 
