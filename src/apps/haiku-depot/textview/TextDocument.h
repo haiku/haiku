@@ -5,6 +5,8 @@
 #ifndef TEXT_DOCUMENT_H
 #define TEXT_DOCUMENT_H
 
+#include <Referenceable.h>
+
 #include "CharacterStyle.h"
 #include "List.h"
 #include "Paragraph.h"
@@ -13,7 +15,7 @@
 typedef List<Paragraph, false>	ParagraphList;
 
 
-class TextDocument {
+class TextDocument : public BReferenceable {
 public:
 								TextDocument();
 								TextDocument(
@@ -56,6 +58,8 @@ public:
 			const Paragraph&	ParagraphAt(int32 textOffset,
 									int32& paragraphOffset) const;
 
+			const Paragraph&	ParagraphAt(int32 index) const;
+
 			bool				Append(const Paragraph& paragraph);
 
 private:
@@ -63,6 +67,9 @@ private:
 			Paragraph			fEmptyLastParagraph;
 			CharacterStyle		fDefaultCharacterStyle;
 };
+
+
+typedef BReference<TextDocument> TextDocumentRef;
 
 
 #endif // TEXT_DOCUMENT_H

@@ -178,6 +178,15 @@ TextDocument::ParagraphAt(int32 textOffset, int32& paragraphOffset) const
 }
 
 
+const Paragraph&
+TextDocument::ParagraphAt(int32 index) const
+{
+	if (index >= 0 && index < fParagraphs.CountItems())
+		return fParagraphs.ItemAtFast(index);
+	return fEmptyLastParagraph;
+}
+
+
 bool
 TextDocument::Append(const Paragraph& paragraph)
 {
