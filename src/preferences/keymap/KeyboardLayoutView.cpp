@@ -173,66 +173,76 @@ KeyboardLayoutView::MouseDown(BPoint point)
 			const key_map& map = fKeymap->Map();
 			BMenuItem* item = NULL;
 
-			item = _SwapModifiersMenuItem(key->code, map.left_shift_key);
+			item = _SwapModifiersMenuItem(B_LEFT_SHIFT_KEY, key->code,
+				map.left_shift_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.left_shift_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(key->code, map.left_control_key);
+			item = _SwapModifiersMenuItem(B_LEFT_CONTROL_KEY, key->code,
+				map.left_control_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.left_control_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(key->code, map.left_option_key);
+			item = _SwapModifiersMenuItem(B_LEFT_OPTION_KEY, key->code,
+				map.left_option_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.left_option_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(key->code, map.left_command_key);
+			item = _SwapModifiersMenuItem(B_LEFT_COMMAND_KEY, key->code,
+				map.left_command_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.left_command_key)
 				item->SetMarked(true);
 
 			modifiersPopUp->AddSeparatorItem();
 
-			item = _SwapModifiersMenuItem(key->code, map.right_shift_key);
+			item = _SwapModifiersMenuItem(B_RIGHT_SHIFT_KEY,
+				key->code, map.right_shift_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.right_shift_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(key->code, map.right_control_key);
+			item = _SwapModifiersMenuItem(B_RIGHT_CONTROL_KEY,
+				key->code, map.right_control_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.right_control_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(key->code, map.menu_key);
+			item = _SwapModifiersMenuItem(B_MENU_KEY, key->code, map.menu_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.menu_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(key->code, map.right_option_key);
+			item = _SwapModifiersMenuItem(B_RIGHT_OPTION_KEY, key->code,
+				map.right_option_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.right_option_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(key->code, map.right_command_key);
+			item = _SwapModifiersMenuItem(B_RIGHT_COMMAND_KEY, key->code,
+				map.right_command_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.right_command_key)
 				item->SetMarked(true);
 
 			modifiersPopUp->AddSeparatorItem();
 
-			item = _SwapModifiersMenuItem(key->code, map.caps_key);
+			item = _SwapModifiersMenuItem(B_CAPS_LOCK, key->code,
+				map.caps_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.caps_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(key->code, map.num_key);
+			item = _SwapModifiersMenuItem(B_NUM_LOCK, key->code, map.num_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.num_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(key->code, map.scroll_key);
+			item = _SwapModifiersMenuItem(B_SCROLL_LOCK, key->code,
+				map.scroll_key);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.scroll_key)
 				item->SetMarked(true);
@@ -1269,17 +1279,21 @@ KeyboardLayoutView::_SendFakeKeyDown(const Key* key)
 
 
 BMenuItem*
-KeyboardLayoutView::_SwapModifiersMenuItem(uint32 oldCode, uint32 newCode)
+KeyboardLayoutView::_SwapModifiersMenuItem(uint32 modifier, uint32 oldCode,
+	uint32 newCode)
 {
 	int32 mask = B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY;
-	uint32 oldModifier = fKeymap->Modifier(oldCode) & ~mask;
-	uint32 newModifier = fKeymap->Modifier(newCode) & ~mask;
+	const char* oldName = _NameForModifier(fKeymap->Modifier(oldCode) & ~mask);
+	const char* newName = _NameForModifier(fKeymap->Modifier(newCode) & ~mask);
 
 	BMessage* message = new BMessage(kMsgUpdateModifierKeys);
-	message->AddUInt32(_NameForModifier(newModifier), oldCode);
-	message->AddUInt32(_NameForModifier(oldModifier), newCode);
+	message->AddUInt32(newName, oldCode);
+	message->AddUInt32(oldName, newCode);
 
-	return new BMenuItem(_NameForModifier(newModifier, true), message);
+	if (oldCode == newCode)
+		message->AddBool("unset", true);
+
+	return new BMenuItem(_NameForModifier(modifier, true), message);
 }
 
 
