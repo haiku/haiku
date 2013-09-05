@@ -99,7 +99,7 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 	TextSpan span = fTextSpans.ItemAtFast(index);
 	if (span.Style() == newSpan.Style()) {
 		span.Insert(offset, newSpan.Text());
-		return fTextSpans.Replace(span, index);
+		return fTextSpans.Replace(index, span);
 	}
 
 	if (offset == 0) {
@@ -108,7 +108,7 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 			TextSpan span = fTextSpans.ItemAtFast(index - 1);
 			if (span.Style() == newSpan.Style()) {
 				span.Insert(span.CharCount(), newSpan.Text());
-				return fTextSpans.Replace(span, index - 1);
+				return fTextSpans.Replace(index - 1, span);
 			}
 		}
 		// Just insert the new span before the one at index
@@ -119,7 +119,7 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 	TextSpan spanBefore = span.SubSpan(0, offset);
 	TextSpan spanAfter = span.SubSpan(offset, span.CharCount() - offset);
 
-	return fTextSpans.Replace(spanBefore, index)
+	return fTextSpans.Replace(index, spanBefore)
 		&& fTextSpans.Add(newSpan, index + 1)
 		&& fTextSpans.Add(spanAfter, index + 2);
 }

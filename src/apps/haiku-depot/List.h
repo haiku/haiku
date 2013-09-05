@@ -172,7 +172,7 @@ public:
 		
 	}
 
-	inline bool Replace(const ItemType& copyFrom, int32 index)
+	inline bool Replace(int32 index, const ItemType& copyFrom)
 	{
 		if (index < 0 || index >= (int32)fCount)
 			return false;
