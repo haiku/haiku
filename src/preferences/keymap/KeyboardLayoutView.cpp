@@ -163,8 +163,10 @@ KeyboardLayoutView::MouseDown(BPoint point)
 		return;
 	}
 
-	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
-		if (fKeymap->IsModifierKey(key->code)) {
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0
+		|| ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0
+			&& (modifiers() & B_CONTROL_KEY) != 0)) {
+		if (_IsMappableToModifierKey(key->code)) {
 			// pop up the modifier keys menu
 			BPopUpMenu* modifiersPopUp = new BPopUpMenu("Modifiers pop up",
 				true, true, B_ITEMS_IN_COLUMN);
@@ -243,8 +245,7 @@ KeyboardLayoutView::MouseDown(BPoint point)
 		&& (fButtons & B_TERTIARY_MOUSE_BUTTON) == 0) {
 		// toggle the "deadness" of dead keys via middle mouse button
 		bool isEnabled = false;
-		uint8 deadKey
-			= fKeymap->DeadKey(key->code, fModifiers, &isEnabled);
+		uint8 deadKey = fKeymap->DeadKey(key->code, fModifiers, &isEnabled);
 		if (deadKey > 0) {
 			fKeymap->SetDeadKeyEnabled(key->code, fModifiers, !isEnabled);
 			_InvalidateKey(key);
@@ -290,10 +291,13 @@ KeyboardLayoutView::MouseUp(BPoint point)
 		return;
 	}
 
-	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
-		// do nothing
-	} else if ((fButtons & B_TERTIARY_MOUSE_BUTTON) != 0
-		&& (buttons & B_TERTIARY_MOUSE_BUTTON) == 0) {
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0
+		|| ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0
+			&& (modifiers() & B_CONTROL_KEY) != 0)) {
+		; // do nothing
+	} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0
+		&& (fButtons & B_TERTIARY_MOUSE_BUTTON) == 0) {
+		// toggle the "deadness" of dead keys via middle mouse button
 		_SetKeyState(key->code, false);
 		_InvalidateKey(key);
 		fButtons = buttons;
@@ -1308,4 +1312,22 @@ KeyboardLayoutView::_NameForModifier(uint32 modifier, bool pretty) const
 		return pretty ? B_TRANSLATE_COMMENT("Menu", "Menu key") : "menu_key";
 
 	return NULL;
+}
+
+
+bool
+KeyboardLayoutView::_IsMappableToModifierKey(uint32 keyCode) const
+{
+	return keyCode == 0x3b	// caps lock
+		|| keyCode == 0x22	// num lock
+		|| keyCode == 0x0f	// scroll lock
+		|| keyCode == 0x4b	// left shift
+		|| keyCode == 0x56	// right shift
+		|| keyCode == 0x5d	// left command
+		|| keyCode == 0x5f	// right command
+		|| keyCode == 0x5c	// left control
+		|| keyCode == 0x60	// right control
+		|| keyCode == 0x66	// left option
+		|| keyCode == 0x67	// right option
+		|| keyCode == 0x68;	// menu
 }

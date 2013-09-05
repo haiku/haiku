@@ -96,6 +96,7 @@ private:
 									uint32 new_code);
 			const char*			_NameForModifier(uint32 modifier,
 									bool pretty = false) const;
+			bool				_IsMappableToModifierKey(uint32 keyCode) const;
 
 			BBitmap*			fOffscreenBitmap;
 			BView*				fOffscreenView;
