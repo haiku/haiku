@@ -66,6 +66,13 @@ CharacterStyle::SetFont(const BFont& font)
 }
 
 
+const BFont&
+CharacterStyle::Font() const
+{
+	return fStyleData->Font();
+}
+
+
 bool
 CharacterStyle::SetAscent(float ascent)
 {
@@ -75,6 +82,13 @@ CharacterStyle::SetAscent(float ascent)
 
 	fStyleData = data;
 	return true;
+}
+
+
+float
+CharacterStyle::Ascent() const
+{
+	return fStyleData->Ascent();
 }
 
 
@@ -90,6 +104,13 @@ CharacterStyle::SetDescent(float descent)
 }
 
 
+float
+CharacterStyle::Descent() const
+{
+	return fStyleData->Descent();
+}
+
+
 bool
 CharacterStyle::SetWidth(float width)
 {
@@ -99,6 +120,32 @@ CharacterStyle::SetWidth(float width)
 
 	fStyleData = data;
 	return true;
+}
+
+
+float
+CharacterStyle::Width() const
+{
+	return fStyleData->Width();
+}
+
+
+bool
+CharacterStyle::SetGlyphSpacing(float spacing)
+{
+	CharacterStyleDataRef data = fStyleData->SetGlyphSpacing(spacing);
+	if (data == fStyleData)
+		return data->GlyphSpacing() == spacing;
+
+	fStyleData = data;
+	return true;
+}
+
+
+float
+CharacterStyle::GlyphSpacing() const
+{
+	return fStyleData->GlyphSpacing();
 }
 
 
@@ -114,6 +161,13 @@ CharacterStyle::SetForegroundColor(rgb_color color)
 }
 
 
+rgb_color
+CharacterStyle::ForegroundColor() const
+{
+	return fStyleData->ForegroundColor();
+}
+
+
 bool
 CharacterStyle::SetBackgroundColor(rgb_color color)
 {
@@ -123,6 +177,13 @@ CharacterStyle::SetBackgroundColor(rgb_color color)
 
 	fStyleData = data;
 	return true;
+}
+
+
+rgb_color
+CharacterStyle::BackgroundColor() const
+{
+	return fStyleData->BackgroundColor();
 }
 
 
@@ -138,6 +199,13 @@ CharacterStyle::SetStrikeOutColor(rgb_color color)
 }
 
 
+rgb_color
+CharacterStyle::StrikeOutColor() const
+{
+	return fStyleData->StrikeOutColor();
+}
+
+
 bool
 CharacterStyle::SetUnderlineColor(rgb_color color)
 {
@@ -147,6 +215,13 @@ CharacterStyle::SetUnderlineColor(rgb_color color)
 
 	fStyleData = data;
 	return true;
+}
+
+
+rgb_color
+CharacterStyle::UnderlineColor() const
+{
+	return fStyleData->UnderlineColor();
 }
 
 
@@ -162,6 +237,13 @@ CharacterStyle::SetStrikeOut(uint8 strikeOut)
 }
 
 
+uint8
+CharacterStyle::StrikeOut() const
+{
+	return fStyleData->StrikeOut();
+}
+
+
 bool
 CharacterStyle::SetUnderline(uint8 underline)
 {
@@ -171,6 +253,13 @@ CharacterStyle::SetUnderline(uint8 underline)
 
 	fStyleData = data;
 	return true;
+}
+
+
+uint8
+CharacterStyle::Underline() const
+{
+	return fStyleData->Underline();
 }
 
 

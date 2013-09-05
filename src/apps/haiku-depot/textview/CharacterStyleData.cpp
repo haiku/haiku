@@ -141,6 +141,21 @@ CharacterStyleData::SetWidth(float width)
 
 
 CharacterStyleDataRef
+CharacterStyleData::SetGlyphSpacing(float glyphSpacing)
+{
+	if (fGlyphSpacing == glyphSpacing)
+		return CharacterStyleDataRef(this);
+
+	CharacterStyleData* ret = new(std::nothrow) CharacterStyleData(*this);
+	if (ret == NULL)
+		return CharacterStyleDataRef(this);
+
+	ret->fGlyphSpacing = glyphSpacing;
+	return CharacterStyleDataRef(ret, true);
+}
+
+
+CharacterStyleDataRef
 CharacterStyleData::SetForegroundColor(rgb_color color)
 {
 	if (fFgColor == color)

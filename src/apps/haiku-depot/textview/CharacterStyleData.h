@@ -57,6 +57,10 @@ public:
 	inline	float				Width() const
 									{ return fWidth; }
 
+			CharacterStyleDataRef SetGlyphSpacing(float glyphSpacing);
+	inline	float				GlyphSpacing() const
+									{ return fGlyphSpacing; }
+
 			CharacterStyleDataRef SetForegroundColor(rgb_color color);
 	inline	rgb_color			ForegroundColor() const
 									{ return fFgColor; }

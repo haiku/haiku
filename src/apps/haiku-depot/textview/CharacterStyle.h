@@ -29,6 +29,9 @@ public:
 			bool				SetWidth(float width);
 			float				Width() const;
 
+			bool				SetGlyphSpacing(float spacing);
+			float				GlyphSpacing() const;
+
 			bool				SetForegroundColor(rgb_color color);
 			rgb_color			ForegroundColor() const;
 
