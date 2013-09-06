@@ -17,6 +17,7 @@ local textDocumentSources =
 	BulletData.cpp
 	CharacterStyle.cpp
 	CharacterStyleData.cpp
+	MarkupParser.cpp
 	Paragraph.cpp
 	ParagraphLayout.cpp
 	ParagraphStyle.cpp
