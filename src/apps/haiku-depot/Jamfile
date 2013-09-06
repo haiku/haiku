@@ -24,9 +24,7 @@ local textDocumentSources =
 	TextDocument.cpp
 	TextDocumentLayout.cpp
 	TextDocumentView.cpp
-	TextLayout.cpp
 	TextSpan.cpp
-	TextStyle.cpp
 	TextView.cpp
 ;
 
@@ -44,7 +42,7 @@ Application HaikuDepot :
 	PackageManager.cpp
 	support.cpp
 
-	# textview stuff
+	# text view stuff
 	$(textDocumentSources)
 	
 	: be translation libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
