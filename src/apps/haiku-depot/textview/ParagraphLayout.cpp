@@ -707,6 +707,10 @@ void
 ParagraphLayout::_DrawSpan(BView* view, BPoint offset,
 	const TextSpan& span, int32 textOffset) const
 {
+	const BString& text = span.Text();
+	if (text.Length() == 0)
+		return;
+
 	const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
 	const LineInfo& line = fLineInfos.ItemAtFast(glyph.lineIndex);
 	
@@ -725,7 +729,10 @@ ParagraphLayout::_DrawSpan(BView* view, BPoint offset,
 	delta.space = line.extraWhiteSpacing;
 
 	// TODO: Fix in app_server: First glyph should not be shifted by delta.
-	offset.x -= delta.nonspace;
+	if (text[0] == ' ')
+		offset.x -= delta.space;
+	else
+		offset.x -= delta.nonspace;
 
 	view->DrawString(span.Text(), offset, &delta);
 }
