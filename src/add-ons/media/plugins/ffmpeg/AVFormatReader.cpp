@@ -238,10 +238,12 @@ StreamBase::StreamBase(BPositionIO* source, BLocker* sourceLock,
 
 StreamBase::~StreamBase()
 {
-	av_free(fIOContext->buffer);
-	av_free(fIOContext);
+	if (fContext != NULL)
+		avformat_close_input(&fContext);
 	av_free_packet(&fPacket);
 	av_free(fContext);
+	av_free(fIOContext->buffer);
+	av_free(fIOContext);
 }
 
 
@@ -263,6 +265,7 @@ StreamBase::Open()
 		_Seek);
 	if (fIOContext == NULL) {
 		TRACE("StreamBase::Open() - avio_alloc_context() failed!\n");
+		av_free(buffer);
 		return B_ERROR;
 	}
 
@@ -273,6 +276,9 @@ StreamBase::Open()
 	if (avformat_open_input(&fContext, "", NULL, NULL) < 0) {
 		TRACE("StreamBase::Open() - avformat_open_input() failed!\n");
 		// avformat_open_input() frees the context in case of failure
+		fContext = NULL;
+		av_free(fIOContext);
+		fIOContext = NULL;
 		return B_NOT_SUPPORTED;
 	}
 
@@ -1772,5 +1778,3 @@ AVFormatReader::GetNextChunk(void* _cookie, const void** chunkBuffer,
 	Stream* cookie = reinterpret_cast<Stream*>(_cookie);
 	return cookie->GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
 }
-
-
