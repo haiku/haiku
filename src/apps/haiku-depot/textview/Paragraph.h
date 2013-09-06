@@ -35,6 +35,7 @@ public:
 			void				Clear();
 
 			int32				Length() const;
+			bool				IsEmpty() const;
 
 private:
 			ParagraphStyle		fStyle;

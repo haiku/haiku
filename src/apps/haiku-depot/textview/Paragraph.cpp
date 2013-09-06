@@ -143,3 +143,9 @@ Paragraph::Length() const
 	return length;
 }
 
+
+bool
+Paragraph::IsEmpty() const
+{
+	return fTextSpans.CountItems() == 0;
+}
