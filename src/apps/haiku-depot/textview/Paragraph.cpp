@@ -125,6 +125,13 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 }
 
 
+void
+Paragraph::Clear()
+{
+	fTextSpans.Clear();
+}
+
+
 int32
 Paragraph::Length() const
 {
