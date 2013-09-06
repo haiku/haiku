@@ -118,7 +118,7 @@ MarkupParser::_ParseText(const BString& text)
 		switch (nextChar) {
 			case '\n':
 			case '\0':
-				_CopySpan(text, start, offset - 1);
+				_CopySpan(text, start, offset);
 				_FinishParagraph();
 				start = offset + 1;
 				break;
