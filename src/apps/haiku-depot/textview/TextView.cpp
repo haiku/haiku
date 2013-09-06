@@ -10,11 +10,16 @@ TextView::TextView(const char* name)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 {
-	fTextLayout.SetWidth(Bounds().Width());
-	fTextLayout.SetLineSpacing(ceilf(fTextLayout.Font().Size() * 0.2));
-
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	BFont font;
+	GetFont(&font);
+
+	ParagraphStyle style;
+	style.SetLineSpacing(ceilf(font.Size() * 0.2));
+	
+	SetParagraphStyle(style);
 }
 
 
@@ -81,7 +86,7 @@ void
 TextView::GetHeightForWidth(float width, float* min, float* max,
 	float* preferred)
 {
-	TextLayout layout(fTextLayout);
+	ParagraphLayout layout(fTextLayout);
 	layout.SetWidth(width);
 
 	float height = layout.Height() + 1;
@@ -98,6 +103,23 @@ TextView::GetHeightForWidth(float width, float* min, float* max,
 void
 TextView::SetText(const BString& text)
 {
-	fTextLayout.SetText(text);
+	fText.Clear();
+
+	CharacterStyle regularStyle;
+	fText.Append(TextSpan(text, regularStyle));
+
+	fTextLayout.SetParagraph(fText);
+	
+	InvalidateLayout();
+}
+
+
+void
+TextView::SetParagraphStyle(const ParagraphStyle& style)
+{
+	fText.SetStyle(style);
+	fTextLayout.SetParagraph(fText);
+
+	InvalidateLayout();
 }
 

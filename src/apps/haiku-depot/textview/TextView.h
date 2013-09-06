@@ -8,7 +8,8 @@
 #include <String.h>
 #include <View.h>
 
-#include "TextLayout.h"
+#include "Paragraph.h"
+#include "ParagraphLayout.h"
 
 
 class TextView : public BView {
@@ -30,9 +31,11 @@ public:
 									float* max, float* preferred);
 
 			void				SetText(const BString& text);
+			void				SetParagraphStyle(const ParagraphStyle& style);
 
 private:
-			TextLayout			fTextLayout;
+			Paragraph			fText;
+			ParagraphLayout		fTextLayout;
 };
 
 #endif // TEXT_VIEW_H
