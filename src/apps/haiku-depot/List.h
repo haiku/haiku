@@ -159,9 +159,10 @@ public:
 		}
 
 		int32 nextIndex = index + 1;
-		if ((int32)fCount > nextIndex)
+		if ((int32)fCount > nextIndex) {
 			memcpy(fItems + index, fItems + nextIndex,
 				(fCount - nextIndex) * sizeof(ItemType));
+		}
 		
 		fCount--;
 	}
