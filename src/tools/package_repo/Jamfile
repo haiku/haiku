@@ -1,6 +1,9 @@
 SubDir HAIKU_TOP src tools package_repo ;
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package_repo ] ;
+SEARCH_SOURCE +=
+	[ FDirName $(HAIKU_TOP) src bin package_repo ]
+	[ FDirName $(HAIKU_TOP) src bin package ]
+	;
 
 UsePrivateHeaders kernel shared ;
 
