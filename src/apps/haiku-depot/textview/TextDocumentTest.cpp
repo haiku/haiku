@@ -44,7 +44,13 @@ TextDocumentTest::ReadyToRun()
 	CharacterStyle regularStyle;
 	
 	CharacterStyle boldStyle(regularStyle);
-	boldStyle.SetFont(BFont(be_bold_font));
+	boldStyle.SetBold(true);
+
+	CharacterStyle italicStyle(regularStyle);
+	italicStyle.SetItalic(true);
+
+	CharacterStyle italicAndBoldStyle(boldStyle);
+	italicAndBoldStyle.SetItalic(true);
 	
 	CharacterStyle bigStyle(regularStyle);
 	bigStyle.SetFontSize(24);
@@ -82,8 +88,13 @@ TextDocumentTest::ReadyToRun()
 	document->Append(paragraph);
 
 	paragraph = Paragraph(paragraphStyle);
-	paragraph.Append(TextSpan("The wrapping in this bullet item should "
-		"look visually pleasing. And why should it not?", regularStyle));
+	paragraph.Append(TextSpan("The wrapping in ", regularStyle));
+	paragraph.Append(TextSpan("this", italicStyle));
+	
+	paragraph.Append(TextSpan(" bullet item should look visually "
+		"pleasing. And ", regularStyle));
+	paragraph.Append(TextSpan("why", italicAndBoldStyle));
+	paragraph.Append(TextSpan(" should it not?", regularStyle));
 	document->Append(paragraph);
 
 	documentView->SetTextDocument(document);

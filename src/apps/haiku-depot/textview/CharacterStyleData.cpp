@@ -277,3 +277,4 @@ CharacterStyleData::operator=(const CharacterStyleData& other)
 {
 	return *this;
 }
+

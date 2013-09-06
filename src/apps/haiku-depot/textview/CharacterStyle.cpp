@@ -83,6 +83,58 @@ CharacterStyle::SetFontSize(float size)
 
 
 bool
+CharacterStyle::SetBold(bool bold)
+{
+	uint16 face = Font().Face();
+	if ((bold && (face & B_BOLD_FACE) != 0)
+		|| (!bold && (face & B_BOLD_FACE) == 0)) {
+		return true;
+	}
+	
+	uint16 neededFace = face;
+	if (bold) {
+		if ((face & B_ITALIC_FACE) != 0)
+			neededFace = B_BOLD_FACE | B_ITALIC_FACE;
+		else
+			neededFace = B_BOLD_FACE;
+	} else {
+		if ((face & B_ITALIC_FACE) != 0)
+			neededFace = B_ITALIC_FACE;
+		else
+			neededFace = B_REGULAR_FACE;
+	}
+
+	return SetFont(_FindFontForFace(neededFace));
+}
+
+
+bool
+CharacterStyle::SetItalic(bool italic)
+{
+	uint16 face = Font().Face();
+	if ((italic && (face & B_ITALIC_FACE) != 0)
+		|| (!italic && (face & B_ITALIC_FACE) == 0)) {
+		return true;
+	}
+	
+	uint16 neededFace = face;
+	if (italic) {
+		if ((face & B_BOLD_FACE) != 0)
+			neededFace = B_BOLD_FACE | B_ITALIC_FACE;
+		else
+			neededFace = B_ITALIC_FACE;
+	} else {
+		if ((face & B_BOLD_FACE) != 0)
+			neededFace = B_BOLD_FACE;
+		else
+			neededFace = B_REGULAR_FACE;
+	}
+
+	return SetFont(_FindFontForFace(neededFace));
+}
+
+
+bool
 CharacterStyle::SetAscent(float ascent)
 {
 	CharacterStyleDataRef data = fStyleData->SetAscent(ascent);
@@ -285,4 +337,30 @@ CharacterStyle::Underline() const
 	return fStyleData->Underline();
 }
 
+
+// #pragma mark - private
+
+
+BFont
+CharacterStyle::_FindFontForFace(uint16 face) const
+{
+	BFont font(Font());
+	
+	font_family family;
+	font_style style;
+	font.GetFamilyAndStyle(&family, &style);
+
+	int32 styleCount = count_font_styles(family);
+	for (int32 i = 0; i < styleCount; i++) {
+		uint16 styleFace;
+		if (get_font_style(family, i, &style, &styleFace) == B_OK) {
+			if (styleFace == face) {
+				font.SetFamilyAndStyle(family, style);
+				return font;
+			}
+		}
+	}
+	
+	return font;
+}
 

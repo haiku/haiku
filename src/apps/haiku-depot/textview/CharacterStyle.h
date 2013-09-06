@@ -21,6 +21,8 @@ public:
 			const BFont&		Font() const;
 
 			bool				SetFontSize(float size);
+			bool				SetBold(bool bold);
+			bool				SetItalic(bool italic);
 
 			bool				SetAscent(float ascent);
 			float				Ascent() const;
@@ -57,6 +59,10 @@ public:
 
 			bool				SetUnderline(uint8 underline);
 			uint8				Underline() const;
+
+
+private:
+			BFont				_FindFontForFace(uint16 face) const;
 
 private:
 			CharacterStyleDataRef fStyleData;
