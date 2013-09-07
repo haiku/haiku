@@ -303,6 +303,8 @@ protected:
 
 			void			_HarvestRecordFeatureUnits(_AudioControl* rootControl,
 								AudioControlsMap& Map);
+			void			_HarvestOutputFeatureUnits(_AudioControl* rootControl,
+								AudioControlsMap& Map);
 			void			_ListMixControlsPage(int32& index,
 								multi_mix_control_info* Info,
 								AudioControlsMap& Map, const char* Name);

@@ -1194,15 +1194,37 @@ AudioControlInterface::_HarvestRecordFeatureUnits(_AudioControl* rootControl,
 	}
 
 	switch(rootControl->SubType()) {
-		case USB_AUDIO_AC_OUTPUT_TERMINAL:
-			_HarvestRecordFeatureUnits(Find(rootControl->SourceID()), Map);
-			break;
-
 		case USB_AUDIO_AC_SELECTOR_UNIT:
 			{
 				SelectorUnit* unit = static_cast<SelectorUnit*>(rootControl);
 				for (int i = 0; i < unit->fInputPins.Count(); i++)
 					_HarvestRecordFeatureUnits(Find(unit->fInputPins[i]), Map);
+				Map.Put(rootControl->ID(), rootControl);
+			}
+			break;
+
+		case USB_AUDIO_AC_FEATURE_UNIT:
+			Map.Put(rootControl->ID(), rootControl);
+			break;
+	}
+}
+
+
+void
+AudioControlInterface::_HarvestOutputFeatureUnits(_AudioControl* rootControl,
+		AudioControlsMap& Map)
+{
+	if (rootControl == 0) {
+		TRACE(ERR, "Not processing due NULL root control.\n");
+		return;
+	}
+
+	switch(rootControl->SubType()) {
+		case USB_AUDIO_AC_MIXER_UNIT:
+			{
+				MixerUnit* unit = static_cast<MixerUnit*>(rootControl);
+				for (int i = 0; i < unit->fInputPins.Count(); i++)
+					_HarvestOutputFeatureUnits(Find(unit->fInputPins[i]), Map);
 				Map.Put(rootControl->ID(), rootControl);
 			}
 			break;
@@ -1797,20 +1819,22 @@ AudioControlInterface::_ListMixControlsPage(int32& index,
 status_t
 AudioControlInterface::ListMixControls(multi_mix_control_info* Info)
 {
-	// first harvest feature units that assigned to output USB I/O terminal(s)
+	// first harvest feature units that assigned to output terminal(s)
 	AudioControlsMap RecordControlsMap;
+	AudioControlsMap OutputControlsMap;
 
 	for (AudioControlsIterator I = fOutputTerminals.Begin();
 			I != fOutputTerminals.End(); I++) {
 		_Terminal* terminal = static_cast<_Terminal*>(I->Value());
 		if (terminal->IsUSBIO())
 			_HarvestRecordFeatureUnits(terminal, RecordControlsMap);
+		else
+			_HarvestOutputFeatureUnits(terminal, OutputControlsMap);
 	}
 
 	// separate input and output Feature units
 	// and collect mixer units that can be controlled
 	AudioControlsMap InputControlsMap;
-	AudioControlsMap OutputControlsMap;
 	AudioControlsMap MixerControlsMap;
 
 	for (AudioControlsIterator I = fAudioControls.Begin();
@@ -1828,8 +1852,9 @@ AudioControlInterface::ListMixControls(multi_mix_control_info* Info)
 		if (control->SubType() != USB_AUDIO_AC_FEATURE_UNIT)
 			continue;
 
-		// ignore controls that are already in the record controls map
-		if (RecordControlsMap.Find(control->ID()) != RecordControlsMap.End())
+		// ignore controls that are already in the output controls maps
+		if (RecordControlsMap.Find(control->ID()) != RecordControlsMap.End()
+			|| OutputControlsMap.Find(control->ID()) != OutputControlsMap.End())
 			continue;
 
 		_AudioControl* sourceControl = Find(control->SourceID());
