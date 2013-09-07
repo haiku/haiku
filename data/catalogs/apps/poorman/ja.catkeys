@@ -29,7 +29,7 @@ Quit	PoorMan		終了
 Hits: 0	PoorMan		ヒット: 0
 Save log console	PoorMan		ログコンソールを保存
 Edit	PoorMan		編集
-Create Log File	PoorMan		ログファイルの作成
+Create Log File	PoorMan		ログファイルを作成
 Log to console	PoorMan		コンソールにログを出力
 Directory: (none)	PoorMan		ディレクトリ: (無し)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Web に公開するフォルダーを選択してください。\n\nPoorMan にデフォルトの \"public_html\" をホームフォルダー中に作成させることもできます。\nまたは、代わりにユーザーのフォルダーを指定することもできます。

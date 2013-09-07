@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	2739021859
+1	polish	x-vnd.Haiku-ActivityMonitor	1211510241
 P-faults	DataSource		P-błędy
 Media nodes	DataSource		Węzły multimedialne
 Threads	DataSource		Wątki
@@ -6,6 +6,7 @@ Always on top	ActivityWindow		Zawsze na wierzchu
 Add graph	ActivityWindow		Dodaj wykres
 Teams	DataSource		Zespoły
 Hide legend	ActivityView		Ukryj legendę
+MiB	DataSource		MiB
 Network send	DataSource		Wysłano
 CPU usage (combined)	DataSource		Użycie CPU (całkowite)
 CPU	DataSource		CPU
@@ -26,12 +27,14 @@ Update time interval:	SettingsWindow		Częstotliwość odświeżania:
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		Wyjdź
 Block cache memory	DataSource		Pamięć bloku cache
+%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Usuń wykres
 %lld sec.	SettingsWindow		%lld sek.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Użycie CPU
 Raw clipboard	DataSource		Surowy schowek
 Sems	DataSource		Semy
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		Monitor Aktywności
 Running applications	DataSource		Uruchomione aplikacje
 Semaphores	DataSource		Semafory

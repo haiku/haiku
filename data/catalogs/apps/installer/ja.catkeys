@@ -37,7 +37,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Haikuインストーラーへ�
 Boot sector successfully written.	InstallProgress		ブートセクターの書き込みに成功しました。
 Performing installation.	InstallProgress		インストールを実行しています。
 scanning…	InstallerWindow		ディスクを検出しています…
-Set up boot menu	InstallerWindow		ブートメニューの設定
+Set up boot menu	InstallerWindow		ブートメニューを設定
 2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (os-prober v1.44 以降)\n
 The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		プライマリーパーティションの数にもかかわらず、最初の論理パーティションは常に\"4\"という数字が付きます。\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUBの命名規則はまだ: (hdN,n) です。\n\n
@@ -77,7 +77,7 @@ Hide optional packages	InstallerWindow		オプショナルパッケージを隠�
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		インストーラーを閉じる前に、DriveSetup を終了してください。
 Restart system	InstallerWindow		システムを再起動
 OK	InstallerWindow		OK
-Set up partitions…	InstallerWindow		パーティションの設定…
+Set up partitions…	InstallerWindow		パーティションを設定…
 The partition can't be mounted. Please choose a different partition.	InstallProgress		このパーティションをマウントできません。他のパーティションを選択してください。
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		ブートマネージャー実行中…\n\nインストールを続けるには、ブートマネージャーを閉じてください。
 Install anyway	InstallProgress		それでもインストールする
@@ -87,7 +87,7 @@ Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		'%1s' 
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		DriveSetup は実行中です。\n\nDriveSetup を終了させてからインストールを続行してください。
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Haikuを試用していただきありがとうございます。Haikuを堪能してください!そして、Haikuのことを気に入って頂ければ幸いです。
 OK	InstallProgress		OK
-Please choose target	InstallerWindow		インストール先の選択
+Please choose target	InstallerWindow		インストール先を選択
 ???	InstallerWindow	Unknown partition name	???
 1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1) Haikuを(エミュレータでなく)実機にインストールする場合は、ハードディスクのパーティションを先に用意しておくことが望ましいです。インストーラーおよびDriveSetupツールには、Haikuファイルシステムによる既存のパーティションの初期化機能があります。しかし、パーティションを作成、変更するオプションは充分な多種多様のコンピューターの構成でテストされていないため、使用を勧めません。\n
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2) インストーラーは、Haikuのパーティションを起動可能にします。しかし、Haikuを既存のブートメニューに結合する機能はありません。すでにGRUBがインストールされている場合、ブートメニューにHaikuを追加できます。追加作業は、使用しているGRUBのバージョンによって異なります。\n\n\n
@@ -116,7 +116,7 @@ Please close the Boot Manager window before closing the Installer window.	Instal
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   はじめて Haiku のブートに成功したら、 \"Welcome\" と \"Userguide\" を必ず読んでください。これらは、デスクトップ上のリンクおよび、WebPositive のブックマーク中にあります。\n\n
 Tools	InstallerWindow		ツール
 The mount point could not be retrieved.	InstallProgress		マウントポイントを取得できませんでした。
-The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先パーティションにはデータがあります。それでもインストールしますか？\n\n注意: システムフォルダーはインストール元からそのままクリーンコピーされますが、その他のフォルダーはマージされ、両方のボリュームに存在するファイルやリンクはインストール元のバージョンで上書きされます。
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		インストール先パーティションにはデータがあります。それでもインストールしますか?\n\n注意: システムフォルダーはインストール元からそのままクリーンコピーされますが、その他のフォルダーはマージされ、両方のボリュームに存在するファイルやリンクはインストール元のバージョンで上書きされます。
 You can see the correct partition in GParted for example.\n\n\n	InstallerApp		正確なパーティションはGPartedなどで見られます。\n\n\n
 \ttitle\t\t\t\tHaiku\n	InstallerApp		\ttitle\t\t\t\tHaiku\n
 \tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n	InstallerApp		\tsudo <好みのテキストエディター> /boot/grub/menu.lst\n\n

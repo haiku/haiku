@@ -79,7 +79,7 @@ SCSI Information	DeviceSCSI		SCSI 情報
 Enclosure	DeviceSCSI		エンクロージャー
 Array	DeviceSCSI		アレイ
 Bridge	Device		ブリッジ
-Refresh devices	DevicesView		デバイスの更新
+Refresh devices	DevicesView		デバイスを更新
 Unknown device	DevicesView		不明なデバイス
 Graphics Peripheral	DeviceSCSI		グラフィック装置
 Tape Drive	DeviceSCSI		テープドライブ

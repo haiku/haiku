@@ -8,7 +8,7 @@ Enforce valid icon sizes	ConfigView		強制的に有効なサイズにする
 ICO Settings	main		ICO 設定
 Windows icon translator	ICOTranslator		Windowsアイコン用トランスレーター
 pixels in either direction.	ConfigView		ピクセル(縦横とも)です。
-Write 32 bit images on true color input	ConfigView		true colorの入力に対して32 bitイメージを書き出す
+Write 32 bit images on true color input	ConfigView		true color の入力に対して 32 bit イメージを書き出す
 Icon	ICOTranslator		アイコン
 ICOTranslator Settings	ConfigView		ICO トランスレーター設定
 Windows icon translator	ConfigView		Windowsアイコン用トランスレーター

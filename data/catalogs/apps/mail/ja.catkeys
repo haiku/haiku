@@ -69,7 +69,7 @@ Trash	Mail		ごみ箱
 Default account:	Mail		標準アカウント:
 Size:	Mail		サイズ:
 Account from mail	Mail		メッセージを受信したアカウント
-Edit signatures…	Mail		署名の編集…
+Edit signatures…	Mail		署名を編集…
 New	Mail		新規
 Attachments: 	Mail		添付ファイル:
 On	Mail		オン
@@ -84,7 +84,7 @@ Attachments:	Mail		添付ファイル:
 Title:	Mail		署名の名称:
 <no account found>	Mail		<アカウントが見つかりません>
 Find…	Mail		検索…
-Accounts…	Mail		アカウントの設定…
+Accounts…	Mail		アカウントを設定…
 Mail preferences	Mail		メールの設定
 Initial spell check mode:	Mail		スペルチェックモード:
 Leave same	Mail		変更しません

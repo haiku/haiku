@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libbe	1921499696
+1	polish	x-vnd.Haiku-libbe	3504008668
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -14,9 +14,11 @@ alpha	AboutWindow		alfa
 Error	PrintJob		Błąd
 No Pages to print!	PrintJob		Brak Stron do wydrukowania!
 All Rights Reserved.	AboutWindow		Wszelkie Prawa Zastrzeżone.
+About %app%	AboutWindow		O %app%
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Zielony:
+Ok	AboutWindow		Ok
 Version history:	AboutWindow		Historia zmian:
 Remove replicant	Dragger		Usuń replikant
 OK	ZombieReplicantView		OK
@@ -36,4 +38,5 @@ About %app…	Dragger		O %app…
 development	AboutWindow		rozwój
 Error	ZombieReplicantView		Błąd
 Blue:	ColorControl		Niebieski:
+gold master	AboutWindow		złote wydanie
 Can't delete this replicant from its original application. Life goes on.	Dragger		Nie można usunąć tego replikanta z jego oryginalnej aplikacji. Życie toczy się dalej.

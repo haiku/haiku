@@ -33,15 +33,15 @@ Stereo	MediaPlayer-InfoWin		ステレオ
 Open…	MediaPlayer-PlaylistWindow		開く…
 Toggle mute.	MediaPlayer-Main		ミュートのオン / オフ
 Undo	MediaPlayer-PlaylistWindow		元に戻す
-Use hardware video overlays if available	MediaPlayer-SettingsWindow		可能なら、ハードウェアビデオオーバーレイを使う
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		利用できるなら、ハードウェアビデオオーバーレイを使う
 File info…	MediaPlayer-Main		ファイル情報…
 Pause playback.	MediaPlayer-Main		再生を一時停止する。
 Overlay	MediaPlayer-InfoWin		オーバーレイ
-Remove Entry	MediaPlayer-RemovePLItemsCmd		項目の削除
+Remove Entry	MediaPlayer-RemovePLItemsCmd		項目を削除
 Close window after playing audio	MediaPlayer-SettingsWindow		オーディオ再生終了後、ウィンドウを閉じる
 Full volume	MediaPlayer-SettingsWindow		最大音量
 Drop files to play	MediaPlayer-Main		ファイルをドロップして再生してください。
-TogglePlaying	MediaPlayer-Main		再生のオン / オフ
+TogglePlaying	MediaPlayer-Main		再生をオン / オフ
 Copyright	MediaPlayer-InfoWin		著作権
 Cancel	MediaPlayer-SettingsWindow		取り消し
 Loop audio	MediaPlayer-SettingsWindow		オーディオを繰り返し再生
@@ -52,12 +52,12 @@ Quit	MediaPlayer-Main		終了
 Video	MediaPlayer-Main		ビデオ
 Start playing.	MediaPlayer-Main		再生開始
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		ファイルフォーマットを扱うデコーダーがインストールされていません。または、デコーダーと特定のバージョンのフォーマットに問題があります。
-Import Entry	MediaPlayer-ImportPLItemsCmd		項目のインポート
-Gets the URI of the currently playing item.	MediaPlayer-Main		現在再生中項目の URI を取得します。
+Import Entry	MediaPlayer-ImportPLItemsCmd		項目をインポート
+Gets the URI of the currently playing item.	MediaPlayer-Main		再生中項目の URI を取得します。
 %d Channels	MediaPlayer-InfoWin		%d チャンネル
 400% scale	MediaPlayer-Main		400% 表示
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました:\n\nエラー:
-Move Entries	MediaPlayer-MovePLItemsCmd		項目の移動
+Move Entries	MediaPlayer-MovePLItemsCmd		項目を移動
 Audio	MediaPlayer-Main		オーディオ
 Open Playlist	MediaPlayer-PlaylistWindow		プレイリストを開く
 MediaPlayer	System name		メディアプレーヤー
@@ -66,7 +66,7 @@ Settings…	MediaPlayer-Main		設定…
 MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 設定
 h	MediaPlayer-InfoWin	Hours	時間
 Select all	MediaPlayer-PlaylistWindow		すべて選択
-Move Entry	MediaPlayer-MovePLItemsCmd		項目の移動
+Move Entry	MediaPlayer-MovePLItemsCmd		項目を移動
 Open	MediaPlayer-PlaylistWindow		開く
 Stop playing.	MediaPlayer-Main		再生を停止
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		ファイル'%filename'を開けませんでした。\n\n
@@ -118,7 +118,7 @@ raw video	MediaPlayer-InfoWin		raw ビデオ
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリ不足)。プレイリストの保存に失敗しました。
 Hide interface	MediaPlayer-Main		インターフェイスを隠す
-Copy Entry	MediaPlayer-CopyPLItemsCmd		項目のコピー
+Copy Entry	MediaPlayer-CopyPLItemsCmd		項目をコピー
 none	Subtitles menu		無し
 Move file to Trash	MediaPlayer-PlaylistWindow		ファイルをごみ箱に移動
 URI	MediaPlayer-Main		URI

@@ -3,7 +3,7 @@ P-faults	DataSource		ページフォルト
 Media nodes	DataSource		メディアノード数
 Threads	DataSource		スレッド数
 Always on top	ActivityWindow		常に前面に
-Add graph	ActivityWindow		グラフの追加
+Add graph	ActivityWindow		グラフを追加
 Teams	DataSource		チーム数
 Hide legend	ActivityView		説明を隠す
 MiB	DataSource		MiB
@@ -28,7 +28,7 @@ TX	DataSource	Shorter version for Sending	送信
 Quit	ActivityWindow		終了
 Block cache memory	DataSource		ブロックキャッシュメモリ
 %.1f KiB/s	DataSource		%.1f KiB/s
-Remove graph	ActivityView		グラフの削除
+Remove graph	ActivityView		グラフを削除
 %lld sec.	SettingsWindow		%lld 秒
 %lld ms	SettingsWindow		%lld マイクロ秒
 CPU usage	DataSource		CPU 使用率

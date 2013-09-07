@@ -34,12 +34,12 @@ Pulse	NormalPulseView		Pulse
 %ld MHz	NormalPulseView		%ld MHz
 Deskbar mode	NormalPulseView		Deskbar モード
 Pulse	PulseApp		Pulse
-Width of icon:	ConfigView		アイコンの幅
+Width of icon:	ConfigView		アイコンの幅:
 You can't disable the last active CPU.	CPUButton		最後の CPU は無効にできません。
 Normal mode	DeskbarPulseView		ウィンドウモード
 OK	CPUButton		Ok
 About Pulse…	CPUButton		Pulse について…
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Deskbar からの削除に失敗しました.\n%s
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Deskbar からの削除に失敗しました。\n%s
 Mini mode	NormalPulseView		ミニモード
 Info	DeskbarPulseView		情報
 Pulse settings	PulseWindow		Pulse の設定

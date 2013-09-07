@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ScreenSaver	215605989
+1	ukrainian	x-vnd.Haiku-ScreenSaver	3630119516
 Could not load screen saver	ScreenSaver		Не вдалося загрузити зберігач
 30 seconds	ScreenSaver		30 секунд
 Start screensaver	ScreenSaver		Запустити зберігач
@@ -7,7 +7,6 @@ Password:	ScreenSaver		Пароль:
 Password lock	ScreenSaver		Використати пароль
 Add…	ScreenSaver		Додати…
 Screensavers	ScreenSaver		Зберігачі екрану
-mouse is here	ScreenSaver		мишка тут
 Display Power Management Signaling not available	ScreenSaver		Display Power Management Signaling not available
 ScreenSaver	System name		Зберігач екрану
 Test	ScreenSaver		Тест
@@ -17,11 +16,9 @@ Cancel	ScreenSaver		Відмінити
 Turn off screen	ScreenSaver		Вимкнути екран
 No options available	ScreenSaver		Опції недоступні
 Password Window	ScreenSaver		Вікно паролю
-Fade now when	ScreenSaver		Зникнути зараз коли
 Screensaver settings	ScreenSaver		Настройки зберігача
 Passwords don't match. Please try again.	ScreenSaver		Пароль не збігаєтся. Будь ласка, спробуйте ще раз.
 OK	ScreenSaver		Гаразд
-Don't fade when	ScreenSaver		Не зникати коли
 Blackness	ScreenSaver		Чорнота
 Use custom password	ScreenSaver		Використовувати пароль користувача
 Done	ScreenSaver		Готово

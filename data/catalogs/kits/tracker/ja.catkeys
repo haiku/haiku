@@ -127,19 +127,19 @@ Save as Query template:	FindPanel		クエリ雛型として保存する:
 preferences	B_PREFERENCES_DIRECTORY		設定
 Cancel	FSUtils		中止
 move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	移動
-Edit name	ContainerWindow		名前の編集
+Edit name	ContainerWindow		名前を編集
 Show volumes on Desktop	SettingsView		ディスクをデスクトップに表示する
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		%nameアドオンの読み込み中に%errorエラーが発生
 Defaults	TrackerSettingsWindow		デフォルト
 %num items	CountView		%num 個
 Mini icon view	ContainerWindow		ミニアイコン表示
-Clean up	VolumeWindow		アイコンの整列
+Clean up	VolumeWindow		アイコンを整列
 OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		ファイルが誤って実行可能に設定されているため、\"%name\" を開けませんでした。
 Add-ons	ContainerWindow		アドオン
 Edit templates…	TemplatesMenu		テンプレートを編集…
-Finish: %time - Over %finishtime left	StatusWindow		終了: %time - 残り %finishtime 以上
+Finish: %time - Over %finishtime left	StatusWindow		終了: %time - 残り %finishtime 超
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		このフォルダーにすでに \"%name\" という項目があります。作成しようとしているシンボリックリンクと置き換えますか?
 Fewer options	FindPanel		検索オプションを隠す
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		コピー先ディスクの空き容量が不足しています。コピーができません。
@@ -193,7 +193,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		正規表現にエラー�
 Mount all	MountMenu		すべてマウント
 calculating…	InfoWindow		計算中…
 Unmount	VolumeWindow		マウント解除
-Edit name	VolumeWindow		名前の編集
+Edit name	VolumeWindow		名前を編集
 Mount all disks now	AutoMounterSettings		すべてのディスクをただちにマウント
 Untitled bitmap	PoseView		無名ビットマップ
 of %items	StatusWindow		/ %items
@@ -209,9 +209,9 @@ You cannot create a link to the root directory.	FSUtils		ルートフォルダ�
 48 x 48	ContainerWindow		48 x 48
 Resize to fit	VolumeWindow		最適な表示サイズに変更
 Could not find application \"%appname\"	OpenWithWindow		アプリケーション \"%appname\" が見つかりませんでした
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に移動できません。完全に削除しても良いでしょうか？元は戻せませんので、ご注意ください。
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に移動できません。完全に削除しても良いでしょうか? 元には戻せませんので、ご注意ください。
 Invert	SelectionWindow		反転
-rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	名前の変更
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	名前を変更
 Find	FindPanel		検索
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	移動
 Get info	ContainerWindow		詳細情報…
@@ -245,14 +245,14 @@ Create relative link here	ContainerWindow		ここに相対リンクを作成
 trash	B_TRASH_DIRECTORY		ごみ箱
 matches regular expression	SelectionWindow		正規表現と一致
 Mount settings…	SettingsView		マウント設定…
-Edit name	InfoWindow		名前の編集
+Edit name	InfoWindow		名前を編集
 Could not open \"%name\" (%error). 	FSUtils		\"%name\"を開けませんでした (%error)。
 Paste	ContainerWindow		貼り付け
 Modified:	InfoWindow		更新日時:
 Error moving \"%name\".	FSUtils		\"%name\"を移動中にエラーが発生しました。
 TiB	WidgetAttributeText		TiB
 40 x 40	ContainerWindow		40 x 40
-The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定のフォルダーに\"%name\"というファイルがすでに存在します。置き換えますか？
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定のフォルダーに\"%name\"というファイルがすでに存在します。置き換えますか?
 Cancel	ContainerWindow		中止
 Only the boot disk	AutoMounterSettings		起動ディスクのみ
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		config フォルダーを%ifYouDoAction した場合、%osName が正常に動作しなくなる可能性があります!\n\n続けてもよろしいですか?
@@ -273,14 +273,14 @@ The target disk does not support creating links.	FSUtils		指定されたディ�
 starts with	SelectionWindow		指定文字列で始まる
 Preparing to delete items…	StatusWindow		削除の準備をしています…
 Enable type-ahead filtering	SettingsView		先行入力フィルターを有効にする
-Would you like to find a suitable application to open the file?	FSUtils		このファイルを開くことのできるアプリケーションを検索しますか？
+Would you like to find a suitable application to open the file?	FSUtils		このファイルを開くことのできるアプリケーションを検索しますか?
 There was an error writing the attribute.	WidgetAttributeText		属性の書き込み中にエラーが発生しました。
 Recalculate folder size	InfoWindow		フォルダーサイズを再計算
 Unknown	WidgetAttributeText		不明
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を開けませんでした (シンボル %symbol がありません)。\n
 by name	FindPanel		名前で検索
 Creating links: 	StatusWindow		作成中リンク:
-Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	名前の変更
+Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	名前を変更
 Paused: click to resume or stop	StatusWindow		一時停止中: クリックで動作の再開また中断をしてください 
 Preferred for %type	OpenWithWindow		%type対応優先アプリ
 GiB	WidgetAttributeText		GiB
@@ -298,7 +298,7 @@ Error moving \"%name\"	FSUtils		\"%name\"の移動中にエラーが発生
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
 Cancel	WidgetAttributeText		中止
 Could not find an application to open \"%name\" (%error). 	FSUtils		%errorエラーが発生したため、\"%name\" を開くアプリケーションが見つかりませんでした。
-Create a Query template	FindPanel		クエリ雛型の作成
+Create a Query template	FindPanel		クエリ雛型を作成
 Previously mounted disks	AutoMounterSettings		以前にマウントされていたディスク
 %Ld B	WidgetAttributeText		%Ld バイト
 copying	FSUtils		コピー中
@@ -320,7 +320,7 @@ Permissions	ContainerWindow		アクセス権
 moving	FSUtils		移動中
 Identify	InfoWindow		ファイル形式を判別
 Recent folders	ContainerWindow		最近開いたフォルダー
-rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	名前の変更
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	名前を変更
 Close all	ContainerWindow		すべて閉じる
 Include trash	FindPanel		ごみ箱を含む
 Query template	FindPanel		クエリテンプレート
@@ -380,7 +380,7 @@ You can't replace a folder with one of its sub-folders.	FSUtils		サブフォル
 Preferences…	ContainerWindow		設定…
 Move	PoseView		移動
 Open and make preferred	OpenWithWindow		関連付けて開く
-Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除してもよろしいですか？削除した項目は復元できませんので、ご注意ください。
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除してもよろしいですか? 削除した項目は復元できませんので、ご注意ください。
 If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		ホームフォルダーを%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります。\n\n続けてもよろしいですか?\n\nそれでもホームフォルダーの%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
 Add-ons	DeskWindow		アドオン
 Name	FindPanel		名前
