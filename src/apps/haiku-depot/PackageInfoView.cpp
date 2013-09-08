@@ -12,6 +12,7 @@
 #include <Button.h>
 #include <CardLayout.h>
 #include <Catalog.h>
+#include <Cursor.h>
 #include <Font.h>
 #include <GridView.h>
 #include <LayoutBuilder.h>
@@ -136,6 +137,44 @@ public:
 
 private:
 	MarkupParser	fMarkupParser;
+};
+
+
+class LinkView : public BStringView, public BInvoker {
+public:
+	LinkView(const char* name, const char* string, BMessage* message,
+		rgb_color color)
+		:
+		BStringView(name, string),
+		BInvoker(message, NULL),
+		fNormalColor(color),
+		fHoverColor((rgb_color){ 1, 141, 211, 255 })
+	{
+	}
+	
+	virtual void MouseMoved(BPoint where, uint32 transit,
+		const BMessage* dragMessage)
+	{
+		if (transit == B_ENTERED_VIEW) {
+			SetHighColor(fHoverColor);
+			BCursor cursor(B_CURSOR_ID_FOLLOW_LINK);
+			SetViewCursor(&cursor, true);
+			Invalidate();
+		} else if (transit == B_EXITED_VIEW) {
+			SetHighColor(fNormalColor);
+			SetViewCursor(NULL);
+			Invalidate();
+		}
+	}
+
+	virtual void MouseDown(BPoint where)
+	{
+		Invoke(Message());
+	}
+
+private:
+	rgb_color	fNormalColor;
+	rgb_color	fHoverColor;
 };
 
 
@@ -532,6 +571,12 @@ private:
 // #pragma mark - AboutView
 
 
+enum {
+	MSG_EMAIL_PUBLISHER				= 'emlp',
+	MSG_VISIT_PUBLISHER_WEBSITE		= 'vpws',
+};
+
+
 class AboutView : public BView {
 public:
 	AboutView()
@@ -568,14 +613,14 @@ public:
 			BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
 		
 		fEmailIconView = new BitmapView("email icon view");
-		fEmailLinkView = new BStringView("email link view", "");
+		fEmailLinkView = new LinkView("email link view", "",
+			new BMessage(MSG_EMAIL_PUBLISHER), kLightBlack);
 		fEmailLinkView->SetFont(&smallFont);
-		fEmailLinkView->SetHighColor(kLightBlack);
 
 		fWebsiteIconView = new BitmapView("website icon view");
-		fWebsiteLinkView = new BStringView("website link view", "");
+		fWebsiteLinkView = new LinkView("website link view", "",
+			new BMessage(MSG_VISIT_PUBLISHER_WEBSITE), kLightBlack);
 		fWebsiteLinkView->SetFont(&smallFont);
-		fWebsiteLinkView->SetHighColor(kLightBlack);
 		
 		BGroupView* leftGroup = new BGroupView(B_VERTICAL,
 			B_USE_DEFAULT_SPACING);
