@@ -99,6 +99,46 @@ public:
 };
 
 
+class MarkupTextView : public TextDocumentView {
+public:
+	MarkupTextView(const char* name)
+		:
+		TextDocumentView(name)
+	{
+		CharacterStyle regularStyle;
+		
+		float fontSize = regularStyle.Font().Size();
+		
+		ParagraphStyle paragraphStyle;
+		paragraphStyle.SetJustify(true);
+		paragraphStyle.SetSpacingTop(ceilf(fontSize * 0.3f));
+		paragraphStyle.SetLineSpacing(ceilf(fontSize * 0.2f));
+		
+		fMarkupParser.SetStyles(regularStyle, paragraphStyle);
+	}
+
+	void SetText(const BString& markupText) {
+		SetTextDocument(fMarkupParser.CreateDocumentFromMarkup(markupText));
+	}
+
+	void SetText(const BString heading, const BString& markupText) {
+		TextDocumentRef document(new(std::nothrow) TextDocument(), true);
+
+		Paragraph paragraph(fMarkupParser.HeadingParagraphStyle());
+		paragraph.Append(TextSpan(heading,
+			fMarkupParser.HeadingCharacterStyle()));
+		document->Append(paragraph);
+
+		fMarkupParser.AppendMarkup(document, markupText);
+		
+		SetTextDocument(document);
+	}
+
+private:
+	MarkupParser	fMarkupParser;
+};
+
+
 // #pragma mark - AboutView
 
 
@@ -503,11 +543,9 @@ public:
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint));
 		
-		fDescriptionView = new BTextView("description view");
-		fDescriptionView->SetViewColor(ViewColor());
-		fDescriptionView->MakeEditable(false);
-		const float textInset = be_plain_font->Size();
-		fDescriptionView->SetInsets(textInset, textInset, textInset, 0.0f);
+		fDescriptionView = new MarkupTextView("description view");
+		fDescriptionView->SetLowColor(ViewColor());
+		fDescriptionView->SetInsets(be_plain_font->Size());
 		
 		BScrollView* scrollView = new CustomScrollView(
 			"description scroll view", fDescriptionView);
@@ -572,10 +610,8 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		fDescriptionView->SetText(package.ShortDescription());
-		fDescriptionView->Insert(fDescriptionView->TextLength(), "\n\n", 2);
-		fDescriptionView->Insert(fDescriptionView->TextLength(),
-			package.FullDescription(), package.FullDescription().Length());
+		fDescriptionView->SetText(package.ShortDescription(),
+			package.FullDescription());
 
 		fEmailIconView->SetBitmap(fEmailIcon.Bitmap(SharedBitmap::SIZE_16));
 		fEmailLinkView->SetText(package.Publisher().Email());
@@ -604,17 +640,17 @@ public:
 	}
 
 private:
-	BTextView*		fDescriptionView;
+	MarkupTextView*		fDescriptionView;
 
-	BitmapView*		fScreenshotView;
+	BitmapView*			fScreenshotView;
 
-	SharedBitmap	fEmailIcon;
-	BitmapView*		fEmailIconView;
-	BStringView*	fEmailLinkView;
+	SharedBitmap		fEmailIcon;
+	BitmapView*			fEmailIconView;
+	BStringView*		fEmailLinkView;
 
-	SharedBitmap	fWebsiteIcon;
-	BitmapView*		fWebsiteIconView;
-	BStringView*	fWebsiteLinkView;
+	SharedBitmap		fWebsiteIcon;
+	BitmapView*			fWebsiteIconView;
+	BStringView*		fWebsiteLinkView;
 };
 
 
@@ -691,9 +727,11 @@ public:
 
 		fTextView = new TextView("rating text");
 		fTextView->SetViewColor(ViewColor());
+		ParagraphStyle paragraphStyle(fTextView->ParagraphStyle());
+		paragraphStyle.SetJustify(true);
+		fTextView->SetParagraphStyle(paragraphStyle);
+
 		fTextView->SetText(rating.Comment());
-//		const float textInset = be_plain_font->Size();
-//		fTextView->SetInsets(0.0f, floorf(textInset / 2), textInset, 0.0f);
 
 		BLayoutBuilder::Group<>(this)
 			.Add(fAvatarView, 0.2f)
@@ -945,18 +983,7 @@ public:
 		
 		SetLayout(fLayout);
 
-		CharacterStyle regularStyle;
-		
-		float fontSize = regularStyle.Font().Size();
-		
-		ParagraphStyle paragraphStyle;
-		paragraphStyle.SetJustify(true);
-		paragraphStyle.SetSpacingTop(ceilf(fontSize * 0.3f));
-		paragraphStyle.SetLineSpacing(ceilf(fontSize * 0.2f));
-		
-		fMarkupParser.SetStyles(regularStyle, paragraphStyle);
-		
-		fTextView = new TextDocumentView("changelog view");
+		fTextView = new MarkupTextView("changelog view");
 		fTextView->SetLowColor(ViewColor());
 		fTextView->SetInsets(be_plain_font->Size());
 		
@@ -980,19 +1007,17 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		fTextView->SetTextDocument(fMarkupParser.CreateDocumentFromMarkup(
-			package.Changelog()));
+		fTextView->SetText(package.Changelog());
 	}
 
 	void Clear()
 	{
-		fTextView->SetTextDocument(fMarkupParser.CreateDocumentFromMarkup(""));
+		fTextView->SetText("");
 	}
 
 private:
 	BGroupLayout*		fLayout;
-	TextDocumentView*	fTextView;
-	MarkupParser		fMarkupParser;
+	MarkupTextView*		fTextView;
 };
 
 
