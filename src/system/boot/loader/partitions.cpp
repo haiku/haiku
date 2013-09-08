@@ -16,6 +16,7 @@
 #include <boot/stdio.h>
 #include <boot/vfs.h>
 #include <ddm_modules.h>
+#include <HashMap.h>
 
 #include "RootFileSystem.h"
 
@@ -99,6 +100,10 @@ private:
 };
 
 
+static int32 sIdCounter = 0;
+static HashMap<HashKey32<int32>, Partition*> sIdPartitionMap;
+
+
 //	#pragma mark -
 
 
@@ -111,7 +116,9 @@ Partition::Partition(int fd)
 	TRACE(("%p Partition::Partition\n", this));
 
 	memset((partition_data *)this, 0, sizeof(partition_data));
-	id = (partition_id)this;
+
+	id = atomic_add(&sIdCounter, 1);
+	sIdPartitionMap.Put(id, this);
 
 	// it's safe to close the file
 	fFD = dup(fd);
@@ -132,6 +139,7 @@ Partition::~Partition()
 			child->SetParent(NULL);
 	}
 
+	sIdPartitionMap.Remove(id);
 	close(fFD);
 }
 
@@ -469,8 +477,13 @@ partition_data *
 create_child_partition(partition_id id, int32 index, off_t offset, off_t size,
 	partition_id childID)
 {
-	Partition &partition = *(Partition *)id;
-	Partition *child = partition.AddChild();
+	Partition *partition = sIdPartitionMap.Get(id);
+	if (partition == NULL) {
+		dprintf("creating partition failed: could not find partition.\n");
+		return NULL;
+	}
+
+	Partition *child = partition->AddChild();
 	if (child == NULL) {
 		dprintf("creating partition failed: no memory\n");
 		return NULL;
@@ -490,8 +503,6 @@ create_child_partition(partition_id id, int32 index, off_t offset, off_t size,
 partition_data *
 get_child_partition(partition_id id, int32 index)
 {
-	//Partition &partition = *(Partition *)id;
-
 	// TODO: do we really have to implement this?
 	//	The intel partition module doesn't really need this for our mission...
 	TRACE(("get_child_partition(id = %lu, index = %ld)\n", id, index));
@@ -503,8 +514,11 @@ get_child_partition(partition_id id, int32 index)
 partition_data *
 get_parent_partition(partition_id id)
 {
-	Partition &partition = *(Partition *)id;
-
-	return partition.Parent();
+	Partition *partition = sIdPartitionMap.Get(id);
+	if (partition == NULL) {
+		dprintf("could not find parent partition.\n");
+		return NULL;
+	}
+	return partition->Parent();
 }
 
