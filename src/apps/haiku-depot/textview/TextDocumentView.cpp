@@ -36,7 +36,7 @@ TextDocumentView::Draw(BRect updateRect)
 	FillRect(updateRect, B_SOLID_LOW);
 
 	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
-	fTextDocumentLayout.Draw(this, BPoint(fInsetLeft, fInsetTop));
+	fTextDocumentLayout.Draw(this, BPoint(fInsetLeft, fInsetTop), updateRect);
 }
 
 
@@ -107,6 +107,7 @@ TextDocumentView::SetTextDocument(const TextDocumentRef& document)
 	fTextDocument = document;
 	fTextDocumentLayout.SetTextDocument(fTextDocument);
 	InvalidateLayout();
+	_UpdateScrollBars();
 }
 
 

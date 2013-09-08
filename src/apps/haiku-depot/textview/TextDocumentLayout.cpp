@@ -88,14 +88,19 @@ TextDocumentLayout::Height()
 
 
 void
-TextDocumentLayout::Draw(BView* view, const BPoint& offset)
+TextDocumentLayout::Draw(BView* view, const BPoint& offset,
+	const BRect& updateRect)
 {
 	_ValidateLayout();
 	
 	int layoutCount = fParagraphLayouts.CountItems();
 	for (int i = 0; i < layoutCount; i++) {
 		const ParagraphLayoutInfo& layout = fParagraphLayouts.ItemAtFast(i);
-		layout.layout->Draw(view, BPoint(offset.x, offset.y + layout.y));
+		BPoint location(offset.x, offset.y + layout.y);
+		if (location.y > updateRect.bottom)
+			break;
+		if (location.y + layout.layout->Height() > updateRect.top)
+			layout.layout->Draw(view, location);
 	}
 }
 

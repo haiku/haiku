@@ -83,7 +83,8 @@ public:
 									{ return fWidth; }
 
 			float				Height();
-			void				Draw(BView* view, const BPoint& offset);
+			void				Draw(BView* view, const BPoint& offset,
+									const BRect& updateRect);
 
 private:
 			void				_Init();
