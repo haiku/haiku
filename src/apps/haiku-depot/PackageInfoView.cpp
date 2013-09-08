@@ -24,7 +24,9 @@
 
 #include "BitmapButton.h"
 #include "BitmapView.h"
+#include "MarkupParser.h"
 #include "PackageManager.h"
+#include "TextDocumentView.h"
 #include "TextView.h"
 
 
@@ -942,12 +944,21 @@ public:
 			kContentTint));
 		
 		SetLayout(fLayout);
+
+		CharacterStyle regularStyle;
 		
-		fTextView = new BTextView("changelog view");
-		fTextView->SetViewColor(ViewColor());
-		fTextView->MakeEditable(false);
-		const float textInset = be_plain_font->Size();
-		fTextView->SetInsets(textInset, textInset, textInset, 0.0f);
+		float fontSize = regularStyle.Font().Size();
+		
+		ParagraphStyle paragraphStyle;
+		paragraphStyle.SetJustify(true);
+		paragraphStyle.SetSpacingTop(ceilf(fontSize * 0.3f));
+		paragraphStyle.SetLineSpacing(ceilf(fontSize * 0.2f));
+		
+		fMarkupParser.SetStyles(regularStyle, paragraphStyle);
+		
+		fTextView = new TextDocumentView("changelog view");
+		fTextView->SetLowColor(ViewColor());
+		fTextView->SetInsets(be_plain_font->Size());
 		
 		BScrollView* scrollView = new CustomScrollView(
 			"changelog scroll view", fTextView);
@@ -961,7 +972,6 @@ public:
 	
 	virtual ~ChangelogView()
 	{
-		Clear();
 	}
 
 	virtual void Draw(BRect updateRect)
@@ -970,17 +980,19 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		fTextView->SetText(package.Changelog());
+		fTextView->SetTextDocument(fMarkupParser.CreateDocumentFromMarkup(
+			package.Changelog()));
 	}
 
 	void Clear()
 	{
-		fTextView->SetText("");
+		fTextView->SetTextDocument(fMarkupParser.CreateDocumentFromMarkup(""));
 	}
 
 private:
-	BGroupLayout*	fLayout;
-	BTextView*		fTextView;
+	BGroupLayout*		fLayout;
+	TextDocumentView*	fTextView;
+	MarkupParser		fMarkupParser;
 };
 
 
