@@ -16,7 +16,7 @@ TextView::TextView(const char* name)
 	BFont font;
 	GetFont(&font);
 
-	ParagraphStyle style;
+	::ParagraphStyle style;
 	style.SetLineSpacing(ceilf(font.Size() * 0.2));
 	
 	SetParagraphStyle(style);
@@ -115,7 +115,7 @@ TextView::SetText(const BString& text)
 
 
 void
-TextView::SetParagraphStyle(const ParagraphStyle& style)
+TextView::SetParagraphStyle(const ::ParagraphStyle& style)
 {
 	fText.SetStyle(style);
 	fTextLayout.SetParagraph(fText);

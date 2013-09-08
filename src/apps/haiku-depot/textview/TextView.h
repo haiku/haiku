@@ -31,7 +31,9 @@ public:
 									float* max, float* preferred);
 
 			void				SetText(const BString& text);
-			void				SetParagraphStyle(const ParagraphStyle& style);
+			void				SetParagraphStyle(const ::ParagraphStyle& style);
+			const ::ParagraphStyle& ParagraphStyle() const
+									{ return fText.Style(); }
 
 private:
 			Paragraph			fText;
