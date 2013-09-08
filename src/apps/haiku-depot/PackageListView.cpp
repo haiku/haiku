@@ -540,6 +540,9 @@ PackageListView::SelectionChanged()
 	BMessage message(MSG_PACKAGE_SELECTED);
 	
 	BRow* selected = CurrentSelection();
+	
+	// TODO: Wrong index, its the visible one (i.e. sorted)!
+	// Solve by putting an ID for the package in the message instead.
 	int32 index = -1;
 	if (selected != NULL)
 		index = IndexOf(selected);
