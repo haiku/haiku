@@ -265,7 +265,10 @@ MainWindow::_InitDummyModel()
 		"and play back music from your computer. Sequitur is designed for "
 		"people who like to tinker with their music. It facilitates rapid, "
 		"dynamic, and radical processing of your performance.",
-		"2.1.0 - 04 August 2002.\n\n"
+		
+		"== Sequitur 2.1 Release Notes ==\n"
+		"04 August 2002\n\n"
+		"Features\n\n"
 		" * Important fix to file IO that prevents data corruption.\n\n"
 		" * Dissolve filter could cause crash when operating on notes "
 		"with extremely short durations. (thanks to David Shipman)\n\n"
@@ -278,8 +281,8 @@ MainWindow::_InitDummyModel()
 		"All curve tools make use of a new tool seed for drawing "
 		"bezier curves; see section 6.3.2. of the user's guide for an "
 		"explanation of the Curve seed.\n\n"
-		" * New menu items in the Song window: Edit->Expand Marked Range "
-		"and Edit->Contract Marked Range. These items are only active if "
+		" * New menu items in the Song window: '''Edit->Expand Marked Range''' "
+		"and '''Edit->Contract Marked Range'''. These items are only active if "
 		"the loop markers are on. The Expand command shifts everything "
 		"from the left marker to the end of the song over by the total "
 		"loop range. The Contract command deletes the area within the "
@@ -310,7 +313,7 @@ MainWindow::_InitDummyModel()
 		"into control change, pitch bend, tempo change and channel "
 		"pressure events. The new tool Broken Down Line uses this "
 		"filter.\n\n"
-		" * Note to filter developers: The filter API has changed. You "
+		" * ''Note to filter developers:'' The filter API has changed. You "
 		"will need to recompile your filters.");
 	sequitur.AddUserRating(
 		UserRating(UserInfo("pete"), 4.5f,
