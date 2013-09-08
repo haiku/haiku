@@ -32,7 +32,7 @@ MarkupParser::MarkupParser()
 
 
 MarkupParser::MarkupParser(const CharacterStyle& characterStyle,
-		const ParagraphStyle& paragraphStyle)
+	const ParagraphStyle& paragraphStyle)
 	:
 	fNormalStyle(characterStyle),
 	fBoldStyle(),
@@ -47,6 +47,16 @@ MarkupParser::MarkupParser(const CharacterStyle& characterStyle,
 	fCurrentCharacterStyle(&fNormalStyle),
 	fCurrentParagraphStyle(&fParagraphStyle)
 {
+	_InitStyles();
+}
+
+
+void
+MarkupParser::SetStyles(const CharacterStyle& characterStyle,
+	const ParagraphStyle& paragraphStyle)
+{
+	fNormalStyle = characterStyle;
+	fParagraphStyle = paragraphStyle;
 	_InitStyles();
 }
 
@@ -112,7 +122,7 @@ MarkupParser::_ParseText(const BString& text)
 	int32 charCount = text.CountChars();
 	const char* c = text.String();
 	
-	while (offset < charCount) {
+	while (offset <= charCount) {
 		uint32 nextChar = UTF8ToCharCode(&c);
 
 		switch (nextChar) {

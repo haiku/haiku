@@ -15,6 +15,10 @@ public:
 									const CharacterStyle& characterStyle,
 									const ParagraphStyle& paragraphStyle);
 
+			void				SetStyles(
+									const CharacterStyle& characterStyle,
+									const ParagraphStyle& paragraphStyle);
+
 			TextDocumentRef		CreateDocumentFromMarkup(const BString& text);
 
 private:
