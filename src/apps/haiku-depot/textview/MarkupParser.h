@@ -19,7 +19,14 @@ public:
 									const CharacterStyle& characterStyle,
 									const ParagraphStyle& paragraphStyle);
 
+			const CharacterStyle& HeadingCharacterStyle() const
+									{ return fHeadingStyle; }
+			const ParagraphStyle& HeadingParagraphStyle() const
+									{ return fHeadingParagraphStyle; }
+
 			TextDocumentRef		CreateDocumentFromMarkup(const BString& text);
+			void				AppendMarkup(const TextDocumentRef& document,
+									const BString& text);
 
 private:
 			void				_InitStyles();

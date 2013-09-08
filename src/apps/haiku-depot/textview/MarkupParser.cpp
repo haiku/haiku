@@ -64,9 +64,20 @@ MarkupParser::SetStyles(const CharacterStyle& characterStyle,
 TextDocumentRef
 MarkupParser::CreateDocumentFromMarkup(const BString& text)
 {
-	fTextDocument.SetTo(new(std::nothrow) TextDocument(), true);
-	if (fTextDocument.Get() == NULL)
-		return fTextDocument;
+	TextDocumentRef document(new(std::nothrow) TextDocument(), true);
+	if (document.Get() == NULL)
+		return document;
+	
+	AppendMarkup(document, text);
+	
+	return document;
+}
+
+
+void
+MarkupParser::AppendMarkup(const TextDocumentRef& document, const BString& text)
+{
+	fTextDocument.SetTo(document);
 	
 	fCurrentCharacterStyle = &fNormalStyle;
 	fCurrentParagraphStyle = &fParagraphStyle;
@@ -76,7 +87,7 @@ MarkupParser::CreateDocumentFromMarkup(const BString& text)
 	
 	_ParseText(text);
 	
-	return fTextDocument;
+	fTextDocument.Unset();
 }
 
 
