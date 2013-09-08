@@ -19,7 +19,7 @@ public:
 
 	virtual void				Draw(BRect updateRect);
 
-	virtual void				AttachedToWindow();
+	virtual	void				AttachedToWindow();
 	virtual void				FrameResized(float width, float height);
 
 	virtual	BSize				MinSize();
@@ -33,9 +33,23 @@ public:
 			void				SetTextDocument(
 									const TextDocumentRef& document);
 
+			void				SetInsets(float inset);
+			void				SetInsets(float horizontal, float vertical);
+			void				SetInsets(float left, float top, float right,
+									float bottom);
+private:
+			float				_TextLayoutWidth(float viewWidth) const;
+
+			void				_UpdateScrollBars();
+
 private:
 			TextDocumentRef		fTextDocument;
 			TextDocumentLayout	fTextDocumentLayout;
+
+			float				fInsetLeft;
+			float				fInsetTop;
+			float				fInsetRight;
+			float				fInsetBottom;
 };
 
 #endif // TEXT_DOCUMENT_VIEW_H

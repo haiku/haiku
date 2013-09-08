@@ -5,15 +5,22 @@
 
 #include "TextDocumentView.h"
 
+#include <algorithm>
+
+#include <ScrollBar.h>
+
 
 TextDocumentView::TextDocumentView(const char* name)
 	:
-	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
+	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	fInsetLeft(0.0f),
+	fInsetTop(0.0f),
+	fInsetRight(0.0f),
+	fInsetBottom(0.0f)
 {
-	fTextDocumentLayout.SetWidth(Bounds().Width());
+	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
 
 	SetViewColor(B_TRANSPARENT_COLOR);
-//	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(255, 255, 255, 255);
 }
 
@@ -28,17 +35,15 @@ TextDocumentView::Draw(BRect updateRect)
 {
 	FillRect(updateRect, B_SOLID_LOW);
 
-	fTextDocumentLayout.SetWidth(Bounds().Width());
-	fTextDocumentLayout.Draw(this, B_ORIGIN);
+	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
+	fTextDocumentLayout.Draw(this, BPoint(fInsetLeft, fInsetTop));
 }
 
 
 void
 TextDocumentView::AttachedToWindow()
 {
-	BView* parent = Parent();
-	if (parent != NULL)
-		SetLowColor(parent->ViewColor());
+	_UpdateScrollBars();
 }
 
 
@@ -46,13 +51,14 @@ void
 TextDocumentView::FrameResized(float width, float height)
 {
 	fTextDocumentLayout.SetWidth(width);
+	_UpdateScrollBars();
 }
 
 
 BSize
 TextDocumentView::MinSize()
 {
-	return BSize(50.0f, 0.0f);
+	return BSize(fInsetLeft + fInsetRight + 50.0f, fInsetTop + fInsetBottom);
 }
 
 
@@ -82,9 +88,9 @@ TextDocumentView::GetHeightForWidth(float width, float* min, float* max,
 	float* preferred)
 {
 	TextDocumentLayout layout(fTextDocumentLayout);
-	layout.SetWidth(width);
+	layout.SetWidth(_TextLayoutWidth(width));
 
-	float height = layout.Height() + 1;
+	float height = layout.Height() + 1 + fInsetTop + fInsetBottom;
 
 	if (min != NULL)
 		*min = height;
@@ -101,5 +107,85 @@ TextDocumentView::SetTextDocument(const TextDocumentRef& document)
 	fTextDocument = document;
 	fTextDocumentLayout.SetTextDocument(fTextDocument);
 	InvalidateLayout();
+}
+
+
+void
+TextDocumentView::SetInsets(float inset)
+{
+	SetInsets(inset, inset, inset, inset);
+}
+
+
+void
+TextDocumentView::SetInsets(float horizontal, float vertical)
+{
+	SetInsets(horizontal, vertical, horizontal, vertical);
+}
+
+
+void
+TextDocumentView::SetInsets(float left, float top, float right, float bottom)
+{
+	if (fInsetLeft == left && fInsetTop == top
+		&& fInsetRight == right && fInsetBottom == bottom) {
+		return;
+	}
+
+	fInsetLeft = left;
+	fInsetTop = top;
+	fInsetRight = right;
+	fInsetBottom = bottom;
+
+	InvalidateLayout();
+}
+
+
+// #pragma mark - private
+
+
+float
+TextDocumentView::_TextLayoutWidth(float viewWidth) const
+{
+	return viewWidth - (fInsetLeft + fInsetRight);
+}
+
+
+static const float kHorizontalScrollBarStep = 10.0f;
+static const float kVerticalScrollBarStep = 12.0f;
+
+
+void
+TextDocumentView::_UpdateScrollBars()
+{
+	BRect bounds(Bounds());
+
+	BScrollBar* horizontalScrollBar = ScrollBar(B_HORIZONTAL);
+	if (horizontalScrollBar != NULL) {
+		long viewWidth = bounds.IntegerWidth();
+		long dataWidth = (long)ceilf(
+			fTextDocumentLayout.Width() + fInsetLeft + fInsetRight);
+
+		long maxRange = dataWidth - viewWidth;
+		maxRange = std::max(maxRange, 0L);
+
+		horizontalScrollBar->SetRange(0, (float)maxRange);
+		horizontalScrollBar->SetProportion((float)viewWidth / dataWidth);
+		horizontalScrollBar->SetSteps(kHorizontalScrollBarStep, dataWidth / 10);
+	}
+
+ 	BScrollBar* verticalScrollBar = ScrollBar(B_VERTICAL);
+	if (verticalScrollBar != NULL) {
+		long viewHeight = bounds.IntegerHeight();
+		long dataHeight = (long)ceilf(
+			fTextDocumentLayout.Height() + fInsetTop + fInsetBottom);
+
+		long maxRange = dataHeight - viewHeight;
+		maxRange = std::max(maxRange, 0L);
+
+		verticalScrollBar->SetRange(0, maxRange);
+		verticalScrollBar->SetProportion((float)viewHeight / dataHeight);
+		verticalScrollBar->SetSteps(kVerticalScrollBarStep, viewHeight);
+	}
 }
 
