@@ -583,10 +583,6 @@ ModulesView::DetachedFromWindow()
 void
 ModulesView::AttachedToWindow()
 {
-	PopulateScreenSaverList();
-
-	_OpenSaver();
-
 	fScreenSaversListView->SetTarget(this);
 	fTestButton->SetTarget(this);
 	fAddButton->SetTarget(this);
@@ -596,8 +592,8 @@ ModulesView::AttachedToWindow()
 void
 ModulesView::AllAttached()
 {
-	// This only works after the view has been attached
-	fScreenSaversListView->ScrollToSelection();
+	PopulateScreenSaverList();
+	fScreenSaversListView->Invoke(new BMessage(kMsgSaverSelected));
 }
 
 
@@ -911,7 +907,7 @@ ScreenSaverWindow::~ScreenSaverWindow()
 
 
 void
-ScreenSaverWindow::MessageReceived(BMessage *message)
+ScreenSaverWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgChangePassword:
