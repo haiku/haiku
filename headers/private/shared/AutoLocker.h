@@ -171,8 +171,8 @@ protected:
 
 }	// namespace BPrivate
 
-using BPrivate::AutoLocker;
-using BPrivate::AutoLockerReadLocking;
-using BPrivate::AutoLockerWriteLocking;
+using ::BPrivate::AutoLocker;
+using ::BPrivate::AutoLockerReadLocking;
+using ::BPrivate::AutoLockerWriteLocking;
 
 #endif	// _AUTO_LOCKER_H

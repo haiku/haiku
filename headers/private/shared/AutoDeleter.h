@@ -269,12 +269,12 @@ private:
 }	// namespace BPrivate
 
 
-using BPrivate::ObjectDeleter;
-using BPrivate::ArrayDeleter;
-using BPrivate::MemoryDeleter;
-using BPrivate::CObjectDeleter;
-using BPrivate::MethodDeleter;
-using BPrivate::FileDescriptorCloser;
+using ::BPrivate::ObjectDeleter;
+using ::BPrivate::ArrayDeleter;
+using ::BPrivate::MemoryDeleter;
+using ::BPrivate::CObjectDeleter;
+using ::BPrivate::MethodDeleter;
+using ::BPrivate::FileDescriptorCloser;
 
 
 #endif	// _AUTO_DELETER_H
