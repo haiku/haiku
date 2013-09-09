@@ -19,6 +19,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <Looper.h>
+#include <MessageRunner.h>
 #include <NodeMonitor.h>
 #include <Path.h>
 
@@ -48,7 +49,10 @@ static const char* const kActivationFileName
 static const char* const kTemporaryActivationFileName
 	= PACKAGES_DIRECTORY_ACTIVATION_FILE ".tmp";
 
-static bigtime_t kCommunicationTimeout = 1000000;
+static const bigtime_t kHandleNodeMonitorEvents = 'nmon';
+
+static const bigtime_t kNodeMonitorEventHandlingDelay = 500000;
+static const bigtime_t kCommunicationTimeout = 1000000;
 
 
 // #pragma mark - Listener
@@ -1068,6 +1072,13 @@ Volume::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kHandleNodeMonitorEvents:
+			if (fListener != NULL) {
+				if (system_time() >= fNodeMonitorEventHandleTime)
+					fListener->VolumeNodeMonitorEventOccurred(this);
+			}
+			break;
+
 		default:
 			BHandler::MessageReceived(message);
 			break;
@@ -1206,12 +1217,14 @@ Volume::_QueueNodeMonitorEvent(const BString& name, bool wasCreated)
 	}
 
 	AutoLocker<BLocker> eventsLock(fPendingNodeMonitorEventsLock);
-	bool firstEvent = fPendingNodeMonitorEvents.IsEmpty();
 	fPendingNodeMonitorEvents.Add(event);
 	eventsLock.Unlock();
 
-	if (firstEvent && fListener != NULL)
-		fListener->VolumeNodeMonitorEventOccurred(this);
+	fNodeMonitorEventHandleTime
+		= system_time() + kNodeMonitorEventHandlingDelay;
+	BMessage message(kHandleNodeMonitorEvents);
+	BMessageRunner::StartSending(this, &message, kNodeMonitorEventHandlingDelay,
+		1);
 }
 
 
