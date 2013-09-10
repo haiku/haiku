@@ -286,6 +286,33 @@ BPackageManager::Update(const BSolverPackageSpecifierList& packages)
 }
 
 
+void
+BPackageManager::VerifyInstallation()
+{
+	Init(B_ADD_INSTALLED_REPOSITORIES | B_ADD_REMOTE_REPOSITORIES
+		| B_REFRESH_REPOSITORIES);
+
+	for (;;) {
+		status_t error = fSolver->VerifyInstallation();
+		if (error != B_OK)
+			DIE(error, "failed to compute package dependencies");
+
+		_HandleProblems();
+
+		// (virtually) apply the result to this repository
+		_AnalyzeResult();
+		InstallationRepository().ApplyChanges();
+
+		// verify the next specific respository
+		if (!_NextSpecificInstallationLocation())
+			break;
+	}
+
+	_ConfirmChanges();
+	_ApplyPackageChanges();
+}
+
+
 BPackageManager::InstalledRepository&
 BPackageManager::InstallationRepository()
 {

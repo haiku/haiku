@@ -88,6 +88,8 @@ public:
 			void				Update(const BSolverPackageSpecifierList&
 									packages);
 
+			void				VerifyInstallation();
+
 protected:
 			InstalledRepository& InstallationRepository();
 
