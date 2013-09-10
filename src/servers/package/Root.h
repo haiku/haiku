@@ -29,7 +29,8 @@ public:
 								Root();
 	virtual						~Root();
 
-			status_t			Init(const node_ref& nodeRef);
+			status_t			Init(const node_ref& nodeRef,
+									bool isSystemRoot);
 
 			const node_ref&		NodeRef() const		{ return fNodeRef; }
 			dev_t				DeviceID() const	{ return fNodeRef.device; }
@@ -76,6 +77,7 @@ private:
 private:
 	mutable	BLocker				fLock;
 			node_ref			fNodeRef;
+			bool				fIsSystemRoot;
 			BString				fPath;
 			Volume*				fSystemVolume;
 			Volume*				fCommonVolume;

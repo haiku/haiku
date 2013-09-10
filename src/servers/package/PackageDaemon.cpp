@@ -59,11 +59,6 @@ PackageDaemon::Init()
 		_RegisterVolume(device);
 	}
 
-	// find the system root
-	struct stat st;
-	if (stat("/boot", &st) == 0)
-		fSystemRoot = _FindRoot(node_ref(st.st_dev, st.st_ino));
-
 	return B_OK;
 }
 
@@ -175,7 +170,14 @@ PackageDaemon::_GetOrCreateRoot(const node_ref& nodeRef, Root*& _root)
 			RETURN_ERROR(B_NO_MEMORY);
 		ObjectDeleter<Root> rootDeleter(root);
 
-		status_t error = root->Init(nodeRef);
+		bool isSystemRoot = false;
+		if (fSystemRoot == NULL) {
+			struct stat st;
+			isSystemRoot = stat("/boot", &st) == 0
+				&& node_ref(st.st_dev, st.st_ino) == nodeRef;
+		}
+
+		status_t error = root->Init(nodeRef, isSystemRoot);
 		if (error != B_OK)
 			RETURN_ERROR(error);
 
@@ -183,6 +185,9 @@ PackageDaemon::_GetOrCreateRoot(const node_ref& nodeRef, Root*& _root)
 			RETURN_ERROR(B_NO_MEMORY);
 
 		rootDeleter.Detach();
+
+		if (isSystemRoot)
+			fSystemRoot = root;
 
 		INFORM("root at \"%s\" (device: %" B_PRIdDEV ", node: %" B_PRIdINO ") "
 			"registered\n", root->Path().String(), nodeRef.device,

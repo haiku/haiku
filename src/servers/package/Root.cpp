@@ -76,6 +76,7 @@ Root::Root()
 	:
 	fLock("packagefs root"),
 	fNodeRef(),
+	fIsSystemRoot(false),
 	fPath(),
 	fSystemVolume(NULL),
 	fCommonVolume(NULL),
@@ -96,9 +97,10 @@ Root::~Root()
 
 
 status_t
-Root::Init(const node_ref& nodeRef)
+Root::Init(const node_ref& nodeRef, bool isSystemRoot)
 {
 	fNodeRef = nodeRef;
+	fIsSystemRoot = isSystemRoot;
 
 	// init members and spawn job runner thread
 	status_t error = fJobQueue.Init();
