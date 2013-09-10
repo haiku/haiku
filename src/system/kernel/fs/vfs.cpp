@@ -5260,10 +5260,8 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 				putter.SetTo(vnode);
 			}
 
-			if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type())) {
-				put_vnode(vnode);
+			if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
 				return B_LINK_LIMIT;
-			}
 
 			int fd = open_vnode(vnode, openMode & ~O_CREAT, kernel);
 			// on success keep the vnode reference for the FD
