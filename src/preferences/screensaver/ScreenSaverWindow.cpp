@@ -846,10 +846,14 @@ ScreenSaverWindow::ScreenSaverWindow()
 {
 	fSettings.Load();
 
-	float spacing = be_control_look->DefaultItemSpacing();
+	fMinWidth = ceilf(std::max(446.0f,
+		be_control_look->DefaultItemSpacing() * 44.6f));
 
-	fMinWidth = ceilf(std::max(446.0f, spacing * 44.6f));
-	fMinHeight = ceilf(std::max(325.0f, spacing * 32.5f));
+	font_height fontHeight;
+	be_plain_font->GetHeight(&fontHeight);
+	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
+
+	fMinHeight = ceilf(std::max(325.0f, textHeight * 28));
 
 	// Create the password editing window
 	fPasswordWindow = new PasswordWindow(fSettings);
