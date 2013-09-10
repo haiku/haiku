@@ -221,17 +221,9 @@ BDaemonClient::_CommitTransaction(const BActivationTransaction& transaction,
 
 	// send the request
 	BMessage request(B_MESSAGE_COMMIT_TRANSACTION);
-	if ((error = request.AddInt32("location", transaction.Location())) != B_OK
-		|| (error = request.AddInt64("change count",
-			transaction.ChangeCount())) != B_OK
-		|| (error = request.AddString("transaction",
-			transaction.TransactionDirectoryName())) != B_OK
-		|| (error = request.AddStrings("activate",
-			transaction.PackagesToActivate())) != B_OK
-		|| (error = request.AddStrings("deactivate",
-			transaction.PackagesToDeactivate())) != B_OK) {
+	error = transaction.Archive(&request);
+	if (error != B_OK)
 		return error;
-	}
 
 	BMessage reply;
 	fDaemonMessenger.SendMessage(&request, &reply);

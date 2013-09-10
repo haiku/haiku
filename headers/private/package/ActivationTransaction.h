@@ -9,6 +9,7 @@
 #define _PACKAGE__PRIVATE__ACTIVATION_TRANSACTION_H_
 
 
+#include <Archivable.h>
 #include <package/PackageDefs.h>
 #include <StringList.h>
 
@@ -17,10 +18,12 @@ namespace BPackageKit {
 namespace BPrivate {
 
 
-class BActivationTransaction {
+class BActivationTransaction : public BArchivable {
 public:
 								BActivationTransaction();
-								~BActivationTransaction();
+                                BActivationTransaction(BMessage* archive,
+                                    status_t* _error = NULL);
+	virtual						~BActivationTransaction();
 
 			status_t			SetTo(BPackageInstallationLocation location,
 									int64 changeCount,
@@ -48,6 +51,14 @@ public:
 			bool				SetPackagesToDeactivate(
 									const BStringList& packages);
 			bool				AddPackageToDeactivate(const BString& package);
+
+	virtual	status_t			Archive(BMessage* archive,
+									bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* archive);
+
+private:
+	static	status_t			_ExtractStringList(BMessage* archive,
+									const char* field, BStringList& _list);
 
 private:
 			BPackageInstallationLocation fLocation;
