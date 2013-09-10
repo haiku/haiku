@@ -137,8 +137,8 @@ private:
 	static	BResources*			sAppResources;
 
 			const char*			fAppName;
-			BPrivate::PortLink*	fServerLink;
-			BPrivate::ServerMemoryAllocator* fServerAllocator;
+			::BPrivate::PortLink*	fServerLink;
+			::BPrivate::ServerMemoryAllocator* fServerAllocator;
 
 			void*				fCursorData;
 			bigtime_t			fPulseRate;

@@ -394,7 +394,7 @@ private:
 			window_look			fLook;
 			window_feel			fFeel;
 			int32				fLastViewToken;
-			BPrivate::PortLink*	fLink;
+			::BPrivate::PortLink* fLink;
 			BMessageRunner*		fPulseRunner;
 			BRect				fPreviousFrame;
 

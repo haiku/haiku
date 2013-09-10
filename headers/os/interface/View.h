@@ -710,7 +710,7 @@ private:
 			bool				fAttached;
 			bool				_unused_bool1;
 			bool				_unused_bool2;
-			BPrivate::ViewState* fState;
+			::BPrivate::ViewState* fState;
 			BRect				fBounds;
 			BShelf*				fShelf;
 			uint32				fEventMask;
