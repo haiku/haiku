@@ -77,10 +77,16 @@ public:
 
 			void				Install(const char* const* packages,
 									int packageCount);
+			void				Install(const BSolverPackageSpecifierList&
+									packages);
 			void				Uninstall(const char* const* packages,
 									int packageCount);
+			void				Uninstall(const BSolverPackageSpecifierList&
+									packages);
 			void				Update(const char* const* packages,
 									int packageCount);
+			void				Update(const BSolverPackageSpecifierList&
+									packages);
 
 protected:
 			InstalledRepository& InstallationRepository();

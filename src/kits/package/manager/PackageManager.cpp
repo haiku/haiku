@@ -124,18 +124,22 @@ BPackageManager::Init(uint32 flags)
 void
 BPackageManager::Install(const char* const* packages, int packageCount)
 {
+	BSolverPackageSpecifierList packagesToInstall;
+	if (!packagesToInstall.AppendSpecifiers(packages, packageCount))
+		throw std::bad_alloc();
+	Install(packagesToInstall);
+}
+
+
+void
+BPackageManager::Install(const BSolverPackageSpecifierList& packages)
+{
 	Init(B_ADD_INSTALLED_REPOSITORIES | B_ADD_REMOTE_REPOSITORIES
 		| B_REFRESH_REPOSITORIES);
 
 	// solve
-	BSolverPackageSpecifierList packagesToInstall;
-	for (int i = 0; i < packageCount; i++) {
-		if (!packagesToInstall.AppendSpecifier(packages[i]))
-			throw std::bad_alloc();
-	}
-
 	const BSolverPackageSpecifier* unmatchedSpecifier;
-	status_t error = fSolver->Install(packagesToInstall, &unmatchedSpecifier);
+	status_t error = fSolver->Install(packages, &unmatchedSpecifier);
 	if (error != B_OK) {
 		if (unmatchedSpecifier != NULL) {
 			DIE(error, "failed to find a match for \"%s\"",
@@ -156,18 +160,22 @@ BPackageManager::Install(const char* const* packages, int packageCount)
 void
 BPackageManager::Uninstall(const char* const* packages, int packageCount)
 {
+	BSolverPackageSpecifierList packagesToUninstall;
+	if (!packagesToUninstall.AppendSpecifiers(packages, packageCount))
+		throw std::bad_alloc();
+	Uninstall(packagesToUninstall);
+}
+
+
+void
+BPackageManager::Uninstall(const BSolverPackageSpecifierList& packages)
+{
 	Init(B_ADD_INSTALLED_REPOSITORIES);
 
 	// find the packages that match the specification
-	BSolverPackageSpecifierList packagesToUninstall;
-	for (int i = 0; i < packageCount; i++) {
-		if (!packagesToUninstall.AppendSpecifier(packages[i]))
-			throw std::bad_alloc();
-	}
-
 	const BSolverPackageSpecifier* unmatchedSpecifier;
 	PackageList foundPackages;
-	status_t error = fSolver->FindPackages(packagesToUninstall,
+	status_t error = fSolver->FindPackages(packages,
 		BSolver::B_FIND_INSTALLED_ONLY, foundPackages, &unmatchedSpecifier);
 	if (error != B_OK) {
 		if (unmatchedSpecifier != NULL) {
@@ -244,18 +252,22 @@ BPackageManager::Uninstall(const char* const* packages, int packageCount)
 void
 BPackageManager::Update(const char* const* packages, int packageCount)
 {
+	BSolverPackageSpecifierList packagesToUpdate;
+	if (!packagesToUpdate.AppendSpecifiers(packages, packageCount))
+		throw std::bad_alloc();
+	Update(packagesToUpdate);
+}
+
+
+void
+BPackageManager::Update(const BSolverPackageSpecifierList& packages)
+{
 	Init(B_ADD_INSTALLED_REPOSITORIES | B_ADD_REMOTE_REPOSITORIES
 		| B_REFRESH_REPOSITORIES);
 
 	// solve
-	BSolverPackageSpecifierList packagesToUpdate;
-	for (int i = 0; i < packageCount; i++) {
-		if (!packagesToUpdate.AppendSpecifier(packages[i]))
-			throw std::bad_alloc();
-	}
-
 	const BSolverPackageSpecifier* unmatchedSpecifier;
-	status_t error = fSolver->Update(packagesToUpdate, true,
+	status_t error = fSolver->Update(packages, true,
 		&unmatchedSpecifier);
 	if (error != B_OK) {
 		if (unmatchedSpecifier != NULL) {
