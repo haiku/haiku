@@ -249,30 +249,47 @@ private:
 
 
 struct Volume::CommitTransactionHandler {
-	CommitTransactionHandler(Volume* volume, BMessage* request, BMessage& reply)
+	CommitTransactionHandler(Volume* volume,
+		const PackageSet& packagesAlreadyAdded,
+		const PackageSet& packagesAlreadyRemoved)
 		:
 		fVolume(volume),
-		fRequest(request),
-		fReply(reply),
 		fPackagesToActivate(20, true),
 		fPackagesToDeactivate(),
 		fAddedPackages(),
-		fRemovedPackages()
+		fRemovedPackages(),
+		fPackagesAlreadyAdded(packagesAlreadyAdded),
+		fPackagesAlreadyRemoved(packagesAlreadyRemoved)
 	{
 	}
 
-	void HandleRequest()
+	void HandleRequest(BMessage* request, BMessage* reply)
+	{
+		status_t error;
+		BActivationTransaction transaction(request, &error);
+		if (error == B_OK)
+			error = transaction.InitCheck();
+		if (error != B_OK) {
+			if (error == B_NO_MEMORY)
+				throw Exception(B_NO_MEMORY);
+			throw Exception(B_DAEMON_BAD_REQUEST);
+		}
+
+		HandleRequest(transaction, reply);
+	}
+
+	void HandleRequest(const BActivationTransaction& transaction,
+		BMessage* reply)
 	{
 		// check the change count
-		int64 changeCount;
-		if (fRequest->FindInt64("change count", &changeCount) != B_OK)
+		if (transaction.ChangeCount() != fVolume->fChangeCount)
 			throw Exception(B_DAEMON_CHANGE_COUNT_MISMATCH);
 
 		// collect the packages to deactivate
-		_GetPackagesToDeactivate();
+		_GetPackagesToDeactivate(transaction);
 
 		// read the packages to activate
-		_ReadPackagesToActivate();
+		_ReadPackagesToActivate(transaction);
 
 		// anything to do at all?
 		if (fPackagesToActivate.IsEmpty() &&  fPackagesToDeactivate.empty()) {
@@ -281,7 +298,7 @@ struct Volume::CommitTransactionHandler {
 		}
 
 		// create an old state directory
-		_CreateOldStateDirectory();
+		_CreateOldStateDirectory(reply);
 
 		// move packages to deactivate to old state directory
 		_RemovePackagesToDeactivate();
@@ -311,29 +328,25 @@ struct Volume::CommitTransactionHandler {
 		_RemoveOldStateDirectory();
 	}
 
+	const BString& OldStateDirectoryName() const
+	{
+		return fOldStateDirectoryName;
+	}
+
 private:
 	typedef BObjectList<Package> PackageList;
 
-	void _GetPackagesToDeactivate()
+	void _GetPackagesToDeactivate(const BActivationTransaction& transaction)
 	{
-		static const char* const kPackagesToDeactivateFieldName = "deactivate";
-
-		// get the number of packages to activate
-		type_code type;
-		int32 packagesToDeactivateCount;
-		if (fRequest->GetInfo(kPackagesToDeactivateFieldName, &type,
-				&packagesToDeactivateCount) != B_OK) {
-			// the field is missing, i.e. no packages shall be deactivated
+		// get the number of packages to deactivate
+		const BStringList& packagesToDeactivate
+			= transaction.PackagesToDeactivate();
+		int32 packagesToDeactivateCount = packagesToDeactivate.CountStrings();
+		if (packagesToDeactivateCount == 0)
 			return;
-		}
 
 		for (int32 i = 0; i < packagesToDeactivateCount; i++) {
-			const char* packageName;
-			status_t error = fRequest->FindString(
-				kPackagesToDeactivateFieldName, i, &packageName);
-			if (error != B_OK)
-				throw Exception(error);
-
+			BString packageName = packagesToDeactivate.StringAt(i);
 			Package* package = fVolume->fPackagesByFileName.Lookup(packageName);
 			if (package == NULL) {
 				throw Exception(B_DAEMON_NO_SUCH_PACKAGE, "no such package",
@@ -346,30 +359,19 @@ private:
 		}
 	}
 
-	void _ReadPackagesToActivate()
+	void _ReadPackagesToActivate(const BActivationTransaction& transaction)
 	{
-		static const char* const kPackagesToActivateFieldName = "activate";
-
 		// get the number of packages to activate
-		type_code type;
-		int32 packagesToActivateCount;
-		if (fRequest->GetInfo(kPackagesToActivateFieldName, &type,
-				&packagesToActivateCount) != B_OK) {
-			// the field is missing, i.e. no packages shall be activated
+		const BStringList& packagesToActivate
+			= transaction.PackagesToActivate();
+		int32 packagesToActivateCount = packagesToActivate.CountStrings();
+		if (packagesToActivateCount == 0)
 			return;
-		}
 
-		// get the name of the transaction directory
-		BString transactionDirectoryName;
-		if (packagesToActivateCount > 0) {
-			if (fRequest->FindString("transaction", &transactionDirectoryName)
-					!= B_OK) {
-				throw Exception(B_DAEMON_BAD_REQUEST);
-			}
-		}
-
-		// check the name -- we only allow a simple subdirectory of the admin
-		// directory
+		// check the transaction directory name -- we only allow a simple
+		// subdirectory of the admin directory
+		const BString& transactionDirectoryName
+			= transaction.TransactionDirectoryName();
 		if (transactionDirectoryName.IsEmpty()
 			|| transactionDirectoryName.FindFirst('/') >= 0
 			|| transactionDirectoryName == "."
@@ -394,19 +396,23 @@ private:
 
 		// read the packages
 		for (int32 i = 0; i < packagesToActivateCount; i++) {
-			const char* packageName;
-			error = fRequest->FindString(kPackagesToActivateFieldName, i,
-				&packageName);
-			if (error != B_OK)
-				throw Exception(error);
+			BString packageName = packagesToActivate.StringAt(i);
 
 			// make sure it doesn't clash with an already existing package
 			Package* package = fVolume->fPackagesByFileName.Lookup(packageName);
-			if (package != NULL
-				&& fPackagesToDeactivate.find(package)
-					== fPackagesToDeactivate.end()) {
-				throw Exception(B_DAEMON_PACKAGE_ALREADY_EXISTS, NULL,
-					packageName);
+			if (package != NULL) {
+				if (fPackagesAlreadyAdded.find(package)
+						!= fPackagesAlreadyAdded.end()) {
+					if (!fPackagesToActivate.AddItem(package))
+						throw Exception(B_NO_MEMORY);
+					continue;
+				}
+
+				if (fPackagesToDeactivate.find(package)
+						== fPackagesToDeactivate.end()) {
+					throw Exception(B_DAEMON_PACKAGE_ALREADY_EXISTS, NULL,
+						packageName);
+				}
 			}
 
 			// read the package
@@ -430,7 +436,7 @@ private:
 		}
 	}
 
-	void _CreateOldStateDirectory()
+	void _CreateOldStateDirectory(BMessage* reply)
 	{
 		// construct a nice name from the current date and time
 		time_t nowSeconds = time(NULL);
@@ -478,9 +484,11 @@ private:
 			throw Exception(error, "failed to write old activation file");
 
 		// add the old state directory to the reply
-		error = fReply.AddString("old state", fOldStateDirectoryName);
-		if (error != B_OK)
-			throw Exception(error, "failed to add field to reply");
+		if (reply != NULL) {
+			error = reply->AddString("old state", fOldStateDirectoryName);
+			if (error != B_OK)
+				throw Exception(error, "failed to add field to reply");
+		}
 	}
 
 	void _RemovePackagesToDeactivate()
@@ -490,8 +498,14 @@ private:
 
 		for (PackageSet::const_iterator it = fPackagesToDeactivate.begin();
 			it != fPackagesToDeactivate.end(); ++it) {
-			// get an BEntry for the package
 			Package* package = *it;
+			if (fPackagesAlreadyRemoved.find(package)
+					!= fPackagesAlreadyRemoved.end()) {
+				fRemovedPackages.insert(package);
+				continue;
+			}
+
+			// get a BEntry for the package
 			entry_ref entryRef;
 			entryRef.device = fVolume->fPackagesDirectoryRef.device;
 			entryRef.directory = fVolume->fPackagesDirectoryRef.node;
@@ -532,8 +546,14 @@ private:
 
 		int32 count = fPackagesToActivate.CountItems();
 		for (int32 i = 0; i < count; i++) {
-			// get an BEntry for the package
 			Package* package = fPackagesToActivate.ItemAt(i);
+			if (fPackagesAlreadyAdded.find(package)
+					!= fPackagesAlreadyAdded.end()) {
+				fAddedPackages.insert(package);
+				continue;
+			}
+
+			// get a BEntry for the package
 			entry_ref entryRef;
 			entryRef.device = fTransactionDirectoryRef.device;
 			entryRef.directory = fTransactionDirectoryRef.node;
@@ -581,6 +601,11 @@ private:
 			// remove package from the volume
 			Package* package = *it;
 			fVolume->_RemovePackage(package);
+
+			if (fPackagesAlreadyAdded.find(package)
+					!= fPackagesAlreadyAdded.end()) {
+				continue;
+			}
 
 			if (transactionDirectory.InitCheck() != B_OK)
 				continue;
@@ -631,8 +656,13 @@ private:
 
 		for (PackageSet::iterator it = fRemovedPackages.begin();
 			it != fRemovedPackages.end(); ++it) {
-			// get an BEntry for the package
 			Package* package = *it;
+			if (fPackagesAlreadyRemoved.find(package)
+					!= fPackagesAlreadyRemoved.end()) {
+				continue;
+			}
+
+			// get a BEntry for the package
 			BEntry entry;
 			status_t error = entry.SetTo(&fOldStateDirectory,
 				package->FileName());
@@ -681,16 +711,16 @@ private:
 	}
 
 private:
-	Volume*		fVolume;
-	BMessage*	fRequest;
-	BMessage&	fReply;
-	PackageList	fPackagesToActivate;
-	PackageSet	fPackagesToDeactivate;
-	PackageSet	fAddedPackages;
-	PackageSet	fRemovedPackages;
-	BDirectory	fOldStateDirectory;
-	BString		fOldStateDirectoryName;
-	node_ref	fTransactionDirectoryRef;
+	Volume*				fVolume;
+	PackageList			fPackagesToActivate;
+	PackageSet			fPackagesToDeactivate;
+	PackageSet			fAddedPackages;
+	PackageSet			fRemovedPackages;
+	const PackageSet&	fPackagesAlreadyAdded;
+	const PackageSet&	fPackagesAlreadyRemoved;
+	BDirectory			fOldStateDirectory;
+	BString				fOldStateDirectoryName;
+	node_ref			fTransactionDirectoryRef;
 };
 
 
@@ -710,6 +740,7 @@ Volume::Volume(BLooper* looper)
 	fPackagesByNodeRef(),
 	fPendingNodeMonitorEventsLock("pending node monitor events"),
 	fPendingNodeMonitorEvents(),
+	fNodeMonitorEventHandleTime(0),
 	fPackagesToBeActivated(),
 	fPackagesToBeDeactivated(),
 	fChangeCount(0),
@@ -1007,10 +1038,10 @@ Volume::HandleCommitTransactionRequest(BMessage* message)
 		return;
 
 	// perform the request
-	CommitTransactionHandler handler(this, message, reply);
+	CommitTransactionHandler handler(this, PackageSet(), PackageSet());
 	int32 error;
 	try {
-		handler.HandleRequest();
+		handler.HandleRequest(message, &reply);
 		error = B_DAEMON_OK;
 	} catch (Exception& exception) {
 		error = exception.Error();
@@ -1086,6 +1117,23 @@ Volume::MessageReceived(BMessage* message)
 }
 
 
+BPackageInstallationLocation
+Volume::Location() const
+{
+	switch (fMountType) {
+		case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
+			return B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
+		case PACKAGE_FS_MOUNT_TYPE_COMMON:
+			return B_PACKAGE_INSTALLATION_LOCATION_COMMON;
+		case PACKAGE_FS_MOUNT_TYPE_HOME:
+			return B_PACKAGE_INSTALLATION_LOCATION_HOME;
+		case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
+		default:
+			return B_PACKAGE_INSTALLATION_LOCATION_ENUM_COUNT;
+	}
+}
+
+
 int
 Volume::OpenRootDirectory() const
 {
@@ -1147,6 +1195,86 @@ Volume::ProcessPendingPackageActivationChanges()
 	// clear the activation/deactivation sets in any event
 	fPackagesToBeActivated.clear();
 	fPackagesToBeDeactivated.clear();
+}
+
+
+void
+Volume::ClearPackageActivationChanges()
+{
+	fPackagesToBeActivated.clear();
+	fPackagesToBeDeactivated.clear();
+}
+
+
+status_t
+Volume::CreateTransaction(BPackageInstallationLocation location,
+	BActivationTransaction& _transaction, BDirectory& _transactionDirectory)
+{
+	// open admin directory
+	BDirectory adminDirectory;
+	status_t error = _OpenPackagesSubDirectory(
+		RelativePath(kAdminDirectoryName), true, adminDirectory);
+	if (error != B_OK)
+		return error;
+
+	// create a transaction directory
+	int uniqueId = 1;
+	BString directoryName;
+	for (;; uniqueId++) {
+		directoryName.SetToFormat("transaction-%d", uniqueId);
+		if (directoryName.IsEmpty())
+			return B_NO_MEMORY;
+
+		error = adminDirectory.CreateDirectory(directoryName,
+			&_transactionDirectory);
+		if (error == B_OK)
+			break;
+		if (error != B_FILE_EXISTS)
+			return error;
+	}
+
+	// init the transaction
+	error = _transaction.SetTo(location, fChangeCount, directoryName);
+	if (error != B_OK) {
+		BEntry entry;
+		_transactionDirectory.GetEntry(&entry);
+		_transactionDirectory.Unset();
+		if (entry.InitCheck() == B_OK)
+			entry.Remove();
+		return error;
+	}
+
+	return B_OK;
+}
+
+
+void
+Volume::CommitTransaction(const BActivationTransaction& transaction,
+	const PackageSet& packagesAlreadyAdded,
+	const PackageSet& packagesAlreadyRemoved,
+	BDaemonClient::BCommitTransactionResult& _result)
+{
+	// perform the request
+	CommitTransactionHandler handler(this, packagesAlreadyAdded,
+		packagesAlreadyRemoved);
+	int32 error;
+	try {
+		handler.HandleRequest(transaction, NULL);
+		error = B_DAEMON_OK;
+		_result.SetTo(error, BString(), BString(),
+			handler.OldStateDirectoryName());
+	} catch (Exception& exception) {
+		error = exception.Error();
+		_result.SetTo(error, exception.ErrorMessage(), exception.PackageName(),
+			BString());
+	} catch (std::bad_alloc& exception) {
+		error = B_NO_MEMORY;
+		_result.SetTo(error, BString(), BString(), BString());
+	}
+
+	// revert on error
+	if (error != B_DAEMON_OK)
+		handler.Revert();
 }
 
 

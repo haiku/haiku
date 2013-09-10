@@ -9,18 +9,21 @@
 #define VOLUME_H
 
 
-#include <set>
-
 #include <Handler.h>
 #include <Locker.h>
 #include <Message.h>
 #include <String.h>
 
+#include <package/ActivationTransaction.h>
+#include <package/DaemonClient.h>
 #include <package/packagefs.h>
 #include <util/DoublyLinkedList.h>
 
 #include "Package.h"
 
+
+using BPackageKit::BPrivate::BActivationTransaction;
+using BPackageKit::BPrivate::BDaemonClient;
 
 class BDirectory;
 
@@ -30,6 +33,10 @@ namespace BPackageKit {
 	class BSolver;
 	class BSolverRepository;
 }
+
+using BPackageKit::BPackageInstallationLocation;
+using BPackageKit::BSolver;
+using BPackageKit::BSolverRepository;
 
 
 class Volume : public BHandler {
@@ -61,6 +68,7 @@ public:
 									{ return fPath; }
 			PackageFSMountType	MountType() const
 									{ return fMountType; }
+			BPackageInstallationLocation Location() const;
 
 			const node_ref&		RootDirectoryRef() const
 									{ return fRootDirectoryRef; }
@@ -81,12 +89,33 @@ public:
 			void				SetRoot(Root* root)
 									{ fRoot = root; }
 
+			const PackageFileNameHashTable& PackagesByFileName() const
+									{ return fPackagesByFileName; }
+			const PackageNodeRefHashTable& PackagesByNodeRef() const
+									{ return fPackagesByNodeRef; }
+
 			int					OpenRootDirectory() const;
 
 			void				ProcessPendingNodeMonitorEvents();
 
 			bool				HasPendingPackageActivationChanges() const;
 			void				ProcessPendingPackageActivationChanges();
+			void				ClearPackageActivationChanges();
+			const PackageSet&	PackagesToBeActivated() const
+									{ return fPackagesToBeActivated; }
+			const PackageSet&	PackagesToBeDeactivated() const
+									{ return fPackagesToBeDeactivated; }
+
+			status_t			CreateTransaction(
+									BPackageInstallationLocation location,
+									BActivationTransaction& _transaction,
+									BDirectory& _transactionDirectory);
+			void				CommitTransaction(
+									const BActivationTransaction& transaction,
+									const PackageSet& packagesAlreadyAdded,
+									const PackageSet& packagesAlreadyRemoved,
+									BDaemonClient::BCommitTransactionResult&
+										_result);
 
 private:
 			struct NodeMonitorEvent;
@@ -97,7 +126,6 @@ private:
 			friend struct CommitTransactionHandler;
 
 			typedef DoublyLinkedList<NodeMonitorEvent> NodeMonitorEventList;
-			typedef std::set<Package*> PackageSet;
 
 private:
 			void				_HandleEntryCreatedOrRemoved(
@@ -164,6 +192,7 @@ private:
 			PackageNodeRefHashTable fPackagesByNodeRef;
 			BLocker				fPendingNodeMonitorEventsLock;
 			NodeMonitorEventList fPendingNodeMonitorEvents;
+			bigtime_t			fNodeMonitorEventHandleTime;
 			PackageSet			fPackagesToBeActivated;
 			PackageSet			fPackagesToBeDeactivated;
 			int64				fChangeCount;

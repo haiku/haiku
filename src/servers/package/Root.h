@@ -42,6 +42,8 @@ public:
 									// deletes the volume (eventually)
 
 			Volume*				FindVolume(dev_t deviceID) const;
+			Volume*				GetVolume(
+									BPackageInstallationLocation location);
 
 			void				HandleRequest(BMessage* message);
 
@@ -60,8 +62,6 @@ private:
 
 private:
 			Volume**			_GetVolume(PackageFSMountType mountType);
-			Volume*				_GetVolume(
-									BPackageInstallationLocation location);
 			Volume*				_NextVolumeFor(Volume* volume);
 
 			void				_InitPackages(Volume* volume);
@@ -73,6 +73,8 @@ private:
 
 	static	status_t			_JobRunnerEntry(void* data);
 			status_t			_JobRunner();
+
+	static	void				_ShowError(const char* errorMessage);
 
 private:
 	mutable	BLocker				fLock;

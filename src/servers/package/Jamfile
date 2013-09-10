@@ -4,17 +4,19 @@ UsePrivateSystemHeaders ;
 UsePrivateHeaders app kernel shared ;
 
 Server package_daemon
- 	:
- 	DebugSupport.cpp
- 	Job.cpp
- 	JobQueue.cpp
- 	Package.cpp
- 	PackageDaemon.cpp
- 	Root.cpp
- 	Volume.cpp
+	:
+	DebugSupport.cpp
+	Job.cpp
+	JobQueue.cpp
+	Package.cpp
+	PackageDaemon.cpp
+	PackageManager.cpp
+	ProblemWindow.cpp
+	Root.cpp
+	Volume.cpp
 	:
 	be package
 	$(TARGET_LIBSTDC++)
 	:
 	package_daemon.rdef
-;
+	;

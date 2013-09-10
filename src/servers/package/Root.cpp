@@ -9,6 +9,7 @@
 
 #include "Root.h"
 
+#include <Alert.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <package/PackageDefs.h>
@@ -16,13 +17,17 @@
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
+#include <Server.h>
 
 #include <package/DaemonDefs.h>
+#include <package/manager/Exceptions.h>
 
 #include "DebugSupport.h"
+#include "PackageManager.h"
 
 
 using namespace BPackageKit::BPrivate;
+using namespace BPackageKit::BManager::BPrivate;
 
 
 // #pragma mark - VolumeJob
@@ -215,6 +220,22 @@ Root::FindVolume(dev_t deviceID) const
 }
 
 
+Volume*
+Root::GetVolume(BPackageInstallationLocation location)
+{
+	switch ((BPackageInstallationLocation)location) {
+		case B_PACKAGE_INSTALLATION_LOCATION_SYSTEM:
+			return fSystemVolume;
+		case B_PACKAGE_INSTALLATION_LOCATION_COMMON:
+			return fCommonVolume;
+		case B_PACKAGE_INSTALLATION_LOCATION_HOME:
+			return fHomeVolume;
+		default:
+			return NULL;
+	}
+}
+
+
 void
 Root::HandleRequest(BMessage* message)
 {
@@ -253,22 +274,6 @@ Root::_GetVolume(PackageFSMountType mountType)
 		case PACKAGE_FS_MOUNT_TYPE_HOME:
 			return &fHomeVolume;
 		case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
-		default:
-			return NULL;
-	}
-}
-
-
-Volume*
-Root::_GetVolume(BPackageInstallationLocation location)
-{
-	switch ((BPackageInstallationLocation)location) {
-		case B_PACKAGE_INSTALLATION_LOCATION_SYSTEM:
-			return fSystemVolume;
-		case B_PACKAGE_INSTALLATION_LOCATION_COMMON:
-			return fCommonVolume;
-		case B_PACKAGE_INSTALLATION_LOCATION_HOME:
-			return fHomeVolume;
 		default:
 			return NULL;
 	}
@@ -330,8 +335,39 @@ Root::_ProcessNodeMonitorEvents(Volume* volume)
 {
 	volume->ProcessPendingNodeMonitorEvents();
 
-	if (volume->HasPendingPackageActivationChanges())
+	if (!volume->HasPendingPackageActivationChanges())
+		return;
+
+	// If this is not the system root, just activate/deactivate the packages.
+	if (!fIsSystemRoot) {
 		volume->ProcessPendingPackageActivationChanges();
+		return;
+	}
+
+	// For the system root do the full dependency analysis.
+
+	PRINT("Root::_ProcessNodeMonitorEvents(): running package manager...\n");
+	try {
+		PackageManager packageManager(this, volume);
+		packageManager.HandleUserChanges();
+	} catch (BNothingToDoException&) {
+		PRINT("Root::_ProcessNodeMonitorEvents(): -> nothing to do\n");
+	} catch (std::bad_alloc&) {
+		_ShowError(
+			"Insufficient memory while trying to apply package changes.");
+	} catch (BFatalErrorException& exception) {
+		if (exception.Error() == B_OK) {
+			_ShowError(exception.Message());
+		} else {
+			_ShowError(BString().SetToFormat("%s: %s",
+				exception.Message().String(), strerror(exception.Error())));
+		}
+		// TODO: Print exception.Details()?
+	} catch (BAbortedByUserException&) {
+		PRINT("Root::_ProcessNodeMonitorEvents(): -> aborted by user\n");
+	}
+
+	volume->ClearPackageActivationChanges();
 }
 
 
@@ -347,7 +383,7 @@ Root::_HandleRequest(BMessage* message)
 
 	// get the volume and let it handle the message
 	AutoLocker<BLocker> locker(fLock);
-	Volume* volume = _GetVolume((BPackageInstallationLocation)location);
+	Volume* volume = GetVolume((BPackageInstallationLocation)location);
 	locker.Unlock();
 
 	if (volume != NULL) {
@@ -395,4 +431,22 @@ Root::_JobRunner()
 	}
 
 	return B_OK;
+}
+
+
+/*static*/ void
+Root::_ShowError(const char* errorMessage)
+{
+	BServer* server = dynamic_cast<BServer*>(be_app);
+	if (server != NULL && server->InitGUIContext() == B_OK) {
+		BAlert* alert = new(std::nothrow) BAlert("Package error",
+			errorMessage, "OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if (alert != NULL) {
+			alert->SetShortcut(0, B_ESCAPE);
+			alert->Go();
+			return;
+		}
+	}
+
+	ERROR("Root::_ShowError(): %s\n", errorMessage);
 }

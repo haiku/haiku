@@ -9,6 +9,8 @@
 #define PACKAGE_H
 
 
+#include <set>
+
 #include <Entry.h>
 #include <Node.h>
 #include <package/PackageInfo.h>
@@ -124,6 +126,7 @@ struct PackageNodeRefHashDefinition {
 
 typedef BOpenHashTable<PackageFileNameHashDefinition> PackageFileNameHashTable;
 typedef BOpenHashTable<PackageNodeRefHashDefinition> PackageNodeRefHashTable;
+typedef std::set<Package*> PackageSet;
 
 
 #endif	// PACKAGE_H
