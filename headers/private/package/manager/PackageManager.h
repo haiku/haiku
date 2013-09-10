@@ -82,6 +82,9 @@ public:
 			void				Update(const char* const* packages,
 									int packageCount);
 
+protected:
+			InstalledRepository& InstallationRepository();
+
 private:
 			void				_HandleProblems();
 			void				_AnalyzeResult();
@@ -99,8 +102,6 @@ private:
 							 		const BEntry& entry);
 			int32				_FindBasePackage(const PackageList& packages,
 									const BPackageInfo& info);
-
-			InstalledRepository& _InstallationRepository();
 
 			void				_AddInstalledRepository(
 									InstalledRepository* repository);

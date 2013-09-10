@@ -179,7 +179,7 @@ BPackageManager::Uninstall(const char* const* packages, int packageCount)
 
 	// determine the inverse base package closure for the found packages
 // TODO: Optimize!
-	InstalledRepository& installationRepository = _InstallationRepository();
+	InstalledRepository& installationRepository = InstallationRepository();
 	bool foundAnotherPackage;
 	do {
 		foundAnotherPackage = false;
@@ -274,6 +274,16 @@ BPackageManager::Update(const char* const* packages, int packageCount)
 }
 
 
+BPackageManager::InstalledRepository&
+BPackageManager::InstallationRepository()
+{
+	if (fInstalledRepositories.IsEmpty())
+		DIE("no installation repository");
+
+	return *fInstalledRepositories.LastItem();
+}
+
+
 void
 BPackageManager::_HandleProblems()
 {
@@ -295,7 +305,7 @@ BPackageManager::_AnalyzeResult()
 	if (error != B_OK)
 		DIE(error, "failed to compute packages to un/-install");
 
-	InstalledRepository& installationRepository = _InstallationRepository();
+	InstalledRepository& installationRepository = InstallationRepository();
 	PackageList& packagesToActivate
 		= installationRepository.PackagesToActivate();
 	PackageList& packagesToDeactivate
@@ -560,16 +570,6 @@ BPackageManager::_FindBasePackage(const PackageList& packages,
 	}
 
 	return -1;
-}
-
-
-BPackageManager::InstalledRepository&
-BPackageManager::_InstallationRepository()
-{
-	if (fInstalledRepositories.IsEmpty())
-		DIE("no installation repository");
-
-	return *fInstalledRepositories.LastItem();
 }
 
 
