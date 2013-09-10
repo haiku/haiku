@@ -211,6 +211,7 @@ public:
 
 	virtual	void				InitInstalledRepository(
 									InstalledRepository& repository) = 0;
+	virtual	void				ResultComputed(InstalledRepository& repository);
 
 	virtual	status_t			PrepareTransaction(Transaction& transaction)
 									= 0;

@@ -387,6 +387,8 @@ BPackageManager::_AnalyzeResult()
 		if (!packagesToActivate.AddItem(basePackage))
 			throw std::bad_alloc();
 	}
+
+	fInstallationInterface->ResultComputed(installationRepository);
 }
 
 
@@ -800,6 +802,13 @@ BPackageManager::Transaction::~Transaction()
 
 
 BPackageManager::InstallationInterface::~InstallationInterface()
+{
+}
+
+
+void
+BPackageManager::InstallationInterface::ResultComputed(
+	InstalledRepository& repository)
 {
 }
 
