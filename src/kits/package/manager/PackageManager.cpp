@@ -471,10 +471,12 @@ BPackageManager::_PreparePackageChanges(
 		RemoteRepository* remoteRepository
 			= dynamic_cast<RemoteRepository*>(package->Repository());
 		if (remoteRepository == NULL) {
-			// clone the existing package
-			_ClonePackageFile(
-				dynamic_cast<InstalledRepository*>(package->Repository()),
-				fileName, entry);
+			// clone the existing package (unless already present)
+			if (package->Repository() != &installationRepository) {
+				_ClonePackageFile(
+					dynamic_cast<InstalledRepository*>(package->Repository()),
+					fileName, entry);
+			}
 		} else {
 			// download the package
 			BString url = remoteRepository->Config().PackagesURL();
