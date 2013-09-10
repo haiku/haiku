@@ -753,6 +753,13 @@ BPackageManager::InstalledRepository::DisablePackage(BSolverPackage* package)
 
 
 bool
+BPackageManager::InstalledRepository::EnablePackage(BSolverPackage* package)
+{
+	return fDisabledPackages.RemoveItem(package);
+}
+
+
+bool
 BPackageManager::InstalledRepository::HasChanges() const
 {
 	return !fPackagesToActivate.IsEmpty() || !fPackagesToDeactivate.IsEmpty();

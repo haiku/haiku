@@ -167,6 +167,9 @@ public:
 									{ return fInitialPriority; }
 
 			void				DisablePackage(BSolverPackage* package);
+									// throws, if already disabled
+			bool				EnablePackage(BSolverPackage* package);
+									// returns whether it was disabled
 
 			PackageList&		PackagesToActivate()
 									{ return fPackagesToActivate; }
