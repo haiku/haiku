@@ -518,7 +518,9 @@ BPackageManager::_CommitPackageChanges(Transaction& transaction)
 	BDaemonClient::BCommitTransactionResult transactionResult;
 	status_t error = fInstallationInterface->CommitTransaction(transaction,
 		transactionResult);
-	if (error != B_OK) {
+	if (error != B_OK)
+		DIE(error, "failed to commit transaction");
+	if (transactionResult.Error() != B_OK) {
 		DIE("failed to commit transaction: %s",
 			transactionResult.FullErrorMessage().String());
 	}
