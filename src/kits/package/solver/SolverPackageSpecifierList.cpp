@@ -40,7 +40,7 @@ BSolverPackageSpecifierList::BSolverPackageSpecifierList()
 {
 }
 
-	
+
 BSolverPackageSpecifierList::BSolverPackageSpecifierList(
 	const BSolverPackageSpecifierList& other)
 	:
@@ -112,6 +112,22 @@ bool
 BSolverPackageSpecifierList::AppendSpecifier(const BString& selectString)
 {
 	return AppendSpecifier(BSolverPackageSpecifier(selectString));
+}
+
+
+bool
+BSolverPackageSpecifierList::AppendSpecifiers(const char* const* selectStrings,
+	int32 count)
+{
+	for (int32 i = 0; i < count; i++) {
+		if (!AppendSpecifier(selectStrings[i])) {
+			for (int32 k = i - 1; k >= 0; k--)
+				fSpecifiers->pop_back();
+			return false;
+		}
+	}
+
+	return true;
 }
 
 

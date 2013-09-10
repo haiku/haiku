@@ -31,6 +31,9 @@ public:
 									const BSolverPackageSpecifier& specifier);
 			bool				AppendSpecifier(BSolverPackage* package);
 			bool				AppendSpecifier(const BString& selectString);
+			bool				AppendSpecifiers(
+									const char* const* selectStrings,
+									int32 count);
 			void				MakeEmpty();
 
 			BSolverPackageSpecifierList& operator=(
