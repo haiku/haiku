@@ -46,6 +46,9 @@ public:
 			status_t			CommitTransaction(
 									const BActivationTransaction& transaction,
 									BCommitTransactionResult& _result);
+									// B_OK only means _result is initialized,
+									// not the success of committing the
+									// transaction
 
 			status_t			CreateTransaction(
 									BPackageInstallationLocation location,
