@@ -93,10 +93,8 @@ ProblemWindow::ProblemWindow()
 	viewPort->SetChildView(fContainerView = new BGroupView(B_VERTICAL, 0));
 
 	// set small scroll step (large step will be set by the view port)
-	BFont font;
-	topTextView->GetFont(&font);
 	font_height fontHeight;
-	font.GetHeight(&fontHeight);
+	topTextView->GetFontHeight(&fontHeight);
 	float smallStep = ceilf(fontHeight.ascent + fontHeight.descent);
 	viewPort->ScrollBar(B_VERTICAL)->SetSteps(smallStep, smallStep);
 }
