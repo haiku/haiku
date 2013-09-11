@@ -129,6 +129,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			TwoDimensionalLayout.cpp
 			View.cpp
 			ViewLayoutItem.cpp
+			ViewPort.cpp
 			Window.cpp
 			WindowStack.cpp
 			ZombieReplicantView.cpp
