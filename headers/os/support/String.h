@@ -55,7 +55,8 @@ public:
 			BString&		SetToChars(const BString& string, int32 charCount);
 			BString&		AdoptChars(BString& from, int32 charCount);
 
-			BString&		SetToFormat(const char* format, ...);
+			BString&		SetToFormat(const char* format, ...)
+								__attribute__((__format__(__printf__, 2, 3)));
 			BString&		SetToFormatVarArgs(const char* format,
 								va_list args);
 
