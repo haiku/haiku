@@ -27,8 +27,8 @@ using namespace BPackageKit;
 using BPackageKit::BManager::BPrivate::BFatalErrorException;
 
 
-static const int32 kRetryMessage = 'rtry';
-static const int32 kUpdateRetryButtonMessage = 'uprt';
+static const uint32 kRetryMessage = 'rtry';
+static const uint32 kUpdateRetryButtonMessage = 'uprt';
 
 
 struct ProblemWindow::Solution {
