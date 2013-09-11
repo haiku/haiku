@@ -30,6 +30,7 @@ using BPackageKit::BManager::BPrivate::BPackageManager;
 
 class Package;
 class ProblemWindow;
+class ResultWindow;
 class Root;
 class Volume;
 
@@ -95,8 +96,8 @@ private:
 			typedef std::map<Package*, BSolverPackage*> SolverPackageMap;
 
 private:
-			bool				_GetResultText(InstalledRepository& repository,
-									BString& _text);
+			bool				_AddResults(InstalledRepository& repository,
+									ResultWindow* window);
 
 			BSolverPackage*		_SolverPackageFor(Package* package) const;
 

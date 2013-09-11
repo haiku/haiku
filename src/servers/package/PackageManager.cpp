@@ -6,7 +6,6 @@
 
 #include "PackageManager.h"
 
-#include <Alert.h>
 #include <Notification.h>
 #include <package/DownloadFileRequest.h>
 #include <package/RefreshRepositoryRequest.h>
@@ -15,11 +14,13 @@
 #include <package/solver/SolverProblem.h>
 #include <package/solver/SolverProblemSolution.h>
 
+#include <AutoDeleter.h>
 #include <package/manager/Exceptions.h>
 #include <package/manager/RepositoryBuilder.h>
 #include <Server.h>
 
 #include "ProblemWindow.h"
+#include "ResultWindow.h"
 #include "Root.h"
 #include "Volume.h"
 
@@ -290,29 +291,27 @@ void
 PackageManager::ConfirmChanges(bool fromMostSpecific)
 {
 	// Check whether there are any changes other than those made by the user.
-	BString alertText(
-		"The following additional package changes have to be made:");
+	_InitGui();
+	ResultWindow* window = new ResultWindow;
+	ObjectDeleter<ResultWindow> windowDeleter(window);
+
 	bool hasOtherChanges = false;
 	int32 count = fInstalledRepositories.CountItems();
 	if (fromMostSpecific) {
 		for (int32 i = count - 1; i >= 0; i--)
 			hasOtherChanges
-				|= _GetResultText(*fInstalledRepositories.ItemAt(i), alertText);
+				|= _AddResults(*fInstalledRepositories.ItemAt(i), window);
 	} else {
 		for (int32 i = 0; i < count; i++)
 			hasOtherChanges
-				|= _GetResultText(*fInstalledRepositories.ItemAt(i), alertText);
+				|= _AddResults(*fInstalledRepositories.ItemAt(i), window);
 	}
 
 	if (!hasOtherChanges)
 		return;
 
-	// show an alert
-	_InitGui();
-	BAlert* alert = new BAlert("Package changes", alertText,
-       "Cancel", "Apply changes");
-	alert->SetShortcut(0, B_ESCAPE);
-	if (alert->Go() == 0)
+	// show the window
+	if (windowDeleter.Detach()->Go() == 0)
 		throw BAbortedByUserException();
 }
 
@@ -381,55 +380,15 @@ PackageManager::JobAborted(BJob* job)
 
 
 bool
-PackageManager::_GetResultText(InstalledRepository& repository,
-	BString& _text)
+PackageManager::_AddResults(InstalledRepository& repository,
+	ResultWindow* window)
 {
 	if (!repository.HasChanges())
 		return false;
 
-	bool hasOtherChanges = false;
-	bool isTargetLocation
-		= repository.Location() == fVolume->Location();
-
-	BString text = BString().SetToFormat("\n  in %s:",
-		repository.Name().String());
-
-	PackageList& packagesToActivate = repository.PackagesToActivate();
-	PackageList& packagesToDeactivate = repository.PackagesToDeactivate();
-
-	for (int32 i = 0; BSolverPackage* package = packagesToActivate.ItemAt(i);
-		i++) {
-		if (isTargetLocation
-			&& fPackagesAddedByUser.find(package)
-				!= fPackagesAddedByUser.end()) {
-			continue;
-		}
-
-		text << BString().SetToFormat(
-			"\n    install package %s from repository %s\n",
-			package->Info().FileName().String(),
-			package->Repository()->Name().String());
-		hasOtherChanges = true;
-	}
-
-	for (int32 i = 0; BSolverPackage* package = packagesToDeactivate.ItemAt(i);
-		i++) {
-		if (isTargetLocation
-			&& fPackagesRemovedByUser.find(package)
-				!= fPackagesRemovedByUser.end()) {
-			continue;
-		}
-
-		text << BString().SetToFormat(
-			"\n    uninstall package %s\n", package->VersionedName().String());
-		hasOtherChanges = true;
-	}
-
-	if (!hasOtherChanges)
-		return false;
-
-	_text << text;
-	return true;
+	return window->AddLocationChanges(repository.Name(),
+		repository.PackagesToActivate(), fPackagesAddedByUser,
+		repository.PackagesToDeactivate(), fPackagesRemovedByUser);
 }
 
 

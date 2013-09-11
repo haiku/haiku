@@ -12,6 +12,7 @@ Server package_daemon
 	PackageDaemon.cpp
 	PackageManager.cpp
 	ProblemWindow.cpp
+	ResultWindow.cpp
 	Root.cpp
 	Volume.cpp
 	:
