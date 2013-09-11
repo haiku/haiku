@@ -10,6 +10,7 @@
 #include <GroupView.h>
 #include <LayoutBuilder.h>
 #include <RadioButton.h>
+#include <ScrollView.h>
 #include <StringView.h>
 #include <package/solver/Solver.h>
 #include <package/solver/SolverPackage.h>
@@ -18,6 +19,7 @@
 
 #include <AutoLocker.h>
 #include <package/manager/Exceptions.h>
+#include <ViewPort.h>
 
 
 using namespace BPackageKit;
@@ -70,19 +72,33 @@ ProblemWindow::ProblemWindow()
 	if (fDoneSemaphore < 0)
 		throw std::bad_alloc();
 
+	BStringView* topTextView = NULL;
+	BViewPort* viewPort = NULL;
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.SetInsets(B_USE_SMALL_INSETS)
-		.Add(new BStringView(NULL,
+		.Add(topTextView = new BStringView(NULL,
 			"The following problems have been encountered. Please select a "
 			"solution for each:"))
-// TODO: Use a scroll view!
-		.Add(fContainerView = new BGroupView(B_VERTICAL, 0))
+		.Add(new BScrollView(NULL, viewPort = new BViewPort(), 0, false, true))
 		.AddGroup(B_HORIZONTAL)
 			.Add(fCancelButton = new BButton("Cancel", new BMessage(B_CANCEL)))
 			.AddGlue()
 			.Add(fRetryButton = new BButton("Retry",
 				new BMessage(kRetryMessage)))
 		.End();
+
+	topTextView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+
+	viewPort->SetChildView(fContainerView = new BGroupView(B_VERTICAL, 0));
+
+	// set small scroll step (large step will be set by the view port)
+	BFont font;
+	topTextView->GetFont(&font);
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
+	float smallStep = ceilf(fontHeight.ascent + fontHeight.descent);
+	viewPort->ScrollBar(B_VERTICAL)->SetSteps(smallStep, smallStep);
 }
 
 
