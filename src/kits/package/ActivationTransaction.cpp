@@ -41,12 +41,12 @@ BActivationTransaction::BActivationTransaction(BMessage* archive,
 	status_t error;
 	int32 location;
 	if ((error = archive->FindInt32("location", &location)) == B_OK
-		|| (error = archive->FindInt64("change count", &fChangeCount)) == B_OK
-		|| (error = archive->FindString("transaction",
+		&& (error = archive->FindInt64("change count", &fChangeCount)) == B_OK
+		&& (error = archive->FindString("transaction",
 			&fTransactionDirectoryName)) == B_OK
-		|| (error = _ExtractStringList(archive, "activate",
+		&& (error = _ExtractStringList(archive, "activate",
 			fPackagesToActivate)) == B_OK
-		|| (error = _ExtractStringList(archive, "deactivate",
+		&& (error = _ExtractStringList(archive, "deactivate",
 			fPackagesToDeactivate)) == B_OK) {
 		if (location >= 0
 			&& location <= B_PACKAGE_INSTALLATION_LOCATION_ENUM_COUNT) {
