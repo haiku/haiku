@@ -525,8 +525,15 @@ rule AddBootModuleSymlinksToContainer container : targets
 			Exit "ERROR: Add*ToContainer has not been invoked for it yet." ;
 		}
 
+		# chop off the system dir prefix from installDir
+		installDir = [ on $(installDir) return $(DIRECTORY_TOKENS) ] ;
+		local dummy ;
+		for dummy in $(systemDirTokens) {
+			installDir = $(installDir[2-]) ;
+		}
+
 		local name = $(target:BS) ;
-		local linkTarget = [ FDirName ../../.. $(installDir:G=) $(name) ] ;
+		local linkTarget = [ FDirName ../../.. $(installDir) $(name) ] ;
 
 		AddSymlinkToContainer $(container)
 			: $(systemDirTokens) add-ons kernel boot
