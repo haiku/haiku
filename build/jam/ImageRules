@@ -820,6 +820,62 @@ actions AddExtractFileToContainerExtractFilesScript
 }
 
 
+rule AddPackagesAndRepositoryVariablesToContainerScript script : container
+{
+	AddVariableToScript $(script) : downloadDir : $(HAIKU_DOWNLOAD_DIR) ;
+	AddTargetVariableToScript $(script) : <build>package ;
+	AddTargetVariableToScript $(script) : <build>get_package_dependencies
+		: getPackageDependencies ;
+
+	# Add a variable to indicate whether packages dependencies shall be
+	# resolved. We always want to do that in non-update mode, but also in update
+	# mode when all packages are updated.
+	local updateOnly
+		= [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] ;
+	local resolvePackageDependencies ;
+	if ( ! $(updateOnly) || $(HAIKU_UPDATE_ALL_PACKAGES) )
+		&& ! $(HAIKU_BOOTSTRAP_BUILD) {
+		resolvePackageDependencies = 1 ;
+	}
+	AddVariableToScript $(script) : resolvePackageDependencies
+		: $(resolvePackageDependencies) ;
+
+	# Add variables "systemPackages" and "commonPackages" with the packages
+	# copied/updated.
+	local allPackages = [ on $(container) return $(HAIKU_PACKAGES_IN_IMAGE) ] ;
+	if $(updateOnly) && ! [ IncludeAllTargetsInContainer $(container) ] {
+		allPackages = [ FilterContainerUpdateTargets $(allPackages)
+			: [ on $(container) return $(HAIKU_INCLUDE_IN_CONTAINER_VAR) ] ] ;
+	}
+
+	local systemPackages ;
+	local commonPackages ;
+	local package ;
+	for package in $(allPackages) {
+		if [ on $(package) return $(HAIKU_PACKAGE_INSTALLATION_LOCATION) ]
+				= system {
+			systemPackages += $(package) ;
+		} else {
+			commonPackages += $(package) ;
+		}
+	}
+
+	AddTargetVariableToScript $(script) : $(systemPackages) : systemPackages ;
+	AddTargetVariableToScript $(script) : $(commonPackages) : commonPackages ;
+
+	# Generate the repository package lists and add variables for the
+	# repositories.
+	local repository ;
+	local repositoryFiles ;
+	for repository in $(HAIKU_REPOSITORIES) {
+		repositoryFiles
+			+= [ on $(repository) return $(HAIKU_REPOSITORY_CACHE_FILE) ] ;
+	}
+
+	AddTargetVariableToScript $(script) : $(repositoryFiles) : repositories ;
+}
+
+
 #pragma mark - Haiku Image rules
 
 rule SetUpdateHaikuImageOnly flag

@@ -61,7 +61,6 @@ Always $(script) ;
 AddVariableToScript $(script) : sourceDir : $(HAIKU_TOP) ;
 AddVariableToScript $(script) : outputDir : $(HAIKU_OUTPUT_DIR) ;
 AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
-AddVariableToScript $(script) : downloadDir : $(HAIKU_DOWNLOAD_DIR) ;
 AddVariableToScript $(script) : installDir : $(HAIKU_INSTALL_DIR) ;
 #AddVariableToScript $(script) : isImage : 1 ;
 AddVariableToScript $(script) : imageSize : $(HAIKU_IMAGE_SIZE) ;
@@ -76,11 +75,8 @@ AddTargetVariableToScript $(script) : <build>fs_shell_command : fsShellCommand ;
 AddTargetVariableToScript $(script) : <build>copyattr ;
 AddTargetVariableToScript $(script) : <build>create_image : createImage ;
 AddTargetVariableToScript $(script) : <build>makebootable ;
-AddTargetVariableToScript $(script) : <build>package ;
 AddTargetVariableToScript $(script) : <build>rc ;
 AddTargetVariableToScript $(script) : <build>resattr ;
-AddTargetVariableToScript $(script) : <build>get_package_dependencies
-	: getPackageDependencies ;
 AddTargetVariableToScript $(script) : <build>unzip ;
 AddTargetVariableToScript $(script) : <build>vmdkimage ;
 if $(HOST_RM_ATTRS_TARGET) {
@@ -89,51 +85,8 @@ if $(HOST_RM_ATTRS_TARGET) {
 	AddVariableToScript $(script) : rmAttrs : rm ;
 }
 
-# Add a variable to indicate whether packages dependencies shall be resolved. We
-# always want to do that in non-update mode, but also in update mode when all
-# packages are updated.
-local resolvePackageDependencies ;
-if ( ! [ IsUpdateHaikuImageOnly ] || $(HAIKU_UPDATE_ALL_PACKAGES) )
-	&& ! $(HAIKU_BOOTSTRAP_BUILD) {
-	resolvePackageDependencies = 1 ;
-}
-AddVariableToScript $(script) : resolvePackageDependencies
-	: $(resolvePackageDependencies) ;
-
-# Add variables "systemPackages" and "commonPackages" with the packages
-# copied/updated.
-local container = $(HAIKU_IMAGE_CONTAINER_NAME) ;
-local allPackages = [ on $(container) return $(HAIKU_PACKAGES_IN_IMAGE) ] ;
-if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
-	&& ! [ IncludeAllTargetsInContainer $(container) ] {
-	allPackages = [ FilterContainerUpdateTargets $(allPackages)
-		: HAIKU_INCLUDE_IN_IMAGE ] ;
-}
-
-local systemPackages ;
-local commonPackages ;
-local package ;
-for package in $(allPackages) {
-	if [ on $(package) return $(HAIKU_PACKAGE_INSTALLATION_LOCATION) ]
-			= system {
-		systemPackages += $(package) ;
-	} else {
-		commonPackages += $(package) ;
-	}
-}
-
-AddTargetVariableToScript $(script) : $(systemPackages) : systemPackages ;
-AddTargetVariableToScript $(script) : $(commonPackages) : commonPackages ;
-
-# Generate the repository package lists and add variables for the repositories.
-local repository ;
-local repositoryFiles ;
-for repository in $(HAIKU_REPOSITORIES) {
-	repositoryFiles
-		+= [ on $(repository) return $(HAIKU_REPOSITORY_CACHE_FILE) ] ;
-}
-
-AddTargetVariableToScript $(script) : $(repositoryFiles) : repositories ;
+AddPackagesAndRepositoryVariablesToContainerScript $(script)
+	: $(HAIKU_IMAGE_CONTAINER_NAME) ;
 
 # create the other scripts
 HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;
