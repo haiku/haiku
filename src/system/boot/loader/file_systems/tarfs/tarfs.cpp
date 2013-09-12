@@ -109,7 +109,7 @@ private:
 
 class Directory : public ::Directory, public Entry {
 public:
-								Directory(const char* name);
+								Directory(Directory* parent, const char* name);
 	virtual						~Directory();
 
 	virtual	status_t			Open(void** _cookie, int mode);
@@ -136,10 +136,11 @@ public:
 									TarFS::Directory** _dir = NULL);
 			status_t			AddFile(tar_header* header);
 
-	private:
-		typedef ::Directory _inherited;
+private:
+			typedef ::Directory _inherited;
 
-		EntryList	fEntries;
+			Directory*			fParent;
+			EntryList			fEntries;
 };
 
 
@@ -329,8 +330,10 @@ TarFS::File::Inode() const
 
 // #pragma mark -
 
-TarFS::Directory::Directory(const char* name)
-	: TarFS::Entry(name)
+TarFS::Directory::Directory(Directory* parent, const char* name)
+	:
+	TarFS::Entry(name),
+	fParent(parent)
 {
 }
 
@@ -381,6 +384,11 @@ TarFS::Directory::GetName(char* nameBuffer, size_t bufferSize) const
 TarFS::Entry*
 TarFS::Directory::LookupEntry(const char* name)
 {
+	if (strcmp(name, ".") == 0)
+		return this;
+	if (strcmp(name, "..") == 0)
+		return fParent;
+
 	EntryIterator iterator(fEntries.GetIterator());
 
 	while (iterator.HasNext()) {
@@ -471,7 +479,7 @@ TarFS::Directory::AddDirectory(char* dirName, TarFS::Directory** _dir)
 			return B_ERROR;
 	} else {
 		// doesn't exist yet -- create it
-		dir = new(nothrow) TarFS::Directory(dirName);
+		dir = new(nothrow) TarFS::Directory(this, dirName);
 		if (!dir)
 			return B_NO_MEMORY;
 
@@ -624,7 +632,8 @@ TarFS::Symlink::Inode() const
 
 
 TarFS::Volume::Volume()
-	: TarFS::Directory("Boot from CD-ROM")
+	:
+	TarFS::Directory(this, "Boot from CD-ROM")
 {
 }
 
