@@ -49,8 +49,8 @@ RemotePackageRepository HaikuPorts
 	gperf-3.0.4-1
 	grep-2.14-5
 	groff-1.20.1-2
-#	haikuwebkit-1.1.3_2013_08_09-2
-#	haikuwebkit_devel-1.1.3_2013_08_09-2
+	haikuwebkit-1.1.3_2013_08_09-2
+	haikuwebkit_devel-1.1.3_2013_08_09-2
 	htmldoc-1.8.27-3
 	icu-4.8.1.1-4
 	icu_devel-4.8.1.1-4
@@ -96,7 +96,7 @@ RemotePackageRepository HaikuPorts
 	openssl-1.0.0j-3
 	openssl_devel-1.0.0j-3
 	p7zip-9.20.1-5
-#	pe-2.4.3_hg606-1
+	pe-2.4.3_hg606-1
 	perl-5.10.1-6
 	pkgconfig-0.27.1-1
 	python-2.6.8-5
@@ -111,7 +111,7 @@ RemotePackageRepository HaikuPorts
 	subversion_devel-1.6.18-6
 	tar-1.26-6
 	texinfo-4.13a-7
-#	vision-0.9.7.r944-1
+	vision-0.9.7.r945-1
 	wpa_supplicant-2.0-3
 	xz_utils-5.0.4-2
 	yasm-1.2.0-3
@@ -145,7 +145,7 @@ RemotePackageRepository HaikuPorts
 	gperf
 	grep
 	groff
-#	haikuwebkit
+	haikuwebkit
 	htmldoc
 	icu
 	jam
@@ -174,7 +174,7 @@ RemotePackageRepository HaikuPorts
 	openssh
 	openssl
 	p7zip
-#	pe
+	pe
 	perl
 	pkgconfig
 	python
@@ -187,7 +187,7 @@ RemotePackageRepository HaikuPorts
 	tar
 	texi2html
 	texinfo
-#	vision
+	vision
 	wpa_supplicant
 	yasm
 	xz_utils
