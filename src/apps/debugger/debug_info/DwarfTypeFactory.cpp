@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -767,14 +768,25 @@ DwarfTypeFactory::_CreateModifiedType(const BString& name,
 {
 	// Get the base type entry. If it is a modified type too or a typedef,
 	// collect all modifiers and iterate until hitting an actual base type.
-	DIEType* baseTypeEntry;
+	DIEType* baseTypeEntry = NULL;
+	DwarfType* baseType = NULL;
 	while (true) {
 		DIEModifiedType* baseTypeOwnerEntry = DwarfUtils::GetDIEByPredicate(
 			typeEntry, HasTypePredicate<DIEModifiedType>());
-		if (baseTypeOwnerEntry == NULL)
-			return B_BAD_VALUE;
-
-		baseTypeEntry = baseTypeOwnerEntry->GetType();
+		if (baseTypeOwnerEntry == NULL) {
+			if (typeEntry->GetType() == NULL) {
+				// in the case of a modified type that points to an
+				// unspecified type (i.e. const void* in C/C++),
+				// gcc appears to omit the base type attribute entirely.
+				status_t result = _CreateUnspecifiedType(name,
+					NULL, baseType);
+				if (result != B_OK)
+					return result;
+				break;
+			} else
+				return B_BAD_VALUE;
+		} else
+			baseTypeEntry = baseTypeOwnerEntry->GetType();
 
 		// resolve a typedef
 		if (baseTypeEntry->Tag() == DW_TAG_typedef) {
@@ -823,11 +835,13 @@ DwarfTypeFactory::_CreateModifiedType(const BString& name,
 		break;
 	}
 
-	// create the base type
-	DwarfType* baseType;
-	status_t error = CreateType(baseTypeEntry, baseType);
-	if (error != B_OK)
-		return error;
+	if (baseType == NULL) {
+		// create the base type
+		status_t error = CreateType(baseTypeEntry, baseType);
+		if (error != B_OK)
+			return error;
+	}
+
 	BReference<Type> baseTypeReference(baseType, true);
 
 	DwarfModifiedType* type = new(std::nothrow) DwarfModifiedType(fTypeContext,

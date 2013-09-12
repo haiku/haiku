@@ -13,6 +13,7 @@
 
 #include <module.h>
 #include <PCI.h>
+#include <PCI_x86.h>
 #include <USB3.h>
 #include <KernelExport.h>
 
@@ -24,6 +25,7 @@
 #define USB_MODULE_NAME	"xhci"
 
 pci_module_info *XHCI::sPCIModule = NULL;
+pci_x86_module_info *XHCI::sPCIx86Module = NULL;
 
 
 static int32
@@ -111,6 +113,8 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		fRegisterArea(-1),
 		fPCIInfo(info),
 		fStack(stack),
+		fIRQ(0),
+		fUseMSI(false),
 		fErstArea(-1),
 		fDcbaArea(-1),
 		fSpinlock(B_SPINLOCK_INITIALIZER),
@@ -256,10 +260,24 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		B_NORMAL_PRIORITY, (void *)this);
 	resume_thread(fEventThread);
 
+	// Find the right interrupt vector, using MSIs if available.
+	fIRQ = fPCIInfo->u.h0.interrupt_line;
+	if (sPCIx86Module != NULL && sPCIx86Module->get_msi_count(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function) >= 1) {
+		uint8 msiVector = 0;
+		if (sPCIx86Module->configure_msi(fPCIInfo->bus, fPCIInfo->device,
+				fPCIInfo->function, 1, &msiVector) == B_OK
+			&& sPCIx86Module->enable_msi(fPCIInfo->bus, fPCIInfo->device,
+				fPCIInfo->function) == B_OK) {
+			TRACE_ALWAYS("using message signaled interrupts\n");
+			fIRQ = msiVector;
+			fUseMSI = true;
+		}
+	}
+
 	// Install the interrupt handler
 	TRACE("installing interrupt handler\n");
-	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
-		InterruptHandler, (void *)this, 0);
+	install_io_interrupt_handler(fIRQ, InterruptHandler, (void *)this, 0);
 
 	memset(fPortSpeeds, 0, sizeof(fPortSpeeds));
 	memset(fPortSlots, 0, sizeof(fPortSlots));
@@ -281,14 +299,28 @@ XHCI::~XHCI()
 	delete_sem(fCmdCompSem);
 	delete_sem(fFinishTransfersSem);
 	delete_sem(fEventSem);
+	wait_for_thread(fFinishThread, &result);
+	wait_for_thread(fEventThread, &result);
+
+	remove_io_interrupt_handler(fIRQ, InterruptHandler, (void *)this);
+
 	delete_area(fRegisterArea);
 	delete_area(fErstArea);
 	for (uint32 i = 0; i < fScratchpadCount; i++)
 		delete_area(fScratchpadArea[i]);
 	delete_area(fDcbaArea);
-	wait_for_thread(fFinishThread, &result);
-	wait_for_thread(fEventThread, &result);
+
+	if (fUseMSI && sPCIx86Module != NULL) {
+		sPCIx86Module->disable_msi(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function);
+		sPCIx86Module->unconfigure_msi(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function);
+	}
 	put_module(B_PCI_MODULE_NAME);
+	if (sPCIx86Module != NULL) {
+		sPCIx86Module = NULL;
+		put_module(B_PCI_X86_MODULE_NAME);
+	}
 }
 
 
@@ -656,6 +688,14 @@ XHCI::AddTo(Stack *stack)
 		sPCIModule = NULL;
 		put_module(B_PCI_MODULE_NAME);
 		return B_NO_MEMORY;
+	}
+
+	// Try to get the PCI x86 module as well so we can enable possible MSIs.
+	if (sPCIx86Module == NULL && get_module(B_PCI_X86_MODULE_NAME,
+			(module_info **)&sPCIx86Module) != B_OK) {
+		// If it isn't there, that's not critical though.
+		TRACE_MODULE_ERROR("failed to get pci x86 module\n");
+		sPCIx86Module = NULL;
 	}
 
 	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {

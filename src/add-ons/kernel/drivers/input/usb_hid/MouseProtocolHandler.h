@@ -23,7 +23,7 @@ class HIDReportItem;
 class MouseProtocolHandler : public ProtocolHandler {
 public:
 								MouseProtocolHandler(HIDReport &report,
-									bool tablet, HIDReportItem &xAxis,
+									HIDReportItem &xAxis,
 									HIDReportItem &yAxis);
 
 	static	void				AddHandlers(HIDDevice &device,
@@ -37,7 +37,6 @@ private:
 			status_t			_ReadReport(void *buffer);
 
 			HIDReport &			fReport;
-			bool				fTablet;
 
 			HIDReportItem &		fXAxis;
 			HIDReportItem &		fYAxis;

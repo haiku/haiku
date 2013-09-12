@@ -725,7 +725,7 @@ DwarfCompoundType::ResolveBaseTypeLocation(BaseType* _baseType,
 		return B_BAD_VALUE;
 
 	return _ResolveDataMemberLocation(baseType->GetDwarfType(),
-		baseType->Entry()->Location(), parentLocation, _location);
+		baseType->Entry()->Location(), parentLocation, false, _location);
 }
 
 
@@ -738,17 +738,23 @@ DwarfCompoundType::ResolveDataMemberLocation(DataMember* _member,
 		return B_BAD_VALUE;
 	DwarfTypeContext* typeContext = TypeContext();
 
+	bool isBitField = true;
+	DIEMember* memberEntry = member->Entry();
+	// TODO: handle DW_AT_data_bit_offset
+	if (!memberEntry->ByteSize()->IsValid()
+		&& !memberEntry->BitOffset()->IsValid()
+		&& !memberEntry->BitSize()->IsValid()) {
+		isBitField = false;
+	}
+
 	ValueLocation* location;
 	status_t error = _ResolveDataMemberLocation(member->GetDwarfType(),
-		member->Entry()->Location(), parentLocation, location);
+		member->Entry()->Location(), parentLocation, isBitField, location);
 	if (error != B_OK)
 		return error;
 
 	// If the member isn't a bit field, we're done.
-	DIEMember* memberEntry = member->Entry();
-	if (!memberEntry->ByteSize()->IsValid()
-		&& !memberEntry->BitOffset()->IsValid()
-		&& !memberEntry->BitSize()->IsValid()) {
+	if (!isBitField) {
 		_location = location;
 		return B_OK;
 	}
@@ -861,7 +867,8 @@ DwarfCompoundType::AddTemplateParameter(DwarfTemplateParameter* parameter)
 status_t
 DwarfCompoundType::_ResolveDataMemberLocation(DwarfType* memberType,
 	const MemberLocation* memberLocation,
-	const ValueLocation& parentLocation, ValueLocation*& _location)
+	const ValueLocation& parentLocation, bool isBitField,
+	ValueLocation*& _location)
 {
 	// create the value location object for the member
 	ValueLocation* location = new(std::nothrow) ValueLocation(
@@ -873,9 +880,18 @@ DwarfCompoundType::_ResolveDataMemberLocation(DwarfType* memberType,
 	switch (memberLocation->attributeClass) {
 		case ATTRIBUTE_CLASS_CONSTANT:
 		{
-			if (!location->SetTo(parentLocation, memberLocation->constant * 8,
+			if (isBitField) {
+				if (!location->SetTo(parentLocation,
+					memberLocation->constant * 8,
 					memberType->ByteSize() * 8)) {
-				return B_NO_MEMORY;
+					return B_NO_MEMORY;
+				}
+			} else {
+				if (!location->SetToByteOffset(parentLocation,
+					memberLocation->constant,
+					memberType->ByteSize())) {
+					return B_NO_MEMORY;
+				}
 			}
 
 			break;

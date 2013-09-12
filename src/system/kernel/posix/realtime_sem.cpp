@@ -946,7 +946,7 @@ _user_realtime_sem_open(const char* userName, int openFlagsOrShared,
 
 	// open the semaphore
 	sem_t* usedUserSem;
-	bool created;
+	bool created = false;
 	int32_t id;
 	error = context->OpenSem(name, openFlagsOrShared, mode, semCount, userSem,
 		usedUserSem, id, created);

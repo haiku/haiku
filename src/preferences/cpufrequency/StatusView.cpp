@@ -483,9 +483,12 @@ void
 StatusView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
-	else
+	if (Parent()) {
+		if ((Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0)
+			SetViewColor(B_TRANSPARENT_COLOR);
+		else
+			SetViewColor(Parent()->ViewColor());
+	} else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	SetLowColor(ViewColor());
@@ -590,10 +593,10 @@ StatusView::Draw(BRect updateRect)
 	GetFontHeight(&fontHeight);
 	float height = fontHeight.ascent + fontHeight.descent;
 
-	if (be_control_look != NULL)
+	if (be_control_look != NULL) {
 		be_control_look->DrawLabel(this, fFreqString.String(),
-			this->ViewColor(), 0, BPoint(0, height));
-	else {
+			Parent()->ViewColor(), 0, BPoint(0, height));
+	} else {
 		MovePenTo(0, height);
 		DrawString(fFreqString.String());
 	}

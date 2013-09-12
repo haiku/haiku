@@ -4,9 +4,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
- *		John Scipione <jscipione@gmail.com>
- *		Timothy Wayper <timmy@wunderbear.com>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Timothy Wayper, timmy@wunderbear.com
  */
 #ifndef _CALC_WINDOW_H
 #define _CALC_WINDOW_H

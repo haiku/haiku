@@ -36,6 +36,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
 }
 
+AddFilesToPackage add-ons kernel busses random : virtio_rng ;
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToPackage add-ons kernel busses virtio : virtio_pci ;
@@ -64,8 +65,7 @@ AddNewDriversToPackage power		: acpi_battery@x86 ;
 #AddNewDriversToPackage display		: display_controls@x86 ;
 
 # legacy drivers
-AddDriversToPackage					: console dprintf null random <driver>tty
-										zero ;
+AddDriversToPackage					: console dprintf null <driver>tty zero ;
 AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
@@ -280,14 +280,14 @@ AddFilesToPackage add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 
 AddFilesToPackage add-ons Tracker
-	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O
-		Open\ Terminal-T ZipOMatic-Z ;
+	: FileType Mark\ as… Mark\ as\ Read Open\ Target\ Folder
+		Open\ Terminal ZipOMatic ;
 AddSymlinkToPackage add-ons Tracker
-	: /boot/system/preferences/Backgrounds : Background-B ;
+	: /boot/system/preferences/Backgrounds : Background ;
 AddSymlinkToPackage add-ons Tracker
-	: /boot/system/apps/TextSearch : TextSearch-G ;
+	: /boot/system/apps/TextSearch : TextSearch ;
 AddSymlinkToPackage add-ons Tracker
-	: /boot/system/apps/DiskUsage : DiskUsage-I ;
+	: /boot/system/apps/DiskUsage : DiskUsage ;
 
 AddFilesToPackage add-ons input_server devices
 	: <input>keyboard <input>mouse <input>tablet <input>wacom ;

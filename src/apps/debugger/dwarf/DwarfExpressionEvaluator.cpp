@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -600,18 +601,21 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 
 			case DW_OP_call2:
 				TRACE_EXPR("  DW_OP_call2\n");
-				_Call(fDataReader.Read<uint16>(0), true);
+				_Call(fDataReader.Read<uint16>(0), dwarf_reference_type_local);
 				break;
 			case DW_OP_call4:
 				TRACE_EXPR("  DW_OP_call4\n");
-				_Call(fDataReader.Read<uint32>(0), true);
+				_Call(fDataReader.Read<uint32>(0), dwarf_reference_type_local);
 				break;
 			case DW_OP_call_ref:
 				TRACE_EXPR("  DW_OP_call_ref\n");
-				if (fContext->AddressSize() == 4)
-					_Call(fDataReader.Read<uint32>(0), false);
-				else
-					_Call(fDataReader.Read<uint64>(0), false);
+				if (fContext->AddressSize() == 4) {
+					_Call(fDataReader.Read<uint32>(0),
+						dwarf_reference_type_global);
+				} else {
+					_Call(fDataReader.Read<uint64>(0),
+						dwarf_reference_type_global);
+				}
 				break;
 
 			case DW_OP_piece:
@@ -628,6 +632,40 @@ DwarfExpressionEvaluator::_Evaluate(ValuePieceLocation* _piece)
 				TRACE_EXPR("  DW_OP_nop\n");
 				break;
 
+			case DW_OP_implicit_value:
+			{
+				TRACE_EXPR("  DW_OP_implicit_value\n");
+				if (_piece == NULL) {
+					throw EvaluationException(
+						"DW_OP_implicit_value in non-location expression");
+				}
+				uint32 length = fDataReader.ReadUnsignedLEB128(0);
+				if (length == 0)
+					return B_BAD_DATA;
+
+				if (fDataReader.BytesRemaining() < length)
+					return B_BAD_DATA;
+
+				if (!_piece->SetToValue(fDataReader.Data(), length))
+					return B_NO_MEMORY;
+
+				return B_OK;
+			}
+			case DW_OP_stack_value:
+			{
+				TRACE_EXPR("  DW_OP_stack_value\n");
+				if (_piece == NULL) {
+					throw EvaluationException(
+						"DW_OP_stack_value in non-location expression");
+				}
+				if (fStackSize == 0)
+					return B_BAD_DATA;
+				target_addr_t value = _Pop();
+				if (!_piece->SetToValue(&value, sizeof(target_addr_t)))
+					return B_NO_MEMORY;
+
+				return B_OK;
+			}
 			default:
 				if (opcode >= DW_OP_lit0 && opcode <= DW_OP_lit31) {
 					TRACE_EXPR("  DW_OP_lit%u\n", opcode - DW_OP_lit0);
@@ -746,7 +784,7 @@ DwarfExpressionEvaluator::_PushRegister(uint32 reg, target_addr_t offset)
 
 
 void
-DwarfExpressionEvaluator::_Call(uint64 offset, bool local)
+DwarfExpressionEvaluator::_Call(uint64 offset, uint8 refType)
 {
 	if (fDataReader.HasOverflow())
 		throw EvaluationException("unexpected end of expression");
@@ -754,7 +792,7 @@ DwarfExpressionEvaluator::_Call(uint64 offset, bool local)
 	// get the expression to "call"
 	const void* block;
 	off_t size;
-	if (fContext->GetCallTarget(offset, local, block, size) != B_OK)
+	if (fContext->GetCallTarget(offset, refType, block, size) != B_OK)
 		throw EvaluationException("failed to get call target");
 
 	// no expression is OK, then this is just a no-op

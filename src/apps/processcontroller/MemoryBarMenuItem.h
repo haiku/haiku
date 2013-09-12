@@ -36,17 +36,17 @@ class MemoryBarMenuItem : public BMenuItem {
 
 		void			DrawIcon();
 		void			DrawBar(bool force);
-		int				UpdateSituation(int64 commitedMemory);
+		int				UpdateSituation(int64 committedMemory);
 		void			BarUpdate();
 		void			Init();
 		void			Reset(char* name, team_id team, BBitmap* icon, bool deleteIcon);
 
 	private:
 		int64			fPhysicalMemory;
-		int64			fCommitedMemory;
+		int64			fCommittedMemory;
 		int64			fWriteMemory;
 		int64			fAllMemory;
-		int64			fLastCommited;
+		int64			fLastCommitted;
 		int64			fLastWrite;
 		int64			fLastAll;
 		team_id			fTeamID;

@@ -1,8 +1,7 @@
-1	english	x-vnd.Haiku-ActivityMonitor	3704566709
+1	english	x-vnd.Haiku-ActivityMonitor	234995750
 P-faults	DataSource		页面错误
 Media nodes	DataSource		媒介节点
 Threads	DataSource		线程
-MB	DataSource		MB
 Add graph	ActivityWindow		添加图示
 Teams	DataSource		团队
 Hide legend	ActivityView		隐藏说明
@@ -27,7 +26,6 @@ TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		退出
 Block cache memory	DataSource		高速缓存
 Remove graph	ActivityView		删除图示
-%.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		CPU使用率
@@ -43,6 +41,5 @@ File	ActivityWindow		文件
 usage	DataSource		使用情况
 Additional items	ActivityView		附加项
 Network receive	DataSource		网络接收
-%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		内存
 RX	DataSource	Shorter version for Receiving.	RX

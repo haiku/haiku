@@ -210,7 +210,7 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 							strerror(error));
 					return error;
 				}
-				error = valueLoader->LoadValue(memberLocation, valueType,
+				error = valueLoader->LoadValue(memberLocation, B_UINT32_TYPE,
 					false, what);
 				if (error != B_OK)
 					return error;

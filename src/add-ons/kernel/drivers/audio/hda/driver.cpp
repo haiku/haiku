@@ -15,6 +15,7 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 hda_controller gCards[MAX_CARDS];
 uint32 gNumCards;
 pci_module_info* gPci;
+pci_x86_module_info* gPCIx86Module;
 
 
 extern "C" status_t
@@ -82,6 +83,10 @@ init_driver(void)
 		return ENODEV;
 	}
 
+	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&gPCIx86Module)
+			!= B_OK)
+		gPCIx86Module = NULL;
+
 	return B_OK;
 }
 
@@ -99,8 +104,12 @@ uninit_driver(void)
 		free((void*)gCards[i].devfs_path);
 		gCards[i].devfs_path = NULL;
 	}
-	
+
 	put_module(B_PCI_MODULE_NAME);
+	if (gPCIx86Module != NULL) {
+		put_module(B_PCI_X86_MODULE_NAME);
+		gPCIx86Module = NULL;
+	}
 }
 
 

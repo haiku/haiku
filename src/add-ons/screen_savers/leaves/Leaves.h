@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -14,8 +14,6 @@
 #include <ScreenSaver.h>
 
 
-class BSlider;
-
 class Leaves : public BScreenSaver, public BHandler {
 public:
 						Leaves(BMessage* archive, image_id id);
@@ -28,9 +26,6 @@ public:
 	virtual	void		MessageReceived(BMessage* message);
 
 private:
-			BSlider*	fDropRateSlider;
-			BSlider*	fLeafSizeSlider;
-			BSlider*	fSizeVariationSlider;
 			int32		fDropRate;
 			int32		fLeafSize;
 			int32		fSizeVariation;
@@ -38,5 +33,5 @@ private:
 	inline	BPoint		_RandomPoint(const BRect& bound);
 };
 
-#endif	// _LEAVES_H_
 
+#endif	// _LEAVES_H_

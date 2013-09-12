@@ -39,9 +39,9 @@ KernelMemoryBarMenuItem::KernelMemoryBarMenuItem(system_info& systemInfo)
 	fLastSum = -1;
 	fGrenze1 = -1;
 	fGrenze2 = -1;
-	fPhysicalMemory = systemInfo.max_pages * B_PAGE_SIZE / 1024LL;
-	fCommittedMemory = systemInfo.used_pages * B_PAGE_SIZE / 1024LL;
-	fCachedMemory = systemInfo.cached_pages * B_PAGE_SIZE / 1024LL;
+	fPhysicalMemory = (int64)systemInfo.max_pages * B_PAGE_SIZE / 1024LL;
+	fCommittedMemory = (int64)systemInfo.used_pages * B_PAGE_SIZE / 1024LL;
+	fCachedMemory = (int64)systemInfo.cached_pages * B_PAGE_SIZE / 1024LL;
 }
 
 

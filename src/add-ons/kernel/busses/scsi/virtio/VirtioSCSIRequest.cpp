@@ -181,7 +181,7 @@ VirtioSCSIRequest::FillRequest(uint32 inCount, uint32 outCount,
 	entries[outCount].address = entries[0].address
 		+ sizeof(struct virtio_scsi_cmd_req);
 	entries[outCount].size = sizeof(struct virtio_scsi_cmd_resp);
-	
+
 	if (inCount > 1) {
 		memcpy(entries + outCount + 1, fCCB->sg_list, fCCB->sg_count
 			* sizeof(physical_entry));

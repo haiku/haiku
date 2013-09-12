@@ -37,8 +37,9 @@ public:
 	virtual	bool				GetTLSAddress(target_addr_t localAddress,
 									target_addr_t& _address) = 0;
 
-	virtual	status_t			GetCallTarget(uint64 offset, bool local,
-									const void*& _block, off_t& _size) = 0;
+	virtual	status_t			GetCallTarget(uint64 offset,
+									uint8 refType, const void*& _block,
+									off_t& _size) = 0;
 									// returns error, when an error resolving
 									// the entry occurs; returns B_OK and a NULL
 									// block, when the entry doesn't have a
@@ -81,7 +82,7 @@ private:
 			void				_DereferenceAddressSpaceAddress(
 									uint8 addressSize);
 			void				_PushRegister(uint32 reg, target_addr_t offset);
-			void				_Call(uint64 offset, bool local);
+			void				_Call(uint64 offset, uint8 refType);
 
 private:
 			DwarfExpressionEvaluationContext* fContext;

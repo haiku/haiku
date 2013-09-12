@@ -92,3 +92,5 @@ resource mini_icon array {
 };
 
 #endif	// HAIKU_TARGET_PLATFORM_HAIKU
+
+resource(100, "BEOS:default_shortcut") "O";

@@ -857,7 +857,7 @@ BTextControl::LayoutAlignment()
 
 	_ValidateLayoutData();
 	return BLayoutUtils::ComposeAlignment(ExplicitAlignment(),
-		BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET));
+		BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
 }
 
 

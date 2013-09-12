@@ -444,28 +444,34 @@ BMenuItem::DrawContent()
 void
 BMenuItem::Draw()
 {
-	rgb_color lowColor = fSuper->LowColor();
+	const rgb_color lowColor = fSuper->LowColor();
+	const rgb_color highColor = fSuper->HighColor();
 
 	bool enabled = IsEnabled();
 	bool selected = IsSelected();
+	bool activated = selected && (enabled || Submenu() != NULL);
 
-	// set low color and fill background if selected
-	bool activated = selected && (enabled || Submenu());
+	// set low color
 	if (activated) {
-		BRect rect = Frame();
-		be_control_look->DrawMenuItemBackground(fSuper, rect, rect,
-			ui_color(B_MENU_SELECTED_BACKGROUND_COLOR),
-			BControlLook::B_ACTIVATED);
-	}
+		fSuper->SetLowColor(ui_color(B_MENU_SELECTED_BACKGROUND_COLOR));
+		// fill in the background
+		BRect rect(Frame());
+		be_control_look->DrawMenuItemBackground(fSuper, rect, Frame(),
+			fSuper->LowColor(), BControlLook::B_ACTIVATED);
+	} else
+		fSuper->SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
 
 	// set high color
-	if (activated)
+	if (activated && enabled)
 		fSuper->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
 	else if (enabled)
 		fSuper->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 	else {
-		// TODO: Use a lighten tint if the menu uses a dark background
-		fSuper->SetHighColor(tint_color(lowColor, B_DISABLED_LABEL_TINT));
+		rgb_color bgColor = fSuper->LowColor();
+		if (bgColor.red + bgColor.green + bgColor.blue > 128 * 3)
+			fSuper->SetHighColor(tint_color(bgColor, B_DISABLED_LABEL_TINT));
+		else
+			fSuper->SetHighColor(tint_color(bgColor, B_LIGHTEN_2_TINT));
 	}
 
 	// draw content
@@ -485,7 +491,9 @@ BMenuItem::Draw()
 			_DrawSubmenuSymbol();
 	}
 
+	// restore the parent menu's low color and high color
 	fSuper->SetLowColor(lowColor);
+	fSuper->SetHighColor(highColor);
 }
 
 

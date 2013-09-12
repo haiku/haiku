@@ -17,6 +17,7 @@ MergeObject Debugger_dwarf.o
 	AbbreviationTable.cpp
 	AttributeClasses.cpp
 	AttributeValue.cpp
+	BaseUnit.cpp
 	CfaContext.cpp
 	CfaRuleSet.cpp
 	CompilationUnit.cpp
@@ -29,5 +30,6 @@ MergeObject Debugger_dwarf.o
 	DwarfUtils.cpp
 	LineNumberProgram.cpp
 	SourceLanguageInfo.cpp
+	TypeUnit.cpp
 	TagNames.cpp
 ;

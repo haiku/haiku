@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1638733886
+1	swedish	x-vnd.Haiku-libtracker	1762695842
 common	B_COMMON_DIRECTORY		gemensam
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
@@ -143,6 +143,7 @@ Add-ons	ContainerWindow		Tillägg
 Edit templates…	TemplatesMenu		Redigera mallar...
 Finish: %time - Over %finishtime left	StatusWindow		Klar: %time - Över %finishtime kvar
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ett objekt med namnet "%name" finns redan i denna katalog. Vill du ersätta det med den symboliska länken du skapar?
+Fewer options	FindPanel		Färre alternativ
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Det finns inte tillräckligt ledig minne på destinationsdisken för att kopiera markeringen.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunde inte öppna "%document" med programmet "%app" (%error).
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Ledsen, att spara mer än ett objekt är inte tillåtet.
@@ -236,6 +237,7 @@ Temporary	FindPanel		Tillfällig
 Version	OpenWithWindow		Version
 Default application	InfoWindow		Förvalt program
 Preparing to copy items…	StatusWindow		Förbereder kopiering av objekt...
+Save query as template…	FindPanel		Spara sökning som mall…
 Show folder location in title tab	SettingsView		Visa katalogplats i fönsterfliken
 Proceed	FSUtils		Fortsätt
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Vissa objekt finns redan i denna katalog med samma namn som de objekt du %verb.\n\nVill du ersätta dem med de du %verb eller bli tillfrågad för var och en?
@@ -334,6 +336,7 @@ The specified name is already used as the name of a folder. Please choose anothe
 Clean up	ContainerWindow		Rada upp
 after	FindPanel		efter
 Select…	QueryContainerWindow		Markera...
+More options	FindPanel		Fler alternativ
 link	FSUtils	filename link	länk
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		I %func \nfind_directory() misslyckades. \nOrsak: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Det valda namnet är otillåtet. Var god välj ett annat namn.
@@ -445,6 +448,7 @@ contains	FindPanel		innehåller
 Relation	OpenWithWindow		Relation
 Open	FilePanelPriv		Öppna
 Mount	DeskWindow		Montera
+Recent queries	FindPanel		Senaste frågor
 Mount	ContainerWindow		Montera
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used använt -- %free ledigt)
 Cancel	FSClipBoard		Avbryt

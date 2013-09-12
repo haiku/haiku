@@ -4,10 +4,10 @@ Negative:	TimeFormatSettings		負表記:
 already chosen	LanguageListView		すでに選択済
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		使用できる言語が見つかりません！このプレフレットは使用できません！
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		変更を有効にするために、DeskbarとTrackerを再起動する必要があります。今すぐ再起動してよいですか?
-Long format:	TimeFormatSettings		長い形式：
+Long format:	TimeFormatSettings		長い形式:
 Currency	TimeFormatSettings		通貨
 Locale	System name		ロケール
-Short format:	TimeFormatSettings		短い形式：
+Short format:	TimeFormatSettings		短い形式:
 Language	Locale Preflet Window		言語
 Preferred languages	Locale Preflet Window		言語の優先順位
 Use month/day-names from preferred language	TimeFormatSettings		優先する言語の月/日の名前を使用する

@@ -2,12 +2,12 @@
 GMT (UNIX compatible)	Time		GMT (UNIX 互換)
 OK	Time		OK
 Asia	Time		アジア
-\nNow: 	Time		 \n現在：
+\nNow: 	Time		 \n現在:
 Africa	Time		アフリカ
 Stop	Time		中断
 Could not contact server	Time		サーバーに接続できませんでした。
 Australia	Time		オーストラリア
-Preview time:	Time		プレビュー：
+Preview time:	Time		プレビュー:
 Synchronize	Time		同期
 Revert	Time		元に戻す
 Pacific	Time		太平洋
@@ -32,14 +32,14 @@ Time	System name		日付と時間
 America	Time		アメリカ
 Reset	Time		リセット
 Synchronize at boot	Time		システム起動時に同期する
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date  作者：\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date  作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		不正な時間を受け取りました
 Antarctica	Time		南極
 Show time zone	Time		タイムゾーンを表示
 Show clock in Deskbar	Time		Deskbar に時計を表示
 The following error occured while synchronizing:r\n%s: %s	Time		同期中に次のエラーが発生しました\n%s: %s
 <Other>	Time		<その他>
-Current time:	Time		現在時刻：
+Current time:	Time		現在時刻:
 Try all servers	Time		すべてのサーバーを試す
 Time zone	Time		タイムゾーン
 Could not create socket	Time		ソケットを作成できませんでした。

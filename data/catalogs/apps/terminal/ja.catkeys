@@ -88,7 +88,7 @@ Edit	Terminal TermWindow		編集
 Color:	Terminal AppearancePrefView		色:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンはウィンドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
 Print	Terminal TermWindow		印刷
-Use text:	Terminal FindWindow		テキスト指定：
+Use text:	Terminal FindWindow		テキスト指定:
 Cancel	Terminal TermWindow		中止
 OK	Terminal TermApp		OK
 Find failed	Terminal TermWindow		見つかりませんでした

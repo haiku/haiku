@@ -45,3 +45,4 @@ resource vector_icon {
 	$"000A09010C023C00000000000000003C000048B00048F000"
 };
 
+resource(100, "BEOS:default_shortcut") "G";

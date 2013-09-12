@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src apps patchbay ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SimpleTest PatchBay
+	:
+	PatchApp.cpp
+	PatchWin.cpp
+	PatchView.cpp
+	PatchRow.cpp
+	EndpointInfo.cpp
+	MidiEventMeter.cpp
+	:
+	midi midi2 be libicon.a $(TARGET_LIBSTDC++)
+	:
+	PatchBay.rdef
+;
+

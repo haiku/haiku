@@ -1095,14 +1095,17 @@ HTML5DrawingEngine::_ExtractBitmapRegions(ServerBitmap& bitmap, uint32 options,
 			bitmaps[i] = new(std::nothrow) UtilityBitmap(
 				BRect(0, 0, targetWidth - 1, targetHeight - 1),
 				bitmap.ColorSpace(), 0);
-			if (bitmaps[i] == NULL)
-				result = B_NO_MEMORY;
 
-			result = bitmaps[i]->ImportBits(bitmap.Bits(), bitmap.BitsLength(),
-				bitmap.BytesPerRow(), bitmap.ColorSpace(), sourceRect.LeftTop(),
-				BPoint(0, 0), targetWidth, targetHeight);
-			if (result != B_OK)
-				delete bitmaps[i];
+			if (bitmaps[i] == NULL) {
+				result = B_NO_MEMORY;
+			} else {
+				result = bitmaps[i]->ImportBits(bitmap.Bits(), bitmap.BitsLength(),
+					bitmap.BytesPerRow(), bitmap.ColorSpace(), sourceRect.LeftTop(),
+					BPoint(0, 0), targetWidth, targetHeight);
+
+				if (result != B_OK)
+					delete bitmaps[i];
+			}
 		}
 
 		if (result != B_OK) {

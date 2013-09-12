@@ -72,7 +72,7 @@ public:
 									int32 what, const char* property);
 	virtual	status_t			GetSupportedSuites(BMessage* data);
 
-	virtual	void				MakeFocus(bool state = true);
+	virtual	void				MakeFocus(bool focused = true);
 	virtual	void				AllAttached();
 	virtual	void				AllDetached();
 
@@ -92,6 +92,8 @@ private:
 									BMessage* archive = NULL);
 			void				_LayoutView();
 			void				_InitOffscreen();
+			void				_InvalidateSelector(int16 ramp,
+									rgb_color color, bool focused);
 			void				_DrawColorArea(BView* target, BRect update);
 			void				_DrawSelectors(BView* target);
 			void				_DrawColorRamp(BRect rect, BView* target,
@@ -124,8 +126,9 @@ private:
 			BBitmap*			fBitmap;
 			BView*				fOffscreenView;
 
-			int32				fFocusedComponent;	
-			uint32				_reserved[2];	
+			int16				fFocusedRamp;
+			int16				fClickedRamp;
+			uint32				_reserved[2];
 };
 
 inline void

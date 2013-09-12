@@ -191,6 +191,8 @@ pci_mech2_get_max_bus_devices(void *cookie, int32 *count)
 
 
 addr_t sPCIeBase = 0;
+uint8 sStartBusNumber;
+uint8 sEndBusNumber;
 #define PCIE_VADDR(base, bus, slot, func, reg)  ((base) + \
 	((((bus) & 0xff) << 20) | (((slot) & 0x1f) << 15) |   \
     (((func) & 0x7) << 12) | ((reg) & 0xfff)))
@@ -199,6 +201,12 @@ static status_t
 pci_mechpcie_read_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 					  uint16 offset, uint8 size, uint32 *value)
 {
+	// fallback to mechanism 1 for out of range busses
+	if (bus < sStartBusNumber || bus > sEndBusNumber) {
+		return pci_mech1_read_config(cookie, bus, device, function, offset,
+			size, value);
+	}
+
 	status_t status = B_OK;
 
 	addr_t address = PCIE_VADDR(sPCIeBase, bus, device, function, offset);
@@ -225,6 +233,12 @@ static status_t
 pci_mechpcie_write_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 					   uint16 offset, uint8 size, uint32 value)
 {
+	// fallback to mechanism 1 for out of range busses
+	if (bus < sStartBusNumber || bus > sEndBusNumber) {
+		return pci_mech1_write_config(cookie, bus, device, function, offset,
+			size, value);
+	}
+
 	status_t status = B_OK;
 
 	addr_t address = PCIE_VADDR(sPCIeBase, bus, device, function, offset);
@@ -360,6 +374,8 @@ pci_controller_init(void)
 							| B_KERNEL_WRITE_AREA, (void **)&sPCIeBase);
 					if (mcfgArea < 0)
 						break;
+					sStartBusNumber = alloc->StartBusNumber;
+					sEndBusNumber = alloc->EndBusNumber;
 					dprintf("PCI: mechanism pcie controller found\n");
 					return pci_controller_add(&pci_controller_x86_mechpcie,
 						NULL);
@@ -399,5 +415,3 @@ pci_controller_init(void)
 	dprintf("PCI: no configuration mechanism found\n");
 	return B_ERROR;
 }
-
-

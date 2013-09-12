@@ -328,6 +328,7 @@ private:
 									DwarfType* memberType,
 									const MemberLocation* memberLocation,
 									const ValueLocation& parentLocation,
+									bool isBitField,
 									ValueLocation*& _location);
 
 private:

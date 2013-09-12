@@ -30,6 +30,8 @@ extern "C" {
 
 struct root_device_softc {
 	struct pci_info	pci_info;
+	bool			is_msi;
+	bool			is_msix;
 };
 
 enum {

@@ -118,7 +118,7 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	gmpObjDir=$objDir/gmp
 	cloogObjDir=$objDir/cloog
 	mkdir -p $pplObjDir $gmpObjDir $cloogObjDir || exit 1
-	
+
 	gccConfigureArgs="$gccConfigureArgs --with-cloog=$installDir \
 		--enable-cloog-backend=isl --with-ppl=$installDir \
 		--disable-cloog-version-check --with-gmp=$installDir \
@@ -136,6 +136,7 @@ export LC_ALL=POSIX
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $binutilsSourceDir/configure \
 	--prefix=$installDir $buildHostSpec --target=$haikuMachine \
+	--enable-targets=$haikuMachine,i386-efi-pe,x86_64-efi-pe \
 	--disable-nls --disable-shared --disable-werror \
 	--with-sysroot=$sysrootDir \
 	$binutilsConfigureArgs \
@@ -152,7 +153,7 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 		--disable-shared --enable-cxx || exit 1
 	$MAKE $additionalMakeArgs || exit 1
 	$MAKE $additionalMakeArgs install || exit 1
-	
+
 	# build ppl
 	cd $pplObjDir
 	CFLAGS="-O2" CXXFLAGS="-O2" $pplSourceDir/configure --prefix=$installDir \

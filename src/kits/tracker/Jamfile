@@ -25,6 +25,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local libtracker = [ MultiArchDefaultGristFiles libtracker.so ] ;
 		AddResources $(libtracker) : TrackerIcons.rdef libtracker.rdef ;
 
+		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons input_server
+			filters shortcut_catcher ] ;
+
 		SharedLibrary $(libtracker) :
 			AttributeStream.cpp
 			AutoMounterSettings.cpp
@@ -101,6 +104,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			be translation $(vectorIconLibs) $(TARGET_LIBSTDC++) localestub
 			[ MultiArchDefaultGristFiles libshared.a ]
+			[ MultiArchDefaultGristFiles libshortcuts_shared.a ]
 			;
 	}
 }

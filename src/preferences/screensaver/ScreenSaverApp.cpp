@@ -1,14 +1,12 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Michael Phipps
  */
 
-
-#include "ScreenSaverWindow.h"
 
 #include <Application.h>
 #include <Entry.h>
@@ -18,27 +16,33 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "ScreenSaverWindow.h"
+
 
 class ScreenSaverApp : public BApplication {
-	public:
-		ScreenSaverApp();
-		virtual void RefsReceived(BMessage *message);
+public:
+	ScreenSaverApp();
+	virtual void RefsReceived(BMessage* message);
 
-	private:
-		BWindow *fScreenSaverWindow;
+private:
+	BWindow* fScreenSaverWindow;
 };
 
 
+//	#pragma mark - ScreenSaverApp
+
+
 ScreenSaverApp::ScreenSaverApp()
-	: BApplication("application/x-vnd.Haiku-ScreenSaver") 
+	:
+	BApplication("application/x-vnd.Haiku-ScreenSaver")
 {
 	fScreenSaverWindow = new ScreenSaverWindow();
 	fScreenSaverWindow->Show();
 }
 
 
-void 
-ScreenSaverApp::RefsReceived(BMessage *message)
+void
+ScreenSaverApp::RefsReceived(BMessage* message)
 {
 	entry_ref ref;
 	if (message->FindRef("refs", &ref) != B_OK)
@@ -46,7 +50,7 @@ ScreenSaverApp::RefsReceived(BMessage *message)
 
 	// Install the screen saver by copying it to the add-ons directory
 	// TODO: the translator have a similar mechanism - this could be cleaned
-	//	up and have one nicely working solution
+	//       up and have one nicely working solution
 	// TODO: should test if the dropped ref is really a screen saver!
 	// TODO: you can receive more than one ref at a time...
 
@@ -59,14 +63,16 @@ ScreenSaverApp::RefsReceived(BMessage *message)
 	entry.GetPath(&path);
 
 	// TODO: find_directory() anyone??
-	char temp[2*B_PATH_NAME_LENGTH];
-	sprintf(temp,"cp %s '/boot/home/config/add-ons/Screen Savers/'\n", path.Path());
+	char temp[B_PATH_NAME_LENGTH * 2];
+	sprintf(temp, "cp %s '/boot/home/config/add-ons/Screen Savers/'\n",
+		path.Path());
 	system(temp);
+
 	fScreenSaverWindow->PostMessage(kMsgUpdateList);
 }
 
 
-//	#pragma mark -
+//	#pragma mark - main()
 
 
 int

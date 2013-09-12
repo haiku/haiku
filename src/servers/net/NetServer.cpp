@@ -1388,6 +1388,8 @@ NetServer::_ConvertNetworkFromSettings(BMessage& message)
 int
 main(int argc, char** argv)
 {
+	srand(system_time());
+
 	status_t status;
 	NetServer server(status);
 	if (status != B_OK) {

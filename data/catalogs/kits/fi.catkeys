@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	677628532
+1	finnish	x-vnd.Haiku-libbe	3504008668
 gamma	AboutWindow		gamma
 beta	AboutWindow		beeta
 %3.2f GiB	StringForSize		%3.2f gibitavua
@@ -14,9 +14,11 @@ alpha	AboutWindow		alfa
 Error	PrintJob		Virhe
 No Pages to print!	PrintJob		Ei ole tulostettavia sivuja!
 All Rights Reserved.	AboutWindow		All Rights Reserved.
+About %app%	AboutWindow		Ohjelmasta %app%
 OK	Dragger		Valmis
 OK	PrintJob		Valmis
 Green:	ColorControl		Vihreä:
+Ok	AboutWindow		Valmis
 Version history:	AboutWindow		Versiohistoria:
 Remove replicant	Dragger		Poista replikantti
 OK	ZombieReplicantView		Valmis

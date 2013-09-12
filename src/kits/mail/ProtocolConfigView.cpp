@@ -50,7 +50,7 @@ BodyDownloadConfig::BodyDownloadConfig()
 	fSizeBox = new BTextControl(r, "size", "", "", NULL);
 
 	r.OffsetBy(r.Width() + 5,0);
-	fBytesLabel = new BStringView(r, "kb", "KB");
+	fBytesLabel = new BStringView(r, "kb", B_TRANSLATE("KiB"));
 	AddChild(fBytesLabel);
 	fSizeBox->SetDivider(0);
 

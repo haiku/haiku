@@ -316,6 +316,8 @@ BMenuBar::MouseDown(BPoint where)
 		if ((mouse_mode() == B_FOCUS_FOLLOWS_MOUSE)
 			|| ((mouse_mode() == B_CLICK_TO_FOCUS_MOUSE)
 				&& ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0))) {
+			// right-click to bring-to-front and send-to-back
+			// (might cause some regressions in FFM)
 			window->Activate();
 			window->UpdateIfNeeded();
 		}
@@ -526,8 +528,10 @@ BMenuItem*
 BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 {
 	// TODO: Cleanup, merge some "if" blocks if possible
-	fChosenItem = NULL;
+	BMenuItem* item = NULL;
 	fState = MENU_STATE_TRACKING;
+	fChosenItem = NULL;
+		// we will use this for keyboard selection
 
 	BPoint where;
 	uint32 buttons;
@@ -545,22 +549,19 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 		if (!LockLooper())
 			break;
 
-		BMenuItem* menuItem = NULL;
-		if (dynamic_cast<_BMCMenuBar_*>(this))
-			menuItem = ItemAt(0);
-		else
-			menuItem = _HitTestItems(where, B_ORIGIN);
+		item = dynamic_cast<_BMCMenuBar_*>(this) != NULL ? ItemAt(0)
+			: _HitTestItems(where, B_ORIGIN);
+
 		if (_OverSubmenu(fSelected, ConvertToScreen(where))
 			|| fState == MENU_STATE_KEY_TO_SUBMENU) {
 			// call _Track() from the selected sub-menu when the mouse cursor
 			// is over its window
-			BMenu* menu = fSelected->Submenu();
+			BMenu* submenu = fSelected->Submenu();
 			UnlockLooper();
 			snoozeAmount = 30000;
-			bool wasSticky = _IsStickyMode();
-			menu->_SetStickyMode(wasSticky);
+			submenu->_SetStickyMode(_IsStickyMode());
 			int localAction;
-			fChosenItem = menu->_Track(&localAction);
+			fChosenItem = submenu->_Track(&localAction);
 
 			// The mouse could have meen moved since the last time we
 			// checked its position, or buttons might have been pressed.
@@ -570,18 +571,19 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 			// where to store the current mouse position ?
 			// (Or just use the BView mouse hooks)
 			BPoint newWhere;
+			uint32 newButtons;
 			if (LockLooper()) {
-				GetMouse(&newWhere, &buttons);
+				GetMouse(&newWhere, &newButtons);
 				UnlockLooper();
 			}
 
-			// This code is needed to make menus
-			// that are children of BMenuFields "sticky" (see ticket #953)
+			// Needed to make BMenuField child menus "sticky"
+			// (see ticket #953)
 			if (localAction == MENU_STATE_CLOSED) {
 				if (fExtraRect != NULL && fExtraRect->Contains(where)
+					&& point_distance(newWhere, where) < 9) {
 					// 9 = 3 pixels ^ 2 (since point_distance() returns the
 					// square of the distance)
-					&& point_distance(newWhere, where) < 9) {
 					_SetStickyMode(true);
 					fExtraRect = NULL;
 				} else
@@ -589,11 +591,11 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 			}
 			if (!LockLooper())
 				break;
-		} else if (menuItem != NULL) {
-			if (menuItem->Submenu() != NULL && menuItem != fSelected) {
-				if (menuItem->Submenu()->Window() == NULL) {
+		} else if (item != NULL) {
+			if (item->Submenu() != NULL && item != fSelected) {
+				if (item->Submenu()->Window() == NULL) {
 					// open the menu if it's not opened yet
-					_SelectItem(menuItem);
+					_SelectItem(item);
 				} else {
 					// Menu was already opened, close it and bail
 					_SelectItem(NULL);
@@ -602,9 +604,9 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 				}
 			} else {
 				// No submenu, just select the item
-				_SelectItem(menuItem);
+				_SelectItem(item);
 			}
-		} else if (menuItem == NULL && fSelected != NULL
+		} else if (item == NULL && fSelected != NULL
 			&& !_IsStickyMode() && Bounds().Contains(where)) {
 			_SelectItem(NULL);
 			fState = MENU_STATE_TRACKING;
@@ -613,38 +615,44 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 		UnlockLooper();
 
 		if (fState != MENU_STATE_CLOSED) {
-			// If user doesn't move the mouse, loop here,
-			// so we don't interfere with keyboard menu navigation
-			BPoint newLocation = where;
+			BPoint newWhere = where;
 			uint32 newButtons = buttons;
+
 			do {
+				// If user doesn't move the mouse or change buttons loop
+				// here so that we don't interfere with keyboard menu
+				// navigation
 				snooze(snoozeAmount);
 				if (!LockLooper())
 					break;
-				GetMouse(&newLocation, &newButtons, true);
+
+				GetMouse(&newWhere, &newButtons);
 				UnlockLooper();
-			} while (newLocation == where && newButtons == buttons
+			} while (newWhere == where && newButtons == buttons
 				&& fState == MENU_STATE_TRACKING);
 
-			where = newLocation;
-			buttons = newButtons;
+			uint32 test = newWhere == where ? 0 : buttons;
 
-			if (buttons != 0 && _IsStickyMode()) {
-				if (menuItem == NULL
-					|| (menuItem->Submenu() && menuItem->Submenu()->Window())) {
-					// clicked outside menu bar or on item with already
+			if (newButtons != test && _IsStickyMode()) {
+				if (item == NULL || (item->Submenu() != NULL
+						&& item->Submenu()->Window() != NULL)) {
+					// clicked outside the menu bar or on item with already
 					// open sub menu
 					fState = MENU_STATE_CLOSED;
 				} else
 					_SetStickyMode(false);
-			} else if (buttons == 0 && !_IsStickyMode()) {
+			} else if (newButtons == test && !_IsStickyMode()) {
 				if ((fSelected != NULL && fSelected->Submenu() == NULL)
-					|| menuItem == NULL) {
+					|| item == NULL) {
+					// clicked on an item without a submenu or clicked and
+					// released the mouse button outside the menu bar
 					fChosenItem = fSelected;
 					fState = MENU_STATE_CLOSED;
 				} else
 					_SetStickyMode(true);
 			}
+			where = newWhere;
+			buttons = newButtons;
 		}
 	}
 
@@ -654,6 +662,7 @@ BMenuBar::_Track(int32* action, int32 startIndex, bool showMenu)
 
 		if (fChosenItem != NULL)
 			fChosenItem->Invoke();
+
 		_RestoreFocus();
 		UnlockLooper();
 	}
@@ -679,9 +688,9 @@ BMenuBar::_StealFocus()
 
 	BWindow* window = Window();
 	if (window != NULL && window->Lock()) {
-		BView* focus = window->CurrentFocus();
-		if (focus != NULL && focus != this)
-			fPrevFocusToken = _get_object_token_(focus);
+		BView* focusView = window->CurrentFocus();
+		if (focusView != NULL && focusView != this)
+			fPrevFocusToken = _get_object_token_(focusView);
 		MakeFocus();
 		window->Unlock();
 	}
@@ -700,7 +709,6 @@ BMenuBar::_RestoreFocus()
 			BView* view = dynamic_cast<BView*>(handler);
 			if (view != NULL && view->Window() == window)
 				view->MakeFocus();
-
 		} else if (IsFocus())
 			MakeFocus(false);
 

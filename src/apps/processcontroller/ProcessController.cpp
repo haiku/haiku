@@ -738,14 +738,14 @@ thread_popup(void *arg)
 	// Memory Usage section
 	MemoryBarMenu* MemoryPopup = new MemoryBarMenu(B_TRANSLATE("Memory usage"),
 	infos, systemInfo);
-	int commitedMemory = int(systemInfo.used_pages * B_PAGE_SIZE / 1024);
+	int64 committedMemory = (int64)systemInfo.used_pages * B_PAGE_SIZE / 1024;
 	for (m = 0; m < systemInfo.used_teams; m++) {
 		if (infos[m].team_info.team >= 0) {
 			MemoryBarMenuItem* memoryItem =
 				new MemoryBarMenuItem(infos[m].team_name,
 					infos[m].team_info.team, infos[m].team_icon, false, NULL);
 			MemoryPopup->AddItem(memoryItem);
-			memoryItem->UpdateSituation(commitedMemory);
+			memoryItem->UpdateSituation(committedMemory);
 		}
 	}
 

@@ -918,7 +918,7 @@ uint64 qsqrt(uint64 qdev)
 		x = qdev / x;
 		x += y;
 		x /= 2;
-	} while ((x - y) > 1 || (x - y) > -1);
+	} while ((x - y) > 1 || (x - y) < -1);
 
 	return (uint64) x;
 }

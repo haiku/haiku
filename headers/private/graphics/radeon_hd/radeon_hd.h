@@ -41,6 +41,8 @@
 #define DEVICE_NAME				"radeon_hd"
 #define RADEON_ACCELERANT_NAME	"radeon_hd.accelerant"
 
+#define MAX_NAME_LENGTH		32
+
 // Used to collect EDID from boot loader
 #define EDID_BOOT_INFO "vesa_edid/v1"
 #define MODES_BOOT_INFO "vesa_modes/v1"
@@ -52,6 +54,7 @@
 
 
 // Radeon Chipsets
+// !! Must match chipset names below
 enum radeon_chipset {
 	RADEON_R420 = 0,	//r400, Radeon X700-X850
 	RADEON_R423,
@@ -97,10 +100,62 @@ enum radeon_chipset {
 	RADEON_TAHITI,		// DCE 6.0
 	RADEON_ARUBA,		// DCE 6.1 Trinity/Richland
 	RADEON_OLAND,		// DCE 6.4
-	RADEON_HAINAN,		// NO DCE
+	RADEON_HAINAN,		// NO DCE, only compute
 	RADEON_KAVERI,		//Sea Islands, DCE 8.1
 	RADEON_BONAIRE,		// DCE 8.2
 	RADEON_KABINI,		// DCE 8.3
+};
+
+// !! Must match chipset families above
+static const char radeon_chip_name[][MAX_NAME_LENGTH] = {
+	"R420",
+	"R423",
+	"RV410",
+	"RS400",
+	"RS480",
+	"RS600",
+	"RS690",
+	"RS740",
+	"RV515",
+	"R520",
+	"RV530",
+	"RV560",
+	"RV570",
+	"R580",
+	"R600",
+	"RV610",
+	"RV630",
+	"RV670",
+	"RV620",
+	"RV635",
+	"RS780",
+	"RS880",
+	"RV770",
+	"RV730",
+	"RV710",
+	"RV740",
+	"Cedar",
+	"Redwood",
+	"Juniper",
+	"Cypress",
+	"Hemlock",
+	"Palm",
+	"Sumo",
+	"Sumo2",
+	"Caicos",
+	"Turks",
+	"Barts",
+	"Cayman",
+	"Antilles",
+	"Cape Verde",
+	"Pitcairn",
+	"Tahiti",
+	"Aruba",
+	"Oland",
+	"Hainan",
+	"Kaveri",
+	"Bonaire",
+	"Kabini"
 };
 
 
@@ -170,9 +225,9 @@ struct radeon_shared_info {
 	uint16			cursor_hot_x;
 	uint16			cursor_hot_y;
 
-	char			deviceName[32];
+	char			deviceName[MAX_NAME_LENGTH];
 	uint16			chipsetID;
-	char			chipsetName[16];
+	char			chipsetName[MAX_NAME_LENGTH];
 	uint32			chipsetFlags;
 	uint8			dceMajor;
 	uint8			dceMinor;

@@ -866,6 +866,9 @@ bool
 TExpandoMenuBar::CheckForSizeOverrun()
 {
 	if (fVertical) {
+		if (Window() == NULL)
+			return false;
+
 		BRect screenFrame = (BScreen(Window())).Frame();
 		return Window()->Frame().bottom > screenFrame.bottom;
 	}

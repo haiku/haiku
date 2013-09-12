@@ -1,0 +1,36 @@
+##
+##	Driver for USB Audio Device Class devices.
+##	Copyright (c) 2009-13 S.Zharski <imker@gmx.li>
+##	Distributed under the terms of the MIT license.
+##
+
+## trace [mask] - activate different tracing levels
+## mask - decimal or hexadecimal number combined from the following bits
+## 0x01 - severe errors
+## 0x02 - general messages
+## 0x04 - controls map parsing and mixer control
+## 0x08 - driver API calls
+## 0x10 - data flow (without descriptors)
+## 0x20 - dump iso descriptors
+## 0x40 - USB audio control parsing
+## default value: 0x01
+
+#trace 0x7F
+
+## logfile [full path to private log file]
+## default path value: /var/log/usb_asix.log
+## if disabled - all output goes to syslog
+
+logfile /boot/home/usb_audio.log
+
+## reset_logfile [on|off] - truncate private log file on driver/system restart
+## default value: off
+##
+
+# reset_logfile off
+
+## add_timestamp  [on|off]  - add time of writing the string in private log file.
+## default value: on
+##
+
+# add_timestamp off

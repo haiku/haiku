@@ -21,6 +21,8 @@ get_feature_name(uint32 feature)
 			return "in out";
 		case VIRTIO_SCSI_F_HOTPLUG:
 			return "hotplug";
+		case VIRTIO_SCSI_F_CHANGE:
+			return "change";
 	}
 	return NULL;
 }
@@ -32,13 +34,17 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 	fVirtio(NULL),
 	fVirtioDevice(NULL),
 	fStatus(B_NO_INIT),
-	fRequest(NULL)
+	fRequest(NULL),
+	fEventDPC(NULL)
 {
 	CALLED();
 
 	B_INITIALIZE_SPINLOCK(&fInterruptLock);
 	fInterruptCondition.Init(this, "virtio scsi transfer");
-	
+
+	if (gSCSI->alloc_dpc(&fEventDPC) != B_OK)
+		return;
+
 	// get the Virtio device from our parent's parent
 	device_node *parent = gDeviceManager->get_parent_node(node);
 	device_node *virtioParent = gDeviceManager->get_parent_node(parent);
@@ -49,7 +55,7 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 	gDeviceManager->put_node(virtioParent);
 
 	fVirtio->negociate_features(fVirtioDevice,
-		0 /*VIRTIO_SCSI_F_HOTPLUG*/,
+		VIRTIO_SCSI_F_CHANGE /*VIRTIO_SCSI_F_HOTPLUG*/,
 		&fFeatures, &get_feature_name);
 
 	fStatus = fVirtio->read_device_config(fVirtioDevice, 0, &fConfig,
@@ -83,14 +89,17 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 	fControlVirtioQueue = virtioQueues[0];
 	fEventVirtioQueue = virtioQueues[1];
 	fRequestVirtioQueue = virtioQueues[2];
-	
-	fStatus = fVirtio->setup_interrupt(fVirtioDevice, NULL, NULL);
+
+	for (uint32 i = 0; i < VIRTIO_SCSI_NUM_EVENTS; i++)
+		_SubmitEvent(i);
+
+	fStatus = fVirtio->setup_interrupt(fVirtioDevice, NULL, this);
 	if (fStatus != B_OK) {
 		ERROR("interrupt setup failed (%s)\n", strerror(fStatus));
 		return;
 	}
 
-	
+
 }
 
 
@@ -98,6 +107,8 @@ VirtioSCSIController::~VirtioSCSIController()
 {
 	CALLED();
 	delete fRequest;
+
+	gSCSI->free_dpc(fEventDPC);
 }
 
 
@@ -140,7 +151,7 @@ VirtioSCSIController::GetRestrictions(uint8 targetID, bool *isATAPI,
 	bool *noAutoSense, uint32 *maxBlocks)
 {
 	*isATAPI = false;
-	*noAutoSense = true;	
+	*noAutoSense = true;
 	*maxBlocks = fConfig.cmd_per_lun;
 }
 
@@ -206,11 +217,11 @@ VirtioSCSIController::ExecuteRequest(scsi_ccb *ccb)
 	}
 
 	fVirtio->queue_request_v(fRequestVirtioQueue, entries,
-		outCount, inCount, VirtioSCSIController::RequestCallback, this);
+		outCount, inCount, VirtioSCSIController::_RequestCallback, NULL);
 
 	result = fInterruptConditionEntry.Wait(B_RELATIVE_TIMEOUT,
 		fRequest->Timeout());
-	
+
 	{
 		InterruptsSpinLocker locker(fInterruptLock);
 		fExpectsInterrupt = false;
@@ -224,7 +235,7 @@ VirtioSCSIController::ExecuteRequest(scsi_ccb *ccb)
 
 
 uchar
-VirtioSCSIController::AbortRequest(scsi_ccb *request)			
+VirtioSCSIController::AbortRequest(scsi_ccb *request)
 {
 	return SCSI_REQ_CMP;
 }
@@ -241,24 +252,101 @@ status_t
 VirtioSCSIController::Control(uint8 targetID, uint32 op, void *buffer,
 	size_t length)
 {
-	CALLED();	
+	CALLED();
 	return B_DEV_INVALID_IOCTL;
 }
 
 
 void
-VirtioSCSIController::RequestCallback(void* cookie)
+VirtioSCSIController::_RequestCallback(void* driverCookie, void* cookie)
 {
 	CALLED();
-	VirtioSCSIController* controller = (VirtioSCSIController*)cookie;
-	controller->_Interrupt();
+	VirtioSCSIController* controller = (VirtioSCSIController*)driverCookie;
+	controller->_RequestInterrupt();
 }
 
 
 void
-VirtioSCSIController::_Interrupt()
+VirtioSCSIController::_RequestInterrupt()
 {
 	SpinLocker locker(fInterruptLock);
 	fInterruptCondition.NotifyAll();
 }
 
+
+
+void
+VirtioSCSIController::_EventCallback(void* driverCookie, void* cookie)
+{
+	CALLED();
+	VirtioSCSIController* controller = (VirtioSCSIController*)driverCookie;
+	struct virtio_scsi_event* event = (struct virtio_scsi_event*)cookie;
+	controller->_EventInterrupt(event);
+}
+
+
+void
+VirtioSCSIController::_EventInterrupt(struct virtio_scsi_event* event)
+{
+	CALLED();
+	TRACE("events %#x\n", event->event);
+	if ((event->event & VIRTIO_SCSI_T_EVENTS_MISSED) != 0) {
+		ERROR("events missed\n");
+	} else switch (event->event) {
+		case VIRTIO_SCSI_T_TRANSPORT_RESET:
+			ERROR("transport reset\n");
+			break;
+		case VIRTIO_SCSI_T_ASYNC_NOTIFY:
+			ERROR("async notify\n");
+			break;
+		case VIRTIO_SCSI_T_PARAM_CHANGE:
+		{
+			uint16 sense = (event->reason >> 8)
+				| ((event->reason & 0xff) << 8);
+			if (sense == SCSIS_ASC_CAPACITY_DATA_HAS_CHANGED) {
+				ERROR("capacity data has changed for %x:%x\n", event->lun[1],
+					event->lun[2] << 8 | event->lun[3]);
+				gSCSI->schedule_dpc(fBus, fEventDPC, _RescanChildBus, this);
+			} else
+				ERROR("param change, unknown reason\n");
+			break;
+		}
+		default:
+			ERROR("unknown event %#x\n", event->event);
+			break;
+	}
+}
+
+
+void
+VirtioSCSIController::_SubmitEvent(uint32 eventNumber)
+{
+	CALLED();
+	struct virtio_scsi_event* event = &fEventBuffers[eventNumber];
+	bzero(event, sizeof(struct virtio_scsi_event));
+
+	physical_entry entry;
+	get_memory_map(event, sizeof(struct virtio_scsi_event), &entry, 1);
+
+	fVirtio->queue_request_v(fEventVirtioQueue, &entry,
+		0, 1, VirtioSCSIController::_EventCallback, event);
+}
+
+
+void
+VirtioSCSIController::_RescanChildBus(void *cookie)
+{
+	CALLED();
+	VirtioSCSIController* controller = (VirtioSCSIController*)cookie;
+	device_node *childNode = NULL;
+	const device_attr attrs[] = { { NULL } };
+	if (gDeviceManager->get_next_child_node(controller->fNode, attrs,
+		&childNode) != B_OK) {
+		ERROR("couldn't find the child node for %p\n", controller->fNode);
+		return;
+	}
+
+	gDeviceManager->rescan_node(childNode);
+	TRACE("rescan done %p\n", childNode);
+	gDeviceManager->put_node(childNode);
+}

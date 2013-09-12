@@ -1,0 +1,71 @@
+SubDir HAIKU_TOP src apps haiku-depot ;
+
+UsePrivateHeaders interface shared ;
+
+# source directories
+local sourceDirs =
+	textview
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haiku-depot $(sourceDir) ] ;
+}
+
+local textDocumentSources =
+	Bullet.cpp
+	BulletData.cpp
+	CharacterStyle.cpp
+	CharacterStyleData.cpp
+	MarkupParser.cpp
+	Paragraph.cpp
+	ParagraphLayout.cpp
+	ParagraphStyle.cpp
+	ParagraphStyleData.cpp
+	TextDocument.cpp
+	TextDocumentLayout.cpp
+	TextDocumentView.cpp
+	TextSpan.cpp
+	TextView.cpp
+;
+
+Application HaikuDepot :
+	App.cpp
+	BitmapButton.cpp
+	BitmapView.cpp
+	FilterView.cpp
+	main.cpp
+	MainWindow.cpp
+	Model.cpp
+	PackageInfo.cpp
+	PackageInfoView.cpp
+	PackageListView.cpp
+	PackageManager.cpp
+	support.cpp
+
+	# text view stuff
+	$(textDocumentSources)
+	
+	: be translation libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
+		$(HAIKU_LOCALE_LIBS)
+	: HaikuDepot.rdef
+;
+
+DoCatalogs HaikuDepot :
+	x-vnd.Haiku-HaikuDepot
+	:
+	App.cpp
+	FilterView.cpp
+	MainWindow.cpp
+	Model.cpp
+	PackageInfoView.cpp
+	PackageListView.cpp
+	PackageManager.cpp
+;
+
+Application TextDocumentTest :
+	TextDocumentTest.cpp
+	$(textDocumentSources)
+
+	: be translation libshared.a $(TARGET_LIBSUPC++)
+;

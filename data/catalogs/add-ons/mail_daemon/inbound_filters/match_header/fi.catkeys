@@ -3,7 +3,7 @@
 has	ConfigView		on
 Move to	ConfigView		Siirrä kohtaan
 Then	ConfigView		Sitten
-value (use REGEX: in from of regular expressions like *spam*)	ConfigView		arvo (käytä REGEX-ohjelmisto: säännöllisistä lausekkeista kuten *spam*)
+value (use REGEX: in from of regular expressions like *spam*)	ConfigView		arvo (käytä REGEX-ohjelmistoa: säännöllisistä lausekkeista kuten *spam*)
 this field is based on the action	ConfigView		tämä kenttä perustuu toimintoon
 Delete message	ConfigView		Poista viesti
 Rule filter	RuleFilter		Sääntösuodatin

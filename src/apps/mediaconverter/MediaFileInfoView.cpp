@@ -157,20 +157,20 @@ MediaFileInfoView::Update(BMediaFile* file, entry_ref* ref)
 
 	if (file != NULL && ref != NULL) {
 		fRef = *ref;
-		status_t ret = fInfo.LoadInfo(file);
-		if (ret != B_OK) {
+		status_t result = fInfo.LoadInfo(file);
+		if (result != B_OK) {
 			BString error(B_TRANSLATE("An error has occurred reading the "
 				"file info.\n\nError : "));
-			error << strerror(ret);
+			error << strerror(result);
 			BAlert* alert = new BAlert(
 				B_TRANSLATE("File Error"), error.String(),
-				B_TRANSLATE("OK"));
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go(NULL);
 		}
-	} else {
+	} else
 		fRef = entry_ref();
-	}
+
 	InvalidateLayout();
 	Invalidate();
 }

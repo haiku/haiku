@@ -53,6 +53,9 @@ public:
 			FunctionInstance*	FunctionAtAddress(target_addr_t address) const;
 			FunctionInstance*	FunctionByName(const char* name) const;
 
+			FunctionInstance*	MainFunction() const
+									{ return fMainFunction; }
+
 			status_t			AddSourceCodeInfo(LocatableFile* file,
 									FileSourceCode* sourceCode) const;
 
@@ -73,6 +76,7 @@ private:
 			ImageInfo			fImageInfo;
 			SpecificInfoList	fSpecificInfos;
 			FunctionList		fFunctions;
+			FunctionInstance*	fMainFunction;
 };
 
 

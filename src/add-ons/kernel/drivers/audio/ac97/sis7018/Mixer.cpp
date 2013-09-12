@@ -612,6 +612,8 @@ Mixer::ListMixControls(multi_mix_control_info* Info)
 		_CreateMIXControlGroup(Info, index, recordGroup, RecordControls[i]);
 	}
 
+	Info->control_count = index;
+
 	return B_OK;
 }
 

@@ -51,6 +51,7 @@
 #else
 #	define TRACE(x...) ;
 #endif
+#define ERROR(x...) dprintf("\33[36mAGP:\33[0m " x)
 
 
 #define MAX_DEVICES	  8
@@ -477,7 +478,8 @@ Aperture::CreateMemory(size_t size, size_t alignment, uint32 flags)
 
 	status_t status = _Insert(memory, size, alignment, flags);
 	if (status < B_OK) {
-		// did not find a free space large for this memory object
+		ERROR("Aperture::CreateMemory(): did not find a free space large for "
+			"this memory object\n");
 		delete memory;
 		return NULL;
 	}
@@ -548,8 +550,11 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 		memory->page = vm_page_allocate_page_run(
 			PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR, count, &restrictions,
 			VM_PRIORITY_SYSTEM);
-		if (memory->page == NULL)
+		if (memory->page == NULL) {
+			ERROR("Aperture::AllocateMemory(): vm_page_allocate_page_run() "
+				"failed (with B_APERTURE_NEED_PHYSICAL)\n");
 			return B_NO_MEMORY;
+		}
 	} else {
 		// Allocate table to hold the pages
 		memory->pages = (vm_page **)malloc(count * sizeof(vm_page *));
@@ -564,8 +569,11 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 		vm_page* page = vm_page_allocate_page_run(
 			PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR, count, &restrictions,
 			VM_PRIORITY_SYSTEM);
-		if (page == NULL)
+		if (page == NULL) {
+			ERROR("Aperture::AllocateMemory(): vm_page_allocate_page_run() "
+				"failed (without B_APERTURE_NEED_PHYSICAL)\n");
 			return B_NO_MEMORY;
+		}
 
 		for (uint32 i = 0; i < count; i++)
 			memory->pages[i] = page + i;
@@ -589,8 +597,10 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 	memory->area = create_area("GART memory", &address, B_ANY_KERNEL_ADDRESS,
 		size, B_FULL_LOCK | ((flags & B_APERTURE_NEED_PHYSICAL) != 0
 			? B_CONTIGUOUS : 0), 0);
-	if (memory->area < B_OK)
+	if (memory->area < B_OK) {
+		ERROR("Aperture::AllocateMemory(): create_area() failed\n");
 		return B_NO_MEMORY;
+	}
 #endif
 
 	memory->flags |= ALLOCATED_APERTURE;
@@ -668,8 +678,10 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 			physical_entry entry;
 			status = get_memory_map((void *)(address + offset), B_PAGE_SIZE,
 				&entry, 1);
-			if (status < B_OK)
+			if (status < B_OK) {
+				ERROR("Aperture::BindMemory(): get_memory_map() failed\n");
 				return status;
+			}
 
 			physicalAddress = entry.address;
 		} else {
@@ -688,8 +700,10 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 
 		status = fModule->bind_page(fPrivateAperture, start + offset,
 			physicalAddress);
-		if (status < B_OK)
+		if (status < B_OK) {
+			ERROR("Aperture::BindMemory(): bind_page() failed\n");
 			return status;
+		}
 	}
 
 	memory->flags |= BIND_APERTURE;

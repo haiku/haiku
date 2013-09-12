@@ -18,8 +18,7 @@ enum {
 	AC_MACPTR		= 1 << (ATTRIBUTE_CLASS_MACPTR - 1),
 	AC_RANGELISTPTR	= 1 << (ATTRIBUTE_CLASS_RANGELISTPTR - 1),
 	AC_REFERENCE	= 1 << (ATTRIBUTE_CLASS_REFERENCE - 1),
-	AC_STRING		= 1 << (ATTRIBUTE_CLASS_STRING - 1),
-	AC_EXPRESSION	= 1 << (ATTRIBUTE_CLASS_EXPRESSION - 1)
+	AC_STRING		= 1 << (ATTRIBUTE_CLASS_STRING - 1)
 };
 
 
@@ -70,7 +69,7 @@ static const attribute_name_info_entry kAttributeNameInfos[] = {
 	{ ENTRY(prototyped),			AC_FLAG },
 	{ ENTRY(return_addr),			AC_BLOCK | AC_LOCLISTPTR },
 	{ ENTRY(start_scope),			AC_CONSTANT },
-	{ ENTRY(bit_stride),			AC_CONSTANT },
+	{ ENTRY(bit_stride),			AC_BLOCK | AC_CONSTANT | AC_REFERENCE },
 	{ ENTRY(upper_bound),			AC_BLOCK | AC_CONSTANT | AC_REFERENCE },
 	{ ENTRY(abstract_origin),		AC_REFERENCE },
 	{ ENTRY(accessibility),			AC_CONSTANT },
@@ -91,7 +90,7 @@ static const attribute_name_info_entry kAttributeNameInfos[] = {
 	{ ENTRY(friend),				AC_REFERENCE },
 	{ ENTRY(identifier_case),		AC_CONSTANT },
 	{ ENTRY(macro_info),			AC_MACPTR },
-	{ ENTRY(namelist_item),			AC_BLOCK },
+	{ ENTRY(namelist_item),			AC_BLOCK | AC_REFERENCE },
 	{ ENTRY(priority),				AC_REFERENCE },
 	{ ENTRY(segment),				AC_BLOCK | AC_LOCLISTPTR },
 	{ ENTRY(specification),			AC_REFERENCE },
@@ -135,11 +134,11 @@ static const attribute_name_info_entry kAttributeNameInfos[] = {
 	{ ENTRY(const_expr),			AC_FLAG },
 	{ ENTRY(enum_class),			AC_FLAG },
 	{ ENTRY(linkage_name),			AC_STRING },
-	{ ENTRY(call_site_value),		AC_BLOCK | AC_EXPRESSION },
-	{ ENTRY(call_site_data_value),	AC_BLOCK | AC_EXPRESSION },
-	{ ENTRY(call_site_target),		AC_BLOCK | AC_EXPRESSION },
+	{ ENTRY(call_site_value),		AC_BLOCK },
+	{ ENTRY(call_site_data_value),	AC_BLOCK },
+	{ ENTRY(call_site_target),		AC_BLOCK },
 	{ ENTRY(call_site_target_clobbered),
-									AC_BLOCK | AC_EXPRESSION },
+									AC_BLOCK },
 	{ ENTRY(tail_call),				AC_FLAG },
 	{ ENTRY(all_tail_call_sites),	AC_FLAG },
 	{ ENTRY(all_call_sites),		AC_FLAG },
@@ -181,7 +180,7 @@ static const attribute_info_entry kAttributeFormInfos[] = {
 	{ ENTRY(indirect),		AC_REFERENCE },
 	{ ENTRY(sec_offset),	AC_LINEPTR | AC_LOCLISTPTR | AC_MACPTR
 								| AC_RANGELISTPTR },
-	{ ENTRY(exprloc),		AC_EXPRESSION },
+	{ ENTRY(exprloc),		AC_BLOCK },
 	{ ENTRY(flag_present),	AC_FLAG },
 	{ ENTRY(ref_sig8),		AC_REFERENCE },
 	{}

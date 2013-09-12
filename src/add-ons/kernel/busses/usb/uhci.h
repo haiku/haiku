@@ -23,6 +23,7 @@
 
 struct pci_info;
 struct pci_module_info;
+struct pci_x86_module_info;
 class UHCIRootHub;
 class DebugTransfer;
 
@@ -208,6 +209,7 @@ inline	uint16						ReadReg16(uint32 reg);
 inline	uint32						ReadReg32(uint32 reg);
 
 static	pci_module_info *			sPCIModule;
+static	pci_x86_module_info *		sPCIx86Module;
 
 		uint32						fRegisterBase;
 		pci_info *					fPCIInfo;
@@ -256,6 +258,9 @@ static	pci_module_info *			sPCIModule;
 		UHCIRootHub *				fRootHub;
 		uint8						fRootHubAddress;
 		uint8						fPortResetChange;
+
+		uint8						fIRQ;
+		bool						fUseMSI;
 };
 
 

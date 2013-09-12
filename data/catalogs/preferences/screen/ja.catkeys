@@ -1,12 +1,12 @@
 1	japanese	x-vnd.Haiku-Screen	2033930135
 yes	Screen		はい
-Use laptop panel:	Screen		ラップトップパネルを使用：
+Use laptop panel:	Screen		ラップトップパネルを使用:
 15 bits/pixel, 32768 colors	Screen		15ビット/画素, 32768色
 /other…	Screen		その他…
 16 bits/pixel, 65536 colors	Screen		16ビット/画素, 65536色
 Revert	Screen		元に戻す
-Swap displays:	Screen		ディスプレイを交換：
-Combine displays:	Screen		ディスプレイを一体化：
+Swap displays:	Screen		ディスプレイを交換:
+Combine displays:	Screen		ディスプレイを一体化:
 Done	Screen		完了
 Set background…	Screen		背景を設定…
 Undo	Screen		元に戻す
@@ -15,12 +15,12 @@ Screen preferences by the Haiku team	Screen		Haiku チームによる画面設�
 Screen	System name		画面
 OK	Screen		OK
 Workspaces	Screen		ワークスペース
-The screen mode could not be set:\n\t%s\n	Screen		スクリーンモードは設定できませんでした：\n\t%s\n
+The screen mode could not be set:\n\t%s\n	Screen		スクリーンモードは設定できませんでした:\n\t%s\n
 no	Screen		いいえ
-Could not write VESA mode settings file:\n\t	Screen		VESA モード設定ファイルを書き込めませんでした：\n\t
+Could not write VESA mode settings file:\n\t	Screen		VESA モード設定ファイルを書き込めませんでした:\n\t
 Type or use the left and right arrow keys.	Screen		入力するか、左右矢印キーを使用してください。
 Warning	Screen		警告
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		水平周波数：\t%lu - %lu kHz\n垂直周波数：\t%lu - %lu Hz\n\n最大ピクセルクロック：\t%g MHz
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		水平周波数: \t%lu - %lu kHz\n垂直周波数: \t%lu - %lu Hz\n\n最大ピクセルクロック: \t%g MHz
 Keep	Screen		保持
 Unknown mode	Screen		不明なモード
 disable	Screen		無効
@@ -47,6 +47,6 @@ Screen	Screen		画面
 8 bits/pixel, 256 colors	Screen		8ビット/画素, 256色
 Apply	Screen		適用
 Refresh rate	Screen		リフレッシュレート
-%sSerial no.: %s	Screen		%sシリアルナンバー： %s
+%sSerial no.: %s	Screen		%sシリアルナンバー: %s
 Colors:	Screen		色:
-Video format:	Screen		ビデオフォーマット：
+Video format:	Screen		ビデオフォーマット:

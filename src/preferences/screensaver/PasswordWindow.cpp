@@ -1,126 +1,133 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
- *		Julun <host.haiku@gmx.de>
+ *		Julun, host.haiku@gmx.de
+ *		Michael Phipps
+ *		John Scipione, jscipione@gmail.com
  */
 
-#include "PasswordWindow.h"
 
+#include "PasswordWindow.h"
 
 #include <Alert.h>
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
+#include <LayoutBuilder.h>
+#include <LayoutItem.h>
 #include <RadioButton.h>
 #include <Screen.h>
+#include <Size.h>
 #include <TextControl.h>
 
 #include <ctype.h>
 
+#include "ScreenSaverSettings.h"
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ScreenSaver"
 
-const uint32 kMsgDone = 'done';
-const uint32 kMsgPasswordTypeChanged = 'pwtp';
+
+static const uint32 kPasswordTextWidth = 12;
+
+static const uint32 kMsgDone = 'done';
+static const uint32 kMsgPasswordTypeChanged = 'pwtp';
 
 
 PasswordWindow::PasswordWindow(ScreenSaverSettings& settings) 
-	: BWindow(BRect(100, 100, 380, 249), B_TRANSLATE("Password Window"),
-		B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS
-			| B_NOT_RESIZABLE),
+	:
+	BWindow(BRect(100, 100, 300, 200), B_TRANSLATE("Password Window"),
+		B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE
+			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fSettings(settings)
 {
 	_Setup();
 	Update();
-
-	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
-	BPoint point;
-	point.x = (screenFrame.Width() - Bounds().Width()) / 2;
-	point.y = (screenFrame.Height() - Bounds().Height()) / 2;
-
-	if (screenFrame.Contains(point))
-		MoveTo(point);
 }
 
 
 void 
 PasswordWindow::_Setup()
 {
-	BRect bounds = Bounds();
-	BView* topView = new BView(bounds, "topView", B_FOLLOW_ALL, B_WILL_DRAW);
+	float spacing = be_control_look->DefaultItemSpacing();
+
+	BView* topView = new BView("topView", B_WILL_DRAW);
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
+	topView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
-	bounds.InsetBy(10.0, 10.0);
-	fUseNetwork = new BRadioButton(bounds, "useNetwork",
+	BBox* networkBox = new BBox("networkBox");
+	networkBox->SetBorder(B_NO_BORDER);
+
+	fUseNetwork = new BRadioButton("useNetwork",
 		B_TRANSLATE("Use network password"),
-		new BMessage(kMsgPasswordTypeChanged), B_FOLLOW_NONE);
-	topView->AddChild(fUseNetwork);
-	fUseNetwork->ResizeToPreferred();
-	fUseNetwork->MoveBy(10.0, 0.0);
+		new BMessage(kMsgPasswordTypeChanged));
+	networkBox->SetLabel(fUseNetwork);
 
-	bounds.OffsetBy(0.0, fUseNetwork->Bounds().Height());
-	BBox *customBox = new BBox(bounds, "customBox", B_FOLLOW_NONE);
-	topView->AddChild(customBox);
+	BBox* customBox = new BBox("customBox");
 
-	fUseCustom = new BRadioButton(BRect(), "useCustom",
+	fUseCustom = new BRadioButton("useCustom",
 		B_TRANSLATE("Use custom password"),
-		new BMessage(kMsgPasswordTypeChanged), B_FOLLOW_NONE);
+		new BMessage(kMsgPasswordTypeChanged));
 	customBox->SetLabel(fUseCustom);
-	fUseCustom->ResizeToPreferred();
 
-	fPasswordControl = new BTextControl(bounds, "passwordControl",
-		B_TRANSLATE("Password:"), 
-		NULL, B_FOLLOW_NONE);
-	customBox->AddChild(fPasswordControl);
-	fPasswordControl->ResizeToPreferred();
+	fPasswordControl = new BTextControl("passwordTextView",
+		B_TRANSLATE("Password:"), B_EMPTY_STRING, NULL);
 	fPasswordControl->TextView()->HideTyping(true);
 	fPasswordControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	
-	bounds.OffsetBy(0.0, fPasswordControl->Bounds().Height() + 5.0);
-	fConfirmControl = new BTextControl(bounds, "confirmControl", 
-		B_TRANSLATE("Confirm password:"),
-		"VeryLongPasswordPossible",
-		B_FOLLOW_NONE);
-	customBox->AddChild(fConfirmControl);
+
+	BLayoutItem* passwordTextView
+		= fPasswordControl->CreateTextViewLayoutItem();
+	passwordTextView->SetExplicitMinSize(BSize(spacing * kPasswordTextWidth,
+		B_SIZE_UNSET));
+
+	fConfirmControl = new BTextControl("confirmTextView", 
+		B_TRANSLATE("Confirm password:"), B_EMPTY_STRING, NULL);
+	fConfirmControl->SetExplicitMinSize(BSize(spacing * kPasswordTextWidth,
+		B_SIZE_UNSET));
 	fConfirmControl->TextView()->HideTyping(true);
 	fConfirmControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
-	float width, height;
-	fConfirmControl->GetPreferredSize(&width, &height);
-	fPasswordControl->ResizeTo(width, height);
-	fConfirmControl->ResizeTo(width, height);
-	
-	float divider = be_plain_font->StringWidth(B_TRANSLATE("Confirm password:"))
-		+ 5.0;
-	fConfirmControl->SetDivider(divider);
-	fPasswordControl->SetDivider(divider);
-	
-	customBox->ResizeTo(fConfirmControl->Frame().right + 10.0,
-		fConfirmControl->Frame().bottom + 10.0);
-	
-	BButton* button = new BButton(BRect(), "done", B_TRANSLATE("Done"),
+	BLayoutItem* confirmTextView = fConfirmControl->CreateTextViewLayoutItem();
+	confirmTextView->SetExplicitMinSize(BSize(spacing * kPasswordTextWidth,
+		B_SIZE_UNSET));
+
+	customBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+		.SetInsets(B_USE_SMALL_SPACING)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+			.Add(fPasswordControl->CreateLabelLayoutItem(), 0, 0)
+			.Add(passwordTextView, 1, 0)
+			.Add(fConfirmControl->CreateLabelLayoutItem(), 0, 1)
+			.Add(confirmTextView, 1, 1)
+			.End()
+		.View());
+
+	BButton* doneButton = new BButton("done", B_TRANSLATE("Done"),
 		new BMessage(kMsgDone));
-	topView->AddChild(button);
-	button->ResizeToPreferred();
 
-	BRect frame = customBox->Frame();
-	button->MoveTo(frame.right - button->Bounds().Width(), frame.bottom + 10.0);
-
-	frame = button->Frame();
-	button->MakeDefault(true);
-
-	button = new BButton(frame, "cancel", B_TRANSLATE("Cancel"),
+	BButton* cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_CANCEL));
-	topView->AddChild(button);
-	button->ResizeToPreferred();
-	button->MoveBy(-(button->Bounds().Width() + 10.0), 0.0);
 
-	ResizeTo(customBox->Frame().right + 10.0, frame.bottom + 10.0);
+	BLayoutBuilder::Group<>(topView, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(networkBox)
+		.Add(customBox)
+		.AddStrut(B_USE_DEFAULT_SPACING)
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(cancelButton)
+			.Add(doneButton)
+			.End()
+		.End();
+
+	doneButton->MakeDefault(true);
+
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	GetLayout()->AddView(topView);
 }
 
 
@@ -138,12 +145,12 @@ PasswordWindow::Update()
 }
 
 
-char *
-PasswordWindow::_SanitizeSalt(const char *password)
+char*
+PasswordWindow::_SanitizeSalt(const char* password)
 {
-	char *salt;
-	
-	uint8 length = strlen(password);	
+	char* salt;
+
+	uint8 length = strlen(password);
 
 	if (length < 2)
 		salt = new char[3];
@@ -174,45 +181,45 @@ PasswordWindow::_SanitizeSalt(const char *password)
 
 
 void 
-PasswordWindow::MessageReceived(BMessage *message) 
+PasswordWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgDone:
 			fSettings.SetLockMethod(fUseCustom->Value() ? "custom" : "network");
 			if (fUseCustom->Value()) {
-				if (strcmp(fPasswordControl->Text(), fConfirmControl->Text())) {
-					BAlert *alert = new BAlert("noMatch",
+				if (strcmp(fPasswordControl->Text(), fConfirmControl->Text())
+						!= 0) {
+					BAlert* alert = new BAlert("noMatch",
 						B_TRANSLATE("Passwords don't match. Please try again."),
 						B_TRANSLATE("OK"));
 					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
 					break;
 				}
-				const char *salt = _SanitizeSalt(fPasswordControl->Text());
+				const char* salt = _SanitizeSalt(fPasswordControl->Text());
 				fSettings.SetPassword(crypt(fPasswordControl->Text(), salt));
 				delete[] salt;
-			} else {
+			} else
 				fSettings.SetPassword("");
-			}
+
 			fPasswordControl->SetText("");
 			fConfirmControl->SetText("");
 			fSettings.Save();
 			Hide();
 			break;
 
-	case B_CANCEL:
-		fPasswordControl->SetText("");
-		fConfirmControl->SetText("");
-		Hide();
-		break;
+		case B_CANCEL:
+			fPasswordControl->SetText("");
+			fConfirmControl->SetText("");
+			Hide();
+			break;
 
-	case kMsgPasswordTypeChanged:
-		fSettings.SetLockMethod(fUseCustom->Value() > 0 ? "custom" : "network");
-		Update();
-		break;
+		case kMsgPasswordTypeChanged:
+			fSettings.SetLockMethod(fUseCustom->Value() > 0 ? "custom" : "network");
+			Update();
+			break;
 
-	default:
-		BWindow::MessageReceived(message);
-		break;
+		default:
+			BWindow::MessageReceived(message);
  	}
 }

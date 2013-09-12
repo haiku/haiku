@@ -28,7 +28,8 @@ DIECompileUnitBase::DIECompileUnitBase()
 	fBaseTypesUnit(NULL),
 	fLanguage(0),
 	fIdentifierCase(0),
-	fUseUTF8(true)
+	fUseUTF8(true),
+	fContainsMainSubprogram(false)
 {
 }
 
@@ -186,6 +187,15 @@ DIECompileUnitBase::AddAttribute_ranges(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fAddressRangesOffset = value.pointer;
+	return B_OK;
+}
+
+
+status_t
+DIECompileUnitBase::AddAttribute_main_subprogram(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fContainsMainSubprogram = true;
 	return B_OK;
 }
 
@@ -1069,6 +1079,14 @@ DIEMember::AddAttribute_bit_offset(uint16 attributeName,
 }
 
 
+status_t
+DIEMember::AddAttribute_data_bit_offset(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fDataBitOffset, value);
+}
+
+
 // #pragma mark - DIEPointerType
 
 
@@ -1431,7 +1449,12 @@ status_t
 DIEPointerToMemberType::AddAttribute_containing_type(uint16 attributeName,
 	const AttributeValue& value)
 {
-	fContainingType = dynamic_cast<DIECompoundType*>(value.reference);
+	DebugInfoEntry* type = value.reference;
+	DIEModifiedType* modifiedType;
+	while ((modifiedType = dynamic_cast<DIEModifiedType*>(type)) != NULL)
+		type = modifiedType->GetType();
+
+	fContainingType = dynamic_cast<DIECompoundType*>(type);
 	return fContainingType != NULL ? B_OK : B_BAD_DATA;
 }
 
@@ -1637,6 +1660,14 @@ DIEBaseType::AddAttribute_bit_offset(uint16 attributeName,
 	const AttributeValue& value)
 {
 	return SetDynamicAttributeValue(fBitOffset, value);
+}
+
+
+status_t
+DIEBaseType::AddAttribute_data_bit_offset(uint16 attributeName,
+	const AttributeValue& value)
+{
+	return SetDynamicAttributeValue(fDataBitOffset, value);
 }
 
 
@@ -2527,6 +2558,54 @@ DIESharedType::AddAttribute_decl_column(uint16 attributeName,
 }
 
 
+// #pragma mark - DIETypeUnit
+
+
+DIETypeUnit::DIETypeUnit()
+{
+}
+
+
+uint16
+DIETypeUnit::Tag() const
+{
+	return DW_TAG_type_unit;
+}
+
+
+// #pragma mark - DIETemplateTemplateParameter
+
+
+DIETemplateTemplateParameter::DIETemplateTemplateParameter()
+	:
+	fName(NULL)
+{
+}
+
+
+uint16
+DIETemplateTemplateParameter::Tag() const
+{
+	return DW_TAG_GNU_template_template_param;
+}
+
+
+const char*
+DIETemplateTemplateParameter::Name() const
+{
+	return fName;
+}
+
+
+status_t
+DIETemplateTemplateParameter::AddAttribute_name(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fName = value.string;
+	return B_OK;
+}
+
+
 // #pragma mark - DIETemplateTypeParameterPack
 
 
@@ -2886,6 +2965,12 @@ DebugInfoEntryFactory::CreateDebugInfoEntry(uint16 tag, DebugInfoEntry*& _entry)
 			break;
 		case DW_TAG_shared_type:
 			entry = new(std::nothrow) DIESharedType;
+			break;
+		case DW_TAG_type_unit:
+			entry = new(std::nothrow) DIETypeUnit;
+			break;
+		case DW_TAG_GNU_template_template_param:
+			entry = new(std::nothrow) DIETemplateTemplateParameter;
 			break;
 		case DW_TAG_GNU_template_parameter_pack:
 			entry = new(std::nothrow) DIETemplateTypeParameterPack;

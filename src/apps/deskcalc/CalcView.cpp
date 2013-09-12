@@ -1,13 +1,13 @@
 /*
- * Copyright 2006-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2013, Haiku, Inc. All rights reserved.
  * Copyright 1997, 1998 R3 Software Ltd. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Philippe Saint-Pierre <stpere@gmail.com>
- *		John Scipione <jscipione@gmail.com>
- *		Timothy Wayper <timmy@wunderbear.com>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Philippe Saint-Pierre, stpere@gmail.com
+ *		John Scipione, jscipione@gmail.com
+ *		Timothy Wayper, timmy@wunderbear.com
  */
 
 
@@ -45,8 +45,10 @@
 #include "CalcOptions.h"
 #include "ExpressionTextView.h"
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "CalcView"
+
 
 //const uint8 K_COLOR_OFFSET				= 32;
 const float kFontScaleY						= 0.4f;
@@ -87,10 +89,12 @@ const char *kKeypadDescriptionScientific =
     "1     2     3     +     -    \n"
     "0     .     BS    =     C    \n";
 
+
 enum {
 	FLAGS_FLASH_KEY							= 1 << 0,
 	FLAGS_MOUSE_DOWN						= 1 << 1
 };
+
 
 struct CalcView::CalcKey {
 	char		label[8];
@@ -113,8 +117,7 @@ CalcView::Instantiate(BMessage* archive)
 
 CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	:
-	BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS),
 	fColumns(5),
 	fRows(4),
 
@@ -311,12 +314,7 @@ CalcView::MessageReceived(BMessage* message)
 void
 CalcView::Draw(BRect updateRect)
 {
-	bool drawBackground = true;
-	if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
-		// CalcView is embedded somewhere, most likely the Tracker Desktop
-		// shelf.
-		drawBackground = false;
-	}
+	bool drawBackground = !_IsEmbedded();
 
 	SetHighColor(fBaseColor);
 	BRect expressionRect(_ExpressionRect());
@@ -358,47 +356,11 @@ CalcView::Draw(BRect updateRect)
 			expressionRect.InsetBy(1, 1);
 		}
 
-		if (be_control_look != NULL) {
-			uint32 flags = 0;
-			if (!drawBackground)
-				flags |= BControlLook::B_BLEND_FRAME;
-			be_control_look->DrawTextControlBorder(this, expressionRect,
-				updateRect, fBaseColor, flags);
-		} else {
-			BeginLineArray(8);
-
-			rgb_color lightShadow = tint_color(fBaseColor, B_DARKEN_1_TINT);
-			rgb_color darkShadow = tint_color(fBaseColor, B_DARKEN_3_TINT);
-
-			AddLine(BPoint(expressionRect.left, expressionRect.bottom),
-					BPoint(expressionRect.left, expressionRect.top),
-					lightShadow);
-			AddLine(BPoint(expressionRect.left + 1, expressionRect.top),
-					BPoint(expressionRect.right, expressionRect.top),
-					lightShadow);
-			AddLine(BPoint(expressionRect.right, expressionRect.top + 1),
-					BPoint(expressionRect.right, expressionRect.bottom),
-					fLightColor);
-			AddLine(BPoint(expressionRect.left + 1, expressionRect.bottom),
-					BPoint(expressionRect.right - 1, expressionRect.bottom),
-					fLightColor);
-
-			expressionRect.InsetBy(1, 1);
-			AddLine(BPoint(expressionRect.left, expressionRect.bottom),
-					BPoint(expressionRect.left, expressionRect.top),
-					darkShadow);
-			AddLine(BPoint(expressionRect.left + 1, expressionRect.top),
-					BPoint(expressionRect.right, expressionRect.top),
-					darkShadow);
-			AddLine(BPoint(expressionRect.right, expressionRect.top + 1),
-					BPoint(expressionRect.right, expressionRect.bottom),
-					fBaseColor);
-			AddLine(BPoint(expressionRect.left + 1, expressionRect.bottom),
-					BPoint(expressionRect.right - 1, expressionRect.bottom),
-					fBaseColor);
-
-			EndLineArray();
-		}
+		uint32 flags = 0;
+		if (!drawBackground)
+			flags |= BControlLook::B_BLEND_FRAME;
+		be_control_look->DrawTextControlBorder(this, expressionRect,
+			updateRect, fBaseColor, flags);
 	}
 
 	if (fOptions->keypad_mode == KEYPAD_MODE_COMPACT)
@@ -422,101 +384,38 @@ CalcView::Draw(BRect updateRect)
 
 	SetFontSize(min_c(sizeRow * kFontScaleY, sizeCol * kFontScaleX));
 
-	if (be_control_look != NULL) {
-		CalcKey* key = fKeypad;
-		for (int row = 0; row < fRows; row++) {
-			for (int col = 0; col < fColumns; col++) {
-				BRect frame;
-				frame.left = keypadRect.left + col * sizeCol;
-				frame.right = keypadRect.left + (col + 1) * sizeCol - 1;
-				frame.top = sizeDisp + row * sizeRow;
-				frame.bottom = sizeDisp + (row + 1) * sizeRow - 1;
-
-				if (drawBackground) {
-					SetHighColor(fBaseColor);
-					StrokeRect(frame);
-				}
-				frame.InsetBy(1, 1);
-
-				uint32 flags = 0;
-				if (!drawBackground)
-					flags |= BControlLook::B_BLEND_FRAME;
-				if (key->flags != 0)
-					flags |= BControlLook::B_ACTIVATED;
-				flags |= BControlLook::B_IGNORE_OUTLINE;
-
-				be_control_look->DrawButtonFrame(this, frame, updateRect,
-					fBaseColor, fBaseColor, flags);
-
-				be_control_look->DrawButtonBackground(this, frame, updateRect,
-					fBaseColor, flags);
-
-				be_control_look->DrawLabel(this, key->label, frame, updateRect,
-					fBaseColor, flags, BAlignment(B_ALIGN_HORIZONTAL_CENTER,
-						B_ALIGN_VERTICAL_CENTER));
-
-				key++;
-			}
-		}
-		return;
-	}
-
-	// TODO: support pressed keys
-
-	// paint keypad b/g
-	SetHighColor(fBaseColor);
-	FillRect(updateRect & keypadRect);
-
-	// render key main grid
-	BeginLineArray(((fColumns + fRows) << 1) + 1);
-
-	// render cols
-	AddLine(BPoint(0.0, sizeDisp),
-			BPoint(0.0, fHeight),
-			fLightColor);
-	for (int col = 1; col < fColumns; col++) {
-		AddLine(BPoint(col * sizeCol - 1.0, sizeDisp),
-				BPoint(col * sizeCol - 1.0, fHeight),
-				fDarkColor);
-		AddLine(BPoint(col * sizeCol, sizeDisp),
-				BPoint(col * sizeCol, fHeight),
-				fLightColor);
-	}
-	AddLine(BPoint(fColumns * sizeCol, sizeDisp),
-			BPoint(fColumns * sizeCol, fHeight),
-			fDarkColor);
-
-	// render rows
-	for (int row = 0; row < fRows; row++) {
-		AddLine(BPoint(0.0, sizeDisp + row * sizeRow - 1.0),
-				BPoint(fWidth, sizeDisp + row * sizeRow - 1.0),
-				fDarkColor);
-		AddLine(BPoint(0.0, sizeDisp + row * sizeRow),
-				BPoint(fWidth, sizeDisp + row * sizeRow),
-				fLightColor);
-	}
-	AddLine(BPoint(0.0, sizeDisp + fRows * sizeRow),
-			BPoint(fWidth, sizeDisp + fRows * sizeRow),
-			fDarkColor);
-
-	// main grid complete
-	EndLineArray();
-
-	// render key symbols
-	float halfSizeCol = sizeCol * 0.5f;
-	SetHighColor(fButtonTextColor);
-	SetLowColor(fBaseColor);
-	SetDrawingMode(B_OP_COPY);
-
-	float baselineOffset = ((fHeight - sizeDisp) / (float)fRows)
-							* (1.0 - kFontScaleY) * 0.5;
 	CalcKey* key = fKeypad;
 	for (int row = 0; row < fRows; row++) {
 		for (int col = 0; col < fColumns; col++) {
-			float halfSymbolWidth = StringWidth(key->label) * 0.5f;
-			DrawString(key->label,
-				BPoint(col * sizeCol + halfSizeCol - halfSymbolWidth,
-				sizeDisp + (row + 1) * sizeRow - baselineOffset));
+			BRect frame;
+			frame.left = keypadRect.left + col * sizeCol;
+			frame.right = keypadRect.left + (col + 1) * sizeCol - 1;
+			frame.top = sizeDisp + row * sizeRow;
+			frame.bottom = sizeDisp + (row + 1) * sizeRow - 1;
+
+			if (drawBackground) {
+				SetHighColor(fBaseColor);
+				StrokeRect(frame);
+			}
+			frame.InsetBy(1, 1);
+
+			uint32 flags = 0;
+			if (!drawBackground)
+				flags |= BControlLook::B_BLEND_FRAME;
+			if (key->flags != 0)
+				flags |= BControlLook::B_ACTIVATED;
+			flags |= BControlLook::B_IGNORE_OUTLINE;
+
+			be_control_look->DrawButtonFrame(this, frame, updateRect,
+				fBaseColor, fBaseColor, flags);
+
+			be_control_look->DrawButtonBackground(this, frame, updateRect,
+				fBaseColor, flags);
+
+			be_control_look->DrawLabel(this, key->label, frame, updateRect,
+				fBaseColor, flags, BAlignment(B_ALIGN_HORIZONTAL_CENTER,
+					B_ALIGN_VERTICAL_CENTER));
+
 			key++;
 		}
 	}
@@ -671,40 +570,33 @@ CalcView::MakeFocus(bool focused)
 
 
 void
-CalcView::ResizeTo(float width, float height)
-{
-	BView::ResizeTo(width, height);
-}
-
-
-void
 CalcView::FrameResized(float width, float height)
 {
 	fWidth = width;
 	fHeight = height;
 
 	// layout expression text view
-	BRect frame = _ExpressionRect();
+	BRect expressionRect = _ExpressionRect();
 	if (fOptions->keypad_mode == KEYPAD_MODE_COMPACT) {
-		frame.InsetBy(2, 2);
-		frame.right -= ceilf(fCalcIcon->Bounds().Width() * 1.5);
+		expressionRect.InsetBy(2, 2);
+		expressionRect.right -= ceilf(fCalcIcon->Bounds().Width() * 1.5);
 	} else
-		frame.InsetBy(4, 4);
+		expressionRect.InsetBy(4, 4);
 
-	fExpressionTextView->MoveTo(frame.LeftTop());
-	fExpressionTextView->ResizeTo(frame.Width(), frame.Height());
+	fExpressionTextView->MoveTo(expressionRect.LeftTop());
+	fExpressionTextView->ResizeTo(expressionRect.Width(), expressionRect.Height());
 
 	// configure expression text view font size and color
 	float sizeDisp = fOptions->keypad_mode == KEYPAD_MODE_COMPACT
-					 ? fHeight : fHeight * kDisplayScaleY;
+		? fHeight : fHeight * kDisplayScaleY;
 	BFont font(be_bold_font);
 	font.SetSize(sizeDisp * kExpressionFontScaleY);
 	fExpressionTextView->SetFontAndColor(&font, B_FONT_ALL);
 
-	frame.OffsetTo(B_ORIGIN);
-	float inset = (frame.Height() - fExpressionTextView->LineHeight(0)) / 2;
-	frame.InsetBy(0, inset);
-	fExpressionTextView->SetTextRect(frame);
+	expressionRect.OffsetTo(B_ORIGIN);
+	float inset = (expressionRect.Height() - fExpressionTextView->LineHeight(0)) / 2;
+	expressionRect.InsetBy(0, inset);
+	fExpressionTextView->SetTextRect(expressionRect);
 	Invalidate();
 }
 
@@ -911,11 +803,14 @@ CalcView::SetDegreeMode(bool degrees)
 void
 CalcView::SetKeypadMode(uint8 mode)
 {
-	if (fOptions->keypad_mode == mode)
+	if (_IsEmbedded())
 		return;
 
 	BWindow* window = Window();
 	if (window == NULL)
+		return;
+
+	if (fOptions->keypad_mode == mode)
 		return;
 
 	fOptions->keypad_mode = mode;
@@ -929,12 +824,12 @@ CalcView::SetKeypadMode(uint8 mode)
 		{
 			if (window->Bounds() == Frame()) {
 				window->SetSizeLimits(kMinimumWidthCompact,
-									  kMaximumWidthCompact,
-									  kMinimumHeightCompact,
-									  kMaximumHeightCompact);
+					kMaximumWidthCompact, kMinimumHeightCompact,
+					kMaximumHeightCompact);
 				window->ResizeTo(width, height * kDisplayScaleY);
 			} else
 				ResizeTo(width, height * kDisplayScaleY);
+
 			break;
 		}
 
@@ -946,22 +841,29 @@ CalcView::SetKeypadMode(uint8 mode)
 			_ParseCalcDesc(fKeypadDescription);
 
 			window->SetSizeLimits(kMinimumWidthScientific,
-								  kMaximumWidthScientific,
-								  kMinimumHeightScientific,
-								  kMaximumHeightScientific);
+				kMaximumWidthScientific, kMinimumHeightScientific,
+				kMaximumHeightScientific);
+
 			if (width < kMinimumWidthScientific)
 				width = kMinimumWidthScientific;
-			if (width > kMaximumWidthScientific)
+			else if (width > kMaximumWidthScientific)
 				width = kMaximumWidthScientific;
+
 			if (height < kMinimumHeightScientific)
 				height = kMinimumHeightScientific;
-			if (height > kMaximumHeightScientific)
+			else if (height > kMaximumHeightScientific)
 				height = kMaximumHeightScientific;
-			ResizeTo(width, height);
+
+			if (width != fWidth || height != fHeight)
+				ResizeTo(width, height);
+			else
+				Invalidate();
+
 			break;
 		}
 
-		default: // KEYPAD_MODE_BASIC is the default
+		case KEYPAD_MODE_BASIC:
+		default:
 		{
 			free(fKeypadDescription);
 			fKeypadDescription = strdup(kKeypadDescriptionBasic);
@@ -969,16 +871,22 @@ CalcView::SetKeypadMode(uint8 mode)
 			_ParseCalcDesc(fKeypadDescription);
 
 			window->SetSizeLimits(kMinimumWidthBasic, kMaximumWidthBasic,
-								  kMinimumHeightBasic, kMaximumHeightBasic);
+				kMinimumHeightBasic, kMaximumHeightBasic);
+
 			if (width < kMinimumWidthBasic)
 				width = kMinimumWidthBasic;
-			if (width > kMaximumWidthBasic)
+			else if (width > kMaximumWidthBasic)
 				width = kMaximumWidthBasic;
+
 			if (height < kMinimumHeightBasic)
 				height = kMinimumHeightBasic;
-			if (height > kMaximumHeightBasic)
+			else if (height > kMaximumHeightBasic)
 				height = kMaximumHeightBasic;
-			ResizeTo(width, height);
+
+			if (width != fWidth || height != fHeight)
+				ResizeTo(width, height);
+			else
+				Invalidate();
 		}
 	}
 }
@@ -1376,4 +1284,13 @@ CalcView::_FetchAppIcon(BBitmap* into)
 	}
 	if (status != B_OK)
 		memset(into->Bits(), 0, into->BitsLength());
+}
+
+
+// Returns whether or not CalcView is embedded somewhere, most likely
+// the Desktop
+bool
+CalcView::_IsEmbedded()
+{
+	return Parent() != NULL && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0;
 }

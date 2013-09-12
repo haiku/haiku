@@ -4,9 +4,9 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
- *		John Scipione <jscipione@gmail.com>
- *		Timothy Wayper <timmy@wunderbear.com>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		John Scipione, jscipione@gmail.com
+ *		Timothy Wayper, timmy@wunderbear.com
  */
 
 
@@ -42,7 +42,7 @@ CalcWindow::CalcWindow(BRect frame, BMessage* settings)
 
 	// Size Limits are defined in CalcView.h
 	SetSizeLimits(kMinimumWidthBasic, kMaximumWidthBasic,
-				  kMinimumHeightBasic, kMaximumHeightBasic);
+		kMinimumHeightBasic, kMaximumHeightBasic);
 
 	frame.OffsetTo(B_ORIGIN);
 	fCalcView = new CalcView(frame, baseColor, settings);

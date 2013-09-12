@@ -1,11 +1,12 @@
 /*
- * Copyright 2005-2008, Haiku Inc. All rights reserved.
+ * Copyright 2005-2013, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jan-Rixt Van Hoye
  *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
  *		Michael Lotz <mmlr@mlotz.ch>
+ *		Siarzhuk Zharski <imker@gmx.li>
  */
 
 #ifndef OHCI_HARDWARE_H
@@ -396,6 +397,8 @@ typedef struct {
 	uint16		offset[OHCI_ITD_NOFFSET];	// Buffer offsets
 	// Software part
 	uint32		physical_address;			// Physical address of this descriptor
+	size_t		buffer_size;				// Size of the buffer
+	void		*buffer_logical;			// Logical pointer to the buffer
 	void		*next_logical_descriptor;	// Logical pointer next descriptor
 	void		*next_done_descriptor;		// Used for collision in the hash table
 } ohci_isochronous_td;
@@ -404,11 +407,31 @@ typedef struct {
 #define	OHCI_ITD_SET_STARTING_FRAME(x)			((x) & 0xffff)
 #define	OHCI_ITD_GET_DELAY_INTERRUPT(x)			(((x) >> 21) & 7)
 #define	OHCI_ITD_SET_DELAY_INTERRUPT(x)			((x) << 21)
-#define	OHCI_ITD_NO_INTERRUPT					0x00e00000
+#define	OHCI_ITD_INTERRUPT_MASK					0x00e00000
 #define	OHCI_ITD_GET_FRAME_COUNT(x)				((((x) >> 24) & 7) + 1)
 #define	OHCI_ITD_SET_FRAME_COUNT(x)				(((x) - 1) << 24)
 #define	OHCI_ITD_GET_CONDITION_CODE(x)			((x) >> 28)
-#define	OHCI_ITD_NO_CONDITION_CODE				0xf0000000
+#define	OHCI_ITD_SET_CONDITION_CODE(x)			((x) << 28)
+#define	OHCI_ITD_CONDITION_CODE_MASK			0xf0000000
+
+#define	OHCI_ITD_OFFSET_IDX(x)					(x)
+
+#define OHCI_ITD_INTERRUPT_IMMEDIATE			0x00
+#define OHCI_ITD_INTERRUPT_NONE					0x07
+
+#define OHCI_ITD_CONDITION_NO_ERROR				0x00
+#define OHCI_ITD_CONDITION_CRC_ERROR			0x01
+#define OHCI_ITD_CONDITION_BIT_STUFFING			0x02
+#define OHCI_ITD_CONDITION_TOGGLE_MISMATCH		0x03
+#define OHCI_ITD_CONDITION_STALL				0x04
+#define OHCI_ITD_CONDITION_NO_RESPONSE			0x05
+#define OHCI_ITD_CONDITION_PID_CHECK_FAILURE	0x06
+#define OHCI_ITD_CONDITION_UNEXPECTED_PID		0x07
+#define OHCI_ITD_CONDITION_DATA_OVERRUN			0x08
+#define OHCI_ITD_CONDITION_DATA_UNDERRUN		0x09
+#define OHCI_ITD_CONDITION_BUFFER_OVERRUN		0x0c
+#define OHCI_ITD_CONDITION_BUFFER_UNDERRUN		0x0d
+#define OHCI_ITD_CONDITION_NOT_ACCESSED			0x0f
 
 // TO FIX
 #define itd_pswn itd_offset						// Packet Status Word
@@ -418,6 +441,10 @@ typedef struct {
 #define OHCI_ITD_GET_BUFFER_CONDITION_CODE(x)	((x) >> 12)
 
 #define OHCI_ISOCHRONOUS_TD_ALIGN 32
+
+// Number of frames
+#define NUMBER_OF_FRAMES		1024
+#define MAX_AVAILABLE_BANDWIDTH	900	// Microseconds
 
 // --------------------------------
 //	Completion Codes (section 4.3.3)

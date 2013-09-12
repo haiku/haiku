@@ -69,6 +69,8 @@ enum {
 	DW_TAG_rvalue_reference_type	= 0x42,
 	DW_TAG_template_alias			= 0x43,
 	DW_TAG_lo_user					= 0x4080,
+	DW_TAG_GNU_template_template_param
+									= 0x4106,
 	DW_TAG_GNU_template_parameter_pack
 									= 0x4107,
 	DW_TAG_GNU_formal_parameter_pack
@@ -306,6 +308,8 @@ enum {
 	DW_OP_form_tls_address		= 0x9b,
 	DW_OP_call_frame_cfa		= 0x9c,
 	DW_OP_bit_piece				= 0x9d,
+	DW_OP_implicit_value		= 0x9e,
+	DW_OP_stack_value			= 0x9f,
 	DW_OP_lo_user				= 0xe0,
 	DW_OP_hi_user				= 0xff
 };
@@ -504,6 +508,13 @@ enum {
     DW_CFA_GNU_window_save		= 0x2d,
     DW_CFA_GNU_args_size		= 0x2e,
     DW_CFA_GNU_negative_offset_extended	= 0x2f
+};
+
+
+enum dwarf_reference_type {
+	dwarf_reference_type_local = 0,
+	dwarf_reference_type_global,
+	dwarf_reference_type_signature
 };
 
 

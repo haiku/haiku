@@ -1,12 +1,13 @@
 /*
- * Copyright 2006 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All rights reserved.
  * Copyright 1997, 1998 R3 Software Ltd. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
- *		John Scipione <jscipione@gmail.com>
- *		Timothy Wayper <timmy@wunderbear.com>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Philippe Saint-Pierre, stpere@gmail.com
+ *		John Scipione, jscipione@gmail.com
+ *		Timothy Wayper, timmy@wunderbear.com
  */
 #ifndef _CALC_VIEW_H
 #define _CALC_VIEW_H
@@ -59,7 +60,6 @@ class CalcView : public BView {
 	virtual	void				MouseUp(BPoint point);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeFocus(bool focused = true);
-	virtual	void				ResizeTo(float width, float height);
 	virtual	void				FrameResized(float width, float height);
 
 			// Archive this view.
@@ -117,6 +117,7 @@ class CalcView : public BView {
 			void				_MarkKeypadItems(uint8 mode);
 
 			void				_FetchAppIcon(BBitmap* into);
+			bool				_IsEmbedded();
 
 			// grid dimensions
 			int16				fColumns;

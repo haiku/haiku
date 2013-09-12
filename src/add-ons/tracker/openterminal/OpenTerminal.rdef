@@ -42,3 +42,4 @@ resource vector_icon {
 	$"B30CB30C0A0C0110000A0B010F2032290A09010D2032BA450A09010D2036BB11"
 };
 
+resource("BEOS:default_shortcut") "T";

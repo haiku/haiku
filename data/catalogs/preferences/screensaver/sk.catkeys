@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-ScreenSaver	215605989
+1	slovak	x-vnd.Haiku-ScreenSaver	3630119516
 Could not load screen saver	ScreenSaver		Nebolo možné načítať šetrič obrazovky
 30 seconds	ScreenSaver		30 sekúnd
 Start screensaver	ScreenSaver		Spustiť šetrič obrazovky
@@ -7,7 +7,6 @@ Password:	ScreenSaver		Heslo:
 Password lock	ScreenSaver		Zamknutie heslom
 Add…	ScreenSaver		Pridať…
 Screensavers	ScreenSaver		Šetriče obrazovky
-mouse is here	ScreenSaver		myš je tu
 Display Power Management Signaling not available	ScreenSaver		Display Power Management Signaling nie je dostupný
 ScreenSaver	System name		Šetrič obrazovky
 Test	ScreenSaver		Test
@@ -17,11 +16,9 @@ Cancel	ScreenSaver		Zrušiť
 Turn off screen	ScreenSaver		Vypnúť obrazovku
 No options available	ScreenSaver		Žiadne dostupné možnosti
 Password Window	ScreenSaver		Okno s heslom
-Fade now when	ScreenSaver		Stmaviť teraz, keď
 Screensaver settings	ScreenSaver		Nastavenia šetriča obrazovky
 Passwords don't match. Please try again.	ScreenSaver		Heslá sa nezhodujú. Prosím, skúste to znova.
 OK	ScreenSaver		OK
-Don't fade when	ScreenSaver		Nestmavovať, keď
 Blackness	ScreenSaver		Čiernota
 Use custom password	ScreenSaver		Použiť vlastné heslo
 Done	ScreenSaver		Hotovo

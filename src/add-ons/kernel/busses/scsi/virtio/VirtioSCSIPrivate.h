@@ -35,6 +35,8 @@ void swap_words(void *data, size_t size);
 #define VIRTIO_SCSI_STANDARD_TIMEOUT		10 * 1000 * 1000
 #define VIRTIO_SCSI_INITIATOR_ID	7
 
+#define VIRTIO_SCSI_NUM_EVENTS		4
+
 
 class VirtioSCSIRequest;
 
@@ -58,10 +60,16 @@ public:
 			uchar				TerminateRequest(scsi_ccb* request);
 			status_t			Control(uint8 targetID, uint32 op,
 									void* buffer, size_t length);
-			
+
 private:
-	static	void				RequestCallback(void *cookie);
-			void				_Interrupt();
+	static	void				_RequestCallback(void* driverCookie,
+									void *cookie);
+			void				_RequestInterrupt();
+	static	void				_EventCallback(void *driverCookie, void *cookie);
+			void				_EventInterrupt(struct virtio_scsi_event* event);
+	static	void				_RescanChildBus(void *cookie);
+
+			void				_SubmitEvent(uint32 event);
 
 			device_node*		fNode;
 			scsi_bus 			fBus;
@@ -86,6 +94,8 @@ private:
 			ConditionVariableEntry fInterruptConditionEntry;
 			bool				fExpectsInterrupt;
 
+			scsi_dpc_cookie		fEventDPC;
+			struct virtio_scsi_event fEventBuffers[VIRTIO_SCSI_NUM_EVENTS];
 };
 
 
@@ -131,7 +141,7 @@ private:
 			bool				fHasLock;
 
 			uint8				fStatus;
-			
+
 			bigtime_t			fTimeout;
 			size_t				fBytesLeft;
 			bool				fIsWrite;

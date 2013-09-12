@@ -16,6 +16,7 @@
 #include <NetworkDevice.h>
 #include <NetworkInterface.h>
 
+#include <algorithm>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <stdio.h>
@@ -38,8 +39,10 @@
 #define DHCP_CLIENT_PORT	68
 #define DHCP_SERVER_PORT	67
 
-#define DEFAULT_TIMEOUT		2	// secs
-#define MAX_TIMEOUT			15	// secs
+#define DEFAULT_TIMEOUT		4	// secs
+#define MAX_TIMEOUT			64	// secs
+
+#define MAX_RETRIES			5
 
 enum message_opcode {
 	BOOT_REQUEST = 1,
@@ -427,10 +430,7 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	fServer(AF_INET, NULL, DHCP_SERVER_PORT),
 	fLeaseTime(0)
 {
-	fStartTime = system_time();
-	fTransactionID = (uint32)fStartTime;
-
-	srand(fTransactionID);
+	fTransactionID = (uint32)system_time() ^ rand();
 
 	BNetworkAddress link;
 	BNetworkInterface interface(device);
@@ -498,12 +498,21 @@ DHCPClient::Initialize()
 status_t
 DHCPClient::_Negotiate(dhcp_state state)
 {
+	if (state == BOUND)
+		return B_OK;
+
+	fStartTime = system_time();
+	fTransactionID++;
+
+	char hostName[MAXHOSTNAMELEN];
+	if (gethostname(hostName, MAXHOSTNAMELEN) == 0)
+		fHostName.SetTo(hostName, MAXHOSTNAMELEN);
+	else
+		fHostName.Truncate(0);
+
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket < 0)
 		return errno;
-
-	BNetworkAddress local;
-	local.SetToWildcard(AF_INET, DHCP_CLIENT_PORT);
 
 	// Enable reusing the port. This is needed in case there is more
 	// than 1 interface that needs to be configured. Note that the only reason
@@ -512,108 +521,69 @@ DHCPClient::_Negotiate(dhcp_state state)
 	int option = 1;
 	setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &option, sizeof(option));
 
+	BNetworkAddress local;
+	local.SetToWildcard(AF_INET, DHCP_CLIENT_PORT);
+
+	option = 1;
+	setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
+
 	if (bind(socket, local, local.Length()) < 0) {
 		close(socket);
 		return errno;
 	}
 
-	BNetworkAddress broadcast;
-	broadcast.SetToBroadcast(AF_INET, DHCP_SERVER_PORT);
+	bigtime_t previousLeaseTime = fLeaseTime;
 
-	option = 1;
-	setsockopt(socket, SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
-
-	if (state == INIT) {
-		// The local interface does not have an address yet, bind the socket
-		// to the device directly.
-		BNetworkDevice device(Device());
-		int index = device.Index();
-
-		setsockopt(socket, SOL_SOCKET, SO_BINDTODEVICE, &index, sizeof(int));
+	status_t status = B_OK;
+	while (state != BOUND) {
+		status = _StateTransition(socket, state);
+		if (status != B_OK && (state == SELECTING || state == REBOOTING))
+			break;
 	}
 
-	bigtime_t previousLeaseTime = fLeaseTime;
-	fLeaseTime = 0;
-	fRenewalTime = 0;
-	fRebindingTime = 0;
+	close(socket);
 
-	status_t status = B_ERROR;
-	time_t timeout;
-	uint32 tries;
-	_ResetTimeout(socket, timeout, tries);
+	if (fLeaseTime == 0)
+		fLeaseTime = previousLeaseTime;
+	if (fLeaseTime == 0)
+		fLeaseTime = 60;
 
-	char hostName[MAXHOSTNAMELEN];
-	if (gethostname(hostName, MAXHOSTNAMELEN) == 0)
-		fHostName.SetTo(hostName, MAXHOSTNAMELEN);
-	else
-		fHostName.Truncate(0);
+	if (fRenewalTime == 0)
+		fRenewalTime = fLeaseTime / 2;
+	if (fRebindingTime == 0)
+		fRebindingTime = fLeaseTime * 7 / 8;
+	fLeaseTime += fRequestTime;
+	fRenewalTime += fRequestTime;
+	fRebindingTime += fRequestTime;
+	_RestartLease(fRenewalTime);
 
-	dhcp_message discover(DHCP_DISCOVER);
-	_PrepareMessage(discover, state);
+	fStatus = status;
+	if (status)
+		return status;
 
-	dhcp_message request(DHCP_REQUEST);
-	_PrepareMessage(request, state);
+	// configure interface
+	BMessage reply;
+	status = Target().SendMessage(&fConfiguration, &reply);
+	if (status == B_OK)
+		status = reply.FindInt32("status", &fStatus);
 
-	// send discover/request message
-	_SendMessage(socket, state == INIT ? discover : request,
-		state != RENEWING ? broadcast : fServer);
-		// no need to check the status; in case of an error we'll just send
-		// the message again
+	// configure resolver
+	reply.MakeEmpty();
+	fResolverConfiguration.AddString("device", Device());
+	status = Target().SendMessage(&fResolverConfiguration, &reply);
+	if (status == B_OK)
+		status = reply.FindInt32("status", &fStatus);
+	return status;
+}
 
-	// receive loop until we've got an offer and acknowledged it
 
-	while (state != BOUND) {
-		char buffer[2048];
-		struct sockaddr_in from;
-		socklen_t fromLength = sizeof(from);
-		ssize_t bytesReceived = recvfrom(socket, buffer, sizeof(buffer),
-			0, (struct sockaddr*)&from, &fromLength);
-		if (bytesReceived < 0 && errno == B_TIMED_OUT) {
-			// depending on the state, we'll just try again
-			if (!_TimeoutShift(socket, timeout, tries)) {
-				close(socket);
-				return B_TIMED_OUT;
-			}
-
-			_SendMessage(socket, state == INIT ? discover : request,
-				state != RENEWING ? broadcast : fServer);
-			continue;
-
-		} else if (bytesReceived < 0)
-			break;
-
-		dhcp_message* message = (dhcp_message*)buffer;
-		if (message->transaction_id != htonl(fTransactionID)
-			|| !message->HasOptions()
-			|| memcmp(message->mac_address, discover.mac_address,
-				discover.hardware_address_length)) {
-			// this message is not for us
-			continue;
-		}
-
-		// advance from startup state
-		if (state == INIT)
-			state = SELECTING;
-		else if (state == INIT_REBOOT)
-			state = REBOOTING;
-
-		syslog(LOG_DEBUG, "%s: Received %s from %s\n",
-			Device(), dhcp_message::TypeToString(message->Type()),
-			_AddressToString(from.sin_addr.s_addr).String());
-
-		switch (message->Type()) {
-			case DHCP_NONE:
-			default:
-				// ignore this message
-				break;
-
-			case DHCP_OFFER:
-			{
-				// first offer wins
-				if (state != SELECTING)
-					break;
-
-				// collect interface options
+status_t
+DHCPClient::_GotMessage(dhcp_state& state, dhcp_message* message)
+{
+	switch (state) {
+		case SELECTING:
+			if (message->Type() == DHCP_OFFER) {
+				state = REQUESTING;
 
 				fAssignedAddress = message->your_address;
 				syslog(LOG_INFO, "  your_address: %s\n",
@@ -630,27 +600,16 @@ DHCPClient::_Negotiate(dhcp_state state)
 				_ParseOptions(*message, address, fResolverConfiguration);
 
 				fConfiguration.AddMessage("address", &address);
-
-				// request configuration from the server
-
-				_ResetTimeout(socket, timeout, tries);
-				state = REQUESTING;
-				_PrepareMessage(request, state);
-
-				status = _SendMessage(socket, request, broadcast);
-					// we're sending a broadcast so that all potential offers
-					// get an answer
-				break;
+				return B_OK;
 			}
 
-			case DHCP_ACK:
-			{
-				if (state != REQUESTING
-					&& state != REBOOTING
-					&& state != REBINDING
-					&& state != RENEWING)
-					continue;
+			return B_BAD_VALUE;
 
+		case REBOOTING:
+		case REBINDING:
+		case RENEWING:
+		case REQUESTING:
+			if (message->Type() == DHCP_ACK) {
 				// TODO: we might want to configure the stuff, don't we?
 				BMessage address;
 				fResolverConfiguration.MakeEmpty();
@@ -661,67 +620,96 @@ DHCPClient::_Negotiate(dhcp_state state)
 				// our address request has been acknowledged
 				state = BOUND;
 
-				// configure interface
-				BMessage reply;
-				status = Target().SendMessage(&fConfiguration, &reply);
-				if (status == B_OK)
-					status = reply.FindInt32("status", &fStatus);
-
-				// configure resolver
-				reply.MakeEmpty();
-				fResolverConfiguration.AddString("device", Device());
-				status = Target().SendMessage(&fResolverConfiguration, &reply);
-				if (status == B_OK)
-					status = reply.FindInt32("status", &fStatus);
-				break;
+				return B_OK;
 			}
 
-			case DHCP_NACK:
-				if (state != REQUESTING
-					&& state != REBOOTING
-					&& state != REBINDING
-					&& state != RENEWING)
-					continue;
+			if (message->Type() == DHCP_NACK) {
+				// server reject our request on previous assigned address
+				// back to square one...
+				fAssignedAddress = 0;
+				state = INIT;
+				return B_OK;
+			}
 
-				if (state == REBOOTING) {
-					// server reject our request on previous assigned address
-					// back to square one...
-					fAssignedAddress = 0;
-				}
+		default:
+			return B_BAD_VALUE;
+	}
+}
 
-				// try again (maybe we should prefer other servers if this
-				// happens more than once)
-				status = _SendMessage(socket, discover, broadcast);
-				if (status == B_OK)
-					state = INIT;
-				break;
+
+status_t
+DHCPClient::_StateTransition(int socket, dhcp_state& state)
+{
+	if (state == INIT) {
+		// The local interface does not have an address yet, bind the socket
+		// to the device directly.
+		BNetworkDevice device(Device());
+		int index = device.Index();
+
+		setsockopt(socket, SOL_SOCKET, SO_BINDTODEVICE, &index, sizeof(int));
+	}
+
+	BNetworkAddress broadcast;
+	broadcast.SetToBroadcast(AF_INET, DHCP_SERVER_PORT);
+
+	time_t timeout;
+	uint32 tries;
+	_ResetTimeout(socket, state, timeout, tries);
+
+	dhcp_message discover(DHCP_DISCOVER);
+	_PrepareMessage(discover, state);
+
+	dhcp_message request(DHCP_REQUEST);
+	_PrepareMessage(request, state);
+
+	bool skipRequest = false;
+	dhcp_state originalState = state;
+	fRequestTime = system_time();
+	while (true) {
+		if (!skipRequest) {
+			_SendMessage(socket, originalState == INIT ? discover : request,
+				originalState == RENEWING ? fServer : broadcast);
+
+			if (originalState == INIT)
+				state = SELECTING;
+			else if (originalState == INIT_REBOOT)
+				state = REBOOTING;
 		}
+
+		char buffer[2048];
+		struct sockaddr_in from;
+		socklen_t fromLength = sizeof(from);
+
+		ssize_t bytesReceived = recvfrom(socket, buffer, sizeof(buffer),
+			0, (struct sockaddr*)&from, &fromLength);
+		if (bytesReceived < 0 && errno == B_TIMED_OUT) {
+			// depending on the state, we'll just try again
+			if (!_TimeoutShift(socket, state, timeout, tries))
+				return B_TIMED_OUT;
+			skipRequest = false;
+			continue;
+		} else if (bytesReceived < 0)
+			return errno;
+
+		skipRequest = true;
+		dhcp_message* message = (dhcp_message*)buffer;
+		if (message->transaction_id != htonl(fTransactionID)
+			|| !message->HasOptions()
+			|| memcmp(message->mac_address, discover.mac_address,
+				discover.hardware_address_length)) {
+			// this message is not for us
+			continue;
+		}
+
+		syslog(LOG_DEBUG, "%s: Received %s from %s\n",
+			Device(), dhcp_message::TypeToString(message->Type()),
+			_AddressToString(from.sin_addr.s_addr).String());
+
+		if (_GotMessage(state, message) == B_OK)
+			break;
 	}
 
-	close(socket);
-
-	if (status == B_OK && fLeaseTime > 0) {
-		// notify early enough when the lease is
-		if (fRenewalTime == 0)
-			fRenewalTime = fLeaseTime * 2/3;
-		if (fRebindingTime == 0)
-			fRebindingTime = fLeaseTime * 5/6;
-
-		bigtime_t now = system_time();
-		_RestartLease(fRenewalTime);
-
-		fLeaseTime += now;
-		fRenewalTime += now;
-		fRebindingTime += now;
-			// make lease times absolute
-	} else {
-		fLeaseTime = previousLeaseTime;
-		bigtime_t now = system_time();
-		fRenewalTime = (fLeaseTime - now) * 2/3 + now;
-		fRebindingTime = (fLeaseTime - now) * 5/6 + now;
-	}
-
-	return status;
+	return B_OK;
 }
 
 
@@ -732,7 +720,7 @@ DHCPClient::_RestartLease(bigtime_t leaseTime)
 		return;
 
 	BMessage lease(kMsgLeaseTime);
-	fRunner = new BMessageRunner(this, &lease, leaseTime, 1);
+	fRunner = new BMessageRunner(this, &lease, leaseTime - system_time(), 1);
 }
 
 
@@ -899,7 +887,8 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 
 
 void
-DHCPClient::_ResetTimeout(int socket, time_t& timeout, uint32& tries)
+DHCPClient::_ResetTimeout(int socket, dhcp_state& state, time_t& timeout,
+	uint32& tries)
 {
 	timeout = DEFAULT_TIMEOUT;
 	tries = 0;
@@ -912,15 +901,36 @@ DHCPClient::_ResetTimeout(int socket, time_t& timeout, uint32& tries)
 
 
 bool
-DHCPClient::_TimeoutShift(int socket, time_t& timeout, uint32& tries)
+DHCPClient::_TimeoutShift(int socket, dhcp_state& state, time_t& timeout,
+	uint32& tries)
 {
-	timeout += timeout;
-	if (timeout > MAX_TIMEOUT) {
-		timeout = DEFAULT_TIMEOUT;
-
-		if (++tries > 2)
-			return false;
+	if (state == RENEWING && system_time() > fRebindingTime) {
+		state = REBINDING;
+		return false;
 	}
+
+	if (state == REBINDING && system_time() > fLeaseTime) {
+		state = INIT;
+		return false;
+	}
+		
+	tries++;
+	timeout += timeout;
+	if (timeout > MAX_TIMEOUT)
+		timeout = MAX_TIMEOUT;
+
+	if (tries > MAX_RETRIES) {
+		bigtime_t remaining = 0;
+		if (state == RENEWING)
+			remaining = (fRebindingTime - system_time()) / 2 + 1;
+		else if (state == REBINDING)
+			remaining = (fLeaseTime - system_time()) / 2 + 1;
+		else
+			return false;
+
+		timeout = std::max(remaining / 1000000, bigtime_t(60));
+	}
+
 	syslog(LOG_DEBUG, "%s: Timeout shift: %lu secs (try %lu)\n",
 		Device(), timeout, tries);
 
@@ -978,13 +988,12 @@ DHCPClient::_CurrentState() const
 {
 	bigtime_t now = system_time();
 
-	if (now > fLeaseTime || fStatus < B_OK)
+	if (now > fLeaseTime || fStatus != B_OK)
 		return INIT;
 	if (now >= fRebindingTime)
 		return REBINDING;
 	if (now >= fRenewalTime)
 		return RENEWING;
-
 	return BOUND;
 }
 
@@ -994,35 +1003,8 @@ DHCPClient::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgLeaseTime:
-		{
-			dhcp_state state = _CurrentState();
-
-			bigtime_t next;
-			if (_Negotiate(state) == B_OK) {
-				switch (state) {
-					case RENEWING:
-						next = fRebindingTime;
-						break;
-					case REBINDING:
-					default:
-						next = fRenewalTime;
-						break;
-				}
-			} else {
-				switch (state) {
-					case RENEWING:
-						next = (fLeaseTime - fRebindingTime) / 4 + system_time();
-						break;
-					case REBINDING:
-					default:
-						next = (fLeaseTime - fRenewalTime) / 4 + system_time();
-						break;
-				}
-			}
-
-			_RestartLease(next - system_time());
+			_Negotiate(_CurrentState());
 			break;
-		}
 
 		default:
 			BHandler::MessageReceived(message);

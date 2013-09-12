@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons tracker zipomatic ;
 
 UsePrivateHeaders shared ;
 
-Application ZipOMatic-Z :
+Application ZipOMatic :
 	GenericThread.cpp
 	ZipOMatic.cpp
 	ZipOMaticActivity.cpp
@@ -13,7 +13,7 @@ Application ZipOMatic-Z :
 	: ZipOMatic.rdef
 ;
 
-DoCatalogs ZipOMatic-Z :
+DoCatalogs ZipOMatic :
 	x-vnd.haiku.zip-o-matic
 	:
 	ZipOMatic.cpp

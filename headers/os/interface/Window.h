@@ -123,7 +123,7 @@ public:
 			void				Zoom();
 			void				SetZoomLimits(float maxWidth, float maxHeight);
 	virtual void				ScreenChanged(BRect screenSize,
-									color_space format);
+									color_space depth);
 
 			void				SetPulseRate(bigtime_t rate);
 			bigtime_t			PulseRate() const;
@@ -219,7 +219,7 @@ public:
 
 	virtual BHandler*			ResolveSpecifier(BMessage* message,
 									int32 index, BMessage* specifier,
-									int32 form, const char* property);
+									int32 what, const char* property);
 	virtual status_t			GetSupportedSuites(BMessage* data);
 
 			status_t			AddToSubset(BWindow* window);

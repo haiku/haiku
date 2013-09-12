@@ -54,9 +54,6 @@ private:
 			void				_ParseStatus();
 			void				_ParseHeaders();
 
-			void				_CopyChunkInBuffer(char** buffer,
-									ssize_t* bytesReceived);
-
 			void				_AddOutputBufferLine(const char* line);
 
 

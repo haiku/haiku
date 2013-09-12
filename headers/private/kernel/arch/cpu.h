@@ -46,6 +46,7 @@ void arch_cpu_sync_icache(void *address, size_t length);
 
 void arch_cpu_memory_read_barrier(void);
 void arch_cpu_memory_write_barrier(void);
+void arch_cpu_memory_read_write_barrier(void);
 
 
 #ifdef __cplusplus

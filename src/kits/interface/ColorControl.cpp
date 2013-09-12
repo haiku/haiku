@@ -92,7 +92,8 @@ BColorControl::_InitData(color_control_layout layout, float size,
 
 	fSelectedPaletteColorIndex = -1;
 	fPreviousSelectedPaletteColorIndex = -1;
-	fFocusedComponent = 0;
+	fFocusedRamp = !fPaletteMode && IsFocus() ? 1 : -1;
+	fClickedRamp = -1;
 
 	const char* red = B_TRANSLATE_MARK("Red:");
 	const char* green = B_TRANSLATE_MARK("Green:");
@@ -278,35 +279,17 @@ BColorControl::SetValue(int32 value)
 
 		fPreviousSelectedPaletteColorIndex = fSelectedPaletteColorIndex;
 	} else {
-		float invalidateRadius = kSelectorSize / 2 + kSelectorPenSize;
-		BPoint p;
-
 		if (c1.red != c2.red) {
-			p = _SelectorPosition(_RampFrame(1), c1.red);
-			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
-				 p.x + invalidateRadius, p.y + invalidateRadius));
-
-			p = _SelectorPosition(_RampFrame(1), c2.red);
-			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
-				 p.x + invalidateRadius, p.y + invalidateRadius));
+			_InvalidateSelector(1, c1, IsFocus() && fFocusedRamp == 1);
+			_InvalidateSelector(1, c2, IsFocus() && fFocusedRamp == 1);
 		}
 		if (c1.green != c2.green) {
-			p = _SelectorPosition(_RampFrame(2), c1.green);
-			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
-				 p.x + invalidateRadius, p.y + invalidateRadius));
-
-			p = _SelectorPosition(_RampFrame(2), c2.green);
-			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
-				 p.x + invalidateRadius, p.y + invalidateRadius));
+			_InvalidateSelector(2, c1, IsFocus() && fFocusedRamp == 2);
+			_InvalidateSelector(2, c2, IsFocus() && fFocusedRamp == 2);
 		}
 		if (c1.blue != c2.blue) {
-			p = _SelectorPosition(_RampFrame(3), c1.blue);
-			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
-				 p.x + invalidateRadius, p.y + invalidateRadius));
-
-			p = _SelectorPosition(_RampFrame(3), c2.blue);
-			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
-				 p.x + invalidateRadius, p.y + invalidateRadius));
+			_InvalidateSelector(3, c1, IsFocus() && fFocusedRamp == 3);
+			_InvalidateSelector(3, c2, IsFocus() && fFocusedRamp == 3);
 		}
 	}
 
@@ -414,34 +397,22 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 	BRect rect = _PaletteFrame();
 	bool enabled = IsEnabled();
 
-	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color darken1 = tint_color(noTint, B_DARKEN_1_TINT);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color darken1 = tint_color(base, B_DARKEN_1_TINT);
 
 	if (be_control_look != NULL) {
-		uint32 flags = 0;
-		if (!enabled)
-			flags |= BControlLook::B_DISABLED;
-
-		be_control_look->DrawTextControlBorder(target, rect, updateRect, noTint,
-			flags);
+		uint32 flags = be_control_look->Flags(this);
+		be_control_look->DrawTextControlBorder(target, rect, updateRect,
+			base, flags);
 	} else {
-		rgb_color lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
-		rgb_color lightenmax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
-		rgb_color darken2 = tint_color(noTint, B_DARKEN_2_TINT);
-		rgb_color darken4 = tint_color(noTint, B_DARKEN_4_TINT);
-
 		// first bevel
-		if (enabled)
-			target->SetHighColor(darken1);
-		else
-			target->SetHighColor(noTint);
+		rgb_color lighten1 = tint_color(base, B_LIGHTEN_1_TINT);
+		rgb_color lightenmax = tint_color(base, B_LIGHTEN_MAX_TINT);
+		target->SetHighColor(enabled ? darken1 : base);
 
 		target->StrokeLine(rect.LeftBottom(), rect.LeftTop());
 		target->StrokeLine(rect.LeftTop(), rect.RightTop());
-		if (enabled)
-			target->SetHighColor(lightenmax);
-		else
-			target->SetHighColor(lighten1);
+		target->SetHighColor(enabled ? lightenmax : lighten1);
 
 		target->StrokeLine(BPoint(rect.left + 1.0f, rect.bottom),
 			rect.RightBottom());
@@ -451,14 +422,13 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 		rect.InsetBy(1.0f, 1.0f);
 
 		// second bevel
-		if (enabled)
-			target->SetHighColor(darken4);
-		else
-			target->SetHighColor(darken2);
+		rgb_color darken2 = tint_color(base, B_DARKEN_2_TINT);
+		rgb_color darken4 = tint_color(base, B_DARKEN_4_TINT);
+		target->SetHighColor(enabled ? darken4 : darken2);
 
 		target->StrokeLine(rect.LeftBottom(), rect.LeftTop());
 		target->StrokeLine(rect.LeftTop(), rect.RightTop());
-		target->SetHighColor(noTint);
+		target->SetHighColor(base);
 		target->StrokeLine(BPoint(rect.left + 1.0f, rect.bottom),
 			rect.RightBottom());
 		target->StrokeLine(rect.RightBottom(),
@@ -474,10 +444,7 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 			/ int(fCellSize));
 
 		// grid
-		if (enabled)
-			target->SetHighColor(darken1);
-		else
-			target->SetHighColor(noTint);
+		target->SetHighColor(enabled ? darken1 : base);
 
 		for (int xi = 0; xi < fColumns + 1; xi++) {
 			float x = fPaletteFrame.left + float(xi) * fCellSize;
@@ -529,8 +496,8 @@ BColorControl::_DrawColorArea(BView* target, BRect updateRect)
 void
 BColorControl::_DrawSelectors(BView* target)
 {
-	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color lightenmax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color lightenmax = tint_color(base, B_LIGHTEN_MAX_TINT);
 
 	if (fPaletteMode) {
 		if (fSelectedPaletteColorIndex != -1) {
@@ -539,15 +506,38 @@ BColorControl::_DrawSelectors(BView* target)
 		}
 	} else {
 		rgb_color color = ValueAsColor();
-		target->SetPenSize(kSelectorPenSize);
 		target->SetHighColor(255, 255, 255);
 
-		target->StrokeEllipse(_SelectorPosition(_RampFrame(1), color.red),
-			 kSelectorSize / 2, kSelectorSize / 2);
-		target->StrokeEllipse(_SelectorPosition(_RampFrame(2), color.green),
-			 kSelectorSize / 2, kSelectorSize / 2);
-		target->StrokeEllipse(_SelectorPosition(_RampFrame(3), color.blue),
-			 kSelectorSize / 2, kSelectorSize / 2);
+		BPoint center = _SelectorPosition(_RampFrame(1), color.red);
+		if (fFocusedRamp == 1) {
+			target->SetPenSize(kSelectorPenSize / 2);
+			target->StrokeEllipse(center, kSelectorSize, kSelectorSize);
+			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
+		} else {
+			target->SetPenSize(kSelectorPenSize);
+			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
+		}
+
+		center = _SelectorPosition(_RampFrame(2), color.green);
+		if (fFocusedRamp == 2) {
+			target->SetPenSize(kSelectorPenSize / 2);
+			target->StrokeEllipse(center, kSelectorSize, kSelectorSize);
+			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
+		} else {
+			target->SetPenSize(kSelectorPenSize);
+			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
+		}
+
+
+		center = _SelectorPosition(_RampFrame(3), color.blue);
+		if (fFocusedRamp == 3) {
+			target->SetPenSize(kSelectorPenSize / 2);
+			target->StrokeEllipse(center, kSelectorSize, kSelectorSize);
+			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
+		} else {
+			target->SetPenSize(kSelectorPenSize);
+			target->StrokeEllipse(center, kSelectorSize / 2, kSelectorSize / 2);
+		}
 
 		target->SetPenSize(1.0f);
 	}
@@ -654,6 +644,28 @@ BColorControl::_InitOffscreen()
 
 
 void
+BColorControl::_InvalidateSelector(int16 ramp, rgb_color color, bool focused)
+{
+	if (fPaletteMode)
+		return;
+
+	if (ramp < 1 || ramp > 3)
+		return;
+
+	float invalidateRadius = focused
+		? kSelectorSize + kSelectorPenSize / 2
+		: kSelectorSize / 2 + kSelectorPenSize;
+
+	uint8 colorValue = ramp == 1 ? color.red : ramp == 2 ? color.green
+		: color.blue;
+
+	BPoint pos = _SelectorPosition(_RampFrame(ramp), colorValue);
+	Invalidate(BRect(pos.x - invalidateRadius, pos.y - invalidateRadius,
+		pos.x + invalidateRadius, pos.y + invalidateRadius));
+}
+
+
+void
 BColorControl::SetCellSize(float size)
 {
 	_SetCellSize(size);
@@ -727,7 +739,108 @@ BColorControl::WindowActivated(bool state)
 void
 BColorControl::KeyDown(const char* bytes, int32 numBytes)
 {
-	// TODO: make this keyboard navigable!
+	if (IsFocus() && !fPaletteMode && numBytes == 1) {
+		rgb_color color = ValueAsColor();
+
+		switch (bytes[0]) {
+			case B_UP_ARROW:
+			{
+				int16 oldFocus = fFocusedRamp;
+				fFocusedRamp--;
+				if (fFocusedRamp < 1)
+					fFocusedRamp = 3;
+
+				_InvalidateSelector(oldFocus, color, true);
+				_InvalidateSelector(fFocusedRamp, color, true);
+				break;
+			}
+
+			case B_DOWN_ARROW:
+			{
+				int16 oldFocus = fFocusedRamp;
+				fFocusedRamp++;
+				if (fFocusedRamp > 3)
+					fFocusedRamp = 1;
+
+				_InvalidateSelector(oldFocus, color, true);
+				_InvalidateSelector(fFocusedRamp, color, true);
+				break;
+			}
+
+			case B_LEFT_ARROW:
+			{
+				bool goFaster = false;
+				if (Window() != NULL) {
+					BMessage* message = Window()->CurrentMessage();
+					if (message != NULL && message->what == B_KEY_DOWN) {
+						int32 repeats = 0;
+						if (message->FindInt32("be:key_repeat", &repeats)
+								== B_OK && repeats > 4) {
+							goFaster = true;
+						}
+					}
+				}
+
+				if (fFocusedRamp == 1) {
+					if (goFaster && color.red >= 5)
+						color.red -= 5;
+					else if (color.red > 0)
+						color.red--;
+				} else if (fFocusedRamp == 2) {
+					if (goFaster && color.green >= 5)
+						color.green -= 5;
+					else if (color.green > 0)
+						color.green--;
+				} else if (fFocusedRamp == 3) {
+				 	if (goFaster && color.blue >= 5)
+						color.blue -= 5;
+					else if (color.blue > 0)
+						color.blue--;
+				}
+
+				SetValue(color);
+				Invoke();
+				break;
+			}
+
+			case B_RIGHT_ARROW:
+			{
+				bool goFaster = false;
+				if (Window() != NULL) {
+					BMessage* message = Window()->CurrentMessage();
+					if (message != NULL && message->what == B_KEY_DOWN) {
+						int32 repeats = 0;
+						if (message->FindInt32("be:key_repeat", &repeats)
+								== B_OK && repeats > 4) {
+							goFaster = true;
+						}
+					}
+				}
+
+				if (fFocusedRamp == 1) {
+					if (goFaster && color.red <= 250)
+						color.red += 5;
+					else if (color.red < 255)
+						color.red++;
+				} else if (fFocusedRamp == 2) {
+					if (goFaster && color.green <= 250)
+						color.green += 5;
+					else if (color.green < 255)
+						color.green++;
+				} else if (fFocusedRamp == 3) {
+				 	if (goFaster && color.blue <= 250)
+						color.blue += 5;
+					else if (color.blue < 255)
+						color.blue++;
+				}
+
+				SetValue(color);
+				Invoke();
+				break;
+			}
+		}
+	}
+
 	BControl::KeyDown(bytes, numBytes);
 }
 
@@ -735,7 +848,7 @@ BColorControl::KeyDown(const char* bytes, int32 numBytes)
 void
 BColorControl::MouseUp(BPoint point)
 {
-	fFocusedComponent = 0;
+	fClickedRamp = -1;
 	SetTracking(false);
 }
 
@@ -747,8 +860,6 @@ BColorControl::MouseDown(BPoint point)
 		return;
 	if (!fPaletteFrame.Contains(point))
 		return;
-
-	MakeFocus();
 
 	if (fPaletteMode) {
 		int col = (int)((point.x - fPaletteFrame.left) / fCellSize);
@@ -767,16 +878,16 @@ BColorControl::MouseDown(BPoint point)
 
 		if (_RampFrame(0).Contains(point)) {
 			color.red = color.green = color.blue = shade;
-			fFocusedComponent = 1;
+			fClickedRamp = 0;
 		} else if (_RampFrame(1).Contains(point)) {
 			color.red = shade;
-			fFocusedComponent = 2;
+			fClickedRamp = 1;
 		} else if (_RampFrame(2).Contains(point)) {
 			color.green = shade;
-			fFocusedComponent = 3;
-		} else if (_RampFrame(3).Contains(point)){
+			fClickedRamp = 2;
+		} else if (_RampFrame(3).Contains(point)) {
 			color.blue = shade;
-			fFocusedComponent = 4;
+			fClickedRamp = 3;
 		}
 
 		SetValue(color);
@@ -806,7 +917,7 @@ BColorControl::MouseMoved(BPoint point, uint32 transit,
 			SetValue(system_colors()->color_list[colorIndex]);
 		}
 	} else {
-		if (fFocusedComponent == 0)
+		if (fClickedRamp < 0 || fClickedRamp > 3)
 			return;
 
 		rgb_color color = ValueAsColor();
@@ -815,22 +926,14 @@ BColorControl::MouseMoved(BPoint point, uint32 transit,
 			min_c((point.x - _RampFrame(0).left) * 255
 				/ _RampFrame(0).Width(), 255));
 
-		switch (fFocusedComponent) {
-			case 1:
-				color.red = color.green = color.blue = shade;
-				break;
-			case 2:
-				color.red = shade;
-				break;
-			case 3:
-				color.green = shade;
-				break;
-			case 4:
-				color.blue = shade;
-				break;
-			default:
-				break;
-		}
+		if (fClickedRamp == 0)
+			color.red = color.green = color.blue = shade;
+		else if (fClickedRamp == 1)
+			color.red = shade;
+		else if (fClickedRamp == 2)
+			color.green = shade;
+		else if (fClickedRamp == 3)
+			color.blue = shade;
 
 		SetValue(color);
 	}
@@ -912,9 +1015,10 @@ BColorControl::GetSupportedSuites(BMessage* data)
 
 
 void
-BColorControl::MakeFocus(bool state)
+BColorControl::MakeFocus(bool focused)
 {
-	BControl::MakeFocus(state);
+	fFocusedRamp = !fPaletteMode && focused ? 1 : -1;
+	BControl::MakeFocus(focused);
 }
 
 

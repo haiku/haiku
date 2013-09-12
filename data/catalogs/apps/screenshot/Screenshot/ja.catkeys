@@ -6,20 +6,20 @@ Screenshot	System name		スクリーンショット
 Select	ScreenshotWindow		選択
 Capture active window	ScreenshotWindow		アクティブウィンドウのみ
 Cancel	ScreenshotWindow		中止
-Name:	ScreenshotWindow		ファイル名：
+Name:	ScreenshotWindow		ファイル名:
 Choose folder	ScreenshotWindow		フォルダーを選択
 Save	ScreenshotWindow		保存
 Overwrite	ScreenshotWindow		上書き
 Choose folder...	ScreenshotWindow		フォルダーを選択…
 Please select	ScreenshotWindow		選択してください
-Save as:	ScreenshotWindow		ファイル形式：
+Save as:	ScreenshotWindow		ファイル形式:
 Copy to clipboard	ScreenshotWindow		クリップボードにコピー
-Save in:	ScreenshotWindow		保存場所：
+Save in:	ScreenshotWindow		保存場所:
 screenshot	Screenshot	Base filename of screenshot files	スクリーンショット
 New screenshot	ScreenshotWindow		新しいスクリーンショット
 Artwork folder	ScreenshotWindow		アートワークフォルダー
 Home folder	ScreenshotWindow		ホームフォルダー
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		同じ名前のファイルはすでに存在します。\n本当に上書きしますか?
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		同じ名前のファイルはすでに存在します。\n上書きしてよろしいですか?
 Settings…	ScreenshotWindow		設定…
 overwrite	ScreenshotWindow		上書き
 Delay:	ScreenshotWindow		遅延時間

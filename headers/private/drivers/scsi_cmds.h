@@ -146,6 +146,7 @@
 #define SCSIS_ASC_WAS_RESET					0x2900
 	// reset by power-on/bus reset/device reset
 #define SCSIS_ASC_PARAMS_CHANGED			0x2a00
+#define SCSIS_ASC_CAPACITY_DATA_HAS_CHANGED	0x2a09
 #define SCSIS_ASC_MEDIUM_FORMAT_CORRUPTED	0x3100
 #define SCSIS_ASC_ROUNDED_PARAM				0x3700	// parameter got rounded
 #define SCSIS_ASC_NO_MEDIUM					0x3a00	// medium not present

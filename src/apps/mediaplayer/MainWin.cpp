@@ -1092,7 +1092,7 @@ MainWin::OpenPlaylistItem(const PlaylistItemRef& item)
 			"The file could not be opened.");
 		message.ReplaceFirst("%app%", kApplicationName);
 		BAlert* alert = new BAlert(kApplicationName, message.String(),
-			B_TRANSLATE("OK"));
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		_PlaylistItemOpened(item, ret);
@@ -1341,7 +1341,7 @@ MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
 				message << B_TRANSLATE("Error: ") << strerror(result);
 			}
 			BAlert* alert = new BAlert("error", message.String(),
-				B_TRANSLATE("OK"));
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
 			fControls->SetDisabledString(kDisabledSeekMessage);
@@ -1626,7 +1626,7 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
 			"Audio track menu"), new BMessage(M_DUMMY)));
 		audioTrackMenu->ItemAt(0)->SetMarked(true);
 	}
-
+	audioTrackMenu->SetEnabled(count > 1);
 
 	count = fController->VideoTrackCount();
 	current = fController->CurrentVideoTrack();
@@ -1641,6 +1641,7 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
 		videoTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
 		videoTrackMenu->ItemAt(0)->SetMarked(true);
 	}
+	videoTrackMenu->SetEnabled(count > 1);
 
 	count = fController->SubTitleTrackCount();
 	if (count > 0) {
@@ -1670,6 +1671,7 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
 			new BMessage(M_DUMMY)));
 		subTitleTrackMenu->ItemAt(0)->SetMarked(true);
 	}
+	subTitleTrackMenu->SetEnabled(count > 1);
 }
 
 

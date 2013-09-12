@@ -179,14 +179,19 @@ BNavigator::~BNavigator()
 void
 BNavigator::AttachedToWindow()
 {
-	// Inital setup of widget states
-	UpdateLocation(0, kActionSet);
-
 	// All messages should arrive here
 	fBack->SetTarget(this);
 	fForw->SetTarget(this);
 	fUp->SetTarget(this);
 	fLocation->SetTarget(this);
+}
+
+
+void
+BNavigator::AllAttached()
+{
+	// Inital setup of widget states
+	UpdateLocation(0, kActionSet);
 }
 
 

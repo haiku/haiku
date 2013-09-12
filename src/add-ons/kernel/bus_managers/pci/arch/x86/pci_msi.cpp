@@ -15,6 +15,10 @@
 extern PCI *gPCI;
 
 
+static status_t pci_unconfigure_msix(PCIDev *device);
+static status_t pci_disable_msix(PCIDev *device);
+
+
 static void
 pci_ht_msi_map(PCIDev *device, uint64 address)
 {
@@ -33,7 +37,7 @@ pci_ht_msi_map(PCIDev *device, uint64 address)
 			info->control_value |= PCI_ht_command_msi_enable;
 		}
 		gPCI->WriteConfig(device, info->capability_offset + PCI_ht_command,
-			info->control_value, 2); 
+			info->control_value, 2);
 	}
 }
 
@@ -166,6 +170,11 @@ pci_unconfigure_msi(uint8 virtualBus, uint8 _device, uint8 function)
 	if (device == NULL)
 		return B_ERROR;
 
+	// try MSI-X
+	result = pci_unconfigure_msix(device);
+	if (result != B_UNSUPPORTED && result != B_NO_INIT)
+		return result;
+
 	msi_info *info =  &device->arch_info.msi;
 	if (!info->msi_capable)
 		return B_UNSUPPORTED;
@@ -242,6 +251,11 @@ pci_disable_msi(uint8 virtualBus, uint8 _device, uint8 function)
 	PCIDev *device = gPCI->FindDevice(domain, bus, _device, function);
 	if (device == NULL)
 		return B_ERROR;
+
+	// try MSI-X
+	result = pci_disable_msix(device);
+	if (result != B_UNSUPPORTED && result != B_NO_INIT)
+		return result;
 
 	msi_info *info =  &device->arch_info.msi;
 	if (!info->msi_capable)
@@ -345,7 +359,7 @@ pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 	// map the table bar
 	size_t tableSize = info->message_count * 16;
 	addr_t address;
-	area_id area = map_physical_memory("msi table map", 
+	area_id area = map_physical_memory("msi table map",
 		device->info.u.h0.base_registers[info->table_bar],
 		tableSize + info->table_offset,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, (void**)&address);
@@ -356,7 +370,7 @@ pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 
 	// and the pba bar if necessary
 	if (info->table_bar != info->pba_bar) {
-		area = map_physical_memory("msi pba map", 
+		area = map_physical_memory("msi pba map",
 			device->info.u.h0.base_registers[info->pba_bar],
 			tableSize + info->pba_offset,
 			B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
@@ -366,7 +380,7 @@ pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 			info->table_area_id = -1;
 			return area;
 		}
-		info->pba_area_id = area;	
+		info->pba_area_id = area;
 	} else
 		info->pba_area_id = -1;
 	info->pba_address = address + info->pba_offset;
@@ -402,22 +416,9 @@ pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 }
 
 
-status_t
-pci_unconfigure_msix(uint8 virtualBus, uint8 _device, uint8 function)
+static status_t
+pci_unconfigure_msix(PCIDev *device)
 {
-	if (!msi_supported())
-		return B_UNSUPPORTED;
-
-	uint8 bus;
-	uint8 domain;
-	status_t result = gPCI->ResolveVirtualBus(virtualBus, &domain, &bus);
-	if (result != B_OK)
-		return result;
-
-	PCIDev *device = gPCI->FindDevice(domain, bus, _device, function);
-	if (device == NULL)
-		return B_ERROR;
-
 	msix_info *info =  &device->arch_info.msix;
 	if (!info->msix_capable)
 		return B_UNSUPPORTED;
@@ -493,21 +494,8 @@ pci_enable_msix(uint8 virtualBus, uint8 _device, uint8 function)
 
 
 status_t
-pci_disable_msix(uint8 virtualBus, uint8 _device, uint8 function)
+pci_disable_msix(PCIDev *device)
 {
-	if (!msi_supported())
-		return B_UNSUPPORTED;
-
-	uint8 bus;
-	uint8 domain;
-	status_t result = gPCI->ResolveVirtualBus(virtualBus, &domain, &bus);
-	if (result != B_OK)
-		return result;
-
-	PCIDev *device = gPCI->FindDevice(domain, bus, _device, function);
-	if (device == NULL)
-		return B_ERROR;
-
 	msix_info *info =  &device->arch_info.msix;
 	if (!info->msix_capable)
 		return B_UNSUPPORTED;
@@ -558,10 +546,9 @@ pci_read_msix_info(PCIDev *device)
 	uint32 pba_value = gPCI->ReadConfig(device->domain, device->bus,
 		device->device, device->function,
 		info->capability_offset + PCI_msix_pba, 4);
-	
+
 	info->table_bar = table_value & PCI_msix_bir_mask;
 	info->table_offset = table_value & PCI_msix_offset_mask;
 	info->pba_bar = pba_value & PCI_msix_bir_mask;
 	info->pba_offset = pba_value & PCI_msix_offset_mask;
 }
-

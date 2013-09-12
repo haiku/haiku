@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-Mouse	1033564338
-Mouse type:	SettingsView		マウスの種類：
+Mouse type:	SettingsView		マウスの種類:
 Warp	SettingsView		ワープ
 2-Button	SettingsView		2 ボタン
 Double-click test area	SettingsView		ダブルクリックテスト領域
@@ -10,7 +10,7 @@ Click to focus	SettingsView		クリックでフォーカスのみ
 Click to focus and raise	SettingsView		クリックでフォーカスと最前面へ
 3-Button	SettingsView		3 ボタン
 Mouse speed	SettingsView		マウスの速度
-Focus mode:	SettingsView		フォーカスモード：
+Focus mode:	SettingsView		フォーカスモード:
 Instant warp	SettingsView		簡易ワープ
 Dig Deal	MouseApplication		大丈夫です
 1-Button	SettingsView		1 ボタン

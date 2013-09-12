@@ -14,6 +14,7 @@
 
 struct pci_info;
 struct pci_module_info;
+struct pci_x86_module_info;
 class EHCIRootHub;
 
 
@@ -188,6 +189,7 @@ inline	uint16						ReadCapReg16(uint32 reg);
 inline	uint32						ReadCapReg32(uint32 reg);
 
 static	pci_module_info *			sPCIModule;
+static	pci_x86_module_info *		sPCIx86Module;
 
 		uint8 *						fCapabilityRegisters;
 		uint8 *						fOperationalRegisters;
@@ -243,6 +245,8 @@ static	pci_module_info *			sPCIModule;
 
 		// Interrupt polling
 		thread_id					fInterruptPollThread;
+		uint8						fIRQ;
+		bool						fUseMSI;
 };
 
 

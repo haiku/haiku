@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	3577331897
+1	swedish	x-vnd.Haiku-WebPositive	1786411139
 Show home button	Settings Window		Visa hem-knappen
 Username:	Authentication Panel		Användarnamn:
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
@@ -16,6 +16,7 @@ Start page:	Settings Window		Start sida:
 History	WebPositive Window		Historik
 Error opening downloads folder	Download Window		Fel vid öppnande av nerladdnings foldern
 Paste	WebPositive Window		Klistra in
+Double-click or middle-click to open new tab.	Tab Manager		Dubbelklicka eller klicka på mittersta musknappen för att öppna en ny tab.
 Proxy username:	Settings Window		Proxyanvändarnamn:
 Settings	Settings Window		Inställningar
 %seconds seconds left	Download Window		%seconds secunder kvar

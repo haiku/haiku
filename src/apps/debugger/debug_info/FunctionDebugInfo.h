@@ -27,6 +27,8 @@ public:
 	virtual	const BString&		Name() const = 0;
 	virtual	const BString&		PrettyName() const = 0;
 
+	virtual	bool				IsMain() const = 0;
+
 	virtual	LocatableFile*		SourceFile() const = 0;
 	virtual	SourceLocation		SourceStartLocation() const = 0;
 	virtual	SourceLocation		SourceEndLocation() const = 0;

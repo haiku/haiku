@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Be-MAIL	233997769
 View	Mail		表示
 %d - Date	Mail		%d - 日付
-Attach attributes:	Mail		属性の添付：
+Attach attributes:	Mail		属性の添付:
 Inconsistency occurred in the undo/redo buffer.	Mail		Undo/Redo バッファに不一致が発生しました。
 An error occurred trying to save the attachment.	Mail		添付ファイルの保存の際にエラーが発生しました。 
 Copy to new	Mail		新規メッセージにコピー
@@ -12,20 +12,20 @@ Print	Mail		印刷
 New mail message	Mail		新規メッセージ
 Untitled	Mail		無題
 Automatic	Mail		自動
-Automatically mark mail as read:	Mail		メールを自動的に既読に設定：
+Automatically mark mail as read:	Mail		メールを自動的に既読に設定:
 helpful message	Mail		有益なメッセージ
-Colored quotes:	Mail		引用部分の着色：
-Subject:	Mail		件名：
+Colored quotes:	Mail		引用部分の着色:
+Subject:	Mail		件名:
 Reply to all	Mail		全員に返信
 Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	添付ファイル: %name% (タイプ: %type%)
 Show icons & labels	Mail		アイコンとラベル
 Remove attachment	Mail		添付ファイルを削除
-Button bar:	Mail		ボタンバー：
+Button bar:	Mail		ボタンバー:
 spam	B_USER_DIRECTORY/mail/spam		スパム
 Beginner	Mail		初心者
 Don't save	Mail		保存しない
 Expert	Mail		上級者
-Reply account:	Mail		返信アカウント：
+Reply account:	Mail		返信アカウント:
 Message	Mail		メッセージ
 Settings…	Mail		設定…
 Reply to sender	Mail		差出人に返信
@@ -40,7 +40,7 @@ Cc:	Mail		Cc:
 Off	Mail		オフ
 Find	Mail		検索
 Undo	Mail		元に戻す
-Date:	Mail		日付：
+Date:	Mail		日付:
 An error occurred trying to open this signature.	Mail		この署名を開くときにエラーが発生しました。
 No file attributes, just plain data	Mail		ファイル属性を付けない (データのみ)
 Edit queries…	Mail		クエリフォルダーを開く…
@@ -60,18 +60,18 @@ Redo	Mail		やり直し
 Add enclosure…	Mail		添付ファイルを追加…
 Mail	System name		メール
 Print…	Mail		印刷…
-Warn unencodable:	Mail		文字コード不一致通知：
+Warn unencodable:	Mail		文字コード不一致通知:
 Quit	Mail		終了
 %n - Full name	Mail		%n - 名前
  Read 	Mail		既読
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		ごみ箱
-Default account:	Mail		標準アカウント：
+Default account:	Mail		標準アカウント:
 Size:	Mail		サイズ:
 Account from mail	Mail		メッセージを受信したアカウント
-Edit signatures…	Mail		署名の編集…
+Edit signatures…	Mail		署名を編集…
 New	Mail		新規
-Attachments: 	Mail		添付ファイル：
+Attachments: 	Mail		添付ファイル:
 On	Mail		オン
 Set to %s	Mail		「%s」に設定
 Forward	Mail		転送
@@ -81,20 +81,20 @@ To:	Mail		To:
 Only files can be added as attachments.	Mail		添付できるのは、ファイルのみです。
 Previous message	Mail		前のメッセージ
 Attachments:	Mail		添付ファイル:
-Title:	Mail		署名の名称：
+Title:	Mail		署名の名称:
 <no account found>	Mail		<アカウントが見つかりません>
 Find…	Mail		検索…
-Accounts…	Mail		アカウントの設定…
+Accounts…	Mail		アカウントを設定…
 Mail preferences	Mail		メールの設定
-Initial spell check mode:	Mail		スペルチェックモード：
+Initial spell check mode:	Mail		スペルチェックモード:
 Leave same	Mail		変更しません
 Page setup…	Mail		ページ設定…
-Text wrapping:	Mail		文字列の折り返し：
+Text wrapping:	Mail		文字列の折り返し:
 Revert	Mail		戻す
 File	Mail		ファイル
 mail	B_USER_DIRECTORY/mail		メール
 None	Mail		無し
-(Name unavailable)	Mail		(名前が利用できません)
+(Name unavailable)	Mail		(名前は利用できません)
 Copy link location	Mail		このリンクのアドレスをコピー
 out	B_USER_DIRECTORY/mail/out		送信トレイ
 Show header	Mail		ヘッダーを表示
@@ -107,7 +107,7 @@ Close	Mail		閉じる
 No matches	Mail		一致しません
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		メールサービスが起動されていないため、このメッセージは処理待ちとなりメールサービス起動後に処理されます。
 Really delete this signature? This cannot be undone.	Mail		署名を削除しますか？削除した書名は復元できませんので、ご注意ください。
-Save this message as a draft before closing?	Mail		閉じる前にドラフトとして保存しますか?
+Save this message as a draft before closing?	Mail		閉じる前に下書きとして保存しますか?
 Open	Mail		開く
 draft	B_USER_DIRECTORY/mail/draft		下書き
 Quote	Mail		引用符を付ける
@@ -117,22 +117,22 @@ User interface	Mail		インターフェイスの設定
 Cancel	Mail		中止
 Send message	Mail		メッセージを送信
 Remove enclosure	Mail		添付ファイルを削除
-Account:	Mail		アカウント：
-Decoding:	Mail		文字コード：
+Account:	Mail		アカウント:
+Decoding:	Mail		文字コード:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		People データ形式をサポートするアプリケーションが見つかりませんでした。
 Delete	Mail		削除
 Don't send	Mail		送信しない
 Leave as '%s'	Mail		「%s」のままにする
 Copy	Mail		コピー
 Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データが見つかりません。
-Reply preamble:	Mail		返信の前書き：
+Reply preamble:	Mail		返信の前書き:
 Signatures	Mail		署名
 Next	Mail		次へ
 Set to…	Mail		他の属性に変更…
 Use default account	Mail		標準アカウントを使う
 Sorry	Mail		失礼
-Encoding:	Mail		文字コード：
-Font:	Mail		フォント：
+Encoding:	Mail		文字コード:
+Font:	Mail		フォント:
 (Address unavailable)	Mail		(アドレスは利用できません)
 Save address	Mail		アドレスを保存
 Queries	Mail		クエリ
@@ -144,17 +144,17 @@ Save as draft	Mail		下書きとして保存
 The mail_daemon could not be started:\n\t	Mail		メールサービス (mail_daemon) を起動できませんでした。\n\t
 Open attachment	Mail		添付ファイルを開く
 sent	B_USER_DIRECTORY/mail/sent		送信済みメール
-(Date unavailable)	Mail		(日付が利用できません)
+(Date unavailable)	Mail		(日付は利用できません)
 Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリーとクエリテンプレートをこのフォルダーに入れてください。
 Reply	Mail		返信
-From:	Mail		差出人：
+From:	Mail		差出人:
 Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。
 Open draft	Mail		下書きを開く
 Cut	Mail		切り取り
 Check spelling	Mail		スペルチェック
 Set to Saved	Mail		「保存済み」に設定
 Open this link	Mail		このリンクを開く
-Auto signature:	Mail		署名の自動追加：
+Auto signature:	Mail		署名の自動追加:
 Add signature	Mail		署名を追加
 Need Tracker to move items to trash	Mail		メッセージを削除するには Tracker が必要です。
 Mailing	Mail		メールの設定

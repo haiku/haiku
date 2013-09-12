@@ -579,6 +579,22 @@ smp_add_safemode_menus(Menu *menu)
 		item->SetType(MENU_ITEM_MARKABLE);
 		item->SetData(B_SAFEMODE_DISABLE_APIC);
 		item->SetHelpText("Disables using the local APIC, also disables SMP.");
+
+		cpuid_info info;
+		if (get_current_cpuid(&info, 1) == B_OK
+				&& (info.regs.ecx & IA32_FEATURE_EXT_X2APIC) != 0) {
+#if 0
+			menu->AddItem(item = new(nothrow) MenuItem("Disable X2APIC"));
+			item->SetType(MENU_ITEM_MARKABLE);
+			item->SetData(B_SAFEMODE_DISABLE_X2APIC);
+			item->SetHelpText("Disables using X2APIC.");
+#else
+			menu->AddItem(item = new(nothrow) MenuItem("Enable X2APIC"));
+			item->SetType(MENU_ITEM_MARKABLE);
+			item->SetData(B_SAFEMODE_ENABLE_X2APIC);
+			item->SetHelpText("Enables using X2APIC.");
+#endif
+		}
 	}
 
 	if (gKernelArgs.num_cpus < 2)

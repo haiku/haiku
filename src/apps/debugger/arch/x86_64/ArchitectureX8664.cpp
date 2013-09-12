@@ -1,7 +1,7 @@
 /*
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +24,7 @@
 #include "StackFrame.h"
 #include "Statement.h"
 #include "TeamMemory.h"
+#include "ValueLocation.h"
 #include "X86AssemblyLanguage.h"
 
 #include "disasm/DisassemblerX8664.h"
@@ -61,6 +62,7 @@ static const int32 kFromDwarfRegisters[] = {
 };
 
 static const int32 kFromDwarfRegisterCount = sizeof(kFromDwarfRegisters) / 4;
+static const uint16 kFunctionPrologueSize = 4;
 
 
 // #pragma mark - ToDwarfRegisterMap
@@ -293,8 +295,140 @@ ArchitectureX8664::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 	CpuState* _cpuState, bool isTopFrame, StackFrame*& _frame,
 	CpuState*& _previousCpuState)
 {
-	fprintf(stderr, "ArchitectureX8664::CreateStackFrame: TODO\n");
-	return B_UNSUPPORTED;
+	CpuStateX8664* cpuState = dynamic_cast<CpuStateX8664*>(_cpuState);
+	uint64 framePointer = cpuState->IntRegisterValue(X86_64_REGISTER_RBP);
+	uint64 rip = cpuState->IntRegisterValue(X86_64_REGISTER_RIP);
+
+	bool readStandardFrame = true;
+	uint64 previousFramePointer = 0;
+	uint64 returnAddress = 0;
+
+	// check for syscall frames
+	stack_frame_type frameType;
+	bool hasPrologue = false;
+	if (isTopFrame && cpuState->InterruptVector() == 99) {
+		// The thread is performing a syscall. So this frame is not really the
+		// top-most frame and we need to adjust the rip.
+		frameType = STACK_FRAME_TYPE_SYSCALL;
+		rip -= 2;
+			// int 99, sysenter, and syscall all are 2 byte instructions
+
+		// The syscall stubs are frameless, the return address is on top of the
+		// stack.
+		uint32 rsp = cpuState->IntRegisterValue(X86_64_REGISTER_RSP);
+		uint32 address;
+		if (fTeamMemory->ReadMemory(rsp, &address, 8) == 8) {
+			returnAddress = address;
+			previousFramePointer = framePointer;
+			framePointer = 0;
+			readStandardFrame = false;
+		}
+	} else {
+		hasPrologue = _HasFunctionPrologue(function);
+		if (hasPrologue)
+			frameType = STACK_FRAME_TYPE_STANDARD;
+		else
+			frameType = STACK_FRAME_TYPE_FRAMELESS;
+		// TODO: Handling for frameless functions. It's not trivial to find the
+		// return address on the stack, though.
+
+		// If the function is not frameless and we're at the top frame we need
+		// to check whether the prologue has not been executed (completely) or
+		// we're already after the epilogue.
+		if (isTopFrame) {
+			uint64 stack = 0;
+			if (hasPrologue) {
+				if (rip < function->Address() + kFunctionPrologueSize) {
+					// The prologue has not been executed yet, i.e. there's no
+					// stack frame yet. Get the return address from the stack.
+					stack = cpuState->IntRegisterValue(X86_64_REGISTER_RSP);
+					if (rip > function->Address()) {
+						// The "push %rbp" has already been executed.
+						stack += 8;
+					}
+				} else {
+					// Not in the function prologue, but maybe after the
+					// epilogue. The epilogue is a single "pop %rbp", so we
+					// check whether the current instruction is already a
+					// "ret".
+					uint8 code[1];
+					if (fTeamMemory->ReadMemory(rip, &code, 1) == 1
+						&& code[0] == 0xc3) {
+						stack = cpuState->IntRegisterValue(
+							X86_64_REGISTER_RSP);
+					}
+				}
+			} else {
+				// Check if the instruction pointer is at a readable location.
+				// If it isn't, then chances are we got here via a bogus
+				// function pointer, and the prologue hasn't actually been
+				// executed. In such a case, what we need is right at the top
+				// of the stack.
+				uint8 data[1];
+				if (fTeamMemory->ReadMemory(rip, &data, 1) != 1)
+					stack = cpuState->IntRegisterValue(X86_64_REGISTER_RSP);
+			}
+
+			if (stack != 0) {
+				uint64 address;
+				if (fTeamMemory->ReadMemory(stack, &address, 8) == 8) {
+					returnAddress = address;
+					previousFramePointer = framePointer;
+					framePointer = 0;
+					readStandardFrame = false;
+					frameType = STACK_FRAME_TYPE_FRAMELESS;
+				}
+			}
+		}
+	}
+
+	// create the stack frame
+	StackFrameDebugInfo* stackFrameDebugInfo
+		= new(std::nothrow) NoOpStackFrameDebugInfo;
+	if (stackFrameDebugInfo == NULL)
+		return B_NO_MEMORY;
+	BReference<StackFrameDebugInfo> stackFrameDebugInfoReference(
+		stackFrameDebugInfo, true);
+
+	StackFrame* frame = new(std::nothrow) StackFrame(frameType, cpuState,
+		framePointer, rip, stackFrameDebugInfo);
+	if (frame == NULL)
+		return B_NO_MEMORY;
+	BReference<StackFrame> frameReference(frame, true);
+
+	status_t error = frame->Init();
+	if (error != B_OK)
+		return error;
+
+	// read the previous frame and return address, if this is a standard frame
+	if (readStandardFrame) {
+		uint64 frameData[2];
+		if (framePointer != 0
+			&& fTeamMemory->ReadMemory(framePointer, frameData, 16) == 16) {
+			previousFramePointer = frameData[0];
+			returnAddress = frameData[1];
+		}
+	}
+
+	// create the CPU state, if we have any info
+	CpuStateX8664* previousCpuState = NULL;
+	if (returnAddress != 0) {
+		// prepare the previous CPU state
+		previousCpuState = new(std::nothrow) CpuStateX8664;
+		if (previousCpuState == NULL)
+			return B_NO_MEMORY;
+
+		previousCpuState->SetIntRegister(X86_64_REGISTER_RBP,
+			previousFramePointer);
+		previousCpuState->SetIntRegister(X86_64_REGISTER_RIP, returnAddress);
+		frame->SetPreviousCpuState(previousCpuState);
+	}
+
+	frame->SetReturnAddress(returnAddress);
+
+	_frame = frameReference.Detach();
+	_previousCpuState = previousCpuState;
+	return B_OK;
 }
 
 
@@ -488,6 +622,41 @@ ArchitectureX8664::GetInstructionInfo(target_addr_t address,
 
 
 status_t
+ArchitectureX8664::ResolvePICFunctionAddress(target_addr_t instructionAddress,
+	CpuState* state, target_addr_t& _targetAddress)
+{
+	target_addr_t previousIP = state->InstructionPointer();
+	// if the function in question is position-independent, the call
+	// will actually have taken us to its corresponding PLT slot.
+	// in such a case, look at the disassembled jump to determine
+	// where to find the actual function address.
+	InstructionInfo info;
+	if (GetInstructionInfo(instructionAddress, info, state) != B_OK)
+		return B_BAD_VALUE;
+
+	// x86-64 is likely to use a RIP-relative jump here
+	// as such, set our instruction pointer to the address
+	// after this instruction (where it would be during actual
+	// execution), and recalculate the target address of the jump
+	state->SetInstructionPointer(info.Address() + info.Size());
+	status_t result = GetInstructionInfo(info.Address(), info, state);
+	state->SetInstructionPointer(previousIP);
+	if (result != B_OK)
+		return result;
+
+	target_addr_t subroutineAddress;
+	ssize_t bytesRead = fTeamMemory->ReadMemory(info.TargetAddress(),
+		&subroutineAddress, fAddressSize);
+
+	if (bytesRead != fAddressSize)
+		return B_BAD_VALUE;
+
+	_targetAddress = subroutineAddress;
+	return B_OK;
+}
+
+
+status_t
 ArchitectureX8664::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
 	int32& _maxBytesPerRegister, uint8& _watchpointCapabilityFlags)
 {
@@ -506,8 +675,37 @@ ArchitectureX8664::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
 
 status_t
 ArchitectureX8664::GetReturnAddressLocation(StackFrame* frame,
-	target_size_t valueSize, ValueLocation*& _location) {
-	return B_NOT_SUPPORTED;
+	target_size_t valueSize, ValueLocation*& _location)
+{
+	// for the calling conventions currently in use on Haiku,
+	// the x86-64 rules for how values are returned are as follows:
+	//
+	// - 64 bit or smaller values are returned in RAX.
+	// - > 64 bit values are returned on the stack.
+	ValueLocation* location = new(std::nothrow) ValueLocation(
+		IsBigEndian());
+	if (location == NULL)
+		return B_NO_MEMORY;
+	BReference<ValueLocation> locationReference(location,
+		true);
+
+	if (valueSize <= 8) {
+		ValuePieceLocation piece;
+		piece.SetSize(valueSize);
+		piece.SetToRegister(X86_64_REGISTER_RAX);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+	} else {
+		ValuePieceLocation piece;
+		CpuStateX8664* state = dynamic_cast<CpuStateX8664*>(frame->GetCpuState());
+		piece.SetToMemory(state->IntRegisterValue(X86_64_REGISTER_RAX));
+		piece.SetSize(valueSize);
+		if (!location->AddPiece(piece))
+			return B_NO_MEMORY;
+	}
+
+	_location = locationReference.Detach();
+	return B_OK;
 }
 
 
@@ -528,4 +726,25 @@ ArchitectureX8664::_AddIntegerRegister(int32 index, const char* name,
 {
 	_AddRegister(index, name, 8 * BVariant::SizeOfType(valueType), valueType,
 		type, calleePreserved);
+}
+
+
+bool
+ArchitectureX8664::_HasFunctionPrologue(FunctionDebugInfo* function) const
+{
+	if (function == NULL)
+		return false;
+
+	// check whether the function has the typical prologue
+	if (function->Size() < kFunctionPrologueSize)
+		return false;
+
+	uint8 buffer[kFunctionPrologueSize];
+	if (fTeamMemory->ReadMemory(function->Address(), buffer,
+			kFunctionPrologueSize) != kFunctionPrologueSize) {
+		return false;
+	}
+
+	return buffer[0] == 0x55 && buffer[1] == 0x48 && buffer[2] == 0x89
+		&& buffer[3] == 0xe5;
 }

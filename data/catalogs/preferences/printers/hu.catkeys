@@ -33,7 +33,7 @@ Remove	PrintersWindow		Eltávolítás
 Add …	PrintersWindow		Hozzáadás…
 Print jobs for 	PrintersWindow		Feladat lista: 
 Failed	JobListView		Sikertelen
-%.2f KB	JobListView		%.2f KB
+%.2f KB	JobListView		%.2f KiB
 Magenta	TestPageView		Magenta
 Completed	JobListView		Kész
 No printer found!	TransportMenu		Nem található nyomtató!

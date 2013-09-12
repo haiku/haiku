@@ -74,7 +74,7 @@ LocalePreflet::MessageReceived(BMessage* message)
 
 		case B_ABOUT_REQUESTED:
 		{
-			BAboutWindow* window = new BAboutWindow(kAppName, kSignature);
+			BAboutWindow* window;
 
 			const char* authors[] = {
 				"Axel Dörfler",

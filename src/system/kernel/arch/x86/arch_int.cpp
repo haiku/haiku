@@ -24,7 +24,7 @@
 
 #include <arch/x86/apic.h>
 #include <arch/x86/descriptors.h>
-#include <arch/x86/msi.h>
+#include <arch/x86/msi_priv.h>
 
 #include <stdio.h>
 
@@ -411,7 +411,7 @@ arch_int_init_post_vm(kernel_args* args)
 status_t
 arch_int_init_io(kernel_args* args)
 {
-	msi_init();
+	msi_init(args);
 	ioapic_init(args);
 	return B_OK;
 }

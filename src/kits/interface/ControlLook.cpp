@@ -87,8 +87,10 @@ BControlLook::Flags(BControl* control) const
 	if (!control->IsEnabled())
 		flags |= B_DISABLED;
 
-	if (control->IsFocus())
+	if (control->IsFocus() && control->Window() != NULL
+		&& control->Window()->IsActive()) {
 		flags |= B_FOCUSED;
+	}
 
 	if (control->Value() == B_CONTROL_ON)
 		flags |= B_ACTIVATED;

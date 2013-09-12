@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Appearance	1475577782
+1	polish	x-vnd.Haiku-Appearance	727801787
 Plain font:	Font view		Zwykła czcionka:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
@@ -36,6 +36,7 @@ List background	Colors tab		Tło listy
 OK	DecorSettingsView		OK
 Control mark	Colors tab		Znak sterujący
 Size:	Font Selection view		Rozmiar:
+Decorator:	DecorSettingsView		Dekorator:
 Selected list item background	Colors tab		Tło zaznaczonego elementu listy
 Panel background	Colors tab		Tło panelu
 Menu font:	Font view		Czcionka menu:
@@ -49,6 +50,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutorzy:\n\t%decorAuthors\n\nURL: %decorURL\nLicencja: %decorLic\n\n%decorDesc\n
 Reduce colored edges filter strength:	AntialiasingSettingsView		Zmniejszenie siły kolorowych filtrów krawędzi:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Antyaliasing podpikselowy w połączeniu z hintowaniem czcionek jest niedostępny w tym buildzie Haiku w celu uniknięcia problemów patentowych. Aby włączyć tę funkcjonalność, musisz zbudować Haiku samemu i włączyć niektóre opcje w pliku nagłówkowym biblioteki libfreetype.
+Scroll bar thumb	Colors tab		Pasek przewijania
 Control text	Colors tab		Tekst kontrolki
 Single:	DecorSettingsView		Pojedyncze:
 Tooltip text	Colors tab		Tekst podpowiedzi

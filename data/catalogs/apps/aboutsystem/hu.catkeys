@@ -5,11 +5,11 @@ BSD (4-clause)	AboutView		BSD (4-klauzulás)
 %ld Processors:	AboutView		%ld Processzor:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL és Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Minden jog fenntartva.
-%d MiB total	AboutView		%d MB összesen
+%d MiB total	AboutView		%d MiB összesen
 Michael Phipps (project founder)\n\n	AboutView		Michael Phippsnek (projektalapító)\n\n
 The Haiku-Ports team\n	AboutView		A Haiku-Ports csapatának\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard.  Minden jog fenntartva.
-%d MiB used (%d%%)	AboutView		%d MB használt (%d%%)
+%d MiB used (%d%%)	AboutView		%d MiB használt (%d%%)
 Website, marketing & documentation:\n	AboutView		Weboldal, marketing és dokumentáció:\n
 GNU LGPL v2.1	AboutView		GNU LGPL v2.1
 AboutSystem	System name		Névjegy
@@ -28,7 +28,7 @@ Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All r
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		E szoftver része szerzői jog által védettek.\nSzerzői jog © 1996-2006 The FreeType Project. Minden jog fenntartva.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		A Haiku kódjának szerzői jogai a Haiku, Inc.-et vagy, ha nevük a forráskódban külön ki van emelve, a kód egyes íróit illetik. A Haiku® és a HAIKU logo® a Haiku, Inc. bejegyzett védjegye.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nMinden jog fenntartva.
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MB összesen, %inaccessible MB nem használható
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB összesen, %inaccessible MiB nem használható
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard és munkatársai.
 Contributors:\n	AboutView		Közreműködők:\n
 Unknown	AboutView		Ismeretlen

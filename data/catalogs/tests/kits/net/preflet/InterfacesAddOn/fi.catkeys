@@ -1,4 +1,5 @@
-1	finnish	x-vnd.Haiku-InterfacesAddOn	1172292901
+1	finnish	x-vnd.Haiku-InterfacesAddOn	160108912
+Interface	InterfaceWindow		Käyttöliittymä
 Configure…	InterfacesListView		Aseta…
 Static	IntefaceAddressView		Staattinen
 None	InterfacesListView		Ei mitään
@@ -11,10 +12,12 @@ Renegotiate	InterfacesAddOn		Neuvottele uudelleen
 The method for obtaining an IP address	IntefaceAddressView		IP-osoitteen hakumenetelmä
 Your gateway	IntefaceAddressView		Yhdyskäytäväsi
 Enable	InterfacesListView		Käytössä
+Received:	IntefaceHardwareView		Vastaanotettu:
 Revert	InterfaceWindow		Palauta
 connected	IntefaceHardwareView		yhdistetty
 Gateway:	IntefaceAddressView		Yhdyskäytävä:
 Disable	InterfacesListView		Ei ole käytössä
+Sent:	IntefaceHardwareView		Lähetetty:
 Disable	InterfacesAddOn		Ei ole käytössä
 Configure…	InterfacesAddOn		Aseta…
 Renegotiate Address	InterfacesListView		Neuvottele osoite uudelleen
@@ -26,4 +29,5 @@ Off	IntefaceAddressView		Pois käytöstä
 MAC address:	IntefaceHardwareView		MAC-osoite:
 Netmask:	IntefaceAddressView		Verkkopeite:
 Your IP address	IntefaceAddressView		IP-osoitteesi
+%llu KBytes	IntefaceHardwareView		%llu kilotavua
 disconnected	IntefaceHardwareView		yhteys katkaistu

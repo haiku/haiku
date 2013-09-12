@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2011 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -135,8 +136,13 @@ ExpressionTextView::SetTextRect(BRect rect)
 	InputTextView::SetTextRect(rect);
 
 	int32 count = fPreviousExpressions.CountItems();
-	if (fHistoryPos == count && fCurrentValue.CountChars() > 0)
+	if (fHistoryPos == count && fCurrentValue.CountChars() > 0) {
+		int32 start;
+		int32 finish;
+		GetSelection(&start, &finish);
 		SetValue(fCurrentValue.String());
+		Select(start, finish);
+	}
 }
 
 
@@ -400,7 +406,7 @@ ExpressionTextView::PreviousExpression()
 	}
 
 	BString* item = (BString*)fPreviousExpressions.ItemAt(fHistoryPos);
-	if (item)
+	if (item != NULL)
 		SetExpression(item->String());
 }
 

@@ -48,6 +48,7 @@
 #include <TranslationUtils.h>
 #include <UnicodeChar.h>
 #include <UTF8.h>
+#include <Volume.h>
 
 
 using namespace BPrivate;
@@ -517,10 +518,17 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			break;
 
 		case UPDATE_STATUS:
+		{
 			message->AddBool("modified", !fClean);
-			message->AddBool("readOnly", !fTextView->IsEditable());
+			bool readOnly = !fTextView->IsEditable();
+			message->AddBool("readOnly", readOnly);
+			if (readOnly) {
+				BVolume volume(fNodeRef.device);
+				message->AddBool("canUnlock", !volume.IsReadOnly());
+			}
 			fStatusView->SetStatus(message);
 			break;
+		}
 
 		case UNLOCK_FILE:
 		{
@@ -1437,6 +1445,8 @@ StyledEditWindow::_LoadFile(entry_ref* ref, const char* forceEncoding)
 		bool editable = (getuid() == st.st_uid && S_IWUSR & st.st_mode)
 					|| (getgid() == st.st_gid && S_IWGRP & st.st_mode)
 					|| (S_IWOTH & st.st_mode);
+		BVolume volume(ref->device);
+		editable = editable && !volume.IsReadOnly();
 		_SetReadOnly(!editable);
 	}
 

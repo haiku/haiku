@@ -1,12 +1,12 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	1913625522
+1	japanese	x-vnd.Haiku-ActivityMonitor	1211510241
 P-faults	DataSource		ページフォルト
 Media nodes	DataSource		メディアノード数
 Threads	DataSource		スレッド数
-MB	DataSource		MB
 Always on top	ActivityWindow		常に前面に
-Add graph	ActivityWindow		グラフの追加
+Add graph	ActivityWindow		グラフを追加
 Teams	DataSource		チーム数
 Hide legend	ActivityView		説明を隠す
+MiB	DataSource		MiB
 Network send	DataSource		ネットワーク送信バイト数
 CPU usage (combined)	DataSource		CPU 使用率(合計)
 CPU	DataSource		CPU
@@ -23,17 +23,18 @@ Page faults	DataSource		ページフォールト数
 Sending	DataSource		送信バイト数
 Cache	DataSource		キャッシュ
 %.1f faults/s	DataSource		%.1f フォールト/s
-Update time interval:	SettingsWindow		更新間隔：
+Update time interval:	SettingsWindow		更新間隔:
 TX	DataSource	Shorter version for Sending	送信
 Quit	ActivityWindow		終了
 Block cache memory	DataSource		ブロックキャッシュメモリ
-Remove graph	ActivityView		グラフの削除
-%.1f MB	DataSource		%.1f MB
+%.1f KiB/s	DataSource		%.1f KiB/s
+Remove graph	ActivityView		グラフを削除
 %lld sec.	SettingsWindow		%lld 秒
 %lld ms	SettingsWindow		%lld マイクロ秒
 CPU usage	DataSource		CPU 使用率
 Raw clipboard	DataSource		バイナリクリップボード
 Sems	DataSource		セマフォ
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		利用状況モニター
 Running applications	DataSource		実行中のアプリケーション数
 Semaphores	DataSource		セマフォ数
@@ -44,6 +45,5 @@ File	ActivityWindow		ファイル
 usage	DataSource		使用量
 Additional items	ActivityView		追加項目
 Network receive	DataSource		ネットワーク受信バイト数
-%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		メモリ
 RX	DataSource	Shorter version for Receiving.	受信

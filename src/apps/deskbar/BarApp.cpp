@@ -969,7 +969,7 @@ TBarApp::FetchAppIcon(BarTeamInfo* barInfo)
 	}
 
 	delete barInfo->iconCache[index];
-	barInfo->iconCache[index] = NULL;
+	barInfo->iconCache[index] = barInfo->icon = icon;
 }
 
 

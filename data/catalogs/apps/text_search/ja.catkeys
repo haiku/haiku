@@ -22,7 +22,7 @@ Actions	GrepWindow		アクション
 File	GrepWindow		ファイル
 Encoding	GrepWindow		文字コード
 History	GrepWindow		検索履歴
-%s: There was a problem running grep.	Grepper		%s: grepの動作中に問題が起こりました。
+%s: There was a problem running grep.	Grepper		%s: grep の動作中に問題が起こりました。
 New window	GrepWindow		新規ウィンドウ
 Please select the files you wish to keep searching.	GrepWindow		検索したいファイルを選択してください。
 TextSearch	GrepWindow		テキスト検索
