@@ -32,10 +32,9 @@ if $(HOST_RM_ATTRS_TARGET) {
 } else {
 	AddVariableToScript $(script) : rmAttrs : rm ;
 }
-if $(optionalPackageDescriptions) {
-	AddTargetVariableToScript $(script) : $(optionalPackageDescriptions)
-		: optionalPackageDescriptions ;
-}
+
+AddPackagesAndRepositoryVariablesToContainerScript $(script)
+	: $(HAIKU_IMAGE_CONTAINER_NAME) ;
 
 # Convenience wrapper rule around BuildHaikuCD.
 rule _BuildHaikuCD haikuCD : bootFloppy
