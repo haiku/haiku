@@ -515,7 +515,10 @@ vfs_mount_boot_file_system(kernel_args* args)
 	}
 
 	// If we're booting off a packaged system, mount packagefs.
-	if (bootVolume.GetBool(BOOT_VOLUME_PACKAGED, false)) {
+	struct stat st;
+	if (bootVolume.GetBool(BOOT_VOLUME_PACKAGED, false)
+		|| (bootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)
+			&& lstat(kSystemPackagesDirectory, &st) == 0)) {
 		static const char* const kPackageFSName = "packagefs";
 
 		dev_t packageMount = _kern_mount("/boot/system", NULL, kPackageFSName,
