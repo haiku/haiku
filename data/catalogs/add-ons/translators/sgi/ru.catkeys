@@ -2,7 +2,7 @@
 Use compression:	SGIView		Использовать сжатие:
 Version %d.%d.%d %s	SGIView		Версия %d.%d.%d %s
 SGITranslator Settings	SGITranslator		Настройки SGI транслятора
-None	SGIView		без сжатия
+None	SGIView		Без сжатия
 SGI images	SGITranslator		SGI изображения
 SGI image translator	SGITranslator		Транслятор SGI изображений
 SGI image	SGITranslator		SGI изображение

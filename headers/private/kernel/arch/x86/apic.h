@@ -113,9 +113,28 @@ bool		apic_available();
 uint32		apic_read(uint32 offset);
 void		apic_write(uint32 offset, uint32 data);
 uint32		apic_local_id();
+uint32		apic_local_version();
+uint32		apic_task_priority();
+void		apic_set_task_priority(uint32 config);
 void		apic_end_of_interrupt();
 
 void		apic_disable_local_ints();
+
+uint32		apic_spurious_intr_vector();
+void		apic_set_spurious_intr_vector(uint32 config);
+uint32		apic_intr_command_1();
+void		apic_set_intr_command_1(uint32 config);
+uint32		apic_intr_command_2();
+void		apic_set_intr_command_2(uint32 config);
+
+uint32		apic_lvt_timer();
+void		apic_set_lvt_timer(uint32 config);
+uint32		apic_lvt_error();
+void		apic_set_lvt_error(uint32 config);
+uint32		apic_lvt_initial_timer_count();
+void		apic_set_lvt_initial_timer_count(uint32 config);
+uint32		apic_lvt_timer_divide_config();
+void		apic_set_lvt_timer_divide_config(uint32 config);
 
 status_t	apic_init(kernel_args *args);
 status_t	apic_per_cpu_init(kernel_args *args, int32 cpu);

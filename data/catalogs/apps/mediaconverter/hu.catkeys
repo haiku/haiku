@@ -27,7 +27,7 @@ Source files	MediaConverter		Forrásfájlok
 Error writing video frame %lld	MediaConverter		Hiba történt a %lld. képkocka írása közben
 Error writing audio frame %lld	MediaConverter		Hiba történt a %lld. hang írása közben
 Cancelling	MediaConverter		Megszakítás folyamatban
-%d byte 	MediaFileInfo		%d byte
+%d byte 	MediaFileInfo		%d byte 
 Error loading files	MediaConverter		Hiba történt a fájlok betöltése során
 Cancel	MediaConverter		Mégse
 None available	Video codecs		Nincs elérhető

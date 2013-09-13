@@ -5,5 +5,5 @@ SubDir HAIKU_TOP src tests kits midi ;
 #SubInclude HAIKU_TOP src tests kits midi midi_player ;
 #SubInclude HAIKU_TOP src tests kits midi midi_player_replacement ;
 #SubInclude HAIKU_TOP src tests kits midi synth_file_reader ;
-SubInclude HAIKU_TOP src tests kits midi patchbay ;
+#SubInclude HAIKU_TOP src tests kits midi patchbay ;
 

@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src bin network wget ;
 
 UseHeaders [ FDirName $(SUBDIR) src ] : true ;
 
-local defines = [ FDefines HAVE_CONFIG_H=1 ] ;
+local defines = [ FDefines HAVE_CONFIG_H=1 HAVE_ARPA_INET_H=1 ] ;
 
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;

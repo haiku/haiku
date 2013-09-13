@@ -170,7 +170,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	dummy->RemoveSelf();
 	delete dummy;
 
-	float menuFieldHeight = menuBarHeight + 6;
+	float menuFieldHeight = menuBarHeight + 2;
 	float controlHeight = menuBarHeight + floorf(be_plain_font->Size() / 1.15);
 
 	if (!fIncoming) {

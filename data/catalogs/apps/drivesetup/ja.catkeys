@@ -2,7 +2,7 @@
 DriveSetup	System name		DriveSetup
 Cancel	AbstractParametersPanel		中止
 Delete	MainWindow		削除
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		変更を本当にディスクに保存しますか?\n\nその場合、選択されたパーティションのすべてのデータが失われますので、ご注意ください。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		変更をディスクに保存しますか?\n\nその場合、選択されたパーティションのすべてのデータが失われますので、ご注意ください。
 Rescan	MainWindow		ディスクを再検出
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		パーティション情報の取得に失敗しました。
@@ -12,13 +12,13 @@ OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<空>
 Unable to find the selected partition by ID.	MainWindow		選択されたパーティションを ID で検出できませんでした。
 Select a partition from the list below.	DiskView		下記の一覧からパーティションを一つ選択してください。
-No disk devices have been recognized.	DiskView		ディスクデバイスが検出されませんでした。
-Failed to initialize the disk %s!\n	MainWindow		ディスク %s の初期化に失敗しました！\n
+No disk devices have been recognized.	DiskView		ディスクデバイスが検出されていません。
+Failed to initialize the disk %s!\n	MainWindow		ディスク %s の初期化に失敗しました。\n
 The selected disk is read-only.	MainWindow		選択されたディスクは読み取り専用です。
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" を本当にフォーマットして良いですか?  変更をディスクに書き込む直前に再度確認します。
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" をフォーマットしますか?  変更をディスクに書き込む直前に再度確認します。
 Could not mount partition %s.	MainWindow		パーティション %s をマウントできませんでした。
 The partition %s has been successfully formatted.\n	MainWindow		%s パーティションは正常にフォーマットされました。\n
-Change parameters	MainWindow		パラメーターの変更
+Change parameters	MainWindow		パラメーターを変更
 The partition %s is already unmounted.	MainWindow		パーティション %s はすでにマウント解除されています。
 Failed to delete the partition. No changes have been written to disk.	MainWindow		パーティションの削除に失敗しました。変更は保存されていません。
 Could not delete the selected partition.	MainWindow		選択されたパーティションを削除できませんでした。
@@ -36,25 +36,25 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Write changes	MainWindow		変更を書き込む
 There was an error preparing the disk for modifications.	MainWindow		ディスクの変更のための準備をする際、エラーが発生しました。
 The partition %s is already mounted.	MainWindow		パーティション %s はすでにマウントされています。
-Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		パーティションを本当にフォーマットして良いですか? 変更をディスクに書き込む直前に再度確認します。
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		パーティションをフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
 Partition name:	ChangeParametersPanel		パーティション名 :
 Change	ChangeParametersPanel		変更
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われますので、ご注意ください。
-Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		選択されたパーティションを本当に削除しますか?\n\nその場合、パーティションのすべてのデータが失われますので、ご注意ください。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われます。
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		選択されたパーティションを削除しますか?\n\nその場合、パーティションのすべてのデータが失われます。
 Create…	MainWindow		新規作成…
 Disk system \"%s\"\" not found!	MainWindow		\"%s\"\" ディスクシステムがみつかりません!
 The disk has been successfully initialized.\n	MainWindow		ディスクは正常に初期化されました。\n
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できませんでした。
-Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		パーティションのパラメーターの変更に失敗しました。ディスクは変更されません。
-Failed to format the partition %s!\n	MainWindow		パーティション %s のフォーマットに失敗しました！\n
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		パーティションのパラメーターの変更に失敗しました。ディスクは変更されていません。
+Failed to format the partition %s!\n	MainWindow		パーティション %s のフォーマットに失敗しました。\n
 Mount	MainWindow		マウント
 Partition type	PartitionList		パーティション種別 :
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		本当にディスク全体をフォーマットして良いですか?  (大抵の人はまずパーティショニングシステムでディスクを初期化します) 変更をディスクに書き込む直前に再度確認します。
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		ディスク全体をフォーマットしますか?  (大抵の人はまずパーティショニングシステムでディスクを初期化します) 変更をディスクに書き込む直前に再度確認します。
 The panel experienced a problem!	MainWindow		パネルに問題が発生しました。
-Change parameters…	MainWindow		パラメーターの変更…
+Change parameters…	MainWindow		パラメーターを変更…
 Device	PartitionList		デバイス
 Disk	MainWindow		ディスク
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		本当に選択したディスクを初期化しますか? データはすべて失われます。変更をディスクに書き込む直前に再度確認します。\n
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		選択したディスクを初期化しますか? データはすべて失われます。変更をディスクに書き込む直前に再度確認します。\n
 Partition size	CreateParametersPanel		パーティションサイズ
 Device	DiskView		デバイス
 Active	PartitionList		アクティブ
@@ -66,7 +66,7 @@ End: %s	Support		終了位置: %s
 The panel could not return successfully.	MainWindow		パネルは正しく返しませんでした。
 Cancel	MainWindow		中止
 Delete partition	MainWindow		パーティションを削除
-Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		選択したパーティションのパラメーターを本当に変更して良いですか?\n\nパーティションはほかのオペレーティングシステムからはもう認識されないかもしれません!
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		選択したパーティションのパラメーターを変更しますか?\n\nパーティションはほかのオペレーティングシステムからはもう認識されないかもしれません。
 Eject	MainWindow		取り出す
 Partition	MainWindow		パーティション
 Validation of the given parameters failed.	MainWindow		指定されたパラメーターの検証に失敗しました。
@@ -79,7 +79,7 @@ Wipe (not implemented)	MainWindow		ワイプ (実装されていません)
 Validation of the given initialization parameters failed.	MainWindow		初期化パラメーターの検証に失敗しました
 The selected partition does not contain a partitioning system.	MainWindow		選択されたパーティションにパーティションシステムはありません。
 Offset: %s	Support		オフセット: %s
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われますので、ご注意ください。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われます。
 The partition %s is currently mounted.	MainWindow		%s パーティションが現在マウントされています。
 Surface test (not implemented)	MainWindow		表面チェック (実装されていません)
 Format	MainWindow		フォーマット

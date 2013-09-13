@@ -7,6 +7,8 @@ UsePrivateHeaders interface mount shared storage support tracker ;
 
 AddResources libtracker.so : TrackerIcons.rdef libtracker.rdef ;
 
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons input_server filters shortcut_catcher ] ;
+
 SubDirC++Flags
 	-D_BUILDING_tracker=1
 #	-D_INCLUDES_CLASS_DEVICE_MAP=1
@@ -89,7 +91,8 @@ SharedLibrary libtracker.so :
 	VolumeWindow.cpp
 	WidgetAttributeText.cpp
 
-	: be translation $(vector_icon_libs) $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS) libshared.a
+	: be translation $(vector_icon_libs) $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS) libshared.a 
+		libshortcuts_shared.a 
 	;
 
 DoCatalogs libtracker.so :

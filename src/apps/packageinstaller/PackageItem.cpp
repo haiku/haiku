@@ -336,7 +336,7 @@ PackageItem::ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 			*temp = new uint8[*tempSize];
 		}
 		if (*dataSize < *attrOSize) {
-			delete *attrData;
+			delete[] *attrData;
 			*dataSize = *attrOSize;
 			*attrData = new uint8[*dataSize];
 		}

@@ -571,7 +571,7 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 		} else
 			itemCount = 1;
 
-		ssize_t dataSize;
+		int32 dataSize;
 		if (miniData) {
 			uint8 miniSize;
 			reader(miniSize);
@@ -595,15 +595,15 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 		reader(buffer, dataSize);
 
 		status_t result = B_OK;
-		ssize_t itemSize = 0;
+		int32 itemSize = 0;
 		if (fixedSize)
 			itemSize = dataSize / itemCount;
 
 		if (format == MESSAGE_FORMAT_R5) {
 			for (int32 i = 0; i < itemCount; i++) {
 				if (!fixedSize) {
-					itemSize = *(ssize_t *)pointer;
-					pointer += sizeof(ssize_t);
+					itemSize = *(int32 *)pointer;
+					pointer += sizeof(int32);
 				}
 
 				result = into->AddData(nameBuffer, type, pointer, itemSize,
@@ -617,13 +617,13 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 				if (fixedSize)
 					pointer += itemSize;
 				else
-					pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
+					pointer += pad_to_8(itemSize + sizeof(int32)) - sizeof(int32);
 			}
 		} else {
 			for (int32 i = 0; i < itemCount; i++) {
 				if (!fixedSize) {
-					itemSize = __swap_int32(*(ssize_t *)pointer);
-					pointer += sizeof(ssize_t);
+					itemSize = __swap_int32(*(int32 *)pointer);
+					pointer += sizeof(int32);
 				}
 
 				swap_data(type, pointer, itemSize, B_SWAP_ALWAYS);
@@ -638,7 +638,7 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 				if (fixedSize)
 					pointer += itemSize;
 				else
-					pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
+					pointer += pad_to_8(itemSize + sizeof(int32)) - sizeof(int32);
 			}
 		}
 

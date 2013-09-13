@@ -466,6 +466,7 @@ BUrlProtocolHttp::_MakeRequest()
 	ssize_t bytesReceived = 0;
 	ssize_t bytesTotal = 0;
 	char* inputTempBuffer = NULL;
+	ssize_t chunkSize = -1;
 	fQuit = false;
 
 	while (!fQuit && !(receiveEnd && parseEnd)) {
@@ -507,6 +508,10 @@ BUrlProtocolHttp::_MakeRequest()
 				if ((fContext != NULL) && fHeaders.HasHeader("Set-Cookie")) {
 					for (int32 i = 0;  i < fHeaders.CountHeaders(); i++) {
 						if (fHeaders.HeaderAt(i).NameIs("Set-Cookie")) {
+							BNetworkCookie* cookie = new BNetworkCookie();
+							cookie->ParseCookieStringFromUrl(
+								fHeaders.HeaderAt(i).Value(), fUrl);
+							fContext->GetCookieJar().AddCookie(cookie);
 						}
 					}
 				}
@@ -524,14 +529,53 @@ BUrlProtocolHttp::_MakeRequest()
 			// If Transfer-Encoding is chunked, we should read a complete
 			// chunk in buffer before handling it
 			if (readByChunks) {
-				_CopyChunkInBuffer(&inputTempBuffer, &bytesRead);
+				if (chunkSize >= 0) {
+					if ((ssize_t)fInputBuffer.Size() >= chunkSize + 2)  {
+							// 2 more bytes to handle the closing CR+LF
+						bytesRead = chunkSize;
+						inputTempBuffer = new char[chunkSize+2];
+						fInputBuffer.RemoveData(inputTempBuffer, chunkSize+2);
+						chunkSize = -1;
+					} else {
+						// Not enough data, try again later
+						bytesRead = -1;
+						inputTempBuffer = NULL;
+					}
+				} else {
+					BString chunkHeader;
+					if (_GetLine(chunkHeader) == B_ERROR) {
+						chunkSize = -1;
+						inputTempBuffer = NULL;
+						bytesRead = -1;
+					} else {
+						// Format of a chunk header:
+						// <chunk size in hex>[; optional data]
+						int32 semiColonIndex = chunkHeader.FindFirst(";", 0);
 
-				// A chunk of 0 bytes indicates the end of the chunked transfer
+						// Cut-off optional data if present
+						if (semiColonIndex != -1) {
+							chunkHeader.Remove(semiColonIndex,
+								chunkHeader.Length() - semiColonIndex);
+						}
+
+						chunkSize = strtol(chunkHeader.String(), NULL, 16);
+						PRINT(("BHP[%p] Chunk %s=%ld\n", this,
+							chunkHeader.String(), chunkSize));
+						if (chunkSize == 0) {
+							fContentReceived = true;
+						}
+
+						bytesRead = -1;
+						inputTempBuffer = NULL;
+					}
+				}
+
+				// A chunk of 0 bytes indicates the end of the chunked
+				// transfer
 				if (bytesRead == 0) {
 					receiveEnd = true;
 				}
-			}
-			else {
+			} else {
 				bytesRead = fInputBuffer.Size();
 
 				if (bytesRead > 0) {
@@ -542,8 +586,6 @@ BUrlProtocolHttp::_MakeRequest()
 
 			if (bytesRead > 0) {
 				bytesReceived += bytesRead;
-				_EmitDebug(B_URL_PROTOCOL_DEBUG_TRANSFER_IN, "%d bytes",
-					bytesRead);
 
 				if (fListener != NULL) {
 					fListener->DataReceived(this, inputTempBuffer, bytesRead);
@@ -651,52 +693,6 @@ BUrlProtocolHttp::_ParseHeaders()
 
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_IN, "%s", currentHeader.String());
 	fHeaders.AddHeader(currentHeader.String());
-}
-
-
-void
-BUrlProtocolHttp::_CopyChunkInBuffer(char** buffer, ssize_t* bytesReceived)
-{
-	static ssize_t chunkSize = -1;
-	BString chunkHeader;
-
-	if (chunkSize >= 0) {
-		if ((ssize_t)fInputBuffer.Size() >= chunkSize + 2)  {
-			// 2 more bytes to handle the closing CR+LF
-			*bytesReceived = chunkSize;
-			*buffer = new char[chunkSize+2];
-			fInputBuffer.RemoveData(*buffer, chunkSize+2);
-			chunkSize = -1;
-		} else {
-			*bytesReceived = -1;
-			*buffer = NULL;
-		}
-	} else {
-		if (_GetLine(chunkHeader) == B_ERROR) {
-			chunkSize = -1;
-			*buffer = NULL;
-			*bytesReceived = -1;
-			return;
-		}
-
-		// Format of a chunk header:
-		// <chunk size in hex>[; optional data]
-		int32 semiColonIndex = chunkHeader.FindFirst(";", 0);
-
-		// Cut-off optional data if present
-		if (semiColonIndex != -1)
-			chunkHeader.Remove(semiColonIndex,
-				chunkHeader.Length() - semiColonIndex);
-
-		chunkSize = strtol(chunkHeader.String(), NULL, 16);
-		PRINT(("BHP[%p] Chunk %s=%ld\n", this, chunkHeader.String(), chunkSize));
-		if (chunkSize == 0) {
-			fContentReceived = true;
-		}
-
-		*bytesReceived = -1;
-		*buffer = NULL;
-	}
 }
 
 

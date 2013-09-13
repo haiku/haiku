@@ -19,7 +19,7 @@
 #include <InterfaceDefs.h>
 
 
-#define NUM_KEYS 256
+#define NUM_KEYS 128
 #define MAX_UTF8_LENGTH 5	// up to 4 chars, plus a nul terminator
 
 struct KeyLabelMap {
@@ -97,10 +97,8 @@ static const char* keyDescriptions[NUM_KEYS];
 // series of optional up-to-(4+1)-byte terminated UTF-8 character strings...
 static char utfDescriptions[NUM_KEYS * MAX_UTF8_LENGTH];
 
-static const char* FindSpecialKeyLabelFor(uint8 keyCode, int& last);
-
 static const char*
-FindSpecialKeyLabelFor(uint8 keyCode, int& last)
+FindSpecialKeyLabelFor(uint8 keyCode, uint32& last)
 {
 	while ((keyLabels[last].fKeyCode < keyCode) 
 		&& (last < (sizeof(keyLabels) / sizeof(struct KeyLabelMap)) - 1)) 
@@ -116,7 +114,7 @@ FindSpecialKeyLabelFor(uint8 keyCode, int& last)
 void 
 InitKeyIndices()
 {
-	int nextSpecial = 0;
+	uint32 nextSpecial = 0;
 	key_map* map;
 	char* keys;
 	get_key_map(&map, &keys);
@@ -125,8 +123,8 @@ InitKeyIndices()
 		keyDescriptions[j] = NULL;	// default
 
 		const char* slabel = FindSpecialKeyLabelFor(j, nextSpecial);
-		int keyCode = map->normal_map[j];
-		
+		int32 keyCode = map->normal_map[j];
+
 		if (keyCode >= 0) {
 			const char* mapDesc = &keys[keyCode];
 			uint8 len = *mapDesc;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku.
+ * Copyright 2003-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  */
 
 #include "ScreenCornerSelector.h"
-#include "Constants.h"
-#include "Utility.h"
+
+#include <stdio.h>
 
 #include <Rect.h>
 #include <Point.h>
@@ -17,7 +17,8 @@
 #include <Screen.h>
 #include <Window.h>
 
-#include <stdio.h>
+#include "Constants.h"
+#include "Utility.h"
 
 
 static const float kAspectRatio = 4.0f / 3.0f;
@@ -26,10 +27,11 @@ static const float kArrowSize = 11.0f;
 static const float kStopSize = 15.0f;
 
 
-ScreenCornerSelector::ScreenCornerSelector(BRect frame, const char *name,
-		BMessage* message, uint32 resizingMode)
-	: BControl(frame, name, NULL, message, resizingMode,
-		B_WILL_DRAW | B_NAVIGABLE),
+ScreenCornerSelector::ScreenCornerSelector(BRect frame, const char* name,
+	BMessage* message, uint32 resizingMode)
+	:
+	BControl(frame, name, NULL, message, resizingMode,
+		B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE),
 	fCurrentCorner(NO_CORNER),
 	fPreviousCorner(-1)
 {
@@ -70,7 +72,7 @@ ScreenCornerSelector::_CenterFrame(BRect innerFrame) const
 
 
 void
-ScreenCornerSelector::Draw(BRect update)
+ScreenCornerSelector::Draw(BRect updateRect)
 {
 	rgb_color darkColor = {160, 160, 160, 255};
 	rgb_color blackColor = {0, 0, 0, 255};
@@ -82,7 +84,7 @@ ScreenCornerSelector::Draw(BRect update)
 
 	SetDrawingMode(B_OP_OVER);
 
-	if (!_InnerFrame(outerRect).Contains(update)) {
+	if (!_InnerFrame(outerRect).Contains(updateRect)) {
 		// frame & background
 
 		// if the focus is changing, we don't redraw the whole view, but only

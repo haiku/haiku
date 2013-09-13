@@ -608,8 +608,6 @@ intel_init()
 	if (get_module(B_PCI_MODULE_NAME, (module_info**)&sPCI) != B_OK)
 		return B_ERROR;
 
-	bool found = false;
-
 	for (uint32 index = 0; sPCI->get_nth_pci_info(index, &sInfo.bridge) == B_OK;
 			index++) {
 		if (sInfo.bridge.vendor_id != VENDOR_ID_INTEL
@@ -621,20 +619,16 @@ intel_init()
 				/ sizeof(kSupportedDevices[0]); i++) {
 			if (sInfo.bridge.device_id == kSupportedDevices[i].bridge_id) {
 				sInfo.type = kSupportedDevices[i].type;
-				found = has_display_device(sInfo.display,
-					kSupportedDevices[i].display_id);
+				if (has_display_device(sInfo.display,
+						kSupportedDevices[i].display_id)) {
+					TRACE("found intel bridge\n");
+					return B_OK;
+				}
 			}
 		}
-
-		if (found)
-			break;
 	}
 
-	if (!found)
-		return ENODEV;
-
-	TRACE("found intel bridge\n");
-	return B_OK;
+	return ENODEV;
 }
 
 

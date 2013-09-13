@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_DEBUGGER_H
@@ -40,18 +41,26 @@ public:
 								~TeamDebugger();
 
 			status_t			Init(team_id teamID, thread_id threadID,
+									int argc,
+									const char* const* argv,
 									bool stopInMain);
 
 			void				Activate();
 
 			team_id				TeamID() const	{ return fTeamID; }
 
+			int					ArgumentCount() const
+									{ return fCommandLineArgc; }
+			const char**		Arguments() const
+									{ return fCommandLineArgv; }
+
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
 	// UserInterfaceListener
 	virtual	void				FunctionSourceCodeRequested(
-									FunctionInstance* function);
+									FunctionInstance* function,
+									bool forceDisassembly = false);
 	virtual void				SourceEntryLocateRequested(
 									const char* sourcePath,
 									const char* locatedPath);
@@ -61,14 +70,23 @@ private:
 									ValueNode* valueNode);
 	virtual	void				ThreadActionRequested(thread_id threadID,
 									uint32 action, target_addr_t address);
+
 	virtual	void				SetBreakpointRequested(target_addr_t address,
-									bool enabled);
+									bool enabled, bool hidden = false);
 	virtual	void				SetBreakpointEnabledRequested(
 									UserBreakpoint* breakpoint,
 									bool enabled);
 	virtual	void				ClearBreakpointRequested(target_addr_t address);
 	virtual	void				ClearBreakpointRequested(
 									UserBreakpoint* breakpoint);
+
+	virtual	void				SetStopOnImageLoadRequested(bool enabled,
+									bool useImageNames);
+	virtual	void				AddStopImageNameRequested(
+									const char* name);
+	virtual	void				RemoveStopImageNameRequested(
+									const char* name);
+
 	virtual	void				SetWatchpointRequested(target_addr_t address,
 									uint32 type, int32 length, bool enabled);
 	virtual	void				SetWatchpointEnabledRequested(
@@ -81,6 +99,8 @@ private:
 									TeamMemoryBlock::Listener* listener);
 
 	virtual void				DebugReportRequested(entry_ref* targetPath);
+
+	virtual	void				TeamRestartRequested();
 
 	virtual	bool				UserInterfaceQuitRequested(
 									QuitOption quitOption);
@@ -130,12 +150,14 @@ private:
 									ImageCreatedEvent* event);
 			bool				_HandleImageDeleted(
 									ImageDeletedEvent* event);
+			bool				_HandlePostSyscall(
+									PostSyscallEvent* event);
 
 			void				_HandleImageDebugInfoChanged(image_id imageID);
 			void				_HandleImageFileChanged(image_id imageID);
 
 			void				_HandleSetUserBreakpoint(target_addr_t address,
-									bool enabled);
+									bool enabled, bool hidden);
 			void				_HandleSetUserBreakpoint(
 									UserBreakpoint* breakpoint, bool enabled);
 			void				_HandleClearUserBreakpoint(
@@ -153,6 +175,8 @@ private:
 			void				_HandleInspectAddress(
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
+			status_t			_HandleSetArguments(int argc,
+									const char* const* argv);
 
 			ThreadHandler*		_GetThreadHandler(thread_id threadID);
 
@@ -189,6 +213,8 @@ private:
 	volatile bool				fTerminating;
 			bool				fKillTeamOnQuit;
 			TeamSettings		fTeamSettings;
+			int					fCommandLineArgc;
+			const char**		fCommandLineArgv;
 };
 
 
@@ -197,6 +223,8 @@ public:
 	virtual						~Listener();
 
 	virtual void				TeamDebuggerStarted(TeamDebugger* debugger) = 0;
+	virtual	void				TeamDebuggerRestartRequested(
+									TeamDebugger* debugger) = 0;
 	virtual	void				TeamDebuggerQuit(TeamDebugger* debugger) = 0;
 };
 

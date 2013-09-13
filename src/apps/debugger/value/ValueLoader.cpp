@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -73,6 +74,7 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 				return B_ENTRY_NOT_FOUND;
 			case VALUE_PIECE_LOCATION_MEMORY:
 			case VALUE_PIECE_LOCATION_REGISTER:
+			case VALUE_PIECE_LOCATION_IMPLICIT:
 				break;
 		}
 
@@ -121,21 +123,40 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 		uint32 bytesToRead = piece.size;
 		uint32 bitSize = piece.bitSize;
 		uint8 bitOffset = piece.bitOffset;
+			// TODO: the offset's ordinal position and direction aren't
+			// specified by DWARF, and simply follow the target language.
+			// To handle non C/C++ languages properly, the corresponding
+			// SourceLanguage will need to be passed in and extended to
+			// return the relevant information.
 
 		switch (piece.type) {
 			case VALUE_PIECE_LOCATION_INVALID:
 			case VALUE_PIECE_LOCATION_UNKNOWN:
 				return B_ENTRY_NOT_FOUND;
 			case VALUE_PIECE_LOCATION_MEMORY:
+			case VALUE_PIECE_LOCATION_IMPLICIT:
 			{
 				target_addr_t address = piece.address;
 
-				TRACE_LOCALS("  piece %" B_PRId32 ": memory address: %#"
-					B_PRIx64 ", bits: %" B_PRIu32 "\n", i, address, bitSize);
+				if (piece.type == VALUE_PIECE_LOCATION_MEMORY) {
+					TRACE_LOCALS("  piece %" B_PRId32 ": memory address: %#"
+						B_PRIx64 ", bits: %" B_PRIu32 "\n", i, address,
+						bitSize);
+				} else {
+					TRACE_LOCALS("  piece %" B_PRId32 ": implicit value, "
+						"bits: %" B_PRIu32 "\n", i, bitSize);
+				}
 
 				uint8 pieceBuffer[kMaxPieceSize];
-				ssize_t bytesRead = fTeamMemory->ReadMemory(address,
-					pieceBuffer, bytesToRead);
+				ssize_t bytesRead;
+				if (piece.type == VALUE_PIECE_LOCATION_MEMORY) {
+					bytesRead = fTeamMemory->ReadMemory(address,
+						pieceBuffer, bytesToRead);
+				} else {
+					memcpy(pieceBuffer, piece.value, piece.size);
+					bytesRead = piece.size;
+				}
+
 				if (bytesRead < 0)
 					return bytesRead;
 				if ((uint32)bytesRead != bytesToRead)
@@ -178,8 +199,10 @@ ValueLoader::LoadValue(ValueLocation* location, type_code valueType,
 				if (registerValue.Size() < bytesToRead)
 					return B_ENTRY_NOT_FOUND;
 
-				if (!bigEndian)
+				if (!bigEndian) {
 					registerValue.SwapEndianess();
+					bitOffset = registerValue.Size() * 8 - bitOffset - bitSize;
+				}
 				valueBuffer.AddBits(registerValue.Bytes(), bitSize, bitOffset);
 				break;
 			}

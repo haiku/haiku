@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,21 +14,20 @@
 #include <Box.h>
 #include <ScreenSaverRunner.h>
 
-class BScreenSaver;
-
 
 class PreviewView : public BView { 
-	public:
-		PreviewView(BRect frame, const char *name);
-		virtual ~PreviewView();
+public:
+								PreviewView(const char* name);
+	virtual						~PreviewView();
 
-		virtual void Draw(BRect update); 
+	virtual	void				Draw(BRect update);
 
-		BView* AddPreview();
-		BView* RemovePreview();
+			BView*				AddPreview();
+			BView*				RemovePreview();
 
-	private:
-		BView* fSaverView;
+private:
+			BView*				fSaverView;
 };
+
 
 #endif	// PREVIEW_VIEW_H

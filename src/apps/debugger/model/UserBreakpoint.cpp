@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -99,7 +100,8 @@ UserBreakpoint::UserBreakpoint(const UserBreakpointLocation& location)
 	:
 	fLocation(location),
 	fValid(false),
-	fEnabled(false)
+	fEnabled(false),
+	fHidden(false)
 {
 }
 
@@ -159,4 +161,11 @@ void
 UserBreakpoint::SetEnabled(bool enabled)
 {
 	fEnabled = enabled;
+}
+
+
+void
+UserBreakpoint::SetHidden(bool hidden)
+{
+	fHidden = hidden;
 }

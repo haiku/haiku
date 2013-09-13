@@ -81,7 +81,8 @@ public:
 			int					Columns() const;
 			BRect				SetTermSize(int rows, int cols,
 									bool notifyShell);
-			void				SetTermSize(BRect rect);
+			void				SetTermSize(BRect rect,
+									bool notifyShell = false);
 			void				GetTermSizeFromRect(const BRect &rect,
 									int *rows, int *columns);
 
@@ -250,6 +251,8 @@ private:
 			void				_HandleInputMethodChanged(BMessage* message);
 			void				_HandleInputMethodLocationRequest();
 			void				_CancelInputMethod();
+
+			void				_UpdateModifiers();
 
 			void				_NextState(State* state);
 

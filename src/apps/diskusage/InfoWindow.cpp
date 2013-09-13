@@ -17,6 +17,7 @@
 #include <vector>
 
 #include <Catalog.h>
+#include <StringForSize.h>
 #include <StringView.h>
 #include <Bitmap.h>
 #include <NodeInfo.h>
@@ -77,7 +78,7 @@ InfoWin::InfoWin(BPoint p, FileInfo *f, BWindow* parent)
 
 	// Size
 	char name[B_PATH_NAME_LENGTH] = { 0 };
-	size_to_string(f->size, name, sizeof(name));
+	string_for_size(f->size, name, sizeof(name));
 	if (f->count > 0) {
 		// This is a directory.
 		char str[64];

@@ -36,7 +36,6 @@ Inode::OpenDir(OpenDirCookie* cookie)
 	if (result != B_OK)
 		return result;
 
-	cookie->fFileSystem = fFileSystem;
 	cookie->fSpecial = 0;
 	cookie->fSnapshot = NULL;
 	cookie->fCurrent = NULL;
@@ -52,7 +51,6 @@ Inode::OpenAttrDir(OpenDirCookie* cookie)
 {
 	ASSERT(cookie != NULL);
 
-	cookie->fFileSystem = fFileSystem;
 	cookie->fSpecial = 0;
 	cookie->fSnapshot = NULL;
 	cookie->fCurrent = NULL;

@@ -2,9 +2,9 @@ SubDir HAIKU_TOP src add-ons tracker openterminal ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-AddResources Open\ Terminal-T : OpenTerminal.rdef ;
+AddResources Open\ Terminal : OpenTerminal.rdef ;
 
-Addon Open\ Terminal-T :
+Addon Open\ Terminal :
 	OpenTerminal.cpp
 
 	: be tracker $(TARGET_LIBSTDC++)

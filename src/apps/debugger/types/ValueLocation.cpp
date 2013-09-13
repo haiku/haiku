@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -70,6 +71,21 @@ ValueLocation::ValueLocation(const ValueLocation& other)
 	fPieces(other.fPieces),
 	fBigEndian(other.fBigEndian)
 {
+}
+
+
+bool
+ValueLocation::SetToByteOffset(const ValueLocation& other, uint64 byteOffset,
+	uint64 byteSize)
+{
+	Clear();
+
+	fBigEndian = other.fBigEndian;
+	ValuePieceLocation piece = other.PieceAt(0);
+	piece.SetToMemory(piece.address + byteOffset);
+	piece.SetSize(byteSize);
+
+	return AddPiece(piece);
 }
 
 
@@ -257,6 +273,11 @@ ValueLocation::Dump() const
 				break;
 			case VALUE_PIECE_LOCATION_REGISTER:
 				printf("  register %" B_PRIu32, piece.reg);
+				break;
+			case VALUE_PIECE_LOCATION_IMPLICIT:
+				printf("  implicit value: ");
+				for (uint32 j = 0; j < piece.size; j++)
+					printf("%x ", ((char *)piece.value)[j]);
 				break;
 		}
 

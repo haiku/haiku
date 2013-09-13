@@ -89,6 +89,7 @@ TExpandoMenuBar::TExpandoMenuBar(BRect frame, const char* name,
 	fExpandNewTeams(static_cast<TBarApp*>(be_app)->Settings()->expandNewTeams),
 	fDeskbarMenuWidth(kMinMenuItemWidth),
 	fPreviousDragTargetItem(NULL),
+	fLastMousedOverItem(NULL),
 	fLastClickedItem(NULL),
 	fClickedExpander(false)
 {
@@ -369,7 +370,7 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 
 			case B_INSIDE_VIEW:
 			{
-				BMenuItem* menuItem = NULL;
+				BMenuItem* menuItem;
 				TTeamMenuItem* item = TeamItemAtPoint(where, &menuItem);
 				TWindowMenuItem* windowMenuItem
 					= dynamic_cast<TWindowMenuItem*>(menuItem);
@@ -396,6 +397,7 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 						SetToolTip(windowMenuItem->FullTitle());
 					} else
 						SetToolTip((const char*)NULL);
+
 					break;
 				}
 
@@ -406,12 +408,10 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					break;
 				}
 
-				// new item, set the tooltip to the item name
 				SetToolTip(item->Name());
-
-				// save the current menuitem for the next MouseMoved() call
+					// new item, set the tooltip to the item name
 				fLastMousedOverItem = menuItem;
-
+					// save the current menuitem for the next MouseMoved() call
 				break;
 			}
 
@@ -422,8 +422,8 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			{
 				TTeamMenuItem* lastItem
 					= dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
-				if (fVertical && fShowTeamExpander && fClickedExpander
-					&& lastItem != NULL) {
+				if (lastItem != NULL && fVertical && fShowTeamExpander
+					&& fClickedExpander) {
 					// Started expander animation, then exited view,
 					// since we can't track outside mouse movements
 					// redraw the original expander arrow
@@ -714,14 +714,8 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
 			if (item->Teams()->HasItem((void*)(addr_t)team)) {
 				item->Teams()->RemoveItem(team);
-
 				if (partial)
 					return;
-
-#ifdef DOUBLECLICKBRINGSTOFRONT
-				if (fLastClickedItem == i)
-					fLastClickedItem = -1;
-#endif
 
 				BAutolock locker(sMonLocker);
 					// make the update thread wait
@@ -871,6 +865,9 @@ bool
 TExpandoMenuBar::CheckForSizeOverrun()
 {
 	if (fVertical) {
+		if (Window() == NULL)
+			return false;
+
 		BRect screenFrame = (BScreen(Window())).Frame();
 		return Window()->Frame().bottom > screenFrame.bottom;
 	}

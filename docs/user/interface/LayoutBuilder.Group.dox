@@ -64,8 +64,7 @@
 
 /*!
 	\fn BLayoutBuilder::Group<ParentBuilder>::Group(BWindow *window,
-		enum orientation orientation=B_HORIZONTAL,
-		float spacing=B_USE_DEFAULT_SPACING)
+		orientation orientation, float spacing)
 	\brief Creates a new BGroupLayout, and attaches it to a BWindow.
 
 	\note The top BView* in \a window has its ViewColor set to
@@ -98,8 +97,7 @@
 
 /*!
 	\fn BLayoutBuilder::Group<ParentBuilder>::Group(
-		enum orientation orientation=B_HORIZONTAL,
-		float spacing=B_USE_DEFAULT_SPACING)
+		orientation orientation, float spacing)
 	\brief Creates a new BGroupView and targets it.
 
 	Methods called on this builder will be directed to the new BGroupView's
@@ -178,8 +176,7 @@
 
 /*!
 	\fn GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
-		enum orientation orientation, float spacing=B_USE_DEFAULT_SPACING,
-		float weight=1.0f)
+		orientation orientation, float spacing, float weight)
 	\brief Construct and add a viewless BGroupLayout, then return a GroupBuilder
 		representing the newly added layout.
 
@@ -264,8 +261,7 @@
 
 /*!
 	\fn SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
-		enum orientation orientation, float spacing=B_USE_DEFAULT_SPACING,
-		float weight=1.0f)
+		orientation orientation, float spacing, float weight)
 
 	\brief Create and add a new BSplitView with a weight of \c weight, then
 		return a SplitBuilder representing the new BSplitView.

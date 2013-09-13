@@ -1,6 +1,7 @@
 /*
  * Copyright 2004-2006, Jérôme DUVAL. All rights reserved.
  * Copyright 2010, Karsten Heimrich. All rights reserved.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,8 +16,7 @@
 #include <ControlLook.h>
 #include <Entry.h>
 #include <File.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -64,10 +64,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	fSettings(*settings),
 	fPreferences(NULL)
 {
-	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
-	SetLayout(layout);
-
-	_AddMenuBar(layout);
+	_CreateMenuBar();
 
 	fDestButton = new BButton(B_TRANSLATE("Destination"),
 		new BMessage(MSG_DEST));
@@ -100,34 +97,40 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	BString statusPlaceholderString;
 	statusPlaceholderString.SetTo(' ', MAX_STATUS_LENGTH * 2);
 
-	BView* topView = layout->View();
 	const float spacing = be_control_look->DefaultItemSpacing();
-	topView->AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
-		.AddGroup(B_HORIZONTAL, spacing)
-			.AddGroup(B_VERTICAL, 5.0)
-				.Add(fSourceButton)
-				.Add(fDestButton)
-				.Add(fExpandButton)
-			.End()
-			.AddGroup(B_VERTICAL, spacing)
-				.Add(fSourceText = new BTextControl(NULL, NULL,
-					new BMessage(MSG_SOURCETEXT)))
-				.Add(fDestText = new BTextControl(NULL, NULL,
-					new BMessage(MSG_DESTTEXT)))
-				.AddGroup(B_HORIZONTAL, spacing)
-					.Add(fShowContents = new BCheckBox(
-						B_TRANSLATE("Show contents"),
-						new BMessage(MSG_SHOWCONTENTS)))
-					.Add(fStatusView = new BStringView(NULL,
-							statusPlaceholderString))
+	BGroupLayout* pathLayout;
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0)
+		.SetInsets(0.0)
+		.Add(fBar)
+		.AddGroup(B_VERTICAL, spacing)
+			.AddGroup(B_HORIZONTAL, spacing)
+				.AddGroup(B_VERTICAL, 5.0)
+					.Add(fSourceButton)
+					.Add(fDestButton)
+					.Add(fExpandButton)
+				.End()
+				.AddGroup(B_VERTICAL, spacing)
+					.Add(fSourceText = new BTextControl(NULL, NULL,
+						new BMessage(MSG_SOURCETEXT)))
+					.Add(fDestText = new BTextControl(NULL, NULL,
+						new BMessage(MSG_DESTTEXT)))
+					.AddGroup(B_HORIZONTAL, spacing)
+						.GetLayout(&pathLayout)
+						.Add(fShowContents = new BCheckBox(
+							B_TRANSLATE("Show contents"),
+							new BMessage(MSG_SHOWCONTENTS)))
+						.Add(fStatusView = new BStringView(NULL,
+								statusPlaceholderString))
+					.End()
 				.End()
 			.End()
+			.Add(scrollView)
+			.SetInsets(spacing, spacing, spacing, spacing)
 		.End()
-		.Add(scrollView)
-		.SetInsets(spacing, spacing, spacing, spacing)
-	);
+	.End();
 
-	size = topView->PreferredSize();
+	pathLayout->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	size = GetLayout()->View()->PreferredSize();
 	fSizeLimit = size.Height() - scrollView->PreferredSize().height - spacing;
 
 	ResizeTo(Bounds().Width(), fSizeLimit);
@@ -380,7 +383,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 					if (strstr(string.String(), "Enter password") != NULL) {
 						fExpandingThread->SuspendExternalExpander();
 						BString password;
-						PasswordAlert* alert = 
+						PasswordAlert* alert =
 							new PasswordAlert("passwordAlert", string);
 						alert->Go(password);
 						fExpandingThread->ResumeExternalExpander();
@@ -389,8 +392,8 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 				}
 			}
 			break;
-		
-		case 'errp': 
+
+		case 'errp':
 		{
 			BString string;
 			if (msg->FindString("error", &string) == B_OK
@@ -550,7 +553,7 @@ ExpanderWindow::RefsReceived(BMessage* msg)
 #define B_TRANSLATION_CONTEXT "ExpanderMenu"
 
 void
-ExpanderWindow::_AddMenuBar(BLayout* layout)
+ExpanderWindow::_CreateMenuBar()
 {
 	fBar = new BMenuBar("menu_bar", B_ITEMS_IN_ROW, B_INVALIDATE_AFTER_LAYOUT);
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
@@ -578,7 +581,6 @@ ExpanderWindow::_AddMenuBar(BLayout* layout)
 	menu->AddItem(fPreferencesItem = new BMenuItem(B_TRANSLATE("Settings…"),
 		new BMessage(MSG_PREFERENCES), 'S'));
 	fBar->AddItem(menu);
-	layout->AddView(fBar);
 }
 
 

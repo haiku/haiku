@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_WINDOW_H
@@ -26,9 +26,12 @@
 class BButton;
 class BFilePanel;
 class BMenuBar;
+class BMessageRunner;
 class BSplitView;
 class BStringView;
 class BTabView;
+class ConsoleOutputView;
+class BreakConditionConfigWindow;
 class Image;
 class InspectorWindow;
 class RegistersView;
@@ -109,6 +112,9 @@ private:
 									target_addr_t address);
 	virtual	void				ThreadActionRequested(::Thread* thread,
 									uint32 action, target_addr_t address);
+	virtual	void				FunctionSourceCodeRequested(
+									FunctionInstance* function,
+									bool forceDisassembly);
 
 
 	// VariablesView::Listener
@@ -125,6 +131,8 @@ private:
 									const Team::ThreadEvent& event);
 	virtual	void				ImageDebugInfoChanged(
 									const Team::ImageEvent& event);
+	virtual	void				ConsoleOutputReceived(
+									const Team::ConsoleOutputEvent& event);
 	virtual	void				UserBreakpointChanged(
 									const Team::UserBreakpointEvent& event);
 	virtual	void				WatchpointChanged(
@@ -175,6 +183,7 @@ private:
 			SourceCode*			fActiveSourceCode;
 			ActiveSourceObject	fActiveSourceObject;
 			UserInterfaceListener* fListener;
+			BMessageRunner*		fTraceUpdateRunner;
 			BTabView*			fTabView;
 			BTabView*			fLocalsTabView;
 			ThreadListView*		fThreadListView;
@@ -191,10 +200,13 @@ private:
 			BButton*			fStepOutButton;
 			BMenuBar*			fMenuBar;
 			BStringView*		fSourcePathView;
+			ConsoleOutputView*	fConsoleOutputView;
 			BSplitView*			fFunctionSplitView;
 			BSplitView*			fSourceSplitView;
 			BSplitView*			fImageSplitView;
 			BSplitView*			fThreadSplitView;
+			BSplitView*			fConsoleSplitView;
+			BreakConditionConfigWindow* fBreakConditionConfigWindow;
 			InspectorWindow*	fInspectorWindow;
 			GuiTeamUiSettings	fUiSettings;
 			BFilePanel*			fFilePanel;

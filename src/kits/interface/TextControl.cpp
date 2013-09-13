@@ -850,6 +850,17 @@ BTextControl::PreferredSize()
 }
 
 
+BAlignment
+BTextControl::LayoutAlignment()
+{
+	CALLED();
+
+	_ValidateLayoutData();
+	return BLayoutUtils::ComposeAlignment(ExplicitAlignment(),
+		BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
+}
+
+
 BLayoutItem*
 BTextControl::CreateLabelLayoutItem()
 {

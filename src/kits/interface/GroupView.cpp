@@ -8,7 +8,7 @@
 #include <GroupView.h>
 
 
-BGroupView::BGroupView(enum orientation orientation, float spacing)
+BGroupView::BGroupView(orientation orientation, float spacing)
 	:
 	BView(NULL, 0, new BGroupLayout(orientation, spacing))
 {
@@ -16,8 +16,8 @@ BGroupView::BGroupView(enum orientation orientation, float spacing)
 }
 
 
-BGroupView::BGroupView(const char* name, enum orientation orientation,
-	float spacing)
+BGroupView::BGroupView(const char* name, orientation orientation,
+		float spacing)
 	:
 	BView(name, 0, new BGroupLayout(orientation, spacing))
 {

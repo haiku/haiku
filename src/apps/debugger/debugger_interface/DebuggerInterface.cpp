@@ -316,6 +316,9 @@ DebuggerInterface::Close(bool killTeam)
 
 	if (fDebuggerPort >= 0)
 		delete_port(fDebuggerPort);
+
+	fNubPort = -1;
+	fDebuggerPort = -1;
 }
 
 
@@ -348,8 +351,10 @@ DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 
 			if (ignore) {
 				if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
-					continue_thread(message.origin.nub_port,
+					error = continue_thread(message.origin.nub_port,
 						message.origin.thread);
+					if (error != B_OK)
+						return error;
 				continue;
 			}
 
@@ -370,16 +375,14 @@ DebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 status_t
 DebuggerInterface::SetTeamDebuggingFlags(uint32 flags)
 {
-	set_team_debugging_flags(fNubPort, flags);
-	return B_OK;
+	return set_team_debugging_flags(fNubPort, flags);
 }
 
 
 status_t
 DebuggerInterface::ContinueThread(thread_id thread)
 {
-	continue_thread(fNubPort, thread);
-	return B_OK;
+	return continue_thread(fNubPort, thread);
 }
 
 
@@ -827,13 +830,22 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 					info.data_size));
 			break;
 		}
+		case B_DEBUGGER_MESSAGE_POST_SYSCALL:
+		{
+			event = new(std::nothrow) PostSyscallEvent(message.origin.team,
+				message.origin.thread,
+				SyscallInfo(message.post_syscall.start_time,
+					message.post_syscall.end_time,
+					message.post_syscall.return_value,
+					message.post_syscall.syscall, message.post_syscall.args));
+			break;
+		}
 		default:
 			printf("DebuggerInterface for team %" B_PRId32 ": unknown message "
 				"from kernel: %" B_PRId32 "\n", fTeamID, messageCode);
 			// fall through...
 		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
-		case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 		case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
 		case B_DEBUGGER_MESSAGE_PROFILER_UPDATE:
 		case B_DEBUGGER_MESSAGE_HANDED_OVER:

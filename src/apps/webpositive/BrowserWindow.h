@@ -47,10 +47,15 @@ class BStatusBar;
 class BStringView;
 class BTextControl;
 class BWebView;
-class IconButton;
 class SettingsMessage;
 class TabManager;
 class URLInputGroup;
+
+namespace BPrivate {
+	class BIconButton;
+}
+
+using BPrivate::BIconButton;
 
 enum {
 	INTERFACE_ELEMENT_MENU			= 1 << 0,
@@ -214,10 +219,10 @@ private:
 			BMenuItem*			fBackMenuItem;
 			BMenuItem*			fForwardMenuItem;
 
-			IconButton*			fBackButton;
-			IconButton*			fForwardButton;
-			IconButton*			fStopButton;
-			IconButton*			fHomeButton;
+			BIconButton*		fBackButton;
+			BIconButton*		fForwardButton;
+			BIconButton*		fStopButton;
+			BIconButton*		fHomeButton;
 			URLInputGroup*		fURLInputGroup;
 			BStringView*		fStatusText;
 			BStatusBar*			fLoadingProgressBar;

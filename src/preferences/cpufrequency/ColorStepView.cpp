@@ -162,11 +162,10 @@ ColorStepView::Draw(BRect updateRect)
 		pos = nextPos;
 	}
 	// draw label
-	if (IsEnabled()) {
+	if (IsEnabled())
 		view->SetHighColor(0, 0, 0);
-	} else {
+	else
 		view->SetHighColor(tint_color(LowColor(), B_DISABLED_LABEL_TINT));
-	}
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
@@ -234,8 +233,7 @@ ColorStepView::SetFrequencys(StateList *list)
 	if (perfNumber < fNSteps) {
 		for (int i = 0; i < fNSteps - perfNumber; i++)
 			fPerformanceList->AddItem(new performance_step);
-	}
-	else {
+	} else {
 		for (int i = 0; i <  perfNumber - fNSteps; i++)
 			fPerformanceList->RemoveItemAt(0);
 	}
@@ -326,13 +324,10 @@ void
 ColorStepView::_ColorStep(int32 step, rgb_color &color)
 {
 	color.red = fLowFreqColor.red
-					+ (fHighFreqColor.red - fLowFreqColor.red)
-						/ (fNSteps - 1) * step;
+		+ (fHighFreqColor.red - fLowFreqColor.red) * step / (fNSteps - 1);
 	color.green = fLowFreqColor.green
-					+ (fHighFreqColor.green - fLowFreqColor.green)
-						/ (fNSteps - 1) * step;
+		+ (fHighFreqColor.green - fLowFreqColor.green) * step / (fNSteps - 1);
 	color.blue = fLowFreqColor.blue
-					+ (fHighFreqColor.blue - fLowFreqColor.blue)
-						/ (fNSteps - 1) * step;
+		+ (fHighFreqColor.blue - fLowFreqColor.blue) * step / (fNSteps - 1);
 }
 

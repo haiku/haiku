@@ -49,3 +49,5 @@ resource vector_icon {
 	$"18001501178600040A01010B1815FF01178400040A08010C000A09010D000A0A"
 	$"010E00"
 };
+
+resource(100, "BEOS:default_shortcut") "I";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MENU_FIELD_H
@@ -42,7 +42,7 @@ public:
 	virtual	void				AllAttached();
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
-	virtual	void				MakeFocus(bool state);
+	virtual	void				MakeFocus(bool focused);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				WindowActivated(bool state);
 	virtual	void				MouseUp(BPoint where);
@@ -121,9 +121,12 @@ private:
 								BMenuField(const char* label,
 									BMenu* menu, BMessage* message);
 
+			void				_DrawLabel(BRect updateRect);
+			void				_DrawMenuBar(BRect updateRect);
+
 			void				InitObject(const char* label);
 			void				InitObject2();
-			void				DrawLabel(BRect updateRect);
+
 	static	void				InitMenu(BMenu* menu);
 
 			int32				_MenuTask();
@@ -145,8 +148,6 @@ private:
 			alignment			fAlign;
 			float				fDivider;
 			bool				fEnabled;
-			bool				fSelected;
-			bool				fTransition;
 			bool				fFixedSizeMB;
 			thread_id			fMenuTaskID;
 

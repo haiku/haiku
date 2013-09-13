@@ -56,7 +56,7 @@
 
 /*!
 	\fn void BTwoDimensionalLayout::AlignLayoutWith(
-		BTwoDimensionalLayout* other, enum orientation orientation)
+		BTwoDimensionalLayout* other, orientation orientation)
 	\brief Align the BLayoutItem&apos;s in the specified \a orientation within
 		two or more BTwoDimensionalLayout&apos;s.
 
@@ -114,7 +114,7 @@
 
 
 /*!
-	\fn void BTwoDimensionalLayout::PrepareItems(enum orientation orientation)
+	\fn void BTwoDimensionalLayout::PrepareItems(orientation orientation)
 	\brief Prepare the BLayoutItem in this BTwoDimensionalLayout subclass
 		for layout within a certain \a orientation.
 
@@ -158,8 +158,8 @@
 
 
 /*!
-	\fn void BTwoDimensionalLayout::GetColumnRowConstraints(enum orientation 
-		orientation, int32 index, ColumnRowConstraints* constraints)
+	\fn void BTwoDimensionalLayout::GetColumnRowConstraints(
+		orientation orientation, int32 index, ColumnRowConstraints* constraints)
 	\brief Fill in the ColumnRowConstraints for a certain column or row in
 		the BTwoDimensionalLayout.
 

@@ -33,6 +33,8 @@ public:
 			void				LoadSettings(const BMessage& settings);
 			status_t			SaveSettings(BMessage& settings);
 
+			void				SetStackTraceClearPending();
+
 private:
 			class FramesTableModel;
 
@@ -46,6 +48,7 @@ private:
 			StackTrace*			fStackTrace;
 			Table*				fFramesTable;
 			FramesTableModel*	fFramesTableModel;
+			bool				fTraceClearPending;
 			Listener*			fListener;
 };
 

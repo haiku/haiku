@@ -1,7 +1,8 @@
-1	belarusian	x-vnd.Haiku-libmail	161731481
+1	belarusian	x-vnd.Haiku-libmail	4037525365
 Partially download messages larger than	ProtocolConfigView		Часткова спампоўваць паведамленні большыя за
 Password:	ProtocolConfigView		Пароль:
 Remove mail from server when deleted	ProtocolConfigView		Выдаляць паведамленні з сервера
+KiB	ProtocolConfigView		КБ
 Mail server:	ProtocolConfigView		Сервер пошты:
 Select…	MailKit		Абраць…
 Connection type:	ProtocolConfigView		Тып злучэння:

@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
  */
 #ifndef INPUT_TEXT_VIEW_H
 #define INPUT_TEXT_VIEW_H

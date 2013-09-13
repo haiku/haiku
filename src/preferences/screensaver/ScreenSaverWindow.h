@@ -1,18 +1,18 @@
 /*
- * Copyright 2003-2010, Haiku.
+ * Copyright 2003-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Phipps
- *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jérôme Duval, jerome.duval@free.fr
+ *		Michael Phipps
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef SCREEN_SAVER_WINDOW_H
 #define SCREEN_SAVER_WINDOW_H
 
 
 #include "PasswordWindow.h"
-#include "ScreenSaverSettings.h"
 
 #include <Box.h>
 #include <CheckBox.h>
@@ -20,15 +20,14 @@
 #include <Slider.h>
 #include <ListView.h>
 
+#include "ScreenSaverSettings.h"
+
 
 class BButton;
 class BTabView;
-class BTextView;
 
+class FadeView;
 class ModulesView;
-class ScreenCornerSelector;
-class ScreenSaverRunner;
-class TimeSlider;
 
 
 class ScreenSaverWindow : public BWindow {
@@ -41,37 +40,16 @@ public:
 	virtual	bool				QuitRequested();
 
 			void				LoadSettings();
-			void				SetMinimalSizeLimit(float width, float height);
-
-private:
-			void				_SetupFadeTab(BRect frame);
-			void				_UpdateTurnOffScreen();
-			void				_UpdateStatus();
 
 private:
 			float				fMinWidth;
 			float				fMinHeight;
 			ScreenSaverSettings	fSettings;
-			uint32				fTurnOffScreenFlags;
-
-			BView*				fFadeView;
-			ModulesView*		fModulesView;
-			BTabView*			fTabView;
-
-			BCheckBox*			fEnableCheckBox;
-			TimeSlider*			fRunSlider;
-
-			BCheckBox*			fTurnOffCheckBox;
-			TimeSlider*			fTurnOffSlider;
-			BTextView*			fTurnOffNotSupported;
-
-			BCheckBox*			fPasswordCheckBox;
-			TimeSlider*			fPasswordSlider;
-			BButton*			fPasswordButton;
 			PasswordWindow*		fPasswordWindow;
 
-			ScreenCornerSelector* fFadeNow;
-			ScreenCornerSelector* fFadeNever;
+			FadeView*			fFadeView;
+			ModulesView*		fModulesView;
+			BTabView*			fTabView;
 };
 
 

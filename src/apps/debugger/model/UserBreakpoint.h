@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef USER_BREAKPOINT_H
@@ -100,6 +101,9 @@ public:
 			void				SetEnabled(bool enabled);
 									// BreakpointManager only
 
+			bool				IsHidden() const	{ return fHidden; }
+			void				SetHidden(bool hidden);
+
 private:
 			typedef BObjectList<UserBreakpointInstance> InstanceList;
 
@@ -108,6 +112,7 @@ private:
 			InstanceList		fInstances;
 			bool				fValid;
 			bool				fEnabled;
+			bool				fHidden;
 };
 
 

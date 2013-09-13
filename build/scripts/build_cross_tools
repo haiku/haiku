@@ -20,6 +20,11 @@ additionalMakeArgs=$*
 	# additional flags for the binutils build. Should there ever be any other
 	# flags than -jN, we need to handle this differently.
 
+if [ `uname -o` = 'Haiku' ]; then
+	# force cross-build if building on Haiku:
+	buildhostMachine=i586-pc-haiku_buildhost
+	buildHostSpec="--build=$buildhostMachine --host=$buildhostMachine"
+fi
 
 if [ ! -d $haikuSourceDir ]; then
 	echo "ERROR: No such directory: \"$haikuSourceDir\"" >&2
@@ -101,8 +106,8 @@ fi
 # build binutils
 cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
-	--prefix=$installDir --target=i586-pc-haiku --disable-nls \
-	--enable-shared=yes --disable-werror || exit 1
+	--prefix=$installDir $buildHostSpec --target=i586-pc-haiku \
+	--disable-nls --enable-shared=yes --disable-werror || exit 1
 make $additionalMakeArgs || exit 1
 make $additionalMakeArgs install || exit 1
 
@@ -146,10 +151,10 @@ case `uname` in
 	;;
 esac
 CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" $buildToolsDir/gcc/configure \
-	--prefix=$installDir \
-	--target=i586-pc-haiku --disable-nls --enable-shared=yes \
-	--enable-languages=c,c++ --with-headers=$tmpIncludeDir \
-	--with-libs=$tmpLibDir || exit 1
+	--prefix=$installDir $buildHostSpec --target=i586-pc-haiku \
+	--disable-nls --enable-shared=yes --enable-languages=c,c++ \
+	--with-headers=$tmpIncludeDir --with-libs=$tmpLibDir \
+	|| exit 1
 unset CC
 
 # hack the Makefile to avoid trouble with stuff we don't need anyway
@@ -184,12 +189,10 @@ rm -f $installDir/lib/gcc-lib/i586-pc-haiku/$haikuRequiredLegacyGCCVersion/inclu
 
 # remove the system headers from the installation dir
 # Only the ones from the source tree should be used.
-sysIncludeDir=$installDir/i586-pc-haiku/sys-include
-rm -rf $sysIncludeDir/be $sysIncludeDir/posix
+rm -rf $installDir/i586-pc-haiku/sys-include
 
 # remove the objects dir
 rm -rf $objDir
 
 
 echo "binutils and gcc for cross compilation have been built successfully!"
-

@@ -32,13 +32,16 @@
 
 // Card chipset flags
 #define CHIP_STD		(1 << 0) // Standard chipset
-#define CHIP_IGP		(1 << 1) // IGP chipset
-#define CHIP_MOBILE		(1 << 2) // Mobile chipset
-#define CHIP_DISCREET	(1 << 3) // Discreet chipset
-#define CHIP_APU		(1 << 4) // APU chipset
+#define CHIP_X2			(1 << 1) // Dual cpu
+#define CHIP_IGP		(1 << 2) // IGP chipset
+#define CHIP_MOBILE		(1 << 3) // Mobile chipset
+#define CHIP_DISCREET	(1 << 4) // Discreet chipset
+#define CHIP_APU		(1 << 5) // APU chipset
 
 #define DEVICE_NAME				"radeon_hd"
 #define RADEON_ACCELERANT_NAME	"radeon_hd.accelerant"
+
+#define MAX_NAME_LENGTH		32
 
 // Used to collect EDID from boot loader
 #define EDID_BOOT_INFO "vesa_edid/v1"
@@ -51,6 +54,7 @@
 
 
 // Radeon Chipsets
+// !! Must match chipset names below
 enum radeon_chipset {
 	RADEON_R420 = 0,	//r400, Radeon X700-X850
 	RADEON_R423,
@@ -61,41 +65,97 @@ enum radeon_chipset {
 	RADEON_RS690,
 	RADEON_RS740,
 	RADEON_RV515,
-	RADEON_R520,		//r500, Radeon X1300-X1950
-	RADEON_RV530,
-	RADEON_RV560,
-	RADEON_RV570,
-	RADEON_R580,
-	RADEON_R600,		//r600, Radeon HD 2000, 3000
-	RADEON_RV610,
-	RADEON_RV630,
-	RADEON_RV670,
-	RADEON_RV620,
-	RADEON_RV635,
-	RADEON_RS780,
-	RADEON_RS880,
-	RADEON_RV770,		//r700, Radeon HD 4000
-	RADEON_RV730,
-	RADEON_RV710,
-	RADEON_RV740,
-	RADEON_CEDAR,		//Evergreen, Radeon HD 5000
-	RADEON_REDWOOD,
-	RADEON_JUNIPER,
-	RADEON_CYPRESS,
-	RADEON_HEMLOCK,
-	RADEON_PALM,		//Fusion APU (NI), Radeon HD 6000
-	RADEON_SUMO,
-	RADEON_SUMO2,
-	RADEON_CAICOS,		//Nothern Islands, Radeon HD 6000
-	RADEON_TURKS,
-	RADEON_BARTS,
-	RADEON_CAYMAN,
-	RADEON_ANTILLES,
-	RADEON_LOMBOK,		//Southern Islands, Radeon HD 7000
-	RADEON_CAPEVERDE,
-	RADEON_PITCAIRN,
-	RADEON_TAHITI,
-	RADEON_NEWZEALAND
+	RADEON_R520,		//r500, DCE 1.0
+	RADEON_RV530,		// DCE 1.0
+	RADEON_RV560,		// DCE 1.0
+	RADEON_RV570,		// DCE 1.0
+	RADEON_R580,		// DCE 1.0
+	RADEON_R600,		//r600, DCE 2.0
+	RADEON_RV610,		// DCE 2.0
+	RADEON_RV630,		// DCE 2.0
+	RADEON_RV670,		// DCE 2.0
+	RADEON_RV620,		// DCE 3.0
+	RADEON_RV635,		// DCE 3.0
+	RADEON_RS780,		// DCE 3.0
+	RADEON_RS880,		// DCE 3.0
+	RADEON_RV770,		//r700, DCE 3.1
+	RADEON_RV730,		// DCE 3.2
+	RADEON_RV710,		// DCE 3.2
+	RADEON_RV740,		// DCE 3.2
+	RADEON_CEDAR,		//Evergreen, DCE 4.0
+	RADEON_REDWOOD,		// DCE 4.0
+	RADEON_JUNIPER,		// DCE 4.0
+	RADEON_CYPRESS,		// DCE 4.0
+	RADEON_HEMLOCK,		// DCE 4.0?
+	RADEON_PALM,		//Fusion APU (NI), DCE 4.1
+	RADEON_SUMO,		// DCE 4.1
+	RADEON_SUMO2,		// DCE 4.1
+	RADEON_CAICOS,		//Nothern Islands, DCE 5.0
+	RADEON_TURKS,		// DCE 5.0
+	RADEON_BARTS,		// DCE 5.0
+	RADEON_CAYMAN,		// DCE 5.0
+	RADEON_ANTILLES,	// DCE 5.0?
+	RADEON_CAPEVERDE,	//Southern Islands, DCE 6.0
+	RADEON_PITCAIRN,	// DCE 6.0
+	RADEON_TAHITI,		// DCE 6.0
+	RADEON_ARUBA,		// DCE 6.1 Trinity/Richland
+	RADEON_OLAND,		// DCE 6.4
+	RADEON_HAINAN,		// NO DCE, only compute
+	RADEON_KAVERI,		//Sea Islands, DCE 8.1
+	RADEON_BONAIRE,		// DCE 8.2
+	RADEON_KABINI,		// DCE 8.3
+};
+
+// !! Must match chipset families above
+static const char radeon_chip_name[][MAX_NAME_LENGTH] = {
+	"R420",
+	"R423",
+	"RV410",
+	"RS400",
+	"RS480",
+	"RS600",
+	"RS690",
+	"RS740",
+	"RV515",
+	"R520",
+	"RV530",
+	"RV560",
+	"RV570",
+	"R580",
+	"R600",
+	"RV610",
+	"RV630",
+	"RV670",
+	"RV620",
+	"RV635",
+	"RS780",
+	"RS880",
+	"RV770",
+	"RV730",
+	"RV710",
+	"RV740",
+	"Cedar",
+	"Redwood",
+	"Juniper",
+	"Cypress",
+	"Hemlock",
+	"Palm",
+	"Sumo",
+	"Sumo2",
+	"Caicos",
+	"Turks",
+	"Barts",
+	"Cayman",
+	"Antilles",
+	"Cape Verde",
+	"Pitcairn",
+	"Tahiti",
+	"Aruba",
+	"Oland",
+	"Hainan",
+	"Kaveri",
+	"Bonaire",
+	"Kabini"
 };
 
 
@@ -165,9 +225,9 @@ struct radeon_shared_info {
 	uint16			cursor_hot_x;
 	uint16			cursor_hot_y;
 
-	char			deviceName[32];
+	char			deviceName[MAX_NAME_LENGTH];
 	uint16			chipsetID;
-	char			chipsetName[16];
+	char			chipsetName[MAX_NAME_LENGTH];
 	uint32			chipsetFlags;
 	uint8			dceMajor;
 	uint8			dceMinor;

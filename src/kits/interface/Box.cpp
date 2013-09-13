@@ -1,12 +1,13 @@
 /*
- * Copyright (c) 2001-2009, Haiku, Inc.
+ * Copyright 2001-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Stephan Aßmus <superstippi@gmx.de>
- *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		DarkWyrm, bpmagic@columbus.rr.com
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Marc Flerackers, mflerackers@androme.be
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -37,13 +38,15 @@ struct BBox::LayoutData {
 	BSize	min;
 	BSize	max;
 	BSize	preferred;
+	BAlignment alignment;
 	bool	valid;			// validity the other fields
 };
 
 
-BBox::BBox(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
+BBox::BBox(BRect frame, const char* name, uint32 resizingMode, uint32 flags,
 		border_style border)
-	: BView(frame, name, resizingMode, flags  | B_WILL_DRAW | B_FRAME_EVENTS),
+	:
+	BView(frame, name, resizingMode, flags  | B_WILL_DRAW | B_FRAME_EVENTS),
 	  fStyle(border)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -54,8 +57,9 @@ BBox::BBox(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 
 
 BBox::BBox(const char* name, uint32 flags, border_style border, BView* child)
-	: BView(name, flags | B_WILL_DRAW | B_FRAME_EVENTS),
-	  fStyle(border)
+	:
+	BView(name, flags | B_WILL_DRAW | B_FRAME_EVENTS),
+	fStyle(border)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -68,8 +72,9 @@ BBox::BBox(const char* name, uint32 flags, border_style border, BView* child)
 
 
 BBox::BBox(border_style border, BView* child)
-	: BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP),
-	  fStyle(border)
+	:
+	BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP),
+	fStyle(border)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -81,9 +86,10 @@ BBox::BBox(border_style border, BView* child)
 }
 
 
-BBox::BBox(BMessage *archive)
-	: BView(archive),
-	  fStyle(B_FANCY_BORDER)
+BBox::BBox(BMessage* archive)
+	:
+	BView(archive),
+	fStyle(B_FANCY_BORDER)
 {
 	_InitObject(archive);
 }
@@ -97,8 +103,8 @@ BBox::~BBox()
 }
 
 
-BArchivable *
-BBox::Instantiate(BMessage *archive)
+BArchivable*
+BBox::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BBox"))
 		return new BBox(archive);
@@ -108,7 +114,7 @@ BBox::Instantiate(BMessage *archive)
 
 
 status_t
-BBox::Archive(BMessage *archive, bool deep) const
+BBox::Archive(BMessage* archive, bool deep) const
 {
 	status_t ret = BView::Archive(archive, deep);
 
@@ -179,7 +185,7 @@ BBox::InnerFrame()
 
 
 void
-BBox::SetLabel(const char *string)
+BBox::SetLabel(const char* string)
 {
 	_ClearLabel();
 
@@ -194,7 +200,7 @@ BBox::SetLabel(const char *string)
 
 
 status_t
-BBox::SetLabel(BView *viewLabel)
+BBox::SetLabel(BView* viewLabel)
 {
 	_ClearLabel();
 
@@ -213,14 +219,14 @@ BBox::SetLabel(BView *viewLabel)
 }
 
 
-const char *
+const char*
 BBox::Label() const
 {
 	return fLabel;
 }
 
 
-BView *
+BView*
 BBox::LabelView() const
 {
 	return fLabelView;
@@ -357,7 +363,7 @@ BBox::FrameResized(float width, float height)
 
 
 void
-BBox::MessageReceived(BMessage *message)
+BBox::MessageReceived(BMessage* message)
 {
 	BView::MessageReceived(message);
 }
@@ -385,7 +391,7 @@ BBox::WindowActivated(bool active)
 
 
 void
-BBox::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+BBox::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
 	BView::MouseMoved(point, transit, message);
 }
@@ -398,10 +404,9 @@ BBox::FrameMoved(BPoint newLocation)
 }
 
 
-BHandler *
-BBox::ResolveSpecifier(BMessage *message, int32 index,
-	BMessage *specifier, int32 what,
-	const char *property)
+BHandler*
+BBox::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
+	int32 what, const char* property)
 {
 	return BView::ResolveSpecifier(message, index, specifier, what, property);
 }
@@ -424,7 +429,7 @@ BBox::ResizeToPreferred()
 
 
 void
-BBox::GetPreferredSize(float *_width, float *_height)
+BBox::GetPreferredSize(float* _width, float* _height)
 {
 	_ValidateLayoutData();
 
@@ -443,7 +448,7 @@ BBox::MakeFocus(bool focused)
 
 
 status_t
-BBox::GetSupportedSuites(BMessage *message)
+BBox::GetSupportedSuites(BMessage* message)
 {
 	return BView::GetSupportedSuites(message);
 }
@@ -480,7 +485,7 @@ BBox::Perform(perform_code code, void* _data)
 			BBox::GetHeightForWidth(data->width, &data->min, &data->max,
 				&data->preferred);
 			return B_OK;
-}
+		}
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
@@ -533,6 +538,17 @@ BBox::PreferredSize()
 	BSize size = (GetLayout() ? GetLayout()->PreferredSize()
 		: fLayoutData->preferred);
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
+}
+
+
+BAlignment
+BBox::LayoutAlignment()
+{
+	_ValidateLayoutData();
+
+	BAlignment alignment = (GetLayout() ? GetLayout()->Alignment()
+			: fLayoutData->alignment);
+	return BLayoutUtils::ComposeAlignment(ExplicitAlignment(), alignment);
 }
 
 
@@ -633,7 +649,7 @@ BBox::_InitObject(BMessage* archive)
 		SetFont(&font, flags);
 
 	if (archive != NULL) {
-		const char *string;
+		const char* string;
 		if (archive->FindString("_label", &string) == B_OK)
 			SetLabel(string);
 
@@ -845,6 +861,8 @@ BBox::_ValidateLayoutData()
 	else
 		minWidth = addWidth - 1;
 
+	BAlignment alignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER);
+
 	// finally consider the child constraints, if we shall support layout
 	BView* child = _Child();
 	if (child && (Flags() & B_SUPPORTS_LAYOUT)) {
@@ -866,10 +884,19 @@ BBox::_ValidateLayoutData()
 		fLayoutData->min = min;
 		fLayoutData->max = max;
 		fLayoutData->preferred = preferred;
+
+		BAlignment childAlignment = child->LayoutAlignment();
+		if (childAlignment.horizontal == B_ALIGN_USE_FULL_WIDTH)
+			alignment.horizontal = B_ALIGN_USE_FULL_WIDTH;
+		if (childAlignment.vertical == B_ALIGN_USE_FULL_HEIGHT)
+			alignment.vertical = B_ALIGN_USE_FULL_HEIGHT;
+
+		fLayoutData->alignment = alignment;
 	} else {
 		fLayoutData->min.Set(minWidth, addHeight - 1);
 		fLayoutData->max.Set(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
 		fLayoutData->preferred = fLayoutData->min;
+		fLayoutData->alignment = alignment;
 	}
 
 	fLayoutData->valid = true;

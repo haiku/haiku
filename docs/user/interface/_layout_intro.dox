@@ -40,7 +40,7 @@
 	So, let's review the BGroupLayout constructor:
 
 \code
-BGroupLayout(enum orientation orientation, float spacing = B_USE_DEFAULT_SPACING)
+BGroupLayout(orientation orientation, float spacing = B_USE_DEFAULT_SPACING)
 \endcode
 
 	Because we only have one item in this layout, \c orientation and \c spacing

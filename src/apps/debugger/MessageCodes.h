@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef MESSAGE_CODES_H
@@ -21,12 +22,19 @@ enum {
 	MSG_CLEAR_WATCHPOINT						= 'cwpt',
 	MSG_ENABLE_WATCHPOINT						= 'ewpt',
 	MSG_DISABLE_WATCHPOINT						= 'dwpt',
+	MSG_STOP_ON_IMAGE_LOAD						= 'tsil',
+	MSG_ADD_STOP_IMAGE_NAME						= 'asin',
+	MSG_REMOVE_STOP_IMAGE_NAME					= 'rsin',
 
 	MSG_THREAD_STATE_CHANGED					= 'tsch',
 	MSG_THREAD_CPU_STATE_CHANGED				= 'tcsc',
 	MSG_THREAD_STACK_TRACE_CHANGED				= 'tstc',
 	MSG_STACK_FRAME_VALUE_RETRIEVED				= 'sfvr',
 	MSG_IMAGE_DEBUG_INFO_CHANGED				= 'idic',
+	MSG_STOP_IMAGE_SETTINGS_CHANGED				= 'sisc',
+	MSG_STOP_IMAGE_NAME_ADDED					= 'sina',
+	MSG_STOP_IMAGE_NAME_REMOVED					= 'sinr',
+	MSG_CONSOLE_OUTPUT_RECEIVED					= 'core',
 	MSG_IMAGE_FILE_CHANGED						= 'ifch',
 	MSG_FUNCTION_SOURCE_CODE_CHANGED			= 'fnsc',
 	MSG_USER_BREAKPOINT_CHANGED					= 'ubrc',
@@ -48,8 +56,11 @@ enum {
 	MSG_VALUE_NODE_VALUE_CHANGED				= 'vnvc',
 
 	MSG_TEAM_DEBUGGER_QUIT						= 'dbqt',
+	MSG_TEAM_RESTART_REQUESTED					= 'trrq',
 	MSG_SHOW_TEAMS_WINDOW						= 'stsw',
 	MSG_TEAMS_WINDOW_CLOSED						= 'tswc',
+	MSG_SHOW_BREAK_CONDITION_CONFIG_WINDOW		= 'sbcc',
+	MSG_BREAK_CONDITION_CONFIG_WINDOW_CLOSED	= 'bccw',
 	MSG_START_NEW_TEAM							= 'sttt',
 	MSG_DEBUG_THIS_TEAM							= 'dbtt',
 	MSG_SHOW_INSPECTOR_WINDOW					= 'sirw',

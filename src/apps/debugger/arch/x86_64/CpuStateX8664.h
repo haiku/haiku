@@ -69,6 +69,9 @@ public:
 	virtual	bool				SetRegisterValue(const Register* reg,
 									const BVariant& value);
 
+			uint64				InterruptVector() const
+									{ return fInterruptVector; }
+
 			bool				IsRegisterSet(int32 index) const;
 			uint64				IntRegisterValue(int32 index) const;
 			void				SetIntRegister(int32 index, uint64 value);
@@ -80,6 +83,7 @@ private:
 private:
 			uint64				fIntRegisters[X86_64_REGISTER_COUNT];
 			RegisterBitSet		fSetRegisters;
+			uint64				fInterruptVector;
 };
 
 

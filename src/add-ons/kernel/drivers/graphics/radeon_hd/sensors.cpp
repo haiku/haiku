@@ -26,7 +26,7 @@ radeon_thermal_query(radeon_info &info)
 	uint32 rawTemp = 0;
 	int32 finalTemp = 0;
 
-	if (info.chipsetID >= RADEON_LOMBOK) {
+	if (info.chipsetID >= RADEON_CAPEVERDE) {
 		rawTemp = (read32(info.registers + SI_CG_MULT_THERMAL_STATUS)
 			& SI_CTF_TEMP_MASK) >> SI_CTF_TEMP_SHIFT;
 

@@ -10,6 +10,7 @@
 
 #include <module.h>
 #include <PCI.h>
+#include <PCI_x86.h>
 #include <USB3.h>
 #include <KernelExport.h>
 
@@ -18,6 +19,7 @@
 #define USB_MODULE_NAME "uhci"
 
 pci_module_info *UHCI::sPCIModule = NULL;
+pci_x86_module_info *UHCI::sPCIx86Module = NULL;
 
 static int32 sDebuggerCommandAdded = 0;
 
@@ -404,7 +406,9 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fFinishIsochronousThread(-1),
 		fRootHub(NULL),
 		fRootHubAddress(0),
-		fPortResetChange(0)
+		fPortResetChange(0),
+		fIRQ(0),
+		fUseMSI(false)
 {
 	// Create a lock for the isochronous transfer list
 	mutex_init(&fIsochronousLock, "UHCI isochronous lock");
@@ -557,10 +561,24 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		(void *)this);
 	resume_thread(fFinishIsochronousThread);
 
+	// Find the right interrupt vector, using MSIs if available.
+	fIRQ = fPCIInfo->u.h0.interrupt_line;
+	if (sPCIx86Module != NULL && sPCIx86Module->get_msi_count(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function) >= 1) {
+		uint8 msiVector = 0;
+		if (sPCIx86Module->configure_msi(fPCIInfo->bus, fPCIInfo->device,
+				fPCIInfo->function, 1, &msiVector) == B_OK
+			&& sPCIx86Module->enable_msi(fPCIInfo->bus, fPCIInfo->device,
+				fPCIInfo->function) == B_OK) {
+			TRACE_ALWAYS("using message signaled interrupts\n");
+			fIRQ = msiVector;
+			fUseMSI = true;
+		}
+	}
+
 	// Install the interrupt handler
 	TRACE("installing interrupt handler\n");
-	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
-		InterruptHandler, (void *)this, 0);
+	install_io_interrupt_handler(fIRQ, InterruptHandler, (void *)this, 0);
 
 	// Enable interrupts
 	fEnabledInterrupts = UHCI_USBSTS_USBINT | UHCI_USBSTS_ERRINT
@@ -599,6 +617,8 @@ UHCI::~UHCI()
 	wait_for_thread(fCleanupThread, &result);
 	wait_for_thread(fFinishIsochronousThread, &result);
 
+	remove_io_interrupt_handler(fIRQ, InterruptHandler, (void *)this);
+
 	LockIsochronous();
 	isochronous_transfer_data *isoTransfer = fFirstIsochronousTransfer;
 	while (isoTransfer) {
@@ -629,7 +649,17 @@ UHCI::~UHCI()
 	delete fRootHub;
 	delete_area(fFrameArea);
 
+	if (fUseMSI && sPCIx86Module != NULL) {
+		sPCIx86Module->disable_msi(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function);
+		sPCIx86Module->unconfigure_msi(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function);
+	}
 	put_module(B_PCI_MODULE_NAME);
+	if (sPCIx86Module != NULL) {
+		sPCIx86Module = NULL;
+		put_module(B_PCI_X86_MODULE_NAME);
+	}
 	Unlock();
 }
 
@@ -1941,6 +1971,14 @@ UHCI::AddTo(Stack *stack)
 		sPCIModule = NULL;
 		put_module(B_PCI_MODULE_NAME);
 		return B_NO_MEMORY;
+	}
+
+	// Try to get the PCI x86 module as well so we can enable possible MSIs.
+	if (sPCIx86Module == NULL && get_module(B_PCI_X86_MODULE_NAME,
+			(module_info **)&sPCIx86Module) != B_OK) {
+		// If it isn't there, that's not critical though.
+		TRACE_MODULE_ERROR("failed to get pci x86 module\n");
+		sPCIx86Module = NULL;
 	}
 
 	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {

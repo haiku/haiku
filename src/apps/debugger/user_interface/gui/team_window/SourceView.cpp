@@ -59,6 +59,7 @@ static const char* kEnableBreakpointMessage = "Click to enable breakpoint at "
 	"line %" B_PRId32 ".";
 
 static const uint32 MSG_OPEN_SOURCE_FILE = 'mosf';
+static const uint32 MSG_SWITCH_DISASSEMBLY_STATE = 'msds';
 
 static const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
 
@@ -183,6 +184,7 @@ private:
 			MarkerManager*		fMarkerManager;
 			StackTrace*			fStackTrace;
 			StackFrame*			fStackFrame;
+			rgb_color			fBackgroundColor;
 			rgb_color			fBreakpointOptionMarker;
 };
 
@@ -205,6 +207,8 @@ struct SourceView::MarkerManager::InstructionPointerMarker : Marker {
 									bool topIP, bool currentIP);
 
 	virtual	void				Draw(BView* view, BRect rect);
+
+			bool				IsCurrentIP() const { return fIsCurrentIP; }
 
 private:
 			void				_DrawArrow(BView* view, BPoint tip, BSize size,
@@ -686,6 +690,8 @@ SourceView::MarkerManager::_UpdateBreakpointMarkers()
 
 		for (int32 i = 0; UserBreakpoint* breakpoint = breakpoints.ItemAt(i);
 				i++) {
+			if (breakpoint->IsHidden())
+				continue;
 			UserBreakpointInstance* breakpointInstance
 				= breakpoint->InstanceAt(0);
 			FunctionInstance* functionInstance;
@@ -832,9 +838,9 @@ SourceView::MarkerView::MarkerView(SourceView* sourceView, Team* team,
 	fStackFrame(NULL)
 {
 	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
-	fBreakpointOptionMarker = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_1_TINT);
-	SetViewColor(tint_color(background, B_LIGHTEN_2_TINT));
+	fBreakpointOptionMarker = tint_color(background, B_DARKEN_1_TINT);
+	fBackgroundColor = tint_color(background, B_LIGHTEN_2_TINT);
+	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 
@@ -887,49 +893,59 @@ SourceView::MarkerView::MaxSize()
 void
 SourceView::MarkerView::Draw(BRect updateRect)
 {
-	if (fSourceCode == NULL)
+	SetLowColor(fBackgroundColor);
+	if (fSourceCode == NULL) {
+		FillRect(updateRect, B_SOLID_LOW);
 		return;
+	}
 
 	// get the lines intersecting with the update rect
 	int32 minLine, maxLine;
 	GetLineRange(updateRect, minLine, maxLine);
-	if (minLine > maxLine)
-		return;
+	if (minLine <= maxLine) {
+		// get the markers in that range
+		SourceView::MarkerManager::MarkerList markers;
+		fMarkerManager->GetMarkers(minLine, maxLine, markers);
 
-	// get the markers in that range
-	SourceView::MarkerManager::MarkerList markers;
-	fMarkerManager->GetMarkers(minLine, maxLine, markers);
+		float width = Bounds().Width();
 
-	float width = Bounds().Width();
+		AutoLocker<SourceCode> sourceLocker(fSourceCode);
 
-	AutoLocker<SourceCode> sourceLocker(fSourceCode);
+		int32 markerIndex = 0;
+		for (int32 line = minLine; line <= maxLine; line++) {
+			bool drawBreakpointOptionMarker = true;
 
-	int32 markerIndex = 0;
-	for (int32 line = minLine; line <= maxLine; line++) {
-		bool drawBreakpointOptionMarker = true;
+			SourceView::MarkerManager::Marker* marker;
+			FillRect(LineRect(line), B_SOLID_LOW);
+			while ((marker = markers.ItemAt(markerIndex)) != NULL
+					&& marker->Line() == (uint32)line) {
+				marker->Draw(this, LineRect(line));
+				drawBreakpointOptionMarker = false;
+				markerIndex++;
+			}
 
-		SourceView::MarkerManager::Marker* marker;
-		while ((marker = markers.ItemAt(markerIndex)) != NULL
-				&& marker->Line() == (uint32)line) {
-			marker->Draw(this, LineRect(line));
-			drawBreakpointOptionMarker = false;
-			markerIndex++;
+			if (!drawBreakpointOptionMarker)
+				continue;
+
+			SourceLocation statementStart, statementEnd;
+			if (!fSourceCode->GetStatementLocationRange(SourceLocation(line),
+					statementStart, statementEnd)
+				|| statementStart.Line() != line) {
+				continue;
+			}
+
+			float y = ((float)line + 0.5f) * fFontInfo->lineHeight;
+			SetHighColor(fBreakpointOptionMarker);
+			FillEllipse(BPoint(width - 8, y), 2, 2);
 		}
-
-		if (!drawBreakpointOptionMarker)
-			continue;
-
-		SourceLocation statementStart, statementEnd;
-		if (!fSourceCode->GetStatementLocationRange(SourceLocation(line),
-				statementStart, statementEnd)
-			|| statementStart.Line() != line) {
-			continue;
-		}
-
-		float y = ((float)line + 0.5f) * fFontInfo->lineHeight;
-		SetHighColor(fBreakpointOptionMarker);
-		FillEllipse(BPoint(width - 8, y), 2, 2);
 	}
+
+	float y = (maxLine + 1) * fFontInfo->lineHeight;
+	if (y < updateRect.bottom) {
+		FillRect(BRect(0.0, y, Bounds().right, updateRect.bottom),
+			B_SOLID_LOW);
+	}
+
 }
 
 
@@ -1040,7 +1056,7 @@ SourceView::TextView::TextView(SourceView* sourceView, MarkerManager* manager,
 	fScrollRunner(NULL),
 	fMarkerManager(manager)
 {
-	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+	SetViewColor(B_TRANSPARENT_COLOR);
 	fTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 	SetFlags(Flags() | B_NAVIGABLE);
 }
@@ -1080,8 +1096,11 @@ SourceView::TextView::MaxSize()
 void
 SourceView::TextView::Draw(BRect updateRect)
 {
-	if (fSourceCode == NULL)
+	if (fSourceCode == NULL) {
+		SetLowColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+		FillRect(updateRect, B_SOLID_LOW);
 		return;
+	}
 
 	// get the lines intersecting with the update rect
 	int32 minLine, maxLine;
@@ -1093,13 +1112,17 @@ SourceView::TextView::Draw(BRect updateRect)
 	SetHighColor(fTextColor);
 	SetFont(&fFontInfo->font);
 	SourceView::MarkerManager::Marker* marker;
+	SourceView::MarkerManager::InstructionPointerMarker* ipMarker;
 	int32 markerIndex = 0;
+	float y;
 	for (int32 i = minLine; i <= maxLine; i++) {
-		SetLowColor(ViewColor());
-		float y = i * fFontInfo->lineHeight;
+		SetLowColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+		y = i * fFontInfo->lineHeight;
 		BString lineString;
 		_FormatLine(fSourceCode->LineAt(i), lineString);
 
+		FillRect(BRect(0.0, y, kLeftTextMargin, y + fFontInfo->lineHeight),
+			B_SOLID_LOW);
 		for (int32 j = markerIndex; j < markers.CountItems(); j++) {
 			marker = markers.ItemAt(j);
 			 if (marker->Line() < (uint32)i) {
@@ -1107,20 +1130,32 @@ SourceView::TextView::Draw(BRect updateRect)
 			 	continue;
 			 } else if (marker->Line() == (uint32)i) {
 			 	++markerIndex;
-			 	if (dynamic_cast<SourceView::MarkerManager
-			 		::InstructionPointerMarker*>(marker) != NULL)
-			 		SetLowColor(96, 216, 216, 255);
-			 	else
+			 	 ipMarker = dynamic_cast<SourceView::MarkerManager
+			 	 	::InstructionPointerMarker*>(marker);
+			 	if (ipMarker != NULL) {
+			 		if (ipMarker->IsCurrentIP())
+			 			SetLowColor(96, 216, 216, 255);
+			 		else
+			 			SetLowColor(216, 216, 216, 255);
+
+			 	} else
 					SetLowColor(255, 255, 0, 255);
-				FillRect(BRect(kLeftTextMargin, y, Bounds().right,
-					y + fFontInfo->lineHeight), B_SOLID_LOW);
 				break;
 			 } else
 			 	break;
 		}
 
+		FillRect(BRect(kLeftTextMargin, y, Bounds().right,
+			y + fFontInfo->lineHeight - 1), B_SOLID_LOW);
 		DrawString(lineString,
 			BPoint(kLeftTextMargin, y + fFontInfo->fontHeight.ascent));
+	}
+
+	y = (maxLine + 1) * fFontInfo->lineHeight;
+	if (y < updateRect.bottom) {
+		SetLowColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+		FillRect(BRect(0.0, y, Bounds().right, updateRect.bottom),
+			B_SOLID_LOW);
 	}
 
 	if (fSelectionStart.line != -1 && fSelectionEnd.line != -1) {
@@ -1747,13 +1782,51 @@ SourceView::TextView::_ScrollToBottom(void)
 bool
 SourceView::TextView::_AddGeneralActions(BPopUpMenu* menu, int32 line)
 {
-	BMessage* message = new(std::nothrow) BMessage(MSG_OPEN_SOURCE_FILE);
+	if (fSourceCode == NULL)
+		return true;
+
+	BMessage* message = NULL;
+	if (fSourceCode->GetSourceFile() != NULL) {
+		message = new(std::nothrow) BMessage(MSG_OPEN_SOURCE_FILE);
+		if (message == NULL)
+			return false;
+		message->AddInt32("line", line);
+
+		if (!_AddGeneralActionItem(menu, "Open source file", message))
+			return false;
+	}
+
+	if (fSourceView->fStackFrame == NULL)
+		return true;
+
+	FunctionInstance* instance = fSourceView->fStackFrame->Function();
+	if (instance == NULL)
+		return true;
+
+	FileSourceCode* code = instance->GetFunction()->GetSourceCode();
+
+	// if we only have disassembly, this option doesn't apply.
+	if (code == NULL)
+		return true;
+
+	// verify that we do in fact know the source file of the function,
+	// since we can't switch to it if it wasn't found and hasn't been
+	// located.
+	BString sourcePath;
+	code->GetSourceFile()->GetLocatedPath(sourcePath);
+	if (sourcePath.IsEmpty())
+		return true;
+
+	message = new(std::nothrow) BMessage(
+		MSG_SWITCH_DISASSEMBLY_STATE);
 	if (message == NULL)
 		return false;
-	message->AddInt32("line", line);
 
-	if (!_AddGeneralActionItem(menu, "Open source file", message))
+	if (!_AddGeneralActionItem(menu, dynamic_cast<DisassembledCode*>(
+			fSourceCode) != NULL ? "Show source" : "Show disassembly",
+			message)) {
 		return false;
+	}
 
 	return true;
 }
@@ -1927,6 +2000,40 @@ SourceView::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_SWITCH_DISASSEMBLY_STATE:
+		{
+			if (fStackFrame == NULL)
+				break;
+
+			FunctionInstance* instance = fStackFrame->Function();
+			if (instance == NULL)
+					break;
+
+			SourceCode* code = NULL;
+			if (dynamic_cast<FileSourceCode*>(fSourceCode) != NULL) {
+				if (instance->SourceCodeState()
+					== FUNCTION_SOURCE_NOT_LOADED) {
+					fListener->FunctionSourceCodeRequested(instance, true);
+					break;
+				}
+
+				code = instance->GetSourceCode();
+			} else {
+				Function* function = instance->GetFunction();
+				if (function->SourceCodeState()
+					== FUNCTION_SOURCE_NOT_LOADED) {
+					fListener->FunctionSourceCodeRequested(instance, false);
+					break;
+				}
+
+				code = function->GetSourceCode();
+			}
+
+			if (code != NULL)
+				SetSourceCode(code);
+			break;
+		}
+
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -1970,13 +2077,13 @@ SourceView::SetStackTrace(StackTrace* stackTrace, Thread* activeThread)
 
 	fMarkerManager->SetStackTrace(fStackTrace);
 	fMarkerView->SetStackTrace(fStackTrace);
-	fTextView->Invalidate();
 }
 
 
 void
 SourceView::SetStackFrame(StackFrame* stackFrame)
 {
+	TRACE_GUI("SourceView::SetStackFrame(%p)\n", stackFrame);
 	if (stackFrame == fStackFrame)
 		return;
 

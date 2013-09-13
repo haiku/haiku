@@ -18,6 +18,7 @@
 #include <Messenger.h>
 #include <Message.h>
 #include <MessageFilter.h>
+#include <Node.h>
 
 // Maps BMessages to ShortcutsSpecs!
 // The thread here gets file update messages, and updates
@@ -49,6 +50,7 @@ private:
 				
 				port_id 			fPort;
 				char*				fFileName;
+				node_ref			fNodeRef;
 				BLocker 			fSyncSpecs;	// locks the lists below
 				BList 				fInjects;
 				BList*	 			fSpecs; 

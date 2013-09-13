@@ -22,16 +22,16 @@
 #include <keyboard_mouse_driver.h>
 
 
-MouseProtocolHandler::MouseProtocolHandler(HIDReport &report, bool tablet,
+MouseProtocolHandler::MouseProtocolHandler(HIDReport &report,
 	HIDReportItem &xAxis, HIDReportItem &yAxis)
 	:
-	ProtocolHandler(report.Device(),
-		tablet ? "input/tablet/usb" : "input/mouse/usb/", 0),
+	ProtocolHandler(report.Device(), "input/mouse/usb/", 0),
 	fReport(report),
-	fTablet(tablet),
+
 	fXAxis(xAxis),
 	fYAxis(yAxis),
 	fWheel(NULL),
+
 	fLastButtons(0),
 	fClickCount(0),
 	fLastClickTime(0),
@@ -64,7 +64,6 @@ void
 MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 	ProtocolHandler *&handlerList)
 {
-	bool tablet = false;
 	bool supported = false;
 	switch (collection.UsagePage()) {
 		case B_HID_USAGE_PAGE_GENERIC_DESKTOP:
@@ -78,26 +77,10 @@ MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 
 			break;
 		}
-
-		case B_HID_USAGE_PAGE_DIGITIZER:
-		{
-			switch (collection.UsageID()) {
-				case B_HID_UID_DIG_DIGITIZER:
-				case B_HID_UID_DIG_PEN:
-				case B_HID_UID_DIG_LIGHT_PEN:
-				case B_HID_UID_DIG_TOUCH_SCREEN:
-				case B_HID_UID_DIG_TOUCH_PAD:
-				case B_HID_UID_DIG_WHITE_BOARD:
-					supported = true;
-					tablet = true;
-			}
-
-			break;
-		}
 	}
 
 	if (!supported) {
-		TRACE("collection not a mouse/tablet/digitizer\n");
+		TRACE("collection not a mouse\n");
 		return;
 	}
 
@@ -114,22 +97,19 @@ MouseProtocolHandler::AddHandlers(HIDDevice &device, HIDCollection &collection,
 	for (uint32 i = 0; i < inputReportCount; i++) {
 		HIDReport *inputReport = inputReports[i];
 
-		// try to find at least an x and y axis
+		// try to find at least an absolute x and y axis
 		HIDReportItem *xAxis = inputReport->FindItem(
 			B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_X);
-		if (xAxis == NULL)
+		if (xAxis == NULL || !xAxis->Relative())
 			continue;
 
 		HIDReportItem *yAxis = inputReport->FindItem(
 			B_HID_USAGE_PAGE_GENERIC_DESKTOP, B_HID_UID_GD_Y);
-		if (yAxis == NULL)
+		if (yAxis == NULL || !yAxis->Relative())
 			continue;
 
-		if (!xAxis->Relative() && !yAxis->Relative())
-			tablet = true;
-
 		ProtocolHandler *newHandler = new(std::nothrow) MouseProtocolHandler(
-			*inputReport, tablet, *xAxis, *yAxis);
+			*inputReport, *xAxis, *yAxis);
 		if (newHandler == NULL) {
 			TRACE("failed to allocated mouse protocol handler\n");
 			continue;
@@ -148,10 +128,8 @@ MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 	switch (op) {
 		case MS_READ:
 		{
-			if ((!fTablet && length < sizeof(mouse_movement))
-				|| (fTablet && length < sizeof(tablet_movement))) {
+			if (length < sizeof(mouse_movement))
 				return B_BUFFER_OVERFLOW;
-			}
 
 			while (true) {
 				status_t result = _ReadReport(buffer);
@@ -202,21 +180,15 @@ MouseProtocolHandler::_ReadReport(void *buffer)
 		return B_INTERRUPTED;
 	}
 
-	float axisAbsoluteData[2];
 	uint32 axisRelativeData[2];
-	if (fXAxis.Extract() == B_OK && fXAxis.Valid()) {
-		if (fXAxis.Relative())
-			axisRelativeData[0] = fXAxis.Data();
-		else
-			axisAbsoluteData[0] = fXAxis.ScaledFloatData();
-	}
+	axisRelativeData[0] = 0;
+	axisRelativeData[1] = 0;
 
-	if (fYAxis.Extract() == B_OK && fYAxis.Valid()) {
-		if (fYAxis.Relative())
-			axisRelativeData[1] = fYAxis.Data();
-		else
-			axisAbsoluteData[1] = fYAxis.ScaledFloatData();
-	}
+	if (fXAxis.Extract() == B_OK && fXAxis.Valid())
+		axisRelativeData[0] = fXAxis.Data();
+
+	if (fYAxis.Extract() == B_OK && fYAxis.Valid())
+		axisRelativeData[1] = fYAxis.Data();
 
 	uint32 wheelData = 0;
 	if (fWheel != NULL && fWheel->Extract() == B_OK && fWheel->Valid())
@@ -251,33 +223,15 @@ MouseProtocolHandler::_ReadReport(void *buffer)
 
 	fLastButtons = buttons;
 
-	if (fTablet) {
-		tablet_movement *info = (tablet_movement *)buffer;
-		memset(info, 0, sizeof(tablet_movement));
+	mouse_movement *info = (mouse_movement *)buffer;
+	memset(info, 0, sizeof(mouse_movement));
 
-		info->xpos = axisAbsoluteData[0];
-		info->ypos = axisAbsoluteData[1];
-		info->has_contact = true;
-		info->pressure = 1.0;
-		info->eraser = false;
-		info->tilt_x = 0.0;
-		info->tilt_y = 0.0;
-
-		info->buttons = buttons;
-		info->clicks = clicks;
-		info->timestamp = timestamp;
-		info->wheel_ydelta = -wheelData;
-	} else {
-		mouse_movement *info = (mouse_movement *)buffer;
-		memset(info, 0, sizeof(mouse_movement));
-
-		info->buttons = buttons;
-		info->xdelta = axisRelativeData[0];
-		info->ydelta = -axisRelativeData[1];
-		info->clicks = clicks;
-		info->timestamp = timestamp;
-		info->wheel_ydelta = -wheelData;
-	}
+	info->buttons = buttons;
+	info->xdelta = axisRelativeData[0];
+	info->ydelta = -axisRelativeData[1];
+	info->clicks = clicks;
+	info->timestamp = timestamp;
+	info->wheel_ydelta = -wheelData;
 
 	return B_OK;
 }

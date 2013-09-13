@@ -1,11 +1,12 @@
 /*
- * Copyright 2005-2008, Haiku Inc. All rights reserved.
+ * Copyright 2005-2013, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jan-Rixt Van Hoye
  *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
  *		Michael Lotz <mmlr@mlotz.ch>
+ *		Siarzhuk Zharski <imker@gmx.li>
  */
 #ifndef OHCI_H
 #define OHCI_H
@@ -69,12 +70,20 @@ static	int32						_InterruptHandler(void *data);
 										ohci_general_td *dataDescriptor,
 										ohci_general_td *lastDescriptor,
 										bool directionIn);
-		status_t					_CancelQueuedIsochronousTransfers(
-										Pipe *pipe, bool force);
+		status_t					_AddPendingIsochronousTransfer(
+										Transfer *transfer,
+										ohci_endpoint_descriptor *endpoint,
+										ohci_isochronous_td *firstDescriptor,
+										ohci_isochronous_td *lastDescriptor,
+										bool directionIn);
+
 		status_t					_UnlinkTransfer(transfer_data *transfer);
 
 static	int32						_FinishThread(void *data);
 		void						_FinishTransfers();
+		bool						_FinishIsochronousTransfer(
+										transfer_data *transfer,
+										transfer_data **_lastTransfer);
 
 		status_t					_SubmitRequest(Transfer *transfer);
 		status_t					_SubmitTransfer(Transfer *transfer);
@@ -85,6 +94,11 @@ static	int32						_FinishThread(void *data);
 										ohci_endpoint_descriptor *endpoint,
 										ohci_general_td *first,
 										ohci_general_td *last);
+		void						_SwitchIsochronousEndpointTail(
+										ohci_endpoint_descriptor *endpoint,
+										ohci_isochronous_td *first,
+										ohci_isochronous_td *last);
+
 		void						_RemoveTransferFromEndpoint(
 										transfer_data *transfer);
 
@@ -101,7 +115,6 @@ static	int32						_FinishThread(void *data);
 										size_t bufferSize);
 		void						_FreeGeneralDescriptor(
 										ohci_general_td *descriptor);
-
 		status_t					_CreateDescriptorChain(
 										ohci_general_td **firstDescriptor,
 										ohci_general_td **lastDescriptor,
@@ -110,22 +123,48 @@ static	int32						_FinishThread(void *data);
 		void						_FreeDescriptorChain(
 										ohci_general_td *topDescriptor);
 
+		ohci_isochronous_td *		_CreateIsochronousDescriptor(
+										size_t bufferSize);
+		void						_FreeIsochronousDescriptor(
+										ohci_isochronous_td *descriptor);
+		status_t					_CreateIsochronousDescriptorChain(
+										ohci_isochronous_td **firstDescriptor,
+										ohci_isochronous_td **lastDescriptor,
+										Transfer *transfer);
+		void						_FreeIsochronousDescriptorChain(
+										ohci_isochronous_td *topDescriptor);
+
 		size_t						_WriteDescriptorChain(
 										ohci_general_td *topDescriptor,
 										iovec *vector, size_t vectorCount);
 		size_t						_ReadDescriptorChain(
 										ohci_general_td *topDescriptor,
 										iovec *vector, size_t vectorCount);
+
+		size_t						_WriteIsochronousDescriptorChain(
+										ohci_isochronous_td *topDescriptor,
+										iovec *vector, size_t vectorCount);
+		void						_ReadIsochronousDescriptorChain(
+										ohci_isochronous_td *topDescriptor,
+										iovec *vector, size_t vectorCount);
+
 		size_t						_ReadActualLength(
 										ohci_general_td *topDescriptor);
 
 		void						_LinkDescriptors(ohci_general_td *first,
 										ohci_general_td *second);
+		void						_LinkIsochronousDescriptors(
+										ohci_isochronous_td *first,
+										ohci_isochronous_td *second,
+										ohci_isochronous_td *nextDone);
 
-		ohci_isochronous_td *		_CreateIsochronousDescriptor();
-		void						_FreeIsochronousDescriptor(
-										ohci_isochronous_td *descriptor);
+		bool						_AllocateIsochronousBandwidth(uint16 frame,
+										uint16 size);
+		void						_ReleaseIsochronousBandwidth(
+										uint16 startFrame, uint16 count);
 
+		status_t					_GetStatusOfConditionCode(
+										uint8 conditionCode);
 		// Private locking
 		bool						_LockEndpoints();
 		void						_UnlockEndpoints();
@@ -139,6 +178,8 @@ inline	uint32						_ReadReg(uint32 reg);
 										ohci_endpoint_descriptor *endpoint);
 		void						_PrintDescriptorChain(
 										ohci_general_td *topDescriptor);
+		void						_PrintDescriptorChain(
+										ohci_isochronous_td *topDescriptor);
 
 static	pci_module_info *			sPCIModule;
 static	pci_x86_module_info *		sPCIx86Module;
@@ -167,6 +208,8 @@ static	pci_x86_module_info *		sPCIx86Module;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
 		Pipe *						fProcessingPipe;
+		// frame bandwidth watchdogs array
+		uint16 *					fFrameBandwidth;
 
 		// Root Hub
 		OHCIRootHub *				fRootHub;
@@ -174,6 +217,9 @@ static	pci_x86_module_info *		sPCIx86Module;
 
 		// Port management
 		uint8						fPortCount;
+
+		uint8						fIRQ;
+		bool						fUseMSI;
 };
 
 

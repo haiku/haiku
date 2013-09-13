@@ -91,6 +91,8 @@ public:
 									VMAddressSpace** _space = NULL);
 	inline	status_t			AddArea(area_id area, bool writeLock,
 									VMAddressSpace** _space = NULL);
+	inline	status_t			AddArea(VMArea* area, bool writeLock,
+									VMAddressSpace** _space = NULL);
 
 			status_t			AddAreaCacheAndLock(area_id areaID,
 									bool writeLockThisOne, bool writeLockOthers,
@@ -136,6 +138,15 @@ MultiAddressSpaceLocker::AddArea(area_id area, bool writeLock,
 	VMAddressSpace** _space)
 {
 	return _AddAddressSpace(GetAddressSpaceByAreaID(area), writeLock, _space);
+}
+
+
+inline status_t
+MultiAddressSpaceLocker::AddArea(VMArea* area, bool writeLock,
+	VMAddressSpace** _space)
+{
+	area->address_space->Get();
+	return _AddAddressSpace(area->address_space, writeLock, _space);
 }
 
 

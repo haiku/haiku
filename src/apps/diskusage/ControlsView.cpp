@@ -73,13 +73,12 @@ VolumeTab::IconWidth() const
 void
 VolumeTab::DrawLabel(BView* owner, BRect frame)
 {
+	owner->SetDrawingMode(B_OP_OVER);
 	if (fIcon != NULL) {
-		owner->SetDrawingMode(B_OP_OVER);
 		owner->MovePenTo(frame.left + kSmallHMargin,
 			(frame.top + frame.bottom - fIcon->Bounds().Height()) / 2.0);
 		owner->DrawBitmap(fIcon);
 	}
-	owner->SetDrawingMode(B_OP_COPY);
 	font_height fh;
 	owner->GetFontHeight(&fh);
 

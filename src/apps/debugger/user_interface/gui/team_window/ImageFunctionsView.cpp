@@ -11,9 +11,13 @@
 #include <new>
 #include <set>
 
+#include <LayoutBuilder.h>
+#include <MessageRunner.h>
 #include <StringList.h>
+#include <TextControl.h>
 
 #include <AutoDeleter.h>
+#include <RegExp.h>
 
 #include "table/TableColumns.h"
 
@@ -23,6 +27,15 @@
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
 #include "Tracing.h"
+
+
+static const uint32 MSG_FUNCTION_FILTER_CHANGED = 'mffc';
+static const uint32 MSG_FUNCTION_TYPING_TIMEOUT	= 'mftt';
+
+static const uint32 kKeypressTimeout = 250000;
+
+// from ColumnTypes.cpp
+static const float kTextMargin = 8.0;
 
 
 // #pragma mark - SourcePathComponentNode
@@ -37,7 +50,9 @@ public:
 		fParent(parent),
 		fComponentName(componentName),
 		fSourceFile(sourceFile),
-		fFunction(function)
+		fFunction(function),
+		fFilterMatch(),
+		fHasMatchingChild(false)
 	{
 		if (fSourceFile != NULL)
 			fSourceFile->AcquireReference();
@@ -124,6 +139,26 @@ public:
 		return true;
 	}
 
+	const RegExp::MatchResult& FilterMatch() const
+	{
+		return fFilterMatch;
+	}
+
+	void SetFilterMatch(const RegExp::MatchResult& match)
+	{
+		fFilterMatch = match;
+	}
+
+	bool HasMatchingChild() const
+	{
+		return fHasMatchingChild;
+	}
+
+	void SetHasMatchingChild()
+	{
+		fHasMatchingChild = true;
+	}
+
 private:
 	friend class ImageFunctionsView::FunctionsTableModel;
 
@@ -148,6 +183,76 @@ private:
 	LocatableFile*			fSourceFile;
 	FunctionInstance*		fFunction;
 	ChildPathComponentList	fChildPathComponents;
+	RegExp::MatchResult		fFilterMatch;
+	bool					fHasMatchingChild;
+};
+
+
+// #pragma mark - HighlightingTableColumn
+
+
+class ImageFunctionsView::HighlightingTableColumn : public StringTableColumn {
+public:
+	HighlightingTableColumn(int32 modelIndex, const char* title, float width,
+		float minWidth, float maxWidth, uint32 truncate,
+		alignment align = B_ALIGN_LEFT)
+		:
+		StringTableColumn(modelIndex, title, width, minWidth, maxWidth,
+			truncate, align),
+		fHasFilter(false)
+	{
+	}
+
+	void SetHasFilter(bool hasFilter)
+	{
+		fHasFilter = hasFilter;
+	}
+
+	virtual void DrawValue(const BVariant& value, BRect rect,
+		BView* targetView)
+	{
+		StringTableColumn::DrawValue(value, rect, targetView);
+
+		if (fHasFilter) {
+			// TODO: handle this case as well
+			if (fField.HasClippedString())
+				return;
+
+			const SourcePathComponentNode* node
+				= (const SourcePathComponentNode*)value.ToPointer();
+
+			const RegExp::MatchResult& match = node->FilterMatch();
+			if (!match.HasMatched())
+				return;
+
+			targetView->PushState();
+			BRect fillRect(rect);
+			fillRect.left += kTextMargin + targetView->StringWidth(
+				fField.String(), match.StartOffset());
+			float filterWidth = targetView->StringWidth(fField.String()
+					+ match.StartOffset(), match.EndOffset()
+					- match.StartOffset());
+			fillRect.right = fillRect.left + filterWidth;
+			targetView->SetLowColor(255, 255, 0, 255);
+			targetView->SetDrawingMode(B_OP_MIN);
+			targetView->FillRect(fillRect, B_SOLID_LOW);
+			targetView->PopState();
+		}
+	}
+
+	virtual	BField*	PrepareField(const BVariant& value) const
+	{
+		const SourcePathComponentNode* node
+			= (const SourcePathComponentNode*)value.ToPointer();
+
+		BVariant tempValue(node->ComponentName(), B_VARIANT_DONT_COPY_DATA);
+		return StringTableColumn::PrepareField(tempValue);
+
+	}
+
+
+private:
+	bool fHasFilter;
 };
 
 
@@ -198,6 +303,8 @@ public:
 
 		LocatableFile* currentFile = NULL;
 		BStringList pathComponents;
+		bool applyFilter = !fFilterString.IsEmpty()
+			&& fCurrentFilter.IsValid();
 		int32 functionCount = fImageDebugInfo->CountFunctions();
 		for (int32 i = 0; i < functionCount; i++) {
 			FunctionInstance* instance = fImageDebugInfo->FunctionAt(i);
@@ -213,22 +320,42 @@ public:
 			}
 
 			LocatableFile* sourceFile = instance->SourceFile();
+			BString sourcePath;
+			if (sourceFile != NULL)
+				sourceFile->GetPath(sourcePath);
+
+			RegExp::MatchResult pathMatch;
+			RegExp::MatchResult functionMatch;
+			if (applyFilter && !_FilterFunction(instance, sourcePath,
+					pathMatch, functionMatch)) {
+				continue;
+			}
+
 			if (sourceFile == NULL) {
-				if (!_AddFunctionNode(sourcelessNode, instance, NULL))
+				if (!_AddFunctionNode(sourcelessNode, instance, NULL,
+						functionMatch)) {
 					return;
+				}
 				continue;
 			}
 
 			if (sourceFile != currentFile) {
 				currentFile = sourceFile;
-				if (!_GetSourcePathComponents(currentFile,
+				pathComponents.MakeEmpty();
+				if (applyFilter) {
+					pathComponents.Add(sourcePath);
+				} else {
+					if (!_GetSourcePathComponents(currentFile,
 						pathComponents)) {
-					return;
+						return;
+					}
 				}
 			}
 
-			if (!_AddFunctionByPath(pathComponents, instance, currentFile))
+			if (!_AddFunctionByPath(pathComponents, instance, currentFile,
+					pathMatch, functionMatch)) {
 				return;
+			}
 		}
 
 		if (sourcelessNode->CountChildren() != 0) {
@@ -278,9 +405,19 @@ public:
 
 		SourcePathComponentNode* node = (SourcePathComponentNode*)object;
 
-		value.SetTo(node->ComponentName(), B_VARIANT_DONT_COPY_DATA);
+		value.SetTo(node);
 
 		return true;
+	}
+
+	bool HasMatchingChildAt(void* parent, int32 index) const
+	{
+		SourcePathComponentNode* node
+			= (SourcePathComponentNode*)ChildAt(parent, index);
+		if (node != NULL)
+			return node->HasMatchingChild();
+
+		return false;
 	}
 
 	bool GetFunctionPath(FunctionInstance* function, TreeTablePath& _path)
@@ -351,6 +488,16 @@ public:
 		return false;
 	}
 
+	void SetFilter(const char* filter)
+	{
+		fFilterString = filter;
+		if (fFilterString.IsEmpty()
+			|| fCurrentFilter.SetPattern(filter, RegExp::PATTERN_TYPE_WILDCARD,
+				false)) {
+			SetImageDebugInfo(fImageDebugInfo);
+		}
+	}
+
 private:
 	bool _GetSourcePathComponents(LocatableFile* currentFile,
 		BStringList& pathComponents)
@@ -359,8 +506,6 @@ private:
 		currentFile->GetPath(sourcePath);
 		if (sourcePath.IsEmpty())
 			return false;
-
-		pathComponents.MakeEmpty();
 
 		int32 startIndex = 0;
 		if (sourcePath[0] == '/')
@@ -383,7 +528,8 @@ private:
 	}
 
 	bool _AddFunctionByPath(const BStringList& pathComponents,
-		FunctionInstance* function, LocatableFile* file)
+		FunctionInstance* function, LocatableFile* file,
+		RegExp::MatchResult& pathMatch, RegExp::MatchResult& functionMatch)
 	{
 		SourcePathComponentNode* parentNode = NULL;
 		SourcePathComponentNode* currentNode = NULL;
@@ -401,6 +547,10 @@ private:
 					parentNode,	pathComponent, NULL, NULL);
 				if (currentNode == NULL)
 					return false;
+
+				if (pathComponents.CountStrings() == 1)
+					currentNode->SetFilterMatch(pathMatch);
+
 				BReference<SourcePathComponentNode> nodeReference(currentNode,
 					true);
 				if (parentNode != NULL) {
@@ -415,14 +565,21 @@ private:
 					nodeReference.Detach();
 				}
 			}
+
+			if (functionMatch.HasMatched())
+				currentNode->SetHasMatchingChild();
+
 			parentNode = currentNode;
+
 		}
 
-		return _AddFunctionNode(currentNode, function, file);
+		return _AddFunctionNode(currentNode, function, file,
+			functionMatch);
 	}
 
 	bool _AddFunctionNode(SourcePathComponentNode* parent,
-		FunctionInstance* function, LocatableFile* file)
+		FunctionInstance* function, LocatableFile* file,
+		RegExp::MatchResult& match)
 	{
 		SourcePathComponentNode* functionNode = new(std::nothrow)
 			SourcePathComponentNode(parent, function->PrettyName(), file,
@@ -431,12 +588,24 @@ private:
 		if (functionNode == NULL)
 			return B_NO_MEMORY;
 
+		functionNode->SetFilterMatch(match);
+
 		BReference<SourcePathComponentNode> nodeReference(functionNode, true);
 		if (!parent->AddChild(functionNode))
 			return false;
 
 		return true;
 	}
+
+	bool _FilterFunction(FunctionInstance* instance, const BString& sourcePath,
+		RegExp::MatchResult& pathMatch, RegExp::MatchResult& functionMatch)
+	{
+		functionMatch = fCurrentFilter.Match(instance->PrettyName());
+		pathMatch = fCurrentFilter.Match(sourcePath.String());
+
+		return functionMatch.HasMatched() || pathMatch.HasMatched();
+	}
+
 
 private:
 	typedef BObjectList<SourcePathComponentNode> ChildPathComponentList;
@@ -445,6 +614,8 @@ private:
 	ImageDebugInfo*			fImageDebugInfo;
 	ChildPathComponentList	fChildPathComponents;
 	SourcePathComponentNode* fSourcelessNode;
+	BString					fFilterString;
+	RegExp					fCurrentFilter;
 };
 
 
@@ -455,9 +626,12 @@ ImageFunctionsView::ImageFunctionsView(Listener* listener)
 	:
 	BGroupView(B_VERTICAL),
 	fImageDebugInfo(NULL),
+	fFilterField(NULL),
 	fFunctionsTable(NULL),
 	fFunctionsTableModel(NULL),
-	fListener(listener)
+	fListener(listener),
+	fHighlightingColumn(NULL),
+	fLastFilterKeypress(0)
 {
 	SetName("Functions");
 }
@@ -545,6 +719,46 @@ ImageFunctionsView::SetFunction(FunctionInstance* function)
 
 
 void
+ImageFunctionsView::AttachedToWindow()
+{
+	BView::AttachedToWindow();
+
+	fFilterField->SetTarget(this);
+}
+
+
+void
+ImageFunctionsView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_FUNCTION_FILTER_CHANGED:
+		{
+			fLastFilterKeypress = system_time();
+			BMessage keypressMessage(MSG_FUNCTION_TYPING_TIMEOUT);
+			BMessageRunner::StartSending(BMessenger(this), &keypressMessage,
+				kKeypressTimeout, 1);
+			break;
+		}
+
+		case MSG_FUNCTION_TYPING_TIMEOUT:
+		{
+			if (system_time() - fLastFilterKeypress >= kKeypressTimeout) {
+				fFunctionsTableModel->SetFilter(fFilterField->Text());
+				fHighlightingColumn->SetHasFilter(
+					fFilterField->TextView()->TextLength() > 0);
+				_ExpandFilteredNodes();
+			}
+			break;
+		}
+
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
 ImageFunctionsView::LoadSettings(const BMessage& settings)
 {
 	BMessage tableSettings;
@@ -591,17 +805,46 @@ ImageFunctionsView::_Init()
 {
 	fFunctionsTable = new TreeTable("functions", 0, B_FANCY_BORDER);
 	AddChild(fFunctionsTable->ToView());
+	AddChild(fFilterField = new BTextControl("filtertext", "Filter:",
+			NULL, NULL));
+
+	fFilterField->SetModificationMessage(new BMessage(
+			MSG_FUNCTION_FILTER_CHANGED));
 	fFunctionsTable->SetSortingEnabled(false);
 
 	// columns
-	fFunctionsTable->AddColumn(new StringTableColumn(0, "File/Function", 300,
-		100, 1000, B_TRUNCATE_BEGINNING, B_ALIGN_LEFT));
+	fFunctionsTable->AddColumn(fHighlightingColumn
+		= new HighlightingTableColumn(0, "File/Function", 300, 100, 1000,
+			B_TRUNCATE_BEGINNING, B_ALIGN_LEFT));
 
 	fFunctionsTableModel = new FunctionsTableModel();
 	fFunctionsTable->SetTreeTableModel(fFunctionsTableModel);
 
 	fFunctionsTable->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fFunctionsTable->AddTreeTableListener(this);
+}
+
+
+void
+ImageFunctionsView::_ExpandFilteredNodes()
+{
+	if (fFilterField->TextView()->TextLength() == 0)
+		return;
+
+	for (int32 i = 0; i < fFunctionsTableModel->CountChildren(
+		fFunctionsTableModel); i++) {
+		// only expand nodes if the match actually hit a function,
+		// and not just the containing path.
+		if (fFunctionsTableModel->CountChildren(fFunctionsTableModel) == 1
+			|| fFunctionsTableModel->HasMatchingChildAt(fFunctionsTableModel,
+				i)) {
+			TreeTablePath path;
+			path.AddComponent(i);
+			fFunctionsTable->SetNodeExpanded(path, true, true);
+		}
+	}
+
+	fFunctionsTable->ResizeAllColumnsToPreferred();
 }
 
 

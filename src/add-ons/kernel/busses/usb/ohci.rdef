@@ -12,6 +12,6 @@ resource app_version {
 	variety = 0,
 	internal = 0,
 	short_info = "OHCI host controller driver",
-	long_info = "Haiku OHCI HCD - Copyright 2005-2009, Haiku Inc."
+	long_info = "Haiku OHCI HCD - Copyright 2005-2013, Haiku Inc."
 };
 

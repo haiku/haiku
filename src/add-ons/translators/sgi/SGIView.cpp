@@ -30,6 +30,9 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+
+#include "SGIView.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -46,12 +49,13 @@
 
 #include "SGIImage.h"
 #include "SGITranslator.h"
-#include "SGIView.h"
+
 
 const char* author = "Stephan Aßmus, <stippi@yellowbites.com>";
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "SGIView"
+
 
 // add_menu_item
 void
@@ -67,19 +71,7 @@ add_menu_item(BMenu* menu,
 	menu->AddItem(item);
 }
 
-// ---------------------------------------------------------------
-// Constructor
-//
-// Sets up the view settings
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
+
 SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 	:
 	BView(name, flags, new BGroupLayout(B_VERTICAL)),
@@ -92,16 +84,16 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 	// create the menu items with the various compression methods
 	add_menu_item(menu, SGI_COMP_NONE, B_TRANSLATE("None"), 
 		currentCompression);
-//	menu->AddSeparatorItem();
+	//menu->AddSeparatorItem();
 	add_menu_item(menu, SGI_COMP_RLE, B_TRANSLATE("RLE"), currentCompression);
 
-// DON'T turn this on, it's so slow that I didn't wait long enough
-// the one time I tested this. So I don't know if the code even works.
-// Supposedly, this would look for an already written scanline, and
-// modify the scanline tables so that the current row is not written
-// at all...
+	// DON'T turn this on, it's so slow that I didn't wait long enough
+	// the one time I tested this. So I don't know if the code even works.
+	// Supposedly, this would look for an already written scanline, and
+	// modify the scanline tables so that the current row is not written
+	// at all...
 
-//	add_menu_item(menu, SGI_COMP_ARLE, "Agressive RLE", currentCompression);
+	//add_menu_item(menu, SGI_COMP_ARLE, "Agressive RLE", currentCompression);
 
 	fCompressionMF = new BMenuField("compression", 
 		B_TRANSLATE("Use compression:"), menu);
@@ -138,14 +130,17 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 		.SetInsets(padding)
 		.Add(titleView)
 		.Add(detailView)
-		.Add(fCompressionMF)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fCompressionMF)
+			.AddGlue()
+			.End()
 		.Add(infoView)
 		.AddGlue();
 
 	BFont font;
 	GetFont(&font);
- 	SetExplicitPreferredSize(
-		BSize((font.Size() * 390) / 12, (font.Size() * 180) / 12));
+	SetExplicitPreferredSize(BSize((font.Size() * 390) / 12,
+		(font.Size() * 180) / 12));
 
 	// TODO: remove this workaround for ticket #4217
 	infoView->SetExplicitPreferredSize(
@@ -155,37 +150,19 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 }
 
 
-// ---------------------------------------------------------------
-// Destructor
-//
-// Does nothing
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
 SGIView::~SGIView()
 {
 	fSettings->Release();
 }
 
-// ---------------------------------------------------------------
-// MessageReceived
-//
-// Handles state changes of the Compression menu field
-//
-// Preconditions:
-//
-// Parameters: area,	not used
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
+
+void
+SGIView::AllAttached()
+{
+	fCompressionMF->Menu()->SetTargetForItems(this);
+}
+
+
 void
 SGIView::MessageReceived(BMessage* message)
 {
@@ -196,30 +173,9 @@ SGIView::MessageReceived(BMessage* message)
 				fSettings->SetGetInt32(SGI_SETTING_COMPRESSION, &value);
 				fSettings->SaveSettings();
 			}
-			fCompressionMF->ResizeToPreferred();
 			break;
 		}
 		default:
 			BView::MessageReceived(message);
 	}
 }
-
-// ---------------------------------------------------------------
-// AllAttached
-//
-// sets the target for the controls controlling the configuration
-//
-// Preconditions:
-//
-// Parameters: area,	not used
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-void
-SGIView::AllAttached()
-{
-	fCompressionMF->Menu()->SetTargetForItems(this);
-}
-

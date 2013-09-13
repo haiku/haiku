@@ -1,11 +1,12 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2013 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jerome Duval (jerome.duval@free.fr)
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jerome Duval, jerome.duval@free.fr
  *		Jonas Sundström, jonas@kirilla.se
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -16,6 +17,7 @@
 
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Cursor.h>
 #include <Debug.h>
 #include <File.h>
@@ -72,8 +74,8 @@ BackgroundsView::BackgroundsView()
 {
 	SetBorder(B_NO_BORDER);
 
-	fPreviewBox = new BBox("preview");
-	fPreviewBox->SetLabel(B_TRANSLATE("Preview"));
+	BBox* previewBox = new BBox("preview");
+	previewBox->SetLabel(B_TRANSLATE("Preview"));
 
 	fPreview = new Preview();
 
@@ -101,9 +103,9 @@ BackgroundsView::BackgroundsView()
 		}
 	}
 
-	BView* view = BLayoutBuilder::Group<>()
+	previewBox->AddChild(BLayoutBuilder::Group<>()
 		.AddGlue()
-		.AddGroup(B_VERTICAL, 20)
+		.AddGroup(B_VERTICAL, 0)
 			.AddGroup(B_HORIZONTAL, 0)
 				.AddGlue()
 				.AddGrid(0, 0, 1)
@@ -119,17 +121,16 @@ BackgroundsView::BackgroundsView()
 					.End()
 				.AddGlue()
 				.End()
-			.AddGroup(B_HORIZONTAL, 10)
+			.AddStrut(be_control_look->DefaultItemSpacing() * 2)
+			.AddGroup(B_HORIZONTAL)
 				.Add(fXPlacementText)
 				.Add(fYPlacementText)
 				.End()
 			.AddGlue()
-			.SetInsets(10, 10, 10, 10)
+			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
 		.AddGlue()
-		.View();
-
-	fPreviewBox->AddChild(view);
+		.View());
 
 	BBox* rightbox = new BBox("rightbox");
 
@@ -150,8 +151,8 @@ BackgroundsView::BackgroundsView()
 		B_TRANSLATE("Other folder" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOtherFolder)));
 
-	BMenuField* workspaceMenuField = new BMenuField(BRect(0, 0, 130, 18),
-		"workspaceMenuField", NULL, fWorkspaceMenu, true);
+	BMenuField* workspaceMenuField = new BMenuField("workspaceMenuField",
+		NULL, fWorkspaceMenu);
 	workspaceMenuField->ResizeToPreferred();
 	rightbox->SetLabel(workspaceMenuField);
 
@@ -162,9 +163,9 @@ BackgroundsView::BackgroundsView()
 	fImageMenu->AddItem(new BMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOtherImage)));
 
-	BMenuField* imageMenuField = new BMenuField(NULL, fImageMenu);
+	BMenuField* imageMenuField = new BMenuField("image",
+		B_TRANSLATE("Image:"), fImageMenu);
 	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
-	imageMenuField->ResizeToPreferred();
 
 	fPlacementMenu = new BPopUpMenu(B_TRANSLATE("pick one"));
 	fPlacementMenu->AddItem(new BMenuItem(B_TRANSLATE("Manual"),
@@ -176,43 +177,31 @@ BackgroundsView::BackgroundsView()
 	fPlacementMenu->AddItem(new BMenuItem(B_TRANSLATE("Tile"),
 		new BMessage(kMsgTilePlacement)));
 
-	BMenuField* placementMenuField = new BMenuField(NULL, fPlacementMenu);
+	BMenuField* placementMenuField = new BMenuField("placement",
+		B_TRANSLATE("Placement:"), fPlacementMenu);
 	placementMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fIconLabelOutline = new BCheckBox(B_TRANSLATE("Icon label outline"),
 		new BMessage(kMsgIconLabelOutline));
 	fIconLabelOutline->SetValue(B_CONTROL_OFF);
 
-	fPicker = new BColorControl(BPoint(0, 0), B_CELLS_32x8, 7.0, "Picker",
+	fPicker = new BColorControl(BPoint(0, 0), B_CELLS_32x8, 8.0, "Picker",
 		new BMessage(kMsgUpdateColor));
 
-	BStringView* imageStringView =
-		new BStringView(NULL, B_TRANSLATE("Image:"));
-	BStringView* placementStringView =
-		new BStringView(NULL, B_TRANSLATE("Placement:"));
-
-	imageStringView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
-		B_ALIGN_NO_VERTICAL));
-	placementStringView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
-		B_ALIGN_NO_VERTICAL));
-
-	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
-			.AddGroup(B_VERTICAL, 10)
-				.AddGrid(10, 10)
-					.Add(imageStringView, 0, 0)
-					.Add(placementStringView, 0, 1)
-					.Add(imageMenuField, 1, 0)
-					.Add(placementMenuField, 1, 1)
-					.End()
-				.Add(fIconLabelOutline)
-				.End()
-			.Add(fPicker)
-			.SetInsets(10, 10, 10, 10)
+	rightbox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+			.Add(imageMenuField->CreateLabelLayoutItem(), 0, 0)
+			.Add(imageMenuField->CreateMenuBarLayoutItem(), 1, 0, 2, 1)
+			.Add(placementMenuField->CreateLabelLayoutItem(), 0, 1)
+			.Add(placementMenuField->CreateMenuBarLayoutItem(), 1, 1, 2, 1)
+			.Add(fIconLabelOutline, 1, 2)
+				// checkbox only spans one column so that it
+				// doesn't dictate the width of the menu bars.
 			.End()
-		.View();
-
-	rightbox->AddChild(view);
+		.AddGlue()
+		.Add(fPicker)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.View());
 
 	fRevert = new BButton(B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevertSettings));
@@ -224,21 +213,21 @@ BackgroundsView::BackgroundsView()
 	fApply->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 		B_ALIGN_NO_VERTICAL));
 
-	view = BLayoutBuilder::Group<>()
-		.AddGroup(B_VERTICAL, 10)
-			.AddGroup(B_HORIZONTAL, 10)
-				.Add(fPreviewBox)
-				.Add(rightbox)
+	AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+		.AddGroup(B_HORIZONTAL)
+			.AddGroup(B_VERTICAL, 0)
+				.AddStrut(floorf(rightbox->TopBorderOffset()
+					- previewBox->TopBorderOffset()) - 1)
+				.Add(previewBox)
 				.End()
-			.AddGroup(B_HORIZONTAL, 0)
-				.Add(fRevert)
-				.Add(fApply)
-				.End()
-			.SetInsets(10, 10, 10, 10)
+			.Add(rightbox)
 			.End()
-		.View();
-
-	AddChild(view);
+		.AddGroup(B_HORIZONTAL)
+			.Add(fRevert)
+			.Add(fApply)
+			.End()
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.View());
 
 	fApply->MakeDefault(true);
 }
@@ -316,10 +305,6 @@ BackgroundsView::MessageReceived(BMessage* msg)
 		}
 
 		case kMsgManualPlacement:
-			_UpdatePreview();
-			_UpdateButtons();
-			break;
-
 		case kMsgTilePlacement:
 		case kMsgScalePlacement:
 		case kMsgCenterPlacement:

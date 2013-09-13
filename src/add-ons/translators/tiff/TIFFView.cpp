@@ -30,6 +30,9 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+
+#include "TIFFView.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -46,7 +49,6 @@
 #include "TIFFTranslator.h"
 #include "TranslatorSettings.h"
 
-#include "TIFFView.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "TIFFView"
@@ -66,22 +68,11 @@ add_menu_item(BMenu* menu,
 	menu->AddItem(item);
 }
 
-// ---------------------------------------------------------------
-// Constructor
-//
-// Sets up the view settings
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-TIFFView::TIFFView(const char *name, uint32 flags,
-	TranslatorSettings *settings)
-	:	BView(name, flags)
+
+TIFFView::TIFFView(const char* name, uint32 flags,
+	TranslatorSettings* settings)
+	:
+	BView(name, flags)
 {
 	fSettings = settings;
 
@@ -102,12 +93,12 @@ TIFFView::TIFFView(const char *name, uint32 flags,
 	int16 i = 1;
 	fLibTIFF[0] = new BStringView(NULL, B_TRANSLATE("TIFF Library:"));
 	char libtiff[] = TIFFLIB_VERSION_STR;
-    char *tok = strtok(libtiff, "\n");
-    while (i < 5 && tok) {
+	char* tok = strtok(libtiff, "\n");
+	while (i < 5 && tok) {
 		fLibTIFF[i] = new BStringView(NULL, tok);
 		tok = strtok(NULL, "\n");
 		i++;
-    }
+	}
 
 	BPopUpMenu* menu = new BPopUpMenu("pick compression");
 
@@ -123,66 +114,54 @@ TIFFView::TIFFView(const char *name, uint32 flags,
 	add_menu_item(menu, COMPRESSION_LZW, B_TRANSLATE("LZW"),
 		currentCompression);
 
-// TODO: the disabled compression modes are not configured in libTIFF
-//	menu->AddSeparatorItem();
-//	add_menu_item(menu, COMPRESSION_JPEG, "JPEG", currentCompression);
-// TODO ? - strip encoding is not implemented in libTIFF for this compression
-//	add_menu_item(menu, COMPRESSION_JP2000, "JPEG2000", currentCompression);
+	// TODO: the disabled compression modes are not configured in libTIFF
+	//	menu->AddSeparatorItem();
+	//	add_menu_item(menu, COMPRESSION_JPEG, "JPEG", currentCompression);
+	// TODO ? - strip encoding is not implemented in libTIFF for this compression
+	//	add_menu_item(menu, COMPRESSION_JP2000, "JPEG2000", currentCompression);
 
- 	fCompressionMF = new BMenuField(B_TRANSLATE("Use Compression:"), menu);
+	fCompressionMF = new BMenuField(B_TRANSLATE("Use compression:"), menu);
 
- 	// Build the layout
+	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
 		.SetInsets(5)
- 		.Add(fTitle)
- 		.Add(fDetail)
- 		.AddGlue()
- 		.Add(fCompressionMF)
- 		.AddGlue()
- 		.Add(fLibTIFF[0])
- 		.Add(fLibTIFF[1])
- 		.Add(fLibTIFF[2])
- 		.Add(fLibTIFF[3])
- 			// Theses 4 adding above work because we know there are 4 strings
- 			// but it's fragile: one string less in the library version and the application breaks
+		.Add(fTitle)
+		.Add(fDetail)
+		.AddGlue()
+		.AddGroup(B_HORIZONTAL)
+			.Add(fCompressionMF)
+			.AddGlue()
+			.End()
+		.AddGlue()
+		.Add(fLibTIFF[0])
+		.Add(fLibTIFF[1])
+		.Add(fLibTIFF[2])
+		.Add(fLibTIFF[3])
+			// Theses 4 adding above work because we know there are 4 strings
+			// but it's fragile: one string less in the library version and the
+			// application breaks
 		.AddGlue();
 
- 	BFont font;
- 	GetFont(&font);
- 	SetExplicitPreferredSize(BSize((font.Size() * 350)/12, (font.Size() * 200)/12));
+	BFont font;
+	GetFont(&font);
+	SetExplicitPreferredSize(
+		BSize((font.Size() * 350)/12, (font.Size() * 200)/12));
 }
 
-// ---------------------------------------------------------------
-// Destructor
-//
-// Does nothing
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
+
 TIFFView::~TIFFView()
 {
 	fSettings->Release();
 }
 
-// ---------------------------------------------------------------
-// MessageReceived
-//
-// Handles state changes of the Compression menu field
-//
-// Preconditions:
-//
-// Parameters: area,	not used
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
+
+void
+TIFFView::AllAttached()
+{
+	fCompressionMF->Menu()->SetTargetForItems(this);
+}
+
+
 void
 TIFFView::MessageReceived(BMessage* message)
 {
@@ -199,26 +178,3 @@ TIFFView::MessageReceived(BMessage* message)
 			BView::MessageReceived(message);
 	}
 }
-
-// ---------------------------------------------------------------
-// AllAttached
-//
-// sets the target for the controls controlling the configuration
-//
-// Preconditions:
-//
-// Parameters: area,	not used
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-void
-TIFFView::AllAttached()
-{
-	fCompressionMF->Menu()->SetTargetForItems(this);
-	fCompressionMF->SetDivider(fCompressionMF->StringWidth(fCompressionMF->Label()) + 3);
-	fCompressionMF->ResizeToPreferred();
-}
-
-

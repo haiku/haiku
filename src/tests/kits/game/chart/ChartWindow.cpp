@@ -58,9 +58,9 @@ enum {
 	H_BORDER		= 5,
 	V_BORDER		= 2,
 	ANIM_LABEL		= 52,
-	ANIM_POPUP		= 42,
+	ANIM_POPUP		= 125,
 	DISP_LABEL		= 40,
-	DISP_POPUP		= 42,
+	DISP_POPUP		= 122,
 	BUTTON_WIDTH	= 50,
 	BUTTON_OFFSET	= -100,
 	SPACE_LABEL		= 40,
@@ -518,12 +518,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		popup->SetFont(&font);
 		popup->MenuBar()->SetFont(&font);
 		popup->Menu()->SetFont(&font);
-		popup->ResizeToPreferred();
 		popup->SetDivider(popup->StringWidth(popup->Label()) + 4.0f);
 		fTopView->AddChild(popup);
 
-	h += ANIM_LABEL + ANIM_POPUP +
-		 popup->StringWidth(B_TRANSLATE("Slow rotation"));
+	h += ANIM_LABEL + ANIM_POPUP + H_BORDER;
 
 		/* display mode popup */
 		menu = new BPopUpMenu(B_TRANSLATE("Off"));
@@ -551,12 +549,10 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		popup->SetFont(&font);
 		popup->MenuBar()->SetFont(&font);
 		popup->Menu()->SetFont(&font);
-		popup->ResizeToPreferred();
 		popup->SetDivider(popup->StringWidth(popup->Label()) + 4.0f);
 		fTopView->AddChild(popup);
 
-	h += DISP_LABEL + DISP_POPUP +
-		popup->StringWidth(B_TRANSLATE("DirectWindow")) + H_BORDER;
+	h += DISP_LABEL + DISP_POPUP + H_BORDER;
 
 		/* create the offwindow (invisible) button on the left side.
 		   this will be used to record the content of the Picture

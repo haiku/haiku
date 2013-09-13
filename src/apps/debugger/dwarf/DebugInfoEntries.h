@@ -161,6 +161,9 @@ public:
 			off_t				StatementListOffset() const
 									{ return fStatementListOffset; }
 
+			bool				ContainsMainSubprogram() const
+									{ return fContainsMainSubprogram; }
+
 	virtual	status_t			AddChild(DebugInfoEntry* child);
 
 	virtual	status_t			AddAttribute_name(uint16 attributeName,
@@ -188,6 +191,9 @@ public:
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_ranges(uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_main_subprogram(
+									uint16 attributeName,
+									const AttributeValue& value);
 
 //TODO:
 //	virtual	status_t			AddAttribute_segment(uint16 attributeName,
@@ -209,6 +215,7 @@ protected:
 			uint16				fLanguage;
 			uint8				fIdentifierCase;
 			bool				fUseUTF8;
+			bool				fContainsMainSubprogram;
 };
 
 
@@ -669,6 +676,8 @@ public:
 									{ return &fByteSize; }
 			const DynamicAttributeValue* BitOffset() const
 									{ return &fBitOffset; }
+			const DynamicAttributeValue* DataBitOffset() const
+									{ return &fDataBitOffset; }
 			const DynamicAttributeValue* BitSize() const
 									{ return &fBitSize; }
 			const MemberLocation* Location() const
@@ -682,6 +691,9 @@ public:
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_bit_offset(uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_data_bit_offset(
+									uint16 attributeName,
+									const AttributeValue& value);
 	virtual	status_t			AddAttribute_data_member_location(
 									uint16 attributeName,
 									const AttributeValue& value);
@@ -693,6 +705,7 @@ private:
 			DIEType*			fType;
 			DynamicAttributeValue fByteSize;
 			DynamicAttributeValue fBitOffset;
+			DynamicAttributeValue fDataBitOffset;
 			DynamicAttributeValue fBitSize;
 			MemberLocation		fLocation;
 };
@@ -1041,6 +1054,8 @@ public:
 	virtual	const DynamicAttributeValue* ByteSize() const;
 			const DynamicAttributeValue* BitOffset() const
 									{ return &fBitOffset; }
+			const DynamicAttributeValue* DataBitOffset() const
+									{ return &fDataBitOffset; }
 			const DynamicAttributeValue* BitSize() const
 									{ return &fBitSize; }
 			uint8				Encoding() const	{ return fEncoding; }
@@ -1053,6 +1068,9 @@ public:
 	virtual	status_t			AddAttribute_bit_size(uint16 attributeName,
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_bit_offset(uint16 attributeName,
+									const AttributeValue& value);
+	virtual	status_t			AddAttribute_data_bit_offset(
+									uint16 attributeName,
 									const AttributeValue& value);
 	virtual	status_t			AddAttribute_endianity(uint16 attributeName,
 									const AttributeValue& value);
@@ -1069,6 +1087,7 @@ public:
 private:
 			DynamicAttributeValue fByteSize;
 			DynamicAttributeValue fBitOffset;
+			DynamicAttributeValue fDataBitOffset;
 			DynamicAttributeValue fBitSize;
 			uint8				fEncoding;
 			uint8				fEndianity;
@@ -1225,12 +1244,15 @@ public:
 										{ return fTemplateTypeParameters; }
 			const DebugInfoEntryList TemplateValueParameters() const
 										{ return fTemplateValueParameters; }
+			const DebugInfoEntryList CallSites() const
+										{ return fCallSites; }
 
 			bool				IsPrototyped() const	{ return fPrototyped; }
 			uint8				Inline() const			{ return fInline; }
 			bool				IsArtificial() const	{ return fArtificial; }
 			uint8				CallingConvention() const
 										{ return fCallingConvention; }
+			bool				IsMain() const			{ return fMain; }
 
 			DIEType*			ReturnType() const		{ return fReturnType; }
 
@@ -1264,6 +1286,10 @@ public:
 	virtual status_t			AddAttribute_calling_convention(
 									uint16 attributeName,
 									const AttributeValue& value);
+	virtual	status_t			AddAttribute_main_subprogram(
+									uint16 attributeName,
+									const AttributeValue& value);
+
 
 protected:
 			DebugInfoEntryList	fParameters;
@@ -1271,6 +1297,7 @@ protected:
 			DebugInfoEntryList	fBlocks;
 			DebugInfoEntryList	fTemplateTypeParameters;
 			DebugInfoEntryList	fTemplateValueParameters;
+			DebugInfoEntryList	fCallSites;
 			target_addr_t		fLowPC;
 			target_addr_t		fHighPC;
 			off_t				fAddressRangesOffset;
@@ -1281,6 +1308,7 @@ protected:
 			uint8				fAddressClass;
 			bool				fPrototyped;
 			uint8				fInline;
+			bool				fMain;
 			bool				fArtificial;
 			uint8				fCallingConvention;
 
@@ -1597,6 +1625,30 @@ private:
 };
 
 
+class DIETypeUnit : public DIECompileUnitBase {
+public:
+								DIETypeUnit();
+
+	virtual	uint16				Tag() const;
+};
+
+
+class DIETemplateTemplateParameter : public DIEDeclaredBase {
+public:
+								DIETemplateTemplateParameter();
+
+	virtual	uint16				Tag() const;
+
+	virtual	const char*			Name() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+
+private:
+			const char*			fName;
+};
+
+
 class DIETemplateTypeParameterPack : public DIEDeclaredBase {
 public:
 								DIETemplateTypeParameterPack();
@@ -1622,6 +1674,50 @@ private:
 class DIETemplateValueParameterPack : public DIEDeclaredBase {
 public:
 								DIETemplateValueParameterPack();
+
+	virtual	uint16				Tag() const;
+
+	virtual	const char*			Name() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+
+			const DebugInfoEntryList& Children() const
+										{ return fChildren; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+private:
+			const char*			fName;
+			DebugInfoEntryList	fChildren;
+};
+
+
+class DIECallSite : public DIEDeclaredBase {
+public:
+								DIECallSite();
+
+	virtual	uint16				Tag() const;
+
+	virtual	const char*			Name() const;
+
+	virtual	status_t			AddAttribute_name(uint16 attributeName,
+									const AttributeValue& value);
+
+			const DebugInfoEntryList& Children() const
+										{ return fChildren; }
+
+	virtual	status_t			AddChild(DebugInfoEntry* child);
+
+private:
+			const char*			fName;
+			DebugInfoEntryList	fChildren;
+};
+
+
+class DIECallSiteParameter : public DIEDeclaredBase {
+public:
+								DIECallSiteParameter();
 
 	virtual	uint16				Tag() const;
 

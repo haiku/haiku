@@ -21,31 +21,32 @@
 
 static const int32 kMaxDecimalPlaces = 32;
 
-enum {
-	TOKEN_IDENTIFIER			= 0,
 
+enum {
+	TOKEN_NONE					= 0,
+	TOKEN_IDENTIFIER,
 	TOKEN_CONSTANT,
 
-	TOKEN_PLUS,
-	TOKEN_MINUS,
+	TOKEN_END_OF_LINE			= '\n',
 
-	TOKEN_STAR,
-	TOKEN_SLASH,
-	TOKEN_MODULO,
+	TOKEN_PLUS					= '+',
+	TOKEN_MINUS					= '-',
 
-	TOKEN_POWER,
-	TOKEN_FACTORIAL,
+	TOKEN_STAR					= '*',
+	TOKEN_SLASH					= '/',
+	TOKEN_MODULO				= '%',
 
-	TOKEN_OPENING_BRACKET,
-	TOKEN_CLOSING_BRACKET,
+	TOKEN_POWER					= '^',
+	TOKEN_FACTORIAL				= '!',
 
-	TOKEN_AND,
-	TOKEN_OR,
-	TOKEN_NOT,
+	TOKEN_OPENING_BRACKET		= '(',
+	TOKEN_CLOSING_BRACKET		= ')',
 
-	TOKEN_NONE,
-	TOKEN_END_OF_LINE
+	TOKEN_AND					= '&',
+	TOKEN_OR					= '|',
+	TOKEN_NOT					= '~'
 };
+
 
 struct ExpressionParser::Token {
 	Token()
@@ -196,7 +197,6 @@ class ExpressionParser::Tokenizer {
 			fCurrentToken = Token(begin, length, _CurrentPos() - length,
 				TOKEN_CONSTANT);
 			fCurrentToken.value = temp.String();
-
 		} else if (isalpha(*fCurrentChar) && *fCurrentChar != 'x') {
 			const char* begin = fCurrentChar;
 			while (*fCurrentChar != 0 && (isalpha(*fCurrentChar)
@@ -206,62 +206,33 @@ class ExpressionParser::Tokenizer {
 			int32 length = fCurrentChar - begin;
 			fCurrentToken = Token(begin, length, _CurrentPos() - length,
 				TOKEN_IDENTIFIER);
-
-		} else if ((unsigned char)fCurrentChar[0] == 0xCF
-			&& (unsigned char)fCurrentChar[1] == 0x80) {
-			// UTF-8 small greek letter PI
+		} else if (strncmp(fCurrentChar, "π", 2) == 0) {
 			fCurrentToken = Token(fCurrentChar, 2, _CurrentPos() - 1,
 				TOKEN_IDENTIFIER);
 			fCurrentChar += 2;
-
 		} else {
 			int32 type = TOKEN_NONE;
 
 			switch (*fCurrentChar) {
-				case '+':
-					type = TOKEN_PLUS;
+				case TOKEN_PLUS:
+				case TOKEN_MINUS:
+				case TOKEN_STAR:
+				case TOKEN_SLASH:
+				case TOKEN_MODULO:
+				case TOKEN_POWER:
+				case TOKEN_FACTORIAL:
+				case TOKEN_OPENING_BRACKET:
+				case TOKEN_CLOSING_BRACKET:
+				case TOKEN_AND:
+				case TOKEN_OR:
+				case TOKEN_NOT:
+				case TOKEN_END_OF_LINE:
+					type = *fCurrentChar;
 					break;
-				case '-':
-					type = TOKEN_MINUS;
-					break;
-				case '*':
-					type = TOKEN_STAR;
-					break;
-				case '/':
+
 				case '\\':
 				case ':':
-					type = TOKEN_SLASH;
-					break;
-
-				case '%':
-					type = TOKEN_MODULO;
-					break;
-				case '^':
-					type = TOKEN_POWER;
-					break;
-				case '!':
-					type = TOKEN_FACTORIAL;
-					break;
-
-				case '(':
-					type = TOKEN_OPENING_BRACKET;
-					break;
-				case ')':
-					type = TOKEN_CLOSING_BRACKET;
-					break;
-
-				case '&':
-					type = TOKEN_AND;
-					break;
-				case '|':
-					type = TOKEN_OR;
-					break;
-				case '~':
-					type = TOKEN_NOT;
-					break;
-
-				case '\n':
-					type = TOKEN_END_OF_LINE;
+				type = TOKEN_SLASH;
 					break;
 
 				case 'x':
@@ -591,14 +562,10 @@ ExpressionParser::_InitArguments(MAPM values[], int32 argumentCount)
 MAPM
 ExpressionParser::_ParseFunction(const Token& token)
 {
-	if (strcmp("e", token.string.String()) == 0)
+	if (token.string == "e")
 		return _ParseFactorial(MAPM(MM_E));
-	else if (strcasecmp("pi", token.string.String()) == 0
-		|| ((unsigned char)token.string.String()[0] == 0xCF
-			&& (unsigned char)token.string.String()[1] == 0x80)) {
-		// UTF-8 small greek letter PI
+	else if (token.string.ICompare("pi") == 0 || token.string == "π")
 		return _ParseFactorial(MAPM(MM_PI));
-	}
 
 	// hard coded cases for different count of arguments
 	// supports functions with 3 arguments at most
@@ -755,9 +722,40 @@ ExpressionParser::_EatToken(int32 type)
 {
 	Token token = fTokenizer->NextToken();
 	if (token.type != type) {
-		BString temp("expected '");
-		temp << (char)type << "' got '" << token.string << "'";
+		BString expected;
+		switch (type) {
+			case TOKEN_IDENTIFIER:
+				expected = "an identifier";
+				break;
+
+			case TOKEN_CONSTANT:
+				expected = "a constant";
+				break;
+
+			case TOKEN_PLUS:
+			case TOKEN_MINUS:
+			case TOKEN_STAR:
+			case TOKEN_MODULO:
+			case TOKEN_POWER:
+			case TOKEN_FACTORIAL:
+			case TOKEN_OPENING_BRACKET:
+			case TOKEN_CLOSING_BRACKET:
+			case TOKEN_AND:
+			case TOKEN_OR:
+			case TOKEN_NOT:
+				expected << "'" << (char)type << "'";
+				break;
+
+			case TOKEN_SLASH:
+				expected = "'/', '\\', or ':'";
+				break;
+
+			case TOKEN_END_OF_LINE:
+				expected = "'\\n'";
+				break;
+		}
+		BString temp;
+		temp << "Expected " << expected.String() << " got '" << token.string << "'";
 		throw ParseException(temp.String(), token.position);
 	}
 }
-

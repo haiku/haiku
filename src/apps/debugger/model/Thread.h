@@ -71,6 +71,10 @@ public:
 			StackTrace*			GetStackTrace() const	{ return fStackTrace; }
 			void				SetStackTrace(StackTrace* trace);
 
+			bool				StopRequestPending() const
+									{ return fStopRequestPending; }
+			void				SetStopRequestPending();
+
 			ReturnValueInfoList*
 								ReturnValueInfos() const
 								{ return fReturnValueInfos; }
@@ -84,6 +88,7 @@ private:
 			uint32				fState;
 			ReturnValueInfoList*
 								fReturnValueInfos;
+			bool				fStopRequestPending;
 			uint32				fStoppedReason;
 			BString				fStoppedReasonInfo;
 			CpuState*			fCpuState;

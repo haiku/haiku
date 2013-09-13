@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-Backgrounds	3513602073
 Backgrounds	System name		背景
-X:	Main View		X 方向：
-Resolution: 	Image Filepanel		解像度：
+X:	Main View		X 方向:
+Resolution: 	Image Filepanel		解像度:
 pick one	Main View		１つ選択
 Default	Main View		デフォルト
 Center	Main View		中央
@@ -13,13 +13,13 @@ All workspaces	Main View		すべてのワークスペース
 Icon label outline	Main View		アイコンラベルアウトライン
 Other…	Main View		ファイルを指定…
 Current workspace	Main View		現在のワークスペース
-Folder: 	Main View		フォルダー：
+Folder: 	Main View		フォルダー:
 Apply	Main View		適用
 Other folder…	Main View		フォルダーを指定…
-Y:	Main View		Y 方向：
+Y:	Main View		Y 方向:
 Tile	Main View		並べて表示
 Select	Main View		選択
 Scale to fit	Main View		画面サイズに合わせる
-Placement:	Main View		配置：
+Placement:	Main View		配置:
 Preview	Main View		プレビュー
-Image:	Main View		画像：
+Image:	Main View		画像:

@@ -17,7 +17,8 @@
 
 ImageDebugInfo::ImageDebugInfo(const ImageInfo& imageInfo)
 	:
-	fImageInfo(imageInfo)
+	fImageInfo(imageInfo),
+	fMainFunction(NULL)
 {
 }
 
@@ -68,6 +69,9 @@ ImageDebugInfo::FinishInit(DebuggerInterface* interface)
 				error = B_NO_MEMORY;
 				break;
 			}
+
+			if (function->IsMain())
+				fMainFunction = instance;
 		}
 
 		// Remove references returned by the specific debug info -- the

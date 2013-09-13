@@ -58,18 +58,18 @@ virtio_negociate_features(void* cookie, uint32 supported,
 {
 	CALLED();
 	VirtioDevice *device = (VirtioDevice *)cookie;
-	
+
 	return device->NegociateFeatures(supported, negociated, get_feature_name);
 }
 
-	
+
 status_t
 virtio_read_device_config(void* cookie, uint8 offset, void* buffer,
 		size_t bufferSize)
 {
 	CALLED();
 	VirtioDevice *device = (VirtioDevice *)cookie;
-	
+
 	return device->ReadDeviceConfig(offset, buffer, bufferSize);
 }
 
@@ -80,7 +80,7 @@ virtio_write_device_config(void* cookie, uint8 offset,
 {
 	CALLED();
 	VirtioDevice *device = (VirtioDevice *)cookie;
-	
+
 	return device->WriteDeviceConfig(offset, buffer, bufferSize);
 }
 
@@ -96,11 +96,11 @@ virtio_alloc_queues(virtio_device cookie, size_t count, virtio_queue *queues)
 
 status_t
 virtio_setup_interrupt(virtio_device cookie, virtio_intr_func config_handler,
-	void* configCookie)
+	void *driverCookie)
 {
 	CALLED();
 	VirtioDevice *device = (VirtioDevice *)cookie;
-	return device->SetupInterrupt(config_handler, configCookie); 
+	return device->SetupInterrupt(config_handler, driverCookie);
 }
 
 
@@ -128,7 +128,7 @@ virtio_queue_request(virtio_queue cookie, const physical_entry *readEntry,
 			entries[1] = *writtenEntry;
 	} else if (writtenEntry != NULL)
 		entries[0] = *writtenEntry;
-	
+
 	return virtio_queue_request_v(cookie, entries, readEntry != NULL ? 1 : 0,
 		writtenEntry != NULL? 1 : 0, callback, callbackCookie);
 }

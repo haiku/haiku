@@ -58,7 +58,10 @@ VirtioDevice::VirtioDevice(device_node *node)
 	fCookie(NULL),
 	fStatus(B_NO_INIT),
 	fQueues(NULL),
-	fFeatures(0)
+	fFeatures(0),
+	fAlignment(0),
+	fConfigHandler(NULL),
+	fDriverCookie(NULL)
 {
 	device_node *parent = gDeviceManager->get_parent_node(node);
 	fStatus = gDeviceManager->get_driver(parent,
@@ -112,15 +115,15 @@ VirtioDevice::NegociateFeatures(uint32 supported, uint32* negociated,
 
 	// filter our own features
 	fFeatures &= (VIRTIO_FEATURE_TRANSPORT_MASK
-		/*| VIRTIO_FEATURE_RING_INDIRECT_DESC*/ | VIRTIO_FEATURE_RING_EVENT_IDX);
+		| VIRTIO_FEATURE_RING_INDIRECT_DESC | VIRTIO_FEATURE_RING_EVENT_IDX);
 
 	*negociated = fFeatures;
-	
+
 	DumpFeatures("negociated features", fFeatures, get_feature_name);
 
 	return fController->write_guest_features(fCookie, fFeatures);
 }
-	
+
 
 status_t
 VirtioDevice::ReadDeviceConfig(uint8 offset, void* buffer, size_t bufferSize)
@@ -172,16 +175,15 @@ err:
 
 
 status_t
-VirtioDevice::SetupInterrupt(virtio_intr_func configHandler,
-	void* configCookie)
+VirtioDevice::SetupInterrupt(virtio_intr_func configHandler, void *driverCookie)
 {
 	fConfigHandler = configHandler;
-	fConfigCookie = configCookie;
-	status_t status = fController->setup_interrupt(fCookie);
+	fDriverCookie = driverCookie;
+	status_t status = fController->setup_interrupt(fCookie, fQueueCount);
 	if (status != B_OK)
 		return status;
 
-	// ready to go	
+	// ready to go
 	fController->set_status(fCookie, VIRTIO_CONFIG_STATUS_DRIVER_OK);
 
 	for (size_t index = 0; index < fQueueCount; index++)
@@ -194,7 +196,7 @@ status_t
 VirtioDevice::SetupQueue(uint16 queueNumber, phys_addr_t physAddr)
 {
 	return fController->setup_queue(fCookie, queueNumber, physAddr);
-}			
+}
 
 
 void
@@ -212,14 +214,14 @@ VirtioDevice::QueueInterrupt(uint16 queueNumber)
 			return B_BAD_VALUE;
 		return fQueues[queueNumber]->Interrupt();
 	}
-	
+
 	status_t status = B_OK;
 	for (uint16 i = 0; i < fQueueCount; i++) {
 		status = fQueues[i]->Interrupt();
 		if (status != B_OK)
 			break;
 	}
-	
+
 	return status;
 }
 
@@ -228,7 +230,7 @@ status_t
 VirtioDevice::ConfigInterrupt()
 {
 	if (fConfigHandler != NULL)
-		fConfigHandler(fConfigCookie);
+		fConfigHandler(fDriverCookie);
 	return B_OK;
 }
 
@@ -252,4 +254,3 @@ VirtioDevice::DumpFeatures(const char* title, uint32 features,
 	}
 	TRACE("%s: %s\n", title, features_string);
 }
-

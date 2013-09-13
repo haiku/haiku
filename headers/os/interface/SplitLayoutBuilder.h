@@ -10,7 +10,7 @@
 class BSplitLayoutBuilder {
 public:
 								BSplitLayoutBuilder(
-									enum orientation orientation = B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									float spacing = B_USE_DEFAULT_SPACING);
 								BSplitLayoutBuilder(BSplitView* view);
 

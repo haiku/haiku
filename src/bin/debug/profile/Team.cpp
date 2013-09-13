@@ -1,5 +1,6 @@
 /*
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -86,7 +87,9 @@ Team::Init(team_id teamID, port_id debuggerPort)
 	// set team debugging flags
 	int32 teamDebugFlags = B_TEAM_DEBUG_THREADS
 		| B_TEAM_DEBUG_TEAM_CREATION | B_TEAM_DEBUG_IMAGES;
-	set_team_debugging_flags(fNubPort, teamDebugFlags);
+	error = set_team_debugging_flags(fNubPort, teamDebugFlags);
+	if (error != B_OK)
+		return error;
 
 	return B_OK;
 }
@@ -138,7 +141,10 @@ Team::InitThread(Thread* thread)
 //				| (traceChildThreads
 //					? B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS : 0);
 //		}
-		set_thread_debugging_flags(fNubPort, thread->ID(), threadDebugFlags);
+		status_t error = set_thread_debugging_flags(fNubPort, thread->ID(),
+			threadDebugFlags);
+		if (error != B_OK)
+			return error;
 
 		// start profiling
 		debug_nub_start_profiler message;
@@ -150,7 +156,7 @@ Team::InitThread(Thread* thread)
 		message.variable_stack_depth = gOptions.analyze_full_stack;
 
 		debug_nub_start_profiler_reply reply;
-		status_t error = send_debug_message(&fDebugContext,
+		error = send_debug_message(&fDebugContext,
 			B_DEBUG_START_PROFILER, &message, sizeof(message), &reply,
 			sizeof(reply));
 		if (error != B_OK || (error = reply.error) != B_OK) {

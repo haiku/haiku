@@ -263,18 +263,18 @@ private:
 			case 2:
 			{
 				LocatableFile* sourceFile = location.SourceFile();
+				BString data;
 				if (sourceFile != NULL) {
-					BString data;
 					data.SetToFormat("%s:%" B_PRId32, sourceFile->Name(),
 						location.GetSourceLocation().Line() + 1);
-					value.SetTo(data);
 				} else {
 					AutoLocker<Team> teamLocker(fTeam);
 					if (UserBreakpointInstance* instance
 							= breakpoint->InstanceAt(0)) {
-						value.SetTo(instance->Address());
+						data.SetToFormat("%#" B_PRIx64, instance->Address());
 					}
 				}
+				value.SetTo(data);
 				return true;
 			}
 			default:
@@ -380,6 +380,9 @@ BreakpointListView::UnsetListener()
 void
 BreakpointListView::UserBreakpointChanged(UserBreakpoint* breakpoint)
 {
+	if (breakpoint->IsHidden())
+		return;
+
 	BreakpointProxy proxy(breakpoint, NULL);
 	fBreakpointsTableModel->UpdateBreakpoint(&proxy);
 }

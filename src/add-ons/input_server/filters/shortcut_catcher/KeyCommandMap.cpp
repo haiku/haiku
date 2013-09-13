@@ -14,9 +14,12 @@
 #include <Beep.h>
 #include <Entry.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <MessageFilter.h>
 #include <NodeMonitor.h>
 #include <OS.h>
+#include <Path.h>
+#include <PathMonitor.h>
 #include <WindowScreen.h>
 
 #include "BitFieldTesters.h"
@@ -71,20 +74,19 @@ KeyCommandMap::KeyCommandMap(const char* file)
 	strcpy(fFileName, file);
 
 	BEntry fileEntry(fFileName);
-	// TODO: Using a BPathMonitor would be preferable. See discussion linked off
-	// ticket #6278.
-	if (!fileEntry.Exists())
-		BFile file(fFileName, B_READ_ONLY | B_CREATE_FILE);
-	
-	if (fileEntry.InitCheck() == B_NO_ERROR) {
-		node_ref nref;
 
-		if (fileEntry.GetNodeRef(&nref) == B_NO_ERROR)
-			watch_node(&nref, B_WATCH_STAT, this);
+	BEntry parent;
+	BPath parentPath;
+	if (fileEntry.GetParent(&parent) == B_OK
+		&& parent.GetPath(&parentPath) == B_OK) {
+		BPrivate::BPathMonitor::StartWatching(parentPath.Path(),
+			B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
 	}
 
-	BMessage msg(FILE_UPDATED);
-	PostMessage(&msg);
+	if (fileEntry.InitCheck() == B_NO_ERROR) {
+		BMessage msg(FILE_UPDATED);
+		PostMessage(&msg);
+	}
 
 	fPort = create_port(1, SHORTCUTS_CATCHER_PORT_NAME);
 	_PutMessageToPort();
@@ -100,7 +102,7 @@ KeyCommandMap::~KeyCommandMap()
 	for (int i = fInjects.CountItems() - 1; i >= 0; i--)
 		delete (BMessage*)fInjects.ItemAt(i);
 
-	stop_watching(this);
+	BPrivate::BPathMonitor::StopWatching(BMessenger(this, this));
 		// don't know if this is necessary, but it can't hurt
 	_DeleteHKSList(fSpecs);
 	delete [] fFileName;
@@ -219,18 +221,30 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 			_PutMessageToPort();
 			break;
 
-		case B_NODE_MONITOR:
+		case B_PATH_MONITOR:
+		{
+			const char* path = "";
+			// only fall through for appropriate file
+			if (!(msg->FindString("path", &path) == B_OK
+					&& strcmp(path, fFileName) == 0)) {
+				dev_t device;
+				ino_t node;
+				if (msg->FindInt32("device", &device) != B_OK
+					|| msg->FindInt64("node", &node) != B_OK
+					|| device != fNodeRef.device
+					|| node != fNodeRef.node)
+					break;
+			}
+		}
 		case FILE_UPDATED:
 		{
 			BMessage fileMsg;
 			BFile file(fFileName, B_READ_ONLY);
+			BList* newList = new BList;
+			BList* oldList = NULL;
 			if (file.InitCheck() == B_OK && fileMsg.Unflatten(&file) == B_OK) {
-				BList* newList = new BList;
 
-				// whatever this is set to will be deleted below.
-				// defaults to no deletion
-				BList* oldList = NULL;
-
+				file.GetNodeRef(&fNodeRef);
 				int i = 0;
 				BMessage msg;
 				while (fileMsg.FindMessage("spec", i++, &msg) == B_OK) {
@@ -241,6 +255,27 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 					if (msg.FindInt32("key", (int32*) &key) == B_OK
 						&& msg.FindMessage("act", &actMsg) == B_OK
 						&& msg.FindMessage("modtester", &testerMsg) == B_OK) {
+						
+						// Leave handling of add-ons shortcuts to Tracker
+						BString command;
+						if (msg.FindString("command", &command) == B_OK) {
+							BPath path;
+							if (find_directory(B_SYSTEM_ADDONS_DIRECTORY, &path) == B_OK) {
+								path.Append("Tracker/");
+								if (command.FindFirst(path.Path()) != B_ERROR)
+									continue;
+							}
+							if (find_directory(B_COMMON_ADDONS_DIRECTORY, &path) == B_OK) {
+								path.Append("Tracker/");
+								if (command.FindFirst(path.Path()) != B_ERROR)
+									continue;
+							}
+							if (find_directory(B_USER_ADDONS_DIRECTORY, &path) == B_OK) {
+								path.Append("Tracker/");
+								if (command.FindFirst(path.Path()) != B_ERROR)
+									continue;
+							}
+						}
 						BArchivable* archive = instantiate_object(&testerMsg);
 						if (BitFieldTester* tester
 								= dynamic_cast<BitFieldTester*>(archive)) {
@@ -257,18 +292,20 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 							delete archive;
 					}
 				}
-
-				if (fSyncSpecs.Lock()) {
-					// swap in the new list
-					oldList = fSpecs;
-					fSpecs = newList;
-					fSyncSpecs.Unlock();
-				} else {
-					// wtf? This shouldn't happen...
-					oldList = newList; // but clean up if it does
-				}
-				_DeleteHKSList(oldList);
+			} else {
+				fNodeRef.device = -1;
+				fNodeRef.node = -1;
 			}
+			if (fSyncSpecs.Lock()) {
+				// swap in the new list
+				oldList = fSpecs;
+				fSpecs = newList;
+				fSyncSpecs.Unlock();
+			} else {
+				// wtf? This shouldn't happen...
+				oldList = newList; // but clean up if it does
+			}
+			_DeleteHKSList(oldList);
 		}
 		break;
 	}

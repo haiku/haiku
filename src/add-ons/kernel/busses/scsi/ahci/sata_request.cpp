@@ -182,7 +182,7 @@ sata_request::abort()
 
 
 void
-sata_request::wait_for_completition()
+sata_request::wait_for_completion()
 {
 	if (fCcb) panic("wrong usage");
 	acquire_sem(fCompletionSem);
@@ -190,7 +190,7 @@ sata_request::wait_for_completition()
 
 
 int
-sata_request::completition_status()
+sata_request::completion_status()
 {
 	if (fCcb) panic("wrong usage");
 	return fCompletionStatus;

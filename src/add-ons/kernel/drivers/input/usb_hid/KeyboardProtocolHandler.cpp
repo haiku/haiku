@@ -224,7 +224,7 @@ KeyboardProtocolHandler::AddHandlers(HIDDevice &device,
 	for (uint32 i = 0; i < inputReportCount; i++) {
 		HIDReport *inputReport = inputReports[i];
 
-		bool mayHaveOutput = false;
+//		bool mayHaveOutput = false;
 		bool foundKeyboardUsage = false;
 		for (uint32 j = 0; j < inputReport->CountItems(); j++) {
 			HIDReportItem *item = inputReport->ItemAt(j);
@@ -238,7 +238,7 @@ KeyboardProtocolHandler::AddHandlers(HIDDevice &device,
 					&& item->Array())) {
 				// found at least one item with a keyboard usage or with
 				// a consumer/button usage that is handled like a key
-				mayHaveOutput = item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD;
+//				mayHaveOutput = item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD;
 				foundKeyboardUsage = true;
 				break;
 			}

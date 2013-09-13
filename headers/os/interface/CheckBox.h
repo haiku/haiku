@@ -17,9 +17,9 @@ public:
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BCheckBox(const char* name, const char* label,
 									BMessage* message, uint32 flags
-										= B_WILL_DRAW | B_NAVIGABLE); 
+										= B_WILL_DRAW | B_NAVIGABLE);
 								BCheckBox(const char* label,
-									BMessage* message = NULL); 
+									BMessage* message = NULL);
 								BCheckBox(BMessage* archive);
 
 	virtual						~BCheckBox();
@@ -55,6 +55,7 @@ public:
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
+	virtual	BAlignment			LayoutAlignment();
 
 	virtual	void				MakeFocus(bool focused = true);
 

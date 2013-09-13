@@ -7,7 +7,7 @@ You have %num new message for %name.	filter		%name より\n%num 通のメッセ�
 Log window	ConfigView		ログウィンドウ
 Central beep	ConfigView		ビープ音 (すべてのアカウント)
 Beep	ConfigView		ビープ音
-Method:	ConfigView		方法：
+Method:	ConfigView		方法:
 Central alert	ConfigView		警告ウィンドウ (すべてのアカウント)
 Alert	ConfigView		警告ウィンドウ
 none	ConfigView		無し

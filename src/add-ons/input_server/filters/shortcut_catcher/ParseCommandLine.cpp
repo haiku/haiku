@@ -26,9 +26,10 @@
 #include <SupportKit.h>
 
 
+const char *kTrackerSignature = "application/x-vnd.Be-TRAK";
+
 // This char is used to hold words together into single words...
 #define GUNK_CHAR 0x01
-#define PATHTOTRACKER "/system/Tracker"
 
 // Turn all spaces that are not-to-be-counted-as-spaces into GUNK_CHAR chars.
 static void
@@ -219,7 +220,6 @@ CloneArgv(char** argv)
 }
 
 
-
 BString
 ParseArgvZeroFromString(const char* command)
 {
@@ -299,24 +299,22 @@ LaunchCommand(char** argv, int32 argc)
 		// than launch.
 		BDirectory testDir(&entry);
 		if (testDir.InitCheck() == B_NO_ERROR) {
-			// Hack way to do this--really I should be able to do this by 
-			// sending a BMessage. But how? When I finally get my copy of the
-			// BeOS Bible, maybe then I'll find out.
-			BPath trackerPath;
-			if (find_directory(B_SYSTEM_DIRECTORY, &trackerPath) != B_OK
-				|| trackerPath.Append("Tracker") != B_OK) {
-				return B_ENTRY_NOT_FOUND;
-			}
-			BString cmd(trackerPath.Path());
-			cmd << " '" << argv[0] << "'";
-			system(cmd.String());
-			return B_NO_ERROR;
+			entry_ref ref;
+			status_t status = entry.GetRef(&ref);
+			if (status < B_OK)
+				return status;
+
+			BMessenger target(kTrackerSignature);
+			BMessage message(B_REFS_RECEIVED);
+			message.AddRef("refs", &ref);
+
+			return target.SendMessage(&message);
 		} else {
 			// It's not a directory. Must be a file.
 			entry_ref ref;
 			if (entry.GetRef(&ref) == B_NO_ERROR) {
 				if (argc > 1) 
-					be_roster->Launch(&ref, argc-1, &argv[1]);
+					be_roster->Launch(&ref, argc - 1, &argv[1]);
 				else
 					be_roster->Launch(&ref);
 				return B_NO_ERROR;

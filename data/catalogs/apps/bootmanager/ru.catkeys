@@ -44,7 +44,7 @@ Update	DrivesPage	Button	Обновить
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Пожалуйста, выберите файл, содержащий главную загрузочную запись (MBR) для восстановления. Этот файл был создан при первой установке менеджера загрузки.
 Old Master Boot Record Saved failure	BootManagerController	Title	Предыдущая загрузочная запись (MBR) сохранена
 Drives	DrivesPage	Title	Диски
-No space available!	DrivesPage	Cannot install	Невозможно записать MBR!
+No space available!	DrivesPage	Cannot install	Нет места для MBR!
 Never	DefaultPartitionPage		бесконечно
 Partition table not compatible	BootManagerController	Title	Несовместимая таблица разделов
 Old Master Boot Record saved	BootManagerController	Title	Предыдущая загрузочная запись (MBR) сохранена

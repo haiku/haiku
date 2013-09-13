@@ -306,7 +306,8 @@ CallbackServer::ConnectionThread(ConnectionEntry* entry)
 			return result;
 		}
 
-		CallbackRequest* request = new CallbackRequest(buffer, size);
+		CallbackRequest* request
+			= new(std::nothrow) CallbackRequest(buffer, size);
 		if (request == NULL) {
 			free(buffer);
 			continue;	

@@ -16,8 +16,11 @@
 #define VIRTIO_DEVICE_ID_ENTROPY	0x04
 #define VIRTIO_DEVICE_ID_BALLOON	0x05
 #define VIRTIO_DEVICE_ID_IOMEMORY	0x06
+#define VIRTIO_DEVICE_ID_RP_MESSAGE	0x07
 #define VIRTIO_DEVICE_ID_SCSI		0x08
 #define VIRTIO_DEVICE_ID_9P			0x09
+#define VIRTIO_DEVICE_ID_RP_SERIAL	0x0b
+#define VIRTIO_DEVICE_ID_CAIF		0x0c
 
 #define VIRTIO_FEATURE_TRANSPORT_MASK	((1 << 28) - 1)
 
@@ -50,7 +53,7 @@ typedef void* virtio_device;
 // queue cookie, issued by virtio bus manager
 typedef void* virtio_queue;
 // callback function for requests
-typedef void (*virtio_callback_func)(void *cookie);
+typedef void (*virtio_callback_func)(void* driverCookie, void *cookie);
 // callback function for interrupts
 typedef void (*virtio_intr_func)(void *cookie);
 
@@ -78,10 +81,10 @@ typedef struct {
 		size_t bufferSize);
 	status_t (*write_device_config)(void* cookie, uint8 offset,
 		const void* buffer, size_t bufferSize);
-	
+
 	uint16	(*get_queue_ring_size)(void* cookie, uint16 queue);
 	status_t (*setup_queue)(void* cookie, uint16 queue, phys_addr_t phy);
-	status_t (*setup_interrupt)(void* cookie);
+	status_t (*setup_interrupt)(void* cookie, uint16 queueCount);
 	void	(*notify_queue)(void* cookie, uint16 queue);
 } virtio_sim_interface;
 
@@ -92,7 +95,7 @@ typedef struct {
 
 	status_t (*negociate_features)(virtio_device cookie, uint32 supported,
 		uint32* negociated, const char* (*get_feature_name)(uint32));
-	
+
 	status_t (*read_device_config)(virtio_device cookie, uint8 offset,
 		void* buffer, size_t bufferSize);
 	status_t (*write_device_config)(virtio_device cookie, uint8 offset,
@@ -102,7 +105,7 @@ typedef struct {
 		virtio_queue *queues);
 
 	status_t (*setup_interrupt)(virtio_device cookie,
-		virtio_intr_func config_handler, void* configCookie);
+		virtio_intr_func config_handler, void* driverCookie);
 
 	status_t (*queue_request)(virtio_queue queue,
 		const physical_entry *readEntry,

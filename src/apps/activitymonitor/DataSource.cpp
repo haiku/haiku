@@ -290,7 +290,7 @@ void
 MemoryDataSource::Print(BString& text, int64 value) const
 {
 	char buffer[32];
-	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%.1f MB"), value / 1048576.0);
+	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%.1f MiB"), value / 1048576.0);
 
 	text = buffer;
 }
@@ -299,7 +299,7 @@ MemoryDataSource::Print(BString& text, int64 value) const
 const char*
 MemoryDataSource::Unit() const
 {
-	return B_TRANSLATE("MB");
+	return B_TRANSLATE("MiB");
 }
 
 
@@ -1231,7 +1231,7 @@ void
 NetworkUsageDataSource::Print(BString& text, int64 value) const
 {
 	char buffer[32];
-	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%.1f KB/s"), value / 1024.0);
+	snprintf(buffer, sizeof(buffer), B_TRANSLATE("%.1f KiB/s"), value / 1024.0);
 
 	text = buffer;
 }

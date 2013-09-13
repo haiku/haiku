@@ -87,4 +87,4 @@
 		dprintf( "%s%s: "format"\n", FUNC_NAME); DEBUG_WAIT_ERROR \
 	}} while( 0 )
 
-#endif	/* _BENAPHORE_H */
+#endif	/* _WRAPPER_H */

@@ -45,6 +45,7 @@ private:
 			BString			fCellText[kStatusCellCount];
 			float			fCellWidth[kStatusCellCount];
 			bool			fReadOnly;
+			bool			fCanUnlock;
 			BString			fEncoding;
 };
 

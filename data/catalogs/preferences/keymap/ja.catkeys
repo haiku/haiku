@@ -12,12 +12,12 @@ Circumflex trigger	Keymap window		サーカムフレックスのトリガー
 Diaeresis trigger	Keymap window		ウムラウトのトリガー
 Disabled	Modifier keys window	Do nothing	無効
 Open…	Keymap window		開く…
-System:	Keymap window		システム：
+System:	Keymap window		システム:
 Set modifier keys…	Keymap window		修飾キーを設定…
 Option:	Modifier keys window	Option key role name	Option:
 Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift キー
-User:	Keymap window		ユーザー：
+User:	Keymap window		ユーザー:
 Key	Modifier keys window	As in a computer keyboard key	キー
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl キー
 Control:	Modifier keys window	Control key role name	Control:

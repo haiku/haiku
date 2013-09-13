@@ -36,6 +36,7 @@ class ControlView : public BView {
 
 	private:
 		void _AddFontMenu(BRect rect);
+		void _AddDrawingModeMenu(BRect rect);
 		void _UpdateFontmenus(bool setInitialfont = false);
 		void _DeselectOldItems();
 

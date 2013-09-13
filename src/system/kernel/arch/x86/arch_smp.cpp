@@ -121,8 +121,8 @@ arch_smp_send_broadcast_ici(void)
 	uint32 config;
 	cpu_status state = disable_interrupts();
 
-	config = apic_read(APIC_INTR_COMMAND_1) & APIC_INTR_COMMAND_1_MASK;
-	apic_write(APIC_INTR_COMMAND_1, config | 0xfd | APIC_DELIVERY_MODE_FIXED
+	config = apic_intr_command_1() & APIC_INTR_COMMAND_1_MASK;
+	apic_set_intr_command_1(config | 0xfd | APIC_DELIVERY_MODE_FIXED
 		| APIC_INTR_COMMAND_1_ASSERT
 		| APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL
 		| APIC_INTR_COMMAND_1_DEST_ALL_BUT_SELF);
@@ -140,18 +140,18 @@ arch_smp_send_ici(int32 target_cpu)
 
 	state = disable_interrupts();
 
-	config = apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK;
-	apic_write(APIC_INTR_COMMAND_2, config | sCPUAPICIds[target_cpu] << 24);
+	config = apic_intr_command_2() & APIC_INTR_COMMAND_2_MASK;
+	apic_set_intr_command_2(config | sCPUAPICIds[target_cpu] << 24);
 
-	config = apic_read(APIC_INTR_COMMAND_1) & APIC_INTR_COMMAND_1_MASK;
-	apic_write(APIC_INTR_COMMAND_1, config | 0xfd | APIC_DELIVERY_MODE_FIXED
+	config = apic_intr_command_1() & APIC_INTR_COMMAND_1_MASK;
+	apic_set_intr_command_1(config | 0xfd | APIC_DELIVERY_MODE_FIXED
 		| APIC_INTR_COMMAND_1_ASSERT
 		| APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL
 		| APIC_INTR_COMMAND_1_DEST_FIELD);
 
 	timeout = 100000000;
 	// wait for message to be sent
-	while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0 && --timeout != 0)
+	while ((apic_intr_command_1() & APIC_DELIVERY_STATUS) != 0 && --timeout != 0)
 		asm volatile ("pause;");
 
 	if (timeout == 0)

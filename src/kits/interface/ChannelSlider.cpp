@@ -83,7 +83,7 @@ BChannelSlider::BChannelSlider(BRect area, const char* name, const char* label,
 
 
 BChannelSlider::BChannelSlider(BRect area, const char* name, const char* label,
-	BMessage* model, enum orientation orientation, int32 channels,
+	BMessage* model, orientation orientation, int32 channels,
 		uint32 resizeMode, uint32 flags)
 	: BChannelControl(area, name, label, model, channels, resizeMode, flags)
 
@@ -94,7 +94,7 @@ BChannelSlider::BChannelSlider(BRect area, const char* name, const char* label,
 
 
 BChannelSlider::BChannelSlider(const char* name, const char* label,
-	BMessage* model, enum orientation orientation, int32 channels,
+	BMessage* model, orientation orientation, int32 channels,
 		uint32 flags)
 	: BChannelControl(name, label, model, channels, flags)
 
@@ -502,7 +502,7 @@ BChannelSlider::Orientation() const
 
 
 void
-BChannelSlider::SetOrientation(enum orientation orientation)
+BChannelSlider::SetOrientation(orientation orientation)
 {
 	bool isVertical = orientation == B_VERTICAL;
 	if (isVertical != fIsVertical) {

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -68,7 +69,7 @@ static const attribute_name_info_entry kAttributeNameInfos[] = {
 	{ ENTRY(prototyped),			AC_FLAG },
 	{ ENTRY(return_addr),			AC_BLOCK | AC_LOCLISTPTR },
 	{ ENTRY(start_scope),			AC_CONSTANT },
-	{ ENTRY(bit_stride),			AC_CONSTANT },
+	{ ENTRY(bit_stride),			AC_BLOCK | AC_CONSTANT | AC_REFERENCE },
 	{ ENTRY(upper_bound),			AC_BLOCK | AC_CONSTANT | AC_REFERENCE },
 	{ ENTRY(abstract_origin),		AC_REFERENCE },
 	{ ENTRY(accessibility),			AC_CONSTANT },
@@ -89,7 +90,7 @@ static const attribute_name_info_entry kAttributeNameInfos[] = {
 	{ ENTRY(friend),				AC_REFERENCE },
 	{ ENTRY(identifier_case),		AC_CONSTANT },
 	{ ENTRY(macro_info),			AC_MACPTR },
-	{ ENTRY(namelist_item),			AC_BLOCK },
+	{ ENTRY(namelist_item),			AC_BLOCK | AC_REFERENCE },
 	{ ENTRY(priority),				AC_REFERENCE },
 	{ ENTRY(segment),				AC_BLOCK | AC_LOCLISTPTR },
 	{ ENTRY(specification),			AC_REFERENCE },
@@ -127,10 +128,26 @@ static const attribute_name_info_entry kAttributeNameInfos[] = {
 	{ ENTRY(elemental),				AC_FLAG },
 	{ ENTRY(pure),					AC_FLAG },
 	{ ENTRY(recursive),				AC_FLAG },
+	{ ENTRY(signature),				AC_REFERENCE },
+	{ ENTRY(main_subprogram),		AC_FLAG },
+	{ ENTRY(data_bit_offset),		AC_CONSTANT },
+	{ ENTRY(const_expr),			AC_FLAG },
+	{ ENTRY(enum_class),			AC_FLAG },
+	{ ENTRY(linkage_name),			AC_STRING },
+	{ ENTRY(call_site_value),		AC_BLOCK },
+	{ ENTRY(call_site_data_value),	AC_BLOCK },
+	{ ENTRY(call_site_target),		AC_BLOCK },
+	{ ENTRY(call_site_target_clobbered),
+									AC_BLOCK },
+	{ ENTRY(tail_call),				AC_FLAG },
+	{ ENTRY(all_tail_call_sites),	AC_FLAG },
+	{ ENTRY(all_call_sites),		AC_FLAG },
+	{ ENTRY(all_source_call_sites),	AC_FLAG },
+
 	{}
 };
 
-static const uint32 kAttributeNameInfoCount = DW_AT_recursive + 1;
+static const uint32 kAttributeNameInfoCount = DW_AT_linkage_name + 9;
 static attribute_name_info_entry sAttributeNameInfos[kAttributeNameInfoCount];
 
 
@@ -160,10 +177,16 @@ static const attribute_info_entry kAttributeFormInfos[] = {
 	{ ENTRY(ref4),			AC_REFERENCE },
 	{ ENTRY(ref8),			AC_REFERENCE },
 	{ ENTRY(ref_udata),		AC_REFERENCE },
+	{ ENTRY(indirect),		AC_REFERENCE },
+	{ ENTRY(sec_offset),	AC_LINEPTR | AC_LOCLISTPTR | AC_MACPTR
+								| AC_RANGELISTPTR },
+	{ ENTRY(exprloc),		AC_BLOCK },
+	{ ENTRY(flag_present),	AC_FLAG },
+	{ ENTRY(ref_sig8),		AC_REFERENCE },
 	{}
 };
 
-static const uint32 kAttributeFormInfoCount = DW_FORM_ref_udata + 1;
+static const uint32 kAttributeFormInfoCount = DW_FORM_ref_sig8 + 1;
 static attribute_info_entry sAttributeFormInfos[kAttributeFormInfoCount];
 
 static struct InitAttributeInfos {
@@ -171,7 +194,12 @@ static struct InitAttributeInfos {
 	{
 		for (uint32 i = 0; kAttributeNameInfos[i].name != NULL; i++) {
 			const attribute_name_info_entry& entry = kAttributeNameInfos[i];
-			sAttributeNameInfos[entry.value] = entry;
+			if (entry.value <= DW_AT_linkage_name)
+				sAttributeNameInfos[entry.value] = entry;
+			else {
+				sAttributeNameInfos[DW_AT_linkage_name + 1
+					+ (entry.value - DW_AT_call_site_value)] = entry;
+			}
 		}
 
 		for (uint32 i = 0; kAttributeFormInfos[i].name != NULL; i++) {
@@ -185,8 +213,15 @@ static struct InitAttributeInfos {
 uint16
 get_attribute_name_classes(uint32 name)
 {
-	return name < kAttributeNameInfoCount
-		? sAttributeNameInfos[name].classes : 0;
+	if (name < DW_AT_linkage_name)
+		return sAttributeNameInfos[name].classes;
+	else if (name >= DW_AT_call_site_value
+		&& name <= DW_AT_all_source_call_sites) {
+		return sAttributeNameInfos[DW_AT_linkage_name + 1
+			+ (name - DW_AT_call_site_value)].classes;
+	}
+
+	return 0;
 }
 
 
@@ -217,8 +252,15 @@ get_attribute_class(uint32 name, uint32 form)
 const char*
 get_attribute_name_name(uint32 name)
 {
-	return name < kAttributeNameInfoCount
-		? sAttributeNameInfos[name].name : NULL;
+	if (name < DW_AT_linkage_name)
+		return sAttributeNameInfos[name].name;
+	else if (name >= DW_AT_call_site_value
+		&& name <= DW_AT_all_source_call_sites) {
+		return sAttributeNameInfos[DW_AT_linkage_name + 1 +
+				(name - DW_AT_call_site_value)].name;
+	}
+
+	return NULL;
 }
 
 

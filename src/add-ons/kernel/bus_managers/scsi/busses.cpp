@@ -217,29 +217,30 @@ scsi_init_bus(device_node *node, void **cookie)
 	bus->dma_params.max_sg_block_size &= ~bus->dma_params.alignment;
 
 	if (bus->dma_params.alignment > B_PAGE_SIZE) {
-		SHOW_ERROR(0, "Alignment (0x%x) must be less then B_PAGE_SIZE",
-			(int)bus->dma_params.alignment);
+		SHOW_ERROR(0, "Alignment (0x%" B_PRIx32 ") must be less then "
+			"B_PAGE_SIZE", bus->dma_params.alignment);
 		res = B_ERROR;
 		goto err;
 	}
 
 	if (bus->dma_params.max_sg_block_size < 1) {
-		SHOW_ERROR(0, "Max s/g block size (0x%x) is too small",
-			(int)bus->dma_params.max_sg_block_size);
+		SHOW_ERROR(0, "Max s/g block size (0x%" B_PRIx32 ") is too small",
+			bus->dma_params.max_sg_block_size);
 		res = B_ERROR;
 		goto err;
 	}
 
 	if (bus->dma_params.dma_boundary < B_PAGE_SIZE - 1) {
-		SHOW_ERROR(0, "DMA boundary (0x%x) must be at least B_PAGE_SIZE",
-			(int)bus->dma_params.dma_boundary);
+		SHOW_ERROR(0, "DMA boundary (0x%" B_PRIx32 ") must be at least "
+			"B_PAGE_SIZE", bus->dma_params.dma_boundary);
 		res = B_ERROR;
 		goto err;
 	}
 
 	if (bus->dma_params.max_blocks < 1 || bus->dma_params.max_sg_blocks < 1) {
-		SHOW_ERROR(0, "Max blocks (%d) and max s/g blocks (%d) must be at least 1",
-			(int)bus->dma_params.max_blocks, (int)bus->dma_params.max_sg_blocks);
+		SHOW_ERROR(0, "Max blocks (%" B_PRIu32 ") and max s/g blocks (%"
+			B_PRIu32 ") must be at least 1", bus->dma_params.max_blocks,
+			bus->dma_params.max_sg_blocks);
 		res = B_ERROR;
 		goto err;
 	}

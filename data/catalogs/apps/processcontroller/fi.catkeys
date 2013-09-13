@@ -1,5 +1,6 @@
-1	finnish	x-vnd.Haiku-ProcessController	2886374724
+1	finnish	x-vnd.Haiku-ProcessController	1848752768
 Memory usage	ProcessController		Muistikäyttö
+Kill this team!	ProcessController		Tuhoa tämä säie!
 Idle priority	ProcessController		Joutokäyntiprioriteetti
 Restart Deskbar	ProcessController		Käynnistä Työpöytäpalkki uudelleen
 Custom priority	ProcessController		Räätälöity prioriteetti
@@ -7,6 +8,7 @@ This team is already gone…	ProcessController		Tämä ryhmä on jo poistunut...
 Error saving file	ProcessController		Virhe tallennettaessa tiedostoa
 Real-time priority	ProcessController		Ajantasaprioriteetti
 Your setting file could not be saved!\n(%s)	ProcessController		Asetustiedostosi tallentaminen epäonnistui!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Mitä haluat tehdä säikeelle ”%s”?
 This thread is already gone…	ProcessController		Tämä säie on jo poistunut...
 Cancel	ProcessController		Peru
 Display priority	ProcessController		Näyttöprioriteetti
@@ -36,6 +38,7 @@ Threads and CPU usage	ProcessController		Säikeet ja prosessorikäyttö
 Urgent display priority	ProcessController		Kiireellinen näyttöprioriteetti
 OK	ProcessController		Valmis
 Damned!	ProcessController		Kirottua!
+Debug this team!	ProcessController		Vikajäljitä tätä säiettä!
 Usage: %s [-deskbar]\n	ProcessController		Käyttö: %s [-deskbar]\n
 ProcessController	System name		Prosessiohjain
 Real-time display priority	ProcessController		Ajantasanäyttöprioriteetti

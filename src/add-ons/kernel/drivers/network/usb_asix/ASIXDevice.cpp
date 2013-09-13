@@ -226,8 +226,13 @@ ASIXDevice::Read(uint8 *buffer, size_t *numBytes)
 
 		*numBytes = header.Length();
 
-		if (fActualLengthRead - sizeof(TRXHeader) > header.Length()) {
+		// the device pushes packets 16bit aligned
+		if (fActualLengthRead - sizeof(TRXHeader) > header.Length()
+				+ (header.Length() % 2)) {
 			TRACE_ALWAYS("MISMATCH of the frame length: hdr %d; received:%d\n",
+				header.Length(), fActualLengthRead - sizeof(TRXHeader));
+		} else if (fActualLengthRead - sizeof(TRXHeader) < header.Length()) {
+			TRACE_ALWAYS("Error: received too little data: hdr %d; received:%d\n",
 				header.Length(), fActualLengthRead - sizeof(TRXHeader));
 		}
 
@@ -750,4 +755,3 @@ ASIXDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 		device->fNotifyBufferLength, _NotifyCallback, device);
 	atomic_add(&device->fInsideNotify, -1);
 }
-

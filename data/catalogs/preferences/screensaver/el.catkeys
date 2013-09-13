@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ScreenSaver	215605989
+1	greek, modern (1453-)	x-vnd.Haiku-ScreenSaver	3630119516
 Could not load screen saver	ScreenSaver		Δεν ήταν δυνατή η φόρτωση της προφύλαξης οθόνης
 30 seconds	ScreenSaver		30 δευτερόλεπτα
 Start screensaver	ScreenSaver		Εκκίνηση προφύλαξης οθόνης
@@ -7,7 +7,6 @@ Password:	ScreenSaver		Κωδικός:
 Password lock	ScreenSaver		Κωδικός κλειδώματος
 Add…	ScreenSaver		Προσθήκη
 Screensavers	ScreenSaver		Προφυλάξεις οθόνης
-mouse is here	ScreenSaver		το ποντίκι είναι εδώ
 Display Power Management Signaling not available	ScreenSaver		Η προβολή της σηματοδότησης διαχείρισης ενέργειας δεν είναι διαθέσιμη
 ScreenSaver	System name		ScreenSaver
 Test	ScreenSaver		Τέστ
@@ -17,11 +16,9 @@ Cancel	ScreenSaver		Άκυρο
 Turn off screen	ScreenSaver		Απενεργοποίηση οθόνης
 No options available	ScreenSaver		Μη διαθέσιμες επιλογές
 Password Window	ScreenSaver		Κωδικός παραθύρου
-Fade now when	ScreenSaver		Να εξαφανίζεται όταν
 Screensaver settings	ScreenSaver		Ρυθμίσεις προφύλαξης οθόνης
 Passwords don't match. Please try again.	ScreenSaver		Οι κωδικοί πρόσβασης δεν ταιριάζουν. Παρακαλώ δοκιμάστε ξανά.
 OK	ScreenSaver		Εντάξει
-Don't fade when	ScreenSaver		Να μην εξαφανίζεται όταν
 Blackness	ScreenSaver		Σκοτεινότητα
 Use custom password	ScreenSaver		Χρήση προσαρμοσμένου κωδικού πρόσβασης
 Done	ScreenSaver		Έγινε

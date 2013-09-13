@@ -32,8 +32,9 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 	size_t cur_idx;
 	size_t left_len;
 
-	SHOW_FLOW(3, "vec_count=%lu, vec_offset=%lu, len=%lu, max_entries=%lu",
-		vec_count, vec_offset, len, max_entries);
+	SHOW_FLOW(3, "vec_count=%" B_PRIuSIZE ", vec_offset=%" B_PRIuSIZE ", len=%"
+		B_PRIuSIZE ", max_entries=%" B_PRIuSIZE, vec_count, vec_offset, len,
+		max_entries);
 
 	// skip iovec blocks if needed
 	while (vec_count > 0 && vec_offset > vec->iov_len) {
@@ -117,8 +118,8 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 	*num_entries = cur_idx;
 	*mapped_len = len - left_len;
 
-	SHOW_FLOW( 3, "num_entries=%d, mapped_len=%x",
-		(int)*num_entries, (int)*mapped_len );
+	SHOW_FLOW( 3, "num_entries=%" B_PRIuSIZE ", mapped_len=%" B_PRIxSIZE,
+		*num_entries, *mapped_len);
 
 	return B_OK;
 }

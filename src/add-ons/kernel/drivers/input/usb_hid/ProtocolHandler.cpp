@@ -14,9 +14,10 @@
 #include "ProtocolHandler.h"
 
 // includes for the different protocol handlers
+#include "JoystickProtocolHandler.h"
 #include "KeyboardProtocolHandler.h"
 #include "MouseProtocolHandler.h"
-#include "JoystickProtocolHandler.h"
+#include "TabletProtocolHandler.h"
 
 
 ProtocolHandler::ProtocolHandler(HIDDevice *device, const char *basePath,
@@ -76,7 +77,6 @@ ProtocolHandler::AddHandlers(HIDDevice &device, ProtocolHandler *&handlerList,
 	TRACE("root collection holds %lu application collection%s\n",
 		appCollectionCount, appCollectionCount != 1 ? "s" : "");
 
-	handlerCount = 0;
 	for (uint32  i = 0; i < appCollectionCount; i++) {
 		HIDCollection *collection = rootCollection->ChildAtFlat(
 			COLLECTION_APPLICATION, i);
@@ -86,11 +86,19 @@ ProtocolHandler::AddHandlers(HIDDevice &device, ProtocolHandler *&handlerList,
 		TRACE("collection usage page %u usage id %u\n",
 			collection->UsagePage(), collection->UsageID());
 
+		// NOTE: The driver publishes devices for all added handlers.
+
+		// TODO: How does this work if a device is not a compound device
+		// like a keyboard with built-in touchpad, but allows multiple
+		// alternative configurations like a tablet that works as either
+		// regular (relative) mouse, or (absolute) tablet?
 		KeyboardProtocolHandler::AddHandlers(device, *collection, handlerList);
-		MouseProtocolHandler::AddHandlers(device, *collection, handlerList);
 		JoystickProtocolHandler::AddHandlers(device, *collection, handlerList);
+		MouseProtocolHandler::AddHandlers(device, *collection, handlerList);
+		TabletProtocolHandler::AddHandlers(device, *collection, handlerList);
 	}
 
+	handlerCount = 0;
 	ProtocolHandler *handler = handlerList;
 	while (handler != NULL) {
 		handler = handler->NextHandler();

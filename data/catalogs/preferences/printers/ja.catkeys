@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Be-PRNT	2674539197
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		プリンター： %printer_name%\nドライバー： %driver%\n
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		プリンター: %printer_name%\nドライバー: %driver%\n
 Waiting	JobListView		待機中
 Print test page	PrintersWindow		テストページを印刷
 Test Page	TestPageView		テストページ
@@ -10,20 +10,20 @@ Add printer	AddPrinterDialog		プリンターを追加
 Green	TestPageView		緑
 Printers	PrintersWindow		プリンター
 Default Printer	PrinterListView		通常使うプリンター
-Transport: %transport% %transport_address%	PrinterListView		転送先： %transport% %transport_address%
+Transport: %transport% %transport_address%	PrinterListView		転送先: %transport% %transport_address%
 No pending jobs.	PrinterListView		印刷待ち中のジョブはありません。
 pages	JobListView		ページ
 Printers	System name		プリンター
 Processing	JobListView		処理中
 Red	TestPageView		赤
-Printer name:	AddPrinterDialog		プリンター名：
-Driver: %driver%	PrinterListView		ドライバー： %driver%
+Printer name:	AddPrinterDialog		プリンター名:
+Driver: %driver%	PrinterListView		ドライバー: %driver%
  pending jobs.	PrinterListView		個のジョブが印刷待ちです。
 Black	TestPageView		黒
 Restart job	PrintersWindow		ジョブを再開
 Add	AddPrinterDialog		追加
 Make default	PrintersWindow		通常使うプリンターに設定
-Transport: %transport% %transport_address%	TestPageView		転送先： %transport% %transport_address%
+Transport: %transport% %transport_address%	TestPageView		転送先: %transport% %transport_address%
 Cancel job	PrintersWindow		ジョブを中止
 Yellow	TestPageView		黄
 Blue	TestPageView		青
@@ -31,14 +31,14 @@ Blue	TestPageView		青
 Remove	PrintersWindow		削除
 <pick one>	AddPrinterDialog		<１つ選択>
 Add …	PrintersWindow		追加…
-Print jobs for 	PrintersWindow		このプリンターのジョブ： 
+Print jobs for 	PrintersWindow		このプリンターのジョブ:
 Failed	JobListView		エラー
 %.2f KB	JobListView		%.2f KB
 Magenta	TestPageView		マゼンタ
 Completed	JobListView		完了
 No printer found!	TransportMenu		プリンターが見つかりません。
-Print jobs: No printer selected	PrintersWindow		印刷ジョブ：プリンターが選択されていません
+Print jobs: No printer selected	PrintersWindow		印刷ジョブ: プリンターが選択されていません
 Cyan	TestPageView		シアン
 Unknown status	JobListView		状態が不明
-Connected to:	AddPrinterDialog		ポート：
-Printer type:	AddPrinterDialog		プリンターの種類：
+Connected to:	AddPrinterDialog		ポート:
+Printer type:	AddPrinterDialog		プリンターの種類:

@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUG_EVENT_H
@@ -8,6 +9,7 @@
 #include <debugger.h>
 
 #include "ImageInfo.h"
+#include "SyscallInfo.h"
 #include "Types.h"
 
 
@@ -193,6 +195,19 @@ public:
 
 private:
 			ImageInfo			fInfo;
+};
+
+
+class PostSyscallEvent : public DebugEvent {
+public:
+								PostSyscallEvent(team_id team,
+									thread_id thread,
+									const SyscallInfo& info);
+
+			const SyscallInfo&	GetSyscallInfo() const	{ return fInfo; }
+
+private:
+			SyscallInfo			fInfo;
 };
 
 

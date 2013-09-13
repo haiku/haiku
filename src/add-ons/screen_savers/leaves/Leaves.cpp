@@ -1,11 +1,13 @@
 /*
- * Copyright 2010-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Deyan Genovski, deangenovski@gmail.com
  *		Geoffry Song, goffrie@gmail.com
  */
+
+
 #include "Leaves.h"
 
 #include <stdlib.h>
@@ -60,6 +62,7 @@ static const int kMinimumDropRate = 2, kMaximumDropRate = 50;
 static const int kMinimumLeafSize = 50, kMaximumLeafSize = 1000;
 static const int kMaximumSizeVariation = 200;
 
+// message constants
 enum {
 	MSG_SET_DROP_RATE		= 'drop',
 	MSG_SET_LEAF_SIZE		= 'size',
@@ -77,9 +80,6 @@ instantiate_screen_saver(BMessage* msg, image_id image)
 Leaves::Leaves(BMessage* archive, image_id id)
 	:
 	BScreenSaver(archive, id),
-	fDropRateSlider(NULL),
-	fLeafSizeSlider(NULL),
-	fSizeVariationSlider(NULL),
 	fDropRate(10),
 	fLeafSize(150),
 	fSizeVariation(50)
@@ -102,35 +102,35 @@ Leaves::StartConfig(BView* view)
 	bounds.InsetBy(10, 10);
 	BRect frame(0, 0, bounds.Width(), 20);
 
-	fDropRateSlider = new BSlider(frame, "drop rate",
+	BSlider* dropRateSlider = new BSlider(frame, "drop rate",
 		B_TRANSLATE("Drop rate:"), new BMessage(MSG_SET_DROP_RATE),
 		kMinimumDropRate, kMaximumDropRate,	B_BLOCK_THUMB,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-	fDropRateSlider->SetValue(fDropRate);
-	fDropRateSlider->ResizeToPreferred();
-	bounds.bottom -= fDropRateSlider->Bounds().Height() * 1.5;
-	fDropRateSlider->MoveTo(bounds.LeftBottom());
-	view->AddChild(fDropRateSlider);
+	dropRateSlider->SetValue(fDropRate);
+	dropRateSlider->ResizeToPreferred();
+	bounds.bottom -= dropRateSlider->Bounds().Height() * 1.5;
+	dropRateSlider->MoveTo(bounds.LeftBottom());
+	view->AddChild(dropRateSlider);
 
-	fLeafSizeSlider = new BSlider(frame, "leaf size",
+	BSlider* leafSizeSlider = new BSlider(frame, "leaf size",
 		B_TRANSLATE("Leaf size:"), new BMessage(MSG_SET_LEAF_SIZE),
 		kMinimumLeafSize, kMaximumLeafSize,	B_BLOCK_THUMB,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-	fLeafSizeSlider->SetValue(fLeafSize);
-	fLeafSizeSlider->ResizeToPreferred();
-	bounds.bottom -= fLeafSizeSlider->Bounds().Height() * 1.5;
-	fLeafSizeSlider->MoveTo(bounds.LeftBottom());
-	view->AddChild(fLeafSizeSlider);
+	leafSizeSlider->SetValue(fLeafSize);
+	leafSizeSlider->ResizeToPreferred();
+	bounds.bottom -= leafSizeSlider->Bounds().Height() * 1.5;
+	leafSizeSlider->MoveTo(bounds.LeftBottom());
+	view->AddChild(leafSizeSlider);
 
-	fSizeVariationSlider = new BSlider(frame, "variation",
+	BSlider* sizeVariationSlider = new BSlider(frame, "variation",
 		B_TRANSLATE("Size variation:"),	new BMessage(MSG_SET_SIZE_VARIATION),
 		0, kMaximumSizeVariation, B_BLOCK_THUMB,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-	fSizeVariationSlider->SetValue(fSizeVariation);
-	fSizeVariationSlider->ResizeToPreferred();
-	bounds.bottom -= fSizeVariationSlider->Bounds().Height() * 1.5;
-	fSizeVariationSlider->MoveTo(bounds.LeftBottom());
-	view->AddChild(fSizeVariationSlider);
+	sizeVariationSlider->SetValue(fSizeVariation);
+	sizeVariationSlider->ResizeToPreferred();
+	bounds.bottom -= sizeVariationSlider->Bounds().Height() * 1.5;
+	sizeVariationSlider->MoveTo(bounds.LeftBottom());
+	view->AddChild(sizeVariationSlider);
 
 	BTextView* textView = new BTextView(bounds, B_EMPTY_STRING,
 		bounds.OffsetToCopy(0., 0.), B_FOLLOW_ALL, B_WILL_DRAW);
@@ -150,9 +150,9 @@ Leaves::StartConfig(BView* view)
 	BWindow* window = view->Window();
 	if (window) window->AddHandler(this);
 
-	fDropRateSlider->SetTarget(this);
-	fLeafSizeSlider->SetTarget(this);
-	fSizeVariationSlider->SetTarget(this);
+	dropRateSlider->SetTarget(this);
+	leafSizeSlider->SetTarget(this);
+	sizeVariationSlider->SetTarget(this);
 }
 
 
@@ -187,14 +187,29 @@ Leaves::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_SET_DROP_RATE:
-			fDropRate = fDropRateSlider->Value();
+		{
+			int32 dropRate;
+			if (message->FindInt32("be:value", &dropRate) == B_OK)
+				fDropRate = dropRate;
 			break;
+		}
+
 		case MSG_SET_LEAF_SIZE:
-			fLeafSize = fLeafSizeSlider->Value();
+		{
+			int32 leafSize;
+			if (message->FindInt32("be:value", &leafSize) == B_OK)
+				fLeafSize = leafSize;
 			break;
+		}
+
 		case MSG_SET_SIZE_VARIATION:
-			fSizeVariation = fSizeVariationSlider->Value();
+		{
+			int32 sizeVariation;
+			if (message->FindInt32("be:value", &sizeVariation) == B_OK)
+				fSizeVariation = sizeVariation;
 			break;
+		}
+
 		default:
 			BHandler::MessageReceived(message);
 	}
@@ -253,4 +268,3 @@ Leaves::_RandomPoint(const BRect& bound)
 	return BPoint(drand48() * (bound.right - bound.left) + bound.left,
 		drand48() * (bound.bottom - bound.top) + bound.top);
 }
-

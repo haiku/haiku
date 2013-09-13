@@ -1,0 +1,34 @@
+1	ukrainian	x-vnd.Haiku-hmulti_audio.media_addon	451057402
+Master	MultiAudio		Головний
+SPDIF	MultiAudio		SPDIF
+Gain	MultiAudio		Гучність
+Output 3D center	MultiAudio		Центр 3D вихода
+Extended Setup	MultiAudio		Розширене налаштування
+CD	MultiAudio		CD
+Tone control	MultiAudio		Керування тоном
+Phone	MultiAudio		Телефон
+Aux	MultiAudio		Додатковий
+Output bass	MultiAudio		Вихід басів
+Headphones	MultiAudio		Навушники
+Beep	MultiAudio		Сигнал
+Output mono mix	MultiAudio		Вихід моно мікс
+Output stereo mix	MultiAudio		Вихід стерео мікс
+Input	MultiAudio		Вхід
+Output treble	MultiAudio		Вихід високих
+Mono mix	MultiAudio		Моно міксування
+General	MultiAudio		Загальні
+Input & Output	MultiAudio		Вхід і Вихід
+Enhanced Setup	MultiAudio		Розширені налаштування
+Stereo mix	MultiAudio		Стерео міксування
+Output 3D depth	MultiAudio		Вихід 3D глибини
+Volume	MultiAudio		Гучність
+Output	MultiAudio		Вихід
+Video	MultiAudio		Відео
+Line	MultiAudio		Лінія
+Mic	MultiAudio		Мікрофон
+ frequency:	MultiAudio		частота:
+Enable	MultiAudio		Увімкнути
+Mute	MultiAudio		Приглушити
+Wave	MultiAudio		Хвиля
+Setup	MultiAudio		Параметри
+Level	MultiAudio		Рівень

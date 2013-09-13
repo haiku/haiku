@@ -223,6 +223,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	BBox* windowSettingsBox = new BBox("window");
 	windowSettingsBox->SetLabel(B_TRANSLATE("Window"));
 	windowSettingsBox->AddChild(BLayoutBuilder::Group<>()
+		.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 		.AddGroup(B_VERTICAL, 0)
 			.Add(fWindowAlwaysOnTop)
 			.Add(fWindowAutoRaise)

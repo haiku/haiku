@@ -523,7 +523,7 @@ detect_cpu(int currentCPU)
 
 	// print some fun data
 	get_current_cpuid(&cpuid, 0);
-	uint32 maxBasicLeaf = cpuid.eax_0.max_eax;	
+	uint32 maxBasicLeaf = cpuid.eax_0.max_eax;
 
 	// build the vendor string
 	memset(vendorString, 0, sizeof(vendorString));
@@ -1017,3 +1017,14 @@ arch_cpu_memory_write_barrier(void)
 #endif
 }
 
+
+void
+arch_cpu_memory_read_write_barrier(void)
+{
+#ifdef __x86_64__
+	asm volatile("mfence" : : : "memory");
+#else
+	asm volatile ("lock;" : : : "memory");
+	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
+#endif
+}

@@ -606,13 +606,13 @@ TermView::SetTermSize(int rows, int columns, bool notifyShell)
 
 
 void
-TermView::SetTermSize(BRect rect)
+TermView::SetTermSize(BRect rect, bool notifyShell)
 {
 	int rows;
 	int columns;
 
 	GetTermSizeFromRect(rect, &rows, &columns);
-	SetTermSize(rows, columns, false);
+	SetTermSize(rows, columns, notifyShell);
 }
 
 
@@ -1156,12 +1156,13 @@ void
 TermView::AttachedToWindow()
 {
 	fMouseButtons = 0;
-	fModifiers = modifiers();
+
+	_UpdateModifiers();
 
 	// update the terminal size because it may have changed while the TermView
 	// was detached from the window. On such conditions FrameResized was not
 	// called when the resize occured
-	SetTermSize(Bounds());
+	SetTermSize(Bounds(), true);
 	MakeFocus(true);
 	if (fScrollBar) {
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);
@@ -1380,14 +1381,9 @@ TermView::WindowActivated(bool active)
 			_Deactivate();
 	}
 
-	fActiveState->WindowActivated(active);
+	_UpdateModifiers();
 
-	if (active) {
-		int32 oldModifiers = fModifiers;
-		fModifiers = modifiers();
-		if (fModifiers != oldModifiers)
-			fActiveState->ModifiersChanged(oldModifiers, fModifiers);
-	}
+	fActiveState->WindowActivated(active);
 }
 
 
@@ -1409,6 +1405,8 @@ TermView::MakeFocus(bool focusState)
 void
 TermView::KeyDown(const char *bytes, int32 numBytes)
 {
+	_UpdateModifiers();
+
 	fActiveState->KeyDown(bytes, numBytes);
 }
 
@@ -1601,10 +1599,7 @@ TermView::MessageReceived(BMessage *msg)
 
 		case B_MODIFIERS_CHANGED:
 		{
-			int32 oldModifiers = fModifiers;
-			fModifiers = msg->GetInt32("modifiers", 0);
-			if (fModifiers != oldModifiers)
-				fActiveState->ModifiersChanged(oldModifiers, fModifiers);
+			_UpdateModifiers();
 			break;
 		}
 
@@ -2376,6 +2371,8 @@ TermView::MouseDown(BPoint where)
 	if (!IsFocus())
 		MakeFocus();
 
+	_UpdateModifiers();
+
 	BMessage* currentMessage = Window()->CurrentMessage();
 	int32 buttons = currentMessage->GetInt32("buttons", 0);
 
@@ -2389,6 +2386,8 @@ TermView::MouseDown(BPoint where)
 void
 TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 {
+	_UpdateModifiers();
+
 	fActiveState->MouseMoved(where, transit, message, fModifiers);
 }
 
@@ -2396,6 +2395,8 @@ TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 void
 TermView::MouseUp(BPoint where)
 {
+	_UpdateModifiers();
+
 	int32 buttons = Window()->CurrentMessage()->GetInt32("buttons", 0);
 
 	fActiveState->MouseUp(where, buttons);
@@ -2972,6 +2973,19 @@ TermView::_CancelInputMethod()
 	}
 
 	delete inlineInput;
+}
+
+
+void
+TermView::_UpdateModifiers()
+{
+	// TODO: This method is a general work-around for missing or out-of-order
+	// B_MODIFIERS_CHANGED messages. This should really be fixed where it is
+	// broken (app server?).
+	int32 oldModifiers = fModifiers;
+	fModifiers = modifiers();
+	if (fModifiers != oldModifiers && fActiveState != NULL)
+		fActiveState->ModifiersChanged(oldModifiers, fModifiers);
 }
 
 

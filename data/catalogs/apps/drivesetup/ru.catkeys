@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	3460572565
+1	russian	x-vnd.Haiku-DriveSetup	3775412465
 DriveSetup	System name		Разметка диска
 Cancel	AbstractParametersPanel		Отмена
 Delete	MainWindow		Удалить
@@ -50,6 +50,7 @@ Failed to format the partition %s!\n	MainWindow		Не удалось иници�
 Mount	MainWindow		Подключить
 Partition type	PartitionList		Тип раздела
 Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать весь диск? (обычно на диске создают систему разделов)\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
+The panel experienced a problem!	MainWindow		С панелью произошла проблема!
 Change parameters…	MainWindow		Изменить параметры…
 Device	PartitionList		Устройство
 Disk	MainWindow		Диск
@@ -62,6 +63,7 @@ Continue	MainWindow		Продолжить
 Cannot delete the selected partition.	MainWindow		Невозможно удалить выбранный раздел.
 Mount all	MainWindow		Подключить все
 End: %s	Support		Конец: %s
+The panel could not return successfully.	MainWindow		Панели не удалось корректно вернуться.
 Cancel	MainWindow		Отмена
 Delete partition	MainWindow		Удалить раздел
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Вы уверены, что хотите изменить параметры выбранного раздела?\n\nРаздел может больше не распознаваться другими операционными системами!

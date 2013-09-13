@@ -1,6 +1,7 @@
 // Copyright 1999, Be Incorporated. All Rights Reserved.
 // Copyright 2000-2004, Jun Suzuki. All Rights Reserved.
 // Copyright 2007, Stephan Aßmus. All Rights Reserved.
+// Copyright 2010-2013, Haiku, Inc. All Rights Reserved.
 // This file may be used under the terms of the Be Sample Code License.
 #ifndef MEDIA_CONVERTER_WINDOW_H
 #define MEDIA_CONVERTER_WINDOW_H
@@ -30,8 +31,8 @@ public:
 	virtual						~MediaConverterWindow();
 
 protected:
-	virtual void				MessageReceived(BMessage* message);
-	virtual bool				QuitRequested();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
 
 public:
 			void				LanguageChanged();
@@ -70,6 +71,8 @@ public:
 			void				SetVideoQualityLabel(const char* label);
 
 			BDirectory			OutputDirectory() const;
+
+			void				TruncateOutputFolderPath();
 
 private:
 			void				_UpdateLabels();

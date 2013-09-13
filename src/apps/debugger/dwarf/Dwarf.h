@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_H
@@ -64,11 +65,18 @@ enum {
 	DW_TAG_imported_unit			= 0x3d,
 	DW_TAG_condition				= 0x3f,
 	DW_TAG_shared_type				= 0x40,
+	DW_TAG_type_unit				= 0x41,
+	DW_TAG_rvalue_reference_type	= 0x42,
+	DW_TAG_template_alias			= 0x43,
 	DW_TAG_lo_user					= 0x4080,
+	DW_TAG_GNU_template_template_param
+									= 0x4106,
 	DW_TAG_GNU_template_parameter_pack
 									= 0x4107,
 	DW_TAG_GNU_formal_parameter_pack
 									= 0x4108,
+	DW_TAG_GNU_call_site			= 0x4109,
+	DW_TAG_GNU_call_site_parameter	= 0x410a,
 	DW_TAG_hi_user					= 0xffff
 };
 
@@ -166,7 +174,37 @@ enum {
 	DW_AT_elemental				= 0x66,		// flag
 	DW_AT_pure					= 0x67,		// flag
 	DW_AT_recursive				= 0x68,		// flag
+	DW_AT_signature				= 0x69,		// reference
+	DW_AT_main_subprogram		= 0x6a,		// flag
+	DW_AT_data_bit_offset		= 0x6b,		// constant
+	DW_AT_const_expr			= 0x6c,		// flag
+	DW_AT_enum_class			= 0x6d,		// flag
+	DW_AT_linkage_name			= 0x6e,		// string
+	// TODO: proposed DWARF5 final values
+/*	DW_AT_call_site_value		= 0x6f,		// exprloc
+	DW_AT_call_site_data_value	= 0x70,		// exprloc
+	DW_AT_call_site_target		= 0x71,		// exprloc
+	DW_AT_call_site_target_clobbered
+								= 0x72,		// exprloc
+	DW_AT_tail_call				= 0x73,		// flag
+	DW_AT_all_tail_call_sites	= 0x74,		// flag
+	DW_AT_all_call_sites		= 0x75,		// flag
+	DW_AT_all_source_call_sites	= 0x76,		// flag
+*/
 	DW_AT_lo_user				= 0x2000,
+	DW_AT_call_site_value		= 0x2111,	// exprloc
+	DW_AT_call_site_data_value
+								= 0x2112,	// exprloc
+	DW_AT_call_site_target
+								= 0x2113,	// exprloc
+	DW_AT_call_site_target_clobbered
+								= 0x2114,	// exprloc
+	DW_AT_tail_call				= 0x2115,	// flag
+	DW_AT_all_tail_call_sites
+								= 0x2116,	// flag
+	DW_AT_all_call_sites		= 0x2117,	// flag
+	DW_AT_all_source_call_sites
+								= 0x2118,	// flag
 	DW_AT_hi_user				= 0x3fff
 };
 
@@ -195,6 +233,12 @@ enum {
 	DW_FORM_ref8		= 0x14,	// reference
 	DW_FORM_ref_udata	= 0x15,	// reference
 	DW_FORM_indirect	= 0x16,	// form in .debug_info
+	DW_FORM_sec_offset	= 0x17, // lineptr, loclistptr, macptr, rangelistptr
+	DW_FORM_exprloc		= 0x18,	// dwarf expression
+	DW_FORM_flag_present
+						= 0x19,	// flag
+	DW_FORM_ref_sig8	= 0x20	// reference
+
 };
 
 // expression operation
@@ -264,6 +308,8 @@ enum {
 	DW_OP_form_tls_address		= 0x9b,
 	DW_OP_call_frame_cfa		= 0x9c,
 	DW_OP_bit_piece				= 0x9d,
+	DW_OP_implicit_value		= 0x9e,
+	DW_OP_stack_value			= 0x9f,
 	DW_OP_lo_user				= 0xe0,
 	DW_OP_hi_user				= 0xff
 };
@@ -462,6 +508,13 @@ enum {
     DW_CFA_GNU_window_save		= 0x2d,
     DW_CFA_GNU_args_size		= 0x2e,
     DW_CFA_GNU_negative_offset_extended	= 0x2f
+};
+
+
+enum dwarf_reference_type {
+	dwarf_reference_type_local = 0,
+	dwarf_reference_type_global,
+	dwarf_reference_type_signature
 };
 
 

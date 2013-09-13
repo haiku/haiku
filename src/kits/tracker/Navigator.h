@@ -98,6 +98,7 @@ protected:
 	virtual void Draw(BRect rect);
 	virtual void MessageReceived(BMessage* msg);
 	virtual void AttachedToWindow();
+	virtual	void AllAttached();
 
 	void GoForward(bool option); // is option key held down?
 	void GoBackward(bool option);

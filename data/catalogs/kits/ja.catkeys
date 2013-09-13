@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libbe	677628532
+1	japanese	x-vnd.Haiku-libbe	3504008668
 gamma	AboutWindow		γ
 beta	AboutWindow		β
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -14,9 +14,11 @@ alpha	AboutWindow		α
 Error	PrintJob		エラー
 No Pages to print!	PrintJob		印刷するページがありません。
 All Rights Reserved.	AboutWindow		All Rights Reserved.
+About %app%	AboutWindow		%app% について
 OK	Dragger		OK
 OK	PrintJob		OK
-Green:	ColorControl		緑：
+Green:	ColorControl		緑:
+Ok	AboutWindow		Ok
 Version history:	AboutWindow		改訂履歴:
 Remove replicant	Dragger		レプリカントを削除
 OK	ZombieReplicantView		OK
@@ -30,11 +32,11 @@ Redo	TextView		やり直し
 Select All	TextView		すべて選択
 Warning	Dragger		警告
 Undo	TextView		元に戻す
-Red:	ColorControl		赤：
+Red:	ColorControl		赤:
 %3.2f MiB	StringForSize		%3.2f MiB
 About %app…	Dragger		%appについて…
 development	AboutWindow		開発版
 Error	ZombieReplicantView		エラー
-Blue:	ColorControl		青：
+Blue:	ColorControl		青:
 gold master	AboutWindow		ゴールデンマスター
 Can't delete this replicant from its original application. Life goes on.	Dragger		このレプリカントを元々のアプリケーションから削除することはできません。現状を維持します。

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-WebPositive	3577331897
+1	portuguese (brazil)	x-vnd.Haiku-WebPositive	1786411139
 Show home button	Settings Window		Exibir botão home
 Username:	Authentication Panel		Nome de Usuário:
 Copy URL to clipboard	Download Window		Copiar URL para a área de transferência
@@ -16,6 +16,7 @@ Start page:	Settings Window		Página inicial:
 History	WebPositive Window		Histórico
 Error opening downloads folder	Download Window		Erro ao abrir pasta de itens baixados
 Paste	WebPositive Window		Colar
+Double-click or middle-click to open new tab.	Tab Manager		Clique duas vezes ou com o botão do meio do mouse para abrir uma nova guia.
 Proxy username:	Settings Window		Nome de usuário do proxy:
 Settings	Settings Window		Definições
 %seconds seconds left	Download Window		%seconds segundos restantes

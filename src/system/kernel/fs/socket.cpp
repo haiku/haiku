@@ -827,6 +827,7 @@ _user_bind(int socket, const struct sockaddr *userAddress,
 		return B_BAD_VALUE;
 
 	sockaddr_storage address;
+	memset(&address, 0, sizeof(address));
 	if (!IS_USER_ADDRESS(userAddress)
 			|| user_memcpy(&address, userAddress, addressLength) != B_OK) {
 		return B_BAD_ADDRESS;
@@ -858,6 +859,7 @@ _user_connect(int socket, const struct sockaddr *userAddress,
 		return B_BAD_VALUE;
 
 	sockaddr_storage address;
+	memset(&address, 0, sizeof(address));
 	if (!IS_USER_ADDRESS(userAddress)
 			|| user_memcpy(&address, userAddress, addressLength) != B_OK) {
 		return B_BAD_ADDRESS;

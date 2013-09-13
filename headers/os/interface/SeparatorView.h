@@ -13,34 +13,30 @@
 
 class BSeparatorView : public BView {
 public:
-								BSeparatorView(enum orientation orientation,
+								BSeparatorView(orientation orientation,
 									border_style border = B_PLAIN_BORDER);
 								BSeparatorView(const char* name,
 									const char* label,
-									enum orientation orientation
-										= B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									border_style border = B_FANCY_BORDER,
 									const BAlignment& alignment
 										= BAlignment(B_ALIGN_HORIZONTAL_CENTER,
 											B_ALIGN_VERTICAL_CENTER));
 								BSeparatorView(const char* name,
 									BView* labelView,
-									enum orientation orientation
-										= B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									border_style border = B_FANCY_BORDER,
 									const BAlignment& alignment
 										= BAlignment(B_ALIGN_HORIZONTAL_CENTER,
 											B_ALIGN_VERTICAL_CENTER));
 								BSeparatorView(const char* label = NULL,
-									enum orientation orientation
-										= B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									border_style border = B_FANCY_BORDER,
 									const BAlignment& alignment
 										= BAlignment(B_ALIGN_HORIZONTAL_CENTER,
 											B_ALIGN_VERTICAL_CENTER));
 								BSeparatorView(BView* labelView,
-									enum orientation orientation
-										= B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									border_style border = B_FANCY_BORDER,
 									const BAlignment& alignment
 										= BAlignment(B_ALIGN_HORIZONTAL_CENTER,
@@ -61,7 +57,7 @@ public:
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
 
-			void				SetOrientation(enum orientation orientation);
+			void				SetOrientation(orientation orientation);
 			void				SetAlignment(const BAlignment& aligment);
 			void				SetBorderStyle(border_style border);
 
@@ -88,7 +84,7 @@ private:
 
 private:
 			void				_Init(const char* label, BView* labelView,
-									enum orientation orientation,
+									orientation orientation,
 									BAlignment alignment, border_style border);
 
 			float				_BorderSize() const;

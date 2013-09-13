@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
  */
 #ifndef EXPRESSION_TEXT_VIEW_H
 #define EXPRESSION_TEXT_VIEW_H

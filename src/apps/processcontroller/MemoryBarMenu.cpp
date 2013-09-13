@@ -89,8 +89,8 @@ MemoryBarMenu::Pulse()
 {
 	system_info	sinfo;
 	get_system_info(&sinfo);
-	int committedMemory = int(sinfo.used_pages * B_PAGE_SIZE / 1024);
-	int cachedMemory = int(sinfo.cached_pages * B_PAGE_SIZE / 1024);
+	int64 committedMemory = (int64)sinfo.used_pages * B_PAGE_SIZE / 1024;
+	int64 cachedMemory = (int64)sinfo.cached_pages * B_PAGE_SIZE / 1024;
 	Window()->BeginViewTransaction();
 
 	// create the list of items to remove, for their team is gone. Update the old teams.

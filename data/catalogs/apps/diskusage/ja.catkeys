@@ -3,14 +3,14 @@ Scanning %refName%	Scanner		%refName%をスキャン中
 Size	Info Window		サイズ
 Rescan	Pie View		再スキャン
 Kind	Info Window		種類
-file unavailable	Pie View		利用できないファイル
+file unavailable	Pie View		ファイルは利用できません
 no supporting apps	Pie View		対象アプリケーション無し
 %d file	Status View		%d 個のファイル
 Path	Info Window		パス
 Scan	Status View		スキャン
 9999.99 GB	Status View		9999.99 GB
 Rescan	Status View		再スキャン
-file unavailable	Status View		利用できないファイル
+file unavailable	Status View		ファイルは利用できません
 Get info	Pie View		情報を表示
 DiskUsage	System name		DiskUsage
  in %d files	Info Window		%d 個のファイル中

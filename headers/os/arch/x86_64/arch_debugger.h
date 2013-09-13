@@ -58,6 +58,8 @@ struct x86_64_debug_cpu_state {
 	uint64	rcx;
 	uint64	rbx;
 	uint64	rax;
+	uint64	vector;
+	uint64	error_code;
 	uint64	rip;
 	uint64	cs;
 	uint64	rflags;

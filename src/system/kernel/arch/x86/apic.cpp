@@ -13,18 +13,20 @@
 #include <arch/x86/msi.h>
 
 #include <debug.h>
+#include <safemode.h>
 #include <vm/vm.h>
 
 #include "timers/apic_timer.h"
 
 
 static void *sLocalAPIC = NULL;
+static bool sX2APIC = false;
 
 
 bool
 apic_available()
 {
-	return sLocalAPIC != NULL;
+	return sLocalAPIC != NULL || sX2APIC;
 }
 
 
@@ -45,14 +47,50 @@ apic_write(uint32 offset, uint32 data)
 uint32
 apic_local_id()
 {
-	return (apic_read(APIC_ID) & 0xffffffff) >> 24;
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_ID);
+	else
+		return (apic_read(APIC_ID) & 0xffffffff) >> 24;
+}
+
+
+uint32
+apic_version()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_VERSION);
+	else
+		return apic_read(APIC_VERSION);
+}
+
+
+uint32
+apic_task_priority()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_TASK_PRIORITY);
+	else
+		return apic_read(APIC_TASK_PRIORITY);
+}
+
+
+void
+apic_set_task_priority(uint32 config)
+{
+	if (sX2APIC)
+		x86_write_msr(IA32_MSR_APIC_TASK_PRIORITY, config);
+	else
+		apic_write(APIC_TASK_PRIORITY, config);
 }
 
 
 void
 apic_end_of_interrupt()
 {
-	apic_write(APIC_EOI, 0);
+	if (sX2APIC)
+		x86_write_msr(IA32_MSR_APIC_EOI, 0);
+	else
+		apic_write(APIC_EOI, 0);
 }
 
 
@@ -60,8 +98,159 @@ void
 apic_disable_local_ints()
 {
 	// just clear them out completely
-	apic_write(APIC_LVT_LINT0, APIC_LVT_MASKED);
-	apic_write(APIC_LVT_LINT1, APIC_LVT_MASKED);
+	if (sX2APIC) {
+		x86_write_msr(IA32_MSR_APIC_LVT_LINT0, APIC_LVT_MASKED);
+		x86_write_msr(IA32_MSR_APIC_LVT_LINT1, APIC_LVT_MASKED);
+	} else {
+		apic_write(APIC_LVT_LINT0, APIC_LVT_MASKED);
+		apic_write(APIC_LVT_LINT1, APIC_LVT_MASKED);
+	}
+}
+
+
+uint32
+apic_spurious_intr_vector()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_SPURIOUS_INTR_VECTOR);
+	else
+		return apic_read(APIC_SPURIOUS_INTR_VECTOR);
+}
+
+
+void
+apic_set_spurious_intr_vector(uint32 config)
+{
+	if (sX2APIC)
+		x86_write_msr(IA32_MSR_APIC_SPURIOUS_INTR_VECTOR, config);
+	else
+		apic_write(APIC_SPURIOUS_INTR_VECTOR, config);
+}
+
+
+uint32
+apic_intr_command_1()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_INTR_COMMAND) & 0xffffffff;
+	else
+		return apic_read(APIC_INTR_COMMAND_1);
+}
+
+
+void
+apic_set_intr_command_1(uint32 config)
+{
+	if (sX2APIC) {
+		uint64 value = x86_read_msr(IA32_MSR_APIC_INTR_COMMAND);
+		arch_cpu_memory_read_write_barrier();
+		x86_write_msr(IA32_MSR_APIC_INTR_COMMAND,
+			(value & 0xffffffff00000000LL) | config);
+	} else
+		apic_write(APIC_INTR_COMMAND_1, config);
+}
+
+
+uint32
+apic_intr_command_2()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_INTR_COMMAND) >> 32;
+	else
+		return apic_read(APIC_INTR_COMMAND_2);
+}
+
+
+void
+apic_set_intr_command_2(uint32 config)
+{
+	if (sX2APIC) {
+		uint64 value = x86_read_msr(IA32_MSR_APIC_INTR_COMMAND);
+		arch_cpu_memory_read_write_barrier();
+		x86_write_msr(IA32_MSR_APIC_INTR_COMMAND,
+			(value & 0xffffffff) | ((uint64)config << 32));
+	} else
+		apic_write(APIC_INTR_COMMAND_2, config);
+}
+
+
+uint32
+apic_lvt_timer()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_LVT_TIMER);
+	else
+		return apic_read(APIC_LVT_TIMER);
+}
+
+
+void
+apic_set_lvt_timer(uint32 config)
+{
+	if (sX2APIC)
+		x86_write_msr(IA32_MSR_APIC_LVT_TIMER, config);
+	else
+		apic_write(APIC_LVT_TIMER, config);
+}
+
+
+uint32
+apic_lvt_error()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_LVT_ERROR);
+	else
+		return apic_read(APIC_LVT_ERROR);
+}
+
+
+void
+apic_set_lvt_error(uint32 config)
+{
+	if (sX2APIC)
+		x86_write_msr(IA32_MSR_APIC_LVT_ERROR, config);
+	else
+		apic_write(APIC_LVT_ERROR, config);
+}
+
+
+uint32
+apic_lvt_initial_timer_count()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_INITIAL_TIMER_COUNT);
+	else
+		return apic_read(APIC_INITIAL_TIMER_COUNT);
+}
+
+
+void
+apic_set_lvt_initial_timer_count(uint32 config)
+{
+	if (sX2APIC)
+		x86_write_msr(IA32_MSR_APIC_INITIAL_TIMER_COUNT, config);
+	else
+		apic_write(APIC_INITIAL_TIMER_COUNT, config);
+}
+
+
+uint32
+apic_lvt_timer_divide_config()
+{
+	if (sX2APIC)
+		return x86_read_msr(IA32_MSR_APIC_TIMER_DIVIDE_CONFIG);
+	else
+		return apic_read(APIC_TIMER_DIVIDE_CONFIG);
+}
+
+
+void
+apic_set_lvt_timer_divide_config(uint32 config)
+{
+	if (sX2APIC)
+		x86_write_msr(IA32_MSR_APIC_TIMER_DIVIDE_CONFIG, config);
+	else
+		apic_write(APIC_TIMER_DIVIDE_CONFIG, config);
 }
 
 
@@ -70,6 +259,35 @@ apic_init(kernel_args *args)
 {
 	if (args->arch_args.apic == NULL)
 		return B_NO_INIT;
+
+	if (x86_check_feature(IA32_FEATURE_EXT_X2APIC, FEATURE_EXT)) {
+		dprintf("found x2apic\n");
+#if 0
+		if (!get_safemode_boolean(B_SAFEMODE_DISABLE_X2APIC, false)) {
+			uint64 apic_base = x86_read_msr(IA32_MSR_APIC_BASE);
+			if ((apic_base & IA32_MSR_APIC_BASE_X2APIC) == 0) {
+				x86_write_msr(IA32_MSR_APIC_BASE, apic_base
+					| IA32_MSR_APIC_BASE_X2APIC);
+			}
+			sX2APIC = true;
+			return B_OK;
+		}
+
+		dprintf("x2apic disabled per safemode setting\n");
+#else
+		if (get_safemode_boolean(B_SAFEMODE_ENABLE_X2APIC, false)) {
+			uint64 apic_base = x86_read_msr(IA32_MSR_APIC_BASE);
+			if ((apic_base & IA32_MSR_APIC_BASE_X2APIC) == 0) {
+				x86_write_msr(IA32_MSR_APIC_BASE, apic_base
+					| IA32_MSR_APIC_BASE_X2APIC);
+			}
+			sX2APIC = true;
+
+			dprintf("x2apic enabled per safemode setting\n");
+			return B_OK;
+		}
+#endif
+	}
 
 	sLocalAPIC = args->arch_args.apic;
 	dprintf("mapping local apic at %p\n", sLocalAPIC);
@@ -89,13 +307,12 @@ status_t
 apic_per_cpu_init(kernel_args *args, int32 cpu)
 {
 	dprintf("setting up apic for CPU %" B_PRId32 ": apic id %" B_PRIu32 ", "
-		"version %" B_PRIu32 "\n", cpu, apic_local_id(),
-		apic_read(APIC_VERSION));
+		"version %" B_PRIu32 "\n", cpu, apic_local_id(), apic_version());
 
 	/* set spurious interrupt vector to 0xff */
-	uint32 config = apic_read(APIC_SPURIOUS_INTR_VECTOR) & 0xffffff00;
+	uint32 config = apic_spurious_intr_vector() & 0xffffff00;
 	config |= APIC_ENABLE | 0xff;
-	apic_write(APIC_SPURIOUS_INTR_VECTOR, config);
+	apic_set_spurious_intr_vector(config);
 
 	// don't touch the LINT0/1 configuration in virtual wire mode
 	// ToDo: implement support for other modes...
@@ -130,14 +347,14 @@ apic_per_cpu_init(kernel_args *args, int32 cpu)
 	apic_timer_per_cpu_init(args, cpu);
 
 	/* setup error vector to 0xfe */
-	config = (apic_read(APIC_LVT_ERROR) & 0xffffff00) | 0xfe;
-	apic_write(APIC_LVT_ERROR, config);
+	config = (apic_lvt_error() & 0xffffff00) | 0xfe;
+	apic_set_lvt_error(config);
 
 	/* accept all interrupts */
-	config = apic_read(APIC_TASK_PRIORITY) & 0xffffff00;
-	apic_write(APIC_TASK_PRIORITY, config);
+	config = apic_task_priority() & 0xffffff00;
+	apic_set_task_priority(config);
 
-	config = apic_read(APIC_SPURIOUS_INTR_VECTOR);
+	config = apic_spurious_intr_vector();
 	apic_end_of_interrupt();
 
 	return B_OK;

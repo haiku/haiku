@@ -36,7 +36,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Write changes	MainWindow		Änderungen schreiben
 There was an error preparing the disk for modifications.	MainWindow		Beim Vorbereiten der Änderungen trat ein interner Fehler auf.
 The partition %s is already mounted.	MainWindow		Die Partition \"%s\" ist bereits eingehangen.
-Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 Partition name:	ChangeParametersPanel		Partitionsname:
 Change	ChangeParametersPanel		Ändern
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!

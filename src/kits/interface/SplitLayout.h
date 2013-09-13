@@ -23,7 +23,7 @@ using BPrivate::Layout::LayoutInfo;
 
 class BSplitLayout : public BAbstractLayout {
 public:
-								BSplitLayout(enum orientation orientation,
+								BSplitLayout(orientation orientation,
 									float spacing = 0.0f);
 								BSplitLayout(BMessage* from);
 	virtual						~BSplitLayout();
@@ -37,7 +37,7 @@ public:
 			void				SetSpacing(float spacing);
 
 			orientation			Orientation() const;
-			void				SetOrientation(enum orientation orientation);
+			void				SetOrientation(orientation orientation);
 
 			float				SplitterSize() const;
 			void				SetSplitterSize(float size);

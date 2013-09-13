@@ -1,12 +1,12 @@
-1	hungarian	x-vnd.Haiku-ActivityMonitor	1913625522
+1	hungarian	x-vnd.Haiku-ActivityMonitor	1211510241
 P-faults	DataSource		P hibák
 Media nodes	DataSource		Média csomópontok
 Threads	DataSource		Szálak
-MB	DataSource		MB
 Always on top	ActivityWindow		Mindig felül
 Add graph	ActivityWindow		Grafikon hozzáadása
 Teams	DataSource		Csapatok
 Hide legend	ActivityView		Magyarázat elrejtése
+MiB	DataSource		MiB
 Network send	DataSource		Küldött adatok
 CPU usage (combined)	DataSource		Processzor használat (kombinált)
 CPU	DataSource		CPU
@@ -27,13 +27,14 @@ Update time interval:	SettingsWindow		Frissítési gyakoriság:
 TX	DataSource	Shorter version for Sending	Adás
 Quit	ActivityWindow		Kilépés
 Block cache memory	DataSource		Blokk gyorsítótár
+%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Grafikon eltávolítása
-%.1f MB	DataSource		%.1f MB
 %lld sec.	SettingsWindow		%lld s.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Processzor használat
 Raw clipboard	DataSource		Nyers vágólap
 Sems	DataSource		Szemaforok
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		Folyamatmonitor
 Running applications	DataSource		Futó programok
 Semaphores	DataSource		Szemaforok
@@ -44,6 +45,5 @@ File	ActivityWindow		Fájl
 usage	DataSource		használat
 Additional items	ActivityView		További elemek
 Network receive	DataSource		Fogadott adatok
-%.1f KB/s	DataSource		%.1f KB/s
 Memory	DataSource		Memória
 RX	DataSource	Shorter version for Receiving.	Vétel

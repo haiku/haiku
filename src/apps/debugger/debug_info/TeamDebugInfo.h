@@ -63,6 +63,8 @@ public:
 									FunctionInstance* functionInstance,
 									DisassembledCode*& _sourceCode);
 										// returns reference
+			FunctionInstance*	MainFunction() const
+									{ return fMainFunction; }
 
 			// team is locked
 			status_t			AddImageDebugInfo(
@@ -99,6 +101,7 @@ private:
 			FunctionTable*		fFunctions;
 			SourceFileTable*	fSourceFiles;
 			GlobalTypeCache*	fTypeCache;
+			FunctionInstance*	fMainFunction;
 };
 
 

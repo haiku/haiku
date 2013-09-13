@@ -208,7 +208,7 @@ BCollator::Archive(BMessage* archive, bool deep) const
 
 	if (status == B_OK && error == U_ZERO_ERROR)
 		status = archive->AddData("loc:collator", B_RAW_TYPE, buffer, size);
-	delete buffer;
+	free(buffer);
 
 	if (error == U_ZERO_ERROR)
 		return status;

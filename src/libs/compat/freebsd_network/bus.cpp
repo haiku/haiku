@@ -56,7 +56,6 @@ struct internal_intr {
 	void			*arg;
 	int				irq;
 	uint32			flags;
-	bool			is_msi;
 
 	thread_id		thread;
 	sem_id			sem;
@@ -170,8 +169,6 @@ bus_alloc_resource(device_t dev, int type, int *rid, unsigned long start,
 			res->r_bustag = 1;
 			res->r_bushandle = info->u.h0.interrupt_line + *rid - 1;
 			result = 0;
-
-			// TODO: msi-x interrupts
 		}
 	} else if (type == SYS_RES_MEMORY)
 		result = bus_alloc_mem_resource(dev, res, *rid);
@@ -349,7 +346,6 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 	intr->arg = arg;
 	intr->irq = res->r_bushandle;
 	intr->flags = flags;
-	intr->is_msi = false;
 	intr->sem = -1;
 	intr->thread = -1;
 
@@ -386,14 +382,21 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 		// this is an msi, enable it
 		pci_info *info
 			= &((struct root_device_softc *)dev->root->softc)->pci_info;
-		if (gPCIx86->enable_msi(info->bus, info->device,
-				info->function) != B_OK) {
-			device_printf(dev, "enabling msi failed\n");
-			bus_teardown_intr(dev, res, intr);
-			return ENODEV;
+		if (((struct root_device_softc *)dev->root->softc)->is_msi) {
+			if (gPCIx86->enable_msi(info->bus, info->device,
+					info->function) != B_OK) {
+				device_printf(dev, "enabling msi failed\n");
+				bus_teardown_intr(dev, res, intr);
+				return ENODEV;
+			}
+		} else if (((struct root_device_softc *)dev->root->softc)->is_msix) {
+			if (gPCIx86->enable_msix(info->bus, info->device,
+					info->function) != B_OK) {
+				device_printf(dev, "enabling msix failed\n");
+				bus_teardown_intr(dev, res, intr);
+				return ENODEV;
+			}
 		}
-
-		intr->is_msi = true;
 	}
 
 	if (status < B_OK) {
@@ -412,11 +415,11 @@ int
 bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 {
 	struct internal_intr *intr = (struct internal_intr *)arg;
+	struct root_device_softc *root = (struct root_device_softc *)dev->root->softc;
 
-	if (intr->is_msi && gPCIx86 != NULL) {
+	if ((root->is_msi || root->is_msix) && gPCIx86 != NULL) {
 		// disable msi generation
-		pci_info *info
-			= &((struct root_device_softc *)dev->root->softc)->pci_info;
+		pci_info *info = &root->pci_info;
 		gPCIx86->disable_msi(info->bus, info->device, info->function);
 	}
 
@@ -613,14 +616,14 @@ pci_get_domain(device_t dev)
 	return 0;
 }
 
-uint32_t 
+uint32_t
 pci_get_devid(device_t dev)
 {
 	return pci_read_config(dev, PCI_device_id, 2) << 16 |
 		pci_read_config(dev, PCI_vendor_id, 2);
 }
 
-uint8_t 
+uint8_t
 pci_get_cachelnsz(device_t dev)
 {
 	return pci_read_config(dev, PCI_line_size, 1);
@@ -787,6 +790,7 @@ pci_alloc_msi(device_t dev, int *count)
 		return ENODEV;
 	}
 
+	((struct root_device_softc *)dev->root->softc)->is_msi = true;
 	info->u.h0.interrupt_line = startVector;
 	return EOK;
 }
@@ -801,6 +805,8 @@ pci_release_msi(device_t dev)
 
 	info = &((struct root_device_softc *)dev->root->softc)->pci_info;
 	gPCIx86->unconfigure_msi(info->bus, info->device, info->function);
+	((struct root_device_softc *)dev->root->softc)->is_msi = false;
+	((struct root_device_softc *)dev->root->softc)->is_msix = false;
 	return EOK;
 }
 
@@ -808,14 +814,33 @@ pci_release_msi(device_t dev)
 int
 pci_msix_count(device_t dev)
 {
-	return 0;
+	pci_info *info;
+	if (gPCIx86 == NULL)
+		return 0;
+
+	info = &((struct root_device_softc *)dev->root->softc)->pci_info;
+	return gPCIx86->get_msix_count(info->bus, info->device, info->function);
 }
 
 
 int
 pci_alloc_msix(device_t dev, int *count)
 {
-	return ENODEV;
+	pci_info *info;
+	uint8 startVector = 0;
+	if (gPCIx86 == NULL)
+		return ENODEV;
+
+	info = &((struct root_device_softc *)dev->root->softc)->pci_info;
+
+	if (gPCIx86->configure_msix(info->bus, info->device, info->function, *count,
+			&startVector) != B_OK) {
+		return ENODEV;
+	}
+
+	((struct root_device_softc *)dev->root->softc)->is_msix = true;
+	info->u.h0.interrupt_line = startVector;
+	return EOK;
 }
 
 

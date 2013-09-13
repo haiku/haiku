@@ -5,10 +5,10 @@ Creating archive: %s	file:ZipOMaticWindow.cpp		アーカイブ %s を作成中
 Continue	file:ZipOMaticWindow.cpp		続ける
 Preparing to archive	file:ZipperThread.cpp		アーカイブを準備中
 Drop files here.	file:ZipOMaticWindow.cpp		ここにファイルをドロップしてください。
-Filename: %s	file:ZipOMaticWindow.cpp		ファイル名： %s
+Filename: %s	file:ZipOMaticWindow.cpp		ファイル名: %s
 Let them continue	file:ZipOMatic.cpp		これらを続ける
-Do you want to stop them?	file:ZipOMatic.cpp		中止してよろしいですか？
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		アーカイブの作成を中止してよろしいですか？
+Do you want to stop them?	file:ZipOMatic.cpp		中止しますか？
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		アーカイブの作成を中止しますか?
 %ld files added.	file:ZipOMaticWindow.cpp		%ld 個のファイルを追加しました。
 Stopped	file:ZipOMaticWindow.cpp		一時停止中
 Archive	file:ZipperThread.cpp		アーカイブ

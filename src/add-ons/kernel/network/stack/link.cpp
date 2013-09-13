@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -467,8 +467,10 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 			if (interface == NULL)
 				return B_DEVICE_NOT_FOUND;
 
-			if (user_memcpy(&request, value, sizeof(ifmediareq)) != B_OK)
+			if (user_memcpy(&request, value, sizeof(ifmediareq)) != B_OK) {
+				put_device_interface(interface);
 				return B_BAD_ADDRESS;
+			}
 
 			// TODO: see above.
 			if (interface->device->module->control(interface->device,
@@ -478,6 +480,7 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 				request.ifm_active = request.ifm_current
 					= interface->device->media;
 			}
+			put_device_interface(interface);
 
 			return user_memcpy(value, &request, sizeof(struct ifmediareq));
 		}

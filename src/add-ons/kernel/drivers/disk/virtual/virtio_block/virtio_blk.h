@@ -60,7 +60,7 @@ struct virtio_blk_config {
 
 	/* block size of device (if VIRTIO_BLK_F_BLK_SIZE) */
 	uint32_t blk_size;
-} __packed;
+} _PACKED;
 
 /*
  * Command types

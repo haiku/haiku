@@ -24,8 +24,7 @@ static const float kMinBorderLength = 5.0f;
 // TODO: More testing, especially archiving.
 
 
-BSeparatorView::BSeparatorView(enum orientation orientation,
-		border_style border)
+BSeparatorView::BSeparatorView(orientation orientation, border_style border)
 	:
 	BView(NULL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 {
@@ -35,7 +34,7 @@ BSeparatorView::BSeparatorView(enum orientation orientation,
 
 
 BSeparatorView::BSeparatorView(const char* name, const char* label,
-		enum orientation orientation, border_style border,
+		orientation orientation, border_style border,
 		const BAlignment& alignment)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
@@ -45,7 +44,7 @@ BSeparatorView::BSeparatorView(const char* name, const char* label,
 
 
 BSeparatorView::BSeparatorView(const char* name, BView* labelView,
-		enum orientation orientation, border_style border,
+		orientation orientation, border_style border,
 		const BAlignment& alignment)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
@@ -55,7 +54,7 @@ BSeparatorView::BSeparatorView(const char* name, BView* labelView,
 
 
 BSeparatorView::BSeparatorView(const char* label,
-		enum orientation orientation, border_style border,
+		orientation orientation, border_style border,
 		const BAlignment& alignment)
 	:
 	BView("", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
@@ -65,7 +64,7 @@ BSeparatorView::BSeparatorView(const char* label,
 
 
 BSeparatorView::BSeparatorView(BView* labelView,
-		enum orientation orientation, border_style border,
+		orientation orientation, border_style border,
 		const BAlignment& alignment)
 	:
 	BView("", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
@@ -331,7 +330,7 @@ BSeparatorView::PreferredSize()
 
 
 void
-BSeparatorView::SetOrientation(enum orientation orientation)
+BSeparatorView::SetOrientation(orientation orientation)
 {
 	if (orientation == fOrientation)
 		return;
@@ -437,7 +436,7 @@ BSeparatorView::DoLayout()
 
 void
 BSeparatorView::_Init(const char* label, BView* labelView,
-	enum orientation orientation, BAlignment alignment, border_style border)
+	orientation orientation, BAlignment alignment, border_style border)
 {
 	fLabel = "";
 	fLabelView = NULL;

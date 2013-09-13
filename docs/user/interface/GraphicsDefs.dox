@@ -1,0 +1,93 @@
+/*
+ * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/GraphicsDefs.h	hrev45737
+ *		src/kits/interface/GraphicsDefs.cpp	hrev45737
+ */
+
+
+/*!
+	\file GraphicsDefs.h
+	\ingroup interface
+	\ingroup libbe
+	\brief Graphics-related functions and variables used by the Interface Kit.
+*/
+
+
+/*!
+	\struct pattern
+	\ingroup interface
+	\ingroup libbe
+	\brief A pattern to use when drawing.
+*/
+
+
+/*!
+	\var B_SOLID_HIGH
+
+	Draw using the view's high color.
+*/
+
+
+/*!
+	\var B_MIXED_COLORS
+
+	Draw a pattern of the view's high and low colors.
+*/
+
+
+/*!
+	\var B_SOLID_LOW
+
+	Draw using the view's low color.
+*/
+
+
+/*!
+	\enum source_alpha
+	\ingroup interface
+
+	Blending alpha mode constants.
+*/
+
+
+/*!
+	\var source_alpha B_PIXEL_ALPHA
+
+	Use the alpha value of each pixel when drawing a bitmap.
+*/
+
+
+/*!
+	\var source_alpha B_CONSTANT_ALPHA
+
+	Use the alpha channel of the view's high color.
+*/
+
+
+/*!
+	\enum alpha_function
+	\ingroup interface
+
+	Blending alpha function constants.
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_OVERLAY
+
+	Used for drawing a image with transparency over an opaque background.
+*/
+
+
+/*!
+	\var alpha_function B_ALPHA_COMPOSITE
+
+	Used to composite two or more transparent images together offscreen to
+	produce a new image drawn using \c B_ALPHA_OVERLAY mode.
+*/

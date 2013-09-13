@@ -131,18 +131,18 @@ struct pci_module_info {
 						pci_info 	*info	/* caller-supplied buffer for info */
 					);
 	uint32			(*read_pci_config) (
-						uchar	bus,		/* bus number */
-						uchar	device,		/* device # on bus */
-						uchar	function,	/* function # in device */
-						uchar	offset,		/* offset in configuration space */
-						uchar	size		/* # bytes to read (1, 2 or 4) */
+						uint8	bus,		/* bus number */
+						uint8	device,		/* device # on bus */
+						uint8	function,	/* function # in device */
+						uint16	offset,		/* offset in configuration space */
+						uint8	size		/* # bytes to read (1, 2 or 4) */
 					);
 	void			(*write_pci_config) (
-						uchar	bus,		/* bus number */
-						uchar	device,		/* device # on bus */
-						uchar	function,	/* function # in device */
-						uchar	offset,		/* offset in configuration space */
-						uchar	size,		/* # bytes to write (1, 2 or 4) */
+						uint8	bus,		/* bus number */
+						uint8	device,		/* device # on bus */
+						uint8	function,	/* function # in device */
+						uint16	offset,		/* offset in configuration space */
+						uint8	size,		/* # bytes to write (1, 2 or 4) */
 						uint32	value		/* value to write */
 					);
 
@@ -174,6 +174,14 @@ struct pci_module_info {
 						uchar device,
 						uchar function,
 						uchar newInterruptLineValue);
+
+	status_t		(*find_pci_extended_capability) (
+						uint8	bus,
+						uint8	device,
+						uint8	function,
+						uint16	cap_id,
+						uint16	*offset
+					);
 };
 
 #define	B_PCI_MODULE_NAME		"bus_managers/pci/v1"
@@ -196,6 +204,7 @@ struct pci_module_info {
 #define PCI_header_type			0x0e		/* (1 byte) header type */
 #define PCI_bist				0x0f		/* (1 byte) built-in self-test */
 
+#define PCI_extended_capability 0x100		/* (4 bytes) extended capability */
 
 
 /* ---
@@ -315,6 +324,7 @@ struct pci_module_info {
 #define PCI_ata				0x05			/* ATA controller with ADMA interface */
 #define PCI_sata			0x06			/* Serial ATA controller */
 #define PCI_sas				0x07			/* Serial Attached SCSI controller */
+#define PCI_nvm				0x08			/* NVM Express controller */
 #define PCI_mass_storage_other 0x80			/* other mass storage controller */
 
 /* ---
@@ -326,6 +336,15 @@ struct pci_module_info {
 #define PCI_sata_other			0x00	/* vendor specific interface */
 #define PCI_sata_ahci			0x01	/* AHCI interface */
 
+/* ---
+	values of the class_api field for
+		class_base	= 0x01 (mass storage)
+		class_sub	= 0x08 (NVM Express controller)
+--- */
+
+#define PCI_nvm_other			0x00	/* vendor specific interface */
+#define PCI_nvm_hci				0x01	/* NVMHCI interface 1.0 */
+#define PCI_nvm_hci_enterprise	0x02	/* NVMHCI enterprise */
 
 /* ---
 	values for the class_sub field for class_base = 0x02 (network)
@@ -336,6 +355,8 @@ struct pci_module_info {
 #define PCI_fddi			0x02			/* FDDI controller */
 #define PCI_atm				0x03			/* ATM controller */
 #define PCI_isdn            0x04            /* ISDN controller */
+#define PCI_worldfip		0x05            /* WorldFip controller */
+#define PCI_picmg			0x06            /* PICMG controller */
 #define PCI_network_other	0x80			/* other network controller */
 
 
@@ -396,6 +417,8 @@ struct pci_module_info {
 #define PCI_parallel					0x01	/* parallel port */
 #define PCI_multiport_serial            0x02    /* multiport serial controller */
 #define PCI_modem                       0x03    /* modem */
+#define PCI_gpib						0x04    /* GPIB controller */
+#define PCI_smart_card					0x05	/* Smard Card controller */
 #define PCI_simple_communications_other	0x80	/* other communications device */
 
 /* ---
@@ -430,6 +453,8 @@ struct pci_module_info {
 #define PCI_timer					0x02	/* timers */
 #define PCI_rtc						0x03	/* real time clock */
 #define PCI_generic_hot_plug        0x04    /* generic PCI hot-plug controller */
+#define PCI_sd_host					0x05	/* SD Host controller */
+#define PCI_iommu					0x06	/* IOMMU */
 #define PCI_system_peripheral_other	0x80	/* other generic system peripheral */
 
 /* ---
@@ -635,6 +660,8 @@ struct pci_module_info {
 
 #define PCI_address_io_mask		0xFFFFFFFC	/* mask to get i/o space base address */
 
+#define PCI_range_memory_mask	0xFFFFFFF0	/* mask to get memory ranges */
+
 
 /* ---
 	masks for flags in expansion rom base address registers
@@ -677,7 +704,7 @@ struct pci_module_info {
 #define PCI_cap_id_msi		0x05      /* Message signalled interrupt */
 #define PCI_cap_id_chswp	0x06      /* Compact PCI HotSwap */
 #define PCI_cap_id_pcix		0x07      /* PCI-X */
-#define PCI_cap_id_ldt		0x08
+#define PCI_cap_id_ht		0x08	  /* HyperTransport */
 #define PCI_cap_id_vendspec	0x09
 #define PCI_cap_id_debugport	0x0a
 #define PCI_cap_id_cpci_rsrcctl 0x0b
@@ -689,6 +716,41 @@ struct pci_module_info {
 #define PCI_cap_id_msix		0x11	/* MSI-X */
 #define PCI_cap_id_sata		0x12	/* Serial ATA Capability */
 #define PCI_cap_id_pciaf	0x13	/* PCI Advanced Features */
+
+/** PCI Extended Capabilities */
+#define PCI_extcap_id(x)		(x & 0x0000ffff)
+#define PCI_extcap_version(x)	((x & 0x000f0000) >> 16)
+#define PCI_extcap_next_ptr(x)	((x & 0xfff00000) >> 20)
+
+#define PCI_extcap_id_aer			0x0001	/* Advanced Error Reporting */
+#define PCI_extcap_id_vc			0x0002	/* Virtual Channel */
+#define PCI_extcap_id_serial		0x0003	/* Serial Number */
+#define PCI_extcap_id_power_budget	0x0004	/* Power Budgeting */
+#define PCI_extcap_id_rcl_decl		0x0005	/* Root Complex Link Declaration */
+#define PCI_extcap_id_rcil_ctl		0x0006	/* Root Complex Internal Link Control */
+#define PCI_extcap_id_rcec_assoc	0x0007	/* Root Complex Event Collector Association */
+#define PCI_extcap_id_mfvc			0x0008	/* MultiFunction Virtual Channel */
+#define PCI_extcap_id_vc2			0x0009	/* Virtual Channel 2 */
+#define PCI_extcap_id_rcrb_header	0x000a	/* RCRB Header */
+#define PCI_extcap_id_vendor		0x000b	/* Vendor Unique */
+#define PCI_extcap_id_acs			0x000d	/* Access Control Services */
+#define PCI_extcap_id_ari			0x000e	/* Alternative Routing Id Interpretation */
+#define PCI_extcap_id_ats			0x000f	/* Address Translation Services */
+#define PCI_extcap_id_srio_virtual	0x0010	/* Single Root I/O Virtualization */
+#define PCI_extcap_id_mrio_virtual	0x0011	/* Multiple Root I/O Virtual */
+#define PCI_extcap_id_multicast		0x0012	/* Multicast */
+#define PCI_extcap_id_page_request	0x0013	/* Page Request */
+#define PCI_extcap_id_amd			0x0014	/* AMD Reserved */
+#define PCI_extcap_id_resizable_bar	0x0015	/* Resizable Bar */
+#define PCI_extcap_id_dyn_power_alloc	0x0016	/* Dynamic Power Allocation */
+#define PCI_extcap_id_tph_requester	0x0017	/* TPH Requester */
+#define PCI_extcap_id_latency_tolerance	0x0018	/* Latency Tolerance Reporting */
+#define PCI_extcap_id_2ndpcie		0x0019	/* Secondary PCIe */
+#define PCI_extcap_id_pmux			0x001a	/* Protocol Multiplexing */
+#define PCI_extcap_id_pasid			0x001b	/* Process Address Space Id */
+#define PCI_extcap_id_ln_requester	0x001c	/* LN Requester */
+#define PCI_extcap_id_dpc			0x001d	/* Downstream Porto Containment */
+#define PCI_extcap_id_l1pm			0x001e	/* L1 Power Management Substates */
 
 /** Power Management Control Status Register settings */
 #define PCI_pm_mask             0x03
@@ -728,6 +790,53 @@ struct pci_module_info {
 #define PCI_msi_control_mmc_8		0x0006
 #define PCI_msi_control_mmc_16		0x0008
 #define PCI_msi_control_mmc_32		0x000a
+
+/** MSI-X registers **/
+#define PCI_msix_control			0x02
+#define PCI_msix_table				0x04
+#define PCI_msix_pba				0x08
+
+#define PCI_msix_control_table_size	0x07ff
+#define PCI_msix_control_function_mask	0x4000
+#define PCI_msix_control_enable		0x8000
+#define PCI_msix_bir_mask			0x0007
+#define PCI_msix_bir_0				0x10
+#define PCI_msix_bir_1				0x14
+#define PCI_msix_bir_2				0x18
+#define PCI_msix_bir_3				0x1c
+#define PCI_msix_bir_4				0x20
+#define PCI_msix_bir_5				0x24
+#define PCI_msix_offset_mask		0xfff8
+
+#define PCI_msix_vctrl_mask			0x0001
+
+/** HyperTransport registers **/
+#define PCI_ht_command				0x02
+#define PCI_ht_msi_address_low		0x04
+#define PCI_ht_msi_address_high		0x08
+
+#define PCI_ht_command_cap_mask_3_bits	0xe000
+#define PCI_ht_command_cap_mask_5_bits	0xf800
+#define PCI_ht_command_cap_slave	0x0000
+#define PCI_ht_command_cap_host		0x2000
+#define PCI_ht_command_cap_switch	0x4000
+#define PCI_ht_command_cap_interrupt	0x8000
+#define PCI_ht_command_cap_revision_id	0x8800
+#define PCI_ht_command_cap_unit_id_clumping	0x9000
+#define PCI_ht_command_cap_ext_config_space	0x9800
+#define PCI_ht_command_cap_address_mapping	0xa000
+#define PCI_ht_command_cap_msi_mapping	0xa800
+#define PCI_ht_command_cap_direct_route	0xb000
+#define PCI_ht_command_cap_vcset	0xb800
+#define PCI_ht_command_cap_retry_mode	0xc000
+#define PCI_ht_command_cap_x86_encoding	0xc800
+#define PCI_ht_command_cap_gen3		0xd000
+#define PCI_ht_command_cap_fle		0xd800
+#define PCI_ht_command_cap_pm		0xe000
+#define PCI_ht_command_cap_high_node_count	0xe800
+
+#define PCI_ht_command_msi_enable	0x0001
+#define PCI_ht_command_msi_fixed	0x0002
 
 #ifdef __cplusplus
 }

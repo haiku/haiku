@@ -12,6 +12,7 @@
 #include <AGP.h>
 #include <KernelExport.h>
 #include <PCI.h>
+#include <PCI_x86.h>
 
 #include "intel_extreme.h"
 #include "lock.h"
@@ -34,6 +35,8 @@ struct intel_info {
 	struct overlay_registers* overlay_registers;
 
 	bool			fake_interrupts;
+	uint8			irq;
+	bool			use_msi;
 
 	const char*		device_identifier;
 	DeviceType		device_type;

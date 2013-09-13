@@ -19,6 +19,7 @@ Thread::Thread(Team* team, thread_id threadID)
 	fID(threadID),
 	fState(THREAD_STATE_UNKNOWN),
 	fReturnValueInfos(NULL),
+	fStopRequestPending(false),
 	fStoppedReason(THREAD_STOPPED_UNKNOWN),
 	fCpuState(NULL),
 	fStackTrace(NULL)
@@ -78,6 +79,7 @@ Thread::SetState(uint32 state, uint32 reason, const BString& info)
 		SetCpuState(NULL);
 		SetStackTrace(NULL);
 		ClearReturnValueInfos();
+		fStopRequestPending = false;
 	}
 
 	fTeam->NotifyThreadStateChanged(this);
@@ -117,6 +119,12 @@ Thread::SetStackTrace(StackTrace* trace)
 		fStackTrace->AcquireReference();
 
 	fTeam->NotifyThreadStackTraceChanged(this);
+}
+
+void
+Thread::SetStopRequestPending()
+{
+	fStopRequestPending = true;
 }
 
 

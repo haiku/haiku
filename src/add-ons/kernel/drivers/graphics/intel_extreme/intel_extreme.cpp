@@ -131,13 +131,30 @@ init_interrupt_handler(intel_info &info)
 		status = B_ERROR;
 	}
 
-	if (status == B_OK && info.pci->u.h0.interrupt_pin != 0x00
-		&& info.pci->u.h0.interrupt_line != 0xff) {
+	// Find the right interrupt vector, using MSIs if available.
+	info.irq = 0xff;
+	info.use_msi = false;	
+	if (info.pci->u.h0.interrupt_pin != 0x00)	
+		info.irq = info.pci->u.h0.interrupt_line;
+	if (gPCIx86Module != NULL && gPCIx86Module->get_msi_count(info.pci->bus,
+			info.pci->device, info.pci->function) >= 1) {
+		uint8 msiVector = 0;
+		if (gPCIx86Module->configure_msi(info.pci->bus, info.pci->device,
+				info.pci->function, 1, &msiVector) == B_OK
+			&& gPCIx86Module->enable_msi(info.pci->bus, info.pci->device,
+				info.pci->function) == B_OK) {
+			ERROR("using message signaled interrupts\n");
+			info.irq = msiVector;
+			info.use_msi = true;
+		}
+	}
+
+	if (status == B_OK && info.irq != 0xff) {
 		// we've gotten an interrupt line for us to use
 
 		info.fake_interrupts = false;
 
-		status = install_io_interrupt_handler(info.pci->u.h0.interrupt_line,
+		status = install_io_interrupt_handler(info.irq,
 			&intel_interrupt_handler, (void*)&info, 0);
 		if (status == B_OK) {
 			write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
@@ -340,16 +357,19 @@ intel_extreme_init(intel_info &info)
 
 	// setup overlay registers
 
-	if (intel_allocate_memory(info, B_PAGE_SIZE, 0,
-			intel_uses_physical_overlay(*info.shared_info)
+	status_t status = intel_allocate_memory(info, B_PAGE_SIZE, 0,
+		intel_uses_physical_overlay(*info.shared_info)
 				? B_APERTURE_NEED_PHYSICAL : 0,
-			(addr_t*)&info.overlay_registers,
-			&info.shared_info->physical_overlay_registers) == B_OK) {
+		(addr_t*)&info.overlay_registers, 
+		&info.shared_info->physical_overlay_registers);
+	if (status == B_OK) {
 		info.shared_info->overlay_offset = (addr_t)info.overlay_registers
 			- info.aperture_base;
+		init_overlay_registers(info.overlay_registers);
+	} else {
+		ERROR("error: could not allocate overlay memory! %s\n",
+			strerror(status));
 	}
-
-	init_overlay_registers(info.overlay_registers);
 
 	// Allocate hardware status page and the cursor memory
 
@@ -381,8 +401,14 @@ intel_extreme_uninit(intel_info &info)
 		write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
 		write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
 
-		remove_io_interrupt_handler(info.pci->u.h0.interrupt_line,
-			intel_interrupt_handler, &info);
+		remove_io_interrupt_handler(info.irq, intel_interrupt_handler, &info);
+
+		if (info.use_msi && gPCIx86Module != NULL) {
+			gPCIx86Module->disable_msi(info.pci->bus,
+				info.pci->device, info.pci->function);
+			gPCIx86Module->unconfigure_msi(info.pci->bus,
+				info.pci->device, info.pci->function);
+		}
 	}
 
 	gGART->unmap_aperture(info.aperture);

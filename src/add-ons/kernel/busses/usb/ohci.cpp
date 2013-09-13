@@ -1,11 +1,12 @@
 /*
- * Copyright 2005-2008, Haiku Inc. All rights reserved.
+ * Copyright 2005-2013, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jan-Rixt Van Hoye
  *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
  *		Michael Lotz <mmlr@mlotz.ch>
+ *		Siarzhuk Zharski <imker@gmx.li>
  */
 
 #include <module.h>
@@ -74,9 +75,12 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fFinishThread(-1),
 		fStopFinishThread(false),
 		fProcessingPipe(NULL),
+		fFrameBandwidth(NULL),
 		fRootHub(NULL),
 		fRootHubAddress(0),
-		fPortCount(0)
+		fPortCount(0),
+		fIRQ(0),
+		fUseMSI(false)
 {
 	if (!fInitOK) {
 		TRACE_ERROR("bus manager failed to init\n");
@@ -213,7 +217,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	// interrupts during handover. Therefore we disable interrupts before
 	// requesting ownership. We have to keep the ownership change interrupt
 	// enabled though, as otherwise the SMM will not be notified of the
-	// ownership change request we trigger below.	
+	// ownership change request we trigger below.
 	_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS &
 		~OHCI_OWNERSHIP_CHANGE) ;
 
@@ -230,7 +234,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 
 		if ((control & OHCI_INTERRUPT_ROUTING) != 0) {
 			TRACE_ERROR("smm does not respond.\n");
-			
+
 			// TODO: Enable this reset as soon as the non-specified
 			// reset a few lines later is replaced by a better solution.
 			//_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
@@ -310,6 +314,12 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	fPortCount = numberOfPorts;
 	TRACE("port count is %d\n", fPortCount);
 
+	// Create the array that will keep bandwidth information
+	fFrameBandwidth = new(std::nothrow) uint16[NUMBER_OF_FRAMES];
+
+	for (int32 i = 0; i < NUMBER_OF_FRAMES; i++)
+		fFrameBandwidth[i] = MAX_AVAILABLE_BANDWIDTH;
+
 	// Create semaphore the finisher thread will wait for
 	fFinishTransfersSem = create_sem(0, "OHCI Finish Transfers");
 	if (fFinishTransfersSem < B_OK) {
@@ -323,7 +333,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	resume_thread(fFinishThread);
 
 	// Find the right interrupt vector, using MSIs if available.
-	uint8 interruptVector = fPCIInfo->u.h0.interrupt_line;
+	fIRQ = fPCIInfo->u.h0.interrupt_line;
 	if (sPCIx86Module != NULL && sPCIx86Module->get_msi_count(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function) >= 1) {
 		uint8 msiVector = 0;
@@ -332,14 +342,14 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 			&& sPCIx86Module->enable_msi(fPCIInfo->bus, fPCIInfo->device,
 				fPCIInfo->function) == B_OK) {
 			TRACE_ALWAYS("using message signaled interrupts\n");
-			interruptVector = msiVector;
+			fIRQ = msiVector;
+			fUseMSI = true;
 		}
 	}
 
 	// Install the interrupt handler
 	TRACE("installing interrupt handler\n");
-	install_io_interrupt_handler(interruptVector, _InterruptHandler,
-		(void *)this, 0);
+	install_io_interrupt_handler(fIRQ, _InterruptHandler, (void *)this, 0);
 
 	// Enable interesting interrupts now that the handler is in place
 	_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_NORMAL_INTERRUPTS
@@ -356,6 +366,8 @@ OHCI::~OHCI()
 	fStopFinishThread = true;
 	delete_sem(fFinishTransfersSem);
 	wait_for_thread(fFinishThread, &result);
+
+	remove_io_interrupt_handler(fIRQ, _InterruptHandler, (void *)this);
 
 	_LockEndpoints();
 	mutex_destroy(&fEndpointLock);
@@ -374,10 +386,21 @@ OHCI::~OHCI()
 			_FreeEndpoint(fInterruptEndpoints[i]);
 	}
 
+	delete [] fFrameBandwidth;
 	delete [] fInterruptEndpoints;
 	delete fRootHub;
 
+	if (fUseMSI && sPCIx86Module != NULL) {
+		sPCIx86Module->disable_msi(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function);
+		sPCIx86Module->unconfigure_msi(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function);
+	}
 	put_module(B_PCI_MODULE_NAME);
+	if (sPCIx86Module != NULL) {
+		sPCIx86Module = NULL;
+		put_module(B_PCI_X86_MODULE_NAME);
+	}
 }
 
 
@@ -445,9 +468,6 @@ OHCI::SubmitTransfer(Transfer *transfer)
 status_t
 OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
-	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
-		return _CancelQueuedIsochronousTransfers(pipe, force);
-
 	if (!Lock())
 		return B_ERROR;
 
@@ -473,6 +493,25 @@ OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 				= current->endpoint->tail_physical_descriptor;
 
 			if (!force) {
+				if (pipe->Type() & USB_OBJECT_ISO_PIPE) {
+					ohci_isochronous_td *descriptor
+						= (ohci_isochronous_td *)current->first_descriptor;
+					while (descriptor) {
+						uint16 frame = OHCI_ITD_GET_STARTING_FRAME(
+							descriptor->flags);
+						_ReleaseIsochronousBandwidth(frame,
+							OHCI_ITD_GET_FRAME_COUNT(descriptor->flags));
+						if (descriptor
+								== (ohci_isochronous_td*)current->last_descriptor)
+							// this is the last ITD of the transfer
+							break;
+
+						descriptor
+							= (ohci_isochronous_td *)
+							descriptor->next_done_descriptor;
+					}
+				}
+
 				// If the transfer is canceled by force, the one causing the
 				// cancel is probably not the one who initiated the transfer
 				// and the callback is likely not safe anymore
@@ -900,10 +939,55 @@ OHCI::_AddPendingTransfer(Transfer *transfer,
 
 
 status_t
-OHCI::_CancelQueuedIsochronousTransfers(Pipe *pipe, bool force)
+OHCI::_AddPendingIsochronousTransfer(Transfer *transfer,
+	ohci_endpoint_descriptor *endpoint, ohci_isochronous_td *firstDescriptor,
+	ohci_isochronous_td *lastDescriptor, bool directionIn)
 {
-	// TODO
-	return B_ERROR;
+	if (!transfer || !endpoint || !lastDescriptor)
+		return B_BAD_VALUE;
+
+	transfer_data *data = new(std::nothrow) transfer_data;
+	if (!data)
+		return B_NO_MEMORY;
+
+	status_t result = transfer->InitKernelAccess();
+	if (result < B_OK) {
+		delete data;
+		return result;
+	}
+
+	data->transfer = transfer;
+	data->endpoint = endpoint;
+	data->incoming = directionIn;
+	data->canceled = false;
+	data->link = NULL;
+
+	// the current tail will become the first descriptor
+	data->first_descriptor = (ohci_general_td*)endpoint->tail_logical_descriptor;
+
+	// the data and first descriptors are the same
+	data->data_descriptor = data->first_descriptor;
+
+	// the last and the first descriptor might be the same
+	if (lastDescriptor == firstDescriptor)
+		data->last_descriptor = data->first_descriptor;
+	else
+		data->last_descriptor = (ohci_general_td*)lastDescriptor;
+
+	if (!Lock()) {
+		delete data;
+		return B_ERROR;
+	}
+
+	if (fLastTransfer)
+		fLastTransfer->link = data;
+	else
+		fFirstTransfer = data;
+
+	fLastTransfer = data;
+	Unlock();
+
+	return B_OK;
 }
 
 
@@ -943,10 +1027,22 @@ OHCI::_FinishTransfers()
 			ohci_endpoint_descriptor *endpoint = transfer->endpoint;
 			status_t callbackStatus = B_OK;
 
+			if (endpoint->flags & OHCI_ENDPOINT_ISOCHRONOUS_FORMAT) {
+				transfer_data *next = transfer->link;
+				if (_FinishIsochronousTransfer(transfer, &lastTransfer)) {
+					delete transfer->transfer;
+					delete transfer;
+				}
+				transfer = next;
+				continue;
+			}
+
 			MutexLocker endpointLocker(endpoint->lock);
 
 			if ((endpoint->head_physical_descriptor & OHCI_ENDPOINT_HEAD_MASK)
-				!= endpoint->tail_physical_descriptor) {
+					!= endpoint->tail_physical_descriptor
+						&& (endpoint->head_physical_descriptor
+							& OHCI_ENDPOINT_HALTED) == 0) {
 				// there are still active transfers on this endpoint, we need
 				// to wait for all of them to complete, otherwise we'd read
 				// a potentially bogus data toggle value below
@@ -977,49 +1073,7 @@ OHCI::_FinishTransfers()
 						// still ensures that this td was handled before).
 						TRACE_ERROR("td error: 0x%08" B_PRIx32 "\n", status);
 
-						switch (status) {
-							case OHCI_TD_CONDITION_CRC_ERROR:
-							case OHCI_TD_CONDITION_BIT_STUFFING:
-							case OHCI_TD_CONDITION_TOGGLE_MISMATCH:
-								callbackStatus = B_DEV_CRC_ERROR;
-								break;
-
-							case OHCI_TD_CONDITION_STALL:
-								callbackStatus = B_DEV_STALLED;
-								break;
-
-							case OHCI_TD_CONDITION_NO_RESPONSE:
-								callbackStatus = B_TIMED_OUT;
-								break;
-
-							case OHCI_TD_CONDITION_PID_CHECK_FAILURE:
-								callbackStatus = B_DEV_BAD_PID;
-								break;
-
-							case OHCI_TD_CONDITION_UNEXPECTED_PID:
-								callbackStatus = B_DEV_UNEXPECTED_PID;
-								break;
-
-							case OHCI_TD_CONDITION_DATA_OVERRUN:
-								callbackStatus = B_DEV_DATA_OVERRUN;
-								break;
-
-							case OHCI_TD_CONDITION_DATA_UNDERRUN:
-								callbackStatus = B_DEV_DATA_UNDERRUN;
-								break;
-
-							case OHCI_TD_CONDITION_BUFFER_OVERRUN:
-								callbackStatus = B_DEV_FIFO_OVERRUN;
-								break;
-
-							case OHCI_TD_CONDITION_BUFFER_UNDERRUN:
-								callbackStatus = B_DEV_FIFO_UNDERRUN;
-								break;
-
-							default:
-								callbackStatus = B_ERROR;
-								break;
-						}
+						callbackStatus = _GetStatusOfConditionCode(status);
 
 						transferDone = true;
 						break;
@@ -1146,6 +1200,141 @@ OHCI::_FinishTransfers()
 			transfer = next;
 		}
 	}
+}
+
+
+bool
+OHCI::_FinishIsochronousTransfer(transfer_data *transfer,
+	transfer_data **_lastTransfer)
+{
+	status_t callbackStatus = B_OK;
+	size_t actualLength = 0;
+	uint32 packet = 0;
+
+	if (transfer->canceled)
+		callbackStatus = B_CANCELED;
+	else {
+		// at first check if ALL ITDs are retired by HC
+		ohci_isochronous_td *descriptor
+			= (ohci_isochronous_td *)transfer->first_descriptor;
+		while (descriptor) {
+			if (OHCI_TD_GET_CONDITION_CODE(descriptor->flags)
+				== OHCI_TD_CONDITION_NOT_ACCESSED) {
+				TRACE("ITD %p still active\n", descriptor);
+				*_lastTransfer = transfer;
+				return false;
+			}
+
+			if (descriptor == (ohci_isochronous_td*)transfer->last_descriptor) {
+				// this is the last ITD of the transfer
+				descriptor = (ohci_isochronous_td *)transfer->first_descriptor;
+				break;
+			}
+
+			descriptor
+				= (ohci_isochronous_td *)descriptor->next_done_descriptor;
+		}
+
+		while (descriptor) {
+			uint32 status = OHCI_TD_GET_CONDITION_CODE(descriptor->flags);
+			if (status != OHCI_TD_CONDITION_NO_ERROR) {
+				TRACE_ERROR("ITD error: 0x%08" B_PRIx32 "\n", status);
+				// spec says that in most cases condition code
+				// of retired ITDs is set to NoError, but for the
+				// time overrun it can be DataOverrun. We assume
+				// the _first_ occurience of such error as status
+				// reported to the callback
+				if (callbackStatus == B_OK)
+					callbackStatus = _GetStatusOfConditionCode(status);
+			}
+
+			usb_isochronous_data *isochronousData
+				= transfer->transfer->IsochronousData();
+
+			uint32 frameCount = OHCI_ITD_GET_FRAME_COUNT(descriptor->flags);
+			for (size_t i = 0; i < frameCount; i++, packet++) {
+				usb_iso_packet_descriptor* packet_descriptor
+					= &isochronousData->packet_descriptors[packet];
+
+				uint16 offset = descriptor->offset[OHCI_ITD_OFFSET_IDX(i)];
+				uint8 code = OHCI_ITD_GET_BUFFER_CONDITION_CODE(offset);
+				packet_descriptor->status = _GetStatusOfConditionCode(code);
+
+				// not touched by HC - sheduled too late to be processed
+				// in the requested frame - so we ignore it too
+				if (packet_descriptor->status == B_DEV_TOO_LATE)
+					continue;
+
+				size_t len = OHCI_ITD_GET_BUFFER_LENGTH(offset);
+				if (!transfer->incoming)
+					len = packet_descriptor->request_length - len;
+
+				packet_descriptor->actual_length = len;
+				actualLength += len;
+			}
+
+			uint16 frame = OHCI_ITD_GET_STARTING_FRAME(descriptor->flags);
+			_ReleaseIsochronousBandwidth(frame,
+				OHCI_ITD_GET_FRAME_COUNT(descriptor->flags));
+
+			TRACE("ITD %p done\n", descriptor);
+
+			if (descriptor == (ohci_isochronous_td*)transfer->last_descriptor)
+				break;
+
+			descriptor
+				= (ohci_isochronous_td *)descriptor->next_done_descriptor;
+		}
+	}
+
+	// remove the transfer from the list first so we are sure
+	// it doesn't get canceled while we still process it
+	if (Lock()) {
+		if (*_lastTransfer)
+			(*_lastTransfer)->link = transfer->link;
+
+		if (transfer == fFirstTransfer)
+			fFirstTransfer = transfer->link;
+		if (transfer == fLastTransfer)
+			fLastTransfer = *_lastTransfer;
+
+		// store the currently processing pipe here so we can wait
+		// in cancel if we are processing something on the target pipe
+		if (!transfer->canceled)
+			fProcessingPipe = transfer->transfer->TransferPipe();
+
+		transfer->link = NULL;
+		Unlock();
+	}
+
+	// break the descriptor chain on the last descriptor
+	transfer->last_descriptor->next_logical_descriptor = NULL;
+	TRACE("iso.transfer %p done with status 0x%08" B_PRIx32 " len:%ld\n",
+		transfer, callbackStatus, actualLength);
+
+	// if canceled the callback has already been called
+	if (!transfer->canceled) {
+		if (callbackStatus == B_OK && actualLength > 0) {
+			if (transfer->data_descriptor && transfer->incoming) {
+				// data to read out
+				iovec *vector = transfer->transfer->Vector();
+				size_t vectorCount = transfer->transfer->VectorCount();
+
+				transfer->transfer->PrepareKernelAccess();
+				_ReadIsochronousDescriptorChain(
+					(ohci_isochronous_td*)transfer->data_descriptor,
+					vector, vectorCount);
+			}
+		}
+
+		transfer->transfer->Finished(callbackStatus, actualLength);
+		fProcessingPipe = NULL;
+	}
+
+	_FreeIsochronousDescriptorChain(
+		(ohci_isochronous_td*)transfer->first_descriptor);
+
+	return true;
 }
 
 
@@ -1293,8 +1482,58 @@ OHCI::_SubmitTransfer(Transfer *transfer)
 status_t
 OHCI::_SubmitIsochronousTransfer(Transfer *transfer)
 {
-	TRACE_ERROR("isochronous transfers not implemented\n");
-	return B_ERROR;
+	Pipe *pipe = transfer->TransferPipe();
+	bool directionIn = (pipe->Direction() == Pipe::In);
+	usb_isochronous_data *isochronousData = transfer->IsochronousData();
+
+	ohci_isochronous_td *firstDescriptor = NULL;
+	ohci_isochronous_td *lastDescriptor = NULL;
+	status_t result = _CreateIsochronousDescriptorChain(&firstDescriptor,
+		&lastDescriptor, transfer);
+
+	if (firstDescriptor == 0 || lastDescriptor == 0)
+		return B_ERROR;
+
+	if (result < B_OK)
+		return result;
+
+	// Set the last descriptor to generate an interrupt
+	lastDescriptor->flags &= ~OHCI_ITD_INTERRUPT_MASK;
+	// let the controller retire last ITD
+	lastDescriptor->flags |= OHCI_ITD_SET_DELAY_INTERRUPT(1);
+
+	// If direction is out set every descriptor data
+	if (pipe->Direction() == Pipe::Out)
+		_WriteIsochronousDescriptorChain(firstDescriptor,
+			transfer->Vector(), transfer->VectorCount());
+	else
+		// Initialize the packet descriptors
+		for (uint32 i = 0; i < isochronousData->packet_count; i++) {
+			isochronousData->packet_descriptors[i].actual_length = 0;
+			isochronousData->packet_descriptors[i].status = B_NO_INIT;
+		}
+
+	// Add to the transfer list
+	ohci_endpoint_descriptor *endpoint
+		= (ohci_endpoint_descriptor *)pipe->ControllerCookie();
+
+	MutexLocker endpointLocker(endpoint->lock);
+	result = _AddPendingIsochronousTransfer(transfer, endpoint,
+		firstDescriptor, lastDescriptor, directionIn);
+	if (result < B_OK) {
+		TRACE_ERROR("failed to add pending iso.transfer:"
+			"0x%08" B_PRIx32 "\n", result);
+		_FreeIsochronousDescriptorChain(firstDescriptor);
+		return result;
+	}
+
+	// Add the descriptor chain to the endpoint
+	_SwitchIsochronousEndpointTail(endpoint, firstDescriptor, lastDescriptor);
+	endpointLocker.Unlock();
+
+	endpoint->flags &= ~OHCI_ENDPOINT_SKIP;
+
+	return B_OK;
 }
 
 
@@ -1325,6 +1564,54 @@ OHCI::_SwitchEndpointTail(ohci_endpoint_descriptor *endpoint,
 		_LinkDescriptors(tail, first);
 	else
 		_LinkDescriptors(last, first);
+
+	// update the endpoint tail pointer to reflect the change
+	endpoint->tail_logical_descriptor = first;
+	endpoint->tail_physical_descriptor = (uint32)first->physical_address;
+	TRACE("switched tail from %p to %p\n", tail, first);
+
+#if 0
+	_PrintEndpoint(endpoint);
+	_PrintDescriptorChain(tail);
+#endif
+}
+
+
+void
+OHCI::_SwitchIsochronousEndpointTail(ohci_endpoint_descriptor *endpoint,
+	ohci_isochronous_td *first, ohci_isochronous_td *last)
+{
+	// fill in the information of the first descriptor into the current tail
+	ohci_isochronous_td *tail
+		= (ohci_isochronous_td*)endpoint->tail_logical_descriptor;
+	tail->flags = first->flags;
+	tail->buffer_page_byte_0 = first->buffer_page_byte_0;
+	tail->next_physical_descriptor = first->next_physical_descriptor;
+	tail->last_byte_address = first->last_byte_address;
+	tail->buffer_size = first->buffer_size;
+	tail->buffer_logical = first->buffer_logical;
+	tail->next_logical_descriptor = first->next_logical_descriptor;
+	tail->next_done_descriptor = first->next_done_descriptor;
+
+	// the first descriptor becomes the new tail
+	first->flags = 0;
+	first->buffer_page_byte_0 = 0;
+	first->next_physical_descriptor = 0;
+	first->last_byte_address = 0;
+	first->buffer_size = 0;
+	first->buffer_logical = NULL;
+	first->next_logical_descriptor = NULL;
+	first->next_done_descriptor = NULL;
+
+	for (int i = 0; i < OHCI_ITD_NOFFSET; i++) {
+		tail->offset[i] = first->offset[i];
+		first->offset[i] = 0;
+	}
+
+	if (first == last)
+		_LinkIsochronousDescriptors(tail, first, NULL);
+	else
+		_LinkIsochronousDescriptors(last, first, NULL);
 
 	// update the endpoint tail pointer to reflect the change
 	endpoint->tail_logical_descriptor = first;
@@ -1501,9 +1788,11 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 	if (pipe->Type() & USB_OBJECT_ISO_PIPE) {
 		// Set the isochronous bit format
 		endpoint->flags |= OHCI_ENDPOINT_ISOCHRONOUS_FORMAT;
-		// TODO
-		_FreeEndpoint(endpoint);
-		return B_ERROR;
+		ohci_isochronous_td *tail = _CreateIsochronousDescriptor(0);
+		tail->flags = 0;
+		endpoint->tail_logical_descriptor = tail;
+		endpoint->head_physical_descriptor = tail->physical_address;
+		endpoint->tail_physical_descriptor = tail->physical_address;
 	} else {
 		ohci_general_td *tail = _CreateGeneralDescriptor(0);
 		tail->flags = 0;
@@ -1677,6 +1966,191 @@ OHCI::_FreeDescriptorChain(ohci_general_td *topDescriptor)
 }
 
 
+ohci_isochronous_td *
+OHCI::_CreateIsochronousDescriptor(size_t bufferSize)
+{
+	ohci_isochronous_td *descriptor = NULL;
+	phys_addr_t physicalAddress;
+
+	if (fStack->AllocateChunk((void **)&descriptor, &physicalAddress,
+		sizeof(ohci_isochronous_td)) != B_OK) {
+		TRACE_ERROR("failed to allocate isochronous descriptor\n");
+		return NULL;
+	}
+
+	descriptor->physical_address = (uint32)physicalAddress;
+	descriptor->next_physical_descriptor = 0;
+	descriptor->next_logical_descriptor = NULL;
+	descriptor->next_done_descriptor = NULL;
+	descriptor->buffer_size = bufferSize;
+	if (bufferSize == 0) {
+		descriptor->buffer_page_byte_0 = 0;
+		descriptor->buffer_logical = NULL;
+		descriptor->last_byte_address = 0;
+		return descriptor;
+	}
+
+	if (fStack->AllocateChunk(&descriptor->buffer_logical,
+		&physicalAddress, bufferSize) != B_OK) {
+		TRACE_ERROR("failed to allocate space for iso.buffer\n");
+		fStack->FreeChunk(descriptor, descriptor->physical_address,
+			sizeof(ohci_isochronous_td));
+		return NULL;
+	}
+	descriptor->buffer_page_byte_0 = (uint32)physicalAddress;
+	descriptor->last_byte_address
+		= descriptor->buffer_page_byte_0 + bufferSize - 1;
+
+	return descriptor;
+}
+
+
+void
+OHCI::_FreeIsochronousDescriptor(ohci_isochronous_td *descriptor)
+{
+	if (!descriptor)
+		return;
+
+	if (descriptor->buffer_logical) {
+		fStack->FreeChunk(descriptor->buffer_logical,
+			descriptor->buffer_page_byte_0, descriptor->buffer_size);
+	}
+
+	fStack->FreeChunk((void *)descriptor, descriptor->physical_address,
+		sizeof(ohci_general_td));
+}
+
+
+status_t
+OHCI::_CreateIsochronousDescriptorChain(ohci_isochronous_td **_firstDescriptor,
+	ohci_isochronous_td **_lastDescriptor, Transfer *transfer)
+{
+	Pipe *pipe = transfer->TransferPipe();
+	usb_isochronous_data *isochronousData = transfer->IsochronousData();
+
+	size_t dataLength = transfer->VectorLength();
+	size_t packet_count = isochronousData->packet_count;
+
+	if (packet_count == 0) {
+		TRACE_ERROR("isochronous packet_count should not be equal to zero.");
+		return B_BAD_VALUE;
+	}
+
+	size_t packetSize = dataLength / packet_count;
+	if (dataLength % packet_count != 0)
+		packetSize++;
+
+	if (packetSize > pipe->MaxPacketSize()) {
+		TRACE_ERROR("isochronous packetSize %ld is bigger"
+			" than pipe MaxPacketSize %ld.", packetSize, pipe->MaxPacketSize());
+		return B_BAD_VALUE;
+	}
+
+	uint16 bandwidth = transfer->Bandwidth() / packet_count;
+	if (transfer->Bandwidth() % packet_count != 0)
+		bandwidth++;
+
+	ohci_isochronous_td *firstDescriptor = NULL;
+	ohci_isochronous_td *lastDescriptor = *_firstDescriptor;
+
+	// the frame number currently processed by the host controller
+	uint16 currentFrame = fHcca->current_frame_number & 0xFFFF;
+	uint16 safeFrames = 5;
+
+	// The entry where to start inserting the first Isochronous descriptor
+	// real frame number may differ in case provided one has not bandwidth
+	if (isochronousData->flags & USB_ISO_ASAP ||
+		isochronousData->starting_frame_number == NULL)
+		// We should stay about 5-10 ms ahead of the controller
+		// USB1 frame is equal to 1 ms
+		currentFrame += safeFrames;
+	else
+		currentFrame = *isochronousData->starting_frame_number;
+
+	uint16 packets = packet_count;
+	uint16 frameOffset = 0;
+	while (packets > 0) {
+		// look for up to 8 continous frames with available bandwidth
+		uint16 frameCount = 0;
+		while (frameCount < min_c(OHCI_ITD_NOFFSET, packets)
+				&& _AllocateIsochronousBandwidth(frameOffset + currentFrame
+					+ frameCount, bandwidth))
+			frameCount++;
+
+		if (frameCount == 0) {
+			// starting frame has no bandwidth for our transaction - try next
+			if (++frameOffset >= 0xFFFF) {
+				TRACE_ERROR("failed to allocate bandwidth\n");
+				_FreeIsochronousDescriptorChain(firstDescriptor);
+				return B_NO_MEMORY;
+			}
+			continue;
+		}
+
+		ohci_isochronous_td *descriptor = _CreateIsochronousDescriptor(
+				packetSize * frameCount);
+
+		if (!descriptor) {
+			TRACE_ERROR("failed to allocate ITD\n");
+			_ReleaseIsochronousBandwidth(currentFrame + frameOffset, frameCount);
+			_FreeIsochronousDescriptorChain(firstDescriptor);
+			return B_NO_MEMORY;
+		}
+
+		uint16 pageOffset = descriptor->buffer_page_byte_0 & 0xfff;
+		descriptor->buffer_page_byte_0 &= ~0xfff;
+		for (uint16 i = 0; i < frameCount; i++) {
+			descriptor->offset[OHCI_ITD_OFFSET_IDX(i)]
+				= OHCI_ITD_MK_OFFS(pageOffset + packetSize * i);
+		}
+
+		descriptor->flags = OHCI_ITD_SET_FRAME_COUNT(frameCount)
+				| OHCI_ITD_SET_CONDITION_CODE(OHCI_ITD_CONDITION_NOT_ACCESSED)
+				| OHCI_ITD_SET_DELAY_INTERRUPT(OHCI_ITD_INTERRUPT_NONE)
+				| OHCI_ITD_SET_STARTING_FRAME(currentFrame + frameOffset);
+
+		// the last packet may be shorter than other ones in this transfer
+		if (packets <= OHCI_ITD_NOFFSET)
+			descriptor->last_byte_address
+				+= dataLength - packetSize * (packet_count);
+
+		// link to previous
+		if (lastDescriptor)
+			_LinkIsochronousDescriptors(lastDescriptor, descriptor, descriptor);
+
+		lastDescriptor = descriptor;
+		if (!firstDescriptor)
+			firstDescriptor = descriptor;
+
+		packets -= frameCount;
+
+		frameOffset += frameCount;
+
+		if (packets == 0 && isochronousData->starting_frame_number)
+			*isochronousData->starting_frame_number = currentFrame + frameOffset;
+	}
+
+	*_firstDescriptor = firstDescriptor;
+	*_lastDescriptor = lastDescriptor;
+
+	return B_OK;
+}
+
+
+void
+OHCI::_FreeIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor)
+{
+	ohci_isochronous_td *current = topDescriptor;
+	ohci_isochronous_td *next = NULL;
+
+	while (current) {
+		next = (ohci_isochronous_td *)current->next_done_descriptor;
+		_FreeIsochronousDescriptor(current);
+		current = next;
+	}
+}
+
+
 size_t
 OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 	size_t vectorCount)
@@ -1725,6 +2199,61 @@ OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 			break;
 
 		current = (ohci_general_td *)current->next_logical_descriptor;
+	}
+
+	TRACE("wrote descriptor chain (%ld bytes)\n", actualLength);
+	return actualLength;
+}
+
+
+size_t
+OHCI::_WriteIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
+	iovec *vector, size_t vectorCount)
+{
+	ohci_isochronous_td *current = topDescriptor;
+	size_t actualLength = 0;
+	size_t vectorIndex = 0;
+	size_t vectorOffset = 0;
+	size_t bufferOffset = 0;
+
+	while (current) {
+		if (!current->buffer_logical)
+			break;
+
+		while (true) {
+			size_t length = min_c(current->buffer_size - bufferOffset,
+				vector[vectorIndex].iov_len - vectorOffset);
+
+			TRACE("copying %ld bytes to bufferOffset %ld from"
+				" vectorOffset %ld at index %ld of %ld\n", length, bufferOffset,
+				vectorOffset, vectorIndex, vectorCount);
+			memcpy((uint8 *)current->buffer_logical + bufferOffset,
+				(uint8 *)vector[vectorIndex].iov_base + vectorOffset, length);
+
+			actualLength += length;
+			vectorOffset += length;
+			bufferOffset += length;
+
+			if (vectorOffset >= vector[vectorIndex].iov_len) {
+				if (++vectorIndex >= vectorCount) {
+					TRACE("wrote descriptor chain (%ld bytes, no"
+						" more vectors)\n", actualLength);
+					return actualLength;
+				}
+
+				vectorOffset = 0;
+			}
+
+			if (bufferOffset >= current->buffer_size) {
+				bufferOffset = 0;
+				break;
+			}
+		}
+
+		if (!current->next_logical_descriptor)
+			break;
+
+		current = (ohci_isochronous_td *)current->next_logical_descriptor;
 	}
 
 	TRACE("wrote descriptor chain (%ld bytes)\n", actualLength);
@@ -1791,6 +2320,59 @@ OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 }
 
 
+void
+OHCI::_ReadIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
+	iovec *vector, size_t vectorCount)
+{
+	ohci_isochronous_td *current = topDescriptor;
+	size_t actualLength = 0;
+	size_t vectorIndex = 0;
+	size_t vectorOffset = 0;
+	size_t bufferOffset = 0;
+
+	while (current && OHCI_ITD_GET_CONDITION_CODE(current->flags)
+			!= OHCI_ITD_CONDITION_NOT_ACCESSED) {
+		size_t bufferSize = current->buffer_size;
+		if (current->buffer_logical != NULL && bufferSize > 0) {
+			while (true) {
+				size_t length = min_c(bufferSize - bufferOffset,
+					vector[vectorIndex].iov_len - vectorOffset);
+
+				TRACE("copying %ld bytes to vectorOffset %ld from bufferOffset"
+					" %ld at index %ld of %ld\n", length, vectorOffset,
+					bufferOffset, vectorIndex, vectorCount);
+				memcpy((uint8 *)vector[vectorIndex].iov_base + vectorOffset,
+					(uint8 *)current->buffer_logical + bufferOffset, length);
+
+				actualLength += length;
+				vectorOffset += length;
+				bufferOffset += length;
+
+				if (vectorOffset >= vector[vectorIndex].iov_len) {
+					if (++vectorIndex >= vectorCount) {
+						TRACE("read descriptor chain (%ld bytes, "
+							"no more vectors)\n", actualLength);
+						return;
+					}
+
+					vectorOffset = 0;
+				}
+
+				if (bufferOffset >= bufferSize) {
+					bufferOffset = 0;
+					break;
+				}
+			}
+		}
+
+		current = (ohci_isochronous_td *)current->next_done_descriptor;
+	}
+
+	TRACE("read descriptor chain (%ld bytes)\n", actualLength);
+	return;
+}
+
+
 size_t
 OHCI::_ReadActualLength(ohci_general_td *topDescriptor)
 {
@@ -1822,18 +2404,85 @@ OHCI::_LinkDescriptors(ohci_general_td *first, ohci_general_td *second)
 }
 
 
-ohci_isochronous_td *
-OHCI::_CreateIsochronousDescriptor()
+void
+OHCI::_LinkIsochronousDescriptors(ohci_isochronous_td *first,
+	ohci_isochronous_td *second, ohci_isochronous_td *nextDone)
 {
-	// TODO
-	return NULL;
+	first->next_physical_descriptor = second->physical_address;
+	first->next_logical_descriptor = second;
+	first->next_done_descriptor = nextDone;
+}
+
+
+bool
+OHCI::_AllocateIsochronousBandwidth(uint16 frame, uint16 size)
+{
+	frame %= NUMBER_OF_FRAMES;
+	if (size > fFrameBandwidth[frame])
+		return false;
+
+	fFrameBandwidth[frame]-= size;
+	return true;
 }
 
 
 void
-OHCI::_FreeIsochronousDescriptor(ohci_isochronous_td *descriptor)
+OHCI::_ReleaseIsochronousBandwidth(uint16 startFrame, uint16 frameCount)
 {
-	// TODO
+	for (size_t index = 0; index < frameCount; index++) {
+		uint16 frame = (startFrame + index) % NUMBER_OF_FRAMES;
+		fFrameBandwidth[frame] = MAX_AVAILABLE_BANDWIDTH;
+	}
+}
+
+
+status_t
+OHCI::_GetStatusOfConditionCode(uint8 conditionCode)
+{
+	switch (conditionCode) {
+		case OHCI_TD_CONDITION_NO_ERROR:
+			return B_OK;
+
+		case OHCI_TD_CONDITION_CRC_ERROR:
+		case OHCI_TD_CONDITION_BIT_STUFFING:
+		case OHCI_TD_CONDITION_TOGGLE_MISMATCH:
+			return B_DEV_CRC_ERROR;
+
+		case OHCI_TD_CONDITION_STALL:
+			return B_DEV_STALLED;
+
+		case OHCI_TD_CONDITION_NO_RESPONSE:
+			return B_TIMED_OUT;
+
+		case OHCI_TD_CONDITION_PID_CHECK_FAILURE:
+			return B_DEV_BAD_PID;
+
+		case OHCI_TD_CONDITION_UNEXPECTED_PID:
+			return B_DEV_UNEXPECTED_PID;
+
+		case OHCI_TD_CONDITION_DATA_OVERRUN:
+			return B_DEV_DATA_OVERRUN;
+
+		case OHCI_TD_CONDITION_DATA_UNDERRUN:
+			return B_DEV_DATA_UNDERRUN;
+
+		case OHCI_TD_CONDITION_BUFFER_OVERRUN:
+			return B_DEV_FIFO_OVERRUN;
+
+		case OHCI_TD_CONDITION_BUFFER_UNDERRUN:
+			return B_DEV_FIFO_UNDERRUN;
+
+		case OHCI_TD_CONDITION_NOT_ACCESSED:
+			return B_DEV_PENDING;
+
+		case 0x0E:
+			return B_DEV_TOO_LATE; // PSW: _NOT_ACCESSED
+
+		default:
+			break;
+	}
+
+	return B_ERROR;
 }
 
 
@@ -1868,7 +2517,7 @@ OHCI::_ReadReg(uint32 reg)
 void
 OHCI::_PrintEndpoint(ohci_endpoint_descriptor *endpoint)
 {
-	TRACE_ALWAYS("endpoint %p\n", endpoint);
+	dprintf("endpoint %p\n", endpoint);
 	dprintf("\tflags........... 0x%08" B_PRIx32 "\n", endpoint->flags);
 	dprintf("\ttail_physical... 0x%08" B_PRIx32 "\n", endpoint->tail_physical_descriptor);
 	dprintf("\thead_physical... 0x%08" B_PRIx32 "\n", endpoint->head_physical_descriptor);
@@ -1883,7 +2532,7 @@ void
 OHCI::_PrintDescriptorChain(ohci_general_td *topDescriptor)
 {
 	while (topDescriptor) {
-		TRACE_ALWAYS("descriptor %p\n", topDescriptor);
+		dprintf("descriptor %p\n", topDescriptor);
 		dprintf("\tflags........... 0x%08" B_PRIx32 "\n", topDescriptor->flags);
 		dprintf("\tbuffer_physical. 0x%08" B_PRIx32 "\n", topDescriptor->buffer_physical);
 		dprintf("\tnext_physical... 0x%08" B_PRIx32 "\n", topDescriptor->next_physical_descriptor);
@@ -1896,3 +2545,30 @@ OHCI::_PrintDescriptorChain(ohci_general_td *topDescriptor)
 		topDescriptor = (ohci_general_td *)topDescriptor->next_logical_descriptor;
 	}
 }
+
+
+void
+OHCI::_PrintDescriptorChain(ohci_isochronous_td *topDescriptor)
+{
+	while (topDescriptor) {
+		dprintf("iso.descriptor %p\n", topDescriptor);
+		dprintf("\tflags........... 0x%08" B_PRIx32 "\n", topDescriptor->flags);
+		dprintf("\tbuffer_pagebyte0 0x%08" B_PRIx32 "\n", topDescriptor->buffer_page_byte_0);
+		dprintf("\tnext_physical... 0x%08" B_PRIx32 "\n", topDescriptor->next_physical_descriptor);
+		dprintf("\tlast_byte....... 0x%08" B_PRIx32 "\n", topDescriptor->last_byte_address);
+		dprintf("\toffset:\n\t0x%04x 0x%04x 0x%04x 0x%04x\n"
+							"\t0x%04x 0x%04x 0x%04x 0x%04x\n",
+				topDescriptor->offset[0], topDescriptor->offset[1],
+				topDescriptor->offset[2], topDescriptor->offset[3],
+				topDescriptor->offset[4], topDescriptor->offset[5],
+				topDescriptor->offset[6], topDescriptor->offset[7]);
+		dprintf("\tphysical........ 0x%08" B_PRIx32 "\n", topDescriptor->physical_address);
+		dprintf("\tbuffer_size..... %lu\n", topDescriptor->buffer_size);
+		dprintf("\tbuffer_logical.. %p\n", topDescriptor->buffer_logical);
+		dprintf("\tnext_logical.... %p\n", topDescriptor->next_logical_descriptor);
+		dprintf("\tnext_done....... %p\n", topDescriptor->next_done_descriptor);
+
+		topDescriptor = (ohci_isochronous_td *)topDescriptor->next_done_descriptor;
+	}
+}
+

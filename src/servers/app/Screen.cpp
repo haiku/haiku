@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2013, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -140,13 +140,18 @@ Screen::SetBestMode(uint16 width, uint16 height, uint32 colorSpace,
 	int32 index = _FindBestMode(modes, count, width, height, colorSpace,
 		frequency);
 	if (index < 0) {
+		debug_printf("app_server: Finding best mode for %ux%u (%" B_PRIu32
+			", %g Hz%s) failed\n", width, height, colorSpace, frequency,
+			strict ? ", strict" : "");
+
 		if (strict) {
-			debug_printf("Finding best mode failed\n");
 			delete[] modes;
 			return B_ERROR;
 		} else {
 			index = 0;
 			// Just use the first mode in the list
+			debug_printf("app_server: Use %ux%u (%" B_PRIu32 ") instead.\n",
+				modes[0].timing.h_total, modes[0].timing.v_total, modes[0].space);
 		}
 	}
 

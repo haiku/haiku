@@ -55,14 +55,13 @@ public:
 	typedef Split<ThisBuilder>		SplitBuilder;
 
 public:
-	inline						Group(enum orientation orientation
-										= B_HORIZONTAL,
+	inline						Group(orientation orientation = B_HORIZONTAL,
 									float spacing = B_USE_DEFAULT_SPACING);
 	inline						Group(BWindow* window,
-									enum orientation orientation = B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									float spacing = B_USE_DEFAULT_SPACING);
 	inline						Group(BView* view,
-									enum orientation orientation = B_HORIZONTAL,
+									orientation orientation = B_HORIZONTAL,
 									float spacing = B_USE_DEFAULT_SPACING);
 	inline						Group(BGroupLayout* layout);
 	inline						Group(BGroupView* view);
@@ -77,7 +76,7 @@ public:
 	inline	ThisBuilder&		Add(BLayoutItem* item);
 	inline	ThisBuilder&		Add(BLayoutItem* item, float weight);
 
-	inline	GroupBuilder		AddGroup(enum orientation orientation,
+	inline	GroupBuilder		AddGroup(orientation orientation,
 									float spacing = B_USE_DEFAULT_SPACING,
 									float weight = 1.0f);
 	inline	GroupBuilder		AddGroup(BGroupView* groupView,
@@ -94,7 +93,7 @@ public:
 	inline	GridBuilder			AddGrid(BGridView* gridView,
 									float weight = 1.0f);
 
-	inline	SplitBuilder		AddSplit(enum orientation orientation,
+	inline	SplitBuilder		AddSplit(orientation orientation,
 									float spacing = B_USE_DEFAULT_SPACING,
 									float weight = 1.0f);
 	inline	SplitBuilder		AddSplit(BSplitView* splitView,
@@ -165,7 +164,7 @@ public:
 									int32 textColumnCount = 1,
 									int32 rowCount = 1);
 
-	inline	GroupBuilder		AddGroup(enum orientation orientation,
+	inline	GroupBuilder		AddGroup(orientation orientation,
 									float spacing, int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
 	inline	GroupBuilder		AddGroup(BGroupView* groupView,	int32 column,
@@ -186,7 +185,7 @@ public:
 									int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
 
-	inline	SplitBuilder		AddSplit(enum orientation orientation,
+	inline	SplitBuilder		AddSplit(orientation orientation,
 									float spacing, int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
 	inline	SplitBuilder		AddSplit(BSplitView* splitView, int32 column,
@@ -225,8 +224,7 @@ public:
 	typedef Split<ThisBuilder>		SplitBuilder;
 
 public:
-	inline						Split(enum orientation orientation
-										= B_HORIZONTAL,
+	inline						Split(orientation orientation = B_HORIZONTAL,
 									float spacing = B_USE_DEFAULT_SPACING);
 	inline						Split(BSplitView* view);
 
@@ -239,7 +237,7 @@ public:
 	inline	ThisBuilder&		Add(BLayoutItem* item);
 	inline	ThisBuilder&		Add(BLayoutItem* item, float weight);
 
-	inline	GroupBuilder		AddGroup(enum orientation orientation,
+	inline	GroupBuilder		AddGroup(orientation orientation,
 									float spacing = B_USE_DEFAULT_SPACING,
 									float weight = 1.0f);
 	inline	GroupBuilder		AddGroup(BGroupView* groupView,
@@ -256,7 +254,7 @@ public:
 	inline	GridBuilder			AddGrid(BGridLayout* gridLayout,
 									float weight = 1.0f);
 
-	inline	SplitBuilder		AddSplit(enum orientation orientation,
+	inline	SplitBuilder		AddSplit(orientation orientation,
 									float spacing = B_USE_DEFAULT_SPACING,
 									float weight = 1.0f);
 	inline	SplitBuilder		AddSplit(BSplitView* splitView,
@@ -358,7 +356,7 @@ Base<ParentBuilder>::End()
 
 
 template<typename ParentBuilder>
-Group<ParentBuilder>::Group(enum orientation orientation, float spacing)
+Group<ParentBuilder>::Group(orientation orientation, float spacing)
 	:
 	fLayout((new BGroupView(orientation, spacing))->GroupLayout())
 {
@@ -366,8 +364,8 @@ Group<ParentBuilder>::Group(enum orientation orientation, float spacing)
 
 
 template<typename ParentBuilder>
-Group<ParentBuilder>::Group(BWindow* window, enum orientation orientation,
-	float spacing)
+Group<ParentBuilder>::Group(BWindow* window, orientation orientation,
+		float spacing)
 	:
 	fLayout(new BGroupLayout(orientation, spacing))
 {
@@ -379,8 +377,8 @@ Group<ParentBuilder>::Group(BWindow* window, enum orientation orientation,
 
 
 template<typename ParentBuilder>
-Group<ParentBuilder>::Group(BView* view, enum orientation orientation,
-	float spacing)
+Group<ParentBuilder>::Group(BView* view, orientation orientation,
+		float spacing)
 	:
 	fLayout(new BGroupLayout(orientation, spacing))
 {
@@ -478,8 +476,8 @@ Group<ParentBuilder>::Add(BLayoutItem* item, float weight)
 
 template<typename ParentBuilder>
 typename Group<ParentBuilder>::GroupBuilder
-Group<ParentBuilder>::AddGroup(enum orientation orientation, float spacing,
-	float weight)
+Group<ParentBuilder>::AddGroup(orientation orientation, float spacing,
+		float weight)
 {
 	GroupBuilder builder(new BGroupLayout(orientation, spacing));
 	builder.SetParent(this);
@@ -546,8 +544,8 @@ Group<ParentBuilder>::AddGrid(BGridView* gridView, float weight)
 
 template<typename ParentBuilder>
 typename Group<ParentBuilder>::SplitBuilder
-Group<ParentBuilder>::AddSplit(enum orientation orientation, float spacing,
-	float weight)
+Group<ParentBuilder>::AddSplit(orientation orientation, float spacing,
+		float weight)
 {
 	SplitBuilder builder(orientation, spacing);
 	builder.SetParent(this);
@@ -800,8 +798,8 @@ Grid<ParentBuilder>::AddTextControl(BTextControl* textControl, int32 column,
 
 template<typename ParentBuilder>
 typename Grid<ParentBuilder>::GroupBuilder
-Grid<ParentBuilder>::AddGroup(enum orientation orientation, float spacing,
-	int32 column, int32 row, int32 columnCount, int32 rowCount)
+Grid<ParentBuilder>::AddGroup(orientation orientation, float spacing,
+		int32 column, int32 row, int32 columnCount, int32 rowCount)
 {
 	GroupBuilder builder(new BGroupLayout(orientation, spacing));
 	builder.SetParent(this);
@@ -860,7 +858,7 @@ Grid<ParentBuilder>::AddGrid(BGridView* gridView, int32 column, int32 row,
 
 template<typename ParentBuilder>
 typename Grid<ParentBuilder>::SplitBuilder
-Grid<ParentBuilder>::AddSplit(enum orientation orientation, float spacing,
+Grid<ParentBuilder>::AddSplit(orientation orientation, float spacing,
 	int32 column, int32 row, int32 columnCount, int32 rowCount)
 {
 	SplitBuilder builder(orientation, spacing);
@@ -986,7 +984,7 @@ Grid<ParentBuilder>::operator BGridLayout*()
 
 
 template<typename ParentBuilder>
-Split<ParentBuilder>::Split(enum orientation orientation, float spacing)
+Split<ParentBuilder>::Split(orientation orientation, float spacing)
 	:
 	fView(new BSplitView(orientation, spacing))
 {
@@ -1065,8 +1063,8 @@ Split<ParentBuilder>::Add(BLayoutItem* item, float weight)
 
 template<typename ParentBuilder>
 typename Split<ParentBuilder>::GroupBuilder
-Split<ParentBuilder>::AddGroup(enum orientation orientation, float spacing,
-	float weight)
+Split<ParentBuilder>::AddGroup(orientation orientation, float spacing,
+		float weight)
 {
 	GroupBuilder builder(new BGroupLayout(orientation, spacing));
 	builder.SetParent(this);
@@ -1133,8 +1131,8 @@ Split<ParentBuilder>::AddGrid(BGridLayout* layout, float weight)
 
 template<typename ParentBuilder>
 typename Split<ParentBuilder>::SplitBuilder
-Split<ParentBuilder>::AddSplit(enum orientation orientation, float spacing,
-	float weight)
+Split<ParentBuilder>::AddSplit(orientation orientation, float spacing,
+		float weight)
 {
 	SplitBuilder builder(orientation, spacing);
 	builder.SetParent(this);

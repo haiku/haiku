@@ -46,7 +46,7 @@ Screen	Screen		Экран
 %.1f Hz	Screen		%.1f Гц
 8 bits/pixel, 256 colors	Screen		8 бит на пиксель, 256 цветов
 Apply	Screen		Применить
-Refresh rate	Screen		частота обновления
+Refresh rate	Screen		Частота обновления
 %sSerial no.: %s	Screen		%sСерийный №: %s
 Colors:	Screen		Цвета:
 Video format:	Screen		Видео формат:

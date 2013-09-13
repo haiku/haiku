@@ -41,7 +41,8 @@ public:
 			// All Handle*() methods are invoked in team debugger thread,
 			// looper lock held.
 			bool				HandleThreadDebugged(
-									ThreadDebuggedEvent* event);
+									ThreadDebuggedEvent* event,
+									const BString& stoppedReason = BString());
 			bool				HandleDebuggerCall(
 									DebuggerCallEvent* event);
 			bool				HandleBreakpointHit(

@@ -69,6 +69,9 @@ void
 BUrlRequest::SetContext(BUrlContext* context)
 {
 	fContext = context;
+
+	if (fUrlProtocol != NULL)
+		fUrlProtocol->SetContext(context);
 }
 
 

@@ -17,6 +17,7 @@
 
 struct pci_info;
 struct pci_module_info;
+struct pci_x86_module_info;
 struct xhci_td;
 struct xhci_device;
 struct xhci_endpoint;
@@ -35,8 +36,8 @@ enum xhci_state {
 typedef struct xhci_td {
 	struct xhci_trb	trbs[XHCI_MAX_TRBS_PER_TD];
 
-	addr_t	this_phy;					// A physical pointer to this address
-	addr_t	buffer_phy[XHCI_MAX_TRBS_PER_TD];
+	phys_addr_t	this_phy;				// A physical pointer to this address
+	phys_addr_t	buffer_phy[XHCI_MAX_TRBS_PER_TD];
 	void	*buffer_log[XHCI_MAX_TRBS_PER_TD];	// Pointer to the logical buffer
 	size_t	buffer_size[XHCI_MAX_TRBS_PER_TD];	// Size of the buffer
 	uint8	buffer_count;
@@ -51,7 +52,7 @@ typedef struct xhci_endpoint {
 	xhci_device		*device;
 	xhci_td 		*td_head;
 	struct xhci_trb *trbs; // [XHCI_MAX_TRANSFERS]
-	addr_t trb_addr;
+	phys_addr_t trb_addr;
 	uint8	used;
 	uint8	current;
 	mutex	lock;
@@ -63,15 +64,15 @@ typedef struct xhci_device {
 	uint8 address;
 	enum xhci_state state;
 	area_id trb_area;
-	addr_t trb_addr;
+	phys_addr_t trb_addr;
 	struct xhci_trb (*trbs); // [XHCI_MAX_ENDPOINTS - 1][XHCI_MAX_TRANSFERS]
 
 	area_id input_ctx_area;
-	addr_t input_ctx_addr;
+	phys_addr_t input_ctx_addr;
 	struct xhci_input_device_ctx *input_ctx;
 
 	area_id device_ctx_area;
-	addr_t device_ctx_addr;
+	phys_addr_t device_ctx_addr;
 	struct xhci_device_ctx *device_ctx;
 
 	xhci_endpoint endpoints[XHCI_MAX_ENDPOINTS - 1];
@@ -194,6 +195,7 @@ private:
 	inline	void				WriteDoorReg32(uint32 reg, uint32 value);
 
 	static	pci_module_info *	sPCIModule;
+	static	pci_x86_module_info *sPCIx86Module;
 
 			uint8 *				fCapabilityRegisters;
 			uint32				fCapabilityLength;
@@ -205,6 +207,8 @@ private:
 			area_id				fRegisterArea;
 			pci_info *			fPCIInfo;
 			Stack *				fStack;
+			uint8				fIRQ;
+			bool				fUseMSI;
 
 			area_id				fErstArea;
 			xhci_erst_element *	fErst;

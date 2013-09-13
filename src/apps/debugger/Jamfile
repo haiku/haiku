@@ -4,6 +4,10 @@ CCFLAGS +=  -Werror ;
 C++FLAGS += -Werror ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+# for syscall_numbers.h
+UseHeaders [ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) system kernel ] ;
+
 UsePrivateHeaders app debug interface kernel shared libroot ;
 UsePrivateSystemHeaders ;
 
@@ -25,6 +29,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli commands ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui inspector_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
@@ -57,6 +62,11 @@ SourceHdrs
 	DwarfTypes.cpp
 	: [ FDirName $(SUBDIR) dwarf ]
 ;
+
+# since syscall_numbers.h is generated on the fly, we need to explicitly
+# let Jam know about the dependency.
+Includes [ FGristFiles TeamDebugger.cpp ]
+	: <syscalls>syscall_numbers.h ;
 
 Application Debugger :
 	Debugger.cpp
@@ -154,6 +164,7 @@ Application Debugger :
 	StackTrace.cpp
 	Statement.cpp
 	SymbolInfo.cpp
+	SyscallInfo.cpp
 	SystemInfo.cpp
 	Team.cpp
 	TeamInfo.cpp
@@ -200,8 +211,11 @@ Application Debugger :
 	UserInterface.cpp
 
 	# user_interface/cli
-	CliCommand.cpp
 	CliContext.cpp
+	CommandLineUserInterface.cpp
+
+	# user_interface/cli/commands
+	CliCommand.cpp
 	CliContinueCommand.cpp
 	CliDebugReportCommand.cpp
 	CliDumpMemoryCommand.cpp
@@ -213,7 +227,6 @@ Application Debugger :
 	CliThreadCommand.cpp
 	CliThreadsCommand.cpp
 	CliVariablesCommand.cpp
-	CommandLineUserInterface.cpp
 
 	# user_interface/gui
 	GraphicalUserInterface.cpp
@@ -232,8 +245,10 @@ Application Debugger :
 	TeamsListView.cpp
 
 	# user_interface/gui/team_window
+	BreakConditionConfigWindow.cpp
 	BreakpointListView.cpp
 	BreakpointsView.cpp
+	ConsoleOutputView.cpp
 	ImageFunctionsView.cpp
 	ImageListView.cpp
 	RegistersView.cpp

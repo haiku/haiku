@@ -80,7 +80,7 @@ WatchPromptWindow::_Init()
 	fArchitecture->GetWatchpointDebugCapabilities(maxDebugRegisters,
 		maxBytesPerRegister, debugCapabilityFlags);
 
-	BMenu* typeMenu = new BMenu("Watch Type");
+	BMenu* typeMenu = new BMenu("Watch type");
 
 	BMenuItem* watchTypeItem = new BMenuItem("Read", NULL);
 	watchTypeItem->SetEnabled(

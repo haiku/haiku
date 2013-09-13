@@ -10,6 +10,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+
 #include "FontSelectionView.h"
 
 #include <Box.h>
@@ -121,7 +122,8 @@ FontSelectionView::FontSelectionView(const char* name,
 	fPreviewBox = new BBox("preview box", B_WILL_DRAW | B_FRAME_EVENTS);
 	fPreviewBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
 		.Add(fPreviewText)
-		.SetInsets(5, 5, 5, 5)
+		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
+			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 		.TopView()
 	);
 }

@@ -90,6 +90,8 @@ get_iframe_registers(const iframe* frame, debug_cpu_state* cpuState)
 	cpuState->rcx = frame->cx;
 	cpuState->rbx = frame->bx;
 	cpuState->rax = frame->ax;
+	cpuState->vector = frame->vector;
+	cpuState->error_code = frame->error_code;
 	cpuState->rip = frame->ip;
 	cpuState->cs = frame->cs;
 	cpuState->rflags = frame->flags;

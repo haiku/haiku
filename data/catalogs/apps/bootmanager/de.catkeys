@@ -26,7 +26,7 @@ After one second	DefaultPartitionPage		Nach einer Sekunde
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager needs 2 KB available space before the first partition.	BootManagerController		Die Partitionstabelle auf der ersten Festplatte ist nicht mit dem Bootmenü kompatibel.\nDas Bootmenü benötigt 2 KiB freien Speicher vor der ersten Partition.
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Die folgenden Partitionen wurden erkannt. Nun müssen die Partitionen ausgewählt werden, die im Bootmenü erscheinen sollen. Außerdem können sie so benannt werden, wie sie später im Menü erscheinen sollen.
 After one minute	DefaultPartitionPage		Nach einer Minute
-The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Der Master-Boot-Record des Bootlaufwerks (%s) wurde erfolgreich aus der Sicherungsdatei %s wiederhergestellt.
+The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Der Master-Boot-Record des Bootlaufwerks (%DISK) wurde erfolgreich aus der Sicherungsdatei %FILE wiederhergestellt.
 Write boot menu	BootManagerController	Button	Bootmenü schreiben
 The Master Boot Record could not be restored!	BootManagerController		Der Master-Boot-Record konnte nicht wiederhergestellt werden!
 Uninstall	DrivesPage	Button	Entfernen

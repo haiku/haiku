@@ -107,9 +107,10 @@ get_geometry(das_handle* handle, device_geometry* geometry)
 	geometry->read_only = false;
 	geometry->write_once = false;
 
-	TRACE("scsi_disk: get_geometry(): %ld, %ld, %ld, %ld, %d, %d, %d, %d\n",
-		geometry->bytes_per_sector, geometry->sectors_per_track,
-		geometry->cylinder_count, geometry->head_count, geometry->device_type,
+	TRACE("scsi_disk: get_geometry(): %" B_PRId32 ", %" B_PRId32 ", %" B_PRId32
+		", %" B_PRId32 ", %d, %d, %d, %d\n", geometry->bytes_per_sector,
+		geometry->sectors_per_track, geometry->cylinder_count,
+		geometry->head_count, geometry->device_type,
 		geometry->removable, geometry->read_only, geometry->write_once);
 
 	return B_OK;
@@ -209,7 +210,6 @@ das_uninit_device(void* _cookie)
 	das_driver_info* info = (das_driver_info*)_cookie;
 
 	delete info->io_scheduler;
-	delete info->dma_resource;
 }
 
 
@@ -324,7 +324,7 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	das_handle* handle = (das_handle*)cookie;
 	das_driver_info* info = handle->info;
 
-	TRACE("ioctl(op = %ld)\n", op);
+	TRACE("ioctl(op = %" B_PRIu32 ")\n", op);
 
 	switch (op) {
 		case B_GET_DEVICE_SIZE:
@@ -398,8 +398,8 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 static void
 das_set_capacity(das_driver_info* info, uint64 capacity, uint32 blockSize)
 {
-	TRACE("das_set_capacity(device = %p, capacity = %Ld, blockSize = %ld)\n",
-		info, capacity, blockSize);
+	TRACE("das_set_capacity(device = %p, capacity = %" B_PRIu64
+		", blockSize = %" B_PRIu32 ")\n", info, capacity, blockSize);
 
 	// get log2, if possible
 	uint32 blockShift = log2(blockSize);
@@ -555,6 +555,7 @@ das_init_driver(device_node *node, void **cookie)
 		&callbacks, info->scsi_device, info->scsi, info->node,
 		info->removable, 10, &info->scsi_periph_device);
 	if (status != B_OK) {
+		delete info->dma_resource;
 		free(info);
 		return status;
 	}
@@ -570,6 +571,7 @@ das_uninit_driver(void *_cookie)
 	das_driver_info* info = (das_driver_info*)_cookie;
 
 	sSCSIPeripheral->unregister_device(info->scsi_periph_device);
+	delete info->dma_resource;
 	free(info);
 }
 
@@ -591,6 +593,19 @@ das_register_child_devices(void* _cookie)
 	free(name);
 	return status;
 }
+
+
+static status_t
+das_rescan_child_devices(void* _cookie)
+{
+	das_driver_info* info = (das_driver_info*)_cookie;
+	uint64 capacity = info->capacity;
+	update_capacity(info);
+	if (info->capacity != capacity)
+		sSCSIPeripheral->media_changed(info->scsi_periph_device);
+	return B_OK;
+}
+
 
 
 module_dependency module_dependencies[] = {
@@ -634,7 +649,7 @@ struct driver_module_info sSCSIDiskDriver = {
 	das_init_driver,
 	das_uninit_driver,
 	das_register_child_devices,
-	NULL,	// rescan
+	das_rescan_child_devices,	
 	NULL,	// removed
 };
 

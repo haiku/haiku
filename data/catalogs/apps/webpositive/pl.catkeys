@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	3577331897
+1	polish	x-vnd.Haiku-WebPositive	1786411139
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -16,6 +16,7 @@ Start page:	Settings Window		Strona startowa:
 History	WebPositive Window		Historia
 Error opening downloads folder	Download Window		Błąd podczas otwierania folderu pobierania
 Paste	WebPositive Window		Wklej
+Double-click or middle-click to open new tab.	Tab Manager		Dwuklik lub przyciśnięcie  środkowego przycisku myszy spowoduje otworzenie nowej karty.
 Proxy username:	Settings Window		Nazwa użytkownika serwera proxy:
 Settings	Settings Window		Ustawienia
 %seconds seconds left	Download Window		Pozostało %seconds sekund 

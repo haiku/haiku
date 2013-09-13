@@ -14,7 +14,7 @@
 #include "SplitLayout.h"
 
 
-BSplitView::BSplitView(enum orientation orientation, float spacing)
+BSplitView::BSplitView(orientation orientation, float spacing)
 	:
 	BView(NULL,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_INVALIDATE_AFTER_LAYOUT,
@@ -97,7 +97,7 @@ BSplitView::Orientation() const
 
 
 void
-BSplitView::SetOrientation(enum orientation orientation)
+BSplitView::SetOrientation(orientation orientation)
 {
 	fSplitLayout->SetOrientation(orientation);
 }
@@ -358,7 +358,7 @@ BSplitView::Instantiate(BMessage* from)
 
 void
 BSplitView::DrawSplitter(BRect frame, const BRect& updateRect,
-	enum orientation orientation, bool pressed)
+	orientation orientation, bool pressed)
 {
 	_DrawDefaultSplitter(this, frame, updateRect, orientation, pressed);
 }
@@ -366,7 +366,7 @@ BSplitView::DrawSplitter(BRect frame, const BRect& updateRect,
 
 void
 BSplitView::_DrawDefaultSplitter(BView* view, BRect frame,
-	const BRect& updateRect, enum orientation orientation, bool pressed)
+	const BRect& updateRect, orientation orientation, bool pressed)
 {
 	uint32 flags = pressed ? BControlLook::B_ACTIVATED : 0;
 	be_control_look->DrawSplitter(view, frame, updateRect, view->ViewColor(),

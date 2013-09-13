@@ -114,8 +114,11 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 		rsdt = (acpi_descriptor_header*)mmu_map_physical_memory(
 			rsdp->rsdt_address, sizeof(acpi_descriptor_header),
 			kDefaultPageFlags);
-		if (rsdt != NULL
-			&& strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
+		if (rsdt == NULL) {
+			TRACE(("acpi: couldn't map rsdt header\n"));
+			return B_ERROR;
+		}
+		if (strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
 			mmu_free(rsdt, sizeof(acpi_descriptor_header));
 			rsdt = NULL;
 			TRACE(("acpi: invalid root system description table\n"));

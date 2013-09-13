@@ -33,6 +33,9 @@
 /* #define NDEBUG 1*/		/* Undefine this for debugging assertions.  */
 #include <assert.h>
 
+int __printf_fphex (FILE *fp, const struct printf_info *info,
+		const void *const *args);
+
 /* This defines make it possible to use the same code for GNU C library and
    the GNU I/O library.	 */
 #ifdef USE_IN_LIBIO
@@ -90,7 +93,7 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 
 
 
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(__INTEL__)
 
 /* sysdeps/x86_64/fpu/printf_fphex.c */
 
@@ -166,7 +169,7 @@ do {									      \
 	}								      \
 } while (0)
 
-#endif	/* __x86_64__ */
+#endif	/* __x86_64__ || __INTEL__ */
 
 
 int
@@ -193,10 +196,10 @@ __printf_fphex (FILE *fp,
   /* Buffer for the generated number string for the mantissa.  The
      maximal size for the mantissa is 128 bits.  */
   char numbuf[32];
-  char *numstr;
+  char *numstr="";
   char *numend;
   wchar_t wnumbuf[32];
-  wchar_t *wnumstr;
+  wchar_t *wnumstr=L"";
   wchar_t *wnumend;
   int negative;
 
@@ -205,14 +208,14 @@ __printf_fphex (FILE *fp,
   char *expstr;
   wchar_t wexpbuf[5];
   wchar_t *wexpstr;
-  int expnegative;
-  int exponent;
+  int expnegative = 0;
+  int exponent = 0;
 
   /* Non-zero is mantissa is zero.  */
-  int zero_mantissa;
+  int zero_mantissa = 1;
 
   /* The leading digit before the decimal point.  */
-  char leading;
+  char leading = '0';
 
   /* Precision.  */
   int precision = info->prec;

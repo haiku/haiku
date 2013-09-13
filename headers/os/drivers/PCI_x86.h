@@ -35,6 +35,23 @@ typedef struct pci_x86_module_info {
 						uint8 bus,				/* bus number */
 						uint8 device,			/* device # on bus */
 						uint8 function);		/* function # in device */
+
+	uint8			(*get_msix_count)(
+						uint8 bus,				/* bus number */
+						uint8 device,			/* device # on bus */
+						uint8 function);		/* function # in device */
+
+	status_t		(*configure_msix)(
+						uint8 bus,				/* bus number */
+						uint8 device,			/* device # on bus */
+						uint8 function,			/* function # in device */
+						uint8 count,			/* count of vectors desired */
+						uint8 *startVector);	/* first configured vector */
+	status_t		(*enable_msix)(
+						uint8 bus,				/* bus number */
+						uint8 device,			/* device # on bus */
+						uint8 function);		/* function # in device */
+
 } pci_x86_module_info;
 
 #define B_PCI_X86_MODULE_NAME	"bus_managers/pci/x86/v1"

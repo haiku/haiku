@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -147,11 +147,11 @@ public:
 		return false;
 	}
 
-	virtual status_t GetCallTarget(uint64 offset, bool local,
+	virtual status_t GetCallTarget(uint64 offset, uint8 refType,
 		const void*& _block, off_t& _size)
 	{
 		// resolve the entry
-		DebugInfoEntry* entry = fFile->_ResolveReference(fUnit, offset, local);
+		DebugInfoEntry* entry = fFile->_ResolveReference(fUnit, offset, refType);
 		if (entry == NULL)
 			return B_ENTRY_NOT_FOUND;
 
@@ -459,8 +459,9 @@ DwarfFile::DwarfFile()
 	fEHFrameSection(NULL),
 	fDebugLocationSection(NULL),
 	fDebugPublicTypesSection(NULL),
+	fDebugTypesSection(NULL),
 	fCompilationUnits(20, true),
-	fCurrentCompilationUnit(NULL),
+	fTypesSectionRequired(false),
 	fFinished(false),
 	fFinishError(B_OK)
 {
@@ -489,6 +490,13 @@ DwarfFile::~DwarfFile()
 		delete fAlternateElfFile;
 	}
 
+	TypeUnitTableEntry* entry = fTypeUnits.Clear(true);
+	while (entry != NULL) {
+		TypeUnitTableEntry* nextEntry = entry->next;
+		delete entry;
+		entry = nextEntry;
+	}
+
 	free(fName);
 	free(fAlternateName);
 }
@@ -501,12 +509,16 @@ DwarfFile::Load(const char* fileName)
 	if (fName == NULL)
 		return B_NO_MEMORY;
 
+	status_t error = fTypeUnits.Init();
+	if (error != B_OK)
+		return error;
+
 	// load the ELF file
 	fElfFile = new(std::nothrow) ElfFile;
 	if (fElfFile == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = fElfFile->Init(fileName);
+	error = fElfFile->Init(fileName);
 	if (error != B_OK)
 		return error;
 
@@ -535,72 +547,19 @@ DwarfFile::Load(const char* fileName)
 		return B_OK;
 	}
 
-	// iterate through the debug info section
-	DataReader dataReader(fDebugInfoSection->Data(),
-		fDebugInfoSection->Size(), 4);
-			// address size doesn't matter here
-	while (dataReader.HasData()) {
-		off_t unitHeaderOffset = dataReader.Offset();
-		bool dwarf64;
-		uint64 unitLength = dataReader.ReadInitialLength(dwarf64);
+	error = _ParseDebugInfoSection();
+	if (error != B_OK)
+		return error;
 
-		off_t unitLengthOffset = dataReader.Offset();
-			// the unitLength starts here
-
-		if (unitLengthOffset + unitLength
-				> (uint64)fDebugInfoSection->Size()) {
-			WARNING("\"%s\": Invalid compilation unit length.\n", fileName);
-			break;
+	if (fTypesSectionRequired) {
+		fDebugTypesSection = debugInfoFile->GetSection(".debug_types");
+		if (fDebugTypesSection == NULL) {
+			WARNING(".debug_types section required but missing.\n");
+			return B_BAD_DATA;
 		}
-
-		int version = dataReader.Read<uint16>(0);
-		off_t abbrevOffset = dwarf64
-			? dataReader.Read<uint64>(0)
-			: dataReader.Read<uint32>(0);
-		uint8 addressSize = dataReader.Read<uint8>(0);
-
-		if (dataReader.HasOverflow()) {
-			WARNING("\"%s\": Unexpected end of data in compilation unit "
-				"header.\n", fileName);
-			break;
-		}
-
-		TRACE_DIE("DWARF%d compilation unit: version %d, length: %" B_PRIu64
-			", abbrevOffset: %" B_PRIdOFF ", address size: %d\n",
-			dwarf64 ? 64 : 32, version, unitLength, abbrevOffset, addressSize);
-
-		if (version != 2 && version != 3) {
-			WARNING("\"%s\": Unsupported compilation unit version: %d\n",
-				fileName, version);
-			break;
-		}
-
-		if (addressSize != 4 && addressSize != 8) {
-			WARNING("\"%s\": Unsupported address size: %d\n", fileName,
-				addressSize);
-			break;
-		}
-		dataReader.SetAddressSize(addressSize);
-
-		off_t unitContentOffset = dataReader.Offset();
-
-		// create a compilation unit object
-		CompilationUnit* unit = new(std::nothrow) CompilationUnit(
-			unitHeaderOffset, unitContentOffset,
-			unitLength + (unitLengthOffset - unitHeaderOffset),
-			abbrevOffset, addressSize, dwarf64);
-		if (unit == NULL || !fCompilationUnits.AddItem(unit)) {
-			delete unit;
-			return B_NO_MEMORY;
-		}
-
-		// parse the debug info for the unit
-		fCurrentCompilationUnit = unit;
-		error = _ParseCompilationUnit(unit);
+		error = _ParseTypesSection();
 		if (error != B_OK)
 			return error;
-
-		dataReader.SeekAbsolute(unitLengthOffset + unitLength);
 	}
 
 	return B_OK;
@@ -615,10 +574,17 @@ DwarfFile::FinishLoading()
 	if (fFinishError != B_OK)
 		return fFinishError;
 
+	status_t error;
+	for (TypeUnitTable::Iterator it = fTypeUnits.GetIterator();
+		TypeUnitTableEntry* entry = it.Next();) {
+		error = _FinishUnit(entry->unit);
+		if (error != B_OK)
+			return fFinishError = error;
+	}
+
 	for (int32 i = 0; CompilationUnit* unit = fCompilationUnits.ItemAt(i);
 			i++) {
-		fCurrentCompilationUnit = unit;
-		status_t error = _FinishCompilationUnit(unit);
+		error = _FinishUnit(unit);
 		if (error != B_OK)
 			return fFinishError = error;
 	}
@@ -936,6 +902,174 @@ DwarfFile::EvaluateDynamicValue(CompilationUnit* unit, uint8 addressSize,
 
 
 status_t
+DwarfFile::_ParseDebugInfoSection()
+{
+	// iterate through the debug info section
+	DataReader dataReader(fDebugInfoSection->Data(),
+		fDebugInfoSection->Size(), 4);
+			// address size doesn't matter here
+	while (dataReader.HasData()) {
+		off_t unitHeaderOffset = dataReader.Offset();
+		bool dwarf64;
+		uint64 unitLength = dataReader.ReadInitialLength(dwarf64);
+
+		off_t unitLengthOffset = dataReader.Offset();
+			// the unitLength starts here
+
+		if (unitLengthOffset + unitLength
+				> (uint64)fDebugInfoSection->Size()) {
+			WARNING("\"%s\": Invalid compilation unit length.\n", fName);
+			break;
+		}
+
+		int version = dataReader.Read<uint16>(0);
+		off_t abbrevOffset = dwarf64
+			? dataReader.Read<uint64>(0)
+			: dataReader.Read<uint32>(0);
+		uint8 addressSize = dataReader.Read<uint8>(0);
+
+		if (dataReader.HasOverflow()) {
+			WARNING("\"%s\": Unexpected end of data in compilation unit "
+				"header.\n", fName);
+			break;
+		}
+
+		TRACE_DIE("DWARF%d compilation unit: version %d, length: %" B_PRIu64
+			", abbrevOffset: %" B_PRIdOFF ", address size: %d\n",
+			dwarf64 ? 64 : 32, version, unitLength, abbrevOffset, addressSize);
+
+		if (version < 2 || version > 4) {
+			WARNING("\"%s\": Unsupported compilation unit version: %d\n",
+				fName, version);
+			break;
+		}
+
+		if (addressSize != 4 && addressSize != 8) {
+			WARNING("\"%s\": Unsupported address size: %d\n", fName,
+				addressSize);
+			break;
+		}
+		dataReader.SetAddressSize(addressSize);
+
+		off_t unitContentOffset = dataReader.Offset();
+
+		// create a compilation unit object
+		CompilationUnit* unit = new(std::nothrow) CompilationUnit(
+			unitHeaderOffset, unitContentOffset,
+			unitLength + (unitLengthOffset - unitHeaderOffset),
+			abbrevOffset, addressSize, dwarf64);
+		if (unit == NULL || !fCompilationUnits.AddItem(unit)) {
+			delete unit;
+			return B_NO_MEMORY;
+		}
+
+		// parse the debug info for the unit
+		status_t error = _ParseCompilationUnit(unit);
+		if (error != B_OK)
+			return error;
+
+		dataReader.SeekAbsolute(unitLengthOffset + unitLength);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DwarfFile::_ParseTypesSection()
+{
+	DataReader dataReader(fDebugTypesSection->Data(),
+		fDebugTypesSection->Size(), 4);
+	while (dataReader.HasData()) {
+		off_t unitHeaderOffset = dataReader.Offset();
+		bool dwarf64;
+		uint64 unitLength = dataReader.ReadInitialLength(dwarf64);
+
+		off_t unitLengthOffset = dataReader.Offset();
+			// the unitLength starts here
+
+		if (unitLengthOffset + unitLength
+				> (uint64)fDebugTypesSection->Size()) {
+			WARNING("Invalid type unit length, offset %#" B_PRIx64 ".\n",
+				unitHeaderOffset);
+			break;
+		}
+
+		int version = dataReader.Read<uint16>(0);
+		off_t abbrevOffset = dwarf64
+			? dataReader.Read<uint64>(0)
+			: dataReader.Read<uint32>(0);
+		uint8 addressSize = dataReader.Read<uint8>(0);
+
+		if (dataReader.HasOverflow()) {
+			WARNING("Unexpected end of data in type unit header at %#"
+				B_PRIx64 ".\n", unitHeaderOffset);
+			break;
+		}
+
+		dataReader.SetAddressSize(addressSize);
+
+		uint64 signature = dataReader.Read<uint64>(0);
+
+		off_t typeOffset = dwarf64
+			? dataReader.Read<uint64>(0)
+			: dataReader.Read<uint32>(0);
+
+		off_t unitContentOffset = dataReader.Offset();
+
+		TRACE_DIE("DWARF%d type unit: version %d, length: %" B_PRIu64
+			", abbrevOffset: %" B_PRIdOFF ", address size: %d, "
+			"signature: %#" B_PRIx64 ", type offset: %" B_PRIu64 "\n",
+			dwarf64 ? 64 : 32, version, unitLength, abbrevOffset, addressSize,
+			signature, typeOffset);
+
+		if (version > 4) {
+			WARNING("\"%s\": Unsupported type unit version: %d\n",
+				fName, version);
+			break;
+		}
+
+		if (addressSize != 4 && addressSize != 8) {
+			WARNING("\"%s\": Unsupported address size: %d\n", fName,
+				addressSize);
+			break;
+		}
+
+		// create a type unit object
+		TypeUnit* unit = new(std::nothrow) TypeUnit(
+			unitHeaderOffset, unitContentOffset,
+			unitLength + (unitLengthOffset - unitHeaderOffset),
+			abbrevOffset, typeOffset, addressSize, signature, dwarf64);
+		if (unit == NULL) {
+			delete unit;
+			return B_NO_MEMORY;
+		}
+
+		// parse the debug info for the unit
+		status_t error = _ParseTypeUnit(unit);
+		if (error != B_OK)
+			return error;
+
+		// TODO: it should theoretically never happen that we get a duplicate,
+		// but it wouldn't hurt to check since that situation would potentially
+		// be problematic.
+		if (fTypeUnits.Lookup(signature) == NULL) {
+			TypeUnitTableEntry* entry = new(std::nothrow)
+				TypeUnitTableEntry(signature, unit);
+			if (entry == NULL)
+				return B_NO_MEMORY;
+
+			fTypeUnits.Insert(entry);
+		}
+
+		dataReader.SeekAbsolute(unitLengthOffset + unitLength);
+	}
+
+	return B_OK;
+}
+
+
+status_t
 DwarfFile::_ParseCompilationUnit(CompilationUnit* unit)
 {
 	AbbreviationTable* abbreviationTable;
@@ -952,7 +1086,7 @@ DwarfFile::_ParseCompilationUnit(CompilationUnit* unit)
 
 	DebugInfoEntry* entry;
 	bool endOfEntryList;
-	error = _ParseDebugInfoEntry(dataReader, abbreviationTable, entry,
+	error = _ParseDebugInfoEntry(dataReader, unit, abbreviationTable, entry,
 		endOfEntryList);
 	if (error != B_OK)
 		return error;
@@ -980,12 +1114,63 @@ DwarfFile::_ParseCompilationUnit(CompilationUnit* unit)
 
 
 status_t
+DwarfFile::_ParseTypeUnit(TypeUnit* unit)
+{
+	AbbreviationTable* abbreviationTable;
+	status_t error = _GetAbbreviationTable(unit->AbbreviationOffset(),
+		abbreviationTable);
+	if (error != B_OK)
+		return error;
+
+	unit->SetAbbreviationTable(abbreviationTable);
+
+	DataReader dataReader(
+		(const uint8*)fDebugTypesSection->Data() + unit->ContentOffset(),
+		unit->ContentSize(), unit->AddressSize());
+
+	DebugInfoEntry* entry;
+	bool endOfEntryList;
+	error = _ParseDebugInfoEntry(dataReader, unit, abbreviationTable, entry,
+		endOfEntryList);
+	if (error != B_OK)
+		return error;
+
+	DIETypeUnit* unitEntry = dynamic_cast<DIETypeUnit*>(entry);
+	if (unitEntry == NULL) {
+		WARNING("No type unit entry in .debug_types section.\n");
+		return B_BAD_DATA;
+	}
+
+	unit->SetUnitEntry(unitEntry);
+	DebugInfoEntry* typeEntry = unit->EntryForOffset(unit->TypeOffset());
+	if (typeEntry == NULL) {
+		WARNING("No type found for type unit %p at specified offset %"
+			B_PRId64 ".\n", unit, unit->TypeOffset());
+		return B_BAD_DATA;
+	}
+	unit->SetTypeEntry(typeEntry);
+
+	TRACE_DIE_ONLY(
+		TRACE_DIE("remaining bytes in unit: %" B_PRIdOFF "\n",
+			dataReader.BytesRemaining());
+		if (dataReader.HasData()) {
+			TRACE_DIE("  ");
+			while (dataReader.HasData())
+				TRACE_DIE("%02x", dataReader.Read<uint8>(0));
+			TRACE_DIE("\n");
+		}
+	)
+	return B_OK;
+}
+
+
+status_t
 DwarfFile::_ParseDebugInfoEntry(DataReader& dataReader,
-	AbbreviationTable* abbreviationTable, DebugInfoEntry*& _entry,
-	bool& _endOfEntryList, int level)
+	BaseUnit* unit, AbbreviationTable* abbreviationTable,
+	DebugInfoEntry*& _entry, bool& _endOfEntryList, int level)
 {
 	off_t entryOffset = dataReader.Offset()
-		+ fCurrentCompilationUnit->RelativeContentOffset();
+		+ unit->RelativeContentOffset();
 
 	uint32 code = dataReader.ReadUnsignedLEB128(0);
 	if (code == 0) {
@@ -1001,7 +1186,7 @@ DwarfFile::_ParseDebugInfoEntry(DataReader& dataReader,
 	// get the corresponding abbreviation entry
 	AbbreviationEntry abbreviationEntry;
 	if (!abbreviationTable->GetAbbreviationEntry(code, abbreviationEntry)) {
-		WARNING("No abbreviation entry for code %" B_PRIu32 "\n", code);
+		WARNING("No abbreviation entry for code %" B_PRIx32 "\n", code);
 		return B_BAD_DATA;
 	}
 
@@ -1021,12 +1206,13 @@ DwarfFile::_ParseDebugInfoEntry(DataReader& dataReader,
 		abbreviationEntry.Code(), get_entry_tag_name(abbreviationEntry.Tag()),
 		abbreviationEntry.Tag(), abbreviationEntry.HasChildren());
 
-	error = fCurrentCompilationUnit->AddDebugInfoEntry(entry, entryOffset);
+	error = unit->AddDebugInfoEntry(entry, entryOffset);
+
 	if (error != B_OK)
 		return error;
 
 	// parse the attributes (supply NULL entry to avoid adding them yet)
-	error = _ParseEntryAttributes(dataReader, NULL, abbreviationEntry);
+	error = _ParseEntryAttributes(dataReader, unit, NULL, abbreviationEntry);
 	if (error != B_OK)
 		return error;
 
@@ -1036,7 +1222,7 @@ DwarfFile::_ParseDebugInfoEntry(DataReader& dataReader,
 			DebugInfoEntry* childEntry;
 			bool endOfEntryList;
 			status_t error = _ParseDebugInfoEntry(dataReader,
-				abbreviationTable, childEntry, endOfEntryList, level + 1);
+				unit, abbreviationTable, childEntry, endOfEntryList, level + 1);
 			if (error != B_OK)
 				return error;
 
@@ -1072,14 +1258,20 @@ DwarfFile::_ParseDebugInfoEntry(DataReader& dataReader,
 
 
 status_t
-DwarfFile::_FinishCompilationUnit(CompilationUnit* unit)
+DwarfFile::_FinishUnit(BaseUnit* unit)
 {
-	TRACE_DIE("\nfinishing compilation unit %p\n", unit);
+	CompilationUnit* compilationUnit = dynamic_cast<CompilationUnit*>(unit);
+	bool isTypeUnit = compilationUnit == NULL;
+	TRACE_DIE("\nfinishing %s unit %p\n",
+		isTypeUnit ? "type" : "compilation", unit);
+
 
 	AbbreviationTable* abbreviationTable = unit->GetAbbreviationTable();
 
+	ElfSection* section = isTypeUnit
+			? fDebugTypesSection : fDebugInfoSection;
 	DataReader dataReader(
-		(const uint8*)fDebugInfoSection->Data() + unit->HeaderOffset(),
+		(const uint8*)section->Data() + unit->HeaderOffset(),
 		unit->TotalSize(), unit->AddressSize());
 
 	DebugInfoEntryInitInfo entryInitInfo;
@@ -1112,7 +1304,8 @@ DwarfFile::_FinishCompilationUnit(CompilationUnit* unit)
 
 		// parse the attributes -- this time pass the entry, so that the
 		// attribute get set on it
-		error = _ParseEntryAttributes(dataReader, entry, abbreviationEntry);
+		error = _ParseEntryAttributes(dataReader, unit, entry,
+			abbreviationEntry);
 		if (error != B_OK)
 			return error;
 
@@ -1127,21 +1320,27 @@ DwarfFile::_FinishCompilationUnit(CompilationUnit* unit)
 	// set the compilation unit's source language
 	unit->SetSourceLanguage(entryInitInfo.languageInfo);
 
+	if (isTypeUnit)
+		return B_OK;
+
 	// resolve the compilation unit's address range list
-	if (TargetAddressRangeList* ranges = ResolveRangeList(unit,
-			unit->UnitEntry()->AddressRangesOffset())) {
-		unit->SetAddressRanges(ranges);
+	if (TargetAddressRangeList* ranges = ResolveRangeList(compilationUnit,
+			compilationUnit->UnitEntry()->AddressRangesOffset())) {
+		compilationUnit->SetAddressRanges(ranges);
 		ranges->ReleaseReference();
 	}
 
 	// add compilation dir to directory list
-	const char* compilationDir = unit->UnitEntry()->CompilationDir();
-	if (!unit->AddDirectory(compilationDir != NULL ? compilationDir : "."))
+	const char* compilationDir = compilationUnit->UnitEntry()
+		->CompilationDir();
+	if (!compilationUnit->AddDirectory(compilationDir != NULL
+				? compilationDir : ".")) {
 		return B_NO_MEMORY;
+	}
 
 	// parse line info header
 	if (fDebugLineSection != NULL)
-		_ParseLineInfo(unit);
+		_ParseLineInfo(compilationUnit);
 
 	return B_OK;
 }
@@ -1149,7 +1348,7 @@ DwarfFile::_FinishCompilationUnit(CompilationUnit* unit)
 
 status_t
 DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
-	DebugInfoEntry* entry, AbbreviationEntry& abbreviationEntry)
+	BaseUnit* unit, DebugInfoEntry* entry, AbbreviationEntry& abbreviationEntry)
 {
 	uint32 attributeName;
 	uint32 attributeForm;
@@ -1170,7 +1369,8 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 		// first.
 		uint64 value = 0;
 		off_t blockLength = 0;
-		bool localReference = true;
+		off_t valueOffset = dataReader.Offset() + unit->ContentOffset();
+		uint8 refType = dwarf_reference_type_local;
 
 		switch (attributeForm) {
 			case DW_FORM_addr:
@@ -1195,6 +1395,7 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				attributeValue.SetToString(dataReader.ReadString());
 				break;
 			case DW_FORM_block:
+			case DW_FORM_exprloc:
 				blockLength = dataReader.ReadUnsignedLEB128(0);
 				break;
 			case DW_FORM_block1:
@@ -1213,7 +1414,7 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case DW_FORM_strp:
 			{
 				if (fDebugStringSection != NULL) {
-					off_t offset = fCurrentCompilationUnit->IsDwarf64()
+					off_t offset = unit->IsDwarf64()
 						? (off_t)dataReader.Read<uint64>(0)
 						: (off_t)dataReader.Read<uint32>(0);
 					if (offset >= fDebugStringSection->Size()) {
@@ -1233,10 +1434,10 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				value = dataReader.ReadUnsignedLEB128(0);
 				break;
 			case DW_FORM_ref_addr:
-				value = fCurrentCompilationUnit->IsDwarf64()
+				value = unit->IsDwarf64()
 					? dataReader.Read<uint64>(0)
 					: (uint64)dataReader.Read<uint32>(0);
-				localReference = false;
+				refType = dwarf_reference_type_global;
 				break;
 			case DW_FORM_ref1:
 				value = dataReader.Read<uint8>(0);
@@ -1253,6 +1454,19 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case DW_FORM_ref_udata:
 				value = dataReader.ReadUnsignedLEB128(0);
 				break;
+			case DW_FORM_flag_present:
+				attributeValue.SetToFlag(true);
+				break;
+			case DW_FORM_ref_sig8:
+				fTypesSectionRequired = true;
+				value = dataReader.Read<uint64>(0);
+				refType = dwarf_reference_type_signature;
+				break;
+			case DW_FORM_sec_offset:
+				value = unit->IsDwarf64()
+					? dataReader.Read<uint64>(0)
+					: (uint64)dataReader.Read<uint32>(0);
+				break;
 			case DW_FORM_indirect:
 			default:
 				WARNING("Unsupported attribute form: %" B_PRIu32 "\n",
@@ -1264,14 +1478,13 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 		// it
 		uint8 attributeClass = get_attribute_class(attributeName,
 			attributeForm);
+
 		if (attributeClass == ATTRIBUTE_CLASS_UNKNOWN) {
 			TRACE_DIE("skipping attribute with unrecognized class: %s (%#"
 				B_PRIx32 ") %s (%#" B_PRIx32 ")\n",
 				get_attribute_name_name(attributeName), attributeName,
 				get_attribute_form_name(attributeForm), attributeForm);
-			continue;
 		}
-//		attributeValue.attributeClass = attributeClass;
 
 		// set the attribute value according to the attribute's class
 		switch (attributeClass) {
@@ -1300,7 +1513,7 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case ATTRIBUTE_CLASS_REFERENCE:
 				if (entry != NULL) {
 					attributeValue.SetToReference(_ResolveReference(
-						fCurrentCompilationUnit, value, localReference));
+						unit, value, refType));
 					if (attributeValue.reference == NULL) {
 						// gcc 2 apparently somtimes produces DW_AT_sibling
 						// attributes pointing to the end of the sibling list.
@@ -1308,8 +1521,11 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 						if (attributeName == DW_AT_sibling)
 							continue;
 
-						WARNING("Failed to resolve reference: %s (%#" B_PRIx32
-							") %s (%#" B_PRIx32 "): value: %" B_PRIu64 "\n",
+						WARNING("Failed to resolve reference on entry %p: "
+							"(%#" B_PRIx64 ") %s (%#" B_PRIx32 ") %s "
+							"(%#" B_PRIx32 "): value: %#" B_PRIx64 "\n",
+							entry,
+							valueOffset,
 							get_attribute_name_name(attributeName),
 							attributeName,
 							get_attribute_form_name(attributeForm),
@@ -1329,16 +1545,17 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			return B_BAD_DATA;
 		}
 
+		TRACE_DIE_ONLY(
+			char buffer[1024];
+			TRACE_DIE("  attr (%#" B_PRIx64 ") %s %s (%d): %s\n",
+				valueOffset,
+				get_attribute_name_name(attributeName),
+				get_attribute_form_name(attributeForm), attributeClass,
+				attributeValue.ToString(buffer, sizeof(buffer)));
+		)
+
 		// add the attribute
 		if (entry != NULL) {
-			TRACE_DIE_ONLY(
-				char buffer[1024];
-				TRACE_DIE("  attr %s %s (%d): %s\n",
-					get_attribute_name_name(attributeName),
-					get_attribute_form_name(attributeForm), attributeClass,
-					attributeValue.ToString(buffer, sizeof(buffer)));
-			)
-
 			DebugInfoEntrySetter attributeSetter
 				= get_attribute_name_setter(attributeName);
 			if (attributeSetter != 0) {
@@ -2360,13 +2577,35 @@ DwarfFile::_GetAbbreviationTable(off_t offset, AbbreviationTable*& _table)
 
 
 DebugInfoEntry*
-DwarfFile::_ResolveReference(CompilationUnit* unit, uint64 offset,
-	bool localReference) const
+DwarfFile::_ResolveReference(BaseUnit* unit, uint64 offset,
+	uint8 refType) const
 {
-	if (localReference)
-		return unit->EntryForOffset(offset);
+	switch (refType) {
+		case dwarf_reference_type_local:
+			return unit->EntryForOffset(offset);
+			break;
+		case dwarf_reference_type_global:
+		{
+			CompilationUnit* unit = _GetContainingCompilationUnit(offset);
+			if (unit == NULL)
+				break;
 
-	// TODO: Implement program-global references!
+			offset -= unit->HeaderOffset();
+			DebugInfoEntry* entry = unit->EntryForOffset(offset);
+			if (entry != NULL)
+				return entry;
+			break;
+		}
+		case dwarf_reference_type_signature:
+		{
+			TRACE_DIE("Resolving signature %#" B_PRIx64 "\n", offset);
+			TypeUnitTableEntry* entry = fTypeUnits.Lookup(offset);
+			if (entry != NULL && entry->unit != NULL)
+				return entry->unit->TypeEntry();
+			break;
+		}
+	}
+
 	return NULL;
 }
 
@@ -2506,7 +2745,8 @@ DwarfFile::_LocateDebugInfo()
 
 
 status_t
-DwarfFile::_GetDebugInfoPath(const char* debugFileName, BString& _infoPath)
+DwarfFile::_GetDebugInfoPath(const char* debugFileName,
+	BString& _infoPath) const
 {
 	const directory_which dirLocations[] = { B_USER_CONFIG_DIRECTORY,
 		B_COMMON_DIRECTORY, B_SYSTEM_DIRECTORY };
@@ -2553,3 +2793,31 @@ DwarfFile::_GetDebugInfoPath(const char* debugFileName, BString& _infoPath)
 	return B_ENTRY_NOT_FOUND;
 }
 
+
+TypeUnitTableEntry*
+DwarfFile::_GetTypeUnit(uint64 signature) const
+{
+	return fTypeUnits.Lookup(signature);
+}
+
+
+CompilationUnit*
+DwarfFile::_GetContainingCompilationUnit(off_t refAddr) const
+{
+	if (fCompilationUnits.IsEmpty())
+		return NULL;
+
+	// binary search
+	int lower = 0;
+	int upper = fCompilationUnits.CountItems() - 1;
+	while (lower < upper) {
+		int mid = (lower + upper + 1) / 2;
+		if (fCompilationUnits.ItemAt(mid)->HeaderOffset() > refAddr)
+			upper = mid - 1;
+		else
+			lower = mid;
+	}
+
+	CompilationUnit* unit = fCompilationUnits.ItemAt(lower);
+	return unit->ContainsAbsoluteOffset(refAddr) ? unit : NULL;
+}

@@ -11,6 +11,7 @@
 #include <driver_settings.h>
 #include <module.h>
 #include <PCI.h>
+#include <PCI_x86.h>
 #include <USB3.h>
 #include <KernelExport.h>
 
@@ -19,6 +20,7 @@
 #define USB_MODULE_NAME	"ehci"
 
 pci_module_info *EHCI::sPCIModule = NULL;
+pci_x86_module_info *EHCI::sPCIx86Module = NULL;
 
 
 static int32
@@ -118,6 +120,8 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fPeriodicFrameListArea(-1),
 		fPeriodicFrameList(NULL),
 		fInterruptEntries(NULL),
+		fItdEntries(NULL),
+		fSitdEntries(NULL),
 		fAsyncQueueHead(NULL),
 		fAsyncAdvanceSem(-1),
 		fFirstTransfer(NULL),
@@ -140,7 +144,9 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fPortCount(0),
 		fPortResetChange(0),
 		fPortSuspendChange(0),
-		fInterruptPollThread(-1)
+		fInterruptPollThread(-1),
+		fIRQ(0),
+		fUseMSI(false)
 {
 	// Create a lock for the isochronous transfer list
 	mutex_init(&fIsochronousLock, "EHCI isochronous lock");
@@ -350,16 +356,31 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 			"ehci interrupt poll thread", B_NORMAL_PRIORITY, (void *)this);
 		resume_thread(fInterruptPollThread);
 	} else {
+		// Find the right interrupt vector, using MSIs if available.
+		fIRQ = fPCIInfo->u.h0.interrupt_line;
+		if (sPCIx86Module != NULL && sPCIx86Module->get_msi_count(
+				fPCIInfo->bus, fPCIInfo->device, fPCIInfo->function) >= 1) {
+			uint8 msiVector = 0;
+			if (sPCIx86Module->configure_msi(fPCIInfo->bus, fPCIInfo->device,
+					fPCIInfo->function, 1, &msiVector) == B_OK
+				&& sPCIx86Module->enable_msi(fPCIInfo->bus, fPCIInfo->device,
+					fPCIInfo->function) == B_OK) {
+				TRACE_ALWAYS("using message signaled interrupts\n");
+				fIRQ = msiVector;
+				fUseMSI = true;
+			}
+		}
+
 		// install the interrupt handler and enable interrupts
-		install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
-			InterruptHandler, (void *)this, 0);
+		install_io_interrupt_handler(fIRQ, InterruptHandler,
+			(void *)this, 0);
 	}
 
 	// ensure that interrupts are en-/disabled on the PCI device
 	command = sPCIModule->read_pci_config(fPCIInfo->bus, fPCIInfo->device,
 		fPCIInfo->function, PCI_command, 2);
-	if (polling == ((command & PCI_command_int_disable) == 0)) {
-		if (polling)
+	if ((polling || fUseMSI) == ((command & PCI_command_int_disable) == 0)) {
+		if (polling || fUseMSI)
 			command &= ~PCI_command_int_disable;
 		else
 			command |= PCI_command_int_disable;
@@ -546,6 +567,8 @@ EHCI::~EHCI()
 
 	if (fInterruptPollThread >= 0)
 		wait_for_thread(fInterruptPollThread, &result);
+	else
+		remove_io_interrupt_handler(fIRQ, InterruptHandler, (void *)this);
 
 	LockIsochronous();
 	isochronous_transfer_data *isoTransfer = fFirstIsochronousTransfer;
@@ -562,7 +585,19 @@ EHCI::~EHCI()
 	delete [] fSitdEntries;
 	delete_area(fPeriodicFrameListArea);
 	delete_area(fRegisterArea);
+
+	if (fUseMSI && sPCIx86Module != NULL) {
+		sPCIx86Module->disable_msi(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function);
+		sPCIx86Module->unconfigure_msi(fPCIInfo->bus,
+			fPCIInfo->device, fPCIInfo->function);
+	}
 	put_module(B_PCI_MODULE_NAME);
+
+	if (sPCIx86Module != NULL) {
+		sPCIx86Module = NULL;
+		put_module(B_PCI_X86_MODULE_NAME);
+	}
 }
 
 
@@ -939,6 +974,14 @@ EHCI::AddTo(Stack *stack)
 		return B_NO_MEMORY;
 	}
 
+	// Try to get the PCI x86 module as well so we can enable possible MSIs.
+	if (sPCIx86Module == NULL && get_module(B_PCI_X86_MODULE_NAME,
+			(module_info **)&sPCIx86Module) != B_OK) {
+		// If it isn't there, that's not critical though.
+		TRACE_MODULE_ERROR("failed to get pci x86 module\n");
+		sPCIx86Module = NULL;
+	}
+
 	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
 		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
 			&& item->class_api == PCI_usb_ehci) {
@@ -954,6 +997,10 @@ EHCI::AddTo(Stack *stack)
 				delete item;
 				sPCIModule = NULL;
 				put_module(B_PCI_MODULE_NAME);
+				if (sPCIx86Module != NULL) {
+					sPCIx86Module = NULL;
+					put_module(B_PCI_X86_MODULE_NAME);
+				}
 				return B_NO_MEMORY;
 			}
 
@@ -977,6 +1024,10 @@ EHCI::AddTo(Stack *stack)
 		delete item;
 		sPCIModule = NULL;
 		put_module(B_PCI_MODULE_NAME);
+		if (sPCIx86Module != NULL) {
+			sPCIx86Module = NULL;
+			put_module(B_PCI_X86_MODULE_NAME);
+		}
 		return ENODEV;
 	}
 

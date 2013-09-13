@@ -145,6 +145,8 @@ const int32 kWindowStaggerBy = 17;
 
 BRect BContainerWindow::sNewWindRect(85, 50, 548, 280);
 
+LockingList<AddonShortcut>* BContainerWindow::fAddonsList
+	= new LockingList<struct AddonShortcut>(10, true);
 
 namespace BPrivate {
 
@@ -165,48 +167,6 @@ ActivateWindowFilter(BMessage*, BHandler** target, BMessageFilter*)
 }
 
 
-static void
-StripShortcut(const Model* model, char* result, uint32 &shortcut)
-{
-	// model name (possibly localized) for the menu item label
-	strlcpy(result, model->Name(), B_FILE_NAME_LENGTH);
-
-	// check if there is a shortcut in the model name
-	uint32 length = strlen(result);
-	if (length > 2 && result[length - 2] == '-') {
-		shortcut = result[length - 1];
-		result[length - 2] = '\0';
-		return;
-	}
-
-	// check if there is a shortcut in the filename
-	char* refName = model->EntryRef()->name;
-	length = strlen(refName);
-	if (length > 2 && refName[length - 2] == '-') {
-		shortcut = refName[length - 1];
-		return;
-	}
-
-	shortcut = '\0';
-}
-
-
-static const Model*
-MatchOne(const Model* model, void* castToName)
-{
-	char buffer[B_FILE_NAME_LENGTH];
-	uint32 dummy;
-	StripShortcut(model, buffer, dummy);
-
-	if (strcmp(buffer, (const char*)castToName) == 0) {
-		// found match, bail out
-		return model;
-	}
-
-	return 0;
-}
-
-
 int
 CompareLabels(const BMenuItem* item1, const BMenuItem* item2)
 {
@@ -218,7 +178,7 @@ CompareLabels(const BMenuItem* item1, const BMenuItem* item2)
 
 static bool
 AddOneAddon(const Model* model, const char* name, uint32 shortcut,
-	bool primary, void* context)
+	uint32 modifiers, bool primary, void* context)
 {
 	AddOneAddonParams* params = (AddOneAddonParams*)context;
 
@@ -226,7 +186,7 @@ AddOneAddon(const Model* model, const char* name, uint32 shortcut,
 	message->AddRef("refs", model->EntryRef());
 
 	ModelMenuItem* item = new ModelMenuItem(model, name, message,
-		(char)shortcut, B_OPTION_KEY);
+		(char)shortcut, modifiers);
 
 	if (primary)
 		params->primaryList->AddItem(item);
@@ -2761,9 +2721,10 @@ BContainerWindow::AddFileContextMenus(BMenu* menu)
 		menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
 			? B_TRANSLATE("Delete")	: B_TRANSLATE("Move to Trash"),
 			new BMessage(kMoveToTrash), 'T'));
-
-		// add separator for copy to/move to items (navigation items)
-		menu->AddSeparatorItem();
+		if (!IsPrintersDir()) {
+			// add separator for copy to/move to items (navigation items)
+			menu->AddSeparatorItem();
+		}
 	} else {
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Delete"),
 			new BMessage(kDelete), 0));
@@ -2918,114 +2879,56 @@ BContainerWindow::AddTrashContextMenus(BMenu* menu)
 
 void
 BContainerWindow::EachAddon(bool (*eachAddon)(const Model*, const char*,
-	uint32 shortcut, bool primary, void* context), void* passThru,
-	BObjectList<BString> &mimeTypes)
+	uint32 shortcut, uint32 modifiers, bool primary, void* context),
+	void* passThru, BObjectList<BString> &mimeTypes)
 {
-	BObjectList<Model> uniqueList(10, true);
-	BPath path;
-	bool bail = false;
-	if (find_directory(B_BEOS_ADDONS_DIRECTORY, &path) == B_OK)
-		bail = EachAddon(path, eachAddon, &uniqueList, passThru, mimeTypes);
+	AutoLock<LockingList<AddonShortcut> > lock(fAddonsList);
+	if (lock.IsLocked()) {
+		for (int i = fAddonsList->CountItems() - 1; i >= 0; i--) {
+			struct AddonShortcut* item = fAddonsList->ItemAt(i);
+			bool primary = false;
 
-	if (!bail && find_directory(B_USER_ADDONS_DIRECTORY, &path) == B_OK)
-		bail = EachAddon(path, eachAddon, &uniqueList, passThru, mimeTypes);
+			if (mimeTypes.CountItems()) {
+				BFile file(item->model->EntryRef(), B_READ_ONLY);
+				if (file.InitCheck() == B_OK) {
+					BAppFileInfo info(&file);
+					if (info.InitCheck() == B_OK) {
+						bool secondary = true;
 
-	if (!bail && find_directory(B_COMMON_ADDONS_DIRECTORY, &path) == B_OK)
-		EachAddon(path, eachAddon, &uniqueList, passThru, mimeTypes);
-}
+						// does this add-on has types set at all?
+						BMessage message;
+						if (info.GetSupportedTypes(&message) == B_OK) {
+							type_code type;
+							int32 count;
+							if (message.GetInfo("types", &type,
+									&count) == B_OK)
+								secondary = false;
+						}
 
-
-bool
-BContainerWindow::EachAddon(BPath &path, bool (*eachAddon)(const Model*,
-	const char*, uint32 shortcut, bool primary, void*),
-	BObjectList<Model>* uniqueList, void* params,
-	BObjectList<BString> &mimeTypes)
-{
-	path.Append("Tracker");
-
-	BDirectory dir;
-	BEntry entry;
-
-	if (dir.SetTo(path.Path()) != B_OK)
-		return false;
-
-	dir.Rewind();
-	while (dir.GetNextEntry(&entry) == B_OK) {
-		Model* model = new Model(&entry);
-
-		if (model->InitCheck() == B_OK && model->IsSymLink()) {
-			// resolve symlinks
-			Model* resolved = new Model(model->EntryRef(), true, true);
-			if (resolved->InitCheck() == B_OK)
-				model->SetLinkTo(resolved);
-			else
-				delete resolved;
-		}
-		if (model->InitCheck() != B_OK
-			|| !model->ResolveIfLink()->IsExecutable()) {
-			delete model;
-			continue;
-		}
-
-		// check if it supports at least one of the selected entries
-
-		bool primary = false;
-
-		if (mimeTypes.CountItems()) {
-			BFile file(&entry, B_READ_ONLY);
-			if (file.InitCheck() == B_OK) {
-				BAppFileInfo info(&file);
-				if (info.InitCheck() == B_OK) {
-					bool secondary = true;
-
-					// does this add-on has types set at all?
-					BMessage message;
-					if (info.GetSupportedTypes(&message) == B_OK) {
-						type_code type;
-						int32 count;
-						if (message.GetInfo("types", &type, &count) == B_OK)
-							secondary = false;
-					}
-
-					// check all supported types if it has some set
-					if (!secondary) {
-						for (int32 i = mimeTypes.CountItems();
-								!primary && i-- > 0;) {
-							BString* type = mimeTypes.ItemAt(i);
-							if (info.IsSupportedType(type->String())) {
-								BMimeType mimeType(type->String());
-								if (info.Supports(&mimeType))
-									primary = true;
-								else
-									secondary = true;
+						// check all supported types if it has some set
+						if (!secondary) {
+							for (int32 i = mimeTypes.CountItems();
+									!primary && i-- > 0;) {
+								BString* type = mimeTypes.ItemAt(i);
+								if (info.IsSupportedType(type->String())) {
+									BMimeType mimeType(type->String());
+									if (info.Supports(&mimeType))
+										primary = true;
+									else
+										secondary = true;
+								}
 							}
 						}
-					}
 
-					if (!secondary && !primary) {
-						delete model;
-						continue;
+						if (!secondary && !primary)
+							continue;
 					}
 				}
 			}
+			((eachAddon)(item->model, item->model->Name(), item->key,
+				item->modifiers, primary, passThru));
 		}
-
-		char name[B_FILE_NAME_LENGTH];
-		uint32 key;
-		StripShortcut(model, name, key);
-
-		// do a uniqueness check
-		if (uniqueList->EachElement(MatchOne, name)) {
-			// found one already in the list
-			delete model;
-			continue;
-		}
-		uniqueList->AddItem(model);
-
-		if ((eachAddon)(model, name, key, primary, params))
-			return true;
 	}
-	return false;
 }
 
 
@@ -4039,8 +3942,10 @@ BContainerWindow::ShowSelectionWindow()
 void
 BContainerWindow::ShowNavigator(bool show)
 {
-	if (PoseView()->IsDesktopWindow())
+	if (PoseView()->IsDesktopWindow() || !TargetModel()->IsDirectory()
+		|| fPoseView->IsFilePanel()) {
 		return;
+	}
 
 	if (show) {
 		if (Navigator() && !Navigator()->IsHidden())

@@ -63,18 +63,18 @@ apic_timer_set_hardware_timer(bigtime_t relativeTimeout)
 
 	cpu_status state = disable_interrupts();
 
-	uint32 config = apic_read(APIC_LVT_TIMER) | APIC_LVT_MASKED; // mask the timer
-	apic_write(APIC_LVT_TIMER, config);
+	uint32 config = apic_lvt_timer() | APIC_LVT_MASKED; // mask the timer
+	apic_set_lvt_timer(config);
 
-	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
+	apic_set_lvt_initial_timer_count(0); // zero out the timer
 
-	config = apic_read(APIC_LVT_TIMER) & ~APIC_LVT_MASKED; // unmask the timer
-	apic_write(APIC_LVT_TIMER, config);
+	config = apic_lvt_timer() & ~APIC_LVT_MASKED; // unmask the timer
+	apic_set_lvt_timer(config);
 
 	//TRACE_TIMER(("arch_smp_set_apic_timer: config 0x%lx, timeout %Ld, tics/sec %lu, tics %lu\n",
 	//	config, relativeTimeout, sApicTicsPerSec, ticks));
 
-	apic_write(APIC_INITIAL_TIMER_COUNT, ticks); // start it up
+	apic_set_lvt_initial_timer_count(ticks); // start it up
 
 	restore_interrupts(state);
 
@@ -87,11 +87,11 @@ apic_timer_clear_hardware_timer()
 {
 	cpu_status state = disable_interrupts();
 
-	uint32 config = apic_read(APIC_LVT_TIMER) | APIC_LVT_MASKED;
+	uint32 config = apic_lvt_timer() | APIC_LVT_MASKED;
 		// mask the timer
-	apic_write(APIC_LVT_TIMER, config);
+	apic_set_lvt_timer(config);
 
-	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the timer
+	apic_set_lvt_initial_timer_count(0); // zero out the timer
 
 	restore_interrupts(state);
 	return B_OK;
@@ -118,14 +118,14 @@ status_t
 apic_timer_per_cpu_init(struct kernel_args *args, int32 cpu)
 {
 	/* setup timer */
-	uint32 config = apic_read(APIC_LVT_TIMER) & APIC_LVT_TIMER_MASK;
+	uint32 config = apic_lvt_timer() & APIC_LVT_TIMER_MASK;
 	config |= 0xfb | APIC_LVT_MASKED; // vector 0xfb, timer masked
-	apic_write(APIC_LVT_TIMER, config);
+	apic_set_lvt_timer(config);
 
-	apic_write(APIC_INITIAL_TIMER_COUNT, 0); // zero out the clock
+	apic_set_lvt_initial_timer_count(0); // zero out the clock
 
-	config = apic_read(APIC_TIMER_DIVIDE_CONFIG) & 0xfffffff0;
+	config = apic_lvt_timer_divide_config() & 0xfffffff0;
 	config |= APIC_TIMER_DIVIDE_CONFIG_1; // clock division by 1
-	apic_write(APIC_TIMER_DIVIDE_CONFIG, config);
+	apic_set_lvt_timer_divide_config(config);
 	return B_OK;
 }

@@ -41,7 +41,7 @@ public:
 			void				RefsReceived(BMessage* msg);
 
 private:
-			void				_AddMenuBar(BLayout* layout);
+			void				_CreateMenuBar();
 			bool				CanQuit();
 				// returns true if the window can be closed safely, false if not
 			void				CloseWindowOrKeepOpen();

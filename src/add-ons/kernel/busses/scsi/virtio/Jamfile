@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons kernel busses scsi virtio ;
+
+UsePrivateHeaders drivers virtio ;
+UsePrivateKernelHeaders ;
+
+KernelAddon virtio_scsi :
+	virtio_scsi.cpp
+	VirtioSCSIController.cpp
+	VirtioSCSIHelper.cpp
+	VirtioSCSIRequest.cpp
+;

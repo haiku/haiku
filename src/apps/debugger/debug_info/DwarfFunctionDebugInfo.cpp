@@ -78,6 +78,13 @@ DwarfFunctionDebugInfo::PrettyName() const
 }
 
 
+bool
+DwarfFunctionDebugInfo::IsMain() const
+{
+	return fSubprogramEntry->IsMain();
+}
+
+
 LocatableFile*
 DwarfFunctionDebugInfo::SourceFile() const
 {

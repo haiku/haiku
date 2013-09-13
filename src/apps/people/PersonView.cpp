@@ -55,10 +55,10 @@ PersonView::PersonView(const char* name, const char* categoryAttribute,
 	SetName(name);
 	SetFlags(Flags() | B_WILL_DRAW);
 
-	if (ref)
-		fFile = new BFile(ref, O_RDWR);
-	else
-		fFile = NULL;
+	fRef = ref;
+	BFile* file = NULL;
+	if (fRef != NULL)
+		file = new BFile(fRef, B_READ_ONLY);
 
 	float spacing = be_control_look->DefaultItemSpacing();
 	BGridLayout* layout = GridLayout();
@@ -71,14 +71,14 @@ PersonView::PersonView(const char* name, const char* categoryAttribute,
 	layout->ItemAt(0, 0)->SetExplicitAlignment(
 		BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
 
-	if (fFile)
-		fFile->GetModificationTime(&fLastModificationTime);
+	if (file != NULL)
+		file->GetModificationTime(&fLastModificationTime);
+	delete file;
 }
 
 
 PersonView::~PersonView()
 {
-	delete fFile;
 }
 
 
@@ -269,8 +269,7 @@ PersonView::BuildGroupMenu()
 void
 PersonView::CreateFile(const entry_ref* ref)
 {
-	delete fFile;
-	fFile = new BFile(ref, B_READ_WRITE);
+	fRef = ref;
 	Save();
 }
 
@@ -293,13 +292,17 @@ PersonView::IsSaved() const
 void
 PersonView::Save()
 {
+	BFile file(fRef, B_READ_WRITE);
+	if (file.InitCheck() != B_NO_ERROR)
+		return;
+
 	fSaving = true;
 
 	int32 count = fControls.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		AttributeTextControl* control = fControls.ItemAt(i);
 		const char* value = control->Text();
-		fFile->WriteAttr(control->Attribute().String(), B_STRING_TYPE, 0,
+		file.WriteAttr(control->Attribute().String(), B_STRING_TYPE, 0,
 			value, strlen(value) + 1);
 		control->Update();
 	}
@@ -307,8 +310,8 @@ PersonView::Save()
 	// Write the picture, if any, in the person file content
 	if (fPictureView) {
 		// Trim any previous content
-		fFile->Seek(0, SEEK_SET);
-		fFile->SetSize(0);
+		file.Seek(0, SEEK_SET);
+		file.SetSize(0);
 
 		BBitmap* picture = fPictureView->Bitmap();
 		if (picture) {
@@ -318,7 +321,7 @@ PersonView::Save()
 			stream.DetachBitmap(&picture);
 
 			BTranslatorRoster* roster = BTranslatorRoster::Default();
-			roster->Translate(&stream, NULL, NULL, fFile,
+			roster->Translate(&stream, NULL, NULL, &file,
 				fPictureView->SuggestedType(), B_TRANSLATOR_BITMAP,
 				fPictureView->SuggestedMIMEType());
 
@@ -327,7 +330,7 @@ PersonView::Save()
 		fPictureView->Update();
 	}
 
-	fFile->GetModificationTime(&fLastModificationTime);
+	file.GetModificationTime(&fLastModificationTime);
 
 	fSaving = false;
 }
@@ -350,14 +353,20 @@ PersonView::SetAttribute(const char* attribute, bool update)
 {
 	char* value = NULL;
 	attr_info info;
-	if (fFile != NULL && fFile->GetAttrInfo(attribute, &info) == B_OK) {
+	BFile* file = NULL;	
+
+	if (fRef != NULL)
+		file = new(std::nothrow) BFile(fRef, B_READ_ONLY);
+
+	if (file != NULL && file->GetAttrInfo(attribute, &info) == B_OK) {
 		value = (char*)calloc(info.size, 1);
-		fFile->ReadAttr(attribute, B_STRING_TYPE, 0, value, info.size);
+		file->ReadAttr(attribute, B_STRING_TYPE, 0, value, info.size);
 	}
 
 	SetAttribute(attribute, value, update);
 
 	free(value);
+	delete file;
 }
 
 

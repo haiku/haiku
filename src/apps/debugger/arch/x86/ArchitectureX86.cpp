@@ -598,6 +598,31 @@ ArchitectureX86::GetInstructionInfo(target_addr_t address,
 
 
 status_t
+ArchitectureX86::ResolvePICFunctionAddress(target_addr_t instructionAddress,
+	CpuState* state, target_addr_t& _targetAddress)
+{
+	// if the function in question is position-independent, the call
+	// will actually have taken us to its corresponding PLT slot.
+	// in such a case, look at the disassembled jump to determine
+	// where to find the actual function address.
+	InstructionInfo info;
+	if (GetInstructionInfo(instructionAddress, info, state) != B_OK) {
+		return B_BAD_VALUE;
+	}
+	target_addr_t subroutineAddress = info.TargetAddress();
+
+	ssize_t bytesRead = fTeamMemory->ReadMemory(info.TargetAddress(),
+		&subroutineAddress, fAddressSize);
+
+	if (bytesRead != fAddressSize)
+		return B_BAD_VALUE;
+
+	_targetAddress = subroutineAddress;
+	return B_OK;
+}
+
+
+status_t
 ArchitectureX86::GetWatchpointDebugCapabilities(int32& _maxRegisterCount,
 	int32& _maxBytesPerRegister, uint8& _watchpointCapabilityFlags)
 {
@@ -650,7 +675,8 @@ ArchitectureX86::GetReturnAddressLocation(StackFrame* frame,
 			return B_NO_MEMORY;
 	} else {
 		ValuePieceLocation piece;
-		piece.SetToMemory(frame->GetCpuState()->StackPointer());
+		CpuStateX86* state = dynamic_cast<CpuStateX86*>(frame->GetCpuState());
+		piece.SetToMemory(state->IntRegisterValue(X86_REGISTER_EAX));
 		piece.SetSize(valueSize);
 		if (!location->AddPiece(piece))
 			return B_NO_MEMORY;

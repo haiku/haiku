@@ -195,7 +195,7 @@ void write_colorspace_attr(
 	const char* key,
 	color_space c,
 	ExportContext& context) {
-	
+
 	switch(c) {
 		case B_RGB32:
 			context.writeAttr(key, "B_RGB32");
@@ -337,7 +337,7 @@ void write_colorspace_attr(
 void import_color_space(
 	const char* value,
 	color_space& dest) {
-	
+
 	if(!strcmp(value, "B_RGB32"))
 		dest = B_RGB32;
 	else if(!strcmp(value, "B_RGBA32"))
@@ -446,7 +446,7 @@ void write_media_type(
 
 	context.beginElement(MediaFormatIO::s_media_type_tag);
 	context.beginContent();
-	
+
 	switch(t) {
 		case B_MEDIA_NO_TYPE:
 			context.writeString("B_MEDIA_NO_TYPE");
@@ -500,7 +500,7 @@ void import_media_type_content(
 	media_multistream_format::avi_info& f,
 	const char* value,
 	ImportContext& context) {
-	
+
 	if(f.type_count == 5) {
 		// ignore
 		// +++++ should this be an error?
@@ -539,7 +539,7 @@ void import_media_type_content(
 
 	++f.type_count;
 }
-	
+
 
 void export_raw_audio_attr(
 	const media_raw_audio_format& f,
@@ -548,7 +548,7 @@ void export_raw_audio_attr(
 	media_raw_audio_format& w = media_raw_audio_format::wildcard;
 
 	if(f.frame_rate != w.frame_rate)
-		context.writeAttr(gKey_frame_rate, f.frame_rate);	
+		context.writeAttr(gKey_frame_rate, f.frame_rate);
 	if(f.channel_count != w.channel_count)
 		context.writeAttr(gKey_channel_count, f.channel_count);
 	if(f.buffer_size != w.buffer_size)
@@ -570,7 +570,7 @@ void export_raw_audio_attr(
 		default:
 			break;
 	}
-	
+
 	switch(f.byte_order) {
 		case B_MEDIA_BIG_ENDIAN:
 			context.writeAttr(gKey_byte_order, "B_MEDIA_BIG_ENDIAN");
@@ -607,7 +607,7 @@ void export_video_display_info_attr(
 	ExportContext& context) {
 
 	media_video_display_info& w = media_video_display_info::wildcard;
-	
+
 	if(d.line_width != w.line_width)
 		context.writeAttr(gKey_line_width, d.line_width);
 	if(d.line_count != w.line_count)
@@ -632,17 +632,17 @@ void export_raw_video_attr(
 
 	// attributes
 	if(f.field_rate != w.field_rate)
-		context.writeAttr(gKey_field_rate, f.field_rate);	
+		context.writeAttr(gKey_field_rate, f.field_rate);
 	if(f.interlace != w.interlace)
-		context.writeAttr(gKey_interlace, f.interlace);	
+		context.writeAttr(gKey_interlace, f.interlace);
 	if(f.first_active != w.first_active)
-		context.writeAttr(gKey_first_active, f.first_active);	
+		context.writeAttr(gKey_first_active, f.first_active);
 	if(f.last_active != w.last_active)
-		context.writeAttr(gKey_last_active, f.last_active);	
+		context.writeAttr(gKey_last_active, f.last_active);
 	if(f.pixel_width_aspect != w.pixel_width_aspect)
-		context.writeAttr(gKey_pixel_width_aspect, (uint32)f.pixel_width_aspect);	
+		context.writeAttr(gKey_pixel_width_aspect, (uint32)f.pixel_width_aspect);
 	if(f.pixel_height_aspect != w.pixel_height_aspect)
-		context.writeAttr(gKey_pixel_height_aspect, (uint32)f.pixel_height_aspect);	
+		context.writeAttr(gKey_pixel_height_aspect, (uint32)f.pixel_height_aspect);
 
 	switch(f.orientation) {
 		case B_VIDEO_TOP_LEFT_RIGHT:
@@ -659,7 +659,7 @@ void export_raw_video_attr(
 void export_raw_video_content(
 	const media_raw_video_format& f,
 	ExportContext& context) {
-	
+
 	context.beginContent();
 	context.beginElement(MediaFormatIO::s_video_display_info_tag);
 	export_video_display_info_attr(f.display, context);
@@ -683,15 +683,15 @@ void export_multistream_flags_attr(
 void export_multistream_vid_info_attr(
 	media_multistream_format::vid_info f,
 	ExportContext& context) {
-	
+
 	// +++++ no wildcard to compare against (assume 0 == wildcard?)
-	
+
 	context.writeAttr(gKey_frame_rate, f.frame_rate);
 	context.writeAttr(gKey_width, (uint32)f.width);
 	context.writeAttr(gKey_height, (uint32)f.height);
 	write_colorspace_attr(gKey_space, f.space, context);
 	context.writeAttr(gKey_sampling_rate, f.sampling_rate);
-	
+
 	switch(f.sample_format) {
 		case B_UNDEFINED_SAMPLES:
 			context.writeAttr(gKey_sample_format, "B_UNDEFINED_SAMPLES");
@@ -719,7 +719,7 @@ void export_multistream_vid_info_attr(
 		default:
 			break;
 	}
-	
+
 	context.writeAttr(gKey_channel_count, (uint32)f.channel_count);
 }
 
@@ -737,7 +737,7 @@ void export_multistream_avi_info_content(
 	ExportContext& context) {
 
 	context.beginContent();
-		
+
 	for(uint16 n = 0; n < f.type_count; ++n)
 		write_media_type(f.types[n], context);
 }
@@ -745,7 +745,7 @@ void export_multistream_avi_info_content(
 void export_multistream_attr(
 	const media_multistream_format& f,
 	ExportContext& context) {
-	
+
 	media_multistream_format& w = media_multistream_format::wildcard;
 
 	// attributes
@@ -791,12 +791,12 @@ void export_multistream_content(
 	ExportContext& context) {
 
 	context.beginContent();
-	
+
 	// write flags
 	context.beginElement(MediaFormatIO::s_multistream_flags_tag);
 	export_multistream_flags_attr(f.flags, context);
 	context.endElement();
-	
+
 	// write format-specific info
 	if(f.format == media_multistream_format::B_VID) {
 		context.beginElement(MediaFormatIO::s_multistream_vid_info_tag);
@@ -815,7 +815,7 @@ void export_multistream_content(
 void export_encoded_audio_attr(
 	const media_encoded_audio_format& f,
 	ExportContext& context) {
-	
+
 	media_encoded_audio_format& w = media_encoded_audio_format::wildcard;
 
 	switch(f.encoding) {
@@ -836,7 +836,7 @@ void export_encoded_audio_attr(
 void export_encoded_audio_content(
 	const media_encoded_audio_format& f,
 	ExportContext& context) {
-	
+
 	context.beginContent();
 
 	context.beginElement(MediaFormatIO::s_raw_audio_tag);
@@ -889,39 +889,39 @@ void export_encoded_video_content(
 
 void MediaFormatIO::xmlExportBegin(
 	ExportContext&		context) const {
-	
+
 	switch(m_format.type) {
 
 		case B_MEDIA_RAW_AUDIO:
 			context.beginElement(s_raw_audio_tag);
 			break;
-		
+
 		case B_MEDIA_RAW_VIDEO:
 			context.beginElement(s_raw_video_tag);
 			break;
-			
+
 		case B_MEDIA_MULTISTREAM:
 			context.beginElement(s_multistream_tag);
 			break;
-			
+
 		case B_MEDIA_ENCODED_AUDIO:
 			context.beginElement(s_encoded_audio_tag);
 			break;
-			
+
 		case B_MEDIA_ENCODED_VIDEO:
 			context.beginElement(s_encoded_video_tag);
 			break;
-			
+
 		default:
 			// +++++ not very polite
 			context.reportError("MediaFormatIO: type not supported\n");
 			break;
-	}	
+	}
 }
 
 void MediaFormatIO::xmlExportAttributes(
 	ExportContext&		context) const {
-	
+
 	switch(m_format.type) {
 		case B_MEDIA_RAW_AUDIO:
 			export_raw_audio_attr(m_format.u.raw_audio, context);
@@ -929,51 +929,51 @@ void MediaFormatIO::xmlExportAttributes(
 			export_multi_audio_info_attr(m_format.u.raw_audio, context);
 #endif
 			break;
-		
+
 		case B_MEDIA_RAW_VIDEO:
 			export_raw_video_attr(m_format.u.raw_video, context);
 			break;
-			
+
 		case B_MEDIA_MULTISTREAM:
 			export_multistream_attr(m_format.u.multistream, context);
 			break;
-			
+
 		case B_MEDIA_ENCODED_AUDIO:
 			export_encoded_audio_attr(m_format.u.encoded_audio, context);
 			break;
-			
+
 		case B_MEDIA_ENCODED_VIDEO:
 			export_encoded_video_attr(m_format.u.encoded_video, context);
 			break;
-			
+
 		default:
 			break;
-	}	
+	}
 }
 
 void MediaFormatIO::xmlExportContent(
 	ExportContext&		context) const {
-	
+
 	switch(m_format.type) {
 		case B_MEDIA_RAW_VIDEO:
 			export_raw_video_content(m_format.u.raw_video, context);
 			break;
-			
+
 		case B_MEDIA_MULTISTREAM:
 			export_multistream_content(m_format.u.multistream, context);
 			break;
-			
+
 		case B_MEDIA_ENCODED_AUDIO:
 			export_encoded_audio_content(m_format.u.encoded_audio, context);
 			break;
-			
+
 		case B_MEDIA_ENCODED_VIDEO:
 			export_encoded_video_content(m_format.u.encoded_video, context);
 			break;
-			
+
 		default:
 			break;
-	}	
+	}
 }
 
 void MediaFormatIO::xmlExportEnd(
@@ -991,7 +991,7 @@ void import_raw_audio_attribute(
 	const char* key,
 	const char* value,
 	ImportContext& context) {
-	
+
 	if(!strcmp(key, gKey_frame_rate))
 		f.frame_rate = atof(value);
 	else if(!strcmp(key, gKey_channel_count))
@@ -1023,13 +1023,13 @@ void import_multi_audio_info_attribute(
 	const char* key,
 	const char* value,
 	ImportContext& context) {
-	
+
 	if(!strcmp(key, gKey_channel_mask))
 		f.channel_mask = atol(value);
 	else if(!strcmp(key, gKey_valid_bits))
 		f.valid_bits = atoi(value);
 	else if(!strcmp(key, gKey_matrix_mask))
-		f.matrix_mask = atoi(value);		
+		f.matrix_mask = atoi(value);
 }
 
 #endif
@@ -1065,7 +1065,7 @@ void import_video_display_info_attribute(
 	const char* key,
 	const char* value,
 	ImportContext& context) {
-	
+
 	if(!strcmp(key, gKey_line_width))
 		d.line_width = atol(value);
 	else if(!strcmp(key, gKey_line_count))
@@ -1171,7 +1171,7 @@ void import_multistream_avi_info_attribute(
 	const char* key,
 	const char* value,
 	ImportContext& context) {
-	
+
 	if(!strcmp(key, gKey_us_per_frame))
 		f.us_per_frame = atol(value);
 	else if(!strcmp(key, gKey_width))
@@ -1195,13 +1195,13 @@ void import_encoded_audio_attribute(
 	else if(!strcmp(key, gKey_frame_size))
 		f.frame_size = atol(value);
 }
-			
+
 void import_encoded_video_attribute(
 	media_encoded_video_format& f,
 	const char* key,
 	const char* value,
 	ImportContext& context) {
-	
+
 	if(!strcmp(key, gKey_encoding)) {
 		if(!strcmp(value, "B_ANY"))
 			f.encoding = media_encoded_video_format::B_ANY;
@@ -1247,7 +1247,7 @@ void MediaFormatIO::xmlImportBegin(
 	else
 		context.reportError("Bad element mapping?  MediaFormatIO can't cope.");
 }
-	
+
 void MediaFormatIO::xmlImportAttribute(
 	const char*					key,
 	const char*					value,
@@ -1262,7 +1262,7 @@ void MediaFormatIO::xmlImportAttribute(
 				m_format.u.raw_audio, key, value, context);
 #endif
 			break;
-			
+
 		case B_MEDIA_RAW_VIDEO:
 			import_raw_video_attribute(
 				m_format.u.raw_video, key, value, context);
@@ -1272,17 +1272,17 @@ void MediaFormatIO::xmlImportAttribute(
 			import_multistream_attribute(
 				m_format.u.multistream, key, value, context);
 			break;
-			
+
 		case B_MEDIA_ENCODED_AUDIO:
 			import_encoded_audio_attribute(
 				m_format.u.encoded_audio, key, value, context);
 			break;
-			
+
 		case B_MEDIA_ENCODED_VIDEO:
 			import_encoded_video_attribute(
 				m_format.u.encoded_video, key, value, context);
 			break;
-		
+
 		default:
 			context.reportError("MediaFormatIO: bad type.");
 	}
@@ -1292,21 +1292,29 @@ void MediaFormatIO::xmlImportContent(
 	const char*					data,
 	uint32						length,
 	ImportContext&		context) {}
-		
+
 void MediaFormatIO::xmlImportChild(
 	IPersistent*			child,
 	ImportContext&		context) {
 
 	MediaFormatIO* childAsFormat = dynamic_cast<MediaFormatIO*>(child);
 	if(m_format.type == B_MEDIA_ENCODED_AUDIO) {
-		if(!childAsFormat || childAsFormat->m_format.type != B_MEDIA_RAW_AUDIO)
+		if (childAsFormat == NULL
+			|| childAsFormat->m_format.type != B_MEDIA_RAW_AUDIO) {
 			context.reportError("Expected a raw_audio_format.");
-		m_format.u.encoded_audio.output = childAsFormat->m_format.u.raw_audio;
+		} else {
+			m_format.u.encoded_audio.output =
+				childAsFormat->m_format.u.raw_audio;
+		}
 	}
 	else if(m_format.type == B_MEDIA_ENCODED_VIDEO) {
-		if(!childAsFormat || childAsFormat->m_format.type != B_MEDIA_RAW_VIDEO)
+		if (childAsFormat == NULL
+			|| childAsFormat->m_format.type != B_MEDIA_RAW_VIDEO) {
 			context.reportError("Expected a raw_video_format.");
-		m_format.u.encoded_video.output = childAsFormat->m_format.u.raw_video;
+		} else {
+			m_format.u.encoded_video.output =
+				childAsFormat->m_format.u.raw_video;
+		}
 	}
 	else {
 		// +++++ should this be an error?
@@ -1314,19 +1322,19 @@ void MediaFormatIO::xmlImportChild(
 	}
 	delete child;
 }
-		
+
 void MediaFormatIO::xmlImportComplete(
 	ImportContext&		context) {
-	
+
 	// +++++ validity checks?
-	
+
 	m_complete = true;
 }
-		
+
 void MediaFormatIO::xmlImportChildBegin(
 	const char*					name,
 	ImportContext&		context) {
-	
+
 	if(!strcmp(name, s_video_display_info_tag)) {
 		if(m_format.type != B_MEDIA_RAW_VIDEO)
 			context.reportError("MediaFormatIO: unexpected element.");
@@ -1372,7 +1380,7 @@ void MediaFormatIO::xmlImportChildAttribute(
 	else if(!strcmp(context.element(), s_multistream_avi_info_tag	))
 		import_multistream_avi_info_attribute(
 			m_format.u.multistream.u.avi, key, value, context);
-			
+
 	else
 		context.reportError("MediaFormatIO: bad child element.");
 }
@@ -1386,7 +1394,7 @@ void MediaFormatIO::xmlImportChildContent(
 		m_mediaType.Append(data, length);
 	}
 }
-		
+
 void MediaFormatIO::xmlImportChildComplete(
 	const char*					name,
 	ImportContext&		context) {

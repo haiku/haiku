@@ -44,7 +44,8 @@ StatusView::StatusView(BScrollView* scrollView)
 				B_FOLLOW_BOTTOM | B_FOLLOW_LEFT, B_WILL_DRAW),
 			fScrollView(scrollView),
 			fPreferredSize(0., 0.),
-			fReadOnly(false)
+			fReadOnly(false),
+			fCanUnlock(false)
 {
 	memset(fCellWidth, 0, sizeof(fCellWidth));
 }
@@ -155,7 +156,7 @@ StatusView::Draw(BRect updateRect)
 void
 StatusView::MouseDown(BPoint where)
 {
-	if (!fReadOnly)
+	if (!fReadOnly || !fCanUnlock)
 		return;
 
 	float left = fCellWidth[kPositionCell] + fCellWidth[kEncodingCell];
@@ -212,11 +213,13 @@ StatusView::SetStatus(BMessage* message)
 
 	bool modified = false;
 	fReadOnly = false;
+	fCanUnlock = false;
 	if (B_OK == message->FindBool("modified", &modified) && modified) {
 		fCellText[kFileStateCell] = B_TRANSLATE("Modified");
 	} else if (B_OK == message->FindBool("readOnly", &fReadOnly) && fReadOnly) {
 		fCellText[kFileStateCell] = B_TRANSLATE("Read-only");
-		fCellText[kFileStateCell] << " " UTF8_EXPAND_ARROW;
+	    if (B_OK == message->FindBool("canUnlock", &fCanUnlock) && fCanUnlock)
+			fCellText[kFileStateCell] << " " UTF8_EXPAND_ARROW;
 	} else
 		fCellText[kFileStateCell].Truncate(0);
 

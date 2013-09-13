@@ -29,36 +29,38 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
-
 #ifndef SGIVIEW_H
 #define SGIVIEW_H
+
 
 #include <View.h>
 #include "TranslatorSettings.h"
 
+
 class BMenuField;
+
 
 class SGIView : public BView {
 public:
-	SGIView(const char* name, uint32 flags, TranslatorSettings* settings);
-		// sets up the view
-		
-	~SGIView();
-		// releases the SGITranslator settings
+								SGIView(const char* name, uint32 flags, TranslatorSettings* settings);
+									// sets up the view
 
-	virtual void AllAttached();
-	virtual void MessageReceived(BMessage* message);
+								~SGIView();
+									// releases the SGITranslator settings
+
+	virtual	void				AllAttached();
+	virtual	void				MessageReceived(BMessage* message);
 
 	enum {
 		MSG_COMPRESSION_CHANGED	= 'cmch',
 	};
 
 private:
-	BMenuField*				fCompressionMF;
+			BMenuField*			fCompressionMF;
 
-	TranslatorSettings* fSettings;
-		// the actual settings for the translator,
-		// shared with the translator
+			TranslatorSettings*	fSettings;
+				// the actual settings for the translator, shared with the translator
 };
+
 
 #endif // #ifndef SGIVIEW_H

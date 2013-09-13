@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +12,7 @@
 #include <new>
 
 #include <ControlLook.h>
+#include <Window.h>
 
 #include "table/TableColumns.h"
 
@@ -107,6 +108,7 @@ StackTraceView::StackTraceView(Listener* listener)
 	fStackTrace(NULL),
 	fFramesTable(NULL),
 	fFramesTableModel(NULL),
+	fTraceClearPending(false),
 	fListener(listener)
 {
 	SetName("Stack Trace");
@@ -147,6 +149,7 @@ StackTraceView::UnsetListener()
 void
 StackTraceView::SetStackTrace(StackTrace* stackTrace)
 {
+	fTraceClearPending = false;
 	if (stackTrace == fStackTrace)
 		return;
 
@@ -205,9 +208,16 @@ StackTraceView::SaveSettings(BMessage& settings)
 
 
 void
+StackTraceView::SetStackTraceClearPending()
+{
+	fTraceClearPending = true;
+}
+
+
+void
 StackTraceView::TableSelectionChanged(Table* table)
 {
-	if (fListener == NULL)
+	if (fListener == NULL || fTraceClearPending)
 		return;
 
 	StackFrame* frame

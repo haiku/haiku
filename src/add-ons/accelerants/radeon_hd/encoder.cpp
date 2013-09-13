@@ -507,7 +507,7 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 						}
 					}
 
-					if ((lvdsFlags & ATOM_PANEL_MISC_TEMPORAL) != 0)
+					if ((lvdsFlags & ATOM_PANEL_MISC_TEMPORAL) != 0) {
 						args.v2.ucTemporal = PANEL_ENCODER_TEMPORAL_DITHER_EN;
 						if ((lvdsFlags & ATOM_PANEL_MISC_888RGB) != 0) {
 							args.v2.ucTemporal
@@ -518,6 +518,7 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 							args.v2.ucTemporal
 							|= PANEL_ENCODER_TEMPORAL_LEVEL_4;
 						}
+					}
 				} else {
 					//if (dig->linkb)
 					//	args.v2.ucMisc |= PANEL_ENCODER_MISC_TMDS_LINKB;

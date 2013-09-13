@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ScreenSaver	215605989
+1	romanian	x-vnd.Haiku-ScreenSaver	3630119516
 Could not load screen saver	ScreenSaver		Nu s-a putut încărca protectorul de ecran
 30 seconds	ScreenSaver		30 de secunde
 Start screensaver	ScreenSaver		Pornește protectorul de ecran
@@ -7,7 +7,6 @@ Password:	ScreenSaver		Parolă:
 Password lock	ScreenSaver		Blocare parolă
 Add…	ScreenSaver		Adaugă...
 Screensavers	ScreenSaver		Protectoare de ecran
-mouse is here	ScreenSaver		mausul este aici
 Display Power Management Signaling not available	ScreenSaver		Semnalarea afișajului de administrare a consumului nu este disponibilă
 ScreenSaver	System name		ProtectorEcran
 Test	ScreenSaver		Testează
@@ -17,11 +16,9 @@ Cancel	ScreenSaver		Anulează
 Turn off screen	ScreenSaver		Închide ecranul
 No options available	ScreenSaver		Nu există opțiuni disponibile
 Password Window	ScreenSaver		Fereastră parolă
-Fade now when	ScreenSaver		Estompează acum când
 Screensaver settings	ScreenSaver		Configurări protector de ecran
 Passwords don't match. Please try again.	ScreenSaver		Parolele nu se potrivesc. Încercați din nou.
 OK	ScreenSaver		OK
-Don't fade when	ScreenSaver		Nu estompa când
 Blackness	ScreenSaver		Întunecat
 Use custom password	ScreenSaver		Utilizează parolă personalizată
 Done	ScreenSaver		Gata

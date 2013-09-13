@@ -4,12 +4,12 @@ Add Style	Icon-O-Matic-AddStylesCmd		スタイルを追加
 Color (#%02x%02x%02x)	Style name after dropping a color		カラー (#%02x%02x%02x)
 Add	Icon-O-Matic-StylesList		追加
 Move Shape	Icon-O-Matic-MoveShapesCommand		シェイプを移動
-Opening the document failed!	Icon-O-Matic-Main		ドキュメントの読み込みに失敗しました！
+Opening the document failed!	Icon-O-Matic-Main		ドキュメントの読み込みに失敗しました。
 Reset transformation	Icon-O-Matic-ShapesList		変形をリセット
 Move Paths	Icon-O-Matic-MovePathsCmd		パスを移動
 None	Icon-O-Matic-Properties		解除
 New	Icon-O-Matic-Menu-File		新規作成
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic はロードされた SVG のすべてのデータを解釈できなかったかもしれません。オリジナルファイルを上書きすると、この情報は失われるでしょう。
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic はロードされた SVG のすべてのデータを解釈できなかったかもしれません。元のファイルを上書きすると、この情報は失われるでしょう。
 Paste Properties	Icon-O-Matic-Properties		プロパティを貼り付け
 Stroke	Transformation		ストローク
 Save Icon	Dialog title		アイコンを保存
@@ -48,7 +48,7 @@ Change Color	Icon-O-Matic-SetColorCmd		カラーを変更
 Style	Icon-O-Matic-Menus		スタイル
 <modify path>	Icon-O-Matic-PathCmd		<パスを修正>
 Opening the icon failed!	Icon-O-Matic-Main		アイコンを開けません!
-Error: 	Icon-O-Matic-Main		エラー：
+Error: 	Icon-O-Matic-Main		エラー:
 Rotate indices backwards	Icon-O-Matic-PathsList		インデックスを逆順に辿る
 Name	Icon-O-Matic-PropertyNames		名前
 bad news	Icon-O-Matic-Exporter		悪い知らせ
@@ -82,7 +82,7 @@ Add with path	Icon-O-Matic-ShapesList		パスとともに追加
 Gradient type	Icon-O-Matic-StyleTypes		グラデーションのタイプ
 Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		中止
-Modify Control Point	Icon-O-Matic-ChangePointCmd		コントロールポイントの編集
+Modify Control Point	Icon-O-Matic-ChangePointCmd		コントロールポイントを編集
 Saving your document failed!	Icon-O-Matic-Exporter		ドキュメントの保存に失敗しました！
 edit it's properties here.	Empty property list - 3rd line		オブジェクトをクリックしてください。
 Split	Icon-O-Matic-PathManipulator		分割
@@ -193,7 +193,7 @@ Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		シェイプを固定
 Split Control Point	Icon-O-Matic-SplitPointsCmd		コントロールポイントを分割
 Open…	Icon-O-Matic-Menu-File		開く…
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		カラー (#%02x%02x%02x)
-Edit Gradient	Icon-O-Matic-SetGradientCmd		グラデーションの編集
+Edit Gradient	Icon-O-Matic-SetGradientCmd		グラデーションを編集
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		パスをクリーンアップ
 Rounding	Icon-O-Matic-PropertyNames		丸め
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		シェイプを削除

@@ -256,7 +256,7 @@ typedef struct {
 	uint32		sim_priv;				/* Size of SIM private data area */
 	uchar		vuhba_flags[SCSI_VUHBA];/* Vendor unique capabilities */
 	uchar		initiator_id;			/* ID of the HBA on the SCSI bus */
-	uint32		hba_queue_size;			// size of adapaters command queue
+	uint32		hba_queue_size;			// size of adapters command queue
 	char		sim_vid[SCSI_SIM_ID];	/* Vendor ID of the SIM */
 	char		hba_vid[SCSI_HBA_ID];	/* Vendor ID of the HBA */
 

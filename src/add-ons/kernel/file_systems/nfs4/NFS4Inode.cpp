@@ -1004,18 +1004,16 @@ NFS4Inode::ReadDirOnce(DirEntry** dirents, uint32* count, OpenDirCookie* cookie,
 		ArrayDeleter<AttrValue> beforeDeleter(before);
 
 		result = reply.ReadDir(dirCookie, dirCookieVerf, dirents, count, eof);
-		if (result != B_OK) {
-			delete[] before;
+		if (result != B_OK)
 			return result;
-		}
+
 		ArrayDeleter<DirEntry> entriesDeleter(*dirents);
 
 		AttrValue* after;
 		result = reply.GetAttr(&after, &attrCount);
-		if (result != B_OK) {
-			delete[] before;
+		if (result != B_OK)
 			return result;
-		}
+
 		ArrayDeleter<AttrValue> afterDeleter(after);
 
 		if ((*change == 0

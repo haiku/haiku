@@ -32,8 +32,8 @@ public:
 	void			finish(int tfd, size_t bytesTransfered);
 	void			abort();
 
-	void			wait_for_completition();
-	int				completition_status();
+	void			wait_for_completion();
+	int				completion_status();
 
 private:
 	scsi_ccb *		fCcb;

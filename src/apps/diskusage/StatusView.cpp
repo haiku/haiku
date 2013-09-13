@@ -19,6 +19,7 @@
 #include <Button.h>
 #include <Node.h>
 #include <String.h>
+#include <StringForSize.h>
 #include <StringView.h>
 
 #include <LayoutBuilder.h>
@@ -145,7 +146,7 @@ StatusView::ShowInfo(const FileInfo* info)
 	fPathView->SetText(pathLabel.String());
 
 	char label[B_PATH_NAME_LENGTH];
-	size_to_string(info->size, label, sizeof(label));
+	string_for_size(info->size, label, sizeof(label));
 	fSizeView->SetText(label);
 
 	if (info->count > 0) {

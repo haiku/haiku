@@ -84,7 +84,6 @@ Inode::Create(const char* name, int mode, int perms, OpenFileCookie* cookie,
 	}
 
 	cookie->fOpenState = state;
-	cookie->fFileSystem = fFileSystem;
 
 	*id = FileIdToInoT(state->fInfo.fFileId);
 
@@ -168,7 +167,6 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		file_cache_set_size(fFileCache, 0);
 	}
 
-	cookie->fFileSystem = fFileSystem;
 	cookie->fMode = mode;
 	cookie->fLocks = NULL;
 
@@ -262,7 +260,6 @@ Inode::OpenAttr(const char* _name, int mode, OpenAttrCookie* cookie,
 	fFileSystem->AddOpenFile(state);
 
 	cookie->fOpenState = state;
-	cookie->fFileSystem = fFileSystem;
 	cookie->fMode = mode;
 
 	if (data.fType != OPEN_DELEGATE_NONE) {

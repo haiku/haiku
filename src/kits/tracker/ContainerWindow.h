@@ -72,6 +72,13 @@ enum {
 	kRestoreDecor		= 0x4
 };
 
+struct AddonShortcut {
+	Model* 	model;
+	char 	key;
+	char 	defaultKey;
+	uint32 	modifiers;
+};
+
 class BContainerWindow : public BWindow {
 	public:
 		BContainerWindow(LockingList<BWindow>* windowList,
@@ -173,7 +180,8 @@ class BContainerWindow : public BWindow {
 
 		// add-on iteration
 		void EachAddon(bool (*)(const Model*, const char*, uint32 shortcut,
-			bool primary, void*), void*, BObjectList<BString> &);
+			uint32 modifiers, bool primary, void*), void*,
+			BObjectList<BString> &);
 
 		BPopUpMenu* ContextMenu();
 
@@ -290,6 +298,8 @@ class BContainerWindow : public BWindow {
 
 		uint32 fContainerWindowFlags;
 		BackgroundImage* fBackgroundImage;
+
+		static LockingList<struct AddonShortcut>* fAddonsList;
 
 	private:
 		BRect fSavedZoomRect;

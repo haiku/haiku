@@ -38,55 +38,6 @@
 #define ERROR(x...) dprintf("radeon_hd: " x)
 
 
-// Must match chipset families in radeon_hd.h
-static const char radeon_chip_name[][16] = {
-	"R420",
-	"R423",
-	"RV410",
-	"RS400",
-	"RS480",
-	"RS600",
-	"RS690",
-	"RS740",
-	"RV515",
-	"R520",
-	"RV530",
-	"RV560",
-	"RV570",
-	"R580",
-	"R600",
-	"RV610",
-	"RV630",
-	"RV670",
-	"RV620",
-	"RV635",
-	"RS780",
-	"RS880",
-	"RV770",
-	"RV730",
-	"RV710",
-	"RV740",
-	"Cedar",
-	"Redwood",
-	"Juniper",
-	"Cypress",
-	"Hemlock",
-	"Palm",
-	"Sumo",
-	"Sumo2",
-	"Caicos",
-	"Turks",
-	"Barts",
-	"Cayman",
-	"Antilles",
-	"Lombok",
-	"Cape Verde",
-	"Pitcairn",
-	"Tahiti",
-	"New Zealand"
-};
-
-
 //	#pragma mark -
 
 
@@ -693,9 +644,10 @@ radeon_hd_init(radeon_info &info)
 	info.shared_info->dceMajor = info.dceMajor;
 	info.shared_info->dceMinor = info.dceMinor;
 	info.shared_info->registers_area = info.registers_area;
-	strcpy(info.shared_info->deviceName, info.deviceName);
-	strcpy(info.shared_info->chipsetName,
-		radeon_chip_name[info.chipsetID]);
+	strncpy(info.shared_info->deviceName,
+		info.deviceName, MAX_NAME_LENGTH);
+	strncpy(info.shared_info->chipsetName,
+		radeon_chip_name[info.chipsetID], MAX_NAME_LENGTH);
 
 	// *** AtomBIOS mapping
 	// First we try an active bios read

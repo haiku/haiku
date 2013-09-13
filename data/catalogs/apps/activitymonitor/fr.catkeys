@@ -1,12 +1,12 @@
-1	french	x-vnd.Haiku-ActivityMonitor	1913625522
+1	french	x-vnd.Haiku-ActivityMonitor	1211510241
 P-faults	DataSource		P-fautes
 Media nodes	DataSource		Nœuds média
 Threads	DataSource		Tâches
-MB	DataSource		Mo
 Always on top	ActivityWindow		Toujours au-dessus
 Add graph	ActivityWindow		Ajouter un graphe
 Teams	DataSource		Processus
 Hide legend	ActivityView		Cacher la légende
+MiB	DataSource		Mio
 Network send	DataSource		Émission réseau
 CPU usage (combined)	DataSource		Activité CPU (combinée)
 CPU	DataSource		CPU
@@ -27,13 +27,14 @@ Update time interval:	SettingsWindow		Fréquence de mise à jour :
 TX	DataSource	Shorter version for Sending	Tx
 Quit	ActivityWindow		Quitter
 Block cache memory	DataSource		Mémoire cache de blocs
+%.1f KiB/s	DataSource		%.1f Kio/s
 Remove graph	ActivityView		Supprimer un graphe
-%.1f MB	DataSource		%.1f Mo
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Activité CPU
 Raw clipboard	DataSource		Presse-papier brut
 Sems	DataSource		Sems
+%.1f MiB	DataSource		%.1f Mio
 ActivityMonitor	System name		Moniteur d'activité
 Running applications	DataSource		Applications en cours
 Semaphores	DataSource		Sémaphores
@@ -44,6 +45,5 @@ File	ActivityWindow		Fichier
 usage	DataSource		utilisation
 Additional items	ActivityView		Éléments supplémentaires
 Network receive	DataSource		Réception réseau
-%.1f KB/s	DataSource		%.1f Ko/s
 Memory	DataSource		Mémoire
 RX	DataSource	Shorter version for Receiving.	Rx

@@ -1,8 +1,7 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	1913625522
+1	finnish	x-vnd.Haiku-ActivityMonitor	2739021859
 P-faults	DataSource		P-viat
 Media nodes	DataSource		Mediasolmut
 Threads	DataSource		Säikeet
-MB	DataSource		Mt
 Always on top	ActivityWindow		Aina päällimmäisenä
 Add graph	ActivityWindow		Lisää kuvaaja
 Teams	DataSource		Ryhmät
@@ -28,7 +27,6 @@ TX	DataSource	Shorter version for Sending	Läh.
 Quit	ActivityWindow		Poistu
 Block cache memory	DataSource		Lohkovälimuisti
 Remove graph	ActivityView		Poista kuvaaja
-%.1f MB	DataSource		%.1f Mt
 %lld sec.	SettingsWindow		%lld s
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Suoritinkäyttö
@@ -44,6 +42,5 @@ File	ActivityWindow		Tiedosto
 usage	DataSource		käyttö
 Additional items	ActivityView		Lisäkohteet
 Network receive	DataSource		Verkkovastaanotto
-%.1f KB/s	DataSource		%.1f kt/s
 Memory	DataSource		Muisti
 RX	DataSource	Shorter version for Receiving.	Vast.

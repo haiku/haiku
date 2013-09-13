@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	484941621
+1	polish	x-vnd.Haiku-DriveSetup	3102001288
 DriveSetup	System name		DriveSetup
 Cancel	AbstractParametersPanel		Anuluj
 Delete	MainWindow		Usuń
@@ -68,6 +68,7 @@ Delete partition	MainWindow		Usuń partycję
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Czy jesteś pewna/pewny, że chcesz zmienić parametry wybranej partycji?\n\nPartycja może już nie być rozpoznawalna przez inne systemy operacyjne!
 Eject	MainWindow		Wysuń
 Partition	MainWindow		Partycja
+Create	CreateParametersPanel		Utwórz
 File system	PartitionList		System plików
 Validation of the given creation parameters failed.	MainWindow		Sprawdzenie poprawności parametrów tworzenia partycji nie powiodło się.
 Partition type:	ChangeParametersPanel		Typ partycji:

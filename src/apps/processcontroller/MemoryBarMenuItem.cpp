@@ -55,7 +55,7 @@ MemoryBarMenuItem::Init()
 	fAllMemory = -1;
 	fGrenze1 = -1;
 	fGrenze2 = -1;
-	fLastCommited = -1;
+	fLastCommitted = -1;
 	fLastWrite = -1;
 	fLastAll = -1;
 }
@@ -108,7 +108,7 @@ MemoryBarMenuItem::DrawBar(bool force)
 {
 	// only draw anything if something has changed
 	if (!force && fWriteMemory == fLastWrite && fAllMemory == fLastAll
-		&& fCommitedMemory == fLastCommited)
+		&& fCommittedMemory == fLastCommitted)
 		return;
 
 	bool selected = IsSelected();
@@ -135,8 +135,10 @@ MemoryBarMenuItem::DrawBar(bool force)
 
 	rect.InsetBy(1, 1);
 	BRect r = rect;
-	double grenze1 = rect.left + (rect.right - rect.left) * float(fWriteMemory) / fCommitedMemory;
-	double grenze2 = rect.left + (rect.right - rect.left) * float(fAllMemory) / fCommitedMemory;
+	double grenze1 = rect.left + (rect.right - rect.left) * float(fWriteMemory)
+		/ fCommittedMemory;
+	double grenze2 = rect.left + (rect.right - rect.left) * float(fAllMemory)
+		/ fCommittedMemory;
 	if (grenze1 > rect.right)
 		grenze1 = rect.right;
 	if (grenze2 > rect.right)
@@ -188,7 +190,7 @@ MemoryBarMenuItem::DrawBar(bool force)
 	fGrenze1 = grenze1;
 	fGrenze2 = grenze2;
 
-	fLastCommited = fCommitedMemory;
+	fLastCommitted = fCommittedMemory;
 
 	// Draw the values if necessary; if only fCommitedMemory changes, only
 	// the bar might have to be updated
@@ -234,9 +236,9 @@ MemoryBarMenuItem::GetContentSize(float* _width, float* _height)
 
 
 int
-MemoryBarMenuItem::UpdateSituation(int64 commitedMemory)
+MemoryBarMenuItem::UpdateSituation(int64 committedMemory)
 {
-	fCommitedMemory = commitedMemory;
+	fCommittedMemory = committedMemory;
 	BarUpdate();
 	return fWriteMemory;
 }

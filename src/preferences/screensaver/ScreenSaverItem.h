@@ -1,13 +1,13 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2013 Haiku, Inc. All Rights Reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              Jérôme Duval, jerome.duval@free.fr
+ *		JÃ©rÃ´me Duval, jerome.duval@free.fr
  */
+#ifndef SCREEN_SAVER_ITEM_H
+#define SCREEN_SAVER_ITEM_H
 
-#ifndef __SCREENSAVERITEM_H__
-#define __SCREENSAVERITEM_H__
 
 #include <ListItem.h>
 #include <String.h>
@@ -16,13 +16,14 @@
 
 class ScreenSaverItem : public BStringItem {
 public:
-		ScreenSaverItem(const char* event_name,const char* path) 
-			: BStringItem(event_name), fPath(path) {
-		
-		}
-		
-		const char*		Path() const { return fPath.String();}
+	ScreenSaverItem(const char* eventName, const char* path)
+		: BStringItem(eventName), fPath(path) {}
+
+	const char* Path() const { return fPath.String(); }
+
 private:
-			BString		fPath;
+	BString fPath;
 };
-#endif
+
+
+#endif	// SCREEN_SAVER_ITEM_H

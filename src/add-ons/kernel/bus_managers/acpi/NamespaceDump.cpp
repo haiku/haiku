@@ -1,18 +1,24 @@
-/* ++++++++++
-	ACPI namespace dump.
-	Nothing special here, just tree enumeration and type identification.
-+++++ */
+/*
+ * Copyright 2006-2013, Jérôme Duval. All rights reserved.
+ * Copyright 2011-2012, Fredrik Holmqvis. All rights reserved.
+ * Copyright 2008, Stefano Ceccherini. All rights reserved.
+ * Copyright 2006, Bryan Varner. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <Drivers.h>
-#include <unistd.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
-#include "ACPIPrivate.h"
+#include <Drivers.h>
 
 #include <util/kernel_cpp.h>
 #include <util/ring_buffer.h>
+
+#include "ACPIPrivate.h"
+
 
 class RingBuffer {
 public:
@@ -166,7 +172,7 @@ static int32
 acpi_namespace_dump(void *arg)
 {
 	acpi_ns_device_info *device = (acpi_ns_device_info*)(arg);
-        dump_acpi_namespace(device, NULL, 0);
+	dump_acpi_namespace(device, NULL, 0);
 
 	delete_sem(device->read_sem);
 	device->read_sem = -1;
@@ -231,7 +237,7 @@ acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 	if (ringBuffer.ReadableAmount() == 0) {
 		ringBuffer.Unlock();
 		status_t status = acquire_sem_etc(device->read_sem, 1, B_CAN_INTERRUPT, 0);
-		if (status != B_OK) {
+		if (status != B_OK && status != B_BAD_SEM_ID) {
 			*num_bytes = 0;
 			return status;
 		}
@@ -279,17 +285,7 @@ acpi_namespace_control(void* cookie, uint32 op, void* arg, size_t len)
 static status_t
 acpi_namespace_close(void* cookie)
 {
-	status_t status;
-	acpi_ns_device_info *device = (acpi_ns_device_info *)cookie;
 	dprintf("acpi_ns_dump: device_close\n");
-
-	if (device->read_sem >= 0)
-		delete_sem(device->read_sem);
-
-	device->buffer->DestroyLock();
-	wait_for_thread(device->thread, &status);
-	delete device->buffer;
-
 	return B_OK;
 }
 
@@ -301,7 +297,16 @@ acpi_namespace_close(void* cookie)
 static status_t
 acpi_namespace_free(void* cookie)
 {
+	status_t status;
+	acpi_ns_device_info *device = (acpi_ns_device_info *)cookie;
 	dprintf("acpi_ns_dump: device_free\n");
+
+	if (device->read_sem >= 0)
+		delete_sem(device->read_sem);
+
+	device->buffer->DestroyLock();
+	wait_for_thread(device->thread, &status);
+	delete device->buffer;
 
 	return B_OK;
 }

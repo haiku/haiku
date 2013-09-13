@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VALUE_LOCATION_H
@@ -16,7 +17,8 @@ enum value_piece_location_type {
 	VALUE_PIECE_LOCATION_INVALID,	// structure is invalid
 	VALUE_PIECE_LOCATION_UNKNOWN,	// location unknown, but size is valid
 	VALUE_PIECE_LOCATION_MEMORY,	// piece is in memory
-	VALUE_PIECE_LOCATION_REGISTER	// piece is in a register
+	VALUE_PIECE_LOCATION_REGISTER,	// piece is in a register
+	VALUE_PIECE_LOCATION_IMPLICIT	// value isn't stored anywhere in memory but is known
 };
 
 
@@ -31,11 +33,20 @@ struct ValuePieceLocation {
 	uint64						bitOffset;	// bit offset (to the most
 											// significant bit)
 	value_piece_location_type	type;
+	void*						value;		// used for storing implicit values
+
 
 	ValuePieceLocation()
 		:
-		type(VALUE_PIECE_LOCATION_INVALID)
+		type(VALUE_PIECE_LOCATION_INVALID),
+		value(NULL)
 	{
+	}
+
+	~ValuePieceLocation()
+	{
+		if (value != NULL)
+			free(value);
 	}
 
 	bool IsValid() const
@@ -74,6 +85,18 @@ struct ValuePieceLocation {
 		this->bitOffset = bitOffset;
 	}
 
+	bool SetToValue(const void* data, target_size_t size)
+	{
+		char* valueData = (char*)malloc(size);
+		if (valueData == NULL)
+			return false;
+		memcpy(valueData, data, size);
+		SetSize(size);
+		type = VALUE_PIECE_LOCATION_IMPLICIT;
+		value = valueData;
+		return true;
+	}
+
 	ValuePieceLocation& Normalize(bool bigEndian);
 };
 
@@ -85,6 +108,9 @@ public:
 								ValueLocation(bool bigEndian,
 									const ValuePieceLocation& piece);
 								ValueLocation(const ValueLocation& other);
+
+			bool				SetToByteOffset(const ValueLocation& other,
+									uint64 byteffset, uint64 Size);
 
 			bool				SetTo(const ValueLocation& other,
 									uint64 bitOffset, uint64 bitSize);

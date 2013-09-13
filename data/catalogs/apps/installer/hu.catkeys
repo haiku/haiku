@@ -7,13 +7,13 @@ Newer versions of GRUB use an extra configuration file to add custom entries to 
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Itt a \"GRUB_HIDDEN_TIMEOUT=0\" sor elé rakjon egy \"#\" jelet ha azt szeretné, hogy a boot menü ténylegesen meg is jelenjen.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A telepítés befejeződött! A(z) „%s” lemez bootszektora elkészült. A „Kilépés” gombbal elhagyhatja a telepítőt, vagy új partíciót választhat egy új rendszer telepítéséhez.
 Quit	InstallerApp		Kilépés
-Additional disk space required: 0.0 KiB	InstallerWindow		Még 0.0 KB hely kell.
+Additional disk space required: 0.0 KiB	InstallerWindow		0.0 KiB hely szükséges
 With GRUB it's: (hdN,n)\n\n	InstallerApp		A GRUB esetében ez: (hdN,n)\n\n
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Leállítás
-Install progress:  	InstallerWindow		Telepítés állapota:  
+Install progress:  	InstallerWindow		Másolás:  
 2.2) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
-Starting Installation.	InstallProgress		A telepítés előkészítése.
+Starting Installation.	InstallProgress		A telepítés előkészítése…
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ez a szoftver alfa verziójú! Ebből következik, hogy adatvesztés könnyen előfordulhat. Gyakran csináljon biztonsági mentéseket! Mi szóltunk.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Biztos meg kívánja szakítani a telepítést?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Biztosan a mostani rendszerindító lemezre telepíti a rendszert? A telepítőnek újra kell indítania a számítógépét, hogy folytathassa a műveletet.
@@ -28,14 +28,14 @@ Install from:	InstallerWindow		Honnan:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld/%2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		FONTOS TUDNIVALÓK A HAIKU TELEPÍTÉSE ELŐTT\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Folytatás
-Write boot sector to '%s'	InstallerWindow		Bootszektor írása „%s” helyre
-Collecting copy information.	InstallProgress		Másolás információinak összegyűjtése.
+Write boot sector to '%s'	InstallerWindow		Bootszektor írása: „%s”
+Collecting copy information.	InstallProgress		Másolás információinak összegyűjtése…
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Válassza ki a felugró menüből a lemezt melyről telepíteni szeretne, majd kattintson a „Mehet” gombra.
 Quit Boot Manager and DriveSetup	InstallerWindow		Kilépés a Rendszerválasztóból és a Lemezkezelőből
 Quit	InstallerWindow		Kilépés
 Welcome to the Haiku Installer!\n\n	InstallerApp		Üdvözöljük a Haiku Telepítőjében!\n\n
 Boot sector successfully written.	InstallProgress		A rendszerindító szektor módosítva lett.
-Performing installation.	InstallProgress		A telepítés folyamatban!
+Performing installation.	InstallProgress		A telepítés folyamatban…
 scanning…	InstallerWindow		keresés…
 Set up boot menu	InstallerWindow		Rendszerválasztó beállítása
 2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB (v1.44 óta)\n
@@ -43,7 +43,7 @@ The first logical partition always has the number \"4\", regardless of the numbe
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		A GRUB elnevezései még mindig így néznek ki: (hdN,n)\n\n
 \tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <az ön által választott szövegszerkesztő> /boot/grub/menu.lst\n\n
 Abort	InstallerWindow		Megszakítás
-Finishing Installation.	InstallProgress		Telepítés befejezése.
+Finishing Installation.	InstallProgress		Telepítés befejezése…
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <az ön által választott szövegszerkesztő> /etc/default/grub\n\n
 Restart	InstallerWindow		Újraindítás
 README	InstallerApp		OLVASSEL
@@ -52,7 +52,7 @@ Please close the Boot Manager and DriveSetup windows before closing the Installe
 Scanning for disks…	InstallerWindow		Lemezek keresése…
 2.3) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		A lemez nem csatolható. Válasszon egy másikat!
-?? of ??	InstallerWindow	Unknown progress	??/??
+?? of ??	InstallerWindow	Unknown progress	?? / ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Indítsa el a Lemezbeállító segédprogramot a\nlétező merevlemezek és egyéb adathordozók\npartícionálásához! A partíciókat a Haiku\noperációs rendszer rendszerbetöltőjéhez\n BFS-sel (Be FájlrendSzerrel) kell inicializálni.
 Show optional packages	InstallerWindow		Választható csomagok megjelenítése
@@ -104,11 +104,11 @@ Continue	InstallerApp		Folytatás
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		A programot, ami a Haiku boot menüjét állítaná be, nem sikerült elindítani.
 Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Írja át a /boot/grub/menu.lst fájlt valamilyen szövegszerkesztővel így:\n\n
 Boot sector not written because of an internal error.	InstallProgress		A Boot szektorba egy belső hiba miatt nem lehetett írni.
-Additional disk space required: %s	InstallerWindow		Még ennyi hely szükségeltetik: %s
+Additional disk space required: %s	InstallerWindow		Még ennyi hely szükséges: %s
 NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		MEGJEGYZÉS: Ugyan a merevlemezek elnevezése itt is ugyanúgy működik mint ahogy az a 2.1)-es pontban le van írva, a partíciók elnevezése máshogy működik.\n\n
 Cancel	InstallProgress		Mégse
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		A Rendszerválasztó és a Lemezkezelő fut…\n\nA telepítés folytatásához zárja be mindkét programot.
-Try installing anyway	InstallProgress		Feltelepítés megpróbálása
+Try installing anyway	InstallProgress		Telepítés megpróbálása
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		Tehát a fejléc alá, amit nem szabad átírni, írjon be néhány ehhez hasonló sort:\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		Biztosan félbeszakítja a telepítést?
 Onto:	InstallerWindow		Hova:

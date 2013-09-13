@@ -308,7 +308,7 @@ FUNCTION(x86_64_syscall_entry):
 	push	$USER_CODE_SEG				// cs
 	push	%rcx						// ip
 	push	$0							// error_code
-	push	$0							// vector
+	push	$99							// vector
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_SYSCALL)
 
 	cld

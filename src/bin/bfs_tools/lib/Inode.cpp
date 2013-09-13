@@ -621,8 +621,10 @@ Inode::EmptyInode(Disk *disk, const char *name, int32 mode)
 	}
 
 	Inode *object = new (std::nothrow) Inode(disk, inode);
-	if (object == NULL)
+	if (object == NULL) {
 		free(inode);
+		return NULL;
+	}
 
 	object->AcquireBuffer();
 		// this must not be deleted anymore!
