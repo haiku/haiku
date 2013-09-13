@@ -215,7 +215,6 @@ status_t
 PackageManager::CommitTransaction(Transaction& transaction,
 	BDaemonClient::BCommitTransactionResult& _result)
 {
-debug_printf("PackageManager::CommitTransaction()\n");
 	Volume* volume = fRoot->GetVolume(transaction.Repository().Location());
 	if (volume == NULL)
 		return B_BAD_VALUE;
@@ -247,8 +246,6 @@ debug_printf("PackageManager::CommitTransaction()\n");
 			}
 		}
 	}
-debug_printf("  activating   %ld (%zu) packages\n", transaction.ActivationTransaction().PackagesToActivate().CountStrings(), packagesAlreadyAdded.size());
-debug_printf("  deactivating %ld (%zu) packages\n", transaction.ActivationTransaction().PackagesToDeactivate().CountStrings(), packagesAlreadyRemoved.size());
 
 	volume->CommitTransaction(transaction.ActivationTransaction(),
 		packagesAlreadyAdded, packagesAlreadyRemoved, _result);
