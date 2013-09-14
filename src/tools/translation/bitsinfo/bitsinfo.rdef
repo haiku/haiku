@@ -1,0 +1,17 @@
+/*
+ * bitsinfo.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-bitsinfo";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "bitsinfo displays text information about Be bitmap format ("bits") images.",
+	long_info = "Haiku bitsinfo is a command line tool for displaying text information about Be bitmap format ("bits") images. Written by Michael Wilber, OBOS Translation Kit Team, Copyright © 2003 OpenBeOS Project."
+};
+
+resource app_flags B_SINGLE_LAUNCH;
