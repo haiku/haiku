@@ -619,3 +619,38 @@ TREE_PATH="$(HAIKU_REPOSITORY_TREE_PATH)"
 TARGET_ARCHITECTURE="$(HAIKU_PACKAGING_ARCH)"
 EOF
 }
+
+
+rule BuildRemoteHaikuPortsRepository target : packages
+{
+	local packageListFile = <repository-package-list>HaikuPorts-packages ;
+	Depends $(target) : $(packageListFile) ;
+	
+	HAIKU_REMOTE_REPOSITORY_PACKAGES on $(target) = $(packages) ;
+	BuildRemoteHaikuPortsRepository1 $(target) : $(packageListFile) ;
+}
+
+
+actions BuildRemoteHaikuPortsRepository1
+{
+	remote=haiku_files@haiku-files.org
+	
+	if [ -n "$(HAIKU_REMOTE_REPOSITORY_PACKAGES:E=:J)" ]; then
+		for package in $(HAIKU_REMOTE_REPOSITORY_PACKAGES) ; do
+			file=`basename $package`
+			if ! grep -q $file $(2); then
+				echo "Error: $file is not being referenced in $(2)"
+				exit 1
+			fi 
+		done
+		scp $(HAIKU_REMOTE_REPOSITORY_PACKAGES) \
+			$remote:haiku-files.org/files/hpkg/
+	fi
+
+	packageList=package-list.$(TARGET_PACKAGING_ARCH)		
+	scp $(2) $remote:build_repository/$packageList
+	
+	ssh $remote \
+		"cd build_repository \
+			&& ./build_repo.sh $(TARGET_PACKAGING_ARCH) $packageList"
+}
