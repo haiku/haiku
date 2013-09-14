@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tools translation bitsinfo ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 BinCommand bitsinfo : 
 	bitsinfo.cpp 
 	: be libbe.so $(HAIKU_LOCALE_LIBS) translation $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) ;
