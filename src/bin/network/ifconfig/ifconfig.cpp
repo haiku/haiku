@@ -105,6 +105,7 @@ static const media_type kMediaTypes[] = {
 			{ IFM_100_TX, "100baseTX", "100 MBit, 100BASE-TX" },
 			{ IFM_1000_T, "1000baseT", "1 GBit, 1000BASE-T" },
 			{ IFM_1000_SX, "1000baseSX", "1 GBit, 1000BASE-SX" },
+			{ IFM_10G_T, "10GbaseT", "10 GBit, 10GBASE-T" },
 			{ -1, NULL, NULL }
 		},
 		{
@@ -1012,4 +1013,3 @@ main(int argc, char** argv)
 	list_interfaces(name);
 	return 0;
 }
-
