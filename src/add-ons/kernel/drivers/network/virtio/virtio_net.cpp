@@ -56,6 +56,48 @@ const char *
 get_feature_name(uint32 feature)
 {
 	switch (feature) {
+		case VIRTIO_NET_F_CSUM:
+			return "host checksum";
+		case VIRTIO_NET_F_GUEST_CSUM:
+			return "guest checksum";
+		case VIRTIO_NET_F_MAC:
+			return "macaddress";
+		case VIRTIO_NET_F_GSO:
+			return "host allgso";
+		case VIRTIO_NET_F_GUEST_TSO4:
+			return "guest tso4";
+		case VIRTIO_NET_F_GUEST_TSO6:
+			return "guest tso6";
+		case VIRTIO_NET_F_GUEST_ECN:
+			return "guest tso6+ecn";
+		case VIRTIO_NET_F_GUEST_UFO:
+			return "guest ufo";
+		case VIRTIO_NET_F_HOST_TSO4:
+			return "host tso4";
+		case VIRTIO_NET_F_HOST_TSO6:
+			return "host tso6";
+		case VIRTIO_NET_F_HOST_ECN:
+			return "host tso6+ecn";
+		case VIRTIO_NET_F_HOST_UFO:
+			return "host UFO";
+		case VIRTIO_NET_F_MRG_RXBUF:
+			return "host mergerxbuffers";
+		case VIRTIO_NET_F_STATUS:
+			return "status";
+		case VIRTIO_NET_F_CTRL_VQ:
+			return "control vq";
+		case VIRTIO_NET_F_CTRL_RX:
+			return "rx mode";
+		case VIRTIO_NET_F_CTRL_VLAN:
+			return "vlan filter";
+		case VIRTIO_NET_F_CTRL_RX_EXTRA:
+			return "rx mode extra";
+		case VIRTIO_NET_F_GUEST_ANNOUNCE:
+			return "guest announce";
+		case VIRTIO_NET_F_MQ:
+			return "multiqueue";
+		case VIRTIO_NET_F_CTRL_MAC_ADDR:
+			return "set macaddress";
 	}
 	return NULL;
 }
@@ -76,7 +118,7 @@ virtio_net_init_device(void* _info, void** _cookie)
 	sDeviceManager->put_node(parent);
 
 	info->virtio->negociate_features(info->virtio_device,
-		0, &info->features, &get_feature_name);
+		0 /*  */, &info->features, &get_feature_name);
 
 	// TODO read config
 	// TODO alloc queues and setup interrupts
