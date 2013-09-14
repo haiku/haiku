@@ -1,0 +1,17 @@
+/*
+ * bmpinfo.rdef
+ */
+
+resource app_signature "application/x-vnd.Haiku-bmpinfo";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+	variety = 0,
+	internal = 0,
+	short_info = "bmpinfo displays text information about BMP images.",
+	long_info = "Haiku bmpinfo is a command line tool for displaying text information about BMP images. Written by Michael Wilber, OBOS Translation Kit Team, Copyright © 2003 OpenBeOS Project."
+};
+
+resource app_flags B_SINGLE_LAUNCH;
