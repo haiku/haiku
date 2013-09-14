@@ -1,7 +1,8 @@
-1	finnish	x-vnd.Haiku-libmail	161731481
+1	finnish	x-vnd.Haiku-libmail	4037525365
 Partially download messages larger than	ProtocolConfigView		Osittain ladatut viestit suurempia kuin
 Password:	ProtocolConfigView		Salasana:
 Remove mail from server when deleted	ProtocolConfigView		Poista sähköposti palvelimelta poistettaessa
+KiB	ProtocolConfigView		kibitavua
 Mail server:	ProtocolConfigView		Sähköpostipalvelin:
 Select…	MailKit		Valitse...
 Connection type:	ProtocolConfigView		Yhteystyyppi:

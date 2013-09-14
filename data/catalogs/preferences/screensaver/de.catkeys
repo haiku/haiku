@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ScreenSaver	3630119516
+1	german	x-vnd.Haiku-ScreenSaver	232492478
 Could not load screen saver	ScreenSaver		Bildschirmschoner konnte nicht geladen werden.
 30 seconds	ScreenSaver		30 Sekunden
 Start screensaver	ScreenSaver		Bildschirmschoner starten
@@ -11,7 +11,9 @@ Display Power Management Signaling not available	ScreenSaver		Stromsparfunktione
 ScreenSaver	System name		Bildschirmschoner
 Test	ScreenSaver		Test
 General	ScreenSaver		Allgemein
+Fade now when mouse is here	ScreenSaver		Sofort starten, wenn Maus in diesem Eck
 Enable screensaver	ScreenSaver		Bildschirmschoner aktivieren
+Don't fade when mouse is here	ScreenSaver		Nicht starten, wenn Maus in diesem Eck
 Cancel	ScreenSaver		Abbrechen
 Turn off screen	ScreenSaver		Bildschirm ausschalten
 No options available	ScreenSaver		Keine Optionen verfügbar

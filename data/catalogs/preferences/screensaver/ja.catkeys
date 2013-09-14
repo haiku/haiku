@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ScreenSaver	3630119516
+1	japanese	x-vnd.Haiku-ScreenSaver	232492478
 Could not load screen saver	ScreenSaver		スクリーンセーバーを実行できませんでした
 30 seconds	ScreenSaver		30 秒
 Start screensaver	ScreenSaver		スクリーンセーバーを開始
@@ -11,7 +11,9 @@ Display Power Management Signaling not available	ScreenSaver		DPMS (Display Powe
 ScreenSaver	System name		スクリーンセーバー
 Test	ScreenSaver		テスト
 General	ScreenSaver		一般
+Fade now when mouse is here	ScreenSaver		マウスが指定の場所にあるときに画面を消す
 Enable screensaver	ScreenSaver		スクリーンセーバーを有効にする
+Don't fade when mouse is here	ScreenSaver		マウスが指定の場所にあるとき画面を消さない
 Cancel	ScreenSaver		取り消し
 Turn off screen	ScreenSaver		画面を消す
 No options available	ScreenSaver		設定がありません
