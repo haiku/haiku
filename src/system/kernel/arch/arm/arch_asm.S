@@ -227,8 +227,8 @@ FUNCTION(arch_debug_call_with_fault_handler):
 	// Set fault handler address, and fault handler stack pointer address. We
 	// don't need to save the previous values, since that's done by the caller.
 	ldr	r4, =1f
-	str	r4, [ r0, #CPU_ENT_fault_handler ]
-	str	sp, [ r0, #CPU_ENT_fault_handler_stack_pointer ]
+	str	r4, [r0, #CPU_ENT_fault_handler]
+	str	sp, [r0, #CPU_ENT_fault_handler_stack_pointer]
 	mov	r4, r1
 
 	// call the function
