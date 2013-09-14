@@ -7,10 +7,14 @@
 #include <ethernet.h>
 #include <virtio.h>
 
+#include <net/if_media.h>
+#include <new>
+
+#include "ether_driver.h"
 #define ETHER_ADDR_LEN	ETHER_ADDRESS_LENGTH
 #include "virtio_net.h"
 
-
+#define MAX_FRAME_SIZE	1536
 
 #define VIRTIO_NET_DRIVER_MODULE_NAME "drivers/network/virtio_net/driver_v1"
 #define VIRTIO_NET_DEVICE_MODULE_NAME "drivers/network/virtio_net/device_v1"
@@ -23,6 +27,15 @@ typedef struct {
 	virtio_device_interface*	virtio;
 
 	uint32 					features;
+
+	uint32					pairs_count;
+	::virtio_queue*			receive_queues;
+	::virtio_queue*			send_queues;
+
+
+	bool					nonblocking;
+	uint32					maxframesize;
+	uint8					macaddr[6];
 
 } virtio_net_driver_info;
 
@@ -120,8 +133,41 @@ virtio_net_init_device(void* _info, void** _cookie)
 	info->virtio->negociate_features(info->virtio_device,
 		0 /*  */, &info->features, &get_feature_name);
 
+	if ((info->features & VIRTIO_NET_F_MQ) != 0
+			&& info->virtio->read_device_config(info->virtio_device,
+				offsetof(struct virtio_net_config, max_virtqueue_pairs),
+				&info->pairs_count, sizeof(info->pairs_count)) == B_OK) {
+		system_info sysinfo;
+		if (get_system_info(&sysinfo) == B_OK
+			&& info->pairs_count > sysinfo.cpu_count) {
+			info->pairs_count = sysinfo.cpu_count;
+		}
+	} else
+		info->pairs_count = 1;
+
 	// TODO read config
-	// TODO alloc queues and setup interrupts
+
+	uint32 queueCount = info->pairs_count * 2;
+	if ((info->features & VIRTIO_NET_F_CTRL_VQ) != 0)
+		queueCount++;
+	::virtio_queue virtioQueues[queueCount];
+	status_t status = info->virtio->alloc_queues(info->virtio_device, queueCount,
+		virtioQueues);
+	if (status != B_OK) {
+		ERROR("queue allocation failed (%s)\n", strerror(status));
+		return status;
+	}
+
+	info->receive_queues = new(std::nothrow) virtio_queue[info->pairs_count];
+	info->send_queues = new(std::nothrow) virtio_queue[info->pairs_count];
+	if (info->receive_queues == NULL || info->receive_queues == NULL)
+		return B_NO_MEMORY;
+	for (uint32 i = 0; i < info->pairs_count; i++) {
+		info->receive_queues[i] = virtioQueues[i * 2];
+		info->send_queues[i] = virtioQueues[i * 2 + 1];
+	}
+
+	// TODO setup interrupts
 
 	*_cookie = info;
 	return B_OK;
@@ -147,7 +193,15 @@ virtio_net_open(void* _info, const char* path, int openMode, void** _cookie)
 	if (handle == NULL)
 		return B_NO_MEMORY;
 
+	info->nonblocking = (openMode & O_NONBLOCK) != 0;
+	info->maxframesize = MAX_FRAME_SIZE;
 	handle->info = info;
+
+	if ((info->features & VIRTIO_NET_F_MAC) != 0) {
+		info->virtio->read_device_config(info->virtio_device,
+			offsetof(struct virtio_net_config, mac),
+			&info->macaddr, sizeof(info->macaddr));
+	}
 
 	*_cookie = handle;
 	return B_OK;
@@ -203,10 +257,59 @@ virtio_net_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	virtio_net_handle* handle = (virtio_net_handle*)cookie;
 	virtio_net_driver_info* info = handle->info;
 
-	TRACE("ioctl(op = %ld)\n", op);
+	TRACE("ioctl(op = %lx)\n", op);
 
 	switch (op) {
+		case ETHER_GETADDR:
+			TRACE("ioctl: get macaddr\n");
+			memcpy(buffer, &info->macaddr, sizeof(info->macaddr));
+			return B_OK;
+
+		case ETHER_INIT:
+			TRACE("ioctl: init\n");
+			return B_OK;
+
+		case ETHER_GETFRAMESIZE:
+			TRACE("ioctl: get frame size\n");
+			*(uint32*)buffer = info->maxframesize;
+			return B_OK;
+
+		case ETHER_SETPROMISC:
+			TRACE("ioctl: set promisc\n");
+			break;
+
+		case ETHER_NONBLOCK:
+			info->nonblocking = *(int32 *)buffer == 0;
+			TRACE("ioctl: non blocking ? %s\n", info->nonblocking ? "yes" : "no");
+			return B_OK;
+
+		case ETHER_ADDMULTI:
+			TRACE("ioctl: add multicast\n");
+			break;
+
+		case ETHER_GET_LINK_STATE:
+		{
+			TRACE("ioctl: get link state\n");
+			ether_link_state_t state;
+			uint16 status = VIRTIO_NET_S_LINK_UP;
+			if ((info->features & VIRTIO_NET_F_STATUS) != 0) {
+				info->virtio->read_device_config(info->virtio_device,
+					offsetof(struct virtio_net_config, status),
+					&status, sizeof(status));
+			}
+			state.media = ((status & VIRTIO_NET_S_LINK_UP) != 0 ? IFM_ACTIVE : 0)
+				| IFM_ETHER | IFM_FULL_DUPLEX | IFM_10G_T;
+			state.speed = 10000000000ULL;
+			state.quality = 1000;
+
+			return user_memcpy(buffer, &state, sizeof(ether_link_state_t));
+		}
+
+		default:
+			ERROR("ioctl: unknown message %" B_PRIx32 "\n", op);
+			break;
 	}
+
 
 	return B_DEV_INVALID_IOCTL;
 }
