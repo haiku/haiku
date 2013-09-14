@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network virtio ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders drivers net virtio ;
+
+KernelAddon virtio_net :
+	virtio_net.cpp
+;
