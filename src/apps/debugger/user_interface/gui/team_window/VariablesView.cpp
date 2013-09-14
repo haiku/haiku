@@ -2103,7 +2103,7 @@ status_t
 VariablesView::_AddContextAction(const char* action, uint32 what,
 	ContextActionList* actions, BMessage*& _message)
 {
-	_message = new BMessage(what);
+	_message = new(std::nothrow) BMessage(what);
 	if (_message == NULL)
 		return B_NO_MEMORY;
 
