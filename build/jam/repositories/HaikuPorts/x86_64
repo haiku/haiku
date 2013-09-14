@@ -97,7 +97,7 @@ RemotePackageRepository HaikuPorts
 	openssl-1.0.0j-3
 	openssl_devel-1.0.0j-3
 	p7zip-9.20.1-5
-	pe-2.4.3_hg610-1
+	pe-2.4.3_hg611-1
 	perl-5.10.1-6
 	pkgconfig-0.27.1-1
 	python-2.6.8-5
