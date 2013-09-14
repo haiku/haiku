@@ -20,7 +20,7 @@ additionalMakeArgs=$*
 	# additional flags for the binutils build. Should there ever be any other
 	# flags than -jN, we need to handle this differently.
 
-if [ `uname -o` = 'Haiku' ]; then
+if [ `uname -s` = 'Haiku' ]; then
 	# force cross-build if building on Haiku:
 	buildhostMachine=i586-pc-haiku_buildhost
 	buildHostSpec="--build=$buildhostMachine --host=$buildhostMachine"
