@@ -315,8 +315,8 @@ ArchitectureX8664::CreateStackFrame(Image* image, FunctionDebugInfo* function,
 
 		// The syscall stubs are frameless, the return address is on top of the
 		// stack.
-		uint32 rsp = cpuState->IntRegisterValue(X86_64_REGISTER_RSP);
-		uint32 address;
+		uint64 rsp = cpuState->IntRegisterValue(X86_64_REGISTER_RSP);
+		uint64 address;
 		if (fTeamMemory->ReadMemory(rsp, &address, 8) == 8) {
 			returnAddress = address;
 			previousFramePointer = framePointer;
