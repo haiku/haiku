@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ScreenSaver	3630119516
+1	hungarian	x-vnd.Haiku-ScreenSaver	232492478
 Could not load screen saver	ScreenSaver		A képernyővédő betöltése sikertelen
 30 seconds	ScreenSaver		30 másodperc
 Start screensaver	ScreenSaver		Képernyővédő indítása
@@ -11,7 +11,9 @@ Display Power Management Signaling not available	ScreenSaver		A kijelző energia
 ScreenSaver	System name		Képernyővédő
 Test	ScreenSaver		Próba
 General	ScreenSaver		Általános
+Fade now when mouse is here	ScreenSaver		Bekapcsolás, ha az egér itt van
 Enable screensaver	ScreenSaver		Képernyővédő engedélyezése
+Don't fade when mouse is here	ScreenSaver		Ne kapcsoljon be, ha az egér itt van
 Cancel	ScreenSaver		Mégse
 Turn off screen	ScreenSaver		Képernyő kikapcsolása
 No options available	ScreenSaver		Nincsenek elérhető beállítások
