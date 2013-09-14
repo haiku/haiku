@@ -36,9 +36,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ByteOrder.h>
+#include <Catalog.h>
 #include <File.h>
 #include <TranslatorFormats.h>
 #include <StorageDefs.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "tgainfo"
 
 #define max(x,y) ((x > y) ? x : y)
 #define DATA_BUFFER_SIZE 64
@@ -99,8 +103,8 @@ const char *
 colormaptype(uint8 n)
 {
 	switch (n) {
-		case 0: return "No colormap";
-		case 1: return "colormap";
+		case 0: return B_TRANSLATE("No colormap");
+		case 1: return B_TRANSLATE("colormap");
 	}
 	return "unknown";
 }
@@ -109,15 +113,16 @@ const char *
 imagetype(uint8 n)
 {
 	switch (n) {
-		case 0:  return "No Image Data";
-		case 1:  return "colormap";
-		case 2:  return "true color";
-		case 3:  return "grayscale";
-		case 9:  return "RLE colormap";
-		case 10: return "RLE true color";
-		case 11: return "RLE grayscale";
+		case 0:  return B_TRANSLATE("No Image Data");
+		case 1:  return B_TRANSLATE("colormap");
+		case 2:  return B_TRANSLATE("true color");
+		case 3:  return B_TRANSLATE("grayscale");
+		case 9:  return B_TRANSLATE("RLE colormap");
+		case 10: return B_TRANSLATE("RLE true color");
+		case 11: return B_TRANSLATE("RLE grayscale");
+		default: break;
 	}
-	return "unknown";
+	return B_TRANSLATE("unknown");
 }
 
 uint16
@@ -140,7 +145,7 @@ print_tga_info(BFile &file)
 	// read in TGA headers
 	ssize_t size = TGA_HEADERS_SIZE;
 	if (size > 0 && file.Read(buf, size) != size) {
-		printf("Error: unable to read all TGA headers\n");
+		printf(B_TRANSLATE("Error: unable to read all TGA headers\n"));
 		return;
 	}
 	
@@ -150,12 +155,15 @@ print_tga_info(BFile &file)
 	fh.colormaptype = buf[1];
 	fh.imagetype = buf[2];
 	
-	printf("\nFile Header:\n");
-	printf("    id length: %d\n", fh.idlength);
+	printf(B_TRANSLATE("\nFile Header:\n"));
+	printf(B_TRANSLATE("    id length: %d\n"), static_cast<int>(fh.idlength));
 	
-	printf("colormap type: %d (%s)\n", fh.colormaptype,
-		colormaptype(fh.colormaptype));
-	printf("   image type: %d (%s)\n", fh.imagetype, imagetype(fh.imagetype));
+	printf(B_TRANSLATE("colormap type: %d (%s)\n"),
+		static_cast<int>(fh.colormaptype),
+		static_cast<const char *>(colormaptype(fh.colormaptype)));
+	printf(B_TRANSLATE("   image type: %d (%s)\n"),
+		static_cast<int>(fh.imagetype),
+		static_cast<const char *>(imagetype(fh.imagetype)));
 	
 	
 	// TGA color map spec
@@ -164,10 +172,13 @@ print_tga_info(BFile &file)
 	mapspec.length = tga_uint16(reinterpret_cast<char *>(buf), 5);
 	mapspec.entrysize = buf[7];
 	
-	printf("\nColormap Spec:\n");
-	printf("first entry: %d\n", mapspec.firstentry);
-	printf("     length: %d\n", mapspec.length);
-	printf(" entry size: %d\n", mapspec.entrysize);
+	printf(B_TRANSLATE("\nColormap Spec:\n"));
+	printf(B_TRANSLATE("first entry: %d\n"),
+		static_cast<int>(mapspec.firstentry));
+	printf(B_TRANSLATE("     length: %d\n"),
+		static_cast<int>(mapspec.length));
+	printf(B_TRANSLATE(" entry size: %d\n"),
+		static_cast<int>(mapspec.entrysize));
 	
 	
 	// TGA image spec
@@ -179,20 +190,47 @@ print_tga_info(BFile &file)
 	imagespec.depth = buf[16];
 	imagespec.descriptor = buf[17];
 	
-	printf("\nImage Spec:\n");
-	printf("  x origin: %d\n", imagespec.xorigin);
-	printf("  y origin: %d\n", imagespec.yorigin);
-	printf("     width: %d\n", imagespec.width);
-	printf("    height: %d\n", imagespec.height);
-	printf("     depth: %d\n", imagespec.depth);
-	printf("descriptor: 0x%.2x\n", imagespec.descriptor);
-		printf("\talpha (attr): %d\n",
-			imagespec.descriptor & TGA_DESC_ALPHABITS);
-		printf("\t      origin: %d (%s %s)\n",
-			imagespec.descriptor & (TGA_ORIGIN_VERT_BIT | TGA_ORIGIN_HORZ_BIT),
-			((imagespec.descriptor & TGA_ORIGIN_VERT_BIT) ? "top" : "bottom"),
-			((imagespec.descriptor & TGA_ORIGIN_HORZ_BIT) ? "right" : "left"));
-		printf("\t  bits 7 & 6: %d\n", imagespec.descriptor & TGA_DESC_BITS76);
+	printf(B_TRANSLATE("\nImage Spec:\n"));
+	printf(B_TRANSLATE("  x origin: %d\n"),
+		static_cast<int>(imagespec.xorigin));
+	printf(B_TRANSLATE("  y origin: %d\n"),
+		static_cast<int>(imagespec.yorigin));
+	printf(B_TRANSLATE("     width: %d\n"),
+		static_cast<int>(imagespec.width));
+	printf(B_TRANSLATE("    height: %d\n"),
+		static_cast<int>(imagespec.height));
+	printf(B_TRANSLATE("     depth: %d\n"),
+		static_cast<int>(imagespec.depth));
+	printf(B_TRANSLATE("descriptor: 0x%.2x\n"),
+		static_cast<int>(imagespec.descriptor));
+	printf(B_TRANSLATE("\talpha (attr): %d\n"),
+		static_cast<int>(imagespec.descriptor & TGA_DESC_ALPHABITS));
+	if (imagespec.descriptor & TGA_ORIGIN_VERT_BIT)
+		if (imagespec.descriptor & TGA_ORIGIN_HORZ_BIT)
+			printf(B_TRANSLATE("\t      origin: %d (%s %s)\n"),
+				static_cast<int>(imagespec.descriptor & (TGA_ORIGIN_VERT_BIT 
+				| TGA_ORIGIN_HORZ_BIT)), static_cast<const char *>("top"),
+				static_cast<const char *>("right"));
+		else
+			printf(B_TRANSLATE("\t      origin: %d (%s %s)\n"),
+			static_cast<int>(imagespec.descriptor & (TGA_ORIGIN_VERT_BIT 
+				| TGA_ORIGIN_HORZ_BIT)), static_cast<const char *>("top"),
+				static_cast<const char *>("left"));
+	else
+		if (imagespec.descriptor & TGA_ORIGIN_HORZ_BIT)
+			printf(B_TRANSLATE("\t      origin: %d (%s %s)\n"),
+				static_cast<int>(imagespec.descriptor & (TGA_ORIGIN_VERT_BIT 
+				| TGA_ORIGIN_HORZ_BIT)), static_cast<const char *>("bottom"),
+				static_cast<const char *>("right"));
+		else
+			printf(B_TRANSLATE("\t      origin: %d (%s %s)\n"),
+			static_cast<int>(imagespec.descriptor & (TGA_ORIGIN_VERT_BIT 
+				| TGA_ORIGIN_HORZ_BIT)), static_cast<const char *>("bottom"),
+				static_cast<const char *>("left"));
+			
+			
+	printf(B_TRANSLATE("\t  bits 7 & 6: %d\n"),
+		static_cast<int>(imagespec.descriptor & TGA_DESC_BITS76));
 		
 		
 	// Optional TGA Footer
@@ -208,107 +246,128 @@ print_tga_info(BFile &file)
 				extoffset = tga_uint32(tgafooter, 0);
 				devoffset = tga_uint32(tgafooter, 4);
 			
-				printf("\nTGA Footer:\n");
-				printf("extension offset: 0x%.8lx (%ld)\n", extoffset, extoffset);
-				printf("developer offset: 0x%.8lx (%ld)\n", devoffset, devoffset);
-				printf("signature: %s\n", tgafooter + 8);
+				printf(B_TRANSLATE("\nTGA Footer:\n"));
+				printf(B_TRANSLATE("extension offset: 0x%.8lx (%ld)\n"),
+					static_cast<long int>(extoffset),
+					static_cast<long int>(extoffset));
+				printf(B_TRANSLATE("developer offset: 0x%.8lx (%ld)\n"),
+					static_cast<long int>(devoffset),
+					static_cast<long int>(devoffset));
+				printf(B_TRANSLATE("signature: %s\n"), tgafooter + 8);
 				
 				if (extoffset) {
 					char extbuf[TGA_EXT_LEN];
 					if (file.ReadAt(extoffset, extbuf, TGA_EXT_LEN) == TGA_EXT_LEN) {
 					
-						printf("\nExtension Area:\n");
+						printf(B_TRANSLATE("\nExtension Area:\n"));
 						
 						char strbuffer[LINE_LEN];
 						
 						uint16 extsize = tga_uint16(extbuf, 0);
 						if (extsize < TGA_EXT_LEN) {
-							printf("\nError: extension area is too small (%d)\n", extsize);
+							printf(B_TRANSLATE("\nError: extension "
+								"area is too small (%d)\n"), extsize);
 							return;
 						}
-						printf("size: %d\n", extsize);
+						printf(B_TRANSLATE("size: %d\n"), extsize);
 						
 						memset(strbuffer, 0, LINE_LEN);
 						strncpy(strbuffer, extbuf + 2, 41);
 						printf("author: \"%s\"\n", strbuffer);
 						
-						printf("comments:\n");
+						printf(B_TRANSLATE("comments:\n"));
 						for (int32 i = 0; i < 4; i++) {
 							memset(strbuffer, 0, LINE_LEN);
 							strcpy(strbuffer, extbuf + 43 + (i * 81));
-							printf("\tline %ld: \"%s\"\n", i + 1, strbuffer);
+							printf(B_TRANSLATE("\tline %ld: \"%s\"\n"),
+								static_cast<long int>(i + 1),
+								static_cast<const char *>(strbuffer));
 						}
 
-						printf("date/time (yyyy-mm-dd hh:mm:ss): %.4d-%.2d-%.2d %.2d:%.2d:%.2d\n",
+						printf(B_TRANSLATE("date/time (yyyy-mm-dd hh:mm:ss): "
+							"%.4d-%.2d-%.2d %.2d:%.2d:%.2d\n"),
 							tga_uint16(extbuf, 367), tga_uint16(extbuf, 369),
 							tga_uint16(extbuf, 371), tga_uint16(extbuf, 373),
 							tga_uint16(extbuf, 375), tga_uint16(extbuf, 377));
 							
 						memset(strbuffer, 0, LINE_LEN);
 						strncpy(strbuffer, extbuf + 379, 41);
-						printf("job name: \"%s\"\n", strbuffer);
+						printf(B_TRANSLATE("job name: \"%s\"\n"), strbuffer);
 
-						printf("job time (hh:mm:ss): %.2d:%.2d:%.2d\n",
-							tga_uint16(extbuf, 420), tga_uint16(extbuf, 422),
-							tga_uint16(extbuf, 424));
+						printf(B_TRANSLATE("job time (hh:mm:ss): "
+							"%.2d:%.2d:%.2d\n"), tga_uint16(extbuf, 420),
+							tga_uint16(extbuf, 422), tga_uint16(extbuf, 424));
 							
 						memset(strbuffer, 0, LINE_LEN);
 						strncpy(strbuffer, extbuf + 426, 41);
-						printf("software id: \"%s\"\n", strbuffer);
+						printf(B_TRANSLATE("software id: \"%s\"\n"),
+							strbuffer);
 						
 						char strver[] = "[null]";
 						if (extbuf[469] != '\0') {
 							strver[0] = extbuf[469];
 							strver[1] = '\0';
 						}
-						printf("software version, letter: %d, %s\n",
-							tga_uint16(extbuf, 467), strver);
+						printf(B_TRANSLATE("software version, letter: %d, "
+							"%s\n"), tga_uint16(extbuf, 467), strver);
 						
-						printf("key color (A,R,G,B): %d, %d, %d, %d\n",
-							extbuf[470], extbuf[471], extbuf[472], extbuf[473]);
+						printf(B_TRANSLATE("key color (A,R,G,B): %d, %d, %d, "
+							"%d\n"), extbuf[470], extbuf[471], extbuf[472],
+							extbuf[473]);
 						
-						printf("pixel aspect ratio: %d / %d\n",
+						printf(B_TRANSLATE("pixel aspect ratio: %d / %d\n"),
 							tga_uint16(extbuf, 474), tga_uint16(extbuf, 476));
 
-						printf("gamma value: %d / %d\n",
+						printf(B_TRANSLATE("gamma value: %d / %d\n"),
 							tga_uint16(extbuf, 478), tga_uint16(extbuf, 480));
 						
-						printf("color correction offset: 0x%.8lx (%ld)\n",
-							tga_uint32(extbuf, 482), tga_uint32(extbuf, 482));
-						printf("postage stamp offset: 0x%.8lx (%ld)\n",
-							tga_uint32(extbuf, 486), tga_uint32(extbuf, 486));
-						printf("scan line offset: 0x%.8lx (%ld)\n",
-							tga_uint32(extbuf, 490), tga_uint32(extbuf, 490));
+						printf(B_TRANSLATE("color correction offset: 0x%.8lx "
+							"(%ld)\n"),	tga_uint32(extbuf, 482),
+							tga_uint32(extbuf, 482));
+						printf(B_TRANSLATE("postage stamp offset: 0x%.8lx "
+							"(%ld)\n"),	tga_uint32(extbuf, 486),
+							tga_uint32(extbuf, 486));
+						printf(B_TRANSLATE("scan line offset: 0x%.8lx "
+							"(%ld)\n"), tga_uint32(extbuf, 490),
+							tga_uint32(extbuf, 490));
 						
 						const char *strattrtype = NULL;
 						uint8 attrtype = extbuf[494];
 						switch (attrtype) {
-							case 0: strattrtype = "no alpha"; break;
-							case 1: strattrtype = "undefined, ignore"; break;
-							case 2: strattrtype = "undefined, retain"; break;
-							case 3: strattrtype = "alpha"; break;
-							case 4: strattrtype = "pre-multiplied alpha"; break;
+							case 0: strattrtype 
+								= B_TRANSLATE("no alpha"); break;
+							case 1: strattrtype 
+								= B_TRANSLATE("undefined, ignore"); break;
+							case 2: strattrtype 
+								= B_TRANSLATE("undefined, retain"); break;
+							case 3: strattrtype 
+								= B_TRANSLATE("alpha"); break;
+							case 4: strattrtype 
+								= B_TRANSLATE("pre-multiplied alpha"); break;
 							default:
 								if (attrtype > 4 && attrtype < 128)
-									strattrtype = "reserved";
+									strattrtype = B_TRANSLATE("reserved");
 								else
-									strattrtype = "unassigned";
+									strattrtype = B_TRANSLATE("unassigned");
 								break;
 						}
-						printf("attributes type: %d (%s)\n", attrtype, strattrtype);
+						printf(B_TRANSLATE("attributes type: %d (%s)\n"),
+							attrtype, strattrtype);
 						
 					} else
-						printf("\nError: Unable to read entire extension area\n");
+						printf(B_TRANSLATE("\nError: Unable to read entire "
+							"extension area\n"));
 				}
 				
 			} else
-				printf("\nTGA footer not found\n");
+				printf(B_TRANSLATE("\nTGA footer not found\n"));
 
 		} else
-			printf("\nError: Unable to read TGA footer section\n");
+			printf(B_TRANSLATE("\nError: Unable to read TGA footer "
+				"section\n"));
 			
 	} else
-		printf("\nError: Unable to get file size\n");
+		printf(B_TRANSLATE("\nError: Unable to get file size\n"));
 }
 
 int
@@ -317,18 +376,18 @@ main(int argc, char **argv)
 	printf("\n");
 	
 	if (argc == 1) {
-		printf("tgainfo - reports information about a TGA image file\n");
-		printf("\nUsage:\n");
-		printf("tgainfo filename.tga\n");	
+		printf(B_TRANSLATE("tgainfo - reports information about a TGA image file\n"));
+		printf(B_TRANSLATE("\nUsage:\n"));
+		printf(B_TRANSLATE("tgainfo filename.tga\n"));	
 	}
 	else {
 		BFile file;
 		
 		for (int32 i = 1; i < argc; i++) {
 			if (file.SetTo(argv[i], B_READ_ONLY) != B_OK)
-				printf("\nError opening %s\n", argv[i]);
+				printf(B_TRANSLATE("\nError opening %s\n"), argv[i]);
 			else {
-				printf("\nTGA image information for: %s\n", argv[i]);
+				printf(B_TRANSLATE("\nTGA image information for: %s\n"), argv[i]);
 				print_tga_info(file);
 			}
 		}
