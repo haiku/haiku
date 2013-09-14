@@ -355,7 +355,10 @@ private:
 
 			fPackagesToDeactivate.insert(package);
 
-			package->IncrementEntryRemovedIgnoreLevel();
+			if (fPackagesAlreadyRemoved.find(package)
+					== fPackagesAlreadyRemoved.end()) {
+				package->IncrementEntryRemovedIgnoreLevel();
+			}
 		}
 	}
 
