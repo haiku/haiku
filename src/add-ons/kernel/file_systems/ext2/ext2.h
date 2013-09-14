@@ -141,13 +141,13 @@ struct ext2_super_block {
 	{
 		free_blocks = B_HOST_TO_LENDIAN_INT32(freeBlocks & 0xffffffff);
 		if (has64bits)
-			free_blocks_high = B_HOST_TO_LENDIAN_INT32(freeBlocks >> 32);  
+			free_blocks_high = B_HOST_TO_LENDIAN_INT32(freeBlocks >> 32);
 	}
 	void SetLastOrphan(ino_t id)
 		{ last_orphan = B_HOST_TO_LENDIAN_INT32((uint32)id); }
 	void SetReadOnlyFeatures(uint32 readOnlyFeatures) const
 		{ readOnlyFeatures = B_HOST_TO_LENDIAN_INT32(readOnlyFeatures); }
-	
+
 	bool IsValid();
 		// implemented in Volume.cpp
 } _PACKED;
@@ -211,7 +211,7 @@ struct ext2_block_group {
 	uint32	_reserved[2];
 	uint16	unused_inodes;
 	uint16	checksum;
-	
+
 	// ext4
 	uint32	block_bitmap_high;
 	uint32	inode_bitmap_high;
@@ -249,7 +249,7 @@ struct ext2_block_group {
 	{
 		uint32 blocks = B_LENDIAN_TO_HOST_INT16(free_blocks);
 		if (has64bits)
-			blocks |= 
+			blocks |=
 				((uint32)B_LENDIAN_TO_HOST_INT16(free_blocks_high) << 16);
 		return blocks;
 	}
@@ -257,7 +257,7 @@ struct ext2_block_group {
 	{
 		uint32 inodes = B_LENDIAN_TO_HOST_INT16(free_inodes);
 		if (has64bits)
-			inodes |= 
+			inodes |=
 				((uint32)B_LENDIAN_TO_HOST_INT16(free_inodes_high) << 16);
 		return inodes;
 	}
@@ -265,7 +265,7 @@ struct ext2_block_group {
 	{
 		uint32 dirs = B_LENDIAN_TO_HOST_INT16(used_directories);
 		if (has64bits)
-			dirs |= 
+			dirs |=
 				((uint32)B_LENDIAN_TO_HOST_INT16(used_directories_high) << 16);
 		return dirs;
 	}
@@ -274,11 +274,11 @@ struct ext2_block_group {
 	{
 		uint32 inodes = B_LENDIAN_TO_HOST_INT16(unused_inodes);
 		if (has64bits)
-			inodes |= 
+			inodes |=
 				((uint32)B_LENDIAN_TO_HOST_INT16(unused_inodes_high) << 16);
 		return inodes;
 	}
-	
+
 
 	void SetFreeBlocks(uint32 freeBlocks, bool has64bits)
 	{
@@ -376,7 +376,7 @@ struct ext2_extent_entry {
 	uint32 physical_block;
 	uint32 LogicalBlock() const
 		{ return B_LENDIAN_TO_HOST_INT32(logical_block); }
-	uint16 Length() const { return B_LENDIAN_TO_HOST_INT16(length) == 0x8000 
+	uint16 Length() const { return B_LENDIAN_TO_HOST_INT16(length) == 0x8000
 		? 0x8000 : B_LENDIAN_TO_HOST_INT16(length) & 0x7fff; }
 	uint64 PhysicalBlock() const { return B_LENDIAN_TO_HOST_INT32(physical_block)
 		| ((uint64)B_LENDIAN_TO_HOST_INT16(physical_block_high) << 32); }
@@ -437,7 +437,7 @@ struct ext2_inode {
 	uint16	uid_high;
 	uint16	gid_high;
 	uint32	_reserved2;
-	
+
 	// extra attributes
 	uint16	extra_inode_size;
 	uint16	_padding2;
@@ -460,18 +460,18 @@ struct ext2_inode {
 	{
 		timespec->tv_sec = B_LENDIAN_TO_HOST_INT32(time);
 		if (extra && sizeof(timespec->tv_sec) > 4)
-			timespec->tv_sec |= 
+			timespec->tv_sec |=
 				(uint64)(B_LENDIAN_TO_HOST_INT32(time_extra) & 0x2) << 32;
 		if (extra)
 			timespec->tv_nsec = B_LENDIAN_TO_HOST_INT32(time_extra) >> 2;
 		else
 			timespec->tv_nsec = 0;
 	}
-	
-	void GetModificationTime(struct timespec *timespec, bool extra) const 
-		{ _DecodeTime(timespec, modification_time, modification_time_extra, 
+
+	void GetModificationTime(struct timespec *timespec, bool extra) const
+		{ _DecodeTime(timespec, modification_time, modification_time_extra,
 			extra); }
-	void GetAccessTime(struct timespec *timespec, bool extra) const 
+	void GetAccessTime(struct timespec *timespec, bool extra) const
 		{ _DecodeTime(timespec, access_time, access_time_extra, extra); }
 	void GetChangeTime(struct timespec *timespec, bool extra) const
 		{ _DecodeTime(timespec, change_time, change_time_extra, extra); }
@@ -494,7 +494,7 @@ struct ext2_inode {
 			time |= (uint64)timespec->tv_sec >> 32;
 		return B_HOST_TO_LENDIAN_INT32(time);
 	}
-	
+
 	void SetModificationTime(const struct timespec *timespec, bool extra)
 	{
 		modification_time = B_HOST_TO_LENDIAN_INT32((uint32)timespec->tv_sec);
@@ -517,7 +517,7 @@ struct ext2_inode {
 	{
 		if (extra) {
 			creation_time = B_HOST_TO_LENDIAN_INT32((uint32)timespec->tv_sec);
-			creation_time_extra = 
+			creation_time_extra =
 				B_HOST_TO_LENDIAN_INT32((uint32)timespec->tv_nsec);
 		}
 	}
@@ -527,7 +527,7 @@ struct ext2_inode {
 	}
 
 	ino_t  NextOrphan() const { return (ino_t)DeletionTime(); }
-	
+
 	off_t Size() const
 	{
 		if (S_ISREG(Mode())) {
@@ -654,6 +654,10 @@ struct ext2_inode {
 #define EXT2_INODE_DIR_SYNCH			0x00010000
 #define EXT2_INODE_HUGE_FILE			0x00040000
 #define EXT2_INODE_EXTENTS				0x00080000
+#define EXT2_INODE_LARGE_EA				0x00200000
+#define EXT2_INODE_EOF_BLOCKS			0x00400000
+#define EXT2_INODE_INLINE_DATA			0x10000000
+#define EXT2_INODE_RESERVED				0x80000000
 
 #define EXT2_INODE_INHERITED (EXT2_INODE_SECURE_DELETION | EXT2_INODE_UNDELETE \
 	| EXT2_INODE_COMPRESSED | EXT2_INODE_SYNCHRONOUS | EXT2_INODE_IMMUTABLE \

@@ -633,8 +633,9 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	inode->SetAccessTime(&timespec);
 	inode->SetCreationTime(&timespec);
 	inode->SetModificationTime(&timespec);
-	node.SetFlags(parent->Flags() & EXT2_INODE_INHERITED);
-	if (volume->HasExtentsFeature() 
+	if (parent != NULL)
+		node.SetFlags(parent->Flags() & EXT2_INODE_INHERITED);
+	if (volume->HasExtentsFeature()
 		&& (inode->IsDirectory() || inode->IsFile())) {
 		node.SetFlag(EXT2_INODE_EXTENTS);
 		ExtentStream stream(volume, &node.extent_stream, 0);
@@ -935,4 +936,3 @@ Inode::IncrementNumLinks(Transaction& transaction)
 		fVolume->ActivateDirNLink(transaction);
 	}
 }
-
