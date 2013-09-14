@@ -753,15 +753,6 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 		}
 	}
 
-	// If availalbe enable NX-bit (No eXecute). Boot CPU can not enable
-	// NX-bit here since PAE should be enabled first.
-	if (cpu != 0) {
-		if (x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
-			x86_write_msr(IA32_MSR_EFER, x86_read_msr(IA32_MSR_EFER)
-				| IA32_MSR_EFER_NX);
-		}
-	}
-
 	return B_OK;
 }
 
