@@ -164,83 +164,36 @@ FUNCTION(atomic_get):
         bx	lr
 FUNCTION_END(atomic_get)
 
+FUNCTION(__sync_fetch_and_add_4):
+	bx	lr
+FUNCTION_END(__sync_fetch_and_add_4)
 
 /* int64	atomic_add64(vint64 *value, int64 addValue) */
-//FUNCTION(atomic_add64):
-//		movem.l	%d2-%d3/%a2,-(%a7)
-//		move.l	(4,%a7),%a2
-//		lea.l	(4,%a2),%a1
-//		// addValue
-//		move.l	(12,%a7),%d3	/*LSB*/
-//		move.l	(8,%a7),%d2		/*MSB*/
-//miss5:	// old value
-//		move.l	(%a1),%d1		/*LSB*/
-//		move.l	(%a2),%d0		/*MSB*/
-//		add.l	%d1,%d3
-//		addx.l	%d0,%d2
-//		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
-//		bne		miss5
-//		// return value d0:d1
-//		movem.l	(%a7)+,%d2-%d3/%a2
-//		rts
-//FUNCTION_END(atomic_add64)
+FUNCTION(atomic_add64):
+	bx	lr
+FUNCTION_END(atomic_add64)
 
 /* int64	atomic_and64(vint64 *value, int64 andValue) */
-//FUNCTION(atomic_and64):
-//FUNCTION_END(atomic_and64)
+FUNCTION(atomic_and64):
+	bx	lr
+FUNCTION_END(atomic_and64)
 
 /* int64	atomic_or64(vint64 *value, int64 orValue) */
-//FUNCTION(atomic_or64):
-//FUNCTION_END(atomic_or64)
+FUNCTION(atomic_or64):
+	bx	lr
+FUNCTION_END(atomic_or64)
 
 /* int64	atomic_set64(vint64 *value, int64 newValue) */
-//FUNCTION(atomic_set64):
-//		movem.l	%d2-%d3/%a2,-(%a7)
-//		move.l	(4,%a7),%a2
-//		lea.l	(4,%a2),%a1
-//		// new value
-//		move.l	(12,%a7),%d3	/*LSB*/
-//		move.l	(8,%a7),%d2		/*MSB*/
-//		// old value
-//		move.l	(%a1),%d1		/*LSB*/
-//		move.l	(%a2),%d0		/*MSB*/
-//miss8:	cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
-//		bne		miss8
-//		// return value d0:d1
-//		movem.l	(%a7)+,%d2-%d3/%a2
-//		rts
-//FUNCTION_END(atomic_set64)
+FUNCTION(atomic_set64):
+	bx	lr
+FUNCTION_END(atomic_set64)
 
 /* int64	atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst) */
-//FUNCTION(atomic_test_and_set64):
-//		movem.l	%d2-%d3/%a2,-(%a7)
-//		move.l	(4,%a7),%a2
-//		lea.l	(4,%a2),%a1
-//		// new value
-//		move.l	(12,%a7),%d3	/*LSB*/
-//		move.l	(8,%a7),%d2		/*MSB*/
-//		// test against value
-//		move.l	(20,%a7),%d1	/*LSB*/
-//		move.l	(16,%a7),%d0	/*MSB*/
-//		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
-//		// return value d0:d1
-//		movem.l	(%a7)+,%d2-%d3/%a2
-//		rts
-//FUNCTION_END(atomic_test_and_set64)
+FUNCTION(atomic_test_and_set64):
+	bx	lr
+FUNCTION_END(atomic_test_and_set64)
 
 /* int64	atomic_get64(vint64 *value) */
-//FUNCTION(atomic_get64):
-//		movem.l	%d2-%d3/%a2,-(%a7)
-//		move.l	(4,%a7),%a2
-//		lea.l	(4,%a2),%a1
-//		move.l	(%a1),%d1	/*LSB*/
-//		move.l	(%a2),%d0		/*MSB*/
-//		move.l	%d1,%d3
-//		move.l	%d0,%d2
-//		// we must use cas... so we change to the same value if matching,
-//		// else we get the correct one anyway
-//		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
-//		// return value
-//		movem.l	(%a7)+,%d2-%d3/%a2
-//		rts
-//FUNCTION_END(atomic_get64)
+FUNCTION(atomic_get64):
+	bx	lr
+FUNCTION_END(atomic_get64)
