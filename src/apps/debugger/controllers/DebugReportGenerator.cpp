@@ -18,12 +18,15 @@
 #include "AreaInfo.h"
 #include "CpuState.h"
 #include "DebuggerInterface.h"
+#include "DisassembledCode.h"
+#include "FunctionInstance.h"
 #include "Image.h"
 #include "MessageCodes.h"
 #include "Register.h"
 #include "SemaphoreInfo.h"
 #include "StackFrame.h"
 #include "StackTrace.h"
+#include "Statement.h"
 #include "StringUtils.h"
 #include "SystemInfo.h"
 #include "Team.h"
@@ -51,7 +54,8 @@ DebugReportGenerator::DebugReportGenerator(::Team* team,
 	fWaitingNode(NULL),
 	fCurrentBlock(NULL),
 	fBlockRetrievalStatus(B_OK),
-	fTraceWaitingThread(NULL)
+	fTraceWaitingThread(NULL),
+	fSourceWaitingFunction(NULL)
 {
 	fTeam->AddListener(this);
 	fArchitecture->AcquireReference();
@@ -203,6 +207,20 @@ DebugReportGenerator::ValueNodeValueChanged(ValueNode* node)
 	}
 }
 
+
+void
+DebugReportGenerator::FunctionSourceCodeChanged(Function* function)
+{
+	AutoLocker< ::Team> teamLocker(fTeam);
+	if (function == fSourceWaitingFunction) {
+		if (function->FirstInstance()->SourceCodeState()
+				== FUNCTION_SOURCE_LOADED
+		   || function->FirstInstance()->SourceCodeState()
+				== FUNCTION_SOURCE_UNAVAILABLE) {
+			release_sem(fTeamDataSem);
+		}
+	}
+}
 
 status_t
 DebugReportGenerator::_GenerateReportHeader(BString& _output)
@@ -452,9 +470,12 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 			&& frame->CountLocalVariables() == 0) {
 			// only dump the topmost frame
 			if (i == 0) {
+				locker.Unlock();
+				_DumpFunctionDisassembly(_output, frame->InstructionPointer());
 				_DumpStackFrameMemory(_output, thread->GetCpuState(),
 					frame->FrameAddress(), thread->GetTeam()->GetArchitecture()
 						->StackGrowthDirection());
+				locker.Lock();
 			}
 			continue;
 		}
@@ -496,6 +517,66 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 
 
 void
+DebugReportGenerator::_DumpFunctionDisassembly(BString& _output,
+	target_addr_t instructionPointer)
+{
+	AutoLocker< ::Team> teamLocker(fTeam);
+	BString data;
+	FunctionInstance* instance = NULL;
+	Statement* statement = NULL;
+	status_t error = fTeam->GetStatementAtAddress(instructionPointer, instance,
+		statement);
+	if (error != B_OK) {
+		data.SetToFormat("Unable to retrieve disassembly for IP %#" B_PRIx64
+				": %s\n", instructionPointer, strerror(error));
+		_output << data;
+		return;
+	}
+
+	DisassembledCode* code = instance->GetSourceCode();
+	Function* function = instance->GetFunction();
+	if (code == NULL) {
+		switch (function->SourceCodeState()) {
+			case FUNCTION_SOURCE_NOT_LOADED:
+				function->AddListener(this);
+				fSourceWaitingFunction = function;
+				fListener->FunctionSourceCodeRequested(instance, true);
+				// fall through
+			case FUNCTION_SOURCE_LOADING:
+			{
+				teamLocker.Unlock();
+				error = acquire_sem(fTeamDataSem);
+				if (error != B_OK)
+					return;
+				teamLocker.Lock();
+				break;
+			}
+			default:
+				return;
+		}
+
+		if (instance->SourceCodeState() == 	FUNCTION_SOURCE_UNAVAILABLE)
+			return;
+
+		error = fTeam->GetStatementAtAddress(instructionPointer, instance,
+			statement);
+		code = instance->GetSourceCode();
+	}
+
+	SourceLocation location = statement->StartSourceLocation();
+
+	_output << "\t\t\tDisassembly:\n";
+	for (int32 i = 0; i < location.Line(); i++) {
+		_output << "\t\t\t\t" << code->LineAt(i);
+		if (i == location.Line() - 1)
+			_output << " <--";
+		_output << "\n";
+	}
+	_output << "\n";
+}
+
+
+void
 DebugReportGenerator::_DumpStackFrameMemory(BString& _output,
 	CpuState* state, target_addr_t framePointer, uint8 stackDirection)
 {
@@ -519,11 +600,11 @@ DebugReportGenerator::_DumpStackFrameMemory(BString& _output,
 
 	_output << "\t\t\tFrame memory:\n";
 	if (fBlockRetrievalStatus == B_OK) {
-		UiUtils::DumpMemory(_output, 3, fCurrentBlock, startAddress, 1, 16,
+		UiUtils::DumpMemory(_output, 4	, fCurrentBlock, startAddress, 1, 16,
 			endAddress - startAddress);
 	} else {
 		BString data;
-		data.SetToFormat("\t\t\tUnavailable (%s)\n", strerror(
+		data.SetToFormat("\t\t\t\tUnavailable (%s)\n", strerror(
 				fBlockRetrievalStatus));
 		_output += data;
 	}
