@@ -29,10 +29,10 @@ public:
 
 	virtual void				SelectionChanged();
 
-			void				AddPackage(const PackageInfo& package);
+			void				AddPackage(const PackageInfoRef& package);
 			
 private:
-			PackageRow*			_FindRow(const PackageInfo& package,
+			PackageRow*			_FindRow(const PackageInfoRef& package,
 									PackageRow* parent = NULL);
 private:
 			class ItemCountView;

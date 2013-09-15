@@ -80,13 +80,13 @@ private:
 class PackageRow : public BRow {
 	typedef BRow Inherited;
 public:
-								PackageRow(const PackageInfo& package);
+								PackageRow(const PackageInfoRef& package);
 
-			const PackageInfo&	Package() const
+			const PackageInfoRef& Package() const
 									{ return fPackage; }
 
 private:
-			PackageInfo			fPackage;
+			PackageInfoRef		fPackage;
 };
 
 
@@ -374,11 +374,16 @@ enum {
 };
 
 
-PackageRow::PackageRow(const PackageInfo& package)
+PackageRow::PackageRow(const PackageInfoRef& packageRef)
 	:
 	Inherited(ceilf(be_plain_font->Size() * 1.8f)),
-	fPackage(package)
+	fPackage(packageRef)
 {
+	if (packageRef.Get() == NULL)
+		return;
+	
+	const PackageInfo& package = *packageRef.Get();
+	
 	// Package icon and title
 	// NOTE: The icon BBitmap is referenced by the fPackage member.
 	const BBitmap* icon = NULL;
@@ -553,7 +558,7 @@ PackageListView::SelectionChanged()
 
 
 void
-PackageListView::AddPackage(const PackageInfo& package)
+PackageListView::AddPackage(const PackageInfoRef& package)
 {
 	PackageRow* packageRow = _FindRow(package);
 
@@ -575,7 +580,7 @@ PackageListView::AddPackage(const PackageInfo& package)
 
 
 PackageRow*
-PackageListView::_FindRow(const PackageInfo& package, PackageRow* parent)
+PackageListView::_FindRow(const PackageInfoRef& package, PackageRow* parent)
 {
 	for (int32 i = CountRows(parent) - 1; i >= 0; i--) {
 		PackageRow* row = dynamic_cast<PackageRow*>(RowAt(i, parent));

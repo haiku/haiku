@@ -640,7 +640,7 @@ DepotInfo::operator!=(const DepotInfo& other) const
 
 
 bool
-DepotInfo::AddPackage(const PackageInfo& package)
+DepotInfo::AddPackage(const PackageInfoRef& package)
 {
 	return fPackages.Add(package);
 }
