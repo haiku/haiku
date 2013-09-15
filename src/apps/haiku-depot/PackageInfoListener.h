@@ -6,7 +6,7 @@
 #define PACKAGE_INFO_LISTENER_H
 
 
-#include "PackageInfo.h"
+#include <Referenceable.h>
 
 
 enum {
@@ -15,6 +15,10 @@ enum {
 	PKG_CHANGED_SCREENSHOTS		= 1 << 2,
 	// ...
 };
+
+
+class PackageInfo;
+typedef BReference<PackageInfo>	PackageInfoRef;
 
 
 class PackageInfoEvent {
@@ -41,7 +45,7 @@ private:
 };
 
 
-class PackageInfoListener {
+class PackageInfoListener : public BReferenceable {
 public:
 								PackageInfoListener();
 	virtual						~PackageInfoListener();
@@ -49,6 +53,9 @@ public:
 	virtual	void				PackageChanged(
 									const PackageInfoEvent& event) = 0;
 };
+
+
+typedef BReference<PackageInfoListener> PackageInfoListenerRef;
 
 
 #endif // PACKAGE_INFO_LISTENER_H

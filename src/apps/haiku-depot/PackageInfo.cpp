@@ -535,7 +535,12 @@ PackageInfo::AddCategory(const CategoryRef& category)
 bool
 PackageInfo::AddUserRating(const UserRating& rating)
 {
-	return fUserRatings.Add(rating);
+	if (!fUserRatings.Add(rating))
+		return false;
+
+	_NotifyListeners(PKG_CHANGED_RATINGS);
+
+	return true;
 }
 
 
@@ -584,7 +589,50 @@ PackageInfo::CalculateRatingSummary() const
 bool
 PackageInfo::AddScreenshot(const BitmapRef& screenshot)
 {
-	return fScreenshots.Add(screenshot);
+	if (!fScreenshots.Add(screenshot))
+		return false;
+
+	_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
+
+	return true;
+}
+
+
+bool
+PackageInfo::AddListener(const PackageInfoListenerRef& listener)
+{
+	return fListeners.Add(listener);
+}
+
+
+void
+PackageInfo::RemoveListener(const PackageInfoListenerRef& listener)
+{
+	fListeners.Remove(listener);
+}
+
+
+void
+PackageInfo::_NotifyListeners(uint32 changes)
+{
+	int count = fListeners.CountItems();
+	if (count == 0)
+		return;
+
+	// Clone list to avoid listeners detaching themselves in notifications
+	// to screw up the list while iterating it.
+	PackageListenerList listeners(fListeners);
+	// Check if it worked:
+	if (listeners.CountItems () != count)
+		return;
+
+	PackageInfoEvent event(PackageInfoRef(this), changes);
+
+	for (int i = 0; i < count; i++) {
+		const PackageInfoListenerRef& listener = listeners.ItemAtFast(i);
+		if (listener.Get() != NULL)
+			listener->PackageChanged(event);
+	}
 }
 
 
