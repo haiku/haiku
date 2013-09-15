@@ -487,7 +487,7 @@ usb_disk_request_sense(device_lun *lun)
 				parameter.additional_sense_code_qualifier);
 			lun->media_present = false;
 			usb_disk_reset_capacity(lun);
-			return B_DEV_NO_MEDIA;
+			return B_DEV_NOT_READY;
 
 		case SCSI_SENSE_KEY_DATA_PROTECT:
 			TRACE_ALWAYS("request_sense: write protected\n");
