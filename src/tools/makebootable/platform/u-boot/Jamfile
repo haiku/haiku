@@ -1,3 +1,12 @@
 SubDir HAIKU_TOP src tools makebootable platform u-boot ;
 
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src bin makebootable platform u-boot ] ;
+
+BuildPlatformMain <build>makebootable :
+	makebootable.cpp
+	$(hostPlatformSources)
+	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
+;
+
 BuildPlatformMain <build>makebootable : makebootable.cpp : $(HOST_LIBSTDC++) ;
