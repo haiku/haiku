@@ -1,8 +1,5 @@
 SubDir HAIKU_TOP src apps debugger ;
 
-CCFLAGS +=  -Werror ;
-C++FLAGS += -Werror ;
-
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 # for syscall_numbers.h
