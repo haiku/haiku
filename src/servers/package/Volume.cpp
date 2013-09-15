@@ -1041,7 +1041,8 @@ Volume::HandleCommitTransactionRequest(BMessage* message)
 		return;
 
 	// perform the request
-	CommitTransactionHandler handler(this, PackageSet(), PackageSet());
+	PackageSet dummy;
+	CommitTransactionHandler handler(this, dummy, dummy);
 	int32 error;
 	try {
 		handler.HandleRequest(message, &reply);
