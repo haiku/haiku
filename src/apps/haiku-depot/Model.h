@@ -14,7 +14,7 @@ public:
 	virtual						~PackageFilter();
 
 	virtual	bool				AcceptsPackage(
-									const PackageInfo& package) const = 0;
+									const PackageInfoRef& package) const = 0;
 };
 
 typedef BReference<PackageFilter> PackageFilterRef;
@@ -55,7 +55,7 @@ public:
 									{ return fProgressCategories; }
 
 			void				SetPackageState(
-									const PackageInfo& package,
+									const PackageInfoRef& package,
 									PackageState state);
 
 			// Configure PackageFilters

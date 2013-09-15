@@ -181,7 +181,7 @@ typedef BReference<PackageCategory> CategoryRef;
 typedef List<CategoryRef, false> CategoryList;
 
 
-class PackageInfo {
+class PackageInfo : public BReferenceable {
 public:
 								PackageInfo();
 								PackageInfo(const BitmapRef& icon,
@@ -239,7 +239,10 @@ private:
 };
 
 
-typedef List<PackageInfo, false> PackageList;
+typedef BReference<PackageInfo> PackageInfoRef;
+
+
+typedef List<PackageInfoRef, false> PackageList;
 
 
 enum PackageState {
@@ -266,7 +269,7 @@ public:
 			const PackageList&	Packages() const
 									{ return fPackages; }
 
-			bool				AddPackage(const PackageInfo& package);
+			bool				AddPackage(const PackageInfoRef& package);
 
 private:
 			BString				fName;

@@ -160,9 +160,9 @@ MainWindow::_AdoptModel()
 
 
 void
-MainWindow::_AdoptPackage(const PackageInfo& package)
+MainWindow::_AdoptPackage(const PackageInfoRef& package)
 {
-	fPackageInfoView->SetPackage(package);
+	fPackageInfoView->SetPackage(*package.Get());
 }
 
 
@@ -183,7 +183,7 @@ MainWindow::_InitDummyModel()
 	DepotInfo depot(B_TRANSLATE("Default"));
 
 	// WonderBrush
-	PackageInfo wonderbrush(
+	PackageInfoRef wonderbrush(new(std::nothrow) PackageInfo(
 		BitmapRef(new SharedBitmap(601), true),
 		"WonderBrush",
 		"2.1.2",
@@ -196,24 +196,24 @@ MainWindow::_InitDummyModel()
 		"WonderBrush is YellowBites' software for doing graphics design "
 		"on Haiku. It combines many great under-the-hood features with "
 		"powerful tools and an efficient and intuitive interface.",
-		"2.1.2 - Initial Haiku release.");
-	wonderbrush.AddUserRating(
+		"2.1.2 - Initial Haiku release."), true);
+	wonderbrush->AddUserRating(
 		UserRating(UserInfo("humdinger"), 4.5f,
 		"Awesome!", "en", "2.1.2", 0, 0)
 	);
-	wonderbrush.AddUserRating(
+	wonderbrush->AddUserRating(
 		UserRating(UserInfo("bonefish"), 5.0f,
 		"The best!", "en", "2.1.2", 3, 1)
 	);
-	wonderbrush.AddScreenshot(
+	wonderbrush->AddScreenshot(
 		BitmapRef(new SharedBitmap(603), true));
-	wonderbrush.AddCategory(fModel.CategoryGraphics());
-	wonderbrush.AddCategory(fModel.CategoryProductivity());
+	wonderbrush->AddCategory(fModel.CategoryGraphics());
+	wonderbrush->AddCategory(fModel.CategoryProductivity());
 	
 	depot.AddPackage(wonderbrush);
 
 	// Paladin
-	PackageInfo paladin(
+	PackageInfoRef paladin(new(std::nothrow) PackageInfo(
 		BitmapRef(new SharedBitmap(602), true),
 		"Paladin",
 		"1.2.0",
@@ -227,30 +227,30 @@ MainWindow::_InitDummyModel()
 		"The interface is streamlined, it has some features sorely "
 		"missing from BeIDE, like running a project in the Terminal, "
 		"and has a bundled text editor based upon Pe.",
-		"");
-	paladin.AddUserRating(
+		""), true);
+	paladin->AddUserRating(
 		UserRating(UserInfo("stippi"), 3.5f,
 		"Could be more integrated from the sounds of it.",
 		"en", "1.2.0", 0, 1)
 	);
-	paladin.AddUserRating(
+	paladin->AddUserRating(
 		UserRating(UserInfo("mmadia"), 5.0f,
 		"It rocks! Give a try",
 		"en", "1.1.0", 1, 0)
 	);
-	paladin.AddUserRating(
+	paladin->AddUserRating(
 		UserRating(UserInfo("bonefish"), 2.0f,
 		"It just needs to use my jam-rewrite 'ham' and it will be great.",
 		"en", "1.1.0", 3, 1)
 	);
-	paladin.AddScreenshot(
+	paladin->AddScreenshot(
 		BitmapRef(new SharedBitmap(605), true));
-	paladin.AddCategory(fModel.CategoryDevelopment());
+	paladin->AddCategory(fModel.CategoryDevelopment());
 
 	depot.AddPackage(paladin);
 
 	// Sequitur
-	PackageInfo sequitur(
+	PackageInfoRef sequitur(new(std::nothrow) PackageInfo(
 		BitmapRef(new SharedBitmap(604), true),
 		"Sequitur",
 		"2.1.0",
@@ -314,8 +314,8 @@ MainWindow::_InitDummyModel()
 		"pressure events. The new tool Broken Down Line uses this "
 		"filter.\n\n"
 		" * ''Note to filter developers:'' The filter API has changed. You "
-		"will need to recompile your filters.");
-	sequitur.AddUserRating(
+		"will need to recompile your filters."), true);
+	sequitur->AddUserRating(
 		UserRating(UserInfo("pete"), 4.5f,
 		"I can weave a web of sound! And it connects to PatchBay. Check "
 		"it out, I can wholeheartly recommend this app!! This rating "
@@ -326,14 +326,14 @@ MainWindow::_InitDummyModel()
 		"please the programmer with the text layouting and scrolling of "
 		"long ratings!", "en", "2.1.0", 4, 1)
 	);
-	sequitur.AddUserRating(
+	sequitur->AddUserRating(
 		UserRating(UserInfo("stippi"), 3.5f,
 		"It seems very capable. Still runs fine on Haiku. The interface "
 		"is composed of many small, hard to click items. But you can "
 		"configure a tool for each mouse button, which is great for the "
 		"work flow.", "en", "2.1.0", 2, 1)
 	);
-	sequitur.AddCategory(fModel.CategoryAudio());
+	sequitur->AddCategory(fModel.CategoryAudio());
 	
 	depot.AddPackage(sequitur);
 

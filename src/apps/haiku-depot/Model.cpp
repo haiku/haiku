@@ -24,7 +24,7 @@ PackageFilter::~PackageFilter()
 
 class AnyFilter : public PackageFilter {
 public:
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		return true;
 	}
@@ -39,7 +39,7 @@ public:
 	{
 	}
 	
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		// TODO: Maybe a PackageInfo ought to know the Depot it came from?
 		// But right now the same package could theoretically be provided
@@ -68,9 +68,11 @@ public:
 	{
 	}
 	
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
-		const CategoryList& categories = package.Categories();
+		if (package.Get() == NULL)
+			return false;
+		const CategoryList& categories = package->Categories();
 		for (int i = categories.CountItems() - 1; i >= 0; i--) {
 			const CategoryRef& category = categories.ItemAtFast(i);
 			if (category.Get() == NULL)
@@ -94,7 +96,7 @@ public:
 	{
 	}
 	
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		return fPackageList.Contains(package);
 	}
@@ -114,7 +116,7 @@ public:
 	{
 	}
 	
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		return fPackageListA.Contains(package)
 			|| fPackageListB.Contains(package);
@@ -146,15 +148,17 @@ public:
 		}
 	}
 	
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
+		if (package.Get() == NULL)
+			return false;
 		// Every search term must be found in one of the package texts
 		for (int32 i = fSearchTerms.CountItems() - 1; i >= 0; i--) {
 			const BString& term = fSearchTerms.ItemAtFast(i);
-			if (!_TextContains(package.Title(), term)
-				&& !_TextContains(package.Publisher().Name(), term)
-				&& !_TextContains(package.ShortDescription(), term)
-				&& !_TextContains(package.FullDescription(), term)) {
+			if (!_TextContains(package->Title(), term)
+				&& !_TextContains(package->Publisher().Name(), term)
+				&& !_TextContains(package->ShortDescription(), term)
+				&& !_TextContains(package->FullDescription(), term)) {
 				return false;
 			}
 		}
@@ -263,7 +267,7 @@ Model::CreatePackageList() const
 		const PackageList& packages = depot.Packages();
 
 		for (int32 j = 0; j < packages.CountItems(); j++) {
-			const PackageInfo& package = packages.ItemAtFast(j);
+			const PackageInfoRef& package = packages.ItemAtFast(j);
 			if (fCategoryFilter->AcceptsPackage(package)
 				&& fSearchTermsFilter->AcceptsPackage(package)) {
 				resultList.Add(package);
@@ -283,7 +287,7 @@ Model::AddDepot(const DepotInfo& depot)
 
 
 void
-Model::SetPackageState(const PackageInfo& package, PackageState state)
+Model::SetPackageState(const PackageInfoRef& package, PackageState state)
 {
 	switch (state) {
 		default:
