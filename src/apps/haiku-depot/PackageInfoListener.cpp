@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 
+#include "PackageInfo.h"
+
 
 // #pragma mark - PackageInfoEvent
 
