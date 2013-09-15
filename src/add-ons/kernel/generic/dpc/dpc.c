@@ -64,7 +64,7 @@ dpc_thread(void *arg)
 	}
 
 	// Let's finish the pending DPCs, if any.
-	// Otherwise, resource could leaks...
+	// Otherwise, resource could leak...
 	while (queue->count--) {
 		dpc = queue->slots[queue->head];
 		queue->head = (queue->head + 1) % queue->size;
@@ -135,7 +135,7 @@ delete_dpc_queue(void *handle)
 	if (!queue)
 		return B_BAD_VALUE;
 
-	// Close the queue: queue_dpc() should knows we're closing:
+	// Close the queue: queue_dpc() should know we're closing:
 	former = disable_interrupts();
 	acquire_spinlock(&queue->lock);
 
@@ -186,8 +186,8 @@ queue_dpc(void *handle, dpc_func function, void *arg)
 	restore_interrupts(former);
 
 	if (status == B_OK)
-		// Wake up the corresponding dpc thead
-		// Notice that interrupt handlers should returns B_INVOKE_SCHEDULER to
+		// Wake up the corresponding dpc thread
+		// Notice that interrupt handlers should return B_INVOKE_SCHEDULER to
 		// shorten DPC latency as much as possible...
 		status = release_sem_etc(queue->wakeup_sem, 1, B_DO_NOT_RESCHEDULE);
 
