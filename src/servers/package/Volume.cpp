@@ -297,23 +297,25 @@ struct Volume::CommitTransactionHandler {
 				"no packages to activate or deactivate");
 		}
 
-		// create an old state directory
-		_CreateOldStateDirectory(reply);
+		_ApplyChanges(reply);
+	}
 
-		// move packages to deactivate to old state directory
-		_RemovePackagesToDeactivate();
+	void HandleRequest(const PackageSet& packagesAdded,
+		const PackageSet& packagesRemoved)
+	{
+		// Copy package sets to fPackagesToActivate/fPackagesToDeactivate. The
+		// given sets are assumed to be identical to the ones specified in the
+		// constructor invocation (fPackagesAlreadyAdded,
+		// fPackagesAlreadyRemoved).
+		for (PackageSet::const_iterator it = packagesAdded.begin();
+			it != packagesAdded.end(); ++it) {
+			if (!fPackagesToActivate.AddItem(*it))
+				throw std::bad_alloc();
+		}
 
-		// move packages to activate to packages directory
-		_AddPackagesToActivate();
+		fPackagesToDeactivate = packagesRemoved;
 
-		// activate/deactivate packages
-		fVolume->_ChangePackageActivation(fAddedPackages, fRemovedPackages);
-
-		// removed packages have been deleted, new packages shall not be deleted
-		fAddedPackages.clear();
-		fRemovedPackages.clear();
-		fPackagesToActivate.MakeEmpty(false);
-		fPackagesToDeactivate.clear();
+		_ApplyChanges(NULL);
 	}
 
 	void Revert()
@@ -437,6 +439,27 @@ private:
 
 			package->IncrementEntryCreatedIgnoreLevel();
 		}
+	}
+
+	void _ApplyChanges(BMessage* reply)
+	{
+		// create an old state directory
+		_CreateOldStateDirectory(reply);
+
+		// move packages to deactivate to old state directory
+		_RemovePackagesToDeactivate();
+
+		// move packages to activate to packages directory
+		_AddPackagesToActivate();
+
+		// activate/deactivate packages
+		fVolume->_ChangePackageActivation(fAddedPackages, fRemovedPackages);
+
+		// removed packages have been deleted, new packages shall not be deleted
+		fAddedPackages.clear();
+		fRemovedPackages.clear();
+		fPackagesToActivate.MakeEmpty(false);
+		fPackagesToDeactivate.clear();
 	}
 
 	void _CreateOldStateDirectory(BMessage* reply)
@@ -1187,14 +1210,28 @@ Volume::ProcessPendingPackageActivationChanges()
 	if (!HasPendingPackageActivationChanges())
 		return;
 
+	// perform the request
+	CommitTransactionHandler handler(this, fPackagesToBeActivated,
+		fPackagesToBeDeactivated);
+	int32 error;
 	try {
-		_ChangePackageActivation(fPackagesToBeActivated,
-			fPackagesToBeDeactivated);
+		handler.HandleRequest(fPackagesToBeActivated, fPackagesToBeDeactivated);
+		error = B_DAEMON_OK;
 	} catch (Exception& exception) {
+		error = exception.Error();
 		ERROR("Volume::ProcessPendingPackageActivationChanges(): package "
 			"activation failed: %s\n", exception.ToString().String());
 // TODO: Notify the user!
+	} catch (std::bad_alloc& exception) {
+		error = B_NO_MEMORY;
+		ERROR("Volume::ProcessPendingPackageActivationChanges(): package "
+			"activation failed: out of memory\n");
+// TODO: Notify the user!
 	}
+
+	// revert on error
+	if (error != B_DAEMON_OK)
+		handler.Revert();
 
 	// clear the activation/deactivation sets in any event
 	fPackagesToBeActivated.clear();
