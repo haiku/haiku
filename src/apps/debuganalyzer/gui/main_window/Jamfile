@@ -7,9 +7,6 @@ UseHeaders $(HAIKU_DEBUG_ANALYZER_HEADERS) ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src apps debugger util ] ;
 
-CCFLAGS +=  -Werror ;
-C++FLAGS += -Werror ;
-
 MergeObject DebugAnalyzer_gui_main_window.o
 	:
 	GeneralPage.cpp
