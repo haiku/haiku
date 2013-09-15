@@ -38,6 +38,7 @@ Application HaikuDepot :
 	MainWindow.cpp
 	Model.cpp
 	PackageInfo.cpp
+	PackageInfoListener.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
 	PackageManager.cpp
