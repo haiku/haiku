@@ -1,12 +1,12 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
- *		headers/os/support/Autolock.h	rev 19972
+ *		headers/os/support/Autolock.h	rev 33370
  */
 
 
@@ -28,14 +28,14 @@
 	of your code. This class is usually used in combination with a BLocker
 	that protects a certain part of your code and data that are being
 	accessed by multiple threads. While BAutolock does not add any features
-	to locking, it provides a mechanism to easily lock and protect a part of your
-	code. 
+	to locking, it provides a mechanism to easily lock and protect a part of
+	your code. 
 
 	Normally, when you need to protect data, you would have to make sure that
 	all your locks are paired with unlocks. Below is a simple example, but you
 	can imagine that there are more complex situations where you might spend a
-	lot of time debugging a hang because you didn't pair all the Lock()s with an
-	Unlock(). See the example:
+	lot of time debugging a hang because you didn't pair all the Lock()s with 
+	an Unlock(). See the example:
 
 \code
 status_t
@@ -105,7 +105,7 @@ Receiver::HandleCall(Call *call)
 
 
 /*!
-	\fn bool BAutolock::IsLocked(void)
+	\fn bool BAutolock::IsLocked()
 	\brief Verify whether the  associated BLocker or BLooper are actually
 		locked.
 
@@ -118,4 +118,25 @@ Receiver::HandleCall(Call *call)
 	protect yourself from any harm.
 	\retval true The lock was acquired.
 	\retval false Failed to acquire the lock.
+*/
+
+
+/*!
+	\fn bool BAutolock::Lock()
+	\brief Lock the BAutolock if it has not already happened
+	
+	Note that unlike BLocker, the object is not locked with lock count. That
+	means that if the lock is already taken, this method returns \c true
+	without any action.
+
+	\retval true The lock was acquired (or had already been acquired).
+	\retval false Failed to acquire the lock.
+*/
+
+
+/*!
+	\fn void BAutolock::Unlock()
+	\brief Unlock the BAutolock if the lock is being held
+
+	If the lock is not held, the method does nothing.
 */

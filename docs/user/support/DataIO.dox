@@ -7,8 +7,8 @@
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
- *		headers/os/support/DataIO.h	rev 17981
- *		src/kits/support/DataIO.cpp	rev 20510
+ *		headers/os/support/DataIO.h	rev 38226
+ *		src/kits/support/DataIO.cpp	rev 42177
  */
 
 
@@ -95,18 +95,18 @@
 
 	The interface of this object applies to objects or data that allows
 	position-aware reading and writing of data. Classes that derive from this
-	class should at least re-implement ReadAt(), WriteAt(), Seek(), Position(),
-	SetSize() and GetSize() methods.
+	class should at least re-implement ReadAt(), WriteAt(), Seek(), 
+	Position(), SetSize() and GetSize() methods.
 
-	A good example of a form of data that can derive from this object, are files.
-	The BFile class derives from BPositionIO and provides this interface to 
-	files. If your object or data only supports linear reading and writing, 
-	consider deriving from the base-class BDataIO.
+	A good example of a form of data that can derive from this object, are 
+	files. The BFile class derives from BPositionIO and provides this 
+	interface to files. If your object or data only supports linear reading 
+	and writing, consider deriving from the base-class BDataIO.
 
 	A final note, from BDataIO this class inherits Read() and Write(). The 
-	default implementation is to read or write the data at the current position 
-	indicated by Position(). Re-implement the methods if you require a different
-	behavior.
+	default implementation is to read or write the data at the current 
+	position indicated by Position(). Re-implement the methods if you require 
+	a different behavior.
 */
 
 

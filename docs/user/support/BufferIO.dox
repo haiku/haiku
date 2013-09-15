@@ -7,8 +7,8 @@
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
- *		headers/os/support/BufferIO.h	rev 19972
- *		src/kits/support/BufferIO.cpp	rev 20510
+ *		headers/os/support/BufferIO.h	rev 38225
+ *		src/kits/support/BufferIO.cpp	rev 44862
  */
 
 

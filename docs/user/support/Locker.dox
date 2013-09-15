@@ -1,13 +1,13 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
- *		headers/os/support/Locker.h rev 19972
- *		src/kits/support/Locker.cpp rev 13826
+ *		headers/os/support/Locker.h rev 36218
+ *		src/kits/support/Locker.cpp rev 32758
  */
 
 /*!
@@ -150,6 +150,16 @@ Flower::Water(int amount)
 	Release the internal semaphore. Because of this, any pending Lock() calls
 	from other threads be cancelled. The return code will be \c false for 
 	those calls.
+*/
+
+
+/*!
+	\fn status_t BLocker::InitCheck()
+	\brief Check whether the locker has properly initialized
+	
+	\retval B_OK The semaphore has been properly initialized
+	\retval (negative) Any other error value that is related to semaphore
+		initialization
 */
 
 
