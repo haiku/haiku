@@ -8,11 +8,13 @@
 
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
+#include <Locker.h>
 
 #include "PackageInfo.h"
 
 
 class PackageRow;
+class PackageListener;
 
 enum {
 	MSG_PACKAGE_SELECTED		= 'pkgs',
@@ -21,7 +23,7 @@ enum {
 
 class PackageListView : public BColumnListView {
 public:
-								PackageListView();
+								PackageListView(BLocker* modelLock);
 	virtual						~PackageListView();
 
 	virtual void				AttachedToWindow();
@@ -34,10 +36,15 @@ public:
 private:
 			PackageRow*			_FindRow(const PackageInfoRef& package,
 									PackageRow* parent = NULL);
+			PackageRow*			_FindRow(const BString& packageTitle,
+									PackageRow* parent = NULL);
+
 private:
 			class ItemCountView;
-			
+
+			BLocker*			fModelLock;			
 			ItemCountView*		fItemCountView;
+			PackageListener*	fPackageListener;
 };
 
 #endif // PACKAGE_LIST_VIEW_H

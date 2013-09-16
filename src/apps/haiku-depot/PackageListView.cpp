@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <stdio.h>
 
+#include <Autolock.h>
 #include <Catalog.h>
 #include <ScrollBar.h>
 #include <Window.h>
@@ -80,13 +81,58 @@ private:
 class PackageRow : public BRow {
 	typedef BRow Inherited;
 public:
-								PackageRow(const PackageInfoRef& package);
+								PackageRow(const PackageInfoRef& package,
+									PackageListener* listener);
+	virtual						~PackageRow();
 
 			const PackageInfoRef& Package() const
 									{ return fPackage; }
 
+			void				UpdateRating();
+
 private:
 			PackageInfoRef		fPackage;
+			PackageInfoListenerRef fPackageListener;
+};
+
+
+enum {
+	MSG_UPDATE_PACKAGE		= 'updp'
+};
+
+
+class PackageListener : public PackageInfoListener {
+public:
+	PackageListener(PackageListView* view)
+		:
+		fView(view)
+	{
+	}
+
+	virtual ~PackageListener()
+	{
+	}
+
+	virtual void PackageChanged(const PackageInfoEvent& event)
+	{
+		if ((event.Changes() & PKG_CHANGED_RATINGS) == 0)
+			return;
+		
+		BMessenger messenger(fView);
+		if (!messenger.IsValid())
+			return;
+
+		const PackageInfo& package = *event.Package().Get();
+		
+		BMessage message(MSG_UPDATE_PACKAGE);
+		message.AddString("title", package.Title());
+		message.AddUInt32("changes", event.Changes());
+		
+		messenger.SendMessage(&message);
+	}
+
+private:
+	PackageListView*	fView;
 };
 
 
@@ -374,15 +420,17 @@ enum {
 };
 
 
-PackageRow::PackageRow(const PackageInfoRef& packageRef)
+PackageRow::PackageRow(const PackageInfoRef& packageRef,
+		PackageListener* packageListener)
 	:
 	Inherited(ceilf(be_plain_font->Size() * 1.8f)),
-	fPackage(packageRef)
+	fPackage(packageRef),
+	fPackageListener(packageListener)
 {
 	if (packageRef.Get() == NULL)
 		return;
 	
-	const PackageInfo& package = *packageRef.Get();
+	PackageInfo& package = *packageRef.Get();
 	
 	// Package icon and title
 	// NOTE: The icon BBitmap is referenced by the fPackage member.
@@ -392,8 +440,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef)
 	SetField(new BBitmapStringField(icon, package.Title()), kTitleColumn);
 
 	// Rating
-	RatingSummary summary = package.CalculateRatingSummary();
-	SetField(new RatingField(summary.averageRating), kRatingColumn);
+	UpdateRating();
 
 	// Description
 	SetField(new BStringField(package.ShortDescription()), kDescriptionColumn);
@@ -405,6 +452,25 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef)
 	// Status
 	// TODO: Fetch info about installed/deactivated/unintalled/...
 	SetField(new BStringField("n/a"), kStatusColumn);
+
+	package.AddListener(fPackageListener);
+}
+
+
+PackageRow::~PackageRow()
+{
+	if (fPackage.Get() != NULL)
+		fPackage->RemoveListener(fPackageListener);
+}
+
+
+void
+PackageRow::UpdateRating()
+{
+	if (fPackage.Get() == NULL)
+		return;
+	RatingSummary summary = fPackage->CalculateRatingSummary();
+	SetField(new RatingField(summary.averageRating), kRatingColumn);
 }
 
 
@@ -492,9 +558,11 @@ private:
 // #pragma mark - PackageListView
 
 
-PackageListView::PackageListView()
+PackageListView::PackageListView(BLocker* modelLock)
 	:
-	BColumnListView("package list view", 0, B_FANCY_BORDER, true)
+	BColumnListView("package list view", 0, B_FANCY_BORDER, true),
+	fModelLock(modelLock),
+	fPackageListener(new(std::nothrow) PackageListener(this))
 {
 	AddColumn(new PackageColumn(B_TRANSLATE("Name"), 150, 50, 300,
 		B_TRUNCATE_MIDDLE), kTitleColumn);
@@ -516,6 +584,8 @@ PackageListView::PackageListView()
 
 PackageListView::~PackageListView()
 {
+	Clear();
+	delete fPackageListener;
 }
 
 
@@ -530,6 +600,27 @@ void
 PackageListView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_UPDATE_PACKAGE:
+		{
+			BString title;
+			uint32 changes;
+			if (message->FindString("title", &title) != B_OK
+				|| message->FindUInt32("changes", &changes) != B_OK) {
+				break;
+			}
+
+			if ((changes & PKG_CHANGED_RATINGS) == 0)
+				break;
+
+			BAutolock _(fModelLock);
+
+			PackageRow* row = _FindRow(title);
+			if (row != NULL)
+				row->UpdateRating();
+			
+			break;
+		}
+
 		default:
 			BColumnListView::MessageReceived(message);
 			break;
@@ -561,8 +652,10 @@ PackageListView::AddPackage(const PackageInfoRef& package)
 	if (packageRow != NULL)
 		return;
 
+	BAutolock _(fModelLock);
+
 	// create the row for this package
-	packageRow = new PackageRow(package);
+	packageRow = new PackageRow(package, fPackageListener);
 
 	// add the row, parent may be NULL (add at top level)
 	AddRow(packageRow);
@@ -584,6 +677,27 @@ PackageListView::_FindRow(const PackageInfoRef& package, PackageRow* parent)
 		if (CountRows(row) > 0) {
 			// recurse into child rows
 			row = _FindRow(package, row);
+			if (row != NULL)
+				return row;
+		}
+	}
+
+	return NULL;
+}
+
+
+PackageRow*
+PackageListView::_FindRow(const BString& packageTitle, PackageRow* parent)
+{
+	for (int32 i = CountRows(parent) - 1; i >= 0; i--) {
+		PackageRow* row = dynamic_cast<PackageRow*>(RowAt(i, parent));
+		if (row != NULL && row->Package().Get() != NULL
+			&& row->Package()->Title() == packageTitle) {
+			return row;
+		}
+		if (CountRows(row) > 0) {
+			// recurse into child rows
+			row = _FindRow(packageTitle, row);
 			if (row != NULL)
 				return row;
 		}

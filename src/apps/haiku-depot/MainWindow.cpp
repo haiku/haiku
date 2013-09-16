@@ -40,7 +40,7 @@ MainWindow::MainWindow(BRect frame)
 	_BuildMenu(menuBar);
 	
 	fFilterView = new FilterView(fModel);
-	fPackageListView = new PackageListView();
+	fPackageListView = new PackageListView(fModel.Lock());
 	fPackageInfoView = new PackageInfoView(fModel.Lock(), &fPackageManager);
 	
 	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
