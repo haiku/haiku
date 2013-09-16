@@ -141,9 +141,11 @@ init_common(int device, bool isClone)
 	// The overlay registers, hardware status, and cursor memory share
 	// a single area with the shared_info
 
-	gInfo->overlay_registers = (struct overlay_registers*)
-		(gInfo->shared_info->graphics_memory
-		+ gInfo->shared_info->overlay_offset);
+	if (gInfo->shared_info->overlay_offset != 0) {
+		gInfo->overlay_registers = (struct overlay_registers*)
+			(gInfo->shared_info->graphics_memory
+			+ gInfo->shared_info->overlay_offset);
+	}
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
 		// allocate some extra memory for the 3D context
