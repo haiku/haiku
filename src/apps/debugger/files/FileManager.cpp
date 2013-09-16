@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +15,7 @@
 #include "LocatableFile.h"
 #include "SourceFile.h"
 #include "StringUtils.h"
+#include "TeamFileManagerSettings.h"
 
 
 // #pragma mark - EntryPath
@@ -542,7 +543,8 @@ FileManager::FileManager()
 	fLock("file manager"),
 	fTargetDomain(NULL),
 	fSourceDomain(NULL),
-	fSourceFiles(NULL)
+	fSourceFiles(NULL),
+	fLocationMappings()
 {
 }
 
@@ -636,10 +638,18 @@ FileManager::GetSourceFile(const BString& path)
 
 
 void
-FileManager::SourceEntryLocated(const BString& path, const BString& locatedPath)
+FileManager::SourceEntryLocated(const BString& path,
+	const BString& locatedPath)
 {
 	AutoLocker<FileManager> locker(this);
 	fSourceDomain->EntryLocated(path, locatedPath);
+
+	BMessage archivedMapping;
+	if (archivedMapping.AddString("source:path", path) == B_OK
+		&& archivedMapping.AddString("source:locatedpath", locatedPath)
+			== B_OK) {
+		fLocationMappings.AddMessage("source:mapping", &archivedMapping);
+	}
 }
 
 
@@ -684,6 +694,30 @@ FileManager::LoadSourceFile(LocatableFile* file, SourceFile*& _sourceFile)
 
 	_sourceFile = sourceFileDeleter.Detach();
 	return B_OK;
+}
+
+
+status_t
+FileManager::LoadLocationMappings(TeamFileManagerSettings* settings)
+{
+	for (int32 i = 0; i < settings->CountSourceMappings(); i++) {
+		BString sourcePath;
+		BString locatedPath;
+
+		if (settings->GetSourceMappingAt(i, sourcePath, locatedPath) != B_OK)
+			return B_NO_MEMORY;
+
+		SourceEntryLocated(sourcePath, locatedPath);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+FileManager::SaveLocationMappings(TeamFileManagerSettings* settings)
+{
+	return settings->SetTo(fLocationMappings);
 }
 
 

@@ -181,6 +181,7 @@ Application Debugger :
 	BreakpointSetting.cpp
 	GuiTeamUiSettings.cpp
 	SettingsManager.cpp
+	TeamFileManagerSettings.cpp
 	TeamSettings.cpp
 	TeamUiSettings.cpp
 	TeamUiSettingsFactory.cpp

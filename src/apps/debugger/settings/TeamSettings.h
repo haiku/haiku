@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_SETTINGS_H
@@ -15,6 +16,7 @@ class BMessage;
 class Team;
 class BreakpointSetting;
 class TeamUiSettings;
+class TeamFileManagerSettings;
 
 
 class TeamSettings {
@@ -41,6 +43,11 @@ public:
 			TeamSettings&		operator=(const TeamSettings& other);
 									// throws std::bad_alloc
 
+			TeamFileManagerSettings*
+								FileManagerSettings() const;
+			status_t			SetFileManagerSettings(
+									TeamFileManagerSettings* settings);
+
 private:
 			typedef BObjectList<BreakpointSetting> BreakpointList;
 			typedef BObjectList<TeamUiSettings> UiSettingsList;
@@ -51,6 +58,8 @@ private:
 private:
 			BreakpointList		fBreakpoints;
 			UiSettingsList		fUiSettings;
+			TeamFileManagerSettings*
+								fFileManagerSettings;
 			BString				fTeamName;
 };
 
