@@ -66,7 +66,7 @@ main(int argc, const char* const* argv)
 	const char* home = "/boot/home";
 	int expiration = 99999;
 	int inactive = -1;
-	gid_t gid = 100;
+	const char* group = NULL;
 	const char* shell = "/bin/sh";
 	const char* realName = "";
 
@@ -101,9 +101,10 @@ main(int argc, const char* const* argv)
 				break;
 
 			case 'g':
-				gid = atoi(optarg);
-// TODO: Support name!
+			{
+				group = optarg;
 				break;
+			}
 
 			case 'h':
 				print_usage_and_exit(false);
@@ -137,6 +138,57 @@ main(int argc, const char* const* argv)
 	if (getpwnam(user) != NULL) {
 		fprintf(stderr, "Error: User \"%s\" already exists.\n", user);
 		exit(1);
+	}
+
+	// get group ID
+	gid_t gid = 100;
+	if (group != NULL) {
+		char* end;
+		gid = strtol(group, &end, 0);
+		if (*end == '\0') {
+			// seems to be a number
+			if (gid < 1) {
+				fprintf(stderr, "Error: Invalid group ID \"%s\".\n",
+					group);
+				exit(1);
+			}
+		} else {
+			// must be a group name -- get it
+			char* buffer = NULL;
+			ssize_t bufferSize = sysconf(_SC_GETGR_R_SIZE_MAX);
+			if (bufferSize <= 0)
+				bufferSize = 256;
+			for (;;) {
+				buffer = (char*)realloc(buffer, bufferSize);
+				if (buffer == NULL) {
+					fprintf(stderr, "Error: Out of memory!\n");
+					exit(1);
+				}
+
+				struct group groupBuffer;
+				struct group* groupFound;
+				int error = getgrnam_r(group, &groupBuffer, buffer, bufferSize,
+					&groupFound);
+				if (error == ERANGE) {
+					bufferSize *= 2;
+					continue;
+				}
+
+				if (error != 0) {
+					fprintf(stderr, "Error: Failed to get info for group \"%s\".\n",
+						group);
+					exit(1);
+				}
+				if (groupFound == NULL) {
+					fprintf(stderr, "Error: Specified group \"%s\" doesn't "
+						"exist.\n", group);
+					exit(1);
+				}
+
+				gid = groupFound->gr_gid;
+				break;
+			}
+		}
 	}
 
 	// read password
