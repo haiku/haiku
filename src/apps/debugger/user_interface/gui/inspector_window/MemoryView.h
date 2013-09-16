@@ -38,9 +38,9 @@ enum {
 };
 
 
+class BMessageRunner;
+
 class Team;
-
-
 class TeamMemoryBlock;
 
 
@@ -66,6 +66,9 @@ public:
 	virtual void				MakeFocus(bool isFocused);
 	virtual void				MessageReceived(BMessage* message);
 	virtual void				MouseDown(BPoint point);
+	virtual void				MouseMoved(BPoint point, uint32 transit,
+									const BMessage* dragMessage);
+	virtual void				MouseUp(BPoint point);
 			void				ScrollToSelection();
 	virtual void				TargetedByScrollView(BScrollView* scrollView);
 
@@ -74,6 +77,22 @@ private:
 	void						_RecalcScrollBars();
 	void						_GetNextHexBlock(char* buffer,
 									int32 bufferSize, const char* address);
+
+	int32						_GetOffsetAt(BPoint point) const;
+	BPoint						_GetPointForOffset(int32 offset) const;
+	void						_RecalcBounds();
+	float						_GetAddressDisplayWidth() const;
+
+	inline int32				_GetHexDigitsPerBlock() const
+									{ return 1 << fHexMode; };
+
+	void						_GetSelectionRegion(BRegion& region);
+	void						_GetSelectedText(BString& text);
+	void						_CopySelectionToClipboard();
+
+	void						_HandleAutoScroll();
+	void						_ScrollByLines(int32 lineCount);
+	void						_HandleContextMenu(BPoint point);
 
 private:
 	::Team*						fTeam;
@@ -87,6 +106,17 @@ private:
 	int32						fCurrentEndianMode;
 	int32						fHexMode;
 	int32						fTextMode;
+	float						fHexLeft;
+	float						fHexRight;
+	float						fTextLeft;
+	float						fTextRight;
+	int32						fSelectionBase;
+	int32						fSelectionStart;
+	int32						fSelectionEnd;
+	BMessageRunner*				fScrollRunner;
+
+	bool						fTrackingMouse;
+
 	Listener*					fListener;
 };
 
