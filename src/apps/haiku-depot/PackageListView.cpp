@@ -544,14 +544,9 @@ PackageListView::SelectionChanged()
 	
 	BMessage message(MSG_PACKAGE_SELECTED);
 	
-	BRow* selected = CurrentSelection();
-	
-	// TODO: Wrong index, its the visible one (i.e. sorted)!
-	// Solve by putting an ID for the package in the message instead.
-	int32 index = -1;
+	PackageRow* selected = dynamic_cast<PackageRow*>(CurrentSelection());
 	if (selected != NULL)
-		index = IndexOf(selected);
-	message.AddInt32("index", index);
+		message.AddString("title", selected->Package()->Title());
 	
 	Window()->PostMessage(&message);
 }

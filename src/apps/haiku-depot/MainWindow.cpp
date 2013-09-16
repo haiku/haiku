@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include <Alert.h>
+#include <Autolock.h>
 #include <Application.h>
 #include <Button.h>
 #include <Catalog.h>
@@ -87,14 +88,22 @@ MainWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
+			// TODO: ?
 			break;
 
 		case MSG_PACKAGE_SELECTED:
 		{
-			int32 index;
-			if (message->FindInt32("index", &index) == B_OK
-				&& index >= 0 && index < fVisiblePackages.CountItems()) {
-				_AdoptPackage(fVisiblePackages.ItemAtFast(index));
+			BString title;
+			if (message->FindString("title", &title) == B_OK) {
+				int count = fVisiblePackages.CountItems();
+				for (int i = 0; i < count; i++) {
+					const PackageInfoRef& package
+						= fVisiblePackages.ItemAtFast(i);
+					if (package.Get() != NULL && package->Title() == title) {
+						_AdoptPackage(package);
+						break;
+					}
+				}
 			} else {
 				_ClearPackage();
 			}
