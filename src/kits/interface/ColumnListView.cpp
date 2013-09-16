@@ -500,9 +500,7 @@ BRow::SetField(BField* field, int32 logicalFieldIndex)
 
 	if (NULL != fList) {
 		ValidateField(field, logicalFieldIndex);
-		BRect inv;
-		fList->GetRowRect(this, &inv);
-		fList->Invalidate(inv);
+		Invalidate();
 	}
 
 	fFields.AddItem(field, logicalFieldIndex);
@@ -527,6 +525,14 @@ bool
 BRow::IsSelected() const
 {
 	return fPrevSelected != NULL;
+}
+
+
+void
+BRow::Invalidate()
+{
+	if (fList != NULL)
+		fList->InvalidateRow(this);
 }
 
 
@@ -1337,6 +1343,15 @@ void
 BColumnListView::Clear()
 {
 	fOutlineView->Clear();
+}
+
+
+void
+BColumnListView::InvalidateRow(BRow* row)
+{
+	BRect updateRect;
+	GetRowRect(row, &updateRect);
+	fOutlineView->Invalidate(updateRect);
 }
 
 
