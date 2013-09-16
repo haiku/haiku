@@ -889,7 +889,7 @@ MemoryView::_HandleContextMenu(BPoint point)
 		else
 			address = *((uint64*)(fTargetBlock->Data() + fSelectionStart));
 
-		if (fEndianMode == EndianModeBigEndian)
+		if (fCurrentEndianMode == EndianModeBigEndian)
 			address = B_HOST_TO_BENDIAN_INT64(address);
 		else
 			address = B_HOST_TO_LENDIAN_INT64(address);
