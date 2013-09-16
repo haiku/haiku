@@ -49,8 +49,9 @@ query_group_entry(const char* name, gid_t _gid, struct group *group,
 	KMessage reply;
 	status_t error = BPrivate::send_authentication_request_to_registrar(message,
 		reply);
-	if (error != B_OK)
-		return error;
+	if (error != B_OK) {
+		return error == ENOENT ? B_OK : error;
+	}
 
 	int32 gid;
 	const char* password;
