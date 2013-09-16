@@ -15,5 +15,7 @@ BinCommand passwd : passwd.cpp : libmultiuser_utils.a ;
 
 BinCommand useradd : useradd.cpp : libmultiuser_utils.a ;
 
+BinCommand userdel : userdel.cpp ;
+
 # set set-uid bit on passwd
 MODE on passwd = 04755 ;

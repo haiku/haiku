@@ -435,6 +435,12 @@ public:
 		return B_OK;
 	}
 
+	void RemoveUser(User* user)
+	{
+		fUsersByID.erase(fUsersByID.find(user->UID()));
+		fUsersByName.erase(fUsersByName.find(user->Name()));
+	}
+
 	User* UserByID(uid_t uid) const
 	{
 		map<uid_t, User*>::const_iterator it = fUsersByID.find(uid);
@@ -721,7 +727,7 @@ AuthenticationManager::_RequestThread()
 				if (error == B_OK) {
 					message.SendReply(fPasswdDBReply, -1, -1, 0, registrarTeam);
 				} else {
-					fPasswdDBReply->SetTo(1);
+					_InvalidatePasswdDBReply();
 					KMessage reply(error);
 					message.SendReply(&reply, -1, -1, 0, registrarTeam);
 				}
@@ -752,7 +758,7 @@ AuthenticationManager::_RequestThread()
 				if (error == B_OK) {
 					message.SendReply(fGroupDBReply, -1, -1, 0, registrarTeam);
 				} else {
-					fGroupDBReply->SetTo(1);
+					_InvalidateGroupDBReply();
 					KMessage reply(error);
 					message.SendReply(&reply, -1, -1, 0, registrarTeam);
 				}
@@ -789,7 +795,7 @@ AuthenticationManager::_RequestThread()
 					message.SendReply(fShadowPwdDBReply, -1, -1, 0,
 						registrarTeam);
 				} else {
-					fShadowPwdDBReply->SetTo(1);
+					_InvalidateShadowPwdDBReply();
 					KMessage reply(error);
 					message.SendReply(&reply, -1, -1, 0, registrarTeam);
 				}
@@ -915,7 +921,7 @@ AuthenticationManager::_RequestThread()
 					error = B_BAD_VALUE;
 				}
 
-				// only can change anything
+				// only root can change anything
 				if (error == B_OK && !isRoot)
 					error = EPERM;
 
@@ -951,8 +957,8 @@ AuthenticationManager::_RequestThread()
 						if (error == B_OK) {
 							fUserDB->AddUser(user);
 							fUserDB->WriteToDisk();
-							fPasswdDBReply->SetTo(1);
-							fShadowPwdDBReply->SetTo(1);
+							_InvalidatePasswdDBReply();
+							_InvalidateShadowPwdDBReply();
 						}
 					} catch (...) {
 						error = B_NO_MEMORY;
@@ -971,13 +977,59 @@ AuthenticationManager::_RequestThread()
 
 				break;
 			}
+
+			case B_REG_DELETE_USER:
+			{
+				// find user
+				User* user = NULL;
+				int32 uid;
+				const char* name;
+
+				if (message.FindInt32("uid", &uid) == B_OK) {
+					user = fUserDB->UserByID(uid);
+				} else if (message.FindString("name", &name) == B_OK) {
+					user = fUserDB->UserByName(name);
+				} else {
+					error = B_BAD_VALUE;
+				}
+
+				if (error == B_OK && user == NULL)
+					error = ENOENT;
+
+				// only root can change anything
+				if (error == B_OK && !isRoot)
+					error = EPERM;
+
+				// apply the change
+				if (error == B_OK) {
+					fUserDB->RemoveUser(user);
+					fUserDB->WriteToDisk();
+					_InvalidatePasswdDBReply();
+					_InvalidateShadowPwdDBReply();
+				}
+
+				// send reply
+				KMessage reply;
+				reply.SetWhat(error);
+				message.SendReply(&reply, -1, -1, 0, registrarTeam);
+
+				break;
+			}
+
 			case B_REG_UPDATE_GROUP:
 				debug_printf("B_REG_UPDATE_GROUP done: currently unsupported!\n");
 				break;
+
+			case B_REG_DELETE_GROUP:
+			{
+				debug_printf(
+					"B_REG_DELETE_GROUP done: currently unsupported!\n");
+				break;
+			}
+
 			default:
 				debug_printf("REG: invalid message: %" B_PRIu32 "\n",
 					message.What());
-
 		}
 	}
 }
@@ -1131,4 +1183,25 @@ AuthenticationManager::_InitShadowPwdDB()
 	}
 
 	return B_OK;
+}
+
+
+void
+AuthenticationManager::_InvalidatePasswdDBReply()
+{
+	fPasswdDBReply->SetTo(1);
+}
+
+
+void
+AuthenticationManager::_InvalidateGroupDBReply()
+{
+	fGroupDBReply->SetTo(1);
+}
+
+
+void
+AuthenticationManager::_InvalidateShadowPwdDBReply()
+{
+	fShadowPwdDBReply->SetTo(1);
 }

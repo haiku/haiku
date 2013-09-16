@@ -35,6 +35,10 @@ private:
 			status_t			_InitGroupDB();
 			status_t			_InitShadowPwdDB();
 
+			void				_InvalidatePasswdDBReply();
+			void				_InvalidateGroupDBReply();
+			void				_InvalidateShadowPwdDBReply();
+
 private:
 			port_id				fRequestPort;
 			thread_id			fRequestThread;

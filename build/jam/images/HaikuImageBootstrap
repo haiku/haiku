@@ -37,7 +37,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
 	tr traceroute trash true truncate tsort tty
 	uname unchop unexpand unmount uniq unlink unshar unzip unzipsfx
-	<bin>updatedb uptime urlwrapper useradd uudecode uuencode
+	<bin>updatedb uptime urlwrapper useradd userdel uudecode uuencode
 	vdir version vmstat
 	waitfor watch wc wget whoami writembr@x86 xargs xres
 	yes
