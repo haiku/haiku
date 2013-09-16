@@ -175,8 +175,8 @@ main(int argc, const char* const* argv)
 				}
 
 				if (error != 0) {
-					fprintf(stderr, "Error: Failed to get info for group \"%s\".\n",
-						group);
+					fprintf(stderr, "Error: Failed to get info for group "
+						"\"%s\".\n", group);
 					exit(1);
 				}
 				if (groupFound == NULL) {
