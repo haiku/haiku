@@ -184,9 +184,7 @@ MemoryView::Draw(BRect rect)
 			for (int32 j = 0; j < currentBlocksPerLine; j++) {
 				const char* blockAddress = currentAddress + (j
 					* blockByteSize);
-				_GetNextHexBlock(buffer,
-					std::min((size_t)hexBlockSize, sizeof(buffer)),
-					blockAddress);
+				_GetNextHexBlock(buffer, sizeof(buffer), blockAddress);
 				DrawString(buffer, drawPoint);
 				if (targetAddress >= blockAddress && targetAddress <
 					blockAddress + blockByteSize) {
@@ -581,7 +579,8 @@ MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
 	switch(fHexMode) {
 		case HexMode8BitInt:
 		{
-			snprintf(buffer, bufferSize, "%02" B_PRIx8, *address);
+			snprintf(buffer, bufferSize, "%02" B_PRIx8,
+				*((const uint8*)address));
 			break;
 		}
 		case HexMode16BitInt:
@@ -802,8 +801,7 @@ MemoryView::_GetSelectedText(BString& text)
 
 	char buffer[32];
 	for (int32 i = 0; i < count; i++) {
-		_GetNextHexBlock(buffer, std::min(_GetHexDigitsPerBlock() + 1,
-				(int32)32),	data);
+		_GetNextHexBlock(buffer, sizeof(buffer), data);
 		data += blockSize;
 		text << buffer;
 		if (i < count - 1)
