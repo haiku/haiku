@@ -6,6 +6,8 @@
 #ifndef FILE_MANAGER_H
 #define FILE_MANAGER_H
 
+#include <map>
+
 #include <Locker.h>
 #include <Message.h>
 #include <String.h>
@@ -43,7 +45,7 @@ public:
 										// returns a reference
 			LocatableFile*		GetSourceFile(const BString& path);
 										// returns a reference
-			void				SourceEntryLocated(const BString& path,
+			status_t			SourceEntryLocated(const BString& path,
 									const BString& locatedPath);
 
 			status_t			LoadSourceFile(LocatableFile* file,
@@ -65,6 +67,7 @@ private:
 			typedef BOpenHashTable<EntryHashDefinition> LocatableEntryTable;
 			typedef DoublyLinkedList<LocatableEntry> DeadEntryList;
 			typedef BOpenHashTable<SourceFileHashDefinition> SourceFileTable;
+			typedef std::map<BString, BString> LocatedFileMap;
 
 			friend struct SourceFileEntry;
 				// for gcc 2
@@ -72,13 +75,16 @@ private:
 private:
 			SourceFileEntry*	_LookupSourceFile(const BString& path);
 			void				_SourceFileUnused(SourceFileEntry* entry);
+			void				_LocateFileIfMapped(const BString& sourcePath,
+									LocatableFile* file);
 
 private:
 			BLocker				fLock;
 			Domain*				fTargetDomain;
 			Domain*				fSourceDomain;
 			SourceFileTable*	fSourceFiles;
-			BMessage			fLocationMappings;
+
+			LocatedFileMap		fSourceLocationMappings;
 };
 
 
