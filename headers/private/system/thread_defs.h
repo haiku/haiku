@@ -13,10 +13,10 @@
 
 /** Size of the stack given to teams in user space */
 #define USER_STACK_GUARD_SIZE		(4 * B_PAGE_SIZE)		// 16 kB
-#define USER_MAIN_THREAD_STACK_SIZE	(16 * 1024 * 1024)		// 16 MB
-#define USER_STACK_SIZE				(256 * 1024)			// 256 kB
-#define MIN_USER_STACK_SIZE			(8 * 1024)				// 8 kB
-#define MAX_USER_STACK_SIZE			(16 * 1024 * 1024)		// 16 MB
+#define MIN_USER_STACK_SIZE			(2 * B_PAGE_SIZE)		// 8 kB
+#define MAX_USER_STACK_SIZE			(4096 * B_PAGE_SIZE)	// 16 MB
+#define USER_MAIN_THREAD_STACK_SIZE	MAX_USER_STACK_SIZE
+#define USER_STACK_SIZE				(64 * B_PAGE_SIZE)		// 256 kB
 
 
 // The type of object a thread blocks on (thread::wait::type, set by
