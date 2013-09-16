@@ -802,7 +802,8 @@ MemoryView::_GetSelectedText(BString& text)
 
 	char buffer[32];
 	for (int32 i = 0; i < count; i++) {
-		_GetNextHexBlock(buffer, sizeof(buffer), data);
+		_GetNextHexBlock(buffer, std::min(_GetHexDigitsPerBlock() + 1,
+				(int32)32),	data);
 		data += blockSize;
 		text << buffer;
 		if (i < count - 1)
