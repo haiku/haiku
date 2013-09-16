@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de. All Rights Reserved.
+ * Copyright 2008-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -30,9 +30,27 @@ extern const char *__progname;
 
 
 static const char* kUsage =
-"Usage: %s [ -d <home> ] [ -e <expiration> ] [ -f <inactive> ] [ -g <gid> ]\n"
-"          [ -s <shell> ] [ -n <real name> ]\n"
-;
+	"Usage: %s [ <options> ] <user name>\n"
+	"Creates a new user <user name>.\n"
+	"\n"
+	"Options:\n"
+	"  -d <home>\n"
+	"    Specifies the home directory for the new user.\n"
+	"  -e <expiration>\n"
+	"    Specifies the expiration date for the new user's account.\n"
+	"  -f <inactive>\n"
+	"    Specifies the number of days after the expiration of the new user's "
+			"password\n"
+	"    until the account expires.\n"
+	"  -g <gid>\n"
+	"    Specifies the new user's primary group by ID or name.\n"
+	"  -h, --help\n"
+	"    Print usage info.\n"
+	"  -s <shell>\n"
+	"    Specifies the new user's login shell.\n"
+	"  -n <real name>\n"
+	"    Specifies the new user's real name.\n"
+	;
 
 static void
 print_usage_and_exit(bool error)
@@ -84,6 +102,7 @@ main(int argc, const char* const* argv)
 
 			case 'g':
 				gid = atoi(optarg);
+// TODO: Support name!
 				break;
 
 			case 'h':
