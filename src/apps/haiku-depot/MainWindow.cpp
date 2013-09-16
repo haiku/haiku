@@ -40,7 +40,7 @@ MainWindow::MainWindow(BRect frame)
 	
 	fFilterView = new FilterView(fModel);
 	fPackageListView = new PackageListView();
-	fPackageInfoView = new PackageInfoView(&fPackageManager);
+	fPackageInfoView = new PackageInfoView(fModel.Lock(), &fPackageManager);
 	
 	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
 	
@@ -162,7 +162,8 @@ MainWindow::_AdoptModel()
 void
 MainWindow::_AdoptPackage(const PackageInfoRef& package)
 {
-	fPackageInfoView->SetPackage(*package.Get());
+	fPackageInfoView->SetPackage(package);
+	fModel.PopulatePackage(package);
 }
 
 
@@ -176,9 +177,12 @@ MainWindow::_ClearPackage()
 void
 MainWindow::_InitDummyModel()
 {
-	// TODO: The Model could be filled from another thread by 
-	// sending messages which contain collected package information.
-	// The Model could be cached on disk.
+	// TODO: The Model needs to be filled initially by the Package Kit APIs.
+	// It already caches information locally. Error handlers need to be
+	// installed to display problems to the user. When a package is selected
+	// for display, extra information is retrieved like screen-shots, user-
+	// ratings and so on. This triggers notifications which in turn updates
+	// the UI.
 	
 	DepotInfo depot(B_TRANSLATE("Default"));
 
@@ -197,16 +201,6 @@ MainWindow::_InitDummyModel()
 		"on Haiku. It combines many great under-the-hood features with "
 		"powerful tools and an efficient and intuitive interface.",
 		"2.1.2 - Initial Haiku release."), true);
-	wonderbrush->AddUserRating(
-		UserRating(UserInfo("humdinger"), 4.5f,
-		"Awesome!", "en", "2.1.2", 0, 0)
-	);
-	wonderbrush->AddUserRating(
-		UserRating(UserInfo("bonefish"), 5.0f,
-		"The best!", "en", "2.1.2", 3, 1)
-	);
-	wonderbrush->AddScreenshot(
-		BitmapRef(new SharedBitmap(603), true));
 	wonderbrush->AddCategory(fModel.CategoryGraphics());
 	wonderbrush->AddCategory(fModel.CategoryProductivity());
 	
@@ -228,23 +222,6 @@ MainWindow::_InitDummyModel()
 		"missing from BeIDE, like running a project in the Terminal, "
 		"and has a bundled text editor based upon Pe.",
 		""), true);
-	paladin->AddUserRating(
-		UserRating(UserInfo("stippi"), 3.5f,
-		"Could be more integrated from the sounds of it.",
-		"en", "1.2.0", 0, 1)
-	);
-	paladin->AddUserRating(
-		UserRating(UserInfo("mmadia"), 5.0f,
-		"It rocks! Give a try",
-		"en", "1.1.0", 1, 0)
-	);
-	paladin->AddUserRating(
-		UserRating(UserInfo("bonefish"), 2.0f,
-		"It just needs to use my jam-rewrite 'ham' and it will be great.",
-		"en", "1.1.0", 3, 1)
-	);
-	paladin->AddScreenshot(
-		BitmapRef(new SharedBitmap(605), true));
 	paladin->AddCategory(fModel.CategoryDevelopment());
 
 	depot.AddPackage(paladin);
@@ -315,24 +292,6 @@ MainWindow::_InitDummyModel()
 		"filter.\n\n"
 		" * ''Note to filter developers:'' The filter API has changed. You "
 		"will need to recompile your filters."), true);
-	sequitur->AddUserRating(
-		UserRating(UserInfo("pete"), 4.5f,
-		"I can weave a web of sound! And it connects to PatchBay. Check "
-		"it out, I can wholeheartly recommend this app!! This rating "
-		"comment is of course only so long, because the new TextView "
-		"layout needs some testing. Oh, and did I mention it works with "
-		"custom installed sound fonts? Reading through this comment I find "
-		"that I did not until now. Hopefully there are enough lines now to "
-		"please the programmer with the text layouting and scrolling of "
-		"long ratings!", "en", "2.1.0", 4, 1)
-	);
-	sequitur->AddUserRating(
-		UserRating(UserInfo("stippi"), 3.5f,
-		"It seems very capable. Still runs fine on Haiku. The interface "
-		"is composed of many small, hard to click items. But you can "
-		"configure a tool for each mouse button, which is great for the "
-		"work flow.", "en", "2.1.0", 2, 1)
-	);
 	sequitur->AddCategory(fModel.CategoryAudio());
 	
 	depot.AddPackage(sequitur);

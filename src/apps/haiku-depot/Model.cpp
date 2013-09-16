@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+#include <Autolock.h>
 #include <Catalog.h>
 
 
@@ -366,3 +367,86 @@ Model::SetSearchTerms(const BString& searchTerms)
 	fSearchTermsFilter.SetTo(filter, true);
 }
 
+
+// #pragma mark - information retrival
+
+
+void
+Model::PopulatePackage(const PackageInfoRef& package)
+{
+	if (fPopulatedPackages.Contains(package))
+		return;
+
+	BAutolock _(&fLock);
+
+	// TODO: Replace with actual backend that retrieves package extra
+	// information and user-contributed package information.
+	
+	// TODO: There should probably also be a way to "unpopulate" the
+	// package information. Maybe a cache of populated packages, so that
+	// packages loose their extra information after a certain amount of
+	// time when they have not been accessed/displayed in the UI. Otherwise
+	// HaikuDepot will consume more and more resources in the packages.
+	// Especially screen-shots will be a problem eventually.
+	
+	// TODO: Simulate a delay in retrieving this info, and do that on
+	// a separate thread.
+	
+	fPopulatedPackages.Add(package);
+
+	if (package->Title() == "WonderBrush") {
+
+		package->AddUserRating(
+			UserRating(UserInfo("humdinger"), 4.5f,
+			"Awesome!", "en", "2.1.2", 0, 0)
+		);
+		package->AddUserRating(
+			UserRating(UserInfo("bonefish"), 5.0f,
+			"The best!", "en", "2.1.2", 3, 1)
+		);
+		package->AddScreenshot(
+			BitmapRef(new SharedBitmap(603), true));
+
+	} else if (package->Title() == "Paladin") {
+
+		package->AddUserRating(
+			UserRating(UserInfo("stippi"), 3.5f,
+			"Could be more integrated from the sounds of it.",
+			"en", "1.2.0", 0, 1)
+		);
+		package->AddUserRating(
+			UserRating(UserInfo("mmadia"), 5.0f,
+			"It rocks! Give a try",
+			"en", "1.1.0", 1, 0)
+		);
+		package->AddUserRating(
+			UserRating(UserInfo("bonefish"), 2.0f,
+			"It just needs to use my jam-rewrite 'ham' and it will be great.",
+			"en", "1.1.0", 3, 1)
+		);
+		package->AddScreenshot(
+			BitmapRef(new SharedBitmap(605), true));
+
+	} else if (package->Title() == "Sequitur") {
+
+		package->AddUserRating(
+			UserRating(UserInfo("pete"), 4.5f,
+			"I can weave a web of sound! And it connects to PatchBay. Check "
+			"it out, I can wholeheartly recommend this app!! This rating "
+			"comment is of course only so long, because the new TextView "
+			"layout needs some testing. Oh, and did I mention it works with "
+			"custom installed sound fonts? Reading through this comment I find "
+			"that I did not until now. Hopefully there are enough lines now to "
+			"please the programmer with the text layouting and scrolling of "
+			"long ratings!", "en", "2.1.0", 4, 1)
+		);
+		package->AddUserRating(
+			UserRating(UserInfo("stippi"), 3.5f,
+			"It seems very capable. Still runs fine on Haiku. The interface "
+			"is composed of many small, hard to click items. But you can "
+			"configure a tool for each mouse button, which is great for the "
+			"work flow.", "en", "2.1.0", 2, 1)
+		);
+
+	}
+}
