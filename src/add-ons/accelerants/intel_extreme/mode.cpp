@@ -431,7 +431,10 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	mode.h_display_start = 0;
 	mode.v_display_start = 0;
 	mode.flags = B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS
-		| B_DPMS | B_SUPPORTS_OVERLAYS;
+		| B_DPMS;
+	if (gInfo->overlay_registers != NULL) {
+		mode.flags |= B_SUPPORTS_OVERLAYS;
+	}
 }
 
 
