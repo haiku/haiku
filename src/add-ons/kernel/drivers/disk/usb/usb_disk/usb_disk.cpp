@@ -963,7 +963,7 @@ usb_disk_prepare_partial_buffer(device_lun *lun, off_t position, size_t length,
 		return result;
 	}
 
-	off_t offset = position - (blockPosition * lun->block_size);
+	off_t offset = position - (off_t)blockPosition * lun->block_size;
 	partialBuffer = (uint8 *)blockBuffer + offset;
 	return B_OK;
 }
