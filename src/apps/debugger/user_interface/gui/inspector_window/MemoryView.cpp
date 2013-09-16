@@ -660,7 +660,7 @@ MemoryView::_GetOffsetAt(BPoint point) const
 	if (fHexMode == HexModeNone)
 		return -1;
 
-	int32 lineNumber = point.y / fLineHeight;
+	int32 lineNumber = int32(point.y / fLineHeight);
 	int32 charsPerBlock = _GetHexDigitsPerBlock() / 2;
 	int32 totalHexBlocks = fTargetBlock->Size() / charsPerBlock;
 	int32 lineCount = totalHexBlocks / fHexBlocksPerLine;
