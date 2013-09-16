@@ -89,7 +89,7 @@ TeamFileManagerSettings::AddSourceMapping(const BString& sourcePath,
 status_t
 TeamFileManagerSettings::RemoveSourceMappingAt(int32 index)
 {
-	return fValues.RemoveData("mapping", index);
+	return fValues.RemoveData("source:mapping", index);
 }
 
 
@@ -98,7 +98,7 @@ TeamFileManagerSettings::GetSourceMappingAt(int32 index, BString& sourcePath,
 	BString& locatedPath)
 {
 	BMessage mapping;
-	status_t error = fValues.FindMessage("mapping", index, &mapping);
+	status_t error = fValues.FindMessage("source:mapping", index, &mapping);
 	if (error != B_OK)
 		return error;
 
