@@ -5,6 +5,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <Locker.h>
 
 #include "PackageInfo.h"
 
@@ -23,6 +24,9 @@ typedef BReference<PackageFilter> PackageFilterRef;
 class Model {
 public:
 								Model();
+
+			BLocker*			Lock()
+									{ return &fLock; }
 
 			// !Returns new PackageInfoList from current parameters
 			PackageList			CreatePackageList() const;
@@ -63,7 +67,12 @@ public:
 			void				SetDepot(const BString& depot);
 			void				SetSearchTerms(const BString& searchTerms);
 
+			// Retrieve package information
+			void				PopulatePackage(const PackageInfoRef& package);
+
 private:
+			BLocker				fLock;
+
 			DepotList			fDepots;
 
 			CategoryRef			fCategoryAudio;
@@ -84,6 +93,7 @@ private:
 			PackageList			fUninstalledPackages;
 			PackageList			fDownloadingPackages;
 			PackageList			fUpdateablePackages;
+			PackageList			fPopulatedPackages;
 
 			PackageFilterRef	fCategoryFilter;
 			BString				fDepotFilter;

@@ -8,8 +8,10 @@
 #include <GroupView.h>
 
 #include "PackageInfo.h"
+#include "PackageInfoListener.h"
 
 
+class BLocker;
 class TitleView;
 class PackageActionView;
 class PackageManager;
@@ -23,19 +25,27 @@ enum {
 
 class PackageInfoView : public BGroupView {
 public:
-								PackageInfoView(PackageManager* packageManager);
+								PackageInfoView(BLocker* modelLock,
+									PackageManager* packageManager);
 	virtual						~PackageInfoView();
 
 	virtual void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
 
-			void				SetPackage(const PackageInfo& package);
+			void				SetPackage(const PackageInfoRef& package);
 			void				Clear();
 
 private:
+			class Listener;
+
+private:
+			BLocker*			fModelLock;
+
 			TitleView*			fTitleView;
 			PackageActionView*	fPackageActionView;
 			PagesView*			fPagesView;
+			
+			Listener*			fPackageListener;
 };
 
 #endif // PACKAGE_INFO_VIEW_H
