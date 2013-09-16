@@ -1,11 +1,13 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef FILE_MANAGER_H
 #define FILE_MANAGER_H
 
 #include <Locker.h>
+#include <Message.h>
 #include <String.h>
 
 #include <util/DoublyLinkedList.h>
@@ -15,6 +17,7 @@
 class LocatableEntry;
 class LocatableFile;
 class SourceFile;
+class TeamFileManagerSettings;
 
 
 class FileManager {
@@ -47,6 +50,11 @@ public:
 									SourceFile*& _sourceFile);
 										// returns a reference
 
+			status_t			LoadLocationMappings(TeamFileManagerSettings*
+									settings);
+			status_t			SaveLocationMappings(TeamFileManagerSettings*
+									settings);
+
 private:
 			struct EntryPath;
 			struct EntryHashDefinition;
@@ -70,6 +78,7 @@ private:
 			Domain*				fTargetDomain;
 			Domain*				fSourceDomain;
 			SourceFileTable*	fSourceFiles;
+			BMessage			fLocationMappings;
 };
 
 

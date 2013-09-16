@@ -1991,6 +1991,8 @@ TeamDebugger::_LoadSettings()
 			breakpointSetting->IsEnabled());
 	}
 
+	fFileManager->LoadLocationMappings(fTeamSettings.FileManagerSettings());
+
 	const TeamUiSettings* uiSettings = fTeamSettings.UiSettingFor(
 		fUserInterface->ID());
 	if (uiSettings != NULL)
@@ -2022,6 +2024,8 @@ TeamDebugger::_SaveSettings()
 				settings.AddUiSettings(clonedSettings);
 		}
 	}
+
+	fFileManager->SaveLocationMappings(settings.FileManagerSettings());
 	locker.Unlock();
 
 	// save the settings
