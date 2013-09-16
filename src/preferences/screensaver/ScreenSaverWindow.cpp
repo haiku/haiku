@@ -583,8 +583,6 @@ ModulesView::DetachedFromWindow()
 void
 ModulesView::AttachedToWindow()
 {
-	PopulateScreenSaverList();
-
 	fScreenSaversListView->SetTarget(this);
 	fTestButton->SetTarget(this);
 	fAddButton->SetTarget(this);
@@ -594,8 +592,7 @@ ModulesView::AttachedToWindow()
 void
 ModulesView::AllAttached()
 {
-	fScreenSaversListView->ScrollToSelection();
-		// This only works after the list view is attached
+	PopulateScreenSaverList();
 	fScreenSaversListView->Invoke(new BMessage(kMsgSaverSelected));
 }
 
