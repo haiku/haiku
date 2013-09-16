@@ -12,6 +12,8 @@
 #include <limits.h>
 #include <stdlib.h>
 
+#include <Debug.h>
+
 #include <thread_defs.h>
 
 
@@ -105,6 +107,8 @@ pthread_attr_setstacksize(pthread_attr_t *_attr, size_t stacksize)
 	if (_attr == NULL || (attr = *_attr) == NULL)
 		return B_BAD_VALUE;
 
+	STATIC_ASSERT(PTHREAD_STACK_MIN >= MIN_USER_STACK_SIZE
+		&& PTHREAD_STACK_MIN <= MAX_USER_STACK_SIZE);
 	if (stacksize < PTHREAD_STACK_MIN || stacksize > MAX_USER_STACK_SIZE)
 		return B_BAD_VALUE;
 
