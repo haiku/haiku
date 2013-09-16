@@ -267,8 +267,8 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	uint32 logicalBlockAddress, uint16 transferLength, void *data,
 	size_t *dataLength, bool directionIn)
 {
-	TRACE("operation: lun: %u; op: %u; oplen: %u; lba: %lu; tlen: %u; data: "
-		"%p; dlen: %p (%lu); in: %c\n",
+	TRACE("operation: lun: %u; op: %u; oplen: %u; lba: %" B_PRIu32
+		"; tlen: %u; data: %p; dlen: %p (%lu); in: %c\n",
 		lun->logical_unit_number, operation, opLength, logicalBlockAddress,
 		transferLength, data, dataLength, dataLength ? *dataLength : 0,
 		directionIn ? 'y' : 'n');
@@ -691,7 +691,7 @@ usb_disk_callback(void *cookie, status_t status, void *data,
 static status_t
 usb_disk_device_added(usb_device newDevice, void **cookie)
 {
-	TRACE("device_added(0x%08lx)\n", newDevice);
+	TRACE("device_added(0x%08" B_PRIx32 ")\n", newDevice);
 	disk_device *device = (disk_device *)malloc(sizeof(disk_device));
 	device->device = newDevice;
 	device->removed = false;
@@ -856,7 +856,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 		sprintf(device->luns[i]->name, DEVICE_NAME, device->device_number, i);
 	mutex_unlock(&gDeviceListLock);
 
-	TRACE("new device: 0x%08lx\n", (uint32)device);
+	TRACE("new device: 0x%p\n", device);
 	*cookie = (void *)device;
 	return B_OK;
 }
@@ -865,7 +865,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 static status_t
 usb_disk_device_removed(void *cookie)
 {
-	TRACE("device_removed(0x%08lx)\n", (uint32)cookie);
+	TRACE("device_removed(0x%p)\n", cookie);
 	disk_device *device = (disk_device *)cookie;
 
 	mutex_lock(&gDeviceListLock);
@@ -1096,7 +1096,8 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case B_GET_MEDIA_STATUS:
 		{
 			*(status_t *)buffer = usb_disk_test_unit_ready(lun);
-			TRACE("B_GET_MEDIA_STATUS: 0x%08lx\n", *(status_t *)buffer);
+			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n",
+				*(status_t *)buffer);
 			result = B_OK;
 			break;
 		}
@@ -1117,8 +1118,9 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			geometry.removable = lun->removable;
 			geometry.read_only = lun->write_protected;
 			geometry.write_once = lun->device_type == B_WORM;
-			TRACE("B_GET_GEOMETRY: %ld sectors at %ld bytes per sector\n",
-				geometry.cylinder_count, geometry.bytes_per_sector);
+			TRACE("B_GET_GEOMETRY: %" B_PRId32 " sectors at %" B_PRId32
+				" bytes per sector\n", geometry.cylinder_count,
+				geometry.bytes_per_sector);
 			result = user_memcpy(buffer, &geometry, sizeof(device_geometry));
 			break;
 		}
@@ -1212,7 +1214,7 @@ usb_disk_read(void *cookie, off_t position, void *buffer, size_t *length)
 	if (buffer == NULL || length == NULL)
 		return B_BAD_VALUE;
 
-	TRACE("read(%lld, %ld)\n", position, *length);
+	TRACE("read(%" B_PRIdOFF ", %ld)\n", position, *length);
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
 	mutex_lock(&device->lock);
@@ -1260,7 +1262,7 @@ usb_disk_write(void *cookie, off_t position, const void *buffer,
 	if (buffer == NULL || length == NULL)
 		return B_BAD_VALUE;
 
-	TRACE("write(%lld, %ld)\n", position, *length);
+	TRACE("write(%" B_PRIdOFF", %ld)\n", position, *length);
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
 	mutex_lock(&device->lock);
