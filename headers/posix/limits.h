@@ -43,7 +43,7 @@
 #define PATH_MAX				(1024)
 #define PIPE_MAX				(512)
 #define PTHREAD_KEYS_MAX		256
-#define PTHREAD_STACK_MIN		4096
+#define PTHREAD_STACK_MIN		(2 * PAGE_SIZE)
 #define SSIZE_MAX		  		__HAIKU_SADDR_MAX
 #define TTY_NAME_MAX			(256)
 #define TZNAME_MAX		  		(32)
