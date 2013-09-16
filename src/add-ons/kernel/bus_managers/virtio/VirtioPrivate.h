@@ -107,6 +107,7 @@ public:
 
 			bool				IsFull() const { return fRingFree == 0; }
 			bool				IsEmpty() const { return fRingFree == fRingSize; }
+			uint16				Size() const { return fRingSize; }
 
 			VirtioDevice*		Device() { return fDevice; }
 

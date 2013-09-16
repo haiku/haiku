@@ -134,6 +134,31 @@ virtio_queue_request(virtio_queue cookie, const physical_entry *readEntry,
 }
 
 
+bool
+virtio_queue_is_full(virtio_queue cookie)
+{
+	VirtioQueue *queue = (VirtioQueue *)cookie;
+	return queue->IsFull();
+}
+
+
+bool
+virtio_queue_is_empty(virtio_queue cookie)
+{
+	VirtioQueue *queue = (VirtioQueue *)cookie;
+	return queue->IsEmpty();
+}
+
+
+uint16
+virtio_queue_size(virtio_queue cookie)
+{
+	VirtioQueue *queue = (VirtioQueue *)cookie;
+	return queue->Size();
+}
+
+
+
 //	#pragma mark -
 
 
@@ -222,7 +247,10 @@ virtio_device_interface virtio_device_module = {
 	virtio_alloc_queues,
 	virtio_setup_interrupt,
 	virtio_queue_request,
-	virtio_queue_request_v
+	virtio_queue_request_v,
+	virtio_queue_is_full,
+	virtio_queue_is_empty,
+	virtio_queue_size
 };
 
 virtio_for_controller_interface virtio_for_controller_module = {
