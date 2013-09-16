@@ -130,7 +130,7 @@ main(int argc, const char* const* argv)
 	const char* user = argv[optind];
 
 	if (geteuid() != 0) {
-		fprintf(stderr, "Error: You need to be root.\n");
+		fprintf(stderr, "Error: Only root may add users.\n");
 		exit(1);
 	}
 
@@ -191,41 +191,6 @@ main(int argc, const char* const* argv)
 		}
 	}
 
-	// read password
-	char password[LINE_MAX];
-	if (read_password("password for user: ", password, sizeof(password),
-			false) != B_OK) {
-		exit(1);
-	}
-
-	if (strlen(password) >= MAX_SHADOW_PWD_PASSWORD_LEN) {
-		fprintf(stderr, "Error: The password is too long.\n");
-		exit(1);
-	}
-
-	// read password again
-	char repeatedPassword[LINE_MAX];
-	if (read_password("repeat password: ", repeatedPassword,
-			sizeof(repeatedPassword), false) != B_OK) {
-		exit(1);
-	}
-
-	// passwords need to match
-	if (strcmp(password, repeatedPassword) != 0) {
-		fprintf(stderr, "Error: passwords don't match\n");
-		exit(1);
-	}
-
-	memset(repeatedPassword, 0, sizeof(repeatedPassword));
-
-	// crypt it
-	char* encryptedPassword;
-	if (strlen(password) > 0) {
-		encryptedPassword = crypt(password, user);
-		memset(password, 0, sizeof(password));
-	} else
-		encryptedPassword = password;
-
 	// find an unused UID
 	uid_t uid = 1000;
 	while (getpwuid(uid) != NULL)
@@ -240,7 +205,7 @@ main(int argc, const char* const* argv)
 		|| message.AddString("home", home) != B_OK
 		|| message.AddString("shell", shell) != B_OK
 		|| message.AddString("real name", realName) != B_OK
-		|| message.AddString("shadow password", encryptedPassword) != B_OK
+		|| message.AddString("shadow password", "!") != B_OK
 		|| message.AddInt32("last changed", time(NULL)) != B_OK
 		|| message.AddInt32("min", min) != B_OK
 		|| message.AddInt32("max", max) != B_OK

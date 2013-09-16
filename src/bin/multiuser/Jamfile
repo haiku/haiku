@@ -13,7 +13,7 @@ BinCommand login : login.cpp : libmultiuser_utils.a ;
 
 BinCommand passwd : passwd.cpp : libmultiuser_utils.a ;
 
-BinCommand useradd : useradd.cpp : libmultiuser_utils.a ;
+BinCommand useradd : useradd.cpp ;
 
 BinCommand userdel : userdel.cpp ;
 
