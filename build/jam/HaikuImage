@@ -98,11 +98,11 @@ SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix icmp6 ipv6 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
 	x86,x86_64 @{
-		vesa.accelerant
+		vesa.accelerant intel_extreme.accelerant
 	}@ # x86,x86_64
 	x86 @{
 		3dfx.accelerant ati.accelerant matrox.accelerant neomagic.accelerant
-		nvidia.accelerant intel_810.accelerant intel_extreme.accelerant
+		nvidia.accelerant intel_810.accelerant
 		radeon.accelerant radeon_hd.accelerant s3.accelerant 
 		#via.accelerant vmware.accelerant
 	}@ # x86
@@ -156,10 +156,10 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ice1712 sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
 	x86,x86_64 @{
-		vesa
+		vesa intel_extreme 
 	}@ # x86,x86_64
 	x86 @{
-		ati 3dfx intel_810 intel_extreme matrox neomagic nvidia radeon radeon_hd
+		ati 3dfx intel_810 matrox neomagic nvidia radeon radeon_hd
 		s3 #via vmware
 	}@ # x86
 ] ;
@@ -187,7 +187,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures acpi_button@x86 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	ata@ata pci ps2@x86,x86_64 isa@x86,x86_64
-	ide@ide scsi config_manager agp_gart@x86 usb firewire@x86 acpi@x86
+	ide@ide scsi config_manager agp_gart@x86,x86_64 usb firewire@x86 acpi@x86
 	virtio random
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs btrfs cdda exfat ext2 fat iso9660 nfs nfs4
@@ -216,7 +216,7 @@ for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
 AddFilesToHaikuImage system add-ons kernel bus_managers
 	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToHaikuImage system add-ons kernel busses agp_gart
-	: <agp_gart>intel@x86 ;
+	: <agp_gart>intel@x86,x86_64 ;
 
 if $(HAIKU_ATA_STACK) = 1 {
 	AddFilesToHaikuImage system add-ons kernel busses ata
