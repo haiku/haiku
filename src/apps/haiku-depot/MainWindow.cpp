@@ -154,6 +154,7 @@ MainWindow::_AdoptModel()
 	
 	fPackageListView->Clear();
 	for (int32 i = 0; i < fVisiblePackages.CountItems(); i++) {
+		BAutolock _(fModel.Lock());
 		fPackageListView->AddPackage(fVisiblePackages.ItemAtFast(i));
 	}
 }
