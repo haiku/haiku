@@ -92,7 +92,7 @@ TextDocumentLayout::Draw(BView* view, const BPoint& offset,
 	const BRect& updateRect)
 {
 	_ValidateLayout();
-	
+
 	int layoutCount = fParagraphLayouts.CountItems();
 	for (int i = 0; i < layoutCount; i++) {
 		const ParagraphLayoutInfo& layout = fParagraphLayouts.ItemAtFast(i);
@@ -151,9 +151,9 @@ TextDocumentLayout::_Layout()
 
 		if (i > 0)
 			y += style.SpacingTop();
-	
+
 		fParagraphLayouts.Replace(i, ParagraphLayoutInfo(y, info.layout));
-		
+
 		info.layout->SetWidth(fWidth);
 		y += info.layout->Height() + style.SpacingBottom();
 	}

@@ -23,7 +23,7 @@ public:
 									const BMessage* dragMessage);
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseUp(BPoint where);
-	
+
 	virtual	BSize				MinSize();
 	virtual	BSize				PreferredSize();
 	virtual	BSize				MaxSize();

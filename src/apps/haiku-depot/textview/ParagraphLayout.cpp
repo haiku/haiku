@@ -194,7 +194,7 @@ ParagraphLayout::ParagraphLayout(const ParagraphLayout& other)
 	:
 	fTextSpans(other.fTextSpans),
 	fParagraphStyle(other.fParagraphStyle),
-	
+
 	fWidth(other.fWidth),
 	fLayoutValid(false),
 
@@ -251,13 +251,13 @@ void
 ParagraphLayout::Draw(BView* view, const BPoint& offset)
 {
 	_ValidateLayout();
-	
+
 	int lineCount = fLineInfos.CountItems();
 	for (int i = 0; i < lineCount; i++) {
 		const LineInfo& line = fLineInfos.ItemAtFast(i);
 		_DrawLine(view, offset, line);
 	}
-	
+
 	const Bullet& bullet = fParagraphStyle.Bullet();
 	if (bullet.Spacing() > 0.0f && bullet.String().Length() > 0) {
 		// Draw bullet at offset
@@ -317,7 +317,7 @@ ParagraphLayout::_Layout()
 	int glyphCount = fGlyphInfos.CountItems();
 	for (int i = 0; i < glyphCount; i++) {
 		GlyphInfo glyph = fGlyphInfos.ItemAtFast(i);
-		
+
 		uint32 charClassification = get_char_classification(glyph.charCode);
 
 		float advanceX = glyph.width;
@@ -528,7 +528,7 @@ ParagraphLayout::_ApplyAlignment()
 					whiteSpace = spaceLeftForSpace / spaceCount;
 				if (charCount > 0)
 					charSpace = spaceLeftForChars / charCount;
-				
+
 				LineInfo line = fLineInfos.ItemAtFast(lineIndex);
 				line.extraGlyphSpacing = charSpace;
 				line.extraWhiteSpacing = whiteSpace;
@@ -583,7 +583,7 @@ ParagraphLayout::_AppendGlyphInfos(const TextSpan& span)
 	int charCount = span.CharCount();
 	if (charCount == 0)
 		return true;
-	
+
 	const BString& text = span.Text();
 	const BFont& font = span.Style().Font();
 
@@ -621,7 +621,7 @@ ParagraphLayout::_AppendGlyphInfo(uint32 charCode, float width,
 	}
 
 	width += style.GlyphSpacing();
-	
+
 	return fGlyphInfos.Add(GlyphInfo(charCode, 0.0f, width, 0));
 }
 
@@ -679,7 +679,7 @@ ParagraphLayout::_IncludeStyleInLine(LineInfo& line,
 	float descent = style.Descent();
 	if (descent > line.maxDescent)
 		line.maxDescent = descent;
-	
+
 	float height = ascent + descent;
 	if (style.Font().Size() > height)
 		height = style.Font().Size();
@@ -713,7 +713,7 @@ ParagraphLayout::_DrawSpan(BView* view, BPoint offset,
 
 	const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
 	const LineInfo& line = fLineInfos.ItemAtFast(glyph.lineIndex);
-	
+
 	offset.x += glyph.x;
 	offset.y += line.y + line.maxAscent;
 

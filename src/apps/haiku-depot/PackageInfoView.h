@@ -44,7 +44,7 @@ private:
 			TitleView*			fTitleView;
 			PackageActionView*	fPackageActionView;
 			PagesView*			fPagesView;
-			
+
 			Listener*			fPackageListener;
 };
 

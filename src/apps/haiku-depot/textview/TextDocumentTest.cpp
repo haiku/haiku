@@ -41,14 +41,14 @@ TextDocumentTest::ReadyToRun()
 	;
 
 	CharacterStyle regularStyle;
-	
+
 	float fontSize = regularStyle.Font().Size();
-	
+
 	ParagraphStyle paragraphStyle;
 	paragraphStyle.SetJustify(true);
 	paragraphStyle.SetSpacingTop(ceilf(fontSize * 0.6f));
 	paragraphStyle.SetLineSpacing(ceilf(fontSize * 0.2f));
-	
+
 //	CharacterStyle boldStyle(regularStyle);
 //	boldStyle.SetBold(true);
 //
@@ -57,7 +57,7 @@ TextDocumentTest::ReadyToRun()
 //
 //	CharacterStyle italicAndBoldStyle(boldStyle);
 //	italicAndBoldStyle.SetItalic(true);
-//	
+//
 //	CharacterStyle bigStyle(regularStyle);
 //	bigStyle.SetFontSize(24);
 //	bigStyle.SetForegroundColor(255, 50, 50);
@@ -96,7 +96,7 @@ TextDocumentTest::ReadyToRun()
 //	paragraph = Paragraph(paragraphStyle);
 //	paragraph.Append(TextSpan("The wrapping in ", regularStyle));
 //	paragraph.Append(TextSpan("this", italicStyle));
-//	
+//
 //	paragraph.Append(TextSpan(" bullet item should look visually "
 //		"pleasing. And ", regularStyle));
 //	paragraph.Append(TextSpan("why", italicAndBoldStyle));
@@ -104,7 +104,7 @@ TextDocumentTest::ReadyToRun()
 //	document->Append(paragraph);
 
 	MarkupParser parser(regularStyle, paragraphStyle);
-	
+
 	TextDocumentRef document = parser.CreateDocumentFromMarkup(
 		"== Text document test ==\n"
 		"This is a test to see if '''different''' "

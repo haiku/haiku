@@ -46,26 +46,26 @@ BitmapView::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
 	DrawBackground(bounds, updateRect);
-	
+
 	if (fBitmap == NULL)
 		return;
 
 	BRect bitmapBounds = fBitmap->Bounds();
 	if (bitmapBounds.Width() <= 0.0f || bitmapBounds.Height() <= 0.0f)
 		return;
-	
+
 	float scale = 1.0f;
 
 	if (fScaleBitmap) {
 		float hScale = bounds.Width() / bitmapBounds.Width();
 		float vScale = bounds.Height() / bitmapBounds.Height();
-		
+
 		scale = std::min(hScale, vScale);
 	}
-	
+
 	float width = bitmapBounds.Width() * scale;
 	float height = bitmapBounds.Height() * scale;
-	
+
 	switch (LayoutAlignment().horizontal) {
 		case B_ALIGN_LEFT:
 			break;
@@ -90,7 +90,7 @@ BitmapView::Draw(BRect updateRect)
 				+ (bounds.Height() - height) / 2.0f);
 			break;
 	}
-	
+
 	bounds.right = ceilf(bounds.left + width);
 	bounds.bottom = ceilf(bounds.top + height);
 
@@ -103,13 +103,13 @@ BSize
 BitmapView::MinSize()
 {
 	BSize size(0.0f, 0.0f);
-	
+
 	if (fBitmap != NULL) {
 		BRect bounds = fBitmap->Bounds();
 		size.width = bounds.Width();
 		size.height = bounds.Height();
 	}
-	
+
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
@@ -139,11 +139,11 @@ BitmapView::SetBitmap(const BBitmap* bitmap)
 	BSize size = MinSize();
 
 	fBitmap = bitmap;
-	
+
 	BSize newSize = MinSize();
 	if (size != newSize)
 		InvalidateLayout();
-	
+
 	Invalidate();
 }
 

@@ -15,7 +15,7 @@ public:
 	virtual						~PackageAction();
 
 	virtual const char*			Label() const = 0;
-	
+
 	// TODO: Perform() needs to be passed a progress listener
 	// and it needs a mechanism to report and react to errors. The
 	// Package Kit supports this stuff already.

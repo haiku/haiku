@@ -117,17 +117,17 @@ public:
 	{
 		if ((event.Changes() & PKG_CHANGED_RATINGS) == 0)
 			return;
-		
+
 		BMessenger messenger(fView);
 		if (!messenger.IsValid())
 			return;
 
 		const PackageInfo& package = *event.Package().Get();
-		
+
 		BMessage message(MSG_UPDATE_PACKAGE);
 		message.AddString("title", package.Title());
 		message.AddUInt32("changes", event.Changes());
-		
+
 		messenger.SendMessage(&message);
 	}
 
@@ -185,10 +185,10 @@ RatingField::SetRating(float rating)
 		rating = 0.0f;
 	if (rating > 5.0f)
 		rating = 5.0f;
-	
+
 	if (rating == fRating)
 		return;
-	
+
 	fRating = rating;
 	// TODO: cause a redraw?
 }
@@ -292,7 +292,7 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 			drawOverlay = false;
 			stringWidth = parent->StringWidth(string);
 		}
-			
+
 		switch (Alignment()) {
 			default:
 			case B_ALIGN_LEFT:
@@ -320,15 +320,15 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 			+ fontHeight.ascent;
 
 		parent->DrawString(string, BPoint(rect.left, y));
-	
+
 		if (drawOverlay) {
 			rect.left = ceilf(rect.left
 				+ (ratingField->Rating() / 5.0f) * rect.Width());
-		
+
 			rgb_color color = parent->LowColor();
 			color.alpha = 190;
 			parent->SetHighColor(color);
-			
+
 			parent->SetDrawingMode(B_OP_ALPHA);
 			parent->FillRect(rect, B_SOLID_HIGH);
 
@@ -429,9 +429,9 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 {
 	if (packageRef.Get() == NULL)
 		return;
-	
+
 	PackageInfo& package = *packageRef.Get();
-	
+
 	// Package icon and title
 	// NOTE: The icon BBitmap is referenced by the fPackage member.
 	const BBitmap* icon = NULL;
@@ -487,13 +487,13 @@ public:
 		BFont font(be_plain_font);
 		font.SetSize(9.0f);
 		SetFont(&font);
-		
+
 		SetViewColor(B_TRANSPARENT_COLOR);
 		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 		SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
 	}
-	
+
 	virtual BSize MinSize()
 	{
 		BString label(_GetLabel());
@@ -513,15 +513,15 @@ public:
 	virtual void Draw(BRect updateRect)
 	{
 		FillRect(updateRect, B_SOLID_LOW);
-		
+
 		BString label(_GetLabel());
-	
+
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
-		
+
 		BRect bounds(Bounds());
 		float width = StringWidth(label);
-		
+
 		BPoint offset;
 		offset.x = bounds.left + (bounds.Width() - width) / 2.0f;
 		offset.y = bounds.top + (bounds.Height()
@@ -576,7 +576,7 @@ PackageListView::PackageListView(BLocker* modelLock)
 		B_TRUNCATE_END), kStatusColumn);
 
 	SetSortingEnabled(true);
-	
+
 	fItemCountView = new ItemCountView();
 	AddStatusView(fItemCountView);
 }
@@ -617,7 +617,7 @@ PackageListView::MessageReceived(BMessage* message)
 			PackageRow* row = _FindRow(title);
 			if (row != NULL)
 				row->UpdateRating();
-			
+
 			break;
 		}
 
@@ -632,13 +632,13 @@ void
 PackageListView::SelectionChanged()
 {
 	BColumnListView::SelectionChanged();
-	
+
 	BMessage message(MSG_PACKAGE_SELECTED);
-	
+
 	PackageRow* selected = dynamic_cast<PackageRow*>(CurrentSelection());
 	if (selected != NULL)
 		message.AddString("title", selected->Package()->Title());
-	
+
 	Window()->PostMessage(&message);
 }
 

@@ -35,7 +35,7 @@ Bullet::operator=(const Bullet& other)
 {
 	if (this == &other)
 		return *this;
-	
+
 	fBulletData = other.fBulletData;
 	return *this;
 }

@@ -54,20 +54,20 @@ public:
 	{
 		BRect innerFrame = Bounds();
 		innerFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
-		
+
 		BView* target = Target();
 		if (target != NULL) {
 			Target()->MoveTo(innerFrame.left, innerFrame.top);
 			Target()->ResizeTo(innerFrame.Width(), innerFrame.Height());
 		}
-		
+
 		BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
 		if (scrollBar != NULL) {
 			BRect rect = innerFrame;
 			rect.left = rect.right + 1;
 			rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
 			rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	
+
 			scrollBar->MoveTo(rect.left, rect.top);
 			scrollBar->ResizeTo(rect.Width(), rect.Height());
 		}
@@ -86,7 +86,7 @@ public:
 	virtual void DoLayout()
 	{
 		CustomScrollView::DoLayout();
-		
+
 		BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
 		BView* target = Target();
 		if (target != NULL && scrollBar != NULL) {
@@ -108,14 +108,14 @@ public:
 		TextDocumentView(name)
 	{
 		CharacterStyle regularStyle;
-		
+
 		float fontSize = regularStyle.Font().Size();
-		
+
 		ParagraphStyle paragraphStyle;
 		paragraphStyle.SetJustify(true);
 		paragraphStyle.SetSpacingTop(ceilf(fontSize * 0.3f));
 		paragraphStyle.SetLineSpacing(ceilf(fontSize * 0.2f));
-		
+
 		fMarkupParser.SetStyles(regularStyle, paragraphStyle);
 	}
 
@@ -132,7 +132,7 @@ public:
 		document->Append(paragraph);
 
 		fMarkupParser.AppendMarkup(document, markupText);
-		
+
 		SetTextDocument(document);
 	}
 
@@ -152,7 +152,7 @@ public:
 		fHoverColor((rgb_color){ 1, 141, 211, 255 })
 	{
 	}
-	
+
 	virtual void MouseMoved(BPoint where, uint32 transit,
 		const BMessage* dragMessage)
 	{
@@ -193,7 +193,7 @@ public:
 		SetViewColor(B_TRANSPARENT_COLOR);
 		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	}
-	
+
 	virtual ~RatingView()
 	{
 	}
@@ -208,18 +208,18 @@ public:
 	virtual void Draw(BRect updateRect)
 	{
 		FillRect(updateRect, B_SOLID_LOW);
-		
+
 		if (fRating < 0.0f)
 			return;
-		
+
 		const BBitmap* star = fStarBitmap.Bitmap(SharedBitmap::SIZE_16);
 		if (star == NULL) {
 			fprintf(stderr, "No star icon found in application resources.\n");
 			return;
 		}
-		
+
 		SetDrawingMode(B_OP_OVER);
-		
+
 		float x = 0;
 		for (int i = 0; i < 5; i++) {
 			DrawBitmap(star, BPoint(x, 0));
@@ -230,14 +230,14 @@ public:
 			return;
 
 		SetDrawingMode(B_OP_OVER);
-		
+
 		BRect rect(Bounds());
 		rect.left = ceilf(rect.left + (fRating / 5.0f) * rect.Width());
-		
+
 		rgb_color color = LowColor();
 		color.alpha = 190;
 		SetHighColor(color);
-		
+
 		SetDrawingMode(B_OP_ALPHA);
 		FillRect(rect, B_SOLID_HIGH);
 	}
@@ -280,7 +280,7 @@ public:
 		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
 	}
-	
+
 	virtual ~DiagramBarView()
 	{
 	}
@@ -297,13 +297,13 @@ public:
 	virtual void Draw(BRect updateRect)
 	{
 		FillRect(updateRect, B_SOLID_LOW);
-		
+
 		if (fValue <= 0.0f)
 			return;
-		
+
 		BRect rect(Bounds());
 		rect.right = ceilf(rect.left + fValue * rect.Width());
-		
+
 		FillRect(rect, B_SOLID_HIGH);
 	}
 
@@ -411,10 +411,10 @@ public:
 			.Add(fVersionInfo)
 			.AddGlue(3.0f)
 		;
-	
+
 		Clear();
 	}
-	
+
 	virtual ~TitleView()
 	{
 	}
@@ -427,7 +427,7 @@ public:
 			fIconView->SetBitmap(NULL);
 
 		fTitleView->SetText(package.Title());
-		
+
 		BString publisher = B_TRANSLATE("by %Publisher%");
 		publisher.ReplaceAll("%Publisher%", package.Publisher().Name());
 		fPublisherView->SetText(publisher);
@@ -493,15 +493,15 @@ public:
 		fLayout(new BGroupLayout(B_HORIZONTAL))
 	{
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		
+
 		SetLayout(fLayout);
 	}
-	
+
 	virtual ~PackageActionView()
 	{
 		Clear();
 	}
-	
+
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
@@ -522,7 +522,7 @@ public:
 				}
 				break;
 			}
-			
+
 			default:
 				BView::MessageReceived(message);
 				break;
@@ -534,18 +534,18 @@ public:
 		Clear();
 
 		fPackageActions = fPackageManager->GetPackageActions(package);
-		
+
 		// Add Buttons in reverse action order
 		for (int32 i = fPackageActions.CountItems() - 1; i >= 0; i--) {
 			const PackageActionRef& action = fPackageActions.ItemAtFast(i);
-			
+
 			BMessage* message = new BMessage(MSG_PACKAGE_ACTION);
 			message->AddInt32("index", i);
-			
+
 			BButton* button = new BButton(action->Label(), message);
 			fLayout->AddView(button);
 			button->SetTarget(this);
-			
+
 			fButtons.AddItem(button);
 		}
 	}
@@ -562,7 +562,7 @@ public:
 
 private:
 	PackageManager*		fPackageManager;
-	
+
 	BGroupLayout*		fLayout;
 	PackageActionList	fPackageActions;
 	BList				fButtons;
@@ -588,18 +588,18 @@ public:
 	{
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint));
-		
+
 		fDescriptionView = new MarkupTextView("description view");
 		fDescriptionView->SetLowColor(ViewColor());
 		fDescriptionView->SetInsets(be_plain_font->Size());
-		
+
 		BScrollView* scrollView = new CustomScrollView(
 			"description scroll view", fDescriptionView);
-		
+
 		BFont smallFont;
 		GetFont(&smallFont);
 		smallFont.SetSize(std::max(9.0f, ceilf(smallFont.Size() * 0.85f)));
-		
+
 		// TODO: Clicking the screen shot view should open ShowImage with the
 		// the screen shot. This could be done by writing the screen shot to
 		// a temporary folder, launching ShowImage to display it, and writing
@@ -612,7 +612,7 @@ public:
 			BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 		fScreenshotView->SetExplicitAlignment(
 			BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
-		
+
 		fEmailIconView = new BitmapView("email icon view");
 		fEmailLinkView = new LinkView("email link view", "",
 			new BMessage(MSG_EMAIL_PUBLISHER), kLightBlack);
@@ -622,11 +622,11 @@ public:
 		fWebsiteLinkView = new LinkView("website link view", "",
 			new BMessage(MSG_VISIT_PUBLISHER_WEBSITE), kLightBlack);
 		fWebsiteLinkView->SetFont(&smallFont);
-		
+
 		BGroupView* leftGroup = new BGroupView(B_VERTICAL,
 			B_USE_DEFAULT_SPACING);
 		leftGroup->SetViewColor(ViewColor());
-		
+
 		BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0.0f)
 //			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
 			.AddGroup(leftGroup)
@@ -648,7 +648,7 @@ public:
 			.SetInsets(0.0f, -1.0f, -1.0f, -1.0f)
 		;
 	}
-	
+
 	virtual ~AboutView()
 	{
 		Clear();
@@ -719,7 +719,7 @@ public:
 				rating.User().Avatar()->Bitmap(SharedBitmap::SIZE_16));
 		}
 		fAvatarView->SetExplicitMinSize(BSize(16.0f, 16.0f));
-	
+
 		fNameView = new BStringView("user name", rating.User().NickName());
 		BFont nameFont(be_bold_font);
 		nameFont.SetSize(std::max(9.0f, floorf(nameFont.Size() * 0.9f)));
@@ -727,7 +727,7 @@ public:
 		fNameView->SetHighColor(kLightBlack);
 		fNameView->SetExplicitMaxSize(
 			BSize(nameFont.StringWidth("xxxxxxxxxxxxxxxxxxxxxx"), B_SIZE_UNSET));
-	
+
 		fRatingView = new RatingView();
 		fRatingView->SetRating(rating.Rating());
 
@@ -754,7 +754,7 @@ public:
 		fUpVoteCountView = new BStringView("up vote count", "");
 		fVoteDownIconView = new BitmapButton("vote down icon", voteDownMessage);
 		fDownVoteCountView = new BStringView("up vote count", "");
-		
+
 		fVoteUpIconView->SetBitmap(
 			voteUpIcon->Bitmap(SharedBitmap::SIZE_16));
 		fVoteDownIconView->SetBitmap(
@@ -842,7 +842,7 @@ protected:
 		BGroupView::DoLayout();
 		if (BScrollBar* scrollBar = ScrollBar(B_VERTICAL)) {
 			BRect layoutArea = GroupLayout()->LayoutArea();
-			float layoutHeight = layoutArea.Height();			
+			float layoutHeight = layoutArea.Height();
 			// Min size is not reliable with HasHeightForWidth() children,
 			// since it does not reflect how thos children are currently
 			// laid out, but what their theoretical minimum size would be.
@@ -874,13 +874,13 @@ public:
 	{
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint - 0.1));
-		
+
 		BLayoutBuilder::Grid<> layoutBuilder(this);
-		
+
 		BFont smallFont;
 		GetFont(&smallFont);
 		smallFont.SetSize(std::max(9.0f, floorf(smallFont.Size() * 0.85f)));
-		
+
 		for (int32 i = 0; i < 5; i++) {
 			BString label;
 			label.SetToFormat("%ld", 5 - i);
@@ -891,14 +891,14 @@ public:
 
 			fDiagramBarViews[i] = new DiagramBarView();
 			layoutBuilder.Add(fDiagramBarViews[i], 1, i);
-			
+
 			fCountViews[i] = new BStringView("", "");
 			fCountViews[i]->SetFont(&smallFont);
 			fCountViews[i]->SetHighColor(kLightBlack);
 			fCountViews[i]->SetAlignment(B_ALIGN_RIGHT);
 			layoutBuilder.Add(fCountViews[i], 2, i);
 		}
-		
+
 		layoutBuilder.SetInsets(5);
 	}
 
@@ -909,7 +909,7 @@ public:
 			BString label;
 			label.SetToFormat("%ld", count);
 			fCountViews[i]->SetText(label);
-			
+
 			if (summary.ratingCount > 0) {
 				fDiagramBarViews[i]->SetValue(
 					(float)count / summary.ratingCount);
@@ -942,15 +942,15 @@ public:
 	{
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint));
-		
+
 		fRatingSummaryView = new RatingSummaryView();
-		
+
 		RatingContainerView* ratingsContainerView = new RatingContainerView();
 		fRatingContainerLayout = ratingsContainerView->GroupLayout();
 
 		BScrollView* scrollView = new RatingsScrollView(
 			"ratings scroll view", ratingsContainerView);
-		
+
 		BLayoutBuilder::Group<>(this)
 			.AddGroup(B_VERTICAL)
 				.Add(fRatingSummaryView, 0.0f)
@@ -961,7 +961,7 @@ public:
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
 	}
-	
+
 	virtual ~UserRatingsView()
 	{
 		Clear();
@@ -975,10 +975,10 @@ public:
 		fRatingSummaryView->SetToSummary(package.CalculateRatingSummary());
 
 		const UserRatingList& userRatings = package.UserRatings();
-		
+
 		// TODO: Sort by age or usefullness rating
 		// TODO: Optionally hide ratings that are not in the system language
-		
+
 		for (int i = userRatings.CountItems() - 1; i >= 0; i--) {
 			const UserRating& rating = userRatings.ItemAtFast(i);
 			RatingItemView* view = new RatingItemView(rating, fThumbsUpIcon,
@@ -1026,23 +1026,23 @@ public:
 	{
 		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			kContentTint));
-		
+
 		SetLayout(fLayout);
 
 		fTextView = new MarkupTextView("changelog view");
 		fTextView->SetLowColor(ViewColor());
 		fTextView->SetInsets(be_plain_font->Size());
-		
+
 		BScrollView* scrollView = new CustomScrollView(
 			"changelog scroll view", fTextView);
-		
+
 		BLayoutBuilder::Group<>(fLayout)
 			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
 			.Add(scrollView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
 	}
-	
+
 	virtual ~ChangelogView()
 	{
 	}
@@ -1078,7 +1078,7 @@ public:
 		fLayout(new BCardLayout())
 	{
 		SetBorder(B_NO_BORDER);
-		
+
 		fAboutView = new AboutView();
 		fUserRatingsView = new UserRatingsView();
 		fChangelogView = new ChangelogView();
@@ -1086,14 +1086,14 @@ public:
 		AddTab(fAboutView);
 		AddTab(fUserRatingsView);
 		AddTab(fChangelogView);
-		
+
 		TabAt(0)->SetLabel(B_TRANSLATE("About"));
 		TabAt(1)->SetLabel(B_TRANSLATE("Ratings"));
 		TabAt(2)->SetLabel(B_TRANSLATE("Changelog"));
 
 		Select(0);
 	}
-	
+
 	virtual ~PagesView()
 	{
 		Clear();
@@ -1116,7 +1116,7 @@ public:
 
 private:
 	BCardLayout*		fLayout;
-	
+
 	AboutView*			fAboutView;
 	UserRatingsView*	fUserRatingsView;
 	ChangelogView*		fChangelogView;
@@ -1150,11 +1150,11 @@ public:
 			return;
 
 		const PackageInfo& package = *event.Package().Get();
-		
+
 		BMessage message(MSG_UPDATE_PACKAGE);
 		message.AddString("title", package.Title());
 		message.AddUInt32("changes", event.Changes());
-		
+
 		messenger.SendMessage(&message);
 	}
 
@@ -1246,9 +1246,9 @@ PackageInfoView::MessageReceived(BMessage* message)
 			const PackageInfo& package = *fPackageListener->Package().Get();
 			if (package.Title() != title)
 				break;
-			
+
 			BAutolock _(fModelLock);
-			
+
 			if ((changes & PKG_CHANGED_DESCRIPTION) != 0
 				|| (changes & PKG_CHANGED_SCREENSHOTS) != 0) {
 				fTitleView->SetPackage(package);
@@ -1271,13 +1271,13 @@ void
 PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 {
 	BAutolock _(fModelLock);
-	
+
 	const PackageInfo& package = *packageRef.Get();
-	
+
 	fTitleView->SetPackage(package);
 	fPackageActionView->SetPackage(package);
 	fPagesView->SetPackage(package);
-	
+
 	if (fPagesView->IsHidden(fPagesView))
 		fPagesView->Show();
 

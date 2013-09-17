@@ -88,19 +88,19 @@ private:
 
 private:
 			BFont				fFont;
-		
+
 			// The following three values override glyph metrics unless -1
 			float				fAscent;
 			float				fDescent;
 			float				fWidth;
 
 			float				fGlyphSpacing;
-		
+
 			rgb_color			fFgColor;
 			rgb_color			fBgColor;
 			rgb_color			fStrikeOutColor;
 			rgb_color			fUnderlineColor;
-		
+
 			uint8				fStrikeOutStyle;
 			uint8				fUnderlineStyle;
 };

@@ -34,7 +34,7 @@ public:
 private:
 			void				_BuildMenu(BMenuBar* menuBar);
 			void				_AdoptModel();
-			
+
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();
 

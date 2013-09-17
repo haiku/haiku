@@ -35,7 +35,7 @@ public:
 		lineIndex(lineIndex)
 	{
 	}
-	
+
 	GlyphInfo(const GlyphInfo& other)
 		:
 		charCode(other.charCode),
@@ -94,7 +94,7 @@ public:
 		layoutedSpans()
 	{
 	}
-	
+
 	LineInfo(int32 textOffset, float y, float height, float maxAscent,
 		float maxDescent)
 		:
@@ -108,7 +108,7 @@ public:
 		layoutedSpans()
 	{
 	}
-	
+
 	LineInfo(const LineInfo& other)
 		:
 		textOffset(other.textOffset),

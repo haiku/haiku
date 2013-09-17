@@ -81,7 +81,7 @@ FilterView::FilterView(const Model& model)
 		B_TRANSLATE("Search terms:"), "", NULL);
 	fSearchTermsText->SetModificationMessage(
 		new BMessage(MSG_SEARCH_TERMS_MODIFIED));
-	
+
 	BSize minSearchSize = fSearchTermsText->MinSize();
 	float minSearchWidth
 		= be_plain_font->StringWidth(fSearchTermsText->Label())
@@ -91,14 +91,14 @@ FilterView::FilterView(const Model& model)
 	fSearchTermsText->SetExplicitMinSize(minSearchSize);
 	float maxSearchWidth = minSearchWidth * 2;
 	fSearchTermsText->SetExplicitMaxSize(BSize(maxSearchWidth, B_SIZE_UNSET));
-	
+
 	// Build layout
 	BLayoutBuilder::Group<>(this)
 		.Add(fShowField, 0.0f)
 		.Add(fRepositoryField, 0.0f)
 		.AddGlue(0.5f)
 		.Add(fSearchTermsText, 1.0f)
-		
+
 		.SetInsets(B_USE_DEFAULT_SPACING)
 	;
 }
@@ -129,7 +129,7 @@ FilterView::MessageReceived(BMessage* message)
 			Window()->PostMessage(&searchTerms);
 			break;
 		}
-		
+
 		default:
 			BGroupView::MessageReceived(message);
 			break;

@@ -32,7 +32,7 @@ public:
 	virtual void				SelectionChanged();
 
 			void				AddPackage(const PackageInfoRef& package);
-			
+
 private:
 			PackageRow*			_FindRow(const PackageInfoRef& package,
 									PackageRow* parent = NULL);
@@ -42,7 +42,7 @@ private:
 private:
 			class ItemCountView;
 
-			BLocker*			fModelLock;			
+			BLocker*			fModelLock;
 			ItemCountView*		fItemCountView;
 			PackageListener*	fPackageListener;
 };

@@ -44,7 +44,7 @@ public:
 	{
 		return B_TRANSLATE("Install");
 	}
-	
+
 	virtual status_t Perform()
 	{
 		// TODO: Trigger asynchronous installation of the package

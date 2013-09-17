@@ -38,13 +38,13 @@ MainWindow::MainWindow(BRect frame)
 
 	BMenuBar* menuBar = new BMenuBar(B_TRANSLATE("Main Menu"));
 	_BuildMenu(menuBar);
-	
+
 	fFilterView = new FilterView(fModel);
 	fPackageListView = new PackageListView(fModel.Lock());
 	fPackageInfoView = new PackageInfoView(fModel.Lock(), &fPackageManager);
-	
+
 	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
-	
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.Add(menuBar)
 		.Add(fFilterView)
@@ -77,7 +77,7 @@ MainWindow::QuitRequested()
 	BMessage message(MSG_MAIN_WINDOW_CLOSED);
 	message.AddRect("window frame", Frame());
 	be_app->PostMessage(&message);
-	
+
 	return true;
 }
 
@@ -109,7 +109,7 @@ MainWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-		
+
 		case MSG_CATEGORY_SELECTED:
 		{
 			BString name;
@@ -119,7 +119,7 @@ MainWindow::MessageReceived(BMessage* message)
 			_AdoptModel();
 			break;
 		}
-		
+
 		case MSG_DEPOT_SELECTED:
 		{
 			BString name;
@@ -129,7 +129,7 @@ MainWindow::MessageReceived(BMessage* message)
 			_AdoptModel();
 			break;
 		}
-		
+
 		case MSG_SEARCH_TERMS_MODIFIED:
 		{
 			// TODO: Do this with a delay!
@@ -139,7 +139,7 @@ MainWindow::MessageReceived(BMessage* message)
 			fModel.SetSearchTerms(searchTerms);
 			_AdoptModel();
 		}
-		
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -160,7 +160,7 @@ void
 MainWindow::_AdoptModel()
 {
 	fVisiblePackages = fModel.CreatePackageList();
-	
+
 	fPackageListView->Clear();
 	for (int32 i = 0; i < fVisiblePackages.CountItems(); i++) {
 		BAutolock _(fModel.Lock());
@@ -193,7 +193,7 @@ MainWindow::_InitDummyModel()
 	// for display, extra information is retrieved like screen-shots, user-
 	// ratings and so on. This triggers notifications which in turn updates
 	// the UI.
-	
+
 	DepotInfo depot(B_TRANSLATE("Default"));
 
 	// WonderBrush
@@ -213,7 +213,7 @@ MainWindow::_InitDummyModel()
 		"2.1.2 - Initial Haiku release."), true);
 	wonderbrush->AddCategory(fModel.CategoryGraphics());
 	wonderbrush->AddCategory(fModel.CategoryProductivity());
-	
+
 	depot.AddPackage(wonderbrush);
 
 	// Paladin
@@ -252,7 +252,7 @@ MainWindow::_InitDummyModel()
 		"and play back music from your computer. Sequitur is designed for "
 		"people who like to tinker with their music. It facilitates rapid, "
 		"dynamic, and radical processing of your performance.",
-		
+
 		"== Sequitur 2.1 Release Notes ==\n"
 		"04 August 2002\n\n"
 		"Features\n\n"
@@ -303,7 +303,7 @@ MainWindow::_InitDummyModel()
 		" * ''Note to filter developers:'' The filter API has changed. You "
 		"will need to recompile your filters."), true);
 	sequitur->AddCategory(fModel.CategoryAudio());
-	
+
 	depot.AddPackage(sequitur);
 
 	// Finish off
