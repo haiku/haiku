@@ -195,7 +195,8 @@ private:
 		pae_page_table_entry* paeEntry = paeTable;
 		for (uint32 i = 0; i < kPAEPageTableEntryCount;
 				i++, entry++, paeEntry++) {
-			if ((*entry & X86_PTE_PRESENT) != 0) {
+			if ((*entry & X86_PTE_PRESENT) != 0
+				&& _IsVirtualAddressAllocated(virtualBase + i * B_PAGE_SIZE)) {
 				// Note, we use the fact that the PAE flags are defined to the
 				// same values.
 				*paeEntry = *entry & (X86_PTE_PRESENT
@@ -309,6 +310,20 @@ private:
 			memset(page, 0, B_PAGE_SIZE);
 
 		return page;
+	}
+
+	bool _IsVirtualAddressAllocated(addr_t address) const
+	{
+		for (uint32 i = 0; i < fKernelArgs->num_virtual_allocated_ranges; i++) {
+			addr_t start = fKernelArgs->virtual_allocated_range[i].start;
+			addr_t end = start + fKernelArgs->virtual_allocated_range[i].size;
+			if (address < start)
+				return false;
+			if (address <= end - 1)
+				return true;
+		}
+
+		return false;
 	}
 
 private:
