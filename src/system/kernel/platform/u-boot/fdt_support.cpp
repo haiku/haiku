@@ -69,7 +69,7 @@ void dump_fdt(const void *fdt)
 	int err;
 
 	dprintf("FDT @ %p:\n", fdt);
-	
+
 	if (!fdt)
 		return;
 

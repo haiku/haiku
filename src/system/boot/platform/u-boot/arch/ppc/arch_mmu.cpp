@@ -64,11 +64,11 @@
 	 0x01900000			boot.tgz (= ramdisk)
 	 0x02000000			boot loader uimage
 
-	  
-	 					boot loader heap (should be discarded later on)
-	 ... 256M-Kstack	page hash table
+
+					boot loader heap (should be discarded later on)
+	 ... 256M-Kstack		page hash table
 	 ... 256M			kernel stack
-						kernel stack guard page
+					kernel stack guard page
 
 	The kernel is mapped at KERNEL_BASE, all other stuff mapped by the
 	loader (kernel args, modules, driver settings, ...) comes after

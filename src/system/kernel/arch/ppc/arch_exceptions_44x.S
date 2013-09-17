@@ -287,7 +287,7 @@ __44x_save_regs:
 	stwu	%r0, -4(%r1)		/* push r3 */
 
 	/* push r4-r31 */
-	stwu	%r4, -4(%r1)		
+	stwu	%r4, -4(%r1)
 	stwu	%r5, -4(%r1)
 	stwu	%r6, -4(%r1)
 	stwu	%r7, -4(%r1)
@@ -393,7 +393,7 @@ __44x_restore_regs_and_rfi:
 	lwzu	%r5, 4(%r1)
 	lwzu	%r4, 4(%r1)
 	lwzu	%r3, 4(%r1)
-	
+
 	/* Stop here, before we overwrite r1, and continue with the floating point
 	   registers first. */
 	addi	%r2, %r1, 16		/* skip r3-r0 */
