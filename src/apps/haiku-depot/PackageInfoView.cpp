@@ -766,9 +766,9 @@ public:
 		fDownVoteCountView->SetHighColor(kLightBlack);
 
 		BString voteCountLabel;
-		voteCountLabel.SetToFormat("%ld", rating.UpVotes());
+		voteCountLabel.SetToFormat("%" B_PRId32, rating.UpVotes());
 		fUpVoteCountView->SetText(voteCountLabel);
-		voteCountLabel.SetToFormat("%ld", rating.DownVotes());
+		voteCountLabel.SetToFormat("%" B_PRId32, rating.DownVotes());
 		fDownVoteCountView->SetText(voteCountLabel);
 
 		fTextView = new TextView("rating text");
@@ -883,7 +883,7 @@ public:
 
 		for (int32 i = 0; i < 5; i++) {
 			BString label;
-			label.SetToFormat("%ld", 5 - i);
+			label.SetToFormat("%" B_PRId32, 5 - i);
 			fLabelViews[i] = new BStringView("", label);
 			fLabelViews[i]->SetFont(&smallFont);
 			fLabelViews[i]->SetHighColor(kLightBlack);
@@ -904,10 +904,10 @@ public:
 
 	void SetToSummary(const RatingSummary& summary) {
 		for (int32 i = 0; i < 5; i++) {
-			int count = summary.ratingCountByStar[4 - i];
+			int32 count = summary.ratingCountByStar[4 - i];
 
 			BString label;
-			label.SetToFormat("%ld", count);
+			label.SetToFormat("%" B_PRId32, count);
 			fCountViews[i]->SetText(label);
 
 			if (summary.ratingCount > 0) {
