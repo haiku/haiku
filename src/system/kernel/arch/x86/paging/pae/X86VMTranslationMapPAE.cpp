@@ -227,8 +227,8 @@ X86VMTranslationMapPAE::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 		+ virtualAddress / B_PAGE_SIZE % kPAEPageTableEntryCount;
 
 	ASSERT_PRINT((*entry & X86_PAE_PTE_PRESENT) == 0,
-		"virtual address: %#" B_PRIxADDR ", existing pte: %#" B_PRIx64,
-		virtualAddress, *entry);
+		"virtual address: %#" B_PRIxADDR ", existing pte: %#" B_PRIx64 " @ %p",
+		virtualAddress, *entry, entry);
 
 	X86PagingMethodPAE::PutPageTableEntryInTable(entry, physicalAddress,
 		attributes, memoryType, fIsKernelMap);
