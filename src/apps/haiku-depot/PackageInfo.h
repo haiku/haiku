@@ -10,6 +10,7 @@
 #include <String.h>
 
 #include "List.h"
+#include "PackageInfoListener.h"
 
 
 class BBitmap;
@@ -181,7 +182,10 @@ typedef BReference<PackageCategory> CategoryRef;
 typedef List<CategoryRef, false> CategoryList;
 
 
-class PackageInfo {
+typedef List<PackageInfoListenerRef, false, 2> PackageListenerList;
+
+
+class PackageInfo : public BReferenceable {
 public:
 								PackageInfo();
 								PackageInfo(const BitmapRef& icon,
@@ -225,6 +229,14 @@ public:
 			const BitmapList&	Screenshots() const
 									{ return fScreenshots; }
 
+			bool				AddListener(
+									const PackageInfoListenerRef& listener);
+			void				RemoveListener(
+									const PackageInfoListenerRef& listener);
+
+private:
+			void				_NotifyListeners(uint32 changes);
+
 private:
 			BitmapRef			fIcon;
 			BString				fTitle;
@@ -236,10 +248,14 @@ private:
 			CategoryList		fCategories;
 			UserRatingList		fUserRatings;
 			BitmapList			fScreenshots;
+			PackageListenerList	fListeners;
 };
 
 
-typedef List<PackageInfo, false> PackageList;
+typedef BReference<PackageInfo> PackageInfoRef;
+
+
+typedef List<PackageInfoRef, false> PackageList;
 
 
 enum PackageState {
@@ -266,7 +282,7 @@ public:
 			const PackageList&	Packages() const
 									{ return fPackages; }
 
-			bool				AddPackage(const PackageInfo& package);
+			bool				AddPackage(const PackageInfoRef& package);
 
 private:
 			BString				fName;

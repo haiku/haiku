@@ -31,7 +31,10 @@
 
 
 #define NORFLASH_ADDR	0x00000000
+#define SIZE_IN_BLOCKS	256
 
+/* Hide the start of NOR since U-Boot lives there */
+#define HIDDEN_BLOCKS	2
 
 struct nor_driver_info {
 	device_node *node;
@@ -54,7 +57,7 @@ nor_init_device(void *_info, void **_cookie)
 
 	info->mapped = NULL;
 	info->blocksize = 128 * 1024;
-	info->totalsize = info->blocksize * 256;
+	info->totalsize = (SIZE_IN_BLOCKS - HIDDEN_BLOCKS) * info->blocksize;
 
 	info->id = map_physical_memory("NORFlash", NORFLASH_ADDR, info->totalsize, B_ANY_KERNEL_ADDRESS, B_READ_AREA, &info->mapped);
 	if (info->id < 0)
@@ -139,6 +142,8 @@ nor_read(void *_cookie, off_t position, void *data, size_t *numbytes)
 	nor_driver_info *info = (nor_driver_info*)_cookie;
 	TRACE("read(%Ld,%lu)\n", position, *numbytes);
 
+	position += HIDDEN_BLOCKS * info->blocksize;
+
 	if (position + *numbytes > info->totalsize)
 		*numbytes = info->totalsize - (position + *numbytes);
 
@@ -160,8 +165,16 @@ nor_write(void *_cookie, off_t position, const void *data, size_t *numbytes)
 static float
 nor_supports_device(device_node *parent)
 {
+	const char *bus;
 	TRACE("supports_device\n");
-	return 0.6;
+
+	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+		return B_ERROR;
+
+	if (strcmp(bus, "generic"))
+		return 0.0;
+
+	return 1.0;
 }
 
 

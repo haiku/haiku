@@ -135,6 +135,8 @@ public:
 			bool 				IsExpanded() const;
 			bool				IsSelected() const;
 
+			void				Invalidate();
+
 private:
 	// Blows up into the debugger if the validation fails.
 			void				ValidateFields() const;
@@ -331,6 +333,8 @@ public:
 			bool				SwapRows(int32 index1, int32 index2, BRow*
 									parentRow1 = NULL, BRow* parentRow2 = NULL);
 			void				Clear();
+
+			void				InvalidateRow(BRow* row);
 
 	// Appearance (DEPRECATED)
 			void				GetFont(BFont* font) const

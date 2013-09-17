@@ -12,3 +12,5 @@ resource(5, "META:EXTENS") message(234) {
 	"extensions" = "MP3",
 	"type" = "audio/mpeg"
 };
+
+resource(6, "META:SNIFF_RULE") "0.50 (0xfffb|0xfffa|\"ID3\")";

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ScreenSaver	3630119516
+1	belarusian	x-vnd.Haiku-ScreenSaver	232492478
 Could not load screen saver	ScreenSaver		Не ўдалося загрузіць захавальнік экрана
 30 seconds	ScreenSaver		30 секунд
 Start screensaver	ScreenSaver		Запусціць захавальнік
@@ -11,7 +11,9 @@ Display Power Management Signaling not available	ScreenSaver		Кіраванне
 ScreenSaver	System name		Захавальнік Экрана
 Test	ScreenSaver		Тэст
 General	ScreenSaver		Агульныя
+Fade now when mouse is here	ScreenSaver		Зацямняць перасунуўшы указальнік мышы сюды
 Enable screensaver	ScreenSaver		Уключыць захавальнік
+Don't fade when mouse is here	ScreenSaver		Не зацямняць калі указальнік мышы знаходзіцца тут
 Cancel	ScreenSaver		Адмена
 Turn off screen	ScreenSaver		Выключыць экран
 No options available	ScreenSaver		Ніякія опцыі недаступныя

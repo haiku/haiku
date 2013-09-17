@@ -11,19 +11,29 @@
 #include <stdio.h>
 
 #include <ByteOrder.h>
+#include <Clipboard.h>
 #include <Looper.h>
+#include <MenuItem.h>
+#include <MessageRunner.h>
 #include <Messenger.h>
+#include <PopUpMenu.h>
+#include <Region.h>
 #include <ScrollView.h>
 #include <String.h>
 
 #include "Architecture.h"
+#include "AutoDeleter.h"
+#include "MessageCodes.h"
 #include "Team.h"
 #include "TeamMemoryBlock.h"
 
 
 enum {
-	MSG_TARGET_ADDRESS_CHANGED = 'mtac'
+	MSG_TARGET_ADDRESS_CHANGED = 'mtac',
+	MSG_VIEW_AUTOSCROLL			= 'mvas'
 };
+
+static const bigtime_t kScrollTimer = 10000LL;
 
 
 MemoryView::MemoryView(::Team* team, Listener* listener)
@@ -39,6 +49,10 @@ MemoryView::MemoryView(::Team* team, Listener* listener)
 	fHexBlocksPerLine(0),
 	fHexMode(HexMode8BitInt),
 	fTextMode(TextModeASCII),
+	fSelectionBase(0),
+	fSelectionStart(0),
+	fSelectionEnd(0),
+	fScrollRunner(NULL),
 	fListener(listener)
 {
 	Architecture* architecture = team->GetArchitecture();
@@ -76,11 +90,14 @@ void
 MemoryView::SetTargetAddress(TeamMemoryBlock* block, target_addr_t address)
 {
 	fTargetAddress = address;
-	if (fTargetBlock != NULL)
+	if (block != fTargetBlock && fTargetBlock != NULL)
 		fTargetBlock->ReleaseReference();
 
-	fTargetBlock = block;
-	fTargetBlock->AcquireReference();
+	if (block != fTargetBlock) {
+		fTargetBlock = block;
+		fTargetBlock->AcquireReference();
+	}
+
 	MakeFocus(true);
 	BMessenger(this).SendMessage(MSG_TARGET_ADDRESS_CHANGED);
 }
@@ -119,7 +136,7 @@ MemoryView::Draw(BRect rect)
 	if (fTargetBlock == NULL)
 		return;
 
-	uint32 hexBlockSize = (1 << fHexMode) + 1;
+	uint32 hexBlockSize = _GetHexDigitsPerBlock() + 1;
 	uint32 blockByteSize = hexBlockSize / 2;
 	if (fHexMode != HexModeNone && fTextMode != TextModeNone) {
 		divider += (fHexBlocksPerLine * hexBlockSize + 1) * fCharWidth;
@@ -156,7 +173,6 @@ MemoryView::Draw(BRect rect)
 		DrawString(buffer, drawPoint);
 		drawPoint.x += fCharWidth * (fTargetAddressSize + 2);
 		PopState();
-
 		if (fHexMode != HexModeNone) {
 			if (currentAddress + (currentBlocksPerLine * blockByteSize)
 				> maxAddress) {
@@ -168,20 +184,15 @@ MemoryView::Draw(BRect rect)
 			for (int32 j = 0; j < currentBlocksPerLine; j++) {
 				const char* blockAddress = currentAddress + (j
 					* blockByteSize);
-				_GetNextHexBlock(buffer,
-					std::min((size_t)hexBlockSize, sizeof(buffer)),
-					blockAddress);
-				DrawString(buffer, drawPoint);
+				_GetNextHexBlock(buffer, sizeof(buffer), blockAddress);
 				if (targetAddress >= blockAddress && targetAddress <
-					blockAddress + blockByteSize) {
+						blockAddress + blockByteSize) {
 					PushState();
-					SetHighColor(B_TRANSPARENT_COLOR);
-					SetDrawingMode(B_OP_INVERT);
-					FillRect(BRect(drawPoint.x, drawPoint.y - fh.ascent,
-						drawPoint.x + (hexBlockSize - 1) * fCharWidth,
-						drawPoint.y + fh.descent));
+					SetHighColor(make_color(216,0,0));
+					DrawString(buffer, drawPoint);
 					PopState();
-				}
+				} else
+					DrawString(buffer, drawPoint);
 
 				drawPoint.x += fCharWidth * hexBlockSize;
 			}
@@ -190,6 +201,7 @@ MemoryView::Draw(BRect rect)
 				drawPoint.x += fCharWidth * hexBlockSize
 					* (fHexBlocksPerLine - currentBlocksPerLine);
 		}
+
 		if (fTextMode != TextModeNone) {
 			drawPoint.x += fCharWidth;
 			for (int32 j = 0; j < currentCharsPerLine; j++) {
@@ -225,6 +237,15 @@ MemoryView::Draw(BRect rect)
 			currentAddress += fTextCharsPerLine;
 			lineAddress += fTextCharsPerLine;
 		}
+	}
+
+	if (fSelectionStart != fSelectionEnd) {
+		PushState();
+		BRegion selectionRegion;
+		_GetSelectionRegion(selectionRegion);
+		SetDrawingMode(B_OP_INVERT);
+		FillRegion(&selectionRegion, B_SOLID_HIGH);
+		PopState();
 	}
 }
 
@@ -332,6 +353,11 @@ void
 MemoryView::MessageReceived(BMessage* message)
 {
 	switch(message->what) {
+		case B_COPY:
+		{
+			_CopySelectionToClipboard();
+			break;
+		}
 		case MSG_TARGET_ADDRESS_CHANGED:
 		{
 			_RecalcScrollBars();
@@ -370,6 +396,11 @@ MemoryView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case MSG_VIEW_AUTOSCROLL:
+		{
+			_HandleAutoScroll();
+			break;
+		}
 		default:
 		{
 			BView::MessageReceived(message);
@@ -385,7 +416,78 @@ MemoryView::MouseDown(BPoint point)
 	if (!IsFocus())
 		MakeFocus(true);
 
-	BView::MouseDown(point);
+	if (fTargetBlock == NULL)
+		return;
+
+	int32 buttons;
+	if (Looper()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK)
+		buttons = B_PRIMARY_MOUSE_BUTTON;
+
+	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
+		_HandleContextMenu(point);
+		return;
+	}
+
+	int32 offset = _GetOffsetAt(point);
+	if (offset < fSelectionStart || offset > fSelectionEnd) {
+		BRegion oldSelectionRegion;
+		_GetSelectionRegion(oldSelectionRegion);
+		fSelectionBase = offset;
+		fSelectionStart = fSelectionBase;
+		fSelectionEnd = fSelectionBase;
+		Invalidate(oldSelectionRegion.Frame());
+	}
+
+	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+	fTrackingMouse = true;
+}
+
+
+void
+MemoryView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
+{
+	if (!fTrackingMouse)
+		return;
+
+	BRegion oldSelectionRegion;
+	_GetSelectionRegion(oldSelectionRegion);
+	int32 offset = _GetOffsetAt(point);
+	if (offset < fSelectionBase) {
+		fSelectionStart = offset;
+		fSelectionEnd = fSelectionBase;
+	} else {
+		fSelectionStart = fSelectionBase;
+		fSelectionEnd = offset;
+	}
+
+	BRegion region;
+	_GetSelectionRegion(region);
+	region.Include(&oldSelectionRegion);
+	Invalidate(region.Frame());
+
+	switch (transit) {
+		case B_EXITED_VIEW:
+			fScrollRunner = new BMessageRunner(BMessenger(this),
+				new BMessage(MSG_VIEW_AUTOSCROLL), kScrollTimer);
+			break;
+
+		case B_ENTERED_VIEW:
+			delete fScrollRunner;
+			fScrollRunner = NULL;
+			break;
+
+		default:
+			break;
+	}
+}
+
+
+void
+MemoryView::MouseUp(BPoint point)
+{
+	fTrackingMouse = false;
+	delete fScrollRunner;
+	fScrollRunner = NULL;
 }
 
 
@@ -395,10 +497,12 @@ MemoryView::ScrollToSelection()
 	if (fTargetBlock != NULL) {
 		target_addr_t offset = fTargetAddress - fTargetBlock->BaseAddress();
 		int32 lineNumber = 0;
-		if (fHexBlocksPerLine > 0)
-			lineNumber = offset / (fHexBlocksPerLine * (1 << (fHexMode - 1)));
-		else if (fTextCharsPerLine > 0)
+		if (fHexBlocksPerLine > 0) {
+			lineNumber = offset / (fHexBlocksPerLine
+				* (_GetHexDigitsPerBlock() / 2));
+		} else if (fTextCharsPerLine > 0)
 			lineNumber = offset / fTextCharsPerLine;
+
 		float y = lineNumber * fLineHeight;
 		if (y < Bounds().top)
 			ScrollTo(0.0, y);
@@ -429,40 +533,23 @@ MemoryView::_RecalcScrollBars()
 	float max = 0.0;
 	BScrollBar *scrollBar = ScrollBar(B_VERTICAL);
 	if (fTargetBlock != NULL) {
-		BRect bounds = Bounds();
-		// the left portion of the view is off limits since it
-		// houses the address offset of the current line
-		float baseWidth = bounds.Width() - ((fTargetAddressSize + 2)
-			* fCharWidth);
-		float hexWidth = 0.0;
-		float textWidth = 0.0;
-		int32 hexDigits = 1 << fHexMode;
+		int32 hexDigits = _GetHexDigitsPerBlock();
 		int32 sizeFactor = 1 + hexDigits;
-		if (fHexMode != HexModeNone) {
-			if (fTextMode != TextModeNone) {
-				float hexProportion = sizeFactor / (float)(sizeFactor
-					+ hexDigits / 2);
-				hexWidth = baseWidth * hexProportion;
-				// when sharing the display between hex and text,
-				// we allocate a 2 character space to separate the views
-				hexWidth -= 2 * fCharWidth;
-				textWidth = baseWidth - hexWidth;
-			} else
-				hexWidth = baseWidth;
-		} else if (fTextMode != TextModeNone)
-			textWidth = baseWidth;
+		_RecalcBounds();
 
+		float hexWidth = fHexRight - fHexLeft;
 		int32 nybblesPerLine = int32(hexWidth / fCharWidth);
 		fHexBlocksPerLine = 0;
 		fTextCharsPerLine = 0;
 		if (fHexMode != HexModeNone) {
 			fHexBlocksPerLine = nybblesPerLine / sizeFactor;
 			fHexBlocksPerLine &= ~1;
+			fHexRight = fHexLeft + (fHexBlocksPerLine * sizeFactor
+				* fCharWidth);
 			if (fTextMode != TextModeNone)
 				fTextCharsPerLine = fHexBlocksPerLine * hexDigits / 2;
 		} else if (fTextMode != TextModeNone)
-			fTextCharsPerLine = int32(textWidth / fCharWidth);
-
+			fTextCharsPerLine = int32((fTextRight - fTextLeft) / fCharWidth);
 		int32 lineCount = 0;
 		float totalHeight = 0.0;
 		if (fHexBlocksPerLine > 0) {
@@ -473,6 +560,7 @@ MemoryView::_RecalcScrollBars()
 
 		totalHeight = lineCount * fLineHeight;
 		if (totalHeight > 0.0) {
+			BRect bounds = Bounds();
 			max = totalHeight - bounds.Height();
 			scrollBar->SetProportion(bounds.Height() / totalHeight);
 			scrollBar->SetSteps(fLineHeight, bounds.Height());
@@ -488,7 +576,8 @@ MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
 	switch(fHexMode) {
 		case HexMode8BitInt:
 		{
-			snprintf(buffer, bufferSize, "%02" B_PRIx8, *address);
+			snprintf(buffer, bufferSize, "%02" B_PRIx8,
+				*((const uint8*)address));
 			break;
 		}
 		case HexMode16BitInt:
@@ -555,6 +644,290 @@ MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
 			break;
 		}
 	}
+}
+
+
+int32
+MemoryView::_GetOffsetAt(BPoint point) const
+{
+	if (fTargetBlock == NULL)
+		return -1;
+
+	// TODO: support selection in the text region as well
+	if (fHexMode == HexModeNone)
+		return -1;
+
+	int32 lineNumber = int32(point.y / fLineHeight);
+	int32 charsPerBlock = _GetHexDigitsPerBlock() / 2;
+	int32 totalHexBlocks = fTargetBlock->Size() / charsPerBlock;
+	int32 lineCount = totalHexBlocks / fHexBlocksPerLine;
+
+	if (lineNumber >= lineCount)
+		return -1;
+
+	point.x -= fHexLeft;
+	if (point.x < 0)
+		point.x = 0;
+	else if (point.x > fHexRight)
+		point.x = fHexRight;
+
+	float blockWidth = (charsPerBlock * 2 + 1) * fCharWidth;
+	int32 containingBlock = int32(floor(point.x / blockWidth));
+
+	return fHexBlocksPerLine * charsPerBlock * lineNumber
+		+ containingBlock * charsPerBlock;
+}
+
+
+BPoint
+MemoryView::_GetPointForOffset(int32 offset) const
+{
+	BPoint point;
+	int32 bytesPerLine = fHexBlocksPerLine * _GetHexDigitsPerBlock() / 2;
+	int32 line = offset / bytesPerLine;
+	int32 lineOffset = offset % bytesPerLine;
+
+	point.x = fHexLeft + (lineOffset * 2 * fCharWidth)
+			+ (lineOffset * 2 * fCharWidth / _GetHexDigitsPerBlock());
+	point.y = line * fLineHeight;
+
+	return point;
+}
+
+
+void
+MemoryView::_RecalcBounds()
+{
+	fHexLeft = 0;
+	fHexRight = 0;
+	fTextLeft = 0;
+	fTextRight = 0;
+
+	// the left bound is determined by the space taken up by the actual
+	// displayed addresses.
+	float left = _GetAddressDisplayWidth();
+	float width = Bounds().Width() - left;
+
+	if (fHexMode != HexModeNone) {
+		int32 hexDigits = _GetHexDigitsPerBlock();
+		int32 sizeFactor = 1 + hexDigits;
+		if (fTextMode != TextModeNone) {
+			float hexProportion = sizeFactor / (float)(sizeFactor
+				+ hexDigits / 2);
+			float hexWidth = width * hexProportion;
+			fTextLeft = left + hexWidth;
+			fHexLeft = left;
+			// when sharing the display between hex and text,
+			// we allocate a 2 character space to separate the views
+			hexWidth -= 2 * fCharWidth;
+			fHexRight = left + hexWidth;
+		} else {
+			fHexLeft = left;
+			fHexRight = left + width;
+		}
+	} else if (fTextMode != TextModeNone) {
+		fTextLeft = left;
+		fTextRight = left + width;
+	}
+}
+
+
+float
+MemoryView::_GetAddressDisplayWidth() const
+{
+	return (fTargetAddressSize + 2) * fCharWidth;
+}
+
+
+void
+MemoryView::_GetSelectionRegion(BRegion& region)
+{
+	region.MakeEmpty();
+	BPoint startPoint = _GetPointForOffset(fSelectionStart);
+	BPoint endPoint = _GetPointForOffset(fSelectionEnd);
+
+	BRect rect;
+	if (startPoint.y == endPoint.y) {
+		// single line case
+		rect.left = startPoint.x;
+		rect.top = startPoint.y;
+		rect.right = endPoint.x;
+		rect.bottom = endPoint.y + fLineHeight;
+		region.Include(rect);
+	} else {
+		float currentLine = startPoint.y;
+
+		// first line
+		rect.left = startPoint.x;
+		rect.top = startPoint.y;
+		rect.right = fHexRight;
+		rect.bottom = startPoint.y + fLineHeight;
+		region.Include(rect);
+		currentLine += fLineHeight;
+
+		// middle region
+		if (currentLine < endPoint.y) {
+			rect.left = fHexLeft;
+			rect.top = currentLine;
+			rect.right = fHexRight;
+			rect.bottom = endPoint.y;
+			region.Include(rect);
+		}
+
+		rect.left = fHexLeft;
+		rect.top = endPoint.y;
+		rect.right = endPoint.x;
+		rect.bottom = endPoint.y + fLineHeight;
+		region.Include(rect);
+	}
+}
+
+
+void
+MemoryView::_GetSelectedText(BString& text)
+{
+	if (fSelectionStart == fSelectionEnd)
+		return;
+
+	text.Truncate(0);
+
+	char* data = (char *)fTargetBlock->Data() + fSelectionStart;
+	int16 blockSize = _GetHexDigitsPerBlock() / 2;
+	int32 count = (fSelectionEnd - fSelectionStart)
+		/ blockSize;
+
+	char buffer[32];
+	for (int32 i = 0; i < count; i++) {
+		_GetNextHexBlock(buffer, sizeof(buffer), data);
+		data += blockSize;
+		text << buffer;
+		if (i < count - 1)
+			text << " ";
+	}
+}
+
+
+void
+MemoryView::_CopySelectionToClipboard()
+{
+	BString text;
+	_GetSelectedText(text);
+
+	if (text.Length() > 0) {
+		be_clipboard->Lock();
+		be_clipboard->Data()->RemoveData("text/plain");
+		be_clipboard->Data()->AddData ("text/plain",
+			B_MIME_TYPE, text.String(), text.Length());
+		be_clipboard->Commit();
+		be_clipboard->Unlock();
+	}
+}
+
+
+void
+MemoryView::_HandleAutoScroll()
+{
+	BPoint point;
+	uint32 buttons;
+	GetMouse(&point, &buttons);
+	float difference = 0.0;
+	int factor = 0;
+	BRect visibleRect = Bounds();
+	if (point.y < visibleRect.top)
+		difference = point.y - visibleRect.top;
+	else if (point.y > visibleRect.bottom)
+		difference = point.y - visibleRect.bottom;
+	if (difference != 0.0) {
+		factor = (int)(ceilf(difference / fLineHeight));
+		_ScrollByLines(factor);
+	}
+
+	MouseMoved(point, B_OUTSIDE_VIEW, NULL);
+}
+
+
+void
+MemoryView::_ScrollByLines(int32 lineCount)
+{
+	BScrollBar* vertical = ScrollBar(B_VERTICAL);
+	if (vertical == NULL)
+		return;
+
+	float value = vertical->Value();
+	vertical->SetValue(value + fLineHeight * lineCount);
+}
+
+
+void
+MemoryView::_HandleContextMenu(BPoint point)
+{
+	int32 offset = _GetOffsetAt(point);
+	if (offset < fSelectionStart || offset > fSelectionEnd)
+		return;
+
+	BPopUpMenu* menu = new(std::nothrow) BPopUpMenu("Options");
+	if (menu == NULL)
+		return;
+
+	ObjectDeleter<BPopUpMenu> menuDeleter(menu);
+	ObjectDeleter<BMenuItem> itemDeleter;
+	ObjectDeleter<BMessage> messageDeleter;
+	BMessage* message = NULL;
+	BMenuItem* item = NULL;
+	if (fSelectionEnd - fSelectionStart == fTargetAddressSize / 2) {
+		BMessage* message = new(std::nothrow) BMessage(MSG_INSPECT_ADDRESS);
+		if (message == NULL)
+			return;
+
+		target_addr_t address;
+		if (fTargetAddressSize == 8)
+			address = *((uint32*)(fTargetBlock->Data() + fSelectionStart));
+		else
+			address = *((uint64*)(fTargetBlock->Data() + fSelectionStart));
+
+		if (fCurrentEndianMode == EndianModeBigEndian)
+			address = B_HOST_TO_BENDIAN_INT64(address);
+		else
+			address = B_HOST_TO_LENDIAN_INT64(address);
+
+		messageDeleter.SetTo(message);
+		message->AddUInt64("address", address);
+		BMenuItem* item = new(std::nothrow) BMenuItem("Inspect", message);
+		if (item == NULL)
+			return;
+
+		messageDeleter.Detach();
+		itemDeleter.SetTo(item);
+		if (!menu->AddItem(item))
+			return;
+
+		item->SetTarget(Looper());
+		itemDeleter.Detach();
+	}
+
+	message = new(std::nothrow) BMessage(B_COPY);
+	if (message == NULL)
+		return;
+
+	messageDeleter.SetTo(message);
+	item = new(std::nothrow) BMenuItem("Copy", message);
+	if (item == NULL)
+		return;
+
+	messageDeleter.Detach();
+	itemDeleter.SetTo(item);
+	if (!menu->AddItem(item))
+		return;
+
+	item->SetTarget(this);
+	itemDeleter.Detach();
+	menuDeleter.Detach();
+
+	BPoint screenWhere(point);
+	ConvertToScreen(&screenWhere);
+	BRect mouseRect(screenWhere, screenWhere);
+	mouseRect.InsetBy(-4.0, -4.0);
+	menu->Go(screenWhere, true, false, mouseRect, true);
 }
 
 

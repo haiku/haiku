@@ -1,4 +1,13 @@
 SubDir HAIKU_TOP src tools translation bitsinfo ;
 
-BinCommand bitsinfo : bitsinfo.cpp : be $(TARGET_LIBSUPC++) ;
+BinCommand bitsinfo : 
+	bitsinfo.cpp 
+	: be libbe.so $(HAIKU_LOCALE_LIBS) translation $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) ;
 
+AddResources bitsinfo : bitsinfo.rdef ;
+
+DoCatalogs bitsinfo :
+	x-vnd.Haiku-bitsinfo
+	: 
+	bitsinfo.cpp
+;

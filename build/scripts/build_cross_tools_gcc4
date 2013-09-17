@@ -50,7 +50,7 @@ arm-*)
 	;;
 esac
 
-if [ `uname -o` = 'Haiku' ]; then
+if [ `uname -s` = 'Haiku' ]; then
 	# force cross-build if building on Haiku:
 	buildhostMachine=${haikuMachine}_buildhost
 	buildHostSpec="--build=$buildhostMachine --host=$buildhostMachine"

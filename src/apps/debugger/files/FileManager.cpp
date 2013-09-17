@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +15,7 @@
 #include "LocatableFile.h"
 #include "SourceFile.h"
 #include "StringUtils.h"
+#include "TeamFileManagerSettings.h"
 
 
 // #pragma mark - EntryPath
@@ -611,7 +612,8 @@ FileManager::GetTargetFile(const BString& path)
 
 
 void
-FileManager::TargetEntryLocated(const BString& path, const BString& locatedPath)
+FileManager::TargetEntryLocated(const BString& path,
+	const BString& locatedPath)
 {
 	AutoLocker<FileManager> locker(this);
 	fTargetDomain->EntryLocated(path, locatedPath);
@@ -623,7 +625,14 @@ FileManager::GetSourceFile(const BString& directory,
 	const BString& relativePath)
 {
 	AutoLocker<FileManager> locker(this);
-	return fSourceDomain->GetFile(directory, relativePath);
+	LocatableFile* file = fSourceDomain->GetFile(directory, relativePath);
+
+	if (directory.Length() == 0 || relativePath[0] == '/')
+		_LocateFileIfMapped(relativePath, file);
+	else
+		_LocateFileIfMapped(BString(directory) << '/' << relativePath, file);
+
+	return file;
 }
 
 
@@ -631,15 +640,27 @@ LocatableFile*
 FileManager::GetSourceFile(const BString& path)
 {
 	AutoLocker<FileManager> locker(this);
-	return fSourceDomain->GetFile(path);
+	LocatableFile* file = fSourceDomain->GetFile(path);
+	_LocateFileIfMapped(path, file);
+
+	return file;
 }
 
 
-void
-FileManager::SourceEntryLocated(const BString& path, const BString& locatedPath)
+status_t
+FileManager::SourceEntryLocated(const BString& path,
+	const BString& locatedPath)
 {
 	AutoLocker<FileManager> locker(this);
 	fSourceDomain->EntryLocated(path, locatedPath);
+
+	try {
+		fSourceLocationMappings[path] = locatedPath;
+	} catch (...) {
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
 }
 
 
@@ -687,6 +708,45 @@ FileManager::LoadSourceFile(LocatableFile* file, SourceFile*& _sourceFile)
 }
 
 
+status_t
+FileManager::LoadLocationMappings(TeamFileManagerSettings* settings)
+{
+	AutoLocker<FileManager> locker(this);
+
+	for (int32 i = 0; i < settings->CountSourceMappings(); i++) {
+		BString sourcePath;
+		BString locatedPath;
+
+		if (settings->GetSourceMappingAt(i, sourcePath, locatedPath) != B_OK)
+			return B_NO_MEMORY;
+
+		try {
+			fSourceLocationMappings[sourcePath] = locatedPath;
+		} catch (...) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+FileManager::SaveLocationMappings(TeamFileManagerSettings* settings)
+{
+	AutoLocker<FileManager> locker(this);
+
+	for (LocatedFileMap::const_iterator it = fSourceLocationMappings.begin();
+		it != fSourceLocationMappings.end(); ++it) {
+		status_t error = settings->AddSourceMapping(it->first, it->second);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
 FileManager::SourceFileEntry*
 FileManager::_LookupSourceFile(const BString& path)
 {
@@ -712,4 +772,18 @@ FileManager::_SourceFileUnused(SourceFileEntry* entry)
 	SourceFileEntry* otherEntry = fSourceFiles->Lookup(entry->path);
 	if (otherEntry == entry)
 		fSourceFiles->Remove(entry);
+}
+
+
+void
+FileManager::_LocateFileIfMapped(const BString& sourcePath,
+	LocatableFile* file)
+{
+	// called with lock held
+	LocatedFileMap::const_iterator it = fSourceLocationMappings.find(
+		sourcePath);
+	if (it != fSourceLocationMappings.end()
+		&& file->State() != LOCATABLE_ENTRY_LOCATED_EXPLICITLY) {
+			fSourceDomain->EntryLocated(it->first, it->second);
+	}
 }

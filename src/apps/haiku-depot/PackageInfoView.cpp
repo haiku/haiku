@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <stdio.h>
 
+#include <Autolock.h>
 #include <Bitmap.h>
 #include <Button.h>
 #include <CardLayout.h>
@@ -1122,12 +1123,77 @@ private:
 };
 
 
+// #pragma mark - PackageInfoViewListener
+
+
+enum {
+	MSG_UPDATE_PACKAGE		= 'updp'
+};
+
+
+class PackageInfoView::Listener : public PackageInfoListener {
+public:
+	Listener(PackageInfoView* view)
+		:
+		fView(view)
+	{
+	}
+
+	virtual ~Listener()
+	{
+	}
+
+	virtual void PackageChanged(const PackageInfoEvent& event)
+	{
+		BMessenger messenger(fView);
+		if (!messenger.IsValid())
+			return;
+
+		const PackageInfo& package = *event.Package().Get();
+		
+		BMessage message(MSG_UPDATE_PACKAGE);
+		message.AddString("title", package.Title());
+		message.AddUInt32("changes", event.Changes());
+		
+		messenger.SendMessage(&message);
+	}
+
+	void SetPackage(const PackageInfoRef& package)
+	{
+		if (fPackage == package)
+			return;
+
+		PackageInfoListenerRef listener(this);
+
+		if (fPackage.Get() != NULL)
+			fPackage->RemoveListener(listener);
+
+		fPackage = package;
+
+		if (fPackage.Get() != NULL)
+			fPackage->AddListener(listener);
+	}
+
+	const PackageInfoRef& Package() const
+	{
+		return fPackage;
+	}
+
+private:
+	PackageInfoView*	fView;
+	PackageInfoRef		fPackage;
+};
+
+
 // #pragma mark - PackageInfoView
 
 
-PackageInfoView::PackageInfoView(PackageManager* packageManager)
+PackageInfoView::PackageInfoView(BLocker* modelLock,
+		PackageManager* packageManager)
 	:
-	BGroupView("package info view", B_VERTICAL)
+	BGroupView("package info view", B_VERTICAL),
+	fModelLock(modelLock),
+	fPackageListener(new(std::nothrow) Listener(this))
 {
 	fTitleView = new TitleView();
 	fPackageActionView = new PackageActionView(packageManager);
@@ -1150,6 +1216,8 @@ PackageInfoView::PackageInfoView(PackageManager* packageManager)
 
 PackageInfoView::~PackageInfoView()
 {
+	fPackageListener->SetPackage(PackageInfoRef(NULL));
+	delete fPackageListener;
 }
 
 
@@ -1163,6 +1231,35 @@ void
 PackageInfoView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_UPDATE_PACKAGE:
+		{
+			if (fPackageListener->Package().Get() == NULL)
+				break;
+
+			BString title;
+			uint32 changes;
+			if (message->FindString("title", &title) != B_OK
+				|| message->FindUInt32("changes", &changes) != B_OK) {
+				break;
+			}
+
+			const PackageInfo& package = *fPackageListener->Package().Get();
+			if (package.Title() != title)
+				break;
+			
+			BAutolock _(fModelLock);
+			
+			if ((changes & PKG_CHANGED_DESCRIPTION) != 0
+				|| (changes & PKG_CHANGED_SCREENSHOTS) != 0) {
+				fTitleView->SetPackage(package);
+			}
+
+			if ((changes & PKG_CHANGED_RATINGS) != 0) {
+				fPagesView->SetPackage(package);
+			}
+
+			break;
+		}
 		default:
 			BGroupView::MessageReceived(message);
 			break;
@@ -1171,14 +1268,20 @@ PackageInfoView::MessageReceived(BMessage* message)
 
 
 void
-PackageInfoView::SetPackage(const PackageInfo& package)
+PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 {
+	BAutolock _(fModelLock);
+	
+	const PackageInfo& package = *packageRef.Get();
+	
 	fTitleView->SetPackage(package);
 	fPackageActionView->SetPackage(package);
 	fPagesView->SetPackage(package);
 	
 	if (fPagesView->IsHidden(fPagesView))
 		fPagesView->Show();
+
+	fPackageListener->SetPackage(packageRef);
 }
 
 
@@ -1191,5 +1294,9 @@ PackageInfoView::Clear()
 
 	if (!fPagesView->IsHidden(fPagesView))
 		fPagesView->Hide();
+
+	BAutolock _(fModelLock);
+
+	fPackageListener->SetPackage(PackageInfoRef(NULL));
 }
 

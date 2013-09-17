@@ -1174,6 +1174,57 @@ hda_codec_switch_init(hda_audio_group* audioGroup)
 }
 
 
+static void
+hda_codec_check_sense(hda_codec* codec, bool disable)
+{
+	hda_audio_group* audioGroup = codec->audio_groups[0];
+
+	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
+		hda_widget& widget = audioGroup->widgets[i];
+
+		if (widget.type != WT_PIN_COMPLEX
+			|| !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities)
+			|| CONF_DEFAULT_DEVICE(widget.d.pin.config)
+				!= PIN_DEV_HEAD_PHONE_OUT)
+			continue;
+
+		corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
+			VID_GET_PINSENSE, 0);
+		uint32 response;
+		hda_send_verbs(audioGroup->codec, &verb, &response, 1);
+		disable = response & PIN_SENSE_PRESENCE_DETECT;
+		TRACE("hda: sensed pin widget %ld, %d\n", widget.node_id, disable);
+
+		uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
+				true);
+		verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
+			VID_SET_PIN_WIDGET_CONTROL, disable ? ctrl : 0);
+		hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
+		break;
+	}
+
+	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
+		hda_widget& widget = audioGroup->widgets[i];
+
+		if (widget.type != WT_PIN_COMPLEX
+			|| !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities))
+			continue;
+
+		int device = CONF_DEFAULT_DEVICE(widget.d.pin.config);
+		if (device != PIN_DEV_AUX
+			&& device != PIN_DEV_SPEAKER
+			&& device != PIN_DEV_LINE_OUT)
+			continue;
+
+		uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
+				true);
+		corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
+			VID_SET_PIN_WIDGET_CONTROL, disable ? 0 : ctrl);
+		hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
+	}
+}
+
+
 static status_t
 hda_codec_switch_handler(hda_codec* codec)
 {
@@ -1182,53 +1233,8 @@ hda_codec_switch_handler(hda_codec* codec)
 		codec->unsol_response_read %= MAX_CODEC_UNSOL_RESPONSES;
 
 		bool disable = response & 1;
-		hda_audio_group* audioGroup = codec->audio_groups[0];
-
-		for (uint32 i = 0; i < audioGroup->widget_count; i++) {
-			hda_widget& widget = audioGroup->widgets[i];
-
-			if (widget.type != WT_PIN_COMPLEX
-				|| !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities)
-				|| CONF_DEFAULT_DEVICE(widget.d.pin.config)
-					!= PIN_DEV_HEAD_PHONE_OUT)
-				continue;
-
-			corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
-				VID_GET_PINSENSE, 0);
-			uint32 response;
-			hda_send_verbs(audioGroup->codec, &verb, &response, 1);
-			disable = response & PIN_SENSE_PRESENCE_DETECT;
-			TRACE("hda: sensed pin widget %ld, %d\n", widget.node_id, disable);
-
-			uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
-					true);
-			verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
-				VID_SET_PIN_WIDGET_CONTROL, disable ? ctrl : 0);
-			hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
-			break;
-		}
-
-		for (uint32 i = 0; i < audioGroup->widget_count; i++) {
-			hda_widget& widget = audioGroup->widgets[i];
-
-			if (widget.type != WT_PIN_COMPLEX
-				|| !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities))
-				continue;
-
-			int device = CONF_DEFAULT_DEVICE(widget.d.pin.config);
-			if (device != PIN_DEV_AUX
-				&& device != PIN_DEV_SPEAKER
-				&& device != PIN_DEV_LINE_OUT)
-				continue;
-
-			uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
-					true);
-			corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
-				VID_SET_PIN_WIDGET_CONTROL, disable ? 0 : ctrl);
-			hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
-		}
+		hda_codec_check_sense(codec, disable);
 	}
-
 	return B_OK;
 }
 
@@ -1520,6 +1526,8 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 			}
 		}
 	}
+
+	hda_codec_check_sense(codec, false);
 
 	codec->unsol_response_thread = spawn_kernel_thread(
 		(status_t(*)(void*))hda_codec_switch_handler,

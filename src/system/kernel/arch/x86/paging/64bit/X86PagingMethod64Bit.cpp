@@ -60,10 +60,8 @@ X86PagingMethod64Bit::Init(kernel_args* args,
 	fKernelVirtualPML4 = (uint64*)(addr_t)args->arch_args.vir_pgdir;
 
 	// if availalbe enable NX-bit (No eXecute)
-	if (x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
-		x86_write_msr(IA32_MSR_EFER, x86_read_msr(IA32_MSR_EFER)
-			| IA32_MSR_EFER_NX);
-	}
+	if (x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD))
+		call_all_cpus_sync(&_EnableExecutionDisable, NULL);
 
 	// Ensure that the user half of the address space is clear. This removes
 	// the temporary identity mapping made by the boot loader.
@@ -382,5 +380,13 @@ X86PagingMethod64Bit::PutPageTableEntryInTable(uint64* entry,
 
 	// put it in the page table
 	SetTableEntry(entry, page);
+}
+
+
+/*static*/ void
+X86PagingMethod64Bit::_EnableExecutionDisable(void* dummy, int cpu)
+{
+	x86_write_msr(IA32_MSR_EFER, x86_read_msr(IA32_MSR_EFER)
+		| IA32_MSR_EFER_NX);
 }
 

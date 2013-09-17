@@ -9,6 +9,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network usb_asix ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network usb_davicom ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network usb_ecm ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network via_rhine ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network virtio ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network vlance ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wb840 ;
 

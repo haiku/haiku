@@ -16,6 +16,7 @@
 #include "ArchivingUtils.h"
 #include "BreakpointSetting.h"
 #include "Team.h"
+#include "TeamFileManagerSettings.h"
 #include "TeamUiSettings.h"
 #include "TeamUiSettingsFactory.h"
 #include "UserBreakpoint.h"
@@ -23,6 +24,7 @@
 
 TeamSettings::TeamSettings()
 {
+	fFileManagerSettings = new TeamFileManagerSettings();
 }
 
 
@@ -115,6 +117,12 @@ TeamSettings::SetTo(const BMessage& archive)
 		}
 	}
 
+	if (archive.FindMessage("filemanagersettings", &childArchive) == B_OK) {
+		error = fFileManagerSettings->SetTo(childArchive);
+		if (error != B_OK)
+			return error;
+	}
+
 	return B_OK;
 }
 
@@ -148,6 +156,14 @@ TeamSettings::WriteTo(BMessage& archive) const
 		if (error != B_OK)
 			return error;
 	}
+
+	error = fFileManagerSettings->WriteTo(childArchive);
+	if (error != B_OK)
+		return error;
+
+	error = archive.AddMessage("filemanagersettings", &childArchive);
+	if (error != B_OK)
+		return error;
 
 	return B_OK;
 }
@@ -234,7 +250,29 @@ TeamSettings::operator=(const TeamSettings& other)
 		}
 	}
 
+	*fFileManagerSettings = *other.fFileManagerSettings;
+
 	return *this;
+}
+
+
+TeamFileManagerSettings*
+TeamSettings::FileManagerSettings() const
+{
+	return fFileManagerSettings;
+}
+
+
+status_t
+TeamSettings::SetFileManagerSettings(TeamFileManagerSettings* settings)
+{
+	try {
+		*fFileManagerSettings = *settings;
+	} catch (...) {
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
 }
 
 

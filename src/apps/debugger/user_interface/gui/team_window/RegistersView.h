@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef REGISTERS_VIEW_H
@@ -34,6 +35,10 @@ private:
 private:
 	// TableListener
 	virtual	void				TableRowInvoked(Table* table, int32 rowIndex);
+
+	virtual	void				TableCellMouseDown(Table* table, int32 rowIndex,
+									int32 columnIndex, BPoint screenWhere,
+									uint32 buttons);
 
 			void				_Init();
 

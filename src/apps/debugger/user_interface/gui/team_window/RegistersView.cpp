@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,12 +11,17 @@
 #include <new>
 
 #include <ControlLook.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
+#include <Window.h>
 
 #include "table/TableColumns.h"
 
 #include "Architecture.h"
+#include "AutoDeleter.h"
 #include "CpuState.h"
 #include "GuiSettingsUtils.h"
+#include "MessageCodes.h"
 #include "Register.h"
 #include "UiUtils.h"
 
@@ -226,6 +231,48 @@ RegistersView::SaveSettings(BMessage& settings)
 void
 RegistersView::TableRowInvoked(Table* table, int32 rowIndex)
 {
+}
+
+
+void
+RegistersView::TableCellMouseDown(Table* table, int32 rowIndex,
+	int32 columnIndex, BPoint screenWhere,	uint32 buttons)
+{
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
+		return;
+
+	BVariant value;
+	if (!fRegisterTableModel->GetValueAt(rowIndex, 1, value))
+		return;
+
+	BPopUpMenu* menu = new(std::nothrow)BPopUpMenu("Options");
+	if (menu == NULL)
+		return;
+
+	ObjectDeleter<BPopUpMenu> menuDeleter(menu);
+	BMessage* message = new(std::nothrow)BMessage(MSG_SHOW_INSPECTOR_WINDOW);
+	if (message == NULL)
+		return;
+
+	message->AddUInt64("address", value.ToUInt64());
+
+	ObjectDeleter<BMessage> messageDeleter(message);
+	BMenuItem* item = new(std::nothrow)BMenuItem("Inspect", message);
+	if (item == NULL)
+		return;
+
+	messageDeleter.Detach();
+	ObjectDeleter<BMenuItem> itemDeleter(item);
+	if (!menu->AddItem(item))
+		return;
+
+	itemDeleter.Detach();
+	menu->SetTargetForItems(Window());
+	menuDeleter.Detach();
+
+	BRect mouseRect(screenWhere, screenWhere);
+	mouseRect.InsetBy(-4.0, -4.0);
+	menu->Go(screenWhere, true, false, mouseRect, true);
 }
 
 

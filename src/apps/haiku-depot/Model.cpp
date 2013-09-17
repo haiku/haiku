@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+#include <Autolock.h>
 #include <Catalog.h>
 
 
@@ -24,7 +25,7 @@ PackageFilter::~PackageFilter()
 
 class AnyFilter : public PackageFilter {
 public:
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		return true;
 	}
@@ -39,7 +40,7 @@ public:
 	{
 	}
 	
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		// TODO: Maybe a PackageInfo ought to know the Depot it came from?
 		// But right now the same package could theoretically be provided
@@ -68,9 +69,11 @@ public:
 	{
 	}
 	
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
-		const CategoryList& categories = package.Categories();
+		if (package.Get() == NULL)
+			return false;
+		const CategoryList& categories = package->Categories();
 		for (int i = categories.CountItems() - 1; i >= 0; i--) {
 			const CategoryRef& category = categories.ItemAtFast(i);
 			if (category.Get() == NULL)
@@ -94,7 +97,7 @@ public:
 	{
 	}
 	
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		return fPackageList.Contains(package);
 	}
@@ -114,7 +117,7 @@ public:
 	{
 	}
 	
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		return fPackageListA.Contains(package)
 			|| fPackageListB.Contains(package);
@@ -146,15 +149,17 @@ public:
 		}
 	}
 	
-	virtual bool AcceptsPackage(const PackageInfo& package) const
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
+		if (package.Get() == NULL)
+			return false;
 		// Every search term must be found in one of the package texts
 		for (int32 i = fSearchTerms.CountItems() - 1; i >= 0; i--) {
 			const BString& term = fSearchTerms.ItemAtFast(i);
-			if (!_TextContains(package.Title(), term)
-				&& !_TextContains(package.Publisher().Name(), term)
-				&& !_TextContains(package.ShortDescription(), term)
-				&& !_TextContains(package.FullDescription(), term)) {
+			if (!_TextContains(package->Title(), term)
+				&& !_TextContains(package->Publisher().Name(), term)
+				&& !_TextContains(package->ShortDescription(), term)
+				&& !_TextContains(package->FullDescription(), term)) {
 				return false;
 			}
 		}
@@ -263,7 +268,7 @@ Model::CreatePackageList() const
 		const PackageList& packages = depot.Packages();
 
 		for (int32 j = 0; j < packages.CountItems(); j++) {
-			const PackageInfo& package = packages.ItemAtFast(j);
+			const PackageInfoRef& package = packages.ItemAtFast(j);
 			if (fCategoryFilter->AcceptsPackage(package)
 				&& fSearchTermsFilter->AcceptsPackage(package)) {
 				resultList.Add(package);
@@ -283,7 +288,7 @@ Model::AddDepot(const DepotInfo& depot)
 
 
 void
-Model::SetPackageState(const PackageInfo& package, PackageState state)
+Model::SetPackageState(const PackageInfoRef& package, PackageState state)
 {
 	switch (state) {
 		default:
@@ -362,3 +367,86 @@ Model::SetSearchTerms(const BString& searchTerms)
 	fSearchTermsFilter.SetTo(filter, true);
 }
 
+
+// #pragma mark - information retrival
+
+
+void
+Model::PopulatePackage(const PackageInfoRef& package)
+{
+	if (fPopulatedPackages.Contains(package))
+		return;
+
+	BAutolock _(&fLock);
+
+	// TODO: Replace with actual backend that retrieves package extra
+	// information and user-contributed package information.
+	
+	// TODO: There should probably also be a way to "unpopulate" the
+	// package information. Maybe a cache of populated packages, so that
+	// packages loose their extra information after a certain amount of
+	// time when they have not been accessed/displayed in the UI. Otherwise
+	// HaikuDepot will consume more and more resources in the packages.
+	// Especially screen-shots will be a problem eventually.
+	
+	// TODO: Simulate a delay in retrieving this info, and do that on
+	// a separate thread.
+	
+	fPopulatedPackages.Add(package);
+
+	if (package->Title() == "WonderBrush") {
+
+		package->AddUserRating(
+			UserRating(UserInfo("humdinger"), 4.5f,
+			"Awesome!", "en", "2.1.2", 0, 0)
+		);
+		package->AddUserRating(
+			UserRating(UserInfo("bonefish"), 5.0f,
+			"The best!", "en", "2.1.2", 3, 1)
+		);
+		package->AddScreenshot(
+			BitmapRef(new SharedBitmap(603), true));
+
+	} else if (package->Title() == "Paladin") {
+
+		package->AddUserRating(
+			UserRating(UserInfo("stippi"), 3.5f,
+			"Could be more integrated from the sounds of it.",
+			"en", "1.2.0", 0, 1)
+		);
+		package->AddUserRating(
+			UserRating(UserInfo("mmadia"), 5.0f,
+			"It rocks! Give a try",
+			"en", "1.1.0", 1, 0)
+		);
+		package->AddUserRating(
+			UserRating(UserInfo("bonefish"), 2.0f,
+			"It just needs to use my jam-rewrite 'ham' and it will be great.",
+			"en", "1.1.0", 3, 1)
+		);
+		package->AddScreenshot(
+			BitmapRef(new SharedBitmap(605), true));
+
+	} else if (package->Title() == "Sequitur") {
+
+		package->AddUserRating(
+			UserRating(UserInfo("pete"), 4.5f,
+			"I can weave a web of sound! And it connects to PatchBay. Check "
+			"it out, I can wholeheartly recommend this app!! This rating "
+			"comment is of course only so long, because the new TextView "
+			"layout needs some testing. Oh, and did I mention it works with "
+			"custom installed sound fonts? Reading through this comment I find "
+			"that I did not until now. Hopefully there are enough lines now to "
+			"please the programmer with the text layouting and scrolling of "
+			"long ratings!", "en", "2.1.0", 4, 1)
+		);
+		package->AddUserRating(
+			UserRating(UserInfo("stippi"), 3.5f,
+			"It seems very capable. Still runs fine on Haiku. The interface "
+			"is composed of many small, hard to click items. But you can "
+			"configure a tool for each mouse button, which is great for the "
+			"work flow.", "en", "2.1.0", 2, 1)
+		);
+
+	}
+}

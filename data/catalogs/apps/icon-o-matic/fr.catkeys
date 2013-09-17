@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	605140404
+1	french	x-vnd.haiku-icon_o_matic	806315965
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -67,6 +67,7 @@ Contour	Transformation		Contour
 Perspective	Transformation		Perspective
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Déplacer la Transformation
 Opacity	Icon-O-Matic-PropertyNames		Opacité
+Add with path	Icon-O-Matic-ShapesList		Ajouter avec un chemin
 Gradient type	Icon-O-Matic-StyleTypes		Type de dégradé
 Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Annuler
@@ -79,6 +80,7 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		Attribut META:ICON
 Translation Y	Icon-O-Matic-PropertyNames		Translation en Y
 Rotate	Icon-O-Matic-TransformationBoxStates		Pivoter
 Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Supprimer une transformation
+Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotation des indices de chemin
 Add Transformer	Icon-O-Matic-AddTransformersCmd		Ajouter une transformation
 Remove	Icon-O-Matic-PathsList		Enlever
 Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Déplacer le point de contrôle

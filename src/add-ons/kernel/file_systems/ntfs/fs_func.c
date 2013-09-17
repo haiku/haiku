@@ -274,7 +274,9 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 	*_cookie = cookie;
 
-	return 0.8f;
+	// Make sure we return a higher number than the intel partition check
+	// as this one is more accurate.
+	return 0.82f;
 }
 
 

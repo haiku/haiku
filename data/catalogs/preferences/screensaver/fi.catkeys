@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ScreenSaver	3630119516
+1	finnish	x-vnd.Haiku-ScreenSaver	232492478
 Could not load screen saver	ScreenSaver		Näytönsäästäjän lataus epäonnistui
 30 seconds	ScreenSaver		30 sekuntia
 Start screensaver	ScreenSaver		Käynnistä näytönsäästäjä
@@ -11,7 +11,9 @@ Display Power Management Signaling not available	ScreenSaver		Näytön jännites
 ScreenSaver	System name		Näytönsäästäjäasetukset
 Test	ScreenSaver		Testaa
 General	ScreenSaver		Yleinen
+Fade now when mouse is here	ScreenSaver		Häivytä nyt kun hiiren kohdistin on tässä
 Enable screensaver	ScreenSaver		Ota käyttöön näytönsäästäjä
+Don't fade when mouse is here	ScreenSaver		Älä häivytä, kun hiiren kohdistin on tässä
 Cancel	ScreenSaver		Peru
 Turn off screen	ScreenSaver		Käännä näyttö pois päältä
 No options available	ScreenSaver		Valitsimia ei ole käytettävissä

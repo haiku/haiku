@@ -38,9 +38,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ByteOrder.h>
+#include <Catalog.h>
 #include <File.h>
 #include <TranslatorFormats.h>
 #include <StorageDefs.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "bitsinfo"
 
 struct ColorSpaceName { 
 	color_space id;
@@ -62,7 +66,8 @@ PrintBitsInfo(const char *filepath, bool bdumppixels)
 		// read in the rest of the header
 		ssize_t size = sizeof(TranslatorBitmap);
 		if (file.Read(reinterpret_cast<uint8 *> (&header), size) != size) {
-			printf("\nError: Unable to read the Be bitmap header.\n");
+			printf(B_TRANSLATE("\nError: Unable to read the Be bitmap "
+				"header.\n"));
 			return;
 		}
 		if (!bdumppixels)
@@ -72,28 +77,29 @@ PrintBitsInfo(const char *filepath, bool bdumppixels)
 		// convert to host byte order
 		if (swap_data(B_UINT32_TYPE, &header, sizeof(TranslatorBitmap),
 			B_SWAP_BENDIAN_TO_HOST) != B_OK) {
-			printf("\nError: Unable to swap byte order\n");
+			printf(B_TRANSLATE("\nError: Unable to swap byte order\n"));
 			return;
 		}
 		
-		printf("\nBe bitmap (\"bits\") header for: %s\n\n", filepath);
+		printf(B_TRANSLATE("\nBe bitmap (\"bits\") header for: %s\n\n"), 
+			filepath);
 	
 		const uint32 kbitsmagic = 0x62697473UL;
 			// in ASCII, this number looks like "bits"
-		printf("magic number: 0x%.8lx ", header.magic);
 		if (header.magic == kbitsmagic)
-			printf("(valid)\n");
+			printf(B_TRANSLATE("magic number: 0x%.8lx (valid)\n"), 
+				header.magic);
 		else
-			printf("(INVALID, should be: 0x%.8lx)\n",
-				kbitsmagic);
-		printf("bounds: (%f, %f, %f, %f)\n",
+			printf(B_TRANSLATE("magic number: 0x%.8lx (INVALID, should be: "
+				"0x%.8lx)\n"), header.magic, kbitsmagic);
+		printf(B_TRANSLATE("bounds: (%f, %f, %f, %f)\n"),
 			header.bounds.left, header.bounds.top,
 			header.bounds.right, header.bounds.bottom);
-		printf("dimensions: %d x %d\n",
+		printf(B_TRANSLATE("dimensions: %d x %d\n"),
 			static_cast<int>(header.bounds.Width() + 1),
 			static_cast<int>(header.bounds.Height() + 1));
 		
-		printf("bytes per row: %u\n",
+		printf(B_TRANSLATE("bytes per row: %u\n"),
 			static_cast<unsigned int>(header.rowBytes));
 	
 		// print out colorspace if it matches an item in the list
@@ -149,15 +155,15 @@ PrintBitsInfo(const char *filepath, bool bdumppixels)
 		int32 i;
 		for (i = 0; i < kncolorspaces; i++) {
 			if (header.colors == colorspaces[i].id) {
-				printf("color space: %s\n", colorspaces[i].name);
+				printf(B_TRANSLATE("color space: %s\n"), colorspaces[i].name);
 				break;
 			}
 		}
 		if (i == kncolorspaces)
-			printf("color space: Unknown (0x%.8lx)\n",
+			printf(B_TRANSLATE("color space: Unknown (0x%.8lx)\n"),
 				static_cast<unsigned long>(header.colors));
 			
-		printf("data size: %u\n",
+		printf(B_TRANSLATE("data size: %u\n"),
 			static_cast<unsigned int>(header.dataSize));
 			
 		if (bdumppixels) {
@@ -178,18 +184,19 @@ PrintBitsInfo(const char *filepath, bool bdumppixels)
 					break;
 				
 				default:
-					printf("Sorry, %s isn't supported yet"
-						" for this color space\n", kpixels);
+					printf(B_TRANSLATE("Sorry, %s isn't supported yet"
+						" for this color space\n"), kpixels);
 					return;
 			}
 			uint8 *prow = new uint8[header.rowBytes];
 			if (!prow) {
-				printf("Error: Not enough memory for row buffer\n");
+				printf(B_TRANSLATE("Error: Not enough memory for row "
+					"buffer\n"));
 				return;
 			}
 			ssize_t ret, n;
 			uint32 totalbytes = 0;
-			printf("pixel data (%s):\n", components);
+			printf(B_TRANSLATE("pixel data (%s):\n"), components);
 			while ((ret = file.Read(prow, header.rowBytes)) > 0) {
 				n = 0;
 				while (n < ret) {
@@ -205,18 +212,21 @@ PrintBitsInfo(const char *filepath, bool bdumppixels)
 		}			
 		
 	} else
-		printf("Error opening %s\n", filepath);
+		printf(B_TRANSLATE_COMMENT("Error opening %s\n", 
+			"file path is opening"), filepath);
 }
 
 int
 main(int argc, char **argv)
 {
 	if (argc == 1) {
-		printf("\nbitsinfo - reports information about a Be bitmap (\"bits\") image\n");
-		printf("\nUsage:\n");
-		printf("bitsinfo [options] filename.bits\n\n");
-		printf("Options:\n\n");
-		printf("\t%s \t print RGB color for each pixel\n", kpixels);
+		printf(B_TRANSLATE("\nbitsinfo - reports information about a Be "
+			"bitmap (\"bits\") image\n"));
+		printf(B_TRANSLATE("\nUsage:\n"));
+		printf(B_TRANSLATE("bitsinfo [options] filename.bits\n\n"));
+		printf(B_TRANSLATE("Options:\n\n"));
+		printf(B_TRANSLATE("\t%s \t print RGB color for each pixel\n"), 
+			kpixels);
 	}
 	else {
 		int32 first = 1;

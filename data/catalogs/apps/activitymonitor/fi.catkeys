@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	2739021859
+1	finnish	x-vnd.Haiku-ActivityMonitor	1211510241
 P-faults	DataSource		P-viat
 Media nodes	DataSource		Mediasolmut
 Threads	DataSource		Säikeet
@@ -6,6 +6,7 @@ Always on top	ActivityWindow		Aina päällimmäisenä
 Add graph	ActivityWindow		Lisää kuvaaja
 Teams	DataSource		Ryhmät
 Hide legend	ActivityView		Piilota merkin selitys
+MiB	DataSource		mebitavua
 Network send	DataSource		Verkkolähetys
 CPU usage (combined)	DataSource		Suoritinkäyttö (yhdistetty)
 CPU	DataSource		Suoritin
@@ -26,12 +27,14 @@ Update time interval:	SettingsWindow		Päivitä aikaväli:
 TX	DataSource	Shorter version for Sending	Läh.
 Quit	ActivityWindow		Poistu
 Block cache memory	DataSource		Lohkovälimuisti
+%.1f KiB/s	DataSource		%.1f kibitavua/s
 Remove graph	ActivityView		Poista kuvaaja
 %lld sec.	SettingsWindow		%lld s
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Suoritinkäyttö
 Raw clipboard	DataSource		Raakadataleikepöytä
 Sems	DataSource		Opastimet
+%.1f MiB	DataSource		%.1f Mebitavua
 ActivityMonitor	System name		Aktiviteettivalvonta
 Running applications	DataSource		Suoritetaan sovelluksia
 Semaphores	DataSource		Opastimet

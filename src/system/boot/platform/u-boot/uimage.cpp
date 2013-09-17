@@ -55,7 +55,7 @@ image_multi_getimg(struct image_header *image, uint32 idx, uint32 *data, uint32 
 			*size = ntohl(sizes[i]);
 			return true;
 		}
-		base += ntohl(sizes[i]);
+		base += (ntohl(sizes[i]) + 3) & ~3;
 	}
 	return false;
 }
