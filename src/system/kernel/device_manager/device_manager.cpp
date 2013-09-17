@@ -2280,7 +2280,6 @@ device_manager_init(struct kernel_args* args)
 	dm_init_io_resources();
 
 	recursive_lock_init(&sLock, "device manager");
-	init_node_tree();
 
 	register_generic_syscall(DEVICE_MANAGER_SYSCALLS, control_device_manager,
 		1, 0);
@@ -2300,6 +2299,9 @@ device_manager_init(struct kernel_args* args)
 		"dump an I/O operation");
 	add_debugger_command("io_buffer", &dump_io_buffer, "dump an I/O buffer");
 	add_debugger_command("dma_buffer", &dump_dma_buffer, "dump a DMA buffer");
+
+	init_node_tree();
+
 	return B_OK;
 }
 
