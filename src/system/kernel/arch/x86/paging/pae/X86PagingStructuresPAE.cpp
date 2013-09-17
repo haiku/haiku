@@ -21,7 +21,7 @@
 
 X86PagingStructuresPAE::X86PagingStructuresPAE()
 {
-	fVirtualPageDirs[0] = NULL;
+	memset(fVirtualPageDirs, 0, sizeof(fVirtualPageDirs));
 }
 
 
@@ -29,6 +29,7 @@ X86PagingStructuresPAE::~X86PagingStructuresPAE()
 {
 	// free the user page dirs
 	free(fVirtualPageDirs[0]);
+		// There's one contiguous allocation for 0 and 1.
 
 	// free the PDPT page
 	X86PagingMethodPAE::Method()->Free32BitPage(fPageDirPointerTable,
