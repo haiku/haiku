@@ -188,9 +188,35 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 }
 
 
+// Little helper class for handling the
+// iframe stack as used by KDL.
+class IFrameScope {
+public:
+	IFrameScope(struct iframe *iframe) {
+		fThread = thread_get_current_thread();
+		if (fThread)
+			arm_push_iframe(&fThread->arch_info.iframes, iframe);
+		else
+			arm_push_iframe(&gBootFrameStack, iframe);
+	}
+
+	virtual ~IFrameScope() {
+		// pop iframe
+		if (fThread)
+			arm_pop_iframe(&fThread->arch_info.iframes);
+		else
+			arm_pop_iframe(&gBootFrameStack);
+	}
+private:
+	Thread* fThread;
+};
+
+
 extern "C" void
 arch_arm_undefined(struct iframe *iframe)
 {
+	IFrameScope scope(iframe); // push/pop iframe
+
 	print_iframe("Undefined Instruction", iframe);
 	panic("not handled!");
 }
@@ -199,6 +225,8 @@ arch_arm_undefined(struct iframe *iframe)
 extern "C" void
 arch_arm_syscall(struct iframe *iframe)
 {
+	IFrameScope scope(iframe); // push/pop iframe
+
 	print_iframe("Software interrupt", iframe);
 }
 
@@ -206,6 +234,8 @@ arch_arm_syscall(struct iframe *iframe)
 extern "C" void
 arch_arm_data_abort(struct iframe *frame)
 {
+	IFrameScope scope(iframe);
+
 	Thread *thread = thread_get_current_thread();
 	bool isUser = (frame->spsr & 0x1f) == 0x10;
 	addr_t far = arm_get_far();
@@ -290,6 +320,8 @@ arch_arm_data_abort(struct iframe *frame)
 extern "C" void
 arch_arm_prefetch_abort(struct iframe *iframe)
 {
+	IFrameScope scope(iframe);
+
 	print_iframe("Prefetch Abort", iframe);
 	panic("not handled!");
 }
@@ -298,6 +330,8 @@ arch_arm_prefetch_abort(struct iframe *iframe)
 extern "C" void
 arch_arm_irq(struct iframe *iframe)
 {
+	IFrameScope scope(iframe);
+
 	for (int i=0; i < 32; i++) {
 		if (sPxaInterruptBase[PXA_ICIP] & (1 << i))
 			int_io_interrupt_handler(i, true);
@@ -308,6 +342,8 @@ arch_arm_irq(struct iframe *iframe)
 extern "C" void
 arch_arm_fiq(struct iframe *iframe)
 {
+	IFrameScope scope(iframe);
+
 	for (int i=0; i < 32; i++) {
 		if (sPxaInterruptBase[PXA_ICIP] & (1 << i)) {
 			dprintf("arch_arm_fiq: help me, FIQ %d was triggered but no "

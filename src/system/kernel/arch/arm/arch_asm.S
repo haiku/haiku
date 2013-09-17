@@ -94,6 +94,12 @@ FUNCTION(arm_get_far):
 	bx	lr
 FUNCTION_END(arm_get_far)
 
+/* addr_t arm_get_fp(void); */
+FUNCTION(arm_get_fp):
+	mov	r0, fp				@ get framepointer
+	bx	lr
+FUNCTION_END(arm_get_fp);
+
 /* status_t arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
 FUNCTION(arch_cpu_user_memcpy):
 	stmfd   sp!, { r4-r6 }
