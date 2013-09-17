@@ -207,6 +207,10 @@ public:
 				PrintInstallPath(value.string);
 				break;
 
+			case B_PACKAGE_INFO_CHECKSUM:
+				PrintChecksum(value.string);
+				break;
+
 			default:
 				return false;
 		}
@@ -379,6 +383,11 @@ public:
 	void PrintInstallPath(const char* path) const
 	{
 		printf("\tinstall path: %s\n", path);
+	}
+
+	void PrintChecksum(const char* checksum) const
+	{
+		printf("\tchecksum: %s\n", checksum);
 	}
 
 private:
