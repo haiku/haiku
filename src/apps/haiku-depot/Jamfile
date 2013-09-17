@@ -46,9 +46,9 @@ Application HaikuDepot :
 
 	# text view stuff
 	$(textDocumentSources)
-	
+
 	: be translation libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
-		$(HAIKU_LOCALE_LIBS)
+		localestub
 	: HaikuDepot.rdef
 ;
 
