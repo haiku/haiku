@@ -677,7 +677,7 @@ MemoryView::_GetOffsetAt(BPoint point) const
 	float blockWidth = (charsPerBlock * 2 + 1) * fCharWidth;
 	int32 containingBlock = int32(floor(point.x / blockWidth));
 
-	return fHexBlocksPerLine * lineNumber
+	return fHexBlocksPerLine * charsPerBlock * lineNumber
 		+ containingBlock * charsPerBlock;
 }
 
