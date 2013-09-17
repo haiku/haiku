@@ -1000,33 +1000,12 @@ dump_page_queue(int argc, char **argv)
 
 	if (argc == 3) {
 		struct vm_page *page = queue->Head();
-		const char *type = "none";
-		int i;
-
-		if (page->Cache() != NULL) {
-			switch (page->Cache()->type) {
-				case CACHE_TYPE_RAM:
-					type = "RAM";
-					break;
-				case CACHE_TYPE_DEVICE:
-					type = "device";
-					break;
-				case CACHE_TYPE_VNODE:
-					type = "vnode";
-					break;
-				case CACHE_TYPE_NULL:
-					type = "null";
-					break;
-				default:
-					type = "???";
-					break;
-			}
-		}
 
 		kprintf("page        cache       type       state  wired  usage\n");
-		for (i = 0; page; i++, page = queue->Next(page)) {
+		for (page_num_t i = 0; page; i++, page = queue->Next(page)) {
 			kprintf("%p  %p  %-7s %8s  %5d  %5d\n", page, page->Cache(),
-				type, page_state_to_string(page->State()),
+				vm_cache_type_to_string(page->Cache()->type),
+				page_state_to_string(page->State()),
 				page->WiredCount(), page->usage_count);
 		}
 	}
