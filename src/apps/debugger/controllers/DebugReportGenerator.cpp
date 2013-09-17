@@ -566,9 +566,9 @@ DebugReportGenerator::_DumpFunctionDisassembly(BString& _output,
 	SourceLocation location = statement->StartSourceLocation();
 
 	_output << "\t\t\tDisassembly:\n";
-	for (int32 i = 0; i < location.Line(); i++) {
+	for (int32 i = 0; i <= location.Line(); i++) {
 		_output << "\t\t\t\t" << code->LineAt(i);
-		if (i == location.Line() - 1)
+		if (i == location.Line())
 			_output << " <--";
 		_output << "\n";
 	}
