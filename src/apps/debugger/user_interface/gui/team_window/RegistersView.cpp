@@ -242,7 +242,7 @@ RegistersView::TableCellMouseDown(Table* table, int32 rowIndex,
 		return;
 
 	BVariant value;
-	if (!fRegisterTableModel->GetValueAt(rowIndex, columnIndex, value))
+	if (!fRegisterTableModel->GetValueAt(rowIndex, 1, value))
 		return;
 
 	BPopUpMenu* menu = new(std::nothrow)BPopUpMenu("Options");
