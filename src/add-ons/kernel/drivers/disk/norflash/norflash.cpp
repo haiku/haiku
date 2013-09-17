@@ -165,8 +165,16 @@ nor_write(void *_cookie, off_t position, const void *data, size_t *numbytes)
 static float
 nor_supports_device(device_node *parent)
 {
+	const char *bus;
 	TRACE("supports_device\n");
-	return 0.6;
+
+	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+		return B_ERROR;
+
+	if (strcmp(bus, "generic"))
+		return 0.0;
+
+	return 1.0;
 }
 
 
