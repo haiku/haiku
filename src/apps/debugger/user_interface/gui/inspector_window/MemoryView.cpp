@@ -185,17 +185,14 @@ MemoryView::Draw(BRect rect)
 				const char* blockAddress = currentAddress + (j
 					* blockByteSize);
 				_GetNextHexBlock(buffer, sizeof(buffer), blockAddress);
-				DrawString(buffer, drawPoint);
 				if (targetAddress >= blockAddress && targetAddress <
-					blockAddress + blockByteSize) {
+						blockAddress + blockByteSize) {
 					PushState();
-					SetHighColor(B_TRANSPARENT_COLOR);
-					SetDrawingMode(B_OP_INVERT);
-					FillRect(BRect(drawPoint.x, drawPoint.y - fh.ascent,
-						drawPoint.x + (hexBlockSize - 1) * fCharWidth,
-						drawPoint.y + fh.descent));
+					SetHighColor(make_color(216,0,0));
+					DrawString(buffer, drawPoint);
 					PopState();
-				}
+				} else
+					DrawString(buffer, drawPoint);
 
 				drawPoint.x += fCharWidth * hexBlockSize;
 			}
