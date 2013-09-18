@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps haiku-depot ;
 
-UsePrivateHeaders interface shared ;
+UsePrivateHeaders interface shared package ;
 
 # source directories
 local sourceDirs =
@@ -33,7 +33,9 @@ Application HaikuDepot :
 	App.cpp
 	BitmapButton.cpp
 	BitmapView.cpp
+	DecisionProvider.cpp
 	FilterView.cpp
+	JobStateListener.cpp
 	main.cpp
 	MainWindow.cpp
 	Model.cpp
@@ -47,8 +49,8 @@ Application HaikuDepot :
 	# text view stuff
 	$(textDocumentSources)
 
-	: be translation libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
-		localestub
+	: be package translation libcolumnlistview.a libshared.a
+		$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) localestub
 	: HaikuDepot.rdef
 ;
 
