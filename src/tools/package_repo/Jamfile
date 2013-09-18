@@ -14,6 +14,6 @@ BuildPlatformMain <build>package_repo :
 	command_list.cpp
 	package_repo.cpp
 	:
-	libpackage_build.so $(HOST_LIBBE) $(HOST_LIBSUPC++)
+	libpackage_build.so $(HOST_LIBBE) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 ;
 
