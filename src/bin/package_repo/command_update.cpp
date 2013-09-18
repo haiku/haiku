@@ -324,7 +324,8 @@ command_update(int argc, const char* const* argv)
 		PackageInfos::iterator infoIter = packageInfos.find(packageInfo);
 		if (infoIter != packageInfos.end()) {
 			infoIter->second = true;
-			if ((result = repositoryWriter.AddPackageInfo(packageInfo)) != B_OK)
+			if ((result = repositoryWriter.AddPackageInfo(infoIter->first))
+					!= B_OK)
 				return 1;
 			if (verbose) {
 				printf("keeping '%s-%s'\n", infoIter->first.Name().String(),
