@@ -18,7 +18,7 @@
 		serial1 = &btuart;
 		serial2 = &stuart;
 		serial3 = &hwuart;
-		i2c0 = &pwri2c;
+	/*	i2c0 = &pwri2c; */
 		i2c1 = &pxai2c1;
 	};
 
