@@ -24,6 +24,8 @@
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 
+#include <support/Url.h>
+
 #include "BitmapButton.h"
 #include "BitmapView.h"
 #include "MarkupParser.h"
@@ -654,6 +656,27 @@ public:
 		Clear();
 	}
 
+	virtual void AttachedToWindow()
+	{
+		fWebsiteLinkView->SetTarget(this);
+	}
+
+	virtual void MessageReceived(BMessage* message)
+	{
+		switch(message->what) {
+			case MSG_VISIT_PUBLISHER_WEBSITE:
+			{
+				BPrivate::Support::BUrl url(fWebsiteLinkView->Text());
+				url.OpenWithPreferredApplication();
+				break;
+			}
+
+			default:
+				BView::MessageReceived(message);
+				break;
+		}
+	}
+
 	void SetPackage(const PackageInfo& package)
 	{
 		fDescriptionView->SetText(package.ShortDescription(),
@@ -696,7 +719,7 @@ private:
 
 	SharedBitmap		fWebsiteIcon;
 	BitmapView*			fWebsiteIconView;
-	BStringView*		fWebsiteLinkView;
+	LinkView*			fWebsiteLinkView;
 };
 
 
