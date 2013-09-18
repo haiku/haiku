@@ -13,6 +13,7 @@
 #include <ByteOrder.h>
 #include <KernelExport.h>
 
+#include <ATACommands.h>
 #include <ATAInfoBlock.h>
 
 #include "ahci_controller.h"
@@ -358,8 +359,8 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 	uint32 ci = fRegs->ci;
 
 	if (!fTestUnitReadyActive) {
-		TRACE("AHCIPort::InterruptErrorHandler port %d, "
-			"fCommandsActive 0x%08" B_PRIx32 ", is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", fIndex,
+		TRACE("AHCIPort::InterruptErrorHandler port %d, fCommandsActive 0x%08"
+			B_PRIx32 ", is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", fIndex,
 			fCommandsActive, is, ci);
 
 		TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
@@ -563,7 +564,8 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 	sata_request sreq;
 	sreq.set_data(&ataData, sizeof(ataData));
-	sreq.set_ata_cmd(fIsATAPI ? 0xa1 : 0xec); // Identify (Packet) Device
+	sreq.set_ata_cmd(fIsATAPI
+		? ATA_COMMAND_IDENTIFY_PACKET_DEVICE : ATA_COMMAND_IDENTIFY_DEVICE);
 	ExecuteSataRequest(&sreq);
 	sreq.wait_for_completion();
 
@@ -671,7 +673,8 @@ AHCIPort::ScsiSynchronizeCache(scsi_ccb *request)
 		return;
 	}
 
-	sreq->set_ata_cmd(fUse48BitCommands ? 0xea : 0xe7); // Flush Cache
+	sreq->set_ata_cmd(fUse48BitCommands
+		? ATA_COMMAND_FLUSH_CACHE_EXT : ATA_COMMAND_FLUSH_CACHE);
 	ExecuteSataRequest(sreq);
 }
 
@@ -771,7 +774,9 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount,
 		}
 		if (lba > MAX_SECTOR_LBA_48)
 			panic("achi: ScsiReadWrite position too large for 48-bit LBA\n");
-		sreq->set_ata48_cmd(isWrite ? 0x35 : 0x25, lba, sectorCount);
+		sreq->set_ata48_cmd(
+			isWrite ? ATA_COMMAND_WRITE_DMA_EXT : ATA_COMMAND_READ_DMA_EXT,
+			lba, sectorCount);
 	} else {
 		if (sectorCount > 256) {
 			panic("ahci: ScsiReadWrite length too large, %lu sectors",
@@ -779,7 +784,8 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount,
 		}
 		if (lba > MAX_SECTOR_LBA_28)
 			panic("achi: ScsiReadWrite position too large for normal LBA\n");
-		sreq->set_ata28_cmd(isWrite ? 0xca : 0xc8, lba, sectorCount);
+		sreq->set_ata28_cmd(isWrite
+			? ATA_COMMAND_WRITE_DMA : ATA_COMMAND_READ_DMA, lba, sectorCount);
 	}
 
 	ExecuteSataRequest(sreq, isWrite);
@@ -799,6 +805,7 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 		return;
 	}
 
+	sreq->set_ata_cmd(ATA_COMMAND_DATA_SET_MANAGEMENT);
 	delete sreq;
 }
 
@@ -1074,7 +1081,6 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 uchar
 AHCIPort::ScsiAbortRequest(scsi_ccb *request)
 {
-
 	return SCSI_REQ_CMP;
 }
 

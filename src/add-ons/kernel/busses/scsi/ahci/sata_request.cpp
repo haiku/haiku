@@ -10,6 +10,9 @@
 #include "scsi_cmds.h"
 
 
+#define FIS_TYPE_REGISTER_HOST_TO_DEVICE 0x27
+
+
 sata_request::sata_request()
 	:
 	fCcb(NULL),
@@ -54,7 +57,7 @@ void
 sata_request::set_ata_cmd(uint8 command)
 {
 	memset(fFis, 0, sizeof(fFis));
-	fFis[0] = 0x27;
+	fFis[0] = FIS_TYPE_REGISTER_HOST_TO_DEVICE;
 	fFis[1] = 0x80;
 	fFis[2] = command;
 }
