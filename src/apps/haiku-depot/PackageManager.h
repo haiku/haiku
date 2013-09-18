@@ -80,10 +80,6 @@ private:
 									InstalledRepository& repository);
 
 private:
-			void				_PrintResult(InstalledRepository&
-									installationRepository);
-
-private:
 			DecisionProvider	fDecisionProvider;
 			JobStateListener	fJobStateListener;
 			BContext			fContext;

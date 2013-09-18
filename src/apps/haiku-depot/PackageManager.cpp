@@ -176,10 +176,3 @@ PackageManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 {
 	// TODO: implement
 }
-
-
-void
-PackageManager::_PrintResult(InstalledRepository& installationRepository)
-{
-	// TODO: implement
-}
