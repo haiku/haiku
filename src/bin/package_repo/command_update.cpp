@@ -24,6 +24,7 @@
 #include <package/hpkg/RepositoryWriter.h>
 #include <package/hpkg/StandardErrorOutput.h>
 #include <package/PackageInfo.h>
+#include <package/PackageInfoContentHandler.h>
 #include <package/RepositoryInfo.h>
 
 #include "package_repo.h"
@@ -77,9 +78,14 @@ parsePackageListFile(const char* packageListFileName,
 
 
 struct PackageInfosCollector : BRepositoryContentHandler {
-	PackageInfosCollector(PackageInfos& packageInfos)
+	PackageInfosCollector(PackageInfos& packageInfos,
+		BHPKG::BErrorOutput* errorOutput)
 		:
-		fPackageInfos(packageInfos)
+		fPackageInfos(packageInfos),
+		fErrorOutput(errorOutput),
+		fRepositoryInfo(),
+		fPackageInfo(),
+		fPackageInfoContentHandler(fPackageInfo, fErrorOutput)
 	{
 	}
 
@@ -92,121 +98,7 @@ struct PackageInfosCollector : BRepositoryContentHandler {
 	virtual status_t HandlePackageAttribute(
 		const BPackageInfoAttributeValue& value)
 	{
-		switch (value.attributeID) {
-			case B_PACKAGE_INFO_NAME:
-				fPackageInfo.SetName(value.string);
-				break;
-
-			case B_PACKAGE_INFO_SUMMARY:
-				fPackageInfo.SetSummary(value.string);
-				break;
-
-			case B_PACKAGE_INFO_DESCRIPTION:
-				fPackageInfo.SetDescription(value.string);
-				break;
-
-			case B_PACKAGE_INFO_VENDOR:
-				fPackageInfo.SetVendor(value.string);
-				break;
-
-			case B_PACKAGE_INFO_PACKAGER:
-				fPackageInfo.SetPackager(value.string);
-				break;
-
-			case B_PACKAGE_INFO_BASE_PACKAGE:
-				fPackageInfo.SetBasePackage(value.string);
-				break;
-
-			case B_PACKAGE_INFO_FLAGS:
-				fPackageInfo.SetFlags(value.unsignedInt);
-				break;
-
-			case B_PACKAGE_INFO_ARCHITECTURE:
-				fPackageInfo.SetArchitecture(BPackageArchitecture(
-					value.unsignedInt));
-				break;
-
-			case B_PACKAGE_INFO_VERSION:
-				fPackageInfo.SetVersion(value.version);
-				break;
-
-			case B_PACKAGE_INFO_COPYRIGHTS:
-				fPackageInfo.AddCopyright(value.string);
-				break;
-
-			case B_PACKAGE_INFO_LICENSES:
-				fPackageInfo.AddLicense(value.string);
-				break;
-
-			case B_PACKAGE_INFO_URLS:
-				fPackageInfo.AddURL(value.string);
-				break;
-
-			case B_PACKAGE_INFO_SOURCE_URLS:
-				fPackageInfo.AddSourceURL(value.string);
-				break;
-
-			case B_PACKAGE_INFO_PROVIDES:
-				fPackageInfo.AddProvides(value.resolvable);
-				break;
-
-			case B_PACKAGE_INFO_REQUIRES:
-				fPackageInfo.AddRequires(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_SUPPLEMENTS:
-				fPackageInfo.AddSupplements(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_CONFLICTS:
-				fPackageInfo.AddConflicts(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_FRESHENS:
-				fPackageInfo.AddFreshens(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_REPLACES:
-				fPackageInfo.AddReplaces(value.string);
-				break;
-
-			case B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES:
-				fPackageInfo.AddGlobalWritableFileInfo(
-					value.globalWritableFileInfo);
-				break;
-
-			case B_PACKAGE_INFO_USER_SETTINGS_FILES:
-				fPackageInfo.AddUserSettingsFileInfo(
-					value.userSettingsFileInfo);
-				break;
-
-			case B_PACKAGE_INFO_USERS:
-				fPackageInfo.AddUser(value.user);
-				break;
-
-			case B_PACKAGE_INFO_GROUPS:
-				fPackageInfo.AddGroup(value.string);
-				break;
-
-			case B_PACKAGE_INFO_POST_INSTALL_SCRIPTS:
-				fPackageInfo.AddPostInstallScript(value.string);
-				break;
-
-			case B_PACKAGE_INFO_INSTALL_PATH:
-				fPackageInfo.SetInstallPath(value.string);
-				break;
-
-			case B_PACKAGE_INFO_CHECKSUM:
-				fPackageInfo.SetChecksum(value.string);
-				break;
-
-			default:
-				printf("Error: Invalid package attribute section: unexpected "
-					"package attribute id %d encountered\n", value.attributeID);
-				return B_BAD_DATA;
-		}
-
-		return B_OK;
+		return fPackageInfoContentHandler.HandlePackageAttribute(value);
 	}
 
 	virtual status_t HandlePackageDone(const char* packageName)
@@ -237,9 +129,11 @@ struct PackageInfosCollector : BRepositoryContentHandler {
 	}
 
 private:
+	PackageInfos& fPackageInfos;
+	BHPKG::BErrorOutput* fErrorOutput;
 	BRepositoryInfo fRepositoryInfo;
 	BPackageInfo fPackageInfo;
-	PackageInfos& fPackageInfos;
+	BPackageInfoContentHandler fPackageInfoContentHandler;
 };
 
 
@@ -372,7 +266,7 @@ command_update(int argc, const char* const* argv)
 
 	// collect package infos and repository info from source repository
 	PackageInfos packageInfos;
-	PackageInfosCollector packageInfosCollector(packageInfos);
+	PackageInfosCollector packageInfosCollector(packageInfos, &errorOutput);
 	error = repositoryReader.ParseContent(&packageInfosCollector);
 	if (error != B_OK)
 		return 1;
