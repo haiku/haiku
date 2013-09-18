@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -94,7 +94,8 @@ BContext::_Initialize()
 	if ((result = tempDirectory.InitCheck()) != B_OK)
 		return result;
 
-	BString contextName = BString("pkgkit-context-") << find_thread(NULL);
+	BString contextName = BString("pkgkit-context-") << find_thread(NULL)
+		<< "-" << system_time();
 	BDirectory baseDirectory;
 	result = tempDirectory.CreateDirectory(contextName.String(),
 		&baseDirectory);
