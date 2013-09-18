@@ -17,5 +17,11 @@ BinCommand useradd : useradd.cpp ;
 
 BinCommand userdel : userdel.cpp ;
 
+BinCommand groupadd : groupadd.cpp ;
+
+BinCommand groupdel : groupdel.cpp ;
+
+BinCommand groupmod : groupmod.cpp : $(TARGET_LIBSTDC++) ;
+
 # set set-uid bit on passwd
 MODE on passwd = 04755 ;
