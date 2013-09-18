@@ -52,6 +52,16 @@ BRepositoryWriter::AddPackage(const BEntry& packageEntry)
 
 
 status_t
+BRepositoryWriter::AddPackageInfo(const BPackageInfo& packageInfo)
+{
+	if (fImpl == NULL)
+		return B_NO_INIT;
+
+	return fImpl->AddPackageInfo(packageInfo);
+}
+
+
+status_t
 BRepositoryWriter::Finish()
 {
 	if (fImpl == NULL)

@@ -41,11 +41,14 @@ public:
 
 			status_t			Init(const char* fileName);
 			status_t			AddPackage(const BEntry& packageEntry);
+			status_t			AddPackageInfo(const BPackageInfo& packageInfo);
 			status_t			Finish();
 
 private:
 			status_t			_Init(const char* fileName);
 			status_t			_AddPackage(const BEntry& packageEntry);
+			status_t			_AddPackageInfo(
+									const BPackageInfo& packageInfo);
 			status_t			_Finish();
 
 			status_t			_RegisterCurrentPackageInfo();

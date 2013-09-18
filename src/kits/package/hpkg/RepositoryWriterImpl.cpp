@@ -234,6 +234,20 @@ RepositoryWriterImpl::AddPackage(const BEntry& packageEntry)
 
 
 status_t
+RepositoryWriterImpl::AddPackageInfo(const BPackageInfo& packageInfo)
+{
+	try {
+		return _AddPackageInfo(packageInfo);
+	} catch (status_t error) {
+		return error;
+	} catch (std::bad_alloc) {
+		fListener->PrintError("Out of memory!\n");
+		return B_NO_MEMORY;
+	}
+}
+
+
+status_t
 RepositoryWriterImpl::Finish()
 {
 	try {
@@ -344,6 +358,20 @@ RepositoryWriterImpl::_AddPackage(const BEntry& packageEntry)
 
 	// register package's attributes
 	if ((result = _RegisterCurrentPackageInfo()) != B_OK)
+		return result;
+
+	return B_OK;
+}
+
+
+status_t
+RepositoryWriterImpl::_AddPackageInfo(const BPackageInfo& packageInfo)
+{
+	fPackageInfo = packageInfo;
+
+	// register package's attributes
+	status_t result = _RegisterCurrentPackageInfo();
+	if (result != B_OK)
 		return result;
 
 	return B_OK;
