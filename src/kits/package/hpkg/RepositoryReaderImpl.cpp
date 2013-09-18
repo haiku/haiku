@@ -45,6 +45,8 @@ static const size_t kMaxPackageAttributesSize	= 64 * 1024 * 1024;
 
 class RepositoryReaderImpl::PackagesAttributeHandler
 	: public AttributeHandler {
+private:
+	typedef AttributeHandler super;
 public:
 	PackagesAttributeHandler(BRepositoryContentHandler* contentHandler)
 		:
@@ -92,9 +94,12 @@ public:
 		return B_OK;
 	}
 
-	virtual status_t Delete(AttributeHandlerContext* context)
+	virtual status_t NotifyDone(AttributeHandlerContext* context)
 	{
-		return _NotifyPackageDone();
+		status_t result = _NotifyPackageDone();
+		if (result == B_OK)
+			result = super::NotifyDone(context);
+		return result;
 	}
 
 private:

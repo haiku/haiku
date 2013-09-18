@@ -104,6 +104,14 @@ ReaderImplBase::AttributeHandler::HandleAttribute(
 
 
 status_t
+ReaderImplBase::AttributeHandler::NotifyDone(
+	AttributeHandlerContext* context)
+{
+	return B_OK;
+}
+
+
+status_t
 ReaderImplBase::AttributeHandler::Delete(AttributeHandlerContext* context)
 {
 	delete this;
@@ -124,14 +132,12 @@ ReaderImplBase::PackageInfoAttributeHandlerBase
 
 
 status_t
-ReaderImplBase::PackageInfoAttributeHandlerBase::Delete(
+ReaderImplBase::PackageInfoAttributeHandlerBase::NotifyDone(
 	AttributeHandlerContext* context)
 {
 	status_t error = context->packageContentHandler->HandlePackageAttribute(
 		fPackageInfoValue);
 	fPackageInfoValue.Clear();
-
-	delete this;
 	return error;
 }
 
@@ -143,7 +149,7 @@ ReaderImplBase::PackageVersionAttributeHandler::PackageVersionAttributeHandler(
 	BPackageInfoAttributeValue& packageInfoValue,
 	BPackageVersionData& versionData, bool notify)
 	:
-	PackageInfoAttributeHandlerBase(packageInfoValue),
+	super(packageInfoValue),
 	fPackageVersionData(versionData),
 	fNotify(notify)
 {
@@ -187,19 +193,14 @@ ReaderImplBase::PackageVersionAttributeHandler::HandleAttribute(
 
 
 status_t
-ReaderImplBase::PackageVersionAttributeHandler::Delete(
+ReaderImplBase::PackageVersionAttributeHandler::NotifyDone(
 	AttributeHandlerContext* context)
 {
-	status_t error = B_OK;
-	if (fNotify) {
-		fPackageInfoValue.attributeID = B_PACKAGE_INFO_VERSION;
-		error = context->packageContentHandler->HandlePackageAttribute(
-			fPackageInfoValue);
-		fPackageInfoValue.Clear();
-	}
+	if (!fNotify)
+		return B_OK;
 
-	delete this;
-	return error;
+	fPackageInfoValue.attributeID = B_PACKAGE_INFO_VERSION;
+	return super::NotifyDone(context);
 }
 
 
@@ -210,7 +211,7 @@ ReaderImplBase::PackageResolvableAttributeHandler
 	::PackageResolvableAttributeHandler(
 		BPackageInfoAttributeValue& packageInfoValue)
 	:
-	PackageInfoAttributeHandlerBase(packageInfoValue)
+	super(packageInfoValue)
 {
 }
 
@@ -268,7 +269,7 @@ ReaderImplBase::PackageResolvableExpressionAttributeHandler
 	::PackageResolvableExpressionAttributeHandler(
 		BPackageInfoAttributeValue& packageInfoValue)
 	:
-	PackageInfoAttributeHandlerBase(packageInfoValue)
+	super(packageInfoValue)
 {
 }
 
@@ -328,7 +329,7 @@ ReaderImplBase::GlobalWritableFileInfoAttributeHandler
 	::GlobalWritableFileInfoAttributeHandler(
 		BPackageInfoAttributeValue& packageInfoValue)
 	:
-	PackageInfoAttributeHandlerBase(packageInfoValue)
+	super(packageInfoValue)
 {
 }
 
@@ -378,7 +379,7 @@ ReaderImplBase::UserSettingsFileInfoAttributeHandler
 	::UserSettingsFileInfoAttributeHandler(
 		BPackageInfoAttributeValue& packageInfoValue)
 	:
-	PackageInfoAttributeHandlerBase(packageInfoValue)
+	super(packageInfoValue)
 {
 }
 
@@ -419,7 +420,7 @@ ReaderImplBase::UserSettingsFileInfoAttributeHandler::HandleAttribute(
 ReaderImplBase::UserAttributeHandler::UserAttributeHandler(
 		BPackageInfoAttributeValue& packageInfoValue)
 	:
-	PackageInfoAttributeHandlerBase(packageInfoValue),
+	super(packageInfoValue),
 	fGroups()
 {
 }
@@ -464,14 +465,15 @@ ReaderImplBase::UserAttributeHandler::HandleAttribute(
 
 
 status_t
-ReaderImplBase::UserAttributeHandler::Delete(AttributeHandlerContext* context)
+ReaderImplBase::UserAttributeHandler::NotifyDone(
+	AttributeHandlerContext* context)
 {
 	if (!fGroups.IsEmpty()) {
 		fPackageInfoValue.user.groups = fGroups.Elements();
 		fPackageInfoValue.user.groupCount = fGroups.Count();
 	}
 
-	return PackageInfoAttributeHandlerBase::Delete(context);
+	return super::NotifyDone(context);
 }
 
 
@@ -740,17 +742,16 @@ ReaderImplBase::LowLevelAttributeHandler::HandleAttribute(
 
 
 status_t
-ReaderImplBase::LowLevelAttributeHandler::Delete(
+ReaderImplBase::LowLevelAttributeHandler::NotifyDone(
 	AttributeHandlerContext* context)
 {
-	status_t error = B_OK;
 	if (fID != B_HPKG_ATTRIBUTE_ID_ENUM_COUNT) {
-		error = context->lowLevelHandler->HandleAttributeDone(
+		status_t error = context->lowLevelHandler->HandleAttributeDone(
 			(BHPKGAttributeID)fID, fValue, fParentToken, fToken);
+		if (error != B_OK)
+			return error;
 	}
-
-	delete this;
-	return error;
+	return super::NotifyDone(context);
 }
 
 
@@ -1082,6 +1083,9 @@ ReaderImplBase::_ParseAttributeTree(AttributeHandlerContext* context)
 
 		if (tag == 0) {
 			AttributeHandler* handler = PopAttributeHandler();
+			error = handler->NotifyDone(context);
+			if (error != B_OK)
+				return error;
 			if (level-- == 0)
 				return B_OK;
 

@@ -243,6 +243,8 @@ public:
 									const AttributeValue& value,
 									AttributeHandler** _handler);
 
+	virtual	status_t			NotifyDone(AttributeHandlerContext* context);
+
 	virtual	status_t			Delete(AttributeHandlerContext* context);
 
 protected:
@@ -256,12 +258,14 @@ class ReaderImplBase::IgnoreAttributeHandler : public AttributeHandler {
 
 class ReaderImplBase::PackageInfoAttributeHandlerBase
 	: public AttributeHandler {
+private:
+	typedef	AttributeHandler	super;
 public:
 								PackageInfoAttributeHandlerBase(
 									BPackageInfoAttributeValue&
 										packageInfoValue);
 
-	virtual	status_t			Delete(AttributeHandlerContext* context);
+	virtual	status_t			NotifyDone(AttributeHandlerContext* context);
 
 protected:
 			BPackageInfoAttributeValue& fPackageInfoValue;
@@ -270,6 +274,8 @@ protected:
 
 class ReaderImplBase::PackageVersionAttributeHandler
 	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
 public:
 								PackageVersionAttributeHandler(
 									BPackageInfoAttributeValue&
@@ -282,7 +288,7 @@ public:
 									const AttributeValue& value,
 									AttributeHandler** _handler);
 
-	virtual	status_t			Delete(AttributeHandlerContext* context);
+	virtual	status_t			NotifyDone(AttributeHandlerContext* context);
 
 private:
 			BPackageVersionData& fPackageVersionData;
@@ -292,6 +298,8 @@ private:
 
 class ReaderImplBase::PackageResolvableAttributeHandler
 	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
 public:
 								PackageResolvableAttributeHandler(
 									BPackageInfoAttributeValue&
@@ -306,6 +314,8 @@ public:
 
 class ReaderImplBase::PackageResolvableExpressionAttributeHandler
 	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
 public:
 								PackageResolvableExpressionAttributeHandler(
 									BPackageInfoAttributeValue&
@@ -320,6 +330,8 @@ public:
 
 class ReaderImplBase::GlobalWritableFileInfoAttributeHandler
 	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
 public:
 								GlobalWritableFileInfoAttributeHandler(
 									BPackageInfoAttributeValue&
@@ -334,6 +346,8 @@ public:
 
 class ReaderImplBase::UserSettingsFileInfoAttributeHandler
 	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
 public:
 								UserSettingsFileInfoAttributeHandler(
 									BPackageInfoAttributeValue&
@@ -348,6 +362,8 @@ public:
 
 class ReaderImplBase::UserAttributeHandler
 	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
 public:
 								UserAttributeHandler(
 									BPackageInfoAttributeValue&
@@ -358,7 +374,7 @@ public:
 									const AttributeValue& value,
 									AttributeHandler** _handler);
 
-	virtual	status_t			Delete(AttributeHandlerContext* context);
+	virtual	status_t			NotifyDone(AttributeHandlerContext* context);
 
 private:
 			Array<const char*>	fGroups;
@@ -366,6 +382,8 @@ private:
 
 
 class ReaderImplBase::PackageAttributeHandler : public AttributeHandler {
+private:
+	typedef	AttributeHandler	super;
 public:
 	virtual	status_t			HandleAttribute(
 									AttributeHandlerContext* context, uint8 id,
@@ -378,6 +396,8 @@ private:
 
 
 class ReaderImplBase::LowLevelAttributeHandler : public AttributeHandler {
+private:
+	typedef	AttributeHandler	super;
 public:
 								LowLevelAttributeHandler();
 								LowLevelAttributeHandler(uint8 id,
@@ -388,7 +408,8 @@ public:
 									AttributeHandlerContext* context, uint8 id,
 									const AttributeValue& value,
 									AttributeHandler** _handler);
-	virtual	status_t			Delete(AttributeHandlerContext* context);
+
+	virtual	status_t			NotifyDone(AttributeHandlerContext* context);
 
 private:
 			void*				fParentToken;
