@@ -1,0 +1,41 @@
+/dts-v1/;
+/include/ "pxa27x.dtsi"
+
+/ {
+	model = "Gumstix Verdex";
+	compatible = "gumstix,verdex", "marvell,pxa27x";
+
+	chosen {
+		bootargs = "console=ttyS0,115200 debug";
+	};
+
+	memory {
+		reg = <0xa0000000 0x10000000>;
+	};
+
+	pxabus {
+                ffuart: uart@40100000 {
+                        status = "okay";
+                };
+
+		usb0: ohci@4c000000 {
+			status = "okay";
+		};
+
+		/* The devices below should be in pxa27x.dtsi, but I kept them here
+			so to keep the files from upstream as clean as possible for now */
+
+		lcdc: lcdc@44000000 {
+			compatible = "mrvl,pxa-lcdc" ;
+			reg = <0x44000000 0xa0> ;
+			interrupts = <17> ;
+		};
+
+		timers: timers@40a00000 {
+			compatible = "mrvl,pxa-timers" ;
+			reg = <0x40a00000 0xc0> ;
+			interrupts = <26>, <27>, <28>, <29>, <7> ;
+			interrupt-names = "OST_0", "OST_1", "OST_2", "OST_3", "OST_4_11" ;
+		};
+	};
+};
