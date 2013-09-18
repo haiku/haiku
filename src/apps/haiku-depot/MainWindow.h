@@ -38,7 +38,7 @@ private:
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();
 
-			void				_InitDummyModel();
+			void				_InitModel();
 
 private:
 			FilterView*			fFilterView;
@@ -49,7 +49,8 @@ private:
 			Model				fModel;
 			PackageList			fVisiblePackages;
 
-			PackageManager		fPackageManager;
+			PackageManager
+								fPackageManager;
 };
 
 #endif // MAIN_WINDOW_H
