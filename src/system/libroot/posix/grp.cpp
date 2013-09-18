@@ -64,8 +64,8 @@ query_group_entry(const char* name, gid_t _gid, struct group *group,
 
 	const char* members[MAX_GROUP_MEMBER_COUNT];
 	int memberCount = 0;
-	for (int memberCount = 0; memberCount < MAX_GROUP_MEMBER_COUNT;) {
-		if (reply.FindString("members", members + memberCount) != B_OK)
+	for (int32 index = 0; memberCount < MAX_GROUP_MEMBER_COUNT; index++) {
+		if (reply.FindString("members", index, members + memberCount) != B_OK)
 			break;
 		memberCount++;
 	}
