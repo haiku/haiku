@@ -149,7 +149,7 @@ public:
 		BStringView(name, string),
 		BInvoker(message, NULL),
 		fNormalColor(color),
-		fHoverColor((rgb_color){ 1, 141, 211, 255 })
+		fHoverColor(make_color(1, 141, 211))
 	{
 	}
 
