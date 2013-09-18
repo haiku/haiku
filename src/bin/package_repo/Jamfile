@@ -10,8 +10,10 @@ DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 BinCommand package_repo :
 	command_create.cpp
 	command_list.cpp
+	command_update.cpp
 	package_repo.cpp
 	:
 	package be
 	$(TARGET_LIBSUPC++)
+	$(TARGET_LIBSTDC++)
 ;

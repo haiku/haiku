@@ -47,7 +47,7 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 				printf("package-attributes:\n");
 				fPrinter.PrintName(value.string);
 			} else
-				printf("package: %s", value.string);
+				printf("\t%s\n", value.string);
 		} else {
 			if (fVerbose && !fPrinter.PrintAttribute(value)) {
 				printf("*** Invalid package attribute section: unexpected "
@@ -80,6 +80,7 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 			for (int i = 0; i < licenseNames.CountStrings(); ++i)
 				printf("\t\t%s\n", licenseNames.StringAt(i).String());
 		}
+		printf("packages:\n");
 
 		return B_OK;
 	}
