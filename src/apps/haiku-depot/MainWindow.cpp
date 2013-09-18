@@ -274,15 +274,23 @@ MainWindow::_InitModel()
 		PackageInfoMap::iterator it = foundPackages.find(
 			repoPackageInfo.Name());
 		if (it != foundPackages.end())
-			modelInfo = it->second;
+			modelInfo.SetTo(it->second);
 		else {
+			BString publisherURL;
+			if (repoPackageInfo.URLList().CountStrings() > 0)
+				publisherURL = repoPackageInfo.URLList().StringAt(0);
 			modelInfo.SetTo(new(std::nothrow) PackageInfo(NULL,
-				repoPackageInfo.Name(), repoPackageInfo.Version().ToString(),
-				PublisherInfo(BitmapRef(), repoPackageInfo.Vendor(), "", ""),
-				repoPackageInfo.Summary(), repoPackageInfo.Description(), ""),
-			true);
+					repoPackageInfo.Name(),
+					repoPackageInfo.Version().ToString(),
+					PublisherInfo(BitmapRef(), repoPackageInfo.Vendor(),
+					"", publisherURL), repoPackageInfo.Summary(),
+					repoPackageInfo.Description(), ""),
+				true);
+
 			if (modelInfo.Get() == NULL)
 				return;
+
+			foundPackages[repoPackageInfo.Name()] = modelInfo;
 		}
 
 		BSolverRepository* repository = package->Repository();
@@ -302,16 +310,20 @@ MainWindow::_InitModel()
 				installationLocation = "home";
 			}
 
-			if (installationLocation != NULL)
-				packageLocations[installationLocation].AddItem(modelInfo.Get());
+			if (installationLocation != NULL) {
+				packageLocations[installationLocation].AddItem(
+					modelInfo.Get());
+			}
 		}
 	}
 
-	for (DepotInfoMap::iterator it = depots.begin(); it != depots.end(); ++it)
+	for (DepotInfoMap::iterator it = depots.begin(); it != depots.end();
+		++it) {
 		fModel.AddDepot(it->second);
+	}
 
 	for (PackageLocationMap::iterator it = packageLocations.begin();
-		 it != packageLocations.end(); ++it) {
+		it != packageLocations.end(); ++it) {
 		for (int32 i = 0; i < it->second.CountItems(); i++) {
 			fModel.SetPackageState(it->second.ItemAt(i), ACTIVATED);
 				// TODO: indicate the specific installation location
@@ -319,5 +331,4 @@ MainWindow::_InitModel()
 				// by querying the package roster
 		}
 	}
-
 }
