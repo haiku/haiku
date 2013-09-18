@@ -243,6 +243,7 @@ HOST_UNARFLAGS		?= x ;
 # check the host platform compatibility
 SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
 	: linux openbsd freebsd darwin sunos cygwin ;
+HOST_PLATFORM_(host)_COMPATIBLE = 1 ;
 
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
 	|| $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = cygwin
@@ -265,15 +266,16 @@ if $(HOST_PLATFORM) = cygwin {
 		--enable-auto-import ;
 }
 
-HOST_CPU	?= $(OSPLAT:L) ;
+HOST_CPU ?= $(OSPLAT:L) ;
 
 # Jam doesn't know x86_64, so override HOST_CPU, if 64 bit.
 if $(HOST_CPU) = x86 && $(HOST_PLATFORM_IS_64_BIT) {
 	HOST_CPU = x86_64 ;
 }
 
-HOST_ARCH				?= $(HOST_CPU) ;
+HOST_ARCH ?= $(HOST_CPU) ;
 HOST_ARCHS = $(HOST_ARCH) ;
+HOST_KERNEL_ARCH = host ;
 
 # analyze GCC version
 HOST_GCC_VERSION = [ FAnalyzeGCCVersion HOST_GCC_RAW_VERSION ] ;

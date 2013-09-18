@@ -207,6 +207,9 @@ rule SetPlatformCompatibilityFlagVariables
 			$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE = true ;
 		}
 
+		case host :
+			# not compatible to anything
+
 		case * :
 		{
 			if ! ( $(platform) in $(otherPlatforms) ) {
