@@ -288,6 +288,13 @@ Model::AddDepot(const DepotInfo& depot)
 
 
 void
+Model::Clear()
+{
+	fDepots.Clear();
+}
+
+
+void
 Model::SetPackageState(const PackageInfoRef& package, PackageState state)
 {
 	switch (state) {

@@ -35,6 +35,8 @@ public:
 			const DepotList&	Depots() const
 									{ return fDepots; }
 
+			void				Clear();
+
 			// Access to global categories
 			const CategoryRef&	CategoryAudio() const
 									{ return fCategoryAudio; }
