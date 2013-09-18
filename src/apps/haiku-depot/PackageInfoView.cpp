@@ -663,7 +663,7 @@ public:
 
 	virtual void MessageReceived(BMessage* message)
 	{
-		switch(message->what) {
+		switch (message->what) {
 			case MSG_VISIT_PUBLISHER_WEBSITE:
 			{
 				BPrivate::Support::BUrl url(fWebsiteLinkView->Text());
