@@ -26,6 +26,7 @@
 #include <package/Context.h>
 #include <package/RefreshRepositoryRequest.h>
 #include <package/PackageRoster.h>
+#include "package/RepositoryCache.h"
 #include <package/solver/SolverPackage.h>
 
 #include "DecisionProvider.h"
@@ -38,6 +39,11 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MainWindow"
+
+
+enum {
+	MSG_MODEL_WORKER_DONE = 'mmwd'
+};
 
 
 using namespace BPackageKit;
@@ -53,10 +59,10 @@ MainWindow::MainWindow(BRect frame)
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
-	fPackageManager(B_PACKAGE_INSTALLATION_LOCATION_HOME)
+	fPackageManager(B_PACKAGE_INSTALLATION_LOCATION_HOME),
+	fTerminating(false),
+	fModelWorker(B_BAD_THREAD_ID)
 {
-	_InitModel();
-
 	BMenuBar* menuBar = new BMenuBar(B_TRANSLATE("Main Menu"));
 	_BuildMenu(menuBar);
 
@@ -83,12 +89,21 @@ MainWindow::MainWindow(BRect frame)
 	fSplitView->SetCollapsible(0, false);
 	fSplitView->SetCollapsible(1, false);
 
-	_AdoptModel();
+	fModelWorker = spawn_thread(&_RefreshModelThreadWorker, "model loader",
+		B_LOW_PRIORITY, this);
+
+	if (fModelWorker > 0)
+		resume_thread(fModelWorker);
 }
 
 
 MainWindow::~MainWindow()
 {
+	fTerminating = true;
+	if (fModelWorker > 0) {
+		status_t result;
+		wait_for_thread(fModelWorker, &result);
+	}
 }
 
 
@@ -107,6 +122,12 @@ void
 MainWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_MODEL_WORKER_DONE:
+		{
+			fModelWorker = B_BAD_THREAD_ID;
+			_AdoptModel();
+			break;
+		}
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
 			// TODO: ?
@@ -206,23 +227,20 @@ MainWindow::_ClearPackage()
 
 
 void
-MainWindow::_InitModel()
+MainWindow::_RefreshRepositories(bool force)
 {
 	BPackageRoster roster;
-
 	BStringList repositoryNames;
-	status_t result = roster.GetRepositoryNames(repositoryNames);
 
-	// TODO: notify user
+	status_t result = roster.GetRepositoryNames(repositoryNames);
 	if (result != B_OK)
 		return;
-
-	DepotInfoMap depots;
 
 	DecisionProvider decisionProvider;
 	JobStateListener listener;
 	BContext context(decisionProvider, listener);
 
+	BRepositoryCache cache;
 	for (int32 i = 0; i < repositoryNames.CountStrings(); ++i) {
 		const BString& repoName = repositoryNames.StringAt(i);
 		BRepositoryConfig repoConfig;
@@ -232,13 +250,32 @@ MainWindow::_InitModel()
 			continue;
 		}
 
-		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
-		result = refreshRequest.Process();
-		if (result != B_OK) {
-			// TODO: notify user
-			continue;
+		if (roster.GetRepositoryCache(repoName, &cache) != B_OK
+			|| force) {
+			BRefreshRepositoryRequest refreshRequest(context, repoConfig);
+			result = refreshRequest.Process();
+			if (result != B_OK) {
+				// TODO: notify user
+				continue;
+			}
 		}
+	}
+}
 
+
+void
+MainWindow::_RefreshPackageList()
+{
+	BPackageRoster roster;
+	BStringList repositoryNames;
+
+	status_t result = roster.GetRepositoryNames(repositoryNames);
+	if (result != B_OK)
+		return;
+
+	DepotInfoMap depots;
+	for (int32 i = 0; i < repositoryNames.CountStrings(); i++) {
+		const BString& repoName = repositoryNames.StringAt(i);
 		depots[repoName] = DepotInfo(repoName);
 	}
 
@@ -317,6 +354,10 @@ MainWindow::_InitModel()
 		}
 	}
 
+	BAutolock lock(fModel.Lock());
+
+	fModel.Clear();
+
 	for (DepotInfoMap::iterator it = depots.begin(); it != depots.end();
 		++it) {
 		fModel.AddDepot(it->second);
@@ -332,3 +373,25 @@ MainWindow::_InitModel()
 		}
 	}
 }
+
+
+status_t
+MainWindow::_RefreshModelThreadWorker(void* arg)
+{
+	MainWindow* mainWindow = reinterpret_cast<MainWindow*>(arg);
+
+	BMessenger messenger(mainWindow);
+
+	mainWindow->_RefreshRepositories();
+
+	if (mainWindow->fTerminating)
+		return B_OK;
+
+	mainWindow->_RefreshPackageList();
+
+	messenger.SendMessage(MSG_MODEL_WORKER_DONE);
+
+	return B_OK;
+}
+
+

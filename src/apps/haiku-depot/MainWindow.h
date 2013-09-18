@@ -38,7 +38,10 @@ private:
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();
 
-			void				_InitModel();
+			void				_RefreshRepositories(bool force = false);
+			void				_RefreshPackageList();
+
+	static	status_t			_RefreshModelThreadWorker(void* arg);
 
 private:
 			FilterView*			fFilterView;
@@ -51,6 +54,9 @@ private:
 
 			PackageManager
 								fPackageManager;
+
+			bool				fTerminating;
+			thread_id			fModelWorker;
 };
 
 #endif // MAIN_WINDOW_H
