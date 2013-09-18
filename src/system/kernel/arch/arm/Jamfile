@@ -10,10 +10,8 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelMergeObject kernel_arch_arm.o :
-#	arch_atomic.c
 	arch_commpage.cpp
 	arch_cpu.cpp
-#	arch_cpu_asm.S
 	arch_debug_console.cpp
 	arch_debug.cpp
 	arch_elf.cpp
@@ -32,6 +30,9 @@ KernelMergeObject kernel_arch_arm.o :
 	debug_uart_8250.cpp
 	arch_uart_8250.cpp
 	arch_uart_pl011.cpp
+
+	arch_atomic64.cpp
+	arch_atomic32.cpp
 
 	# paging
 	arm_physical_page_mapper.cpp

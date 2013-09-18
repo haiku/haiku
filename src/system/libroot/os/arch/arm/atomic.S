@@ -4,14 +4,15 @@
 */
 
 #include <asm_defs.h>
-
+#include <arch_config.h>
 
 .text
+
+#ifndef ATOMIC_FUNCS_ARE_SYSCALLS
 
 /* int atomic_add(int *value, int increment)
  */
 FUNCTION(atomic_add):
-#if __ARM_ARCH__ >= 6
 miss1:	       	ldrex       r12, [r0]
         	add         r2,  r12, r1
         	strex       r3,  r2,  [r0]
@@ -19,25 +20,6 @@ miss1:	       	ldrex       r12, [r0]
         	bne         miss1
         	mov         r0,  r12
 	        bx          lr
-#else
-        /* disable interrupts, do the add, and reenable */
-        mrs     r2, cpsr
-        mov     r12, r2
-        orr     r2, r2, #(3<<6)
-        msr     cpsr_c, r2
-
-        /* ints disabled, old cpsr state in r12 */
-
-        /* do the add, leave the previous value in r0 */
-        mov     r3, r0
-        ldr     r0, [r3]
-        add     r2, r0, r1
-        str     r2, [r3]
-
-        /* restore interrupts and exit */
-        msr     cpsr_c, r12
-        bx      lr
-#endif
 FUNCTION_END(atomic_add)
 
 
@@ -46,7 +28,6 @@ FUNCTION_END(atomic_add)
 /* int atomic_and(int *value, int andValue)
  */
 FUNCTION(atomic_and):
-#if __ARM_ARCH__ >= 6
 miss2:	       	ldrex       r12, [r0]
         	and         r2,  r12, r1
         	strex       r3,  r2,  [r0]
@@ -54,33 +35,11 @@ miss2:	       	ldrex       r12, [r0]
         	bne         miss2
         	mov         r0,  r12
 	        bx          lr
-#else
-        /* disable interrupts, do the and, and reenable */
-        mrs     r2, cpsr
-        mov     r12, r2
-        orr     r2, r2, #(3<<6)
-        msr     cpsr_c, r2
-
-        /* ints disabled, old cpsr state in r12 */
-
-        /* do the and, leave the previous value in r0 */
-        mov     r3, r0
-        ldr     r0, [r3]
-        and     r2, r0, r1
-        str     r2, [r3]
-
-        /* restore interrupts and exit */
-        msr     cpsr_c, r12
-        bx      lr
-#endif
-
 FUNCTION_END(atomic_and)
 
 /* int atomic_or(int *value, int orValue)
  */
 FUNCTION(atomic_or):
-#if __ARM_ARCH__ >= 6
-
 miss3:	       	ldrex       r12, [r0]
         	eor         r2,  r12, r1
         	strex       r3,  r2,  [r0]
@@ -88,48 +47,21 @@ miss3:	       	ldrex       r12, [r0]
         	bne         miss3
         	mov         r0,  r12
 	        bx	lr
-#else
-        /* disable interrupts, do the or, and reenable */
-        mrs     r2, cpsr
-        mov     r12, r2
-        orr     r2, r2, #(3<<6)
-        msr     cpsr_c, r2
-
-        /* ints disabled, old cpsr state in r12 */
-
-        /* do the or, leave the previous value in r0 */
-        mov     r3, r0
-        ldr     r0, [r3]
-        orr     r2, r0, r1
-        str     r2, [r3]
-
-        /* restore interrupts and exit */
-        msr     cpsr_c, r12
-        bx      lr
-#endif
-
 FUNCTION_END(atomic_or)
 
 /* int atomic_set(int *value, int setTo)
  */
 FUNCTION(atomic_set):
-#if __ARM_ARCH__ >= 6
 miss4:		ldrex   r12, [r0]
        		strex   r3, r1, [r0]
        		teq     r3, #0
        		bne     miss4
 	        bx  lr
-#else
-	mov	r3, r0
-	swp	r0, r1, [r3]
-        bx      lr
-#endif
 FUNCTION_END(atomic_set)
 
 /* int atomic_test_and_set(int *value, int setTo, int testValue) 
  */
 FUNCTION(atomic_test_and_set):
-#if __ARM_ARCH__ >= 6
 miss5:  ldrex       r12, [r0]                       @ load from the address and mark it exclusive
         cmp         r12, r2                         @ compare the value with the comperand(r2)
         strexeq     r3,  r1,  [r0]                  @ if they were equal, attempt to store the new value (r1)
@@ -139,21 +71,6 @@ miss5:  ldrex       r12, [r0]                       @ load from the address and 
         bne         same                            @ if it succeeded, jump to (same) and return. there is no need to clrex if strex succeeded
 differ: clrex                           	    @ clrex
 same:   mov         r0,  r12
-#else
-        /* disable interrupts, and save state */
-        mrs     r3, cpsr
-        mov     r12, r3
-        orr     r3, r3, #(3<<6)
-        msr     cpsr_c, r3
-
-	mov	r3, r0
-	ldr	r0, [r3]
-	cmp	r0, r2
-	streq	r1, [r3]
-
-        /* restore interrupts and exit */
-        msr     cpsr_c, r12
-#endif
         bx      lr
 FUNCTION_END(atomic_test_and_set)
 
@@ -167,6 +84,10 @@ FUNCTION_END(atomic_get)
 FUNCTION(__sync_fetch_and_add_4):
 	bx	lr
 FUNCTION_END(__sync_fetch_and_add_4)
+
+#endif
+
+#ifndef ATOMIC64_FUNCS_ARE_SYSCALLS
 
 /* int64	atomic_add64(vint64 *value, int64 addValue) */
 FUNCTION(atomic_add64):
@@ -197,3 +118,5 @@ FUNCTION_END(atomic_test_and_set64)
 FUNCTION(atomic_get64):
 	bx	lr
 FUNCTION_END(atomic_get64)
+
+#endif /* ATOMIC64_FUNCS_ARE_SYSCALLS */
