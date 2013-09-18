@@ -10,10 +10,14 @@
 #include "Volume.h"
 
 #include <errno.h>
+#include <grp.h>
+#include <pwd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+
+#include <string>
 
 #include <Directory.h>
 #include <Entry.h>
@@ -40,6 +44,8 @@
 
 using namespace BPackageKit::BPrivate;
 
+typedef std::set<std::string> StringSet;
+
 
 static const char* const kPackageFileNameExtension = ".hpkg";
 static const char* const kAdminDirectoryName
@@ -53,6 +59,8 @@ static const bigtime_t kHandleNodeMonitorEvents = 'nmon';
 
 static const bigtime_t kNodeMonitorEventHandlingDelay = 500000;
 static const bigtime_t kCommunicationTimeout = 1000000;
+
+const char* const kShellEscapeCharacters = " ~`#$&*()\\|[]{};'\"<>?!";
 
 
 // #pragma mark - Listener
@@ -259,7 +267,9 @@ struct Volume::CommitTransactionHandler {
 		fAddedPackages(),
 		fRemovedPackages(),
 		fPackagesAlreadyAdded(packagesAlreadyAdded),
-		fPackagesAlreadyRemoved(packagesAlreadyRemoved)
+		fPackagesAlreadyRemoved(packagesAlreadyRemoved),
+		fAddedGroups(),
+		fAddedUsers()
 	{
 	}
 
@@ -325,6 +335,9 @@ struct Volume::CommitTransactionHandler {
 
 		// move packages to deactivate back to packages directory
 		_RevertRemovePackagesToDeactivate();
+
+		// revert user and group changes
+		_RevertUserGroupChanges();
 
 		// remove old state directory
 		_RemoveOldStateDirectory();
@@ -455,6 +468,9 @@ private:
 		// activate/deactivate packages
 		fVolume->_ChangePackageActivation(fAddedPackages, fRemovedPackages);
 
+		// run post-installation scripts
+		_RunPostInstallScripts();
+
 		// removed packages have been deleted, new packages shall not be deleted
 		fAddedPackages.clear();
 		fRemovedPackages.clear();
@@ -576,6 +592,7 @@ private:
 			if (fPackagesAlreadyAdded.find(package)
 					!= fPackagesAlreadyAdded.end()) {
 				fAddedPackages.insert(package);
+				_PreparePackageToActivate(package);
 				continue;
 			}
 
@@ -606,7 +623,127 @@ private:
 
 			// also add the package to the volume
 			fVolume->_AddPackage(package);
+
+			_PreparePackageToActivate(package);
 		}
+	}
+
+	void _PreparePackageToActivate(Package* package)
+	{
+		// add groups
+		const BStringList& groups = package->Info().Groups();
+		int32 count = groups.CountStrings();
+		for (int32 i = 0; i < count; i++)
+			_AddGroup(package, groups.StringAt(i));
+
+		// add users
+		const BObjectList<BUser>& users = package->Info().Users();
+		for (int32 i = 0; const BUser* user = users.ItemAt(i); i++)
+			_AddUser(package, *user);
+
+		// handle global writable files
+		const BObjectList<BGlobalWritableFileInfo>& files
+			= package->Info().GlobalWritableFileInfos();
+		for (int32 i = 0; const BGlobalWritableFileInfo* file = files.ItemAt(i);
+			i++) {
+			_AddGlobalWritableFile(package, *file);
+		}
+	}
+
+	void _AddGroup(Package* package, const BString& groupName)
+	{
+		// Check whether the group already exists.
+		char buffer[256];
+		struct group groupBuffer;
+		struct group* groupFound;
+		int error = getgrnam_r(groupName, &groupBuffer, buffer, sizeof(buffer),
+			&groupFound);
+		if ((error == 0 && groupFound != NULL) || error == ERANGE)
+			return;
+
+		// add it
+		fAddedGroups.insert(groupName.String());
+
+		std::string commandLine("groupadd ");
+		commandLine += _ShellEscapeString(groupName).String();
+
+		if (system(commandLine.c_str()) != 0) {
+			fAddedGroups.erase(groupName.String());
+			throw Exception(error,
+				BString().SetToFormat("failed to add group \%s\"",
+					groupName.String()),
+				package->FileName());
+		}
+	}
+
+	void _AddUser(Package* package, const BUser& user)
+	{
+		// Check whether the user already exists.
+		char buffer[256];
+		struct passwd passwdBuffer;
+		struct passwd* passwdFound;
+		int error = getpwnam_r(user.Name(), &passwdBuffer, buffer,
+			sizeof(buffer), &passwdFound);
+		if ((error == 0 && passwdFound != NULL) || error == ERANGE)
+			return;
+
+		// add it
+		fAddedUsers.insert(user.Name().String());
+
+		std::string commandLine("useradd ");
+
+		if (!user.RealName().IsEmpty()) {
+			commandLine += std::string("-n ")
+				+ _ShellEscapeString(user.RealName()).String() + " ";
+		}
+
+		if (!user.Home().IsEmpty()) {
+			commandLine += std::string("-d ")
+				+ _ShellEscapeString(user.Home()).String() + " ";
+		}
+
+		if (!user.Shell().IsEmpty()) {
+			commandLine += std::string("-s ")
+				+ _ShellEscapeString(user.Shell()).String() + " ";
+		}
+
+		if (!user.Groups().IsEmpty()) {
+			commandLine += std::string("-g ")
+				+ _ShellEscapeString(user.Groups().First()).String() + " ";
+		}
+
+		commandLine += _ShellEscapeString(user.Name()).String();
+
+		if (system(commandLine.c_str()) != 0) {
+			fAddedUsers.erase(user.Name().String());
+			throw Exception(error,
+				BString().SetToFormat("failed to add user \%s\"",
+					user.Name().String()),
+				package->FileName());
+		}
+
+		// add the supplementary groups
+		int32 groupCount = user.Groups().CountStrings();
+		for (int32 i = 1; i < groupCount; i++) {
+			commandLine = std::string("groupmod -A ")
+				+ _ShellEscapeString(user.Name()).String()
+				+ " "
+				+ _ShellEscapeString(user.Groups().StringAt(i)).String();
+			if (system(commandLine.c_str()) != 0) {
+				fAddedUsers.erase(user.Name().String());
+				throw Exception(error,
+					BString().SetToFormat("failed to add user \%s\" to group "
+						"\"%s\"", user.Name().String(),
+						user.Groups().StringAt(i).String()),
+					package->FileName());
+			}
+		}
+	}
+
+	void _AddGlobalWritableFile(Package* package,
+		const BGlobalWritableFileInfo& file)
+	{
+// TODO:...
 	}
 
 	void _RevertAddPackagesToActivate()
@@ -709,6 +846,27 @@ private:
 		}
 	}
 
+	void _RevertUserGroupChanges()
+	{
+		// delete users
+		for (StringSet::const_iterator it = fAddedUsers.begin();
+			it != fAddedUsers.end(); ++it) {
+			std::string commandLine("userdel ");
+			commandLine += _ShellEscapeString(it->c_str()).String();
+			if (system(commandLine.c_str()) != 0)
+				ERROR("failed to remove user \"%s\"\n", it->c_str());
+		}
+
+		// delete groups
+		for (StringSet::const_iterator it = fAddedGroups.begin();
+			it != fAddedGroups.end(); ++it) {
+			std::string commandLine("groupdel ");
+			commandLine += _ShellEscapeString(it->c_str()).String();
+			if (system(commandLine.c_str()) != 0)
+				ERROR("failed to remove group \"%s\"\n", it->c_str());
+		}
+	}
+
 	void _RemoveOldStateDirectory()
 	{
 		if (fOldStateDirectory.InitCheck() != B_OK)
@@ -736,6 +894,50 @@ private:
 		}
 	}
 
+	void _RunPostInstallScripts()
+	{
+		for (PackageSet::iterator it = fAddedPackages.begin();
+			it != fAddedPackages.end(); ++it) {
+			Package* package = *it;
+			const BStringList& scripts = package->Info().PostInstallScripts();
+			int32 count = scripts.CountStrings();
+			for (int32 i = 0; i < count; i++)
+				_RunPostInstallScript(package, scripts.StringAt(i));
+		}
+	}
+
+	void _RunPostInstallScript(Package* package, const BString& script)
+	{
+		BDirectory rootDir(&fVolume->fRootDirectoryRef);
+		BPath scriptPath(&rootDir, script);
+		status_t error = scriptPath.InitCheck();
+		if (error != B_OK) {
+			ERROR("Volume::CommitTransactionHandler::_RunPostInstallScript(): "
+				"failed get path of post-installation script \"%s\" of package "
+				"%s: %s\n", script.String(), package->FileName().String(),
+				strerror(error));
+// TODO: Notify the user!
+			return;
+		}
+
+		if (system(scriptPath.Path()) != 0) {
+			ERROR("Volume::CommitTransactionHandler::_RunPostInstallScript(): "
+				"running post-installation script \"%s\" of package %s "
+				"failed: %s\n", script.String(), package->FileName().String(),
+				strerror(error));
+// TODO: Notify the user!
+		}
+	}
+
+	BString _ShellEscapeString(const BString& string)
+	{
+		BString result(string);
+		result.CharacterEscape(kShellEscapeCharacters, '\\');
+		if (result.IsEmpty())
+			throw std::bad_alloc();
+		return result;
+	}
+
 private:
 	Volume*				fVolume;
 	PackageList			fPackagesToActivate;
@@ -747,6 +949,8 @@ private:
 	BDirectory			fOldStateDirectory;
 	BString				fOldStateDirectoryName;
 	node_ref			fTransactionDirectoryRef;
+	StringSet			fAddedGroups;
+	StringSet			fAddedUsers;
 };
 
 
