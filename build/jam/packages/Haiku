@@ -320,8 +320,8 @@ CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;
 
 # "Applications" links
 DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
-	Devices DiskProbe DriveSetup DiskUsage Expander Icon-O-Matic Installer
-	Magnify	Mail MediaConverter MediaPlayer MidiPlayer People PoorMan
+	Devices DiskProbe DriveSetup DiskUsage Expander HaikuDepot Icon-O-Matic
+	Installer Magnify Mail MediaConverter MediaPlayer MidiPlayer People PoorMan
 	Screenshot SoundRecorder StyledEdit Terminal TV
 ;
 local linkTarget ;
