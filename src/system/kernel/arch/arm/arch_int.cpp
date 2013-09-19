@@ -31,7 +31,7 @@
 #include <string.h>
 
 
-//#define TRACE_ARCH_INT
+#define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
 #	define TRACE(x) dprintf x
 #else
@@ -108,9 +108,9 @@ print_iframe(const char *event, struct iframe *frame)
 		frame->r0, frame->r1, frame->r2, frame->r3,
 		frame->r4, frame->r5, frame->r6, frame->r7);
 	dprintf("R08=%08lx R09=%08lx R10=%08lx R11=%08lx\n"
-		"R12=%08lx R13=%08lx R14=%08lx CPSR=%08lx\n",
+		"R12=%08lx SP=%08lx LR=%08lx  PC=%08lx CPSR=%08lx\n",
 		frame->r8, frame->r9, frame->r10, frame->r11,
-		frame->r12, frame->usr_sp, frame->usr_lr, frame->spsr);
+		frame->r12, frame->svc_sp, frame->svc_lr, frame->pc, frame->spsr);
 }
 
 
@@ -215,9 +215,9 @@ private:
 extern "C" void
 arch_arm_undefined(struct iframe *iframe)
 {
+	print_iframe("Undefined Instruction", iframe);
 	IFrameScope scope(iframe); // push/pop iframe
 
-	print_iframe("Undefined Instruction", iframe);
 	panic("not handled!");
 }
 
@@ -225,17 +225,14 @@ arch_arm_undefined(struct iframe *iframe)
 extern "C" void
 arch_arm_syscall(struct iframe *iframe)
 {
-	IFrameScope scope(iframe); // push/pop iframe
-
 	print_iframe("Software interrupt", iframe);
+	IFrameScope scope(iframe); // push/pop iframe
 }
 
 
 extern "C" void
 arch_arm_data_abort(struct iframe *frame)
 {
-	IFrameScope scope(iframe);
-
 	Thread *thread = thread_get_current_thread();
 	bool isUser = (frame->spsr & 0x1f) == 0x10;
 	addr_t far = arm_get_far();
@@ -244,7 +241,10 @@ arch_arm_data_abort(struct iframe *frame)
 
 #ifdef TRACE_ARCH_INT
 	print_iframe("Data Abort", frame);
+	dprintf("FAR: %08lx, thread: %s\n", far, thread->name);
 #endif
+
+	IFrameScope scope(frame);
 
 	if (debug_debugger_running()) {
 		// If this CPU or this thread has a fault handler, we're allowed to be
@@ -320,9 +320,9 @@ arch_arm_data_abort(struct iframe *frame)
 extern "C" void
 arch_arm_prefetch_abort(struct iframe *iframe)
 {
+	print_iframe("Prefetch Abort", iframe);
 	IFrameScope scope(iframe);
 
-	print_iframe("Prefetch Abort", iframe);
 	panic("not handled!");
 }
 
