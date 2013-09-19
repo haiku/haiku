@@ -546,7 +546,7 @@ BString::Split(const char* separator, bool noEmptyStrings,
 		if (endIndex > index || !noEmptyStrings) {
 			BString toAppend(String() + index, endIndex - index);
 			if (toAppend.Length() != endIndex - index
-				|| _list.Add(toAppend)) {
+				|| !_list.Add(toAppend)) {
 				return false;
 			}
 		}
