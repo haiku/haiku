@@ -19,6 +19,8 @@
 
 
 class PackageManager;
+class ProblemWindow;
+class ResultWindow;
 
 
 class PackageAction : public BReferenceable {
@@ -94,6 +96,11 @@ private:
 private:
 		static	status_t		_PackageActionWorker(void* arg);
 
+				bool			_AddResults(
+									BPackageManager::InstalledRepository&
+										repository,
+									ResultWindow* window);
+
 private:
 			DecisionProvider	fDecisionProvider;
 			JobStateListener	fJobStateListener;
@@ -105,6 +112,7 @@ private:
 			PackageActionList	fPendingActions;
 			BLocker				fPendingActionsLock;
 			sem_id				fPendingActionsSem;
+			ProblemWindow*		fProblemWindow;
 };
 
 #endif // PACKAGE_MANAGER_H

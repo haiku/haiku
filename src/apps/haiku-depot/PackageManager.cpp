@@ -22,7 +22,10 @@
 #include <package/solver/SolverProblem.h>
 #include <package/solver/SolverProblemSolution.h>
 
+#include "AutoDeleter.h"
 #include "AutoLocker.h"
+#include "ProblemWindow.h"
+#include "ResultWindow.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -30,15 +33,13 @@
 
 
 using namespace BPackageKit::BPrivate;
+using namespace BPackageKit::BManager::BPrivate;
 
 using BPackageKit::BRefreshRepositoryRequest;
 using BPackageKit::DownloadFileRequest;
-using BPackageKit::BManager::BPrivate::BException;
-using BPackageKit::BManager::BPrivate::BFatalErrorException;
 using BPackageKit::BSolver;
 using BPackageKit::BSolverPackage;
 using BPackageKit::BSolverRepository;
-
 
 // #pragma mark - PackageAction
 
@@ -139,7 +140,8 @@ PackageManager::PackageManager(BPackageInstallationLocation location)
 	fDecisionProvider(),
 	fJobStateListener(),
 	fContext(fDecisionProvider, fJobStateListener),
-	fClientInstallationInterface()
+	fClientInstallationInterface(),
+	fProblemWindow(NULL)
 {
 	fInstallationInterface = &fClientInstallationInterface;
 	fRequestHandler = this;
@@ -160,6 +162,9 @@ PackageManager::~PackageManager()
 	delete_sem(fPendingActionsSem);
 	status_t result;
 	wait_for_thread(fPendingActionsWorker, &result);
+
+	if (fProblemWindow != NULL)
+		fProblemWindow->PostMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -278,14 +283,39 @@ PackageManager::DownloadPackage(const BString& fileURL,
 void
 PackageManager::HandleProblems()
 {
-	// TODO: implement
+	if (fProblemWindow == NULL)
+		fProblemWindow = new ProblemWindow;
+
+	ProblemWindow::SolverPackageSet dummy;
+	if (!fProblemWindow->Go(fSolver,dummy, dummy))
+		throw BAbortedByUserException();
 }
 
 
 void
 PackageManager::ConfirmChanges(bool fromMostSpecific)
 {
-	// TODO: implement
+	ResultWindow* window = new ResultWindow;
+	ObjectDeleter<ResultWindow> windowDeleter(window);
+
+	bool hasOtherChanges = false;
+	int32 count = fInstalledRepositories.CountItems();
+	if (fromMostSpecific) {
+		for (int32 i = count - 1; i >= 0; i--)
+			hasOtherChanges
+				|= _AddResults(*fInstalledRepositories.ItemAt(i), window);
+	} else {
+		for (int32 i = 0; i < count; i++)
+			hasOtherChanges
+				|= _AddResults(*fInstalledRepositories.ItemAt(i), window);
+	}
+
+	if (!hasOtherChanges)
+		return;
+
+	// show the window
+	if (windowDeleter.Detach()->Go() == 0)
+		throw BAbortedByUserException();
 }
 
 
@@ -338,3 +368,19 @@ PackageManager::_PackageActionWorker(void* arg)
 
 	return 0;
 }
+
+
+bool
+PackageManager::_AddResults(InstalledRepository& repository,
+	ResultWindow* window)
+{
+	if (!repository.HasChanges())
+		return false;
+
+	ProblemWindow::SolverPackageSet dummy;
+	return window->AddLocationChanges(repository.Name(),
+		repository.PackagesToActivate(), dummy,
+		repository.PackagesToDeactivate(), dummy);
+}
+
+

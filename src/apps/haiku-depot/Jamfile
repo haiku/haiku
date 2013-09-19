@@ -12,6 +12,7 @@ for sourceDir in $(sourceDirs) {
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haiku-depot $(sourceDir) ] ;
 }
 
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
 local textDocumentSources =
 	Bullet.cpp
 	BulletData.cpp
@@ -45,6 +46,10 @@ Application HaikuDepot :
 	PackageListView.cpp
 	PackageManager.cpp
 	support.cpp
+
+	# package_daemon
+	ProblemWindow.cpp
+	ResultWindow.cpp
 
 	# text view stuff
 	$(textDocumentSources)
