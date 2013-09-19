@@ -711,8 +711,8 @@ FileManager::LoadSourceFile(LocatableFile* file, SourceFile*& _sourceFile)
 status_t
 FileManager::LoadLocationMappings(TeamFileManagerSettings* settings)
 {
+#if 0
 	AutoLocker<FileManager> locker(this);
-
 	for (int32 i = 0; i < settings->CountSourceMappings(); i++) {
 		BString sourcePath;
 		BString locatedPath;
@@ -726,7 +726,7 @@ FileManager::LoadLocationMappings(TeamFileManagerSettings* settings)
 			return B_NO_MEMORY;
 		}
 	}
-
+#endif
 	return B_OK;
 }
 
@@ -734,6 +734,7 @@ FileManager::LoadLocationMappings(TeamFileManagerSettings* settings)
 status_t
 FileManager::SaveLocationMappings(TeamFileManagerSettings* settings)
 {
+#if 0
 	AutoLocker<FileManager> locker(this);
 
 	for (LocatedFileMap::const_iterator it = fSourceLocationMappings.begin();
@@ -742,7 +743,7 @@ FileManager::SaveLocationMappings(TeamFileManagerSettings* settings)
 		if (error != B_OK)
 			return error;
 	}
-
+#endif
 	return B_OK;
 }
 
