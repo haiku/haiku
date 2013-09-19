@@ -518,7 +518,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fChangelog == other.fChangelog
 		&& fCategories == other.fCategories
 		&& fUserRatings == other.fUserRatings
-		&& fScreenshots == other.fScreenshots;
+		&& fScreenshots == other.fScreenshots
+		&& fState == other.fState;
 }
 
 

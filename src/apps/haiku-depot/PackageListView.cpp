@@ -24,7 +24,8 @@ static const char* skPackageStateActive = B_TRANSLATE_MARK("Active");
 static const char* skPackageStateInactive = B_TRANSLATE_MARK("Inactive");
 
 
-inline BString PackageStateToString(PackageState state)
+inline BString
+package_state_to_string(PackageState state)
 {
 	switch (state) {
 		case NONE:
@@ -474,7 +475,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 
 	// Status
 	// TODO: Fetch info about installed/deactivated/uninstalled/...
-	SetField(new BStringField(PackageStateToString(package.State())),
+	SetField(new BStringField(package_state_to_string(package.State())),
 		kStatusColumn);
 
 	package.AddListener(fPackageListener);
