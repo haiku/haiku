@@ -445,7 +445,8 @@ PackageInfo::PackageInfo()
 	fFullDescription(),
 	fChangelog(),
 	fUserRatings(),
-	fScreenshots()
+	fScreenshots(),
+	fState(NONE)
 {
 }
 
@@ -464,7 +465,8 @@ PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
 	fChangelog(changelog),
 	fCategories(),
 	fUserRatings(),
-	fScreenshots()
+	fScreenshots(),
+	fState(NONE)
 {
 }
 
@@ -480,7 +482,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fChangelog(other.fChangelog),
 	fCategories(other.fCategories),
 	fUserRatings(other.fUserRatings),
-	fScreenshots(other.fScreenshots)
+	fScreenshots(other.fScreenshots),
+	fState(other.fState)
 {
 }
 
@@ -498,6 +501,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fCategories = other.fCategories;
 	fUserRatings = other.fUserRatings;
 	fScreenshots = other.fScreenshots;
+	fState = other.fState;
 	return *this;
 }
 
@@ -529,6 +533,14 @@ bool
 PackageInfo::AddCategory(const CategoryRef& category)
 {
 	return fCategories.Add(category);
+}
+
+
+void
+PackageInfo::SetState(PackageState state)
+{
+	fState = state;
+	_NotifyListeners(PKG_CHANGED_STATE);
 }
 
 

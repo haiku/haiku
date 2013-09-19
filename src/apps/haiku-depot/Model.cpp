@@ -323,6 +323,8 @@ Model::SetPackageState(const PackageInfoRef& package, PackageState state)
 			fUninstalledPackages.Add(package);
 			break;
 	}
+
+	package->SetState(state);
 }
 
 

@@ -18,6 +18,29 @@
 #define B_TRANSLATION_CONTEXT "PackageListView"
 
 
+static const char* skPackageStateAvailable = B_TRANSLATE_MARK("Available");
+static const char* skPackageStateUninstalled = B_TRANSLATE_MARK("Uninstalled");
+static const char* skPackageStateActive = B_TRANSLATE_MARK("Active");
+static const char* skPackageStateInactive = B_TRANSLATE_MARK("Inactive");
+
+
+inline BString PackageStateToString(PackageState state)
+{
+	switch (state) {
+		case NONE:
+			return B_TRANSLATE(skPackageStateAvailable);
+		case INSTALLED:
+			return B_TRANSLATE(skPackageStateInactive);
+		case ACTIVATED:
+			return B_TRANSLATE(skPackageStateActive);
+		case UNINSTALLED:
+			return B_TRANSLATE(skPackageStateUninstalled);
+	}
+
+	return B_TRANSLATE("Unknown");
+}
+
+
 // A field type displaying both a bitmap and a string so that the
 // tree display looks nicer (both text and bitmap are indented)
 // TODO: Code-duplication with DriveSetup PartitionList.h
@@ -450,8 +473,9 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	SetField(new BStringField("0 KiB"), kSizeColumn);
 
 	// Status
-	// TODO: Fetch info about installed/deactivated/unintalled/...
-	SetField(new BStringField("n/a"), kStatusColumn);
+	// TODO: Fetch info about installed/deactivated/uninstalled/...
+	SetField(new BStringField(PackageStateToString(package.State())),
+		kStatusColumn);
 
 	package.AddListener(fPackageListener);
 }
