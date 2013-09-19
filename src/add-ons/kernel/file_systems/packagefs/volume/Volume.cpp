@@ -476,7 +476,7 @@ Volume::Mount(const char* parameterString)
 				volumeName = "common";
 				break;
 			case PACKAGE_FS_MOUNT_TYPE_HOME:
-				volumeName = "home";
+				volumeName = "config";
 				break;
 			case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
 			default:
