@@ -683,6 +683,9 @@ BPoint
 MemoryView::_GetPointForOffset(int32 offset) const
 {
 	BPoint point;
+	if (fHexMode == HexModeNone)
+		return point;
+
 	int32 bytesPerLine = fHexBlocksPerLine * _GetHexDigitsPerBlock() / 2;
 	int32 line = offset / bytesPerLine;
 	int32 lineOffset = offset % bytesPerLine;
@@ -742,6 +745,9 @@ MemoryView::_GetAddressDisplayWidth() const
 void
 MemoryView::_GetSelectionRegion(BRegion& region)
 {
+	if (fHexMode == HexModeNone)
+		return;
+
 	region.MakeEmpty();
 	BPoint startPoint = _GetPointForOffset(fSelectionStart);
 	BPoint endPoint = _GetPointForOffset(fSelectionEnd);
