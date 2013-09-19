@@ -514,10 +514,13 @@ public:
 					const PackageActionRef& action
 						= fPackageActions.ItemAt(index);
 					if (action.Get() != NULL) {
-						status_t result = action->Perform();
+						PackageActionList actions;
+						actions.Add(action);
+						status_t result = fPackageManager
+							->SchedulePackageActions(actions);
 						if (result != B_OK) {
-							fprintf(stderr, "Package action failed: %s '%s'\n",
-								action->Label(),
+							fprintf(stderr, "Failed to schedule action: "
+								"%s '%s'\n", action->Label(),
 								action->Package().Title().String());
 						}
 					}

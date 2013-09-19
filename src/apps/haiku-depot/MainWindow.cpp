@@ -24,6 +24,7 @@
 #include <TabView.h>
 
 #include <package/Context.h>
+#include <package/manager/Exceptions.h>
 #include <package/RefreshRepositoryRequest.h>
 #include <package/PackageRoster.h>
 #include "package/RepositoryCache.h"
@@ -47,6 +48,8 @@ enum {
 
 
 using namespace BPackageKit;
+using BManager::BPrivate::BException;
+using BManager::BPrivate::BFatalErrorException;
 
 
 typedef std::map<BString, PackageInfoRef> PackageInfoMap;
@@ -252,11 +255,17 @@ MainWindow::_RefreshRepositories(bool force)
 
 		if (roster.GetRepositoryCache(repoName, &cache) != B_OK
 			|| force) {
-			BRefreshRepositoryRequest refreshRequest(context, repoConfig);
-			result = refreshRequest.Process();
-			if (result != B_OK) {
-				// TODO: notify user
-				continue;
+			try {
+				BRefreshRepositoryRequest refreshRequest(context, repoConfig);
+
+				result = refreshRequest.Process();
+			} catch (BFatalErrorException ex) {
+				fprintf(stderr, "Fatal error occurred while refreshing "
+					"repository: %s (%s)\n", ex.Message().String(),
+					ex.Details().String());
+			} catch (BException ex) {
+				fprintf(stderr, "Exception occurred while refreshing "
+					"repository: %s\n", ex.Message().String());
 			}
 		}
 	}
@@ -279,8 +288,14 @@ MainWindow::_RefreshPackageList()
 		depots[repoName] = DepotInfo(repoName);
 	}
 
-	fPackageManager.Init(PackageManager::B_ADD_INSTALLED_REPOSITORIES
+	try {
+		fPackageManager.Init(PackageManager::B_ADD_INSTALLED_REPOSITORIES
 			| PackageManager::B_ADD_REMOTE_REPOSITORIES);
+	} catch (BException ex) {
+		fprintf(stderr, "Exception occurred while initializing PackageManager:"
+			"%s\n", ex.Message().String());
+		return;
+	}
 
 	BObjectList<BSolverPackage> packages;
 	result = fPackageManager.Solver()->FindPackages("",

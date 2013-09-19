@@ -8,6 +8,8 @@
 #ifndef PACKAGE_MANAGER_H
 #define PACKAGE_MANAGER_H
 
+#include <Locker.h>
+
 #include <package/DaemonClient.h>
 #include <package/manager/PackageManager.h>
 
@@ -16,9 +18,13 @@
 #include "PackageInfo.h"
 
 
+class PackageManager;
+
+
 class PackageAction : public BReferenceable {
 public:
-								PackageAction(const PackageInfo& package);
+								PackageAction(const PackageInfo& package,
+									PackageManager* manager);
 	virtual						~PackageAction();
 
 	virtual const char*			Label() const = 0;
@@ -30,6 +36,9 @@ public:
 
 			const PackageInfo&	Package() const
 									{ return fPackage; }
+
+protected:
+			PackageManager*		fPackageManager;
 
 private:
 			PackageInfo			fPackage;
@@ -57,6 +66,9 @@ public:
 	virtual	PackageState		GetPackageState(const PackageInfo& package);
 	virtual	PackageActionList	GetPackageActions(const PackageInfo& package);
 
+			status_t			SchedulePackageActions(
+									PackageActionList& list);
+
 private:
 	// RequestHandler
 	virtual	status_t			RefreshRepository(
@@ -80,11 +92,19 @@ private:
 									InstalledRepository& repository);
 
 private:
+		static	status_t		_PackageActionWorker(void* arg);
+
+private:
 			DecisionProvider	fDecisionProvider;
 			JobStateListener	fJobStateListener;
 			BContext			fContext;
 			BPackageManager::ClientInstallationInterface
-									fClientInstallationInterface;
+								fClientInstallationInterface;
+
+			thread_id			fPendingActionsWorker;
+			PackageActionList	fPendingActions;
+			BLocker				fPendingActionsLock;
+			sem_id				fPendingActionsSem;
 };
 
 #endif // PACKAGE_MANAGER_H
