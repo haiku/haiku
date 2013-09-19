@@ -41,6 +41,8 @@ private:
 			void				_RefreshRepositories(bool force = false);
 			void				_RefreshPackageList();
 
+			void				_StartRefreshWorker();
+
 	static	status_t			_RefreshModelThreadWorker(void* arg);
 
 private:

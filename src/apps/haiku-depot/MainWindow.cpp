@@ -43,7 +43,8 @@
 
 
 enum {
-	MSG_MODEL_WORKER_DONE = 'mmwd'
+	MSG_MODEL_WORKER_DONE = 'mmwd',
+	MSG_REFRESH_DEPOTS = 'mrdp'
 };
 
 
@@ -92,11 +93,7 @@ MainWindow::MainWindow(BRect frame)
 	fSplitView->SetCollapsible(0, false);
 	fSplitView->SetCollapsible(1, false);
 
-	fModelWorker = spawn_thread(&_RefreshModelThreadWorker, "model loader",
-		B_LOW_PRIORITY, this);
-
-	if (fModelWorker > 0)
-		resume_thread(fModelWorker);
+	_StartRefreshWorker();
 }
 
 
@@ -136,6 +133,11 @@ MainWindow::MessageReceived(BMessage* message)
 			// TODO: ?
 			break;
 
+		case MSG_REFRESH_DEPOTS:
+		{
+			_StartRefreshWorker();
+			break;
+		}
 		case MSG_PACKAGE_SELECTED:
 		{
 			BString title;
@@ -196,6 +198,8 @@ void
 MainWindow::_BuildMenu(BMenuBar* menuBar)
 {
 	BMenu* menu = new BMenu(B_TRANSLATE("Package"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh depots"),
+			new BMessage(MSG_REFRESH_DEPOTS)));
 	menuBar->AddItem(menu);
 
 }
@@ -387,6 +391,20 @@ MainWindow::_RefreshPackageList()
 				// by querying the package roster
 		}
 	}
+}
+
+
+void
+MainWindow::_StartRefreshWorker()
+{
+	if (fModelWorker != B_BAD_THREAD_ID)
+		return;
+
+	fModelWorker = spawn_thread(&_RefreshModelThreadWorker, "model loader",
+		B_LOW_PRIORITY, this);
+
+	if (fModelWorker > 0)
+		resume_thread(fModelWorker);
 }
 
 
