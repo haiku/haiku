@@ -60,6 +60,7 @@ RemotePackageRepository HaikuPorts
 	jpeg_tools-9-3
 	keymapswitcher-1.2.7.10-1
 	libedit-2012_06_01_3.0-1
+	libedit_devel-2012_06_01_3.0-1
 	libiconv-1.13.1-6
 	libiconv_devel-1.13.1-6
 	libogg-1.3.0-2
@@ -92,12 +93,12 @@ RemotePackageRepository HaikuPorts
 	ncurses_devel-5.9-10
 	neon-0.29.6-7
 	neon_devel-0.29.6-7
-	openssh-6.0p1-7
+	openssh-6.0p1-8
 	openssl-1.0.0j-3
 	openssl_devel-1.0.0j-3
 	p7zip-9.20.1-4
 	pe-2.4.3_hg602-5
-	perl-5.10.1-5
+	perl-5.10.1-6
 	pkgconfig-0.27.1-1
 	python-2.6.8-5
 	readline-6.2-3
