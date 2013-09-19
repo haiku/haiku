@@ -89,6 +89,42 @@ public:
 };
 
 
+// #pragma mark - UninstallPackageAction
+
+
+class UninstallPackageAction : public PackageAction {
+public:
+	UninstallPackageAction(const PackageInfo& package, PackageManager* manager)
+		:
+		PackageAction(package, manager)
+	{
+	}
+
+	virtual const char* Label() const
+	{
+		return B_TRANSLATE("Uninstall");
+	}
+
+	virtual status_t Perform()
+	{
+		const char* packageName = Package().Title().String();
+		try {
+			fPackageManager->Uninstall(&packageName, 1);
+		} catch (BFatalErrorException ex) {
+			fprintf(stderr, "Fatal error occurred while uninstalling package "
+				"%s: %s (%s)\n", packageName, ex.Message().String(),
+				ex.Details().String());
+			return ex.Error();
+		} catch (BException ex) {
+			fprintf(stderr, "Exception occurred while uninstalling package "
+				"%s: %s\n", packageName, ex.Message().String());
+		}
+
+		return B_OK;
+	}
+};
+
+
 // #pragma mark - PackageManager
 
 
