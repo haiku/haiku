@@ -861,6 +861,7 @@ ScreenSaverWindow::ScreenSaverWindow()
 
 	// Create the tab view
 	fTabView = new BTabView("tab_view", B_WIDTH_FROM_LABEL);
+	fTabView->SetBorder(B_NO_BORDER);
 
 	// Create the controls inside the tabs
 	fFadeView = new FadeView(B_TRANSLATE("General"), fSettings);
@@ -876,7 +877,7 @@ ScreenSaverWindow::ScreenSaverWindow()
 		B_ALIGN_USE_FULL_HEIGHT));
 	topView->SetExplicitMinSize(BSize(fMinWidth, fMinHeight));
 	BLayoutBuilder::Group<>(topView, B_VERTICAL)
-		.SetInsets(-1, B_USE_SMALL_SPACING, -1, -1)
+		.SetInsets(0, B_USE_SMALL_SPACING, 0, 0)
 		.Add(fTabView)
 		.End();
 
