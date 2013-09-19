@@ -29,11 +29,15 @@
 #define B_TRANSLATION_CONTEXT "PackageManager"
 
 
+using namespace BPackageKit::BPrivate;
+
 using BPackageKit::BRefreshRepositoryRequest;
 using BPackageKit::DownloadFileRequest;
-using namespace BPackageKit::BPrivate;
 using BPackageKit::BManager::BPrivate::BException;
 using BPackageKit::BManager::BPrivate::BFatalErrorException;
+using BPackageKit::BSolver;
+using BPackageKit::BSolverPackage;
+using BPackageKit::BSolverRepository;
 
 
 // #pragma mark - PackageAction
@@ -173,17 +177,42 @@ PackageManager::GetPackageActions(const PackageInfo& package)
 {
 	PackageActionList actionList;
 
-	// TODO: Actually fetch applicable actions for this package.
-	// If the package is installed and active, it can be
-	//		* uninstalled
-	//		* deactivated
-	// If the package is installed and inactive, it can be
-	//		* uninstalled
-	//		* activated
-	// If the package is not installed, it can be
-	//		* installed (and it will be automatically activated)
-	actionList.Add(PackageActionRef(new InstallPackageAction(package, this),
-			true));
+	BObjectList<BSolverPackage> packages;
+	status_t result = Solver()->FindPackages(package.Title(),
+		BSolver::B_FIND_IN_NAME, packages);
+	if (result == B_OK) {
+		bool installed = false;
+		bool systemPackage = false;
+		for (int32 i = 0; i < packages.CountItems(); i++) {
+			const BSolverPackage* solverPackage = packages.ItemAt(i);
+			if (solverPackage->Name() != package.Title())
+				continue;
+
+			const BSolverRepository* repository = solverPackage->Repository();
+			if (repository == static_cast<const BSolverRepository*>(
+					SystemRepository())) {
+				installed = true;
+				systemPackage = true;
+			} else if (repository == static_cast<const BSolverRepository*>(
+					CommonRepository())) {
+				installed = true;
+			} else if (repository == static_cast<const BSolverRepository*>(
+					HomeRepository())) {
+				installed = true;
+			}
+		}
+
+		if (installed) {
+			if (!systemPackage) {
+				actionList.Add(PackageActionRef(new UninstallPackageAction(
+					package, this),	true));
+			}
+		} else {
+			actionList.Add(PackageActionRef(new InstallPackageAction(package,
+					this), true));
+		}
+		// TODO: activation status
+	}
 
 	return actionList;
 }
