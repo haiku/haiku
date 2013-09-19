@@ -284,7 +284,7 @@ command_update(int argc, const char* const* argv)
 	// create new repository
 	BRepositoryWriter repositoryWriter(&listener, &repositoryInfo);
 	BString tempRepositoryFileName(targetRepositoryFileName);
-	tempRepositoryFileName += ".new";
+	tempRepositoryFileName += ".___new___";
 	if ((result = repositoryWriter.Init(tempRepositoryFileName.String()))
 			!= B_OK) {
 		listener.PrintError("Error: can't initialize repository-writer : %s\n",
@@ -357,6 +357,15 @@ command_update(int argc, const char* const* argv)
 	result = repositoryWriter.Finish();
 	if (result != B_OK)
 		return 1;
+
+	result = BEntry(tempRepositoryFileName.String()).Rename(
+		targetRepositoryFileName, true);
+	if (result != B_OK) {
+		printf("Error: unable to rename repository %s to %s - %s\n",
+			tempRepositoryFileName.String(), targetRepositoryFileName,
+			strerror(result));
+		return 1;
+	}
 
 	if (verbose) {
 		printf("\nsuccessfully created repository '%s'\n",
