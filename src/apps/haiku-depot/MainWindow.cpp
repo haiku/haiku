@@ -8,8 +8,6 @@
 
 #include <map>
 
-#include <stdio.h>
-
 #include <Alert.h>
 #include <Autolock.h>
 #include <Application.h>
@@ -30,6 +28,7 @@
 #include "package/RepositoryCache.h"
 #include <package/solver/SolverPackage.h>
 
+#include "AutoDeleter.h"
 #include "DecisionProvider.h"
 #include "FilterView.h"
 #include "JobStateListener.h"
@@ -56,6 +55,19 @@ using BManager::BPrivate::BFatalErrorException;
 typedef std::map<BString, PackageInfoRef> PackageInfoMap;
 typedef std::map<BString, BObjectList<PackageInfo> > PackageLocationMap;
 typedef std::map<BString, DepotInfo> DepotInfoMap;
+
+
+struct RefreshWorkerParameters {
+	MainWindow* window;
+	bool forceRefresh;
+
+	RefreshWorkerParameters(MainWindow* window, bool forceRefresh)
+		:
+		window(window),
+		forceRefresh(forceRefresh)
+		{
+		}
+};
 
 
 MainWindow::MainWindow(BRect frame)
@@ -135,7 +147,7 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_REFRESH_DEPOTS:
 		{
-			_StartRefreshWorker();
+			_StartRefreshWorker(true);
 			break;
 		}
 		case MSG_PACKAGE_SELECTED:
@@ -264,12 +276,16 @@ MainWindow::_RefreshRepositories(bool force)
 
 				result = refreshRequest.Process();
 			} catch (BFatalErrorException ex) {
-				fprintf(stderr, "Fatal error occurred while refreshing "
-					"repository: %s (%s)\n", ex.Message().String(),
-					ex.Details().String());
+				BString message(B_TRANSLATE("An error occurred while "
+					"refreshing the repository: %error% (%details%)"));
+ 				message.ReplaceFirst("%error%", ex.Message());
+				message.ReplaceFirst("%details%", ex.Details());
+				_NotifyUser("Error", message.String());
 			} catch (BException ex) {
-				fprintf(stderr, "Exception occurred while refreshing "
-					"repository: %s\n", ex.Message().String());
+				BString message(B_TRANSLATE("An error occurred while "
+					"refreshing the repository: %error%"));
+				message.ReplaceFirst("%error%", ex.Message());
+				_NotifyUser("Error", message.String());
 			}
 		}
 	}
@@ -296,8 +312,10 @@ MainWindow::_RefreshPackageList()
 		fPackageManager.Init(PackageManager::B_ADD_INSTALLED_REPOSITORIES
 			| PackageManager::B_ADD_REMOTE_REPOSITORIES);
 	} catch (BException ex) {
-		fprintf(stderr, "Exception occurred while initializing PackageManager:"
-			"%s\n", ex.Message().String());
+		BString message(B_TRANSLATE("An error occurred while "
+			"initializing the package manager: %message%"));
+		message.ReplaceFirst("%message%", ex.Message());
+		_NotifyUser("Error", message.String());
 		return;
 	}
 
@@ -395,27 +413,38 @@ MainWindow::_RefreshPackageList()
 
 
 void
-MainWindow::_StartRefreshWorker()
+MainWindow::_StartRefreshWorker(bool force)
 {
 	if (fModelWorker != B_BAD_THREAD_ID)
 		return;
 
-	fModelWorker = spawn_thread(&_RefreshModelThreadWorker, "model loader",
-		B_LOW_PRIORITY, this);
+	RefreshWorkerParameters* parameters = new(std::nothrow)
+		RefreshWorkerParameters(this, force);
+	if (parameters == NULL)
+		return;
 
-	if (fModelWorker > 0)
+	ObjectDeleter<RefreshWorkerParameters> deleter(parameters);
+	fModelWorker = spawn_thread(&_RefreshModelThreadWorker, "model loader",
+		B_LOW_PRIORITY, parameters);
+
+	if (fModelWorker > 0) {
+		deleter.Detach();
 		resume_thread(fModelWorker);
+	}
 }
 
 
 status_t
 MainWindow::_RefreshModelThreadWorker(void* arg)
 {
-	MainWindow* mainWindow = reinterpret_cast<MainWindow*>(arg);
+	RefreshWorkerParameters* parameters
+		= reinterpret_cast<RefreshWorkerParameters*>(arg);
+	MainWindow* mainWindow = parameters->window;
+	ObjectDeleter<RefreshWorkerParameters> deleter(parameters);
 
 	BMessenger messenger(mainWindow);
 
-	mainWindow->_RefreshRepositories();
+	mainWindow->_RefreshRepositories(parameters->forceRefresh);
 
 	if (mainWindow->fTerminating)
 		return B_OK;
@@ -427,4 +456,14 @@ MainWindow::_RefreshModelThreadWorker(void* arg)
 	return B_OK;
 }
 
+
+void
+MainWindow::_NotifyUser(const char* title, const char* message)
+{
+	BAlert *alert = new(std::nothrow) BAlert(title, message,
+		B_TRANSLATE("Close"));
+
+	if (alert != NULL)
+		alert->Go();
+}
 

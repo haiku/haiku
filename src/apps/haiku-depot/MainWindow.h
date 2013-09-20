@@ -38,12 +38,15 @@ private:
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();
 
-			void				_RefreshRepositories(bool force = false);
+			void				_RefreshRepositories(bool force);
 			void				_RefreshPackageList();
 
-			void				_StartRefreshWorker();
+			void				_StartRefreshWorker(bool force = false);
 
 	static	status_t			_RefreshModelThreadWorker(void* arg);
+
+			void				_NotifyUser(const char* title,
+									const char* message);
 
 private:
 			FilterView*			fFilterView;
