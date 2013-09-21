@@ -18,6 +18,11 @@
 #include "PackageInfo.h"
 
 
+namespace BPackageKit {
+	class BSolverPackage;
+}
+
+
 class PackageManager;
 class ProblemWindow;
 class ResultWindow;
@@ -25,7 +30,7 @@ class ResultWindow;
 
 class PackageAction : public BReferenceable {
 public:
-								PackageAction(const PackageInfo& package,
+								PackageAction(PackageInfoRef package,
 									PackageManager* manager);
 	virtual						~PackageAction();
 
@@ -36,14 +41,14 @@ public:
 	// Package Kit supports this stuff already.
 	virtual status_t			Perform() = 0;
 
-			const PackageInfo&	Package() const
+			PackageInfoRef		Package() const
 									{ return fPackage; }
 
 protected:
 			PackageManager*		fPackageManager;
 
 private:
-			PackageInfo			fPackage;
+			PackageInfoRef		fPackage;
 };
 
 
@@ -66,10 +71,16 @@ public:
 	virtual						~PackageManager();
 
 	virtual	PackageState		GetPackageState(const PackageInfo& package);
-	virtual	PackageActionList	GetPackageActions(const PackageInfo& package);
+	virtual	PackageActionList	GetPackageActions(PackageInfoRef package);
 
 			status_t			SchedulePackageActions(
 									PackageActionList& list);
+
+			void				SetCurrentActionPackage(
+									PackageInfoRef package,
+									bool install);
+
+			void				ClearCurrentActionPackage();
 
 private:
 	// RequestHandler
@@ -101,6 +112,9 @@ private:
 										repository,
 									ResultWindow* window);
 
+				BPackageKit::BSolverPackage*
+								_GetSolverPackage(PackageInfoRef package);
+
 private:
 			DecisionProvider	fDecisionProvider;
 			JobStateListener	fJobStateListener;
@@ -113,6 +127,10 @@ private:
 			BLocker				fPendingActionsLock;
 			sem_id				fPendingActionsSem;
 			ProblemWindow*		fProblemWindow;
+			BPackageKit::BSolverPackage*
+								fCurrentInstallPackage;
+			BPackageKit::BSolverPackage*
+								fCurrentUninstallPackage;
 };
 
 #endif // PACKAGE_MANAGER_H

@@ -43,7 +43,8 @@
 
 enum {
 	MSG_MODEL_WORKER_DONE = 'mmwd',
-	MSG_REFRESH_DEPOTS = 'mrdp'
+	MSG_REFRESH_DEPOTS = 'mrdp',
+	MSG_PACKAGE_STATE_CHANGED = 'mpsc'
 };
 
 
@@ -197,11 +198,35 @@ MainWindow::MessageReceived(BMessage* message)
 				searchTerms = "";
 			fModel.SetSearchTerms(searchTerms);
 			_AdoptModel();
+			break;
+		}
+
+		case MSG_PACKAGE_STATE_CHANGED:
+		{
+			PackageInfo* info;
+			if (message->FindPointer("package", (void **)&info) == B_OK) {
+				PackageInfoRef ref(info, true);
+				fModel.SetPackageState(ref, ref->State());
+			}
 		}
 
 		default:
 			BWindow::MessageReceived(message);
 			break;
+	}
+}
+
+
+void
+MainWindow::PackageChanged(const PackageInfoEvent& event)
+{
+	if ((event.Changes() & PKG_CHANGED_STATE) != 0) {
+		PackageInfoRef ref(event.Package());
+		BMessage message(MSG_PACKAGE_STATE_CHANGED);
+		message.AddPointer("package", ref.Get());
+		ref.Detach();
+			// reference needs to be released by MessageReceived();
+		PostMessage(&message);
 	}
 }
 
@@ -366,6 +391,8 @@ MainWindow::_RefreshPackageList()
 
 			foundPackages[repoPackageInfo.Name()] = modelInfo;
 		}
+
+		modelInfo->AddListener(this);
 
 		BSolverRepository* repository = package->Repository();
 		if (dynamic_cast<BPackageManager::RemoteRepository*>(repository)

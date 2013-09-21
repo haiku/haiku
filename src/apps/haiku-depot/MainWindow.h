@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -8,6 +9,7 @@
 #include <Window.h>
 
 #include "Model.h"
+#include "PackageInfoListener.h"
 #include "PackageManager.h"
 
 
@@ -22,7 +24,7 @@ enum {
 };
 
 
-class MainWindow : public BWindow {
+class MainWindow : public BWindow, private PackageInfoListener {
 public:
 								MainWindow(BRect frame);
 	virtual						~MainWindow();
@@ -30,6 +32,11 @@ public:
 	// BWindow interface
 	virtual	bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* message);
+
+private:
+	// PackageInfoListener
+	virtual	void				PackageChanged(
+									const PackageInfoEvent& event);
 
 private:
 			void				_BuildMenu(BMenuBar* menuBar);

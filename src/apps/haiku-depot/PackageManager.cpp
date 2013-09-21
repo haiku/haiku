@@ -24,6 +24,7 @@
 
 #include "AutoDeleter.h"
 #include "AutoLocker.h"
+#include "PackageInfo.h"
 #include "ProblemWindow.h"
 #include "ResultWindow.h"
 
@@ -44,7 +45,7 @@ using BPackageKit::BSolverRepository;
 // #pragma mark - PackageAction
 
 
-PackageAction::PackageAction(const PackageInfo& package,
+PackageAction::PackageAction(PackageInfoRef package,
 	PackageManager* manager)
 	:
 	fPackageManager(manager),
@@ -63,7 +64,7 @@ PackageAction::~PackageAction()
 
 class InstallPackageAction : public PackageAction {
 public:
-	InstallPackageAction(const PackageInfo& package, PackageManager* manager)
+	InstallPackageAction(PackageInfoRef package, PackageManager* manager)
 		:
 		PackageAction(package, manager)
 	{
@@ -76,7 +77,9 @@ public:
 
 	virtual status_t Perform()
 	{
-		const char* packageName = Package().Title().String();
+		PackageInfoRef ref(Package());
+		fPackageManager->SetCurrentActionPackage(ref, true);
+		const char* packageName = ref->Title().String();
 		try {
 			fPackageManager->Install(&packageName, 1);
 		} catch (BFatalErrorException ex) {
@@ -84,10 +87,16 @@ public:
 				"%s: %s (%s)\n", packageName, ex.Message().String(),
 				ex.Details().String());
 			return ex.Error();
+		} catch (BAbortedByUserException ex) {
+			return B_OK;
+		} catch (BNothingToDoException ex) {
 		} catch (BException ex) {
 			fprintf(stderr, "Exception occurred while installing package "
 				"%s: %s\n", packageName, ex.Message().String());
+			return B_ERROR;;
 		}
+
+		ref->SetState(ACTIVATED);
 
 		return B_OK;
 	}
@@ -99,7 +108,7 @@ public:
 
 class UninstallPackageAction : public PackageAction {
 public:
-	UninstallPackageAction(const PackageInfo& package, PackageManager* manager)
+	UninstallPackageAction(PackageInfoRef package, PackageManager* manager)
 		:
 		PackageAction(package, manager)
 	{
@@ -112,7 +121,9 @@ public:
 
 	virtual status_t Perform()
 	{
-		const char* packageName = Package().Title().String();
+		PackageInfoRef ref(Package());
+		fPackageManager->SetCurrentActionPackage(ref, false);
+		const char* packageName = ref->Title().String();
 		try {
 			fPackageManager->Uninstall(&packageName, 1);
 		} catch (BFatalErrorException ex) {
@@ -120,10 +131,14 @@ public:
 				"%s: %s (%s)\n", packageName, ex.Message().String(),
 				ex.Details().String());
 			return ex.Error();
-		} catch (BException ex) {
+		} catch (BAbortedByUserException ex) {
+		} catch (BNothingToDoException ex) {
 			fprintf(stderr, "Exception occurred while uninstalling package "
 				"%s: %s\n", packageName, ex.Message().String());
+			return B_ERROR;
 		}
+
+		ref->SetState(NONE);
 
 		return B_OK;
 	}
@@ -141,7 +156,9 @@ PackageManager::PackageManager(BPackageInstallationLocation location)
 	fJobStateListener(),
 	fContext(fDecisionProvider, fJobStateListener),
 	fClientInstallationInterface(),
-	fProblemWindow(NULL)
+	fProblemWindow(NULL),
+	fCurrentInstallPackage(NULL),
+	fCurrentUninstallPackage(NULL)
 {
 	fInstallationInterface = &fClientInstallationInterface;
 	fRequestHandler = this;
@@ -178,46 +195,39 @@ PackageManager::GetPackageState(const PackageInfo& package)
 
 
 PackageActionList
-PackageManager::GetPackageActions(const PackageInfo& package)
+PackageManager::GetPackageActions(PackageInfoRef package)
 {
 	PackageActionList actionList;
 
-	BObjectList<BSolverPackage> packages;
-	status_t result = Solver()->FindPackages(package.Title(),
-		BSolver::B_FIND_IN_NAME, packages);
-	if (result == B_OK) {
-		bool installed = false;
-		bool systemPackage = false;
-		for (int32 i = 0; i < packages.CountItems(); i++) {
-			const BSolverPackage* solverPackage = packages.ItemAt(i);
-			if (solverPackage->Name() != package.Title())
-				continue;
+	bool installed = false;
+	bool systemPackage = false;
+	BSolverPackage* solverPackage = _GetSolverPackage(package);
+	if (solverPackage == NULL)
+		return actionList;
 
-			const BSolverRepository* repository = solverPackage->Repository();
-			if (repository == static_cast<const BSolverRepository*>(
-					SystemRepository())) {
-				installed = true;
-				systemPackage = true;
-			} else if (repository == static_cast<const BSolverRepository*>(
-					CommonRepository())) {
-				installed = true;
-			} else if (repository == static_cast<const BSolverRepository*>(
-					HomeRepository())) {
-				installed = true;
-			}
-		}
-
-		if (installed) {
-			if (!systemPackage) {
-				actionList.Add(PackageActionRef(new UninstallPackageAction(
-					package, this),	true));
-			}
-		} else {
-			actionList.Add(PackageActionRef(new InstallPackageAction(package,
-					this), true));
-		}
-		// TODO: activation status
+	const BSolverRepository* repository = solverPackage->Repository();
+	if (repository == static_cast<const BSolverRepository*>(
+			SystemRepository())) {
+		installed = true;
+		systemPackage = true;
+	} else if (repository == static_cast<const BSolverRepository*>(
+			CommonRepository())) {
+		installed = true;
+	} else if (repository == static_cast<const BSolverRepository*>(
+			HomeRepository())) {
+		installed = true;
 	}
+
+	if (installed) {
+		if (!systemPackage) {
+			actionList.Add(PackageActionRef(new UninstallPackageAction(
+				package, this), true));
+		}
+	} else {
+		actionList.Add(PackageActionRef(new InstallPackageAction(package,
+					this), true));
+	}
+	// TODO: activation status
 
 	return actionList;
 }
@@ -234,6 +244,27 @@ PackageManager::SchedulePackageActions(PackageActionList& list)
 	}
 
 	return release_sem_etc(fPendingActionsSem, list.CountItems(), 0);
+}
+
+
+void
+PackageManager::SetCurrentActionPackage(PackageInfoRef package, bool install)
+{
+	BSolverPackage* solverPackage = _GetSolverPackage(package);
+	if (solverPackage == NULL)
+		ClearCurrentActionPackage();
+	else {
+		fCurrentInstallPackage = install ? solverPackage : NULL;
+		fCurrentUninstallPackage = install ? NULL : solverPackage;
+	}
+}
+
+
+void
+PackageManager::ClearCurrentActionPackage()
+{
+	fCurrentInstallPackage = NULL;
+	fCurrentUninstallPackage = NULL;
 }
 
 
@@ -286,8 +317,15 @@ PackageManager::HandleProblems()
 	if (fProblemWindow == NULL)
 		fProblemWindow = new ProblemWindow;
 
-	ProblemWindow::SolverPackageSet dummy;
-	if (!fProblemWindow->Go(fSolver,dummy, dummy))
+	ProblemWindow::SolverPackageSet installPackages;
+	ProblemWindow::SolverPackageSet uninstallPackages;
+	if (fCurrentInstallPackage != NULL)
+		installPackages.insert(fCurrentInstallPackage);
+
+	if (fCurrentUninstallPackage != NULL)
+		uninstallPackages.insert(fCurrentInstallPackage);
+
+	if (!fProblemWindow->Go(fSolver,installPackages, uninstallPackages))
 		throw BAbortedByUserException();
 }
 
@@ -364,6 +402,7 @@ PackageManager::_PackageActionWorker(void* arg)
 		}
 
 		ref->Perform();
+		manager->ClearCurrentActionPackage();
 	}
 
 	return 0;
@@ -377,10 +416,34 @@ PackageManager::_AddResults(InstalledRepository& repository,
 	if (!repository.HasChanges())
 		return false;
 
-	ProblemWindow::SolverPackageSet dummy;
+	ProblemWindow::SolverPackageSet installPackages;
+	ProblemWindow::SolverPackageSet uninstallPackages;
+	if (fCurrentInstallPackage != NULL)
+		installPackages.insert(fCurrentInstallPackage);
+
+	if (fCurrentUninstallPackage != NULL)
+		uninstallPackages.insert(fCurrentInstallPackage);
+
 	return window->AddLocationChanges(repository.Name(),
-		repository.PackagesToActivate(), dummy,
-		repository.PackagesToDeactivate(), dummy);
+		repository.PackagesToActivate(), installPackages,
+		repository.PackagesToDeactivate(), uninstallPackages);
 }
 
 
+BSolverPackage*
+PackageManager::_GetSolverPackage(PackageInfoRef package)
+{
+	BObjectList<BSolverPackage> packages;
+	status_t result = Solver()->FindPackages(package->Title(),
+		BSolver::B_FIND_IN_NAME, packages);
+	if (result == B_OK) {
+		for (int32 i = 0; i < packages.CountItems(); i++) {
+			BSolverPackage* solverPackage = packages.ItemAt(i);
+			if (solverPackage->Name() != package->Title())
+				continue;
+			return solverPackage;
+		}
+	}
+
+	return NULL;
+}

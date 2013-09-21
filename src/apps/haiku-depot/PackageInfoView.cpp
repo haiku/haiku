@@ -521,7 +521,7 @@ public:
 						if (result != B_OK) {
 							fprintf(stderr, "Failed to schedule action: "
 								"%s '%s'\n", action->Label(),
-								action->Package().Title().String());
+								action->Package()->Title().String());
 						}
 					}
 				}
@@ -538,7 +538,8 @@ public:
 	{
 		Clear();
 
-		fPackageActions = fPackageManager->GetPackageActions(package);
+		fPackageActions = fPackageManager->GetPackageActions(
+			const_cast<PackageInfo*>(&package));
 
 		// Add Buttons in reverse action order
 		for (int32 i = fPackageActions.CountItems() - 1; i >= 0; i--) {
@@ -1280,8 +1281,11 @@ PackageInfoView::MessageReceived(BMessage* message)
 				fTitleView->SetPackage(package);
 			}
 
-			if ((changes & PKG_CHANGED_RATINGS) != 0) {
+			if ((changes & PKG_CHANGED_RATINGS) != 0)
 				fPagesView->SetPackage(package);
+
+			if ((changes & PKG_CHANGED_STATE) != 0) {
+				fPackageActionView->SetPackage(package);
 			}
 
 			break;
