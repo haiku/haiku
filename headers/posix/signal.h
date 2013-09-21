@@ -95,7 +95,7 @@ struct sigaction {
 #define SS_ONSTACK		0x1
 #define SS_DISABLE		0x2
 
-#define MINSIGSTKSZ		4096
+#define MINSIGSTKSZ		8192
 #define SIGSTKSZ		16384
 
 /* for signals using an alternate stack */
