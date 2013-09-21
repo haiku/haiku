@@ -77,6 +77,9 @@ public:
 
 	virtual status_t Perform()
 	{
+		fPackageManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES
+			| BPackageManager::B_ADD_REMOTE_REPOSITORIES
+			| BPackageManager::B_REFRESH_REPOSITORIES);
 		PackageInfoRef ref(Package());
 		fPackageManager->SetCurrentActionPackage(ref, true);
 		const char* packageName = ref->Title().String();
@@ -90,6 +93,7 @@ public:
 		} catch (BAbortedByUserException ex) {
 			return B_OK;
 		} catch (BNothingToDoException ex) {
+			return B_OK;
 		} catch (BException ex) {
 			fprintf(stderr, "Exception occurred while installing package "
 				"%s: %s\n", packageName, ex.Message().String());
@@ -121,6 +125,7 @@ public:
 
 	virtual status_t Perform()
 	{
+		fPackageManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES);
 		PackageInfoRef ref(Package());
 		fPackageManager->SetCurrentActionPackage(ref, false);
 		const char* packageName = ref->Title().String();
@@ -132,7 +137,10 @@ public:
 				ex.Details().String());
 			return ex.Error();
 		} catch (BAbortedByUserException ex) {
+			return B_OK;
 		} catch (BNothingToDoException ex) {
+			return B_OK;
+		} catch (BException ex) {
 			fprintf(stderr, "Exception occurred while uninstalling package "
 				"%s: %s\n", packageName, ex.Message().String());
 			return B_ERROR;
@@ -197,6 +205,7 @@ PackageManager::GetPackageState(const PackageInfo& package)
 PackageActionList
 PackageManager::GetPackageActions(PackageInfoRef package)
 {
+	Init(B_ADD_INSTALLED_REPOSITORIES | B_ADD_REMOTE_REPOSITORIES);
 	PackageActionList actionList;
 
 	bool installed = false;
@@ -433,14 +442,23 @@ PackageManager::_AddResults(InstalledRepository& repository,
 BSolverPackage*
 PackageManager::_GetSolverPackage(PackageInfoRef package)
 {
+	int32 flags = BSolver::B_FIND_IN_NAME;
+	if (package->State() == ACTIVATED || package->State() == INSTALLED)
+		flags |= BSolver::B_FIND_INSTALLED_ONLY;
+
 	BObjectList<BSolverPackage> packages;
 	status_t result = Solver()->FindPackages(package->Title(),
-		BSolver::B_FIND_IN_NAME, packages);
+		flags, packages);
 	if (result == B_OK) {
 		for (int32 i = 0; i < packages.CountItems(); i++) {
 			BSolverPackage* solverPackage = packages.ItemAt(i);
 			if (solverPackage->Name() != package->Title())
 				continue;
+			else if (package->State() == NONE
+				&& dynamic_cast<BPackageManager::RemoteRepository*>(
+					solverPackage->Repository()) == NULL) {
+				continue;
+			}
 			return solverPackage;
 		}
 	}
