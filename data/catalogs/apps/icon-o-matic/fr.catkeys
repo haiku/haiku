@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	806315965
+1	french	x-vnd.haiku-icon_o_matic	2058853918
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -139,6 +139,7 @@ Save image	Icon-O-Matic-SavePanel		Enregistrer l'image
 Add Styles	Icon-O-Matic-AddStylesCmd		Ajouter des styles
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Enlever les points de contrôle
 Format	Icon-O-Matic-SavePanel		Format
+Add rect	Icon-O-Matic-PathsList		Ajouter un rectangle
 Edit	Icon-O-Matic-Menus		Éditer
 Duplicate	Icon-O-Matic-StylesList		Dupliquer
 too big	Icon-O-Matic-StyledTextImport		trop grand
@@ -161,6 +162,7 @@ Split Control Point	Icon-O-Matic-SplitPointsCmd		Diviser le point de contrôle
 Open…	Icon-O-Matic-Menu-File		Ouvrir…
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Couleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Éditer le dégadé
+Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Nettoyer le chemin
 Rounding	Icon-O-Matic-PropertyNames		Arrondi
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Enlever les formes
 Clean up	Icon-O-Matic-PathsList		Nettoyer
