@@ -540,8 +540,10 @@ PackageInfo::AddCategory(const CategoryRef& category)
 void
 PackageInfo::SetState(PackageState state)
 {
-	fState = state;
-	_NotifyListeners(PKG_CHANGED_STATE);
+	if (fState != state) {
+		fState = state;
+		_NotifyListeners(PKG_CHANGED_STATE);
+	}
 }
 
 
