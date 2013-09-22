@@ -574,7 +574,7 @@ while [ $# -gt 0 ] ; do
 			set_variable crossToolsPrefix_$targetArch "$2"
 			targetArchs="$targetArchs $targetArch"
 			HAIKU_PACKAGING_ARCHS=
-			unknownArchIndex=$[$unknownArchIndex + 1]
+			unknownArchIndex=$(($unknownArchIndex + 1))
 			shift 2
 			;;
 		--distro-compatibility)
