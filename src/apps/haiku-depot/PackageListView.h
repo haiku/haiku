@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_LIST_VIEW_H
@@ -27,6 +28,8 @@ public:
 	virtual						~PackageListView();
 
 	virtual void				AttachedToWindow();
+	virtual	void				AllAttached();
+
 	virtual	void				MessageReceived(BMessage* message);
 
 	virtual void				SelectionChanged();

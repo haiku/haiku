@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013, Rene Gollent, <rene@gollent.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -608,8 +609,6 @@ PackageListView::PackageListView(BLocker* modelLock)
 	AddColumn(new PackageColumn(B_TRANSLATE("Status"), 60, 60, 100,
 		B_TRUNCATE_END), kStatusColumn);
 
-	SetSortingEnabled(true);
-
 	fItemCountView = new ItemCountView();
 	AddStatusView(fItemCountView);
 }
@@ -625,7 +624,19 @@ PackageListView::~PackageListView()
 void
 PackageListView::AttachedToWindow()
 {
+	BColumnListView::AttachedToWindow();
+
 	PackageColumn::InitTextMargin(ScrollView());
+}
+
+
+void
+PackageListView::AllAttached()
+{
+	BColumnListView::AllAttached();
+
+	SetSortingEnabled(true);
+	SetSortColumn(ColumnAt(0), false, true);
 }
 
 
