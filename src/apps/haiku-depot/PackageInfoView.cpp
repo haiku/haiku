@@ -537,13 +537,30 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		Clear();
-
 		PackageManager manager(
 			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME);
 
-		fPackageActions = manager.GetPackageActions(
+		PackageActionList actions = manager.GetPackageActions(
 			const_cast<PackageInfo*>(&package));
+
+		bool clearNeeded = false;
+		if (actions.CountItems() != fPackageActions.CountItems())
+			clearNeeded = true;
+		else {
+			for (int32 i = 0; i < actions.CountItems(); i++) {
+				if (strcasecmp(actions.ItemAtFast(i)->Label(),
+						fPackageActions.ItemAtFast(i)->Label()) != 0) {
+					clearNeeded = true;
+					break;
+				}
+			}
+		}
+
+		fPackageActions = actions;
+		if (!clearNeeded)
+			return;
+
+		Clear();
 
 		// Add Buttons in reverse action order
 		for (int32 i = fPackageActions.CountItems() - 1; i >= 0; i--) {
