@@ -212,7 +212,6 @@ RatingField::SetRating(float rating)
 		return;
 
 	fRating = rating;
-	// TODO: cause a redraw?
 }
 
 
@@ -493,8 +492,8 @@ PackageRow::UpdateState()
 	if (fPackage.Get() == NULL)
 		return;
 
-	BStringField* field = (BStringField*)GetField(kStatusColumn);
-	field->SetString(package_state_to_string(fPackage->State()));
+	SetField(new BStringField(package_state_to_string(fPackage->State())),
+		kStatusColumn);
 }
 
 
