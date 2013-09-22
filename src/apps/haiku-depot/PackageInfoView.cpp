@@ -431,8 +431,7 @@ public:
 
 		fTitleView->SetText(package.Title());
 
-		BString publisher = B_TRANSLATE("by %Publisher%");
-		publisher.ReplaceAll("%Publisher%", package.Publisher().Name());
+		BString publisher = package.Publisher().Name();
 		fPublisherView->SetText(publisher);
 
 		BString version = B_TRANSLATE("%Version%");

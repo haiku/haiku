@@ -405,10 +405,14 @@ MainWindow::_RefreshPackageList()
 			BString publisherURL;
 			if (repoPackageInfo.URLList().CountStrings() > 0)
 				publisherURL = repoPackageInfo.URLList().StringAt(0);
+			const BStringList& rightsList = repoPackageInfo.CopyrightList();
+			BString publisherName = repoPackageInfo.Vendor();
+			if (rightsList.CountStrings() > 0)
+				publisherName = rightsList.StringAt(0);
 			modelInfo.SetTo(new(std::nothrow) PackageInfo(NULL,
 					repoPackageInfo.Name(),
 					repoPackageInfo.Version().ToString(),
-					PublisherInfo(BitmapRef(), repoPackageInfo.Vendor(),
+					PublisherInfo(BitmapRef(), publisherName,
 					"", publisherURL), repoPackageInfo.Summary(),
 					repoPackageInfo.Description(), ""),
 				true);
