@@ -50,7 +50,7 @@ class InstallPackageAction : public PackageAction {
 public:
 	InstallPackageAction(PackageInfoRef package)
 		:
-		PackageAction(package)
+		PackageAction(PACKAGE_ACTION_INSTALL, package)
 	{
 	}
 
@@ -98,7 +98,7 @@ class UninstallPackageAction : public PackageAction {
 public:
 	UninstallPackageAction(PackageInfoRef package)
 		:
-		PackageAction(package)
+		PackageAction(PACKAGE_ACTION_UNINSTALL, package)
 	{
 	}
 

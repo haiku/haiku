@@ -14,11 +14,21 @@
 
 class PackageManager;
 
+enum {
+	PACKAGE_ACTION_INSTALL = 0,
+	PACKAGE_ACTION_UNINSTALL,
+	PACKAGE_ACTION_MAX
+};
+
 
 class PackageAction : public BReferenceable {
 public:
-								PackageAction(PackageInfoRef package);
+								PackageAction(int32 type,
+									PackageInfoRef package);
 	virtual						~PackageAction();
+
+			int32				Type() const
+									{ return fType; }
 
 	virtual const char*			Label() const = 0;
 
@@ -32,6 +42,7 @@ protected:
 
 private:
 			PackageInfoRef		fPackage;
+			int32				fType;
 };
 
 

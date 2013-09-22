@@ -547,8 +547,8 @@ public:
 			clearNeeded = true;
 		else {
 			for (int32 i = 0; i < actions.CountItems(); i++) {
-				if (strcasecmp(actions.ItemAtFast(i)->Label(),
-						fPackageActions.ItemAtFast(i)->Label()) != 0) {
+				if (actions.ItemAtFast(i)->Type()
+					!= fPackageActions.ItemAtFast(i)->Type()) {
 					clearNeeded = true;
 					break;
 				}
