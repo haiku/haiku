@@ -14,6 +14,7 @@
 #include "ps2_service.h"
 
 #include "ps2_alps.h"
+#include "ps2_elantech.h"
 #include "ps2_standard_mouse.h"
 #include "ps2_synaptics.h"
 #include "ps2_trackpoint.h"
@@ -85,6 +86,12 @@ ps2_dev_detect_pointing(ps2_dev *dev, device_hooks **hooks)
 	status = probe_alps(dev);
 	if (status == B_OK) {
 		*hooks = &gALPSDeviceHooks;
+		goto dev_found;
+	}
+
+	status = probe_elantech(dev);
+	if (status == B_OK) {
+		*hooks = &gElantechDeviceHooks;
 		goto dev_found;
 	}
 
@@ -190,7 +197,7 @@ ps2_dev_publish(ps2_dev *dev)
 	if (atomic_get(&dev->flags) & PS2_FLAG_KEYB) {
 		status = devfs_publish_device(dev->name, &gKeyboardDeviceHooks);
 	} else {
-		// Check if this is the "pass-through" device and wait until 
+		// Check if this is the "pass-through" device and wait until
 		// the parent_dev goes to enabled state. It is required to prevent
 		// from messing up the Synaptics command sequences in synaptics_open.
 		if (dev->parent_dev) {
@@ -204,7 +211,7 @@ ps2_dev_publish(ps2_dev *dev)
 				snooze(timeout / 20);
 			}
 			TRACE("ps2: publishing %s: parent %s is %s; wait time %" B_PRId64
-				"\n", dev->name, dev->parent_dev->name, 
+				"\n", dev->name, dev->parent_dev->name,
 				status == B_OK ? "enabled" : "busy", system_time() - start);
 		}
 
@@ -490,3 +497,23 @@ ps2_dev_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out,
 	return dev->command(dev, cmd, out, out_count, in, in_count, timeout);
 }
 
+
+status_t
+ps2_dev_sliced_command(ps2_dev *dev, uint8 cmd)
+{
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_SCALE11) != B_OK)
+		return B_ERROR;
+	uint8 val = (cmd >> 6) & 3;
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_RES, &val, 1) != B_OK)
+		return B_ERROR;
+	val = (cmd >> 4) & 3;
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_RES, &val, 1) != B_OK)
+		return B_ERROR;
+	val = (cmd >> 2) & 3;
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_RES, &val, 1) != B_OK)
+		return B_ERROR;
+	val = cmd & 3;
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_RES, &val, 1) != B_OK)
+		return B_ERROR;
+	return B_OK;
+}

@@ -67,8 +67,8 @@ public:
 private:
 	bool				fFired;
 	uint8				fLastPackage[PS2_PACKET_ALPS];
-	timer				fEventTimer;	
-	alps_cookie*		fCookie;		
+	timer				fEventTimer;
+	alps_cookie*		fCookie;
 };
 
 
@@ -112,7 +112,7 @@ typedef struct alps_model_info {
 
 static const struct alps_model_info gALPSModelInfos[] = {
 	{{0x32, 0x02, 0x14}, 0xf8, 0xf8, ALPS_PASS | ALPS_DUALPOINT},
-		// Toshiba Salellite Pro M10 
+		// Toshiba Salellite Pro M10
 //	{{0x33, 0x02, 0x0a}, 0x88, 0xf8, ALPS_OLDPROTO},
 		// UMAX-530T
 	{{0x53, 0x02, 0x0a}, 0xf8, 0xf8, 0},
@@ -153,15 +153,6 @@ static const struct alps_model_info gALPSModelInfos[] = {
 
 
 static alps_model_info* sFoundModel = NULL;
-
-
-#define PS2_MOUSE_CMD_SET_SCALE11		0xe6
-#define PS2_MOUSE_CMD_SET_SCALE21		0xe7
-#define PS2_MOUSE_CMD_SET_RES			0xe8
-#define PS2_MOUSE_CMD_GET_INFO			0xe9
-#define PS2_MOUSE_CMD_SET_STREAM  		0xea
-#define PS2_MOUSE_CMD_SET_POLL			0xf0
-#define PS2_MOUSE_CMD_SET_RATE			0xf3
 
 
 // touchpad proportions
@@ -279,16 +270,16 @@ probe_alps(ps2_dev* dev)
 	TRACE("ALPS: probe\n");
 
 	val[0] = 0;
-	if (ps2_dev_command(dev, PS2_MOUSE_CMD_SET_RES, val, 1, NULL, 0) != B_OK
-		|| ps2_dev_command(dev, PS2_MOUSE_CMD_SET_SCALE11, NULL, 0, NULL, 0)
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_RES, val, 1, NULL, 0) != B_OK
+		|| ps2_dev_command(dev, PS2_CMD_MOUSE_SET_SCALE11, NULL, 0, NULL, 0)
 			!= B_OK
-		|| ps2_dev_command(dev, PS2_MOUSE_CMD_SET_SCALE11, NULL, 0, NULL, 0)
+		|| ps2_dev_command(dev, PS2_CMD_MOUSE_SET_SCALE11, NULL, 0, NULL, 0)
 			!= B_OK
-		|| ps2_dev_command(dev, PS2_MOUSE_CMD_SET_SCALE11, NULL, 0, NULL, 0)
+		|| ps2_dev_command(dev, PS2_CMD_MOUSE_SET_SCALE11, NULL, 0, NULL, 0)
 			!= B_OK)
 		return B_ERROR;
 
-	if (ps2_dev_command(dev, PS2_MOUSE_CMD_GET_INFO, NULL, 0, val, 3)
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_GET_INFO, NULL, 0, val, 3)
 		!= B_OK)
 		return B_ERROR;
 
@@ -296,16 +287,16 @@ probe_alps(ps2_dev* dev)
 		return B_ERROR;
 
 	val[0] = 0;
-	if (ps2_dev_command(dev, PS2_MOUSE_CMD_SET_RES, val, 1, NULL, 0) != B_OK
-		|| ps2_dev_command(dev, PS2_MOUSE_CMD_SET_SCALE21, NULL, 0, NULL, 0)
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_RES, val, 1, NULL, 0) != B_OK
+		|| ps2_dev_command(dev, PS2_CMD_MOUSE_SET_SCALE21, NULL, 0, NULL, 0)
 			!= B_OK
-		|| ps2_dev_command(dev, PS2_MOUSE_CMD_SET_SCALE21, NULL, 0, NULL, 0)
+		|| ps2_dev_command(dev, PS2_CMD_MOUSE_SET_SCALE21, NULL, 0, NULL, 0)
 			!= B_OK
-		|| ps2_dev_command(dev, PS2_MOUSE_CMD_SET_SCALE21, NULL, 0, NULL, 0)
+		|| ps2_dev_command(dev, PS2_CMD_MOUSE_SET_SCALE21, NULL, 0, NULL, 0)
 			!= B_OK)
 		return B_ERROR;
 
-	if (ps2_dev_command(dev, PS2_MOUSE_CMD_GET_INFO, NULL, 0, val, 3)
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_GET_INFO, NULL, 0, val, 3)
 		!= B_OK)
 		return B_ERROR;
 
@@ -337,12 +328,12 @@ switch_hardware_tab(ps2_dev* dev, bool on)
 {
 	uint8 val[3];
 	uint8 arg = 0x00;
-	uint8 command = PS2_MOUSE_CMD_SET_RES;
+	uint8 command = PS2_CMD_MOUSE_SET_RES;
 	if (on) {
 		arg = 0x0A;
-		command = PS2_MOUSE_CMD_SET_RATE;
+		command = PS2_CMD_KEYBOARD_SET_TYPEMATIC;
 	}
-	if (ps2_dev_command(dev, PS2_MOUSE_CMD_GET_INFO, NULL, 0, val, 3) != B_OK
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_GET_INFO, NULL, 0, val, 3) != B_OK
 		|| ps2_dev_command(dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0) != B_OK
 		|| ps2_dev_command(dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0) != B_OK
 		|| ps2_dev_command(dev, command, &arg, 1, NULL, 0) != B_OK)
@@ -355,9 +346,9 @@ switch_hardware_tab(ps2_dev* dev, bool on)
 status_t
 enable_passthrough(ps2_dev* dev, bool on)
 {
-	uint8 command = PS2_MOUSE_CMD_SET_SCALE11;
+	uint8 command = PS2_CMD_MOUSE_SET_SCALE11;
 	if (on)
-		command = PS2_MOUSE_CMD_SET_SCALE21;
+		command = PS2_CMD_MOUSE_SET_SCALE21;
 
 	if (ps2_dev_command(dev, command, NULL, 0, NULL, 0) != B_OK
 		|| ps2_dev_command(dev, command, NULL, 0, NULL, 0) != B_OK
@@ -438,7 +429,7 @@ alps_open(const char *name, uint32 flags, void **_cookie)
 	if ((sFoundModel->flags & ALPS_PASS) != 0
 		&& enable_passthrough(dev, true) != B_OK)
 		goto err4;
-		
+
 	// switch tap mode off
 	if (switch_hardware_tab(dev, false) != B_OK)
 		goto err4;
@@ -455,7 +446,7 @@ alps_open(const char *name, uint32 flags, void **_cookie)
 		&& enable_passthrough(dev, false) != B_OK)
 		goto err4;
 
-	if (ps2_dev_command(dev, PS2_MOUSE_CMD_SET_STREAM, NULL, 0, NULL, 0) != B_OK)
+	if (ps2_dev_command(dev, PS2_CMD_MOUSE_SET_STREAM, NULL, 0, NULL, 0) != B_OK)
 		goto err4;
 
 	if (ps2_dev_command(dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0) != B_OK)
@@ -633,4 +624,3 @@ device_hooks gALPSDeviceHooks = {
 	alps_read,
 	alps_write,
 };
-

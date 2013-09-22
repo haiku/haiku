@@ -369,7 +369,7 @@ ps2_init(void)
 	//ps2_selftest();
 
 	// Setup the command byte with disabled keyboard and AUX interrupts
-	// to prevent interrupts storm on some KBCs during active multiplexing 
+	// to prevent interrupts storm on some KBCs during active multiplexing
 	// activation procedure. Fixes #7635.
 	status = ps2_setup_command_byte(false);
 	if (status) {
@@ -391,8 +391,9 @@ ps2_init(void)
 	}
 
 	if (gActiveMultiplexingEnabled) {
-		if (ps2_dev_command_timeout(&ps2_device[PS2_DEVICE_MOUSE], 0xe6,
-				NULL, 0, NULL, 0, 100000) == B_TIMED_OUT) {
+		if (ps2_dev_command_timeout(&ps2_device[PS2_DEVICE_MOUSE],
+				PS2_CMD_MOUSE_SET_SCALE11, NULL, 0, NULL, 0, 100000)
+			== B_TIMED_OUT) {
 			INFO("ps2: accessing multiplexed mouse port 0 timed out, ignoring it!\n");
 		} else {
 			ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
