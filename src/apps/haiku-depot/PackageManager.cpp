@@ -42,31 +42,15 @@ using BPackageKit::BSolver;
 using BPackageKit::BSolverPackage;
 using BPackageKit::BSolverRepository;
 
-// #pragma mark - PackageAction
-
-
-PackageAction::PackageAction(PackageInfoRef package,
-	PackageManager* manager)
-	:
-	fPackageManager(manager),
-	fPackage(package)
-{
-}
-
-
-PackageAction::~PackageAction()
-{
-}
-
 
 // #pragma mark - InstallPackageAction
 
 
 class InstallPackageAction : public PackageAction {
 public:
-	InstallPackageAction(PackageInfoRef package, PackageManager* manager)
+	InstallPackageAction(PackageInfoRef package)
 		:
-		PackageAction(package, manager)
+		PackageAction(package)
 	{
 	}
 
@@ -112,9 +96,9 @@ public:
 
 class UninstallPackageAction : public PackageAction {
 public:
-	UninstallPackageAction(PackageInfoRef package, PackageManager* manager)
+	UninstallPackageAction(PackageInfoRef package)
 		:
-		PackageAction(package, manager)
+		PackageAction(package)
 	{
 	}
 
@@ -171,23 +155,11 @@ PackageManager::PackageManager(BPackageInstallationLocation location)
 	fInstallationInterface = &fClientInstallationInterface;
 	fRequestHandler = this;
 	fUserInteractionHandler = this;
-
-	fPendingActionsSem = create_sem(0, "PendingPackageActions");
-	if (fPendingActionsSem >= 0) {
-		fPendingActionsWorker = spawn_thread(&_PackageActionWorker,
-			"Planet Express", B_NORMAL_PRIORITY, this);
-		if (fPendingActionsWorker >= 0)
-			resume_thread(fPendingActionsWorker);
-	}
 }
 
 
 PackageManager::~PackageManager()
 {
-	delete_sem(fPendingActionsSem);
-	status_t result;
-	wait_for_thread(fPendingActionsWorker, &result);
-
 	if (fProblemWindow != NULL)
 		fProblemWindow->PostMessage(B_QUIT_REQUESTED);
 }
@@ -230,11 +202,11 @@ PackageManager::GetPackageActions(PackageInfoRef package)
 	if (installed) {
 		if (!systemPackage) {
 			actionList.Add(PackageActionRef(new UninstallPackageAction(
-				package, this), true));
+				package), true));
 		}
 	} else {
-		actionList.Add(PackageActionRef(new InstallPackageAction(package,
-					this), true));
+		actionList.Add(PackageActionRef(new InstallPackageAction(package),
+				true));
 	}
 	// TODO: activation status
 
@@ -242,38 +214,12 @@ PackageManager::GetPackageActions(PackageInfoRef package)
 }
 
 
-status_t
-PackageManager::SchedulePackageActions(PackageActionList& list)
-{
-	AutoLocker<BLocker> lock(&fPendingActionsLock);
-	for (int32 i = 0; i < list.CountItems(); i++) {
-		if (!fPendingActions.Add(list.ItemAtFast(i))) {
-			return B_NO_MEMORY;
-		}
-	}
-
-	return release_sem_etc(fPendingActionsSem, list.CountItems(), 0);
-}
-
-
 void
 PackageManager::SetCurrentActionPackage(PackageInfoRef package, bool install)
 {
 	BSolverPackage* solverPackage = _GetSolverPackage(package);
-	if (solverPackage == NULL)
-		ClearCurrentActionPackage();
-	else {
-		fCurrentInstallPackage = install ? solverPackage : NULL;
-		fCurrentUninstallPackage = install ? NULL : solverPackage;
-	}
-}
-
-
-void
-PackageManager::ClearCurrentActionPackage()
-{
-	fCurrentInstallPackage = NULL;
-	fCurrentUninstallPackage = NULL;
+	fCurrentInstallPackage = install ? solverPackage : NULL;
+	fCurrentUninstallPackage = install ? NULL : solverPackage;
 }
 
 
@@ -395,29 +341,6 @@ PackageManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 }
 
 
-status_t
-PackageManager::_PackageActionWorker(void* arg)
-{
-	PackageManager* manager = reinterpret_cast<PackageManager*>(arg);
-
-	while (acquire_sem(manager->fPendingActionsSem) == B_OK) {
-		PackageActionRef ref;
-		{
-			AutoLocker<BLocker> lock(&manager->fPendingActionsLock);
-			ref = manager->fPendingActions.ItemAt(0);
-			if (ref.Get() == NULL)
-				break;
-			manager->fPendingActions.Remove(0);
-		}
-
-		ref->Perform();
-		manager->ClearCurrentActionPackage();
-	}
-
-	return 0;
-}
-
-
 bool
 PackageManager::_AddResults(InstalledRepository& repository,
 	ResultWindow* window)
@@ -431,7 +354,7 @@ PackageManager::_AddResults(InstalledRepository& repository,
 		installPackages.insert(fCurrentInstallPackage);
 
 	if (fCurrentUninstallPackage != NULL)
-		uninstallPackages.insert(fCurrentInstallPackage);
+		uninstallPackages.insert(fCurrentUninstallPackage);
 
 	return window->AddLocationChanges(repository.Name(),
 		repository.PackagesToActivate(), installPackages,

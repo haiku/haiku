@@ -29,6 +29,7 @@
 #include "BitmapButton.h"
 #include "BitmapView.h"
 #include "MarkupParser.h"
+#include "PackageActionHandler.h"
 #include "PackageManager.h"
 #include "TextDocumentView.h"
 #include "TextView.h"
@@ -488,11 +489,11 @@ private:
 
 class PackageActionView : public BView {
 public:
-	PackageActionView(PackageManager* packageManager)
+	PackageActionView(PackageActionHandler* handler)
 		:
 		BView("about view", B_WILL_DRAW),
-		fPackageManager(packageManager),
-		fLayout(new BGroupLayout(B_HORIZONTAL))
+		fLayout(new BGroupLayout(B_HORIZONTAL)),
+		fPackageActionHandler(handler)
 	{
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -516,7 +517,7 @@ public:
 					if (action.Get() != NULL) {
 						PackageActionList actions;
 						actions.Add(action);
-						status_t result = fPackageManager
+						status_t result = fPackageActionHandler
 							->SchedulePackageActions(actions);
 						if (result != B_OK) {
 							fprintf(stderr, "Failed to schedule action: "
@@ -538,7 +539,10 @@ public:
 	{
 		Clear();
 
-		fPackageActions = fPackageManager->GetPackageActions(
+		PackageManager manager(
+			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME);
+
+		fPackageActions = manager.GetPackageActions(
 			const_cast<PackageInfo*>(&package));
 
 		// Add Buttons in reverse action order
@@ -567,10 +571,9 @@ public:
 	}
 
 private:
-	PackageManager*		fPackageManager;
-
 	BGroupLayout*		fLayout;
 	PackageActionList	fPackageActions;
+	PackageActionHandler* fPackageActionHandler;
 	BList				fButtons;
 };
 
@@ -1216,14 +1219,14 @@ private:
 
 
 PackageInfoView::PackageInfoView(BLocker* modelLock,
-		PackageManager* packageManager)
+		PackageActionHandler* handler)
 	:
 	BGroupView("package info view", B_VERTICAL),
 	fModelLock(modelLock),
 	fPackageListener(new(std::nothrow) Listener(this))
 {
 	fTitleView = new TitleView();
-	fPackageActionView = new PackageActionView(packageManager);
+	fPackageActionView = new PackageActionView(handler);
 	fPagesView = new PagesView();
 
 	BLayoutBuilder::Group<>(this)

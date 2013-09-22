@@ -29,12 +29,13 @@
 #include <package/solver/SolverPackage.h>
 
 #include "AutoDeleter.h"
+#include "AutoLocker.h"
 #include "DecisionProvider.h"
 #include "FilterView.h"
 #include "JobStateListener.h"
 #include "PackageInfoView.h"
 #include "PackageListView.h"
-
+#include "PackageManager.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -76,7 +77,6 @@ MainWindow::MainWindow(BRect frame)
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
-	fPackageManager(B_PACKAGE_INSTALLATION_LOCATION_HOME),
 	fTerminating(false),
 	fModelWorker(B_BAD_THREAD_ID)
 {
@@ -85,7 +85,7 @@ MainWindow::MainWindow(BRect frame)
 
 	fFilterView = new FilterView(fModel);
 	fPackageListView = new PackageListView(fModel.Lock());
-	fPackageInfoView = new PackageInfoView(fModel.Lock(), &fPackageManager);
+	fPackageInfoView = new PackageInfoView(fModel.Lock(), this);
 
 	fSplitView = new BSplitView(B_VERTICAL, 5.0f);
 
@@ -107,6 +107,14 @@ MainWindow::MainWindow(BRect frame)
 	fSplitView->SetCollapsible(1, false);
 
 	_StartRefreshWorker();
+
+	fPendingActionsSem = create_sem(0, "PendingPackageActions");
+	if (fPendingActionsSem >= 0) {
+		fPendingActionsWorker = spawn_thread(&_PackageActionWorker,
+			"Planet Express", B_NORMAL_PRIORITY, this);
+		if (fPendingActionsWorker >= 0)
+			resume_thread(fPendingActionsWorker);
+	}
 }
 
 
@@ -117,6 +125,10 @@ MainWindow::~MainWindow()
 		status_t result;
 		wait_for_thread(fModelWorker, &result);
 	}
+
+	delete_sem(fPendingActionsSem);
+	status_t result;
+	wait_for_thread(fPendingActionsWorker, &result);
 }
 
 
@@ -231,6 +243,20 @@ MainWindow::PackageChanged(const PackageInfoEvent& event)
 }
 
 
+status_t
+MainWindow::SchedulePackageActions(PackageActionList& list)
+{
+	AutoLocker<BLocker> lock(&fPendingActionsLock);
+	for (int32 i = 0; i < list.CountItems(); i++) {
+		if (!fPendingActions.Add(list.ItemAtFast(i))) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	return release_sem_etc(fPendingActionsSem, list.CountItems(), 0);
+}
+
+
 void
 MainWindow::_BuildMenu(BMenuBar* menuBar)
 {
@@ -333,8 +359,9 @@ MainWindow::_RefreshPackageList()
 		depots[repoName] = DepotInfo(repoName);
 	}
 
+	PackageManager manager(B_PACKAGE_INSTALLATION_LOCATION_HOME);
 	try {
-		fPackageManager.Init(PackageManager::B_ADD_INSTALLED_REPOSITORIES
+		manager.Init(PackageManager::B_ADD_INSTALLED_REPOSITORIES
 			| PackageManager::B_ADD_REMOTE_REPOSITORIES);
 	} catch (BException ex) {
 		BString message(B_TRANSLATE("An error occurred while "
@@ -345,7 +372,7 @@ MainWindow::_RefreshPackageList()
 	}
 
 	BObjectList<BSolverPackage> packages;
-	result = fPackageManager.Solver()->FindPackages("",
+	result = manager.Solver()->FindPackages("",
 		BSolver::B_FIND_CASE_INSENSITIVE | BSolver::B_FIND_IN_NAME
 			| BSolver::B_FIND_IN_SUMMARY | BSolver::B_FIND_IN_DESCRIPTION
 			| BSolver::B_FIND_IN_PROVIDES,
@@ -401,13 +428,13 @@ MainWindow::_RefreshPackageList()
 		} else {
 			const char* installationLocation = NULL;
 			if (repository == static_cast<const BSolverRepository*>(
-					fPackageManager.SystemRepository())) {
+					manager.SystemRepository())) {
 				installationLocation = "system";
 			} else if (repository == static_cast<const BSolverRepository*>(
-					fPackageManager.CommonRepository())) {
+					manager.CommonRepository())) {
 				installationLocation = "common";
 			} else if (repository == static_cast<const BSolverRepository*>(
-					fPackageManager.HomeRepository())) {
+					manager.HomeRepository())) {
 				installationLocation = "home";
 			}
 
@@ -481,6 +508,28 @@ MainWindow::_RefreshModelThreadWorker(void* arg)
 	messenger.SendMessage(MSG_MODEL_WORKER_DONE);
 
 	return B_OK;
+}
+
+
+status_t
+MainWindow::_PackageActionWorker(void* arg)
+{
+	MainWindow* window = reinterpret_cast<MainWindow*>(arg);
+
+	while (acquire_sem(window->fPendingActionsSem) == B_OK) {
+		PackageActionRef ref;
+		{
+			AutoLocker<BLocker> lock(&window->fPendingActionsLock);
+			ref = window->fPendingActions.ItemAt(0);
+			if (ref.Get() == NULL)
+				break;
+			window->fPendingActions.Remove(0);
+		}
+
+		ref->Perform();
+	}
+
+	return 0;
 }
 
 

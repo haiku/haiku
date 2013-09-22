@@ -9,8 +9,9 @@
 #include <Window.h>
 
 #include "Model.h"
+#include "PackageAction.h"
+#include "PackageActionHandler.h"
 #include "PackageInfoListener.h"
-#include "PackageManager.h"
 
 
 class BSplitView;
@@ -19,12 +20,14 @@ class PackageActionsView;
 class PackageInfoView;
 class PackageListView;
 
+
 enum {
 	MSG_MAIN_WINDOW_CLOSED		= 'mwcl',
 };
 
 
-class MainWindow : public BWindow, private PackageInfoListener {
+class MainWindow : public BWindow, private PackageInfoListener,
+	private PackageActionHandler {
 public:
 								MainWindow(BRect frame);
 	virtual						~MainWindow();
@@ -37,6 +40,11 @@ private:
 	// PackageInfoListener
 	virtual	void				PackageChanged(
 									const PackageInfoEvent& event);
+
+private:
+	// PackageActionHandler
+	virtual	status_t			SchedulePackageActions(
+									PackageActionList& list);
 
 private:
 			void				_BuildMenu(BMenuBar* menuBar);
@@ -52,6 +60,9 @@ private:
 
 	static	status_t			_RefreshModelThreadWorker(void* arg);
 
+	static	status_t			_PackageActionWorker(void* arg);
+
+
 			void				_NotifyUser(const char* title,
 									const char* message);
 
@@ -64,11 +75,13 @@ private:
 			Model				fModel;
 			PackageList			fVisiblePackages;
 
-			PackageManager
-								fPackageManager;
-
 			bool				fTerminating;
 			thread_id			fModelWorker;
+
+			thread_id			fPendingActionsWorker;
+			PackageActionList	fPendingActions;
+			BLocker				fPendingActionsLock;
+			sem_id				fPendingActionsSem;
 };
 
 #endif // MAIN_WINDOW_H
