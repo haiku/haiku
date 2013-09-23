@@ -7,3 +7,5 @@ http://www.netneurotic.net/mac/openfirmware.html
 http://www.netbsd.org/ports/macppc/faq.html
 http://mail-index.netbsd.org/port-macppc/1999/03/21/0001.html
 http://mail-index.netbsd.org/port-macppc/1999/06/25/0006.html
+http://ps-2.kev009.com/solinno.co.uk/7043-140/files/docs/ {OF,PReP}
+http://www.openfirmware.org/1275/bindings/chrp/
