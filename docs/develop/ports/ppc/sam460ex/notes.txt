@@ -46,6 +46,8 @@ http://www.csd.uwo.ca/~mburrel/stuff/ppc-asm.html
 http://www.linux-kvm.org/page/PowerPC_Book_E_MMU
 http://wiki.freebsd.org/powerpc/BookE
 http://en.wikipedia.org/wiki/Memory_management_unit#PowerPC
+** ePAPR
+https://www.power.org/wp-content/uploads/2012/06/Power_ePAPR_APPROVED_v1.1.pdf
 ** 440
 http://elinux.org/Book_E_and_PPC_440
 *** amcc 4x0
