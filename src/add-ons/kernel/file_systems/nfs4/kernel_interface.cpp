@@ -74,8 +74,8 @@ CreateNFS4Server(RPC::Server* serv)
 //	dirtime=X	- attempt revalidate directory cache not more often than each X
 //				  seconds
 static status_t
-ParseArguments(const char* _args, AddressResolver** address, char** _path,
-	MountConfiguration* conf)
+ParseArguments(const char* _args, AddressResolver** address, char** _server,
+	char** _path, MountConfiguration* conf)
 {
 	if (_args == NULL)
 		return B_BAD_VALUE;
@@ -94,12 +94,18 @@ ParseArguments(const char* _args, AddressResolver** address, char** _path,
 		return B_MISMATCHED_VALUES;
 	*path++ = '\0';
 
-	*address = new AddressResolver(args);
-	if (*address == NULL)
+	*_server = strdup(args);
+	if (*_server == NULL)
 		return B_NO_MEMORY;
+	*address = new AddressResolver(args);
+	if (*address == NULL) {
+		delete *_server;
+		return B_NO_MEMORY;
+	}
 
 	*_path = strdup(path);
 	if (*_path == NULL) {
+		delete *_server;
 		delete *address;
 		return B_NO_MEMORY;
 	}
@@ -176,7 +182,8 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 	AddressResolver* resolver;
 	MountConfiguration config;
 	char* path;
-	result = ParseArguments(args, &resolver, &path, &config);
+	char* serverName;
+	result = ParseArguments(args, &resolver, &serverName, &path, &config);
 	if (result != B_OK)
 		return result;
 	MemoryDeleter pathDeleter(path);
@@ -188,7 +195,9 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 		return result;
 	
 	FileSystem* fs;
-	result = FileSystem::Mount(&fs, server, path, volume->id, config);
+	result = FileSystem::Mount(&fs, server, serverName, path, volume->id,
+		config);
+	free(serverName);
 	if (result != B_OK) {
 		gRPCServerManager->Release(server);
 		return result;
