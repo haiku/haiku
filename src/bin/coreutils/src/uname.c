@@ -50,6 +50,10 @@
 # include <mach-o/arch.h>
 #endif
 
+#ifdef __HAIKU__
+# include <OS.h>
+#endif
+
 #include "system.h"
 #include "error.h"
 #include "quote.h"
@@ -339,6 +343,23 @@ main (int argc, char **argv)
 # endif
         }
 #endif
+
+#ifdef __HAIKU__
+	  {
+		system_info sysinfo;
+		get_system_info(&sysinfo);
+
+		switch (sysinfo.platform_type) {
+			case B_AT_CLONE_PLATFORM:
+				element = "x86";
+				break;
+			case B_64_BIT_PC_PLATFORM:
+				element = "x86_64";
+				break;
+		}
+	  }
+#endif
+
       if (! (toprint == UINT_MAX && element == unknown))
         print_element (element);
     }
