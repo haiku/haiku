@@ -118,6 +118,8 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_SIZE = 20000 ;
 
 			AddHaikuImagePackages
+				curl
+				curl_devel
 				freetype
 				freetype_devel
 				grep
@@ -158,6 +160,8 @@ rule DefineDefaultBuildProfiles
 					in [ MultiArchSubDirSetup $(TARGET_PACKAGING_ARCHS[2-]) ] {
 				on $(architectureObject) {
 					AddHaikuImagePackages
+						curl
+						curl_devel
 						freetype
 						freetype_devel
 						icu
