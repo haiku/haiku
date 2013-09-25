@@ -63,6 +63,7 @@ HPKG_SOURCES =
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		UseBuildFeatureHeaders curl ;
 		UseBuildFeatureHeaders zlib ;
 
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
@@ -70,6 +71,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
 
+		Includes [ FGristFiles FetchFileJob.cpp ]
+			: [ BuildFeatureAttribute curl : headers ] ;
 		Includes [ FGristFiles $(HPKG_SOURCES) ]
 			: [ BuildFeatureAttribute zlib : headers ] ;
 
@@ -130,6 +133,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			[ MultiArchDefaultGristFiles libshared.a ]
 			be
+			[ BuildFeatureAttribute curl : library ]
 			[ BuildFeatureAttribute zlib : library ]
 			$(TARGET_LIBSTDC++)
 			;
