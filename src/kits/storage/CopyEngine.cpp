@@ -20,7 +20,6 @@
 #include <File.h>
 #include <fs_attr.h>
 #include <Path.h>
-#include <String.h>
 #include <SymLink.h>
 #include <TypeConstants.h>
 
@@ -97,7 +96,7 @@ BCopyEngine::RemoveFlags(uint32 flags)
 
 
 status_t
-BCopyEngine::CopyEntry(const char* sourcePath, const char* destPath)
+BCopyEngine::CopyEntry(const Entry& sourceEntry, const Entry& destEntry)
 {
 	if (fBuffer == NULL) {
 		fBuffer = new(std::nothrow) char[kDefaultBufferSize];
@@ -111,6 +110,18 @@ BCopyEngine::CopyEntry(const char* sourcePath, const char* destPath)
 		} else
 			fBufferSize = kDefaultBufferSize;
 	}
+
+	BPath sourcePathBuffer;
+	const char* sourcePath;
+	status_t error = sourceEntry.GetPath(sourcePathBuffer, sourcePath);
+	if (error != B_OK)
+		return error;
+
+	BPath destPathBuffer;
+	const char* destPath;
+	error = destEntry.GetPath(destPathBuffer, destPath);
+	if (error != B_OK)
+		return error;
 
 	return _CopyEntry(sourcePath, destPath);
 }

@@ -26,6 +26,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DriverSettings.cpp
 			Entry.cpp
 			EntryList.cpp
+			EntryOperationEngineBase.cpp
 			File.cpp
 			FileDescriptorIO.cpp
 			FileIO.cpp

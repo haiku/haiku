@@ -11,7 +11,7 @@
 
 #include <stdarg.h>
 
-#include <SupportDefs.h>
+#include <EntryOperationEngineBase.h>
 
 
 class BFile;
@@ -21,7 +21,7 @@ class BNode;
 namespace BPrivate {
 
 
-class BCopyEngine {
+class BCopyEngine : public BEntryOperationEngineBase {
 public:
 			class BController;
 
@@ -43,8 +43,8 @@ public:
 			BCopyEngine&		AddFlags(uint32 flags);
 			BCopyEngine&		RemoveFlags(uint32 flags);
 
-			status_t			CopyEntry(const char* sourcePath,
-									const char* destPath);
+			status_t			CopyEntry(const Entry& sourceEntry,
+									const Entry& destEntry);
 
 private:
 			status_t			_CopyEntry(const char* sourcePath,
