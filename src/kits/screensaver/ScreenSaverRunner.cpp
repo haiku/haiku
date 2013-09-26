@@ -182,16 +182,14 @@ ScreenSaverRunner::_Run()
 {
 	static const uint32 kInitialTickRate = 50000;
 
-	status_t lockStatus = fWindow->LockWithTimeout(kInitialTickRate);
-	if (lockStatus == B_OK) {
+	if (fWindow->Lock()) {
 		fView->SetViewColor(0, 0, 0);
 		fView->SetLowColor(0, 0, 0);
 		if (fSaver != NULL)
 			fHasStarted = fSaver->StartSaver(fView, fPreview) == B_OK;
 
 		fWindow->Unlock();
-	} else
-		return lockStatus;
+	}
 
 	// TODO: This code is getting awfully complicated and should
 	// probably be refactored.
