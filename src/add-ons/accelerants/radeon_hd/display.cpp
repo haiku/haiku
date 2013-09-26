@@ -611,8 +611,8 @@ display_dce45_crtc_load_lut(uint8 crtcID)
 
 	if (info.dceMajor >= 5) {
 		Write32(OUT, NI_INPUT_CSC_CONTROL + regs->crtcOffset,
-		   (NI_INPUT_CSC_GRPH_MODE(NI_INPUT_CSC_BYPASS) |
-		   NI_INPUT_CSC_OVL_MODE(NI_INPUT_CSC_BYPASS)));
+			(NI_INPUT_CSC_GRPH_MODE(NI_INPUT_CSC_BYPASS)
+				| NI_INPUT_CSC_OVL_MODE(NI_INPUT_CSC_BYPASS)));
 		Write32(OUT, NI_PRESCALE_GRPH_CONTROL + regs->crtcOffset,
 			NI_GRPH_PRESCALE_BYPASS);
 		Write32(OUT, NI_PRESCALE_OVL_CONTROL + regs->crtcOffset,
@@ -638,17 +638,15 @@ display_dce45_crtc_load_lut(uint8 crtcID)
 	Write32(OUT, EVERGREEN_DC_LUT_RW_INDEX, 0);
 	for (int i = 0; i < 256; i++) {
 		Write32(OUT, EVERGREEN_DC_LUT_30_COLOR + regs->crtcOffset,
-			 (r[i] << 20) |
-			 (g[i] << 10) |
-			 (b[i] << 0));
+			(r[i] << 20) | (g[i] << 10) | (b[i] << 0));
 	}
 
 	if (info.dceMajor >= 5) {
 		Write32(OUT, NI_DEGAMMA_CONTROL + regs->crtcOffset,
-		   (NI_GRPH_DEGAMMA_MODE(NI_DEGAMMA_BYPASS) |
-		   NI_OVL_DEGAMMA_MODE(NI_DEGAMMA_BYPASS) |
-		   NI_ICON_DEGAMMA_MODE(NI_DEGAMMA_BYPASS) |
-		   NI_CURSOR_DEGAMMA_MODE(NI_DEGAMMA_BYPASS)));
+			(NI_GRPH_DEGAMMA_MODE(NI_DEGAMMA_BYPASS)
+				| NI_OVL_DEGAMMA_MODE(NI_DEGAMMA_BYPASS)
+				| NI_ICON_DEGAMMA_MODE(NI_DEGAMMA_BYPASS)
+				| NI_CURSOR_DEGAMMA_MODE(NI_DEGAMMA_BYPASS)));
 		Write32(OUT, NI_GAMUT_REMAP_CONTROL + regs->crtcOffset,
 			(NI_GRPH_GAMUT_REMAP_MODE(NI_GAMUT_REMAP_BYPASS) |
 			NI_OVL_GAMUT_REMAP_MODE(NI_GAMUT_REMAP_BYPASS)));
@@ -693,9 +691,7 @@ display_avivo_crtc_load_lut(uint8 crtcID)
 	Write32(OUT, AVIVO_DC_LUT_RW_INDEX, 0);
 	for (int i = 0; i < 256; i++) {
 		Write32(OUT, AVIVO_DC_LUT_30_COLOR,
-			 (r[i] << 20) |
-			 (g[i] << 10) |
-			 (b[i] << 0));
+			(r[i] << 20) | (g[i] << 10) | (b[i] << 0));
 	}
 
 	Write32(OUT, AVIVO_D1GRPH_LUT_SEL + regs->crtcOffset, crtcID);
