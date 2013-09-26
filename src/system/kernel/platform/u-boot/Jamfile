@@ -3,6 +3,24 @@ SubDir HAIKU_TOP src system kernel platform u-boot ;
 SubDirCcFlags $(TARGET_KERNEL_PIC_CCFLAGS) ;
 SubDirC++Flags $(TARGET_KERNEL_PIC_CCFLAGS) ;
 
+UseLibraryHeaders [ FDirName libfdt ] ;
+
+local libFDTSources =
+	fdt.c
+	fdt_ro.c
+	fdt_rw.c
+	fdt_strerror.c
+	fdt_sw.c
+	fdt_wip.c
+;
+
 KernelMergeObject kernel_platform_u-boot.o :
 	platform.cpp
+	fdt_support.cpp
+	openfirmware.cpp
+	$(libFDTSources)
 ;
+
+SEARCH on [ FGristFiles $(libFDTSources) ]
+	= [ FDirName $(HAIKU_TOP) src libs libfdt ] ;
+

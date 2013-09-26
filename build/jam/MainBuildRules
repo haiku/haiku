@@ -181,6 +181,16 @@ actions AssembleNasm
 	fi
 }
 
+rule CompileDTS
+{
+	Depends $(<) : $(>) ;
+}
+
+actions CompileDTS
+{
+	dtc -O dtb -o $(1) $(2);
+}
+
 rule Ld
 {
 	# Ld <name> : <objs> : <linkerscript> : <flags> ;

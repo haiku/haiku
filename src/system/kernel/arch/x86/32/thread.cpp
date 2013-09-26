@@ -110,6 +110,15 @@ x86_set_tls_context(Thread *thread)
 }
 
 
+static addr_t
+arch_randomize_stack_pointer(addr_t value)
+{
+	STATIC_ASSERT(MAX_RANDOM_VALUE >= B_PAGE_SIZE - 1);
+	value -= random_value() & (B_PAGE_SIZE - 1);
+	return value & ~addr_t(0xf);
+}
+
+
 static uint8*
 get_signal_stack(Thread* thread, struct iframe* frame, struct sigaction* action)
 {
@@ -119,7 +128,8 @@ get_signal_stack(Thread* thread, struct iframe* frame, struct sigaction* action)
 		&& (frame->user_sp < thread->signal_stack_base
 			|| frame->user_sp >= thread->signal_stack_base
 				+ thread->signal_stack_size)) {
-		return (uint8*)(thread->signal_stack_base + thread->signal_stack_size);
+		addr_t stackTop = thread->signal_stack_base + thread->signal_stack_size;
+		return (uint8*)arch_randomize_stack_pointer(stackTop);
 	}
 
 	return (uint8*)frame->user_sp;
@@ -199,15 +209,6 @@ arch_thread_dump_info(void *info)
 	kprintf("\tesp: %p\n", at->current_stack.esp);
 	kprintf("\tss: %p\n", at->current_stack.ss);
 	kprintf("\tfpu_state at %p\n", at->fpu_state);
-}
-
-
-static addr_t
-arch_randomize_stack_pointer(addr_t value)
-{
-	STATIC_ASSERT(MAX_RANDOM_VALUE >= B_PAGE_SIZE - 1);
-	value -= random_value() & (B_PAGE_SIZE - 1);
-	return value & ~addr_t(0xf);
 }
 
 

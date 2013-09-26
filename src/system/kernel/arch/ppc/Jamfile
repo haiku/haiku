@@ -14,6 +14,7 @@ KernelMergeObject kernel_arch_ppc.o :
 	arch_debug.cpp
 	arch_elf.cpp
 	arch_exceptions.S
+	arch_exceptions_44x.S
 	arch_int.cpp
 	arch_mmu.cpp
 	arch_platform.cpp
@@ -26,6 +27,8 @@ KernelMergeObject kernel_arch_ppc.o :
 	arch_vm.cpp
 	arch_vm_translation_map.cpp
 	arch_asm.S
+	debug_uart_8250.cpp
+	arch_uart_8250.cpp
 
 	generic_vm_physical_page_mapper.cpp
 	generic_vm_physical_page_ops.cpp

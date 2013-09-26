@@ -1,3 +1,10 @@
+/*
+ * Copyright 2011, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Clemens Zeidler (haiku@Clemens-Zeidler.de)
+ */
 #ifndef ALPS_H
 #define ALPS_H
 

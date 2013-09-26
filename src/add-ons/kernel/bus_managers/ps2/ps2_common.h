@@ -28,6 +28,7 @@
 #else
 #	define INFO(x...)
 #endif
+#define ERROR(x...) dprintf(x)
 
 //#define TRACE_PS2
 #ifdef TRACE_PS2

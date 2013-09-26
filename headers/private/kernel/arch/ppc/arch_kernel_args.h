@@ -29,6 +29,9 @@ typedef struct {
 	// to the Open Firmware.
 	uint32		num_virtual_ranges_to_keep;
 	addr_range	virtual_ranges_to_keep[MAX_VIRTUAL_RANGES_TO_KEEP];
+
+	// platform type we booted from
+	int			platform;
 } arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_PPC_KERNEL_ARGS_H */

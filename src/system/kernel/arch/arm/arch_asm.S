@@ -82,11 +82,13 @@ FUNCTION(arm_context_switch):
 	bx	lr
 FUNCTION_END(arm_context_switch)
 
+
 /* addr_t arm_get_fsr(void); */
 FUNCTION(arm_get_fsr):
 	mrc	p15, 0, r0, c5, c0, 0		@ get FSR
 	bx	lr
 FUNCTION_END(arm_get_fsr)
+
 
 /* addr_t arm_get_far(void); */
 FUNCTION(arm_get_far):
@@ -94,9 +96,18 @@ FUNCTION(arm_get_far):
 	bx	lr
 FUNCTION_END(arm_get_far)
 
+
+/* addr_t arm_get_fp(void); */
+FUNCTION(arm_get_fp):
+	mov	r0, fp				@ get framepointer
+	bx	lr
+FUNCTION_END(arm_get_fp);
+
+
 /* status_t arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
 FUNCTION(arch_cpu_user_memcpy):
-	stmfd   sp!, { r4-r6 }
+	stmfd   sp!, { r4-r6, lr }
+
 	ldr	r6, [r3]
 	ldr	r4, =.L_user_memcpy_error
 	str	r4, [r3]	/* set fault handler */
@@ -106,33 +117,35 @@ FUNCTION(arch_cpu_user_memcpy):
 	str	r5, [r0]
 	add	r1, #4
 	add	r0, #4
-	sub	r4, #1
+	subs	r4, #1
 	bne	1b
+
+	ands	r4, r2, #3	/* size % 4 */
+	beq	3f
+
 2:
-	and	r4, r2, #3	/* size % 4 */
 	ldrb	r5, [r1]
 	strb	r5, [r0]
 	add	r1, #1
 	add	r0, #1
-	sub	r4, #1
+	subs	r4, #1
 	bne	2b
-
+3:
 	str	r6, [r3]	/* restore fault handler */
 	mov	r0, #0
-	ldmfd   sp!, { r4-r6 }
-	bx	lr
+	ldmfd   sp!, { r4-r6, pc }
 
 .L_user_memcpy_error:
 	str	r6, [r3]	/* restore fault handler */
 	mov	r0, #-1
 
-	ldmfd   sp!, { r4-r6 }
-	bx	lr
+	ldmfd   sp!, { r4-r6, pc }
 FUNCTION_END(arch_cpu_user_memcpy)
 
 /* status_t arch_cpu_user_memset(void *to, char c, size_t count, addr_t *faultHandler) */
 FUNCTION(arch_cpu_user_memset):
-	stmfd   sp!, { r4-r5 }
+	stmfd   sp!, { r4-r5, lr }
+
 	ldr	r5, [r3]
 	ldr	r4, =.L_user_memset_error
 	str	r4, [r3]
@@ -146,33 +159,31 @@ FUNCTION(arch_cpu_user_memset):
 1:
 	str	r1, [r0]
 	add	r0, r0, #4
-	sub	r4, r4, #1
+	subs	r4, r4, #1
 	bne	1b
 
 	and	r4, r2, #3	/* count % 4 */
 2:
 	strb	r1, [r0]
 	add	r0, r0, #1
-	sub	r4, r4, #1
+	subs	r4, r4, #1
 	bne	2b
 
 	mov	r0, #0
 	str	r5, [r3]
 
-	ldmfd   sp!, { r4-r5 }
-	bx	lr
+	ldmfd   sp!, { r4-r5, pc }
 
 .L_user_memset_error:
 	mov	r0, #-1
 	str	r5, [r3]
 
-	ldmfd   sp!, { r4-r5 }
-	bx	lr
+	ldmfd   sp!, { r4-r5, pc }
 FUNCTION_END(arch_cpu_user_memset)
 
 /* ssize_t arch_cpu_user_strlcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
 FUNCTION(arch_cpu_user_strlcpy):
-	stmfd   sp!, { r4-r6 }
+	stmfd   sp!, { r4-r6, lr }
 	ldr	r5, [r3]
 	ldr	r4, =.L_user_strlcpy_error
 	str	r4, [r3]
@@ -181,7 +192,7 @@ FUNCTION(arch_cpu_user_strlcpy):
 	ldrb	r4, [r1, r6]
 	strb	r4, [r0, r6]
 	add	r6, r6, #1
-	and	r4, #0xff	/* done yet? */
+	cmp	r4, #0
 	beq	2f
 	cmp	r6, r2		/* reached max length? */
 	blt	1b
@@ -189,18 +200,16 @@ FUNCTION(arch_cpu_user_strlcpy):
 	mov	r4, #0
 	strb	r4, [r0, r6]
 
-	mov	r0, r4		/* return B_OK */
+	mov	r0, r6		/* return length */
 	str	r5, [r3]	/* restore fault handler */
 
-	ldmfd   sp!, { r4-r6 }
-	bx	lr
+	ldmfd   sp!, { r4-r6, pc }
 
 .L_user_strlcpy_error:
 	mov	r0, #-1
 	str	r5, [r3]
 
-	ldmfd   sp!, { r4-r6 }
-	bx	lr
+	ldmfd   sp!, { r4-r6, pc }
 FUNCTION_END(arch_cpu_user_strlcpy)
 
 
@@ -236,12 +245,11 @@ FUNCTION(arch_debug_call_with_fault_handler):
 	blx	r2
 
 	// regular return
-	ldmfd   sp!, { r4, lr }
-	bx	lr
+	ldmfd   sp!, { r4, pc }
 
 	// fault -- return via longjmp(jumpBuffer, 1)
 1:
-	mov	r0, r4
+	mov	r0, r1
 	mov	r1, #1
 	bl	longjmp
 FUNCTION_END(arch_debug_call_with_fault_handler)

@@ -1154,7 +1154,7 @@ TRACE("build tree!\n");
 
 
 static void
-hda_codec_switch_init(hda_audio_group* audioGroup)
+hda_audio_group_switch_init(hda_audio_group* audioGroup)
 {
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		hda_widget& widget = audioGroup->widgets[i];
@@ -1175,10 +1175,8 @@ hda_codec_switch_init(hda_audio_group* audioGroup)
 
 
 static void
-hda_codec_check_sense(hda_codec* codec, bool disable)
+hda_audio_group_check_sense(hda_audio_group* audioGroup, bool disable)
 {
-	hda_audio_group* audioGroup = codec->audio_groups[0];
-
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		hda_widget& widget = audioGroup->widgets[i];
 
@@ -1233,7 +1231,8 @@ hda_codec_switch_handler(hda_codec* codec)
 		codec->unsol_response_read %= MAX_CODEC_UNSOL_RESPONSES;
 
 		bool disable = response & 1;
-		hda_codec_check_sense(codec, disable);
+		hda_audio_group* audioGroup = codec->audio_groups[0];
+		hda_audio_group_check_sense(audioGroup, disable);
 	}
 	return B_OK;
 }
@@ -1285,8 +1284,8 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 
 	if (hda_audio_group_build_tree(audioGroup) != B_OK)
 		goto err;
-	hda_codec_switch_init(audioGroup);
-
+	hda_audio_group_switch_init(audioGroup);
+	
 	audioGroup->playback_stream = hda_stream_new(audioGroup, STREAM_PLAYBACK);
 	audioGroup->record_stream = hda_stream_new(audioGroup, STREAM_RECORD);
 	TRACE("hda: streams playback %p, record %p\n", audioGroup->playback_stream,
@@ -1295,6 +1294,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 	if (audioGroup->playback_stream != NULL
 		|| audioGroup->record_stream != NULL) {
 		codec->audio_groups[codec->num_audio_groups++] = audioGroup;
+		hda_audio_group_check_sense(audioGroup, false);
 		return B_OK;
 	}
 
@@ -1526,8 +1526,6 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 			}
 		}
 	}
-
-	hda_codec_check_sense(codec, false);
 
 	codec->unsol_response_thread = spawn_kernel_thread(
 		(status_t(*)(void*))hda_codec_switch_handler,

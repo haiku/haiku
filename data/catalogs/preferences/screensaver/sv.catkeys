@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ScreenSaver	3630119516
+1	swedish	x-vnd.Haiku-ScreenSaver	232492478
 Could not load screen saver	ScreenSaver		Kunde inte läsa in skärmsläckaren
 30 seconds	ScreenSaver		30 sekunder
 Start screensaver	ScreenSaver		Starta skärmsläckare
@@ -11,7 +11,9 @@ Display Power Management Signaling not available	ScreenSaver		Stöd för att sä
 ScreenSaver	System name		Skärmsläckare
 Test	ScreenSaver		Testa
 General	ScreenSaver		Allmänt
+Fade now when mouse is here	ScreenSaver		Avta nu när musen är här
 Enable screensaver	ScreenSaver		Aktivera skärmsläckare
+Don't fade when mouse is here	ScreenSaver		Avta inte nu när musen är här
 Cancel	ScreenSaver		Avbryt
 Turn off screen	ScreenSaver		Stäng av skärmen
 No options available	ScreenSaver		Inga alternativ tillgängliga

@@ -63,6 +63,9 @@ nor_init_device(void *_info, void **_cookie)
 	if (info->id < 0)
 		return info->id;
 
+	info->mapped += HIDDEN_BLOCKS * info->blocksize;
+
+
 	*_cookie = info;
 	return B_OK;
 }

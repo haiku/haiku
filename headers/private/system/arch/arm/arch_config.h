@@ -10,8 +10,14 @@
 
 #define STACK_GROWS_DOWNWARDS
 
-//#define ATOMIC_FUNCS_ARE_SYSCALLS
-//#define ATOMIC64_FUNCS_ARE_SYSCALLS
+// If we're building on ARMv5 or older, all our atomics need to be syscalls... :(
+#if _M_ARM <= 5
+#define ATOMIC_FUNCS_ARE_SYSCALLS
+#endif
 
+// If we're building on ARMv6 or older, 64-bit atomics need to be syscalls...
+#if _M_ARM < 7
+#define ATOMIC64_FUNCS_ARE_SYSCALLS
+#endif
 
 #endif	/* _KERNEL_ARCH_ARM_CONFIG_H */

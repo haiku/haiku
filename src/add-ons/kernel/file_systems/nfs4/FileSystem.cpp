@@ -125,8 +125,8 @@ GetInodeNames(const char** root, const char* _path)
 
 
 status_t
-FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* fsPath,
-	dev_t id, const MountConfiguration& configuration)
+FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* serverName,
+	const char* fsPath, dev_t id, const MountConfiguration& configuration)
 {
 	ASSERT(_fs != NULL);
 	ASSERT(serv != NULL);
@@ -222,23 +222,23 @@ FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* fsPath,
 	result = Inode::CreateInode(fs, fi, &inode);
 	if (result != B_OK)
 		return result;
+	RootInode* rootInode = reinterpret_cast<RootInode*>(inode);
+	fs->fRoot = rootInode;
 
-	char* name = strrchr(fsPath, '/');
-	if (name != NULL) {
-		name++;
-		reinterpret_cast<RootInode*>(inode)->SetName(name);
-	} else if (fsPath[0] != '\0')
-		reinterpret_cast<RootInode*>(inode)->SetName(fsPath);
-	else {
-		char* address = serv->ID().UniversalAddress();
-		if (address != NULL)
-			reinterpret_cast<RootInode*>(inode)->SetName(address);
-		else
-			reinterpret_cast<RootInode*>(inode)->SetName("NFS4 Share");
-		free(address);
-	}
+	char* fsName = strdup(fsPath);
+	if (fsName == NULL)
+		return B_NO_MEMORY;
+	for (int i = strlen(fsName) - 1; i >= 0 && fsName[i] == '/'; i--)
+		fsName[i] = '\0';
 
-	fs->fRoot = reinterpret_cast<RootInode*>(inode);
+	char* name = strrchr(fsName, '/');
+	if (name != NULL)
+		rootInode->SetName(name + 1);
+	else if (fsName[0] != '\0')
+		rootInode->SetName(fsName);
+	else
+		rootInode->SetName(serverName);
+	free(fsName);
 
 	fs->NFSServer()->AddFileSystem(fs);
 	*_fs = fs;

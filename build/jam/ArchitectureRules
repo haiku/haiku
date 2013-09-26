@@ -38,6 +38,12 @@ rule ArchitectureSetup architecture
 		gccBaseFlags += -Wno-array-bounds ;
 	}
 
+	local cpu = $(HAIKU_CPU_$(architecture)) ;
+	if $(cpu) = arm {
+		# For stackcrawls
+		gccBaseFlags += -mapcs-frame ;
+	}
+
 	# activating graphite optimizations
 	if $(HAIKU_USE_GCC_GRAPHITE_$(architecture)) = 1 {
 		gccBaseFlags += -floop-interchange -ftree-loop-distribution
@@ -67,7 +73,6 @@ rule ArchitectureSetup architecture
 		Exit "HAIKU_STRIP_$(architecture) not set. Please re-run configure." ;
 	}
 
-	local cpu = $(HAIKU_CPU_$(architecture)) ;
 	HAIKU_ARCH_$(architecture) = $(cpu) ;
 	HAIKU_ARCH ?= $(cpu) ;
 		# Set only, if not set yet. This way HAIKU_ARCH is set to the primary

@@ -5,6 +5,7 @@ UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ]
 	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) openfirmware ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) u-boot ] ;
 
 KernelStaticLibrary pci_arch_bus_manager :
 	pci_controller.cpp
@@ -14,4 +15,7 @@ KernelStaticLibrary pci_arch_bus_manager :
 	pci_openfirmware.cpp
 	uninorth.cpp
 	grackle.cpp
+
+	# U-Boot
+	pci_u-boot.cpp
 ;

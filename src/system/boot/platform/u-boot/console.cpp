@@ -45,10 +45,12 @@ static SerialConsole sSerial;
 FILE *stdin, *stdout, *stderr;
 
 
+/*
 static void
 scroll_up()
 {
 }
+*/
 
 
 //	#pragma mark -

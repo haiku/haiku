@@ -8,6 +8,7 @@ KernelAddon ps2 :
 	ps2_alps.cpp
 	ps2_common.cpp
 	ps2_dev.cpp
+	ps2_elantech.cpp
 	ps2_keyboard.cpp
 	ps2_module.cpp
 	ps2_standard_mouse.cpp

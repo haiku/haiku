@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -288,10 +288,12 @@ NetworkStatusView::MessageReceived(BMessage* message)
 		{
 			const char* deviceName;
 			const char* name;
+			BNetworkAddress address;
 			if (message->FindString("device", &deviceName) == B_OK
-				&& message->FindString("name", &name) == B_OK) {
+				&& message->FindString("name", &name) == B_OK
+				&& message->FindFlat("address", &address) == B_OK) {
 				BNetworkDevice device(deviceName);
-				status_t status = device.JoinNetwork(name);
+				status_t status = device.JoinNetwork(address);
 				if (status != B_OK) {
 					BString text
 						= B_TRANSLATE("Could not join wireless network:\n");
@@ -467,6 +469,7 @@ NetworkStatusView::MouseDown(BPoint point)
 			BMessage* message = new BMessage(kMsgJoinNetwork);
 			message->AddString("device", wifiInterface);
 			message->AddString("name", network.name);
+			message->AddFlat("address", &network.address);
 
 			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
 				network.signal_strength,
@@ -506,7 +509,7 @@ NetworkStatusView::_AboutRequested()
 {
 	BAboutWindow* window = new BAboutWindow(
 		B_TRANSLATE_SYSTEM_NAME("NetworkStatus"), kSignature);
-	
+
 	const char* authors[] = {
 		"Axel Dörfler",
 		"Hugo Santos",

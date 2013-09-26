@@ -18,6 +18,7 @@
 
 #include <fs/devfs.h>
 
+#include "scsi_sense.h"
 #include "usb_disk_scsi.h"
 
 
@@ -136,11 +137,11 @@ status_t	usb_disk_receive_csw(disk_device *device,
 status_t	usb_disk_operation(device_lun *lun, uint8 operation,
 				uint8 opLength, uint32 logicalBlockAddress,
 				uint16 transferLength, void *data, size_t *dataLength,
-				bool directionIn);
+				bool directionIn, err_act *action = NULL);
 
-status_t	usb_disk_request_sense(device_lun *lun);
+status_t	usb_disk_request_sense(device_lun *lun, err_act *action);
 status_t	usb_disk_mode_sense(device_lun *lun);
-status_t	usb_disk_test_unit_ready(device_lun *lun);
+status_t	usb_disk_test_unit_ready(device_lun *lun, err_act *action = NULL);
 status_t	usb_disk_inquiry(device_lun *lun);
 status_t	usb_disk_reset_capacity(device_lun *lun);
 status_t	usb_disk_update_capacity(device_lun *lun);
@@ -265,7 +266,7 @@ usb_disk_receive_csw(disk_device *device, command_status_wrapper *status)
 status_t
 usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	uint32 logicalBlockAddress, uint16 transferLength, void *data,
-	size_t *dataLength, bool directionIn)
+	size_t *dataLength, bool directionIn, err_act *_action)
 {
 	TRACE("operation: lun: %u; op: %u; oplen: %u; lba: %" B_PRIu32
 		"; tlen: %u; data: %p; dlen: %p (%lu); in: %c\n",
@@ -407,7 +408,7 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 						" failed at the SCSI level\n", operation);
 				}
 
-				result = usb_disk_request_sense(lun);
+				result = usb_disk_request_sense(lun, _action);
 				return result == B_OK ? B_ERROR : result;
 			}
 		}
@@ -437,7 +438,7 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 
 
 status_t
-usb_disk_request_sense(device_lun *lun)
+usb_disk_request_sense(device_lun *lun, err_act *_action)
 {
 	size_t dataLength = sizeof(scsi_request_sense_6_parameter);
 	scsi_request_sense_6_parameter parameter;
@@ -449,56 +450,42 @@ usb_disk_request_sense(device_lun *lun)
 		return result;
 	}
 
+	const char *label = NULL;
+	err_act action = err_act_fail;
+	status_t status = B_ERROR;
+	scsi_get_sense_asc_info((parameter.additional_sense_code << 8)
+		| parameter.additional_sense_code_qualifier, &label, &action,
+		&status);
+
 	if (parameter.sense_key > SCSI_SENSE_KEY_NOT_READY
 		&& parameter.sense_key != SCSI_SENSE_KEY_UNIT_ATTENTION) {
 		TRACE_ALWAYS("request_sense: key: 0x%02x; asc: 0x%02x; ascq: "
-			"0x%02x;\n", parameter.sense_key, parameter.additional_sense_code,
-			parameter.additional_sense_code_qualifier);
+			"0x%02x; %s\n", parameter.sense_key, parameter.additional_sense_code,
+			parameter.additional_sense_code_qualifier,
+			label ? label : "(unknown)");
 	}
 
-	switch (parameter.sense_key) {
-		case SCSI_SENSE_KEY_NO_SENSE:
-		case SCSI_SENSE_KEY_RECOVERED_ERROR:
-			return B_OK;
-
-		case SCSI_SENSE_KEY_HARDWARE_ERROR:
-		case SCSI_SENSE_KEY_MEDIUM_ERROR:
-			TRACE_ALWAYS("request_sense: media or hardware error\n");
-			return B_DEV_UNREADABLE;
-
-		case SCSI_SENSE_KEY_ILLEGAL_REQUEST:
-			TRACE_ALWAYS("request_sense: illegal request\n");
-			return B_DEV_INVALID_IOCTL;
-
-		case SCSI_SENSE_KEY_UNIT_ATTENTION:
-			if (parameter.additional_sense_code
-					!= SCSI_ASC_MEDIUM_NOT_PRESENT) {
-				TRACE_ALWAYS("request_sense: media changed\n");
-				lun->media_changed = true;
-				lun->media_present = true;
-
-				return B_DEV_MEDIA_CHANGED;
-			}
-			// fall through
-
-		case SCSI_SENSE_KEY_NOT_READY:
-			TRACE("request_sense: device not ready (asc 0x%02x ascq 0x%02x)\n",
-				parameter.additional_sense_code,
-				parameter.additional_sense_code_qualifier);
-			lun->media_present = false;
-			usb_disk_reset_capacity(lun);
-			return B_DEV_NOT_READY;
-
-		case SCSI_SENSE_KEY_DATA_PROTECT:
-			TRACE_ALWAYS("request_sense: write protected\n");
-			return B_READ_ONLY_DEVICE;
-
-		case SCSI_SENSE_KEY_ABORTED_COMMAND:
-			TRACE_ALWAYS("request_sense: command aborted\n");
-			return B_CANCELED;
+	if ((parameter.additional_sense_code == 0
+			&& parameter.additional_sense_code_qualifier == 0)
+		|| label == NULL) {
+		scsi_get_sense_key_info(parameter.sense_key, &label, &action, &status);
 	}
 
-	return B_ERROR;
+	if (status == B_DEV_MEDIA_CHANGED) {
+		lun->media_changed = true;
+		lun->media_present = true;
+	} else if (parameter.sense_key == SCSI_SENSE_KEY_UNIT_ATTENTION
+		&& status != B_DEV_NO_MEDIA) {
+		lun->media_present = true;
+	} else if (status == B_DEV_NOT_READY) {
+		lun->media_present = false;
+		usb_disk_reset_capacity(lun);
+	}
+	
+	if (_action != NULL)
+		*_action = action;
+
+	return status;
 }
 
 
@@ -524,7 +511,7 @@ usb_disk_mode_sense(device_lun *lun)
 
 
 status_t
-usb_disk_test_unit_ready(device_lun *lun)
+usb_disk_test_unit_ready(device_lun *lun, err_act *_action)
 {
 	// if unsupported we assume the unit is fixed and therefore always ok
 	if (!lun->device->tur_supported)
@@ -533,10 +520,10 @@ usb_disk_test_unit_ready(device_lun *lun)
 	status_t result;
 	if (lun->device->is_atapi) {
 		result = usb_disk_operation(lun, SCSI_START_STOP_UNIT_6, 6, 0, 1,
-			NULL, NULL, false);
+			NULL, NULL, false, _action);
 	} else {
 		result = usb_disk_operation(lun, SCSI_TEST_UNIT_READY_6, 6, 0, 0,
-			NULL, NULL, true);
+			NULL, NULL, true, _action);
 	}
 
 	if (result == B_DEV_INVALID_IOCTL) {
@@ -554,11 +541,14 @@ usb_disk_inquiry(device_lun *lun)
 	size_t dataLength = sizeof(scsi_inquiry_6_parameter);
 	scsi_inquiry_6_parameter parameter;
 	status_t result = B_ERROR;
+	err_act action = err_act_ok;
 	for (uint32 tries = 0; tries < 3; tries++) {
 		result = usb_disk_operation(lun, SCSI_INQUIRY_6, 6, 0, dataLength,
-			&parameter, &dataLength, true);
-		if (result == B_OK)
+			&parameter, &dataLength, true, &action);
+		if (result == B_OK || (action != err_act_retry
+				&& action != err_act_many_retries)) {
 			break;
+		}
 	}
 	if (result != B_OK) {
 		TRACE_ALWAYS("getting inquiry data failed: %s\n", strerror(result));
@@ -612,6 +602,7 @@ usb_disk_update_capacity(device_lun *lun)
 	size_t dataLength = sizeof(scsi_read_capacity_10_parameter);
 	scsi_read_capacity_10_parameter parameter;
 	status_t result = B_ERROR;
+	err_act action = err_act_ok;
 
 	// Retry reading the capacity up to three times. The first try might only
 	// yield a unit attention telling us that the device or media status
@@ -620,9 +611,11 @@ usb_disk_update_capacity(device_lun *lun)
 	// reads.
 	for (int32 i = 0; i < 3; i++) {
 		result = usb_disk_operation(lun, SCSI_READ_CAPACITY_10, 10, 0, 0,
-			&parameter, &dataLength, true);
-		if (result == B_OK)
+			&parameter, &dataLength, true, &action);
+		if (result == B_OK || (action != err_act_retry
+				&& action != err_act_many_retries)) {
 			break;
+		}
 	}
 
 	if (result != B_OK) {
@@ -801,10 +794,11 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 
 		// initialize this lun
 		result = usb_disk_inquiry(lun);
+		err_act action = err_act_ok;
 		for (uint32 tries = 0; tries < 8; tries++) {
 			TRACE("usb lun %"B_PRIu8" inquiry attempt %"B_PRIu32" begin\n",
 				i, tries);
-			status_t ready = usb_disk_test_unit_ready(lun);
+			status_t ready = usb_disk_test_unit_ready(lun, &action);
 			if (ready == B_OK || ready == B_DEV_NO_MEDIA) {
 				if (lun->device_type == B_CD)
 					lun->write_protected = true;
@@ -821,7 +815,8 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 			}
 			TRACE("usb lun %"B_PRIu8" inquiry attempt %"B_PRIu32" failed\n",
 				i, tries);
-
+			if (action != err_act_retry && action != err_act_many_retries)
+				break;
 			bigtime_t snoozeTime = 1000000 * tries;
 			TRACE("snoozing %"B_PRIu64" microseconds for usb lun\n",
 				snoozeTime);
@@ -1095,7 +1090,17 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 	switch (op) {
 		case B_GET_MEDIA_STATUS:
 		{
-			*(status_t *)buffer = usb_disk_test_unit_ready(lun);
+			err_act action = err_act_ok;
+			for (uint32 tries = 0; tries < 3; tries++) {
+				status_t ready = usb_disk_test_unit_ready(lun, &action);
+				if (ready == B_OK || ready == B_DEV_NO_MEDIA
+					|| (action != err_act_retry
+						&& action != err_act_many_retries)) {
+					*(status_t *)buffer = ready;
+					break;
+				}
+				snooze(500000);
+			}			
 			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n",
 				*(status_t *)buffer);
 			result = B_OK;

@@ -48,7 +48,13 @@
 #define PS2_BITS_TRANSLATE_SCANCODES	0x40
 
 // data words
+#define PS2_CMD_MOUSE_SET_SCALE11		0xe6
+#define PS2_CMD_MOUSE_SET_SCALE21		0xe7
+#define PS2_CMD_MOUSE_SET_RES			0xe8
+#define PS2_CMD_MOUSE_GET_INFO			0xe9
+#define PS2_CMD_MOUSE_SET_STREAM  		0xea
 #define PS2_CMD_KEYBOARD_SET_LEDS		0xed
+#define PS2_CMD_MOUSE_SET_POLL			0xf0
 #define PS2_CMD_KEYBOARD_SET_TYPEMATIC	0xf3
 #define PS2_CMD_ECHO					0xee
 #define PS2_CMD_TEST_PASSED				0xaa
@@ -56,6 +62,7 @@
 #define PS2_CMD_SET_SAMPLE_RATE			0xf3
 #define PS2_CMD_ENABLE					0xf4
 #define PS2_CMD_DISABLE					0xf5
+#define PS2_CMD_MOUSE_RESET_DIS			0xf6
 #define PS2_CMD_RESET					0xff
 #define PS2_CMD_RESEND					0xfe
 
@@ -79,6 +86,7 @@
 #define PS2_PACKET_INTELLIMOUSE			4
 #define PS2_PACKET_SYNAPTICS			6
 #define PS2_PACKET_ALPS					6
+#define PS2_PACKET_ELANTECH				6	// version 1 is only 4
 #define PS2_MAX_PACKET_SIZE				6
 	// Should be equal to the biggest packet size
 

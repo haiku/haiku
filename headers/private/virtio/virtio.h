@@ -117,6 +117,12 @@ typedef struct {
 		size_t readVectorCount, size_t writtenVectorCount,
 		virtio_callback_func callback, void *callbackCookie);
 
+	bool (*queue_is_full)(virtio_queue queue);
+
+	bool (*queue_is_empty)(virtio_queue queue);
+
+	uint16 (*queue_size)(virtio_queue queue);
+
 } virtio_device_interface;
 
 

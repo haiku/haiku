@@ -6,19 +6,27 @@ UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ]
 	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 
+UseLibraryHeaders [ FDirName libfdt ] ;
+
 SubDirC++Flags -fno-rtti ;
+
+BootMergeObject boot_platform_u-boot_ppc_amcc440.o :
+	arch_mmu_amcc440.cpp
+	: -fno-pic -mcpu=440
+;
 
 BootMergeObject boot_platform_u-boot_ppc.o :
 	# must come first to have _start_* at correct locations
 	shell.S
 
-	#arch_mmu.cpp
+	arch_mmu.cpp
 	arch_cpu_asm.S
 	arch_start_kernel.S
 	arch_cpu.cpp
 	#mmu.cpp
 	: -fno-pic
+	: boot_platform_u-boot_ppc_amcc440.o
 ;
 
-SEARCH on [ FGristFiles arch_cpu_asm.S arch_mmu.cpp ]
+SEARCH on [ FGristFiles arch_cpu_asm.S ]
     = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;

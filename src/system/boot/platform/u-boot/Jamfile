@@ -52,6 +52,7 @@ BootMergeObject boot_platform_u-boot_common.o :
 	uimage.cpp
 	video.cpp
 	fdt_support.cpp
+	openfirmware.cpp
 	$(genericPlatformSources)
 	$(libFDTSources)
 
@@ -246,6 +247,9 @@ Depends haiku-mmc-image : haiku-$(HAIKU_BOOT_BOARD).mmc ;
 
 SEARCH on [ FGristFiles $(genericPlatformSources) ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform generic ] ;
+
+SEARCH on [ FGristFiles openfirmware.cpp fdt_support.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel platform u-boot ] ;
 
 SEARCH on [ FGristFiles $(libFDTSources) ]
 	= [ FDirName $(HAIKU_TOP) src libs libfdt ] ;

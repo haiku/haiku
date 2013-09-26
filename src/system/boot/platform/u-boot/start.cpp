@@ -18,6 +18,7 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <platform_arch.h>
+#include <platform/openfirmware/openfirmware.h>
 
 #include <string.h>
 
@@ -104,6 +105,12 @@ platform_start_kernel(void)
 	addr_t stackTop
 		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
+	if (gFDT) {
+		// clone the Flattened Device Tree blob
+		gKernelArgs.platform_args.fdt = kernel_args_malloc(fdt_totalsize(gFDT));
+		memcpy(gKernelArgs.platform_args.fdt, gFDT, fdt_totalsize(gFDT));
+	}
+
 //	smp_init_other_cpus();
 	serial_cleanup();
 	mmu_init_for_kernel();
@@ -114,7 +121,7 @@ platform_start_kernel(void)
 	status_t error = arch_start_kernel(&gKernelArgs, kernelEntry,
 		stackTop);
 
-	panic("kernel returned!\n");
+	panic("kernel returned %lx!\n", error);
 }
 
 
@@ -190,6 +197,9 @@ start_raw(int argc, const char **argv)
 
 	serial_init(gFDT);
 	console_init();
+	// initialize the OpenFirmware wrapper
+	of_init(NULL);
+
 	cpu_init();
 
 	if (args.platform.fdt_data) {

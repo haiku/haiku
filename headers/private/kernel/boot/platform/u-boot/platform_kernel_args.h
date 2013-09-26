@@ -17,7 +17,13 @@
 
 
 typedef struct {
-	char dummy;
+	// XXX: HACK: must match the OF platform args
+	// FIXME: use a union instead?
+	void	*openfirmware_entry;
+	char	rtc_path[128];
+
+	// Flattened Device Tree blob
+	void	*fdt;
 } platform_kernel_args;
 
 #endif	/* KERNEL_BOOT_PLATFORM_UBOOT_KERNEL_ARGS_H */
