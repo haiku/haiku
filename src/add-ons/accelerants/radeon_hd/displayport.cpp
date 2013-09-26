@@ -772,7 +772,7 @@ dp_link_train(uint8 crtcID)
 {
 	TRACE("%s\n", __func__);
 
-        uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
 	display_mode* mode = &gDisplay[crtcID]->currentMode;
 
