@@ -70,3 +70,21 @@ Package::Init(const entry_ref& entryRef)
 
 	return B_OK;
 }
+
+
+BString
+Package::RevisionedName() const
+{
+	return BString().SetToFormat("%s-%s", fInfo.Name().String(),
+		fInfo.Version().ToString().String());
+}
+
+
+BString
+Package::RevisionedNameThrows() const
+{
+	BString result(RevisionedName());
+	if (result.IsEmpty())
+		throw std::bad_alloc();
+	return result;
+}

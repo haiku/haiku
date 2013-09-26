@@ -36,6 +36,9 @@ public:
 			const BPackageInfo & Info() const
 									{ return fInfo; }
 
+			BString				RevisionedName() const;
+			BString				RevisionedNameThrows() const;
+
 			bool				IsActive() const
 									{ return fActive; }
 			void				SetActive(bool active)
