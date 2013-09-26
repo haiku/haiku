@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010 Haiku Inc. All rights reserved.
+ * Copyright 2004-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,23 +32,6 @@
 #include <String.h>
 
 #include <AutoDeleter.h>
-
-
-Settings::Settings(const char* name)
-	:
-	fAuto(true),
-	fDisabled(false),
-	fNameServers(5, true)
-{
-	fName = name;
-
-	ReadConfiguration();
-}
-
-
-Settings::~Settings()
-{
-}
 
 
 static status_t
@@ -111,6 +94,44 @@ GetDefaultGateway(BString& gateway)
 }
 
 
+// #pragma mark -
+
+
+Settings::Settings(const char* name)
+	:
+	fAuto(true),
+	fDisabled(false),
+	fNameServers(5, true)
+{
+	fName = name;
+
+	ReadConfiguration();
+}
+
+
+Settings::~Settings()
+{
+}
+
+
+/*!	Returns all associated wireless networks. */
+std::vector<wireless_network>
+Settings::WirelessNetworks()
+{
+	std::vector<wireless_network> networks;
+
+	BNetworkDevice device(fName);
+	if (device.IsWireless()) {
+		wireless_network wirelessNetwork;
+		uint32 cookie = 0;
+		while (device.GetNextAssociatedNetwork(cookie, wirelessNetwork) == B_OK)
+			networks.push_back(wirelessNetwork);
+	}
+
+	return networks;
+}
+
+
 void
 Settings::ReadConfiguration()
 {
@@ -131,21 +152,6 @@ Settings::ReadConfiguration()
 
 	fAuto = (flags & (IFF_AUTO_CONFIGURED | IFF_CONFIGURING)) != 0;
 	fDisabled = (flags & IFF_UP) == 0;
-
-	// Read wireless network from interfaces
-
-	fWirelessNetwork.SetTo(NULL);
-
-	BNetworkDevice networkDevice(fName);
-	if (networkDevice.IsWireless()) {
-		uint32 networkIndex = 0;
-		wireless_network wirelessNetwork;
-		// TODO: We only get the first associated network for now
-		if (networkDevice.GetNextAssociatedNetwork(networkIndex,
-				wirelessNetwork) == B_OK) {
-			fWirelessNetwork.SetTo(wirelessNetwork.name);
-		}
-	}
 
 	// read resolv.conf for the dns.
 	fNameServers.MakeEmpty();

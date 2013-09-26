@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010 Haiku Inc. All rights reserved.
+ * Copyright 2004-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,8 @@
 
 
 #include "EthernetSettingsView.h"
+
+#include <set>
 
 #include <errno.h>
 #include <stdio.h>
@@ -368,9 +370,15 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 		BMenu* menu = fNetworkMenuField->Menu();
 		menu->RemoveItems(0, menu->CountItems(), true);
 
+		std::set<BNetworkAddress> associated;
+		BNetworkAddress address;
+		uint32 cookie = 0;
+		while (device.GetNextAssociatedNetwork(cookie, address) == B_OK)
+			associated.insert(address);
+
 		wireless_network network;
 		int32 count = 0;
-		uint32 cookie = 0;
+		cookie = 0;
 		while (device.GetNextNetwork(cookie, network) == B_OK) {
 			BMessage* message = new BMessage(kMsgNetwork);
 			message->AddString("device", device.Name());
@@ -379,7 +387,7 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
 				network.signal_strength,
 				(network.flags & B_NETWORK_IS_ENCRYPTED) != 0, message);
-			if (fCurrentSettings->WirelessNetwork() == network.name)
+			if (associated.find(network.address) != associated.end())
 				item->SetMarked(true);
 			menu->AddItem(item);
 
@@ -445,16 +453,6 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 	fCurrentSettings->SetIP(fIPTextControl->Text());
 	fCurrentSettings->SetNetmask(fNetMaskTextControl->Text());
 	fCurrentSettings->SetGateway(fGatewayTextControl->Text());
-
-	if (!fNetworkMenuField->IsHidden(fNetworkMenuField)) {
-		if (fNetworkMenuField->Menu()->ItemAt(0)->IsMarked()) {
-			fCurrentSettings->SetWirelessNetwork(NULL);
-		} else {
-			BMenuItem* item = fNetworkMenuField->Menu()->FindMarked();
-			if (item != NULL)
-				fCurrentSettings->SetWirelessNetwork(item->Label());
-		}
-	}
 
 	fCurrentSettings->SetAutoConfigure(
 		strcmp(fTypeMenuField->Menu()->FindMarked()->Label(),
@@ -539,7 +537,8 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 	for (int i = 0; i < fSettings.CountItems(); i++) {
 		Settings* settings = fSettings.ItemAt(i);
 
-		if (settings->AutoConfigure() && settings->WirelessNetwork() == "")
+		std::vector<wireless_network> networks = settings->WirelessNetworks();
+		if (settings->AutoConfigure() && networks.empty())
 			continue;
 
 		if (fp == NULL) {
@@ -564,9 +563,14 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 			fprintf(fp, "\t\tmask\t%s\n", settings->Netmask());
 			fprintf(fp, "\t}\n");
 		}
-		if (settings->WirelessNetwork() != "") {
-			fprintf(fp, "\tnetwork\t%s\n",
-				settings->WirelessNetwork().String());
+		if (!networks.empty()) {
+			for (size_t index = 0; index < networks.size(); index++) {
+				wireless_network& network = networks[index];
+				fprintf(fp, "\tnetwork %s {\n", network.name);
+				fprintf(fp, "\t\tmac\t%s\n",
+					network.address.ToString().String());
+				fprintf(fp, "\t}\n");
+			}
 		}
 		fprintf(fp, "}\n\n");
 	}
