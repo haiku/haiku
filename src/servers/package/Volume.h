@@ -19,6 +19,7 @@
 #include <package/packagefs.h>
 #include <util/DoublyLinkedList.h>
 
+#include "FSUtils.h"
 #include "Package.h"
 
 
@@ -119,12 +120,11 @@ public:
 
 private:
 			struct NodeMonitorEvent;
-			struct RelativePath;
-			struct Exception;
 			struct CommitTransactionHandler;
 
 			friend struct CommitTransactionHandler;
 
+			typedef FSUtils::RelativePath RelativePath;
 			typedef DoublyLinkedList<NodeMonitorEvent> NodeMonitorEventList;
 
 private:
@@ -160,6 +160,9 @@ private:
 									const RelativePath& path, bool create,
 									BDirectory& _directory);
 
+			status_t			_OpenSettingsRootDirectory(
+									BDirectory& _directory);
+
 			status_t			_CreateActivationFileContent(
 									const PackageSet& toActivate,
 									const PackageSet& toDeactivate,
@@ -180,6 +183,11 @@ private:
 									const PackageSet& packagesToActivate,
 									const PackageSet& packagesToDeactivate);
 									// throws Exception
+
+			status_t			_ExtractPackageContent(Package* package,
+									const char* contentPath,
+									BDirectory& targetDirectory,
+									BDirectory& _extractedFilesDirectory);
 
 private:
 			BString				fPath;
@@ -206,6 +214,9 @@ public:
 
 	virtual	void				VolumeNodeMonitorEventOccurred(Volume* volume)
 									= 0;
+	virtual	status_t			GetRootDirectoryRef(
+									PackageFSMountType mountType,
+									node_ref& _ref) = 0;
 };
 
 

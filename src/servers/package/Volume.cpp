@@ -36,10 +36,15 @@
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
+#include <CopyEngine.h>
+#include <NotOwningEntryRef.h>
 #include <package/DaemonDefs.h>
 #include <package/PackagesDirectoryDefs.h>
+#include <RemoveEngine.h>
 
 #include "DebugSupport.h"
+#include "Exception.h"
+#include "FSTransaction.h"
 
 
 using namespace BPackageKit::BPrivate;
@@ -54,13 +59,13 @@ static const char* const kActivationFileName
 	= PACKAGES_DIRECTORY_ACTIVATION_FILE;
 static const char* const kTemporaryActivationFileName
 	= PACKAGES_DIRECTORY_ACTIVATION_FILE ".tmp";
+static const char* const kWritableFilesDirectoryName = "writable-files";
+static const char* const kPackageFileAttribute = "SYS:PACKAGE";
 
 static const bigtime_t kHandleNodeMonitorEvents = 'nmon';
 
 static const bigtime_t kNodeMonitorEventHandlingDelay = 500000;
 static const bigtime_t kCommunicationTimeout = 1000000;
-
-const char* const kShellEscapeCharacters = " ~`#$&*()\\|[]{};'\"<>?!";
 
 
 // #pragma mark - Listener
@@ -100,159 +105,6 @@ private:
 };
 
 
-// #pragma mark - RelativePath
-
-
-struct Volume::RelativePath {
-	RelativePath(const char* component1 = NULL, const char* component2 = NULL,
-		const char* component3 = NULL)
-		:
-		fComponentCount(kMaxComponentCount)
-	{
-		fComponents[0] = component1;
-		fComponents[1] = component2;
-		fComponents[2] = component3;
-
-		for (size_t i = 0; i < kMaxComponentCount; i++) {
-			if (fComponents[i] == NULL) {
-				fComponentCount = i;
-				break;
-			}
-		}
-	}
-
-	bool IsEmpty() const
-	{
-		return fComponentCount == 0;
-	}
-
-	RelativePath HeadPath(size_t componentsToDropCount = 1)
-	{
-		RelativePath result;
-		if (componentsToDropCount < fComponentCount) {
-			result.fComponentCount = fComponentCount - componentsToDropCount;
-			for (size_t i = 0; i < result.fComponentCount; i++)
-				result.fComponents[i] = fComponents[i];
-		}
-
-		return result;
-	}
-
-	const char* LastComponent() const
-	{
-		return fComponentCount > 0 ? fComponents[fComponentCount - 1] : NULL;
-	}
-
-	BString ToString() const
-	{
-		if (fComponentCount == 0)
-			return BString();
-
-		size_t length = fComponentCount - 1;
-		for (size_t i = 0; i < fComponentCount; i++)
-			length += strlen(fComponents[i]);
-
-		BString result;
-		char* buffer = result.LockBuffer(length + 1);
-		if (buffer == NULL)
-			return BString();
-
-		for (size_t i = 0; i < fComponentCount; i++) {
-			if (i > 0) {
-				*buffer = '/';
-				buffer++;
-			}
-			strcpy(buffer, fComponents[i]);
-			buffer += strlen(buffer);
-		}
-
-		return result.UnlockBuffer();
-	}
-
-private:
-	static const size_t	kMaxComponentCount = 3;
-
-	const char*	fComponents[kMaxComponentCount];
-	size_t		fComponentCount;
-};
-
-
-// #pragma mark - Exception
-
-
-struct Volume::Exception {
-	Exception(int32 error, const char* errorMessage = NULL,
-		const char* packageName = NULL)
-		:
-		fError(error),
-		fErrorMessage(errorMessage),
-		fPackageName(packageName)
-	{
-	}
-
-	int32 Error() const
-	{
-		return fError;
-	}
-
-	const BString& ErrorMessage() const
-	{
-		return fErrorMessage;
-	}
-
-	const BString& PackageName() const
-	{
-		return fPackageName;
-	}
-
-	BString ToString() const
-	{
-		const char* error;
-		if (fError >= 0) {
-			switch (fError) {
-				case B_DAEMON_OK:
-					error = "no error";
-					break;
-				case B_DAEMON_CHANGE_COUNT_MISMATCH:
-					error = "transaction out of date";
-					break;
-				case B_DAEMON_BAD_REQUEST:
-					error = "invalid transaction";
-					break;
-				case B_DAEMON_NO_SUCH_PACKAGE:
-					error = "no such package";
-					break;
-				case B_DAEMON_PACKAGE_ALREADY_EXISTS:
-					error = "package already exists";
-					break;
-				default:
-					error = "unknown error";
-					break;
-			}
-		} else
-			error = strerror(fError);
-
-		BString string;
-		if (!fErrorMessage.IsEmpty()) {
-			string = fErrorMessage;
-			string << ": ";
-		}
-
-		string << error;
-
-		if (!fPackageName.IsEmpty())
-			string << ", package: \"" << fPackageName << '"';
-
-		return string;
-	}
-
-private:
-	int32		fError;
-	BString		fErrorMessage;
-	BString		fPackageName;
-};
-
-
 // #pragma mark - CommitTransactionHandler
 
 
@@ -269,7 +121,8 @@ struct Volume::CommitTransactionHandler {
 		fPackagesAlreadyAdded(packagesAlreadyAdded),
 		fPackagesAlreadyRemoved(packagesAlreadyRemoved),
 		fAddedGroups(),
-		fAddedUsers()
+		fAddedUsers(),
+		fFSTransaction()
 	{
 	}
 
@@ -339,8 +192,9 @@ struct Volume::CommitTransactionHandler {
 		// revert user and group changes
 		_RevertUserGroupChanges();
 
-		// remove old state directory
-		_RemoveOldStateDirectory();
+		// Revert all other FS operations, i.e. the writable files changes as
+		// well as the creation of the old state directory.
+		fFSTransaction.RollBack();
 	}
 
 	const BString& OldStateDirectoryName() const
@@ -510,10 +364,15 @@ private:
 		}
 
 		// create the directory
+		FSTransaction::CreateOperation createOldStateDirectoryOperation(
+			&fFSTransaction, FSUtils::Entry(adminDirectory, directoryName));
+
 		error = adminDirectory.CreateDirectory(directoryName,
 			&fOldStateDirectory);
 		if (error != B_OK)
 			throw Exception(error, "failed to create old state directory");
+
+		createOldStateDirectoryOperation.Finished();
 
 		fOldStateDirectoryName = directoryName;
 
@@ -548,11 +407,8 @@ private:
 			}
 
 			// get a BEntry for the package
-			entry_ref entryRef;
-			entryRef.device = fVolume->fPackagesDirectoryRef.device;
-			entryRef.directory = fVolume->fPackagesDirectoryRef.node;
-			if (entryRef.set_name(package->FileName()) != B_OK)
-				throw Exception(B_NO_MEMORY);
+			NotOwningEntryRef entryRef(fVolume->fPackagesDirectoryRef,
+				package->FileName());
 
 			BEntry entry;
 			status_t error = entry.SetTo(&entryRef);
@@ -665,7 +521,7 @@ private:
 		fAddedGroups.insert(groupName.String());
 
 		std::string commandLine("groupadd ");
-		commandLine += _ShellEscapeString(groupName).String();
+		commandLine += FSUtils::ShellEscapeString(groupName).String();
 
 		if (system(commandLine.c_str()) != 0) {
 			fAddedGroups.erase(groupName.String());
@@ -694,25 +550,26 @@ private:
 
 		if (!user.RealName().IsEmpty()) {
 			commandLine += std::string("-n ")
-				+ _ShellEscapeString(user.RealName()).String() + " ";
+				+ FSUtils::ShellEscapeString(user.RealName()).String() + " ";
 		}
 
 		if (!user.Home().IsEmpty()) {
 			commandLine += std::string("-d ")
-				+ _ShellEscapeString(user.Home()).String() + " ";
+				+ FSUtils::ShellEscapeString(user.Home()).String() + " ";
 		}
 
 		if (!user.Shell().IsEmpty()) {
 			commandLine += std::string("-s ")
-				+ _ShellEscapeString(user.Shell()).String() + " ";
+				+ FSUtils::ShellEscapeString(user.Shell()).String() + " ";
 		}
 
 		if (!user.Groups().IsEmpty()) {
 			commandLine += std::string("-g ")
-				+ _ShellEscapeString(user.Groups().First()).String() + " ";
+				+ FSUtils::ShellEscapeString(user.Groups().First()).String()
+				+ " ";
 		}
 
-		commandLine += _ShellEscapeString(user.Name()).String();
+		commandLine += FSUtils::ShellEscapeString(user.Name()).String();
 
 		if (system(commandLine.c_str()) != 0) {
 			fAddedUsers.erase(user.Name().String());
@@ -726,9 +583,10 @@ private:
 		int32 groupCount = user.Groups().CountStrings();
 		for (int32 i = 1; i < groupCount; i++) {
 			commandLine = std::string("groupmod -A ")
-				+ _ShellEscapeString(user.Name()).String()
+				+ FSUtils::ShellEscapeString(user.Name()).String()
 				+ " "
-				+ _ShellEscapeString(user.Groups().StringAt(i)).String();
+				+ FSUtils::ShellEscapeString(user.Groups().StringAt(i))
+					.String();
 			if (system(commandLine.c_str()) != 0) {
 				fAddedUsers.erase(user.Name().String());
 				throw Exception(error,
@@ -743,7 +601,346 @@ private:
 	void _AddGlobalWritableFile(Package* package,
 		const BGlobalWritableFileInfo& file)
 	{
-// TODO:...
+		if (!file.IsIncluded())
+			return;
+
+		// Open the root directory of the installation location where we will
+		// extract the files -- that's the volume's root directory save for
+		// "system" where it is "common".
+		BDirectory rootDirectory;
+		status_t error = fVolume->_OpenSettingsRootDirectory(rootDirectory);
+		if (error != B_OK) {
+			throw Exception(error,
+				BString().SetToFormat("failed to get the root directory "
+					"for writable files"),
+				package->FileName());
+		}
+
+		// Open writable-files directory in the administrative directory.
+		if (fWritableFilesDirectory.InitCheck() != B_OK) {
+			error = fVolume->_OpenPackagesSubDirectory(
+				RelativePath(kAdminDirectoryName, kWritableFilesDirectoryName),
+				true, fWritableFilesDirectory);
+
+			if (error != B_OK) {
+				throw Exception(error,
+					BString().SetToFormat("failed to get the backup directory "
+						"for writable files"),
+					package->FileName());
+			}
+		}
+
+		// extract files into a subdir of the writable-files directory
+		BDirectory extractedFilesDirectory;
+		_ExtractPackageContent(package, file.Path(),
+			fWritableFilesDirectory, extractedFilesDirectory);
+
+		// Map the path name to the actual target location. Currently this only
+		// concerns "settings/", which is mapped to "settings/global/".
+		BString targetPath(file.Path());
+		if (fVolume->fMountType == PACKAGE_FS_MOUNT_TYPE_HOME) {
+			if (targetPath == "settings"
+				|| targetPath.StartsWith("settings/")) {
+				targetPath.Insert("/global", 8);
+				if (targetPath.Length() == file.Path().Length())
+					throw std::bad_alloc();
+			}
+		}
+
+		// open parent directory of the source entry
+		const char* lastSlash = strrchr(file.Path(), '/');
+		BDirectory* sourceDirectory;
+		BDirectory stackSourceDirectory;
+		if (lastSlash != NULL) {
+			sourceDirectory = &stackSourceDirectory;
+			BString sourceParentPath(file.Path(),
+				lastSlash - file.Path().String());
+			if (sourceParentPath.Length() == 0)
+				throw std::bad_alloc();
+
+			error = stackSourceDirectory.SetTo(&extractedFilesDirectory,
+				sourceParentPath);
+			if (error != B_OK) {
+				throw Exception(error,
+					BString().SetToFormat("failed to open directory \"%s\"",
+						_GetPath(
+							FSUtils::Entry(extractedFilesDirectory,
+								sourceParentPath),
+							sourceParentPath).String()),
+					package->FileName());
+			}
+		} else {
+			sourceDirectory = &extractedFilesDirectory;
+		}
+
+		// open parent directory of the target entry -- create, if necessary
+		FSUtils::Path relativeSourcePath(file.Path());
+		lastSlash = strrchr(targetPath, '/');
+		if (lastSlash != NULL) {
+			BString targetParentPath(targetPath,
+				lastSlash - targetPath.String());
+			if (targetParentPath.Length() == 0)
+				throw std::bad_alloc();
+
+			BDirectory targetDirectory;
+			error = FSUtils::OpenSubDirectory(rootDirectory,
+				RelativePath(targetParentPath), true, targetDirectory);
+			if (error != B_OK) {
+				throw Exception(error,
+					BString().SetToFormat("failed to open/create directory "
+						"\"%s\"",
+						_GetPath(
+							FSUtils::Entry(rootDirectory,targetParentPath),
+							targetParentPath).String()),
+					package->FileName());
+			}
+			_AddGlobalWritableFileRecurse(package, *sourceDirectory,
+				relativeSourcePath, targetDirectory, lastSlash + 1,
+				file.UpdateType());
+		} else {
+			_AddGlobalWritableFileRecurse(package, *sourceDirectory,
+				relativeSourcePath, rootDirectory, targetPath,
+				file.UpdateType());
+		}
+	}
+
+	void _AddGlobalWritableFileRecurse(Package* package,
+		BDirectory& sourceDirectory, FSUtils::Path& relativeSourcePath,
+		BDirectory& targetDirectory, const char* targetName,
+		BWritableFileUpdateType updateType)
+	{
+		// * If the file doesn't exist, just copy the extracted one.
+		// * If the file does exist, compare with the previous original version:
+		//   * If unchanged, just overwrite it.
+		//   * If changed, leave it to the user for now. When we support merging
+		//     first back the file up, then try the merge.
+
+		// Check whether the target location exists and what type the entry at
+		// both locations are.
+		struct stat targetStat;
+		if (targetDirectory.GetStatFor(targetName, &targetStat) != B_OK) {
+			// target doesn't exist -- just copy
+			PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
+				"couldn't get stat for writable file, copying...\n");
+			FSTransaction::CreateOperation copyOperation(&fFSTransaction,
+				FSUtils::Entry(targetDirectory, targetName));
+			status_t error = BCopyEngine(BCopyEngine::COPY_RECURSIVELY)
+				.CopyEntry(
+					FSUtils::Entry(sourceDirectory, relativeSourcePath.Leaf()),
+					FSUtils::Entry(targetDirectory, targetName));
+			if (error != B_OK) {
+				if (targetDirectory.GetStatFor(targetName, &targetStat) == B_OK)
+					copyOperation.Finished();
+
+				throw Exception(error,
+					BString().SetToFormat("failed to copy entry \"%s\"",
+						_GetPath(
+							FSUtils::Entry(sourceDirectory,
+								relativeSourcePath.Leaf()),
+							relativeSourcePath).String()),
+					package->FileName());
+			}
+			copyOperation.Finished();
+			return;
+		}
+
+		struct stat sourceStat;
+		status_t error = sourceDirectory.GetStatFor(relativeSourcePath.Leaf(),
+			&sourceStat);
+		if (error != B_OK) {
+			throw Exception(error,
+				BString().SetToFormat("failed to get stat data for entry "
+					"\"%s\"",
+					_GetPath(
+						FSUtils::Entry(targetDirectory, targetName),
+						targetName).String()),
+				package->FileName());
+		}
+
+		if ((sourceStat.st_mode & S_IFMT) != (targetStat.st_mode & S_IFMT)
+			|| (!S_ISDIR(sourceStat.st_mode) && !S_ISREG(sourceStat.st_mode)
+				&& !S_ISLNK(sourceStat.st_mode))) {
+			// Source and target entry types don't match or this is an entry
+			// we cannot handle. The user must handle this manually.
+			PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
+				"writable file exists, but type doesn't match previous type\n");
+// TODO: Notify user!
+			return;
+		}
+
+		if (S_ISDIR(sourceStat.st_mode)) {
+			// entry is a directory -- recurse
+			BDirectory sourceSubDirectory;
+			error = sourceSubDirectory.SetTo(&sourceDirectory,
+				relativeSourcePath.Leaf());
+			if (error != B_OK) {
+				throw Exception(error,
+					BString().SetToFormat("failed to open directory \"%s\"",
+						_GetPath(
+							FSUtils::Entry(sourceDirectory,
+								relativeSourcePath.Leaf()),
+							relativeSourcePath).String()),
+					package->FileName());
+			}
+
+			BDirectory targetSubDirectory;
+			error = targetSubDirectory.SetTo(&targetDirectory, targetName);
+			if (error != B_OK) {
+				throw Exception(error,
+					BString().SetToFormat("failed to open directory \"%s\"",
+						_GetPath(
+							FSUtils::Entry(targetDirectory, targetName),
+							targetName).String()),
+					package->FileName());
+			}
+
+			entry_ref entry;
+			while (sourceSubDirectory.GetNextRef(&entry) == B_OK) {
+				relativeSourcePath.AppendComponent(entry.name);
+				_AddGlobalWritableFileRecurse(package, sourceSubDirectory,
+					relativeSourcePath, targetSubDirectory, entry.name,
+					updateType);
+				relativeSourcePath.RemoveLastComponent();
+			}
+
+			PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
+				"writable directory, recursion done\n");
+			return;
+		}
+
+		// get the package the target file originated from
+		BString originalPackage;
+		if (BNode(&targetDirectory, targetName).ReadAttrString(
+				kPackageFileAttribute, &originalPackage) != B_OK) {
+			// Can't determine the original package. The user must handle this
+			// manually.
+// TODO: Notify user, if not B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD!
+			PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
+				"failed to get SYS:PACKAGE attribute\n");
+			return;
+		}
+
+		// If that's our package, we're happy.
+		if (originalPackage == package->RevisionedNameThrows()) {
+			PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
+				"file tagged with same package version we're activating\n");
+			return;
+		}
+
+		// Check, whether the writable-files directory for the original package
+		// exists.
+		BString originalRelativeSourcePath = BString().SetToFormat("%s/%s",
+			originalPackage.String(), relativeSourcePath.ToCString());
+		if (originalRelativeSourcePath.IsEmpty())
+			throw std::bad_alloc();
+
+		struct stat originalPackageStat;
+		if (fWritableFilesDirectory.GetStatFor(originalRelativeSourcePath,
+				&originalPackageStat) != B_OK
+			|| (sourceStat.st_mode & S_IFMT)
+				!= (originalPackageStat.st_mode & S_IFMT)) {
+			// Original entry doesn't exist (either we don't have the data from
+			// the original package or the entry really didn't exist) or its
+			// type differs from the expected one. The user must handle this
+			// manually.
+			PRINT("Volume::CommitTransactionHandler::_AddGlobalWritableFile(): "
+				"original \"%s\" doesn't exist or has other type\n",
+				_GetPath(FSUtils::Entry(fWritableFilesDirectory,
+						originalRelativeSourcePath),
+					originalRelativeSourcePath).String());
+			return;
+// TODO: Notify user!
+		}
+
+		if (S_ISREG(sourceStat.st_mode)) {
+			// compare file content
+			bool equal;
+			error = FSUtils::CompareFileContent(
+				FSUtils::Entry(fWritableFilesDirectory,
+					originalRelativeSourcePath),
+				FSUtils::Entry(targetDirectory, targetName),
+				equal);
+			// TODO: Merge support!
+			if (error != B_OK || !equal) {
+				// The comparison failed or the files differ. The user must
+				// handle this manually.
+				PRINT("Volume::CommitTransactionHandler::"
+					"_AddGlobalWritableFile(): "
+					"file comparison failed (%s) or files aren't equal\n",
+					strerror(error));
+				return;
+// TODO: Notify user, if not B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD!
+			}
+		} else {
+			// compare symlinks
+			bool equal;
+			error = FSUtils::CompareSymLinks(
+				FSUtils::Entry(fWritableFilesDirectory,
+					originalRelativeSourcePath),
+				FSUtils::Entry(targetDirectory, targetName),
+				equal);
+			if (error != B_OK || !equal) {
+				// The comparison failed or the symlinks differ. The user must
+				// handle this manually.
+				PRINT("Volume::CommitTransactionHandler::"
+					"_AddGlobalWritableFile(): "
+					"symlink comparison failed (%s) or symlinks aren't equal\n",
+					strerror(error));
+				return;
+// TODO: Notify user, if not B_WRITABLE_FILE_UPDATE_TYPE_KEEP_OLD!
+			}
+		}
+
+		// Replace the existing file/symlink. We do that in two steps: First
+		// copy the new file to a neighoring location, then move-replace the
+		// old file.
+		BString tempTargetName;
+		tempTargetName.SetToFormat("%s.%s", targetName,
+			package->RevisionedNameThrows().String());
+		if (tempTargetName.IsEmpty())
+			throw std::bad_alloc();
+
+		// copy
+		FSTransaction::CreateOperation copyOperation(&fFSTransaction,
+			FSUtils::Entry(targetDirectory, tempTargetName));
+
+		error = BCopyEngine(BCopyEngine::UNLINK_DESTINATION).CopyEntry(
+			FSUtils::Entry(sourceDirectory, relativeSourcePath.Leaf()),
+			FSUtils::Entry(targetDirectory, tempTargetName));
+		if (error != B_OK) {
+			throw Exception(error,
+				BString().SetToFormat("failed to copy entry \"%s\"",
+					_GetPath(
+						FSUtils::Entry(sourceDirectory,
+							relativeSourcePath.Leaf()),
+						relativeSourcePath).String()),
+				package->FileName());
+		}
+
+		copyOperation.Finished();
+
+		// rename
+		FSTransaction::RemoveOperation renameOperation(&fFSTransaction,
+			FSUtils::Entry(targetDirectory, targetName),
+			FSUtils::Entry(fWritableFilesDirectory,
+				originalRelativeSourcePath));
+
+		BEntry targetEntry;
+		error = targetEntry.SetTo(&targetDirectory, tempTargetName);
+		if (error == B_OK)
+			error = targetEntry.Rename(targetName, true);
+		if (error != B_OK) {
+			throw Exception(error,
+				BString().SetToFormat("failed to rename entry \"%s\" to \"%s\"",
+					_GetPath(
+						FSUtils::Entry(targetDirectory, tempTargetName),
+						tempTargetName).String(),
+					targetName),
+				package->FileName());
+		}
+
+		renameOperation.Finished();
+		copyOperation.Unregister();
 	}
 
 	void _RevertAddPackagesToActivate()
@@ -774,13 +971,8 @@ private:
 				continue;
 
 			// get BEntry for the package
-			entry_ref entryRef;
-			entryRef.device = fVolume->fPackagesDirectoryRef.device;
-			entryRef.directory = fVolume->fPackagesDirectoryRef.node;
-			if (entryRef.set_name(package->FileName()) != B_OK) {
-				ERROR("out of memory\n");
-				continue;
-			}
+			NotOwningEntryRef entryRef(fVolume->fPackagesDirectoryRef,
+				package->FileName());
 
 			BEntry entry;
 			error = entry.SetTo(&entryRef);
@@ -852,7 +1044,7 @@ private:
 		for (StringSet::const_iterator it = fAddedUsers.begin();
 			it != fAddedUsers.end(); ++it) {
 			std::string commandLine("userdel ");
-			commandLine += _ShellEscapeString(it->c_str()).String();
+			commandLine += FSUtils::ShellEscapeString(it->c_str()).String();
 			if (system(commandLine.c_str()) != 0)
 				ERROR("failed to remove user \"%s\"\n", it->c_str());
 		}
@@ -861,36 +1053,9 @@ private:
 		for (StringSet::const_iterator it = fAddedGroups.begin();
 			it != fAddedGroups.end(); ++it) {
 			std::string commandLine("groupdel ");
-			commandLine += _ShellEscapeString(it->c_str()).String();
+			commandLine += FSUtils::ShellEscapeString(it->c_str()).String();
 			if (system(commandLine.c_str()) != 0)
 				ERROR("failed to remove group \"%s\"\n", it->c_str());
-		}
-	}
-
-	void _RemoveOldStateDirectory()
-	{
-		if (fOldStateDirectory.InitCheck() != B_OK)
-			return;
-
-		// remove the old activation file (it won't exist, if creating it
-		// failed)
-		BEntry(&fOldStateDirectory, kActivationFileName).Remove();
-
-		// Now the directory should be empty. If it isn't, it still contains
-		// some old package file, which we failed to move back.
-		BEntry entry;
-		status_t error = fOldStateDirectory.GetEntry(&entry);
-		if (error != B_OK) {
-			ERROR("failed to get entry for old state directory: %s\n",
-				strerror(error));
-			return;
-		}
-
-		error = entry.Remove();
-		if (error != B_OK) {
-			ERROR("failed to remove old state directory: %s\n",
-				strerror(error));
-			return;
 		}
 	}
 
@@ -929,13 +1094,184 @@ private:
 		}
 	}
 
-	BString _ShellEscapeString(const BString& string)
+	static BString _GetPath(const FSUtils::Entry& entry,
+		const BString& fallback)
 	{
-		BString result(string);
-		result.CharacterEscape(kShellEscapeCharacters, '\\');
-		if (result.IsEmpty())
+		BString path = entry.Path();
+		return path.IsEmpty() ? fallback : path;
+	}
+
+	void _ExtractPackageContent(Package* package, const char* contentPath,
+		BDirectory& targetDirectory, BDirectory& _extractedFilesDirectory)
+	{
+		// check whether the subdirectory already exists
+		BString targetName(package->RevisionedNameThrows());
+
+		BEntry targetEntry;
+		status_t error = targetEntry.SetTo(&targetDirectory, targetName);
+		if (error != B_OK) {
+			throw Exception(error,
+				BString().SetToFormat("failed to init entry \"%s\"",
+					_GetPath(
+						FSUtils::Entry(targetDirectory, targetName),
+						targetName).String()),
+				package->FileName());
+		}
+		if (targetEntry.Exists()) {
+			// nothing to do -- the very same version of the package has already
+			// been extracted
+			error = _extractedFilesDirectory.SetTo(&targetDirectory,
+				targetName);
+			if (error != B_OK) {
+				throw Exception(error,
+					BString().SetToFormat("failed to open directory \"%s\"",
+						_GetPath(
+							FSUtils::Entry(targetDirectory, targetName),
+							targetName).String()),
+					package->FileName());
+			}
+			return;
+		}
+
+		// create the subdirectory with a temporary name (remove, if it already
+		// exists)
+		BString temporaryTargetName = BString().SetToFormat("%s.tmp",
+			targetName.String());
+		if (temporaryTargetName.IsEmpty())
 			throw std::bad_alloc();
-		return result;
+
+		error = targetEntry.SetTo(&targetDirectory, temporaryTargetName);
+		if (error != B_OK) {
+			throw Exception(error,
+				BString().SetToFormat("failed to init entry \"%s\"",
+					_GetPath(
+						FSUtils::Entry(targetDirectory, temporaryTargetName),
+						temporaryTargetName).String()),
+				package->FileName());
+		}
+
+		if (targetEntry.Exists()) {
+			// remove pre-existing
+			error = BRemoveEngine().RemoveEntry(FSUtils::Entry(targetEntry));
+			if (error != B_OK) {
+				throw Exception(error,
+					BString().SetToFormat("failed to remove directory \"%s\"",
+						_GetPath(
+							FSUtils::Entry(targetDirectory,
+								temporaryTargetName),
+							temporaryTargetName).String()),
+					package->FileName());
+			}
+		}
+
+		BDirectory& subDirectory = _extractedFilesDirectory;
+		FSTransaction::CreateOperation createSubDirectoryOperation(
+			&fFSTransaction,
+			FSUtils::Entry(targetDirectory, temporaryTargetName));
+		error = targetDirectory.CreateDirectory(temporaryTargetName,
+			&subDirectory);
+		if (error != B_OK) {
+			throw Exception(error,
+				BString().SetToFormat("failed to create directory \"%s\"",
+					_GetPath(
+						FSUtils::Entry(targetDirectory, temporaryTargetName),
+						temporaryTargetName).String()),
+				package->FileName());
+		}
+
+		createSubDirectoryOperation.Finished();
+
+		// extract
+		NotOwningEntryRef packageRef(fVolume->fPackagesDirectoryRef,
+			package->FileName());
+
+		error = FSUtils::ExtractPackageContent(FSUtils::Entry(packageRef),
+			contentPath, FSUtils::Entry(subDirectory));
+		if (error != B_OK) {
+			throw Exception(error,
+				BString().SetToFormat("failed to extracted \"%s\" from package",
+					contentPath),
+				package->FileName());
+		}
+
+		// tag all entries with the package attribute
+		error = _TagPackageEntriesRecursively(subDirectory, targetName, true);
+		if (error != B_OK) {
+			throw Exception(error,
+				BString().SetToFormat("failed to tag extract files in \"%s\" "
+					"with package attribute",
+					_GetPath(
+						FSUtils::Entry(targetDirectory, temporaryTargetName),
+						temporaryTargetName).String()),
+				package->FileName());
+		}
+
+		// rename the subdirectory
+		error = targetEntry.Rename(targetName);
+		if (error != B_OK) {
+			throw Exception(error,
+				BString().SetToFormat("failed to rename entry \"%s\" to \"%s\"",
+					_GetPath(
+						FSUtils::Entry(targetDirectory, temporaryTargetName),
+						temporaryTargetName).String(),
+					targetName.String()),
+				package->FileName());
+		}
+
+		// keep the directory, regardless of whether the transaction is rolled
+		// back
+		createSubDirectoryOperation.Unregister();
+	}
+
+	static status_t _TagPackageEntriesRecursively(BDirectory& directory,
+		const BString& value, bool nonDirectoriesOnly)
+	{
+		char buffer[sizeof(dirent) + B_FILE_NAME_LENGTH];
+		dirent *entry = (dirent*)buffer;
+		while (directory.GetNextDirents(entry, sizeof(buffer), 1) == 1) {
+			if (strcmp(entry->d_name, ".") == 0
+				|| strcmp(entry->d_name, "..") == 0) {
+				continue;
+			}
+
+			// determine type
+			struct stat st;
+			status_t error = directory.GetStatFor(entry->d_name, &st);
+			if (error != B_OK)
+				return error;
+			bool isDirectory = S_ISDIR(st.st_mode);
+
+			// open the node and set the attribute
+			BNode stackNode;
+			BDirectory stackDirectory;
+			BNode* node;
+			if (isDirectory) {
+				node = &stackDirectory;
+				error = stackDirectory.SetTo(&directory, entry->d_name);
+			} else {
+				node = &stackNode;
+				error = stackNode.SetTo(&directory, entry->d_name);
+			}
+
+			if (error != B_OK)
+				return error;
+
+			if (!isDirectory || !nonDirectoriesOnly) {
+				error = node->WriteAttrString(kPackageFileAttribute, &value);
+				if (error != B_OK)
+					return error;
+			}
+
+			// recurse
+			if (isDirectory) {
+				error = _TagPackageEntriesRecursively(stackDirectory, value,
+					nonDirectoriesOnly);
+				if (error != B_OK)
+					return error;
+			}
+		}
+
+		return B_OK;
 	}
 
 private:
@@ -949,8 +1285,10 @@ private:
 	BDirectory			fOldStateDirectory;
 	BString				fOldStateDirectoryName;
 	node_ref			fTransactionDirectoryRef;
+	BDirectory			fWritableFilesDirectory;
 	StringSet			fAddedGroups;
 	StringSet			fAddedUsers;
+	FSTransaction		fFSTransaction;
 };
 
 
@@ -1893,40 +2231,47 @@ Volume::_OpenPackagesSubDirectory(const RelativePath& path, bool create,
 	BDirectory directory;
 	status_t error = directory.SetTo(&fPackagesDirectoryRef);
 	if (error != B_OK) {
-		ERROR("Volume::_OpenConfigSubDirectory(): failed to open packages "
+		ERROR("Volume::_OpenPackagesSubDirectory(): failed to open packages "
 			"directory: %s\n", strerror(error));
 		RETURN_ERROR(error);
 	}
 
-	// get a string for the path
-	BString pathString = path.ToString();
-	if (pathString.IsEmpty())
-		RETURN_ERROR(B_NO_MEMORY);
+	return FSUtils::OpenSubDirectory(directory, path, create, _directory);
+}
 
-	// If creating is not allowed, just try to open it.
-	if (!create)
-		RETURN_ERROR(_directory.SetTo(&directory, pathString));
 
-	// get an absolute path and create the subdirectory
-	BPath absolutePath;
-	error = absolutePath.SetTo(&directory, pathString);
-	if (error != B_OK) {
-		ERROR("Volume::_OpenConfigSubDirectory(): failed to get absolute path "
-			"for subdirectory \"%s\": %s\n", pathString.String(),
-			strerror(error));
-		RETURN_ERROR(error);
+status_t
+Volume::_OpenSettingsRootDirectory(BDirectory& _directory)
+{
+	switch (fMountType) {
+		case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
+		{
+			// try our sibling volume
+			if (fListener != NULL) {
+				node_ref ref;
+				status_t error = fListener->GetRootDirectoryRef(
+					PACKAGE_FS_MOUNT_TYPE_COMMON, ref);
+				if (error != B_ENTRY_NOT_FOUND)
+					return error;
+				return _directory.SetTo(&ref);
+			}
+
+			// try a path relative to our root directory
+			BDirectory rootDirectory;
+			status_t error = rootDirectory.SetTo(&fRootDirectoryRef);
+			if (error != B_OK)
+				return error;
+			return _directory.SetTo(&rootDirectory, "../common");
+		}
+
+		case PACKAGE_FS_MOUNT_TYPE_COMMON:
+		case PACKAGE_FS_MOUNT_TYPE_HOME:
+			return _directory.SetTo(&fRootDirectoryRef);
+
+		case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
+		default:
+			return B_BAD_VALUE;
 	}
-
-	error = create_directory(absolutePath.Path(),
-		S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-	if (error != B_OK) {
-		ERROR("Volume::_OpenConfigSubDirectory(): failed to create packages "
-			"subdirectory \"%s\": %s\n", pathString.String(),
-			strerror(error));
-		RETURN_ERROR(error);
-	}
-
-	RETURN_ERROR(_directory.SetTo(&directory, pathString));
 }
 
 

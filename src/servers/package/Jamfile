@@ -1,11 +1,14 @@
 SubDir HAIKU_TOP src servers package ;
 
 UsePrivateSystemHeaders ;
-UsePrivateHeaders app interface kernel shared ;
+UsePrivateHeaders app interface kernel shared storage ;
 
 Server package_daemon
 	:
 	DebugSupport.cpp
+	Exception.cpp
+	FSTransaction.cpp
+	FSUtils.cpp
 	Job.cpp
 	JobQueue.cpp
 	Package.cpp

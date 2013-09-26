@@ -50,6 +50,9 @@ public:
 private:
 	// Volume::Listener
 	virtual	void				VolumeNodeMonitorEventOccurred(Volume* volume);
+	virtual	status_t			GetRootDirectoryRef(
+									PackageFSMountType mountType,
+									node_ref& _ref) ;
 
 protected:
 	virtual	void				LastReferenceReleased();

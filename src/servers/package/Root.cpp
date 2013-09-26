@@ -257,6 +257,19 @@ Root::VolumeNodeMonitorEventOccurred(Volume* volume)
 }
 
 
+status_t
+Root::GetRootDirectoryRef(PackageFSMountType mountType, node_ref& _ref)
+{
+	AutoLocker<BLocker> locker(fLock);
+	Volume** volume = _GetVolume(mountType);
+	if (volume == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	_ref = (*volume)->RootDirectoryRef();
+	return B_OK;
+}
+
+
 void
 Root::LastReferenceReleased()
 {
