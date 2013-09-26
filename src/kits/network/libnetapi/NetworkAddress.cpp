@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1211,6 +1211,9 @@ BNetworkAddress::operator const sockaddr&()
 status_t
 BNetworkAddress::_ParseLinkAddress(const char* address)
 {
+	if (address == NULL)
+		return B_BAD_VALUE;
+
 	uint8 linkAddress[128];
 	uint32 length = 0;
 	while (length < sizeof(linkAddress)) {
