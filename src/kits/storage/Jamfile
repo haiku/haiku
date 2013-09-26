@@ -42,6 +42,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			PathMonitor.cpp
 			Query.cpp
 			QueryPredicate.cpp
+			RemoveEngine.cpp
 			ResourceFile.cpp
 			ResourceItem.cpp
 			Resources.cpp
