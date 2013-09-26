@@ -89,6 +89,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DownloadFileRequest.cpp
 			DropRepositoryRequest.cpp
 			FetchFileJob.cpp
+			InitTerminateLibPackage.cpp
 			InstallationLocationInfo.cpp
 			Job.cpp
 			JobQueue.cpp
