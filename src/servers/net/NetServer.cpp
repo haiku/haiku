@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -90,6 +90,7 @@ private:
 
 			status_t			_AutoJoinNetwork(const BMessage& message);
 			status_t			_JoinNetwork(const BMessage& message,
+									const BNetworkAddress* address = NULL,
 									const char* name = NULL);
 			status_t			_LeaveNetwork(const BMessage& message);
 
@@ -661,12 +662,20 @@ NetServer::_ConfigureInterface(BMessage& message)
 		}
 	}
 
-	const char* networkName;
-	if (message.FindString("network", &networkName) == B_OK) {
-		// We want to join a specific network.
+	// Join the specified networks
+	BMessage networkMessage;
+	for (int32 index = 0; message.FindMessage("network", index,
+			&networkMessage) == B_OK; index++) {
+		const char* networkName = message.GetString("name", NULL);
+		const char* addressString = message.GetString("mac", NULL);
+
+		BNetworkAddress address;
+		status_t addressStatus = address.SetTo(AF_LINK, addressString);
+
 		BNetworkDevice device(name);
 		if (device.IsWireless() && !device.HasLink()) {
-			status_t status = _JoinNetwork(message, networkName);
+			status_t status = _JoinNetwork(message,
+				addressStatus == B_OK ? &address : NULL, networkName);
 			if (status != B_OK) {
 				fprintf(stderr, "%s: joining network \"%s\" failed: %s\n",
 					interface.Name(), networkName, strerror(status));
@@ -1008,7 +1017,7 @@ NetServer::_AutoJoinNetwork(const BMessage& message)
 		const char* networkName;
 		BNetworkAddress link;
 
-		const char* mac;
+		const char* mac = NULL;
 		if (networkMessage.FindString("mac", &mac) == B_OK) {
 			link.SetTo(AF_LINK, mac);
 			status = device.GetNetwork(link, network);
@@ -1016,7 +1025,8 @@ NetServer::_AutoJoinNetwork(const BMessage& message)
 			status = device.GetNetwork(networkName, network);
 
 		if (status == B_OK) {
-			status = _JoinNetwork(message, network.name);
+			status = _JoinNetwork(message, mac != NULL ? &link : NULL,
+				network.name);
 			printf("auto join network \"%s\": %s\n", network.name,
 				strerror(status));
 			if (status == B_OK)
@@ -1029,20 +1039,23 @@ NetServer::_AutoJoinNetwork(const BMessage& message)
 
 
 status_t
-NetServer::_JoinNetwork(const BMessage& message, const char* name)
+NetServer::_JoinNetwork(const BMessage& message, const BNetworkAddress* address,
+	const char* name)
 {
 	const char* deviceName;
 	if (message.FindString("device", &deviceName) != B_OK)
 		return B_BAD_VALUE;
 
-	BNetworkAddress address;
-	message.FindFlat("address", &address);
+	BNetworkAddress deviceAddress;
+	message.FindFlat("address", &deviceAddress);
+	if (address == NULL)
+		address = &deviceAddress;
 
 	if (name == NULL)
 		message.FindString("name", &name);
 	if (name == NULL) {
 		// No name specified, we need a network address
-		if (address.Family() != AF_LINK)
+		if (address->Family() != AF_LINK)
 			return B_BAD_VALUE;
 	}
 
@@ -1054,7 +1067,7 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 	while (fSettings.GetNextNetwork(cookie, networkMessage) == B_OK) {
 		const char* networkName;
 		if (networkMessage.FindString("name", &networkName) == B_OK
-			&& name != NULL && address.Family() != AF_LINK
+			&& name != NULL && address->Family() != AF_LINK
 			&& !strcmp(name, networkName)) {
 			found = true;
 			break;
@@ -1062,9 +1075,9 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 
 		const char* mac;
 		if (networkMessage.FindString("mac", &mac) == B_OK
-			&& address.Family() == AF_LINK) {
+			&& address->Family() == AF_LINK) {
 			BNetworkAddress link(AF_LINK, mac);
-			if (link == address) {
+			if (link == *address) {
 				found = true;
 				break;
 			}
@@ -1080,13 +1093,13 @@ NetServer::_JoinNetwork(const BMessage& message, const char* name)
 	wireless_network network;
 
 	bool askForConfig = false;
-	if ((address.Family() != AF_LINK
-			|| device.GetNetwork(address, network) != B_OK)
+	if ((address->Family() != AF_LINK
+			|| device.GetNetwork(*address, network) != B_OK)
 		&& device.GetNetwork(name, network) != B_OK) {
 		// We did not find a network - just ignore that, and continue
 		// with some defaults
 		strlcpy(network.name, name, sizeof(network.name));
-		network.address = address;
+		network.address = *address;
 		network.authentication_mode = B_NETWORK_AUTHENTICATION_NONE;
 		network.cipher = 0;
 		network.group_cipher = 0;

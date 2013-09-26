@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,11 +42,16 @@ const static settings_template kInterfaceAddressTemplate[] = {
 	{0, NULL, NULL}
 };
 
+const static settings_template kInterfaceNetworkTemplate[] = {
+	{B_STRING_TYPE, "name", NULL, true},
+	{B_STRING_TYPE, "mac", NULL},
+};
+
 const static settings_template kInterfaceTemplate[] = {
 	{B_STRING_TYPE, "device", NULL, true},
 	{B_BOOL_TYPE, "disabled", NULL},
 	{B_MESSAGE_TYPE, "address", kInterfaceAddressTemplate},
-	{B_STRING_TYPE, "network", NULL},
+	{B_MESSAGE_TYPE, "network", kInterfaceNetworkTemplate},
 	{B_INT32_TYPE, "flags", NULL},
 	{B_INT32_TYPE, "metric", NULL},
 	{B_INT32_TYPE, "mtu", NULL},
