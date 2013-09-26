@@ -84,7 +84,7 @@ public:
 } // namespace BPrivate
 
 
-using BPrivate::NotOwningEntryRef;
+using ::BPrivate::NotOwningEntryRef;
 
 
 #endif	// _NOT_OWNING_ENTRY_REF_H
