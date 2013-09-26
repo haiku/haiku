@@ -186,6 +186,7 @@ provides {
 }
 
 requires {
+	lib:libcurl
 	lib:libfreetype
 #ifndef HAIKU_BOOTSTRAP_BUILD
 	lib:libjpeg
