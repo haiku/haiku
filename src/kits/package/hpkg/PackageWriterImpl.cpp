@@ -655,7 +655,8 @@ PackageWriterImpl::_CheckLicenses()
 		= systemLicensePath.SetTo(HAIKU_BUILD_SYSTEM_DATA_DIRECTORY);
 #endif
 	if (result != B_OK) {
-		fListener->PrintError("unable to find system data path!\n");
+		fListener->PrintError("unable to find system data path: %s!\n",
+			strerror(result));
 		return result;
 	}
 	if ((result = systemLicensePath.Append("licenses")) != B_OK) {
