@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons translators tiff ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UseLibraryHeaders tiff zlib ;
+UseLibraryHeaders tiff ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
@@ -17,7 +17,7 @@ Translator TIFFTranslator :
 	TIFFView.cpp
 
 	: be libtiff.so translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	: true
 ;
 
@@ -28,8 +28,3 @@ DoCatalogs TIFFTranslator :
 	TIFFTranslator.cpp
 	TIFFView.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	TIFFTranslator :
-	boot home config add-ons Translators ;
-

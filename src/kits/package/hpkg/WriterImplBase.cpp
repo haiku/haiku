@@ -18,10 +18,11 @@
 
 #include <AutoDeleter.h>
 
-#include <package/hpkg/HPKGDefsPrivate.h>
-
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/ErrorOutput.h>
+
+#include <package/hpkg/HPKGDefsPrivate.h>
+#include <package/hpkg/PackageFileHeapWriter.h>
 
 
 namespace BPackageKit {
@@ -176,105 +177,8 @@ WriterImplBase::AttributeValue::_ApplicableIntEncoding(uint64 value)
 }
 
 
-// #pragma mark - AbstractDataWriter
-
-
-WriterImplBase::AbstractDataWriter::AbstractDataWriter()
-	:
-	fBytesWritten(0)
-{
-}
-
-
-WriterImplBase::AbstractDataWriter::~AbstractDataWriter()
-{
-}
-
-
-// #pragma mark - FDDataWriter
-
-
-WriterImplBase::FDDataWriter::FDDataWriter(int fd, off_t offset,
-	BErrorOutput* errorOutput)
-	:
-	fFD(fd),
-	fOffset(offset),
-	fErrorOutput(errorOutput)
-{
-}
-
-
-status_t
-WriterImplBase::FDDataWriter::WriteDataNoThrow(const void* buffer, size_t size)
-{
-	ssize_t bytesWritten = pwrite(fFD, buffer, size, fOffset);
-	if (bytesWritten < 0) {
-		fErrorOutput->PrintError(
-			"WriteDataNoThrow(%p, %lu) failed to write data: %s\n", buffer,
-			size, strerror(errno));
-		return errno;
-	}
-	if ((size_t)bytesWritten != size) {
-		fErrorOutput->PrintError(
-			"WriteDataNoThrow(%p, %lu) failed to write all data\n", buffer,
-			size);
-		return B_ERROR;
-	}
-
-	fOffset += size;
-	fBytesWritten += size;
-	return B_OK;
-}
-
-
-// #pragma mark - ZlibDataWriter
-
-
-WriterImplBase::ZlibDataWriter::ZlibDataWriter(AbstractDataWriter* dataWriter)
-	:
-	fDataWriter(dataWriter),
-	fCompressor(this)
-{
-}
-
-
-void
-WriterImplBase::ZlibDataWriter::Init()
-{
-	status_t error = fCompressor.Init();
-	if (error != B_OK)
-		throw status_t(error);
-}
-
-
-void
-WriterImplBase::ZlibDataWriter::Finish()
-{
-	status_t error = fCompressor.Finish();
-	if (error != B_OK)
-		throw status_t(error);
-}
-
-
-status_t
-WriterImplBase::ZlibDataWriter::WriteDataNoThrow(const void* buffer,
-	size_t size)
-{
-	status_t error = fCompressor.CompressNext(buffer, size);
-	if (error == B_OK)
-		fBytesWritten += size;
-	return error;
-}
-
-
-status_t
-WriterImplBase::ZlibDataWriter::WriteData(const void* buffer, size_t size)
-{
-	return fDataWriter->WriteDataNoThrow(buffer, size);
-}
-
-
 // #pragma mark - PackageAttribute
+
 
 WriterImplBase::PackageAttribute::PackageAttribute(BHPKGAttributeID id_,
 	uint8 type_, uint8 encoding_)
@@ -310,11 +214,13 @@ WriterImplBase::PackageAttribute::_DeleteChildren()
 // #pragma mark - WriterImplBase
 
 
-WriterImplBase::WriterImplBase(BErrorOutput* errorOutput)
+WriterImplBase::WriterImplBase(const char* fileType, BErrorOutput* errorOutput)
 	:
+	fHeapWriter(NULL),
+	fFileType(fileType),
 	fErrorOutput(errorOutput),
 	fFileName(NULL),
-	fFlags(0),
+	fParameters(),
 	fFD(-1),
 	fFinished(false),
 	fDataWriter(NULL)
@@ -324,36 +230,46 @@ WriterImplBase::WriterImplBase(BErrorOutput* errorOutput)
 
 WriterImplBase::~WriterImplBase()
 {
+	delete fHeapWriter;
+
 	if (fFD >= 0)
 		close(fFD);
 
 	if (!fFinished && fFileName != NULL
-		&& (fFlags & B_HPKG_WRITER_UPDATE_PACKAGE) == 0) {
+		&& (Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) == 0) {
 		unlink(fFileName);
 	}
 }
 
 
 status_t
-WriterImplBase::Init(const char* fileName, const char* type, uint32 flags)
+WriterImplBase::Init(const char* fileName, size_t headerSize,
+	const BPackageWriterParameters& parameters)
 {
+	fParameters = parameters;
+
 	if (fPackageStringCache.Init() != B_OK)
 		throw std::bad_alloc();
 
 	// open file (don't truncate in update mode)
 	int openMode = O_RDWR;
-	if ((flags & B_HPKG_WRITER_UPDATE_PACKAGE) == 0)
+	if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) == 0)
 		openMode |= O_CREAT | O_TRUNC;
 
 	fFD = open(fileName, openMode, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 	if (fFD < 0) {
-		fErrorOutput->PrintError("Failed to open %s file \"%s\": %s\n", type,
-			fileName, strerror(errno));
+		fErrorOutput->PrintError("Failed to open %s file \"%s\": %s\n",
+			fFileType, fileName, strerror(errno));
 		return errno;
 	}
 
 	fFileName = fileName;
-	fFlags = flags;
+
+	// create heap writer
+	fHeapWriter = new PackageFileHeapWriter(fErrorOutput, FD(), headerSize,
+		fParameters.CompressionLevel());
+	fHeapWriter->Init();
+	fDataWriter = fHeapWriter->DataWriter();
 
 	return B_OK;
 }
@@ -364,40 +280,28 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	const BPackageInfo& packageInfo)
 {
 	// name
-	PackageAttribute* name = new PackageAttribute(
-		B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	name->string = fPackageStringCache.Get(packageInfo.Name().String());
-	attributeList.Add(name);
+	AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_NAME, packageInfo.Name(),
+		attributeList);
 
 	// summary
-	PackageAttribute* summary = new PackageAttribute(
-		B_HPKG_ATTRIBUTE_ID_PACKAGE_SUMMARY, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	summary->string = fPackageStringCache.Get(packageInfo.Summary().String());
-	attributeList.Add(summary);
+	AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_SUMMARY,
+		packageInfo.Summary(), attributeList);
 
 	// description
-	PackageAttribute* description = new PackageAttribute(
-		B_HPKG_ATTRIBUTE_ID_PACKAGE_DESCRIPTION, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	description->string
-		= fPackageStringCache.Get(packageInfo.Description().String());
-	attributeList.Add(description);
+	AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_DESCRIPTION,
+		packageInfo.Description(), attributeList);
 
 	// vendor
-	PackageAttribute* vendor = new PackageAttribute(
-		B_HPKG_ATTRIBUTE_ID_PACKAGE_VENDOR, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	vendor->string = fPackageStringCache.Get(packageInfo.Vendor().String());
-	attributeList.Add(vendor);
+	AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_VENDOR,
+		packageInfo.Vendor(), attributeList);
 
 	// packager
-	PackageAttribute* packager = new PackageAttribute(
-		B_HPKG_ATTRIBUTE_ID_PACKAGE_PACKAGER, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	packager->string = fPackageStringCache.Get(packageInfo.Packager().String());
-	attributeList.Add(packager);
+	AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_PACKAGER,
+		packageInfo.Packager(), attributeList);
+
+	// base package (optional)
+	_AddStringAttributeIfNotEmpty(B_HPKG_ATTRIBUTE_ID_PACKAGE_BASE_PACKAGE,
+		packageInfo.BasePackage(), attributeList);
 
 	// flags
 	PackageAttribute* flags = new PackageAttribute(
@@ -417,45 +321,20 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 	RegisterPackageVersion(attributeList, packageInfo.Version());
 
 	// copyright list
-	const BStringList& copyrightList = packageInfo.CopyrightList();
-	for (int i = 0; i < copyrightList.CountStrings(); ++i) {
-		PackageAttribute* copyright = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		copyright->string = fPackageStringCache.Get(copyrightList.StringAt(i));
-		attributeList.Add(copyright);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_COPYRIGHT,
+			packageInfo.CopyrightList(), attributeList);
 
 	// license list
-	const BStringList& licenseList = packageInfo.LicenseList();
-	for (int i = 0; i < licenseList.CountStrings(); ++i) {
-		PackageAttribute* license = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		license->string = fPackageStringCache.Get(licenseList.StringAt(i));
-		attributeList.Add(license);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_LICENSE,
+		packageInfo.LicenseList(), attributeList);
 
 	// URL list
-	const BStringList& urlList = packageInfo.URLList();
-	for (int i = 0; i < urlList.CountStrings(); ++i) {
-		PackageAttribute* url = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_URL, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		url->string = fPackageStringCache.Get(urlList.StringAt(i));
-		attributeList.Add(url);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_URL,
+		packageInfo.URLList(), attributeList);
 
 	// source URL list
-	const BStringList& sourceURLList = packageInfo.SourceURLList();
-	for (int i = 0; i < sourceURLList.CountStrings(); ++i) {
-		PackageAttribute* url = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL,
-			B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		url->string = fPackageStringCache.Get(sourceURLList.StringAt(i));
-		attributeList.Add(url);
-	}
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_SOURCE_URL,
+		packageInfo.SourceURLList(), attributeList);
 
 	// provides list
 	const BObjectList<BPackageResolvable>& providesList
@@ -466,17 +345,9 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		bool hasCompatibleVersion
 			= resolvable->CompatibleVersion().InitCheck() == B_OK;
 
-		PackageAttribute* provides = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		provides->string = fPackageStringCache.Get(resolvable->Name().String());
-		attributeList.Add(provides);
-
-		PackageAttribute* providesType = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES_TYPE,
-			B_HPKG_ATTRIBUTE_TYPE_UINT, B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
-		providesType->unsignedInt = resolvable->Type();
-		provides->children.Add(providesType);
+		PackageAttribute* provides = AddStringAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_PROVIDES, resolvable->Name(),
+			attributeList);
 
 		if (hasVersion)
 			RegisterPackageVersion(provides->children, resolvable->Version());
@@ -505,35 +376,98 @@ WriterImplBase::RegisterPackageInfo(PackageAttributeList& attributeList,
 		packageInfo.FreshensList(), B_HPKG_ATTRIBUTE_ID_PACKAGE_FRESHENS);
 
 	// replaces list
-	const BStringList& replacesList = packageInfo.ReplacesList();
-	for (int i = 0; i < replacesList.CountStrings(); ++i) {
-		PackageAttribute* replaces = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		replaces->string = fPackageStringCache.Get(replacesList.StringAt(i));
-		attributeList.Add(replaces);
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_REPLACES,
+		packageInfo.ReplacesList(), attributeList);
+
+	// global writable file info list
+	const BObjectList<BGlobalWritableFileInfo>& globalWritableFileInfos
+		= packageInfo.GlobalWritableFileInfos();
+	for (int32 i = 0; i < globalWritableFileInfos.CountItems(); ++i) {
+		BGlobalWritableFileInfo* info = globalWritableFileInfos.ItemAt(i);
+		PackageAttribute* attribute = AddStringAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_GLOBAL_WRITABLE_FILE, info->Path(),
+			attributeList);
+
+		if (info->IsDirectory()) {
+			PackageAttribute* isDirectoryAttribute = new PackageAttribute(
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY,
+				B_HPKG_ATTRIBUTE_TYPE_UINT,
+				B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+			isDirectoryAttribute->unsignedInt = 1;
+			attribute->children.Add(isDirectoryAttribute);
+		}
+
+		if (info->IsIncluded()) {
+			PackageAttribute* updateTypeAttribute = new PackageAttribute(
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_WRITABLE_FILE_UPDATE_TYPE,
+				B_HPKG_ATTRIBUTE_TYPE_UINT,
+				B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+			updateTypeAttribute->unsignedInt = info->UpdateType();
+			attribute->children.Add(updateTypeAttribute);
+		}
 	}
+
+	// user settings file info list
+	const BObjectList<BUserSettingsFileInfo>& userSettingsFileInfos
+		= packageInfo.UserSettingsFileInfos();
+	for (int32 i = 0; i < userSettingsFileInfos.CountItems(); ++i) {
+		BUserSettingsFileInfo* info = userSettingsFileInfos.ItemAt(i);
+		PackageAttribute* attribute = AddStringAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SETTINGS_FILE, info->Path(),
+			attributeList);
+
+		if (info->IsDirectory()) {
+			PackageAttribute* isDirectoryAttribute = new PackageAttribute(
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_IS_WRITABLE_DIRECTORY,
+				B_HPKG_ATTRIBUTE_TYPE_UINT,
+				B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
+			isDirectoryAttribute->unsignedInt = 1;
+			attribute->children.Add(isDirectoryAttribute);
+		} else {
+			_AddStringAttributeIfNotEmpty(
+				B_HPKG_ATTRIBUTE_ID_PACKAGE_SETTINGS_FILE_TEMPLATE,
+				info->TemplatePath(), attribute->children);
+		}
+	}
+
+	// user list
+	const BObjectList<BUser>& users = packageInfo.Users();
+	for (int32 i = 0; i < users.CountItems(); ++i) {
+		const BUser* user = users.ItemAt(i);
+		PackageAttribute* attribute = AddStringAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER, user->Name(), attributeList);
+
+		_AddStringAttributeIfNotEmpty(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_REAL_NAME, user->RealName(),
+			attribute->children);
+		_AddStringAttributeIfNotEmpty(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_HOME, user->Home(),
+			attribute->children);
+		_AddStringAttributeIfNotEmpty(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_SHELL, user->Shell(),
+			attribute->children);
+
+		for (int32 k = 0; k < user->Groups().CountStrings(); k++) {
+			AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_USER_GROUP,
+				user->Groups().StringAt(k), attribute->children);
+		}
+	}
+
+	// group list
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_GROUP,
+		packageInfo.Groups(), attributeList);
+
+	// post install script list
+	_AddStringAttributeList(B_HPKG_ATTRIBUTE_ID_PACKAGE_POST_INSTALL_SCRIPT,
+		packageInfo.PostInstallScripts(), attributeList);
 
 	// checksum (optional, only exists in repositories)
-	if (packageInfo.Checksum().Length() > 0) {
-		PackageAttribute* checksum = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_CHECKSUM, B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		checksum->string
-			= fPackageStringCache.Get(packageInfo.Checksum().String());
-		attributeList.Add(checksum);
-	}
+	_AddStringAttributeIfNotEmpty(B_HPKG_ATTRIBUTE_ID_PACKAGE_CHECKSUM,
+		packageInfo.Checksum(), attributeList);
 
 	// install path (optional)
-	if (!packageInfo.InstallPath().IsEmpty()) {
-		PackageAttribute* installPath = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_INSTALL_PATH,
-			B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		installPath->string = fPackageStringCache.Get(
-			packageInfo.InstallPath().String());
-		attributeList.Add(installPath);
-	}
+	_AddStringAttributeIfNotEmpty(B_HPKG_ATTRIBUTE_ID_PACKAGE_INSTALL_PATH,
+		packageInfo.InstallPath(), attributeList);
 }
 
 
@@ -541,48 +475,27 @@ void
 WriterImplBase::RegisterPackageVersion(PackageAttributeList& attributeList,
 	const BPackageVersion& version, BHPKGAttributeID attributeID)
 {
-	PackageAttribute* versionMajor = new PackageAttribute(
-		attributeID, B_HPKG_ATTRIBUTE_TYPE_STRING,
-		B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-	versionMajor->string = fPackageStringCache.Get(version.Major().String());
-	attributeList.Add(versionMajor);
+	PackageAttribute* versionMajor = AddStringAttribute(attributeID,
+		version.Major(), attributeList);
 
-	if (version.Minor().Length() > 0) {
-		PackageAttribute* versionMinor = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR,
-			B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		versionMinor->string
-			= fPackageStringCache.Get(version.Minor().String());
-		versionMajor->children.Add(versionMinor);
-
-		if (version.Micro().Length() > 0) {
-			PackageAttribute* versionMicro = new PackageAttribute(
-				B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MICRO,
-				B_HPKG_ATTRIBUTE_TYPE_STRING,
-				B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-			versionMicro->string
-				= fPackageStringCache.Get(version.Micro().String());
-			versionMajor->children.Add(versionMicro);
-		}
+	if (!version.Minor().IsEmpty()) {
+		AddStringAttribute(B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MINOR,
+			version.Minor(), versionMajor->children);
+		_AddStringAttributeIfNotEmpty(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_MICRO, version.Micro(),
+			versionMajor->children);
 	}
 
-	if (!version.PreRelease().IsEmpty()) {
-		PackageAttribute* preRelease = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_PRE_RELEASE,
-			B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		preRelease->string
-			= fPackageStringCache.Get(version.PreRelease().String());
-		versionMajor->children.Add(preRelease);
-	}
+	_AddStringAttributeIfNotEmpty(
+		B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_PRE_RELEASE,
+		version.PreRelease(), versionMajor->children);
 
-	if (version.Release() != 0) {
-		PackageAttribute* versionRelease = new PackageAttribute(
-			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_RELEASE,
-			B_HPKG_ATTRIBUTE_TYPE_UINT, B_HPKG_ATTRIBUTE_ENCODING_INT_8_BIT);
-		versionRelease->unsignedInt = version.Release();
-		versionMajor->children.Add(versionRelease);
+	if (version.Revision() != 0) {
+		PackageAttribute* versionRevision = new PackageAttribute(
+			B_HPKG_ATTRIBUTE_ID_PACKAGE_VERSION_REVISION,
+			B_HPKG_ATTRIBUTE_TYPE_UINT, B_HPKG_ATTRIBUTE_ENCODING_INT_32_BIT);
+		versionRevision->unsignedInt = version.Revision();
+		versionMajor->children.Add(versionRevision);
 	}
 }
 
@@ -594,15 +507,10 @@ WriterImplBase::RegisterPackageResolvableExpressionList(
 {
 	for (int i = 0; i < expressionList.CountItems(); ++i) {
 		BPackageResolvableExpression* resolvableExpr = expressionList.ItemAt(i);
-		bool hasVersion = resolvableExpr->Version().InitCheck() == B_OK;
+		PackageAttribute* name = AddStringAttribute((BHPKGAttributeID)id,
+			resolvableExpr->Name(), attributeList);
 
-		PackageAttribute* name = new PackageAttribute((BHPKGAttributeID)id,
-			B_HPKG_ATTRIBUTE_TYPE_STRING,
-			B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
-		name->string = fPackageStringCache.Get(resolvableExpr->Name().String());
-		attributeList.Add(name);
-
-		if (hasVersion) {
+		if (resolvableExpr->Version().InitCheck() == B_OK) {
 			PackageAttribute* op = new PackageAttribute(
 				B_HPKG_ATTRIBUTE_ID_PACKAGE_RESOLVABLE_OPERATOR,
 				B_HPKG_ATTRIBUTE_TYPE_UINT,
@@ -612,6 +520,18 @@ WriterImplBase::RegisterPackageResolvableExpressionList(
 			RegisterPackageVersion(name->children, resolvableExpr->Version());
 		}
 	}
+}
+
+
+WriterImplBase::PackageAttribute*
+WriterImplBase::AddStringAttribute(BHPKGAttributeID id, const BString& value,
+	DoublyLinkedList<PackageAttribute>& list)
+{
+	PackageAttribute* attribute = new PackageAttribute(id,
+		B_HPKG_ATTRIBUTE_TYPE_STRING, B_HPKG_ATTRIBUTE_ENCODING_STRING_TABLE);
+	attribute->string = fPackageStringCache.Get(value);
+	list.Add(attribute);
+	return attribute;
 }
 
 
@@ -665,8 +585,10 @@ WriterImplBase::WritePackageAttributes(
 	uint32& _stringsLengthUncompressed)
 {
 	// write the cached strings
+	uint64 startOffset = fHeapWriter->UncompressedHeapSize();
 	uint32 stringsCount = WriteCachedStrings(fPackageStringCache, 2);
-	_stringsLengthUncompressed = DataWriter()->BytesWritten();
+	_stringsLengthUncompressed
+		= fHeapWriter->UncompressedHeapSize() - startOffset;
 
 	_WritePackageAttributes(packageAttributes);
 
@@ -755,20 +677,29 @@ WriterImplBase::WriteUnsignedLEB128(uint64 value)
 
 
 void
-WriterImplBase::WriteBuffer(const void* buffer, size_t size, off_t offset)
+WriterImplBase::RawWriteBuffer(const void* buffer, size_t size, off_t offset)
 {
 	ssize_t bytesWritten = pwrite(fFD, buffer, size, offset);
 	if (bytesWritten < 0) {
 		fErrorOutput->PrintError(
-			"WriteBuffer(%p, %lu) failed to write data: %s\n", buffer, size,
+			"RawWriteBuffer(%p, %lu) failed to write data: %s\n", buffer, size,
 			strerror(errno));
 		throw status_t(errno);
 	}
 	if ((size_t)bytesWritten != size) {
 		fErrorOutput->PrintError(
-			"WriteBuffer(%p, %lu) failed to write all data\n", buffer, size);
+			"RawWriteBuffer(%p, %lu) failed to write all data\n", buffer, size);
 		throw status_t(B_ERROR);
 	}
+}
+
+
+void
+WriterImplBase::_AddStringAttributeList(BHPKGAttributeID id,
+	const BStringList& value, DoublyLinkedList<PackageAttribute>& list)
+{
+	for (int32 i = 0; i < value.CountStrings(); i++)
+		AddStringAttribute(id, value.StringAt(i), list);
 }
 
 
@@ -782,7 +713,7 @@ WriterImplBase::_WritePackageAttributes(
 		uint8 encoding = attribute->ApplicableEncoding();
 
 		// write tag
-		WriteUnsignedLEB128(HPKG_ATTRIBUTE_TAG_COMPOSE(
+		WriteUnsignedLEB128(compose_attribute_tag(
 			attribute->id, attribute->type, encoding,
 			!attribute->children.IsEmpty()));
 

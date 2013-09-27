@@ -1,11 +1,19 @@
 SubDir HAIKU_TOP src system glue ;
 
-UsePrivateSystemHeaders ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		UsePrivateSystemHeaders ;
 
-KernelObjects
-	init_term_dyn.c
-	start_dyn.c
-	haiku_version_glue.c
-;
+		Objects
+			init_term_dyn.c
+			start_dyn.c
+			haiku_version_glue.c
+			;
+	}
+}
 
-SubInclude HAIKU_TOP src system glue arch ;
+local arch ;
+for arch in $(TARGET_ARCHS) {
+	SubInclude HAIKU_TOP src system glue arch $(arch) ;
+}

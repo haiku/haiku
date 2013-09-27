@@ -31,7 +31,3 @@ BinCommand ppp_up :
 HaikuInstall install-networking
 	: /boot/beos/bin
 	: ppp_up ;
-
-Package haiku-networkingkit-cvs :
-	ppp_up :
-	boot beos bin ;

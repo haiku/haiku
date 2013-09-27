@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src system boot ;
 
 DEFINES += _BOOT_MODE ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
+					$(TARGET_KERNEL_ARCH) ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix string ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix stdlib ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix locale ] ;
@@ -11,6 +13,7 @@ UsePrivateHeaders [ FDirName libroot locale ] ;
 
 BootMergeObject boot_libroot.o :
 	abs.c
+	atomic.S
 	ctype.cpp
 	LocaleData.cpp
 	qsort.c
@@ -27,6 +30,7 @@ BootMergeObject boot_libroot.o :
 	strncmp.c
 	strcat.c
 	strcpy.c
+	strerror.c
 	strlcat.c
 	strlcpy.c
 	strchr.c
@@ -54,8 +58,13 @@ BootLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	boot_amiga_ffs.a
 	boot_tarfs.a
 	boot_fatfs.a
+	boot_packagefs.a
 
-	# needed by tarfs and video_splash.cpp
+	boot_loader.a
+		# a second time, so undefined references in the file systems can be
+		# resolved
+
+	# needed by tarfs, packagefs, and video_splash.cpp
 	boot_zlib.a
 
 	# libroot functions needed by the stage2 boot loader
@@ -79,7 +88,7 @@ rule BuildCoffLoader {
 
 actions BuildCoffLoader bind HACK_COFF {
 	rm -f $(1)
-	$(TARGET_OBJCOPY) -O $(COFF_FORMAT) $(2) $(1)
+	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O $(COFF_FORMAT) $(2) $(1)
 	#$(CP) $(2) $(1)
 	$(HACK_COFF) $(1)
 }
@@ -102,7 +111,7 @@ rule BuildBiosLoader {
 
 actions BuildBiosLoader {
 	rm -f $(1)
-	$(TARGET_OBJCOPY) -O binary $(2) $(1)
+	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O binary $(2) $(1)
 }
 
 BuildBiosLoader haiku_loader : boot_loader_$(TARGET_BOOT_PLATFORM) ;

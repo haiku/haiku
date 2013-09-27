@@ -51,6 +51,7 @@ namespace BPrivate {
 #define B_PRINTER_SPOOL_MIMETYPE	"application/x-vnd.Be.printer-spool"
 
 #define kPlainTextMimeType			"text/plain"
+#define kVirtualDirectoryMimeType	"application/x-vnd.haiku-virtual-directory"
 
 #define kBitmapMimeType				"image/x-vnd.Be-bitmap"
 #define kLargeIconType				"icon/large"

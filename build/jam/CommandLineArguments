@@ -66,6 +66,16 @@ rule ProcessCommandLineArguments
 				}
 			}
 
+			# Copy the given set of local package files to the remote repository
+			# and create a new version of that remote repository.
+			case build-remote-repository : {
+				BuildRemoteHaikuPortsRepository $(JAM_TARGETS[1])
+					: $(JAM_TARGETS[2-]) ;
+				JAM_TARGETS = $(JAM_TARGETS[1]) ;
+				NotFile $(JAM_TARGETS) ;
+				Always $(JAM_TARGETS) ;
+			}
+
 			# A target starting with "@" is a build profile.
 			case @* : {
 				HAIKU_BUILD_PROFILE = [ Match "@(.*)" : $(JAM_TARGETS[1]) ] ;
@@ -81,7 +91,9 @@ rule ProcessCommandLineArguments
 				if $(JAM_TARGETS[1]) in update-image update-vmware-image
 						update-install {
 					SetUpdateHaikuImageOnly 1 ;
+					HAIKU_PACKAGES_UPDATE_ONLY = 1 ;
 					HAIKU_INCLUDE_IN_IMAGE on $(JAM_TARGETS[2-]) = 1 ;
+					HAIKU_INCLUDE_IN_PACKAGES on $(JAM_TARGETS[2-]) = 1 ;
 
 					if $(JAM_TARGETS[1]) = update-image {
 						JAM_TARGETS = haiku-image ;

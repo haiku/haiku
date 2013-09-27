@@ -72,7 +72,7 @@ Translator JPEG2000Translator :
 	$(jasper_files)
 
 	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	: true
 ;
 
@@ -82,8 +82,3 @@ DoCatalogs JPEG2000Translator :
 	JPEG2000Translator.h
 	JPEG2000Translator.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	JPEG2000Translator :
-	boot home config add-ons Translators ;
-

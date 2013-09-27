@@ -201,8 +201,8 @@ public:
 			KPath path(B_PATH_NAME_LENGTH + 1);
 			if (path.InitCheck() != B_OK
 				|| vfs_entry_ref_to_path(event->device, event->directory,
-						event->name, path.LockBuffer(),
-				path.BufferSize()) != B_OK) {
+					event->name, true, path.LockBuffer(),
+					path.BufferSize()) != B_OK) {
 				delete event;
 				return B_ERROR;
 			}

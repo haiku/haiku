@@ -40,23 +40,18 @@ Server registrar
 	WatchingService.cpp
 
 	# mime
-	AssociatedTypes.cpp
 	CreateAppMetaMimeThread.cpp
-	Database.cpp
-	InstalledTypes.cpp
 	MimeSnifferAddon.cpp
 	MimeSnifferAddonManager.cpp
 	MimeUpdateThread.cpp
 	RegistrarThread.cpp
 	RegistrarThreadManager.cpp
-	SnifferRules.cpp
-	Supertype.cpp
-	SupportingApps.cpp
 	UpdateMimeInfoThread.cpp
 	:
+	libstorage_kit_mime.a
 	be
 	$(TARGET_LIBSTDC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	:
 	registrar.rdef
 ;

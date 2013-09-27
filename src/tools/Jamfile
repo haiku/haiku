@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tools ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
 UsePrivateBuildHeaders app storage ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src/bin ] ;
@@ -21,16 +20,6 @@ local tools =
 ;
 
 USES_BE_API on $(tools) = true ;
-
-# TODO: temporary kludge
-local libHaikuCompat ;
-if $(HOST_PLATFORM) in r5 bone dano {
-	ObjectC++Flags database_support.cpp UpdateMimeInfoThread.cpp
-		MimeUpdateThread.cpp
-		: -include [ FDirName $(HAIKU_TOP) headers build
-			HaikuBuildCompatibility.h ] ;
-	libHaikuCompat = libhaikucompat_build.a ;
-}
 
 BuildPlatformMain <build>catattr : catattr.cpp : $(HOST_LIBBE) ;
 
@@ -55,39 +44,16 @@ BuildPlatformMain <build>generate_boot_screen :
 
 BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
 
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	AddResources <build>mimeset : mimeset.rdef ;
-}
-
-local mimesetSources =
-	mimeset.cpp
-	Mime.cpp
-	database_support.cpp
-	UpdateMimeInfoThread.cpp
-	MimeUpdateThread.cpp
-;
-
-if $(HOST_PLATFORM) = haiku_host {
-	mimesetSources += AppFileInfo.cpp ;
-}
-
 BuildPlatformMain <build>mimeset :
-	$(mimesetSources)
-	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) $(libHaikuCompat)
+	mimeset.cpp
+	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;
-
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	SEARCH on [ FGristFiles AppFileInfo.cpp ]
-		= [ FDirName $(HAIKU_TOP) src build libbe storage ] ;
-
-	SourceSysHdrs AppFileInfo.cpp UpdateMimeInfoThread.cpp
-		: [ FDirName  $(HAIKU_TOP) headers build os storage ] ;
-}
 
 BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>rm_attrs_tmp : rm_attrs.cpp
 	: $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) ;
+PLATFORM on <build>rm_attrs = host ;
 MakeLocateDebug <build>rm_attrs ;
 File <build>rm_attrs : <build>rm_attrs_tmp ;
 MODE on <build>rm_attrs = 755 ;
@@ -102,7 +68,7 @@ BuildPlatformMain <build>settype : settype.cpp : $(HOST_LIBBE)
 	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
 BuildPlatformMain <build>setversion : setversion.cpp : $(HOST_LIBBE)
-	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) $(libHaikuCompat) ;
+	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
 BuildPlatformMain <build>xres : xres.cpp : $(HOST_LIBBE) $(HOST_LIBSTDC++)
 	$(HOST_LIBSUPC++) ;
@@ -123,18 +89,21 @@ SubInclude HAIKU_TOP src tools addattr ;
 SubInclude HAIKU_TOP src tools anyboot ;
 SubInclude HAIKU_TOP src tools bfs_shell ;
 SubInclude HAIKU_TOP src tools cppunit ;
+SubInclude HAIKU_TOP src tools create_repository_config ;
 SubInclude HAIKU_TOP src tools docbook ;
 SubInclude HAIKU_TOP src tools elfsymbolpatcher ;
 SubInclude HAIKU_TOP src tools fixup_amiga_boot_checksum ;
 SubInclude HAIKU_TOP src tools fixup_tos_boot_checksum ;
 SubInclude HAIKU_TOP src tools fs_shell ;
 SubInclude HAIKU_TOP src tools gensyscalls ;
+SubInclude HAIKU_TOP src tools get_package_dependencies ;
 SubInclude HAIKU_TOP src tools hack_coff ;
 SubInclude HAIKU_TOP src tools keymap ;
 SubInclude HAIKU_TOP src tools locale ;
 SubInclude HAIKU_TOP src tools makebootable ;
 SubInclude HAIKU_TOP src tools opd_to_package_info ;
 SubInclude HAIKU_TOP src tools package ;
+SubInclude HAIKU_TOP src tools package_repo ;
 SubInclude HAIKU_TOP src tools rc ;
 SubInclude HAIKU_TOP src tools remote_disk_server ;
 SubInclude HAIKU_TOP src tools resattr ;

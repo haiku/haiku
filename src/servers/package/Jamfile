@@ -1,0 +1,26 @@
+SubDir HAIKU_TOP src servers package ;
+
+UsePrivateSystemHeaders ;
+UsePrivateHeaders app interface kernel shared storage ;
+
+Server package_daemon
+	:
+	DebugSupport.cpp
+	Exception.cpp
+	FSTransaction.cpp
+	FSUtils.cpp
+	Job.cpp
+	JobQueue.cpp
+	Package.cpp
+	PackageDaemon.cpp
+	PackageManager.cpp
+	ProblemWindow.cpp
+	ResultWindow.cpp
+	Root.cpp
+	Volume.cpp
+	:
+	be package
+	$(TARGET_LIBSTDC++)
+	:
+	package_daemon.rdef
+	;

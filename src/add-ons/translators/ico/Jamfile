@@ -13,7 +13,7 @@ Translator ICOTranslator :
 	ConfigView.cpp
 	ICO.cpp
 	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	: true
 ;
 
@@ -24,8 +24,3 @@ DoCatalogs ICOTranslator :
 	ConfigView.cpp
 	ICOTranslator.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	ICOTranslator
-	: boot home config add-ons Translators
-	;

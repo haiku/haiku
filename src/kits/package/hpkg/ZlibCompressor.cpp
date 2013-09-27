@@ -38,7 +38,7 @@ ZlibCompressor::~ZlibCompressor()
 
 
 status_t
-ZlibCompressor::Init()
+ZlibCompressor::Init(int compressionLevel)
 {
 	// initialize the stream
 	fStream.next_in = NULL;
@@ -56,7 +56,7 @@ ZlibCompressor::Init()
 	fStream.adler = 0;
 	fStream.reserved = 0;
 
-	int zlibError = deflateInit(&fStream, Z_BEST_COMPRESSION);
+	int zlibError = deflateInit(&fStream, compressionLevel);
 	if (zlibError != Z_OK)
 		return TranslateZlibError(zlibError);
 
@@ -128,7 +128,8 @@ ZlibCompressor::Finish()
 
 /*static*/ status_t
 ZlibCompressor::CompressSingleBuffer(const void* input, size_t inputSize,
-	void* output, size_t outputSize, size_t& _compressedSize)
+	void* output, size_t outputSize, size_t& _compressedSize,
+	int compressionLevel)
 {
 	if (inputSize == 0 || outputSize == 0)
 		return B_BAD_VALUE;
@@ -136,10 +137,10 @@ ZlibCompressor::CompressSingleBuffer(const void* input, size_t inputSize,
 	// prepare stream
 	z_stream zStream = {
 		(Bytef*)input,				// next_in
-		inputSize,					// avail_in
+		uInt(inputSize),			// avail_in
 		0,							// total_in
 		(Bytef*)output,				// next_out
-		outputSize,					// avail_out
+		uInt(outputSize),			// avail_out
 		0,							// total_out
 		0,							// msg
 		0,							// state;
@@ -151,7 +152,7 @@ ZlibCompressor::CompressSingleBuffer(const void* input, size_t inputSize,
 		0							// reserved
 	};
 
-	int zlibError = deflateInit(&zStream, Z_BEST_COMPRESSION);
+	int zlibError = deflateInit(&zStream, compressionLevel);
 	if (zlibError != Z_OK)
 		return TranslateZlibError(zlibError);
 

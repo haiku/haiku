@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src system kernel lib zlib ;
+
+local zlibSourceDirectory = [ BuildFeatureAttribute zlib : sources : path ] ;
+UseHeaders $(zlibSourceDirectory) ;
+UseHeaders $(zlibSourceDirectory) : true ;
+
+local zlibSources =
+	inflate.c
+	inffast.c
+	inftrees.c
+	adler32.c
+	crc32.c
+	zutil.c
+	;
+
+LOCATE on [ FGristFiles $(zlibSources) ] = $(zlibSourceDirectory) ;
+Depends [ FGristFiles $(zlibSources) ]
+	: [ BuildFeatureAttribute zlib : sources ] ;
+
+# Build zlib with PIC, such that it can be used by kernel add-ons (filesystems).
+KernelStaticLibrary kernel_libz.a :
+	$(zlibSources)
+	;

@@ -9,14 +9,3 @@ UsePrivateHeaders [ FDirName graphics neomagic ] ;
 KernelAddon neomagic :
 	driver.c
 ;
-
-Package haiku-neomagic-cvs :
-	README.html UPDATE.html ;
-Package haiku-neomagic-cvs :
-	neomagic :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-neomagic-cvs : graphics neomagic ;
-Package haiku-neomagic-cvs :
-	neomagic.settings :
-	boot home config settings kernel drivers ;
-

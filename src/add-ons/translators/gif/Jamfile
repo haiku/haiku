@@ -18,7 +18,7 @@ Translator GIFTranslator :
 	SavePalette.cpp
 	SFHash.cpp
 	:
-	be translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	be translation $(TARGET_LIBSUPC++) localestub
 	: true
 ;
 
@@ -28,9 +28,3 @@ DoCatalogs GIFTranslator :
 	GIFTranslator.cpp
 	GIFView.cpp
 ;
-
-
-Package haiku-translationkit-cvs :
-	GIFTranslator :
-	boot home config add-ons Translators ;
-

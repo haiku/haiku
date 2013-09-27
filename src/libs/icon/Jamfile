@@ -13,52 +13,57 @@ local sourceDirs =
 	transformer
 ;
 
-local sourceDir ;
-for sourceDir in $(sourceDirs) {
-	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs icon $(sourceDir) ] ;
-}
-
 # system headers
 UseLibraryHeaders agg icon ;
 
 UsePrivateHeaders shared ;
 
-StaticLibrary libicon.a :
-	# flat_icon
-	FlatIconFormat.cpp
-	FlatIconImporter.cpp
-	LittleEndianBuffer.cpp
-	PathCommandQueue.cpp
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local sourceDir ;
+		for sourceDir in $(sourceDirs) {
+			SEARCH_SOURCE
+				+= [ FDirName $(HAIKU_TOP) src libs icon $(sourceDir) ] ;
+		}
 
-	# message
-	Defines.cpp
-	MessageImporter.cpp
+		StaticLibrary [ MultiArchDefaultGristFiles libicon.a ] :
+			# flat_icon
+			FlatIconFormat.cpp
+			FlatIconImporter.cpp
+			LittleEndianBuffer.cpp
+			PathCommandQueue.cpp
 
-	# shape
-	PathContainer.cpp
-	Shape.cpp
-	ShapeContainer.cpp
-	VectorPath.cpp
+			# message
+			Defines.cpp
+			MessageImporter.cpp
 
-	# style
-	GradientTransformable.cpp
-	Style.cpp
-	StyleContainer.cpp
+			# shape
+			PathContainer.cpp
+			Shape.cpp
+			ShapeContainer.cpp
+			VectorPath.cpp
 
-	# transformable
-	Transformable.cpp
+			# style
+			GradientTransformable.cpp
+			Style.cpp
+			StyleContainer.cpp
 
-	# transformer
-	AffineTransformer.cpp
-	ContourTransformer.cpp
-	PathSource.cpp
-	PerspectiveTransformer.cpp
-	StrokeTransformer.cpp
-	Transformer.cpp
-	TransformerFactory.cpp
+			# transformable
+			Transformable.cpp
 
-	Icon.cpp
-	IconRenderer.cpp
-	IconUtils.cpp
-;
+			# transformer
+			AffineTransformer.cpp
+			ContourTransformer.cpp
+			PathSource.cpp
+			PerspectiveTransformer.cpp
+			StrokeTransformer.cpp
+			Transformer.cpp
+			TransformerFactory.cpp
 
+			Icon.cpp
+			IconRenderer.cpp
+			IconUtils.cpp
+			;
+	}
+}

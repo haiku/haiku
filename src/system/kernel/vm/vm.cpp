@@ -1133,8 +1133,8 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 	addressRestrictions.address = address;
 	addressRestrictions.address_specification = B_EXACT_ADDRESS;
 	status = map_backing_store(addressSpace, cache, 0, name, size,
-		B_ALREADY_WIRED, B_ALREADY_WIRED, REGION_NO_PRIVATE_MAP, 0,
-		&addressRestrictions, true, &area, NULL);
+		B_ALREADY_WIRED, 0, REGION_NO_PRIVATE_MAP, 0, &addressRestrictions,
+		true, &area, NULL);
 	if (status != B_OK) {
 		cache->ReleaseRefAndUnlock();
 		return status;

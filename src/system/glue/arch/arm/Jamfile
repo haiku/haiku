@@ -1,7 +1,11 @@
 SubDir HAIKU_TOP src system glue arch arm ;
 
-KernelObjects
-	crti.S
-	crtn.S
-	;
-
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup arm ] {
+	on $(architectureObject) {
+		Objects
+			crti.S
+			crtn.S
+			;
+	}
+}

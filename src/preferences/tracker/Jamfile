@@ -4,7 +4,7 @@ Preference <preference>Tracker
 	:
 	TrackerPreferences.cpp
 	:
-	be $(HAIKU_LOCALE_LIBS)
+	be localestub
 	:
 	TrackerPreferences.rdef
 ;

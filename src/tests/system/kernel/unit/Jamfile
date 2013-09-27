@@ -16,7 +16,7 @@ KernelAddon kernel_unit_tests :
 	:
 	<nogrist>kernel_unit_tests_lock.o
 
-	$(TARGET_STATIC_LIBSUPC++)
+	$(HAIKU_STATIC_LIBSUPC++_$(TARGET_PACKAGING_ARCH))
 ;
 
 

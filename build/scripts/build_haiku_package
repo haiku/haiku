@@ -1,0 +1,125 @@
+#!/bin/sh
+set -o errexit
+
+# The first argument is the shell script that initializes the variables:
+# addBuildCompatibilityLibDir
+# mimeDB
+# outputDir
+# sourceDir
+# tmpDir
+# compressionLevel
+# updateOnly
+# cc
+#
+# addattr
+# copyattr
+# mimeset
+# package
+# rc
+# rmAttrs
+# unzip
+#
+
+if [ $# -le 1 ]; then
+	echo "$0: Missing parameters!" >&2
+	exit 1
+fi
+
+packagePath="$1"
+packageInfoPath="$2"
+shift 2
+
+if [ $# -gt 0 ]; then
+	. $1
+	shift
+fi
+
+# this adds the build library dir to LD_LIBRARY_PATH
+eval "$addBuildCompatibilityLibDir"
+
+
+# make a clean contents dir
+packageName=`basename "$packagePath"`
+echo "$packageName: Removing and re-creating package contents dir ..."
+contentsDir="$tmpDir/contents"
+$rmAttrs -rf "$contentsDir"
+mkdir -p "$contentsDir"
+
+
+# map the shell commands
+sPrefix=
+tPrefix="$contentsDir/"
+cd=cd
+scd=:
+cp="$copyattr -d"
+copyAttrs="$copyattr"
+ln=ln
+mkdir=mkdir
+rm=$rmAttrs
+mkindex=mkindex
+
+
+extractFile()
+{
+	# extractFile <archive> <directory> <extractedSubDir>
+	archiveFile=$1
+	targetExtractedDir=$2
+	extractedSubDir=$3
+
+	extractDir=$tmpDir/extract
+	$rmAttrs -rf "$extractDir"
+	mkdir -p "$extractDir"
+
+	case "$archiveFile" in
+		*.zip)
+			$unzip -q -d "$extractDir" "$archiveFile"
+			;;
+		*.tgz|*.tar.gz)
+			tar -C "$extractDir" -xf "$archiveFile"
+			;;
+		*.hpkg)
+			if [ -n "$extractedSubDir" ]; then
+				$package extract -C "$extractDir" "$archiveFile" \
+					"$extractedSubDir"
+			else
+				$package extract -C "$extractDir" "$archiveFile"
+			fi
+			;;
+		*)
+			echo "Unhandled archive extension in build_haiku_image" \
+				"extractFile()"
+			exit 1
+			;;
+	esac
+
+	$cp -r "${sPrefix}$extractDir/$extractedSubDir/." \
+		"${tPrefix}$targetExtractedDir"
+
+	$rmAttrs -rf "$extractDir"
+}
+
+
+# execute the scripts preparing the package contents
+echo "$packageName: Collecting package contents ..."
+while [ $# -gt 0 ]; do
+	. $1
+	shift
+done
+
+
+# mimeset the whole package content
+echo "$packageName: mimeset'ing package contents ..."
+$mimeset --mimedb "$mimeDB" "$contentsDir"
+
+
+# create the package
+if [ ! $updateOnly ]; then
+	echo "$packageName: Creating the package ..."
+	rm -f "$packagePath"
+	$package create -q "-$compressionLevel" -i "$packageInfoPath" \
+		-C "$contentsDir" "$packagePath"
+else
+	echo "$packageName: Updating the package ..."
+	$package add -q -f "-$compressionLevel" -i "$packageInfoPath" \
+		-C "$contentsDir" "$packagePath" .
+fi

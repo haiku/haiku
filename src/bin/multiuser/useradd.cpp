@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de. All Rights Reserved.
+ * Copyright 2008-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -30,9 +30,27 @@ extern const char *__progname;
 
 
 static const char* kUsage =
-"Usage: %s [ -d <home> ] [ -e <expiration> ] [ -f <inactive> ] [ -g <gid> ]\n"
-"          [ -s <shell> ] [ -n <real name> ]\n"
-;
+	"Usage: %s [ <options> ] <user name>\n"
+	"Creates a new user <user name>.\n"
+	"\n"
+	"Options:\n"
+	"  -d <home>\n"
+	"    Specifies the home directory for the new user.\n"
+	"  -e <expiration>\n"
+	"    Specifies the expiration date for the new user's account.\n"
+	"  -f <inactive>\n"
+	"    Specifies the number of days after the expiration of the new user's "
+			"password\n"
+	"    until the account expires.\n"
+	"  -g <gid>\n"
+	"    Specifies the new user's primary group by ID or name.\n"
+	"  -h, --help\n"
+	"    Print usage info.\n"
+	"  -s <shell>\n"
+	"    Specifies the new user's login shell.\n"
+	"  -n <real name>\n"
+	"    Specifies the new user's real name.\n"
+	;
 
 static void
 print_usage_and_exit(bool error)
@@ -48,7 +66,7 @@ main(int argc, const char* const* argv)
 	const char* home = "/boot/home";
 	int expiration = 99999;
 	int inactive = -1;
-	gid_t gid = 100;
+	const char* group = NULL;
 	const char* shell = "/bin/sh";
 	const char* realName = "";
 
@@ -83,8 +101,10 @@ main(int argc, const char* const* argv)
 				break;
 
 			case 'g':
-				gid = atoi(optarg);
+			{
+				group = optarg;
 				break;
+			}
 
 			case 'h':
 				print_usage_and_exit(false);
@@ -110,7 +130,7 @@ main(int argc, const char* const* argv)
 	const char* user = argv[optind];
 
 	if (geteuid() != 0) {
-		fprintf(stderr, "Error: You need to be root.\n");
+		fprintf(stderr, "Error: Only root may add users.\n");
 		exit(1);
 	}
 
@@ -120,40 +140,56 @@ main(int argc, const char* const* argv)
 		exit(1);
 	}
 
-	// read password
-	char password[LINE_MAX];
-	if (read_password("password for user: ", password, sizeof(password),
-			false) != B_OK) {
-		exit(1);
+	// get group ID
+	gid_t gid = 100;
+	if (group != NULL) {
+		char* end;
+		gid = strtol(group, &end, 0);
+		if (*end == '\0') {
+			// seems to be a number
+			if (gid < 1) {
+				fprintf(stderr, "Error: Invalid group ID \"%s\".\n",
+					group);
+				exit(1);
+			}
+		} else {
+			// must be a group name -- get it
+			char* buffer = NULL;
+			ssize_t bufferSize = sysconf(_SC_GETGR_R_SIZE_MAX);
+			if (bufferSize <= 0)
+				bufferSize = 256;
+			for (;;) {
+				buffer = (char*)realloc(buffer, bufferSize);
+				if (buffer == NULL) {
+					fprintf(stderr, "Error: Out of memory!\n");
+					exit(1);
+				}
+
+				struct group groupBuffer;
+				struct group* groupFound;
+				int error = getgrnam_r(group, &groupBuffer, buffer, bufferSize,
+					&groupFound);
+				if (error == ERANGE) {
+					bufferSize *= 2;
+					continue;
+				}
+
+				if (error != 0) {
+					fprintf(stderr, "Error: Failed to get info for group "
+						"\"%s\".\n", group);
+					exit(1);
+				}
+				if (groupFound == NULL) {
+					fprintf(stderr, "Error: Specified group \"%s\" doesn't "
+						"exist.\n", group);
+					exit(1);
+				}
+
+				gid = groupFound->gr_gid;
+				break;
+			}
+		}
 	}
-
-	if (strlen(password) >= MAX_SHADOW_PWD_PASSWORD_LEN) {
-		fprintf(stderr, "Error: The password is too long.\n");
-		exit(1);
-	}
-
-	// read password again
-	char repeatedPassword[LINE_MAX];
-	if (read_password("repeat password: ", repeatedPassword,
-			sizeof(repeatedPassword), false) != B_OK) {
-		exit(1);
-	}
-
-	// passwords need to match
-	if (strcmp(password, repeatedPassword) != 0) {
-		fprintf(stderr, "Error: passwords don't match\n");
-		exit(1);
-	}
-
-	memset(repeatedPassword, 0, sizeof(repeatedPassword));
-
-	// crypt it
-	char* encryptedPassword;
-	if (strlen(password) > 0) {
-		encryptedPassword = crypt(password, user);
-		memset(password, 0, sizeof(password));
-	} else
-		encryptedPassword = password;
 
 	// find an unused UID
 	uid_t uid = 1000;
@@ -169,7 +205,7 @@ main(int argc, const char* const* argv)
 		|| message.AddString("home", home) != B_OK
 		|| message.AddString("shell", shell) != B_OK
 		|| message.AddString("real name", realName) != B_OK
-		|| message.AddString("shadow password", encryptedPassword) != B_OK
+		|| message.AddString("shadow password", "!") != B_OK
 		|| message.AddInt32("last changed", time(NULL)) != B_OK
 		|| message.AddInt32("min", min) != B_OK
 		|| message.AddInt32("max", max) != B_OK

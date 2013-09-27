@@ -6,71 +6,79 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 
-local sslSources ;
-local md5Sources ;
-if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
-	SubDirC++Flags -DOPENSSL_ENABLED ;
-	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
-	sslSources = SSL.cpp ;
-	md5Sources = ;
-	Includes [ FGristFiles $(sslSources) SecureSocket.cpp HttpAuthentication.cpp ]
-		: $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
-		# Dependency needed to trigger downloading/unzipping the package before
-		# compiling the files.
-	SetupFeatureObjectsDir ssl ;
-} else {
-	# As we don't have md5 from ssl, use our own
-	md5Sources = md5.c ;
-	SetupFeatureObjectsDir no-ssl ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local sslSources ;
+		local md5Sources ;
+		if [ FIsBuildFeatureEnabled openssl ] {
+			SubDirC++Flags -DOPENSSL_ENABLED ;
+			UseBuildFeatureHeaders openssl ;
+			sslSources = SSL.cpp ;
+			md5Sources = ;
+			Includes [ FGristFiles $(sslSources) SecureSocket.cpp
+					HttpAuthentication.cpp ]
+				: [ BuildFeatureAttribute openssl : headers ] ;
+				# Dependency needed to trigger downloading/unzipping the package before
+				# compiling the files.
+			SetupFeatureObjectsDir ssl ;
+		} else {
+			# As we don't have md5 from ssl, use our own
+			md5Sources = md5.c ;
+			SetupFeatureObjectsDir no-ssl ;
+		}
+
+		SharedLibrary [ MultiArchDefaultGristFiles libbnetapi.so ] :
+			init.cpp
+			DynamicBuffer.cpp
+			NetEndpoint.cpp
+			NetAddress.cpp
+			NetBuffer.cpp
+			NetDebug.cpp
+
+			$(sslSources)
+
+			NetworkAddress.cpp
+			NetworkAddressResolver.cpp
+			NetworkCookie.cpp
+			NetworkCookieJar.cpp
+			NetworkDevice.cpp
+			NetworkInterface.cpp
+			NetworkRoster.cpp
+
+			AbstractSocket.cpp
+			DatagramSocket.cpp
+			Socket.cpp
+			SecureSocket.cpp
+
+			# TODO: The HTTP stuff should all go into an add-on. It needs
+			# linking against libcrypto.so and only the add-on should link
+			# against it.
+			# Building of the commented out files has not been completely tested
+			# after integrating the code from the GSoC 2010 "Services Kit"
+			# project and doing some renaming of types, constants and methods.
+			HttpAuthentication.cpp
+			HttpHeaders.cpp
+			HttpForm.cpp
+			HttpTime.cpp
+
+			$(md5Sources)
+
+			Url.cpp
+			UrlContext.cpp
+			UrlProtocol.cpp
+			UrlProtocolAsynchronousListener.cpp
+			UrlProtocolDispatchingListener.cpp
+			UrlProtocolHttp.cpp # TODO: -> add-on, See above.
+			UrlProtocolListener.cpp
+			UrlRequest.cpp
+			UrlResult.cpp
+			UrlSynchronousRequest.cpp
+
+			:
+			be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
+			[ BuildFeatureAttribute openssl : libraries ]
+			[ MultiArchDefaultGristFiles libshared.a ]
+			;
+	}
 }
-
-SharedLibrary libbnetapi.so :
-	init.cpp
-	DynamicBuffer.cpp
-	NetEndpoint.cpp
-	NetAddress.cpp
-	NetBuffer.cpp
-	NetDebug.cpp
-
-	$(sslSources)
-
-	NetworkAddress.cpp
-	NetworkAddressResolver.cpp
-	NetworkCookie.cpp
-	NetworkCookieJar.cpp
-	NetworkDevice.cpp
-	NetworkInterface.cpp
-	NetworkRoster.cpp
-
-	AbstractSocket.cpp
-	DatagramSocket.cpp
-	Socket.cpp
-	SecureSocket.cpp
-
-	# TODO: The HTTP stuff should all go into an add-on. It needs linking
-	# against libcrypto.so and only the add-on should link against it.
-	# Building of the commented out files has not been completely tested after
-	# integrating the code from the GSoC 2010 "Services Kit" project and doing
-	# some renaming of types, constants and methods.
-	HttpAuthentication.cpp
-	HttpHeaders.cpp
-	HttpForm.cpp
-	HttpTime.cpp
-
-	$(md5Sources)
-
-	Url.cpp
-	UrlContext.cpp
-	UrlProtocol.cpp
-	UrlProtocolAsynchronousListener.cpp
-	UrlProtocolDispatchingListener.cpp
-	UrlProtocolHttp.cpp # TODO: -> add-on, See above.
-	UrlProtocolListener.cpp
-	UrlRequest.cpp
-	UrlResult.cpp
-	UrlSynchronousRequest.cpp
-
-	:
-	be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) $(HAIKU_OPENSSL_LIBS)
-	libshared.a
-;

@@ -1,0 +1,308 @@
+local architecture = $(HAIKU_PACKAGING_ARCHS[1]) ;
+
+
+local haikuPackage = haiku.hpkg ;
+HaikuPackage $(haikuPackage) ;
+
+
+# wifi firmware
+for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
+	local package = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGE) ] ;
+	local archive = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVE) ] ;
+	local extract = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_DO_EXTRACT) ] ;
+	if $(archive) {
+		AddWifiFirmwareToPackage $(driver) : $(package) : $(archive)
+			: $(extract) ;
+	}
+	local packages = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGES) ] ;
+	local archives = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVES) ] ;
+	for archive in $(archives) {
+		AddWifiFirmwareToPackage $(driver) : $(packages[1]) : $(archive)
+			: $(extract) ;
+		packages = $(packages[2-]) ;
+	}
+}
+
+
+# modules
+AddFilesToPackage add-ons kernel bus_managers : $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
+AddFilesToPackage add-ons kernel busses agp_gart : <agp_gart>intel@x86 ;
+
+if $(HAIKU_ATA_STACK) = 1 {
+	AddFilesToPackage add-ons kernel busses ata
+		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
+} else {
+	AddFilesToPackage add-ons kernel busses ide
+		: generic_ide_pci it8211 legacy_sata silicon_image_3112 ide_isa@x86 ;
+}
+
+AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
+AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci ;
+AddFilesToPackage add-ons kernel busses virtio : virtio_pci ;
+AddFilesToPackage add-ons kernel console : vga_text ;
+AddFilesToPackage add-ons kernel debugger
+	: <kdebug>demangle <kdebug>disasm@x86 <kdebug>hangman
+	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>qrencode
+	  <kdebug>run_on_exit ;
+AddFilesToPackage add-ons kernel file_systems : $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
+AddFilesToPackage add-ons kernel generic
+	: ata_adapter@ata bios@x86,x86_64 dpc ide_adapter@ide
+		locked_pool mpu401 scsi_periph <module>tty ;
+AddFilesToPackage add-ons kernel partitioning_systems
+	: amiga_rdb apple efi_gpt intel session ;
+AddFilesToPackage add-ons kernel interrupt_controllers : openpic@ppc ;
+
+if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
+	AddFilesToPackage add-ons kernel cpu : generic_x86 ;
+}
+
+# drivers
+AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
+AddNewDriversToPackage disk virtual : virtio_block ;
+AddNewDriversToPackage power		: enhanced_speedstep@x86 ;
+AddNewDriversToPackage power		: acpi_battery@x86 ;
+#AddNewDriversToPackage display		: display_controls@x86 ;
+
+# legacy drivers
+AddDriversToPackage					: console dprintf null random <driver>tty
+										zero ;
+AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
+AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
+AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
+AddDriversToPackage bus				: usb_raw fw_raw@x86 ;
+AddDriversToPackage disk floppy		: pc_floppy@x86 ;
+AddDriversToPackage disk usb		: usb_disk ;
+AddDriversToPackage disk usb		: usb_floppy ;
+AddDriversToPackage printer usb		: usb_printer ;
+AddDriversToPackage disk virtual	: nbd ;
+AddDriversToPackage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
+AddDriversToPackage input			: ps2_hid usb_hid wacom ;
+AddDriversToPackage misc			: <driver>poke <driver>mem ;
+AddDriversToPackage net				: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+AddDriversToPackage ports			: usb_serial ;
+AddDriversToPackage power			: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
+
+# kernel
+AddFilesToPackage : <revisioned>kernel_$(TARGET_ARCH) ;
+
+# libs
+AddLibrariesToPackage lib
+	: [ HaikuImageGetSystemLibs ] [ HaikuImageGetPrivateSystemLibs ] ;
+
+# libnetwork.so replaces quite a few libraries
+if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
+	local libNetworkAliases = libsocket.so libbind.so libnet.so ;
+	local lib ;
+	for lib in $(libNetworkAliases) {
+		AddSymlinkToPackage lib : libnetwork.so : $(lib) ;
+	}
+
+	AddSymlinkToPackage lib : libbnetapi.so : libnetapi.so ;
+}
+
+
+# servers
+AddFilesToPackage servers : $(SYSTEM_SERVERS) ;
+
+# apps
+AddFilesToPackage  				: runtime_loader Deskbar Tracker ;
+AddFilesToPackage bin			: $(SYSTEM_BIN) consoled ;
+AddFilesToPackage apps			: $(SYSTEM_APPS) ;
+AddFilesToPackage preferences	: $(SYSTEM_PREFERENCES) ;
+AddFilesToPackage demos			: $(SYSTEM_DEMOS) ;
+
+SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage bin : which ;
+SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToPackage bin : install-wifi-firmwares.sh ;
+
+AddSymlinkToPackage bin : bash : sh ;
+AddSymlinkToPackage bin : trash : untrash ;
+AddSymlinkToPackage bin : less : more ;
+AddSymlinkToPackage bin : gzip : gunzip ;
+AddSymlinkToPackage bin : gzip : zcat ;
+AddSymlinkToPackage bin : zdiff : zcmp ;
+AddSymlinkToPackage bin : unzip : zipinfo ;
+AddSymlinkToPackage bin : gawk : awk ;
+
+# scripts and data files
+local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript
+	InstallerInitScript InstallerFinishScript ;
+SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
+AddFilesToPackage boot : $(bootScripts) ;
+
+# post install scripts
+local postInstallFiles = default_deskbar_items.sh ;
+postInstallFiles = $(postInstallFiles:G=post-install) ;
+SEARCH on $(postInstallFiles)
+	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
+AddFilesToPackage boot post-install : $(postInstallFiles) ;
+
+local fortuneFiles = [ Glob $(HAIKU_TOP)/data/system/data/fortunes
+	: [a-zA-Z0-9]* ] ;
+fortuneFiles = $(fortuneFiles:G=data!fortunes) ;
+AddFilesToPackage data fortunes : $(fortuneFiles) ;
+
+local fontDir = [ FDirName $(HAIKU_TOP) data system data fonts ] ;
+local psFonts = [ Glob $(fontDir)/psfonts : *.afm *.pfb ] ;
+local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
+AddFilesToPackage data fonts psfonts : $(psFonts) ;
+AddFilesToPackage data fonts ttfonts : $(ttFonts) ;
+
+local keymapFiles = [ Glob [ FDirName $(HAIKU_TOP) src data keymaps ]
+	: *.keymap ] ;
+keymapFiles = $(keymapFiles:BG=keymap) ;
+AddFilesToPackage data Keymaps : $(keymapFiles) ;
+AddSymlinkToPackage data Keymaps : Swedish : Finnish ;
+AddSymlinkToPackage data Keymaps : Slovene : Croatian ;
+AddSymlinkToPackage data Keymaps : US-International : Brazilian ;
+
+# Copy keyboard layout files to the image one-by-one.
+local keyboardLayoutsDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
+local keyboardLayoutFiles =
+	"Generic 104-key"
+	"Generic 105-key International"
+	"Kinesis Advantage"
+	"Kinesis Ergo Elan International"
+	"TypeMatrix 2030" ;
+keyboardLayoutFiles = $(keyboardLayoutFiles:G=keyboard-layout) ;
+SEARCH on $(keyboardLayoutFiles) = $(keyboardLayoutsDir) ;
+AddFilesToPackage data KeyboardLayouts
+	: $(keyboardLayoutFiles) ;
+
+# Add Apple Aluminum keyboard layout files to the image in an Apple Aluminum
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local appleAluminumDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts
+		Apple\ Aluminum ] ;
+local appleAluminumFiles =
+	"Apple Aluminium Extended International"
+	"Apple Aluminium International"
+	"Apple Aluminum (US)"
+	"Apple Aluminum Extended (US)" ;
+appleAluminumFiles = $(appleAluminumFiles:G=keyboard-layout) ;
+SEARCH on $(appleAluminumFiles) = $(appleAluminumDir) ;
+AddFilesToPackage data KeyboardLayouts Apple\ Aluminum
+	: $(appleAluminumFiles) ;
+
+# Add ThinkPad keyboard layout files to the image in a ThinkPad
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local thinkpadDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ThinkPad ] ;
+local thinkPadFiles =
+	"ThinkPad (US)"
+	"ThinkPad International"
+	"ThinkPad T400s (US)"
+	"ThinkPad T400s International"
+	"ThinkPad X1 (US)"
+	"ThinkPad X1 International"
+	"ThinkPad X100e (US)"
+	"ThinkPad X100e International" ;
+thinkPadFiles = $(thinkPadFiles:G=keyboard-layout) ;
+SEARCH on $(thinkPadFiles) = $(thinkpadDir) ;
+AddFilesToPackage data KeyboardLayouts ThinkPad
+	: $(thinkPadFiles) ;
+
+# boot module links
+AddBootModuleSymlinksToPackage
+	acpi@x86 ata@ata pci isa@x86 config_manager dpc
+	ide@ide scsi usb
+	openpic@ppc
+	ata_adapter@ata ide_adapter@ide locked_pool scsi_periph
+	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112
+	ide_isa@x86
+	<usb>uhci <usb>ohci <usb>ehci
+	scsi_cd scsi_disk usb_disk
+	virtio virtio_pci virtio_block virtio_scsi
+	efi_gpt
+	intel
+	bfs packagefs
+;
+
+# add-ons
+AddFilesToPackage add-ons accelerants	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
+AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
+AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
+
+AddFilesToPackage add-ons Tracker
+	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O
+		Open\ Terminal-T ZipOMatic-Z ;
+AddSymlinkToPackage add-ons Tracker
+	: /boot/system/preferences/Backgrounds : Background-B ;
+AddSymlinkToPackage add-ons Tracker
+	: /boot/system/apps/TextSearch : TextSearch-G ;
+AddSymlinkToPackage add-ons Tracker
+	: /boot/system/apps/DiskUsage : DiskUsage-I ;
+
+AddFilesToPackage add-ons input_server devices
+	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
+AddFilesToPackage add-ons input_server filters
+	: screen_saver shortcut_catcher ;
+
+AddFilesToPackage add-ons kernel network : <net>notifications stack ;
+AddFilesToPackage add-ons kernel network : dns_resolver ;
+AddFilesToPackage add-ons kernel network devices : $(SYSTEM_NETWORK_DEVICES) ;
+AddFilesToPackage add-ons kernel network datalink_protocols
+	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
+AddFilesToPackage add-ons kernel network ppp: $(SYSTEM_NETWORK_PPP) ;
+AddFilesToPackage add-ons kernel network protocols
+	: $(SYSTEM_NETWORK_PROTOCOLS) ;
+
+AddFilesToPackage add-ons disk_systems
+	: <disk_system>intel <disk_system>gpt <disk_system>bfs <disk_system>ntfs ;
+
+
+# the MIME DB
+CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;
+
+
+# Deskbar menu symlinks
+
+# "Applications" links
+DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap DeskCalc
+	Devices DiskProbe DriveSetup DiskUsage Expander Installer
+	StyledEdit Terminal
+;
+local linkTarget ;
+for linkTarget in $(DESKBAR_APPLICATIONS) {
+	AddSymlinkToPackage data deskbar menu Applications
+		: ../../../../apps/$(linkTarget) : $(linkTarget) ;
+}
+
+# "Desktop applets" links
+DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
+	Workspaces
+;
+for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
+	AddSymlinkToPackage data deskbar menu Desktop\ applets
+		: ../../../../apps/$(linkTarget) : $(linkTarget) ;
+}
+
+# "Preferences" links
+AddDirectoryToPackage data deskbar menu Preferences ;
+DESKBAR_PREFERENCES = $(SYSTEM_PREFERENCES:B) ;
+for linkTarget in $(DESKBAR_PREFERENCES) {
+	AddSymlinkToPackage data deskbar menu Preferences
+		: ../../../../preferences/$(linkTarget)
+		: $(linkTarget) ;
+}
+
+# Deskbar menu entries file
+AddFilesToPackage data deskbar : <deskbar>menu_entries ;
+
+
+# licenses
+CopyDirectoryToPackage data
+	: [ FDirName $(HAIKU_TOP) data system data licenses ]
+	: licenses ;
+
+# Copy documentation as per DiskUsage's license requirement.
+CopyDirectoryToPackage documentation
+	: [ FDirName $(HAIKU_TOP) docs apps diskusage ]
+	: diskusage ;
+
+
+BuildHaikuPackage $(haikuPackage) : haiku ;

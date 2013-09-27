@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tools gensyscalls ;
 
-SubDirHdrs [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
-
 
 # What want to do here is analyze the <syscalls.h> header and generate headers
 # and sources containing information about the syscalls (like what parameters
@@ -21,135 +19,173 @@ SubDirHdrs [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 # * gensyscalls.cpp and the generated gensyscalls_infos.cpp are compiled into
 #	the gensyscalls tool.
 # * gensyscalls has options to generate the various output files:
-#	- <syscalls>syscalls.S.inc: Used to define the syscall functions in libroot.
-#	- <syscalls>syscall_dispatcher.h: Big "switch" statement for the syscall
-#	  dispatcher in the kernel.
-#	- <syscalls>syscall_numbers.h: Macro definitions assigning indices to the
-#	  syscalls.
-#	- <syscalls>syscall_table.h: An array with syscall information in the
-#	  kernel. Used for dispatching syscalls e.g. for x86.
-#	- <syscalls>strace_syscalls.h: Syscall information needed by strace.
+#	- <syscalls!$(architecture>syscalls.S.inc: Used to define the syscall
+#     functions in libroot.
+#	- <syscalls!$(architecture>syscall_dispatcher.h: Big "switch" statement for
+#     the syscall dispatcher in the kernel.
+#	- <syscalls!$(architecture>syscall_numbers.h: Macro definitions assigning
+#     indices to the syscalls.
+#	- <syscalls!$(architecture>syscall_table.h: An array with syscall
+#     information in the kernel. Used for dispatching syscalls e.g. for x86.
+#	- <syscalls!$(architecture>strace_syscalls.h: Syscall information needed by
+#     strace.
 
 
-# preprocess the syscalls header
-
-rule PreprocessSyscalls
+rule PreprocessSyscalls preprocessedHeader : header : architecture
 {
-	# PreprocessSyscalls <preprocessedHeader> : <header> ;
+	# PreprocessSyscalls <preprocessedHeader> : <header> : <architecture> ;
 
-	Depends $(<) : $(>) ;
+	Depends $(preprocessedHeader) : $(header) ;
 
-	local headers = [ on $(1) return $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
+	local headers = [ on $(preprocessedHeader)
+		return $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
 	local sysHeaders =
-		$(TARGET_PRIVATE_SYSTEM_HEADERS)
-		[ ArchHeaders $(TARGET_KERNEL_ARCH) ]
-		[ on $(1) return $(SUBDIRSYSHDRS) $(SYSHDRS) ]
-		$(HAIKU_HDRS) ;
+		$(TARGET_PRIVATE_SYSTEM_HEADERS_$(architecture))
+		[ ArchHeaders $(TARGET_ARCH_$(architecture)) ]
+		[ on $(preprocessedHeader) return $(SUBDIRSYSHDRS) $(SYSHDRS) ]
+		$(TARGET_HDRS_$(architecture)) ;
 
-	HDRS on $(<) = $(headers) ;
-	SYSHDRS on $(<) = $(sysHeaders) ;
+	HDRS on $(preprocessedHeader) = $(headers) ;
+	SYSHDRS on $(preprocessedHeader) = $(sysHeaders) ;
 
-	HDRRULE on $(>) = HdrRule ;
-	HDRSCAN on $(>) = $(HDRPATTERN) ;
-	HDRSEARCH on $(>) = $(headers) $(sysHeaders) $(STDHDRS) ;
-	HDRGRIST on $(>) = $(HDRGRIST) ;
+	HDRRULE on $(header) = HdrRule ;
+	HDRSCAN on $(header) = $(HDRPATTERN) ;
+	HDRSEARCH on $(header) = $(headers) $(sysHeaders) $(STDHDRS) ;
+	HDRGRIST on $(header) = $(HDRGRIST) ;
 
-	DEFINES on $(<) += $(HAIKU_DEFINES) GEN_SYSCALL_INFOS_PROCESSING ;
+	DEFINES on $(preprocessedHeader) += $(TARGET_DEFINES_$(architecture))
+		$(TARGET_DEFINES) GEN_SYSCALL_INFOS_PROCESSING ;
 
-	CCFLAGS on $(<) += $(HAIKU_CCFLAGS) $(SUBDIRCCFLAGS) $(OPTIM) ;
-	CCHDRS on $(<) = [ FIncludes $(headers) : $(HAIKU_LOCAL_INCLUDES_OPTION) ]
-		$(HAIKU_INCLUDES_SEPARATOR)
-		[ FSysIncludes $(sysHeaders) : $(HAIKU_SYSTEM_INCLUDES_OPTION) ] ;
-	CCDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
+	CC on $(preprocessedHeader) = $(TARGET_C++_$(architecture)) ;
+	CCFLAGS on $(preprocessedHeader) += $(TARGET_CCFLAGS_$(architecture))
+		$(SUBDIRCCFLAGS) $(OPTIM) ;
+	CCHDRS on $(preprocessedHeader) =
+		[ FIncludes $(headers)
+			: $(TARGET_LOCAL_INCLUDES_OPTION_$(architecture)) ]
+		$(TARGET_INCLUDES_SEPARATOR_$(architecture))
+		[ FSysIncludes $(sysHeaders)
+			: $(TARGET_SYSTEM_INCLUDES_OPTION_$(architecture)) ] ;
+	CCDEFS on $(preprocessedHeader)
+		= [ on $(preprocessedHeader) FDefines $(DEFINES) ] ;
 }
+
 
 actions PreprocessSyscalls
 {
-	$(HAIKU_C++) -xc++ -E "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
+	$(CC) -xc++ -E "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
 }
 
-local syscallsHeader = [ FGristFiles syscalls.h ] ;
-SEARCH on $(syscallsHeader) = [ FDirName $(HAIKU_TOP) headers private system ] ;
 
-# Generate the preprocessed syscalls.h header. It will be parsed by
-# gensyscallinfos (it contains marker #pragmas).
-local syscallsHeaderPPParsable = [ FGristFiles syscalls.h.pp.parsable ] ;
-MakeLocateArch $(syscallsHeaderPPParsable) ;
-PreprocessSyscalls $(syscallsHeaderPPParsable) : $(syscallsHeader) ;
-
-
-# build gensyscallinfos
-
-BuildPlatformMain gensyscallinfos
-	: gensyscallinfos.cpp
-	: $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
-;
-
-
-# generate the syscall infos source file and the source for the header it
-# includes
-
-local syscallInfos = [ FGristFiles gensyscalls_infos.cpp ] ;
-local syscallTypesSizesSource = [ FGristFiles syscall_types_sizes.h.cpp ] ;
-local syscallTypesSizes = [ FGristFiles syscall_types_sizes.h ] ;
-MakeLocateArch $(syscallInfos) $(syscallTypesSizesSource) $(syscallTypesSizes) ;
-
-rule GenSyscallInfos
+rule GenSyscallInfos targets : sources : gensyscallinfos
 {
-	Depends $(1) : gensyscallinfos $(2) ;
-	GenSyscallInfos1 $(1) : gensyscallinfos $(2) ;
+	Depends $(targets) : $(gensyscallinfos) $(sources) ;
+	GenSyscallInfos1 $(targets) : $(gensyscallinfos) $(sources) ;
 }
+
 
 actions GenSyscallInfos1
 {
 	$(2[1]) $(2[2]) $(1)
 }
 
-GenSyscallInfos $(syscallInfos) $(syscallTypesSizesSource)
-	: $(syscallsHeaderPPParsable) ;
 
-TARGET_HDRS on $(syscallTypesSizes)
-	= [ on $(syscallTypesSizes) return $(TARGET_HDRS) ]
-		$(TARGET_PRIVATE_SYSTEM_HEADERS) ;
-CreateAsmStructOffsetsHeader $(syscallTypesSizes) : $(syscallTypesSizesSource) ;
-
-#Includes $(syscallInfos) : $(syscallTypesSizes) ;
-	# explicitly tell jam about the inclusion of the generated header
-Depends $(syscallInfos:S=$(SUFOBJ)) : $(syscallTypesSizes) ;
-	# NOTE: Jam messes up the "Includes" declaration, so we have to declare
-	# the dependency more directly.
-
-
-# build gensyscalls
-
-BuildPlatformMain gensyscalls : gensyscalls.cpp $(syscallInfos) ;
-LinkAgainst gensyscalls : $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
-
-
-# generate the output files
-
-# place them where they are needed
-local dir = $(HAIKU_COMMON_DEBUG_OBJECT_DIR) ;
-MakeLocate <syscalls>syscalls.S.inc : [ FDirName $(dir) system libroot os ] ;
-MakeLocate <syscalls>syscall_dispatcher.h : [ FDirName $(dir) system kernel ] ;
-MakeLocate <syscalls>syscall_numbers.h : [ FDirName $(dir) system kernel ] ;
-MakeLocate <syscalls>syscall_table.h : [ FDirName $(dir) system kernel ] ;
-MakeLocate <syscalls>strace_syscalls.h : [ FDirName $(dir) bin debug strace ] ;
-
-rule GenSyscallsFile file : option
+rule GenSyscallsFile file : gensyscalls : option
 {
 	GENSYSCALLS_FILE_OPTION on $(file) = $(option) ;
-	Depends $(file) : gensyscalls ;
-	GenSyscallsFile1 $(file) : gensyscalls ;
+	Depends $(file) : $(gensyscalls) ;
+	GenSyscallsFile1 $(file) : $(gensyscalls) ;
 }
+
 
 actions GenSyscallsFile1
 {
 	$(2[1]) $(GENSYSCALLS_FILE_OPTION) $(1)
 }
 
-GenSyscallsFile <syscalls>syscalls.S.inc : -c ;
-GenSyscallsFile <syscalls>syscall_dispatcher.h : -d ;
-GenSyscallsFile <syscalls>syscall_numbers.h : -n ;
-GenSyscallsFile <syscalls>syscall_table.h : -t ;
-GenSyscallsFile <syscalls>strace_syscalls.h : -s ;
+
+local syscallsHeader = [ FGristFiles syscalls.h ] ;
+SEARCH on $(syscallsHeader) = [ FDirName $(HAIKU_TOP) headers private system ] ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		# Generate the preprocessed syscalls.h header. It will be parsed by
+		# gensyscallinfos (it contains marker #pragmas).
+		local syscallsHeaderPPParsable
+			= [ FGristFiles syscalls.h.pp.parsable ] ;
+		MakeLocateArch $(syscallsHeaderPPParsable) ;
+		PreprocessSyscalls $(syscallsHeaderPPParsable) : $(syscallsHeader)
+			: $(architecture) ;
+
+		# build gensyscallinfos
+
+		local gensyscallinfos = gensyscallinfos_$(architecture) ;
+		SourceHdrs gensyscallinfos.cpp
+			: [ FDirName $(SUBDIR) arch $(TARGET_ARCH_$(architecture)) ] ;
+		BuildPlatformMain $(gensyscallinfos)
+			: gensyscallinfos.cpp
+			: $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
+			;
+
+		# generate the syscall infos source file and the source for the header
+		# it includes
+
+		local syscallInfos = [ FGristFiles gensyscalls_infos.cpp ] ;
+		local syscallTypesSizesSource
+			= [ FGristFiles syscall_types_sizes.h.cpp ] ;
+		local syscallTypesSizes = [ FGristFiles syscall_types_sizes.h ] ;
+		MakeLocateArch $(syscallInfos) $(syscallTypesSizesSource)
+			$(syscallTypesSizes) ;
+
+		GenSyscallInfos $(syscallInfos) $(syscallTypesSizesSource)
+			: $(syscallsHeaderPPParsable) : $(gensyscallinfos) ;
+
+		TARGET_HDRS_$(architecture) on $(syscallTypesSizes)
+			= [ on $(syscallTypesSizes) return $(TARGET_HDRS_$(architecture)) ]
+				[ FDirName $(SUBDIR) arch $(TARGET_ARCH_$(architecture)) ]
+				$(TARGET_PRIVATE_SYSTEM_HEADERS_$(architecture)) ;
+		CreateAsmStructOffsetsHeader $(syscallTypesSizes)
+			: $(syscallTypesSizesSource) ;
+
+		#Includes $(syscallInfos) : $(syscallTypesSizes) ;
+			# explicitly tell jam about the inclusion of the generated header
+		Depends $(syscallInfos:S=$(SUFOBJ)) : $(syscallTypesSizes) ;
+			# NOTE: Jam messes up the "Includes" declaration, so we have to declare
+			# the dependency more directly.
+
+		# build gensyscalls
+
+		local gensyscalls = gensyscalls_$(architecture) ;
+		BuildPlatformMain $(gensyscalls)
+			: gensyscalls.cpp $(syscallInfos) ;
+		LinkAgainst $(gensyscalls) : $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
+
+		# generate the output files
+
+		# place them where they are needed
+		local dir = $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(architecture)) ;
+		MakeLocate <syscalls!$(architecture)>syscalls.S.inc
+			: [ FDirName $(dir) system libroot os ] ;
+		MakeLocate <syscalls!$(architecture)>syscall_dispatcher.h
+			: [ FDirName $(dir) system kernel ] ;
+		MakeLocate <syscalls!$(architecture)>syscall_numbers.h
+			: [ FDirName $(dir) system kernel ] ;
+		MakeLocate <syscalls!$(architecture)>syscall_table.h
+			: [ FDirName $(dir) system kernel ] ;
+		MakeLocate <syscalls!$(architecture)>strace_syscalls.h
+			: [ FDirName $(dir) bin debug strace ] ;
+
+		GenSyscallsFile <syscalls!$(architecture)>syscalls.S.inc
+			: $(gensyscalls) : -c ;
+		GenSyscallsFile <syscalls!$(architecture)>syscall_dispatcher.h
+			: $(gensyscalls) : -d ;
+		GenSyscallsFile <syscalls!$(architecture)>syscall_numbers.h
+			: $(gensyscalls) : -n ;
+		GenSyscallsFile <syscalls!$(architecture)>syscall_table.h
+			: $(gensyscalls) : -t ;
+		GenSyscallsFile <syscalls!$(architecture)>strace_syscalls.h
+			: $(gensyscalls) : -s ;
+	}
+}

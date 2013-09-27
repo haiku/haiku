@@ -7,7 +7,7 @@ AddResources Icons : Icons.rdef ;
 
 ScreenSaver Icons :
 	IconDisplay.cpp IconsSaver.cpp :
-	be libscreensaver.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	be libscreensaver.so localestub $(TARGET_LIBSUPC++)
 ;
 
 DoCatalogs Icons :

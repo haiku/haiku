@@ -8,26 +8,25 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 UsePrivateHeaders translation textencoding ;
-UsePrivateSystemHeaders ;
 
-SharedLibrary libtranslation.so :
-	BitmapStream.cpp
-	FuncTranslator.cpp
-	TranslationUtils.cpp
-	Translator.cpp
-	TranslatorRoster.cpp
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		UsePrivateSystemHeaders ;
 
-	: be libtextencoding.so $(TARGET_LIBSTDC++)
-;
+		SharedLibrary [ MultiArchDefaultGristFiles libtranslation.so ] :
+			BitmapStream.cpp
+			FuncTranslator.cpp
+			TranslationUtils.cpp
+			Translator.cpp
+			TranslatorRoster.cpp
 
-Package haiku-translationkit-cvs :
-	README.html ;
-
-Package haiku-translationkit-cvs :
-	libtranslation.so :
-	boot home config lib ;
+			: be textencoding $(TARGET_LIBSTDC++)
+			;
+	}
+}
 
 if $(TARGET_PLATFORM) = libbe_test {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR) : libtranslation.so
-		: tests!apps ;
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR)
+		: libtranslation.so : tests!apps ;
 }

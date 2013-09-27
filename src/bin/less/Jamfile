@@ -1,8 +1,9 @@
 SubDir HAIKU_TOP src bin less ;
 
 # filter warnings we don't want here
-TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
-	: -Wall -Wmissing-prototypes ] ;
+TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH)
+	= [ FFilter $(TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH))
+		: -Wall -Wmissing-prototypes ] ;
 
 SubDirCcFlags -DBINDIR='\"/bin\"' -DSYSDIR='\"/etc\"' ;
 

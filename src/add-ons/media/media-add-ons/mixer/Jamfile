@@ -15,12 +15,8 @@ Addon mixer.media_addon :
 	MixerSettings.cpp
 	MixerUtils.cpp
 	Resampler.cpp
-	: be media $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be media $(TARGET_LIBSUPC++) localestub
 ;
-
-Package haiku-mixer-cvs
-	: mixer.media_addon
-	: boot home config add-ons media ;
 
 DoCatalogs mixer.media_addon
 	:

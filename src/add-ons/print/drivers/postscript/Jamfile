@@ -16,7 +16,3 @@ Addon PS\ Compatible :
 	FilterIO.cpp
 	: be libprint.a $(TARGET_LIBSTDC++)
 ;
-
-Package haiku-printingkit-cvs :
-	PS\ Compatible :
-	boot home config add-ons Print ;

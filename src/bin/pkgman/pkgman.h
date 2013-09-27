@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <String.h>
+
 
 extern const char* kProgramName;
 
@@ -35,10 +37,10 @@ do {																\
 
 void	print_usage_and_exit(bool error);
 
-int		command_add_repo(int argc, const char* const* argv);
-int		command_drop_repo(int argc, const char* const* argv);
-int		command_list_repos(int argc, const char* const* argv);
-int		command_refresh(int argc, const char* const* argv);
+
+extern const BString kCommandCategoryPackages;
+extern const BString kCommandCategoryRepositories;
+extern const BString kCommandCategoryOther;
 
 
 #endif	// PKGMAN_H

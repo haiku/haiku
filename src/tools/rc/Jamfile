@@ -15,18 +15,8 @@ SubDirC++Flags -include $(r5Compatibility) ;
 BuildPlatformStaticLibrary <build>librdef.a :
 	compile.cpp decompile.cpp lexer.l parser.y rdef.cpp ;
 
-# On BeOS incompatible platforms we implicitly link against libroot_build.so,
-# which does already include the strl*() routines.
-local strlSources ;
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	strlSources = strlcpy.c strlcat.c ;
-}
-
 BuildPlatformMain <build>rc :
 	rc.cpp
-
-	# these two are needed for R5 only
-	$(strlSources)
 
 	: <build>librdef.a $(HOST_LIBSTDC++) $(HOST_LIBBE) $(HOST_LIBSUPC++)
 ;

@@ -982,6 +982,7 @@ NodeMonitorService::RemoveUserListeners(struct io_context *context,
 			// to remove its successor (which is saved in "removeListener")
 
 		_RemoveListener(removeListener);
+		context->num_monitors--;
 		count++;
 	}
 
@@ -1244,6 +1245,12 @@ notify_query_attr_changed(port_id port, int32 token, dev_t device,
 
 
 //	#pragma mark - User syscalls
+
+
+// TODO: We should verify that the port specified in the syscalls does actually
+// belong to the calling team. The situation is complicated by the fact that a
+// port can be transferred to another team. Consequently we should remove all
+// associated monitor listeners when a port is transferred/deleted.
 
 
 status_t

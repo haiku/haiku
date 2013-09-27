@@ -55,6 +55,7 @@ All rights reserved.
 #include "BarWindow.h"
 #include "DeskbarMenu.h"
 #include "DeskbarUtils.h"
+#include "ExpandoMenuBar.h"
 #include "InlineScrollView.h"
 #include "ResourceSet.h"
 #include "ShowHideMenuItem.h"

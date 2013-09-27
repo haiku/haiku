@@ -142,7 +142,7 @@ TextSpan::_TruncateRemove(int32& start, int32& count) const
 		count = 0;
 		return;
 	}
-	
+
 	if (start < 0) {
 		count += start;
 		start = 0;

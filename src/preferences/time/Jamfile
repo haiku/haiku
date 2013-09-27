@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders interface locale shared [ FDirName libroot time ] ;
 UsePrivateSystemHeaders ;
+UseBuildFeatureHeaders icu ;
 
 local sources =
 	AnalogClock.cpp
@@ -25,14 +26,13 @@ local sources =
 	;
 
 
-SubDirSysHdrs $(HAIKU_ICU_HEADERS) ;
-Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute icu : headers ] ;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
 Preference Time
 	: $(sources)
-	: be libshared.a $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS) $(HAIKU_NETWORK_LIBS)
+	: be libshared.a $(TARGET_LIBSTDC++) localestub $(HAIKU_NETWORK_LIBS)
 	: Time.rdef
 	;
 

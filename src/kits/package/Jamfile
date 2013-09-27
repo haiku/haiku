@@ -1,39 +1,58 @@
 SubDir HAIKU_TOP src kits package ;
 
-UseHeaders $(HAIKU_ZLIB_HEADERS) : true ;
-
 UsePrivateHeaders
 	kernel
-	shared ;
-
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+	shared
+	storage
+	;
 
 HPKG_SOURCES =
 	AttributeDataReader.cpp
-	BlockBufferCache.cpp
-	BlockBufferCacheImpl.cpp
-	BufferCache.cpp
-	CachedBuffer.cpp
+	BlockBufferPool.cpp
+	BlockBufferPoolImpl.cpp
+	BlockBufferPoolNoLock.cpp
+	BufferPool.cpp
 	DataOutput.cpp
 	DataReader.cpp
+	DataWriters.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp
+	GlobalWritableFileInfo.cpp
+	HPKGDefs.cpp
 	PackageContentHandler.cpp
 	PackageData.cpp
 	PackageDataReader.cpp
 	PackageEntry.cpp
 	PackageEntryAttribute.cpp
+	PackageFileHeapAccessorBase.cpp
+	PackageFileHeapReader.cpp
+	PackageFileHeapWriter.cpp
 	PackageReader.cpp
 	PackageReaderImpl.cpp
 	PackageWriter.cpp
 	PackageWriterImpl.cpp
+	PoolBuffer.cpp
 	ReaderImplBase.cpp
+	RepositoryContentHandler.cpp
 	RepositoryReader.cpp
 	RepositoryReaderImpl.cpp
 	RepositoryWriter.cpp
 	RepositoryWriterImpl.cpp
 	Strings.cpp
+	UserSettingsFileInfo.cpp
 	WriterImplBase.cpp
+
+	# V1 support
+	HPKGDefsV1.cpp
+	PackageContentHandlerV1.cpp
+	PackageDataReaderV1.cpp
+	PackageDataV1.cpp
+	PackageEntryAttributeV1.cpp
+	PackageEntryV1.cpp
+	PackageInfoContentHandlerV1.cpp
+	PackageReaderImplV1.cpp
+	PackageReaderV1.cpp
+	ReaderImplBaseV1.cpp
 
 	# compression
 	ZlibCompressionBase.cpp
@@ -41,39 +60,80 @@ HPKG_SOURCES =
 	ZlibDecompressor.cpp
 	;
 
-Includes [ FGristFiles $(HPKG_SOURCES) ]
-	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		UseBuildFeatureHeaders zlib ;
 
-SharedLibrary libpackage.so
-	:
-	ActivateRepositoryCacheJob.cpp
-	ActivateRepositoryConfigJob.cpp
-	AddRepositoryRequest.cpp
-	Attributes.cpp
-	BlockBufferCacheNoLock.cpp
-	ChecksumAccessors.cpp
-	Context.cpp
-	DropRepositoryRequest.cpp
-	FetchFileJob.cpp
-	Job.cpp
-	JobQueue.cpp
-	PackageInfo.cpp
-	PackageInfoContentHandler.cpp
-	PackageInfoSet.cpp
-	PackageResolvable.cpp
-	PackageResolvableExpression.cpp
-	PackageRoster.cpp
-	PackageVersion.cpp
-	RefreshRepositoryRequest.cpp
-	RemoveRepositoryJob.cpp
-	RepositoryCache.cpp
-	RepositoryConfig.cpp
-	RepositoryInfo.cpp
-	Request.cpp
-	TempfileManager.cpp
-	ValidateChecksumJob.cpp
+		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
+		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
+		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
 
-	$(HPKG_SOURCES)
-	:
-	libshared.a be $(HAIKU_ZLIB_LIB) $(TARGET_LIBSTDC++)
-;
+		Includes [ FGristFiles $(HPKG_SOURCES) ]
+			: [ BuildFeatureAttribute zlib : headers ] ;
+
+		SharedLibrary [ MultiArchDefaultGristFiles libpackage.so ]
+			:
+			ActivateRepositoryCacheJob.cpp
+			ActivateRepositoryConfigJob.cpp
+			ActivationTransaction.cpp
+			AddRepositoryRequest.cpp
+			Attributes.cpp
+			ChecksumAccessors.cpp
+			Context.cpp
+			DaemonClient.cpp
+			DownloadFileRequest.cpp
+			DropRepositoryRequest.cpp
+			FetchFileJob.cpp
+			InstallationLocationInfo.cpp
+			Job.cpp
+			JobQueue.cpp
+			PackageInfo.cpp
+			PackageInfoContentHandler.cpp
+			PackageInfoParser.cpp
+			PackageInfoSet.cpp
+			PackageResolvable.cpp
+			PackageResolvableExpression.cpp
+			PackageRoster.cpp
+			PackageVersion.cpp
+			RefreshRepositoryRequest.cpp
+			RemoveRepositoryJob.cpp
+			RepositoryCache.cpp
+			RepositoryConfig.cpp
+			RepositoryInfo.cpp
+			Request.cpp
+			TempfileManager.cpp
+			User.cpp
+			ValidateChecksumJob.cpp
+
+			$(HPKG_SOURCES)
+
+			# hpkg, but only libpackage
+			NoErrorOutput.cpp
+			StandardErrorOutput.cpp
+
+			# manager
+			Exceptions.cpp
+			PackageManager.cpp
+			RepositoryBuilder.cpp
+
+			# solver
+			Solver.cpp
+			SolverPackage.cpp
+			SolverPackageSpecifier.cpp
+			SolverPackageSpecifierList.cpp
+			SolverProblem.cpp
+			SolverProblemSolution.cpp
+			SolverRepository.cpp
+			SolverResult.cpp
+			:
+			[ MultiArchDefaultGristFiles libshared.a ]
+			be
+			[ BuildFeatureAttribute zlib : library ]
+			$(TARGET_LIBSTDC++)
+			;
+	}
+}
+
+HaikuSubInclude solver ;

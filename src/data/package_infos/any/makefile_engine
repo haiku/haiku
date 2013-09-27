@@ -1,0 +1,19 @@
+name			makefile_engine
+version			R1~alpha4_pm-1
+architecture	any
+summary			"The makefile engine"
+description 	"A simple generic makefile engine and makefile template."
+
+packager		"The Haiku build system"
+vendor			"Be Inc., Haiku Project"
+
+copyrights		"? Be Inc. 2001-2013 Haiku, Inc."
+licenses		MIT
+
+provides {
+	makefile_engine=R1~alpha4_pm-1
+}
+
+requires {
+	cmd:make
+}

@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 extern void heap_release(struct stage2_args *args);
+extern void heap_print_statistics();
 extern status_t heap_init(struct stage2_args *args);
 
 #ifdef __cplusplus

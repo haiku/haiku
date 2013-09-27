@@ -12,7 +12,7 @@ Translator PCXTranslator :
 	PCXTranslator.cpp
 	ConfigView.cpp
 	PCX.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) localestub
 	: true
 ;
 
@@ -23,8 +23,3 @@ DoCatalogs PCXTranslator :
 	ConfigView.cpp
 	PCXTranslator.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	PCXTranslator
-	: boot home config add-ons Translators
-	;

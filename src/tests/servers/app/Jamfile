@@ -12,7 +12,8 @@ SetSubDirSupportedPlatforms libbe_test ;
 # No need to define any of those targets, when not building for libbe_test
 if $(TARGET_PLATFORM) = libbe_test {
 
-UseLibraryHeaders agg png zlib ;
+UseLibraryHeaders agg png ;
+UseBuildFeatureHeaders zlib ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
 # headers/build/private/kernel is needed for safemode.h and syscalls.h.
@@ -29,7 +30,7 @@ UseHeaders [ FDirName $(appServerDir) drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter font_support ] ;
 UseHeaders [ FDirName $(appServerDir) font ] ;
 UseHeaders [ FDirName $(appServerDir) stackandtile ] ;
-UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+UseBuildFeatureHeaders freetype ;
 UseLibraryHeaders agg lp_solve linprog ;
 
 # This overrides the definitions in private/servers/app/ServerConfig.h
@@ -171,7 +172,7 @@ Server test_app_server :
 
 	# libraries
 	:
-	z libtestappserver.so be
+	[ BuildFeatureAttribute zlib : library ] libtestappserver.so be
 	libhwinterface.so libhwinterfaceimpl.so liblinprog.a
 	libfreetype.so libtextencoding.so
 	$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)

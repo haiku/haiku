@@ -159,7 +159,7 @@ towlower(wint_t wc)
 	if (gLocaleBackend == NULL)
 		return tolower(wc);
 
-	wint_t result = 0;
+	wint_t result = wc;
 	gLocaleBackend->ToWCTrans(wc, _ISlower, result);
 
 	return result;
@@ -172,7 +172,7 @@ towupper(wint_t wc)
 	if (gLocaleBackend == NULL)
 		return toupper(wc);
 
-	wint_t result = 0;
+	wint_t result = wc;
 	gLocaleBackend->ToWCTrans(wc, _ISupper, result);
 
 	return result;
@@ -182,12 +182,18 @@ towupper(wint_t wc)
 wint_t
 towctrans(wint_t wc, wctrans_t transition)
 {
-	if (gLocaleBackend == NULL)
-		return tolower(wc);
+	if (gLocaleBackend == NULL) {
+		if (transition == _ISlower)
+			return tolower(wc);
+		if (transition == _ISupper)
+			return toupper(wc);
 
-	wint_t result = 0;
+		__set_errno(EINVAL);
+		return wc;
+	}
+
+	wint_t result = wc;
 	status_t status = gLocaleBackend->ToWCTrans(wc, transition, result);
-
 	if (status != B_OK)
 		__set_errno(EINVAL);
 

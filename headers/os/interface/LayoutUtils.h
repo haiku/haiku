@@ -1,15 +1,20 @@
 /*
- * Copyright 2006, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_LAYOUT_UTILS_H
 #define	_LAYOUT_UTILS_H
 
+
 #include <Alignment.h>
 #include <Rect.h>
 #include <Size.h>
+#include <String.h>
 
+
+class BLayoutItem;
 class BView;
+
 
 class BLayoutUtils {
 public:
@@ -36,6 +41,17 @@ public:
 									BAlignment alignment);
 	static	void				AlignInFrame(BView* view, BRect frame);
 	static	BRect				MoveIntoFrame(BRect rect, BSize frameSize);
+
+	// debugging
+	static	BString				GetLayoutTreeDump(BView* view);
+	static	BString				GetLayoutTreeDump(BLayoutItem* item);
+
+private:
+	static	void				_GetLayoutTreeDump(BView* view, int level,
+									BString& _output);
+	static	void				_GetLayoutTreeDump(BLayoutItem* item,
+									int level, bool isViewLayout,
+									BString& _output);
 };
 
 #endif	//	_LAYOUT_UTILS_H

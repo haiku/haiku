@@ -1467,7 +1467,8 @@ BContainerWindow::MessageReceived(BMessage* message)
 				PoseView()->MoveSelectionInto(&model, this, false, false,
 					message->what == kCreateLink,
 					message->what == kCreateRelativeLink);
-			} else if (!TargetModel()->IsQuery()) {
+			} else if (!TargetModel()->IsQuery()
+				&& !TargetModel()->IsVirtualDirectory()) {
 				// no destination specified, create link in same dir as item
 				PoseView()->MoveSelectionInto(TargetModel(), this, false, false,
 					message->what == kCreateLink,
@@ -1855,7 +1856,8 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 			new BMessage(kFindButton), 'F'));
 	}
 
-	if (!TargetModel()->IsQuery() && !IsTrash() && !IsPrintersDir()) {
+	if (!TargetModel()->IsQuery() && !TargetModel()->IsVirtualDirectory()
+		&& !IsTrash() && !IsPrintersDir()) {
 		if (!PoseView()->IsFilePanel()) {
 			TemplatesMenu* templateMenu = new TemplatesMenu(PoseView(),
 				B_TRANSLATE("New"));
@@ -2068,6 +2070,7 @@ BContainerWindow::AddShortcuts()
 	ASSERT(!IsTrash());
 	ASSERT(!PoseView()->IsFilePanel());
 	ASSERT(!TargetModel()->IsQuery());
+	ASSERT(!TargetModel()->IsVirtualDirectory());
 
 	AddShortcut('X', B_COMMAND_KEY | B_SHIFT_KEY,
 		new BMessage(kCutMoreSelectionToClipboard), this);
@@ -3668,8 +3671,9 @@ BContainerWindow::SetUpDefaultState()
 		// try copying state from our parent directory, unless it is the
 		// desktop folder
 		BEntry entry(TargetModel()->EntryRef());
-		BDirectory parent;
-		if (entry.GetParent(&parent) == B_OK && parent != desktop) {
+		BNode parent;
+		if (FSGetParentVirtualDirectoryAware(entry, parent) == B_OK
+			&& parent != desktop) {
 			PRINT(("looking at parent for state\n"));
 			if (NodeHasSavedState(&parent)) {
 				PRINT(("got state from parent\n"));

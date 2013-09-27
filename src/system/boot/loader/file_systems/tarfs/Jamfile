@@ -1,29 +1,42 @@
 SubDir HAIKU_TOP src system boot loader file_systems tarfs ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers libs zlib ] ;
-
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders kernel shared storage ;
-SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
+
+local zlibSourceDirectory = [ BuildFeatureAttribute zlib : sources : path ] ;
+UseHeaders $(zlibSourceDirectory) ;
+UseHeaders $(zlibSourceDirectory) : true ;
 
 local defines = [ FDefines _BOOT_MODE ] ;
 SubDirCcFlags $(defines) ;
 SubDirC++Flags -fno-rtti $(defines) ;
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs zlib ] ;
 
-
-BootStaticLibrary boot_zlib :
+local zlibSources =
 	inflate.c
 	inffast.c
 	inftrees.c
 	adler32.c
 	crc32.c
 	zutil.c
+	;
+
+LOCATE on [ FGristFiles $(zlibSources) ] = $(zlibSourceDirectory) ;
+Depends [ FGristFiles $(zlibSources) ]
+	: [ BuildFeatureAttribute zlib : sources ] ;
+
+BootStaticLibrary boot_zlib :
+	$(zlibSources)
 	: -fno-pic
 	;
 
+
+Includes [ FGristFiles tarfs.cpp ] : [ BuildFeatureAttribute zlib : sources ] ;
+	# Strictly speaking it should be "headers", but the sources contain the
+	# headers as well and we have already added the sources directory to the
+	# header search path for the subdirectory. Should building boot_zlib be
+	# moved to its own directory, this should better be changes as well.
 
 BootStaticLibrary boot_tarfs :
 	tarfs.cpp

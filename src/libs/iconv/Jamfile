@@ -5,16 +5,24 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders iconv ;
 
-# disable warnings we don't want here
-TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
-	: -Wmissing-prototypes -Wsign-compare ] ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-SubDirCcFlags
-	-DLIBDIR="\\\"/boot/system/lib\\\""
-	-DICONV_CONST=""
-	;
+		# disable warnings we don't want here
+		TARGET_WARNING_CCFLAGS_$(architecture)
+			= [ FFilter $(TARGET_WARNING_CCFLAGS_$(architecture))
+				: -Wmissing-prototypes -Wsign-compare ] ;
 
-StaticLibrary libiconv.a :	
-	iconv.c
-	localcharset.c
-	;
+		SubDirCcFlags
+			-DLIBDIR="\\\"/boot/system/lib\\\""
+			-DICONV_CONST=""
+			;
+
+		StaticLibrary [ MultiArchDefaultGristFiles libiconv.a ] :
+			iconv.c
+			localcharset.c
+			;
+	}
+}

@@ -21,8 +21,8 @@ using BPrivate::Libroot::gLocaleBackend;
 using BPrivate::Libroot::LocaleBackend;
 
 
-static char sStandardTZName[64] 		= { "???" };
-static char sDaylightSavingTZName[64]	= { "???" };
+static char sStandardTZName[64] 		= { "GMT" };
+static char sDaylightSavingTZName[64]	= { "GMT" };
 
 
 char* tzname[2] = {
@@ -31,6 +31,12 @@ char* tzname[2] = {
 };
 long timezone = 0;
 int daylight = 0;
+
+
+// These two functions are used as a fallback when the locale backend could not
+// be loaded. They are implemented in localtime_fading_out.c.
+extern "C" struct tm* __gmtime_r_fallback(const time_t* timep, struct tm* tmp);
+extern "C" time_t __mktime_fallback(struct tm* tmp);
 
 
 extern "C" void
@@ -73,8 +79,9 @@ localtime_r(const time_t* inTime, struct tm* tmOut)
 		return tmOut;
 	}
 
-	__set_errno(ENOSYS);
-	return NULL;
+	// without a locale backend, there are no timezones, so we fall back to
+	// using a basic gmtime_r implementation.
+	return __gmtime_r_fallback(inTime, tmOut);
 }
 
 
@@ -105,8 +112,9 @@ gmtime_r(const time_t* inTime, struct tm* tmOut)
 		return tmOut;
 	}
 
-	__set_errno(ENOSYS);
-	return NULL;
+	// without a locale backend, we fall back to using a basic gmtime_r
+	// implementation.
+	return __gmtime_r_fallback(inTime, tmOut);
 }
 
 
@@ -131,6 +139,7 @@ mktime(struct tm* inTm)
 		return timeOut;
 	}
 
-	__set_errno(ENOSYS);
-	return -1;
+	// without a locale backend, we fall back to using a basic gmtime_r
+	// implementation.
+	return __mktime_fallback(inTm);
 }

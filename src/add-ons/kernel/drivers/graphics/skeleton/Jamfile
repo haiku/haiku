@@ -8,14 +8,3 @@ UsePrivateHeaders [ FDirName graphics skeleton ] ;
 KernelAddon skel.driver :
 	driver.c
 ;
-
-Package haiku-skeleton-cvs :
-	README.html UPDATE.html ;
-Package haiku-skeleton-cvs :
-	skel.driver : 
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-skeleton-cvs : graphics skel.driver ;
-Package haiku-skeleton-cvs :
-	skel.settings :
-	boot home config settings kernel drivers ;
-

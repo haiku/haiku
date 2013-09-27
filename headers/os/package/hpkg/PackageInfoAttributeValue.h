@@ -8,10 +8,12 @@
 
 #include <SupportDefs.h>
 
+#include <string.h>
+
 #include <package/PackageArchitecture.h>
 #include <package/PackageInfoAttributes.h>
 #include <package/PackageResolvableOperator.h>
-#include <package/PackageResolvableType.h>
+#include <package/WritableFileUpdateType.h>
 
 
 namespace BPackageKit {
@@ -24,12 +26,11 @@ struct BPackageVersionData {
 			const char*			minor;
 			const char*			micro;
 			const char*			preRelease;
-			uint8				release;
+			uint32				revision;
 };
 
 
 struct BPackageResolvableData {
-			BPackageResolvableType	type;
 			const char*			name;
 			bool				haveVersion;
 			bool				haveCompatibleVersion;
@@ -46,6 +47,30 @@ struct BPackageResolvableExpressionData {
 };
 
 
+struct BGlobalWritableFileInfoData {
+	const char*				path;
+	BWritableFileUpdateType	updateType;
+	bool					isDirectory;
+};
+
+
+struct BUserSettingsFileInfoData {
+	const char*	path;
+	const char*	templatePath;
+	bool		isDirectory;
+};
+
+
+struct BUserData {
+	const char*			name;
+	const char*			realName;
+	const char*			home;
+	const char*			shell;
+	const char* const*	groups;
+	size_t				groupCount;
+};
+
+
 struct BPackageInfoAttributeValue {
 			union {
 				uint64			unsignedInt;
@@ -53,6 +78,9 @@ struct BPackageInfoAttributeValue {
 				BPackageVersionData version;
 				BPackageResolvableData resolvable;
 				BPackageResolvableExpressionData resolvableExpression;
+				BGlobalWritableFileInfoData globalWritableFileInfo;
+				BUserSettingsFileInfoData userSettingsFileInfo;
+				BUserData		user;
 			};
 			BPackageInfoAttributeID	attributeID;
 

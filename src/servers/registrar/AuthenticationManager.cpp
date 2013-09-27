@@ -12,9 +12,11 @@
 
 #include <map>
 #include <new>
+#include <set>
 #include <string>
 
 #include <DataIO.h>
+#include <StringList.h>
 
 #include <AutoDeleter.h>
 #include <RegistrarDefs.h>
@@ -28,6 +30,9 @@ using std::map;
 using std::string;
 
 using namespace BPrivate;
+
+
+typedef std::set<std::string> StringSet;
 
 
 class AuthenticationManager::FlatStore {
@@ -337,22 +342,29 @@ private:
 
 class AuthenticationManager::Group {
 public:
+	Group()
+		:
+		fGID(0),
+		fName(),
+		fPassword(),
+		fMembers()
+	{
+	}
+
 	Group(const char* name, const char* password, gid_t gid,
 		const char* const* members, int memberCount)
 		:
 		fGID(gid),
 		fName(name),
 		fPassword(password),
-		fMembers(new string[memberCount]),
-		fMemberCount(memberCount)
+		fMembers()
 	{
 		for (int i = 0; i < memberCount; i++)
-			fMembers[i] = members[i];
+			fMembers.insert(members[i]);
 	}
 
 	~Group()
 	{
-		delete[] fMembers;
 	}
 
 	const string& Name() const	{ return fName; }
@@ -360,12 +372,40 @@ public:
 
 	bool HasMember(const char* name)
 	{
-		for (int i = 0; i < fMemberCount; i++) {
-			if (fMembers[i] == name)
-				return true;
+		try {
+			return fMembers.find(name) != fMembers.end();
+		} catch (...) {
+			return false;
 		}
+	}
 
-		return false;
+	bool MemberRemoved(const std::string& name)
+	{
+		return fMembers.erase(name) > 0;
+	}
+
+	void UpdateFromMessage(const KMessage& message)
+	{
+		int32 intValue;
+		if (message.FindInt32("gid", &intValue) == B_OK)
+			fGID = intValue;
+
+		const char* stringValue;
+		if (message.FindString("name", &stringValue) == B_OK)
+			fName = stringValue;
+
+		if (message.FindString("password", &stringValue) == B_OK)
+			fPassword = stringValue;
+
+		if (message.FindString("members", &stringValue) == B_OK) {
+			fMembers.clear();
+			for (int32 i = 0;
+				(stringValue = message.GetString("members", i, NULL)) != NULL;
+				i++) {
+				if (stringValue != NULL && *stringValue != '\0')
+					fMembers.insert(stringValue);
+			}
+		}
 	}
 
 	group* WriteFlatGroup(FlatStore& store) const
@@ -373,15 +413,18 @@ public:
 		struct group group;
 
 		char* members[MAX_GROUP_MEMBER_COUNT + 1];
-		for (int i = 0; i < fMemberCount; i++)
-			members[i] = store.AppendString(fMembers[i].c_str());
-		members[fMemberCount] = (char*)-1;
+		int32 count = 0;
+		for (StringSet::const_iterator it = fMembers.begin();
+			it != fMembers.end(); ++it) {
+			members[count++] = store.AppendString(it->c_str());
+		}
+		members[count] = (char*)-1;
 
 		group.gr_gid = fGID;
 		group.gr_name = store.AppendString(fName);
 		group.gr_passwd = store.AppendString(fPassword);
 		group.gr_mem = (char**)store.AppendData(members,
-			sizeof(char*) * (fMemberCount + 1), true);
+			sizeof(char*) * (count + 1), true);
 
 		return store.AppendData(group);
 	}
@@ -396,22 +439,34 @@ public:
 			return error;
 		}
 
-		for (int i = 0; i < fMemberCount; i++) {
-			if ((error = message.AddString("members", fMembers[i].c_str()))
-					!= B_OK) {
+		for (StringSet::const_iterator it = fMembers.begin();
+			it != fMembers.end(); ++it) {
+			if ((error = message.AddString("members", it->c_str())) != B_OK)
 				return error;
-			}
 		}
 
 		return B_OK;
 	}
 
+	void WriteGroupLine(FILE* file)
+	{
+		fprintf(file, "%s:%s:%d:",
+			fName.c_str(), fPassword.c_str(), (int)fGID);
+		for (StringSet::const_iterator it = fMembers.begin();
+			it != fMembers.end(); ++it) {
+			if (it == fMembers.begin())
+				fprintf(file, "%s", it->c_str());
+			else
+				fprintf(file, ",%s", it->c_str());
+		}
+		fputs("\n", file);
+	}
+
 private:
-	gid_t	fGID;
-	string	fName;
-	string	fPassword;
-	string*	fMembers;
-	int		fMemberCount;
+	gid_t		fGID;
+	string		fName;
+	string		fPassword;
+	StringSet	fMembers;
 };
 
 
@@ -433,6 +488,12 @@ public:
 		}
 
 		return B_OK;
+	}
+
+	void RemoveUser(User* user)
+	{
+		fUsersByID.erase(fUsersByID.find(user->UID()));
+		fUsersByName.erase(fUsersByName.find(user->Name()));
 	}
 
 	User* UserByID(uid_t uid) const
@@ -549,6 +610,23 @@ public:
 		return B_OK;
 	}
 
+	void RemoveGroup(Group* group)
+	{
+		fGroupsByID.erase(fGroupsByID.find(group->GID()));
+		fGroupsByName.erase(fGroupsByName.find(group->Name()));
+	}
+
+	bool UserRemoved(const std::string& user)
+	{
+		bool changed = false;
+		for (map<gid_t, Group*>::const_iterator it = fGroupsByID.begin();
+			 it != fGroupsByID.end(); ++it) {
+			Group* group = it->second;
+			changed |= group->MemberRemoved(user);
+		}
+		return changed;
+	}
+
 	Group* GroupByID(gid_t gid) const
 	{
 		map<gid_t, Group*>::const_iterator it = fGroupsByID.find(gid);
@@ -597,6 +675,31 @@ public:
 		store.WriteData(offset, entries, entriesSpace);
 
 		return count;
+	}
+
+	void WriteToDisk()
+	{
+		// rename the old files
+		string groupBackup(kGroupFile);
+		groupBackup += ".old";
+
+		rename(kGroupFile, groupBackup.c_str());
+			// Don't check errors. We can't do anything anyway.
+
+		// open file
+		FILE* groupFile = fopen(kGroupFile, "w");
+		if (groupFile == NULL) {
+			debug_printf("REG: Failed to open group file \"%s\" for "
+				"writing: %s\n", kGroupFile, strerror(errno));
+		}
+		CObjectDeleter<FILE, int> _1(groupFile, fclose);
+
+		// write groups
+		for (map<gid_t, Group*>::const_iterator it = fGroupsByID.begin();
+			it != fGroupsByID.end(); ++it) {
+			Group* group = it->second;
+			group->WriteGroupLine(groupFile);
+		}
 	}
 
 private:
@@ -721,7 +824,7 @@ AuthenticationManager::_RequestThread()
 				if (error == B_OK) {
 					message.SendReply(fPasswdDBReply, -1, -1, 0, registrarTeam);
 				} else {
-					fPasswdDBReply->SetTo(1);
+					_InvalidatePasswdDBReply();
 					KMessage reply(error);
 					message.SendReply(&reply, -1, -1, 0, registrarTeam);
 				}
@@ -752,7 +855,7 @@ AuthenticationManager::_RequestThread()
 				if (error == B_OK) {
 					message.SendReply(fGroupDBReply, -1, -1, 0, registrarTeam);
 				} else {
-					fGroupDBReply->SetTo(1);
+					_InvalidateGroupDBReply();
 					KMessage reply(error);
 					message.SendReply(&reply, -1, -1, 0, registrarTeam);
 				}
@@ -789,7 +892,7 @@ AuthenticationManager::_RequestThread()
 					message.SendReply(fShadowPwdDBReply, -1, -1, 0,
 						registrarTeam);
 				} else {
-					fShadowPwdDBReply->SetTo(1);
+					_InvalidateShadowPwdDBReply();
 					KMessage reply(error);
 					message.SendReply(&reply, -1, -1, 0, registrarTeam);
 				}
@@ -915,7 +1018,7 @@ AuthenticationManager::_RequestThread()
 					error = B_BAD_VALUE;
 				}
 
-				// only can change anything
+				// only root can change anything
 				if (error == B_OK && !isRoot)
 					error = EPERM;
 
@@ -951,8 +1054,8 @@ AuthenticationManager::_RequestThread()
 						if (error == B_OK) {
 							fUserDB->AddUser(user);
 							fUserDB->WriteToDisk();
-							fPasswdDBReply->SetTo(1);
-							fShadowPwdDBReply->SetTo(1);
+							_InvalidatePasswdDBReply();
+							_InvalidateShadowPwdDBReply();
 						}
 					} catch (...) {
 						error = B_NO_MEMORY;
@@ -971,13 +1074,163 @@ AuthenticationManager::_RequestThread()
 
 				break;
 			}
-			case B_REG_UPDATE_GROUP:
-				debug_printf("B_REG_UPDATE_GROUP done: currently unsupported!\n");
+
+			case B_REG_DELETE_USER:
+			{
+				// find user
+				User* user = NULL;
+				int32 uid;
+				const char* name;
+
+				if (message.FindInt32("uid", &uid) == B_OK) {
+					user = fUserDB->UserByID(uid);
+				} else if (message.FindString("name", &name) == B_OK) {
+					user = fUserDB->UserByName(name);
+				} else {
+					error = B_BAD_VALUE;
+				}
+
+				if (error == B_OK && user == NULL)
+					error = ENOENT;
+
+				// only root can change anything
+				if (error == B_OK && !isRoot)
+					error = EPERM;
+
+				// apply the change
+				if (error == B_OK) {
+					std::string userName = user->Name();
+
+					fUserDB->RemoveUser(user);
+					fUserDB->WriteToDisk();
+					_InvalidatePasswdDBReply();
+					_InvalidateShadowPwdDBReply();
+
+					if (fGroupDB->UserRemoved(userName)) {
+						fGroupDB->WriteToDisk();
+						_InvalidateGroupDBReply();
+					}
+				}
+
+				// send reply
+				KMessage reply;
+				reply.SetWhat(error);
+				message.SendReply(&reply, -1, -1, 0, registrarTeam);
+
 				break;
+			}
+
+			case B_REG_UPDATE_GROUP:
+			{
+				// find group
+				Group* group = NULL;
+				int32 gid;
+				const char* name;
+
+				if (message.FindInt32("gid", &gid) == B_OK) {
+					group = fGroupDB->GroupByID(gid);
+				} else if (message.FindString("name", &name) == B_OK) {
+					group = fGroupDB->GroupByName(name);
+				} else {
+					error = B_BAD_VALUE;
+				}
+
+				// only root can change anything
+				if (error == B_OK && !isRoot)
+					error = EPERM;
+
+				// check addGroup vs. existing group
+				bool addGroup = message.GetBool("add group", false);
+				if (error == B_OK) {
+					if (addGroup) {
+						if (group != NULL)
+							error = EEXIST;
+					} else if (group == NULL)
+						error = ENOENT;
+				}
+
+				// apply all changes
+				if (error == B_OK) {
+					// clone the group object and update it from the message
+					Group* oldGroup = group;
+					group = NULL;
+					try {
+						group = (oldGroup != NULL ? new Group(*oldGroup)
+							: new Group);
+						group->UpdateFromMessage(message);
+
+						// gid and name should remain the same
+						if (oldGroup != NULL) {
+							if (oldGroup->GID() != group->GID()
+								|| oldGroup->Name() != group->Name()) {
+								error = B_BAD_VALUE;
+							}
+						}
+
+						// replace the old group and write DBs to disk
+						if (error == B_OK) {
+							fGroupDB->AddGroup(group);
+							fGroupDB->WriteToDisk();
+							_InvalidateGroupDBReply();
+						}
+					} catch (...) {
+						error = B_NO_MEMORY;
+					}
+
+					if (error == B_OK)
+						delete oldGroup;
+					else
+						delete group;
+				}
+
+				// send reply
+				KMessage reply;
+				reply.SetWhat(error);
+				message.SendReply(&reply, -1, -1, 0, registrarTeam);
+
+				break;
+			}
+
+			case B_REG_DELETE_GROUP:
+			{
+				// find group
+				Group* group = NULL;
+				int32 gid;
+				const char* name;
+
+				if (message.FindInt32("gid", &gid) == B_OK) {
+					group = fGroupDB->GroupByID(gid);
+				} else if (message.FindString("name", &name) == B_OK) {
+					group = fGroupDB->GroupByName(name);
+				} else {
+					error = B_BAD_VALUE;
+				}
+
+				if (error == B_OK && group == NULL)
+					error = ENOENT;
+
+				// only root can change anything
+				if (error == B_OK && !isRoot)
+					error = EPERM;
+
+				// apply the change
+				if (error == B_OK) {
+					fGroupDB->RemoveGroup(group);
+					fGroupDB->WriteToDisk();
+					_InvalidateGroupDBReply();
+				}
+
+				// send reply
+				KMessage reply;
+				reply.SetWhat(error);
+				message.SendReply(&reply, -1, -1, 0, registrarTeam);
+
+				break;
+			}
+
 			default:
 				debug_printf("REG: invalid message: %" B_PRIu32 "\n",
 					message.What());
-
 		}
 	}
 }
@@ -1131,4 +1384,25 @@ AuthenticationManager::_InitShadowPwdDB()
 	}
 
 	return B_OK;
+}
+
+
+void
+AuthenticationManager::_InvalidatePasswdDBReply()
+{
+	fPasswdDBReply->SetTo(1);
+}
+
+
+void
+AuthenticationManager::_InvalidateGroupDBReply()
+{
+	fGroupDBReply->SetTo(1);
+}
+
+
+void
+AuthenticationManager::_InvalidateShadowPwdDBReply()
+{
+	fShadowPwdDBReply->SetTo(1);
 }

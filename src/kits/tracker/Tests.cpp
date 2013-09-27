@@ -43,6 +43,7 @@ All rights reserved.
 #include <String.h>
 #include <Window.h>
 
+#include <directories.h>
 
 #include "EntryIterator.h"
 #include "IconCache.h"
@@ -54,13 +55,9 @@ All rights reserved.
 
 const char* pathsToSearch[] = {
 //	"/boot/home/config/settings/NetPositive/Bookmarks/",
-#ifdef __HAIKU__
-	"/boot/system",
-#else
-	"/boot/beos",
-#endif
-	"/boot/apps",
-	"/boot/home",
+	kSystemDirectory,
+	kAppsDirectory,
+	kUserDirectory,
 	0
 };
 

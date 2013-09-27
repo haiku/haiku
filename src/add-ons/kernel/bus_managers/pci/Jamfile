@@ -17,7 +17,8 @@ KernelAddon pci :
 
 # pci_info.cpp currently needs pcihdr.h so we make its path available and adds dependency
 ObjectHdrs [ FGristFiles pci_info$(SUFOBJ) ]
-	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) apps devices ] ;
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) apps
+		devices ] ;
 Includes [ FGristFiles pci_info.cpp ] : <src!apps!devices>pcihdr.h ;
 
 SubInclude HAIKU_TOP src add-ons kernel bus_managers pci arch

@@ -330,7 +330,9 @@ BTranslatorRoster::Private::AddDefaultPaths()
 {
 	// add user directories first, so that they can override system translators
 	const directory_which paths[] = {
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
 		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
 		B_SYSTEM_ADDONS_DIRECTORY,
 	};

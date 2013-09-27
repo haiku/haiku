@@ -627,11 +627,6 @@ FileManager::GetSourceFile(const BString& directory,
 	AutoLocker<FileManager> locker(this);
 	LocatableFile* file = fSourceDomain->GetFile(directory, relativePath);
 
-	if (directory.Length() == 0 || relativePath[0] == '/')
-		_LocateFileIfMapped(relativePath, file);
-	else
-		_LocateFileIfMapped(BString(directory) << '/' << relativePath, file);
-
 	return file;
 }
 
@@ -641,7 +636,6 @@ FileManager::GetSourceFile(const BString& path)
 {
 	AutoLocker<FileManager> locker(this);
 	LocatableFile* file = fSourceDomain->GetFile(path);
-	_LocateFileIfMapped(path, file);
 
 	return file;
 }
@@ -671,11 +665,18 @@ FileManager::LoadSourceFile(LocatableFile* file, SourceFile*& _sourceFile)
 
 	// get the path
 	BString path;
-	if (!file->GetLocatedPath(path))
-		return B_ENTRY_NOT_FOUND;
+	BString originalPath;
+	file->GetPath(originalPath);
+	if (!file->GetLocatedPath(path)) {
+		// see if this is a file we have a lazy mapping for.
+		if (!_LocateFileIfMapped(originalPath, file)
+			|| !file->GetLocatedPath(path)) {
+			return B_ENTRY_NOT_FOUND;
+		}
+	}
 
 	// we might already know the source file
-	SourceFileEntry* entry = _LookupSourceFile(path);
+	SourceFileEntry* entry = _LookupSourceFile(originalPath);
 	if (entry != NULL) {
 		entry->file->AcquireReference();
 		_sourceFile = entry->file;
@@ -683,7 +684,7 @@ FileManager::LoadSourceFile(LocatableFile* file, SourceFile*& _sourceFile)
 	}
 
 	// create the hash table entry
-	entry = new(std::nothrow) SourceFileEntry(this, path);
+	entry = new(std::nothrow) SourceFileEntry(this, originalPath);
 	if (entry == NULL)
 		return B_NO_MEMORY;
 
@@ -712,7 +713,6 @@ status_t
 FileManager::LoadLocationMappings(TeamFileManagerSettings* settings)
 {
 	AutoLocker<FileManager> locker(this);
-
 	for (int32 i = 0; i < settings->CountSourceMappings(); i++) {
 		BString sourcePath;
 		BString locatedPath;
@@ -775,15 +775,20 @@ FileManager::_SourceFileUnused(SourceFileEntry* entry)
 }
 
 
-void
+bool
 FileManager::_LocateFileIfMapped(const BString& sourcePath,
 	LocatableFile* file)
 {
 	// called with lock held
+
 	LocatedFileMap::const_iterator it = fSourceLocationMappings.find(
 		sourcePath);
 	if (it != fSourceLocationMappings.end()
-		&& file->State() != LOCATABLE_ENTRY_LOCATED_EXPLICITLY) {
-			fSourceDomain->EntryLocated(it->first, it->second);
+		&& file->State() != LOCATABLE_ENTRY_LOCATED_EXPLICITLY
+		&& file->State() != LOCATABLE_ENTRY_LOCATED_IMPLICITLY) {
+		fSourceDomain->EntryLocated(it->first, it->second);
+		return true;
 	}
+
+	return false;
 }

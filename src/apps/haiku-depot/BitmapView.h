@@ -12,16 +12,16 @@
 class BitmapView : public BView {
 public:
 								BitmapView(const char* name);
-	
+
 	virtual						~BitmapView();
 
 	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
-	
+
 	virtual	BSize				MinSize();
 	virtual	BSize				PreferredSize();
 	virtual	BSize				MaxSize();
-	
+
 			void				SetBitmap(const BBitmap* bitmap);
 			void				SetScaleBitmap(bool scaleBitmap);
 

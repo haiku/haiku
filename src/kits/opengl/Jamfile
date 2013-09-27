@@ -2,9 +2,6 @@ SubDir HAIKU_TOP src kits opengl ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders interface ;
-UsePrivateSystemHeaders ;
-
 local sources =
 	GLView.cpp
 	GLDispatcher.cpp
@@ -18,39 +15,52 @@ if $(TARGET_PLATFORM) != haiku {
 		# We need our public GL headers also when not compiling for Haiku.
 }
 
-SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
-Includes [ FGristFiles $(sources) ] : $(HAIKU_GLU_HEADERS_DEPENDENCY) ;
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) include ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa main ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi ] ;
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mapi glapi ] ;
+		UsePrivateHeaders interface ;
+		UsePrivateSystemHeaders ;
+		UseBuildFeatureHeaders glu ;
+		UseBuildFeatureHeaders mesa ;
 
-# For older versions of Mesa
-UseHeaders [ FDirName $(HAIKU_MESA_DIR) src mesa glapi ] ;
+		Includes [ FGristFiles $(sources) ]
+			: [ BuildFeatureAttribute glu : headers ] ;
+		Includes [ FGristFiles $(sources) ]
+			: [ BuildFeatureAttribute mesa : headers ] ;
 
-LINKFLAGS on libGL.so = [ on libGL.so return $(LINKFLAGS) ]
-	-Xlinker --whole-archive -Xlinker --no-undefined ;
+		UseHeaders [ BuildFeatureAttribute mesa : headers : path ] ;
+		local privateHeaders
+			= [ BuildFeatureAttribute mesa : privateHeaders : path ] ;
+		UseHeaders [ FDirName $(privateHeaders) mesa ] ;
+		UseHeaders [ FDirName $(privateHeaders) mesa main ] ;
+		UseHeaders [ FDirName $(privateHeaders) mapi ] ;
+		UseHeaders [ FDirName $(privateHeaders) mapi glapi ] ;
 
-# For GCC2
-if $(HAIKU_GCC_VERSION[1]) < 3 {
-	SubDirC++Flags --no-warnings ;
+		# For older versions of Mesa
+		UseHeaders [ FDirName $(privateHeaders) mesa glapi ] ;
+
+		LINKFLAGS on libGL.so = [ on libGL.so return $(LINKFLAGS) ]
+			-Xlinker --whole-archive -Xlinker --no-undefined ;
+
+		# For GCC2
+		if $(architecture) = x86_gcc2 {
+			SubDirC++Flags --no-warnings ;
+		}
+
+		SharedLibrary [ MultiArchDefaultGristFiles libGL.so ] : $(sources) :
+			# GLU
+			[ BuildFeatureAttribute glu : library ]
+
+			# GLAPI Dispatch code (from Mesa buildpackage)
+			[ BuildFeatureAttribute mesa : glapiLibrary ]
+
+			# External libraries:
+			game			# BWindowScreen needed by BGLScreen stub class
+			network
+			be
+			$(TARGET_LIBSTDC++)
+			;
+	}
 }
-
-
-SharedLibrary libGL.so : $(sources) :
-	# GLU
-	$(HAIKU_GLU_LIBS)
-
-	# GLAPI Dispatch code (from Mesa buildpackage)
-	$(HAIKU_GLAPI_LIB)
-
-	# External libraries:
-	game			# BWindowScreen needed by BGLScreen stub class
-	network
-	be
-	$(TARGET_LIBSTDC++)
-;

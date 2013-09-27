@@ -9,15 +9,19 @@ if $(TARGET_PLATFORM) != haiku {
 
 UsePrivateHeaders midi ;
 
-SharedLibrary libmidi2.so :
-	MidiConsumer.cpp
-	MidiEndpoint.cpp
-	MidiLocalConsumer.cpp
-	MidiLocalProducer.cpp
-	MidiProducer.cpp
-	MidiRoster.cpp
-	MidiRosterLooper.cpp
-	:
-	be $(TARGET_LIBSUPC++)
-;
-
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		SharedLibrary [ MultiArchDefaultGristFiles libmidi2.so ] :
+			MidiConsumer.cpp
+			MidiEndpoint.cpp
+			MidiLocalConsumer.cpp
+			MidiLocalProducer.cpp
+			MidiProducer.cpp
+			MidiRoster.cpp
+			MidiRosterLooper.cpp
+			:
+			be $(TARGET_LIBSUPC++)
+			;
+	}
+}

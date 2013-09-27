@@ -1,250 +1,242 @@
-#-------------------------------------------------------------------------------
-# Packages for OBOS alpha/beta testers
-#-------------------------------------------------------------------------------
-
-rule Copy
+rule FHaikuPackageGrist package
 {
-	if $(2) {
-		SEARCH on $(2) += $(SEARCH_SOURCE) ;
-		Depends $(1) : <build>copyattr $(2) ;
-		Copy1 $(1) : <build>copyattr $(2) ;
-	}
+	local grist = [ Match "<(.*)>" : $(package:G) ] ;
+	return hpkg_$(grist:E="")-$(package:G=) ;
 }
 
-actions Copy1
-{
-	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	"$(2[1])" -d "$(2[2-])" "$(1)"
-}
 
-rule Packages
+rule HaikuPackage package
 {
-	local packagenames = $(1) ;
-	local packagefiles = $(2) ;
-	local path = $(3) ;
-	for name in $(packagenames) {
-		Package $(name) : $(packagefiles) : $(path) ;
-    }
-}
+	local grist = [ FHaikuPackageGrist $(package) ] ;
 
-rule FPackageConfigSubPath
-{
-	# FPackageConfigSubPath <packagename>
-	#
-	local packagename = $(1) ;
+	HAIKU_CONTAINER_GRIST on $(package) = $(grist) ;
+	HAIKU_INCLUDE_IN_CONTAINER_VAR on $(package) = HAIKU_INCLUDE_IN_PACKAGES ;
+	HAIKU_INSTALL_TARGETS_VAR on $(package)
+		= $(grist)_HAIKU_PACKAGE_INSTALL_TARGETS ;
+	HAIKU_CONTAINER_SYSTEM_DIR_TOKENS on $(package) = ;
 
-	local configSubPath ;
-	on $(packagename) {
-		if $(PLATFORM) = host {
-			configSubPath = $(HOST_PLATFORM) $(HOST_ARCH) ;
-		} else {
-			configSubPath = $(TARGET_PLATFORM) $(TARGET_ARCH) ;
-		}
-	
-		if $(DEBUG) = 0 {
-			configSubPath += release ;
-		} else {
-			configSubPath += debug_$(DEBUG) ;
-		}
+	HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE = $(package) ;
+
+	if $(HAIKU_PACKAGES_UPDATE_ONLY) {
+		HAIKU_CONTAINER_UPDATE_ONLY on $(package) = 1 ;
+		HAIKU_CONTAINER_INHERIT_UPDATE_VARIABLE on $(package)
+			= HAIKU_INCLUDE_IN_IMAGE ;
+	} else if $(HAIKU_UPDATE_ALL_PACKAGES) {
+		HAIKU_INCLUDE_IN_IMAGE on $(package) = 1 ;
 	}
 
-	return $(configSubPath) ;
+	HAIKU_CONTAINER_ALWAYS_CREATE_DIRECTORIES on $(package) = 1 ;
 }
 
-rule Package
+
+rule PreprocessPackageInfo source : directory : architecture
+	: secondaryArchitecture
 {
-	local packagename = $(1) ;
-    local packagefiles = $(2) ;
-	local path = $(3) ;
+	source = $(source:G=package-info-source) ;
+	SEARCH on $(source) +=
+		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) $(architecture) ]
+		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) any ]
+		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) generic ] 
+	;
 
-	local configSubPath = [ FPackageConfigSubPath $(packagename) ] ;
-	local packagezip = $(packagename:S=.zip:G=_packages) ;
-	local targetDir = [ FDirName $(HAIKU_PACKAGE_DIR) $(configSubPath) ] ;
-	local packagedir = [ FDirName $(targetDir) $(packagename) ] ;
-
-    local installscript = install.sh ;
-	local packageinstallscript = $(installscript:G=_packages!$(packagename)) ;
-    local installzip = install.zip ;
-	local packageinstallzip = $(installzip:G=_packages!$(packagename)) ;
-
-    local packageobjectdir = [ FDirName $(HAIKU_PACKAGE_OBJECT_DIR)
-		$(configSubPath) $(packagename) ] ;
-	local packagefiledir =  [ FDirName $(packageobjectdir) $(path) ] ;
-    local packagefileinstallzip
-    	= $(installzip:G=_package_objects!$(packagename)) ;
-
-	# add the files to the install.zip
-	local packagefilegrist = [ FGrist _package_files $(packagename) $(path) ] ;
-    for file in $(packagefiles) {
-		if $(path[0]) = "boot" {
-			local packagefile = $(file:G=$(packagefilegrist)) ;
-			MakeLocate $(packagefile) : $(packagefiledir) ;
-			Copy $(packagefile) : $(file) ;
-			Clean cleanPackages : $(packagefile) ;
-			PackageInstallZip $(packagefileinstallzip) : $(packagefile) ;
-		} else {
-			local packagefile = $(file:G=_packages!$(packagename)) ;
-			MakeLocate $(packagefile) : $(packagedir) ;
-			Copy $(packagefile) : [ FGristFiles $(file) ] ;
-			Clean cleanPackages : $(packagefile) ;
-			Depends $(packagezip) : $(packagefile) ;
-		}
+	local target = $(source:BSG=package-info)-package-info ;
+	local defines = HAIKU_PACKAGING_ARCH=$(architecture) ;
+	local sedReplacements = %HAIKU_PACKAGING_ARCH%,$(architecture) ;
+	if $(HAIKU_BOOTSTRAP_BUILD) {
+		defines += HAIKU_BOOTSTRAP_BUILD ;
+		target = $(target)-bootstrap ;
 	}
-
-	# general setup for this package -- only on first invocation
-	if ! $(_setup_$(packagename)) {
-		_setup_$(packagename) = true ;
-
-		NotFile $(packagename) ;
-		LocalDepends packages : $(packagename) ;
-
-		MakeLocate $(packagezip) : $(targetDir) ;
-		MakeLocate $(packageinstallscript) : $(packagedir) ;
-		MakeLocate $(packageinstallzip) : $(packagedir) ;
-		MakeLocate $(packagefileinstallzip) : $(packageobjectdir) ;
-
-		PackageInstallScript $(packageinstallscript) : $(packagedir) ;
-		LinkInstallZip $(packageinstallzip) : $(packagefileinstallzip) ;
-		Depends $(packagename) : $(packagezip) ;
-		PackageZip $(packagezip) : $(packagedir)
-			: $(packageinstallscript) $(packageinstallzip) ;
-	}
-
-}
-
-rule PackageSymLink
-{
-	# PackageSymLink <packageName> : <symlink path components>
-	#	: <symlink target>
-	#
-	local packagename = $(1) ;
-	local symlinkPath = $(2) ;
-	local symlinkTarget = $(3) ;
-	
-	local configSubPath = [ FPackageConfigSubPath $(packagename) ] ;
-
-	local symlinkDir = [ FReverse $(symlinkPath) ] ;
-	local symlink = $(symlinkDir[1]) ;
-	symlinkDir = [ FReverse $(symlinkDir[2-]) ] ;
-	local symlinkGrist = [ FGrist _package $(packagename) $(symlinkDir) ] ;
-	symlink = $(symlink:G=$(symlinkGrist)) ;
-
-	if $(symlinkDir[1]) = boot {
-	    local installzip = install.zip ;
-	    local packagefileinstallzip
-    		= $(installzip:G=_package_objects!$(packagename)) ;
-
-		local packageobjectdir = [ FDirName $(HAIKU_PACKAGE_OBJECT_DIR)
-			$(configSubPath) $(packagename) ] ;
-		symlinkDir = [ FDirName $(packageobjectdir) $(symlinkDir) ] ;
-
-		PackageInstallZip $(packagefileinstallzip) : $(symlink) ;
-
+	if $(secondaryArchitecture) {
+		defines += HAIKU_SECONDARY_PACKAGING_ARCH=$(secondaryArchitecture) ;
+		sedReplacements
+			+= %HAIKU_SECONDARY_PACKAGING_ARCH%,$(secondaryArchitecture) ;
+		sedReplacements +=
+			%HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%,_$(secondaryArchitecture) ;
 	} else {
-		local packagezip = $(packagename:S=.zip:G=_packages) ;
-
-		local packagedir = [ FDirName $(HAIKU_PACKAGE_DIR) $(configSubPath)
-			$(packagename) ] ;
-		symlinkDir = [ FDirName $(packagedir) $(symlinkDir) ] ;
-
-		Depends $(packagezip) : $(symlink) ;
+		sedReplacements
+			+= %HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%, ;
 	}
 
-	MakeLocate $(symlink) : $(symlinkDir) ;
-	SymLink $(symlink) : $(symlinkTarget) : false ;
-	Clean cleanPackages : $(symlink) ;
+	MakeLocate $(target) : $(directory) ;
+	Depends $(target) : $(source) ;
+
+	CCDEFS on $(target) = [ FDefines $(defines) ] ;
+	HAIKU_SED_REPLACEMENTS on $(target) = "-e s,$(sedReplacements),g" ;
+
+	PreprocessPackageInfo1 $(target) : $(source) ;
+
+	return $(target) ;
 }
 
-rule PackageDriverSymLink
+
+actions PreprocessPackageInfo1
 {
-	# PackageDriverSymLink <packageName> : <devRelativeSymlinkComponents> ;
-	# <packageName>: Package name.
-	# <devRelativeSymlinkComponents>: Path components relative to the 
-	#     /boot/home/config/add-ons/kernel/drivers/dev directory, e.g.
-	#     "graphics mga.driver" (no quotation, of course).
-	#
-	local packageName = $(1) ;
-	local symlinkComponents = $(2) ;
+	sed $(HAIKU_SED_REPLACEMENTS) < $(2) | $(HOST_CC) -E -w $(CCDEFS) - -o $(1)
+}
 
-	# construct the symlink contents
-	local symlinkPath = [ FReverse $(symlinkComponents) ] ;
-	symlinkPath = bin $(symlinkPath[1]) ;
 
-	for i in $(symlinkComponents) {
-		symlinkPath = $(DOTDOT) $(symlinkPath) ;
+rule BuildHaikuPackage package : packageInfo
+{
+	local architecture = $(HAIKU_PACKAGING_ARCH) ;
+	local secondaryArchitecture ;
+	if $(TARGET_PACKAGING_ARCH) != $(architecture) {
+		secondaryArchitecture = $(TARGET_PACKAGING_ARCH) ;
 	}
 
-	PackageSymLink $(packageName)
-		: boot home config add-ons kernel drivers dev $(symlinkComponents)
-		: [ FDirName $(symlinkPath) ] ;
+	local grist = [ FHaikuPackageGrist $(package) ] ;
+
+	local tempDir
+		= [ FDirName $(HAIKU_PACKAGES_BUILD_DIR_$(architecture)) $(grist) ] ;
+	local scriptDir = [ FDirName $(tempDir) scripts ] ;
+
+	#  build the package info and locate the package
+	packageInfo = [ PreprocessPackageInfo $(packageInfo) : $(tempDir)
+		: $(architecture) : $(secondaryArchitecture) ] ;
+	MakeLocate $(package) : $(HAIKU_PACKAGES_DIR_$(architecture)) ;
+	Depends $(package) : $(packageInfo) ;
+
+	# prepare the script that initializes the shell variables
+	local initVariablesScript = <$(grist)>haiku.package-init-vars ;
+	MakeLocate $(initVariablesScript) : $(scriptDir) ;
+	Always $(initVariablesScript) ;
+
+	local script = $(initVariablesScript) ;
+	AddVariableToScript $(script) : sourceDir : $(HAIKU_TOP) ;
+	AddVariableToScript $(script) : outputDir : $(HAIKU_OUTPUT_DIR) ;
+	AddVariableToScript $(script) : tmpDir : $(tempDir) ;
+	AddVariableToScript $(script) : addBuildCompatibilityLibDir
+		: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+	AddVariableToScript $(script) : compressionLevel
+		: [ on $(package) return $(HAIKU_PACKAGE_COMPRESSION_LEVEL) ] ;
+	AddVariableToScript $(script) : updateOnly
+		: [ on $(package) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] ;
+	AddVariableToScript $(script) : cc : $(TARGET_CC_$(architecture)) ;
+	AddTargetVariableToScript $(script) : <build>addattr ;
+	AddTargetVariableToScript $(script) : <build>copyattr ;
+	AddTargetVariableToScript $(script) : <mimedb>mime_db : mimeDB ;
+	AddTargetVariableToScript $(script) : <build>mimeset ;
+	AddTargetVariableToScript $(script) : <build>package ;
+	AddTargetVariableToScript $(script) : <build>rc ;
+	AddTargetVariableToScript $(script) : <build>resattr ;
+	AddTargetVariableToScript $(script) : <build>unzip ;
+	if $(HOST_RM_ATTRS_TARGET) {
+		AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET)
+			: rmAttrs ;
+	} else {
+		AddVariableToScript $(script) : rmAttrs : rm ;
+	}
+
+	# create the other scripts
+	local makeDirsScript = <$(grist)>haiku.package-make-dirs ;
+	local copyFilesScript = <$(grist)>haiku.package-copy-files ;
+	local extractFilesScript = <$(grist)>haiku.package-extract-files ;
+
+	MakeLocate $(makeDirsScript) $(copyFilesScript) $(extractFilesScript)
+		: $(scriptDir) ;
+
+	CreateContainerMakeDirectoriesScript $(package) : $(makeDirsScript) ;
+	CreateContainerCopyFilesScript $(package) : $(copyFilesScript) ;
+	CreateContainerExtractFilesScript $(package) : $(extractFilesScript) ;
+
+	local scripts = $(initVariablesScript) $(makeDirsScript)
+		$(copyFilesScript) $(extractFilesScript) ;
+
+	# call the build actions
+	local mainScript = build_haiku_package ;
+	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
+
+	LocalDepends $(package) : $(mainScript) $(scripts) ;
+	BuildHaikuPackage1 $(package) : $(mainScript) $(packageInfo) $(scripts) ;
 }
 
-rule PackageZip
+
+actions BuildHaikuPackage1
 {
-	local dir = $(2:G=dir) ;
-	Depends $(1) : $(dir) $(3) ;
-	Clean cleanPackages : $(1) ;
-	PackageZip1 $(1) : $(dir) ;
+	$(2[1]) "$(1)" "$(2[2])" $(2[3-])
 }
 
-actions together PackageZip1 {
-	cd "$(2:P)" ;
-	zip -rq "$(1:BS)" "$(2:BS)" ;
-}
 
-rule PackageInstallScript
+rule AddDirectoryToPackage directoryTokens : attributeFiles
 {
-	MakeLocate $(1) : $(2) ;
-	Clean cleanPackages : $(1) ;
-	PackageInstallScript1 $(1) : $(2:G=dir) ;
+	return [ AddDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(directoryTokens) : $(attributeFiles) ] ;
 }
 
-actions together PackageInstallScript1
+
+rule AddFilesToPackage directory : targets : destName
 {
-echo '#!/bin/sh
-base=`dirname "$0"`
-cd "$base"
-if [ -n "$TTY" ]
-then
-    unzip -d / install.zip
-else
-    response=`alert "Would you like to automatically overwrite existing files, or receive a prompt?" "Overwrite" "Prompt"`
-    if [ $response == "Overwrite" ]
-    then
-        unzip -od / install.zip
-        alert "Finished installing" "Thanks"
-    else
-        if [ -e /boot/beos/apps/Terminal ]
-        then
-            terminal=/boot/beos/apps/Terminal
-        else
-            terminal=`query Terminal | head -1`
-        fi
-        $terminal -t "installer" /bin/sh "$0"
-    fi
-fi' > "$(1)" ;
-	chmod 755 "$(1)" ;
+	AddFilesToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE) : $(directory)
+		: $(targets) : $(destName) ;
 }
 
-rule PackageInstallZip
+
+rule AddSymlinkToPackage directoryTokens : linkTarget : linkName
 {
-	Depends $(1) : $(2) ;
-	Clean cleanPackages : $(1) ;
+	linkTarget = $(linkTarget:J=/) ;
+
+	AddSymlinkToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(directoryTokens) : $(linkTarget) : $(linkName) ;
 }
 
-actions together PackageInstallZip
+
+rule CopyDirectoryToPackage directoryTokens : sourceDirectory
+	: targetDirectoryName : excludePatterns : flags
 {
-	cd "$(1:P)" ;
-	zip -rqy "$(1:BS)" boot ;
+	CopyDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(directoryTokens) : $(sourceDirectory) : $(targetDirectoryName)
+		: $(excludePatterns) : $(flags) ;
 }
 
-rule LinkInstallZip
+
+rule AddHeaderDirectoryToPackage dirTokens : dirName : flags
 {
-	Depends $(1) : $(2) ;
-	Clean cleanPackages : $(1) ;
+	AddHeaderDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(dirTokens) : $(dirName) : $(flags) ;
 }
 
-actions together LinkInstallZip
+
+rule AddWifiFirmwareToPackage driver : subDirToExtract : archive
+	: extract
 {
-	ln -sf "`pwd`/$(2)" "$(1)" ;
+	AddWifiFirmwareToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(driver) : $(subDirToExtract) : $(archive) : $(extract) ;
 }
+
+
+rule ExtractArchiveToPackage dirTokens : archiveFile : flags : extractedSubDir
+{
+	ExtractArchiveToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(dirTokens) : $(archiveFile) : $(flags) : $(extractedSubDir) ;
+}
+
+
+rule AddDriversToPackage relativeDirectoryTokens : targets
+{
+	AddDriversToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(relativeDirectoryTokens) : $(targets) ;
+}
+
+
+rule AddNewDriversToPackage relativeDirectoryTokens : targets
+{
+	AddNewDriversToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(relativeDirectoryTokens) : $(targets) ;
+}
+
+
+rule AddBootModuleSymlinksToPackage targets
+{
+	AddBootModuleSymlinksToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(targets) ;
+}
+
+
+rule AddLibrariesToPackage directory : libs
+{
+	AddLibrariesToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		: $(directory) : $(libs) ;
+}
+
+
+# default value for the package compression level
+HAIKU_PACKAGE_COMPRESSION_LEVEL ?= 9 ;

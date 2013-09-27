@@ -3,152 +3,45 @@ SubDir HAIKU_TOP ;
 NotFile doc_files ;
 Depends files : doc_files ;
 
-# Pseudo-target to build the mail kit only
-NotFile MailKit ;
-Depends MailKit :
-	libmail.so
-	mail_daemon
-	E-mail
-	BeMail
-
-	# mail_daemon addons
-	Inbox
-	Outbox
-	Message\ Parser
-	New\ Mail\ Notification
-	Match\ Header
-	R5\ Daemon\ Filter
-	IMAP
-	POP3
-	SMTP
-	Fortune
-	Spam\ Filter
-	spamdbm
-;
-
-# Pseudo-target to build the media stuffs only
-# TODO: don't know how to make avcodec mp3_decoder mp3_reader ogg speex vorbis
-NotFile MediaKit ;
-Depends MediaKit :
-	libmedia.so
-	libgame.so
-
-	# Servers
-	media_addon_server
-	media_server
-
-	# Preference
-	Sounds
-	Media
-
-	# Deskbar replicant
-	desklink
-
-	# add-ons
-	mixer.media_addon
-	tone_producer_demo.media_addon
-	video_producer_demo.media_addon
-	legacy.media_addon
-	multi_audio.media_addon
-#	reader.media_addon
-#	writer.media_addon
-#	demultiplexer.media_addon
-
-	# codecs
-	ac3_decoder
-	aiff_reader
-	au_reader
-	avcodec
-	avi_reader
-	matroska
-	mp3_decoder
-	mp3_reader
-	musepack
-	ogg
-	raw_decoder
-	speex
-	vorbis
-	wav_reader
-	mov_reader
-;
-
-# Pseudo-target to build the input kit only
-NotFile InputKit ;
-Depends InputKit :
-	# Servers
-	input_server
-
-	# Addons
-	<input>keyboard
-	<input>mouse
-
-	# Apps
-	keymap
-
-	# Preferences
-	Keymap
-	Keyboard
-	Mouse
-;
-
-# Pseudo-target to build the OpenGL kit only
-NotFile OpenGLKit ;
-Depends OpenGLKit :
-	libGL.so
-	GLTeapot
-#	GLInfo
-;
-
-# Pseudo-target to build the screensaver kit only
-NotFile ScreenSaverKit ;
-Depends ScreenSaverKit :
-	libscreensaver.so
-	screen_saver
-	screen_blanker
-	ScreenSaver
-	Haiku
-;
-
-# Pseudo-target to build the locale kit only
-# TODO: src/add-ons/locale/collators/GermanDIN-2.cpp does not compile
-NotFile LocaleKit ;
-Depends LocaleKit :
-	Locale
-
-	# binaries for building localized software on haiku
-	collectcatkeys
-	dumpcatalog
-	linkcatkeys
-
-	# addons
-	LocaleKitCollatorAddons
-	LocaleKitCatalogAddons
-
-	# tests
-	LocaleKitTests
-;
-
-# Add optional packages given via HAIKU_ADD_OPTIONAL_PACKAGES.
-if $(HAIKU_ADD_OPTIONAL_PACKAGES) {
-	AddOptionalHaikuImagePackages
-		[ FSplitString $(HAIKU_ADD_OPTIONAL_PACKAGES) : / ] ;
-}
-
 # Prepare the optional build features before parsing the Jamfile tree.
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildFeatures ] ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildFeatures ] ;
+	}
+}
 
 # Include packages that are required by all images.
-AddOptionalHaikuImagePackages MandatoryPackages ;
+if ! $(HAIKU_BOOTSTRAP_BUILD) {
+	# primary architecture
+	AddHaikuImagePackages
+		bzip2 ctags ffmpeg freetype glu grep icu jpeg libpng libsolv mesa sed
+		tar zlib
+		:
+		system
+		;
 
-# If enabled, make sure that OpenSSL is added to the image.
-if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
-	AddOptionalHaikuImagePackages OpenSSL ;
+	# secondary architectures
+	local architectureObject ;
+	for architectureObject
+			in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
+		on $(architectureObject) {
+			AddHaikuImagePackages
+				ffmpeg freetype glu icu jpeg libpng libsolv mesa zlib
+				:
+				system
+				;
+		}
+	}
 }
 
-AddOptionalHaikuImagePackages ICU ;
+# If enabled, make sure that OpenSSL is added to the image.
+if [ FIsBuildFeatureEnabled openssl ] {
+	AddHaikuImagePackages openssl ;
+}
 
-# Evaluate optional package dependencies
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackageDependencies ] ;
+# add additionally requested packages
+AddHaikuImagePackages $(HAIKU_IMAGE_ADDITIONAL_PACKAGES) ;
 
 # Optionally we allow not to include the "src" subdirectory.
 if $(HAIKU_DONT_INCLUDE_SRC) {
@@ -173,13 +66,17 @@ SubDir HAIKU_TOP ;
 UserBuildConfigRulePostBuildTargets	;
 
 # specify the Haiku image and network boot archive contents
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) NetBootArchive ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) FloppyBootImage ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootImage ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootPPCImage ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuCD ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) AnybootImage ] ;
+if $(HAIKU_BOOTSTRAP_BUILD) {
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImageBootstrap ] ;
+} else {
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImage ] ;
+}
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images NetBootArchive ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images FloppyBootImage ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images CDBootImage ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images CDBootPPCImage ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuCD ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images AnybootImage ] ;
 
 # Check whether all requested optional packages do actually exist.
 local package ;

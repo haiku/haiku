@@ -1,47 +1,57 @@
 SubDir HAIKU_TOP src system libroot posix string ;
 
-UsePrivateHeaders 
-	[ FDirName libroot ] 
-	[ FDirName libroot locale ] 
-;
+UsePrivateHeaders
+	[ FDirName libroot ]
+	[ FDirName libroot locale ]
+	;
 
-MergeObject posix_string.o :
-	bcmp.c
-	bcopy.c
-	bzero.c
-	ffs.cpp
-	memccpy.c
-	memchr.c
-	memcmp.c
-	memmove.c
-	stpcpy.c
-	strcasecmp.c
-	strcasestr.c
-	strcat.c
-	strchr.c
-	strchrnul.c
-	strcmp.c
-	strcoll.cpp
-	strcpy.c
-	strcspn.c
-	strdup.c
-	strerror.c
-	strlcat.c
-	strlcpy.c
-	strlen.cpp
-	strlwr.c
-	strncat.c
-	strncmp.c
-	strncpy.cpp
-	strndup.cpp
-	strnlen.cpp
-	strpbrk.c
-	strrchr.c
-	strspn.c
-	strstr.c
-	strtok.c
-	strupr.c
-	strxfrm.cpp
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-HaikuSubInclude arch $(TARGET_ARCH) ;
+		MergeObject <$(architecture)>posix_string.o :
+			bcmp.c
+			bcopy.c
+			bzero.c
+			ffs.cpp
+			memccpy.c
+			memchr.c
+			memcmp.c
+			memmove.c
+			stpcpy.c
+			strcasecmp.c
+			strcasestr.c
+			strcat.c
+			strchr.c
+			strchrnul.c
+			strcmp.c
+			strcoll.cpp
+			strcpy.c
+			strcspn.c
+			strdup.c
+			strerror.c
+			strlcat.c
+			strlcpy.c
+			strlen.cpp
+			strlwr.c
+			strncat.c
+			strncmp.c
+			strncpy.cpp
+			strndup.cpp
+			strnlen.cpp
+			strpbrk.c
+			strrchr.c
+			strspn.c
+			strstr.c
+			strtok.c
+			strupr.c
+			strxfrm.cpp
+			;
+	}
+}
+
+local arch ;
+for arch in $(TARGET_ARCHS) {
+	HaikuSubInclude arch $(arch) ;
+}

@@ -491,7 +491,7 @@ Keymap::LoadSource(FILE* file)
 status_t
 Keymap::SaveAsCurrent()
 {
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	BPath path;
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
 	if (status != B_OK)
@@ -564,7 +564,7 @@ Keymap::SaveAsSource(const char* name)
 	if (file == NULL)
 		return errno;
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	text_run_array* textRuns;
 	_SaveSourceText(file, &textRuns);
 
@@ -718,7 +718,7 @@ Keymap::SaveAsCppHeader(const char* fileName, const char* mapName)
 status_t
 Keymap::Use()
 {
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	return _restore_key_map_();
 
 #else	// ! __BEOS__
@@ -731,7 +731,7 @@ Keymap::Use()
 void
 Keymap::RestoreSystemDefault()
 {
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	// work-around to get rid of this stupid find_directory_r() on Zeta
 #	ifdef find_directory
 #		undef find_directory
@@ -790,7 +790,7 @@ Keymap::GetKey(const char* chars, int32 offset, char* buffer, size_t bufferSize)
 }
 
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 void
 Keymap::_SaveSourceText(FILE* file, text_run_array** _textRuns)
 {
@@ -808,7 +808,7 @@ Keymap::_SaveSourceText(FILE* file)
 	static const rgb_color kCommentColor = (rgb_color){200, 92, 92, 255};
 	static const rgb_color kTextColor = (rgb_color){0, 0, 0, 255};
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	BFont font = *be_fixed_font;
 
 	if (runs != NULL) {
@@ -822,7 +822,7 @@ Keymap::_SaveSourceText(FILE* file)
 		"#\n"
 		"#\tRaw key numbering for 102-key keyboard...\n");
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (runs != NULL) {
 		runs->runs[1].offset = bytes;
 		runs->runs[1].font = font;
@@ -851,7 +851,7 @@ Keymap::_SaveSourceText(FILE* file)
 		"# [ ctrl ]          [ cmd ]             [ space ]             [ cmd ]          [ ctrl ]    [lft] [dwn] [rgt]    [ 0 ] [ . ]\n"
 		"#   0x5c              0x5d                 0x5e                 0x5f             0x60       0x61  0x62  0x63     0x64  0x65\n");
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (runs != NULL) {
 		runs->runs[2].offset = bytes;
 		runs->runs[2].font = font;
@@ -871,7 +871,7 @@ Keymap::_SaveSourceText(FILE* file)
 		"#\t\t\tkeypad '='   = 0x6a\n"
 		"#\t\t\tpower key    = 0x6b\n");
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (runs != NULL) {
 		runs->runs[3].offset = bytes;
 		runs->runs[3].font = *be_fixed_font;
@@ -898,7 +898,7 @@ Keymap::_SaveSourceText(FILE* file)
 		fKeys.left_control_key, fKeys.right_control_key,
 		fKeys.left_option_key, fKeys.right_option_key, fKeys.menu_key);
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (runs != NULL) {
 		runs->runs[4].offset = bytes;
 		runs->runs[4].font = *be_fixed_font;
@@ -915,7 +915,7 @@ Keymap::_SaveSourceText(FILE* file)
 		"#   LockSettings = CapsLock NumLock ScrollLock\n"
 		"#\n");
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (runs != NULL) {
 		runs->runs[5].offset = bytes;
 		runs->runs[5].font = *be_fixed_font;
@@ -932,7 +932,7 @@ Keymap::_SaveSourceText(FILE* file)
 		bytes += fprintf(file, "ScrollLock ");
 	bytes += fprintf(file, "\n");
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (runs != NULL) {
 		runs->runs[6].offset = bytes;
 		runs->runs[6].font = *be_fixed_font;
@@ -950,7 +950,7 @@ Keymap::_SaveSourceText(FILE* file)
 		"C        Cs       Co       Cos     \n", file);
 
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (runs != NULL) {
 		runs->runs[7].offset = bytes;
 		runs->runs[7].font = *be_fixed_font;

@@ -6,6 +6,7 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 Application Installer :
 	CopyEngine.cpp
 	InstallerApp.cpp
+	InstallerDefs.cpp
 	InstallerWindow.cpp
 	PackageViews.cpp
 	PartitionMenuItem.cpp
@@ -13,7 +14,7 @@ Application Installer :
 	UnzipEngine.cpp
 	WorkerThread.cpp
 	: be tracker translation libshared.a $(TARGET_LIBSTDC++) 
-		$(HAIKU_LOCALE_LIBS)
+		localestub
 	: Installer.rdef
 ;
 
@@ -26,4 +27,3 @@ DoCatalogs Installer :
 	ProgressReporter.cpp
 	WorkerThread.cpp
 ;
-

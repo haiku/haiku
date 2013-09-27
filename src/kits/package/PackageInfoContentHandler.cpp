@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -137,6 +137,31 @@ BPackageInfoContentHandler::HandlePackageAttribute(
 
 		case B_PACKAGE_INFO_INSTALL_PATH:
 			fPackageInfo.SetInstallPath(value.string);
+			break;
+
+		case B_PACKAGE_INFO_BASE_PACKAGE:
+			fPackageInfo.SetBasePackage(value.string);
+			break;
+
+		case B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES:
+			fPackageInfo.AddGlobalWritableFileInfo(
+				value.globalWritableFileInfo);
+			break;
+
+		case B_PACKAGE_INFO_USER_SETTINGS_FILES:
+			fPackageInfo.AddUserSettingsFileInfo(value.userSettingsFileInfo);
+			break;
+
+		case B_PACKAGE_INFO_USERS:
+			fPackageInfo.AddUser(value.user);
+			break;
+
+		case B_PACKAGE_INFO_GROUPS:
+			fPackageInfo.AddGroup(value.string);
+			break;
+
+		case B_PACKAGE_INFO_POST_INSTALL_SCRIPTS:
+			fPackageInfo.AddPostInstallScript(value.string);
 			break;
 
 		default:

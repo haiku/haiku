@@ -15,7 +15,7 @@ Translator STXTTranslator :
 	STXTTranslator.cpp
 	STXTView.cpp
 	: be translation libtextencoding.so libtranslatorsutils.a 
-	$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	$(TARGET_LIBSUPC++) localestub
 	: true
 ;
 
@@ -26,8 +26,4 @@ DoCatalogs STXTTranslator :
 	STXTTranslator.cpp
 	STXTView.cpp
 ;
-	
-#Package haiku-translationkit-cvs :
-#	STXTTranslator :
-#	boot home config add-ons Translators ;
 

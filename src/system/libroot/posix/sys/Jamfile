@@ -1,29 +1,37 @@
 SubDir HAIKU_TOP src system libroot posix sys ;
 
 UsePrivateHeaders libroot shared ;
-UsePrivateSystemHeaders ;
 
-MergeObject posix_sys.o :
-	chmod.c
-	flock.c
-	ftime.c
-	ftok.c
-	getrusage.c
- 	gettimeofday.c
-	itimer.cpp
-	mkdir.c
-	mkfifo.c
-	mman.cpp
-	rlimit.c
- 	select.c
-	stat.c
-	statvfs.c
- 	times.cpp
- 	uio.c
- 	umask.c
- 	uname.c
- 	utimes.c
-	wait.cpp
-	xsi_msg_queue.cpp
-	xsi_sem.cpp
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateSystemHeaders ;
+
+		MergeObject <$(architecture)>posix_sys.o :
+			chmod.c
+			flock.c
+			ftime.c
+			ftok.c
+			getrusage.c
+			gettimeofday.c
+			itimer.cpp
+			mkdir.c
+			mkfifo.c
+			mman.cpp
+			rlimit.c
+			select.c
+			stat.c
+			statvfs.c
+			times.cpp
+			uio.c
+			umask.c
+			uname.c
+			utimes.c
+			wait.cpp
+			xsi_msg_queue.cpp
+			xsi_sem.cpp
+			;
+	}
+}

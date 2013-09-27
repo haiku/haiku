@@ -115,7 +115,7 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 		return fTextSpans.Add(newSpan, index);
 	}
 
-	// Split the span, 
+	// Split the span,
 	TextSpan spanBefore = span.SubSpan(0, offset);
 	TextSpan spanAfter = span.SubSpan(offset, span.CharCount() - offset);
 

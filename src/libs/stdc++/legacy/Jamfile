@@ -1,178 +1,195 @@
 SubDir HAIKU_TOP src libs stdc++ legacy ;
 
-# disable undesired warnings, and add some required C++ flags
-CCFLAGS += -Wno-missing-prototypes ;
-C++FLAGS += -nostdinc++ -fno-implicit-templates -Wno-sign-compare -fpic ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup x86_gcc2 ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-# define header-searchpaths all by ourselves, as including system headers
-# messes things up:
-# use the following paths to make use of the headers contained in glibc, 
-# but this doesn't work yet, as the libio we are using here and the one 
-# contained in our libroot are different versions.
-SYSHDRS = 
-	$(SUBDIR)
-	[ FDirName $(HAIKU_TOP) src system libroot posix glibc libio ]
-	[ FDirName $(HAIKU_TOP) src system libroot posix glibc stdlib ] 
-	[ FDirName $(HAIKU_TOP) src system libroot posix glibc stdio-common ] 
-	[ FDirName $(HAIKU_TOP) src system libroot posix glibc include ] 
-	[ FDirName $(HAIKU_TOP) src system libroot posix glibc include arch x86 ] 
-	[ FDirName $(HAIKU_TOP) headers cpp ] 
-	[ FDirName $(HAIKU_TOP) src system libroot posix glibc ] 
-	[ FDirName $(HAIKU_TOP) headers posix ] 
-	[ FDirName $(HAIKU_TOP) headers os ] 
-	[ FDirName $(HAIKU_TOP) headers os kernel ] 
-	[ FDirName $(HAIKU_TOP) headers os storage ] 
-	[ FDirName $(HAIKU_TOP) headers os support ] 
-	$(TARGET_GCC_HEADERS_DIR) ; 		# such that include_next will work
+		# disable undesired warnings, and add some required C++ flags
+		CCFLAGS += -Wno-missing-prototypes ;
+		C++FLAGS += -nostdinc++ -fno-implicit-templates -Wno-sign-compare
+			-fpic ;
 
-UsePrivateHeaders libroot ;
+		# define header-searchpaths all by ourselves, as including system headers
+		# messes things up:
+		# use the following paths to make use of the headers contained in glibc,
+		# but this doesn't work yet, as the libio we are using here and the one
+		# contained in our libroot are different versions.
+		local glibcDir
+			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc ] ;
+		SYSHDRS =
+			$(SUBDIR)
+			[ FDirName $(glibcDir) libio ]
+			[ FDirName $(glibcDir) stdlib ]
+			[ FDirName $(glibcDir) stdio-common ]
+			[ FDirName $(glibcDir) include ]
+			[ FDirName $(glibcDir) include arch x86 ]
+			[ FDirName $(HAIKU_TOP) headers cpp ]
+			$(glibcDir)
+			[ FDirName $(HAIKU_TOP) headers posix ]
+			[ FDirName $(HAIKU_TOP) headers os ]
+			[ FDirName $(HAIKU_TOP) headers os kernel ]
+			[ FDirName $(HAIKU_TOP) headers os storage ]
+			[ FDirName $(HAIKU_TOP) headers os support ]
+			$(HAIKU_GCC_HEADERS_DIR_x86_gcc2)
+				# so that include_next will work
+			;
 
-# some source-files generate several different objects, depending on
-# the defines that are used during the compilation call.
-# So we explicitly state each of these (with their respective defines):
-rule GenerateStdC++Object
-{
-	# GenerateStdC++Object <object> : <source> : <defines> ;
-	local object = [ FGristFiles $(1) ] ;
-	local sources = $(2) ;
-	local defines = $(3) ;
+		UsePrivateHeaders libroot ;
 
-	if $(object) {
-		Object $(object) : $(sources) ;
-		ObjectDefines $(object) : $(defines) ;
-	} else {
-		Objects $(sources) ;
-		ObjectDefines $(sources) : $(defines) ;
+		# some source-files generate several different objects, depending on
+		# the defines that are used during the compilation call.
+		# So we explicitly state each of these (with their respective defines):
+		rule GenerateStdC++Object
+		{
+			# GenerateStdC++Object <object> : <source> : <defines> ;
+			local object = [ FGristFiles $(1) ] ;
+			local sources = $(2) ;
+			local defines = $(3) ;
+
+			if $(object) {
+				Object $(object) : $(sources) ;
+				ObjectDefines $(object) : $(defines) ;
+			} else {
+				Objects $(sources) ;
+				ObjectDefines $(sources) : $(defines) ;
+			}
+		}
+
+		GenerateStdC++Object cstrio.o
+			: sinst.cc
+			: C EXTRACT INSERT GETLINE
+			;
+
+		GenerateStdC++Object cstrmain.o
+			: sinst.cc
+			: C REP MAIN TRAITS ADDSS ADDPS ADDCS ADDSP ADDSC EQSS EQPS EQSP
+				NESS NEPS NESP LTSS LTPS LTSP GTSS GTPS GTSP LESS LEPS LESP GESS
+				GEPS GESP ;
+
+		GenerateStdC++Object dcomio.o
+			: cinst.cc
+			: D EXTRACT INSERT ;
+
+		GenerateStdC++Object dcomplex.o
+			: cinst.cc
+			: D MAIN ADDCC ADDCF ADDFC SUBCC SUBCF SUBFC MULCC MULCF MULFC DIVCC
+				DIVCF DIVFC PLUS MINUS EQCC EQCF EQFC NECC NECF NEFC ABS ARG
+				POLAR CONJ NORM COS  COSH EXP LOG POWCC POWCF POWCI POWFC SIN
+				SINH SQRT ;
+
+		GenerateStdC++Object fcomio.o
+			: cinst.cc
+			: F EXTRACT INSERT ;
+
+		GenerateStdC++Object fcomplex.o
+			: cinst.cc
+			: F MAIN ADDCC ADDCF ADDFC SUBCC SUBCF SUBFC MULCC MULCF MULFC DIVCC
+				DIVCF DIVFC PLUS MINUS EQCC EQCF EQFC NECC NECF NEFC ABS ARG
+				POLAR CONJ NORM COS COSH EXP LOG POWCC POWCF POWCI POWFC SIN
+				SINH SQRT ;
+
+		GenerateStdC++Object ldcomio.o
+			: cinst.cc
+			: LD EXTRACT INSERT ;
+
+		GenerateStdC++Object ldcomplex.o
+			: cinst.cc
+			: LD MAIN ADDCC ADDCF ADDFC SUBCC SUBCF SUBFC MULCC MULCF MULFC
+				DIVCC DIVCF DIVFC PLUS MINUS EQCC EQCF EQFC NECC NECF NEFC ABS
+				ARG POLAR CONJ NORM COS  COSH EXP LOG POWCC POWCF POWCI POWFC
+				SIN SINH SQRT ;
+
+		# generate standard objects through our new rule, too:
+		GenerateStdC++Object
+			:  cmathi.cc
+				cstdlibi.cc
+				cstringi.cc
+				stdexcepti.cc ;
+
+		# c++ parts from libio:
+		GenerateStdC++Object
+			: 	builtinbuf.cc
+				editbuf.cc
+				filebuf.cc
+				fstream.cc
+				indstream.cc
+				ioassign.cc
+				ioextend.cc
+				iomanip.cc
+				iostream.cc
+				isgetline.cc
+				isgetsb.cc
+				isscan.cc
+				osform.cc
+				parsestream.cc
+				pfstream.cc
+				PlotFile.cc
+				procbuf.cc
+				sbform.cc
+				sbgetline.cc
+				sbscan.cc
+				SFile.cc
+				stdexcepti.cc
+				stdiostream.cc
+				stdstrbufs.cc
+				stdstreams.cc
+				stlinst.cc
+				stream.cc
+				streambuf.cc
+				strstream.cc ;
+
+		# stuff imported from libiberty:
+		GenerateStdC++Object
+			: basename.c getpagesize.c insque.c sigsetmask.c strerror.c
+				vfork.c ;
+
+		SharedLibraryFromObjects libstdc++.r4.so :
+			basename.o
+			builtinbuf.o
+			cmathi.o
+			cstdlibi.o
+			cstringi.o
+			cstrio.o
+			cstrmain.o
+			dcomio.o
+			dcomplex.o
+			editbuf.o
+			fcomio.o
+			fcomplex.o
+			filebuf.o
+			fstream.o
+			getpagesize.o
+			indstream.o
+			insque.o
+			ioassign.o
+			ioextend.o
+			iomanip.o
+			iostream.o
+			isgetline.o
+			isgetsb.o
+			isscan.o
+			ldcomio.o
+			ldcomplex.o
+			osform.o
+			parsestream.o
+			pfstream.o
+			PlotFile.o
+			procbuf.o
+			sbform.o
+			sbgetline.o
+			sbscan.o
+			SFile.o
+			sigsetmask.o
+			stdexcepti.o
+			stdiostream.o
+			stdstrbufs.o
+			stdstreams.o
+			stlinst.o
+			stream.o
+			streambuf.o
+			strerror.o
+			strstream.o
+			vfork.o ;
 	}
 }
-
-GenerateStdC++Object cstrio.o 
-	: sinst.cc 
-	: C EXTRACT INSERT GETLINE 
-	;
-
-GenerateStdC++Object cstrmain.o
-	: sinst.cc 
-	: C REP MAIN TRAITS ADDSS ADDPS ADDCS ADDSP ADDSC EQSS EQPS EQSP NESS NEPS 
-	  NESP LTSS LTPS LTSP GTSS GTPS GTSP LESS LEPS LESP GESS GEPS GESP ;
-
-GenerateStdC++Object dcomio.o
-	: cinst.cc 
-	: D EXTRACT INSERT ;
-
-GenerateStdC++Object dcomplex.o
-	: cinst.cc 
-	: D MAIN ADDCC ADDCF ADDFC SUBCC SUBCF SUBFC MULCC MULCF MULFC DIVCC DIVCF 
-	  DIVFC PLUS MINUS EQCC EQCF EQFC NECC NECF NEFC ABS ARG POLAR CONJ NORM COS 
-     COSH EXP LOG POWCC POWCF POWCI POWFC SIN SINH SQRT ;
-
-GenerateStdC++Object fcomio.o
-	: cinst.cc 
-	: F EXTRACT INSERT ;
-
-GenerateStdC++Object fcomplex.o
-	: cinst.cc 
-	: F MAIN ADDCC ADDCF ADDFC SUBCC SUBCF SUBFC MULCC MULCF MULFC DIVCC DIVCF 
-	  DIVFC PLUS MINUS EQCC EQCF EQFC NECC NECF NEFC ABS ARG POLAR CONJ NORM COS
-	  COSH EXP LOG POWCC POWCF POWCI POWFC SIN SINH SQRT ;
-
-GenerateStdC++Object ldcomio.o
-	: cinst.cc 
-	: LD EXTRACT INSERT ;
-
-GenerateStdC++Object ldcomplex.o
-	: cinst.cc 
-	: LD MAIN ADDCC ADDCF ADDFC SUBCC SUBCF SUBFC MULCC MULCF MULFC DIVCC DIVCF 
-	  DIVFC PLUS MINUS EQCC EQCF EQFC NECC NECF NEFC ABS ARG POLAR CONJ NORM COS 
-     COSH EXP LOG POWCC POWCF POWCI POWFC SIN SINH SQRT ;
-
-# generate standard objects through our new rule, too:
-GenerateStdC++Object 
-	:  cmathi.cc 
-		cstdlibi.cc 
-		cstringi.cc 
-		stdexcepti.cc ;
-
-# c++ parts from libio:
-GenerateStdC++Object 
-	: 	builtinbuf.cc 
-		editbuf.cc 
-		filebuf.cc 
-		fstream.cc 
-		indstream.cc 
-		ioassign.cc
-		ioextend.cc
-		iomanip.cc
-		iostream.cc
-		isgetline.cc
-		isgetsb.cc
-		isscan.cc
-		osform.cc
-		parsestream.cc
-		pfstream.cc
-		PlotFile.cc
-		procbuf.cc
-		sbform.cc
-		sbgetline.cc
-		sbscan.cc
-		SFile.cc
-		stdexcepti.cc
-		stdiostream.cc
-		stdstrbufs.cc
-		stdstreams.cc
-		stlinst.cc
-		stream.cc
-		streambuf.cc
-		strstream.cc ;
-
-# stuff imported from libiberty:
-GenerateStdC++Object 
-	: basename.c getpagesize.c insque.c sigsetmask.c strerror.c vfork.c ;
-
-SharedLibraryFromObjects libstdc++.r4.so : 
-	basename.o
- 	builtinbuf.o 
-	cmathi.o
-	cstdlibi.o
-	cstringi.o
-	cstrio.o
-	cstrmain.o
-	dcomio.o
-	dcomplex.o
-	editbuf.o 
-	fcomio.o
-	fcomplex.o
-	filebuf.o 
-	fstream.o 
-	getpagesize.o
-	indstream.o 
-	insque.o
-	ioassign.o
-	ioextend.o
-	iomanip.o
-	iostream.o
-	isgetline.o
-	isgetsb.o
-	isscan.o
-	ldcomio.o
-	ldcomplex.o
-	osform.o
-	parsestream.o
-	pfstream.o
-	PlotFile.o
-	procbuf.o
-	sbform.o
-	sbgetline.o
-	sbscan.o
-	SFile.o
-	sigsetmask.o
-	stdexcepti.o
-	stdiostream.o
-	stdstrbufs.o
-	stdstreams.o
-	stlinst.o
-	stream.o
-	streambuf.o
-	strerror.o
-	strstream.o 
-	vfork.o ;

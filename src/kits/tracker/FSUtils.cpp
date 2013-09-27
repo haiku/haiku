@@ -71,6 +71,8 @@ respective holders. All rights reserved.
 #include <fs_info.h>
 #include <sys/utsname.h>
 
+#include <AutoLocker.h>
+
 #include "Attributes.h"
 #include "Bitmaps.h"
 #include "Commands.h"
@@ -85,6 +87,7 @@ respective holders. All rights reserved.
 #include "Tracker.h"
 #include "TrackerSettings.h"
 #include "Utilities.h"
+#include "VirtualDirectoryManager.h"
 
 
 enum {
@@ -3156,6 +3159,66 @@ GetAttrInfo(const BNode* node, const char* hostAttrName,
 	}
 	return kReadAttrFailed;
 }
+
+
+status_t
+FSGetParentVirtualDirectoryAware(const BEntry& entry, entry_ref& _ref)
+{
+	node_ref nodeRef;
+	if (entry.GetNodeRef(&nodeRef) == B_OK) {
+		if (VirtualDirectoryManager* manager
+				= VirtualDirectoryManager::Instance()) {
+			AutoLocker<VirtualDirectoryManager> managerLocker(manager);
+			if (manager->GetParentDirectoryDefinitionFile(nodeRef, _ref,
+					nodeRef)) {
+				return B_OK;
+			}
+		}
+	}
+
+	status_t error;
+	BDirectory parent;
+	BEntry parentEntry;
+	if ((error = entry.GetParent(&parent)) != B_OK
+		|| (error = parent.GetEntry(&parentEntry)) != B_OK
+		|| (error = parentEntry.GetRef(&_ref)) != B_OK) {
+		return error;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+FSGetParentVirtualDirectoryAware(const BEntry& entry, BEntry& _entry)
+{
+	node_ref nodeRef;
+	if (entry.GetNodeRef(&nodeRef) == B_OK) {
+		if (VirtualDirectoryManager* manager
+				= VirtualDirectoryManager::Instance()) {
+			AutoLocker<VirtualDirectoryManager> managerLocker(manager);
+			entry_ref parentRef;
+			if (manager->GetParentDirectoryDefinitionFile(nodeRef, parentRef,
+					nodeRef)) {
+				return _entry.SetTo(&parentRef);
+			}
+		}
+	}
+
+	return entry.GetParent(&_entry);
+}
+
+
+status_t
+FSGetParentVirtualDirectoryAware(const BEntry& entry, BNode& _node)
+{
+	entry_ref ref;
+	status_t error = FSGetParentVirtualDirectoryAware(entry, ref);
+	if (error == B_OK)
+		error = _node.SetTo(&ref);
+	return error;
+}
+
 
 // launching code
 

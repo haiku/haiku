@@ -22,11 +22,11 @@
 #include "package.h"
 #include "PackageWriterListener.h"
 #include "PackageWritingUtils.h"
-#include "StandardErrorOutput.h"
 
 
-using BPackageKit::BHPKG::BPackageWriterListener;
 using BPackageKit::BHPKG::BPackageWriter;
+using BPackageKit::BHPKG::BPackageWriterListener;
+using BPackageKit::BHPKG::BPackageWriterParameters;
 
 
 int
@@ -38,6 +38,7 @@ command_create(int argc, const char* const* argv)
 	bool isBuildPackage = false;
 	bool quiet = false;
 	bool verbose = false;
+	int32 compressionLevel = BPackageKit::BHPKG::B_HPKG_COMPRESSION_LEVEL_BEST;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -48,12 +49,25 @@ command_create(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+bC:hi:I:qv", sLongOptions,
-			NULL);
+		int c = getopt_long(argc, (char**)argv, "+b0123456789C:hi:I:qv",
+			sLongOptions, NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				compressionLevel = c - '0';
+				break;
+
 			case 'b':
 				isBuildPackage = true;
 				break;
@@ -102,9 +116,12 @@ command_create(int argc, const char* const* argv)
 	}
 
 	// create package
+	BPackageWriterParameters writerParameters;
+	writerParameters.SetCompressionLevel(compressionLevel);
+
 	PackageWriterListener listener(verbose, quiet);
 	BPackageWriter packageWriter(&listener);
-	status_t result = packageWriter.Init(packageFileName);
+	status_t result = packageWriter.Init(packageFileName, &writerParameters);
 	if (result != B_OK)
 		return 1;
 
@@ -151,8 +168,8 @@ command_create(int argc, const char* const* argv)
 	}
 
 	// add the .PackageInfo
-	result = packageWriter.AddEntry(B_HPKG_PACKAGE_INFO_FILE_NAME,
-		packageInfoFD);
+	result = packageWriter.AddEntry(
+		BPackageKit::BHPKG::B_HPKG_PACKAGE_INFO_FILE_NAME, packageInfoFD);
 	if (result != B_OK)
 		return 1;
 

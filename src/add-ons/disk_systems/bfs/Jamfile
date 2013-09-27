@@ -13,7 +13,7 @@ Addon <disk_system>bfs :
 
 	bfs_disk_system.cpp
 
-	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) libshared.a
+	: be localestub $(TARGET_LIBSUPC++) libshared.a
 ;
 
 DoCatalogs <disk_system>bfs :

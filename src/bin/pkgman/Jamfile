@@ -1,16 +1,23 @@
 SubDir HAIKU_TOP src bin pkgman ;
 
-UsePrivateHeaders support ;
+UsePrivateHeaders shared storage support ;
 
 BinCommand pkgman :
+	Command.cpp
 	command_add_repo.cpp
 	command_drop_repo.cpp
+	command_install.cpp
 	command_list_repos.cpp
+	command_update.cpp
 	command_refresh.cpp
+	command_resolve_dependencies.cpp
+	command_search.cpp
+	command_uninstall.cpp
 	DecisionProvider.cpp
 	JobStateListener.cpp
+	PackageManager.cpp
 	pkgman.cpp
 	:
 	package be
-	$(TARGET_LIBSUPC++)
+	$(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
 ;

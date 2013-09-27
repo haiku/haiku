@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -25,19 +25,139 @@
 
 #include <util/OpenHashTable.h>
 
+#include <package/hpkg/BlockBufferPoolNoLock.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageDataReader.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageReader.h>
-#include <package/BlockBufferCacheNoLock.h>
+#include <package/hpkg/StandardErrorOutput.h>
+#include <package/hpkg/v1/PackageContentHandler.h>
+#include <package/hpkg/v1/PackageDataReader.h>
+#include <package/hpkg/v1/PackageEntry.h>
+#include <package/hpkg/v1/PackageEntryAttribute.h>
+#include <package/hpkg/v1//PackageReader.h>
 
 #include "package.h"
-#include "StandardErrorOutput.h"
 
 
-using namespace BPackageKit::BHPKG;
-using BPackageKit::BBlockBufferCacheNoLock;
+using BPackageKit::BHPKG::BAbstractBufferedDataReader;
+using BPackageKit::BHPKG::BBlockBufferPoolNoLock;
+using BPackageKit::BHPKG::BBufferDataReader;
+using BPackageKit::BHPKG::BBufferPool;
+using BPackageKit::BHPKG::BDataReader;
+using BPackageKit::BHPKG::BErrorOutput;
+using BPackageKit::BHPKG::BFDDataReader;
+using BPackageKit::BHPKG::BPackageInfoAttributeValue;
+using BPackageKit::BHPKG::BStandardErrorOutput;
+
+
+struct VersionPolicyV1 {
+	typedef BPackageKit::BHPKG::V1::BPackageContentHandler
+		PackageContentHandler;
+	typedef BPackageKit::BHPKG::V1::BPackageData PackageData;
+	typedef BPackageKit::BHPKG::V1::BPackageEntry PackageEntry;
+	typedef BPackageKit::BHPKG::V1::BPackageEntryAttribute
+		PackageEntryAttribute;
+	typedef BPackageKit::BHPKG::V1::BPackageReader PackageReader;
+	typedef BDataReader HeapReaderBase;
+
+	static inline size_t BufferSize()
+	{
+		return BPackageKit::BHPKG::V1::B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB;
+	}
+
+	static inline const char* PackageInfoFileName()
+	{
+		return BPackageKit::BHPKG::V1::B_HPKG_PACKAGE_INFO_FILE_NAME;
+	}
+
+	static inline uint64 PackageDataCompressedSize(const PackageData& data)
+	{
+		return data.CompressedSize();
+	}
+
+	static inline uint64 PackageDataUncompressedSize(const PackageData& data)
+	{
+		return data.UncompressedSize();
+	}
+
+	static inline status_t InitReader(PackageReader& packageReader,
+		const char* fileName)
+	{
+		return packageReader.Init(fileName);
+	}
+
+	static status_t GetHeapReader(PackageReader& packageReader,
+		HeapReaderBase*& _heapReader, bool& _mustDelete)
+	{
+		_heapReader = new(std::nothrow) BFDDataReader(
+			packageReader.PackageFileFD());
+		_mustDelete = false;
+		return _heapReader != NULL ? B_OK : B_NO_MEMORY;
+	}
+
+	static status_t CreatePackageDataReader(BBufferPool* bufferPool,
+		HeapReaderBase* heapReader, const PackageData& data,
+		BAbstractBufferedDataReader*& _reader)
+	{
+		return BPackageKit::BHPKG::V1::BPackageDataReaderFactory(bufferPool)
+			.CreatePackageDataReader(heapReader, data, _reader);
+	}
+};
+
+struct VersionPolicyV2 {
+	typedef BPackageKit::BHPKG::BPackageContentHandler PackageContentHandler;
+	typedef BPackageKit::BHPKG::BPackageData PackageData;
+	typedef BPackageKit::BHPKG::BPackageEntry PackageEntry;
+	typedef BPackageKit::BHPKG::BPackageEntryAttribute PackageEntryAttribute;
+	typedef BPackageKit::BHPKG::BPackageReader PackageReader;
+	typedef BAbstractBufferedDataReader HeapReaderBase;
+
+	static inline size_t BufferSize()
+	{
+		return 64 * 1024;
+	}
+
+	static inline const char* PackageInfoFileName()
+	{
+		return BPackageKit::BHPKG::B_HPKG_PACKAGE_INFO_FILE_NAME;
+	}
+
+	static inline uint64 PackageDataCompressedSize(const PackageData& data)
+	{
+		return data.Size();
+	}
+
+	static inline uint64 PackageDataUncompressedSize(const PackageData& data)
+	{
+		return data.Size();
+	}
+
+	static inline status_t InitReader(PackageReader& packageReader,
+		const char* fileName)
+	{
+		return packageReader.Init(fileName,
+			BPackageKit::BHPKG
+				::B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE);
+	}
+
+	static status_t GetHeapReader(PackageReader& packageReader,
+		HeapReaderBase*& _heapReader, bool& _mustDelete)
+	{
+		_heapReader = packageReader.HeapReader();
+		_mustDelete = false;
+		return B_OK;
+	}
+
+	static status_t CreatePackageDataReader(BBufferPool* bufferPool,
+		HeapReaderBase* heapReader, const PackageData& data,
+		BAbstractBufferedDataReader*& _reader)
+	{
+		return BPackageKit::BHPKG::BPackageDataReaderFactory()
+			.CreatePackageDataReader(heapReader, data, _reader);
+	}
+};
 
 
 struct Entry {
@@ -65,6 +185,14 @@ struct Entry {
 	static status_t Create(Entry* parent, const char* name, bool implicit,
 		Entry*& _entry)
 	{
+		if (parent != NULL) {
+			Entry* entryInParent = parent->FindChild(name);
+			if (entryInParent != NULL) {
+				_entry = entryInParent;
+				return B_OK;
+			}
+		}
+
 		char* clonedName = strdup(name);
 		if (clonedName == NULL)
 			return B_NO_MEMORY;
@@ -176,11 +304,13 @@ private:
 };
 
 
-struct PackageContentExtractHandler : BPackageContentHandler {
-	PackageContentExtractHandler(int packageFileFD)
+template<typename VersionPolicy>
+struct PackageContentExtractHandler : VersionPolicy::PackageContentHandler {
+	PackageContentExtractHandler(BBufferPool* bufferPool,
+	typename VersionPolicy::HeapReaderBase* heapReader)
 		:
-		fBufferCache(B_HPKG_DEFAULT_DATA_CHUNK_SIZE_ZLIB, 2),
-		fPackageFileReader(packageFileFD),
+		fBufferPool(bufferPool),
+		fPackageFileReader(heapReader),
 		fDataBuffer(NULL),
 		fDataBufferSize(0),
 		fRootFilterEntry(NULL, NULL, true),
@@ -197,11 +327,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 
 	status_t Init()
 	{
-		status_t error = fBufferCache.Init();
-		if (error != B_OK)
-			return error;
-
-		error = fRootFilterEntry.Init();
+		status_t error = fRootFilterEntry.Init();
 		if (error != B_OK)
 			return error;
 
@@ -280,7 +406,7 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		return entry;
 	}
 
-	virtual status_t HandleEntry(BPackageEntry* entry)
+	virtual status_t HandleEntry(typename VersionPolicy::PackageEntry* entry)
 	{
 		// create a token
 		Token* token = new(std::nothrow) Token;
@@ -384,15 +510,8 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 			}
 
 			// write data
-			status_t error;
-			const BPackageData& data = entry->Data();
-			if (data.IsEncodedInline()) {
-				BBufferDataReader dataReader(data.InlineData(),
-					data.CompressedSize());
-				error = _ExtractFileData(&dataReader, data, fd);
-			} else
-				error = _ExtractFileData(&fPackageFileReader, data, fd);
-
+			status_t error = _ExtractFileData(fPackageFileReader, entry->Data(),
+				fd);
 			if (error != B_OK)
 				return error;
 		} else if (S_ISLNK(entry->Mode())) {
@@ -452,8 +571,9 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
-		BPackageEntryAttribute* attribute)
+	virtual status_t HandleEntryAttribute(
+		typename VersionPolicy::PackageEntry* entry,
+		typename VersionPolicy::PackageEntryAttribute* attribute)
 	{
 		// don't write attributes of ignored or implicit entries
 		Token* token = (Token*)entry->UserToken();
@@ -477,21 +597,16 @@ struct PackageContentExtractHandler : BPackageContentHandler {
 		}
 
 		// write data
-		status_t error;
-		const BPackageData& data = attribute->Data();
-		if (data.IsEncodedInline()) {
-			BBufferDataReader dataReader(data.InlineData(),
-				data.CompressedSize());
-			error = _ExtractFileData(&dataReader, data, fd);
-		} else
-			error = _ExtractFileData(&fPackageFileReader, data, fd);
+		status_t error = _ExtractFileData(fPackageFileReader, attribute->Data(),
+			fd);
 
 		fs_close_attr(fd);
 
 		return error;
 	}
 
-	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	virtual status_t HandleEntryDone(
+		typename VersionPolicy::PackageEntry* entry)
 	{
 		Token* token = (Token*)entry->UserToken();
 
@@ -561,13 +676,13 @@ private:
 		return Entry::Create(parentEntry, name.String(), implicit, _entry);
 	}
 
-	void _GetParentFDAndEntryName(BPackageEntry* entry, int& _parentFD,
-		const char*& _entryName)
+	void _GetParentFDAndEntryName(typename VersionPolicy::PackageEntry* entry,
+		int& _parentFD, const char*& _entryName)
 	{
 		_entryName = entry->Name();
 
 		if (fInfoFileName != NULL
-			&& strcmp(_entryName, B_HPKG_PACKAGE_INFO_FILE_NAME) == 0) {
+			&& strcmp(_entryName, VersionPolicy::PackageInfoFileName()) == 0) {
 			_parentFD = AT_FDCWD;
 			_entryName = fInfoFileName;
 		} else {
@@ -576,11 +691,12 @@ private:
 		}
 	}
 
-	BString _EntryPath(const BPackageEntry* entry)
+	BString _EntryPath(const typename VersionPolicy::PackageEntry* entry)
 	{
 		BString path;
 
-		if (const BPackageEntry* parent = entry->Parent()) {
+		if (const typename VersionPolicy::PackageEntry* parent
+				= entry->Parent()) {
 			path = _EntryPath(parent);
 			path << '/';
 		}
@@ -589,19 +705,20 @@ private:
 		return path;
 	}
 
-	status_t _ExtractFileData(BDataReader* dataReader, const BPackageData& data,
-		int fd)
+	status_t _ExtractFileData(
+		typename VersionPolicy::HeapReaderBase* dataReader,
+		const typename VersionPolicy::PackageData& data, int fd)
 	{
-		// create a BPackageDataReader
-		BPackageDataReader* reader;
-		status_t error = BPackageDataReaderFactory(&fBufferCache)
-			.CreatePackageDataReader(dataReader, data, reader);
+		// create a PackageDataReader
+		BAbstractBufferedDataReader* reader;
+		status_t error = VersionPolicy::CreatePackageDataReader(fBufferPool,
+			dataReader, data, reader);
 		if (error != B_OK)
 			return error;
-		ObjectDeleter<BPackageDataReader> readerDeleter(reader);
+		ObjectDeleter<BAbstractBufferedDataReader> readerDeleter(reader);
 
 		// write the data
-		off_t bytesRemaining = data.UncompressedSize();
+		off_t bytesRemaining = VersionPolicy::PackageDataUncompressedSize(data);
 		off_t offset = 0;
 		while (bytesRemaining > 0) {
 			// read
@@ -634,15 +751,109 @@ private:
 	}
 
 private:
-	BBlockBufferCacheNoLock	fBufferCache;
-	BFDDataReader			fPackageFileReader;
-	void*					fDataBuffer;
-	size_t					fDataBufferSize;
-	Entry					fRootFilterEntry;
-	int						fBaseDirectory;
-	const char*				fInfoFileName;
-	bool					fErrorOccurred;
+	BBufferPool*							fBufferPool;
+	typename VersionPolicy::HeapReaderBase*	fPackageFileReader;
+	void*									fDataBuffer;
+	size_t									fDataBufferSize;
+	Entry									fRootFilterEntry;
+	int										fBaseDirectory;
+	const char*								fInfoFileName;
+	bool									fErrorOccurred;
 };
+
+
+template<typename VersionPolicy>
+static void
+do_extract(const char* packageFileName, const char* changeToDirectory,
+	const char* packageInfoFileName, const char* const* explicitEntries,
+	int explicitEntryCount, bool ignoreVersionError)
+{
+	// open package
+	BStandardErrorOutput errorOutput;
+	BBlockBufferPoolNoLock bufferPool(VersionPolicy::BufferSize(), 2);
+	if (bufferPool.Init() != B_OK) {
+		errorOutput.PrintError("Error: Out of memory!\n");
+		exit(1);
+	}
+
+	typename VersionPolicy::PackageReader packageReader(&errorOutput);
+	status_t error = VersionPolicy::InitReader(packageReader, packageFileName);
+	if (error != B_OK) {
+		if (ignoreVersionError && error == B_MISMATCHED_VALUES)
+			return;
+		exit(1);
+	}
+
+	typename VersionPolicy::HeapReaderBase* heapReader;
+	bool mustDeleteHeapReader;
+	error = VersionPolicy::GetHeapReader(packageReader, heapReader,
+		mustDeleteHeapReader);
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Failed to create heap reader: \"%s\"\n",
+			strerror(error));
+		exit(1);
+	}
+	ObjectDeleter<BDataReader> heapReaderDeleter(
+		mustDeleteHeapReader ? heapReader : NULL);
+
+	PackageContentExtractHandler<VersionPolicy> handler(&bufferPool,
+		heapReader);
+	error = handler.Init();
+	if (error != B_OK)
+		exit(1);
+
+	// If entries to extract have been specified explicitly, add those to the
+	// filtered ones.
+	if (explicitEntryCount > 0) {
+		for (int i = 0; i < explicitEntryCount; i++) {
+			const char* entryName = explicitEntries[i];
+			if (entryName[0] == '\0' || entryName[0] == '/') {
+				fprintf(stderr, "Error: Invalid entry name: \"%s\"\n",
+					entryName);
+				exit(1);
+			}
+			if (handler.AddFilterEntry(entryName) != B_OK)
+				exit(1);
+		}
+	} else
+		handler.SetExtractAll();
+
+	// get the target directory, if requested
+	if (changeToDirectory != NULL) {
+		int currentDirFD = open(changeToDirectory, O_RDONLY);
+		if (currentDirFD < 0) {
+			fprintf(stderr, "Error: Failed to change the current working "
+				"directory to \"%s\": %s\n", changeToDirectory,
+				strerror(errno));
+			exit(1);
+		}
+
+		handler.SetBaseDirectory(currentDirFD);
+	}
+
+	// If a package info file name is given, set it.
+	if (packageInfoFileName != NULL)
+		handler.SetPackageInfoFile(packageInfoFileName);
+
+	// extract
+	error = packageReader.ParseContent(&handler);
+	if (error != B_OK)
+		exit(1);
+
+	// check whether all explicitly specified entries have been extracted
+	if (explicitEntryCount > 0) {
+		for (int i = 0; i < explicitEntryCount; i++) {
+			if (Entry* entry = handler.FindFilterEntry(explicitEntries[i])) {
+				if (!entry->Seen()) {
+					fprintf(stderr, "Warning: Entry \"%s\" not found.\n",
+						explicitEntries[i]);
+				}
+			}
+		}
+	}
+
+	exit(0);
+}
 
 
 int
@@ -681,75 +892,18 @@ command_extract(int argc, const char* const* argv)
 		}
 	}
 
-	// At least one argument should remain -- the package file name.
+	// At least one argument should remain -- the package file name. Any further
+	// arguments are the names of the entries to extract.
 	if (optind + 1 > argc)
 		print_usage_and_exit(true);
 
 	const char* packageFileName = argv[optind++];
-
-	// open package
-	StandardErrorOutput errorOutput;
-	BPackageReader packageReader(&errorOutput);
-	status_t error = packageReader.Init(packageFileName);
-	if (error != B_OK)
-		return 1;
-
-	PackageContentExtractHandler handler(packageReader.PackageFileFD());
-	error = handler.Init();
-	if (error != B_OK)
-		return 1;
-
-	// If entries to extract have been specified explicitly, add those to the
-	// filtered ones.
-	int explicitEntriesIndex = optind;
-	if (optind < argc) {
-		while (optind < argc) {
-			const char* entryName = argv[optind++];
-			if (entryName[0] == '\0' || entryName[0] == '/') {
-				fprintf(stderr, "Error: Invalid entry name: \"%s\".",
-					entryName);
-				return 1;
-			}
-
-			if (handler.AddFilterEntry(entryName) != B_OK)
-				return 1;
-		}
-	} else
-		handler.SetExtractAll();
-
-	// get the target directory, if requested
-	if (changeToDirectory != NULL) {
-		int currentDirFD = open(changeToDirectory, O_RDONLY);
-		if (currentDirFD < 0) {
-			fprintf(stderr, "Error: Failed to change the current working "
-				"directory to \"%s\": %s\n", changeToDirectory,
-				strerror(errno));
-			return 1;
-		}
-
-		handler.SetBaseDirectory(currentDirFD);
-	}
-
-	// If a package info file name is given, set it.
-	if (packageInfoFileName != NULL)
-		handler.SetPackageInfoFile(packageInfoFileName);
-
-	// extract
-	error = packageReader.ParseContent(&handler);
-	if (error != B_OK)
-		return 1;
-
-	// check whether all explicitly specified entries have been extracted
-	if (explicitEntriesIndex < argc) {
-		for (int i = explicitEntriesIndex; i < argc; i++) {
-			if (Entry* entry = handler.FindFilterEntry(argv[i])) {
-				if (!entry->Seen()) {
-					fprintf(stderr, "Warning: Entry \"%s\" not found.\n",
-						argv[i]);
-				}
-			}
-		}
-	}
+	const char* const* explicitEntries = argv + optind;
+	int explicitEntryCount = argc - optind;
+	do_extract<VersionPolicyV2>(packageFileName, changeToDirectory,
+		packageInfoFileName, explicitEntries, explicitEntryCount, true);
+	do_extract<VersionPolicyV1>(packageFileName, changeToDirectory,
+		packageInfoFileName, explicitEntries, explicitEntryCount, false);
 
 	return 0;
 }

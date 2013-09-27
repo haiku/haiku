@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src tests kits locale ;
 
 UsePublicHeaders locale ;
 UsePrivateHeaders locale shared ;
+UseBuildFeatureHeaders icu ;
 
 # Pseudo target to build all locale kit tests
 NotFile LocaleKitTests ;
@@ -33,14 +34,13 @@ LocaleTest genericNumberFormatTest.cpp ;
 LocaleTest localeTest.cpp ;
 LocaleTest formatTest.cpp ;
 
-SubDirSysHdrs $(HAIKU_ICU_HEADERS) ;
-Includes [ FGristFiles ICUTest.cpp ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles ICUTest.cpp ] : [ BuildFeatureAttribute icu : headers ] ;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
 Application ICUTest :
 	ICUTest.cpp :
-	be $(TARGET_LIBSUPC++) $(HAIKU_ICU_LIBS) ;
+	be $(TARGET_LIBSUPC++) [ BuildFeatureAttribute icu : libraries ] ;
 
 Addon catalogTestAddOn
 	: catalogTestAddOn.cpp

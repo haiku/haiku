@@ -16,6 +16,7 @@
 #include <package/RefreshRepositoryRequest.h>
 #include <package/PackageRoster.h>
 
+#include "Command.h"
 #include "DecisionProvider.h"
 #include "JobStateListener.h"
 #include "pkgman.h"
@@ -27,23 +28,22 @@ using namespace BPackageKit;
 // TODO: internationalization!
 
 
-static const char* kCommandUsage =
-	"Usage: %s add-repo <repo-URL> [<repo-URL> ...]\n"
+static const char* const kShortUsage =
+	"  %command% <repo-base-url>\n"
+	"    Adds the repository with the given <repo-base-URL>.\n";
+
+static const char* const kLongUsage =
+	"Usage: %program% %command% <repo-URL> [<repo-URL> ...]\n"
 	"Adds one or more repositories by downloading them from the given URL(s).\n"
-	"\n"
-;
+	"\n";
 
 
-static void
-print_command_usage_and_exit(bool error)
-{
-    fprintf(error ? stderr : stdout, kCommandUsage, kProgramName);
-    exit(error ? 1 : 0);
-}
+DEFINE_COMMAND(AddRepoCommand, "add-repo", kShortUsage, kLongUsage,
+	kCommandCategoryRepositories)
 
 
 int
-command_add_repo(int argc, const char* const* argv)
+AddRepoCommand::Execute(int argc, const char* const* argv)
 {
 	bool asUserRepository = false;
 
@@ -61,7 +61,7 @@ command_add_repo(int argc, const char* const* argv)
 
 		switch (c) {
 			case 'h':
-				print_command_usage_and_exit(false);
+				PrintUsageAndExit(false);
 				break;
 
 			case 'u':
@@ -69,14 +69,14 @@ command_add_repo(int argc, const char* const* argv)
 				break;
 
 			default:
-				print_command_usage_and_exit(true);
+				PrintUsageAndExit(true);
 				break;
 		}
 	}
 
 	// The remaining arguments are repo URLs, i. e. at least one more argument.
 	if (argc < optind + 1)
-		print_command_usage_and_exit(true);
+		PrintUsageAndExit(true);
 
 	const char* const* repoURLs = argv + optind;
 	int urlCount = argc - optind;
@@ -88,18 +88,13 @@ command_add_repo(int argc, const char* const* argv)
 	status_t result;
 	for (int i = 0; i < urlCount; ++i) {
 		AddRepositoryRequest addRequest(context, repoURLs[i], asUserRepository);
-		result = addRequest.InitCheck();
-		if (result != B_OK)
-			DIE(result, "unable to create request for adding repository");
-		result = addRequest.CreateInitialJobs();
-		if (result != B_OK)
-			DIE(result, "unable to create necessary jobs");
-
-		while (BJob* job = addRequest.PopRunnableJob()) {
-			result = job->Run();
-			delete job;
-			if (result == B_CANCELED)
-				return 1;
+		result = addRequest.Process(true);
+		if (result != B_OK) {
+			if (result != B_CANCELED) {
+				DIE(result, "request for adding repository \"%s\" failed",
+					repoURLs[i]);
+			}
+			return 1;
 		}
 
 		// now refresh the repo-cache of the new repository
@@ -107,19 +102,15 @@ command_add_repo(int argc, const char* const* argv)
 		BPackageRoster roster;
 		BRepositoryConfig repoConfig;
 		roster.GetRepositoryConfig(repoName, &repoConfig);
+		
 		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
-		result = refreshRequest.InitCheck();
-		if (result != B_OK)
-			DIE(result, "unable to create request for refreshing repository");
-		result = refreshRequest.CreateInitialJobs();
-		if (result != B_OK)
-			DIE(result, "unable to create necessary jobs");
-
-		while (BJob* job = refreshRequest.PopRunnableJob()) {
-			result = job->Run();
-			delete job;
-			if (result == B_CANCELED)
-				return 1;
+		result = refreshRequest.Process(true);
+		if (result != B_OK) {
+			if (result != B_CANCELED) {
+				DIE(result, "request for refreshing repository \"%s\" failed",
+					repoName.String());
+			}
+			return 1;
 		}
 	}
 

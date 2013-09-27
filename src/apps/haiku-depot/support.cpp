@@ -59,7 +59,7 @@ save_settings(BMessage* message, const char* fileName, const char* folder)
 	// passing folder is optional
 	if (folder != NULL)
 		ret = path.Append(folder);
-		
+
 	if (ret == B_OK)
 		ret = create_directory(path.Path(), 0777);
 
@@ -83,7 +83,7 @@ make_sure_frame_is_on_screen(BRect& frame, float borderWidth,
 {
 	if (!frame.IsValid())
 		return false;
-	
+
 	BScreen* screen = window != NULL ? new BScreen(window)
 		: new BScreen(B_MAIN_SCREEN_ID);
 
@@ -91,7 +91,7 @@ make_sure_frame_is_on_screen(BRect& frame, float borderWidth,
 		delete screen;
 		return false;
 	}
-	
+
 	BRect screenFrame = screen->Frame();
 
 	// Validate borderWidth and tabHeight
@@ -104,7 +104,7 @@ make_sure_frame_is_on_screen(BRect& frame, float borderWidth,
 		tabHeight = 0.0f;
 	else
 		tabHeight = std::min(tabHeight, floorf(screenFrame.Height() / 4.0f));
-	
+
 	// Account for window border and tab. It doesn't matter much if the
 	// decorator frame is wider, just as long as the user can grab a
 	// border to move the window

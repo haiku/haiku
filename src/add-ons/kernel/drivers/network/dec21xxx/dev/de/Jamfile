@@ -15,4 +15,5 @@ KernelStaticLibrary dec21xxx_de.a
 	;
 
 ObjectHdrs [ FGristFiles if_de$(SUFOBJ) ]
-	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;

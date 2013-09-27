@@ -50,7 +50,7 @@ query_passwd_entry(const char* name, uid_t _uid, struct passwd *passwd,
 	status_t error = BPrivate::send_authentication_request_to_registrar(message,
 		reply);
 	if (error != B_OK)
-		return error;
+		return error == ENOENT ? B_OK : error;
 
 	int32 uid;
 	int32 gid;

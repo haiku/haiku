@@ -10,10 +10,10 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
-UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+UseBuildFeatureHeaders freetype ;
 
 Includes [ FGristFiles DrawingEngine.cpp ]
-	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+	: [ BuildFeatureAttribute freetype : headers ] ;
 
 StaticLibrary libasdrawing.a :
 	BitmapBuffer.cpp

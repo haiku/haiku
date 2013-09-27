@@ -86,7 +86,7 @@ using std::max;
 
 const char* const kInstantiateItemCFunctionName = "instantiate_deskbar_item";
 const char* const kInstantiateEntryCFunctionName = "instantiate_deskbar_entry";
-const char* const kReplicantSettingsFile = "Deskbar_replicants";
+const char* const kReplicantSettingsFile = "replicants";
 const char* const kReplicantPathField = "replicant_path";
 
 float sMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
@@ -467,7 +467,7 @@ TReplicantTray::InitAddOnSupport()
 	fItemList = new BList();
 	BPath path;
 
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) == B_OK) {
+	if (GetDeskbarSettingsDirectory(path, true) == B_OK) {
 		path.Append(kReplicantSettingsFile);
 
 		BFile file(path.Path(), B_READ_ONLY);
@@ -1259,8 +1259,7 @@ TReplicantTray::_SaveSettings()
 {
 	status_t result;
 	BPath path;
-	if ((result = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true))
-		 == B_OK) {
+	if ((result = GetDeskbarSettingsDirectory(path, true)) == B_OK) {
 		path.Append(kReplicantSettingsFile);
 
 		BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);

@@ -12,7 +12,7 @@
 
 #include <Keymap.h>
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #	include <TextView.h>
 #endif
 
@@ -43,7 +43,7 @@ public:
 									char* buffer, size_t bufferSize);
 
 private:
-#if (defined(__BEOS__) || defined(__HAIKU__))
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			void				_SaveSourceText(FILE* file,
 									text_run_array** _textRuns = NULL);
 #else

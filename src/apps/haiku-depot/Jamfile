@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps haiku-depot ;
 
-UsePrivateHeaders interface shared ;
+UsePrivateHeaders interface shared package ;
 
 # source directories
 local sourceDirs =
@@ -12,6 +12,7 @@ for sourceDir in $(sourceDirs) {
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haiku-depot $(sourceDir) ] ;
 }
 
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
 local textDocumentSources =
 	Bullet.cpp
 	BulletData.cpp
@@ -33,10 +34,14 @@ Application HaikuDepot :
 	App.cpp
 	BitmapButton.cpp
 	BitmapView.cpp
+	DecisionProvider.cpp
 	FilterView.cpp
+	JobStateListener.cpp
 	main.cpp
 	MainWindow.cpp
 	Model.cpp
+	PackageAction.cpp
+	PackageActionHandler.cpp
 	PackageInfo.cpp
 	PackageInfoListener.cpp
 	PackageInfoView.cpp
@@ -44,11 +49,15 @@ Application HaikuDepot :
 	PackageManager.cpp
 	support.cpp
 
+	# package_daemon
+	ProblemWindow.cpp
+	ResultWindow.cpp
+
 	# text view stuff
 	$(textDocumentSources)
-	
-	: be translation libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
-		$(HAIKU_LOCALE_LIBS)
+
+	: be package translation libcolumnlistview.a libshared.a
+		$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) localestub
 	: HaikuDepot.rdef
 ;
 

@@ -141,6 +141,7 @@ class Model {
 		bool IsTrash() const;
 		bool IsDesktop() const;
 		bool IsVolume() const;
+		bool IsVirtualDirectory() const;
 
 		IconSource IconFrom() const;
 		void SetIconFrom(IconSource);
@@ -239,6 +240,7 @@ class Model {
 			kRootNode,
 			kTrashNode,
 			kDesktopNode,
+			kVirtualDirectoryNode,
 			kUnknownNode
 		};
 
@@ -381,7 +383,8 @@ Model::IsFile() const
 	return fBaseType == kPlainNode
 		|| fBaseType == kQueryNode
 		|| fBaseType == kQueryTemplateNode
-		|| fBaseType == kExecutableNode;
+		|| fBaseType == kExecutableNode
+		|| fBaseType == kVirtualDirectoryNode;
 }
 
 
@@ -422,7 +425,7 @@ Model::IsContainer() const
 {
 	// I guess as in should show container window -
 	// volumes show the volume window
-	return IsQuery() || IsDirectory();
+	return IsQuery() || IsDirectory() || IsVirtualDirectory();
 }
 
 
@@ -458,6 +461,13 @@ inline bool
 Model::IsSymLink() const
 {
 	return fBaseType == kLinkNode;
+}
+
+
+inline bool
+Model::IsVirtualDirectory() const
+{
+	return fBaseType == kVirtualDirectoryNode;
 }
 
 

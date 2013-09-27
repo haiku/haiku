@@ -33,7 +33,7 @@ SUBDIRSYSHDRS = $(oldSubDirSysHdrs) ;
 SubDirHdrs $(bfsSourceDir) ;
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
-SYSHDRS = $(HAIKU_HDRS) ;
+SYSHDRS = $(HAIKU_HDRS_$(HAIKU_PACKAGING_ARCH)) ;
 
 
 {

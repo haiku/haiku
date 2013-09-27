@@ -19,16 +19,9 @@ Server mail_daemon :
 	MailDaemon.cpp
 	main.cpp
 	Notifier.cpp
-	: be libmail.so tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
+	: be libmail.so tracker localestub $(TARGET_LIBSTDC++)
 		$(TARGET_NETWORK_LIBS)
 ;
-
-Package haiku-maildaemon-cvs :
-	mail_daemon :
-	boot beos system servers ;
-
-Packages haiku-maildaemon-cvs :
-	README LICENSE HISTORY install.sh ;
 
 DoCatalogs mail_daemon :
 	x-vnd.Be-POST

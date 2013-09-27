@@ -22,8 +22,8 @@ rule Link
 		LINK on $(1) = $(HOST_LINK) ;
 	 	LINKFLAGS on $(1) = $(HOST_LINKFLAGS) [ on $(1) return $(LINKFLAGS) ] ;
 	} else {
-		LINK on $(1) = $(TARGET_LINK) ;
-	 	LINKFLAGS on $(1) = $(TARGET_LINKFLAGS)
+		LINK on $(1) = $(TARGET_LINK_$(TARGET_PACKAGING_ARCH)) ;
+	 	LINKFLAGS on $(1) = $(TARGET_LINKFLAGS_$(TARGET_PACKAGING_ARCH))
 			[ on $(1) return $(LINKFLAGS) ] ;
 	}
 
@@ -34,8 +34,14 @@ rule Link
 	on $(1) XRes $(1) : $(RESFILES) ;
 	if ! [ on $(1) return $(DONT_USE_BEOS_RULES) ] {
 		SetType $(1) ;
-		MimeSet $(1) ;
+		MimeSet $(1) : sharedObject ;
 		SetVersion $(1) ;
+
+		# For applications for the target also generate the MIME DB entries.
+		if [ on $(1) return $(PLATFORM) ] != host
+			&& [ on $(1) return $(RESFILES) ] {
+			CreateAppMimeDBEntries $(1) ;
+		}
 
 		# If the generic attribute emulation is enabled, make sure the tool to
 		# remove the attributes is built first.
@@ -100,8 +106,9 @@ rule Object
 			}
 
 		} else {
-			sysHeaders += $(TARGET_HDRS) ;
-			defines += $(TARGET_DEFINES) ;
+			sysHeaders += $(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
+			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
+				$(TARGET_DEFINES) ;
 		}
 	}
 
@@ -188,13 +195,17 @@ rule As
 		systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
 
 	} else {
-		flags = [ on $(1) return $(TARGET_ASFLAGS) $(ASFLAGS) ] ;
+		flags = [ on $(1) return $(TARGET_ASFLAGS_$(architecture))
+			$(ASFLAGS) ] ;
 
-		CC on $(1) = $(TARGET_CC) ;
+		CC on $(1) = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;
 
-		includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
-		localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
-		systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
+		includesSeparator
+			= $(TARGET_INCLUDES_SEPARATOR_$(TARGET_PACKAGING_ARCH)) ;
+		localIncludesOption
+			= $(TARGET_LOCAL_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
+		systemIncludesOption
+			= $(TARGET_SYSTEM_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
 	}
 
 	Depends $(<) : $(>) ;
@@ -288,18 +299,22 @@ rule Cc
 		} else {
 			# warning flags
 			if $(WARNINGS) != 0 {
-				flags += $(TARGET_WARNING_CCFLAGS) ;
+				flags += $(TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH)) ;
 			}
 
 			# debug and other flags
-			flags += $(TARGET_CCFLAGS) $(TARGET_DEBUG_$(DEBUG)_CCFLAGS)
+			flags += $(TARGET_CCFLAGS_$(TARGET_PACKAGING_ARCH))
+				$(TARGET_DEBUG_$(DEBUG)_CCFLAGS_$(TARGET_PACKAGING_ARCH))
 				$(SUBDIRCCFLAGS) $(CCFLAGS) ;
 
-			CC on $(1) = $(TARGET_CC) ;
+			CC on $(1) = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;
 
-			includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
-			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
-			systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
+			includesSeparator
+				= $(TARGET_INCLUDES_SEPARATOR_$(TARGET_PACKAGING_ARCH)) ;
+			localIncludesOption
+				= $(TARGET_LOCAL_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
+			systemIncludesOption
+				= $(TARGET_SYSTEM_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
 		}
 
 		CCFLAGS on $(<) = $(flags) ;
@@ -355,18 +370,22 @@ rule C++
 		} else {
 			# warning flags
 			if $(WARNINGS) != 0 {
-				flags += $(TARGET_WARNING_C++FLAGS) ;
+				flags += $(TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCH)) ;
 			}
 
 			# debug and other flags
-			flags += $(TARGET_C++FLAGS) $(TARGET_DEBUG_$(DEBUG)_C++FLAGS)
+			flags += $(TARGET_C++FLAGS_$(TARGET_PACKAGING_ARCH))
+				$(TARGET_DEBUG_$(DEBUG)_C++FLAGS_$(TARGET_PACKAGING_ARCH))
 				$(SUBDIRC++FLAGS) $(C++FLAGS) ;
 
-			C++ on $(1) = $(TARGET_C++) ;
+			C++ on $(1) = $(TARGET_C++_$(TARGET_PACKAGING_ARCH)) ;
 
-			includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
-			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
-			systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
+			includesSeparator
+				= $(TARGET_INCLUDES_SEPARATOR_$(TARGET_PACKAGING_ARCH)) ;
+			localIncludesOption
+				= $(TARGET_LOCAL_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
+			systemIncludesOption
+				= $(TARGET_SYSTEM_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
 		}
 
 		C++FLAGS on $(<) = $(flags) ;
@@ -418,8 +437,9 @@ rule LibraryFromObjects
 			AR on $(_l) = $(HOST_AR) $(HOST_ARFLAGS) ;
 			RANLIB on $(_l) = $(HOST_RANLIB) ;
 		} else {
-			AR on $(_l) = $(TARGET_AR) $(TARGET_ARFLAGS) ;
-			RANLIB on $(_l) = $(TARGET_RANLIB) ;
+			AR on $(_l) = $(TARGET_AR_$(TARGET_PACKAGING_ARCH))
+				$(TARGET_ARFLAGS_$(TARGET_PACKAGING_ARCH)) ;
+			RANLIB on $(_l) = $(TARGET_RANLIB_$(TARGET_PACKAGING_ARCH)) ;
 		}
 
 		# library depends on its member objects
@@ -529,7 +549,8 @@ rule MainFromObjects
 }
 
 # Override Jam 2.5rc3 MakeLocate and MkDir to deal more intelligently
-# with grist set on the supplied directory name.
+# with grist set on the supplied directory name. Also do nothing for already
+# located files.
 rule MakeLocate
 {
 	local dir = $(2[1]) ;
@@ -539,9 +560,16 @@ rule MakeLocate
 		if ! $(dir:G) {
 			dir = $(dir:G=dir) ;
 		}
-	    LOCATE on $(1) += $(dir:G=) ;	# don't relocate once located
-	    Depends $(1) : $(dir) ;
-	    MkDir $(dir) ;
+
+		local target ;
+		for target in $(1) {
+			# don't relocate once located
+		    LOCATE on $(target) += $(dir:G=) ;
+			if [ on $(target) return $(LOCATE) ] = $(dir:G=) {
+			    Depends $(target) : $(dir) ;
+		    	MkDir $(dir) ;
+			}
+		}
 	}
 }
 
@@ -646,11 +674,13 @@ rule ObjectHdrs
 					[ FSysIncludes $(SYSHDRS)
 						: $(HOST_SYSTEM_INCLUDES_OPTION) ] ;
 			} else {
+				local architecture = $(TARGET_PACKAGING_ARCH) ;
 				fileHeaders =
-					[ FIncludes $(localHeaders) : $(TARGET_LOCAL_INCLUDES_OPTION) ]
-					$(TARGET_INCLUDES_SEPARATOR)
+					[ FIncludes $(localHeaders)
+						: $(TARGET_LOCAL_INCLUDES_OPTION_$(architecture)) ]
+					$(TARGET_INCLUDES_SEPARATOR_$(architecture))
 					[ FSysIncludes $(SYSHDRS)
-						: $(TARGET_SYSTEM_INCLUDES_OPTION) ] ;
+						: $(TARGET_SYSTEM_INCLUDES_OPTION_$(architecture)) ] ;
 			}
 
 			ASHDRS on $(file) = $(fileHeaders) ;
@@ -691,4 +721,10 @@ rule SubInclude
 
 	# restore SUBDIR_TOKENS
 	SUBDIR_TOKENS = $(oldSubDirTokens) ;
+}
+
+
+actions File
+{
+	$(CP) "$(>)" "$(<)"
 }

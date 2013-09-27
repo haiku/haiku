@@ -1,11 +1,16 @@
 SubDir HAIKU_TOP src tools translation pnginfo ;
 
-UseLibraryHeaders zlib ;
-UseHeaders $(HAIKU_LIBPNG_HEADERS) : true ;
+UseBuildFeatureHeaders zlib ;
+UseBuildFeatureHeaders libpng ;
 
 Includes [ FGristFiles pnginfo.cpp ]
-	: $(HAIKU_LIBPNG_HEADERS_DEPENDENCY) ;
+	:
+	[ BuildFeatureAttribute libpng : headers ]
+	[ BuildFeatureAttribute zlib : headers ]
+	;
 
-BinCommand pnginfo : pnginfo.cpp : be $(HAIKU_LIBPNG_LIB) libz.a
+BinCommand pnginfo : pnginfo.cpp : be
+	[ BuildFeatureAttribute libpng : library ]
+	[ BuildFeatureAttribute zlib : library ]
 	$(TARGET_LIBSUPC++) ;
 

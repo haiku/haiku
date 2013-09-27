@@ -13,7 +13,7 @@ Server syslog_daemon :
 	# ToDo: this can be removed for the Haiku build
 	strlcpy.c
 	:
-	be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	be $(TARGET_LIBSUPC++) localestub
 ;
 
 DoCatalogs syslog_daemon :

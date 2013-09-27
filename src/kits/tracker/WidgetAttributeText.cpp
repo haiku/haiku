@@ -1104,7 +1104,8 @@ SizeAttributeText::ReadValue()
 	}
 
 	if (fModel->IsDirectory() || fModel->IsQuery()
-		|| fModel->IsQueryTemplate() || fModel->IsSymLink())
+		|| fModel->IsQueryTemplate() || fModel->IsSymLink()
+		|| fModel->IsVirtualDirectory())
 		return kUnknownSize;
 
 	fValueIsDefined = true;

@@ -40,7 +40,6 @@ Volume::Volume(fs_volume* fsVolume)
 
 Volume::~Volume()
 {
-	delete fRootNode;
 }
 
 

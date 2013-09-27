@@ -18,6 +18,9 @@
 namespace BPackageKit {
 
 
+using BPrivate::JobQueue;
+
+
 BRequest::BRequest(const BContext& context)
 	:
 	fContext(context),
@@ -46,6 +49,30 @@ BRequest::PopRunnableJob()
 		return NULL;
 
 	return fJobQueue->Pop();
+}
+
+
+status_t
+BRequest::Process(bool failIfCanceledOnly)
+{
+	status_t error = InitCheck();
+	if (error != B_OK)
+		return error;
+
+	error = CreateInitialJobs();
+	if (error != B_OK)
+		return error;
+
+	while (BJob* job = PopRunnableJob()) {
+		error = job->Run();
+		delete job;
+		if (error != B_OK) {
+			if (!failIfCanceledOnly || error == B_CANCELED)
+				return error;
+		}
+	}
+
+	return B_OK;
 }
 
 

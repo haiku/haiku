@@ -34,15 +34,6 @@ enum InstallStatus {
 	kCancelled
 };
 
-const uint32 MSG_STATUS_MESSAGE = 'iSTM';
-const uint32 MSG_INSTALL_FINISHED = 'iIFN';
-const uint32 MSG_RESET = 'iRSI';
-const uint32 MSG_WRITE_BOOT_SECTOR = 'iWBS';
-
-const char PACKAGES_DIRECTORY[] = "_packages_";
-const char SOURCES_DIRECTORY[] = "_sources_";
-const char VAR_DIRECTORY[] = "var";
-
 
 class InstallerWindow : public BWindow {
 public:
@@ -52,8 +43,6 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
-			BMenu*				GetSourceMenu() { return fSrcMenu; };
-			BMenu*				GetTargetMenu() { return fDestMenu; };
 private:
 			void				_ShowOptionalPackages();
 			void				_LaunchDriveSetup();

@@ -7,7 +7,7 @@ Server notification_server :
 	NotificationServer.cpp
 	NotificationView.cpp
 	NotificationWindow.cpp
-	: be translation $(TARGET_LIBSTDC++) libnotification.a $(HAIKU_LOCALE_LIBS)
+	: be translation $(TARGET_LIBSTDC++) libnotification.a localestub
 	: notification_server.rdef
 ;
 

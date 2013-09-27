@@ -58,6 +58,8 @@
 #define SYSCALL_TRACING_IGNORE_KTRACE_OUTPUT	1
 #define TCP_TRACING								0
 #define TEAM_TRACING							0
+#define TRANSLATION_MAP_TRACING					0
+#define TRANSLATION_MAP_TRACING_STACK_TRACE		0	/* stack trace depth */
 #define USER_MALLOC_TRACING						0
 #define VFS_PAGES_IO_TRACING					0
 #define VM_CACHE_TRACING						0

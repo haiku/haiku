@@ -37,13 +37,14 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
+#include "be_jerror.h"
+
 // Be headers
 #include <Alert.h>
 #include <Catalog.h>
 #include <stdio.h>
 
 // JPEG headers
-#include <jpeglib.h>
 #include <jconfig.h>
 #include <jerror.h>
 
@@ -73,8 +74,10 @@ be_error_exit (j_common_ptr cinfo)
 
 	fprintf(stderr, B_TRANSLATE("JPEG Library Error: %s\n"), buffer);
 
+	be_jpeg_error_mgr* errorManager
+		= static_cast<be_jpeg_error_mgr*>(cinfo->err);
 	jmp_buf longJumpBuffer;
-	memcpy(&longJumpBuffer, &(cinfo->err->long_jump_buffer), sizeof(jmp_buf));
+	memcpy(&longJumpBuffer, errorManager->long_jump_buffer, sizeof(jmp_buf));
 
 	/* Let the memory manager delete any temp files before we die */
 	jpeg_destroy(cinfo);
@@ -108,12 +111,12 @@ be_output_message (j_common_ptr cinfo)
 /*
  * Fill in the standard error-handling methods in a jpeg_error_mgr object.
  * Since Translator doesn't use it's own error table, we can use error_mgr's
- * variables to store some usefull data.
+ * variables to store some useful data.
  * last_addon_message (as ShowReadWarnings) is used for storing SETTINGS->ShowReadWarningBox value
  */
 
 GLOBAL(struct jpeg_error_mgr *)
-be_jpeg_std_error (struct jpeg_error_mgr * err, TranslatorSettings* settings,
+be_jpeg_std_error(be_jpeg_error_mgr* err, TranslatorSettings* settings,
 	const jmp_buf* longJumpBuffer)
 {
 	settings->Acquire();
@@ -123,7 +126,7 @@ be_jpeg_std_error (struct jpeg_error_mgr * err, TranslatorSettings* settings,
 	err->output_message = be_output_message;
 
 	err->ShowReadWarnings = settings->SetGetBool(JPEG_SET_SHOWREADWARNING, NULL);
-	memcpy(&(err->long_jump_buffer), longJumpBuffer, sizeof(jmp_buf));
+	err->long_jump_buffer = longJumpBuffer;
 
 	settings->Release();
 	return err;

@@ -1,0 +1,107 @@
+SubDir HAIKU_TOP src data mime_db ;
+
+
+rule BuildMimeDB superTypes
+{
+	local mimeDB = <mimedb>mime_db ;
+	MakeLocateCommonPlatform $(mimeDB) ;
+
+	# make the supertypes
+	local compiledSuperTypes ;
+	local superType ;
+	for superType in $(superTypes) {
+		local compiledSuperType = $(superType:S=.rsrc:G=mimedb-super) ;
+		ResComp $(compiledSuperType) : $(superType) ;
+		compiledSuperTypes += $(compiledSuperType) ;
+	}
+
+	Depends $(mimeDB) : <build>resattr $(compiledSuperTypes) ;
+	BuildMimeDBSuperTypes $(mimeDB) : <build>resattr $(compiledSuperTypes) ;
+
+	# make the subtypes for each supertype
+	for superType in $(superTypes) {
+		local subTypes = [ on $(superType) return $(HAIKU_MIMEDB_SUBTYPES) ] ;
+		local compiledSubTypes ;
+		for subType in $(subTypes) {
+			local compiledSubType = $(subType:BS).rsrc ;
+				# Note: The subtype name may contain '.'s. Hence we cannot use
+				# ":S=.rsrc".
+			compiledSubType = $(compiledSubType:G=mimedb-sub-$(superType:B)) ;
+			MakeLocate $(compiledSubType)
+				: [ FDirName $(COMMON_PLATFORM_LOCATE_TARGET) $(superType:B) ] ;
+				# Need to locate explicitly to avoid clashes between equally
+				# named subtypes of different supertypes.
+			ResComp $(compiledSubType) : $(subType) ;
+			compiledSubTypes += $(compiledSubType) ;
+		}
+
+		if $(compiledSubTypes) {
+			Depends $(mimeDB) : $(superType) $(compiledSubTypes) ;
+			BuildMimeDBSubTypes $(mimeDB)
+				: <build>resattr $(superType) $(compiledSubTypes) ;
+		}
+	}
+}
+
+
+actions BuildMimeDBSuperTypes
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+
+	# remove and re-create the directory
+	baseDirectory="$(1)"
+	$(RM) -rf "$baseDirectory"
+	mkdir "$baseDirectory"
+
+	resattr="$(2[1])"
+
+	for sourceFile in "$(2[2-])" ; do
+		type=`basename "$sourceFile" .rsrc`
+		targetDirectory="$baseDirectory/$type"
+		mkdir "$targetDirectory"
+		"$resattr" -O -o "$targetDirectory" "$sourceFile"
+	done
+}
+
+
+actions BuildMimeDBSubTypes
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+
+	resattr="$(2[1])"
+	superType=`basename "$(2[2])" .super`
+	superTypeDirectory="$(1)/$superType"
+
+	for sourceFile in "$(2[3-])" ; do
+		type=`basename "$sourceFile" .rsrc`
+		targetFile="$superTypeDirectory/$type"
+		"$resattr" -O -o "$targetFile" "$sourceFile"
+	done
+}
+
+
+# glob the supertype source files
+local superTypeFiles = [ Glob $(SUBDIR) : *.super ] ;
+superTypeFiles = $(superTypeFiles:BSG=mimedb) ;
+SEARCH on $(superTypeFiles) = $(SUBDIR) ;
+
+# for each supertype glob the subtype source files
+local superTypeFile ;
+for superTypeFile in $(superTypeFiles) {
+	local superTypeDirectory = [ FDirName $(SUBDIR) $(superTypeFile:B) ] ;
+	local subTypeFiles = [ Glob $(superTypeDirectory) : * ] ;
+
+	local subTypes ;
+	local subType ;
+	for subType in $(subTypeFiles:BS) {
+		if $(subType) != "." && $(subType) != ".." {
+			subType = $(subType:G=mimedb-sub-$(superTypeFile:B)) ;
+			SEARCH on $(subType) = $(superTypeDirectory) ;
+			subTypes += $(subType) ;
+		}
+	}
+
+	HAIKU_MIMEDB_SUBTYPES on $(superTypeFile) = $(subTypes) ;
+}
+
+BuildMimeDB $(superTypeFiles) ;

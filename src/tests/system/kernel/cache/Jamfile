@@ -9,7 +9,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src system kernel cache ] ;
 
 StdBinCommands
 	cache_control.cpp
-	: libroot.so ;
+	;
 
 SimpleTest BlockMapTest :
 	BlockMapTest.cpp

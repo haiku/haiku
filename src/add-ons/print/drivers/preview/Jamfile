@@ -14,7 +14,3 @@ Addon Preview :
 	PreviewDriver.cpp
 	: be libprint.a $(TARGET_LIBSTDC++)
 ;
-
-Package haiku-printingkit-cvs :
-	Preview :
-	boot home config add-ons Print ;

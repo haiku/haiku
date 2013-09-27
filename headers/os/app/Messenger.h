@@ -57,6 +57,8 @@ public:
 	bool IsValid() const;
 	team_id Team() const;
 
+	uint32 HashValue() const;
+
 	//----- Private or reserved -----------------------------------------
 
 	class Private;

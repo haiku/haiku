@@ -3,8 +3,9 @@ SubDir HAIKU_TOP src tests system benchmarks libMicro ;
 SEARCH_SOURCE = [ FDirName $(SUBDIR) ] ;
 
 # filter warnings we don't want here
-TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
-	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH)
+	= [ FFilter $(TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH))
+		: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 UseHeaders [ FDirName $(SUBDIR) $(SUBDIR) $(SUBDIR) $(SUBDIR) $(SUBDIR) headers posix ] : true ;
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
@@ -38,30 +39,30 @@ BinCommand <libmicro>bind :
 	: libmicro.a $(TARGET_NETWORK_LIBS) ;
 
 BinCommand atomic : 
-	: libelided.a libroot.so ;
+	: libelided.a ;
 
 BinCommand cachetocache : 
-	: libelided.a libroot.so ;
+	: libelided.a ;
 
 BinCommand cascade_mutex : 
 	cascade_mutex.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand cascade_cond : 
 	cascade_cond.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand cascade_lockf : 
 	cascade_lockf.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand cascade_fcntl : 
 	cascade_fcntl.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand cascade_flock : 
 	cascade_flock.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand chdir : 
 	chdir.c
@@ -69,7 +70,7 @@ BinCommand chdir :
 
 BinCommand close : 
 	close.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand close_tcp : 
 	close_tcp.c
@@ -81,27 +82,27 @@ BinCommand connection :
 
 BinCommand dup : 
 	dup.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand exec_bin : 
 	exec_bin.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand exec : 
 	exec.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand exit : 
 	exit.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand exp : 
 	exp.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand fcntl : 
 	fcntl.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand fcntl_ndelay : 
 	fcntl_ndelay.c
@@ -109,23 +110,23 @@ BinCommand fcntl_ndelay :
 
 BinCommand file_lock : 
 	file_lock.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand fork : 
 	fork.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 # atm unsupported
 BinCommand getcontext : 
-	: libelided.a libroot.so ;
+	: libelided.a ;
 
 BinCommand getenv : 
 	getenv.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand gettimeofday : 
 	gettimeofday.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand <libmicro>getpeername : 
 	getpeername.c
@@ -133,11 +134,11 @@ BinCommand <libmicro>getpeername :
 
 BinCommand getpid : 
 	getpid.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand getrusage : 
 	getrusage.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand getsockname : 
 	getsockname.c
@@ -145,7 +146,7 @@ BinCommand getsockname :
 
 BinCommand isatty : 
 	isatty.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand listen : 
 	listen.c
@@ -153,75 +154,75 @@ BinCommand listen :
 
 BinCommand localtime_r : 
 	localtime_r.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand <libmicro>log : 
 	log.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand longjmp : 
 	longjmp.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand lrand48 : 
 	lrand48.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand lseek : 
 	lseek.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand malloc : 
 	malloc.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand memcpy : 
 	memcpy.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand memmove : 
 	memmove.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand memrand : 
 	memrand.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand memset : 
 	memset.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand mktime : 
 	mktime.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 # atm unsupported
 BinCommand mprotect : 
-	: libelided.a libroot.so ;
+	: libelided.a ;
 
 BinCommand mmap :
 	mmap.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 # atm unsupported
 BinCommand msync : 
-	: libelided.a libroot.so ;
+	: libelided.a ;
 
 BinCommand munmap :
 	munmap.c 
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand mutex :
 	mutex.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand nop : 
 	nop.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand <libmicro>open : 
 	open.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand pipe : 
 	pipe.c
@@ -233,28 +234,28 @@ BinCommand poll :
 
 BinCommand pread : 
 	pread.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand pthread_create :
 	pthread_create.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand pwrite : 
 	pwrite.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand read : 
 	read.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand realpath : 
 	realpath.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand recurse : 
 	recurse.c
 	recurse2.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand select : 
 	select.c
@@ -262,11 +263,11 @@ BinCommand select :
 
 # atm unsupported
 BinCommand semop : 
-	: libelided.a libroot.so ;
+	: libelided.a ;
 
 # atm unsupported
 BinCommand setcontext : 
-	: libelided.a libroot.so ;
+	: libelided.a ;
 
 BinCommand setsockopt : 
 	setsockopt.c
@@ -274,19 +275,19 @@ BinCommand setsockopt :
 
 BinCommand sigaction : 
 	sigaction.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand siglongjmp : 
 	siglongjmp.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand signal : 
 	signal.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand sigprocmask : 
 	sigprocmask.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 
 BinCommand <libmicro>socket :  
@@ -302,56 +303,56 @@ BinCommand socketpair :
 
 BinCommand <libmicro>stat : 
 	stat.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand strcasecmp : 
 	strcasecmp.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand strchr : 
 	strchr.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand strcmp : 
 	strcmp.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand strcpy : 
 	strcpy.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand strftime : 
 	strftime.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand strlen : 
 	strlen.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand strtol : 
 	strtol.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand system : 
 	system.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand time : 
 	time.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand times : 
 	times.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand write : 
 	write.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand writev : 
 	writev.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;
 
 BinCommand tattle : 
 	tattle.c
-	: libmicro.a libroot.so ;
+	: libmicro.a ;

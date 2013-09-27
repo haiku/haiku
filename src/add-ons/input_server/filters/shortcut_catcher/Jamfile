@@ -1,16 +1,21 @@
 SubDir HAIKU_TOP src add-ons input_server filters shortcut_catcher ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders storage ;
 
-#	Common files used here and in the app
-StaticLibrary libshortcuts_shared.a :
-	BitFieldTesters.cpp
-	CommandActuators.cpp
-	KeyInfos.cpp
-	ParseCommandLine.cpp
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		#	Common files used here and in the app
+		StaticLibrary [ MultiArchDefaultGristFiles libshortcuts_shared.a ] :
+			BitFieldTesters.cpp
+			CommandActuators.cpp
+			KeyInfos.cpp
+			ParseCommandLine.cpp
+			;
+	}
+}
 
 Addon shortcut_catcher : 
 	CommandExecutor.cpp

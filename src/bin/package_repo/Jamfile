@@ -2,18 +2,18 @@ SubDir HAIKU_TOP src bin package_repo ;
 
 UsePrivateHeaders kernel shared ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) src bin package ] ;
+
 DEFINES += B_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 	# TODO: Remove when it is complete!
-
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
 
 BinCommand package_repo :
 	command_create.cpp
 	command_list.cpp
+	command_update.cpp
 	package_repo.cpp
-	StandardErrorOutput.cpp
 	:
 	package be
 	$(TARGET_LIBSUPC++)
+	$(TARGET_LIBSTDC++)
 ;
-

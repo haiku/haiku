@@ -30,60 +30,48 @@ TOffscreenView::TOffscreenView(BRect frame, const char *name, short mRadius,
 	  fHoursRadius(hRadius),
 	  fMinutesRadius(mRadius),
 	  fFace(face),
-	  fShowSeconds(show)
+	  fShowSeconds(show),
+	  fInner(NULL),
+	  fCenter(NULL)
 {
+	for (short i = 0; i <= 8; i++)
+		fClockFace[i] = NULL;
+
 	status_t error;
-#ifdef __HAIKU__
 	BResources rsrcs;
 	error = rsrcs.SetToImage(&&dummy_label);
 dummy_label:
 	if (error == B_OK) {
-		{
-#else
-	// Note: Since we can be run as replicant, we get our 
-	// resources this way, not via be_app->AppResources().
-	entry_ref ref;
-	error = be_roster->FindApp(kAppSignature, &ref);
-	if (error == B_NO_ERROR) {
-		BFile file(&ref, O_RDONLY);
-		error = file.InitCheck();
-		if (error == B_NO_ERROR) {
-			BResources rsrcs(&file);
-#endif
-			for (short i = 0; i <= 8; i++)
-				fClockFace[i] = NULL;
-
-			size_t len;
-			void *picH;
-			BRect theRect(0, 0, 82, 82);
-			for (short loop = 0; loop <= 8; loop++) {
-				if ((picH = rsrcs.FindResource('PICT', loop + 4, &len))) {
-					fClockFace[loop] = new BBitmap(theRect, B_CMAP8);
-					fClockFace[loop]->SetBits(picH, len, 0, B_CMAP8);
-					free(picH);
-				}
-			}
-
-			theRect.Set(0,0,15,15);
-			if ((picH = rsrcs.FindResource(B_MINI_ICON_TYPE, "center", &len))) {
-				fCenter = new BBitmap(theRect, B_CMAP8);
-				fCenter->SetBits(picH, len, 0, B_CMAP8);
-				free(picH);
-			}
-
-			theRect.Set(0,0,2,2);
-			if ((picH = rsrcs.FindResource('PICT', 13, &len))) {
-				fInner = new BBitmap(theRect, B_CMAP8);
-				fInner->SetBits(picH, len, 0, B_CMAP8);
+		size_t len;
+		void *picH;
+		BRect theRect(0, 0, 82, 82);
+		for (short loop = 0; loop <= 8; loop++) {
+			if ((picH = rsrcs.FindResource('PICT', loop + 4, &len))) {
+				fClockFace[loop] = new BBitmap(theRect, B_CMAP8);
+				fClockFace[loop]->SetBits(picH, len, 0, B_CMAP8);
 				free(picH);
 			}
 		}
-	} 
+
+		theRect.Set(0,0,15,15);
+		if ((picH = rsrcs.FindResource(B_MINI_ICON_TYPE, "center", &len))) {
+			fCenter = new BBitmap(theRect, B_CMAP8);
+			fCenter->SetBits(picH, len, 0, B_CMAP8);
+			free(picH);
+		}
+
+		theRect.Set(0,0,2,2);
+		if ((picH = rsrcs.FindResource('PICT', 13, &len))) {
+			fInner = new BBitmap(theRect, B_CMAP8);
+			fInner->SetBits(picH, len, 0, B_CMAP8);
+			free(picH);
+		}
+	}
 
 	float x, y;
 	float counter;
 	short index = 0;
-	
+
 	// Generate minutes points array
 	for (counter = 90; counter >= 0; counter -= 6, index++) {
 		x = mRadius * cos(((360 - counter)/180.0) * 3.1415);
@@ -115,7 +103,7 @@ dummy_label:
 
 void
 TOffscreenView::NextFace()
-{	
+{
 	fFace++;
 	if (fFace > 8)
 		fFace = 1;
@@ -124,13 +112,13 @@ TOffscreenView::NextFace()
 
 void
 TOffscreenView::DrawX()
-{	
+{
 	ASSERT(Window());
 
 	if (Window()->Lock()) {
-		if (fClockFace != NULL)
+		if (fClockFace[fFace] != NULL)
 			DrawBitmap(fClockFace[fFace], BPoint(0, 0));
-		
+
 		//
 		// Draw hands
 		//
@@ -163,7 +151,7 @@ TOffscreenView::~TOffscreenView()
 	for (int32 counter = 0; counter <= 8; counter++)
 		delete fClockFace[counter];
 };
-	
+
 
 //	#pragma mark -
 
@@ -194,7 +182,7 @@ TOnscreenView::InitObject(BRect rect, short mRadius, short hRadius,
 	if (fOffscreen != NULL && fOffscreen->Lock()) {
 		fOffscreen->AddChild(fOffscreenView);
 		fOffscreen->Unlock();
-		
+
 		fOffscreenView->DrawX();
 	}
 }
@@ -226,19 +214,19 @@ TOnscreenView::Archive(BMessage *data, bool deep) const
 
 	if (status == B_OK)
 		status = data->AddRect("bounds", Bounds());
-	
+
 	if (status == B_OK)
 		status = data->AddInt32("mRadius", fOffscreenView->fMinutesRadius);
-	
+
 	if (status == B_OK)
 		status = data->AddInt32("hRadius", fOffscreenView->fHoursRadius);
-	
+
 	if (status == B_OK)
 		status = data->AddInt32("offset", fOffscreenView->fOffset);
-	
+
 	if (status == B_OK)
 		status = data->AddBool("seconds", fOffscreenView->fShowSeconds);
-	
+
 	if (status == B_OK)
 		status = data->AddInt32("face", fOffscreenView->fFace);
 
@@ -263,11 +251,11 @@ TOnscreenView::Pulse()
 
 	time_t current = time(0);
 	struct tm *loctime = localtime(&current);
-	
+
 	short hours = loctime->tm_hour;
 	short minutes = loctime->tm_min;
 	short seconds = loctime->tm_sec;
-	
+
 	if ((fOffscreenView->fShowSeconds && (seconds != fOffscreenView->fSeconds))
 		|| (minutes != fOffscreenView->fMinutes)) {
 			fOffscreenView->fHours = hours;
@@ -335,7 +323,7 @@ TOnscreenView::MouseDown( BPoint point )
 	BPoint	cursor;
 	uint32	buttons;
 	BRect	bounds = Bounds();
-	
+
 	GetMouse(&cursor,&buttons);
 	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
 		fOffscreenView->fShowSeconds = !fOffscreenView->fShowSeconds;

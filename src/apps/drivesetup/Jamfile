@@ -15,7 +15,7 @@ Preference DriveSetup :
 	PartitionList.cpp
 	Support.cpp
 
-	: be $(HAIKU_LOCALE_LIBS) libcolumnlistview.a libshared.a
+	: be localestub libcolumnlistview.a libshared.a
 		$(TARGET_LIBSUPC++)
 	: DriveSetup.rdef
 ;

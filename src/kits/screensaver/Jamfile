@@ -7,18 +7,16 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons screen_saver ] ;
 
 UsePrivateHeaders screen_saver ;
 
-SharedLibrary libscreensaver.so :
-	BuildScreenSaverDefaultSettingsView.cpp
-	ScreenSaver.cpp
-	ScreenSaverSettings.cpp
-	ScreenSaverRunner.cpp
-	:
-	be game $(TARGET_LIBSUPC++)
-;
-
-Package haiku-screensaverkit-cvs :
-	libscreensaver.so :
-	boot home config lib ;
-
-Packages haiku-screensaverkit-cvs :
-	README ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		SharedLibrary [ MultiArchDefaultGristFiles libscreensaver.so ] :
+			BuildScreenSaverDefaultSettingsView.cpp
+			ScreenSaver.cpp
+			ScreenSaverSettings.cpp
+			ScreenSaverRunner.cpp
+			:
+			be game $(TARGET_LIBSUPC++)
+			;
+	}
+}

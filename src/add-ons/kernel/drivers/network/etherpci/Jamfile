@@ -9,11 +9,6 @@ KernelAddon etherpci :
 	etherpci.c 
 	;
 
-Package haiku-networkingkit-cvs :
-	etherpci :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-networkingkit-cvs : net etherpci ;
-
 
 # Installation
 

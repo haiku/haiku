@@ -399,6 +399,23 @@ hash_hash_string(const char *string)
 
 
 uint32
+hash_hash_string_part(const char *string, size_t maxLength)
+{
+	uint32 hash = 0;
+	char c;
+
+	// we assume hash to be at least 32 bits
+	while (maxLength-- > 0 && (c = *string++) != 0) {
+		hash ^= hash >> 28;
+		hash <<= 4;
+		hash ^= c;
+	}
+
+	return hash;
+}
+
+
+uint32
 hash_count_elements(struct hash_table *table)
 {
 	return table->num_elements;

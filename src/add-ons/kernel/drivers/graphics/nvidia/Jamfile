@@ -10,14 +10,3 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 KernelAddon nvidia :
 	driver.c
 ;
-
-Package haiku-nvidia-cvs :
-	README.html UPDATE.html ;
-Package haiku-nvidia-cvs :
-	nvidia :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-nvidia-cvs : graphics nvidia ;
-Package haiku-nvidia-cvs :
-	nvidia.settings :
-	boot home config settings kernel drivers ;
-

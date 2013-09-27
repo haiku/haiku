@@ -25,7 +25,7 @@ ParagraphStyle::operator=(const ParagraphStyle& other)
 {
 	if (this == &other)
 		return *this;
-	
+
 	fStyleData = other.fStyleData;
 	return *this;
 }

@@ -14,11 +14,12 @@
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/RepositoryContentHandler.h>
 #include <package/hpkg/RepositoryReader.h>
+#include <package/hpkg/StandardErrorOutput.h>
 #include <package/PackageInfo.h>
 #include <package/RepositoryInfo.h>
 
-#include "package.h"
-#include "StandardErrorOutput.h"
+#include "package_repo.h"
+#include "PackageInfoPrinter.h"
 
 
 using namespace BPackageKit::BHPKG;
@@ -27,23 +28,13 @@ using namespace BPackageKit;
 struct RepositoryContentListHandler : BRepositoryContentHandler {
 	RepositoryContentListHandler(bool verbose)
 		:
+		fPrinter(),
 		fLevel(0),
 		fVerbose(verbose)
 	{
 	}
 
-	virtual status_t HandleEntry(BPackageEntry* entry)
-	{
-		return B_OK;
-	}
-
-	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
-		BPackageEntryAttribute* attribute)
-	{
-		return B_OK;
-	}
-
-	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	virtual status_t HandlePackage(const char* packageName)
 	{
 		return B_OK;
 	}
@@ -51,156 +42,25 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 	virtual status_t HandlePackageAttribute(
 		const BPackageInfoAttributeValue& value)
 	{
-		switch (value.attributeID) {
-			case B_PACKAGE_INFO_NAME:
-				if (fVerbose) {
-					printf("package-attributes:\n");
-					printf("\tname: %s\n", value.string);
-				} else
-					printf("package: %s", value.string);
-				break;
-
-			case B_PACKAGE_INFO_SUMMARY:
-				if (fVerbose)
-					printf("\tsummary: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_DESCRIPTION:
-				if (fVerbose)
-					printf("\tdescription: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_VENDOR:
-				if (fVerbose)
-					printf("\tvendor: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_PACKAGER:
-				if (fVerbose)
-					printf("\tpackager: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_FLAGS:
-				if (value.unsignedInt == 0 || !fVerbose)
-					break;
-				printf("\tflags:\n");
-				if ((value.unsignedInt & B_PACKAGE_FLAG_APPROVE_LICENSE) != 0)
-					printf("\t\tapprove_license\n");
-				if ((value.unsignedInt & B_PACKAGE_FLAG_SYSTEM_PACKAGE) != 0)
-					printf("\t\tsystem_package\n");
-				break;
-
-			case B_PACKAGE_INFO_ARCHITECTURE:
-				if (fVerbose) {
-					printf("\tarchitecture: %s\n",
-						BPackageInfo::kArchitectureNames[value.unsignedInt]);
-				}
-				break;
-
-			case B_PACKAGE_INFO_VERSION:
-				if (!fVerbose)
-					printf("(");
-				_PrintPackageVersion(value.version);
-				if (!fVerbose)
-					printf(")\n");
-				break;
-
-			case B_PACKAGE_INFO_COPYRIGHTS:
-				if (fVerbose)
-					printf("\tcopyright: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_LICENSES:
-				if (fVerbose)
-					printf("\tlicense: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_URLS:
-				if (fVerbose)
-					printf("\tURL: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_SOURCE_URLS:
-				if (fVerbose)
-					printf("\tsource URL: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_PROVIDES:
-				if (!fVerbose)
-					break;
-				printf("\tprovides: %s", value.resolvable.name);
-				if (value.resolvable.haveVersion) {
-					printf(" = ");
-					_PrintPackageVersion(value.resolvable.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_REQUIRES:
-				if (!fVerbose)
-					break;
-				printf("\trequires: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_SUPPLEMENTS:
-				if (!fVerbose)
-					break;
-				printf("\tsupplements: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_CONFLICTS:
-				if (!fVerbose)
-					break;
-				printf("\tconflicts: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_FRESHENS:
-				if (!fVerbose)
-					break;
-				printf("\tfreshens: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_REPLACES:
-				if (!fVerbose)
-					break;
-				printf("\treplaces: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_CHECKSUM:
-				printf("\tchecksum: %s\n", value.string);
-				break;
-
-			default:
-				printf(
-					"*** Invalid package attribute section: unexpected "
+		if (value.attributeID == B_PACKAGE_INFO_NAME) {
+			if (fVerbose) {
+				printf("package-attributes:\n");
+				fPrinter.PrintName(value.string);
+			} else
+				printf("\t%s\n", value.string);
+		} else {
+			if (fVerbose && !fPrinter.PrintAttribute(value)) {
+				printf("*** Invalid package attribute section: unexpected "
 					"package attribute id %d encountered\n", value.attributeID);
 				return B_BAD_DATA;
+			}
 		}
 
+		return B_OK;
+	}
+
+	virtual status_t HandlePackageDone(const char* packageName)
+	{
 		return B_OK;
 	}
 
@@ -220,6 +80,7 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 			for (int i = 0; i < licenseNames.CountStrings(); ++i)
 				printf("\t\t%s\n", licenseNames.StringAt(i).String());
 		}
+		printf("packages:\n");
 
 		return B_OK;
 	}
@@ -231,20 +92,13 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 private:
 	static void _PrintPackageVersion(const BPackageVersionData& version)
 	{
-		printf("%s", version.major);
-		if (version.minor != NULL && version.minor[0] != '\0')
-			printf(".%s", version.minor);
-		if (version.micro != NULL && version.micro[0] != '\0')
-			printf(".%s", version.micro);
-		if (version.preRelease != NULL && version.preRelease[0] != '\0')
-			printf("-%s", version.preRelease);
-		if (version.release > 0)
-			printf("-%d", version.release);
+		printf("%s", BPackageVersion(version).ToString().String());
 	}
 
 private:
-	int		fLevel;
-	bool	fVerbose;
+	PackageInfoPrinter	fPrinter;
+	int					fLevel;
+	bool				fVerbose;
 };
 
 
@@ -287,7 +141,7 @@ command_list(int argc, const char* const* argv)
 	const char* repositoryFileName = argv[optind++];
 
 	// open repository
-	StandardErrorOutput errorOutput;
+	BStandardErrorOutput errorOutput;
 	BRepositoryReader repositoryReader(&errorOutput);
 	status_t error = repositoryReader.Init(repositoryFileName);
 	if (error != B_OK)

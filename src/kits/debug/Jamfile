@@ -6,23 +6,34 @@ UsePrivateHeaders kernel ;
 UsePrivateHeaders libroot ;
 UsePrivateHeaders runtime_loader ;
 UsePrivateHeaders shared ;
-UsePrivateSystemHeaders ;
 SubDirHdrs [ FDirName $(SUBDIR) arch ] ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-SharedLibrary libdebug.so :
-	debug_support.cpp
-	DebugContext.cpp
-	DebugEventStream.cpp
-	DebugLooper.cpp
-	DebugMessageHandler.cpp
-	Image.cpp
-	SymbolLookup.cpp
-	TeamDebugger.cpp
+		UsePrivateSystemHeaders ;
 
-	# architecture specific
-	arch_debug_support.cpp
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 
-	: be $(TARGET_LIBSUPC++)
-;
+		local libroot = [ MultiArchConditionalGristFiles libdebug.so
+			: : $(architecture) ] ;
+
+		SharedLibrary [ MultiArchDefaultGristFiles libdebug.so ] :
+			debug_support.cpp
+			DebugContext.cpp
+			DebugEventStream.cpp
+			DebugLooper.cpp
+			DebugMessageHandler.cpp
+			Image.cpp
+			SymbolLookup.cpp
+			TeamDebugger.cpp
+
+			# architecture specific
+			arch_debug_support.cpp
+
+			: be $(TARGET_LIBSUPC++)
+			;
+	}
+}

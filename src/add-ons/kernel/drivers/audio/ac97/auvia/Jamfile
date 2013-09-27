@@ -14,11 +14,3 @@ KernelAddon auvia :
 	multi.c
 	util.c
 ;
-
-Package haiku-auvia-cvs
-	:
-	auvia
-	:
-	boot home config add-ons kernel drivers bin ;
-
-PackageDriverSymLink haiku-auvia-cvs : audio hmulti auvia ;

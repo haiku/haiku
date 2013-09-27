@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src data settings tracker_new_templates ;
+
+
+rule PrepareTrackerNewTemplates source : mimeType
+{
+	local source = [ FGristFiles $(source) ] ;
+	local target = $(source:G=tracker-new-templates) ;
+	MakeLocateCommonPlatform $(target) ;
+	File $(target) : $(source) ;
+	SetType $(target) : $(mimeType) ;
+}
+
+
+PrepareTrackerNewTemplates "C++ header" : text/x-source-code ;
+PrepareTrackerNewTemplates "C++ source" : text/x-source-code ;
+PrepareTrackerNewTemplates "makefile" : text/x-makefile ;
+PrepareTrackerNewTemplates "text file" : text/plain ;

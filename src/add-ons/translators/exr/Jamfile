@@ -16,7 +16,7 @@ Translator EXRTranslator :
 	EXRTranslator.cpp
 	IStreamWrapper.cpp
 	: be translation libilmimf.so $(TARGET_LIBSTDC++) libtranslatorsutils.a 
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	: true
 ;
 
@@ -27,10 +27,6 @@ DoCatalogs EXRTranslator :
 	EXRTranslator.cpp
 	main.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	EXRTranslator :
-	boot home config add-ons Translators ;
 
 SubInclude HAIKU_TOP src add-ons translators exr openexr ;
 

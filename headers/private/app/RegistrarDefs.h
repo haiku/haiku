@@ -121,7 +121,9 @@ enum {
 	B_REG_GET_GROUP							= 'rggr',
 	B_REG_GET_USER_GROUPS					= 'rgug',
 	B_REG_UPDATE_USER						= 'ruus',
+	B_REG_DELETE_USER						= 'rdus',
 	B_REG_UPDATE_GROUP						= 'rugr',
+	B_REG_DELETE_GROUP						= 'rdgr',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants

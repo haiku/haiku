@@ -4,25 +4,34 @@ SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UsePrivateHeaders app interface media shared support ;
 
-MergeObject <libbe>support_kit.o :
-	Archivable.cpp
-	ArchivingManagers.cpp
-	Beep.cpp
-	BlockCache.cpp
-	BufferedDataIO.cpp
-	BufferIO.cpp
-	ByteOrder.cpp
-	DataIO.cpp
-	DateTime.cpp
-	Flattenable.cpp
-	List.cpp
-	Locker.cpp
-	PointerList.cpp
-	Referenceable.cpp
-	StopWatch.cpp
-	String.cpp
-	StringList.cpp
-	Url.cpp
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-StaticLibrary libreferenceable.a : : [ FGristFiles Referenceable.o ] ;
+		MergeObject <libbe!$(architecture)>support_kit.o :
+			Archivable.cpp
+			ArchivingManagers.cpp
+			Beep.cpp
+			BlockCache.cpp
+			BufferedDataIO.cpp
+			BufferIO.cpp
+			ByteOrder.cpp
+			DataIO.cpp
+			DateTime.cpp
+			Flattenable.cpp
+			List.cpp
+			Locker.cpp
+			PointerList.cpp
+			Referenceable.cpp
+			StopWatch.cpp
+			String.cpp
+			StringList.cpp
+			Url.cpp
+			Uuid.cpp
+			;
+
+		StaticLibrary [ MultiArchDefaultGristFiles libreferenceable.a ]
+			: : [ FGristFiles Referenceable.o ] ;
+	}
+}

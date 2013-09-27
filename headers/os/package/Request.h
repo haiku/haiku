@@ -18,7 +18,6 @@ class BContext;
 namespace BPrivate {
 	class JobQueue;
 }
-using BPrivate::JobQueue;
 
 
 class BRequest : protected BJobStateListener {
@@ -32,14 +31,16 @@ public:
 
 			BJob*				PopRunnableJob();
 
+			status_t			Process(bool failIfCanceledOnly = false);
+
 protected:
 			status_t			QueueJob(BJob* job);
 
 			const BContext&		fContext;
 
-private:
+protected:
 			status_t			fInitStatus;
-			JobQueue*			fJobQueue;
+			BPrivate::JobQueue*	fJobQueue;
 };
 
 

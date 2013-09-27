@@ -36,8 +36,3 @@ Addon s3.accelerant :
 
 	: be libaccelerantscommon.a
 ;
-
-Package haiku-s3-cvs :
-	s3.accelerant :
-	boot home config add-ons accelerants ;
-	

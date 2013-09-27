@@ -20,6 +20,7 @@ HAIKU_INCLUDE_IN_CONTAINER_VAR on $(HAIKU_IMAGE_CONTAINER_NAME)
 	= HAIKU_INCLUDE_IN_IMAGE ;
 HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_IMAGE_CONTAINER_NAME)
 	= HAIKU_IMAGE_INSTALL_TARGETS ;
+HAIKU_CONTAINER_SYSTEM_DIR_TOKENS on $(HAIKU_IMAGE_CONTAINER_NAME) = system ;
 
 # network boot archive
 HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME = haiku-netboot-archive-container ;
@@ -28,15 +29,8 @@ HAIKU_CONTAINER_GRIST on $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
 # HAIKU_INCLUDE_IN_CONTAINER_VAR -- update only mode not supported
 HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
 	= HAIKU_NET_BOOT_ARCHIVE_INSTALL_TARGETS ;
-
-# alternative gcc archive
-HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME
-	= haiku-alternative-gcc-archive-container ;
-HAIKU_CONTAINER_GRIST on $(HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME)
-	= AlternativeGCCArchive ;
-# HAIKU_INCLUDE_IN_CONTAINER_VAR -- update only mode not supported
-HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_ALTERNATIVE_GCC_ARCHIVE_CONTAINER_NAME)
-	= HAIKU_ALTERNATIVE_GCC_ARCHIVE_INSTALL_TARGETS ;
+HAIKU_CONTAINER_SYSTEM_DIR_TOKENS on $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
+	= system ;
 
 # boot floppy
 HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME = haiku-boot-floppy-container ;
@@ -45,6 +39,8 @@ HAIKU_CONTAINER_GRIST on $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
 # HAIKU_INCLUDE_IN_CONTAINER_VAR -- update only mode not supported
 HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
 	= HAIKU_FLOPPY_BOOT_IMAGE_INSTALL_TARGETS ;
+HAIKU_CONTAINER_SYSTEM_DIR_TOKENS on $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
+	= system ;
 
 # boot CD image
 HAIKU_CD_BOOT_IMAGE_CONTAINER_NAME = haiku-boot-cd-container ;
@@ -52,13 +48,18 @@ HAIKU_CONTAINER_GRIST on $(HAIKU_CD_BOOT_IMAGE_CONTAINER_NAME) = CDBootImage ;
 # HAIKU_INCLUDE_IN_CONTAINER_VAR -- update only mode not supported
 HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_CD_BOOT_IMAGE_CONTAINER_NAME)
 	= HAIKU_CD_BOOT_IMAGE_INSTALL_TARGETS ;
+HAIKU_CONTAINER_SYSTEM_DIR_TOKENS on $(HAIKU_CD_BOOT_IMAGE_CONTAINER_NAME)
+	= system ;
 
 # boot CD for PPC image
 HAIKU_CD_BOOT_PPC_IMAGE_CONTAINER_NAME = haiku-boot-cd-ppc-container ;
-HAIKU_CONTAINER_GRIST on $(HAIKU_CD_BOOT_PPC_IMAGE_CONTAINER_NAME) = CDBootPPCImage ;
+HAIKU_CONTAINER_GRIST on $(HAIKU_CD_BOOT_PPC_IMAGE_CONTAINER_NAME)
+	= CDBootPPCImage ;
 # HAIKU_INCLUDE_IN_CONTAINER_VAR -- update only mode not supported
 HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_CD_BOOT_PPC_IMAGE_CONTAINER_NAME)
 	= HAIKU_CD_BOOT_PPC_IMAGE_INSTALL_TARGETS ;
+HAIKU_CONTAINER_SYSTEM_DIR_TOKENS on $(HAIKU_CD_BOOT_PPC_IMAGE_CONTAINER_NAME)
+	= system ;
 
 # Haiku image/install defaults
 HAIKU_DEFAULT_IMAGE_NAME = haiku.image ;
@@ -82,23 +83,6 @@ HAIKU_DEFAULT_ANYBOOT_LABEL ?= Haiku ;
 ProcessCommandLineArguments ;
 
 
-# include libgccObjects
-{
-	local libgccObjects = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : libgccObjects ] ;
-
-	if ! $(libgccObjects) {
-		ECHO "No `libgccObjects' found in"
-			"$(HAIKU_BUILD_OUTPUT_DIR)!" ;
-		EXIT "Please run ./configure in the source tree's root directory"
-			"again!" ;
-	}
-
-	LOCATE on libgccObjects = $(HAIKU_BUILD_OUTPUT_DIR) ;
-
-	include libgccObjects ;
-}
-
-
 # supported debug levels
 HAIKU_DEBUG_LEVELS = 0 1 2 3 4 5 ;
 
@@ -113,456 +97,67 @@ HAIKU_CONFIG_HEADERS = [ FDirName $(HAIKU_TOP) build user_config_headers ]
 	[ FDirName $(HAIKU_TOP) build config_headers ] ;
 
 
-#pragma mark -
+# object directories common to all architectures
+HAIKU_OBJECT_BASE_DIR = [ FDirName $(HAIKU_OBJECT_DIR) haiku ] ;
+HAIKU_COMMON_ARCH_OBJECT_DIR = [ FDirName $(HAIKU_OBJECT_BASE_DIR) common ] ;
 
-# haiku target platform settings
 
-# analyze GCC version
-HAIKU_GCC_VERSION = [ FAnalyzeGCCVersion HAIKU_GCC_RAW_VERSION ] ;
+#pragma mark - haiku target platform settings
 
-# enable GCC -pipe option, if requested
-if $(HAIKU_USE_GCC_PIPE) = 1 {
-	HAIKU_GCC_BASE_FLAGS = -pipe ;
+
+local architecture ;
+for architecture in $(HAIKU_PACKAGING_ARCHS) {
+	ArchitectureSetup $(architecture) ;
 }
 
-# disable strict aliasing on anything newer than gcc 2 as it may lead to
-# unexpected results. also disable the tree-vrp (value range propagation)
-# optimization for now as with the current gcc4 version we are using this
-# results in some broken code.
-# TODO: remove the -fno-strict-aliasing option when all code has been
-#		analyzed/fixed with regard to aliasing.
-# TODO: retest/remove the -fno-tree-vrp option as soon as we have updated our
-#		gcc4 compiler. See this discussion on some issues:
-# http://www.freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
-if $(HAIKU_GCC_VERSION[1]) >= 3 {
-	HAIKU_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-tree-vrp ;
+# TODO: Might not be needed anymore.
+if $(HAIKU_HOST_BUILD_ONLY) = 1 {
+	HAIKU_GCC_VERSION = 0 0 0 ;
 }
 
-# disable array bounds warnings on gcc 4.6 or newer since they trigger
-# too many false positives. Coverity does a better job of this kind of analysis
-# anyways.
-if $(HAIKU_GCC_VERSION[1]) >= 4 {
-	HAIKU_GCC_BASE_FLAGS += -Wno-array-bounds ;
+if $(HAIKU_PACKAGING_ARCH) {
+	KernelArchitectureSetup $(HAIKU_PACKAGING_ARCH) ;
 }
 
-# activating graphite optimizations
-if $(HAIKU_USE_GCC_GRAPHITE) = 1 {
-	HAIKU_GCC_BASE_FLAGS += -floop-interchange -ftree-loop-distribution
-		-floop-strip-mine -floop-block ;
-}
-
-if $(HOST_GCC_VERSION[1]) >= 3 {
-	HOST_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-tree-vrp ;
-}
-
-# override gcc 2.95.3's header directory -- strictly necessary only when using
-# the BeOS native compiler (since its headers are incompatible), but it doesn't
-# harm for the cross-compiler either.
-if $(HAIKU_GCC_VERSION[1]) = 2 {
-	HAIKU_GCC_HEADERS_DIR = [ FDirName $(HAIKU_TOP) headers build gcc-2.95.3 ] ;
-}
-
-# the subdirectory into which the alternative GCC libraries are to be installed
-if $(HAIKU_GCC_VERSION[1]) = 2 {
-	HAIKU_ALTERNATIVE_GCC_LIB_SUBDIR = gcc2 ;
-} else {
-	HAIKU_ALTERNATIVE_GCC_LIB_SUBDIR = gcc4 ;
-}
-
-# initial state for flags etc.
-HAIKU_C++ ?= $(HAIKU_CC) ;
-HAIKU_LINK = $(HAIKU_CC) ;
-HAIKU_LINKFLAGS = $(HAIKU_GCC_BASE_FLAGS) ;
-HAIKU_BOOT_LINKFLAGS = ;
-
-HAIKU_HDRS = [ FStandardHeaders ] ;
-HAIKU_KERNEL_CCFLAGS = $(HAIKU_CCFLAGS) $(HAIKU_GCC_BASE_FLAGS) ;
-HAIKU_KERNEL_C++FLAGS = $(HAIKU_C++FLAGS) $(HAIKU_GCC_BASE_FLAGS) ;
-HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS) $(HAIKU_GCC_BASE_FLAGS) ;
-HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS) $(HAIKU_GCC_BASE_FLAGS) ;
-HAIKU_CCFLAGS += $(HAIKU_GCC_BASE_FLAGS) -nostdinc ;
-HAIKU_C++FLAGS += $(HAIKU_GCC_BASE_FLAGS) -nostdinc ;
 HAIKU_DEFINES = __HAIKU__ ;
-HAIKU_NO_WERROR ?= 0 ;
+HAIKU_LIBSUPC++ = $(HAIKU_LIBSUPC++_$(HAIKU_PACKAGING_ARCH)) ;
+HAIKU_LIBSTDC++ = $(HAIKU_LIBSTDC++_$(HAIKU_PACKAGING_ARCH)) ;
+
 
 # distro compatibility level defines
 HAIKU_DISTRO_COMPATIBILITY ?= "default" ;
 switch $(HAIKU_DISTRO_COMPATIBILITY) {
-	case official	: {
+	case official :
 		HAIKU_DEFINES += HAIKU_DISTRO_COMPATIBILITY_OFFICIAL ;
 		HAIKU_INCLUDE_TRADEMARKS = "" ;
-	}
-	case compatible	: {
+	case compatible :
 		HAIKU_DEFINES += HAIKU_DISTRO_COMPATIBILITY_COMPATIBLE ;
 		HAIKU_INCLUDE_TRADEMARKS = "" ;
-	}
-	case "default"	: {
+	case "default" :
 		HAIKU_DEFINES += HAIKU_DISTRO_COMPATIBILITY_DEFAULT ;
 		HAIKU_INCLUDE_TRADEMARKS = ;
-	}
-	case *			: Exit "Invalid value for HAIKU_DISTRO_COMPATIBILITY:"
-						$(HAIKU_DISTRO_COMPATIBILITY) ;
-}
-
-# analyze the gcc machine spec to determine HAIKU_CPU
-switch $(HAIKU_GCC_MACHINE) {
-	case i?86-*		: HAIKU_CPU = x86 ;
-	case x86_64-*	: HAIKU_CPU = x86_64 ;
-	case powerpc-*	: HAIKU_CPU = ppc ;
-	case m68k-*		: HAIKU_CPU = m68k ;
-	case mipsel-*	: HAIKU_CPU = mipsel ;
-	case arm-*		: HAIKU_CPU = arm ;
-	case *			: Exit "Unsupported gcc target machine:"
-						$(HAIKU_GCC_MACHINE) ;
-}
-
-# determine the endianness of the host
-switch $(HOST_GCC_MACHINE) {
-	case amd64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case i?86-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case powerpc-*	: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
-	case x86_64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-
-	# the following are rather unlikely as hosts ...
-	case arm-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case m68k-*		: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
-	case mipsel-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case *			: Exit "Unsupported gcc host machine:" $(HOST_GCC_MACHINE) ;
-}
-
-switch $(HAIKU_CPU) {
-	case ppc :
-	{
-		HAIKU_DEFINES += __POWERPC__ ;
-		HAIKU_BOOT_PLATFORM ?= openfirmware ;
-		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
-		# offset in floppy image (>= sizeof(haiku_loader))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
-	}
-	case arm :
-	{
-		HAIKU_DEFINES += __ARM__ ;
-		HAIKU_CCFLAGS += -mapcs-frame ; # For stackcrawls
-		HAIKU_C++FLAGS += -mapcs-frame ;
-		HAIKU_BOOT_PLATFORM ?= u-boot ;
-		HAIKU_BOOT_BOARD ?= verdex ;
-		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
-			# in kB (there is not really a floppy on the gumstix ;) )
-		# offset in floppy image (>= sizeof(haiku_loader))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
-		HAIKU_NO_WERROR = 1 ;
-			# we use #warning as placeholders for things to write...
-	}
-	case x86 :
-	{
-		HAIKU_DEFINES += __INTEL__ ;
-		HAIKU_BOOT_PLATFORM = bios_ia32 ;
-		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
-		# offset in floppy image (>= sizeof(haiku_loader))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
-
-		# yasm is required for target arch x86
-		if ! $(HAIKU_YASM) {
-			Exit "HAIKU_YASM not set. Please re-run configure." ;
-		}
-	}
-	case x86_64 :
-	{
-		# x86_64 completely shares the x86 bootloader.
-		HAIKU_BOOT_PLATFORM = bios_ia32 ;
-		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
-		# offset in floppy image (>= sizeof(haiku_loader))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
-
-		# x86_64 kernel source is under arch/x86.
-		HAIKU_KERNEL_ARCH = x86 ;
-
-		# yasm is required for target arch x86_64
-		if ! $(HAIKU_YASM) {
-			Exit "HAIKU_YASM not set. Please re-run configure." ;
-		}
-	}
-	case m68k :
-	{
-		HAIKU_DEFINES += __M68K__ ;
-		HAIKU_BOOT_PLATFORM ?= atari_m68k ;
-		switch $(HAIKU_BOOT_PLATFORM) {
-			case atari_m68k :
-			{
-				HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
-			}
-			case amiga_m68k :
-			{
-				# for now we have trouble reading from double-sided images
-				HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 880 ; # in kB
-			}
-		}
-		# offset in floppy image (>= sizeof(haiku_loader))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 260 ; # in kB
-		HAIKU_NO_WERROR = 1 ;
-			# we use #warning as placeholders for things to write...
-	}
-	case mipsel :
-	{
-		HAIKU_DEFINES += __MIPSEL__ ;
-		# RouterBOARD firmware (ELF image over TFTP)
-		HAIKU_BOOT_PLATFORM = routerboard_mipsel ;
-		# offset in floppy image (>= sizeof(haiku_loader))
-		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB
-		HAIKU_NO_WERROR = 1 ;
-			# we use #warning as placeholders for things to write...
-	}
 	case * :
-		Exit "Currently unsupported target CPU:" $(HAIKU_CPU) ;
+		Exit "Invalid value for HAIKU_DISTRO_COMPATIBILITY:"
+			$(HAIKU_DISTRO_COMPATIBILITY) ;
 }
 
-# strip is required
-if ! $(HAIKU_STRIP) {
-	Exit "HAIKU_STRIP not set. Please re-run configure." ;
-}
-
-# Include embedded board-specific file.
-if $(HAIKU_BOOT_BOARD) {
-	include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD)
-		BoardSetup ] ;
-}
-
-HAIKU_ARCH ?= $(HAIKU_CPU) ;
-HAIKU_ARCH_MACRO_DEFINE = ARCH_$(HAIKU_ARCH) ;
-HAIKU_DEFINES += $(HAIKU_ARCH_MACRO_DEFINE) ;
-HAIKU_DEFINES += BOOT_ARCHIVE_IMAGE_OFFSET=$(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
-HAIKU_KERNEL_ARCH ?= $(HAIKU_ARCH) ;
-HAIKU_ATA_STACK ?= 1 ;
-
-# directories
-HAIKU_OBJECT_BASE_DIR = [ FDirName $(HAIKU_OBJECT_DIR) haiku ] ;
-HAIKU_COMMON_ARCH_OBJECT_DIR = [ FDirName $(HAIKU_OBJECT_BASE_DIR) common ] ;
-HAIKU_ARCH_OBJECT_DIR = [ FDirName $(HAIKU_OBJECT_BASE_DIR) $(HAIKU_ARCH) ] ;
-HAIKU_COMMON_DEBUG_OBJECT_DIR = [ FDirName $(HAIKU_ARCH_OBJECT_DIR) common ] ;
-HAIKU_DEBUG_0_OBJECT_DIR = [ FDirName $(HAIKU_ARCH_OBJECT_DIR) release ] ;
-
-local level ;
-for level in $(HAIKU_DEBUG_LEVELS[2-]) {
-	HAIKU_DEBUG_$(level)_OBJECT_DIR
-		= [ FDirName $(HAIKU_ARCH_OBJECT_DIR) debug_$(level) ] ;
-}
-
-# set variables for gcc header options
-SetIncludePropertiesVariables HAIKU ;
-
-# assembler flags
-HAIKU_ASFLAGS = ;
-
-# C/C++ flags
-HAIKU_KERNEL_CCFLAGS += -finline -fno-builtin ;
-HAIKU_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions ;
-HAIKU_KERNEL_DEFINES += _KERNEL_MODE ;
-HAIKU_BOOT_CCFLAGS += -finline -fno-builtin ;
-HAIKU_BOOT_C++FLAGS += -finline -fno-builtin -fno-exceptions ;
-
-if $(HAIKU_GCC_VERSION[1]) >= 3 {
-	HAIKU_BOOT_C++FLAGS += -fno-use-cxa-atexit ;
-	HAIKU_KERNEL_C++FLAGS += -fno-use-cxa-atexit ;
-}
-
-if $(HAIKU_GCC_VERSION[1]) >= 4 {
-	HAIKU_C++FLAGS += -Wno-deprecated ;
-
-	HAIKU_KERNEL_CCFLAGS += -ffreestanding ;
-	HAIKU_KERNEL_C++FLAGS += -ffreestanding ;
-	HAIKU_BOOT_CCFLAGS += -ffreestanding ;
-	HAIKU_BOOT_C++FLAGS += -ffreestanding ;
-}
-
-HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
-HAIKU_KERNEL_PIC_LINKFLAGS = ;
-HAIKU_KERNEL_ADDON_LINKFLAGS = ;
-
-switch $(HAIKU_ARCH) {
-	case ppc :
-	{
-		# Build a position independent PPC kernel. We need to be able to
-		# relocate the kernel, since the virtual address space layout at boot
-		# time is not fixed.
-		HAIKU_KERNEL_PIC_CCFLAGS = -fPIE ;
-		HAIKU_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
-	}
-
-	case m68k :
-	{
-		# We don't want to have to handle emulating missing FPU opcodes for 040
-		# and 060 in the kernel.
-		HAIKU_KERNEL_CCFLAGS += -m68020-60 ;
-		HAIKU_KERNEL_C++FLAGS += -m68020-60 ;
-	}
-	case x86 :
-	{
-		HAIKU_CCFLAGS += -march=pentium ;
-		HAIKU_C++FLAGS += -march=pentium ;
-		HAIKU_KERNEL_CCFLAGS += -march=pentium ;
-		HAIKU_KERNEL_C++FLAGS += -march=pentium ;
-
-		# Enable use of the gcc built-in atomic functions instead of atomic_*().
-		# The former are inlined and have thus less overhead. They are not
-		# available with gcc 2, but the header will take care of that.
-		HAIKU_DEFINES += B_USE_BUILTIN_ATOMIC_FUNCTIONS ;
-	}
-	case x86_64 :
-	{
-		# Kernel lives in the top 2GB of the address space, use kernel code
-		# model.
-		HAIKU_KERNEL_PIC_CCFLAGS += -mcmodel=kernel ;
-
-		# Disable the red zone, which cannot be used in kernel code due to
-		# interrupts, and always enable the frame pointer so stack traces are
-		# correct.
-		HAIKU_KERNEL_CCFLAGS += -mno-red-zone -fno-omit-frame-pointer ;
-		HAIKU_KERNEL_C++FLAGS += -mno-red-zone -fno-omit-frame-pointer ;
-		HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
-		HAIKU_KERNEL_ADDON_LINKFLAGS += -z max-page-size=0x1000 ;
-
-		# Bootloader is 32-bit.
-		HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;
-		HAIKU_BOOT_CCFLAGS += -m32 -march=pentium ;
-		HAIKU_BOOT_C++FLAGS += -m32 -march=pentium ;
-
-		# Enable use of the gcc built-in atomic functions instead of atomic_*().
-		# The former are inlined and have thus less overhead.
-		HAIKU_DEFINES += B_USE_BUILTIN_ATOMIC_FUNCTIONS ;
-	}
-}
-
-# If the environment variable HAIKU_INCLUDE_PATENTED_CODE is defined, we
-# define an equally named macro to the variable value. Some components use the
-# macro to allow compilation of code known to implemented patented ideas and/or
-# techniques, for example the Freetype bytecode hinter or sub-pixel rendering
-# as well as some problematic media codecs.
+# If the environment variable HAIKU_INCLUDE_PATENTED_CODE is defined, we define
+# an equally named macro to the variable value. Some components use the macro
+# to allow compilation of code known to implemented patented ideas and/or
+# techniques, for example the Freetype bytecode hinter or sub-pixel rendering as
+# well as some problematic media codecs.
 if $(HAIKU_INCLUDE_PATENTED_CODE) {
 	HAIKU_DEFINES
 		+= HAIKU_INCLUDE_PATENTED_CODE=$(HAIKU_INCLUDE_PATENTED_CODE) ;
 }
 
-# warning flags
-HAIKU_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes
-	-Wpointer-arith -Wcast-align -Wsign-compare -Wno-multichar ;
-HAIKU_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-ctor-dtor-privacy
-	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare
-	-Wno-multichar ;
-
-HAIKU_KERNEL_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes
-	-Wno-multichar ;
-HAIKU_KERNEL_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-multichar ;
-
-# debug flags
-HAIKU_DEBUG_FLAGS ?= -ggdb ;
-
-# debug 0: suppress asserts
-HAIKU_DEBUG_0_CCFLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
-HAIKU_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
-
-HAIKU_KERNEL_DEBUG_0_CCFLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
-HAIKU_KERNEL_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
-
-local level ;
-for level in $(HAIKU_DEBUG_LEVELS[2-]) {
-	local flags = $(HAIKU_DEBUG_FLAGS) [ FDefines DEBUG=$(level) ] ;
-	HAIKU_DEBUG_$(level)_CCFLAGS			= $(flags) ;
-	HAIKU_DEBUG_$(level)_C++FLAGS			= $(flags) ;
-	HAIKU_KERNEL_DEBUG_$(level)_CCFLAGS		= $(flags) ;
-	HAIKU_KERNEL_DEBUG_$(level)_C++FLAGS	= $(flags) ;
-}
-
-if $(HAIKU_GCC_VERSION[1]) >= 3 {
-	# TODO: Temporary work-around. Should be defined in the compiler specs
-	HAIKU_LINKFLAGS += -Xlinker --no-undefined ;
-} else {
-	HAIKU_DEFINES += _BEOS_R5_COMPATIBLE_ ;
-}
-
-# private shared kernel/libroot headers
-HAIKU_PRIVATE_SYSTEM_HEADERS =
-	[ PrivateHeaders $(DOT) system system/arch/$(HAIKU_ARCH) ]
-;
-
-# private kernel headers to be used when compiling kernel code
-HAIKU_PRIVATE_KERNEL_HEADERS =
-	[ PrivateHeaders $(DOT) kernel libroot shared
-		kernel/boot/platform/$(HAIKU_BOOT_PLATFORM) ]
-	[ ArchHeaders $(HAIKU_KERNEL_ARCH) ]
-	[ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) system kernel ]
-	$(HAIKU_PRIVATE_SYSTEM_HEADERS)
-;
-
-# Add some grist to the libgcc objects
-HAIKU_GCC_LIBGCC_OBJECTS = $(HAIKU_GCC_LIBGCC_OBJECTS:G=libgcc) ;
-
-# the C++ standard library
-HAIKU_BUILD_SHARED_LIBSTDC++ = ;
-if $(HAIKU_SHARED_LIBSTDC++) {
-	HAIKU_LIBSTDC++ = $(HAIKU_SHARED_LIBSTDC++) ;
-} else {
-	# no shared library available with the compiler -- build it
-	if $(HAIKU_GCC_VERSION[1]) = 2 {
-		HAIKU_LIBSTDC++ = libstdc++.r4.so ;
-	} else {
-		HAIKU_LIBSTDC++ = libstdc++.so ;
-	}
-	HAIKU_SHARED_LIBSTDC++ = $(HAIKU_LIBSTDC++) ;
-	HAIKU_BUILD_SHARED_LIBSTDC++ = 1 ;
-}
-
-# the C++ support (runtime) library
-HAIKU_BUILD_SHARED_LIBSUPC++ = ;
-if $(HAIKU_SHARED_LIBSUPC++) {
-	HAIKU_LIBSUPC++ = $(HAIKU_SHARED_LIBSUPC++) ;
-} else {
-	# no shared library available with the compiler -- build it for gcc 4
-	if $(HAIKU_GCC_VERSION[1]) != 2 {
-		HAIKU_SHARED_LIBSUPC++ = libsupc++.so ;
-		HAIKU_BUILD_SHARED_LIBSUPC++ = 1 ;
-	}
-
-	HAIKU_LIBSUPC++ = $(HAIKU_SHARED_LIBSUPC++) ;
-}
-
+HAIKU_ATA_STACK ?= 1 ;
 
 # network libraries
 HAIKU_NETWORK_LIBS = network ;
 HAIKU_NETAPI_LIB = bnetapi ;
 HAIKU_SELECT_UNAME_ETC_LIB = ;	# libroot, against which we link anyway
 
-
-# locale libraries
-HAIKU_LOCALE_LIBS = liblocalestub.a ;
-
-
-# library and executable glue code
-local commonGlueCode =
-	<src!system!glue>init_term_dyn.o
-	<src!system!glue!arch!$(HAIKU_ARCH)>crti.o
-	<src!system!glue!arch!$(HAIKU_ARCH)>crtn.o
-;
-HAIKU_LIBRARY_BEGIN_GLUE_CODE =
-	<src!system!glue!arch!$(HAIKU_ARCH)>crti.o
-	crtbegin.o
-	<src!system!glue>init_term_dyn.o
-;
-HAIKU_LIBRARY_END_GLUE_CODE =
-	crtend.o
-	<src!system!glue!arch!$(HAIKU_ARCH)>crtn.o
-;
-HAIKU_EXECUTABLE_BEGIN_GLUE_CODE =
-	<src!system!glue!arch!$(HAIKU_ARCH)>crti.o
-	crtbegin.o
-	<src!system!glue>start_dyn.o
-	<src!system!glue>init_term_dyn.o
-;
-HAIKU_EXECUTABLE_END_GLUE_CODE = $(HAIKU_LIBRARY_END_GLUE_CODE) ;
-HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = crtbegin.o
-	<src!system!glue>haiku_version_glue.o ;
-HAIKU_KERNEL_ADDON_END_GLUE_CODE = $(HAIKU_GCC_LIBGCC) crtend.o ;
-
-SEARCH on crtbegin.o crtend.o = $(HAIKU_GCC_LIB_DIR) ;
 
 HAIKU_EXECUTABLE_MIME_TYPE = "application/x-vnd.Be-elfexecutable" ;
 
@@ -578,23 +173,23 @@ if ! $(HAIKU_BUILD_VERSION) {
 # an unknown build.
 HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 
-# init library name map
-{
-	local i ;
-	for i in be bnetapi debug device game GL locale mail media midi midi2
-			network opengl package root screensaver textencoding tracker
-			translation z {
-		HAIKU_LIBRARY_NAME_MAP_$(i) = lib$(i).so ;
-	}
-	HAIKU_LIBRARY_NAME_MAP_libstdc++ = $(HAIKU_LIBSTDC++) ;
-	HAIKU_LIBRARY_NAME_MAP_libsupc++ = $(HAIKU_LIBSUPC++) ;
-	HAIKU_LIBRARY_NAME_MAP_input_server = <nogrist>input_server ;
+
+#pragma mark - host platform settings
+
+
+# determine the endianness of the host
+switch $(HOST_GCC_MACHINE) {
+	case amd64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+	case i?86-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+	case powerpc-*	: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
+	case x86_64-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+
+	# the following are rather unlikely as hosts ...
+	case arm-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+	case m68k-*		: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
+	case mipsel-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+	case *			: Exit "Unsupported gcc host machine:" $(HOST_GCC_MACHINE) ;
 }
-
-
-#pragma mark -
-
-# host platform settings
 
 # analyze the host gcc machine spec to find out about 64-bitness
 HOST_PLATFORM_IS_64_BIT = ;
@@ -648,6 +243,7 @@ HOST_UNARFLAGS		?= x ;
 # check the host platform compatibility
 SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
 	: linux openbsd freebsd darwin sunos cygwin ;
+HOST_PLATFORM_(host)_COMPATIBLE = 1 ;
 
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
 	|| $(HOST_PLATFORM) = darwin || $(HOST_PLATFORM) = cygwin
@@ -670,21 +266,32 @@ if $(HOST_PLATFORM) = cygwin {
 		--enable-auto-import ;
 }
 
-HOST_CPU	?= $(OSPLAT:L) ;
+HOST_CPU ?= $(OSPLAT:L) ;
 
 # Jam doesn't know x86_64, so override HOST_CPU, if 64 bit.
 if $(HOST_CPU) = x86 && $(HOST_PLATFORM_IS_64_BIT) {
 	HOST_CPU = x86_64 ;
 }
 
-HOST_ARCH				?= $(HOST_CPU) ;
-HOST_ARCH_MACRO_DEFINE	= ARCH_$(HOST_CPU) ;
+HOST_ARCH ?= $(HOST_CPU) ;
+HOST_ARCHS = $(HOST_ARCH) ;
+HOST_KERNEL_ARCH = host ;
 
+# analyze GCC version
+HOST_GCC_VERSION = [ FAnalyzeGCCVersion HOST_GCC_RAW_VERSION ] ;
+
+# set packaging architecture
+HOST_PACKAGING_ARCH		?= $(HOST_CPU) ;
+if $(HOST_PACKAGING_ARCH) = x86 && $(HOST_GCC_VERSION[1]) = 2 {
+	HOST_PACKAGING_ARCH = x86_gcc2 ;
+}
+HOST_PACKAGING_ARCHS = $(HOST_PACKAGING_ARCH) ;
 
 # directories
 HOST_OBJECT_BASE_DIR = [ FDirName $(HAIKU_OBJECT_DIR) $(HOST_PLATFORM) ] ;
 HOST_COMMON_ARCH_OBJECT_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) common ] ;
-HOST_ARCH_OBJECT_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) $(HOST_ARCH) ] ;
+HOST_ARCH_OBJECT_DIR
+	= [ FDirName $(HOST_OBJECT_BASE_DIR) $(HOST_PACKAGING_ARCH) ] ;
 HOST_COMMON_DEBUG_OBJECT_DIR = [ FDirName $(HOST_ARCH_OBJECT_DIR) common ] ;
 HOST_DEBUG_0_OBJECT_DIR = [ FDirName $(HOST_ARCH_OBJECT_DIR) release ] ;
 
@@ -693,9 +300,6 @@ for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 	HOST_DEBUG_$(level)_OBJECT_DIR
 		= [ FDirName $(HOST_ARCH_OBJECT_DIR) debug_$(level) ] ;
 }
-
-# analyze GCC version
-HOST_GCC_VERSION = [ FAnalyzeGCCVersion HOST_GCC_RAW_VERSION ] ;
 
 # set variables for gcc header options
 SetIncludePropertiesVariables HOST ;
@@ -710,6 +314,10 @@ HOST_C++FLAGS += -Wno-multichar ;
 if $(HOST_PLATFORM) != cygwin {
 	HOST_PIC_CCFLAGS += -fPIC ;
 	HOST_PIC_C++FLAGS += -fPIC ;
+}
+
+if $(HOST_GCC_VERSION[1]) >= 3 {
+	HOST_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-tree-vrp ;
 }
 
 HOST_KERNEL_CCFLAGS += $(HOST_GCC_BASE_FLAGS) -finline -fno-builtin
@@ -751,13 +359,14 @@ HOST_KERNEL_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes ;
 HOST_KERNEL_WARNING_C++FLAGS = -Wall -Wno-trigraphs ;
 
 # debug flags
+local hostDebugFlags ;
 switch $(HOST_PLATFORM) {
-	case haiku	: HOST_DEBUG_FLAGS ?= -ggdb ;
-	case haiku_host	: HOST_DEBUG_FLAGS ?= -ggdb ;
-	case linux	: HOST_DEBUG_FLAGS ?= -ggdb ;
-	case freebsd	: HOST_DEBUG_FLAGS ?= -ggdb ;
-	case darwin	: HOST_DEBUG_FLAGS ?= -ggdb ;
-	case *		: HOST_DEBUG_FLAGS ?= -g ;
+	case haiku		: hostDebugFlags ?= -ggdb ;
+	case haiku_host	: hostDebugFlags ?= -ggdb ;
+	case linux		: hostDebugFlags ?= -ggdb ;
+	case freebsd	: hostDebugFlags ?= -ggdb ;
+	case darwin		: hostDebugFlags ?= -ggdb ;
+	case *			: hostDebugFlags ?= -g ;
 }
 
 # debug 0: suppress asserts
@@ -769,7 +378,7 @@ HOST_KERNEL_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
 
 local level ;
 for level in $(HAIKU_DEBUG_LEVELS[2-]) {
-	local flags = $(HOST_DEBUG_FLAGS) [ FDefines DEBUG=$(level) ] ;
+	local flags = $(hostDebugFlags) [ FDefines DEBUG=$(level) ] ;
 	HOST_DEBUG_$(level)_CCFLAGS			= $(flags) ;
 	HOST_DEBUG_$(level)_C++FLAGS		= $(flags) ;
 	HOST_KERNEL_DEBUG_$(level)_CCFLAGS	= $(flags) ;
@@ -793,15 +402,8 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE)
 	CP = copyattr --data ;
 }
 
-HOST_DEFINES += $(HOST_ARCH_MACRO_DEFINE) ;
+HOST_DEFINES += ARCH_$(HOST_CPU) ;
 HOST_DEFINES += _NO_INLINE_ASM ;
-
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	# TODO: That's obviously not correct, but in the way the COMPILE_FOR_R5
-	# macro is used, it actually seems to mean r5/bone/dano.
-	# TODO: Deprecated. Remove!
-	HOST_DEFINES += COMPILE_FOR_R5 ;
-}
 
 # for builds of tools in the current environment
 HOST_BUILD_COMPATIBILITY_LIB_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) lib ] ;
@@ -822,8 +424,9 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 
 	HOST_LIBROOT = root ;
 	HOST_STATIC_LIBROOT = $(HOST_LIBROOT) ;
-	HOST_LIBBE = be ;
-	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR = "export LIBRARY_PATH=$LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)"  ;
+	HOST_LIBBE = libbe_build.so ;
+	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
+		= "export LIBRARY_PATH=$LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
 	HOST_LIBRARY_NAME_MAP_input_server = /system/servers/input_server ;
 	HOST_DEFINES += __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS ;
 
@@ -918,6 +521,11 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 				tools rm_attrs ] -f ;
 			# assumes that rm_attrs is built with debugging disabled
 		HOST_RM_ATTRS_TARGET = <build>rm_attrs ;
+
+		# If specified, use xattr support to tag files with unique IDs.
+		if $(HAIKU_HOST_USE_XATTR_REF) = 1 {
+			HOST_DEFINES += HAIKU_HOST_USE_XATTR_REF ;
+		}
 	}
 }
 
@@ -959,37 +567,31 @@ HOST_BE_API_HEADERS = ;
 HOST_BE_API_CCFLAGS = ;
 HOST_BE_API_C++FLAGS = ;
 
-if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-	HOST_BE_API_HEADERS =
-		[ FDirName $(HAIKU_TOP) headers build ]
-		[ FDirName $(HAIKU_TOP) headers build os ]
-		[ FDirName $(HAIKU_TOP) headers build os app ]
-		[ FDirName $(HAIKU_TOP) headers build os drivers ]
-		[ FDirName $(HAIKU_TOP) headers build os kernel ]
-		[ FDirName $(HAIKU_TOP) headers build os interface ]
-		[ FDirName $(HAIKU_TOP) headers build os locale ]
-		[ FDirName $(HAIKU_TOP) headers build os opengl ]
-		[ FDirName $(HAIKU_TOP) headers build os storage ]
-		[ FDirName $(HAIKU_TOP) headers build os support ]
-		[ FDirName $(HAIKU_TOP) headers build private ]
-	;
-	HOST_BE_API_CCFLAGS = -include BeOSBuildCompatibility.h ;
-	HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
-}
-
 # Add directory with system headers we need when building something for the host
 # platform, e.g. containing missing POSIX/GNU headers.
 HOST_HDRS += [ FDirName $(HAIKU_TOP) headers build host $(HOST_PLATFORM) ] ;
 
-# For all versions of BeOS also add the common beos directory.
-if $(HOST_PLATFORM) in r5 bone dano {
-	HOST_HDRS += [ FDirName $(HAIKU_TOP) headers build host beos_common ] ;
+HOST_BE_API_HEADERS =
+	[ FDirName $(HAIKU_TOP) headers build ]
+	[ FDirName $(HAIKU_TOP) headers build os ]
+	[ FDirName $(HAIKU_TOP) headers build os app ]
+	[ FDirName $(HAIKU_TOP) headers build os drivers ]
+	[ FDirName $(HAIKU_TOP) headers build os kernel ]
+	[ FDirName $(HAIKU_TOP) headers build os interface ]
+	[ FDirName $(HAIKU_TOP) headers build os locale ]
+	[ FDirName $(HAIKU_TOP) headers build os opengl ]
+	[ FDirName $(HAIKU_TOP) headers build os storage ]
+	[ FDirName $(HAIKU_TOP) headers build os support ]
+	[ FDirName $(HAIKU_TOP) headers build private ]
+;
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	HOST_BE_API_CCFLAGS = -include BeOSBuildCompatibility.h ;
+	HOST_BE_API_C++FLAGS = $(HOST_BE_API_CCFLAGS) ;
 }
 
 
-#pragma mark -
+#pragma mark - target platform settings
 
-# target platform settings
 
 # check the target platform compatibility
 SetPlatformCompatibilityFlagVariables TARGET_PLATFORM : TARGET : target ;
@@ -1003,46 +605,59 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 # Set TARGET_* variables either from HAIKU_* or HOST_* depending on the
-# specified TARGET_PLATFORM.
+# specified TARGET_PLATFORM. Some variables are package architecture dependent
+# and their name gets a respective suffix. A few variables exist both with and
+# without suffix. The latter is either equivalent to the variable with the
+# primary architecture suffix (e.g. TARGET_ARCH) or is (additionally) applicable
+# for all architectures (e.g. TARGET_DEFINES).
 
 local buildVars =
-	ARCH CPU GCC_VERSION KERNEL_ARCH
+	ARCH ARCHS KERNEL_ARCH PACKAGING_ARCH PACKAGING_ARCHS
 
-	AR CC C++ LD OBJCOPY RANLIB ELFEDIT
-
-	INCLUDES_SEPARATOR LOCAL_INCLUDES_OPTION SYSTEM_INCLUDES_OPTION
-
-	HDRS CPPFLAGS CCFLAGS C++FLAGS LDFLAGS LINK LINKFLAGS DEFINES
-	ARFLAGS UNARFLAGS
+	DEFINES
 	KERNEL_DEFINES
 
 	KERNEL_CCFLAGS KERNEL_C++FLAGS
 	KERNEL_PIC_CCFLAGS KERNEL_PIC_LINKFLAGS KERNEL_ADDON_LINKFLAGS
 	BOOT_CCFLAGS BOOT_C++FLAGS BOOT_LINKFLAGS
-	WARNING_CCFLAGS WARNING_C++FLAGS
 
 	KERNEL_WARNING_CCFLAGS KERNEL_WARNING_C++FLAGS
-
-	DEBUG_FLAGS
-
-	DEBUG_$(HAIKU_DEBUG_LEVELS)_CCFLAGS DEBUG_$(HAIKU_DEBUG_LEVELS)_C++FLAGS
 
 	KERNEL_DEBUG_$(HAIKU_DEBUG_LEVELS)_CCFLAGS
 	KERNEL_DEBUG_$(HAIKU_DEBUG_LEVELS)_C++FLAGS
 
 	PRIVATE_KERNEL_HEADERS
-	PRIVATE_SYSTEM_HEADERS
 
 	LIBSTDC++ LIBSUPC++
-	STATIC_LIBSTDC++ STATIC_LIBSUPC++
 
 	NETWORK_LIBS NETAPI_LIB SELECT_UNAME_ETC_LIB
 
-	ARCH_MACRO_DEFINE EXECUTABLE_MIME_TYPE
+	EXECUTABLE_MIME_TYPE
 
-	OBJECT_BASE_DIR COMMON_ARCH_OBJECT_DIR COMMON_DEBUG_OBJECT_DIR
+	OBJECT_BASE_DIR COMMON_ARCH_OBJECT_DIR
+	;
+
+local archDependentBuildVars =
+	ARCH CPU GCC_VERSION
+
+	AR CC C++ ELFEDIT LD OBJCOPY RANLIB STRIP
+
+	ARFLAGS ASFLAGS UNARFLAGS CPPFLAGS CCFLAGS C++FLAGS HDRS LDFLAGS
+	LINK LINKFLAGS
+
+	WARNING_CCFLAGS WARNING_C++FLAGS
+
+	DEBUG_$(HAIKU_DEBUG_LEVELS)_CCFLAGS DEBUG_$(HAIKU_DEBUG_LEVELS)_C++FLAGS
+
+	INCLUDES_SEPARATOR LOCAL_INCLUDES_OPTION SYSTEM_INCLUDES_OPTION
+
+	PRIVATE_SYSTEM_HEADERS
+
+	LIBSTDC++ LIBSUPC++
+
+	ARCH_OBJECT_DIR COMMON_DEBUG_OBJECT_DIR
 	DEBUG_$(HAIKU_DEBUG_LEVELS)_OBJECT_DIR
-;
+	;
 
 if $(TARGET_PLATFORM) = haiku {
 	local var ;
@@ -1050,31 +665,37 @@ if $(TARGET_PLATFORM) = haiku {
 		TARGET_$(var) = $(HAIKU_$(var)) ;
 	}
 
-	TARGET_GCC_LIB_DIR			= $(HAIKU_GCC_LIB_DIR) ;
-	TARGET_GCC_HEADERS_DIR		= $(HAIKU_GCC_HEADERS_DIR) ;
-	TARGET_GCC_LIBGCC			= $(HAIKU_GCC_LIBGCC) ;
-	TARGET_GCC_LIBGCC_OBJECTS	= $(HAIKU_GCC_LIBGCC_OBJECTS) ;
+	for var in $(archDependentBuildVars)_$(TARGET_PACKAGING_ARCHS) {
+		TARGET_$(var) = $(HAIKU_$(var)) ;
+	}
 
-	TARGET_KERNEL_LIBGCC		= $(HAIKU_KERNEL_LIBGCC) ;
-	TARGET_KERNEL_LIBSUPC++		= $(HAIKU_KERNEL_LIBSUPC++) ;
-	TARGET_BOOT_LIBGCC			= $(HAIKU_BOOT_LIBGCC) ;
-	TARGET_BOOT_LIBSUPC++		= $(HAIKU_BOOT_LIBSUPC++) ;
+	TARGET_KERNEL_LIBGCC
+		= $(HAIKU_KERNEL_LIBGCC_$(TARGET_PACKAGING_ARCH)) ;
+	TARGET_KERNEL_LIBSUPC++
+		= $(HAIKU_KERNEL_LIBSUPC++_$(TARGET_PACKAGING_ARCH)) ;
+	TARGET_BOOT_LIBGCC
+		= $(HAIKU_BOOT_LIBGCC_$(TARGET_PACKAGING_ARCH)) ;
+	TARGET_BOOT_LIBSUPC++
+		= $(HAIKU_BOOT_LIBSUPC++_$(TARGET_PACKAGING_ARCH)) ;
 
 	TARGET_BOOT_PLATFORM		?= $(HAIKU_BOOT_PLATFORM) ;
 	TARGET_BOOT_BOARD			?= $(HAIKU_BOOT_BOARD) ;
 
-	TARGET_LIBRARY_NAME_MAP		= HAIKU_LIBRARY_NAME_MAP ;
-
+	local architecture ;
+	for architecture in $(TARGET_PACKAGING_ARCHS) {
+		TARGET_DEFINES_$(architecture) = $(HAIKU_DEFINES_$(architecture)) ;
+		TARGET_LIBRARY_NAME_MAP_$(architecture)
+			= HAIKU_LIBRARY_NAME_MAP_$(architecture) ;
+	}
 } else {
 	local var ;
 	for var in $(buildVars) {
 		TARGET_$(var) = $(HOST_$(var)) ;
 	}
 
-	TARGET_GCC_LIB_DIR			= ;
-	TARGET_GCC_HEADERS_DIR		= ;
-	TARGET_GCC_LIBGCC			= ;
-	TARGET_GCC_LIBGCC_OBJECTS	= ;
+	for var in $(archDependentBuildVars) {
+		TARGET_$(var)_$(TARGET_PACKAGING_ARCH) = $(HOST_$(var)) ;
+	}
 
 	TARGET_KERNEL_LIBGCC		= ;
 	TARGET_KERNEL_LIBSUPC++		= ;
@@ -1084,7 +705,10 @@ if $(TARGET_PLATFORM) = haiku {
 	TARGET_BOOT_PLATFORM		= ;
 	TARGET_BOOT_BOARD			= ;
 
-	TARGET_LIBRARY_NAME_MAP		= HOST_LIBRARY_NAME_MAP ;
+	TARGET_DEFINES_$(TARGET_PACKAGING_ARCH) = ;
+		# all flags are in TARGET_DEFINES
+
+	TARGET_LIBRARY_NAME_MAP_$(TARGET_PACKAGING_ARCH) = HOST_LIBRARY_NAME_MAP ;
 }
 
 # define macro, for identifying the platform
@@ -1120,6 +744,10 @@ if $(HOST_PLATFORM_IS_64_BIT) {
 	HOST_DEFINES += HAIKU_HOST_PLATFORM_64_BIT ;
 }
 
+# define Haiku packaging architecture macro for host build
+HOST_DEFINES += HAIKU_PACKAGING_ARCH=\\\"$(HAIKU_PACKAGING_ARCH)\\\" ;
+
+
 #pragma mark -
 
 # In case we build for a BeOS compatible platform, but not for Haiku, we
@@ -1130,8 +758,8 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) && $(TARGET_PLATFORM_BEOS_COMPATIBLE) {
 	# headers and flags
 	local compatibilityHeader = -include [ FDirName $(HAIKU_TOP) headers build
 		HaikuBuildCompatibility.h ] ;
-	TARGET_CCFLAGS += $(compatibilityHeader) ;
-	TARGET_C++FLAGS += $(compatibilityHeader) ;
+	TARGET_CCFLAGS_$(TARGET_PACKAGING_ARCH) += $(compatibilityHeader) ;
+	TARGET_C++FLAGS_$(TARGET_PACKAGING_ARCH) += $(compatibilityHeader) ;
 
 	# compatibility library
 	TARGET_HAIKU_COMPATIBILITY_LIBS = libhaikucompat.a ;
@@ -1141,13 +769,13 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) && $(TARGET_PLATFORM_BEOS_COMPATIBLE) {
 
 if $(TARGET_PLATFORM) = libbe_test {
 	# headers and flags
-	TARGET_HDRS +=
+	TARGET_HDRS_$(TARGET_PACKAGING_ARCH) +=
 		[ PublicHeaders $(DOT) app drivers game interface kernel locale storage
 			support ]
 		[ PrivateHeaders $(DOT) ] ;
 	TARGET_DEFINES += __HAIKU__ ;
 
-	TARGET_PRIVATE_SYSTEM_HEADERS =
+	TARGET_PRIVATE_SYSTEM_HEADERS_$(TARGET_PACKAGING_ARCH) =
 		[ PrivateHeaders $(DOT) system system/arch/$(TARGET_ARCH) ] ;
 
 	# directories
@@ -1155,28 +783,30 @@ if $(TARGET_PLATFORM) = libbe_test {
 		= [ FDirName $(HAIKU_OBJECT_DIR) $(TARGET_PLATFORM) ] ;
 	TARGET_COMMON_ARCH_OBJECT_DIR
 		= [ FDirName $(TARGET_OBJECT_BASE_DIR) common ] ;
-	TARGET_ARCH_OBJECT_DIR
+	TARGET_ARCH_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)
 		= [ FDirName $(TARGET_OBJECT_BASE_DIR) $(TARGET_ARCH) ] ;
-	TARGET_COMMON_DEBUG_OBJECT_DIR
-		= [ FDirName $(TARGET_ARCH_OBJECT_DIR) common ] ;
-	TARGET_DEBUG_0_OBJECT_DIR
-		= [ FDirName $(TARGET_ARCH_OBJECT_DIR) release ] ;
+	TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)
+		= [ FDirName $(TARGET_ARCH_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
+			common ] ;
+	TARGET_DEBUG_0_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)
+		= [ FDirName $(TARGET_ARCH_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
+			release ] ;
 
 	local level ;
 	for level in $(HAIKU_DEBUG_LEVELS[2-]) {
-		TARGET_DEBUG_$(level)_OBJECT_DIR
-			= [ FDirName $(TARGET_ARCH_OBJECT_DIR) debug_$(level) ] ;
+		TARGET_DEBUG_$(level)_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)
+			= [ FDirName $(TARGET_ARCH_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
+				debug_$(level) ] ;
 	}
 
 	# library name map
-	TARGET_LIBRARY_NAME_MAP = LIBBE_LIBRARY_NAME_MAP ;
+	TARGET_LIBRARY_NAME_MAP_$(TARGET_PACKAGING_ARCH) = LIBBE_LIBRARY_NAME_MAP ;
 	LIBBE_LIBRARY_NAME_MAP_be = libbe_test.so ;
 }
 
 
-#pragma mark -
+#pragma mark - common stuff
 
-# common stuff
 
 # start with a clean state
 CCFLAGS = ;
@@ -1188,13 +818,6 @@ DEFINES = ;
 CC = bad-cc ;
 C++ = bad-c++ ;
 LINK = bad-link ;
-
-# Allow compiling unit tests on Zeta. Instead of fixing the PostMessage()
-# issues, they deprecated that nice function. This will enable it again:
-C++FLAGS += -D_ZETA_USING_DEPRECATED_API_=1 ;
-# Same for buggy find_directory threadsafety fixes
-C++FLAGS += -D_ZETA_TS_FIND_DIR_=1 ;
-	# TODO: Doesn't really belong here.
 
 
 # Defaults for warnings, optimization, and debugging.
@@ -1236,8 +859,20 @@ HAIKU_APP_TEST_DIR		?= [ FDirName $(HAIKU_TEST_DIR) apps ] ;
 HAIKU_APP_TEST_LIB_DIR 	?= [ FDirName $(HAIKU_APP_TEST_DIR) lib ] ;
 HAIKU_TMP_DIR			?= [ FDirName $(HAIKU_OUTPUT_DIR) tmp ] ;
 
-HAIKU_PACKAGE_DIR ?= [ FDirName $(HAIKU_OUTPUT_DIR) packages ] ;
-HAIKU_PACKAGE_OBJECT_DIR ?= [ FDirName $(HAIKU_OBJECT_DIR) packages ] ;
+local architecture ;
+for architecture in $(HAIKU_PACKAGING_ARCHS) {
+	local baseDir
+		= [ FDirName $(TARGET_OBJECT_BASE_DIR) $(architecture) packaging ] ;
+	HAIKU_PACKAGES_DIR_$(architecture) = [ FDirName $(baseDir) packages ] ;
+	HAIKU_PACKAGES_BUILD_DIR_$(architecture)
+		= [ FDirName $(baseDir) packages_build ] ;
+	HAIKU_PACKAGE_REPOSITORIES_DIR_$(architecture)
+		= [ FDirName $(baseDir) repositories ] ;
+}
+
+
+HAIKU_PACKAGE_INFOS_DIR			= [ FDirName $(HAIKU_TOP) src data
+									package_infos ] ;
 
 TARGET_TEST_DIR				?= [ FDirName $(HAIKU_TEST_DIR)
 									$(TARGET_PLATFORM) ] ;
@@ -1252,197 +887,27 @@ SUBDIRRULES += SetupObjectsDir ;
 # with imported sources.
 AUTO_SET_UP_CONFIG_VARIABLES +=
 	HOST_WARNING_CCFLAGS HOST_WARNING_C++FLAGS
-	TARGET_WARNING_CCFLAGS TARGET_WARNING_C++FLAGS
+	TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCHS)
+	TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCHS)
+	;
 
-	# also add PLATFORM and SUPPORTED_PLATFORMS
-	PLATFORM SUPPORTED_PLATFORMS
-;
+# also add PLATFORM and SUPPORTED_PLATFORMS
+AUTO_SET_UP_CONFIG_VARIABLES += PLATFORM SUPPORTED_PLATFORMS ;
 
 
-# enable -Werror for certain parts of the source tree
-HAIKU_WERRORFLAGS = ;
-if $(HAIKU_GCC_VERSION[1]) >= 4 {
-	# -Wuninitialized gives too many false positives.
-	HAIKU_WERRORFLAGS = -Wno-error=uninitialized ;
-
-	# TODO: remove the -Wno-unused-but-set-variable option
-	HAIKU_WERRORFLAGS += -Wno-unused-but-set-variable ;
+# set up warnings
+local architecture ;
+for architecture in $(TARGET_PACKAGING_ARCHS) {
+	ArchitectureSetupWarnings $(architecture) ;
 }
 
-rule EnableWerror dirTokens : scope {
-	AppendToConfigVar CCFLAGS : HAIKU_TOP $(dirTokens)
-		: -Werror $(HAIKU_WERRORFLAGS) : $(scope) ;
-	AppendToConfigVar C++FLAGS : HAIKU_TOP $(dirTokens)
-		: -Werror $(HAIKU_WERRORFLAGS) : $(scope) ;
+
+# set up architecture build features
+local architecture ;
+for architecture in $(TARGET_PACKAGING_ARCHS) {
+	InitArchitectureBuildFeatures $(architecture) ;
 }
 
-# Work-around for GCC 2 problem -- despite -Wno-multichar it reports
-# multichar warnings in headers/private/kernel/debugger_keymaps.h included by
-# src/system/kernel/arch/x86/arch_debug_console.cpp.
-if $(HAIKU_GCC_VERSION[1]) = 2 {
-	local file = <src!system!kernel!arch!x86>arch_debug_console.o ;
-	C++FLAGS on $(file) = [ on $(file) return $(C++FLAGS) ] ;
-}
-
-if $(HAIKU_NO_WERROR) != 1 {
-	EnableWerror src add-ons accelerants 3dfx ;
-	EnableWerror src add-ons accelerants ati ;
-	EnableWerror src add-ons accelerants common ;
-	EnableWerror src add-ons accelerants et6x00 ;
-#	EnableWerror src add-ons accelerants intel_extreme ;
-#	EnableWerror src add-ons accelerants matrox ;
-	EnableWerror src add-ons accelerants neomagic ;
-#	EnableWerror src add-ons accelerants nvidia ;
-	EnableWerror src add-ons accelerants nvidia_gpgpu ;
-#	EnableWerror src add-ons accelerants radeon ;
-#	EnableWerror src add-ons accelerants radeon_hd ;
-	EnableWerror src add-ons accelerants s3 ;
-	EnableWerror src add-ons accelerants skeleton ;
-	EnableWerror src add-ons accelerants vesa ;
-	EnableWerror src add-ons accelerants via ;
-	EnableWerror src add-ons accelerants vmware ;
-	EnableWerror src add-ons bluetooth ;
-	EnableWerror src add-ons decorators ;
-	EnableWerror src add-ons disk_systems ;
-	EnableWerror src add-ons input_server devices ;
-#	EnableWerror src add-ons input_server filters ;
-#	EnableWerror src add-ons input_server methods ;
-	EnableWerror src add-ons kernel bluetooth ;
-#	EnableWerror src add-ons kernel bus_managers acpi ;
-	EnableWerror src add-ons kernel bus_managers agp_gart ;
-	EnableWerror src add-ons kernel bus_managers ata ;
-	EnableWerror src add-ons kernel bus_managers config_manager ;
-#	EnableWerror src add-ons kernel bus_managers firewire ;
-	EnableWerror src add-ons kernel bus_managers isa ;
-	EnableWerror src add-ons kernel bus_managers pci ;
-#	EnableWerror src add-ons kernel bus_managers ps2 ; # gcc2
-	EnableWerror src add-ons kernel bus_managers scsi ;
-	EnableWerror src add-ons kernel bus_managers usb ;
-	EnableWerror src add-ons kernel busses agp_gart ;
-	EnableWerror src add-ons kernel busses ata ;
-	EnableWerror src add-ons kernel busses scsi ;
-	EnableWerror src add-ons kernel busses usb ;
-	EnableWerror src add-ons kernel console ;
-	EnableWerror src add-ons kernel cpu ;
-#	EnableWerror src add-ons kernel debugger ; # gcc2
-#	EnableWerror src add-ons kernel drivers audio ;
-	EnableWerror src add-ons kernel drivers bluetooth ;
-	EnableWerror src add-ons kernel drivers bus ;
-	EnableWerror src add-ons kernel drivers common ;
-	EnableWerror src add-ons kernel drivers disk ;
-	EnableWerror src add-ons kernel drivers dvb ;
-#	EnableWerror src add-ons kernel drivers graphics ;
-#	EnableWerror src add-ons kernel drivers input ;
-	EnableWerror src add-ons kernel drivers joystick ;
-	EnableWerror src add-ons kernel drivers midi ;
-	EnableWerror src add-ons kernel drivers misc ;
-#	EnableWerror src add-ons kernel drivers network ;
-	EnableWerror src add-ons kernel drivers ports ;
-#	EnableWerror src add-ons kernel drivers power ;
-	EnableWerror src add-ons kernel drivers printer ;
-	EnableWerror src add-ons kernel drivers random ;
-	EnableWerror src add-ons kernel drivers tty ;
-	EnableWerror src add-ons kernel drivers video ;
-	EnableWerror src add-ons kernel file_systems bfs ;
-	EnableWerror src add-ons kernel file_systems cdda ;
-#	EnableWerror src add-ons kernel file_systems ext2 ;
-#	EnableWerror src add-ons kernel file_systems fat ;
-#	EnableWerror src add-ons kernel file_systems googlefs ;
-	EnableWerror src add-ons kernel file_systems iso9660 ;
-	EnableWerror src add-ons kernel file_systems layers ;
-	EnableWerror src add-ons kernel file_systems netfs ;
-	EnableWerror src add-ons kernel file_systems nfs ;
-	EnableWerror src add-ons kernel file_systems nfs4 ;
-#	EnableWerror src add-ons kernel file_systems ntfs ;
-	EnableWerror src add-ons kernel file_systems packagefs ;
-	EnableWerror src add-ons kernel file_systems ramfs ;
-#	EnableWerror src add-ons kernel file_systems reiserfs ;
-	EnableWerror src add-ons kernel file_systems udf ;
-	EnableWerror src add-ons kernel file_systems userlandfs ;
-	EnableWerror src add-ons kernel generic ;
-#	EnableWerror src add-ons kernel network datalink_protocols ;
-	EnableWerror src add-ons kernel network devices ;
-	EnableWerror src add-ons kernel network dns_resolver ;
-	EnableWerror src add-ons kernel network notifications ;
-	EnableWerror src add-ons kernel network ppp ;
-	EnableWerror src add-ons kernel network protocols ;
-#	EnableWerror src add-ons kernel network stack ;
-	EnableWerror src add-ons kernel partitioning_systems ;
-	EnableWerror src add-ons locale ;
-	EnableWerror src add-ons mail_daemon ;
-	EnableWerror src add-ons media media-add-ons demultiplexer ;
-	EnableWerror src add-ons media media-add-ons dvb ;
-	EnableWerror src add-ons media media-add-ons esound_sink ;
-	EnableWerror src add-ons media media-add-ons finepix_webcam ;
-	EnableWerror src add-ons media media-add-ons firewire_dv ;
-	EnableWerror src add-ons media media-add-ons legacy ;
-	EnableWerror src add-ons media media-add-ons mixer ;
-	EnableWerror src add-ons media media-add-ons multi_audio ;
-	EnableWerror src add-ons media media-add-ons opensound ;
-	EnableWerror src add-ons media media-add-ons radeon ;
-	EnableWerror src add-ons media media-add-ons reader ;
-	EnableWerror src add-ons media media-add-ons tone_producer_demo ;
-	EnableWerror src add-ons media media-add-ons usb_vision ;
-#	EnableWerror src add-ons media media-add-ons usb_webcam ;
-	EnableWerror src add-ons media media-add-ons video_mixer ;
-#	EnableWerror src add-ons media media-add-ons video_producer_demo ;
-	EnableWerror src add-ons media media-add-ons videowindow ;
-	EnableWerror src add-ons media media-add-ons writer ;
-	EnableWerror src add-ons media plugins ac3_decoder ;
-	EnableWerror src add-ons media plugins aiff_reader ;
-	EnableWerror src add-ons media plugins ape_reader ;
-#	EnableWerror src add-ons media plugins asf_reader ;
-	EnableWerror src add-ons media plugins au_reader ;
-#	EnableWerror src add-ons media plugins avi_reader ;
-#	EnableWerror src add-ons media plugins ffmpeg ;
-#	EnableWerror src add-ons media plugins matroska ;
-#	EnableWerror src add-ons media plugins mov_reader ;
-	EnableWerror src add-ons media plugins mp3_decoder ;
-#	EnableWerror src add-ons media plugins mp3_reader ;
-	EnableWerror src add-ons media plugins mp4_reader ;
-	EnableWerror src add-ons media plugins musepack ;
-#	EnableWerror src add-ons media plugins ogg ;
-#	EnableWerror src add-ons media plugins raw_decoder ;
-#	EnableWerror src add-ons media plugins speex ;
-	EnableWerror src add-ons media plugins theora ;
-	EnableWerror src add-ons media plugins vorbis ;
-#	EnableWerror src add-ons media plugins wav_reader ;
-	EnableWerror src add-ons media plugins xvid_decoder ;
-	EnableWerror src add-ons opengl ;
-	EnableWerror src add-ons print ;
-	EnableWerror src add-ons screen_savers ;
-	EnableWerror src add-ons tracker ;
-	EnableWerror src add-ons translators bmp ;
-#	EnableWerror src add-ons translators exr ;
-	EnableWerror src add-ons translators gif ;
-#	EnableWerror src add-ons translators hpgs ;
-	EnableWerror src add-ons translators hvif ;
-	EnableWerror src add-ons translators ico ;
-#	EnableWerror src add-ons translators jpeg ; # gcc2
-	EnableWerror src add-ons translators jpeg2000 ;
-	EnableWerror src add-ons translators pcx ;
-#	EnableWerror src add-ons translators png ; # gcc2
-	EnableWerror src add-ons translators ppm ;
-	EnableWerror src add-ons translators raw ;
-	EnableWerror src add-ons translators rtf ;
-	EnableWerror src add-ons translators sgi ;
-	EnableWerror src add-ons translators shared ;
-#	EnableWerror src add-ons translators stxt ;
-	EnableWerror src add-ons translators tga ;
-	EnableWerror src add-ons translators tiff ;
-#	EnableWerror src add-ons translators wonderbrush ;
-	EnableWerror src add-ons print ;
-	EnableWerror src bin package ;
-	EnableWerror src apps ;
-	EnableWerror src kits ;
-	EnableWerror src preferences ;
-	EnableWerror src servers ;
-	EnableWerror src system kernel ;
-	EnableWerror src system libroot add-ons ;
-	EnableWerror src system libroot posix locale ;
-	EnableWerror src system libroot posix wchar ;
-	EnableWerror src system runtime_loader ;
-}
 
 # The following directories cannot currently be compiled with DEBUG=1
 SetConfigVar DEBUG : HAIKU_TOP src add-ons disk_systems bfs : 0 : local ;

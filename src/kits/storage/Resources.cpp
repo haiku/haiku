@@ -141,6 +141,8 @@ BResources::SetTo(const char* path, bool clobber)
 	// open file
 	BFile file;
 	status_t error = file.SetTo(path, B_READ_WRITE);
+	if (error != B_OK && error != B_ENTRY_NOT_FOUND)
+		error = file.SetTo(path, B_READ_ONLY);
 	if (error != B_OK) {
 		Unset();
 		return error;
@@ -162,6 +164,8 @@ BResources::SetTo(const entry_ref* ref, bool clobber)
 	// open file
 	BFile file;
 	status_t error = file.SetTo(ref, B_READ_WRITE);
+	if (error != B_OK && error != B_ENTRY_NOT_FOUND)
+		error = file.SetTo(ref, B_READ_ONLY);
 	if (error != B_OK) {
 		Unset();
 		return error;

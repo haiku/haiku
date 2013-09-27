@@ -149,33 +149,69 @@ actions SetVersion1
 	$(2[1]) "$(1)" -system $(HAIKU_BUILD_VERSION) -short "$(HAIKU_BUILD_DESCRIPTION)" ;
 }
 
-rule SetType
+rule SetType target : type
 {
-	# SetType <target>
+	# SetType <target> [ : <type> ]
+	# Sets the MIME type on the target. If none is given, the executable MIME
+	# type is used.
 
-	Depends $(1) : <build>settype ;
-	SetType1 $(1) : <build>settype ;
+	TARGET_MIME_TYPE on $(target) = $(type:E=$(TARGET_EXECUTABLE_MIME_TYPE)) ;
+
+	Depends $(target) : <build>settype ;
+	SetType1 $(target) : <build>settype ;
 }
 
 actions SetType1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(2[1]) -t $(TARGET_EXECUTABLE_MIME_TYPE) "$(1)" ;
+	$(2[1]) -t $(TARGET_MIME_TYPE) "$(1)" ;
 }
 
-rule MimeSet
+rule MimeSet target
 {
-	# MimeSet <target>
+	# MimeSet <target> ;
 
-	Depends $(1) : <build>mimeset ;
-	MimeSet1 $(1) : <build>mimeset ;
+	Depends $(target) : <build>mimeset <mimedb>mime_db ;
+	MimeSet1 $(target) : <build>mimeset <mimedb>mime_db ;
 }
+
 
 actions MimeSet1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(2[1]) -f "$(1)" ;
+	$(2[1]) -f --mimedb "$(2[2])" "$(1)"
 }
+
+
+rule CreateAppMimeDBEntries target
+{
+	# MimeSetApp <target> ;
+	# Create the app meta MIME DB entries for the given target. The
+	# HAIKU_MIME_DB_ENTRIES variable on <target> is set to the generated
+	# resulting target directory that contains the MIME DB entries.
+
+	local appGrist = $(target:G) ;
+	local appMimeDB = $(target:BS)_mimedb ;
+	appMimeDB = $(appMimeDB:G=mimedb-app-$(appGrist:E=)) ;
+	MakeLocateDebug $(appMimeDB) ;
+	Depends $(appMimeDB) : <build>mimeset $(target) <mimedb>mime_db ;
+	CreateAppMimeDBEntries1 $(appMimeDB)
+		: <build>mimeset $(target) <mimedb>mime_db ;
+
+	HAIKU_MIME_DB_ENTRIES on $(target) = $(appMimeDB) ;
+}
+
+
+actions CreateAppMimeDBEntries1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+
+	appMimeDB="$(1)"
+	$(RM) -rf "$appMimeDB"
+	$(MKDIR) "$appMimeDB"
+	$(2[1]) -f --apps --mimedb "$appMimeDB" --mimedb "$(2[3])" "$(2[2])"
+}
+
 
 rule ResComp
 {
@@ -196,9 +232,11 @@ rule ResComp
 			cc = $(HOST_CC) ;
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 		} else {
-			defines += $(TARGET_DEFINES) ;
-			cc = $(TARGET_CC) ;
-			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
+			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
+				$(TARGET_DEFINES) ;
+			cc = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;
+			localIncludesOption
+				= $(TARGET_LOCAL_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
 		}
 	}
 

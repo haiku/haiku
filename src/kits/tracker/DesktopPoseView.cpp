@@ -78,6 +78,7 @@ DesktopPoseView::InitDesktopDirentIterator(BPoseView* nodeMonitoringTarget,
 	CachedEntryIteratorList* result = new CachedEntryIteratorList();
 
 	ASSERT(!sourceModel.IsQuery());
+	ASSERT(!sourceModel.IsVirtualDirectory());
 	ASSERT(sourceModel.Node());
 	BDirectory* sourceDirectory
 		= dynamic_cast<BDirectory*>(sourceModel.Node());

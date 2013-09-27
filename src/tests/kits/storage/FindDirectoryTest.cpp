@@ -322,10 +322,10 @@ test_find_directory(directory_which dir, BPath &path, dev_t device)
 			break;
 		// Global directories.
 		case B_APPS_DIRECTORY:
-			error = path.SetTo("/boot/apps");
+			error = path.SetTo("/boot/common/apps");
 			break;
 		case B_PREFERENCES_DIRECTORY:
-			error = path.SetTo("/boot/preferences");
+			error = path.SetTo("/boot/common/preferences");
 			break;
 		case B_UTILITIES_DIRECTORY:
 			error = path.SetTo("/boot/utilities");

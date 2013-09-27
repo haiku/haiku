@@ -10,7 +10,3 @@ Addon HP\ JetDirect :
 	SetupWindow.cpp
 	: be $(TARGET_NETWORK_LIBS) $(TARGET_NETAPI_LIB) $(TARGET_LIBSUPC++)
 ;
-
-Package haiku-printingkit-cvs :
-	HP\ JetDirect :
-	boot home config add-ons Print transport ;

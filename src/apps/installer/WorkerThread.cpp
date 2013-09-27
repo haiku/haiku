@@ -9,6 +9,9 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include <set>
+#include <string>
+
 #include <Alert.h>
 #include <Autolock.h>
 #include <Catalog.h>
@@ -28,7 +31,7 @@
 
 #include "AutoLocker.h"
 #include "CopyEngine.h"
-#include "InstallerWindow.h"
+#include "InstallerDefs.h"
 #include "PackageViews.h"
 #include "PartitionMenuItem.h"
 #include "ProgressReporter.h"
@@ -80,10 +83,78 @@ private:
 // #pragma mark - WorkerThread
 
 
-WorkerThread::WorkerThread(InstallerWindow *window)
+class WorkerThread::EntryFilter : public CopyEngine::EntryFilter {
+public:
+	EntryFilter(const char* sourceDirectory)
+		:
+		fIgnorePaths(),
+		fSourceDevice(-1)
+	{
+		try {
+			fIgnorePaths.insert(kPackagesDirectoryPath);
+			fIgnorePaths.insert(kSourcesDirectoryPath);
+			fIgnorePaths.insert("rr_moved");
+			fIgnorePaths.insert("boot.catalog");
+			fIgnorePaths.insert("haiku-boot-floppy.image");
+			fIgnorePaths.insert("common/var/swap");
+			fIgnorePaths.insert("common/var/shared_memory");
+
+			fPackageFSRootPaths.insert("system");
+			fPackageFSRootPaths.insert("common");
+			fPackageFSRootPaths.insert("home/config");
+		} catch (std::bad_alloc&) {
+		}
+
+		struct stat st;
+		if (stat(sourceDirectory, &st) == 0)
+			fSourceDevice = st.st_dev;
+	}
+
+	virtual bool ShouldCopyEntry(const BEntry& entry, const char* path,
+		const struct stat& statInfo, int32 level) const
+	{
+		if (fIgnorePaths.find(path) != fIgnorePaths.end()) {
+			printf("ignoring '%s'.\n", path);
+			return false;
+		}
+
+		if (statInfo.st_dev != fSourceDevice) {
+			// Allow that only for the root of the packagefs mounts, since
+			// those contain directories that shine through from the
+			// underlying volume.
+			if (fPackageFSRootPaths.find(path) == fPackageFSRootPaths.end())
+				return false;
+		}
+
+		return true;
+	}
+
+	virtual bool ShouldClobberFolder(const BEntry& entry, const char* path,
+		const struct stat& statInfo, int32 level) const
+	{
+		if (level == 1 && S_ISDIR(statInfo.st_mode)) {
+			if (strcmp("system", path) == 0) {
+				printf("clobbering '%s'.\n", path);
+				return true;
+			}
+		}
+		return false;
+	}
+
+private:
+	std::set<std::string>	fIgnorePaths;
+	std::set<std::string>	fPackageFSRootPaths;
+	dev_t					fSourceDevice;
+};
+
+
+// #pragma mark - WorkerThread
+
+
+WorkerThread::WorkerThread(const BMessenger& owner)
 	:
 	BLooper("copy_engine"),
-	fWindow(window),
+	fOwner(owner),
 	fPackages(NULL),
 	fSpaceRequired(0),
 	fCancelSemaphore(-1)
@@ -99,7 +170,8 @@ WorkerThread::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case MSG_START_INSTALLING:
-			_PerformInstall(fWindow->GetSourceMenu(), fWindow->GetTargetMenu());
+			_PerformInstall(message->GetInt32("source", -1),
+				message->GetInt32("target", -1));
 			break;
 
 		case MSG_WRITE_BOOT_SECTOR:
@@ -186,10 +258,15 @@ WorkerThread::SetPackagesList(BList *list)
 
 
 void
-WorkerThread::StartInstall()
+WorkerThread::StartInstall(partition_id sourcePartitionID,
+	partition_id targetPartitionID)
 {
 	// Executed in window thread.
-	PostMessage(MSG_START_INSTALLING, this);
+	BMessage message(MSG_START_INSTALLING);
+	message.AddInt32("source", sourcePartitionID);
+	message.AddInt32("target", targetPartitionID);
+
+	PostMessage(&message, this);
 }
 
 
@@ -246,8 +323,9 @@ WorkerThread::_LaunchFinishScript(BPath &path)
 }
 
 
-void
-WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
+status_t
+WorkerThread::_PerformInstall(partition_id sourcePartitionID,
+	partition_id targetPartitionID)
 {
 	CALLED();
 
@@ -265,55 +343,48 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	const char* mountError = B_TRANSLATE("The disk can't be mounted. Please "
 		"choose a different disk.");
 
-	BMessenger messenger(fWindow);
-	ProgressReporter reporter(messenger, new BMessage(MSG_STATUS_MESSAGE));
-	CopyEngine engine(&reporter);
-	BList unzipEngines;
-
-	PartitionMenuItem* targetItem = (PartitionMenuItem*)targetMenu->FindMarked();
-	PartitionMenuItem* srcItem = (PartitionMenuItem*)srcMenu->FindMarked();
-	if (!srcItem || !targetItem) {
-		ERR("bad menu items\n");
-		goto error;
+	if (sourcePartitionID < 0 || targetPartitionID < 0) {
+		ERR("bad source or target partition ID\n");
+		return _InstallationError(err);
 	}
 
 	// check if target is initialized
 	// ask if init or mount as is
-	if (fDDRoster.GetPartitionWithID(targetItem->ID(), &device,
+	if (fDDRoster.GetPartitionWithID(targetPartitionID, &device,
 			&partition) == B_OK) {
 		if (!partition->IsMounted()) {
 			if ((err = partition->Mount()) < B_OK) {
 				_SetStatusMessage(mountError);
 				ERR("BPartition::Mount");
-				goto error;
+				return _InstallationError(err);
 			}
 		}
 		if ((err = partition->GetVolume(&targetVolume)) != B_OK) {
 			ERR("BPartition::GetVolume");
-			goto error;
+			return _InstallationError(err);
 		}
 		if ((err = partition->GetMountPoint(&targetDirectory)) != B_OK) {
 			ERR("BPartition::GetMountPoint");
-			goto error;
+			return _InstallationError(err);
 		}
-	} else if (fDDRoster.GetDeviceWithID(targetItem->ID(), &device) == B_OK) {
+	} else if (fDDRoster.GetDeviceWithID(targetPartitionID, &device) == B_OK) {
 		if (!device.IsMounted()) {
 			if ((err = device.Mount()) < B_OK) {
 				_SetStatusMessage(mountError);
 				ERR("BDiskDevice::Mount");
-				goto error;
+				return _InstallationError(err);
 			}
 		}
 		if ((err = device.GetVolume(&targetVolume)) != B_OK) {
 			ERR("BDiskDevice::GetVolume");
-			goto error;
+			return _InstallationError(err);
 		}
 		if ((err = device.GetMountPoint(&targetDirectory)) != B_OK) {
 			ERR("BDiskDevice::GetMountPoint");
-			goto error;
+			return _InstallationError(err);
 		}
 	} else
-		goto error; // shouldn't happen
+		return _InstallationError(err);  // shouldn't happen
 
 	// check if target has enough space
 	if (fSpaceRequired > 0 && targetVolume.FreeBytes() < fSpaceRequired) {
@@ -324,27 +395,28 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetShortcut(1, B_ESCAPE);
 		if (alert->Go() != 0)
-				goto error;
+			return _InstallationError(err);
 	}
 
-	if (fDDRoster.GetPartitionWithID(srcItem->ID(), &device, &partition) == B_OK) {
+	if (fDDRoster.GetPartitionWithID(sourcePartitionID, &device, &partition)
+			== B_OK) {
 		if ((err = partition->GetMountPoint(&srcDirectory)) != B_OK) {
 			ERR("BPartition::GetMountPoint");
-			goto error;
+			return _InstallationError(err);
 		}
-	} else if (fDDRoster.GetDeviceWithID(srcItem->ID(), &device) == B_OK) {
+	} else if (fDDRoster.GetDeviceWithID(sourcePartitionID, &device) == B_OK) {
 		if ((err = device.GetMountPoint(&srcDirectory)) != B_OK) {
 			ERR("BDiskDevice::GetMountPoint");
-			goto error;
+			return _InstallationError(err);
 		}
 	} else
-		goto error; // shouldn't happen
+		return _InstallationError(err); // shouldn't happen
 
 	// check not installing on itself
 	if (strcmp(srcDirectory.Path(), targetDirectory.Path()) == 0) {
 		_SetStatusMessage(B_TRANSLATE("You can't install the contents of a "
 			"disk onto itself. Please choose a different disk."));
-		goto error;
+		return _InstallationError(err);
 	}
 
 	// check not installing on boot volume
@@ -356,7 +428,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		alert->SetShortcut(1, B_ESCAPE);
 		if (alert->Go() != 0) {
 			_SetStatusMessage("Installation stopped.");
-			goto error;
+			return _InstallationError(err);
 		}
 	}
 
@@ -393,12 +465,16 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		if (alert->Go() != 0) {
 		// TODO: Would be cool to offer the option here to clean additional
 		// folders at the user's choice (like /boot/common and /boot/develop).
-			err = B_CANCELED;
-			goto error;
+			return _InstallationError(B_CANCELED);
 		}
 	}
 
 	// Begin actual installation
+
+	ProgressReporter reporter(fOwner, new BMessage(MSG_STATUS_MESSAGE));
+	EntryFilter entryFilter(srcDirectory.Path());
+	CopyEngine engine(&reporter, &entryFilter);
+	BList unzipEngines;
 
 	_LaunchInitScript(targetDirectory);
 
@@ -408,29 +484,29 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	// want problems fixed along the way...
 	err = _CreateDefaultIndices(targetDirectory);
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 	// Mirror all the indices which are present on the source volume onto
 	// the target volume.
 	err = _MirrorIndices(srcDirectory, targetDirectory);
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 
 	// Let the engine collect information for the progress bar later on
 	engine.ResetTargets(srcDirectory.Path());
 	err = engine.CollectTargets(srcDirectory.Path(), fCancelSemaphore);
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 
 	// Collect selected packages also
 	if (fPackages) {
-		BPath pkgRootDir(srcDirectory.Path(), PACKAGES_DIRECTORY);
+		BPath pkgRootDir(srcDirectory.Path(), kPackagesDirectoryPath);
 		int32 count = fPackages->CountItems();
 		for (int32 i = 0; i < count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
 			BPath packageDir(pkgRootDir.Path(), p->Folder());
 			err = engine.CollectTargets(packageDir.Path(), fCancelSemaphore);
 			if (err != B_OK)
-				goto error;
+				return _InstallationError(err);
 		}
 	}
 
@@ -438,7 +514,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	err = _ProcessZipPackages(srcDirectory.Path(), targetDirectory.Path(),
 		&reporter, unzipEngines);
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 
 	reporter.StartTimer();
 
@@ -446,11 +522,11 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 	err = engine.CopyFolder(srcDirectory.Path(), targetDirectory.Path(),
 		fCancelSemaphore);
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 
 	// copy selected packages
 	if (fPackages) {
-		BPath pkgRootDir(srcDirectory.Path(), PACKAGES_DIRECTORY);
+		BPath pkgRootDir(srcDirectory.Path(), kPackagesDirectoryPath);
 		int32 count = fPackages->CountItems();
 		for (int32 i = 0; i < count; i++) {
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
@@ -458,7 +534,7 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 			err = engine.CopyFolder(packageDir.Path(), targetDirectory.Path(),
 				fCancelSemaphore);
 			if (err != B_OK)
-				goto error;
+				return _InstallationError(err);
 		}
 	}
 
@@ -472,21 +548,26 @@ WorkerThread::_PerformInstall(BMenu* srcMenu, BMenu* targetMenu)
 		delete engine;
 	}
 	if (err != B_OK)
-		goto error;
+		return _InstallationError(err);
 
 	_LaunchFinishScript(targetDirectory);
 
-	BMessenger(fWindow).SendMessage(MSG_INSTALL_FINISHED);
+	fOwner.SendMessage(MSG_INSTALL_FINISHED);
+	return B_OK;
+}
 
-	return;
-error:
+
+status_t
+WorkerThread::_InstallationError(status_t error)
+{
 	BMessage statusMessage(MSG_RESET);
-	if (err == B_CANCELED)
+	if (error == B_CANCELED)
 		_SetStatusMessage(B_TRANSLATE("Installation canceled."));
 	else
-		statusMessage.AddInt32("error", err);
+		statusMessage.AddInt32("error", error);
 	ERR("_PerformInstall failed");
-	BMessenger(fWindow).SendMessage(&statusMessage);
+	fOwner.SendMessage(&statusMessage);
+	return error;
 }
 
 
@@ -586,7 +667,7 @@ WorkerThread::_ProcessZipPackages(const char* sourcePath,
 	// TODO: Put those in the optional packages list view
 	// TODO: Implement mechanism to handle dependencies between these
 	// packages. (Selecting one will auto-select others.)
-	BPath pkgRootDir(sourcePath, PACKAGES_DIRECTORY);
+	BPath pkgRootDir(sourcePath, kPackagesDirectoryPath);
 	BDirectory directory(pkgRootDir.Path());
 	BEntry entry;
 	while (directory.GetNextEntry(&entry) == B_OK) {
@@ -626,7 +707,7 @@ WorkerThread::_SetStatusMessage(const char *status)
 {
 	BMessage msg(MSG_STATUS_MESSAGE);
 	msg.AddString("status", status);
-	BMessenger(fWindow).SendMessage(&msg);
+	fOwner.SendMessage(&msg);
 }
 
 

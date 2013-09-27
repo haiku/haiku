@@ -71,21 +71,30 @@ local genericSources =
 	e_rem_pio2f.c k_rem_pio2f.c
 
 	memrchr.c
-;
+	;
 
-MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
-	$(genericSources)
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup arm ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-MergeObject posix_gnu_arch_$(TARGET_ARCH)_others.o :
-	e_sqrt.c
-	e_sqrtf.c
-;
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o :
+			$(genericSources)
+			;
 
-MergeObjectFromObjects posix_gnu_arch_$(TARGET_ARCH).o : :
-	posix_gnu_arch_$(TARGET_ARCH)_generic.o
-	posix_gnu_arch_$(TARGET_ARCH)_others.o
-;
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_others.o :
+			e_sqrt.c
+			e_sqrtf.c
+			;
 
-SEARCH on [ FGristFiles $(genericSources) ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch generic ] ;
+		MergeObjectFromObjects <$(architecture)>posix_gnu_arch_$(TARGET_ARCH).o
+			: :
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_others.o
+			;
+
+		SEARCH on [ FGristFiles $(genericSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch
+				generic ] ;
+	}
+}

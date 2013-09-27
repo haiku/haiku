@@ -9,7 +9,7 @@ SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 Application Tracker :
 	main.cpp
-	: be tracker $(HAIKU_LOCALE_LIBS)
+	: be tracker localestub
 	: Tracker.rdef
 	;
 

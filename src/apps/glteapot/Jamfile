@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps glteapot ;
-SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+UseBuildFeatureHeaders glu ;
+UseBuildFeatureHeaders mesa ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -13,11 +13,16 @@ local sources =
 	TeapotApp.cpp
 ;
 
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] :
+	[ BuildFeatureAttribute glu : headers ]
+	[ BuildFeatureAttribute mesa : headers ]
+	;
 
 Application GLTeapot :
 	$(sources)
-	: be GL game $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	:
+	be GL game localestub $(TARGET_LIBSUPC++)
+	[ BuildFeatureAttribute glu : library ]
 	: GLTeapot.rdef
 ;
 

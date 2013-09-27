@@ -127,9 +127,8 @@ DeviceWatcher::Start()
 		"Initial devices scan", B_NORMAL_PRIORITY, this));
 
 	// And watch for any change
-	return BPathMonitor::StartWatching(kDevicesRoot, B_ENTRY_CREATED
-		| B_ENTRY_REMOVED | B_ENTRY_MOVED | B_WATCH_FILES_ONLY
-		| B_WATCH_RECURSIVELY, this);
+	return BPathMonitor::StartWatching(kDevicesRoot,
+		B_WATCH_FILES_ONLY | B_WATCH_RECURSIVELY, this);
 }
 
 

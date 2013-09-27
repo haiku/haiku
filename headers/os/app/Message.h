@@ -27,6 +27,7 @@ class BBlockCache;
 class BMessenger;
 class BHandler;
 class BString;
+class BStringList;
 struct entry_ref;
 
 
@@ -140,6 +141,8 @@ public:
 			status_t			AddString(const char* name, const char* string);
 			status_t			AddString(const char* name,
 									const BString& string);
+			status_t			AddStrings(const char *name,
+									const BStringList& list);
 			status_t			AddInt8(const char* name, int8 value);
 			status_t			AddUInt8(const char* name, uint8 value);
 			status_t			AddInt16(const char* name, int16 value);
@@ -197,6 +200,8 @@ public:
 									BString* string) const;
 			status_t			FindString(const char* name, int32 index,
 									BString* string) const;
+			status_t			FindStrings(const char* name,
+									BStringList* list) const;
 			status_t			FindInt8(const char* name, int8* value) const;
 			status_t			FindInt8(const char* name, int32 index,
 									int8* value) const;

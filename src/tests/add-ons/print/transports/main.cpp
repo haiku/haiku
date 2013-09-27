@@ -69,7 +69,9 @@ int main (int argc, char *argv[])
 	printf("Looking for %s transport addon:\n", transport);
 
 	directory_which which[] = {
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
 		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
 		B_SYSTEM_ADDONS_DIRECTORY
 	};

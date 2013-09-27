@@ -1,0 +1,455 @@
+rule FQualifiedBuildFeatureName features
+{
+	# FQualifiedBuildFeatureName <features>
+	#
+	# Prepends the name of the current target packaging architecture to the
+	# given feature names.
+
+	return $(TARGET_PACKAGING_ARCH):$(features) ;
+}
+
+
+rule FIsBuildFeatureEnabled feature
+{
+	# FIsBuildFeatureEnabled <feature> ;
+	# Returns whether the given build feature <feature> is enabled (if so: "1",
+	# if not: empty list).
+	#
+	# <feature> - The name of the build feature (all lower case).
+
+	feature = [ FQualifiedBuildFeatureName $(feature) ] ;
+	return $(HAIKU_BUILD_FEATURE_$(feature:U)_ENABLED) ;
+}
+
+
+rule FMatchesBuildFeatures specification
+{
+	# FMatchesBuildFeatures <specification> ;
+	# Returns whether the given build feature specification <specification>
+	# holds. <specification> consists of positive and negative build feature
+	# conditions. Conditions can be individual list elements and multiple
+	# conditions can be joined, separated by ",", in a single list element. The
+	# effect is the same; they are considered as single set of conditions.
+	# A positive condition does not start with a "!". It holds when the build
+	# feature named by the element is enabled.
+	# A negative condition starts with a "!". It holds when the build feature
+	# named by the string resulting from removing the leading "!" is not
+	# enabled.
+	# <specification> holds when it is not empty and
+	# * none of the negative conditions it contains hold and
+	# * if it contains any positive conditions, at least one one of them holds.
+	#
+	# <specification> - The build feature specification. A list of individual
+	#	conditions or conditions joined by ",".
+
+	local splitSpecification ;
+	local element ;
+	for element in $(specification) {
+		splitSpecification += [ FSplitString $(element) : "," ] ;
+	}
+	return [ FConditionsHold $(splitSpecification) : FIsBuildFeatureEnabled ] ;
+}
+
+
+rule FFilterByBuildFeatures list
+{
+	# FFilterByBuildFeatures <list> ;
+	# Filters the list annotated by build feature specifications and returns the
+	# resulting list. The list can be annotated in two different ways:
+	# * A single list element can be annotated by appending "@<specification>"
+	#   to it, with <specification> being a build feature specification (a
+	#   single comma-separated string). The element appears in the resulting
+	#   list, only if <specification> holds.
+	# * A sublist can be annotated by enclosing it in "<specification> @{" (two
+	#   separate list elements) and "}@", with <specification> being a build
+	#   feature specification (a single comma-separated string). The enclosed
+	#   sublist appears in the resulting list, only if <specification> holds.
+	# The sublist annotations can be nested. The annotations themselves don't
+	# appear in the resulting list.
+	#
+	# <list> - A list annotated with build feature specifications.
+
+	local filteredList ;
+
+	# Since we must look ahead one element to be able to decide whether an
+	# element is a regular list element or a features specification for a
+	# subsequent "@{". Hence we always process an element other than "@{" and
+	# "}@" in the next iteration. We append a dummy element to the list so we
+	# don't need special handling for the last element.
+	local evaluationStack = 1 ;
+	local previousElement ;
+	local element ;
+	for element in $(list) dummy {
+		local stackTop = $(evaluationStack[1]) ;
+		local processElement = $(previousElement) ;
+		switch $(element) {
+			case }@ :
+			{
+				# Pop the topmost specification off the stack.
+				evaluationStack = $(evaluationStack[2-]) ;
+				if ! $(evaluationStack) {
+					Exit "FFilterByBuildFeatures: Unbalanced @( in: " $(list) ;
+				}
+
+				processElement = $(previousElement) ;
+				previousElement = ;
+			}
+			case @{ :
+			{
+				if ! $(previousElement) {
+					Exit "FFilterByBuildFeatures: No feature specification"
+						"after )@ in: " $(list) ;
+				}
+
+				if $(evaluationStack[1]) = 1
+					&& [ FMatchesBuildFeatures $(previousElement) ] {
+					evaluationStack = 1 $(evaluationStack) ;
+				} else {
+					evaluationStack = 0 $(evaluationStack) ;
+				}
+
+				processElement = ;
+				previousElement = ;
+			}
+			case * :
+			{
+				processElement = $(previousElement) ;
+				previousElement = $(element) ;
+			}
+		}
+
+		if $(processElement) && $(stackTop) = 1 {
+			local splitElement = [ Match "(.*)@([^@]*)" : $(processElement) ] ;
+			if $(splitElement) {
+				if [ FMatchesBuildFeatures $(splitElement[2]) ] {
+					filteredList += $(splitElement[1]) ;
+				}
+			} else {
+				filteredList += $(processElement) ;
+			}
+		}
+	}
+
+	if $(evaluationStack[2-]) {
+		Exit "FFilterByBuildFeatures: Unbalanced )@ in: " $(list) ;
+	}
+
+	return $(filteredList) ;
+}
+
+
+rule EnableBuildFeatures features : specification
+{
+	# EnableBuildFeatures <features> : <specification> ;
+	# Enables the build features <features>, if the build features specification
+	# <specification> holds. If <specification> is omitted, the features are
+	# enabled unconditionally.
+	# The rule enables a build feature by adding its given lower case name to
+	# the build variable HAIKU_BUILD_FEATURES and defining a build variable
+	# HAIKU_BUILD_FEATURE_<FEATURE>_ENABLED (<FEATURE> being the upper case name
+	# of the build feature) to "1".
+	#
+	# <features> - A list of build feature names (lower case).
+	# <specification> - An optional build features specification (cf.
+	#	FMatchesBuildFeatures).
+
+	features = [ FQualifiedBuildFeatureName $(features) ] ;
+
+	if ! $(HAIKU_BUILD_FEATURE_$(feature:U)_ENABLED)
+		&& ( ! $(specification)
+			|| [ FMatchesBuildFeatures $(specification) ] ) {
+		local feature ;
+		for feature in $(features) {
+			HAIKU_BUILD_FEATURES += $(feature) ;
+			HAIKU_BUILD_FEATURE_$(feature:U)_ENABLED = 1 ;
+		}
+	}
+}
+
+
+rule BuildFeatureObject feature
+{
+	# BuildFeatureObject <feature> ;
+	# Returns a unique object for the given build feature. It is used for
+	# attaching attribute values to it.
+
+	feature = [ FQualifiedBuildFeatureName $(feature) ] ;
+
+	local featureObject = $(HAIKU_BUILD_FEATURE_$(feature:U)) ;
+	if ! $(featureObject) {
+		featureObject = [ NewUniqueTarget ] ;
+		HAIKU_BUILD_FEATURE_$(feature:U) = $(featureObject) ;
+	}
+
+	return $(featureObject) ;
+}
+
+
+rule SetBuildFeatureAttribute feature : attribute : values : package
+{
+	# SetBuildFeatureAttribute <feature> : <attribute> : <values>
+	#	[ : <package> ] ;
+	# Sets attribute <attribute> of a build feature <feature> to value <values>.
+	# If <package> is specified, it names the package the attribute belongs to.
+
+	local featureObject = [ BuildFeatureObject $(feature) ] ;
+	HAIKU_ATTRIBUTE_$(attribute) on $(featureObject) = $(values) ;
+	if $(package) {
+		HAIKU_ATTRIBUTE_$(attribute):package on $(featureObject) = $(package) ;
+	}
+}
+
+
+rule BuildFeatureAttribute feature : attribute : flags
+{
+	# BuildFeatureAttribute <feature> : <attribute> [ : <flags> ] ;
+	# Returns the value of attribute <attribute> of a build feature <feature>.
+	# Flags can be a list of flags which influence the returned value. Currently
+	# only flag "path" is defined, which will convert the attribute value --
+	# which is assumed to be a list of (gristed) targets with a path relative to
+	# the extraction directory of the build feature archive files -- to paths.
+	# A typical example is the "headers" attribute, whose value can be used as
+	# dependency, but which must be converted to a path to be a valid headers
+	# search path.
+
+	local featureObject = [ BuildFeatureObject $(feature) ] ;
+	local values
+		= [ on $(featureObject) return $(HAIKU_ATTRIBUTE_$(attribute)) ] ;
+	if path in $(flags) {
+		# get the attribute's package and the corresponding extraction dir
+		local package
+			= [ BuildFeatureAttribute $(feature) : $(attribute):package ] ;
+		local directory ;
+		if $(package) {
+			directory = [ BuildFeatureAttribute $(feature)
+				: $(package):directory ] ;
+		}
+
+		# translate the values
+		local paths ;
+		local value ;
+		for value in $(values:G=) {
+			paths += [ FDirName $(directory) $(value) ] ;
+		}
+		values = $(paths) ;
+	}
+
+	return $(values) ;
+}
+
+
+rule ExtractBuildFeatureArchivesExpandValue value : fileName
+{
+	if ! $(value) {
+		return $(value) ;
+	}
+
+	# split the value
+	local splitValue ;
+	while $(value) {
+		local components = [ Match "([^%]*)(%[^%]*%)(.*)" : $(value) ] ;
+		if ! $(components) {
+			splitValue += $(value) ;
+			break ;
+		}
+
+		if $(components[1]) {
+			splitValue += $(components[1]) ;
+		}
+		splitValue += $(components[2]) ;
+		value = $(components[3]) ;
+	}
+
+	# reassemble the value, performing the substitutions
+	local %packageName% ;
+	local %portName% ;
+	local %packageFullVersion% ;
+	value = "" ;
+	while $(splitValue) {
+		local component = $(splitValue[1]) ;
+		splitValue = $(splitValue[2-]) ;
+		switch $(component) {
+			case %packageRevisionedName% :
+				splitValue = %packageName% "-" %packageFullVersion%
+					$(splitValue) ;
+
+			case %portRevisionedName% :
+				splitValue = %portName% "-" %packageFullVersion% $(splitValue) ;
+
+			case %*% :
+				if ! x$(%packageName%) {
+					# extract package name and version from file name
+					local splitName
+						= [ Match "([^-]*)-(.*).hpkg" : $(fileName) ] ;
+					if $(splitName) {
+						%packageName% = $(splitName[1]) ;
+						%packageFullVersion%
+							= [ Match "([^-]*-[^-]*)-.*" : $(splitName[2]) ] ;
+						if ! $(packageFullVersion%) {
+							packageFullVersion% = $(splitName[2]) ;
+						}
+					} else {
+						%packageName% = [ Match "(.*).hpkg" : $(fileName) ] ;
+						if ! $(%packageName%) {
+							%packageName% = $(fileName) ;
+						}
+						%packageFullVersion% = "" ;
+					}
+
+					# get the port name from the package name
+					splitName = [ FSplitPackageName $(%packageName%) ] ;
+					%portName% = $(splitName[1]) ;
+				}
+
+				value = "$(value)$($(component):E=)" ;
+
+			case * :
+				value = "$(value)$(component)" ;
+		}
+	}
+
+	return $(value) ;
+}
+
+
+rule ExtractBuildFeatureArchives feature : list
+{
+	# ExtractBuildFeatureArchives <feature> : <list> ;
+	# Downloads and extracts one or more archives for build feature <feature>
+	# and sets attributes for the build feature to extracted entries. The syntax
+	# for <list> is:
+	# "file:" <packageAlias> <packageName>
+	#    <attribute>: <value> ...
+	#    ...
+	# "file:" <packageAlias2> <packageName2>
+	# ...
+	#
+	# <packageAlias> specifies a short name for the archive (e.g. "base" for the
+	# base package, "devel" for the development package, etc.), <packageName>
+	# the unversioned name of the package (e.g. "libsolv_devel").
+	# <attribute> can be any name and <value> any relative path in the
+	# extraction directory. The following placeholders in <value> will be
+	# replaced with the respective value:
+	# * %packageName% is replaced with the name of the package as extracted from
+	#   the package file name (may differ from the specified package name e.g.
+	#   for bootstrap packages).
+	# * %portName% is replaced with the name of the port the package belongs to.
+	#   That is %packageName% with any well-known package type suffix ("_devel",
+	#   "_source", etc.) removed.
+	# * %packageFullVersion% is replaced with the the full version string of the
+	#   package (i.e. including the revision) as extracted frmo the package file
+	#   name.
+	# * %packageRevisionedName% is replaced with what
+	#   %packageName%-%packageFullVersion% would be replaced.
+	# * %portRevisionedName% is replaced with what
+	#   %portName%-%packageFullVersion% would be replaced.
+	#
+	# The attribute with the name "depends" will be handled specially. Its
+	# <value> specifies the name of a package the current package depends on
+	# (e.g. "devel" typically depends on "base"). If such a dependency is
+	# specified the current package will be extracted to the same directory as
+	# the package it depends on. The "depends" attribute must precede any other
+	# attribute for the package.
+	#
+	# The rule also sets the build feature attribute "<packageAlias>:directory"
+	# to the extraction directory for each package.
+
+	local qualifiedFeature = [ FQualifiedBuildFeatureName $(feature) ] ;
+	list = [ FFilterByBuildFeatures $(list) ] ;
+
+	while $(list) {
+		if $(list[1]) != file: {
+			Exit "ExtractBuildFeatureArchives: Expected \"file: ...\", got:"
+				$(list) ;
+		}
+
+		local package = $(list[2]) ;
+		local file = [ FetchPackage $(list[3]) ] ;
+		local fileName = $(file:BS) ;
+		list = $(list[4-]) ;
+
+		local directory = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+			$(fileName:B) ] ;
+		directory = $(directory:G=$(package)) ;
+
+		while $(list) {
+			local attribute = [ Match "(.*):" : $(list[1]) ] ;
+			if ! $(attribute) {
+				Exit "ExtractBuildFeatureArchives: Expected attribute, got:"
+					$(list) ;
+			}
+			if $(attribute) = file {
+				break ;
+			}
+
+			list = $(list[2-]) ;
+
+			local values ;
+
+			while $(list) {
+				switch $(list[1]) {
+					case *: :
+					{
+						break ;
+					}
+					case * :
+					{
+						values += [ ExtractBuildFeatureArchivesExpandValue
+							$(list[1]) : $(fileName) ] ;
+						list = $(list[2-]) ;
+					}
+				}
+			}
+
+			if $(attribute) = depends {
+				# Inherit the extraction directory (with a different grist) and
+				# depend on the extraction directory of the base package.
+				local basePackage = $(values[1]) ;
+				local baseDirectory = [ BuildFeatureAttribute $(feature)
+					: $(basePackage):directory ] ;
+				directory = $(baseDirectory:G=$(package)) ;
+				Depends $(directory) : $(directory:G=$(basePackage)) ;
+			} else {
+				SetBuildFeatureAttribute $(feature) : $(attribute)
+					: [ ExtractArchive $(directory)
+						: $(values) : $(file)
+						: extracted-$(qualifiedFeature)-$(package) ] ;
+				SetBuildFeatureAttribute $(feature) : $(attribute):package
+					: $(package) ;
+			}
+		}
+
+		SetBuildFeatureAttribute $(feature) : $(package):directory
+			: $(directory:G=) ;
+	}
+}
+
+
+rule InitArchitectureBuildFeatures architecture
+{
+	# InitArchitectureBuildFeatures <architecture> ;
+	#
+	# Enable the build features that can be derived directly from the
+	# architecture.
+
+	# The build feature rule use TARGET_PACKAGING_ARCH, so set that temporarily.
+	local savedArchitecture = $(TARGET_PACKAGING_ARCH) ;
+	TARGET_PACKAGING_ARCH = $(architecture) ;
+
+	# Add the target architecture as a build feature.
+	EnableBuildFeatures $(TARGET_ARCH_$(architecture)) ;
+
+	# For the primary architecture add the "primary" build feature.
+	if $(architecture) = $(TARGET_PACKAGING_ARCHS[1]) {
+		EnableBuildFeatures primary ;
+	}
+
+	# Add all secondary architectures as build features (with prefix).
+	EnableBuildFeatures secondary_$(TARGET_PACKAGING_ARCHS[2-]) ;
+
+	if $(TARGET_GCC_VERSION_$(architecture)[1]) = 2 {
+		EnableBuildFeatures gcc2 ;
+	}
+
+	TARGET_PACKAGING_ARCH = $(savedArchitecture) ;
+}

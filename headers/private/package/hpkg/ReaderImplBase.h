@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -7,10 +7,16 @@
 #define _PACKAGE__HPKG__PRIVATE__READER_IMPL_BASE_H_
 
 
+#include <errno.h>
+#include <sys/stat.h>
+
+#include <ByteOrder.h>
 #include <SupportDefs.h>
 
+#include <Array.h>
 #include <util/SinglyLinkedList.h>
 
+#include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/PackageAttributeValue.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
@@ -21,182 +27,108 @@ namespace BPackageKit {
 namespace BHPKG {
 
 
+class BAbstractBufferedDataReader;
 class BErrorOutput;
 
 
 namespace BPrivate {
 
 
+class PackageFileHeapReader;
+
+
+struct PackageFileSection {
+	uint32			uncompressedLength;
+	uint8*			data;
+	uint64			offset;
+	uint64			currentOffset;
+	uint64			stringsLength;
+	uint64			stringsCount;
+	char**			strings;
+	const char*		name;
+
+	PackageFileSection(const char* _name)
+		:
+		data(NULL),
+		strings(NULL),
+		name(_name)
+	{
+	}
+
+	~PackageFileSection()
+	{
+		delete[] strings;
+		delete[] data;
+	}
+};
+
+
 class ReaderImplBase {
 protected:
-								ReaderImplBase(
+								ReaderImplBase(const char* fileType,
 									BErrorOutput* errorOutput);
 	virtual						~ReaderImplBase();
-
-	virtual	status_t			Init(int fd, bool keepFD);
 
 			int					FD() const;
 
 			BErrorOutput*		ErrorOutput() const;
 
+			uint16				MinorFormatVersion() const
+									{ return fMinorFormatVersion; }
+
+			uint64				UncompressedHeapSize() const;
+
+			PackageFileHeapReader* RawHeapReader() const
+									{ return fRawHeapReader; }
+			BAbstractBufferedDataReader* HeapReader() const
+									{ return fHeapReader; }
+									// equals RawHeapReader(), if uncached
+
+			BAbstractBufferedDataReader* DetachHeapReader(
+									PackageFileHeapReader** _rawHeapReader
+										= NULL);
+									// Detaches both raw and (if applicable)
+									// cached heap reader. The called gains
+									// ownership. The FD may need to be set on
+									// the raw heap reader, if it shall be used
+									// after destroying this object and Init()
+									// has been called with keepFD == true.
+
 protected:
-			struct AttributeHandlerContext {
-				BErrorOutput*	errorOutput;
-				union {
-					BPackageContentHandler*			packageContentHandler;
-					BLowLevelPackageContentHandler*	lowLevelHandler;
-				};
-				bool			hasLowLevelHandler;
-
-				uint64			heapOffset;
-				uint64			heapSize;
-
-				BHPKGPackageSectionID	section;
-
-				AttributeHandlerContext(BErrorOutput* errorOutput,
-					BPackageContentHandler* packageContentHandler,
-					BHPKGPackageSectionID section);
-
-				AttributeHandlerContext(BErrorOutput* errorOutput,
-					BLowLevelPackageContentHandler* lowLevelHandler,
-					BHPKGPackageSectionID section);
-
-				void ErrorOccurred();
-			};
-
+			class AttributeHandlerContext;
+			class AttributeHandler;
+			class IgnoreAttributeHandler;
+			class PackageInfoAttributeHandlerBase;
+			class PackageVersionAttributeHandler;
+			class PackageResolvableAttributeHandler;
+			class PackageResolvableExpressionAttributeHandler;
+			class GlobalWritableFileInfoAttributeHandler;
+			class UserSettingsFileInfoAttributeHandler;
+			class UserAttributeHandler;
+			class PackageAttributeHandler;
+			class LowLevelAttributeHandler;
 
 			typedef BPackageAttributeValue AttributeValue;
-
-			struct AttributeHandler
-				: SinglyLinkedListLinkImpl<AttributeHandler> {
-				virtual ~AttributeHandler();
-
-				void SetLevel(int level);
-				virtual status_t HandleAttribute(
-					AttributeHandlerContext* context, uint8 id,
-					const AttributeValue& value, AttributeHandler** _handler);
-
-				virtual status_t Delete(AttributeHandlerContext* context);
-
-			protected:
-				int	fLevel;
-			};
-
-
-			struct IgnoreAttributeHandler : AttributeHandler {
-			};
-
-
-			struct PackageVersionAttributeHandler : AttributeHandler {
-				PackageVersionAttributeHandler(
-					BPackageInfoAttributeValue& packageInfoValue,
-					BPackageVersionData& versionData, bool notify);
-
-				virtual status_t HandleAttribute(
-					AttributeHandlerContext* context, uint8 id,
-					const AttributeValue& value, AttributeHandler** _handler);
-
-				virtual status_t Delete(AttributeHandlerContext* context);
-
-			private:
-				BPackageInfoAttributeValue&	fPackageInfoValue;
-				BPackageVersionData&		fPackageVersionData;
-				bool						fNotify;
-			};
-
-
-			struct PackageResolvableAttributeHandler : AttributeHandler {
-				PackageResolvableAttributeHandler(
-					BPackageInfoAttributeValue& packageInfoValue);
-
-				virtual status_t HandleAttribute(
-					AttributeHandlerContext* context, uint8 id,
-					const AttributeValue& value, AttributeHandler** _handler);
-
-				virtual status_t Delete(AttributeHandlerContext* context);
-
-			private:
-				BPackageInfoAttributeValue&	fPackageInfoValue;
-			};
-
-
-			struct PackageResolvableExpressionAttributeHandler
-				: AttributeHandler {
-				PackageResolvableExpressionAttributeHandler(
-					BPackageInfoAttributeValue& packageInfoValue);
-
-				virtual status_t HandleAttribute(
-					AttributeHandlerContext* context, uint8 id,
-					const AttributeValue& value, AttributeHandler** _handler);
-
-				virtual status_t Delete(AttributeHandlerContext* context);
-
-			private:
-				BPackageInfoAttributeValue&	fPackageInfoValue;
-			};
-
-
-			struct PackageAttributeHandler : AttributeHandler {
-				virtual status_t HandleAttribute(
-					AttributeHandlerContext* context, uint8 id,
-					const AttributeValue& value, AttributeHandler** _handler);
-
-			private:
-				BPackageInfoAttributeValue	fPackageInfoValue;
-			};
-
-
-			struct LowLevelAttributeHandler : AttributeHandler {
-				LowLevelAttributeHandler();
-				LowLevelAttributeHandler(uint8 id,
-					const BPackageAttributeValue& value, void* parentToken,
-					void* token);
-
-				virtual status_t HandleAttribute(
-					AttributeHandlerContext* context, uint8 id,
-					const AttributeValue& value, AttributeHandler** _handler);
-				virtual status_t Delete(AttributeHandlerContext* context);
-
-			private:
-				void*			fParentToken;
-				void*			fToken;
-				uint8			fID;
-				AttributeValue	fValue;
-			};
-
-
-			struct SectionInfo {
-				uint32			compression;
-				uint32			compressedLength;
-				uint32			uncompressedLength;
-				uint8*			data;
-				uint64			offset;
-				uint64			currentOffset;
-				uint64			stringsLength;
-				uint64			stringsCount;
-				char**			strings;
-				const char*		name;
-
-				SectionInfo(const char* _name)
-					:
-					data(NULL),
-					strings(NULL),
-					name(_name)
-				{
-				}
-
-				~SectionInfo()
-				{
-					delete[] strings;
-					delete[] data;
-				}
-			};
-
 			typedef SinglyLinkedList<AttributeHandler> AttributeHandlerList;
 
 protected:
-			const char*			CheckCompression(
-									const SectionInfo& section) const;
+			template<typename Header, uint32 kMagic, uint16 kVersion,
+				uint16 kMinorVersion>
+			status_t			Init(int fd, bool keepFD, Header& header,
+									uint32 flags);
+			status_t			InitHeapReader(uint32 compression,
+									uint32 chunkSize, off_t offset,
+									uint64 compressedSize,
+									uint64 uncompressedSize);
+	virtual	status_t			CreateCachedHeapReader(
+									PackageFileHeapReader* heapReader,
+									BAbstractBufferedDataReader*&
+										_cachedReader);
+			status_t			InitSection(PackageFileSection& section,
+									uint64 endOffset, uint64 length,
+									uint64 maxSaneLength, uint64 stringsLength,
+									uint64 stringsCount);
+			status_t			PrepareSection(PackageFileSection& section);
 
 			status_t			ParseStrings();
 
@@ -214,8 +146,7 @@ protected:
 
 			status_t			ReadBuffer(off_t offset, void* buffer,
 									size_t size);
-			status_t			ReadCompressedBuffer(
-									const SectionInfo& section);
+			status_t			ReadSection(const PackageFileSection& section);
 
 	inline	AttributeHandler*	CurrentAttributeHandler() const;
 	inline	void				PushAttributeHandler(
@@ -223,13 +154,15 @@ protected:
 	inline	AttributeHandler*	PopAttributeHandler();
 	inline	void				ClearAttributeHandlerStack();
 
-	inline	SectionInfo*		CurrentSection();
-	inline	void				SetCurrentSection(SectionInfo* section);
+	inline	PackageFileSection*	CurrentSection();
+	inline	void				SetCurrentSection(PackageFileSection* section);
 
 protected:
-			SectionInfo			fPackageAttributesSection;
+			PackageFileSection	fPackageAttributesSection;
 
 private:
+			status_t			_Init(int fd, bool keepFD);
+
 			status_t			_ParseAttributeTree(
 									AttributeHandlerContext* context);
 
@@ -247,17 +180,329 @@ private:
 									size_t* _stringLength = NULL);
 
 private:
+			const char*			fFileType;
 			BErrorOutput*		fErrorOutput;
 			int					fFD;
 			bool				fOwnsFD;
+			uint16				fMinorFormatVersion;
+			uint16				fCurrentMinorFormatVersion;
 
-			SectionInfo*		fCurrentSection;
+			PackageFileHeapReader* fRawHeapReader;
+			BAbstractBufferedDataReader* fHeapReader;
+
+			PackageFileSection*	fCurrentSection;
 
 			AttributeHandlerList fAttributeHandlerStack;
 
 			uint8*				fScratchBuffer;
 			size_t				fScratchBufferSize;
 };
+
+
+// #pragma mark - attribute handlers
+
+
+class ReaderImplBase::AttributeHandlerContext {
+public:
+			BErrorOutput*			errorOutput;
+			union {
+				BPackageContentHandler*			packageContentHandler;
+				BLowLevelPackageContentHandler*	lowLevelHandler;
+			};
+			bool					hasLowLevelHandler;
+			bool					ignoreUnknownAttributes;
+
+			BHPKGPackageSectionID	section;
+
+public:
+								AttributeHandlerContext(
+									BErrorOutput* errorOutput,
+									BPackageContentHandler*
+										packageContentHandler,
+									BHPKGPackageSectionID section,
+									bool ignoreUnknownAttributes);
+								AttributeHandlerContext(
+									BErrorOutput* errorOutput,
+									BLowLevelPackageContentHandler*
+										lowLevelHandler,
+									BHPKGPackageSectionID section,
+									bool ignoreUnknownAttributes);
+
+			void				ErrorOccurred();
+};
+
+
+class ReaderImplBase::AttributeHandler
+	: public SinglyLinkedListLinkImpl<AttributeHandler> {
+public:
+	virtual						~AttributeHandler();
+
+			void				SetLevel(int level);
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+
+	virtual	status_t			NotifyDone(AttributeHandlerContext* context);
+
+	virtual	status_t			Delete(AttributeHandlerContext* context);
+
+protected:
+			int					fLevel;
+};
+
+
+class ReaderImplBase::IgnoreAttributeHandler : public AttributeHandler {
+};
+
+
+class ReaderImplBase::PackageInfoAttributeHandlerBase
+	: public AttributeHandler {
+private:
+	typedef	AttributeHandler	super;
+public:
+								PackageInfoAttributeHandlerBase(
+									BPackageInfoAttributeValue&
+										packageInfoValue);
+
+	virtual	status_t			NotifyDone(AttributeHandlerContext* context);
+
+protected:
+			BPackageInfoAttributeValue& fPackageInfoValue;
+};
+
+
+class ReaderImplBase::PackageVersionAttributeHandler
+	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
+public:
+								PackageVersionAttributeHandler(
+									BPackageInfoAttributeValue&
+										packageInfoValue,
+									BPackageVersionData& versionData,
+									bool notify);
+
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+
+	virtual	status_t			NotifyDone(AttributeHandlerContext* context);
+
+private:
+			BPackageVersionData& fPackageVersionData;
+			bool				fNotify;
+};
+
+
+class ReaderImplBase::PackageResolvableAttributeHandler
+	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
+public:
+								PackageResolvableAttributeHandler(
+									BPackageInfoAttributeValue&
+										packageInfoValue);
+
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+};
+
+
+class ReaderImplBase::PackageResolvableExpressionAttributeHandler
+	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
+public:
+								PackageResolvableExpressionAttributeHandler(
+									BPackageInfoAttributeValue&
+										packageInfoValue);
+
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+};
+
+
+class ReaderImplBase::GlobalWritableFileInfoAttributeHandler
+	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
+public:
+								GlobalWritableFileInfoAttributeHandler(
+									BPackageInfoAttributeValue&
+										packageInfoValue);
+
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+};
+
+
+class ReaderImplBase::UserSettingsFileInfoAttributeHandler
+	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
+public:
+								UserSettingsFileInfoAttributeHandler(
+									BPackageInfoAttributeValue&
+										packageInfoValue);
+
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+};
+
+
+class ReaderImplBase::UserAttributeHandler
+	: public PackageInfoAttributeHandlerBase {
+private:
+	typedef	PackageInfoAttributeHandlerBase	super;
+public:
+								UserAttributeHandler(
+									BPackageInfoAttributeValue&
+										packageInfoValue);
+
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+
+	virtual	status_t			NotifyDone(AttributeHandlerContext* context);
+
+private:
+			Array<const char*>	fGroups;
+};
+
+
+class ReaderImplBase::PackageAttributeHandler : public AttributeHandler {
+private:
+	typedef	AttributeHandler	super;
+public:
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+
+private:
+			BPackageInfoAttributeValue fPackageInfoValue;
+};
+
+
+class ReaderImplBase::LowLevelAttributeHandler : public AttributeHandler {
+private:
+	typedef	AttributeHandler	super;
+public:
+								LowLevelAttributeHandler();
+								LowLevelAttributeHandler(uint8 id,
+									const BPackageAttributeValue& value,
+									void* parentToken, void* token);
+
+	virtual	status_t			HandleAttribute(
+									AttributeHandlerContext* context, uint8 id,
+									const AttributeValue& value,
+									AttributeHandler** _handler);
+
+	virtual	status_t			NotifyDone(AttributeHandlerContext* context);
+
+private:
+			void*				fParentToken;
+			void*				fToken;
+			uint8				fID;
+			AttributeValue		fValue;
+};
+
+
+// #pragma mark - template and inline methods
+
+
+template<typename Header, uint32 kMagic, uint16 kVersion, uint16 kMinorVersion>
+status_t
+ReaderImplBase::Init(int fd, bool keepFD, Header& header, uint32 flags)
+{
+	status_t error = _Init(fd, keepFD);
+	if (error != B_OK)
+		return error;
+
+	// stat the file
+	struct stat st;
+	if (fstat(FD(), &st) < 0) {
+		ErrorOutput()->PrintError("Error: Failed to access %s file: %s\n",
+			fFileType, strerror(errno));
+		return errno;
+	}
+
+	// read the header
+	if ((error = ReadBuffer(0, &header, sizeof(header))) != B_OK)
+		return error;
+
+	// check the header
+
+	// magic
+	if (B_BENDIAN_TO_HOST_INT32(header.magic) != kMagic) {
+		ErrorOutput()->PrintError("Error: Invalid %s file: Invalid "
+			"magic\n", fFileType);
+		return B_BAD_DATA;
+	}
+
+	// version
+	if (B_BENDIAN_TO_HOST_INT16(header.version) != kVersion) {
+		if ((flags & B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE) == 0) {
+			ErrorOutput()->PrintError("Error: Invalid/unsupported %s file "
+				"version (%d)\n", fFileType,
+				B_BENDIAN_TO_HOST_INT16(header.version));
+		}
+		return B_MISMATCHED_VALUES;
+	}
+
+	fMinorFormatVersion = B_BENDIAN_TO_HOST_INT16(header.minor_version);
+	fCurrentMinorFormatVersion = kMinorVersion;
+
+	// header size
+	uint64 heapOffset = B_BENDIAN_TO_HOST_INT16(header.header_size);
+	if (heapOffset < (off_t)sizeof(header)) {
+		ErrorOutput()->PrintError("Error: Invalid %s file: Invalid header "
+			"size (%" B_PRIu64 ")\n", fFileType, heapOffset);
+		return B_BAD_DATA;
+	}
+
+	// total size
+	uint64 totalSize = B_BENDIAN_TO_HOST_INT64(header.total_size);
+	if (totalSize != (uint64)st.st_size) {
+		ErrorOutput()->PrintError("Error: Invalid %s file: Total size in "
+			"header (%" B_PRIu64 ") doesn't agree with total file size (%"
+			B_PRIdOFF ")\n", fFileType, totalSize, st.st_size);
+		return B_BAD_DATA;
+	}
+
+	// heap size
+	uint64 compressedHeapSize
+		= B_BENDIAN_TO_HOST_INT64(header.heap_size_compressed);
+	if (compressedHeapSize > totalSize
+		|| heapOffset > totalSize - compressedHeapSize) {
+		ErrorOutput()->PrintError("Error: Invalid %s file: Heap size in "
+			"header (%" B_PRIu64 ") doesn't agree with total file size (%"
+			B_PRIu64 ") and heap offset (%" B_PRIu64 ")\n", fFileType,
+			compressedHeapSize, totalSize, heapOffset);
+		return B_BAD_DATA;
+	}
+
+	error = InitHeapReader(
+		B_BENDIAN_TO_HOST_INT16(header.heap_compression),
+		B_BENDIAN_TO_HOST_INT32(header.heap_chunk_size), heapOffset,
+		compressedHeapSize,
+		B_BENDIAN_TO_HOST_INT64(header.heap_size_uncompressed));
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
+}
 
 
 inline int
@@ -274,7 +519,7 @@ ReaderImplBase::ErrorOutput() const
 }
 
 
-ReaderImplBase::SectionInfo*
+PackageFileSection*
 ReaderImplBase::CurrentSection()
 {
 	return fCurrentSection;
@@ -282,7 +527,7 @@ ReaderImplBase::CurrentSection()
 
 
 void
-ReaderImplBase::SetCurrentSection(SectionInfo* section)
+ReaderImplBase::SetCurrentSection(PackageFileSection* section)
 {
 	fCurrentSection = section;
 }

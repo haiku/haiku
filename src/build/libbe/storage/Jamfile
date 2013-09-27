@@ -2,21 +2,22 @@ SubDir HAIKU_TOP src build libbe storage ;
 
 UsePrivateBuildHeaders app kernel shared storage ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
-
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage mime ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage sniffer ] ;
 
 USES_BE_API on <libbe_build>storage_kit.o = true ;
 
 BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	AppFileInfo.cpp
 	Directory.cpp
+	DriverSettings.cpp
 	Entry.cpp
 	EntryList.cpp
 	File.cpp
 	FileIO.cpp
 	FindDirectory.cpp
+	MergedDirectory.cpp
 	Mime.cpp
 	MimeType.cpp
 	Node.cpp
@@ -33,7 +34,30 @@ BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	Volume.cpp
 	storage_support.cpp
 
+	# mime
+	AppMetaMimeCreator.cpp
+	AssociatedTypes.cpp
+	Database.cpp
+	DatabaseDirectory.cpp
+	DatabaseLocation.cpp
 	database_support.cpp
-	MimeUpdateThread.cpp
-	UpdateMimeInfoThread.cpp
+	InstalledTypes.cpp
+	MimeEntryProcessor.cpp
+	MimeInfoUpdater.cpp
+	MimeSniffer.cpp
+	SnifferRules.cpp
+	Supertype.cpp
+	SupportingApps.cpp
+
+	# sniffer
+	CharStream.cpp
+	Err.cpp
+	DisjList.cpp
+	Pattern.cpp
+	PatternList.cpp
+	Parser.cpp
+	Range.cpp
+	RPattern.cpp
+	RPatternList.cpp
+	Rule.cpp
 ;

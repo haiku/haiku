@@ -97,26 +97,28 @@ rule FSplitPath
 }
 
 
-rule FSetConditionsHold conditions : set
+rule FConditionsHold conditions : predicate
 {
-	# FSetConditionsHold <conditions> : <set> ;
-	# Checks whether the conditions <conditions> are satisfied by the list of
-	# elements <set> and returns a respective result (if so: "1", if not: empty
-	# list). The conditions are satisfied when <conditions> is not empty and
+	# FConditionsHold <conditions> : <predicate> ;
+	# Checks whether the conditions <conditions> are satisfied by the predicate
+	# rule <predicate> and returns a respective result (if so: "1", if not:
+	# empty list). The conditions are satisfied when <conditions> is not empty
+	# and
 	# * none of the negative conditions it contains hold and
-	# * if <conditions> contains any positive conditions, at least one one of
-	#   those holds.
+	# * if <conditions> contains any positive conditions, at least one of those
+	#   holds.
 	# A positive condition is an element not starting with a "!". It holds when
-	# the element is contained in <set>.
+	# the predicate rule <predicate> returns true for the element.
 	# A negative condition is an element that starts with a "!". It holds when
-	# the string resulting from removing the leading "!" is not contained in
-	# <set>.
+	# the predicate rule <predicate> returns true for the string resulting from
+	# removing the leading "!".
 	#
 	# <conditions> - The list of conditions.
-	# <set> - The elements against which the conditions are tested.
+	# <predicate> - The predicate rule invoked to test the elements.
 	#
 	# Examples:
-	# For set { a b c } the following conditions hold:
+	# For a predicate that holds for the elements of the set { a b c } the
+	# following conditions hold:
 	# { a }, { a d }, { !d }, { !d !e }, { a !d }, { b !e !f }
 	# The following conditions don't hold:
 	# { }, { d }, { d e }, { !a }, { !a b }, { !d e } { a b !c !d }
@@ -131,14 +133,14 @@ rule FSetConditionsHold conditions : set
 			{
 				hasNegative = 1 ;
 				condition = [ Match "!(.*)" : $(condition) ] ;
-				if $(condition) in $(set) {
+				if [ $(predicate) $(condition) ] {
 					return ;
 				}
 			}
 			case * :
 			{
 				hasPositive = 1 ;
-				if $(condition) in $(set) {
+				if [ $(predicate) $(condition) ] {
 					positiveMatch = 1 ;
 				}
 			}
@@ -205,6 +207,9 @@ rule SetPlatformCompatibilityFlagVariables
 			$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE = true ;
 		}
 
+		case host :
+			# not compatible to anything
+
 		case * :
 		{
 			if ! ( $(platform) in $(otherPlatforms) ) {
@@ -267,19 +272,19 @@ rule FAnalyzeGCCVersion
 	return $(version) ;
 }
 
-rule SetIncludePropertiesVariables
+rule SetIncludePropertiesVariables prefix : suffix
 {
-	# SetIncludePropertiesVariables <varPrefix> ;
+	# SetIncludePropertiesVariables <prefix> : <suffix> ;
 	#
-	local prefix = $(1) ;
-	if $($(prefix)_GCC_VERSION[1]) < 4 {
-		$(prefix)_INCLUDES_SEPARATOR = -I- ;
-		$(prefix)_LOCAL_INCLUDES_OPTION = -I ;
-		$(prefix)_SYSTEM_INCLUDES_OPTION = -I ;
+	suffix = $(suffix:E=) ;
+	if $($(prefix)_GCC_VERSION$(suffix)[1]) < 4 {
+		$(prefix)_INCLUDES_SEPARATOR$(suffix) = -I- ;
+		$(prefix)_LOCAL_INCLUDES_OPTION$(suffix) = -I ;
+		$(prefix)_SYSTEM_INCLUDES_OPTION$(suffix) = -I ;
 	} else {
-		$(prefix)_INCLUDES_SEPARATOR = ;
-		$(prefix)_LOCAL_INCLUDES_OPTION = "-iquote " ;
-		$(prefix)_SYSTEM_INCLUDES_OPTION = "-I " ;
+		$(prefix)_INCLUDES_SEPARATOR$(suffix) = ;
+		$(prefix)_LOCAL_INCLUDES_OPTION$(suffix) = "-iquote " ;
+		$(prefix)_SYSTEM_INCLUDES_OPTION$(suffix) = "-I " ;
 	}
 }
 

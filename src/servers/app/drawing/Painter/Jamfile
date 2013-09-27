@@ -9,7 +9,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app font ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
-UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+UseBuildFeatureHeaders freetype ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing_modes ] ;
 
@@ -19,7 +19,7 @@ if $(TARGET_ARCH) = x86 {
 }
 
 Includes [ FGristFiles AGGTextRenderer.cpp Painter.cpp ]
-	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+	: [ BuildFeatureAttribute freetype : headers ] ;
 
 StaticLibrary libpainter.a :
 	GlobalSubpixelSettings.cpp

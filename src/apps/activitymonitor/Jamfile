@@ -11,7 +11,7 @@ Application ActivityMonitor :
 	SystemInfo.cpp
 	SystemInfoHandler.cpp
 	: be tracker media libbnetapi.so libshared.a $(TARGET_LIBSTDC++)
-		$(TARGET_NETWORK_LIBS) $(HAIKU_LOCALE_LIBS)
+		$(TARGET_NETWORK_LIBS) localestub
 	: ActivityMonitor.rdef
 	;
 

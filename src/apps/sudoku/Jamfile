@@ -12,7 +12,7 @@ Application Sudoku :
 	SudokuView.cpp
 	SudokuWindow.cpp
 
-	: be tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
+	: be tracker localestub $(TARGET_LIBSTDC++)
 	: Sudoku.rdef
 	;
 

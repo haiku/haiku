@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src tools makebootable platform bios_ia32 ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_systems bfs ;
 
 UsePrivateHeaders storage shared ;
-UsePrivateSystemHeaders system ;
+UsePrivateSystemHeaders ;
 
 SEARCH_SOURCE
 	+= [ FDirName $(HAIKU_TOP) src bin makebootable platform bios_ia32 ] ;

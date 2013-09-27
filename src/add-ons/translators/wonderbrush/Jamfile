@@ -5,13 +5,13 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 # Include support sub folder
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators wonderbrush support ] ;
 
-UseHeaders $(HAIKU_ZLIB_HEADERS) : true ;
+UseBuildFeatureHeaders zlib ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources WonderBrushTranslator : WonderBrushTranslator.rdef ;
 
 Includes [ FGristFiles bitmap_compression.cpp ]
-	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
+	: [ BuildFeatureAttribute zlib : headers ] ;
 
 Translator WonderBrushTranslator :
 	Canvas.cpp
@@ -26,8 +26,10 @@ Translator WonderBrushTranslator :
 	blending.cpp
 	lab_convert.cpp
 
-	: be translation $(HAIKU_ZLIB_LIB) libtranslatorsutils.a
-	$(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be translation
+	[ BuildFeatureAttribute zlib : library ]
+	libtranslatorsutils.a
+	$(TARGET_LIBSUPC++) localestub
 	: true
 ;
 
@@ -39,8 +41,3 @@ DoCatalogs WonderBrushTranslator :
 	WonderBrushTranslator.cpp
 	WonderBrushView.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	WonderBrushTranslator :
-	boot home config add-ons Translators ;
-

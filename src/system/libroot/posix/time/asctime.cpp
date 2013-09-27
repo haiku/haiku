@@ -8,6 +8,8 @@
 #include <time.h>
 #include <stdio.h>
 
+#include <errno_private.h>
+
 #include "PosixLCTimeInfo.h"
 
 
@@ -30,6 +32,11 @@ print_time(char* buffer, size_t bufferSize, const struct tm* tm)
 extern "C" char*
 asctime(const struct tm* tm)
 {
+	if (tm == NULL) {
+		__set_errno(EINVAL);
+		return NULL;
+	}
+
 	static char buffer[26];
 		// That's enough to hold normal dates (i.e. with 4-digit years), for any
 		// other dates the behaviour of asctime() is undefined according to the
@@ -42,6 +49,11 @@ asctime(const struct tm* tm)
 extern "C" char*
 asctime_r(const struct tm* tm, char* buffer)
 {
+	if (tm == NULL) {
+		__set_errno(EINVAL);
+		return NULL;
+	}
+
 	return print_time(buffer, 26, tm);
 		// 26 bytes seems to be required by the standard, so we can't write more
 }

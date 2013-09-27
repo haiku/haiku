@@ -1,5 +1,5 @@
 SubDir HAIKU_TOP src tests kits opengl direct_mode ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+UseBuildFeatureHeaders mesa ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -14,7 +14,7 @@ local sources =
 	GLDirectMode.cpp
 ;
 
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
 SimpleTest GLDirectMode :
 	$(sources)

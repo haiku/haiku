@@ -22,7 +22,6 @@
 #include "package.h"
 #include "PackageWriterListener.h"
 #include "PackageWritingUtils.h"
-#include "StandardErrorOutput.h"
 
 
 using namespace BPackageKit::BHPKG;
@@ -36,6 +35,7 @@ command_add(int argc, const char* const* argv)
 	bool quiet = false;
 	bool verbose = false;
 	bool force = false;
+	int32 compressionLevel = BPackageKit::BHPKG::B_HPKG_COMPRESSION_LEVEL_BEST;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -46,12 +46,25 @@ command_add(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+C:fhi:qv", sLongOptions,
-			NULL);
+		int c = getopt_long(argc, (char**)argv, "+0123456789C:fhi:qv",
+			sLongOptions, NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				compressionLevel = c - '0';
+				break;
+
 			case 'C':
 				changeToDirectory = optarg;
 				break;
@@ -97,10 +110,14 @@ command_add(int argc, const char* const* argv)
 	int entriesToAddCount = argc - optind;
 
 	// create package
+	BPackageWriterParameters writerParameters;
+	writerParameters.SetFlags(
+		B_HPKG_WRITER_UPDATE_PACKAGE | (force ? B_HPKG_WRITER_FORCE_ADD : 0));
+	writerParameters.SetCompressionLevel(compressionLevel);
+
 	PackageWriterListener listener(verbose, quiet);
 	BPackageWriter packageWriter(&listener);
-	status_t result = packageWriter.Init(packageFileName,
-		B_HPKG_WRITER_UPDATE_PACKAGE | (force ? B_HPKG_WRITER_FORCE_ADD : 0));
+	status_t result = packageWriter.Init(packageFileName, &writerParameters);
 	if (result != B_OK)
 		return 1;
 

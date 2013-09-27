@@ -12,12 +12,12 @@ SubDirSysHdrs [ FDirName $(SUBDIR) md5 ] ;
 # use OpenSSL, if enabled
 local sslSources ;
 
-if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
+if [ FIsBuildFeatureEnabled openssl ] {
 	SubDirCcFlags -DHAVE_LIBSSL ;
-	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
+	UseBuildFeatureHeaders openssl ;
 	sslSources = openssl.c ;
 	Includes [ FGristFiles $(sslSources) ]
-		: $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
+		: [ BuildFeatureAttribute openssl : headers ] ;
 		# Dependency needed to trigger downloading/unzipping the package before
 		# compiling the files.
 	SetupFeatureObjectsDir ssl ;
@@ -75,5 +75,5 @@ BinCommand wget :
 	xmalloc.c
 	xalloc-die.c
 	$(sslSources)
-	: $(TARGET_NETWORK_LIBS) $(HAIKU_OPENSSL_LIBS)
+	: $(TARGET_NETWORK_LIBS) [ BuildFeatureAttribute openssl : libraries ]
 ;

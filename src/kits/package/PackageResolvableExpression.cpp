@@ -7,6 +7,7 @@
 #include <package/PackageResolvableExpression.h>
 
 #include <package/hpkg/PackageInfoAttributeValue.h>
+#include <package/PackageResolvable.h>
 
 
 namespace BPackageKit {
@@ -95,7 +96,7 @@ BPackageResolvableExpression::ToString() const
 	BString string = fName;
 
 	if (fVersion.InitCheck() == B_OK)
-		string << fOperator << fVersion.ToString();
+		string << kOperatorNames[fOperator] << fVersion.ToString();
 
 	return string;
 }
@@ -119,6 +120,65 @@ BPackageResolvableExpression::Clear()
 	fName.Truncate(0);
 	fOperator = B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT;
 	fVersion.Clear();
+}
+
+
+bool
+BPackageResolvableExpression::Matches(const BPackageVersion& version,
+	const BPackageVersion& compatibleVersion) const
+{
+	// If no particular version is required, we always match.
+	if (fVersion.InitCheck() != B_OK)
+		return true;
+
+	if (version.InitCheck() != B_OK)
+		return false;
+
+	int compare = version.Compare(fVersion);
+	bool matches = false;
+	switch (fOperator) {
+		case B_PACKAGE_RESOLVABLE_OP_LESS:
+			matches = compare < 0;
+			break;
+		case B_PACKAGE_RESOLVABLE_OP_LESS_EQUAL:
+			matches = compare <= 0;
+			break;
+		case B_PACKAGE_RESOLVABLE_OP_EQUAL:
+			matches = compare == 0;
+			break;
+		case B_PACKAGE_RESOLVABLE_OP_NOT_EQUAL:
+			matches = compare != 0;
+			break;
+		case B_PACKAGE_RESOLVABLE_OP_GREATER_EQUAL:
+			matches = compare >= 0;
+			break;
+		case B_PACKAGE_RESOLVABLE_OP_GREATER:
+			matches = compare > 0;
+			break;
+		default:
+			break;
+	}
+	if (!matches)
+		return false;
+
+	// Check compatible version. If not specified, the match must be exact.
+	// Otherwise fVersion must be >= compatibleVersion.
+	if (compatibleVersion.InitCheck() != B_OK)
+		return compare == 0;
+
+	// Since compatibleVersion <= version, we can save the comparison, if
+	// version <= fVersion.
+	return compare <= 0 || compatibleVersion.Compare(fVersion) <= 0;
+}
+
+
+bool
+BPackageResolvableExpression::Matches(const BPackageResolvable& provides) const
+{
+	if (provides.Name() != fName)
+		return false;
+
+	return Matches(provides.Version(), provides.CompatibleVersion());
 }
 
 

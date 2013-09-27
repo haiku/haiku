@@ -4,7 +4,7 @@ AddResources Leaves : Leaves.rdef ;
 
 ScreenSaver Leaves :
 	Leaves.cpp :
-	be screensaver $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	be screensaver $(TARGET_LIBSUPC++) localestub
 ;
 
 DoCatalogs Leaves :

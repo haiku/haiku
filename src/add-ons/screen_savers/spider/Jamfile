@@ -9,7 +9,7 @@ ScreenSaver Spider :
 	PolygonQueue.cpp
 	SpiderSaver.cpp
 
-	: be libscreensaver.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be libscreensaver.so localestub $(TARGET_LIBSUPC++)
 ;
 
 DoCatalogs Spider :

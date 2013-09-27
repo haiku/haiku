@@ -16,11 +16,8 @@
 #include <fs_attr.h>
 #include <NodeInfo.h>
 #include <Path.h>
-#include <String.h>
 #include <SymLink.h>
 
-#include "InstallerWindow.h"
-	// TODO: For PACKAGES_DIRECTORY and VAR_DIRECTORY, not so nice...
 #include "SemaphoreLocker.h"
 #include "ProgressReporter.h"
 
@@ -28,11 +25,24 @@
 using std::nothrow;
 
 
-CopyEngine::CopyEngine(ProgressReporter* reporter)
+// #pragma mark - EntryFilter
+
+
+CopyEngine::EntryFilter::~EntryFilter()
+{
+}
+
+
+// #pragma mark - CopyEngine
+
+
+CopyEngine::CopyEngine(ProgressReporter* reporter, EntryFilter* entryFilter)
 	:
 	fBufferQueue(),
 	fWriterThread(-1),
 	fQuitting(false),
+
+	fAbsoluteSourcePath(),
 
 	fBytesRead(0),
 	fLastBytesRead(0),
@@ -49,7 +59,8 @@ CopyEngine::CopyEngine(ProgressReporter* reporter)
 	fCurrentTargetFolder(NULL),
 	fCurrentItem(NULL),
 
-	fProgressReporter(reporter)
+	fProgressReporter(reporter),
+	fEntryFilter(entryFilter)
 {
 	fWriterThread = spawn_thread(_WriteThreadEntry, "buffer writer",
 		B_NORMAL_PRIORITY, this);
@@ -84,6 +95,8 @@ CopyEngine::ResetTargets(const char* source)
 	// TODO: One could subtract the bytes/items which were added to the
 	// ProgressReporter before resetting them...
 
+	fAbsoluteSourcePath = source;
+
 	fBytesRead = 0;
 	fLastBytesRead = 0;
 	fItemsCopied = 0;
@@ -98,19 +111,6 @@ CopyEngine::ResetTargets(const char* source)
 
 	fCurrentTargetFolder = NULL;
 	fCurrentItem = NULL;
-
-	// init BEntry pointing to /var
-	// There is no other way to retrieve the path to the var folder
-	// on the source volume. Using find_directory() with
-	// B_COMMON_VAR_DIRECTORY will only ever get the var folder on the
-	// current /boot volume regardless of the volume of "source", which
-	// makes sense, since passing a volume is meant to folders that are
-	// volume specific, like "trash".
-	BPath path(source);
-	if (path.Append("common/var/swap") == B_OK)
-		fSwapFileEntry.SetTo(path.Path());
-	else
-		fSwapFileEntry.Unset();
 }
 
 
@@ -141,7 +141,6 @@ CopyEngine::CopyFile(const BEntry& _source, const BEntry& _destination,
 	SemaphoreLocker lock(cancelSemaphore);
 	if (cancelSemaphore >= 0 && !lock.IsLocked()) {
 		// We are supposed to quit
-printf("CopyFile - cancled\n");
 		return B_CANCELED;
 	}
 
@@ -241,13 +240,16 @@ CopyEngine::_CollectCopyInfo(const char* _source, int32& level,
 		struct stat statInfo;
 		entry.GetStat(&statInfo);
 
-		char name[B_FILE_NAME_LENGTH];
-		status_t ret = entry.GetName(name);
+		BPath sourceEntryPath;
+		status_t ret = entry.GetPath(&sourceEntryPath);
 		if (ret < B_OK)
 			return ret;
 
-		if (!_ShouldCopyEntry(entry, name, statInfo, level))
+		if (fEntryFilter != NULL
+			&& !fEntryFilter->ShouldCopyEntry(entry,
+				_RelativeEntryPath(sourceEntryPath.Path()), statInfo, level)) {
 			continue;
+		}
 
 		if (S_ISDIR(statInfo.st_mode)) {
 			// handle recursive directory copy
@@ -309,16 +311,22 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 			return B_CANCELED;
 		}
 
-		char name[B_FILE_NAME_LENGTH];
-		status_t ret = entry.GetName(name);
-		if (ret < B_OK)
+		const char* name = entry.Name();
+		BPath sourceEntryPath;
+		status_t ret = entry.GetPath(&sourceEntryPath);
+		if (ret != B_OK)
 			return ret;
+		const char* relativeSourceEntryPath
+			= _RelativeEntryPath(sourceEntryPath.Path());
 
 		struct stat statInfo;
 		entry.GetStat(&statInfo);
 
-		if (!_ShouldCopyEntry(entry, name, statInfo, level))
+		if (fEntryFilter != NULL
+			&& !fEntryFilter->ShouldCopyEntry(entry, relativeSourceEntryPath,
+				statInfo, level)) {
 			continue;
+		}
 
 		fItemsCopied++;
 		fCurrentItem = name;
@@ -333,9 +341,11 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 			if (copy.Exists()) {
 				ret = B_OK;
 				if (copy.IsDirectory()) {
-					if (_ShouldClobberFolder(name, statInfo, level))
+					if (fEntryFilter
+						&& fEntryFilter->ShouldClobberFolder(entry,
+							relativeSourceEntryPath, statInfo, level)) {
 						ret = _RemoveFolder(copy);
-					else {
+					} else {
 						// Do not overwrite attributes on folders that exist.
 						// This should work better when the install target
 						// already contains a Haiku installation.
@@ -351,11 +361,6 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 				}
 			}
 
-			BPath srcFolder;
-			ret = entry.GetPath(&srcFolder);
-			if (ret < B_OK)
-				return ret;
-
 			BPath dstFolder;
 			ret = copy.GetPath(&dstFolder);
 			if (ret < B_OK)
@@ -364,7 +369,7 @@ CopyEngine::_CopyFolder(const char* _source, const char* _destination,
 			if (cancelSemaphore >= 0)
 				lock.Unlock();
 
-			ret = _CopyFolder(srcFolder.Path(), dstFolder.Path(), level,
+			ret = _CopyFolder(sourceEntryPath.Path(), dstFolder.Path(), level,
 				cancelSemaphore);
 			if (ret < B_OK)
 				return ret;
@@ -481,6 +486,20 @@ CopyEngine::_RemoveFolder(BEntry& entry)
 }
 
 
+const char*
+CopyEngine::_RelativeEntryPath(const char* absoluteSourcePath) const
+{
+	if (strncmp(absoluteSourcePath, fAbsoluteSourcePath,
+			fAbsoluteSourcePath.Length()) != 0) {
+		return absoluteSourcePath;
+	}
+
+	const char* relativePath
+		= absoluteSourcePath + fAbsoluteSourcePath.Length();
+	return relativePath[0] == '/' ? relativePath + 1 : relativePath;
+}
+
+
 void
 CopyEngine::_UpdateProgress()
 {
@@ -501,66 +520,6 @@ CopyEngine::_UpdateProgress()
 
 	fProgressReporter->ItemsWritten(items, bytes, fCurrentItem,
 		fCurrentTargetFolder);
-}
-
-
-bool
-CopyEngine::_ShouldCopyEntry(const BEntry& entry, const char* name,
-	const struct stat& statInfo, int32 level) const
-{
-	if (level == 1 && S_ISDIR(statInfo.st_mode)) {
-		if (strcmp(VAR_DIRECTORY, name) == 0) {
-			// old location of /boot/var
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-		if (strcmp(PACKAGES_DIRECTORY, name) == 0) {
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-		if (strcmp(SOURCES_DIRECTORY, name) == 0) {
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-		if (strcmp("rr_moved", name) == 0) {
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-	}
-	if (level == 1 && S_ISREG(statInfo.st_mode)) {
-		if (strcmp("boot.catalog", name) == 0) {
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-		if (strcmp("haiku-boot-floppy.image", name) == 0) {
-			printf("ignoring '%s'.\n", name);
-			return false;
-		}
-	}
-	if (fSwapFileEntry == entry) {
-		// current location of var
-		printf("ignoring swap file\n");
-		return false;
-	}
-	return true;
-}
-
-
-bool
-CopyEngine::_ShouldClobberFolder(const char* name, const struct stat& statInfo,
-	int32 level) const
-{
-	if (level == 1 && S_ISDIR(statInfo.st_mode)) {
-		if (strcmp("system", name) == 0) {
-			printf("clobbering '%s'.\n", name);
-			return true;
-		}
-//		if (strcmp("develop", name) == 0) {
-//			printf("clobbering '%s'.\n", name);
-//			return true;
-//		}
-	}
-	return false;
 }
 
 
@@ -621,5 +580,3 @@ CopyEngine::_WriteThread()
 			megaBytes / seconds);
 	}
 }
-
-

@@ -17,12 +17,8 @@ Addon hmulti_audio.media_addon :
 	MultiAudioUtility.cpp
 	Resampler.cpp
 	TimeComputer.cpp
-	: be media $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be media $(TARGET_LIBSUPC++) localestub
 ;
-
-Package haiku-multi_audio-cvs
-	: hmulti_audio.media_addon
-	: boot home config add-ons media ;
 
 DoCatalogs hmulti_audio.media_addon
 	:

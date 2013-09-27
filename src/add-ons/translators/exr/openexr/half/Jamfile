@@ -2,12 +2,17 @@ SubDir HAIKU_TOP src add-ons translators exr openexr half ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
 
-if $(HAIKU_LIBSTDC++) = libstdc++.r4.so {
-	SubDirC++Flags -Dios_base=ios -ftemplate-depth-24 ;
-}
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+			SubDirC++Flags -Dios_base=ios -ftemplate-depth-24 ;
+		}
 
-StaticLibrary libhalf.a :
-eLut.cpp
-half.cpp
-toFloat.cpp
-;
+		StaticLibrary [ MultiArchDefaultGristFiles libhalf.a ] :
+			eLut.cpp
+			half.cpp
+			toFloat.cpp
+			;
+	}
+}

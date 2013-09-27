@@ -71,11 +71,13 @@ rule ObjectSysHdrs
 					[ FSysIncludes $(sysHeaders)
 						: $(HOST_SYSTEM_INCLUDES_OPTION) ] ;
 			} else {
+				local architecture = $(TARGET_PACKAGING_ARCH) ;
 				fileHeaders =
-					[ FIncludes $(HDRS) : $(TARGET_LOCAL_INCLUDES_OPTION) ]
-					$(TARGET_INCLUDES_SEPARATOR)
+					[ FIncludes $(HDRS)
+						: $(TARGET_LOCAL_INCLUDES_OPTION_$(architecture)) ]
+					$(TARGET_INCLUDES_SEPARATOR_$(architecture))
 					[ FSysIncludes $(sysHeaders)
-						: $(TARGET_SYSTEM_INCLUDES_OPTION) ] ;
+						: $(TARGET_SYSTEM_INCLUDES_OPTION_$(architecture)) ] ;
 			}
 
 			ASHDRS on $(file) = $(fileHeaders) ;
@@ -408,7 +410,22 @@ rule UsePrivateKernelHeaders
 
 rule UsePrivateSystemHeaders
 {
-	UseHeaders $(TARGET_PRIVATE_SYSTEM_HEADERS) : true ;
+	UseHeaders $(TARGET_PRIVATE_SYSTEM_HEADERS_$(TARGET_PACKAGING_ARCH))
+		: true ;
+}
+
+
+rule UseBuildFeatureHeaders feature : attribute 
+{
+	# UseBuildFeatureHeaders <feature> : [ <attribute> ] ;
+	# A shorthand for
+	# UseHeaders [ BuildFeatureAttribute <feature> : <attribute> ] : true ;
+	# Moreover the default value for <attribute> is "headers", which usually
+	# allows the rule to be called with the feature name as the only parameter.
+
+	local headers = [ BuildFeatureAttribute $(feature) : $(attribute:E=headers)
+		: path ] ;
+	UseHeaders $(headers) : true ;
 }
 
 
@@ -426,7 +443,7 @@ rule FStandardOSHeaders
 }
 
 
-rule FStandardHeaders
+rule FStandardHeaders architecture
 {
 	local osIncludes = add-ons add-ons/file_system add-ons/graphics
 					   add-ons/input_server add-ons/registrar
@@ -439,14 +456,14 @@ rule FStandardHeaders
 
 	# The C++ headers. If specified, we use the compiler headers, otherwise
 	# the ones that come with our libstdc++.
-	if $(HAIKU_C++_HEADERS_DIR) {
-		headers += $(HAIKU_C++_HEADERS_DIR) ;
+	if $(HAIKU_C++_HEADERS_DIR_$(architecture)) {
+		headers += $(HAIKU_C++_HEADERS_DIR_$(architecture)) ;
 	} else {
 		headers += [ FDirName $(HAIKU_TOP) headers cpp ] ;
 	}
 
 	# GCC headers
-	headers += $(HAIKU_GCC_HEADERS_DIR) ;
+	headers += $(HAIKU_GCC_HEADERS_DIR_$(architecture)) ;
 
 	# Use headers directory, to allow to do things like include <posix/string.h>
 	headers += [ FDirName $(HAIKU_TOP) headers ] ;

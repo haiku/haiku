@@ -1,8 +1,9 @@
 SubDir HAIKU_TOP src bin gdb readline ;
 
 # filter warnings we don't want here
-TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
-	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH)
+	= [ FFilter $(TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH))
+		: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 local RL_LIBRARY_VERSION = 4.3 ;
 

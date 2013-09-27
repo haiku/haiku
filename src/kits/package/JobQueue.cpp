@@ -159,8 +159,9 @@ JobQueue::Pop()
 			if (head == fQueuedJobs->end())
 				return NULL;
 		}
+		BJob* job = *head;
 		fQueuedJobs->erase(head);
-		return *head;
+		return job;
 	}
 
 	return NULL;
@@ -235,7 +236,8 @@ JobQueue::_RemoveDependantJobsOf(BJob* job)
 		} catch (...) {
 		}
 		_RemoveDependantJobsOf(dependantJob);
-		delete job;
+		dependantJob->RemoveDependency(job);
+		delete dependantJob;
 	}
 }
 

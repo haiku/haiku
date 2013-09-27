@@ -17,6 +17,7 @@
 #include <File.h>
 #include <Message.h>
 
+#include <AutoDeleter.h>
 #include <package/PackageInfo.h>
 
 
@@ -25,14 +26,14 @@ namespace BPackageKit {
 
 const uint8 BRepositoryInfo::kDefaultPriority	= 50;
 
-const char* BRepositoryInfo::kNameField			= "name";
-const char* BRepositoryInfo::kURLField			= "url";
-const char* BRepositoryInfo::kVendorField		= "vendor";
-const char* BRepositoryInfo::kSummaryField		= "summary";
-const char* BRepositoryInfo::kPriorityField		= "priority";
-const char* BRepositoryInfo::kArchitectureField	= "architecture";
-const char* BRepositoryInfo::kLicenseNameField	= "licenseName";
-const char* BRepositoryInfo::kLicenseTextField	= "licenseText";
+const char* const BRepositoryInfo::kNameField			= "name";
+const char* const BRepositoryInfo::kURLField			= "url";
+const char* const BRepositoryInfo::kVendorField			= "vendor";
+const char* const BRepositoryInfo::kSummaryField		= "summary";
+const char* const BRepositoryInfo::kPriorityField		= "priority";
+const char* const BRepositoryInfo::kArchitectureField	= "architecture";
+const char* const BRepositoryInfo::kLicenseNameField	= "licenseName";
+const char* const BRepositoryInfo::kLicenseTextField	= "licenseText";
 
 
 BRepositoryInfo::BRepositoryInfo()
@@ -49,13 +50,13 @@ BRepositoryInfo::BRepositoryInfo(BMessage* data)
 	inherited(data),
 	fLicenseTexts(5)
 {
-	fInitStatus = SetTo(data);
+	fInitStatus = _SetTo(data);
 }
 
 
 BRepositoryInfo::BRepositoryInfo(const BEntry& entry)
 {
-	fInitStatus = SetTo(entry);
+	fInitStatus = _SetTo(entry);
 }
 
 
@@ -119,107 +120,14 @@ BRepositoryInfo::InitCheck() const
 status_t
 BRepositoryInfo::SetTo(const BMessage* data)
 {
-	if (data == NULL)
-		return B_BAD_VALUE;
-
-	status_t result;
-	if ((result = data->FindString(kNameField, &fName)) != B_OK)
-		return result;
-	if ((result = data->FindString(kURLField, &fOriginalBaseURL)) != B_OK)
-		return result;
-	if ((result = data->FindString(kVendorField, &fVendor)) != B_OK)
-		return result;
-	result = data->FindString(kSummaryField, &fSummary);
-	if (result != B_OK)
-		return result;
-	if ((result = data->FindUInt8(kPriorityField, &fPriority)) != B_OK)
-		return result;
-	result = data->FindUInt8(kArchitectureField, (uint8*)&fArchitecture);
-	if (result != B_OK)
-		return result;
-	if (fArchitecture == B_PACKAGE_ARCHITECTURE_ANY)
-		return B_BAD_DATA;
-
-	const char* licenseName;
-	const char* licenseText;
-	for (int i = 0;
-		data->FindString(kLicenseNameField, i, &licenseName) == B_OK
-			&& data->FindString(kLicenseTextField, i, &licenseText) == B_OK;
-		++i) {
-		if (!fLicenseNames.Add(licenseName) || !fLicenseTexts.Add(licenseText))
-			return B_NO_MEMORY;
-	}
-
-	return B_OK;
+	return fInitStatus = _SetTo(data);
 }
 
 
 status_t
 BRepositoryInfo::SetTo(const BEntry& entry)
 {
-	BFile file(&entry, B_READ_ONLY);
-	status_t result = file.InitCheck();
-	if (result != B_OK)
-		return result;
-
-	off_t size;
-	if ((result = file.GetSize(&size)) != B_OK)
-		return result;
-
-	BString configString;
-	char* buffer = configString.LockBuffer(size);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	if ((result = file.Read(buffer, size)) < size) {
-		configString.UnlockBuffer(0);
-		return (result >= 0) ? B_IO_ERROR : result;
-	}
-
-	buffer[size] = '\0';
-	configString.UnlockBuffer(size);
-
-	void* settingsHandle = parse_driver_settings_string(configString.String());
-	if (settingsHandle == NULL)
-		return B_BAD_DATA;
-
-	const char* name = get_driver_parameter(settingsHandle, "name", NULL, NULL);
-	const char* url = get_driver_parameter(settingsHandle, "url", NULL, NULL);
-	const char* vendor
-		= get_driver_parameter(settingsHandle, "vendor", NULL, NULL);
-	const char* summary
-		= get_driver_parameter(settingsHandle, "summary", NULL, NULL);
-	const char* priorityString
-		= get_driver_parameter(settingsHandle, "priority", NULL, NULL);
-	const char* architectureString
-		= get_driver_parameter(settingsHandle, "architecture", NULL, NULL);
-
-	unload_driver_settings(settingsHandle);
-
-	if (name == NULL || *name == '\0' || url == NULL || *url == '\0'
-		|| vendor == NULL || *vendor == '\0'
-		|| summary == NULL || *summary == '\0'
-		|| priorityString == NULL || *priorityString == '\0'
-		|| architectureString == NULL || *architectureString == '\0') {
-		return B_BAD_DATA;
-	}
-
-	BPackageArchitecture architecture;
-	if (BPackageInfo::GetArchitectureByName(architectureString, architecture)
-			!= B_OK || architecture == B_PACKAGE_ARCHITECTURE_ANY) {
-		return B_BAD_DATA;
-	}
-
-	fName = name;
-	fOriginalBaseURL = url;
-	fVendor = vendor;
-	fSummary = summary;
-	fPriority = atoi(priorityString);
-	fArchitecture = architecture;
-
-	fInitStatus = B_OK;
-
-	return B_OK;
+	return fInitStatus = _SetTo(entry);
 }
 
 
@@ -337,6 +245,111 @@ BRepositoryInfo::ClearLicenses()
 {
 	fLicenseNames.MakeEmpty();
 	fLicenseTexts.MakeEmpty();
+}
+
+
+status_t
+BRepositoryInfo::_SetTo(const BMessage* data)
+{
+	if (data == NULL)
+		return B_BAD_VALUE;
+
+	status_t result;
+	if ((result = data->FindString(kNameField, &fName)) != B_OK)
+		return result;
+	if ((result = data->FindString(kURLField, &fOriginalBaseURL)) != B_OK)
+		return result;
+	if ((result = data->FindString(kVendorField, &fVendor)) != B_OK)
+		return result;
+	result = data->FindString(kSummaryField, &fSummary);
+	if (result != B_OK)
+		return result;
+	if ((result = data->FindUInt8(kPriorityField, &fPriority)) != B_OK)
+		return result;
+	result = data->FindUInt8(kArchitectureField, (uint8*)&fArchitecture);
+	if (result != B_OK)
+		return result;
+	if (fArchitecture == B_PACKAGE_ARCHITECTURE_ANY)
+		return B_BAD_DATA;
+
+	const char* licenseName;
+	const char* licenseText;
+	for (int i = 0;
+		data->FindString(kLicenseNameField, i, &licenseName) == B_OK
+			&& data->FindString(kLicenseTextField, i, &licenseText) == B_OK;
+		++i) {
+		if (!fLicenseNames.Add(licenseName) || !fLicenseTexts.Add(licenseText))
+			return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+BRepositoryInfo::_SetTo(const BEntry& entry)
+{
+	BFile file(&entry, B_READ_ONLY);
+	status_t result = file.InitCheck();
+	if (result != B_OK)
+		return result;
+
+	off_t size;
+	if ((result = file.GetSize(&size)) != B_OK)
+		return result;
+
+	BString configString;
+	char* buffer = configString.LockBuffer(size);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	if ((result = file.Read(buffer, size)) < size) {
+		configString.UnlockBuffer(0);
+		return (result >= 0) ? B_IO_ERROR : result;
+	}
+
+	buffer[size] = '\0';
+	configString.UnlockBuffer(size);
+
+	void* settingsHandle = parse_driver_settings_string(configString.String());
+	if (settingsHandle == NULL)
+		return B_BAD_DATA;
+	CObjectDeleter<void, status_t> settingsHandleDeleter(settingsHandle,
+		&unload_driver_settings);
+
+	const char* name = get_driver_parameter(settingsHandle, "name", NULL, NULL);
+	const char* url = get_driver_parameter(settingsHandle, "url", NULL, NULL);
+	const char* vendor
+		= get_driver_parameter(settingsHandle, "vendor", NULL, NULL);
+	const char* summary
+		= get_driver_parameter(settingsHandle, "summary", NULL, NULL);
+	const char* priorityString
+		= get_driver_parameter(settingsHandle, "priority", NULL, NULL);
+	const char* architectureString
+		= get_driver_parameter(settingsHandle, "architecture", NULL, NULL);
+
+	if (name == NULL || *name == '\0' || url == NULL || *url == '\0'
+		|| vendor == NULL || *vendor == '\0'
+		|| summary == NULL || *summary == '\0'
+		|| priorityString == NULL || *priorityString == '\0'
+		|| architectureString == NULL || *architectureString == '\0') {
+		return B_BAD_DATA;
+	}
+
+	BPackageArchitecture architecture;
+	if (BPackageInfo::GetArchitectureByName(architectureString, architecture)
+			!= B_OK || architecture == B_PACKAGE_ARCHITECTURE_ANY) {
+		return B_BAD_DATA;
+	}
+
+	fName = name;
+	fOriginalBaseURL = url;
+	fVendor = vendor;
+	fSummary = summary;
+	fPriority = atoi(priorityString);
+	fArchitecture = architecture;
+
+	return B_OK;
 }
 
 

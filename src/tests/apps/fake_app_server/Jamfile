@@ -1,13 +1,14 @@
 SubDir HAIKU_TOP src tests apps fake_app_server ;
 
-UseLibraryHeaders agg png zlib ;
+UseLibraryHeaders agg png ;
+UseBuildFeatureHeaders zlib ;
 UsePrivateHeaders app interface shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
-UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+UseBuildFeatureHeaders freetype ;
 
 Server fake_app_server :
 	AppServer.cpp

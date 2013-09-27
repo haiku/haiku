@@ -21,26 +21,34 @@ UsePrivateHeaders app interface kernel locale print shared ;
 
 # Build our libbe.so
 
-AddResources libbe.so : 
-	libbe_version.rdef CountryFlags.rdef LanguageFlags.rdef 
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+		local libbe = [ MultiArchDefaultGristFiles libbe.so ] ;
 
+		AddResources $(libbe) :
+			libbe_version.rdef CountryFlags.rdef LanguageFlags.rdef
+			;
 
-SetVersionScript libbe.so : libbe_versions ;
+		SetVersionScript $(libbe) : libbe_versions ;
 
-SharedLibrary libbe.so : :
-	<libbe>app_kit.o
-	<libbe>interface_kit.o
-	<libbe>locale_kit.o
-	<libbe>storage_kit.o
-	<libbe>support_kit.o
+		SharedLibrary $(libbe) : :
+			<libbe!$(architecture)>app_kit.o
+			<libbe!$(architecture)>interface_kit.o
+			<libbe!$(architecture)>locale_kit.o
+			<libbe!$(architecture)>storage_kit.o
+			<libbe!$(architecture)>support_kit.o
 
-	libicon.a
-	libagg.a
+			[ MultiArchDefaultGristFiles libstorage_kit_mime.a ]
 
-	libroot.so	# make sure it links against our libroot.so
-	$(TARGET_LIBSTDC++) $(HAIKU_ICU_LIBS)
-;
+			[ MultiArchDefaultGristFiles libicon.a ]
+			[ MultiArchDefaultGristFiles libagg.a ]
+
+			$(TARGET_LIBSTDC++) [ BuildFeatureAttribute icu : libraries ]
+			;
+	}
+}
 
 # Build libbe_test.so
 

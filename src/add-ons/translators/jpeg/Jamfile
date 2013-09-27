@@ -8,13 +8,13 @@ SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) raw ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 	#for BaseTranslator.h and friends
 
-UseHeaders $(HAIKU_JPEG_HEADERS) : true ;
+UseBuildFeatureHeaders jpeg ;
 
 AddResources JPEGTranslator : JPEGTranslator.rdef ;
 
-Includes [ FGristFiles be_jdatadst.cpp be_jdatasrc.cpp
-	be_jerror.cpp JPEGTranslator.cpp ]
-	: $(HAIKU_JPEG_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles be_jdatadst.cpp be_jdatasrc.cpp be_jerror.cpp
+		JPEGTranslator.cpp ]
+	: [ BuildFeatureAttribute jpeg : headers ] ;
 
 Translator JPEGTranslator :
 	be_jdatadst.cpp
@@ -22,8 +22,9 @@ Translator JPEGTranslator :
 	be_jerror.cpp
 	exif_parser.cpp
 	JPEGTranslator.cpp
-	: be translation libtranslatorsutils.a $(HAIKU_JPEG_LIB)
-	$(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	: be translation libtranslatorsutils.a
+	[ BuildFeatureAttribute jpeg : library ]
+	$(TARGET_LIBSTDC++) localestub
 	: true
 ;
 

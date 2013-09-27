@@ -11,8 +11,3 @@ Addon USB\ Port :
 	PrintTransportAddOn.cpp
 	: libshared.a libdevice.so be $(TARGET_LIBSUPC++)
 ;
-
-Package haiku-printingkit-cvs :
-	USB\ Port :
-	boot home config add-ons Print transport ;
-

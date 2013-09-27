@@ -81,8 +81,8 @@ Directory::Close(void *cookie)
 }
 
 
-Node *
-Directory::Lookup(const char *name, bool traverseLinks)
+Node*
+Directory::LookupDontTraverse(const char* name)
 {
 	if (!strcmp(name, ".")) {
 		Acquire();

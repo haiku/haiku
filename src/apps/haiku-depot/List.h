@@ -147,7 +147,7 @@ public:
 		if (fCount > 0)
 			_Resize(fCount - 1);
 	}
-	
+
 	inline void Remove(int32 index)
 	{
 		if (index < 0 || index >= (int32)fCount)
@@ -163,21 +163,21 @@ public:
 			memcpy(fItems + index, fItems + nextIndex,
 				(fCount - nextIndex) * sizeof(ItemType));
 		}
-		
+
 		fCount--;
 	}
 
 	inline void Remove(const ItemType& item)
 	{
 		Remove(IndexOf(item));
-		
+
 	}
 
 	inline bool Replace(int32 index, const ItemType& copyFrom)
 	{
 		if (index < 0 || index >= (int32)fCount)
 			return false;
-		
+
 		ItemType* item = fItems + index;
 		// Initialize the new object from the original.
 		if (!PlainOldData) {

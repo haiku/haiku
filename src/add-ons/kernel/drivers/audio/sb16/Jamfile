@@ -10,8 +10,3 @@ KernelAddon sb16 :
 	sb16_hw.c
 	sb16_multi_audio.c
 ;
-
-Package haiku-sb16-cvs :
-	sb16 :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-sb16-cvs : audio multi sb16 ;

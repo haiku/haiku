@@ -60,7 +60,8 @@ void hash_dump_table(struct hash_table* table);
  *		the key, returning 0 if equal, other if not
  */
 
-uint32 hash_hash_string(const char *str);
+uint32 hash_hash_string(const char *string);
+uint32 hash_hash_string_part(const char *string, size_t maxLength);
 
 #ifdef __cplusplus
 }

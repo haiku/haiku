@@ -15,6 +15,7 @@
 #include <package/RefreshRepositoryRequest.h>
 #include <package/PackageRoster.h>
 
+#include "Command.h"
 #include "DecisionProvider.h"
 #include "JobStateListener.h"
 #include "pkgman.h"
@@ -26,23 +27,22 @@ using namespace BPackageKit;
 // TODO: internationalization!
 
 
-static const char* kCommandUsage =
-	"Usage: %s refresh [<repo-name> ...]\n"
+static const char* const kShortUsage =
+	"  %command% [<repo-name> ...]\n"
+	"    Refreshes all or just the given repositories.\n";
+
+static const char* const kLongUsage =
+	"Usage: %program% %command% [<repo-name> ...]\n"
 	"Refreshes all or just the given repositories.\n"
-	"\n"
-;
+	"\n";
 
 
-static void
-print_command_usage_and_exit(bool error)
-{
-    fprintf(error ? stderr : stdout, kCommandUsage, kProgramName);
-    exit(error ? 1 : 0);
-}
+DEFINE_COMMAND(RefreshCommand, "refresh", kShortUsage, kLongUsage,
+	kCommandCategoryRepositories)
 
 
 int
-command_refresh(int argc, const char* const* argv)
+RefreshCommand::Execute(int argc, const char* const* argv)
 {
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -57,11 +57,11 @@ command_refresh(int argc, const char* const* argv)
 
 		switch (c) {
 			case 'h':
-				print_command_usage_and_exit(false);
+				PrintUsageAndExit(false);
 				break;
 
 			default:
-				print_command_usage_and_exit(true);
+				PrintUsageAndExit(true);
 				break;
 		}
 	}
@@ -69,10 +69,6 @@ command_refresh(int argc, const char* const* argv)
 	// The remaining arguments are repo names.
 	const char* const* repoArgs = argv + optind;
 	int nameCount = argc - optind;
-
-	DecisionProvider decisionProvider;
-	JobStateListener listener;
-	BContext context(decisionProvider, listener);
 
 	BStringList repositoryNames(20);
 
@@ -88,6 +84,10 @@ command_refresh(int argc, const char* const* argv)
 		}
 	}
 
+	DecisionProvider decisionProvider;
+	JobStateListener listener;
+	BContext context(decisionProvider, listener);
+
 	status_t result;
 	for (int i = 0; i < repositoryNames.CountStrings(); ++i) {
 		const BString& repoName = repositoryNames.StringAt(i);
@@ -99,19 +99,12 @@ command_refresh(int argc, const char* const* argv)
 			WARN(result, "skipping repository-config '%s'", path.Path());
 			continue;
 		}
-		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
-		result = refreshRequest.InitCheck();
-		if (result != B_OK)
-			DIE(result, "unable to create request for refreshing repository");
-		result = refreshRequest.CreateInitialJobs();
-		if (result != B_OK)
-			DIE(result, "unable to create necessary jobs");
 
-		while (BJob* job = refreshRequest.PopRunnableJob()) {
-			result = job->Run();
-			delete job;
-			if (result != B_OK)
-				return 1;
+		BRefreshRepositoryRequest refreshRequest(context, repoConfig);
+		result = refreshRequest.Process();
+		if (result != B_OK) {
+			DIE(result, "request for refreshing repository \"%s\" failed",
+				repoName.String());
 		}
 	}
 

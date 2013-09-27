@@ -27,6 +27,11 @@ public:
 		return fString.fPrivateData;
 	}
 
+	bool IsShareable() const
+	{
+		return fString._IsShareable();
+	}
+
 	static vint32& DataRefCount(char* data)
 	{
 		return *(((int32 *)data) - 2);

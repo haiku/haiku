@@ -25,7 +25,7 @@ CharacterStyle::operator=(const CharacterStyle& other)
 {
 	if (this == &other)
 		return *this;
-	
+
 	fStyleData = other.fStyleData;
 	return *this;
 }
@@ -90,7 +90,7 @@ CharacterStyle::SetBold(bool bold)
 		|| (!bold && (face & B_BOLD_FACE) == 0)) {
 		return true;
 	}
-	
+
 	uint16 neededFace = face;
 	if (bold) {
 		if ((face & B_ITALIC_FACE) != 0)
@@ -116,7 +116,7 @@ CharacterStyle::SetItalic(bool italic)
 		|| (!italic && (face & B_ITALIC_FACE) == 0)) {
 		return true;
 	}
-	
+
 	uint16 neededFace = face;
 	if (italic) {
 		if ((face & B_BOLD_FACE) != 0)
@@ -345,7 +345,7 @@ BFont
 CharacterStyle::_FindFontForFace(uint16 face) const
 {
 	BFont font(Font());
-	
+
 	font_family family;
 	font_style style;
 	font.GetFamilyAndStyle(&family, &style);
@@ -360,7 +360,7 @@ CharacterStyle::_FindFontForFace(uint16 face) const
 			}
 		}
 	}
-	
+
 	return font;
 }
 

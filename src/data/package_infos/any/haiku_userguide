@@ -1,0 +1,18 @@
+name			haiku_userguide
+version			R1~alpha4_pm-1
+architecture	any
+summary			"The Haiku user documentation"
+description		"The Haiku user documentation."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2013 Haiku, Inc. et al"
+licenses		MIT
+
+provides {
+	haiku_userguide=R1~alpha4_pm-1
+}
+
+requires {
+}

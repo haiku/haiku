@@ -1,0 +1,94 @@
+local architecture = $(HAIKU_PACKAGING_ARCHS[1]) ;
+
+
+local haikuDevelPackage = haiku_devel.hpkg ;
+HaikuPackage $(haikuDevelPackage) ;
+
+local arch = $(TARGET_ARCH) ;
+
+# glue code
+AddFilesToPackage develop lib :
+	<src!system!glue!arch!$(arch)!$(architecture)>crti.o
+	<src!system!glue!arch!$(arch)!$(architecture)>crtn.o
+	<src!system!glue!$(architecture)>init_term_dyn.o
+	<src!system!glue!$(architecture)>start_dyn.o
+	<src!system!glue!$(architecture)>haiku_version_glue.o
+	;
+
+# kernel
+AddFilesToPackage develop lib : kernel.so : _KERNEL_ ;
+
+# additional libraries
+local developmentLibs = <revisioned>libroot_debug.so ;
+AddFilesToPackage lib : $(developmentLibs) ;
+
+# library symlinks
+local lib ;
+for lib in [ HaikuImageGetSystemLibs ] $(developmentLibs) {
+	AddSymlinkToPackage develop lib : /system/lib $(lib:BS) ;
+	local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
+	if $(abiVersion) {
+		local abiVersionedLib = $(lib:BS).$(abiVersion) ;
+		AddSymlinkToPackage develop lib
+			: /system/lib $(abiVersionedLib) ;
+	}
+}
+
+# static libraries
+AddFilesToPackage develop lib : <$(architecture)>liblocalestub.a ;
+
+# the POSIX error code mapper library
+AddFilesToPackage develop lib : libposix_error_mapper.a ;
+
+# ABI independent stuff
+
+# headers
+AddHeaderDirectoryToPackage config ;
+AddHeaderDirectoryToPackage glibc ;
+AddHeaderDirectoryToPackage os ;
+AddHeaderDirectoryToPackage posix ;
+
+# private headers
+AddHeaderDirectoryToPackage private ;
+CopyDirectoryToPackage develop headers private libs compat
+	: [ FDirName $(HAIKU_TOP) src libs compat freebsd_network ]
+	: : -x *.c -x *.cpp -x *.awk -x Jamfile -x miidevs ;
+CopyDirectoryToPackage develop headers private libs compat
+	: [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ]
+	: : -x *.c -x Jamfile ;
+
+# create be -> os symlink for now
+AddSymlinkToPackage develop headers : os : be ;
+
+# BSD and GNU compatibility headers
+AddHeaderDirectoryToPackage compatibility bsd : bsd ;
+AddHeaderDirectoryToPackage compatibility gnu : gnu ;
+
+# third party libs headers
+if ! $(HAIKU_BOOTSTRAP_BUILD) {
+	AddHeaderDirectoryToPackage libs tiff : 3rdparty ;
+}
+
+# cpp headers
+if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
+	# GCC 2 only -- for GCC 4 they come with the gcc package
+	CopyDirectoryToPackage develop headers c++
+		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;
+}
+
+# OpenGL headers
+if $(TARGET_ARCH) = x86 && ! $(HAIKU_BOOTSTRAP_BUILD) {
+	local mesaGlHeaders
+		= [ FDirName [ BuildFeatureAttribute mesa : headers : path ] GL ] ;
+	local mesaGlHeadersDependency = [ BuildFeatureAttribute mesa : headers ] ;
+	mesaGlHeaders = $(mesaGlHeaders:G=$(mesaGlHeadersDependency:G)) ;
+	Depends $(mesaGlHeaders) : $(mesaGlHeadersDependency) ;
+	CopyDirectoryToPackage develop headers os opengl
+		: $(mesaGlHeaders) : : : isTarget ;
+}
+
+# Deskbar menu symlinks
+AddSymlinkToPackage data deskbar menu Applications
+	: ../../../../apps/Debugger : Debugger ;
+
+BuildHaikuPackage $(haikuDevelPackage) : haiku_devel ;

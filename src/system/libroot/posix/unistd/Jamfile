@@ -1,42 +1,50 @@
 SubDir HAIKU_TOP src system libroot posix unistd ;
 
-UsePrivateSystemHeaders ;
 UsePrivateHeaders libroot runtime_loader shared ;
 
-MergeObject posix_unistd.o :
-	access.c
-	alarm.c
-	chown.c
-	chroot.cpp
-	close.c
-	conf.cpp
-	directory.c
-	dup.c
-	exec.cpp
-	_exit.c
-	fork.c
-	getlogin.c
-	getpagesize.c
-	hostname.cpp
-	ioctl.c
-	link.c
-	lockf.cpp
-	lseek.c
-	mknod.c
-	mount.c
-	pause.c
-	pipe.c
-	process.c
-	read.c
-	sbrk.c
-	sleep.c
-	sync.c
-	system.cpp
-	terminal.c
-	truncate.c
-	ttyname.c
-	ualarm.c
-	usergroup.cpp
-	usleep.c
-	write.c
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateSystemHeaders ;
+
+		MergeObject <$(architecture)>posix_unistd.o :
+			access.c
+			alarm.c
+			chown.c
+			chroot.cpp
+			close.c
+			conf.cpp
+			directory.c
+			dup.c
+			exec.cpp
+			_exit.c
+			fork.c
+			getlogin.c
+			getpagesize.c
+			hostname.cpp
+			ioctl.c
+			link.c
+			lockf.cpp
+			lseek.c
+			mknod.c
+			mount.c
+			pause.c
+			pipe.c
+			process.c
+			read.c
+			sbrk.c
+			sleep.c
+			sync.c
+			system.cpp
+			terminal.c
+			truncate.c
+			ttyname.c
+			ualarm.c
+			usergroup.cpp
+			usleep.c
+			write.c
+			;
+	}
+}

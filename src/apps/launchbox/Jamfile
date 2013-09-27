@@ -11,7 +11,7 @@ Application LaunchBox :
 	PadView.cpp
 	Panel.cpp
 	support.cpp
-	: be translation libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be translation libshared.a $(TARGET_LIBSUPC++) localestub
 	: LaunchBox.rdef
 ;
 

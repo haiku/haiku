@@ -67,9 +67,9 @@ MarkupParser::CreateDocumentFromMarkup(const BString& text)
 	TextDocumentRef document(new(std::nothrow) TextDocument(), true);
 	if (document.Get() == NULL)
 		return document;
-	
+
 	AppendMarkup(document, text);
-	
+
 	return document;
 }
 
@@ -78,15 +78,15 @@ void
 MarkupParser::AppendMarkup(const TextDocumentRef& document, const BString& text)
 {
 	fTextDocument.SetTo(document);
-	
+
 	fCurrentCharacterStyle = &fNormalStyle;
 	fCurrentParagraphStyle = &fParagraphStyle;
-	
+
 	fCurrentParagraph = Paragraph(*fCurrentParagraphStyle);
 	fSpanStartOffset = 0;
-	
+
 	_ParseText(text);
-	
+
 	fTextDocument.Unset();
 }
 
@@ -132,7 +132,7 @@ MarkupParser::_ParseText(const BString& text)
 
 	int32 charCount = text.CountChars();
 	const char* c = text.String();
-	
+
 	while (offset <= charCount) {
 		uint32 nextChar = UTF8ToCharCode(&c);
 
@@ -158,7 +158,7 @@ MarkupParser::_ParseText(const BString& text)
 						_ToggleStyle(fItalicStyle);
 					else if (tickCount == 3)
 						_ToggleStyle(fBoldStyle);
-					
+
 					// Don't include the ticks in the next span.
 					offset += tickCount - 1;
 					start = offset + 1;
@@ -186,7 +186,7 @@ MarkupParser::_ParseText(const BString& text)
 
 					_CopySpan(text, start, offset - 1);
 					_FinishParagraph();
-					
+
 					offset += 2;
 					c += 2;
 
@@ -212,7 +212,7 @@ MarkupParser::_ParseText(const BString& text)
 
 			default:
 				break;
-		
+
 		}
 		offset++;
 	}

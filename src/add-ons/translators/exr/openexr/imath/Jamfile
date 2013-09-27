@@ -4,16 +4,21 @@ SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) half ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) iex ] ;
 
-if $(HAIKU_LIBSTDC++) = libstdc++.r4.so {
-        SubDirC++Flags -Dios_base=ios -ftemplate-depth-24 ;
-}
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+			SubDirC++Flags -Dios_base=ios -ftemplate-depth-24 ;
+		}
 
-StaticLibrary libimath.a :
-ImathBox.cpp
-ImathColorAlgo.cpp
-ImathFun.cpp
-ImathMatrixAlgo.cpp
-ImathRandom.cpp
-ImathShear.cpp
-ImathVec.cpp
-;
+		StaticLibrary [ MultiArchDefaultGristFiles libimath.a ] :
+			ImathBox.cpp
+			ImathColorAlgo.cpp
+			ImathFun.cpp
+			ImathMatrixAlgo.cpp
+			ImathRandom.cpp
+			ImathShear.cpp
+			ImathVec.cpp
+			;
+	}
+}

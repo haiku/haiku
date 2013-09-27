@@ -251,8 +251,8 @@ NetServer::ReadyToRun()
 	_BringUpInterfaces();
 	_StartServices();
 
-	BPrivate::BPathMonitor::StartWatching("/dev/net", B_ENTRY_CREATED
-		| B_ENTRY_REMOVED | B_WATCH_FILES_ONLY | B_WATCH_RECURSIVELY, this);
+	BPrivate::BPathMonitor::StartWatching("/dev/net", 
+		B_WATCH_FILES_ONLY | B_WATCH_RECURSIVELY, this);
 }
 
 

@@ -23,7 +23,6 @@
 #include <package/hpkg/HPKGDefsPrivate.h>
 
 #include <package/hpkg/DataOutput.h>
-#include <package/hpkg/ErrorOutput.h>
 #include <package/hpkg/PackageData.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
@@ -48,80 +47,16 @@ static const size_t kMaxTOCSize					= 64 * 1024 * 1024;
 static const size_t kMaxPackageAttributesSize	= 1 * 1024 * 1024;
 
 
-// #pragma mark - DataAttributeHandler
-
-
-struct PackageReaderImpl::DataAttributeHandler : AttributeHandler {
-	DataAttributeHandler(BPackageData* data)
-		:
-		fData(data)
-	{
-	}
-
-	static status_t InitData(AttributeHandlerContext* context,
-		BPackageData* data, const AttributeValue& value)
-	{
-		if (value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE)
-			data->SetData(value.data.size, value.data.raw);
-		else
-			data->SetData(value.data.size, value.data.offset);
-
-		data->SetUncompressedSize(value.data.size);
-
-		return B_OK;
-	}
-
-	static status_t Create(AttributeHandlerContext* context,
-		BPackageData* data, const AttributeValue& value,
-		AttributeHandler*& _handler)
-	{
-		DataAttributeHandler* handler = new(std::nothrow) DataAttributeHandler(
-			data);
-		if (handler == NULL)
-			return B_NO_MEMORY;
-
-		InitData(context, data, value);
-
-		_handler = handler;
-		return B_OK;
-	}
-
-	virtual status_t HandleAttribute(AttributeHandlerContext* context,
-		uint8 id, const AttributeValue& value, AttributeHandler** _handler)
-	{
-		switch (id) {
-			case B_HPKG_ATTRIBUTE_ID_DATA_SIZE:
-				fData->SetUncompressedSize(value.unsignedInt);
-				return B_OK;
-
-			case B_HPKG_ATTRIBUTE_ID_DATA_COMPRESSION:
-			{
-				switch (value.unsignedInt) {
-					case B_HPKG_COMPRESSION_NONE:
-					case B_HPKG_COMPRESSION_ZLIB:
-						break;
-					default:
-						context->errorOutput->PrintError("Error: Invalid "
-							"compression type for data (%llu)\n",
-							value.unsignedInt);
-						return B_BAD_DATA;
-				}
-
-				fData->SetCompression(value.unsignedInt);
-				return B_OK;
-			}
-
-			case B_HPKG_ATTRIBUTE_ID_DATA_CHUNK_SIZE:
-				fData->SetChunkSize(value.unsignedInt);
-				return B_OK;
-		}
-
-		return AttributeHandler::HandleAttribute(context, id, value, _handler);
-	}
-
-private:
-	BPackageData*	fData;
-};
+static status_t
+set_package_data_from_attribute_value(const BPackageAttributeValue& value,
+	BPackageData& data)
+{
+	if (value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE)
+		data.SetData(value.data.size, value.data.raw);
+	else
+		data.SetData(value.data.size, value.data.offset);
+	return B_OK;
+}
 
 
 // #pragma mark - AttributeAttributeHandler
@@ -140,12 +75,8 @@ struct PackageReaderImpl::AttributeAttributeHandler : AttributeHandler {
 	{
 		switch (id) {
 			case B_HPKG_ATTRIBUTE_ID_DATA:
-				if (_handler != NULL) {
-					return DataAttributeHandler::Create(context,
-						&fAttribute.Data(), value, *_handler);
-				}
-				return DataAttributeHandler::InitData(context,
-					&fAttribute.Data(), value);
+				return set_package_data_from_attribute_value(value,
+					fAttribute.Data());
 
 			case B_HPKG_ATTRIBUTE_ID_FILE_ATTRIBUTE_TYPE:
 				fAttribute.SetType(value.unsignedInt);
@@ -279,12 +210,8 @@ struct PackageReaderImpl::EntryAttributeHandler : AttributeHandler {
 			}
 
 			case B_HPKG_ATTRIBUTE_ID_DATA:
-				if (_handler != NULL) {
-					return DataAttributeHandler::Create(context, &fEntry.Data(),
-						value, *_handler);
-				}
-				return DataAttributeHandler::InitData(context, &fEntry.Data(),
-					value);
+				return set_package_data_from_attribute_value(value,
+					fEntry.Data());
 
 			case B_HPKG_ATTRIBUTE_ID_SYMLINK_PATH:
 				fEntry.SetSymlinkPath(value.string);
@@ -378,7 +305,7 @@ struct PackageReaderImpl::RootAttributeHandler : PackageAttributeHandler {
 
 PackageReaderImpl::PackageReaderImpl(BErrorOutput* errorOutput)
 	:
-	inherited(errorOutput),
+	inherited("package", errorOutput),
 	fTOCSection("TOC")
 {
 }
@@ -390,7 +317,7 @@ PackageReaderImpl::~PackageReaderImpl()
 
 
 status_t
-PackageReaderImpl::Init(const char* fileName)
+PackageReaderImpl::Init(const char* fileName, uint32 flags)
 {
 	// open file
 	int fd = open(fileName, O_RDONLY);
@@ -400,185 +327,45 @@ PackageReaderImpl::Init(const char* fileName)
 		return errno;
 	}
 
-	return Init(fd, true);
+	return Init(fd, true, flags);
 }
 
 
 status_t
-PackageReaderImpl::Init(int fd, bool keepFD)
+PackageReaderImpl::Init(int fd, bool keepFD, uint32 flags)
 {
-	status_t error = inherited::Init(fd, keepFD);
-	if (error != B_OK)
-		return error;
-
-	// stat it
-	struct stat st;
-	if (fstat(FD(), &st) < 0) {
-		ErrorOutput()->PrintError("Error: Failed to access package file: %s\n",
-			strerror(errno));
-		return errno;
-	}
-
-	// read the header
 	hpkg_header header;
-	if ((error = ReadBuffer(0, &header, sizeof(header))) != B_OK)
+	status_t error = inherited::Init<hpkg_header, B_HPKG_MAGIC, B_HPKG_VERSION,
+		B_HPKG_MINOR_VERSION>(fd, keepFD, header, flags);
+	if (error != B_OK)
 		return error;
+	fHeapSize = UncompressedHeapSize();
 
-	// check the header
-
-	// magic
-	if (B_BENDIAN_TO_HOST_INT32(header.magic) != B_HPKG_MAGIC) {
-		ErrorOutput()->PrintError("Error: Invalid package file: Invalid "
-			"magic\n");
-		return B_BAD_DATA;
-	}
-
-	// header size
-	fHeapOffset = B_BENDIAN_TO_HOST_INT16(header.header_size);
-	if ((size_t)fHeapOffset < sizeof(hpkg_header)) {
-		ErrorOutput()->PrintError("Error: Invalid package file: Invalid header "
-			"size (%llu)\n", fHeapOffset);
-		return B_BAD_DATA;
-	}
-
-	// version
-	if (B_BENDIAN_TO_HOST_INT16(header.version) != B_HPKG_VERSION) {
-		ErrorOutput()->PrintError("Error: Invalid/unsupported package file "
-			"version (%d)\n", B_BENDIAN_TO_HOST_INT16(header.version));
-		return B_BAD_DATA;
-	}
-
-	// total size
-	fTotalSize = B_BENDIAN_TO_HOST_INT64(header.total_size);
-	if (fTotalSize != (uint64)st.st_size) {
-		ErrorOutput()->PrintError("Error: Invalid package file: Total size in "
-			"header (%llu) doesn't agree with total file size (%lld)\n",
-			fTotalSize, st.st_size);
-		return B_BAD_DATA;
-	}
-
-	// package attributes length and compression
-	fPackageAttributesSection.compression
-		= B_BENDIAN_TO_HOST_INT32(header.attributes_compression);
-	fPackageAttributesSection.compressedLength
-		= B_BENDIAN_TO_HOST_INT32(header.attributes_length_compressed);
-	fPackageAttributesSection.uncompressedLength
-		= B_BENDIAN_TO_HOST_INT32(header.attributes_length_uncompressed);
-	fPackageAttributesSection.stringsLength
-		= B_BENDIAN_TO_HOST_INT32(header.attributes_strings_length);
-	fPackageAttributesSection.stringsCount
-		= B_BENDIAN_TO_HOST_INT32(header.attributes_strings_count);
-
-	if (const char* errorString = CheckCompression(
-		fPackageAttributesSection)) {
-		ErrorOutput()->PrintError("Error: Invalid package file: package "
-			"attributes section: %s\n", errorString);
-		return B_BAD_DATA;
-	}
-
-	// TOC length and compression
-	fTOCSection.compression = B_BENDIAN_TO_HOST_INT32(header.toc_compression);
-	fTOCSection.compressedLength
-		= B_BENDIAN_TO_HOST_INT64(header.toc_length_compressed);
-	fTOCSection.uncompressedLength
-		= B_BENDIAN_TO_HOST_INT64(header.toc_length_uncompressed);
-
-	if (const char* errorString = CheckCompression(fTOCSection)) {
-		ErrorOutput()->PrintError("Error: Invalid package file: TOC section: "
-			"%s\n", errorString);
-		return B_BAD_DATA;
-	}
-
-	// TOC subsections
-	fTOCSection.stringsLength
-		= B_BENDIAN_TO_HOST_INT64(header.toc_strings_length);
-	fTOCSection.stringsCount
-		= B_BENDIAN_TO_HOST_INT64(header.toc_strings_count);
-
-	if (fTOCSection.stringsLength > fTOCSection.uncompressedLength
-		|| fTOCSection.stringsCount > fTOCSection.stringsLength) {
-		ErrorOutput()->PrintError("Error: Invalid package file: Invalid TOC "
-			"subsections description\n");
-		return B_BAD_DATA;
-	}
-
-	// check whether the sections fit together
-	if (fPackageAttributesSection.compressedLength > fTotalSize
-		|| fTOCSection.compressedLength
-			> fTotalSize - fPackageAttributesSection.compressedLength
-		|| fHeapOffset
-			> fTotalSize - fPackageAttributesSection.compressedLength
-				- fTOCSection.compressedLength) {
-		ErrorOutput()->PrintError("Error: Invalid package file: The sum of the "
-			"sections sizes is greater than the package size\n");
-		return B_BAD_DATA;
-	}
-
-	fPackageAttributesSection.offset
-		= fTotalSize - fPackageAttributesSection.compressedLength;
-	fTOCSection.offset = fPackageAttributesSection.offset
-		- fTOCSection.compressedLength;
-	fHeapSize = fTOCSection.offset - fHeapOffset;
-
-	// TOC size sanity check
-	if (fTOCSection.uncompressedLength > kMaxTOCSize) {
-		ErrorOutput()->PrintError("Error: Package file TOC section size "
-			"is %llu bytes. This is beyond the reader's sanity limit\n",
-			fTOCSection.uncompressedLength);
-		return B_UNSUPPORTED;
-	}
-
-	// package attributes size sanity check
-	if (fPackageAttributesSection.uncompressedLength
-			> kMaxPackageAttributesSize) {
-		ErrorOutput()->PrintError(
-			"Error: Package file package attributes section size "
-			"is %llu bytes. This is beyond the reader's sanity limit\n",
-			fPackageAttributesSection.uncompressedLength);
-		return B_UNSUPPORTED;
-	}
-
-	// read in the complete TOC
-	fTOCSection.data
-		= new(std::nothrow) uint8[fTOCSection.uncompressedLength];
-	if (fTOCSection.data == NULL) {
-		ErrorOutput()->PrintError("Error: Out of memory!\n");
-		return B_NO_MEMORY;
-	}
-	error = ReadCompressedBuffer(fTOCSection);
+	// init package attributes section
+	error = InitSection(fPackageAttributesSection, fHeapSize,
+		B_BENDIAN_TO_HOST_INT32(header.attributes_length),
+		kMaxPackageAttributesSize,
+		B_BENDIAN_TO_HOST_INT32(header.attributes_strings_length),
+		B_BENDIAN_TO_HOST_INT32(header.attributes_strings_count));
 	if (error != B_OK)
 		return error;
 
-	// read in the complete package attributes section
-	fPackageAttributesSection.data
-		= new(std::nothrow) uint8[fPackageAttributesSection.uncompressedLength];
-	if (fPackageAttributesSection.data == NULL) {
-		ErrorOutput()->PrintError("Error: Out of memory!\n");
-		return B_NO_MEMORY;
-	}
-	error = ReadCompressedBuffer(fPackageAttributesSection);
+	// init TOC section
+	error = InitSection(fTOCSection, fPackageAttributesSection.offset,
+		B_BENDIAN_TO_HOST_INT64(header.toc_length), kMaxTOCSize,
+		B_BENDIAN_TO_HOST_INT64(header.toc_strings_length),
+		B_BENDIAN_TO_HOST_INT64(header.toc_strings_count));
 	if (error != B_OK)
 		return error;
 
-	// start parsing the TOC
-	fTOCSection.currentOffset = 0;
-	SetCurrentSection(&fTOCSection);
-
-	// strings
-	error = ParseStrings();
+	// prepare the sections for use
+	error = PrepareSection(fTOCSection);
 	if (error != B_OK)
 		return error;
 
-	// parse strings from package attributes section
-	fPackageAttributesSection.currentOffset = 0;
-	SetCurrentSection(&fPackageAttributesSection);
-
-	// strings
-	error = ParseStrings();
+	error = PrepareSection(fPackageAttributesSection);
 	if (error != B_OK)
 		return error;
-
-	SetCurrentSection(NULL);
 
 	return B_OK;
 }
@@ -588,7 +375,8 @@ status_t
 PackageReaderImpl::ParseContent(BPackageContentHandler* contentHandler)
 {
 	AttributeHandlerContext context(ErrorOutput(), contentHandler,
-		B_HPKG_SECTION_PACKAGE_ATTRIBUTES);
+		B_HPKG_SECTION_PACKAGE_ATTRIBUTES,
+		MinorFormatVersion() > B_HPKG_MINOR_VERSION);
 	RootAttributeHandler rootAttributeHandler;
 
 	status_t error
@@ -607,7 +395,8 @@ status_t
 PackageReaderImpl::ParseContent(BLowLevelPackageContentHandler* contentHandler)
 {
 	AttributeHandlerContext context(ErrorOutput(), contentHandler,
-		B_HPKG_SECTION_PACKAGE_ATTRIBUTES);
+		B_HPKG_SECTION_PACKAGE_ATTRIBUTES,
+		MinorFormatVersion() > B_HPKG_MINOR_VERSION);
 	LowLevelAttributeHandler rootAttributeHandler;
 
 	status_t error
@@ -629,10 +418,6 @@ PackageReaderImpl::_ParseTOC(AttributeHandlerContext* context,
 	// parse the TOC
 	fTOCSection.currentOffset = fTOCSection.stringsLength;
 	SetCurrentSection(&fTOCSection);
-
-	// prepare attribute handler context
-	context->heapOffset = fHeapOffset;
-	context->heapSize = fHeapSize;
 
 	// init the attribute handler stack
 	rootAttributeHandler->SetLevel(0);
@@ -688,7 +473,7 @@ PackageReaderImpl::ReadAttributeValue(uint8 type, uint8 encoding,
 					return B_BAD_DATA;
 				}
 
-				_value.SetToData(size, fHeapOffset + offset);
+				_value.SetToData(size, offset);
 			} else if (encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_INLINE) {
 				if (size > B_HPKG_MAX_INLINE_DATA_SIZE) {
 					ErrorOutput()->PrintError("Error: Invalid %s section: "

@@ -1,0 +1,60 @@
+# The packages we build. Each is defined in its own file in the packages/
+# subdirectory.
+local packages =
+	HaikuDevel
+	HaikuLoader
+	HaikuUserguide
+	HaikuWelcome
+	MakefileEngine
+	;
+
+if $(HAIKU_BOOTSTRAP_BUILD) {
+	packages += HaikuBootstrap ;
+} else {
+	packages += Haiku ;
+}
+
+local archDependentPackages =
+	HaikuCrossDevel
+	WebPositive
+	;
+
+local secondaryArchPackages =
+	HaikuDevelSecondary
+	;
+if $(HAIKU_BOOTSTRAP_BUILD) {
+	secondaryArchPackages += HaikuSecondaryBootstrap ;
+} else {
+	secondaryArchPackages += HaikuSecondary ;
+}
+
+
+packages = $(packages:G=package-rules) ;
+archDependentPackages = $(archDependentPackages:G=package-rules) ;
+secondaryArchPackages = $(secondaryArchPackages:G=package-rules) ;
+SEARCH on $(packages) $(archDependentPackages) $(secondaryArchPackages)
+	= [ FDirName $(HAIKU_BUILD_RULES_DIR) packages ] ;
+
+local package ;
+for package in $(packages) {
+	include $(package) ;
+}
+
+for package in $(archDependentPackages) {
+	local architectureObject ;
+	for architectureObject in [ MultiArchSubDirSetup ] {
+		on $(architectureObject) {
+			include $(package) ;
+		}
+	}
+}
+
+for package in $(secondaryArchPackages) {
+	local architectureObject ;
+	for architectureObject in
+			[ MultiArchSubDirSetup $(TARGET_PACKAGING_ARCHS[2-]) ] {
+		on $(architectureObject) {
+			include $(package) ;
+		}
+	}
+}

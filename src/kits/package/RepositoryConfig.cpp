@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,6 +18,8 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
+
+#include <DriverSettings.h>
 
 
 namespace BPackageKit {
@@ -89,46 +91,23 @@ BRepositoryConfig::SetTo(const BEntry& entry)
 	fEntry = entry;
 	fInitStatus = B_NO_INIT;
 
-	BFile file(&entry, B_READ_ONLY);
-	status_t result = file.InitCheck();
+	entry_ref ref;
+	status_t result = entry.GetRef(&ref);
 	if (result != B_OK)
 		return result;
 
-	off_t size;
-	if ((result = file.GetSize(&size)) != B_OK)
+	BDriverSettings driverSettings;
+	result = driverSettings.Load(ref);
+	if (result != B_OK)
 		return result;
 
-	BString configString;
-	char* buffer = configString.LockBuffer(size);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	if ((result = file.Read(buffer, size)) < size) {
-		configString.UnlockBuffer(0);
-		return (result >= 0) ? B_IO_ERROR : result;
-	}
-
-	buffer[size] = '\0';
-	configString.UnlockBuffer(size);
-
-	void* settingsHandle = parse_driver_settings_string(configString.String());
-	if (settingsHandle == NULL)
-		return B_BAD_DATA;
-
-	const char* url = get_driver_parameter(settingsHandle, "url", NULL, NULL);
-	const char* priorityString
-		= get_driver_parameter(settingsHandle, "priority", NULL, NULL);
-
-	unload_driver_settings(settingsHandle);
+	const char* url = driverSettings.GetParameterValue("url");
+	const char* priorityString = driverSettings.GetParameterValue("priority");
 
 	if (url == NULL || *url == '\0')
 		return B_BAD_DATA;
 
-	char name[B_FILE_NAME_LENGTH];
-	if ((result = entry.GetName(name)) != B_OK)
-		return result;
-
-	fName = name;
+	fName = entry.Name();
 	fBaseURL = url;
 	fPriority = priorityString == NULL
 		? kUnsetPriority : atoi(priorityString);
@@ -178,6 +157,15 @@ const BEntry&
 BRepositoryConfig::Entry() const
 {
 	return fEntry;
+}
+
+
+BString
+BRepositoryConfig::PackagesURL() const
+{
+	if (fBaseURL.IsEmpty())
+		return BString();
+	return BString().SetToFormat("%s/packages", fBaseURL.String());
 }
 
 

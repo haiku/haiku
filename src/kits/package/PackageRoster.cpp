@@ -14,10 +14,12 @@
 
 #include <Directory.h>
 #include <Entry.h>
+#include <Messenger.h>
 #include <Path.h>
 #include <String.h>
 #include <StringList.h>
 
+#include <package/InstallationLocationInfo.h>
 #include <package/PackageInfo.h>
 #include <package/PackageInfoContentHandler.h>
 #include <package/PackageInfoSet.h>
@@ -25,6 +27,11 @@
 #include <package/RepositoryConfig.h>
 
 #include <package/hpkg/PackageReader.h>
+
+
+#if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
+#	include <package/DaemonClient.h>
+#endif
 
 
 namespace BPackageKit {
@@ -184,91 +191,33 @@ BPackageRoster::GetRepositoryConfig(const BString& name,
 
 
 status_t
+BPackageRoster::GetInstallationLocationInfo(
+	BPackageInstallationLocation location, BInstallationLocationInfo& _info)
+{
+// This method makes sense only on an installed Haiku, but not for the build
+// tools.
+#if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
+	return BPackageKit::BPrivate::BDaemonClient().GetInstallationLocationInfo(
+		location, _info);
+#else
+	return B_NOT_SUPPORTED;
+#endif
+}
+
+
+status_t
 BPackageRoster::GetActivePackages(BPackageInstallationLocation location,
 	BPackageInfoSet& packageInfos)
 {
 // This method makes sense only on an installed Haiku, but not for the build
 // tools.
 #if defined(__HAIKU__) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
-	// check the given location
-	directory_which packagesDirectory;
-	switch (location) {
-		case B_PACKAGE_INSTALLATION_LOCATION_SYSTEM:
-			packagesDirectory = B_SYSTEM_PACKAGES_DIRECTORY;
-			break;
-		case B_PACKAGE_INSTALLATION_LOCATION_COMMON:
-			packagesDirectory = B_COMMON_PACKAGES_DIRECTORY;
-			break;
-		case B_PACKAGE_INSTALLATION_LOCATION_HOME:
-			packagesDirectory = B_USER_PACKAGES_DIRECTORY;
-			break;
-		default:
-			return B_BAD_VALUE;
-	}
-
-	// find the package links directory
-	BPath packageLinksPath;
-	status_t error = find_directory(B_PACKAGE_LINKS_DIRECTORY,
-		&packageLinksPath);
+	BInstallationLocationInfo info;
+	status_t error = GetInstallationLocationInfo(location, info);
 	if (error != B_OK)
 		return error;
 
-	// find and open the packages directory
-	BPath packagesDirPath;
-	error = find_directory(packagesDirectory, &packagesDirPath);
-	if (error != B_OK)
-		return error;
-
-	BDirectory directory;
-	error = directory.SetTo(packagesDirPath.Path());
-	if (error != B_OK)
-		return error;
-
-	// TODO: Implement that correctly be reading the activation files/directory!
-
-	// iterate through the packages
-	char buffer[sizeof(dirent) + B_FILE_NAME_LENGTH];
-	dirent* entry = (dirent*)&buffer;
-	while (directory.GetNextDirents(entry, sizeof(buffer), 1) == 1) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-
-		// get the full package file path
-		BPath packagePath;
-		error = packagePath.SetTo(packagesDirPath.Path(), entry->d_name);
-		if (error != B_OK)
-			continue;
-
-		// read the package info from the file
-		BPackageReader packageReader(NULL);
-		error = packageReader.Init(packagePath.Path());
-		if (error != B_OK)
-			continue;
-
-		BPackageInfo info;
-		BPackageInfoContentHandler handler(info);
-		error = packageReader.ParseContent(&handler);
-		if (error != B_OK || info.InitCheck() != B_OK)
-			continue;
-
-		// check whether the package is really active by verifying that a
-		// package link exists for it
-		BString packageLinkName(info.Name());
-		packageLinkName << '-' << info.Version().ToString();
-		BPath packageLinkPath;
-		struct stat st;
-		if (packageLinkPath.SetTo(packageLinksPath.Path(), packageLinkName)
-				!= B_OK
-			|| lstat(packageLinkPath.Path(), &st) != 0) {
-			continue;
-		}
-
-		// add the info
-		error = packageInfos.AddInfo(info);
-		if (error != B_OK)
-			return error;
-	}
-
+	packageInfos = info.ActivePackageInfos();
 	return B_OK;
 #else
 	return B_NOT_SUPPORTED;

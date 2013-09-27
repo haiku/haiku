@@ -31,7 +31,6 @@
 #include <IconUtils.h>
 #include <Mime.h>
 #include <MimeType.h>
-#include <mime/database_access.h>
 #include <Node.h>
 #include <Path.h>
 #include <RegistrarDefs.h>

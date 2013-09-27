@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +9,8 @@
 #include <new>
 
 #include <package/hpkg/ErrorOutput.h>
+
+#include <package/hpkg/PackageFileHeapReader.h>
 #include <package/hpkg/PackageReaderImpl.h>
 
 
@@ -31,22 +33,22 @@ BPackageReader::~BPackageReader()
 
 
 status_t
-BPackageReader::Init(const char* fileName)
+BPackageReader::Init(const char* fileName, uint32 flags)
 {
 	if (fImpl == NULL)
 		return B_NO_INIT;
 
-	return fImpl->Init(fileName);
+	return fImpl->Init(fileName, flags);
 }
 
 
 status_t
-BPackageReader::Init(int fd, bool keepFD)
+BPackageReader::Init(int fd, bool keepFD, uint32 flags)
 {
 	if (fImpl == NULL)
 		return B_NO_INIT;
 
-	return fImpl->Init(fd, keepFD);
+	return fImpl->Init(fd, keepFD, flags);
 }
 
 
@@ -77,6 +79,14 @@ BPackageReader::PackageFileFD()
 		return -1;
 
 	return fImpl->PackageFileFD();
+}
+
+
+
+BAbstractBufferedDataReader*
+BPackageReader::HeapReader() const
+{
+	return fImpl != NULL ? fImpl->HeapReader() : NULL;
 }
 
 

@@ -31,8 +31,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "JPEGTranslator.h"
-#include "TranslatorWindow.h"
-#include "exif_parser.h"
 
 #include <syslog.h>
 
@@ -41,6 +39,11 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <LayoutBuilder.h>
 #include <TabView.h>
 #include <TextView.h>
+
+#include "be_jerror.h"
+#include "exif_parser.h"
+#include "TranslatorWindow.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "JPEGTranslator"
@@ -953,7 +956,7 @@ JPEGTranslator::Compress(BPositionIO* in, BPositionIO* out,
 
 	// Set basic things needed for jpeg writing
 	struct jpeg_compress_struct cinfo;
-	struct jpeg_error_mgr jerr;
+	struct be_jpeg_error_mgr jerr;
 	cinfo.err = be_jpeg_std_error(&jerr, fSettings, longJumpBuffer);
 	jpeg_create_compress(&cinfo);
 	be_jpeg_stdio_dest(&cinfo, out);
@@ -1057,7 +1060,7 @@ JPEGTranslator::Decompress(BPositionIO* in, BPositionIO* out,
 
 	// Set basic things needed for jpeg reading
 	struct jpeg_decompress_struct cinfo;
-	struct jpeg_error_mgr jerr;
+	struct be_jpeg_error_mgr jerr;
 	cinfo.err = be_jpeg_std_error(&jerr, fSettings, longJumpBuffer);
 	jpeg_create_decompress(&cinfo);
 	be_jpeg_stdio_src(&cinfo, in);

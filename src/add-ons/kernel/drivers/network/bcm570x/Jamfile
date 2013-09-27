@@ -14,11 +14,6 @@ KernelAddon bcm570x :
 	mempool.c
 	;
 
-Package haiku-networkingkit-cvs :
-	bcm570x :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-networkingkit-cvs : net bcm570x ;
-
 
 # Installation
 

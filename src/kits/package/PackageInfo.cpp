@@ -1,12 +1,13 @@
 /*
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
+ * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include <package/PackageInfo.h>
 
-#include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,788 +15,21 @@
 
 #include <File.h>
 #include <Entry.h>
+#include <Message.h>
+#include <package/hpkg/NoErrorOutput.h>
+#include <package/hpkg/PackageReader.h>
+#include <package/hpkg/v1/PackageInfoContentHandler.h>
+#include <package/hpkg/v1/PackageReader.h>
+#include <package/PackageInfoContentHandler.h>
+
+#include "PackageInfoParser.h"
+#include "PackageInfoStringBuilder.h"
 
 
 namespace BPackageKit {
 
 
-namespace {
-
-
-enum TokenType {
-	TOKEN_WORD,
-	TOKEN_QUOTED_STRING,
-	TOKEN_OPERATOR_ASSIGN,
-	TOKEN_OPERATOR_LESS,
-	TOKEN_OPERATOR_LESS_EQUAL,
-	TOKEN_OPERATOR_EQUAL,
-	TOKEN_OPERATOR_NOT_EQUAL,
-	TOKEN_OPERATOR_GREATER_EQUAL,
-	TOKEN_OPERATOR_GREATER,
-	TOKEN_OPEN_BRACE,
-	TOKEN_CLOSE_BRACE,
-	TOKEN_ITEM_SEPARATOR,
-	//
-	TOKEN_EOF,
-};
-
-
-struct ParseError {
-	BString 	message;
-	const char*	pos;
-
-	ParseError(const BString& _message, const char* _pos)
-		: message(_message), pos(_pos)
-	{
-	}
-};
-
-
-}	// anonymous namespace
-
-
-/*
- * Parses a ".PackageInfo" file and fills a BPackageInfo object with the
- * package info elements found.
- */
-class BPackageInfo::Parser {
-public:
-								Parser(ParseErrorListener* listener = NULL);
-
-			status_t			Parse(const BString& packageInfoString,
-									BPackageInfo* packageInfo);
-
-private:
-			struct Token;
-			struct ListElementParser;
-	friend	struct ListElementParser;
-
-			Token				_NextToken();
-			void				_RewindTo(const Token& token);
-
-			void				_ParseStringValue(BString* value);
-			uint32				_ParseFlags();
-			void				_ParseArchitectureValue(
-									BPackageArchitecture* value);
-			void				_ParseVersionValue(BPackageVersion* value,
-									bool releaseIsOptional);
-			void				_ParseList(ListElementParser& elementParser,
-									bool allowSingleNonListElement);
-			void				_ParseStringList(BStringList* value,
-									bool allowQuotedStrings = true,
-									bool convertToLowerCase = false);
-			void				_ParseResolvableList(
-									BObjectList<BPackageResolvable>* value);
-			void				_ParseResolvableExprList(
-									BObjectList<BPackageResolvableExpression>*
-										value);
-
-			void				_Parse(BPackageInfo* packageInfo);
-
-private:
-			ParseErrorListener*	fListener;
-			const char*			fPos;
-};
-
-
-struct BPackageInfo::Parser::Token {
-	TokenType	type;
-	BString		text;
-	const char*	pos;
-
-	Token(TokenType _type, const char* _pos, int length = 0)
-		: type(_type), pos(_pos)
-	{
-		if (length != 0) {
-			text.SetTo(pos, length);
-
-			if (type == TOKEN_QUOTED_STRING) {
-				// unescape value of quoted string
-				char* value = text.LockBuffer(length);
-				if (value == NULL)
-					return;
-				int index = 0;
-				int newIndex = 0;
-				bool lastWasEscape = false;
-				while (char c = value[index++]) {
-					if (lastWasEscape) {
-						lastWasEscape = false;
-						// map \n to newline and \t to tab
-						if (c == 'n')
-							c = '\n';
-						else if (c == 't')
-							c = '\t';
-					} else if (c == '\\') {
-						lastWasEscape = true;
-						continue;
-					}
-					value[newIndex++] = c;
-				}
-				value[newIndex] = '\0';
-				text.UnlockBuffer(newIndex);
-			}
-		}
-	}
-
-	operator bool() const
-	{
-		return type != TOKEN_EOF;
-	}
-};
-
-
-struct BPackageInfo::Parser::ListElementParser {
-	virtual void operator()(const Token& token) = 0;
-};
-
-
-BPackageInfo::ParseErrorListener::~ParseErrorListener()
-{
-}
-
-
-BPackageInfo::Parser::Parser(ParseErrorListener* listener)
-	:
-	fListener(listener),
-	fPos(NULL)
-{
-}
-
-
-status_t
-BPackageInfo::Parser::Parse(const BString& packageInfoString,
-	BPackageInfo* packageInfo)
-{
-	if (packageInfo == NULL)
-		return B_BAD_VALUE;
-
-	fPos = packageInfoString.String();
-
-	try {
-		_Parse(packageInfo);
-	} catch (const ParseError& error) {
-		if (fListener != NULL) {
-			// map error position to line and column
-			int line = 1;
-			int column;
-			int32 offset = error.pos - packageInfoString.String();
-			int32 newlinePos = packageInfoString.FindLast('\n', offset - 1);
-			if (newlinePos < 0)
-				column = offset;
-			else {
-				column = offset - newlinePos;
-				do {
-					line++;
-					newlinePos = packageInfoString.FindLast('\n',
-						newlinePos - 1);
-				} while (newlinePos >= 0);
-			}
-			fListener->OnError(error.message, line, column);
-		}
-		return B_BAD_DATA;
-	} catch (const std::bad_alloc& e) {
-		if (fListener != NULL)
-			fListener->OnError("out of memory", 0, 0);
-		return B_NO_MEMORY;
-	}
-
-	return B_OK;
-}
-
-
-BPackageInfo::Parser::Token
-BPackageInfo::Parser::_NextToken()
-{
-	// Eat any whitespace or comments. Also eat ';' -- they have the same
-	// function as newlines. We remember the last encountered ';' or '\n' and
-	// return it as a token afterwards.
-	const char* itemSeparatorPos = NULL;
-	bool inComment = false;
-	while ((inComment && *fPos != '\0') || isspace(*fPos) || *fPos == ';'
-		|| *fPos == '#') {
-		if (*fPos == '#') {
-			inComment = true;
-		} else if (*fPos == '\n') {
-			itemSeparatorPos = fPos;
-			inComment = false;
-		} else if (!inComment && *fPos == ';')
-			itemSeparatorPos = fPos;
-		fPos++;
-	}
-
-	if (itemSeparatorPos != NULL) {
-		return Token(TOKEN_ITEM_SEPARATOR, itemSeparatorPos);
-	}
-
-	const char* tokenPos = fPos;
-	switch (*fPos) {
-		case '\0':
-			return Token(TOKEN_EOF, fPos);
-
-		case '{':
-			fPos++;
-			return Token(TOKEN_OPEN_BRACE, tokenPos);
-
-		case '}':
-			fPos++;
-			return Token(TOKEN_CLOSE_BRACE, tokenPos);
-
-		case '<':
-			fPos++;
-			if (*fPos == '=') {
-				fPos++;
-				return Token(TOKEN_OPERATOR_LESS_EQUAL, tokenPos, 2);
-			}
-			return Token(TOKEN_OPERATOR_LESS, tokenPos, 1);
-
-		case '=':
-			fPos++;
-			if (*fPos == '=') {
-				fPos++;
-				return Token(TOKEN_OPERATOR_EQUAL, tokenPos, 2);
-			}
-			return Token(TOKEN_OPERATOR_ASSIGN, tokenPos, 1);
-
-		case '!':
-			if (fPos[1] == '=') {
-				fPos += 2;
-				return Token(TOKEN_OPERATOR_NOT_EQUAL, tokenPos, 2);
-			}
-			break;
-
-		case '>':
-			fPos++;
-			if (*fPos == '=') {
-				fPos++;
-				return Token(TOKEN_OPERATOR_GREATER_EQUAL, tokenPos, 2);
-			}
-			return Token(TOKEN_OPERATOR_GREATER, tokenPos, 1);
-
-		case '"':
-		case '\'':
-		{
-			char quoteChar = *fPos;
-			fPos++;
-			const char* start = fPos;
-			// anything until the next quote is part of the value
-			bool lastWasEscape = false;
-			while ((*fPos != quoteChar || lastWasEscape) && *fPos != '\0') {
-				if (lastWasEscape)
-					lastWasEscape = false;
-				else if (*fPos == '\\')
-					lastWasEscape = true;
-				fPos++;
-			}
-			if (*fPos != quoteChar)
-				throw ParseError("unterminated quoted-string", tokenPos);
-			const char* end = fPos++;
-			return Token(TOKEN_QUOTED_STRING, start, end - start);
-		}
-
-		default:
-		{
-			const char* start = fPos;
-			while (isalnum(*fPos) || *fPos == '.' || *fPos == '-'
-				|| *fPos == '_' || *fPos == ':' || *fPos == '+') {
-				fPos++;
-			}
-			if (fPos == start)
-				break;
-			return Token(TOKEN_WORD, start, fPos - start);
-		}
-	}
-
-	BString error = BString("unknown token '") << *fPos << "' encountered";
-	throw ParseError(error.String(), fPos);
-}
-
-
-void
-BPackageInfo::Parser::_RewindTo(const Token& token)
-{
-	fPos = token.pos;
-}
-
-
-void
-BPackageInfo::Parser::_ParseStringValue(BString* value)
-{
-	Token string = _NextToken();
-	if (string.type != TOKEN_QUOTED_STRING && string.type != TOKEN_WORD)
-		throw ParseError("expected quoted-string or word", string.pos);
-
-	*value = string.text;
-}
-
-
-void
-BPackageInfo::Parser::_ParseArchitectureValue(BPackageArchitecture* value)
-{
-	Token arch = _NextToken();
-	if (arch.type == TOKEN_WORD) {
-		for (int i = 0; i < B_PACKAGE_ARCHITECTURE_ENUM_COUNT; ++i) {
-			if (arch.text.ICompare(BPackageInfo::kArchitectureNames[i]) == 0) {
-				*value = (BPackageArchitecture)i;
-				return;
-			}
-		}
-	}
-
-	BString error("architecture must be one of: [");
-	for (int i = 0; i < B_PACKAGE_ARCHITECTURE_ENUM_COUNT; ++i) {
-		if (i > 0)
-			error << ",";
-		error << BPackageInfo::kArchitectureNames[i];
-	}
-	error << "]";
-	throw ParseError(error, arch.pos);
-}
-
-
-void
-BPackageInfo::Parser::_ParseVersionValue(BPackageVersion* value,
-	bool releaseIsOptional)
-{
-	Token word = _NextToken();
-	if (word.type != TOKEN_WORD)
-		throw ParseError("expected word (a version)", word.pos);
-
-	// get the release number
-	uint8 release = 0;
-	int32 lastDashPos = word.text.FindLast('-');
-	if (lastDashPos >= 0) {
-		// Might be either the release number or, if that is optional, a
-		// pre-release. The former always is a number, the latter starts with a
-		// non-digit.
-		if (isdigit(word.text[lastDashPos + 1])) {
-			int number = atoi(word.text.String() + lastDashPos + 1);
-			if (number <= 0 || number > 99) {
-				throw ParseError("release number must be from 1-99",
-					word.pos + word.text.Length());
-			}
-			release = number;
-			word.text.Truncate(lastDashPos);
-			lastDashPos = word.text.FindLast('-');
-		}
-	}
-
-	if (release == 0 && !releaseIsOptional) {
-		throw ParseError("expected release number (-<number> suffix)",
-			word.pos + word.text.Length());
-	}
-
-	// get the pre-release string
-	BString preRelease;
-	if (lastDashPos >= 0) {
-		if (isdigit(word.text[lastDashPos + 1])) {
-			throw ParseError("pre-release number must not start with a digit",
-				word.pos + word.text.Length());
-		}
-
-		word.text.CopyInto(preRelease, lastDashPos + 1, word.text.Length());
-		word.text.Truncate(lastDashPos);
-	}
-
-	// get major, minor, and micro strings
-	BString major;
-	BString minor;
-	BString micro;
-	int32 firstDotPos = word.text.FindFirst('.');
-	if (firstDotPos < 0)
-		major = word.text;
-	else {
-		word.text.CopyInto(major, 0, firstDotPos);
-		int32 secondDotPos = word.text.FindFirst('.', firstDotPos + 1);
-		if (secondDotPos == firstDotPos + 1)
-			throw ParseError("expected minor version", word.pos + secondDotPos);
-
-		if (secondDotPos < 0)
-			word.text.CopyInto(minor, firstDotPos + 1, word.text.Length());
-		else {
-			word.text.CopyInto(minor, firstDotPos + 1,
-				secondDotPos - (firstDotPos + 1));
-			word.text.CopyInto(micro, secondDotPos + 1, word.text.Length());
-		}
-	}
-
-	value->SetTo(major, minor, micro, preRelease, release);
-}
-
-
-void
-BPackageInfo::Parser::_ParseList(ListElementParser& elementParser,
-	bool allowSingleNonListElement)
-{
-	Token openBracket = _NextToken();
-	if (openBracket.type != TOKEN_OPEN_BRACE) {
-		if (!allowSingleNonListElement)
-			throw ParseError("expected start of list ('[')", openBracket.pos);
-
-		elementParser(openBracket);
-		return;
-	}
-
-	while (true) {
-		Token token = _NextToken();
-		if (token.type == TOKEN_CLOSE_BRACE)
-			return;
-
-		if (token.type == TOKEN_ITEM_SEPARATOR)
-			continue;
-
-		elementParser(token);
-	}
-}
-
-
-void
-BPackageInfo::Parser::_ParseStringList(BStringList* value,
-	bool allowQuotedStrings, bool convertToLowerCase)
-{
-	struct StringParser : public ListElementParser {
-		BStringList* value;
-		bool allowQuotedStrings;
-		bool convertToLowerCase;
-
-		StringParser(BStringList* value, bool allowQuotedStrings,
-			bool convertToLowerCase)
-			:
-			value(value),
-			allowQuotedStrings(allowQuotedStrings),
-			convertToLowerCase(convertToLowerCase)
-		{
-		}
-
-		virtual void operator()(const Token& token)
-		{
-			if (allowQuotedStrings) {
-				if (token.type != TOKEN_QUOTED_STRING
-					&& token.type != TOKEN_WORD) {
-					throw ParseError("expected quoted-string or word",
-						token.pos);
-				}
-			} else {
-				if (token.type != TOKEN_WORD)
-					throw ParseError("expected word", token.pos);
-			}
-
-			BString element(token.text);
-			if (convertToLowerCase)
-				element.ToLower();
-
-			value->Add(element);
-		}
-	} stringParser(value, allowQuotedStrings, convertToLowerCase);
-
-	_ParseList(stringParser, true);
-}
-
-
-uint32
-BPackageInfo::Parser::_ParseFlags()
-{
-	struct FlagParser : public ListElementParser {
-		uint32 flags;
-
-		FlagParser()
-			:
-			flags(0)
-		{
-		}
-
-		virtual void operator()(const Token& token)
-		{
-		if (token.type != TOKEN_WORD)
-			throw ParseError("expected word (a flag)", token.pos);
-
-		if (token.text.ICompare("approve_license") == 0)
-			flags |= B_PACKAGE_FLAG_APPROVE_LICENSE;
-		else if (token.text.ICompare("system_package") == 0)
-			flags |= B_PACKAGE_FLAG_SYSTEM_PACKAGE;
-		else {
-				throw ParseError(
-					"expected 'approve_license' or 'system_package'",
-				token.pos);
-		}
-	}
-	} flagParser;
-
-	_ParseList(flagParser, true);
-
-	return flagParser.flags;
-}
-
-
-void
-BPackageInfo::Parser::_ParseResolvableList(
-	BObjectList<BPackageResolvable>* value)
-{
-	struct ResolvableParser : public ListElementParser {
-		Parser& parser;
-		BObjectList<BPackageResolvable>* value;
-
-		ResolvableParser(Parser& parser_,
-			BObjectList<BPackageResolvable>* value_)
-			:
-			parser(parser_),
-			value(value_)
-		{
-		}
-
-		virtual void operator()(const Token& token)
-		{
-			if (token.type != TOKEN_WORD) {
-				throw ParseError("expected word (a resolvable name)",
-					token.pos);
-			}
-
-			BPackageResolvableType type = B_PACKAGE_RESOLVABLE_TYPE_DEFAULT;
-			int32 colonPos = token.text.FindFirst(':');
-			if (colonPos >= 0) {
-				BString typeName(token.text, colonPos);
-				for (int i = 0; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT; ++i) {
-					if (typeName.ICompare(BPackageResolvable::kTypeNames[i])
-							== 0) {
-						type = (BPackageResolvableType)i;
-						break;
-					}
-				}
-				if (type == B_PACKAGE_RESOLVABLE_TYPE_DEFAULT) {
-					BString error("resolvable type (<type>:) must be one of [");
-					for (int i = 1; i < B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT;
-							++i) {
-						if (i > 1)
-							error << ",";
-						error << BPackageResolvable::kTypeNames[i];
-					}
-					error << "]";
-					throw ParseError(error, token.pos);
-				}
-			}
-
-			// parse version
-			BPackageVersion version;
-			Token op = parser._NextToken();
-			if (op.type == TOKEN_OPERATOR_ASSIGN) {
-				parser._ParseVersionValue(&version, true);
-			} else if (op.type == TOKEN_ITEM_SEPARATOR
-				|| op.type == TOKEN_CLOSE_BRACE) {
-				parser._RewindTo(op);
-			} else
-				throw ParseError("expected '=', comma or ']'", op.pos);
-
-			// parse compatible version
-			BPackageVersion compatibleVersion;
-			Token compatible = parser._NextToken();
-			if (compatible.type == TOKEN_WORD
-				&& (compatible.text == "compat"
-					|| compatible.text == "compatible")) {
-				op = parser._NextToken();
-				if (op.type == TOKEN_OPERATOR_GREATER_EQUAL) {
-					parser._ParseVersionValue(&compatibleVersion, true);
-				} else
-					parser._RewindTo(compatible);
-			} else
-				parser._RewindTo(compatible);
-
-			value->AddItem(new BPackageResolvable(token.text, type, version,
-				compatibleVersion));
-		}
-	} resolvableParser(*this, value);
-
-	_ParseList(resolvableParser, false);
-}
-
-
-void
-BPackageInfo::Parser::_ParseResolvableExprList(
-	BObjectList<BPackageResolvableExpression>* value)
-{
-	struct ResolvableExpressionParser : public ListElementParser {
-		Parser& parser;
-		BObjectList<BPackageResolvableExpression>* value;
-
-		ResolvableExpressionParser(Parser& parser_,
-			BObjectList<BPackageResolvableExpression>* value_)
-			:
-			parser(parser_),
-			value(value_)
-		{
-		}
-
-		virtual void operator()(const Token& token)
-		{
-			if (token.type != TOKEN_WORD) {
-				throw ParseError("expected word (a resolvable name)",
-					token.pos);
-			}
-
-		BPackageVersion version;
-			Token op = parser._NextToken();
-		if (op.type == TOKEN_OPERATOR_LESS
-			|| op.type == TOKEN_OPERATOR_LESS_EQUAL
-			|| op.type == TOKEN_OPERATOR_EQUAL
-			|| op.type == TOKEN_OPERATOR_NOT_EQUAL
-			|| op.type == TOKEN_OPERATOR_GREATER_EQUAL
-			|| op.type == TOKEN_OPERATOR_GREATER) {
-				parser._ParseVersionValue(&version, true);
-		} else if (op.type == TOKEN_ITEM_SEPARATOR
-			|| op.type == TOKEN_CLOSE_BRACE) {
-				parser._RewindTo(op);
-		} else {
-			throw ParseError(
-				"expected '<', '<=', '==', '!=', '>=', '>', comma or ']'",
-				op.pos);
-		}
-
-		BPackageResolvableOperator resolvableOperator
-			= (BPackageResolvableOperator)(op.type - TOKEN_OPERATOR_LESS);
-
-			value->AddItem(new BPackageResolvableExpression(token.text,
-			resolvableOperator, version));
-	}
-	} resolvableExpressionParser(*this, value);
-
-	_ParseList(resolvableExpressionParser, false);
-}
-
-
-void
-BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
-{
-	bool seen[B_PACKAGE_INFO_ENUM_COUNT];
-	for (int i = 0; i < B_PACKAGE_INFO_ENUM_COUNT; ++i)
-		seen[i] = false;
-
-	const char* const* names = BPackageInfo::kElementNames;
-
-	while (Token t = _NextToken()) {
-		if (t.type == TOKEN_ITEM_SEPARATOR)
-			continue;
-
-		if (t.type != TOKEN_WORD)
-			throw ParseError("expected word (a variable name)", t.pos);
-
-		BPackageInfoAttributeID attribute = B_PACKAGE_INFO_ENUM_COUNT;
-		for (int i = 0; i < B_PACKAGE_INFO_ENUM_COUNT; i++) {
-			if (names[i] != NULL && t.text.ICompare(names[i]) == 0) {
-				attribute = (BPackageInfoAttributeID)i;
-				break;
-			}
-		}
-
-		if (attribute == B_PACKAGE_INFO_ENUM_COUNT) {
-			BString error = BString("unknown attribute \"") << t.text << '"';
-			throw ParseError(error, t.pos);
-		}
-
-		if (seen[attribute]) {
-			BString error = BString(names[attribute]) << " already seen!";
-			throw ParseError(error, t.pos);
-		}
-
-		switch (attribute) {
-			case B_PACKAGE_INFO_NAME:
-			{
-				BString name;
-				_ParseStringValue(&name);
-				packageInfo->SetName(name);
-				break;
-			}
-
-			case B_PACKAGE_INFO_SUMMARY:
-			{
-				BString summary;
-				_ParseStringValue(&summary);
-				if (summary.FindFirst('\n') >= 0)
-					throw ParseError("the summary contains linebreaks", t.pos);
-				packageInfo->SetSummary(summary);
-				break;
-			}
-
-			case B_PACKAGE_INFO_DESCRIPTION:
-				_ParseStringValue(&packageInfo->fDescription);
-				break;
-
-			case B_PACKAGE_INFO_VENDOR:
-				_ParseStringValue(&packageInfo->fVendor);
-				break;
-
-			case B_PACKAGE_INFO_PACKAGER:
-				_ParseStringValue(&packageInfo->fPackager);
-				break;
-
-			case B_PACKAGE_INFO_ARCHITECTURE:
-				_ParseArchitectureValue(&packageInfo->fArchitecture);
-				break;
-
-			case B_PACKAGE_INFO_VERSION:
-				_ParseVersionValue(&packageInfo->fVersion, false);
-				break;
-
-			case B_PACKAGE_INFO_COPYRIGHTS:
-				_ParseStringList(&packageInfo->fCopyrightList);
-				break;
-
-			case B_PACKAGE_INFO_LICENSES:
-				_ParseStringList(&packageInfo->fLicenseList);
-				break;
-
-			case B_PACKAGE_INFO_URLS:
-				_ParseStringList(&packageInfo->fURLList);
-				break;
-
-			case B_PACKAGE_INFO_SOURCE_URLS:
-				_ParseStringList(&packageInfo->fSourceURLList);
-				break;
-
-			case B_PACKAGE_INFO_PROVIDES:
-				_ParseResolvableList(&packageInfo->fProvidesList);
-				break;
-
-			case B_PACKAGE_INFO_REQUIRES:
-				_ParseResolvableExprList(&packageInfo->fRequiresList);
-				break;
-
-			case B_PACKAGE_INFO_SUPPLEMENTS:
-				_ParseResolvableExprList(&packageInfo->fSupplementsList);
-				break;
-
-			case B_PACKAGE_INFO_CONFLICTS:
-				_ParseResolvableExprList(&packageInfo->fConflictsList);
-				break;
-
-			case B_PACKAGE_INFO_FRESHENS:
-				_ParseResolvableExprList(&packageInfo->fFreshensList);
-				break;
-
-			case B_PACKAGE_INFO_REPLACES:
-				_ParseStringList(&packageInfo->fReplacesList, false, true);
-				break;
-
-			case B_PACKAGE_INFO_FLAGS:
-				packageInfo->SetFlags(_ParseFlags());
-				break;
-
-			default:
-				// can never get here
-				break;
-		}
-
-		seen[attribute] = true;
-	}
-
-	// everything up to and including 'provides' is mandatory
-	for (int i = 0; i <= B_PACKAGE_INFO_PROVIDES; ++i) {
-		if (!seen[i]) {
-			BString error = BString(names[i]) << " is not being set anywhere!";
-			throw ParseError(error, fPos);
-		}
-	}
-}
-
-
-const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
+const char* const BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"name",
 	"summary",
 	"description",
@@ -816,32 +50,211 @@ const char* BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"source-urls",
 	"checksum",		// not being parsed, computed externally
 	NULL,			// install-path -- not settable via .PackageInfo
+	"base-package",
+	"global-writable-files",
+	"user-settings-files",
+	"users",
+	"groups",
+	"post-install-scripts"
 };
 
 
-const char*
+const char* const
 BPackageInfo::kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 	"any",
 	"x86",
 	"x86_gcc2",
+	"source",
+	"x86_64",
 };
+
+
+const char* const BPackageInfo::kWritableFileUpdateTypes[
+		B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT] = {
+	"keep-old",
+	"manual",
+	"auto-merge",
+};
+
+
+// #pragma mark - FieldName
+
+
+struct BPackageInfo::FieldName {
+	FieldName(const char* prefix, const char* suffix)
+	{
+		size_t prefixLength = strlen(prefix);
+		size_t suffixLength = strlen(suffix);
+		if (prefixLength + suffixLength >= sizeof(fFieldName)) {
+			fFieldName[0] = '\0';
+			return;
+		}
+
+		memcpy(fFieldName, prefix, prefixLength);
+		memcpy(fFieldName + prefixLength, suffix, suffixLength);
+		fFieldName[prefixLength + suffixLength] = '\0';
+	}
+
+	bool ReplaceSuffix(size_t prefixLength, const char* suffix)
+	{
+		size_t suffixLength = strlen(suffix);
+		if (prefixLength + suffixLength >= sizeof(fFieldName)) {
+			fFieldName[0] = '\0';
+			return false;
+		}
+
+		memcpy(fFieldName + prefixLength, suffix, suffixLength);
+		fFieldName[prefixLength + suffixLength] = '\0';
+		return true;
+	}
+
+	bool IsValid() const
+	{
+		return fFieldName[0] != '\0';
+	}
+
+	operator const char*()
+	{
+		return fFieldName;
+	}
+
+private:
+	char	fFieldName[64];
+};
+
+
+// #pragma mark - PackageFileLocation
+
+
+struct BPackageInfo::PackageFileLocation {
+	PackageFileLocation(const char* path)
+		:
+		fPath(path),
+		fFD(-1)
+	{
+	}
+
+	PackageFileLocation(int fd)
+		:
+		fPath(NULL),
+		fFD(fd)
+	{
+	}
+
+	const char* Path() const
+	{
+		return fPath;
+	}
+
+	int FD() const
+	{
+		return fFD;
+	}
+
+private:
+	const char*	fPath;
+	int			fFD;
+};
+
+
+// #pragma mark - BPackageInfo
 
 
 BPackageInfo::BPackageInfo()
 	:
+	BArchivable(),
 	fFlags(0),
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
-	fCopyrightList(5),
-	fLicenseList(5),
-	fURLList(5),
-	fSourceURLList(5),
+	fCopyrightList(4),
+	fLicenseList(4),
+	fURLList(4),
+	fSourceURLList(4),
+	fGlobalWritableFileInfos(4, true),
+	fUserSettingsFileInfos(4, true),
+	fUsers(4, true),
+	fGroups(4),
+	fPostInstallScripts(4),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
-	fConflictsList(5, true),
-	fFreshensList(5, true),
-	fReplacesList(5)
+	fConflictsList(4, true),
+	fFreshensList(4, true),
+	fReplacesList(4)
 {
+}
+
+
+BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
+	:
+	BArchivable(archive),
+	fFlags(0),
+	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
+	fCopyrightList(4),
+	fLicenseList(4),
+	fURLList(4),
+	fSourceURLList(4),
+	fGlobalWritableFileInfos(4, true),
+	fUserSettingsFileInfos(4, true),
+	fUsers(4, true),
+	fGroups(4),
+	fPostInstallScripts(4),
+	fProvidesList(20, true),
+	fRequiresList(20, true),
+	fSupplementsList(20, true),
+	fConflictsList(4, true),
+	fFreshensList(4, true),
+	fReplacesList(4)
+{
+	status_t error;
+	int32 architecture;
+	if ((error = archive->FindString("name", &fName)) == B_OK
+		&& (error = archive->FindString("summary", &fSummary)) == B_OK
+		&& (error = archive->FindString("description", &fDescription)) == B_OK
+		&& (error = archive->FindString("vendor", &fVendor)) == B_OK
+		&& (error = archive->FindString("packager", &fPackager)) == B_OK
+		&& (error = archive->FindString("basePackage", &fBasePackage)) == B_OK
+		&& (error = archive->FindUInt32("flags", &fFlags)) == B_OK
+		&& (error = archive->FindInt32("architecture", &architecture)) == B_OK
+		&& (error = _ExtractVersion(archive, "version", 0, fVersion)) == B_OK
+		&& (error = _ExtractStringList(archive, "copyrights", fCopyrightList))
+			== B_OK
+		&& (error = _ExtractStringList(archive, "licenses", fLicenseList))
+			== B_OK
+		&& (error = _ExtractStringList(archive, "urls", fURLList)) == B_OK
+		&& (error = _ExtractStringList(archive, "source-urls", fSourceURLList))
+			== B_OK
+		&& (error = _ExtractGlobalWritableFileInfos(archive,
+			"global-writable-files", fGlobalWritableFileInfos)) == B_OK
+		&& (error = _ExtractUserSettingsFileInfos(archive, "user-settings-files",
+			fUserSettingsFileInfos)) == B_OK
+		&& (error = _ExtractUsers(archive, "users", fUsers)) == B_OK
+		&& (error = _ExtractStringList(archive, "groups", fGroups)) == B_OK
+		&& (error = _ExtractStringList(archive, "post-install-scripts",
+			fPostInstallScripts)) == B_OK
+		&& (error = _ExtractResolvables(archive, "provides", fProvidesList))
+			== B_OK
+		&& (error = _ExtractResolvableExpressions(archive, "requires",
+			fRequiresList)) == B_OK
+		&& (error = _ExtractResolvableExpressions(archive, "supplements",
+			fSupplementsList)) == B_OK
+		&& (error = _ExtractResolvableExpressions(archive, "conflicts",
+			fConflictsList)) == B_OK
+		&& (error = _ExtractResolvableExpressions(archive, "freshens",
+			fFreshensList)) == B_OK
+		&& (error = _ExtractStringList(archive, "replaces", fReplacesList))
+			== B_OK
+		&& (error = archive->FindString("checksum", &fChecksum)) == B_OK
+		&& (error = archive->FindString("install-path", &fInstallPath)) == B_OK
+		&& (error = archive->FindString("file-name", &fFileName)) == B_OK) {
+		if (architecture >= 0
+			&& architecture <= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
+			fArchitecture = (BPackageArchitecture)architecture;
+		} else
+			error = B_BAD_DATA;
+	}
+
+	if (_error != NULL)
+		*_error = error;
 }
 
 
@@ -904,6 +317,20 @@ BPackageInfo::ReadFromConfigString(const BString& packageInfoString,
 
 
 status_t
+BPackageInfo::ReadFromPackageFile(const char* path)
+{
+	return _ReadFromPackageFile(PackageFileLocation(path));
+}
+
+
+status_t
+BPackageInfo::ReadFromPackageFile(int fd)
+{
+	return _ReadFromPackageFile(PackageFileLocation(fd));
+}
+
+
+status_t
 BPackageInfo::InitCheck() const
 {
 	if (fName.Length() == 0 || fSummary.Length() == 0
@@ -914,6 +341,50 @@ BPackageInfo::InitCheck() const
 		|| fCopyrightList.IsEmpty() || fLicenseList.IsEmpty()
 		|| fProvidesList.IsEmpty())
 		return B_NO_INIT;
+
+	// check global writable files
+	int32 globalWritableFileCount = fGlobalWritableFileInfos.CountItems();
+	for (int32 i = 0; i < globalWritableFileCount; i++) {
+		const BGlobalWritableFileInfo* info
+			= fGlobalWritableFileInfos.ItemAt(i);
+		status_t error = info->InitCheck();
+		if (error != B_OK)
+			return error;
+	}
+
+	// check user settings files
+	int32 userSettingsFileCount = fUserSettingsFileInfos.CountItems();
+	for (int32 i = 0; i < userSettingsFileCount; i++) {
+		const BUserSettingsFileInfo* info = fUserSettingsFileInfos.ItemAt(i);
+		status_t error = info->InitCheck();
+		if (error != B_OK)
+			return error;
+	}
+
+	// check users
+	int32 userCount = fUsers.CountItems();
+	for (int32 i = 0; i < userCount; i++) {
+		const BUser* user = fUsers.ItemAt(i);
+		status_t error = user->InitCheck();
+		if (error != B_OK)
+			return B_NO_INIT;
+
+		// make sure the user's groups are specified as groups
+		const BStringList& userGroups = user->Groups();
+		int32 groupCount = userGroups.CountStrings();
+		for (int32 k = 0; k < groupCount; k++) {
+			const BString& group = userGroups.StringAt(k);
+			if (!fGroups.HasString(group))
+				return B_BAD_VALUE;
+		}
+	}
+
+	// check groups
+	int32 groupCount = fGroups.CountStrings();
+	for (int32 i = 0; i< groupCount; i++) {
+		if (!BUser::IsValidUserName(fGroups.StringAt(i)))
+			return B_BAD_VALUE;
+	}
 
 	return B_OK;
 }
@@ -955,6 +426,13 @@ BPackageInfo::Packager() const
 
 
 const BString&
+BPackageInfo::BasePackage() const
+{
+	return fBasePackage;
+}
+
+
+const BString&
 BPackageInfo::Checksum() const
 {
 	return fChecksum;
@@ -965,6 +443,13 @@ const BString&
 BPackageInfo::InstallPath() const
 {
 	return fInstallPath;
+}
+
+
+BString
+BPackageInfo::FileName() const
+{
+	return fFileName.IsEmpty() ? CanonicalFileName() : fFileName;
 }
 
 
@@ -1017,6 +502,41 @@ BPackageInfo::SourceURLList() const
 }
 
 
+const BObjectList<BGlobalWritableFileInfo>&
+BPackageInfo::GlobalWritableFileInfos() const
+{
+	return fGlobalWritableFileInfos;
+}
+
+
+const BObjectList<BUserSettingsFileInfo>&
+BPackageInfo::UserSettingsFileInfos() const
+{
+	return fUserSettingsFileInfos;
+}
+
+
+const BObjectList<BUser>&
+BPackageInfo::Users() const
+{
+	return fUsers;
+}
+
+
+const BStringList&
+BPackageInfo::Groups() const
+{
+	return fGroups;
+}
+
+
+const BStringList&
+BPackageInfo::PostInstallScripts() const
+{
+	return fPostInstallScripts;
+}
+
+
 const BObjectList<BPackageResolvable>&
 BPackageInfo::ProvidesList() const
 {
@@ -1059,6 +579,38 @@ BPackageInfo::ReplacesList() const
 }
 
 
+BString
+BPackageInfo::CanonicalFileName() const
+{
+	if (InitCheck() != B_OK)
+		return BString();
+
+	return BString().SetToFormat("%s-%s-%s.hpkg", fName.String(),
+		fVersion.ToString().String(), kArchitectureNames[fArchitecture]);
+}
+
+
+bool
+BPackageInfo::Matches(const BPackageResolvableExpression& expression) const
+{
+	// check for an explicit match on the package
+	if (expression.Name().StartsWith("pkg:")) {
+		return fName == expression.Name().String() + 4
+			&& expression.Matches(fVersion, fVersion);
+	}
+
+	// search for a matching provides
+	int32 count = fProvidesList.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BPackageResolvable* provides = fProvidesList.ItemAt(i);
+		if (expression.Matches(*provides))
+			return true;
+	}
+
+	return false;
+}
+
+
 void
 BPackageInfo::SetName(const BString& name)
 {
@@ -1096,6 +648,13 @@ BPackageInfo::SetPackager(const BString& packager)
 
 
 void
+BPackageInfo::SetBasePackage(const BString& basePackage)
+{
+	fBasePackage = basePackage;
+}
+
+
+void
 BPackageInfo::SetChecksum(const BString& checksum)
 {
 	fChecksum = checksum;
@@ -1106,6 +665,13 @@ void
 BPackageInfo::SetInstallPath(const BString& installPath)
 {
 	fInstallPath = installPath;
+}
+
+
+void
+BPackageInfo::SetFileName(const BString& fileName)
+{
+	fFileName = fileName;
 }
 
 
@@ -1183,6 +749,96 @@ status_t
 BPackageInfo::AddSourceURL(const BString& url)
 {
 	return fSourceURLList.Add(url) ? B_OK : B_NO_MEMORY;
+}
+
+
+void
+BPackageInfo::ClearGlobalWritableFileInfos()
+{
+	fGlobalWritableFileInfos.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddGlobalWritableFileInfo(const BGlobalWritableFileInfo& info)
+{
+	BGlobalWritableFileInfo* newInfo
+		= new (std::nothrow) BGlobalWritableFileInfo(info);
+	if (newInfo == NULL || !fGlobalWritableFileInfos.AddItem(newInfo)) {
+		delete newInfo;
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+void
+BPackageInfo::ClearUserSettingsFileInfos()
+{
+	fUserSettingsFileInfos.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddUserSettingsFileInfo(const BUserSettingsFileInfo& info)
+{
+	BUserSettingsFileInfo* newInfo
+		= new (std::nothrow) BUserSettingsFileInfo(info);
+	if (newInfo == NULL || !fUserSettingsFileInfos.AddItem(newInfo)) {
+		delete newInfo;
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+void
+BPackageInfo::ClearUsers()
+{
+	fUsers.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddUser(const BUser& user)
+{
+	BUser* newUser = new (std::nothrow) BUser(user);
+	if (newUser == NULL || !fUsers.AddItem(newUser)) {
+		delete newUser;
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+void
+BPackageInfo::ClearGroups()
+{
+	fGroups.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddGroup(const BString& group)
+{
+	return fGroups.Add(group) ? B_OK : B_NO_MEMORY;
+}
+
+
+void
+BPackageInfo::ClearPostInstallScripts()
+{
+	fPostInstallScripts.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::AddPostInstallScript(const BString& path)
+{
+	return fPostInstallScripts.Add(path) ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -1303,8 +959,10 @@ BPackageInfo::Clear()
 	fDescription.Truncate(0);
 	fVendor.Truncate(0);
 	fPackager.Truncate(0);
+	fBasePackage.Truncate(0);
 	fChecksum.Truncate(0);
 	fInstallPath.Truncate(0);
+	fFileName.Truncate(0);
 	fFlags = 0;
 	fArchitecture = B_PACKAGE_ARCHITECTURE_ENUM_COUNT;
 	fVersion.Clear();
@@ -1312,12 +970,120 @@ BPackageInfo::Clear()
 	fLicenseList.MakeEmpty();
 	fURLList.MakeEmpty();
 	fSourceURLList.MakeEmpty();
+	fGlobalWritableFileInfos.MakeEmpty();
+	fUserSettingsFileInfos.MakeEmpty();
+	fUsers.MakeEmpty();
+	fGroups.MakeEmpty();
+	fPostInstallScripts.MakeEmpty();
 	fRequiresList.MakeEmpty();
 	fProvidesList.MakeEmpty();
 	fSupplementsList.MakeEmpty();
 	fConflictsList.MakeEmpty();
 	fFreshensList.MakeEmpty();
 	fReplacesList.MakeEmpty();
+}
+
+
+status_t
+BPackageInfo::Archive(BMessage* archive, bool deep) const
+{
+	status_t error = BArchivable::Archive(archive, deep);
+	if (error != B_OK)
+		return error;
+
+	if ((error = archive->AddString("name", fName)) != B_OK
+		|| (error = archive->AddString("summary", fSummary)) != B_OK
+		|| (error = archive->AddString("description", fDescription)) != B_OK
+		|| (error = archive->AddString("vendor", fVendor)) != B_OK
+		|| (error = archive->AddString("packager", fPackager)) != B_OK
+		|| (error = archive->AddString("basePackage", fBasePackage)) != B_OK
+		|| (error = archive->AddUInt32("flags", fFlags)) != B_OK
+		|| (error = archive->AddInt32("architecture", fArchitecture)) != B_OK
+		|| (error = _AddVersion(archive, "version", fVersion)) != B_OK
+		|| (error = archive->AddStrings("copyrights", fCopyrightList))
+			!= B_OK
+		|| (error = archive->AddStrings("licenses", fLicenseList)) != B_OK
+		|| (error = archive->AddStrings("urls", fURLList)) != B_OK
+		|| (error = archive->AddStrings("source-urls", fSourceURLList))
+			!= B_OK
+		|| (error = _AddGlobalWritableFileInfos(archive,
+			"global-writable-files", fGlobalWritableFileInfos)) != B_OK
+		|| (error = _AddUserSettingsFileInfos(archive,
+			"user-settings-files", fUserSettingsFileInfos)) != B_OK
+		|| (error = _AddUsers(archive, "users", fUsers)) != B_OK
+		|| (error = archive->AddStrings("groups", fGroups)) != B_OK
+		|| (error = archive->AddStrings("post-install-scripts",
+			fPostInstallScripts)) != B_OK
+		|| (error = _AddResolvables(archive, "provides", fProvidesList)) != B_OK
+		|| (error = _AddResolvableExpressions(archive, "requires",
+			fRequiresList)) != B_OK
+		|| (error = _AddResolvableExpressions(archive, "supplements",
+			fSupplementsList)) != B_OK
+		|| (error = _AddResolvableExpressions(archive, "conflicts",
+			fConflictsList)) != B_OK
+		|| (error = _AddResolvableExpressions(archive, "freshens",
+			fFreshensList)) != B_OK
+		|| (error = archive->AddStrings("replaces", fReplacesList)) != B_OK
+		|| (error = archive->AddString("checksum", fChecksum)) != B_OK
+		|| (error = archive->AddString("install-path", fInstallPath)) != B_OK
+		|| (error = archive->AddString("file-name", fFileName)) != B_OK) {
+		return error;
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ BArchivable*
+BPackageInfo::Instantiate(BMessage* archive)
+{
+	if (validate_instantiation(archive, "BPackageInfo"))
+		return new(std::nothrow) BPackageInfo(archive);
+	return NULL;
+}
+
+
+status_t
+BPackageInfo::GetConfigString(BString& _string) const
+{
+	return StringBuilder()
+		.Write("name", fName)
+		.Write("version", fVersion)
+		.Write("summary", fSummary)
+		.Write("description", fDescription)
+		.Write("vendor", fVendor)
+		.Write("packager", fPackager)
+		.Write("architecture", kArchitectureNames[fArchitecture])
+		.Write("copyrights", fCopyrightList)
+		.Write("licenses", fLicenseList)
+		.Write("urls", fURLList)
+		.Write("source-urls", fSourceURLList)
+		.Write("global-writable-files", fGlobalWritableFileInfos)
+		.Write("user-settings-files", fUserSettingsFileInfos)
+		.Write("users", fUsers)
+		.Write("groups", fGroups)
+		.Write("post-install-scripts", fPostInstallScripts)
+		.Write("provides", fProvidesList)
+		.BeginRequires(fBasePackage)
+			.Write("requires", fRequiresList)
+		.EndRequires()
+		.Write("supplements", fSupplementsList)
+		.Write("conflicts", fConflictsList)
+		.Write("freshens", fFreshensList)
+		.Write("replaces", fReplacesList)
+		.WriteFlags("flags", fFlags)
+		.Write("checksum", fChecksum)
+		.GetString(_string);
+	// Note: fInstallPath and fFileName can not be specified via .PackageInfo.
+}
+
+
+BString
+BPackageInfo::ToString() const
+{
+	BString string;
+	GetConfigString(string);
+	return string;
 }
 
 
@@ -1333,5 +1099,613 @@ BPackageInfo::GetArchitectureByName(const BString& name,
 	}
 	return B_NAME_NOT_FOUND;
 }
+
+
+/*static*/ status_t
+BPackageInfo::ParseVersionString(const BString& string, bool revisionIsOptional,
+	BPackageVersion& _version, ParseErrorListener* listener)
+{
+	return Parser(listener).ParseVersion(string, revisionIsOptional, _version);
+}
+
+
+status_t
+BPackageInfo::_ReadFromPackageFile(const PackageFileLocation& fileLocation)
+{
+	BHPKG::BNoErrorOutput errorOutput;
+
+	// try current package file format version
+	{
+		BHPKG::BPackageReader packageReader(&errorOutput);
+		status_t error = fileLocation.Path() != NULL
+			? packageReader.Init(fileLocation.Path())
+			: packageReader.Init(fileLocation.FD(), false);
+		if (error == B_OK) {
+			BPackageInfoContentHandler handler(*this);
+			return packageReader.ParseContent(&handler);
+		}
+
+		if (error != B_MISMATCHED_VALUES)
+			return error;
+	}
+
+	// try package file format version 1
+	BHPKG::V1::BPackageReader packageReader(&errorOutput);
+	status_t error = fileLocation.Path() != NULL
+		? packageReader.Init(fileLocation.Path())
+		: packageReader.Init(fileLocation.FD(), false);
+	if (error != B_OK)
+		return error;
+
+	BHPKG::V1::BPackageInfoContentHandler handler(*this);
+	return packageReader.ParseContent(&handler);
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddVersion(BMessage* archive, const char* field,
+	const BPackageVersion& version)
+{
+	// Storing BPackageVersion::ToString() would be nice, but the corresponding
+	// constructor only works for valid versions and we might want to store
+	// invalid versions as well.
+
+	// major
+	size_t fieldLength = strlen(field);
+	FieldName fieldName(field, ":major");
+	if (!fieldName.IsValid())
+		return B_BAD_VALUE;
+
+	status_t error = archive->AddString(fieldName, version.Major());
+	if (error != B_OK)
+		return error;
+
+	// minor
+	if (!fieldName.ReplaceSuffix(fieldLength, ":minor"))
+		return B_BAD_VALUE;
+
+	error = archive->AddString(fieldName, version.Minor());
+	if (error != B_OK)
+		return error;
+
+	// micro
+	if (!fieldName.ReplaceSuffix(fieldLength, ":micro"))
+		return B_BAD_VALUE;
+
+	error = archive->AddString(fieldName, version.Micro());
+	if (error != B_OK)
+		return error;
+
+	// pre-release
+	if (!fieldName.ReplaceSuffix(fieldLength, ":pre"))
+		return B_BAD_VALUE;
+
+	error = archive->AddString(fieldName, version.PreRelease());
+	if (error != B_OK)
+		return error;
+
+	// revision
+	if (!fieldName.ReplaceSuffix(fieldLength, ":revision"))
+		return B_BAD_VALUE;
+
+	return archive->AddUInt32(fieldName, version.Revision());
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddResolvables(BMessage* archive, const char* field,
+	const ResolvableList& resolvables)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName typeField(field, ":type");
+	FieldName versionField(field, ":version");
+	FieldName compatibleVersionField(field, ":compat");
+
+	if (!nameField.IsValid() || !typeField.IsValid() || !versionField.IsValid()
+		|| !compatibleVersionField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// add fields
+	int32 count = resolvables.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BPackageResolvable* resolvable = resolvables.ItemAt(i);
+		status_t error;
+		if ((error = archive->AddString(nameField, resolvable->Name())) != B_OK
+			|| (error = _AddVersion(archive, versionField,
+				resolvable->Version())) != B_OK
+			|| (error = _AddVersion(archive, compatibleVersionField,
+				resolvable->CompatibleVersion())) != B_OK) {
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddResolvableExpressions(BMessage* archive, const char* field,
+	const ResolvableExpressionList& expressions)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName operatorField(field, ":operator");
+	FieldName versionField(field, ":version");
+
+	if (!nameField.IsValid() || !operatorField.IsValid()
+		|| !versionField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// add fields
+	int32 count = expressions.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BPackageResolvableExpression* expression = expressions.ItemAt(i);
+		status_t error;
+		if ((error = archive->AddString(nameField, expression->Name())) != B_OK
+			|| (error = archive->AddInt32(operatorField,
+				expression->Operator())) != B_OK
+			|| (error = _AddVersion(archive, versionField,
+				expression->Version())) != B_OK) {
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddGlobalWritableFileInfos(BMessage* archive, const char* field,
+	const GlobalWritableFileInfoList& infos)
+{
+	// construct the field names we need
+	FieldName pathField(field, ":path");
+	FieldName updateTypeField(field, ":updateType");
+	FieldName isDirectoryField(field, ":isDirectory");
+
+	if (!pathField.IsValid() || !updateTypeField.IsValid()
+		|| !isDirectoryField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// add fields
+	int32 count = infos.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BGlobalWritableFileInfo* info = infos.ItemAt(i);
+		status_t error;
+		if ((error = archive->AddString(pathField, info->Path())) != B_OK
+			|| (error = archive->AddInt32(updateTypeField, info->UpdateType()))
+				!= B_OK
+			|| (error = archive->AddBool(isDirectoryField,
+				info->IsDirectory())) != B_OK) {
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddUserSettingsFileInfos(BMessage* archive, const char* field,
+	const UserSettingsFileInfoList& infos)
+{
+	// construct the field names we need
+	FieldName pathField(field, ":path");
+	FieldName templatePathField(field, ":templatePath");
+	FieldName isDirectoryField(field, ":isDirectory");
+
+	if (!pathField.IsValid() || !templatePathField.IsValid()
+		|| !isDirectoryField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// add fields
+	int32 count = infos.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BUserSettingsFileInfo* info = infos.ItemAt(i);
+		status_t error;
+		if ((error = archive->AddString(pathField, info->Path())) != B_OK
+			|| (error = archive->AddString(templatePathField,
+				info->TemplatePath())) != B_OK
+			|| (error = archive->AddBool(isDirectoryField,
+				info->IsDirectory())) != B_OK) {
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_AddUsers(BMessage* archive, const char* field,
+	const UserList& users)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName realNameField(field, ":realName");
+	FieldName homeField(field, ":home");
+	FieldName shellField(field, ":shell");
+	FieldName groupsField(field, ":groups");
+
+	if (!nameField.IsValid() || !realNameField.IsValid() || !homeField.IsValid()
+		|| !shellField.IsValid() || !groupsField.IsValid())
+		return B_BAD_VALUE;
+
+	// add fields
+	int32 count = users.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const BUser* user = users.ItemAt(i);
+		BString groups = user->Groups().Join(" ");
+		if (groups.IsEmpty() && !user->Groups().IsEmpty())
+			return B_NO_MEMORY;
+
+		status_t error;
+		if ((error = archive->AddString(nameField, user->Name())) != B_OK
+			|| (error = archive->AddString(realNameField, user->RealName()))
+				!= B_OK
+			|| (error = archive->AddString(homeField, user->Home())) != B_OK
+			|| (error = archive->AddString(shellField, user->Shell())) != B_OK
+			|| (error = archive->AddString(groupsField, groups)) != B_OK) {
+			return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractVersion(BMessage* archive, const char* field, int32 index,
+	BPackageVersion& _version)
+{
+	// major
+	size_t fieldLength = strlen(field);
+	FieldName fieldName(field, ":major");
+	if (!fieldName.IsValid())
+		return B_BAD_VALUE;
+
+	BString major;
+	status_t error = archive->FindString(fieldName, index, &major);
+	if (error != B_OK)
+		return error;
+
+	// minor
+	if (!fieldName.ReplaceSuffix(fieldLength, ":minor"))
+		return B_BAD_VALUE;
+
+	BString minor;
+	error = archive->FindString(fieldName, index, &minor);
+	if (error != B_OK)
+		return error;
+
+	// micro
+	if (!fieldName.ReplaceSuffix(fieldLength, ":micro"))
+		return B_BAD_VALUE;
+
+	BString micro;
+	error = archive->FindString(fieldName, index, &micro);
+	if (error != B_OK)
+		return error;
+
+	// pre-release
+	if (!fieldName.ReplaceSuffix(fieldLength, ":pre"))
+		return B_BAD_VALUE;
+
+	BString preRelease;
+	error = archive->FindString(fieldName, index, &preRelease);
+	if (error != B_OK)
+		return error;
+
+	// revision
+	if (!fieldName.ReplaceSuffix(fieldLength, ":revision"))
+		return B_BAD_VALUE;
+
+	uint32 revision;
+	error = archive->FindUInt32(fieldName, index, &revision);
+	if (error != B_OK)
+		return error;
+
+	_version.SetTo(major, minor, micro, preRelease, revision);
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractStringList(BMessage* archive, const char* field,
+	BStringList& _list)
+{
+	status_t error = archive->FindStrings(field, &_list);
+	return error == B_NAME_NOT_FOUND ? B_OK : error;
+		// If the field doesn't exist, that's OK.
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractResolvables(BMessage* archive, const char* field,
+	ResolvableList& _resolvables)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName typeField(field, ":type");
+	FieldName versionField(field, ":version");
+	FieldName compatibleVersionField(field, ":compat");
+
+	if (!nameField.IsValid() || !typeField.IsValid() || !versionField.IsValid()
+		|| !compatibleVersionField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(nameField, &type, &count) != B_OK) {
+		// the field is missing
+		return B_OK;
+	}
+
+	// extract fields
+	for (int32 i = 0; i < count; i++) {
+		BString name;
+		status_t error = archive->FindString(nameField, i, &name);
+		if (error != B_OK)
+			return error;
+
+		BPackageVersion version;
+		error = _ExtractVersion(archive, versionField, i, version);
+		if (error != B_OK)
+			return error;
+
+		BPackageVersion compatibleVersion;
+		error = _ExtractVersion(archive, compatibleVersionField, i,
+			compatibleVersion);
+		if (error != B_OK)
+			return error;
+
+		BPackageResolvable* resolvable = new(std::nothrow) BPackageResolvable(
+			name, version, compatibleVersion);
+		if (resolvable == NULL || !_resolvables.AddItem(resolvable)) {
+			delete resolvable;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractResolvableExpressions(BMessage* archive,
+	const char* field, ResolvableExpressionList& _expressions)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName operatorField(field, ":operator");
+	FieldName versionField(field, ":version");
+
+	if (!nameField.IsValid() || !operatorField.IsValid()
+		|| !versionField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(nameField, &type, &count) != B_OK) {
+		// the field is missing
+		return B_OK;
+	}
+
+	// extract fields
+	for (int32 i = 0; i < count; i++) {
+		BString name;
+		status_t error = archive->FindString(nameField, i, &name);
+		if (error != B_OK)
+			return error;
+
+		int32 operatorType;
+		error = archive->FindInt32(operatorField, i, &operatorType);
+		if (error != B_OK)
+			return error;
+		if (operatorType < 0
+			|| operatorType > B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT) {
+			return B_BAD_DATA;
+		}
+
+		BPackageVersion version;
+		error = _ExtractVersion(archive, versionField, i, version);
+		if (error != B_OK)
+			return error;
+
+		BPackageResolvableExpression* expression
+			= new(std::nothrow) BPackageResolvableExpression(name,
+				(BPackageResolvableOperator)operatorType, version);
+		if (expression == NULL || !_expressions.AddItem(expression)) {
+			delete expression;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractGlobalWritableFileInfos(BMessage* archive,
+	const char* field, GlobalWritableFileInfoList& _infos)
+{
+	// construct the field names we need
+	FieldName pathField(field, ":path");
+	FieldName updateTypeField(field, ":updateType");
+	FieldName isDirectoryField(field, ":isDirectory");
+
+	if (!pathField.IsValid() || !updateTypeField.IsValid()
+		|| !isDirectoryField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(pathField, &type, &count) != B_OK) {
+		// the field is missing
+		return B_OK;
+	}
+
+	// extract fields
+	for (int32 i = 0; i < count; i++) {
+		BString path;
+		status_t error = archive->FindString(pathField, i, &path);
+		if (error != B_OK)
+			return error;
+
+		int32 updateType;
+		error = archive->FindInt32(updateTypeField, i, &updateType);
+		if (error != B_OK)
+			return error;
+		if (updateType < 0
+			|| updateType > B_WRITABLE_FILE_UPDATE_TYPE_ENUM_COUNT) {
+			return B_BAD_DATA;
+		}
+
+		bool isDirectory;
+		error = archive->FindBool(isDirectoryField, i, &isDirectory);
+		if (error != B_OK)
+			return error;
+
+		BGlobalWritableFileInfo* info
+			= new(std::nothrow) BGlobalWritableFileInfo(path,
+				(BWritableFileUpdateType)updateType, isDirectory);
+		if (info == NULL || !_infos.AddItem(info)) {
+			delete info;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractUserSettingsFileInfos(BMessage* archive,
+	const char* field, UserSettingsFileInfoList& _infos)
+{
+	// construct the field names we need
+	FieldName pathField(field, ":path");
+	FieldName templatePathField(field, ":templatePath");
+	FieldName isDirectoryField(field, ":isDirectory");
+
+	if (!pathField.IsValid() || !templatePathField.IsValid()
+		|| !isDirectoryField.IsValid()) {
+		return B_BAD_VALUE;
+	}
+
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(pathField, &type, &count) != B_OK) {
+		// the field is missing
+		return B_OK;
+	}
+
+	// extract fields
+	for (int32 i = 0; i < count; i++) {
+		BString path;
+		status_t error = archive->FindString(pathField, i, &path);
+		if (error != B_OK)
+			return error;
+
+		BString templatePath;
+		error = archive->FindString(templatePathField, i, &templatePath);
+		if (error != B_OK)
+			return error;
+
+		bool isDirectory;
+		error = archive->FindBool(isDirectoryField, i, &isDirectory);
+		if (error != B_OK)
+			return error;
+
+		BUserSettingsFileInfo* info = isDirectory
+			? new(std::nothrow) BUserSettingsFileInfo(path, true)
+			: new(std::nothrow) BUserSettingsFileInfo(path, templatePath);
+		if (info == NULL || !_infos.AddItem(info)) {
+			delete info;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+BPackageInfo::_ExtractUsers(BMessage* archive, const char* field,
+	UserList& _users)
+{
+	// construct the field names we need
+	FieldName nameField(field, ":name");
+	FieldName realNameField(field, ":realName");
+	FieldName homeField(field, ":home");
+	FieldName shellField(field, ":shell");
+	FieldName groupsField(field, ":groups");
+
+	if (!nameField.IsValid() || !realNameField.IsValid() || !homeField.IsValid()
+		|| !shellField.IsValid() || !groupsField.IsValid())
+		return B_BAD_VALUE;
+
+	// get the number of items
+	type_code type;
+	int32 count;
+	if (archive->GetInfo(nameField, &type, &count) != B_OK) {
+		// the field is missing
+		return B_OK;
+	}
+
+	// extract fields
+	for (int32 i = 0; i < count; i++) {
+		BString name;
+		status_t error = archive->FindString(nameField, i, &name);
+		if (error != B_OK)
+			return error;
+
+		BString realName;
+		error = archive->FindString(realNameField, i, &realName);
+		if (error != B_OK)
+			return error;
+
+		BString home;
+		error = archive->FindString(homeField, i, &home);
+		if (error != B_OK)
+			return error;
+
+		BString shell;
+		error = archive->FindString(shellField, i, &shell);
+		if (error != B_OK)
+			return error;
+
+		BString groupsString;
+		error = archive->FindString(groupsField, i, &groupsString);
+		if (error != B_OK)
+			return error;
+
+		BStringList groups;
+		if (!groupsString.IsEmpty() && !groupsString.Split(" ", false, groups))
+			return B_NO_MEMORY;
+
+		BUser* user = new(std::nothrow) BUser(name, realName, home, shell,
+			groups);
+		if (user == NULL || !_users.AddItem(user)) {
+			delete user;
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
 
 }	// namespace BPackageKit

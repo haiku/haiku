@@ -1,30 +1,20 @@
 #!/bin/sh
 #
-# parameters <machine> <haiku sourcedir> <buildtools dir> <haiku output dir>
+# parameters <machine> <haiku sourcedir> <buildtools dir> <isntall dir>
 
 # get and check the parameters
 if [ $# -lt 4 ]; then
 	echo Usage: $0 '<machine> <haiku sourcedir> <buildtools dir>' \
-		'<haiku output dir>' >&2
+		'<install dir>' >&2
 	exit 1
 fi
 
 haikuMachine=$1
 haikuSourceDir=$2
 buildToolsDir=$3
-haikuOutputDir=$4
+installDir=$4
 shift 4
 additionalMakeArgs=$*
-
-case `uname` in
-FreeBSD|OpenBSD)
-	MAKE=gmake
-	;;
-*)
-	MAKE=make
-	;;
-esac
-export MAKE
 
 case $haikuMachine in
 x86_64-*)
@@ -68,7 +58,7 @@ fi
 
 
 # create the output dir
-mkdir -p $haikuOutputDir || exit 1
+mkdir -p $installDir || exit 1
 
 
 # get absolute paths
@@ -82,8 +72,9 @@ cd $buildToolsDir
 buildToolsDir=$(pwd)
 cd $currentDir
 
-cd $haikuOutputDir
-haikuOutputDir=$(pwd)
+cd $installDir
+installDir=$(pwd)
+cd $currentDir
 
 binutilsSourceDir=$buildToolsDir/binutils
 gccSourceDir=$buildToolsDir/gcc
@@ -104,13 +95,13 @@ fi
 find $binutilsSourceDir $gccSourceDir -name \*.info -print0 | xargs -0 touch
 
 # create the object and installation directories for the cross compilation tools
-installDir=$haikuOutputDir/cross-tools
-objDir=$haikuOutputDir/cross-tools-build
+objDir=${installDir}-build
 binutilsObjDir=$objDir/binutils
 gccObjDir=$objDir/gcc
 stdcxxObjDir=$objDir/stdcxx
-tmpIncludeDir=$objDir/sysincludes
-tmpLibDir=$objDir/syslibs
+sysrootDir=$installDir/sysroot
+tmpIncludeDir=$sysrootDir/boot/system/develop/headers
+tmpLibDir=$sysrootDir/boot/system/develop/lib
 
 rm -rf $installDir $objDir
 
@@ -134,6 +125,10 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 		--with-host-libstdcxx=\"-lstdc++\""
 fi
 
+if [ -n "$SECONDARY_ARCH" ]; then
+	gccConfigureArgs="$gccConfigureArgs --with-hybrid-secondary=$SECONDARY_ARCH"
+fi
+
 # force the POSIX locale, as the build (makeinfo) might choke otherwise
 export LC_ALL=POSIX
 
@@ -142,7 +137,9 @@ cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $binutilsSourceDir/configure \
 	--prefix=$installDir $buildHostSpec --target=$haikuMachine \
 	--enable-targets=$haikuMachine,i386-efi-pe,x86_64-efi-pe \
-	--disable-nls --disable-shared --disable-werror $binutilsConfigureArgs \
+	--disable-nls --disable-shared --disable-werror \
+	--with-sysroot=$sysrootDir \
+	$binutilsConfigureArgs \
 	|| exit 1
 $MAKE $additionalMakeArgs || exit 1
 $MAKE $additionalMakeArgs install || exit 1
@@ -203,7 +200,7 @@ CFLAGS="-O2" CXXFLAGS="-O2" $gccSourceDir/configure \
 	--prefix=$installDir $buildHostSpec --target=$haikuMachine \
 	--disable-nls --disable-shared --with-system-zlib \
 	--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
-	--with-headers=$tmpIncludeDir --with-libs=$tmpLibDir \
+	--with-sysroot=$sysrootDir \
 	$gccConfigureArgs \
 	|| exit 1
 
@@ -246,6 +243,9 @@ fi
 # remove the system headers from the installation dir
 # Only the ones from the source tree should be used.
 rm -rf $installDir/$haikuMachine/sys-include
+
+# remove the sysroot dir
+rm -rf $sysrootDir
 
 # remove the objects dir
 rm -rf $objDir

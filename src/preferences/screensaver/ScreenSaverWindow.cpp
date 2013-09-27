@@ -710,7 +710,9 @@ ModulesView::PopulateScreenSaverList()
 	// Iterate over add-on directories, and add their files to the list view
 
 	directory_which which[] = {
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
 		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
 		B_SYSTEM_ADDONS_DIRECTORY,
 	};

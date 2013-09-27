@@ -12,6 +12,10 @@
 
 #include <new>
 
+#include <Referenceable.h>
+
+#include <AutoDeleter.h>
+
 #include <util/OpenHashTable.h>
 
 #include <package/PackageInfo.h>
@@ -32,6 +36,16 @@ struct BPackageInfoSet::PackageInfo : public BPackageInfo {
 		BPackageInfo(other),
 		listNext(NULL)
 	{
+	}
+
+	void DeleteList()
+	{
+		PackageInfo* info = this;
+		while (info != NULL) {
+			PackageInfo* next = info->listNext;
+			delete info;
+			info = next;
+		}
 	}
 };
 
@@ -68,8 +82,8 @@ struct BPackageInfoSet::PackageInfoHashDefinition {
 // #pragma mark - PackageMap
 
 
-struct BPackageInfoSet::PackageMap
-	: public BOpenHashTable<PackageInfoHashDefinition> {
+struct BPackageInfoSet::PackageMap : public BReferenceable,
+	public BOpenHashTable<PackageInfoHashDefinition> {
 
 	PackageMap()
 		:
@@ -79,12 +93,34 @@ struct BPackageInfoSet::PackageMap
 
 	~PackageMap()
 	{
-		PackageInfo* info = Clear(true);
-		while (info != NULL) {
-			PackageInfo* next = info->hashNext;
-			delete info;
-			info = next;
+		DeleteAllPackageInfos();
+	}
+
+	static PackageMap* Create()
+	{
+		PackageMap* map = new(std::nothrow) PackageMap;
+		if (map == NULL || map->Init() != B_OK) {
+			delete map;
+			return NULL;
 		}
+
+		return map;
+	}
+
+	PackageMap* Clone() const
+	{
+		PackageMap* newMap = Create();
+		if (newMap == NULL)
+			return NULL;
+		ObjectDeleter<PackageMap> newMapDeleter(newMap);
+
+		for (BPackageInfoSet::Iterator it(this); it.HasNext();) {
+			const BPackageInfo* info = it.Next();
+			if (newMap->AddNewPackageInfo(*info) != B_OK)
+				return NULL;
+		}
+
+		return newMapDeleter.Detach();
 	}
 
 	void AddPackageInfo(PackageInfo* info)
@@ -96,6 +132,32 @@ struct BPackageInfoSet::PackageMap
 			Insert(info);
 
 		fCount++;
+	}
+
+	status_t AddNewPackageInfo(const BPackageInfo& oldInfo)
+	{
+		PackageInfo* info = new(std::nothrow) PackageInfo(oldInfo);
+		if (info == NULL)
+			return B_NO_MEMORY;
+		ObjectDeleter<PackageInfo> infoDeleter(info);
+
+		status_t error = info->InitCheck();
+		if (error != B_OK)
+			return error;
+
+		AddPackageInfo(infoDeleter.Detach());
+
+		return B_OK;
+	}
+
+	void DeleteAllPackageInfos()
+	{
+		PackageInfo* info = Clear(true);
+		while (info != NULL) {
+			PackageInfo* next = info->hashNext;
+			info->DeleteList();
+			info = next;
+		}
 	}
 
 	uint32 CountPackageInfos() const
@@ -111,20 +173,13 @@ private:
 // #pragma mark - Iterator
 
 
-BPackageInfoSet::Iterator::Iterator()
+BPackageInfoSet::Iterator::Iterator(const PackageMap* map)
 	:
-	fSet(NULL),
-	fNextInfo(NULL)
+	fMap(map),
+	fNextInfo(map != NULL ? map->GetIterator().Next() : NULL)
 {
 }
 
-
-BPackageInfoSet::Iterator::Iterator(const BPackageInfoSet* set)
-	:
-	fSet(set),
-	fNextInfo(fSet->fPackageMap->GetIterator().Next())
-{
-}
 
 bool
 BPackageInfoSet::Iterator::HasNext() const
@@ -145,7 +200,7 @@ BPackageInfoSet::Iterator::Next()
 		} else {
 			// get next in hash table
 			PackageMap::Iterator iterator
-				= fSet->fPackageMap->GetIterator(fNextInfo->Name());
+				= fMap->GetIterator(fNextInfo->Name());
 			iterator.Next();
 			fNextInfo = iterator.Next();
 		}
@@ -160,64 +215,52 @@ BPackageInfoSet::Iterator::Next()
 
 BPackageInfoSet::BPackageInfoSet()
 	:
-	fPackageMap(new(std::nothrow) PackageMap)
+	fPackageMap(NULL)
 {
 }
 
 
 BPackageInfoSet::~BPackageInfoSet()
 {
-	MakeEmpty();
-	delete fPackageMap;
+	if (fPackageMap != NULL)
+		fPackageMap->ReleaseReference();
+}
+
+
+BPackageInfoSet::BPackageInfoSet(const BPackageInfoSet& other)
+	:
+	fPackageMap(other.fPackageMap)
+{
+	if (fPackageMap != NULL)
+		fPackageMap->AcquireReference();
 }
 
 
 status_t
-BPackageInfoSet::Init()
+BPackageInfoSet::AddInfo(const BPackageInfo& info)
 {
-	return fPackageMap->Init();
-}
-
-
-status_t
-BPackageInfoSet::AddInfo(const BPackageInfo& _info)
-{
-	if (fPackageMap == NULL)
-		return B_NO_INIT;
-
-	PackageInfo* info = new(std::nothrow) PackageInfo(_info);
-	if (info == NULL)
+	if (!_CopyOnWrite())
 		return B_NO_MEMORY;
 
-	status_t error = info->InitCheck();
-	if (error != B_OK) {
-		delete info;
-		return error;
-	}
-
-	if (PackageInfo* oldInfo = fPackageMap->Lookup(info->Name())) {
-		// TODO: Check duplicates?
-		info->listNext = oldInfo->listNext;
-		oldInfo->listNext = info;
-	} else
-		fPackageMap->Insert(info);
-
-	return B_OK;
+	return fPackageMap->AddNewPackageInfo(info);
 }
 
 
 void
 BPackageInfoSet::MakeEmpty()
 {
-	if (fPackageMap == NULL)
+	if (fPackageMap == NULL || fPackageMap->CountPackageInfos() == 0)
 		return;
 
-	PackageInfo* info = fPackageMap->Clear(true);
-	while (info != NULL) {
-		PackageInfo* next = info->hashNext;
-		delete info;
-		info = next;
+	// If our map is shared, just set it to NULL.
+	if (fPackageMap->CountReferences() != 1) {
+		fPackageMap->ReleaseReference();
+		fPackageMap = NULL;
+		return;
 	}
+
+	// Our map is not shared -- make it empty.
+	fPackageMap->DeleteAllPackageInfos();
 }
 
 
@@ -234,7 +277,46 @@ BPackageInfoSet::CountInfos() const
 BPackageInfoSet::Iterator
 BPackageInfoSet::GetIterator() const
 {
-	return Iterator(this);
+	return Iterator(fPackageMap);
+}
+
+
+BPackageInfoSet&
+BPackageInfoSet::operator=(const BPackageInfoSet& other)
+{
+	if (other.fPackageMap == fPackageMap)
+		return *this;
+
+	if (fPackageMap != NULL)
+		fPackageMap->ReleaseReference();
+
+	fPackageMap = other.fPackageMap;
+
+	if (fPackageMap != NULL)
+		fPackageMap->AcquireReference();
+
+	return *this;
+}
+
+
+bool
+BPackageInfoSet::_CopyOnWrite()
+{
+	if (fPackageMap == NULL) {
+		fPackageMap = PackageMap::Create();
+		return fPackageMap != NULL;
+	}
+
+	if (fPackageMap->CountReferences() == 1)
+		return true;
+
+	PackageMap* newMap = fPackageMap->Clone();
+	if (newMap == NULL)
+		return false;
+
+	fPackageMap->ReleaseReference();
+	fPackageMap = newMap;
+	return true;
 }
 
 

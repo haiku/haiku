@@ -57,14 +57,18 @@ public:
 
 	static	const uint8			kDefaultPriority;
 
-	static	const char*			kNameField;
-	static	const char*			kURLField;
-	static	const char*			kVendorField;
-	static	const char*			kSummaryField;
-	static	const char*			kPriorityField;
-	static	const char*			kArchitectureField;
-	static	const char*			kLicenseNameField;
-	static	const char*			kLicenseTextField;
+	static	const char* const	kNameField;
+	static	const char* const	kURLField;
+	static	const char* const	kVendorField;
+	static	const char*	const	kSummaryField;
+	static	const char*	const	kPriorityField;
+	static	const char*	const	kArchitectureField;
+	static	const char*	const	kLicenseNameField;
+	static	const char*	const	kLicenseTextField;
+
+private:
+			status_t			_SetTo(const BMessage* data);
+			status_t			_SetTo(const BEntry& entry);
 
 private:
 			status_t			fInitStatus;

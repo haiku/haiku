@@ -15,7 +15,6 @@ BuildPlatformMain <build>package :
 	package.cpp
 	PackageWriterListener.cpp
 	PackageWritingUtils.cpp
-	StandardErrorOutput.cpp
 
 	:
 	libpackage_build.so $(HOST_LIBBE) $(HOST_LIBSUPC++)

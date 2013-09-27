@@ -1,9 +1,5 @@
 SubDir HAIKU_TOP src libs tiff ;
 
-UseLibraryHeaders tiff ;
-UseHeaders $(HAIKU_JPEG_HEADERS) : true ;
-UseHeaders $(HAIKU_ZLIB_HEADERS) : true ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 local shared_files =
@@ -46,14 +42,28 @@ local shared_files =
 	tif_zip.c 
 	;
 
-Includes [ FGristFiles tif_jpeg.c tif_ojpeg.c ]
-	: $(HAIKU_JPEG_HEADERS_DEPENDENCY) ;
-Includes [ FGristFiles tif_pixarlog.c tif_zip.c ]
-	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		UseLibraryHeaders tiff ;
+		UseBuildFeatureHeaders jpeg ;
+		UseBuildFeatureHeaders zlib ;
 
-Objects $(shared_files) ;
+		Includes [ FGristFiles tif_jpeg.c tif_ojpeg.c ]
+			: [ BuildFeatureAttribute jpeg : headers ] ;
+		Includes [ FGristFiles tif_pixarlog.c tif_zip.c ]
+			: [ BuildFeatureAttribute zlib : headers ] ;
 
-SharedLibrary libtiff.so : [ FGristFiles $(shared_files:S=.o) ]
-	: $(HAIKU_JPEG_LIB) $(HAIKU_ZLIB_LIB) : 3.8 ;
+		Objects $(shared_files) ;
 
-StaticLibrary libtiff.a : [ FGristFiles $(shared_files:S=.o) ] ;
+		SharedLibrary [ MultiArchDefaultGristFiles libtiff.so ]
+			: [ FGristFiles $(shared_files:S=.o) ]
+			:
+			[ BuildFeatureAttribute jpeg : library ]
+			[ BuildFeatureAttribute zlib : library ]
+			: 3.8 ;
+
+		StaticLibrary [ MultiArchDefaultGristFiles libtiff.a ]
+			: [ FGristFiles $(shared_files:S=.o) ] ;
+	}
+}

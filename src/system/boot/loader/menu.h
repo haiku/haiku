@@ -9,6 +9,7 @@
 #include <boot/vfs.h>
 
 
-extern status_t user_menu(Directory **_bootVolume);
+extern status_t user_menu(BootVolume& _bootVolume);
+
 
 #endif	/* MENU_H */

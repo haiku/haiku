@@ -1,9 +1,12 @@
 SubDir HAIKU_TOP src build libpackage ;
 
-UsePrivateBuildHeaders kernel shared ;
+UsePrivateBuildHeaders kernel package shared storage ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
 
 USES_BE_API on libpackage_build.so = true ;
 
@@ -20,30 +23,51 @@ USES_BE_API on libpackage_build.so = true ;
 
 HPKG_SOURCES =
 	AttributeDataReader.cpp
-	BlockBufferCache.cpp
-	BlockBufferCacheImpl.cpp
-	BufferCache.cpp
-	CachedBuffer.cpp
+	BlockBufferPool.cpp
+	BlockBufferPoolImpl.cpp
+	BlockBufferPoolNoLock.cpp
+	BufferPool.cpp
+	PoolBuffer.cpp
 	DataOutput.cpp
 	DataReader.cpp
+	DataWriters.cpp
 	ErrorOutput.cpp
 	FDDataReader.cpp
+	GlobalWritableFileInfo.cpp
+	HPKGDefs.cpp
 	PackageContentHandler.cpp
 	PackageData.cpp
 	PackageDataReader.cpp
 	PackageEntry.cpp
 	PackageEntryAttribute.cpp
+	PackageFileHeapAccessorBase.cpp
+	PackageFileHeapReader.cpp
+	PackageFileHeapWriter.cpp
 	PackageReader.cpp
 	PackageReaderImpl.cpp
 	PackageWriter.cpp
 	PackageWriterImpl.cpp
 	ReaderImplBase.cpp
+	RepositoryContentHandler.cpp
 	RepositoryReader.cpp
 	RepositoryReaderImpl.cpp
 	RepositoryWriter.cpp
 	RepositoryWriterImpl.cpp
 	Strings.cpp
+	UserSettingsFileInfo.cpp
 	WriterImplBase.cpp
+
+	# V1 support
+	HPKGDefsV1.cpp
+	PackageContentHandlerV1.cpp
+	PackageDataReaderV1.cpp
+	PackageDataV1.cpp
+	PackageEntryAttributeV1.cpp
+	PackageEntryV1.cpp
+	PackageInfoContentHandlerV1.cpp
+	PackageReaderImplV1.cpp
+	PackageReaderV1.cpp
+	ReaderImplBaseV1.cpp
 
 	# compression
 	ZlibCompressionBase.cpp
@@ -58,17 +82,20 @@ BuildPlatformSharedLibrary libpackage_build.so
 	:
 	ActivateRepositoryCacheJob.cpp
 	ActivateRepositoryConfigJob.cpp
+	ActivationTransaction.cpp
 	AddRepositoryRequest.cpp
 	Attributes.cpp
-	BlockBufferCacheNoLock.cpp
 	ChecksumAccessors.cpp
 	Context.cpp
+	DownloadFileRequest.cpp
 	DropRepositoryRequest.cpp
 	FetchFileJob.cpp
+	InstallationLocationInfo.cpp
 	Job.cpp
 	JobQueue.cpp
 	PackageInfo.cpp
 	PackageInfoContentHandler.cpp
+	PackageInfoParser.cpp
 	PackageInfoSet.cpp
 	PackageResolvable.cpp
 	PackageResolvableExpression.cpp
@@ -81,9 +108,31 @@ BuildPlatformSharedLibrary libpackage_build.so
 	RepositoryInfo.cpp
 	Request.cpp
 	TempfileManager.cpp
+	User.cpp
 	ValidateChecksumJob.cpp
 
 	$(HPKG_SOURCES)
+
+	# hpkg, but only libpackage
+	NoErrorOutput.cpp
+	StandardErrorOutput.cpp
+
+	# manager
+	Exceptions.cpp
+	RepositoryBuilder.cpp
+
+	# solver
+	Solver.cpp
+	SolverPackage.cpp
+	SolverPackageSpecifier.cpp
+	SolverPackageSpecifierList.cpp
+	SolverProblem.cpp
+	SolverProblemSolution.cpp
+	SolverRepository.cpp
+	SolverResult.cpp
 	:
 	libshared_build.a $(HOST_LIBBE) z $(HOST_LIBSTDC++)
 ;
+
+
+HaikuSubInclude solver ;

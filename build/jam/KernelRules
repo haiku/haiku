@@ -23,8 +23,9 @@ rule SetupKernel
 		ObjectDefines $(object) : $(TARGET_KERNEL_DEFINES) ;
 
 		# override warning flags
-		TARGET_WARNING_CCFLAGS on $(object) = $(TARGET_KERNEL_WARNING_CCFLAGS) ;
-		TARGET_WARNING_C++FLAGS on $(object)
+		TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH) on $(object)
+			= $(TARGET_KERNEL_WARNING_CCFLAGS) ;
+		TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCH) on $(object)
 			= $(TARGET_KERNEL_WARNING_C++FLAGS) ;
 	}
 }
@@ -39,7 +40,7 @@ rule KernelLd
 {
 	# KernelLd <name> : <objs> : <linkerscript> : <args> ;
 
-	LINK on $(1) = $(TARGET_LD) ;
+	LINK on $(1) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
 
 	LINKFLAGS on $(1) = $(4) ;
 	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
@@ -92,7 +93,7 @@ actions KernelSo1
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 
 	$(2[1]) --data $(2[2]) $(1) &&
-	$(HAIKU_ELFEDIT) --output-type dyn $(1)
+	$(HAIKU_ELFEDIT_$(TARGET_PACKAGING_ARCH)) --output-type dyn $(1)
 }
 
 rule KernelAddon
@@ -133,7 +134,7 @@ rule KernelAddon
 	Depends $(target) : $(beginGlue) $(endGlue) ;
 
 	# compile and link
-	SetupKernel $(sources) : $(TARGET_KERNEL_PIC_FLAGS) : false ;
+	SetupKernel $(sources) : : false ;
 	local linkFlags = -nostdlib -Xlinker --no-undefined
 		-Xlinker -soname=\"$(target:G=)\" $(TARGET_KERNEL_ADDON_LINKFLAGS) ;
 	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ] $(linkFlags) ;
@@ -161,7 +162,7 @@ rule KernelStaticLibrary
 {
 	# Usage KernelStaticLibrary <name> : <sources> : <extra cc flags>  ;
 	# This is designed to take a set of sources and libraries and create
-	# a file called lib<name>.a
+	# a static library.
 
 	SetupKernel $(2) : $(3) : false ;
 	Library $(1) : $(2) ;
@@ -187,5 +188,5 @@ actions KernelStaticLibraryObjects
 	# Force recreation of the archive to avoid build errors caused by
 	# stale dependencies after renaming or deleting object files.
 	$(RM) "$(1)"
-	$(HAIKU_AR) -r "$(1)" "$(2)" ;
+	$(HAIKU_AR_$(TARGET_PACKAGING_ARCH)) -r "$(1)" "$(2)" ;
 }

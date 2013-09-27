@@ -10,7 +10,7 @@
 #include <stdio.h>
 #endif
 
-#include <debugger.h>
+#include <OS.h>
 
 //#define TRACE_REFERENCEABLE
 #if defined(TRACE_REFERENCEABLE) && defined(_KERNEL_MODE)

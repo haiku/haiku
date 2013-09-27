@@ -14,23 +14,6 @@ KernelAddon sis900 :
 	sis900.c
 	;
 
-Package haiku-sis900-cvs :
-	sis900 :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-sis900-cvs : net sis900 ;
-Package haiku-sis900-cvs :
-	sis900.settings :
-	boot home config settings kernel drivers sample ;
-
-Package haiku-networkingkit-cvs :
-	sis900 :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-networkingkit-cvs : net sis900 ;
-Package haiku-networkingkit-cvs :
-	sis900.settings :
-	boot home config settings kernel drivers sample ;
-
-
 
 rule InstallSiS900
 {

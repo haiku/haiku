@@ -21,7 +21,7 @@ Application ShowImage :
 	ShowImageWindow.cpp
 	ToolBarIcons.cpp
 	ToolBarView.cpp
-	: libshared.a be tracker translation $(HAIKU_LOCALE_LIBS)
+	: libshared.a be tracker translation localestub
 		$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 	: ShowImage.rdef
 ;

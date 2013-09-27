@@ -10,6 +10,7 @@ void	print_usage_and_exit(bool error);
 
 int		command_create(int argc, const char* const* argv);
 int		command_list(int argc, const char* const* argv);
+int		command_update(int argc, const char* const* argv);
 
 
 #endif	// PACKAGE_REPO_H

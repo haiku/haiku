@@ -4,15 +4,22 @@ UsePrivateHeaders
 	[ FDirName libroot ]
 	[ FDirName libroot locale ]
 	[ FDirName libroot time ]
-;
+	;
 
-MergeObject posix_locale.o :
-	ctype.cpp
-	LocaleBackend.cpp
-	LocaleData.cpp
-	LocaleDataBridge.cpp
-	localeconv.cpp
-	nl_langinfo.cpp
-	setlocale.cpp
-	wctype.cpp
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		MergeObject <$(architecture)>posix_locale.o :
+			ctype.cpp
+			LocaleBackend.cpp
+			LocaleData.cpp
+			LocaleDataBridge.cpp
+			localeconv.cpp
+			nl_langinfo.cpp
+			setlocale.cpp
+			wctype.cpp
+			;
+	}
+}

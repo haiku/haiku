@@ -13,7 +13,7 @@ Application CDPlayer :
 	VolumeSlider.cpp
 
 	: be $(TARGET_SELECT_UNAME_ETC_LIB) $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
-		$(HAIKU_LOCALE_LIBS) translation textencoding
+		localestub translation textencoding
 	: CDPlayer.rdef
 ;
 

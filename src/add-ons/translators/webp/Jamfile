@@ -18,7 +18,7 @@ Translator WebPTranslator :
 	<libwebp>webpdecode.o
 	<libwebp>webpencode.o
 	be translation libtranslatorsutils.a
-	$(TARGET_LIBSUPC++)	$(HAIKU_LOCALE_LIBS)
+	$(TARGET_LIBSUPC++)	localestub
 	: true
 ;
 

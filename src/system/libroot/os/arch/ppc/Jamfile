@@ -1,24 +1,31 @@
 SubDir HAIKU_TOP src system libroot os arch ppc ;
 
-UsePrivateKernelHeaders ;
-	# TODO: Replace by "UsePrivateHeaders libroot" after resolving the TODO in
-	# time.c!
-UsePrivateSystemHeaders ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ppc ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+		UsePrivateKernelHeaders ;
+			# TODO: Replace by "UsePrivateHeaders libroot" after resolving the
+			# TODO in time.c!
+		UsePrivateSystemHeaders ;
 
-MergeObject os_arch_$(TARGET_ARCH).o :
-	atomic.S
-	byteorder.S
-	compatibility.c	# only here until the places where those functions are used
-					# are fixed
-	stack_frame.c
-#	systeminfo.c
-	system_time.c
-	system_time_asm.S
-	thread.c
-	time.c
-	tls.c
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
-	generic_system_time_nsecs.cpp
-;
+		MergeObject <$(architecture)>os_arch_$(TARGET_ARCH).o :
+			atomic.S
+			byteorder.S
+			compatibility.c	# only here until the places where those functions
+							# are used are fixed
+			stack_frame.c
+#			systeminfo.c
+			system_time.c
+			system_time_asm.S
+			thread.c
+			time.c
+			tls.c
+
+			generic_system_time_nsecs.cpp
+			;
+	}
+}

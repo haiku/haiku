@@ -11,7 +11,7 @@ Translator BMPTranslator :
 	BMPTranslator.cpp
 	BMPView.cpp
 	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 	: true
 ;
 
@@ -22,8 +22,3 @@ DoCatalogs BMPTranslator :
 	BMPTranslator.cpp
 	BMPView.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	BMPTranslator :
-	boot home config add-ons Translators ;
-

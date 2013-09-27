@@ -11,11 +11,10 @@ Server debug_server
  	:
  	DebugServer.cpp
 	:
-	libroot.so	# Haiku libroot
-	libbe.so	# Haiku libbe
+	be
 	libdebug.so
 	$(TARGET_LIBSTDC++)
-	$(HAIKU_LOCALE_LIBS)
+	localestub
 ;
 
 DoCatalogs debug_server :

@@ -1,19 +1,19 @@
 #!/bin/sh
 
-# Parameters <haiku sourcedir> <buildtools dir> <haiku output dir>
+# Parameters <haiku sourcedir> <buildtools dir> <install dir>
 # Influential environmental variable:
 # * haikuRequiredLegacyGCCVersion: The required version of the gcc. Will be
 #   checked against the version in the buildtools directory.
 
 # get and check the parameters
 if [ $# -lt 3 ]; then
-	echo Usage: $0 '<haiku sourcedir> <buildtools dir> <haiku output dir>' >&2
+	echo Usage: $0 '<haiku sourcedir> <buildtools dir> <install dir>' >&2
 	exit 1
 fi
 
 haikuSourceDir=$1
 buildToolsDir=$2/legacy
-haikuOutputDir=$3
+installDir=$3
 shift 3
 additionalMakeArgs=$*
 	# Note: The gcc 2 build has trouble with -jN N > 1, hence we only use the
@@ -62,7 +62,7 @@ fi
 
 
 # create the output dir
-mkdir -p $haikuOutputDir || exit 1
+mkdir -p $installDir || exit 1
 
 
 # get absolute paths
@@ -76,13 +76,13 @@ cd $buildToolsDir
 buildToolsDir=`pwd`
 cd $currentDir
 
-cd $haikuOutputDir
-haikuOutputDir=`pwd`
+cd $installDir
+installDir=`pwd`
+cd $currentDir
 
 
 # create the object and installation directories for the cross compilation tools
-installDir=$haikuOutputDir/cross-tools
-objDir=$haikuOutputDir/cross-tools-build
+objDir=${installDir}-build
 binutilsObjDir=$objDir/binutils
 gccObjDir=$objDir/gcc
 tmpIncludeDir=$objDir/sysincludes
@@ -93,6 +93,11 @@ rm -rf $installDir $objDir
 mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $tmpIncludeDir \
 	$tmpLibDir || exit 1
 mkdir -p $installDir/lib/gcc-lib/i586-pc-haiku/$haikuRequiredLegacyGCCVersion
+
+gccConfigureArgs=
+if [ -n "$SECONDARY_ARCH" ]; then
+	gccConfigureArgs="$gccConfigureArgs --with-hybrid-secondary=$SECONDARY_ARCH"
+fi
 
 # force the POSIX locale, as the build (makeinfo) might choke otherwise
 export LC_ALL=POSIX
@@ -108,8 +113,8 @@ cd $binutilsObjDir
 CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
 	--prefix=$installDir $buildHostSpec --target=i586-pc-haiku \
 	--disable-nls --enable-shared=yes --disable-werror || exit 1
-make $additionalMakeArgs || exit 1
-make $additionalMakeArgs install || exit 1
+$MAKE $additionalMakeArgs || exit 1
+$MAKE $additionalMakeArgs install || exit 1
 
 PATH=$PATH:$installDir/bin
 export PATH
@@ -153,7 +158,7 @@ esac
 CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" $buildToolsDir/gcc/configure \
 	--prefix=$installDir $buildHostSpec --target=i586-pc-haiku \
 	--disable-nls --enable-shared=yes --enable-languages=c,c++ \
-	--with-headers=$tmpIncludeDir --with-libs=$tmpLibDir \
+	--with-headers=$tmpIncludeDir --with-libs=$tmpLibDir $gccConfigureArgs \
 	|| exit 1
 unset CC
 
@@ -168,13 +173,13 @@ eval "sed $sedExpr Makefile.bak > Makefile" || exit 1
 rm Makefile.bak
 
 # make gcc
-make cross || {
+$MAKE cross || {
 	echo "ERROR: Building gcc failed." >&2
 	exit 1
 }
 
 # install gcc
-make install-gcc-cross || {
+$MAKE install-gcc-cross || {
 	echo "ERROR: Installing the cross compiler failed." >&2
 	exit 1
 }
@@ -183,6 +188,11 @@ make install-gcc-cross || {
 # (unconditional hack: math_huge_val_ifndef) from ours and it is semantically
 # equivalent.
 rm -f $installDir/lib/gcc-lib/i586-pc-haiku/$haikuRequiredLegacyGCCVersion/include/math.h
+
+# Symlink the built-in C++ headers path to the sys-include directory. This is
+# not actually needed for cross compiling Haiku itself, but simplifies using the
+# cross compiler for building the bootstrap packages.
+(cd $installDir/include; ln -s ../i586-pc-haiku/sys-include/c++/2.95.3 g++)
 
 
 # cleanup

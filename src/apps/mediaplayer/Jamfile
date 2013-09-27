@@ -115,7 +115,7 @@ Application MediaPlayer :
 	VideoView.cpp
 
 	: be game media tracker translation textencoding $(TARGET_LIBSTDC++) 
-		$(HAIKU_LOCALE_LIBS) libshared.a
+		localestub libshared.a
 	: MediaPlayer.rdef
 ;
 

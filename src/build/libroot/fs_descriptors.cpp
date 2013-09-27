@@ -23,6 +23,8 @@
 
 #include <fs_attr.h>
 
+#include <syscalls.h>
+
 #include "fs_impl.h"
 
 using std::map;
@@ -33,6 +35,27 @@ typedef map<int, BPrivate::Descriptor*> DescriptorMap;
 static DescriptorMap *sDescriptors;
 
 namespace BPrivate {
+
+
+static int
+dup_maybe_system(int fd)
+{
+	if (get_descriptor(fd) != NULL)
+		return _kern_dup(fd);
+
+	int clonedFD = dup(fd);
+	return clonedFD >= 0 ? clonedFD : errno;
+}
+
+
+static status_t
+close_maybe_system(int fd)
+{
+	if (get_descriptor(fd) != NULL)
+		return _kern_close(fd);
+
+	return close(fd) == 0 ? B_OK : errno;
+}
 
 
 // #pragma mark - Descriptor
@@ -263,7 +286,7 @@ SymlinkDescriptor::GetPath(string& path) const
 AttributeDescriptor::AttributeDescriptor(int fileFD, const char* attribute,
 	uint32 type, int openMode)
 	:
-	fFileFD(dup(fileFD)),
+	fFileFD(dup_maybe_system(fileFD)),
 	fType(type),
 	fOpenMode(openMode),
 	fData(NULL),
@@ -377,7 +400,7 @@ AttributeDescriptor::Close()
 	if (fFileFD < 0)
 		return B_BAD_VALUE;
 
-	close(fFileFD);
+	close_maybe_system(fFileFD);
 	fFileFD = -1;
 
 	free(fData);

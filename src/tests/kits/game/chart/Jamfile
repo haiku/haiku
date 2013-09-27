@@ -8,7 +8,7 @@ Application Chart :
 	ChartRender.cpp
 	ChartView.cpp
 	ChartWindow.cpp
-	: be game $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be game localestub $(TARGET_LIBSUPC++)
 	: Chart.rdef
 	;
 

@@ -1566,8 +1566,8 @@ swap_init_post_modules()
 	if (swapDeviceID == gBootDevice)
 		path = kDefaultSwapPath;
 	else {
-		vfs_entry_ref_to_path(info.dev, info.root,
-			".", path.LockBuffer(), path.BufferSize());
+		vfs_entry_ref_to_path(info.dev, info.root, ".", true, path.LockBuffer(),
+			path.BufferSize());
 		path.UnlockBuffer();
 		path.Append("swap");
 	}

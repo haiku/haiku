@@ -55,6 +55,7 @@ All rights reserved.
 #include "QueryPoseView.h"
 #include "Tracker.h"
 #include "Utilities.h"
+#include "VirtualDirectoryEntryList.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -138,6 +139,8 @@ FavoritesMenu::AddNextItem()
 
 			if (startModel.IsQuery())
 				fContainer = new QueryEntryListCollection(&startModel);
+			else if (startModel.IsVirtualDirectory())
+				fContainer = new VirtualDirectoryEntryList(&startModel);
 			else
 				fContainer = new DirectoryEntryList(*dynamic_cast<BDirectory*>
 					(startModel.Node()));

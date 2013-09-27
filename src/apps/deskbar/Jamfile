@@ -40,7 +40,7 @@ Application Deskbar :
 	ResourceSet.cpp
 	Switcher.cpp
 	$(targetSource)
-	: be $(HAIKU_LOCALE_LIBS) tracker $(targetLib) $(TARGET_LIBSUPC++)
+	: be localestub tracker $(targetLib) $(TARGET_LIBSUPC++)
 ;
 
 DoCatalogs Deskbar :

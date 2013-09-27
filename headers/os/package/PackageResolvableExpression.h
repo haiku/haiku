@@ -21,6 +21,9 @@ namespace BHPKG {
 using BHPKG::BPackageResolvableExpressionData;
 
 
+class BPackageResolvable;
+
+
 /*
  * Expresses a constraint on a specific resolvable, either just a name
  * or a name plus a relational operator and a version.
@@ -63,6 +66,12 @@ public:
 									const BPackageVersion& version
 										= BPackageVersion());
 			void				Clear();
+
+			bool				Matches(const BPackageVersion& version,
+									const BPackageVersion& compatibleVersion)
+									const;
+			bool				Matches(const BPackageResolvable& provides)
+									const;
 
 public:
 	static	const char*			kOperatorNames[];

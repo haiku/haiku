@@ -12,19 +12,7 @@
 namespace BPackageKit {
 
 
-const char*
-BPackageResolvable::kTypeNames[B_PACKAGE_RESOLVABLE_TYPE_ENUM_COUNT] = {
-	"",
-	"lib",
-	"cmd",
-	"app",
-	"add_on",
-};
-
-
 BPackageResolvable::BPackageResolvable()
-	:
-	fType(B_PACKAGE_RESOLVABLE_TYPE_DEFAULT)
 {
 }
 
@@ -32,7 +20,6 @@ BPackageResolvable::BPackageResolvable()
 BPackageResolvable::BPackageResolvable(const BPackageResolvableData& data)
 	:
 	fName(data.name),
-	fType(data.type),
 	fVersion(data.version),
 	fCompatibleVersion(data.compatibleVersion)
 {
@@ -40,11 +27,9 @@ BPackageResolvable::BPackageResolvable(const BPackageResolvableData& data)
 
 
 BPackageResolvable::BPackageResolvable(const BString& name,
-	BPackageResolvableType type, const BPackageVersion& version,
-	const BPackageVersion& compatibleVersion)
+	const BPackageVersion& version, const BPackageVersion& compatibleVersion)
 	:
 	fName(name),
-	fType(type),
 	fVersion(version),
 	fCompatibleVersion(compatibleVersion)
 {
@@ -63,13 +48,6 @@ const BString&
 BPackageResolvable::Name() const
 {
 	return fName;
-}
-
-
-BPackageResolvableType
-BPackageResolvable::Type() const
-{
-	return fType;
 }
 
 
@@ -104,11 +82,10 @@ BPackageResolvable::ToString() const
 
 
 void
-BPackageResolvable::SetTo(const BString& name, BPackageResolvableType type,
-	const BPackageVersion& version, const BPackageVersion& compatibleVersion)
+BPackageResolvable::SetTo(const BString& name, const BPackageVersion& version,
+	const BPackageVersion& compatibleVersion)
 {
 	fName = name;
-	fType = type;
 	fVersion = version;
 	fCompatibleVersion = compatibleVersion;
 

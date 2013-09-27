@@ -27,14 +27,15 @@ public:
 								ZlibCompressor(BDataOutput* output);
 								~ZlibCompressor();
 
-			status_t			Init();
+			status_t			Init(int compressionLevel = Z_BEST_COMPRESSION);
 			status_t			CompressNext(const void* input,
 									size_t inputSize);
 			status_t			Finish();
 
 	static	status_t			CompressSingleBuffer(const void* input,
 									size_t inputSize, void* output,
-									size_t outputSize, size_t& _compressedSize);
+									size_t outputSize, size_t& _compressedSize,
+									int compressionLevel = Z_BEST_COMPRESSION);
 
 private:
 			z_stream			fStream;

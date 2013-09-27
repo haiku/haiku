@@ -1,8 +1,9 @@
 SubDir HAIKU_TOP src bin coreutils src ;
 
 # filter warnings we don't want here
-TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
-	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH)
+	= [ FFilter $(TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH))
+		: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DB_ENABLE_INCOMPLETE_POSIX_AT_SUPPORT ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
@@ -98,7 +99,7 @@ StdBinCommands
 	pwd.c
 	sleep.c
 	sort.c
-        : libfetish.a libroot.so : $(coreutils_rsrc) ;
+	: libfetish.a : $(coreutils_rsrc) ;
 
 # df.c
 # hostid.c
@@ -118,21 +119,21 @@ BinCommand ls :
 	ls.c ls-ls.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand rm : 
-	rm.c remove.c : libfetish.a libroot.so : $(coreutils_rsrc) ;
+	rm.c remove.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand chgrp : 
-	chgrp.c chown-core.c : libfetish.a libroot.so : $(coreutils_rsrc) ;
+	chgrp.c chown-core.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand chown : 
 	chown.c [ FGristFiles chown-core.o ]
-	: libfetish.a libroot.so : $(coreutils_rsrc) ;
+	: libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand cp : 
 	cp.c copy.c cp-hash.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand mv : 
 	mv.c [ FGristFiles copy.o cp-hash.o remove.o ]
-	: libfetish.a libroot.so : $(coreutils_rsrc) ;
+	: libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand md5sum : md5sum-md5sum.c : libfetish.a : $(coreutils_rsrc) ;
 BinCommand sha1sum : md5sum-sha1sum.c : libfetish.a : $(coreutils_rsrc) ;
@@ -150,9 +151,9 @@ BinCommand dir :
 BinCommand <bin>install : install.c prog-fprintf.c [ FGristFiles copy.o cp-hash.o ]
 	: libfetish.a : $(coreutils_rsrc) ;
 
-BinCommand mkdir : mkdir.c [ FGristFiles prog-fprintf.o ] : libfetish.a libroot.so : $(coreutils_rsrc) ;
+BinCommand mkdir : mkdir.c [ FGristFiles prog-fprintf.o ] : libfetish.a : $(coreutils_rsrc) ;
 
-BinCommand rmdir : rmdir.c [ FGristFiles prog-fprintf.o ] : libfetish.a libroot.so : $(coreutils_rsrc) ;
+BinCommand rmdir : rmdir.c [ FGristFiles prog-fprintf.o ] : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand uname : uname.c uname-uname.c : libfetish.a $(TARGET_SELECT_UNAME_ETC_LIB) : $(coreutils_rsrc) ;
 

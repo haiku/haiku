@@ -6,11 +6,13 @@
 #define __BSTRING__
 
 
-#include <BeBuild.h>
-#include <SupportDefs.h>
+#include <stdarg.h>
 #include <string.h>
 
+#include <SupportDefs.h>
 
+
+class BStringList;
 class BStringRef;
 
 
@@ -53,7 +55,10 @@ public:
 			BString&		SetToChars(const BString& string, int32 charCount);
 			BString&		AdoptChars(BString& from, int32 charCount);
 
-			BString&		SetToFormat(const char* format, ...);
+			BString&		SetToFormat(const char* format, ...)
+								__attribute__((__format__(__printf__, 2, 3)));
+			BString&		SetToFormatVarArgs(const char* format,
+								va_list args);
 
 			// Substring copying
 			BString&		CopyInto(BString& into, int32 fromOffset,
@@ -65,6 +70,9 @@ public:
 								int32 charCount) const;
 			bool			CopyCharsInto(char* into, int32* intoLength,
 								int32 fromCharOffset, int32 charCount) const;
+
+			bool			Split(const char* separator, bool noEmptyStrings,
+								BStringList& _list) const;
 
 			// Appending
 			BString&		operator+=(const BString& string);
@@ -220,6 +228,14 @@ public:
 								int32 beforeOffset) const;
 			int32			IFindLast(const char* string,
 								int32 beforeOffset) const;
+
+			bool			StartsWith(const BString& string) const;
+			bool			StartsWith(const char* string) const;
+			bool			StartsWith(const char* string, int32 length) const;
+
+			bool			EndsWith(const BString& string) const;
+			bool			EndsWith(const char* string) const;
+			bool			EndsWith(const char* string, int32 length) const;
 
 			// Replacing
 			BString&		ReplaceFirst(char replaceThis, char withThis);

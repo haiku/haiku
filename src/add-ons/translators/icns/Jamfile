@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons translators icns ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UseHeaders $(HAIKU_LIBPNG_HEADERS) : true ;
+UseBuildFeatureHeaders libpng ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) openjpeg ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) libicns ] ;
@@ -45,7 +45,7 @@ local openjpeg_files =
 ObjectCcFlags [ FGristFiles $(openjpeg_files:S=$(SUFOBJ)) ] : -w ;
 
 Includes [ FGristFiles icns_png.c ]
-	: $(HAIKU_LIBPNG_HEADERS_DEPENDENCY) ;
+	: [ BuildFeatureAttribute libpng : headers ] ;
 
 local libicns_files = 
 	icns_debug.c
@@ -76,7 +76,8 @@ Translator ICNSTranslator :
 	$(libicns_files)
 
 	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	$(HAIKU_LIBPNG_LIB) $(HAIKU_LOCALE_LIBS)
+	[ BuildFeatureAttribute libpng : library ]
+	localestub
 	: true
 ;
 
@@ -87,8 +88,3 @@ DoCatalogs ICNSTranslator :
 	ICNSTranslator.h
 	ICNSTranslator.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	ICNSTranslator :
-	boot home config add-ons Translators ;
-

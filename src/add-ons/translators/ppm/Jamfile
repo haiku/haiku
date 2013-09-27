@@ -6,7 +6,7 @@ AddResources PPMTranslator : PPMTranslator.rdef ;
 
 Translator PPMTranslator
 	: PPMMain.cpp PPMTranslator.cpp colorspace.cpp
-	: be translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be translation $(TARGET_LIBSUPC++) localestub
 	: true
 ;
 
@@ -16,9 +16,3 @@ DoCatalogs PPMTranslator :
 	PPMMain.cpp
 	PPMTranslator.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	PPMTranslator :
-	boot home config add-ons Translators ;
-
-

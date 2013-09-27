@@ -35,13 +35,14 @@
 #include <View.h>
 
 #include "BarApp.h"
+#include "DeskbarUtils.h"
 #include "StatusView.h"
 
 
 static const float kIndentSpacing
 	= be_control_look->DefaultItemSpacing() * 2.3;
 static const uint32 kSettingsViewChanged = 'Svch';
-static const char* kSettingsFileName = "Deskbar_prefs_window_settings";
+static const char* kSettingsFileName = "prefs_window_settings";
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -419,7 +420,7 @@ status_t
 PreferencesWindow::_InitSettingsFile(BFile* file, bool write)
 {
 	BPath prefsPath;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &prefsPath);
+	status_t status = GetDeskbarSettingsDirectory(prefsPath);
 	if (status != B_OK)
 		return status;
 

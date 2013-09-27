@@ -2112,6 +2112,16 @@ dprintf(const char* format, ...)
 
 
 void
+dvprintf(const char* format, va_list args)
+{
+	if (!sSerialDebugEnabled && !sSyslogOutputEnabled && !sBlueScreenEnabled)
+		return;
+
+	dprintf_args(format, args, true);
+}
+
+
+void
 dprintf_no_syslog(const char* format, ...)
 {
 	va_list args;
@@ -2258,13 +2268,15 @@ _user_debug_output(const char* userString)
 
 	char string[512];
 	int32 length;
+	int32 toWrite;
 	do {
 		length = user_strlcpy(string, userString, sizeof(string));
 		if (length <= 0)
 			break;
-		debug_puts(string, length);
-		userString += sizeof(string) - 1;
-	} while (length >= (ssize_t)sizeof(string));
+		toWrite = std::min(length, (int32)sizeof(string) - 1);
+		debug_puts(string, toWrite);
+		userString += toWrite;
+	} while (length > toWrite);
 }
 
 

@@ -6,19 +6,25 @@ set -o errexit
 # outputDir
 # tmpDir
 # addBuildCompatibilityLibDir
+# systemPackages, commonPackages - lists of the hpkg packages copied/updated
+#   (in "system" and "common" respectively)
+# repositories - all repository files
+# downloadDir
 # The following are only for image types:
 # installDir
 # isImage
 # imagePath
 # imageSize
 # imageLabel
+# resolvePackageDependencies
 # updateOnly
 # dontClearImage
 # isVMwareImage
-# optionalPackageDescriptions
 #
 # addattr
 # copyattr
+# getPackageDependencies
+# package
 # rc
 # rmAttrs
 # unzip
@@ -31,7 +37,6 @@ set -o errexit
 # The following is only for cd types:
 # generate_attribute_stores
 # isCD
-# stripCommand
 #
 if [ $# -gt 0 ]; then
 	. $1
@@ -142,29 +147,24 @@ else
 fi
 
 
-stripDebugInfo()
+is_in_list()
 {
-	file="$1"
-
-	# Determine whether the file is an ELF file by checking the ELF signature,
-	# or at least the printable characters.
-	elfMarker=`dd "if=$file" bs=1 skip=1 count=3 2> /dev/null`
-	if [ "$elfMarker" = 'ELF' ]; then
-		# make user-writable first -- some files aren't
-		chmod u+w "$file"
-		"$stripCommand" --strip-debug "$file"
-	fi
+	local element
+	for element in $2; do
+		if [ "$1" = "$element" ]; then
+			return 0
+		fi
+	done
+	return 1
 }
+
 
 extractFile()
 {
-	# extractFile <archive> <directory> <extractedSubDir> <stripDebugSymbols>
+	# extractFile <archive> <directory> <extractedSubDir>
 	archiveFile=$1
 	targetExtractedDir=$2
 	extractedSubDir=$3
-	stripDebugSymbols=$4
-
-	echo "Extracting $archiveFile ..."
 
 	extractDir=$tmpDir/extract
 	$rmAttrs -rf "$extractDir"
@@ -172,13 +172,25 @@ extractFile()
 
 	case "$archiveFile" in
 		*.zip)
+			echo "Extracting $archiveFile ..."
 			$unzip -q -d "$extractDir" "$archiveFile"
 			;;
 		*.tgz|*.tar.gz)
+			echo "Extracting $archiveFile ..."
 			tar -C "$extractDir" -xf "$archiveFile"
 			;;
+		*.hpkg)
+			echo "Extracting $archiveFile ..."
+			if [ -n "$extractedSubDir" ]; then
+				$package extract -C "$extractDir" "$archiveFile" \
+					"$extractedSubDir"
+			else
+				$package extract -C "$extractDir" "$archiveFile"
+			fi
+			;;
 		*)
-			echo "Unhandled archive extension in build_haiku_image extractFile()"
+			echo "Unhandled archive extension in build_haiku_image" \
+				"extractFile()"
 			exit 1
 			;;
 	esac
@@ -189,36 +201,27 @@ extractFile()
 		rm $extractDir/.OptionalPackageDescription
 	fi
 
-	if [ "$stripDebugSymbols" = "1" ]; then
-		# strip executables in common/bin
-		if [ -d $extractDir/common/bin ]; then
-			for file in `find $extractDir/common/bin -type f -a -perm +100 \
-					-a -size +1k`; do
-				stripDebugInfo "$file"
-			done
-		fi
-
-		# strip libraries in common/lib
-		if [ -d $extractDir/common/lib ]; then
-			for file in `find $extractDir/common/lib -type f -a -size +1k \
-					-a -name lib\*`; do
-				stripDebugInfo "$file"
-			done
-		fi
-	fi
-
-	$cp -r "${sPrefix}$extractDir/$extractedSubDir/." "${tPrefix}$targetExtractedDir"
+	$cp -r "${sPrefix}$extractDir/$extractedSubDir/." \
+		"${tPrefix}$targetExtractedDir"
 
 	$rmAttrs -rf "$extractDir"
+}
+
+
+downloadFile()
+{
+	url=$1
+	path=$2
+
+	if [ ! -f "$path" ]; then
+		wget -O "$path" "$url"
+	fi
 }
 
 
 mkdir -p $tmpDir
 copyrightsFile=$tmpDir/copyrights
 $rmAttrs -f $copyrightsFile
-if [ "$optionalPackageDescriptions" ]; then
-	cp "$optionalPackageDescriptions" $copyrightsFile
-fi
 
 if [ $isCD ]; then
 	# setup output dir
@@ -274,70 +277,66 @@ while [ $# -gt 0 ]; do
 done
 
 
-# install MIME database
-# TODO: It should be possible to do that in the build system too.
+# resolve package dependencies
+if [ -n "$resolvePackageDependencies" ]; then
+	echo "Resolving package dependencies ..."
 
-if [ ! $updateOnly ]; then
-	mimeDBSource=$sourceDir/src/data/beos_mime
-	mimeDBDest=${tPrefix}home/config/settings/beos_mime
-
-	echo "Deleting old MIME database ..."
-
-	$rm -rf $mimeDBDest
-	$mkdir -p $mimeDBDest
-	mimeTmpDir=$tmpDir/mime
-	mimeDBTmpDir=$tmpDir/mime/db
-	mimeTmpIndex=0
-	mimeTmpFile=$mimeTmpDir/mimedb$$.rsrc
-
-	# create tmp dir for the MIME conversion stuff
-	mkdir -p $mimeDBTmpDir
-
-	echo "Installing MIME database ..."
-
-	for inSuperFile in $mimeDBSource/*.super; do
-		superType=$(basename $inSuperFile .super)
-		tmpSuperDir=$mimeDBTmpDir/$superType
-
-		# compile rdef to rsrc file and the rsrc file to attributes
-		$rc -o $mimeTmpFile $inSuperFile
-		mkdir -p $tmpSuperDir
-		$resattr -O -o $tmpSuperDir $mimeTmpFile
-		$rmAttrs $mimeTmpFile
-
-		# iterate through the sub types
-		for inSubFile in $mimeDBSource/$superType/*; do
-			# check, if the type exists
-			if test -f $inSubFile && grep META:TYPE $inSubFile > /dev/null 2>&1 ; then
-				subType=$(basename $inSubFile)
-				tmpSubFile=$mimeDBTmpDir/$superType/$subType
-
-				# compile rdef to rsrc file and the rsrc file to attributes
-				$rc -o $mimeTmpFile $inSubFile
-				$resattr -O -o $tmpSubFile $mimeTmpFile
-				$rmAttrs $mimeTmpFile
-			fi
-		done
+	# additional packages for system
+	packageUrls=`$getPackageDependencies $repositories -- $systemPackages`
+	for packageUrl in $packageUrls; do
+		packageFileName=`basename $packageUrl`
+		packageFilePath="$downloadDir/$packageFileName"
+		downloadFile $packageUrl "$packageFilePath"
+		$cp "${sPrefix}$packageFilePath" "${tPrefix}system/packages"
+		systemPackages="$systemPackages $packageFilePath"
 	done
 
-	$cp -r ${sPrefix}$mimeDBTmpDir/. $mimeDBDest
+	# Remove packages from the list for common, that are already in the package
+	# list for system.
+	unfilteredCommonPackages="$commonPackages"
+	commonPackages=
+	for packageFile in $unfilteredCommonPackages; do
+		if is_in_list "$packageFile" "$systemPackages"; then
+			:
+		else
+			commonPackages="$commonPackages $packageFile"
+		fi
+	done
 
-	# cleanup tmp dir
-	$rmAttrs -rf $mimeTmpDir
-fi	# ! updateOnly
+	# additional packages for common
+	packageUrls=`$getPackageDependencies $repositories -- $systemPackages \
+		$commonPackages`
+	for packageUrl in $packageUrls; do
+		packageFileName=`basename $packageUrl`
+		packageFilePath="$downloadDir/$packageFileName"
+		downloadFile $packageUrl "$packageFilePath"
+		$cp "${sPrefix}$packageFilePath" "${tPrefix}common/packages"
+		commonPackages="$commonPackages $packageFilePath"
+	done
+fi
+
+
+# install default settings for packages
+for packageFile in $systemPackages $commonPackages; do
+	if $package list -p $packageFile | egrep '^settings/' > /dev/null; then
+		extractFile $packageFile common/settings settings
+	fi
+done
 
 
 # add the concatenated copyrights as an attribute to AboutSystem
+# TODO: That might not be necessary, when all third-party software everything
+# is packaged. Though we might not package everything.
 
-if [ ! $updateOnly ]; then
-	if [ -f $copyrightsFile ]; then
-		copyrightAttrs=$tmpDir/copyrightAttrs
-		$rmAttrs -f $copyrightAttrs
-		touch $copyrightAttrs
-		$addattr -f $copyrightsFile COPYRIGHTS $copyrightAttrs
-		$copyAttrs ${sPrefix}$copyrightAttrs ${tPrefix}system/apps/AboutSystem
-	fi
-fi
+# if [ ! $updateOnly ]; then
+# 	if [ -f $copyrightsFile ]; then
+# 		copyrightAttrs=$tmpDir/copyrightAttrs
+# 		$rmAttrs -f $copyrightAttrs
+# 		touch $copyrightAttrs
+# 		$addattr -f $copyrightsFile COPYRIGHTS $copyrightAttrs
+# 		$copyAttrs ${sPrefix}$copyrightAttrs ${tPrefix}system/apps/AboutSystem
+# 	fi
+# fi
 
 if [ $isCD ]; then
 	# generate the attribute stores

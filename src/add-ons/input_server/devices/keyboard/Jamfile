@@ -14,11 +14,7 @@ Addon <input>keyboard :
 	TeamMonitorWindow.cpp
 	TeamListItem.cpp
 
-	: input_server be libshared.a $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) ;
-
-Package haiku-inputkit-cvs :
-	<input>keyboard :
-	boot home config add-ons input_server devices ;
+	: input_server be libshared.a localestub $(TARGET_LIBSUPC++) ;
 
 DoCatalogs <input>keyboard :
 	x-vnd.Haiku-KeyboardInputServerDevice

@@ -1,10 +1,4 @@
 SubDir HAIKU_TOP src add-ons print drivers pdf ;
 
-Package haiku-pdf_writer-cvs :
-	README TODO CHANGES ;
-
 SubInclude HAIKU_TOP src add-ons print drivers pdf source ;
-SubInclude HAIKU_TOP src add-ons print drivers pdf bookmarks ;
-SubInclude HAIKU_TOP src add-ons print drivers pdf encoding ;
-SubInclude HAIKU_TOP src add-ons print drivers pdf xrefs ;
 

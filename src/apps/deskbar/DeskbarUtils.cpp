@@ -56,6 +56,11 @@ All rights reserved.
 #include "ExpandoMenuBar.h"
 
 
+const char* const kDeskbarMenuEntriesFileName = "menu_entries";
+
+static const char* const kDeskbarDirectoryName = "deskbar";
+
+
 void
 AddRefsToDeskbarMenu(const BMessage* m, entry_ref* subdirectory)
 {
@@ -101,4 +106,30 @@ AddRefsToDeskbarMenu(const BMessage* m, entry_ref* subdirectory)
 			}
 		}
 	}
+}
+
+
+status_t
+GetDeskbarSettingsDirectory(BPath& _path, bool create)
+{
+	status_t error = find_directory(B_USER_SETTINGS_DIRECTORY, &_path, create);
+	if (error != B_OK)
+		return error;
+
+	error = _path.Append(kDeskbarDirectoryName);
+	if (error != B_OK)
+		return error;
+
+	return create ? create_directory(_path.Path(), 0755) : error;
+}
+
+
+status_t
+GetDeskbarDataDirectory(BPath& _path)
+{
+	status_t error = find_directory(B_SYSTEM_DATA_DIRECTORY, &_path, false);
+	if (error != B_OK)
+		return error;
+
+	return _path.Append(kDeskbarDirectoryName);
 }

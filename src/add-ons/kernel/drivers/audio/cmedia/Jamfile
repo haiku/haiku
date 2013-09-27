@@ -12,11 +12,3 @@ KernelAddon cmedia :
 	mux.c
 	pcm.c
 ;
-
-Package haiku-cmedia-cvs
-	:
-	cmedia
-	:
-	boot home config add-ons kernel drivers bin ;
-
-PackageDriverSymLink haiku-cmedia-cvs : audio cmedia ;

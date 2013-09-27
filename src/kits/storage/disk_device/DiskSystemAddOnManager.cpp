@@ -110,7 +110,16 @@ DiskSystemAddOnManager::LoadDiskSystems()
 		return B_OK;
 
 	StringSet alreadyLoaded;
-	status_t error = _LoadAddOns(alreadyLoaded, B_USER_ADDONS_DIRECTORY);
+	status_t error
+		= _LoadAddOns(alreadyLoaded, B_USER_NONPACKAGED_ADDONS_DIRECTORY);
+
+	if (error == B_OK)
+		error = _LoadAddOns(alreadyLoaded, B_USER_ADDONS_DIRECTORY);
+
+	if (error == B_OK) {
+		error
+			= _LoadAddOns(alreadyLoaded, B_COMMON_NONPACKAGED_ADDONS_DIRECTORY);
+	}
 
 	if (error == B_OK)
 		error = _LoadAddOns(alreadyLoaded, B_COMMON_ADDONS_DIRECTORY);

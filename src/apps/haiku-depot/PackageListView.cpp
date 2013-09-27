@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013, Rene Gollent, <rene@gollent.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -16,6 +17,30 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PackageListView"
+
+
+static const char* skPackageStateAvailable = B_TRANSLATE_MARK("Available");
+static const char* skPackageStateUninstalled = B_TRANSLATE_MARK("Uninstalled");
+static const char* skPackageStateActive = B_TRANSLATE_MARK("Active");
+static const char* skPackageStateInactive = B_TRANSLATE_MARK("Inactive");
+
+
+inline BString
+package_state_to_string(PackageState state)
+{
+	switch (state) {
+		case NONE:
+			return B_TRANSLATE(skPackageStateAvailable);
+		case INSTALLED:
+			return B_TRANSLATE(skPackageStateInactive);
+		case ACTIVATED:
+			return B_TRANSLATE(skPackageStateActive);
+		case UNINSTALLED:
+			return B_TRANSLATE(skPackageStateUninstalled);
+	}
+
+	return B_TRANSLATE("Unknown");
+}
 
 
 // A field type displaying both a bitmap and a string so that the
@@ -88,6 +113,7 @@ public:
 			const PackageInfoRef& Package() const
 									{ return fPackage; }
 
+			void				UpdateState();
 			void				UpdateRating();
 
 private:
@@ -115,19 +141,16 @@ public:
 
 	virtual void PackageChanged(const PackageInfoEvent& event)
 	{
-		if ((event.Changes() & PKG_CHANGED_RATINGS) == 0)
-			return;
-		
 		BMessenger messenger(fView);
 		if (!messenger.IsValid())
 			return;
 
 		const PackageInfo& package = *event.Package().Get();
-		
+
 		BMessage message(MSG_UPDATE_PACKAGE);
 		message.AddString("title", package.Title());
 		message.AddUInt32("changes", event.Changes());
-		
+
 		messenger.SendMessage(&message);
 	}
 
@@ -185,12 +208,11 @@ RatingField::SetRating(float rating)
 		rating = 0.0f;
 	if (rating > 5.0f)
 		rating = 5.0f;
-	
+
 	if (rating == fRating)
 		return;
-	
+
 	fRating = rating;
-	// TODO: cause a redraw?
 }
 
 
@@ -292,7 +314,7 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 			drawOverlay = false;
 			stringWidth = parent->StringWidth(string);
 		}
-			
+
 		switch (Alignment()) {
 			default:
 			case B_ALIGN_LEFT:
@@ -320,15 +342,15 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 			+ fontHeight.ascent;
 
 		parent->DrawString(string, BPoint(rect.left, y));
-	
+
 		if (drawOverlay) {
 			rect.left = ceilf(rect.left
 				+ (ratingField->Rating() / 5.0f) * rect.Width());
-		
+
 			rgb_color color = parent->LowColor();
 			color.alpha = 190;
 			parent->SetHighColor(color);
-			
+
 			parent->SetDrawingMode(B_OP_ALPHA);
 			parent->FillRect(rect, B_SOLID_HIGH);
 
@@ -429,9 +451,9 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 {
 	if (packageRef.Get() == NULL)
 		return;
-	
+
 	PackageInfo& package = *packageRef.Get();
-	
+
 	// Package icon and title
 	// NOTE: The icon BBitmap is referenced by the fPackage member.
 	const BBitmap* icon = NULL;
@@ -450,8 +472,9 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	SetField(new BStringField("0 KiB"), kSizeColumn);
 
 	// Status
-	// TODO: Fetch info about installed/deactivated/unintalled/...
-	SetField(new BStringField("n/a"), kStatusColumn);
+	// TODO: Fetch info about installed/deactivated/uninstalled/...
+	SetField(new BStringField(package_state_to_string(package.State())),
+		kStatusColumn);
 
 	package.AddListener(fPackageListener);
 }
@@ -461,6 +484,17 @@ PackageRow::~PackageRow()
 {
 	if (fPackage.Get() != NULL)
 		fPackage->RemoveListener(fPackageListener);
+}
+
+
+void
+PackageRow::UpdateState()
+{
+	if (fPackage.Get() == NULL)
+		return;
+
+	SetField(new BStringField(package_state_to_string(fPackage->State())),
+		kStatusColumn);
 }
 
 
@@ -487,13 +521,13 @@ public:
 		BFont font(be_plain_font);
 		font.SetSize(9.0f);
 		SetFont(&font);
-		
+
 		SetViewColor(B_TRANSPARENT_COLOR);
 		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 		SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
 	}
-	
+
 	virtual BSize MinSize()
 	{
 		BString label(_GetLabel());
@@ -513,15 +547,15 @@ public:
 	virtual void Draw(BRect updateRect)
 	{
 		FillRect(updateRect, B_SOLID_LOW);
-		
+
 		BString label(_GetLabel());
-	
+
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
-		
+
 		BRect bounds(Bounds());
 		float width = StringWidth(label);
-		
+
 		BPoint offset;
 		offset.x = bounds.left + (bounds.Width() - width) / 2.0f;
 		offset.y = bounds.top + (bounds.Height()
@@ -575,8 +609,6 @@ PackageListView::PackageListView(BLocker* modelLock)
 	AddColumn(new PackageColumn(B_TRANSLATE("Status"), 60, 60, 100,
 		B_TRUNCATE_END), kStatusColumn);
 
-	SetSortingEnabled(true);
-	
 	fItemCountView = new ItemCountView();
 	AddStatusView(fItemCountView);
 }
@@ -592,7 +624,19 @@ PackageListView::~PackageListView()
 void
 PackageListView::AttachedToWindow()
 {
+	BColumnListView::AttachedToWindow();
+
 	PackageColumn::InitTextMargin(ScrollView());
+}
+
+
+void
+PackageListView::AllAttached()
+{
+	BColumnListView::AllAttached();
+
+	SetSortingEnabled(true);
+	SetSortColumn(ColumnAt(0), false, true);
 }
 
 
@@ -609,15 +653,14 @@ PackageListView::MessageReceived(BMessage* message)
 				break;
 			}
 
-			if ((changes & PKG_CHANGED_RATINGS) == 0)
-				break;
-
 			BAutolock _(fModelLock);
-
 			PackageRow* row = _FindRow(title);
-			if (row != NULL)
-				row->UpdateRating();
-			
+			if (row != NULL) {
+				if ((changes & PKG_CHANGED_RATINGS) != 0)
+					row->UpdateRating();
+				if ((changes & PKG_CHANGED_STATE) != 0)
+					row->UpdateState();
+			}
 			break;
 		}
 
@@ -632,13 +675,13 @@ void
 PackageListView::SelectionChanged()
 {
 	BColumnListView::SelectionChanged();
-	
+
 	BMessage message(MSG_PACKAGE_SELECTED);
-	
+
 	PackageRow* selected = dynamic_cast<PackageRow*>(CurrentSelection());
 	if (selected != NULL)
 		message.AddString("title", selected->Package()->Title());
-	
+
 	Window()->PostMessage(&message);
 }
 

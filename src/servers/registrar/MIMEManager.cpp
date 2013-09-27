@@ -21,7 +21,11 @@
 #include <String.h>
 #include <TypeConstants.h>
 
+#include <mime/AppMetaMimeCreator.h>
+#include <mime/database_support.h>
+
 #include "CreateAppMetaMimeThread.h"
+#include "MessageDeliverer.h"
 #include "MimeSnifferAddonManager.h"
 #include "TextSnifferAddon.h"
 #include "UpdateMimeInfoThread.h"
@@ -38,23 +42,53 @@ using namespace BPrivate;
 */
 
 
+static MimeSnifferAddonManager*
+init_mime_sniffer_add_on_manager()
+{
+	if (MimeSnifferAddonManager::CreateDefault() != B_OK)
+		return NULL;
+
+	MimeSnifferAddonManager* manager = MimeSnifferAddonManager::Default();
+	manager->AddMimeSnifferAddon(new(nothrow) TextSnifferAddon());
+	return manager;
+}
+
+
+class MIMEManager::DatabaseLocker
+	: public BPrivate::Storage::Mime::MimeEntryProcessor::DatabaseLocker {
+public:
+	DatabaseLocker(MIMEManager* manager)
+		:
+		fManager(manager)
+	{
+	}
+
+	virtual bool Lock()
+	{
+		return fManager->Lock();
+	}
+
+	virtual void Unlock()
+	{
+		fManager->Unlock();
+	}
+
+private:
+	MIMEManager*	fManager;
+};
+
+
 /*!	\brief Creates and initializes a MIMEManager.
 */
 MIMEManager::MIMEManager()
 	:
 	BLooper("main_mime"),
-	fDatabase(),
+	fDatabase(BPrivate::Storage::Mime::default_database_location(),
+		init_mime_sniffer_add_on_manager(), this),
+	fDatabaseLocker(new(std::nothrow) DatabaseLocker(this)),
 	fThreadManager()
 {
 	AddHandler(&fThreadManager);
-
-	// prepare the MimeSnifferAddonManager and the built-in add-ons
-	status_t error = MimeSnifferAddonManager::CreateDefault();
-	if (error == B_OK) {
-		MimeSnifferAddonManager* addonManager
-			= MimeSnifferAddonManager::Default();
-		addonManager->AddMimeSnifferAddon(new(nothrow) TextSnifferAddon());
-	}
 }
 
 
@@ -237,7 +271,7 @@ MIMEManager::MessageReceived(BMessage *message)
 						thread = new(nothrow) CreateAppMetaMimeThread(
 							synchronous ? "create_app_meta_mime (s)"
 								: "create_app_meta_mime (a)",
-							B_NORMAL_PRIORITY + 1, &fDatabase,
+							B_NORMAL_PRIORITY + 1, &fDatabase, fDatabaseLocker,
 							BMessenger(&fThreadManager), &root, recursive,
 							force, synchronous ? message : NULL);
 						break;
@@ -246,7 +280,7 @@ MIMEManager::MessageReceived(BMessage *message)
 						thread = new(nothrow) UpdateMimeInfoThread(synchronous
 								? "update_mime_info (s)"
 								: "update_mime_info (a)",
-							B_NORMAL_PRIORITY + 1, &fDatabase,
+							B_NORMAL_PRIORITY + 1, &fDatabase, fDatabaseLocker,
 							BMessenger(&fThreadManager), &root, recursive,
 							force, synchronous ? message : NULL);
 						break;
@@ -295,6 +329,13 @@ MIMEManager::MessageReceived(BMessage *message)
 			BLooper::MessageReceived(message);
 			break;
 	}
+}
+
+
+status_t
+MIMEManager::Notify(BMessage* message, const BMessenger& target)
+{
+	return MessageDeliverer::Default()->DeliverMessage(message, target);
 }
 
 

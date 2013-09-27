@@ -2683,7 +2683,7 @@ vfs_get_vnode_name(void *_vnode, char *name, fssh_size_t nameSize)
 
 fssh_status_t
 vfs_entry_ref_to_path(fssh_dev_t device, fssh_ino_t inode, const char *leaf,
-	char *path, fssh_size_t pathLength)
+	bool kernel, char *path, fssh_size_t pathLength)
 {
 	struct vnode *vnode;
 	fssh_status_t status;
@@ -5684,7 +5684,7 @@ fssh_status_t
 _kern_entry_ref_to_path(fssh_dev_t device, fssh_ino_t inode, const char *leaf,
 	char* path, fssh_size_t pathLength)
 {
-	return vfs_entry_ref_to_path(device, inode, leaf, path, pathLength);
+	return vfs_entry_ref_to_path(device, inode, leaf, true, path, pathLength);
 }
 
 

@@ -11,11 +11,11 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
-UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+UseBuildFeatureHeaders freetype ;
 
 Includes [ FGristFiles RemoteDrawingEngine.cpp RemoteMessage.cpp
-	RemoteHWInterface.cpp ]
-	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+		RemoteHWInterface.cpp ]
+	: [ BuildFeatureAttribute freetype : headers ] ;
 
 StaticLibrary libasremote.a :
 	NetReceiver.cpp

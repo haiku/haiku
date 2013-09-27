@@ -13,6 +13,7 @@ enum {
 	PKG_CHANGED_DESCRIPTION		= 1 << 0,
 	PKG_CHANGED_RATINGS			= 1 << 1,
 	PKG_CHANGED_SCREENSHOTS		= 1 << 2,
+	PKG_CHANGED_STATE			= 1 << 3
 	// ...
 };
 

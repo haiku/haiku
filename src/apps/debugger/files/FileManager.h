@@ -75,7 +75,7 @@ private:
 private:
 			SourceFileEntry*	_LookupSourceFile(const BString& path);
 			void				_SourceFileUnused(SourceFileEntry* entry);
-			void				_LocateFileIfMapped(const BString& sourcePath,
+			bool				_LocateFileIfMapped(const BString& sourcePath,
 									LocatableFile* file);
 
 private:

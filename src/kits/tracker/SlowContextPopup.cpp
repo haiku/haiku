@@ -60,6 +60,7 @@ All rights reserved.
 #include "SlowContextPopup.h"
 #include "Thread.h"
 #include "Tracker.h"
+#include "VirtualDirectoryEntryList.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -247,6 +248,8 @@ BSlowContextMenu::StartBuildingItemList()
 
 		if (startModel.IsQuery())
 			fContainer = new QueryEntryListCollection(&startModel);
+		else if (startModel.IsVirtualDirectory())
+			fContainer = new VirtualDirectoryEntryList(&startModel);
 		else if (startModel.IsDesktop()) {
 			fIteratingDesktop = true;
 			fContainer = DesktopPoseView::InitDesktopDirentIterator(0,

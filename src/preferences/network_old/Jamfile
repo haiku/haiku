@@ -15,8 +15,3 @@ Preference Network :
 	;
 
 LinkAgainst Network : be root ;
-
-Package haiku-networkingkit-cvs :
-	Network :
-#	boot beos preferences ;
-	boot home Desktop haiku-networkingkit ;

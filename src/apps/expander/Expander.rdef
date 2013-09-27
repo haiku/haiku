@@ -24,7 +24,8 @@ resource(1, "BEOS:FILE_TYPES") message {
 	"types" = "application/zip",
 	"types" = "application/x-gunzip",
 	"types" = "application/x-bzip2",
-	"types" = "application/x-rar"
+	"types" = "application/x-rar",
+	"types" = "application/x-vnd.haiku-package"
 };
 
 resource vector_icon {

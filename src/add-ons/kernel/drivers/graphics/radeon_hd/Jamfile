@@ -19,8 +19,3 @@ KernelAddon radeon_hd :
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp 
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-
-Package haiku-radeon_hd-cvs :
-	radeon_hd : 
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-radeon_hd-cvs : graphics radeon_hd ;

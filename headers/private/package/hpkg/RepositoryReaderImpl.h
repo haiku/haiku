@@ -25,8 +25,7 @@ namespace BPrivate {
 class RepositoryReaderImpl : public ReaderImplBase {
 	typedef	ReaderImplBase		inherited;
 public:
-								RepositoryReaderImpl(
-									BErrorOutput* errorOutput);
+								RepositoryReaderImpl(BErrorOutput* errorOutput);
 								~RepositoryReaderImpl();
 
 			status_t			Init(const char* fileName);
@@ -39,10 +38,10 @@ public:
 									BRepositoryContentHandler* contentHandler);
 
 private:
-			struct RootAttributeHandler;
+			class PackagesAttributeHandler;
+			class PackageContentHandlerAdapter;
 
 private:
-			SectionInfo			fRepositoryInfoSection;
 			BRepositoryInfo		fRepositoryInfo;
 };
 

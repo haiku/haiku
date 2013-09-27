@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include <Debug.h>
+#include <StringList.h>
 
 #include <StringPrivate.h>
 #include <utf8_functions.h>
@@ -427,13 +428,31 @@ BString::AdoptChars(BString& string, int32 charCount)
 BString&
 BString::SetToFormat(const char* format, ...)
 {
+	va_list args;
+	va_start(args, format);
+	SetToFormatVarArgs(format, args);
+	va_end(args);
+
+	return *this;
+}
+
+
+BString&
+BString::SetToFormatVarArgs(const char* format, va_list args)
+{
+	// Use a small on-stack buffer to save a second vsnprintf() call for most
+	// use cases.
 	int32 bufferSize = 1024;
 	char buffer[bufferSize];
 
-	va_list arg;
-	va_start(arg, format);
-	int32 bytes = vsnprintf(buffer, bufferSize, format, arg);
-	va_end(arg);
+	va_list clonedArgs;
+#if __GNUC__ == 2
+	__va_copy(clonedArgs, args);
+#else
+	va_copy(clonedArgs, args);
+#endif
+	int32 bytes = vsnprintf(buffer, bufferSize, format, clonedArgs);
+	va_end(clonedArgs);
 
 	if (bytes < 0)
 		return Truncate(0);
@@ -443,11 +462,7 @@ BString::SetToFormat(const char* format, ...)
 		return *this;
 	}
 
-	va_list arg2;
-	va_start(arg2, format);
-	bytes = vsnprintf(LockBuffer(bytes), bytes + 1, format, arg2);
-	va_end(arg2);
-
+	bytes = vsnprintf(LockBuffer(bytes), bytes + 1, format, args);
 	if (bytes < 0)
 		bytes = 0;
 
@@ -506,6 +521,42 @@ BString::CopyCharsInto(char* into, int32* intoLength, int32 fromCharOffset,
 	}
 
 	memcpy(into, fPrivateData + fromOffset, length);
+	return true;
+}
+
+
+bool
+BString::Split(const char* separator, bool noEmptyStrings,
+	BStringList& _list) const
+{
+	int32 separatorLength = strlen(separator);
+	int32 length = Length();
+	if (separatorLength == 0 || length == 0 || separatorLength > length) {
+		if (length == 0 && noEmptyStrings)
+			return true;
+		return _list.Add(*this);
+	}
+
+	int32 index = 0;
+	for (;;) {
+		int32 endIndex = index < length ? FindFirst(separator, index) : length;
+		if (endIndex < 0)
+			endIndex = length;
+
+		if (endIndex > index || !noEmptyStrings) {
+			BString toAppend(String() + index, endIndex - index);
+			if (toAppend.Length() != endIndex - index
+				|| !_list.Add(toAppend)) {
+				return false;
+			}
+		}
+
+		if (endIndex == length)
+			break;
+
+		index = endIndex + 1;
+	}
+
 	return true;
 }
 
@@ -1356,6 +1407,55 @@ BString::IFindLast(const char* string, int32 beforeOffset) const
 
 	return _IFindBefore(string, min_clamp0(beforeOffset, Length()),
 		strlen(safestr(string)));
+}
+
+
+bool
+BString::StartsWith(const BString& string) const
+{
+	return StartsWith(string.String(), string.Length());
+}
+
+
+bool
+BString::StartsWith(const char* string) const
+{
+	return StartsWith(string, strlen(string));
+}
+
+
+bool
+BString::StartsWith(const char* string, int32 length) const
+{
+	if (length > Length())
+		return false;
+
+	return memcmp(String(), string, length) == 0;
+}
+
+
+bool
+BString::EndsWith(const BString& string) const
+{
+	return EndsWith(string.String(), string.Length());
+}
+
+
+bool
+BString::EndsWith(const char* string) const
+{
+	return EndsWith(string, strlen(string));
+}
+
+
+bool
+BString::EndsWith(const char* string, int32 length) const
+{
+	int32 offset = Length() - length;
+	if (offset < 0)
+		return false;
+
+	return memcmp(String() + offset, string, length) == 0;
 }
 
 

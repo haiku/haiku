@@ -8,8 +8,6 @@ SubDirCcFlags [ FDefines HAIKU_MULTI_AUDIO=1 ] ;
 SimpleTest multi_audio_test :
 	multi_audio_test.cpp
 	argv.c
-
-	: libroot.so
 ;
 
 SEARCH on [ FGristFiles

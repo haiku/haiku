@@ -8,16 +8,20 @@ AddResources libtextencoding.so : libtextencoding.rdef ;
 UsePrivateHeaders textencoding ;
 UseLibraryHeaders iconv ;
 
-SharedLibrary libtextencoding.so :
-	CharacterSet.cpp
-	CharacterSetRoster.cpp
-	character_sets.cpp
-	utf8_conversions.cpp
-	: be libiconv.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) ;
-
-Package haiku-maildaemon-cvs :
-	libtextencoding.so :
-	boot beos system lib ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		SharedLibrary [ MultiArchDefaultGristFiles libtextencoding.so ] :
+			CharacterSet.cpp
+			CharacterSetRoster.cpp
+			character_sets.cpp
+			utf8_conversions.cpp
+			:
+			be
+			[ MultiArchDefaultGristFiles libiconv.a ]
+			$(TARGET_LIBSUPC++) localestub ;
+	}
+}
 
 DoCatalogs libtextencoding.so :
 	x-vnd.Haiku-libtextencoding

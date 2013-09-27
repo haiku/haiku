@@ -28,8 +28,3 @@ KernelAddon h2generic :
 	
 SEARCH on [ FGristFiles $(r5_src)
         ] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-
-Package haiku-h2generic-cvs :
-	h2generic :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-h2generic-cvs : bluetooth h2 h2generic ;

@@ -32,13 +32,17 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
 		} else {
-			sysHeaders += $(TARGET_HDRS) ;
-			defines += $(TARGET_DEFINES) ;
-			cc = $(TARGET_CC) ;
-			
-			includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
-			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
-			systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
+			sysHeaders += $(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
+			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
+				$(TARGET_DEFINES) ;
+			cc = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;
+
+			includesSeparator
+				= $(TARGET_INCLUDES_SEPARATOR_$(TARGET_PACKAGING_ARCH)) ;
+			localIncludesOption
+				= $(TARGET_LOCAL_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
+			systemIncludesOption
+				= $(TARGET_SYSTEM_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
 		}
 	}
 

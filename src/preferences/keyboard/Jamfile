@@ -14,7 +14,7 @@ Preference Keyboard :
 	KeyboardSettings.cpp 
 	KeyboardView.cpp 
 	KeyboardWindow.cpp
-	: translation be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: translation be $(TARGET_LIBSUPC++) localestub
 	: Keyboard.rdef
 	;
 

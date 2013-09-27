@@ -7,76 +7,83 @@ SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ilmthread ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) imath ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) config ] ;
 
-if $(HAIKU_LIBSTDC++) = libstdc++.r4.so {
-	SubDirC++Flags -Dios_base=ios -ftemplate-depth-24 ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		UseBuildFeatureHeaders zlib ;
+
+		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+			SubDirC++Flags -Dios_base=ios -ftemplate-depth-24 ;
+		}
+
+		Includes [ FGristFiles ImfPxr24Compressor.cpp ImfZipCompressor.cpp ]
+			: [ BuildFeatureAttribute zlib : headers ] ;
+
+		#StaticLibrary [ MultiArchDefaultGristFiles libilmimf.a ] :
+		SharedLibrary [ MultiArchDefaultGristFiles libilmimf.so ] :
+			b44ExpLogTable.cpp
+			ImfAttribute.cpp
+			ImfB44Compressor.cpp
+			ImfBoxAttribute.cpp
+			ImfChannelListAttribute.cpp
+			ImfChannelList.cpp
+			ImfChromaticitiesAttribute.cpp
+			ImfChromaticities.cpp
+			ImfCompressionAttribute.cpp
+			ImfCompressor.cpp
+			ImfConvert.cpp
+			ImfCRgbaFile.cpp
+			ImfDoubleAttribute.cpp
+			ImfEnvmapAttribute.cpp
+			ImfEnvmap.cpp
+			ImfFloatAttribute.cpp
+			ImfFrameBuffer.cpp
+			ImfFramesPerSecond.cpp
+			ImfHeader.cpp
+			ImfHuf.cpp
+			ImfInputFile.cpp
+			ImfIntAttribute.cpp
+			ImfIO.cpp
+			ImfKeyCodeAttribute.cpp
+			ImfKeyCode.cpp
+			ImfLineOrderAttribute.cpp
+			ImfLut.cpp
+			ImfMatrixAttribute.cpp
+			ImfMisc.cpp
+			ImfOpaqueAttribute.cpp
+			ImfOutputFile.cpp
+			ImfPizCompressor.cpp
+			ImfPreviewImageAttribute.cpp
+			ImfPreviewImage.cpp
+			ImfPxr24Compressor.cpp
+			ImfRationalAttribute.cpp
+			ImfRational.cpp
+			ImfRgbaFile.cpp
+			ImfRgbaYca.cpp
+			ImfRleCompressor.cpp
+			ImfScanLineInputFile.cpp
+			ImfStandardAttributes.cpp
+			ImfStdIO.cpp
+			ImfStringAttribute.cpp
+			ImfTestFile.cpp
+			ImfThreading.cpp
+			ImfTileDescriptionAttribute.cpp
+			ImfTiledInputFile.cpp
+			ImfTiledMisc.cpp
+			ImfTiledOutputFile.cpp
+			ImfTiledRgbaFile.cpp
+			ImfTileOffsets.cpp
+			ImfTimeCodeAttribute.cpp
+			ImfTimeCode.cpp
+			ImfVecAttribute.cpp
+			ImfVersion.cpp
+			ImfWav.cpp
+			ImfZipCompressor.cpp
+			:
+			[ MultiArchDefaultGristFiles libhalf.a libiex.a libimath.a
+				libilmthread.a ]
+			$(TARGET_LIBSTDC++)
+			[ BuildFeatureAttribute zlib : library ]
+			;
+	}
 }
-
-UseHeaders $(HAIKU_ZLIB_HEADERS) : true ;
-
-Includes [ FGristFiles ImfPxr24Compressor.cpp ImfZipCompressor.cpp ]
-	: $(HAIKU_ZLIB_HEADERS_DEPENDENCY) ;
-
-#StaticLibrary libilmimf.a :
-SharedLibrary libilmimf.so :
-b44ExpLogTable.cpp
-ImfAttribute.cpp
-ImfB44Compressor.cpp
-ImfBoxAttribute.cpp
-ImfChannelListAttribute.cpp
-ImfChannelList.cpp
-ImfChromaticitiesAttribute.cpp
-ImfChromaticities.cpp
-ImfCompressionAttribute.cpp
-ImfCompressor.cpp
-ImfConvert.cpp
-ImfCRgbaFile.cpp
-ImfDoubleAttribute.cpp
-ImfEnvmapAttribute.cpp
-ImfEnvmap.cpp
-ImfFloatAttribute.cpp
-ImfFrameBuffer.cpp
-ImfFramesPerSecond.cpp
-ImfHeader.cpp
-ImfHuf.cpp
-ImfInputFile.cpp
-ImfIntAttribute.cpp
-ImfIO.cpp
-ImfKeyCodeAttribute.cpp
-ImfKeyCode.cpp
-ImfLineOrderAttribute.cpp
-ImfLut.cpp
-ImfMatrixAttribute.cpp
-ImfMisc.cpp
-ImfOpaqueAttribute.cpp
-ImfOutputFile.cpp
-ImfPizCompressor.cpp
-ImfPreviewImageAttribute.cpp
-ImfPreviewImage.cpp
-ImfPxr24Compressor.cpp
-ImfRationalAttribute.cpp
-ImfRational.cpp
-ImfRgbaFile.cpp
-ImfRgbaYca.cpp
-ImfRleCompressor.cpp
-ImfScanLineInputFile.cpp
-ImfStandardAttributes.cpp
-ImfStdIO.cpp
-ImfStringAttribute.cpp
-ImfTestFile.cpp
-ImfThreading.cpp
-ImfTileDescriptionAttribute.cpp
-ImfTiledInputFile.cpp
-ImfTiledMisc.cpp
-ImfTiledOutputFile.cpp
-ImfTiledRgbaFile.cpp
-ImfTileOffsets.cpp
-ImfTimeCodeAttribute.cpp
-ImfTimeCode.cpp
-ImfVecAttribute.cpp
-ImfVersion.cpp
-ImfWav.cpp
-ImfZipCompressor.cpp
-: libhalf.a libiex.a libimath.a libilmthread.a $(TARGET_LIBSTDC++)
-	$(HAIKU_ZLIB_LIB)
-;
-

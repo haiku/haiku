@@ -20,18 +20,22 @@
 #include <unistd.h>
 #include <string.h>
 
+
 #ifndef BOOT_ARCH
 #	error BOOT_ARCH has to be defined to differentiate the kernel per platform
 #endif
 
-#define KERNEL_IMAGE			"kernel_" BOOT_ARCH
-#define KERNEL_PATH				"system/" KERNEL_IMAGE
+#define SYSTEM_DIRECTORY_PREFIX	"system/"
+#define KERNEL_IMAGE	"kernel_" BOOT_ARCH
+#define KERNEL_PATH		SYSTEM_DIRECTORY_PREFIX KERNEL_IMAGE
 
 #ifdef ALTERNATE_BOOT_ARCH
 # define ALTERNATE_KERNEL_IMAGE	"kernel_" ALTERNATE_BOOT_ARCH
 # define ALTERNATE_KERNEL_PATH	"system/" ALTERNATE_KERNEL_IMAGE
 #endif
 
+
+static const char* const kSystemDirectoryPrefix = SYSTEM_DIRECTORY_PREFIX;
 
 static const char *sKernelPaths[][2] = {
 	{ KERNEL_PATH, KERNEL_IMAGE },
@@ -43,17 +47,32 @@ static const char *sKernelPaths[][2] = {
 
 static const char *sAddonPaths[] = {
 	kVolumeLocalSystemKernelAddonsDirectory,
+	kVolumeLocalCommonNonpackagedKernelAddonsDirectory,
 	kVolumeLocalCommonKernelAddonsDirectory,
+	kVolumeLocalUserNonpackagedKernelAddonsDirectory,
 	kVolumeLocalUserKernelAddonsDirectory,
 	NULL
 };
 
 
 static int
-find_kernel(Directory *volume, const char **name = NULL)
+open_maybe_packaged(BootVolume& volume, const char* path, int openMode)
+{
+	if (strncmp(path, kSystemDirectoryPrefix, strlen(kSystemDirectoryPrefix))
+			== 0) {
+		path += strlen(kSystemDirectoryPrefix);
+		return open_from(volume.SystemDirectory(), path, openMode);
+	}
+
+	return open_from(volume.RootDirectory(), path, openMode);
+}
+
+
+static int
+find_kernel(BootVolume& volume, const char** name = NULL)
 {
 	for (int32 i = 0; sKernelPaths[i][0] != NULL; i++) {
-		int fd = open_from(volume, sKernelPaths[i][0], O_RDONLY);
+		int fd = open_maybe_packaged(volume, sKernelPaths[i][0], O_RDONLY);
 		if (fd >= 0) {
 			if (name)
 				*name = sKernelPaths[i][1];
@@ -65,15 +84,20 @@ find_kernel(Directory *volume, const char **name = NULL)
 	return B_ENTRY_NOT_FOUND;
 }
 
+
 bool
 is_bootable(Directory *volume)
 {
 	if (volume->IsEmpty())
 		return false;
 
+	BootVolume bootVolume;
+	if (bootVolume.SetTo(volume) != B_OK)
+		return false;
+
 	// check for the existance of a kernel (for our platform)
-	int fd = find_kernel(volume);
-	if (fd < B_OK)
+	int fd = find_kernel(bootVolume);
+	if (fd < 0)
 		return false;
 
 	close(fd);
@@ -83,7 +107,7 @@ is_bootable(Directory *volume)
 
 
 status_t
-load_kernel(stage2_args *args, Directory *volume)
+load_kernel(stage2_args* args, BootVolume& volume)
 {
 	const char *name;
 	int fd = find_kernel(volume, &name);
@@ -118,11 +142,11 @@ load_kernel(stage2_args *args, Directory *volume)
 
 
 static status_t
-load_modules_from(Directory *volume, const char *path)
+load_modules_from(BootVolume& volume, const char* path)
 {
 	// we don't have readdir() & co. (yet?)...
 
-	int fd = open_from(volume, path, O_RDONLY);
+	int fd = open_maybe_packaged(volume, path, O_RDONLY);
 	if (fd < B_OK)
 		return fd;
 
@@ -156,7 +180,7 @@ load_modules_from(Directory *volume, const char *path)
  */
 
 static status_t
-load_module(Directory *volume, const char *name)
+load_module(BootVolume& volume, const char* name)
 {
 	char moduleName[B_FILE_NAME_LENGTH];
 	if (strlcpy(moduleName, name, sizeof(moduleName)) > sizeof(moduleName))
@@ -164,7 +188,7 @@ load_module(Directory *volume, const char *name)
 
 	for (int32 i = 0; sAddonPaths[i]; i++) {
 		// get base path
-		int baseFD = open_from(volume, sAddonPaths[i], O_RDONLY);
+		int baseFD = open_maybe_packaged(volume, sAddonPaths[i], O_RDONLY);
 		if (baseFD < B_OK)
 			continue;
 
@@ -205,7 +229,7 @@ load_module(Directory *volume, const char *name)
 
 
 status_t
-load_modules(stage2_args *args, Directory *volume)
+load_modules(stage2_args* args, BootVolume& volume)
 {
 	int32 failed = 0;
 
@@ -239,7 +263,8 @@ load_modules(stage2_args *args, Directory *volume)
 	if (!gBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
 		// iterate over the mounted volumes and load their file system
 		Partition *partition;
-		if (gRoot->GetPartitionFor(volume, &partition) == B_OK) {
+		if (gRoot->GetPartitionFor(volume.RootDirectory(), &partition)
+				== B_OK) {
 			while (partition != NULL) {
 				load_module(volume, partition->ModuleName());
 				partition = partition->Parent();

@@ -1087,7 +1087,7 @@ DirectoryWatcher::EventOccurred(NotificationService& service,
 
 	KPath path(B_PATH_NAME_LENGTH + 1);
 	if (path.InitCheck() != B_OK || vfs_entry_ref_to_path(device, directory,
-			name, path.LockBuffer(), path.BufferSize()) != B_OK)
+			name, true, path.LockBuffer(), path.BufferSize()) != B_OK)
 		return;
 
 	path.UnlockBuffer();

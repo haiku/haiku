@@ -16,52 +16,12 @@ namespace BHPKG {
 
 
 static const char* kAttributeNames[B_HPKG_ATTRIBUTE_ID_ENUM_COUNT + 1] = {
-	"dir:entry",
-	"file:type",
-	"file:permissions",
-	"file:user",
-	"file:group",
-	"file:atime",
-	"file:mtime",
-	"file:crtime",
-	"file:atime:nanos",
-	"file:mtime:nanos",
-	"file:crtime:nanos",
-	"file:attribute",
-	"file:attribute:type",
-	"data",
-	"data:compression",
-	"data:size",
-	"data:chunk_size",
-	"symlink:path",
-	"package:name",
-	"package:summary",
-	"package:description",
-	"package:vendor",
-	"package:packager",
-	"package:flags",
-	"package:architecture",
-	"package:version.major",
-	"package:version.minor",
-	"package:version.micro",
-	"package:version.release",
-	"package:copyright",
-	"package:license",
-	"package:provides",
-	"package:provides.type",
-	"package:requires",
-	"package:supplements",
-	"package:conflicts",
-	"package:freshens",
-	"package:replaces",
-	"package:resolvable.operator",
-	"package:checksum",
-	"package:version.prerelease",
-	"package:provides.compatible",
-	"package:url",
-	"package:source-url",
-	"package:install-path",
-	NULL
+	#define B_DEFINE_HPKG_ATTRIBUTE(id, type, name, constant)	\
+		name,
+	#include <package/hpkg/PackageAttributes.h>
+	#undef B_DEFINE_HPKG_ATTRIBUTE
+	//
+	NULL	// B_HPKG_ATTRIBUTE_ID_ENUM_COUNT
 };
 
 

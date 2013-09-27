@@ -1,0 +1,31 @@
+SubDir HAIKU_TOP src kits package solver ;
+
+# add-on implementing a libsolv based BSolver
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+
+		UseBuildFeatureHeaders libsolv ;
+
+		local libsolvHeaders
+			= [ BuildFeatureAttribute libsolv : headers : path ] ;
+		UseHeaders [ FDirName $(libsolvHeaders) solv ] ;
+
+		UsePrivateHeaders shared ;
+
+		SharedLibrary
+			[ MultiArchDefaultGristFiles libpackage-add-on-libsolv.so ]
+			:
+			LibsolvSolver.cpp
+			:
+			package
+			[ BuildFeatureAttribute libsolv : libraries ]
+			be $(TARGET_LIBSTDC++)
+		;
+
+
+		Includes [ FGristFiles LibsolvSolver.cpp ]
+			: [ BuildFeatureAttribute libsolv : headers ] ;
+	}
+}

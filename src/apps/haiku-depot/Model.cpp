@@ -39,7 +39,7 @@ public:
 		fDepot(depot)
 	{
 	}
-	
+
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		// TODO: Maybe a PackageInfo ought to know the Depot it came from?
@@ -55,7 +55,7 @@ public:
 		}
 		return false;
 	}
-	
+
 private:
 	DepotInfo	fDepot;
 };
@@ -68,7 +68,7 @@ public:
 		fCategory(category)
 	{
 	}
-	
+
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		if (package.Get() == NULL)
@@ -96,7 +96,7 @@ public:
 		fPackageList(packageList)
 	{
 	}
-	
+
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		return fPackageList.Contains(package);
@@ -116,7 +116,7 @@ public:
 		fPackageListB(packageListB)
 	{
 	}
-	
+
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		return fPackageListA.Contains(package)
@@ -148,7 +148,7 @@ public:
 			index = nextSpace + 1;
 		}
 	}
-	
+
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
 		if (package.Get() == NULL)
@@ -234,7 +234,7 @@ Model::Model()
 		B_TRANSLATE("Uninstalled packages"), "uninstalled"), true));
 
 	// A category for all packages that the user has installed or uninstalled.
-	// Those packages resemble what makes their system different from a 
+	// Those packages resemble what makes their system different from a
 	// fresh Haiku installation.
 	fUserCategories.Add(CategoryRef(new PackageCategory(
 		BitmapRef(),
@@ -261,10 +261,10 @@ Model::CreatePackageList() const
 
 	for (int32 i = 0; i < fDepots.CountItems(); i++) {
 		const DepotInfo& depot = fDepots.ItemAtFast(i);
-		
+
 		if (fDepotFilter.Length() > 0 && fDepotFilter != depot.Name())
 			continue;
-		
+
 		const PackageList& packages = depot.Packages();
 
 		for (int32 j = 0; j < packages.CountItems(); j++) {
@@ -284,6 +284,13 @@ bool
 Model::AddDepot(const DepotInfo& depot)
 {
 	return fDepots.Add(depot);
+}
+
+
+void
+Model::Clear()
+{
+	fDepots.Clear();
 }
 
 
@@ -316,6 +323,8 @@ Model::SetPackageState(const PackageInfoRef& package, PackageState state)
 			fUninstalledPackages.Add(package);
 			break;
 	}
+
+	package->SetState(state);
 }
 
 
@@ -326,7 +335,7 @@ void
 Model::SetCategory(const BString& category)
 {
 	PackageFilter* filter;
-	
+
 	if (category.Length() == 0)
 		filter = new AnyFilter();
 	else if (category == "installed")
@@ -358,7 +367,7 @@ void
 Model::SetSearchTerms(const BString& searchTerms)
 {
 	PackageFilter* filter;
-	
+
 	if (searchTerms.Length() == 0)
 		filter = new AnyFilter();
 	else
@@ -381,17 +390,17 @@ Model::PopulatePackage(const PackageInfoRef& package)
 
 	// TODO: Replace with actual backend that retrieves package extra
 	// information and user-contributed package information.
-	
+
 	// TODO: There should probably also be a way to "unpopulate" the
 	// package information. Maybe a cache of populated packages, so that
 	// packages loose their extra information after a certain amount of
 	// time when they have not been accessed/displayed in the UI. Otherwise
 	// HaikuDepot will consume more and more resources in the packages.
 	// Especially screen-shots will be a problem eventually.
-	
+
 	// TODO: Simulate a delay in retrieving this info, and do that on
 	// a separate thread.
-	
+
 	fPopulatedPackages.Add(package);
 
 	if (package->Title() == "WonderBrush") {

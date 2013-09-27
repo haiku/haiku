@@ -11,12 +11,7 @@ AddResources Message : Message.rdef ;
 
 ScreenSaver Message :
 	Message.cpp : 
-	be libscreensaver.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) ;
-
-Package haiku-screensaverkit-cvs :
-	Message :
-	boot home config add-ons Screen\ Savers
-;
+	be libscreensaver.so localestub $(TARGET_LIBSUPC++) ;
 
 DoCatalogs Message :
 	x-vnd.Haiku-MessageScreensaver

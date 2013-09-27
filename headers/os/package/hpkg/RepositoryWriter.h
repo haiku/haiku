@@ -60,6 +60,7 @@ public:
 
 			status_t			Init(const char* fileName);
 			status_t			AddPackage(const BEntry& packageEntry);
+			status_t			AddPackageInfo(const BPackageInfo& packageInfo);
 			status_t			Finish();
 
 private:

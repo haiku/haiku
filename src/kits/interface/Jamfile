@@ -30,122 +30,130 @@ UsePrivateHeaders app input print interface locale shared support tracker ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-MergeObject <libbe>interface_kit.o :
-	AbstractLayout.cpp
-	AbstractLayoutItem.cpp
-	AffineTransform.cpp
-	Alert.cpp
-	Alignment.cpp
-	Bitmap.cpp
-	BMCPrivate.cpp
-	Box.cpp
-	Button.cpp
-	CardLayout.cpp
-	ChannelControl.cpp
-	ChannelSlider.cpp
-	CheckBox.cpp
-	ColorConversion.cpp
-	ColorControl.cpp
-	ColorTools.cpp
-	Control.cpp
-	ControlLook.cpp
-	DecorInfo.cpp
-	Deskbar.cpp
-	Dragger.cpp
-	Font.cpp
-	Gradient.cpp
-	GradientLinear.cpp
-	GradientRadial.cpp
-	GradientRadialFocus.cpp
-	GradientDiamond.cpp
-	GradientConic.cpp
-	GraphicsDefs.cpp
-	GridLayout.cpp
-	GridLayoutBuilder.cpp
-	GridView.cpp
-	GroupLayout.cpp
-	GroupLayoutBuilder.cpp
-	GroupView.cpp
-	Input.cpp
-	InterfaceDefs.cpp
-	Layout.cpp
-	LayoutContext.cpp
-	LayoutItem.cpp
-	LayoutUtils.cpp
-	ListItem.cpp
-	ListView.cpp
-	Menu.cpp
-	MenuBar.cpp
-	MenuField.cpp
-	MenuItem.cpp
-	MenuPrivate.cpp
-	MenuWindow.cpp
-	OptionControl.cpp
-	OptionPopUp.cpp
-	OutlineListView.cpp
-	Picture.cpp
-	PictureButton.cpp
-	PictureDataWriter.cpp
-	PicturePlayer.cpp
-	Point.cpp
-	Polygon.cpp
-	PopUpMenu.cpp
-	PrintJob.cpp
-	PrivateScreen.cpp
-	RadioButton.cpp
-	Rect.cpp
-	Region.cpp
-	RegionSupport.cpp
-	Screen.cpp
-	ScrollBar.cpp
-	ScrollView.cpp
-	SeparatorItem.cpp
-	SeparatorView.cpp
-	Shape.cpp
-	Shelf.cpp
-	Size.cpp
-	Slider.cpp
-	SpaceLayoutItem.cpp
-	SplitLayout.cpp
-	SplitLayoutBuilder.cpp
-	SplitView.cpp
-	StatusBar.cpp
-	StringItem.cpp
-	StringView.cpp
-	TabView.cpp
-	TextControl.cpp
-	TextInput.cpp
-	TextView.cpp
-	ToolTip.cpp
-	ToolTipManager.cpp
-	TwoDimensionalLayout.cpp
-	View.cpp
-	ViewLayoutItem.cpp
-	Window.cpp
-	WindowStack.cpp
-	ZombieReplicantView.cpp
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
 
-	# BTextView support
-	InlineInput.cpp
-	LineBuffer.cpp
-	StyleBuffer.cpp
-	TextGapBuffer.cpp
-	UndoBuffer.cpp
-	WidthBuffer.cpp
+		MergeObject <libbe!$(architecture)>interface_kit.o :
+			AbstractLayout.cpp
+			AbstractLayoutItem.cpp
+			AffineTransform.cpp
+			Alert.cpp
+			Alignment.cpp
+			Bitmap.cpp
+			BMCPrivate.cpp
+			Box.cpp
+			Button.cpp
+			CardLayout.cpp
+			ChannelControl.cpp
+			ChannelSlider.cpp
+			CheckBox.cpp
+			ColorConversion.cpp
+			ColorControl.cpp
+			ColorTools.cpp
+			Control.cpp
+			ControlLook.cpp
+			DecorInfo.cpp
+			Deskbar.cpp
+			Dragger.cpp
+			Font.cpp
+			Gradient.cpp
+			GradientLinear.cpp
+			GradientRadial.cpp
+			GradientRadialFocus.cpp
+			GradientDiamond.cpp
+			GradientConic.cpp
+			GraphicsDefs.cpp
+			GridLayout.cpp
+			GridLayoutBuilder.cpp
+			GridView.cpp
+			GroupLayout.cpp
+			GroupLayoutBuilder.cpp
+			GroupView.cpp
+			Input.cpp
+			InterfaceDefs.cpp
+			Layout.cpp
+			LayoutContext.cpp
+			LayoutItem.cpp
+			LayoutUtils.cpp
+			ListItem.cpp
+			ListView.cpp
+			Menu.cpp
+			MenuBar.cpp
+			MenuField.cpp
+			MenuItem.cpp
+			MenuPrivate.cpp
+			MenuWindow.cpp
+			OptionControl.cpp
+			OptionPopUp.cpp
+			OutlineListView.cpp
+			Picture.cpp
+			PictureButton.cpp
+			PictureDataWriter.cpp
+			PicturePlayer.cpp
+			Point.cpp
+			Polygon.cpp
+			PopUpMenu.cpp
+			PrintJob.cpp
+			PrivateScreen.cpp
+			RadioButton.cpp
+			Rect.cpp
+			Region.cpp
+			RegionSupport.cpp
+			Screen.cpp
+			ScrollBar.cpp
+			ScrollView.cpp
+			SeparatorItem.cpp
+			SeparatorView.cpp
+			Shape.cpp
+			Shelf.cpp
+			Size.cpp
+			Slider.cpp
+			SpaceLayoutItem.cpp
+			SplitLayout.cpp
+			SplitLayoutBuilder.cpp
+			SplitView.cpp
+			StatusBar.cpp
+			StringItem.cpp
+			StringView.cpp
+			TabView.cpp
+			TextControl.cpp
+			TextInput.cpp
+			TextView.cpp
+			ToolTip.cpp
+			ToolTipManager.cpp
+			TwoDimensionalLayout.cpp
+			View.cpp
+			ViewLayoutItem.cpp
+			ViewPort.cpp
+			Window.cpp
+			WindowStack.cpp
+			ZombieReplicantView.cpp
 
-	# layouter
-	CollapsingLayouter.cpp
-	ComplexLayouter.cpp
-	Layouter.cpp
-	LayoutOptimizer.cpp
-	OneElementLayouter.cpp
-	SimpleLayouter.cpp
+			# BTextView support
+			InlineInput.cpp
+			LineBuffer.cpp
+			StyleBuffer.cpp
+			TextGapBuffer.cpp
+			UndoBuffer.cpp
+			WidthBuffer.cpp
 
-	: libshared.a
-;
+			# layouter
+			CollapsingLayouter.cpp
+			ComplexLayouter.cpp
+			Layouter.cpp
+			LayoutOptimizer.cpp
+			OneElementLayouter.cpp
+			SimpleLayouter.cpp
+
+			: [ MultiArchDefaultGristFiles libshared.a ]
+			;
+	}
+}
 
 StaticLibrary libcolumnlistview.a :
 	ColumnListView.cpp

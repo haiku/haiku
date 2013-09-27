@@ -1,0 +1,197 @@
+name 			haiku
+version			R1~alpha4_pm-1
+architecture	x86_64
+summary			"The Haiku base system"
+
+description		"The Haiku base system includes all system core software, like
+boot loader, kernel, the system libraries, servers, and applications."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2013 Haiku, Inc. et al"
+licenses {
+	MIT
+	"GNU LGPL v2.1"
+}
+
+provides {
+	haiku=R1~alpha4_pm-1 compat>=R1~alpha1
+	coreutils = 8.4 compat >= 0
+	diffutils = 2.8.1 compat >= 0
+	findutils = 4.2.33 compat >= 0
+	cmd:arp
+	cmd:awk
+	cmd:base64
+	cmd:basename
+	cmd:bash
+	cmd:bc
+	cmd:cat
+	cmd:chgrp
+	cmd:chmod
+	cmd:chop
+	cmd:chown
+	cmd:chroot
+	cmd:cksum
+	cmd:clear
+	cmd:cmp
+	cmd:comm
+	cmd:compress
+	cmd:cp = 8.4
+	cmd:csplit
+	cmd:cut
+	cmd:date
+	cmd:dc
+	cmd:dd
+	cmd:df
+	cmd:diff = 2.8.1
+	cmd:diff3
+	cmd:dirname
+	cmd:du
+	cmd:echo
+	cmd:env
+	cmd:expand
+	cmd:expr
+	cmd:factor
+	cmd:false
+	cmd:find = 4.2.33
+	cmd:fmt
+	cmd:fold
+	cmd:frcode
+	cmd:ftp
+	cmd:ftpd
+	cmd:funzip
+	cmd:gawk
+	cmd:gdb
+	cmd:getlimits
+	cmd:groups
+	cmd:gunzip
+	cmd:gzexe
+	cmd:gzip
+	cmd:hd
+	cmd:head
+	cmd:hostname
+	cmd:id
+	cmd:install
+	cmd:join
+	cmd:kill
+	cmd:less
+	cmd:lessecho
+	cmd:lesskey
+	cmd:link
+	cmd:ln = 8.4
+	cmd:locate
+	cmd:login
+	cmd:logname
+	cmd:ls
+	cmd:md5sum
+	cmd:merge
+	cmd:mkdir
+	cmd:mkfifo
+	cmd:mktemp
+	cmd:more
+	cmd:mv = 8.4
+	cmd:netcat
+	cmd:nl
+	cmd:nohup
+	cmd:nproc
+	cmd:od
+	cmd:passwd
+	cmd:paste
+	cmd:patch
+	cmd:pathchk
+	cmd:ping
+	cmd:ping6
+	cmd:pr
+	cmd:printenv
+	cmd:printf
+	cmd:prio
+	cmd:ps
+	cmd:ptx
+	cmd:pwd
+	cmd:readlink
+	cmd:renice
+	cmd:rlog
+	cmd:rm
+	cmd:rmdir
+	cmd:sdiff
+	cmd:seq
+	cmd:sh
+	cmd:sha1sum
+	cmd:sha256sum
+	cmd:shar
+	cmd:shred
+	cmd:shuf
+	cmd:sleep
+	cmd:sort
+	cmd:split
+	cmd:stat
+	cmd:stty
+	cmd:su
+	cmd:sum
+	cmd:sync
+	cmd:tac
+	cmd:tail
+	cmd:tcpdump
+	cmd:tee
+	cmd:telnet
+	cmd:telnetd
+	cmd:test
+	cmd:timeout
+	cmd:top
+	cmd:touch
+	cmd:tput
+	cmd:tr
+	cmd:traceroute
+	cmd:trash
+	cmd:true
+	cmd:truncate
+	cmd:tsort
+	cmd:tty
+	cmd:uname
+	cmd:unchop
+	cmd:unexpand
+	cmd:uniq
+	cmd:unlink
+	cmd:unshar
+	cmd:unzip = 5.50
+	cmd:unzipsfx
+	cmd:updatedb
+	cmd:useradd
+	cmd:uudecode
+	cmd:uuencode
+	cmd:vdir
+	cmd:watch
+	cmd:wc
+	cmd:wget = 1.12
+	cmd:which
+	cmd:whoami
+	cmd:xargs
+	cmd:xres
+	cmd:yes
+	cmd:zcat
+	cmd:zcmp
+	cmd:zdiff
+	cmd:zforce
+	cmd:zgrep
+	cmd:zip = 2.32
+	cmd:zipcloak
+	cmd:zipgrep
+	cmd:zipinfo
+	cmd:zipnote
+	cmd:zipsplit
+	cmd:zmore
+	cmd:znew
+	lib:libtiff = 3.9.4 compat >= 3
+}
+
+requires {
+	lib:libfreetype
+#ifndef HAIKU_BOOTSTRAP_BUILD
+	lib:libjpeg
+	lib:libpng
+#endif
+	lib:libsolv
+	lib:libsolvext
+	lib:libz
+}

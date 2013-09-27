@@ -51,6 +51,8 @@ public:
 	status_t InitCheck() const;
 	bool Exists() const;
 
+	const char* Name() const;
+
 	virtual status_t GetStat(struct stat *st) const;
 
 	status_t SetTo(const BDirectory *dir, const char *path,

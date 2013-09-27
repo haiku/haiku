@@ -3,10 +3,10 @@
 
 /* CUPS data directory. */
 /* Not used in Haiku */
-#define CUPS_DATADIR "/boot/common/data/cups"
+#define CUPS_DATADIR "/system/data/cups"
 
 /* Not used in Haiku */
-#define CUPS_MODELDIR "/boot/common/data/model/gutenprint/5.2/"
+#define CUPS_MODELDIR "/system/data/model/gutenprint/5.2/"
 
 /* */
 /* Not used in Haiku */
@@ -153,7 +153,7 @@
 #define PACKAGE_DATA_DIR "/system/data/gutenprint"
 
 /* */
-#define PACKAGE_LIB_DIR "/boot/common/lib/gutenprint"
+#define PACKAGE_LIB_DIR "/system/lib/gutenprint"
 
 /* */
 #define PACKAGE_LOCALE_DIR "/NOT_USED/locale"
@@ -171,7 +171,7 @@
 #define PACKAGE_VERSION "5.2.7"
 
 /* */
-#define PKGMODULEDIR "/boot/common/lib/gutenprint/5.2/modules"
+#define PKGMODULEDIR "/system/lib/gutenprint/5.2/modules"
 
 /* */
 #define PKGXMLDATADIR "/system/data/gutenprint"

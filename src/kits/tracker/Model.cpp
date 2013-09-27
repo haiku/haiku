@@ -325,16 +325,16 @@ Model::CompareFolderNamesFirst(const Model* compareModel) const
 	const Model* resolvedCompareModel = compareModel->ResolveIfLink();
 	const Model* resolvedMe = ResolveIfLink();
 
-	if (resolvedMe->IsVolume()) {
-		if (!resolvedCompareModel->IsVolume())
-			return -1;
-	} else if (resolvedCompareModel->IsVolume())
-		return 1;
+	bool meIsDirOrVolume = resolvedMe->IsDirectory() || resolvedMe->IsVolume()
+		|| resolvedMe->IsVirtualDirectory();
+	bool otherIsDirOrVolume = resolvedCompareModel->IsDirectory()
+		|| resolvedCompareModel->IsVolume()
+		|| resolvedCompareModel->IsVirtualDirectory();
 
-	if (resolvedMe->IsDirectory()) {
-		if (!resolvedCompareModel->IsDirectory())
+	if (meIsDirOrVolume) {
+		if (!otherIsDirOrVolume)
 			return -1;
-	} else if (resolvedCompareModel->IsDirectory())
+	} else if (otherIsDirOrVolume)
 		return 1;
 
 	return NaturalCompare(Name(), compareModel->Name());
@@ -428,6 +428,7 @@ Model::OpenNodeCommon(bool writable)
 		case kExecutableNode:
 		case kQueryNode:
 		case kQueryTemplateNode:
+		case kVirtualDirectoryNode:
 			// open or reopen
 			delete fNode;
 			fNode = new BFile(&fEntryRef,
@@ -631,6 +632,8 @@ Model::FinishSettingUpType()
 				fBaseType = kQueryNode;
 			else if (strcmp(mimeString, B_QUERY_TEMPLATE_MIMETYPE) == 0)
 				fBaseType = kQueryTemplateNode;
+			else if (strcmp(mimeString, kVirtualDirectoryMimeType) == 0)
+				fBaseType = kVirtualDirectoryNode;
 
 			if (info.GetPreferredApp(mimeString) == B_OK) {
 				if (fPreferredAppName)
@@ -1332,6 +1335,10 @@ Model::PrintToStream(int32 level, bool deep)
 
 		case kVolumeNode:
 			PRINT(("volume, name %s\n", fVolumeName ? fVolumeName : ""));
+			break;
+
+		case kVirtualDirectoryNode:
+			PRINT(("virtual directory\n"));
 			break;
 
 		default:

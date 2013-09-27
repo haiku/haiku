@@ -1,34 +1,42 @@
 SubDir HAIKU_TOP src system libroot posix time ;
 
 # for localtime.c strftime.c
-SubDirCcFlags -DNOID -DTZDIR='get_timezones_directory()' -DUSG_COMPAT
-	-DTM_GMTOFF=tm_gmtoff -DTM_ZONE=tm_zone -DPCTS=1 -DSTD_INSPIRED ;
+SubDirCcFlags -DNOID -DUSG_COMPAT -DTM_GMTOFF=tm_gmtoff -DTM_ZONE=tm_zone 
+	-DPCTS=1 -DSTD_INSPIRED ;
 
 UsePrivateHeaders
 	libroot
 	[ FDirName libroot locale ]
 	[ FDirName libroot time ]
 	shared
-;
-UsePrivateSystemHeaders ;
+	;
 
-MergeObject posix_time.o :
-	asctime.cpp
-	clock.cpp
-	clock_support.cpp
-	ctime.c
-	difftime.c
-	localtime_fading_out.c
-	localtime.cpp
-	nanosleep.c
-	stime.c
-	strftime.c
-	strptime.c
-	timelocal.cpp
-	time.c
-	timer_support.cpp
-	wcsftime.c
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UsePrivateSystemHeaders ;
+
+		MergeObject <$(architecture)>posix_time.o :
+			asctime.cpp
+			clock.cpp
+			clock_support.cpp
+			ctime.c
+			difftime.c
+			localtime_fading_out.c
+			localtime.cpp
+			nanosleep.c
+			stime.c
+			strftime.c
+			strptime.c
+			timelocal.cpp
+			time.c
+			timer_support.cpp
+			wcsftime.c
+			;
+	}
+}
 
 # Explanations of flags:
 #

@@ -17,9 +17,9 @@
    02111-1307 USA.  */
 
 #ifndef	_PRINTF_H
-
 #define	_PRINTF_H	1
-#include <features.h>
+
+#include <sys/cdefs.h>
 
 __BEGIN_DECLS
 
@@ -93,7 +93,7 @@ extern int register_printf_function (int __spec, printf_function __func,
    the number of arguments it wants.  */
 
 extern size_t parse_printf_format (__const char *__restrict __fmt, size_t __n,
-				   int *__restrict __argtypes) __THROW;
+				   int *__restrict __argtypes);
 
 
 /* Codes returned by `parse_printf_format' for basic types.
@@ -132,12 +132,11 @@ enum
    used.  Otherwise powers of 1024.  */
 extern int printf_size (FILE *__restrict __fp,
 			__const struct printf_info *__info,
-			__const void *__const *__restrict __args) __THROW;
+			__const void *__const *__restrict __args);
 
 /* This is the appropriate argument information function for `printf_size'.  */
 extern int printf_size_info (__const struct printf_info *__restrict
-			     __info, size_t __n, int *__restrict __argtypes)
-     __THROW;
+			     __info, size_t __n, int *__restrict __argtypes);
 
 
 __END_DECLS

@@ -1,27 +1,25 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MIME_DATABASE_SUPPORT_H
 #define _MIME_DATABASE_SUPPORT_H
 
 
-#include <StorageDefs.h>
+#include <Mime.h>
+#include <SupportDefs.h>
 
-#include <string>
 
-class BNode;
-class BMessage;
-class BString;
+class BBitmap;
 
 
 namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
-// Database directory
-const std::string get_database_directory();
-const std::string get_application_database_directory();
+
+class DatabaseLocation;
+
 
 // Attribute Prefixes
 extern const char *kMiniIconAttrPrefix;
@@ -75,24 +73,18 @@ extern const char *kMetaMimeType;
 // Error codes (to be used only by BPrivate::Storage::Mime members)
 extern const status_t kMimeGuessFailureError;
 
-std::string type_to_filename(const char *type);
 
-status_t open_type(const char *type, BNode *result);
-status_t open_or_create_type(const char *type, BNode *result, bool *didCreate);
+DatabaseLocation* default_database_location();
 
-ssize_t read_mime_attr(const char *type, const char *attr, void *data,
-                       size_t len, type_code datatype);
-status_t read_mime_attr_message(const char *type, const char *attr, BMessage *msg);
-status_t read_mime_attr_string(const char *type, const char *attr, BString *str);
-status_t write_mime_attr(const char *type, const char *attr, const void *data,
-						     size_t len, type_code datatype, bool *didCreate);
-status_t write_mime_attr_message(const char *type, const char *attr,
-									const BMessage *msg, bool *didCreate);
+// Called by BMimeType to get properly formatted icon data ready
+// to be shipped off to SetIcon*() and written to the database
+status_t get_icon_data(const BBitmap *icon, icon_size size, void **data,
+			int32 *dataSize);
 
-status_t delete_attribute(const char *type, const char *attr);
 
 } // namespace Mime
 } // namespace Storage
 } // namespace BPrivate
+
 
 #endif	// _MIME_DATABASE_SUPPORT_H

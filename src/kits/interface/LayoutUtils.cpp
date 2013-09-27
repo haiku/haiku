@@ -1,11 +1,16 @@
 /*
- * Copyright 2006-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2006-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
 #include <LayoutUtils.h>
 
+#include <typeinfo>
+
+#include <Layout.h>
 #include <View.h>
+
+#include "ViewLayoutItem.h"
 
 
 // // AddSizesFloat
@@ -229,4 +234,112 @@ BLayoutUtils::MoveIntoFrame(BRect rect, BSize frameSize)
 		leftTop.y = 0;
 
 	return rect.OffsetToSelf(leftTop);
+}
+
+
+/*static*/ BString
+BLayoutUtils::GetLayoutTreeDump(BView* view)
+{
+	BString result;
+	_GetLayoutTreeDump(view, 0, result);
+	return result;
+}
+
+
+/*static*/ BString
+BLayoutUtils::GetLayoutTreeDump(BLayoutItem* item)
+{
+	BString result;
+	_GetLayoutTreeDump(item, 0, false, result);
+	return result;
+}
+
+
+/*static*/ void
+BLayoutUtils::_GetLayoutTreeDump(BView* view, int level, BString& _output)
+{
+	BString indent;
+	indent.SetTo(' ', level * 2);
+
+	if (view == NULL) {
+		_output << indent << "<null view>\n";
+		return;
+	}
+
+	BRect frame = view->Frame();
+	BSize min = view->MinSize();
+	BSize max = view->MinSize();
+	BSize preferred = view->PreferredSize();
+	_output << BString().SetToFormat(
+		"%sview %p (%s):\n"
+		"%s  frame: (%f, %f, %f, %f)\n"
+		"%s  min:   (%f, %f)\n"
+		"%s  max:   (%f, %f)\n"
+		"%s  pref:  (%f, %f)\n",
+		indent.String(), view, typeid(*view).name(),
+		indent.String(), frame.left, frame.top, frame.right, frame.bottom,
+		indent.String(), min.width, min.height,
+		indent.String(), max.width, max.height,
+		indent.String(), preferred.width, preferred.height);
+
+	if (BLayout* layout = view->GetLayout()) {
+		_GetLayoutTreeDump(layout, level, true, _output);
+		return;
+	}
+
+	int32 count = view->CountChildren();
+	for (int32 i = 0; i < count; i++) {
+		_output << indent << "  ---\n";
+		_GetLayoutTreeDump(view->ChildAt(i), level + 1, _output);
+	}
+}
+
+
+/*static*/ void
+BLayoutUtils::_GetLayoutTreeDump(BLayoutItem* item, int level,
+	bool isViewLayout, BString& _output)
+{
+	if (BViewLayoutItem* viewItem = dynamic_cast<BViewLayoutItem*>(item)) {
+		_GetLayoutTreeDump(viewItem->View(), level, _output);
+		return;
+	}
+
+	BString indent;
+	indent.SetTo(' ', level * 2);
+
+	if (item == NULL) {
+		_output << indent << "<null item>\n";
+		return;
+	}
+
+	BLayout* layout = dynamic_cast<BLayout*>(item);
+	BRect frame = item->Frame();
+	BSize min = item->MinSize();
+	BSize max = item->MinSize();
+	BSize preferred = item->PreferredSize();
+	if (isViewLayout) {
+		_output << indent << BString().SetToFormat("  [layout %p (%s)]\n",
+			layout, typeid(*layout).name());
+	} else {
+		_output << indent << BString().SetToFormat("item %p (%s):\n",
+			item, typeid(*item).name());
+	}
+	_output << BString().SetToFormat(
+		"%s  frame: (%f, %f, %f, %f)\n"
+		"%s  min:   (%f, %f)\n"
+		"%s  max:   (%f, %f)\n"
+		"%s  pref:  (%f, %f)\n",
+		indent.String(), frame.left, frame.top, frame.right, frame.bottom,
+		indent.String(), min.width, min.height,
+		indent.String(), max.width, max.height,
+		indent.String(), preferred.width, preferred.height);
+
+	if (layout == NULL)
+		return;
+
+	int32 count = layout->CountItems();
+	for (int32 i = 0; i < count; i++) {
+		_output << indent << "  ---\n";
+		_GetLayoutTreeDump(layout->ItemAt(i), level + 1, false, _output);
+	}
 }

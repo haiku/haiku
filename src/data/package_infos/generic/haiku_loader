@@ -1,0 +1,18 @@
+name			haiku_loader
+version			R1~alpha4_pm-1
+architecture	%HAIKU_PACKAGING_ARCH%
+summary			"The Haiku boot loader"
+description		"The Haiku boot loader."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2013 Haiku, Inc. et al"
+licenses		"MIT"
+
+provides {
+	haiku_loader=R1~alpha4_pm-1
+}
+
+requires {
+}

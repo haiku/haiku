@@ -109,7 +109,7 @@ private:
 
 class Directory : public ::Directory, public Entry {
 public:
-								Directory(const char* name);
+								Directory(Directory* parent, const char* name);
 	virtual						~Directory();
 
 	virtual	status_t			Open(void** _cookie, int mode);
@@ -119,7 +119,7 @@ public:
 									size_t bufferSize) const;
 
 	virtual	TarFS::Entry*		LookupEntry(const char* name);
-	virtual	::Node*				Lookup(const char* name, bool traverseLinks);
+	virtual	::Node*				LookupDontTraverse(const char* name);
 
 	virtual	status_t			GetNextEntry(void* cookie, char* nameBuffer,
 									size_t bufferSize);
@@ -136,10 +136,11 @@ public:
 									TarFS::Directory** _dir = NULL);
 			status_t			AddFile(tar_header* header);
 
-	private:
-		typedef ::Directory _inherited;
+private:
+			typedef ::Directory _inherited;
 
-		EntryList	fEntries;
+			Directory*			fParent;
+			EntryList			fEntries;
 };
 
 
@@ -152,6 +153,8 @@ public:
 									size_t bufferSize);
 	virtual	ssize_t				WriteAt(void* cookie, off_t pos,
 									const void* buffer, size_t bufferSize);
+
+	virtual	status_t			ReadLink(char* buffer, size_t bufferSize);
 
 	virtual	status_t			GetName(char* nameBuffer,
 									size_t bufferSize) const;
@@ -327,8 +330,10 @@ TarFS::File::Inode() const
 
 // #pragma mark -
 
-TarFS::Directory::Directory(const char* name)
-	: TarFS::Entry(name)
+TarFS::Directory::Directory(Directory* parent, const char* name)
+	:
+	TarFS::Entry(name),
+	fParent(parent)
 {
 }
 
@@ -379,6 +384,11 @@ TarFS::Directory::GetName(char* nameBuffer, size_t bufferSize) const
 TarFS::Entry*
 TarFS::Directory::LookupEntry(const char* name)
 {
+	if (strcmp(name, ".") == 0)
+		return this;
+	if (strcmp(name, "..") == 0)
+		return fParent;
+
 	EntryIterator iterator(fEntries.GetIterator());
 
 	while (iterator.HasNext()) {
@@ -392,25 +402,13 @@ TarFS::Directory::LookupEntry(const char* name)
 
 
 ::Node*
-TarFS::Directory::Lookup(const char* name, bool traverseLinks)
+TarFS::Directory::LookupDontTraverse(const char* name)
 {
 	TarFS::Entry* entry = LookupEntry(name);
 	if (!entry)
 		return NULL;
 
 	Node* node = entry->ToNode();
-
-	if (traverseLinks) {
-		if (S_ISLNK(node->Type())) {
-			Symlink* symlink = static_cast<Symlink*>(node);
-			int fd = open_from(this, symlink->LinkPath(), O_RDONLY);
-			if (fd >= 0) {
-				node = get_node_from(fd);
-				close(fd);
-			}
-		}
-	}
-
 	if (node)
 		node->Acquire();
 
@@ -481,7 +479,7 @@ TarFS::Directory::AddDirectory(char* dirName, TarFS::Directory** _dir)
 			return B_ERROR;
 	} else {
 		// doesn't exist yet -- create it
-		dir = new(nothrow) TarFS::Directory(dirName);
+		dir = new(nothrow) TarFS::Directory(this, dirName);
 		if (!dir)
 			return B_NO_MEMORY;
 
@@ -588,6 +586,20 @@ TarFS::Symlink::WriteAt(void* cookie, off_t pos, const void* buffer,
 
 
 status_t
+TarFS::Symlink::ReadLink(char* buffer, size_t bufferSize)
+{
+	const char* path = fHeader->linkname;
+	size_t size = strlen(path) + 1;
+
+	if (size > bufferSize)
+		return B_BUFFER_OVERFLOW;
+
+	memcpy(buffer, path, size);
+	return B_OK;
+}
+
+
+status_t
 TarFS::Symlink::GetName(char* nameBuffer, size_t bufferSize) const
 {
 	return strlcpy(nameBuffer, Name(), bufferSize) >= bufferSize
@@ -620,7 +632,8 @@ TarFS::Symlink::Inode() const
 
 
 TarFS::Volume::Volume()
-	: TarFS::Directory("Boot from CD-ROM")
+	:
+	TarFS::Directory(this, "Boot from CD-ROM")
 {
 }
 

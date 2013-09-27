@@ -6,30 +6,41 @@ UsePrivateHeaders
 	[ FDirName libroot locale ]
 	[ FDirName libroot time ]
 	shared
-;
+	;
 
-local sources =
-	ICUCategoryData.cpp
-	ICUCollateData.cpp
-	ICUCtypeData.cpp
-	ICULocaleBackend.cpp
-	ICULocaleconvData.cpp
-	ICUMessagesData.cpp
-	ICUMonetaryData.cpp
-	ICUNumericData.cpp
-	ICUThreadLocalStorageValue.cpp
-	ICUTimeConversion.cpp
-	ICUTimeData.cpp
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-SubDirSysHdrs $(HAIKU_ICU_HEADERS) ;
-Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
-	# Dependency needed to trigger downloading/unzipping the package before
-	# compiling the files.
+		UseBuildFeatureHeaders icu ;
 
-SharedLibrary libroot-addon-icu.so
-	: $(sources)
-	:
-	libreferenceable.a $(TARGET_LIBSTDC++) $(HAIKU_ICU_LIBS)
-;
+		local sources =
+			ICUCategoryData.cpp
+			ICUCollateData.cpp
+			ICUCtypeData.cpp
+			ICULocaleBackend.cpp
+			ICULocaleconvData.cpp
+			ICUMessagesData.cpp
+			ICUMonetaryData.cpp
+			ICUNumericData.cpp
+			ICUThreadLocalStorageValue.cpp
+			ICUTimeConversion.cpp
+			ICUTimeData.cpp
+			;
 
+		Includes [ FGristFiles $(sources) ]
+			: [ BuildFeatureAttribute icu : headers ] ;
+			# Dependency needed to trigger downloading/unzipping the package
+			# before compiling the files.
+
+		local grist = [ MultiArchIfPrimary "" : <$(architecture)> ] ;
+
+		SharedLibrary $(grist)libroot-addon-icu.so
+			: $(sources)
+			:
+			$(grist)libreferenceable.a $(TARGET_LIBSTDC++_$(architecture))
+			[ BuildFeatureAttribute icu : libraries ]
+			;
+	}
+}

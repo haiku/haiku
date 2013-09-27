@@ -5,7 +5,7 @@ Application OverlayImage :
 	OverlayView.cpp
 	OverlayWindow.cpp
 
-	: be libtranslation.so $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	: be libtranslation.so $(TARGET_LIBSTDC++) localestub
 	: OverlayImage.rdef
 ;
 

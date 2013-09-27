@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons screen_savers flurry ;
-SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+UseBuildFeatureHeaders glu ;
+UseBuildFeatureHeaders mesa ;
 
 AddResources Message : Flurry.rdef ;
 
@@ -12,13 +12,17 @@ local sources =
 	Texture.cpp
 ;
 
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] :
+	[ BuildFeatureAttribute glu : headers ]
+	[ BuildFeatureAttribute mesa : headers ]
+	;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
 ScreenSaver Flurry :
 	$(sources) :
-	be screensaver GL libshared.a $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	be screensaver GL libshared.a localestub $(TARGET_LIBSUPC++)
+	[ BuildFeatureAttribute glu : library ]
 ;
 
 DoCatalogs Flurry :

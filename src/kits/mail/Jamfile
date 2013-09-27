@@ -35,30 +35,37 @@ local sources =
 ;
 
 
-# use OpenSSL, if enabled
-if $(HAIKU_BUILD_FEATURE_OPENSSL_ENABLED) {
-	SubDirC++Flags -DUSE_SSL ;
-	SubDirSysHdrs $(HAIKU_OPENSSL_HEADERS) ;
-	Includes [ FGristFiles $(sources) ] : $(HAIKU_OPENSSL_HEADERS_DEPENDENCY) ;
-		# Dependency needed to trigger downloading/unzipping the package before
-		# compiling the files.
-	SetupFeatureObjectsDir ssl ;
-} else {
-	SetupFeatureObjectsDir no-ssl ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		# use OpenSSL, if enabled
+		if [ FIsBuildFeatureEnabled openssl ] {
+			SubDirC++Flags -DUSE_SSL ;
+			UseBuildFeatureHeaders openssl ;
+			Includes [ FGristFiles $(sources) ]
+				: [ BuildFeatureAttribute openssl : headers ] ;
+				# Dependency needed to trigger downloading/unzipping the package before
+				# compiling the files.
+			SetupFeatureObjectsDir ssl ;
+		} else {
+			SetupFeatureObjectsDir no-ssl ;
+		}
+
+		local libmail = [ MultiArchDefaultGristFiles libmail.so ] ;
+		AddResources $(libmail) : libmail.rdef ;
+
+		SharedLibrary $(libmail) :
+			$(sources)
+			:
+			be bnetapi textencoding tracker
+			$(TARGET_LIBSTDC++)
+			$(TARGET_NETWORK_LIBS)
+			$(TARGET_SELECT_UNAME_ETC_LIB)
+			[ BuildFeatureAttribute openssl : libraries ]
+			localestub
+			;
+	}
 }
-
-AddResources libmail.so : libmail.rdef ;
-
-SharedLibrary libmail.so :
-	$(sources)
-	:
-	be libbnetapi.so libtextencoding.so tracker
-	$(TARGET_LIBSTDC++)
-	$(TARGET_NETWORK_LIBS)
-	$(TARGET_SELECT_UNAME_ETC_LIB)
-	$(HAIKU_OPENSSL_LIBS)
-	$(HAIKU_LOCALE_LIBS)
-;
 
 
 DoCatalogs libmail.so :

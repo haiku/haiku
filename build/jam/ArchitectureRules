@@ -1,0 +1,785 @@
+rule ArchitectureSetup architecture
+{
+	# ArchitectureSetup <architecture> ;
+	#
+	# Initializes all global packaging architecture dependent variables for the
+	# given packaging architecture. Also sets HAIKU_ARCH (to the primary
+	# architecture), if this is the first invocation of the rule, and adds
+	# the architecture to HAIKU_ARCHS, if not yet contained.
+
+	# analyze GCC version
+	local gccVersion
+		= [ FAnalyzeGCCVersion HAIKU_GCC_RAW_VERSION_$(architecture) ] ;
+	HAIKU_GCC_VERSION_$(architecture) = $(gccVersion) ;
+
+	# enable GCC -pipe option, if requested
+	local gccBaseFlags ;
+	if $(HAIKU_USE_GCC_PIPE) = 1 {
+		gccBaseFlags = -pipe ;
+	}
+
+	# disable strict aliasing on anything newer than gcc 2 as it may lead to
+	# unexpected results. also disable the tree-vrp (value range propagation)
+	# optimization for now as with the current gcc4 version we are using this
+	# results in some broken code.
+	# TODO: remove the -fno-strict-aliasing option when all code has been
+	#		analyzed/fixed with regard to aliasing.
+	# TODO: retest/remove the -fno-tree-vrp option as soon as we have updated
+	#		our gcc4 compiler. See this discussion on some issues:
+	# http://www.freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
+	if $(gccVersion[1]) >= 3 {
+		gccBaseFlags += -fno-strict-aliasing -fno-tree-vrp ;
+	}
+
+	# disable array bounds warnings on gcc 4.6 or newer since they trigger
+	# too many false positives. Coverity does a better job of this kind of
+	# analysis anyways.
+	if $(gccVersion[1]) >= 4 {
+		gccBaseFlags += -Wno-array-bounds ;
+	}
+
+	local cpu = $(HAIKU_CPU_$(architecture)) ;
+	if $(cpu) = arm {
+		# For stackcrawls
+		gccBaseFlags += -mapcs-frame ;
+	}
+
+	# activating graphite optimizations
+	if $(HAIKU_USE_GCC_GRAPHITE_$(architecture)) = 1 {
+		gccBaseFlags += -floop-interchange -ftree-loop-distribution
+			-floop-strip-mine -floop-block ;
+	}
+	HAIKU_GCC_BASE_FLAGS_$(architecture) = $(gccBaseFlags) ;
+
+	# override gcc 2.95.3's header directory -- strictly necessary only when
+	# using the BeOS native compiler (since its headers are incompatible), but
+	# it doesn't harm for the cross-compiler either.
+	if $(gccVersion[1]) = 2 {
+		HAIKU_GCC_HEADERS_DIR_$(architecture)
+			= [ FDirName $(HAIKU_TOP) headers build gcc-2.95.3 ] ;
+	}
+
+	# initial state for flags etc.
+	HAIKU_C++_$(architecture) ?= $(HAIKU_CC_$(architecture)) ;
+	HAIKU_LINK_$(architecture) = $(HAIKU_CC_$(architecture)) ;
+	HAIKU_LINKFLAGS_$(architecture) = $(gccBaseFlags) ;
+
+	HAIKU_HDRS_$(architecture) = [ FStandardHeaders $(architecture) ] ;
+	HAIKU_CCFLAGS_$(architecture) += $(gccBaseFlags) -nostdinc ;
+	HAIKU_C++FLAGS_$(architecture) += $(gccBaseFlags) -nostdinc ;
+
+	# strip is required
+	if ! $(HAIKU_STRIP_$(architecture)) {
+		Exit "HAIKU_STRIP_$(architecture) not set. Please re-run configure." ;
+	}
+
+	HAIKU_ARCH_$(architecture) = $(cpu) ;
+	HAIKU_ARCH ?= $(cpu) ;
+		# Set only, if not set yet. This way HAIKU_ARCH is set to the primary
+		# architecture.
+	if ! $(cpu) in $(HAIKU_ARCHS) {
+		HAIKU_ARCHS += $(cpu) ;
+	}
+	HAIKU_DEFINES_$(architecture) += ARCH_$(cpu) ;
+
+	# directories
+	HAIKU_ARCH_OBJECT_DIR_$(architecture)
+		= [ FDirName $(HAIKU_OBJECT_BASE_DIR) $(architecture) ] ;
+	HAIKU_COMMON_DEBUG_OBJECT_DIR_$(architecture)
+		= [ FDirName $(HAIKU_ARCH_OBJECT_DIR_$(architecture)) common ] ;
+	HAIKU_DEBUG_0_OBJECT_DIR_$(architecture)
+		= [ FDirName $(HAIKU_ARCH_OBJECT_DIR_$(architecture)) release ] ;
+
+	local level ;
+	for level in $(HAIKU_DEBUG_LEVELS[2-]) {
+		HAIKU_DEBUG_$(level)_OBJECT_DIR_$(architecture)
+			= [ FDirName $(HAIKU_ARCH_OBJECT_DIR_$(architecture))
+				debug_$(level) ] ;
+	}
+
+	# set variables for gcc header options
+	SetIncludePropertiesVariables HAIKU : _$(architecture) ;
+
+	# assembler flags
+	HAIKU_ASFLAGS_$(architecture) = ;
+
+	# C/C++ flags
+	if $(gccVersion[1]) >= 4 {
+		HAIKU_C++FLAGS_$(architecture) += -Wno-deprecated ;
+	}
+
+	switch $(cpu) {
+		case x86* :
+			# Enable use of the gcc built-in atomic functions instead of
+			# atomic_*(). The former are inlined and have thus less overhead.
+			# They are not available with gcc 2, but the header will take care
+			# of that.
+			HAIKU_DEFINES_$(architecture) += B_USE_BUILTIN_ATOMIC_FUNCTIONS ;
+	}
+
+	# warning flags
+	HAIKU_WARNING_CCFLAGS_$(architecture)
+		= -Wall -Wno-trigraphs -Wmissing-prototypes
+		-Wpointer-arith -Wcast-align -Wsign-compare -Wno-multichar ;
+	HAIKU_WARNING_C++FLAGS_$(architecture) = -Wall -Wno-trigraphs
+		-Wno-ctor-dtor-privacy -Woverloaded-virtual -Wpointer-arith -Wcast-align
+		-Wsign-compare -Wno-multichar ;
+
+	# debug flags
+	local debugFlags = -ggdb ;
+
+	# debug 0: suppress asserts
+	HAIKU_DEBUG_0_CCFLAGS_$(architecture) = [ FDefines NDEBUG=$(NDEBUG) ] ;
+	HAIKU_DEBUG_0_C++FLAGS_$(architecture) = [ FDefines NDEBUG=$(NDEBUG) ] ;
+
+	local level ;
+	for level in $(HAIKU_DEBUG_LEVELS[2-]) {
+		local flags = $(debugFlags) [ FDefines DEBUG=$(level) ] ;
+		HAIKU_DEBUG_$(level)_CCFLAGS_$(architecture) = $(flags) ;
+		HAIKU_DEBUG_$(level)_C++FLAGS_$(architecture) = $(flags) ;
+	}
+
+	if $(gccVersion[1]) >= 3 {
+		# TODO: Temporary work-around. Should be defined in the compiler specs
+		HAIKU_LINKFLAGS_$(architecture) += -Xlinker --no-undefined ;
+	} else {
+		HAIKU_DEFINES_$(architecture) += _BEOS_R5_COMPATIBLE_ ;
+	}
+
+	# private shared kernel/libroot headers
+	HAIKU_PRIVATE_SYSTEM_HEADERS_$(architecture)
+		= [ PrivateHeaders $(DOT) system system/arch/$(cpu) ] ;
+
+	# Add some grist to the libgcc objects
+	HAIKU_GCC_LIBGCC_OBJECTS_$(architecture)
+		= $(HAIKU_GCC_LIBGCC_OBJECTS_$(architecture):G=libgcc!$(architecture)) ;
+
+	# the C++ standard library
+	HAIKU_BUILD_SHARED_LIBSTDC++_$(architecture) = ;
+	if $(HAIKU_SHARED_LIBSTDC++_$(architecture)) {
+		HAIKU_LIBSTDC++_$(architecture)
+			= $(HAIKU_SHARED_LIBSTDC++_$(architecture)) ;
+	} else {
+		# no shared library available with the compiler -- build it
+		if $(gccVersion[1]) = 2 {
+			HAIKU_LIBSTDC++_$(architecture) = libstdc++.r4.so ;
+		} else {
+			HAIKU_LIBSTDC++_$(architecture) = <$(architecture)>libstdc++.so ;
+		}
+		HAIKU_SHARED_LIBSTDC++_$(architecture)
+			= $(HAIKU_LIBSTDC++_$(architecture)) ;
+		HAIKU_BUILD_SHARED_LIBSTDC++_$(architecture) = 1 ;
+	}
+
+	# the C++ support (runtime) library
+	HAIKU_BUILD_SHARED_LIBSUPC++_$(architecture) = ;
+	if $(HAIKU_SHARED_LIBSUPC++_$(architecture)) {
+		HAIKU_LIBSUPC++_$(architecture)
+			= $(HAIKU_SHARED_LIBSUPC++_$(architecture)) ;
+	} else {
+		# no shared library available with the compiler -- build it for gcc 4
+		if $(gccVersion[1]) != 2 {
+			HAIKU_SHARED_LIBSUPC++_$(architecture)
+				= <$(architecture)>libsupc++.so ;
+			HAIKU_BUILD_SHARED_LIBSUPC++_$(architecture) = 1 ;
+		}
+
+		HAIKU_LIBSUPC++_$(architecture)
+			= $(HAIKU_SHARED_LIBSUPC++_$(architecture)) ;
+	}
+
+	# library and executable glue code
+	local commonGlueCode =
+		<src!system!glue!$(architecture)>init_term_dyn.o
+		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
+		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crtn.o
+		;
+	HAIKU_LIBRARY_BEGIN_GLUE_CODE_$(architecture) =
+		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
+		<$(architecture)>crtbegin.o
+		<src!system!glue!$(architecture)>init_term_dyn.o
+		;
+	HAIKU_LIBRARY_END_GLUE_CODE_$(architecture) =
+		<$(architecture)>crtend.o
+		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crtn.o
+		;
+	HAIKU_EXECUTABLE_BEGIN_GLUE_CODE_$(architecture) =
+		<src!system!glue!arch!$(HAIKU_ARCH)!$(architecture)>crti.o
+		<$(architecture)>crtbegin.o
+		<src!system!glue!$(architecture)>start_dyn.o
+		<src!system!glue!$(architecture)>init_term_dyn.o
+		;
+	HAIKU_EXECUTABLE_END_GLUE_CODE_$(architecture)
+		= $(HAIKU_LIBRARY_END_GLUE_CODE_$(architecture)) ;
+
+	SEARCH on <$(architecture)>crtbegin.o <$(architecture)>crtend.o
+		= $(HAIKU_GCC_LIB_DIR_$(architecture)) ;
+
+	# init library name map
+	local libraryGrist = "" ;
+	if $(architecture) != $(HAIKU_PACKAGING_ARCHS[1]) {
+		libraryGrist = $(architecture) ;
+	}
+	local i ;
+	for i in be bnetapi debug device game GL locale mail media midi midi2
+			network opengl package root screensaver textencoding tracker
+			translation z {
+		local library = lib$(i).so ;
+		HAIKU_LIBRARY_NAME_MAP_$(architecture)_$(i)
+			= $(library:G=$(libraryGrist)) ;
+	}
+	HAIKU_LIBRARY_NAME_MAP_$(architecture)_libstdc++
+		= $(HAIKU_LIBSTDC++_$(architecture)) ;
+	HAIKU_LIBRARY_NAME_MAP_$(architecture)_libsupc++
+		= $(HAIKU_LIBSUPC++_$(architecture)) ;
+	HAIKU_LIBRARY_NAME_MAP_$(architecture)_localestub
+		= <$(architecture)>liblocalestub.a ;
+	if $(architecture) = $(HAIKU_PACKAGING_ARCHS[1]) {
+		HAIKU_LIBRARY_NAME_MAP_$(architecture)_input_server
+			= <nogrist>input_server ;
+	} else {
+		HAIKU_LIBRARY_NAME_MAP_$(architecture)_input_server
+			= <$(architecture)>input_server ;
+	}
+}
+
+
+rule KernelArchitectureSetup architecture
+{
+	# KernelArchitectureSetup <architecture> ;
+	#
+	# Initializes the global kernel and boot loader related variables. Those
+	# don't have a packaging architecture suffix, since they are only set for
+	# the primary packaging architecture. <architecture> is the primary
+	# packaging architecture (supplied for convenience).
+
+	HAIKU_KERNEL_ARCH = $(HAIKU_ARCH) ;
+
+	local gccVersion = $(HAIKU_GCC_VERSION_$(architecture)) ;
+	local cpu = $(HAIKU_CPU_$(architecture)) ;
+
+	switch $(cpu) {
+		case ppc :
+			HAIKU_BOOT_PLATFORM ?= openfirmware ;
+			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
+			# offset in floppy image (>= sizeof(haiku_loader))
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
+
+		case arm :
+			HAIKU_BOOT_PLATFORM ?= u-boot ;
+			HAIKU_BOOT_BOARD ?= verdex ;
+			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
+				# in kB (there is not really a floppy on the gumstix ;) )
+			# offset in floppy image (>= sizeof(haiku_loader))
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
+
+		case x86 :
+			HAIKU_BOOT_PLATFORM = bios_ia32 ;
+			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
+			# offset in floppy image (>= sizeof(haiku_loader))
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
+
+			# yasm is required for target arch x86
+			if ! $(HAIKU_YASM) {
+				Exit "HAIKU_YASM not set. Please re-run configure." ;
+			}
+
+		case x86_64 :
+			# x86_64 completely shares the x86 bootloader.
+			HAIKU_BOOT_PLATFORM = bios_ia32 ;
+			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
+			# offset in floppy image (>= sizeof(haiku_loader))
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
+
+			# x86_64 kernel source is under arch/x86.
+			HAIKU_KERNEL_ARCH = x86 ;
+
+			# yasm is required for target arch x86_64
+			if ! $(HAIKU_YASM) {
+				Exit "HAIKU_YASM not set. Please re-run configure." ;
+			}
+
+		case m68k :
+			HAIKU_BOOT_PLATFORM ?= atari_m68k ;
+			switch $(HAIKU_BOOT_PLATFORM) {
+				case atari_m68k :
+				{
+					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
+				}
+				case amiga_m68k :
+				{
+					# for now we have trouble reading from double-sided images
+					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 880 ; # in kB
+				}
+			}
+			# offset in floppy image (>= sizeof(haiku_loader))
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 260 ; # in kB
+
+		case mipsel :
+			# RouterBOARD firmware (ELF image over TFTP)
+			HAIKU_BOOT_PLATFORM = routerboard_mipsel ;
+			# offset in floppy image (>= sizeof(haiku_loader))
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB
+
+		case * :
+			Exit "Currently unsupported target CPU:" $(cpu) ;
+	}
+
+	# Include embedded board-specific file.
+	if $(HAIKU_BOOT_BOARD) {
+		include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD)
+			BoardSetup ] ;
+	}
+
+	# private kernel headers to be used when compiling kernel code
+	HAIKU_PRIVATE_KERNEL_HEADERS =
+		[ PrivateHeaders $(DOT) kernel libroot shared
+			kernel/boot/platform/$(HAIKU_BOOT_PLATFORM) ]
+		[ ArchHeaders $(HAIKU_KERNEL_ARCH) ]
+		[ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR_$(architecture)) system
+			kernel ]
+		$(HAIKU_PRIVATE_SYSTEM_HEADERS_$(architecture))
+		;
+
+	# C/C++ flags
+	local gccBaseFlags = $(HAIKU_GCC_BASE_FLAGS_$(architecture))
+		-finline -fno-builtin ;
+
+	if $(gccVersion[1]) >= 4 {
+		gccBaseFlags += -ffreestanding ;
+	}
+
+	local g++BaseFlags = $(gccBaseFlags) -fno-exceptions ;
+
+	if $(gccVersion[1]) >= 3 {
+		g++BaseFlags += -fno-use-cxa-atexit ;
+	}
+
+	HAIKU_KERNEL_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(gccBaseFlags) ;
+	HAIKU_KERNEL_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(g++BaseFlags) ;
+	HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(gccBaseFlags) ;
+	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(g++BaseFlags) ;
+	HAIKU_BOOT_LINKFLAGS = ;
+
+	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
+	HAIKU_KERNEL_PIC_LINKFLAGS = ;
+	HAIKU_KERNEL_ADDON_LINKFLAGS = ;
+
+	switch $(cpu) {
+		case ppc :
+			# Build a position independent PPC kernel. We need to be able to
+			# relocate the kernel, since the virtual address space layout at
+			# boot time is not fixed.
+			HAIKU_KERNEL_PIC_CCFLAGS = -fPIE ;
+			HAIKU_KERNEL_PIC_LINKFLAGS = -shared -fPIE ;
+
+		case m68k :
+			# We don't want to have to handle emulating missing FPU opcodes for
+			# 040 and 060 in the kernel.
+			HAIKU_KERNEL_CCFLAGS += -m68020-60 ;
+			HAIKU_KERNEL_C++FLAGS += -m68020-60 ;
+
+		case x86 :
+			HAIKU_KERNEL_CCFLAGS += -march=pentium ;
+			HAIKU_KERNEL_C++FLAGS += -march=pentium ;
+
+		case x86_64 :
+			# Kernel lives in the top 2GB of the address space, use kernel code
+			# model.
+			HAIKU_KERNEL_PIC_CCFLAGS += -mcmodel=kernel ;
+
+			# Disable the red zone, which cannot be used in kernel code due to
+			# interrupts, and always enable the frame pointer so stack traces
+			# are correct.
+			HAIKU_KERNEL_CCFLAGS += -mno-red-zone -fno-omit-frame-pointer ;
+			HAIKU_KERNEL_C++FLAGS += -mno-red-zone -fno-omit-frame-pointer ;
+			HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
+			HAIKU_KERNEL_ADDON_LINKFLAGS += -z max-page-size=0x1000 ;
+
+			# Bootloader is 32-bit.
+			HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;
+			HAIKU_BOOT_CCFLAGS += -m32 -march=pentium ;
+			HAIKU_BOOT_C++FLAGS += -m32 -march=pentium ;
+	}
+
+	# warning flags
+	HAIKU_KERNEL_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes
+		-Wno-multichar ;
+	HAIKU_KERNEL_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-multichar ;
+
+	# debug flags
+	local level ;
+	for level in $(HAIKU_DEBUG_LEVELS) {
+		local flags = $(HAIKU_DEBUG_FLAGS) [ FDefines DEBUG=$(level) ] ;
+		HAIKU_KERNEL_DEBUG_$(level)_CCFLAGS
+			= $(HAIKU_DEBUG_$(level)_CCFLAGS_$(architecture)) ;
+		HAIKU_KERNEL_DEBUG_$(level)_C++FLAGS
+			= $(HAIKU_DEBUG_$(level)_C++FLAGS_$(architecture)) ;
+	}
+
+	# defines
+	HAIKU_KERNEL_DEFINES += _KERNEL_MODE ;
+
+	HAIKU_DEFINES_$(architecture)
+		+= BOOT_ARCHIVE_IMAGE_OFFSET=$(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
+		# TODO: That doesn't need to be a general define. It's just needed for
+		# compiling (part of) the boot loader.
+
+	# kernel add-on glue code
+	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = <$(architecture)>crtbegin.o
+		<src!system!glue!$(architecture)>haiku_version_glue.o ;
+	HAIKU_KERNEL_ADDON_END_GLUE_CODE
+		= $(HAIKU_GCC_LIBGCC_$(architecture)) <$(architecture)>crtend.o ;
+}
+
+
+rule ArchitectureSetupWarnings architecture
+{
+	# ArchitectureSetupWarnings <architecture> ;
+	#
+	# Sets up compiler warnings and error flags for various subdirectories for
+	# the given packaging architecture.
+
+	local cpu = $(HAIKU_CPU_$(architecture)) ;
+	switch $(cpu) {
+		case arm :
+			return ;
+				# we use #warning as placeholders for things to write...
+		case m68k :
+			return ;
+				# we use #warning as placeholders for things to write...
+		case mipsel :
+			return ;
+				# we use #warning as placeholders for things to write...
+	}
+
+
+	# enable -Werror for certain parts of the source tree
+	HAIKU_WERRORFLAGS = ;
+	local gccVersion = $(HAIKU_GCC_VERSION_$(architecture)) ;
+	if $(gccVersion[1]) >= 4 {
+		# -Wuninitialized gives too many false positives.
+		HAIKU_WERRORFLAGS = -Wno-error=uninitialized ;
+
+		# TODO: remove the -Wno-unused-but-set-variable option
+		HAIKU_WERRORFLAGS += -Wno-unused-but-set-variable ;
+	}
+
+	HAIKU_WERROR_ARCH = $(architecture) ;
+
+	rule EnableWerror dirTokens : scope {
+		AppendToConfigVar TARGET_WARNING_CCFLAGS_$(HAIKU_WERROR_ARCH)
+			: HAIKU_TOP $(dirTokens)
+			: -Werror $(HAIKU_WERRORFLAGS) : $(scope) ;
+		AppendToConfigVar TARGET_WARNING_C++FLAGS_$(HAIKU_WERROR_ARCH)
+			: HAIKU_TOP $(dirTokens)
+			: -Werror $(HAIKU_WERRORFLAGS) : $(scope) ;
+	}
+
+	# Work-around for GCC 2 problem -- despite -Wno-multichar it reports
+	# multichar warnings in headers/private/kernel/debugger_keymaps.h included
+	# by src/system/kernel/arch/x86/arch_debug_console.cpp.
+	if $(gccVersion[1]) = 2 {
+		local file = <src!system!kernel!arch!x86>arch_debug_console.o ;
+		TARGET_WARNING_C++FLAGS_$(architecture) on $(file)
+			= [ on $(file) return $(TARGET_WARNING_C++FLAGS_$(architecture)) ] ;
+	}
+
+	EnableWerror src add-ons accelerants 3dfx ;
+	EnableWerror src add-ons accelerants ati ;
+	EnableWerror src add-ons accelerants common ;
+	EnableWerror src add-ons accelerants et6x00 ;
+#	EnableWerror src add-ons accelerants intel_extreme ;
+#	EnableWerror src add-ons accelerants matrox ;
+	EnableWerror src add-ons accelerants neomagic ;
+#	EnableWerror src add-ons accelerants nvidia ;
+	EnableWerror src add-ons accelerants nvidia_gpgpu ;
+#	EnableWerror src add-ons accelerants radeon ;
+#	EnableWerror src add-ons accelerants radeon_hd ;
+	EnableWerror src add-ons accelerants s3 ;
+	EnableWerror src add-ons accelerants skeleton ;
+	EnableWerror src add-ons accelerants vesa ;
+	EnableWerror src add-ons accelerants via ;
+	EnableWerror src add-ons accelerants vmware ;
+	EnableWerror src add-ons bluetooth ;
+	EnableWerror src add-ons decorators ;
+	EnableWerror src add-ons disk_systems ;
+	EnableWerror src add-ons input_server devices ;
+#	EnableWerror src add-ons input_server filters ;
+#	EnableWerror src add-ons input_server methods ;
+	EnableWerror src add-ons kernel bluetooth ;
+#	EnableWerror src add-ons kernel bus_managers acpi ;
+	EnableWerror src add-ons kernel bus_managers agp_gart ;
+	EnableWerror src add-ons kernel bus_managers ata ;
+	EnableWerror src add-ons kernel bus_managers config_manager ;
+#	EnableWerror src add-ons kernel bus_managers firewire ;
+	EnableWerror src add-ons kernel bus_managers isa ;
+	EnableWerror src add-ons kernel bus_managers pci ;
+#	EnableWerror src add-ons kernel bus_managers ps2 ; # gcc2
+	EnableWerror src add-ons kernel bus_managers scsi ;
+	EnableWerror src add-ons kernel bus_managers usb ;
+	EnableWerror src add-ons kernel busses agp_gart ;
+	EnableWerror src add-ons kernel busses ata ;
+	EnableWerror src add-ons kernel busses scsi ;
+	EnableWerror src add-ons kernel busses usb ;
+	EnableWerror src add-ons kernel console ;
+	EnableWerror src add-ons kernel cpu ;
+#	EnableWerror src add-ons kernel debugger ; # gcc2
+#	EnableWerror src add-ons kernel drivers audio ;
+	EnableWerror src add-ons kernel drivers bluetooth ;
+	EnableWerror src add-ons kernel drivers bus ;
+	EnableWerror src add-ons kernel drivers common ;
+	EnableWerror src add-ons kernel drivers disk ;
+	EnableWerror src add-ons kernel drivers dvb ;
+#	EnableWerror src add-ons kernel drivers graphics ;
+#	EnableWerror src add-ons kernel drivers input ;
+	EnableWerror src add-ons kernel drivers joystick ;
+	EnableWerror src add-ons kernel drivers midi ;
+	EnableWerror src add-ons kernel drivers misc ;
+#	EnableWerror src add-ons kernel drivers network ;
+	EnableWerror src add-ons kernel drivers ports ;
+#	EnableWerror src add-ons kernel drivers power ;
+	EnableWerror src add-ons kernel drivers printer ;
+	EnableWerror src add-ons kernel drivers random ;
+	EnableWerror src add-ons kernel drivers tty ;
+	EnableWerror src add-ons kernel drivers video ;
+	EnableWerror src add-ons kernel file_systems bfs ;
+	EnableWerror src add-ons kernel file_systems cdda ;
+#	EnableWerror src add-ons kernel file_systems ext2 ;
+#	EnableWerror src add-ons kernel file_systems fat ;
+#	EnableWerror src add-ons kernel file_systems googlefs ;
+	EnableWerror src add-ons kernel file_systems iso9660 ;
+	EnableWerror src add-ons kernel file_systems layers ;
+	EnableWerror src add-ons kernel file_systems netfs ;
+	EnableWerror src add-ons kernel file_systems nfs ;
+	EnableWerror src add-ons kernel file_systems nfs4 ;
+#	EnableWerror src add-ons kernel file_systems ntfs ;
+	EnableWerror src add-ons kernel file_systems packagefs ;
+	EnableWerror src add-ons kernel file_systems ramfs ;
+#	EnableWerror src add-ons kernel file_systems reiserfs ;
+	EnableWerror src add-ons kernel file_systems udf ;
+	EnableWerror src add-ons kernel file_systems userlandfs ;
+	EnableWerror src add-ons kernel generic ;
+#	EnableWerror src add-ons kernel network datalink_protocols ;
+	EnableWerror src add-ons kernel network devices ;
+	EnableWerror src add-ons kernel network dns_resolver ;
+	EnableWerror src add-ons kernel network notifications ;
+	EnableWerror src add-ons kernel network ppp ;
+	EnableWerror src add-ons kernel network protocols ;
+#	EnableWerror src add-ons kernel network stack ;
+	EnableWerror src add-ons kernel partitioning_systems ;
+	EnableWerror src add-ons locale ;
+	EnableWerror src add-ons mail_daemon ;
+	EnableWerror src add-ons media media-add-ons demultiplexer ;
+	EnableWerror src add-ons media media-add-ons dvb ;
+	EnableWerror src add-ons media media-add-ons esound_sink ;
+	EnableWerror src add-ons media media-add-ons finepix_webcam ;
+	EnableWerror src add-ons media media-add-ons firewire_dv ;
+	EnableWerror src add-ons media media-add-ons legacy ;
+	EnableWerror src add-ons media media-add-ons mixer ;
+	EnableWerror src add-ons media media-add-ons multi_audio ;
+	EnableWerror src add-ons media media-add-ons opensound ;
+	EnableWerror src add-ons media media-add-ons radeon ;
+	EnableWerror src add-ons media media-add-ons reader ;
+	EnableWerror src add-ons media media-add-ons tone_producer_demo ;
+	EnableWerror src add-ons media media-add-ons usb_vision ;
+#	EnableWerror src add-ons media media-add-ons usb_webcam ;
+	EnableWerror src add-ons media media-add-ons video_mixer ;
+#	EnableWerror src add-ons media media-add-ons video_producer_demo ;
+	EnableWerror src add-ons media media-add-ons videowindow ;
+	EnableWerror src add-ons media media-add-ons writer ;
+	EnableWerror src add-ons media plugins ac3_decoder ;
+	EnableWerror src add-ons media plugins aiff_reader ;
+	EnableWerror src add-ons media plugins ape_reader ;
+#	EnableWerror src add-ons media plugins asf_reader ;
+	EnableWerror src add-ons media plugins au_reader ;
+#	EnableWerror src add-ons media plugins avi_reader ;
+#	EnableWerror src add-ons media plugins ffmpeg ;
+#	EnableWerror src add-ons media plugins matroska ;
+#	EnableWerror src add-ons media plugins mov_reader ;
+	EnableWerror src add-ons media plugins mp3_decoder ;
+#	EnableWerror src add-ons media plugins mp3_reader ;
+	EnableWerror src add-ons media plugins mp4_reader ;
+	EnableWerror src add-ons media plugins musepack ;
+#	EnableWerror src add-ons media plugins ogg ;
+#	EnableWerror src add-ons media plugins raw_decoder ;
+#	EnableWerror src add-ons media plugins speex ;
+	EnableWerror src add-ons media plugins theora ;
+	EnableWerror src add-ons media plugins vorbis ;
+#	EnableWerror src add-ons media plugins wav_reader ;
+	EnableWerror src add-ons media plugins xvid_decoder ;
+	EnableWerror src add-ons opengl ;
+	EnableWerror src add-ons print ;
+	EnableWerror src add-ons screen_savers ;
+	EnableWerror src add-ons tracker ;
+	EnableWerror src add-ons translators bmp ;
+#	EnableWerror src add-ons translators exr ;
+	EnableWerror src add-ons translators gif ;
+#	EnableWerror src add-ons translators hpgs ;
+	EnableWerror src add-ons translators hvif ;
+	EnableWerror src add-ons translators ico ;
+#	EnableWerror src add-ons translators jpeg ; # gcc2
+	EnableWerror src add-ons translators jpeg2000 ;
+	EnableWerror src add-ons translators pcx ;
+#	EnableWerror src add-ons translators png ; # gcc2
+	EnableWerror src add-ons translators ppm ;
+	EnableWerror src add-ons translators raw ;
+	EnableWerror src add-ons translators rtf ;
+	EnableWerror src add-ons translators sgi ;
+	EnableWerror src add-ons translators shared ;
+#	EnableWerror src add-ons translators stxt ;
+	EnableWerror src add-ons translators tga ;
+	EnableWerror src add-ons translators tiff ;
+#	EnableWerror src add-ons translators wonderbrush ;
+	EnableWerror src add-ons print ;
+	EnableWerror src bin multiuser ;
+	EnableWerror src bin package ;
+	EnableWerror src bin package_repo ;
+	EnableWerror src bin pkgman ;
+	EnableWerror src apps ;
+	EnableWerror src kits ;
+	EnableWerror src preferences ;
+	EnableWerror src servers ;
+	EnableWerror src system kernel ;
+	EnableWerror src system libroot add-ons ;
+	EnableWerror src system libroot posix locale ;
+	EnableWerror src system libroot posix wchar ;
+	EnableWerror src system runtime_loader ;
+}
+
+
+rule MultiArchIfPrimary ifValue : elseValue : architecture
+{
+	# MultiArchIfPrimary <ifValue> : <elseValue>
+	#	[ : <architecture> = $(TARGET_PACKAGING_ARCH) ] ;
+	#
+	# Returns one of the two given values depending on whether
+	# <architecture> is the primary packaging architecture.
+
+	architecture ?= $(TARGET_PACKAGING_ARCH) ;
+
+	if $(architecture) = $(TARGET_PACKAGING_ARCHS[1]) {
+		return $(ifValue) ;
+	}
+	return $(elseValue) ;
+}
+
+
+rule MultiArchConditionalGristFiles files : primaryGrist : secondaryGrist
+	: architecture
+{
+	# MultiArchConditionalGristFiles <files> : <primaryGrist>
+	#	: <secondaryGrist> [ : <architecture> = $(TARGET_PACKAGING_ARCH) ] ;
+	#
+	# Returns <files> with their grist set to either <primaryGrist> or
+	# <secondaryGrist> depending on whether <architecture> is the primary
+	# packaging architecture.
+
+	architecture ?= $(TARGET_PACKAGING_ARCH) ;
+
+	local grist = [ MultiArchIfPrimary $(primaryGrist) : $(secondaryGrist)
+		: $(architecture) ] ;
+	return $(files:G=$(grist:E=)) ;
+}
+
+
+rule MultiArchDefaultGristFiles files : gristPrefix : architecture
+{
+	# MultiArchDefaultGristFiles <files> : <gristPrefix>
+	#	[ : <architecture> = $(TARGET_PACKAGING_ARCH) ] ;
+	#
+	# Convenient shorthand for MultiArchConditionalGristFiles for the common
+	# case that for a secondary packaging architecture the packaging
+	# architecture name shall be appended to the grist while it shall be omitted
+	# for the primary packaging architecture. IOW, if architecture is the
+	# primary packaging architecture, <files> are returned with their grist set
+	# to <gristPrefix>, otherwise <files> are returned with their grist set to
+	# <gristPrefix>!<architecture> respectively <architecture> (if <gristPrefix>
+	# is empty).
+
+	architecture ?= $(TARGET_PACKAGING_ARCH) ;
+
+	local secondaryGrist = $(gristPrefix)!$(architecture) ;
+	secondaryGrist ?= $(architecture) ;
+
+	return [ MultiArchConditionalGristFiles $(files) : $(gristPrefix) :
+		$(secondaryGrist) : $(architecture) ] ;
+}
+
+
+rule MultiArchSubDirSetup architectures
+{
+	# MultiArchSubDirSetup <architectures> ;
+	#
+	# For each of the given packaging architectures <architectures> that are
+	# in the packaging architectures configured for the build (or all configured
+	# packaging architectures, if <architectures> is empty) an object is
+	# prepared that can be used for an "on ... { ... }" block to set up subdir
+	# variables for the respective packaging architecture. Most notably
+	# TARGET_PACKAGING_ARCH, TARGET_ARCH, TARGET_LIBSUPC++, and TARGET_LIBSTDC++
+	# are set to the values for the respective packaging architecture. The
+	# per-subdir variables SOURCE_GRIST, LOCATE_TARGET, LOCATE_SOURCE,
+	# SEARCH_SOURCE, *_LOCATE_TARGET, are reset. All SUBDIR* and config
+	# variables are set to the values they had when this rule was invoked.
+
+	local result ;
+	architectures ?= $(TARGET_PACKAGING_ARCHS) ;
+	local architecture ;
+	for architecture in $(architectures) {
+		if ! $(architecture) in $(TARGET_PACKAGING_ARCHS) {
+			continue ;
+		}
+
+		local architectureObject = $(architecture:G=<arch-object>) ;
+		result += $(architectureObject) ;
+
+		# Set the variables that default to the values of the respective
+		# variables for the primary architecture.
+		TARGET_PACKAGING_ARCH on $(architectureObject) = $(architecture) ;
+
+		local var ;
+		for var in TARGET_ARCH TARGET_LIBSUPC++ TARGET_LIBSTDC++ {
+			$(var) on $(architectureObject) = $($(var)_$(architecture)) ;
+		}
+
+		# Clone the current config variable values and the variables SubDir
+		# resets.
+		for var in $(AUTO_SET_UP_CONFIG_VARIABLES) SUBDIR$(SUBDIRRESET) {
+			$(var) on $(architectureObject) = $($(var)) ;
+		}
+
+		# adjust SOURCE_GRIST
+		SOURCE_GRIST on $(architectureObject)
+			= $(SOURCE_GRIST:E=)!$(architecture) ;
+
+		# Adjust the subdir's object dirs that are architecture dependent. To
+		# avoid duplicating the code from SetupObjectsDir, we call it. Since it
+		# sets global variables, we set these variables on our object, call
+		# SetupObjectsDir in an "on" block, and grab the new variable values.
+		local hostTarget = HOST TARGET ;
+		local objectDirVars =
+			COMMON_ARCH COMMON_DEBUG DEBUG_$(HAIKU_DEBUG_LEVELS)
+			;
+		objectDirVars =
+			COMMON_PLATFORM_LOCATE_TARGET
+			$(hostTarget)_$(objectDirVars)_LOCATE_TARGET
+			LOCATE_TARGET
+			LOCATE_SOURCE
+			SEARCH_SOURCE
+			;
+
+		for var in $(objectDirVars) {
+			$(var) on $(architectureObject) = ;
+		}
+
+		on $(architectureObject) {
+			SetupObjectsDir ;
+
+			for var in $(objectDirVars) {
+				$(var) on $(architectureObject) = $($(var)) ;
+			}
+		}
+	}
+
+	return $(result) ;
+}

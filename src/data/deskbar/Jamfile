@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src data deskbar ;
+
+local deskbarMenuEntries = <deskbar>menu_entries ;
+MakeLocateCommonPlatform $(deskbarMenuEntries) ;
+File $(deskbarMenuEntries) : menu_entries ;
+SetType $(deskbarMenuEntries) : application/x-vnd.haiku-virtual-directory ;

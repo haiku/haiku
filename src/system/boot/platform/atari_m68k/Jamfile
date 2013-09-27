@@ -99,7 +99,7 @@ rule AtariBootPrgLd
 {
 	# AtariBootPrgLd <name> : <objs> : <linkerscript> : <args> ;
 
-	LINK on $(1) = $(TARGET_LD) ;
+	LINK on $(1) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
 
 	LINKFLAGS on $(1) = $(4) ;
 	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }

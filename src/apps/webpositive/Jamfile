@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps webpositive ;
 
-SubDirSysHdrs $(HAIKU_WEBKIT_HEADERS) ;
-
 SubDirC++Flags $(defines) -Wno-error=sequence-point ;
 SubDirCcFlags $(defines) -Wno-error=sequence-point ;
 
@@ -11,11 +9,6 @@ local sourceDirs =
 	support
 	tabview
 ;
-
-local sourceDir ;
-for sourceDir in $(sourceDirs) {
-	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps webpositive $(sourceDir) ] ;
-}
 
 local sources =
 	# autocompletion
@@ -46,28 +39,52 @@ local sources =
 	URLInputGroup.cpp
 ;
 
-Includes [ FGristFiles $(sources) ] : $(HAIKU_WEBKIT_HEADERS_DEPENDENCY) ;
-	# Dependency needed to trigger downloading/unzipping the package before
-	# compiling the files.
+# We build WebPositive only for one architecture -- the first architecture for
+# which it is possible.
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		if ! [ FIsBuildFeatureEnabled webkit ] {
+			continue ;
+		}
 
-# private OS headers
-UseLibraryHeaders icon ;
-UsePrivateHeaders shared tracker ;
-SubDirHdrs $(HAIKU_TOP) src kits tracker ;
+		UseBuildFeatureHeaders webkit ;
 
+		local sourceDir ;
+		for sourceDir in $(sourceDirs) {
+			SEARCH_SOURCE
+				+= [ FDirName $(HAIKU_TOP) src apps webpositive $(sourceDir) ] ;
+		}
 
-Application WebPositive :
-	$(sources)
-	:
-	$(HAIKU_WEBKIT_LIBS)
-	$(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
-	be libshared.a network tracker translation
-	:
-	WebPositive.rdef
-;
+		Includes [ FGristFiles $(sources) ]
+			: [ BuildFeatureAttribute webkit : headers ] ;
+			# Dependency needed to trigger downloading/unzipping the package
+			# before compiling the files.
 
-DoCatalogs WebPositive :
-	x-vnd.Haiku-WebPositive
-	:
-	$(sources)
-;
+		# private OS headers
+		UseLibraryHeaders icon ;
+		UsePrivateHeaders shared tracker ;
+		SubDirHdrs $(HAIKU_TOP) src kits tracker ;
+
+		Application WebPositive :
+			$(sources)
+			:
+			[ BuildFeatureAttribute webkit : libraries ]
+			$(TARGET_LIBSTDC++) localestub
+			[ MultiArchDefaultGristFiles libshared.a ]
+			be network tracker translation
+			:
+			WebPositive.rdef
+			;
+
+		DoCatalogs WebPositive :
+			x-vnd.Haiku-WebPositive
+			:
+			$(sources)
+			;
+
+		EnableBuildFeatures webpositive ;
+
+		break ;
+	}
+}

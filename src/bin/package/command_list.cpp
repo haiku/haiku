@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,32 +12,96 @@
 #include <string.h>
 #include <time.h>
 
+#include <Entry.h>
 #include <package/hpkg/PackageContentHandler.h>
 #include <package/hpkg/PackageEntry.h>
 #include <package/hpkg/PackageEntryAttribute.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/PackageReader.h>
+#include <package/hpkg/StandardErrorOutput.h>
+#include <package/hpkg/v1/PackageContentHandler.h>
+#include <package/hpkg/v1/PackageEntry.h>
+#include <package/hpkg/v1/PackageEntryAttribute.h>
+#include <package/hpkg/v1//PackageReader.h>
 
 #include <package/PackageInfo.h>
 
 #include "package.h"
-#include "StandardErrorOutput.h"
+#include "PackageInfoPrinter.h"
 
 
-using namespace BPackageKit::BHPKG;
 using namespace BPackageKit;
+using BPackageKit::BHPKG::BErrorOutput;
+using BPackageKit::BHPKG::BPackageInfoAttributeValue;
+using BPackageKit::BHPKG::BStandardErrorOutput;
 
 
-struct PackageContentListHandler : BPackageContentHandler {
-	PackageContentListHandler(bool listAttributes)
+struct VersionPolicyV1 {
+	typedef BPackageKit::BHPKG::V1::BPackageContentHandler
+		PackageContentHandler;
+	typedef BPackageKit::BHPKG::V1::BPackageEntry PackageEntry;
+	typedef BPackageKit::BHPKG::V1::BPackageEntryAttribute
+		PackageEntryAttribute;
+	typedef BPackageKit::BHPKG::V1::BPackageReader PackageReader;
+
+	static inline uint64 PackageDataSize(
+		const BPackageKit::BHPKG::V1::BPackageData& data)
+	{
+		return data.UncompressedSize();
+	}
+
+	static inline status_t InitReader(PackageReader& packageReader,
+		const char* fileName)
+	{
+		return packageReader.Init(fileName);
+	}
+};
+
+struct VersionPolicyV2 {
+	typedef BPackageKit::BHPKG::BPackageContentHandler PackageContentHandler;
+	typedef BPackageKit::BHPKG::BPackageEntry PackageEntry;
+	typedef BPackageKit::BHPKG::BPackageEntryAttribute PackageEntryAttribute;
+	typedef BPackageKit::BHPKG::BPackageReader PackageReader;
+
+	static inline uint64 PackageDataSize(
+		const BPackageKit::BHPKG::BPackageData& data)
+	{
+		return data.Size();
+	}
+
+	static inline status_t InitReader(PackageReader& packageReader,
+		const char* fileName)
+	{
+		return packageReader.Init(fileName,
+			BPackageKit::BHPKG
+				::B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE);
+	}
+};
+
+
+enum ListMode {
+	LIST_ALL,
+	LIST_PATHS_ONLY,
+	LIST_META_INFO_ONLY
+};
+
+
+template<typename VersionPolicy>
+struct PackageContentListHandler : VersionPolicy::PackageContentHandler {
+	PackageContentListHandler(bool listEntries, bool listAttributes)
 		:
+		fPrinter(),
 		fLevel(0),
-		fListAttribute(listAttributes)
+		fListEntries(listEntries),
+		fListAttribute(listEntries && listAttributes)
 	{
 	}
 
-	virtual status_t HandleEntry(BPackageEntry* entry)
+	virtual status_t HandleEntry(typename VersionPolicy::PackageEntry* entry)
 	{
+		if (!fListEntries)
+			return B_OK;
+
 		fLevel++;
 
 		int indentation = (fLevel - 1) * 2;
@@ -45,7 +109,8 @@ struct PackageContentListHandler : BPackageContentHandler {
 
 		// name and size
 		printf("%-*s", indentation < 32 ? 32 - indentation : 0, entry->Name());
-		printf("  %8llu", (unsigned long long)entry->Data().UncompressedSize());
+		printf("  %8llu",
+			(unsigned long long)VersionPolicy::PackageDataSize(entry->Data()));
 
 		// time
 		struct tm* time = localtime(&entry->ModifiedTime().tv_sec);
@@ -80,8 +145,9 @@ struct PackageContentListHandler : BPackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
-		BPackageEntryAttribute* attribute)
+	virtual status_t HandleEntryAttribute(
+		typename VersionPolicy::PackageEntry* entry,
+		typename VersionPolicy::PackageEntryAttribute* attribute)
 	{
 		if (!fListAttribute)
 			return B_OK;
@@ -90,7 +156,8 @@ struct PackageContentListHandler : BPackageContentHandler {
 		printf("%*s<", indentation, "");
 		printf("%-*s  %8llu", indentation < 31 ? 31 - indentation : 0,
 			attribute->Name(),
-			(unsigned long long)attribute->Data().UncompressedSize());
+			(unsigned long long)VersionPolicy::PackageDataSize(
+				attribute->Data()));
 
 		uint32 type = attribute->Type();
 		if (isprint(type & 0xff) && isprint((type >> 8) & 0xff)
@@ -104,8 +171,12 @@ struct PackageContentListHandler : BPackageContentHandler {
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryDone(BPackageEntry* entry)
+	virtual status_t HandleEntryDone(
+		typename VersionPolicy::PackageEntry* entry)
 	{
+		if (!fListEntries)
+			return B_OK;
+
 		fLevel--;
 		return B_OK;
 	}
@@ -113,132 +184,13 @@ struct PackageContentListHandler : BPackageContentHandler {
 	virtual status_t HandlePackageAttribute(
 		const BPackageInfoAttributeValue& value)
 	{
-		switch (value.attributeID) {
-			case B_PACKAGE_INFO_NAME:
-				printf("package-attributes:\n");
-				printf("\tname: %s\n", value.string);
-				break;
+		if (value.attributeID == B_PACKAGE_INFO_NAME)
+			printf("package-attributes:\n");
 
-			case B_PACKAGE_INFO_SUMMARY:
-				printf("\tsummary: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_DESCRIPTION:
-				printf("\tdescription: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_VENDOR:
-				printf("\tvendor: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_PACKAGER:
-				printf("\tpackager: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_FLAGS:
-				if (value.unsignedInt == 0)
-					break;
-				printf("\tflags:\n");
-				if ((value.unsignedInt & B_PACKAGE_FLAG_APPROVE_LICENSE) != 0)
-					printf("\t\tapprove_license\n");
-				if ((value.unsignedInt & B_PACKAGE_FLAG_SYSTEM_PACKAGE) != 0)
-					printf("\t\tsystem_package\n");
-				break;
-
-			case B_PACKAGE_INFO_ARCHITECTURE:
-				printf("\tarchitecture: %s\n",
-					BPackageInfo::kArchitectureNames[value.unsignedInt]);
-				break;
-
-			case B_PACKAGE_INFO_VERSION:
-				printf("\tversion: ");
-				_PrintPackageVersion(value.version);
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_COPYRIGHTS:
-				printf("\tcopyright: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_LICENSES:
-				printf("\tlicense: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_URLS:
-				printf("\tURL: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_SOURCE_URLS:
-				printf("\tsource URL: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_PROVIDES:
-				printf("\tprovides: %s", value.resolvable.name);
-				if (value.resolvable.haveVersion) {
-					printf(" = ");
-					_PrintPackageVersion(value.resolvable.version);
-				}
-				if (value.resolvable.haveCompatibleVersion) {
-					printf(" (compatible >= ");
-					_PrintPackageVersion(value.resolvable.compatibleVersion);
-					printf(")");
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_REQUIRES:
-				printf("\trequires: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_SUPPLEMENTS:
-				printf("\tsupplements: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_CONFLICTS:
-				printf("\tconflicts: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_FRESHENS:
-				printf("\tfreshens: %s", value.resolvableExpression.name);
-				if (value.resolvableExpression.haveOpAndVersion) {
-					printf(" %s ", BPackageResolvableExpression::kOperatorNames[
-							value.resolvableExpression.op]);
-					_PrintPackageVersion(value.resolvableExpression.version);
-				}
-				printf("\n");
-				break;
-
-			case B_PACKAGE_INFO_REPLACES:
-				printf("\treplaces: %s\n", value.string);
-				break;
-
-			case B_PACKAGE_INFO_INSTALL_PATH:
-				printf("\tinstall path: %s\n", value.string);
-				break;
-
-			default:
-				printf(
-					"*** Invalid package attribute section: unexpected "
-					"package attribute id %d encountered\n", value.attributeID);
-				return B_BAD_DATA;
+		if (!fPrinter.PrintAttribute(value)) {
+			printf("*** Invalid package attribute section: unexpected "
+				"package attribute id %d encountered\n", value.attributeID);
+			return B_BAD_DATA;
 		}
 
 		return B_OK;
@@ -265,26 +217,105 @@ private:
 
 	static void _PrintPackageVersion(const BPackageVersionData& version)
 	{
-		printf("%s", version.major);
-		if (version.minor != NULL && version.minor[0] != '\0')
-			printf(".%s", version.minor);
-		if (version.micro != NULL && version.micro[0] != '\0')
-			printf(".%s", version.micro);
-		if (version.preRelease != NULL && version.preRelease[0] != '\0')
-			printf("-%s", version.preRelease);
-		if (version.release > 0)
-			printf("-%d", version.release);
+		printf("%s", BPackageVersion(version).ToString().String());
 	}
 
 private:
-	int		fLevel;
-	bool	fListAttribute;
+	PackageInfoPrinter	fPrinter;
+	int					fLevel;
+	bool				fListEntries;
+	bool				fListAttribute;
 };
+
+
+template<typename VersionPolicy>
+struct PackageContentListPathsHandler : VersionPolicy::PackageContentHandler {
+	PackageContentListPathsHandler()
+		:
+		fPathComponents()
+	{
+	}
+
+	virtual status_t HandleEntry(typename VersionPolicy::PackageEntry* entry)
+	{
+		fPathComponents.Add(entry->Name());
+		printf("%s\n", fPathComponents.Join("/").String());
+		return B_OK;
+	}
+
+	virtual status_t HandleEntryAttribute(
+		typename VersionPolicy::PackageEntry* entry,
+		typename VersionPolicy::PackageEntryAttribute* attribute)
+	{
+		return B_OK;
+	}
+
+	virtual status_t HandleEntryDone(
+		typename VersionPolicy::PackageEntry* entry)
+	{
+		fPathComponents.Remove(fPathComponents.CountStrings() - 1);
+		return B_OK;
+	}
+
+	virtual status_t HandlePackageAttribute(
+		const BPackageInfoAttributeValue& value)
+	{
+		return B_OK;
+	}
+
+	virtual void HandleErrorOccurred()
+	{
+	}
+
+private:
+	BStringList	fPathComponents;
+};
+
+
+template<typename VersionPolicy>
+static void
+do_list(const char* packageFileName, bool listAttributes, ListMode listMode,
+	bool ignoreVersionError)
+{
+	// open package
+	BStandardErrorOutput errorOutput;
+	typename VersionPolicy::PackageReader packageReader(&errorOutput);
+	status_t error = VersionPolicy::InitReader(packageReader, packageFileName);
+	if (error != B_OK) {
+		if (ignoreVersionError && error == B_MISMATCHED_VALUES)
+			return;
+		exit(1);
+	}
+
+	// list
+	switch (listMode) {
+		case LIST_PATHS_ONLY:
+		{
+			PackageContentListPathsHandler<VersionPolicy> handler;
+			error = packageReader.ParseContent(&handler);
+			break;
+		}
+
+		case LIST_ALL:
+		case LIST_META_INFO_ONLY:
+		{
+			PackageContentListHandler<VersionPolicy> handler(
+				listMode != LIST_META_INFO_ONLY, listAttributes);
+			error = packageReader.ParseContent(&handler);
+		}
+	}
+
+	if (error != B_OK)
+		exit(1);
+
+	exit(0);
+}
 
 
 int
 command_list(int argc, const char* const* argv)
 {
+	ListMode listMode = LIST_ALL;
 	bool listAttributes = false;
 
 	while (true) {
@@ -294,7 +325,7 @@ command_list(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+ha", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+ahip", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -303,8 +334,16 @@ command_list(int argc, const char* const* argv)
 				listAttributes = true;
 				break;
 
+			case 'i':
+				listMode = LIST_META_INFO_ONLY;
+				break;
+
 			case 'h':
 				print_usage_and_exit(false);
+				break;
+
+			case 'p':
+				listMode = LIST_PATHS_ONLY;
 				break;
 
 			default:
@@ -319,18 +358,36 @@ command_list(int argc, const char* const* argv)
 
 	const char* packageFileName = argv[optind++];
 
-	// open package
-	StandardErrorOutput errorOutput;
-	BPackageReader packageReader(&errorOutput);
-	status_t error = packageReader.Init(packageFileName);
-	if (error != B_OK)
-		return 1;
+	// If the file doesn't look like a package file, try to load it as a
+	// package info file.
+	if (!BString(packageFileName).EndsWith(".hpkg")) {
+		struct ErrorListener : BPackageInfo::ParseErrorListener {
+			virtual void OnError(const BString& msg, int line, int col)
+			{
+				fprintf(stderr, "%s:%d:%d: %s\n", fPath, line, col,
+					msg.String());
+			}
 
-	// list
-	PackageContentListHandler handler(listAttributes);
-	error = packageReader.ParseContent(&handler);
-	if (error != B_OK)
-		return 1;
+			const char*	fPath;
+		} errorListener;
+		errorListener.fPath = packageFileName;
+
+		BPackageInfo info;
+		if (info.ReadFromConfigFile(BEntry(packageFileName), &errorListener)
+				!= B_OK) {
+			return 1;
+		}
+
+		printf("package-attributes:\n");
+		PackageInfoPrinter().PrintPackageInfo(info);
+		return 0;
+	}
+
+	BHPKG::BStandardErrorOutput errorOutput;
+
+	// current package file format version
+	do_list<VersionPolicyV2>(packageFileName, listAttributes, listMode, true);
+	do_list<VersionPolicyV1>(packageFileName, listAttributes, listMode, false);
 
 	return 0;
 }

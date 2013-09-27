@@ -51,7 +51,7 @@ KernelAddon <test>userlandfs
 
 	  $(kernelC++)
 
-	: $(HAIKU_GCC_LIBGCC)
+	: $(HAIKU_GCC_LIBGCC_$(TARGET_PACKAGING_ARCH)
 		# TARGET_GCC_LIBGCC is not defined for TARGET_PLATFORM != haiku,
 		# but the compiler is the same in this case anyway.
 ;

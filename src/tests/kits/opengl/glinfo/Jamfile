@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src tests kits opengl glinfo ;
-SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+UseBuildFeatureHeaders glu ;
+UseBuildFeatureHeaders mesa ;
 
 UsePrivateHeaders interface ;
 
@@ -14,7 +14,10 @@ local sources =
 	GearsView.cpp
 ;
 
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] :
+	[ BuildFeatureAttribute glu : headers ]
+	[ BuildFeatureAttribute mesa : headers ]
+	;
 	# Dependency needed to trigger downloading/unzipping the package before
 	# compiling the files.
 
@@ -22,8 +25,9 @@ Preference GLInfo :
 	$(sources)
 	:
 	be GL libglut.so 
-	translation libcolumnlistview.a $(HAIKU_LOCALE_LIBS)
+	translation libcolumnlistview.a localestub
 	$(TARGET_LIBSUPC++)
+	[ BuildFeatureAttribute glu : library ]
 	:
 	GLInfo.rdef
 ;

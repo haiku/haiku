@@ -14,9 +14,3 @@ Addon fake_renderer :
 	FakeRenderer.cpp
 	: libGL.so be
 ;
-
-Package haiku-opengl-cvs : 
-	fake_renderer :  
-	boot home config add-ons opengl 
-;
- 

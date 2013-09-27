@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons screen_savers glife ;
-SubDirSysHdrs $(HAIKU_GLU_HEADERS) ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+UseBuildFeatureHeaders glu ;
+UseBuildFeatureHeaders mesa ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -14,7 +14,10 @@ local sources =
 	GLifeConfig.cpp
 ;
 
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] :
+	[ BuildFeatureAttribute glu : headers ]
+	[ BuildFeatureAttribute mesa : headers ]
+	;
     # Dependency needed to trigger downloading/unzipping the package before
     # compiling the files.
 
@@ -22,7 +25,8 @@ AddResources GLife : GLife.rdef ;
 
 ScreenSaver GLife :
 	$(sources) : 
-	be screensaver GL $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	be screensaver GL localestub $(TARGET_LIBSUPC++)
+	[ BuildFeatureAttribute glu : library ]
 ;
 
 DoCatalogs GLife :

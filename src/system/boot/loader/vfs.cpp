@@ -21,6 +21,7 @@
 #include <syscall_utils.h>
 
 #include "RootFileSystem.h"
+#include "file_systems/packagefs/packagefs.h"
 
 
 using namespace boot;
@@ -94,6 +95,13 @@ Node::Close(void *cookie)
 {
 	TRACE(("%p::Close()\n", this));
 	return Release();
+}
+
+
+status_t
+Node::ReadLink(char* buffer, size_t bufferSize)
+{
+	return B_BAD_VALUE;
 }
 
 
@@ -205,6 +213,40 @@ int32
 Directory::Type() const
 {
 	return S_IFDIR;
+}
+
+
+Node*
+Directory::Lookup(const char* name, bool traverseLinks)
+{
+	Node* node = LookupDontTraverse(name);
+	if (node == NULL)
+		return NULL;
+
+	if (!traverseLinks || !S_ISLNK(node->Type()))
+		return node;
+
+	// the node is a symbolic link, so we have to resolve the path
+	char linkPath[B_PATH_NAME_LENGTH];
+	status_t error = node->ReadLink(linkPath, sizeof(linkPath));
+
+	node->Release();
+		// we don't need this one anymore
+
+	if (error != B_OK)
+		return NULL;
+
+	// let open_from() do the real work
+	int fd = open_from(this, linkPath, O_RDONLY);
+	if (fd < 0)
+		return NULL;
+
+	node = get_node_from(fd);
+	if (node != NULL)
+		node->Acquire();
+
+	close(fd);
+	return node;
 }
 
 
@@ -356,6 +398,85 @@ Descriptor::Release()
 //	#pragma mark -
 
 
+BootVolume::BootVolume()
+	:
+	fRootDirectory(NULL),
+	fSystemDirectory(NULL),
+	fPackaged(false)
+{
+}
+
+
+BootVolume::~BootVolume()
+{
+	Unset();
+}
+
+
+status_t
+BootVolume::SetTo(Directory* rootDirectory)
+{
+	Unset();
+
+	if (rootDirectory == NULL)
+		return B_BAD_VALUE;
+
+	fRootDirectory = rootDirectory;
+
+	// find the system directory
+	Node* systemNode = fRootDirectory->Lookup("system", true);
+	if (systemNode == NULL || !S_ISDIR(systemNode->Type())) {
+		if (systemNode != NULL)
+			systemNode->Release();
+		Unset();
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	fSystemDirectory = static_cast<Directory*>(systemNode);
+
+	// try opening the system package
+	int packageFD = open_from(fSystemDirectory, "packages/haiku.hpkg",
+		O_RDONLY);
+	fPackaged = packageFD >= 0;
+	if (!fPackaged)
+		return B_OK;
+
+	// the system is packaged -- mount the packagefs
+	Directory* packageRootDirectory;
+	status_t error = packagefs_mount_file(packageFD, packageRootDirectory);
+	close(packageFD);
+	if (error != B_OK) {
+		Unset();
+		return error;
+	}
+
+	fSystemDirectory->Release();
+	fSystemDirectory = packageRootDirectory;
+
+	return B_OK;
+}
+
+
+void
+BootVolume::Unset()
+{
+	if (fRootDirectory != NULL) {
+		fRootDirectory->Release();
+		fRootDirectory = NULL;
+	}
+
+	if (fSystemDirectory != NULL) {
+		fSystemDirectory->Release();
+		fSystemDirectory = NULL;
+	}
+
+	fPackaged = false;
+}
+
+
+//	#pragma mark -
+
+
 status_t
 vfs_init(stage2_args *args)
 {
@@ -368,18 +489,23 @@ vfs_init(stage2_args *args)
 
 
 status_t
-register_boot_file_system(Directory *volume)
+register_boot_file_system(BootVolume& bootVolume)
 {
-	gRoot->AddLink("boot", volume);
+	Directory* rootDirectory = bootVolume.RootDirectory();
+	gRoot->AddLink("boot", rootDirectory);
 
 	Partition *partition;
-	status_t status = gRoot->GetPartitionFor(volume, &partition);
+	status_t status = gRoot->GetPartitionFor(rootDirectory, &partition);
 	if (status != B_OK) {
-		dprintf("register_boot_file_system(): could not locate boot volume in root!\n");
+		dprintf("register_boot_file_system(): could not locate boot volume in "
+			"root!\n");
 		return status;
 	}
 
-	gBootVolume.SetInt64(BOOT_VOLUME_PARTITION_OFFSET, partition->offset);
+	gBootVolume.SetInt64(BOOT_VOLUME_PARTITION_OFFSET,
+		partition->offset);
+	if (bootVolume.IsPackaged())
+		gBootVolume.SetBool(BOOT_VOLUME_PACKAGED, true);
 
 	Node *device = get_node_from(partition->FD());
 	if (device == NULL) {
@@ -391,41 +517,50 @@ register_boot_file_system(Directory *volume)
 }
 
 
-/** Gets the boot device, scans all of its partitions, gets the
- *	boot partition, and mounts its file system.
- *	Returns the file system's root node or NULL for failure.
- */
+/*! Gets the boot device, scans all of its partitions, gets the
+	boot partition, and mounts its file system.
 
-Directory *
-get_boot_file_system(stage2_args *args)
+	\param args The stage 2 arguments.
+	\param _bootVolume On success set to the boot volume.
+	\return \c B_OK on success, another error code otherwise.
+*/
+status_t
+get_boot_file_system(stage2_args* args, BootVolume& _bootVolume)
 {
 	Node *device;
-	if (platform_add_boot_device(args, &gBootDevices) < B_OK)
-		return NULL;
+	status_t error = platform_add_boot_device(args, &gBootDevices);
+	if (error != B_OK)
+		return error;
 
 	// the boot device must be the first device in the list
 	device = gBootDevices.First();
 
-	if (add_partitions_for(device, false, true) < B_OK)
-		return NULL;
+	error = add_partitions_for(device, false, true);
+	if (error != B_OK)
+		return error;
 
 	Partition *partition;
-	if (platform_get_boot_partition(args, device, &gPartitions, &partition) < B_OK)
-		return NULL;
+	error = platform_get_boot_partition(args, device, &gPartitions, &partition);
+	if (error != B_OK)
+		return error;
 
 	Directory *fileSystem;
-	status_t status = partition->Mount(&fileSystem, true);
-
-	if (status < B_OK) {
+	error = partition->Mount(&fileSystem, true);
+	if (error != B_OK) {
 		// this partition doesn't contain any known file system; we
 		// don't need it anymore
 		gPartitions.Remove(partition);
 		delete partition;
-		return NULL;
+		return error;
 	}
 
+	// init the BootVolume
+	error = _bootVolume.SetTo(fileSystem);
+	if (error != B_OK)
+		return error;
+
 	sBootDevice = device;
-	return fileSystem;
+	return B_OK;
 }
 
 
@@ -640,6 +775,13 @@ read_pos(int fd, off_t offset, void *buffer, size_t bufferSize)
 		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
 	RETURN_AND_SET_ERRNO(descriptor->ReadAt(offset, buffer, bufferSize));
+}
+
+
+ssize_t
+pread(int fd, void* buffer, size_t bufferSize, off_t offset)
+{
+	return read_pos(fd, offset, buffer, bufferSize);
 }
 
 

@@ -13,8 +13,8 @@
 
 class BLocker;
 class TitleView;
+class PackageActionHandler;
 class PackageActionView;
-class PackageManager;
 class PagesView;
 
 enum {
@@ -26,7 +26,7 @@ enum {
 class PackageInfoView : public BGroupView {
 public:
 								PackageInfoView(BLocker* modelLock,
-									PackageManager* packageManager);
+									PackageActionHandler* handler);
 	virtual						~PackageInfoView();
 
 	virtual void				AttachedToWindow();
@@ -44,7 +44,7 @@ private:
 			TitleView*			fTitleView;
 			PackageActionView*	fPackageActionView;
 			PagesView*			fPagesView;
-			
+
 			Listener*			fPackageListener;
 };
 

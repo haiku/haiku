@@ -17,12 +17,6 @@ KernelAddon beos_ipro1000 :
 	util.c
 	;
 
-Package haiku-networkingkit-cvs : beos_ipro1000 :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-networkingkit-cvs : net beos_ipro1000 ;
-Package haiku-networkingkit-cvs : ipro1000.settings :
-	boot home config settings kernel drivers sample ;
-
 # Installation
 
 HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 

@@ -10,7 +10,7 @@ Preference DataTranslations :
 	DataTranslationsSettings.cpp
 	TranslatorListView.cpp
 
-	: be translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) libshared.a
+	: be translation $(TARGET_LIBSUPC++) localestub libshared.a
 	: DataTranslations.rdef
 	;
 

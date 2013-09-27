@@ -9,8 +9,3 @@ UsePrivateHeaders graphics kernel ;
 KernelAddon s3 :
 	driver.cpp
 ;
-
-Package haiku-s3-cvs :
-	s3 : 
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-s3-cvs : graphics s3 ;

@@ -1,10 +1,10 @@
 SubDir HAIKU_TOP src preferences appearance ;
 
 UsePrivateHeaders app interface [ FDirName servers app ] ;
-UseHeaders $(HAIKU_FREETYPE_HEADERS) : true ;
+UseBuildFeatureHeaders freetype ;
 
 Includes [ FGristFiles AntialiasingSettingsView.cpp ]
-	: $(HAIKU_FREETYPE_HEADERS_DEPENDENCY) ;
+	: [ BuildFeatureAttribute freetype : headers ] ;
 
 Preference Appearance :
 	APRMain.cpp
@@ -28,7 +28,7 @@ Preference Appearance :
 	#FontMenu.cpp
 	#MenuView.cpp
 
-	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) localestub
 	: Appearance.rdef
 	;
 

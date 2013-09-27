@@ -29,7 +29,8 @@
 #include "smp.h"
 
 
-#define HEAP_SIZE (128 * 1024)
+#define HEAP_SIZE ((1024 + 256) * 1024)
+
 
 // GCC defined globals
 extern void (*__ctor_list)(void);

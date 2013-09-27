@@ -7,7 +7,7 @@ Application MidiPlayer :
 	MidiPlayerWindow.cpp 
 	ScopeView.cpp
 	SynthBridge.cpp
-	: be midi midi2 $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be midi midi2 $(TARGET_LIBSUPC++) localestub
 	: MidiPlayer.rdef
 ;
 

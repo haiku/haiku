@@ -1,23 +1,30 @@
 SubDir HAIKU_TOP src system libroot posix pthread ;
 
-UsePrivateSystemHeaders ;
 UsePrivateHeaders kernel ;
 	# for util/DoublyLinkedList.h
 UsePrivateHeaders libroot shared ;
 
-MergeObject posix_pthread.o :
-	pthread.cpp
-	pthread_atfork.c
-	pthread_attr.c
-	pthread_cancel.cpp
-	pthread_cleanup.cpp
-	pthread_cond.cpp
-	pthread_condattr.c
-	pthread_key.cpp
-	pthread_mutex.cpp
-	pthread_mutexattr.c
-	pthread_once.cpp
-	pthread_rwlock.cpp
-	pthread_spinlock.c
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
+		UsePrivateSystemHeaders ;
+
+		MergeObject <$(architecture)>posix_pthread.o :
+			pthread.cpp
+			pthread_atfork.c
+			pthread_attr.c
+			pthread_cancel.cpp
+			pthread_cleanup.cpp
+			pthread_cond.cpp
+			pthread_condattr.c
+			pthread_key.cpp
+			pthread_mutex.cpp
+			pthread_mutexattr.c
+			pthread_once.cpp
+			pthread_rwlock.cpp
+			pthread_spinlock.c
+			;
+	}
+}

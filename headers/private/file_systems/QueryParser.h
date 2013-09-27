@@ -708,6 +708,7 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 	// get a pointer to the attribute in question
 	union value<QueryPolicy> value;
 	uint8* buffer = (uint8*)&value;
+	const size_t bufferSize = sizeof(value);
 
 	// first, check if we are matching for a live query and use that value
 	if (attributeName != NULL && !strcmp(fAttribute, attributeName)) {
@@ -737,6 +738,7 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 		type = B_INT32_TYPE;
 	} else {
 		// then for attributes
+		size = bufferSize;
 		if (QueryPolicy::NodeGetAttribute(node, fAttribute, buffer, &size,
 				&type) != B_OK) {
 			return MatchEmptyString();
@@ -1108,7 +1110,7 @@ template<typename QueryPolicy>
 void
 Operator<QueryPolicy>::PrintToStream()
 {
-	D(__out("( "));
+	QUERY_D(__out("( "));
 	if (fLeft != NULL)
 		fLeft->PrintToStream();
 
@@ -1118,12 +1120,12 @@ Operator<QueryPolicy>::PrintToStream()
 		case OP_AND: op = "AND"; break;
 		default: op = "?"; break;
 	}
-	D(__out(" %s ", op));
+	QUERY_D(__out(" %s ", op));
 
 	if (fRight != NULL)
 		fRight->PrintToStream();
 
-	D(__out(" )"));
+	QUERY_D(__out(" )"));
 }
 
 
@@ -1140,7 +1142,7 @@ Equation<QueryPolicy>::PrintToStream()
 		case OP_LESS_THAN: symbol = "<"; break;
 		case OP_LESS_THAN_OR_EQUAL: symbol = "<="; break;
 	}
-	D(__out("[\"%s\" %s \"%s\"]", fAttribute, symbol, fString));
+	QUERY_D(__out("[\"%s\" %s \"%s\"]", fAttribute, symbol, fString));
 }
 
 #endif	// DEBUG_QUERY
@@ -1162,7 +1164,7 @@ Expression<QueryPolicy>::Expression(char* expr)
 	}
 	QUERY_D(if (fTerm != NULL) {
 		fTerm->PrintToStream();
-		D(__out("\n"));
+		QUERY_D(__out("\n"));
 		if (*expr != '\0')
 			PRINT(("Unexpected end of string: \"%s\"!\n", expr));
 	});

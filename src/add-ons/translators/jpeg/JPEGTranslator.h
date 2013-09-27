@@ -191,15 +191,5 @@ class TranslatorView : public BTabView {
 EXTERN(void) be_jpeg_stdio_src(j_decompress_ptr cinfo, BPositionIO *infile);	// from "be_jdatasrc.cpp"
 EXTERN(void) be_jpeg_stdio_dest(j_compress_ptr cinfo, BPositionIO *outfile);	// from "be_jdatadst.cpp"
 
-//---------------------------------------------------
-//	Error output functions
-//	based on the one from jerror.c
-//	modified to use settings
-//	(so user can decide to show dialog-boxes or not)
-//---------------------------------------------------
-EXTERN(struct jpeg_error_mgr *) be_jpeg_std_error (struct jpeg_error_mgr * err,
-	TranslatorSettings * settings, const jmp_buf* longJumpBuffer);
-	// implemented in "be_jerror.cpp"
-
 #endif // _JPEGTRANSLATOR_H_
 

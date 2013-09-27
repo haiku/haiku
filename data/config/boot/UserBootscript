@@ -3,7 +3,7 @@
 # DO NOT EDIT!
 #=====================================================================
 # Start programs and open files in the boot launch folder
-for file in $HOME/config/boot/launch/* 
+for file in $HOME/config/settings/boot/launch/* 
 do 
 	/bin/open "$file" &
 done

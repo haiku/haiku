@@ -72,6 +72,7 @@ All rights reserved.
 #include <Window.h>
 
 #include <ObjectListPrivate.h>
+#include <PathMonitor.h>
 
 #include "Attributes.h"
 #include "AttributeStream.h"
@@ -1107,6 +1108,7 @@ BPoseView::InitDirentIterator(const entry_ref* ref)
 		return NULL;
 
 	ASSERT(!sourceModel.IsQuery());
+	ASSERT(!sourceModel.IsVirtualDirectory());
 	ASSERT(sourceModel.Node());
 
 	BDirectory* directory = dynamic_cast<BDirectory*>(sourceModel.Node());
@@ -1349,7 +1351,7 @@ BPoseView::AddPosesTask(void* castToParams)
 			if (count <= 0 && modelChunkIndex == -1)
 				break;
 
-			if (count) {
+			if (count > 0) {
 				ASSERT(count == 1);
 
 				if ((!hideDotFiles && (!strcmp(eptr->d_name, ".")
@@ -1393,7 +1395,7 @@ BPoseView::AddPosesTask(void* castToParams)
 				throw failToLock();
 			}
 
-			if (count) {
+			if (count > 0) {
 				// try to watch the model, no matter what
 
 				if (result != B_OK) {
@@ -1421,7 +1423,7 @@ BPoseView::AddPosesTask(void* castToParams)
 
 			bigtime_t now = system_time();
 
-			if (!count || modelChunkIndex >= kMaxAddPosesChunk - 1
+			if (count <= 0 || modelChunkIndex >= kMaxAddPosesChunk - 1
 				|| now > nextChunkTime) {
 				// keep getting models until we get <kMaxAddPosesChunk> of them
 				// or until 300000 runs out
@@ -1446,7 +1448,7 @@ BPoseView::AddPosesTask(void* castToParams)
 				snooze(500);	// be nice
 			}
 
-			if (!count)
+			if (count <= 0)
 				break;
 		}
 
@@ -1613,28 +1615,35 @@ BPoseView::CreateVolumePose(BVolume* volume, bool watchIndividually)
 	}
 
 	BDirectory root;
-	if (volume->GetRootDirectory(&root) == B_OK) {
-		node_ref itemNode;
-		root.GetNodeRef(&itemNode);
+	if (volume->GetRootDirectory(&root) != B_OK)
+		return;
 
-		BEntry entry;
-		root.GetEntry(&entry);
+	BEntry entry;
+	root.GetEntry(&entry);
 
-		entry_ref ref;
-		entry.GetRef(&ref);
+	entry_ref ref;
+	entry.GetRef(&ref);
 
-		node_ref dirNode;
-		dirNode.device = ref.device;
-		dirNode.node = ref.directory;
+	// If the volume is mounted at a directory of a persistent volume, we don't
+	// want it on the desktop or in the disks window.
+	BVolume parentVolume(ref.device);
+	if (parentVolume.InitCheck() == B_OK && parentVolume.IsPersistent())
+		return;
 
-		BPose* pose = EntryCreated(&dirNode, &itemNode, ref.name, 0);
+	node_ref itemNode;
+	root.GetNodeRef(&itemNode);
 
-		if (pose && watchIndividually) {
-			// make sure volume names still get watched, even though
-			// they are on the desktop which is not their physical parent
-			pose->TargetModel()->WatchVolumeAndMountPoint(B_WATCH_NAME | B_WATCH_STAT
-				| B_WATCH_ATTR, this);
-		}
+	node_ref dirNode;
+	dirNode.device = ref.device;
+	dirNode.node = ref.directory;
+
+	BPose *pose = EntryCreated(&dirNode, &itemNode, ref.name, 0);
+
+	if (pose && watchIndividually) {
+		// make sure volume names still get watched, even though
+		// they are on the desktop which is not their physical parent
+		pose->TargetModel()->WatchVolumeAndMountPoint(B_WATCH_NAME | B_WATCH_STAT
+			| B_WATCH_ATTR, this);
 	}
 }
 
@@ -2146,6 +2155,7 @@ BPoseView::MessageReceived(BMessage* message)
 			break;
 
 		case B_NODE_MONITOR:
+		case B_PATH_MONITOR:
 		case B_QUERY_UPDATE:
 			if (!FSNotification(message))
 				pendingNodeMonitorCache.Add(message);
@@ -4913,6 +4923,10 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 		okToMove = alert->Go() == 1;
 	}
 
+	// TODO: Handle correctly!
+	if (srcWindow->TargetModel()->IsVirtualDirectory())
+		okToMove = false;
+
 	if (okToMove) {
 		PoseList* selectionList = srcWindow->PoseView()->SelectionList();
 		BList* pointList = destWindow->PoseView()->GetDropPointList(clickPt, loc, selectionList,
@@ -5159,6 +5173,7 @@ BPoseView::FSNotification(const BMessage* message)
 				TrackerSettings settings;
 				if (dirNode != *TargetModel()->NodeRef()
 					&& !TargetModel()->IsQuery()
+					&& !TargetModel()->IsVirtualDirectory()
 					&& !TargetModel()->IsRoot()
 					&& (!settings.ShowDisksIcon() || !IsDesktopView())) {
 					if (count == 0)
@@ -5167,13 +5182,12 @@ BPoseView::FSNotification(const BMessage* message)
 				}
 
 				const char* name;
-				if (message->FindString("name", &name) != B_OK)
-					break;
+				if (message->FindString("name", &name) != B_OK) {
 #if DEBUG
-				else
 					SERIAL_PRINT(("no name in entry creation message\n"));
-					break;
 #endif
+					break;
+				}
 				if (count) {
 					// basically, let's say we have a broken link :
 					// ./a_link -> ./some_folder/another_folder/a_target
@@ -5440,7 +5454,8 @@ BPoseView::EntryMoved(const BMessage* message)
 		TargetModel()->UpdateEntryRef(&dirNode, name);
 		assert_cast<BContainerWindow*>(Window())->UpdateTitle();
 	}
-	if (oldDir == dirNode.node || TargetModel()->IsQuery()) {
+	if (oldDir == dirNode.node || TargetModel()->IsQuery()
+		|| TargetModel()->IsVirtualDirectory()) {
 
 		// rename or move of entry in this directory (or query)
 
@@ -5590,6 +5605,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 	message->FindString("attr", &attrName);
 
 	if (TargetModel() != NULL && *TargetModel()->NodeRef() == itemNode
+		&& TargetModel()->IsNodeOpen()
 		&& TargetModel()->AttrChanged(attrName)) {
 		// the icon of our target has changed, update drag icon
 		// TODO: make this simpler (ie. store the icon with the window)
@@ -8322,11 +8338,9 @@ BPoseView::OpenParent()
 		return;
 
 	BEntry entry(TargetModel()->EntryRef());
-	BDirectory parent;
 	entry_ref ref;
 
-	if (entry.GetParent(&parent) != B_OK
-		|| parent.GetEntry(&entry) != B_OK
+	if (FSGetParentVirtualDirectoryAware(entry, entry) != B_OK
 		|| entry.GetRef(&ref) != B_OK)
 		return;
 

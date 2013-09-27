@@ -111,6 +111,8 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 	functions.GetString = _GetString;
 	functions.UpdateState = _UpdateState;
 	functions.MapRenderbuffer = _RenderBufferMap;
+	functions.GetBufferSize = NULL;
+	functions.Error = _Error;
 	functions.Flush = _Flush;
 
 	// create core context
@@ -135,6 +137,12 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
 
 	_mesa_meta_init(fContext);
 	_mesa_enable_sw_extensions(fContext);
+	_mesa_enable_1_3_extensions(fContext);
+	_mesa_enable_1_4_extensions(fContext);
+	_mesa_enable_1_5_extensions(fContext);
+	_mesa_enable_2_0_extensions(fContext);
+	_mesa_enable_2_1_extensions(fContext);
+
 	_mesa_compute_version(fContext);
 
 	_mesa_initialize_dispatch_tables(fContext);
@@ -455,6 +463,19 @@ MesaSoftwareRenderer::_AllocateBitmap()
 
 
 // #pragma mark - static
+
+
+void
+MesaSoftwareRenderer::_Error(gl_context* ctx)
+{
+	CALLED();
+	#if 0
+	// TODO: err. Mesa dropped DriverCtx
+	MesaSoftwareRenderer* mr = (MesaSoftwareRenderer*)ctx->DriverCtx;
+	if (mr && mr->GLView())
+		mr->GLView()->ErrorCallback((unsigned long)ctx->ErrorValue);
+	#endif
+}
 
 
 const GLubyte*

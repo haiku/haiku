@@ -408,7 +408,7 @@ copy_entry(const char *sourcePath, const char *destPath,
 				sizeof(linkTo) - 1);
 			if (bytesRead < 0) {
 				fprintf(stderr, "Error: Failed to read symlink \"%s\": %s\n",
-					sourcePath, strerror(error));
+					sourcePath, strerror(errno));
 				exit(1);
 			}
 
@@ -439,7 +439,7 @@ copy_entry(const char *sourcePath, const char *destPath,
 		destNode->SetOwner(sourceStat.st_uid);
 		destNode->SetGroup(sourceStat.st_gid);
 		destNode->SetPermissions(sourceStat.st_mode);
-		#if (defined(__BEOS__) || defined(__HAIKU__))
+		#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			destNode->SetCreationTime(sourceStat.st_crtime);
 		#endif
 		destNode->SetModificationTime(sourceStat.st_mtime);

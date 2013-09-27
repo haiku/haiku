@@ -25,16 +25,18 @@ local sources =
 	;
 
 
-SubDirSysHdrs $(HAIKU_FFMPEG_HEADERS) ;
-Includes [ FGristFiles $(sources) ] : $(HAIKU_FFMPEG_HEADERS_DEPENDENCY) ;
+UseBuildFeatureHeaders ffmpeg ;
+Includes [ FGristFiles $(sources) ]
+	: [ BuildFeatureAttribute ffmpeg : headers ] ;
 
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) ] ;
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavcodec ] ;
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavdevice ] ;
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavfilter ] ;
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavformat ] ;
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libavutil ] ;
-UseHeaders [ FDirName $(HAIKU_FFMPEG_HEADERS) libswscale ] ;
+local ffmpegHeaders = [ BuildFeatureAttribute ffmpeg : headers : path ] ;
+UseHeaders $(ffmpegHeaders) ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavcodec ] ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavdevice ] ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavfilter ] ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavformat ] ;
+UseHeaders [ FDirName $(ffmpegHeaders) libavutil ] ;
+UseHeaders [ FDirName $(ffmpegHeaders) libswscale ] ;
 
 Addon ffmpeg :
 	$(sources)
@@ -45,18 +47,18 @@ Addon ffmpeg :
 	:
 
 	# FFmpeg libraries (from FFmpeg optional package):
-	$(HAIKU_FFMPEG_LIBS)
+	[ BuildFeatureAttribute ffmpeg : libraries ]
 
-	$(HAIKU_SPEEX_LIBS)
-	$(HAIKU_LIBTHEORA_LIBS)
-	$(HAIKU_LIBVORBIS_LIBS)
-	$(HAIKU_LIBOGG_LIBS)
-	$(HAIKU_LIBVPX_LIBS)
+	[ BuildFeatureAttribute speex : libraries ]
+	[ BuildFeatureAttribute libtheora : libraries ]
+	[ BuildFeatureAttribute libvorbis : libraries ]
+	[ BuildFeatureAttribute libogg : libraries ]
+	[ BuildFeatureAttribute libvpx : libraries ]
 	libbz2_ffmpeg.a
 
 	be
 	media
-	$(HAIKU_ZLIB_LIB)
+	[ BuildFeatureAttribute zlib : library ]
 	$(TARGET_LIBSUPC++)
 	$(TARGET_NETWORK_LIBS)
 ;

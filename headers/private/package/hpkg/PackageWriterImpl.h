@@ -29,12 +29,15 @@ namespace BHPKG {
 
 class BDataReader;
 class BErrorOutput;
+class BPackageWriterParameters;
 
 
 namespace BPrivate {
 
 
 struct hpkg_header;
+class PackageFileHeapWriter;
+
 
 class PackageWriterImpl : public WriterImplBase {
 	typedef	WriterImplBase		inherited;
@@ -44,7 +47,8 @@ public:
 									BPackageWriterListener* listener);
 								~PackageWriterImpl();
 
-			status_t			Init(const char* fileName, uint32 flags);
+			status_t			Init(const char* fileName,
+									const BPackageWriterParameters& parameters);
 			status_t			SetInstallPath(const char* installPath);
 			void				SetCheckLicenses(bool checkLicenses);
 			status_t			AddEntry(const char* fileName, int fd = -1);
@@ -60,7 +64,8 @@ private:
 			typedef DoublyLinkedList<Entry> EntryList;
 
 private:
-			status_t			_Init(const char* fileName, uint32 flags);
+			status_t			_Init(const char* fileName,
+									const BPackageWriterParameters& parameters);
 			status_t			_Finish();
 
 			status_t			_RegisterEntry(const char* fileName, int fd);
@@ -78,28 +83,14 @@ private:
 									Entry* entry, const char* fileName,
 									char* pathBuffer);
 			void				_CompactHeap();
-			void				_MoveHeapChunk(off_t fromOffset, off_t toOffset,
-									off_t size);
 			void				_AttributeRemoved(Attribute* attribute);
 
-			void				_WriteTOC(hpkg_header& header);
-			int32				_WriteTOCCompressed(
-									uint64& _uncompressedStringsSize,
-									uint64& _uncompressedMainSize,
-									uint64& _tocUncompressedSize);
-			int32				_WriteTOCUncompressed(
-									uint64& _uncompressedStringsSize,
-									uint64& _uncompressedMainSize,
-									uint64& _tocUncompressedSize);
-			int32				_WriteTOCSections(uint64& _stringsSize,
-									uint64& _mainSize);
+			void				_WriteTOC(hpkg_header& header, uint64& _length);
 			void				_WriteAttributeChildren(Attribute* attribute);
 
-			void				_WritePackageAttributes(hpkg_header& header);
+			void				_WritePackageAttributes(hpkg_header& header,
+									uint64& _length);
 			uint32				_WritePackageAttributesCompressed(
-									uint32& _stringsLengthUncompressed,
-									uint32& _attributesLengthUncompressed);
-			uint32				_WritePackageAttributesUncompressed(
 									uint32& _stringsLengthUncompressed,
 									uint32& _attributesLengthUncompressed);
 
@@ -125,8 +116,6 @@ private:
 
 			status_t			_AddData(BDataReader& dataReader, off_t size);
 
-			status_t			_WriteUncompressedData(BDataReader& dataReader,
-									off_t size, uint64 writeOffset);
 			status_t			_WriteZlibCompressedData(
 									BDataReader& dataReader,
 									off_t size, uint64 writeOffset,
@@ -136,12 +125,9 @@ private:
 			BPackageWriterListener*	fListener;
 
 			off_t				fHeapOffset;
-			off_t				fHeapEnd;
+			uint16				fHeaderSize;
 
-			::BPrivate::RangeArray<off_t>* fHeapRangesToRemove;
-
-			void*				fDataBuffer;
-			const size_t		fDataBufferSize;
+			::BPrivate::RangeArray<uint64>* fHeapRangesToRemove;
 
 			Entry*				fRootEntry;
 

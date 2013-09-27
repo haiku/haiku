@@ -1,19 +1,25 @@
 SubDir HAIKU_TOP src system libroot posix arch arm ;
 
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup arm ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-UsePrivateHeaders [ FDirName system arch $(TARGET_ARCH) ] ;
+		UsePrivateHeaders [ FDirName system arch $(TARGET_ARCH) ] ;
 
-local genericSources =
-	setjmp_save_sigs.c
-;
+		local genericSources =
+			setjmp_save_sigs.c
+			;
 
-MergeObject posix_arch_$(TARGET_ARCH).o :
-	fenv.c
-	sigsetjmp.S
-	siglongjmp.S
+		MergeObject <$(architecture)>posix_arch_$(TARGET_ARCH).o :
+			fenv.c
+			sigsetjmp.S
+			siglongjmp.S
 
-	$(genericSources)
-;
+			$(genericSources)
+			;
 
-SEARCH on [ FGristFiles $(genericSources) ]
-	= [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+		SEARCH on [ FGristFiles $(genericSources) ]
+			= [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+	}
+}

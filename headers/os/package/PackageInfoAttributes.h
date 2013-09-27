@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011-2013, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__PACKAGE_INFO_ATTRIBUTES_H_
@@ -16,7 +16,8 @@ enum BPackageInfoAttributeID {
 	B_PACKAGE_INFO_VENDOR,		// e.g. "Haiku Project"
 	B_PACKAGE_INFO_PACKAGER,	// e-mail address preferred
 	B_PACKAGE_INFO_ARCHITECTURE,
-	B_PACKAGE_INFO_VERSION,		// <major>[.<minor>[.<micro>]][-<pre>]-<release>
+	B_PACKAGE_INFO_VERSION,		// <major>[.<minor>[.<micro>]][-<pre>]
+								//		-<revision>
 	B_PACKAGE_INFO_COPYRIGHTS,	// list
 	B_PACKAGE_INFO_LICENSES,	// list
 	B_PACKAGE_INFO_PROVIDES,	// list of resolvables this package provides,
@@ -39,6 +40,17 @@ enum BPackageInfoAttributeID {
 	B_PACKAGE_INFO_CHECKSUM,	// sha256-checksum
 	B_PACKAGE_INFO_INSTALL_PATH, // package install path; only for package
 								// building
+	B_PACKAGE_INFO_BASE_PACKAGE, // name of the base package for this package
+	B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES,
+								// list of global writable file infos
+	B_PACKAGE_INFO_USER_SETTINGS_FILES,
+								// list of user settings file infos
+	B_PACKAGE_INFO_USERS,
+								// list of (Unix) users defined/needed
+	B_PACKAGE_INFO_GROUPS,
+								// list of (Unix) groups defined/needed
+	B_PACKAGE_INFO_POST_INSTALL_SCRIPTS,
+								// list of scripts to be executed post-install
 	//
 	B_PACKAGE_INFO_ENUM_COUNT,
 };

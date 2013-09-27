@@ -21,6 +21,7 @@
 #include <package/PackageRoster.h>
 #include <package/RepositoryInfo.h>
 
+#include "Command.h"
 #include "pkgman.h"
 
 
@@ -30,24 +31,23 @@
 using namespace BPackageKit;
 
 
-static const char* kCommandUsage =
+static const char* const kShortUsage =
+	"  %command%\n"
+	"    Lists all repositories.\n";
+
+static const char* const kLongUsage =
 	"Usage:\n"
-	"    %s list-repos [options]\n"
+	"    %program% %command% [options]\n"
 	"Lists all configured package repositories.\n"
-	"\n"
-;
+	"\n";
 
 
-static void
-print_command_usage_and_exit(bool error)
-{
-    fprintf(error ? stderr : stdout, kCommandUsage, kProgramName);
-    exit(error ? 1 : 0);
-}
+DEFINE_COMMAND(ListReposCommand, "list-repos", kShortUsage, kLongUsage,
+	kCommandCategoryRepositories)
 
 
 int
-command_list_repos(int argc, const char* const* argv)
+ListReposCommand::Execute(int argc, const char* const* argv)
 {
 	bool verbose = false;
 
@@ -65,7 +65,7 @@ command_list_repos(int argc, const char* const* argv)
 
 		switch (c) {
 			case 'h':
-				print_command_usage_and_exit(false);
+				PrintUsageAndExit(false);
 				break;
 
 			case 'v':
@@ -73,14 +73,14 @@ command_list_repos(int argc, const char* const* argv)
 				break;
 
 			default:
-				print_command_usage_and_exit(true);
+				PrintUsageAndExit(true);
 				break;
 		}
 	}
 
 	// No remaining arguments.
 	if (argc != optind)
-		print_command_usage_and_exit(true);
+		PrintUsageAndExit(true);
 
 	BStringList repositoryNames(20);
 	BPackageRoster roster;
@@ -116,11 +116,11 @@ command_list_repos(int argc, const char* const* argv)
 					repoCache.Info().Summary().String());
 				printf("\t\tarch:      %s\n", BPackageInfo::kArchitectureNames[
 						repoCache.Info().Architecture()]);
-				printf("\t\tpkg-count: %lu\n", repoCache.CountPackages());
+				printf("\t\tpkg-count: %" B_PRIu32 "\n",
+					repoCache.CountPackages());
 				printf("\t\torig-url:  %s\n",
 					repoCache.Info().OriginalBaseURL().String());
 				printf("\t\torig-prio: %u\n", repoCache.Info().Priority());
-
 			} else
 				printf("\t\t<no repository cache found>\n");
 		}

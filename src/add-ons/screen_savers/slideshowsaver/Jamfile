@@ -16,10 +16,6 @@ ScreenSaver SlideShowSaver :
 	be screensaver $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) tracker translation
 ;
 
-Package haiku-screensavers-cvs :
-	SlideShowSaver :
-	boot home config add-ons screen_savers ;
-
 DoCatalogs SlideShowSaver :
 	x-vnd.Haiku-SlideShowSaver
 	:

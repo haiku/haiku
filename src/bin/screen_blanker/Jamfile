@@ -16,17 +16,13 @@ BinCommand screen_blanker :
 		# needed for some old/broken screen saver add-ons that do not
 		# link against libscreensaver.so
 
-	: be game $(HAIKU_LOCALE_LIBS) libscreensaver.so $(TARGET_LIBSUPC++)
+	: be game localestub libscreensaver.so $(TARGET_LIBSUPC++)
 	: screen_blanker.rdef
 ;
 
 SEARCH on [ FGristFiles
 		ScreenSaver.cpp
 	] = [ FDirName $(HAIKU_TOP) src kits screensaver ] ;
-
-Package haiku-screensaverkit-cvs :
-	screen_blanker :
-	boot home config bin ;
 
 DoCatalogs screen_blanker :
 	x-vnd.Haiku.screenblanker

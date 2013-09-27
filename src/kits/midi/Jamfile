@@ -11,21 +11,26 @@ if $(TARGET_PLATFORM) != haiku {
 UsePrivateHeaders midi ;
 UseLibraryHeaders fluidsynth ;
 
-SharedLibrary libmidi.so :
-	Midi.cpp
-	MidiGlue.cpp
-	MidiPort.cpp
-	MidiStore.cpp
-	MidiSynth.cpp
-	MidiSynthFile.cpp
-	MidiText.cpp
-	Samples.cpp
-	SoftSynth.cpp
-	Synth.cpp
-	:
-	be
-	libmidi2.so
-	media
-	libfluidsynth.so
-	$(TARGET_LIBSUPC++)
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		SharedLibrary [ MultiArchDefaultGristFiles libmidi.so ] :
+			Midi.cpp
+			MidiGlue.cpp
+			MidiPort.cpp
+			MidiStore.cpp
+			MidiSynth.cpp
+			MidiSynthFile.cpp
+			MidiText.cpp
+			Samples.cpp
+			SoftSynth.cpp
+			Synth.cpp
+			:
+			be
+			midi2
+			media
+			[ MultiArchDefaultGristFiles libfluidsynth.so ]
+			$(TARGET_LIBSUPC++)
+			;
+	}
+}

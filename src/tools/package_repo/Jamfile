@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src tools package_repo ;
+
+SEARCH_SOURCE +=
+	[ FDirName $(HAIKU_TOP) src bin package_repo ]
+	[ FDirName $(HAIKU_TOP) src bin package ]
+	;
+
+UsePrivateHeaders kernel shared ;
+
+USES_BE_API on <build>package_repo = true ;
+
+BuildPlatformMain <build>package_repo :
+	command_create.cpp
+	command_list.cpp
+	command_update.cpp
+	package_repo.cpp
+	:
+	libpackage_build.so $(HOST_LIBBE) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+;
+

@@ -11,8 +11,3 @@ Addon Parallel\ Port :
 	PrintTransportAddOn.cpp
 	: be $(TARGET_LIBSUPC++)
 ;
-
-Package haiku-printingkit-cvs :
-	Parallel\ Port :
-	boot home config add-ons Print transport ;
-

@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons media plugins asf_reader libasf ;
 
-UseLibraryHeaders zlib ;
-
 StaticLibrary libasfreader.a :
 	asf.c
 	byteio.c

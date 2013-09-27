@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -46,11 +46,12 @@ static struct {
 	const char *path;
 	const char *target;
 } sPredefinedLinks[] = {
-	{ kGlobalSystemDirectory,	kSystemDirectory },
-	{ kGlobalBinDirectory,		kSystemBinDirectory },
-	{ kGlobalEtcDirectory,		kCommonEtcDirectory },
-	{ kGlobalTempDirectory,		kCommonTempDirectory },
-	{ kGlobalVarDirectory,		kCommonVarDirectory },
+	{ kGlobalSystemDirectory,		kSystemDirectory },
+	{ kGlobalBinDirectory,			kSystemBinDirectory },
+	{ kGlobalEtcDirectory,			kCommonEtcDirectory },
+	{ kGlobalTempDirectory,			kCommonTempDirectory },
+	{ kGlobalVarDirectory,			kCommonVarDirectory },
+	{ kGlobalPackageLinksDirectory,	kSystemPackageLinksDirectory },
 	{NULL}
 };
 
@@ -471,6 +472,8 @@ vfs_mount_boot_file_system(kernel_args* args)
 		panic("did not find any boot partitions!");
 	}
 
+	dev_t bootDevice = -1;
+
 	KPartition* bootPartition;
 	while (partitions.Pop(&bootPartition)) {
 		KPath path;
@@ -489,26 +492,62 @@ vfs_mount_boot_file_system(kernel_args* args)
 		}
 
 		TRACE(("trying to mount boot partition: %s\n", path.Path()));
-		gBootDevice = _kern_mount("/boot", path.Path(), fsName, 0, NULL, 0);
-		if (gBootDevice >= 0) {
+
+		bootDevice = _kern_mount("/boot", path.Path(), fsName, 0, NULL, 0);
+		if (bootDevice >= 0) {
 			dprintf("Mounted boot partition: %s\n", path.Path());
 			gReadOnlyBootDevice = readOnly;
 			break;
 		}
 	}
 
-	if (gBootDevice < B_OK)
+	if (bootDevice < B_OK)
 		panic("could not mount boot device!\n");
 
 	// create link for the name of the boot device
 
 	fs_info info;
-	if (_kern_read_fs_info(gBootDevice, &info) == B_OK) {
+	if (_kern_read_fs_info(bootDevice, &info) == B_OK) {
 		char path[B_FILE_NAME_LENGTH + 1];
 		snprintf(path, sizeof(path), "/%s", info.volume_name);
 
 		_kern_create_symlink(-1, path, "/boot", 0);
 	}
+
+	// If we're booting off a packaged system, mount packagefs.
+	struct stat st;
+	if (bootVolume.GetBool(BOOT_VOLUME_PACKAGED, false)
+		|| (bootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)
+			&& lstat(kSystemPackagesDirectory, &st) == 0)) {
+		static const char* const kPackageFSName = "packagefs";
+
+		dev_t packageMount = _kern_mount("/boot/system", NULL, kPackageFSName,
+			0, "packages /boot/system/packages; type system",
+			0 /* unused argument length */);
+		if (packageMount < 0) {
+			panic("Failed to mount system packagefs: %s",
+				strerror(packageMount));
+		}
+
+		packageMount = _kern_mount("/boot/common", NULL, kPackageFSName, 0,
+			"packages /boot/common/packages; type common",
+			0 /* unused argument length */);
+		if (packageMount < 0) {
+			dprintf("Failed to mount common packagefs: %s\n",
+				strerror(packageMount));
+		}
+
+		packageMount = _kern_mount("/boot/home/config", NULL, kPackageFSName, 0,
+			"packages /boot/home/config/packages; type home",
+			0 /* unused argument length */);
+		if (packageMount < 0) {
+			dprintf("Failed to mount home packagefs: %s\n",
+				strerror(packageMount));
+		}
+	}
+
+	// Now that packagefs is mounted, the boot volume is really ready.
+	gBootDevice = bootDevice;
 
 	// Do post-boot-volume module initialization. The module code wants to know
 	// whether the module images the boot loader has pre-loaded are the same as

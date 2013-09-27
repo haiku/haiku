@@ -1,0 +1,102 @@
+# This package is like the HaikuDevel package, but it is meant for cross
+# development, i.e. it assumes that a specific cross compiler is installed
+# on the Haiku system where this package is being used.
+# The main use of this package is to provide HaikuPorter with a development
+# environment for a cross-build Haiku platform.
+
+local primaryArchitecture = $(HAIKU_PACKAGING_ARCHS[1]) ;
+local architecture = $(TARGET_PACKAGING_ARCH) ;
+local isPrimaryArchitecture = [ MultiArchIfPrimary 1 : ] ;
+
+local packageNameSuffix = $(primaryArchitecture) ;
+local architectureSubDir ;
+if ! $(isPrimaryArchitecture) {
+	packageNameSuffix = $(primaryArchitecture)_$(architecture) ;
+	architectureSubDir = $(architecture) ;
+}
+
+local additionalLibraries_stage1 ;
+local additionalLibraries
+	= [ MultiArchDefaultGristFiles libbe.so libnetwork.so libpackage.so ] ;
+
+local stage ;
+for stage in _stage1 "" {
+	# first create the actual cross development package
+
+	local haikuCrossDevelSysrootPackage
+		= haiku_cross_devel_sysroot$(stage)_$(packageNameSuffix).hpkg ;
+	HaikuPackage $(haikuCrossDevelSysrootPackage) ;
+
+	local developCrossLibDirTokens = develop lib $(architectureSubDir) ;
+
+	# glue code
+	AddFilesToPackage $(developCrossLibDirTokens) :
+		<src!system!glue!arch!$(TARGET_ARCH)!$(architecture)>crti.o
+		<src!system!glue!arch!$(TARGET_ARCH)!$(architecture)>crtn.o
+		<src!system!glue!$(architecture)>init_term_dyn.o
+		<src!system!glue!$(architecture)>start_dyn.o
+		<src!system!glue!$(architecture)>haiku_version_glue.o
+		;
+
+	# kernel
+	if $(isPrimaryArchitecture) {
+		AddFilesToPackage $(developCrossLibDirTokens) : kernel.so : _KERNEL_ ;
+	}
+
+	# libraries
+	AddLibrariesToPackage $(developCrossLibDirTokens) :
+		[ MultiArchDefaultGristFiles libbsd.so ]
+		[ MultiArchDefaultGristFiles libroot.so : revisioned ]
+		$(HAIKU_SHARED_LIBSTDC++_$(architecture))
+		$(HAIKU_SHARED_LIBSUPC++_$(architecture))
+		$(additionalLibraries$(stage))
+		;
+
+	# static libraries
+	AddFilesToPackage $(developCrossLibDirTokens)
+		: <$(architecture)>liblocalestub.a ;
+
+	# the POSIX error code mapper library
+	AddFilesToPackage $(developCrossLibDirTokens)
+		: [ MultiArchDefaultGristFiles libposix_error_mapper.a ] ;
+
+	# headers
+	local developCrossHeadersDirTokens = develop headers ;
+	local headerDir ;
+	for headerDir in config glibc os posix {
+		CopyDirectoryToPackage $(developCrossHeadersDirTokens)
+			: [ FDirName $(HAIKU_TOP) headers $(headerDir) ] ;
+	}
+
+	# BSD and GNU compatibility headers
+	for headerDir in bsd gnu {
+		CopyDirectoryToPackage $(developCrossHeadersDirTokens)
+			: [ FDirName $(HAIKU_TOP) headers compatibility $(headerDir) ] ;
+	}
+
+	# cpp headers
+	if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
+		# GCC 2 only -- for GCC 4 they come with the DevelopmentBase package
+		CopyDirectoryToPackage $(developCrossHeadersDirTokens) c++
+			: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;
+	}
+
+	BuildHaikuPackage $(haikuCrossDevelSysrootPackage)
+		: haiku_cross_devel_sysroot ;
+
+	# Now create a wrapper package which just contains the actual cross
+	# development package. This wrapper package can safely be installed into the
+	# system hierarchy of the target system, from where haikuporter will fetch
+	# it when needed.
+
+	local haikuCrossDevelPackage
+		= haiku_cross_devel$(stage)_$(packageNameSuffix).hpkg ;
+	HaikuPackage $(haikuCrossDevelPackage) ;
+
+	# add the wrapped package
+	local developCrossDirTokens = develop cross ;
+	AddFilesToPackage $(developCrossDirTokens)
+		: $(haikuCrossDevelSysrootPackage) ;
+
+	BuildHaikuPackage $(haikuCrossDevelPackage) : haiku_cross_devel ;
+}

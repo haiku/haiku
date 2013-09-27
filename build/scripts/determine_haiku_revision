@@ -1,70 +1,51 @@
 #!/bin/sh
 
-determineGitRevision()
-{
-	haikuTop=$1
-	haikuBuildOutputDir=$2
+haikuTop=$1
+revisionFile=$2
+haikuBuildOutputDir=`dirname $revisionFile`
+lastBuiltRevisionFile=${haikuBuildOutputDir}/last-built-revision
 
-	revision=`cat ${haikuBuildOutputDir}/haiku-revision 2>/dev/null`
-	lastBuiltRevision=`cat ${haikuBuildOutputDir}/last-built-revision \
-		2>/dev/null`
-	localRev=`git rev-parse HEAD`
+case `uname` in
+Darwin)
+	SED=gsed
+	;;
+*)
+	SED=sed
+	;;
+esac
+export SED
 
-	# only determine the haiku-revision if anything has changed from
-	# last build
-	if [ -z "$revision" -o "$lastBuiltRevision" != "$localRev" ]; then
-		# the revision we use is the description of HEAD with respect to the
-		# last reachable hrev-(haiku-revision-)tag
-		revision=`git describe --dirty --tags --match=hrev*`
-		if [ -z "$revision" ]; then
-			# failed to find any hrev tags, use short hash instead
-			revision=`git rev-parse --short HEAD`
-		elif echo "$revision" | grep -- '-' >/dev/null; then
-			# HEAD is not directly a changeset from Haiku's central repo, so we
-			# add the current branch name as additional info
-			branchName=`git branch | grep '*' | cut -b 3-`
-			revision="$revision [$branchName]"
-		fi
-		echo $localRev >${haikuBuildOutputDir}/last-built-revision
-	fi
-}
+revision=`cat ${revisionFile} 2>/dev/null`
+lastBuiltRevision=`cat $lastBuiltRevisionFile 2>/dev/null`
 
+originalDir=`pwd`
+cd ${haikuTop}
+export LC_ALL=C
 
-determineHaikuRevision()
-{
-	haikuTop=$1
-	haikuBuildOutputDir=$2
+localRev=`git rev-parse HEAD`
 
-	case `uname` in
-	Darwin)
-		SED=gsed
-		;;
-	*)
-		SED=sed
-		;;
-	esac
-	export SED
-
-	originalDir=`pwd`
-	cd ${haikuTop}
-	export LC_ALL=C
-	if [ -d .svn ]; then
-		revision=`svn info 2>/dev/null | grep Revision | awk '{printf $2}'`
-	elif [ -d .git/svn ]; then
-		revision=`git svn info 2>/dev/null | grep Revision | awk '{printf $2}'`
-	elif [ -d .git ]; then
-		determineGitRevision $haikuTop $haikuBuildOutputDir
-	elif [ -d .hg ]; then
-		# Try searching hg log for last svn commit
-		# Extract from "(svn r12345) ..." line
-		revision=`(cd ${haikuTop} &&
-			hg log --no-merges --template "{desc|firstline}\n") 2> /dev/null |
-			grep --max-count=1 "(svn r" |
-			$SED -n -e 's,(svn r\(.*\)).*,\1,p'`
-	fi
+# only determine the haiku-revision if anything has changed from
+# last build
+if [ -z "$revision" -o "$lastBuiltRevision" != "$localRev" ]; then
+	# the revision we use is the description of HEAD with respect to the
+	# last reachable hrev-(haiku-revision-)tag
+	revision=`git describe --dirty --tags --match=hrev*`
 	if [ -z "$revision" ]; then
-		revision=0
+		# failed to find any hrev tags, use short hash instead
+		revision=`git rev-parse --short HEAD`
+	elif echo "$revision" | grep -- '-' >/dev/null; then
+		# HEAD is not directly a changeset from Haiku's central repo, so we
+		# add the current branch name as additional info
+		branchName=`git branch | grep '*' | cut -b 3-`
+		revision="$revision [$branchName]"
 	fi
-	echo $revision >${haikuBuildOutputDir}/haiku-revision
-	cd $originalDir
-}
+fi
+
+cd $originalDir
+
+if [ -z "$revision" ]; then
+	revision=0
+fi
+
+echo $localRev >${lastBuiltRevisionFile}
+echo $revision >${revisionFile}

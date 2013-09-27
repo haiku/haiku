@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix glibc arch m68k ;
 
-SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc arch m68k ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
 	$(TARGET_ARCH) ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
@@ -126,44 +126,53 @@ local genericSources =
 	# no asm for m68k in glibc
 	strlen.c
 	w_sqrt.c w_sqrtf.c # w_sqrtl.c
-;
+	;
 
-MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
-	$(genericSources)
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup m68k ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o :
+			$(genericSources)
+			;
 
-	add_n.S
-	addmul_1.S
-	doasin.c
-	feholdexcpt.c fraiseexcpt.c fesetenv.c fesetround.c ftestexcept.c
-#	ldbl2mpn.c
-	lshift.S rshift.S
-	mul_1.S
-#	strlen.S
-	sub_n.S
-	submul_1.S
+		MergeObject <$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_other.o :
 
-	e_acos.c e_acosf.c # e_acosl.c
-	e_asin.c e_asinf.c # e_asinl.c
-	e_sqrt.c e_sqrtf.c # e_sqrtl.c
-#	s_fdim.c s_fdimf.c # s_fdiml.S
-#	s_fabs.S s_fabsf.S # s_fabsl.S
-	# s_fpclassifyl.c
-#	s_isnan.c s_isnanf.S
-	s_nearbyint.c s_nearbyintf.c # s_nearbyintl.c
-	s_remquo.c s_remquof.c # s_remquol.c
-	s_rint.c s_rintf.c # s_rintl.c
-	s_scalbln.c s_scalblnf.c # s_scalblnl.c
-#	t_sqrt.c
-#	w_sqrt.c w_sqrtf.c # w_sqrtl.c
-;
-	
-MergeObjectFromObjects posix_gnu_arch_$(TARGET_ARCH).o : :
-	posix_gnu_arch_$(TARGET_ARCH)_generic.o
-	posix_gnu_arch_$(TARGET_ARCH)_other.o
-;
+			add_n.S
+			addmul_1.S
+			doasin.c
+			feholdexcpt.c fraiseexcpt.c fesetenv.c fesetround.c ftestexcept.c
+#			ldbl2mpn.c
+			lshift.S rshift.S
+			mul_1.S
+#			strlen.S
+			sub_n.S
+			submul_1.S
 
-SEARCH on [ FGristFiles $(genericSources) ]
-	= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch generic ] ;
+			e_acos.c e_acosf.c # e_acosl.c
+			e_asin.c e_asinf.c # e_asinl.c
+			e_sqrt.c e_sqrtf.c # e_sqrtl.c
+#			s_fdim.c s_fdimf.c # s_fdiml.S
+#			s_fabs.S s_fabsf.S # s_fabsl.S
+			# s_fpclassifyl.c
+#			s_isnan.c s_isnanf.S
+			s_nearbyint.c s_nearbyintf.c # s_nearbyintl.c
+			s_remquo.c s_remquof.c # s_remquol.c
+			s_rint.c s_rintf.c # s_rintl.c
+			s_scalbln.c s_scalblnf.c # s_scalblnl.c
+#			t_sqrt.c
+#			w_sqrt.c w_sqrtf.c # w_sqrtl.c
+			;
+
+		MergeObjectFromObjects <$(architecture)>posix_gnu_arch_$(TARGET_ARCH).o
+			: :
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_generic.o
+			<$(architecture)>posix_gnu_arch_$(TARGET_ARCH)_other.o
+			;
+
+		SEARCH on [ FGristFiles $(genericSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix glibc arch
+				generic ] ;
+	}
+}

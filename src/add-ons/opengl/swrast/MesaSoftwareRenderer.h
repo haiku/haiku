@@ -44,6 +44,7 @@ public:
 	virtual	void			DirectConnected(direct_buffer_info* info);
 
 private:
+	static	void			_Error(gl_context* ctx);
 	static	const GLubyte*	_GetString(gl_context* ctx, GLenum name);
 			void			_CheckResize(GLuint newWidth, GLuint newHeight);
 	static	void			_UpdateState(gl_context* ctx, GLuint newState);

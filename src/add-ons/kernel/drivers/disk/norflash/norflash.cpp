@@ -145,6 +145,8 @@ nor_read(void *_cookie, off_t position, void *data, size_t *numbytes)
 	nor_driver_info *info = (nor_driver_info*)_cookie;
 	TRACE("read(%Ld,%lu)\n", position, *numbytes);
 
+	position += HIDDEN_BLOCKS * info->blocksize;
+
 	if (position + *numbytes > info->totalsize)
 		*numbytes = info->totalsize - (position + *numbytes);
 

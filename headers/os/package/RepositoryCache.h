@@ -37,7 +37,6 @@ public:
 
 private:
 			struct RepositoryContentHandler;
-			struct StandardErrorOutput;
 
 private:
 			BEntry				fEntry;

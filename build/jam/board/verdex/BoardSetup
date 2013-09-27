@@ -79,7 +79,6 @@ TARGET_ASFLAGS += -mcpu=xscale -D__XSCALE__ ;
 HAIKU_KERNEL_LINKFLAGS +=
 	-Wl,-z -Wl,max-page-size=0x1000
 	-Wl,-z -Wl,common-page-size=0x1000 ;
-HAIKU_LINKFLAGS +=
+HAIKU_LINKFLAGS_$(HAIKU_PACKAGING_ARCH) +=
 	-Wl,-z -Wl,max-page-size=0x1000
 	-Wl,-z -Wl,common-page-size=0x1000 ;
-

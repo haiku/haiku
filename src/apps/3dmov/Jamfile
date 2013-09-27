@@ -1,10 +1,10 @@
 SubDir HAIKU_TOP src apps 3dmov ;
-SubDirSysHdrs $(HAIKU_MESA_HEADERS) ;
+UseBuildFeatureHeaders mesa ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # For GCC2
-if $(HAIKU_GCC_VERSION[1]) < 3 {
+if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) < 3 {
 	SubDirC++Flags --no-warnings ;
 }
 
@@ -19,11 +19,11 @@ local sources =
 	GLUtility.cpp
     ;
 
-Includes [ FGristFiles $(sources) ] : $(HAIKU_MESA_HEADERS_DEPENDENCY) ;
+Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
 Application 3DMov :
 	$(sources)
-	: be GL game $(HAIKU_LOCALE_LIBS) media translation $(TARGET_LIBSUPC++)
+	: be GL game localestub media translation $(TARGET_LIBSUPC++)
 	: 3dmov.rdef
 ;
 

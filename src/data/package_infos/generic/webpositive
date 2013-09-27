@@ -1,0 +1,20 @@
+name			webpositive%HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%
+version			R1~alpha4_pm-1
+architecture	HAIKU_PACKAGING_ARCH
+summary			"A WebKit based web browser for Haiku"
+
+description		"A WebKit based web browser for Haiku."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2013 Haiku, Inc. et al"
+licenses		"MIT"
+
+provides {
+	webpositive%HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX% = R1~alpha4_pm-1
+}
+
+requires {
+	haikuwebkit%HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%
+}

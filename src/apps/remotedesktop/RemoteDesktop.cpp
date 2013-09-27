@@ -104,7 +104,7 @@ main(int argc, char *argv[])
 		char shellCommand[4096];
 		snprintf(shellCommand, sizeof(shellCommand),
 			"echo connected; export TARGET_SCREEN=localhost:%lu; %s\n",
-			listenPort, command);
+			listenPort, terminalPath.Path());
 
 		int pipes[4];
 		if (pipe(&pipes[0]) != 0 || pipe(&pipes[2]) != 0) {

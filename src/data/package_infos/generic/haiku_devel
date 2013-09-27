@@ -1,0 +1,22 @@
+name			haiku_devel
+version			R1~alpha4_pm-1
+architecture	%HAIKU_PACKAGING_ARCH%
+summary			"The Haiku base system development files"
+
+description		"The package contains all files associated with the base system
+needed for development, like static libraries, glue code, library symlinks,
+header files, etc."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2013 Haiku, Inc. et al"
+licenses		"MIT"
+
+provides {
+	haiku_devel = R1~alpha4_pm-1 compat >= R1~alpha1
+}
+
+requires {
+	haiku == R1~alpha4_pm-1 base
+}

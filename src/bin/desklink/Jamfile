@@ -12,7 +12,7 @@ BinCommand desklink :
 	VolumeControl.cpp
 	VolumeWindow.cpp
 
-	: be libmedia.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be libmedia.so localestub $(TARGET_LIBSUPC++)
 	: desklink.rdef
 ;
 

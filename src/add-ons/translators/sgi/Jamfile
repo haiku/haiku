@@ -11,7 +11,7 @@ Translator SGITranslator :
 	SGIMain.cpp
 	SGITranslator.cpp
 	SGIView.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) localestub
 	: true
 ;
 
@@ -22,8 +22,3 @@ DoCatalogs SGITranslator :
 	SGITranslator.cpp
 	SGIView.cpp
 ;
-
-Package haiku-translationkit-cvs :
-	SGITranslator :
-	boot home config add-ons Translators ;
-

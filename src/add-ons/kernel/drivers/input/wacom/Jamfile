@@ -7,10 +7,3 @@ SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
 KernelAddon wacom :
 	wacom.c
 ;
-
-Package haiku-inputkit-cvs :
-		wacpm :
-		boot home config add-ons kernel drivers bin ;
-
-PackageDriverSymLink haiku-inputkit-cvs : input wacom ;
-

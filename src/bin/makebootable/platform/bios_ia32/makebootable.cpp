@@ -43,7 +43,7 @@
 #	define USE_PARTITION_MAP 1
 #endif
 
-#ifdef __HAIKU__
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #	include <image.h>
 
 #	include <DiskDevice.h>
@@ -197,7 +197,7 @@ write_boot_code_part(const char *fileName, int fd, off_t imageOffset,
 }
 
 
-#ifdef __HAIKU__
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
 static status_t
 find_own_image(image_info *info)
@@ -297,7 +297,7 @@ main(int argc, const char *const *argv)
 
 	// read the boot code
 	uint8 *bootCodeData = NULL;
-#ifndef __HAIKU__
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	bootCodeData = read_boot_code_data(argv[0]);
 #else
 	image_info info;
@@ -334,7 +334,7 @@ main(int argc, const char *const *argv)
 		int64 partitionOffset = 0;
 		fs_info info;	// needs to be here (we use the device name later)
 		if (S_ISDIR(st.st_mode)) {
-			#if defined(__BEOS__) || defined(__HAIKU__)
+			#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
 				// a directory: get the device
 				error = fs_stat_dev(st.st_dev, &info);
@@ -361,7 +361,8 @@ main(int argc, const char *const *argv)
 		} else if (S_ISCHR(st.st_mode)) {
 			// character special: a device or partition under BeOS
 			// or under FreeBSD
-			#if !(defined(__BEOS__) || defined(__HAIKU__)) && !defined(HAIKU_HOST_PLATFORM_FREEBSD)
+			#if !defined(HAIKU_TARGET_PLATFORM_HAIKU) \
+				&& !defined(HAIKU_HOST_PLATFORM_FREEBSD)
 
 				fprintf(stderr, "Error: Character special devices not "
 					"supported on this platform.\n");
@@ -612,11 +613,11 @@ main(int argc, const char *const *argv)
 				partitionOffset = partition->Offset();
 			#else
 			// partitions are block devices under Haiku, but not under BeOS
-			#ifndef __HAIKU__
+			#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 				fprintf(stderr, "Error: Block devices not supported on this "
 					"platform!\n");
 				exit(1);
-			#endif	// __HAIKU__
+			#endif	// HAIKU_TARGET_PLATFORM_HAIKU
 
 			#endif
 		} else {
@@ -633,7 +634,7 @@ main(int argc, const char *const *argv)
 			exit(1);
 		}
 
-		#if (defined(__BEOS__) || defined(__HAIKU__))
+		#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 
 			// get a partition info
 			if (!noPartition
@@ -668,7 +669,7 @@ main(int argc, const char *const *argv)
 			kSecondBootCodePartOffset, kSecondBootCodePartSize,
 			dryRun);
 
-#ifdef __HAIKU__
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		// check if this partition is mounted
 		BDiskDeviceRoster roster;
 		BPartition* partition;
@@ -703,7 +704,7 @@ main(int argc, const char *const *argv)
 					"partition is mounted!\n");
 			}
 		}
-#endif	// __HAIKU__
+#endif	// HAIKU_TARGET_PLATFORM_HAIKU
 
 		close(fd);
 	}

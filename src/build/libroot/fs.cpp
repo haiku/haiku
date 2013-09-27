@@ -207,7 +207,7 @@ find_dir_entry(DIR *dir, const char *path, NodeRef ref, string &name,
 	// find the entry
 	bool found = false;
 	while (dirent *entry = readdir(dir)) {
-		if ((!skipDot && strcmp(entry->d_name, ".") == 0)
+		if ((strcmp(entry->d_name, ".") == 0 && skipDot)
 			|| strcmp(entry->d_name, "..") == 0) {
 			// skip "." and ".."
 		} else /*if (entry->d_ino == ref.node)*/ {
@@ -252,6 +252,37 @@ find_dir_entry(const char *path, NodeRef ref, string &name, bool skipDot)
 	return error;
 }
 
+
+static bool
+guess_normalized_dir_path(string path, NodeRef ref, string& _normalizedPath)
+{
+	// We assume the CWD is normalized and hope that the directory is an
+	// ancestor of it. We just chop off path components until we find a match or
+	// hit root.
+	char cwd[B_PATH_NAME_LENGTH];
+	if (getcwd(cwd, sizeof(cwd)) == NULL)
+		return false;
+
+	while (cwd[0] == '/') {
+		struct stat st;
+		if (stat(cwd, &st) == 0) {
+			if (st.st_dev == ref.device && st.st_ino == ref.node) {
+				_normalizedPath = cwd;
+				return true;
+			}
+		}
+
+		*strrchr(cwd, '/') = '\0';
+	}
+
+	// TODO: If path is absolute, we could also try to work with that, though
+	// the other way around -- trying prefixes until we hit a "." or ".."
+	// component.
+
+	return false;
+}
+
+
 // normalize_dir_path
 static status_t
 normalize_dir_path(string path, NodeRef ref, string &normalizedPath)
@@ -274,8 +305,19 @@ normalize_dir_path(string path, NodeRef ref, string &normalizedPath)
 	// find the entry
 	string name;
 	status_t error = find_dir_entry(path.c_str(), ref, name, true)				;
-	if (error != B_OK)
+	if (error != B_OK) {
+		if (error != B_ENTRY_NOT_FOUND) {
+			// We couldn't open the directory. This might be because we don't
+			// have read permission. We're OK with not fully normalizing the
+			// path and try to guess the path in this case. Note: We don't check
+			// error for B_PERMISSION_DENIED, since opendir() may clobber the
+			// actual kernel error code with something not helpful.
+			if (guess_normalized_dir_path(path, ref, normalizedPath))
+				return B_OK;
+		}
+
 		return error;
+	}
 
 	// recurse to get the parent dir path, if found
 	error = normalize_dir_path(path, parentRef, normalizedPath);
@@ -410,6 +452,18 @@ BPrivate::get_path(int fd, const char *name, string &path)
 		Descriptor *descriptor = get_descriptor(fd);
 		if (!descriptor)
 			return B_FILE_ERROR;
+
+		// Handle symlink descriptors here explicitly, so this function can be
+		// used more flexibly.
+		if (SymlinkDescriptor* symlinkDescriptor
+				= dynamic_cast<SymlinkDescriptor*>(descriptor)) {
+			path = symlinkDescriptor->path;
+			if (name == NULL)
+				return B_OK;
+			path += '/';
+			path += name;
+			return B_OK;
+		}
 
 		// get node ref for the descriptor
 		NodeRef ref;
@@ -609,6 +663,7 @@ _kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize,
 
 	// get the next entry
 	dirent *entry;
+	errno = 0;
 	if (dynamic_cast<AttrDirDescriptor*>(descriptor))
 		entry = fs_read_attr_dir(descriptor->dir);
 	else

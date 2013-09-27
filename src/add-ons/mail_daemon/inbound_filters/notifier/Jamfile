@@ -11,7 +11,7 @@ Addon NewMailNotification :
 	filter.cpp
 	ConfigView.cpp
 	:
-	be libmail.so $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	be libmail.so localestub $(TARGET_LIBSUPC++)
 	;
 
 DoCatalogs NewMailNotification :

@@ -6,16 +6,20 @@
 #define _PACKAGE__PACKAGE_INFO_H_
 
 
+#include <Archivable.h>
 #include <ObjectList.h>
 #include <String.h>
 #include <StringList.h>
 
+#include <package/GlobalWritableFileInfo.h>
 #include <package/PackageArchitecture.h>
 #include <package/PackageFlags.h>
 #include <package/PackageInfoAttributes.h>
 #include <package/PackageResolvable.h>
 #include <package/PackageResolvableExpression.h>
 #include <package/PackageVersion.h>
+#include <package/User.h>
+#include <package/UserSettingsFileInfo.h>
 
 
 class BEntry;
@@ -28,11 +32,10 @@ namespace BPackageKit {
 /*
  * Keeps a list of package info elements (e.g. name, version, vendor, ...) which
  * will be converted to package attributes when creating a package. Usually,
- * these elements have been parsed from a ".PackageInfo"-file.
- * Alternatively, the package reader populates a BPackageInfo object by
- * collecting package attributes from an existing package.
+ * these elements have been parsed from a ".PackageInfo" file.
+ * Alternatively, they can be read from an existing package file.
  */
-class BPackageInfo {
+class BPackageInfo : public BArchivable {
 public:
 			struct ParseErrorListener {
 				virtual	~ParseErrorListener();
@@ -41,7 +44,9 @@ public:
 
 public:
 								BPackageInfo();
-								~BPackageInfo();
+								BPackageInfo(BMessage* archive,
+									status_t* _error = NULL);
+	virtual						~BPackageInfo();
 
 			status_t			ReadFromConfigFile(
 									const BEntry& packageInfoEntry,
@@ -52,6 +57,8 @@ public:
 			status_t			ReadFromConfigString(
 									const BString& packageInfoString,
 									ParseErrorListener* listener = NULL);
+			status_t			ReadFromPackageFile(const char* path);
+			status_t			ReadFromPackageFile(int fd);
 
 			status_t			InitCheck() const;
 
@@ -60,8 +67,12 @@ public:
 			const BString&		Description() const;
 			const BString&		Vendor() const;
 			const BString&		Packager() const;
+			const BString&		BasePackage() const;
 			const BString&		Checksum() const;
 			const BString&		InstallPath() const;
+			BString				FileName() const;
+									// the explicitly set file name, if any, or
+									// CanonicalFileName() otherwise
 
 			uint32				Flags() const;
 
@@ -74,6 +85,16 @@ public:
 			const BStringList&	URLList() const;
 			const BStringList&	SourceURLList() const;
 
+			const BObjectList<BGlobalWritableFileInfo>&
+									GlobalWritableFileInfos() const;
+			const BObjectList<BUserSettingsFileInfo>&
+									UserSettingsFileInfos() const;
+
+			const BObjectList<BUser>& Users() const;
+			const BStringList&	Groups() const;
+
+			const BStringList&	PostInstallScripts() const;
+
 			const BObjectList<BPackageResolvable>&	ProvidesList() const;
 			const BObjectList<BPackageResolvableExpression>&
 								RequiresList() const;
@@ -85,13 +106,20 @@ public:
 								FreshensList() const;
 			const BStringList&	ReplacesList() const;
 
+			BString				CanonicalFileName() const;
+
+			bool				Matches(const BPackageResolvableExpression&
+									expression) const;
+
 			void				SetName(const BString& name);
 			void				SetSummary(const BString& summary);
 			void				SetDescription(const BString& description);
 			void				SetVendor(const BString& vendor);
 			void				SetPackager(const BString& packager);
+			void				SetBasePackage(const BString& basePackage);
 			void				SetChecksum(const BString& checksum);
 			void				SetInstallPath(const BString& installPath);
+			void				SetFileName(const BString& fileName);
 
 			void				SetFlags(uint32 flags);
 
@@ -111,6 +139,23 @@ public:
 
 			void				ClearSourceURLList();
 			status_t			AddSourceURL(const BString& url);
+
+			void				ClearGlobalWritableFileInfos();
+			status_t			AddGlobalWritableFileInfo(
+									const BGlobalWritableFileInfo& info);
+
+			void				ClearUserSettingsFileInfos();
+			status_t			AddUserSettingsFileInfo(
+									const BUserSettingsFileInfo& info);
+
+			void				ClearUsers();
+			status_t			AddUser(const BUser& user);
+
+			void				ClearGroups();
+			status_t			AddGroup(const BString& group);
+
+			void				ClearPostInstallScripts();
+			status_t			AddPostInstallScript(const BString& path);
 
 			void				ClearProvidesList();
 			status_t			AddProvides(const BPackageResolvable& provides);
@@ -136,16 +181,89 @@ public:
 
 			void				Clear();
 
+	virtual	status_t 			Archive(BMessage* archive,
+									bool deep = true) const;
+	static 	BArchivable*		Instantiate(BMessage* archive);
+
+			status_t			GetConfigString(BString& _string) const;
+			BString				ToString() const;
+
 public:
 	static	status_t			GetArchitectureByName(const BString& name,
 									BPackageArchitecture& _architecture);
 
-	static	const char*			kElementNames[];
-	static	const char*			kArchitectureNames[];
+	static	status_t			ParseVersionString(const BString& string,
+									bool revisionIsOptional,
+									BPackageVersion& _version,
+									ParseErrorListener* listener = NULL);
+
+public:
+	static	const char*	const	kElementNames[];
+	static	const char*	const	kArchitectureNames[];
+	static	const char* const	kWritableFileUpdateTypes[];
 
 private:
 			class Parser;
 			friend class Parser;
+			struct StringBuilder;
+			struct FieldName;
+			struct PackageFileLocation;
+
+			typedef BObjectList<BPackageResolvable> ResolvableList;
+			typedef BObjectList<BPackageResolvableExpression>
+				ResolvableExpressionList;
+
+			typedef BObjectList<BGlobalWritableFileInfo>
+				GlobalWritableFileInfoList;
+			typedef BObjectList<BUserSettingsFileInfo>
+				UserSettingsFileInfoList;
+
+			typedef BObjectList<BUser> UserList;
+
+private:
+			status_t			_ReadFromPackageFile(
+									const PackageFileLocation& fileLocation);
+
+	static	status_t			_AddVersion(BMessage* archive,
+									const char* field,
+									const BPackageVersion& version);
+	static	status_t			_AddResolvables(BMessage* archive,
+									const char* field,
+									const ResolvableList& resolvables);
+	static	status_t			_AddResolvableExpressions(BMessage* archive,
+									const char* field,
+									const ResolvableExpressionList&
+										expressions);
+	static	status_t			_AddGlobalWritableFileInfos(BMessage* archive,
+									const char* field,
+									const GlobalWritableFileInfoList&
+										infos);
+	static	status_t			_AddUserSettingsFileInfos(BMessage* archive,
+									const char* field,
+									const UserSettingsFileInfoList&
+										infos);
+	static	status_t			_AddUsers(BMessage* archive, const char* field,
+									const UserList& users);
+
+	static	status_t			_ExtractVersion(BMessage* archive,
+									const char* field, int32 index,
+									BPackageVersion& _version);
+	static	status_t			_ExtractStringList(BMessage* archive,
+									const char* field, BStringList& _list);
+	static	status_t			_ExtractResolvables(BMessage* archive,
+									const char* field,
+									ResolvableList& _resolvables);
+	static	status_t			_ExtractResolvableExpressions(BMessage* archive,
+									const char* field,
+									ResolvableExpressionList& _expressions);
+	static	status_t			_ExtractGlobalWritableFileInfos(
+									BMessage* archive, const char* field,
+									GlobalWritableFileInfoList& _infos);
+	static	status_t			_ExtractUserSettingsFileInfos(
+									BMessage* archive, const char* field,
+									UserSettingsFileInfoList& _infos);
+	static	status_t			_ExtractUsers(BMessage* archive,
+									const char* field, UserList& _users);
 
 private:
 			BString				fName;
@@ -153,10 +271,11 @@ private:
 			BString				fDescription;
 			BString				fVendor;
 			BString				fPackager;
+			BString				fBasePackage;
 
 			uint32				fFlags;
 
-			BPackageArchitecture	fArchitecture;
+			BPackageArchitecture fArchitecture;
 
 			BPackageVersion		fVersion;
 
@@ -165,19 +284,26 @@ private:
 			BStringList			fURLList;
 			BStringList			fSourceURLList;
 
-			BObjectList<BPackageResolvable>	fProvidesList;
+			BObjectList<BGlobalWritableFileInfo> fGlobalWritableFileInfos;
+			BObjectList<BUserSettingsFileInfo> fUserSettingsFileInfos;
 
-			BObjectList<BPackageResolvableExpression>	fRequiresList;
-			BObjectList<BPackageResolvableExpression>	fSupplementsList;
+			UserList			fUsers;
+			BStringList			fGroups;
 
-			BObjectList<BPackageResolvableExpression>	fConflictsList;
+			BStringList			fPostInstallScripts;
 
-			BObjectList<BPackageResolvableExpression>	fFreshensList;
+			ResolvableList		fProvidesList;
+
+			ResolvableExpressionList fRequiresList;
+			ResolvableExpressionList fSupplementsList;
+			ResolvableExpressionList fConflictsList;
+			ResolvableExpressionList fFreshensList;
 
 			BStringList			fReplacesList;
 
 			BString				fChecksum;
 			BString				fInstallPath;
+			BString				fFileName;
 };
 
 

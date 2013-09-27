@@ -8,7 +8,7 @@ UsePrivateHeaders shared ;
 
 Application Magnify : 
 	Magnify.cpp 
-	: be game $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) tracker
+	: be game localestub $(TARGET_LIBSUPC++) tracker
 	: Magnify.rdef
 ;
 

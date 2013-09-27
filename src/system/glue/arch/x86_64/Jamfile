@@ -1,7 +1,13 @@
 SubDir HAIKU_TOP src system glue arch x86_64 ;
 
-KernelObjects
-	crti.S
-	crtn.S
-	;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
+	on $(architectureObject) {
+		UsePrivateSystemHeaders ;
 
+		Objects
+			crti.S
+			crtn.S
+			;
+	}
+}

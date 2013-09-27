@@ -26,8 +26,12 @@ class Node : public DoublyLinkedListLinkImpl<Node> {
 		virtual status_t Open(void **_cookie, int mode);
 		virtual status_t Close(void *cookie);
 
-		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize) = 0;
-		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize) = 0;
+		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
+			size_t bufferSize) = 0;
+		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
+			size_t bufferSize) = 0;
+
+		virtual status_t ReadLink(char* buffer, size_t bufferSize);
 
 		virtual status_t GetName(char *nameBuffer, size_t bufferSize) const;
 		virtual status_t GetFileMap(struct file_map_run *runs, int32 *count);
@@ -55,7 +59,8 @@ class Directory : public Node {
 
 		virtual int32 Type() const;
 
-		virtual Node *Lookup(const char *name, bool traverseLinks) = 0;
+		virtual Node* Lookup(const char* name, bool traverseLinks);
+		virtual Node* LookupDontTraverse(const char* name) = 0;
 
 		virtual status_t GetNextEntry(void *cookie, char *nameBuffer, size_t bufferSize) = 0;
 		virtual status_t GetNextNode(void *cookie, Node **_node) = 0;
@@ -99,11 +104,41 @@ class MemoryDisk : public Node {
 };
 
 
+class BootVolume {
+public:
+								BootVolume();
+								~BootVolume();
+
+		status_t				SetTo(Directory* rootDirectory);
+		void					Unset();
+
+		bool					IsValid() const
+									{ return fRootDirectory != NULL; }
+
+		Directory*				RootDirectory() const
+									{ return fRootDirectory; }
+		Directory*				SystemDirectory() const
+									{ return fSystemDirectory; }
+		bool					IsPackaged() const
+									{ return fPackaged; }
+
+private:
+			Directory*			fRootDirectory;
+				// root directory of the volume
+			Directory*			fSystemDirectory;
+				// "system" directory of the volume; if packaged the root
+				// directory of the mounted packagefs
+			bool				fPackaged;
+				// indicates whether the boot volume's system is packaged
+};
+
+
 /* function prototypes */
 
 extern status_t vfs_init(stage2_args *args);
-extern status_t register_boot_file_system(Directory *directory);
-extern Directory *get_boot_file_system(stage2_args *args);
+extern status_t register_boot_file_system(BootVolume& bootVolume);
+extern status_t get_boot_file_system(stage2_args* args,
+			BootVolume& _bootVolume);
 extern status_t mount_file_systems(stage2_args *args);
 extern int open_node(Node *node, int mode);
 extern int open_from(Directory *directory, const char *path, int mode,

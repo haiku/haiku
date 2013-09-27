@@ -1,9 +1,10 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Oliver Tappe <zooey@hirschkaefer.de>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 
 
@@ -22,8 +23,11 @@
 #include <package/hpkg/PackageInfoAttributeValue.h>
 #include <package/hpkg/RepositoryContentHandler.h>
 #include <package/hpkg/RepositoryReader.h>
+#include <package/hpkg/StandardErrorOutput.h>
 #include <package/PackageInfo.h>
 #include <package/RepositoryInfo.h>
+
+#include <package/PackageInfoContentHandler.h>
 
 
 namespace BPackageKit {
@@ -36,136 +40,45 @@ using namespace BHPKG;
 
 
 struct BRepositoryCache::RepositoryContentHandler : BRepositoryContentHandler {
-	RepositoryContentHandler(BRepositoryInfo* repositoryInfo,
-		BPackageInfoSet& packages)
+	RepositoryContentHandler(BRepositoryInfo& repositoryInfo,
+		BPackageInfoSet& packages, BErrorOutput* errorOutput)
 		:
 		fRepositoryInfo(repositoryInfo),
-		fPackages(packages)
+		fPackageInfo(),
+		fPackages(packages),
+		fPackageInfoContentHandler(fPackageInfo, errorOutput)
 	{
 	}
 
-	virtual status_t HandleEntry(BPackageEntry* entry)
+	virtual status_t HandlePackage(const char* packageName)
 	{
+		fPackageInfo.Clear();
 		return B_OK;
 	}
 
-	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
-		BPackageEntryAttribute* attribute)
-	{
-		return B_OK;
-	}
-
-	virtual status_t HandleEntryDone(BPackageEntry* entry)
-	{
-		return B_OK;
-	}
 
 	virtual status_t HandlePackageAttribute(
 		const BPackageInfoAttributeValue& value)
 	{
-		switch (value.attributeID) {
-			case B_PACKAGE_INFO_NAME:
-				fPackageInfo.SetName(value.string);
-				break;
+		return fPackageInfoContentHandler.HandlePackageAttribute(value);
+	}
 
-			case B_PACKAGE_INFO_SUMMARY:
-				fPackageInfo.SetSummary(value.string);
-				break;
+	virtual status_t HandlePackageDone(const char* packageName)
+	{
+		status_t result = fPackageInfo.InitCheck();
+		if (result != B_OK)
+			return result;
 
-			case B_PACKAGE_INFO_DESCRIPTION:
-				fPackageInfo.SetDescription(value.string);
-				break;
-
-			case B_PACKAGE_INFO_VENDOR:
-				fPackageInfo.SetVendor(value.string);
-				break;
-
-			case B_PACKAGE_INFO_PACKAGER:
-				fPackageInfo.SetPackager(value.string);
-				break;
-
-			case B_PACKAGE_INFO_FLAGS:
-				fPackageInfo.SetFlags(value.unsignedInt);
-				break;
-
-			case B_PACKAGE_INFO_ARCHITECTURE:
-				fPackageInfo.SetArchitecture(
-					(BPackageArchitecture)value.unsignedInt);
-				break;
-
-			case B_PACKAGE_INFO_VERSION:
-				fPackageInfo.SetVersion(value.version);
-				break;
-
-			case B_PACKAGE_INFO_COPYRIGHTS:
-				fPackageInfo.AddCopyright(value.string);
-				break;
-
-			case B_PACKAGE_INFO_LICENSES:
-				fPackageInfo.AddLicense(value.string);
-				break;
-
-			case B_PACKAGE_INFO_PROVIDES:
-				fPackageInfo.AddProvides(value.resolvable);
-				break;
-
-			case B_PACKAGE_INFO_REQUIRES:
-				fPackageInfo.AddRequires(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_SUPPLEMENTS:
-				fPackageInfo.AddSupplements(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_CONFLICTS:
-				fPackageInfo.AddConflicts(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_FRESHENS:
-				fPackageInfo.AddFreshens(value.resolvableExpression);
-				break;
-
-			case B_PACKAGE_INFO_REPLACES:
-				fPackageInfo.AddReplaces(value.string);
-				break;
-
-			case B_PACKAGE_INFO_URLS:
-				fPackageInfo.AddURL(value.string);
-				break;
-
-			case B_PACKAGE_INFO_SOURCE_URLS:
-				fPackageInfo.AddSourceURL(value.string);
-				break;
-
-			case B_PACKAGE_INFO_INSTALL_PATH:
-				fPackageInfo.SetInstallPath(value.string);
-				break;
-
-			case B_PACKAGE_INFO_CHECKSUM:
-			{
-				fPackageInfo.SetChecksum(value.string);
-				status_t result = fPackageInfo.InitCheck();
-				if (result != B_OK)
-					return result;
-
-				result = fPackages.AddInfo(fPackageInfo);
-				if (result != B_OK)
-					return result;
-
-				fPackageInfo.Clear();
-				break;
-			}
-
-			default:
-				return B_BAD_DATA;
-		}
+		result = fPackages.AddInfo(fPackageInfo);
+		if (result != B_OK)
+			return result;
 
 		return B_OK;
 	}
 
 	virtual status_t HandleRepositoryInfo(const BRepositoryInfo& repositoryInfo)
 	{
-		*fRepositoryInfo = repositoryInfo;
+		fRepositoryInfo = repositoryInfo;
 
 		return B_OK;
 	}
@@ -175,20 +88,10 @@ struct BRepositoryCache::RepositoryContentHandler : BRepositoryContentHandler {
 	}
 
 private:
-	BRepositoryInfo*	fRepositoryInfo;
-	BPackageInfo		fPackageInfo;
-	BPackageInfoSet&	fPackages;
-};
-
-
-// #pragma mark - StandardErrorOutput
-
-
-class BRepositoryCache::StandardErrorOutput : public BErrorOutput {
-	virtual	void PrintErrorVarArgs(const char* format, va_list args)
-	{
-		vfprintf(stderr, format, args);
-	}
+	BRepositoryInfo&			fRepositoryInfo;
+	BPackageInfo				fPackageInfo;
+	BPackageInfoSet&			fPackages;
+	BPackageInfoContentHandler	fPackageInfoContentHandler;
 };
 
 
@@ -243,25 +146,21 @@ BRepositoryCache::SetTo(const BEntry& entry)
 	fPackages.MakeEmpty();
 	fEntry.Unset();
 
-	// init package info set
-	status_t result = fPackages.Init();
-	if (result != B_OK)
-		return result;
-
 	// get cache file path
 	fEntry = entry;
 
 	BPath repositoryCachePath;
+	status_t result;
 	if ((result = entry.GetPath(&repositoryCachePath)) != B_OK)
 		return result;
 
 	// read repository cache
-	StandardErrorOutput errorOutput;
+	BStandardErrorOutput errorOutput;
 	BRepositoryReader repositoryReader(&errorOutput);
 	if ((result = repositoryReader.Init(repositoryCachePath.Path())) != B_OK)
 		return result;
 
-	RepositoryContentHandler handler(&fInfo, fPackages);
+	RepositoryContentHandler handler(fInfo, fPackages, &errorOutput);
 	if ((result = repositoryReader.ParseContent(&handler)) != B_OK)
 		return result;
 

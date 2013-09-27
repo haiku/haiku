@@ -20,10 +20,6 @@ Addon matrox.accelerant :
 	: libmatrox_engine.a
 ;
 
-Package haiku-matrox-cvs :
-	matrox.accelerant :
-	boot home config add-ons accelerants ;
-
 Depends matrox.accelerant : matrox ;
 
 SubInclude HAIKU_TOP src add-ons accelerants matrox engine ;

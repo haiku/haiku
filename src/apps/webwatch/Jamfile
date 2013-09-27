@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 Application WebWatch :
 	WatchApp.cpp
 	WatchView.cpp
-	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
+	: be localestub $(TARGET_LIBSUPC++)
 	: WebWatch.rdef
 ;
 

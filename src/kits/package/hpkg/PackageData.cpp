@@ -21,10 +21,7 @@ using namespace BPrivate;
 
 BPackageData::BPackageData()
 	:
-	fCompressedSize(0),
-	fUncompressedSize(0),
-	fChunkSize(0),
-	fCompression(B_HPKG_COMPRESSION_NONE),
+	fSize(0),
 	fEncodedInline(true)
 {
 }
@@ -33,7 +30,7 @@ BPackageData::BPackageData()
 void
 BPackageData::SetData(uint64 size, uint64 offset)
 {
-	fUncompressedSize = fCompressedSize = size;
+	fSize = size;
 	fOffset = offset;
 	fEncodedInline = false;
 }
@@ -42,7 +39,7 @@ BPackageData::SetData(uint64 size, uint64 offset)
 void
 BPackageData::SetData(uint8 size, const void* data)
 {
-	fUncompressedSize = fCompressedSize = size;
+	fSize = size;
 	if (size > 0)
 		memcpy(fInlineData, data, size);
 	fEncodedInline = true;

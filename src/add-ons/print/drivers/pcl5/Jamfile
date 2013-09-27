@@ -12,7 +12,3 @@ Addon PCL5\ Compatible :
 	PCL5Cap.cpp
 	: be libprint.a $(TARGET_LIBSTDC++)
 ;
-
-Package haiku-printingkit-cvs :
-	PCL5\ Compatible :
-	boot home config add-ons Print ;

@@ -4684,7 +4684,7 @@ vfs_get_vnode_name(struct vnode* vnode, char* name, size_t nameSize)
 
 status_t
 vfs_entry_ref_to_path(dev_t device, ino_t inode, const char* leaf,
-	char* path, size_t pathLength)
+	bool kernel, char* path, size_t pathLength)
 {
 	struct vnode* vnode;
 	status_t status;
@@ -4697,7 +4697,7 @@ vfs_entry_ref_to_path(dev_t device, ino_t inode, const char* leaf,
 	if (leaf && (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0)) {
 		// special cases "." and "..": we can directly get the vnode of the
 		// referenced directory
-		status = entry_ref_to_vnode(device, inode, leaf, false, true, &vnode);
+		status = entry_ref_to_vnode(device, inode, leaf, false, kernel, &vnode);
 		leaf = NULL;
 	} else
 		status = get_vnode(device, inode, &vnode, true, false);
@@ -4705,7 +4705,7 @@ vfs_entry_ref_to_path(dev_t device, ino_t inode, const char* leaf,
 		return status;
 
 	// get the directory path
-	status = dir_vnode_to_path(vnode, path, pathLength, true);
+	status = dir_vnode_to_path(vnode, path, pathLength, kernel);
 	put_vnode(vnode);
 		// we don't need the vnode anymore
 	if (status != B_OK)
@@ -8126,6 +8126,9 @@ _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char* name)
 int
 _kern_open_dir(int fd, const char* path)
 {
+	if (path == NULL)
+		return dir_open(fd, NULL, true);;
+
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
@@ -8762,7 +8765,7 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char* leaf,
 	}
 
 	status_t status = vfs_entry_ref_to_path(device, inode, leaf,
-		path.LockBuffer(), path.BufferSize());
+		false, path.LockBuffer(), path.BufferSize());
 	if (status != B_OK)
 		return status;
 

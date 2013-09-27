@@ -5,42 +5,56 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders shared locale ;
-UseHeaders [ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) servers input ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src kits ] ;
 
-# for RWLockManager only
-UsePrivateSystemHeaders ;
-UsePrivateHeaders kernel libroot ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-StaticLibrary libshared.a :
-	AboutMenuItem.cpp
-	AboutWindow.cpp
-	ArgumentVector.cpp
-	CalendarView.cpp
-	ColorQuantizer.cpp
-	CommandPipe.cpp
-	DragTrackingFilter.cpp
-	HashString.cpp
-	IconButton.cpp
-	IconView.cpp
-	Keymap.cpp
-	LongAndDragTrackingFilter.cpp
-	NaturalCompare.cpp
-	PromptWindow.cpp
-	QueryFile.cpp
-	RegExp.cpp
-	RWLockManager.cpp
-	SHA256.cpp
-	ShakeTrackingFilter.cpp
-	StringForRate.cpp
-	StringForSize.cpp
-	Variant.cpp
-;
+		UseHeaders [ FDirName
+			$(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCHS[1]))
+			servers input ] ;
+			# For the generated SystemKeymap.h. We're fine with the one for the
+			# primary architecture.
+		UseHeaders [ FDirName $(HAIKU_TOP) src kits ] ;
 
-Includes [ FGristFiles Keymap.cpp ] : <src!servers!input>SystemKeymap.h ;
+		# for RWLockManager only
+		UsePrivateSystemHeaders ;
+		UsePrivateHeaders kernel libroot ;
+
+		StaticLibrary [ MultiArchDefaultGristFiles libshared.a ] :
+			AboutMenuItem.cpp
+			AboutWindow.cpp
+			ArgumentVector.cpp
+			CalendarView.cpp
+			ColorQuantizer.cpp
+			CommandPipe.cpp
+			DragTrackingFilter.cpp
+			HashString.cpp
+			IconButton.cpp
+			IconView.cpp
+			Keymap.cpp
+			LongAndDragTrackingFilter.cpp
+			NaturalCompare.cpp
+			PromptWindow.cpp
+			QueryFile.cpp
+			RegExp.cpp
+			RWLockManager.cpp
+			SHA256.cpp
+			ShakeTrackingFilter.cpp
+			StringForRate.cpp
+			StringForSize.cpp
+			Variant.cpp
+			;
+
+		Includes [ FGristFiles Keymap.cpp ]
+			: <src!servers!input>SystemKeymap.h ;
+	}
+}
+
 
 UseLibraryHeaders mapm ;
 
 StaticLibrary libexpression_parser.a :
 	ExpressionParser.cpp
-;
+	;

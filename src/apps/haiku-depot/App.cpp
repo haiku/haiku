@@ -78,7 +78,7 @@ App::MessageReceived(BMessage* message)
 			Quit();
 			break;
 		}
-		
+
 		default:
 			BApplication::MessageReceived(message);
 			break;

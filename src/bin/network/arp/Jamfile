@@ -25,9 +25,3 @@ HaikuInstall install-userland-networking
 	: arp
 	: installed-userland-networking
 ;
-
-Package haiku-networkingkit-cvs :
-	arp :
-#	boot home config bin ;
-	boot home Desktop haiku-networkingkit ;
-

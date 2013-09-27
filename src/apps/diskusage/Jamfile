@@ -14,7 +14,7 @@ Application DiskUsage :
 	Snapshot.cpp
 	StatusView.cpp
 	VolumeView.cpp
-	: be libshared.a $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
+	: be libshared.a localestub $(TARGET_LIBSTDC++)
 	: DiskUsage.rdef
 ;
 

@@ -8,7 +8,7 @@ Application Screenshot :
 	ScreenshotApp.cpp
 	ScreenshotWindow.cpp
 	Utility.cpp
-	: be $(HAIKU_LOCALE_LIBS) tracker translation $(TARGET_LIBSUPC++)
+	: be localestub tracker translation $(TARGET_LIBSUPC++)
 	: ScreenshotApp.rdef
 ;
 
@@ -22,7 +22,7 @@ DoCatalogs Screenshot :
 Application screenshot :
 	Screenshot.cpp
 	Utility.cpp
-	: be $(HAIKU_LOCALE_LIBS) translation $(TARGET_LIBSUPC++)
+	: be localestub translation $(TARGET_LIBSUPC++)
 	: Screenshot.rdef
 ;
 

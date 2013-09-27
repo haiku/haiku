@@ -14,6 +14,7 @@ SubInclude HAIKU_TOP src servers midi ;
 SubInclude HAIKU_TOP src servers mount ;
 SubInclude HAIKU_TOP src servers net ;
 SubInclude HAIKU_TOP src servers notification ;
+SubInclude HAIKU_TOP src servers package ;
 SubInclude HAIKU_TOP src servers power ;
 SubInclude HAIKU_TOP src servers print ;
 SubInclude HAIKU_TOP src servers print_addon ;

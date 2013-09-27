@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src add-ons print drivers pdf bookmarks ;
-
-Package haiku-pdf_writer-cvs :
-	Sample :
-	boot home config settings PDF\ Writer bookmarks ;	
-
-Package haiku-printingkit-cvs :
-	Sample :
-	boot home config settings PDF\ Writer bookmarks ;	

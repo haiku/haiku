@@ -104,7 +104,7 @@ BitmapButton::DrawBackground(BRect& bounds, BRect updateRect)
 		uint32 flags = 0;
 		if (fMouseDown)
 			flags |= BControlLook::B_ACTIVATED;
-		
+
 		be_control_look->DrawButtonFrame(this, bounds, updateRect,
 			color, color, flags);
 		be_control_look->DrawButtonBackground(this, bounds, updateRect,

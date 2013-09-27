@@ -7,7 +7,7 @@ Application AboutSystem :
 	HyperTextActions.cpp
 	HyperTextView.cpp
 	Utilities.cpp
-	: $(TARGET_LIBSTDC++) be translation $(HAIKU_LOCALE_LIBS)
+	: $(TARGET_LIBSTDC++) be translation localestub
 	: AboutSystem.rdef
 ;
 

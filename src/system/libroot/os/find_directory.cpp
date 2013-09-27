@@ -55,16 +55,16 @@ static const char *kSystemDirectories[] = {
 	SYSTEM "/servers",
 	SYSTEM "/apps",
 	SYSTEM "/bin",
-	COMMON "/etc",
+	COMMON "/settings/etc",
 	SYSTEM "/documentation",
 	SYSTEM "/preferences",
 	SYSTEM "/add-ons/Translators",
 	SYSTEM "/add-ons/media",
 	SYSTEM "/data/sounds",
 	SYSTEM "/data",
-	"develop",
+	SYSTEM "/develop",
 	SYSTEM "/packages",
-	"develop/headers",
+	SYSTEM "/develop/headers",
 };
 
 /* Common directories, shared among users */
@@ -78,7 +78,7 @@ static const char *kCommonDirectories[] = {
 	COMMON "/lib",
 	COMMON "/servers",
 	COMMON "/bin",
-	COMMON "/etc",
+	COMMON "/settings/etc",
 	COMMON "/documentation",
 	COMMON "/settings",
 	COMMON "/develop",						// B_COMMON_DEVELOP_DIRECTORY
@@ -92,7 +92,7 @@ static const char *kCommonDirectories[] = {
 	COMMON "/data",
 	COMMON "/cache",						// B_COMMON_CACHE_DIRECTORY
 	COMMON "/packages",
-	COMMON "/include",
+	COMMON "/develop/headers",
 	COMMON NON_PACKAGED,
 	COMMON NON_PACKAGED "/add-ons",
 	COMMON NON_PACKAGED "/add-ons/Translators",
@@ -104,6 +104,7 @@ static const char *kCommonDirectories[] = {
 	COMMON NON_PACKAGED "/documentation",
 	COMMON NON_PACKAGED "/lib",
 	COMMON NON_PACKAGED "/develop/headers",
+	COMMON NON_PACKAGED "/develop",
 };
 
 /* User directories */
@@ -119,7 +120,7 @@ static const char *kUserDirectories[] = {
 	HOME CONFIG "/data/fonts",
 	HOME CONFIG "/lib",
 	HOME CONFIG "/settings",
-	HOME CONFIG "/settings/deskbar",
+	HOME CONFIG "/settings/deskbar/menu",
 	HOME CONFIG "/settings/printers",
 	HOME CONFIG "/add-ons/Translators",
 	HOME CONFIG "/add-ons/media",
@@ -127,7 +128,7 @@ static const char *kUserDirectories[] = {
 	HOME CONFIG "/data",
 	HOME CONFIG "/cache",
 	HOME CONFIG "/packages",
-	HOME CONFIG "/include",
+	HOME CONFIG "/develop/headers",
 	HOME CONFIG NON_PACKAGED,
 	HOME CONFIG NON_PACKAGED "/add-ons",
 	HOME CONFIG NON_PACKAGED "/add-ons/Translators",
@@ -139,6 +140,9 @@ static const char *kUserDirectories[] = {
 	HOME CONFIG NON_PACKAGED "/documentation",
 	HOME CONFIG NON_PACKAGED "/lib",
 	HOME CONFIG NON_PACKAGED "/develop/headers",
+	HOME CONFIG NON_PACKAGED "/develop",
+	HOME CONFIG "/develop",
+	HOME CONFIG "/documentation",
 };
 
 
@@ -305,6 +309,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_COMMON_NONPACKAGED_DOCUMENTATION_DIRECTORY:
 		case B_COMMON_NONPACKAGED_LIB_DIRECTORY:
 		case B_COMMON_NONPACKAGED_HEADERS_DIRECTORY:
+		case B_COMMON_NONPACKAGED_DEVELOP_DIRECTORY:
 			templatePath = kCommonDirectories[which - B_COMMON_DIRECTORY];
 			break;
 
@@ -325,6 +330,8 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_USER_CACHE_DIRECTORY:
 		case B_USER_PACKAGES_DIRECTORY:
 		case B_USER_HEADERS_DIRECTORY:
+		case B_USER_DEVELOP_DIRECTORY:
+		case B_USER_DOCUMENTATION_DIRECTORY:
 		case B_USER_NONPACKAGED_DIRECTORY:
 		case B_USER_NONPACKAGED_ADDONS_DIRECTORY:
 		case B_USER_NONPACKAGED_TRANSLATORS_DIRECTORY:
@@ -336,15 +343,16 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_USER_NONPACKAGED_DOCUMENTATION_DIRECTORY:
 		case B_USER_NONPACKAGED_LIB_DIRECTORY:
 		case B_USER_NONPACKAGED_HEADERS_DIRECTORY:
+		case B_USER_NONPACKAGED_DEVELOP_DIRECTORY:
 			templatePath = kUserDirectories[which - B_USER_DIRECTORY];
 			break;
 
 		/* Global directories */
 		case B_APPS_DIRECTORY:
-			templatePath = "apps";
+			templatePath = COMMON "/apps";
 			break;
 		case B_PREFERENCES_DIRECTORY:
-			templatePath = "preferences";
+			templatePath = COMMON "/preferences";
 			break;
 		case B_UTILITIES_DIRECTORY:
 			templatePath = "utilities";

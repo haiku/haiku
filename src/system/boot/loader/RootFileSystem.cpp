@@ -49,8 +49,8 @@ RootFileSystem::Close(void *cookie)
 }
 
 
-Node *
-RootFileSystem::Lookup(const char *name, bool /*traverseLinks*/)
+Node*
+RootFileSystem::LookupDontTraverse(const char* name)
 {
 	EntryIterator iterator = fLinks.GetIterator();
 	struct entry *entry;
