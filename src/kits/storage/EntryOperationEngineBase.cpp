@@ -64,7 +64,7 @@ status_t
 BEntryOperationEngineBase::Entry::GetPath(BPath& buffer, const char*& _path)
 	const
 {
-	status_t error;
+	status_t error = B_OK;
 
 	if (fEntry != NULL) {
 		error = buffer.SetTo(fEntry);
