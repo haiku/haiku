@@ -51,6 +51,10 @@ development tools are included in official releases (e.g. R1 alpha 1) and in the
 Whether they are installed can be tested for instance by running them in the
 shell with the "--version" parameter.
 
+The following libraries (and their respective headers) are required:
+ * curl
+ * zlib
+
 Specific: Haiku for the ARM platform
 ------------------------------------
 
@@ -59,10 +63,6 @@ The following tools are needed to compile Haiku for the ARM platform
  * mkimage (http://www.denx.de/wiki/UBoot)
  * Mtools (http://www.gnu.org/software/mtools/intro.html)
  * sfdisk
-
-Specific: Linux
----------------
- * zlib1g-dev (for building GCC4 buildtools on Linux hosts)
 
 Specific: Mac OS X
 ------------------
@@ -123,10 +123,11 @@ Configuring your build
 ======================
 
 The configure script generates a file named "BuildConfig" in the
-"generated/build" directory. As long as configure is not modified (!), there
-is no need to call it again. That is for re-building you only need to invoke
-jam (see below). If you don't update the source tree very frequently, you may
-want to execute 'configure' after each update just to be on the safe side.
+"generated/build" directory. As long as configure is not modified (!) or the
+cross-compilation tools have been updated, there is no need to call it again.
+That is for re-building you only need to invoke jam (see below). If you don't
+update the source tree very frequently, you may want to execute 'configure'
+after each update just to be on the safe side.
 
 Depending on your goal, there are several different ways to configure Haiku.
 You can either call configure from within your Haiku trunk folder. That will
@@ -137,31 +138,20 @@ configure from within them. For example imagine the following directory setup
   buildtools-trunk/
   haiku-trunk/
   haiku-trunk/generated.x86gcc2
-  haiku-trunk/generated.x86gcc4
 
 Configure a GCC 2.95 Hybrid, from non-Haiku platform
 ----------------------------------------------------
 
-  cd haiku-trunk/generated.x86gcc4
-  ../configure --use-gcc-pipe --use-xattr \
-    --build-cross-tools-gcc4 x86 ../../buildtools/ \
-    --alternative-gcc-output-dir ../generated.x86gcc2
-  cd ../generated.x86gcc2
-  ../configure --use-gcc-pipe --use-xattr \
-    --build-cross-tools ../../buildtools/ \
-    --alternative-gcc-output-dir ../generated.x86gcc4
+  cd haiku-trunk/generated.x86gcc2
+  ../configure --use-xattr-ref \
+    --build-cross-tools x86_gcc2 ../../buildtools/ \
+    --build-cross-tools x86
 
 Configure a GCC 2.95 Hybrid, from within Haiku
 ----------------------------------------------
 
-  cd haiku-trunk/generated.x86gcc4
-  ../configure --use-gcc-pipe \
-    --alternative-gcc-output-dir ../generated.x86gcc2 \
-    --cross-tools-prefix /boot/develop/abi/x86/gcc4/tools/current/bin/
-  cd ../generated.x86gcc2
-  ../configure --use-gcc-pipe \
-    --alternative-gcc-output-dir ../generated.x86gcc4 \
-    --cross-tools-prefix /boot/develop/abi/x86/gcc2/tools/current/bin/
+  cd haiku-trunk/generated.x86gcc2
+  ../configure --target-arch x86_gcc2 --target-arch x86
 
 Additional information about GCC Hybrids can be found on the website,
 http://www.haiku-os.org/guides/building/gcc-hybrid
@@ -199,7 +189,7 @@ as they contain information on customizing your build of Haiku.
 Building a Haiku anyboot file
 ---------------------------
 
-  jam -q haiku-anyboot-image
+  jam -q @anyboot-image
 
 This generates an image file named 'haiku-anyboot.image' in your output
 directory under 'generated/'.
@@ -207,7 +197,7 @@ directory under 'generated/'.
 Building a VMware image file
 ----------------------------
 
-  jam -q haiku-vmware-image
+  jam -q @vmware-image
 
 This generates an image file named 'haiku.vmdk' in your output
 directory under 'generated/'.
@@ -215,7 +205,7 @@ directory under 'generated/'.
 Directory Installation
 ----------------------
 
-  HAIKU_INSTALL_DIR=/Haiku jam -q install-haiku
+  HAIKU_INSTALL_DIR=/Haiku jam -q @install
 
 Installs all Haiku components into the volume mounted at "/Haiku" and
 automatically marks it as bootable. To create a partition in the first place
@@ -230,17 +220,17 @@ Building individual components
 If you don't want to build the complete Haiku, but only a certain
 app/driver/etc. you can specify it as argument to jam, e.g.:
 
-  jam Debugger
+  jam -q Debugger
 
 Alternatively, you can 'cd' to the directory of the component you want to
 build and run 'jam' from there. Note: if your generated directory named
 something other than "generated/", you will need to tell jam where it is.
 
-  jam -sHAIKU_OUTPUT_DIR=<path to generated folder>
+  jam -q -sHAIKU_OUTPUT_DIR=<path to generated folder>
 
 You can also force rebuilding of a component by using the "-a" parameter:
 
-  jam -a Debugger
+  jam -qa Debugger
 
 
 Running
