@@ -23,37 +23,19 @@ using namespace BPackageKit::BPrivate;
 
 PackageManager::PackageManager(BPackageInstallationLocation location)
 	:
-	BPackageManager(location),
+	BPackageManager(location, &fJobStateListener),
 	BPackageManager::UserInteractionHandler(),
 	fDecisionProvider(),
 	fJobStateListener(JobStateListener::EXIT_ON_ABORT),
-	fContext(fDecisionProvider, fJobStateListener),
 	fClientInstallationInterface()
 {
 	fInstallationInterface = &fClientInstallationInterface;
-	fRequestHandler = this;
 	fUserInteractionHandler = this;
 }
 
 
 PackageManager::~PackageManager()
 {
-}
-
-
-status_t
-PackageManager::RefreshRepository(const BRepositoryConfig& repoConfig)
-{
-	return BRefreshRepositoryRequest(fContext, repoConfig).Process();
-}
-
-
-status_t
-PackageManager::DownloadPackage(const BString& fileURL,
-	const BEntry& targetEntry, const BString& checksum)
-{
-	return DownloadFileRequest(fContext, fileURL, targetEntry, checksum)
-		.Process();
 }
 
 

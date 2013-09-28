@@ -22,20 +22,11 @@ using BManager::BPrivate::BPackageManager;
 
 
 class PackageManager : public BPackageManager,
-	private BPackageManager::RequestHandler,
 	private BPackageManager::UserInteractionHandler {
 public:
 								PackageManager(
 									BPackageInstallationLocation location);
 								~PackageManager();
-
-private:
-	// RequestHandler
-	virtual	status_t			RefreshRepository(
-									const BRepositoryConfig& repoConfig);
-	virtual	status_t			DownloadPackage(const BString& fileURL,
-                                    const BEntry& targetEntry,
-                                    const BString& checksum);
 
 private:
 	// UserInteractionHandler
@@ -58,7 +49,6 @@ private:
 private:
 			DecisionProvider	fDecisionProvider;
 			JobStateListener	fJobStateListener;
-			BContext			fContext;
 			BPackageManager::ClientInstallationInterface
 									fClientInstallationInterface;
 };

@@ -41,7 +41,6 @@ public:
 			class InstallationInterface;
 			class ClientInstallationInterface;
 			class UserInteractionHandler;
-			class RequestHandler;
 
 			typedef BObjectList<RemoteRepository> RemoteRepositoryList;
 			typedef BObjectList<InstalledRepository> InstalledRepositoryList;
@@ -56,8 +55,9 @@ public:
 
 public:
 								BPackageManager(
-									BPackageInstallationLocation location);
-								~BPackageManager();
+									BPackageInstallationLocation location,
+									BJobStateListener* listener);
+	virtual						~BPackageManager();
 
 			void				Init(uint32 flags);
 
@@ -89,6 +89,13 @@ public:
 									packages);
 
 			void				VerifyInstallation();
+
+
+	virtual	status_t			DownloadPackage(const BString& fileURL,
+									const BEntry& targetEntry,
+									const BString& checksum);
+	virtual	status_t			RefreshRepository(
+									const BRepositoryConfig& repoConfig);
 
 protected:
 			InstalledRepository& InstallationRepository();
@@ -133,8 +140,8 @@ protected:
 
 			// must be set by the derived class
 			InstallationInterface* fInstallationInterface;
-			RequestHandler*		fRequestHandler;
 			UserInteractionHandler* fUserInteractionHandler;
+			BJobStateListener*	fJobStateListener;
 };
 
 
@@ -240,18 +247,6 @@ public:
 
 private:
 			BDaemonClient		fDaemonClient;
-};
-
-
-class BPackageManager::RequestHandler {
-public:
-	virtual						~RequestHandler();
-
-	virtual	status_t			RefreshRepository(
-									const BRepositoryConfig& repoConfig) = 0;
-	virtual	status_t			DownloadPackage(const BString& fileURL,
-                                    const BEntry& targetEntry,
-                                    const BString& checksum) = 0;
 };
 
 

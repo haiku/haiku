@@ -142,18 +142,16 @@ public:
 
 PackageManager::PackageManager(BPackageInstallationLocation location)
 	:
-	BPackageManager(location),
+	BPackageManager(location, &fJobStateListener),
 	BPackageManager::UserInteractionHandler(),
 	fDecisionProvider(),
 	fJobStateListener(),
-	fContext(fDecisionProvider, fJobStateListener),
 	fClientInstallationInterface(),
 	fProblemWindow(NULL),
 	fCurrentInstallPackage(NULL),
 	fCurrentUninstallPackage(NULL)
 {
 	fInstallationInterface = &fClientInstallationInterface;
-	fRequestHandler = this;
 	fUserInteractionHandler = this;
 }
 
@@ -228,7 +226,7 @@ PackageManager::RefreshRepository(const BRepositoryConfig& repoConfig)
 {
 	status_t result;
 	try {
-		result = BRefreshRepositoryRequest(fContext, repoConfig).Process();
+		result = BPackageManager::RefreshRepository(repoConfig);
 	} catch (BFatalErrorException ex) {
 		fprintf(stderr, "Fatal error occurred while refreshing repository: "
 			"%s (%s)\n", ex.Message().String(), ex.Details().String());
@@ -249,8 +247,8 @@ PackageManager::DownloadPackage(const BString& fileURL,
 {
 	status_t result;
 	try {
-		result = DownloadFileRequest(fContext, fileURL, targetEntry, checksum)
-			.Process();
+		result = BPackageManager::DownloadPackage(fileURL, targetEntry,
+			checksum);
 	} catch (BFatalErrorException ex) {
 		fprintf(stderr, "Fatal error occurred while downloading package: "
 			"%s: %s (%s)\n", fileURL.String(), ex.Message().String(),

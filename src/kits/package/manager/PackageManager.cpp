@@ -4,13 +4,16 @@
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Rene Gollent <rene@gollent.com>
  */
 
 
 #include <package/manager/PackageManager.h>
 
 #include <Directory.h>
+#include <package/DownloadFileRequest.h>
 #include <package/PackageRoster.h>
+#include <package/RefreshRepositoryRequest.h>
 #include <package/RepositoryCache.h>
 #include <package/solver/SolverPackage.h>
 #include <package/solver/SolverPackageSpecifier.h>
@@ -37,7 +40,8 @@ namespace BPrivate {
 // #pragma mark - BPackageManager
 
 
-BPackageManager::BPackageManager(BPackageInstallationLocation location)
+BPackageManager::BPackageManager(BPackageInstallationLocation location,
+	BJobStateListener* listener)
 	:
 	fLocation(location),
 	fSolver(NULL),
@@ -51,8 +55,8 @@ BPackageManager::BPackageManager(BPackageInstallationLocation location)
 	fOtherRepositories(10, true),
 	fTransactions(5, true),
 	fInstallationInterface(NULL),
-	fRequestHandler(NULL),
-	fUserInteractionHandler(NULL)
+	fUserInteractionHandler(NULL),
+	fJobStateListener(listener)
 {
 }
 
@@ -483,7 +487,7 @@ BPackageManager::_PreparePackageChanges(
 			BString url = remoteRepository->Config().PackagesURL();
 			url << '/' << fileName;
 
-			status_t error = fRequestHandler->DownloadPackage(url, entry,
+			status_t error = DownloadPackage(url, entry,
 				package->Info().Checksum());
 			if (error != B_OK)
 				DIE(error, "failed to download package");
@@ -671,7 +675,7 @@ BPackageManager::_GetRepositoryCache(BPackageRoster& roster,
 	if (!refresh && roster.GetRepositoryCache(config.Name(), &_cache) == B_OK)
 		return B_OK;
 
-	status_t error = fRequestHandler->RefreshRepository(config);
+	status_t error = RefreshRepository(config);
 	if (error != B_OK) {
 		fUserInteractionHandler->Warn(error,
 			"refreshing repository \"%s\" failed", config.Name().String());
@@ -699,6 +703,26 @@ BPackageManager::_NextSpecificInstallationLocation()
 	}
 
 	return false;
+}
+
+
+status_t
+BPackageManager::DownloadPackage(const BString& fileURL,
+	const BEntry& targetEntry, const BString& checksum)
+{
+	BDecisionProvider provider;
+	BContext context(provider, *fJobStateListener);
+	return DownloadFileRequest(context, fileURL, targetEntry, checksum)
+		.Process();
+}
+
+
+status_t
+BPackageManager::RefreshRepository(const BRepositoryConfig& repoConfig)
+{
+	BDecisionProvider provider;
+	BContext context(provider, *fJobStateListener);
+	return BRefreshRepositoryRequest(context, repoConfig).Process();
 }
 
 
@@ -866,14 +890,6 @@ BPackageManager::ClientInstallationInterface::CommitTransaction(
 {
 	return fDaemonClient.CommitTransaction(transaction.ActivationTransaction(),
 		_result);
-}
-
-
-// #pragma mark - RequestHandler
-
-
-BPackageManager::RequestHandler::~RequestHandler()
-{
 }
 
 
