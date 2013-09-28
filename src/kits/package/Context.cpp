@@ -29,6 +29,15 @@ BDecisionProvider::~BDecisionProvider()
 }
 
 
+bool
+BDecisionProvider::YesNoDecisionNeeded(const BString& description,
+	const BString& question, const BString& yes, const BString& no,
+	const BString& defaultChoice)
+{
+	return defaultChoice == yes;
+}
+
+
 BContext::BContext(BDecisionProvider& decisionProvider,
 	BJobStateListener& jobStateListener)
 	:

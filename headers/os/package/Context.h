@@ -25,7 +25,7 @@ struct BDecisionProvider {
 	virtual	bool				YesNoDecisionNeeded(const BString& description,
 									const BString& question,
 									const BString& yes, const BString& no,
-									const BString& defaultChoice) = 0;
+									const BString& defaultChoice);
 //	virtual	bool				ActionsAcceptanceDecisionNeeded(
 //									const BString& description,
 //									const BString& question) = 0;
