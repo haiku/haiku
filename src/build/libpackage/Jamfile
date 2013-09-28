@@ -14,6 +14,12 @@ USES_BE_API on libpackage_build.so = true ;
 {
 	# The package writer needs to know where the license files are located.
 	local dataDir = [ FDirName $(HAIKU_TOP) data system data ] ;
+	# The directory path we compile in must be absolute. If it isn't prepend
+	# pwd.
+	local defines ;
+	if ! [ Match "(^/.*)" : $(dataDir) ] {
+		dataDir = `pwd`/$(dataDir) ;
+	}
 	local defines = [ FDefines
 		HAIKU_BUILD_SYSTEM_DATA_DIRECTORY="\\\"$(dataDir)\\\""
 	] ;
