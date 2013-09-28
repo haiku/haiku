@@ -38,7 +38,7 @@
 // abort()s. Obviously that isn't good behavior for a library.
 
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#ifdef __HAIKU__
 
 
 BSolver*
