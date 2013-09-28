@@ -142,10 +142,9 @@ public:
 
 PackageManager::PackageManager(BPackageInstallationLocation location)
 	:
-	BPackageManager(location, &fJobStateListener),
+	BPackageManager(location),
 	BPackageManager::UserInteractionHandler(),
 	fDecisionProvider(),
-	fJobStateListener(),
 	fClientInstallationInterface(),
 	fProblemWindow(NULL),
 	fCurrentInstallPackage(NULL),
@@ -312,6 +311,42 @@ PackageManager::ConfirmChanges(bool fromMostSpecific)
 
 void
 PackageManager::Warn(status_t error, const char* format, ...)
+{
+	// TODO: implement
+}
+
+
+void
+PackageManager::ProgressPackageDownloadStarted(const char* packageName)
+{
+	// TODO: implement
+}
+
+
+void
+PackageManager::ProgressPackageDownloadActive(const char* packageName,
+	float completionPercentage)
+{
+	// TODO: implement
+}
+
+
+void
+PackageManager::ProgressPackageDownloadComplete(const char* packageName)
+{
+	// TODO: implement
+}
+
+
+void
+PackageManager::ProgressPackageChecksumStarted(const char* title)
+{
+	// TODO: implement
+}
+
+
+void
+PackageManager::ProgressPackageChecksumComplete(const char* title)
 {
 	// TODO: implement
 }

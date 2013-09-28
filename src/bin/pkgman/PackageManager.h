@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Rene Gollent <rene@gollent.com>
  */
 #ifndef PACKAGE_MANAGER_H
 #define PACKAGE_MANAGER_H
@@ -13,7 +14,6 @@
 #include <package/manager/PackageManager.h>
 
 #include "DecisionProvider.h"
-#include "JobStateListener.h"
 
 
 using namespace BPackageKit;
@@ -28,12 +28,29 @@ public:
 									BPackageInstallationLocation location);
 								~PackageManager();
 
+	virtual	void				JobFailed(BJob* job);
+	virtual	void				JobAborted(BJob* job);
+
 private:
 	// UserInteractionHandler
 	virtual	void				HandleProblems();
 	virtual	void				ConfirmChanges(bool fromMostSpecific);
 
 	virtual	void				Warn(status_t error, const char* format, ...);
+
+
+	virtual	void				ProgressPackageDownloadStarted(
+									const char* packageName);
+	virtual	void				ProgressPackageDownloadActive(
+									const char* packageName,
+									float completionPercentage);
+	virtual	void				ProgressPackageDownloadComplete(
+									const char* packageName);
+	virtual	void				ProgressPackageChecksumStarted(
+									const char* packageName);
+	virtual	void				ProgressPackageChecksumComplete(
+									const char* packageName);
+
 	virtual	void				ProgressStartApplyingChanges(
 									InstalledRepository& repository);
 	virtual	void				ProgressTransactionCommitted(
@@ -48,7 +65,6 @@ private:
 
 private:
 			DecisionProvider	fDecisionProvider;
-			JobStateListener	fJobStateListener;
 			BPackageManager::ClientInstallationInterface
 									fClientInstallationInterface;
 };

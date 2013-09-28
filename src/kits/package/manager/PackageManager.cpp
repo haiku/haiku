@@ -25,9 +25,15 @@
 #include <CopyEngine.h>
 #include <package/ActivationTransaction.h>
 #include <package/DaemonClient.h>
+#include <package/FetchFileJob.h>
 #include <package/manager/RepositoryBuilder.h>
+#include <package/ValidateChecksumJob.h>
 
 #include "PackageManagerUtils.h"
+
+
+using BPackageKit::BPrivate::FetchFileJob;
+using BPackageKit::BPrivate::ValidateChecksumJob;
 
 
 namespace BPackageKit {
@@ -40,8 +46,7 @@ namespace BPrivate {
 // #pragma mark - BPackageManager
 
 
-BPackageManager::BPackageManager(BPackageInstallationLocation location,
-	BJobStateListener* listener)
+BPackageManager::BPackageManager(BPackageInstallationLocation location)
 	:
 	fLocation(location),
 	fSolver(NULL),
@@ -55,8 +60,7 @@ BPackageManager::BPackageManager(BPackageInstallationLocation location,
 	fOtherRepositories(10, true),
 	fTransactions(5, true),
 	fInstallationInterface(NULL),
-	fUserInteractionHandler(NULL),
-	fJobStateListener(listener)
+	fUserInteractionHandler(NULL)
 {
 }
 
@@ -325,6 +329,45 @@ BPackageManager::InstallationRepository()
 		DIE("no installation repository");
 
 	return *fInstalledRepositories.LastItem();
+}
+
+
+void
+BPackageManager::JobStarted(BJob* job)
+{
+	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
+		FetchFileJob* fetchJob = (FetchFileJob*)job;
+		fUserInteractionHandler->ProgressPackageDownloadStarted(
+			fetchJob->DownloadFileName());
+	} else if (dynamic_cast<ValidateChecksumJob*>(job) != NULL) {
+		fUserInteractionHandler->ProgressPackageChecksumStarted(
+			job->Title().String());
+	}
+}
+
+
+void
+BPackageManager::JobProgress(BJob* job)
+{
+	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
+		FetchFileJob* fetchJob = (FetchFileJob*)job;
+		fUserInteractionHandler->ProgressPackageDownloadActive(
+			fetchJob->DownloadFileName(), fetchJob->DownloadProgress());
+	}
+}
+
+
+void
+BPackageManager::JobSucceeded(BJob* job)
+{
+	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
+		FetchFileJob* fetchJob = (FetchFileJob*)job;
+		fUserInteractionHandler->ProgressPackageDownloadComplete(
+			fetchJob->DownloadFileName());
+	} else if (dynamic_cast<ValidateChecksumJob*>(job) != NULL) {
+		fUserInteractionHandler->ProgressPackageChecksumComplete(
+			job->Title().String());
+	}
 }
 
 
@@ -711,7 +754,7 @@ BPackageManager::DownloadPackage(const BString& fileURL,
 	const BEntry& targetEntry, const BString& checksum)
 {
 	BDecisionProvider provider;
-	BContext context(provider, *fJobStateListener);
+	BContext context(provider, *this);
 	return DownloadFileRequest(context, fileURL, targetEntry, checksum)
 		.Process();
 }
@@ -721,7 +764,7 @@ status_t
 BPackageManager::RefreshRepository(const BRepositoryConfig& repoConfig)
 {
 	BDecisionProvider provider;
-	BContext context(provider, *fJobStateListener);
+	BContext context(provider, *this);
 	return BRefreshRepositoryRequest(context, repoConfig).Process();
 }
 

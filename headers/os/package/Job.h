@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011-2013, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__JOB_H_
@@ -22,6 +22,7 @@ struct BJobStateListener {
 
 								// these default implementations do nothing
 	virtual	void				JobStarted(BJob* job);
+	virtual	void				JobProgress(BJob* job);
 	virtual	void				JobSucceeded(BJob* job);
 	virtual	void				JobFailed(BJob* job);
 	virtual	void				JobAborted(BJob* job);
@@ -30,7 +31,8 @@ struct BJobStateListener {
 
 enum BJobState {
 	JOB_STATE_WAITING_TO_RUN,
-	JOB_STATE_RUNNING,
+	JOB_STATE_STARTED,
+	JOB_STATE_IN_PROGRESS,
 	JOB_STATE_SUCCEEDED,
 	JOB_STATE_FAILED,
 	JOB_STATE_ABORTED,

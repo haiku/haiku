@@ -1,9 +1,10 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Oliver Tappe <zooey@hirschkaefer.de>
+ *		Rene Gollent <rene@gollent.com>
  */
 
 
@@ -24,6 +25,12 @@ BJobStateListener::~BJobStateListener()
 
 void
 BJobStateListener::JobStarted(BJob* job)
+{
+}
+
+
+void
+BJobStateListener::JobProgress(BJob* job)
 {
 }
 
@@ -134,9 +141,10 @@ BJob::Run()
 	if (fState != JOB_STATE_WAITING_TO_RUN)
 		return B_NOT_ALLOWED;
 
-	fState = JOB_STATE_RUNNING;
+	fState = JOB_STATE_STARTED;
 	NotifyStateListeners();
 
+	fState = JOB_STATE_IN_PROGRESS;
 	fResult = Execute();
 	Cleanup(fResult);
 
@@ -227,8 +235,11 @@ BJob::NotifyStateListeners()
 		if (listener == NULL)
 			continue;
 		switch (fState) {
-			case JOB_STATE_RUNNING:
+			case JOB_STATE_STARTED:
 				listener->JobStarted(this);
+				break;
+			case JOB_STATE_IN_PROGRESS:
+				listener->JobProgress(this);
 				break;
 			case JOB_STATE_SUCCEEDED:
 				listener->JobSucceeded(this);

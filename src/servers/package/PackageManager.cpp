@@ -43,7 +43,6 @@ PackageManager::PackageManager(Root* root, Volume* volume)
 	fProblemWindow(NULL)
 {
 	fInstallationInterface = this;
-	fRequestHandler = this;
 	fUserInteractionHandler = this;
 }
 
@@ -253,22 +252,6 @@ PackageManager::CommitTransaction(Transaction& transaction,
 }
 
 
-status_t
-PackageManager::RefreshRepository(const BRepositoryConfig& repoConfig)
-{
-	return BRefreshRepositoryRequest(fContext, repoConfig).Process();
-}
-
-
-status_t
-PackageManager::DownloadPackage(const BString& fileURL,
-	const BEntry& targetEntry, const BString& checksum)
-{
-	return DownloadFileRequest(fContext, fileURL, targetEntry, checksum)
-		.Process();
-}
-
-
 void
 PackageManager::HandleProblems()
 {
@@ -329,6 +312,37 @@ PackageManager::Warn(status_t error, const char* format, ...)
 	notification.SetTitle("Package Daemon");
 	notification.SetContent(message);
 	notification.Send();
+}
+
+
+void
+PackageManager::ProgressPackageDownloadStarted(const char* packageName)
+{
+}
+
+
+void
+PackageManager::ProgressPackageDownloadActive(const char* packageName,
+	float completionPercentage)
+{
+}
+
+
+void
+PackageManager::ProgressPackageDownloadComplete(const char* packageName)
+{
+}
+
+
+void
+PackageManager::ProgressPackageChecksumStarted(const char* title)
+{
+}
+
+
+void
+PackageManager::ProgressPackageChecksumComplete(const char* title)
+{
 }
 
 

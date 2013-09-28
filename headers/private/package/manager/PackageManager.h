@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Rene Gollent <rene@gollent.com>
  */
 #ifndef _PACKAGE__MANAGER__PRIVATE__PACKAGE_MANAGER_H_
 #define _PACKAGE__MANAGER__PRIVATE__PACKAGE_MANAGER_H_
@@ -20,6 +21,7 @@
 
 #include <package/ActivationTransaction.h>
 #include <package/DaemonClient.h>
+#include <package/Job.h>
 
 
 namespace BPackageKit {
@@ -33,7 +35,7 @@ using BPackageKit::BPrivate::BActivationTransaction;
 using BPackageKit::BPrivate::BDaemonClient;
 
 
-class BPackageManager {
+class BPackageManager : protected BJobStateListener {
 public:
 			class RemoteRepository;
 			class InstalledRepository;
@@ -55,8 +57,7 @@ public:
 
 public:
 								BPackageManager(
-									BPackageInstallationLocation location,
-									BJobStateListener* listener);
+									BPackageInstallationLocation location);
 	virtual						~BPackageManager();
 
 			void				Init(uint32 flags);
@@ -100,6 +101,12 @@ public:
 protected:
 			InstalledRepository& InstallationRepository();
 
+protected:
+			// BJobStateListener
+	virtual	void				JobStarted(BJob* job);
+	virtual	void				JobProgress(BJob* job);
+	virtual	void				JobSucceeded(BJob* job);
+
 private:
 			void				_HandleProblems();
 			void				_AnalyzeResult();
@@ -141,7 +148,6 @@ protected:
 			// must be set by the derived class
 			InstallationInterface* fInstallationInterface;
 			UserInteractionHandler* fUserInteractionHandler;
-			BJobStateListener*	fJobStateListener;
 };
 
 
@@ -259,6 +265,19 @@ public:
 
 	virtual	void				Warn(status_t error, const char* format, ...)
 									= 0;
+
+	virtual	void				ProgressPackageDownloadStarted(
+									const char* packageName) = 0;
+	virtual	void				ProgressPackageDownloadActive(
+									const char* packageName,
+									float completionPercentage) = 0;
+	virtual	void				ProgressPackageDownloadComplete(
+									const char* packageName) = 0;
+	virtual	void				ProgressPackageChecksumStarted(
+									const char* title) = 0;
+	virtual	void				ProgressPackageChecksumComplete(
+									const char* title) = 0;
+
 	virtual	void				ProgressStartApplyingChanges(
 									InstalledRepository& repository) = 0;
 	virtual	void				ProgressTransactionCommitted(

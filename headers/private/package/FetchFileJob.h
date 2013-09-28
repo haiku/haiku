@@ -29,6 +29,10 @@ public:
 									const BEntry& targetEntry);
 	virtual						~FetchFileJob();
 
+			float				DownloadProgress() const;
+			const char*			DownloadURL() const;
+			const char*			DownloadFileName() const;
+
 protected:
 	virtual	status_t			Execute();
 	virtual	void				Cleanup(status_t jobResult);
@@ -46,6 +50,7 @@ private:
 			BString				fFileURL;
 			BEntry				fTargetEntry;
 			BFile				fTargetFile;
+			float				fDownloadProgress;
 };
 
 

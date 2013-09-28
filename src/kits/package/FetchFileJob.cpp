@@ -28,13 +28,35 @@ FetchFileJob::FetchFileJob(const BContext& context, const BString& title,
 	inherited(context, title),
 	fFileURL(fileURL),
 	fTargetEntry(targetEntry),
-	fTargetFile(&targetEntry, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY)
+	fTargetFile(&targetEntry, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY),
+	fDownloadProgress(0.0)
 {
 }
 
 
 FetchFileJob::~FetchFileJob()
 {
+}
+
+
+float
+FetchFileJob::DownloadProgress() const
+{
+	return fDownloadProgress;
+}
+
+
+const char*
+FetchFileJob::DownloadURL() const
+{
+	return fFileURL.String();
+}
+
+
+const char*
+FetchFileJob::DownloadFileName() const
+{
+	return fTargetEntry.Name();
 }
 
 
@@ -87,19 +109,19 @@ FetchFileJob::Execute()
 		return B_ERROR;
 	}
 
-/*	if (WIFSIGNALED(cmdResult)
-		&& (WTERMSIG(cmdResult) == SIGINT || WTERMSIG(cmdResult) == SIGQUIT)) {
-		return B_CANCELED;
-	} */
-
 	return B_OK;
 }
 
 
 int
-FetchFileJob::_ProgressCallback(void *clientp, double dltotal, double dlnow,
+FetchFileJob::_ProgressCallback(void *userp, double dltotal, double dlnow,
 	double ultotal,	double ulnow)
 {
+	FetchFileJob* job = reinterpret_cast<FetchFileJob*>(userp);
+	if (dltotal != 0) {
+		job->fDownloadProgress = dlnow / dltotal;
+		job->NotifyStateListeners();
+	}
 	return 0;
 }
 

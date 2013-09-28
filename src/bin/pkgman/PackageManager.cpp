@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Rene Gollent <rene@gollent.com>
  */
 
 
@@ -23,10 +24,9 @@ using namespace BPackageKit::BPrivate;
 
 PackageManager::PackageManager(BPackageInstallationLocation location)
 	:
-	BPackageManager(location, &fJobStateListener),
+	BPackageManager(location),
 	BPackageManager::UserInteractionHandler(),
 	fDecisionProvider(),
-	fJobStateListener(JobStateListener::EXIT_ON_ABORT),
 	fClientInstallationInterface()
 {
 	fInstallationInterface = &fClientInstallationInterface;
@@ -36,6 +36,24 @@ PackageManager::PackageManager(BPackageInstallationLocation location)
 
 PackageManager::~PackageManager()
 {
+}
+
+
+void
+PackageManager::JobFailed(BJob* job)
+{
+	BString error = job->ErrorString();
+	if (error.Length() > 0) {
+		error.ReplaceAll("\n", "\n*** ");
+		fprintf(stderr, "%s", error.String());
+	}
+}
+
+
+void
+PackageManager::JobAborted(BJob* job)
+{
+	DIE(job->Result(), "aborted");
 }
 
 
@@ -131,6 +149,42 @@ PackageManager::Warn(status_t error, const char* format, ...)
 		printf("\n");
 	else
 		printf(": %s\n", strerror(error));
+}
+
+
+void
+PackageManager::ProgressPackageDownloadStarted(const char* packageName)
+{
+	printf("Downloading %s...\n", packageName);
+}
+
+
+void
+PackageManager::ProgressPackageDownloadActive(const char* packageName,
+	float completionPercentage)
+{
+	// TODO: how to report progress? ncurses perhaps?
+}
+
+
+void
+PackageManager::ProgressPackageDownloadComplete(const char* packageName)
+{
+	printf("Finished downloading %s...\n", packageName);
+}
+
+
+void
+PackageManager::ProgressPackageChecksumStarted(const char* title)
+{
+	printf("%s...\n", title);
+}
+
+
+void
+PackageManager::ProgressPackageChecksumComplete(const char* title)
+{
+	printf("%s complete.\n", title);
 }
 
 

@@ -62,6 +62,19 @@ private:
 	virtual	void				ConfirmChanges(bool fromMostSpecific);
 
 	virtual	void				Warn(status_t error, const char* format, ...);
+
+	virtual	void				ProgressPackageDownloadStarted(
+									const char* packageName);
+	virtual	void				ProgressPackageDownloadActive(
+									const char* packageName,
+									float completionPercentage);
+	virtual	void				ProgressPackageDownloadComplete(
+									const char* packageName);
+	virtual	void				ProgressPackageChecksumStarted(
+									const char* title);
+	virtual	void				ProgressPackageChecksumComplete(
+									const char* title);
+
 	virtual	void				ProgressStartApplyingChanges(
 									InstalledRepository& repository);
 	virtual	void				ProgressTransactionCommitted(
@@ -81,7 +94,6 @@ private:
 
 private:
 			DecisionProvider	fDecisionProvider;
-			JobStateListener	fJobStateListener;
 			BPackageManager::ClientInstallationInterface
 								fClientInstallationInterface;
 

@@ -37,9 +37,8 @@ class Volume;
 
 class PackageManager : public BPackageManager,
 	private BPackageManager::InstallationInterface,
-	private BPackageManager::RequestHandler,
 	private BPackageManager::UserInteractionHandler,
-	private BDecisionProvider, private BJobStateListener {
+	private BDecisionProvider {
 public:
 								PackageManager(Root* root, Volume* volume);
 								~PackageManager();
@@ -58,19 +57,24 @@ private:
 										_result);
 
 private:
-	// RequestHandler
-	virtual	status_t			RefreshRepository(
-									const BRepositoryConfig& repoConfig);
-	virtual	status_t			DownloadPackage(const BString& fileURL,
-                                    const BEntry& targetEntry,
-                                    const BString& checksum);
-
-private:
 	// UserInteractionHandler
 	virtual	void				HandleProblems();
 	virtual	void				ConfirmChanges(bool fromMostSpecific);
 
 	virtual	void				Warn(status_t error, const char* format, ...);
+
+	virtual	void				ProgressPackageDownloadStarted(
+									const char* packageName);
+	virtual	void				ProgressPackageDownloadActive(
+									const char* packageName,
+									float completionPercentage);
+	virtual	void				ProgressPackageDownloadComplete(
+									const char* packageName);
+	virtual	void				ProgressPackageChecksumStarted(
+									const char* title);
+	virtual	void				ProgressPackageChecksumComplete(
+									const char* title);
+
 	virtual	void				ProgressStartApplyingChanges(
 									InstalledRepository& repository);
 	virtual	void				ProgressTransactionCommitted(
