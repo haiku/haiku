@@ -21,7 +21,7 @@ USES_BE_API on libpackage_build.so = true ;
 		dataDir = `pwd`/$(dataDir) ;
 	}
 	local defines = [ FDefines
-		HAIKU_BUILD_SYSTEM_DATA_DIRECTORY="\\\"$(dataDir)\\\""
+		\"HAIKU_BUILD_SYSTEM_DATA_DIRECTORY="\\\"$(dataDir)\\\""\"
 	] ;
 	ObjectC++Flags PackageWriterImpl.cpp : $(defines) ;
 }
