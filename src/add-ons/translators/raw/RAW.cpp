@@ -695,7 +695,7 @@ get2_rggb:
 				fMeta.camera_multipliers[i ^ (i >> 1)] = fRead.Next<uint16>();
 			}
 		}
-	
+
 next:
     	fRead.Seek(nextOffset, SEEK_SET);
 	}
@@ -1664,7 +1664,7 @@ DCRaw::_AdobeCoefficients(const char *make, const char *model)
 			if (table[i].black)
 				fMeta.black = table[i].black;
 			for (uint32 j = 0; j < 12; j++) {
-				cameraXYZ[0][j] = table[i].trans[j] / 10000.0;
+				((double**)cameraXYZ)[0][j] = table[i].trans[j] / 10000.0;
 			}
 			_CameraXYZCoefficients(cameraXYZ);
 			break;
