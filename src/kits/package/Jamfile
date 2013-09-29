@@ -73,6 +73,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		Includes [ FGristFiles FetchFileJob.cpp ]
 			: [ BuildFeatureAttribute curl : headers ] ;
+		Includes [ FGristFiles InitTerminateLibPackage.cpp ]
+			: [ BuildFeatureAttribute curl : headers ] ;
 		Includes [ FGristFiles $(HPKG_SOURCES) ]
 			: [ BuildFeatureAttribute zlib : headers ] ;
 
