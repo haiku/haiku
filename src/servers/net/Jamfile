@@ -23,7 +23,7 @@ Server net_server :
 	DHCPClient.cpp
 	Services.cpp
 
-	: be network bnetapi $(TARGET_LIBSTDC++)
+	: be network bnetapi $(TARGET_LIBSTDC++) libshared.a
 	# for PPP
 	#libppp.a
 ;

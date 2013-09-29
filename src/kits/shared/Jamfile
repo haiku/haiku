@@ -30,6 +30,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ColorQuantizer.cpp
 			CommandPipe.cpp
 			DragTrackingFilter.cpp
+			DriverSettingsMessageAdapter.cpp
 			HashString.cpp
 			IconButton.cpp
 			IconView.cpp
