@@ -89,7 +89,10 @@ atomic_get64(vint64 *value)
 
 #endif	/* ATOMIC64_FUNCS_ARE_SYSCALLS */
 
-/* GCC compatibility: libstdc++ needs this one */
+/* GCC compatibility: libstdc++ needs this one.
+ * TODO: Update libstdc++ and drop this.
+ * cf. http://fedoraproject.org/wiki/Architectures/ARM/GCCBuiltInAtomicOperations
+ */
 
 extern int32_t __sync_fetch_and_add_4(int32_t *value, int32_t addValue)
 {
