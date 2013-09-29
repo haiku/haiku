@@ -454,7 +454,8 @@ rule DownloadFile file : url : source
 
 actions ChecksumFileSHA256
 {
-	$(HOST_SHA256) $(2) | sed -r 's,([^[:space:]]*).*,\1,' > $(1)
+	$(HOST_SHA256) $(2) \
+		| $(HOST_EXTENDED_REGEX_SED) 's,([^[:space:]]*).*,\1,' > $(1)
 		# The sed part is only necessary for sha256sum, but it doesn't harm for
 		# sha256 either.
 }

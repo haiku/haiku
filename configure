@@ -465,6 +465,7 @@ HAIKU_HOST_USE_32BIT=0
 HAIKU_HOST_USE_XATTR=0
 HAIKU_HOST_USE_XATTR_REF=0
 HAIKU_HOST_BUILD_ONLY=0
+HOST_EXTENDED_REGEX_SED="sed -r"
 HOST_GCC_LD=`gcc -print-prog-name=ld`
 HOST_GCC_OBJCOPY=`gcc -print-prog-name=objcopy`
 SFDISK_BINARY=sfdisk
@@ -663,6 +664,11 @@ if [ $caseInsensitive != 0 ]; then
 	exit 1
 fi
 
+# determine how to invoke sed with extended regexp support for non-GNU sed
+if [ $HOST_PLATFORM = "darwin" ]; then
+	HOST_EXTENDED_REGEX_SED="sed -E"
+fi
+
 # create output directory
 mkdir -p "$buildOutputDir" || exit 1
 
@@ -858,6 +864,7 @@ HAIKU_BUILD_ATTRIBUTES_DIR	?= ${HAIKU_BUILD_ATTRIBUTES_DIR} ;
 
 HAIKU_YASM					?= ${HAIKU_YASM} ;
 
+HOST_EXTENDED_REGEX_SED		?= ${HOST_EXTENDED_REGEX_SED} ;
 HOST_GCC_RAW_VERSION		?= ${HOST_GCC_RAW_VERSION} ;
 HOST_GCC_MACHINE			?= ${HOST_GCC_MACHINE} ;
 HOST_LD						?= ${HOST_GCC_LD} ;
