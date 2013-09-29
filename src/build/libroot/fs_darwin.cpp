@@ -230,7 +230,11 @@ fdopendir(int fd)
 		return NULL;
 	}
 
-	return opendir(path);
+	DIR* dir = opendir(path);
+	if (dir != NULL)
+		close(fd);
+
+	return dir;
 }
 
 
