@@ -279,7 +279,7 @@ actions BootstrapRepositoryFetchPackage1
 
 	# make Haiku cross devel package path absolute
 	haikuCrossDevelPackage="$(2[1])"
-	if [[ "$haikuCrossDevelPackage" != /* ]]; then
+	if [ "x$haikuCrossDevelPackage" = "x${haikuCrossDevelPackage#/}" ]; then
 		haikuCrossDevelPackage="`pwd`/$haikuCrossDevelPackage"
 	fi
 
@@ -287,7 +287,7 @@ actions BootstrapRepositoryFetchPackage1
 	secondaryCrossDevelPackages=
 	if [ -n "$(2[2-]:J)" ]; then
 		for secondaryCrossDevelPackage in "$(2[2-])" ; do
-			if [[ "$secondaryCrossDevelPackage" != /* ]]; then
+			if [ "x$secondaryCrossDevelPackage" = "x${secondaryCrossDevelPackage#/}" ]; then
 				secondaryCrossDevelPackage="`pwd`/$secondaryCrossDevelPackage"
 			fi
 			if [ -n "$secondaryCrossDevelPackages" ]; then
@@ -340,7 +340,7 @@ EOF
 
 	# If we have cross tools, add the cross tools directory.
 	gcc=$(HAIKU_CC_$(HAIKU_PACKAGING_ARCH))
-	if [[ "$gcc" = /* ]]; then
+	if [ "x$gcc" != "x${gcc#/}" ]; then
 		if [ `basename $gcc` = \
 				$(HAIKU_GCC_MACHINE_$(HAIKU_PACKAGING_ARCH))-gcc ]; then
 			dir=`dirname $gcc`
@@ -560,7 +560,7 @@ actions BuildHaikuPortsSourcePackageDirectory1
 
 	# make Haiku cross devel package path absolute
 	haikuCrossDevelPackage="$(2[2])"
-	if [[ "$haikuCrossDevelPackage" != /* ]]; then
+	if [ "x$haikuCrossDevelPackage" = "x${haikuCrossDevelPackage#/}" ]; then
 		haikuCrossDevelPackage="`pwd`/$haikuCrossDevelPackage"
 	fi
 
@@ -568,7 +568,7 @@ actions BuildHaikuPortsSourcePackageDirectory1
 	secondaryCrossDevelPackages=
 	if [ -n "$(2[3-]:J)" ]; then
 		for secondaryCrossDevelPackage in "$(2[3-])" ; do
-			if [[ "$secondaryCrossDevelPackage" != /* ]]; then
+			if [ "x$secondaryCrossDevelPackage" = "x${secondaryCrossDevelPackage#/}" ]; then
 				secondaryCrossDevelPackage="`pwd`/$secondaryCrossDevelPackage"
 			fi
 			if [ -n "$secondaryCrossDevelPackages" ]; then
