@@ -62,6 +62,10 @@ const char* const kArchitectureNames[B_PACKAGE_ARCHITECTURE_ENUM_COUNT] = {
 	"x86",
 	"x86_gcc2",
 	"source",
+	"x86_64",
+	"ppc",
+	"arm",
+	"m68k"
 };
 
 
