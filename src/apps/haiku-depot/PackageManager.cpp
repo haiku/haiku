@@ -43,14 +43,24 @@ using BPackageKit::BSolverPackage;
 using BPackageKit::BSolverRepository;
 
 
+// #pragma mark - DownloadProgressListener
+
+
+DownloadProgressListener::~DownloadProgressListener()
+{
+}
+
+
 // #pragma mark - InstallPackageAction
 
 
-class InstallPackageAction : public PackageAction {
+class InstallPackageAction : public PackageAction,
+	private DownloadProgressListener {
 public:
 	InstallPackageAction(PackageInfoRef package)
 		:
-		PackageAction(PACKAGE_ACTION_INSTALL, package)
+		PackageAction(PACKAGE_ACTION_INSTALL, package),
+		fLastDownloadUpdate(0)
 	{
 	}
 
@@ -66,6 +76,7 @@ public:
 			| BPackageManager::B_REFRESH_REPOSITORIES);
 		PackageInfoRef ref(Package());
 		fPackageManager->SetCurrentActionPackage(ref, true);
+		fPackageManager->AddProgressListener(this);
 		const char* packageName = ref->Title().String();
 		try {
 			fPackageManager->Install(&packageName, 1);
@@ -84,10 +95,25 @@ public:
 			return B_ERROR;;
 		}
 
+		fPackageManager->RemoveProgressListener(this);
 		ref->SetState(ACTIVATED);
 
 		return B_OK;
 	}
+
+	// DownloadProgressListener
+	virtual void DownloadProgressChanged(float progress)
+	{
+		bigtime_t now = system_time();
+		if (now - fLastDownloadUpdate > 250000) {
+			PackageInfoRef ref(Package());
+			ref->SetDownloadProgress(progress);
+			fLastDownloadUpdate = now;
+		}
+	}
+
+private:
+	bigtime_t fLastDownloadUpdate;
 };
 
 
@@ -264,6 +290,20 @@ PackageManager::DownloadPackage(const BString& fileURL,
 
 
 void
+PackageManager::AddProgressListener(DownloadProgressListener* listener)
+{
+	fDownloadProgressListeners.AddItem(listener);
+}
+
+
+void
+PackageManager::RemoveProgressListener(DownloadProgressListener* listener)
+{
+	fDownloadProgressListeners.RemoveItem(listener);
+}
+
+
+void
 PackageManager::HandleProblems()
 {
 	if (fProblemWindow == NULL)
@@ -327,7 +367,10 @@ void
 PackageManager::ProgressPackageDownloadActive(const char* packageName,
 	float completionPercentage)
 {
-	// TODO: implement
+	for (int32 i = 0; i < fDownloadProgressListeners.CountItems(); i++) {
+		fDownloadProgressListeners.ItemAt(i)->DownloadProgressChanged(
+			completionPercentage);
+	}
 }
 
 

@@ -36,6 +36,17 @@ using BPackageKit::BPrivate::BDaemonClient;
 using BPackageKit::BManager::BPrivate::BPackageManager;
 
 
+class DownloadProgressListener {
+	public:
+	virtual	~DownloadProgressListener();
+
+	virtual	void				DownloadProgressChanged(float progress) = 0;
+};
+
+
+typedef BObjectList<DownloadProgressListener> DownloadProgressListenerList;
+
+
 class PackageManager : public BPackageManager,
 	private BPackageManager::UserInteractionHandler {
 public:
@@ -55,6 +66,11 @@ public:
 	virtual	status_t			DownloadPackage(const BString& fileURL,
 									const BEntry& targetEntry,
 									const BString& checksum);
+
+			void				AddProgressListener(
+									DownloadProgressListener* listener);
+			void				RemoveProgressListener(
+									DownloadProgressListener* listener);
 
 private:
 	// UserInteractionHandler
@@ -102,6 +118,9 @@ private:
 								fCurrentInstallPackage;
 			BPackageKit::BSolverPackage*
 								fCurrentUninstallPackage;
+
+			DownloadProgressListenerList
+								fDownloadProgressListeners;
 };
 
 #endif // PACKAGE_MANAGER_H
