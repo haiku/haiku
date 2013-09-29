@@ -88,3 +88,10 @@ atomic_get64(vint64 *value)
 }
 
 #endif	/* ATOMIC64_FUNCS_ARE_SYSCALLS */
+
+/* GCC compatibility: libstdc++ needs this one */
+
+extern int32_t __sync_fetch_and_add_4(int32_t *value, int32_t addValue)
+{
+	return atomic_add((vint32 *)value, addValue);
+}

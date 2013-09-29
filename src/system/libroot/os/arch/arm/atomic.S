@@ -81,11 +81,7 @@ FUNCTION(atomic_get):
         bx	lr
 FUNCTION_END(atomic_get)
 
-FUNCTION(__sync_fetch_and_add_4):
-	bx	lr
-FUNCTION_END(__sync_fetch_and_add_4)
-
-#endif
+#endif /* ATOMIC_FUNCS_ARE_SYSCALLS */
 
 #ifndef ATOMIC64_FUNCS_ARE_SYSCALLS
 
