@@ -455,7 +455,7 @@ init_bus(device_node* node, void** bus_cookie)
 		bus->pci, bus->device);
 
 	*bus_cookie = bus;
-	return B_OK;
+	return status;
 }
 
 

@@ -7,5 +7,5 @@ UsePrivateHeaders kernel virtio ;
 KernelAddon virtio_pci :
 	virtio_pci.cpp
 
-	: $(HAIKU_KERNEL_LIBSUPC++)
+	: $(TARGET_KERNEL_LIBSUPC++)
 ;
