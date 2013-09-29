@@ -87,6 +87,13 @@ if $(HOST_PLATFORM) = haiku_host &&  $(HOST_GCC_VERSION[1]) < 3 {
 	SourceHdrs FetchFileJob.cpp : /boot/$(locations)/develop/headers/curl ;
 }
 
+# FreeBSD's gcc doesn't have /usr/local/include and /usr/local/lib in its
+# default search paths, but that's where its libcurl port gets installed to.
+if $(HOST_PLATFORM) = freebsd {
+	SourceHdrs FetchFileJob.cpp : /usr/local/include ;
+	LINKFLAGS on libpackage_build.so += -L/usr/local/lib ;
+}
+
 # locate the library
 MakeLocate libpackage_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
 
