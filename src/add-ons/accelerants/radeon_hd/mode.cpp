@@ -44,13 +44,13 @@ status_t
 create_mode_list(void)
 {
 	// TODO: multi-monitor?  for now we use VESA and not gDisplay edid
+	uint8 crtcID = 0;
 
 	const color_space kRadeonHDSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
 		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
 
 	gInfo->mode_list_area = create_display_modes("radeon HD modes",
-		gInfo->shared_info->has_edid ? &gInfo->shared_info->edid_info : NULL,
-		NULL, 0, kRadeonHDSpaces,
+		&gDisplay[crtcID]->edidData, NULL, 0, kRadeonHDSpaces,
 		sizeof(kRadeonHDSpaces) / sizeof(kRadeonHDSpaces[0]),
 		is_mode_supported, &gInfo->mode_list, &gInfo->shared_info->mode_count);
 	if (gInfo->mode_list_area < B_OK)
@@ -111,6 +111,7 @@ status_t
 radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 {
 	// TODO: multi-monitor?  for now we use VESA edid
+	uint8 crtcID = 0;
 
 	TRACE("%s\n", __func__);
 	if (!gInfo->shared_info->has_edid)
@@ -118,9 +119,9 @@ radeon_get_edid_info(void* info, size_t size, uint32* edid_version)
 	if (size < sizeof(struct edid1_info))
 		return B_BUFFER_OVERFLOW;
 
-	memcpy(info, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
+	//memcpy(info, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
 		// VESA
-	//memcpy(info, &gDisplay[0]->edidData, sizeof(struct edid1_info));
+	memcpy(info, &gDisplay[crtcID]->edidData, sizeof(struct edid1_info));
 		// Display 0
 
 	*edid_version = EDID_VERSION_1;
