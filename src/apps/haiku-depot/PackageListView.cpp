@@ -26,9 +26,9 @@ static const char* skPackageStateInactive = B_TRANSLATE_MARK("Inactive");
 
 
 inline BString
-package_state_to_string(PackageState state)
+package_state_to_string(PackageInfoRef ref)
 {
-	switch (state) {
+	switch (ref->State()) {
 		case NONE:
 			return B_TRANSLATE(skPackageStateAvailable);
 		case INSTALLED:
@@ -37,6 +37,12 @@ package_state_to_string(PackageState state)
 			return B_TRANSLATE(skPackageStateActive);
 		case UNINSTALLED:
 			return B_TRANSLATE(skPackageStateUninstalled);
+		case DOWNLOADING:
+		{
+			BString data;
+			data.SetToFormat("%3.2f%%", ref->DownloadProgress() * 100.0);
+			return data;
+		}
 	}
 
 	return B_TRANSLATE("Unknown");
@@ -473,7 +479,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 
 	// Status
 	// TODO: Fetch info about installed/deactivated/uninstalled/...
-	SetField(new BStringField(package_state_to_string(package.State())),
+	SetField(new BStringField(package_state_to_string(fPackage)),
 		kStatusColumn);
 
 	package.AddListener(fPackageListener);
@@ -493,7 +499,7 @@ PackageRow::UpdateState()
 	if (fPackage.Get() == NULL)
 		return;
 
-	SetField(new BStringField(package_state_to_string(fPackage->State())),
+	SetField(new BStringField(package_state_to_string(fPackage)),
 		kStatusColumn);
 }
 

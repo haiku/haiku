@@ -188,8 +188,9 @@ typedef List<PackageInfoListenerRef, false, 2> PackageListenerList;
 enum PackageState {
 	NONE		= 0,
 	INSTALLED	= 1,
-	ACTIVATED	= 2,
-	UNINSTALLED	= 3,
+	DOWNLOADING	= 2,
+	ACTIVATED	= 3,
+	UNINSTALLED	= 4,
 };
 
 
@@ -228,6 +229,9 @@ public:
 									{ return fState; }
 			void				SetState(PackageState state);
 
+			float				DownloadProgress() const;
+			void				SetDownloadProgress(float progress);
+
 			bool				AddCategory(const CategoryRef& category);
 			const CategoryList&	Categories() const
 									{ return fCategories; }
@@ -261,6 +265,7 @@ private:
 			UserRatingList		fUserRatings;
 			BitmapList			fScreenshots;
 			PackageState		fState;
+			float				fDownloadProgress;
 			PackageListenerList	fListeners;
 };
 

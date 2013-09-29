@@ -446,7 +446,8 @@ PackageInfo::PackageInfo()
 	fChangelog(),
 	fUserRatings(),
 	fScreenshots(),
-	fState(NONE)
+	fState(NONE),
+	fDownloadProgress(0.0)
 {
 }
 
@@ -466,7 +467,8 @@ PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
 	fCategories(),
 	fUserRatings(),
 	fScreenshots(),
-	fState(NONE)
+	fState(NONE),
+	fDownloadProgress(0.0)
 {
 }
 
@@ -483,7 +485,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fCategories(other.fCategories),
 	fUserRatings(other.fUserRatings),
 	fScreenshots(other.fScreenshots),
-	fState(other.fState)
+	fState(other.fState),
+	fDownloadProgress(other.fDownloadProgress)
 {
 }
 
@@ -502,6 +505,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fUserRatings = other.fUserRatings;
 	fScreenshots = other.fScreenshots;
 	fState = other.fState;
+	fDownloadProgress = other.fDownloadProgress;
 	return *this;
 }
 
@@ -519,7 +523,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fCategories == other.fCategories
 		&& fUserRatings == other.fUserRatings
 		&& fScreenshots == other.fScreenshots
-		&& fState == other.fState;
+		&& fState == other.fState
+		&& fDownloadProgress == other.fDownloadProgress;
 }
 
 
@@ -542,8 +547,26 @@ PackageInfo::SetState(PackageState state)
 {
 	if (fState != state) {
 		fState = state;
+		if (fState != DOWNLOADING)
+			fDownloadProgress = 0.0;
 		_NotifyListeners(PKG_CHANGED_STATE);
 	}
+}
+
+
+float
+PackageInfo::DownloadProgress() const
+{
+	return fDownloadProgress;
+}
+
+
+void
+PackageInfo::SetDownloadProgress(float progress)
+{
+	fState = DOWNLOADING;
+	fDownloadProgress = progress;
+	_NotifyListeners(PKG_CHANGED_STATE);
 }
 
 
