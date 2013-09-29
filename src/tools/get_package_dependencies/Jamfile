@@ -11,5 +11,5 @@ BuildPlatformMain <build>get_package_dependencies :
 	:
 	libpackage-add-on-libsolv_build.so
 	libsolvext_build.so libsolv_build.so
-	libpackage_build.so $(HOST_LIBBE) $(HOST_LIBSTDC++)
+	libpackage_build.so $(HOST_LIBBE) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	;
