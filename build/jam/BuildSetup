@@ -266,6 +266,10 @@ if $(HOST_PLATFORM) = cygwin {
 		--enable-auto-import ;
 }
 
+if $(HOST_PLATFORM) = freebsd {
+	HOST_LINKFLAGS += -L/usr/local/lib ;
+}
+
 HOST_CPU ?= $(OSPLAT:L) ;
 
 # Jam doesn't know x86_64, so override HOST_CPU, if 64 bit.
@@ -570,6 +574,10 @@ HOST_BE_API_C++FLAGS = ;
 # Add directory with system headers we need when building something for the host
 # platform, e.g. containing missing POSIX/GNU headers.
 HOST_HDRS += [ FDirName $(HAIKU_TOP) headers build host $(HOST_PLATFORM) ] ;
+
+if $(HOST_PLATFORM) = freebsd {
+	HOST_HDRS += /usr/local/include ;
+}
 
 HOST_BE_API_HEADERS =
 	[ FDirName $(HAIKU_TOP) headers build ]
