@@ -533,9 +533,9 @@ Settings::Update(BMessage* message)
 		return B_BAD_VALUE;
 
 	BPath settingsFolderPath;
-	_GetPath(NULL, 	settingsFolderPath);
+	_GetPath(NULL, settingsFolderPath);
 	if (strncmp(pathName, settingsFolderPath.Path(),
-		strlen(settingsFolderPath.Path()))) {
+			strlen(settingsFolderPath.Path()))) {
 		return B_NAME_NOT_FOUND;
 	}
 
