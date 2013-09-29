@@ -17,7 +17,6 @@
 
 
 using BPackageKit::BContext;
-using BPackageKit::BDecisionProvider;
 using BPackageKit::BJob;
 using BPackageKit::BJobStateListener;
 using BPackageKit::BPackageInstallationLocation;
@@ -37,8 +36,7 @@ class Volume;
 
 class PackageManager : public BPackageManager,
 	private BPackageManager::InstallationInterface,
-	private BPackageManager::UserInteractionHandler,
-	private BDecisionProvider {
+	private BPackageManager::UserInteractionHandler {
 public:
 								PackageManager(Root* root, Volume* volume);
 								~PackageManager();
@@ -84,13 +82,6 @@ private:
 									InstalledRepository& repository);
 
 private:
-	// BDecisionProvider
-	virtual	bool				YesNoDecisionNeeded(const BString& description,
-									const BString& question,
-									const BString& yes, const BString& no,
-									const BString& defaultChoice);
-
-private:
 	// BJobStateListener
 	virtual	void				JobFailed(BJob* job);
 	virtual	void				JobAborted(BJob* job);
@@ -110,7 +101,6 @@ private:
 private:
 			Root*				fRoot;
 			Volume*				fVolume;
-			BContext			fContext;
 			SolverPackageMap	fSolverPackages;
 			SolverPackageSet	fPackagesAddedByUser;
 			SolverPackageSet	fPackagesRemovedByUser;

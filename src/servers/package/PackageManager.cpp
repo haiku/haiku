@@ -36,7 +36,6 @@ PackageManager::PackageManager(Root* root, Volume* volume)
 	BPackageManager::UserInteractionHandler(),
 	fRoot(root),
 	fVolume(volume),
-	fContext(*this, *this),
 	fSolverPackages(),
 	fPackagesAddedByUser(),
 	fPackagesRemovedByUser(),
@@ -362,17 +361,6 @@ PackageManager::ProgressTransactionCommitted(InstalledRepository& repository,
 void
 PackageManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 {
-}
-
-
-bool
-PackageManager::YesNoDecisionNeeded(const BString& description,
-	const BString& question, const BString& yes, const BString& no,
-	const BString& defaultChoice)
-{
-	// ATM we need the BDecisionProvider object for the BContext, but we don't
-	// execute any request which actually uses it.
-	return false;
 }
 
 
