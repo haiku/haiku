@@ -442,17 +442,22 @@ public:
 
 		fRatingView->SetRating(ratingSummary.averageRating);
 
-		BString avgRating;
-		avgRating.SetToFormat("%.1f", ratingSummary.averageRating);
-		fAvgRating->SetText(avgRating);
+		if (ratingSummary.ratingCount > 0) {
+			BString avgRating;
+			avgRating.SetToFormat("%.1f", ratingSummary.averageRating);
+			fAvgRating->SetText(avgRating);
+	
+			BString votes;
+			votes.SetToFormat("%d", ratingSummary.ratingCount);
+	
+			BString voteInfo(B_TRANSLATE("(%Votes%)"));
+			voteInfo.ReplaceAll("%Votes%", votes);
 
-		BString votes;
-		votes.SetToFormat("%d", ratingSummary.ratingCount);
-
-		BString voteInfo(B_TRANSLATE("(%Votes%)"));
-		voteInfo.ReplaceAll("%Votes%", votes);
-
-		fVoteInfo->SetText(voteInfo);
+			fVoteInfo->SetText(voteInfo);
+		} else {
+			fAvgRating->SetText("");
+			fVoteInfo->SetText(B_TRANSLATE("n/a"));
+		}
 
 		InvalidateLayout();
 		Invalidate();
