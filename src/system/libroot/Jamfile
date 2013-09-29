@@ -14,6 +14,32 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# we need to link against libgcc.a objects and make
 			# it available to other applications as in BeOS
 
+		# workaround for ARM having waaaaay too many objects in libgcc
+		# which fails execve() with too large argument list
+		# when linking them directly into libroot.
+		local libgccObjects1 =
+			$(HAIKU_GCC_LIBGCC_OBJECTS_$(architecture)[1-800]) ;
+		local libgccObjects2 =
+			$(HAIKU_GCC_LIBGCC_OBJECTS_$(architecture)[801-]) ;
+
+		local librootLibgccObjects =
+			<$(architecture)>libgcc_part1_$(TARGET_ARCH).o ;
+
+		MergeObject <$(architecture)>libgcc_part1_$(TARGET_ARCH).o :
+			:
+			$(libgccObjects1)
+			;
+
+		if $(libgccObjects2) {
+			librootLibgccObjects +=
+				<$(architecture)>libgcc_part2_$(TARGET_ARCH).o ;
+
+			MergeObject <$(architecture)>libgcc_part2_$(TARGET_ARCH).o :
+				:
+				$(libgccObjects2)
+				;
+		}
+
 		local librootObjects =
 			os_main.o
 			os_arch_$(TARGET_ARCH).o
@@ -70,7 +96,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			libroot_init.c
 			:
-			$(HAIKU_GCC_LIBGCC_OBJECTS_$(architecture))
+			$(librootLibgccObjects)
 			$(librootObjects)
 			$(librootNoDebugObjects)
 			$(HAIKU_STATIC_LIBSUPC++_$(architecture))
@@ -84,7 +110,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			libroot_init.c
 			:
-			$(HAIKU_GCC_LIBGCC_OBJECTS_$(architecture))
+			$(librootLibgccObjects)
 			$(librootObjects)
 			$(librootDebugObjects)
 			$(HAIKU_STATIC_LIBSUPC++_$(architecture))
