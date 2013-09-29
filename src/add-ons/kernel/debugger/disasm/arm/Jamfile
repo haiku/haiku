@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel debugger disasm $(TARGET_ARCH) ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+UsePrivateHeaders kernel ;
+
+KernelStaticLibrary disasm_arch.a :
+	disasm_arch.cpp
+	;
+
