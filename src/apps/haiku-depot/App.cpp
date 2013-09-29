@@ -37,10 +37,12 @@ bool
 App::QuitRequested()
 {
 	if (fMainWindow->LockLooperWithTimeout(1500000) == B_OK) {
-		BRect windowFrame = fMainWindow->Frame();
+		BMessage windowSettings;
+		fMainWindow->StoreSettings(windowSettings);
+
 		fMainWindow->UnlockLooper();
 
-		_StoreSettings(windowFrame);
+		_StoreSettings(windowSettings);
 	}
 
 	return true;
@@ -60,7 +62,7 @@ App::ReadyToRun()
 
 	make_sure_frame_is_on_screen(frame);
 
-	fMainWindow = new MainWindow(frame);
+	fMainWindow = new MainWindow(frame, settings);
 	fMainWindow->Show();
 }
 
@@ -71,9 +73,11 @@ App::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_MAIN_WINDOW_CLOSED:
 		{
-			BRect windowFrame;
-			if (message->FindRect("window frame", &windowFrame) == B_OK)
-				_StoreSettings(windowFrame);
+			BMessage windowSettings;
+			if (message->FindMessage("window settings",
+					&windowSettings) == B_OK) {
+				_StoreSettings(windowSettings);
+			}
 
 			Quit();
 			break;
@@ -87,10 +91,8 @@ App::MessageReceived(BMessage* message)
 
 
 void
-App::_StoreSettings(const BRect& windowFrame)
+App::_StoreSettings(const BMessage& windowSettings)
 {
-	BMessage settings;
-	settings.AddRect("window frame", windowFrame);
-	save_settings(&settings, "main_settings", "HaikuDepot");
+	save_settings(&windowSettings, "main_settings", "HaikuDepot");
 }
 

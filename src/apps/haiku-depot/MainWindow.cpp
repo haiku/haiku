@@ -72,7 +72,7 @@ struct RefreshWorkerParameters {
 };
 
 
-MainWindow::MainWindow(BRect frame)
+MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	:
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
@@ -106,6 +106,11 @@ MainWindow::MainWindow(BRect frame)
 	fSplitView->SetCollapsible(0, false);
 	fSplitView->SetCollapsible(1, false);
 
+	// Restore settings
+	BMessage columnSettings;
+	if (settings.FindMessage("column settings", &columnSettings) == B_OK)
+		fPackageListView->LoadState(&columnSettings);
+
 	_StartRefreshWorker();
 
 	fPendingActionsSem = create_sem(0, "PendingPackageActions");
@@ -135,8 +140,12 @@ MainWindow::~MainWindow()
 bool
 MainWindow::QuitRequested()
 {
+	BMessage settings;
+	StoreSettings(settings);
+
 	BMessage message(MSG_MAIN_WINDOW_CLOSED);
-	message.AddRect("window frame", Frame());
+	message.AddMessage("window settings", &settings);
+
 	be_app->PostMessage(&message);
 
 	return true;
@@ -226,6 +235,18 @@ MainWindow::MessageReceived(BMessage* message)
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+MainWindow::StoreSettings(BMessage& settings) const
+{
+	settings.AddRect("window frame", Frame());
+
+	BMessage columnSettings;
+	fPackageListView->SaveState(&columnSettings);
+
+	settings.AddMessage("column settings", &columnSettings);
 }
 
 

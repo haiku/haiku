@@ -46,7 +46,7 @@ load_settings(BMessage* message, const char* fileName, const char* folder)
 
 
 status_t
-save_settings(BMessage* message, const char* fileName, const char* folder)
+save_settings(const BMessage* message, const char* fileName, const char* folder)
 {
 	if (message == NULL || fileName == NULL || fileName[0] == '\0')
 		return B_BAD_VALUE;

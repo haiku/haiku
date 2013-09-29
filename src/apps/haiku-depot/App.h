@@ -22,7 +22,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
-			void				_StoreSettings(const BRect& windowFrame);
+			void				_StoreSettings(const BMessage& windowSettings);
 
 			MainWindow*			fMainWindow;
 };

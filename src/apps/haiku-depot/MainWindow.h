@@ -29,12 +29,15 @@ enum {
 class MainWindow : public BWindow, private PackageInfoListener,
 	private PackageActionHandler {
 public:
-								MainWindow(BRect frame);
+								MainWindow(BRect frame,
+									const BMessage& settings);
 	virtual						~MainWindow();
 
 	// BWindow interface
 	virtual	bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* message);
+
+			void				StoreSettings(BMessage& message) const;
 
 private:
 	// PackageInfoListener
