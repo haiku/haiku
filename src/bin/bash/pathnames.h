@@ -29,6 +29,6 @@
 
 /* The default location of the bash debugger initialization/startup file. */
 #define DEBUGGER_START_FILE	\
-	"/boot/common/share/bashdb/bashdb-main.inc"
+	"/boot/system/data/bashdb/bashdb-main.inc"
 
 #endif /* _PATHNAMES_H */

@@ -19,7 +19,7 @@
 
 
 const char *appName = "application/x-vnd.jsr-additemtest";
-const char *pulsePath = "/boot/common/apps/Pulse";
+const char *pulsePath = "/boot/system/apps/Pulse";
 
 
 /*

@@ -7,6 +7,6 @@
 #}
 
 service ssh {
-	launch	/boot/common/bin/sshd -D
+	launch	/boot/system/bin/sshd -D
 	stand_alone
 }

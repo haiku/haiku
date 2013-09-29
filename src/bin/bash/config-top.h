@@ -55,8 +55,8 @@
 #ifndef DEFAULT_PATH_VALUE
 #define DEFAULT_PATH_VALUE \
   ".:/boot/home/config/non-packaged/bin:/boot/home/config/bin" \
-  ":/boot/common/non-packaged/bin:/boot/common/bin" \
-  ":/bin:/boot/common/apps:/boot/common/preferences" \
+  ":/boot/system/non-packaged/bin" \
+  ":/bin:/boot/system/non-packaged/apps:/boot/system/non-packaged/preferences" \
   ":/boot/system/apps" \
   ":/boot/system/preferences"
 #endif
@@ -65,8 +65,8 @@
    the Posix.2 confstr () function, or CS_PATH define are not present. */
 #ifndef STANDARD_UTILS_PATH
 #define STANDARD_UTILS_PATH \
-  ":/boot/common/non-packaged/bin:/boot/common/bin" \
-  ":/bin:/boot/common/apps:/boot/common/preferences" \
+  ":/boot/system/non-packaged/bin" \
+  ":/bin:/boot/system/non-packaged/apps:/boot/system/non-packaged/preferences" \
   ":/boot/system/apps" \
   ":/boot/system/preferences" 
 #endif

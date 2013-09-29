@@ -214,9 +214,6 @@ public:
 
 	virtual	void				VolumeNodeMonitorEventOccurred(Volume* volume)
 									= 0;
-	virtual	status_t			GetRootDirectoryRef(
-									PackageFSMountType mountType,
-									node_ref& _ref) = 0;
 };
 
 

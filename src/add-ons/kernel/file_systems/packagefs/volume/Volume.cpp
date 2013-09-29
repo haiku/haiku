@@ -53,14 +53,9 @@ static const uint32 kAllStatFields = B_STAT_MODE | B_STAT_UID | B_STAT_GID
 	| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME;
 
 // shine-through directories
-const char* const kSystemShineThroughDirectories[] = {
-	"packages", NULL
-};
-const char* const kCommonShineThroughDirectories[] = {
+const char* const kShineThroughDirectories[] = {
 	"cache", "non-packaged", "packages", "settings", "var", NULL
 };
-const char* const* kHomeShineThroughDirectories
-	= kCommonShineThroughDirectories;
 
 // sanity limit for activation change request
 const size_t kMaxActivationRequestSize = 10 * 1024 * 1024;
@@ -1668,13 +1663,9 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 		// nothing specified -- derive from mount type
 		switch (fMountType) {
 			case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
-				directories = kSystemShineThroughDirectories;
-				break;
 			case PACKAGE_FS_MOUNT_TYPE_COMMON:
-				directories = kCommonShineThroughDirectories;
-				break;
 			case PACKAGE_FS_MOUNT_TYPE_HOME:
-				directories = kHomeShineThroughDirectories;
+				directories = kShineThroughDirectories;
 				break;
 			case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
 				return B_OK;
@@ -1682,11 +1673,11 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 				return B_BAD_VALUE;
 		}
 	} else if (strcmp(shineThroughSetting, "system") == 0)
-		directories = kSystemShineThroughDirectories;
+		directories = kShineThroughDirectories;
 	else if (strcmp(shineThroughSetting, "common") == 0)
-		directories = kCommonShineThroughDirectories;
+		directories = kShineThroughDirectories;
 	else if (strcmp(shineThroughSetting, "home") == 0)
-		directories = kHomeShineThroughDirectories;
+		directories = kShineThroughDirectories;
 	else if (strcmp(shineThroughSetting, "none") == 0)
 		directories = NULL;
 	else

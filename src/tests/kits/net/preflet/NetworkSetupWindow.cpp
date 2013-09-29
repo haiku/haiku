@@ -176,7 +176,7 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 
 	menu->SetRadioMode(true);
 
-	BDirectory dir("/boot/common/settings/network/profiles");
+	BDirectory dir("/boot/system/settings/network/profiles");
 
 	if (dir.InitCheck() == B_OK) {
 		BEntry entry;

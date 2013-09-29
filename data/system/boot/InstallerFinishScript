@@ -13,7 +13,7 @@ if [ ! -d "$target" ]; then
 	exit 1
 fi
 
-mkdir -p "$target/common/cache/tmp"
+mkdir -p "$target/system/cache/tmp"
 
 # remove Installer link
 rm -f "$target/home/Desktop/Installer"

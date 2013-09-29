@@ -17,8 +17,6 @@ if ! $(HAIKU_BOOTSTRAP_BUILD) {
 	AddHaikuImagePackages
 		bzip2 ctags ffmpeg freetype glu grep icu jpeg libpng libsolv mesa sed
 		tar zlib
-		:
-		system
 		;
 
 	# secondary architectures
@@ -28,8 +26,6 @@ if ! $(HAIKU_BOOTSTRAP_BUILD) {
 		on $(architectureObject) {
 			AddHaikuImagePackages
 				ffmpeg freetype glu icu jpeg libpng libsolv mesa zlib
-				:
-				system
 				;
 		}
 	}

@@ -4,9 +4,9 @@
 # Check for recent enough version of bash.
 bash=${BASH_VERSION%.*}; bmajor=${bash%.*}; bminor=${bash#*.}
 if [ $bmajor -gt 3 ] || [ $bmajor -eq 3 -a $bminor -ge 2 ]; then
-    if shopt -q progcomp && [ -r /boot/common/etc/bash_completion ]; then
+    if shopt -q progcomp && [ -r /boot/system/etc/bash_completion ]; then
         # Source completion code.
-        . /boot/common/etc/bash_completion
+        . /boot/system/etc/bash_completion
     fi
 fi
 unset bash bmajor bminor

@@ -8,7 +8,7 @@ local cpuName = [ Match "([^-]*)-.*" : $(gccMachine) ] ;
 local vendorName = [ Match "[^-]*-([^-]*)" : $(gccMachine) ] ;
 local osName = [ Match "[^-]*-[^-]*-([^-]*)" : $(gccMachine) ] ;
 
-SubDirCcFlags -DHAVE_CONFIG_H -DPROGRAM='\"bash\"' -DSHELL -DLOCALEDIR='\"/boot/common/share/locale\"' -DPACKAGE='\"bash\"' ;
+SubDirCcFlags -DHAVE_CONFIG_H -DPROGRAM='\"bash\"' -DSHELL -DLOCALEDIR='\"/boot/system/data/locale\"' -DPACKAGE='\"bash\"' ;
 SubDirCcFlags -DCONF_MACHTYPE='\"$(gccMachine)\"' ;
 SubDirCcFlags -DCONF_HOSTTYPE='\"$(cpuName)\"' ;
 SubDirCcFlags -DCONF_VENDOR='\"$(vendorName)\"' ;

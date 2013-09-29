@@ -133,7 +133,7 @@ AddFilesToPackage boot : $(bootScripts) ;
 local postInstallFiles = default_deskbar_items.sh ;
 postInstallFiles = $(postInstallFiles:G=post-install) ;
 SEARCH on $(postInstallFiles)
-	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
+	= [ FDirName $(HAIKU_TOP) data system boot post_install ] ;
 AddFilesToPackage boot post-install : $(postInstallFiles) ;
 
 local fortuneFiles = [ Glob $(HAIKU_TOP)/data/system/data/fortunes

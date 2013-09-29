@@ -242,10 +242,10 @@ directory contains several dysfunctional programs; working variants of
 these programs are available in `/usr/bin'.  So, if you need `/usr/ucb'
 in your `PATH', put it _after_ `/usr/bin'.
 
-   On Haiku, software installed for all users goes in `/boot/common',
+   On Haiku, software installed for all users goes in `/boot/system',
 not `/usr/local'.  It is recommended to use the following options:
 
-     ./configure --prefix=/boot/common
+     ./configure --prefix=/boot/system
 
 Specifying the System Type
 ==========================

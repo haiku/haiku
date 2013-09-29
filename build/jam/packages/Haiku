@@ -138,7 +138,7 @@ local postInstallFiles = add_catalog_entry_attributes.sh
 	default_deskbar_items.sh ;
 postInstallFiles = $(postInstallFiles:G=post-install) ;
 SEARCH on $(postInstallFiles)
-	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
+	= [ FDirName $(HAIKU_TOP) data system boot post_install ] ;
 AddFilesToPackage boot post-install : $(postInstallFiles) ;
 
 # Gutenprint data files

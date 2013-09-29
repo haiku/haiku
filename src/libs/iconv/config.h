@@ -260,7 +260,7 @@
 /* #undef ICONV_CONST */
 
 /* Define to the value of ${prefix}, as a string. */
-#define INSTALLPREFIX "/boot/common"
+#define INSTALLPREFIX "/boot/system"
 
 /* If malloc(0) is != NULL, define this to 1. Otherwise define this to 0. */
 #define MALLOC_0_IS_NONNULL 1

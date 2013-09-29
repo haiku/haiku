@@ -130,7 +130,7 @@ FullTextAnalyser::_IsInIndexDirectory(const entry_ref& ref)
 	if (BString(path.Path()).FindFirst(fDataBasePath.Path()) == 0)
 		return true;
 
-	if (BString(path.Path()).FindFirst("/boot/common/cache/tmp") == 0)
+	if (BString(path.Path()).FindFirst("/boot/system/cache/tmp") == 0)
 		return true;
 
 	return false;

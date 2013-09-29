@@ -39,7 +39,7 @@
  */
 
 #define SYSTEM "system"
-#define COMMON "common"
+#define COMMON SYSTEM
 #define NON_PACKAGED "/non-packaged"
 
 

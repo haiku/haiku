@@ -28,7 +28,7 @@ if $(HAIKU_IMAGE_HOST_NAME) {
 	Always $(file) ;
 	MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
 	BuildHaikuImageHostnameFile $(file) ;
-	AddFilesToHaikuImage common settings network : $(file) ;
+	AddFilesToHaikuImage system settings network : $(file) ;
 }
 
 

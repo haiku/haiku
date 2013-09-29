@@ -82,7 +82,7 @@ fi
 
 # Create /tmp dir, and make sure it's empty
 
-TMPDIR=/boot/common/cache/tmp
+TMPDIR=/boot/system/cache/tmp
 if [ ! -d $TMPDIR ]; then
 	mkdir -f $TMPDIR
 	chmod a+rwx $TMPDIR
@@ -192,14 +192,14 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Check for fresh install and run post install scripts.
-freshInstallIndicator=/boot/common/settings/fresh_install
+freshInstallIndicator=/boot/system/settings/fresh_install
 postInstallDir=boot/post-install
 if [ -e $freshInstallIndicator ]; then
 	# wait a moment for things to calm down a bit
 	sleep 3
 
 	# execute scripts
-	for f in /boot/system/$postInstallDir/*.sh /boot/common/$postInstallDir/*.sh
+	for f in /boot/system/$postInstallDir/*.sh
 	do
 		if [ -f $f ]; then
 			echo "Running post install script $f ..." > /dev/dprintf

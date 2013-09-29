@@ -34,7 +34,7 @@ local baseSourceURL = http://haiku-files.org/files/sources ;
 
 # BeBook
 if [ IsOptionalHaikuImagePackageAdded BeBook ] {
-	AddHaikuImagePackages be_book : system ;
+	AddHaikuImagePackages be_book ;
 	AddSymlinkToHaikuImage home Desktop
 		: /boot/system/documentation/BeBook/index.html
 		: BeBook ;
@@ -55,12 +55,12 @@ if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
 		AddSymlinkToHaikuImage beos : ../system/bin ;
 		AddSymlinkToHaikuImage beos
 			: ../system/documentation ;
-		AddSymlinkToHaikuImage beos : ../common/settings/etc ;
+		AddSymlinkToHaikuImage beos : ../system/settings/etc ;
 		AddSymlinkToHaikuImage beos : ../system/preferences ;
 		AddSymlinkToHaikuImage beos : ../system ;
 		AddDirectoryToHaikuImage var ;
-		AddSymlinkToHaikuImage var : /boot/common/var/log ;
-		AddSymlinkToHaikuImage var : /boot/common/cache/tmp ;
+		AddSymlinkToHaikuImage var : /boot/system/var/log ;
+		AddSymlinkToHaikuImage var : /boot/system/cache/tmp ;
 	}
 }
 
@@ -102,8 +102,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
-			AddHaikuImagePackages curl_devel ffmpeg_devel freetype_devel glu_devel
-				jpeg_devel libpng_devel zlib_devel : system ;
+			AddHaikuImagePackages curl_devel ffmpeg_devel freetype_devel
+				glu_devel jpeg_devel libpng_devel zlib_devel ;
 		}
 	}
 }
@@ -145,8 +145,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 		:
 		haiku_devel.hpkg
 		haiku_$(TARGET_PACKAGING_ARCHS[2-])_devel.hpkg
+		makefile_engine.hpkg
 		;
-	AddPackageFilesToHaikuImage common : makefile_engine.hpkg ;
 }
 
 

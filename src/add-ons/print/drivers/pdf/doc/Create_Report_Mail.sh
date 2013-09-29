@@ -1,5 +1,5 @@
 #!/bin/sh
-/boot/common/apps/BeMail mailto:philippe.houdoin@free.fr -subject "pdf_writer v.1.0b1 report" -body "Thanks for taking the time to report how pdf_writer v1.0b1 worked for you!
+/boot/system/apps/BeMail mailto:philippe.houdoin@free.fr -subject "pdf_writer v.1.0b1 report" -body "Thanks for taking the time to report how pdf_writer v1.0b1 worked for you!
 
 Please edit the following text to reflect your experience when trying pdf_writer:
 

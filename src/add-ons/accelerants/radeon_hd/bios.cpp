@@ -195,7 +195,7 @@ radeon_dump_bios()
 
 	FILE* fp;
 	char filename[255];
-	sprintf(filename, "/boot/common/cache/tmp/radeon_hd_bios_1002_%" B_PRIx32
+	sprintf(filename, "/boot/system/cache/tmp/radeon_hd_bios_1002_%" B_PRIx32
 		"_%" B_PRIu32 ".bin", info.pciID, info.deviceIndex);
 
 	fp = fopen(filename, "wb");

@@ -25,7 +25,7 @@ static const char* const kLinkPaths[PackageLinkSymlink::TYPE_ENUM_COUNT]
 		"../../../home/config"
 	},
 	{
-		"../../../common/settings",
+		"../../../system/settings",
 		"../../../common/settings",
 		"../../../home/config/settings/global"
 	}

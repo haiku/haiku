@@ -68,10 +68,10 @@ find_directory(directory_which which, dev_t device, bool createIt,
 			path = HAIKU_BUILD_GENERATED_DIRECTORY "/tmp";
 			break;
 		case B_COMMON_SETTINGS_DIRECTORY:
-			path = HAIKU_BUILD_GENERATED_DIRECTORY "/common/settings";
+			path = HAIKU_BUILD_GENERATED_DIRECTORY "/system/settings";
 			break;
 		case B_COMMON_CACHE_DIRECTORY:
-			path = HAIKU_BUILD_GENERATED_DIRECTORY "/common/cache";
+			path = HAIKU_BUILD_GENERATED_DIRECTORY "/system/cache";
 			break;
 		case B_USER_SETTINGS_DIRECTORY:
 			path = HAIKU_BUILD_GENERATED_DIRECTORY "/user/settings";

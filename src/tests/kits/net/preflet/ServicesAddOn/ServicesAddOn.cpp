@@ -104,7 +104,7 @@ ServicesAddOn::ParseInetd()
 status_t
 ServicesAddOn::ParseXinetd()
 {
-	FILE *f = fopen("/boot/common/settings/network/services", "r");
+	FILE *f = fopen("/boot/system/settings/network/services", "r");
 	if (f) {
 		char line[1024], *linePtr;
 		char *token;

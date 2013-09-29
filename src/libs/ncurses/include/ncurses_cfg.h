@@ -51,8 +51,8 @@
 #define HAVE_LONG_FILE_NAMES 1
 #define MIXEDCASE_FILENAMES 1
 #define USE_DATABASE 1
-#define TERMINFO_DIRS "/boot/common/data/terminfo"
-#define TERMINFO "/boot/common/data/terminfo"
+#define TERMINFO_DIRS "/boot/system/data/terminfo"
+#define TERMINFO "/boot/system/data/terminfo"
 #define TERMPATH "/etc/termcap"
 #define HAVE_BIG_CORE 1
 #define PURE_TERMINFO 1

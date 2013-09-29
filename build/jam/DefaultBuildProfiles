@@ -36,12 +36,6 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_SIZE = 800 ;
 
 			AddHaikuImagePackages
-				wpa_supplicant
-				:
-				system
-				;
-
-			AddHaikuImagePackages
 				bepdf
 				cvs
 				keymapswitcher
@@ -56,6 +50,7 @@ rule DefineDefaultBuildProfiles
 				timgmsoundfont
 				vision
 				wonderbrush
+				wpa_supplicant
 				wqy_microhei
 				xz_utils@!gcc2
 				;
@@ -72,7 +67,7 @@ rule DefineDefaultBuildProfiles
 			local architectureObject ;
 			for architectureObject in [ MultiArchSubDirSetup ] {
 				on $(architectureObject) {
-					AddHaikuImagePackages openssl : system ;
+					AddHaikuImagePackages openssl ;
 				}
 			}
 
@@ -93,19 +88,14 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_SIZE = 600 ;
 
 			AddHaikuImagePackages
-				openssl
-				wpa_supplicant
-				:
-				system
-				;
-
-			AddHaikuImagePackages
 				man
 				nano
 				openssh
+				openssl
 				p7zip
 				pe
 				vision
+				wpa_supplicant
 				xz_utils
 				;
 
@@ -118,40 +108,30 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_SIZE = 20000 ;
 
 			AddHaikuImagePackages
-				curl
-				curl_devel
-				freetype
-				freetype_devel
-				grep
-				icu
-				libsolv
-				ncurses
-				ncurses_devel
-				sed
-				zlib
-				zlib_devel
-				:
-				system
-				;
-
-			AddHaikuImagePackages
 				autoconf
 				automake
 				binutils
 				bison
+				curl
+				curl_devel
 				flex
+				freetype
+				freetype_devel
 				gcc
+				grep
 				haikuporter
-#				jam
+				icu
+				libsolv
 				libtool
 				libtool_libltdl
 				m4
 				make
-#				makeinfo
-#				mkdepend
-#				perl
+				ncurses
+				ncurses_devel
 				python
-#				texinfo
+				sed
+				zlib
+				zlib_devel
 				;
 
 			# secondary architecture packages
@@ -160,23 +140,18 @@ rule DefineDefaultBuildProfiles
 					in [ MultiArchSubDirSetup $(TARGET_PACKAGING_ARCHS[2-]) ] {
 				on $(architectureObject) {
 					AddHaikuImagePackages
+						binutils
 						curl
 						curl_devel
 						freetype
 						freetype_devel
+						gcc
 						icu
 						libsolv
 						ncurses
 						ncurses_devel
 						zlib
 						zlib_devel
-						:
-						system
-						;
-
-					AddHaikuImagePackages
-						binutils
-						gcc
 						;
 				}
 			}

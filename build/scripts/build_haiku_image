@@ -6,8 +6,7 @@ set -o errexit
 # outputDir
 # tmpDir
 # addBuildCompatibilityLibDir
-# systemPackages, commonPackages - lists of the hpkg packages copied/updated
-#   (in "system" and "common" respectively)
+# systemPackages - lists of the hpkg packages copied/updated
 # repositories - all repository files
 # downloadDir
 # The following are only for image types:
@@ -281,7 +280,6 @@ done
 if [ -n "$resolvePackageDependencies" ]; then
 	echo "Resolving package dependencies ..."
 
-	# additional packages for system
 	packageUrls=`$getPackageDependencies $repositories -- $systemPackages`
 	for packageUrl in $packageUrls; do
 		packageFileName=`basename $packageUrl`
@@ -290,36 +288,13 @@ if [ -n "$resolvePackageDependencies" ]; then
 		$cp "${sPrefix}$packageFilePath" "${tPrefix}system/packages"
 		systemPackages="$systemPackages $packageFilePath"
 	done
-
-	# Remove packages from the list for common, that are already in the package
-	# list for system.
-	unfilteredCommonPackages="$commonPackages"
-	commonPackages=
-	for packageFile in $unfilteredCommonPackages; do
-		if is_in_list "$packageFile" "$systemPackages"; then
-			:
-		else
-			commonPackages="$commonPackages $packageFile"
-		fi
-	done
-
-	# additional packages for common
-	packageUrls=`$getPackageDependencies $repositories -- $systemPackages \
-		$commonPackages`
-	for packageUrl in $packageUrls; do
-		packageFileName=`basename $packageUrl`
-		packageFilePath="$downloadDir/$packageFileName"
-		downloadFile $packageUrl "$packageFilePath"
-		$cp "${sPrefix}$packageFilePath" "${tPrefix}common/packages"
-		commonPackages="$commonPackages $packageFilePath"
-	done
 fi
 
 
 # install default settings for packages
-for packageFile in $systemPackages $commonPackages; do
+for packageFile in $systemPackages; do
 	if $package list -p $packageFile | egrep '^settings/' > /dev/null; then
-		extractFile $packageFile common/settings settings
+		extractFile $packageFile system/settings settings
 	fi
 done
 

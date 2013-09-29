@@ -215,12 +215,12 @@ local etcFiles = inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = $(etcDir) ;
 etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
-AddFilesToHaikuImage common settings etc : $(etcFiles) ;
+AddFilesToHaikuImage system settings etc : $(etcFiles) ;
 
 local profileFiles = [ Glob $(etcDir)/profile.d : *.sh ] ;
 profileFiles = $(profileFiles:G=profile-d) ;
-AddDirectoryToHaikuImage common settings etc profile.d ;
-AddFilesToHaikuImage common settings etc profile.d : $(profileFiles) ;
+AddDirectoryToHaikuImage system settings etc profile.d ;
+AddFilesToHaikuImage system settings etc profile.d : $(profileFiles) ;
 
 local driverSettingsFiles = <driver-settings>kernel ;
 SEARCH on $(driverSettingsFiles)
@@ -231,18 +231,18 @@ AddFilesToHaikuImage home config settings kernel drivers
 local networkSettingsFiles = <network-settings>services ;
 SEARCH on $(networkSettingsFiles)
 	= [ FDirName $(HAIKU_TOP) data settings network ] ;
-AddFilesToHaikuImage common settings network : $(networkSettingsFiles) ;
+AddFilesToHaikuImage system settings network : $(networkSettingsFiles) ;
 
 # fresh install indicator file for the post install scripts
 SEARCH on <post-install>fresh_install
-	= [ FDirName $(HAIKU_TOP) data common settings ] ;
-AddFilesToHaikuImage common settings : <post-install>fresh_install ;
+	= [ FDirName $(HAIKU_TOP) data system settings ] ;
+AddFilesToHaikuImage system settings : <post-install>fresh_install ;
 
 # create directories that will remain empty
-AddDirectoryToHaikuImage common cache tmp ;
-AddDirectoryToHaikuImage common non-packaged ;
-AddDirectoryToHaikuImage common var empty ;
-AddDirectoryToHaikuImage common var log ;
+AddDirectoryToHaikuImage system cache tmp ;
+AddDirectoryToHaikuImage system non-packaged ;
+AddDirectoryToHaikuImage system var empty ;
+AddDirectoryToHaikuImage system var log ;
 AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage home mail ;
 AddDirectoryToHaikuImage home config packages ;

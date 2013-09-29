@@ -605,10 +605,9 @@ private:
 			return;
 
 		// Open the root directory of the installation location where we will
-		// extract the files -- that's the volume's root directory save for
-		// "system" where it is "common".
+		// extract the files -- that's the volume's root directory.
 		BDirectory rootDirectory;
-		status_t error = fVolume->_OpenSettingsRootDirectory(rootDirectory);
+		status_t error = rootDirectory.SetTo(&fVolume->fRootDirectoryRef);
 		if (error != B_OK) {
 			throw Exception(error,
 				BString().SetToFormat("failed to get the root directory "
@@ -2237,41 +2236,6 @@ Volume::_OpenPackagesSubDirectory(const RelativePath& path, bool create,
 	}
 
 	return FSUtils::OpenSubDirectory(directory, path, create, _directory);
-}
-
-
-status_t
-Volume::_OpenSettingsRootDirectory(BDirectory& _directory)
-{
-	switch (fMountType) {
-		case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
-		{
-			// try our sibling volume
-			if (fListener != NULL) {
-				node_ref ref;
-				status_t error = fListener->GetRootDirectoryRef(
-					PACKAGE_FS_MOUNT_TYPE_COMMON, ref);
-				if (error != B_ENTRY_NOT_FOUND)
-					return error;
-				return _directory.SetTo(&ref);
-			}
-
-			// try a path relative to our root directory
-			BDirectory rootDirectory;
-			status_t error = rootDirectory.SetTo(&fRootDirectoryRef);
-			if (error != B_OK)
-				return error;
-			return _directory.SetTo(&rootDirectory, "../common");
-		}
-
-		case PACKAGE_FS_MOUNT_TYPE_COMMON:
-		case PACKAGE_FS_MOUNT_TYPE_HOME:
-			return _directory.SetTo(&fRootDirectoryRef);
-
-		case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
-		default:
-			return B_BAD_VALUE;
-	}
 }
 
 

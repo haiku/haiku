@@ -840,28 +840,14 @@ rule AddPackagesAndRepositoryVariablesToContainerScript script : container
 	AddVariableToScript $(script) : resolvePackageDependencies
 		: $(resolvePackageDependencies) ;
 
-	# Add variables "systemPackages" and "commonPackages" with the packages
-	# copied/updated.
+	# Add variable "systemPackages"  with the packages copied/updated.
 	local allPackages = [ on $(container) return $(HAIKU_PACKAGES_IN_IMAGE) ] ;
 	if $(updateOnly) && ! [ IncludeAllTargetsInContainer $(container) ] {
 		allPackages = [ FilterContainerUpdateTargets $(allPackages)
 			: [ on $(container) return $(HAIKU_INCLUDE_IN_CONTAINER_VAR) ] ] ;
 	}
 
-	local systemPackages ;
-	local commonPackages ;
-	local package ;
-	for package in $(allPackages) {
-		if [ on $(package) return $(HAIKU_PACKAGE_INSTALLATION_LOCATION) ]
-				= system {
-			systemPackages += $(package) ;
-		} else {
-			commonPackages += $(package) ;
-		}
-	}
-
-	AddTargetVariableToScript $(script) : $(systemPackages) : systemPackages ;
-	AddTargetVariableToScript $(script) : $(commonPackages) : commonPackages ;
+	AddTargetVariableToScript $(script) : $(allPackages) : systemPackages ;
 
 	# Generate the repository package lists and add variables for the
 	# repositories.
@@ -1052,14 +1038,10 @@ rule OptionalPackageDependencies package : dependencies
 }
 
 
-rule AddHaikuImagePackages packages : installationLocation
+rule AddHaikuImagePackages packages
 {
-	# AddHaikuImagePackages <packages> [ : <installationLocation> ] ;
-	 # Adds the given package <packages>s to the image. <installationLocation>
-	 # is either "system" or "common" (the default) and specifies where the
-	 # packages shall be installed.
-
-	installationLocation ?= common ;
+	# AddHaikuImagePackages <packages> ;
+	# Adds the given packages <packages> to the image.
 
 	packages = [ FFilterByBuildFeatures $(packages) ] ;
 
@@ -1083,7 +1065,7 @@ rule AddHaikuImagePackages packages : installationLocation
 				HAIKU_INCLUDE_IN_IMAGE on $(file) = 1 ;
 			}
 
-			AddPackageFilesToHaikuImage $(installationLocation) : $(file) ;
+			AddPackageFilesToHaikuImage system : $(file) ;
 		}
 	}
 }
@@ -1143,9 +1125,8 @@ rule InstallOptionalHaikuImagePackage url : dirTokens : flags
 	# TODO: Remove the non-hpkg cases!
 	# Currently the semantics differs depending on whether the  cdPackage flag
 	# has been specified and the type of the package file:
-	# * For a hpkg <dirTokens> is "common" (default) or "system" and specifies
-	#   the installation location of the package (will be copied to the
-	#   packages/ subdirectory).
+	# * For a hpkg <dirTokens> is ignored. The package will be copied into the
+	#   system/packages directory.
 	# * For a regular archive and cdPackage, <dirTokens> is ignored and
 	#   the package will be copied to the _package_ directory of the CD image.
 	# * For a regular archive and without cdPackage, <dirTokens> specifies the
@@ -1160,11 +1141,10 @@ rule InstallOptionalHaikuImagePackage url : dirTokens : flags
 	local archiveFile = [ DownloadFile $(package) : $(url) ] ;
 
 	if $(package:S) = .hpkg {
-		local location = $(dirTokens:E=common) ;
 		if $(HAIKU_UPDATE_ALL_PACKAGES) {
 			HAIKU_INCLUDE_IN_IMAGE on $(archiveFile) = 1 ;
 		}
-		AddPackageFilesToHaikuImage $(location) : $(archiveFile) ;
+		AddPackageFilesToHaikuImage system : $(archiveFile) ;
 	} else if cdPackage in $(flags) && $(HAIKU_CD_NAME) {
 		# TODO: If HAIKU_CD_NAME is set, that doesn't mean we're building a CD
 		# image!
@@ -1188,7 +1168,7 @@ rule AddEntryToHaikuImageUserGroupFile file : entry
 		Always $(file) ;
 		MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
 		BuildHaikuImageUserGroupFile $(file) ;
-		AddFilesToHaikuImage common settings etc : $(file) ;
+		AddFilesToHaikuImage system settings etc : $(file) ;
 	}
 
 	HAIKU_IMAGE_USER_GROUP_ENTRIES on $(file) = $(allEntries) ;

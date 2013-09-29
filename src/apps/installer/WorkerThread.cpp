@@ -96,11 +96,10 @@ public:
 			fIgnorePaths.insert("rr_moved");
 			fIgnorePaths.insert("boot.catalog");
 			fIgnorePaths.insert("haiku-boot-floppy.image");
-			fIgnorePaths.insert("common/var/swap");
-			fIgnorePaths.insert("common/var/shared_memory");
+			fIgnorePaths.insert("system/var/swap");
+			fIgnorePaths.insert("system/var/shared_memory");
 
 			fPackageFSRootPaths.insert("system");
-			fPackageFSRootPaths.insert("common");
 			fPackageFSRootPaths.insert("home/config");
 		} catch (std::bad_alloc&) {
 		}
@@ -464,7 +463,7 @@ WorkerThread::_PerformInstall(partition_id sourcePartitionID,
 		alert->SetShortcut(1, B_ESCAPE);
 		if (alert->Go() != 0) {
 		// TODO: Would be cool to offer the option here to clean additional
-		// folders at the user's choice (like /boot/common and /boot/develop).
+		// folders at the user's choice.
 			return _InstallationError(B_CANCELED);
 		}
 	}

@@ -34,7 +34,7 @@
 	It handles loading/unloading of dormant nodes.
 
 	Dormant media nodes can be instantiated on demand. The reside on harddisk in
-	the directories /boot/beos/system/add-ons/media, /boot/common/add-ons/media,
+	the directories /boot/beos/system/add-ons/media
 	and /boot/home/config/add-ons/media.
 	Multiple media nodes can be included in one file, they can be accessed using
 	the BMediaAddOn that each file implements.
