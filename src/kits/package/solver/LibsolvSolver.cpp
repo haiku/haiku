@@ -38,27 +38,11 @@
 // abort()s. Obviously that isn't good behavior for a library.
 
 
-#ifdef __HAIKU__
-
-
 BSolver*
 BPackageKit::create_solver()
 {
 	return new(std::nothrow) LibsolvSolver;
 }
-
-
-#else
-
-
-extern "C" BSolver*
-__create_libsolv_solver()
-{
-	return new(std::nothrow) LibsolvSolver;
-}
-
-
-#endif
 
 
 struct LibsolvSolver::SolvQueue : Queue {

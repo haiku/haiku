@@ -13,9 +13,6 @@
 typedef BPackageKit::BSolver* CreateSolverFunction();
 
 
-#ifdef __HAIKU__
-
-
 #include <dlfcn.h>
 #include <pthread.h>
 
@@ -41,16 +38,6 @@ load_libsolv_solver_add_on()
 		dlclose(imageHandle);
 }
 
-#else
-
-
-static BPackageKit::BSolver* __create_libsolv_solver()
-	__attribute__((weakref("__create_libsolv_solver")));
-static CreateSolverFunction* sCreateSolver = &__create_libsolv_solver;
-
-
-#endif
-
 
 namespace BPackageKit {
 
@@ -68,9 +55,7 @@ BSolver::~BSolver()
 /*static*/ status_t
 BSolver::Create(BSolver*& _solver)
 {
-#ifdef __HAIKU__
 	pthread_once(&sLoadLibsolvSolverAddOnInitOnce, &load_libsolv_solver_add_on);
-#endif
 	if (sCreateSolver == NULL)
 		return B_NOT_SUPPORTED;
 
