@@ -266,6 +266,7 @@ _fbsd_uninit_drivers(driver_t *drivers[])
 		uninit_taskqueues();
 	uninit_callout();
 	uninit_mutexes();
+	uninit_hard_clock();
 
 	put_module(B_PCI_MODULE_NAME);
 	if (gPCIx86 != NULL)
