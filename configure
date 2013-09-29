@@ -482,6 +482,8 @@ if sha256sum < /dev/null > /dev/null 2>&1; then
 	HOST_SHA256=sha256sum
 elif sha256 < /dev/null > /dev/null 2>&1; then
 	HOST_SHA256="sha256 -q"
+elif shasum < /dev/null > /dev/null 2>&1; then
+	HOST_SHA256="shasum -a 256"
 else
 	echo "Error: Neither sha256sum nor sha256 seem to be available!" >&2
 	exit 1
