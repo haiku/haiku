@@ -11,6 +11,7 @@
 
 #include <Directory.h>
 #include <package/PackageRoster.h>
+#include <package/RepositoryCache.h>
 #include <package/solver/SolverPackage.h>
 #include <package/solver/SolverPackageSpecifier.h>
 #include <package/solver/SolverPackageSpecifierList.h>
@@ -637,10 +638,18 @@ BPackageManager::_AddRemoteRepository(BPackageRoster& roster, const char* name,
 	bool refresh)
 {
 	BRepositoryConfig config;
-	status_t error = _GetRepositoryConfig(roster, name, refresh, config);
+	status_t error = roster.GetRepositoryConfig(name, &config);
 	if (error != B_OK) {
 		fUserInteractionHandler->Warn(error,
 			"failed to get config for repository \"%s\". Skipping.", name);
+		return;
+	}
+
+	BRepositoryCache cache;
+	error = _GetRepositoryCache(roster, config, refresh, cache);
+	if (error != B_OK) {
+		fUserInteractionHandler->Warn(error,
+			"failed to get cache for repository \"%s\". Skipping.", name);
 		return;
 	}
 
@@ -650,33 +659,25 @@ BPackageManager::_AddRemoteRepository(BPackageRoster& roster, const char* name,
 		throw std::bad_alloc();
 	}
 
-	BRepositoryBuilder(*repository, repository->Config())
+	BRepositoryBuilder(*repository, cache, config.Name())
 		.AddToSolver(fSolver, false);
 }
 
 
 status_t
-BPackageManager::_GetRepositoryConfig(BPackageRoster& roster, const char* name,
-	bool refresh, BRepositoryConfig& _config)
+BPackageManager::_GetRepositoryCache(BPackageRoster& roster,
+	const BRepositoryConfig& config, bool refresh, BRepositoryCache& _cache)
 {
-	// get the repository config
-	status_t error = roster.GetRepositoryConfig(name, &_config);
-	if (error != B_OK)
-		return error;
-
-	// refresh
-	if (!refresh)
+	if (!refresh && roster.GetRepositoryCache(config.Name(), &_cache) == B_OK)
 		return B_OK;
 
-	error = fRequestHandler->RefreshRepository(_config);
+	status_t error = fRequestHandler->RefreshRepository(config);
 	if (error != B_OK) {
 		fUserInteractionHandler->Warn(error,
-			"refreshing repository \"%s\" failed", name);
-		return B_OK;
+			"refreshing repository \"%s\" failed", config.Name().String());
 	}
 
-	// re-get the config
-	return roster.GetRepositoryConfig(name, &_config);
+	return roster.GetRepositoryCache(config.Name(), &_cache);
 }
 
 

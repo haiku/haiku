@@ -115,9 +115,9 @@ private:
 									InstalledRepository* repository);
 			void				_AddRemoteRepository(BPackageRoster& roster,
 									const char* name, bool refresh);
-			status_t			_GetRepositoryConfig(BPackageRoster& roster,
-									const char* name, bool refresh,
-									BRepositoryConfig& _config);
+			status_t			_GetRepositoryCache(BPackageRoster& roster,
+									const BRepositoryConfig& config,
+									bool refresh, BRepositoryCache& _cache);
 
 			bool				_NextSpecificInstallationLocation();
 
