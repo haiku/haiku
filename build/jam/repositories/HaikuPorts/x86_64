@@ -68,8 +68,8 @@ RemotePackageRepository HaikuPorts
 	libpcre_devel-8.21-5
 	libpng-1.5.12-3
 	libpng_devel-1.5.12-3
-	libsolv-0.3.0_haiku_2013_06_16-2
-	libsolv_devel-0.3.0_haiku_2013_06_16-2
+	libsolv-0.3.0_haiku_2013_06_16-3
+	libsolv_devel-0.3.0_haiku_2013_06_16-3
 #	libtheora-1.1.1-2
 #	libtheora_devel-1.1.1-2
 	libtool-2.4-8
@@ -116,8 +116,8 @@ RemotePackageRepository HaikuPorts
 	wpa_supplicant-2.0-3
 	xz_utils-5.0.4-2
 	yasm-1.2.0-3
-	zlib-1.2.8-3
-	zlib_devel-1.2.8-3
+	zlib-1.2.8-4
+	zlib_devel-1.2.8-4
 
 	:
 

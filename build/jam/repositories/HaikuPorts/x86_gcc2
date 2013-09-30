@@ -66,8 +66,8 @@ RemotePackageRepository HaikuPorts
 	libpcre-8.21-5
 	libpng-1.5.12-3
 	libpng_devel-1.5.12-3
-	libsolv-0.3.0_haiku_2013_06_16-2
-	libsolv_devel-0.3.0_haiku_2013_06_16-2
+	libsolv-0.3.0_haiku_2013_06_16-3
+	libsolv_devel-0.3.0_haiku_2013_06_16-3
 	libtheora-1.1.1-2
 	libtheora_devel-1.1.1-2
 	libtool-2.4-8
@@ -114,8 +114,8 @@ RemotePackageRepository HaikuPorts
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-3
 	yasm-1.2.0-3
-	zlib-1.2.8-3
-	zlib_devel-1.2.8-3
+	zlib-1.2.8-4
+	zlib_devel-1.2.8-4
 
 	# secondary architecture (x86)
 	binutils_x86-2.23.2_2013_04_09-1
