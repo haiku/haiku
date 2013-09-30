@@ -124,7 +124,6 @@ local genericSources =
 	w_scalb.c w_scalbf.c # w_scalbl.c
 	w_sinh.c w_sinhf.c # w_sinhl.c
 	# no asm for m68k in glibc
-	strlen.c
 	w_sqrt.c w_sqrtf.c # w_sqrtl.c
 	;
 
