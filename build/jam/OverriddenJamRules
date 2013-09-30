@@ -5,7 +5,7 @@ actions Chmod1
 }
 
 # Overridden to allow spaces in file names.
-actions piecemeal existing Clean
+actions piecemeal together existing Clean
 {
 	$(RM) "$(>)"
 }
