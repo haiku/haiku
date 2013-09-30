@@ -266,10 +266,6 @@ if $(HOST_PLATFORM) = cygwin {
 		--enable-auto-import ;
 }
 
-if $(HOST_PLATFORM) = freebsd {
-	HOST_LINKFLAGS += -L/usr/local/lib ;
-}
-
 HOST_CPU ?= $(OSPLAT:L) ;
 
 # Jam doesn't know x86_64, so override HOST_CPU, if 64 bit.
@@ -576,7 +572,10 @@ HOST_BE_API_C++FLAGS = ;
 HOST_HDRS += [ FDirName $(HAIKU_TOP) headers build host $(HOST_PLATFORM) ] ;
 
 if $(HOST_PLATFORM) = freebsd {
+	# FreeBSD's gcc doesn't include /usr/local/* in its search paths,
+	# though that's where most things from ports wind up being installed.
 	HOST_HDRS += /usr/local/include ;
+	HOST_LINKFLAGS += -L/usr/local/lib ; 
 }
 
 HOST_BE_API_HEADERS =
