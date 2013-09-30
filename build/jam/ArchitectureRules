@@ -376,8 +376,8 @@ rule KernelArchitectureSetup architecture
 		case m68k :
 			# We don't want to have to handle emulating missing FPU opcodes for
 			# 040 and 060 in the kernel.
-			HAIKU_KERNEL_CCFLAGS += -m68020-60 ;
-			HAIKU_KERNEL_C++FLAGS += -m68020-60 ;
+			HAIKU_KERNEL_CCFLAGS += -mtune=68020-60 ;
+			HAIKU_KERNEL_C++FLAGS += -mtune=68020-60 ;
 
 		case x86 :
 			HAIKU_KERNEL_CCFLAGS += -march=pentium ;

@@ -20,7 +20,7 @@ KernelMergeObject arch_m68k_030.o :
 	#M68KPagingStructures030.cpp
 	#M68KVMTranslationMap030.cpp
 
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -m68030
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -mcpu=68030
 ;
 
 KernelMergeObject arch_m68k_040.o :
@@ -33,12 +33,13 @@ KernelMergeObject arch_m68k_040.o :
 	M68KPagingStructures040.cpp
 	M68KVMTranslationMap040.cpp
 
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -m68040
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -mcpu=68040 -Wa,-m68040
 ;
+
 
 KernelMergeObject arch_m68k_060.o :
 	arch_060.cpp
-	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -m68060
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -mcpu=68060
 ;
 
 KernelMergeObject kernel_arch_m68k.o :
