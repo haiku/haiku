@@ -457,7 +457,7 @@ if [ IsPackageAvailable zlib_devel ] {
 		# sources are required for the primary architecture only
 		primary @{
 			file: source zlib_source
-				sources: develop/sources/%portRevisionedName%/source
+				sources: develop/sources/%portRevisionedName%/sources
 		}@
 		;
 
@@ -481,7 +481,7 @@ if [ IsPackageAvailable libsolv_devel ] {
 		# sources are required for the primary architecture only
 		primary @{
 			file: source libsolv_source
-				sources: develop/sources/%portRevisionedName%/source
+				sources: develop/sources/%portRevisionedName%/sources
 		}@
 		;
 
