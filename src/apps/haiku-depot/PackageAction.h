@@ -21,14 +21,20 @@ enum {
 };
 
 
+class Model;
+
+
 class PackageAction : public BReferenceable {
 public:
 								PackageAction(int32 type,
-									PackageInfoRef package);
+									PackageInfoRef package, Model* model);
 	virtual						~PackageAction();
 
 			int32				Type() const
 									{ return fType; }
+
+			Model*				GetModel() const
+									{ return fModel; }
 
 	virtual const char*			Label() const = 0;
 
@@ -43,6 +49,7 @@ protected:
 private:
 			PackageInfoRef		fPackage;
 			int32				fType;
+			Model*				fModel;
 };
 
 

@@ -5,7 +5,7 @@
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
  * 		Stephan Aßmus <superstippi@gmx.de>
- * 		Rene Gollent, reneGollent.com.
+ * 		Rene Gollent <rene@gollent.com>
  */
 
 
@@ -24,6 +24,7 @@
 
 #include "AutoDeleter.h"
 #include "AutoLocker.h"
+#include "Model.h"
 #include "PackageInfo.h"
 #include "ProblemWindow.h"
 #include "ResultWindow.h"
@@ -57,9 +58,9 @@ DownloadProgressListener::~DownloadProgressListener()
 class InstallPackageAction : public PackageAction,
 	private DownloadProgressListener {
 public:
-	InstallPackageAction(PackageInfoRef package)
+	InstallPackageAction(PackageInfoRef package, Model* model)
 		:
-		PackageAction(PACKAGE_ACTION_INSTALL, package),
+		PackageAction(PACKAGE_ACTION_INSTALL, package, model),
 		fLastDownloadUpdate(0)
 	{
 	}
@@ -102,14 +103,40 @@ public:
 	}
 
 	// DownloadProgressListener
-	virtual void DownloadProgressChanged(float progress)
+	virtual void DownloadProgressChanged(const char* packageName,
+		float progress)
 	{
 		bigtime_t now = system_time();
 		if (now - fLastDownloadUpdate > 250000) {
-			PackageInfoRef ref(Package());
-			ref->SetDownloadProgress(progress);
-			fLastDownloadUpdate = now;
+			BString tempName(packageName);
+			tempName.Truncate(tempName.FindFirst('-'));
+				// strip version suffix off package filename
+			PackageInfoRef ref(_FindPackageByName(tempName));
+			if (ref.Get() != NULL) {
+				ref->SetDownloadProgress(progress);
+				fLastDownloadUpdate = now;
+			}
 		}
+	}
+
+
+private:
+	PackageInfoRef _FindPackageByName(const BString& name)
+	{
+		Model* model = GetModel();
+		const DepotList& depots = model->Depots();
+		// TODO: optimize!
+		for (int32 i = 0; i < depots.CountItems(); i++) {
+			const DepotInfo& depot = depots.ItemAtFast(i);
+			const PackageList& packages = depot.Packages();
+			for (int32 j = 0; j < packages.CountItems(); j++) {
+				PackageInfoRef info = packages.ItemAtFast(j);
+				if (info->Title() == name)
+					return info;
+			}
+		}
+
+		return PackageInfoRef();
 	}
 
 private:
@@ -122,9 +149,9 @@ private:
 
 class UninstallPackageAction : public PackageAction {
 public:
-	UninstallPackageAction(PackageInfoRef package)
+	UninstallPackageAction(PackageInfoRef package, Model* model)
 		:
-		PackageAction(PACKAGE_ACTION_UNINSTALL, package)
+		PackageAction(PACKAGE_ACTION_UNINSTALL, package, model)
 	{
 	}
 
@@ -198,7 +225,7 @@ PackageManager::GetPackageState(const PackageInfo& package)
 
 
 PackageActionList
-PackageManager::GetPackageActions(PackageInfoRef package)
+PackageManager::GetPackageActions(PackageInfoRef package, Model* model)
 {
 	Init(B_ADD_INSTALLED_REPOSITORIES | B_ADD_REMOTE_REPOSITORIES);
 	PackageActionList actionList;
@@ -225,11 +252,11 @@ PackageManager::GetPackageActions(PackageInfoRef package)
 	if (installed) {
 		if (!systemPackage) {
 			actionList.Add(PackageActionRef(new UninstallPackageAction(
-				package), true));
+				package, model), true));
 		}
 	} else {
-		actionList.Add(PackageActionRef(new InstallPackageAction(package),
-				true));
+		actionList.Add(PackageActionRef(new InstallPackageAction(package,
+				model),	true));
 	}
 	// TODO: activation status
 
@@ -369,7 +396,7 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 {
 	for (int32 i = 0; i < fDownloadProgressListeners.CountItems(); i++) {
 		fDownloadProgressListeners.ItemAt(i)->DownloadProgressChanged(
-			completionPercentage);
+			packageName, completionPercentage);
 	}
 }
 

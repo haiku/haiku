@@ -48,6 +48,7 @@ private:
 	// PackageActionHandler
 	virtual	status_t			SchedulePackageActions(
 									PackageActionList& list);
+	virtual	Model*				GetModel();
 
 private:
 			void				_BuildMenu(BMenuBar* menuBar);

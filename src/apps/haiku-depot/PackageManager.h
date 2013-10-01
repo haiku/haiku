@@ -23,7 +23,7 @@ namespace BPackageKit {
 	class BSolverPackage;
 }
 
-
+class Model;
 class PackageManager;
 class ProblemWindow;
 class ResultWindow;
@@ -40,7 +40,9 @@ class DownloadProgressListener {
 	public:
 	virtual	~DownloadProgressListener();
 
-	virtual	void				DownloadProgressChanged(float progress) = 0;
+	virtual	void				DownloadProgressChanged(
+									const char* packageName,
+									float progress) = 0;
 };
 
 
@@ -55,7 +57,8 @@ public:
 	virtual						~PackageManager();
 
 	virtual	PackageState		GetPackageState(const PackageInfo& package);
-	virtual	PackageActionList	GetPackageActions(PackageInfoRef package);
+	virtual	PackageActionList	GetPackageActions(PackageInfoRef package,
+									Model* model);
 
 			void				SetCurrentActionPackage(
 									PackageInfoRef package,

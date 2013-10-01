@@ -446,10 +446,10 @@ public:
 			BString avgRating;
 			avgRating.SetToFormat("%.1f", ratingSummary.averageRating);
 			fAvgRating->SetText(avgRating);
-	
+
 			BString votes;
 			votes.SetToFormat("%d", ratingSummary.ratingCount);
-	
+
 			BString voteInfo(B_TRANSLATE("(%Votes%)"));
 			voteInfo.ReplaceAll("%Votes%", votes);
 
@@ -545,7 +545,8 @@ public:
 			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME);
 
 		PackageActionList actions = manager.GetPackageActions(
-			const_cast<PackageInfo*>(&package));
+			const_cast<PackageInfo*>(&package),
+			fPackageActionHandler->GetModel());
 
 		bool clearNeeded = false;
 		if (actions.CountItems() != fPackageActions.CountItems())

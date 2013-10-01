@@ -16,10 +16,11 @@ using namespace BPackageKit;
 // #pragma mark - PackageAction
 
 
-PackageAction::PackageAction(int32 type, PackageInfoRef package)
+PackageAction::PackageAction(int32 type, PackageInfoRef package, Model* model)
 	:
 	fPackage(package),
-	fType(type)
+	fType(type),
+	fModel(model)
 {
 	// TODO: allow configuring the installation location
 	fPackageManager = new(std::nothrow) PackageManager(

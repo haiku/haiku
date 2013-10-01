@@ -12,12 +12,17 @@
 #include "PackageAction.h"
 
 
+class Model;
+
+
 class PackageActionHandler {
 public:
 	virtual						~PackageActionHandler();
 
 	virtual	status_t			SchedulePackageActions(
 									PackageActionList& list) = 0;
+
+	virtual	Model*				GetModel() = 0;
 };
 
 #endif // PACKAGE_ACTION_HANDLER_H

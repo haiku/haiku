@@ -278,6 +278,13 @@ MainWindow::SchedulePackageActions(PackageActionList& list)
 }
 
 
+Model*
+MainWindow::GetModel()
+{
+	return &fModel;
+}
+
+
 void
 MainWindow::_BuildMenu(BMenuBar* menuBar)
 {
