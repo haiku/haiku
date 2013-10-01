@@ -610,7 +610,7 @@ getIntelCPULegacyInitialAPICID(int currentCPU)
 }
 
 
-static inline void
+static inline status_t
 detectIntelCPUTopologyLegacy(int maxBasicLeaf)
 {
 	getCPUTopologyID = getIntelCPULegacyInitialAPICID;
@@ -640,6 +640,8 @@ detectIntelCPUTopologyLegacy(int maxBasicLeaf)
 		| sHierarchyMask[CPU_TOPOLOGY_CORE];
 	sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~kSinglePackageMask;
 	sHierarchyShift[CPU_TOPOLOGY_PACKAGE] = countSetBits(kSinglePackageMask);
+
+	return B_OK;
 }
 
 
@@ -662,23 +664,25 @@ static void
 detectCPUTopology(int currentCPU, cpu_ent* cpu, int maxBasicLeaf)
 {
 	if (currentCPU == 0) {
+		status_t result = B_UNSUPPORTED;
 		if (x86_check_feature(IA32_FEATURE_HTT, FEATURE_COMMON)) {
 			if (cpu->arch.vendor == VENDOR_INTEL) {
-				status_t result = detectIntelCPUTopologyx2APIC(maxBasicLeaf);
+				result = detectIntelCPUTopologyx2APIC(maxBasicLeaf);
 				if (result != B_OK)
-					detectIntelCPUTopologyLegacy(maxBasicLeaf);
-				return;
+					result = detectIntelCPUTopologyLegacy(maxBasicLeaf);
 			}
 		}
 
-		dprintf("No CPU topology information available.\n");
+		if (result != B_OK) {
+			dprintf("No CPU topology information available.\n");
 
-		getCPUTopologyID = getSimpleCPUTopologyID;
+			getCPUTopologyID = getSimpleCPUTopologyID;
 
-		memset(sHierarchyMask, 0, sizeof(sHierarchyMask));
-		sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~uint32(0);
+			memset(sHierarchyMask, 0, sizeof(sHierarchyMask));
+			sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~uint32(0);
 
-		memset(sHierarchyShift, 0, sizeof(sHierarchyShift));
+			memset(sHierarchyShift, 0, sizeof(sHierarchyShift));
+		}
 	}
 
 	ASSERT(getCPUTopologyID != NULL);
