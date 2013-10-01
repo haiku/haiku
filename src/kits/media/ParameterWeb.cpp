@@ -613,7 +613,7 @@ BParameterWeb::Unflatten(type_code code, const void* buffer, ssize_t size)
 
 	for (int32 i = 0; i < count; i++) {
 		ssize_t groupSize
-			= read_from_buffer_swap32<ssize_t>(&buffer, isSwapped);
+			= read_pointer_from_buffer_swap<ssize_t>(&buffer, isSwapped);
 		if (groupSize > size_left(size, bufferStart, buffer)) {
 			ERROR("BParameterWeb::Unflatten(): buffer too small\n");
 			return B_BAD_DATA;
@@ -1085,7 +1085,7 @@ BParameterGroup::Unflatten(type_code code, const void* buffer, ssize_t size)
 			= read_from_buffer_swap32<BParameter::media_parameter_type>(&buffer,
 				isSwapped);
 
-		ssize_t parameterSize = read_from_buffer_swap32<ssize_t>(&buffer,
+		ssize_t parameterSize = read_pointer_from_buffer_swap<ssize_t>(&buffer,
 			isSwapped);
 		if (parameterSize > size_left(size, bufferStart, buffer))
 			return B_BAD_VALUE;
@@ -1133,7 +1133,7 @@ BParameterGroup::Unflatten(type_code code, const void* buffer, ssize_t size)
 		type_code type = read_from_buffer_swap32<type_code>(&buffer, isSwapped);
 
 		ssize_t groupSize
-			= read_from_buffer_swap32<ssize_t>(&buffer, isSwapped);
+			= read_pointer_from_buffer_swap<ssize_t>(&buffer, isSwapped);
 		if (groupSize > size_left(size, bufferStart, buffer))
 			return B_BAD_VALUE;
 
@@ -1638,7 +1638,7 @@ BParameter::Unflatten(type_code code, const void* buffer, ssize_t size)
 		return B_BAD_TYPE;
 	}
 
-	ssize_t parameterSize = read_from_buffer_swap32<ssize_t>(&buffer,
+	ssize_t parameterSize = read_pointer_from_buffer_swap<ssize_t>(&buffer,
 		fSwapDetected);
 	if (parameterSize > size) {
 		ERROR("BParameter::Unflatten(): buffer too small (%ld > %ld)\n",
