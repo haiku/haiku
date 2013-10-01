@@ -30,7 +30,7 @@ BReferenceable::BReferenceable()
 
 BReferenceable::~BReferenceable()
 {
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(_BOOT_MODE)
 	bool enterDebugger = false;
 	char message[256];
 	if (fReferenceCount == 1) {
