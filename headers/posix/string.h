@@ -76,7 +76,7 @@ extern char		*strupr(char *string);
 
 /* extern char		*strsep(char **stringPointer, const char *delimiter); */
 
-extern const char	*strsignal(int signal);
+extern const char	*strsignal(int signum);
 
 /* legacy compatibility -- might be removed one day */
 #define bcmp(a, b, length) memcmp((a), (b), (length))

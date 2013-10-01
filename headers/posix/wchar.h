@@ -103,7 +103,7 @@ extern wchar_t	*wcscpy(wchar_t *dest, const wchar_t *src);
 extern size_t	wcscspn(const wchar_t *wcs, const wchar_t *reject);
 extern wchar_t	*wcsdup(const wchar_t *wcs);
 extern size_t	wcsftime(wchar_t *dest, size_t destLength,
-					const wchar_t *format, const struct tm *time);
+					const wchar_t *format, const struct tm *timeptr);
 extern size_t	wcslcat(wchar_t *dest, const wchar_t *src, size_t maxLength);
 extern size_t	wcslcpy(wchar_t *dest, const wchar_t *src, size_t maxLength);
 extern size_t	wcslen(const wchar_t *wcs);
