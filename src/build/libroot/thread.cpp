@@ -38,11 +38,11 @@ find_thread(const char *name)
 }
 
 // _get_thread_info
-// status_t
-// _get_thread_info(thread_id id, thread_info *info, size_t size)
-// {
-// 	return B_ERROR;
-// }
+status_t
+_get_thread_info(thread_id id, thread_info* info, size_t size)
+{
+	return B_ERROR;
+}
 
 // _get_next_thread_info
 // status_t

@@ -47,8 +47,8 @@ BReferenceable::~BReferenceable()
 			// stack range to be sure.
 			thread_info info;
 			status_t result = get_thread_info(find_thread(NULL), &info);
-			if (result != B_OK || this < info.stack_base
-				|| this > info.stack_end) {
+			if (result == B_OK &&  (this < info.stack_base
+					|| this > info.stack_end)) {
 				snprintf(message, sizeof(message), "Deleted referenceable "
 					"object that's not on the stack (this: %p, stack_base: %p,"
 					" stack_end: %p)\n", this, info.stack_base,
