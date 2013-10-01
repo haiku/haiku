@@ -251,6 +251,15 @@ abort()
 	panic("abort() called!");
 }
 
+
+extern "C"
+void
+exit(int status)
+{
+	panic("exit() called with status code = %d!", status);
+}
+
+
 extern "C"
 void
 debugger(const char *message)
