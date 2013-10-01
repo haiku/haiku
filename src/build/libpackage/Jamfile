@@ -9,6 +9,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
 
 USES_BE_API on libpackage_build.so = true ;
+LINKFLAGS on libpackage_build.so += $(HOST_PTHREAD_LINKFLAGS) ;
 
 
 {

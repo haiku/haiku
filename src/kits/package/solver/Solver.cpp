@@ -25,10 +25,14 @@ static pthread_once_t sLoadLibsolvSolverAddOnInitOnce = PTHREAD_ONCE_INIT;
 static void
 load_libsolv_solver_add_on()
 {
+	int flags = 0;
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	void* imageHandle = dlopen("libpackage-add-on-libsolv.so", 0);
+	void* imageHandle = dlopen("libpackage-add-on-libsolv.so", flags);
 #else
-	void* imageHandle = dlopen("libpackage-add-on-libsolv_build.so", 0);
+#ifdef HAIKU_HOST_PLATFORM_LINUX
+	flags = RTLD_LAZY | RTLD_LOCAL;
+#endif
+	void* imageHandle = dlopen("libpackage-add-on-libsolv_build.so", flags);
 #endif
 	if (imageHandle == NULL)
 		return;

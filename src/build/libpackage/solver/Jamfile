@@ -15,8 +15,6 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package solver ] ;
 MakeLocate libpackage-add-on-libsolv_build.so
 	: $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
 
-LINKFLAGS on libpackage-add-on-libsolv_build.so += $(HOST_PTHREAD_LINKFLAGS) ;
-
 BuildPlatformSharedLibrary libpackage-add-on-libsolv_build.so
 	:
 	LibsolvSolver.cpp
