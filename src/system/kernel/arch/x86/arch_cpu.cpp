@@ -634,7 +634,7 @@ detectIntelCPUTopologyLegacy(int maxBasicLeaf)
 
 	sHierarchyMask[CPU_TOPOLOGY_CORE] = (maxCoreID - 1) * kMaxSMTID;
 	sHierarchyShift[CPU_TOPOLOGY_CORE]
-		= countSetBits(sHierarchyShift[CPU_TOPOLOGY_SMT]);
+		= countSetBits(sHierarchyMask[CPU_TOPOLOGY_SMT]);
 
 	const uint32 kSinglePackageMask = sHierarchyMask[CPU_TOPOLOGY_SMT]
 		| sHierarchyMask[CPU_TOPOLOGY_CORE];
