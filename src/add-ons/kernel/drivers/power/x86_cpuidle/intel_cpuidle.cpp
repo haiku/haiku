@@ -91,7 +91,7 @@ intel_cpuidle_init(void)
 		return B_ERROR;
 
 	cpuid_info cpuid;
-	get_current_cpuid(&cpuid, 5);
+	get_current_cpuid(&cpuid, 5, 0);
 	/* ecx[0] monitor/mwait extension supported
 	 * ecx[1] support for treating interrupts as break-events for mwait
 	 * edx number of sub-states

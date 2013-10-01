@@ -330,7 +330,7 @@ long_start_kernel()
 {
 	// Check whether long mode is supported.
 	cpuid_info info;
-	get_current_cpuid(&info, 0x80000001);
+	get_current_cpuid(&info, 0x80000001, 0);
 	if ((info.regs.edx & (1 << 29)) == 0)
 		panic("64-bit kernel requires a 64-bit CPU");
 

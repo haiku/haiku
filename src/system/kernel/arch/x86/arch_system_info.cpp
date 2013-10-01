@@ -29,7 +29,7 @@ get_cpuid_for(cpuid_info *info, uint32 currentCPU, uint32 eaxRegister,
 	if (currentCPU != forCPU)
 		return false;
 
-	get_current_cpuid(info, eaxRegister);
+	get_current_cpuid(info, eaxRegister, 0);
 	return true;
 }
 

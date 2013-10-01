@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-status_t get_current_cpuid(cpuid_info* info, uint32 eax);
+status_t get_current_cpuid(cpuid_info* info, uint32 eax, uint32 ecx);
 uint32 get_eflags(void);
 void set_eflags(uint32 value);
 
