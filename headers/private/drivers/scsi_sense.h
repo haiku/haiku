@@ -794,7 +794,3 @@ scsi_get_sense_asc_info(uint16 asc_asq, const char **label, err_act *action, sta
 }
 
 
-
-
-
-
