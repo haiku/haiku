@@ -16,4 +16,34 @@ syn keyword Keyword REQUIRES SUMMARY SUPPLEMENTS USER_SETTING_FILES
 
 syn keyword Function PATCH BUILD INSTALL TEST
 
-syn region String start=/\v"/ skip=/\v\\./ end=/\v"/
+syn keyword Define addOnsDir appsDir binDir buildArchitecture configureDirArgs
+syn keyword Define dataDir dataRootDir debugInfoDir developDir developDocDir
+syn keyword Define developLibDir docDir documentationDir fontsDir haikuVersion
+syn keyword Define includeDir infodir installDestDir isCrossRepository jobArgs
+syn keyword Define jobs libDir libExecDir localStateDir manDir oldIncludeDir
+syn keyword Define portBaseDir portDir portFullVersion portName 
+syn keyword Define portPackageLinksdir portRevision portRevisionedName
+syn keyword Define portVersion portVersionedName postInstallDir preferencesDir
+syn keyword Define prefix relativeAddOnsDir relativeAppsDir relativeBinDir
+syn keyword Define relativeDataDir relativeDataRootDir relativeDebugInfoDir
+syn keyword Define relativeDevelopDir relativeDevelopDocDir
+syn keyword Define relativeDevelopLibDir relativeDocDir relativeDocumentationDir
+syn keyword Define relativeFontsDir relativeIncludeDir relativeInfoDir
+syn keyword Define relativeLibDir relativeLibExecDir relativeLocalStateDir
+syn keyword Define relativeManDir relativeOldIncludeDir relativePostInstallDir
+syn keyword Define relativePreferencesDir relativeSbinDir relativeSettingsDir
+syn keyword Define relativeSharedStateDir sbinDir settingsDir sharedStateDir
+syn keyword Define sourceDir targetArchitecture buildMachineTriple
+syn keyword Define buildMachineTripleAsName crossSysrootDir targetMachineTriple
+syn keyword Define targetMachineTripleAsName
+
+syn keyword Function addAppDeskbarSymlink addPreferencesDeskbarSymlink
+syn keyword Function defineDebugInfoPackage extractDebugInfo
+syn keyword Function fixDevelopLibDirReferences fixPkgconfig packageEntries
+syn keyword Function prepareInstalledDevelLib prepareInstalledDevelLibs
+syn keyword Function runConfigure
+
+syn keyword Type cmd devel lib app add_on
+
+syn region String start=/\v"/ skip=/\v\\./ end=/\v"/ contains=Define,Type
+syn match Comment '#.*$'
