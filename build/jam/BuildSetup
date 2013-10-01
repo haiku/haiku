@@ -940,4 +940,3 @@ SetConfigVar DEBUG : HAIKU_TOP src add-ons print drivers gutenprint : 0 : local 
 SetConfigVar DEBUG : HAIKU_TOP src servers input : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src servers media_addon : 0 : local ;
 SetConfigVar DEBUG : HAIKU_TOP src system boot loader file_systems bfs : 0 : local ;
-SetConfigVar DEBUG : HAIKU_TOP src system boot loader file_systems tarfs : 0 : local ;
