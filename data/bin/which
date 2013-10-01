@@ -1,6 +1,0 @@
-#!/bin/bash
-
-. /etc/profile > /dev/null 2>&1
-
-whence $*
-

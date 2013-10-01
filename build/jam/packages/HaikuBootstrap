@@ -111,8 +111,6 @@ AddFilesToPackage apps			: $(SYSTEM_APPS) ;
 AddFilesToPackage preferences	: $(SYSTEM_PREFERENCES) ;
 AddFilesToPackage demos			: $(SYSTEM_DEMOS) ;
 
-SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
-AddFilesToPackage bin : which ;
 SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : install-wifi-firmwares.sh ;
 

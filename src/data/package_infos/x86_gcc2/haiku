@@ -164,7 +164,6 @@ provides {
 	cmd:watch
 	cmd:wc
 	cmd:wget = 1.12
-	cmd:which
 	cmd:whoami
 	cmd:xargs
 	cmd:xres
