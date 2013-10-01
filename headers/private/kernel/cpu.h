@@ -31,6 +31,15 @@ namespace BKernel {
 using BKernel::Thread;
 
 
+typedef enum cpu_topology_level {
+	CPU_TOPOLOGY_SMT,
+	CPU_TOPOLOGY_CORE,
+	CPU_TOPOLOGY_PACKAGE,
+	//
+	CPU_TOPOLOGY_LEVELS
+} cpu_topology_level;
+
+
 /* CPU local data structure */
 
 typedef struct cpu_ent {
@@ -55,6 +64,9 @@ typedef struct cpu_ent {
 	bool			invoke_scheduler;
 	bool			invoke_scheduler_if_idle;
 	bool			disabled;
+
+	// CPU topology information
+	int				topology_id[CPU_TOPOLOGY_LEVELS];
 
 	// arch-specific stuff
 	arch_cpu_info arch;

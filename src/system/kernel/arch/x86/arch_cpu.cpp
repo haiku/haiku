@@ -34,6 +34,7 @@
 
 
 #define DUMP_FEATURE_STRING 1
+#define DUMP_CPU_TOPOLOGY	1
 
 
 /* cpu vendor info */
@@ -121,6 +122,37 @@ x86_optimized_functions gOptimizedFunctions = {
 	memset_generic,
 	&memset_generic_end
 };
+
+/* CPU topology information */
+static uint32 (*getCPUTopologyID)(int currentCPU) = NULL;
+static uint32 sHierarchyMask[CPU_TOPOLOGY_LEVELS];
+static uint32 sHierarchyShift[CPU_TOPOLOGY_LEVELS];
+
+
+// http://graphics.stanford.edu/~seander/bithacks.html
+static inline uint32
+nextPowerOf2(uint32 v)
+{
+	v--;
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >> 16;
+	v++;
+
+	return v;
+}
+
+
+// http://graphics.stanford.edu/~seander/bithacks.html
+static inline uint32
+countSetBits(uint32 v)
+{
+	v = v - ((v >> 1) & 0x55555555);
+	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
+	return (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
+}
 
 
 static status_t
@@ -506,6 +538,167 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 #endif	// DUMP_FEATURE_STRING
 
 
+static uint32
+getIntelCPUInitialx2APICID(int currentCPU)
+{
+	(void)currentCPU;
+
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 11, 0);
+	return cpuid.regs.edx;
+}
+
+
+static inline status_t
+detectIntelCPUTopologyx2APIC(int maxBasicLeaf)
+{
+	if (maxBasicLeaf < 11)
+		return B_UNSUPPORTED;
+
+	const int kLevelCount = CPU_TOPOLOGY_LEVELS;
+	uint8 hierarchyLevels[kLevelCount];
+
+	int currentLevel = 0;
+	int levelType;
+	int levelsSet = 0;
+
+	do {
+		cpuid_info cpuid;
+		get_current_cpuid(&cpuid, 11, currentLevel);
+		if (currentLevel == 0 && cpuid.regs.ebx == 0)
+			return B_UNSUPPORTED;
+
+		levelType = (cpuid.regs.ecx >> 8) & 0xff;
+		switch (levelType) {
+			case 1:	// SMT
+				hierarchyLevels[CPU_TOPOLOGY_SMT] = cpuid.regs.eax & 0x1f;
+				levelsSet |= 1;
+				break;
+			case 2:	// core
+				hierarchyLevels[CPU_TOPOLOGY_CORE] = cpuid.regs.eax & 0x1f;
+				levelsSet |= 2;
+				break;
+		}
+
+		currentLevel++;
+	} while(levelType != 0 && levelsSet != 3);
+
+	getCPUTopologyID = getIntelCPUInitialx2APICID;
+
+	for (int i = 0; i < kLevelCount; i++) {
+		uint32 mask = ~uint32(0);
+		if (i < kLevelCount - 1)
+			mask = (1 << hierarchyLevels[i]) - 1;
+		if (i > 0)
+			mask &= ~sHierarchyMask[i - 1];
+		sHierarchyMask[i] = mask;
+		sHierarchyShift[i] = i > 0 ? hierarchyLevels[i - 1] : 0;
+	}
+
+	return B_OK;
+}
+
+
+static uint32
+getIntelCPULegacyInitialAPICID(int currentCPU)
+{
+	(void)currentCPU;
+
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 1, 0);
+	return cpuid.regs.ebx >> 24;
+}
+
+
+static inline void
+detectIntelCPUTopologyLegacy(int maxBasicLeaf)
+{
+	getCPUTopologyID = getIntelCPULegacyInitialAPICID;
+
+	cpuid_info cpuid;
+
+	get_current_cpuid(&cpuid, 1, 0);
+	int maxLogicalID = nextPowerOf2((cpuid.regs.ebx >> 16) & 0xff);
+
+	int maxCoreID = 1;
+	if (maxBasicLeaf >= 4) {
+		get_current_cpuid(&cpuid, 4, 0);
+		maxCoreID = nextPowerOf2((cpuid.regs.eax >> 26) + 1);
+	}
+
+	ASSERT(maxLogicalID >= maxCoreID);
+	const int kMaxSMTID = maxLogicalID / maxCoreID;
+
+	sHierarchyMask[CPU_TOPOLOGY_SMT] = kMaxSMTID - 1;
+	sHierarchyShift[CPU_TOPOLOGY_SMT] = 0;
+
+	sHierarchyMask[CPU_TOPOLOGY_CORE] = (maxCoreID - 1) * kMaxSMTID;
+	sHierarchyShift[CPU_TOPOLOGY_CORE]
+		= countSetBits(sHierarchyShift[CPU_TOPOLOGY_SMT]);
+
+	const uint32 kSinglePackageMask = sHierarchyMask[CPU_TOPOLOGY_SMT]
+		| sHierarchyMask[CPU_TOPOLOGY_CORE];
+	sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~kSinglePackageMask;
+	sHierarchyShift[CPU_TOPOLOGY_PACKAGE] = countSetBits(kSinglePackageMask);
+}
+
+
+static uint32
+getSimpleCPUTopologyID(int currentCPU)
+{
+	return currentCPU;
+}
+
+
+static inline int
+getTopologyLevelID(uint32 id, cpu_topology_level level)
+{
+	ASSERT(level < CPU_TOPOLOGY_LEVELS);
+	return (id & sHierarchyMask[level]) >> sHierarchyShift[level];
+}
+
+
+static void
+detectCPUTopology(int currentCPU, cpu_ent* cpu, int maxBasicLeaf)
+{
+	if (currentCPU == 0) {
+		if (x86_check_feature(IA32_FEATURE_HTT, FEATURE_COMMON)) {
+			if (cpu->arch.vendor == VENDOR_INTEL) {
+				status_t result = detectIntelCPUTopologyx2APIC(maxBasicLeaf);
+				if (result != B_OK)
+					detectIntelCPUTopologyLegacy(maxBasicLeaf);
+				return;
+			}
+		}
+
+		dprintf("No CPU topology information available.\n");
+
+		getCPUTopologyID = getSimpleCPUTopologyID;
+
+		memset(sHierarchyMask, 0, sizeof(sHierarchyMask));
+		sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~uint32(0);
+
+		memset(sHierarchyShift, 0, sizeof(sHierarchyShift));
+	}
+
+	ASSERT(getCPUTopologyID != NULL);
+	int topologyID = getCPUTopologyID(currentCPU);
+	cpu->topology_id[CPU_TOPOLOGY_SMT]
+		= getTopologyLevelID(topologyID, CPU_TOPOLOGY_SMT);
+	cpu->topology_id[CPU_TOPOLOGY_CORE]
+		= getTopologyLevelID(topologyID, CPU_TOPOLOGY_CORE);
+	cpu->topology_id[CPU_TOPOLOGY_PACKAGE]
+		= getTopologyLevelID(topologyID, CPU_TOPOLOGY_PACKAGE);
+
+#if DUMP_CPU_TOPOLOGY
+	dprintf("CPU %d: apic id %d, package %d, core %d, smt %d\n", currentCPU,
+		topologyID, cpu->topology_id[CPU_TOPOLOGY_PACKAGE],
+		cpu->topology_id[CPU_TOPOLOGY_CORE],
+		cpu->topology_id[CPU_TOPOLOGY_SMT]);
+#endif
+}
+
+
 static void
 detect_cpu(int currentCPU)
 {
@@ -620,6 +813,8 @@ detect_cpu(int currentCPU)
 		cpu->arch.feature[FEATURE_6_EAX] = cpuid.regs.eax;
 		cpu->arch.feature[FEATURE_6_ECX] = cpuid.regs.ecx;
 	}
+
+	detectCPUTopology(currentCPU, cpu, maxBasicLeaf);
 
 #if DUMP_FEATURE_STRING
 	dump_feature_string(currentCPU, cpu);
