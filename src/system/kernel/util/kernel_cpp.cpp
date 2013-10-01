@@ -254,17 +254,18 @@ abort()
 
 extern "C"
 void
-exit(int status)
-{
-	panic("exit() called with status code = %d!", status);
-}
-
-
-extern "C"
-void
 debugger(const char *message)
 {
 	kernel_debugger(message);
 }
 
 #endif	// _#if KERNEL_MODE
+
+
+extern "C"
+void
+exit(int status)
+{
+	panic("exit() called with status code = %d!", status);
+}
+
