@@ -21,6 +21,7 @@
 #include <debug.h>
 #include <elf.h>
 #include <smp.h>
+#include <util/BitUtils.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
@@ -127,32 +128,6 @@ x86_optimized_functions gOptimizedFunctions = {
 static uint32 (*sGetCPUTopologyID)(int currentCPU);
 static uint32 sHierarchyMask[CPU_TOPOLOGY_LEVELS];
 static uint32 sHierarchyShift[CPU_TOPOLOGY_LEVELS];
-
-
-// http://graphics.stanford.edu/~seander/bithacks.html
-static inline uint32
-nextPowerOf2(uint32 v)
-{
-	v--;
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >> 16;
-	v++;
-
-	return v;
-}
-
-
-// http://graphics.stanford.edu/~seander/bithacks.html
-static inline uint32
-countSetBits(uint32 v)
-{
-	v = v - ((v >> 1) & 0x55555555);
-	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
-	return (((v + (v >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
-}
 
 
 static status_t
