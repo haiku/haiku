@@ -129,6 +129,10 @@ static uint32 (*sGetCPUTopologyID)(int currentCPU);
 static uint32 sHierarchyMask[CPU_TOPOLOGY_LEVELS];
 static uint32 sHierarchyShift[CPU_TOPOLOGY_LEVELS];
 
+/* Cache topology information */
+static uint32 sCacheSharingMask[CPU_MAX_CACHE_LEVEL];
+static uint32 sCacheLevelCount;
+
 
 static status_t
 acpi_shutdown(bool rebootSystem)
@@ -563,7 +567,8 @@ detectAMDCPUTopology(uint32 maxBasicLeaf, uint32 maxExtendedLeaf)
 
 	if (maxExtendedLeaf >= 0x80000001) {
 		get_current_cpuid(&cpuid, 0x80000001, 0);
-		if ((cpuid.regs.ecx & 2) != 0)
+		if (x86_check_feature(IA32_FEATURE_AMD_EXT_CMPLEGACY,
+				FEATURE_EXT_AMD_ECX))
 			maxCoreID = maxLogicalID;
 	}
 
@@ -573,11 +578,46 @@ detectAMDCPUTopology(uint32 maxBasicLeaf, uint32 maxExtendedLeaf)
 }
 
 
-static uint32
-getIntelCPUInitialx2APICID(int currentCPU)
+static void
+detectAMDCacheTopology(uint32 maxExtendedLeaf)
 {
-	(void)currentCPU;
+	if (!x86_check_feature(IA32_FEATURE_AMD_EXT_TOPOLOGY, FEATURE_EXT_AMD_ECX))
+		return;
 
+	if (maxExtendedLeaf < 0x8000001d)
+		return;
+	
+	uint8 hierarchyLevels[CPU_MAX_CACHE_LEVEL];
+	uint8 maxCacheLevel = 0;
+
+	int currentLevel = 0;
+	int cacheType;
+	do {
+		cpuid_info cpuid;
+		get_current_cpuid(&cpuid, 0x8000001d, currentLevel);
+
+		cacheType = cpuid.regs.eax & 0x1f;
+		int cacheLevel = (cpuid.regs.eax >> 5) & 0x7;
+
+		int coresCount = nextPowerOf2(((cpuid.regs.eax >> 14) & 0x3f) + 1);
+		hierarchyLevels[cacheLevel - 1]
+			= coresCount * (sHierarchyMask[CPU_TOPOLOGY_SMT] + 1);
+
+		if (cacheType != 0)
+			maxCacheLevel = max_c(maxCacheLevel, cacheLevel);
+
+		currentLevel++;
+	} while (cacheType != 0);
+
+	for (int i = 0; i < maxCacheLevel; i++)
+		sCacheSharingMask[i] = ~uint32(hierarchyLevels[i] - 1);
+	sCacheLevelCount = maxCacheLevel;
+}
+
+
+static uint32
+getIntelCPUInitialx2APICID(int /* currentCPU */)
+{
 	cpuid_info cpuid;
 	get_current_cpuid(&cpuid, 11, 0);
 	return cpuid.regs.edx;
@@ -655,6 +695,39 @@ detectIntelCPUTopologyLegacy(uint32 maxBasicLeaf)
 }
 
 
+static void
+detectIntelCacheTopology(uint32 maxBasicLeaf)
+{
+	if (maxBasicLeaf < 4)
+		return;
+
+	uint8 hierarchyLevels[CPU_MAX_CACHE_LEVEL];
+	uint8 maxCacheLevel = 0;
+
+	int currentLevel = 0;
+	int cacheType;
+	do {
+		cpuid_info cpuid;
+		get_current_cpuid(&cpuid, 4, currentLevel);
+
+		cacheType = cpuid.regs.eax & 0x1f;
+		int cacheLevel = (cpuid.regs.eax >> 5) & 0x7;
+
+		hierarchyLevels[cacheLevel - 1]
+			= nextPowerOf2(((cpuid.regs.eax >> 14) & 0x3f) + 1);
+
+		if (cacheType != 0)
+			maxCacheLevel = max_c(maxCacheLevel, cacheLevel);
+
+		currentLevel++;
+	} while (cacheType != 0);
+
+	for (int i = 0; i < maxCacheLevel; i++)
+		sCacheSharingMask[i] = ~uint32(hierarchyLevels[i] - 1);
+	sCacheLevelCount = maxCacheLevel;
+}
+
+
 static uint32
 getSimpleCPUTopologyID(int currentCPU)
 {
@@ -675,14 +748,24 @@ detectCPUTopology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
 	uint32 maxExtendedLeaf)
 {
 	if (currentCPU == 0) {
+		memset(sCacheSharingMask, 0xff, sizeof(sCacheSharingMask));
+
 		status_t result = B_UNSUPPORTED;
 		if (x86_check_feature(IA32_FEATURE_HTT, FEATURE_COMMON)) {
-			if (cpu->arch.vendor == VENDOR_AMD)
+			if (cpu->arch.vendor == VENDOR_AMD) {
 				result = detectAMDCPUTopology(maxBasicLeaf, maxExtendedLeaf);
+
+				if (result == B_OK)
+					detectAMDCacheTopology(maxExtendedLeaf);
+			}
+
 			if (cpu->arch.vendor == VENDOR_INTEL) {
 				result = detectIntelCPUTopologyx2APIC(maxBasicLeaf);
 				if (result != B_OK)
 					result = detectIntelCPUTopologyLegacy(maxBasicLeaf);
+
+				if (result == B_OK)
+					detectIntelCacheTopology(maxBasicLeaf);
 			}
 		}
 
@@ -707,11 +790,33 @@ detectCPUTopology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
 	cpu->topology_id[CPU_TOPOLOGY_PACKAGE]
 		= getTopologyLevelID(topologyID, CPU_TOPOLOGY_PACKAGE);
 
+	int i;
+	for (i = 0; i < sCacheLevelCount; i++)
+		cpu->cache_id[i] = topologyID & sCacheSharingMask[i];
+	for (; i < CPU_MAX_CACHE_LEVEL; i++)
+		cpu->cache_id[i] = -1;
+
 #if DUMP_CPU_TOPOLOGY
 	dprintf("CPU %d: apic id %d, package %d, core %d, smt %d\n", currentCPU,
 		topologyID, cpu->topology_id[CPU_TOPOLOGY_PACKAGE],
 		cpu->topology_id[CPU_TOPOLOGY_CORE],
 		cpu->topology_id[CPU_TOPOLOGY_SMT]);
+
+	if (sCacheLevelCount > 0) {
+		char cacheLevels[256];
+		int offset = 0;
+		for (int i = 0; i < sCacheLevelCount; i++) {
+			offset += snprintf(cacheLevels + offset,
+					sizeof(cacheLevels) - offset,
+					" L%d id %d%s", i + 1, cpu->cache_id[i],
+					i < sCacheLevelCount - 1 ? "," : "");
+
+			if (offset >= sizeof(cacheLevels))
+				break;
+		}
+
+		dprintf("CPU %d: cache sharing:%s\n", currentCPU, cacheLevels);
+	}
 #endif
 }
 
@@ -820,6 +925,8 @@ detect_cpu(int currentCPU)
 
 	if (maxExtendedLeaf >= 0x80000001) {
 		get_current_cpuid(&cpuid, 0x80000001, 0);
+		if (cpu->arch.vendor == VENDOR_AMD)
+			cpu->arch.feature[FEATURE_EXT_AMD_ECX] = cpuid.regs.ecx; // ecx
 		cpu->arch.feature[FEATURE_EXT_AMD] = cpuid.regs.edx; // edx
 		if (cpu->arch.vendor != VENDOR_AMD)
 			cpu->arch.feature[FEATURE_EXT_AMD] &= IA32_FEATURES_INTEL_EXT;

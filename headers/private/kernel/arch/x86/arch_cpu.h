@@ -24,6 +24,9 @@
 #endif	// !_ASSEMBLER
 
 
+#define CPU_MAX_CACHE_LEVEL	8
+
+
 // MSR registers (possibly Intel specific)
 #define IA32_MSR_TSC					0x10
 #define IA32_MSR_APIC_BASE				0x1b
@@ -152,6 +155,10 @@
 #define IA32_FEATURE_EXT_RDRND		(1 << 30) // RDRAND instruction
 #define IA32_FEATURE_EXT_HYPERVISOR	(1 << 31) // Running on a hypervisor
 
+// x86 features from cpuid eax 0x80000001, ecx register (AMD)
+#define IA32_FEATURE_AMD_EXT_CMPLEGACY	(1 << 1) // Core MP legacy mode
+#define IA32_FEATURE_AMD_EXT_TOPOLOGY	(1 << 22) // Topology extensions
+
 // x86 features from cpuid eax 0x80000001, edx register (AMD)
 // only care about the ones that are unique to this register
 #define IA32_FEATURE_AMD_EXT_SYSCALL	(1 << 11) // SYSCALL/SYSRET
@@ -265,6 +272,7 @@ typedef struct x86_cpu_module_info {
 enum x86_feature_type {
 	FEATURE_COMMON = 0,     // cpuid eax=1, ecx register
 	FEATURE_EXT,            // cpuid eax=1, edx register
+	FEATURE_EXT_AMD_ECX,	// cpuid eax=0x80000001, ecx register (AMD)
 	FEATURE_EXT_AMD,        // cpuid eax=0x80000001, edx register (AMD)
 	FEATURE_6_EAX,          // cpuid eax=6, eax registers
 	FEATURE_6_ECX,          // cpuid eax=6, ecx registers

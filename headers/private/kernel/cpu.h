@@ -67,6 +67,7 @@ typedef struct cpu_ent {
 
 	// CPU topology information
 	int				topology_id[CPU_TOPOLOGY_LEVELS];
+	int				cache_id[CPU_MAX_CACHE_LEVEL];
 
 	// arch-specific stuff
 	arch_cpu_info arch;
