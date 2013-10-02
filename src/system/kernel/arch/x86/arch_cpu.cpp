@@ -570,7 +570,7 @@ getCPULegacyInitialAPICID(int currentCPU)
 
 
 static inline status_t
-detectAMDCPUTopology(int maxBasicLeaf, int maxExtendedLeaf)
+detectAMDCPUTopology(uint32 maxBasicLeaf, uint32 maxExtendedLeaf)
 {
 	getCPUTopologyID = getCPULegacyInitialAPICID;
 
@@ -612,7 +612,7 @@ getIntelCPUInitialx2APICID(int currentCPU)
 
 
 static inline status_t
-detectIntelCPUTopologyx2APIC(int maxBasicLeaf)
+detectIntelCPUTopologyx2APIC(uint32 maxBasicLeaf)
 {
 	if (maxBasicLeaf < 11)
 		return B_UNSUPPORTED;
@@ -662,7 +662,7 @@ detectIntelCPUTopologyx2APIC(int maxBasicLeaf)
 
 
 static inline status_t
-detectIntelCPUTopologyLegacy(int maxBasicLeaf)
+detectIntelCPUTopologyLegacy(uint32 maxBasicLeaf)
 {
 	getCPUTopologyID = getCPULegacyInitialAPICID;
 
@@ -699,8 +699,8 @@ getTopologyLevelID(uint32 id, cpu_topology_level level)
 
 
 static void
-detectCPUTopology(int currentCPU, cpu_ent* cpu, int maxBasicLeaf,
-	int maxExtendedLeaf)
+detectCPUTopology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
+	uint32 maxExtendedLeaf)
 {
 	if (currentCPU == 0) {
 		status_t result = B_UNSUPPORTED;
