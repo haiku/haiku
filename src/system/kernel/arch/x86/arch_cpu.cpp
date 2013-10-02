@@ -124,7 +124,7 @@ x86_optimized_functions gOptimizedFunctions = {
 };
 
 /* CPU topology information */
-static uint32 (*getCPUTopologyID)(int currentCPU) = NULL;
+static uint32 (*sGetCPUTopologyID)(int currentCPU);
 static uint32 sHierarchyMask[CPU_TOPOLOGY_LEVELS];
 static uint32 sHierarchyShift[CPU_TOPOLOGY_LEVELS];
 
@@ -559,10 +559,8 @@ computeCPUHierarchyMasks(int maxLogicalID, int maxCoreID)
 
 
 static uint32
-getCPULegacyInitialAPICID(int currentCPU)
+getCPULegacyInitialAPICID(int /* currentCPU */)
 {
-	(void)currentCPU;
-
 	cpuid_info cpuid;
 	get_current_cpuid(&cpuid, 1, 0);
 	return cpuid.regs.ebx >> 24;
@@ -572,7 +570,7 @@ getCPULegacyInitialAPICID(int currentCPU)
 static inline status_t
 detectAMDCPUTopology(uint32 maxBasicLeaf, uint32 maxExtendedLeaf)
 {
-	getCPUTopologyID = getCPULegacyInitialAPICID;
+	sGetCPUTopologyID = getCPULegacyInitialAPICID;
 
 	cpuid_info cpuid;
 	get_current_cpuid(&cpuid, 1, 0);
@@ -617,8 +615,7 @@ detectIntelCPUTopologyx2APIC(uint32 maxBasicLeaf)
 	if (maxBasicLeaf < 11)
 		return B_UNSUPPORTED;
 
-	const int kLevelCount = CPU_TOPOLOGY_LEVELS;
-	uint8 hierarchyLevels[kLevelCount];
+	uint8 hierarchyLevels[CPU_TOPOLOGY_LEVELS];
 
 	int currentLevel = 0;
 	int levelType;
@@ -643,13 +640,13 @@ detectIntelCPUTopologyx2APIC(uint32 maxBasicLeaf)
 		}
 
 		currentLevel++;
-	} while(levelType != 0 && levelsSet != 3);
+	} while (levelType != 0 && levelsSet != 3);
 
-	getCPUTopologyID = getIntelCPUInitialx2APICID;
+	sGetCPUTopologyID = getIntelCPUInitialx2APICID;
 
-	for (int i = 0; i < kLevelCount; i++) {
+	for (int i = 0; i < CPU_TOPOLOGY_LEVELS; i++) {
 		uint32 mask = ~uint32(0);
-		if (i < kLevelCount - 1)
+		if (i < CPU_TOPOLOGY_LEVELS - 1)
 			mask = (1 << hierarchyLevels[i]) - 1;
 		if (i > 0)
 			mask &= ~sHierarchyMask[i - 1];
@@ -664,7 +661,7 @@ detectIntelCPUTopologyx2APIC(uint32 maxBasicLeaf)
 static inline status_t
 detectIntelCPUTopologyLegacy(uint32 maxBasicLeaf)
 {
-	getCPUTopologyID = getCPULegacyInitialAPICID;
+	sGetCPUTopologyID = getCPULegacyInitialAPICID;
 
 	cpuid_info cpuid;
 
@@ -717,7 +714,7 @@ detectCPUTopology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
 		if (result != B_OK) {
 			dprintf("No CPU topology information available.\n");
 
-			getCPUTopologyID = getSimpleCPUTopologyID;
+			sGetCPUTopologyID = getSimpleCPUTopologyID;
 
 			memset(sHierarchyMask, 0, sizeof(sHierarchyMask));
 			sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~uint32(0);
@@ -726,8 +723,8 @@ detectCPUTopology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
 		}
 	}
 
-	ASSERT(getCPUTopologyID != NULL);
-	int topologyID = getCPUTopologyID(currentCPU);
+	ASSERT(sGetCPUTopologyID != NULL);
+	int topologyID = sGetCPUTopologyID(currentCPU);
 	cpu->topology_id[CPU_TOPOLOGY_SMT]
 		= getTopologyLevelID(topologyID, CPU_TOPOLOGY_SMT);
 	cpu->topology_id[CPU_TOPOLOGY_CORE]
