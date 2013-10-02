@@ -538,6 +538,68 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 #endif	// DUMP_FEATURE_STRING
 
 
+static void
+computeCPUHierarchyMasks(int maxLogicalID, int maxCoreID)
+{
+	ASSERT(maxLogicalID >= maxCoreID);
+	const int kMaxSMTID = maxLogicalID / maxCoreID;
+
+	sHierarchyMask[CPU_TOPOLOGY_SMT] = kMaxSMTID - 1;
+	sHierarchyShift[CPU_TOPOLOGY_SMT] = 0;
+
+	sHierarchyMask[CPU_TOPOLOGY_CORE] = (maxCoreID - 1) * kMaxSMTID;
+	sHierarchyShift[CPU_TOPOLOGY_CORE]
+		= countSetBits(sHierarchyMask[CPU_TOPOLOGY_SMT]);
+
+	const uint32 kSinglePackageMask = sHierarchyMask[CPU_TOPOLOGY_SMT]
+		| sHierarchyMask[CPU_TOPOLOGY_CORE];
+	sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~kSinglePackageMask;
+	sHierarchyShift[CPU_TOPOLOGY_PACKAGE] = countSetBits(kSinglePackageMask);
+}
+
+
+static uint32
+getCPULegacyInitialAPICID(int currentCPU)
+{
+	(void)currentCPU;
+
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 1, 0);
+	return cpuid.regs.ebx >> 24;
+}
+
+
+static inline status_t
+detectAMDCPUTopology(int maxBasicLeaf, int maxExtendedLeaf)
+{
+	getCPUTopologyID = getCPULegacyInitialAPICID;
+
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 1, 0);
+	int maxLogicalID = nextPowerOf2((cpuid.regs.ebx >> 16) & 0xff);
+
+	int maxCoreID = 1;
+	if (maxExtendedLeaf >= 0x80000008) {
+		get_current_cpuid(&cpuid, 0x80000008, 0);
+		maxCoreID = (cpuid.regs.ecx >> 12) & 0xf;
+		if (maxCoreID != 0)
+			maxCoreID = 1 << maxCoreID;
+		else
+			maxCoreID = nextPowerOf2((cpuid.regs.edx & 0xf) + 1);
+	}
+
+	if (maxExtendedLeaf >= 0x80000001) {
+		get_current_cpuid(&cpuid, 0x80000001, 0);
+		if ((cpuid.regs.ecx & 2) != 0)
+			maxCoreID = maxLogicalID;
+	}
+
+	computeCPUHierarchyMasks(maxLogicalID, maxCoreID);
+
+	return B_OK;
+}
+
+
 static uint32
 getIntelCPUInitialx2APICID(int currentCPU)
 {
@@ -599,21 +661,10 @@ detectIntelCPUTopologyx2APIC(int maxBasicLeaf)
 }
 
 
-static uint32
-getIntelCPULegacyInitialAPICID(int currentCPU)
-{
-	(void)currentCPU;
-
-	cpuid_info cpuid;
-	get_current_cpuid(&cpuid, 1, 0);
-	return cpuid.regs.ebx >> 24;
-}
-
-
 static inline status_t
 detectIntelCPUTopologyLegacy(int maxBasicLeaf)
 {
-	getCPUTopologyID = getIntelCPULegacyInitialAPICID;
+	getCPUTopologyID = getCPULegacyInitialAPICID;
 
 	cpuid_info cpuid;
 
@@ -626,20 +677,7 @@ detectIntelCPUTopologyLegacy(int maxBasicLeaf)
 		maxCoreID = nextPowerOf2((cpuid.regs.eax >> 26) + 1);
 	}
 
-	ASSERT(maxLogicalID >= maxCoreID);
-	const int kMaxSMTID = maxLogicalID / maxCoreID;
-
-	sHierarchyMask[CPU_TOPOLOGY_SMT] = kMaxSMTID - 1;
-	sHierarchyShift[CPU_TOPOLOGY_SMT] = 0;
-
-	sHierarchyMask[CPU_TOPOLOGY_CORE] = (maxCoreID - 1) * kMaxSMTID;
-	sHierarchyShift[CPU_TOPOLOGY_CORE]
-		= countSetBits(sHierarchyMask[CPU_TOPOLOGY_SMT]);
-
-	const uint32 kSinglePackageMask = sHierarchyMask[CPU_TOPOLOGY_SMT]
-		| sHierarchyMask[CPU_TOPOLOGY_CORE];
-	sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~kSinglePackageMask;
-	sHierarchyShift[CPU_TOPOLOGY_PACKAGE] = countSetBits(kSinglePackageMask);
+	computeCPUHierarchyMasks(maxLogicalID, maxCoreID);
 
 	return B_OK;
 }
@@ -661,11 +699,14 @@ getTopologyLevelID(uint32 id, cpu_topology_level level)
 
 
 static void
-detectCPUTopology(int currentCPU, cpu_ent* cpu, int maxBasicLeaf)
+detectCPUTopology(int currentCPU, cpu_ent* cpu, int maxBasicLeaf,
+	int maxExtendedLeaf)
 {
 	if (currentCPU == 0) {
 		status_t result = B_UNSUPPORTED;
 		if (x86_check_feature(IA32_FEATURE_HTT, FEATURE_COMMON)) {
+			if (cpu->arch.vendor == VENDOR_AMD)
+				result = detectAMDCPUTopology(maxBasicLeaf, maxExtendedLeaf);
 			if (cpu->arch.vendor == VENDOR_INTEL) {
 				result = detectIntelCPUTopologyx2APIC(maxBasicLeaf);
 				if (result != B_OK)
@@ -818,7 +859,7 @@ detect_cpu(int currentCPU)
 		cpu->arch.feature[FEATURE_6_ECX] = cpuid.regs.ecx;
 	}
 
-	detectCPUTopology(currentCPU, cpu, maxBasicLeaf);
+	detectCPUTopology(currentCPU, cpu, maxBasicLeaf, maxExtendedLeaf);
 
 #if DUMP_FEATURE_STRING
 	dump_feature_string(currentCPU, cpu);
