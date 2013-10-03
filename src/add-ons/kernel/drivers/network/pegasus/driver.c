@@ -1,13 +1,13 @@
 /*
  * Pegasus BeOS Driver
- * 
+ *
  * Copyright 2006, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jérôme Duval
  */
- 
+
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -175,13 +175,13 @@ create_device(const usb_device dev, const usb_interface_info *ii, uint16 ifno)
 {
 	pegasus_dev *device = NULL;
 	sem_id sem;
-	
+
 	ASSERT(usb != NULL && dev != 0);
 
 	device = malloc(sizeof(pegasus_dev));
 	if (device == NULL)
 		return NULL;
-		
+
 	memset(device, 0, sizeof(pegasus_dev));
 
 	device->sem_lock = sem = create_sem(1, DRIVER_NAME "_lock");
@@ -190,7 +190,7 @@ create_device(const usb_device dev, const usb_interface_info *ii, uint16 ifno)
 		free(device);
 		return NULL;
 	}
-	
+
 	device->rx_sem = sem = create_sem(1, DRIVER_NAME"_receive");
 	if (sem < B_OK) {
 		DPRINTF_ERR("create_sem() failed 0x%" B_PRIx32 "\n", sem);
@@ -219,7 +219,7 @@ create_device(const usb_device dev, const usb_interface_info *ii, uint16 ifno)
 		return NULL;
 	}
 	set_sem_owner(device->tx_sem, B_SYSTEM_TEAM);
-	
+
 	device->tx_sem_cb = sem = create_sem(0, DRIVER_NAME"_transmit_cb");
 	if (sem < B_OK) {
 		delete_sem(device->sem_lock);
@@ -230,7 +230,7 @@ create_device(const usb_device dev, const usb_interface_info *ii, uint16 ifno)
 		return NULL;
 	}
 	set_sem_owner(device->tx_sem_cb, B_SYSTEM_TEAM);
-		
+
 	device->number = sDeviceNumber++;
 	device->cookieMagic = PEGASUS_COOKIE_MAGIC;
 	sprintf(device->name, "%s%d", kBaseName, device->number);
@@ -241,7 +241,7 @@ create_device(const usb_device dev, const usb_interface_info *ii, uint16 ifno)
 	device->aue_dying = false;
 	device->flags = 0;
 	device->maxframesize = 1514; // XXX is MAXIMUM_ETHERNET_FRAME_SIZE = 1518 too much?
-		
+
 	return device;
 }
 
@@ -255,7 +255,7 @@ remove_device(pegasus_dev *device)
 	delete_sem(device->tx_sem);
 	delete_sem(device->rx_sem_cb);
 	delete_sem(device->tx_sem_cb);
-		
+
 	delete_sem(device->sem_lock);
 
 	free(device);
@@ -265,7 +265,7 @@ remove_device(pegasus_dev *device)
 /**
 	\fn:
 */
-static status_t 
+static status_t
 setup_endpoints(const usb_interface_info *uii, pegasus_dev *dev)
 {
 	size_t epts[3] = { -1, -1, -1 };
@@ -285,17 +285,17 @@ setup_endpoints(const usb_interface_info *uii, pegasus_dev *dev)
 				epts[2] = ep;
 		}
 	}
-	
+
 	dev->pipe_in = uii->endpoint[epts[0]].handle;
 	dev->pipe_out = uii->endpoint[epts[1]].handle;
 	dev->pipe_intr = uii->endpoint[epts[2]].handle;
 	DPRINTF_INFO("endpoint:%lx %lx %lx\n", dev->pipe_in, dev->pipe_out, dev->pipe_intr);
-	
+
 	return ((epts[0] > -1) && (epts[1] > -1) && (epts[2] > -1)) ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
 
-static void 
+static void
 pegasus_rx_callback(void *cookie, status_t status, void *data, size_t actual_len)
 {
 	pegasus_dev *dev = (pegasus_dev *)cookie;
@@ -306,7 +306,7 @@ pegasus_rx_callback(void *cookie, status_t status, void *data, size_t actual_len
 		DPRINTF_ERR("pegasus_rx_callback() cancelled\n");
 		return;
 	}
-	
+
 	ASSERT(cookie != NULL);
 	dev->rx_actual_length = actual_len;
 	dev->rx_status = status;	/* B_USB_STATUS_* */
@@ -315,22 +315,22 @@ pegasus_rx_callback(void *cookie, status_t status, void *data, size_t actual_len
 }
 
 
-static void 
+static void
 pegasus_tx_callback(void *cookie, status_t status, void *data, size_t actual_len)
 {
 	pegasus_dev *dev = (pegasus_dev *)cookie;
-	
+
 	DPRINTF_INFO("pegasus_tx_callback() %ld %ld\n", status, actual_len);
 	if (status == B_CANCELED) {
 		/* cancelled: device is unplugged */
 		DPRINTF_ERR("pegasus_tx_callback() cancelled\n");
 		return;
 	}
-			
+
 	ASSERT(cookie != NULL);
 	dev->tx_actual_length = actual_len;
 	dev->tx_status = status;	/* B_USB_STATUS_* */
-	release_sem(dev->tx_sem_cb);	
+	release_sem(dev->tx_sem_cb);
 	DPRINTF_INFO("pegasus_tx_callback release sem %ld\n", dev->tx_sem_cb);
 }
 
@@ -348,7 +348,7 @@ pegasus_device_added(const usb_device dev, void **cookie)
 	status_t status;
 	uint16 ifno;
 	int i;
-	
+
 	ASSERT(dev != 0 && cookie != NULL);
 	DPRINTF_INFO("device_added()\n");
 
@@ -357,12 +357,12 @@ pegasus_device_added(const usb_device dev, void **cookie)
 	DPRINTF_INFO("vendor ID 0x%04X, product ID 0x%04X\n", dev_desc->vendor_id,
 		dev_desc->product_id);
 
-	if ((conf = usb->get_nth_configuration(dev, DEFAULT_CONFIGURATION)) 
+	if ((conf = usb->get_nth_configuration(dev, DEFAULT_CONFIGURATION))
 		== NULL) {
 		DPRINTF_ERR("cannot get default configuration\n");
 		return B_ERROR;
 	}
-	
+
 	ifno = AUE_IFACE_IDX;
 	intf = conf->interface [ifno].active;
 
@@ -372,36 +372,36 @@ pegasus_device_added(const usb_device dev, void **cookie)
 		DPRINTF_ERR("set_configuration() failed %s\n", strerror(status));
 		return B_ERROR;
 	}
-	
+
 	if ((device = create_device(dev, intf, ifno)) == NULL) {
 		DPRINTF_ERR("create_device() failed\n");
 		return B_ERROR;
 	}
-	
+
 	device->aue_vendor = dev_desc->vendor_id;
 	device->aue_product = dev_desc->product_id;
-	
+
 	for (i=0; i < sizeof(aue_devs) / sizeof(struct aue_type); i++)
 		if (aue_devs[i].aue_dev.vendor == dev_desc->vendor_id
 			&& aue_devs[i].aue_dev.product == dev_desc->product_id) {
-			device->aue_flags = aue_devs[i].aue_flags;		
+			device->aue_flags = aue_devs[i].aue_flags;
 			break;
 		}
-		
+
 	/* Find endpoints. */
 	setup_endpoints(intf, device);
-	
+
 	aue_attach(device);
 
 	DPRINTF_INFO("MAC %02x:%02x:%02x:%02x:%02x:%02x\n",
 		device->macaddr[0], device->macaddr[1], device->macaddr[2],
 		device->macaddr[3], device->macaddr[4], device->macaddr[5]);
-	
+
 	aue_init(device);
 
 	/* create a port */
 	add_device_info(device);
-	
+
 	*cookie = device;
 	DPRINTF_INFO("added %s\n", device->name);
 	return B_OK;
@@ -418,7 +418,7 @@ pegasus_device_removed(void *cookie)
 	DPRINTF_INFO("device_removed(%s)\n", device->name);
 
 	aue_uninit(device);
-	
+
 	usb->cancel_queued_transfers(device->pipe_in);
 	usb->cancel_queued_transfers(device->pipe_out);
 	usb->cancel_queued_transfers(device->pipe_intr);
@@ -437,14 +437,14 @@ pegasus_device_removed(void *cookie)
 }
 
 
-static status_t 
+static status_t
 pegasus_device_open(const char *name, uint32 flags,
 	driver_cookie **out_cookie)
 {
 	driver_cookie *cookie;
 	pegasus_dev *device;
 	status_t err;
-	
+
 	ASSERT(name != NULL);
 	ASSERT(out_cookie != NULL);
 	DPRINTF_INFO("open(%s)\n", name);
@@ -458,28 +458,28 @@ pegasus_device_open(const char *name, uint32 flags,
 		free(cookie);
 		return err;
 	}
-	device->nonblocking = (flags & O_NONBLOCK) ? true : false;
-	
+	device->nonblocking = (flags & O_NONBLOCK) != 0;
+
 	cookie->device = device;
 	cookie->next = device->open_fds;
 	device->open_fds = cookie;
 	device->open++;
 	release_sem(device->sem_lock);
-	
+
 	*out_cookie = cookie;
 	DPRINTF_INFO("device %s open (%d)\n", name, device->open);
 	return B_OK;
 }
 
 
-static status_t 
+static status_t
 pegasus_device_read(driver_cookie *cookie, off_t position, void *buffer, size_t *_length)
 {
 	pegasus_dev *dev;
 	status_t status;
 	int32 blockFlag;
 	size_t size;
-	
+
 	DPRINTF_INFO("device %p read\n", cookie);
 
 	if (pegasus_checkdeviceinfo(dev = cookie->device) != B_OK) {
@@ -508,12 +508,12 @@ pegasus_device_read(driver_cookie *cookie, off_t position, void *buffer, size_t 
 
 	// queue new request
 	status = usb->queue_bulk(dev->pipe_in, dev->rx_buffer, MAX_FRAME_SIZE, &pegasus_rx_callback, dev);
-	
+
 	if (status != B_OK) {
 		DPRINTF_ERR("queue_bulk:failed:%08" B_PRIx32 "\n", status);
 		goto rx_done;
 	}
-	
+
 	// block until data is available (if blocking is allowed)
 	if ((status = acquire_sem_etc(dev->rx_sem_cb, 1, B_CAN_INTERRUPT | blockFlag, 0)) != B_NO_ERROR) {
 		DPRINTF_ERR("cannot acquire read sem: %" B_PRIx32 ", %s\n", status, strerror(status));
@@ -522,14 +522,14 @@ pegasus_device_read(driver_cookie *cookie, off_t position, void *buffer, size_t 
 #endif
 		goto rx_done;
 	}
-	
+
 	if (dev->rx_status != B_OK) {
 		status = usb->clear_feature(dev->pipe_in, USB_FEATURE_ENDPOINT_HALT);
 		if (status != B_OK)
 			DPRINTF_ERR("clear_feature() error %s\n", strerror(status));
 		goto rx_done;
 	}
-	
+
 	// copy buffer
 	size = dev->rx_actual_length;
 	if (size > MAX_FRAME_SIZE || (size - 2) > *_length) {
@@ -539,7 +539,7 @@ pegasus_device_read(driver_cookie *cookie, off_t position, void *buffer, size_t 
 		*_length = size - 2;
 
 	memcpy(buffer, dev->rx_buffer, size);
-	
+
 	DPRINTF_INFO("read done %ld\n", *_length);
 
 rx_done:
@@ -548,7 +548,7 @@ rx_done:
 }
 
 
-static status_t 
+static status_t
 pegasus_device_write(driver_cookie *cookie, off_t position,	const void *buffer, size_t *_length)
 {
 	pegasus_dev *dev;
@@ -564,7 +564,7 @@ pegasus_device_write(driver_cookie *cookie, off_t position,	const void *buffer, 
 
 	if (dev->aue_dying)
 		return B_DEVICE_NOT_FOUND;		/* already unplugged */
-	
+
 		// block until a free tx descriptor is available
 	if ((status = acquire_sem_etc(dev->tx_sem, 1, B_TIMEOUT, ETHER_TRANSMIT_TIMEOUT)) < B_NO_ERROR) {
 		DPRINTF_ERR("write: acquiring sem failed: %" B_PRIx32 ", %s\n", status, strerror(status));
@@ -576,10 +576,10 @@ pegasus_device_write(driver_cookie *cookie, off_t position,	const void *buffer, 
 		*_length = MAX_FRAME_SIZE;
 
 	frameSize = *_length;
-	
+
 	/* Copy data to tx buffer */
 	memcpy(dev->tx_buffer+2, buffer, frameSize);
-	
+
 	/*
 	 * The ADMtek documentation says that the packet length is
 	 * supposed to be specified in the first two bytes of the
@@ -588,16 +588,16 @@ pegasus_device_write(driver_cookie *cookie, off_t position,	const void *buffer, 
 	 */
 	dev->tx_buffer[0] = (uint8)frameSize;
 	dev->tx_buffer[1] = (uint8)(frameSize >> 8);
-	
+
 	// queue new request, bulk length is one more if size is a multiple of 64
-	status = usb->queue_bulk(dev->pipe_out, dev->tx_buffer, ((frameSize + 2) & 0x3f) ? frameSize + 2 : frameSize + 3, 
+	status = usb->queue_bulk(dev->pipe_out, dev->tx_buffer, ((frameSize + 2) & 0x3f) ? frameSize + 2 : frameSize + 3,
 		&pegasus_tx_callback, dev);
-	
+
 	if (status != B_OK){
 		DPRINTF_ERR("queue_bulk:failed:%08" B_PRIx32 "\n", status);
 		goto tx_done;
-	}	
-	
+	}
+
 	// block until data is sent (if blocking is allowed)
 	if ((status = acquire_sem_etc(dev->tx_sem_cb, 1, B_CAN_INTERRUPT, 0)) != B_NO_ERROR) {
 		DPRINTF_ERR("cannot acquire write done sem: %" B_PRIx32 ", %s\n", status, strerror(status));
@@ -613,7 +613,7 @@ pegasus_device_write(driver_cookie *cookie, off_t position,	const void *buffer, 
 			DPRINTF_ERR("clear_feature() error %s\n", strerror(status));
 		goto tx_done;
 	}
-	
+
 	*_length = frameSize;
 
 tx_done:
@@ -622,7 +622,7 @@ tx_done:
 }
 
 
-static status_t 
+static status_t
 pegasus_device_control(driver_cookie *cookie, uint32 op,
 		void *arg, size_t len)
 {
@@ -641,12 +641,12 @@ pegasus_device_control(driver_cookie *cookie, uint32 op,
 		case ETHER_INIT:
 			DPRINTF_INFO("control() ETHER_INIT\n");
 			return B_OK;
-		
+
 		case ETHER_GETADDR:
 			DPRINTF_INFO("control() ETHER_GETADDR\n");
 			memcpy(arg, &device->macaddr, sizeof(device->macaddr));
 			return B_OK;
-			
+
 		case ETHER_NONBLOCK:
 			if (*(int32 *)arg) {
 				DPRINTF_INFO("non blocking mode on\n");
@@ -660,11 +660,11 @@ pegasus_device_control(driver_cookie *cookie, uint32 op,
 		case ETHER_ADDMULTI:
 			DPRINTF_INFO("control() ETHER_ADDMULTI\n");
 			break;
-		
+
 		case ETHER_REMMULTI:
 			DPRINTF_INFO("control() ETHER_REMMULTI\n");
 			return B_OK;
-		
+
 		case ETHER_SETPROMISC:
 			if (*(int32 *)arg) {
 				DPRINTF_INFO("control() ETHER_SETPROMISC on\n");
@@ -677,17 +677,17 @@ pegasus_device_control(driver_cookie *cookie, uint32 op,
 			DPRINTF_INFO("control() ETHER_GETFRAMESIZE, framesize = %ld (MTU = %ld)\n", device->maxframesize,  device->maxframesize - ENET_HEADER_SIZE);
 			*(uint32*)arg = device->maxframesize;
 			return B_OK;
-			
+
 		default:
 			DPRINTF_INFO("control() Invalid command\n");
 			break;
 	}
-	
+
 	return err;
 }
 
 
-static status_t 
+static status_t
 pegasus_device_close(driver_cookie *cookie)
 {
 	pegasus_dev *device;
@@ -717,7 +717,7 @@ pegasus_device_close(driver_cookie *cookie)
 }
 
 
-static status_t 
+static status_t
 pegasus_device_free(driver_cookie *cookie)
 {
 	pegasus_dev *device;
@@ -746,14 +746,14 @@ pegasus_device_free(driver_cookie *cookie)
 ** to receive device added and removed events
 */
 
-static usb_notify_hooks notify_hooks = 
+static usb_notify_hooks notify_hooks =
 {
 	&pegasus_device_added,
 	&pegasus_device_removed
 };
 
 
-status_t 
+status_t
 init_hardware(void)
 {
 	return B_OK;
@@ -764,7 +764,7 @@ status_t
 init_driver(void)
 {
 	DPRINTF_INFO("init_driver(), built %s %s\n", __DATE__, __TIME__);
-	
+
 #if DEBUG_DRIVER
 	if (load_driver_symbols(drivername) == B_OK) {
 		DPRINTF_INFO("loaded symbols\n");
@@ -772,21 +772,21 @@ init_driver(void)
 		DPRINTF_INFO("no symbols for you!\n");
 	}
 #endif
-			
+
 	if (get_module(B_USB_MODULE_NAME, (module_info**) &usb) != B_OK) {
 		DPRINTF_INFO("cannot get module \"%s\"\n", B_USB_MODULE_NAME);
 		return B_ERROR;
-	} 
-	
+	}
+
 	if ((gDeviceListLock = create_sem(1, "dev_list_lock")) < 0) {
 		put_module(B_USB_MODULE_NAME);
 		return gDeviceListLock;
 	}
-	
-	usb->register_driver(kDriverName, supported_devices, 
+
+	usb->register_driver(kDriverName, supported_devices,
 		sizeof(supported_devices)/sizeof(usb_support_descriptor), NULL);
 	usb->install_notify(kDriverName, &notify_hooks);
-	
+
 	return B_OK;
 }
 
@@ -795,7 +795,7 @@ void
 uninit_driver(void)
 {
 	DPRINTF_INFO("uninit_driver()\n");
-	
+
 	usb->uninstall_notify(kDriverName);
 	delete_sem(gDeviceListLock);
 	put_module(B_USB_MODULE_NAME);
@@ -830,7 +830,7 @@ find_device(const char* name)
 		(device_write_hook)pegasus_device_write,
 		NULL
 	};
-	
+
 	if (search_device_info(name) != NULL)
 		return &hooks;
 	return NULL;
