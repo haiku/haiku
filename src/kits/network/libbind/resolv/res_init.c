@@ -311,7 +311,7 @@ __res_vinit(res_state statp, int preinit) {
 	(line[sizeof(name) - 1] == ' ' || \
 	 line[sizeof(name) - 1] == '\t'))
 
-	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
+	if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, -1, false, path,
 			sizeof(path)) == B_OK)
 		strlcat(path, "/network/resolv.conf", sizeof(path));
 

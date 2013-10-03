@@ -31,7 +31,7 @@
 #define WSTAT_MTIME			0x0020
 #define WSTAT_CRTIME		0x0040
 
-#define B_COMMON_SETTINGS_DIRECTORY		".\\"
+#define B_SYSTEM_SETTINGS_DIRECTORY		".\\"
 #define B_COMMON_SYSTEM_DIRECTORY		".\\"
 
 #define ENOTSUP				1

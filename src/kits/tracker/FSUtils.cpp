@@ -658,12 +658,12 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
 			"\n\nTo %toDoAction the home folder anyway, hold down the "
 			"Shift key and click \"%toConfirmAction\"."));
 	} else if (DirectoryMatchesOrContains(entry, B_USER_CONFIG_DIRECTORY)
-		|| DirectoryMatchesOrContains(entry, B_COMMON_SETTINGS_DIRECTORY)) {
+		|| DirectoryMatchesOrContains(entry, B_SYSTEM_SETTINGS_DIRECTORY)) {
 
 		if (DirectoryMatchesOrContains(entry, "beos_mime",
 				B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatchesOrContains(entry, "beos_mime",
-				B_COMMON_SETTINGS_DIRECTORY)) {
+				B_SYSTEM_SETTINGS_DIRECTORY)) {
 			warning.SetTo(
 				B_TRANSLATE("If you %ifYouDoAction the mime settings, "
 				"%osName may not behave properly!\n\nAre you sure you want "
@@ -676,7 +676,7 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
 				"to do this?"));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_SETTINGS_DIRECTORY)
-			|| DirectoryMatches(entry, B_COMMON_SETTINGS_DIRECTORY)) {
+			|| DirectoryMatches(entry, B_SYSTEM_SETTINGS_DIRECTORY)) {
 			warning.SetTo(
 				B_TRANSLATE("If you %ifYouDoAction the settings folder, "
 				"%osName may not behave properly!\n\nAre you sure you want "

@@ -65,7 +65,7 @@ PrinterPrefs::LoadSettings(BMessage *settings)
 	status_t status;
 	BFile file;
 
-	status = find_directory(B_COMMON_SETTINGS_DIRECTORY, &fSettingsPath);
+	status = find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &fSettingsPath);
 	if (status != B_OK) {
 		// Could not find settings folder.
 		return status;

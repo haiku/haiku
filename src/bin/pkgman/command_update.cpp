@@ -35,10 +35,7 @@ static const char* const kLongUsage =
 	"Options:\n"
 	"  -H, --home\n"
 	"    Update the packages in the user's home directory. Default is to\n"
-	"    update in the common directory.\n"
-	"  -S, --system\n"
-	"    Update the packages in the system directory. Default is to\n"
-	"    update in the common directory.\n"
+	"    update in the system directory.\n"
 	"\n";
 
 
@@ -50,18 +47,17 @@ int
 UpdateCommand::Execute(int argc, const char* const* argv)
 {
 	BPackageInstallationLocation location
-		= B_PACKAGE_INSTALLATION_LOCATION_COMMON;
+		= B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "help", no_argument, 0, 'h' },
 			{ "home", no_argument, 0, 'H' },
-			{ "system", no_argument, 0, 'S' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "hHS", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "hH", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -72,10 +68,6 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 
 			case 'H':
 				location = B_PACKAGE_INSTALLATION_LOCATION_HOME;
-				break;
-
-			case 'S':
-				location = B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 				break;
 
 			default:

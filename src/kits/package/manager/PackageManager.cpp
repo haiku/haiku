@@ -52,8 +52,6 @@ BPackageManager::BPackageManager(BPackageInstallationLocation location)
 	fSolver(NULL),
 	fSystemRepository(new (std::nothrow) InstalledRepository("system",
 		B_PACKAGE_INSTALLATION_LOCATION_SYSTEM, -1)),
-	fCommonRepository(new (std::nothrow) InstalledRepository("common",
-		B_PACKAGE_INSTALLATION_LOCATION_COMMON, -2)),
 	fHomeRepository(new (std::nothrow) InstalledRepository("home",
 		B_PACKAGE_INSTALLATION_LOCATION_HOME, -3)),
 	fInstalledRepositories(10),
@@ -69,7 +67,6 @@ BPackageManager::~BPackageManager()
 {
 	delete fSolver;
 	delete fSystemRepository;
-	delete fCommonRepository;
 	delete fHomeRepository;
 }
 
@@ -85,10 +82,8 @@ BPackageManager::Init(uint32 flags)
 	if (error != B_OK)
 		DIE(error, "failed to create solver");
 
-	if (fSystemRepository == NULL || fCommonRepository == NULL
-		|| fHomeRepository == NULL) {
+	if (fSystemRepository == NULL || fHomeRepository == NULL)
 		throw std::bad_alloc();
-	}
 
 	// add installation location repositories
 	if ((flags & B_ADD_INSTALLED_REPOSITORIES) != 0) {
@@ -103,12 +98,8 @@ BPackageManager::Init(uint32 flags)
 		// well. But we can easily filter those out.
 		_AddInstalledRepository(fSystemRepository);
 
-		if (!fSystemRepository->IsInstalled()) {
-			_AddInstalledRepository(fCommonRepository);
-
-			if (!fCommonRepository->IsInstalled())
-				_AddInstalledRepository(fHomeRepository);
-		}
+		if (!fSystemRepository->IsInstalled())
+			_AddInstalledRepository(fHomeRepository);
 	}
 
 	// add other repositories
@@ -597,8 +588,6 @@ BPackageManager::_ClonePackageFile(InstalledRepository* repository,
 	directory_which packagesWhich;
 	if (repository == fSystemRepository) {
 		packagesWhich = B_SYSTEM_PACKAGES_DIRECTORY;
-	} else if (repository == fCommonRepository) {
-		packagesWhich = B_COMMON_PACKAGES_DIRECTORY;
 	} else {
 		DIE("don't know packages directory path for installation location "
 			"\"%s\"", repository->Name().String());
@@ -732,15 +721,8 @@ bool
 BPackageManager::_NextSpecificInstallationLocation()
 {
 	if (fLocation == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
-		fLocation = B_PACKAGE_INSTALLATION_LOCATION_COMMON;
-		fSystemRepository->SetInstalled(false);
-		_AddInstalledRepository(fCommonRepository);
-		return true;
-	}
-
-	if (fLocation == B_PACKAGE_INSTALLATION_LOCATION_COMMON) {
 		fLocation = B_PACKAGE_INSTALLATION_LOCATION_HOME;
-		fCommonRepository->SetInstalled(false);
+		fSystemRepository->SetInstalled(false);
 		_AddInstalledRepository(fHomeRepository);
 		return true;
 	}

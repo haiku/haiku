@@ -45,7 +45,7 @@ DesktopWindow::DesktopWindow(BRect frame, bool editMode)
 	BPath path;
 	status_t err;
 	entry_ref ref;
-	err = find_directory(B_COMMON_SETTINGS_DIRECTORY, &path, true);
+	err = find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path, true);
 	if (err >= B_OK) {
 		BDirectory dir(path.Path());
 		if (!dir.Contains("x-vnd.Haiku-Login", B_DIRECTORY_NODE))

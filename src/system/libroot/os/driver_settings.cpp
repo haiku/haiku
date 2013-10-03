@@ -766,7 +766,7 @@ load_driver_settings(const char *driverName)
 #ifdef _BOOT_MODE
 		strcpy(path, kUserSettingsDirectory);
 #else
-		// TODO: use B_COMMON_SETTINGS_DIRECTORY instead!
+		// TODO: use B_SYSTEM_SETTINGS_DIRECTORY instead!
 		if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, false, path,
 				sizeof(path)) == B_OK)
 #endif

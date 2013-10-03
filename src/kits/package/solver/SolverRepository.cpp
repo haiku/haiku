@@ -121,12 +121,6 @@ BSolverRepository::SetTo(BAllInstallationLocations)
 	if (error != B_OK)
 		return error;
 
-	error = AddPackages(B_PACKAGE_INSTALLATION_LOCATION_COMMON);
-	if (error != B_OK) {
-		Unset();
-		return error;
-	}
-
 	error = AddPackages(B_PACKAGE_INSTALLATION_LOCATION_HOME);
 	if (error != B_OK) {
 		Unset();

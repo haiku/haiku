@@ -808,7 +808,7 @@ void recordLogin(char *server, char *share, char *client, bool authenticated)
 		return;
 
 	// Obtain the filename for the log file.
-	find_directory(B_COMMON_LOG_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_LOG_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/BeServed-Logins.log");
 
 	// Build the time stamp.

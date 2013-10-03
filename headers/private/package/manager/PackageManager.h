@@ -67,8 +67,6 @@ public:
 
 			const InstalledRepository* SystemRepository() const
 									{ return fSystemRepository; }
-			const InstalledRepository* CommonRepository() const
-									{ return fCommonRepository; }
 			const InstalledRepository* HomeRepository() const
 									{ return fHomeRepository; }
 			const InstalledRepositoryList& InstalledRepositories() const
@@ -139,7 +137,6 @@ protected:
 			BPackageInstallationLocation fLocation;
 			BSolver*			fSolver;
 			InstalledRepository* fSystemRepository;
-			InstalledRepository* fCommonRepository;
 			InstalledRepository* fHomeRepository;
 			InstalledRepositoryList fInstalledRepositories;
 			RemoteRepositoryList fOtherRepositories;

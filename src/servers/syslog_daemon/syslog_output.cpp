@@ -64,7 +64,7 @@ prepare_output()
 
 		// get path (and create it if necessary)
 		BPath base;
-		find_directory(B_COMMON_LOG_DIRECTORY, &base, true);
+		find_directory(B_SYSTEM_LOG_DIRECTORY, &base, true);
 
 		BPath syslog(base);
 		syslog.Append("syslog");

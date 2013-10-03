@@ -217,7 +217,7 @@ NetworkSettings::ReadConfiguration()
 	fWirelessNetwork.SetTo(NULL);
 
 	BPath path;
-	find_directory(B_COMMON_SETTINGS_DIRECTORY, &path);
+	find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path);
 	path.Append("network");
 	path.Append("interfaces");
 

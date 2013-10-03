@@ -1604,7 +1604,7 @@ class FileSharingWindow : public BWindow
 				fileShares[i].next = NULL;
 			}
 
-			find_directory(B_COMMON_SETTINGS_DIRECTORY, 0, false, path, sizeof(path));
+			find_directory(B_SYSTEM_SETTINGS_DIRECTORY, 0, false, path, sizeof(path));
 			strcat(path, "/BeServed-Settings");
 
 			fp = fopen(path, "r");
@@ -1884,7 +1884,7 @@ class FileSharingWindow : public BWindow
 			char path[B_PATH_NAME_LENGTH + 1];
 			int i;
 
-			find_directory(B_COMMON_SETTINGS_DIRECTORY, 0, false, path, sizeof(path));
+			find_directory(B_SYSTEM_SETTINGS_DIRECTORY, 0, false, path, sizeof(path));
 			strcat(path, "/BeServed-Settings");
 
 			fp = fopen(path, "w");

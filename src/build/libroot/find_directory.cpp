@@ -64,13 +64,13 @@ find_directory(directory_which which, dev_t device, bool createIt,
 	// we support only the handful of paths we need
 	const char* path;
 	switch (which) {
-		case B_COMMON_TEMP_DIRECTORY:
+		case B_SYSTEM_TEMP_DIRECTORY:
 			path = HAIKU_BUILD_GENERATED_DIRECTORY "/tmp";
 			break;
-		case B_COMMON_SETTINGS_DIRECTORY:
+		case B_SYSTEM_SETTINGS_DIRECTORY:
 			path = HAIKU_BUILD_GENERATED_DIRECTORY "/system/settings";
 			break;
-		case B_COMMON_CACHE_DIRECTORY:
+		case B_SYSTEM_CACHE_DIRECTORY:
 			path = HAIKU_BUILD_GENERATED_DIRECTORY "/system/cache";
 			break;
 		case B_USER_SETTINGS_DIRECTORY:

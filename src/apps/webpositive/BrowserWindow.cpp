@@ -2364,7 +2364,7 @@ BrowserWindow::_HandlePageSourceResult(const BMessage* message)
 		ret = message->FindString("source", &source);
 
 		if (ret == B_OK)
-			ret = find_directory(B_COMMON_TEMP_DIRECTORY, &pathToPageSource);
+			ret = find_directory(B_SYSTEM_TEMP_DIRECTORY, &pathToPageSource);
 
 		BString tmpFileName("PageSource_");
 		tmpFileName << system_time() << ".html";

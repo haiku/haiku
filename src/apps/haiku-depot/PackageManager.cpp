@@ -240,10 +240,8 @@ PackageManager::GetPackageActions(PackageInfoRef package, Model* model)
 	if (repository == static_cast<const BSolverRepository*>(
 			SystemRepository())) {
 		installed = true;
-		systemPackage = true;
-	} else if (repository == static_cast<const BSolverRepository*>(
-			CommonRepository())) {
-		installed = true;
+//		systemPackage = true;
+// TODO: Being installed in system doesn't make it a system package.
 	} else if (repository == static_cast<const BSolverRepository*>(
 			HomeRepository())) {
 		installed = true;

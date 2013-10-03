@@ -463,9 +463,6 @@ MainWindow::_RefreshPackageList()
 					manager.SystemRepository())) {
 				installationLocation = "system";
 			} else if (repository == static_cast<const BSolverRepository*>(
-					manager.CommonRepository())) {
-				installationLocation = "common";
-			} else if (repository == static_cast<const BSolverRepository*>(
 					manager.HomeRepository())) {
 				installationLocation = "home";
 			}

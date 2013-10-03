@@ -388,7 +388,7 @@ init_map_rules(struct gen_p *irs, const char *conf_file) {
 	FILE *conf;
 
 	if (conf_file == NULL) {
-		if (find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
+		if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, -1, false, path,
 				sizeof(path)) == B_OK) {
 			strlcat(path, "/network/irs.conf", sizeof(path));
 			conf_file = path;

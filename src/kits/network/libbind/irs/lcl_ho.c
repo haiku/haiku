@@ -449,7 +449,7 @@ ho_rewind(struct irs_ho *this) {
 		(void)fclose(pvt->fp);
 	}
 
-	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
+	if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, -1, false, path,
 			sizeof(path)) == B_OK) {
 		strlcat(path, "/network/hosts", sizeof(path));
 

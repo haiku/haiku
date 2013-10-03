@@ -643,7 +643,7 @@ initialize_hostname_list ()
   temp = get_string_value ("HOSTFILE");
   if (temp == 0)
     temp = get_string_value ("hostname_completion_file");
-  if (temp == 0 && find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
+  if (temp == 0 && find_directory(B_SYSTEM_SETTINGS_DIRECTORY, -1, false, path,
     sizeof(path)) == B_OK) {
     strlcat(path, "/network/hosts", sizeof(path));
     temp = path;

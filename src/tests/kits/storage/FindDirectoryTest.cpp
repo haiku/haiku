@@ -43,14 +43,14 @@ const directory_which directories[] = {
 	B_COMMON_LIB_DIRECTORY,
 	B_COMMON_SERVERS_DIRECTORY,
 	B_COMMON_BIN_DIRECTORY,
-	B_COMMON_ETC_DIRECTORY,
+	B_SYSTEM_ETC_DIRECTORY,
 	B_COMMON_DOCUMENTATION_DIRECTORY,
-	B_COMMON_SETTINGS_DIRECTORY,
+	B_SYSTEM_SETTINGS_DIRECTORY,
 	B_COMMON_DEVELOP_DIRECTORY,
-	B_COMMON_LOG_DIRECTORY,
-	B_COMMON_SPOOL_DIRECTORY,
-	B_COMMON_TEMP_DIRECTORY,
-	B_COMMON_VAR_DIRECTORY,
+	B_SYSTEM_LOG_DIRECTORY,
+	B_SYSTEM_SPOOL_DIRECTORY,
+	B_SYSTEM_TEMP_DIRECTORY,
+	B_SYSTEM_VAR_DIRECTORY,
 	B_COMMON_TRANSLATORS_DIRECTORY,
 	B_COMMON_MEDIA_NODES_DIRECTORY,
 	B_COMMON_SOUNDS_DIRECTORY,
@@ -249,28 +249,28 @@ test_find_directory(directory_which dir, BPath &path, dev_t device)
 		case B_COMMON_BIN_DIRECTORY:
 			error = path.SetTo("/boot/home/config/bin");
 			break;
-		case B_COMMON_ETC_DIRECTORY:
+		case B_SYSTEM_ETC_DIRECTORY:
 			error = path.SetTo("/boot/home/config/etc");
 			break;
 		case B_COMMON_DOCUMENTATION_DIRECTORY:
 			error = path.SetTo("/boot/home/config/documentation");
 			break;
-		case B_COMMON_SETTINGS_DIRECTORY:
+		case B_SYSTEM_SETTINGS_DIRECTORY:
 			error = path.SetTo("/boot/home/config/settings");
 			break;
 		case B_COMMON_DEVELOP_DIRECTORY:
 			error = path.SetTo("/boot/develop");
 			break;
-		case B_COMMON_LOG_DIRECTORY:
+		case B_SYSTEM_LOG_DIRECTORY:
 			error = path.SetTo("/boot/var/log");
 			break;
-		case B_COMMON_SPOOL_DIRECTORY:
+		case B_SYSTEM_SPOOL_DIRECTORY:
 			error = path.SetTo("/boot/var/spool");
 			break;
-		case B_COMMON_TEMP_DIRECTORY:
+		case B_SYSTEM_TEMP_DIRECTORY:
 			error = path.SetTo("/boot/var/tmp");
 			break;
-		case B_COMMON_VAR_DIRECTORY:
+		case B_SYSTEM_VAR_DIRECTORY:
 			error = path.SetTo("/boot/var");
 			break;
 		case B_COMMON_TRANSLATORS_DIRECTORY:

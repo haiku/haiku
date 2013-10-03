@@ -190,9 +190,6 @@ SearchCommand::Execute(int argc, const char* const* argv)
 				packageManager.SystemRepository()))
 			installed = "system";
 		else if (package->Repository() == static_cast<const BSolverRepository*>(
-				packageManager.CommonRepository()))
-			installed = "common";
-		else if (package->Repository() == static_cast<const BSolverRepository*>(
 				packageManager.HomeRepository()))
 			installed = "home";
 

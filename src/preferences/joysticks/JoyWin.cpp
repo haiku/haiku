@@ -558,7 +558,7 @@ JoyWin::_FindSettingString(const char* name, const char* strPath)
 	path.Append(name);
 	fFileTempProbeJoystick = new BFile(path.Path(), B_READ_ONLY);
 
-	//status_t err = find_directory(B_COMMON_ETC_DIRECTORY, &path);
+	//status_t err = find_directory(B_SYSTEM_ETC_DIRECTORY, &path);
 //	if (err == B_OK) {
 		//BString str(path.Path());
 		//str << "/joysticks/" << name;

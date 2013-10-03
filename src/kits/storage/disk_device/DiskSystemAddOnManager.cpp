@@ -118,11 +118,8 @@ DiskSystemAddOnManager::LoadDiskSystems()
 
 	if (error == B_OK) {
 		error
-			= _LoadAddOns(alreadyLoaded, B_COMMON_NONPACKAGED_ADDONS_DIRECTORY);
+			= _LoadAddOns(alreadyLoaded, B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY);
 	}
-
-	if (error == B_OK)
-		error = _LoadAddOns(alreadyLoaded, B_COMMON_ADDONS_DIRECTORY);
 
 	if (error == B_OK)
 		error = _LoadAddOns(alreadyLoaded, B_SYSTEM_ADDONS_DIRECTORY);

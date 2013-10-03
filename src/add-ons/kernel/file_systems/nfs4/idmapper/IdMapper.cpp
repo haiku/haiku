@@ -218,7 +218,7 @@ status_t
 ReadSettings()
 {
 	BPath path;
-	status_t result = find_directory(B_COMMON_SETTINGS_DIRECTORY, &path);
+	status_t result = find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path);
 	if (result != B_OK)
 		return result;
 	result = path.Append("nfs4_idmapper.conf");

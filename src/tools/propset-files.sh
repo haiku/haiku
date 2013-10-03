@@ -5,7 +5,7 @@
 # e.g.,
 # haiku/trunk/docs> sh ../src/tools/propset-files.sh
 
-tmpDir="`finddir B_COMMON_TEMP_DIRECTORY`"
+tmpDir="`finddir B_SYSTEM_TEMP_DIRECTORY`"
 tmpFile="${tmpDir}/propset-html"
 find . -type d -name .svn -prune -o -print > "$tmpFile"
 

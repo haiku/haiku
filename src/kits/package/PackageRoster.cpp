@@ -53,7 +53,7 @@ BPackageRoster::~BPackageRoster()
 status_t
 BPackageRoster::GetCommonRepositoryConfigPath(BPath* path, bool create) const
 {
-	return _GetRepositoryPath(path, create, B_COMMON_SETTINGS_DIRECTORY);
+	return _GetRepositoryPath(path, create, B_SYSTEM_SETTINGS_DIRECTORY);
 }
 
 
@@ -67,7 +67,7 @@ BPackageRoster::GetUserRepositoryConfigPath(BPath* path, bool create) const
 status_t
 BPackageRoster::GetCommonRepositoryCachePath(BPath* path, bool create) const
 {
-	return _GetRepositoryPath(path, create, B_COMMON_CACHE_DIRECTORY);
+	return _GetRepositoryPath(path, create, B_SYSTEM_CACHE_DIRECTORY);
 }
 
 

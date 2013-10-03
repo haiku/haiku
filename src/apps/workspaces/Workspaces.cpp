@@ -277,7 +277,7 @@ WorkspacesSettings::_Open(BFile& file, int mode)
 	BPath path;
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	 if (status != B_OK)
-		status = find_directory(B_COMMON_SETTINGS_DIRECTORY, &path);
+		status = find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path);
 	 if (status != B_OK)
 		return status;
 
@@ -285,7 +285,7 @@ WorkspacesSettings::_Open(BFile& file, int mode)
 
 	status = file.SetTo(path.Path(), mode);
 	if (mode == B_READ_ONLY && status == B_ENTRY_NOT_FOUND) {
-		if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) == B_OK) {
+		if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path) == B_OK) {
 			path.Append(kSettingsFile);
 			status = file.SetTo(path.Path(), mode);
 		}

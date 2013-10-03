@@ -21,12 +21,10 @@ static const char* const kLinkPaths[PackageLinkSymlink::TYPE_ENUM_COUNT]
 		[PACKAGE_FS_MOUNT_TYPE_ENUM_COUNT] = {
 	{
 		"../..",
-		"../../../common",
 		"../../../home/config"
 	},
 	{
 		"../../../system/settings",
-		"../../../common/settings",
 		"../../../home/config/settings/global"
 	}
 };

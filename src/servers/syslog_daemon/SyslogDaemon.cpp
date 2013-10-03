@@ -51,7 +51,7 @@ void
 SyslogDaemon::AboutRequested()
 {
 	BPath path;
-	find_directory(B_COMMON_LOG_DIRECTORY, &path);
+	find_directory(B_SYSTEM_LOG_DIRECTORY, &path);
 	path.Append("syslog");
 
 	BString name(B_TRANSLATE("Syslog Daemon"));

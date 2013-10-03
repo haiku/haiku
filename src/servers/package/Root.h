@@ -82,7 +82,6 @@ private:
 			bool				fIsSystemRoot;
 			BString				fPath;
 			Volume*				fSystemVolume;
-			Volume*				fCommonVolume;
 			Volume*				fHomeVolume;
 			JobQueue			fJobQueue;
 			thread_id			fJobRunner;

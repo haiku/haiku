@@ -705,7 +705,7 @@ NetServer::_ConfigureResolver(BMessage& resolverConfiguration)
 	// the auto-generated parts of course.
 
 	BPath path;
-	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK
+	if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path) != B_OK
 		|| path.Append("network/resolv.conf") != B_OK)
 		return B_ERROR;
 

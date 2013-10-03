@@ -95,7 +95,6 @@ PackageFSRoot::RegisterVolume(Volume* volume)
 
 	switch (volume->MountType()) {
 		case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
-		case PACKAGE_FS_MOUNT_TYPE_COMMON:
 			relativeRootPath = "..";
 			break;
 		case PACKAGE_FS_MOUNT_TYPE_HOME:

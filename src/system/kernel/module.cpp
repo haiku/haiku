@@ -285,8 +285,9 @@ using namespace Module;
  */
 static const directory_which kModulePaths[] = {
 	B_BEOS_ADDONS_DIRECTORY,
-	B_COMMON_ADDONS_DIRECTORY,
+	B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
 	B_USER_ADDONS_DIRECTORY,
+	B_USER_NONPACKAGED_ADDONS_DIRECTORY,
 };
 
 static const uint32 kNumModulePaths = sizeof(kModulePaths)

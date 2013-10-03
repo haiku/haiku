@@ -489,7 +489,7 @@ void
 EthernetSettingsView::_SaveDNSConfiguration()
 {
 	BPath path;
-	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path) != B_OK)
+	if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
 
 	path.Append("network/resolv.conf");
@@ -610,7 +610,7 @@ EthernetSettingsView::_TriggerAutoConfig(const char* device)
 status_t
 EthernetSettingsView::_GetPath(const char* name, BPath& path)
 {
-	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path, true) != B_OK)
+	if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path, true) != B_OK)
 		return B_ERROR;
 
 	path.Append("network");

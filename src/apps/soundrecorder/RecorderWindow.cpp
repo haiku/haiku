@@ -214,7 +214,7 @@ RecorderWindow::InitWindow()
 	try {
 		//	Find temp directory for recorded sounds.
 		BPath path;
-		if (!(error = find_directory(B_COMMON_TEMP_DIRECTORY, &path)))
+		if (!(error = find_directory(B_SYSTEM_TEMP_DIRECTORY, &path)))
 			error = fTempDir.SetTo(path.Path());
 		if (error < 0)
 			goto bad_mojo;

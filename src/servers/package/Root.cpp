@@ -84,7 +84,6 @@ Root::Root()
 	fIsSystemRoot(false),
 	fPath(),
 	fSystemVolume(NULL),
-	fCommonVolume(NULL),
 	fHomeVolume(NULL),
 	fJobQueue(),
 	fJobRunner(-1)
@@ -209,7 +208,7 @@ Root::FindVolume(dev_t deviceID) const
 {
 	AutoLocker<BLocker> locker(fLock);
 
-	Volume* volumes[] = { fSystemVolume, fCommonVolume, fHomeVolume };
+	Volume* volumes[] = { fSystemVolume, fHomeVolume };
 	for (size_t i = 0; i < sizeof(volumes) / sizeof(volumes[0]); i++) {
 		Volume* volume = volumes[i];
 		if (volume != NULL && volume->DeviceID() == deviceID)
@@ -226,8 +225,6 @@ Root::GetVolume(BPackageInstallationLocation location)
 	switch ((BPackageInstallationLocation)location) {
 		case B_PACKAGE_INSTALLATION_LOCATION_SYSTEM:
 			return fSystemVolume;
-		case B_PACKAGE_INSTALLATION_LOCATION_COMMON:
-			return fCommonVolume;
 		case B_PACKAGE_INSTALLATION_LOCATION_HOME:
 			return fHomeVolume;
 		default:
@@ -269,8 +266,6 @@ Root::_GetVolume(PackageFSMountType mountType)
 	switch (mountType) {
 		case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
 			return &fSystemVolume;
-		case PACKAGE_FS_MOUNT_TYPE_COMMON:
-			return &fCommonVolume;
 		case PACKAGE_FS_MOUNT_TYPE_HOME:
 			return &fHomeVolume;
 		case PACKAGE_FS_MOUNT_TYPE_CUSTOM:
@@ -291,9 +286,6 @@ Root::_NextVolumeFor(Volume* volume)
 	do {
 		switch (mountType) {
 			case PACKAGE_FS_MOUNT_TYPE_HOME:
-				mountType = PACKAGE_FS_MOUNT_TYPE_COMMON;
-				break;
-			case PACKAGE_FS_MOUNT_TYPE_COMMON:
 				mountType = PACKAGE_FS_MOUNT_TYPE_SYSTEM;
 				break;
 			case PACKAGE_FS_MOUNT_TYPE_SYSTEM:

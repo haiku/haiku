@@ -18,7 +18,7 @@
 static status_t
 get_path(char *path, bool create)
 {
-	status_t status = find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, create,
+	status_t status = find_directory(B_SYSTEM_SETTINGS_DIRECTORY, -1, create,
 		path, B_PATH_NAME_LENGTH);
 	if (status != B_OK)
 		return status;

@@ -467,9 +467,6 @@ Volume::Mount(const char* parameterString)
 			case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
 				volumeName = "system";
 				break;
-			case PACKAGE_FS_MOUNT_TYPE_COMMON:
-				volumeName = "common";
-				break;
 			case PACKAGE_FS_MOUNT_TYPE_HOME:
 				volumeName = "config";
 				break;
@@ -1611,8 +1608,6 @@ Volume::_InitMountType(const char* mountType)
 		fMountType = PACKAGE_FS_MOUNT_TYPE_CUSTOM;
 	else if (strcmp(mountType, "system") == 0)
 		fMountType = PACKAGE_FS_MOUNT_TYPE_SYSTEM;
-	else if (strcmp(mountType, "common") == 0)
-		fMountType = PACKAGE_FS_MOUNT_TYPE_COMMON;
 	else if (strcmp(mountType, "home") == 0)
 		fMountType = PACKAGE_FS_MOUNT_TYPE_HOME;
 	else if (strcmp(mountType, "custom") == 0)
@@ -1663,7 +1658,6 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 		// nothing specified -- derive from mount type
 		switch (fMountType) {
 			case PACKAGE_FS_MOUNT_TYPE_SYSTEM:
-			case PACKAGE_FS_MOUNT_TYPE_COMMON:
 			case PACKAGE_FS_MOUNT_TYPE_HOME:
 				directories = kShineThroughDirectories;
 				break;
@@ -1673,8 +1667,6 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 				return B_BAD_VALUE;
 		}
 	} else if (strcmp(shineThroughSetting, "system") == 0)
-		directories = kShineThroughDirectories;
-	else if (strcmp(shineThroughSetting, "common") == 0)
 		directories = kShineThroughDirectories;
 	else if (strcmp(shineThroughSetting, "home") == 0)
 		directories = kShineThroughDirectories;

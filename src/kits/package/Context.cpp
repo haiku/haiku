@@ -96,7 +96,7 @@ BContext::_Initialize()
 		return B_NO_MEMORY;
 
 	BPath tempPath;
-	status_t result = find_directory(B_COMMON_TEMP_DIRECTORY, &tempPath, true);
+	status_t result = find_directory(B_SYSTEM_TEMP_DIRECTORY, &tempPath, true);
 	if (result != B_OK)
 		return result;
 	BDirectory tempDirectory(tempPath.Path());

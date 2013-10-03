@@ -97,7 +97,7 @@ PlainTextCatalog::PlainTextCatalog(const char *signature, const char *language,
 	if (status != B_OK) {
 		// look in common-etc folder (/boot/home/config/etc):
 		BPath commonEtcPath;
-		find_directory(B_COMMON_ETC_DIRECTORY, &commonEtcPath);
+		find_directory(B_SYSTEM_ETC_DIRECTORY, &commonEtcPath);
 		if (commonEtcPath.InitCheck() == B_OK) {
 			catalogName = BString(commonEtcPath.Path())
 							<< "/locale/" << kCatFolder

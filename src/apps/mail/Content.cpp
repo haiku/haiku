@@ -1909,7 +1909,7 @@ TTextView::Open(hyper_text *enclosure)
 		case TYPE_BE_ENCLOSURE:
 			if (!enclosure->have_ref) {
 				BPath path;
-				if (find_directory(B_COMMON_TEMP_DIRECTORY, &path) == B_NO_ERROR) {
+				if (find_directory(B_SYSTEM_TEMP_DIRECTORY, &path) == B_NO_ERROR) {
 					BDirectory dir(path.Path());
 					if (dir.InitCheck() == B_NO_ERROR) {
 						char name[B_FILE_NAME_LENGTH];

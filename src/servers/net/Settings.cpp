@@ -354,7 +354,7 @@ Settings::_Path(BPath& parent, const char* leaf)
 status_t
 Settings::_GetPath(const char* name, BPath& path)
 {
-	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, &path, true) != B_OK)
+	if (find_directory(B_SYSTEM_SETTINGS_DIRECTORY, &path, true) != B_OK)
 		return B_ERROR;
 
 	path.Append("network");

@@ -274,8 +274,7 @@ BDeskWindow::InitAddonsList(bool update)
 
 		LoadAddOnDir(B_USER_NONPACKAGED_ADDONS_DIRECTORY, this, fAddonsList);
 		LoadAddOnDir(B_USER_ADDONS_DIRECTORY, this, fAddonsList);
-		LoadAddOnDir(B_COMMON_NONPACKAGED_ADDONS_DIRECTORY, this, fAddonsList);
-		LoadAddOnDir(B_COMMON_ADDONS_DIRECTORY, this, fAddonsList);
+		LoadAddOnDir(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, this, fAddonsList);
 		LoadAddOnDir(B_SYSTEM_ADDONS_DIRECTORY, this, fAddonsList);
 	}
 }
@@ -325,13 +324,7 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 					isInAddons = command.FindFirst(path.Path()) == 0;
 				}
 				if (!isInAddons
-					&& (find_directory(B_COMMON_ADDONS_DIRECTORY, &path)
-						== B_OK)) {
-					path.Append("Tracker/");
-					isInAddons = command.FindFirst(path.Path()) == 0;
-				}
-				if (!isInAddons
-					&& (find_directory(B_COMMON_NONPACKAGED_ADDONS_DIRECTORY,
+					&& (find_directory(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
 						&path) == B_OK)) {
 					path.Append("Tracker/");
 					isInAddons = command.FindFirst(path.Path()) == 0;
