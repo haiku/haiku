@@ -411,7 +411,7 @@ TextOutput::GroupEnd(RTF::Group *group)
 	if (!fProcessRuns)
 		return;
 
-	text_run *last;
+	text_run *last = NULL;
 	fGroupStack.Pop(&last);
 
 	// has the style been changed?
