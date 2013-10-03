@@ -242,6 +242,10 @@ switch $(HAIKU_BUILD_PROFILE) {
 #	-> Equivalent to running "jam -q haiku-image" with the settings for the
 #      "disk" profile. "build" is the default action, so it could even be
 #      omitted.
+# jam -q @alpha-raw build haiku.hpkg
+#	-> Build's haiku.hpkg under the influence of the "alpha-raw" profile. This
+#      is is different to "jam -q haiku.hpkg" in that the build profile may
+#      enable certain build features that might not be enabled by default.
 # jam -q @vmware update kernel
 #	-> Equivalent to running "jam -q update-vmware-image kernel" with the
 #      settings for the "vmware" profile.

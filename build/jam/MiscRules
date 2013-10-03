@@ -398,7 +398,13 @@ rule DefineBuildProfile name : type : path {
 
 	switch $(HAIKU_BUILD_PROFILE_ACTION) {
 		case "build" : {
-			JAM_TARGETS = $(buildTarget) ;
+			# If parameters are specified, only build those targets (under the
+			# influence of the build profile).
+			if $(HAIKU_BUILD_PROFILE_PARAMETERS) {
+				JAM_TARGETS = $(HAIKU_BUILD_PROFILE_PARAMETERS) ;
+			} else {
+				JAM_TARGETS = $(buildTarget) ;
+			}
 		}
 
 		case "update" : {
