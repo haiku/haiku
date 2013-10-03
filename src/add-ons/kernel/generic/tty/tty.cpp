@@ -1062,7 +1062,7 @@ tty_write_to_tty_master_unsafe(tty_cookie* sourceCookie, const char* data,
 		// If in echo mode, we do the output conversion and need to update
 		// the needed bytes count.
 		char echoBuffer[3];
-		size_t echoBytes;
+		size_t echoBytes = 0;
 		if (echo) {
 			process_output_char(source, c, echoBuffer, &echoBytes, true);
 			if (echoBytes > bytesNeeded)
