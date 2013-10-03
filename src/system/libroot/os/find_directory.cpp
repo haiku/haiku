@@ -381,7 +381,8 @@ find_directory(directory_which which, dev_t device, bool createIt,
 				struct passwd *pw;
 
 				if (getpwuid_r(geteuid(), &pwBuffer, pwStringBuffer,
-						sizeof(pwStringBuffer), &pw) == 0) {
+						sizeof(pwStringBuffer), &pw) == 0
+					&& pw != NULL) {
 					home = pw->pw_dir;
 				}
 #endif	// USE_PWENTS

@@ -400,8 +400,9 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 	char stringBuffer[256];
 
 	if (argv == NULL || argc == 0) {
-		if (!getpwuid_r(getuid(), &passwdStruct, stringBuffer,
-				sizeof(stringBuffer), &passwdResult)) {
+		if (getpwuid_r(getuid(), &passwdStruct, stringBuffer,
+				sizeof(stringBuffer), &passwdResult) == 0
+			&& passwdResult != NULL) {
 			defaultArgs[0] = passwdStruct.pw_shell;
 		}
 
