@@ -19,4 +19,5 @@ provides {
 
 requires {
 	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% == R1~alpha4_pm-1 base
+	haiku_devel == R1~alpha4_pm-1
 }
