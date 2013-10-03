@@ -724,6 +724,7 @@ detectIntelCacheTopology(uint32 maxBasicLeaf)
 
 	for (int i = 0; i < maxCacheLevel; i++)
 		sCacheSharingMask[i] = ~uint32(hierarchyLevels[i] - 1);
+
 	sCacheLevelCount = maxCacheLevel;
 }
 
@@ -774,10 +775,7 @@ detectCPUTopology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
 
 			sGetCPUTopologyID = getSimpleCPUTopologyID;
 
-			memset(sHierarchyMask, 0, sizeof(sHierarchyMask));
 			sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~uint32(0);
-
-			memset(sHierarchyShift, 0, sizeof(sHierarchyShift));
 		}
 	}
 
