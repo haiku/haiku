@@ -27,7 +27,8 @@ PackageManager::PackageManager(BPackageInstallationLocation location)
 	BPackageManager(location),
 	BPackageManager::UserInteractionHandler(),
 	fDecisionProvider(),
-	fClientInstallationInterface()
+	fClientInstallationInterface(),
+	fPreviousDownloadPercentage(0)
 {
 	fInstallationInterface = &fClientInstallationInterface;
 	fUserInteractionHandler = this;
@@ -156,6 +157,7 @@ void
 PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 {
 	printf("Downloading %s...\n", packageName);
+	fPreviousDownloadPercentage = 0;
 }
 
 
@@ -163,14 +165,23 @@ void
 PackageManager::ProgressPackageDownloadActive(const char* packageName,
 	float completionPercentage)
 {
-	// TODO: how to report progress? ncurses perhaps?
+	int32 currentPercentage = int32(completionPercentage * 100);
+	int32 difference = currentPercentage - fPreviousDownloadPercentage;
+
+	while (difference >= 2) {
+		printf("#");
+		difference -= 2;
+	}
+	fflush(stdout);
+
+	fPreviousDownloadPercentage = currentPercentage - difference;
 }
 
 
 void
 PackageManager::ProgressPackageDownloadComplete(const char* packageName)
 {
-	printf("Finished downloading %s...\n", packageName);
+	printf("\nFinished downloading %s.\n", packageName);
 }
 
 

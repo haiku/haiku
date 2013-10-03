@@ -67,6 +67,7 @@ private:
 			DecisionProvider	fDecisionProvider;
 			BPackageManager::ClientInstallationInterface
 									fClientInstallationInterface;
+			int32				fPreviousDownloadPercentage;
 };
 
 
