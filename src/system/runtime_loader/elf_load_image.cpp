@@ -556,8 +556,8 @@ load_image(char const* name, image_type type, const char* rpath,
 
 	*_image = image;
 
-	KTRACE("rld: load_container(\"%s\"): done: id: %ld (ABI: %#lx)", name,
-		image->id, image->abi);
+	KTRACE("rld: load_container(\"%s\"): done: id: %" B_PRId32 " (ABI: %#"
+		B_PRIx32 ")", name, image->id, image->abi);
 
 	return B_OK;
 
