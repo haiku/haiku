@@ -2,30 +2,32 @@
  * AC97 interface
  *
  * Copyright (c) 2002, Marcus Overhagen <marcus@overhagen.de>
- * Copyright (c) 2008, Jérôme Duval
+ * Copyright (c) 2008-2013, Jérôme Duval
  *
  * All rights reserved.
- * Redistribution and use in source and binary forms, with or without modification, 
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
+ * - Redistributions of source code must retain the above copyright notice,
  *   this list of conditions and the following disclaimer.
  * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation 
+ *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR 
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS 
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+
 #include <KernelExport.h>
 #include <OS.h>
 #include <stdio.h>
@@ -43,6 +45,7 @@ void ac97_dump_capabilities(ac97_dev *dev);
 void ac97_detect_capabilities(ac97_dev *dev);
 void ac97_detect_rates(ac97_dev *dev);
 void ac97_update_register_cache(ac97_dev *dev);
+
 
 const char * stereo_enhancement_technique[] =
 {
@@ -80,25 +83,30 @@ const char * stereo_enhancement_technique[] =
 	"Unknown (31)"
 };
 
-void default_init(ac97_dev *dev);
-void ad1819_init(ac97_dev *dev);
-void ad1881_init(ac97_dev *dev);
-void ad1885_init(ac97_dev *dev);
-void ad1886_init(ac97_dev *dev);
-void ad1980_init(ac97_dev *dev);
-void ad1981b_init(ac97_dev *dev);
-void alc650_init(ac97_dev *dev);
-void stac9708_init(ac97_dev *dev);
-void stac9721_init(ac97_dev *dev);
-void stac9744_init(ac97_dev *dev);
-void stac9756_init(ac97_dev *dev);
-void tr28028_init(ac97_dev *dev);
-void wm9701_init(ac97_dev *dev);
-void wm9703_init(ac97_dev *dev);
-void wm9704_init(ac97_dev *dev);
+
+static void default_init(ac97_dev *dev);
+static void ad1819_init(ac97_dev *dev);
+static void ad1881_init(ac97_dev *dev);
+static void ad1885_init(ac97_dev *dev);
+static void ad1886_init(ac97_dev *dev);
+static void ad1980_init(ac97_dev *dev);
+static void ad1981b_init(ac97_dev *dev);
+static void alc203_init(ac97_dev *dev);
+static void alc650_init(ac97_dev *dev);
+static void alc655_init(ac97_dev *dev);
+static void alc850_init(ac97_dev *dev);
+static void stac9708_init(ac97_dev *dev);
+static void stac9721_init(ac97_dev *dev);
+static void stac9744_init(ac97_dev *dev);
+static void stac9756_init(ac97_dev *dev);
+static void tr28028_init(ac97_dev *dev);
+static void wm9701_init(ac97_dev *dev);
+static void wm9703_init(ac97_dev *dev);
+static void wm9704_init(ac97_dev *dev);
 
 bool ad1819_set_rate(ac97_dev *dev, uint8 reg, uint32 rate);
 bool ad1819_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate);
+
 
 typedef struct
 {
@@ -108,7 +116,8 @@ typedef struct
 	const char *info;
 } codec_table;
 
-codec_table codecs[] = 
+
+codec_table codecs[] =
 {
 	{ CODEC_ID_AD1819,	0xffffffff, ad1819_init,	"Analog Devices AD1819A, AD1819B SoundPort"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1881,	0xffffffff, ad1881_init,	"Analog Devices AD1881 SoundMAX"B_UTF8_REGISTERED },
@@ -127,11 +136,17 @@ codec_table codecs[] =
 	{ CODEC_ID_AK4540,	0xffffffff, default_init,	"Asahi Kasei AK4540" },
 	{ CODEC_ID_AK4542,	0xffffffff, default_init,	"Asahi Kasei AK4542" },
 	{ CODEC_ID_AK4543,	0xffffffff, default_init,	"Asahi Kasei AK4543" },
+	{ 0x414c4300, 		0xffffff00, default_init,	"Avance Logic (Realtek) ALC100" }, /* 0x4300 = ALC100 */
 	{ 0x414c4320,		0xfffffff0, default_init,	"Avance Logic (Realtek) ALC100/ALC100P, RL5383/RL5522" },
-	{ 0x414c4730,		0xffffffff, default_init,	"Avance Logic (Realtek) ALC101" },
-	{ CODEC_ID_ALC201A,	0xffffffff, default_init,	"Avance Logic (Realtek) ALC200/ALC200A, ALC201/ALC201A" }, /* 0x4710 = ALC201A */
+	{ CODEC_ID_ALC201A, 0xfffffff0, default_init,	"Avance Logic (Realtek) ALC200/ALC200A, ALC201/ALC201A" }, /* 0x4710 = ALC201A */
 	{ 0x414c4720,		0xffffffff, alc650_init,	"Avance Logic (Realtek) ALC650" }, /* 0x4720 = ALC650 */
-	{ 0x414c4740,		0xffffffff, default_init,	"Avance Logic (Realtek) ALC202/ALC202A" },
+	{ 0x414c4730, 		0xffffffff, default_init,	"Avance Logic (Realtek) ALC101" },
+	{ 0x414c4740,		0xfffffff0, default_init,	"Avance Logic (Realtek) ALC202/ALC202A" },
+	{ 0x414c4750,		0xfffffff0, default_init,	"Avance Logic (Realtek) ALC250" },
+	{ 0x414c4760,		0xfffffff0, alc655_init,	"Avance Logic (Realtek) ALC655" }, /* 0x4760 = ALC655 */
+	{ 0x414c4770,		0xfffffff0, alc203_init,	"Avance Logic (Realtek) ALC203" },
+	{ 0x414c4780,		0xffffffff, alc655_init,	"Avance Logic (Realtek) ALC658" },
+	{ 0x414c4790,		0xfffffff0, alc850_init,	"Avance Logic (Realtek) ALC850" },
 	{ 0x434d4941,		0xffffffff, default_init,	"C-Media CMI9738" },
 	{ 0x434d4961,		0xffffffff, default_init,	"C-Media CMI9739" },
 	{ 0x43525900,		0xffffffff, default_init,	"Cirrus Logic CS4297" },
@@ -198,9 +213,8 @@ codec_table codecs[] =
 	{ 0x00000000,		0x00000000, default_init,	"Unknown" } /* must be last one, matches every codec */
 };
 
-codec_table *find_codec_table(uint32 codecid);
 
-codec_table *
+static codec_table *
 find_codec_table(uint32 codecid)
 {
 	codec_table *codec;
@@ -210,6 +224,7 @@ find_codec_table(uint32 codecid)
 	return codec;
 }
 
+
 void
 ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write, void *cookie,
 	ushort subvendor_id, ushort subsystem_id)
@@ -217,7 +232,7 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	ac97_dev *dev;
 	codec_table *codec;
 	int i;
-	
+
 	*_dev = dev = (ac97_dev *) malloc(sizeof(ac97_dev));
 	dev->cookie = cookie;
 	dev->reg_read = reg_read;
@@ -225,13 +240,13 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	dev->set_rate = 0;
 	dev->get_rate = 0;
 	dev->clock = 48000; /* default clock on non-broken motherboards */
-	dev->min_vsr = 0x0001;	
+	dev->min_vsr = 0x0001;
 	dev->max_vsr = 0xffff;
 	dev->reversed_eamp_polarity = false;
 	dev->capabilities = 0;
 
 	dev->subsystem = (subvendor_id << 16) | subsystem_id;
-	
+
 	if (dev->subsystem == 0x161f202f
 		|| dev->subsystem == 0x161f203a
 		|| dev->subsystem == 0x161f203e
@@ -246,8 +261,8 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 		|| dev->subsystem == 0x103382be) {
 		dev->reversed_eamp_polarity = true;
 	}
-		
-	/* reset the codec */	
+
+	/* reset the codec */
 	LOG(("codec reset\n"));
 	ac97_reg_uncached_write(dev, AC97_RESET, 0x0000);
 	for (i = 0; i < 500; i++) {
@@ -260,19 +275,19 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	codec = find_codec_table(dev->codec_id);
 	dev->codec_info = codec->info;
 	dev->init = codec->init;
-		
+
 	dev->codec_3d_stereo_enhancement = stereo_enhancement_technique[(ac97_reg_cached_read(dev, AC97_RESET) >> 10) & 31];
 
 	/* setup register cache */
 	ac97_update_register_cache(dev);
-	
+
 	ac97_reg_update_bits(dev, AC97_EXTENDED_STAT_CTRL, 1, 1); // enable variable rate audio
 
 	ac97_detect_capabilities(dev);
 
 	dev->init(dev);
 	ac97_amp_enable(dev, true);
-	
+
 	/* set mixer defaults, enabled Line-out sources are PCM-out, CD-in, Line-in */
 	ac97_reg_update(dev, AC97_CENTER_LFE_VOLUME, 0x0000);	/* set LFE & center volume 0dB */
 	ac97_reg_update(dev, AC97_SURR_VOLUME, 0x0000);			/* set surround volume 0dB */
@@ -282,16 +297,17 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	ac97_reg_update(dev, AC97_PCM_OUT_VOLUME, 0x0808);		/* enable pcm-out */
 	ac97_reg_update(dev, AC97_CD_VOLUME, 0x0808);			/* enable cd-in */
 	ac97_reg_update(dev, AC97_LINE_IN_VOLUME, 0x0808);		/* enable line-in */
-	
+
 	/* set record line in */
 	ac97_reg_update(dev, AC97_RECORD_SELECT, 0x0404);
 
 	LOG(("codec vendor id      = %#08lx\n", dev->codec_id));
 	LOG(("codec description     = %s\n", dev->codec_info));
 	LOG(("codec 3d enhancement = %s\n", dev->codec_3d_stereo_enhancement));
-	
+
 	ac97_dump_capabilities(dev);
 }
+
 
 void
 ac97_detach(ac97_dev *dev)
@@ -305,11 +321,12 @@ ac97_detach(ac97_dev *dev)
 	ac97_reg_update_bits(dev, AC97_PCM_OUT_VOLUME, 0x8000, 0x8000);
 	ac97_reg_update_bits(dev, AC97_CD_VOLUME, 0x8000, 0x8000);
 	ac97_reg_update_bits(dev, AC97_LINE_IN_VOLUME, 0x8000, 0x8000);
-	
-	ac97_amp_enable(dev, false);	
+
+	ac97_amp_enable(dev, false);
 
 	free(dev);
 }
+
 
 void
 ac97_suspend(ac97_dev *dev)
@@ -317,11 +334,13 @@ ac97_suspend(ac97_dev *dev)
 	ac97_amp_enable(dev, false);
 }
 
+
 void
 ac97_resume(ac97_dev *dev)
 {
 	ac97_amp_enable(dev, true);
 }
+
 
 void
 ac97_reg_cached_write(ac97_dev *dev, uint8 reg, uint16 value)
@@ -331,6 +350,7 @@ ac97_reg_cached_write(ac97_dev *dev, uint8 reg, uint16 value)
 	dev->reg_write(dev->cookie, reg, value);
 	dev->reg_cache[reg] = value;
 }
+
 
 uint16
 ac97_reg_cached_read(ac97_dev *dev, uint8 reg)
@@ -348,6 +368,7 @@ ac97_reg_uncached_write(ac97_dev *dev, uint8 reg, uint16 value)
 	dev->reg_write(dev->cookie, reg, value);
 }
 
+
 uint16
 ac97_reg_uncached_read(ac97_dev *dev, uint8 reg)
 {
@@ -355,6 +376,7 @@ ac97_reg_uncached_read(ac97_dev *dev, uint8 reg)
 		return 0;
 	return dev->reg_read(dev->cookie, reg);
 }
+
 
 bool
 ac97_reg_update(ac97_dev *dev, uint8 reg, uint16 value)
@@ -366,6 +388,7 @@ ac97_reg_update(ac97_dev *dev, uint8 reg, uint16 value)
 	ac97_reg_cached_write(dev, reg, value);
 	return true;
 }
+
 
 bool
 ac97_reg_update_bits(ac97_dev *dev, uint8 reg, uint16 mask, uint16 value)
@@ -382,6 +405,7 @@ ac97_reg_update_bits(ac97_dev *dev, uint8 reg, uint16 mask, uint16 value)
 	return true;
 }
 
+
 void
 ac97_update_register_cache(ac97_dev *dev)
 {
@@ -390,23 +414,24 @@ ac97_update_register_cache(ac97_dev *dev)
 		dev->reg_cache[reg] = ac97_reg_uncached_read(dev, reg);
 }
 
+
 bool
 ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 {
 	uint32 value;
 	uint32 old;
-	
+
 	if (dev->set_rate)
 		return dev->set_rate(dev, reg, rate);
 
 	value = (uint32)((rate * 48000ULL) / dev->clock); /* need 64 bit calculation for rates 96000 or higher */
 
 	LOG(("ac97_set_rate: clock = %ld, rate = %ld, value = %ld\n", dev->clock, rate, value));
-	
+
 	/* if double rate audio is currently enabled, divide value by 2 */
 	if (ac97_reg_cached_read(dev, AC97_EXTENDED_STAT_CTRL) & 0x0002)
 		value /= 2;
-		
+
 	if (value < dev->min_vsr || value > dev->max_vsr)
 		return false;
 
@@ -420,6 +445,7 @@ ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 	LOG(("ac97_set_rate done\n"));
 	return true;
 }
+
 
 bool
 ac97_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
@@ -441,6 +467,7 @@ ac97_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
 	return true;
 }
 
+
 void
 ac97_set_clock(ac97_dev *dev, uint32 clock)
 {
@@ -450,11 +477,12 @@ ac97_set_clock(ac97_dev *dev, uint32 clock)
 	ac97_dump_capabilities(dev);
 }
 
+
 void
 ac97_detect_capabilities(ac97_dev *dev)
 {
 	uint16 val;
-	
+
 	val = ac97_reg_cached_read(dev, AC97_RESET);
 	if (val & 0x0001)
 		dev->capabilities |= CAP_PCM_MIC;
@@ -500,20 +528,20 @@ ac97_detect_capabilities(ac97_dev *dev)
 		dev->capabilities |= CAP_REV22;
 	if ((val & (EXID_REV0 | EXID_REV1)) == EXID_REV1)
 		dev->capabilities |= CAP_REV23;
-		
+
 	ac97_detect_rates(dev);
-}		
+}
 
 void
 ac97_detect_rates(ac97_dev *dev)
 {
 	uint32 oldrate;
-	
+
 	dev->capabilities &= ~CAP_PCM_RATE_MASK;
 
 	if (!ac97_get_rate(dev, AC97_PCM_FRONT_DAC_RATE, &oldrate))
 		oldrate = 48000;
-	
+
 	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 20000))
 		dev->capabilities |= CAP_PCM_RATE_CONTINUOUS;
 	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 8000))
@@ -539,16 +567,17 @@ ac97_detect_rates(ac97_dev *dev)
 		// enable double rate mode
 		if (ac97_reg_update_bits(dev, AC97_EXTENDED_STAT_CTRL, 0x0002, 0x0002)) {
 			if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 88200))
-				dev->capabilities |= CAP_PCM_RATE_88200;	
+				dev->capabilities |= CAP_PCM_RATE_88200;
 			if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 96000))
 				dev->capabilities |= CAP_PCM_RATE_96000;
 			// disable double rate mode
 			ac97_reg_update_bits(dev, AC97_EXTENDED_STAT_CTRL, 0x0002, 0x0000);
 		}
 	}
-		
+
 	ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, oldrate);
 }
+
 
 void
 ac97_dump_capabilities(ac97_dev *dev)
@@ -620,10 +649,11 @@ ac97_dump_capabilities(ac97_dev *dev)
 		LOG(("CAP_PCM_RATE_96000\n"));
 }
 
+
 bool
 ac97_has_capability(ac97_dev *dev, uint64 cap)
 {
-	// return (dev->capabilities & cap); // does not work because of 64 bit to integer trucation 
+	// return (dev->capabilities & cap); // does not work because of 64 bit to integer trucation
 	return (dev->capabilities & cap) != 0;
 }
 
@@ -671,15 +701,17 @@ ac97_reg_is_valid(ac97_dev *dev, uint8 reg)
 			if (reg < 0x3c || reg > 0x58)
 				return true;
 			return false;
-		
+
 		default:
 			return true;
 	}
 }
 
-void ac97_amp_enable(ac97_dev *dev, bool yesno)
+
+void
+ac97_amp_enable(ac97_dev *dev, bool yesno)
 {
-	switch (dev->codec_id) {	
+	switch (dev->codec_id) {
 		case CODEC_ID_CS4299A:
 		case CODEC_ID_CS4299C:
 		case CODEC_ID_CS4299D:
@@ -689,7 +721,7 @@ void ac97_amp_enable(ac97_dev *dev, bool yesno)
 			else
 				ac97_reg_cached_write(dev, 0x68, 0);
 			break;
-		
+
 		default:
 			LOG(("ac97_amp_enable, reverse eamp = %d\n", dev->reversed_eamp_polarity));
 			LOG(("powerdown register was = %#04x\n", ac97_reg_uncached_read(dev, AC97_POWERDOWN)));
@@ -704,15 +736,16 @@ void ac97_amp_enable(ac97_dev *dev, bool yesno)
 	}
 }
 
+
 bool
 ad1819_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 {
 	uint32 value;
-	
+
 	value = (uint32)((rate * 48000ULL) / dev->clock); /* need 64 bit calculation for rates 96000 or higher */
 
 	LOG(("ad1819_set_rate: clock = %ld, rate = %ld, value = %ld\n", dev->clock, rate, value));
-	
+
 	if (value < 0x1B58 || value > 0xBB80)
 		return false;
 
@@ -720,7 +753,7 @@ ad1819_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 		case AC97_PCM_FRONT_DAC_RATE:
 			ac97_reg_cached_write(dev, AC97_AD_SAMPLE_RATE_0, value);
 			return true;
-		
+
 		case AC97_PCM_L_R_ADC_RATE:
 			ac97_reg_cached_write(dev, AC97_AD_SAMPLE_RATE_1, value);
 			return true;
@@ -730,16 +763,17 @@ ad1819_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 	}
 }
 
+
 bool
 ad1819_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
 {
 	uint32 value;
-	
+
 	switch (reg) {
 		case AC97_PCM_FRONT_DAC_RATE:
 			value = ac97_reg_cached_read(dev, AC97_AD_SAMPLE_RATE_0);
 			break;
-		
+
 		case AC97_PCM_L_R_ADC_RATE:
 			value = ac97_reg_cached_read(dev, AC97_AD_SAMPLE_RATE_1);
 			break;
@@ -753,12 +787,15 @@ ad1819_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
 }
 
 
-void default_init(ac97_dev *dev)
+void
+default_init(ac97_dev *dev)
 {
 	LOG(("default_init\n"));
 }
 
-void ad1819_init(ac97_dev *dev)
+
+void
+ad1819_init(ac97_dev *dev)
 {
 	LOG(("ad1819_init\n"));
 
@@ -780,10 +817,12 @@ void ad1819_init(ac97_dev *dev)
 	ac97_set_rate(dev, AC97_PCM_L_R_ADC_RATE, 48000);
 }
 
-void ad1881_init(ac97_dev *dev)
+
+void
+ad1881_init(ac97_dev *dev)
 {
 	LOG(("ad1881_init\n"));
-	
+
 	/* Default config for system with single AD1819 codec,
 	 * BROKEN on systems with master & slave codecs */
 	ac97_reg_cached_write(dev, AC97_AD_SERIAL_CONFIG, 0x7000);
@@ -797,27 +836,33 @@ void ad1881_init(ac97_dev *dev)
 	dev->max_vsr = 0xBB80;	/* 48kHz */
 }
 
-void ad1885_init(ac97_dev *dev)
+
+void
+ad1885_init(ac97_dev *dev)
 {
 	LOG(("ad1885_init\n"));
 	ad1881_init(dev);
-	
+
 	/* disable jack sense 0 and 1 (JS0, JS1) to turn off automatic mute */
 	ac97_reg_cached_write(dev, AC97_AD_JACK_SENSE, ac97_reg_cached_read(dev, AC97_AD_JACK_SENSE) | 0x0300);
 }
 
-void ad1886_init(ac97_dev *dev)
+
+void
+ad1886_init(ac97_dev *dev)
 {
 	LOG(("ad1886_init\n"));
 	ad1881_init(dev);
-	
+
 	/* change jack sense to always activate outputs*/
 	ac97_reg_cached_write(dev, AC97_AD_JACK_SENSE, 0x0010);
 	/* change SPDIF to a valid value */
 	ac97_reg_cached_write(dev, AC97_SPDIF_CONTROL, 0x2a20);
 }
 
-void ad1980_init(ac97_dev *dev)
+
+void
+ad1980_init(ac97_dev *dev)
 {
 	LOG(("ad1980_init\n"));
 
@@ -826,7 +871,7 @@ void ad1980_init(ac97_dev *dev)
 	 */
 	ac97_reg_cached_write(dev, AC97_AD_SERIAL_CONFIG, 0x1001);
 	ac97_update_register_cache(dev);
-	
+
 	/* Select Line-out driven with mixer data (not surround data)
 	 * Select Headphone-out driven with mixer data (not surround data),
 	 * LOSEL = 0, HPSEL = 1
@@ -835,7 +880,9 @@ void ad1980_init(ac97_dev *dev)
 	ac97_reg_cached_write(dev, AC97_AD_MISC_CONTROL, 0x0400);
 }
 
-void ad1981b_init(ac97_dev *dev)
+
+void
+ad1981b_init(ac97_dev *dev)
 {
 	LOG(("ad1981b_init\n"));
 	if (dev->subsystem == 0x0e11005a
@@ -853,7 +900,18 @@ void ad1981b_init(ac97_dev *dev)
 	}
 }
 
-void alc650_init(ac97_dev *dev)
+
+void
+alc203_init(ac97_dev *dev)
+{
+	LOG(("alc203_init\n"));
+
+	ac97_reg_update_bits(dev, AC97_ALC650_CLOCK_SOURCE, 0x400, 0x400);
+}
+
+
+void
+alc650_init(ac97_dev *dev)
 {
 	LOG(("alc650_init\n"));
 
@@ -870,7 +928,46 @@ void alc650_init(ac97_dev *dev)
 	ac97_reg_cached_write(dev, AC97_ALC650_CEN_LFE_VOLUME, 0x0808);
 }
 
-void stac9708_init(ac97_dev *dev)
+
+void
+alc655_init(ac97_dev *dev)
+{
+	uint16 val;
+	LOG(("alc655_init\n"));
+
+	ac97_reg_update_bits(dev, AC97_PAGING, 0xf, 0);
+
+	val = ac97_reg_cached_read(dev, AC97_ALC650_CLOCK_SOURCE);
+	// TODO update bits for specific devices
+	val &= ~0x1000;
+	ac97_reg_cached_write(dev, AC97_ALC650_CLOCK_SOURCE, val);
+
+	ac97_reg_cached_write(dev, AC97_ALC650_MULTI_CHAN_CTRL, 0x8000);
+	ac97_reg_cached_write(dev, AC97_ALC650_SURR_VOLUME, 0x808);
+	ac97_reg_cached_write(dev, AC97_ALC650_CEN_LFE_VOLUME, 0x808);
+
+	if (dev->codec_id == 0x414c4781)
+		ac97_reg_update_bits(dev, AC97_ALC650_MISC_CONTROL, 0x800, 0x800);
+}
+
+
+void
+alc850_init(ac97_dev *dev)
+{
+	LOG(("alc850_init\n"));
+
+	ac97_reg_update_bits(dev, AC97_PAGING, 0xf, 0);
+
+	ac97_reg_cached_write(dev, AC97_ALC650_MULTI_CHAN_CTRL, 0x8000);
+	ac97_reg_cached_write(dev, AC97_ALC650_CLOCK_SOURCE, 0x20d2);
+	ac97_reg_cached_write(dev, AC97_ALC650_GPIO_SETUP, 0x8a90);
+	ac97_reg_cached_write(dev, AC97_ALC650_SURR_VOLUME, 0x808);
+	ac97_reg_cached_write(dev, AC97_ALC650_CEN_LFE_VOLUME, 0x808);
+}
+
+
+void
+stac9708_init(ac97_dev *dev)
 {
 	LOG(("stac9708_init\n"));
 	/* ALSA initializes some registers that according to the
@@ -884,7 +981,9 @@ void stac9708_init(ac97_dev *dev)
 	ac97_reg_cached_write(dev, 0x74, 0x0000);
 }
 
-void stac9721_init(ac97_dev *dev)
+
+void
+stac9721_init(ac97_dev *dev)
 {
 	LOG(("stac9721_init\n"));
 	/* Set Analog Special to default (DAC/ADC -6dB disabled) */
@@ -901,7 +1000,9 @@ void stac9721_init(ac97_dev *dev)
 	ac97_reg_cached_write(dev, 0x78, 0x0000);
 }
 
-void stac9744_init(ac97_dev *dev)
+
+void
+stac9744_init(ac97_dev *dev)
 {
 	LOG(("stac9744_init\n"));
 	/* Set Analog Special to default (DAC/ADC -6dB disabled) */
@@ -918,7 +1019,9 @@ void stac9744_init(ac97_dev *dev)
 	ac97_reg_cached_write(dev, 0x78, 0x0000);
 }
 
-void stac9756_init(ac97_dev *dev)
+
+void
+stac9756_init(ac97_dev *dev)
 {
 	LOG(("stac9756_init\n"));
 	/* Set Analog Special to default (AC97 all-mix, DAC/ADC -6dB disabled) */
@@ -935,7 +1038,9 @@ void stac9756_init(ac97_dev *dev)
 	ac97_reg_cached_write(dev, 0x78, 0x0000);
 }
 
-void tr28028_init(ac97_dev *dev)
+
+void
+tr28028_init(ac97_dev *dev)
 {
 	LOG(("tr28028_init\n"));
 	ac97_reg_cached_write(dev, AC97_POWERDOWN, 0x0300);
@@ -944,7 +1049,9 @@ void tr28028_init(ac97_dev *dev)
 	ac97_reg_cached_write(dev, AC97_SPDIF_CONTROL, 0x0000);
 }
 
-void wm9701_init(ac97_dev *dev)
+
+void
+wm9701_init(ac97_dev *dev)
 {
 	LOG(("wm9701_init\n"));
 	/* ALSA writes some of these registers, but the codec
@@ -956,7 +1063,9 @@ void wm9701_init(ac97_dev *dev)
 	ac97_reg_cached_write(dev, 0x5a, 0x0200);
 }
 
-void wm9703_init(ac97_dev *dev)
+
+void
+wm9703_init(ac97_dev *dev)
 {
 	LOG(("wm9703_init\n"));
 	/* Set front mixer value to unmuted */
@@ -965,7 +1074,9 @@ void wm9703_init(ac97_dev *dev)
 	ac97_reg_cached_write(dev, AC97_GENERAL_PURPOSE, 0x8000);
 }
 
-void wm9704_init(ac97_dev *dev)
+
+void
+wm9704_init(ac97_dev *dev)
 {
 	LOG(("wm9704_init\n"));
 	/* Set read DAC value to unmuted */
@@ -977,6 +1088,7 @@ void wm9704_init(ac97_dev *dev)
 	/* DVD noise patch (?) */
 	ac97_reg_cached_write(dev, 0x5a, 0x0200);
 }
+
 
 const ac97_source_info source_info[] = {
 	{ "Recording", B_MIX_GAIN|B_MIX_MUTE|B_MIX_STEREO|B_MIX_RECORDMUX, 100, AC97_RECORD_GAIN, 0x8000, 4, 0, 1, 0, 0.0, 22.5, 1.5 },
