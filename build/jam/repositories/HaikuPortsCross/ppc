@@ -9,8 +9,8 @@ BootstrapPackageRepository HaikuPortsCross
 	zlib_bootstrap_devel-1.2.8-2
 	:
 	# repository architecture packages (stage 2)
-	libsolv_bootstrap-0.3.0_haiku_2013_06_16-1
-	libsolv_bootstrap_devel-0.3.0_haiku_2013_06_16-1
+	libsolv_bootstrap-0.3.0_haiku_2013_10_01-1
+	libsolv_bootstrap_devel-0.3.0_haiku_2013_10_01-1
 
 	:
 	# source packages
