@@ -334,11 +334,13 @@ BUrlProtocolHttp::_ResolveHostName()
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Resolving %s",
 		fUrl.UrlString().String());
 
+	uint16_t port;
 	if (fUrl.HasPort())
-		fRemoteAddr = BNetworkAddress(fUrl.Host(), fUrl.Port());
-	else {
-		fRemoteAddr = BNetworkAddress(fUrl.Host(), fSSL ? 443 : 80);
-	}
+		port = fUrl.Port();
+	else
+		port = fSSL ? 443 : 80;
+
+	fRemoteAddr = BNetworkAddress(AF_INET, fUrl.Host(), port);
 
 	if (fRemoteAddr.InitCheck() != B_OK)
 		return false;
@@ -357,12 +359,13 @@ BUrlProtocolHttp::_ResolveHostName()
 status_t
 BUrlProtocolHttp::_MakeRequest()
 {
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Connection to %s.",
-		fUrl.Authority().String());
+	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Connection to %s on port %d.",
+		fUrl.Authority().String(), fRemoteAddr.Port());
 	status_t connectError = fSocket->Connect(fRemoteAddr);
 
 	if (connectError != B_OK) {
-		_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR, "Socket connection error.");
+		_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR, "Socket connection error %s",
+			strerror(connectError));
 		return B_PROT_CONNECTION_FAILED;
 	}
 
@@ -382,7 +385,7 @@ BUrlProtocolHttp::_MakeRequest()
 		if (fOptPostFields->GetFormType() != B_HTTP_FORM_MULTIPART) {
 			fOutputBuffer = fOptPostFields->RawData();
 			_EmitDebug(B_URL_PROTOCOL_DEBUG_TRANSFER_OUT,
-				fOutputBuffer.String());
+				"%s", fOutputBuffer.String());
 			fSocket->Write(fOutputBuffer.String(), fOutputBuffer.Length());
 		} else {
 			for (BHttpForm::Iterator it = fOptPostFields->GetIterator();
