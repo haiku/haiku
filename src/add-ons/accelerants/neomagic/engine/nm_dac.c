@@ -118,7 +118,7 @@ if (1)
 		G = (ISARB(PALDATA) << 2);
 		B = (ISARB(PALDATA) << 2);
 		/* only compare the most significant 6 bits */
-		if (((r[i] & 0xfc) != R) || ((g[i] & 0xfc) != G) || ((b[i] & 0xfc) != B)) 
+		if (((r[i] & 0xfc) != R) || ((g[i] & 0xfc) != G) || ((b[i] & 0xfc) != B))
 			LOG(1,("DAC palette %d: w %x %x %x, r %x %x %x\n", i, r[i], g[i], b[i], R, G, B)); // apsed
 	}
  }
@@ -147,7 +147,7 @@ status_t nm_dac_set_pix_pll(display_mode target)
 	{
 		return result;
 	}
-	
+
 	/*reprogram (disable,select,wait for stability,enable)*/
 //unknown on Neomagic?:
 //	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0F)|0x04);  /*disable the PIXPLL*/
@@ -179,7 +179,7 @@ status_t nm_dac_set_pix_pll(display_mode target)
 		time++;
 		snooze(1);
 	}
-	
+
 	if (time > 2000)
 		LOG(2,("DAC: PIX PLL frequency not locked!\n"));
 	else
@@ -205,7 +205,7 @@ status_t nm_dac_pix_pll_find
 {
 	int m = 0, n = 0, p = 0, n_max, m_max;
 	float error, error_best = 999999999;
-	int best[2]; 
+	int best[2] = { 0, 0 };
 	float f_vco, max_pclk;
 	float req_pclk = target.timing.pixel_clock/1000.0;
 
