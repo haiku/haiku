@@ -27,6 +27,8 @@
 #include <unistd.h>
 
 #include <errno_private.h>
+#include <find_directory_private.h>
+#include <symbol_versioning.h>
 #include <user_group.h>
 
 /* use pwents to find home */
@@ -211,7 +213,7 @@ create_path(const char *path, mode_t mode)
 
 
 status_t
-find_directory(directory_which which, dev_t device, bool createIt,
+__find_directory(directory_which which, dev_t device, bool createIt,
 	char *returnedPath, int32 pathLength)
 {
 	status_t err = B_OK;
@@ -443,3 +445,17 @@ find_directory(directory_which which, dev_t device, bool createIt,
 	return err;
 }
 
+
+extern "C" status_t
+__find_directory_alpha4(directory_which which, dev_t device, bool createIt,
+	char *returnedPath, int32 pathLength)
+{
+	return __find_directory(which, device, createIt, returnedPath, pathLength);
+}
+
+
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__find_directory_alpha4",
+	"find_directory@", "BASE");
+
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__find_directory", "find_directory@@",
+    "1_ALPHA5");

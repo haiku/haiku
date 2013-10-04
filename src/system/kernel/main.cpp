@@ -25,6 +25,7 @@
 #include <debug.h>
 #include <DPC.h>
 #include <elf.h>
+#include <find_directory_private.h>
 #include <fs/devfs.h>
 #include <fs/KPath.h>
 #include <int.h>
@@ -341,7 +342,7 @@ main2(void *unused)
 	// start the init process
 	{
 		KPath bootScriptPath;
-		status_t status = find_directory(B_SYSTEM_BOOT_DIRECTORY, gBootDevice,
+		status_t status = __find_directory(B_SYSTEM_BOOT_DIRECTORY, gBootDevice,
 			false, bootScriptPath.LockBuffer(), bootScriptPath.BufferSize());
 		if (status != B_OK)
 			dprintf("main2: find_directory() failed: %s\n", strerror(status));

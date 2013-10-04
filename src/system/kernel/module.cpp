@@ -24,6 +24,7 @@
 #include <boot/elf.h>
 #include <boot/kernel_args.h>
 #include <elf.h>
+#include <find_directory_private.h>
 #include <fs/KPath.h>
 #include <fs/node_monitor.h>
 #include <lock.h>
@@ -639,7 +640,7 @@ search_module(const char* name, module_image** _moduleImage)
 		// let the VFS find that module for us
 
 		KPath basePath;
-		if (find_directory(kModulePaths[i], gBootDevice, true,
+		if (__find_directory(kModulePaths[i], gBootDevice, true,
 				basePath.LockBuffer(), basePath.BufferSize()) != B_OK)
 			continue;
 
@@ -1436,7 +1437,7 @@ ModuleNotificationService::_AddDirectory(const char* prefix)
 			break;
 
 		KPath pathBuffer;
-		if (find_directory(kModulePaths[i], gBootDevice, true,
+		if (__find_directory(kModulePaths[i], gBootDevice, true,
 				pathBuffer.LockBuffer(), pathBuffer.BufferSize()) != B_OK)
 			continue;
 
@@ -1607,7 +1608,7 @@ ModuleNotificationService::_Notify(int32 opcode, dev_t device, ino_t directory,
 
 	for (uint32 i = 0; i < kNumModulePaths; i++) {
 		KPath modulePath;
-		if (find_directory(kModulePaths[i], gBootDevice, true,
+		if (__find_directory(kModulePaths[i], gBootDevice, true,
 				modulePath.LockBuffer(), modulePath.BufferSize()) != B_OK)
 			continue;
 
@@ -1889,7 +1890,7 @@ module_init_post_boot_device(bool bootingFromBootLoaderVolume)
 					if (sDisableUserAddOns && i >= kFirstNonSystemModulePath)
 						continue;
 
-					if (find_directory(kModulePaths[i], gBootDevice, true,
+					if (__find_directory(kModulePaths[i], gBootDevice, true,
 							pathBuffer.LockBuffer(), pathBuffer.BufferSize())
 								!= B_OK) {
 						pathBuffer.UnlockBuffer();
@@ -2008,7 +2009,7 @@ open_module_list_etc(const char* prefix, const char* suffix)
 				break;
 
 			KPath pathBuffer;
-			if (find_directory(kModulePaths[i], gBootDevice, true,
+			if (__find_directory(kModulePaths[i], gBootDevice, true,
 					pathBuffer.LockBuffer(), pathBuffer.BufferSize()) != B_OK)
 				continue;
 

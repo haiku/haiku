@@ -17,6 +17,8 @@
 
 #include <StorageDefs.h>
 
+#include <find_directory_private.h>
+
 
 #ifndef HAIKU_BUILD_GENERATED_DIRECTORY
 #	error HAIKU_BUILD_GENERATED_DIRECTORY not defined!
@@ -95,3 +97,10 @@ find_directory(directory_which which, dev_t device, bool createIt,
 	return error;
 }
 
+
+status_t
+__find_directory(directory_which which, dev_t device, bool createIt,
+	char *returnedPath, int32 pathLength)
+{
+	return find_directory(which, device, createIt, returnedPath, pathLength);
+}

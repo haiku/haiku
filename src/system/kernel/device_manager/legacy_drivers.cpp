@@ -18,6 +18,7 @@
 #include <boot_device.h>
 #include <boot/kernel_args.h>
 #include <elf.h>
+#include <find_directory_private.h>
 #include <fs/devfs.h>
 #include <fs/KPath.h>
 #include <fs/node_monitor.h>
@@ -515,7 +516,7 @@ get_priority(const char* path)
 
 	for (uint32 index = 0; index < sizeof(whichPath) / sizeof(whichPath[0]);
 			index++) {
-		if (find_directory(whichPath[index], gBootDevice, false,
+		if (__find_directory(whichPath[index], gBootDevice, false,
 			pathBuffer.LockBuffer(), pathBuffer.BufferSize()) == B_OK) {
 			pathBuffer.UnlockBuffer();
 			if (!strncmp(pathBuffer.Path(), path, pathBuffer.BufferSize()))
@@ -954,7 +955,7 @@ DirectoryIterator::SetTo(const char* path, const char* subPath, bool recursive)
 			if (i < 2 && disableUserAddOns)
 				continue;
 
-			if (find_directory(whichPath[i], gBootDevice, true,
+			if (__find_directory(whichPath[i], gBootDevice, true,
 					pathBuffer.LockBuffer(), pathBuffer.BufferSize()) == B_OK) {
 				pathBuffer.UnlockBuffer();
 				pathBuffer.Append("kernel");
@@ -1388,7 +1389,7 @@ legacy_driver_add_preloaded(kernel_args* args)
 	// NOTE: The initialization success of the path objects is implicitely
 	// checked by the immediately following functions.
 	KPath basePath;
-	status_t status = find_directory(B_BEOS_ADDONS_DIRECTORY,
+	status_t status = __find_directory(B_BEOS_ADDONS_DIRECTORY,
 		gBootDevice, false, basePath.LockBuffer(), basePath.BufferSize());
 	if (status != B_OK) {
 		dprintf("legacy_driver_add_preloaded: find_directory() failed: "
@@ -1496,7 +1497,7 @@ legacy_driver_probe(const char* subPath)
 			if (i < 2 && disableUserAddOns)
 				continue;
 
-			if (find_directory(whichPath[i], gBootDevice, true,
+			if (__find_directory(whichPath[i], gBootDevice, true,
 					path.LockBuffer(), path.BufferSize()) == B_OK) {
 				path.UnlockBuffer();
 				path.Append("kernel/drivers");
