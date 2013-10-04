@@ -388,4 +388,8 @@ CopyDirectoryToPackage develop sample-code
 	: pdflib ;
 
 
+# empty directory
+AddDirectoryToPackage data empty ;
+
+
 BuildHaikuPackage $(haikuPackage) : haiku ;
