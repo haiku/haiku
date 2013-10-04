@@ -79,7 +79,7 @@ BDatagramSocket::MaxTransmissionSize() const
 }
 
 
-size_t
+ssize_t
 BDatagramSocket::SendTo(const BNetworkAddress& address, const void* buffer,
 	size_t size)
 {
@@ -92,7 +92,7 @@ BDatagramSocket::SendTo(const BNetworkAddress& address, const void* buffer,
 }
 
 
-size_t
+ssize_t
 BDatagramSocket::ReceiveFrom(void* buffer, size_t bufferSize,
 	BNetworkAddress& from)
 {

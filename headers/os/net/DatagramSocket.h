@@ -26,9 +26,9 @@ public:
 
 	virtual	size_t				MaxTransmissionSize() const;
 
-	virtual	size_t				SendTo(const BNetworkAddress& address,
+	virtual	ssize_t				SendTo(const BNetworkAddress& address,
 									const void* buffer, size_t size);
-	virtual	size_t				ReceiveFrom(void* buffer, size_t bufferSize,
+	virtual	ssize_t				ReceiveFrom(void* buffer, size_t bufferSize,
 									BNetworkAddress& from);
 
 	// BDataIO implementation
