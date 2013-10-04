@@ -1,0 +1,196 @@
+/*
+ * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *
+ * Corresponds to:
+ *		headers/os/net/AbstractSocket.h rev 43302
+ *		src/kits/network/libnetapi/AbstractSocket.cpp rev 43302
+ */
+
+/*!
+	\file AbstractSocket.h
+	\ingroup network
+	\brief Provides the BAbstractSocket interface.
+*/
+
+/*!
+	\class BAbstractSocket
+	\ingroup network
+	\brief Abstract interface for all socket connections.
+
+	BAbstractSocket provides a common interface for all socket-based
+	communication streams. These includes datagrams, TCP sockets and SSL
+	secure sockets.
+
+	BAbstractSocket implements common behavior between these different socket
+	types. This includes management of a BSD socket integer handle, knowledge
+	of the local and remote network addresses, as well as the connection state.
+	
+	New subclasses of BAbstractSocket may be created to allow communication
+	using more protocols.
+*/
+
+/*!
+	\fn BAbstractSocket::BAbstractSocket()
+	\brief Default constructor.
+
+	The socket is disconnected and unbound, and the status is B_NO_INIT.
+	Use Bind or Connect to initialize it.
+*/
+
+/*!
+	\fn BAbstractSocket::BAbstractSocket(const BAbstractSocket& other)
+	\brief Copy constructor
+
+	There is no new connection to the server. Instead, data sent using several
+	copy of the class will be intermixed, and the first instance to read data
+	will steal it from the others.
+
+	This is probably not what you want, unless you work with datagrams. In
+	that case, the messages read and written are atomic and can be safely sent
+	and received from different places.
+*/
+
+/*!
+	\fn BAbstractSocket::~BAbstractSocket()
+	\brief Destructor
+
+	Disconnects the socket by calling Disconnect().
+*/
+
+/*!
+	\fn status_t BAbstractSocket::InitCheck() const
+	\brief Check connection status
+
+	\returns B_OK if the connection is working, or an error code if something
+		went wrong.
+*/
+
+/*!
+	\fn bool BAbstractSocket::IsBound() const
+
+	A socket becomes bound when Bind succeeds, and stops being bound when
+	Disconnect is called.
+
+	\returns wether the socket is currently bound
+*/
+
+/*!
+	\fn bool BAbstractSocket::IsConnected() const
+
+	A socket becomes connected when Connect succeeds, and disconnected when
+	Disconnect is called.
+
+	\returns wether the socket is currently connected
+*/
+
+/*!
+	\fn void BAbstractSocket::Disconnect()
+	\brief Close the connection
+
+	The socket becomes disconnected and unbound. You can Connect or Bind it
+	again, either to the same or another peer.
+*/
+
+/*!
+	\fn status_t BAbstractSocket::SetTimeout(bigtime_t timeout)
+	\brief sets the read and write timeout
+
+	A negative value disables timeouts, so the Read and Write calls will wait
+	until data is available or can be sent.
+
+	\param timeout The timeout in microseconds, or B_INFINITE_TIMEOUT.
+*/
+
+/*!
+	\fn bigtime_t BAbstractSocket::Timeout() const
+	\brief gets the socket timeout
+
+	\returns the timeout in microseconds, or B_INFINITE_TIMEOUT
+*/
+
+/*!
+	\fn const BNetworkAddress& BAbstractSocket::Local() const
+	\brief gets the local address for this socket
+
+	This gives useful results only if the socket is either connected or bound.
+	Otherwise, an uninitialized address is returned.
+*/
+
+/*!
+	\fn const BNetworkAddress& BAbstractSocket::Peer() const
+	\brief gets the peer address
+
+	This gives useful results only if the socket is either connected or bound.
+	Otherwise, an uninitialized address is returned.
+*/
+
+/*!
+	\fn size_t BAbstractSocket::MaxTransmissionSize() const
+	\brief Return the maximal size of a transmission on this socket.
+
+	The default implementation always returns SSIZE_MAX, but subclasses may
+	restrict this to a smaller size.
+*/
+
+/*!
+	\fn status_t BAbstractSocket::WaitForReadable(bigtime_t timeout) const
+	\brief wait for incoming data
+
+	Wait until data comes in, or the timeout expires. After this function
+	returns B_OK, Read can be called without blocking.
+
+	\param timeout the timeout in microseconds, or B_INFINITE_TIMEOUT
+	\returns B_OK when data is available, B_TIMED_OUT when the timeout expires,
+		or B_WOULD_BLOCK when the wait was interrupted for other reasons.
+*/
+
+/*!
+	\fn status_t BAbstractSocket::WaitForWritable(bigtime_t timeout) const
+	\brief wait until writing is possible
+
+	Wait until the socket becomes ready for writing, or the timeout expires.
+	After this function	returns B_OK, Write can be called without blocking.
+
+	\param timeout the timeout in microseconds, or B_INFINITE_TIMEOUT
+	\returns B_OK when the socket is ready to accept writes, B_TIMED_OUT when
+		the timeout expires, or B_WOULD_BLOCK when the wait was interrupted for
+		another reason.
+*/
+
+/*!
+	\fn int BAbstractSocket::Socket() const
+	\brief get the underlying socket descriptor
+
+	The BSD socket descriptor can be used to modify advanced connection
+	paramters using the POSIX socket API.
+
+	\returns the socket descriptor
+*/
+
+/*!
+	\fn status_t BAbstractSocket::Bind(const BNetworkAddress& local, int type)
+	\brief binds the socket to the given address
+
+	If the socket was already bound, the previous binding is removed.
+
+	\param local the local address to bind
+	\param type the socket type
+	\return B_OK on success, other error codes on error.
+*/
+
+/*!
+	\fn status_t BAbstractSocket::Connect(const BNetworkAddress& peer,
+		int type, bigtime_t timeout)
+	\brief Connect the socket to the given peer.
+
+	The socket is disconnected from any previous connections.
+
+	\param peer the peer to connect to
+	\param type the socket type
+	\param timeout The timeout in microseconds or B_INFINITE_TIMEOUT. This is
+		used for subsequent reads and writes as well.
+*/

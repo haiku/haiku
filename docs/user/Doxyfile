@@ -639,6 +639,7 @@ INPUT                  = . \
                          media \
                          midi \
                          midi2 \
+                         net \
                          posix \
                          storage \
                          support \
@@ -652,6 +653,7 @@ INPUT                  = . \
                          ../../headers/os/locale \
                          ../../headers/os/media \
                          ../../headers/os/midi2 \
+                         ../../headers/os/net \
                          ../../headers/os/storage \
                          ../../headers/os/support \
                          ../../headers/os/translation \

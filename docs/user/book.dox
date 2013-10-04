@@ -48,6 +48,8 @@
 		- The \ref midi2 describes an interface to generating, processing,
 			and playing music in MIDI format. For reference documentation on the
 			\ref midi1 is also included.
+		- The \ref network handles everything network related, from interface
+			IP address settings to HTTP connections.
 		- The \ref storage is a collection of classes that deal with storing and
 			retrieving information from disk.
 		- The \ref support contains support classes to use in your application
@@ -469,6 +471,8 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 
 	\defgroup libmidi2 (libmidi2.so)
 
+	\defgroup network Network Kit
+	\brief Classes that deal with all network connections and communications.
 
 	\defgroup storage Storage Kit
 	\brief Collection of classes that deal with storing and retrieving

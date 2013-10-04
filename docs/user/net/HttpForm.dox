@@ -1,0 +1,120 @@
+/*
+ * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *
+ * Corresponds to:
+ *		headers/os/net/HttpForm.h rev 39161
+ *		src/kits/network/libnetapi/HttpForm.cpp rev 39161
+ */
+
+/*!
+	\file HttpForm.h
+	\ingroup network
+	\brief Management of HTTP form data
+*/
+
+/*!
+	\class BHttpFormData
+	\ingroup network
+	\brief Stores aform data entry sent or received during an HTTP request.
+
+	Each element in a form is stored in an instance of this class. The values
+	can be either strings, arbitrary binary buffers, or a pointer to a file.
+
+	The latter allows reading data from the file as it is being sent through
+	the network, removing hte need to buffer the whole file contents in memory.
+*/
+
+/*!
+	\fn BHttpFormData::BHttpFormData(const BString& name, const BString& value)
+	\brief Construct a BHttpForlData with a string value.
+*/
+
+/*!
+	\fn BHttpFormData::BHttpFormData(const BString& name, const BPath& value)
+	\brief Construct a BHttpForlData which value is a file contents
+*/
+
+/*!
+	\fn BHttpFormData::BHttpFormData(const BString& name, const void* buffer,
+		ssize_t size)
+	\brief Construct a BHttpForlData which value is a binary buffer.
+*/
+
+/*!
+	\fn bool BHttpFormData::InitCheck() const
+	\brief Checks the initialisation of the object
+
+	\return false if attempting to construct a BHttpFormData with a NULL buffer
+*/
+
+/*!
+	\fn const BString& BHttpFormData::Name() const
+	\brief Get the form field name
+*/
+
+/*!
+	\fn const BString& String() const
+	\brief Get the string value of a form field.
+
+	\returns an empty string for buffer and file based fields
+*/
+
+/*!
+	\fn const BPath& File() const
+	\brief Get the file path of a form field.
+
+	\returns an empty string for buffer and string based fields
+*/
+
+/*!
+	\fn const void* Buffer() const
+	\brief Get a pointer to the data of a form field.
+
+	\returns an empty string for string and file based fields
+*/
+
+/*!
+	\fn ssize_t BufferSize() const;
+	\brief Get the buffer size
+
+	\return 0 for string and file based fields.
+*/
+
+/*!
+	\fn bool IsFile() const
+	\return true if the field data is a file
+*/
+
+/*!
+	\fn const BString& Filename() const;
+	\return the name of the file, for file based fields
+*/
+
+/*!
+	\fn const BString& MimeType() const
+	\return the data MIME type
+*/
+
+/*!
+	\fn form_content_type Type() const
+	\return the kind of field
+*/
+
+/*!
+	\fn status_t BHttpFormData::CopyBuffer()
+	\brief Make a copy of the internal buffer
+
+	The constructor for buffer-based fields does not copy the data given to it,
+	it just keeps a pointer. If you want to retain ownership of the data, call
+	this method so the buffer copies and releases it.
+*/
+
+/*!
+	\class BHttpForm
+	\ingroup network
+	\brief Container for all the BHttpFormData instances making up an HTTP form contents.
+*/
