@@ -264,7 +264,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		return err;
 	}
 
-	switch (which) {
+	switch ((int)which) {
 		/* Per volume directories */
 		case B_DESKTOP_DIRECTORY:
 			if (device == bootDevice || !strcmp(fsInfo.fsh_name, "bfs"))
