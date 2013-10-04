@@ -331,7 +331,7 @@ switch_hardware_tab(ps2_dev* dev, bool on)
 	uint8 command = PS2_CMD_MOUSE_SET_RES;
 	if (on) {
 		arg = 0x0A;
-		command = PS2_CMD_KEYBOARD_SET_TYPEMATIC;
+		command = PS2_CMD_SET_TYPEMATIC;
 	}
 	if (ps2_dev_command(dev, PS2_CMD_MOUSE_GET_INFO, NULL, 0, val, 3) != B_OK
 		|| ps2_dev_command(dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0) != B_OK

@@ -113,7 +113,7 @@ set_typematic(int32 rate, bigtime_t delay)
 		value |= 0 << 5;
 
 	return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB],
-		PS2_CMD_KEYBOARD_SET_TYPEMATIC, &value, 1, NULL, 0);
+		PS2_CMD_SET_TYPEMATIC, &value, 1, NULL, 0);
 }
 
 
@@ -309,10 +309,10 @@ probe_keyboard(void)
 				B_PRIx32 "\n", cmdbyte, status);
 		}
 	}
-	
+
 	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB],
 			PS2_CMD_GET_DEVICE_ID, NULL, 0, sKeyboardIds, sizeof(sKeyboardIds));
-	
+
 	if (status != B_OK) {
 		INFO("ps2: cannot read keyboard device id:%#08" B_PRIx32 "\n", status);
 	}

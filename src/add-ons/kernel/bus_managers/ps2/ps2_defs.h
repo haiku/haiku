@@ -55,7 +55,7 @@
 #define PS2_CMD_MOUSE_SET_STREAM  		0xea
 #define PS2_CMD_KEYBOARD_SET_LEDS		0xed
 #define PS2_CMD_MOUSE_SET_POLL			0xf0
-#define PS2_CMD_KEYBOARD_SET_TYPEMATIC	0xf3
+#define PS2_CMD_SET_TYPEMATIC			0xf3
 #define PS2_CMD_ECHO					0xee
 #define PS2_CMD_TEST_PASSED				0xaa
 #define PS2_CMD_GET_DEVICE_ID			0xf2
