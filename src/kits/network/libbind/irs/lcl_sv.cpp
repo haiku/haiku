@@ -159,7 +159,7 @@ sv_rewind(struct irs_sv *sv)
 	}
 
 	char path[PATH_MAX];
-	if (find_directory(B_COMMON_DATA_DIRECTORY, -1, false, path, sizeof(path))
+	if (find_directory(B_SYSTEM_DATA_DIRECTORY, -1, false, path, sizeof(path))
 			== B_OK) {
 		strlcat(path, "/network/services", sizeof(path));
 

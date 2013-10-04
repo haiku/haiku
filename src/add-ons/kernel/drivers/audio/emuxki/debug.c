@@ -44,7 +44,7 @@
 
 
 #if DEBUG > 0
-static const char *logfile = kCommonLogDirectory "/emuxki.log";
+static const char *logfile = kSystemLogDirectory "/emuxki.log";
 static sem_id loglock;
 #endif
 

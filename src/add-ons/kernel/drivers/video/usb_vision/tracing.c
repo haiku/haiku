@@ -32,7 +32,7 @@ bool b_log_funcres  = false;
 bool b_log_settings_loaded = false;
 
 static const char *private_log_path
-	= kCommonLogDirectory "/" DRIVER_NAME ".log";
+	= kSystemLogDirectory "/" DRIVER_NAME ".log";
 static sem_id loglock;
 
 void load_setting(void){

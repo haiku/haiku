@@ -54,7 +54,7 @@ void debug_printf(const char *text,...)
 
 
 #if DEBUG > 0
-static const char *logfile = kCommonLogDirectory "/ich_ac97.log";
+static const char *logfile = kSystemLogDirectory "/ich_ac97.log";
 static sem_id loglock;
 
 

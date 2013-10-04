@@ -64,7 +64,7 @@ bug(const char *format, ...)
 	int     i;
 	int     file;
 
-	if ((file = open(kCommonLogDirectory "/sis900-driver.log",
+	if ((file = open(kSystemLogDirectory "/sis900-driver.log",
 		O_RDWR | O_APPEND | O_CREAT)) >= 0) {
 //		time_t timer = time(NULL);
 //		strftime(c, 2048, "%H:%M:S: ", localtime(&timer));

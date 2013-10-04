@@ -30,6 +30,9 @@ search_path_for_type(image_type type)
 {
 	const char *path = NULL;
 
+	// TODO: The *PATH variables should not include the standard system paths.
+	// Instead those paths should always be used after the directories specified
+	// via the variables.
 	switch (type) {
 		case B_APP_IMAGE:
 			path = getenv("PATH");
@@ -53,25 +56,23 @@ search_path_for_type(image_type type)
 	// Since the kernel does not set any variables, this is also needed
 	// to start the root shell.
 
+	// TODO: The user specific paths should not be used by default.
 	switch (type) {
 		case B_APP_IMAGE:
-			return kUserBinDirectory
+			return kUserNonpackagedBinDirectory
+				":" kUserBinDirectory
 						// TODO: Remove!
-				":" kCommonBinDirectory
+				":" kSystemNonpackagedBinDirectory
 				":" kGlobalBinDirectory
-				":" kAppsDirectory
-				":" kPreferencesDirectory
 				":" kSystemAppsDirectory
-				":" kSystemPreferencesDirectory
-				":" kCommonDevelopToolsBinDirectory;
+				":" kSystemPreferencesDirectory;
 
 		case B_LIBRARY_IMAGE:
 			return kAppLocalLibDirectory
 				":" kUserNonpackagedLibDirectory
 				":" kUserLibDirectory
 					// TODO: Remove!
-				":" kCommonNonpackagedLibDirectory
-				":" kCommonLibDirectory
+				":" kSystemNonpackagedLibDirectory
 				":" kSystemLibDirectory;
 
 		case B_ADD_ON_IMAGE:
@@ -79,7 +80,7 @@ search_path_for_type(image_type type)
 				":" kUserNonpackagedAddonsDirectory
 				":" kUserAddonsDirectory
 					// TODO: Remove!
-				":" kCommonNonpackagedAddonsDirectory
+				":" kSystemNonpackagedAddonsDirectory
 				":" kSystemAddonsDirectory;
 
 		default:

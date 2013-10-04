@@ -330,8 +330,9 @@ LocaleRosterData::_InitializeCatalogAddOns()
 	fCatalogAddOnInfos.AddItem((void*)defaultCatalogAddOnInfo);
 
 	directory_which folders[] = {
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
 		B_USER_ADDONS_DIRECTORY,
-		B_COMMON_ADDONS_DIRECTORY,
+		B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
 		B_SYSTEM_ADDONS_DIRECTORY,
 	};
 	BPath addOnPath;

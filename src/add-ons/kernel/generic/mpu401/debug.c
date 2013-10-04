@@ -58,7 +58,7 @@ void debug_printf(const char *text,...)
 
 
 #if DEBUG > 0
-static const char *logfile = kCommonLogDirectory "/mpu401.log";
+static const char *logfile = kSystemLogDirectory "/mpu401.log";
 static sem_id loglock;
 
 

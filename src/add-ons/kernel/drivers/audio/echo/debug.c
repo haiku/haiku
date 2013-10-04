@@ -43,7 +43,7 @@
 
 
 #if DEBUG > 0
-static const char *logfile = kCommonLogDirectory "/" DRIVER_NAME ".log";
+static const char *logfile = kSystemLogDirectory "/" DRIVER_NAME ".log";
 static sem_id loglock;
 #endif
 

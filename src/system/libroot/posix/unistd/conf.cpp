@@ -387,8 +387,8 @@ confstr(int name, char *buffer, size_t length)
 
 	switch (name) {
 		case _CS_PATH:
-			string = kGlobalBinDirectory ":" kSystemAppsDirectory ":"
-				kCommonBinDirectory ":" kCommonDevelopToolsBinDirectory;
+			string = kSystemNonpackagedBinDirectory ":" kGlobalBinDirectory ":"
+				kSystemAppsDirectory ":" kSystemPreferencesDirectory;
 			break;
 		default:
 			__set_errno(EINVAL);

@@ -1723,8 +1723,9 @@ status_t
 AboutView::_GetLicensePath(const char* license, BPath& path)
 {
 	static const directory_which directoryConstants[] = {
+		B_USER_NONPACKAGED_DATA_DIRECTORY,
 		B_USER_DATA_DIRECTORY,
-		B_COMMON_DATA_DIRECTORY,
+		B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
 		B_SYSTEM_DATA_DIRECTORY
 	};
 	static const int dirCount = 3;

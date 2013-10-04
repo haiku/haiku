@@ -386,7 +386,10 @@ AGMSBayesianSpamFilterConfig::ShowSpamServerConfigurationWindow () {
 			if (errorCode != B_OK) {
 				BPath path;
 				entry_ref ref;
-				directory_which places[] = {B_COMMON_BIN_DIRECTORY,B_BEOS_BIN_DIRECTORY};
+				directory_which places[] = {
+					B_SYSTEM_NONPACKAGED_BIN_DIRECTORY,
+					B_SYSTEM_BIN_DIRECTORY
+				};
 				for (int32 i = 0; i < 2; i++) {
 					find_directory(places[i],&path);
 					path.Append("spamdbm");

@@ -680,9 +680,10 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache>*,
 				resid = R_HomeDirIcon;
 				break;
 
-			case B_BEOS_FONTS_DIRECTORY:
-			case B_COMMON_FONTS_DIRECTORY:
+			case B_SYSTEM_FONTS_DIRECTORY:
+			case B_SYSTEM_NONPACKAGED_FONTS_DIRECTORY:
 			case B_USER_FONTS_DIRECTORY:
+			case B_USER_NONPACKAGED_FONTS_DIRECTORY:
 				resid = R_FontDirIcon;
 				break;
 
@@ -706,7 +707,8 @@ IconCache::GetWellKnownIcon(AutoLock<SimpleIconCache>*,
 				resid = R_QueryDirIcon;
 				break;
 
-			case B_COMMON_DEVELOP_DIRECTORY:
+			case B_SYSTEM_DEVELOP_DIRECTORY:
+			case B_SYSTEM_NONPACKAGED_DEVELOP_DIRECTORY:
 			case B_USER_DESKBAR_DEVELOP_DIRECTORY:
 				resid = R_DevelopDirIcon;
 				break;

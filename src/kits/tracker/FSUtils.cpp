@@ -630,7 +630,6 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
 		return false;
 
 	if (!DirectoryMatchesOrContains(entry, B_SYSTEM_DIRECTORY)
-		&& !DirectoryMatchesOrContains(entry, B_COMMON_DIRECTORY)
 		&& !DirectoryMatchesOrContains(entry, B_USER_DIRECTORY))
 		// quick way out
 		return true;
@@ -645,12 +644,6 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
 			"you want to do this?\n\nTo %toDoAction the system folder or its "
 			"contents anyway, hold down the Shift key and click "
 			"\"%toConfirmAction\"."));
-	} else if (DirectoryMatches(entry, B_COMMON_DIRECTORY)) {
-		warning.SetTo(
-			B_TRANSLATE("If you %ifYouDoAction the common folder, %osName "
-			"may not behave properly!\n\nAre you sure you want to do this?"
-			"\n\nTo %toDoAction the common folder anyway, hold down the "
-			"Shift key and click \"%toConfirmAction\"."));
 	} else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
 		warning .SetTo(
 			B_TRANSLATE("If you %ifYouDoAction the home folder, %osName "
@@ -3925,7 +3918,6 @@ WellKnowEntryList::WellKnowEntryList()
 	AddOne(B_USER_DIRECTORY, "home");
 
 	AddOne(B_BEOS_FONTS_DIRECTORY, "fonts");
-	AddOne(B_COMMON_FONTS_DIRECTORY, "fonts");
 	AddOne(B_USER_FONTS_DIRECTORY, "fonts");
 
 	AddOne(B_BEOS_APPS_DIRECTORY, "apps");
@@ -3944,7 +3936,7 @@ WellKnowEntryList::WellKnowEntryList()
 	AddOne((directory_which)B_USER_QUERIES_DIRECTORY, B_USER_DIRECTORY,
 		"queries", "queries");
 
-	AddOne(B_COMMON_DEVELOP_DIRECTORY, "develop");
+	AddOne(B_SYSTEM_DEVELOP_DIRECTORY, "develop");
 	AddOne((directory_which)B_USER_DESKBAR_DEVELOP_DIRECTORY,
 		B_USER_DESKBAR_DIRECTORY, "Development", "develop");
 

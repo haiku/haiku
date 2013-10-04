@@ -528,12 +528,12 @@ void
 FontManager::_AddSystemPaths()
 {
 	BPath path;
-	if (find_directory(B_BEOS_FONTS_DIRECTORY, &path, true) == B_OK)
+	if (find_directory(B_SYSTEM_FONTS_DIRECTORY, &path, true) == B_OK)
 		_AddPath(path.Path());
 
 	// We don't scan these in test mode to help shave off some startup time
 #if !TEST_MODE
-	if (find_directory(B_COMMON_FONTS_DIRECTORY, &path, true) == B_OK)
+	if (find_directory(B_SYSTEM_NONPACKAGED_FONTS_DIRECTORY, &path, true) == B_OK)
 		_AddPath(path.Path());
 #endif
 }

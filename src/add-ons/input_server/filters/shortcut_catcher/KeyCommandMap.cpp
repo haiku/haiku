@@ -260,17 +260,28 @@ KeyCommandMap::MessageReceived(BMessage* msg)
 						BString command;
 						if (msg.FindString("command", &command) == B_OK) {
 							BPath path;
-							if (find_directory(B_SYSTEM_ADDONS_DIRECTORY, &path) == B_OK) {
+							if (find_directory(B_SYSTEM_ADDONS_DIRECTORY, &path)
+									== B_OK) {
 								path.Append("Tracker/");
 								if (command.FindFirst(path.Path()) != B_ERROR)
 									continue;
 							}
-							if (find_directory(B_COMMON_ADDONS_DIRECTORY, &path) == B_OK) {
+							if (find_directory(
+									B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
+						  			&path) == B_OK) {
 								path.Append("Tracker/");
 								if (command.FindFirst(path.Path()) != B_ERROR)
 									continue;
 							}
-							if (find_directory(B_USER_ADDONS_DIRECTORY, &path) == B_OK) {
+							if (find_directory(B_USER_ADDONS_DIRECTORY, &path)
+									== B_OK) {
+								path.Append("Tracker/");
+								if (command.FindFirst(path.Path()) != B_ERROR)
+									continue;
+							}
+							if (find_directory(
+									B_USER_NONPACKAGED_ADDONS_DIRECTORY, &path)
+									== B_OK) {
 								path.Append("Tracker/");
 								if (command.FindFirst(path.Path()) != B_ERROR)
 									continue;

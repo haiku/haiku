@@ -25,7 +25,7 @@
 
 
 #if DEBUG > 0
-static const char *logfile = kCommonLogDirectory "/es1370.log";
+static const char *logfile = kSystemLogDirectory "/es1370.log";
 static sem_id loglock;
 #endif
 

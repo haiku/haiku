@@ -331,73 +331,40 @@ HWindow::SetupMenuField()
 		menu->AddItem(new BMenuItem(path.Leaf(), msg), 0);
 	}
 
-	BPath path;
-	BDirectory dir;
-	BEntry entry;
-	BPath item_path;
+	directory_which whichDirectories[] = {
+		B_SYSTEM_SOUNDS_DIRECTORY,
+		B_SYSTEM_NONPACKAGED_SOUNDS_DIRECTORY,
+		B_USER_SOUNDS_DIRECTORY,
+		B_USER_NONPACKAGED_SOUNDS_DIRECTORY,
+	};
 
-	status_t err = find_directory(B_BEOS_SOUNDS_DIRECTORY, &path);
-	if (err == B_OK)
-		err = dir.SetTo(path.Path());
-	while (err == B_OK) {
-		err = dir.GetNextEntry(&entry, true);
-		if (entry.InitCheck() != B_NO_ERROR)
-			break;
+	for (size_t i = 0;
+		i < sizeof(whichDirectories) / sizeof(whichDirectories[0]); i++) {
+		BPath path;
+		BDirectory dir;
+		BEntry entry;
+		BPath item_path;
 
-		entry.GetPath(&item_path);
+		status_t err = find_directory(whichDirectories[i], &path);
+		if (err == B_OK)
+			err = dir.SetTo(path.Path());
+		while (err == B_OK) {
+			err = dir.GetNextEntry(&entry, true);
+			if (entry.InitCheck() != B_NO_ERROR)
+				break;
 
-		if (menu->FindItem(item_path.Leaf()))
-			continue;
+			entry.GetPath(&item_path);
 
-		BMessage* msg = new BMessage(M_ITEM_MESSAGE);
-		entry_ref ref;
-		::get_ref_for_path(item_path.Path(), &ref);
-		msg->AddRef("refs", &ref);
-		menu->AddItem(new BMenuItem(item_path.Leaf(), msg), 0);
+			if (menu->FindItem(item_path.Leaf()))
+				continue;
+
+			BMessage* msg = new BMessage(M_ITEM_MESSAGE);
+			entry_ref ref;
+			::get_ref_for_path(item_path.Path(), &ref);
+			msg->AddRef("refs", &ref);
+			menu->AddItem(new BMenuItem(item_path.Leaf(), msg), 0);
+		}
 	}
-
-	err = find_directory(B_USER_SOUNDS_DIRECTORY, &path);
-	if (err == B_OK)
-		err = dir.SetTo(path.Path());
-	while (err == B_OK) {
-		err = dir.GetNextEntry(&entry, true);
-		if (entry.InitCheck() != B_NO_ERROR)
-			break;
-
-		entry.GetPath(&item_path);
-
-		if (menu->FindItem(item_path.Leaf()))
-			continue;
-
-		BMessage* msg = new BMessage(M_ITEM_MESSAGE);
-		entry_ref ref;
-
-		::get_ref_for_path(item_path.Path(), &ref);
-		msg->AddRef("refs", &ref);
-		menu->AddItem(new BMenuItem(item_path.Leaf(), msg), 0);
-	}
-
-	err = find_directory(B_COMMON_SOUNDS_DIRECTORY, &path);
-	if (err == B_OK)
-		err = dir.SetTo(path.Path());
-	while (err == B_OK) {
-		err = dir.GetNextEntry(&entry, true);
-		if (entry.InitCheck() != B_NO_ERROR)
-			break;
-
-		entry.GetPath(&item_path);
-
-		if (menu->FindItem(item_path.Leaf()))
-			continue;
-
-		BMessage* msg = new BMessage(M_ITEM_MESSAGE);
-		entry_ref ref;
-
-		::get_ref_for_path(item_path.Path(), &ref);
-		msg->AddRef("refs", &ref);
-		menu->AddItem(new BMenuItem(item_path.Leaf(), msg), 0);
-	}
-
 }
 
 

@@ -90,8 +90,9 @@ DefaultCatalog::DefaultCatalog(const entry_ref &catalogOwner, const char *langua
 		// search in data folders
 
 		directory_which which[] = {
+			B_USER_NONPACKAGED_DATA_DIRECTORY,
 			B_USER_DATA_DIRECTORY,
-			B_COMMON_DATA_DIRECTORY,
+			B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
 			B_SYSTEM_DATA_DIRECTORY
 		};
 
@@ -581,8 +582,9 @@ default_catalog_get_available_languages(BMessage* availableLanguages,
 	// search in data folders
 
 	directory_which which[] = {
+		B_USER_NONPACKAGED_DATA_DIRECTORY,
 		B_USER_DATA_DIRECTORY,
-		B_COMMON_DATA_DIRECTORY,
+		B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
 		B_SYSTEM_DATA_DIRECTORY
 	};
 

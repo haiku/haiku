@@ -25,7 +25,7 @@ VSTAddOn::VSTAddOn(image_id image)
 	BPath addons_dir;
 	fPluginsList.MakeEmpty();
 
-	find_directory(B_COMMON_ADDONS_DIRECTORY, &addons_dir);
+	find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY, &addons_dir);
 	addons_dir.Append(vst_subdir);
 	ScanPluginsFolders(addons_dir.Path(), true);
 
@@ -33,7 +33,11 @@ VSTAddOn::VSTAddOn(image_id image)
 	addons_dir.Append(vst_subdir);
 	ScanPluginsFolders(addons_dir.Path() ,true);
 
-	find_directory(B_BEOS_ADDONS_DIRECTORY, &addons_dir);
+	find_directory(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, &addons_dir);
+	addons_dir.Append(vst_subdir);	
+	ScanPluginsFolders(addons_dir.Path());
+
+	find_directory(B_SYSTEM_ADDONS_DIRECTORY, &addons_dir);
 	addons_dir.Append(vst_subdir);	
 	ScanPluginsFolders(addons_dir.Path());
 }

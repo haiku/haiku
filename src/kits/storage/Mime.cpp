@@ -326,9 +326,10 @@ get_named_icon(const char* name, uint8** _data, size_t* _size, type_code* _type)
 		return B_BAD_VALUE;
 
 	directory_which kWhich[] = {
+		B_USER_NONPACKAGED_DATA_DIRECTORY,
 		B_USER_DATA_DIRECTORY,
-		B_COMMON_DATA_DIRECTORY,
-		B_BEOS_DATA_DIRECTORY,
+		B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
+		B_SYSTEM_DATA_DIRECTORY,
 	};
 
 	status_t status = B_ENTRY_NOT_FOUND;

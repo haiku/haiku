@@ -48,9 +48,9 @@ static struct {
 } sPredefinedLinks[] = {
 	{ kGlobalSystemDirectory,		kSystemDirectory },
 	{ kGlobalBinDirectory,			kSystemBinDirectory },
-	{ kGlobalEtcDirectory,			kCommonEtcDirectory },
-	{ kGlobalTempDirectory,			kCommonTempDirectory },
-	{ kGlobalVarDirectory,			kCommonVarDirectory },
+	{ kGlobalEtcDirectory,			kSystemEtcDirectory },
+	{ kGlobalTempDirectory,			kSystemTempDirectory },
+	{ kGlobalVarDirectory,			kSystemVarDirectory },
 	{ kGlobalPackageLinksDirectory,	kSystemPackageLinksDirectory },
 	{NULL}
 };

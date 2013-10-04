@@ -39,7 +39,7 @@ bool addUserToGroup(char *user, char *group)
 {
 	char userPath[B_PATH_NAME_LENGTH], groupPath[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, userPath, sizeof(userPath));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, userPath, sizeof(userPath));
 	strcpy(groupPath, userPath);
 	strcat(userPath, "/domains/default/users/");
 	strcat(userPath, user);
@@ -68,7 +68,7 @@ bool removeUserFromGroup(char *user, char *group)
 	if (strcmp(group, "everyone") == 0)
 		return false;
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, userPath, sizeof(userPath));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, userPath, sizeof(userPath));
 	strcat(userPath, "/domains/default/groups/");
 	strcat(userPath, group);
 	strcat(userPath, "/");
@@ -86,7 +86,7 @@ bool isUserInGroup(char *user, char *group)
 	strlwr(user);
 	strlwr(group);
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, userPath, sizeof(userPath));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, userPath, sizeof(userPath));
 	strcat(userPath, "/domains/default/groups/");
 	strcat(userPath, group);
 	strcat(userPath, "/");
@@ -103,7 +103,7 @@ bool createUser(char *user, char *password)
 	// All usernames are saved in lowercase.
 	strlwr(user);
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 
@@ -131,7 +131,7 @@ bool createGroup(char *group)
 	// All usernames are saved in lowercase.
 	strlwr(group);
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/groups/");
 	strcat(path, group);
 
@@ -156,7 +156,7 @@ bool removeUser(char *user)
 	// All usernames are saved in lowercase.
 	strlwr(user);
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 
@@ -165,7 +165,7 @@ bool removeUser(char *user)
 
 	// Now remove all instances of this user from any groups to which
 	// it belonged.
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/groups");
 
 	// Scan the list of groups.  For each group, use removeFiles() to remove
@@ -190,7 +190,7 @@ bool removeGroup(char *group)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/groups/");
 	strcat(path, group);
 	strlwr(path);
@@ -205,7 +205,7 @@ bool setUserFullName(char *user, char *fullName)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -217,7 +217,7 @@ bool setUserDesc(char *user, char *desc)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -232,7 +232,7 @@ bool setUserPassword(char *user, char *password)
 	// Encrypt the password using MD5.
 	md5EncodeString(password, code);
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -244,7 +244,7 @@ bool setUserFlags(char *user, uint32 flags)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -256,7 +256,7 @@ bool setUserDaysToExpire(char *user, uint32 days)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -268,7 +268,7 @@ bool setUserHome(char *user, char *home)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -283,7 +283,7 @@ bool setUserGroup(char *user, char *group)
 	if (!addUserToGroup(user, group))
 		return false;
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -295,7 +295,7 @@ bool setGroupDesc(char *group, char *desc)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/groups/");
 	strcat(path, group);
 	strcat(path, "/.attrib");
@@ -308,7 +308,7 @@ bool getUserFullName(char *user, char *fullName, int bufSize)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -320,7 +320,7 @@ bool getUserDesc(char *user, char *desc, int bufSize)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -332,7 +332,7 @@ bool getUserPassword(char *user, char *password, int bufSize)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -344,7 +344,7 @@ bool getUserFlags(char *user, uint32 *flags)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -358,7 +358,7 @@ bool getUserDaysToExpire(char *user, uint32 *days)
 
 	days = 0;
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -370,7 +370,7 @@ bool getUserHome(char *user, char *home, int bufSize)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -382,7 +382,7 @@ bool getUserGroup(char *user, char *group, int bufSize)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users/");
 	strcat(path, user);
 	strlwr(path);
@@ -397,7 +397,7 @@ bool getGroupDesc(char *group, char *desc, int bufSize)
 	// All usernames are saved in lowercase.
 	strlwr(group);
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/groups/");
 	strcat(path, group);
 	strcat(path, "/.attrib");
@@ -471,7 +471,7 @@ DIR *OpenUsers()
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/users");
 
 	return opendir(path);
@@ -507,7 +507,7 @@ DIR *OpenGroups()
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/groups");
 
 	return opendir(path);
@@ -543,7 +543,7 @@ DIR *OpenGroup(char *group)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/groups/");
 	strcat(path, group);
 
@@ -581,7 +581,7 @@ bool isServerRecordingLogins(char *server)
 	char path[B_PATH_NAME_LENGTH];
 	char buffer[20];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/servers/");
 	strcat(path, server);
 	strlwr(path);
@@ -596,7 +596,7 @@ bool setServerRecordingLogins(char *server, bool recording)
 {
 	char path[B_PATH_NAME_LENGTH];
 
-	find_directory(B_COMMON_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
+	find_directory(B_SYSTEM_DIRECTORY, 0, false, path, sizeof(path));
 	strcat(path, "/domains/default/servers/");
 	strcat(path, server);
 	strlwr(path);

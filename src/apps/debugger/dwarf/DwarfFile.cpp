@@ -2748,8 +2748,12 @@ status_t
 DwarfFile::_GetDebugInfoPath(const char* debugFileName,
 	BString& _infoPath) const
 {
-	const directory_which dirLocations[] = { B_USER_CONFIG_DIRECTORY,
-		B_COMMON_DIRECTORY, B_SYSTEM_DIRECTORY };
+	const directory_which dirLocations[] = {
+		B_USER_NONPACKAGED_DEVELOP_DIRECTORY,
+		B_USER_DEVELOP_DIRECTORY,
+		B_SYSTEM_NONPACKAGED_DEVELOP_DIRECTORY,
+		B_SYSTEM_DEVELOP_DIRECTORY
+	};
 
 	// first, see if we have a relative match to our local directory
 	BPath basePath;
@@ -2780,7 +2784,7 @@ DwarfFile::_GetDebugInfoPath(const char* debugFileName,
 			return result;
 
 		if (strncmp(fName, basePath.Path(), strlen(basePath.Path())) == 0) {
-			_infoPath.SetToFormat("%s/develop/debug/%s", basePath.Path(),
+			_infoPath.SetToFormat("%s/debug/%s", basePath.Path(),
 				debugFileName);
 			entry.SetTo(_infoPath.String());
 			result = entry.InitCheck();

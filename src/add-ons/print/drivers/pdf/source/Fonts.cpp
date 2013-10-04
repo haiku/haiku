@@ -212,9 +212,10 @@ Fonts::CollectFonts()
 	BPath				path;
 	directory_which	*	which_dir;
 	directory_which		lookup_dirs[] = {
-		B_BEOS_FONTS_DIRECTORY,
-		// B_COMMON_FONTS_DIRECTORY,	// seem to be the same directory than B_USER_FONTS_DIRECTORY!!!
+		B_SYSTEM_FONTS_DIRECTORY,
+		B_SYSTEM_NONPACKAGED_FONTS_DIRECTORY,
 		B_USER_FONTS_DIRECTORY,
+		B_USER_NONPACKAGED_FONTS_DIRECTORY,
 		(directory_which) -1
 	};
 

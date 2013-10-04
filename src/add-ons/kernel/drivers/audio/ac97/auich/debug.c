@@ -44,7 +44,7 @@
 
 
 #if DEBUG > 0
-static const char *logfile = kCommonLogDirectory "/auich.log";
+static const char *logfile = kSystemLogDirectory "/auich.log";
 static sem_id loglock;
 #endif
 

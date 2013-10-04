@@ -27,7 +27,7 @@ bool gLogFunctionCalls = false;
 bool gLogFunctionReturns = false;
 bool gLogFunctionResults = false;
 
-static const char *sLogFilePath = kCommonLogDirectory "/" DRIVER_NAME ".log";
+static const char *sLogFilePath = kSystemLogDirectory "/" DRIVER_NAME ".log";
 static sem_id sLogLock;
 
 

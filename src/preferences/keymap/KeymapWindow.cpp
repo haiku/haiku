@@ -558,9 +558,10 @@ void
 KeymapWindow::_AddKeyboardLayouts(BMenu* menu)
 {
 	directory_which dataDirectories[] = {
+		B_USER_NONPACKAGED_DATA_DIRECTORY,
 		B_USER_DATA_DIRECTORY,
-		B_COMMON_DATA_DIRECTORY,
-		B_BEOS_DATA_DIRECTORY
+		B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
+		B_SYSTEM_DATA_DIRECTORY,
 	};
 
 	for (uint32 i = 0;
