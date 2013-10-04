@@ -190,7 +190,7 @@
 
 
 /*!
-	\fn float BGridLayout::MinRowHeight(int32 row) const
+	\fn float BGridLayout::MinRowHeight(int row) const
 	\brief Returns the minimum height for \a row.
 */
 

@@ -210,14 +210,25 @@
 
 
 /*!
-	\fn BCatalog* BLocaleRoster::_GetCatalog()
+	\fn BCatalog* BLocaleRoster::_GetCatalog(BCatalog* catalog,
+		vint32* catalogInitStatus)
 	\brief Get the current image catalog.
 
-	This function returns the catalog for the calling image (application,
-	add-on, or shared library). Note that it doesn't allow to specify a
-	fingerprint. The language will be selected from the user preferences.
+	This function initializes and returns  the catalog for the calling image
+	(application, add-on, or shared library). Note that it doesn't allow to
+	specify a fingerprint. The language will be selected from the user
+	preferences.
 
-	\warning This function needs the image to be lined with liblocalestub.a
+	This function is used by the Locale Kit macros. 
+
+	\warning This function needs the calling image to be linked with
+		liblocalestub.a
 
 	\returns The catalog, if it was loaded successfully.
+
+	\param catalog The catalog to load. The pointer location is used to identify
+		the image for which to load the catalog.
+	\param catalogInitStatus the state of the catalog. This will be set to true
+		on the first call for a given catalog, and if already true the function
+		will do nothing on subsequent calls.
 */

@@ -106,7 +106,8 @@
 
 
 /*!
-	\fn status_t BTimeZone::SetTo(const char* zoneCode)
+	\fn status_t BTimeZone::SetTo(const char* zoneCode,
+		const BLanguage* language = NULL)
 	\brief Set the timezone to another code.
 
 	\returns \c false if there was an error (likely due to an invalid

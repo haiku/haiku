@@ -264,7 +264,7 @@
 
 
 /*!
-	\fn int32 BCatalog::CountItems()
+	\fn int32 BCatalog::CountItems() const
 	\brief Gets the number of items in the catalog.
 
 	\returns the number of strings in the catalog or 0 on error.

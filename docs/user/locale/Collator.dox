@@ -209,8 +209,8 @@
 
 
 /*!
-	\fn bool BCollator::Greater(cosnt char* s1, const char* s2,
-		int8 strength) const
+	\fn bool BCollator::Greater(const char* s1, const char* s2,
+		int8 strength = B_COLLATE_DEFAULT) const
 	\brief Determine if a string is greater than another.
 
 	\note !Greater(s1, s2) is the same as GreaterOrEqual(s2, s1). This means
@@ -225,8 +225,8 @@
 
 
 /*!
-	\fn bool BCollator::GreaterOrEqual(cosnt char* s1, const char* s2,
-		int8 strength) const
+	\fn bool BCollator::GreaterOrEqual(const char* s1, const char* s2,
+		int8 strength = B_COLLATE_DEFAULT) const
 	\brief Determines if one string is greater than another.
 
 	\note !GreaterOrEqual(s1, s2) is the same as Greater(s2, s1).

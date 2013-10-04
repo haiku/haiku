@@ -280,7 +280,7 @@ topLayout->AddItem(nestedLayoutWithView);
 
 
 /*!
-	\fn bool BLayout::AncestorsVisible()
+	\fn bool BLayout::AncestorsVisible() const
 	\brief Get the visibility of the ancestors of this layout.
 
 	If a BLayout is connected to a BView, this will always return \c true.
@@ -352,7 +352,7 @@ topLayout->AddItem(nestedLayoutWithView);
 
 
 /*!
-	\fn BLayoutContext* BLayout::LayoutContext()
+	\fn BLayoutContext* BLayout::LayoutContext() const
 	\brief Returns the BLayoutContext this BLayout is currently operating in,
 		or \c NULL.
 */

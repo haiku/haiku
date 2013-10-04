@@ -154,7 +154,7 @@ Flower::Water(int amount)
 
 
 /*!
-	\fn status_t BLocker::InitCheck()
+	\fn status_t BLocker::InitCheck() const
 	\brief Check whether the locker has properly initialized
 	
 	\retval B_OK The semaphore has been properly initialized
