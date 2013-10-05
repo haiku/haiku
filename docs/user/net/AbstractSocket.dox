@@ -22,43 +22,32 @@
 	\brief Abstract interface for all socket connections.
 
 	BAbstractSocket provides a common interface for all socket-based
-	communication streams. These includes datagrams, TCP sockets and SSL
-	secure sockets.
+	communication streams. These include BDatagramSocket, BSocket,
+	BSecureSocket and BServerSocket.
 
 	BAbstractSocket implements common behavior between these different socket
 	types. This includes management of a BSD socket integer handle, knowledge
 	of the local and remote network addresses, as well as the connection state.
-	
-	New subclasses of BAbstractSocket may be created to allow communication
-	using more protocols.
 */
 
 /*!
 	\fn BAbstractSocket::BAbstractSocket()
 	\brief Default constructor.
 
-	The socket is disconnected and unbound, and the status is B_NO_INIT.
-	Use Bind or Connect to initialize it.
+	Creates an uninitialized socket in disconnected and unbound state.
 */
 
 /*!
 	\fn BAbstractSocket::BAbstractSocket(const BAbstractSocket& other)
 	\brief Copy constructor
 
-	There is no new connection to the server. Instead, data sent using several
-	copy of the class will be intermixed, and the first instance to read data
-	will steal it from the others.
-
-	This is probably not what you want, unless you work with datagrams. In
-	that case, the messages read and written are atomic and can be safely sent
-	and received from different places.
+	The copied object accesses the same underlying socket.
 */
 
 /*!
 	\fn BAbstractSocket::~BAbstractSocket()
 	\brief Destructor
 
-	Disconnects the socket by calling Disconnect().
 */
 
 /*!
