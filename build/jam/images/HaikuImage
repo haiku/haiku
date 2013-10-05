@@ -329,15 +329,18 @@ CopyDirectoryToHaikuImage home config settings Media
 	: [ FDirName $(HAIKU_TOP) data settings media dvb ]
 	: dvb : -x Jamfile ;
 
-# repository config files
+# repository config and cache files
 local repository ;
 for repository in $(HAIKU_REPOSITORIES) {
-	local target = [ on $(repository) return $(HAIKU_REPOSITORY_CONFIG_FILE) ] ;
+	local config = [ on $(repository) return $(HAIKU_REPOSITORY_CONFIG_FILE) ] ;
+	local cache = [ on $(repository) return $(HAIKU_REPOSITORY_CACHE_FILE) ] ;
 	if $(HAIKU_UPDATE_ALL_PACKAGES) {
-		HAIKU_INCLUDE_IN_IMAGE on $(target) = 1 ;
+		HAIKU_INCLUDE_IN_IMAGE on $(config) $(cache) = 1 ;
 	}
 	AddFilesToHaikuImage system settings package-repositories
-		: $(target) : $(repository:G=) ;
+		: $(config) : $(repository:G=) ;
+	AddFilesToHaikuImage system cache package-repositories
+		: $(cache) : $(repository:G=) ;
 }
 
 
