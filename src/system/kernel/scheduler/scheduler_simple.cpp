@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
@@ -25,6 +26,7 @@
 #include <timer.h>
 #include <util/Random.h>
 
+#include "RunQueue.h"
 #include "scheduler_common.h"
 #include "scheduler_tracing.h"
 
@@ -41,23 +43,23 @@ const bigtime_t kThreadQuantum = 3000;
 
 
 // The run queue. Holds the threads ready to run ordered by priority.
-static Thread *sRunQueue = NULL;
+static RunQueue<Thread, THREAD_MAX_SET_PRIORITY>* sRunQueue;
 
 
 static int
 dump_run_queue(int argc, char **argv)
 {
-	Thread *thread;
+	RunQueue<Thread, THREAD_MAX_SET_PRIORITY>::ConstIterator iterator;
+	iterator = sRunQueue->GetConstIterator();
 
-	thread = sRunQueue;
-	if (!thread)
+	if (!iterator.HasNext())
 		kprintf("Run queue is empty!\n");
 	else {
 		kprintf("thread    id      priority name\n");
-		while (thread) {
+		while (iterator.HasNext()) {
+			Thread *thread = iterator.Next();
 			kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 " %s\n", thread,
 				thread->id, thread->priority, thread->name);
-			thread = thread->queue_next;
 		}
 	}
 
@@ -73,24 +75,9 @@ simple_enqueue_in_run_queue(Thread *thread)
 {
 	thread->state = thread->next_state = B_THREAD_READY;
 
-	Thread *curr, *prev;
-	for (curr = sRunQueue, prev = NULL; curr
-			&& curr->priority >= thread->next_priority;
-			curr = curr->queue_next) {
-		if (prev)
-			prev = prev->queue_next;
-		else
-			prev = sRunQueue;
-	}
+	//T(EnqueueThread(thread, prev, curr));
 
-	T(EnqueueThread(thread, prev, curr));
-
-	thread->queue_next = curr;
-	if (prev)
-		prev->queue_next = thread;
-	else
-		sRunQueue = thread;
-
+	sRunQueue->PushBack(thread, thread->next_priority);
 	thread->next_priority = thread->priority;
 
 	// notify listeners
@@ -127,23 +114,8 @@ simple_set_thread_priority(Thread *thread, int32 priority)
 	NotifySchedulerListeners(&SchedulerListener::ThreadRemovedFromRunQueue,
 		thread);
 
-	// find thread in run queue
-	Thread *item, *prev;
-	for (item = sRunQueue, prev = NULL; item && item != thread;
-			item = item->queue_next) {
-		if (prev)
-			prev = prev->queue_next;
-		else
-			prev = sRunQueue;
-	}
-
-	ASSERT(item == thread);
-
-	// remove the thread
-	if (prev)
-		prev->queue_next = item->queue_next;
-	else
-		sRunQueue = item->queue_next;
+	// remove thread from run queue
+	sRunQueue->Remove(thread);
 
 	// set priority and re-insert
 	thread->priority = thread->next_priority = priority;
@@ -185,8 +157,8 @@ reschedule_event(timer *unused)
 static void
 simple_reschedule(void)
 {
-	Thread *oldThread = thread_get_current_thread();
-	Thread *nextThread, *prevThread;
+	Thread* oldThread = thread_get_current_thread();
+	Thread* nextThread;
 
 	// check whether we're only supposed to reschedule, if the current thread
 	// is idle
@@ -220,64 +192,48 @@ simple_reschedule(void)
 			break;
 	}
 
-	nextThread = sRunQueue;
-	prevThread = NULL;
+	while (true) {
+		// select thread with the biggest priority
+		nextThread = sRunQueue->PeekMaximum();
+		if (!nextThread)
+			panic("reschedule(): run queue is empty!\n");
 
-	while (nextThread) {
-		// select next thread from the run queue
-		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
 #if 0
-			if (oldThread == nextThread && nextThread->was_yielded) {
-				// ignore threads that called thread_yield() once
-				nextThread->was_yielded = false;
-				prevThread = nextThread;
-				nextThread = nextThread->queue_next;
-			}
+		if (oldThread == nextThread && nextThread->was_yielded) {
+			// ignore threads that called thread_yield() once
+			nextThread->was_yielded = false;
+			prevThread = nextThread;
+			nextThread = nextThread->queue_next;
+		}
 #endif
 
-			// always extract real time threads
-			if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
-				break;
+		// always extract real time threads
+		if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+			break;
 
-			// find next thread with lower priority
-			Thread *lowerNextThread = nextThread->queue_next;
-			Thread *lowerPrevThread = nextThread;
-			int32 priority = nextThread->priority;
+		// find thread with the second biggest priority
+		Thread* lowerNextThread = sRunQueue->PeekSecondMaximum();
 
-			while (lowerNextThread != NULL
-				&& priority == lowerNextThread->priority) {
-				lowerPrevThread = lowerNextThread;
-				lowerNextThread = lowerNextThread->queue_next;
-			}
-			// never skip last non-idle normal thread
-			if (lowerNextThread == NULL
-				|| lowerNextThread->priority == B_IDLE_PRIORITY)
-				break;
+		// never skip last non-idle normal thread
+		if (lowerNextThread == NULL
+			|| lowerNextThread->priority == B_IDLE_PRIORITY)
+			break;
 
-			int32 priorityDiff = priority - lowerNextThread->priority;
-			if (priorityDiff > 15)
-				break;
+		int32 priorityDiff = nextThread->priority - lowerNextThread->priority;
+		if (priorityDiff > 15)
+			break;
 
-			// skip normal threads sometimes
-			// (twice as probable per priority level)
-			if ((fast_random_value() >> (15 - priorityDiff)) != 0)
-				break;
+		// skip normal threads sometimes
+		// (twice as probable per priority level)
+		if ((fast_random_value() >> (15 - priorityDiff)) != 0)
+			break;
 
-			nextThread = lowerNextThread;
-			prevThread = lowerPrevThread;
-		}
+		nextThread = lowerNextThread;
 
 		break;
 	}
 
-	if (!nextThread)
-		panic("reschedule(): run queue is empty!\n");
-
-	// extract selected thread from the run queue
-	if (prevThread)
-		prevThread->queue_next = nextThread->queue_next;
-	else
-		sRunQueue = nextThread->queue_next;
+	sRunQueue->Remove(nextThread);
 
 	T(ScheduleThread(nextThread, oldThread));
 
@@ -375,6 +331,8 @@ static scheduler_ops kSimpleOps = {
 void
 scheduler_simple_init()
 {
+	sRunQueue = new(std::nothrow) RunQueue<Thread, THREAD_MAX_SET_PRIORITY>;
+
 	gScheduler = &kSimpleOps;
 
 	add_debugger_command_etc("run_queue", &dump_run_queue,
