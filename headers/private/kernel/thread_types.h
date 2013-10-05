@@ -17,6 +17,7 @@
 #include <heap.h>
 #include <ksignal.h>
 #include <lock.h>
+#include <RunQueueLink.h>
 #include <smp.h>
 #include <thread_defs.h>
 #include <timer.h>
@@ -409,7 +410,8 @@ private:
 };
 
 
-struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
+struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
+	RunQueueLinkImpl<Thread> {
 	int32			flags;			// summary of events relevant in interrupt
 									// handlers (signals pending, user debugging
 									// enabled, etc.)
