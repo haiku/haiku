@@ -332,9 +332,12 @@ CopyDirectoryToHaikuImage home config settings Media
 # repository config files
 local repository ;
 for repository in $(HAIKU_REPOSITORIES) {
+	local target = [ on $(repository) return $(HAIKU_REPOSITORY_CONFIG_FILE) ] ;
+	if $(HAIKU_UPDATE_ALL_PACKAGES) {
+		HAIKU_INCLUDE_IN_IMAGE on $(target) = 1 ;
+	}
 	AddFilesToHaikuImage system settings package-repositories
-		: [ on $(repository) return $(HAIKU_REPOSITORY_CONFIG_FILE) ]
-		: $(repository:G=) ;
+		: $(target) : $(repository:G=) ;
 }
 
 
