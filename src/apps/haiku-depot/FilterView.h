@@ -22,11 +22,13 @@ enum {
 
 class FilterView : public BGroupView {
 public:
-								FilterView(const Model& model);
+								FilterView();
 	virtual						~FilterView();
 
 	virtual void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
+
+	virtual void				AdoptModel(const Model& model);
 
 private:
 			BMenuField*			fShowField;

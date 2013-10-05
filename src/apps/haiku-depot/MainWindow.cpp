@@ -83,7 +83,7 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	BMenuBar* menuBar = new BMenuBar(B_TRANSLATE("Main Menu"));
 	_BuildMenu(menuBar);
 
-	fFilterView = new FilterView(fModel);
+	fFilterView = new FilterView();
 	fPackageListView = new PackageListView(fModel.Lock());
 	fPackageInfoView = new PackageInfoView(fModel.Lock(), this);
 
@@ -160,6 +160,7 @@ MainWindow::MessageReceived(BMessage* message)
 		{
 			fModelWorker = B_BAD_THREAD_ID;
 			_AdoptModel();
+			fFilterView->AdoptModel(fModel);
 			break;
 		}
 		case B_SIMPLE_DATA:

@@ -36,43 +36,18 @@ add_categories_to_menu(const CategoryList& categories, BMenu* menu)
 }
 
 
-FilterView::FilterView(const Model& model)
+FilterView::FilterView()
 	:
 	BGroupView("filter view")
 {
 	// Contruct category popup
 	BPopUpMenu* categoryMenu = new BPopUpMenu(B_TRANSLATE("Show"));
-	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All packages"),
-		new BMessage(MSG_CATEGORY_SELECTED)));
-	categoryMenu->AddItem(new BSeparatorItem());
-	add_categories_to_menu(model.Categories(), categoryMenu);
-	categoryMenu->AddItem(new BSeparatorItem());
-	add_categories_to_menu(model.UserCategories(), categoryMenu);
-	categoryMenu->AddItem(new BSeparatorItem());
-	add_categories_to_menu(model.ProgressCategories(), categoryMenu);
-
-	categoryMenu->ItemAt(0)->SetMarked(true);
 
 	fShowField = new BMenuField("category", B_TRANSLATE("Show:"),
 		categoryMenu);
 
 	// Construct repository popup
 	BPopUpMenu* repositoryMenu = new BPopUpMenu(B_TRANSLATE("Depot"));
-	repositoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All depots"),
-		new BMessage(MSG_DEPOT_SELECTED)));
-	repositoryMenu->ItemAt(0)->SetMarked(true);
-
-	repositoryMenu->AddItem(new BSeparatorItem());
-
-	const DepotList& depots = model.Depots();
-	for (int i = 0; i < depots.CountItems(); i++) {
-		const DepotInfo& depot = depots.ItemAtFast(i);
-		BMessage* message = new BMessage(MSG_DEPOT_SELECTED);
-		message->AddString("name", depot.Name());
-		BMenuItem* item = new BMenuItem(depot.Name(), message);
-		repositoryMenu->AddItem(item);
-	}
-
 	fRepositoryField = new BMenuField("repository", B_TRANSLATE("Depot:"),
 		repositoryMenu);
 
@@ -134,4 +109,41 @@ FilterView::MessageReceived(BMessage* message)
 			BGroupView::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+FilterView::AdoptModel(const Model& model)
+{
+	BMenu* repositoryMenu = fRepositoryField->Menu();
+		repositoryMenu->RemoveItems(0, repositoryMenu->CountItems(), true);
+
+	repositoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All depots"),
+		new BMessage(MSG_DEPOT_SELECTED)));
+	repositoryMenu->ItemAt(0)->SetMarked(true);
+
+	repositoryMenu->AddItem(new BSeparatorItem());
+
+	const DepotList& depots = model.Depots();
+	for (int i = 0; i < depots.CountItems(); i++) {
+		const DepotInfo& depot = depots.ItemAtFast(i);
+		BMessage* message = new BMessage(MSG_DEPOT_SELECTED);
+		message->AddString("name", depot.Name());
+		BMenuItem* item = new BMenuItem(depot.Name(), message);
+		repositoryMenu->AddItem(item);
+	}
+
+	BMenu* categoryMenu = fShowField->Menu();
+	categoryMenu->RemoveItems(0, categoryMenu->CountItems(), true);
+
+	categoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All packages"),
+		new BMessage(MSG_CATEGORY_SELECTED)));
+	categoryMenu->AddItem(new BSeparatorItem());
+	add_categories_to_menu(model.Categories(), categoryMenu);
+	categoryMenu->AddItem(new BSeparatorItem());
+	add_categories_to_menu(model.UserCategories(), categoryMenu);
+	categoryMenu->AddItem(new BSeparatorItem());
+	add_categories_to_menu(model.ProgressCategories(), categoryMenu);
+
+	categoryMenu->ItemAt(0)->SetMarked(true);
 }
