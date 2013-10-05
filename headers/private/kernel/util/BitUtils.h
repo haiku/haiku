@@ -14,7 +14,7 @@
 
 // http://graphics.stanford.edu/~seander/bithacks.html
 static inline uint32
-nextPowerOf2(uint32 v)
+next_power_of_2(uint32 v)
 {
 	v--;
 	v |= v >> 1;
@@ -30,7 +30,7 @@ nextPowerOf2(uint32 v)
 
 // http://graphics.stanford.edu/~seander/bithacks.html
 static inline uint32
-countSetBits(uint32 v)
+count_set_bits(uint32 v)
 {
 	v = v - ((v >> 1) & 0x55555555);
 	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
