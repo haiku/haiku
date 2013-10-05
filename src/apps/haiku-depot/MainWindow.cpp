@@ -422,6 +422,8 @@ MainWindow::_RefreshPackageList()
 		// is available in. The above map is used to ensure that in such
 		// cases we consolidate the information, rather than displaying
 		// duplicates
+
+	PackageInfoMap remotePackages;
 	for (int32 i = 0; i < packages.CountItems(); i++) {
 		BSolverPackage* package = packages.ItemAt(i);
 		const BPackageInfo& repoPackageInfo = package->Info();
@@ -458,6 +460,7 @@ MainWindow::_RefreshPackageList()
 		if (dynamic_cast<BPackageManager::RemoteRepository*>(repository)
 				!= NULL) {
 			depots[repository->Name()].AddPackage(modelInfo);
+			remotePackages[modelInfo->Title()] = modelInfo;
 		} else {
 			const char* installationLocation = NULL;
 			if (repository == static_cast<const BSolverRepository*>(
@@ -478,6 +481,24 @@ MainWindow::_RefreshPackageList()
 	BAutolock lock(fModel.Lock());
 
 	fModel.Clear();
+
+	// filter remote packages from the found list
+	// any packages remaining will be locally installed packages
+	// that weren't acquired from a repository
+	for (PackageInfoMap::iterator it = remotePackages.begin();
+		it != remotePackages.end(); ++it) {
+		foundPackages.erase(it->first);
+	}
+
+	if (!foundPackages.empty()) {
+		BString repoName = B_TRANSLATE("Local");
+		depots[repoName] = DepotInfo(repoName);
+		DepotInfoMap::iterator depot = depots.find(repoName);
+		for (PackageInfoMap::iterator it = foundPackages.begin();
+			it != foundPackages.end(); ++it) {
+			depot->second.AddPackage(it->second);
+		}
+	}
 
 	for (DepotInfoMap::iterator it = depots.begin(); it != depots.end();
 		++it) {
