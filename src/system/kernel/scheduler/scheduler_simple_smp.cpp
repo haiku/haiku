@@ -471,7 +471,7 @@ static scheduler_ops kSimpleSMPOps = {
 // #pragma mark -
 
 
-void
+status_t
 scheduler_simple_smp_init()
 {
 	sCPUCount = smp_get_num_cpus();
@@ -480,4 +480,6 @@ scheduler_simple_smp_init()
 
 	add_debugger_command_etc("run_queue", &dump_run_queue,
 		"List threads in run queue", "\nLists threads in run queue", 0);
+
+	return B_OK;
 }

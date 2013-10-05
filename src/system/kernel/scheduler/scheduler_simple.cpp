@@ -328,13 +328,23 @@ static scheduler_ops kSimpleOps = {
 // #pragma mark -
 
 
-void
+status_t
 scheduler_simple_init()
 {
 	sRunQueue = new(std::nothrow) RunQueue<Thread, THREAD_MAX_SET_PRIORITY>;
+	if (sRunQueue == NULL)
+		return B_NO_MEMORY;
+
+	status_t result = sRunQueue->GetInitStatus();
+	if (result != B_OK) {
+		delete sRunQueue;
+		return result;
+	}
 
 	gScheduler = &kSimpleOps;
 
 	add_debugger_command_etc("run_queue", &dump_run_queue,
 		"List threads in run queue", "\nLists threads in run queue", 0);
+
+	return B_OK;
 }

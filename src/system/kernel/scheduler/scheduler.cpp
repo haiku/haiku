@@ -67,18 +67,22 @@ scheduler_init(void)
 	dprintf("scheduler_init: found %" B_PRId32 " logical cpu%s\n", cpuCount,
 		cpuCount != 1 ? "s" : "");
 
+	status_t result;
 	if (cpuCount > 1) {
 #if 0
 		dprintf("scheduler_init: using affine scheduler\n");
-		scheduler_affine_init();
+		result = scheduler_affine_init();
 #else
 		dprintf("scheduler_init: using simple SMP scheduler\n");
-		scheduler_simple_smp_init();
+		result = scheduler_simple_smp_init();
 #endif
 	} else {
 		dprintf("scheduler_init: using simple scheduler\n");
-		scheduler_simple_init();
+		result = scheduler_simple_init();
 	}
+
+	if (result != B_OK)
+		panic("scheduler_init: failed to initialize scheduler\n");
 
 	// Disable rescheduling until the basic kernel initialization is done and
 	// CPUs are ready to enable interrupts.

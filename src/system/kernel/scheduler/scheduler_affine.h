@@ -7,7 +7,7 @@
 #define KERNEL_SCHEDULER_AFFINE_H
 
 
-void scheduler_affine_init();
+status_t scheduler_affine_init();
 
 
 #endif	// KERNEL_SCHEDULER_AFFINE_H

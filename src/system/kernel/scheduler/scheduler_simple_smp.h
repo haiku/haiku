@@ -6,7 +6,7 @@
 #define KERNEL_SCHEDULER_SIMPLE_SMP_H
 
 
-void scheduler_simple_smp_init();
+status_t scheduler_simple_smp_init();
 
 
 #endif	// KERNEL_SCHEDULER_SIMPLE_SMP_H

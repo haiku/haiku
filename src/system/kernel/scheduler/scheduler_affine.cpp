@@ -556,7 +556,7 @@ static scheduler_ops kAffineOps = {
 // #pragma mark -
 
 
-void
+status_t
 scheduler_affine_init()
 {
 	gScheduler = &kAffineOps;
@@ -564,4 +564,6 @@ scheduler_affine_init()
 	memset(sRunQueueSize, 0, sizeof(sRunQueueSize));
 	add_debugger_command_etc("run_queue", &dump_run_queue,
 		"List threads in run queue", "\nLists threads in run queue", 0);
+
+	return B_OK;
 }

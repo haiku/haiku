@@ -6,7 +6,7 @@
 #define KERNEL_SCHEDULER_SIMPLE_H
 
 
-void scheduler_simple_init();
+status_t scheduler_simple_init();
 
 
 #endif	// KERNEL_SCHEDULER_SIMPLE_H
