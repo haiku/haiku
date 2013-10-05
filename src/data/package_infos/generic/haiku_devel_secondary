@@ -1,5 +1,5 @@
 name			haiku_%HAIKU_SECONDARY_PACKAGING_ARCH%_devel
-version			R1~alpha4_pm-1
+version			%HAIKU_VERSION%
 architecture	HAIKU_PACKAGING_ARCH
 summary			"The Haiku base system %HAIKU_SECONDARY_PACKAGING_ARCH% secondary architecture development files"
 
@@ -14,10 +14,10 @@ copyrights		"2001-2013 Haiku, Inc. et al"
 licenses		"MIT"
 
 provides {
-	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH%_devel = R1~alpha4_pm-1 compat >= R1~alpha1
+	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH%_devel = %HAIKU_VERSION% compat >= R1~alpha1
 }
 
 requires {
-	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% == R1~alpha4_pm-1 base
-	haiku_devel == R1~alpha4_pm-1
+	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% == %HAIKU_VERSION% base
+	haiku_devel == %HAIKU_VERSION%
 }

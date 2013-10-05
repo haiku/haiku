@@ -1,5 +1,5 @@
 name			haiku_loader
-version			R1~alpha4_pm-1
+version			%HAIKU_VERSION%
 architecture	%HAIKU_PACKAGING_ARCH%
 summary			"The Haiku boot loader"
 description		"The Haiku boot loader."
@@ -11,7 +11,7 @@ copyrights		"2001-2013 Haiku, Inc. et al"
 licenses		"MIT"
 
 provides {
-	haiku_loader=R1~alpha4_pm-1
+	haiku_loader=%HAIKU_VERSION%
 }
 
 requires {

@@ -1,5 +1,5 @@
 name 			haiku_%HAIKU_SECONDARY_PACKAGING_ARCH%
-version			R1~alpha4_pm-1
+version			%HAIKU_VERSION%
 architecture	x86_gcc2
 summary			"The Haiku base system %HAIKU_SECONDARY_PACKAGING_ARCH% secondary architecture support"
 
@@ -17,7 +17,7 @@ licenses {
 }
 
 provides {
-	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% = R1~alpha4_pm-1 compat>=R1~alpha1
+	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% = %HAIKU_VERSION% compat>=R1~alpha1
 }
 
 requires {

@@ -1,5 +1,5 @@
 name 			haiku
-version			R1~alpha4_pm-1
+version			%HAIKU_VERSION%
 architecture	arm
 summary			"The Haiku base system"
 
@@ -16,7 +16,7 @@ licenses {
 }
 
 provides {
-	haiku=R1~alpha4_pm-1 compat>=R1~alpha1
+	haiku=%HAIKU_VERSION% compat>=R1~alpha1
 	coreutils = 8.4 compat >= 0
 	diffutils = 2.8.1 compat >= 0
 	findutils = 4.2.33 compat >= 0
