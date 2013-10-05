@@ -110,7 +110,7 @@ RemotePackageRepository HaikuPorts
 	subversion_devel-1.6.18-6
 	tar-1.26-6
 	texinfo-4.13a-7
-	vision-0.9.7.r944-1
+	vision-0.9.7.r946-1
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-3
 	yasm-1.2.0-3
