@@ -418,9 +418,8 @@ rule DefineBuildProfile name : type : path {
 		case "update-all" : {
 			JAM_TARGETS = $(buildTarget) ;
 			SetUpdateHaikuImageOnly 1 ;
-			HAIKU_PACKAGES_UPDATE_ONLY = 1 ;
 			HAIKU_INCLUDE_IN_IMAGE = 1 ;
-			HAIKU_INCLUDE_IN_PACKAGES = 1 ;
+			HAIKU_UPDATE_ALL_PACKAGES = 1 ;
 		}
 
 		case "update-packages" : {
