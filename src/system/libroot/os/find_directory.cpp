@@ -172,6 +172,14 @@ static const char *kUserDirectories[] = {
 	HOME CONFIG NON_PACKAGED "/develop",
 	HOME CONFIG "/develop",
 	HOME CONFIG "/documentation",
+	HOME CONFIG "/servers",
+	HOME CONFIG "/apps",
+	HOME CONFIG "/bin",
+	HOME CONFIG "/preferences",
+	HOME CONFIG "/settings/etc",
+	HOME CONFIG "/var/log",
+	HOME CONFIG "/var/spool",
+	HOME CONFIG "/var",
 };
 
 
@@ -373,6 +381,14 @@ __find_directory(directory_which which, dev_t device, bool createIt,
 		case B_USER_NONPACKAGED_LIB_DIRECTORY:
 		case B_USER_NONPACKAGED_HEADERS_DIRECTORY:
 		case B_USER_NONPACKAGED_DEVELOP_DIRECTORY:
+		case B_USER_SERVERS_DIRECTORY:
+		case B_USER_APPS_DIRECTORY:
+		case B_USER_BIN_DIRECTORY:
+		case B_USER_PREFERENCES_DIRECTORY:
+		case B_USER_ETC_DIRECTORY:
+		case B_USER_LOG_DIRECTORY:
+		case B_USER_SPOOL_DIRECTORY:
+		case B_USER_VAR_DIRECTORY:
 			templatePath = kUserDirectories[which - B_USER_DIRECTORY];
 			break;
 
