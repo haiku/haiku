@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	1120214775
+1	slovak	x-vnd.Haiku-libtracker	903081194
 common	B_COMMON_DIRECTORY		spoločné
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
@@ -246,7 +246,6 @@ Mount settings…	SettingsView		Nastavenia pripojenia…
 Edit name	InfoWindow		Upraviť názov
 Could not open \"%name\" (%error). 	FSUtils		Nebolo možné otvoriť \"%name\" (%error). 
 Paste	ContainerWindow		Vložiť
-optional	/boot/optional		voliteľné
 Modified:	InfoWindow		Zmenené:
 Error moving \"%name\".	FSUtils		Chyba pri presúvaní „%name“.
 TiB	WidgetAttributeText		TiB

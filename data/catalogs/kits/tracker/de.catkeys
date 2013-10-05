@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1762695842
+1	german	x-vnd.Haiku-libtracker	1545562261
 common	B_COMMON_DIRECTORY		Allgemein
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
@@ -250,7 +250,6 @@ Mount settings…	SettingsView		Einhänge-Einstellungen…
 Edit name	InfoWindow		Umbenennen
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" konnte nicht geöffnet werden (%error).
 Paste	ContainerWindow		Einfügen
-optional	/boot/optional		Optional
 Modified:	InfoWindow		Geändert:
 Error moving \"%name\".	FSUtils		Fehler beim Verschieben von \"%name\".
 TiB	WidgetAttributeText		TiB

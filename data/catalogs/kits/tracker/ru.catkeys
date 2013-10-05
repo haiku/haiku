@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1762695842
+1	russian	x-vnd.Haiku-libtracker	1545562261
 common	B_COMMON_DIRECTORY		Общие
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
@@ -250,7 +250,6 @@ Mount settings…	SettingsView		Настройка подключения дис
 Edit name	InfoWindow		Переименовать
 Could not open \"%name\" (%error). 	FSUtils		Невозможно открыть \"%name\" (%error). 
 Paste	ContainerWindow		Вставить
-optional	/boot/optional		Опциональные
 Modified:	InfoWindow		Изменён:
 Error moving \"%name\".	FSUtils		Ошибка при перемещении \"%name\".
 TiB	WidgetAttributeText		ТБ

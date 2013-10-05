@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	2487471721
+1	dutch; flemish	x-vnd.Haiku-libtracker	2270338140
 common	B_COMMON_DIRECTORY		algemeen
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icoonweergave
@@ -247,7 +247,6 @@ Mount settings…	SettingsView		Betrek-instellingen...
 Edit name	InfoWindow		Naam aanpassen
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" kon niet geopend worden (%error).
 Paste	ContainerWindow		Plakken
-optional	/boot/optional		optioneel
 Modified:	InfoWindow		Gewijzigd:
 Error moving \"%name\".	FSUtils		Fout bij verplaatsing van \"%name\".
 TiB	WidgetAttributeText		TiB

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	847097272
+1	lithuanian	x-vnd.Haiku-libtracker	629963691
 common	B_COMMON_DIRECTORY		Bendra
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
@@ -247,7 +247,6 @@ Mount settings…	SettingsView		Tomų prijungimo nuostatos…
 Edit name	InfoWindow		Pervardinti
 Could not open \"%name\" (%error). 	FSUtils		Nepavyko atverti „%name“ (%error).
 Paste	ContainerWindow		Įdėti
-optional	/boot/optional		Papildoma
 Modified:	InfoWindow		Modifikavimo data:
 Error moving \"%name\".	FSUtils		Klaida perkeliant „%name“.
 TiB	WidgetAttributeText		TiB

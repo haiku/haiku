@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-libtracker	3225080926
+1	hindi	x-vnd.Haiku-libtracker	3007947345
 common	B_COMMON_DIRECTORY		सामान्य
 OK	WidgetAttributeText		ठीक है
 Icon view	VolumeWindow		चिह्न दृश्य
@@ -233,7 +233,6 @@ Mount settings…	SettingsView		माउंट सेटिंग ...
 Edit name	InfoWindow		नाम संपादित करें
 Could not open \"%name\" (%error). 	FSUtils		खुल नहीं सका \"%name\". (%error). 
 Paste	ContainerWindow		चिपकाना
-optional	/boot/optional		वैकल्पिक
 Modified:	InfoWindow		संशोधित:
 Error moving \"%name\".	FSUtils		जाने में त्रुटि \"%name\".
 TiB	WidgetAttributeText		ती बी

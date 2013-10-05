@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1762695842
+1	french	x-vnd.Haiku-libtracker	1545562261
 common	B_COMMON_DIRECTORY		commun
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
@@ -250,7 +250,6 @@ Mount settings…	SettingsView		Réglages du montage…
 Edit name	InfoWindow		Éditer le nom
 Could not open \"%name\" (%error). 	FSUtils		Impossible d'ouvrir « %name » (%error). 
 Paste	ContainerWindow		Coller
-optional	/boot/optional		optionnel
 Modified:	InfoWindow		Modifié :
 Error moving \"%name\".	FSUtils		Erreur au déplacement de « %name ».
 TiB	WidgetAttributeText		Tio

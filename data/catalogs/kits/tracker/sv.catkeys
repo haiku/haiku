@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1762695842
+1	swedish	x-vnd.Haiku-libtracker	1545562261
 common	B_COMMON_DIRECTORY		gemensam
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
@@ -250,7 +250,6 @@ Mount settings…	SettingsView		Monterings inställningar...
 Edit name	InfoWindow		Redigera namn
 Could not open \"%name\" (%error). 	FSUtils		Kunde inte öppna "%name" (%error).
 Paste	ContainerWindow		Klistra in
-optional	/boot/optional		valfri
 Modified:	InfoWindow		Modifierad:
 Error moving \"%name\".	FSUtils		Fel vid flytt av "%name".
 TiB	WidgetAttributeText		TiB

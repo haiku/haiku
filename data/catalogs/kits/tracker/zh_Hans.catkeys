@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	847097272
+1	english	x-vnd.Haiku-libtracker	629963691
 common	B_COMMON_DIRECTORY		常用
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
@@ -247,7 +247,6 @@ Mount settings…	SettingsView		挂载设置...
 Edit name	InfoWindow		编辑名称
 Could not open \"%name\" (%error). 	FSUtils		无法打开 \"%name\"（%error）。
 Paste	ContainerWindow		粘贴
-optional	/boot/optional		可选
 Modified:	InfoWindow		修改：
 Error moving \"%name\".	FSUtils		移动 \"%name\" 出错。
 TiB	WidgetAttributeText		TiB

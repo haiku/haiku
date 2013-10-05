@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	1762695842
+1	hungarian	x-vnd.Haiku-libtracker	1545562261
 common	B_COMMON_DIRECTORY		Közös
 OK	WidgetAttributeText		Rendben
 Icon view	VolumeWindow		Ikon nézet
@@ -250,7 +250,6 @@ Mount settings…	SettingsView		Csatolási beállítások…
 Edit name	InfoWindow		Név szerkesztése
 Could not open \"%name\" (%error). 	FSUtils		Nem sikerült megnyitni: %name\n\t%error
 Paste	ContainerWindow		Beillesztés
-optional	/boot/optional		Választható
 Modified:	InfoWindow		Módosítva:
 Error moving \"%name\".	FSUtils		Hiba történt a fájl (%name) mozgatása közben.
 TiB	WidgetAttributeText		TiB

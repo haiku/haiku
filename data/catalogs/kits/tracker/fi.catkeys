@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1762695842
+1	finnish	x-vnd.Haiku-libtracker	1545562261
 common	B_COMMON_DIRECTORY		yhteinen
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
@@ -250,7 +250,6 @@ Mount settings…	SettingsView		Liittämisasetukset...
 Edit name	InfoWindow		Muokkaa nimeä
 Could not open \"%name\" (%error). 	FSUtils		Kohteen ”%name” avaus epäonnistui (%error)
 Paste	ContainerWindow		Liitä
-optional	/boot/optional		valinnainen
 Modified:	InfoWindow		Muokattu:
 Error moving \"%name\".	FSUtils		Virhe siirrettäessä kohdetta ”%name”.
 TiB	WidgetAttributeText		tebitavua

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	487315638
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	270182057
 common	B_COMMON_DIRECTORY		κοινό
 OK	WidgetAttributeText		Εντάξει
 Icon view	VolumeWindow		Προβολή εικονιδίου
@@ -233,7 +233,6 @@ Mount settings…	SettingsView		Ρυθμίσεις προσάρτησης...
 Edit name	InfoWindow		Επεξεργασία ονόματος
 Could not open \"%name\" (%error). 	FSUtils		Αδυναμία ανοίγματος του \"%name\" (%error). 
 Paste	ContainerWindow		Επικόλληση
-optional	/boot/optional		προαιρετικό
 Modified:	InfoWindow		Τροποποιήθηκε:
 Error moving \"%name\".	FSUtils		Σφάλμα κατα τη μετακίνηση του \"%name\".
 TiB	WidgetAttributeText		TiB

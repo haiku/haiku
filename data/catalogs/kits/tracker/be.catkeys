@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	1762695842
+1	belarusian	x-vnd.Haiku-libtracker	1545562261
 common	B_COMMON_DIRECTORY		агульны
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
@@ -250,7 +250,6 @@ Mount settings…	SettingsView		Наладкі мантавання…
 Edit name	InfoWindow		Правіць імя
 Could not open \"%name\" (%error). 	FSUtils		Нельга адкрыць \"%name\" (%error). 
 Paste	ContainerWindow		Уставіць
-optional	/boot/optional		дадатковы
 Modified:	InfoWindow		Зменены:
 Error moving \"%name\".	FSUtils		Памылка пры перамяшчэнні \"%name\".
 TiB	WidgetAttributeText		ЦіБ

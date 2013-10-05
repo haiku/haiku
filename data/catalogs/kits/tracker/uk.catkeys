@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	571939486
+1	ukrainian	x-vnd.Haiku-libtracker	354805905
 common	B_COMMON_DIRECTORY		common
 OK	WidgetAttributeText		Гаразд
 Icon view	VolumeWindow		У вигляді іконок
@@ -235,7 +235,6 @@ Mount settings…	SettingsView		Налаштування монтування…
 Edit name	InfoWindow		Редагувати ім'я
 Could not open \"%name\" (%error). 	FSUtils		Не вдалося відкрити \"%name\" (%error).
 Paste	ContainerWindow		Вставити
-optional	/boot/optional		optional
 Modified:	InfoWindow		Змінений:
 Error moving \"%name\".	FSUtils		Помилка переміщення\"%name\".
 TiB	WidgetAttributeText		TiB
