@@ -840,6 +840,9 @@ rule AddPackagesAndRepositoryVariablesToContainerScript script : container
 	AddVariableToScript $(script) : resolvePackageDependencies
 		: $(resolvePackageDependencies) ;
 
+	AddVariableToScript $(script) : updateAllPackages
+		: $(HAIKU_UPDATE_ALL_PACKAGES) ;
+
 	# Add variable "systemPackages"  with the packages copied/updated.
 	local allPackages = [ on $(container) return $(HAIKU_PACKAGES_IN_IMAGE) ] ;
 	if $(updateOnly) && ! [ IncludeAllTargetsInContainer $(container) ] {
