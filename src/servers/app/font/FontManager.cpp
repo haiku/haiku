@@ -1145,10 +1145,12 @@ FontManager::AttachUser(uid_t userID)
 	// TODO: actually, find_directory() cannot know which user ID we want here
 	// TODO: avoids user fonts in safe mode
 	BPath path;
-	if (find_directory(B_USER_FONTS_DIRECTORY, &path, true) != B_OK)
-		return;
-
-	_AddPath(path.Path());
+	if (find_directory(B_USER_FONTS_DIRECTORY, &path, true) == B_OK)
+		_AddPath(path.Path());
+	if (find_directory(B_USER_NONPACKAGED_FONTS_DIRECTORY, &path, true)
+			== B_OK) {
+		_AddPath(path.Path());
+	}
 #endif
 }
 
