@@ -9,6 +9,7 @@ vendor			"Haiku Project"
 
 copyrights		"2001-2013 Haiku, Inc. et al"
 licenses		"MIT"
+flags			system_package
 
 provides {
 	haiku_loader=%HAIKU_VERSION%

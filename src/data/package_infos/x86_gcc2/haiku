@@ -1,6 +1,7 @@
 name 			haiku
 version			%HAIKU_VERSION%
 architecture	x86_gcc2
+flags			system
 summary			"The Haiku base system"
 
 description		"The Haiku base system includes all system core software, like
@@ -14,6 +15,7 @@ licenses {
 	MIT
 	"GNU LGPL v2.1"
 }
+flags			system_package
 
 provides {
 	haiku=%HAIKU_VERSION% compat>=R1~alpha1
