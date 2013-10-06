@@ -227,31 +227,14 @@ PackageManager::GetPackageState(const PackageInfo& package)
 PackageActionList
 PackageManager::GetPackageActions(PackageInfoRef package, Model* model)
 {
-	Init(B_ADD_INSTALLED_REPOSITORIES | B_ADD_REMOTE_REPOSITORIES);
 	PackageActionList actionList;
-
-	bool installed = false;
-	bool systemPackage = false;
-	BSolverPackage* solverPackage = _GetSolverPackage(package);
-	if (solverPackage == NULL)
+	if (package->IsSystemPackage())
 		return actionList;
 
-	const BSolverRepository* repository = solverPackage->Repository();
-	if (repository == static_cast<const BSolverRepository*>(
-			SystemRepository())) {
-		installed = true;
-//		systemPackage = true;
-// TODO: Being installed in system doesn't make it a system package.
-	} else if (repository == static_cast<const BSolverRepository*>(
-			HomeRepository())) {
-		installed = true;
-	}
-
-	if (installed) {
-		if (!systemPackage) {
-			actionList.Add(PackageActionRef(new UninstallPackageAction(
-				package, model), true));
-		}
+	int32 state = package->State();
+	if (state == ACTIVATED || state == INSTALLED) {
+		actionList.Add(PackageActionRef(new UninstallPackageAction(
+			package, model), true));
 	} else {
 		actionList.Add(PackageActionRef(new InstallPackageAction(package,
 				model),	true));

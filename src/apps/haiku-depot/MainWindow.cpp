@@ -55,7 +55,6 @@ using BManager::BPrivate::BFatalErrorException;
 
 
 typedef std::map<BString, PackageInfoRef> PackageInfoMap;
-typedef std::map<BString, BObjectList<PackageInfo> > PackageLocationMap;
 typedef std::map<BString, DepotInfo> DepotInfoMap;
 
 
@@ -414,7 +413,6 @@ MainWindow::_RefreshPackageList()
 	if (packages.IsEmpty())
 		return;
 
-	PackageLocationMap packageLocations;
 	PackageInfoMap foundPackages;
 		// if a given package is installed locally, we will potentially
 		// get back multiple entries, one for each local installation
@@ -422,8 +420,16 @@ MainWindow::_RefreshPackageList()
 		// is available in. The above map is used to ensure that in such
 		// cases we consolidate the information, rather than displaying
 		// duplicates
-
 	PackageInfoMap remotePackages;
+		// any package that we find in a remote repository goes in this map.
+		// this is later used to discern which packages came from a local
+		// installation only, as those must be handled a bit differently
+		// upon uninstallation, since we'd no longer be able to pull them
+		// down remotely.
+	PackageInfoMap systemPackages;
+		// any packages flagged as a system package are added to this map.
+		// such packages cannot be uninstalled, nor can any of their deps.
+
 	for (int32 i = 0; i < packages.CountItems(); i++) {
 		BSolverPackage* package = packages.ItemAt(i);
 		const BPackageInfo& repoPackageInfo = package->Info();
@@ -445,7 +451,8 @@ MainWindow::_RefreshPackageList()
 					repoPackageInfo.Version().ToString(),
 					PublisherInfo(BitmapRef(), publisherName,
 					"", publisherURL), repoPackageInfo.Summary(),
-					repoPackageInfo.Description(), ""),
+					repoPackageInfo.Description(), "",
+					repoPackageInfo.Flags()),
 				true);
 
 			if (modelInfo.Get() == NULL)
@@ -462,20 +469,19 @@ MainWindow::_RefreshPackageList()
 			depots[repository->Name()].AddPackage(modelInfo);
 			remotePackages[modelInfo->Title()] = modelInfo;
 		} else {
-			const char* installationLocation = NULL;
 			if (repository == static_cast<const BSolverRepository*>(
 					manager.SystemRepository())) {
-				installationLocation = "system";
+				modelInfo->AddInstallationLocation(
+					B_PACKAGE_INSTALLATION_LOCATION_SYSTEM);
 			} else if (repository == static_cast<const BSolverRepository*>(
 					manager.HomeRepository())) {
-				installationLocation = "home";
-			}
-
-			if (installationLocation != NULL) {
-				packageLocations[installationLocation].AddItem(
-					modelInfo.Get());
+				modelInfo->AddInstallationLocation(
+					B_PACKAGE_INSTALLATION_LOCATION_HOME);
 			}
 		}
+
+		if (modelInfo->IsSystemPackage())
+			systemPackages[modelInfo->Title()] = modelInfo;
 	}
 
 	BAutolock lock(fModel.Lock());
@@ -505,14 +511,11 @@ MainWindow::_RefreshPackageList()
 		fModel.AddDepot(it->second);
 	}
 
-	for (PackageLocationMap::iterator it = packageLocations.begin();
-		it != packageLocations.end(); ++it) {
-		for (int32 i = 0; i < it->second.CountItems(); i++) {
-			fModel.SetPackageState(it->second.ItemAt(i), ACTIVATED);
-				// TODO: indicate the specific installation location
-				// and verify that the package is in fact activated
-				// by querying the package roster
-		}
+	for (PackageInfoMap::iterator it = systemPackages.begin();
+		it != systemPackages.end(); ++it) {
+		// TODO: need to resolve deps on all of these and correspondingly
+		// mark all of those as system packages as well, so we know
+		// not to show uninstallation as an option.
 	}
 }
 

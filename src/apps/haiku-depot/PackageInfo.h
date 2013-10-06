@@ -6,6 +6,8 @@
 #define PACKAGE_INFO_H
 
 
+#include <set>
+
 #include <Referenceable.h>
 #include <String.h>
 
@@ -183,7 +185,7 @@ typedef List<CategoryRef, false> CategoryList;
 
 
 typedef List<PackageInfoListenerRef, false, 2> PackageListenerList;
-
+typedef std::set<int32> PackageInstallationLocationSet;
 
 enum PackageState {
 	NONE		= 0,
@@ -203,7 +205,8 @@ public:
 									const PublisherInfo& publisher,
 									const BString& shortDescription,
 									const BString& fullDescription,
-									const BString& changelog);
+									const BString& changelog,
+									int32 packageFlags);
 								PackageInfo(const PackageInfo& other);
 
 			PackageInfo&		operator=(const PackageInfo& other);
@@ -225,11 +228,21 @@ public:
 			const BString&		Changelog() const
 									{ return fChangelog; }
 
+			int32				Flags() const
+									{ return fFlags; }
+			bool				IsSystemPackage() const;
+
 			PackageState		State() const
 									{ return fState; }
 			void				SetState(PackageState state);
 
-			float				DownloadProgress() const;
+			const PackageInstallationLocationSet&
+								InstallationLocations() const
+									{ return fInstallationLocations; }
+			void				AddInstallationLocation(int32 location);
+
+			float				DownloadProgress() const
+									{ return fDownloadProgress; }
 			void				SetDownloadProgress(float progress);
 
 			bool				AddCategory(const CategoryRef& category);
@@ -265,8 +278,11 @@ private:
 			UserRatingList		fUserRatings;
 			BitmapList			fScreenshots;
 			PackageState		fState;
+			PackageInstallationLocationSet
+								fInstallationLocations;
 			float				fDownloadProgress;
 			PackageListenerList	fListeners;
+			int32				fFlags;
 };
 
 

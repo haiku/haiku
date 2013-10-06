@@ -1,5 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +13,7 @@
 #include <DataIO.h>
 #include <IconUtils.h>
 #include <MimeType.h>
+#include <package/PackageFlags.h>
 #include <Resources.h>
 
 #include "support.h"
@@ -447,7 +449,8 @@ PackageInfo::PackageInfo()
 	fUserRatings(),
 	fScreenshots(),
 	fState(NONE),
-	fDownloadProgress(0.0)
+	fDownloadProgress(0.0),
+	fFlags(0)
 {
 }
 
@@ -455,7 +458,7 @@ PackageInfo::PackageInfo()
 PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
 		const BString& version, const PublisherInfo& publisher,
 		const BString& shortDescription, const BString& fullDescription,
-		const BString& changelog)
+		const BString& changelog, int32 flags)
 	:
 	fIcon(icon),
 	fTitle(title),
@@ -468,7 +471,8 @@ PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
 	fUserRatings(),
 	fScreenshots(),
 	fState(NONE),
-	fDownloadProgress(0.0)
+	fDownloadProgress(0.0),
+	fFlags(flags)
 {
 }
 
@@ -486,7 +490,9 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fUserRatings(other.fUserRatings),
 	fScreenshots(other.fScreenshots),
 	fState(other.fState),
-	fDownloadProgress(other.fDownloadProgress)
+	fInstallationLocations(other.fInstallationLocations),
+	fDownloadProgress(other.fDownloadProgress),
+	fFlags(other.fFlags)
 {
 }
 
@@ -505,7 +511,9 @@ PackageInfo::operator=(const PackageInfo& other)
 	fUserRatings = other.fUserRatings;
 	fScreenshots = other.fScreenshots;
 	fState = other.fState;
+	fInstallationLocations = other.fInstallationLocations;
 	fDownloadProgress = other.fDownloadProgress;
+	fFlags = other.fFlags;
 	return *this;
 }
 
@@ -524,6 +532,7 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fUserRatings == other.fUserRatings
 		&& fScreenshots == other.fScreenshots
 		&& fState == other.fState
+		&& fFlags == other.fFlags
 		&& fDownloadProgress == other.fDownloadProgress;
 }
 
@@ -532,6 +541,13 @@ bool
 PackageInfo::operator!=(const PackageInfo& other) const
 {
 	return !(*this == other);
+}
+
+
+bool
+PackageInfo::IsSystemPackage() const
+{
+	return (fFlags & BPackageKit::B_PACKAGE_FLAG_SYSTEM_PACKAGE) != 0;
 }
 
 
@@ -554,10 +570,12 @@ PackageInfo::SetState(PackageState state)
 }
 
 
-float
-PackageInfo::DownloadProgress() const
+void
+PackageInfo::AddInstallationLocation(int32 location)
 {
-	return fDownloadProgress;
+	fInstallationLocations.insert(location);
+	SetState(ACTIVATED);
+		// TODO: determine how to differentiate between installed and active.
 }
 
 
