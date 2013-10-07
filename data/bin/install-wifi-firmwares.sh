@@ -35,6 +35,7 @@ baseURL='http://www.haiku-files.org/files/wifi-firmwares'
 firmwareDir=`finddir B_SYSTEM_DATA_DIRECTORY`/firmware
 tempDir=`finddir B_COMMON_TEMP_DIRECTORY`/wifi-firmwares
 driversDir=`finddir B_SYSTEM_ADDONS_DIRECTORY`/kernel/drivers
+tempFirmwareDir=`finddir B_COMMON_TEMP_DIRECTORY`/package_me"$firmwareDir"
 intelLicense='/boot/system/data/licenses/Intel (2xxx firmware)'
 
 
@@ -84,21 +85,24 @@ function InstallAllFirmwares()
 	InstallIprowifi2200
 	InstallBroadcom43xx
 	InstallMarvell88w8335
+	MakeHPKG
 }
 
 
 function UnlinkDriver()
 {
 	# remove the driver's symlink
-	rm -f "${driversDir}/dev/net/${driver}"
+	#rm -f "${driversDir}/dev/net/${driver}"
+	echo "TODO: UnlinkDriver"
 }
 
 
 function SymlinkDriver()
 {
 	# restore the driver's symlink
-	cd "${driversDir}/dev/net/"
-	ln -sf "../../bin/${driver}" "${driver}"
+	#cd "${driversDir}/dev/net/"
+	#ln -sf "../../bin/${driver}" "${driver}"
+	echo "TODO: SymlinkDriver"
 }
 
 
@@ -125,7 +129,7 @@ function DownloadFileIfNotCached()
 
 function SetFirmwarePermissions()
 {
-	cd ${firmwareDir}/${driver}/
+	cd ${tempFirmwareDir}/${driver}/
 	for file in * ; do
 		if [ "$file" != "$driver" ] && [ -f "$file" ] ; then
 			chmod a=r $file
@@ -144,7 +148,7 @@ function CleanTemporaryFiles()
 function PreFirmwareInstallation()
 {
 	echo "Installing firmware for ${driver} ..."
-	mkdir -p "${firmwareDir}/${driver}"
+	mkdir -p "${tempFirmwareDir}/${driver}"
 	UnlinkDriver
 }
 
@@ -166,13 +170,14 @@ function InstallIpw2100()
 	# Extract contents.
 	local file='ipw2100-fw-1.3.tgz'
 	local url="${baseURL}/intel/${file}"
-	local dir="${firmwareDir}/${driver}"
+	local dir="${tempFirmwareDir}/${driver}"
 	DownloadFileIfNotCached $url $file $dir
 
 	# Install the firmware & license file by extracting in place.
-	cd "${firmwareDir}/${driver}"
+	cd "${tempFirmwareDir}/${driver}"
 	gunzip < "$file" | tar xf -
 
+	rm "${tempFirmwareDir}/${driver}/${file}"
 	PostFirmwareInstallation
 }
 
@@ -185,19 +190,20 @@ function InstallIprowifi2200()
 	# Extract contents.
 	local file='ipw2200-fw-3.1.tgz'
 	local url="${baseURL}/intel/${file}"
-	local dir="${firmwareDir}/${driver}"
+	local dir="${tempFirmwareDir}/${driver}"
 	DownloadFileIfNotCached $url $file $dir
 
 	cd "$tempDir"
-	gunzip < "${firmwareDir}/${driver}/$file" | tar xf -
+	gunzip < "${tempFirmwareDir}/${driver}/$file" | tar xf -
 
 	# Install the firmware & license file.
 	cd "${tempDir}/ipw2200-fw-3.1"
-	mv LICENSE.ipw2200-fw "${firmwareDir}/${driver}/"
-	mv ipw2200-ibss.fw "${firmwareDir}/${driver}/"
-	mv ipw2200-sniffer.fw "${firmwareDir}/${driver}/"
-	mv ipw2200-bss.fw "${firmwareDir}/${driver}/"
+	mv LICENSE.ipw2200-fw "${tempFirmwareDir}/${driver}/"
+	mv ipw2200-ibss.fw "${tempFirmwareDir}/${driver}/"
+	mv ipw2200-sniffer.fw "${tempFirmwareDir}/${driver}/"
+	mv ipw2200-bss.fw "${tempFirmwareDir}/${driver}/"
 
+	rm "${tempFirmwareDir}/${driver}/${file}"
 	PostFirmwareInstallation
 }
 
@@ -233,7 +239,7 @@ function InstallMarvell88w8335()
 	# Download firmware archive.
 	local file="malo-firmware-1.4.tgz"
 	local url="${baseURL}/marvell/${file}"
-	local dir="${firmwareDir}/${driver}"
+	local dir="${tempFirmwareDir}/${driver}"
 	DownloadFileIfNotCached $url $file "$dir"
 	if [ $result -gt 0 ]; then
 		echo "...failed. ${driver}'s firmware will not be installed."
@@ -242,12 +248,14 @@ function InstallMarvell88w8335()
 
 	# Extract archive.
 	cd "$tempDir"
-	tar xf "${firmwareDir}/${driver}/$file"
+	tar xf "${tempFirmwareDir}/${driver}/$file"
 
 	# Move firmware files to destination.
 	local sourceDir="${tempDir}/share/examples/malo-firmware"
-	mv ${sourceDir}/malo8335-h "${firmwareDir}/${driver}"
-	mv ${sourceDir}/malo8335-m "${firmwareDir}/${driver}"
+	mv ${sourceDir}/malo8335-h "${tempFirmwareDir}/${driver}"
+	mv ${sourceDir}/malo8335-m "${tempFirmwareDir}/${driver}"
+
+	rm "${tempFirmwareDir}/${driver}/${file}"
 	PostFirmwareInstallation
 }
 
@@ -256,7 +264,7 @@ function BuildBroadcomFWCutter()
 {
 	# Download & extract b43-fwcutter.
 	local file="b43-fwcutter-012.tar.bz2"
-	local dir="${firmwareDir}/${driver}/b43-fwcutter"
+	local dir="${tempFirmwareDir}/${driver}/b43-fwcutter"
 	local url="${baseURL}/b43/fwcutter/${file}"
 	DownloadFileIfNotCached $url $file $dir
 	if [ $result -gt 0 ]; then
@@ -298,6 +306,14 @@ function BuildBroadcomFWCutter()
 	fi
 	mv b43-fwcutter "$tempDir"
 
+	cd "${tempFirmwareDir}/${driver}/b43-fwcutter"
+	rm b43-fwcutter-012.tar.bz2
+	rm byteswap.h
+	rm bits/byteswap.h
+	rmdir bits
+	cd ..
+	rmdir b43-fwcutter
+
 	return 0
 }
 
@@ -306,7 +322,7 @@ function CutAndInstallBroadcomFirmware()
 {
 	# Download firmware.
 	local file="wl_apsta-3.130.20.0.o"
-	local dir="${firmwareDir}/${driver}"
+	local dir="${tempFirmwareDir}/${driver}"
 	local url="${baseURL}/b43/${file}"
 	DownloadFileIfNotCached $url $file $dir
 	if [ $result -gt 0 ]; then
@@ -327,11 +343,61 @@ function CutAndInstallBroadcomFirmware()
 	touch bwi_v3_ucode
 
 	# Install files.
-	mv * ${firmwareDir}/${driver}/
+	mv * ${tempFirmwareDir}/${driver}/
 
+	rm 	"${tempFirmwareDir}/${driver}/$file"
 	return 0
 }
 
 
+function makePackageInfo()
+{
+	cat << EOF > .PackageInfo
+name			wifi_firmwares
+version			2013_10_06-1
+architecture	any
+summary			"Firmwares for various wireless network cards"
+description		"Installs firmwares for the following wireless network cards:
+Broadcom 43xx, Intel ipw2100, Intel ipw2200, and Marvell 88W8335.
+Firmware for broadcom43xx is under the Copyright of Broadcom Corporation(R).
+Firmware for marvell88w8335 is under the Copyright of Marvell Technology(R).
+ipw2100,iprowifi2200 firmware is covered by the Intel(R) license located in
+/boot/system/data/licenses/Intel (2xxx firmware). The user is not granted a
+license to use the package unless these terms are agreed to."
+
+packager	"me"
+vendor		"myself"
+copyrights {
+	"Copyright of Broadcom Corporation(R)"
+	"Copyright of Intel(R) Corporation"
+	"Copyright of Marvell Technology(R)"
+}
+licenses	"Intel (2xxx firmware)"
+flags {
+	"approve_license"
+	"system_package"
+}
+provides {
+	wifi_firmwares = 2013_10_06
+}
+requires {
+	haiku >= R1~alpha4
+}
+
+EOF
+
+}
+
+
+function MakeHPKG()
+{
+	cd "$tempFirmwareDir/../.."
+	makePackageInfo
+	package create wifi_firmwares-1-any.hpkg
+	mv wifi_firmwares-1-any.hpkg `finddir B_SYSTEM_PACKAGES_DIRECTORY`
+}
+
+
 mkdir -p "$tempDir"
+mkdir -p "$tempFirmwareDir"
 DisplayAlert
