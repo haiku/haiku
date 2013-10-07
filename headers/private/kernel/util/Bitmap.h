@@ -9,7 +9,8 @@
 #define KERNEL_UTIL_BITMAP_H
 
 
-#include <Debug.h>
+#include <debug.h>
+
 #include <SupportDefs.h>
 
 
