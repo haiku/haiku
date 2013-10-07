@@ -46,6 +46,23 @@ const bigtime_t kThreadQuantum = 3000;
 static RunQueue<Thread, THREAD_MAX_SET_PRIORITY>* sRunQueue;
 
 
+struct scheduler_thread_data {
+			scheduler_thread_data() { Init(); }
+	void	Init();
+
+	int32	priority_penalty;
+	bool	lost_cpu;
+};
+
+
+void
+scheduler_thread_data::Init()
+{
+	priority_penalty = 0;
+	lost_cpu = false;
+}
+
+
 static int
 dump_run_queue(int argc, char **argv)
 {
@@ -55,15 +72,70 @@ dump_run_queue(int argc, char **argv)
 	if (!iterator.HasNext())
 		kprintf("Run queue is empty!\n");
 	else {
-		kprintf("thread    id      priority name\n");
+		kprintf("thread    id      priority penalty  name\n");
 		while (iterator.HasNext()) {
 			Thread *thread = iterator.Next();
-			kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 " %s\n", thread,
-				thread->id, thread->priority, thread->name);
+			scheduler_thread_data* schedulerThreadData
+				= reinterpret_cast<scheduler_thread_data*>(
+					thread->scheduler_data);
+			kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 " %-8" B_PRId32 " %s\n",
+				thread, thread->id, thread->priority,
+				schedulerThreadData->priority_penalty, thread->name);
 		}
 	}
 
 	return 0;
+}
+
+
+static inline int32
+simple_get_effective_priority(Thread *thread)
+{
+	if (thread->priority == B_IDLE_PRIORITY)
+		return thread->priority;
+
+	scheduler_thread_data* schedulerThreadData
+		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+
+	int32 effectivePriority = thread->priority;
+	if (effectivePriority < B_FIRST_REAL_TIME_PRIORITY)
+		effectivePriority -= schedulerThreadData->priority_penalty;
+
+	ASSERT(schedulerThreadData->priority_penalty >= 0);
+	ASSERT(effectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
+
+	return min_c(effectivePriority, thread->next_priority);
+}
+
+
+static inline void
+simple_increase_penalty(Thread *thread)
+{
+	if (thread->priority <= B_LOWEST_ACTIVE_PRIORITY)
+		return;
+	if (thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+		return;
+
+	TRACE(("increasing thread %ld penalty\n", thread->id));
+
+	scheduler_thread_data* schedulerThreadData
+		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+	int32 oldPenalty = schedulerThreadData->priority_penalty++;
+
+	ASSERT(thread->priority - oldPenalty >= B_LOWEST_ACTIVE_PRIORITY);
+	if (thread->priority - oldPenalty <= B_LOWEST_ACTIVE_PRIORITY)
+		schedulerThreadData->priority_penalty = oldPenalty;
+}
+
+
+static inline void
+simple_cancel_penalty(Thread *thread)
+{
+	scheduler_thread_data* schedulerThreadData
+		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+	if (schedulerThreadData->priority_penalty != 0)
+		TRACE(("cancelling thread %ld penalty\n", thread->id));
+	schedulerThreadData->priority_penalty = 0;
 }
 
 
@@ -77,14 +149,21 @@ simple_enqueue_in_run_queue(Thread *thread)
 
 	//T(EnqueueThread(thread, prev, curr));
 
-	sRunQueue->PushBack(thread, thread->next_priority);
+	int32 threadPriority = simple_get_effective_priority(thread);
+	sRunQueue->PushBack(thread, threadPriority);
 	thread->next_priority = thread->priority;
 
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
 
-	if (thread->priority > thread_get_current_thread()->priority) {
+	Thread* currentThread = thread_get_current_thread();
+	if (threadPriority > currentThread->priority) {
+		scheduler_thread_data* schedulerThreadData
+			= reinterpret_cast<scheduler_thread_data*>(
+				currentThread->scheduler_data);
+
+		schedulerThreadData->lost_cpu = true;
 		gCPU[0].invoke_scheduler = true;
 		gCPU[0].invoke_scheduler_if_idle = false;
 	}
@@ -118,7 +197,9 @@ simple_set_thread_priority(Thread *thread, int32 priority)
 	sRunQueue->Remove(thread);
 
 	// set priority and re-insert
+	simple_cancel_penalty(thread);
 	thread->priority = thread->next_priority = priority;
+
 	simple_enqueue_in_run_queue(thread);
 }
 
@@ -144,9 +225,14 @@ reschedule_event(timer *unused)
 {
 	// This function is called as a result of the timer event set by the
 	// scheduler. Make sure the reschedule() is invoked.
-	thread_get_current_thread()->cpu->invoke_scheduler = true;
-	thread_get_current_thread()->cpu->invoke_scheduler_if_idle = false;
-	thread_get_current_thread()->cpu->preempted = 1;
+	Thread* thread= thread_get_current_thread();
+	scheduler_thread_data* schedulerThreadData
+		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+
+	schedulerThreadData->lost_cpu = true;
+	thread->cpu->invoke_scheduler = true;
+	thread->cpu->invoke_scheduler_if_idle = false;
+	thread->cpu->preempted = 1;
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -174,11 +260,18 @@ simple_reschedule(void)
 	TRACE(("reschedule(): current thread = %ld\n", oldThread->id));
 
 	oldThread->state = oldThread->next_state;
+	scheduler_thread_data* schedulerOldThreadData
+		= reinterpret_cast<scheduler_thread_data*>(oldThread->scheduler_data);
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
+			if (oldThread->cpu->preempted)
+				simple_increase_penalty(oldThread);
+			else if (!schedulerOldThreadData->lost_cpu)
+				simple_cancel_penalty(oldThread);
+
 			TRACE(("enqueueing thread %ld into run queue priority = %ld\n",
-				oldThread->id, oldThread->priority));
+				oldThread->id, simple_get_effective_priority(oldThread)));
 			simple_enqueue_in_run_queue(oldThread);
 			break;
 		case B_THREAD_SUSPENDED:
@@ -192,46 +285,10 @@ simple_reschedule(void)
 			break;
 	}
 
-	while (true) {
-		// select thread with the biggest priority
-		nextThread = sRunQueue->PeekMaximum();
-		if (!nextThread)
-			panic("reschedule(): run queue is empty!\n");
-
-#if 0
-		if (oldThread == nextThread && nextThread->was_yielded) {
-			// ignore threads that called thread_yield() once
-			nextThread->was_yielded = false;
-			prevThread = nextThread;
-			nextThread = nextThread->queue_next;
-		}
-#endif
-
-		// always extract real time threads
-		if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
-			break;
-
-		// find thread with the second biggest priority
-		Thread* lowerNextThread = sRunQueue->PeekSecondMaximum();
-
-		// never skip last non-idle normal thread
-		if (lowerNextThread == NULL
-			|| lowerNextThread->priority == B_IDLE_PRIORITY)
-			break;
-
-		int32 priorityDiff = nextThread->priority - lowerNextThread->priority;
-		if (priorityDiff > 15)
-			break;
-
-		// skip normal threads sometimes
-		// (twice as probable per priority level)
-		if ((fast_random_value() >> (15 - priorityDiff)) != 0)
-			break;
-
-		nextThread = lowerNextThread;
-
-		break;
-	}
+	// select thread with the biggest priority
+	nextThread = sRunQueue->PeekMaximum();
+	if (!nextThread)
+		panic("reschedule(): run queue is empty!\n");
 
 	sRunQueue->Remove(nextThread);
 
@@ -244,6 +301,7 @@ simple_reschedule(void)
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
 	oldThread->was_yielded = false;
+	schedulerOldThreadData->lost_cpu = false;
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	scheduler_update_thread_times(oldThread, nextThread);
@@ -282,7 +340,9 @@ simple_reschedule(void)
 static status_t
 simple_on_thread_create(Thread* thread, bool idleThread)
 {
-	// do nothing
+	thread->scheduler_data = new (std::nothrow)scheduler_thread_data;
+	if (thread->scheduler_data == NULL)
+		return B_NO_MEMORY;
 	return B_OK;
 }
 
@@ -290,14 +350,16 @@ simple_on_thread_create(Thread* thread, bool idleThread)
 static void
 simple_on_thread_init(Thread* thread)
 {
-	// do nothing
+	scheduler_thread_data* schedulerThreadData
+		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+	schedulerThreadData->Init();
 }
 
 
 static void
 simple_on_thread_destroy(Thread* thread)
 {
-	// do nothing
+	delete thread->scheduler_data;
 }
 
 
