@@ -33,9 +33,9 @@ OK='I agree to the licenses. Install firmwares.'
 
 baseURL='http://www.haiku-files.org/files/wifi-firmwares'
 firmwareDir=`finddir B_SYSTEM_DATA_DIRECTORY`/firmware
-tempDir=`finddir B_COMMON_TEMP_DIRECTORY`/wifi-firmwares
+tempDir=`finddir B_SYSTEM_TEMP_DIRECTORY`/wifi-firmwares
 driversDir=`finddir B_SYSTEM_ADDONS_DIRECTORY`/kernel/drivers
-tempFirmwareDir=`finddir B_COMMON_TEMP_DIRECTORY`/package_me"$firmwareDir"
+tempFirmwareDir=`finddir B_SYSTEM_TEMP_DIRECTORY`/package_me"$firmwareDir"
 intelLicense='/boot/system/data/licenses/Intel (2xxx firmware)'
 
 
@@ -395,6 +395,8 @@ function MakeHPKG()
 	makePackageInfo
 	package create wifi_firmwares-1-any.hpkg
 	mv wifi_firmwares-1-any.hpkg `finddir B_SYSTEM_PACKAGES_DIRECTORY`
+	rm -rf "`finddir B_SYSTEM_TEMP_DIRECTORY`/package_me"
+	rm -rf "$tempDir"
 }
 
 
