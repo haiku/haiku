@@ -33,9 +33,9 @@
 
 //#define TRACE_SCHEDULER
 #ifdef TRACE_SCHEDULER
-#	define TRACE(x...) dprintf_no_syslog(x)
+#	define TRACE(...) dprintf_no_syslog(__VA_ARGS__)
 #else
-#	define TRACE(x...) do { } while (false)
+#	define TRACE(...) do { } while (false)
 #endif
 
 
