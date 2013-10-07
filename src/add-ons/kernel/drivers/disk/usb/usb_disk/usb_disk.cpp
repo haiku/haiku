@@ -481,7 +481,7 @@ usb_disk_request_sense(device_lun *lun, err_act *_action)
 		lun->media_present = false;
 		usb_disk_reset_capacity(lun);
 	}
-	
+
 	if (_action != NULL)
 		*_action = action;
 
@@ -799,7 +799,8 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 			TRACE("usb lun %"B_PRIu8" inquiry attempt %"B_PRIu32" begin\n",
 				i, tries);
 			status_t ready = usb_disk_test_unit_ready(lun, &action);
-			if (ready == B_OK || ready == B_DEV_NO_MEDIA) {
+			if (ready == B_OK || ready == B_DEV_NO_MEDIA
+				|| ready == B_DEV_MEDIA_CHANGED) {
 				if (lun->device_type == B_CD)
 					lun->write_protected = true;
 				// TODO: check for write protection; disabled since some
@@ -1100,7 +1101,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 					break;
 				}
 				snooze(500000);
-			}			
+			}
 			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n",
 				*(status_t *)buffer);
 			result = B_OK;
