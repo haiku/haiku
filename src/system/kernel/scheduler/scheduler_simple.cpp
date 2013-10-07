@@ -47,11 +47,16 @@ static RunQueue<Thread, THREAD_MAX_SET_PRIORITY>* sRunQueue;
 
 
 struct scheduler_thread_data {
-			scheduler_thread_data() { Init(); }
-	void	Init();
+				scheduler_thread_data() { Init(); }
+	void		Init();
 
-	int32	priority_penalty;
-	bool	lost_cpu;
+	int32		priority_penalty;
+	bool		lost_cpu;
+	bool		cpu_bound;
+
+	bigtime_t	time_left;
+	bigtime_t	stolen_time;
+	bigtime_t	quantum_start;
 };
 
 
@@ -59,7 +64,11 @@ void
 scheduler_thread_data::Init()
 {
 	priority_penalty = 0;
+	time_left = 0;
+	stolen_time = 0;
+
 	lost_cpu = false;
+	cpu_bound = true;
 }
 
 
@@ -150,8 +159,14 @@ simple_enqueue_in_run_queue(Thread *thread)
 	int32 threadPriority = simple_get_effective_priority(thread);
 	T(EnqueueThread(thread, threadPriority));
 
+	scheduler_thread_data* schedulerThreadData
+		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+
 	sRunQueue->PushBack(thread, threadPriority);
 	thread->next_priority = thread->priority;
+	schedulerThreadData->cpu_bound = true;
+	schedulerThreadData->time_left = 0;
+	schedulerThreadData->stolen_time = 0;
 
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
@@ -159,11 +174,11 @@ simple_enqueue_in_run_queue(Thread *thread)
 
 	Thread* currentThread = thread_get_current_thread();
 	if (threadPriority > currentThread->priority) {
-		scheduler_thread_data* schedulerThreadData
+		scheduler_thread_data* schedulerCurrentThreadData
 			= reinterpret_cast<scheduler_thread_data*>(
 				currentThread->scheduler_data);
 
-		schedulerThreadData->lost_cpu = true;
+		schedulerCurrentThreadData->lost_cpu = true;
 		gCPU[0].invoke_scheduler = true;
 		gCPU[0].invoke_scheduler_if_idle = false;
 	}
@@ -237,6 +252,46 @@ reschedule_event(timer *unused)
 }
 
 
+static inline bool simple_quantum_ended(Thread* thread, bool wasPreempted)
+{
+	scheduler_thread_data* schedulerThreadData
+		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+
+	bigtime_t time_used = system_time() - schedulerThreadData->quantum_start;
+	schedulerThreadData->time_left -= time_used;
+	schedulerThreadData->time_left = max_c(0, schedulerThreadData->time_left);
+
+	// too little time left, it's better make the next quantum a bit longer
+	if (wasPreempted || schedulerThreadData->time_left <= kThreadQuantum / 50) {
+		schedulerThreadData->stolen_time += schedulerThreadData->time_left;
+		schedulerThreadData->time_left = 0;
+	}
+
+	return schedulerThreadData->time_left == 0;
+}
+
+
+static inline bigtime_t simple_compute_quantum(Thread* thread)
+{
+	scheduler_thread_data* schedulerThreadData
+		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+
+	bigtime_t quantum;
+	if (schedulerThreadData->time_left != 0)
+		quantum = schedulerThreadData->time_left;
+	else
+		quantum = kThreadQuantum;
+
+	quantum += schedulerThreadData->stolen_time;
+	schedulerThreadData->stolen_time = 0;
+
+	schedulerThreadData->time_left = quantum;
+	schedulerThreadData->quantum_start = system_time();
+
+	return quantum;
+}
+
+
 /*!	Runs the scheduler.
 	Note: expects thread spinlock to be held
 */
@@ -262,28 +317,44 @@ simple_reschedule(void)
 	oldThread->state = oldThread->next_state;
 	scheduler_thread_data* schedulerOldThreadData
 		= reinterpret_cast<scheduler_thread_data*>(oldThread->scheduler_data);
+
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
-			if (oldThread->cpu->preempted)
-				simple_increase_penalty(oldThread);
-			else if (!schedulerOldThreadData->lost_cpu)
-				simple_cancel_penalty(oldThread);
+			if (!schedulerOldThreadData->lost_cpu)
+				schedulerOldThreadData->cpu_bound = false;
 
-			TRACE("enqueueing thread %ld into run queue priority = %ld\n",
-				oldThread->id, simple_get_effective_priority(oldThread));
-			simple_enqueue_in_run_queue(oldThread);
+			if (simple_quantum_ended(oldThread, oldThread->cpu->preempted)) {
+				if (schedulerOldThreadData->cpu_bound)
+					simple_increase_penalty(oldThread);
+				else
+					simple_cancel_penalty(oldThread);
+
+				TRACE("enqueueing thread %ld into run queue priority = %ld\n",
+					oldThread->id, simple_get_effective_priority(oldThread));
+				simple_enqueue_in_run_queue(oldThread);
+			} else {
+				TRACE("putting thread %ld back in run queue priority = %ld\n",
+					oldThread->id, simple_get_effective_priority(oldThread));
+				sRunQueue->PushFront(oldThread,
+					simple_get_effective_priority(oldThread));
+			}
+
 			break;
 		case B_THREAD_SUSPENDED:
+			simple_cancel_penalty(oldThread);
 			TRACE("reschedule(): suspending thread %ld\n", oldThread->id);
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
 			break;
 		default:
+			simple_cancel_penalty(oldThread);
 			TRACE("not enqueueing thread %ld into run queue next_state = %ld\n",
 				oldThread->id, oldThread->next_state);
 			break;
 	}
+
+	schedulerOldThreadData->lost_cpu = false;
 
 	// select thread with the biggest priority
 	nextThread = sRunQueue->PeekMaximum();
@@ -301,7 +372,6 @@ simple_reschedule(void)
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
 	oldThread->was_yielded = false;
-	schedulerOldThreadData->lost_cpu = false;
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	scheduler_update_thread_times(oldThread, nextThread);
@@ -319,14 +389,13 @@ simple_reschedule(void)
 	}
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
-		bigtime_t quantum = kThreadQuantum;	// TODO: calculate quantum?
 		timer* quantumTimer = &oldThread->cpu->quantum_timer;
-
 		if (!oldThread->cpu->preempted)
 			cancel_timer(quantumTimer);
 
 		oldThread->cpu->preempted = 0;
 		if (!thread_is_idle_thread(nextThread)) {
+			bigtime_t quantum = simple_compute_quantum(oldThread);
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
 		}
