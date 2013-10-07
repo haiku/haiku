@@ -19,8 +19,8 @@ namespace SchedulerTracing {
 void
 EnqueueThread::AddDump(TraceOutput& out)
 {
-	out.Print("scheduler enqueue %ld \"%s\", priority %d (previous %ld, "
-		"next %ld)", fID, fName, fPriority, fPreviousID, fNextID);
+	out.Print("scheduler enqueue %ld \"%s\", effective priority %d, "
+		"real priority %d", fID, fName, fEffectivePriority, fPriority);
 }
 
 

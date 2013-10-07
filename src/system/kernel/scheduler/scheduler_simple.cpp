@@ -147,9 +147,9 @@ simple_enqueue_in_run_queue(Thread *thread)
 {
 	thread->state = thread->next_state = B_THREAD_READY;
 
-	//T(EnqueueThread(thread, prev, curr));
-
 	int32 threadPriority = simple_get_effective_priority(thread);
+	T(EnqueueThread(thread, threadPriority));
+
 	sRunQueue->PushBack(thread, threadPriority);
 	thread->next_priority = thread->priority;
 

@@ -126,7 +126,7 @@ enqueue_in_run_queue(Thread *thread)
 			prev = sRunQueue;
 	}
 
-	T(EnqueueThread(thread, prev, curr));
+	T(EnqueueThread(thread, thread->priority));
 
 	thread->queue_next = curr;
 	if (prev)

@@ -162,7 +162,7 @@ affine_enqueue_in_run_queue(Thread *thread)
 				prev = sRunQueue[targetCPU];
 		}
 
-		T(EnqueueThread(thread, prev, curr));
+		T(EnqueueThread(thread, thread->priority));
 		sRunQueueSize[targetCPU]++;
 		thread->queue_next = curr;
 		if (prev)
