@@ -33,9 +33,9 @@
 
 //#define TRACE_SCHEDULER
 #ifdef TRACE_SCHEDULER
-#	define TRACE(x) dprintf_no_syslog x
+#	define TRACE(x...) dprintf_no_syslog(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) do { } while (false)
 #endif
 
 
@@ -116,7 +116,7 @@ simple_increase_penalty(Thread *thread)
 	if (thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
 		return;
 
-	TRACE(("increasing thread %ld penalty\n", thread->id));
+	TRACE("increasing thread %ld penalty\n", thread->id);
 
 	scheduler_thread_data* schedulerThreadData
 		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
@@ -134,7 +134,7 @@ simple_cancel_penalty(Thread *thread)
 	scheduler_thread_data* schedulerThreadData
 		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
 	if (schedulerThreadData->priority_penalty != 0)
-		TRACE(("cancelling thread %ld penalty\n", thread->id));
+		TRACE("cancelling thread %ld penalty\n", thread->id);
 	schedulerThreadData->priority_penalty = 0;
 }
 
@@ -257,7 +257,7 @@ simple_reschedule(void)
 		}
 	}
 
-	TRACE(("reschedule(): current thread = %ld\n", oldThread->id));
+	TRACE("reschedule(): current thread = %ld\n", oldThread->id);
 
 	oldThread->state = oldThread->next_state;
 	scheduler_thread_data* schedulerOldThreadData
@@ -270,18 +270,18 @@ simple_reschedule(void)
 			else if (!schedulerOldThreadData->lost_cpu)
 				simple_cancel_penalty(oldThread);
 
-			TRACE(("enqueueing thread %ld into run queue priority = %ld\n",
-				oldThread->id, simple_get_effective_priority(oldThread)));
+			TRACE("enqueueing thread %ld into run queue priority = %ld\n",
+				oldThread->id, simple_get_effective_priority(oldThread));
 			simple_enqueue_in_run_queue(oldThread);
 			break;
 		case B_THREAD_SUSPENDED:
-			TRACE(("reschedule(): suspending thread %ld\n", oldThread->id));
+			TRACE("reschedule(): suspending thread %ld\n", oldThread->id);
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
 			break;
 		default:
-			TRACE(("not enqueueing thread %ld into run queue next_state = %ld\n",
-				oldThread->id, oldThread->next_state));
+			TRACE("not enqueueing thread %ld into run queue next_state = %ld\n",
+				oldThread->id, oldThread->next_state);
 			break;
 	}
 
