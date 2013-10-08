@@ -19,6 +19,10 @@
 #include "serial.h"
 
 
+//#define PRINT_TIME_STAMPS
+	// Define to print a TSC timestamp before each line of output.
+
+
 static const char* const kDebugSyslogSignature = "Haiku syslog";
 
 static char sBuffer[16384];
@@ -28,22 +32,48 @@ static ring_buffer* sDebugSyslogBuffer = NULL;
 static bool sPostCleanup = false;
 
 
+#ifdef PRINT_TIME_STAMPS
+extern "C" uint64 rdtsc();
+#endif
+
+
 static void
-dprintf_args(const char *format, va_list args)
+syslog_write(const char* buffer, size_t length)
 {
-	char buffer[512];
-	int length = vsnprintf(buffer, sizeof(buffer), format, args);
-
-	if (length >= (int)sizeof(buffer))
-		length = sizeof(buffer) - 1;
-
 	if (sPostCleanup && sDebugSyslogBuffer != NULL) {
 		ring_buffer_write(sDebugSyslogBuffer, (const uint8*)buffer, length);
 	} else if (sBufferPosition + length < sizeof(sBuffer)) {
 		memcpy(sBuffer + sBufferPosition, buffer, length);
 		sBufferPosition += length;
 	}
+}
 
+
+static void
+dprintf_args(const char *format, va_list args)
+{
+	char buffer[512];
+	int length = vsnprintf(buffer, sizeof(buffer), format, args);
+	if (length == 0)
+		return;
+
+	if (length >= (int)sizeof(buffer))
+		length = sizeof(buffer) - 1;
+
+#ifdef PRINT_TIME_STAMPS
+	static bool sNewLine = true;
+
+	if (sNewLine) {
+		char timeBuffer[32];
+		snprintf(timeBuffer, sizeof(timeBuffer), "[%" B_PRIu64 "] ", rdtsc());
+		syslog_write(timeBuffer, strlen(timeBuffer));
+		serial_puts(timeBuffer, strlen(timeBuffer));
+	}
+
+	sNewLine = buffer[length - 1] == '\n';
+#endif	// PRINT_TIME_STAMPS
+
+	syslog_write(buffer, length);
 	serial_puts(buffer, length);
 
 	if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
