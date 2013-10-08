@@ -32,8 +32,10 @@
 ******************************************************************************/
 /*$FreeBSD$*/
 
+#ifndef __HAIKU__
 #include "opt_inet.h"
 #include "opt_inet6.h"
+#endif
 
 #ifdef HAVE_KERNEL_OPTION_HEADERS
 #include "opt_device_polling.h"

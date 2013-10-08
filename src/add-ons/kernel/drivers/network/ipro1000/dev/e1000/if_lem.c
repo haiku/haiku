@@ -32,8 +32,10 @@
 ******************************************************************************/
 /*$FreeBSD$*/
 
+#ifndef __HAIKU__
 #include "opt_inet.h"
 #include "opt_inet6.h"
+#endif
 
 #ifdef HAVE_KERNEL_OPTION_HEADERS
 #include "opt_device_polling.h"
@@ -2617,6 +2619,9 @@ lem_dma_free(struct adapter *adapter, struct em_dma_alloc *dma)
 static int
 lem_allocate_transmit_structures(struct adapter *adapter)
 {
+#ifdef __HAIKU__
+	int i;
+#endif
 	device_t dev = adapter->dev;
 	struct em_buffer *tx_buffer;
 	int error;
@@ -2649,7 +2654,11 @@ lem_allocate_transmit_structures(struct adapter *adapter)
 	}
 
 	/* Create the descriptor buffer dma maps */
+#ifndef __HAIKU__
 	for (int i = 0; i < adapter->num_tx_desc; i++) {
+#else
+	for (i = 0; i < adapter->num_tx_desc; i++) {
+#endif
 		tx_buffer = &adapter->tx_buffer_area[i];
 		error = bus_dmamap_create(adapter->txtag, 0, &tx_buffer->map);
 		if (error != 0) {
@@ -2673,6 +2682,9 @@ fail:
 static void
 lem_setup_transmit_structures(struct adapter *adapter)
 {
+#ifdef __HAIKU__
+	int i;
+#endif
 	struct em_buffer *tx_buffer;
 #ifdef DEV_NETMAP
 	/* we are already locked */
@@ -2685,7 +2697,11 @@ lem_setup_transmit_structures(struct adapter *adapter)
 	    (sizeof(struct e1000_tx_desc)) * adapter->num_tx_desc);
 
 	/* Free any existing TX buffers */
+#ifndef __HAIKU__
 	for (int i = 0; i < adapter->num_tx_desc; i++, tx_buffer++) {
+#else
+	for (i = 0; i < adapter->num_tx_desc; i++, tx_buffer++) {
+#endif
 		tx_buffer = &adapter->tx_buffer_area[i];
 		bus_dmamap_sync(adapter->txtag, tx_buffer->map,
 		    BUS_DMASYNC_POSTWRITE);
@@ -2801,7 +2817,12 @@ lem_free_transmit_structures(struct adapter *adapter)
 	INIT_DEBUGOUT("free_transmit_structures: begin");
 
 	if (adapter->tx_buffer_area != NULL) {
+#ifdef __HAIKU__
+		int i;
+		for (i = 0; i < adapter->num_tx_desc; i++) {
+#else
 		for (int i = 0; i < adapter->num_tx_desc; i++) {
+#endif
 			tx_buffer = &adapter->tx_buffer_area[i];
 			if (tx_buffer->m_head != NULL) {
 				bus_dmamap_sync(adapter->txtag, tx_buffer->map,
@@ -3791,6 +3812,9 @@ lem_unregister_vlan(void *arg, struct ifnet *ifp, u16 vtag)
 static void
 lem_setup_vlan_hw_support(struct adapter *adapter)
 {
+#ifdef __HAIKU__
+	int i;
+#endif
 	struct e1000_hw *hw = &adapter->hw;
 	u32             reg;
 
@@ -3807,7 +3831,11 @@ lem_setup_vlan_hw_support(struct adapter *adapter)
 	** A soft reset zero's out the VFTA, so
 	** we need to repopulate it now.
 	*/
+#ifndef __HAIKU__
 	for (int i = 0; i < EM_VFTA_SIZE; i++)
+#else
+	for (i = 0; i < EM_VFTA_SIZE; i++)
+#endif
                 if (adapter->shadow_vfta[i] != 0)
 			E1000_WRITE_REG_ARRAY(hw, E1000_VFTA,
                             i, adapter->shadow_vfta[i]);
@@ -4062,12 +4090,19 @@ lem_enable_wakeup(device_t dev)
 static int
 lem_enable_phy_wakeup(struct adapter *adapter)
 {
+#ifdef __HAIKU__
+	int i;
+#endif
 	struct e1000_hw *hw = &adapter->hw;
 	u32 mreg, ret = 0;
 	u16 preg;
 
 	/* copy MAC RARs to PHY RARs */
+#ifndef __HAIKU__
 	for (int i = 0; i < adapter->hw.mac.rar_entry_count; i++) {
+#else
+	for (i = 0; i < adapter->hw.mac.rar_entry_count; i++) {
+#endif
 		mreg = E1000_READ_REG(hw, E1000_RAL(i));
 		e1000_write_phy_reg(hw, BM_RAR_L(i), (u16)(mreg & 0xFFFF));
 		e1000_write_phy_reg(hw, BM_RAR_M(i),
@@ -4079,7 +4114,11 @@ lem_enable_phy_wakeup(struct adapter *adapter)
 	}
 
 	/* copy MAC MTA to PHY MTA */
+#ifndef __HAIKU__
 	for (int i = 0; i < adapter->hw.mac.mta_reg_count; i++) {
+#else
+	for (i = 0; i < adapter->hw.mac.mta_reg_count; i++) {
+#endif	
 		mreg = E1000_READ_REG_ARRAY(hw, E1000_MTA, i);
 		e1000_write_phy_reg(hw, BM_MTA(i), (u16)(mreg & 0xFFFF));
 		e1000_write_phy_reg(hw, BM_MTA(i) + 1,
