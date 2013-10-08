@@ -93,12 +93,9 @@ dump_queue(SimpleRunQueue::ConstIterator& iterator)
 		kprintf("thread      id      priority penalty  name\n");
 		while (iterator.HasNext()) {
 			Thread* thread = iterator.Next();
-			scheduler_thread_data* schedulerThreadData
-				= reinterpret_cast<scheduler_thread_data*>(
-					thread->scheduler_data);
 			kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 " %-8" B_PRId32 " %s\n",
 				thread, thread->id, thread->priority,
-				schedulerThreadData->priority_penalty, thread->name);
+				thread->scheduler_data->priority_penalty, thread->name);
 		}
 	}
 }
@@ -140,11 +137,8 @@ simple_get_effective_priority(Thread* thread)
 	if (thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
 		return thread->priority;
 
-	scheduler_thread_data* schedulerThreadData
-		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
-
 	int32 effectivePriority = thread->priority;
-	effectivePriority -= schedulerThreadData->priority_penalty;
+	effectivePriority -= thread->scheduler_data->priority_penalty;
 
 	ASSERT(effectivePriority < B_FIRST_REAL_TIME_PRIORITY);
 	ASSERT(effectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
@@ -168,13 +162,10 @@ simple_should_force_yield(Thread* thread)
 	if (thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
 		return false;
 
-	scheduler_thread_data* schedulerThreadData
-		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
-
 	const int kYieldFrequency = 1 << (min_c(thread->priority, 25) / 5 + 1);
 
-	return schedulerThreadData->forced_yield_count != 0
-		&& schedulerThreadData->forced_yield_count % kYieldFrequency == 0;
+	return thread->scheduler_data->forced_yield_count != 0
+		&& thread->scheduler_data->forced_yield_count % kYieldFrequency == 0;
 }
 
 
@@ -188,8 +179,7 @@ simple_increase_penalty(Thread* thread)
 
 	TRACE("increasing thread %ld penalty\n", thread->id);
 
-	scheduler_thread_data* schedulerThreadData
-		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 	int32 oldPenalty = schedulerThreadData->priority_penalty++;
 
 	ASSERT(thread->priority - oldPenalty >= B_LOWEST_ACTIVE_PRIORITY);
@@ -205,8 +195,7 @@ simple_increase_penalty(Thread* thread)
 static inline void
 simple_cancel_penalty(Thread* thread)
 {
-	scheduler_thread_data* schedulerThreadData
-		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 
 	if (schedulerThreadData->priority_penalty != 0)
 		TRACE("cancelling thread %ld penalty\n", thread->id);
@@ -220,8 +209,7 @@ simple_enqueue(Thread* thread, bool newOne)
 {
 	thread->state = thread->next_state = B_THREAD_READY;
 
-	scheduler_thread_data* schedulerThreadData
-		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 
 	bigtime_t hasSlept = system_time() - schedulerThreadData->went_sleep;
 	if (newOne && hasSlept > kThreadQuantum)
@@ -248,11 +236,7 @@ simple_enqueue(Thread* thread, bool newOne)
 
 	Thread* currentThread = thread_get_current_thread();
 	if (newOne && threadPriority > currentThread->priority) {
-		scheduler_thread_data* schedulerCurrentThreadData
-			= reinterpret_cast<scheduler_thread_data*>(
-				currentThread->scheduler_data);
-
-		schedulerCurrentThreadData->lost_cpu = true;
+		currentThread->scheduler_data->lost_cpu = true;
 		gCPU[0].invoke_scheduler = true;
 		gCPU[0].invoke_scheduler_if_idle = false;
 	}
@@ -325,10 +309,8 @@ reschedule_event(timer* /* unused */)
 	// This function is called as a result of the timer event set by the
 	// scheduler. Make sure the reschedule() is invoked.
 	Thread* thread= thread_get_current_thread();
-	scheduler_thread_data* schedulerThreadData
-		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
 
-	schedulerThreadData->lost_cpu = true;
+	thread->scheduler_data->lost_cpu = true;
 	thread->cpu->invoke_scheduler = true;
 	thread->cpu->invoke_scheduler_if_idle = false;
 	thread->cpu->preempted = 1;
@@ -339,8 +321,7 @@ reschedule_event(timer* /* unused */)
 static inline bool 
 simple_quantum_ended(Thread* thread, bool wasPreempted, bool hasYielded)
 {
-	scheduler_thread_data* schedulerThreadData
-		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 
 	if (hasYielded) {
 		schedulerThreadData->time_left = 0;
@@ -364,8 +345,7 @@ simple_quantum_ended(Thread* thread, bool wasPreempted, bool hasYielded)
 static inline bigtime_t
 simple_compute_quantum(Thread* thread)
 {
-	scheduler_thread_data* schedulerThreadData
-		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 
 	bigtime_t quantum;
 	if (schedulerThreadData->time_left != 0)
@@ -434,8 +414,7 @@ simple_reschedule(void)
 	TRACE("reschedule(): current thread = %ld\n", oldThread->id);
 
 	oldThread->state = oldThread->next_state;
-	scheduler_thread_data* schedulerOldThreadData
-		= reinterpret_cast<scheduler_thread_data*>(oldThread->scheduler_data);
+	scheduler_thread_data* schedulerOldThreadData = oldThread->scheduler_data;
 
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
@@ -542,9 +521,7 @@ simple_on_thread_create(Thread* thread, bool idleThread)
 static void
 simple_on_thread_init(Thread* thread)
 {
-	scheduler_thread_data* schedulerThreadData
-		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
-	schedulerThreadData->Init();
+	thread->scheduler_data->Init();
 }
 
 
