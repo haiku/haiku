@@ -89,7 +89,6 @@ static const struct iwn_ident iwn_ident_table[] = {
 	{ 0x8086, 0x008b, "Intel Centrino Wireless-N 1030"		},
 	{ 0x8086, 0x0090, "Intel Centrino Advanced-N 6230"		},
 	{ 0x8086, 0x0091, "Intel Centrino Advanced-N 6230"		},
-	{ 0x8086, 0x088e, "Intel Centrino Advanced-N 6235"		},
 	{ 0x8086, 0x0885, "Intel Centrino Wireless-N + WiMAX 6150"	},
 	{ 0x8086, 0x0886, "Intel Centrino Wireless-N + WiMAX 6150"	},
 	{ 0x8086, 0x0896, "Intel Centrino Wireless-N 130"		},
@@ -456,12 +455,12 @@ iwn_attach(device_t dev)
 	pci_write_config(dev, 0x41, 0, 1);
 
 	/* Hardware bug workaround. */
-	reg = pci_read_config(dev, PCIR_COMMAND, 1);
+	reg = pci_read_config(dev, PCIR_COMMAND, 2);
 	if (reg & PCIM_CMD_INTxDIS) {
 		DPRINTF(sc, IWN_DEBUG_RESET, "%s: PCIe INTx Disable set\n",
 		    __func__);
 		reg &= ~PCIM_CMD_INTxDIS;
-		pci_write_config(dev, PCIR_COMMAND, reg, 1);
+		pci_write_config(dev, PCIR_COMMAND, reg, 2);
 	}
 
 	/* Enable bus-mastering. */
@@ -1376,7 +1375,7 @@ iwn_alloc_rx_ring(struct iwn_softc *sc, struct iwn_rx_ring *ring)
 			goto fail;
 		}
 
-		data->m = m_getjcl(M_DONTWAIT, MT_DATA, M_PKTHDR,
+		data->m = m_getjcl(M_NOWAIT, MT_DATA, M_PKTHDR,
 		    IWN_RBUF_SIZE);
 		if (data->m == NULL) {
 			device_printf(sc->sc_dev,
@@ -2333,7 +2332,7 @@ iwn_rx_done(struct iwn_softc *sc, struct iwn_rx_desc *desc,
 		return;
 	}
 
-	m1 = m_getjcl(M_DONTWAIT, MT_DATA, M_PKTHDR, IWN_RBUF_SIZE);
+	m1 = m_getjcl(M_NOWAIT, MT_DATA, M_PKTHDR, IWN_RBUF_SIZE);
 	if (m1 == NULL) {
 		DPRINTF(sc, IWN_DEBUG_ANY, "%s: no mbuf to restock ring\n",
 		    __func__);
@@ -3543,7 +3542,7 @@ iwn_tx_data(struct iwn_softc *sc, struct mbuf *m, struct ieee80211_node *ni)
 			return error;
 		}
 		/* Too many DMA segments, linearize mbuf. */
-		m1 = m_collapse(m, M_DONTWAIT, IWN_MAX_SCATTER);
+		m1 = m_collapse(m, M_NOWAIT, IWN_MAX_SCATTER);
 		if (m1 == NULL) {
 			device_printf(sc->sc_dev,
 			    "%s: could not defrag mbuf\n", __func__);
@@ -3747,7 +3746,7 @@ iwn_tx_data_raw(struct iwn_softc *sc, struct mbuf *m,
 			return error;
 		}
 		/* Too many DMA segments, linearize mbuf. */
-		m1 = m_collapse(m, M_DONTWAIT, IWN_MAX_SCATTER);
+		m1 = m_collapse(m, M_NOWAIT, IWN_MAX_SCATTER);
 		if (m1 == NULL) {
 			device_printf(sc->sc_dev,
 			    "%s: could not defrag mbuf\n", __func__);
@@ -3980,7 +3979,7 @@ iwn_cmd(struct iwn_softc *sc, int code, const void *buf, int size, int async)
 		/* Command is too large to fit in a descriptor. */
 		if (totlen > MCLBYTES)
 			return EINVAL;
-		m = m_getjcl(M_DONTWAIT, MT_DATA, M_PKTHDR, MJUMPAGESIZE);
+		m = m_getjcl(M_NOWAIT, MT_DATA, M_PKTHDR, MJUMPAGESIZE);
 		if (m == NULL)
 			return ENOMEM;
 		cmd = mtod(m, struct iwn_tx_cmd *);

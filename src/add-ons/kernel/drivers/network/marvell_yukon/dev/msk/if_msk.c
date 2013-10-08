@@ -162,7 +162,7 @@ TUNABLE_INT("hw.msk.jumbo_disable", &jumbo_disable);
 /*
  * Devices supported by this driver.
  */
-static struct msk_product {
+static const struct msk_product {
 	uint16_t	msk_vendorid;
 	uint16_t	msk_deviceid;
 	const char	*msk_name;
@@ -257,6 +257,7 @@ static int mskc_shutdown(device_t);
 static int mskc_setup_rambuffer(struct msk_softc *);
 static int mskc_suspend(device_t);
 static int mskc_resume(device_t);
+static bus_dma_tag_t mskc_get_dma_tag(device_t, device_t);
 static void mskc_reset(struct msk_softc *);
 
 static int msk_probe(device_t);
@@ -334,6 +335,8 @@ static device_method_t mskc_methods[] = {
 	DEVMETHOD(device_resume,	mskc_resume),
 	DEVMETHOD(device_shutdown,	mskc_shutdown),
 
+	DEVMETHOD(bus_get_dma_tag,	mskc_get_dma_tag),
+
 	DEVMETHOD_END
 };
 
@@ -368,9 +371,9 @@ static driver_t msk_driver = {
 
 static devclass_t msk_devclass;
 
-DRIVER_MODULE(mskc, pci, mskc_driver, mskc_devclass, 0, 0);
-DRIVER_MODULE(msk, mskc, msk_driver, msk_devclass, 0, 0);
-DRIVER_MODULE(miibus, msk, miibus_driver, miibus_devclass, 0, 0);
+DRIVER_MODULE(mskc, pci, mskc_driver, mskc_devclass, NULL, NULL);
+DRIVER_MODULE(msk, mskc, msk_driver, msk_devclass, NULL, NULL);
+DRIVER_MODULE(miibus, msk, miibus_driver, miibus_devclass, NULL, NULL);
 
 static struct resource_spec msk_res_spec_io[] = {
 	{ SYS_RES_IOPORT,	PCIR_BAR(1),	RF_ACTIVE },
@@ -648,8 +651,8 @@ msk_rx_fill(struct msk_if_softc *sc_if, int jumbo)
 	if ((sc_if->msk_flags & MSK_FLAG_DESCV2) == 0 &&
 	    (sc_if->msk_ifp->if_capenable & IFCAP_RXCSUM) != 0) {
 		/* Wait until controller executes OP_TCPSTART command. */
-		for (i = 10; i > 0; i--) {
-			DELAY(10);
+		for (i = 100; i > 0; i--) {
+			DELAY(100);
 			idx = CSR_READ_2(sc_if->msk_softc,
 			    Y2_PREF_Q_ADDR(sc_if->msk_rxq,
 			    PREF_UNIT_GET_IDX_REG));
@@ -897,7 +900,7 @@ msk_newbuf(struct msk_if_softc *sc_if, int idx)
 	bus_dmamap_t map;
 	int nsegs;
 
-	m = m_getcl(M_DONTWAIT, MT_DATA, M_PKTHDR);
+	m = m_getcl(M_NOWAIT, MT_DATA, M_PKTHDR);
 	if (m == NULL)
 		return (ENOBUFS);
 
@@ -955,7 +958,7 @@ msk_jumbo_newbuf(struct msk_if_softc *sc_if, int idx)
 	bus_dmamap_t map;
 	int nsegs;
 
-	m = m_getjcl(M_DONTWAIT, MT_DATA, M_PKTHDR, MJUM9BYTES);
+	m = m_getjcl(M_NOWAIT, MT_DATA, M_PKTHDR, MJUM9BYTES);
 	if (m == NULL)
 		return (ENOBUFS);
 	if ((m->m_flags & M_EXT) == 0) {
@@ -1180,15 +1183,14 @@ msk_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 static int
 mskc_probe(device_t dev)
 {
-	struct msk_product *mp;
+	const struct msk_product *mp;
 	uint16_t vendor, devid;
 	int i;
 
 	vendor = pci_get_vendor(dev);
 	devid = pci_get_device(dev);
 	mp = msk_products;
-	for (i = 0; i < sizeof(msk_products)/sizeof(msk_products[0]);
-	    i++, mp++) {
+	for (i = 0; i < nitems(msk_products); i++, mp++) {
 		if (vendor == mp->msk_vendorid && devid == mp->msk_deviceid) {
 			device_set_desc(dev, mp->msk_name);
 			return (BUS_PROBE_DEFAULT);
@@ -1696,6 +1698,12 @@ msk_attach(device_t dev)
 			ifp->if_capabilities |= IFCAP_VLAN_HWCSUM;
 	}
 	ifp->if_capenable = ifp->if_capabilities;
+	/*
+	 * Disable RX checksum offloading on controllers that don't use
+	 * new descriptor format but give chance to enable it.
+	 */
+	if ((sc_if->msk_flags & MSK_FLAG_DESCV2) == 0)
+		ifp->if_capenable &= ~IFCAP_RXCSUM;
 
 	/*
 	 * Tell the upper layer(s) we support long frames.
@@ -2111,6 +2119,13 @@ mskc_detach(device_t dev)
 	mtx_destroy(&sc->msk_mtx);
 
 	return (0);
+}
+
+static bus_dma_tag_t
+mskc_get_dma_tag(device_t bus, device_t child __unused)
+{
+
+	return (bus_get_dma_tag(bus));
 }
 
 struct msk_dmamap_arg {
@@ -2658,7 +2673,7 @@ msk_encap(struct msk_if_softc *sc_if, struct mbuf **m_head)
 
 		if (M_WRITABLE(m) == 0) {
 			/* Get a writable copy. */
-			m = m_dup(*m_head, M_DONTWAIT);
+			m = m_dup(*m_head, M_NOWAIT);
 			m_freem(*m_head);
 			if (m == NULL) {
 				*m_head = NULL;
@@ -2737,7 +2752,7 @@ msk_encap(struct msk_if_softc *sc_if, struct mbuf **m_head)
 	error = bus_dmamap_load_mbuf_sg(sc_if->msk_cdata.msk_tx_tag, map,
 	    *m_head, txsegs, &nseg, BUS_DMA_NOWAIT);
 	if (error == EFBIG) {
-		m = m_collapse(*m_head, M_DONTWAIT, MSK_MAXTXSEGS);
+		m = m_collapse(*m_head, M_NOWAIT, MSK_MAXTXSEGS);
 		if (m == NULL) {
 			m_freem(*m_head);
 			*m_head = NULL;

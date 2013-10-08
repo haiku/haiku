@@ -166,7 +166,8 @@ wi_write_val(struct wi_softc *sc, int rid, u_int16_t val)
 	return wi_write_rid(sc, rid, &val, sizeof(val));
 }
 
-SYSCTL_NODE(_hw, OID_AUTO, wi, CTLFLAG_RD, 0, "Wireless driver parameters");
+static SYSCTL_NODE(_hw, OID_AUTO, wi, CTLFLAG_RD, 0,
+	    "Wireless driver parameters");
 
 static	struct timeval lasttxerror;	/* time of last tx error msg */
 static	int curtxeps;			/* current tx error msgs/sec */
@@ -1359,9 +1360,9 @@ wi_rx_intr(struct wi_softc *sc)
 	}
 
 	if (off + len > MHLEN)
-		m = m_getcl(M_DONTWAIT, MT_DATA, M_PKTHDR);
+		m = m_getcl(M_NOWAIT, MT_DATA, M_PKTHDR);
 	else
-		m = m_gethdr(M_DONTWAIT, MT_DATA);
+		m = m_gethdr(M_NOWAIT, MT_DATA);
 	if (m == NULL) {
 		CSR_WRITE_2(sc, WI_EVENT_ACK, WI_EV_RX);
 		ifp->if_ierrors++;

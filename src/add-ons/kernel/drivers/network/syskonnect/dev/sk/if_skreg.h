@@ -1289,7 +1289,7 @@
 struct sk_type {
 	u_int16_t		sk_vid;
 	u_int16_t		sk_did;
-	char			*sk_name;
+	const char		*sk_name;
 };
 
 #define SK_ADDR_LO(x)	((u_int64_t) (x) & 0xffffffff)
@@ -1450,7 +1450,9 @@ struct sk_softc {
 	u_int32_t		sk_pmd;		/* physical media type */
 	u_int32_t		sk_coppertype;
 	u_int32_t		sk_intrmask;
+#ifdef __HAIKU__
 	u_int32_t		sk_intstatus;
+#endif
 	int			sk_int_mod;
 	int			sk_int_ticks;
 	int			sk_suspended;
