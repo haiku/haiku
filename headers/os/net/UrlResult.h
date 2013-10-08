@@ -14,11 +14,11 @@
 #include <Url.h>
 
 
-class BUrlProtocol;
+class BUrlRequest;
 
 
 class BUrlResult {
-			friend class 		BUrlProtocol;
+			friend class 		BUrlRequest;
 			
 public:
 								BUrlResult(const BUrl& url);

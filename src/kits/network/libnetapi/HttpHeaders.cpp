@@ -277,6 +277,8 @@ BHttpHeaders::Clear()
 BHttpHeaders&
 BHttpHeaders::operator=(const BHttpHeaders& other)
 {
+	Clear();
+
 	for (int32 i = 0; i < other.CountHeaders(); i++)
 		AddHeader(other.HeaderAt(i).Name(), other.HeaderAt(i).Value());
 

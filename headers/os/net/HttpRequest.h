@@ -14,22 +14,34 @@
 #include <HttpHeaders.h>
 #include <NetBuffer.h>
 #include <NetworkAddress.h>
-#include <UrlProtocol.h>
+#include <UrlRequest.h>
 
 
 class BAbstractSocket;
 
 
-class BUrlProtocolHttp : public BUrlProtocol {
+class BHttpRequest : public BUrlRequest {
 public:
-								BUrlProtocolHttp(BUrl& url, bool ssl = false,
+								BHttpRequest(const BUrl& url,
+									BUrlResult& result, bool ssl = false,
 									const char *protocolName = "HTTP",
 									BUrlProtocolListener* listener = NULL,
-									BUrlContext* context = NULL,
-									BUrlResult* result = NULL);
-	virtual						~BUrlProtocolHttp();
+									BUrlContext* context = NULL);
+	virtual						~BHttpRequest();
 
-	virtual	status_t			SetOption(uint32 option, void* value);
+            void                SetMethod(int8 method);
+            void                SetFollowLocation(bool follow);
+            void                SetMaxRedirections(int8 maxRedirections);
+            void                SetReferrer(const BString& referrer);
+            void                SetUserAgent(const BString& agent);
+            void                SetHeaders(BHttpHeaders* headers);
+            void                SetDiscardData(bool discard);
+            void                SetDisableListener(bool disable);
+            void                SetAutoReferrer(bool enable);
+            void                SetPostFields(BHttpForm* fields);
+            void                SetInputData(BDataIO* data, ssize_t size = -1);
+            void                SetUserName(const BString& name);
+            void                SetPassword(const BString& password);
 
 	static	bool				IsInformationalStatusCode(int16 code);
 	static	bool				IsSuccessStatusCode(int16 code);
@@ -89,6 +101,7 @@ private:
 			BHttpHeaders*		fOptHeaders;
 			BHttpForm*			fOptPostFields;
 			BDataIO*			fOptInputData;
+			ssize_t				fOptInputDataSize;
 			bool				fOptSetCookies : 1;
 			bool				fOptFollowLocation : 1;
 			bool				fOptDiscardData : 1;

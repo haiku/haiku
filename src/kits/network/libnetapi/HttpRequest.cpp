@@ -17,10 +17,7 @@
 #include <File.h>
 #include <Socket.h>
 #include <SecureSocket.h>
-#include <UrlProtocolHttp.h>
-
-
-using BPrivate::BUrlProtocolOption;
+#include <HttpRequest.h>
 
 
 static const int32 kHttpProtocolReceiveBufferSize = 1024;
@@ -31,11 +28,11 @@ static const char* kHttpProtocolThreadStrStatus[
 	};
 
 
-BUrlProtocolHttp::BUrlProtocolHttp(BUrl& url, bool ssl,
+BHttpRequest::BHttpRequest(const BUrl& url, BUrlResult& result, bool ssl,
 	const char* protocolName, BUrlProtocolListener* listener,
-	BUrlContext* context, BUrlResult* result)
+	BUrlContext* context)
 	:
-	BUrlProtocol(url, listener, context, result, "BUrlProtocol.HTTP", protocolName),
+	BUrlRequest(url, listener, context, result, "BUrlProtocol.HTTP", protocolName),
 	fSSL(ssl),
 	fRequestMethod(B_HTTP_GET),
 	fHttpVersion(B_HTTP_11)
@@ -48,83 +45,109 @@ BUrlProtocolHttp::BUrlProtocolHttp(BUrl& url, bool ssl,
 }
 
 
-BUrlProtocolHttp::~BUrlProtocolHttp()
+BHttpRequest::~BHttpRequest()
 {
 	delete fSocket;
 }
 
 
-status_t
-BUrlProtocolHttp::SetOption(uint32 name, void* value)
+void
+BHttpRequest::SetMethod(int8 method)
 {
-	BUrlProtocolOption option(value);
+	fRequestMethod = method;
+}
 
-	switch (name) {
-		case B_HTTPOPT_METHOD:
-			fRequestMethod = option.Int8();
-			break;
 
-		case B_HTTPOPT_FOLLOWLOCATION:
-			fOptFollowLocation = option.Bool();
-			break;
+void
+BHttpRequest::SetFollowLocation(bool follow)
+{
+	fOptFollowLocation = follow;
+}
 
-		case B_HTTPOPT_MAXREDIRS:
-			fOptMaxRedirs = option.Int8();
-			break;
 
-		case B_HTTPOPT_REFERER:
-			fOptReferer = option.String();
-			break;
+void
+BHttpRequest::SetMaxRedirections(int8 redirections)
+{
+	fOptMaxRedirs = redirections;
+}
 
-		case B_HTTPOPT_USERAGENT:
-			fOptUserAgent = option.String();
-			break;
 
-		case B_HTTPOPT_HEADERS:
-			fOptHeaders = reinterpret_cast<BHttpHeaders*>(option.Pointer());
-			break;
+void
+BHttpRequest::SetReferrer(const BString& referrer)
+{
+	fOptReferer = referrer;
+}
 
-		case B_HTTPOPT_DISCARD_DATA:
-			fOptDiscardData = option.Bool();
-			break;
 
-		case B_HTTPOPT_DISABLE_LISTENER:
-			fOptDisableListener = option.Bool();
-			break;
+void
+BHttpRequest::SetUserAgent(const BString& agent)
+{
+	fOptUserAgent = agent;
+}
 
-		case B_HTTPOPT_AUTOREFERER:
-			fOptAutoReferer = option.Bool();
-			break;
 
-		case B_HTTPOPT_POSTFIELDS:
-			fOptPostFields = reinterpret_cast<BHttpForm*>(option.Pointer());
+void
+BHttpRequest::SetHeaders(BHttpHeaders* headers)
+{
+	fOptHeaders = headers;
+}
 
-			if (fOptPostFields != NULL)
-				fRequestMethod = B_HTTP_POST;
-			break;
 
-		case B_HTTPOPT_INPUTDATA:
-			fOptInputData = reinterpret_cast<BDataIO*>(option.Pointer());
-			break;
+void
+BHttpRequest::SetDiscardData(bool discard)
+{
+	fOptDiscardData = discard;
+}
 
-		case B_HTTPOPT_AUTHUSERNAME:
-			fOptUsername = option.String();
-			break;
 
-		case B_HTTPOPT_AUTHPASSWORD:
-			fOptPassword = option.String();
-			break;
+void
+BHttpRequest::SetDisableListener(bool disable)
+{
+	fOptDisableListener = disable;
+}
 
-		default:
-			return B_ERROR;
-	}
 
-	return B_OK;
+void
+BHttpRequest::SetAutoReferrer(bool enable)
+{
+    fOptAutoReferer = enable;
+}
+
+
+void
+BHttpRequest::SetPostFields(BHttpForm* fields)
+{
+	fOptPostFields = fields;
+
+	if (fOptPostFields != NULL)
+		fRequestMethod = B_HTTP_POST;
+}
+
+
+void
+BHttpRequest::SetInputData(BDataIO* data, ssize_t size)
+{
+	fOptInputData = data;
+	fOptInputDataSize = size;
+}
+
+
+void
+BHttpRequest::SetUserName(const BString& name)
+{
+	fOptUsername = name;
+}
+
+
+void
+BHttpRequest::SetPassword(const BString& password)
+{
+	fOptPassword = password;
 }
 
 
 /*static*/ bool
-BUrlProtocolHttp::IsInformationalStatusCode(int16 code)
+BHttpRequest::IsInformationalStatusCode(int16 code)
 {
 	return (code >= B_HTTP_STATUS__INFORMATIONAL_BASE)
 		&& (code <  B_HTTP_STATUS__INFORMATIONAL_END);
@@ -132,7 +155,7 @@ BUrlProtocolHttp::IsInformationalStatusCode(int16 code)
 
 
 /*static*/ bool
-BUrlProtocolHttp::IsSuccessStatusCode(int16 code)
+BHttpRequest::IsSuccessStatusCode(int16 code)
 {
 	return (code >= B_HTTP_STATUS__SUCCESS_BASE)
 		&& (code <  B_HTTP_STATUS__SUCCESS_END);
@@ -140,7 +163,7 @@ BUrlProtocolHttp::IsSuccessStatusCode(int16 code)
 
 
 /*static*/ bool
-BUrlProtocolHttp::IsRedirectionStatusCode(int16 code)
+BHttpRequest::IsRedirectionStatusCode(int16 code)
 {
 	return (code >= B_HTTP_STATUS__REDIRECTION_BASE)
 		&& (code <  B_HTTP_STATUS__REDIRECTION_END);
@@ -148,7 +171,7 @@ BUrlProtocolHttp::IsRedirectionStatusCode(int16 code)
 
 
 /*static*/ bool
-BUrlProtocolHttp::IsClientErrorStatusCode(int16 code)
+BHttpRequest::IsClientErrorStatusCode(int16 code)
 {
 	return (code >= B_HTTP_STATUS__CLIENT_ERROR_BASE)
 		&& (code <  B_HTTP_STATUS__CLIENT_ERROR_END);
@@ -156,7 +179,7 @@ BUrlProtocolHttp::IsClientErrorStatusCode(int16 code)
 
 
 /*static*/ bool
-BUrlProtocolHttp::IsServerErrorStatusCode(int16 code)
+BHttpRequest::IsServerErrorStatusCode(int16 code)
 {
 	return (code >= B_HTTP_STATUS__SERVER_ERROR_BASE)
 		&& (code <  B_HTTP_STATUS__SERVER_ERROR_END);
@@ -164,17 +187,17 @@ BUrlProtocolHttp::IsServerErrorStatusCode(int16 code)
 
 
 /*static*/ int16
-BUrlProtocolHttp::StatusCodeClass(int16 code)
+BHttpRequest::StatusCodeClass(int16 code)
 {
-	if (BUrlProtocolHttp::IsInformationalStatusCode(code))
+	if (BHttpRequest::IsInformationalStatusCode(code))
 		return B_HTTP_STATUS_CLASS_INFORMATIONAL;
-	else if (BUrlProtocolHttp::IsSuccessStatusCode(code))
+	else if (BHttpRequest::IsSuccessStatusCode(code))
 		return B_HTTP_STATUS_CLASS_SUCCESS;
-	else if (BUrlProtocolHttp::IsRedirectionStatusCode(code))
+	else if (BHttpRequest::IsRedirectionStatusCode(code))
 		return B_HTTP_STATUS_CLASS_REDIRECTION;
-	else if (BUrlProtocolHttp::IsClientErrorStatusCode(code))
+	else if (BHttpRequest::IsClientErrorStatusCode(code))
 		return B_HTTP_STATUS_CLASS_CLIENT_ERROR;
-	else if (BUrlProtocolHttp::IsServerErrorStatusCode(code))
+	else if (BHttpRequest::IsServerErrorStatusCode(code))
 		return B_HTTP_STATUS_CLASS_SERVER_ERROR;
 
 	return B_HTTP_STATUS_CLASS_INVALID;
@@ -182,12 +205,12 @@ BUrlProtocolHttp::StatusCodeClass(int16 code)
 
 
 const char*
-BUrlProtocolHttp::StatusString(status_t threadStatus) const
+BHttpRequest::StatusString(status_t threadStatus) const
 {
 	if (threadStatus < B_PROT_THREAD_STATUS__END)
-		return BUrlProtocol::StatusString(threadStatus);
+		return BUrlRequest::StatusString(threadStatus);
 	else if (threadStatus >= B_PROT_HTTP_THREAD_STATUS__END)
-		return BUrlProtocol::StatusString(-1);
+		return BUrlRequest::StatusString(-1);
 	else
 		return kHttpProtocolThreadStrStatus[threadStatus
 			- B_PROT_THREAD_STATUS__END];
@@ -195,7 +218,7 @@ BUrlProtocolHttp::StatusString(status_t threadStatus) const
 
 
 void
-BUrlProtocolHttp::_ResetOptions()
+BHttpRequest::_ResetOptions()
 {
 	fOptFollowLocation = true;
 	fOptMaxRedirs = 8;
@@ -215,7 +238,7 @@ BUrlProtocolHttp::_ResetOptions()
 
 #include <stdio.h>
 status_t
-BUrlProtocolHttp::_ProtocolLoop()
+BHttpRequest::_ProtocolLoop()
 {
 	printf("UHP[%p]::{Loop} %s\n", this, fUrl.UrlString().String());
 
@@ -252,7 +275,7 @@ BUrlProtocolHttp::_ProtocolLoop()
 		if (fOptAutoReferer)
 			fOptReferer = fUrl.UrlString();
 
-		switch (StatusCodeClass(fResult->StatusCode())) {
+		switch (StatusCodeClass(fResult.StatusCode())) {
 			case B_HTTP_STATUS_CLASS_INFORMATIONAL:
 				// Header 100:continue should have been
 				// handled in the _MakeRequest read loop
@@ -268,7 +291,7 @@ BUrlProtocolHttp::_ProtocolLoop()
 
 				//  TODO: Some browsers seems to translate POST requests to
 				// GET when following a 302 redirection
-				if (fResult->StatusCode() == B_HTTP_STATUS_MOVED_PERMANENTLY) {
+				if (fResult.StatusCode() == B_HTTP_STATUS_MOVED_PERMANENTLY) {
 					BString locationUrl = fHeaders["Location"];
 
 					// Absolute path
@@ -289,7 +312,7 @@ BUrlProtocolHttp::_ProtocolLoop()
 				break;
 
 			case B_HTTP_STATUS_CLASS_CLIENT_ERROR:
-				switch (fResult->StatusCode()) {
+				switch (fResult.StatusCode()) {
 					case B_HTTP_STATUS_UNAUTHORIZED:
 						if (fAuthentication.Method() != B_HTTP_AUTHENTICATION_NONE) {
 							newRequest = false;
@@ -321,7 +344,7 @@ BUrlProtocolHttp::_ProtocolLoop()
 		"%ld headers and %ld bytes of data remaining",
 		fHeaders.CountHeaders(), fInputBuffer.Size());
 
-	if (fResult->StatusCode() == 404)
+	if (fResult.StatusCode() == 404)
 		return B_PROT_HTTP_NOT_FOUND;
 
 	return B_PROT_SUCCESS;
@@ -329,7 +352,7 @@ BUrlProtocolHttp::_ProtocolLoop()
 
 
 bool
-BUrlProtocolHttp::_ResolveHostName()
+BHttpRequest::_ResolveHostName()
 {
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Resolving %s",
 		fUrl.UrlString().String());
@@ -357,7 +380,7 @@ BUrlProtocolHttp::_ResolveHostName()
 
 
 status_t
-BUrlProtocolHttp::_MakeRequest()
+BHttpRequest::_MakeRequest()
 {
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Connection to %s on port %d.",
 		fUrl.Authority().String(), fRemoteAddr.Port());
@@ -442,13 +465,19 @@ BUrlProtocolHttp::_MakeRequest()
 			read = fOptInputData->Read(outputTempBuffer, 1024);
 
 			if (read > 0) {
-				char hexSize[16];
-				size_t hexLength = sprintf(hexSize, "%ld", read);
+				if (fOptInputDataSize < 0)
+				{
+					// Chunked transfer
+					char hexSize[16];
+					size_t hexLength = sprintf(hexSize, "%ld", read);
 
-				fSocket->Write(hexSize, hexLength);
-				fSocket->Write("\r\n", 2);
-				fSocket->Write(outputTempBuffer, read);
-				fSocket->Write("\r\n", 2);
+					fSocket->Write(hexSize, hexLength);
+					fSocket->Write("\r\n", 2);
+					fSocket->Write(outputTempBuffer, read);
+					fSocket->Write("\r\n", 2);
+				} else {
+					fSocket->Write(outputTempBuffer, read);
+				}
 			}
 		}
 
@@ -626,7 +655,7 @@ BUrlProtocolHttp::_MakeRequest()
 
 
 status_t
-BUrlProtocolHttp::_GetLine(BString& destString)
+BHttpRequest::_GetLine(BString& destString)
 {
 	// Find a complete line in inputBuffer
 	uint32 characterIndex = 0;
@@ -653,7 +682,7 @@ BUrlProtocolHttp::_GetLine(BString& destString)
 
 
 void
-BUrlProtocolHttp::_ParseStatus()
+BHttpRequest::_ParseStatus()
 {
 	// Status line should be formatted like: HTTP/M.m SSS ...
 	// With:   M = Major version of the protocol
@@ -682,7 +711,7 @@ BUrlProtocolHttp::_ParseStatus()
 
 
 void
-BUrlProtocolHttp::_ParseHeaders()
+BHttpRequest::_ParseHeaders()
 {
 	BString currentHeader;
 	if (_GetLine(currentHeader) == B_ERROR)
@@ -700,7 +729,7 @@ BUrlProtocolHttp::_ParseHeaders()
 
 
 void
-BUrlProtocolHttp::_CreateRequest()
+BHttpRequest::_CreateRequest()
 {
 	BString request;
 
@@ -748,7 +777,7 @@ BUrlProtocolHttp::_CreateRequest()
 
 
 void
-BUrlProtocolHttp::_AddHeaders()
+BHttpRequest::_AddHeaders()
 {
 	// HTTP 1.1 additional headers
 	if (fHttpVersion == B_HTTP_11) {
@@ -813,8 +842,14 @@ BUrlProtocolHttp::_AddHeaders()
 		fOutputHeaders.AddHeader("Content-Length",
 			fOptPostFields->ContentLength());
 	} else if (fOptInputData != NULL
-		&& (fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT))
-		fOutputHeaders.AddHeader("Transfer-Encoding", "chunked");
+			&& (fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT))
+	{
+		if(fOptInputDataSize >= 0) {
+			fOutputHeaders.AddHeader("Content-Length", fOptInputDataSize);
+		} else {
+			fOutputHeaders.AddHeader("Transfer-Encoding", "chunked");
+		}
+	}
 
 	// Optional headers specified by the user
 	if (fOptHeaders != NULL) {
@@ -850,7 +885,7 @@ BUrlProtocolHttp::_AddHeaders()
 
 
 void
-BUrlProtocolHttp::_AddOutputBufferLine(const char* line)
+BHttpRequest::_AddOutputBufferLine(const char* line)
 {
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_OUT, "%s", line);
 	fOutputBuffer << line << "\r\n";

@@ -9,62 +9,62 @@
 #include <iostream>
 #include <cstdio>
 
-#include <UrlProtocol.h>
+#include <UrlRequest.h>
 #include <UrlProtocolListener.h>
 
 using namespace std;
 
 
 void
-BUrlProtocolListener::ConnectionOpened(BUrlProtocol*)
+BUrlProtocolListener::ConnectionOpened(BUrlRequest*)
 {
 }
 
 
 void
-BUrlProtocolListener::HostnameResolved(BUrlProtocol*, const char*)
+BUrlProtocolListener::HostnameResolved(BUrlRequest*, const char*)
 {
 }
 
 
 void
-BUrlProtocolListener::ResponseStarted(BUrlProtocol*)
+BUrlProtocolListener::ResponseStarted(BUrlRequest*)
 {
 }
 
 
 void
-BUrlProtocolListener::HeadersReceived(BUrlProtocol*)
+BUrlProtocolListener::HeadersReceived(BUrlRequest*)
 {
 }
 
 
 void
-BUrlProtocolListener::DataReceived(BUrlProtocol*, const char*, ssize_t)
+BUrlProtocolListener::DataReceived(BUrlRequest*, const char*, ssize_t)
 {
 }
 
 
 void
-BUrlProtocolListener::DownloadProgress(BUrlProtocol*, ssize_t, ssize_t)
+BUrlProtocolListener::DownloadProgress(BUrlRequest*, ssize_t, ssize_t)
 {
 }
 
 
 void
-BUrlProtocolListener::UploadProgress(BUrlProtocol*, ssize_t, ssize_t)
+BUrlProtocolListener::UploadProgress(BUrlRequest*, ssize_t, ssize_t)
 {
 }
 
 
 void
-BUrlProtocolListener::RequestCompleted(BUrlProtocol*, bool)
+BUrlProtocolListener::RequestCompleted(BUrlRequest*, bool)
 {
 }
 
 
 void
-BUrlProtocolListener::DebugMessage(BUrlProtocol* caller,
+BUrlProtocolListener::DebugMessage(BUrlRequest* caller,
 	BUrlProtocolDebugMessage type, const char* text)
 {
 	switch (type) {

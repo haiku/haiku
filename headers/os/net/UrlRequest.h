@@ -6,64 +6,93 @@
 #define _B_URL_REQUEST_H_
 
 
-#include <HttpHeaders.h>
 #include <Url.h>
 #include <UrlResult.h>
 #include <UrlContext.h>
-#include <UrlProtocol.h>
 #include <UrlProtocolListener.h>
-
-
-enum {
-	B_NO_HANDLER_FOR_PROTOCOL = B_ERROR
-};
+#include <OS.h>
 
 
 class BUrlRequest {
 public:
 									BUrlRequest(const BUrl& url,
-										BUrlProtocolListener* listener = NULL,
-										BUrlContext* context = NULL);
-									BUrlRequest(const BUrlRequest& other);
+										BUrlProtocolListener* listener,
+										BUrlContext* context,
+										BUrlResult& result,
+										const char* threadName,
+										const char* protocolName);
 	virtual							~BUrlRequest();
 
-	// Request parameters modification
-			status_t				SetUrl(const BUrl& url);
-			void					SetContext(BUrlContext* context);
-			void					SetProtocolListener(
-										BUrlProtocolListener* listener);
-			bool					SetProtocolOption(int32 option,
-										void* value);
-	// Request parameters access
-			const BUrlProtocol*		Protocol();
-			const BUrlResult&		Result();
-			const BUrl&				Url();
-
-	// Request control
-	virtual	status_t				Start();
+	// URL protocol thread management
+	virtual	thread_id				Run();
 	virtual status_t				Pause();
 	virtual status_t				Resume();
-	virtual status_t				Abort();
+	virtual	status_t				Stop();
 
-	// Request informations
-	virtual	status_t				InitCheck() const;
+	// URL protocol parameters modification
+			status_t				SetUrl(const BUrl& url);
+			status_t				SetResult(BUrlResult& result);
+			status_t				SetContext(BUrlContext* context);
+			status_t				SetListener(BUrlProtocolListener* listener);
+
+	// URL protocol parameters access
+			const BUrl&				Url() const;
+			BUrlResult&				Result() const;
+			BUrlContext*			Context() const;
+			BUrlProtocolListener*	Listener() const;
+			const BString&			Protocol() const;
+
+	// URL protocol informations
 			bool					IsRunning() const;
 			status_t				Status() const;
-
-	// Overloaded members
-			BUrlRequest&			operator=(const BUrlRequest& other);
+	virtual const char*				StatusString(status_t threadStatus)
+										const;
 
 
 protected:
-			BUrlProtocolListener*	fListener;
-			BUrlProtocol*			fUrlProtocol;
-			BUrlResult				fResult;
-			BUrlContext*			fContext;
-			BUrl					fUrl;
-			status_t				fInitStatus;
+	static	int32					_ThreadEntry(void* arg);
+	virtual	status_t				_ProtocolLoop();
+	virtual void					_EmitDebug(BUrlProtocolDebugMessage type,
+										const char* format, ...);
 
-private:
-			status_t				_SetupProtocol();
+	// URL result parameters access
+			BMallocIO&				_ResultRawData();
+			BHttpHeaders&			_ResultHeaders();
+			void					_SetResultStatusCode(int32 statusCode);
+			BString&				_ResultStatusText();
+
+protected:
+			BUrl					fUrl;
+			BUrlResult&				fResult;
+			BUrlContext*			fContext;
+			BUrlProtocolListener*	fListener;
+
+			bool					fQuit;
+			bool					fRunning;
+			status_t				fThreadStatus;
+			thread_id				fThreadId;
+			BString					fThreadName;
+			BString					fProtocol;
+};
+
+
+// TODO: Rename, this is in the global namespace.
+enum {
+	B_PROT_THREAD_STATUS__BASE	= 0,
+	B_PROT_SUCCESS = B_PROT_THREAD_STATUS__BASE,
+	B_PROT_RUNNING,
+	B_PROT_PAUSED,
+	B_PROT_ABORTED,
+	B_PROT_SOCKET_ERROR,
+	B_PROT_CONNECTION_FAILED,
+	B_PROT_CANT_RESOLVE_HOSTNAME,
+	B_PROT_WRITE_FAILED,
+	B_PROT_READ_FAILED,
+	B_PROT_NO_MEMORY,
+	B_PROT_PROTOCOL_ERROR,
+		//  Thread status over this one are guaranteed to be
+		// errors
+	B_PROT_THREAD_STATUS__END
 };
 
 #endif // _B_URL_REQUEST_H_

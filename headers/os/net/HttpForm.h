@@ -60,8 +60,7 @@ public:
 									
 	// Change behavior
 			status_t			MarkAsFile(const BString& filename, 
-									const BString& mimeType);
-			status_t			MarkAsFile(const BString& filename);
+									const BString& mimeType = "");
 			void				UnmarkAsFile();
 			status_t			CopyBuffer();
 			

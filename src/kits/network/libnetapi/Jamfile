@@ -54,23 +54,20 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# TODO: The HTTP stuff should all go into an add-on. It needs
 			# linking against libcrypto.so and only the add-on should link
 			# against it.
-			# Building of the commented out files has not been completely tested
-			# after integrating the code from the GSoC 2010 "Services Kit"
-			# project and doing some renaming of types, constants and methods.
 			HttpAuthentication.cpp
 			HttpHeaders.cpp
 			HttpForm.cpp
+			HttpRequest.cpp
 			HttpTime.cpp
 
 			$(md5Sources)
 
 			Url.cpp
 			UrlContext.cpp
-			UrlProtocol.cpp
 			UrlProtocolAsynchronousListener.cpp
 			UrlProtocolDispatchingListener.cpp
-			UrlProtocolHttp.cpp # TODO: -> add-on, See above.
 			UrlProtocolListener.cpp
+			UrlProtocolRoster.cpp
 			UrlRequest.cpp
 			UrlResult.cpp
 			UrlSynchronousRequest.cpp

@@ -46,52 +46,52 @@ BUrlProtocolAsynchronousListener::~BUrlProtocolAsynchronousListener()
 
 
 void
-BUrlProtocolAsynchronousListener::ConnectionOpened(BUrlProtocol*)
+BUrlProtocolAsynchronousListener::ConnectionOpened(BUrlRequest*)
 {
 }
 
 
 void
-BUrlProtocolAsynchronousListener::HostnameResolved(BUrlProtocol*, const char*)
+BUrlProtocolAsynchronousListener::HostnameResolved(BUrlRequest*, const char*)
 {
 }
 
 
 void
-BUrlProtocolAsynchronousListener::ResponseStarted(BUrlProtocol*)
+BUrlProtocolAsynchronousListener::ResponseStarted(BUrlRequest*)
 {
 }
 
 
 void
-BUrlProtocolAsynchronousListener::HeadersReceived(BUrlProtocol*)
+BUrlProtocolAsynchronousListener::HeadersReceived(BUrlRequest*)
 {
 }
 
 
 void
-BUrlProtocolAsynchronousListener::DataReceived(BUrlProtocol*, const char*, 
+BUrlProtocolAsynchronousListener::DataReceived(BUrlRequest*, const char*,
 	ssize_t)
 {
 }
 
 
 void
-BUrlProtocolAsynchronousListener::DownloadProgress(BUrlProtocol*, ssize_t, 
+BUrlProtocolAsynchronousListener::DownloadProgress(BUrlRequest*, ssize_t,
 	ssize_t)
 {
 }
 
 
 void
-BUrlProtocolAsynchronousListener::UploadProgress(BUrlProtocol*, ssize_t, 
+BUrlProtocolAsynchronousListener::UploadProgress(BUrlRequest*, ssize_t,
 	ssize_t)
 {
 }
 
 
 void
-BUrlProtocolAsynchronousListener::RequestCompleted(BUrlProtocol*, bool)
+BUrlProtocolAsynchronousListener::RequestCompleted(BUrlRequest*, bool)
 {
 }
 
@@ -114,7 +114,7 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 		return;
 	}
 	
-	BUrlProtocol* caller;
+	BUrlRequest* caller;
 	if (message->FindPointer(kUrlProtocolCaller,
 		reinterpret_cast<void**>(&caller)) != B_OK)
 		return;

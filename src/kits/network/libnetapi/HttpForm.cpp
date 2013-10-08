@@ -184,13 +184,6 @@ BHttpFormData::MarkAsFile(const BString& filename, const BString& mimeType)
 }
 
 
-status_t
-BHttpFormData::MarkAsFile(const BString& filename)
-{
-	return MarkAsFile(filename, "");
-}
-
-
 void
 BHttpFormData::UnmarkAsFile()
 {
