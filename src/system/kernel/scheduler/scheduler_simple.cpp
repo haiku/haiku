@@ -51,6 +51,8 @@ struct scheduler_thread_data {
 	void		Init();
 
 	int32		priority_penalty;
+	int32		forced_yield_count;
+
 	bool		lost_cpu;
 	bool		cpu_bound;
 
@@ -64,6 +66,8 @@ void
 scheduler_thread_data::Init()
 {
 	priority_penalty = 0;
+	forced_yield_count = 0;
+
 	time_left = 0;
 	stolen_time = 0;
 
@@ -107,8 +111,14 @@ simple_get_effective_priority(Thread *thread)
 		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
 
 	int32 effectivePriority = thread->priority;
-	if (effectivePriority < B_FIRST_REAL_TIME_PRIORITY)
-		effectivePriority -= schedulerThreadData->priority_penalty;
+	if (effectivePriority < B_FIRST_REAL_TIME_PRIORITY) {
+		if (schedulerThreadData->forced_yield_count
+			&& schedulerThreadData->forced_yield_count % 16 == 0) {
+			TRACE("forcing thread %ld to yield\n", thread->id);
+			effectivePriority = B_LOWEST_ACTIVE_PRIORITY;
+		} else
+			effectivePriority -= schedulerThreadData->priority_penalty;
+	}
 
 	ASSERT(schedulerThreadData->priority_penalty >= 0);
 	ASSERT(effectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
@@ -132,8 +142,12 @@ simple_increase_penalty(Thread *thread)
 	int32 oldPenalty = schedulerThreadData->priority_penalty++;
 
 	ASSERT(thread->priority - oldPenalty >= B_LOWEST_ACTIVE_PRIORITY);
-	if (thread->priority - oldPenalty <= B_LOWEST_ACTIVE_PRIORITY)
+	const int kMinimalPriority
+		= min_c(thread->priority, 25) / 5;
+	if (thread->priority - oldPenalty <= kMinimalPriority) {
 		schedulerThreadData->priority_penalty = oldPenalty;
+		schedulerThreadData->forced_yield_count++;
+	}
 }
 
 
