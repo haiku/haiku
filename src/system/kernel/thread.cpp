@@ -2447,11 +2447,6 @@ void
 thread_yield(bool force)
 {
 	if (force) {
-		// snooze for roughly 3 thread quantums
-		snooze_etc(9000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT);
-#if 0
-		cpu_status state;
-
 		Thread *thread = thread_get_current_thread();
 		if (thread == NULL)
 			return;
@@ -2459,10 +2454,8 @@ thread_yield(bool force)
 		InterruptsSpinLocker _(gSchedulerLock);
 
 		// mark the thread as yielded, so it will not be scheduled next
-		//thread->was_yielded = true;
-		thread->next_priority = B_LOWEST_ACTIVE_PRIORITY;
+		thread->was_yielded = true;
 		scheduler_reschedule();
-#endif
 	} else {
 		Thread *thread = thread_get_current_thread();
 		if (thread == NULL)

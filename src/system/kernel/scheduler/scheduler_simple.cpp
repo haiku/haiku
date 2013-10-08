@@ -15,6 +15,7 @@
 
 #include <OS.h>
 
+#include <AutoDeleter.h>
 #include <cpu.h>
 #include <debug.h>
 #include <int.h>
@@ -43,7 +44,10 @@ const bigtime_t kThreadQuantum = 3000;
 
 
 // The run queue. Holds the threads ready to run ordered by priority.
-static RunQueue<Thread, THREAD_MAX_SET_PRIORITY>* sRunQueue;
+typedef RunQueue<Thread, THREAD_MAX_SET_PRIORITY> SimpleRunQueue;
+static SimpleRunQueue* sRunQueue;
+static SimpleRunQueue* sExpiredQueue;
+static int32 sYieldedThreadPriority = -1;
 
 
 struct scheduler_thread_data {
@@ -80,16 +84,13 @@ scheduler_thread_data::Init()
 }
 
 
-static int
-dump_run_queue(int argc, char **argv)
+static inline void
+dump_queue(RunQueue<Thread, THREAD_MAX_SET_PRIORITY>::ConstIterator& iterator)
 {
-	RunQueue<Thread, THREAD_MAX_SET_PRIORITY>::ConstIterator iterator;
-	iterator = sRunQueue->GetConstIterator();
-
 	if (!iterator.HasNext())
-		kprintf("Run queue is empty!\n");
+		kprintf("Queue is empty.\n");
 	else {
-		kprintf("thread    id      priority penalty  name\n");
+		kprintf("thread      id      priority penalty  name\n");
 		while (iterator.HasNext()) {
 			Thread *thread = iterator.Next();
 			scheduler_thread_data* schedulerThreadData
@@ -100,8 +101,30 @@ dump_run_queue(int argc, char **argv)
 				schedulerThreadData->priority_penalty, thread->name);
 		}
 	}
+}
+
+
+static int
+dump_run_queue(int argc, char **argv)
+{
+	RunQueue<Thread, THREAD_MAX_SET_PRIORITY>::ConstIterator iterator;
+	kprintf("Current run queue:\n");
+	iterator = sRunQueue->GetConstIterator();
+	dump_queue(iterator);
+
+	kprintf("\nExpired run queue:\n");
+	iterator = sExpiredQueue->GetConstIterator();
+	dump_queue(iterator);
 
 	return 0;
+}
+
+
+static inline void
+simple_yield(Thread* thread)
+{
+	TRACE("thread %ld yielded\n", thread->id);
+	sYieldedThreadPriority = max_c(sYieldedThreadPriority, thread->priority);
 }
 
 
@@ -120,9 +143,10 @@ simple_get_effective_priority(Thread *thread)
 		if (schedulerThreadData->forced_yield_count != 0
 			&& schedulerThreadData->forced_yield_count % kYieldFrequency == 0) {
 			TRACE("forcing thread %ld to yield\n", thread->id);
-			effectivePriority = B_LOWEST_ACTIVE_PRIORITY;
-		} else
-			effectivePriority -= schedulerThreadData->priority_penalty;
+			simple_yield(thread);
+		}
+
+		effectivePriority -= schedulerThreadData->priority_penalty;
 	}
 
 	ASSERT(schedulerThreadData->priority_penalty >= 0);
@@ -188,7 +212,11 @@ simple_enqueue_in_run_queue(Thread *thread)
 	scheduler_thread_data* schedulerThreadData
 		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
 
-	sRunQueue->PushBack(thread, threadPriority);
+	if (threadPriority <= sYieldedThreadPriority)
+		sExpiredQueue->PushBack(thread, threadPriority);
+	else
+		sRunQueue->PushBack(thread, threadPriority);
+
 	thread->next_priority = thread->priority;
 	schedulerThreadData->cpu_bound = true;
 	schedulerThreadData->time_left = 0;
@@ -358,6 +386,10 @@ simple_reschedule(void)
 				else
 					simple_cancel_penalty(oldThread);
 
+				if (oldThread->was_yielded)
+					simple_yield(oldThread);
+				oldThread->was_yielded = false;
+
 				TRACE("enqueueing thread %ld into run queue priority = %ld\n",
 					oldThread->id, simple_get_effective_priority(oldThread));
 				simple_enqueue_in_run_queue(oldThread);
@@ -385,7 +417,26 @@ simple_reschedule(void)
 	schedulerOldThreadData->lost_cpu = false;
 
 	// select thread with the biggest priority
-	nextThread = sRunQueue->PeekMaximum();
+	do {
+		nextThread = sRunQueue->PeekMaximum();
+
+		if (sYieldedThreadPriority >= 0 && nextThread != NULL
+			&& thread_is_idle_thread(nextThread)) {
+			sRunQueue->Remove(nextThread);
+			simple_enqueue_in_run_queue(nextThread);
+			continue;
+		}
+
+		break;
+	} while (true);
+	if (nextThread == NULL && sYieldedThreadPriority >= 0) {
+		RunQueue<Thread, THREAD_MAX_SET_PRIORITY>* temp = sRunQueue;
+		sRunQueue = sExpiredQueue;
+		sExpiredQueue = temp;
+		sYieldedThreadPriority = -1;
+
+		nextThread = sRunQueue->PeekMaximum();
+	}
 	if (!nextThread)
 		panic("reschedule(): run queue is empty!\n");
 
@@ -399,7 +450,6 @@ simple_reschedule(void)
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
-	oldThread->was_yielded = false;
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	scheduler_update_thread_times(oldThread, nextThread);
@@ -490,20 +540,26 @@ static scheduler_ops kSimpleOps = {
 status_t
 scheduler_simple_init()
 {
-	sRunQueue = new(std::nothrow) RunQueue<Thread, THREAD_MAX_SET_PRIORITY>;
+	sRunQueue = new(std::nothrow) SimpleRunQueue;
 	if (sRunQueue == NULL)
 		return B_NO_MEMORY;
+	ObjectDeleter<SimpleRunQueue> runQueueDeleter(sRunQueue);
+
+	sExpiredQueue = new(std::nothrow) SimpleRunQueue;
+	if (sExpiredQueue == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<SimpleRunQueue> expiredQueueDeleter(sExpiredQueue);
 
 	status_t result = sRunQueue->GetInitStatus();
-	if (result != B_OK) {
-		delete sRunQueue;
+	if (result != B_OK)
 		return result;
-	}
 
 	gScheduler = &kSimpleOps;
 
 	add_debugger_command_etc("run_queue", &dump_run_queue,
 		"List threads in run queue", "\nLists threads in run queue", 0);
 
+	runQueueDeleter.Detach();
+	expiredQueueDeleter.Detach();
 	return B_OK;
 }
