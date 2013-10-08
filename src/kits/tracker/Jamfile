@@ -83,7 +83,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			TemplatesMenu.cpp
 			Tests.cpp
 			TextWidget.cpp
-			Thread.cpp
 			TitleView.cpp
 			Tracker.cpp
 			TrackerInitialState.cpp

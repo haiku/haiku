@@ -117,7 +117,7 @@ ThreadSequence::Launch(BObjectList<FunctionObject>* list, bool async,
 ThreadSequence::ThreadSequence(BObjectList<FunctionObject>* list,
 	int32 priority)
 	:	SimpleThread(priority),
- 		fFunctorList(list)
+		fFunctorList(list)
 {
 	Go();
 }

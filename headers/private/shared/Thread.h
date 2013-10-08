@@ -36,14 +36,54 @@ All rights reserved.
 
 
 #include <Debug.h>
+#include <Looper.h>
 #include <OS.h>
 
 #include "ObjectList.h"
 #include "FunctionObject.h"
-#include "Utilities.h"
 
 
 namespace BPrivate {
+
+class MessengerAutoLocker {
+	// move this into AutoLock.h
+	public:
+		MessengerAutoLocker(BMessenger* messenger)
+			:	fMessenger(messenger),
+				fHasLock(messenger->LockTarget())
+		{}
+
+		~MessengerAutoLocker()
+		{
+			Unlock();
+		}
+
+		bool operator!() const
+		{
+			return !fHasLock;
+		}
+
+		bool IsLocked() const
+		{
+			return fHasLock;
+		}
+
+		void Unlock()
+		{
+			if (fHasLock) {
+				BLooper* looper;
+				fMessenger->Target(&looper);
+				if (looper)
+					looper->Unlock();
+				fHasLock = false;
+			}
+		}
+
+	private:
+		BMessenger* fMessenger;
+		bool fHasLock;
+};
+
 
 class SimpleThread {
 	// this should only be used as a base class,
@@ -78,6 +118,7 @@ private:
 	FunctionObject* fFunctor;
 };
 
+
 class ThreadSequence : private SimpleThread {
 public:
 	static void Launch(BObjectList<FunctionObject>*, bool async = true,
@@ -93,6 +134,7 @@ private:
 	BObjectList<FunctionObject>* fFunctorList;
 };
 
+
 // would use SingleParamFunctionObjectWithResult, except mwcc won't handle this
 template <class Param1>
 class SingleParamFunctionObjectWorkaround : public
@@ -105,7 +147,6 @@ public:
 		{
 		}
 
-
 	virtual void operator()()
 		{ (fFunction)(fParam1); }
 
@@ -115,6 +156,7 @@ private:
 	status_t (*fFunction)(Param1);
 	Param1 fParam1;
 };
+
 
 template <class T>
 class SimpleMemberFunctionObjectWorkaround : public

@@ -381,46 +381,6 @@ class LooperAutoLocker {
 };
 
 
-class MessengerAutoLocker {
-	// move this into AutoLock.h
-	public:
-		MessengerAutoLocker(BMessenger* messenger)
-			:	fMessenger(messenger),
-				fHasLock(messenger->LockTarget())
-		{}
-
-		~MessengerAutoLocker()
-		{
-			Unlock();
-		}
-
-		bool operator!() const
-		{
-			return !fHasLock;
-		}
-
-		bool IsLocked() const
-		{
-			return fHasLock;
-		}
-
-		void Unlock()
-		{
-			if (fHasLock) {
-				BLooper* looper;
-				fMessenger->Target(&looper);
-				if (looper)
-					looper->Unlock();
-				fHasLock = false;
-			}
-		}
-
-	private:
-		BMessenger* fMessenger;
-		bool fHasLock;
-};
-
-
 class ShortcutFilter : public BMessageFilter {
 	public:
 		ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,
