@@ -346,6 +346,35 @@ static inline bigtime_t simple_compute_quantum(Thread* thread)
 }
 
 
+static inline Thread*
+simple_get_next_thread(void)
+{
+	Thread* thread;
+	do {
+		thread = sRunQueue->PeekMaximum();
+
+		if (sYieldedThreadPriority >= 0 && thread != NULL
+			&& thread_is_idle_thread(thread)) {
+			sRunQueue->Remove(thread);
+			simple_enqueue_in_run_queue(thread);
+			continue;
+		}
+
+		break;
+	} while (true);
+	if (thread == NULL && sYieldedThreadPriority >= 0) {
+		SimpleRunQueue* temp = sRunQueue;
+		sRunQueue = sExpiredQueue;
+		sExpiredQueue = temp;
+		sYieldedThreadPriority = -1;
+
+		thread = sRunQueue->PeekMaximum();
+	}
+
+	return thread;
+}
+
+
 /*!	Runs the scheduler.
 	Note: expects thread spinlock to be held
 */
@@ -353,7 +382,6 @@ static void
 simple_reschedule(void)
 {
 	Thread* oldThread = thread_get_current_thread();
-	Thread* nextThread;
 
 	// check whether we're only supposed to reschedule, if the current thread
 	// is idle
@@ -417,29 +445,9 @@ simple_reschedule(void)
 	schedulerOldThreadData->lost_cpu = false;
 
 	// select thread with the biggest priority
-	do {
-		nextThread = sRunQueue->PeekMaximum();
-
-		if (sYieldedThreadPriority >= 0 && nextThread != NULL
-			&& thread_is_idle_thread(nextThread)) {
-			sRunQueue->Remove(nextThread);
-			simple_enqueue_in_run_queue(nextThread);
-			continue;
-		}
-
-		break;
-	} while (true);
-	if (nextThread == NULL && sYieldedThreadPriority >= 0) {
-		RunQueue<Thread, THREAD_MAX_SET_PRIORITY>* temp = sRunQueue;
-		sRunQueue = sExpiredQueue;
-		sExpiredQueue = temp;
-		sYieldedThreadPriority = -1;
-
-		nextThread = sRunQueue->PeekMaximum();
-	}
+	Thread* nextThread = simple_get_next_thread();
 	if (!nextThread)
-		panic("reschedule(): run queue is empty!\n");
-
+		panic("reschedule(): run queues are empty!\n");
 	sRunQueue->Remove(nextThread);
 
 	T(ScheduleThread(nextThread, oldThread));
