@@ -544,6 +544,9 @@ public:
 		PackageManager manager(
 			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME);
 
+		// TODO: if the given package is either a system package
+		// or a system dependency, show a message indicating that status
+		// so the user knows why no actions are presented
 		PackageActionList actions = manager.GetPackageActions(
 			const_cast<PackageInfo*>(&package),
 			fPackageActionHandler->GetModel());
