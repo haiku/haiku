@@ -447,7 +447,7 @@ affine_reschedule(void)
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
-	oldThread->was_yielded = false;
+	oldThread->has_yielded = false;
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	scheduler_update_thread_times(oldThread, nextThread);

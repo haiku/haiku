@@ -324,10 +324,16 @@ reschedule_event(timer* /* unused */)
 }
 
 
-static inline bool simple_quantum_ended(Thread* thread, bool wasPreempted)
+static inline bool 
+simple_quantum_ended(Thread* thread, bool wasPreempted, bool hasYielded)
 {
 	scheduler_thread_data* schedulerThreadData
 		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+
+	if (hasYielded) {
+		schedulerThreadData->time_left = 0;
+		return true;
+	}
 
 	bigtime_t time_used = system_time() - schedulerThreadData->quantum_start;
 	schedulerThreadData->time_left -= time_used;
@@ -343,7 +349,8 @@ static inline bool simple_quantum_ended(Thread* thread, bool wasPreempted)
 }
 
 
-static inline bigtime_t simple_compute_quantum(Thread* thread)
+static inline bigtime_t
+simple_compute_quantum(Thread* thread)
 {
 	scheduler_thread_data* schedulerThreadData
 		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
@@ -424,13 +431,12 @@ simple_reschedule(void)
 			if (!schedulerOldThreadData->lost_cpu)
 				schedulerOldThreadData->cpu_bound = false;
 
-			if (simple_quantum_ended(oldThread, oldThread->cpu->preempted)) {
+			if (simple_quantum_ended(oldThread, oldThread->cpu->preempted,
+					oldThread->has_yielded)) {
 				if (schedulerOldThreadData->cpu_bound)
 					simple_increase_penalty(oldThread);
-				else
-					simple_cancel_penalty(oldThread);
 
-				if (oldThread->was_yielded)
+				if (oldThread->has_fully_yielded)
 					simple_yield(oldThread);
 
 				TRACE("enqueueing thread %ld into run queue priority = %ld\n",
@@ -457,7 +463,8 @@ simple_reschedule(void)
 			break;
 	}
 
-	oldThread->was_yielded = false;
+	oldThread->has_yielded = false;
+	oldThread->has_fully_yielded = false;
 	schedulerOldThreadData->lost_cpu = false;
 
 	// select thread with the biggest priority

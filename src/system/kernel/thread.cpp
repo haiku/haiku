@@ -178,7 +178,8 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 	signal_stack_size(0),
 	signal_stack_enabled(false),
 	in_kernel(true),
-	was_yielded(false),
+	has_yielded(false),
+	has_fully_yielded(false),
 	user_thread(NULL),
 	fault_handler(0),
 	page_faults_allowed(1),
@@ -2443,25 +2444,15 @@ peek_next_thread_id()
 void
 thread_yield(bool force)
 {
-	if (force) {
-		Thread *thread = thread_get_current_thread();
-		if (thread == NULL)
-			return;
+	Thread *thread = thread_get_current_thread();
+	if (thread == NULL)
+		return;
 
-		InterruptsSpinLocker _(gSchedulerLock);
+	InterruptsSpinLocker _(gSchedulerLock);
 
-		// mark the thread as yielded, so it will not be scheduled next
-		thread->was_yielded = true;
-		scheduler_reschedule();
-	} else {
-		Thread *thread = thread_get_current_thread();
-		if (thread == NULL)
-			return;
-
-		// Don't force the thread off the CPU, just reschedule.
-		InterruptsSpinLocker _(gSchedulerLock);
-		scheduler_reschedule();
-	}
+	thread->has_yielded = true;
+	thread->has_fully_yielded = force;
+	scheduler_reschedule();
 }
 
 
@@ -3512,7 +3503,7 @@ _user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags,
 void
 _user_thread_yield(void)
 {
-	thread_yield(true);
+	thread_yield(false);
 }
 
 
