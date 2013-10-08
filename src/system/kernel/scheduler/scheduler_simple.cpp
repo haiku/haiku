@@ -85,7 +85,7 @@ scheduler_thread_data::Init()
 
 
 static inline void
-dump_queue(RunQueue<Thread, THREAD_MAX_SET_PRIORITY>::ConstIterator& iterator)
+dump_queue(SimpleRunQueue::ConstIterator& iterator)
 {
 	if (!iterator.HasNext())
 		kprintf("Queue is empty.\n");
@@ -107,7 +107,7 @@ dump_queue(RunQueue<Thread, THREAD_MAX_SET_PRIORITY>::ConstIterator& iterator)
 static int
 dump_run_queue(int argc, char** argv)
 {
-	RunQueue<Thread, THREAD_MAX_SET_PRIORITY>::ConstIterator iterator;
+	SimpleRunQueue::ConstIterator iterator;
 	kprintf("Current run queue:\n");
 	iterator = sRunQueue->GetConstIterator();
 	dump_queue(iterator);
