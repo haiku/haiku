@@ -1,12 +1,15 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "MainWindow.h"
 
 #include <map>
+
+#include <stdio.h>
 
 #include <Alert.h>
 #include <Autolock.h>
@@ -23,10 +26,15 @@
 
 #include <package/Context.h>
 #include <package/manager/Exceptions.h>
+#include <package/manager/RepositoryBuilder.h>
 #include <package/RefreshRepositoryRequest.h>
 #include <package/PackageRoster.h>
 #include "package/RepositoryCache.h"
 #include <package/solver/SolverPackage.h>
+#include <package/solver/SolverProblem.h>
+#include <package/solver/SolverProblemSolution.h>
+#include <package/solver/SolverRepository.h>
+#include <package/solver/SolverResult.h>
 
 #include "AutoDeleter.h"
 #include "AutoLocker.h"
@@ -50,8 +58,7 @@ enum {
 
 
 using namespace BPackageKit;
-using BManager::BPrivate::BException;
-using BManager::BPrivate::BFatalErrorException;
+using namespace BPackageKit::BManager::BPrivate;
 
 
 typedef std::map<BString, PackageInfoRef> PackageInfoMap;
@@ -426,9 +433,14 @@ MainWindow::_RefreshPackageList()
 		// installation only, as those must be handled a bit differently
 		// upon uninstallation, since we'd no longer be able to pull them
 		// down remotely.
-	PackageInfoMap systemPackages;
-		// any packages flagged as a system package are added to this map.
+	BStringList systemFlaggedPackages;
+		// any packages flagged as a system package are added to this list.
 		// such packages cannot be uninstalled, nor can any of their deps.
+	PackageInfoMap systemInstalledPackages;
+		// any packages installed in system are added to this list.
+		// This is later used for dependency resolution of the actual
+		// system packages in order to compute the list of protected
+		// dependencies indicated above.
 
 	for (int32 i = 0; i < packages.CountItems(); i++) {
 		BSolverPackage* package = packages.ItemAt(i);
@@ -473,6 +485,10 @@ MainWindow::_RefreshPackageList()
 					manager.SystemRepository())) {
 				modelInfo->AddInstallationLocation(
 					B_PACKAGE_INSTALLATION_LOCATION_SYSTEM);
+				if (!modelInfo->IsSystemPackage()) {
+					systemInstalledPackages[repoPackageInfo.FileName()]
+						= modelInfo;
+				}
 			} else if (repository == static_cast<const BSolverRepository*>(
 					manager.HomeRepository())) {
 				modelInfo->AddInstallationLocation(
@@ -481,7 +497,7 @@ MainWindow::_RefreshPackageList()
 		}
 
 		if (modelInfo->IsSystemPackage())
-			systemPackages[modelInfo->Title()] = modelInfo;
+			systemFlaggedPackages.Add(repoPackageInfo.FileName());
 	}
 
 	BAutolock lock(fModel.Lock());
@@ -511,11 +527,72 @@ MainWindow::_RefreshPackageList()
 		fModel.AddDepot(it->second);
 	}
 
-	for (PackageInfoMap::iterator it = systemPackages.begin();
-		it != systemPackages.end(); ++it) {
-		// TODO: need to resolve deps on all of these and correspondingly
-		// mark all of those as system packages as well, so we know
-		// not to show uninstallation as an option.
+	// compute the OS package dependencies
+	// create the solver
+	BSolver* solver;
+	status_t error = BSolver::Create(solver);
+	if (error != B_OK) {
+		printf("failed to create solver: %s\n", strerror(error));
+		return;
+	}
+
+	ObjectDeleter<BSolver> solverDeleter(solver);
+	BPath systemPath;
+	error = find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &systemPath);
+	if (error != B_OK) {
+		printf("Unable to retrieve system packages directory: %s\n", strerror(error));
+		return;
+	}
+
+	// add the "installed" repository with the given packages
+	BSolverRepository installedRepository;
+	{
+		BRepositoryBuilder installedRepositoryBuilder(installedRepository,
+			"installed");
+		for (int32 i = 0; i < systemFlaggedPackages.CountStrings(); i++) {
+			BPath packagePath(systemPath);
+			packagePath.Append(systemFlaggedPackages.StringAt(i));
+			installedRepositoryBuilder.AddPackage(packagePath.Path());
+		}
+		installedRepositoryBuilder.AddToSolver(solver, true);
+	}
+
+	// add system repository
+	BSolverRepository systemRepository;
+	{
+		BRepositoryBuilder systemRepositoryBuilder(systemRepository,
+			"system");
+		for (PackageInfoMap::iterator it = systemInstalledPackages.begin();
+			it != systemInstalledPackages.end(); ++it) {
+			BPath packagePath(systemPath);
+			packagePath.Append(it->first);
+			systemRepositoryBuilder.AddPackage(packagePath.Path());
+		}
+		systemRepositoryBuilder.AddToSolver(solver, false);
+	}
+
+	// solve
+	error = solver->VerifyInstallation();
+	if (error != B_OK) {
+		printf("failed to compute packages to install: %s\n", strerror(error));
+		return;
+	}
+
+	BSolverResult solverResult;
+	error = solver->GetResult(solverResult);
+	if (error != B_OK) {
+		printf("failed to get packages to install: %s\n", strerror(error));
+		return;
+	}
+
+	for (int32 i = 0; const BSolverResultElement* element
+			= solverResult.ElementAt(i); i++) {
+		BSolverPackage* package = element->Package();
+		if (element->Type() == BSolverResultElement::B_TYPE_INSTALL) {
+			PackageInfoMap::iterator it = systemInstalledPackages.find(package->Info().FileName());
+			if (it != systemInstalledPackages.end())
+				it->second->SetSystemDependency(true);
+		}
 	}
 }
 
