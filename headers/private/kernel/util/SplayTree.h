@@ -563,6 +563,11 @@ public:
 		return fTree.IsEmpty();
 	}
 
+	Node* FindClosest(const Key& key, bool greater, bool orEqual)
+	{
+		return fTree.FindClosest(key, greater, orEqual);
+	}
+
 	Node* FindMin()
 	{
 		return fTree.FindMin();
