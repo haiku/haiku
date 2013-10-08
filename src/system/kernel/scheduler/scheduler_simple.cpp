@@ -59,6 +59,8 @@ struct scheduler_thread_data {
 	bigtime_t	time_left;
 	bigtime_t	stolen_time;
 	bigtime_t	quantum_start;
+
+	bigtime_t	went_sleep;
 };
 
 
@@ -70,6 +72,8 @@ scheduler_thread_data::Init()
 
 	time_left = 0;
 	stolen_time = 0;
+
+	went_sleep = 0;
 
 	lost_cpu = false;
 	cpu_bound = true;
@@ -156,9 +160,14 @@ simple_cancel_penalty(Thread *thread)
 {
 	scheduler_thread_data* schedulerThreadData
 		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
+
+	if (schedulerThreadData->went_sleep < 0
+		|| system_time() - schedulerThreadData->went_sleep <= kThreadQuantum)
+		return;
 	if (schedulerThreadData->priority_penalty != 0)
 		TRACE("cancelling thread %ld penalty\n", thread->id);
 	schedulerThreadData->priority_penalty = 0;
+	schedulerThreadData->forced_yield_count = 0;
 }
 
 
@@ -169,6 +178,8 @@ static void
 simple_enqueue_in_run_queue(Thread *thread)
 {
 	thread->state = thread->next_state = B_THREAD_READY;
+
+	simple_cancel_penalty(thread);
 
 	int32 threadPriority = simple_get_effective_priority(thread);
 	T(EnqueueThread(thread, threadPriority));
@@ -339,6 +350,8 @@ simple_reschedule(void)
 				schedulerOldThreadData->cpu_bound = false;
 
 			if (simple_quantum_ended(oldThread, oldThread->cpu->preempted)) {
+				schedulerOldThreadData->went_sleep = -1;
+
 				if (schedulerOldThreadData->cpu_bound)
 					simple_increase_penalty(oldThread);
 				else
@@ -356,13 +369,13 @@ simple_reschedule(void)
 
 			break;
 		case B_THREAD_SUSPENDED:
-			simple_cancel_penalty(oldThread);
+			schedulerOldThreadData->went_sleep = system_time();
 			TRACE("reschedule(): suspending thread %ld\n", oldThread->id);
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
 			break;
 		default:
-			simple_cancel_penalty(oldThread);
+			schedulerOldThreadData->went_sleep = system_time();
 			TRACE("not enqueueing thread %ld into run queue next_state = %ld\n",
 				oldThread->id, oldThread->next_state);
 			break;
