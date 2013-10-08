@@ -5,15 +5,17 @@
 
 
 #include <boot/heap.h>
-#include <boot/platform.h>
-
-#include <algorithm>
 
 #ifdef HEAP_TEST
 #	include <stdio.h>
 #endif
 #include <stdlib.h>
 #include <string.h>
+
+#include <algorithm>
+
+#include <boot/platform.h>
+#include <util/SplayTree.h>
 
 
 //#define TRACE_HEAP
@@ -46,72 +48,169 @@
 	// if defined, the maximum heap usage is determined and printed before
 	// entering the kernel
 
-class FreeChunk {
+
+const static size_t kAlignment = 8;
+	// all memory chunks will be a multiple of this
+
+
+class Chunk {
 public:
-			void				SetTo(size_t size, FreeChunk* next);
+	size_t CompleteSize() const
+	{
+		return fSize;
+	}
 
-			uint32				Size() const;
-			uint32				CompleteSize() const { return fSize; }
-
-			FreeChunk*			Next() const { return fNext; }
-			void				SetNext(FreeChunk* next) { fNext = next; }
-
-			FreeChunk*			Split(uint32 splitSize);
-			bool				IsTouching(FreeChunk* link);
-			FreeChunk*			Join(FreeChunk* link);
-			void				Remove(FreeChunk* previous = NULL);
-			void				Enqueue();
-
-			void*				AllocatedAddress() const;
-	static	FreeChunk*			SetToAllocated(void* allocated);
-	static	addr_t				NextOffset() { return sizeof(uint32); }
-
-private:
-			uint32				fSize;
-			FreeChunk*			fNext;
+protected:
+	union {
+		size_t	fSize;
+		char	fAlignment[kAlignment];
+	};
 };
 
 
-const static uint32 kAlignment = 4;
-	// all memory chunks will be a multiple of this
+class FreeChunk;
+
+
+struct FreeChunkData : SplayTreeLink<FreeChunk> {
+
+	FreeChunk* Next() const
+	{
+		return fNext;
+	}
+
+	FreeChunk** NextLink()
+	{
+		return &fNext;
+	}
+
+protected:
+	FreeChunk*	fNext;
+};
+
+
+class FreeChunk : public Chunk, public FreeChunkData {
+public:
+			void				SetTo(size_t size);
+
+			size_t				Size() const;
+
+			FreeChunk*			Split(size_t splitSize);
+			bool				IsTouching(FreeChunk* link);
+			FreeChunk*			Join(FreeChunk* link);
+
+			void*				AllocatedAddress() const;
+	static	FreeChunk*			SetToAllocated(void* allocated);
+};
+
+
+struct FreeChunkKey {
+	FreeChunkKey(size_t size)
+		:
+		fSize(size),
+		fChunk(NULL)
+	{
+	}
+
+	FreeChunkKey(const FreeChunk* chunk)
+		:
+		fSize(chunk->Size()),
+		fChunk(chunk)
+	{
+	}
+
+	int Compare(const FreeChunk* chunk) const
+	{
+		size_t chunkSize = chunk->Size();
+		if (chunkSize != fSize)
+			return fSize < chunkSize ? -1 : 1;
+
+		if (fChunk == chunk)
+			return 0;
+		return fChunk < chunk ? -1 : 1;
+	}
+
+private:
+	size_t				fSize;
+	const FreeChunk*	fChunk;
+};
+
+
+struct FreeChunkTreeDefinition {
+	typedef FreeChunkKey	KeyType;
+	typedef FreeChunk		NodeType;
+
+	static FreeChunkKey GetKey(const FreeChunk* node)
+	{
+		return FreeChunkKey(node);
+	}
+
+	static SplayTreeLink<FreeChunk>* GetLink(FreeChunk* node)
+	{
+		return node;
+	}
+
+	static int Compare(const FreeChunkKey& key, const FreeChunk* node)
+	{
+		return key.Compare(node);
+	}
+
+	static FreeChunk** GetListLink(FreeChunk* node)
+	{
+		return node->NextLink();
+	}
+};
+
+
+typedef IteratableSplayTree<FreeChunkTreeDefinition> FreeChunkTree;
+
 
 static void* sHeapBase;
-static uint32 /*sHeapSize,*/ sMaxHeapSize, sAvailable, sMaxHeapUsage;
-static FreeChunk sFreeAnchor;
+static size_t /*sHeapSize,*/ sMaxHeapSize, sAvailable, sMaxHeapUsage;
+static FreeChunkTree sFreeChunkTree;
+
+static uint64 sTotalMallocCycles = 0;
+static uint64 sTotalFreeCycles = 0;
+
+
+static inline size_t
+align(size_t size)
+{
+	return (size + kAlignment - 1) & ~(kAlignment - 1);
+}
 
 
 void
-FreeChunk::SetTo(size_t size, FreeChunk* next)
+FreeChunk::SetTo(size_t size)
 {
 	fSize = size;
-	fNext = next;
+	fNext = NULL;
 }
 
 
 /*!	Returns the amount of bytes that can be allocated
 	in this chunk.
 */
-uint32
+size_t
 FreeChunk::Size() const
 {
-	return fSize - FreeChunk::NextOffset();
+	return (addr_t)this + fSize - (addr_t)AllocatedAddress();
 }
 
 
-/*!	Splits the upper half at the requested location
-	and returns it.
-*/
+/*!	Splits the upper half at the requested location and returns it. This chunk
+	will no longer be a valid FreeChunk object; only its fSize will be valid.
+ */
 FreeChunk*
-FreeChunk::Split(uint32 splitSize)
+FreeChunk::Split(size_t splitSize)
 {
-	splitSize = (splitSize - 1 + kAlignment) & ~(kAlignment - 1);
+	splitSize = align(splitSize);
 
-	FreeChunk* chunk
-		= (FreeChunk*)((uint8*)this + FreeChunk::NextOffset() + splitSize);
-	chunk->fSize = fSize - splitSize - FreeChunk::NextOffset();
-	chunk->fNext = fNext;
+	FreeChunk* chunk = (FreeChunk*)((addr_t)AllocatedAddress() + splitSize);
+	size_t newSize = (addr_t)chunk - (addr_t)this;
+	chunk->fSize = fSize - newSize;
+	chunk->fNext = NULL;
 
-	fSize = splitSize + FreeChunk::NextOffset();
+	fSize = newSize;
 
 	return chunk;
 }
@@ -153,58 +252,17 @@ FreeChunk::Join(FreeChunk* chunk)
 }
 
 
-void
-FreeChunk::Remove(FreeChunk* previous)
-{
-	if (previous == NULL) {
-		// find the previous chunk in the list
-		FreeChunk* chunk = sFreeAnchor.fNext;
-
-		while (chunk != NULL && chunk != this) {
-			previous = chunk;
-			chunk = chunk->fNext;
-		}
-
-		if (chunk == NULL)
-			panic("try to remove chunk that's not in list");
-	}
-
-	previous->fNext = fNext;
-	fNext = NULL;
-}
-
-
-void
-FreeChunk::Enqueue()
-{
-	FreeChunk* chunk = sFreeAnchor.fNext;
-	FreeChunk* last = &sFreeAnchor;
-	while (chunk && chunk->Size() < fSize) {
-		last = chunk;
-		chunk = chunk->fNext;
-	}
-
-	fNext = chunk;
-	last->fNext = this;
-
-#ifdef DEBUG_ALLOCATIONS
-	memset((uint8*)this + sizeof(FreeChunk), 0xde,
-		fSize - sizeof(FreeChunk));
-#endif
-}
-
-
 void*
 FreeChunk::AllocatedAddress() const
 {
-	return (void*)&fNext;
+	return (void*)static_cast<const FreeChunkData*>(this);
 }
 
 
 FreeChunk*
 FreeChunk::SetToAllocated(void* allocated)
 {
-	return (FreeChunk*)((uint8*)allocated - FreeChunk::NextOffset());
+	return static_cast<FreeChunk*>((FreeChunkData*)allocated);
 }
 
 
@@ -237,17 +295,17 @@ heap_init(stage2_args* args)
 
 	sHeapBase = base;
 	sMaxHeapSize = (uint8*)top - (uint8*)base;
-	sAvailable = sMaxHeapSize - FreeChunk::NextOffset();
-#ifdef DEBUG_MAX_HEAP_USAGE
-	sMaxHeapUsage = sMaxHeapSize - sAvailable;
-#endif
 
 	// declare the whole heap as one chunk, and add it
 	// to the free list
-
 	FreeChunk* chunk = (FreeChunk*)base;
-	chunk->SetTo(sMaxHeapSize, NULL);
-	sFreeAnchor.SetTo(0, chunk);
+	chunk->SetTo(sMaxHeapSize);
+	sFreeChunkTree.Insert(chunk);
+
+	sAvailable = chunk->Size();
+#ifdef DEBUG_MAX_HEAP_USAGE
+	sMaxHeapUsage = sMaxHeapSize - sAvailable;
+#endif
 
 	return B_OK;
 }
@@ -274,11 +332,8 @@ grow_heap(uint32 bytes)
 void
 dump_chunks(void)
 {
-	FreeChunk* chunk = sFreeAnchor.Next();
-	FreeChunk* last = &sFreeAnchor;
+	FreeChunk* chunk = sFreeChunkTree.FindMin();
 	while (chunk != NULL) {
-		last = chunk;
-
 		printf("\t%p: chunk size = %ld, end = %p, next = %p\n", chunk,
 			chunk->Size(), (uint8*)chunk + chunk->CompleteSize(),
 			chunk->Next());
@@ -290,7 +345,7 @@ dump_chunks(void)
 uint32
 heap_available(void)
 {
-	return sAvailable;
+	return (uint32)sAvailable;
 }
 
 
@@ -301,19 +356,17 @@ malloc(size_t size)
 		return NULL;
 
 	// align the size requirement to a kAlignment bytes boundary
-	size = (size - 1 + kAlignment) & ~(size_t)(kAlignment - 1);
+	if (size < sizeof(FreeChunkData))
+		size = sizeof(FreeChunkData);
+	size = align(size);
 
 	if (size > sAvailable) {
 		dprintf("malloc(): Out of memory!\n");
 		return NULL;
 	}
 
-	FreeChunk* chunk = sFreeAnchor.Next();
-	FreeChunk* last = &sFreeAnchor;
-	while (chunk && chunk->Size() < size) {
-		last = chunk;
-		chunk = chunk->Next();
-	}
+	FreeChunk* chunk = sFreeChunkTree.FindClosest(FreeChunkKey(size), true,
+		true);
 
 	if (chunk == NULL) {
 		// could not find a free chunk as large as needed
@@ -321,30 +374,25 @@ malloc(size_t size)
 		return NULL;
 	}
 
-	if (chunk->Size() > size + sizeof(FreeChunk) + kAlignment) {
-		// if this chunk is bigger than the requested size,
-		// we split it to form two chunks (with a minimal
-		// size of kAlignment allocatable bytes).
+	sFreeChunkTree.Remove(chunk);
+	sAvailable -= chunk->Size();
 
+	void* allocatedAddress = chunk->AllocatedAddress();
+
+	// If this chunk is bigger than the requested size and there's enough space
+	// left over for a new chunk, we split it.
+	if (chunk->Size() >= size + align(sizeof(FreeChunk))) {
 		FreeChunk* freeChunk = chunk->Split(size);
-		last->SetNext(freeChunk);
-
-		// re-enqueue the free chunk at the correct position
-		freeChunk->Remove(last);
-		freeChunk->Enqueue();
-	} else {
-		// remove the chunk from the free list
-
-		last->SetNext(chunk->Next());
+		sFreeChunkTree.Insert(freeChunk);
+		sAvailable += freeChunk->Size();
 	}
 
-	sAvailable -= size + sizeof(uint32);
 #ifdef DEBUG_MAX_HEAP_USAGE
 	sMaxHeapUsage = std::max(sMaxHeapUsage, sMaxHeapSize - sAvailable);
 #endif
 
-	TRACE("malloc(%lu) -> %p\n", size, chunk->AllocatedAddress());
-	return chunk->AllocatedAddress();
+	TRACE("malloc(%lu) -> %p\n", size, allocatedAddress);
+	return allocatedAddress;
 }
 
 
@@ -398,54 +446,47 @@ free(void* allocated)
 	FreeChunk* freedChunk = FreeChunk::SetToAllocated(allocated);
 
 #ifdef DEBUG_ALLOCATIONS
-	if (freedChunk->CompleteSize() > sMaxHeapSize) {
-		panic("freed chunk %p clobbered (%lx)!\n", freedChunk,
+	if (freedChunk->Size() > sMaxHeapSize - sAvailable) {
+		panic("freed chunk %p clobbered (%#zx)!\n", freedChunk,
 			freedChunk->Size());
 	}
 	{
-		FreeChunk* chunk = sFreeAnchor.Next();
+		FreeChunk* chunk = sFreeChunkTree.FindMin();
 		while (chunk) {
-			if (chunk->CompleteSize() > sMaxHeapSize || freedChunk == chunk)
-				panic("invalid chunk in free list, or double free\n");
+			if (chunk->Size() > sAvailable || freedChunk == chunk)
+				panic("invalid chunk in free list (%p (%zu)), or double free\n",
+					chunk, chunk->Size());
 			chunk = chunk->Next();
 		}
 	}
 #endif
 
-	sAvailable += freedChunk->CompleteSize();
-#ifdef DEBUG_MAX_HEAP_USAGE
-	sMaxHeapUsage = std::max(sMaxHeapUsage, sMaxHeapSize - sAvailable);
-#endif
-
 	// try to join the new free chunk with an existing one
 	// it may be joined with up to two chunks
 
-	FreeChunk* chunk = sFreeAnchor.Next();
-	FreeChunk* last = &sFreeAnchor;
+	FreeChunk* chunk = sFreeChunkTree.FindMin();
 	int32 joinCount = 0;
 
 	while (chunk) {
-		if (chunk->IsTouching(freedChunk)) {
-			// almost "insert" it into the list before joining
-			// because the next pointer is inherited by the chunk
-			freedChunk->SetNext(chunk->Next());
-			freedChunk = chunk->Join(freedChunk);
+		FreeChunk* nextChunk = chunk->Next();
 
-			// remove the joined chunk from the list
-			last->SetNext(freedChunk->Next());
-			chunk = last;
+		if (chunk->IsTouching(freedChunk)) {
+			sFreeChunkTree.Remove(chunk);
+			sAvailable -= chunk->Size();
+
+			freedChunk = chunk->Join(freedChunk);
 
 			if (++joinCount == 2)
 				break;
 		}
 
-		last = chunk;
-		chunk = chunk->Next();
+		chunk = nextChunk;
 	}
 
-	// enqueue the link at the right position; the
-	// free link queue is ordered by size
-
-	freedChunk->Enqueue();
+	sFreeChunkTree.Insert(freedChunk);
+	sAvailable += freedChunk->Size();
+#ifdef DEBUG_MAX_HEAP_USAGE
+	sMaxHeapUsage = std::max(sMaxHeapUsage, sMaxHeapSize - sAvailable);
+#endif
 }
 
