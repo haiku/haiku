@@ -167,7 +167,6 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 	team_next(NULL),
 	queue_next(NULL),
 	priority(-1),
-	next_priority(-1),
 	io_priority(-1),
 	cpu(cpu),
 	previous_cpu(NULL),
@@ -901,7 +900,6 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 		// available for deinitialization
 	thread->priority = attributes.priority == -1
 		? B_NORMAL_PRIORITY : attributes.priority;
-	thread->next_priority = thread->priority;
 	thread->state = B_THREAD_SUSPENDED;
 	thread->next_state = B_THREAD_SUSPENDED;
 
@@ -1427,7 +1425,7 @@ make_thread_unreal(int argc, char **argv)
 			continue;
 
 		if (thread->priority > B_DISPLAY_PRIORITY) {
-			thread->priority = thread->next_priority = B_NORMAL_PRIORITY;
+			thread->priority = B_NORMAL_PRIORITY;
 			kprintf("thread %" B_PRId32 " made unreal\n", thread->id);
 		}
 	}
@@ -1463,7 +1461,7 @@ set_thread_prio(int argc, char **argv)
 			Thread* thread = it.Next();) {
 		if (thread->id != id)
 			continue;
-		thread->priority = thread->next_priority = prio;
+		thread->priority = prio;
 		kprintf("thread %" B_PRId32 " set to priority %" B_PRId32 "\n", id, prio);
 		found = true;
 		break;
@@ -1702,9 +1700,8 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 	kprintf("name:               \"%s\"\n", thread->name);
 	kprintf("hash_next:          %p\nteam_next:          %p\nq_next:             %p\n",
 		thread->hash_next, thread->team_next, thread->queue_next);
-	kprintf("priority:           %" B_PRId32 " (next %" B_PRId32 ", "
-		"I/O: %" B_PRId32 ")\n", thread->priority, thread->next_priority,
-		thread->io_priority);
+	kprintf("priority:           %" B_PRId32 " (I/O: %" B_PRId32 ")\n",
+		thread->priority, thread->io_priority);
 	kprintf("state:              %s\n", state_to_text(thread, thread->state));
 	kprintf("next_state:         %s\n", state_to_text(thread, thread->next_state));
 	kprintf("cpu:                %p ", thread->cpu);
@@ -1919,7 +1916,7 @@ thread_exit(void)
 		panic("thread_exit() called with interrupts disabled!\n");
 
 	// boost our priority to get this over with
-	thread->priority = thread->next_priority = B_URGENT_DISPLAY_PRIORITY;
+	thread->priority = B_URGENT_DISPLAY_PRIORITY;
 
 	if (team != kernelTeam) {
 		// Cancel previously installed alarm timer, if any. Hold the scheduler
@@ -2730,7 +2727,7 @@ thread_init(kernel_args *args)
 		gCPU[i].running_thread = thread;
 
 		thread->team = team_get_kernel_team();
-		thread->priority = thread->next_priority = B_IDLE_PRIORITY;
+		thread->priority = B_IDLE_PRIORITY;
 		thread->state = B_THREAD_RUNNING;
 		thread->next_state = B_THREAD_READY;
 		sprintf(name, "idle thread %" B_PRIu32 " kstack", i + 1);
@@ -3217,7 +3214,7 @@ set_thread_priority(thread_id id, int32 priority)
 		// It's ourself, so we know we aren't in the run queue, and we can
 		// manipulate our structure directly.
 		oldPriority = thread->priority;
-		thread->priority = thread->next_priority = priority;
+		thread->priority = priority;
 	} else {
 		oldPriority = thread->priority;
 		scheduler_set_thread_priority(thread, priority);

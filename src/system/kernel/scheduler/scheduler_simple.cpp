@@ -152,7 +152,7 @@ simple_get_effective_priority(Thread* thread)
 	ASSERT(schedulerThreadData->priority_penalty >= 0);
 	ASSERT(effectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
 
-	return min_c(effectivePriority, thread->next_priority);
+	return effectivePriority;
 }
 
 
@@ -217,7 +217,6 @@ simple_enqueue_in_run_queue(Thread* thread)
 	else
 		sRunQueue->PushBack(thread, threadPriority);
 
-	thread->next_priority = thread->priority;
 	schedulerThreadData->cpu_bound = true;
 	schedulerThreadData->time_left = 0;
 	schedulerThreadData->stolen_time = 0;
@@ -267,7 +266,7 @@ simple_set_thread_priority(Thread* thread, int32 priority)
 
 	// set priority and re-insert
 	simple_cancel_penalty(thread);
-	thread->priority = thread->next_priority = priority;
+	thread->priority = priority;
 
 	simple_enqueue_in_run_queue(thread);
 }

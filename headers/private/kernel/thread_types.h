@@ -422,7 +422,6 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
 	timer			alarm;			// protected by scheduler lock
 	char			name[B_OS_NAME_LENGTH];	// protected by fLock
 	int32			priority;		// protected by scheduler lock
-	int32			next_priority;	// protected by scheduler lock
 	int32			io_priority;	// protected by fLock
 	int32			state;			// protected by scheduler lock
 	int32			next_state;		// protected by scheduler lock

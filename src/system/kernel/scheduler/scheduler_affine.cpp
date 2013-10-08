@@ -154,7 +154,7 @@ affine_enqueue_in_run_queue(Thread *thread)
 	} else {
 		Thread *curr, *prev;
 		for (curr = sRunQueue[targetCPU], prev = NULL; curr
-			&& curr->priority >= thread->next_priority;
+			&& curr->priority >= thread->priority;
 			curr = curr->queue_next) {
 			if (prev)
 				prev = prev->queue_next;
@@ -172,8 +172,6 @@ affine_enqueue_in_run_queue(Thread *thread)
 
 		thread->scheduler_data->fLastQueue = targetCPU;
 	}
-
-	thread->next_priority = thread->priority;
 
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
@@ -304,7 +302,7 @@ affine_set_thread_priority(Thread *thread, int32 priority)
 	thread = dequeue_from_run_queue(prev, targetCPU);
 
 	// set priority and re-insert
-	thread->priority = thread->next_priority = priority;
+	thread->priority = priority;
 	affine_enqueue_in_run_queue(thread);
 }
 

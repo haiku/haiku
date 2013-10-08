@@ -118,7 +118,7 @@ enqueue_in_run_queue(Thread *thread)
 
 	Thread *curr, *prev;
 	for (curr = sRunQueue, prev = NULL; curr
-			&& curr->priority >= thread->next_priority;
+			&& curr->priority >= thread->priority;
 			curr = curr->queue_next) {
 		if (prev)
 			prev = prev->queue_next;
@@ -133,8 +133,6 @@ enqueue_in_run_queue(Thread *thread)
 		prev->queue_next = thread;
 	else
 		sRunQueue = thread;
-
-	thread->next_priority = thread->priority;
 
 	if (thread->priority != B_IDLE_PRIORITY) {
 		// Select a CPU for the thread to run on. It's not certain that the
@@ -211,7 +209,7 @@ set_thread_priority(Thread *thread, int32 priority)
 		sRunQueue = item->queue_next;
 
 	// set priority and re-insert
-	thread->priority = thread->next_priority = priority;
+	thread->priority = priority;
 	enqueue_in_run_queue(thread);
 }
 
