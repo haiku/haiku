@@ -116,8 +116,9 @@ simple_get_effective_priority(Thread *thread)
 
 	int32 effectivePriority = thread->priority;
 	if (effectivePriority < B_FIRST_REAL_TIME_PRIORITY) {
-		if (schedulerThreadData->forced_yield_count
-			&& schedulerThreadData->forced_yield_count % 16 == 0) {
+		const int kYieldFrequency = 1 << (min_c(thread->priority, 25) / 5 + 1);
+		if (schedulerThreadData->forced_yield_count != 0
+			&& schedulerThreadData->forced_yield_count % kYieldFrequency == 0) {
 			TRACE("forcing thread %ld to yield\n", thread->id);
 			effectivePriority = B_LOWEST_ACTIVE_PRIORITY;
 		} else
