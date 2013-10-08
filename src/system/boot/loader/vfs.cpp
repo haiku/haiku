@@ -611,6 +611,7 @@ mount_file_systems(stage2_args *args)
 				device = last;
 			}
 */
+(void)last;
 		}
 		last = device;
 	}
