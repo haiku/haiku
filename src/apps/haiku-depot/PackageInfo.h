@@ -232,6 +232,10 @@ public:
 									{ return fFlags; }
 			bool				IsSystemPackage() const;
 
+			bool				IsSystemDependency() const
+									{ return fSystemDependency; }
+			void				SetSystemDependency(bool isDependency);
+
 			PackageState		State() const
 									{ return fState; }
 			void				SetState(PackageState state);
@@ -283,6 +287,7 @@ private:
 			float				fDownloadProgress;
 			PackageListenerList	fListeners;
 			int32				fFlags;
+			bool				fSystemDependency;
 };
 
 

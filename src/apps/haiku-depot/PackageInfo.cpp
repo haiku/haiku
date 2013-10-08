@@ -450,7 +450,8 @@ PackageInfo::PackageInfo()
 	fScreenshots(),
 	fState(NONE),
 	fDownloadProgress(0.0),
-	fFlags(0)
+	fFlags(0),
+	fSystemDependency(false)
 {
 }
 
@@ -472,7 +473,8 @@ PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
 	fScreenshots(),
 	fState(NONE),
 	fDownloadProgress(0.0),
-	fFlags(flags)
+	fFlags(flags),
+	fSystemDependency(false)
 {
 }
 
@@ -492,7 +494,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fState(other.fState),
 	fInstallationLocations(other.fInstallationLocations),
 	fDownloadProgress(other.fDownloadProgress),
-	fFlags(other.fFlags)
+	fFlags(other.fFlags),
+	fSystemDependency(other.fSystemDependency)
 {
 }
 
@@ -514,6 +517,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fInstallationLocations = other.fInstallationLocations;
 	fDownloadProgress = other.fDownloadProgress;
 	fFlags = other.fFlags;
+	fSystemDependency = other.fSystemDependency;
 	return *this;
 }
 
@@ -533,7 +537,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fScreenshots == other.fScreenshots
 		&& fState == other.fState
 		&& fFlags == other.fFlags
-		&& fDownloadProgress == other.fDownloadProgress;
+		&& fDownloadProgress == other.fDownloadProgress
+		&& fSystemDependency == other.fSystemDependency;
 }
 
 
@@ -555,6 +560,13 @@ bool
 PackageInfo::AddCategory(const CategoryRef& category)
 {
 	return fCategories.Add(category);
+}
+
+
+void
+PackageInfo::SetSystemDependency(bool isDependency)
+{
+	fSystemDependency = isDependency;
 }
 
 
