@@ -6,7 +6,8 @@ SEARCH_SOURCE
 BuildPlatformMain <build>makebootable :
 	makebootable.cpp
 	$(hostPlatformSources)
-	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
+	:
+	# $(HOST_LIBBE)
+	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;
 
-BuildPlatformMain <build>makebootable : makebootable.cpp : $(HOST_LIBSTDC++) ;
