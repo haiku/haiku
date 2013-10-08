@@ -228,7 +228,7 @@ PackageActionList
 PackageManager::GetPackageActions(PackageInfoRef package, Model* model)
 {
 	PackageActionList actionList;
-	if (package->IsSystemPackage())
+	if (package->IsSystemPackage() || package->IsSystemDependency())
 		return actionList;
 
 	int32 state = package->State();
