@@ -120,6 +120,18 @@ dump_run_queue(int argc, char** argv)
 }
 
 
+static void
+simple_dump_thread_data(scheduler_thread_data* schedulerThreadData)
+{
+	kprintf("\tpriority_penalty:\t%" B_PRId32 "\n",
+		schedulerThreadData->priority_penalty);
+	kprintf("\tforced_yield_count:\t%" B_PRId32 "\n",
+		schedulerThreadData->forced_yield_count);
+	kprintf("\tstolen_time:\t\t%" B_PRId64 "\n",
+		schedulerThreadData->stolen_time);
+}
+
+
 static inline int32
 simple_get_effective_priority(Thread* thread)
 {
@@ -563,7 +575,8 @@ static scheduler_ops kSimpleOps = {
 	simple_on_thread_create,
 	simple_on_thread_init,
 	simple_on_thread_destroy,
-	simple_start
+	simple_start,
+	simple_dump_thread_data
 };
 
 

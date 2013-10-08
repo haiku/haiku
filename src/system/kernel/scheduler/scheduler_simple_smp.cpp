@@ -462,7 +462,8 @@ static scheduler_ops kSimpleSMPOps = {
 	on_thread_create,
 	on_thread_init,
 	on_thread_destroy,
-	start
+	start,
+	NULL
 };
 
 

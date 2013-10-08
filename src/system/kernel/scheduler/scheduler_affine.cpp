@@ -547,7 +547,8 @@ static scheduler_ops kAffineOps = {
 	affine_on_thread_create,
 	affine_on_thread_init,
 	affine_on_thread_destroy,
-	affine_start
+	affine_start,
+	NULL
 };
 
 
