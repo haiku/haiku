@@ -92,7 +92,7 @@ dump_queue(RunQueue<Thread, THREAD_MAX_SET_PRIORITY>::ConstIterator& iterator)
 	else {
 		kprintf("thread      id      priority penalty  name\n");
 		while (iterator.HasNext()) {
-			Thread *thread = iterator.Next();
+			Thread* thread = iterator.Next();
 			scheduler_thread_data* schedulerThreadData
 				= reinterpret_cast<scheduler_thread_data*>(
 					thread->scheduler_data);
@@ -105,7 +105,7 @@ dump_queue(RunQueue<Thread, THREAD_MAX_SET_PRIORITY>::ConstIterator& iterator)
 
 
 static int
-dump_run_queue(int argc, char **argv)
+dump_run_queue(int argc, char** argv)
 {
 	RunQueue<Thread, THREAD_MAX_SET_PRIORITY>::ConstIterator iterator;
 	kprintf("Current run queue:\n");
@@ -129,7 +129,7 @@ simple_yield(Thread* thread)
 
 
 static inline int32
-simple_get_effective_priority(Thread *thread)
+simple_get_effective_priority(Thread* thread)
 {
 	if (thread->priority == B_IDLE_PRIORITY)
 		return thread->priority;
@@ -157,7 +157,7 @@ simple_get_effective_priority(Thread *thread)
 
 
 static inline void
-simple_increase_penalty(Thread *thread)
+simple_increase_penalty(Thread* thread)
 {
 	if (thread->priority <= B_LOWEST_ACTIVE_PRIORITY)
 		return;
@@ -181,7 +181,7 @@ simple_increase_penalty(Thread *thread)
 
 
 static inline void
-simple_cancel_penalty(Thread *thread)
+simple_cancel_penalty(Thread* thread)
 {
 	scheduler_thread_data* schedulerThreadData
 		= reinterpret_cast<scheduler_thread_data*>(thread->scheduler_data);
@@ -200,7 +200,7 @@ simple_cancel_penalty(Thread *thread)
 	Note: thread lock must be held when entering this function
 */
 static void
-simple_enqueue_in_run_queue(Thread *thread)
+simple_enqueue_in_run_queue(Thread* thread)
 {
 	thread->state = thread->next_state = B_THREAD_READY;
 
@@ -243,7 +243,7 @@ simple_enqueue_in_run_queue(Thread *thread)
 	Note: thread lock must be held when entering this function
 */
 static void
-simple_set_thread_priority(Thread *thread, int32 priority)
+simple_set_thread_priority(Thread* thread, int32 priority)
 {
 	if (priority == thread->priority)
 		return;
@@ -290,7 +290,7 @@ simple_estimate_max_scheduling_latency(Thread* thread)
 
 
 static int32
-reschedule_event(timer *unused)
+reschedule_event(timer* /* unused */)
 {
 	// This function is called as a result of the timer event set by the
 	// scheduler. Make sure the reschedule() is invoked.
