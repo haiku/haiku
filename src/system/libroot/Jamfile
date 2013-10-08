@@ -2,6 +2,31 @@ SubDir HAIKU_TOP src system libroot ;
 
 UsePrivateHeaders libroot runtime_loader ;
 
+rule FilterArchive {
+	# FilterArchive <target> : <source> : <members to remove>
+
+	# set the tools according to the platform
+	AR on $(1) = $(TARGET_AR_$(TARGET_PACKAGING_ARCH)) d ;
+	# TODO: use $(TARGET_DELARFLAGS_$(TARGET_PACKAGING_ARCH))
+	RANLIB on $(1) = $(TARGET_RANLIB_$(TARGET_PACKAGING_ARCH)) ;
+
+	MakeLocateArch $(1) ;
+	Depends $(1) : $(2) ;
+	File $(1) : $(2) ;
+	# we don't want the path
+	# XXX: is it done this way?
+	NotFile $(3) ;
+
+	# delete the unwanted members
+	FilterArchive1 $(1) : $(3) ;
+
+	if $(RANLIB) { Ranlib $(1) ; }
+}
+
+actions FilterArchive1 {
+	$(AR) $(<) $(>)
+}
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
@@ -9,38 +34,25 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		UsePrivateSystemHeaders ;
 
-		UnarchiveObjects $(HAIKU_GCC_LIBGCC_OBJECTS_$(architecture))
-			: $(HAIKU_GCC_LIBGCC_$(architecture)) ;
-			# we need to link against libgcc.a objects and make
-			# it available to other applications as in BeOS
+		# Make a copy of libgcc without the objects we don't need
+		FilterArchive <$(architecture)>libroot_libgcc_$(TARGET_ARCH).a
+			: $(HAIKU_GCC_LIBGCC_$(architecture))
+			: $(HAIKU_GCC_LIBGCC_OBJECTS_EXCLUDES_$(architecture)) ;
 
-		# workaround for ARM having waaaaay too many objects in libgcc
-		# which fails execve() with too large argument list
-		# when linking them directly into libroot.
-		local libgccObjects1 =
-			$(HAIKU_GCC_LIBGCC_OBJECTS_$(architecture)[1-800]) ;
-		local libgccObjects2 =
-			$(HAIKU_GCC_LIBGCC_OBJECTS_$(architecture)[801-]) ;
+		# One object to link them all...
+		TARGET_LDFLAGS_$(TARGET_PACKAGING_ARCH) on
+			<$(architecture)>libroot_libgcc_$(TARGET_ARCH).o =
+			[ on <$(architecture)>libroot_libgcc_$(TARGET_ARCH).o
+				return $(TARGET_LDFLAGS_$(TARGET_PACKAGING_ARCH)) ]
+			--whole-archive ;
 
-		local librootLibgccObjects =
-			<$(architecture)>libgcc_part1_$(TARGET_ARCH).o ;
-
-		MergeObject <$(architecture)>libgcc_part1_$(TARGET_ARCH).o :
+		MergeObject <$(architecture)>libroot_libgcc_$(TARGET_ARCH).o
 			:
-			$(libgccObjects1)
-			;
-
-		if $(libgccObjects2) {
-			librootLibgccObjects +=
-				<$(architecture)>libgcc_part2_$(TARGET_ARCH).o ;
-
-			MergeObject <$(architecture)>libgcc_part2_$(TARGET_ARCH).o :
-				:
-				$(libgccObjects2)
-				;
-		}
+			: <$(architecture)>libroot_libgcc_$(TARGET_ARCH).a ;
 
 		local librootObjects =
+			libroot_libgcc_$(TARGET_ARCH).o
+
 			os_main.o
 			os_arch_$(TARGET_ARCH).o
 
@@ -96,7 +108,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			libroot_init.c
 			:
-			$(librootLibgccObjects)
 			$(librootObjects)
 			$(librootNoDebugObjects)
 			$(HAIKU_STATIC_LIBSUPC++_$(architecture))
@@ -110,7 +121,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			libroot_init.c
 			:
-			$(librootLibgccObjects)
 			$(librootObjects)
 			$(librootDebugObjects)
 			$(HAIKU_STATIC_LIBSUPC++_$(architecture))

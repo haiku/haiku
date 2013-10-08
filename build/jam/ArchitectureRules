@@ -154,6 +154,10 @@ rule ArchitectureSetup architecture
 	HAIKU_GCC_LIBGCC_OBJECTS_$(architecture)
 		= $(HAIKU_GCC_LIBGCC_OBJECTS_$(architecture):G=libgcc!$(architecture)) ;
 
+	# List of libgcc objects we don't want to keep
+	HAIKU_GCC_LIBGCC_OBJECTS_EXCLUDES_$(architecture)
+		= eabi.o ;
+
 	# the C++ standard library
 	HAIKU_BUILD_SHARED_LIBSTDC++_$(architecture) = ;
 	if $(HAIKU_SHARED_LIBSTDC++_$(architecture)) {
