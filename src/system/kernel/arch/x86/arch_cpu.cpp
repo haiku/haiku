@@ -155,7 +155,7 @@ acpi_shutdown(bool rebootSystem)
 			_user_set_cpu_enabled(cpu, false);
 		}
 		// TODO: must not be called from the idle thread!
-		thread_yield(true);
+		thread_yield();
 
 		status = acpi->prepare_sleep_state(ACPI_POWER_STATE_OFF, NULL, 0);
 		if (status == B_OK) {

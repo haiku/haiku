@@ -46,8 +46,6 @@ const bigtime_t kThreadQuantum = 1000;
 // The run queue. Holds the threads ready to run ordered by priority.
 typedef RunQueue<Thread, THREAD_MAX_SET_PRIORITY> SimpleRunQueue;
 static SimpleRunQueue* sRunQueue;
-static SimpleRunQueue* sExpiredQueue;
-static int32 sYieldedThreadPriority = -1;
 
 
 struct scheduler_thread_data {
@@ -56,7 +54,6 @@ struct scheduler_thread_data {
 
 	int32		priority_penalty;
 	int32		additional_penalty;
-	int32		forced_yield_count;
 
 	bool		lost_cpu;
 	bool		cpu_bound;
@@ -74,7 +71,6 @@ scheduler_thread_data::Init()
 {
 	priority_penalty = 0;
 	additional_penalty = 0;
-	forced_yield_count = 0;
 
 	time_left = 0;
 	stolen_time = 0;
@@ -133,10 +129,6 @@ dump_run_queue(int argc, char** argv)
 	iterator = sRunQueue->GetConstIterator();
 	dump_queue(iterator);
 
-	kprintf("\nExpired run queue:\n");
-	iterator = sExpiredQueue->GetConstIterator();
-	dump_queue(iterator);
-
 	return 0;
 }
 
@@ -157,8 +149,6 @@ simple_dump_thread_data(Thread* thread)
 	}
 	kprintf("\tadditional_penalty:\t%" B_PRId32 " (%" B_PRId32 ")\n",
 		additionalPenalty, schedulerThreadData->additional_penalty);
-	kprintf("\tforced_yield_count:\t%" B_PRId32 "\n",
-		schedulerThreadData->forced_yield_count);
 	kprintf("\tstolen_time:\t\t%" B_PRId64 "\n",
 		schedulerThreadData->stolen_time);
 }
@@ -183,28 +173,6 @@ simple_get_effective_priority(Thread* thread)
 
 
 static inline void
-simple_yield(Thread* thread)
-{
-	TRACE("thread %ld yielded\n", thread->id);
-	int32 effectivePriority = simple_get_effective_priority(thread);
-	sYieldedThreadPriority = max_c(sYieldedThreadPriority, effectivePriority);
-}
-
-
-static inline bool
-simple_should_force_yield(Thread* thread)
-{
-	if (thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
-		return false;
-
-	const int kYieldFrequency = 1 << (min_c(thread->priority, 25) / 5 + 1);
-
-	return thread->scheduler_data->forced_yield_count != 0
-		&& thread->scheduler_data->forced_yield_count % kYieldFrequency == 0;
-}
-
-
-static inline void
 simple_increase_penalty(Thread* thread)
 {
 	if (thread->priority <= B_LOWEST_ACTIVE_PRIORITY)
@@ -221,7 +189,6 @@ simple_increase_penalty(Thread* thread)
 	const int kMinimalPriority = simple_get_minimal_priority(thread);
 	if (thread->priority - oldPenalty <= kMinimalPriority) {
 		schedulerThreadData->priority_penalty = oldPenalty;
-		schedulerThreadData->forced_yield_count++;
 		schedulerThreadData->additional_penalty++;
 	}
 }
@@ -236,7 +203,6 @@ simple_cancel_penalty(Thread* thread)
 		TRACE("cancelling thread %ld penalty\n", thread->id);
 	schedulerThreadData->priority_penalty = 0;
 	schedulerThreadData->additional_penalty = 0;
-	schedulerThreadData->forced_yield_count = 0;
 }
 
 
@@ -251,16 +217,10 @@ simple_enqueue(Thread* thread, bool newOne)
 	if (newOne && hasSlept > kThreadQuantum)
 		simple_cancel_penalty(thread);
 
-	if (simple_should_force_yield(thread))
-		simple_yield(thread);
-
 	int32 threadPriority = simple_get_effective_priority(thread);
 	T(EnqueueThread(thread, threadPriority));
 
-	if (threadPriority <= sYieldedThreadPriority)
-		sExpiredQueue->PushBack(thread, threadPriority);
-	else
-		sRunQueue->PushBack(thread, threadPriority);
+	sRunQueue->PushBack(thread, threadPriority);
 
 	schedulerThreadData->cpu_bound = true;
 	schedulerThreadData->time_left = 0;
@@ -429,35 +389,6 @@ simple_compute_quantum(Thread* thread)
 }
 
 
-static inline Thread*
-simple_get_next_thread(void)
-{
-	Thread* thread;
-	do {
-		thread = sRunQueue->PeekMaximum();
-
-		if (sYieldedThreadPriority >= 0 && thread != NULL
-			&& thread_is_idle_thread(thread)) {
-			sRunQueue->Remove(thread);
-			simple_enqueue_in_run_queue(thread);
-			continue;
-		}
-
-		break;
-	} while (true);
-	if (thread == NULL && sYieldedThreadPriority >= 0) {
-		SimpleRunQueue* temp = sRunQueue;
-		sRunQueue = sExpiredQueue;
-		sExpiredQueue = temp;
-		sYieldedThreadPriority = -1;
-
-		thread = sRunQueue->PeekMaximum();
-	}
-
-	return thread;
-}
-
-
 /*!	Runs the scheduler.
 	Note: expects thread spinlock to be held
 */
@@ -493,9 +424,6 @@ simple_reschedule(void)
 				if (schedulerOldThreadData->cpu_bound)
 					simple_increase_penalty(oldThread);
 
-				if (oldThread->has_fully_yielded)
-					simple_yield(oldThread);
-
 				TRACE("enqueueing thread %ld into run queue priority = %ld\n",
 					oldThread->id, simple_get_effective_priority(oldThread));
 				simple_enqueue(oldThread, false);
@@ -521,11 +449,10 @@ simple_reschedule(void)
 	}
 
 	oldThread->has_yielded = false;
-	oldThread->has_fully_yielded = false;
 	schedulerOldThreadData->lost_cpu = false;
 
 	// select thread with the biggest priority
-	Thread* nextThread = simple_get_next_thread();
+	Thread* nextThread = sRunQueue->PeekMaximum();
 	if (!nextThread)
 		panic("reschedule(): run queues are empty!\n");
 	sRunQueue->Remove(nextThread);
@@ -634,11 +561,6 @@ scheduler_simple_init()
 		return B_NO_MEMORY;
 	ObjectDeleter<SimpleRunQueue> runQueueDeleter(sRunQueue);
 
-	sExpiredQueue = new(std::nothrow) SimpleRunQueue;
-	if (sExpiredQueue == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<SimpleRunQueue> expiredQueueDeleter(sExpiredQueue);
-
 	status_t result = sRunQueue->GetInitStatus();
 	if (result != B_OK)
 		return result;
@@ -649,6 +571,5 @@ scheduler_simple_init()
 		"List threads in run queue", "\nLists threads in run queue", 0);
 
 	runQueueDeleter.Detach();
-	expiredQueueDeleter.Detach();
 	return B_OK;
 }

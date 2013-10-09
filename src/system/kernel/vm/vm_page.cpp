@@ -2390,7 +2390,7 @@ page_writer(void* /*unused*/)
 			if (cache->AcquireUnreferencedStoreRef() != B_OK) {
 				DEBUG_PAGE_ACCESS_END(page);
 				cacheLocker.Unlock();
-				thread_yield(true);
+				thread_yield();
 				continue;
 			}
 

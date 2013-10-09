@@ -179,7 +179,6 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 	signal_stack_enabled(false),
 	in_kernel(true),
 	has_yielded(false),
-	has_fully_yielded(false),
 	user_thread(NULL),
 	fault_handler(0),
 	page_faults_allowed(1),
@@ -2440,14 +2439,15 @@ peek_next_thread_id()
 
 
 /*!	Yield the CPU to other threads.
-	If \a force is \c true, the thread will almost guaranteedly be unscheduled.
-	If \c false, it will continue to run, if there's no other thread in ready
+	Thread will continue to run, if there's no other thread in ready
 	state, and if it has a higher priority than the other ready threads, it
 	still has a good chance to continue.
 */
 void
-thread_yield(bool force)
+thread_yield(void)
 {
+	// Yielding is for being nice, not for making things work.
+#if !KDEBUG
 	Thread *thread = thread_get_current_thread();
 	if (thread == NULL)
 		return;
@@ -2455,8 +2455,8 @@ thread_yield(bool force)
 	InterruptsSpinLocker _(gSchedulerLock);
 
 	thread->has_yielded = true;
-	thread->has_fully_yielded = force;
 	scheduler_reschedule();
+#endif
 }
 
 
@@ -3507,7 +3507,7 @@ _user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags,
 void
 _user_thread_yield(void)
 {
-	thread_yield(false);
+	thread_yield();
 }
 
 
