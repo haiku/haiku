@@ -123,6 +123,9 @@ public:
 									{ return fPackaged; }
 
 private:
+			int					_OpenSystemPackage();
+
+private:
 			Directory*			fRootDirectory;
 				// root directory of the volume
 			Directory*			fSystemDirectory;

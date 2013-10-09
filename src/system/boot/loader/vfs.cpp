@@ -14,6 +14,8 @@
 
 #include <StorageDefs.h>
 
+#include <AutoDeleter.h>
+
 #include <boot/platform.h>
 #include <boot/partitions.h>
 #include <boot/stdio.h>
@@ -435,8 +437,7 @@ BootVolume::SetTo(Directory* rootDirectory)
 	fSystemDirectory = static_cast<Directory*>(systemNode);
 
 	// try opening the system package
-	int packageFD = open_from(fSystemDirectory, "packages/haiku.hpkg",
-		O_RDONLY);
+	int packageFD = _OpenSystemPackage();
 	fPackaged = packageFD >= 0;
 	if (!fPackaged)
 		return B_OK;
@@ -471,6 +472,46 @@ BootVolume::Unset()
 	}
 
 	fPackaged = false;
+}
+
+
+int
+BootVolume::_OpenSystemPackage()
+{
+	// open the packages directory
+	Node* packagesNode = fSystemDirectory->Lookup("packages", false);
+	if (packagesNode == NULL)
+		return -1;
+	MethodDeleter<Node, status_t> packagesNodeReleaser(packagesNode,
+		&Node::Release);
+
+	if (!S_ISDIR(packagesNode->Type()))
+		return -1;
+	Directory* packageDirectory = (Directory*)packagesNode;
+
+	// search for the system package
+	int fd = -1;
+	void* cookie;
+	if (packageDirectory->Open(&cookie, O_RDONLY) == B_OK) {
+		char name[B_FILE_NAME_LENGTH];
+		while (packageDirectory->GetNextEntry(cookie, name, sizeof(name))
+				== B_OK) {
+			// The name must end with ".hpkg".
+			size_t nameLength = strlen(name);
+			if (nameLength < 6 || strcmp(name + nameLength - 5, ".hpkg") != 0)
+				continue;
+
+			// The name must either be "haiku.hpkg" or start with "haiku-".
+			if (strcmp(name, "haiku.hpkg") == 0
+				|| strncmp(name, "haiku-", 6) == 0) {
+				fd = open_from(packageDirectory, name, O_RDONLY);
+				break;
+			}
+		}
+		packageDirectory->Close(cookie);
+	}
+
+	return fd;
 }
 
 
