@@ -348,6 +348,55 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 		// force a cleanup
 		_FinishedDrag();
 
+		switch (code) {
+			case B_INSIDE_VIEW:
+			{
+				BMenuItem* menuItem;
+				TTeamMenuItem* item = TeamItemAtPoint(where, &menuItem);
+				TWindowMenuItem* windowMenuItem
+					= dynamic_cast<TWindowMenuItem*>(menuItem);
+
+				if (item == NULL || menuItem == NULL) {
+					// item is NULL, remove the tooltip and break out
+					fLastMousedOverItem = NULL;
+					SetToolTip((const char*)NULL);
+					break;
+				}
+
+				if (menuItem == fLastMousedOverItem) {
+					// already set the tooltip for this item, break out
+					break;
+				}
+
+				if (windowMenuItem != NULL && fBarView->Vertical()
+					&& fBarView->ExpandoState() && item->IsExpanded()) {
+					// expando mode window menu item
+					fLastMousedOverItem = menuItem;
+					if (strcmp(windowMenuItem->Label(),
+							windowMenuItem->FullTitle()) != 0) {
+						// label is truncated, set tooltip
+						SetToolTip(windowMenuItem->FullTitle());
+					} else
+						SetToolTip((const char*)NULL);
+
+					break;
+				}
+
+				if (item->HasLabel()) {
+					// item has a visible label, remove the tooltip and break out
+					fLastMousedOverItem = menuItem;
+					SetToolTip((const char*)NULL);
+					break;
+				}
+
+				SetToolTip(item->Name());
+					// new item, set the tooltip to the item name
+				fLastMousedOverItem = menuItem;
+					// save the current menuitem for the next MouseMoved() call
+				break;
+			}
+		}
+
 		BMenuBar::MouseMoved(where, code, message);
 		return;
 	}
