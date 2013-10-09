@@ -458,30 +458,33 @@ BHttpRequest::_MakeRequest()
 		}
 	} else if ((fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT)
 		&& fOptInputData != NULL) {
-		char outputTempBuffer[1024];
-		ssize_t read = 0;
 
-		while (read != -1) {
-			read = fOptInputData->Read(outputTempBuffer, 1024);
+		for(;;) {
+			char outputTempBuffer[1024];
+			ssize_t read = fOptInputData->Read(outputTempBuffer,
+				sizeof(outputTempBuffer));
 
-			if (read > 0) {
-				if (fOptInputDataSize < 0)
-				{
-					// Chunked transfer
-					char hexSize[16];
-					size_t hexLength = sprintf(hexSize, "%ld", read);
+			if(read <= 0) break;
 
-					fSocket->Write(hexSize, hexLength);
-					fSocket->Write("\r\n", 2);
-					fSocket->Write(outputTempBuffer, read);
-					fSocket->Write("\r\n", 2);
-				} else {
-					fSocket->Write(outputTempBuffer, read);
-				}
+			if (fOptInputDataSize < 0)
+			{
+				// Chunked transfer
+				char hexSize[16];
+				size_t hexLength = sprintf(hexSize, "%ld", read);
+
+				fSocket->Write(hexSize, hexLength);
+				fSocket->Write("\r\n", 2);
+				fSocket->Write(outputTempBuffer, read);
+				fSocket->Write("\r\n", 2);
+			} else {
+				fSocket->Write(outputTempBuffer, read);
 			}
 		}
 
-		fSocket->Write("0\r\n\r\n", 5);
+		if (fOptInputDataSize < 0) {
+			// Chunked transfer terminating sequence
+			fSocket->Write("0\r\n\r\n", 5);
+		}
 	}
 	fOutputBuffer.Truncate(0, true);
 
@@ -537,13 +540,11 @@ BHttpRequest::_MakeRequest()
 					fListener->HeadersReceived(this);
 
 				// Parse received cookies
-				if ((fContext != NULL) && fHeaders.HasHeader("Set-Cookie")) {
+				if (fContext != NULL) {
 					for (int32 i = 0;  i < fHeaders.CountHeaders(); i++) {
 						if (fHeaders.HeaderAt(i).NameIs("Set-Cookie")) {
-							BNetworkCookie* cookie = new BNetworkCookie();
-							cookie->ParseCookieStringFromUrl(
+							fContext->GetCookieJar().AddCookie(
 								fHeaders.HeaderAt(i).Value(), fUrl);
-							fContext->GetCookieJar().AddCookie(cookie);
 						}
 					}
 				}
@@ -717,7 +718,7 @@ BHttpRequest::_ParseHeaders()
 	if (_GetLine(currentHeader) == B_ERROR)
 		return;
 
-	// Empty line
+	// An empty line means the end of the header section
 	if (currentHeader.Length() == 0) {
 		fHeadersReceived = true;
 		return;
