@@ -168,9 +168,6 @@ static void* sHeapBase;
 static size_t /*sHeapSize,*/ sMaxHeapSize, sAvailable, sMaxHeapUsage;
 static FreeChunkTree sFreeChunkTree;
 
-static uint64 sTotalMallocCycles = 0;
-static uint64 sTotalFreeCycles = 0;
-
 
 static inline size_t
 align(size_t size)
