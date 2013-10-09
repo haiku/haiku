@@ -692,6 +692,8 @@ rule CreateContainerCopyFilesScript container : script
 				local dummyTarget = $(script)-dummy-$(dir:G=)-$(target) ;
 				NotFile $(dummyTarget) ;
 				TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
+				DO_STRIP on $(dummyTarget) = [ on $(container)
+					return $(HAIKU_CONTAINER_STRIP_BINARIES) ] ;
 
 				local nameFunction
 					= [ on $(destTarget) return $(NAME_FUNCTION) ] ;
@@ -721,6 +723,8 @@ rule CreateContainerCopyFilesScript container : script
 			local dummyTarget = $(script)-dummy-$(dir:G=) ;
 			NotFile $(dummyTarget) ;
 			TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
+			DO_STRIP on $(dummyTarget) = [ on $(container)
+				return $(HAIKU_CONTAINER_STRIP_BINARIES) ] ;
 
 			Depends $(dummyTarget) : $(initScript) $(targets)
 				$(serializationDependency) ;
@@ -763,6 +767,11 @@ actions piecemeal AppendToContainerCopyFilesScript bind OUTPUT_SCRIPT
 {
 	echo \$cp "\"\${sPrefix}$(2)\"" "\"\${tPrefix}$(TARGET_DIR)\"" \
 		>> $(OUTPUT_SCRIPT)
+
+	if [ -n "$(DO_STRIP:E)" ]; then
+		echo \$strip "\"\${tPrefix}$(TARGET_DIR)/$(2:BS)\"" "2>/dev/null" \
+			"|| true" >> $(OUTPUT_SCRIPT)
+	fi
 }
 
 
@@ -775,6 +784,11 @@ actions AppendToContainerCopyFilesScriptSingleFile
 
 	echo \$cp "\"\${sPrefix}$(2[2])\"" \
 		"\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" >> $(2[1])
+
+	if [ -n "$(DO_STRIP:E)" ]; then
+		echo \$strip "\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" \
+			"2>/dev/null" "|| true" >> $(2[1])
+	fi
 }
 
 

@@ -183,6 +183,7 @@ AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
 AddVariableToScript $(script) : addBuildCompatibilityLibDir
 	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
 AddTargetVariableToScript $(script) : <build>copyattr ;
+AddTargetVariableToScript $(script) : $(HAIKU_STRIP_$(TARGET_ARCH)) : strip ;
 
 # create the other scripts
 local makeDirsScript = <FloppyBootArchive>haiku-floppyboot-make-dirs ;
