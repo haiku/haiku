@@ -46,7 +46,7 @@ using namespace BPrivate;
 
 #if HEAP_LEAK_CHECK
 static block* sUsedList = NULL;
-static hoardLockType sUsedLock = 0;
+static hoardLockType sUsedLock = MUTEX_INITIALIZER("");
 
 
 /*!

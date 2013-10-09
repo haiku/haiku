@@ -27,8 +27,12 @@
 #include <OS.h>
 #include <assert.h>
 
+#include <locks.h>
 
-typedef int32 hoardLockType;
+
+// TODO: some kind of adaptive mutex (i.e. trying to spin for a while before
+//  may be a better choice
+typedef mutex hoardLockType;
 
 namespace BPrivate {
 
