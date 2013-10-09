@@ -1788,7 +1788,7 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 	arch_thread_dump_info(&thread->arch_info);
 	if (gScheduler->dump_thread_data != NULL) {
 		kprintf("scheduler data:\n");
-		gScheduler->dump_thread_data(thread->scheduler_data);
+		gScheduler->dump_thread_data(thread);
 	}
 }
 

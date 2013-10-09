@@ -70,7 +70,7 @@ struct scheduler_ops {
 
 	/*! Dumps scheduler specific thread information.
 	*/
-	void (*dump_thread_data)(struct scheduler_thread_data* scheduler_data);
+	void (*dump_thread_data)(Thread* thread);
 };
 
 extern struct scheduler_ops* gScheduler;

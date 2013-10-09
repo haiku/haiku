@@ -55,6 +55,7 @@ struct scheduler_thread_data {
 	void		Init();
 
 	int32		priority_penalty;
+	int32		additional_penalty;
 	int32		forced_yield_count;
 
 	bool		lost_cpu;
@@ -72,6 +73,7 @@ void
 scheduler_thread_data::Init()
 {
 	priority_penalty = 0;
+	additional_penalty = 0;
 	forced_yield_count = 0;
 
 	time_left = 0;
@@ -84,6 +86,28 @@ scheduler_thread_data::Init()
 }
 
 
+static inline int
+simple_get_minimal_priority(Thread* thread)
+{
+	return min_c(thread->priority, 25) / 5;
+}
+
+
+static inline int32
+simple_get_thread_penalty(Thread* thread)
+{
+	int32 penalty = thread->scheduler_data->priority_penalty;
+
+	const int kMinimalPriority = simple_get_minimal_priority(thread);
+	if (kMinimalPriority > 0) {
+		penalty
+			+= thread->scheduler_data->additional_penalty % kMinimalPriority;
+	}
+
+	return penalty;
+
+}
+
 static inline void
 dump_queue(SimpleRunQueue::ConstIterator& iterator)
 {
@@ -95,7 +119,7 @@ dump_queue(SimpleRunQueue::ConstIterator& iterator)
 			Thread* thread = iterator.Next();
 			kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 " %-8" B_PRId32 " %s\n",
 				thread, thread->id, thread->priority,
-				thread->scheduler_data->priority_penalty, thread->name);
+				simple_get_thread_penalty(thread), thread->name);
 		}
 	}
 }
@@ -118,10 +142,21 @@ dump_run_queue(int argc, char** argv)
 
 
 static void
-simple_dump_thread_data(scheduler_thread_data* schedulerThreadData)
+simple_dump_thread_data(Thread* thread)
 {
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+
 	kprintf("\tpriority_penalty:\t%" B_PRId32 "\n",
 		schedulerThreadData->priority_penalty);
+
+	int32 additionalPenalty = 0;
+	const int kMinimalPriority = simple_get_minimal_priority(thread);
+	if (kMinimalPriority > 0) {
+		additionalPenalty
+			= schedulerThreadData->additional_penalty % kMinimalPriority;
+	}
+	kprintf("\tadditional_penalty:\t%" B_PRId32 " (%" B_PRId32 ")\n",
+		additionalPenalty, schedulerThreadData->additional_penalty);
 	kprintf("\tforced_yield_count:\t%" B_PRId32 "\n",
 		schedulerThreadData->forced_yield_count);
 	kprintf("\tstolen_time:\t\t%" B_PRId64 "\n",
@@ -138,7 +173,7 @@ simple_get_effective_priority(Thread* thread)
 		return thread->priority;
 
 	int32 effectivePriority = thread->priority;
-	effectivePriority -= thread->scheduler_data->priority_penalty;
+	effectivePriority -= simple_get_thread_penalty(thread);
 
 	ASSERT(effectivePriority < B_FIRST_REAL_TIME_PRIORITY);
 	ASSERT(effectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
@@ -183,11 +218,11 @@ simple_increase_penalty(Thread* thread)
 	int32 oldPenalty = schedulerThreadData->priority_penalty++;
 
 	ASSERT(thread->priority - oldPenalty >= B_LOWEST_ACTIVE_PRIORITY);
-	const int kMinimalPriority
-		= min_c(thread->priority, 25) / 5;
+	const int kMinimalPriority = simple_get_minimal_priority(thread);
 	if (thread->priority - oldPenalty <= kMinimalPriority) {
 		schedulerThreadData->priority_penalty = oldPenalty;
 		schedulerThreadData->forced_yield_count++;
+		schedulerThreadData->additional_penalty++;
 	}
 }
 
@@ -200,6 +235,7 @@ simple_cancel_penalty(Thread* thread)
 	if (schedulerThreadData->priority_penalty != 0)
 		TRACE("cancelling thread %ld penalty\n", thread->id);
 	schedulerThreadData->priority_penalty = 0;
+	schedulerThreadData->additional_penalty = 0;
 	schedulerThreadData->forced_yield_count = 0;
 }
 
