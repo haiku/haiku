@@ -76,6 +76,19 @@ static const char* kUsage =
 	"                  of the archive.\n"
 	"    -i <info>  - Extract the .PackageInfo file to <info> instead.\n"
 	"\n"
+	"  info [ <options> ] <package>\n"
+	"    Prints individual meta information of package file <package>.\n"
+	"\n"
+	"    -f <format>, --format <format>\n"
+	"               - Print the given format string, performing the following\n"
+	"                 replacements:\n"
+	"                    %fileName%     - the package's canonical file name\n"
+	"                    %name%         - the package name\n"
+	"                    %version%      - the package version\n"
+	"                    %%             - %\n"
+	"                    \n             - new line\n"
+	"                    \t             - tab\n"
+	"\n"
 	"  list [ <options> ] <package>\n"
 	"    Lists the contents of package file <package>.\n"
 	"\n"
@@ -117,6 +130,9 @@ main(int argc, const char* const* argv)
 
 	if (strcmp(command, "list") == 0)
 		return command_list(argc - 1, argv + 1);
+
+	if (strcmp(command, "info") == 0)
+		return command_info(argc - 1, argv + 1);
 
 	if (strcmp(command, "help") == 0)
 		print_usage_and_exit(false);

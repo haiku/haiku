@@ -11,6 +11,7 @@ BuildPlatformMain <build>package :
 	command_create.cpp
 	command_dump.cpp
 	command_extract.cpp
+	command_info.cpp
 	command_list.cpp
 	package.cpp
 	PackageWriterListener.cpp
