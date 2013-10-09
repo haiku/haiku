@@ -104,6 +104,9 @@ private:
 
 			void			_FinishedDrag(bool invoke = false);
 
+			void			_DoneTracking(BPoint where);
+			void			_Track(BPoint where, uint32);
+
 private:
 			TBarView*		fBarView;
 			bool			fVertical : 1;
@@ -116,7 +119,6 @@ private:
 			TTeamMenuItem*	fPreviousDragTargetItem;
 			BMenuItem*		fLastMousedOverItem;
 			BMenuItem*		fLastClickedItem;
-			bool			fClickedExpander;
 			BList			fTeamList;
 
 	static	bool			sDoMonitor;
