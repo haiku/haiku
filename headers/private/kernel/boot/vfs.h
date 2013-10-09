@@ -109,17 +109,17 @@ public:
 								BootVolume();
 								~BootVolume();
 
-		status_t				SetTo(Directory* rootDirectory);
-		void					Unset();
+			status_t			SetTo(Directory* rootDirectory);
+			void				Unset();
 
-		bool					IsValid() const
+			bool				IsValid() const
 									{ return fRootDirectory != NULL; }
 
-		Directory*				RootDirectory() const
+			Directory*			RootDirectory() const
 									{ return fRootDirectory; }
-		Directory*				SystemDirectory() const
+			Directory*			SystemDirectory() const
 									{ return fSystemDirectory; }
-		bool					IsPackaged() const
+			bool				IsPackaged() const
 									{ return fPackaged; }
 
 private:
