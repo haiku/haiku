@@ -216,12 +216,12 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs bindfs btrfs cdda exfat ext2 fat iso9660 nfs
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuPackages ] ;
 
 AddPackageFilesToHaikuImage system :
+	haiku_loader.hpkg
 	haiku.hpkg
 	haiku_$(TARGET_PACKAGING_ARCHS[2-]).hpkg
 	:
 	nameFromMetaInfo
 	;
-AddPackageFilesToHaikuImage system : haiku_loader.hpkg ;
 
 
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
