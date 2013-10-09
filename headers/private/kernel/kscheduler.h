@@ -67,6 +67,10 @@ struct scheduler_ops {
 		lock.
 	*/
 	void (*start)(void);
+
+	/*! Dumps scheduler specific thread information.
+	*/
+	void (*dump_thread_data)(struct scheduler_thread_data* scheduler_data);
 };
 
 extern struct scheduler_ops* gScheduler;
