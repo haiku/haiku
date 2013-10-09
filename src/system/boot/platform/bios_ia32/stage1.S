@@ -647,7 +647,8 @@ kErrorString				db	"Failed to load OS. Press any key to reboot..."
 kPathComponents:
 pathComponent				"system"
 pathComponent				"packages"
-pathComponent				"haiku_loader.hpkg"
+kLastPathComponent:
+pathComponent				"haiku_loader"
 							db	0
 
 
@@ -882,10 +883,19 @@ continueMain:
 	push		bp
 	sub			bp, dx
 
+	; Compare the key length. For the last component we only want to check
+	; whether the prefix matches.
+	cmp			cx, bp
+	jg			.skip_key
+
+	cmp			di, kLastPathComponent + 1
+	je			.compare_keys
+
 	cmp			cx, bp
 	jne			.skip_key
 
-	; compare path component (di) with key (si), length cx (== bp)
+	; compare path component (di) with key (si), length cx (<= bp)
+.compare_keys:
 	pusha
 	repe cmpsb
 	popa
