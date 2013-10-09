@@ -2,7 +2,8 @@ SubDir HAIKU_TOP src system libroot ;
 
 UsePrivateHeaders libroot runtime_loader ;
 
-rule FilterArchive {
+rule FilterArchive
+{
 	# FilterArchive <target> : <source> : <members to remove>
 
 	# set the tools according to the platform
@@ -20,10 +21,13 @@ rule FilterArchive {
 	# delete the unwanted members
 	FilterArchive1 $(1) : $(3) ;
 
-	if $(RANLIB) { Ranlib $(1) ; }
+	if $(RANLIB) {
+		Ranlib $(1) ;
+	}
 }
 
-actions FilterArchive1 {
+actions FilterArchive1
+{
 	$(AR) $(<) $(>)
 }
 
