@@ -195,6 +195,15 @@ BNetworkCookie::SetDomain(const BString& domain)
 {
 	// TODO: canonicalize the domain
 	fDomain = domain;
+
+	// RFC 2109 (legacy) support: domain string may start with a dot,
+	// meant to indicate the cookie should also be used for subdomains.
+	// RFC 6265 makes all cookies work for subdomains, unless the domain is
+	// not specified at all (in this case it has to exactly match the Url of
+	// the page that set the cookie). In any case, we don't need to handle
+	// dot-cookies specifically anymore, so just remove the extra dot.
+	if(fDomain[0] == '.')
+		fDomain.Remove(0, 1);
 	fHostOnly = false;
 
 	fRawFullCookieValid = false;
@@ -410,13 +419,14 @@ BNetworkCookie::IsValidForDomain(const BString& domain) const
 	// Here's a list of TLD:
 	// https://github.com/rsimoes/Mozilla-PublicSuffix/blob/master/effective_tld_names.dat
 
-	// Otherwise, the domains must match exactly, or the cookie domain
-	// must be a suffix starting with a dot.
+	// FIXME do not do substring matching on IP addresses. The RFCs disallow it.
+
+	// Otherwise, the domains must match exactly, or the domain must have a dot
+	// character just before the common suffix.
 	const char* suffix = domain.String() + difference;
-	if (strcmp(suffix, cookieDomain.String()) == 0) {
-		if (difference == 0 || suffix[0] == '.')
-			return true;
-	}
+	if (strcmp(suffix, cookieDomain.String()) == 0 && (difference == 0 
+			|| domain[difference - 1] == '.'))
+		return true;
 
 	return false;
 }
@@ -426,6 +436,7 @@ bool
 BNetworkCookie::IsValidForPath(const BString& path) const
 {
 	const BString& cookiePath = Path();
+
 	if (path.Length() < cookiePath.Length())
 		return false;
 
@@ -438,8 +449,9 @@ BNetworkCookie::IsValidForPath(const BString& path) const
 	// after the prefix is a slash.
 	if (path.Length() == cookiePath.Length()
 			|| cookiePath[cookiePath.Length() - 1] == '/'
-			|| path[cookiePath.Length()] == '/')
+			|| path[cookiePath.Length()] == '/') {
 		return true;
+	}
 
 	return false;
 }
