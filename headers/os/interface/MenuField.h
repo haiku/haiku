@@ -10,6 +10,7 @@
 
 
 class BMenuBar;
+class BMessageFilter;
 
 
 class BMenuField : public BView {
@@ -141,6 +142,9 @@ private:
 			float				_MenuBarOffset() const;
 			float				_MenuBarWidth() const;
 
+			void				_DoneTracking(BPoint point);
+			void				_Track(BPoint point, uint32);
+
 private:
 			char*				fLabel;
 			BMenu*				fMenu;
@@ -152,8 +156,9 @@ private:
 			thread_id			fMenuTaskID;
 
 			LayoutData*			fLayoutData;
+			BMessageFilter*		fMouseDownFilter;
 
-			uint32				_reserved[3];
+			uint32				_reserved[2];
 };
 
 #endif // _MENU_FIELD_H

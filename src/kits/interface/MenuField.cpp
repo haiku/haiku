@@ -19,18 +19,27 @@
 #include <string.h>
 
 #include <AbstractLayoutItem.h>
+#include <BMCPrivate.h>
 #include <ControlLook.h>
 #include <LayoutUtils.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <MenuPrivate.h>
 #include <Message.h>
-#include <BMCPrivate.h>
+#include <MessageFilter.h>
+#include <Thread.h>
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
 #include <binary_compatibility/Support.h>
 
+
+#ifdef CALLED
+#	undef CALLED
+#endif
+#ifdef TRACE
+#	undef TRACE
+#endif
 
 //#define TRACE_MENU_FIELD
 #ifdef TRACE_MENU_FIELD
@@ -144,6 +153,38 @@ struct BMenuField::LayoutData {
 	BSize				menu_bar_min;
 	bool				valid;
 };
+
+
+// #pragma mark - MouseDownFilter
+
+
+class MouseDownFilter : public BMessageFilter
+{
+public:
+								MouseDownFilter();
+	virtual						~MouseDownFilter();
+
+	virtual	filter_result		Filter(BMessage* message, BHandler** target);
+};
+
+
+MouseDownFilter::MouseDownFilter()
+	:
+	BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE)
+{
+}
+
+
+MouseDownFilter::~MouseDownFilter()
+{
+}
+
+
+filter_result
+MouseDownFilter::Filter(BMessage* message, BHandler** target)
+{
+	return message->what == B_MOUSE_DOWN ? B_SKIP_MESSAGE : B_DISPATCH_MESSAGE;
+}
 
 
 // #pragma mark - BMenuField
@@ -268,6 +309,7 @@ BMenuField::~BMenuField()
 		wait_for_thread(fMenuTaskID, &dummy);
 
 	delete fLayoutData;
+	delete fMouseDownFilter;
 }
 
 
@@ -431,8 +473,13 @@ BMenuField::MouseDown(BPoint where)
 
 	fMenuTaskID = spawn_thread((thread_func)_thread_entry,
 		"_m_task_", B_NORMAL_PRIORITY, this);
-	if (fMenuTaskID >= 0)
-		resume_thread(fMenuTaskID);
+	if (fMenuTaskID >= 0 && resume_thread(fMenuTaskID) == B_OK) {
+		if (fMouseDownFilter->Looper() == NULL)
+			Window()->AddCommonFilter(fMouseDownFilter);
+
+		MouseDownThread<BMenuField>::TrackMouse(this, &BMenuField::_DoneTracking,
+			&BMenuField::_Track);
+	}
 }
 
 
@@ -494,16 +541,16 @@ BMenuField::WindowActivated(bool state)
 
 
 void
-BMenuField::MouseUp(BPoint point)
+BMenuField::MouseMoved(BPoint point, uint32 code, const BMessage* message)
 {
-	BView::MouseUp(point);
+	BView::MouseMoved(point, code, message);
 }
 
 
 void
-BMenuField::MouseMoved(BPoint point, uint32 code, const BMessage* message)
+BMenuField::MouseUp(BPoint point)
 {
-	BView::MouseMoved(point, code, message);
+	BView::MouseUp(point);
 }
 
 
@@ -956,6 +1003,7 @@ BMenuField::InitObject(const char* label)
 	fFixedSizeMB = false;
 	fMenuTaskID = -1;
 	fLayoutData = new LayoutData;
+	fMouseDownFilter = new MouseDownFilter();
 
 	SetLabel(label);
 
@@ -1285,7 +1333,20 @@ BMenuField::_MenuBarWidth() const
 }
 
 
-// #pragma mark -
+void
+BMenuField::_DoneTracking(BPoint point)
+{
+	Window()->RemoveCommonFilter(fMouseDownFilter);
+}
+
+
+void
+BMenuField::_Track(BPoint point, uint32)
+{
+}
+
+
+// #pragma mark - BMenuField::LabelLayoutItem
 
 
 BMenuField::LabelLayoutItem::LabelLayoutItem(BMenuField* parent)
@@ -1405,7 +1466,7 @@ BMenuField::LabelLayoutItem::Instantiate(BMessage* from)
 }
 
 
-// #pragma mark -
+// #pragma mark - BMenuField::MenuBarLayoutItem
 
 
 BMenuField::MenuBarLayoutItem::MenuBarLayoutItem(BMenuField* parent)
