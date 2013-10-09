@@ -528,71 +528,83 @@ MainWindow::_RefreshPackageList()
 	}
 
 	// compute the OS package dependencies
-	// create the solver
-	BSolver* solver;
-	status_t error = BSolver::Create(solver);
-	if (error != B_OK) {
-		printf("failed to create solver: %s\n", strerror(error));
-		return;
-	}
+	try {
+		// create the solver
+		BSolver* solver;
+		status_t error = BSolver::Create(solver);
+		if (error != B_OK)
+			throw BFatalErrorException(error, "Failed to create solver.");
 
-	ObjectDeleter<BSolver> solverDeleter(solver);
-	BPath systemPath;
-	error = find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &systemPath);
-	if (error != B_OK) {
-		printf("Unable to retrieve system packages directory: %s\n", strerror(error));
-		return;
-	}
-
-	// add the "installed" repository with the given packages
-	BSolverRepository installedRepository;
-	{
-		BRepositoryBuilder installedRepositoryBuilder(installedRepository,
-			"installed");
-		for (int32 i = 0; i < systemFlaggedPackages.CountStrings(); i++) {
-			BPath packagePath(systemPath);
-			packagePath.Append(systemFlaggedPackages.StringAt(i));
-			installedRepositoryBuilder.AddPackage(packagePath.Path());
+		ObjectDeleter<BSolver> solverDeleter(solver);
+		BPath systemPath;
+		error = find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &systemPath);
+		if (error != B_OK) {
+			throw BFatalErrorException(error, "Unable to retrieve system "
+				"packages directory.");
 		}
-		installedRepositoryBuilder.AddToSolver(solver, true);
-	}
 
-	// add system repository
-	BSolverRepository systemRepository;
-	{
-		BRepositoryBuilder systemRepositoryBuilder(systemRepository,
-			"system");
-		for (PackageInfoMap::iterator it = systemInstalledPackages.begin();
-			it != systemInstalledPackages.end(); ++it) {
-			BPath packagePath(systemPath);
-			packagePath.Append(it->first);
-			systemRepositoryBuilder.AddPackage(packagePath.Path());
+		// add the "installed" repository with the given packages
+		BSolverRepository installedRepository;
+		{
+			BRepositoryBuilder installedRepositoryBuilder(installedRepository,
+				"installed");
+			for (int32 i = 0; i < systemFlaggedPackages.CountStrings(); i++) {
+				BPath packagePath(systemPath);
+				packagePath.Append(systemFlaggedPackages.StringAt(i));
+				installedRepositoryBuilder.AddPackage(packagePath.Path());
+			}
+			installedRepositoryBuilder.AddToSolver(solver, true);
 		}
-		systemRepositoryBuilder.AddToSolver(solver, false);
-	}
 
-	// solve
-	error = solver->VerifyInstallation();
-	if (error != B_OK) {
-		printf("failed to compute packages to install: %s\n", strerror(error));
-		return;
-	}
-
-	BSolverResult solverResult;
-	error = solver->GetResult(solverResult);
-	if (error != B_OK) {
-		printf("failed to get packages to install: %s\n", strerror(error));
-		return;
-	}
-
-	for (int32 i = 0; const BSolverResultElement* element
-			= solverResult.ElementAt(i); i++) {
-		BSolverPackage* package = element->Package();
-		if (element->Type() == BSolverResultElement::B_TYPE_INSTALL) {
-			PackageInfoMap::iterator it = systemInstalledPackages.find(package->Info().FileName());
-			if (it != systemInstalledPackages.end())
-				it->second->SetSystemDependency(true);
+		// add system repository
+		BSolverRepository systemRepository;
+		{
+			BRepositoryBuilder systemRepositoryBuilder(systemRepository,
+				"system");
+			for (PackageInfoMap::iterator it = systemInstalledPackages.begin();
+				it != systemInstalledPackages.end(); ++it) {
+				BPath packagePath(systemPath);
+				packagePath.Append(it->first);
+				systemRepositoryBuilder.AddPackage(packagePath.Path());
+			}
+			systemRepositoryBuilder.AddToSolver(solver, false);
 		}
+
+		// solve
+		error = solver->VerifyInstallation();
+		if (error != B_OK) {
+			throw BFatalErrorException(error, "Failed to compute packages to "
+				"install.");
+		}
+
+		BSolverResult solverResult;
+		error = solver->GetResult(solverResult);
+		if (error != B_OK) {
+			throw BFatalErrorException(error, "Failed to retrieve system "
+				"package dependency list.");
+		}
+
+		for (int32 i = 0; const BSolverResultElement* element
+				= solverResult.ElementAt(i); i++) {
+			BSolverPackage* package = element->Package();
+			if (element->Type() == BSolverResultElement::B_TYPE_INSTALL) {
+				PackageInfoMap::iterator it = systemInstalledPackages.find(
+					package->Info().FileName());
+				if (it != systemInstalledPackages.end())
+					it->second->SetSystemDependency(true);
+			}
+		}
+	} catch (BFatalErrorException ex) {
+		printf("Fatal exception occurred while resolving system dependencies: "
+			"%s, details: %s\n", strerror(ex.Error()), ex.Details().String());
+	} catch (BNothingToDoException) {
+		// do nothing
+	} catch (BException ex) {
+		printf("Exception occurred while resolving system dependencies: %s\n",
+			ex.Message().String());
+	} catch (...) {
+		printf("Unknown exception occurred while resolving system "
+			"dependencies.\n");
 	}
 }
 
