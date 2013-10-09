@@ -189,10 +189,15 @@ rule PropagateContainerUpdateTargetFlags toTarget : fromTarget
 
 
 rule AddFilesToContainer container : directoryTokens : targets : destName
+	: flags
 {
 	# AddFilesToContainer <container> : <directoryTokens> : <targets>
-	#	[ : dest name ]
+	#	: [ <destName> ] : [ <flags> ]
 	#
+	# Supported flags:
+	#	computeName - <destName> is the name of a shell command/function that
+	#		computes the destination name.
+
 	local containerGrist = [ on $(container) return $(HAIKU_CONTAINER_GRIST) ] ;
 	local systemDirTokens
 		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
@@ -236,15 +241,22 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 	local target ;
 	for target in $(targets) {
 		local name ;
+		local nameFunction ;
 		if $(destName) {
-			name = $(destName) ;
+			if computeName in $(flags) {
+				nameFunction = $(destName) ;
+				name = $(destName)/$(target:BS) ;
+			} else {
+				name = $(destName) ;
+			}
 		} else {
-			name = $(target:G=:D=) ;
+			name = $(target:BS) ;
 		}
 
 		local destTarget = $(name:G=$(containerGrist)__$(directory:G=)) ;
 		TARGET on $(destTarget) = $(target) ;
 		INSTALL_DIR on $(destTarget) = $(directory) ;
+		NAME_FUNCTION on $(destTarget) = $(nameFunction) ;
 		$(installTargetsVar) on $(target) += $(destTarget) ;
 		TARGETS_TO_INSTALL on $(directory) += $(destTarget) ;
 
@@ -673,14 +685,22 @@ rule CreateContainerCopyFilesScript container : script
 		local destTarget ;
 		for destTarget in $(destTargets) {
 			local target = [ on $(destTarget) return $(TARGET) ] ;
-			local name = $(destTarget:BS) ;
+			local name = $(destTarget:G=) ;
 			if $(name) != $(target:BS) {
 				# use a unique dummy target for this file, on which we
 				# can define the TARGET_DIR variable
 				local dummyTarget = $(script)-dummy-$(dir:G=)-$(target) ;
 				NotFile $(dummyTarget) ;
 				TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
-				INSTALL_TARGET_NAME on $(dummyTarget) = $(name) ;
+
+				local nameFunction
+					= [ on $(destTarget) return $(NAME_FUNCTION) ] ;
+				if $(nameFunction) {
+					INSTALL_TARGET_NAME on $(dummyTarget) = "\\${name}" ;
+				} else {
+					INSTALL_TARGET_NAME on $(dummyTarget) = $(name) ;
+				}
+				NAME_FUNCTION on $(dummyTarget) = $(nameFunction) ;
 
 				Depends $(dummyTarget) : $(initScript) $(target)
 					$(serializationDependency) ;
@@ -748,6 +768,11 @@ actions piecemeal AppendToContainerCopyFilesScript bind OUTPUT_SCRIPT
 
 actions AppendToContainerCopyFilesScriptSingleFile
 {
+	if [ -n "$(NAME_FUNCTION:E)" ]; then
+		echo "name=\`$(NAME_FUNCTION:E) \"$(2[2])\" 2> /dev/null \` || exit 1" \
+			>> $(2[1])
+	fi
+
 	echo \$cp "\"\${sPrefix}$(2[2])\"" \
 		"\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" >> $(2[1])
 }
@@ -885,12 +910,13 @@ rule AddDirectoryToHaikuImage directoryTokens : attributeFiles
 		: $(directoryTokens) : $(attributeFiles) ] ;
 }
 
-rule AddFilesToHaikuImage directory : targets : destName
+rule AddFilesToHaikuImage directory : targets : destName : flags
 {
-	# AddFilesToHaikuImage <directory> : <targets> [ : dest name ]
+	# AddFilesToHaikuImage <directory> : <targets> : [ <destName> ]
+	#	: [ <flags> ]
 
 	AddFilesToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(directory)
-		: $(targets) : $(destName) ;
+		: $(targets) : $(destName) : $(flags) ;
 }
 
 rule FFilesInHaikuImageDirectory directoryTokens
