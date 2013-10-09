@@ -16,8 +16,7 @@
 class BNetworkCookie : public BArchivable {
 public:
 								BNetworkCookie(const char* name,
-									const char* value);
-								BNetworkCookie(const BString& cookieString);
+									const char* value, const BUrl& url);
 								BNetworkCookie(const BString& cookieString,
 									const BUrl& url);
 								BNetworkCookie(BMessage* archive);
@@ -26,9 +25,8 @@ public:
 
 	// Parse a "SetCookie" string
 
-			BNetworkCookie&		ParseCookieStringFromUrl(const BString& string,
+			status_t			ParseCookieString(const BString& string,
 									const BUrl& url);
-			BNetworkCookie& 	ParseCookieString(const BString& cookieString);
 
 	// Modify the cookie fields
 			BNetworkCookie&		SetName(const BString& name);
@@ -76,7 +74,6 @@ public:
 	static	BArchivable*		Instantiate(BMessage* archive);
 
 	// Overloaded operators
-			BNetworkCookie&		operator=(const char* string);
 			bool				operator==(const BNetworkCookie& other);
 			bool				operator!=(const BNetworkCookie& other);
 private:

@@ -30,26 +30,22 @@ static const char* kArchivedCookieHttpOnly = "be:cookie.httponly";
 static const char* kArchivedCookieHostOnly = "be:cookie.hostonly";
 
 
-BNetworkCookie::BNetworkCookie(const char* name, const char* value)
+BNetworkCookie::BNetworkCookie(const char* name, const char* value,
+	const BUrl& url)
 {
 	_Reset();
 	fName = name;
 	fValue = value;
+
+	SetDomain(url.Host());
+	SetPath(_DefaultPathForUrl(url));
 }
 
 
-BNetworkCookie::BNetworkCookie(const BString& cookieString)
+BNetworkCookie::BNetworkCookie(const BString& cookieString, const BUrl& url)
 {
 	_Reset();
-	ParseCookieString(cookieString);
-}
-
-
-BNetworkCookie::BNetworkCookie(const BString& cookieString,
-	const BUrl& url)
-{
-	_Reset();
-	ParseCookieStringFromUrl(cookieString, url);
+	ParseCookieString(cookieString, url);
 }
 
 
@@ -88,9 +84,8 @@ BNetworkCookie::~BNetworkCookie()
 // #pragma mark String to cookie fields
 
 
-BNetworkCookie&
-BNetworkCookie::ParseCookieStringFromUrl(const BString& string,
-	const BUrl& url)
+status_t
+BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 {
 	_Reset();
 
@@ -102,7 +97,7 @@ BNetworkCookie::ParseCookieStringFromUrl(const BString& string,
 	index = _ExtractNameValuePair(string, name, value, index);
 	if (index == -1) {
 		// The set-cookie-string is not valid
-		return *this;
+		return B_BAD_DATA;
 	}
 
 	SetName(name);
@@ -149,10 +144,8 @@ BNetworkCookie::ParseCookieStringFromUrl(const BString& string,
 		if (!IsValidForDomain(url.Host())) {
 			// Invalidate the cookie.
 			_Reset();
-			return *this;
+			return B_NOT_ALLOWED;
 		}
-		// We should also reject cookies with domains that match public
-		// suffixes.
 	}
 
 	// If no path was specified or the path is invalid, we compute the default
@@ -160,16 +153,7 @@ BNetworkCookie::ParseCookieStringFromUrl(const BString& string,
 	if (!HasPath() || Path()[0] != '/')
 		SetPath(_DefaultPathForUrl(url));
 
-	return *this;
-}
-
-
-BNetworkCookie&
-BNetworkCookie::ParseCookieString(const BString& string)
-{
-	BUrl url;
-	ParseCookieStringFromUrl(string, url);
-	return *this;
+	return B_OK;
 }
 
 
@@ -417,16 +401,20 @@ BNetworkCookie::IsValidForDomain(const BString& domain) const
 		return false;
 
 	// If the cookie is host-only the domains must match exactly.
-	if (IsHostOnly())
+	if (IsHostOnly()) {
 		return domain == cookieDomain;
+	}
+
+	// FIXME prevent supercookies with a domain of ".com" or similar
+	// This is NOT as straightforward as relying on the last dot in the domain.
+	// Here's a list of TLD:
+	// https://github.com/rsimoes/Mozilla-PublicSuffix/blob/master/effective_tld_names.dat
 
 	// Otherwise, the domains must match exactly, or the cookie domain
-	// must be a suffix with the preceeding character being a dot.
+	// must be a suffix starting with a dot.
 	const char* suffix = domain.String() + difference;
 	if (strcmp(suffix, cookieDomain.String()) == 0) {
-		if (difference == 0)
-			return true;
-		else if (domain[difference - 1] == '.')
+		if (difference == 0 || suffix[0] == '.')
 			return true;
 	}
 
@@ -589,13 +577,6 @@ BNetworkCookie::Instantiate(BMessage* archive)
 
 
 // #pragma mark Overloaded operators
-
-
-BNetworkCookie&
-BNetworkCookie::operator=(const char* string)
-{
-	return ParseCookieString(string);
-}
 
 
 bool

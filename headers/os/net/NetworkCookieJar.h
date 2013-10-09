@@ -7,14 +7,14 @@
 
 #include <Archivable.h>
 #include <Flattenable.h>
-#include <List.h>
 #include <Message.h>
+#include <ObjectList.h>
 #include <NetworkCookie.h>
 #include <String.h>
 #include <Url.h>
 
 
-typedef BList BNetworkCookieList;
+typedef BObjectList<BNetworkCookie> BNetworkCookieList;
 
 
 class BNetworkCookieJar : public BArchivable, public BFlattenable {
@@ -35,6 +35,8 @@ public:
 	virtual						~BNetworkCookieJar();
 
 			status_t			AddCookie(const BNetworkCookie& cookie);
+			status_t			AddCookie(const BString& cookie,
+									const BUrl& url);
 			status_t			AddCookie(BNetworkCookie* cookie);
 			status_t			AddCookies(const BNetworkCookieList& cookies);
 
