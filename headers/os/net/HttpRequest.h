@@ -84,11 +84,17 @@ private:
 			BHttpAuthentication	fAuthentication;
 
 	// Request status
+
 			BHttpHeaders		fOutputHeaders;
-			bool				fStatusReceived;
-			bool				fHeadersReceived;
-			bool				fContentReceived;
-			bool				fTrailingHeadersReceived;
+
+			// Request state/events
+			enum {
+				kRequestInitialState,
+				kRequestStatusReceived,
+				kRequestHeadersReceived,
+				kRequestContentReceived,
+				kRequestTrailingHeadersReceived
+			}					fRequestStatus;
 
 
 	// Protocol options
@@ -131,43 +137,6 @@ enum {
 enum {
 	B_HTTP_10 = 1,
 	B_HTTP_11
-};
-
-
-// HTTP Protocol options
-enum {
-	B_HTTPOPT_METHOD = 0,
-		// (int) Request method (see B_HTTP_GET, ...)
-	B_HTTPOPT_FOLLOWLOCATION,
-		// (bool) Follow Location: headers
-	B_HTTPOPT_MAXREDIRS,
-		// (int) Max relocation
-	B_HTTPOPT_HEADERS,
-		// (BHttpHeaders*) Headers to be sent
-	B_HTTPOPT_REFERER,
-		// (string) Referer
-	B_HTTPOPT_USERAGENT,
-		// (string) User-Agent
-	B_HTTPOPT_SETCOOKIES,
-		// (bool) Send cookies from context
-	B_HTTPOPT_DISCARD_DATA,
-		// (bool) Discard incoming data (still notified)
-	B_HTTPOPT_DISABLE_LISTENER,
-		// (bool) Don't send notification to the listener
-	B_HTTPOPT_AUTOREFERER,
-		// (bool) Automatically set the Referer header
-	B_HTTPOPT_POSTFIELDS,
-		// (BHttpForm*) POST data to be sent
-	B_HTTPOPT_INPUTDATA,
-		// (BDataIO*) Input data to be sent (POST, PUT)
-	B_HTTPOPT_AUTHUSERNAME,
-		// (string) Authentication username
-	B_HTTPOPT_AUTHPASSWORD,
-		// (string) Authentication password
-	B_HTTPOPT_AUTHMETHOD,
-		// (int) Allowed authentication methods (see BHttpAuthenticationMethod)
-
-	B_HTTPOPT__OPT_NUM
 };
 
 

@@ -33,9 +33,14 @@ BHttpRequest::BHttpRequest(const BUrl& url, BUrlResult& result, bool ssl,
 	BUrlContext* context)
 	:
 	BUrlRequest(url, listener, context, result, "BUrlProtocol.HTTP", protocolName),
+	fSocket(NULL),
 	fSSL(ssl),
 	fRequestMethod(B_HTTP_GET),
-	fHttpVersion(B_HTTP_11)
+	fHttpVersion(B_HTTP_11),
+	fRequestStatus(kRequestInitialState),
+	fOptHeaders(NULL),
+	fOptInputData(NULL),
+	fOptInputDataSize(-1)
 {
 	_ResetOptions();
 	if (ssl)
@@ -488,8 +493,7 @@ BHttpRequest::_MakeRequest()
 	}
 	fOutputBuffer.Truncate(0, true);
 
-	fStatusReceived = false;
-	fHeadersReceived = false;
+	fRequestStatus = kRequestInitialState;
 
 	// Receive loop
 	bool receiveEnd = false;
@@ -522,16 +526,16 @@ BHttpRequest::_MakeRequest()
 		else
 			bytesRead = 0;
 
-		if (!fStatusReceived) {
+		if (fRequestStatus < kRequestStatusReceived) {
 			_ParseStatus();
 
 			//! ProtocolHook:ResponseStarted
-			if (fStatusReceived && fListener != NULL)
+			if (fRequestStatus >= kRequestStatusReceived && fListener != NULL)
 				fListener->ResponseStarted(this);
-		} else if (!fHeadersReceived) {
+		} else if (fRequestStatus < kRequestHeadersReceived) {
 			_ParseHeaders();
 
-			if (fHeadersReceived) {
+			if (fRequestStatus >= kRequestHeadersReceived) {
 				receiveBufferSize = kHttpProtocolReceiveBufferSize;
 				_ResultHeaders() = fHeaders;
 
@@ -595,7 +599,7 @@ BHttpRequest::_MakeRequest()
 						PRINT(("BHP[%p] Chunk %s=%ld\n", this,
 							chunkHeader.String(), chunkSize));
 						if (chunkSize == 0) {
-							fContentReceived = true;
+							fRequestStatus = kRequestContentReceived;
 						}
 
 						bytesRead = -1;
@@ -697,7 +701,7 @@ BHttpRequest::_ParseStatus()
 	if (statusLine.CountChars() < 12)
 		return;
 
-	fStatusReceived = true;
+	fRequestStatus = kRequestStatusReceived;
 
 	BString statusCodeStr;
 	BString statusText;
@@ -720,7 +724,7 @@ BHttpRequest::_ParseHeaders()
 
 	// An empty line means the end of the header section
 	if (currentHeader.Length() == 0) {
-		fHeadersReceived = true;
+		fRequestStatus = kRequestHeadersReceived;
 		return;
 	}
 
