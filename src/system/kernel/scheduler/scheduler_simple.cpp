@@ -40,7 +40,7 @@
 #endif
 
 
-const bigtime_t kThreadQuantum = 3000;
+const bigtime_t kThreadQuantum = 1000;
 
 
 // The run queue. Holds the threads ready to run ordered by priority.
@@ -343,6 +343,36 @@ simple_quantum_ended(Thread* thread, bool wasPreempted, bool hasYielded)
 
 
 static inline bigtime_t
+simple_quantum_linear_interpolation(bigtime_t maxQuantum, bigtime_t minQuantum,
+	int32 maxPriority, int32 minPriority, int32 priority)
+{
+	ASSERT(priority <= maxPriority);
+	ASSERT(priority >= minPriority);
+
+	bigtime_t result = (maxQuantum - minQuantum) * (priority - minPriority);
+	result /= maxPriority - minPriority;
+	return maxQuantum - result;
+}
+
+
+static inline bigtime_t
+simple_get_base_quantum(Thread* thread)
+{
+	int32 priority = simple_get_effective_priority(thread);
+
+	if (priority >= B_URGENT_DISPLAY_PRIORITY)
+		return kThreadQuantum;
+	if (priority > B_NORMAL_PRIORITY) {
+		return simple_quantum_linear_interpolation(kThreadQuantum * 4,
+			kThreadQuantum, B_URGENT_DISPLAY_PRIORITY, B_NORMAL_PRIORITY,
+			priority);
+	}
+	return simple_quantum_linear_interpolation(kThreadQuantum * 64,
+		kThreadQuantum * 4, B_NORMAL_PRIORITY, B_IDLE_PRIORITY, priority);
+}
+
+
+static inline bigtime_t
 simple_compute_quantum(Thread* thread)
 {
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
@@ -351,7 +381,7 @@ simple_compute_quantum(Thread* thread)
 	if (schedulerThreadData->time_left != 0)
 		quantum = schedulerThreadData->time_left;
 	else
-		quantum = kThreadQuantum;
+		quantum = simple_get_base_quantum(thread);
 
 	quantum += schedulerThreadData->stolen_time;
 	schedulerThreadData->stolen_time = 0;
