@@ -146,6 +146,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 		haiku_devel.hpkg
 		haiku_$(TARGET_PACKAGING_ARCHS[2-])_devel.hpkg
 		makefile_engine.hpkg
+		:
+		nameFromMetaInfo
 		;
 }
 
@@ -271,7 +273,8 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
 			if [ FIsBuildFeatureEnabled webpositive ] {
-				AddPackageFilesToHaikuImage system : webpositive.hpkg ;
+				AddPackageFilesToHaikuImage system : webpositive.hpkg
+					: nameFromMetaInfo ;
 				InstallOptionalHaikuImagePackage
 					$(baseURL)/WebPositiveBookmarks-2012-02-18.zip
 					: home config settings WebPositive ;
@@ -284,8 +287,9 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 
 # Welcome
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
-	AddPackageFilesToHaikuImage system : haiku_userguide.hpkg ;
-	AddPackageFilesToHaikuImage system : haiku_welcome.hpkg ;
+	AddPackageFilesToHaikuImage system : haiku_userguide.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_welcome.hpkg : nameFromMetaInfo ;
 
 	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/welcome
 		: Welcome ;

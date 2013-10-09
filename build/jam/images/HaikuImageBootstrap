@@ -175,6 +175,8 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuPackages ] ;
 AddPackageFilesToHaikuImage system :
 	haiku.hpkg
 	haiku_$(TARGET_PACKAGING_ARCHS[2-]).hpkg
+	:
+	nameFromMetaInfo
 	;
 AddPackageFilesToHaikuImage system : haiku_loader.hpkg ;
 

@@ -1009,14 +1009,26 @@ rule AddBootModuleSymlinksToHaikuImage targets
 		: $(targets) ;
 }
 
-rule AddPackageFilesToHaikuImage location : packages
+rule AddPackageFilesToHaikuImage location : packages : flags
 {
+	# AddPackageFilesToHaikuImage <location> : <packages> : <flags>
+	#
+	# Supported flags:
+	#	nameFromMetaInfo - determine the target file name from the package meta
+	#		info
+
 	packages = [ FFilterByBuildFeatures $(packages) ] ;
 	HAIKU_PACKAGES_IN_IMAGE on $(HAIKU_IMAGE_CONTAINER_NAME)
 		= [ on $(HAIKU_IMAGE_CONTAINER_NAME) return $(HAIKU_PACKAGES_IN_IMAGE) ]
 			$(packages) ;
 	HAIKU_PACKAGE_INSTALLATION_LOCATION on $(packages) = $(location) ;
-	AddFilesToHaikuImage $(location) packages : $(packages) ;
+
+	if nameFromMetaInfo in $(flags) {
+		AddFilesToHaikuImage $(location) packages : $(packages)
+			: packageFileName : computeName ;
+	} else {
+		AddFilesToHaikuImage $(location) packages : $(packages) ;
+	}
 }
 
 rule AddOptionalHaikuImagePackages packages

@@ -219,6 +219,12 @@ downloadFile()
 }
 
 
+packageFileName()
+{
+	$package info -f "%fileName%" "$1"
+}
+
+
 mkdir -p $tmpDir
 copyrightsFile=$tmpDir/copyrights
 $rmAttrs -f $copyrightsFile
