@@ -1188,7 +1188,7 @@ private:
 			contentPath, FSUtils::Entry(subDirectory));
 		if (error != B_OK) {
 			throw Exception(error,
-				BString().SetToFormat("failed to extracted \"%s\" from package",
+				BString().SetToFormat("failed to extract \"%s\" from package",
 					contentPath),
 				package->FileName());
 		}
