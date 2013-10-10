@@ -232,7 +232,7 @@ BNetworkCookie::SetExpirationDate(time_t expireDate)
 BNetworkCookie&
 BNetworkCookie::SetExpirationDate(BDateTime& expireDate)
 {
-	if (expireDate.Time_t() <= 0) {
+	if (!expireDate.IsValid()) {
 		fExpiration.SetTime_t(0);
 		fSessionCookie = true;
 		fExpirationStringValid = false;
