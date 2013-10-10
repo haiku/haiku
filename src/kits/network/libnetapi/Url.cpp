@@ -92,6 +92,42 @@ BUrl::~BUrl()
 // #pragma mark URL fields modifiers
 
 
+void
+BUrl::Redirect(const BString& newLocation)
+{
+	BString oldUrl = UrlString();
+	BUrl newUrl(newLocation);
+
+	if(newUrl.Protocol() != "")
+	{
+		*this = newUrl;
+	} else {
+		// the new location seems to be relative to ours.
+		const BString& newPath = newUrl.Path();
+
+		if(newPath[0] == '/') {
+			// new path is absolute, just adopt it
+			SetPath(newPath);
+		} else {
+			// Path is relative, append it to current one
+			// TODO resolve '..'
+			BString path = Path();
+			// Remove last part of path (the file, if any) so we get the
+			// "current directory"
+			path.Truncate(path.FindLast('/') + 1);
+			path += newPath;
+			SetPath(path);
+		}
+
+		// Also copy request and fragment from the other URL
+		if(newUrl.Request() != "")
+			SetRequest(newUrl.Request());
+		if(newUrl.Fragment() != "")
+			SetRequest(newUrl.Fragment());
+	}
+}
+
+
 BUrl&
 BUrl::SetUrlString(const BString& url)
 {

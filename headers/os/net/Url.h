@@ -29,6 +29,7 @@ public:
 			BUrl&				SetPath(const BString& path);
 			BUrl&				SetRequest(const BString& request);
 			BUrl&				SetFragment(const BString& fragment);
+			void				Redirect(const BString& newLocation);
 			
 	// URL fields access
 			const BString&		UrlString() const;
