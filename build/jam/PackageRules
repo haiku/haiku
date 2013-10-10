@@ -42,7 +42,6 @@ rule PreprocessPackageInfo source : directory : architecture
 	local target = $(source:BSG=package-info)-package-info ;
 	local defines = HAIKU_PACKAGING_ARCH=$(architecture) ;
 	local sedReplacements = %HAIKU_PACKAGING_ARCH%,$(architecture) ;
-	sedReplacements += %HAIKU_VERSION%,R1~alpha4_pm-1 ;
 	if $(HAIKU_BOOTSTRAP_BUILD) {
 		defines += HAIKU_BOOTSTRAP_BUILD ;
 		target = $(target)-bootstrap ;
@@ -58,13 +57,15 @@ rule PreprocessPackageInfo source : directory : architecture
 			+= %HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%, ;
 	}
 
+	local revisionFile = [ DetermineHaikuRevision ] ;
+
 	MakeLocate $(target) : $(directory) ;
-	Depends $(target) : $(source) ;
+	Depends $(target) : $(source) $(revisionFile) ;
 
 	CCDEFS on $(target) = [ FDefines $(defines) ] ;
 	HAIKU_SED_REPLACEMENTS on $(target) = "-e s,$(sedReplacements),g" ;
 
-	PreprocessPackageInfo1 $(target) : $(source) ;
+	PreprocessPackageInfo1 $(target) : $(source) $(revisionFile) ;
 
 	return $(target) ;
 }
@@ -72,7 +73,10 @@ rule PreprocessPackageInfo source : directory : architecture
 
 actions PreprocessPackageInfo1
 {
-	sed $(HAIKU_SED_REPLACEMENTS) < $(2) | $(HOST_CC) -E -w $(CCDEFS) - -o $(1)
+	revision=`sed -n 's,^\(hrev[0-9]*\).*,\1,p' $(2[2])`
+	sed $(HAIKU_SED_REPLACEMENTS) \
+			-e s,%HAIKU_VERSION%,$(HAIKU_VERSION)_${revision:-0}-1, < $(2[1]) \
+		| $(HOST_CC) -E -w $(CCDEFS) - -o $(1)
 }
 
 

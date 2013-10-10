@@ -11,6 +11,11 @@
 #			directory paths and the like.
 
 
+# The Haiku (base) version. For development builds the revision will be
+# attached.
+HAIKU_VERSION = r1~alpha4_pm ;
+
+
 #pragma mark - container settings
 
 # Haiku image
