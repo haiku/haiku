@@ -29,11 +29,11 @@ rule DefineDefaultBuildProfiles
 	switch $(HAIKU_BUILD_PROFILE) {
 		case "alpha-*" : {
 			Echo Building Haiku R1/alpha ;
-			HAIKU_ROOT_USER_NAME = user ;
-			HAIKU_ROOT_USER_REAL_NAME = "Yourself" ;
+			HAIKU_ROOT_USER_NAME ?= user ;
+			HAIKU_ROOT_USER_REAL_NAME ?= "Yourself" ;
 			AddGroupToHaikuImage party : 101 : user sshd ;
-			HAIKU_IMAGE_HOST_NAME = shredder ;
-			HAIKU_IMAGE_SIZE = 800 ;
+			HAIKU_IMAGE_HOST_NAME ?= shredder ;
+			HAIKU_IMAGE_SIZE ?= 800 ;
 
 			AddHaikuImagePackages
 				bepdf
@@ -81,11 +81,11 @@ rule DefineDefaultBuildProfiles
 
 		case "nightly-*" : {
 			Echo Building Haiku Nightly ;
-			HAIKU_ROOT_USER_NAME = user ;
-			HAIKU_ROOT_USER_REAL_NAME = "Yourself" ;
+			HAIKU_ROOT_USER_NAME ?= user ;
+			HAIKU_ROOT_USER_REAL_NAME ?= "Yourself" ;
 			AddGroupToHaikuImage party : 101 : user sshd ;
-			HAIKU_IMAGE_HOST_NAME = shredder ;
-			HAIKU_IMAGE_SIZE = 600 ;
+			HAIKU_IMAGE_HOST_NAME ?= shredder ;
+			HAIKU_IMAGE_SIZE ?= 600 ;
 
 			AddHaikuImagePackages
 				man
@@ -104,8 +104,8 @@ rule DefineDefaultBuildProfiles
 
 		case "bootstrap-*" : {
 			Echo Building Haiku Bootstrap ;
-			HAIKU_IMAGE_HOST_NAME = shredder ;
-			HAIKU_IMAGE_SIZE = 20000 ;
+			HAIKU_IMAGE_HOST_NAME ?= shredder ;
+			HAIKU_IMAGE_SIZE ?= 20000 ;
 
 			AddHaikuImagePackages
 				autoconf
