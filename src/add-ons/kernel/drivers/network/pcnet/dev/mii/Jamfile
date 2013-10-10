@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network pcnet dev mii ;
+
+UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+KernelStaticLibrary pcnet_mii.a
+	:
+	nsphy.c
+	nsphyter.c
+	ukphy.c
+	ukphy_subr.c
+	;
+
+ObjectHdrs [ FGristFiles nsphy$(SUFOBJ) nsphyter$(SUFOBJ) ]
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) libs
+		compat freebsd_network ] ;
+Includes [ FGristFiles nsphy.c nsphyter.c ]
+	: <src!libs!compat!freebsd_network>miidevs.h ;

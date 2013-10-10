@@ -1,7 +1,6 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network pcnet dev le ;
+SubDir HAIKU_TOP src add-ons kernel drivers network pcnet dev pcn ;
 
 UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
 
 UsePrivateHeaders net system ;
@@ -9,11 +8,8 @@ UsePrivateKernelHeaders ;
 
 SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 
-KernelAddon pcnet :
-	am7990.c
-	am79900.c
-	if_le_pci.c
-	lance.c
+KernelStaticLibrary pcnet_pcn.a
+	: 
+	if_pcn.c
 	glue.c
-	: libfreebsd_network.a pcnet_pcn.a pcnet_mii.a
 	;
