@@ -189,8 +189,8 @@ public:
 			const BTime&		Time() const;
 			void				SetTime(const BTime &time);
 
-			int32				Time_t() const;
-			void				SetTime_t(uint32 seconds);
+			time_t				Time_t() const;
+			void				SetTime_t(time_t seconds);
 
 			bool				operator!=(const BDateTime& dateTime) const;
 			bool				operator==(const BDateTime& dateTime) const;

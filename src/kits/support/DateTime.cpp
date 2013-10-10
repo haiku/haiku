@@ -1371,7 +1371,7 @@ BDateTime::SetTime(const BTime& time)
 	1.1.1970 - 00:00:00. If the current date is before 1.1.1970 the function
 	returns -1;
 */
-int32
+time_t
 BDateTime::Time_t() const
 {
 	BDate date(1970, 1, 1);
@@ -1392,7 +1392,7 @@ BDateTime::Time_t() const
 	tm_struct.tm_isdst = -1;
 
 	// return secs_since_jan1_1970 or -1 on error
-	return int32(mktime(&tm_struct));
+	return mktime(&tm_struct);
 }
 
 
@@ -1401,8 +1401,14 @@ BDateTime::Time_t() const
 	1.1.1970 - 00:00:00.
 */
 void
-BDateTime::SetTime_t(uint32 seconds)
+BDateTime::SetTime_t(time_t seconds)
 {
+	time_t timePart = seconds % kSecondsPerDay;
+	if (timePart < 0) {
+		timePart += kSecondsPerDay;
+		seconds -= kSecondsPerDay;
+	}
+
 	BTime time;
 	time.AddSeconds(seconds % kSecondsPerDay);
 	fTime.SetTime(time);
