@@ -215,7 +215,9 @@ FSUtils::ExtractPackageContent(const char* packagePath, const char* contentPath,
 	std::string commandLine = std::string("package extract -C ")
 		+ ShellEscapeString(targetDirectoryPath).String()
 		+ " "
-		+ ShellEscapeString(packagePath).String();
+		+ ShellEscapeString(packagePath).String()
+		+ " "
+		+ ShellEscapeString(contentPath).String();
 	if (system(commandLine.c_str()) != 0)
 		return B_ERROR;
 	return B_OK;
