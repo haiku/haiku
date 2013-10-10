@@ -168,8 +168,8 @@ RemotePackageRepository HaikuPorts
 	openssl_x86_devel-1.0.0j-4
 	speex_x86-1.2~rc1-2
 	speex_x86_devel-1.2~rc1-2
-	sqlite_x86-3.7.13-4
-	sqlite_x86_devel-3.7.13-4
+	sqlite_x86-3.8.0.2-1
+	sqlite_x86_devel-3.8.0.2-1
 	xz_utils_x86-5.0.4-1
 	zlib_x86-1.2.8-3
 	zlib_x86_devel-1.2.8-3
@@ -183,6 +183,7 @@ RemotePackageRepository HaikuPorts
 	binutils_x86
 	bison
 	bzip2
+	caya
 	cdrtools
 	cmake
 	ctags
@@ -218,6 +219,9 @@ RemotePackageRepository HaikuPorts
 	libvorbis
 	libvpx
 	libxml2
+	libxml2_x86
+	libxslt
+	libxslt_x86
 	m4
 	make
 	man
@@ -240,10 +244,12 @@ RemotePackageRepository HaikuPorts
 	sed
 	speex
 	sqlite
+	sqlite_x86
 	subversion
 	tar
 	texi2html
 	texinfo
+	vim
 	vision
 	wpa_supplicant
 	yasm
