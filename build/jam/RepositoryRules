@@ -619,7 +619,7 @@ rule BuildHaikuPortsRepositoryConfig treePath
 actions BuildHaikuPortsRepositoryConfig1
 {
 cat > $(1) << EOF
-PACKAGER="The Haiku build system <build-system@haiku-os.org>"
+#PACKAGER="Joe Hacker <user@host.com>"
 TREE_PATH="$(HAIKU_REPOSITORY_TREE_PATH)"
 TARGET_ARCHITECTURE="$(HAIKU_PACKAGING_ARCH)"
 EOF
