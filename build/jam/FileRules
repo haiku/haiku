@@ -339,24 +339,9 @@ rule CopySetHaikuRevision target : source
 	# <target> - Output file target. Gristed and located target.
 	# <source> - ELF object to be copied. Gristed and located target.
 
-	# If existing, make the target depend on the .git/index file in the
-	# root directory, so it gets updated when the revision changes due to
-	# commits or merges.
-	local gitIndex = <haiku-rootdir-git>index ;
-	local revisionFile = <haiku-rootdir-git>haiku-revision ;
-	if ! [ on $(gitIndex) return $(HAIKU_GIT_REVISION_DETERMINED) ] {
-		if [ Glob [ FDirName $(HAIKU_TOP) .git ] : index ] {
-			HAIKU_GIT_REVISION_DETERMINED on $(gitIndex) = 1 ;
-			SEARCH on $(gitIndex) = [ FDirName $(HAIKU_TOP) .git ] ;
-			MakeLocate $(revisionFile) : $(HAIKU_BUILD_OUTPUT_DIR) ;
-			Depends $(revisionFile) : $(gitIndex) ;
-			DetermineHaikuRevision $(revisionFile) : $(gitIndex) ;
-		} else {
-			revisionFile = ;
-		}
-	}
-
 	PropagateContainerUpdateTargetFlags $(target) : $(source) ;
+
+	local revisionFile = [ DetermineHaikuRevision ] ;
 
 	Depends $(target)
 		: <build>copyattr <build>set_haiku_revision $(source) $(revisionFile) ;
@@ -379,7 +364,30 @@ actions CopySetHaikuRevision1
 }
 
 
-actions DetermineHaikuRevision
+rule DetermineHaikuRevision
+{
+	# If existing, make the target depend on the .git/index file in the
+	# root directory, so it gets updated when the revision changes due to
+	# commits or merges.
+	local gitIndex = <haiku-rootdir-git>index ;
+	local revisionFile = <haiku-rootdir-git>haiku-revision ;
+	if ! [ on $(gitIndex) return $(HAIKU_GIT_REVISION_DETERMINED) ] {
+		if [ Glob [ FDirName $(HAIKU_TOP) .git ] : index ] {
+			HAIKU_GIT_REVISION_DETERMINED on $(gitIndex) = 1 ;
+			SEARCH on $(gitIndex) = [ FDirName $(HAIKU_TOP) .git ] ;
+			MakeLocate $(revisionFile) : $(HAIKU_BUILD_OUTPUT_DIR) ;
+			Depends $(revisionFile) : $(gitIndex) ;
+			DetermineHaikuRevision1 $(revisionFile) : $(gitIndex) ;
+		} else {
+			revisionFile = ;
+		}
+	}
+
+	return $(revisionFile) ;
+}
+
+
+actions DetermineHaikuRevision1
 {
 	$(HAIKU_TOP)/build/scripts/determine_haiku_revision $(HAIKU_TOP) $(1)
 }
