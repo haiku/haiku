@@ -40,7 +40,8 @@ BHttpRequest::BHttpRequest(const BUrl& url, BUrlResult& result, bool ssl,
 	fRequestStatus(kRequestInitialState),
 	fOptHeaders(NULL),
 	fOptInputData(NULL),
-	fOptInputDataSize(-1)
+	fOptInputDataSize(-1),
+	fOptFollowLocation(true)
 {
 	_ResetOptions();
 	if (ssl)
@@ -299,12 +300,7 @@ BHttpRequest::_ProtocolLoop()
 				if (fResult.StatusCode() == B_HTTP_STATUS_MOVED_PERMANENTLY) {
 					BString locationUrl = fHeaders["Location"];
 
-					// Absolute path
-					if (locationUrl[0] == '/')
-						fUrl.SetPath(locationUrl);
-					// URI
-					else
-						fUrl.SetUrlString(locationUrl);
+					fUrl.Redirect(locationUrl);
 
 					if (--maxRedirs > 0) {
 						newRequest = true;
