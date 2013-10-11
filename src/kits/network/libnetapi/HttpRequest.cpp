@@ -871,11 +871,17 @@ BHttpRequest::_AddHeaders()
 	// Context cookies
 	if (fOptSetCookies && (fContext != NULL)) {
 		BNetworkCookie* cookie;
+		BString cookieString;
 
 		for (BNetworkCookieJar::UrlIterator it
 				= fContext->GetCookieJar().GetUrlIterator(fUrl);
-				(cookie = it.Next()) != NULL;)
-			fOutputHeaders.AddHeader("Cookie", cookie->RawCookie(false));
+				(cookie = it.Next()) != NULL;) {
+			cookieString << cookie->RawCookie(false);
+			cookieString << "; ";
+		}
+
+		if (cookieString.length() > 0)
+			fOutputHeaders.AddHeader("Cookie", cookieString);
 	}
 
 	// Write output headers to output stream
