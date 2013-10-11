@@ -290,6 +290,28 @@ open_executable(char *name, image_type type, const char *rpath,
 
 
 /*!
+	Applies haiku-specific fixes to a shebang line.
+*/
+static void
+fixup_shebang(char *invoker)
+{
+	char *current = invoker;
+	while (*current == ' ' || *current == '\t') {
+		++current;
+	}
+
+	char *commandStart = current;
+	while (*current != ' ' && *current != '\t' && *current != '\0') {
+		++current;
+	}
+
+	// replace /usr/bin/env with /bin/env
+	if (memcmp(commandStart, "/usr/bin/env", current - commandStart) == 0)
+		memmove(commandStart, commandStart + 4, strlen(commandStart + 4) + 1);
+}
+
+
+/*!
 	Tests if there is an executable file at the provided path. It will
 	also test if the file has a valid ELF header or is a shell script.
 	Even if the runtime loader does not need to be able to deal with
@@ -341,8 +363,10 @@ test_executable(const char *name, char *invoker)
 			} else
 				end[0] = '\0';
 
-			if (invoker)
+			if (invoker) {
 				strcpy(invoker, buffer + 2);
+				fixup_shebang(invoker);
+			}
 
 			status = B_OK;
 		}
