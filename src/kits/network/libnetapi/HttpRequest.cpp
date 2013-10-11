@@ -880,7 +880,7 @@ BHttpRequest::_AddHeaders()
 			cookieString << "; ";
 		}
 
-		if (cookieString.length() > 0)
+		if (cookieString.Length() > 0)
 			fOutputHeaders.AddHeader("Cookie", cookieString);
 	}
 

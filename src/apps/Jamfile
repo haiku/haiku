@@ -41,7 +41,6 @@ HaikuSubInclude musiccollection ;
 HaikuSubInclude networkstatus ;
 HaikuSubInclude overlayimage ;
 HaikuSubInclude packageinstaller ;
-HaikuSubInclude packagemanager ;
 HaikuSubInclude pairs ;
 HaikuSubInclude patchbay ;
 HaikuSubInclude people ;
