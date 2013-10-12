@@ -318,9 +318,6 @@ rule KernelArchitectureSetup architecture
 			}
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 260 ; # in kB
-			# the image is too small to have unstripped binaries
-			HAIKU_CONTAINER_STRIP_BINARIES on
-				$(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME) = 1 ;
 
 		case mipsel :
 			# RouterBOARD firmware (ELF image over TFTP)
