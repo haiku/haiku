@@ -11,6 +11,7 @@
 
 #include <OS.h>
 #include <lock.h>
+#include <arch_config.h>
 
 
 extern "C" bool
@@ -45,3 +46,16 @@ _mutex_unlock(mutex*, bool)
 {
 }
 
+
+#ifdef ATOMIC_FUNCS_ARE_SYSCALLS
+
+/* needed by packagefs */
+extern "C" int32
+atomic_add(vint32 *value, int32 addValue)
+{
+	int32 old = *value;
+	*value += addValue;
+	return old;
+}
+
+#endif /*ATOMIC_FUNCS_ARE_SYSCALLS*/
