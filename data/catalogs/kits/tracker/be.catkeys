@@ -1,5 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	1545562261
-common	B_COMMON_DIRECTORY		агульны
+1	belarusian	x-vnd.Haiku-libtracker	2187262474
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
 Add-ons	FilePanelPriv		Дапаўненні
@@ -77,7 +76,6 @@ Preparing to empty Trash…	StatusWindow		Падрыхтоўка да ачыст
 You cannot put the selected item(s) into the trash.	FSUtils		Немагчыма змясціць абраны(я) элемент(ы) ў сметніцу.
 Disks	Model		Дыскі
 Create link	ContainerWindow		Стварыць спасылку
-develop	B_COMMON_DEVELOP_DIRECTORY		распрацоўка
 Decrease size	DeskWindow		Паменшыць памер
 Size	ContainerWindow		Памер
 All disks	AutoMounterSettings		Усе дыскі
@@ -149,7 +147,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Не�
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Прабачце, захаванне больш чым аднаго элемента не дазволена.
 Searching for disks to mount…	StatusWindow		Пошук дыскаў для мантавання…
 New folder	FSUtils		Новы каталог
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Калi вы %ifYouDoAction агульны каталог, %osName можа паводзіць сябе неадэкватна!\n\nВы ўпэўнены што жадаеце зрабіць гэта?\n\nКаб %toDoAction агульны каталог, націсніце клавiшу Shift і клікніце \"%toConfirmAction\".
 Free space color	SettingsView		Колер свабоднага месца
 Cut	ContainerWindow		Выразаць
 Remove	FindPanel		Выдаліць

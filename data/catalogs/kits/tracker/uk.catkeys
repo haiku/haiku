@@ -1,5 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	354805905
-common	B_COMMON_DIRECTORY		common
+1	ukrainian	x-vnd.Haiku-libtracker	572601465
 OK	WidgetAttributeText		Гаразд
 Icon view	VolumeWindow		У вигляді іконок
 Add-ons	FilePanelPriv		Додатки
@@ -70,7 +69,6 @@ Search	FindPanel		Пошук
 Preparing to empty Trash…	StatusWindow		Підготовка до очищення Кошика…
 Disks	Model		Диски
 Create link	ContainerWindow		Створити посилання
-develop	B_COMMON_DEVELOP_DIRECTORY		develop
 Decrease size	DeskWindow		Зменшити розмір
 Size	ContainerWindow		Розмір
 All disks	AutoMounterSettings		Всі диски

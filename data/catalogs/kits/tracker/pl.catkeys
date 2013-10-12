@@ -1,5 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	4019011136
-common	B_COMMON_DIRECTORY		wspólny
+1	polish	x-vnd.Haiku-libtracker	4236806696
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
 Add-ons	FilePanelPriv		Wtyczki
@@ -76,7 +75,6 @@ Preparing to empty Trash…	StatusWindow		Przygotowanie do opróżnienia Kosza�
 You cannot put the selected item(s) into the trash.	FSUtils		Nie możesz umieścić wybranych elementów w Koszu.
 Disks	Model		Dyski
 Create link	ContainerWindow		Utwórz link
-develop	B_COMMON_DEVELOP_DIRECTORY		develop
 Decrease size	DeskWindow		Zmniejsz rozmiar
 Size	ContainerWindow		Rozmiar
 All disks	AutoMounterSettings		Wszystkie dyski

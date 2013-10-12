@@ -1,5 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	270182057
-common	B_COMMON_DIRECTORY		κοινό
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	487977617
 OK	WidgetAttributeText		Εντάξει
 Icon view	VolumeWindow		Προβολή εικονιδίου
 Add-ons	FilePanelPriv		Πρόσθετα
@@ -69,7 +68,6 @@ Search	FindPanel		Αναζήτηση
 Preparing to empty Trash…	StatusWindow		Προετοιμασία καθαρισμού του Κάδου...
 Disks	Model		Δίσκοι
 Create link	ContainerWindow		Δημιουργία σύνδεσμου
-develop	B_COMMON_DEVELOP_DIRECTORY		ανάπτυξη
 Decrease size	DeskWindow		Μείωση μεγέθους
 Size	ContainerWindow		Μέγεθος
 All disks	AutoMounterSettings		Όλοι οι δίσκοι

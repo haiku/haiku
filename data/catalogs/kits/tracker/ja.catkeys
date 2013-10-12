@@ -1,5 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1188087477
-common	B_COMMON_DIRECTORY		一般
+1	japanese	x-vnd.Haiku-libtracker	296461196
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -147,7 +146,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		ア�
 Sorry, saving more than one item is not allowed.	FilePanelPriv		2 項目以上は保存できません。
 Searching for disks to mount…	StatusWindow		マウントできるディスクを探しています…
 New folder	FSUtils		新規フォルダー
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		common フォルダーおよびその中身を%ifYouDoActionした場合、%osName が起動しなくなります。\n\n続けてもよろしいですか?\n \n それでも common フォルダーまたはその中身の%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
 Free space color	SettingsView		空き容量の色
 Cut	ContainerWindow		切り取り
 Remove	FindPanel		削除

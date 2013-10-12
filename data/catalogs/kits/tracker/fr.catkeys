@@ -1,5 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1545562261
-common	B_COMMON_DIRECTORY		commun
+1	french	x-vnd.Haiku-libtracker	2187262474
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Vue en icônes
 Add-ons	FilePanelPriv		Extensions
@@ -77,7 +76,6 @@ Preparing to empty Trash…	StatusWindow		Préparation au vidage de la Corbeille
 You cannot put the selected item(s) into the trash.	FSUtils		Vous ne pouvez pas déplacer l(es) élément(s) sélectionné(s) vers la corbeille.
 Disks	Model		Disques
 Create link	ContainerWindow		Créer un lien
-develop	B_COMMON_DEVELOP_DIRECTORY		développement
 Decrease size	DeskWindow		Diminuer la taille
 Size	ContainerWindow		Taille
 All disks	AutoMounterSettings		Tout les disques
@@ -149,7 +147,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Impos
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Désolé, il n'est pas permis de sauvegarder plus d'un élément.
 Searching for disks to mount…	StatusWindow		Recherche des disques à monter…
 New folder	FSUtils		Nouveau dossier
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Si vous %ifYouDoAction le dossier commun, %osName pourrait ne pas se comporter correctement !\n\nÊtes vous sûr de vouloir effectuer cette opération ?\n\nPour %toDoAction le dossier commun quand même, maintenez la touche <Maj> enfoncée et cliquez sur « %toConfirmAction ».
 Free space color	SettingsView		Couleur de l'espace libre
 Cut	ContainerWindow		Couper
 Remove	FindPanel		Supprimer

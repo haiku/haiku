@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ScreenSaver	3630119516
+1	portuguese (brazil)	x-vnd.Haiku-ScreenSaver	232492478
 Could not load screen saver	ScreenSaver		Não foi possível carregar o protetor de tela
 30 seconds	ScreenSaver		30 segundos
 Start screensaver	ScreenSaver		Iniciar protetor de tela
@@ -11,7 +11,9 @@ Display Power Management Signaling not available	ScreenSaver		Sinalização do G
 ScreenSaver	System name		Protetor de tela
 Test	ScreenSaver		Teste
 General	ScreenSaver		Geral
+Fade now when mouse is here	ScreenSaver		Desvanecer agora quando o mouse está aqui
 Enable screensaver	ScreenSaver		Habilitar o protetor de tela
+Don't fade when mouse is here	ScreenSaver		Não esvanecer quando o mouse está aqui
 Cancel	ScreenSaver		Cancelar
 Turn off screen	ScreenSaver		Desligar a tela
 No options available	ScreenSaver		Nenhuma opção disponível

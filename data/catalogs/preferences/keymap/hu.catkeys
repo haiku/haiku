@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Keymap	4022885915
+1	hungarian	x-vnd.Haiku-Keymap	761976561
 Shift:	Modifier keys window	Shift key role name	Váltógomb:
 Revert	Modifier keys window		Visszaállít
 Tilde trigger	Keymap window		Hullámvonal kapcsoló
@@ -6,6 +6,7 @@ Grave trigger	Keymap window		Fordított ékezet kapcsoló
 Role	Modifier keys window	As in the role of a modifier key	Szerep
 Select dead keys	Keymap window		„Beragadó” gombok kiválasztása
 Cancel	Modifier keys window		Mégse
+Defaults	Keymap window		Eredeti
 Quit	Keymap window		Kilépés
 Switch shortcut keys to Haiku mode	Keymap window		Billentyűzetkombináció-váltás Haiku-módra
 Circumflex trigger	Keymap window		Kalap kapcsoló

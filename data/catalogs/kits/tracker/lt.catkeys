@@ -1,5 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	629963691
-common	B_COMMON_DIRECTORY		Bendra
+1	lithuanian	x-vnd.Haiku-libtracker	1271663904
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
 Add-ons	FilePanelPriv		Priedai
@@ -76,7 +75,6 @@ Search	FindPanel		Ieškoti
 Preparing to empty Trash…	StatusWindow		Ruošiamasi tuštinti Šiukšlinę…
 Disks	Model		Tomai
 Create link	ContainerWindow		Kurti nuorodą
-develop	B_COMMON_DEVELOP_DIRECTORY		Programavimas
 Decrease size	DeskWindow		Sumažinti
 Size	ContainerWindow		Dydis
 All disks	AutoMounterSettings		Visus tomus
@@ -147,7 +145,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Deja, vienu metu įrašyti daugiau nei vieno failo neleidžiama.
 Searching for disks to mount…	StatusWindow		Ieškoma prijungtinų diskų…
 New folder	FSUtils		Naujas aplankas
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jeigu %ifYouDoAction aplanką „Bendra“, „%osName“ sistemos elgesys taps nenuspėjamas!\n\nAr tikrai norite tai atlikti?\n\nJeigu vis tiek norite %toDoAction aplanką „Bendra“, spustelėkite mygtuką „%toConfirmAction“, laikydami nuspaustą Lyg2 klavišą.
 Free space color	SettingsView		Laisvos vietos spalva
 Cut	ContainerWindow		Iškirpti
 Remove	FindPanel		Pašalinti

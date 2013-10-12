@@ -1,5 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	629963691
-common	B_COMMON_DIRECTORY		常用
+1	english	x-vnd.Haiku-libtracker	1271663904
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
 Add-ons	FilePanelPriv		附加组件
@@ -76,7 +75,6 @@ Search	FindPanel		搜索
 Preparing to empty Trash…	StatusWindow		准备清空垃圾箱...
 Disks	Model		磁盘
 Create link	ContainerWindow		创造链接
-develop	B_COMMON_DEVELOP_DIRECTORY		开发
 Decrease size	DeskWindow		缩小尺寸
 Size	ContainerWindow		尺寸
 All disks	AutoMounterSettings		所有磁盘
@@ -147,7 +145,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		无�
 Sorry, saving more than one item is not allowed.	FilePanelPriv		对不起，不允许保存多个项目。
 Searching for disks to mount…	StatusWindow		搜索挂载磁盘...
 New folder	FSUtils		新建文件
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		如果您 %ifYouDoAction common 目录或者其中内容，%osName 可能无法正常执行！\n\n您确定要执行此操作?\n\n为了 %toDoAction common 目录或者其中内容，请按下 Shift 键并点击 \"%toConfirmAction\"。
 Free space color	SettingsView		空闲空间颜色
 Cut	ContainerWindow		剪切
 Remove	FindPanel		删除

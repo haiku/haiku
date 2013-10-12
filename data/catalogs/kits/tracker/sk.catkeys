@@ -1,5 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	903081194
-common	B_COMMON_DIRECTORY		spoločné
+1	slovak	x-vnd.Haiku-libtracker	1544781407
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Zobrazenie ikon
 Add-ons	FilePanelPriv		Doplnky
@@ -75,7 +74,6 @@ Search	FindPanel		Hľadať
 Preparing to empty Trash…	StatusWindow		Pripravuje sa vyprázdnenie Koša…
 Disks	Model		Disky
 Create link	ContainerWindow		Vytvoriť odkaz
-develop	B_COMMON_DEVELOP_DIRECTORY		vývoj
 Decrease size	DeskWindow		Zmenšiť veľkosť
 Size	ContainerWindow		Veľkosť
 All disks	AutoMounterSettings		Všetky disky
@@ -146,7 +144,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nebol
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Ľutujeme, ukladanie viac ako jednej položky nie je dovolené.
 Searching for disks to mount…	StatusWindow		Hľadajú sa disky na pripojenie…
 New folder	FSUtils		Nový priečinok
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction priečinok „common“, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?\n\nAk chcete priečinok „common“ napriek tomu %toDoAction, podržte kláves Shift a kliknite na „%toConfirmAction“.
 Free space color	SettingsView		Farba voľného miesta
 Cut	ContainerWindow		Vystrihnúť
 Remove	FindPanel		Odstrániť

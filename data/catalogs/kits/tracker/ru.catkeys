@@ -1,5 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1545562261
-common	B_COMMON_DIRECTORY		Общие
+1	russian	x-vnd.Haiku-libtracker	2187262474
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
 Add-ons	FilePanelPriv		Дополнения
@@ -77,7 +76,6 @@ Preparing to empty Trash…	StatusWindow		Подготовка к очищени
 You cannot put the selected item(s) into the trash.	FSUtils		Вы не можете переместить выбранные объекты в корзину.
 Disks	Model		Диски
 Create link	ContainerWindow		Создать ссылку в
-develop	B_COMMON_DEVELOP_DIRECTORY		Разработка
 Decrease size	DeskWindow		Уменьшить размер
 Size	ContainerWindow		Размер
 All disks	AutoMounterSettings		Все диски
@@ -149,7 +147,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Не�
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Извините, сохранение более одного файла недопустимо.
 Searching for disks to mount…	StatusWindow		Поиск дисков для подключения…
 New folder	FSUtils		Новая папка
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Если вы %ifYouDoAction папку common, %osName может начать работать некорректно!\n\nВы уверены, что хотите сделать это?\n\nЧтобы %toDoAction папку common, зажмите клавишу Shift и нажмите \"%toConfirmAction\".
 Free space color	SettingsView		Цвет свободного места
 Cut	ContainerWindow		Вырезать
 Remove	FindPanel		Удалить

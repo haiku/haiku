@@ -1,5 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	2270338140
-common	B_COMMON_DIRECTORY		algemeen
+1	dutch; flemish	x-vnd.Haiku-libtracker	2912038353
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icoonweergave
 Add-ons	FilePanelPriv		Invoegtoepassingen
@@ -76,7 +75,6 @@ Search	FindPanel		Zoeken
 Preparing to empty Trash…	StatusWindow		Leegmaken prullenbak voorbereiden...
 Disks	Model		Schijven
 Create link	ContainerWindow		Een link maken
-develop	B_COMMON_DEVELOP_DIRECTORY		develop
 Decrease size	DeskWindow		Grootte verminderen
 Size	ContainerWindow		Grootte
 All disks	AutoMounterSettings		Alle schijven
@@ -147,7 +145,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%do
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Sorry, meer dan één item opslaan is niet toegestaan.
 Searching for disks to mount…	StatusWindow		Bezig met het zoeken naar schijven om te betrekken...
 New folder	FSUtils		Nieuwe map
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Als u %ifYouDoAction de common map, dan kan %osName wellicht niet meer correct functioneren\n\nWeet u zeker dat u dit wilt doen?\n\nOm toch %toDoAction de common map, houd de Shift-toets ingedrukt en klik \"%toConfirmAction\".
 Free space color	SettingsView		Kleur voor vrije ruimte
 Cut	ContainerWindow		Knippen
 Remove	FindPanel		Verwijderen

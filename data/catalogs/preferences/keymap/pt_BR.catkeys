@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Keymap	4022885915
+1	portuguese (brazil)	x-vnd.Haiku-Keymap	761976561
 Shift:	Modifier keys window	Shift key role name	Deslocar:
 Revert	Modifier keys window		Reverter
 Tilde trigger	Keymap window		Acento til
@@ -6,6 +6,7 @@ Grave trigger	Keymap window		Tecla morta
 Role	Modifier keys window	As in the role of a modifier key	Função
 Select dead keys	Keymap window		Selecionar teclas de acento
 Cancel	Modifier keys window		Cancelar
+Defaults	Keymap window		Configurações padrão
 Quit	Keymap window		Sair
 Switch shortcut keys to Haiku mode	Keymap window		Alternar teclas de atalho para o modo Haiku
 Circumflex trigger	Keymap window		Tecla de circunflexo

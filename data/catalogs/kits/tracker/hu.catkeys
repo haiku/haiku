@@ -1,5 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	1545562261
-common	B_COMMON_DIRECTORY		Közös
+1	hungarian	x-vnd.Haiku-libtracker	2187262474
 OK	WidgetAttributeText		Rendben
 Icon view	VolumeWindow		Ikon nézet
 Add-ons	FilePanelPriv		Kiegészítők
@@ -77,7 +76,6 @@ Preparing to empty Trash…	StatusWindow		Felkészülés a Szemetes ürítésér
 You cannot put the selected item(s) into the trash.	FSUtils		A kijelölt elem(ek) nem rakható(k) a Szemetesbe.
 Disks	Model		Lemezek
 Create link	ContainerWindow		Hivatkozás készítése
-develop	B_COMMON_DEVELOP_DIRECTORY		Fejlesztés
 Decrease size	DeskWindow		Méret csökkentése
 Size	ContainerWindow		Méret
 All disks	AutoMounterSettings		Összes lemez
@@ -149,7 +147,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nem s
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Sajnálom, de egyszerre csak egy elemet lehet elmenteni.
 Searching for disks to mount…	StatusWindow		Csatolandó lemezek keresése…
 New folder	FSUtils		Új mappa
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Ha %ifYouDoAction a közös mappát, akkor lehet, hogy a %osName nem fog megfelelően működni!\n\nBiztosan folytatni akarja?\n\nHogy %toDoAction a közös mappát, tartsa lenyomva a „Shift”-et, és kattintson a „%toConfirmAction” gombra.
 Free space color	SettingsView		Szabad terület színe
 Cut	ContainerWindow		Kivágás
 Remove	FindPanel		Eltávolítás

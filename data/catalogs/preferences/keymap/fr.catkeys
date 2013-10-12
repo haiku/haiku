@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	4022885915
+1	french	x-vnd.Haiku-Keymap	761976561
 Shift:	Modifier keys window	Shift key role name	Majuscule :
 Revert	Modifier keys window		Défaire
 Tilde trigger	Keymap window		Tilde
@@ -6,6 +6,7 @@ Grave trigger	Keymap window		Accent grave
 Role	Modifier keys window	As in the role of a modifier key	Rôle
 Select dead keys	Keymap window		Sélection des touches mortes
 Cancel	Modifier keys window		Annuler
+Defaults	Keymap window		Valeurs par défaut
 Quit	Keymap window		Quitter
 Switch shortcut keys to Haiku mode	Keymap window		Basculer les touches de raccourcis en mode Haiku
 Circumflex trigger	Keymap window		Accent circonflexe

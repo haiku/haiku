@@ -1,5 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1545562261
-common	B_COMMON_DIRECTORY		Allgemein
+1	german	x-vnd.Haiku-libtracker	2187262474
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
 Add-ons	FilePanelPriv		Add-ons
@@ -77,7 +76,6 @@ Preparing to empty Trash…	StatusWindow		Leeren des Papierkorbs wird vorbereite
 You cannot put the selected item(s) into the trash.	FSUtils		Die ausgewählten Objekte können nicht in den Papierkorb verschoben werden.
 Disks	Model		Datenträger
 Create link	ContainerWindow		Verknüpfung erstellen
-develop	B_COMMON_DEVELOP_DIRECTORY		Programmierung
 Decrease size	DeskWindow		Verkleinern
 Size	ContainerWindow		Größe
 All disks	AutoMounterSettings		Alle Datenträger
@@ -149,7 +147,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%do
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Es kann leider immer nur ein einzelnes Objekt gespeichert werden.
 Searching for disks to mount…	StatusWindow		Es werden Datenträger zum Einhängen gesucht…
 New folder	FSUtils		Neuer Ordner
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Wird der Allgemein-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten!\n\nUm ihn dennoch %toDoAction, Shift-Taste gedrückt halten und \"%toConfirmAction\" klicken.
 Free space color	SettingsView		Farbe für freien Speicher
 Cut	ContainerWindow		Ausschneiden
 Remove	FindPanel		Entfernen

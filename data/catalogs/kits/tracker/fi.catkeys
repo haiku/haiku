@@ -1,5 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1545562261
-common	B_COMMON_DIRECTORY		yhteinen
+1	finnish	x-vnd.Haiku-libtracker	2187262474
 OK	WidgetAttributeText		Valmis
 Icon view	VolumeWindow		Kuvakenäkymä
 Add-ons	FilePanelPriv		Lisäosat
@@ -77,7 +76,6 @@ Preparing to empty Trash…	StatusWindow		Valmistaudutaan tyhjentämään roskak
 You cannot put the selected item(s) into the trash.	FSUtils		Et voi laittaa valittuja kohteita roskakoriin.
 Disks	Model		Levyt
 Create link	ContainerWindow		Luo linkki
-develop	B_COMMON_DEVELOP_DIRECTORY		kehitys
 Decrease size	DeskWindow		Pienennä kokoa
 Size	ContainerWindow		Koko
 All disks	AutoMounterSettings		Kaikki levyt
@@ -149,7 +147,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Asiak
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Useamman kuin yhden kohteen tallentaminen ei ole sallittua.
 Searching for disks to mount…	StatusWindow		Etsitään liitettäviä levyjä...
 New folder	FSUtils		Uusi kansio
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jos kohdistat toiminnon ”%ifYouDoAction” yleiseen kansioon, ”%osName” ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nToiminnon ”%toDoAction” kohdistamiseksi yleiseen kansioon pidä alhaalla Vaihto-painike ja napsauta \"%toConfirmAction\".
 Free space color	SettingsView		Vapaan tilan väri
 Cut	ContainerWindow		Leikkaa
 Remove	FindPanel		Poista

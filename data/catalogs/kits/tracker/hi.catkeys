@@ -1,5 +1,4 @@
-1	hindi	x-vnd.Haiku-libtracker	3007947345
-common	B_COMMON_DIRECTORY		सामान्य
+1	hindi	x-vnd.Haiku-libtracker	3225742905
 OK	WidgetAttributeText		ठीक है
 Icon view	VolumeWindow		चिह्न दृश्य
 Add-ons	FilePanelPriv		अतिरिक्त जोड़ सकते हैं
@@ -70,7 +69,6 @@ Search	FindPanel		खोजें
 Preparing to empty Trash…	StatusWindow		रद्दी खाली करने की तैयारी ...
 Disks	Model		डिस्कस
 Create link	ContainerWindow		लिंक बनाएँ
-develop	B_COMMON_DEVELOP_DIRECTORY		बनायें
 Decrease size	DeskWindow		आकार घटाएँ
 Size	ContainerWindow		आकार
 All disks	AutoMounterSettings		सभी डिस्कस

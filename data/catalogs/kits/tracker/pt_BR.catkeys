@@ -1,5 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	1545562261
-common	B_COMMON_DIRECTORY		comum
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	2187262474
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Em ícones
 Add-ons	FilePanelPriv		Adicionais
@@ -77,7 +76,6 @@ Preparing to empty Trash…	StatusWindow		Preparando para limpar a Lixeira...
 You cannot put the selected item(s) into the trash.	FSUtils		Não é possível colocar o(s) item(ns) selecionados na lixeira.
 Disks	Model		Discos
 Create link	ContainerWindow		Criar atalho
-develop	B_COMMON_DEVELOP_DIRECTORY		desenvolvimento
 Decrease size	DeskWindow		Diminuir tamanho
 Size	ContainerWindow		Tamanho
 All disks	AutoMounterSettings		Todos os discos
@@ -149,7 +147,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Não 
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Desculpe, salvar mais de um item não é permitido.
 Searching for disks to mount…	StatusWindow		Procurando discos para montar...
 New folder	FSUtils		Nova pasta
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Se %ifYouDoAction a pasta common, %osName pode não se comportar apropriadamente!\n\nEstá seguro de que quer fazer isto?\n\nPara %toDoAction a pasta common de qualquer maneira, segure a tecla Shift e clique \"%toConfirmAction\".
 Free space color	SettingsView		Cor do espaço vazio
 Cut	ContainerWindow		Recortar
 Remove	FindPanel		Remover

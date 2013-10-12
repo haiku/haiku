@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Keymap	4022885915
+1	german	x-vnd.Haiku-Keymap	761976561
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Anfangswerte
 Tilde trigger	Keymap window		~ Tilde
@@ -6,6 +6,7 @@ Grave trigger	Keymap window		` Gravis
 Role	Modifier keys window	As in the role of a modifier key	Funktion
 Select dead keys	Keymap window		Auslösetasten definieren
 Cancel	Modifier keys window		Abbrechen
+Defaults	Keymap window		Standardwerte
 Quit	Keymap window		Beenden
 Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten tauschen: Haiku-Modus
 Circumflex trigger	Keymap window		^ Zirkumflex

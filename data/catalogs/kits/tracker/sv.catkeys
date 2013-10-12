@@ -1,5 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1545562261
-common	B_COMMON_DIRECTORY		gemensam
+1	swedish	x-vnd.Haiku-libtracker	2187262474
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
 Add-ons	FilePanelPriv		Tillägg
@@ -77,7 +76,6 @@ Preparing to empty Trash…	StatusWindow		Förbereder inför tömning av Pappers
 You cannot put the selected item(s) into the trash.	FSUtils		Du kan inte lägga de valda objekten i papperskorgen.
 Disks	Model		Volymer
 Create link	ContainerWindow		Skapa länk
-develop	B_COMMON_DEVELOP_DIRECTORY		utvecklare
 Decrease size	DeskWindow		Minska storleken
 Size	ContainerWindow		Storlek
 All disks	AutoMounterSettings		Alla diskar
@@ -149,7 +147,6 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunde
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Ledsen, att spara mer än ett objekt är inte tillåtet.
 Searching for disks to mount…	StatusWindow		Letar efter diskar för montering...
 New folder	FSUtils		Ny mapp
-If you %ifYouDoAction the common folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the common folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Om du %ifYouDoAction common foldern, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?\n\nFör att %toDoAction common foldern ändå, håll nere Shift och klicka \"%toConfirmAction\".
 Free space color	SettingsView		Färg för ledigt utrymme
 Cut	ContainerWindow		Klipp ut
 Remove	FindPanel		Ta bort
