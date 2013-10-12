@@ -676,32 +676,24 @@ rule CreateContainerCopyFilesScript container : script
 		# concurrent writes to the script file when building with multiple
 		# jobs.
 
-	local needStrip = [ on $(container)
-		return $(HAIKU_CONTAINER_STRIP_BINARIES) ] ;
-		# We are asked to strip the binaries when copying them.
-
 	local dir ;
 	for dir in [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] {
 		# filter the targets that shall be renamed; they have to be copied
 		# individually
-		# we also handle binary separately when asked to strip them
 		local destTargets = [ on $(dir) return $(TARGETS_TO_INSTALL) ] ;
 		local remainingTargets ;
 		local destTarget ;
 		for destTarget in $(destTargets) {
 			local target = [ on $(destTarget) return $(TARGET) ] ;
 			local name = $(destTarget:G=) ;
-			local isBinary = [ on $(target) return $(LINKFLAGS) ] ;
-			local doStrip ;
-			if $(needStrip) && $(isBinary) {
-				doStrip = 1 ;
-			}
-			if $(name) != $(target:BS) || $(doStrip) {
+			if $(name) != $(target:BS) {
 				# use a unique dummy target for this file, on which we
 				# can define the TARGET_DIR variable
 				local dummyTarget = $(script)-dummy-$(dir:G=)-$(target) ;
 				NotFile $(dummyTarget) ;
 				TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
+				DO_STRIP on $(dummyTarget) = [ on $(container)
+					return $(HAIKU_CONTAINER_STRIP_BINARIES) ] ;
 
 				local nameFunction
 					= [ on $(destTarget) return $(NAME_FUNCTION) ] ;
@@ -717,13 +709,8 @@ rule CreateContainerCopyFilesScript container : script
 				Depends $(script) : $(dummyTarget) ;
 				serializationDependency = $(dummyTarget) ;
 
-				if $(doStrip) {
-					AppendToContainerCopyFilesScriptStripFile $(dummyTarget)
-						: $(initScript) $(target) ;
-				} else {
-					AppendToContainerCopyFilesScriptSingleFile $(dummyTarget)
-						: $(initScript) $(target) ;
-				}
+				AppendToContainerCopyFilesScriptSingleFile $(dummyTarget)
+					: $(initScript) $(target) ;
 			} else {
 				remainingTargets += $(target) ;
 			}
@@ -736,6 +723,8 @@ rule CreateContainerCopyFilesScript container : script
 			local dummyTarget = $(script)-dummy-$(dir:G=) ;
 			NotFile $(dummyTarget) ;
 			TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
+			DO_STRIP on $(dummyTarget) = [ on $(container)
+				return $(HAIKU_CONTAINER_STRIP_BINARIES) ] ;
 
 			Depends $(dummyTarget) : $(initScript) $(targets)
 				$(serializationDependency) ;
@@ -778,6 +767,11 @@ actions piecemeal AppendToContainerCopyFilesScript bind OUTPUT_SCRIPT
 {
 	echo \$cp "\"\${sPrefix}$(2)\"" "\"\${tPrefix}$(TARGET_DIR)\"" \
 		>> $(OUTPUT_SCRIPT)
+
+	if [ -n "$(DO_STRIP:E)" ]; then
+		echo \$strip "\"\${tPrefix}$(TARGET_DIR)/$(2:BS)\"" "2>/dev/null" \
+			"|| true" >> $(OUTPUT_SCRIPT)
+	fi
 }
 
 
@@ -790,21 +784,11 @@ actions AppendToContainerCopyFilesScriptSingleFile
 
 	echo \$cp "\"\${sPrefix}$(2[2])\"" \
 		"\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" >> $(2[1])
-}
 
-
-actions AppendToContainerCopyFilesScriptStripFile
-{
-	if [ -n "$(NAME_FUNCTION:E)" ]; then
-		echo "name=\`$(NAME_FUNCTION:E) \"$(2[2])\" 2> /dev/null \` || exit 1" \
-			>> $(2[1])
+	if [ -n "$(DO_STRIP:E)" ]; then
+		echo \$strip "\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" \
+			"2>/dev/null" "|| true" >> $(2[1])
 	fi
-
-	echo \$cp "\"\${sPrefix}$(2[2])\"" \
-		"\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" >> $(2[1])
-
-	echo \$strip "\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" \
-		"2>/dev/null" "|| true" >> $(2[1])
 }
 
 

@@ -341,11 +341,6 @@ rule CopySetHaikuRevision target : source
 
 	PropagateContainerUpdateTargetFlags $(target) : $(source) ;
 
-	if [ on $(source) return $(LINKFLAGS) ] {
-		# hint the target as a (strippable) binary
-		LINKFLAGS on $(target) = [ on $(source) return $(LINKFLAGS) ] ;
-	}
-
 	local revisionFile = [ DetermineHaikuRevision ] ;
 
 	Depends $(target)
