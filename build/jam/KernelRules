@@ -53,6 +53,8 @@ rule KernelLd
 	}
 	LINKLIBS on $(1) =  $(libs) $(TARGET_KERNEL_LIBGCC) ;
 
+	HAIKU_TARGET_IS_EXECUTABLE on $(1) = 1 ;
+
 	# TODO: Do we really want to invoke SetupKernel here? The objects should
 	# have been compiled with KernelObjects anyway, so we're doing that twice.
 	SetupKernel $(2) ;

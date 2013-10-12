@@ -341,6 +341,9 @@ rule CopySetHaikuRevision target : source
 
 	PropagateContainerUpdateTargetFlags $(target) : $(source) ;
 
+	HAIKU_TARGET_IS_EXECUTABLE on $(target) = [ on $(source)
+		return $(HAIKU_TARGET_IS_EXECUTABLE) ] ;
+
 	local revisionFile = [ DetermineHaikuRevision ] ;
 
 	Depends $(target)
