@@ -467,3 +467,50 @@ actions ChecksumFileSHA256
 		# The sed part is only necessary for sha256sum, but it doesn't harm for
 		# sha256 either.
 }
+
+
+rule StripFile target : source
+{
+	# Note: The caller is reponsible for matching TARGET_PACKAGING_ARCH with
+	# the architecture the target was built for.
+	STRIP on $(target) = $(HAIKU_STRIP_$(TARGET_PACKAGING_ARCH)) ;
+
+	PropagateContainerUpdateTargetFlags $(target) : $(source) ;
+
+	LocalClean clean : $(target) ;
+	Depends $(target) : $(source) <build>xres <build>copyattr ;
+	StripFile1 $(target) : $(source) <build>xres <build>copyattr ;
+}
+
+
+actions StripFile1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	"$(STRIP)" -o "$(1)" "$(2[1])"
+	"$(2[2])" -o "$(1)" "$(2[1])"
+	"$(2[3])" "$(2[1])" "$(1)"
+}
+
+
+rule StripFiles files
+{
+	# Note: The caller is reponsible for matching TARGET_PACKAGING_ARCH with
+	# the architecture the targets were built for.
+	local strippedFiles ;
+	local file ;
+	for file in $(files) {
+		local strippedFile = $(file:G=stripped_$(file:G)) ;
+		# Place the stripped file in a "stripped" subdirectory of the file's
+		# location.
+		local location = [ on $(file) return $(LOCATE) ] ;
+		if ! $(location) {
+			location
+				= $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH)) ;
+		}
+		MakeLocateArch $(strippedFile) : [ FDirName $(location) stripped ] ;
+		StripFile $(strippedFile) : $(file) ;
+		strippedFiles += $(strippedFile) ;
+	}
+
+	return $(strippedFiles) ;
+}
