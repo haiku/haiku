@@ -238,6 +238,8 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 	# We create a unique dummy target per target to install.
 	local installTargetsVar
 		= [ on $(container) return $(HAIKU_INSTALL_TARGETS_VAR) ] ;
+	local stripExecutables
+		= [ on $(container) return $(HAIKU_CONTAINER_STRIP_EXECUTABLES) ] ;
 	local target ;
 	for target in $(targets) {
 		local name ;
@@ -253,8 +255,14 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 			name = $(target:BS) ;
 		}
 
+		local installTarget = $(target) ;
+		if $(stripExecutables)
+			&& [ on $(target) return $(HAIKU_TARGET_IS_EXECUTABLE) ] {
+			installTarget = [ StripFiles $(target) ] ;
+		}
+
 		local destTarget = $(name:G=$(containerGrist)__$(directory:G=)) ;
-		TARGET on $(destTarget) = $(target) ;
+		TARGET on $(destTarget) = $(installTarget) ;
 		INSTALL_DIR on $(destTarget) = $(directory) ;
 		NAME_FUNCTION on $(destTarget) = $(nameFunction) ;
 		$(installTargetsVar) on $(target) += $(destTarget) ;
