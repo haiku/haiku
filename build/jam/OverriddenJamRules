@@ -27,6 +27,8 @@ rule Link
 			[ on $(1) return $(LINKFLAGS) ] ;
 	}
 
+	HAIKU_TARGET_IS_EXECUTABLE on $(1) = 1 ;
+
  	NEEDLIBS on $(1) = [ on $(1) return $(NEEDLIBS) ] ;
  	LINKLIBS on $(1) = [ on $(1) return $(LINKLIBS) ] ;
 
