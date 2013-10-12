@@ -698,7 +698,7 @@ else
 		fi
 
 		# determine primary architecture
-		targetArch=`package list -i /system/packages/haiku.hpkg \
+		targetArch=`package list -i /system/packages/haiku-*.hpkg \
 			| sed '/^\s*architecture:/!d; s,^\s*architecture:\s*,,'`
 		is_in_list "$targetArch" "$supportedTargetArchs" || (
 			echo "Unsupported target architecture: \"$targetArch\"" >&2
