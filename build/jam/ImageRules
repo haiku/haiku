@@ -800,11 +800,17 @@ actions AppendToContainerCopyFilesScriptStripFile
 			>> $(2[1])
 	fi
 
-	echo \$cp "\"\${sPrefix}$(2[2])\"" \
+	echo "stripped_file=\"\${tmpDir}/stripped_\$\$\"" >> $(2[1])
+
+	echo \$strip -o "\"\${stripped_file}\"" "\"\${sPrefix}$(2[2])\"" >> $(2[1])
+	echo \$xres -o "\"\${stripped_file}\"" "\"\${sPrefix}$(2[2])\"" >> $(2[1])
+
+	echo \$cp "\"\${stripped_file}\"" \
+		"\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" >> $(2[1])
+	echo \$copyattr "\"\${sPrefix}$(2[2])\"" \
 		"\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" >> $(2[1])
 
-	echo \$strip "\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" \
-		"2>/dev/null" "|| true" >> $(2[1])
+	echo \$rm "\"\${stripped_file}\"" >> $(2[1])
 }
 
 
