@@ -1,12 +1,15 @@
 /*
- * Copyright 2007-2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include "cdda.h"
-#include "cddb.h"
-#include "Lock.h"
+#include <dirent.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
 
 #include <FindDirectory.h>
 #include <fs_info.h>
@@ -19,12 +22,9 @@
 #include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
 
-#include <dirent.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
+#include "cdda.h"
+#include "cddb.h"
+#include "Lock.h"
 
 
 //#define TRACE_CDDA
