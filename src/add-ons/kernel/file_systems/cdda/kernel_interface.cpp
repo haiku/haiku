@@ -19,6 +19,7 @@
 #include <NodeMonitor.h>
 #include <TypeConstants.h>
 
+#include <AutoDeleter.h>
 #include <util/DoublyLinkedList.h>
 
 #include "cdda.h"
@@ -458,11 +459,11 @@ open_attributes(uint32 cddbID, int deviceFD, int mode,
 	if (path == NULL)
 		return -1;
 
+	MemoryDeleter deleter(path);
 	bool create = (mode & O_WRONLY) != 0;
 
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, create, path,
 			B_PATH_NAME_LENGTH) != B_OK) {
-		free(path);
 		return -1;
 	}
 
@@ -479,7 +480,6 @@ open_attributes(uint32 cddbID, int deviceFD, int mode,
 		char* deviceName = path + length;
 		if (ioctl(deviceFD, B_GET_PATH_FOR_DEVICE, deviceName,
 				B_PATH_NAME_LENGTH - length) < B_OK) {
-			free(path);
 			return B_ERROR;
 		}
 
@@ -495,10 +495,7 @@ open_attributes(uint32 cddbID, int deviceFD, int mode,
 	} else
 		strlcat(path, "/shared", B_PATH_NAME_LENGTH);
 
-	int fd = open(path, mode | (create ? O_CREAT | O_TRUNC : 0), 0644);
-
-	free(path);
-	return fd;
+	return open(path, mode | (create ? O_CREAT | O_TRUNC : 0), 0644);
 }
 
 
@@ -623,15 +620,15 @@ Volume::Mount(const char* device)
 	if (toc == NULL)
 		return B_NO_MEMORY;
 
+	MemoryDeleter deleter(toc);
+
 	status_t status = read_table_of_contents(fDevice, toc, 1024);
 	// there has to be at least one audio track
 	if (status == B_OK && count_audio_tracks(toc) == 0)
 		status = B_BAD_TYPE;
 
-	if (status != B_OK) {
-		free(toc);
+	if (status != B_OK)
 		return status;
-	}
 
 	fDiscID = compute_cddb_disc_id(*toc);
 
@@ -643,10 +640,8 @@ Volume::Mount(const char* device)
 		status = publish_vnode(FSVolume(), fRootNode->ID(), fRootNode,
 			&gCDDAVnodeOps, fRootNode->Type(), 0);
 	}
-	if (status != B_OK) {
-		free(toc);
+	if (status != B_OK)
 		return status;
-	}
 
 	bool doLookup = true;
 	cdtext text;
@@ -742,8 +737,6 @@ Volume::Mount(const char* device)
 	_RestoreSharedAttributes();
 	if (fd >= 0)
 		_RestoreAttributes(fd);
-
-	free(toc);
 
 	// determine volume title
 	DetermineName(fDiscID, fDevice, title, sizeof(title));

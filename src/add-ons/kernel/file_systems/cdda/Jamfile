@@ -1,8 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems cdda ;
 
-UsePrivateHeaders drivers kernel ;
+UsePrivateHeaders drivers kernel shared storage ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName storage ] ;
 
 KernelAddon cdda :
 	kernel_interface.cpp
