@@ -19,7 +19,6 @@
 #include <NodeMonitor.h>
 #include <TypeConstants.h>
 
-#include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
 
 #include "cdda.h"
@@ -432,7 +431,7 @@ read_attributes(int fd, Inode* inode)
 		size = B_BENDIAN_TO_HOST_INT32(size);
 		name[length] = '\0';
 
-		Attribute* attribute = new Attribute(name, type);
+		Attribute* attribute = new(std::nothrow) Attribute(name, type);
 		if (attribute->IsProtectedNamespace()) {
 			// Attributes in the protected namespace are handled internally
 			// so we do not load them even if they are present in the
@@ -853,7 +852,8 @@ Inode*
 Volume::_CreateNode(Inode* parent, const char* name, uint64 start,
 	uint64 frames, int32 type)
 {
-	Inode* inode = new Inode(this, parent, name, start, frames, type);
+	Inode* inode = new(std::nothrow) Inode(this, parent, name, start, frames,
+		type);
 	if (inode == NULL)
 		return NULL;
 
@@ -1276,7 +1276,7 @@ status_t
 Inode::AddAttribute(const char* name, type_code type, bool overwrite,
 	const uint8* data, size_t length)
 {
-	Attribute* attribute = new Attribute(name, type);
+	Attribute* attribute = new(std::nothrow) Attribute(name, type);
 	if (attribute == NULL)
 		return B_NO_MEMORY;
 
@@ -1476,7 +1476,7 @@ cdda_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 {
 	TRACE(("cdda_mount: entry\n"));
 
-	Volume* volume = new Volume(fsVolume);
+	Volume* volume = new(std::nothrow) Volume(fsVolume);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 
