@@ -20,7 +20,7 @@ void
 usage(FILE* output)
 {
 	fprintf(output,
-		"Usage: %s <options> <device> <volume name>\n"
+		"Usage: %s <options> <device|volume name>\n"
 		"\n"
 		"Options:\n"
 		"  -h, --help        - print this help text\n"
