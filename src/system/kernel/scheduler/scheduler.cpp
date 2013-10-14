@@ -11,7 +11,6 @@
 
 #include "scheduler_affine.h"
 #include "scheduler_simple.h"
-#include "scheduler_simple_smp.h"
 #include "scheduler_tracing.h"
 
 
