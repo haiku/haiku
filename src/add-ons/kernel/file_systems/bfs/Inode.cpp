@@ -236,10 +236,17 @@ InodeAllocator::CreateTree()
 	if ((fInode->Mode() & S_INDEX_TYPES) == 0)
 		fInode->Node().mode |= HOST_ENDIAN_TO_BFS_INT32(S_STR_INDEX);
 
-	BPlusTree* tree = fInode->fTree
-		= new(std::nothrow) BPlusTree(*fTransaction, fInode);
-	if (tree == NULL || tree->InitCheck() < B_OK)
+	BPlusTree* tree = new(std::nothrow) BPlusTree(*fTransaction, fInode);
+	if (tree == NULL)
 		return B_ERROR;
+
+	status_t status = tree->InitCheck();
+	if (status != B_OK) {
+		delete tree;
+		return status;
+	}
+
+	fInode->fTree = tree;
 
 	if (fInode->IsRegularNode()) {
 		if (tree->Insert(*fTransaction, ".", fInode->ID()) < B_OK
