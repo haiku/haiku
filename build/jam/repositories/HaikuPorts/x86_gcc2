@@ -24,11 +24,12 @@ RemotePackageRepository HaikuPorts
 	bzip2-1.0.6-3
 	caya-2013.07.31-2
 	cdrtools-3.01~a07-3
-	cmake-2.8.11.2-1
+	cmake-2.8.11.2-2
 	ctags-5.8-3
 	curl-7.26.0-5
 	curl_devel-7.26.0-5
 	cvs-1.12.13.1-6
+	distcc-3.1-2
 	doxygen-1.6.3-3
 	expat-2.0.1-7
 	expat_devel-2.0.1-7
@@ -115,6 +116,7 @@ RemotePackageRepository HaikuPorts
 	texinfo-4.13a-7
 	vim-7.3-1
 	vision-0.9.7.r946-1
+	which-2.20-1
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-3
 	yasm-1.2.0-3
@@ -164,6 +166,7 @@ RemotePackageRepository HaikuPorts
 	mesa_x86_devel-9.1.1-1
 	ncurses_x86-5.9-9
 	ncurses_x86_devel-5.9-9
+	ninja_x86-1.4.0-1
 	openssl_x86-1.0.0j-4
 	openssl_x86_devel-1.0.0j-4
 	speex_x86-1.2~rc1-2
@@ -189,6 +192,7 @@ RemotePackageRepository HaikuPorts
 	ctags
 	curl
 	cvs
+	distcc
 	doxygen
 	expat
 	ffmpeg
@@ -232,6 +236,7 @@ RemotePackageRepository HaikuPorts
 	nano
 	ncurses
 	neon
+	ninja_x86
 	openssh
 	openssl
 	p7zip
@@ -251,6 +256,7 @@ RemotePackageRepository HaikuPorts
 	texinfo
 	vim
 	vision
+	which
 	wpa_supplicant
 	yasm
 	xz_utils_x86
