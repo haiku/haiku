@@ -433,6 +433,9 @@ read_attributes(int fd, Inode* inode)
 		name[length] = '\0';
 
 		Attribute* attribute = new(std::nothrow) Attribute(name, type);
+		if (attribute == NULL)
+			return false;
+
 		if (attribute->IsProtectedNamespace()) {
 			// Attributes in the protected namespace are handled internally
 			// so we do not load them even if they are present in the
