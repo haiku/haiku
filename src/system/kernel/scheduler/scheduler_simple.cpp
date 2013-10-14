@@ -55,6 +55,7 @@ static SimpleCPUHeap* sCPUHeap;
 // The run queue. Holds the threads ready to run ordered by priority.
 typedef RunQueue<Thread, THREAD_MAX_SET_PRIORITY> SimpleRunQueue;
 static SimpleRunQueue* sRunQueue;
+static SimpleRunQueue* sCPURunQueues;
 
 
 struct scheduler_thread_data {
@@ -153,7 +154,18 @@ static int
 dump_run_queue(int argc, char** argv)
 {
 	SimpleRunQueue::ConstIterator iterator = sRunQueue->GetConstIterator();
+	kprintf("Shared run queue:\n");
 	dump_queue(iterator);
+
+	int32 cpuCount = smp_get_num_cpus();
+	if (cpuCount < 2)
+		return 0;
+
+	for (int32 i = 0; i < cpuCount; i++) {
+		kprintf("\nCPU %d run queue:\n", i);
+		sCPURunQueues[i].GetConstIterator();
+		dump_queue(iterator);
+	}
 
 	return 0;
 }
@@ -162,7 +174,7 @@ dump_run_queue(int argc, char** argv)
 static int
 dump_cpu_heap(int argc, char** argv)
 {
-	kprintf("\ncpu priority actual priority\n");
+	kprintf("cpu priority actual priority\n");
 	CPUHeapEntry* entry = sCPUHeap->PeekRoot();
 	while (entry) {
 		int32 cpu = entry->fCPUNumber;
@@ -254,7 +266,13 @@ simple_enqueue(Thread* thread, bool newOne)
 
 	T(EnqueueThread(thread, threadPriority));
 
-	sRunQueue->PushBack(thread, threadPriority);
+	bool pinned = sCPURunQueues != NULL && thread->pinned_to_cpu > 0;
+	int32 pinnedCPU = -1;
+	if (pinned) {
+		pinnedCPU = thread->previous_cpu->cpu_num;
+		sCPURunQueues[pinnedCPU].PushBack(thread, threadPriority);
+	} else
+		sRunQueue->PushBack(thread, threadPriority);
 
 	schedulerThreadData->cpu_bound = true;
 	schedulerThreadData->time_left = 0;
@@ -264,24 +282,32 @@ simple_enqueue(Thread* thread, bool newOne)
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
 
-	// TODO: pinned threads
 	// TODO: disabled CPUs
-	CPUHeapEntry* cpuEntry = sCPUHeap->PeekRoot();
-	ASSERT(cpuEntry != NULL);
-
 	int32 thisCPU = smp_get_current_cpu();
-	int32 targetCPU = cpuEntry->fCPUNumber;
+	int32 targetCPU = pinnedCPU;
+
+	if (!pinned) {
+		CPUHeapEntry* cpuEntry = sCPUHeap->PeekRoot();
+		ASSERT(cpuEntry != NULL);
+
+		targetCPU = cpuEntry->fCPUNumber;
+	}
+
+	ASSERT(targetCPU >= 0);
+
 	Thread* targetThread = gCPU[targetCPU].running_thread;
 	int32 targetPriority = simple_get_effective_priority(targetThread);
 
 	ASSERT((targetCPU != thisCPU && targetThread != thread)
 		|| targetCPU == thisCPU);
 
-	int32 currentThreadPriority
-		= simple_get_effective_priority(thread_get_current_thread());
-	if (targetPriority == currentThreadPriority) {
-		targetCPU = thisCPU;
-		targetPriority = currentThreadPriority;
+	if (!pinned) {
+		int32 currentThreadPriority
+			= simple_get_effective_priority(thread_get_current_thread());
+		if (targetPriority == currentThreadPriority) {
+			targetCPU = thisCPU;
+			targetPriority = currentThreadPriority;
+		}
 	}
 
 	TRACE("choosing CPU %ld with current priority %ld\n", targetCPU,
@@ -293,7 +319,7 @@ simple_enqueue(Thread* thread, bool newOne)
 		// It is possible that another CPU schedules the thread before the
 		// target CPU. However, since the target CPU is sent an ICI it will
 		// reschedule anyway and update its heap key to the correct value.
-		sCPUHeap->ModifyKey(cpuEntry, threadPriority);
+		sCPUHeap->ModifyKey(&sCPUEntries[targetCPU], threadPriority);
 
 		if (targetCPU == smp_get_current_cpu()) {
 			gCPU[targetCPU].invoke_scheduler = true;
@@ -315,6 +341,21 @@ simple_enqueue_in_run_queue(Thread* thread)
 	TRACE("enqueueing new thread %ld with static priority %ld\n", thread->id,
 		thread->priority);
 	simple_enqueue(thread, true);
+}
+
+
+static inline void
+simple_put_back(Thread* thread)
+{
+	bool pinned = sCPURunQueues != NULL && thread->pinned_to_cpu > 0;
+
+	if (!pinned)
+		sRunQueue->PushFront(thread, simple_get_effective_priority(thread));
+	else {
+		int32 pinnedCPU = thread->previous_cpu->cpu_num;
+		sCPURunQueues[pinnedCPU].PushFront(thread,
+			simple_get_effective_priority(thread));
+	}
 }
 
 
@@ -466,6 +507,36 @@ simple_compute_quantum(Thread* thread)
 }
 
 
+static inline Thread*
+simple_dequeue_thread(int32 thisCPU)
+{
+	Thread* sharedThread = sRunQueue->PeekMaximum();
+
+	Thread* pinnedThread = NULL;
+	if (sCPURunQueues != NULL)
+		pinnedThread = sCPURunQueues[thisCPU].PeekMaximum();
+
+	if (sharedThread == NULL && pinnedThread == NULL)
+		return NULL;
+
+	int32 pinnedPriority = -1;
+	if (pinnedThread != NULL)
+		pinnedPriority = simple_get_effective_priority(pinnedThread);
+
+	int32 sharedPriority = -1;
+	if (sharedThread != NULL)
+		sharedPriority = simple_get_effective_priority(sharedThread);
+
+	if (sharedPriority > pinnedPriority) {
+		sRunQueue->Remove(sharedThread);
+		return sharedThread;
+	}
+
+	sCPURunQueues[thisCPU].Remove(pinnedThread);
+	return pinnedThread;
+}
+
+
 /*!	Runs the scheduler.
 	Note: expects thread spinlock to be held
 */
@@ -517,8 +588,7 @@ simple_reschedule(void)
 			} else {
 				TRACE("putting thread %ld back in run queue priority = %ld\n",
 					oldThread->id, simple_get_effective_priority(oldThread));
-				sRunQueue->PushFront(oldThread,
-					simple_get_effective_priority(oldThread));
+				simple_put_back(oldThread);
 			}
 
 			break;
@@ -539,10 +609,9 @@ simple_reschedule(void)
 	schedulerOldThreadData->lost_cpu = false;
 
 	// select thread with the biggest priority
-	nextThread = sRunQueue->PeekMaximum();
+	nextThread = simple_dequeue_thread(thisCPU);
 	if (!nextThread)
 		panic("reschedule(): run queues are empty!\n");
-	sRunQueue->Remove(nextThread);
 
 	TRACE("reschedule(): cpu %ld, next thread = %ld\n", thisCPU,
 		nextThread->id);
@@ -676,6 +745,20 @@ scheduler_simple_init()
 	if (result != B_OK)
 		return result;
 
+	ArrayDeleter<SimpleRunQueue> cpuRunQueuesDeleter;
+	if (cpuCount > 1) {
+		sCPURunQueues = new(std::nothrow) SimpleRunQueue[cpuCount];
+		if (sCPURunQueues == NULL)
+			return B_NO_MEMORY;
+		cpuRunQueuesDeleter.SetTo(sCPURunQueues);
+
+		for (int i = 0; i < cpuCount; i++) {
+			result = sCPURunQueues[i].GetInitStatus();
+			if (result != B_OK)
+				return result;
+		}
+	}
+
 	gScheduler = &kSimpleOps;
 
 	add_debugger_command_etc("run_queue", &dump_run_queue,
@@ -687,5 +770,6 @@ scheduler_simple_init()
 	cpuHeapDeleter.Detach();
 	cpuEntriesDeleter.Detach();
 	runQueueDeleter.Detach();
+	cpuRunQueuesDeleter.Detach();
 	return B_OK;
 }
