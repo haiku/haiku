@@ -68,18 +68,12 @@ scheduler_init(void)
 		cpuCount != 1 ? "s" : "");
 
 	status_t result;
-	if (cpuCount > 1) {
 #if 0
-		dprintf("scheduler_init: using affine scheduler\n");
-		result = scheduler_affine_init();
-#else
-		dprintf("scheduler_init: using simple SMP scheduler\n");
-		result = scheduler_simple_smp_init();
+	dprintf("scheduler_init: using affine scheduler\n");
+	result = scheduler_affine_init();
 #endif
-	} else {
-		dprintf("scheduler_init: using simple scheduler\n");
-		result = scheduler_simple_init();
-	}
+	dprintf("scheduler_init: using simple scheduler\n");
+	result = scheduler_simple_init();
 
 	if (result != B_OK)
 		panic("scheduler_init: failed to initialize scheduler\n");

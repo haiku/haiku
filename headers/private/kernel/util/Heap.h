@@ -79,6 +79,8 @@ public:
 
 	inline	Element*	PeekRoot();
 
+	inline	const Key&	GetKey(Element* element) const;
+
 	inline	void		ModifyKey(Element* element, Key newKey);
 
 	inline	void		RemoveRoot();
@@ -184,10 +186,21 @@ HEAP_CLASS_NAME::PeekRoot()
 
 
 HEAP_TEMPLATE_LIST
+const Key&
+HEAP_CLASS_NAME::GetKey(Element* element) const
+{
+	HeapLink<Element, Key>* link = sGetLink(element);
+
+	ASSERT(link->fIndex >= 0 && link->fIndex < fLastElement);
+	return link->fKey;
+}
+
+
+HEAP_TEMPLATE_LIST
 void
 HEAP_CLASS_NAME::ModifyKey(Element* element, Key newKey)
 {
-	HeapLink<Element, Key> link = sGetLink(element);
+	HeapLink<Element, Key>* link = sGetLink(element);
 
 	ASSERT(link->fIndex >= 0 && link->fIndex < fLastElement);
 	Key oldKey = link->fKey;
@@ -208,7 +221,7 @@ HEAP_CLASS_NAME::RemoveRoot()
 
 #if KDEBUG
 	Element* element = PeekRoot();
-	HeapLink<Element, Key> link = sGetLink(element);
+	HeapLink<Element, Key>* link = sGetLink(element);
 	link->fIndex = -1;
 #endif
 
@@ -240,6 +253,8 @@ HEAP_CLASS_NAME::Insert(Element* element, Key key)
 	link->fIndex = fLastElement++;
 	link->fKey = key;
 	_MoveUp(link);
+
+	return B_OK;
 }
 
 
@@ -266,7 +281,6 @@ HEAP_TEMPLATE_LIST
 void
 HEAP_CLASS_NAME::_MoveUp(HeapLink<Element, Key>* link)
 {
-	int i = link->fIndex;
 	while (true) {
 		int parent = (link->fIndex - 1) / 2;
 		if (link->fIndex > 0

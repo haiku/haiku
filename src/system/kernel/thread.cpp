@@ -1425,7 +1425,7 @@ make_thread_unreal(int argc, char **argv)
 			continue;
 
 		if (thread->priority > B_DISPLAY_PRIORITY) {
-			thread->priority = B_NORMAL_PRIORITY;
+			scheduler_set_thread_priority(thread, B_NORMAL_PRIORITY);
 			kprintf("thread %" B_PRId32 " made unreal\n", thread->id);
 		}
 	}
@@ -1461,7 +1461,7 @@ set_thread_prio(int argc, char **argv)
 			Thread* thread = it.Next();) {
 		if (thread->id != id)
 			continue;
-		thread->priority = prio;
+		scheduler_set_thread_priority(thread, prio);
 		kprintf("thread %" B_PRId32 " set to priority %" B_PRId32 "\n", id, prio);
 		found = true;
 		break;
@@ -1920,7 +1920,7 @@ thread_exit(void)
 		panic("thread_exit() called with interrupts disabled!\n");
 
 	// boost our priority to get this over with
-	thread->priority = B_URGENT_DISPLAY_PRIORITY;
+	scheduler_set_thread_priority(thread, B_URGENT_DISPLAY_PRIORITY);
 
 	if (team != kernelTeam) {
 		// Cancel previously installed alarm timer, if any. Hold the scheduler
@@ -3205,15 +3205,8 @@ set_thread_priority(thread_id id, int32 priority)
 
 	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
-	if (thread == thread_get_current_thread()) {
-		// It's ourself, so we know we aren't in the run queue, and we can
-		// manipulate our structure directly.
-		oldPriority = thread->priority;
-		thread->priority = priority;
-	} else {
-		oldPriority = thread->priority;
-		scheduler_set_thread_priority(thread, priority);
-	}
+	oldPriority = thread->priority;
+	scheduler_set_thread_priority(thread, priority);
 
 	return oldPriority;
 }
