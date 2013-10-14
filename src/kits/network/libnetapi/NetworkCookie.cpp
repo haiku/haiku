@@ -45,7 +45,7 @@ BNetworkCookie::BNetworkCookie(const char* name, const char* value,
 BNetworkCookie::BNetworkCookie(const BString& cookieString, const BUrl& url)
 {
 	_Reset();
-	ParseCookieString(cookieString, url);
+	fInitStatus = ParseCookieString(cookieString, url);
 }
 
 
@@ -89,6 +89,11 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 {
 	_Reset();
 
+	// Set default values (these can be overriden later on)
+	SetPath(_DefaultPathForUrl(url));
+	SetDomain(url.Host());
+	fHostOnly = true;
+
 	BString name;
 	BString value;
 	int32 index = 0;
@@ -103,6 +108,10 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 	SetName(name);
 	SetValue(value);
 
+	// Note on error handling: even if there are parse errors, we will continue
+	// and try to parse as much from the cookie as we can.
+	status_t result = B_OK;
+
 	// Parse the remaining cookie attributes.
 	while (index < string.Length()) {
 		ASSERT(string[index] == ';');
@@ -116,44 +125,55 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 			SetHttpOnly(true);
 
 		// The following attributes require a value.
-		if (value.IsEmpty())
-			continue;
 
 		if (name.ICompare("max-age") == 0) {
+			if (value.IsEmpty()) {
+				result = B_BAD_VALUE;
+				continue;
+			}
 			// Validate the max-age value.
 			char* end = NULL;
 			long maxAge = strtol(value.String(), &end, 10);
 			if (*end == '\0')
 				SetMaxAge((int)maxAge);
+			else
+				SetMaxAge(-1); // cookie will expire immediately
 		} else if (name.ICompare("expires") == 0) {
+			if (value.IsEmpty()) {
+				result = B_BAD_VALUE;
+				continue;
+			}
 			BHttpTime date(value);
 			SetExpirationDate(date.Parse());
 		} else if (name.ICompare("domain") == 0) {
-			SetDomain(value);
+			if (value.IsEmpty()) {
+				result = B_BAD_VALUE;
+				continue;
+			}
+
+			status_t domainResult = SetDomain(value);
+			// Do not reset the result to B_OK if something else already failed
+			if (result == B_OK)
+				result = domainResult;
 		} else if (name.ICompare("path") == 0) {
-			SetPath(value);
+			if (value.IsEmpty()) {
+				result = B_BAD_VALUE;
+				continue;
+			}
+			status_t pathResult = SetPath(value);
+			if (result == B_OK)
+				result = pathResult;
 		}
 	}
 
-	// If no domain was specified, we set a host-only domain from the URL.
-	if (!HasDomain()) {
-		SetDomain(url.Host());
-		fHostOnly = true;
-	} else {
-		// Otherwise the setting URL must domain-match the domain it set.
-		if (!IsValidForDomain(url.Host())) {
-			// Invalidate the cookie.
-			_Reset();
-			return B_NOT_ALLOWED;
-		}
+	if (!IsValidForDomain(url.Host())) {
+		// Invalidate the cookie.
+		_Reset();
+		return B_NOT_ALLOWED;
 	}
 
-	// If no path was specified or the path is invalid, we compute the default
-	// path from the URL.
-	if (!HasPath() || Path()[0] != '/')
-		SetPath(_DefaultPathForUrl(url));
 
-	return B_OK;
+	return result;
 }
 
 
@@ -180,21 +200,24 @@ BNetworkCookie::SetValue(const BString& value)
 }
 
 
-BNetworkCookie&
+status_t
 BNetworkCookie::SetPath(const BString& path)
 {
+	if(path[0] != '/')
+		return B_BAD_DATA;
+
 	// TODO: canonicalize the path
 	fPath = path;
 	fRawFullCookieValid = false;
-	return *this;
+	return B_OK;
 }
 
 
-BNetworkCookie&
+status_t
 BNetworkCookie::SetDomain(const BString& domain)
 {
 	// TODO: canonicalize the domain
-	fDomain = domain;
+	BString newDomain = domain;
 
 	// RFC 2109 (legacy) support: domain string may start with a dot,
 	// meant to indicate the cookie should also be used for subdomains.
@@ -202,12 +225,19 @@ BNetworkCookie::SetDomain(const BString& domain)
 	// not specified at all (in this case it has to exactly match the Url of
 	// the page that set the cookie). In any case, we don't need to handle
 	// dot-cookies specifically anymore, so just remove the extra dot.
-	if(fDomain[0] == '.')
-		fDomain.Remove(0, 1);
+	if(newDomain[0] == '.')
+		newDomain.Remove(0, 1);
+
+	// check we're not trying to set a cookie on a TLD or empty domain
+	if(newDomain.FindLast('.') <= 0)
+		return B_BAD_DATA;
+
+	fDomain = newDomain.ToLower();
+
 	fHostOnly = false;
 
 	fRawFullCookieValid = false;
-	return *this;
+	return B_OK;
 }
 
 
@@ -383,7 +413,7 @@ BNetworkCookie::IsSessionCookie() const
 bool
 BNetworkCookie::IsValid() const
 {
-	return HasName() && HasDomain() && HasPath();
+	return fInitStatus == B_OK && HasName() && HasDomain() && HasPath();
 }
 
 
@@ -410,9 +440,8 @@ BNetworkCookie::IsValidForDomain(const BString& domain) const
 		return false;
 
 	// If the cookie is host-only the domains must match exactly.
-	if (IsHostOnly()) {
+	if (IsHostOnly())
 		return domain == cookieDomain;
-	}
 
 	// FIXME prevent supercookies with a domain of ".com" or similar
 	// This is NOT as straightforward as relying on the last dot in the domain.
@@ -436,24 +465,17 @@ bool
 BNetworkCookie::IsValidForPath(const BString& path) const
 {
 	const BString& cookiePath = Path();
+	BString normalizedPath = path;
 
-	if (path.Length() < cookiePath.Length())
+	int slashPos = normalizedPath.FindLast('/');
+	if(slashPos != normalizedPath.Length() - 1)
+		normalizedPath.Truncate(slashPos + 1);
+
+	if (normalizedPath.Length() < cookiePath.Length())
 		return false;
 
 	// The cookie path must be a prefix of the path string
-	if (path.Compare(cookiePath, cookiePath.Length()) != 0)
-		return false;
-
-	// The paths match if they are identical, or if the last
-	// character of the prefix is a slash, or if the character
-	// after the prefix is a slash.
-	if (path.Length() == cookiePath.Length()
-			|| cookiePath[cookiePath.Length() - 1] == '/'
-			|| path[cookiePath.Length()] == '/') {
-		return true;
-	}
-
-	return false;
+	return normalizedPath.Compare(cookiePath, cookiePath.Length()) == 0;
 }
 
 
@@ -719,6 +741,13 @@ BNetworkCookie::_ExtractAttributeValuePair(const BString& cookieString,
 		cookieString.CopyInto(value, first, last - first + 1);
 	else
 		value.SetTo("");
+
+	// values may (or may not) have quotes around them.
+	if(value[0] == '"' && value[value.Length() - 1] == '"')
+	{
+		value.Remove(0, 1);
+		value.Remove(value.Length() - 1, 1);
+	}
 
 	return cookieAVEnd;
 }

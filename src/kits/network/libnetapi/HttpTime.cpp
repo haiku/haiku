@@ -77,6 +77,16 @@ BHttpTime::Parse()
 	
 	if (fDateString.Length() < 4)
 		return 0;
+
+	expireTime.tm_sec = 0;
+	expireTime.tm_min = 0;
+	expireTime.tm_hour = 0;
+	expireTime.tm_mday = 0;
+	expireTime.tm_mon = 0;
+	expireTime.tm_year = 0;
+	expireTime.tm_wday = 0;
+	expireTime.tm_yday = 0;
+	expireTime.tm_isdst = 0;
 		
 	if (fDateString[3] == ',') {
 		if (strptime(fDateString.String(), kRfc1123Format, &expireTime)

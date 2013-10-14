@@ -31,8 +31,8 @@ public:
 	// Modify the cookie fields
 			BNetworkCookie&		SetName(const BString& name);
 			BNetworkCookie&		SetValue(const BString& value);
-			BNetworkCookie&		SetDomain(const BString& domain);
-			BNetworkCookie&		SetPath(const BString& path);
+			status_t			SetDomain(const BString& domain);
+			status_t			SetPath(const BString& path);
 			BNetworkCookie&		SetMaxAge(int32 maxAge);
 			BNetworkCookie&		SetExpirationDate(time_t expireDate);
 			BNetworkCookie&		SetExpirationDate(BDateTime& expireDate);
@@ -99,9 +99,9 @@ private:
 			BString				fDomain;
 			BString				fPath;
 			BDateTime			fExpiration;
+			status_t			fInitStatus;
 			bool				fSecure;
 			bool				fHttpOnly;
-
 			bool				fHostOnly;
 			bool				fSessionCookie;
 };

@@ -117,7 +117,7 @@ BNetworkCookieJar::AddCookie(const BString& cookie, const BUrl& referrer)
 status_t
 BNetworkCookieJar::AddCookie(BNetworkCookie* cookie)
 {
-	if (cookie == NULL)
+	if (cookie == NULL || !cookie->IsValid())
 		return B_BAD_VALUE;
 
 	HashString key(cookie->Domain());
@@ -140,8 +140,9 @@ BNetworkCookieJar::AddCookie(BNetworkCookie* cookie)
 
 	if (cookie->ShouldDeleteNow())
 		delete cookie;
-	else
+	else {
 		list->AddItem(cookie);
+	}
 
 	return B_OK;
 }

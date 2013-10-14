@@ -876,9 +876,12 @@ BHttpRequest::_AddHeaders()
 		for (BNetworkCookieJar::UrlIterator it
 				= fContext->GetCookieJar().GetUrlIterator(fUrl);
 				(cookie = it.Next()) != NULL;) {
-			cookieString << cookie->RawCookie(false);
 			cookieString << "; ";
+			cookieString << cookie->RawCookie(false);
 		}
+
+		// Remove the extra "; " we added before the first item
+		cookieString.Remove(0, 2);
 
 		if (cookieString.Length() > 0)
 			fOutputHeaders.AddHeader("Cookie", cookieString);
