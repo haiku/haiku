@@ -245,7 +245,7 @@ BNetworkCookie&
 BNetworkCookie::SetMaxAge(int32 maxAge)
 {
 	BDateTime expiration = BDateTime::CurrentDateTime(B_GMT_TIME);
-	expiration.Time().AddSeconds(maxAge);
+	expiration.SetTime_t(expiration.Time_t() + maxAge);
 	return SetExpirationDate(expiration);
 }
 
