@@ -282,7 +282,6 @@ simple_enqueue(Thread* thread, bool newOne)
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
 
-	// TODO: disabled CPUs
 	int32 thisCPU = smp_get_current_cpu();
 	int32 targetCPU = pinnedCPU;
 
@@ -609,7 +608,18 @@ simple_reschedule(void)
 	schedulerOldThreadData->lost_cpu = false;
 
 	// select thread with the biggest priority
-	nextThread = simple_dequeue_thread(thisCPU);
+	if (oldThread->cpu->disabled) {
+		ASSERT(sCPURunQueues != NULL);
+		nextThread = sCPURunQueues[thisCPU].PeekMaximum();
+		if (nextThread != NULL)
+			sCPURunQueues[thisCPU].Remove(nextThread);
+		else {
+			nextThread = sRunQueue->GetHead(B_IDLE_PRIORITY);
+			if (nextThread != NULL)
+				sRunQueue->Remove(nextThread);
+		}
+	} else
+		nextThread = simple_dequeue_thread(thisCPU);
 	if (!nextThread)
 		panic("reschedule(): run queues are empty!\n");
 
