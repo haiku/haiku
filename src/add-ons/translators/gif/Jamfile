@@ -2,14 +2,14 @@ SubDir HAIKU_TOP src add-ons translators gif ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
+
 AddResources GIFTranslator : GIFTranslator.rdef ;
 
 Translator GIFTranslator :
 	# Main Source
 	GIFTranslator.cpp
 	GIFView.cpp
-	GIFWindow.cpp
-	Prefs.cpp
 
 	# Real Work
 	GIFLoad.cpp
@@ -19,6 +19,7 @@ Translator GIFTranslator :
 	SFHash.cpp
 	:
 	be translation $(TARGET_LIBSUPC++) localestub
+	libtranslatorsutils.a
 	: true
 ;
 

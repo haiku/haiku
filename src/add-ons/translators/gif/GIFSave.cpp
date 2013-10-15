@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+//						Philippe Saint-Pierre, <stpere@gmail.com>
 
 #include "GIFSave.h"
 #include <stdio.h>
@@ -35,21 +36,26 @@ class ColorCache : public HashItem {
 };
 
 // constructor
-GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
+GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
+	TranslatorSettings* settings)
 {
+	fSettings = settings;
 	color_space cs = bitmap->ColorSpace();
-    if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG && cs != B_RGBA32_BIG) {
-    	if (debug) syslog(LOG_ERR, "GIFSave::GIFSave() - Unknown color space\n");
-    	fatalerror = true;
-    	return;
-    }
+	if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG
+		&& cs != B_RGBA32_BIG) {
+		if (debug)
+			syslog(LOG_ERR, "GIFSave::GIFSave() - Unknown color space\n");
+		fatalerror = true;
+		return;
+	}
     
 	fatalerror = false;
-	prefs = new Prefs();
-	if (prefs->palettemode == OPTIMAL_PALETTE)
-		palette = new SavePalette(bitmap, prefs->palette_size_in_bits);
+	if (fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE) == OPTIMAL_PALETTE)
+		palette = new SavePalette(bitmap,
+			fSettings->SetGetInt32(GIF_SETTING_PALETTE_SIZE));
 	else
-		palette = new SavePalette(prefs->palettemode);
+		palette = new SavePalette(
+			fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE));
 	if (!palette->IsValid()) {
 		fatalerror = true;
 		return;
@@ -58,12 +64,12 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 	width = bitmap->Bounds().IntegerWidth() + 1;
 	height = bitmap->Bounds().IntegerHeight() + 1;
 	if (debug)
-	   syslog(LOG_ERR, "GIFSave::GIFSave() - Image dimensions are %d by %d\n",
+		syslog(LOG_ERR, "GIFSave::GIFSave() - Image dimensions are %d by %d\n",
 					width, height);
 	
-	if (prefs->usedithering) {
+	if (fSettings->SetGetBool(GIF_SETTING_USE_DITHERING)) {
 		if (debug)
-		   syslog(LOG_ERR, "GIFSave::GIFSave() - Using dithering\n");
+			syslog(LOG_ERR, "GIFSave::GIFSave() - Using dithering\n");
 		red_error = new int32[width + 2];
 		red_error = &red_error[1]; // Allow index of -1 too
 		green_error = new int32[width + 2];
@@ -77,16 +83,15 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 			green_error[x] = 0;
 			blue_error[x] = 0;
 		}
-	} else {
-		if (debug)
-		   syslog(LOG_ERR, "GIFSave::GIFSave() - Not using dithering\n");
-	}
+	} else if (debug)
+		syslog(LOG_ERR, "GIFSave::GIFSave() - Not using dithering\n");
 	
 	if (debug) {
-		if (prefs->interlaced)
-		   syslog(LOG_ERR, "GIFSave::GIFSave() - Interlaced, ");
-		else syslog(LOG_ERR, "GIFSave::GIFSave() - Not interlaced, ");
-		switch (prefs->palettemode) {
+		if (fSettings->SetGetBool(GIF_SETTING_INTERLACED))
+			syslog(LOG_ERR, "GIFSave::GIFSave() - Interlaced, ");
+		else
+			syslog(LOG_ERR, "GIFSave::GIFSave() - Not interlaced, ");
+		switch (fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE)) {
 			case WEB_SAFE_PALETTE:
 				syslog(LOG_ERR, "web safe palette\n");
 				break;
@@ -103,20 +108,23 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 		}
 	}
 	
-	if (prefs->usetransparent) {
-		if (prefs->usetransparentauto) {
+	if (fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT)) {
+		if (fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO)) {
 			palette->PrepareForAutoTransparency();
 			if (debug)
 				syslog(LOG_ERR, "GIFSave::GIFSave() - Using transparent index %d\n", 
 					palette->TransparentIndex());
 		} else {
-			palette->SetTransparentColor((uint8)prefs->transparentred,
-									     (uint8)prefs->transparentgreen,
-									     (uint8)prefs->transparentblue);
+			palette->SetTransparentColor(
+				(uint8)fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED),
+				(uint8)fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN),
+				(uint8)fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE));
 			if (debug) {
 				syslog(LOG_ERR, "GIFSave::GIFSave() - Found transparent color %d,%d,%d "
-					"at index %d\n", prefs->transparentred, 
-					prefs->transparentgreen, prefs->transparentblue,
+					"at index %d\n", 
+					fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED),
+					fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN),
+					fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE),
 					palette->TransparentIndex());
 			}
 		}
@@ -128,17 +136,21 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 	this->output = output;
 	this->bitmap = bitmap;
 	WriteGIFHeader();
-	if (debug) syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif header\n");
+	if (debug)
+		syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif header\n");
 		
 	hash = new SFHash(1 << 16);
 	WriteGIFControlBlock();
-	if (debug) syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif control block\n");
+	if (debug)
+		syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif control block\n");
 	WriteGIFImageHeader();
-	if (debug) syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif image header\n");
+	if (debug)
+		syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif image header\n");
 	WriteGIFImageData();
-	if (debug) syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif image data\n");
+	if (debug)
+		syslog(LOG_ERR, "GIFSave::GIFSave() - Wrote gif image data\n");
 	
-	if (prefs->usedithering) {
+	if (fSettings->SetGetBool(GIF_SETTING_USE_DITHERING)) {
 		delete [] &red_error[-1];
 		delete [] &green_error[-1];
 		delete [] &blue_error[-1];
@@ -154,7 +166,7 @@ GIFSave::GIFSave(BBitmap *bitmap, BPositionIO *output)
 GIFSave::~GIFSave()
 {
 	delete palette;
-	delete prefs;
+	fSettings->Release();
 }
 
 // WriteGIFHeader
@@ -204,8 +216,10 @@ void GIFSave::WriteGIFImageHeader()
 	header[7] = height & 0xff;
 	header[8] = (height & 0xff00) >> 8;
 
-	if (prefs->interlaced) header[9] = 0x40;
-	else header[9] = 0x00;
+	if (fSettings->SetGetBool(GIF_SETTING_INTERLACED))
+		header[9] = 0x40;
+	else
+		header[9] = 0x00;
 	output->Write(header, 10);
 }
 
@@ -336,7 +350,9 @@ GIFSave::NextPixel(int pixel)
 {
 	int bpr = bitmap->BytesPerRow();
 	color_space cs = bitmap->ColorSpace();
-	bool useAlphaForTransparency = (prefs->usetransparentauto && cs == B_RGBA32) || cs == B_RGBA32_BIG;
+	bool useAlphaForTransparency = 
+		(fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO) 
+			&& cs == B_RGBA32) || cs == B_RGBA32_BIG;
 	unsigned char r, g, b, a;
 
 	if (cs == B_RGB32 || cs == B_RGBA32) {
@@ -353,22 +369,23 @@ GIFSave::NextPixel(int pixel)
 	gifbits += 4;
 	pos += 4;
 
-	if (!prefs->usetransparent || prefs->usetransparentauto ||
-		r != prefs->transparentred ||
-		g != prefs->transparentgreen ||
-		b != prefs->transparentblue) {
+	if (!fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT) 
+		|| fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO)
+		|| r != fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED)
+		|| g != fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN) 
+		|| b != fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE)) {
 	
-		if (prefs->usedithering) {
-			if (pixel % width == 0) {
+		if (fSettings->SetGetBool(GIF_SETTING_USE_DITHERING)) {
+			if (pixel % width == 0)
 				red_side_error = green_side_error = blue_side_error = 0;
-			}
+
 			b = min_c(255, max_c(0, b - blue_side_error));
 			g = min_c(255, max_c(0, g - green_side_error));
 			r = min_c(255, max_c(0, r - red_side_error));
 		}
 	}
 	
-	if (prefs->interlaced) {
+	if (fSettings->SetGetBool(GIF_SETTING_INTERLACED)) {
 		if (pos >= bpr) {
 			pos = 0;
 			row += gs_increment_pass_by[pass];
@@ -426,11 +443,12 @@ GIFSave::NextPixel(int pixel)
 
 	int index = palette->IndexForColor(r, g, b, useAlphaForTransparency ? a : 255);
 
-	if (index != palette->TransparentIndex() && prefs->usedithering) {
+	if (index != palette->TransparentIndex()
+		&& fSettings->SetGetBool(GIF_SETTING_USE_DITHERING)) {
 		int x = pixel % width;
 		// Don't carry error on to next line when interlaced because
 		// that line won't be adjacent, hence error is meaningless
-		if (prefs->interlaced && x == width - 1) {
+		if (fSettings->SetGetBool(GIF_SETTING_INTERLACED) && x == width - 1) {
 			for (int32 y = -1; y < width + 1; y++) {
 				red_error[y] = 0;
 				green_error[y] = 0;

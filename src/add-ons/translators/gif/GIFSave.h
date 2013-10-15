@@ -20,7 +20,8 @@
 #include <Bitmap.h>
 #include "SavePalette.h"
 #include "SFHash.h"
-#include "Prefs.h"
+
+#include "GIFTranslator.h"
 
 #define HASHSIZE 9973
 #define HASHSTEP 2039
@@ -29,7 +30,7 @@
 
 class GIFSave {
 	public:
-		GIFSave(BBitmap *bitmap, BPositionIO *output);
+		GIFSave(BBitmap* bitmap, BPositionIO* output, TranslatorSettings* settings);
 		~GIFSave();
 
 		bool fatalerror;
@@ -51,7 +52,7 @@ class GIFSave {
 		BBitmap *bitmap;
 		SavePalette *palette;
 		SFHash *hash;
-		Prefs *prefs;
+		TranslatorSettings *fSettings;
 		
 		short *code_value, *prefix_code;
 		unsigned char *append_char;

@@ -15,6 +15,10 @@
 
 // Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
 //                      Maxime Simon, <maxime.simon@gmail.com>
+//			Philippe Saint-Pierre, <stpere@gmail.com>
+
+#include "GIFView.h"
+#include "GIFTranslator.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,31 +28,30 @@
 #include <LayoutBuilder.h>
 #include <String.h>
 
-#include "Prefs.h"
 #include "SavePalette.h"
-
-#include "GIFView.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "GIFView"
 
 
-extern int32 translatorVersion;
-extern char translatorName[];
-
 // constructor
-GIFView::GIFView(const char *name)
-	: BView(name, B_WILL_DRAW)
+GIFView::GIFView(TranslatorSettings* settings)
+	: 
+	BView("GIFView", B_WILL_DRAW),
+	fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BStringView *title = new BStringView("Title", B_TRANSLATE("GIF image translator"));
 	title->SetFont(be_bold_font);
 
-	char version_string[100];
-	sprintf(version_string, "v%d.%d.%d %s", (int)(translatorVersion >> 8),
-		(int)((translatorVersion >> 4) & 0xf), (int)(translatorVersion & 0xf),
-		__DATE__);
+        char version_string[100];
+        snprintf(version_string, sizeof(version_string), B_TRANSLATE("v%d.%d.%d %s"),
+                int(B_TRANSLATION_MAJOR_VERSION(GIF_TRANSLATOR_VERSION)),
+                int(B_TRANSLATION_MINOR_VERSION(GIF_TRANSLATOR_VERSION)),
+                int(B_TRANSLATION_REVISION_VERSION(GIF_TRANSLATOR_VERSION)),
+                __DATE__);
+
 	BStringView *version = new BStringView("Version", version_string);
 
 	const char *copyrightString = "©2003 Daniel Switkin, software@switkin.com";
@@ -74,7 +77,7 @@ GIFView::GIFView(const char *name)
 	int32 count = 2;
 	for (int32 i = 0; i < 8; i++) {
 		BMessage* message = new BMessage(GV_SET_COLOR_COUNT);
-		message->AddInt32("size in bits", i + 1);
+		message->AddInt32(GIF_SETTING_PALETTE_SIZE, i + 1);
 		BString label;
 		label << count;
 		fColorCountMI[i] = new BMenuItem(label.String(), message, 0, 0);
@@ -105,9 +108,7 @@ GIFView::GIFView(const char *name)
  		new BMessage(GV_USE_TRANSPARENT_COLOR));
 
  	fTransparentRedTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_RED));
-
  	fTransparentGreenTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_GREEN));
-
  	fTransparentBlueTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_BLUE));
 
 	BTextView *tr = fTransparentRedTC->TextView();
@@ -163,19 +164,17 @@ GIFView::GIFView(const char *name)
 
 GIFView::~GIFView()
 {
-	delete fPrefs;
+	fSettings->Release();
 }
 
 
 void
 GIFView::RestorePrefs()
 {
-	fPrefs = new Prefs();
-
 	fColorCountMF->SetEnabled(false);
 	fUseDitheringCB->SetEnabled(true);
 
-	switch (fPrefs->palettemode) {
+	switch (fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE)) {
 		case WEB_SAFE_PALETTE:
 			fWebSafeMI->SetMarked(true);
 			break;
@@ -191,35 +190,49 @@ GIFView::RestorePrefs()
 			fColorCountMF->SetEnabled(true);
 			break;
 		default:
-			fPrefs->palettemode = WEB_SAFE_PALETTE;
+			int32 value = WEB_SAFE_PALETTE;
+			fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE, &value);
+			fSettings->SaveSettings();
 			fWebSafeMI->SetMarked(true);
 			break;
 	}
 
-	if (fColorCountMF->IsEnabled() &&
-		fPrefs->palette_size_in_bits > 0 &&
-		fPrefs->palette_size_in_bits <= 8) {
+	if (fColorCountMF->IsEnabled()
+		&& fSettings->SetGetInt32(GIF_SETTING_PALETTE_SIZE) > 0
+		&& fSettings->SetGetInt32(GIF_SETTING_PALETTE_SIZE) <= 8) {
 		// display the stored color count
-		fColorCountMI[fPrefs->palette_size_in_bits - 1]->SetMarked(true);
+		fColorCountMI[fSettings->SetGetInt32(GIF_SETTING_PALETTE_SIZE) - 1]
+			->SetMarked(true);
 	} else {
 		// display 256 colors
 		fColorCount256MI->SetMarked(true);
-		fPrefs->palette_size_in_bits = 8;
+		int32 value = 8;
+		fSettings->SetGetInt32(GIF_SETTING_PALETTE_SIZE, &value);
+		fSettings->SaveSettings();
 	}
 
-	fInterlacedCB->SetValue(fPrefs->interlaced);
+	fInterlacedCB->SetValue(fSettings->SetGetBool(GIF_SETTING_INTERLACED));
 
-	if (fGreyScaleMI->IsMarked()) fUseDitheringCB->SetValue(false);
-	else fUseDitheringCB->SetValue(fPrefs->usedithering);
-	fUseTransparentCB->SetValue(fPrefs->usetransparent);
-	fUseTransparentAutoRB->SetValue(fPrefs->usetransparentauto);
-	fUseTransparentColorRB->SetValue(!fPrefs->usetransparentauto);
-	if (fPrefs->usetransparent) {
+	if (fGreyScaleMI->IsMarked()) 
+		fUseDitheringCB->SetValue(false);
+	else 
+		fUseDitheringCB->SetValue(
+			fSettings->SetGetBool(GIF_SETTING_USE_DITHERING));
+	fUseTransparentCB->SetValue(
+		fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT));
+	fUseTransparentAutoRB->SetValue(
+		fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO));
+	fUseTransparentColorRB->SetValue(
+		!fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO));
+	if (fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT)) {
 		fUseTransparentAutoRB->SetEnabled(true);
 		fUseTransparentColorRB->SetEnabled(true);
-		fTransparentRedTC->SetEnabled(!fPrefs->usetransparentauto);
-		fTransparentGreenTC->SetEnabled(!fPrefs->usetransparentauto);
-		fTransparentBlueTC->SetEnabled(!fPrefs->usetransparentauto);
+		fTransparentRedTC->SetEnabled(
+			!fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO));
+		fTransparentGreenTC->SetEnabled(
+			!fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO));
+		fTransparentBlueTC->SetEnabled(
+			!fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO));
 	} else {
 		fUseTransparentAutoRB->SetEnabled(false);
 		fUseTransparentColorRB->SetEnabled(false);
@@ -229,13 +242,17 @@ GIFView::RestorePrefs()
 	}
 
 	char temp[4];
-	sprintf(temp, "%d", fPrefs->transparentred);
+	sprintf(temp, "%d",
+		(int)fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED));
 	fTransparentRedTC->SetText(temp);
-	sprintf(temp, "%d", fPrefs->transparentgreen);
+	sprintf(temp, "%d",
+		(int)fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN));
 	fTransparentGreenTC->SetText(temp);
-	sprintf(temp, "%d", fPrefs->transparentblue);
+	sprintf(temp, "%d",
+		(int)fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE));
 	fTransparentBlueTC->SetText(temp);
 }
+
 
 // AllAttached
 void
@@ -255,55 +272,80 @@ GIFView::AllAttached()
 	fColorCountM->SetTargetForItems(msgr);
 }
 
+
 // MessageReceived
 void
 GIFView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case GV_WEB_SAFE:
-			fPrefs->palettemode = WEB_SAFE_PALETTE;
+		{
+			int32 value = WEB_SAFE_PALETTE;
+			fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE, &value);
 			fUseDitheringCB->SetEnabled(true);
 			fColorCountMF->SetEnabled(false);
 			fColorCount256MI->SetMarked(true);
 			break;
+		}
 		case GV_BEOS_SYSTEM:
-			fPrefs->palettemode = BEOS_SYSTEM_PALETTE;
+		{
+			int32 value = BEOS_SYSTEM_PALETTE;
+			fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE, &value);
 			fUseDitheringCB->SetEnabled(true);
 			fColorCountMF->SetEnabled(false);
 			fColorCount256MI->SetMarked(true);
 			break;
+		}
 		case GV_GREYSCALE:
-			fPrefs->palettemode = GREYSCALE_PALETTE;
+		{
+			int32 value = GREYSCALE_PALETTE;
+			bool usedithering = false;
+			fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE, &value);
+			fSettings->SetGetBool(GIF_SETTING_USE_DITHERING, &usedithering);
 			fUseDitheringCB->SetEnabled(false);
 			fUseDitheringCB->SetValue(false);
 			fColorCountMF->SetEnabled(false);
 			fColorCount256MI->SetMarked(true);
-			fPrefs->usedithering = false;
 			break;
+		}
 		case GV_OPTIMAL:
-			fPrefs->palettemode = OPTIMAL_PALETTE;
+		{
+			int32 value = OPTIMAL_PALETTE;
+			fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE, &value);
 			fUseDitheringCB->SetEnabled(true);
 			fColorCountMF->SetEnabled(true);
-			fColorCountMI[fPrefs->palette_size_in_bits - 1]->SetMarked(true);
+			fColorCountMI[fSettings->SetGetInt32(GIF_SETTING_PALETTE_SIZE) - 1]
+				->SetMarked(true);
 			break;
+		}
 		case GV_SET_COLOR_COUNT:
 			if (fColorCountMF->IsEnabled()) {
 				int32 sizeInBits;
-				if (message->FindInt32("size in bits", &sizeInBits) >= B_OK) {
+				if (message->FindInt32(GIF_SETTING_PALETTE_SIZE, &sizeInBits)
+					>= B_OK) {
 					if (sizeInBits > 0 && sizeInBits <= 8)
-						fPrefs->palette_size_in_bits = sizeInBits;
+						fSettings->SetGetInt32(GIF_SETTING_PALETTE_SIZE,
+							&sizeInBits);
 				}
 			}
 			break;
 		case GV_INTERLACED:
-			fPrefs->interlaced = fInterlacedCB->Value();
+		{
+			bool value = fInterlacedCB->Value();
+			fSettings->SetGetBool(GIF_SETTING_INTERLACED, &value);
 			break;
+		}
 		case GV_USE_DITHERING:
-			fPrefs->usedithering = fUseDitheringCB->Value();
+		{
+			bool value = fUseDitheringCB->Value();
+			fSettings->SetGetBool(GIF_SETTING_USE_DITHERING, &value);
 			break;
+		}
 		case GV_USE_TRANSPARENT:
-			fPrefs->usetransparent = fUseTransparentCB->Value();
-			if (fPrefs->usetransparent) {
+		{
+			bool value = fUseTransparentCB->Value();
+			fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT, &value);
+			if (value) {
 				fUseTransparentAutoRB->SetEnabled(true);
 				fUseTransparentColorRB->SetEnabled(true);
 				fTransparentRedTC->SetEnabled(fUseTransparentColorRB->Value());
@@ -317,33 +359,50 @@ GIFView::MessageReceived(BMessage *message)
 				fTransparentBlueTC->SetEnabled(false);
 			}
 			break;
+		}
 		case GV_USE_TRANSPARENT_AUTO:
-			fPrefs->usetransparentauto = true;
+		{
+			bool value = true;
+			fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO, &value);
 			fTransparentRedTC->SetEnabled(false);
 			fTransparentGreenTC->SetEnabled(false);
 			fTransparentBlueTC->SetEnabled(false);
 			break;
+		}
 		case GV_USE_TRANSPARENT_COLOR:
-			fPrefs->usetransparentauto = false;
+		{
+			bool value = false;
+			fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO, &value);
 			fTransparentRedTC->SetEnabled(true);
 			fTransparentGreenTC->SetEnabled(true);
 			fTransparentBlueTC->SetEnabled(true);
 			break;
+		}
 		case GV_TRANSPARENT_RED:
-			fPrefs->transparentred = CheckInput(fTransparentRedTC);
+		{	
+			int32 value = CheckInput(fTransparentRedTC);
+			fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED, &value);
 			break;
+		}
 		case GV_TRANSPARENT_GREEN:
-			fPrefs->transparentgreen = CheckInput(fTransparentGreenTC);
+		{
+			int32 value = CheckInput(fTransparentGreenTC);
+			fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN, &value);
 			break;
+		}
 		case GV_TRANSPARENT_BLUE:
-			fPrefs->transparentblue = CheckInput(fTransparentBlueTC);
+		{
+			int32 value = CheckInput(fTransparentBlueTC);
+			fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE, &value);
 			break;
+		}
 		default:
 			BView::MessageReceived(message);
 			break;
 	}
-	fPrefs->Save();
+	fSettings->SaveSettings();
 }
+
 
 int GIFView::CheckInput(BTextControl *control) {
 	int value = atoi(control->Text());

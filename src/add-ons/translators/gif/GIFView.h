@@ -14,11 +14,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+//			Philippe Saint-Pierre, 2013, <stpere@gmail.com>
 
 #ifndef GIFVIEW_H
 #define GIFVIEW_H
 
 #include <View.h>
+#include "TranslatorSettings.h"
 
 class BMenuField;
 class BPopUpMenu;
@@ -26,7 +28,6 @@ class BMenuItem;
 class BCheckBox;
 class BRadioButton;
 class BTextControl;
-class Prefs;
 
 #define GV_WEB_SAFE					'gvws'
 #define GV_BEOS_SYSTEM				'gvbe'
@@ -42,9 +43,12 @@ class Prefs;
 #define GV_TRANSPARENT_BLUE			'gvtb'
 #define GV_SET_COLOR_COUNT			'gvcc'
 
+
+const BRect kRectView(110, 110, 339, 339);
+
 class GIFView : public BView {
  public:
-							GIFView(const char* name);
+							GIFView(TranslatorSettings* settings);
 	virtual					~GIFView();
 
 	virtual	void			MessageReceived(BMessage* message);
@@ -54,7 +58,7 @@ class GIFView : public BView {
 			void			RestorePrefs();
 			int				CheckInput(BTextControl* control);
 
-		Prefs*				fPrefs;
+		TranslatorSettings*		fSettings;
 
 		BMenuField*			fPaletteMF;
 		BPopUpMenu*			fPaletteM;
