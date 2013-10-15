@@ -16,6 +16,7 @@ local libFDTSources =
 
 KernelMergeObject kernel_platform_u-boot.o :
 	platform.cpp
+	fdt_serial.cpp
 	fdt_support.cpp
 	openfirmware.cpp
 	$(libFDTSources)
