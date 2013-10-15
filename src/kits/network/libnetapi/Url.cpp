@@ -659,7 +659,14 @@ BUrl::_ExtractAuthority(const BString& urlString, int16* origin)
 	(*origin) += 2;
 
 
-	int16 userInfoEnd = urlString.FindFirst('@', *origin);
+	int32 userInfoEnd = urlString.FindFirst('@', *origin);
+
+	// if the @ comes after a /, it can't be the delimiter for
+	// user:pasword@host. Characters /:@ in user and password must be escaped.
+	// RFC1738, 3.1, Common Internet Scheme Syntax.
+	int32 nextSlash = urlString.FindFirst('/', *origin);
+	if(userInfoEnd > nextSlash)
+		userInfoEnd = -1;
 
 	// URL contains userinfo field
 	if (userInfoEnd != -1) {
