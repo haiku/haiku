@@ -184,6 +184,12 @@ start_raw(int argc, const char **argv)
 	args.platform.fdt_data = NULL;
 	args.platform.fdt_size = 0;
 
+	if (argv) {
+		// skip the kernel name
+		args.arguments = ++argv;
+		args.arguments_count = --argc;
+	}
+
 	// if we get passed a uimage, try to find the third blob only if we do not have FDT data yet
 	if (gUImage != NULL
 		&& !gFDT
@@ -211,7 +217,7 @@ start_raw(int argc, const char **argv)
 		args.platform.fdt_size = fdt_totalsize(gFDT);
 	}
 
-	// if we get passed an FDT, check /chosen for initrd
+	// if we get passed an FDT, check /chosen for initrd and bootargs
 	if (gFDT != NULL) {
 		int node = fdt_path_offset(gFDT, "/chosen");
 		const void *prop;
@@ -230,6 +236,14 @@ start_raw(int argc, const char **argv)
 				args.platform.boot_tgz_size = initrd_end - initrd_start;
 		dprintf("Found boot tgz from FDT @ %p, %" B_PRIu32 " bytes\n",
 			args.platform.boot_tgz_data, args.platform.boot_tgz_size);
+			}
+			prop = fdt_getprop(gFDT, node, "bootargs", &len);
+			if (prop) {
+				dprintf("Found bootargs: %s\n", (const char *)prop);
+				static const char *sArgs[] = { NULL, NULL };
+				sArgs[0] = (const char *)prop;
+				args.arguments = sArgs;
+				args.arguments_count = 1;
 			}
 		}
 	}
