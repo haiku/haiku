@@ -22,9 +22,20 @@ PackageAction::PackageAction(int32 type, PackageInfoRef package, Model* model)
 	fType(type),
 	fModel(model)
 {
+	const PackageInstallationLocationSet& locations
+		= package->InstallationLocations();
+
+	int32 location = B_PACKAGE_INSTALLATION_LOCATION_HOME;
+	// if the package is already installed, use its first installed location
+	// to initialize the manager.
+	// TODO: ideally if the package is installed at multiple locations,
+	// the user should be able to pick which one to remove.
+	if (locations.size() != 0)
+		location = *locations.begin();
+
 	// TODO: allow configuring the installation location
 	fPackageManager = new(std::nothrow) PackageManager(
-		B_PACKAGE_INSTALLATION_LOCATION_HOME);
+		(BPackageInstallationLocation)location);
 }
 
 
