@@ -67,6 +67,7 @@ void
 BUrlProtocolListener::DebugMessage(BUrlRequest* caller,
 	BUrlProtocolDebugMessage type, const char* text)
 {
+#ifdef DEBUG
 	switch (type) {
 		case B_URL_PROTOCOL_DEBUG_TEXT:
 			cout << "   ";
@@ -88,4 +89,5 @@ BUrlProtocolListener::DebugMessage(BUrlRequest* caller,
 	}
 	
 	cout << " " << caller->Protocol() << ": " << text << endl;
+#endif
 }

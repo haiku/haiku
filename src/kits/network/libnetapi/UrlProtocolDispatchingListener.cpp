@@ -127,5 +127,10 @@ BUrlProtocolDispatchingListener::_SendMessage(BMessage* message,
 	message->AddPointer(kUrlProtocolCaller, caller);
 	message->AddInt8(kUrlProtocolMessageType, notification);
 
-	ASSERT(fMessenger.SendMessage(message) == B_OK);
+#ifdef DEBUG
+	status_t result = fMessenger.SendMessage(message);
+	ASSERT(result == B_OK);
+#else
+	fMessenger.SendMessage(message);
+#endif
 }
