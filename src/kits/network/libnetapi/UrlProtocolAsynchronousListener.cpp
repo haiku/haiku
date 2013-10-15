@@ -20,6 +20,7 @@ BUrlProtocolAsynchronousListener::BUrlProtocolAsynchronousListener(
 	bool transparent) 
 	:
 	BHandler("UrlProtocolAsynchronousListener"),
+	BUrlProtocolListener(),
 	fSynchronousListener(NULL)
 {
 	if (be_app->Lock()) {
@@ -42,57 +43,6 @@ BUrlProtocolAsynchronousListener::~BUrlProtocolAsynchronousListener()
 		be_app->Unlock();
 	}
 	delete fSynchronousListener;
-}
-
-
-void
-BUrlProtocolAsynchronousListener::ConnectionOpened(BUrlRequest*)
-{
-}
-
-
-void
-BUrlProtocolAsynchronousListener::HostnameResolved(BUrlRequest*, const char*)
-{
-}
-
-
-void
-BUrlProtocolAsynchronousListener::ResponseStarted(BUrlRequest*)
-{
-}
-
-
-void
-BUrlProtocolAsynchronousListener::HeadersReceived(BUrlRequest*)
-{
-}
-
-
-void
-BUrlProtocolAsynchronousListener::DataReceived(BUrlRequest*, const char*,
-	ssize_t)
-{
-}
-
-
-void
-BUrlProtocolAsynchronousListener::DownloadProgress(BUrlRequest*, ssize_t,
-	ssize_t)
-{
-}
-
-
-void
-BUrlProtocolAsynchronousListener::UploadProgress(BUrlRequest*, ssize_t,
-	ssize_t)
-{
-}
-
-
-void
-BUrlProtocolAsynchronousListener::RequestCompleted(BUrlRequest*, bool)
-{
 }
 
 
