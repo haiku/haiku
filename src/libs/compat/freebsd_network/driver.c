@@ -42,14 +42,13 @@ int32 gDeviceCount;
 
 
 static status_t
-init_root_device(driver_t *driver, device_t *_root, device_t *_child)
+init_root_device(device_t *_root)
 {
 	static driver_t sRootDriver = {
 		"pci",
 		NULL,
 		sizeof(struct root_device_softc)
 	};
-	device_t child;
 
 	device_t root = device_add_child(NULL, NULL, 0);
 	if (root == NULL)
@@ -65,14 +64,21 @@ init_root_device(driver_t *driver, device_t *_root, device_t *_child)
 	root->driver = &sRootDriver;
 	root->root = root;
 
-	child = device_add_child(root, driver->name, 0);
+	if (_root != NULL)
+		*_root = root;
+
+	return B_OK;
+}
+
+
+static status_t
+add_child_device(driver_t *driver, device_t root, device_t *_child)
+{
+	device_t child = device_add_child(root, driver->name, 0);
 	if (child == NULL) {
-		device_delete_child(NULL, root);
 		return B_ERROR;
 	}
 
-	if (_root != NULL)
-		*_root = root;
 	if (_child != NULL)
 		*_child = child;
 
@@ -94,51 +100,53 @@ status_t
 _fbsd_init_hardware(driver_t *drivers[])
 {
 	status_t status = B_ENTRY_NOT_FOUND;
-	int index;
+	device_t root;
+	pci_info *info;
+	driver_t *driver = NULL;
+	int i = 0;
 
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&gPci) < B_OK)
 		return B_ERROR;
 
-	for (index = 0; status != B_OK && drivers[index]; index++) {
-		device_t child, root;
-		pci_info *info;
-		int i;
+	status = init_root_device(&root);
+	if (status != B_OK)
+		goto err;
 
-		if (init_root_device(drivers[index], &root, &child) != B_OK) {
-			dprintf("%s: creating device failed.\n", gDriverName);
-			put_module(B_PCI_MODULE_NAME);
-			return B_ERROR;
-		}
+	for (info = get_pci_info(root); gPci->get_nth_pci_info(i, info) == B_OK;
+		i++) {
+		int index;
+		driver = NULL;
 
-		TRACE(("%s: init_hardware(%p)\n", gDriverName, drivers[index]));
-
-		if (child->methods.probe == NULL) {
-			dprintf("%s: driver has no device_probe method.\n", gDriverName);
-			device_delete_child(NULL, root);
-			put_module(B_PCI_MODULE_NAME);
-			return B_ERROR;
-		}
-
-		info = get_pci_info(root);
-
-		for (i = 0; gPci->get_nth_pci_info(i, info) == B_OK; i++) {
+		for (index = 0; drivers[index] && gDeviceCount < MAX_DEVICES
+			&& driver == NULL; index++) {
 			int result;
-			result = child->methods.probe(child);
+			device_t device;
+			status = add_child_device(drivers[index], root, &device);
+			if (status < B_OK)
+				break;
+
+			result = device->methods.probe(device);
 			if (result >= 0) {
 				TRACE(("%s, found %s at %d\n", gDriverName,
-					device_get_desc(child), i));
-				status = B_OK;
-				break;
+					device_get_desc(device), i));
+				driver = drivers[index];
 			}
+			device_delete_child(root, device);
 		}
 
-		device_delete_child(NULL, root);
+		if (driver != NULL)
+			break;
 	}
 
-	if (status < B_OK)
-		TRACE(("%s: no hardware found.\n", gDriverName));
+	device_delete_child(NULL, root);
 
+	if (driver == NULL) {
+		status = B_ERROR;
+		TRACE(("%s: no hardware found.\n", gDriverName));
+	}
+err:
 	put_module(B_PCI_MODULE_NAME);
+	TRACE(("%s: status 0x%lx\n", gDriverName, status));
 
 	return status;
 }
@@ -150,8 +158,8 @@ _fbsd_init_drivers(driver_t *drivers[])
 	status_t status;
 	int i = 0;
 	int index = 0;
-
-	dprintf("%s: init_driver(%p)\n", gDriverName, drivers[index]);
+	pci_info *info;
+	device_t root;
 
 	status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPci);
 	if (status < B_OK)
@@ -189,42 +197,53 @@ _fbsd_init_drivers(driver_t *drivers[])
 	if (status < B_OK)
 		goto err6;
 
-	while (drivers[index] && gDeviceCount < MAX_DEVICES) {
-		device_t root, device;
-		bool found = false;
-		pci_info *info;
+	status = init_root_device(&root);
+	if (status != B_OK)
+		goto err7;
 
-		status = init_root_device(drivers[index], &root, &device);
-		if (status < B_OK)
-			break;
+	for (info = get_pci_info(root); gPci->get_nth_pci_info(i, info) == B_OK;
+		i++) {
+		int best = 0;
+		driver_t *driver = NULL;
 
-		info = get_pci_info(root);
+		for (index = 0; drivers[index] && gDeviceCount < MAX_DEVICES; index++) {
+			int result;
+			device_t device;
+			status = add_child_device(drivers[index], root, &device);
+			if (status < B_OK)
+				break;
 
-		for (; gPci->get_nth_pci_info(i, info) == B_OK; i++) {
-			if (device->methods.probe(device) < 0)
-				continue;
-
-			if (device_attach(device) == 0)
-				found = true;
-
-			i++;
-			break;
+			result = device->methods.probe(device);
+			if (result >= 0 && (driver == NULL || result > best)) {
+				TRACE(("%s, found %s at %d (%d)\n", gDriverName,
+					device_get_desc(device), i, result));
+				driver = drivers[index];
+				best = result;
+			}
+			device_delete_child(root, device);
 		}
 
-		if (!found) {
-			device_delete_child(NULL, root);
-			i = 0;
-			if (drivers[++index])
-				dprintf("%s: init_driver(%p)\n", gDriverName, drivers[index]);
+		if (driver != NULL) {
+			device_t device;
+			status = add_child_device(driver, root, &device);
+			if (status != B_OK)
+				break;
+			if (device_attach(device) == 0) {
+				dprintf("%s: init_driver(%p) at %d\n", gDriverName, driver, i);
+			} else
+				device_delete_child(root, device);
 		}
 	}
 
 	if (gDeviceCount > 0)
 		return B_OK;
 
+	device_delete_child(NULL, root);
+
 	if (status == B_OK)
 		status = B_ERROR;
 
+err7:
 	uninit_wlan_stack();
 
 err6:
