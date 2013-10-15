@@ -56,6 +56,7 @@ parse_multiboot_commandline(stage2_args *args)
 
 	sArgs[0] = cmdline;
 	args->arguments = sArgs;
+	args->arguments_count = 1;
 
 	return B_OK;
 }

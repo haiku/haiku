@@ -131,6 +131,7 @@ start(uint64 cfeHandle, uint64 cfeEntry)
 		static const char *sArgs[] = { NULL, NULL };
 		sArgs[0] = (const char *)bootargs;
 		args.arguments = sArgs;
+		args.arguments_count = 1;
 	}
 #endif
 

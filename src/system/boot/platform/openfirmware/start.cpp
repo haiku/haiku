@@ -162,6 +162,7 @@ start(void *openFirmwareEntry)
 		static const char *sArgs[] = { NULL, NULL };
 		sArgs[0] = (const char *)bootargs;
 		args.arguments = sArgs;
+		args.arguments_count = 1;
 	}
 
 	determine_machine();
