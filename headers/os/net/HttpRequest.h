@@ -29,7 +29,7 @@ public:
 									BUrlContext* context = NULL);
 	virtual						~BHttpRequest();
 
-            void                SetMethod(int8 method);
+            void                SetMethod(const char* const method);
             void                SetFollowLocation(bool follow);
             void                SetMaxRedirections(int8 maxRedirections);
             void                SetReferrer(const BString& referrer);
@@ -74,7 +74,7 @@ private:
 			BNetworkAddress		fRemoteAddr;
 			bool				fSSL;
 
-			int8				fRequestMethod;
+			BString				fRequestMethod;
 			int8				fHttpVersion;
 
 			BString				fOutputBuffer;
@@ -123,14 +123,14 @@ enum {
 
 
 // Request method
-enum {
-	B_HTTP_GET = 1,
-	B_HTTP_POST,
-	B_HTTP_PUT,
-	B_HTTP_HEAD,
-	B_HTTP_DELETE,
-	B_HTTP_OPTIONS
-};
+const char* const B_HTTP_GET = "GET";
+const char* const B_HTTP_POST = "POST";
+const char* const B_HTTP_PUT = "PUT";
+const char* const B_HTTP_HEAD = "HEAD";
+const char* const B_HTTP_DELETE = "DELETE";
+const char* const B_HTTP_OPTIONS = "OPTIONS";
+const char* const B_HTTP_TRACE = "TRACE";
+const char* const B_HTTP_CONNECT = "CONNECT";
 
 
 // HTTP Version

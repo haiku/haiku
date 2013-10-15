@@ -58,7 +58,7 @@ BHttpRequest::~BHttpRequest()
 
 
 void
-BHttpRequest::SetMethod(int8 method)
+BHttpRequest::SetMethod(const char* const method)
 {
 	fRequestMethod = method;
 }
@@ -265,7 +265,8 @@ BHttpRequest::_ProtocolLoop()
 
 		if (!_ResolveHostName()) {
 			_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR,
-				"Unable to resolve hostname, aborting.");
+				"Unable to resolve hostname (%s), aborting.",
+					fUrl.Host().String());
 			return B_PROT_CANT_RESOLVE_HOSTNAME;
 		}
 
@@ -732,22 +733,7 @@ BHttpRequest::_ParseHeaders()
 void
 BHttpRequest::_CreateRequest()
 {
-	BString request;
-
-	switch (fRequestMethod) {
-		case B_HTTP_POST:
-			request << "POST";
-			break;
-
-		case B_HTTP_PUT:
-			request << "PUT";
-			break;
-
-		default:
-		case B_HTTP_GET:
-			request << "GET";
-			break;
-	}
+	BString request(fRequestMethod);
 
 	if (Url().HasPath())
 		request << ' ' << Url().Path();
@@ -804,21 +790,7 @@ BHttpRequest::_AddHeaders()
 
 	// Authentication
 	if (fAuthentication.Method() != B_HTTP_AUTHENTICATION_NONE) {
-		BString request;
-		switch (fRequestMethod) {
-			case B_HTTP_POST:
-				request = "POST";
-				break;
-
-			case B_HTTP_PUT:
-				request = "PUT";
-				break;
-
-			default:
-			case B_HTTP_GET:
-				request = "GET";
-				break;
-		}
+		BString request(fRequestMethod);
 
 		fOutputHeaders.AddHeader("Authorization",
 			fAuthentication.Authorization(fUrl, request));
