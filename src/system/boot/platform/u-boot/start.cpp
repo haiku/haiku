@@ -190,7 +190,8 @@ start_raw(int argc, const char **argv)
 		args.arguments_count = --argc;
 	}
 
-	// if we get passed a uimage, try to find the third blob only if we do not have FDT data yet
+	// if we get passed a uimage, try to find the third blob
+	// only if we do not have FDT data yet
 	if (gUImage != NULL
 		&& !gFDT
 		&& image_multi_getimg(gUImage, 2,
@@ -234,8 +235,8 @@ start_raw(int argc, const char **argv)
 			if (initrd_end > initrd_start) {
 				args.platform.boot_tgz_data = (void *)initrd_start;
 				args.platform.boot_tgz_size = initrd_end - initrd_start;
-		dprintf("Found boot tgz from FDT @ %p, %" B_PRIu32 " bytes\n",
-			args.platform.boot_tgz_data, args.platform.boot_tgz_size);
+				dprintf("Found boot tgz from FDT @ %p, %" B_PRIu32 " bytes\n",
+					args.platform.boot_tgz_data, args.platform.boot_tgz_size);
 			}
 			prop = fdt_getprop(gFDT, node, "bootargs", &len);
 			if (prop) {
