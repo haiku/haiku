@@ -75,6 +75,15 @@ static uint32 sCpuRendezvous3;
 static int32 main2(void *);
 
 
+static void
+non_boot_cpu_init(void* args, int currentCPU)
+{
+	kernel_args* kernelArgs = (kernel_args*)args;
+	if (currentCPU != 0)
+		cpu_init_percpu(kernelArgs, currentCPU);
+}
+
+
 extern "C" int
 _start(kernel_args *bootKernelArgs, int currentCPU)
 {
@@ -149,6 +158,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		int_init_post_vm(&sKernelArgs);
 		cpu_init_post_vm(&sKernelArgs);
 		commpage_init();
+		call_all_cpus_sync(non_boot_cpu_init, &sKernelArgs);
+
 		TRACE("init system info\n");
 		system_info_init(&sKernelArgs);
 
@@ -229,7 +240,6 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		arch_cpu_global_TLB_invalidate();
 
 		// this is run for each non boot processor after they've been set loose
-		cpu_init_percpu(&sKernelArgs, currentCPU);
 		smp_per_cpu_init(&sKernelArgs, currentCPU);
 
 		// wait for all other AP cpus to get to this point
