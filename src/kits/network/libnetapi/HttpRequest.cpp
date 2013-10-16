@@ -301,7 +301,7 @@ BHttpRequest::_ProtocolLoop()
 				if (fResult.StatusCode() == B_HTTP_STATUS_MOVED_PERMANENTLY) {
 					BString locationUrl = fHeaders["Location"];
 
-					fUrl.Redirect(locationUrl);
+					fUrl = BUrl(fUrl, locationUrl);
 
 					if (--maxRedirs > 0) {
 						newRequest = true;

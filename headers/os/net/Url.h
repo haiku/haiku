@@ -16,6 +16,7 @@ public:
 								BUrl(const char* url);
 								BUrl(BMessage* archive);
 								BUrl(const BUrl& other);
+								BUrl(const BUrl& base, const BString& relative);
 								BUrl();
 	virtual						~BUrl();
 
@@ -24,12 +25,12 @@ public:
 			BUrl&				SetProtocol(const BString& scheme);
 			BUrl&				SetUserName(const BString& user);
 			BUrl&				SetPassword(const BString& password);
+			void				SetAuthority(const BString& authority);
 			BUrl&				SetHost(const BString& host);
 			BUrl&				SetPort(int port);
 			BUrl&				SetPath(const BString& path);
 			BUrl&				SetRequest(const BString& request);
 			BUrl&				SetFragment(const BString& fragment);
-			void				Redirect(const BString& newLocation);
 			
 	// URL fields access
 			const BString&		UrlString() const;
@@ -88,7 +89,6 @@ public:
 private:
 			void				_ResetFields();
 			void				_ExplodeUrlString(const BString& urlString);
-			void				_ExplodeAuthority();
 
 	static	BString				_DoUrlEncodeChunk(const BString& chunk, 
 									bool strict, bool directory = false);
