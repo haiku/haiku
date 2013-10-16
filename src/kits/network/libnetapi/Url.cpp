@@ -7,12 +7,15 @@
  */
 
 
+#include <Url.h>
+
 #include <ctype.h>
 #include <cstdio>
 #include <cstdlib>
 #include <new>
 
-#include <Url.h>
+#include <RegExp.h>
+
 
 static const char* kArchivedUrl = "be:url string";
 
@@ -611,71 +614,69 @@ BUrl::_ResetFields()
 void
 BUrl::_ExplodeUrlString(const BString& url)
 {
-	int16 urlIndex = 0;
+	// The regexp is provided in RFC3986 (URI generic syntax), Appendix B
+	static RegExp urlMatcher(
+		"^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
 	_ResetFields();
 
-	_ExtractProtocol(url, &urlIndex);
-	_ExtractAuthority(url, &urlIndex);
-	_ExtractPath(url, &urlIndex);
-	_ExtractRequestAndFragment(url, &urlIndex);
-}
+	RegExp::MatchResult match = urlMatcher.Match(url.String());
 
+	if(!match.HasMatched())
+		return; // TODO error reporting
 
-void
-BUrl::_ExtractProtocol(const BString& urlString, int16* origin)
-{
-	int16 firstColon = urlString.FindFirst(':', *origin);
-
-	// If no colon is found, assume the protocol
-	// is not present
-	if (firstColon == -1) 
-		return;
-	else {
-		urlString.CopyInto(fProtocol, *origin, firstColon - *origin);
-		*origin = firstColon + 1;
-	}
-
+	// Scheme/Protocol
+	url.CopyInto(fProtocol, match.GroupStartOffsetAt(1),
+		match.GroupEndOffsetAt(1) - match.GroupStartOffsetAt(1));
 	if (!_IsProtocolValid()) {
 		fHasProtocol = false;
 		fProtocol.Truncate(0);
 	} else
 		fHasProtocol = true;
+
+	// Authority (including user credentials, host, and port
+	url.CopyInto(fAuthority, match.GroupStartOffsetAt(3),
+		match.GroupEndOffsetAt(3) - match.GroupStartOffsetAt(3));
+	_ExplodeAuthority();
+
+	// Path
+	url.CopyInto(fPath, match.GroupStartOffsetAt(4),
+		match.GroupEndOffsetAt(4) - match.GroupStartOffsetAt(4));
+	if(!fPath.IsEmpty())
+		fHasPath = true;
+
+	// Query
+	url.CopyInto(fRequest, match.GroupStartOffsetAt(6),
+		match.GroupEndOffsetAt(6) - match.GroupStartOffsetAt(6));
+	if(!fRequest.IsEmpty())
+		fHasRequest = true;
+
+	// Fragment
+	url.CopyInto(fFragment, match.GroupStartOffsetAt(8),
+		match.GroupEndOffsetAt(8) - match.GroupStartOffsetAt(8));
+	if(!fFragment.IsEmpty())
+		fHasFragment = true;
 }
 
 
 void
-BUrl::_ExtractAuthority(const BString& urlString, int16* origin)
+BUrl::_ExplodeAuthority()
 {
-	// URI doesn't contain an authority field
-	if (urlString.FindFirst("//", *origin) != *origin)
+	if(fAuthority.IsEmpty())
 		return;
 
 	fHasAuthority = true;
 
-//	while (urlString.ByteAt(*origin) == '/')
-//		(*origin)++;
-
-	(*origin) += 2;
-
-
-	int32 userInfoEnd = urlString.FindFirst('@', *origin);
-
-	// if the @ comes after a /, it can't be the delimiter for
-	// user:pasword@host. Characters /:@ in user and password must be escaped.
-	// RFC1738, 3.1, Common Internet Scheme Syntax.
-	int32 nextSlash = urlString.FindFirst('/', *origin);
-	if(userInfoEnd > nextSlash)
-		userInfoEnd = -1;
+	int32 userInfoEnd = fAuthority.FindFirst('@');
 
 	// URL contains userinfo field
 	if (userInfoEnd != -1) {
 		BString userInfo;
-		urlString.CopyInto(userInfo, *origin, userInfoEnd - *origin);
+		fAuthority.CopyInto(userInfo, 0, userInfoEnd);
 
 		int16 colonDelimiter = userInfo.FindFirst(':', 0);
 
-		if (colonDelimiter == *origin) {
+		if (colonDelimiter == 0) {
 			fHasPassword = true;
 			fPassword = userInfo;
 		} else if (colonDelimiter != -1) {
@@ -691,94 +692,39 @@ BUrl::_ExtractAuthority(const BString& urlString, int16* origin)
 		}
 
 		fHasUserInfo = true;
-		*origin = userInfoEnd + 1;
 	}
 
 
 	// Extract the host part
-	int16 hostEnd = *origin;
+	int16 hostEnd = fAuthority.FindFirst(':', userInfoEnd);
+	userInfoEnd++;
 
-	while (hostEnd < urlString.Length()
-		&& !_IsAuthorityTerminator(urlString.ByteAt(hostEnd))
-		&& urlString.ByteAt(hostEnd) != ':') {
-		hostEnd++;
+	if(hostEnd < 0)
+	{
+		// no ':' found, the host extends to the end of the URL
+		hostEnd = fAuthority.Length() + 1;
 	}
 
 	// The host is likely to be present if an authority is
 	// defined, but in some weird cases, it's not.
-	if (hostEnd != *origin) {
-		urlString.CopyInto(fHost, *origin, hostEnd - *origin);
-
-		*origin = hostEnd;
+	if (hostEnd != userInfoEnd) {
+		fAuthority.CopyInto(fHost, userInfoEnd, hostEnd - userInfoEnd);
 		fHasHost = true;
 	}
 
 	// Extract the port part
 	fPort = 0;
-	if (urlString.ByteAt(*origin) == ':') {
-		int16 portEnd = ++(*origin);
-
-		while (portEnd < urlString.Length()
-			&& !_IsAuthorityTerminator(urlString.ByteAt(portEnd)))
-			portEnd++;
+	if (fAuthority.ByteAt(hostEnd) == ':') {
+		hostEnd++;
+		int16 portEnd = fAuthority.Length();
 
 		BString portString;
-		urlString.CopyInto(portString, *origin, portEnd - *origin);
+		fAuthority.CopyInto(portString, hostEnd, portEnd - hostEnd);
 		fPort = atoi(portString.String());
 
 		//  Even if the port is invalid, the URL is considered to
 		// have a port.
 		fHasPort = portString.Length() > 0;
-		*origin = portEnd;
-	}
-}
-
-
-void
-BUrl::_ExtractPath(const BString& urlString, int16* origin)
-{
-	// Extract path from URL
-	if (urlString.ByteAt(*origin) == '/' || !HasAuthority()) {
-		int16 pathEnd = *origin;
-
-		while (pathEnd < urlString.Length()
-				&& !_IsPathTerminator(urlString.ByteAt(pathEnd))) {
-				pathEnd++;
-		}
-
-		urlString.CopyInto(fPath, *origin, pathEnd - *origin);
-
-		*origin = pathEnd;
-		fHasPath = true;
-	}
-}
-
-
-void
-BUrl::_ExtractRequestAndFragment(const BString& urlString, int16* origin)
-{
-	// Extract request field from URL
-	if (urlString.ByteAt(*origin) == '?') {
-		(*origin)++;
-		int16 requestEnd = urlString.FindFirst('#', *origin);
-
-		fHasRequest = true;
-
-		if (requestEnd == -1) {
-			urlString.CopyInto(fRequest, *origin, urlString.Length() - *origin);
-			return;
-		} else {
-			urlString.CopyInto(fRequest, *origin, requestEnd - *origin);
-			*origin = requestEnd;
-		}
-	}
-
-	// Extract fragment field if needed
-	if (urlString.ByteAt(*origin) == '#') {
-		(*origin)++;
-		urlString.CopyInto(fFragment, *origin, urlString.Length() - *origin);
-
-		fHasFragment = true;
 	}
 }
 
@@ -843,36 +789,6 @@ BUrl::_IsProtocolValid()
 	}
 
 	return true;
-}
-
-
-bool
-BUrl::_IsAuthorityTerminator(char c)
-{
-	if (c == '/' || _IsPathTerminator(c))
-		return true;
-	else
-		return false;
-}
-
-
-bool
-BUrl::_IsPathTerminator(char c)
-{
-	if (c == '?' || _IsRequestTerminator(c))
-		return true;
-	else
-		return false;
-}
-
-
-bool
-BUrl::_IsRequestTerminator(char c)
-{
-	if (c == '#')
-		return true;
-	else
-		return false;
 }
 
 

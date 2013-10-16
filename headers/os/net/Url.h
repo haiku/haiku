@@ -88,15 +88,7 @@ public:
 private:
 			void				_ResetFields();
 			void				_ExplodeUrlString(const BString& urlString);
-
-			void				_ExtractProtocol(const BString& urlString, 
-									int16* origin);
-			void				_ExtractAuthority(const BString& urlString, 
-									int16* origin);
-			void				_ExtractPath(const BString& urlString, 
-									int16* origin);
-			void				_ExtractRequestAndFragment(
-									const BString& urlString, int16* origin);
+			void				_ExplodeAuthority();
 
 	static	BString				_DoUrlEncodeChunk(const BString& chunk, 
 									bool strict, bool directory = false);
@@ -104,9 +96,6 @@ private:
 									bool strict);
 
 			bool				_IsProtocolValid();
-	static	bool				_IsAuthorityTerminator(char c);
-	static	bool				_IsPathTerminator(char c);
-	static	bool				_IsRequestTerminator(char c);
 	static	bool				_IsUnreserved(char c);
 	static	bool				_IsGenDelim(char c);
 	static	bool				_IsSubDelim(char c);
