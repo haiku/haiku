@@ -154,40 +154,17 @@ struct RegExp::MatchResultData : public BReferenceable {
 		fMatchCount(0),
 		fMatches(NULL)
 	{
-		// Do the matching: Since we need to provide a buffer for the matches
-		// for regexec() to fill in, but don't know the number of matches
-		// beforehand, we need to guess and retry with a larger buffer, if it
-		// wasn't large enough.
-		size_t maxMatchCount = 32;
-		for (;;) {
-			fMatches = new regmatch_t[maxMatchCount];
-			if (regexec(compiledExpression, string, maxMatchCount, fMatches, 0)
-					!= 0) {
-				delete[] fMatches;
-				fMatches = NULL;
-				fMatchCount = 0;
-				break;
-			}
-
-			if (fMatches[maxMatchCount - 1].rm_so == -1) {
-				// determine the match count
-				size_t lower = 0;
-				size_t upper = maxMatchCount;
-				while (lower < upper) {
-					size_t mid = (lower + upper) / 2;
-					if (fMatches[mid].rm_so == -1)
-						upper = mid;
-					else
-						lower = mid + 1;
-				}
-				fMatchCount = lower;
-				break;
-			}
-
-			// buffer too small -- try again with larger buffer
+		// fMatchCount is always set to the number of matching groups in the
+		// expression (or 0 if an error occured). Some of the "matches" in
+		// the array may still point to the (-1,-1) range if they don't
+		// actually match anything.
+		fMatchCount = compiledExpression->re_nsub + 1;
+		fMatches = new regmatch_t[fMatchCount];
+		if (regexec(compiledExpression, string, fMatchCount, fMatches, 0)
+				!= 0) {
 			delete[] fMatches;
 			fMatches = NULL;
-			maxMatchCount *= 2;
+			fMatchCount = 0;
 		}
 	}
 
