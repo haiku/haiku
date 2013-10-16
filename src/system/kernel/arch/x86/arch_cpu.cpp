@@ -131,7 +131,6 @@ static uint32 sHierarchyShift[CPU_TOPOLOGY_LEVELS];
 
 /* Cache topology information */
 static uint32 sCacheSharingMask[CPU_MAX_CACHE_LEVEL];
-static uint32 sCacheLevelCount;
 
 
 static status_t
@@ -611,7 +610,7 @@ detect_amd_cache_topology(uint32 maxExtendedLeaf)
 
 	for (int i = 0; i < maxCacheLevel; i++)
 		sCacheSharingMask[i] = ~uint32(hierarchyLevels[i] - 1);
-	sCacheLevelCount = maxCacheLevel;
+	gCPUCacheLevelCount = maxCacheLevel;
 }
 
 
@@ -725,7 +724,7 @@ detect_intel_cache_topology(uint32 maxBasicLeaf)
 	for (int i = 0; i < maxCacheLevel; i++)
 		sCacheSharingMask[i] = ~uint32(hierarchyLevels[i] - 1);
 
-	sCacheLevelCount = maxCacheLevel;
+	gCPUCacheLevelCount = maxCacheLevel;
 }
 
 
@@ -789,7 +788,7 @@ detect_cpu_topology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
 		= get_topology_level_id(topologyID, CPU_TOPOLOGY_PACKAGE);
 
 	unsigned int i;
-	for (i = 0; i < sCacheLevelCount; i++)
+	for (i = 0; i < gCPUCacheLevelCount; i++)
 		cpu->cache_id[i] = topologyID & sCacheSharingMask[i];
 	for (; i < CPU_MAX_CACHE_LEVEL; i++)
 		cpu->cache_id[i] = -1;
@@ -800,14 +799,14 @@ detect_cpu_topology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
 		cpu->topology_id[CPU_TOPOLOGY_CORE],
 		cpu->topology_id[CPU_TOPOLOGY_SMT]);
 
-	if (sCacheLevelCount > 0) {
+	if (gCPUCacheLevelCount > 0) {
 		char cacheLevels[256];
 		unsigned int offset = 0;
-		for (i = 0; i < sCacheLevelCount; i++) {
+		for (i = 0; i < gCPUCacheLevelCount; i++) {
 			offset += snprintf(cacheLevels + offset,
 					sizeof(cacheLevels) - offset,
 					" L%d id %d%s", i + 1, cpu->cache_id[i],
-					i < sCacheLevelCount - 1 ? "," : "");
+					i < gCPUCacheLevelCount - 1 ? "," : "");
 
 			if (offset >= sizeof(cacheLevels))
 				break;

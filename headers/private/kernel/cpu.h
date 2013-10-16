@@ -76,6 +76,7 @@ typedef struct cpu_ent {
 
 //extern cpu_ent gCPU[MAX_BOOT_CPUS];
 extern cpu_ent gCPU[];
+extern uint32 gCPUCacheLevelCount;
 
 
 #ifdef __cplusplus

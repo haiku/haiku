@@ -21,6 +21,7 @@
 
 /* global per-cpu structure */
 cpu_ent gCPU[MAX_BOOT_CPUS];
+uint32 gCPUCacheLevelCount;
 
 static spinlock sSetCpuLock;
 

@@ -59,20 +59,39 @@ scheduler_remove_listener(struct SchedulerListener* listener)
 }
 
 
+static bool
+should_use_affine_scheduler(int32 cpuCount)
+{
+	if (cpuCount < 2)
+		return false;
+
+	for (int32 i = 1; i < cpuCount; i++) {
+		for (int32 j = 0; j < gCPUCacheLevelCount; j++) {
+			if (gCPU[i].cache_id[j] != gCPU[i - 1].cache_id[j])
+				return true;
+		}
+	}
+
+	return false;
+}
+
+
 void
 scheduler_init(void)
 {
 	int32 cpuCount = smp_get_num_cpus();
-	dprintf("scheduler_init: found %" B_PRId32 " logical cpu%s\n", cpuCount,
-		cpuCount != 1 ? "s" : "");
+	dprintf("scheduler_init: found %" B_PRId32 " logical cpu%s and %" B_PRId32
+		" cache level%s\n", cpuCount, cpuCount != 1 ? "s" : "",
+		gCPUCacheLevelCount, gCPUCacheLevelCount != 1 ? "s" : "");
 
 	status_t result;
-#if 0
-	dprintf("scheduler_init: using affine scheduler\n");
-	result = scheduler_affine_init();
-#endif
-	dprintf("scheduler_init: using simple scheduler\n");
-	result = scheduler_simple_init();
+	if (should_use_affine_scheduler(cpuCount)) {
+		dprintf("scheduler_init: using affine scheduler\n");
+		result = scheduler_affine_init();
+	} else {
+		dprintf("scheduler_init: using simple scheduler\n");
+		result = scheduler_simple_init();
+	}
 
 	if (result != B_OK)
 		panic("scheduler_init: failed to initialize scheduler\n");
