@@ -413,7 +413,7 @@ BNetworkCookie::IsSessionCookie() const
 bool
 BNetworkCookie::IsValid() const
 {
-	return fInitStatus == B_OK && HasName() && HasDomain() && HasPath();
+	return fInitStatus == B_OK && HasName() && HasDomain();
 }
 
 
