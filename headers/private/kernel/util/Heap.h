@@ -79,7 +79,7 @@ public:
 
 	inline	Element*	PeekRoot();
 
-	inline	const Key&	GetKey(Element* element) const;
+	static	const Key&	GetKey(Element* element);
 
 	inline	void		ModifyKey(Element* element, Key newKey);
 
@@ -96,9 +96,8 @@ private:
 			int			fLastElement;
 			int			fSize;
 
-	Compare		sCompare;
-	GetLink		sGetLink;
-
+	static	Compare		sCompare;
+	static	GetLink		sGetLink;
 };
 
 
@@ -187,12 +186,9 @@ HEAP_CLASS_NAME::PeekRoot()
 
 HEAP_TEMPLATE_LIST
 const Key&
-HEAP_CLASS_NAME::GetKey(Element* element) const
+HEAP_CLASS_NAME::GetKey(Element* element)
 {
-	HeapLink<Element, Key>* link = sGetLink(element);
-
-	ASSERT(link->fIndex >= 0 && link->fIndex < fLastElement);
-	return link->fKey;
+	return sGetLink(element)->fKey;
 }
 
 

@@ -49,20 +49,35 @@ const bigtime_t kMaxThreadQuantum = 10000;
 
 
 struct CPUHeapEntry : public HeapLinkImpl<CPUHeapEntry, int32> {
+	HeapLink<CPUHeapEntry, int32>	fMaxHeap;
 	int32		fCPUNumber;
 };
 
-static CPUHeapEntry* sCPUEntries;
+static CPUHeapEntry* sCPUPriorityEntries;
 typedef Heap<CPUHeapEntry, int32> AffineCPUHeap;
-static AffineCPUHeap* sCPUHeap;
+typedef Heap<CPUHeapEntry, int32, HeapGreaterCompare<int32>,
+		HeapMemberGetLink<CPUHeapEntry, int32, &CPUHeapEntry::fMaxHeap> >
+	AffineCPUMaxHeap;
+
+// TODO: Use one min-max heap per-core
+static AffineCPUHeap* sCPUPriorityHeaps;
+static AffineCPUMaxHeap* sCPUMaxPriorityHeaps;
+
+struct CoreHeapEntry : public HeapLinkImpl<CoreHeapEntry, int32> {
+	int32		fCoreID;
+};
+
+static CoreHeapEntry* sCorePriorityEntries;
+typedef Heap<CoreHeapEntry, int32> AffineCoreHeap;
+static AffineCoreHeap* sCorePriorityHeap;
 
 // The run queues. Holds the threads ready to run ordered by priority.
 // One queue per schedulable target per core. Additionally, each
-// logical processor has its sCPURunQueues used for scheduling
+// logical processor has its sPinnedRunQueues used for scheduling
 // pinned threads.
 typedef RunQueue<Thread, THREAD_MAX_SET_PRIORITY> AffineRunQueue;
 static AffineRunQueue* sRunQueues;
-static AffineRunQueue* sCPURunQueues;
+static AffineRunQueue* sPinnedRunQueues;
 static int32 sRunQueueCount;
 static int32* sCPUToCore;
 
@@ -181,7 +196,7 @@ dump_run_queue(int argc, char **argv)
 	}
 
 	for (int32 i = 0; i < cpuCount; i++) {
-		iterator = sCPURunQueues[i].GetConstIterator();
+		iterator = sPinnedRunQueues[i].GetConstIterator();
 
 		if (iterator.HasNext()) {
 			kprintf("\nCPU %" B_PRId32 " run queue:\n", i);
@@ -193,25 +208,64 @@ dump_run_queue(int argc, char **argv)
 }
 
 
+static void
+dump_heap(AffineCPUHeap* heap)
+{
+	AffineCPUHeap temp;
+
+	kprintf("cpu priority actual priority\n");
+	CPUHeapEntry* entry = heap->PeekRoot();
+	while (entry) {
+		int32 cpu = entry->fCPUNumber;
+		int32 key = AffineCPUHeap::GetKey(entry);
+		kprintf("%3" B_PRId32 " %8" B_PRId32 " %15" B_PRId32 "\n", cpu, key,
+			affine_get_effective_priority(gCPU[cpu].running_thread));
+
+		heap->RemoveRoot();
+		temp.Insert(entry, key);
+
+		entry = heap->PeekRoot();
+	}
+
+	entry = temp.PeekRoot();
+	while (entry) {
+		int32 key = AffineCPUHeap::GetKey(entry);
+		temp.RemoveRoot();
+		heap->Insert(entry, key);
+		entry = temp.PeekRoot();
+	}
+}
+
+
 static int
 dump_cpu_heap(int argc, char** argv)
 {
-	kprintf("cpu priority actual priority\n");
-	CPUHeapEntry* entry = sCPUHeap->PeekRoot();
-	while (entry) {
-		int32 cpu = entry->fCPUNumber;
-		kprintf("%3" B_PRId32 " %8" B_PRId32 " %15" B_PRId32 "\n", cpu,
-			sCPUHeap->GetKey(entry),
-			affine_get_effective_priority(gCPU[cpu].running_thread));
+	AffineCoreHeap temp;
 
-		sCPUHeap->RemoveRoot();
-		entry = sCPUHeap->PeekRoot();
+	kprintf("core priority\n");
+	CoreHeapEntry* entry = sCorePriorityHeap->PeekRoot();
+	while (entry) {
+		int32 core = entry->fCoreID;
+		int32 key = AffineCoreHeap::GetKey(entry);
+		kprintf("%4" B_PRId32 " %8" B_PRId32 "\n", core, key);
+
+		sCorePriorityHeap->RemoveRoot();
+		temp.Insert(entry, key);
+
+		entry = sCorePriorityHeap->PeekRoot();
 	}
 
-	int32 cpuCount = smp_get_num_cpus();
-	for (int i = 0; i < cpuCount; i++) {
-		sCPUHeap->Insert(&sCPUEntries[i],
-			affine_get_effective_priority(gCPU[i].running_thread));
+	entry = temp.PeekRoot();
+	while (entry) {
+		int32 key = AffineCoreHeap::GetKey(entry);
+		temp.RemoveRoot();
+		sCorePriorityHeap->Insert(entry, key);
+		entry = temp.PeekRoot();
+	}
+
+	for (int32 i = 0; i < sRunQueueCount; i++) {
+		kprintf("\nCore %" B_PRId32 " heap:\n", i);
+		dump_heap(&sCPUPriorityHeaps[i]);
 	}
 
 	return 0;
@@ -295,6 +349,41 @@ affine_get_most_idle_cpu()
 #endif
 
 
+static inline void
+affine_update_priority_heaps(int32 cpu, int32 priority)
+{
+	int32 core = sCPUToCore[cpu];
+
+	sCPUPriorityHeaps[core].ModifyKey(&sCPUPriorityEntries[cpu], priority);
+	sCPUMaxPriorityHeaps[core].ModifyKey(&sCPUPriorityEntries[cpu], priority);
+
+	int32 maxPriority
+		= AffineCPUMaxHeap::GetKey(sCPUMaxPriorityHeaps[core].PeekRoot());
+	int32 corePriority = AffineCoreHeap::GetKey(&sCorePriorityEntries[core]);
+
+	if (corePriority != maxPriority)
+		sCorePriorityHeap->ModifyKey(&sCorePriorityEntries[core], maxPriority);
+}
+
+
+static inline int32
+affine_choose_core(void)
+{
+	CoreHeapEntry* entry = sCorePriorityHeap->PeekRoot();
+	ASSERT(entry != NULL);
+	return entry->fCoreID;
+}
+
+
+static inline int32
+affine_choose_cpu(int32 core)
+{
+	CPUHeapEntry* entry = sCPUPriorityHeaps[core].PeekRoot();
+	ASSERT(entry != NULL);
+	return entry->fCPUNumber;
+}
+
+
 static void
 affine_enqueue(Thread* thread, bool newOne)
 {
@@ -323,23 +412,19 @@ affine_enqueue(Thread* thread, bool newOne)
 			targetCPU = idleThreads++;
 			targetCore = sCPUToCore[targetCPU];
 		} else {
-			CPUHeapEntry* cpuEntry = sCPUHeap->PeekRoot();
-			ASSERT(cpuEntry != NULL);
-
-			targetCPU = cpuEntry->fCPUNumber;
-			targetCore = sCPUToCore[targetCPU];
+			targetCore = affine_choose_core();
+			targetCPU = affine_choose_cpu(targetCore);
 		}
 		schedulerThreadData->previous_core = targetCore;
 	} else {
-		targetCPU = thread->previous_cpu->cpu_num;
-		targetCore = sCPUToCore[targetCPU];
-		ASSERT(targetCore == schedulerThreadData->previous_core);
+		targetCore = schedulerThreadData->previous_core;
+		targetCPU = affine_choose_cpu(targetCore);
 	}
 
 	TRACE("enqueueing thread %ld with priority %ld %ld\n", thread->id,
 		threadPriority, targetCore);
 	if (pinned)
-		sCPURunQueues[targetCPU].PushBack(thread, threadPriority);
+		sPinnedRunQueues[targetCPU].PushBack(thread, threadPriority);
 	else
 		sRunQueues[targetCore].PushBack(thread, threadPriority);
 
@@ -363,7 +448,7 @@ affine_enqueue(Thread* thread, bool newOne)
 		// It is possible that another CPU schedules the thread before the
 		// target CPU. However, since the target CPU is sent an ICI it will
 		// reschedule anyway and update its heap key to the correct value.
-		sCPUHeap->ModifyKey(&sCPUEntries[targetCPU], threadPriority);
+		affine_update_priority_heaps(targetCPU, threadPriority);
 
 		if (targetCPU == smp_get_current_cpu()) {
 			gCPU[targetCPU].invoke_scheduler = true;
@@ -391,11 +476,11 @@ affine_enqueue_in_run_queue(Thread *thread)
 static inline void
 affine_put_back(Thread* thread)
 {
-	bool pinned = sCPURunQueues != NULL && thread->pinned_to_cpu > 0;
+	bool pinned = sPinnedRunQueues != NULL && thread->pinned_to_cpu > 0;
 
 	if (pinned) {
 		int32 pinnedCPU = thread->previous_cpu->cpu_num;
-		sCPURunQueues[pinnedCPU].PushFront(thread,
+		sPinnedRunQueues[pinnedCPU].PushFront(thread,
 			affine_get_effective_priority(thread));
 	} else {
 		int32 previousCore = thread->scheduler_data->previous_core;
@@ -492,7 +577,7 @@ affine_set_thread_priority(Thread *thread, int32 priority)
 		affine_get_effective_priority(thread));
 
 	if (thread->state == B_THREAD_RUNNING)
-		sCPUHeap->ModifyKey(&sCPUEntries[thread->cpu->cpu_num], priority);
+		affine_update_priority_heaps(thread->cpu->cpu_num, priority);
 
 	if (thread->state != B_THREAD_READY) {
 		affine_cancel_penalty(thread);
@@ -637,8 +722,8 @@ affine_dequeue_thread(int32 thisCPU)
 	Thread* sharedThread = sRunQueues[thisCore].PeekMaximum();
 
 	Thread* pinnedThread = NULL;
-	if (sCPURunQueues != NULL)
-		pinnedThread = sCPURunQueues[thisCPU].PeekMaximum();
+	if (sPinnedRunQueues != NULL)
+		pinnedThread = sPinnedRunQueues[thisCPU].PeekMaximum();
 
 	if (sharedThread == NULL && pinnedThread == NULL)
 		return NULL;
@@ -656,7 +741,7 @@ affine_dequeue_thread(int32 thisCPU)
 		return sharedThread;
 	}
 
-	sCPURunQueues[thisCPU].Remove(pinnedThread);
+	sPinnedRunQueues[thisCPU].Remove(pinnedThread);
 	return pinnedThread;
 }
 
@@ -692,7 +777,7 @@ affine_reschedule(void)
 	// update CPU heap so that old thread would have CPU properly chosen
 	Thread* nextThread = sRunQueues[thisCore].PeekMaximum();
 	if (nextThread != NULL) {
-		sCPUHeap->ModifyKey(&sCPUEntries[thisCPU],
+		affine_update_priority_heaps(thisCPU,
 			affine_get_effective_priority(nextThread));
 	}
 
@@ -735,10 +820,10 @@ affine_reschedule(void)
 
 	// select thread with the biggest priority
 	if (oldThread->cpu->disabled) {
-		ASSERT(sCPURunQueues != NULL);
-		nextThread = sCPURunQueues[thisCPU].PeekMaximum();
+		ASSERT(sPinnedRunQueues != NULL);
+		nextThread = sPinnedRunQueues[thisCPU].PeekMaximum();
 		if (nextThread != NULL)
-			sCPURunQueues[thisCPU].Remove(nextThread);
+			sPinnedRunQueues[thisCPU].Remove(nextThread);
 		else {
 			nextThread = sRunQueues[thisCore].GetHead(B_IDLE_PRIORITY);
 			if (nextThread != NULL)
@@ -759,7 +844,7 @@ affine_reschedule(void)
 		oldThread, nextThread);
 
 	// update CPU heap
-	sCPUHeap->ModifyKey(&sCPUEntries[thisCPU],
+	affine_update_priority_heaps(thisCPU,
 		affine_get_effective_priority(nextThread));
 
 	nextThread->state = B_THREAD_RUNNING;
@@ -857,40 +942,11 @@ scheduler_affine_init()
 {
 	int32 cpuCount = smp_get_num_cpus();
 
-	sCPUHeap = new AffineCPUHeap;
-	if (sCPUHeap == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<AffineCPUHeap> cpuHeapDeleter(sCPUHeap);
-
-	sCPUEntries = new CPUHeapEntry[cpuCount];
-	if (sCPUEntries == NULL)
-		return B_NO_MEMORY;
-	ArrayDeleter<CPUHeapEntry> cpuEntriesDeleter(sCPUEntries);
-
-	for (int i = 0; i < cpuCount; i++) {
-		sCPUEntries[i].fCPUNumber = i;
-		status_t result = sCPUHeap->Insert(&sCPUEntries[i], B_IDLE_PRIORITY);
-		if (result != B_OK)
-			return result;
-	}
-
-	TRACE("scheduler_affine_init(): creating %" B_PRId32 " per-cpu queue%s\n",
-		cpuCount, cpuCount != 1 ? "s" : "");
-
+	// create logical processor to core mapping
 	sCPUToCore = new(std::nothrow) int32[cpuCount];
 	if (sCPUToCore == NULL)
 		return B_NO_MEMORY;
 	ArrayDeleter<int32> cpuToCoreDeleter(sCPUToCore);
-
-	sCPURunQueues = new(std::nothrow) AffineRunQueue[cpuCount];
-	if (sCPURunQueues == NULL)
-		return B_NO_MEMORY;
-	ArrayDeleter<AffineRunQueue> cpuRunQueuesDeleter(sCPURunQueues);
-	for (int i = 0; i < cpuCount; i++) {
-		status_t result = sCPURunQueues[i].GetInitStatus();
-		if (result != B_OK)
-			return result;
-	}
 
 	int32 coreCount = 0;
 	for (int32 i = 0; i < cpuCount; i++) {
@@ -926,6 +982,73 @@ scheduler_affine_init()
 		}
 	}
 
+	// create logical processor and core heaps
+	sCPUPriorityEntries = new CPUHeapEntry[cpuCount];
+	if (sCPUPriorityEntries == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<CPUHeapEntry> cpuPriorityEntriesDeleter(sCPUPriorityEntries);
+
+	sCorePriorityEntries = new CoreHeapEntry[coreCount];
+	if (sCorePriorityEntries == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<CoreHeapEntry> corePriorityEntriesDeleter(
+		sCorePriorityEntries);
+
+	sCPUPriorityHeaps = new AffineCPUHeap[coreCount];
+	if (sCPUPriorityHeaps == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<AffineCPUHeap> cpuPriorityHeapDeleter(sCPUPriorityHeaps);
+
+	sCPUMaxPriorityHeaps = new AffineCPUMaxHeap[coreCount];
+	if (sCPUMaxPriorityHeaps == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<AffineCPUMaxHeap> cpuMaxPriorityHeapDeleter(
+		sCPUMaxPriorityHeaps);
+
+	for (int32 i = 0; i < cpuCount; i++) {
+		sCPUPriorityEntries[i].fCPUNumber = i;
+		int32 core = sCPUToCore[i];
+
+		status_t result
+			= sCPUPriorityHeaps[core].Insert(&sCPUPriorityEntries[i],
+				B_IDLE_PRIORITY);
+		if (result != B_OK)
+			return result;
+
+		result = sCPUMaxPriorityHeaps[core].Insert(&sCPUPriorityEntries[i],
+			B_IDLE_PRIORITY);
+		if (result != B_OK)
+			return result;
+	}
+
+	sCorePriorityHeap = new AffineCoreHeap;
+	if (sCorePriorityHeap == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<AffineCoreHeap> corePriorityHeapDeleter(sCorePriorityHeap);
+
+	for (int32 i = 0; i < coreCount; i++) {
+		sCorePriorityEntries[i].fCoreID = i;
+		status_t result = sCorePriorityHeap->Insert(&sCorePriorityEntries[i],
+			B_IDLE_PRIORITY);
+		if (result != B_OK)
+			return result;
+	}
+
+	// create per-logical processor run queues for pinned threads
+	TRACE("scheduler_affine_init(): creating %" B_PRId32 " per-cpu queue%s\n",
+		cpuCount, cpuCount != 1 ? "s" : "");
+
+	sPinnedRunQueues = new(std::nothrow) AffineRunQueue[cpuCount];
+	if (sPinnedRunQueues == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<AffineRunQueue> pinnedRunQueuesDeleter(sPinnedRunQueues);
+	for (int i = 0; i < cpuCount; i++) {
+		status_t result = sPinnedRunQueues[i].GetInitStatus();
+		if (result != B_OK)
+			return result;
+	}
+
+	// create per-core run queues
 	TRACE("scheduler_affine_init(): creating %" B_PRId32 " per-core queue%s\n",
 		coreCount, coreCount != 1 ? "s" : "");
 
@@ -947,10 +1070,13 @@ scheduler_affine_init()
 		"List CPUs in CPU priority heap", "\nList CPUs in CPU priority heap",
 		0);
 
-	cpuHeapDeleter.Detach();
-	cpuEntriesDeleter.Detach();
-	cpuToCoreDeleter.Detach();
-	cpuRunQueuesDeleter.Detach();
 	runQueuesDeleter.Detach();
+	pinnedRunQueuesDeleter.Detach();
+	corePriorityHeapDeleter.Detach();
+	cpuMaxPriorityHeapDeleter.Detach();
+	cpuPriorityHeapDeleter.Detach();
+	corePriorityEntriesDeleter.Detach();
+	cpuPriorityEntriesDeleter.Detach();
+	cpuToCoreDeleter.Detach();
 	return B_OK;
 }
