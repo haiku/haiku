@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013. Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2009, Rene Gollent, rene@gollent.com.
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
@@ -15,6 +16,7 @@
 
 #include <OS.h>
 
+#include <AutoDeleter.h>
 #include <cpu.h>
 #include <debug.h>
 #include <int.h>
@@ -25,98 +27,258 @@
 #include <smp.h>
 #include <thread.h>
 #include <timer.h>
+#include <util/Heap.h>
 #include <util/Random.h>
 
+#include "RunQueue.h"
 #include "scheduler_common.h"
 #include "scheduler_tracing.h"
 
 
 //#define TRACE_SCHEDULER
 #ifdef TRACE_SCHEDULER
-#	define TRACE(x) dprintf_no_syslog x
+#	define TRACE(...) dprintf_no_syslog(__VA_ARGS__)
 #else
-#	define TRACE(x) ;
+#	define TRACE(...) do { } while (false)
 #endif
 
-// The run queues. Holds the threads ready to run ordered by priority.
-// One queue per schedulable target (CPU, core, etc.).
-// TODO: consolidate this such that HT/SMT entities on the same physical core
-// share a queue, once we have the necessary API for retrieving the topology
-// information
-static Thread* sRunQueue[B_MAX_CPU_COUNT];
-static int32 sRunQueueSize[B_MAX_CPU_COUNT];
-static Thread* sIdleThreads;
 
-const int32 kMaxTrackingQuantums = 5;
+const bigtime_t kThreadQuantum = 1000;
 const bigtime_t kMinThreadQuantum = 3000;
 const bigtime_t kMaxThreadQuantum = 10000;
 
 
-struct scheduler_thread_data {
-	scheduler_thread_data(void)
-	{
-		Init();
-	}
-
-
-	void Init()
-	{
-		fQuantumAverage = 0;
-		fLastQuantumSlot = 0;
-		fLastQueue = -1;
-		memset(fLastThreadQuantums, 0, sizeof(fLastThreadQuantums));
-	}
-
-	inline void SetQuantum(int32 quantum)
-	{
-		fQuantumAverage -= fLastThreadQuantums[fLastQuantumSlot];
-		fLastThreadQuantums[fLastQuantumSlot] = quantum;
-		fQuantumAverage += quantum;
-		if (fLastQuantumSlot < kMaxTrackingQuantums - 1)
-			++fLastQuantumSlot;
-		else
-			fLastQuantumSlot = 0;
-	}
-
-	inline int32 GetAverageQuantumUsage() const
-	{
-		return fQuantumAverage / kMaxTrackingQuantums;
-	}
-
-	int32 fQuantumAverage;
-	int32 fLastThreadQuantums[kMaxTrackingQuantums];
-	int16 fLastQuantumSlot;
-	int32 fLastQueue;
+struct CPUHeapEntry : public HeapLinkImpl<CPUHeapEntry, int32> {
+	int32		fCPUNumber;
 };
+
+static CPUHeapEntry* sCPUEntries;
+typedef Heap<CPUHeapEntry, int32> AffineCPUHeap;
+static AffineCPUHeap* sCPUHeap;
+
+// The run queues. Holds the threads ready to run ordered by priority.
+// One queue per schedulable target per core. Additionally, each
+// logical processor has its sCPURunQueues used for scheduling
+// pinned threads.
+typedef RunQueue<Thread, THREAD_MAX_SET_PRIORITY> AffineRunQueue;
+static AffineRunQueue* sRunQueues;
+static AffineRunQueue* sCPURunQueues;
+static int32 sRunQueueCount;
+static int32* sCPUToCore;
+
+
+struct scheduler_thread_data {
+						scheduler_thread_data() { Init(); }
+	inline	void		Init();
+
+			int32		priority_penalty;
+			int32		additional_penalty;
+
+			bool		lost_cpu;
+			bool		cpu_bound;
+
+			bigtime_t	time_left;
+			bigtime_t	stolen_time;
+			bigtime_t	quantum_start;
+
+			bigtime_t	went_sleep;
+
+			int32		previous_core;
+};
+
+
+void
+scheduler_thread_data::Init()
+{
+	priority_penalty = 0;
+	additional_penalty = 0;
+
+	time_left = 0;
+	stolen_time = 0;
+
+	went_sleep = 0;
+
+	lost_cpu = false;
+	cpu_bound = true;
+
+	previous_core = -1;
+}
+
+
+static inline int
+affine_get_minimal_priority(Thread* thread)
+{
+	return min_c(thread->priority, 25) / 5;
+}
+
+
+static inline int32
+affine_get_thread_penalty(Thread* thread)
+{
+	int32 penalty = thread->scheduler_data->priority_penalty;
+
+	const int kMinimalPriority = affine_get_minimal_priority(thread);
+	if (kMinimalPriority > 0) {
+		penalty
+			+= thread->scheduler_data->additional_penalty % kMinimalPriority;
+	}
+
+	return penalty;
+
+}
+
+
+static inline int32
+affine_get_effective_priority(Thread* thread)
+{
+	if (thread->priority == B_IDLE_PRIORITY)
+		return thread->priority;
+	if (thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+		return thread->priority;
+
+	int32 effectivePriority = thread->priority;
+	effectivePriority -= affine_get_thread_penalty(thread);
+
+	ASSERT(effectivePriority < B_FIRST_REAL_TIME_PRIORITY);
+	ASSERT(effectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
+
+	return effectivePriority;
+}
+
+
+static void
+dump_queue(AffineRunQueue::ConstIterator& iterator)
+{
+	if (!iterator.HasNext())
+		kprintf("Run queue is empty.\n");
+	else {
+		kprintf("thread      id      priority penalty  name\n");
+		while (iterator.HasNext()) {
+			Thread* thread = iterator.Next();
+			kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 " %-8" B_PRId32 " %s\n",
+				thread, thread->id, thread->priority,
+				affine_get_thread_penalty(thread), thread->name);
+		}
+	}
+}
 
 
 static int
 dump_run_queue(int argc, char **argv)
 {
-	Thread *thread = NULL;
+	int32 cpuCount = smp_get_num_cpus();
+	int32 coreCount = 0;
+	for (int32 i = 0; i < cpuCount; i++) {
+		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0)
+			sCPUToCore[i] = coreCount++;
+	}
 
-	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
-		thread = sRunQueue[i];
-		kprintf("Run queue for cpu %" B_PRId32 " (%" B_PRId32 " threads)\n", i,
-			sRunQueueSize[i]);
-		if (sRunQueueSize[i] > 0) {
-			kprintf("thread      id      priority  avg. quantum  name\n");
-			while (thread) {
-				kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 "  %-12" B_PRId32
-					"  %s\n", thread, thread->id, thread->priority,
-					thread->scheduler_data->GetAverageQuantumUsage(),
-					thread->name);
-				thread = thread->queue_next;
-			}
+	AffineRunQueue::ConstIterator iterator;
+	for (int32 i = 0; i < coreCount; i++) {
+		kprintf("\nCore %" B_PRId32 " run queue:\n", i);
+		iterator = sRunQueues[i].GetConstIterator();
+		dump_queue(iterator);
+	}
+
+	for (int32 i = 0; i < cpuCount; i++) {
+		iterator = sCPURunQueues[i].GetConstIterator();
+
+		if (iterator.HasNext()) {
+			kprintf("\nCPU %" B_PRId32 " run queue:\n", i);
+			dump_queue(iterator);
 		}
 	}
+
 	return 0;
+}
+
+
+static int
+dump_cpu_heap(int argc, char** argv)
+{
+	kprintf("cpu priority actual priority\n");
+	CPUHeapEntry* entry = sCPUHeap->PeekRoot();
+	while (entry) {
+		int32 cpu = entry->fCPUNumber;
+		kprintf("%3" B_PRId32 " %8" B_PRId32 " %15" B_PRId32 "\n", cpu,
+			sCPUHeap->GetKey(entry),
+			affine_get_effective_priority(gCPU[cpu].running_thread));
+
+		sCPUHeap->RemoveRoot();
+		entry = sCPUHeap->PeekRoot();
+	}
+
+	int32 cpuCount = smp_get_num_cpus();
+	for (int i = 0; i < cpuCount; i++) {
+		sCPUHeap->Insert(&sCPUEntries[i],
+			affine_get_effective_priority(gCPU[i].running_thread));
+	}
+
+	return 0;
+}
+
+
+static void
+affine_dump_thread_data(Thread* thread)
+{
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+
+	kprintf("\tpriority_penalty:\t%" B_PRId32 "\n",
+		schedulerThreadData->priority_penalty);
+
+	int32 additionalPenalty = 0;
+	const int kMinimalPriority = affine_get_minimal_priority(thread);
+	if (kMinimalPriority > 0) {
+		additionalPenalty
+			= schedulerThreadData->additional_penalty % kMinimalPriority;
+	}
+	kprintf("\tadditional_penalty:\t%" B_PRId32 " (%" B_PRId32 ")\n",
+		additionalPenalty, schedulerThreadData->additional_penalty);
+	kprintf("\tstolen_time:\t\t%" B_PRId64 "\n",
+		schedulerThreadData->stolen_time);
+	kprintf("\tprevious_core:\t\t%" B_PRId32 "\n",
+		schedulerThreadData->previous_core);
+}
+
+
+static inline void
+affine_increase_penalty(Thread* thread)
+{
+	if (thread->priority <= B_LOWEST_ACTIVE_PRIORITY)
+		return;
+	if (thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+		return;
+
+	TRACE("increasing thread %ld penalty\n", thread->id);
+
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+	int32 oldPenalty = schedulerThreadData->priority_penalty++;
+
+	ASSERT(thread->priority - oldPenalty >= B_LOWEST_ACTIVE_PRIORITY);
+	const int kMinimalPriority = affine_get_minimal_priority(thread);
+	if (thread->priority - oldPenalty <= kMinimalPriority) {
+		schedulerThreadData->priority_penalty = oldPenalty;
+		schedulerThreadData->additional_penalty++;
+	}
+}
+
+
+static inline void
+affine_cancel_penalty(Thread* thread)
+{
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+
+	if (schedulerThreadData->priority_penalty != 0)
+		TRACE("cancelling thread %ld penalty\n", thread->id);
+	schedulerThreadData->priority_penalty = 0;
+	schedulerThreadData->additional_penalty = 0;
 }
 
 
 /*!	Returns the most idle CPU based on the active time counters.
 	Note: thread lock must be held when entering this function
 */
+#if 0
 static int32
 affine_get_most_idle_cpu()
 {
@@ -130,54 +292,79 @@ affine_get_most_idle_cpu()
 
 	return targetCPU;
 }
+#endif
 
 
-/*!	Enqueues the thread into the run queue.
-	Note: thread lock must be held when entering this function
-*/
 static void
-affine_enqueue_in_run_queue(Thread *thread)
+affine_enqueue(Thread* thread, bool newOne)
 {
-	int32 targetCPU = -1;
-	if (thread->pinned_to_cpu > 0)
-		targetCPU = thread->previous_cpu->cpu_num;
-	else if (thread->previous_cpu == NULL || thread->previous_cpu->disabled)
-		targetCPU = affine_get_most_idle_cpu();
-	else
-		targetCPU = thread->previous_cpu->cpu_num;
-
 	thread->state = thread->next_state = B_THREAD_READY;
 
-	if (thread->priority == B_IDLE_PRIORITY) {
-		thread->queue_next = sIdleThreads;
-		sIdleThreads = thread;
-	} else {
-		Thread *curr, *prev;
-		for (curr = sRunQueue[targetCPU], prev = NULL; curr
-			&& curr->priority >= thread->priority;
-			curr = curr->queue_next) {
-			if (prev)
-				prev = prev->queue_next;
-			else
-				prev = sRunQueue[targetCPU];
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+
+	bigtime_t hasSlept = system_time() - schedulerThreadData->went_sleep;
+	if (newOne && hasSlept > kThreadQuantum)
+		affine_cancel_penalty(thread);
+
+	int32 threadPriority = affine_get_effective_priority(thread);
+
+	T(EnqueueThread(thread, threadPriority));
+
+	bool pinned = thread->pinned_to_cpu > 0;
+	int32 targetCPU = -1;
+	int32 targetCore;
+	if (pinned) {
+		targetCPU = thread->previous_cpu->cpu_num;
+		targetCore = sCPUToCore[targetCPU];
+		ASSERT(targetCore == schedulerThreadData->previous_core);
+	} else if (schedulerThreadData->previous_core < 0) {
+		if (thread->priority == B_IDLE_PRIORITY) {
+			static int32 idleThreads = 0;
+			targetCPU = idleThreads++;
+			targetCore = sCPUToCore[targetCPU];
+		} else {
+			CPUHeapEntry* cpuEntry = sCPUHeap->PeekRoot();
+			ASSERT(cpuEntry != NULL);
+
+			targetCPU = cpuEntry->fCPUNumber;
+			targetCore = sCPUToCore[targetCPU];
 		}
-
-		T(EnqueueThread(thread, thread->priority));
-		sRunQueueSize[targetCPU]++;
-		thread->queue_next = curr;
-		if (prev)
-			prev->queue_next = thread;
-		else
-			sRunQueue[targetCPU] = thread;
-
-		thread->scheduler_data->fLastQueue = targetCPU;
+		schedulerThreadData->previous_core = targetCore;
+	} else {
+		targetCPU = thread->previous_cpu->cpu_num;
+		targetCore = sCPUToCore[targetCPU];
+		ASSERT(targetCore == schedulerThreadData->previous_core);
 	}
+
+	TRACE("enqueueing thread %ld with priority %ld %ld\n", thread->id,
+		threadPriority, targetCore);
+	if (pinned)
+		sCPURunQueues[targetCPU].PushBack(thread, threadPriority);
+	else
+		sRunQueues[targetCore].PushBack(thread, threadPriority);
+
+	schedulerThreadData->cpu_bound = true;
+	schedulerThreadData->time_left = 0;
+	schedulerThreadData->stolen_time = 0;
 
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
 
-	if (thread->priority > gCPU[targetCPU].running_thread->priority) {
+	Thread* targetThread = gCPU[targetCPU].running_thread;
+	int32 targetPriority = affine_get_effective_priority(targetThread);
+
+	TRACE("choosing CPU %ld with current priority %ld\n", targetCPU,
+		targetPriority);
+
+	if (threadPriority > targetPriority) {
+		targetThread->scheduler_data->lost_cpu = true;
+
+		// It is possible that another CPU schedules the thread before the
+		// target CPU. However, since the target CPU is sent an ICI it will
+		// reschedule anyway and update its heap key to the correct value.
+		sCPUHeap->ModifyKey(&sCPUEntries[targetCPU], threadPriority);
+
 		if (targetCPU == smp_get_current_cpu()) {
 			gCPU[targetCPU].invoke_scheduler = true;
 			gCPU[targetCPU].invoke_scheduler_if_idle = false;
@@ -189,6 +376,37 @@ affine_enqueue_in_run_queue(Thread *thread)
 }
 
 
+/*!	Enqueues the thread into the run queue.
+	Note: thread lock must be held when entering this function
+*/
+static void
+affine_enqueue_in_run_queue(Thread *thread)
+{
+	TRACE("enqueueing new thread %ld with static priority %ld\n", thread->id,
+		thread->priority);
+	affine_enqueue(thread, true);
+}
+
+
+static inline void
+affine_put_back(Thread* thread)
+{
+	bool pinned = sCPURunQueues != NULL && thread->pinned_to_cpu > 0;
+
+	if (pinned) {
+		int32 pinnedCPU = thread->previous_cpu->cpu_num;
+		sCPURunQueues[pinnedCPU].PushFront(thread,
+			affine_get_effective_priority(thread));
+	} else {
+		int32 previousCore = thread->scheduler_data->previous_core;
+		ASSERT(previousCore >= 0);
+		sRunQueues[previousCore].PushFront(thread,
+			affine_get_effective_priority(thread));
+	}
+}
+
+
+#if 0
 /*!	Dequeues the thread after the given \a prevThread from the run queue.
 */
 static inline Thread *
@@ -257,6 +475,7 @@ steal_thread_from_other_cpus(int32 currentCPU)
 
 	return NULL;
 }
+#endif
 
 
 /*!	Sets the priority of a thread.
@@ -265,12 +484,18 @@ steal_thread_from_other_cpus(int32 currentCPU)
 static void
 affine_set_thread_priority(Thread *thread, int32 priority)
 {
-	int32 targetCPU = -1;
-
 	if (priority == thread->priority)
 		return;
 
+	TRACE("changing thread %ld priority to %ld (old: %ld, effective: %ld)\n",
+		thread->id, priority, thread->priority,
+		affine_get_effective_priority(thread));
+
+	if (thread->state == B_THREAD_RUNNING)
+		sCPUHeap->ModifyKey(&sCPUEntries[thread->cpu->cpu_num], priority);
+
 	if (thread->state != B_THREAD_READY) {
+		affine_cancel_penalty(thread);
 		thread->priority = priority;
 		return;
 	}
@@ -284,25 +509,15 @@ affine_set_thread_priority(Thread *thread, int32 priority)
 	NotifySchedulerListeners(&SchedulerListener::ThreadRemovedFromRunQueue,
 		thread);
 
-	// search run queues for the thread
-	Thread *item = NULL, *prev = NULL;
-	targetCPU = thread->scheduler_data->fLastQueue;
-
-	for (item = sRunQueue[targetCPU], prev = NULL; item && item != thread;
-			item = item->queue_next) {
-		if (prev)
-			prev = prev->queue_next;
-		else
-			prev = item;
-	}
-
-	ASSERT(item == thread);
-
-	// remove the thread
-	thread = dequeue_from_run_queue(prev, targetCPU);
+	// remove thread from run queue
+	int32 previousCore = thread->scheduler_data->previous_core;
+	ASSERT(previousCore >= 0);
+	sRunQueues[previousCore].Remove(thread);
 
 	// set priority and re-insert
+	affine_cancel_penalty(thread);
 	thread->priority = priority;
+
 	affine_enqueue_in_run_queue(thread);
 }
 
@@ -330,10 +545,119 @@ reschedule_event(timer *unused)
 {
 	// This function is called as a result of the timer event set by the
 	// scheduler. Make sure the reschedule() is invoked.
-	thread_get_current_thread()->cpu->invoke_scheduler = true;
-	thread_get_current_thread()->cpu->invoke_scheduler_if_idle = false;
-	thread_get_current_thread()->cpu->preempted = 1;
+	Thread* thread= thread_get_current_thread();
+
+	thread->scheduler_data->lost_cpu = true;
+	thread->cpu->invoke_scheduler = true;
+	thread->cpu->invoke_scheduler_if_idle = false;
+	thread->cpu->preempted = 1;
 	return B_HANDLED_INTERRUPT;
+}
+
+
+static inline bool 
+affine_quantum_ended(Thread* thread, bool wasPreempted, bool hasYielded)
+{
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+
+	if (hasYielded) {
+		schedulerThreadData->time_left = 0;
+		return true;
+	}
+
+	bigtime_t time_used = system_time() - schedulerThreadData->quantum_start;
+	schedulerThreadData->time_left -= time_used;
+	schedulerThreadData->time_left = max_c(0, schedulerThreadData->time_left);
+
+	// too little time left, it's better make the next quantum a bit longer
+	if (wasPreempted || schedulerThreadData->time_left <= kThreadQuantum / 50) {
+		schedulerThreadData->stolen_time += schedulerThreadData->time_left;
+		schedulerThreadData->time_left = 0;
+	}
+
+	return schedulerThreadData->time_left == 0;
+}
+
+
+static inline bigtime_t
+affine_quantum_linear_interpolation(bigtime_t maxQuantum, bigtime_t minQuantum,
+	int32 maxPriority, int32 minPriority, int32 priority)
+{
+	ASSERT(priority <= maxPriority);
+	ASSERT(priority >= minPriority);
+
+	bigtime_t result = (maxQuantum - minQuantum) * (priority - minPriority);
+	result /= maxPriority - minPriority;
+	return maxQuantum - result;
+}
+
+
+static inline bigtime_t
+affine_get_base_quantum(Thread* thread)
+{
+	int32 priority = affine_get_effective_priority(thread);
+
+	if (priority >= B_URGENT_DISPLAY_PRIORITY)
+		return kThreadQuantum;
+	if (priority > B_NORMAL_PRIORITY) {
+		return affine_quantum_linear_interpolation(kThreadQuantum * 4,
+			kThreadQuantum, B_URGENT_DISPLAY_PRIORITY, B_NORMAL_PRIORITY,
+			priority);
+	}
+	return affine_quantum_linear_interpolation(kThreadQuantum * 64,
+		kThreadQuantum * 4, B_NORMAL_PRIORITY, B_IDLE_PRIORITY, priority);
+}
+
+
+static inline bigtime_t
+affine_compute_quantum(Thread* thread)
+{
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+
+	bigtime_t quantum;
+	if (schedulerThreadData->time_left != 0)
+		quantum = schedulerThreadData->time_left;
+	else
+		quantum = affine_get_base_quantum(thread);
+
+	quantum += schedulerThreadData->stolen_time;
+	schedulerThreadData->stolen_time = 0;
+
+	schedulerThreadData->time_left = quantum;
+	schedulerThreadData->quantum_start = system_time();
+
+	return quantum;
+}
+
+
+static inline Thread*
+affine_dequeue_thread(int32 thisCPU)
+{
+	int32 thisCore = sCPUToCore[thisCPU];
+	Thread* sharedThread = sRunQueues[thisCore].PeekMaximum();
+
+	Thread* pinnedThread = NULL;
+	if (sCPURunQueues != NULL)
+		pinnedThread = sCPURunQueues[thisCPU].PeekMaximum();
+
+	if (sharedThread == NULL && pinnedThread == NULL)
+		return NULL;
+
+	int32 pinnedPriority = -1;
+	if (pinnedThread != NULL)
+		pinnedPriority = affine_get_effective_priority(pinnedThread);
+
+	int32 sharedPriority = -1;
+	if (sharedThread != NULL)
+		sharedPriority = affine_get_effective_priority(sharedThread);
+
+	if (sharedPriority > pinnedPriority) {
+		sRunQueues[thisCore].Remove(sharedThread);
+		return sharedThread;
+	}
+
+	sCPURunQueues[thisCPU].Remove(pinnedThread);
+	return pinnedThread;
 }
 
 
@@ -343,8 +667,7 @@ reschedule_event(timer *unused)
 static void
 affine_reschedule(void)
 {
-	int32 currentCPU = smp_get_current_cpu();
-	Thread *oldThread = thread_get_current_thread();
+	Thread* oldThread = thread_get_current_thread();
 
 	// check whether we're only supposed to reschedule, if the current thread
 	// is idle
@@ -357,87 +680,77 @@ affine_reschedule(void)
 		}
 	}
 
-	Thread *nextThread, *prevThread;
+	int32 thisCPU = smp_get_current_cpu();
+	int32 thisCore = sCPUToCore[thisCPU];
 
-	TRACE(("reschedule(): cpu %ld, cur_thread = %ld\n", currentCPU, oldThread->id));
+	TRACE("reschedule(): cpu %ld, current thread = %ld\n", thisCPU,
+		oldThread->id);
 
 	oldThread->state = oldThread->next_state;
+	scheduler_thread_data* schedulerOldThreadData = oldThread->scheduler_data;
+
+	// update CPU heap so that old thread would have CPU properly chosen
+	Thread* nextThread = sRunQueues[thisCore].PeekMaximum();
+	if (nextThread != NULL) {
+		sCPUHeap->ModifyKey(&sCPUEntries[thisCPU],
+			affine_get_effective_priority(nextThread));
+	}
+
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
-			TRACE(("enqueueing thread %ld into run q. pri = %ld\n", oldThread->id, oldThread->priority));
-			affine_enqueue_in_run_queue(oldThread);
+			if (!schedulerOldThreadData->lost_cpu)
+				schedulerOldThreadData->cpu_bound = false;
+
+			if (affine_quantum_ended(oldThread, oldThread->cpu->preempted,
+					oldThread->has_yielded)) {
+				if (schedulerOldThreadData->cpu_bound)
+					affine_increase_penalty(oldThread);
+
+				TRACE("enqueueing thread %ld into run queue priority = %ld\n",
+					oldThread->id, affine_get_effective_priority(oldThread));
+				affine_enqueue(oldThread, false);
+			} else {
+				TRACE("putting thread %ld back in run queue priority = %ld\n",
+					oldThread->id, affine_get_effective_priority(oldThread));
+				affine_put_back(oldThread);
+			}
+
 			break;
 		case B_THREAD_SUSPENDED:
-			TRACE(("reschedule(): suspending thread %ld\n", oldThread->id));
+			schedulerOldThreadData->went_sleep = system_time();
+			TRACE("reschedule(): suspending thread %ld\n", oldThread->id);
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
 			break;
 		default:
-			TRACE(("not enqueueing thread %ld into run q. next_state = %ld\n", oldThread->id, oldThread->next_state));
+			schedulerOldThreadData->went_sleep = system_time();
+			TRACE("not enqueueing thread %ld into run queue next_state = %ld\n",
+				oldThread->id, oldThread->next_state);
 			break;
 	}
 
-	nextThread = sRunQueue[currentCPU];
-	prevThread = NULL;
+	oldThread->has_yielded = false;
+	schedulerOldThreadData->lost_cpu = false;
 
-	if (sRunQueue[currentCPU] != NULL) {
-		TRACE(("dequeueing next thread from cpu %ld\n", currentCPU));
-		// select next thread from the run queue
-		while (nextThread->queue_next) {
-			// always extract real time threads
-			if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
-				break;
-
-			// find next thread with lower priority
-			Thread *lowerNextThread = nextThread->queue_next;
-			Thread *lowerPrevThread = nextThread;
-			int32 priority = nextThread->priority;
-
-			while (lowerNextThread != NULL
-				&& priority == lowerNextThread->priority) {
-				lowerPrevThread = lowerNextThread;
-				lowerNextThread = lowerNextThread->queue_next;
-			}
-			if (lowerNextThread == NULL)
-				break;
-
-			int32 priorityDiff = priority - lowerNextThread->priority;
-			if (priorityDiff > 15)
-				break;
-
-			// skip normal threads sometimes
-			// (twice as probable per priority level)
-			if ((fast_random_value() >> (15 - priorityDiff)) != 0)
-				break;
-
-			nextThread = lowerNextThread;
-			prevThread = lowerPrevThread;
+	// select thread with the biggest priority
+	if (oldThread->cpu->disabled) {
+		ASSERT(sCPURunQueues != NULL);
+		nextThread = sCPURunQueues[thisCPU].PeekMaximum();
+		if (nextThread != NULL)
+			sCPURunQueues[thisCPU].Remove(nextThread);
+		else {
+			nextThread = sRunQueues[thisCore].GetHead(B_IDLE_PRIORITY);
+			if (nextThread != NULL)
+				sRunQueues[thisCore].Remove(nextThread);
 		}
-
-		TRACE(("dequeuing thread %ld from cpu %ld\n", nextThread->id,
-			currentCPU));
-		// extract selected thread from the run queue
-		dequeue_from_run_queue(prevThread, currentCPU);
-	} else {
-		if (!gCPU[currentCPU].disabled) {
-			TRACE(("CPU %ld stealing thread from other CPUs\n", currentCPU));
-			nextThread = steal_thread_from_other_cpus(currentCPU);
-		} else
-			nextThread = NULL;
-
-		if (nextThread == NULL) {
-			TRACE(("No threads to steal, grabbing from idle pool\n"));
-			// no other CPU had anything for us to take,
-			// grab one from the kernel's idle pool
-			nextThread = sIdleThreads;
-			if (nextThread)
-				sIdleThreads = nextThread->queue_next;
-		}
-	}
-
+	} else
+		nextThread = affine_dequeue_thread(thisCPU);
 	if (!nextThread)
-		panic("reschedule(): run queue is empty!\n");
+		panic("reschedule(): run queues are empty!\n");
+
+	TRACE("reschedule(): cpu %ld, next thread = %ld\n", thisCPU,
+		nextThread->id);
 
 	T(ScheduleThread(nextThread, oldThread));
 
@@ -445,21 +758,23 @@ affine_reschedule(void)
 	NotifySchedulerListeners(&SchedulerListener::ThreadScheduled,
 		oldThread, nextThread);
 
+	// update CPU heap
+	sCPUHeap->ModifyKey(&sCPUEntries[thisCPU],
+		affine_get_effective_priority(nextThread));
+
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
-	oldThread->has_yielded = false;
+	ASSERT(nextThread->scheduler_data->previous_core == thisCore);
+	//nextThread->scheduler_data->previous_core = thisCore;
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	scheduler_update_thread_times(oldThread, nextThread);
 
 	// track CPU activity
 	if (!thread_is_idle_thread(oldThread)) {
-		bigtime_t activeTime =
+		oldThread->cpu->active_time +=
 			(oldThread->kernel_time - oldThread->cpu->last_kernel_time)
 			+ (oldThread->user_time - oldThread->cpu->last_user_time);
-		oldThread->cpu->active_time += activeTime;
-		scheduler_thread_data *data = oldThread->scheduler_data;
-		data->SetQuantum(activeTime);
 	}
 
 	if (!thread_is_idle_thread(nextThread)) {
@@ -468,25 +783,13 @@ affine_reschedule(void)
 	}
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
-		timer *quantumTimer = &oldThread->cpu->quantum_timer;
+		timer* quantumTimer = &oldThread->cpu->quantum_timer;
 		if (!oldThread->cpu->preempted)
 			cancel_timer(quantumTimer);
+
 		oldThread->cpu->preempted = 0;
-
-		// we do not adjust the quantum for the idle thread as it is going to be
-		// preempted most of the time and would likely get the longer quantum
-		// over time, indeed we use a smaller quantum to avoid running idle too
-		// long
-		bigtime_t quantum = kMinThreadQuantum;
-		// give CPU-bound background threads a larger quantum size
-		// to minimize unnecessary context switches if the system is idle
-		if (nextThread->priority != B_IDLE_PRIORITY
-			&& nextThread->scheduler_data->GetAverageQuantumUsage()
-			> (kMinThreadQuantum >> 1)
-			&& nextThread->priority < B_NORMAL_PRIORITY)
-			quantum = kMaxThreadQuantum;
-
 		if (!thread_is_idle_thread(nextThread)) {
+			bigtime_t quantum = affine_compute_quantum(oldThread);
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
 		}
@@ -500,13 +803,7 @@ affine_reschedule(void)
 static status_t
 affine_on_thread_create(Thread* thread, bool idleThread)
 {
-	// we don't need a data structure for the idle threads
-	if (idleThread) {
-		thread->scheduler_data = NULL;
-		return B_OK;
-	}
-
-	thread->scheduler_data = new(std::nothrow) scheduler_thread_data();
+	thread->scheduler_data = new (std::nothrow)scheduler_thread_data;
 	if (thread->scheduler_data == NULL)
 		return B_NO_MEMORY;
 	return B_OK;
@@ -516,7 +813,7 @@ affine_on_thread_create(Thread* thread, bool idleThread)
 static void
 affine_on_thread_init(Thread* thread)
 {
-	((scheduler_thread_data *)(thread->scheduler_data))->Init();
+	thread->scheduler_data->Init();
 }
 
 
@@ -548,7 +845,7 @@ static scheduler_ops kAffineOps = {
 	affine_on_thread_init,
 	affine_on_thread_destroy,
 	affine_start,
-	NULL
+	affine_dump_thread_data
 };
 
 
@@ -558,11 +855,102 @@ static scheduler_ops kAffineOps = {
 status_t
 scheduler_affine_init()
 {
+	int32 cpuCount = smp_get_num_cpus();
+
+	sCPUHeap = new AffineCPUHeap;
+	if (sCPUHeap == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<AffineCPUHeap> cpuHeapDeleter(sCPUHeap);
+
+	sCPUEntries = new CPUHeapEntry[cpuCount];
+	if (sCPUEntries == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<CPUHeapEntry> cpuEntriesDeleter(sCPUEntries);
+
+	for (int i = 0; i < cpuCount; i++) {
+		sCPUEntries[i].fCPUNumber = i;
+		status_t result = sCPUHeap->Insert(&sCPUEntries[i], B_IDLE_PRIORITY);
+		if (result != B_OK)
+			return result;
+	}
+
+	TRACE("scheduler_affine_init(): creating %" B_PRId32 " per-cpu queue%s\n",
+		cpuCount, cpuCount != 1 ? "s" : "");
+
+	sCPUToCore = new(std::nothrow) int32[cpuCount];
+	if (sCPUToCore == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<int32> cpuToCoreDeleter(sCPUToCore);
+
+	sCPURunQueues = new(std::nothrow) AffineRunQueue[cpuCount];
+	if (sCPURunQueues == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<AffineRunQueue> cpuRunQueuesDeleter(sCPURunQueues);
+	for (int i = 0; i < cpuCount; i++) {
+		status_t result = sCPURunQueues[i].GetInitStatus();
+		if (result != B_OK)
+			return result;
+	}
+
+	int32 coreCount = 0;
+	for (int32 i = 0; i < cpuCount; i++) {
+		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0)
+			sCPUToCore[i] = coreCount++;
+	}
+	sRunQueueCount = coreCount;
+
+	// TODO: Nasty O(n^2), solutions with better complexity will require
+	// creating helper data structures. This code is run only once, so it
+	// probably won't be a problem until we support systems with large
+	// number of processors.
+	for (int32 i = 0; i < cpuCount; i++) {
+		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0)
+			continue;
+
+		for (int32 j = 0; j < cpuCount; j++) {
+			bool sameCore = true;
+			for (int32 k = 0; k < CPU_TOPOLOGY_LEVELS && sameCore; k++) {
+				if (k == CPU_TOPOLOGY_SMT && gCPU[j].topology_id[k] == 0)
+					continue;
+				if (k == CPU_TOPOLOGY_SMT && gCPU[j].topology_id[k] != 0) {
+					sameCore = false;
+					continue;
+				}
+
+				if (gCPU[i].topology_id[k] != gCPU[j].topology_id[k])
+					sameCore = false;
+			}
+
+			if (sameCore)
+				sCPUToCore[i] = sCPUToCore[j];
+		}
+	}
+
+	TRACE("scheduler_affine_init(): creating %" B_PRId32 " per-core queue%s\n",
+		coreCount, coreCount != 1 ? "s" : "");
+
+	sRunQueues = new(std::nothrow) AffineRunQueue[coreCount];
+	if (sRunQueues == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<AffineRunQueue> runQueuesDeleter(sRunQueues);
+	for (int i = 0; i < coreCount; i++) {
+		status_t result = sRunQueues[i].GetInitStatus();
+		if (result != B_OK)
+			return result;
+	}
+
 	gScheduler = &kAffineOps;
-	memset(sRunQueue, 0, sizeof(sRunQueue));
-	memset(sRunQueueSize, 0, sizeof(sRunQueueSize));
+
 	add_debugger_command_etc("run_queue", &dump_run_queue,
 		"List threads in run queue", "\nLists threads in run queue", 0);
+	add_debugger_command_etc("cpu_heap", &dump_cpu_heap,
+		"List CPUs in CPU priority heap", "\nList CPUs in CPU priority heap",
+		0);
 
+	cpuHeapDeleter.Detach();
+	cpuEntriesDeleter.Detach();
+	cpuToCoreDeleter.Detach();
+	cpuRunQueuesDeleter.Detach();
+	runQueuesDeleter.Detach();
 	return B_OK;
 }

@@ -162,9 +162,12 @@ dump_run_queue(int argc, char** argv)
 		return 0;
 
 	for (int32 i = 0; i < cpuCount; i++) {
-		kprintf("\nCPU %d run queue:\n", i);
-		sCPURunQueues[i].GetConstIterator();
-		dump_queue(iterator);
+		iterator = sCPURunQueues[i].GetConstIterator();
+
+		if (iterator.HasNext()) {
+			kprintf("\nCPU %" B_PRId32 " run queue:\n", i);
+			dump_queue(iterator);
+		}
 	}
 
 	return 0;
