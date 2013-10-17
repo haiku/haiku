@@ -39,6 +39,7 @@ BHttpRequest::BHttpRequest(const BUrl& url, BUrlResult& result, bool ssl,
 	fHttpVersion(B_HTTP_11),
 	fRequestStatus(kRequestInitialState),
 	fOptHeaders(NULL),
+	fOptPostFields(NULL),
 	fOptInputData(NULL),
 	fOptInputDataSize(-1),
 	fOptFollowLocation(true)
@@ -54,6 +55,10 @@ BHttpRequest::BHttpRequest(const BUrl& url, BUrlResult& result, bool ssl,
 BHttpRequest::~BHttpRequest()
 {
 	delete fSocket;
+
+	delete fOptInputData;
+	delete fOptHeaders;
+	delete fOptPostFields;
 }
 
 
@@ -93,13 +98,6 @@ BHttpRequest::SetUserAgent(const BString& agent)
 
 
 void
-BHttpRequest::SetHeaders(BHttpHeaders* headers)
-{
-	fOptHeaders = headers;
-}
-
-
-void
 BHttpRequest::SetDiscardData(bool discard)
 {
 	fOptDiscardData = discard;
@@ -121,8 +119,31 @@ BHttpRequest::SetAutoReferrer(bool enable)
 
 
 void
-BHttpRequest::SetPostFields(BHttpForm* fields)
+BHttpRequest::SetHeaders(const BHttpHeaders& headers)
 {
+	AdoptHeaders(new BHttpHeaders(headers));
+}
+
+
+void
+BHttpRequest::AdoptHeaders(BHttpHeaders* const headers)
+{
+	delete fOptHeaders;
+	fOptHeaders = headers;
+}
+
+
+void
+BHttpRequest::SetPostFields(const BHttpForm& fields)
+{
+	AdoptPostFields(new BHttpForm(fields));
+}
+
+
+void
+BHttpRequest::AdoptPostFields(BHttpForm* const fields)
+{
+	delete fOptPostFields;
 	fOptPostFields = fields;
 
 	if (fOptPostFields != NULL)
@@ -131,8 +152,9 @@ BHttpRequest::SetPostFields(BHttpForm* fields)
 
 
 void
-BHttpRequest::SetInputData(BDataIO* data, ssize_t size)
+BHttpRequest::AdoptInputData(BDataIO* const data, const ssize_t size)
 {
+	delete fOptInputData;
 	fOptInputData = data;
 	fOptInputDataSize = size;
 }
@@ -226,6 +248,9 @@ BHttpRequest::StatusString(status_t threadStatus) const
 void
 BHttpRequest::_ResetOptions()
 {
+	delete fOptPostFields;
+	delete fOptHeaders;
+
 	fOptFollowLocation = true;
 	fOptMaxRedirs = 8;
 	fOptReferer	= "";

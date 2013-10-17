@@ -34,14 +34,19 @@ public:
             void                SetMaxRedirections(int8 maxRedirections);
             void                SetReferrer(const BString& referrer);
             void                SetUserAgent(const BString& agent);
-            void                SetHeaders(BHttpHeaders* headers);
             void                SetDiscardData(bool discard);
             void                SetDisableListener(bool disable);
             void                SetAutoReferrer(bool enable);
-            void                SetPostFields(BHttpForm* fields);
-            void                SetInputData(BDataIO* data, ssize_t size = -1);
             void                SetUserName(const BString& name);
             void                SetPassword(const BString& password);
+
+            void                SetPostFields(const BHttpForm& fields);
+            void                SetHeaders(const BHttpHeaders& headers);
+
+            void                AdoptPostFields(BHttpForm* const fields);
+            void                AdoptInputData(BDataIO* const data,
+									const ssize_t size = -1);
+            void                AdoptHeaders(BHttpHeaders* const headers);
 
 	static	bool				IsInformationalStatusCode(int16 code);
 	static	bool				IsSuccessStatusCode(int16 code);
