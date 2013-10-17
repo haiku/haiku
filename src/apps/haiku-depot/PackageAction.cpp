@@ -25,7 +25,7 @@ PackageAction::PackageAction(int32 type, PackageInfoRef package, Model* model)
 	const PackageInstallationLocationSet& locations
 		= package->InstallationLocations();
 
-	int32 location = B_PACKAGE_INSTALLATION_LOCATION_HOME;
+	int32 location = B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 	// if the package is already installed, use its first installed location
 	// to initialize the manager.
 	// TODO: ideally if the package is installed at multiple locations,
