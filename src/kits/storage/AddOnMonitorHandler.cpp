@@ -1,10 +1,11 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Stephan Aßmus, superstippi@gmx.de
  *		Andrew Bachmann
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -14,6 +15,12 @@
 
 #include <Autolock.h>
 #include <Directory.h>
+#include <FindDirectory.h>
+#include <Path.h>
+
+#include <driver_settings.h>
+#include <safemode_defs.h>
+#include <syscalls.h>
 
 
 #ifndef ADD_ON_STABLE_SECONDS
@@ -100,6 +107,59 @@ AddOnMonitorHandler::AddDirectory(const node_ref* nref, bool sync)
 
 	if (sync)
 		_HandlePendingEntries();
+
+	return B_OK;
+}
+
+
+status_t
+AddOnMonitorHandler::AddAddOnDirectories(const char* leafPath)
+{
+	char parameter[32];
+	size_t parameterLength = sizeof(parameter);
+	uint32 start = 0;
+
+	const directory_which addOnDirectories[] = {
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
+		B_USER_ADDONS_DIRECTORY,
+		B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
+		B_SYSTEM_ADDONS_DIRECTORY
+	};
+
+	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter,
+			&parameterLength) == B_OK) {
+		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
+			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
+			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1")) {
+			// skip user add on directories
+			start = 2;
+		}
+	}
+
+	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
+			&parameterLength) == B_OK) {
+		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
+			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
+			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1")) {
+			// safe mode, only B_SYSTEM_ADDONS_DIRECTORY is used
+			start = 3;
+		}
+	}
+
+	for (uint32 i = start;
+			i < sizeof(addOnDirectories) / sizeof(directory_which); i++) {
+		BDirectory directory;
+		node_ref nodeRef;
+		BPath path;
+		if (find_directory(addOnDirectories[i], &path) == B_OK
+			&& path.Append(leafPath) == B_OK
+			&& directory.SetTo(path.Path()) == B_OK
+			&& directory.GetNodeRef(&nodeRef) == B_OK) {
+			status_t result = this->AddDirectory(&nodeRef);
+			if (result != B_OK)
+				return result;
+		}
+	}
 
 	return B_OK;
 }

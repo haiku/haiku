@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ADD_ON_MONITOR_HANDLER_H
@@ -44,6 +44,8 @@ public:
 	// Including entries from other directories.
 	virtual	status_t			AddDirectory(const node_ref* nref,
 									bool sync = false);
+
+			status_t			AddAddOnDirectories(const char* leafPath = "");
 
 protected:
 	// hooks for sub-class

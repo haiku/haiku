@@ -1,20 +1,17 @@
 /*
- * Copyright 2010, Haiku.
+ * Copyright 2010-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		John Scipione, jscipione@gmail.com
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
+
 
 #include "IndexServer.h"
 
-#include <Directory.h>
-#include <driver_settings.h>
-#include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
-
-#include <syscalls.h>
 
 
 VolumeObserverHandler::VolumeObserverHandler(IndexServer* indexServer)
@@ -315,41 +312,12 @@ void
 IndexServer::_StartWatchingAddOns()
 {
 	AddHandler(&fAddOnMonitorHandler);
+
 	BMessage pulse(B_PULSE);
 	fPulseRunner = new BMessageRunner(&fAddOnMonitorHandler, &pulse, 1000000LL);
 		// the monitor handler needs a pulse to check if add-ons are ready
 
-	char parameter[32];
-	size_t parameterLength = sizeof(parameter);
-	bool safeMode = false;
-	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
-			&parameterLength) == B_OK) {
-		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
-			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
-			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
-			safeMode = true;
-	}
-
-	// load dormant media nodes
-	const directory_which directories[] = {
-		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-		B_USER_ADDONS_DIRECTORY,
-		B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-		B_SYSTEM_ADDONS_DIRECTORY
-	};
-
-	// when safemode, only B_SYSTEM_ADDONS_DIRECTORY is used
-	for (uint32 i = safeMode ? 3 : 0;
-			i < sizeof(directories) / sizeof(directory_which); i++) {
-		BDirectory directory;
-		node_ref nodeRef;
-		BPath path;
-		if (find_directory(directories[i], &path) == B_OK
-			&& path.Append("index_server") == B_OK
-			&& directory.SetTo(path.Path()) == B_OK
-			&& directory.GetNodeRef(&nodeRef) == B_OK)
-			fAddOnMonitorHandler.AddDirectory(&nodeRef, true);
-	}
+	&fAddOnMonitorHandler->AddAddOnDirectories("index_server");
 }
 
 

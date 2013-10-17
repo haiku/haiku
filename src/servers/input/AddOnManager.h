@@ -1,11 +1,12 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Marcus Overhagen
  *		Axel Dörfler, axeld@pinc-software.de
  *		Jérôme Duval
+ *		Marcus Overhagen
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef ADD_ON_MANAGER_H
 #define ADD_ON_MANAGER_H
@@ -27,7 +28,7 @@ using namespace BPrivate;
 
 class AddOnManager : public AddOnMonitor {
 public:
-								AddOnManager(bool safeMode);
+								AddOnManager();
 								~AddOnManager();
 
 	virtual	void 				MessageReceived(BMessage* message);

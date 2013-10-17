@@ -1,11 +1,12 @@
 /*
- * Copyright 2004-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Marcus Overhagen
  *		Axel Dörfler, axeld@pinc-software.de
  *		Jérôme Duval
+ *		Marcus Overhagen
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -21,7 +22,6 @@
 #include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
-#include <FindDirectory.h>
 #include <image.h>
 #include <Path.h>
 #include <Roster.h>
@@ -118,14 +118,13 @@ instantiate_add_on(image_id image, const char* path, const char* type)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - AddOnManager
 
 
-AddOnManager::AddOnManager(bool safeMode)
+AddOnManager::AddOnManager()
 	:
 	AddOnMonitor(),
-	fHandler(new(std::nothrow) MonitorHandler(this)),
-	fSafeMode(safeMode)
+	fHandler(new(std::nothrow) MonitorHandler(this))
 {
 	SetHandler(fHandler);
 }
@@ -259,34 +258,9 @@ AddOnManager::_RegisterAddOns()
 	CALLED();
 	BAutolock locker(this);
 
-	const directory_which directories[] = {
-		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-		B_USER_ADDONS_DIRECTORY,
-		B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-		B_SYSTEM_ADDONS_DIRECTORY
-	};
-	const char* subDirectories[] = {
-		"input_server/devices",
-		"input_server/filters",
-		"input_server/methods"
-	};
-	int32 subDirectoryCount = sizeof(subDirectories) / sizeof(const char*);
-
-	node_ref nref;
-	BDirectory directory;
-	BPath path;
-	// when safemode, only B_SYSTEM_ADDONS_DIRECTORY is used
-	for (uint32 i = fSafeMode ? 2 : 0;
-			i < sizeof(directories) / sizeof(directory_which); i++) {
-		for (int32 j = 0; j < subDirectoryCount; j++) {
-			if (find_directory(directories[i], &path) == B_OK
-				&& path.Append(subDirectories[j]) == B_OK
-				&& directory.SetTo(path.Path()) == B_OK
-				&& directory.GetNodeRef(&nref) == B_OK) {
-				fHandler->AddDirectory(&nref);
-			}
-		}
-	}
+	fHandler->AddAddOnDirectories("input_server/devices");
+	fHandler->AddAddOnDirectories("input_server/filters");
+	fHandler->AddAddOnDirectories("input_server/methods");
 }
 
 

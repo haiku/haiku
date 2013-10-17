@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -37,18 +38,13 @@
 #include <Application.h>
 #include <Beep.h>
 #include <Directory.h>
-#include <driver_settings.h>
 #include <Entry.h>
-#include <FindDirectory.h>
 #include <MediaAddOn.h>
 #include <MediaRoster.h>
 #include <MessageRunner.h>
 #include <Path.h>
 #include <Roster.h>
 #include <String.h>
-
-#include <safemode_defs.h>
-#include <syscalls.h>
 
 #include <AddOnMonitorHandler.h>
 #include <debug.h>
@@ -274,17 +270,6 @@ MediaAddonServer::ReadyToRun()
 	// will be autostarted. Finally, add-ons that don't have
 	// any active nodes (flavors) will be unloaded.
 
-	char parameter[32];
-	size_t parameterLength = sizeof(parameter);
-	bool safeMode = false;
-	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
-			&parameterLength) == B_OK) {
-		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
-			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
-			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
-			safeMode = true;
-	}
-
 	fMonitorHandler = new MonitorHandler(this);
 	AddHandler(fMonitorHandler);
 
@@ -292,32 +277,14 @@ MediaAddonServer::ReadyToRun()
 	fPulseRunner = new BMessageRunner(fMonitorHandler, &pulse, 1000000LL);
 		// the monitor handler needs a pulse to check if add-ons are ready
 
-	// load dormant media nodes
-	const directory_which directories[] = {
-		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-		B_USER_ADDONS_DIRECTORY,
-		B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-		B_SYSTEM_ADDONS_DIRECTORY
-	};
-
-	// when safemode, only B_SYSTEM_ADDONS_DIRECTORY is used
-	for (uint32 i = safeMode ? 3 : 0;
-			i < sizeof(directories) / sizeof(directory_which); i++) {
-		BDirectory directory;
-		node_ref nodeRef;
-		BPath path;
-		if (find_directory(directories[i], &path) == B_OK
-			&& path.Append("media") == B_OK
-			&& directory.SetTo(path.Path()) == B_OK
-			&& directory.GetNodeRef(&nodeRef) == B_OK)
-			fMonitorHandler->AddDirectory(&nodeRef);
-	}
+	fMonitorHandler->AddAddOnDirectories("media");
 
 #ifdef USER_ADDON_PATH
 	node_ref nodeRef;
 	if (entry.SetTo(USER_ADDON_PATH) == B_OK
-		&& entry.GetNodeRef(&nodeRef) == B_OK)
+		&& entry.GetNodeRef(&nodeRef) == B_OK) {
 		fMonitorHandler->AddDirectory(&nodeRef);
+	}
 #endif
 
 	fStartup = false;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +9,7 @@
 #include "BottomlineWindow.h"
 #include "MethodReplicant.h"
 
+#include <driver_settings.h>
 #include <safemode_defs.h>
 #include <syscalls.h>
 
@@ -20,7 +21,6 @@
 #include <Autolock.h>
 #include <Deskbar.h>
 #include <Directory.h>
-#include <driver_settings.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -138,8 +138,8 @@ InputDeviceListItem::Matches(const char* name, input_device_type type) const
 
 
 InputServer::InputServer()
-	: BApplication(INPUTSERVER_SIGNATURE),
-	fSafeMode(false),
+	:
+	BApplication(INPUTSERVER_SIGNATURE),
 	fKeyboardID(0),
 	fInputDeviceListLocker("input server device list"),
 	fKeyboardSettings(),
@@ -162,28 +162,9 @@ InputServer::InputServer()
 
 	_StartEventLoop();
 
-	char parameter[32];
-	size_t parameterLength = sizeof(parameter);
-
-	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
-			&parameterLength) == B_OK) {
-		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
-			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
-			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
-			fSafeMode = true;
-	}
-
-	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter,
-			&parameterLength) == B_OK) {
-		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
-			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
-			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
-			fSafeMode = true;
-	}
-
 	_InitKeyboardMouseStates();
 
-	fAddOnManager = new(std::nothrow) ::AddOnManager(SafeMode());
+	fAddOnManager = new(std::nothrow) ::AddOnManager();
 	if (fAddOnManager != NULL) {
 		// We need to Run() the AddOnManager looper after having loaded
 		// the initial add-ons, otherwise we may deadlock when the looper
@@ -1363,7 +1344,28 @@ InputServer::SetMousePos(long *, long *, float, float)
 bool
 InputServer::SafeMode()
 {
-	return fSafeMode;
+	char parameter[32];
+	size_t parameterLength = sizeof(parameter);
+
+	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter,
+			&parameterLength) == B_OK) {
+		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
+			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
+			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1")) {
+			return true;
+		}
+	}
+
+	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter,
+			&parameterLength) == B_OK) {
+		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
+			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
+			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1")) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

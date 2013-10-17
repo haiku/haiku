@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef INPUT_SERVER_APP_H
@@ -211,7 +211,6 @@ class InputServer : public BApplication {
 		void _ReleaseInput(BMessage* message);
 
 	private:
-		bool 			fSafeMode;
 		uint16			fKeyboardID;
 
 		BList			fInputDeviceList;
