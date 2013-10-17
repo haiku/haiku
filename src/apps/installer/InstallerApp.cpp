@@ -254,7 +254,8 @@ InstallerApp::ReadyToRun()
 	BRect eulaFrame = BRect(0, 0, 600, 450);
 	fEULAWindow = new BWindow(eulaFrame, B_TRANSLATE("README"),
 		B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE
-			| B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS);
+			| B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS
+			| B_QUIT_ON_WINDOW_CLOSE);
 
 	if (!be_roster->IsRunning(kTrackerSignature))
 		fEULAWindow->SetWorkspaces(B_ALL_WORKSPACES);
