@@ -28,6 +28,7 @@
 #include <thread.h>
 #include <timer.h>
 #include <util/Heap.h>
+#include <util/MinMaxHeap.h>
 #include <util/Random.h>
 
 #include "RunQueue.h"
@@ -48,20 +49,13 @@ const bigtime_t kMinThreadQuantum = 3000;
 const bigtime_t kMaxThreadQuantum = 10000;
 
 
-struct CPUHeapEntry : public HeapLinkImpl<CPUHeapEntry, int32> {
-	HeapLink<CPUHeapEntry, int32>	fMaxHeap;
+struct CPUHeapEntry : public MinMaxHeapLinkImpl<CPUHeapEntry, int32> {
 	int32		fCPUNumber;
 };
 
 static CPUHeapEntry* sCPUPriorityEntries;
-typedef Heap<CPUHeapEntry, int32> AffineCPUHeap;
-typedef Heap<CPUHeapEntry, int32, HeapGreaterCompare<int32>,
-		HeapMemberGetLink<CPUHeapEntry, int32, &CPUHeapEntry::fMaxHeap> >
-	AffineCPUMaxHeap;
-
-// TODO: Use one min-max heap per-core
+typedef MinMaxHeap<CPUHeapEntry, int32> AffineCPUHeap;
 static AffineCPUHeap* sCPUPriorityHeaps;
-static AffineCPUMaxHeap* sCPUMaxPriorityHeaps;
 
 struct CoreHeapEntry : public HeapLinkImpl<CoreHeapEntry, int32> {
 	int32		fCoreID;
@@ -214,25 +208,25 @@ dump_heap(AffineCPUHeap* heap)
 	AffineCPUHeap temp;
 
 	kprintf("cpu priority actual priority\n");
-	CPUHeapEntry* entry = heap->PeekRoot();
+	CPUHeapEntry* entry = heap->PeekMinimum();
 	while (entry) {
 		int32 cpu = entry->fCPUNumber;
 		int32 key = AffineCPUHeap::GetKey(entry);
 		kprintf("%3" B_PRId32 " %8" B_PRId32 " %15" B_PRId32 "\n", cpu, key,
 			affine_get_effective_priority(gCPU[cpu].running_thread));
 
-		heap->RemoveRoot();
+		heap->RemoveMinimum();
 		temp.Insert(entry, key);
 
-		entry = heap->PeekRoot();
+		entry = heap->PeekMinimum();
 	}
 
-	entry = temp.PeekRoot();
+	entry = temp.PeekMinimum();
 	while (entry) {
 		int32 key = AffineCPUHeap::GetKey(entry);
-		temp.RemoveRoot();
+		temp.RemoveMinimum();
 		heap->Insert(entry, key);
-		entry = temp.PeekRoot();
+		entry = temp.PeekMinimum();
 	}
 }
 
@@ -355,10 +349,9 @@ affine_update_priority_heaps(int32 cpu, int32 priority)
 	int32 core = sCPUToCore[cpu];
 
 	sCPUPriorityHeaps[core].ModifyKey(&sCPUPriorityEntries[cpu], priority);
-	sCPUMaxPriorityHeaps[core].ModifyKey(&sCPUPriorityEntries[cpu], priority);
 
 	int32 maxPriority
-		= AffineCPUMaxHeap::GetKey(sCPUMaxPriorityHeaps[core].PeekRoot());
+		= AffineCPUHeap::GetKey(sCPUPriorityHeaps[core].PeekMaximum());
 	int32 corePriority = AffineCoreHeap::GetKey(&sCorePriorityEntries[core]);
 
 	if (corePriority != maxPriority)
@@ -378,7 +371,7 @@ affine_choose_core(void)
 static inline int32
 affine_choose_cpu(int32 core)
 {
-	CPUHeapEntry* entry = sCPUPriorityHeaps[core].PeekRoot();
+	CPUHeapEntry* entry = sCPUPriorityHeaps[core].PeekMinimum();
 	ASSERT(entry != NULL);
 	return entry->fCPUNumber;
 }
@@ -999,12 +992,6 @@ scheduler_affine_init()
 		return B_NO_MEMORY;
 	ArrayDeleter<AffineCPUHeap> cpuPriorityHeapDeleter(sCPUPriorityHeaps);
 
-	sCPUMaxPriorityHeaps = new AffineCPUMaxHeap[coreCount];
-	if (sCPUMaxPriorityHeaps == NULL)
-		return B_NO_MEMORY;
-	ArrayDeleter<AffineCPUMaxHeap> cpuMaxPriorityHeapDeleter(
-		sCPUMaxPriorityHeaps);
-
 	for (int32 i = 0; i < cpuCount; i++) {
 		sCPUPriorityEntries[i].fCPUNumber = i;
 		int32 core = sCPUToCore[i];
@@ -1012,11 +999,6 @@ scheduler_affine_init()
 		status_t result
 			= sCPUPriorityHeaps[core].Insert(&sCPUPriorityEntries[i],
 				B_IDLE_PRIORITY);
-		if (result != B_OK)
-			return result;
-
-		result = sCPUMaxPriorityHeaps[core].Insert(&sCPUPriorityEntries[i],
-			B_IDLE_PRIORITY);
 		if (result != B_OK)
 			return result;
 	}
@@ -1073,7 +1055,6 @@ scheduler_affine_init()
 	runQueuesDeleter.Detach();
 	pinnedRunQueuesDeleter.Detach();
 	corePriorityHeapDeleter.Detach();
-	cpuMaxPriorityHeapDeleter.Detach();
 	cpuPriorityHeapDeleter.Detach();
 	corePriorityEntriesDeleter.Detach();
 	cpuPriorityEntriesDeleter.Detach();
