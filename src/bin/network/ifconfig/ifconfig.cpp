@@ -815,7 +815,7 @@ configure_interface(const char* name, char* const* args, int32 argCount)
 			i++;
 		} else if (!strcmp(args[i], "metric")) {
 			if (i + 1 >= argCount) {
-				fprintf(stderr, "%s: Option 'metric' exptected parameter\n",
+				fprintf(stderr, "%s: Option 'metric' expected parameter\n",
 					kProgramName);
 				exit(1);
 			}
@@ -829,7 +829,7 @@ configure_interface(const char* name, char* const* args, int32 argCount)
 				exit(1);
 			}
 			if (i + 1 >= argCount) {
-				fprintf(stderr, "%s: Option 'media' exptected parameter\n",
+				fprintf(stderr, "%s: Option 'media' expected parameter\n",
 					kProgramName);
 				exit(1);
 			}
