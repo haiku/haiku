@@ -131,7 +131,6 @@ compare_void_list_items(const void* _a, const void* _b)
 }
 
 
-
 static int
 compare_void_menu_items(const void* _a, const void* _b)
 {
@@ -142,6 +141,8 @@ compare_void_menu_items(const void* _a, const void* _b)
 
 	return collator.Compare(a->Label(), b->Label());
 }
+
+
 // #pragma mark -
 
 
