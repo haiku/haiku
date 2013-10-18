@@ -28,6 +28,7 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	struct ifnet *ifp;
 	struct ifreq ifr;
 	int i;
+	status_t status;
 
 	for (i = 0; i < MAX_DEVICES; i++) {
 		if (gDevices[i] != NULL && !strcmp(gDevices[i]->device_name, name))
@@ -56,7 +57,11 @@ compat_open(const char *name, uint32 flags, void **cookie)
 
 		memset(&ifr, 0, sizeof(ifr));
 		ifr.ifr_media = IFM_MAKEWORD(IFM_ETHER, IFM_AUTO, 0, 0);
-		ifp->if_ioctl(ifp, SIOCSIFMEDIA, (caddr_t)&ifr);
+		status = ifp->if_ioctl(ifp, SIOCSIFMEDIA, (caddr_t)&ifr);
+		if (status != B_OK) {
+			ifr.ifr_media = IFM_MAKEWORD(IFM_ETHER, IFM_10_T, 0, 0);
+			status = ifp->if_ioctl(ifp, SIOCSIFMEDIA, (caddr_t)&ifr);
+		}
 	}
 
 	ifp->if_flags |= IFF_UP;
