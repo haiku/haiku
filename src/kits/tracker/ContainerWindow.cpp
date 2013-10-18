@@ -2108,6 +2108,14 @@ BContainerWindow::AddShortcuts()
 		new BMessage(kOpenParentDir), PoseView());
 	AddShortcut('O', B_COMMAND_KEY | B_CONTROL_KEY,
 		new BMessage(kOpenSelectionWith), PoseView());
+
+	BMessage* decreaseSize = new BMessage(kIconMode);
+	decreaseSize->AddInt32("scale", 0);
+	AddShortcut('-', B_COMMAND_KEY, decreaseSize, PoseView());
+
+	BMessage* increaseSize = new BMessage(kIconMode);
+	increaseSize->AddInt32("scale", 1);
+	AddShortcut('+', B_COMMAND_KEY, increaseSize, PoseView());
 }
 
 
