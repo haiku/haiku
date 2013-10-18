@@ -96,6 +96,9 @@ private:
 									addr_t* _textAddress, size_t* _textSize,
 									addr_t* _dataAddress, size_t* _dataSize);
 
+			status_t			_FindTableInSection(elf_ehdr* elfHeader,
+									uint16 sectionType);
+
 private:
 			int					fFD;
 			off_t				fFileSize;

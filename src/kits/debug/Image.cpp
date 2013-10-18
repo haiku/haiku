@@ -305,9 +305,6 @@ ImageFile::_LoadFile(const char* path, addr_t* _textAddress, size_t* _textSize,
 		return B_NOT_AN_EXECUTABLE;
 	}
 
-	elf_shdr* sectionHeaders
-		= (elf_shdr*)(fMappedFile + elfHeader->e_shoff);
-
 	// find the text and data segment -- we need load address and size
 	*_textAddress = 0;
 	*_textSize = 0;
@@ -328,12 +325,26 @@ ImageFile::_LoadFile(const char* path, addr_t* _textAddress, size_t* _textSize,
 		}
 	}
 
+	status_t error = _FindTableInSection(elfHeader, SHT_SYMTAB);
+	if (error != B_OK)
+		error = _FindTableInSection(elfHeader, SHT_DYNSYM);
+
+	return error;
+}
+
+
+status_t
+ImageFile::_FindTableInSection(elf_ehdr* elfHeader, uint16 sectionType)
+{
+	elf_shdr* sectionHeaders
+		= (elf_shdr*)(fMappedFile + elfHeader->e_shoff);
+
 	// find the symbol table
 	for (int32 i = 0; i < elfHeader->e_shnum; i++) {
 		elf_shdr* sectionHeader = (elf_shdr*)
 			((uint8*)sectionHeaders + i * elfHeader->e_shentsize);
 
-		if (sectionHeader->sh_type == SHT_SYMTAB) {
+		if (sectionHeader->sh_type == sectionType) {
 			elf_shdr& stringHeader = *(elf_shdr*)
 				((uint8*)sectionHeaders
 					+ sectionHeader->sh_link * elfHeader->e_shentsize);
