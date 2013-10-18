@@ -103,7 +103,7 @@ struct le_pci_softc {
 	struct resource		*sc_rres;
 
 	struct resource		*sc_ires;
-	void			*sc_ih;
+	void				*sc_ih;
 
 	bus_dma_tag_t		sc_pdmat;
 	bus_dma_tag_t		sc_dmat;
@@ -111,7 +111,8 @@ struct le_pci_softc {
 };
 
 int
-check_disable_interrupts_le(device_t dev) {
+check_disable_interrupts_le(device_t dev)
+{
 	struct le_pci_softc *lesc = (struct le_pci_softc *)device_get_softc(dev);
 	HAIKU_INTR_REGISTER_STATE;
 	uint16_t isr;
