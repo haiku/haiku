@@ -131,6 +131,17 @@ compare_void_list_items(const void* _a, const void* _b)
 }
 
 
+
+static int
+compare_void_menu_items(const void* _a, const void* _b)
+{
+	static BCollator collator;
+
+	BMenuItem* a = *(BMenuItem**)_a;
+	BMenuItem* b = *(BMenuItem**)_b;
+
+	return collator.Compare(a->Label(), b->Label());
+}
 // #pragma mark -
 
 
@@ -397,18 +408,20 @@ BootPromptWindow::_PopulateKeymaps()
 	BDirectory directory;
 	if (directory.SetTo(path.Path()) == B_OK) {
 		entry_ref ref;
+		BList itemsList;
 		while (directory.GetNextRef(&ref) == B_OK) {
 			BMessage* message = new BMessage(MSG_KEYMAP_SELECTED);
 			message->AddRef("ref", &ref);
 			BMenuItem* item = new BMenuItem(ref.name, message);
-			fKeymapsMenuField->Menu()->AddItem(item);
-
+			itemsList.AddItem(item);
 			if (currentName == ref.name)
 				item->SetMarked(true);
 
 			if (usInternational == ref.name)
 				fDefaultKeymapItem = item;
 		}
+		itemsList.SortItems(compare_void_menu_items);
+		fKeymapsMenuField->Menu()->AddList(&itemsList, 0);
 	}
 }
 
