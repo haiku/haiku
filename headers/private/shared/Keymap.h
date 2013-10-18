@@ -14,6 +14,8 @@
 #include <InterfaceDefs.h>
 
 
+class BList;
+
 class BKeymap {
 public:
 								BKeymap();
@@ -38,6 +40,9 @@ public:
 			void				GetChars(uint32 keyCode, uint32 modifiers,
 									uint8 activeDeadKey, char** chars,
 									int32* numBytes) const;
+			status_t			GetModifiedCharacters(const char* normal,
+									int32 modifiers,
+									BList* _modifiedCharacters);
 
 			const key_map&		Map() const { return fKeys; }
 

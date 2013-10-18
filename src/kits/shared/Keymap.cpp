@@ -19,6 +19,7 @@
 
 #include <ByteOrder.h>
 #include <File.h>
+#include <List.h>
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #	include "SystemKeymap.h"
@@ -438,6 +439,60 @@ BKeymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 	*chars = new char[*numBytes + 1];
 	strncpy(*chars, &fChars[offset + 1], *numBytes);
 	(*chars)[*numBytes] = 0;
+}
+
+
+status_t
+BKeymap::GetModifiedCharacters(const char* normal, int32 modifiers,
+	BList* _modifiedCharacters)
+{
+	if (normal == NULL || strcmp(normal, "") == 0
+		|| _modifiedCharacters == NULL) {
+		return B_BAD_VALUE;
+	}
+
+	int32 normalOffset;
+	int32 modifiedOffset;
+
+	for(uint32 i = 0; i < 128; i++) {
+		normalOffset = fKeys.normal_map[i];
+		size_t sizeNormal = fChars[normalOffset++];
+		if (sizeNormal == 0
+			|| memcmp(normal, fChars + normalOffset, sizeNormal) != 0) {
+			// this character isn't mapped or doesn't match
+			continue;
+		}
+
+		if (modifiers == B_SHIFT_KEY)
+			modifiedOffset = fKeys.shift_map[i];
+		else if (modifiers == B_CONTROL_KEY)
+			modifiedOffset = fKeys.control_map[i];
+		else if (modifiers == B_OPTION_KEY)
+			modifiedOffset = fKeys.option_map[i];
+		else if (modifiers == (B_OPTION_KEY | B_SHIFT_KEY))
+			modifiedOffset = fKeys.option_shift_map[i];
+		else if (modifiers == B_CAPS_LOCK)
+			modifiedOffset = fKeys.caps_map[i];
+		else if (modifiers == (B_CAPS_LOCK | B_SHIFT_KEY))
+			modifiedOffset = fKeys.caps_shift_map[i];
+		else if (modifiers == (B_OPTION_KEY | B_CAPS_LOCK))
+			modifiedOffset = fKeys.option_caps_map[i];
+		else if (modifiers == (B_OPTION_KEY | B_CAPS_LOCK | B_SHIFT_KEY))
+			modifiedOffset = fKeys.option_caps_shift_map[i];
+		else
+			return B_BAD_VALUE;
+
+		size_t sizeModified = fChars[modifiedOffset++];
+		char* modified = (char*)malloc(sizeModified + 1);
+		if (modified == NULL)
+			return B_NO_MEMORY;
+
+		memcpy(modified, fChars + modifiedOffset, sizeModified);
+		modified[sizeModified] = '\0';
+		_modifiedCharacters->AddItem(modified);
+	}
+
+	return B_OK;
 }
 
 
