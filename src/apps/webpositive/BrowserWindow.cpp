@@ -5,8 +5,7 @@
  * Copyright (C) 2010 Stephan Aßmus <superstippi@gmx.de>
  * Copyright (C) 2010 Michael Lotz <mmlr@mlotz.ch>
  * Copyright (C) 2010 Rene Gollent <rene@gollent.com>
- *
- * All rights reserved.
+ * Copyright 2013 Haiku, Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -48,6 +47,7 @@
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Keymap.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuBar.h>
@@ -609,6 +609,25 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		snprintf(numStr, sizeof(numStr), "%d", (int) i);
 		AddShortcut(numStr[0], B_COMMAND_KEY, selectTab);
 	}
+
+	BKeymap keymap;
+	keymap.SetToCurrent();
+	BList shiftChars;
+	if (keymap.GetModifiedCharacters("=", B_SHIFT_KEY, &shiftChars)
+			== B_OK) {
+		int32 count = shiftChars.CountItems();
+		for (int32 i = 0; i < count; i++) {
+			if (strcmp((const char*)shiftChars.ItemAt(i), "+") == 0) {
+				// Add semantic zoom in shortcut, bug #7428
+				AddShortcut('=', B_COMMAND_KEY,
+					new BMessage(ZOOM_FACTOR_INCREASE));
+				break;
+			}
+		}
+	}
+	while (!shiftChars.IsEmpty())
+		delete (const char*)shiftChars.RemoveItem((int32)0);
+	shiftChars.MakeEmpty();
 
 	be_app->PostMessage(WINDOW_OPENED);
 }
