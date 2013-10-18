@@ -45,7 +45,7 @@ All rights reserved.
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
-#include <InterfaceDefs.h>
+#include <Keymap.h>
 #include <Locale.h>
 #include <MenuItem.h>
 #include <MenuBar.h>
@@ -936,6 +936,26 @@ BContainerWindow::Init(const BMessage* message)
 		// desktop window
 		AddShortcuts();
 	}
+
+	BKeymap keymap;
+	keymap.SetToCurrent();
+	BList shiftChars;
+	if (keymap.GetModifiedCharacters("=", B_SHIFT_KEY, &shiftChars)
+			== B_OK) {
+		int32 count = shiftChars.CountItems();
+		for (int32 i = 0; i < count; i++) {
+			if (strcmp((const char*)shiftChars.ItemAt(i), "+") == 0) {
+				// Add semantic zoom in shortcut, bug #6692
+				BMessage* increaseSize = new BMessage(kIconMode);
+				increaseSize->AddInt32("scale", 1);
+				AddShortcut('=', B_COMMAND_KEY, increaseSize, PoseView());
+				break;
+			}
+		}
+	}
+	while (!shiftChars.IsEmpty())
+		delete (const char*)shiftChars.RemoveItem((int32)0);
+	shiftChars.MakeEmpty();
 
 	AddContextMenus();
 	AddShortcut('T', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kDelete),
