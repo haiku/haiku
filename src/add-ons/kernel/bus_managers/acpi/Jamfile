@@ -4,7 +4,7 @@ UsePrivateKernelHeaders ;
 SubDirHdrs [ FDirName $(SUBDIR) acpica include ] ;
 SubDirHdrs [ FDirName $(SUBDIR) acpica include platform ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) pci ] ;
-SubDirCcFlags -fno-pic -D_KERNEL_MODE ;
+SubDirCcFlags -D_KERNEL_MODE ;
 
 
 local common_src =

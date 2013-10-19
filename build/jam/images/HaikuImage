@@ -186,7 +186,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		3com atheros813x ar81xx attansic_l1 attansic_l2 broadcom440x
 		broadcom570x dec21xxx ipro100 ipro1000 jmicron2x0 marvell_yukon nforce
 		pcnet rtl8139 rtl81xx sis19x syskonnect via_rhine vt612x
-	}@ # x86_64
+	}@ # x86,x86_64
 
 	etherpci pegasus sis900 usb_davicom usb_asix usb_ecm wb840
 
@@ -204,8 +204,8 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures acpi_button@x86 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	ata@ata pci ps2@x86,x86_64 isa@x86,x86_64
-	ide@ide scsi config_manager agp_gart@x86,x86_64 usb firewire@x86 acpi@x86
-	virtio random
+	ide@ide scsi config_manager agp_gart@x86,x86_64 usb firewire@x86
+	acpi@x86,x86_64	virtio random
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs bindfs btrfs cdda exfat ext2 fat iso9660 nfs
 	nfs4 attribute_overlay write_overlay ntfs packagefs reiserfs@x86 udf
