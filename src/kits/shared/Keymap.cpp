@@ -509,7 +509,7 @@ BKeymap::GetModifiedCharacters(const char* in, int32 inModifiers,
 		if (out == NULL)
 			return B_NO_MEMORY;
 
-        memcpy(out, fChars + outOffset, sizeOut);
+		memcpy(out, fChars + outOffset, sizeOut);
 		out[sizeOut] = '\0';
 
 		_outList->AddItem((const char*)out);
