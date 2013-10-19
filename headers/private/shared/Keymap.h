@@ -12,9 +12,8 @@
 
 #include <DataIO.h>
 #include <InterfaceDefs.h>
+#include <ObjectList.h>
 
-
-class BList;
 
 class BKeymap {
 public:
@@ -40,9 +39,9 @@ public:
 			void				GetChars(uint32 keyCode, uint32 modifiers,
 									uint8 activeDeadKey, char** chars,
 									int32* numBytes) const;
-			status_t			GetModifiedCharacters(const char* normal,
-									int32 modifiers,
-									BList* _modifiedCharacters);
+			status_t			GetModifiedCharacters(const char* in,
+									int32 inModifiers, int32 outModifiers,
+									BObjectList<const char>* _outList);
 
 			const key_map&		Map() const { return fKeys; }
 

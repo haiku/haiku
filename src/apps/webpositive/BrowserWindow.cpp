@@ -50,6 +50,7 @@
 #include <Keymap.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
+#include <ObjectList.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
@@ -63,6 +64,7 @@
 #include <StatusBar.h>
 #include <StringView.h>
 #include <TextControl.h>
+#include <UnicodeChar.h>
 
 #include <stdio.h>
 
@@ -612,22 +614,20 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 
 	BKeymap keymap;
 	keymap.SetToCurrent();
-	BList shiftChars;
-	if (keymap.GetModifiedCharacters("=", B_SHIFT_KEY, &shiftChars)
+	BObjectList<const char> unmodified(3, true);
+	if (keymap.GetModifiedCharacters("+", B_SHIFT_KEY, 0, &unmodified)
 			== B_OK) {
-		int32 count = shiftChars.CountItems();
+		int32 count = unmodified.CountItems();
 		for (int32 i = 0; i < count; i++) {
-			if (strcmp((const char*)shiftChars.ItemAt(i), "+") == 0) {
+			uint32 key = BUnicodeChar::FromUTF8(unmodified.ItemAt(i));
+			if (!HasShortcut(key, 0)) {
 				// Add semantic zoom in shortcut, bug #7428
-				AddShortcut('=', B_COMMAND_KEY,
+				AddShortcut(key, B_COMMAND_KEY,
 					new BMessage(ZOOM_FACTOR_INCREASE));
-				break;
 			}
 		}
 	}
-	while (!shiftChars.IsEmpty())
-		delete (const char*)shiftChars.RemoveItem((int32)0);
-	shiftChars.MakeEmpty();
+	unmodified.MakeEmpty();
 
 	be_app->PostMessage(WINDOW_OPENED);
 }

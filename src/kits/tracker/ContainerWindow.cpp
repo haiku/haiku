@@ -53,6 +53,7 @@ All rights reserved.
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Screen.h>
+#include <UnicodeChar.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 #include <Roster.h>
@@ -937,26 +938,6 @@ BContainerWindow::Init(const BMessage* message)
 		AddShortcuts();
 	}
 
-	BKeymap keymap;
-	keymap.SetToCurrent();
-	BList shiftChars;
-	if (keymap.GetModifiedCharacters("=", B_SHIFT_KEY, &shiftChars)
-			== B_OK) {
-		int32 count = shiftChars.CountItems();
-		for (int32 i = 0; i < count; i++) {
-			if (strcmp((const char*)shiftChars.ItemAt(i), "+") == 0) {
-				// Add semantic zoom in shortcut, bug #6692
-				BMessage* increaseSize = new BMessage(kIconMode);
-				increaseSize->AddInt32("scale", 1);
-				AddShortcut('=', B_COMMAND_KEY, increaseSize, PoseView());
-				break;
-			}
-		}
-	}
-	while (!shiftChars.IsEmpty())
-		delete (const char*)shiftChars.RemoveItem((int32)0);
-	shiftChars.MakeEmpty();
-
 	AddContextMenus();
 	AddShortcut('T', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kDelete),
 		PoseView());
@@ -981,6 +962,24 @@ BContainerWindow::Init(const BMessage* message)
 	AddShortcut('F', B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY,
 		new BMessage('dpfL'), PoseView());
 #endif
+
+	BKeymap keymap;
+	keymap.SetToCurrent();
+	BObjectList<const char> unmodified(3, true);
+	if (keymap.GetModifiedCharacters("+", B_SHIFT_KEY, 0, &unmodified)
+			== B_OK) {
+		int32 count = unmodified.CountItems();
+		for (int32 i = 0; i < count; i++) {
+			uint32 key = BUnicodeChar::FromUTF8(unmodified.ItemAt(i));
+			if (!HasShortcut(key, 0)) {
+				// Add semantic zoom in shortcut, bug #6692
+				BMessage* increaseSize = new BMessage(kIconMode);
+					increaseSize->AddInt32("scale", 1);
+				AddShortcut(key, B_COMMAND_KEY, increaseSize, PoseView());
+			}
+		}
+	}
+	unmodified.MakeEmpty();
 
 	if (message)
 		RestoreState(*message);

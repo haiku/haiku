@@ -19,7 +19,7 @@
 
 #include <ByteOrder.h>
 #include <File.h>
-#include <List.h>
+
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #	include "SystemKeymap.h"
@@ -442,54 +442,77 @@ BKeymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey,
 }
 
 
+/*!	Get a list of characters translated from a given character and
+	set of modifiers to another set of modifiers.
+*/
 status_t
-BKeymap::GetModifiedCharacters(const char* normal, int32 modifiers,
-	BList* _modifiedCharacters)
+BKeymap::GetModifiedCharacters(const char* in, int32 inModifiers,
+	int32 outModifiers, BObjectList<const char>* _outList)
 {
-	if (normal == NULL || strcmp(normal, "") == 0
-		|| _modifiedCharacters == NULL) {
+	if (in == NULL || *in == '\0' || _outList == NULL)
 		return B_BAD_VALUE;
-	}
 
-	int32 normalOffset;
-	int32 modifiedOffset;
+	int32 inOffset;
+	int32 outOffset;
 
 	for(uint32 i = 0; i < 128; i++) {
-		normalOffset = fKeys.normal_map[i];
-		size_t sizeNormal = fChars[normalOffset++];
-		if (sizeNormal == 0
-			|| memcmp(normal, fChars + normalOffset, sizeNormal) != 0) {
+		if (inModifiers == 0)
+			inOffset = fKeys.normal_map[i];
+		else if (inModifiers == B_SHIFT_KEY)
+			inOffset = fKeys.shift_map[i];
+		else if (inModifiers == B_CONTROL_KEY)
+			inOffset = fKeys.control_map[i];
+		else if (inModifiers == B_OPTION_KEY)
+			inOffset = fKeys.option_map[i];
+		else if (inModifiers == (B_OPTION_KEY | B_SHIFT_KEY))
+			inOffset = fKeys.option_shift_map[i];
+		else if (inModifiers == B_CAPS_LOCK)
+			inOffset = fKeys.caps_map[i];
+		else if (inModifiers == (B_CAPS_LOCK | B_SHIFT_KEY))
+			inOffset = fKeys.caps_shift_map[i];
+		else if (inModifiers == (B_OPTION_KEY | B_CAPS_LOCK))
+			inOffset = fKeys.option_caps_map[i];
+		else if (inModifiers == (B_OPTION_KEY | B_CAPS_LOCK | B_SHIFT_KEY))
+			inOffset = fKeys.option_caps_shift_map[i];
+		else
+			return B_BAD_VALUE;
+
+		size_t sizeIn = fChars[inOffset++];
+		if (sizeIn == 0 || memcmp(in, fChars + inOffset, sizeIn) != 0) {
 			// this character isn't mapped or doesn't match
 			continue;
 		}
 
-		if (modifiers == B_SHIFT_KEY)
-			modifiedOffset = fKeys.shift_map[i];
-		else if (modifiers == B_CONTROL_KEY)
-			modifiedOffset = fKeys.control_map[i];
-		else if (modifiers == B_OPTION_KEY)
-			modifiedOffset = fKeys.option_map[i];
-		else if (modifiers == (B_OPTION_KEY | B_SHIFT_KEY))
-			modifiedOffset = fKeys.option_shift_map[i];
-		else if (modifiers == B_CAPS_LOCK)
-			modifiedOffset = fKeys.caps_map[i];
-		else if (modifiers == (B_CAPS_LOCK | B_SHIFT_KEY))
-			modifiedOffset = fKeys.caps_shift_map[i];
-		else if (modifiers == (B_OPTION_KEY | B_CAPS_LOCK))
-			modifiedOffset = fKeys.option_caps_map[i];
-		else if (modifiers == (B_OPTION_KEY | B_CAPS_LOCK | B_SHIFT_KEY))
-			modifiedOffset = fKeys.option_caps_shift_map[i];
+		if (outModifiers == 0)
+			outOffset = fKeys.normal_map[i];
+		else if (outModifiers == B_SHIFT_KEY)
+			outOffset = fKeys.shift_map[i];
+		else if (outModifiers == B_CONTROL_KEY)
+			outOffset = fKeys.control_map[i];
+		else if (outModifiers == B_OPTION_KEY)
+			outOffset = fKeys.option_map[i];
+		else if (outModifiers == (B_OPTION_KEY | B_SHIFT_KEY))
+			outOffset = fKeys.option_shift_map[i];
+		else if (outModifiers == B_CAPS_LOCK)
+			outOffset = fKeys.caps_map[i];
+		else if (outModifiers == (B_CAPS_LOCK | B_SHIFT_KEY))
+			outOffset = fKeys.caps_shift_map[i];
+		else if (outModifiers == (B_OPTION_KEY | B_CAPS_LOCK))
+			outOffset = fKeys.option_caps_map[i];
+		else if (outModifiers == (B_OPTION_KEY | B_CAPS_LOCK | B_SHIFT_KEY))
+			outOffset = fKeys.option_caps_shift_map[i];
 		else
 			return B_BAD_VALUE;
 
-		size_t sizeModified = fChars[modifiedOffset++];
-		char* modified = (char*)malloc(sizeModified + 1);
-		if (modified == NULL)
+		size_t sizeOut = fChars[outOffset++];
+		char* out = (char*)malloc(sizeOut + 1);
+		if (out == NULL)
 			return B_NO_MEMORY;
 
-		memcpy(modified, fChars + modifiedOffset, sizeModified);
-		modified[sizeModified] = '\0';
-		_modifiedCharacters->AddItem(modified);
+        memcpy(out, fChars + outOffset, sizeOut);
+		out[sizeOut] = '\0';
+
+		_outList->AddItem((const char*)out);
 	}
 
 	return B_OK;
