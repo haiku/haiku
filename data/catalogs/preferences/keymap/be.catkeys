@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Keymap	4022885915
+1	belarusian	x-vnd.Haiku-Keymap	761976561
 Shift:	Modifier keys window	Shift key role name	Зрух:
 Revert	Modifier keys window		Вярнуць
 Tilde trigger	Keymap window		Tilde
@@ -6,6 +6,7 @@ Grave trigger	Keymap window		Grave
 Role	Modifier keys window	As in the role of a modifier key	Роля
 Select dead keys	Keymap window		Пазначыць трыгеры (Dead Keys)
 Cancel	Modifier keys window		Адмяніць
+Defaults	Keymap window		Прадвызначаныя
 Quit	Keymap window		Выйсці
 Switch shortcut keys to Haiku mode	Keymap window		Пераключыць камбінацыі ў рэжым Haiku
 Circumflex trigger	Keymap window		Circumflex
