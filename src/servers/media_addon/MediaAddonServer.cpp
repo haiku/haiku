@@ -315,7 +315,7 @@ MediaAddonServer::QuitRequested()
 
 	BMediaRoster::CurrentRoster()->Lock();
 	BMediaRoster::CurrentRoster()->Quit();
-				
+
 	for (iterator = fInfoMap.begin(); iterator != fInfoMap.end(); iterator++)
 		_PutAddonIfPossible(iterator->second);
 
@@ -579,9 +579,9 @@ MediaAddonServer::_DestroyInstantiatedFlavors(AddOnInfo& info)
 	NodeVector::iterator iterator = info.active_flavors.begin();
 	for (; iterator != info.active_flavors.end(); iterator++) {
 		media_node& node = *iterator;
-		
+
 		printf("node %" B_PRId32 "\n", node.node);
-		
+
 		if ((node.kind & B_TIME_SOURCE) != 0
 			&& (fMediaRoster->StopTimeSource(node, 0, true) != B_OK)) {
 			printf("MediaAddonServer::_DestroyInstantiatedFlavors couldn't stop "
@@ -650,8 +650,14 @@ MediaAddonServer::_DestroyInstantiatedFlavors(AddOnInfo& info)
 				}
 			}
 		}
-		
-		MediaRosterEx(fMediaRoster)->ReleaseNodeAll(node);
+
+		if (MediaRosterEx(fMediaRoster)->ReleaseNodeAll(node) != B_OK) {
+			printf("MediaAddonServer::_DestroyInstantiatedFlavors "
+						"couldn't release node\n");
+		}
+
+		// wait a bit to let the node clean up
+		snooze(50000);
 	}
 
 	info.active_flavors.clear();
@@ -724,9 +730,9 @@ MediaAddonServer::_InstantiateAutostartFlavors(AddOnInfo& info)
 			continue;
 		else if (status != B_OK)
 			break;
-			
+
 		printf("started node %" B_PRId32 "\n", index);
-						
+
 		status = MediaRosterEx(fMediaRoster)->RegisterNode(node, info.id,
 			internalID);
 		if (status != B_OK) {
@@ -798,4 +804,3 @@ main()
 	delete be_app;
 	return 0;
 }
-

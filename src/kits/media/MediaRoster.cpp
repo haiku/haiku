@@ -221,9 +221,18 @@ BMediaRosterEx::ReleaseNodeAll(const media_node& node)
 	rv = QueryServer(SERVER_RELEASE_NODE_ALL, &request, sizeof(request), &reply,
 		sizeof(reply));
 	if (rv != B_OK) {
-		ERROR("BMediaRoster::ReleaseNodeAll FAILED, node %" B_PRId32 ", port %"
+		ERROR("BMediaRoster::ReleaseNodeAll failed to query media_server, "
+			"retrying local, node %" B_PRId32 ", port %"
 			B_PRId32 ", team %" B_PRId32 "!\n", node.node, node.port,
 			BPrivate::current_team());
+		node_final_release_command command;
+		rv = SendToPort(node.port, NODE_FINAL_RELEASE, &command,
+			sizeof(command));
+		if (rv != B_OK) {
+			ERROR("BMediaRoster::ReleaseNodeAll FAILED, node %" B_PRId32 ", port %"
+				B_PRId32 ", team %" B_PRId32 "!\n", node.node, node.port,
+				BPrivate::current_team());
+		}
 	}
 	return rv;
 }
@@ -2079,13 +2088,16 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 	BPrivate::media::notifications::NodesDeleted(&request.node_id, 1);
 
 	server_unregister_node_reply reply;
+	reply.add_on_id = -1;
 	status_t status = QueryServer(SERVER_UNREGISTER_NODE, &request,
 		sizeof(request), &reply, sizeof(reply));
 	if (status != B_OK) {
 		ERROR("BMediaRoster::UnregisterNode: failed to unregister node id %"
 			B_PRId32 ", name '%s': %s\n", node->ID(), node->Name(),
 			strerror(status));
-		return status;
+		BMediaAddOn *addon = node->AddOn(&reply.flavor_id);
+		if (addon != NULL)
+			reply.add_on_id = addon->AddonID();
 	}
 
 	if (reply.add_on_id != -1) {
@@ -2110,7 +2122,7 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 	// we are a friend class of BMediaNode and invalidate this member variable
 	node->fNodeID = NODE_UNREGISTERED_ID;
 
-	return B_OK;
+	return status;
 }
 
 
@@ -3309,4 +3321,3 @@ BMediaRoster::SetRunningDefault(media_node_id forDefault,
 
 
 BMediaRoster* BMediaRoster::sDefaultInstance = NULL;
-
