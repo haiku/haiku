@@ -23,6 +23,10 @@
 
 * B_MAX_CPU_COUNT should be fixed to be a more sensible future-proof value then 1
 
+* KDL disasm module.
+  cf.
+  http://fxr.watson.org/fxr/source/arch/arm/arm/disassem.c?v=NETBSD
+
 * Add KDL hangman to the boot floppy image for more enjoyment during porting....
 
 * Userland...........
