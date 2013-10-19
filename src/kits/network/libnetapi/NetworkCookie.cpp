@@ -631,6 +631,8 @@ BNetworkCookie::operator!=(const BNetworkCookie& other)
 void
 BNetworkCookie::_Reset()
 {
+	fInitStatus = false;
+
 	fName.Truncate(0);
 	fValue.Truncate(0);
 	fDomain.Truncate(0);

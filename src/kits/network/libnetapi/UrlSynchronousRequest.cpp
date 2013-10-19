@@ -15,7 +15,7 @@
 
 BUrlSynchronousRequest::BUrlSynchronousRequest(BUrlRequest& request)
 	:
-	BUrlRequest(request.Url(), this, request.Context(), request.Result(),
+	BUrlRequest(request.Url(), NULL, request.Context(),
 		"BUrlSynchronousRequest", request.Protocol()),
 	fRequestComplete(false),
 	fWrappedRequest(request)
@@ -44,6 +44,8 @@ BUrlSynchronousRequest::WaitUntilCompletion()
 {
 	while (!fRequestComplete)
 		snooze(10000);
+
+	fResult = fWrappedRequest.Result();
 
 	return B_OK;
 }

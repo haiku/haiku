@@ -18,7 +18,8 @@ BUrlResult::BUrlResult(const BUrl& url)
 	:
 	fUrl(url),
 	fRawData(),
-	fHeaders()
+	fHeaders(),
+	fStatusCode(0)
 {
 }
 
@@ -101,7 +102,10 @@ BUrlResult::operator=(const BUrlResult& other)
 	fHeaders = other.fHeaders;
 	
 	fRawData.SetSize(other.fRawData.BufferLength());
-	fRawData.WriteAt(0, fRawData.Buffer(), fRawData.BufferLength());
+	fRawData.WriteAt(0, other.fRawData.Buffer(), other.fRawData.BufferLength());
+		// FIXME this makes a copy of the data, it would be better to share it
+
+	fStatusCode = other.fStatusCode;
 	
 	return *this;
 }

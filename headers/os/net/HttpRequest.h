@@ -23,7 +23,7 @@ class BAbstractSocket;
 class BHttpRequest : public BUrlRequest {
 public:
 								BHttpRequest(const BUrl& url,
-									BUrlResult& result, bool ssl = false,
+									bool ssl = false,
 									const char *protocolName = "HTTP",
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL);

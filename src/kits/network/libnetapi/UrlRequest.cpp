@@ -28,15 +28,15 @@ static const char* kProtocolThreadStrStatus[B_PROT_THREAD_STATUS__END+1]
 
 
 BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener,
-	BUrlContext* context, BUrlResult& result, const char* threadName,
-	const char* protocolName)
+	BUrlContext* context, const char* threadName, const char* protocolName)
 	:
 	fUrl(url),
-	fResult(result),
+	fResult(url),
 	fContext(context),
 	fListener(listener),
 	fQuit(false),
 	fRunning(false),
+	fThreadStatus(B_PROT_PAUSED),
 	fThreadId(0),
 	fThreadName(threadName),
 	fProtocol(protocolName)
@@ -46,6 +46,7 @@ BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener,
 
 BUrlRequest::~BUrlRequest()
 {
+	Stop();
 }
 
 
@@ -168,7 +169,7 @@ BUrlRequest::Url() const
 }
 
 
-BUrlResult&
+const BUrlResult&
 BUrlRequest::Result() const
 {
 	return fResult;

@@ -20,14 +20,12 @@
 BUrlProtocolRoster::MakeRequest(const BUrl& url,
 	BUrlProtocolListener* listener, BUrlContext* context)
 {
-	BUrlResult* result = new BUrlResult(url);
-		// FIXME this is leaked
 	// TODO: instanciate the correct BUrlProtocol using add-on interface
 	if (url.Protocol() == "http") {
-		return new(std::nothrow) BHttpRequest(url, *result, false, "HTTP", listener,
+		return new(std::nothrow) BHttpRequest(url, false, "HTTP", listener,
 			context);
 	} else if (url.Protocol() == "https") {
-		return new(std::nothrow) BHttpRequest(url, *result, true, "HTTPS", listener,
+		return new(std::nothrow) BHttpRequest(url, true, "HTTPS", listener,
 			context);
 	}
 

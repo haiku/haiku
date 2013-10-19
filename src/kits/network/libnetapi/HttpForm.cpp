@@ -704,6 +704,7 @@ BHttpForm::_GetMultipartHeader(const BHttpFormData* element) const
 
 
 BHttpForm::Iterator::Iterator(BHttpForm* form)
+	: fElement(NULL)
 {
 	fForm = form;
 	fStdIterator = form->fFields.begin();

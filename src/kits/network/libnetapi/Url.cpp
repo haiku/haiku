@@ -52,6 +52,8 @@ BUrl::BUrl(BMessage* archive)
 
 	if (archive->FindString(kArchivedUrl, &url) == B_OK)
 		SetUrlString(url);
+	else
+		_ResetFields();
 }
 
 
@@ -139,6 +141,7 @@ BUrl::BUrl()
 	fRequest(),
 	fHasAuthority(false)
 {
+	_ResetFields();
 }
 
 

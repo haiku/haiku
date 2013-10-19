@@ -118,8 +118,6 @@ private:
 	mutable	bool				fAuthorityValid : 1;
 	mutable bool				fUserInfoValid : 1;
 
-			bool				fBasicUri : 1;
-			
 			bool				fHasProtocol : 1;
 			bool				fHasUserName : 1;
 			bool				fHasPassword : 1;

@@ -59,7 +59,7 @@ BNetworkCookieJar::BNetworkCookieJar(BMessage* archive)
 		if (heapCookie == NULL)
 			break;
 
-		if (!AddCookie(heapCookie)) {
+		if (AddCookie(heapCookie) != B_OK) {
 			delete heapCookie;
 			continue;
 		}
@@ -69,9 +69,7 @@ BNetworkCookieJar::BNetworkCookieJar(BMessage* archive)
 
 BNetworkCookieJar::~BNetworkCookieJar()
 {
-	BNetworkCookie* cookiePtr;
-
-	for (Iterator it = GetIterator(); (cookiePtr = it.Next()) != NULL;)
+	for (Iterator it = GetIterator(); it.Next() != NULL;)
 		delete it.Remove();
 }
 

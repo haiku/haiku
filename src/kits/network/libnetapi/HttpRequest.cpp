@@ -28,11 +28,10 @@ static const char* kHttpProtocolThreadStrStatus[
 	};
 
 
-BHttpRequest::BHttpRequest(const BUrl& url, BUrlResult& result, bool ssl,
-	const char* protocolName, BUrlProtocolListener* listener,
-	BUrlContext* context)
+BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
+	BUrlProtocolListener* listener, BUrlContext* context)
 	:
-	BUrlRequest(url, listener, context, result, "BUrlProtocol.HTTP", protocolName),
+	BUrlRequest(url, listener, context, "BUrlProtocol.HTTP", protocolName),
 	fSocket(NULL),
 	fSSL(ssl),
 	fRequestMethod(B_HTTP_GET),

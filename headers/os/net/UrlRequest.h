@@ -18,7 +18,6 @@ public:
 									BUrlRequest(const BUrl& url,
 										BUrlProtocolListener* listener,
 										BUrlContext* context,
-										BUrlResult& result,
 										const char* threadName,
 										const char* protocolName);
 	virtual							~BUrlRequest();
@@ -37,7 +36,7 @@ public:
 
 	// URL protocol parameters access
 			const BUrl&				Url() const;
-			BUrlResult&				Result() const;
+			const BUrlResult&		Result() const;
 			BUrlContext*			Context() const;
 			BUrlProtocolListener*	Listener() const;
 			const BString&			Protocol() const;
@@ -63,7 +62,7 @@ protected:
 
 protected:
 			BUrl					fUrl;
-			BUrlResult&				fResult;
+			BUrlResult				fResult;
 			BUrlContext*			fContext;
 			BUrlProtocolListener*	fListener;
 
