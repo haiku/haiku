@@ -315,7 +315,7 @@ scsi_sense_asc_table sSCSISenseAscTable[] =
 	{ 0x2705, "Permanent write protect", err_act_fail, B_READ_ONLY_DEVICE },	// T   R
 	{ 0x2706, "Conditional write protect", err_act_fail, B_READ_ONLY_DEVICE },	// R       F
 	{ 0x2707, "Space allocation failed write protect", err_act_fail, B_READ_ONLY_DEVICE },	// D         B
-	{ 0x2800, "Not ready to ready change, medium may have changed", err_act_retry, B_DEV_MEDIA_CHANGED },	// DTLPWROMAEBKVF
+	{ 0x2800, "Not ready to ready change, medium may have changed", err_act_fail, B_DEV_MEDIA_CHANGED },	// DTLPWROMAEBKVF
 	{ 0x2801, "Import or export element accessed", err_act_fail, ENXIO },	// DT  WROM  B
 	{ 0x2802, "Format-layer may have changed", err_act_fail, B_DEV_MEDIA_CHANGED },	// R
 	{ 0x2803, "Import/export element accessed, medium changed", err_act_fail, B_ERROR },	// M
