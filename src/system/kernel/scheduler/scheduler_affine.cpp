@@ -1,5 +1,5 @@
 /*
- * Copyright 2013. Paweł Dziepak, pdziepak@quarnos.org.
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2009, Rene Gollent, rene@gollent.com.
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
@@ -49,21 +49,51 @@ const bigtime_t kMinThreadQuantum = 3000;
 const bigtime_t kMaxThreadQuantum = 10000;
 
 
-struct CPUHeapEntry : public MinMaxHeapLinkImpl<CPUHeapEntry, int32> {
+// Heaps in sCPUPriorityHeaps are used for load balancing on a core the logical
+// processors in the heap belong to. Since there are no cache affinity issues
+// at this level and the run queue is shared among all logical processors on
+// the core the only real concern is to make lower priority threads give way to
+// the higher priority threads.
+struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
 	int32		fCPUNumber;
 };
-
-static CPUHeapEntry* sCPUPriorityEntries;
-typedef MinMaxHeap<CPUHeapEntry, int32> AffineCPUHeap;
+typedef MinMaxHeap<CPUEntry, int32> AffineCPUHeap;
+static CPUEntry* sCPUEntries;
 static AffineCPUHeap* sCPUPriorityHeaps;
 
-struct CoreHeapEntry : public HeapLinkImpl<CoreHeapEntry, int32> {
+struct CoreEntry : public HeapLinkImpl<CoreEntry, int32>,
+	DoublyLinkedListLinkImpl<CoreEntry> {
 	int32		fCoreID;
 };
 
-static CoreHeapEntry* sCorePriorityEntries;
-typedef Heap<CoreHeapEntry, int32> AffineCoreHeap;
+static CoreEntry* sCoreEntries;
+typedef Heap<CoreEntry, int32> AffineCoreHeap;
 static AffineCoreHeap* sCorePriorityHeap;
+
+// sPackageUsageHeap is used to decide which core should be woken up from the
+// idle state. When aiming for performance we should use as many packages as
+// possible with as little cores active in each package as possible (so that the
+// package can enter any boost mode if it has one and the active core have more
+// of the shared cache for themselves. If power saving is the main priority we
+// should keep active cores on as little packages as possible (so that other
+// packages can go to the deep state of sleep). The heap stores only packages
+// with at least one core active and one core idle. The packages with all cores
+// idle are stored in sPackageIdleList (in LIFO manner).
+struct PackageEntry : public MinMaxHeapLinkImpl<PackageEntry, int32>,
+	DoublyLinkedListLinkImpl<PackageEntry> {
+	int32						fPackageID;
+
+	DoublyLinkedList<CoreEntry>	fIdleCores;
+	int32						fIdleCoreCount;
+
+	int32						fCoreCount;
+};
+typedef MinMaxHeap<PackageEntry, int32> AffinePackageHeap;
+typedef DoublyLinkedList<PackageEntry> AffineIdlePackageList;
+
+static PackageEntry* sPackageEntries;
+static AffinePackageHeap* sPackageUsageHeap;
+static AffineIdlePackageList* sIdlePackageList;
 
 // The run queues. Holds the threads ready to run ordered by priority.
 // One queue per schedulable target per core. Additionally, each
@@ -73,7 +103,12 @@ typedef RunQueue<Thread, THREAD_MAX_SET_PRIORITY> AffineRunQueue;
 static AffineRunQueue* sRunQueues;
 static AffineRunQueue* sPinnedRunQueues;
 static int32 sRunQueueCount;
+
+// Since CPU IDs used internally by the kernel bear no relation to the actual
+// CPU topology the following arrays are used to efficiently get the core
+// and the package that CPU in question belongs to.
 static int32* sCPUToCore;
+static int32* sCPUToPackage;
 
 
 struct scheduler_thread_data {
@@ -133,7 +168,6 @@ affine_get_thread_penalty(Thread* thread)
 	}
 
 	return penalty;
-
 }
 
 
@@ -208,7 +242,7 @@ dump_heap(AffineCPUHeap* heap)
 	AffineCPUHeap temp;
 
 	kprintf("cpu priority actual priority\n");
-	CPUHeapEntry* entry = heap->PeekMinimum();
+	CPUEntry* entry = heap->PeekMinimum();
 	while (entry) {
 		int32 cpu = entry->fCPUNumber;
 		int32 key = AffineCPUHeap::GetKey(entry);
@@ -237,7 +271,7 @@ dump_cpu_heap(int argc, char** argv)
 	AffineCoreHeap temp;
 
 	kprintf("core priority\n");
-	CoreHeapEntry* entry = sCorePriorityHeap->PeekRoot();
+	CoreEntry* entry = sCorePriorityHeap->PeekRoot();
 	while (entry) {
 		int32 core = entry->fCoreID;
 		int32 key = AffineCoreHeap::GetKey(entry);
@@ -260,6 +294,79 @@ dump_cpu_heap(int argc, char** argv)
 	for (int32 i = 0; i < sRunQueueCount; i++) {
 		kprintf("\nCore %" B_PRId32 " heap:\n", i);
 		dump_heap(&sCPUPriorityHeaps[i]);
+	}
+
+	return 0;
+}
+
+
+static int
+dump_idle_cores(int argc, char** argv)
+{
+	kprintf("Idle packages:\n");
+	AffineIdlePackageList::ReverseIterator idleIterator
+		= sIdlePackageList->GetReverseIterator();
+
+	if (idleIterator.HasNext()) {
+		kprintf("package cores\n");
+
+		while (idleIterator.HasNext()) {
+			PackageEntry* entry = idleIterator.Next();
+			kprintf("%-7" B_PRId32 " ", entry->fPackageID);
+
+			DoublyLinkedList<CoreEntry>::ReverseIterator iterator
+				= entry->fIdleCores.GetReverseIterator();
+			if (iterator.HasNext()) {
+				while (iterator.HasNext()) {
+					CoreEntry* coreEntry = iterator.Next();
+					kprintf("%" B_PRId32 "%s", coreEntry->fCoreID,
+						iterator.HasNext() ? ", " : "");
+				}
+			} else
+				kprintf("-");
+			kprintf("\n");
+		}
+	} else
+		kprintf("No idle packages.\n");
+
+	AffinePackageHeap temp;
+	temp.GrowHeap(smp_get_num_cpus());
+	kprintf("\nPackages with idle cores:\n");
+
+	PackageEntry* entry = sPackageUsageHeap->PeekMinimum();
+	if (entry == NULL)
+		kprintf("No packages.\n");
+	else
+		kprintf("package count cores\n");
+
+	while (entry != NULL) {
+		kprintf("%-7" B_PRId32 " %-5" B_PRId32 " ", entry->fPackageID,
+			entry->fIdleCoreCount);
+
+		DoublyLinkedList<CoreEntry>::ReverseIterator iterator
+			= entry->fIdleCores.GetReverseIterator();
+		if (iterator.HasNext()) {
+			while (iterator.HasNext()) {
+				CoreEntry* coreEntry = iterator.Next();
+				kprintf("%" B_PRId32 "%s", coreEntry->fCoreID,
+					iterator.HasNext() ? ", " : "");
+			}
+		} else
+			kprintf("-");
+		kprintf("\n");
+
+		sPackageUsageHeap->RemoveMinimum();
+		temp.Insert(entry, entry->fIdleCoreCount);
+
+		entry = sPackageUsageHeap->PeekMinimum();
+	}
+
+	entry = temp.PeekMinimum();
+	while (entry != NULL) {
+		int32 key = AffinePackageHeap::GetKey(entry);
+		temp.RemoveMinimum();
+		sPackageUsageHeap->Insert(entry, key);
+		entry = temp.PeekMinimum();
 	}
 
 	return 0;
@@ -348,21 +455,92 @@ affine_update_priority_heaps(int32 cpu, int32 priority)
 {
 	int32 core = sCPUToCore[cpu];
 
-	sCPUPriorityHeaps[core].ModifyKey(&sCPUPriorityEntries[cpu], priority);
+	sCPUPriorityHeaps[core].ModifyKey(&sCPUEntries[cpu], priority);
 
 	int32 maxPriority
 		= AffineCPUHeap::GetKey(sCPUPriorityHeaps[core].PeekMaximum());
-	int32 corePriority = AffineCoreHeap::GetKey(&sCorePriorityEntries[core]);
+	int32 corePriority = AffineCoreHeap::GetKey(&sCoreEntries[core]);
 
-	if (corePriority != maxPriority)
-		sCorePriorityHeap->ModifyKey(&sCorePriorityEntries[core], maxPriority);
+	if (corePriority != maxPriority) {
+		sCorePriorityHeap->ModifyKey(&sCoreEntries[core], maxPriority);
+
+		int32 package = sCPUToPackage[cpu];
+		PackageEntry* packageEntry = &sPackageEntries[package];
+		if (maxPriority == B_IDLE_PRIORITY) {
+			// core goes idle
+			ASSERT(packageEntry->fIdleCoreCount >= 0);
+			ASSERT(packageEntry->fIdleCoreCount < packageEntry->fCoreCount);
+
+			packageEntry->fIdleCoreCount++;
+			packageEntry->fIdleCores.Add(&sCoreEntries[core]);
+
+			if (packageEntry->fIdleCoreCount == 1) {
+				// first core on that package to go idle
+
+				if (packageEntry->fCoreCount > 1)
+					sPackageUsageHeap->Insert(packageEntry, 1);
+				else
+					sIdlePackageList->Add(packageEntry);
+			} else if (packageEntry->fIdleCoreCount
+				== packageEntry->fCoreCount) {
+				// package goes idle
+				sPackageUsageHeap->ModifyKey(packageEntry, 0);
+				ASSERT(sPackageUsageHeap->PeekMinimum() == packageEntry);
+				sPackageUsageHeap->RemoveMinimum();
+
+				sIdlePackageList->Add(packageEntry);
+			} else {
+				sPackageUsageHeap->ModifyKey(packageEntry,
+					packageEntry->fIdleCoreCount);
+			}
+		} else if (corePriority == B_IDLE_PRIORITY) {
+			// core wakes up
+			ASSERT(packageEntry->fIdleCoreCount > 0);
+			ASSERT(packageEntry->fIdleCoreCount <= packageEntry->fCoreCount);
+
+			packageEntry->fIdleCoreCount--;
+			packageEntry->fIdleCores.Remove(&sCoreEntries[core]);
+
+			if (packageEntry->fIdleCoreCount + 1 == packageEntry->fCoreCount) {
+				// package wakes up
+				sIdlePackageList->Remove(packageEntry);
+
+				if (packageEntry->fIdleCoreCount > 0) {
+					sPackageUsageHeap->Insert(packageEntry,
+						packageEntry->fIdleCoreCount);
+				}
+			} else if (packageEntry->fIdleCoreCount == 0) {
+				// no more idle cores in the package
+				sPackageUsageHeap->ModifyKey(packageEntry, 0);
+				ASSERT(sPackageUsageHeap->PeekMinimum() == packageEntry);
+				sPackageUsageHeap->RemoveMinimum();
+			} else {
+				sPackageUsageHeap->ModifyKey(packageEntry,
+					packageEntry->fIdleCoreCount);
+			}
+		}
+	}
 }
 
 
 static inline int32
 affine_choose_core(void)
 {
-	CoreHeapEntry* entry = sCorePriorityHeap->PeekRoot();
+	CoreEntry* entry;
+
+	if (sIdlePackageList->Last() != NULL) {
+		// wake new package
+		PackageEntry* package = sIdlePackageList->Last();
+		entry = package->fIdleCores.Last();
+	} else if (sPackageUsageHeap->PeekMaximum() != NULL) {
+		// wake new core
+		PackageEntry* package = sPackageUsageHeap->PeekMaximum();
+		entry = package->fIdleCores.Last();
+	} else {
+		// no idle cores, use least occupied core
+		entry = sCorePriorityHeap->PeekRoot();
+	}
+
 	ASSERT(entry != NULL);
 	return entry->fCoreID;
 }
@@ -371,7 +549,7 @@ affine_choose_core(void)
 static inline int32
 affine_choose_cpu(int32 core)
 {
-	CPUHeapEntry* entry = sCPUPriorityHeaps[core].PeekMinimum();
+	CPUEntry* entry = sCPUPriorityHeaps[core].PeekMinimum();
 	ASSERT(entry != NULL);
 	return entry->fCPUNumber;
 }
@@ -935,11 +1113,16 @@ scheduler_affine_init()
 {
 	int32 cpuCount = smp_get_num_cpus();
 
-	// create logical processor to core mapping
+	// create logical processor to core and package mappings
 	sCPUToCore = new(std::nothrow) int32[cpuCount];
 	if (sCPUToCore == NULL)
 		return B_NO_MEMORY;
 	ArrayDeleter<int32> cpuToCoreDeleter(sCPUToCore);
+
+	sCPUToPackage = new(std::nothrow) int32[cpuCount];
+	if (sCPUToPackage == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<int32> cpuToPackageDeleter(sCPUToPackage);
 
 	int32 coreCount = 0;
 	for (int32 i = 0; i < cpuCount; i++) {
@@ -947,6 +1130,14 @@ scheduler_affine_init()
 			sCPUToCore[i] = coreCount++;
 	}
 	sRunQueueCount = coreCount;
+
+	int32 packageCount = 0;
+	for (int32 i = 0; i < cpuCount; i++) {
+		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0
+			&& gCPU[i].topology_id[CPU_TOPOLOGY_CORE] == 0) {
+			sCPUToPackage[i] = packageCount++;
+		}
+	}
 
 	// TODO: Nasty O(n^2), solutions with better complexity will require
 	// creating helper data structures. This code is run only once, so it
@@ -975,33 +1166,69 @@ scheduler_affine_init()
 		}
 	}
 
-	// create logical processor and core heaps
-	sCPUPriorityEntries = new CPUHeapEntry[cpuCount];
-	if (sCPUPriorityEntries == NULL)
-		return B_NO_MEMORY;
-	ArrayDeleter<CPUHeapEntry> cpuPriorityEntriesDeleter(sCPUPriorityEntries);
-
-	sCorePriorityEntries = new CoreHeapEntry[coreCount];
-	if (sCorePriorityEntries == NULL)
-		return B_NO_MEMORY;
-	ArrayDeleter<CoreHeapEntry> corePriorityEntriesDeleter(
-		sCorePriorityEntries);
-
-	sCPUPriorityHeaps = new AffineCPUHeap[coreCount];
-	if (sCPUPriorityHeaps == NULL)
-		return B_NO_MEMORY;
-	ArrayDeleter<AffineCPUHeap> cpuPriorityHeapDeleter(sCPUPriorityHeaps);
-
+	// TODO: Another O(n^2), something has to be done with that... (i.e.
+	// build a tree representing the topology and then use it to create
+	// these mappings.
 	for (int32 i = 0; i < cpuCount; i++) {
-		sCPUPriorityEntries[i].fCPUNumber = i;
-		int32 core = sCPUToCore[i];
+		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0
+			&& gCPU[i].topology_id[CPU_TOPOLOGY_CORE] == 0) {
+			continue;
+		}
 
-		status_t result
-			= sCPUPriorityHeaps[core].Insert(&sCPUPriorityEntries[i],
-				B_IDLE_PRIORITY);
-		if (result != B_OK)
-			return result;
+		for (int32 j = 0; j < cpuCount; j++) {
+			bool samePackage = true;
+			for (int32 k = 0; k < CPU_TOPOLOGY_LEVELS && samePackage; k++) {
+				if (k < CPU_TOPOLOGY_PACKAGE) {
+					if (gCPU[j].topology_id[k] == 0)
+						continue;
+					samePackage = false;
+				}
+
+				samePackage = gCPU[i].topology_id[k] == gCPU[j].topology_id[k];
+			}
+
+			if (samePackage)
+				sCPUToPackage[i] = sCPUToPackage[j];
+		}
 	}
+
+	// create package heap and idle package stack
+	sPackageEntries = new(std::nothrow) PackageEntry[packageCount];
+	if (sPackageEntries == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<PackageEntry> packageEntriesDeleter(sPackageEntries);
+
+	sPackageUsageHeap = new(std::nothrow) AffinePackageHeap;
+	if (sPackageUsageHeap == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<AffinePackageHeap> packageHeapDeleter(sPackageUsageHeap);
+	status_t result = sPackageUsageHeap->GrowHeap(packageCount);
+	if (result != B_OK)
+		return B_OK;
+
+	sIdlePackageList = new(std::nothrow) AffineIdlePackageList;
+	if (sIdlePackageList == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<AffineIdlePackageList> packageListDeleter(sIdlePackageList);
+
+	for (int32 i = 0; i < packageCount; i++) {
+		sPackageEntries[i].fPackageID = i;
+		sPackageEntries[i].fIdleCoreCount = coreCount / packageCount;
+		sPackageEntries[i].fCoreCount = coreCount / packageCount;
+		sIdlePackageList->Insert(&sPackageEntries[i]);
+	}
+
+	// create logical processor and core heaps
+	sCPUEntries = new CPUEntry[cpuCount];
+	if (sCPUEntries == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<CPUEntry> cpuEntriesDeleter(sCPUEntries);
+
+	sCoreEntries = new CoreEntry[coreCount];
+	if (sCoreEntries == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<CoreEntry> coreEntriesDeleter(
+		sCoreEntries);
 
 	sCorePriorityHeap = new AffineCoreHeap;
 	if (sCorePriorityHeap == NULL)
@@ -1009,9 +1236,28 @@ scheduler_affine_init()
 	ObjectDeleter<AffineCoreHeap> corePriorityHeapDeleter(sCorePriorityHeap);
 
 	for (int32 i = 0; i < coreCount; i++) {
-		sCorePriorityEntries[i].fCoreID = i;
-		status_t result = sCorePriorityHeap->Insert(&sCorePriorityEntries[i],
+		sCoreEntries[i].fCoreID = i;
+		status_t result = sCorePriorityHeap->Insert(&sCoreEntries[i],
 			B_IDLE_PRIORITY);
+		if (result != B_OK)
+			return result;
+	}
+
+	sCPUPriorityHeaps = new AffineCPUHeap[coreCount];
+	if (sCPUPriorityHeaps == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<AffineCPUHeap> cpuPriorityHeapDeleter(sCPUPriorityHeaps);
+
+	for (int32 i = 0; i < cpuCount; i++) {
+		sCPUEntries[i].fCPUNumber = i;
+		int32 core = sCPUToCore[i];
+
+		int32 package = sCPUToPackage[i];
+		if (sCPUPriorityHeaps[core].PeekMaximum() == NULL)
+			sPackageEntries[package].fIdleCores.Insert(&sCoreEntries[core]);
+
+		status_t result
+			= sCPUPriorityHeaps[core].Insert(&sCPUEntries[i], B_IDLE_PRIORITY);
 		if (result != B_OK)
 			return result;
 	}
@@ -1051,13 +1297,19 @@ scheduler_affine_init()
 	add_debugger_command_etc("cpu_heap", &dump_cpu_heap,
 		"List CPUs in CPU priority heap", "\nList CPUs in CPU priority heap",
 		0);
+	add_debugger_command_etc("idle_cores", &dump_idle_cores,
+		"List idle cores", "\nList idle cores", 0);
 
 	runQueuesDeleter.Detach();
 	pinnedRunQueuesDeleter.Detach();
 	corePriorityHeapDeleter.Detach();
 	cpuPriorityHeapDeleter.Detach();
-	corePriorityEntriesDeleter.Detach();
-	cpuPriorityEntriesDeleter.Detach();
+	coreEntriesDeleter.Detach();
+	cpuEntriesDeleter.Detach();
+	packageEntriesDeleter.Detach();
+	packageHeapDeleter.Detach();
+	packageListDeleter.Detach();
+	cpuToPackageDeleter.Detach();
 	cpuToCoreDeleter.Detach();
 	return B_OK;
 }
