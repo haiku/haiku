@@ -692,7 +692,7 @@ else
 	if [ -z "$targetArchs" ]; then
 		if [ $HOST_PLATFORM != haiku_host ]; then
 			echo "Please specify the build tools to use or build (via" \
-				"--cross-tools-prefix or --build-cross-tools) or specify a"
+				"--cross-tools-prefix or --build-cross-tools) or specify a" \
 				"host-only build (--host-only)." >&2
 			exit 1
 		fi
