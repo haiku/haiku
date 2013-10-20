@@ -84,9 +84,8 @@ public:
 
 	inline	status_t	Insert(Element* element, Key key);
 
+			status_t	GrowHeap(int minimalSize = 0);
 private:
-			status_t	_GrowHeap();
-
 			void		_MoveUp(MinMaxHeapLink<Element, Key>* link);
 			void		_MoveDown(MinMaxHeapLink<Element, Key>* link);
 			bool		_ChangeTree(MinMaxHeapLink<Element, Key>* link);
@@ -171,7 +170,6 @@ MIN_MAX_HEAP_TEMPLATE_LIST
 MIN_MAX_HEAP_CLASS_NAME::~MinMaxHeap()
 {
 	free(fMinElements);
-	free(fMaxElements);
 }
 
 
@@ -273,10 +271,9 @@ MIN_MAX_HEAP_TEMPLATE_LIST
 status_t
 MIN_MAX_HEAP_CLASS_NAME::Insert(Element* element, Key key)
 {
-
 	if (min_c(fMinLastElement, fMaxLastElement) == fSize) {
 		ASSERT(max_c(fMinLastElement, fMaxLastElement) == fSize);
-		status_t result = _GrowHeap();
+		status_t result = GrowHeap();
 		if (result != B_OK)
 			return result;
 	}
@@ -303,9 +300,10 @@ MIN_MAX_HEAP_CLASS_NAME::Insert(Element* element, Key key)
 
 MIN_MAX_HEAP_TEMPLATE_LIST
 status_t
-MIN_MAX_HEAP_CLASS_NAME::_GrowHeap()
+MIN_MAX_HEAP_CLASS_NAME::GrowHeap(int minimalSize)
 {
-	int newSize = max_c(fSize * 2, 4);
+	minimalSize = minimalSize % 2 ? minimalSize : minimalSize + 1;
+	int newSize = max_c(max_c(fSize * 4, 4), minimalSize);
 
 	size_t arraySize = newSize * sizeof(Element*);
 	Element** newBuffer
@@ -313,14 +311,9 @@ MIN_MAX_HEAP_CLASS_NAME::_GrowHeap()
 	if (newBuffer == NULL)
 		return B_NO_MEMORY;
 	fMinElements = newBuffer;
+	fMaxElements = newBuffer + (newSize / 2);
 
-	newBuffer
-		= reinterpret_cast<Element**>(realloc(fMaxElements, arraySize));
-	if (newBuffer == NULL)
-		return B_NO_MEMORY;
-	fMaxElements = newBuffer;
-
-	fSize = newSize;
+	fSize = newSize / 2;
 	return B_OK;
 }
 
