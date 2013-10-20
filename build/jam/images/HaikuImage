@@ -308,6 +308,7 @@ AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage home mail ;
 AddDirectoryToHaikuImage home config packages ;
 AddDirectoryToHaikuImage home config non-packaged bin ;
+AddDirectoryToHaikuImage home config non-packaged data fonts ;
 AddDirectoryToHaikuImage home config non-packaged lib ;
 AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers bin ;
 AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers dev ;
