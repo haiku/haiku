@@ -399,6 +399,111 @@
 	from the screen without interrupting the message loop by calling Hide(). Other
 	message loop details such as locking and quitting are detailed in the BLooper
 	class.
+
+	BWindow has the following built-in shortcuts:
+
+	<table>
+		<tr>
+			<th>Shortcut</th>
+			<th>Action</th>
+			<th>Handler</th>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{X}</td>
+			<td>Cut</td>
+			<td>Focus view</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{C}</td>
+			<td>Copy</td>
+			<td>Focus view</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{V}</td>
+			<td>Paste</td>
+			<td>Focus view</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{A}</td>
+			<td>Select All</td>
+			<td>Focus view</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{W}</td>
+			<td>Close</td>
+			<td>Window (if closable)</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Q}</td>
+			<td>Quit</td>
+			<td>Application (non-modal windows only)</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{M}</td>
+			<td>Minimize</td>
+			<td>Window (if minimizable)</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{Z}</td>
+			<td>Zoom</td>
+			<td>Window (if zoomable)</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{H}</td>
+			<td>Hide</td>
+			<td>Window</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{F}</td>
+			<td>Send to front</td>
+			<td>Window</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{B}</td>
+			<td>Send behind</td>
+			<td>Window</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{←}</td>
+			<td>Go to left workspace</td>
+			<td>Desktop window</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{→}</td>
+			<td>Go to right workspace</td>
+			<td>Desktop window</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{↑}</td>
+			<td>Go to above workspace</td>
+			<td>Desktop window</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{↓}</td>
+			<td>Go to below workspace</td>
+			<td>Desktop window</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{Shift}+\key{←}</td>
+			<td>Send window and go to left workspace</td>
+			<td>Desktop window</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{Shift}+\key{→}</td>
+			<td>Send window and go to right workspace</td>
+			<td>Desktop window</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{Shift}+\key{↑}</td>
+			<td>Send window and go to above workspace</td>
+			<td>Desktop window</td>
+		</tr>
+		<tr>
+			<td>\key{Command}+\key{Control}+\key{Shift}+\key{↓}</td>
+			<td>Send window and go to below workspace</td>
+			<td>Desktop window</td>
+		</tr>
+	</table>
 */
 
 
@@ -974,13 +1079,31 @@
 
 
 /*!
+	\name Shortcut methods
+
+	The key parameter is specified in the form of a Unicode code point. This
+	is generally an ASCII character such as 'A' or a key constant such as
+	\c B_RIGHT_ARROW. To use a UTF-8 character you must first convert it to a
+	Unicode code point using BUnicodeChar::FromUTF8().
+*/
+
+
+//! @{
+
+
+/*!
 	\fn void BWindow::AddShortcut(uint32 key, uint32 modifiers, BMenuItem* item)
-	\brief Creates a keyboard shortcut that activates \a item.
+	\brief Creates a keyboard shortcut that activates a menu \a item.
 
 	\note This method was not available in BeOS R5.
 
-	\param key The modifier key to set.
-	\param modifiers Additional modifiers on top of \a B_COMMAND_KEY.
+	\param key The character that activates the shortcut, case-insensitive.
+	\param modifiers A bit mask of modifiers in addition to \c B_COMMAND_KEY,
+	       options include:
+	       - \c B_SHIFT_KEY
+	       - \c B_OPTION_KEY
+	       - \c B_CONTROL_KEY
+	       - \c B_MENU_KEY
 	\param item The menu \a item to activate.
 */
 
@@ -989,9 +1112,18 @@
 	\fn void BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage* message)
 	\brief Creates a keyboard shortcut that sends a \a message to the window.
 
-	\param key The modifier key to set.
-	\param modifiers Additional modifiers on top of \a B_COMMAND_KEY.
-	\param message The \a message to send when the shortcut is activated.
+	\warning Don't use this method to a create menu shortcut, add a BMenuItem
+	         instead.
+
+	\param key The character that activates the shortcut, case-insensitive.
+	\param modifiers A bit mask of modifiers in addition to \c B_COMMAND_KEY,
+	       options include:
+	       - \c B_SHIFT_KEY
+	       - \c B_OPTION_KEY
+	       - \c B_CONTROL_KEY
+	       - \c B_MENU_KEY
+	\param message The \a message to send when the shortcut is activated. The
+	       BWindow takes ownership of the \a message.
 */
 
 
@@ -1001,9 +1133,18 @@
 	\brief Creates a keyboard shortcut that sends a \a message to the specified
 	       \a target.
 
-	\param key The modifier key to set.
-	\param modifiers Additional modifiers on top of \a B_COMMAND_KEY.
-	\param message The \a message to send when the shortcut is activated.
+	\warning Don't use this method to a create menu shortcut, add a BMenuItem
+	         instead.
+
+	\param key The character that activates the shortcut, case-insensitive.
+	\param modifiers A bit mask of modifiers in addition to \c B_COMMAND_KEY,
+	       options include one or more of the following:
+	       - \c B_SHIFT_KEY
+	       - \c B_OPTION_KEY
+	       - \c B_CONTROL_KEY
+	       - \c B_MENU_KEY
+	\param message The \a message to send when the shortcut is activated. The
+	       BWindow takes ownership of the \a message.
 	\param target The handler to send the message to.
 */
 
@@ -1012,10 +1153,18 @@
 	\fn bool BWindow::HasShortcut(uint32 key, uint32 modifiers)
 	\brief Returns whether or not the specified shortcut is set on the window.
 
-	\param key The modifier key to check.
-	\param modifiers Additional modifiers on top of \a B_COMMAND_KEY to check.
+	\note This method was not available in BeOS R5.
 
-	\returns \c true if the window has the specified shortcut, \c false otherwise.
+	\param key The character to check, case-insensitive.
+	\param modifiers A bit mask of modifiers in addition to \c B_COMMAND_KEY,
+	       options include one or more of the following:
+	       - \c B_SHIFT_KEY
+	       - \c B_OPTION_KEY
+	       - \c B_CONTROL_KEY
+	       - \c B_MENU_KEY
+
+	\returns \c true if the window has the specified shortcut, \c false
+	         otherwise.
 */
 
 
@@ -1023,9 +1172,19 @@
 	\fn void BWindow::RemoveShortcut(uint32 key, uint32 modifiers)
 	\brief Removes the specified shortcut from the window.
 
-	\param key The modifier key.
-	\param modifiers Additional modifiers on top of \a B_COMMAND_KEY.
+	The memory used by the shortcut message is freed.
+
+	\param key The character to remove, case-insensitive.
+	\param modifiers A bit mask of modifiers in addition to \c B_COMMAND_KEY,
+	       options include one or more of the following:
+	       - \c B_SHIFT_KEY
+	       - \c B_OPTION_KEY
+	       - \c B_CONTROL_KEY
+	       - \c B_MENU_KEY
 */
+
+
+//! @}
 
 
 /*!
