@@ -2792,7 +2792,7 @@ TitleView::MouseDown(BPoint position)
 
 				int32 clicks = 0;
 				Window()->CurrentMessage()->FindInt32("clicks", &clicks);
-				if (clicks == 2) {
+				if (clicks == 2 || buttons == B_TERTIARY_MOUSE_BUTTON) {
 					ResizeSelectedColumn(position, true);
 					fCurrentState = INACTIVE;
 					break;
