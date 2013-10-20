@@ -716,7 +716,7 @@ else
 
 		# determine secondary architectures
 		for targetArch in $supportedTargetArchs; do
-			if [ -e /system/packages/haiku_$targetArch.hpkg ]; then
+			if [ -e /system/packages/haiku_$targetArch-*.hpkg ]; then
 				targetArchs="$targetArchs $targetArch"
 				set_default_value HAIKU_AR_$targetArch		ar-$targetArch
 				set_default_value HAIKU_CC_$targetArch		gcc-$targetArch
