@@ -39,6 +39,15 @@ typedef enum cpu_topology_level {
 	CPU_TOPOLOGY_LEVELS
 } cpu_topology_level;
 
+typedef struct cpu_topology_node {
+	cpu_topology_level	level;
+
+	int					id;
+
+	cpu_topology_node**	children;
+	int					children_count;
+} cpu_topology_node;
+
 
 /* CPU local data structure */
 
@@ -92,6 +101,9 @@ bigtime_t cpu_get_active_time(int32 cpu);
 
 cpu_ent *get_cpu_struct(void);
 extern inline cpu_ent *get_cpu_struct(void) { return &gCPU[smp_get_current_cpu()]; }
+
+status_t cpu_build_topology_tree(void);
+cpu_topology_node* get_cpu_topology(void);
 
 void _user_clear_caches(void *address, size_t length, uint32 flags);
 bool _user_cpu_enabled(int32 cpu);

@@ -21,7 +21,9 @@
 
 /* global per-cpu structure */
 cpu_ent gCPU[MAX_BOOT_CPUS];
+
 uint32 gCPUCacheLevelCount;
+static cpu_topology_node sCPUTopology;
 
 static spinlock sSetCpuLock;
 
@@ -85,6 +87,115 @@ void
 clear_caches(void *address, size_t length, uint32 flags)
 {
 	// ToDo: implement me!
+}
+
+
+static status_t
+cpu_create_topology_node(cpu_topology_node* node, int32* maxID, int32 id)
+{
+	cpu_topology_level level = static_cast<cpu_topology_level>(node->level - 1);
+	ASSERT(level >= 0);
+
+	cpu_topology_node* newNode = new(std::nothrow) cpu_topology_node;
+	if (newNode == NULL)
+		return B_NO_MEMORY;
+	node->children[id] = newNode;
+
+	newNode->level = level;
+	if (level != CPU_TOPOLOGY_SMT) {
+		newNode->children_count = maxID[level - 1];
+		newNode->children
+			= new(std::nothrow) cpu_topology_node*[maxID[level - 1]];
+		if (newNode->children == NULL)
+			return B_NO_MEMORY;
+
+		memset(newNode->children, 0,
+			maxID[level - 1] * sizeof(cpu_topology_node*));
+	} else {
+		newNode->children_count = 0;
+		newNode->children = NULL;
+	}
+
+	return B_OK;
+}
+
+
+static void
+cpu_rebuild_topology_tree(cpu_topology_node* node, int32* lastID)
+{
+	if (node->children == NULL)
+		return;
+
+	int32 count = 0;
+	for (int32 i = 0; i < node->children_count; i++) {
+		if (node->children[i] == NULL)
+			continue;
+
+		if (count != i)
+			node->children[count] = node->children[i];
+
+		if (node->children[count]->level != CPU_TOPOLOGY_SMT)
+			node->children[count]->id = lastID[node->children[count]->level]++;
+
+		cpu_rebuild_topology_tree(node->children[count], lastID);
+		count++;
+	}
+	node->children_count = count;
+}
+
+
+status_t
+cpu_build_topology_tree(void)
+{
+	sCPUTopology.level = CPU_TOPOLOGY_LEVELS;
+
+	int32 maxID[CPU_TOPOLOGY_LEVELS];
+	memset(&maxID, 0, sizeof(maxID));
+
+	const int32 kCPUCount = smp_get_num_cpus();
+	for (int32 i = 0; i < kCPUCount; i++) {
+		for (int32 j = 0; j < CPU_TOPOLOGY_LEVELS; j++)
+			maxID[j] = max_c(maxID[j], gCPU[i].topology_id[j]);
+	}
+
+	for (int32 j = 0; j < CPU_TOPOLOGY_LEVELS; j++)
+		maxID[j]++;
+
+	sCPUTopology.children_count = maxID[CPU_TOPOLOGY_LEVELS - 1];
+	sCPUTopology.children
+		= new(std::nothrow) cpu_topology_node*[maxID[CPU_TOPOLOGY_LEVELS - 1]];
+	if (sCPUTopology.children == NULL)
+		return B_NO_MEMORY;
+	memset(sCPUTopology.children, 0,
+		maxID[CPU_TOPOLOGY_LEVELS - 1] * sizeof(cpu_topology_node*));
+
+	for (int32 i = 0; i < kCPUCount; i++) {
+		cpu_topology_node* node = &sCPUTopology;
+		for (int32 j = CPU_TOPOLOGY_LEVELS - 1; j >= 0; j--) {
+			int32 id = gCPU[i].topology_id[j];
+			if (node->children[id] == NULL) {
+				status_t result = cpu_create_topology_node(node, maxID, id);
+				if (result != B_OK)
+					return result;
+			}
+
+			node = node->children[id];
+		}
+
+		ASSERT(node->level == CPU_TOPOLOGY_SMT);
+		node->id = i;
+	}
+
+	int32 lastID[CPU_TOPOLOGY_LEVELS];
+	memset(&lastID, 0, sizeof(lastID));
+	cpu_rebuild_topology_tree(&sCPUTopology, lastID);
+}
+
+
+cpu_topology_node*
+get_cpu_topology(void)
+{
+	return &sCPUTopology;
 }
 
 

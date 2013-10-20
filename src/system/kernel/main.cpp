@@ -165,6 +165,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 		TRACE("init SMP\n");
 		smp_init(&sKernelArgs);
+		cpu_build_topology_tree();
 		TRACE("init timer\n");
 		timer_init(&sKernelArgs);
 		TRACE("init real time clock\n");
