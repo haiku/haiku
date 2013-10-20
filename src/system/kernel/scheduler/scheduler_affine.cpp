@@ -1108,12 +1108,34 @@ static scheduler_ops kAffineOps = {
 // #pragma mark -
 
 
-status_t
-scheduler_affine_init()
+static void
+traverse_topology_tree(cpu_topology_node* node, int packageID, int coreID)
 {
-	int32 cpuCount = smp_get_num_cpus();
+	switch (node->level) {
+		case CPU_TOPOLOGY_SMT:
+			sCPUToCore[node->id] = coreID;
+			sCPUToPackage[node->id] = packageID;
+			return;
 
-	// create logical processor to core and package mappings
+		case CPU_TOPOLOGY_CORE:
+			coreID = node->id;
+			break;
+
+		case CPU_TOPOLOGY_PACKAGE:
+			packageID = node->id;
+			break;
+	}
+
+	for (int32 i = 0; i < node->children_count; i++)
+		traverse_topology_tree(node->children[i], packageID, coreID);
+}
+
+
+static status_t
+build_topology_mappings(int32& cpuCount, int32& coreCount, int32& packageCount)
+{
+	cpuCount = smp_get_num_cpus();
+
 	sCPUToCore = new(std::nothrow) int32[cpuCount];
 	if (sCPUToCore == NULL)
 		return B_NO_MEMORY;
@@ -1124,73 +1146,39 @@ scheduler_affine_init()
 		return B_NO_MEMORY;
 	ArrayDeleter<int32> cpuToPackageDeleter(sCPUToPackage);
 
-	int32 coreCount = 0;
+	coreCount = 0;
 	for (int32 i = 0; i < cpuCount; i++) {
 		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0)
-			sCPUToCore[i] = coreCount++;
+			coreCount++;
 	}
+
+	packageCount = 0;
+	for (int32 i = 0; i < cpuCount; i++) {
+		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0
+			&& gCPU[i].topology_id[CPU_TOPOLOGY_CORE] == 0) {
+			packageCount++;
+		}
+	}
+
+	cpu_topology_node* root = get_cpu_topology();
+	traverse_topology_tree(root, 0, 0);
+
+	cpuToCoreDeleter.Detach();
+	cpuToPackageDeleter.Detach();
+	return B_OK;
+}
+
+
+status_t
+scheduler_affine_init()
+{
+	// create logical processor to core and package mappings
+	int32 cpuCount, coreCount, packageCount;
+	status_t result = build_topology_mappings(cpuCount, coreCount,
+		packageCount);
+	if (result != B_OK)
+		return result;
 	sRunQueueCount = coreCount;
-
-	int32 packageCount = 0;
-	for (int32 i = 0; i < cpuCount; i++) {
-		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0
-			&& gCPU[i].topology_id[CPU_TOPOLOGY_CORE] == 0) {
-			sCPUToPackage[i] = packageCount++;
-		}
-	}
-
-	// TODO: Nasty O(n^2), solutions with better complexity will require
-	// creating helper data structures. This code is run only once, so it
-	// probably won't be a problem until we support systems with large
-	// number of processors.
-	for (int32 i = 0; i < cpuCount; i++) {
-		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0)
-			continue;
-
-		for (int32 j = 0; j < cpuCount; j++) {
-			bool sameCore = true;
-			for (int32 k = 0; k < CPU_TOPOLOGY_LEVELS && sameCore; k++) {
-				if (k == CPU_TOPOLOGY_SMT && gCPU[j].topology_id[k] == 0)
-					continue;
-				if (k == CPU_TOPOLOGY_SMT && gCPU[j].topology_id[k] != 0) {
-					sameCore = false;
-					continue;
-				}
-
-				if (gCPU[i].topology_id[k] != gCPU[j].topology_id[k])
-					sameCore = false;
-			}
-
-			if (sameCore)
-				sCPUToCore[i] = sCPUToCore[j];
-		}
-	}
-
-	// TODO: Another O(n^2), something has to be done with that... (i.e.
-	// build a tree representing the topology and then use it to create
-	// these mappings.
-	for (int32 i = 0; i < cpuCount; i++) {
-		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0
-			&& gCPU[i].topology_id[CPU_TOPOLOGY_CORE] == 0) {
-			continue;
-		}
-
-		for (int32 j = 0; j < cpuCount; j++) {
-			bool samePackage = true;
-			for (int32 k = 0; k < CPU_TOPOLOGY_LEVELS && samePackage; k++) {
-				if (k < CPU_TOPOLOGY_PACKAGE) {
-					if (gCPU[j].topology_id[k] == 0)
-						continue;
-					samePackage = false;
-				}
-
-				samePackage = gCPU[i].topology_id[k] == gCPU[j].topology_id[k];
-			}
-
-			if (samePackage)
-				sCPUToPackage[i] = sCPUToPackage[j];
-		}
-	}
 
 	// create package heap and idle package stack
 	sPackageEntries = new(std::nothrow) PackageEntry[packageCount];
@@ -1202,7 +1190,7 @@ scheduler_affine_init()
 	if (sPackageUsageHeap == NULL)
 		return B_NO_MEMORY;
 	ObjectDeleter<AffinePackageHeap> packageHeapDeleter(sPackageUsageHeap);
-	status_t result = sPackageUsageHeap->GrowHeap(packageCount);
+	result = sPackageUsageHeap->GrowHeap(packageCount);
 	if (result != B_OK)
 		return B_OK;
 
@@ -1309,7 +1297,5 @@ scheduler_affine_init()
 	packageEntriesDeleter.Detach();
 	packageHeapDeleter.Detach();
 	packageListDeleter.Detach();
-	cpuToPackageDeleter.Detach();
-	cpuToCoreDeleter.Detach();
 	return B_OK;
 }
