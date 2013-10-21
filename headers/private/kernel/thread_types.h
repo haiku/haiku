@@ -418,7 +418,6 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
 	int64			serial_number;	// immutable after adding thread to hash
 	Thread			*hash_next;		// protected by thread hash lock
 	Thread			*team_next;		// protected by team lock and fLock
-	Thread			*queue_next;	// protected by scheduler lock
 	timer			alarm;			// protected by scheduler lock
 	char			name[B_OS_NAME_LENGTH];	// protected by fLock
 	int32			priority;		// protected by scheduler lock
@@ -779,12 +778,6 @@ using BKernel::ThreadListIterator;
 using BKernel::ProcessSession;
 using BKernel::ProcessGroup;
 using BKernel::ProcessGroupList;
-
-
-struct thread_queue {
-	Thread*	head;
-	Thread*	tail;
-};
 
 
 #endif	// !_ASSEMBLER

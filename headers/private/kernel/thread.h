@@ -73,11 +73,6 @@ using BKernel::ThreadCreationAttributes;
 extern "C" {
 #endif
 
-void thread_enqueue(Thread *t, struct thread_queue *q);
-Thread *thread_lookat_queue(struct thread_queue *q);
-Thread *thread_dequeue(struct thread_queue *q);
-Thread *thread_dequeue_id(struct thread_queue *q, thread_id id);
-
 void thread_at_kernel_entry(bigtime_t now);
 	// called when the thread enters the kernel on behalf of the thread
 void thread_at_kernel_exit(void);

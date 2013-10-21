@@ -165,7 +165,6 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 	serial_number(-1),
 	hash_next(NULL),
 	team_next(NULL),
-	queue_next(NULL),
 	priority(-1),
 	io_priority(-1),
 	cpu(cpu),
@@ -1698,8 +1697,8 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 		thread->id);
 	kprintf("serial_number:      %" B_PRId64 "\n", thread->serial_number);
 	kprintf("name:               \"%s\"\n", thread->name);
-	kprintf("hash_next:          %p\nteam_next:          %p\nq_next:             %p\n",
-		thread->hash_next, thread->team_next, thread->queue_next);
+	kprintf("hash_next:          %p\nteam_next:          %p\n",
+		thread->hash_next, thread->team_next);
 	kprintf("priority:           %" B_PRId32 " (I/O: %" B_PRId32 ")\n",
 		thread->priority, thread->io_priority);
 	kprintf("state:              %s\n", state_to_text(thread, thread->state));
@@ -2345,67 +2344,6 @@ thread_reset_for_exec(void)
 	thread->cpu_clock_offset = -thread->CPUTime(false);
 
 	// Note: We don't cancel an alarm. It is supposed to survive exec*().
-}
-
-
-/*! Insert a thread to the tail of a queue */
-void
-thread_enqueue(Thread *thread, struct thread_queue *queue)
-{
-	thread->queue_next = NULL;
-	if (queue->head == NULL) {
-		queue->head = thread;
-		queue->tail = thread;
-	} else {
-		queue->tail->queue_next = thread;
-		queue->tail = thread;
-	}
-}
-
-
-Thread *
-thread_lookat_queue(struct thread_queue *queue)
-{
-	return queue->head;
-}
-
-
-Thread *
-thread_dequeue(struct thread_queue *queue)
-{
-	Thread *thread = queue->head;
-
-	if (thread != NULL) {
-		queue->head = thread->queue_next;
-		if (queue->tail == thread)
-			queue->tail = NULL;
-	}
-	return thread;
-}
-
-
-Thread *
-thread_dequeue_id(struct thread_queue *q, thread_id id)
-{
-	Thread *thread;
-	Thread *last = NULL;
-
-	thread = q->head;
-	while (thread != NULL) {
-		if (thread->id == id) {
-			if (last == NULL)
-				q->head = thread->queue_next;
-			else
-				last->queue_next = thread->queue_next;
-
-			if (q->tail == thread)
-				q->tail = last;
-			break;
-		}
-		last = thread;
-		thread = thread->queue_next;
-	}
-	return thread;
 }
 
 
