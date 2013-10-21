@@ -614,9 +614,8 @@ affine_enqueue(Thread* thread, bool newOne)
 		targetCore = sCPUToCore[targetCPU];
 		ASSERT(targetCore == schedulerThreadData->previous_core);
 	} else if (schedulerThreadData->previous_core < 0) {
-		if (thread->priority == B_IDLE_PRIORITY) {
-			static int32 idleThreads = 0;
-			targetCPU = idleThreads++;
+		if (thread_is_idle_thread(thread)) {
+			targetCPU = thread->previous_cpu->cpu_num;
 			targetCore = sCPUToCore[targetCPU];
 		} else {
 			targetCore = affine_choose_core();

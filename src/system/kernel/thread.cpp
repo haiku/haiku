@@ -2720,6 +2720,7 @@ thread_init(kernel_args *args)
 		}
 
 		gCPU[i].running_thread = thread;
+		thread->previous_cpu = &gCPU[i];
 
 		thread->team = team_get_kernel_team();
 		thread->priority = B_IDLE_PRIORITY;
