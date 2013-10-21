@@ -882,58 +882,6 @@ affine_put_back(Thread* thread)
 }
 
 
-#if 0
-/*!	Looks for a possible thread to grab/run from another CPU.
-	Note: thread lock must be held when entering this function
-*/
-static Thread *
-steal_thread_from_other_cpus(int32 currentCPU)
-{
-	// look through the active CPUs - find the one
-	// that has a) threads available to steal, and
-	// b) out of those, the one that's the most CPU-bound
-	// TODO: make this more intelligent along with enqueue
-	// - we need to try and maintain a reasonable balance
-	// in run queue sizes across CPUs, and also try to maintain
-	// an even distribution of cpu bound / interactive threads
-	int32 targetCPU = -1;
-	for (int32 i = 0; i < smp_get_num_cpus(); i++) {
-		// skip CPUs that have either no or only one thread
-		if (i == currentCPU || sRunQueueSize[i] < 2)
-			continue;
-
-		// out of the CPUs with threads available to steal,
-		// pick whichever one is generally the most CPU bound.
-		if (targetCPU < 0
-			|| sRunQueue[i]->priority > sRunQueue[targetCPU]->priority
-			|| (sRunQueue[i]->priority == sRunQueue[targetCPU]->priority
-				&& sRunQueueSize[i] > sRunQueueSize[targetCPU]))
-			targetCPU = i;
-	}
-
-	if (targetCPU < 0)
-		return NULL;
-
-	Thread* nextThread = sRunQueue[targetCPU];
-	Thread* prevThread = NULL;
-
-	while (nextThread != NULL) {
-		// grab the highest priority non-pinned thread
-		// out of this CPU's queue, dequeue and return it
-		if (nextThread->pinned_to_cpu <= 0) {
-			dequeue_from_run_queue(prevThread, targetCPU);
-			return nextThread;
-		}
-
-		prevThread = nextThread;
-		nextThread = nextThread->queue_next;
-	}
-
-	return NULL;
-}
-#endif
-
-
 /*!	Sets the priority of a thread.
 	Note: thread lock must be held when entering this function
 */
