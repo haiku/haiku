@@ -1191,6 +1191,9 @@ traverse_topology_tree(cpu_topology_node* node, int packageID, int coreID)
 		case CPU_TOPOLOGY_PACKAGE:
 			packageID = node->id;
 			break;
+
+		default:
+			break;
 	}
 
 	for (int32 i = 0; i < node->children_count; i++)
