@@ -23,7 +23,7 @@ RemotePackageRepository HaikuPorts
 	binutils-2.17_2013_04_21-2
 	bison-2.4.3-6
 	bzip2-1.0.6-3
-	caya-2013.07.31-2
+	caya-2013.07.31-3
 	cdrtools-3.01~a07-3
 	cmake-2.8.11.2-2
 	ctags-5.8-3
@@ -39,6 +39,7 @@ RemotePackageRepository HaikuPorts
 	flex-2.5.35-6
 	freetype-2.4.9-3
 	freetype_devel-2.4.9-3
+	friss-0.8beta-1
 	gcc-2.95.3_2013_08_15-2
 	gettext-0.18.1.1-5
 	gettext_libintl-0.18.1.1-5
@@ -61,6 +62,7 @@ RemotePackageRepository HaikuPorts
 	jpeg_devel-9-3
 	jpeg_tools-9-3
 	keymapswitcher-1.2.7.10-1
+	lha-1.14i-1
 	libedit-2012_06_01_3.0-1
 	libiconv-1.13.1-6
 	libiconv_devel-1.13.1-6
@@ -117,6 +119,7 @@ RemotePackageRepository HaikuPorts
 	sqlite_devel-3.8.0.2-1
 	subversion-1.6.18-6
 	subversion_devel-1.6.18-6
+	sum_it-0.2beta-1
 	tar-1.26-6
 	texinfo-4.13a-7
 	unrar-4.2.4-1
@@ -205,6 +208,7 @@ RemotePackageRepository HaikuPorts
 	ffmpeg
 	flex
 	freetype
+	friss
 	gcc
 	gcc_x86
 	gettext
@@ -219,6 +223,7 @@ RemotePackageRepository HaikuPorts
 	jam
 	jpeg
 	keymapswitcher
+	lha
 	libedit
 	libiconv
 	libogg
@@ -258,6 +263,7 @@ RemotePackageRepository HaikuPorts
 	sqlite
 	sqlite_x86
 	subversion
+	sum_it
 	tar
 	texi2html
 	texinfo
