@@ -48,6 +48,7 @@ const bigtime_t kThreadQuantum = 1000;
 const bigtime_t kMinThreadQuantum = 3000;
 const bigtime_t kMaxThreadQuantum = 10000;
 
+const bigtime_t kCacheExpire = 100000;
 
 static scheduler_mode sSchedulerMode;
 
@@ -69,6 +70,8 @@ static AffineCPUHeap* sCPUPriorityHeaps;
 struct CoreEntry : public HeapLinkImpl<CoreEntry, int32>,
 	DoublyLinkedListLinkImpl<CoreEntry> {
 	int32		fCoreID;
+
+	bigtime_t	fActiveTime;
 };
 
 static CoreEntry* sCoreEntries;
@@ -131,6 +134,7 @@ struct scheduler_thread_data {
 			bigtime_t	quantum_start;
 
 			bigtime_t	went_sleep;
+			bigtime_t	went_sleep_active;
 
 			int32		previous_core;
 };
@@ -146,6 +150,7 @@ scheduler_thread_data::Init()
 	stolen_time = 0;
 
 	went_sleep = 0;
+	went_sleep_active = 0;
 
 	lost_cpu = false;
 	cpu_bound = true;
@@ -378,6 +383,31 @@ dump_idle_cores(int argc, char** argv)
 }
 
 
+static inline bool
+affine_has_cache_expired(Thread* thread)
+{
+	if (thread_is_idle_thread(thread))
+		return false;
+
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+	ASSERT(schedulerThreadData->previous_core >= 0);
+
+	CoreEntry* coreEntry = &sCoreEntries[schedulerThreadData->previous_core];
+	switch (sSchedulerMode) {
+		case SCHEDULER_MODE_PERFORMANCE:
+			return coreEntry->fActiveTime
+					- schedulerThreadData->went_sleep_active > kCacheExpire;
+
+		case SCHEDULER_MODE_POWER_SAVING:
+			return system_time() - schedulerThreadData->went_sleep
+				> kCacheExpire;
+
+		default:
+			return true;
+	}
+}
+
+
 static void
 affine_dump_thread_data(Thread* thread)
 {
@@ -396,8 +426,16 @@ affine_dump_thread_data(Thread* thread)
 		additionalPenalty, schedulerThreadData->additional_penalty);
 	kprintf("\tstolen_time:\t\t%" B_PRId64 "\n",
 		schedulerThreadData->stolen_time);
+	kprintf("\twent_sleep:\t\t%" B_PRId64 "\n",
+		schedulerThreadData->went_sleep);
+	kprintf("\twent_sleep_active:\t%" B_PRId64 "\n",
+		schedulerThreadData->went_sleep_active);
 	kprintf("\tprevious_core:\t\t%" B_PRId32 "\n",
 		schedulerThreadData->previous_core);
+	if (schedulerThreadData->previous_core > 0
+		&& affine_has_cache_expired(thread)) {
+		kprintf("\tcache affinity has expired\n");
+	}
 }
 
 
@@ -613,7 +651,9 @@ affine_enqueue(Thread* thread, bool newOne)
 		targetCPU = thread->previous_cpu->cpu_num;
 		targetCore = sCPUToCore[targetCPU];
 		ASSERT(targetCore == schedulerThreadData->previous_core);
-	} else if (schedulerThreadData->previous_core < 0) {
+	} else if (schedulerThreadData->previous_core < 0
+		|| (newOne && affine_has_cache_expired(thread))) {
+
 		if (thread_is_idle_thread(thread)) {
 			targetCPU = thread->previous_cpu->cpu_num;
 			targetCore = sCPUToCore[targetCPU];
@@ -950,6 +990,34 @@ affine_dequeue_thread(int32 thisCPU)
 }
 
 
+static inline void
+affine_track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
+{
+	if (!thread_is_idle_thread(oldThread)) {
+		bigtime_t active
+			= (oldThread->kernel_time - oldThread->cpu->last_kernel_time)
+				+ (oldThread->user_time - oldThread->cpu->last_user_time);
+
+		oldThread->cpu->active_time += active;
+		sCoreEntries[thisCore].fActiveTime += active;
+	}
+
+	if (!thread_is_idle_thread(nextThread)) {
+		oldThread->cpu->last_kernel_time = nextThread->kernel_time;
+		oldThread->cpu->last_user_time = nextThread->user_time;
+	}
+}
+
+
+static inline void
+affine_thread_goes_sleep(Thread* thread, int32 thisCore)
+{
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+	schedulerThreadData->went_sleep = system_time();
+	schedulerThreadData->went_sleep_active = sCoreEntries[thisCore].fActiveTime;
+}
+
+
 /*!	Runs the scheduler.
 	Note: expects thread spinlock to be held
 */
@@ -996,13 +1064,13 @@ affine_reschedule(void)
 
 			break;
 		case B_THREAD_SUSPENDED:
-			schedulerOldThreadData->went_sleep = system_time();
+			affine_thread_goes_sleep(oldThread, thisCore);
 			TRACE("reschedule(): suspending thread %ld\n", oldThread->id);
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
 			break;
 		default:
-			schedulerOldThreadData->went_sleep = system_time();
+			affine_thread_goes_sleep(oldThread, thisCore);
 			TRACE("not enqueueing thread %ld into run queue next_state = %ld\n",
 				oldThread->id, oldThread->next_state);
 			break;
@@ -1049,16 +1117,7 @@ affine_reschedule(void)
 	scheduler_update_thread_times(oldThread, nextThread);
 
 	// track CPU activity
-	if (!thread_is_idle_thread(oldThread)) {
-		oldThread->cpu->active_time +=
-			(oldThread->kernel_time - oldThread->cpu->last_kernel_time)
-			+ (oldThread->user_time - oldThread->cpu->last_user_time);
-	}
-
-	if (!thread_is_idle_thread(nextThread)) {
-		oldThread->cpu->last_kernel_time = nextThread->kernel_time;
-		oldThread->cpu->last_user_time = nextThread->user_time;
-	}
+	affine_track_cpu_activity(oldThread, nextThread, thisCore);
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
 		timer* quantumTimer = &oldThread->cpu->quantum_timer;
@@ -1282,6 +1341,7 @@ scheduler_affine_init()
 
 	for (int32 i = 0; i < coreCount; i++) {
 		sCoreEntries[i].fCoreID = i;
+		sCoreEntries[i].fActiveTime = 0;
 		status_t result = sCorePriorityHeap->Insert(&sCoreEntries[i],
 			B_IDLE_PRIORITY);
 		if (result != B_OK)
