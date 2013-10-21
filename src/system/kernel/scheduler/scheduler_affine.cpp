@@ -49,6 +49,11 @@ const bigtime_t kMinThreadQuantum = 3000;
 const bigtime_t kMaxThreadQuantum = 10000;
 
 
+static scheduler_mode sSchedulerMode;
+
+static int32 (*sChooseCore)(void);
+
+
 // Heaps in sCPUPriorityHeaps are used for load balancing on a core the logical
 // processors in the heap belong to. Since there are no cache affinity issues
 // at this level and the run queue is shared among all logical processors on
@@ -523,8 +528,8 @@ affine_update_priority_heaps(int32 cpu, int32 priority)
 }
 
 
-static inline int32
-affine_choose_core(void)
+static int32
+affine_choose_core_performance(void)
 {
 	CoreEntry* entry;
 
@@ -543,6 +548,37 @@ affine_choose_core(void)
 
 	ASSERT(entry != NULL);
 	return entry->fCoreID;
+}
+
+
+static int32
+affine_choose_core_power_saving(void)
+{
+	CoreEntry* entry;
+
+	// TODO: small tasks packing
+	if (sPackageUsageHeap->PeekMinimum() != NULL) {
+		// wake new core
+		PackageEntry* package = sPackageUsageHeap->PeekMinimum();
+		entry = package->fIdleCores.Last();
+	} else if (sIdlePackageList->Last() != NULL) {
+		// wake new package
+		PackageEntry* package = sIdlePackageList->Last();
+		entry = package->fIdleCores.Last();
+	} else {
+		// no idle cores, use least occupied core
+		entry = sCorePriorityHeap->PeekRoot();
+	}
+
+	ASSERT(entry != NULL);
+	return entry->fCoreID;
+}
+
+
+static inline int32
+affine_choose_core(void)
+{
+	return sChooseCore();
 }
 
 
@@ -1092,6 +1128,37 @@ affine_start(void)
 }
 
 
+static status_t
+affine_set_operation_mode(scheduler_mode mode)
+{
+	if (mode != SCHEDULER_MODE_PERFORMANCE
+		&& mode != SCHEDULER_MODE_POWER_SAVING) {
+		return B_BAD_VALUE;
+	}
+
+#ifdef TRACE_SCHEDULER
+	const char* modeNames = { "performance", "power saving" };
+#endif
+	TRACE("switching scheduler to %s mode\n", modeNames[mode]);
+
+	sSchedulerMode = mode;
+	switch (mode) {
+		case SCHEDULER_MODE_PERFORMANCE:
+			sChooseCore = affine_choose_core_performance;
+			break;
+
+		case SCHEDULER_MODE_POWER_SAVING:
+			sChooseCore = affine_choose_core_power_saving;
+			break;
+
+		default:
+			break;
+	}
+
+	return B_OK;
+}
+
+
 static scheduler_ops kAffineOps = {
 	affine_enqueue_in_run_queue,
 	affine_reschedule,
@@ -1101,6 +1168,7 @@ static scheduler_ops kAffineOps = {
 	affine_on_thread_init,
 	affine_on_thread_destroy,
 	affine_start,
+	affine_set_operation_mode,
 	affine_dump_thread_data
 };
 
@@ -1278,6 +1346,7 @@ scheduler_affine_init()
 			return result;
 	}
 
+	affine_set_operation_mode(SCHEDULER_MODE_PERFORMANCE);
 	gScheduler = &kAffineOps;
 
 	add_debugger_command_etc("run_queue", &dump_run_queue,

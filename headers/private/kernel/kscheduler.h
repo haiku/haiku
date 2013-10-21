@@ -17,6 +17,13 @@ struct scheduling_analysis;
 struct SchedulerListener;
 
 
+typedef enum scheduler_mode {
+	SCHEDULER_MODE_PERFORMANCE,
+	SCHEDULER_MODE_POWER_SAVING,
+	// ...
+	SCHEDULER_MODE_COUNT
+} scheduler_mode;
+
 struct scheduler_ops {
 	/*!	Enqueues the thread in the ready-to-run queue.
 		The caller must hold the scheduler lock (with disabled interrupts).
@@ -67,6 +74,10 @@ struct scheduler_ops {
 		lock.
 	*/
 	void (*start)(void);
+
+	/*! Sets scheduler operation mode.
+	 */
+	status_t (*set_operation_mode)(scheduler_mode mode);
 
 	/*! Dumps scheduler specific thread information.
 	*/

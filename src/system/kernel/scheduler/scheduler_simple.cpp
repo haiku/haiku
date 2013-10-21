@@ -720,6 +720,7 @@ static scheduler_ops kSimpleOps = {
 	simple_on_thread_init,
 	simple_on_thread_destroy,
 	simple_start,
+	NULL,
 	simple_dump_thread_data
 };
 
