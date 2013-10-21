@@ -75,6 +75,7 @@ template<typename Element, typename Key,
 class Heap {
 public:
 						Heap();
+						Heap(int initialSize);
 						~Heap();
 
 	inline	Element*	PeekRoot();
@@ -87,7 +88,7 @@ public:
 	inline	status_t	Insert(Element* element, Key key);
 
 private:
-			status_t	_GrowHeap();
+			status_t	_GrowHeap(int minimalSize = 0);
 
 			void		_MoveUp(HeapLink<Element, Key>* link);
 			void		_MoveDown(HeapLink<Element, Key>* link);
@@ -168,6 +169,17 @@ HEAP_CLASS_NAME::Heap()
 
 
 HEAP_TEMPLATE_LIST
+HEAP_CLASS_NAME::Heap(int initialSize)
+	:
+	fElements(NULL),
+	fLastElement(0),
+	fSize(0)
+{
+	_GrowHeap(initialSize);
+}
+
+
+HEAP_TEMPLATE_LIST
 HEAP_CLASS_NAME::~Heap()
 {
 	free(fElements);
@@ -204,7 +216,7 @@ HEAP_CLASS_NAME::ModifyKey(Element* element, Key newKey)
 
 	if (sCompare(newKey, oldKey))
 		_MoveUp(link);
-	else
+	else if (sCompare(oldKey, newKey))
 		_MoveDown(link);
 }
 
@@ -256,9 +268,10 @@ HEAP_CLASS_NAME::Insert(Element* element, Key key)
 
 HEAP_TEMPLATE_LIST
 status_t
-HEAP_CLASS_NAME::_GrowHeap()
+HEAP_CLASS_NAME::_GrowHeap(int minimalSize)
 {
-	int newSize = max_c(fSize * 2, 4);
+	minimalSize = minimalSize % 2 ? minimalSize : minimalSize + 1;
+	int newSize = max_c(max_c(fSize * 2, 4), minimalSize);
 
 	size_t arraySize = newSize * sizeof(Element*);
 	Element** newBuffer

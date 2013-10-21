@@ -70,6 +70,7 @@ template<typename Element, typename Key,
 class MinMaxHeap {
 public:
 						MinMaxHeap();
+						MinMaxHeap(int initialSize);
 						~MinMaxHeap();
 
 	inline	Element*	PeekMinimum();
@@ -84,8 +85,9 @@ public:
 
 	inline	status_t	Insert(Element* element, Key key);
 
-			status_t	GrowHeap(int minimalSize = 0);
 private:
+			status_t	_GrowHeap(int minimalSize = 0);
+
 			void		_MoveUp(MinMaxHeapLink<Element, Key>* link);
 			void		_MoveDown(MinMaxHeapLink<Element, Key>* link);
 			bool		_ChangeTree(MinMaxHeapLink<Element, Key>* link);
@@ -167,6 +169,19 @@ MIN_MAX_HEAP_CLASS_NAME::MinMaxHeap()
 
 
 MIN_MAX_HEAP_TEMPLATE_LIST
+MIN_MAX_HEAP_CLASS_NAME::MinMaxHeap(int initialSize)
+	:
+	fMinElements(NULL),
+	fMinLastElement(0),
+	fMaxElements(NULL),
+	fMaxLastElement(0),
+	fSize(0)
+{
+	_GrowHeap(initialSize);
+}
+
+
+MIN_MAX_HEAP_TEMPLATE_LIST
 MIN_MAX_HEAP_CLASS_NAME::~MinMaxHeap()
 {
 	free(fMinElements);
@@ -220,7 +235,10 @@ MIN_MAX_HEAP_CLASS_NAME::ModifyKey(Element* element, Key newKey)
 	Key oldKey = link->fKey;
 	link->fKey = newKey;
 
-	if (sCompare(newKey, oldKey) && link->fMinTree)
+	if (!sCompare(newKey, oldKey) && !sCompare(oldKey, newKey))
+		return;
+
+	if (sCompare(newKey, oldKey) ^ !link->fMinTree)
 		_MoveUp(link);
 	else
 		_MoveDown(link);
@@ -273,7 +291,7 @@ MIN_MAX_HEAP_CLASS_NAME::Insert(Element* element, Key key)
 {
 	if (min_c(fMinLastElement, fMaxLastElement) == fSize) {
 		ASSERT(max_c(fMinLastElement, fMaxLastElement) == fSize);
-		status_t result = GrowHeap();
+		status_t result = _GrowHeap();
 		if (result != B_OK)
 			return result;
 	}
@@ -300,7 +318,7 @@ MIN_MAX_HEAP_CLASS_NAME::Insert(Element* element, Key key)
 
 MIN_MAX_HEAP_TEMPLATE_LIST
 status_t
-MIN_MAX_HEAP_CLASS_NAME::GrowHeap(int minimalSize)
+MIN_MAX_HEAP_CLASS_NAME::_GrowHeap(int minimalSize)
 {
 	minimalSize = minimalSize % 2 ? minimalSize : minimalSize + 1;
 	int newSize = max_c(max_c(fSize * 4, 4), minimalSize);
