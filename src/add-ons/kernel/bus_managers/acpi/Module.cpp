@@ -221,6 +221,7 @@ static struct acpi_root_info sACPIRootModule = {
 	get_current_resources,
 	get_possible_resources,
 	set_current_resources,
+	walk_resources,
 	prepare_sleep_state,
 	enter_sleep_state,
 	reboot,
@@ -233,9 +234,7 @@ module_info* modules[] = {
 	(module_info*)&sACPIRootModule,
 	(module_info*)&acpi_ns_dump_module,
 	(module_info*)&gACPIDeviceModule,
-#ifndef __x86_64__
 	(module_info*)&embedded_controller_driver_module,
 	(module_info*)&embedded_controller_device_module,
-#endif
 	NULL
 };

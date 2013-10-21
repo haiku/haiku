@@ -75,6 +75,14 @@ acpi_evaluate_method(acpi_device device, const char *method,
 
 
 static status_t
+acpi_walk_resources(acpi_device device, char *method,
+	acpi_walk_resources_callback callback, void* context)
+{
+	return walk_resources(device->handle, method, callback, context);
+}
+
+
+static status_t
 acpi_device_init_driver(device_node *node, void **cookie)
 {
 	ACPI_HANDLE handle;
@@ -154,4 +162,5 @@ acpi_device_module_info gACPIDeviceModule = {
 	acpi_get_object_type,
 	acpi_get_object,
 	acpi_evaluate_method,
+	acpi_walk_resources
 };

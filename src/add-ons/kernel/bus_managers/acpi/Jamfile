@@ -207,7 +207,6 @@ KernelAddon acpi :
 	Device.cpp
 	NamespaceDump.cpp
 	EmbeddedController.cpp
-	SmallResourceData.cpp
 	:
 	libacpi_ca.a
 	;

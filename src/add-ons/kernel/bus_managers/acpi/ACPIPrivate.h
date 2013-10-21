@@ -39,6 +39,11 @@ typedef struct acpi_device_cookie {
 } acpi_device_cookie;
 
 
+typedef struct acpi_resource acpi_resource;
+typedef acpi_status (*acpi_walk_resources_callback)(acpi_resource* resource,
+	void* context);
+
+
 // ACPI root.
 typedef struct acpi_root_info {
 	driver_module_info info;
@@ -131,6 +136,9 @@ typedef struct acpi_root_info {
 					acpi_data *retBuffer);
 	status_t	(*set_current_resources)(acpi_handle busDeviceHandle,
 					acpi_data *buffer);
+	status_t	(*walk_resources)(acpi_handle busDeviceHandle,
+					char *method, acpi_walk_resources_callback callback,
+					void* context);
 
 	/* Power state setting */
 
@@ -217,6 +225,8 @@ status_t get_possible_resources(acpi_handle busDeviceHandle,
 	acpi_data* returnValue);
 status_t set_current_resources(acpi_handle busDeviceHandle,
 	acpi_data* buffer);
+status_t walk_resources(acpi_handle busDeviceHandle, char* method,
+	acpi_walk_resources_callback callback, void* context);
 
 status_t prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size);
 status_t enter_sleep_state(uint8 state);

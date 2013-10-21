@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Jérôme Duval, korli@users.berlios.de.
  * Copyright (c) 2009 Clemens Zeidler
  * Copyright (c) 2003-2007 Nate Lawson
  * Copyright (c) 2000 Michael Smith
@@ -39,8 +40,6 @@
 #include <Errors.h>
 #include <KernelExport.h>
 #include <drivers/PCI.h>
-
-#include "SmallResourceData.h"
 
 
 #define ACPI_EC_DRIVER_NAME "drivers/power/acpi_embedded_controller/driver_v1"
@@ -140,6 +139,25 @@ acpi_PkgInt32(acpi_object_type* res, int idx, uint32* dst)
 		*dst = (uint32) tmp;
 
 	return status;
+}
+
+
+acpi_status
+embedded_controller_io_ports_parse_callback(ACPI_RESOURCE* resource,
+	void* _context)
+{
+	acpi_ec_cookie* sc = (acpi_ec_cookie*)_context;
+	if (resource->Type != ACPI_RESOURCE_TYPE_IO)
+		return AE_OK;
+	if (sc->ec_data_pci_address == 0) {
+		sc->ec_data_pci_address = resource->Data.Io.Minimum;
+	} else if (sc->ec_csr_pci_address == 0) {
+		sc->ec_csr_pci_address = resource->Data.Io.Minimum;
+	} else {
+		return AE_CTRL_TERMINATE;
+	}
+
+	return AE_OK;
 }
 
 
@@ -282,13 +300,6 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 		(void**)&sc->ec_handle);
 	gDeviceManager->put_node(parent);
 
-	SmallResourceData resourceData(sc->ec_acpi, sc->ec_handle, "_CRS");
-	if (resourceData.InitCheck() != B_OK) {
-		TRACE("failed to read _CRS resource\n")	;
-		return B_ERROR;
-	}
-	io_port portData;
-
 	if (get_module(B_ACPI_MODULE_NAME, (module_info**)&sc->ec_acpi_module)
 			!= B_OK)
 		return B_ERROR;
@@ -313,7 +324,7 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 	// and GPE bit, similar to _PRW.
 	status = sc->ec_acpi->evaluate_method(sc->ec_handle, "_GPE", NULL, &buf);
 	if (status != B_OK) {
-		TRACE("can't evaluate _GPE\n");
+		ERROR("can't evaluate _GPE\n");
 		goto error;
 	}
 
@@ -337,22 +348,19 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 				goto error;
 			break;
 		default:
-			TRACE("_GPE has invalid type %i\n", int(obj->object_type));
+			ERROR("_GPE has invalid type %i\n", int(obj->object_type));
 			goto error;
 	}
 
 	sc->ec_suspending = FALSE;
 
 	// Attach bus resources for data and command/status ports.
-	if (resourceData.ReadIOPort(&portData) != B_OK)
+	status = sc->ec_acpi->walk_resources(sc->ec_handle, "_CRS",
+		embedded_controller_io_ports_parse_callback, sc);
+	if (status != B_OK) {
+		ERROR("Error while getting IO ports addresses\n");
 		goto error;
-
-	sc->ec_data_pci_address = portData.minimumBase;
-
-	if (resourceData.ReadIOPort(&portData) != B_OK)
-		goto error;
-
-	sc->ec_csr_pci_address = portData.minimumBase;
+	}
 
 	// Install a handler for this EC's GPE bit.  We want edge-triggered
 	// behavior.
@@ -369,14 +377,14 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 	status = sc->ec_acpi->install_address_space_handler(sc->ec_handle,
 		ACPI_ADR_SPACE_EC, &EcSpaceHandler, &EcSpaceSetup, sc);
 	if (status != B_OK) {
-		TRACE("can't install address space handler\n");
+		ERROR("can't install address space handler\n");
 		goto error;
 	}
 
 	// Enable runtime GPEs for the handler.
 	status = sc->ec_acpi_module->enable_gpe(sc->ec_gpehandle, sc->ec_gpebit);
 	if (status != B_OK) {
-		TRACE("AcpiEnableGpe failed.\n");
+		ERROR("AcpiEnableGpe failed.\n");
 		goto error;
 	}
 
@@ -519,7 +527,7 @@ EcGpeQueryHandler(void* context)
 	// that may arise from running the query from causing another query
 	// to be queued, we clear the pending flag only after running it.
 	int sci_enqueued = sc->ec_sci_pending;
-	acpi_status acpi_status;
+	acpi_status acpi_status = AE_ERROR;
 	for (uint8 retry = 0; retry < 2; retry++) {
 		acpi_status = EcCommand(sc, EC_COMMAND_QUERY);
 		if (acpi_status == AE_OK)

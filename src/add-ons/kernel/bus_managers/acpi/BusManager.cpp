@@ -625,6 +625,15 @@ set_current_resources(acpi_handle busDeviceHandle, acpi_data *buffer)
 
 
 status_t
+walk_resources(acpi_handle busDeviceHandle, char* method,
+	acpi_walk_resources_callback callback, void* context)
+{
+	return AcpiWalkResources(busDeviceHandle, method,
+		(ACPI_WALK_RESOURCE_CALLBACK)callback, context);
+}
+
+
+status_t
 prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 {
 	ACPI_STATUS acpiStatus;
@@ -770,6 +779,7 @@ struct acpi_module_info gACPIModule = {
 	get_current_resources,
 	get_possible_resources,
 	set_current_resources,
+	walk_resources,
 	prepare_sleep_state,
 	enter_sleep_state,
 	reboot,

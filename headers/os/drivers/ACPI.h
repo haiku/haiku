@@ -142,6 +142,8 @@ enum {
  */
 typedef uint32 acpi_status;
 
+typedef struct acpi_resource acpi_resource;
+
 #endif	// __ACTYPES_H__
 
 
@@ -158,6 +160,9 @@ typedef acpi_status (*acpi_adr_space_setup)(acpi_handle regionHandle,
 
 typedef void (*acpi_notify_handler)(acpi_handle device, uint32 value,
 	void *context);
+
+typedef acpi_status (*acpi_walk_resources_callback)(acpi_resource* resource,
+	void* context);
 
 
 struct acpi_module_info {
@@ -251,6 +256,9 @@ struct acpi_module_info {
 					acpi_data *retBuffer);
 	status_t	(*set_current_resources)(acpi_handle busDeviceHandle,
 					acpi_data *buffer);
+	status_t	(*walk_resources)(acpi_handle busDeviceHandle,
+					char *method, acpi_walk_resources_callback callback,
+					void* context);
 
 	/* Power state setting */
 
@@ -317,6 +325,10 @@ typedef struct acpi_device_module_info {
 	/* Control method execution and data acquisition */
 	status_t	(*evaluate_method)(acpi_device device, const char *method,
 					acpi_objects *args, acpi_data *returnValue);
+
+	/* Resource Management */
+	status_t	(*walk_resources)(acpi_device device, char *method,
+					acpi_walk_resources_callback callback, void* context);
 } acpi_device_module_info;
 
 
