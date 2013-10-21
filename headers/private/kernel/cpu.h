@@ -71,7 +71,6 @@ typedef struct cpu_ent {
 	Thread*			running_thread;
 	Thread*			previous_thread;
 	bool			invoke_scheduler;
-	bool			invoke_scheduler_if_idle;
 	bool			disabled;
 
 	// CPU topology information

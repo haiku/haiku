@@ -656,10 +656,9 @@ affine_enqueue(Thread* thread, bool newOne)
 		// reschedule anyway and update its heap key to the correct value.
 		affine_update_priority_heaps(targetCPU, threadPriority);
 
-		if (targetCPU == smp_get_current_cpu()) {
+		if (targetCPU == smp_get_current_cpu())
 			gCPU[targetCPU].invoke_scheduler = true;
-			gCPU[targetCPU].invoke_scheduler_if_idle = false;
-		} else {
+		else {
 			smp_send_ici(targetCPU, SMP_MSG_RESCHEDULE, 0, 0, 0, NULL,
 				SMP_MSG_FLAG_ASYNC);
 		}
@@ -840,7 +839,6 @@ reschedule_event(timer *unused)
 
 	thread->scheduler_data->lost_cpu = true;
 	thread->cpu->invoke_scheduler = true;
-	thread->cpu->invoke_scheduler_if_idle = false;
 	thread->cpu->preempted = 1;
 	return B_HANDLED_INTERRUPT;
 }
@@ -959,17 +957,6 @@ static void
 affine_reschedule(void)
 {
 	Thread* oldThread = thread_get_current_thread();
-
-	// check whether we're only supposed to reschedule, if the current thread
-	// is idle
-	if (oldThread->cpu->invoke_scheduler) {
-		oldThread->cpu->invoke_scheduler = false;
-		if (oldThread->cpu->invoke_scheduler_if_idle
-			&& oldThread->priority != B_IDLE_PRIORITY) {
-			oldThread->cpu->invoke_scheduler_if_idle = false;
-			return;
-		}
-	}
 
 	int32 thisCPU = smp_get_current_cpu();
 	int32 thisCore = sCPUToCore[thisCPU];
