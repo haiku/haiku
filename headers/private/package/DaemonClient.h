@@ -60,10 +60,6 @@ private:
 			status_t			_ExtractPackageInfoSet(const BMessage& message,
 									const char* field, BPackageInfoSet& _infos);
 
-			status_t			_CommitTransaction(
-									const BActivationTransaction& transaction,
-									BCommitTransactionResult& _result);
-
 private:
 			BMessenger			fDaemonMessenger;
 };

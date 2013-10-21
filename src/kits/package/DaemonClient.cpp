@@ -99,12 +99,45 @@ status_t
 BDaemonClient::CommitTransaction(const BActivationTransaction& transaction,
 	BCommitTransactionResult& _result)
 {
-	status_t error = _CommitTransaction(transaction, _result);
-		// B_OK just indicates that _result has been initialized.
-	if (error != B_OK)
-		_result.SetTo(error, BString(), BString(), BString());
+	if (transaction.InitCheck() != B_OK)
+		return B_BAD_VALUE;
 
-	return _result.Error();
+	status_t error = _InitMessenger();
+	if (error != B_OK)
+		return error;
+
+	// send the request
+	BMessage request(B_MESSAGE_COMMIT_TRANSACTION);
+	error = transaction.Archive(&request);
+	if (error != B_OK)
+		return error;
+
+	BMessage reply;
+	fDaemonMessenger.SendMessage(&request, &reply);
+	if (reply.what != B_MESSAGE_COMMIT_TRANSACTION_REPLY)
+		return B_ERROR;
+
+	// extract the result
+	int32 requestError;
+	error = reply.FindInt32("error", &requestError);
+	if (error != B_OK)
+		return error;
+
+	BString errorMessage;
+	BString errorPackage;
+	BString oldStateDirectory;
+	if (requestError == 0) {
+		error = reply.FindString("old state", &oldStateDirectory);
+		if (error != B_OK)
+			return error;
+	} else {
+		reply.FindString("error message", &errorMessage);
+		reply.FindString("error package", &errorPackage);
+	}
+
+	_result.SetTo(requestError, errorMessage, errorPackage, oldStateDirectory);
+	return B_OK;
+		// Even on error. B_OK just indicates that we have initialized _result.
 }
 
 
@@ -205,52 +238,6 @@ BDaemonClient::_ExtractPackageInfoSet(const BMessage& message,
 	}
 
 	return B_OK;
-}
-
-
-status_t
-BDaemonClient::_CommitTransaction(const BActivationTransaction& transaction,
-	BCommitTransactionResult& _result)
-{
-	if (transaction.InitCheck() != B_OK)
-		return B_BAD_VALUE;
-
-	status_t error = _InitMessenger();
-	if (error != B_OK)
-		return error;
-
-	// send the request
-	BMessage request(B_MESSAGE_COMMIT_TRANSACTION);
-	error = transaction.Archive(&request);
-	if (error != B_OK)
-		return error;
-
-	BMessage reply;
-	fDaemonMessenger.SendMessage(&request, &reply);
-	if (reply.what != B_MESSAGE_COMMIT_TRANSACTION_REPLY)
-		return B_ERROR;
-
-	// extract the result
-	int32 requestError;
-	error = reply.FindInt32("error", &requestError);
-	if (error != B_OK)
-		return error;
-
-	BString errorMessage;
-	BString errorPackage;
-	BString oldStateDirectory;
-	if (requestError == 0) {
-		error = reply.FindString("old state", &oldStateDirectory);
-		if (error != B_OK)
-			return error;
-	} else {
-		reply.FindString("error message", &errorMessage);
-		reply.FindString("error package", &errorPackage);
-	}
-
-	_result.SetTo(requestError, errorMessage, errorPackage, oldStateDirectory);
-	return B_OK;
-		// Even on error. B_OK just indicates that we have initialized _result.
 }
 
 
