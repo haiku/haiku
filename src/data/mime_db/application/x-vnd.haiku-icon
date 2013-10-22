@@ -1,7 +1,7 @@
 
-resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Haiku-icon";
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
-resource(1, "META:TYPE") "application/hvif";
+resource(1, "META:TYPE") "application/x-vnd.Haiku-icon";
 
 resource(2, "META:SNIFF_RULE") "0.50          (\"IMSGHMF1\")";
 
