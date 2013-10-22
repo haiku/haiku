@@ -32,6 +32,7 @@
 #include <SystemCatalog.h>
 #include <View.h>
 
+#include <AutoDeleter.h>
 #include <pr_server.h>
 #include <ViewPrivate.h>
 
@@ -239,6 +240,7 @@ BPrintJob::BeginJob()
 	char *printer = _GetCurrentPrinterName();
 	if (printer == NULL)
 		return;
+	MemoryDeleter _(printer);
 
 	path.Append(printer);
 
@@ -246,10 +248,8 @@ BPrintJob::BeginJob()
 	_GetMangledName(mangledName, B_FILE_NAME_LENGTH);
 
 	path.Append(mangledName);
-	if (path.InitCheck() != B_OK) {
-		free(printer);
+	if (path.InitCheck() != B_OK)
 		return;
-	}
 
 	// TODO: fSpoolFileName should store the name only (not path which can be
 	// 1024 bytes long)
@@ -257,7 +257,6 @@ BPrintJob::BeginJob()
 	fSpoolFile = new BFile(fSpoolFileName, B_READ_WRITE | B_CREATE_FILE);
 
 	if (fSpoolFile->InitCheck() != B_OK) {
-		free(printer);
 		CancelJob();
 		return;
 	}
@@ -271,7 +270,6 @@ BPrintJob::BeginJob()
 
 	if (fSpoolFile->Write(&fSpoolFileHeader, sizeof(print_file_header))
 			!= sizeof(print_file_header)) {
-		free(printer);
 		CancelJob();
 		return;
 	}
@@ -280,7 +278,6 @@ BPrintJob::BeginJob()
 	if (!fSetupMessage->HasString(PSRV_FIELD_CURRENT_PRINTER))
 		fSetupMessage->AddString(PSRV_FIELD_CURRENT_PRINTER, printer);
 
-	free(printer);
 	_AddSetupSpec();
 	_NewPage();
 
