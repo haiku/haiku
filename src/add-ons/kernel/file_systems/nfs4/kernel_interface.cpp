@@ -99,13 +99,13 @@ ParseArguments(const char* _args, AddressResolver** address, char** _server,
 		return B_NO_MEMORY;
 	*address = new AddressResolver(args);
 	if (*address == NULL) {
-		delete *_server;
+		free(*_server);
 		return B_NO_MEMORY;
 	}
 
 	*_path = strdup(path);
 	if (*_path == NULL) {
-		delete *_server;
+		free(*_server);
 		delete *address;
 		return B_NO_MEMORY;
 	}
