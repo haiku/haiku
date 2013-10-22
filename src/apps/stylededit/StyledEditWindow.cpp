@@ -804,6 +804,7 @@ StyledEditWindow::Save(BMessage* message)
 	fClean = true;
 	fNagOnNodeChange = true;
 
+	PostMessage(UPDATE_STATUS);
 	return status;
 }
 
