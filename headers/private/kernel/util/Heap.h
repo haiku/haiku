@@ -230,6 +230,7 @@ HEAP_CLASS_NAME::RemoveRoot()
 #if KDEBUG
 	Element* element = PeekRoot();
 	HeapLink<Element, Key>* link = sGetLink(element);
+	ASSERT(link->fIndex != -1);
 	link->fIndex = -1;
 #endif
 
@@ -257,6 +258,8 @@ HEAP_CLASS_NAME::Insert(Element* element, Key key)
 
 	HeapLink<Element, Key>* link = sGetLink(element);
 
+	ASSERT(link->fIndex == -1);
+
 	fElements[fLastElement] = element;
 	link->fIndex = fLastElement++;
 	link->fKey = key;
@@ -270,7 +273,6 @@ HEAP_TEMPLATE_LIST
 status_t
 HEAP_CLASS_NAME::_GrowHeap(int minimalSize)
 {
-	minimalSize = minimalSize % 2 ? minimalSize : minimalSize + 1;
 	int newSize = max_c(max_c(fSize * 2, 4), minimalSize);
 
 	size_t arraySize = newSize * sizeof(Element*);

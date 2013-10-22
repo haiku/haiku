@@ -258,6 +258,7 @@ MIN_MAX_HEAP_CLASS_NAME::RemoveMinimum()
 #if KDEBUG
 	Element* element = PeekMinimum();
 	MinMaxHeapLink<Element, Key>* link = sGetLink(element);
+	ASSERT(link->fIndex != -1);
 	link->fIndex = -1;
 #endif
 
@@ -278,6 +279,7 @@ MIN_MAX_HEAP_CLASS_NAME::RemoveMaximum()
 #if KDEBUG
 	Element* element = PeekMaximum();
 	MinMaxHeapLink<Element, Key>* link = sGetLink(element);
+	ASSERT(link->fIndex != -1);
 	link->fIndex = -1;
 #endif
 
@@ -296,9 +298,11 @@ MIN_MAX_HEAP_CLASS_NAME::Insert(Element* element, Key key)
 			return result;
 	}
 
-	ASSERT(fMinLastElement != fSize || fMaxLastElement != fSize);
+	ASSERT(fMinLastElement < fSize || fMaxLastElement < fSize);
 
 	MinMaxHeapLink<Element, Key>* link = sGetLink(element);
+
+	ASSERT(link->fIndex == -1);
 
 	link->fMinTree = fMinLastElement < fMaxLastElement;
 
@@ -320,7 +324,7 @@ MIN_MAX_HEAP_TEMPLATE_LIST
 status_t
 MIN_MAX_HEAP_CLASS_NAME::_GrowHeap(int minimalSize)
 {
-	minimalSize = minimalSize % 2 ? minimalSize : minimalSize + 1;
+	minimalSize = minimalSize % 2 == 0 ? minimalSize : minimalSize + 1;
 	int newSize = max_c(max_c(fSize * 4, 4), minimalSize);
 
 	size_t arraySize = newSize * sizeof(Element*);
@@ -329,7 +333,11 @@ MIN_MAX_HEAP_CLASS_NAME::_GrowHeap(int minimalSize)
 	if (newBuffer == NULL)
 		return B_NO_MEMORY;
 	fMinElements = newBuffer;
-	fMaxElements = newBuffer + (newSize / 2);
+
+	newBuffer += newSize / 2;
+	if (fMaxElements != NULL)
+		memcpy(newBuffer, fMaxElements, fSize * sizeof(Element*));
+	fMaxElements = newBuffer;
 
 	fSize = newSize / 2;
 	return B_OK;
