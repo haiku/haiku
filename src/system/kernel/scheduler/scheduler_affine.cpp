@@ -51,10 +51,11 @@ const bigtime_t kMaxThreadQuantum = 10000;
 const bigtime_t kCacheExpire = 100000;
 
 static bigtime_t sDisableSmallTaskPacking;
+static int32 sSmallTaskCore = -1;
 
 static scheduler_mode sSchedulerMode;
 
-static int32 (*sChooseCore)(int32 priority);
+static int32 (*sChooseCore)(Thread* thread);
 
 
 // Heaps in sCPUPriorityHeaps are used for load balancing on a core the logical
@@ -511,10 +512,12 @@ affine_update_thread_heaps(int32 core)
 
 	if (newKey > thread_max_threads()) {
 		if (oldKey <= thread_max_threads()) {
+			if (sSmallTaskCore == entry->fCoreID)
+				sSmallTaskCore = -1;
+
 			sCoreThreadHeap->ModifyKey(entry, -1);
 			ASSERT(sCoreThreadHeap->PeekMinimum() == entry);
 			sCoreThreadHeap->RemoveMinimum();
-			ASSERT(sCoreThreadHeap->PeekMinimum() != entry);
 
 			sCoreCPUBoundThreadHeap->Insert(entry, newKey);
 		} else
@@ -656,7 +659,7 @@ affine_update_priority_heaps(int32 cpu, int32 priority)
 
 
 static int32
-affine_choose_core_performance(int32 priority)
+affine_choose_core_performance(Thread* thread)
 {
 	CoreEntry* entry;
 
@@ -671,6 +674,8 @@ affine_choose_core_performance(int32 priority)
 	} else {
 		// no idle cores, use least occupied core
 		entry = sCorePriorityHeap->PeekRoot();
+
+		int32 priority = affine_get_effective_priority(thread);
 		if (AffineCorePriorityHeap::GetKey(entry) >= priority) {
 			entry = sCoreThreadHeap->PeekMinimum();
 			if (entry == NULL)
@@ -684,17 +689,24 @@ affine_choose_core_performance(int32 priority)
 
 
 static int32
-affine_choose_core_power_saving(int32 priority)
+affine_choose_core_power_saving(Thread* thread)
 {
 	CoreEntry* entry;
 
-	entry = sCorePriorityHeap->PeekRoot();
-	if (entry != NULL && AffineCorePriorityHeap::GetKey(entry) < priority) {
-		// run immediately on already woken core
-	} else if (sDisableSmallTaskPacking < system_time()
+	int32 priority = affine_get_effective_priority(thread);
+	int32 penalty = thread->scheduler_data->priority_penalty;
+
+	if (!sDisableSmallTaskPacking && penalty == 0
 		&& sCoreThreadHeap->PeekMaximum() != NULL) {
 		// try to pack all threads on one core
-		entry = sCoreThreadHeap->PeekMaximum();
+		if (sSmallTaskCore < 0)
+			sSmallTaskCore = sCoreThreadHeap->PeekMaximum()->fCoreID;
+		entry = &sCoreEntries[sSmallTaskCore];
+	} else if (sCorePriorityHeap->PeekRoot() != NULL
+		&& AffineCorePriorityHeap::GetKey(sCorePriorityHeap->PeekRoot())
+			< priority) {
+		// run immediately on already woken core
+		entry = sCorePriorityHeap->PeekRoot();
 	} else if (sPackageUsageHeap->PeekMinimum() != NULL) {
 		// wake new core
 		PackageEntry* package = sPackageUsageHeap->PeekMinimum();
@@ -716,9 +728,9 @@ affine_choose_core_power_saving(int32 priority)
 
 
 static inline int32
-affine_choose_core(int32 priority)
+affine_choose_core(Thread* thread)
 {
-	return sChooseCore(priority);
+	return sChooseCore(thread);
 }
 
 
@@ -746,9 +758,7 @@ affine_should_rebalance(Thread* thread)
 	//  than the average get rid of this one.
 	if (schedulerThreadData->additional_penalty != 0) {
 		int32 averageCPUBound = sCPUBoundThreads / sRunQueueCount;
-		if (coreEntry->fCPUBoundThreads - averageCPUBound > 1)
-			return true;
-		return false;
+		return coreEntry->fCPUBoundThreads - averageCPUBound > 1;
 	}
 
 	// If this thread is not cpu bound but we have at least one consider giving
@@ -761,6 +771,11 @@ affine_should_rebalance(Thread* thread)
 			return true;
 		}
 	}
+
+	// Try our luck at small task packing.
+	int32 penalty = schedulerThreadData->priority_penalty;
+	if (!sDisableSmallTaskPacking && penalty == 0)
+		return sSmallTaskCore != coreEntry->fCoreID;
 
 	// No cpu bound threads - the situation is quite good. Make sure it
 	// won't get much worse...
@@ -861,7 +876,7 @@ affine_enqueue(Thread* thread, bool newOne)
 			if (!newOne)
 				affine_thread_goes_away(thread);
 
-			targetCore = affine_choose_core(threadPriority);
+			targetCore = affine_choose_core(thread);
 			targetCPU = affine_choose_cpu(targetCore);
 		}
 
@@ -1325,10 +1340,12 @@ affine_set_operation_mode(scheduler_mode mode)
 	sSchedulerMode = mode;
 	switch (mode) {
 		case SCHEDULER_MODE_PERFORMANCE:
+			sDisableSmallTaskPacking = true;
 			sChooseCore = affine_choose_core_performance;
 			break;
 
 		case SCHEDULER_MODE_POWER_SAVING:
+			sDisableSmallTaskPacking = false;
 			sChooseCore = affine_choose_core_power_saving;
 			break;
 
