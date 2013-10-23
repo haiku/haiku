@@ -50,8 +50,8 @@ const bigtime_t kMaxThreadQuantum = 10000;
 
 const bigtime_t kCacheExpire = 100000;
 
-static bigtime_t sDisableSmallTaskPacking;
-static int32 sSmallTaskCore = -1;
+static int sDisableSmallTaskPacking;
+static int32 sSmallTaskCore;
 
 static scheduler_mode sSchedulerMode;
 
@@ -512,9 +512,6 @@ affine_update_thread_heaps(int32 core)
 
 	if (newKey > thread_max_threads()) {
 		if (oldKey <= thread_max_threads()) {
-			if (sSmallTaskCore == entry->fCoreID)
-				sSmallTaskCore = -1;
-
 			sCoreThreadHeap->ModifyKey(entry, -1);
 			ASSERT(sCoreThreadHeap->PeekMinimum() == entry);
 			sCoreThreadHeap->RemoveMinimum();
@@ -536,6 +533,18 @@ affine_update_thread_heaps(int32 core)
 
 
 static inline void
+affine_disable_small_task_packing(void)
+{
+	ASSERT(sDisableSmallTaskPacking == 0);
+	ASSERT(sSmallTaskCore == sCPUToCore[smp_get_current_cpu()]);
+
+	ASSERT(sAssignedThreads > 0);
+	sDisableSmallTaskPacking = sAssignedThreads * 64;
+	sSmallTaskCore = -1;
+}
+
+
+static inline void
 affine_increase_penalty(Thread* thread)
 {
 	if (thread->priority <= B_LOWEST_ACTIVE_PRIORITY)
@@ -549,14 +558,24 @@ affine_increase_penalty(Thread* thread)
 	int32 oldPenalty = schedulerThreadData->priority_penalty++;
 
 	ASSERT(thread->priority - oldPenalty >= B_LOWEST_ACTIVE_PRIORITY);
+
 	const int kMinimalPriority = affine_get_minimal_priority(thread);
 	if (thread->priority - oldPenalty <= kMinimalPriority) {
 		int32 core = schedulerThreadData->previous_core;
 		ASSERT(core >= 0);
-		if (schedulerThreadData->additional_penalty == 0) {
+
+		int32 additionalPenalty = schedulerThreadData->additional_penalty;
+		if (additionalPenalty == 0) {
 			sCPUBoundThreads++;
 			sCoreEntries[core].fCPUBoundThreads++;
+
 			affine_update_thread_heaps(core);
+		}
+
+		const int kSmallTaskThreshold = 50;
+		if (additionalPenalty > kSmallTaskThreshold) {
+			if (sSmallTaskCore == core)
+				affine_disable_small_task_packing();
 		}
 
 		schedulerThreadData->priority_penalty = oldPenalty;
@@ -573,8 +592,22 @@ affine_cancel_penalty(Thread* thread)
 	if (schedulerThreadData->priority_penalty != 0)
 		TRACE("cancelling thread %ld penalty\n", thread->id);
 
-	schedulerThreadData->priority_penalty = 0;
-	schedulerThreadData->additional_penalty = 0;
+	switch (sSchedulerMode) {
+		case SCHEDULER_MODE_PERFORMANCE:
+			schedulerThreadData->additional_penalty = 0;
+			schedulerThreadData->priority_penalty = 0;
+			break;
+
+		case SCHEDULER_MODE_POWER_SAVING:
+			if (schedulerThreadData->additional_penalty != 0)
+				schedulerThreadData->additional_penalty /= 2;
+			else if (schedulerThreadData->priority_penalty != 0)
+				schedulerThreadData->priority_penalty--;
+			break;
+
+		default:
+			break;
+	}
 }
 
 
@@ -688,15 +721,26 @@ affine_choose_core_performance(Thread* thread)
 }
 
 
+static inline bool
+affine_is_task_small(Thread* thread)
+{
+	int32 priority = affine_get_effective_priority(thread);
+	int32 penalty = thread->scheduler_data->priority_penalty;
+	return penalty == 0 || priority >= B_DISPLAY_PRIORITY;
+}
+
+
 static int32
 affine_choose_core_power_saving(Thread* thread)
 {
 	CoreEntry* entry;
 
 	int32 priority = affine_get_effective_priority(thread);
-	int32 penalty = thread->scheduler_data->priority_penalty;
 
-	if (!sDisableSmallTaskPacking && penalty == 0
+	if (sDisableSmallTaskPacking > 0)
+		sDisableSmallTaskPacking--;
+
+	if (!sDisableSmallTaskPacking && affine_is_task_small(thread)
 		&& sCoreThreadHeap->PeekMaximum() != NULL) {
 		// try to pack all threads on one core
 		if (sSmallTaskCore < 0)
@@ -772,15 +816,27 @@ affine_should_rebalance(Thread* thread)
 		}
 	}
 
+	int32 threadsAboveAverage = coreEntry->fThreads - averageThread;
+
+	// All cores try to give us small tasks, check whether we have enough.
+	const int kSmallTaskCountThreshold = 5;
+	if (sDisableSmallTaskPacking == 0 && sSmallTaskCore == coreEntry->fCoreID) {
+		if (threadsAboveAverage > kSmallTaskCountThreshold) {
+			if (!affine_is_task_small(thread))
+				return true;
+		} else if (threadsAboveAverage > 2 * kSmallTaskCountThreshold) {
+			affine_disable_small_task_packing();
+		}
+	}
+
 	// Try our luck at small task packing.
-	int32 penalty = schedulerThreadData->priority_penalty;
-	if (!sDisableSmallTaskPacking && penalty == 0)
+	if (sDisableSmallTaskPacking == 0 && affine_is_task_small(thread))
 		return sSmallTaskCore != coreEntry->fCoreID;
 
 	// No cpu bound threads - the situation is quite good. Make sure it
 	// won't get much worse...
 	const int32 kBalanceThreshold = 3;
-	return coreEntry->fThreads - averageThread > kBalanceThreshold;
+	return threadsAboveAverage > kBalanceThreshold;
 }
 
 
@@ -1340,12 +1396,14 @@ affine_set_operation_mode(scheduler_mode mode)
 	sSchedulerMode = mode;
 	switch (mode) {
 		case SCHEDULER_MODE_PERFORMANCE:
-			sDisableSmallTaskPacking = true;
+			sDisableSmallTaskPacking = -1;
+			sSmallTaskCore = -1;
 			sChooseCore = affine_choose_core_performance;
 			break;
 
 		case SCHEDULER_MODE_POWER_SAVING:
-			sDisableSmallTaskPacking = false;
+			sDisableSmallTaskPacking = 0;
+			sSmallTaskCore = -1;
 			sChooseCore = affine_choose_core_power_saving;
 			break;
 
@@ -1481,8 +1539,7 @@ scheduler_affine_init()
 	sCoreEntries = new CoreEntry[coreCount];
 	if (sCoreEntries == NULL)
 		return B_NO_MEMORY;
-	ArrayDeleter<CoreEntry> coreEntriesDeleter(
-		sCoreEntries);
+	ArrayDeleter<CoreEntry> coreEntriesDeleter(sCoreEntries);
 
 	sCorePriorityHeap = new AffineCorePriorityHeap(coreCount);
 	if (sCorePriorityHeap == NULL)
