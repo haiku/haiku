@@ -7,19 +7,31 @@
  *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
-#include "acpi_battery.h"
+
+#include <ACPI.h>
+#include <condition_variable.h>
+#include <Drivers.h>
+#include <Errors.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <Drivers.h>
-#include <Errors.h>
-#include <KernelExport.h>
+#include "device/power_managment.h"
 
-#include <ACPI.h>
-#include <condition_variable.h>
-#include <kernel/arch/x86/arch_cpu.h>
+
+struct battery_driver_cookie {
+	device_node*				node;
+	acpi_device_module_info*	acpi;
+	acpi_device					acpi_cookie;
+};
+
+
+struct battery_device_cookie {
+	battery_driver_cookie*		driver_cookie;
+	vint32						stop_watching;
+};
+
 
 #define ACPI_BATTERY_DRIVER_NAME "drivers/power/acpi_battery/driver_v1"
 #define ACPI_BATTERY_DEVICE_NAME "drivers/power/acpi_battery/device_v1"
@@ -30,12 +42,23 @@
 // name of pnp generator of path ids
 #define ACPI_BATTERY_PATHID_GENERATOR "acpi_battery/path_id"
 
+#define ACPI_NAME_BATTERY "PNP0C0A"
+
+//#define TRACE_BATTERY
+#ifdef TRACE_BATTERY
+#	define TRACE(x...) dprintf("acpi_battery: "x)
+#else
+#	define TRACE(x...)
+#endif
+
+
 static device_manager_info *sDeviceManager;
 static ConditionVariable sBatteryCondition;
 
 
 status_t
-ReadBatteryStatus(battery_driver_cookie* cookie, acpi_battery_info* batteryStatus)
+ReadBatteryStatus(battery_driver_cookie* cookie,
+	acpi_battery_info* batteryStatus)
 {
 	status_t status = B_ERROR;
 
@@ -94,8 +117,6 @@ status_t
 ReadBatteryInfo(battery_driver_cookie* cookie,
 	acpi_extended_battery_info* batteryInfo)
 {
-	status_t status = B_ERROR;
-
 	acpi_data buffer;
 	buffer.pointer = NULL;
 	buffer.length = ACPI_ALLOCATE_BUFFER;
@@ -103,8 +124,8 @@ ReadBatteryInfo(battery_driver_cookie* cookie,
 	acpi_object_type* object;
 	acpi_object_type* pointer;
 
-	status = cookie->acpi->evaluate_method(cookie->acpi_cookie, "_BIF", NULL,
-		&buffer);
+	status_t status = cookie->acpi->evaluate_method(cookie->acpi_cookie,
+		"_BIF", NULL, &buffer);
 	if (status != B_OK)
 		goto exit;
 
@@ -243,6 +264,24 @@ TraceBatteryInfo(acpi_extended_battery_info* batteryInfo)
 }
 
 
+//	#pragma mark - device module API
+
+
+static status_t
+acpi_battery_init_device(void *driverCookie, void **cookie)
+{
+	*cookie = driverCookie;
+	return B_OK;
+}
+
+
+static void
+acpi_battery_uninit_device(void *_cookie)
+{
+
+}
+
+
 static status_t
 acpi_battery_open(void *initCookie, const char *path, int flags, void** cookie)
 {
@@ -263,9 +302,6 @@ acpi_battery_open(void *initCookie, const char *path, int flags, void** cookie)
 static status_t
 acpi_battery_close(void* cookie)
 {
-	battery_device_cookie* device = (battery_device_cookie*)cookie;
-	free(device);
-
 	return B_OK;
 }
 
@@ -336,7 +372,7 @@ acpi_battery_write(void* cookie, off_t position, const void* buffer, size_t* num
 }
 
 
-status_t
+static status_t
 acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 {
 	battery_device_cookie* device = (battery_device_cookie*)_cookie;
@@ -394,6 +430,8 @@ acpi_battery_control(void* _cookie, uint32 op, void* arg, size_t len)
 static status_t
 acpi_battery_free(void* cookie)
 {
+	battery_device_cookie* device = (battery_device_cookie*)cookie;
+	free(device);
 	return B_OK;
 }
 
@@ -406,9 +444,6 @@ acpi_battery_support(device_node *parent)
 {
 	// make sure parent is really the ACPI bus manager
 	const char *bus;
-	uint32 device_type;
-	const char *name;
-
 	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return -1;
 
@@ -416,16 +451,19 @@ acpi_battery_support(device_node *parent)
 		return 0.0;
 
 	// check whether it's really a device
+	uint32 device_type;
 	if (sDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM,
-										&device_type, false) != B_OK
+			&device_type, false) != B_OK
 		|| device_type != ACPI_TYPE_DEVICE) {
 		return 0.0;
 	}
 
 	// check whether it's a battery device
+	const char *name;
 	if (sDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &name,
-		false) != B_OK || strcmp(name, ACPI_NAME_BATTERY))
+		false) != B_OK || strcmp(name, ACPI_NAME_BATTERY)) {
 		return 0.0;
+	}
 
 	return 0.6;
 }
@@ -435,8 +473,7 @@ static status_t
 acpi_battery_register_device(device_node *node)
 {
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{ string: "ACPI Battery" }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "ACPI Battery" }},
 		{ NULL }
 	};
 
@@ -503,19 +540,7 @@ acpi_battery_register_child_devices(void *cookie)
 }
 
 
-static status_t
-acpi_battery_init_device(void *driverCookie, void **cookie)
-{
-	*cookie = driverCookie;
-	return B_OK;
-}
 
-
-static void
-acpi_battery_uninit_device(void *_cookie)
-{
-
-}
 
 
 
