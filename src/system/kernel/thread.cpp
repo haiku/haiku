@@ -1919,7 +1919,10 @@ thread_exit(void)
 		panic("thread_exit() called with interrupts disabled!\n");
 
 	// boost our priority to get this over with
-	scheduler_set_thread_priority(thread, B_URGENT_DISPLAY_PRIORITY);
+	{
+		InterruptsSpinLocker _(gSchedulerLock);
+		scheduler_set_thread_priority(thread, B_URGENT_DISPLAY_PRIORITY);
+	}
 
 	if (team != kernelTeam) {
 		// Cancel previously installed alarm timer, if any. Hold the scheduler
