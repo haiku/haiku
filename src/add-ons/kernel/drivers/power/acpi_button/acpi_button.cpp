@@ -161,7 +161,7 @@ acpi_button_support(device_node *parent)
 		return 0.0;
 	}
 
-	dprintf("acpi_button_support lid device found\n");
+	dprintf("acpi_button_support button device found\n");
 
 	return 0.6;
 }
