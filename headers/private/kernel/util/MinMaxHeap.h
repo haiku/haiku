@@ -335,8 +335,8 @@ MIN_MAX_HEAP_CLASS_NAME::_GrowHeap(int minimalSize)
 	fMinElements = newBuffer;
 
 	newBuffer += newSize / 2;
-	if (fMaxElements != NULL)
-		memcpy(newBuffer, fMaxElements, fSize * sizeof(Element*));
+	if (fMaxLastElement > 0)
+		memcpy(newBuffer, fMinElements + fSize, fSize * sizeof(Element*));
 	fMaxElements = newBuffer;
 
 	fSize = newSize / 2;
@@ -426,7 +426,7 @@ MIN_MAX_HEAP_CLASS_NAME::_ChangeTree(MinMaxHeapLink<Element, Key>* link)
 
 	if (otherLastElement <= 0) {
 		ASSERT(currentLastElement == 1);
-		return true;
+		return false;
 	}
 
 	ASSERT((link->fIndex - 1) / 2 < otherLastElement);
