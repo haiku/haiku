@@ -53,6 +53,8 @@ const bigtime_t kCacheExpire = 100000;
 static int sDisableSmallTaskPacking;
 static int32 sSmallTaskCore;
 
+static bool sSingleCore;
+
 static scheduler_mode sSchedulerMode;
 
 static int32 (*sChooseCore)(Thread* thread);
@@ -439,6 +441,8 @@ dump_idle_cores(int argc, char** argv)
 static inline bool
 affine_has_cache_expired(Thread* thread)
 {
+	ASSERT(!sSingleCore);
+
 	if (thread_is_idle_thread(thread))
 		return false;
 
@@ -495,6 +499,8 @@ affine_dump_thread_data(Thread* thread)
 static void
 affine_update_thread_heaps(int32 core)
 {
+	ASSERT(!sSingleCore);
+
 	CoreEntry* entry = &sCoreEntries[core];
 
 	ASSERT(entry->fCPUBoundThreads >= 0
@@ -535,6 +541,8 @@ affine_update_thread_heaps(int32 core)
 static inline void
 affine_disable_small_task_packing(void)
 {
+	ASSERT(!sSingleCore);
+
 	ASSERT(sDisableSmallTaskPacking == 0);
 	ASSERT(sSmallTaskCore == sCPUToCore[smp_get_current_cpu()]);
 
@@ -565,7 +573,7 @@ affine_increase_penalty(Thread* thread)
 		ASSERT(core >= 0);
 
 		int32 additionalPenalty = schedulerThreadData->additional_penalty;
-		if (additionalPenalty == 0) {
+		if (additionalPenalty == 0 && !sSingleCore) {
 			sCPUBoundThreads++;
 			sCoreEntries[core].fCPUBoundThreads++;
 
@@ -573,7 +581,7 @@ affine_increase_penalty(Thread* thread)
 		}
 
 		const int kSmallTaskThreshold = 50;
-		if (additionalPenalty > kSmallTaskThreshold) {
+		if (additionalPenalty > kSmallTaskThreshold && !sSingleCore) {
 			if (sSmallTaskCore == core)
 				affine_disable_small_task_packing();
 		}
@@ -617,6 +625,9 @@ affine_update_priority_heaps(int32 cpu, int32 priority)
 	int32 core = sCPUToCore[cpu];
 
 	sCPUPriorityHeaps[core].ModifyKey(&sCPUEntries[cpu], priority);
+
+	if (sSingleCore)
+		return;
 
 	int32 maxPriority
 		= AffineCPUHeap::GetKey(sCPUPriorityHeaps[core].PeekMaximum());
@@ -774,6 +785,7 @@ affine_choose_core_power_saving(Thread* thread)
 static inline int32
 affine_choose_core(Thread* thread)
 {
+	ASSERT(!sSingleCore);
 	return sChooseCore(thread);
 }
 
@@ -790,6 +802,8 @@ affine_choose_cpu(int32 core)
 static bool
 affine_should_rebalance(Thread* thread)
 {
+	ASSERT(!sSingleCore);
+
 	if (thread_is_idle_thread(thread))
 		return false;
 
@@ -843,7 +857,7 @@ affine_should_rebalance(Thread* thread)
 static void
 affine_assign_active_thread_to_core(Thread* thread)
 {
-	if (thread_is_idle_thread(thread))
+	if (thread_is_idle_thread(thread) || sSingleCore)
 		return;
 
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
@@ -874,6 +888,12 @@ affine_thread_goes_away(Thread* thread)
 	ASSERT(schedulerThreadData->previous_core >= 0);
 	int32 core = schedulerThreadData->previous_core;
 
+	schedulerThreadData->went_sleep = system_time();
+	schedulerThreadData->went_sleep_active = sCoreEntries[core].fActiveTime;
+
+	if (sSingleCore)
+		return;
+
 	ASSERT(sCoreEntries[core].fThreads > 0);
 	ASSERT(sCoreEntries[core].fThreads > sCoreEntries[core].fCPUBoundThreads
 		|| (sCoreEntries[core].fThreads == sCoreEntries[core].fCPUBoundThreads
@@ -888,9 +908,6 @@ affine_thread_goes_away(Thread* thread)
 	}
 
 	affine_update_thread_heaps(core);
-
-	schedulerThreadData->went_sleep = system_time();
-	schedulerThreadData->went_sleep_active = sCoreEntries[core].fActiveTime;
 }
 
 
@@ -921,6 +938,11 @@ affine_enqueue(Thread* thread, bool newOne)
 
 		if (newOne)
 			affine_assign_active_thread_to_core(thread);
+	} else if (sSingleCore) {
+		targetCore = 0;
+		targetCPU = affine_choose_cpu(targetCore);
+
+		schedulerThreadData->previous_core = targetCore;
 	} else if (schedulerThreadData->previous_core < 0
 		|| (newOne && affine_has_cache_expired(thread))
 		|| affine_should_rebalance(thread)) {
@@ -1506,6 +1528,7 @@ scheduler_affine_init()
 	if (result != B_OK)
 		return result;
 	sRunQueueCount = coreCount;
+	sSingleCore = coreCount == 1;
 
 	// create package heap and idle package stack
 	sPackageEntries = new(std::nothrow) PackageEntry[packageCount];
@@ -1633,8 +1656,10 @@ scheduler_affine_init()
 	add_debugger_command_etc("cpu_heap", &dump_cpu_heap,
 		"List CPUs in CPU priority heap", "\nList CPUs in CPU priority heap",
 		0);
-	add_debugger_command_etc("idle_cores", &dump_idle_cores,
-		"List idle cores", "\nList idle cores", 0);
+	if (!sSingleCore) {
+		add_debugger_command_etc("idle_cores", &dump_idle_cores,
+			"List idle cores", "\nList idle cores", 0);
+	}
 
 	runQueuesDeleter.Detach();
 	pinnedRunQueuesDeleter.Detach();
