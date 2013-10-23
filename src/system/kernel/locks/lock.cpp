@@ -149,7 +149,7 @@ recursive_lock_unlock(recursive_lock *lock)
 
 
 static status_t
-rw_lock_wait(rw_lock* lock, bool writer)
+rw_lock_wait(rw_lock* lock, bool writer, InterruptsSpinLocker& locker)
 {
 	// enqueue in waiter list
 	rw_lock_waiter waiter;
@@ -166,7 +166,14 @@ rw_lock_wait(rw_lock* lock, bool writer)
 
 	// block
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_RW_LOCK, lock);
-	return thread_block_locked(waiter.thread);
+	locker.Unlock();
+
+	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	status_t result = thread_block_locked(thread_get_current_thread());
+	schedulerLocker.Unlock();
+
+	locker.Lock();
+	return result;
 }
 
 
@@ -192,7 +199,10 @@ rw_lock_unblock(rw_lock* lock)
 		lock->holder = waiter->thread->id;
 
 		// unblock thread
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 		thread_unblock_locked(waiter->thread, B_OK);
+		schedulerLocker.Unlock();
+
 		waiter->thread = NULL;
 		return RW_LOCK_WRITER_COUNT_BASE;
 	}
@@ -208,7 +218,10 @@ rw_lock_unblock(rw_lock* lock)
 		readerCount++;
 
 		// unblock thread
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 		thread_unblock_locked(waiter->thread, B_OK);
+		schedulerLocker.Unlock();
+
 		waiter->thread = NULL;
 	} while ((waiter = lock->waiters) != NULL && !waiter->writer);
 
@@ -224,6 +237,7 @@ rw_lock_init(rw_lock* lock, const char* name)
 {
 	lock->name = name;
 	lock->waiters = NULL;
+	lock->lock = B_SPINLOCK_INITIALIZER;
 	lock->holder = -1;
 	lock->count = 0;
 	lock->owner_count = 0;
@@ -241,6 +255,7 @@ rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags)
 {
 	lock->name = (flags & RW_LOCK_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
 	lock->waiters = NULL;
+	lock->lock = B_SPINLOCK_INITIALIZER;
 	lock->holder = -1;
 	lock->count = 0;
 	lock->owner_count = 0;
@@ -260,7 +275,7 @@ rw_lock_destroy(rw_lock* lock)
 		? (char*)lock->name : NULL;
 
 	// unblock all waiters
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker locker(lock->lock);
 
 #if KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
@@ -280,6 +295,7 @@ rw_lock_destroy(rw_lock* lock)
 		lock->waiters = waiter->next;
 
 		// unblock thread
+		InterruptsSpinLocker _(gSchedulerLock);
 		thread_unblock_locked(waiter->thread, B_ERROR);
 	}
 
@@ -296,7 +312,7 @@ rw_lock_destroy(rw_lock* lock)
 status_t
 _rw_lock_read_lock(rw_lock* lock)
 {
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker locker(lock->lock);
 
 	// We might be the writer ourselves.
 	if (lock->holder == thread_get_current_thread_id()) {
@@ -320,7 +336,7 @@ _rw_lock_read_lock(rw_lock* lock)
 	ASSERT(lock->count >= RW_LOCK_WRITER_COUNT_BASE);
 
 	// we need to wait
-	return rw_lock_wait(lock, false);
+	return rw_lock_wait(lock, false, locker);
 }
 
 
@@ -328,7 +344,7 @@ status_t
 _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 	bigtime_t timeout)
 {
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker locker(lock->lock);
 
 	// We might be the writer ourselves.
 	if (lock->holder == thread_get_current_thread_id()) {
@@ -368,13 +384,19 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 
 	// block
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_RW_LOCK, lock);
+	locker.Unlock();
+
+	InterruptsSpinLocker schedulerLock(gSchedulerLock);
 	status_t error = thread_block_with_timeout_locked(timeoutFlags, timeout);
+	schedulerLock.Unlock();
+
 	if (error == B_OK || waiter.thread == NULL) {
 		// We were unblocked successfully -- potentially our unblocker overtook
 		// us after we already failed. In either case, we've got the lock, now.
 		return B_OK;
 	}
 
+	locker.Lock();
 	// We failed to get the lock -- dequeue from waiter list.
 	rw_lock_waiter* previous = NULL;
 	rw_lock_waiter* other = lock->waiters;
@@ -407,9 +429,9 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 
 
 void
-_rw_lock_read_unlock(rw_lock* lock, bool schedulerLocked)
+_rw_lock_read_unlock(rw_lock* lock)
 {
-	InterruptsSpinLocker locker(gSchedulerLock, false, !schedulerLocked);
+	InterruptsSpinLocker locker(lock->lock);
 
 	// If we're still holding the write lock or if there are other readers,
 	// no-one can be woken up.
@@ -437,7 +459,7 @@ _rw_lock_read_unlock(rw_lock* lock, bool schedulerLocked)
 status_t
 rw_lock_write_lock(rw_lock* lock)
 {
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker locker(lock->lock);
 
 	// If we're already the lock holder, we just need to increment the owner
 	// count.
@@ -462,7 +484,7 @@ rw_lock_write_lock(rw_lock* lock)
 	if (oldCount < RW_LOCK_WRITER_COUNT_BASE)
 		lock->active_readers = oldCount - lock->pending_readers;
 
-	status_t status = rw_lock_wait(lock, true);
+	status_t status = rw_lock_wait(lock, true, locker);
 	if (status == B_OK) {
 		lock->holder = thread;
 		lock->owner_count = RW_LOCK_WRITER_COUNT_BASE;
@@ -473,9 +495,9 @@ rw_lock_write_lock(rw_lock* lock)
 
 
 void
-_rw_lock_write_unlock(rw_lock* lock, bool schedulerLocked)
+_rw_lock_write_unlock(rw_lock* lock)
 {
-	InterruptsSpinLocker locker(gSchedulerLock, false, !schedulerLocked);
+	InterruptsSpinLocker locker(lock->lock);
 
 	if (thread_get_current_thread_id() != lock->holder) {
 		panic("rw_lock_write_unlock(): lock %p not write-locked by this thread",
@@ -562,6 +584,7 @@ mutex_init(mutex* lock, const char *name)
 {
 	lock->name = name;
 	lock->waiters = NULL;
+	lock->lock = B_SPINLOCK_INITIALIZER;
 #if KDEBUG
 	lock->holder = -1;
 #else
@@ -580,6 +603,7 @@ mutex_init_etc(mutex* lock, const char *name, uint32 flags)
 {
 	lock->name = (flags & MUTEX_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
 	lock->waiters = NULL;
+	lock->lock = B_SPINLOCK_INITIALIZER;
 #if KDEBUG
 	lock->holder = -1;
 #else
@@ -600,15 +624,16 @@ mutex_destroy(mutex* lock)
 		? (char*)lock->name : NULL;
 
 	// unblock all waiters
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker locker(lock->lock);
 
 #if KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
 		!= lock->holder) {
 		panic("mutex_destroy(): there are blocking threads, but caller doesn't "
 			"hold the lock (%p)", lock);
-		if (_mutex_lock(lock, true) != B_OK)
+		if (_mutex_lock(lock, &locker) != B_OK)
 			return;
+		locker.Lock();
 	}
 #endif
 
@@ -617,6 +642,7 @@ mutex_destroy(mutex* lock)
 		lock->waiters = waiter->next;
 
 		// unblock thread
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 		thread_unblock_locked(waiter->thread, B_ERROR);
 	}
 
@@ -628,49 +654,69 @@ mutex_destroy(mutex* lock)
 }
 
 
+static inline status_t
+mutex_lock_threads_locked(mutex* lock, InterruptsSpinLocker* locker)
+{
+#if KDEBUG
+	return _mutex_lock(lock, locker);
+#else
+	if (atomic_add(&lock->count, -1) < 0)
+		return _mutex_lock(lock, locker);
+	return B_OK;
+#endif
+}
+
+
 status_t
 mutex_switch_lock(mutex* from, mutex* to)
 {
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker locker(to->lock);
 
 #if !KDEBUG
 	if (atomic_add(&from->count, 1) < -1)
 #endif
-		_mutex_unlock(from, true);
+		_mutex_unlock(from);
 
-	return mutex_lock_threads_locked(to);
+	return mutex_lock_threads_locked(to, &locker);
 }
 
 
 status_t
 mutex_switch_from_read_lock(rw_lock* from, mutex* to)
 {
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker locker(to->lock);
 
 #if KDEBUG_RW_LOCK_DEBUG
-	_rw_lock_write_unlock(from, true);
+	_rw_lock_write_unlock(from);
 #else
 	int32 oldCount = atomic_add(&from->count, -1);
 	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
-		_rw_lock_read_unlock(from, true);
+		_rw_lock_read_unlock(from);
 #endif
 
-	return mutex_lock_threads_locked(to);
+	return mutex_lock_threads_locked(to, &locker);
 }
 
 
 status_t
-_mutex_lock(mutex* lock, bool schedulerLocked)
+_mutex_lock(mutex* lock, void* _locker)
 {
 #if KDEBUG
-	if (!gKernelStartup && !schedulerLocked && !are_interrupts_enabled()) {
+	if (!gKernelStartup && _locker == NULL && !are_interrupts_enabled()) {
 		panic("_mutex_lock(): called with interrupts disabled for lock %p",
 			lock);
 	}
 #endif
 
-	// lock only, if !threadsLocked
-	InterruptsSpinLocker locker(gSchedulerLock, false, !schedulerLocked);
+	// lock only, if !lockLocked
+	InterruptsSpinLocker* locker
+		= reinterpret_cast<InterruptsSpinLocker*>(_locker);
+
+	InterruptsSpinLocker lockLocker;
+	if (locker == NULL) {
+		lockLocker.SetTo(lock->lock, false);
+		locker = &lockLocker;
+	}
 
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
@@ -704,22 +750,24 @@ _mutex_lock(mutex* lock, bool schedulerLocked)
 
 	// block
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_MUTEX, lock);
+	locker->Unlock();
+
+	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 	status_t error = thread_block_locked(waiter.thread);
+	schedulerLocker.Unlock();
 
 #if KDEBUG
 	if (error == B_OK)
-		lock->holder = waiter.thread->id;
+		atomic_set(&lock->holder, waiter.thread->id);
 #endif
-
 	return error;
 }
 
 
 void
-_mutex_unlock(mutex* lock, bool schedulerLocked)
+_mutex_unlock(mutex* lock)
 {
-	// lock only, if !threadsLocked
-	InterruptsSpinLocker locker(gSchedulerLock, false, !schedulerLocked);
+	InterruptsSpinLocker locker(lock->lock);
 
 #if KDEBUG
 	if (thread_get_current_thread_id() != lock->holder) {
@@ -743,7 +791,9 @@ _mutex_unlock(mutex* lock, bool schedulerLocked)
 			lock->waiters->last = waiter->last;
 
 		// unblock thread
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 		thread_unblock_locked(waiter->thread, B_OK);
+		schedulerLocker.Unlock();
 
 #if KDEBUG
 		// Already set the holder to the unblocked thread. Besides that this
@@ -768,7 +818,7 @@ status_t
 _mutex_trylock(mutex* lock)
 {
 #if KDEBUG
-	InterruptsSpinLocker _(gSchedulerLock);
+	InterruptsSpinLocker _(lock->lock);
 
 	if (lock->holder <= 0) {
 		lock->holder = thread_get_current_thread_id();
@@ -789,7 +839,7 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 	}
 #endif
 
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker locker(lock->lock);
 
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
@@ -823,8 +873,13 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 
 	// block
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_MUTEX, lock);
-	status_t error = thread_block_with_timeout_locked(timeoutFlags, timeout);
+	locker.Unlock();
 
+	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	status_t error = thread_block_with_timeout_locked(timeoutFlags, timeout);
+	schedulerLocker.Unlock();
+
+	locker.Lock();
 	if (error == B_OK) {
 #if KDEBUG
 		lock->holder = waiter.thread->id;
