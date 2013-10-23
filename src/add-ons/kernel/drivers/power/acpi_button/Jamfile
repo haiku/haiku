@@ -9,8 +9,7 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 KernelAddon acpi_button :
-	acpi_button.c
+	acpi_button.cpp
 	;
 
 Depends acpi_button : acpi ;
-

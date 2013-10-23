@@ -61,7 +61,7 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ;
 AddNewDriversToPackage power		: enhanced_speedstep@x86 ;
-AddNewDriversToPackage power		: acpi_battery@x86 ;
+AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 #AddNewDriversToPackage display		: display_controls@x86 ;
 
 # legacy drivers
@@ -81,7 +81,6 @@ AddDriversToPackage input			: ps2_hid usb_hid wacom ;
 AddDriversToPackage misc			: <driver>poke <driver>mem ;
 AddDriversToPackage net				: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 AddDriversToPackage ports			: usb_serial ;
-AddDriversToPackage power			: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 
 # kernel
 AddFilesToPackage : <revisioned>kernel_$(TARGET_ARCH) ;
