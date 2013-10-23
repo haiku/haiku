@@ -1213,7 +1213,7 @@ affine_track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 			= (oldThread->kernel_time - oldThread->cpu->last_kernel_time)
 				+ (oldThread->user_time - oldThread->cpu->last_user_time);
 
-		oldThread->cpu->active_time += active;
+		atomic_add64(&oldThread->cpu->active_time, active);
 		sCoreEntries[thisCore].fActiveTime += active;
 	}
 

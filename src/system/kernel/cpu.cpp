@@ -74,12 +74,7 @@ cpu_get_active_time(int32 cpu)
 	if (cpu < 0 || cpu > smp_get_num_cpus())
 		return 0;
 
-	// We need to grab the scheduler lock here, because the thread activity
-	// time is not maintained atomically (because there is no need to).
-
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
-	return gCPU[cpu].active_time;
+	return atomic_get64(&gCPU[cpu].active_time);
 }
 
 

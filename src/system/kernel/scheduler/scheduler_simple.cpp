@@ -634,9 +634,9 @@ simple_reschedule(void)
 
 	// track CPU activity
 	if (!thread_is_idle_thread(oldThread)) {
-		oldThread->cpu->active_time +=
+		atomic_add64(&oldThread->cpu->active_time,
 			(oldThread->kernel_time - oldThread->cpu->last_kernel_time)
-			+ (oldThread->user_time - oldThread->cpu->last_user_time);
+			+ (oldThread->user_time - oldThread->cpu->last_user_time));
 	}
 
 	if (!thread_is_idle_thread(nextThread)) {
