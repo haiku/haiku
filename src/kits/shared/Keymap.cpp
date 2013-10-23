@@ -122,6 +122,9 @@ BKeymap::SetToCurrent()
 
 	memcpy(&fKeys, keys, sizeof(fKeys));
 	free(keys);
+
+	fCharsSize = sizeof(fChars);
+
 	return B_OK;
 #else	// ! __BEOS__
 	fprintf(stderr, "Unsupported operation on this platform!\n");
@@ -452,58 +455,15 @@ BKeymap::GetModifiedCharacters(const char* in, int32 inModifiers,
 	if (in == NULL || *in == '\0' || _outList == NULL)
 		return B_BAD_VALUE;
 
-	int32 inOffset;
-	int32 outOffset;
-
 	for(uint32 i = 0; i < 128; i++) {
-		if (inModifiers == 0)
-			inOffset = fKeys.normal_map[i];
-		else if (inModifiers == B_SHIFT_KEY)
-			inOffset = fKeys.shift_map[i];
-		else if (inModifiers == B_CONTROL_KEY)
-			inOffset = fKeys.control_map[i];
-		else if (inModifiers == B_OPTION_KEY)
-			inOffset = fKeys.option_map[i];
-		else if (inModifiers == (B_OPTION_KEY | B_SHIFT_KEY))
-			inOffset = fKeys.option_shift_map[i];
-		else if (inModifiers == B_CAPS_LOCK)
-			inOffset = fKeys.caps_map[i];
-		else if (inModifiers == (B_CAPS_LOCK | B_SHIFT_KEY))
-			inOffset = fKeys.caps_shift_map[i];
-		else if (inModifiers == (B_OPTION_KEY | B_CAPS_LOCK))
-			inOffset = fKeys.option_caps_map[i];
-		else if (inModifiers == (B_OPTION_KEY | B_CAPS_LOCK | B_SHIFT_KEY))
-			inOffset = fKeys.option_caps_shift_map[i];
-		else
-			return B_BAD_VALUE;
-
+		int32 inOffset = Offset(i, inModifiers);
 		size_t sizeIn = fChars[inOffset++];
 		if (sizeIn == 0 || memcmp(in, fChars + inOffset, sizeIn) != 0) {
 			// this character isn't mapped or doesn't match
 			continue;
 		}
 
-		if (outModifiers == 0)
-			outOffset = fKeys.normal_map[i];
-		else if (outModifiers == B_SHIFT_KEY)
-			outOffset = fKeys.shift_map[i];
-		else if (outModifiers == B_CONTROL_KEY)
-			outOffset = fKeys.control_map[i];
-		else if (outModifiers == B_OPTION_KEY)
-			outOffset = fKeys.option_map[i];
-		else if (outModifiers == (B_OPTION_KEY | B_SHIFT_KEY))
-			outOffset = fKeys.option_shift_map[i];
-		else if (outModifiers == B_CAPS_LOCK)
-			outOffset = fKeys.caps_map[i];
-		else if (outModifiers == (B_CAPS_LOCK | B_SHIFT_KEY))
-			outOffset = fKeys.caps_shift_map[i];
-		else if (outModifiers == (B_OPTION_KEY | B_CAPS_LOCK))
-			outOffset = fKeys.option_caps_map[i];
-		else if (outModifiers == (B_OPTION_KEY | B_CAPS_LOCK | B_SHIFT_KEY))
-			outOffset = fKeys.option_caps_shift_map[i];
-		else
-			return B_BAD_VALUE;
-
+		int32 outOffset = Offset(i, outModifiers);
 		size_t sizeOut = fChars[outOffset++];
 		char* out = (char*)malloc(sizeOut + 1);
 		if (out == NULL)
