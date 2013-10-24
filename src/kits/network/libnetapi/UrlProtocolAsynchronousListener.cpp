@@ -99,9 +99,14 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 		case B_URL_PROTOCOL_DATA_RECEIVED:
 			{
 				const char* data;
-				ssize_t		size;
-				message->FindData("url:data", B_STRING_TYPE, 
-					reinterpret_cast<const void**>(&data), &size);
+				ssize_t		size = 0;
+				if(message->FindData("url:data", B_STRING_TYPE, 
+					reinterpret_cast<const void**>(&data), &size) != B_OK)
+				{
+					printf("BOGUS DATA MESSAGE\n");
+					message->PrintToStream();
+					return;
+				}
 				
 				DataReceived(caller, data, size);
 			}

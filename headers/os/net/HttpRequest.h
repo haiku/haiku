@@ -12,6 +12,7 @@
 #include <HttpAuthentication.h>
 #include <HttpForm.h>
 #include <HttpHeaders.h>
+#include <HttpResult.h>
 #include <NetBuffer.h>
 #include <NetworkAddress.h>
 #include <UrlRequest.h>
@@ -48,14 +49,15 @@ public:
 									const ssize_t size = -1);
             void                AdoptHeaders(BHttpHeaders* const headers);
 
+			const BHttpResult&	Result() const;
+			const char*			StatusString(status_t threadStatus) const;
+
 	static	bool				IsInformationalStatusCode(int16 code);
 	static	bool				IsSuccessStatusCode(int16 code);
 	static	bool				IsRedirectionStatusCode(int16 code);
 	static	bool				IsClientErrorStatusCode(int16 code);
 	static	bool				IsServerErrorStatusCode(int16 code);
 	static	int16				StatusCodeClass(int16 code);
-
-	virtual	const char*			StatusString(status_t threadStatus) const;
 
 private:
 			void				_ResetOptions();
@@ -73,6 +75,11 @@ private:
 
 			void				_AddOutputBufferLine(const char* line);
 
+	// URL result parameters access
+			BPositionIO*			_ResultRawData();
+			BHttpHeaders&			_ResultHeaders();
+			void					_SetResultStatusCode(int32 statusCode);
+			BString&				_ResultStatusText();
 
 private:
 			BAbstractSocket*	fSocket;
@@ -91,6 +98,7 @@ private:
 	// Request status
 
 			BHttpHeaders		fOutputHeaders;
+			BHttpResult			fResult;
 
 			// Request state/events
 			enum {

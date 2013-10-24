@@ -45,8 +45,6 @@ BUrlSynchronousRequest::WaitUntilCompletion()
 	while (!fRequestComplete)
 		snooze(10000);
 
-	fResult = fWrappedRequest.Result();
-
 	return B_OK;
 }
 

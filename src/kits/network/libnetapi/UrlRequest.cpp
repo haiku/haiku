@@ -31,7 +31,6 @@ BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener,
 	BUrlContext* context, const char* threadName, const char* protocolName)
 	:
 	fUrl(url),
-	fResult(url),
 	fContext(context),
 	fListener(listener),
 	fQuit(false),
@@ -127,17 +126,6 @@ BUrlRequest::SetUrl(const BUrl& url)
 
 
 status_t
-BUrlRequest::SetResult(BUrlResult& result)
-{
-	if (IsRunning())
-		return B_ERROR;
-
-	fResult = result;
-	return B_OK;
-}
-
-
-status_t
 BUrlRequest::SetContext(BUrlContext* context)
 {
 	if (IsRunning())
@@ -166,13 +154,6 @@ const BUrl&
 BUrlRequest::Url() const
 {
 	return fUrl;
-}
-
-
-const BUrlResult&
-BUrlRequest::Result() const
-{
-	return fResult;
 }
 
 
@@ -240,9 +221,11 @@ BUrlRequest::_ThreadEntry(void* arg)
 	urlProtocol->fRunning = false;
 	urlProtocol->fThreadStatus = protocolLoopExitStatus;
 
-	if (urlProtocol->fListener != NULL)
+	if (urlProtocol->fListener != NULL) {
 		urlProtocol->fListener->RequestCompleted(urlProtocol,
 			protocolLoopExitStatus == B_PROT_SUCCESS);
+		printf("Notified to %p\n", urlProtocol->fListener);
+	}
 
 	return B_OK;
 }
@@ -273,32 +256,4 @@ BUrlRequest::_EmitDebug(BUrlProtocolDebugMessage type,
 	vsnprintf(debugMsg, 256, format, arguments);
 	fListener->DebugMessage(this, type, debugMsg);
 	va_end(arguments);
-}
-
-
-BMallocIO&
-BUrlRequest::_ResultRawData()
-{
-	return fResult.fRawData;
-}
-
-
-BHttpHeaders&
-BUrlRequest::_ResultHeaders()
-{
-	return fResult.fHeaders;
-}
-
-
-void
-BUrlRequest::_SetResultStatusCode(int32 statusCode)
-{
-	fResult.fStatusCode = statusCode;
-}
-
-
-BString&
-BUrlRequest::_ResultStatusText()
-{
-	return fResult.fStatusString;
 }

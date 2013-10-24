@@ -7,7 +7,6 @@
 
 
 #include <Url.h>
-#include <UrlResult.h>
 #include <UrlContext.h>
 #include <UrlProtocolListener.h>
 #include <OS.h>
@@ -30,13 +29,11 @@ public:
 
 	// URL protocol parameters modification
 			status_t				SetUrl(const BUrl& url);
-			status_t				SetResult(BUrlResult& result);
 			status_t				SetContext(BUrlContext* context);
 			status_t				SetListener(BUrlProtocolListener* listener);
 
 	// URL protocol parameters access
 			const BUrl&				Url() const;
-			const BUrlResult&		Result() const;
 			BUrlContext*			Context() const;
 			BUrlProtocolListener*	Listener() const;
 			const BString&			Protocol() const;
@@ -53,16 +50,8 @@ protected:
 	virtual	status_t				_ProtocolLoop();
 	virtual void					_EmitDebug(BUrlProtocolDebugMessage type,
 										const char* format, ...);
-
-	// URL result parameters access
-			BMallocIO&				_ResultRawData();
-			BHttpHeaders&			_ResultHeaders();
-			void					_SetResultStatusCode(int32 statusCode);
-			BString&				_ResultStatusText();
-
 protected:
 			BUrl					fUrl;
-			BUrlResult				fResult;
 			BUrlContext*			fContext;
 			BUrlProtocolListener*	fListener;
 

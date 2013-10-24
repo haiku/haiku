@@ -20,7 +20,7 @@
 #include <HttpRequest.h>
 
 
-static const int32 kHttpProtocolReceiveBufferSize = 1024;
+static const int32 kHttpBufferSize = 4096;
 static const char* kHttpProtocolThreadStrStatus[
 		B_PROT_HTTP_THREAD_STATUS__END - B_PROT_THREAD_STATUS__END]
 	=  {
@@ -36,6 +36,7 @@ BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
 	fSSL(ssl),
 	fRequestMethod(B_HTTP_GET),
 	fHttpVersion(B_HTTP_11),
+	fResult(url),
 	fRequestStatus(kRequestInitialState),
 	fOptHeaders(NULL),
 	fOptPostFields(NULL),
@@ -244,6 +245,13 @@ BHttpRequest::StatusString(status_t threadStatus) const
 }
 
 
+const BHttpResult&
+BHttpRequest::Result() const
+{
+	return fResult;
+}
+
+
 void
 BHttpRequest::_ResetOptions()
 {
@@ -284,8 +292,6 @@ BHttpRequest::_ProtocolLoop()
 		fOutputHeaders.Clear();
 		fHeaders.Clear();
 		_ResultHeaders().Clear();
-		_ResultRawData().Seek(SEEK_SET, 0);
-		_ResultRawData().SetSize(0);
 
 		if (!_ResolveHostName()) {
 			_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR,
@@ -459,13 +465,15 @@ BHttpRequest::_MakeRequest()
 						{
 							BFile upFile(currentField->File().Path(),
 								B_READ_ONLY);
-							char readBuffer[1024];
+							char readBuffer[kHttpBufferSize];
 							ssize_t readSize;
 
-							readSize = upFile.Read(readBuffer, 1024);
+							readSize = upFile.Read(readBuffer,
+								sizeof(readBuffer));
 							while (readSize > 0) {
 								fSocket->Write(readBuffer, readSize);
-								readSize = upFile.Read(readBuffer, 1024);
+								readSize = upFile.Read(readBuffer,
+									sizeof(readBuffer));
 							}
 						}
 						break;
@@ -486,7 +494,7 @@ BHttpRequest::_MakeRequest()
 		&& fOptInputData != NULL) {
 
 		for(;;) {
-			char outputTempBuffer[1024];
+			char outputTempBuffer[kHttpBufferSize];
 			ssize_t read = fOptInputData->Read(outputTempBuffer,
 				sizeof(outputTempBuffer));
 
@@ -557,7 +565,7 @@ BHttpRequest::_MakeRequest()
 			_ParseHeaders();
 
 			if (fRequestStatus >= kRequestHeadersReceived) {
-				receiveBufferSize = kHttpProtocolReceiveBufferSize;
+				receiveBufferSize = kHttpBufferSize;
 				_ResultHeaders() = fHeaders;
 
 				//! ProtocolHook:HeadersReceived
@@ -649,16 +657,6 @@ BHttpRequest::_MakeRequest()
 					fListener->DataReceived(this, inputTempBuffer, bytesRead);
 					fListener->DownloadProgress(this, bytesReceived,
 						bytesTotal);
-				}
-
-				ssize_t dataWrite = _ResultRawData().Write(inputTempBuffer,
-					bytesRead);
-
-				if (dataWrite != bytesRead) {
-					_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR,
-						"Unable to write %dbytes of data (%d).", bytesRead,
-						dataWrite);
-					return B_PROT_NO_MEMORY;
 				}
 
 				if (bytesTotal > 0 && bytesReceived >= bytesTotal)
@@ -895,4 +893,25 @@ BHttpRequest::_AddOutputBufferLine(const char* line)
 {
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_OUT, "%s", line);
 	fOutputBuffer << line << "\r\n";
+}
+
+
+BHttpHeaders&
+BHttpRequest::_ResultHeaders()
+{
+	return fResult.fHeaders;
+}
+
+
+void
+BHttpRequest::_SetResultStatusCode(int32 statusCode)
+{
+	fResult.fStatusCode = statusCode;
+}
+
+
+BString&
+BHttpRequest::_ResultStatusText()
+{
+	return fResult.fStatusString;
 }
