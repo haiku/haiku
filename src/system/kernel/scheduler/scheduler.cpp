@@ -1402,18 +1402,18 @@ scheduler_start(void)
 }
 
 
-static status_t
-set_operation_mode(scheduler_mode mode)
+status_t
+scheduler_set_operation_mode(scheduler_mode mode)
 {
 	if (mode != SCHEDULER_MODE_PERFORMANCE
 		&& mode != SCHEDULER_MODE_POWER_SAVING) {
 		return B_BAD_VALUE;
 	}
 
-#ifdef TRACE_SCHEDULER
-	const char* modeNames = { "performance", "power saving" };
-#endif
-	TRACE("switching scheduler to %s mode\n", modeNames[mode]);
+	const char* modeNames[] = { "performance", "power saving" };
+	dprintf("scheduler: switching to %s mode\n", modeNames[mode]);
+
+	InterruptsSpinLocker _(gSchedulerLock);
 
 	sSchedulerMode = mode;
 	switch (mode) {
@@ -1627,9 +1627,9 @@ _scheduler_init()
 	}
 
 #if 1
-	set_operation_mode(SCHEDULER_MODE_POWER_SAVING);
+	scheduler_set_operation_mode(SCHEDULER_MODE_PERFORMANCE);
 #else
-	set_operation_mode(SCHEDULER_MODE_PERFORMANCE);
+	scheduler_set_operation_mode(SCHEDULER_MODE_POWER_SAVING);
 #endif
 
 	add_debugger_command_etc("run_queue", &dump_run_queue,
