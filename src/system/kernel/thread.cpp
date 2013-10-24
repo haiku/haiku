@@ -1784,10 +1784,8 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 	kprintf("flags:              0x%" B_PRIx32 "\n", thread->flags);
 	kprintf("architecture dependant section:\n");
 	arch_thread_dump_info(&thread->arch_info);
-	if (gScheduler->dump_thread_data != NULL) {
-		kprintf("scheduler data:\n");
-		gScheduler->dump_thread_data(thread);
-	}
+	kprintf("scheduler data:\n");
+	scheduler_dump_thread_data(thread);
 }
 
 
