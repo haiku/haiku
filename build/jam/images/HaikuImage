@@ -202,7 +202,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	#usb_beceemwmx@gpl
 ] ;
 SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures
-	acpi_battery@x86 acpi_button@x86,x86_64
+	acpi_battery@x86,x86_64 acpi_button@x86,x86_64
 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	ata@ata pci ps2@x86,x86_64 isa@x86,x86_64
