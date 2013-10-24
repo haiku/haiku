@@ -81,7 +81,7 @@ acpi_GetInteger(acpi_device_module_info* acpi, acpi_device& acpiCookie,
 	status_t status = acpi->evaluate_method(acpiCookie, path, NULL, &buf);
 	if (status == B_OK) {
 		if (object.object_type == ACPI_TYPE_INTEGER)
-			*number = object.data.integer;
+			*number = object.integer.integer;
 		else
 			status = B_BAD_VALUE;
 	}
@@ -99,7 +99,7 @@ acpi_GetReference(acpi_module_info* acpi, acpi_handle scope,
 	switch (obj->object_type) {
 		case ACPI_TYPE_LOCAL_REFERENCE:
 		case ACPI_TYPE_ANY:
-			return obj->data.reference.handle;
+			return obj->reference.handle;
 
 		case ACPI_TYPE_STRING:
 		{
@@ -107,7 +107,7 @@ acpi_GetReference(acpi_module_info* acpi, acpi_handle scope,
 			// scope can be NULL.
 			// TODO: This may not always be the case.
 			acpi_handle handle;
-			if (acpi->get_handle(scope, obj->data.string.string, &handle)
+			if (acpi->get_handle(scope, obj->string.string, &handle)
 					== B_OK)
 				return handle;
 		}
@@ -120,10 +120,10 @@ acpi_GetReference(acpi_module_info* acpi, acpi_handle scope,
 status_t
 acpi_PkgInt(acpi_object_type* res, int idx, int* dst)
 {
-	acpi_object_type* obj = &res->data.package.objects[idx];
+	acpi_object_type* obj = &res->package.objects[idx];
 	if (obj == NULL || obj->object_type != ACPI_TYPE_INTEGER)
 		return B_BAD_VALUE;
-	*dst = obj->data.integer;
+	*dst = obj->integer.integer;
 
 	return B_OK;
 }
@@ -336,13 +336,13 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 	switch (obj->object_type) {
 		case ACPI_TYPE_INTEGER:
 			sc->ec_gpehandle = NULL;
-			sc->ec_gpebit = obj->data.integer;
+			sc->ec_gpebit = obj->integer.integer;
 			break;
 		case ACPI_TYPE_PACKAGE:
 			if (!ACPI_PKG_VALID(obj, 2))
 				goto error;
 			sc->ec_gpehandle = acpi_GetReference(sc->ec_acpi_module, NULL,
-				&obj->data.package.objects[0]);
+				&obj->package.objects[0]);
 			if (sc->ec_gpehandle == NULL
 				|| acpi_PkgInt32(obj, 1, (uint32*)&sc->ec_gpebit) != B_OK)
 				goto error;

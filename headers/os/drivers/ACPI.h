@@ -11,7 +11,7 @@
 
 
 typedef struct acpi_module_info acpi_module_info;
-typedef struct acpi_object_type acpi_object_type;
+typedef union acpi_object_type acpi_object_type;
 
 #define B_ACPI_MODULE_NAME "bus_managers/acpi/v1"
 
@@ -83,36 +83,43 @@ enum {
 
 /* ACPI control method arg type */
 
-struct acpi_object_type {
+union acpi_object_type {
 	uint32 object_type;
-	union {
+	struct {
+		uint32 object_type;
 		uint64 integer;
-		struct {
-			uint32 len;
-			char *string; /* You have to allocate string space yourself */
-		} string;
-		struct {
-			size_t length;
-			void *buffer;
-		} buffer;
-		struct {
-			uint32 count;
-			acpi_object_type *objects;
-		} package;
-		struct {
-			uint32 actual_type;
-			acpi_handle handle;
-		} reference;
-		struct {
-			uint32 cpu_id;
-			int pblk_address;
-			size_t pblk_length;
-		} processor;
-		struct {
-			uint32 min_power_state;
-			uint32 resource_order;
-		} power_resource;
-	} data;
+	} integer;
+	struct {
+		uint32 object_type;
+		uint32 len;
+		char *string; /* You have to allocate string space yourself */
+	} string;
+	struct {
+		uint32 object_type;
+		uint32 length;
+		void *buffer;
+	} buffer;
+	struct {
+		uint32 object_type;
+		uint32 count;
+		acpi_object_type *objects;
+	} package;
+	struct {
+		uint32 object_type;
+		uint32 actual_type;
+		acpi_handle handle;
+	} reference;
+	struct {
+		uint32 object_type;
+		uint32 cpu_id;
+		acpi_io_address pblk_address;
+		uint32 pblk_length;
+	} processor;
+	struct {
+		uint32 object_type;
+		uint32 min_power_state;
+		uint32 resource_order;
+	} power_resource;
 };
 
 

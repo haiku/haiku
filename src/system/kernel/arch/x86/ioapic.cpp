@@ -612,7 +612,7 @@ acpi_set_interrupt_model(acpi_module_info* acpiModule, uint32 interruptModel)
 {
 	acpi_object_type model;
 	model.object_type = ACPI_TYPE_INTEGER;
-	model.data.integer = interruptModel;
+	model.integer.integer = interruptModel;
 
 	acpi_objects parameter;
 	parameter.count = 1;

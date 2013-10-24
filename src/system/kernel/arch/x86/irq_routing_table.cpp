@@ -346,7 +346,7 @@ evaluate_integer(acpi_module_info* acpi, acpi_handle handle,
 	if (result.object_type != ACPI_TYPE_INTEGER)
 		return B_BAD_TYPE;
 
-	value = result.data.integer;
+	value = result.integer.integer;
 	return B_OK;
 }
 

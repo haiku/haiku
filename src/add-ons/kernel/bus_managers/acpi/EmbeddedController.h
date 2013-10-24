@@ -128,7 +128,7 @@ typedef uint8							EC_EVENT;
 
 #define ACPI_PKG_VALID(pkg, size) \
 		((pkg) != NULL && (pkg)->object_type == ACPI_TYPE_PACKAGE && \
-		(pkg)->data.package.count >= (size))
+		(pkg)->package.count >= (size))
 
 
 /*
