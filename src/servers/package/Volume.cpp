@@ -512,12 +512,7 @@ private:
 			_AddUser(package, *user);
 
 		// handle global writable files
-		const BObjectList<BGlobalWritableFileInfo>& files
-			= package->Info().GlobalWritableFileInfos();
-		for (int32 i = 0; const BGlobalWritableFileInfo* file = files.ItemAt(i);
-			i++) {
-			_AddGlobalWritableFile(package, *file);
-		}
+		_AddGlobalWritableFiles(package);
 	}
 
 	void _AddGroup(Package* package, const BString& groupName)
@@ -612,10 +607,19 @@ private:
 		}
 	}
 
-	void _AddGlobalWritableFile(Package* package,
-		const BGlobalWritableFileInfo& file)
+	void _AddGlobalWritableFiles(Package* package)
 	{
-		if (!file.IsIncluded())
+		// get the list of included files
+		const BObjectList<BGlobalWritableFileInfo>& files
+			= package->Info().GlobalWritableFileInfos();
+		BStringList contentPaths;
+		for (int32 i = 0; const BGlobalWritableFileInfo* file = files.ItemAt(i);
+			i++) {
+			if (file->IsIncluded() && !contentPaths.Add(file->Path()))
+				throw std::bad_alloc();
+		}
+
+		if (contentPaths.IsEmpty())
 			return;
 
 		// Open the root directory of the installation location where we will
@@ -645,9 +649,22 @@ private:
 
 		// extract files into a subdir of the writable-files directory
 		BDirectory extractedFilesDirectory;
-		_ExtractPackageContent(package, file.Path(),
+		_ExtractPackageContent(package, contentPaths,
 			fWritableFilesDirectory, extractedFilesDirectory);
 
+		for (int32 i = 0; const BGlobalWritableFileInfo* file = files.ItemAt(i);
+			i++) {
+			if (file->IsIncluded()) {
+				_AddGlobalWritableFile(package, *file, rootDirectory,
+					extractedFilesDirectory);
+			}
+		}
+	}
+
+	void _AddGlobalWritableFile(Package* package,
+		const BGlobalWritableFileInfo& file, const BDirectory& rootDirectory,
+		const BDirectory& extractedFilesDirectory)
+	{
 		// Map the path name to the actual target location. Currently this only
 		// concerns "settings/", which is mapped to "settings/global/".
 		BString targetPath(file.Path());
@@ -662,7 +679,7 @@ private:
 
 		// open parent directory of the source entry
 		const char* lastSlash = strrchr(file.Path(), '/');
-		BDirectory* sourceDirectory;
+		const BDirectory* sourceDirectory;
 		BDirectory stackSourceDirectory;
 		if (lastSlash != NULL) {
 			sourceDirectory = &stackSourceDirectory;
@@ -671,8 +688,8 @@ private:
 			if (sourceParentPath.Length() == 0)
 				throw std::bad_alloc();
 
-			error = stackSourceDirectory.SetTo(&extractedFilesDirectory,
-				sourceParentPath);
+			status_t error = stackSourceDirectory.SetTo(
+				&extractedFilesDirectory, sourceParentPath);
 			if (error != B_OK) {
 				throw Exception(error,
 					BString().SetToFormat("failed to open directory \"%s\"",
@@ -696,7 +713,7 @@ private:
 				throw std::bad_alloc();
 
 			BDirectory targetDirectory;
-			error = FSUtils::OpenSubDirectory(rootDirectory,
+			status_t error = FSUtils::OpenSubDirectory(rootDirectory,
 				RelativePath(targetParentPath), true, targetDirectory);
 			if (error != B_OK) {
 				throw Exception(error,
@@ -718,8 +735,8 @@ private:
 	}
 
 	void _AddGlobalWritableFileRecurse(Package* package,
-		BDirectory& sourceDirectory, FSUtils::Path& relativeSourcePath,
-		BDirectory& targetDirectory, const char* targetName,
+		const BDirectory& sourceDirectory, FSUtils::Path& relativeSourcePath,
+		const BDirectory& targetDirectory, const char* targetName,
 		BWritableFileUpdateType updateType)
 	{
 		// * If the file doesn't exist, just copy the extracted one.
@@ -1115,8 +1132,9 @@ private:
 		return path.IsEmpty() ? fallback : path;
 	}
 
-	void _ExtractPackageContent(Package* package, const char* contentPath,
-		BDirectory& targetDirectory, BDirectory& _extractedFilesDirectory)
+	void _ExtractPackageContent(Package* package,
+		const BStringList& contentPaths, BDirectory& targetDirectory,
+		BDirectory& _extractedFilesDirectory)
 	{
 		// check whether the subdirectory already exists
 		BString targetName(package->RevisionedNameThrows());
@@ -1199,13 +1217,18 @@ private:
 		NotOwningEntryRef packageRef(fVolume->fPackagesDirectoryRef,
 			package->FileName());
 
-		error = FSUtils::ExtractPackageContent(FSUtils::Entry(packageRef),
-			contentPath, FSUtils::Entry(subDirectory));
-		if (error != B_OK) {
-			throw Exception(error,
-				BString().SetToFormat("failed to extract \"%s\" from package",
-					contentPath),
-				package->FileName());
+		int32 contentPathCount = contentPaths.CountStrings();
+		for (int32 i = 0; i < contentPathCount; i++) {
+			const char* contentPath = contentPaths.StringAt(i);
+
+			error = FSUtils::ExtractPackageContent(FSUtils::Entry(packageRef),
+				contentPath, FSUtils::Entry(subDirectory));
+			if (error != B_OK) {
+				throw Exception(error,
+					BString().SetToFormat(
+						"failed to extract \"%s\" from package", contentPath),
+					package->FileName());
+			}
 		}
 
 		// tag all entries with the package attribute
