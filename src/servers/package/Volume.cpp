@@ -114,7 +114,7 @@ struct Volume::CommitTransactionHandler {
 		const PackageSet& packagesAlreadyRemoved)
 		:
 		fVolume(volume),
-		fPackagesToActivate(20, true),
+		fPackagesToActivate(),
 		fPackagesToDeactivate(),
 		fAddedPackages(),
 		fRemovedPackages(),
@@ -124,6 +124,20 @@ struct Volume::CommitTransactionHandler {
 		fAddedUsers(),
 		fFSTransaction()
 	{
+	}
+
+	~CommitTransactionHandler()
+	{
+		// Delete Package objects we created in case of error (on success
+		// fPackagesToActivate will be empty).
+		int32 count = fPackagesToActivate.CountItems();
+		for (int32 i = 0; i < count; i++) {
+			Package* package = fPackagesToActivate.ItemAt(i);
+			if (fPackagesAlreadyAdded.find(package)
+					== fPackagesAlreadyAdded.end()) {
+				delete package;
+			}
+		}
 	}
 
 	void HandleRequest(BMessage* request, BMessage* reply)
@@ -959,12 +973,13 @@ private:
 			it != fAddedPackages.end(); ++it) {
 			// remove package from the volume
 			Package* package = *it;
-			fVolume->_RemovePackage(package);
 
 			if (fPackagesAlreadyAdded.find(package)
 					!= fPackagesAlreadyAdded.end()) {
 				continue;
 			}
+
+			fVolume->_RemovePackage(package);
 
 			if (transactionDirectory.InitCheck() != B_OK)
 				continue;
