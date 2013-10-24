@@ -58,7 +58,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			HttpHeaders.cpp
 			HttpForm.cpp
 			HttpRequest.cpp
+			HttpResult.cpp
 			HttpTime.cpp
+
+			# TODO: another add-on for file:// (a much simpler one)
+			FileRequest.cpp
 
 			$(md5Sources)
 
@@ -69,7 +73,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			UrlProtocolListener.cpp
 			UrlProtocolRoster.cpp
 			UrlRequest.cpp
-			UrlResult.cpp
 			UrlSynchronousRequest.cpp
 
 			:
