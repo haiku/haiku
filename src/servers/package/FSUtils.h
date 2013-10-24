@@ -197,7 +197,8 @@ public:
 	static	BString				ShellEscapeString(const BString& string);
 									// throw std::bad_alloc
 
-	static	status_t			OpenSubDirectory(BDirectory& baseDirectory,
+	static	status_t			OpenSubDirectory(
+									const BDirectory& baseDirectory,
 									const RelativePath& path, bool create,
 									BDirectory& _directory);
 

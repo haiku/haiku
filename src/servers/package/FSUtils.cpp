@@ -37,8 +37,8 @@ FSUtils::ShellEscapeString(const BString& string)
 
 
 /*static*/ status_t
-FSUtils::OpenSubDirectory(BDirectory& baseDirectory, const RelativePath& path,
-	bool create, BDirectory& _directory)
+FSUtils::OpenSubDirectory(const BDirectory& baseDirectory,
+	const RelativePath& path, bool create, BDirectory& _directory)
 {
 	// get a string for the path
 	BString pathString = path.ToString();
