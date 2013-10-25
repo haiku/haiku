@@ -82,6 +82,7 @@ struct CoreEntry : public DoublyLinkedListLinkImpl<CoreEntry> {
 
 	int32		fCoreID;
 
+	bigtime_t	fReachedBottom;
 	bigtime_t	fActiveTime;
 
 	int32		fCPUBoundThreads;
@@ -604,22 +605,8 @@ cancel_penalty(Thread* thread)
 	if (schedulerThreadData->priority_penalty != 0)
 		TRACE("cancelling thread %ld penalty\n", thread->id);
 
-	switch (sSchedulerMode) {
-		case SCHEDULER_MODE_PERFORMANCE:
-			schedulerThreadData->additional_penalty = 0;
-			schedulerThreadData->priority_penalty = 0;
-			break;
-
-		case SCHEDULER_MODE_POWER_SAVING:
-			if (schedulerThreadData->additional_penalty != 0)
-				schedulerThreadData->additional_penalty /= 2;
-			else if (schedulerThreadData->priority_penalty != 0)
-				schedulerThreadData->priority_penalty--;
-			break;
-
-		default:
-			break;
-	}
+	schedulerThreadData->additional_penalty = 0;
+	schedulerThreadData->priority_penalty = 0;
 }
 
 
@@ -924,9 +911,13 @@ enqueue(Thread* thread, bool newOne)
 
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 
-	bigtime_t hasSlept = system_time() - schedulerThreadData->went_sleep;
-	if (newOne && hasSlept > kThreadQuantum)
-		cancel_penalty(thread);
+	int32 core = schedulerThreadData->previous_core;
+	if (newOne && core >= 0) {
+		if (schedulerThreadData->went_sleep + kThreadQuantum / 4
+			< sCoreEntries[core].fReachedBottom) {
+			cancel_penalty(thread);
+		}
+	}
 
 	int32 threadPriority = get_effective_priority(thread);
 
@@ -1223,6 +1214,11 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 
 		atomic_add64(&oldThread->cpu->active_time, active);
 		sCoreEntries[thisCore].fActiveTime += active;
+	}
+
+	if (thread_is_idle_thread(nextThread)
+		|| get_effective_priority(nextThread) == B_LOWEST_ACTIVE_PRIORITY) {
+		sCoreEntries[thisCore].fReachedBottom = system_time();
 	}
 
 	if (!thread_is_idle_thread(nextThread)) {
