@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -67,6 +67,18 @@ StringCache::Get(const char* value)
 
 	Insert(string);
 	return string;
+}
+
+
+void
+StringCache::Put(CachedString* string)
+{
+	if (string != NULL) {
+		if (--string->usageCount == 0) {
+			Remove(string);
+			delete string;
+		}
+	}
 }
 
 

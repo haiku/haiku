@@ -1052,7 +1052,8 @@ PackageWriterImpl::_AttributeRemoved(Attribute* attribute)
 		&& value.encoding == B_HPKG_ATTRIBUTE_ENCODING_RAW_HEAP) {
 		if (!fHeapRangesToRemove->AddRange(value.data.offset, value.data.size))
 			throw std::bad_alloc();
-	}
+	} else if (value.type == B_HPKG_ATTRIBUTE_TYPE_STRING)
+		fStringCache.Put(value.string);
 
 	for (DoublyLinkedList<Attribute>::Iterator it
 				= attribute->children.GetIterator();
