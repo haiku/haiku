@@ -584,6 +584,7 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 					continue;
 
 				_InvokeItem(item);
+				_QuitTracking(false);
 				break;
 			}
 			break;
