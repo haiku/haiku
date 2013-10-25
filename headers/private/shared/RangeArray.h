@@ -142,10 +142,10 @@ RangeArray<Value>::AddRange(const Value& offset, const Value& size)
 
 	// Joining is possible. We'll adjust the first affected range and remove the
 	// others (if any).
+	endOffset = std::max(endOffset, RangeAt(endIndex - 1).EndOffset());
 	RangeType& firstRange = _RangeAt(index);
 	firstRange.offset = std::min(firstRange.offset, offset);
-	firstRange.size = std::max(endOffset, RangeAt(endIndex - 1).EndOffset())
-		- firstRange.offset;;
+	firstRange.size = endOffset - firstRange.offset;
 
 	if (index + 1 < endIndex)
 		RemoveRanges(index + 1, endIndex - index - 1);
