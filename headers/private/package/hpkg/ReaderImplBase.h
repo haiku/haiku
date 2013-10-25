@@ -64,6 +64,10 @@ struct PackageFileSection {
 
 
 class ReaderImplBase {
+public:
+	inline	const PackageFileSection& PackageAttributesSection() const
+									{ return fPackageAttributesSection; }
+
 protected:
 								ReaderImplBase(const char* fileType,
 									BErrorOutput* errorOutput);
