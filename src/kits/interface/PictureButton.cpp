@@ -71,7 +71,7 @@ BPictureButton::~BPictureButton()
 BArchivable*
 BPictureButton::Instantiate(BMessage* data)
 {
-	if ( validate_instantiation(data, "BPictureButton"))
+	if (validate_instantiation(data, "BPictureButton"))
 		return new (std::nothrow) BPictureButton(data);
 
 	return NULL;
