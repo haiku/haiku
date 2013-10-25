@@ -45,6 +45,9 @@ public:
 			BAbstractBufferedDataReader* HeapReader() const
 									{ return inherited::HeapReader(); }
 
+	inline	const PackageFileSection& TOCSection() const
+									{ return fTOCSection; }
+
 protected:
 								// from ReaderImplBase
 	virtual	status_t			ReadAttributeValue(uint8 type, uint8 encoding,
