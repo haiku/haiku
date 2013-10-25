@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
  * Distributed under the terms of the MIT License.
  */
@@ -457,6 +457,7 @@ PackageWriterImpl::PackageWriterImpl(BPackageWriterListener* listener)
 
 PackageWriterImpl::~PackageWriterImpl()
 {
+	delete fHeapRangesToRemove;
 	delete fRootAttribute;
 	delete fRootEntry;
 }
@@ -561,9 +562,6 @@ status_t
 PackageWriterImpl::Finish()
 {
 	try {
-		RangeArray<uint64> heapRangesToRemove;
-		fHeapRangesToRemove = &heapRangesToRemove;
-
 		if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
 			_UpdateCheckEntryCollisions();
 
@@ -589,8 +587,6 @@ PackageWriterImpl::Finish()
 
 		if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0)
 			_CompactHeap();
-
-		fHeapRangesToRemove = NULL;
 
 		return _Finish();
 	} catch (status_t error) {
@@ -622,6 +618,8 @@ PackageWriterImpl::_Init(const char* fileName,
 	fHeapOffset = fHeaderSize = sizeof(hpkg_header);
 	fTopAttribute = fRootAttribute;
 
+	fHeapRangesToRemove = new RangeArray<uint64>;
+
 	// in update mode, parse the TOC
 	if ((Flags() & B_HPKG_WRITER_UPDATE_PACKAGE) != 0) {
 		PackageReaderImpl packageReader(fListener);
@@ -638,6 +636,18 @@ PackageWriterImpl::_Init(const char* fileName,
 			return result;
 
 		fHeapWriter->Reinit(packageReader.RawHeapReader());
+
+		// Remove the old packages attributes and TOC section from the heap.
+		// We'll write new ones later.
+		const PackageFileSection& attributesSection
+			= packageReader.PackageAttributesSection();
+		const PackageFileSection& tocSection = packageReader.TOCSection();
+		if (!fHeapRangesToRemove->AddRange(attributesSection.offset,
+				attributesSection.uncompressedLength)
+		   || !fHeapRangesToRemove->AddRange(tocSection.offset,
+				tocSection.uncompressedLength)) {
+			throw std::bad_alloc();
+		}
 	}
 
 	return B_OK;
