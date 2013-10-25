@@ -424,6 +424,7 @@ BootVolume::SetTo(Directory* rootDirectory)
 		return B_BAD_VALUE;
 
 	fRootDirectory = rootDirectory;
+	fRootDirectory->Acquire();
 
 	// find the system directory
 	Node* systemNode = fRootDirectory->Lookup("system", true);
