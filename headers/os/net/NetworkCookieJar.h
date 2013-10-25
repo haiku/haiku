@@ -58,9 +58,12 @@ public:
 	virtual	status_t			Unflatten(type_code code,
 									const void* buffer, ssize_t size);
 
+			BNetworkCookieJar&	operator=(const BNetworkCookieJar& other);
+
 	// Iterators
 			Iterator			GetIterator() const;
 			UrlIterator			GetUrlIterator(const BUrl& url) const;
+
 
 private:
 			void				_DoFlatten() const;

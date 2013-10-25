@@ -71,6 +71,8 @@ BNetworkCookieJar::~BNetworkCookieJar()
 {
 	for (Iterator it = GetIterator(); it.Next() != NULL;)
 		delete it.Remove();
+
+	delete fCookieHashMap;
 }
 
 
@@ -353,6 +355,30 @@ BNetworkCookieJar::Unflatten(type_code, const void* buffer, ssize_t size)
 	}
 
 	return B_OK;
+}
+
+
+BNetworkCookieJar&
+BNetworkCookieJar::operator=(const BNetworkCookieJar& other)
+{
+	if(&other == this)
+		return *this;
+
+	BArchivable::operator=(other);
+	BFlattenable::operator=(other);
+
+	fFlattened = other.fFlattened;
+
+	delete fCookieHashMap;
+	fCookieHashMap = new PrivateHashMap();
+
+	for (Iterator it = other.GetIterator(); it.HasNext();)
+	{
+		BNetworkCookie* cookie = it.Next();
+		AddCookie(*cookie); // Pass by reference so the cookie is copied.
+	}
+
+	return *this;
 }
 
 
