@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2011, Haiku.
+ * Copyright 2001-2013, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -817,24 +817,12 @@ BLooper::BLooper(int32 priority, port_id port, const char* name)
 
 
 status_t
-BLooper::_PostMessage(BMessage *msg, BHandler *handler, BHandler *replyTo)
+BLooper::_PostMessage(BMessage* msg, BHandler* handler, BHandler* replyTo)
 {
-	AutoLocker<BLooperList> listLocker(gLooperList);
-	if (!listLocker.IsLocked())
-		return B_ERROR;
-
-	if (!gLooperList.IsLooperValid(this))
-		return B_BAD_VALUE;
-
-	// Does handler belong to this looper?
-	if (handler && handler->Looper() != this)
-		return B_MISMATCHED_VALUES;
-
 	status_t status;
 	BMessenger messenger(handler, this, &status);
-	listLocker.Unlock();
 	if (status == B_OK)
-		status = messenger.SendMessage(msg, replyTo, 0);
+		return messenger.SendMessage(msg, replyTo, 0);
 
 	return status;
 }
