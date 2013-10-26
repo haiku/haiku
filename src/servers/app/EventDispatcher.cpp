@@ -22,6 +22,7 @@
 #include <TokenSpace.h>
 
 #include <Autolock.h>
+#include <ToolTipManager.h>
 #include <View.h>
 
 #include <new>
@@ -817,6 +818,7 @@ EventDispatcher::_EventLoop()
 			}
 			case B_MOUSE_DOWN:
 			case B_MOUSE_UP:
+			case B_MOUSE_IDLE:
 			{
 #ifdef TRACE_EVENTS
 				if (event->what != B_MOUSE_MOVED)
@@ -1002,11 +1004,27 @@ void
 EventDispatcher::_CursorLoop()
 {
 	BPoint where;
-	while (fStream->GetNextCursorPosition(where)) {
-		BAutolock _(fCursorLock);
+	const bigtime_t toolTipDelay = BToolTipManager::Manager()->ShowDelay();	
+	bool mouseIdleSent = true;
+	status_t status = B_OK;
+	
+	while (status != B_ERROR) {
+		const bigtime_t timeout = mouseIdleSent ?
+			B_INFINITE_TIMEOUT : toolTipDelay;
+		status = fStream->GetNextCursorPosition(where, timeout);
+		
+		if (status == B_OK) {
+			mouseIdleSent = false;
+			BAutolock _(fCursorLock);
 
-		if (fHWInterface != NULL)
-			fHWInterface->MoveCursorTo(where.x, where.y);
+			if (fHWInterface != NULL)
+				fHWInterface->MoveCursorTo(where.x, where.y);
+		} else if (status == B_TIMED_OUT) {
+			mouseIdleSent = true;
+			BMessage* mouseIdle = new BMessage(B_MOUSE_IDLE);
+			mouseIdle->AddPoint("be:view_where", fLastCursorPosition);
+			fStream->InsertEvent(mouseIdle);
+		}
 	}
 
 	fCursorThread = -1;

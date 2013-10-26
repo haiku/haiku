@@ -35,10 +35,10 @@ EventStream::SupportsCursorThread() const
 }
 
 
-bool
-EventStream::GetNextCursorPosition(BPoint& where)
+status_t
+EventStream::GetNextCursorPosition(BPoint& where, bigtime_t timeout)
 {
-	return false;
+	return B_ERROR;
 }
 
 
@@ -155,18 +155,23 @@ InputServerStream::GetNextEvent(BMessage** _event)
 }
 
 
-bool
-InputServerStream::GetNextCursorPosition(BPoint &where)
+status_t
+InputServerStream::GetNextCursorPosition(BPoint &where, bigtime_t timeout)
 {
 	status_t status;
+
 	do {
-		status = acquire_sem(fCursorSemaphore);
+		status = acquire_sem_etc(fCursorSemaphore, 1, B_RELATIVE_TIMEOUT,
+			timeout);
 	} while (status == B_INTERRUPTED);
+
+	if (status == B_TIMED_OUT)
+		return status;
 
 	if (status == B_BAD_SEM_ID) {
 		// the semaphore is no longer valid - the input_server must have died
 		fCursorSemaphore = -1;
-		return false;
+		return B_ERROR;
 	}
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -184,10 +189,10 @@ InputServerStream::GetNextCursorPosition(BPoint &where)
 
 	if (fQuitting) {
 		fQuitting = false;
-		return false;
+		return B_ERROR;
 	}
 
-	return true;
+	return B_OK;
 }
 
 

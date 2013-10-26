@@ -1315,17 +1315,7 @@ FrameMoved(origin);
 				message->FindPoint("be:view_where", &where);
 				message->FindInt32("buttons", (int32*)&buttons);
 
-				delete fIdleMouseRunner;
-
-				if (transit != B_EXITED_VIEW && transit != B_OUTSIDE_VIEW) {
-					// Start new idle runner
-					BMessage idle(B_MOUSE_IDLE);
-					idle.AddPoint("be:view_where", where);
-					fIdleMouseRunner = new BMessageRunner(
-						BMessenger(NULL, this), &idle,
-						BToolTipManager::Manager()->ShowDelay(), 1);
-				} else {
-					fIdleMouseRunner = NULL;
+				if (transit == B_EXITED_VIEW || transit == B_OUTSIDE_VIEW) {
 					if (dynamic_cast<BPrivate::ToolTipWindow*>(this) == NULL)
 						BToolTipManager::Manager()->HideTip();
 				}
@@ -2794,7 +2784,6 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	fTopView = NULL;
 	fFocus = NULL;
 	fLastMouseMovedView	= NULL;
-	fIdleMouseRunner = NULL;
 	fKeyMenuBar = NULL;
 	fDefaultButton = NULL;
 

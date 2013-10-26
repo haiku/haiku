@@ -369,7 +369,7 @@ private:
 			BView*				fTopView;
 			BView*				fFocus;
 			BView*				fLastMouseMovedView;
-			BMessageRunner*		fIdleMouseRunner;
+			uint32				_unused1;
 			BMenuBar*			fKeyMenuBar;
 			BButton*			fDefaultButton;
 			BList				fShortcuts;
