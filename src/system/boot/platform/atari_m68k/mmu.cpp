@@ -71,7 +71,7 @@
  */
 #warning M68K: check for Physbase() < ST_RAM_TOP
 
-//#define TRACE_MMU
+#define TRACE_MMU
 #ifdef TRACE_MMU
 #	define TRACE(x) dprintf x
 #else
@@ -90,8 +90,8 @@ static const size_t kMaxKernelSize = 0x200000;		// 2 MB for the kernel
 addr_t gPageRoot = 0;
 
 static addr_t sNextPhysicalAddress = 0x100000;
-static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
-static addr_t sMaxVirtualAddress = KERNEL_BASE /*+ 0x400000*/;
+static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
+static addr_t sMaxVirtualAddress = KERNEL_LOAD_BASE /*+ 0x400000*/;
 
 #if 0
 static addr_t sNextPageTableAddress = 0x90000;
@@ -213,7 +213,7 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 {
 	TRACE(("map_page: vaddr 0x%lx, paddr 0x%lx\n", virtualAddress, physicalAddress));
 
-	if (virtualAddress < KERNEL_BASE)
+	if (virtualAddress < KERNEL_LOAD_BASE)
 		panic("map_page: asked to map invalid page %p!\n", (void *)virtualAddress);
 
 	// slow but I'm too lazy to fix the code below
@@ -258,7 +258,7 @@ init_page_directory(void)
 	//XXX: check for errors
 
 	//gKernelArgs.arch_args.num_pgtables = 0;
-	gMMUOps->add_page_table(KERNEL_BASE);
+	gMMUOps->add_page_table(KERNEL_LOAD_BASE);
 
 #if 0
 
@@ -291,7 +291,7 @@ init_page_directory(void)
 	gPageRoot[1] = (uint32)pageTable | kDefaultPageFlags;
 
 	gKernelArgs.arch_args.num_pgtables = 0;
-	add_page_table(KERNEL_BASE);
+	add_page_table(KERNEL_LOAD_BASE);
 
 	// switch to the new pgdir and enable paging
 	asm("movl %0, %%eax;"
@@ -339,8 +339,8 @@ mmu_allocate(void *virtualAddress, size_t size)
 		addr_t address = (addr_t)virtualAddress;
 
 		// is the address within the valid range?
-		if (address < KERNEL_BASE || address + size * B_PAGE_SIZE
-			>= KERNEL_BASE + kMaxKernelSize)
+		if (address < KERNEL_LOAD_BASE || address + size * B_PAGE_SIZE
+			>= KERNEL_LOAD_BASE + kMaxKernelSize)
 			return NULL;
 
 		for (uint32 i = 0; i < size; i++) {
@@ -378,7 +378,7 @@ mmu_free(void *virtualAddress, size_t size)
 		// get number of pages to map
 
 	// is the address within the valid range?
-	if (address < KERNEL_BASE) {
+	if (address < KERNEL_LOAD_BASE) {
 		panic("mmu_free: asked to unmap out of range region (%p, size %lx)\n",
 			(void *)address, size);
 	}
@@ -499,8 +499,8 @@ mmu_init_for_kernel(void)
 	gKernelArgs.physical_allocated_range[0].size = sNextPhysicalAddress - gKernelArgs.physical_allocated_range[0].start;
 
 	// save the memory we've virtually allocated (for the kernel and other stuff)
-	gKernelArgs.virtual_allocated_range[0].start = KERNEL_BASE;
-	gKernelArgs.virtual_allocated_range[0].size = sNextVirtualAddress - KERNEL_BASE;
+	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE;
+	gKernelArgs.virtual_allocated_range[0].size = sNextVirtualAddress - KERNEL_LOAD_BASE;
 	gKernelArgs.num_virtual_allocated_ranges = 1;
 
 	// sort the address ranges
