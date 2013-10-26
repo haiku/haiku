@@ -3394,6 +3394,7 @@ BTextView::_HandlePageKey(uint32 pageKey, bool commandKeyDown)
 	switch (pageKey) {
 		case B_HOME:
 			if (!fEditable) {
+				fCaretOffset = 0;
 				_ScrollTo(0, 0);
 				break;
 			}
@@ -3427,6 +3428,7 @@ BTextView::_HandlePageKey(uint32 pageKey, bool commandKeyDown)
 
 		case B_END:
 			if (!fEditable) {
+				fCaretOffset = fText->Length();
 				_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
 				break;
 			}
