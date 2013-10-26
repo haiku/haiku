@@ -451,11 +451,24 @@ find_unique_check_sums(NodeList *devices)
 					|| compareDrive->Identifier().device_type != UNKNOWN_DEVICE)
 					continue;
 
+// TODO: Until we can actually get and compare *all* fields of the disk
+// identifier in the kernel, we cannot compare the whole structure (we also
+// should be more careful zeroing the structure before we fill it).
+#if 0
 				if (!memcmp(&drive->Identifier(), &compareDrive->Identifier(),
 						sizeof(disk_identifier))) {
 					clash = true;
 					break;
 				}
+#else
+				const disk_identifier& ourId = drive->Identifier();
+				const disk_identifier& otherId = compareDrive->Identifier();
+				if (memcmp(&ourId.device.unknown.check_sums,
+						&otherId.device.unknown.check_sums,
+						sizeof(ourId.device.unknown.check_sums)) == 0) {
+					clash = true;
+				}
+#endif
 			}
 
 			if (clash)
