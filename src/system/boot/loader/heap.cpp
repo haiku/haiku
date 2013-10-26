@@ -261,15 +261,19 @@ static void*
 malloc_large(size_t size)
 {
 	LargeAllocation* allocation = new(std::nothrow) LargeAllocation;
-	if (allocation == NULL)
+	if (allocation == NULL) {
+		dprintf("malloc_large(): Out of memory!\n");
 		return NULL;
+	}
 
 	if (allocation->Allocate(size) != B_OK) {
+		dprintf("malloc_large(): Out of memory!\n");
 		delete allocation;
 		return NULL;
 	}
 
 	sLargeAllocations.InsertUnchecked(allocation);
+	TRACE("malloc_large(%lu) -> %p\n", size, allocation->Address());
 	return allocation->Address();
 }
 
