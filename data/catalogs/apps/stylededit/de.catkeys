@@ -32,7 +32,7 @@ Document statistics	Statistics		Dokument-Statistik
 Cancel	RevertToSavedAlert		Abbrechen
 Autodetect	Menus		Automatisch
 Document	Menus		Dokument
-Save changes to the document \"%s\"? 	QuitAlert		Änderungen an Dokument \"%s\" speichern? 
+Save changes to the document \"%s\"? 	QuitAlert		Geändertes Dokument \"%s\" speichern? 
 Edit	Menus		Bearbeiten
 Revert	RevertToSavedAlert		Wiederherstellen
 Font	Menus		Schrift

@@ -1,0 +1,50 @@
+1	belarusian	x-vnd.Haiku-HaikuDepot	2627573468
+Name	PackageListView		Імя
+Installed packages	Model		Усталяваныя пакункі
+User modified packages	Model		Пакункі мадыфікаваныя карыстальнікам
+Update available	Model		Ёсьць абноўленыя пакункі
+Changelog	PackageInfoView		Гісторыя зменаў
+for %Version%	PackageInfoView		для %Version%
+Depot:	FilterView		Сховішча:
+Description	PackageListView		Апісанне
+Install	PackageManager		Усталяваць
+HaikuDepot	System name		HaikuDepot
+Uninstall	PackageManager		Выдаліць
+An error occurred while initializing the package manager: %message%	MainWindow		Падчас ініцыялізацыі пакункавага мэнэджэра здарылася памылка: %message%
+Status	PackageListView		Стан
+Development	Model		Распрацоўка
+Ratings	PackageInfoView		Рэйтынг
+1 item	PackageListView		1 элемент
+Inactive	PackageListView		Неактыўны
+Refresh depots	MainWindow		Перачытаць сховішчы
+Main Menu	MainWindow		Галоўнае меню
+Command line	Model		Загадны радок
+(%Votes%)	PackageInfoView		(%Votes%)
+Package	MainWindow		Пакунак
+Search terms:	FilterView		Умовы пошуку:
+%Version%	PackageInfoView		%Version%
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Падчас аднаўлення інфармацыі сховішчаў адбылася памылка: %error% (%details%)
+Productivity	Model		Прадукцыйнасць
+Show:	FilterView		Паказаць:
+Size	PackageListView		Памер
+Games	Model		Гульні
+Rating	PackageListView		Рэйтынг
+Downloading	Model		Спампоўваецца
+%ld items	PackageListView		%ld элементаў
+Graphics	Model		Графіка
+Local	MainWindow		Лакальныя
+Close	MainWindow		Закрыць
+Video	Model		Відэа
+An error occurred while refreshing the repository: %error%	MainWindow		Падчас аднаўлення інфармацыі сховішчаў адбылася памылка: %error%
+All packages	FilterView		Усе пакункі
+Depot	FilterView		Сховішча
+Uninstalled	PackageListView		Выдаленныя
+Unknown	PackageListView		Невядомы
+All depots	FilterView		Усе сховішчы
+Available	PackageListView		Даступна
+n/a	PackageInfoView		н/н
+Show	FilterView		Паказаць
+Uninstalled packages	Model		Выдаленыя пакункі
+Audio	Model		Аўдыё
+About	PackageInfoView		Пра Праграму
+Active	PackageListView		Актыўны

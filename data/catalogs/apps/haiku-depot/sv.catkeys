@@ -1,0 +1,47 @@
+1	swedish	x-vnd.Haiku-HaikuDepot	827100590
+Name	PackageListView		Namn
+Installed packages	Model		Installerade paket
+User modified packages	Model		Användarmodifierade paket
+Update available	Model		Uppdateringar tillgängliga
+Changelog	PackageInfoView		Ändringslogg
+for %Version%	PackageInfoView		för %Version%
+Description	PackageListView		Beskrivning
+Install	PackageManager		Installera
+HaikuDepot	System name		HaikuDepot
+Uninstall	PackageManager		Avinstallera
+An error occurred while initializing the package manager: %message%	MainWindow		Ett fel inträffade när packet manager startade: %message%
+Status	PackageListView		Status
+Development	Model		Utveckling
+Ratings	PackageInfoView		Betyg
+1 item	PackageListView		ett objekt
+Inactive	PackageListView		Inaktiv
+Refresh depots	MainWindow		Uppdatera depå
+Main Menu	MainWindow		Huvudmeny
+Command line	Model		Kommandoraden
+(%Votes%)	PackageInfoView		(%Votes%)
+Package	MainWindow		Paket
+Search terms:	FilterView		Sökvillkor
+%Version%	PackageInfoView		%Version%
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error% (%details%)
+Productivity	Model		Produktivitet
+Show:	FilterView		Visa:
+Size	PackageListView		Storlek
+Games	Model		Spel
+Rating	PackageListView		Betyg
+Downloading	Model		Hämtar
+%ld items	PackageListView		%d objekt
+Graphics	Model		Grafik
+Local	MainWindow		Lokal
+Close	MainWindow		Stäng
+Video	Model		Video
+An error occurred while refreshing the repository: %error%	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error%
+All packages	FilterView		Alla paket
+Uninstalled	PackageListView		Avinstallera
+Unknown	PackageListView		Okänd
+Available	PackageListView		Tillgänglig
+n/a	PackageInfoView		oviktigt
+Show	FilterView		Visa
+Uninstalled packages	Model		Avinstallera paket
+Audio	Model		Ljud
+About	PackageInfoView		Om
+Active	PackageListView		Aktiv

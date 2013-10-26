@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2187262474
+1	russian	x-vnd.Haiku-libtracker	1400181584
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
 Add-ons	FilePanelPriv		Дополнения
@@ -307,11 +307,11 @@ Show Disks icon	SettingsView		Показывать значок дисков
 Mount	VolumeWindow		Подключить
 Cancel	PoseView		Отмена
 \n\t(%Ld bytes, 	FSUtils		\n\t(%Ld байт, 
-You can't move or copy items to read-only volumes.	FSUtils		Невозможно перемещать или копировать что-либо на раздел в режиме \"только для чтения\".
+You can't move or copy items to read-only volumes.	FSUtils		Невозможно перемещать или копировать что-либо на раздел в режиме только для чтения.
 Unknown	FilePermissionsView		Неизвестно
 All files and folders	FindPanel		Все файлы и папки
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Невозможно открыть \"%document\" (Отсутствуют библиотеки: %library). \n
-The Tracker must be running to see Info windows.	PoseView		Для просмотра окна \"Информация\" должен быть запущен Tracker.
+The Tracker must be running to see Info windows.	PoseView		Для просмотра окна Информация должен быть запущен Tracker.
 Other	FilePermissionsView		Другие
 Query name:	FindPanel		Имя запроса:
 Permissions	ContainerWindow		Права
@@ -388,7 +388,7 @@ Select…	DeskWindow		Выделить…
 Copy	FilePanelPriv		Копировать
 Icon view	DeskWindow		Большие значки
 Select all	QueryContainerWindow		Выделить все
-Files cannot be moved or deleted from a read-only volume.	PoseView		Невозможно перемещать с раздела в режиме \"только для чтения\".
+Files cannot be moved or deleted from a read-only volume.	PoseView		Невозможно перемещать с раздела в режиме только для чтения.
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Ошибка при замене \"%name\". Возможно файл открыт или занят.
 Owner	FilePermissionsView		Владелец
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Возникла проблема при сохранении в указанную папку. Пожалуйста, выберите другую.
@@ -427,6 +427,7 @@ New	ContainerWindow		Создать
 Name matches wildcard expression:###	SelectionWindow		Имя совпадает с регулярным выражением:###
 less than	FindPanel		меньше чем
 64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		Разработка
 Modified	ContainerWindow		Изменён
 Edit Query template	FindPanel		Изменить шаблон запроса
 Prompt	FSUtils		Спрашивать

@@ -1,0 +1,50 @@
+1	russian	x-vnd.Haiku-HaikuDepot	2627573468
+Name	PackageListView		Имя
+Installed packages	Model		Установленные пакеты
+User modified packages	Model		Пакеты измененные пользователем
+Update available	Model		Доступны обновления
+Changelog	PackageInfoView		История изменений
+for %Version%	PackageInfoView		для %Version%
+Depot:	FilterView		Склад:
+Description	PackageListView		Описание
+Install	PackageManager		Установить
+HaikuDepot	System name		Склад
+Uninstall	PackageManager		Удалить
+An error occurred while initializing the package manager: %message%	MainWindow		Возникла ошибка при инициализации менеджера пакетов: %message%
+Status	PackageListView		Статус
+Development	Model		Разработка
+Ratings	PackageInfoView		Оценки
+1 item	PackageListView		1 объект
+Inactive	PackageListView		Неактивный
+Refresh depots	MainWindow		Обновить склады
+Main Menu	MainWindow		Главное меню
+Command line	Model		Командная строка
+(%Votes%)	PackageInfoView		(%Votes%)
+Package	MainWindow		Пакет
+Search terms:	FilterView		Условия поиска:
+%Version%	PackageInfoView		%Version%
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
+Productivity	Model		Офис
+Show:	FilterView		Показать:
+Size	PackageListView		Размер
+Games	Model		Игры
+Rating	PackageListView		Оценка
+Downloading	Model		Загружаемые
+%ld items	PackageListView		%ld объектов
+Graphics	Model		Графика
+Local	MainWindow		Локальные
+Close	MainWindow		Закрыть
+Video	Model		Видео
+An error occurred while refreshing the repository: %error%	MainWindow		Возникла ошибка при обновлении репозитория: %error%
+All packages	FilterView		Все пакеты
+Depot	FilterView		Склад:
+Uninstalled	PackageListView		Удаленные
+Unknown	PackageListView		Неизвестно
+All depots	FilterView		Все склады
+Available	PackageListView		Доступен
+n/a	PackageInfoView		н/д
+Show	FilterView		Показать пакеты:
+Uninstalled packages	Model		Удаленные пакеты
+Audio	Model		Аудио
+About	PackageInfoView		О программе
+Active	PackageListView		Активирован
