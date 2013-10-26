@@ -51,7 +51,7 @@ TODO:
 	 0xa2000000 - ?			code (up to 1MB)
 	 0xa2100000			boot loader heap / free physical memory
 
-	The kernel is mapped at KERNEL_BASE, all other stuff mapped by the
+	The kernel is mapped at KERNEL_LOAD_BASE, all other stuff mapped by the
 	loader (kernel args, modules, driver settings, ...) comes after
 	0x80020000 which means that there is currently only 2 MB reserved for
 	the kernel itself (see kMaxKernelSize).
@@ -127,7 +127,7 @@ static struct memblock LOADER_MEMORYMAP[] = {
 static const size_t kMaxKernelSize = 0x200000;		// 2 MB for the kernel
 
 static addr_t sNextPhysicalAddress = 0; //will be set by mmu_init
-static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
+static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
 
 static addr_t sNextPageTableAddress = 0;
 //the page directory is in front of the pagetable
@@ -391,7 +391,7 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	TRACE(("map_page: vaddr 0x%lx, paddr 0x%lx\n", virtualAddress,
 		physicalAddress));
 
-	if (virtualAddress < KERNEL_BASE) {
+	if (virtualAddress < KERNEL_LOAD_BASE) {
 		panic("map_page: asked to map invalid page %p!\n",
 			(void *)virtualAddress);
 	}
@@ -440,7 +440,7 @@ unmap_page(addr_t virtualAddress)
 {
 	TRACE(("unmap_page(virtualAddress = %p)\n", (void *)virtualAddress));
 
-	if (virtualAddress < KERNEL_BASE) {
+	if (virtualAddress < KERNEL_LOAD_BASE) {
 		panic("unmap_page: asked to unmap invalid page %p!\n",
 			(void *)virtualAddress);
 	}
@@ -474,12 +474,13 @@ mmu_allocate(void *virtualAddress, size_t size)
 		addr_t address = (addr_t)virtualAddress;
 
 		// is the address within the valid range?
-		if (address < KERNEL_BASE || address + size * B_PAGE_SIZE
-			>= KERNEL_BASE + kMaxKernelSize) {
+		if (address < KERNEL_LOAD_BASE || address + size * B_PAGE_SIZE
+			>= KERNEL_LOAD_BASE + kMaxKernelSize) {
 			TRACE(("mmu_allocate in illegal range\n address: %" B_PRIx32
-				"  KERNELBASE: %" B_PRIx32 " KERNEL_BASE + kMaxKernelSize: %"
-				B_PRIx32 "  address + size : %" B_PRIx32 "\n", (uint32)address,
-				(uint32)KERNEL_BASE, (uint32)KERNEL_BASE + kMaxKernelSize,
+				"  KERNELBASE: %" B_PRIx32 " KERNEL_LOAD_BASE + kMaxKernelSize:"
+				" %" B_PRIx32 "  address + size : %" B_PRIx32 "\n",
+				(uint32)address, (uint32)KERNEL_LOAD_BASE,
+				(uint32)KERNEL_LOAD_BASE + kMaxKernelSize,
 				(uint32)(address + size)));
 			return NULL;
 		}
@@ -551,9 +552,9 @@ mmu_init_for_kernel(void)
 
 	// Save the memory we've virtually allocated (for the kernel and other
 	// stuff)
-	gKernelArgs.virtual_allocated_range[0].start = KERNEL_BASE;
+	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE;
 	gKernelArgs.virtual_allocated_range[0].size
-		= sNextVirtualAddress - KERNEL_BASE;
+		= sNextVirtualAddress - KERNEL_LOAD_BASE;
 	gKernelArgs.num_virtual_allocated_ranges = 1;
 
 #ifdef TRACE_MEMORY_MAP
