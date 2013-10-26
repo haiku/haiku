@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include <boot/platform.h>
+#include <util/OpenHashTable.h>
 #include <util/SplayTree.h>
 
 
@@ -51,6 +52,9 @@
 
 const static size_t kAlignment = 8;
 	// all memory chunks will be a multiple of this
+const static size_t kLargeAllocationThreshold = 16 * 1024;
+	// allocations of this size or larger are allocated via
+	// platform_allocate_region()
 
 
 class Chunk {
@@ -164,15 +168,122 @@ struct FreeChunkTreeDefinition {
 typedef IteratableSplayTree<FreeChunkTreeDefinition> FreeChunkTree;
 
 
+struct LargeAllocation {
+	LargeAllocation()
+	{
+	}
+
+	void SetTo(void* address, size_t size)
+	{
+		fAddress = address;
+		fSize = size;
+	}
+
+	status_t Allocate(size_t size)
+	{
+		fSize = size;
+		return platform_allocate_region(&fAddress, fSize,
+			B_READ_AREA | B_WRITE_AREA, false);
+	}
+
+	void Free()
+	{
+		platform_free_region(fAddress, fSize);
+	}
+
+	void* Address() const
+	{
+		return fAddress;
+	}
+
+	size_t Size() const
+	{
+		return fSize;
+	}
+
+	LargeAllocation*& HashNext()
+	{
+		return fHashNext;
+	}
+
+private:
+	void*				fAddress;
+	size_t				fSize;
+	LargeAllocation*	fHashNext;
+};
+
+
+struct LargeAllocationHashDefinition {
+	typedef void*			KeyType;
+	typedef	LargeAllocation	ValueType;
+
+	size_t HashKey(void* key) const
+	{
+		return size_t(key) / kAlignment;
+	}
+
+	size_t Hash(LargeAllocation* value) const
+	{
+		return HashKey(value->Address());
+	}
+
+	bool Compare(void* key, LargeAllocation* value) const
+	{
+		return value->Address() == key;
+	}
+
+	LargeAllocation*& GetLink(LargeAllocation* value) const
+	{
+		return value->HashNext();
+	}
+};
+
+
+typedef BOpenHashTable<LargeAllocationHashDefinition> LargeAllocationHashTable;
+
+
 static void* sHeapBase;
-static size_t /*sHeapSize,*/ sMaxHeapSize, sAvailable, sMaxHeapUsage;
+static void* sHeapEnd;
+static size_t sMaxHeapSize, sAvailable, sMaxHeapUsage;
 static FreeChunkTree sFreeChunkTree;
+
+static LargeAllocationHashTable sLargeAllocations;
 
 
 static inline size_t
 align(size_t size)
 {
 	return (size + kAlignment - 1) & ~(kAlignment - 1);
+}
+
+
+static void*
+malloc_large(size_t size)
+{
+	LargeAllocation* allocation = new(std::nothrow) LargeAllocation;
+	if (allocation == NULL)
+		return NULL;
+
+	if (allocation->Allocate(size) != B_OK) {
+		delete allocation;
+		return NULL;
+	}
+
+	sLargeAllocations.InsertUnchecked(allocation);
+	return allocation->Address();
+}
+
+
+static void
+free_large(void* address)
+{
+	LargeAllocation* allocation = sLargeAllocations.Lookup(address);
+	if (allocation == NULL)
+		panic("free_large(%p): unknown allocation!\n", address);
+
+	sLargeAllocations.RemoveUnchecked(allocation);
+	allocation->Free();
+	delete allocation;
 }
 
 
@@ -277,7 +388,8 @@ void
 heap_print_statistics()
 {
 #ifdef DEBUG_MAX_HEAP_USAGE
-	dprintf("maximum boot loader heap usage: %" B_PRIu32 "\n", sMaxHeapUsage);
+	dprintf("maximum boot loader heap usage: %zu, currently used: %zu\n",
+		sMaxHeapUsage, sMaxHeapSize - sAvailable);
 #endif
 }
 
@@ -291,6 +403,7 @@ heap_init(stage2_args* args)
 		return B_ERROR;
 
 	sHeapBase = base;
+	sHeapEnd = top;
 	sMaxHeapSize = (uint8*)top - (uint8*)base;
 
 	// declare the whole heap as one chunk, and add it
@@ -304,26 +417,12 @@ heap_init(stage2_args* args)
 	sMaxHeapUsage = sMaxHeapSize - sAvailable;
 #endif
 
+	if (sLargeAllocations.Init(64) != B_OK)
+		return B_NO_MEMORY;
+
 	return B_OK;
 }
 
-
-#if 0
-char*
-grow_heap(uint32 bytes)
-{
-	char* start;
-
-	if (sHeapSize + bytes > sMaxHeapSize)
-		return NULL;
-
-	start = (char*)sHeapBase + sHeapSize;
-	memset(start, 0, bytes);
-	sHeapSize += bytes;
-
-	return start;
-}
-#endif
 
 #ifdef HEAP_TEST
 void
@@ -356,6 +455,9 @@ malloc(size_t size)
 	if (size < sizeof(FreeChunkData))
 		size = sizeof(FreeChunkData);
 	size = align(size);
+
+	if (size >= kLargeAllocationThreshold)
+		return malloc_large(size);
 
 	if (size > sAvailable) {
 		dprintf("malloc(): Out of memory!\n");
@@ -402,20 +504,28 @@ realloc(void* oldBuffer, size_t newSize)
 		return NULL;
 	}
 
-	size_t copySize = newSize;
+	size_t oldSize = 0;
 	if (oldBuffer != NULL) {
-		FreeChunk* oldChunk = FreeChunk::SetToAllocated(oldBuffer);
+		if (oldBuffer >= sHeapBase && oldBuffer < sHeapEnd) {
+			FreeChunk* oldChunk = FreeChunk::SetToAllocated(oldBuffer);
+			oldSize = oldChunk->Size();
+		} else {
+			LargeAllocation* allocation = sLargeAllocations.Lookup(oldBuffer);
+			if (allocation == NULL) {
+				panic("realloc(%p, %zu): unknown allocation!\n", oldBuffer,
+					newSize);
+			}
 
-		// Check if the old buffer still fits, and if it makes sense to keep it
-		if (oldChunk->Size() >= newSize
-			&& (oldChunk->Size() < 128 || newSize > oldChunk->Size() / 3)) {
-			TRACE("realloc(%p, %lu) old buffer is large enough\n",
-				oldBuffer, newSize);
-			return oldChunk->AllocatedAddress();
+			oldSize = allocation->Size();
 		}
 
-		if (copySize > oldChunk->Size())
-			copySize = oldChunk->Size();
+		// Check if the old buffer still fits, and if it makes sense to keep it.
+		if (oldSize >= newSize
+			&& (oldSize < 128 || newSize > oldSize / 3)) {
+			TRACE("realloc(%p, %lu) old buffer is large enough\n",
+				oldBuffer, newSize);
+			return oldBuffer;
+		}
 	}
 
 	void* newBuffer = malloc(newSize);
@@ -423,7 +533,7 @@ realloc(void* oldBuffer, size_t newSize)
 		return NULL;
 
 	if (oldBuffer != NULL) {
-		memcpy(newBuffer, oldBuffer, copySize);
+		memcpy(newBuffer, oldBuffer, std::min(oldSize, newSize));
 		free(oldBuffer);
 	}
 
@@ -439,6 +549,11 @@ free(void* allocated)
 		return;
 
 	TRACE("free(%p)\n", allocated);
+
+	if (allocated < sHeapBase || allocated >= sHeapEnd) {
+		free_large(allocated);
+		return;
+	}
 
 	FreeChunk* freedChunk = FreeChunk::SetToAllocated(allocated);
 
