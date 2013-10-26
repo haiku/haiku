@@ -44,20 +44,45 @@
 #endif
 
 
+#if __GNUC__ >= 3
+#	define GCC_2_NRV(x)
+	// GCC >= 3.1 doesn't need it anymore
+#else
+#	define GCC_2_NRV(x) return x;
+	// GCC 2 named return value syntax
+	// see http://gcc.gnu.org/onlinedocs/gcc-2.95.2/gcc_5.html#SEC106
+#endif
+
+
 // Locking:
-// * sPortsLock: Protects the sPorts hash table, Team::port_list, and
-//   Port::owner.
-// * Port::lock: Protects all Port members save team_link, hash_link, and lock.
-//   id is immutable.
-// * sPortQuotaLock: Protects sTotalSpaceInUse, sAreaChangeCounter,
-//   sWaitingForSpace and the critical section of creating/adding areas for the
-//   port heap in the grow case. It also has to be held when reading
-//   sWaitingForSpace to determine whether or not to notify the
-//   sNoSpaceCondition condition variable.
+// * sPortsLock: Protects the sPorts and sPortsByName hash tables.
+// * sTeamListLock[]: Protects Team::port_list. Lock index for given team is
+//   (Team::id % kTeamListLockCount).
+// * Port::lock: Protects all Port members save team_link, hash_link, lock and
+//   state. id is immutable.
 //
-// The locking order is sPortsLock -> Port::lock. A port must be looked up
-// in sPorts and locked with sPortsLock held. Afterwards sPortsLock can be
-// dropped, unless any field guarded by sPortsLock is accessed.
+// Port::state ensures atomicity by providing a linearization point for adding
+// and removing ports to the hash tables and the team port list.
+// * sPortsLock and sTeamListLock[] are locked separately and not in a nested
+//   fashion, so a port can be in the hash table but not in the team port list
+//   or vice versa. => Without further provisions, insertion and removal are
+//   not linearizable and thus not concurrency-safe.
+// * To make insertion and removal linearizable, Port::state was added. It is
+//   always only accessed atomically and updates are done using
+//   atomic_test_and_set(). A port is only seen as existent when its state is
+//   Port::kActive.
+// * Deletion of ports is done in two steps: logical and physical deletion. 
+//   First, logical deletion happens and sets Port::state to Port::kDeleted.
+//   This is an atomic operation and from then on, functions like
+//   get_locked_port() consider this port as deleted and ignore it. Secondly,
+//   physical deletion removes the port from hash tables and team port list.
+//   In a similar way, port creation first inserts into hashes and team list
+//   and only then sets port to Port::kActive.
+//   This creates a linearization point at the atomic update of Port::state,
+//   operations become linearizable and thus concurrency-safe. To help
+//   understanding, the linearization points are annotated with comments.
+// * Ports are reference-counted so it's not a problem when someone still
+//   has a reference to a deleted port.
 
 
 struct port_message;
@@ -78,13 +103,22 @@ struct port_message : DoublyLinkedListLinkImpl<port_message> {
 typedef DoublyLinkedList<port_message> MessageList;
 
 
-struct Port {
+struct Port : public KernelReferenceable {
+	enum State {
+		kUnused = 0,
+		kActive,
+		kDeleted
+	};
+
 	struct list_link	team_link;
 	Port*				hash_link;
 	port_id				id;
 	team_id				owner;
+	Port*				name_hash_link;
+	size_t				name_hash;
 	int32		 		capacity;
 	mutex				lock;
+	vint32              state;
 	uint32				read_count;
 	int32				write_count;
 	ConditionVariable	read_condition;
@@ -97,7 +131,9 @@ struct Port {
 	Port(team_id owner, int32 queueLength, char* name)
 		:
 		owner(owner),
+		name_hash(0),
 		capacity(queueLength),
+		state(kUnused),
 		read_count(0),
 		write_count(queueLength),
 		total_count(0),
@@ -110,7 +146,7 @@ struct Port {
 		write_condition.Init(this, "port write");
 	}
 
-	~Port()
+	virtual ~Port()
 	{
 		while (port_message* message = messages.RemoveHead())
 			put_port_message(message);
@@ -149,12 +185,55 @@ struct PortHashDefinition {
 typedef BOpenHashTable<PortHashDefinition> PortHashTable;
 
 
+struct PortNameHashDefinition {
+	typedef const char*	KeyType;
+	typedef	Port		ValueType;
+
+	size_t HashKey(const char* key) const
+	{
+		// Hash function: hash(key) =  key[0] * 31^(length - 1)
+		//   + key[1] * 31^(length - 2) + ... + key[length - 1]
+
+		const size_t length = strlen(key);
+
+		size_t hash = 0;
+		for (size_t index = 0; index < length; index++)
+			hash = 31 * hash + key[index];
+
+		return hash;
+	}
+
+	size_t Hash(Port* value) const
+	{
+		size_t& hash = value->name_hash;
+		if (hash == 0)
+			hash = HashKey(value->lock.name);
+		return hash;
+	}
+
+	bool Compare(const char* key, Port* value) const
+	{
+		return (strcmp(key, value->lock.name) == 0);
+	}
+
+	Port*& GetLink(Port* value) const
+	{
+		return value->name_hash_link;
+	}
+};
+
+typedef BOpenHashTable<PortNameHashDefinition> PortNameHashTable;
+
+
 class PortNotificationService : public DefaultNotificationService {
 public:
 							PortNotificationService();
 
 			void			Notify(uint32 opcode, port_id team);
 };
+
+
+// #pragma mark - tracing
 
 
 #if PORT_TRACING
@@ -338,18 +417,31 @@ static const size_t kBufferGrowRate = kInitialPortBufferSize;
 #define PORT_MAX_MESSAGE_SIZE (256 * 1024)
 
 static int32 sMaxPorts = 4096;
-static int32 sUsedPorts = 0;
+static vint32 sUsedPorts;
 
 static PortHashTable sPorts;
-static heap_allocator* sPortAllocator;
+static PortNameHashTable sPortsByName;
 static ConditionVariable sNoSpaceCondition;
-static int32 sTotalSpaceInUse;
-static int32 sAreaChangeCounter;
-static int32 sWaitingForSpace;
+static vint32 sTotalSpaceCommited;
+static vint32 sWaitingForSpace;
 static port_id sNextPortID = 1;
 static bool sPortsActive = false;
-static mutex sPortsLock = MUTEX_INITIALIZER("ports list");
-static mutex sPortQuotaLock = MUTEX_INITIALIZER("port quota");
+static rw_lock sPortsLock = RW_LOCK_INITIALIZER("ports list");
+
+enum {
+	kTeamListLockCount = 8
+};
+
+static mutex sTeamListLock[kTeamListLockCount] = {
+	MUTEX_INITIALIZER("team ports list 1"),
+	MUTEX_INITIALIZER("team ports list 2"),
+	MUTEX_INITIALIZER("team ports list 3"),
+	MUTEX_INITIALIZER("team ports list 4"),
+	MUTEX_INITIALIZER("team ports list 5"),
+	MUTEX_INITIALIZER("team ports list 6"),
+	MUTEX_INITIALIZER("team ports list 7"),
+	MUTEX_INITIALIZER("team ports list 8")
+};
 
 static PortNotificationService sNotificationService;
 
@@ -377,7 +469,7 @@ PortNotificationService::Notify(uint32 opcode, port_id port)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - debugger commands
 
 
 static int
@@ -463,7 +555,7 @@ dump_port_info(int argc, char** argv)
 		// if the argument looks like a number, treat it as such
 		int32 num = parse_expression(argv[1]);
 		Port* port = sPorts.Lookup(num);
-		if (port == NULL) {
+		if (port == NULL || port->state != Port::kActive) {
 			kprintf("port %" B_PRId32 " (%#" B_PRIx32 ") doesn't exist!\n",
 				num, num);
 			return 0;
@@ -489,6 +581,9 @@ dump_port_info(int argc, char** argv)
 }
 
 
+// #pragma mark - internal helper functions
+
+
 /*!	Notifies the port's select events.
 	The port must be locked.
 */
@@ -500,15 +595,36 @@ notify_port_select_events(Port* port, uint16 events)
 }
 
 
-static Port*
-get_locked_port(port_id id)
+static BReference<Port>
+get_locked_port(port_id id) GCC_2_NRV(portRef)
 {
-	MutexLocker portsLocker(sPortsLock);
+#if __GNUC__ >= 3
+	BReference<Port> portRef;
+#endif
+	{
+		ReadLocker portsLocker(sPortsLock);
+		portRef.SetTo(sPorts.Lookup(id));
+	}
 
-	Port* port = sPorts.Lookup(id);
-	if (port != NULL)
-		mutex_lock(&port->lock);
-	return port;
+	if (portRef != NULL && portRef->state == Port::kActive)
+		mutex_lock(&portRef->lock);
+	else
+		portRef.Unset();
+
+	return portRef;
+}
+
+
+static BReference<Port>
+get_port(port_id id) GCC_2_NRV(portRef)
+{
+#if __GNUC__ >= 3
+	BReference<Port> portRef;
+#endif
+	ReadLocker portsLocker(sPortsLock);
+	portRef.SetTo(sPorts.Lookup(id));
+	
+	return portRef;
 }
 
 
@@ -523,54 +639,58 @@ is_port_closed(Port* port)
 static void
 put_port_message(port_message* message)
 {
-	size_t size = sizeof(port_message) + message->size;
-	heap_free(sPortAllocator, message);
+	const size_t size = sizeof(port_message) + message->size;
+	free(message);
 
-	MutexLocker quotaLocker(sPortQuotaLock);
-	sTotalSpaceInUse -= size;
+	atomic_add(&sTotalSpaceCommited, -size);
 	if (sWaitingForSpace > 0)
 		sNoSpaceCondition.NotifyAll();
 }
 
 
+/*! Port must be locked. */
 static status_t
 get_port_message(int32 code, size_t bufferSize, uint32 flags, bigtime_t timeout,
 	port_message** _message, Port& port)
 {
-	size_t size = sizeof(port_message) + bufferSize;
-	bool needToWait = false;
-
-	MutexLocker quotaLocker(sPortQuotaLock);
+	const size_t size = sizeof(port_message) + bufferSize;
 
 	while (true) {
-		while (sTotalSpaceInUse + size > kTotalSpaceLimit || needToWait) {
+		int32 previouslyCommited = atomic_add(&sTotalSpaceCommited, size);
+
+		while (previouslyCommited + size > kTotalSpaceLimit) {
 			// TODO: add per team limit
-			// We are not allowed to create another heap area, as our
+
+			// We are not allowed to allocate more memory, as our
 			// space limit has been reached - just wait until we get
 			// some free space again.
 
+			atomic_add(&sTotalSpaceCommited, -size);
+
 			// TODO: we don't want to wait - but does that also mean we
-			// shouldn't wait for the area creation?
+			// shouldn't wait for free memory?
 			if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0)
 				return B_WOULD_BLOCK;
 
 			ConditionVariableEntry entry;
 			sNoSpaceCondition.Add(&entry);
 
-			sWaitingForSpace++;
-			quotaLocker.Unlock();
-
 			port_id portID = port.id;
 			mutex_unlock(&port.lock);
 
+			atomic_add(&sWaitingForSpace, 1);
+
+			// TODO: right here the condition could be notified and we'd
+			//       miss it.
+
 			status_t status = entry.Wait(flags, timeout);
 
-			// re-lock the port and the quota
-			Port* newPort = get_locked_port(portID);
-			quotaLocker.Lock();
-			sWaitingForSpace--;
+			atomic_add(&sWaitingForSpace, -1);
 
-			if (newPort != &port || is_port_closed(&port)) {
+			// re-lock the port
+			BReference<Port> newPortRef = get_locked_port(portID);
+
+			if (newPortRef.Get() != &port || is_port_closed(&port)) {
 				// the port is no longer usable
 				return B_BAD_PORT_ID;
 			}
@@ -578,18 +698,12 @@ get_port_message(int32 code, size_t bufferSize, uint32 flags, bigtime_t timeout,
 			if (status == B_TIMED_OUT)
 				return B_TIMED_OUT;
 
-			needToWait = false;
+			previouslyCommited = atomic_add(&sTotalSpaceCommited, size);
 			continue;
 		}
 
-		int32 areaChangeCounter = sAreaChangeCounter;
-		sTotalSpaceInUse += size;
-		quotaLocker.Unlock();
-
 		// Quota is fulfilled, try to allocate the buffer
-
-		port_message* message
-			= (port_message*)heap_memalign(sPortAllocator, 0, size);
+		port_message* message = (port_message*)malloc(size);
 		if (message != NULL) {
 			message->code = code;
 			message->size = bufferSize;
@@ -598,38 +712,10 @@ get_port_message(int32 code, size_t bufferSize, uint32 flags, bigtime_t timeout,
 			return B_OK;
 		}
 
-		quotaLocker.Lock();
-
-		// We weren't able to allocate and we'll start over, including
-		// re-acquireing the quota, so we remove our size from the in-use
-		// counter again.
-		sTotalSpaceInUse -= size;
-
-		if (areaChangeCounter != sAreaChangeCounter) {
-			// There was already an area added since we tried allocating,
-			// start over.
-			continue;
-		}
-
-		// Create a new area for the heap to use
-
-		addr_t base;
-		area_id area = create_area("port grown buffer", (void**)&base,
-			B_ANY_KERNEL_ADDRESS, kBufferGrowRate, B_NO_LOCK,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if (area < 0) {
-			// We'll have to get by with what we have, so wait for someone
-			// to free a message instead. We enforce waiting so that we don't
-			// try to create a new area over and over.
-			needToWait = true;
-			continue;
-		}
-
-		heap_add_area(sPortAllocator, area, base, kBufferGrowRate);
-
-		sAreaChangeCounter++;
-		if (sWaitingForSpace > 0)
-			sNoSpaceCondition.NotifyAll();
+		// We weren't able to allocate and we'll start over,so we remove our
+		// size from the commited-counter again.
+		atomic_add(&sTotalSpaceCommited, -size);
+		continue;
 	}
 }
 
@@ -677,8 +763,10 @@ copy_port_message(port_message* message, int32* _code, void* buffer,
 
 
 static void
-uninit_port_locked(Port* port)
+uninit_port(Port* port)
 {
+	MutexLocker locker(port->lock);
+
 	notify_port_select_events(port, B_EVENT_INVALID);
 	port->select_infos = NULL;
 
@@ -687,6 +775,42 @@ uninit_port_locked(Port* port)
 	port->read_condition.NotifyAll(false, B_BAD_PORT_ID);
 	port->write_condition.NotifyAll(false, B_BAD_PORT_ID);
 	sNotificationService.Notify(PORT_REMOVED, port->id);
+}
+
+
+/*! Caller must ensure there is still a reference to the port. (Either by
+ *  holding a reference itself or by holding a lock on one of the data
+ *  structures in which it is referenced.)
+ */
+static status_t
+delete_port_logical(Port* port)
+{
+	for (;;) {
+		// Try to logically delete
+		const int32 oldState = atomic_test_and_set(&port->state,
+			Port::kDeleted, Port::kActive);
+			// Linearization point for port deletion
+
+		switch (oldState) {
+			case Port::kActive:
+				// Logical deletion succesful
+				return B_OK;
+		
+			case Port::kDeleted:
+				// Someone else already deleted it in the meantime
+				TRACE(("delete_port_logical: already deleted port_id %ld\n",
+						port->id));
+				return B_BAD_PORT_ID;
+
+			case Port::kUnused:
+				// Port is still being created, retry
+				continue;
+
+			default:
+				// Port state got corrupted somehow
+				panic("Invalid port state!\n");
+		}
+	}
 }
 
 
@@ -700,29 +824,53 @@ delete_owned_ports(Team* team)
 {
 	TRACE(("delete_owned_ports(owner = %ld)\n", team->id));
 
-	MutexLocker portsLocker(sPortsLock);
+	list deletionList;
+	list_init_etc(&deletionList, port_team_link_offset());
 
-	// move the ports from the team's port list to a local list
-	struct list queue;
-	list_move_to_list(&team->port_list, &queue);
+	const uint8 lockIndex = team->id % kTeamListLockCount;
+	MutexLocker teamPortsListLocker(sTeamListLock[lockIndex]);
 
-	// iterate through the list or ports, remove them from the hash table and
-	// uninitialize them
-	Port* port = (Port*)list_get_first_item(&queue);
+	// Try to logically delete all ports from the team's port list.
+	// On success, move the port to deletionList.
+	Port* port = (Port*)list_get_first_item(&team->port_list);
 	while (port != NULL) {
-		MutexLocker locker(port->lock);
-		sPorts.Remove(port);
-		uninit_port_locked(port);
-		sUsedPorts--;
+		status_t status = delete_port_logical(port);
+			// Contains linearization point
 
-		port = (Port*)list_get_next_item(&queue, port);
+		Port* nextPort = (Port*)list_get_next_item(&team->port_list, port);
+		
+		if (status == B_OK) {
+			list_remove_link(&port->team_link);
+			list_add_item(&deletionList, port);
+		}
+		
+		port = nextPort;
 	}
 
-	portsLocker.Unlock();
+	teamPortsListLocker.Unlock();
 
-	// delete the ports
-	while (Port* port = (Port*)list_remove_head_item(&queue))
-		delete port;
+	// Remove all ports in deletionList from hashes
+	{
+		WriteLocker portsLocker(sPortsLock);
+
+		for (Port* port = (Port*)list_get_first_item(&deletionList);
+			 port != NULL;
+			 port = (Port*)list_get_next_item(&deletionList, port)) {
+
+			sPorts.Remove(port);
+			sPortsByName.Remove(port);
+			port->ReleaseReference();
+				// joint reference for sPorts and sPortsByName
+		}
+	}
+
+	// Uninitialize ports and release team port list references
+	while (Port* port = (Port*)list_remove_head_item(&deletionList)) {
+		atomic_add(&sUsedPorts, -1);
+		uninit_port(port);
+		port->ReleaseReference();
+			// Reference for team port list
+	}
 }
 
 
@@ -740,35 +888,29 @@ port_used_ports(void)
 }
 
 
+size_t
+port_team_link_offset()
+{
+	// Somewhat ugly workaround since we cannot use offsetof() for a class
+	// with vtable (GCC4 throws a warning then).
+	Port* port = (Port*)0;
+	return (size_t)&port->team_link;
+}
+
+
 status_t
 port_init(kernel_args *args)
 {
-	// initialize ports table
+	// initialize ports table and by-name hash
 	new(&sPorts) PortHashTable;
 	if (sPorts.Init() != B_OK) {
 		panic("Failed to init port hash table!");
 		return B_NO_MEMORY;
 	}
 
-	addr_t base;
-	if (create_area("port heap", (void**)&base, B_ANY_KERNEL_ADDRESS,
-			kInitialPortBufferSize, B_NO_LOCK,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA) < 0) {
-			// TODO: Since port_init() is invoked before the boot partition is
-			// mounted, the underlying VMAnonymousCache cannot commit swap space
-			// upon creation and thus the pages aren't swappable after all. This
-			// makes the area essentially B_LAZY_LOCK with additional overhead.
-		panic("unable to allocate port area!\n");
-		return B_ERROR;
-	}
-
-	static const heap_class kBufferHeapClass = { "port heap", 100,
-		PORT_MAX_MESSAGE_SIZE + sizeof(port_message), 2 * 1024,
-		sizeof(port_message), 4, 2, 24 };
-	sPortAllocator = heap_create_allocator("port buffer", base,
-		kInitialPortBufferSize, &kBufferHeapClass, true);
-	if (sPortAllocator == NULL) {
-		panic("unable to create port heap");
+	new(&sPortsByName) PortNameHashTable;
+	if (sPortsByName.Init() != B_OK) {
+		panic("Failed to init port by name hash table!");
 		return B_NO_MEMORY;
 	}
 
@@ -830,36 +972,58 @@ create_port(int32 queueLength, const char* name)
 		free(nameBuffer);
 		return B_NO_MEMORY;
 	}
-	ObjectDeleter<Port> portDeleter(port);
-
-	MutexLocker locker(sPortsLock);
 
 	// check the ports limit
-	if (sUsedPorts >= sMaxPorts)
+	const int32 previouslyUsed = atomic_add(&sUsedPorts, 1);
+	if (previouslyUsed + 1 >= sMaxPorts) {
+		atomic_add(&sUsedPorts, -1);
+		delete port;
 		return B_NO_MORE_PORTS;
+	}
 
-	sUsedPorts++;
+	{
+		WriteLocker locker(sPortsLock);
 
-	// allocate a port ID
-	do {
-		port->id = sNextPortID++;
+		// allocate a port ID
+		do {
+			port->id = sNextPortID++;
 
-		// handle integer overflow
-		if (sNextPortID < 0)
-			sNextPortID = 1;
-	} while (sPorts.Lookup(port->id) != NULL);
+			// handle integer overflow
+			if (sNextPortID < 0)
+				sNextPortID = 1;
+		} while (sPorts.Lookup(port->id) != NULL);
 
-	// insert port in table and team list
-	sPorts.Insert(port);
-	list_add_item(&team->port_list, &port->team_link);
-	portDeleter.Detach();
+		// Insert port physically:
+		// (1/2) Insert into hash tables
+		port->AcquireReference();
+			// joint reference for sPorts and sPortsByName
+
+		sPorts.Insert(port);
+		sPortsByName.Insert(port);
+	}
+
+	// (2/2) Insert into team list
+	{
+		const uint8 lockIndex = port->owner % kTeamListLockCount;
+		MutexLocker teamPortsListLocker(sTeamListLock[lockIndex]);
+		port->AcquireReference();
+		list_add_item(&team->port_list, port);
+	}
 
 	// tracing, notifications, etc.
 	T(Create(port));
 
-	port_id id = port->id;
+	const port_id id = port->id;
 
-	locker.Unlock();
+	// Insert port logically by marking it active
+	const int32 oldState = atomic_test_and_set(&port->state,
+		Port::kActive, Port::kUnused);
+		// Linearization point for port creation
+
+	if (oldState != Port::kUnused) {
+		// Nobody is allowed to tamper with the port before it's active.
+		panic("Port state was modified during creation!\n");
+	}
 
 	TRACE(("create_port() done: port created %ld\n", id));
 
@@ -877,22 +1041,22 @@ close_port(port_id id)
 		return B_BAD_PORT_ID;
 
 	// get the port
-	Port* port = get_locked_port(id);
-	if (port == NULL) {
+	BReference<Port> portRef = get_locked_port(id);
+	if (portRef == NULL) {
 		TRACE(("close_port: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
-	MutexLocker lock(&port->lock, true);
+	MutexLocker lock(&portRef->lock, true);
 
 	// mark port to disable writing - deleting the semaphores will
 	// wake up waiting read/writes
-	port->capacity = 0;
+	portRef->capacity = 0;
 
-	notify_port_select_events(port, B_EVENT_INVALID);
-	port->select_infos = NULL;
+	notify_port_select_events(portRef, B_EVENT_INVALID);
+	portRef->select_infos = NULL;
 
-	port->read_condition.NotifyAll(false, B_BAD_PORT_ID);
-	port->write_condition.NotifyAll(false, B_BAD_PORT_ID);
+	portRef->read_condition.NotifyAll(false, B_BAD_PORT_ID);
+	portRef->write_condition.NotifyAll(false, B_BAD_PORT_ID);
 
 	return B_OK;
 }
@@ -906,33 +1070,44 @@ delete_port(port_id id)
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
 
-	// get the port and remove it from the hash table and the team
-	Port* port;
-	MutexLocker locker;
+	BReference<Port> portRef = get_port(id);
+
+	if (portRef == NULL) {
+		TRACE(("delete_port: invalid port_id %ld\n", id));
+		return B_BAD_PORT_ID;
+	}
+	
+	status_t status = delete_port_logical(portRef);
+		// Contains linearization point
+	if (status != B_OK)
+		return status;
+
+	// Now remove port physically:
+	// (1/2) Remove from hash tables
 	{
-		MutexLocker portsLocker(sPortsLock);
+		WriteLocker portsLocker(sPortsLock);
 
-		port = sPorts.Lookup(id);
-		if (port == NULL) {
-			TRACE(("delete_port: invalid port_id %ld\n", id));
-			return B_BAD_PORT_ID;
-		}
+		sPorts.Remove(portRef);
+		sPortsByName.Remove(portRef);
 
-		sPorts.Remove(port);
-		list_remove_link(&port->team_link);
-
-		sUsedPorts--;
-
-		locker.SetTo(port->lock, false);
-
-		uninit_port_locked(port);
+		portRef->ReleaseReference();
+			// joint reference for sPorts and sPortsByName
 	}
 
-	T(Delete(port));
+	// (2/2) Remove from team port list
+	{
+		const uint8 lockIndex = portRef->owner % kTeamListLockCount;
+		MutexLocker teamPortsListLocker(sTeamListLock[lockIndex]);
 
-	locker.Unlock();
+		list_remove_link(&portRef->team_link);
+		portRef->ReleaseReference();
+	}
 
-	delete port;
+	uninit_port(portRef);
+
+	T(Delete(portRef));
+
+	atomic_add(&sUsedPorts, -1);
 
 	return B_OK;
 }
@@ -945,16 +1120,16 @@ select_port(int32 id, struct select_info* info, bool kernel)
 		return B_BAD_PORT_ID;
 
 	// get the port
-	Port* port = get_locked_port(id);
-	if (port == NULL)
+	BReference<Port> portRef = get_locked_port(id);
+	if (portRef == NULL)
 		return B_BAD_PORT_ID;
-	MutexLocker locker(port->lock, true);
+	MutexLocker locker(portRef->lock, true);
 
 	// port must not yet be closed
-	if (is_port_closed(port))
+	if (is_port_closed(portRef))
 		return B_BAD_PORT_ID;
 
-	if (!kernel && port->owner == team_get_kernel_team_id()) {
+	if (!kernel && portRef->owner == team_get_kernel_team_id()) {
 		// kernel port, but call from userland
 		return B_NOT_ALLOWED;
 	}
@@ -964,16 +1139,16 @@ select_port(int32 id, struct select_info* info, bool kernel)
 	if (info->selected_events != 0) {
 		uint16 events = 0;
 
-		info->next = port->select_infos;
-		port->select_infos = info;
+		info->next = portRef->select_infos;
+		portRef->select_infos = info;
 
 		// check for events
 		if ((info->selected_events & B_EVENT_READ) != 0
-			&& !port->messages.IsEmpty()) {
+			&& !portRef->messages.IsEmpty()) {
 			events |= B_EVENT_READ;
 		}
 
-		if (port->write_count > 0)
+		if (portRef->write_count > 0)
 			events |= B_EVENT_WRITE;
 
 		if (events != 0)
@@ -993,13 +1168,13 @@ deselect_port(int32 id, struct select_info* info, bool kernel)
 		return B_OK;
 
 	// get the port
-	Port* port = get_locked_port(id);
-	if (port == NULL)
+	BReference<Port> portRef = get_locked_port(id);
+	if (portRef == NULL)
 		return B_BAD_PORT_ID;
-	MutexLocker locker(port->lock, true);
+	MutexLocker locker(portRef->lock, true);
 
 	// find and remove the infos
-	select_info** infoLocation = &port->select_infos;
+	select_info** infoLocation = &portRef->select_infos;
 	while (*infoLocation != NULL && *infoLocation != info)
 		infoLocation = &(*infoLocation)->next;
 
@@ -1022,13 +1197,13 @@ find_port(const char* name)
 	if (name == NULL)
 		return B_BAD_VALUE;
 
-	MutexLocker portsLocker(sPortsLock);
-
-	for (PortHashTable::Iterator it = sPorts.GetIterator();
-		Port* port = it.Next();) {
-		if (!strcmp(name, port->lock.name))
-			return port->id;
-	}
+	ReadLocker locker(sPortsLock);
+	Port* port = sPortsByName.Lookup(name);
+		// Since we have sPortsLock and don't return the port itself,
+		// no BReference necessary
+	
+	if (port != NULL && port->state == Port::kActive)
+		return port->id;
 
 	return B_NAME_NOT_FOUND;
 }
@@ -1045,15 +1220,15 @@ _get_port_info(port_id id, port_info* info, size_t size)
 		return B_BAD_PORT_ID;
 
 	// get the port
-	Port* port = get_locked_port(id);
-	if (port == NULL) {
+	BReference<Port> portRef = get_locked_port(id);
+	if (portRef == NULL) {
 		TRACE(("get_port_info: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
-	MutexLocker locker(port->lock, true);
+	MutexLocker locker(portRef->lock, true);
 
 	// fill a port_info struct with info
-	fill_port_info(port, info, size);
+	fill_port_info(portRef, info, size);
 	return B_OK;
 }
 
@@ -1077,7 +1252,8 @@ _get_next_port_info(team_id teamID, int32* _cookie, struct port_info* info,
 	BReference<Team> teamReference(team, true);
 
 	// iterate through the team's port list
-	MutexLocker portsLocker(sPortsLock);
+	const uint8 lockIndex = teamID % kTeamListLockCount;
+	MutexLocker teamPortsListLocker(sTeamListLock[lockIndex]);
 
 	int32 stopIndex = *_cookie;
 	int32 index = 0;
@@ -1097,9 +1273,12 @@ _get_next_port_info(team_id teamID, int32* _cookie, struct port_info* info,
 		return B_BAD_PORT_ID;
 
 	// fill in the port info
-	MutexLocker locker(port->lock);
-	portsLocker.Unlock();
-	fill_port_info(port, info, size);
+	BReference<Port> portRef = port;
+	teamPortsListLocker.Unlock();
+		// Only use portRef below this line...
+
+	MutexLocker locker(portRef->lock);
+	fill_port_info(portRef, info, size);
 
 	*_cookie = stopIndex + 1;
 	return B_OK;
@@ -1135,24 +1314,24 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 		| B_ABSOLUTE_TIMEOUT;
 
 	// get the port
-	Port* port = get_locked_port(id);
-	if (port == NULL)
+	BReference<Port> portRef = get_locked_port(id);
+	if (portRef == NULL)
 		return B_BAD_PORT_ID;
-	MutexLocker locker(port->lock, true);
+	MutexLocker locker(portRef->lock, true);
 
-	if (is_port_closed(port) && port->messages.IsEmpty()) {
-		T(Info(port, 0, B_BAD_PORT_ID));
+	if (is_port_closed(portRef) && portRef->messages.IsEmpty()) {
+		T(Info(portRef, 0, B_BAD_PORT_ID));
 		TRACE(("_get_port_message_info_etc(): closed port %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
 
-	while (port->read_count == 0) {
+	while (portRef->read_count == 0) {
 		// We need to wait for a message to appear
 		if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0)
 			return B_WOULD_BLOCK;
 
 		ConditionVariableEntry entry;
-		port->read_condition.Add(&entry);
+		portRef->read_condition.Add(&entry);
 
 		locker.Unlock();
 
@@ -1165,15 +1344,15 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 		}
 
 		// re-lock
-		Port* newPort = get_locked_port(id);
-		if (newPort == NULL) {
+		BReference<Port> newPortRef = get_locked_port(id);
+		if (newPortRef == NULL) {
 			T(Info(id, 0, 0, 0, B_BAD_PORT_ID));
 			return B_BAD_PORT_ID;
 		}
-		locker.SetTo(newPort->lock, true);
+		locker.SetTo(newPortRef->lock, true);
 
-		if (newPort != port
-			|| (is_port_closed(port) && port->messages.IsEmpty())) {
+		if (newPortRef != portRef
+			|| (is_port_closed(portRef) && portRef->messages.IsEmpty())) {
 			// the port is no longer there
 			T(Info(id, 0, 0, 0, B_BAD_PORT_ID));
 			return B_BAD_PORT_ID;
@@ -1181,9 +1360,9 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 	}
 
 	// determine tail & get the length of the message
-	port_message* message = port->messages.Head();
+	port_message* message = portRef->messages.Head();
 	if (message == NULL) {
-		panic("port %" B_PRId32 ": no messages found\n", port->id);
+		panic("port %" B_PRId32 ": no messages found\n", portRef->id);
 		return B_ERROR;
 	}
 
@@ -1195,7 +1374,7 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 	T(Info(id, id->read_count, id->write_count, message->code, B_OK));
 
 	// notify next one, as we haven't read from the port
-	port->read_condition.NotifyOne();
+	portRef->read_condition.NotifyOne();
 
 	return B_OK;
 }
@@ -1208,15 +1387,15 @@ port_count(port_id id)
 		return B_BAD_PORT_ID;
 
 	// get the port
-	Port* port = get_locked_port(id);
-	if (port == NULL) {
+	BReference<Port> portRef = get_locked_port(id);
+	if (portRef == NULL) {
 		TRACE(("port_count: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
-	MutexLocker locker(port->lock, true);
+	MutexLocker locker(portRef->lock, true);
 
 	// return count of messages
-	return port->read_count;
+	return portRef->read_count;
 }
 
 
@@ -1244,24 +1423,24 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 		| B_ABSOLUTE_TIMEOUT;
 
 	// get the port
-	Port* port = get_locked_port(id);
-	if (port == NULL)
+	BReference<Port> portRef = get_locked_port(id);
+	if (portRef == NULL)
 		return B_BAD_PORT_ID;
-	MutexLocker locker(port->lock, true);
+	MutexLocker locker(portRef->lock, true);
 
-	if (is_port_closed(port) && port->messages.IsEmpty()) {
-		T(Read(port, 0, B_BAD_PORT_ID));
+	if (is_port_closed(portRef) && portRef->messages.IsEmpty()) {
+		T(Read(portRef, 0, B_BAD_PORT_ID));
 		TRACE(("read_port_etc(): closed port %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
 
-	while (port->read_count == 0) {
+	while (portRef->read_count == 0) {
 		if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0)
 			return B_WOULD_BLOCK;
 
 		// We need to wait for a message to appear
 		ConditionVariableEntry entry;
-		port->read_condition.Add(&entry);
+		portRef->read_condition.Add(&entry);
 
 		locker.Unlock();
 
@@ -1269,30 +1448,30 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 		status_t status = entry.Wait(flags, timeout);
 
 		// re-lock
-		Port* newPort = get_locked_port(id);
-		if (newPort == NULL) {
+		BReference<Port> newPortRef = get_locked_port(id);
+		if (newPortRef == NULL) {
 			T(Read(id, 0, 0, 0, B_BAD_PORT_ID));
 			return B_BAD_PORT_ID;
 		}
-		locker.SetTo(newPort->lock, true);
+		locker.SetTo(newPortRef->lock, true);
 
-		if (newPort != port
-			|| (is_port_closed(port) && port->messages.IsEmpty())) {
+		if (newPortRef != portRef
+			|| (is_port_closed(portRef) && portRef->messages.IsEmpty())) {
 			// the port is no longer there
 			T(Read(id, 0, 0, 0, B_BAD_PORT_ID));
 			return B_BAD_PORT_ID;
 		}
 
 		if (status != B_OK) {
-			T(Read(port, 0, status));
+			T(Read(portRef, 0, status));
 			return status;
 		}
 	}
 
 	// determine tail & get the length of the message
-	port_message* message = port->messages.Head();
+	port_message* message = portRef->messages.Head();
 	if (message == NULL) {
-		panic("port %" B_PRId32 ": no messages found\n", port->id);
+		panic("port %" B_PRId32 ": no messages found\n", portRef->id);
 		return B_ERROR;
 	}
 
@@ -1300,23 +1479,23 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 		size_t size = copy_port_message(message, _code, buffer, bufferSize,
 			userCopy);
 
-		T(Read(port, message->code, size));
+		T(Read(portRef, message->code, size));
 
-		port->read_condition.NotifyOne();
+		portRef->read_condition.NotifyOne();
 			// we only peeked, but didn't grab the message
 		return size;
 	}
 
-	port->messages.RemoveHead();
-	port->total_count++;
-	port->write_count++;
-	port->read_count--;
+	portRef->messages.RemoveHead();
+	portRef->total_count++;
+	portRef->write_count++;
+	portRef->read_count--;
 
-	notify_port_select_events(port, B_EVENT_WRITE);
-	port->write_condition.NotifyOne();
+	notify_port_select_events(portRef, B_EVENT_WRITE);
+	portRef->write_condition.NotifyOne();
 		// make one spot in queue available again for write
 
-	T(Read(id, port->read_count, port->write_count, message->code,
+	T(Read(id, portRef->read_count, portRef->write_count, message->code,
 		min_c(bufferSize, message->size)));
 
 	locker.Unlock();
@@ -1374,41 +1553,41 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 	port_message* message = NULL;
 
 	// get the port
-	Port* port = get_locked_port(id);
-	if (port == NULL) {
+	BReference<Port> portRef = get_locked_port(id);
+	if (portRef == NULL) {
 		TRACE(("write_port_etc: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
-	MutexLocker locker(port->lock, true);
+	MutexLocker locker(portRef->lock, true);
 
-	if (is_port_closed(port)) {
+	if (is_port_closed(portRef)) {
 		TRACE(("write_port_etc: port %ld closed\n", id));
 		return B_BAD_PORT_ID;
 	}
 
-	if (port->write_count <= 0) {
+	if (portRef->write_count <= 0) {
 		if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0)
 			return B_WOULD_BLOCK;
 
-		port->write_count--;
+		portRef->write_count--;
 
 		// We need to block in order to wait for a free message slot
 		ConditionVariableEntry entry;
-		port->write_condition.Add(&entry);
+		portRef->write_condition.Add(&entry);
 
 		locker.Unlock();
 
 		status = entry.Wait(flags, timeout);
 
 		// re-lock
-		Port* newPort = get_locked_port(id);
-		if (newPort == NULL) {
+		BReference<Port> newPortRef = get_locked_port(id);
+		if (newPortRef == NULL) {
 			T(Write(id, 0, 0, 0, 0, B_BAD_PORT_ID));
 			return B_BAD_PORT_ID;
 		}
-		locker.SetTo(newPort->lock, true);
+		locker.SetTo(newPortRef->lock, true);
 
-		if (newPort != port || is_port_closed(port)) {
+		if (newPortRef != portRef || is_port_closed(portRef)) {
 			// the port is no longer there
 			T(Write(id, 0, 0, 0, 0, B_BAD_PORT_ID));
 			return B_BAD_PORT_ID;
@@ -1417,10 +1596,10 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 		if (status != B_OK)
 			goto error;
 	} else
-		port->write_count--;
+		portRef->write_count--;
 
 	status = get_port_message(msgCode, bufferSize, flags, timeout,
-		&message, *port);
+		&message, *portRef);
 	if (status != B_OK) {
 		if (status == B_BAD_PORT_ID) {
 			// the port had to be unlocked and is now no longer there
@@ -1461,23 +1640,23 @@ writev_port_etc(port_id id, int32 msgCode, const iovec* msgVecs,
 		}
 	}
 
-	port->messages.Add(message);
-	port->read_count++;
+	portRef->messages.Add(message);
+	portRef->read_count++;
 
-	T(Write(id, port->read_count, port->write_count, message->code,
+	T(Write(id, portRef->read_count, portRef->write_count, message->code,
 		message->size, B_OK));
 
-	notify_port_select_events(port, B_EVENT_READ);
-	port->read_condition.NotifyOne();
+	notify_port_select_events(portRef, B_EVENT_READ);
+	portRef->read_condition.NotifyOne();
 	return B_OK;
 
 error:
 	// Give up our slot in the queue again, and let someone else
 	// try and fail
-	T(Write(id, port->read_count, port->write_count, 0, 0, status));
-	port->write_count++;
-	notify_port_select_events(port, B_EVENT_WRITE);
-	port->write_condition.NotifyOne();
+	T(Write(id, portRef->read_count, portRef->write_count, 0, 0, status));
+	portRef->write_count++;
+	notify_port_select_events(portRef, B_EVENT_WRITE);
+	portRef->write_condition.NotifyOne();
 
 	return status;
 }
@@ -1498,22 +1677,45 @@ set_port_owner(port_id id, team_id newTeamID)
 	BReference<Team> teamReference(team, true);
 
 	// get the port
-	MutexLocker portsLocker(sPortsLock);
-	Port* port = sPorts.Lookup(id);
-	if (port == NULL) {
+	BReference<Port> portRef = get_locked_port(id);
+	if (portRef == NULL) {
 		TRACE(("set_port_owner: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
-	MutexLocker locker(port->lock);
+	MutexLocker locker(portRef->lock, true);
 
 	// transfer ownership to other team
-	if (team->id != port->owner) {
-		list_remove_link(&port->team_link);
-		list_add_item(&team->port_list, &port->team_link);
-		port->owner = team->id;
+	if (team->id != portRef->owner) {
+		uint8 firstLockIndex  = portRef->owner % kTeamListLockCount;
+		uint8 secondLockIndex = team->id % kTeamListLockCount;
+
+		// Avoid deadlocks: always lock lower index first
+		if (secondLockIndex < firstLockIndex) {
+			uint8 temp = secondLockIndex;
+			secondLockIndex = firstLockIndex;
+			firstLockIndex = temp;
+		}
+
+		MutexLocker oldTeamPortsListLocker(sTeamListLock[firstLockIndex]);
+		MutexLocker newTeamPortsListLocker;
+		if (firstLockIndex != secondLockIndex) {
+			newTeamPortsListLocker.SetTo(sTeamListLock[secondLockIndex],
+					false);
+		}
+
+		// Now that we have locked the team port lists, check the state again
+		if (portRef->state == Port::kActive) {
+			list_remove_link(&portRef->team_link);
+			list_add_item(&team->port_list, portRef.Get());
+			portRef->owner = team->id;
+		} else {
+			// Port was already deleted. We haven't changed anything yet so
+			// we can cancel the operation.
+			return B_BAD_PORT_ID;
+		}
 	}
 
-	T(OwnerChange(port, team->id, B_OK));
+	T(OwnerChange(portRef, team->id, B_OK));
 	return B_OK;
 }
 

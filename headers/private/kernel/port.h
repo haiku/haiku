@@ -36,6 +36,8 @@ void delete_owned_ports(Team* team);
 int32 port_max_ports(void);
 int32 port_used_ports(void);
 
+size_t port_team_link_offset();
+
 status_t select_port(int32 object, struct select_info *info, bool kernel);
 status_t deselect_port(int32 object, struct select_info *info, bool kernel);
 
