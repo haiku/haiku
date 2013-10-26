@@ -72,7 +72,7 @@ struct PackageNode : DoublyLinkedListLinkImpl<PackageNode> {
 		fModifiedTime.tv_nsec = 0;
 	}
 
-	~PackageNode()
+	virtual ~PackageNode()
 	{
 		free(fName);
 	}
@@ -192,6 +192,12 @@ struct PackageDirectory : PackageNode {
 		:
 		PackageNode(volume, mode)
 	{
+	}
+
+	~PackageDirectory()
+	{
+		while (PackageNode* node = fEntries.RemoveHead())
+			delete node;
 	}
 
 	void AddChild(PackageNode* node)
