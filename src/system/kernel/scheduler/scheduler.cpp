@@ -728,7 +728,7 @@ is_task_small(Thread* thread)
 {
 	int32 priority = get_effective_priority(thread);
 	int32 penalty = thread->scheduler_data->priority_penalty;
-	return penalty == 0 || priority >= B_DISPLAY_PRIORITY;
+	return penalty < 2 || priority >= B_DISPLAY_PRIORITY;
 }
 
 
@@ -1244,10 +1244,8 @@ _scheduler_reschedule(void)
 
 	// update CPU heap so that old thread would have CPU properly chosen
 	Thread* nextThread = sRunQueues[thisCore].PeekMaximum();
-	if (nextThread != NULL) {
-		update_priority_heaps(thisCPU,
-			get_effective_priority(nextThread));
-	}
+	if (nextThread != NULL)
+		update_priority_heaps(thisCPU, get_effective_priority(nextThread));
 
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
@@ -1271,6 +1269,7 @@ _scheduler_reschedule(void)
 
 			break;
 		case B_THREAD_SUSPENDED:
+			increase_penalty(oldThread);
 			thread_goes_away(oldThread);
 			TRACE("reschedule(): suspending thread %ld\n", oldThread->id);
 			break;
@@ -1278,6 +1277,7 @@ _scheduler_reschedule(void)
 			thread_goes_away(oldThread);
 			break;
 		default:
+			increase_penalty(oldThread);
 			thread_goes_away(oldThread);
 			TRACE("not enqueueing thread %ld into run queue next_state = %ld\n",
 				oldThread->id, oldThread->next_state);
