@@ -145,7 +145,8 @@ periph_trim_device(scsi_periph_device_info *device, scsi_ccb *request,
 	// Prepare request data
 	memset(unmapBlocks, 0, unmapBlockSize);
 	unmapBlocks->data_length = B_HOST_TO_BENDIAN_INT16(unmapBlockSize - 1);
-	unmapBlocks->data_length = B_HOST_TO_BENDIAN_INT16(unmapBlockSize - 3);
+	unmapBlocks->block_data_length
+		= B_HOST_TO_BENDIAN_INT16(unmapBlockSize - 7);
 
 	for (uint32 i = 0; i < rangeCount; i++) {
 		unmapBlocks->blocks[i].lba = B_HOST_TO_BENDIAN_INT64(
