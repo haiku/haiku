@@ -434,16 +434,20 @@ status_t
 AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax,
 	const void *data, size_t dataSize)
 {
-	int peMax = prdMax + 1;
-	physical_entry pe[peMax];
-	if (get_memory_map(data, dataSize, pe, peMax ) < B_OK) {
-		TRACE("AHCIPort::FillPrdTable get_memory_map failed\n");
+	int maxEntries = prdMax + 1;
+	physical_entry entries[maxEntries];
+	uint32 entriesUsed = maxEntries;
+
+	status_t status = get_memory_map_etc(B_CURRENT_TEAM, data, dataSize,
+		entries, &entriesUsed);
+	if (status != B_OK) {
+		TRACE("AHCIPort::FillPrdTable get_memory_map() failed: %s\n",
+			strerror(status));
 		return B_ERROR;
 	}
-	int peUsed;
-	for (peUsed = 0; pe[peUsed].size; peUsed++)
-		;
-	return FillPrdTable(prdTable, prdCount, prdMax, pe, peUsed, dataSize);
+
+	return FillPrdTable(prdTable, prdCount, prdMax, entries, entriesUsed,
+		dataSize);
 }
 
 
