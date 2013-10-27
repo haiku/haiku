@@ -73,6 +73,11 @@ static int32 (*sChooseCore)(Thread* thread);
 // the higher priority threads.
 struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
 	int32		fCPUNumber;
+
+	bigtime_t	fMeasureActiveTime;
+	bigtime_t	fMeasureTime;
+
+	int			fLoad;
 };
 typedef MinMaxHeap<CPUEntry, int32> CPUHeap;
 static CPUEntry* sCPUEntries;
@@ -93,6 +98,8 @@ struct CoreEntry : public DoublyLinkedListLinkImpl<CoreEntry> {
 
 	int32		fCPUBoundThreads;
 	int32		fThreads;
+
+	int			fLoad;
 };
 
 static CoreEntry* sCoreEntries;
@@ -283,13 +290,13 @@ dump_heap(CPUHeap* heap)
 {
 	CPUHeap temp(smp_get_num_cpus());
 
-	kprintf("cpu priority actual priority\n");
+	kprintf("cpu priority load\n");
 	CPUEntry* entry = heap->PeekMinimum();
 	while (entry) {
 		int32 cpu = entry->fCPUNumber;
 		int32 key = CPUHeap::GetKey(entry);
-		kprintf("%3" B_PRId32 " %8" B_PRId32 " %15" B_PRId32 "\n", cpu, key,
-			get_effective_priority(gCPU[cpu].running_thread));
+		kprintf("%3" B_PRId32 " %8" B_PRId32 " %3d%%\n", cpu, key,
+			sCPUEntries[cpu].fLoad / 10);
 
 		heap->RemoveMinimum();
 		temp.Insert(entry, key);
@@ -311,12 +318,14 @@ static void
 dump_core_thread_heap(CoreThreadHeap* heap)
 {
 	CoreThreadHeap temp(sRunQueueCount);
+	int32 cpuPerCore = smp_get_num_cpus() / sRunQueueCount;
 
 	CoreEntry* entry = heap->PeekMinimum();
 	while (entry) {
 		int32 key = CoreThreadHeap::GetKey(entry);
-		kprintf("%4" B_PRId32 " %6" B_PRId32 " %7" B_PRId32 " %9" B_PRId32 "\n",
-			entry->fCoreID, key, entry->fThreads, entry->fCPUBoundThreads);
+		kprintf("%4" B_PRId32 " %6" B_PRId32 " %7" B_PRId32 " %9" B_PRId32
+			" %3d%%\n", entry->fCoreID, key, entry->fThreads,
+			entry->fCPUBoundThreads, entry->fLoad / cpuPerCore / 10);
 
 		heap->RemoveMinimum();
 		temp.Insert(entry, key);
@@ -364,7 +373,7 @@ dump_cpu_heap(int argc, char** argv)
 		entry = temp.PeekRoot();
 	}
 
-	kprintf("\ncore    key threads cpu-bound\n");
+	kprintf("\ncore    key threads cpu-bound load\n");
 	dump_core_thread_heap(sCoreThreadHeap);
 	dump_core_thread_heap(sCoreCPUBoundThreadHeap);
 
@@ -1265,6 +1274,45 @@ dequeue_thread(int32 thisCPU)
 
 
 static inline void
+compute_cpu_load(int32 cpu)
+{
+	const bigtime_t kLoadMeasureInterval = 50000;
+	const bigtime_t kIntervalInaccuracy = kLoadMeasureInterval / 4;
+
+	int32 thisCPU = smp_get_current_cpu();
+
+	bigtime_t now = system_time();
+	bigtime_t deltaTime = now - sCPUEntries[cpu].fMeasureTime;
+
+	if (deltaTime < kLoadMeasureInterval)
+		return;
+
+	int oldLoad = sCPUEntries[cpu].fLoad;
+
+	int load = sCPUEntries[cpu].fMeasureActiveTime * 1000;
+	load /= max_c(now - sCPUEntries[cpu].fMeasureTime, 1);
+
+	sCPUEntries[cpu].fMeasureActiveTime = 0;
+	sCPUEntries[cpu].fMeasureTime = now;
+
+	deltaTime += kIntervalInaccuracy;
+	int n = max_c(deltaTime / kLoadMeasureInterval, 1);
+	if (n > 10)
+		sCPUEntries[cpu].fLoad = load;
+	else {
+		load *= (1 << n) - 1;
+		sCPUEntries[cpu].fLoad = (sCPUEntries[cpu].fLoad + load) / (1 << n);
+	}
+
+	if (oldLoad != load) {
+		int32 core = sCPUToCore[cpu];
+		sCoreEntries[core].fLoad -= oldLoad;
+		sCoreEntries[core].fLoad += sCPUEntries[cpu].fLoad;
+	}
+}
+
+
+static inline void
 track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 {
 	bigtime_t now = system_time();
@@ -1286,8 +1334,11 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 				+ (oldThread->user_time - oldThread->cpu->last_user_time);
 
 		atomic_add64(&oldThread->cpu->active_time, active);
+		sCPUEntries[smp_get_current_cpu()].fMeasureActiveTime += active;
 		sCoreEntries[thisCore].fActiveTime += active;
 	}
+
+	compute_cpu_load(smp_get_current_cpu());
 
 	int32 oldPriority = get_effective_priority(oldThread);
 	int32 nextPriority = get_effective_priority(nextThread);
@@ -1650,6 +1701,7 @@ _scheduler_init()
 		sCoreEntries[i].fActiveTime = 0;
 		sCoreEntries[i].fThreads = 0;
 		sCoreEntries[i].fCPUBoundThreads = 0;
+		sCoreEntries[i].fLoad = 0;
 
 		status_t result = sCoreThreadHeap->Insert(&sCoreEntries[i], 0);
 		if (result != B_OK)
@@ -1668,6 +1720,11 @@ _scheduler_init()
 
 	for (int32 i = 0; i < cpuCount; i++) {
 		sCPUEntries[i].fCPUNumber = i;
+
+		sCPUEntries[i].fMeasureActiveTime = 0;
+		sCPUEntries[i].fMeasureTime = 0;
+		sCPUEntries[i].fLoad = 0;
+
 		int32 core = sCPUToCore[i];
 
 		int32 package = sCPUToPackage[i];
