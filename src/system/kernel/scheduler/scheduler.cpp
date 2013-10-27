@@ -52,6 +52,8 @@ const bigtime_t kThreadQuantum = 1000;
 const bigtime_t kMinThreadQuantum = 3000;
 const bigtime_t kMaxThreadQuantum = 10000;
 
+const bigtime_t kMinimalWaitTime = kThreadQuantum / 4;
+
 const bigtime_t kCacheExpire = 100000;
 
 static int sDisableSmallTaskPacking;
@@ -82,7 +84,11 @@ struct CoreEntry : public DoublyLinkedListLinkImpl<CoreEntry> {
 
 	int32		fCoreID;
 
+	bigtime_t	fStartedBottom;
 	bigtime_t	fReachedBottom;
+	bigtime_t	fStartedIdle;
+	bigtime_t	fReachedIdle;
+
 	bigtime_t	fActiveTime;
 
 	int32		fCPUBoundThreads;
@@ -902,6 +908,51 @@ thread_goes_away(Thread* thread)
 }
 
 
+static inline bool
+should_cancel_penalty(Thread* thread)
+{
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+	int32 core = schedulerThreadData->previous_core;
+
+	if (core < -1)
+		return false;
+
+	bigtime_t now = system_time();
+	bigtime_t wentSleep = schedulerThreadData->went_sleep;
+
+	if (wentSleep < sCoreEntries[core].fReachedIdle)
+		return true;
+
+	if (sCoreEntries[core].fStartedIdle != 0) {
+		if (wentSleep < sCoreEntries[core].fStartedIdle
+			&& now - sCoreEntries[core].fStartedIdle >= kMinimalWaitTime) {
+			return true;
+		}
+
+		if (wentSleep - sCoreEntries[core].fStartedIdle >= kMinimalWaitTime)
+			return true;
+	}
+
+	if (get_effective_priority(thread) == B_LOWEST_ACTIVE_PRIORITY)
+		return false;
+
+	if (wentSleep < sCoreEntries[core].fReachedIdle)
+		return true;
+
+	if (sCoreEntries[core].fStartedBottom != 0) {
+		if (wentSleep < sCoreEntries[core].fStartedBottom
+			&& now - sCoreEntries[core].fStartedBottom >= kMinimalWaitTime) {
+			return true;
+		}
+
+		if (wentSleep - sCoreEntries[core].fStartedBottom >= kMinimalWaitTime)
+			return true;
+	}
+
+	return false;
+}
+
+
 static void
 enqueue(Thread* thread, bool newOne)
 {
@@ -913,9 +964,18 @@ enqueue(Thread* thread, bool newOne)
 
 	int32 core = schedulerThreadData->previous_core;
 	if (newOne && core >= 0) {
-		if (schedulerThreadData->went_sleep + kThreadQuantum / 4
-			< sCoreEntries[core].fReachedBottom) {
-			cancel_penalty(thread);
+		int32 priority = get_effective_priority(thread);
+
+		if (priority == B_LOWEST_ACTIVE_PRIORITY) {
+			if (schedulerThreadData->went_sleep
+				< sCoreEntries[core].fReachedIdle) {
+				cancel_penalty(thread);
+			}
+		} else {
+			if (schedulerThreadData->went_sleep
+				< sCoreEntries[core].fReachedBottom) {
+				cancel_penalty(thread);
+			}
 		}
 	}
 
@@ -1207,6 +1267,19 @@ dequeue_thread(int32 thisCPU)
 static inline void
 track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 {
+	bigtime_t now = system_time();
+	bigtime_t usedTime = now - oldThread->scheduler_data->quantum_start;
+
+	if (thread_is_idle_thread(oldThread) && usedTime >= kMinimalWaitTime) {
+		sCoreEntries[thisCore].fReachedBottom = now - kMinimalWaitTime;
+		sCoreEntries[thisCore].fReachedIdle = now - kMinimalWaitTime;
+	}
+
+	if (get_effective_priority(oldThread) == B_LOWEST_ACTIVE_PRIORITY
+		&& usedTime >= kMinimalWaitTime) {
+		sCoreEntries[thisCore].fReachedBottom = now - kMinimalWaitTime;
+	}
+
 	if (!thread_is_idle_thread(oldThread)) {
 		bigtime_t active
 			= (oldThread->kernel_time - oldThread->cpu->last_kernel_time)
@@ -1216,9 +1289,21 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 		sCoreEntries[thisCore].fActiveTime += active;
 	}
 
-	if (thread_is_idle_thread(nextThread)
-		|| get_effective_priority(nextThread) == B_LOWEST_ACTIVE_PRIORITY) {
-		sCoreEntries[thisCore].fReachedBottom = system_time();
+	int32 oldPriority = get_effective_priority(oldThread);
+	int32 nextPriority = get_effective_priority(nextThread);
+
+	if (thread_is_idle_thread(nextThread)) {
+		if (!thread_is_idle_thread(oldThread))
+			sCoreEntries[thisCore].fStartedIdle = now;
+		if (oldPriority > B_LOWEST_ACTIVE_PRIORITY)
+			sCoreEntries[thisCore].fStartedBottom = now;
+	} else if (nextPriority == B_LOWEST_ACTIVE_PRIORITY) {
+		sCoreEntries[thisCore].fStartedIdle = 0;
+		if (oldPriority > B_LOWEST_ACTIVE_PRIORITY)
+			sCoreEntries[thisCore].fStartedBottom = now;
+	} else {
+		sCoreEntries[thisCore].fStartedBottom = 0;
+		sCoreEntries[thisCore].fStartedIdle = 0;
 	}
 
 	if (!thread_is_idle_thread(nextThread)) {
@@ -1337,7 +1422,8 @@ _scheduler_reschedule(void)
 			bigtime_t quantum = compute_quantum(oldThread);
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
-		}
+		} else
+			nextThread->scheduler_data->quantum_start = system_time();
 
 		if (nextThread != oldThread)
 			scheduler_switch_thread(oldThread, nextThread);
@@ -1622,7 +1708,7 @@ _scheduler_init()
 			return result;
 	}
 
-#if 1
+#if 0
 	scheduler_set_operation_mode(SCHEDULER_MODE_PERFORMANCE);
 #else
 	scheduler_set_operation_mode(SCHEDULER_MODE_POWER_SAVING);
