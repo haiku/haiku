@@ -344,22 +344,35 @@ BHttpRequest::_ProtocolLoop()
 				break;
 
 			case B_HTTP_STATUS_CLASS_CLIENT_ERROR:
-				switch (fResult.StatusCode()) {
-					case B_HTTP_STATUS_UNAUTHORIZED:
-						if (fAuthentication.Method() != B_HTTP_AUTHENTICATION_NONE) {
-							newRequest = false;
-							break;
-						}
+				if(fResult.StatusCode() == B_HTTP_STATUS_UNAUTHORIZED) {
+					BHttpAuthentication* authentication
+						= &fContext->GetAuthentication(fUrl);
+					status_t status = B_OK;
 
-						newRequest = false;
-						if (fOptUsername.Length() > 0
-							&& fAuthentication.Initialize(fHeaders["WWW-Authenticate"])
-								== B_OK) {
-							fAuthentication.SetUserName(fOptUsername);
-							fAuthentication.SetPassword(fOptPassword);
-							newRequest = true;
-						}
-						break;
+					if (authentication->Method() == B_HTTP_AUTHENTICATION_NONE)
+					{
+						// There is no authentication context for this
+						// url yet, so let's create one.
+						authentication = new BHttpAuthentication();
+						status = authentication->Initialize(
+							fHeaders["WWW-Authenticate"]);
+						fContext->AddAuthentication(fUrl, authentication);
+					}
+
+					newRequest = false;
+					if (fOptUsername.Length() > 0 && status == B_OK) {
+						// If we received an username and password, add them
+						// to the request. This will either change the
+						// credentials for an existing request, or set them
+						// for a new one we created just above.
+						//
+						// If this request handles HTTP redirections, it will
+						// also automatically retry connecting and send the
+						// login information.
+						authentication->SetUserName(fOptUsername);
+						authentication->SetPassword(fOptPassword);
+						newRequest = true;
+					}
 				}
 				break;
 
@@ -811,11 +824,16 @@ BHttpRequest::_AddHeaders()
 		fOutputHeaders.AddHeader("Referer", fOptReferer.String());
 
 	// Authentication
-	if (fAuthentication.Method() != B_HTTP_AUTHENTICATION_NONE) {
-		BString request(fRequestMethod);
+	BHttpAuthentication& authentication = fContext->GetAuthentication(fUrl);
+	if (authentication.Method() != B_HTTP_AUTHENTICATION_NONE) {
+		if (fOptUsername.Length() > 0) {
+			authentication.SetUserName(fOptUsername);
+			authentication.SetPassword(fOptPassword);
+		}
 
+		BString request(fRequestMethod);
 		fOutputHeaders.AddHeader("Authorization",
-			fAuthentication.Authorization(fUrl, request));
+			authentication.Authorization(fUrl, request));
 	}
 
 	// Required headers for POST data

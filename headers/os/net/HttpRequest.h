@@ -9,7 +9,6 @@
 #include <deque>
 
 
-#include <HttpAuthentication.h>
 #include <HttpForm.h>
 #include <HttpHeaders.h>
 #include <HttpResult.h>
@@ -93,7 +92,6 @@ private:
 			BNetBuffer			fInputBuffer;
 
 			BHttpHeaders		fHeaders;
-			BHttpAuthentication	fAuthentication;
 
 	// Request status
 
