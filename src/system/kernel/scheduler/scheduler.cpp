@@ -168,6 +168,10 @@ struct scheduler_thread_data {
 			bigtime_t	stolen_time;
 			bigtime_t	quantum_start;
 
+			bigtime_t	measure_active_time;
+			bigtime_t	measure_time;
+			int			load;
+
 			bigtime_t	went_sleep;
 			bigtime_t	went_sleep_active;
 
@@ -183,6 +187,10 @@ scheduler_thread_data::Init()
 
 	time_left = 0;
 	stolen_time = 0;
+
+	measure_active_time = 0;
+	measure_time = 0;
+	load = 0;
 
 	went_sleep = 0;
 	went_sleep_active = 0;
@@ -499,6 +507,7 @@ scheduler_dump_thread_data(Thread* thread)
 		additionalPenalty, schedulerThreadData->additional_penalty);
 	kprintf("\tstolen_time:\t\t%" B_PRId64 "\n",
 		schedulerThreadData->stolen_time);
+	kprintf("\tload:\t\t\t%d%%\n", schedulerThreadData->load / 10);
 	kprintf("\twent_sleep:\t\t%" B_PRId64 "\n",
 		schedulerThreadData->went_sleep);
 	kprintf("\twent_sleep_active:\t%" B_PRId64 "\n",
@@ -839,6 +848,79 @@ should_rebalance(Thread* thread)
 }
 
 
+static inline int
+compute_load(bigtime_t& measureTime, bigtime_t& measureActiveTime, int& load)
+{
+	const bigtime_t kLoadMeasureInterval = 50000;
+	const bigtime_t kIntervalInaccuracy = kLoadMeasureInterval / 4;
+
+	bigtime_t now = system_time();
+
+	if (measureTime == 0) {
+		measureTime = now;
+		return -1;
+	}
+
+	bigtime_t deltaTime = now - measureTime;
+
+	if (deltaTime < kLoadMeasureInterval)
+		return -1;
+
+	int oldLoad = load;
+	ASSERT(oldLoad >= 0 && oldLoad <= 1000);
+
+	int newLoad = measureActiveTime * 1000;
+	newLoad /= max_c(deltaTime, 1);
+	newLoad = max_c(min_c(newLoad, 1000), 0);
+
+	measureActiveTime = 0;
+	measureTime = now;
+
+	deltaTime += kIntervalInaccuracy;
+	int n = deltaTime / kLoadMeasureInterval;
+	ASSERT(n > 0);
+
+	if (n > 10)
+		load = newLoad;
+	else {
+		newLoad *= (1 << n) - 1;
+		load = (load + newLoad) / (1 << n);
+		ASSERT(load >= 0 && load <= 1000);
+	}
+
+	return oldLoad;
+}
+
+
+static inline void
+compute_cpu_load(int32 cpu)
+{
+	ASSERT(!sSingleCore);
+
+	int oldLoad = compute_load(sCPUEntries[cpu].fMeasureTime,
+		sCPUEntries[cpu].fMeasureActiveTime, sCPUEntries[cpu].fLoad);
+	if (oldLoad < 0)
+		return;
+
+	if (oldLoad != sCPUEntries[cpu].fLoad) {
+		int32 core = sCPUToCore[cpu];
+
+		sCoreEntries[core].fLoad -= oldLoad;
+		sCoreEntries[core].fLoad += sCPUEntries[cpu].fLoad;
+
+		update_load_heaps(core);
+	}
+}
+
+
+static inline void
+compute_thread_load(Thread* thread)
+{
+	compute_load(thread->scheduler_data->measure_time,
+		thread->scheduler_data->measure_active_time,
+		thread->scheduler_data->load);
+}
+
 
 static inline void
 thread_goes_away(Thread* thread)
@@ -907,6 +989,8 @@ enqueue(Thread* thread, bool newOne)
 	ASSERT(thread != NULL);
 
 	thread->state = thread->next_state = B_THREAD_READY;
+
+	compute_thread_load(thread);
 
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 
@@ -1018,6 +1102,8 @@ scheduler_enqueue_in_run_queue(Thread *thread)
 static inline void
 put_back(Thread* thread)
 {
+	compute_thread_load(thread);
+
 	bool pinned = sPinnedRunQueues != NULL && thread->pinned_to_cpu > 0;
 
 	if (pinned) {
@@ -1198,53 +1284,6 @@ dequeue_thread(int32 thisCPU)
 
 
 static inline void
-compute_cpu_load(int32 cpu)
-{
-	ASSERT(!sSingleCore);
-
-	const bigtime_t kLoadMeasureInterval = 50000;
-	const bigtime_t kIntervalInaccuracy = kLoadMeasureInterval / 4;
-
-	bigtime_t now = system_time();
-	bigtime_t deltaTime = now - sCPUEntries[cpu].fMeasureTime;
-
-	if (deltaTime < kLoadMeasureInterval)
-		return;
-
-	int oldLoad = sCPUEntries[cpu].fLoad;
-	ASSERT(oldLoad >= 0 && oldLoad <= 1000);
-
-	int load = sCPUEntries[cpu].fMeasureActiveTime * 1000;
-	load /= max_c(now - sCPUEntries[cpu].fMeasureTime, 1);
-	load = max_c(min_c(load, 1000), 0);
-
-	sCPUEntries[cpu].fMeasureActiveTime = 0;
-	sCPUEntries[cpu].fMeasureTime = now;
-
-	deltaTime += kIntervalInaccuracy;
-	int n = deltaTime / kLoadMeasureInterval;
-	ASSERT(n > 0);
-
-	if (n > 10)
-		sCPUEntries[cpu].fLoad = load;
-	else {
-		load *= (1 << n) - 1;
-		sCPUEntries[cpu].fLoad = (sCPUEntries[cpu].fLoad + load) / (1 << n);
-		ASSERT(sCPUEntries[cpu].fLoad >= 0 && sCPUEntries[cpu].fLoad <= 1000);
-	}
-
-	if (oldLoad != load) {
-		int32 core = sCPUToCore[cpu];
-
-		sCoreEntries[core].fLoad -= oldLoad;
-		sCoreEntries[core].fLoad += sCPUEntries[cpu].fLoad;
-
-		update_load_heaps(core);
-	}
-}
-
-
-static inline void
 track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 {
 	bigtime_t now = system_time();
@@ -1266,6 +1305,7 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 				+ (oldThread->user_time - oldThread->cpu->last_user_time);
 
 		atomic_add64(&oldThread->cpu->active_time, active);
+		oldThread->scheduler_data->measure_active_time += active;
 		sCPUEntries[smp_get_current_cpu()].fMeasureActiveTime += active;
 		sCoreEntries[thisCore].fActiveTime += active;
 	}
@@ -1387,6 +1427,7 @@ _scheduler_reschedule(void)
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
 	ASSERT(nextThread->scheduler_data->previous_core == thisCore);
+	compute_thread_load(nextThread);
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	scheduler_update_thread_times(oldThread, nextThread);
