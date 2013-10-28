@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008-2013 Haiku, Inc. All rights reserved.
  * Copyright 2007-2009, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -36,7 +37,7 @@
 #define RWTRACE(a...)
 
 
-AHCIPort::AHCIPort(AHCIController *controller, int index)
+AHCIPort::AHCIPort(AHCIController* controller, int index)
 	:
 	fController(controller),
 	fIndex(index),
@@ -77,24 +78,25 @@ AHCIPort::Init1()
 		+ sizeof(fis) + sizeof(command_table)
 		+ sizeof(prd) * PRD_TABLE_ENTRY_COUNT;
 
-	char *virtAddr;
+	char* virtAddr;
 	phys_addr_t physAddr;
+	char name[32];
+	snprintf(name, sizeof(name), "AHCI port %d", fIndex);
 
-	fArea = alloc_mem((void **)&virtAddr, &physAddr, size, 0,
-		"some AHCI port");
+	fArea = alloc_mem((void**)&virtAddr, &physAddr, size, 0, name);
 	if (fArea < B_OK) {
 		TRACE("failed allocating memory for port %d\n", fIndex);
 		return fArea;
 	}
 	memset(virtAddr, 0, size);
 
-	fCommandList = (command_list_entry *)virtAddr;
+	fCommandList = (command_list_entry*)virtAddr;
 	virtAddr += sizeof(command_list_entry) * COMMAND_LIST_ENTRY_COUNT;
-	fFIS = (fis *)virtAddr;
+	fFIS = (fis*)virtAddr;
 	virtAddr += sizeof(fis);
-	fCommandTable = (command_table *)virtAddr;
+	fCommandTable = (command_table*)virtAddr;
 	virtAddr += sizeof(command_table);
-	fPRDTable = (prd *)virtAddr;
+	fPRDTable = (prd*)virtAddr;
 	TRACE("PRD table is at %p\n", fPRDTable);
 
 	fRegs->clb  = LO32(physAddr);
@@ -303,8 +305,8 @@ AHCIPort::PostReset()
 
 	if (!fTestUnitReadyActive) {
 		TRACE("device signature 0x%08" B_PRIx32 " (%s)\n", fRegs->sig,
-			(fRegs->sig == 0xeb140101) ? "ATAPI" : (fRegs->sig == 0x00000101) ?
-				"ATA" : "unknown");
+			fRegs->sig == 0xeb140101 ? "ATAPI" : fRegs->sig == 0x00000101
+				? "ATA" : "unknown");
 	}
 
 	return B_OK;
@@ -341,9 +343,9 @@ AHCIPort::Interrupt()
 
 	uint32 ci = fRegs->ci;
 
-	RWTRACE("[%lld] %ld AHCIPort::Interrupt port %d, fCommandsActive 0x%08" B_PRIx32 ", "
-		"is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", system_time(), find_thread(NULL),
-		fIndex, fCommandsActive, is, ci);
+	RWTRACE("[%lld] %ld AHCIPort::Interrupt port %d, fCommandsActive 0x%08"
+		B_PRIx32 ", is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n",
+		system_time(), find_thread(NULL), fIndex, fCommandsActive, is, ci);
 
 	acquire_spinlock(&fSpinlock);
 	if ((fCommandsActive & 1) && !(ci & 1)) {
@@ -432,8 +434,8 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 
 
 status_t
-AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax,
-	const void *data, size_t dataSize)
+AHCIPort::FillPrdTable(volatile prd* prdTable, int* prdCount, int prdMax,
+	const void* data, size_t dataSize)
 {
 	int maxEntries = prdMax + 1;
 	physical_entry entries[maxEntries];
@@ -453,8 +455,8 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax,
 
 
 status_t
-AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax,
-	const physical_entry *sgTable, int sgCount, size_t dataSize)
+AHCIPort::FillPrdTable(volatile prd* prdTable, int* prdCount, int prdMax,
+	const physical_entry* sgTable, int sgCount, size_t dataSize)
 {
 	*prdCount = 0;
 	while (sgCount > 0 && dataSize > 0) {
@@ -510,7 +512,7 @@ AHCIPort::StartTransfer()
 
 
 status_t
-AHCIPort::WaitForTransfer(int *tfd, bigtime_t timeout)
+AHCIPort::WaitForTransfer(int* tfd, bigtime_t timeout)
 {
 	status_t result = acquire_sem_etc(fResponseSem, 1, B_RELATIVE_TIMEOUT,
 		timeout);
@@ -541,7 +543,7 @@ AHCIPort::FinishTransfer()
 
 
 void
-AHCIPort::ScsiTestUnitReady(scsi_ccb *request)
+AHCIPort::ScsiTestUnitReady(scsi_ccb* request)
 {
 	TRACE("AHCIPort::ScsiTestUnitReady port %d\n", fIndex);
 	request->subsys_status = SCSI_REQ_CMP;
@@ -550,17 +552,18 @@ AHCIPort::ScsiTestUnitReady(scsi_ccb *request)
 
 
 void
-AHCIPort::ScsiInquiry(scsi_ccb *request)
+AHCIPort::ScsiInquiry(scsi_ccb* request)
 {
 	TRACE("AHCIPort::ScsiInquiry port %d\n", fIndex);
 
-	const scsi_cmd_inquiry *cmd = (const scsi_cmd_inquiry *)request->cdb;
+	const scsi_cmd_inquiry* cmd = (const scsi_cmd_inquiry*)request->cdb;
 	scsi_res_inquiry scsiData;
 	ata_device_infoblock ataData;
 
 	ASSERT(sizeof(ataData) == 512);
 
-	if (cmd->evpd || cmd->page_code || request->data_length < sizeof(scsiData)) {
+	if (cmd->evpd || cmd->page_code
+		|| request->data_length < sizeof(scsiData)) {
 		TRACE("invalid request\n");
 		request->subsys_status = SCSI_REQ_ABORTED;
 		gSCSI->finished(request, 1);
@@ -582,7 +585,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	}
 
 /*
-	uint8 *data = (uint8*) &ataData;
+	uint8* data = (uint8*) &ataData;
 	for (int i = 0; i < 512; i += 8) {
 		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1],
 			data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
@@ -666,11 +669,11 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 
 void
-AHCIPort::ScsiSynchronizeCache(scsi_ccb *request)
+AHCIPort::ScsiSynchronizeCache(scsi_ccb* request)
 {
 	//TRACE("AHCIPort::ScsiSynchronizeCache port %d\n", fIndex);
 
-	sata_request *sreq = new(std::nothrow) sata_request(request);
+	sata_request* sreq = new(std::nothrow) sata_request(request);
 	if (sreq == NULL) {
 		TRACE("out of memory when allocating sync request\n");
 		request->subsys_status = SCSI_REQ_ABORTED;
@@ -685,11 +688,12 @@ AHCIPort::ScsiSynchronizeCache(scsi_ccb *request)
 
 
 void
-AHCIPort::ScsiReadCapacity(scsi_ccb *request)
+AHCIPort::ScsiReadCapacity(scsi_ccb* request)
 {
 	TRACE("AHCIPort::ScsiReadCapacity port %d\n", fIndex);
 
-	const scsi_cmd_read_capacity *cmd = (const scsi_cmd_read_capacity *)request->cdb;
+	const scsi_cmd_read_capacity* cmd
+		= (const scsi_cmd_read_capacity*)request->cdb;
 	scsi_res_read_capacity scsiData;
 
 	if (cmd->pmi || cmd->lba || request->data_length < sizeof(scsiData)) {
@@ -721,11 +725,10 @@ AHCIPort::ScsiReadCapacity(scsi_ccb *request)
 
 
 void
-AHCIPort::ScsiReadCapacity16(scsi_ccb *request)
+AHCIPort::ScsiReadCapacity16(scsi_ccb* request)
 {
 	TRACE("AHCIPort::ScsiReadCapacity16 port %d\n", fIndex);
 
-	//const scsi_cmd_read_capacity_long *cmd = (const scsi_cmd_read_capacity_long *)request->cdb;
 	scsi_res_read_capacity_long scsiData;
 
 	TRACE("SectorSize %" B_PRIu32 ", SectorCount 0x%" B_PRIx64 "\n",
@@ -746,7 +749,7 @@ AHCIPort::ScsiReadCapacity16(scsi_ccb *request)
 
 
 void
-AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount,
+AHCIPort::ScsiReadWrite(scsi_ccb* request, uint64 lba, size_t sectorCount,
 	bool isWrite)
 {
 	RWTRACE("[%lld] %ld ScsiReadWrite: position %llu, size %lu, isWrite %d\n",
@@ -764,7 +767,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount,
 #endif
 
 	ASSERT(request->data_length == sectorCount * 512);
-	sata_request *sreq = new(std::nothrow) sata_request(request);
+	sata_request* sreq = new(std::nothrow) sata_request(request);
 	if (sreq == NULL) {
 		TRACE("out of memory when allocating read/write request\n");
 		request->subsys_status = SCSI_REQ_ABORTED;
@@ -813,8 +816,7 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 	}
 
 	uint32 lbaRangesSize = lbaRangeCount * sizeof(uint64);
-	uint64* lbaRanges
-		= (uint64*)malloc(lbaRangesSize);
+	uint64* lbaRanges = (uint64*)malloc(lbaRangesSize);
 	if (lbaRanges == NULL) {
 		TRACE("out of memory when allocating %" B_PRIu32 " unmap ranges\n",
 			lbaRangeCount);
@@ -859,7 +861,7 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 
 
 void
-AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
+AHCIPort::ExecuteSataRequest(sata_request* request, bool isWrite)
 {
 	FLOW("ExecuteAtaRequest port %d\n", fIndex);
 
@@ -881,13 +883,13 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 
 	fCommandList->prdtl_flags_cfl = 0;
 	fCommandList->cfl = 5; // 20 bytes, length in DWORDS
-	memcpy((char *)fCommandTable->cfis, request->fis(), 20);
+	memcpy((char*)fCommandTable->cfis, request->fis(), 20);
 
 	fTestUnitReadyActive = request->is_test_unit_ready();
 	if (request->is_atapi()) {
 		// ATAPI PACKET is a 12 or 16 byte SCSI command
-		memset((char *)fCommandTable->acmd, 0, 32);
-		memcpy((char *)fCommandTable->acmd, request->ccb()->cdb,
+		memset((char*)fCommandTable->acmd, 0, 32);
+		memcpy((char*)fCommandTable->acmd, request->ccb()->cdb,
 			request->ccb()->cdb_length);
 		fCommandList->a = 1;
 	}
@@ -954,7 +956,7 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 
 
 void
-AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
+AHCIPort::ScsiExecuteRequest(scsi_ccb* request)
 {
 //	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
@@ -977,7 +979,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 
 //		TRACE("AHCIPort::ScsiExecuteRequest ATAPI: port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
-		sata_request *sreq = new(std::nothrow) sata_request(request);
+		sata_request* sreq = new(std::nothrow) sata_request(request);
 		if (sreq == NULL) {
 			TRACE("out of memory when allocating atapi request\n");
 			request->subsys_status = SCSI_REQ_ABORTED;
@@ -986,7 +988,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		}
 
 		sreq->set_atapi_cmd(request->data_length);
-//		uint8 *data = (uint8*) sreq->ccb()->cdb;
+//		uint8* data = (uint8*) sreq->ccb()->cdb;
 //		for (int i = 0; i < 16; i += 8) {
 //			TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
 //		}
@@ -1032,7 +1034,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		case SCSI_OP_READ_6:
 		case SCSI_OP_WRITE_6:
 		{
-			const scsi_cmd_rw_6 *cmd = (const scsi_cmd_rw_6 *)request->cdb;
+			const scsi_cmd_rw_6* cmd = (const scsi_cmd_rw_6*)request->cdb;
 			uint32 position = ((uint32)cmd->high_lba << 16)
 				| ((uint32)cmd->mid_lba << 8) | (uint32)cmd->low_lba;
 			size_t length = cmd->length != 0 ? cmd->length : 256;
@@ -1043,7 +1045,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		case SCSI_OP_READ_10:
 		case SCSI_OP_WRITE_10:
 		{
-			const scsi_cmd_rw_10 *cmd = (const scsi_cmd_rw_10 *)request->cdb;
+			const scsi_cmd_rw_10* cmd = (const scsi_cmd_rw_10*)request->cdb;
 			uint32 position = B_BENDIAN_TO_HOST_INT32(cmd->lba);
 			size_t length = B_BENDIAN_TO_HOST_INT16(cmd->length);
 			bool isWrite = request->cdb[0] == SCSI_OP_WRITE_10;
@@ -1060,7 +1062,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		case SCSI_OP_READ_12:
 		case SCSI_OP_WRITE_12:
 		{
-			const scsi_cmd_rw_12 *cmd = (const scsi_cmd_rw_12 *)request->cdb;
+			const scsi_cmd_rw_12* cmd = (const scsi_cmd_rw_12*)request->cdb;
 			uint32 position = B_BENDIAN_TO_HOST_INT32(cmd->lba);
 			size_t length = B_BENDIAN_TO_HOST_INT32(cmd->length);
 			bool isWrite = request->cdb[0] == SCSI_OP_WRITE_12;
@@ -1077,7 +1079,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		case SCSI_OP_READ_16:
 		case SCSI_OP_WRITE_16:
 		{
-			const scsi_cmd_rw_16 *cmd = (const scsi_cmd_rw_16 *)request->cdb;
+			const scsi_cmd_rw_16* cmd = (const scsi_cmd_rw_16*)request->cdb;
 			uint64 position = B_BENDIAN_TO_HOST_INT64(cmd->lba);
 			size_t length = B_BENDIAN_TO_HOST_INT32(cmd->length);
 			bool isWrite = request->cdb[0] == SCSI_OP_WRITE_16;
@@ -1128,14 +1130,14 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 
 
 uchar
-AHCIPort::ScsiAbortRequest(scsi_ccb *request)
+AHCIPort::ScsiAbortRequest(scsi_ccb* request)
 {
 	return SCSI_REQ_CMP;
 }
 
 
 uchar
-AHCIPort::ScsiTerminateRequest(scsi_ccb *request)
+AHCIPort::ScsiTerminateRequest(scsi_ccb* request)
 {
 	return SCSI_REQ_CMP;
 }
@@ -1149,12 +1151,13 @@ AHCIPort::ScsiResetDevice()
 
 
 void
-AHCIPort::ScsiGetRestrictions(bool *isATAPI, bool *noAutoSense,
-	uint32 *maxBlocks)
+AHCIPort::ScsiGetRestrictions(bool* isATAPI, bool* noAutoSense,
+	uint32* maxBlocks)
 {
 	*isATAPI = fIsATAPI;
 	*noAutoSense = fIsATAPI; // emulated auto sense for ATA, but not ATAPI
 	*maxBlocks = fUse48BitCommands ? 65536 : 256;
 	TRACE("AHCIPort::ScsiGetRestrictions port %d: isATAPI %d, noAutoSense %d, "
-		"maxBlocks %" B_PRIu32 "\n", fIndex, *isATAPI, *noAutoSense, *maxBlocks);
+		"maxBlocks %" B_PRIu32 "\n", fIndex, *isATAPI, *noAutoSense,
+		*maxBlocks);
 }

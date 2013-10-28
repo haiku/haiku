@@ -59,6 +59,7 @@ sata_request::set_ata_cmd(uint8 command)
 	memset(fFis, 0, sizeof(fFis));
 	fFis[0] = FIS_TYPE_REGISTER_HOST_TO_DEVICE;
 	fFis[1] = 0x80;
+		// This is a command
 	fFis[2] = command;
 }
 
@@ -71,6 +72,7 @@ sata_request::set_ata28_cmd(uint8 command, uint32 lba, uint8 sectorCount)
 	fFis[5] = (lba >> 8) & 0xff;
 	fFis[6] = (lba >> 16) & 0xff;
 	fFis[7] = 0x40 | ((lba >> 24) & 0x0f);
+		// device
 	fFis[12] = sectorCount & 0xff;
 }
 
@@ -83,6 +85,7 @@ sata_request::set_ata48_cmd(uint8 command, uint64 lba, uint16 sectorCount)
 	fFis[5] = (lba >> 8) & 0xff;
 	fFis[6] = (lba >> 16) & 0xff;
 	fFis[7] = 0x40;
+		// device
 	fFis[8] = (lba >> 24) & 0xff;
 	fFis[9] = (lba >> 32) & 0xff;
 	fFis[10] = (lba >> 40) & 0xff;
