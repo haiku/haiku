@@ -839,7 +839,8 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 	}
 
 	sata_request sreq;
-	sreq.set_ata_cmd(ATA_COMMAND_DATA_SET_MANAGEMENT);
+	sreq.set_ata48_cmd(ATA_COMMAND_DATA_SET_MANAGEMENT, 0,
+		(lbaRangesSize + 511) / 512);
 	sreq.set_data(lbaRanges, lbaRangesSize);
 
 	ExecuteSataRequest(&sreq);
