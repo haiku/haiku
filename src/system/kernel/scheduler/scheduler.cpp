@@ -57,8 +57,9 @@ const bigtime_t kMinimalWaitTime = kThreadQuantum / 4;
 const bigtime_t kCacheExpire = 100000;
 
 const bigtime_t kHighLoad = 600;
+const int kLoadDifference = 200;
 
-static int sDisableSmallTaskPacking;
+static bigtime_t sDisableSmallTaskPacking;
 static int32 sSmallTaskCore;
 
 static bool sSingleCore;
@@ -66,6 +67,7 @@ static bool sSingleCore;
 static scheduler_mode sSchedulerMode;
 
 static int32 (*sChooseCore)(Thread* thread);
+static bool (*sShouldRebalance)(Thread* thread);
 
 
 // Heaps in sCPUPriorityHeaps are used for load balancing on a core the logical
@@ -560,16 +562,24 @@ update_load_heaps(int32 core)
 }
 
 
+static inline bool
+is_small_task_packing_enabled(void)
+{
+	if (sDisableSmallTaskPacking == -1)
+		return false;
+	return sDisableSmallTaskPacking < system_time();
+}
+
+
 static inline void
 disable_small_task_packing(void)
 {
 	ASSERT(!sSingleCore);
 
-	ASSERT(sDisableSmallTaskPacking == 0);
+	ASSERT(is_small_task_packing_enabled());
 	ASSERT(sSmallTaskCore == sCPUToCore[smp_get_current_cpu()]);
 
-//	ASSERT(sAssignedThreads > 0);
-//	sDisableSmallTaskPacking = sAssignedThreads * 64;
+	sDisableSmallTaskPacking = system_time() + kThreadQuantum * 100;
 	sSmallTaskCore = -1;
 }
 
@@ -726,9 +736,7 @@ choose_core_performance(Thread* thread)
 static inline bool
 is_task_small(Thread* thread)
 {
-	int32 priority = get_effective_priority(thread);
-	int32 penalty = thread->scheduler_data->priority_penalty;
-	return penalty < 2 || priority >= B_DISPLAY_PRIORITY;
+	return thread->scheduler_data->load <= 200;
 }
 
 
@@ -739,10 +747,7 @@ choose_core_power_saving(Thread* thread)
 
 	int32 priority = get_effective_priority(thread);
 
-	if (sDisableSmallTaskPacking > 0)
-		sDisableSmallTaskPacking--;
-
-	if (!sDisableSmallTaskPacking && is_task_small(thread)
+	if (is_small_task_packing_enabled() && is_task_small(thread)
 		&& sCoreLoadHeap->PeekMaximum() != NULL) {
 		// try to pack all threads on one core
 		if (sSmallTaskCore < 0)
@@ -791,9 +796,38 @@ choose_cpu(int32 core)
 
 
 static bool
-should_rebalance(Thread* thread)
+should_rebalance_performance(Thread* thread)
 {
-#if 0
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+	ASSERT(schedulerThreadData->previous_core >= 0);
+
+	CoreEntry* coreEntry = &sCoreEntries[schedulerThreadData->previous_core];
+
+	// If the thread produces more than 50% of the load, leave it here. In
+	// such situation it is better to move other threads away.
+	if (schedulerThreadData->load >= coreEntry->fLoad / 2)
+		return false;
+
+	// If there is high load on this core but this thread does not contribute
+	// significantly consider giving it to someone less busy.
+	if (coreEntry->fLoad > kHighLoad) {
+		CoreEntry* other = sCoreLoadHeap->PeekMinimum();
+		if (other != NULL && coreEntry->fLoad - other->fLoad >= kLoadDifference)
+			return true;
+	}
+
+	// No cpu bound threads - the situation is quite good. Make sure it
+	// won't get much worse...
+	CoreEntry* other = sCoreLoadHeap->PeekMinimum();
+	if (other == NULL)
+		other = sCoreHighLoadHeap->PeekMinimum();
+	return coreEntry->fLoad - other->fLoad >= kLoadDifference * 2;
+}
+
+
+static bool
+should_rebalance_power_saving(Thread* thread)
+{
 	ASSERT(!sSingleCore);
 
 	if (thread_is_idle_thread(thread))
@@ -802,49 +836,47 @@ should_rebalance(Thread* thread)
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 	ASSERT(schedulerThreadData->previous_core >= 0);
 
-	CoreEntry* coreEntry = &sCoreEntries[schedulerThreadData->previous_core];
+	int32 core = schedulerThreadData->previous_core;
+	CoreEntry* coreEntry = &sCoreEntries[core];
 
-	// If this is a cpu bound thread and we have significantly more such threads
-	//  than the average get rid of this one.
-	if (schedulerThreadData->additional_penalty != 0) {
-		int32 averageCPUBound = sCPUBoundThreads / sRunQueueCount;
-		return coreEntry->fCPUBoundThreads - averageCPUBound > 1;
-	}
-
-	// If this thread is not cpu bound but we have at least one consider giving
-	// this one to someone less busy.
-	int32 averageThread = sAssignedThreads / sRunQueueCount;
-	if (coreEntry->fCPUBoundThreads > 0) {
-		CoreEntry* other = sCoreThreadHeap->PeekMinimum();
-		if (other != NULL
-			&& CoreThreadHeap::GetKey(other) <= averageThread) {
-			return true;
-		}
-	}
-
-	int32 threadsAboveAverage = coreEntry->fThreads - averageThread;
+	// If the thread produces more than 50% of the load, leave it here. In
+	// such situation it is better to move other threads away.
+	// Unless we are trying to pack small tasks here, in such case get rid
+	// of CPU hungry thread and continue packing.
+	if (schedulerThreadData->load >= coreEntry->fLoad / 2)
+		return is_small_task_packing_enabled() && sSmallTaskCore == core;
 
 	// All cores try to give us small tasks, check whether we have enough.
-	const int kSmallTaskCountThreshold = 5;
-	if (sDisableSmallTaskPacking == 0 && sSmallTaskCore == coreEntry->fCoreID) {
-		if (threadsAboveAverage > kSmallTaskCountThreshold) {
+	if (is_small_task_packing_enabled() && sSmallTaskCore == core) {
+		if (coreEntry->fLoad > kHighLoad) {
 			if (!is_task_small(thread))
 				return true;
-		} else if (threadsAboveAverage > 2 * kSmallTaskCountThreshold) {
+		} else if (coreEntry->fLoad > (kHighLoad + 1000) / 2)
 			disable_small_task_packing();
-		}
 	}
 
-	// Try our luck at small task packing.
-	if (sDisableSmallTaskPacking == 0 && is_task_small(thread))
-		return sSmallTaskCore != coreEntry->fCoreID;
+	// Try small task packing.
+	if (is_small_task_packing_enabled() && is_task_small(thread))
+		return sSmallTaskCore != core;
 
 	// No cpu bound threads - the situation is quite good. Make sure it
 	// won't get much worse...
-	const int32 kBalanceThreshold = 3;
-	return threadsAboveAverage > kBalanceThreshold;
-#endif
-	return false;
+	CoreEntry* other = sCoreLoadHeap->PeekMinimum();
+	if (other == NULL)
+		other = sCoreHighLoadHeap->PeekMinimum();
+	return coreEntry->fLoad - other->fLoad >= kLoadDifference;
+}
+
+
+static bool
+should_rebalance(Thread* thread)
+{
+	ASSERT(!sSingleCore);
+
+	if (thread_is_idle_thread(thread))
+		return false;
+
+	return sShouldRebalance(thread);
 }
 
 
@@ -1526,12 +1558,14 @@ scheduler_set_operation_mode(scheduler_mode mode)
 			sDisableSmallTaskPacking = -1;
 			sSmallTaskCore = -1;
 			sChooseCore = choose_core_performance;
+			sShouldRebalance = should_rebalance_performance;
 			break;
 
 		case SCHEDULER_MODE_POWER_SAVING:
 			sDisableSmallTaskPacking = 0;
 			sSmallTaskCore = -1;
 			sChooseCore = choose_core_power_saving;
+			sShouldRebalance = should_rebalance_power_saving;
 			break;
 
 		default:
