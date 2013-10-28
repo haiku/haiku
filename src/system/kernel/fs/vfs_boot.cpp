@@ -222,6 +222,11 @@ DiskBootMethod::IsBootDevice(KDiskDevice* device, bool strict)
 			if (strict && device->Size() != disk->device.unknown.size)
 				return false;
 
+			// Skip the check sum test for CDs, since we didn't read anything
+			// useful from the disk in the boot loader.
+			if (fMethod == BOOT_METHOD_CD)
+				break;
+
 			// check if the check sums match, too
 			for (int32 i = 0; i < NUM_DISK_CHECK_SUMS; i++) {
 				if (disk->device.unknown.check_sums[i].offset == -1)
