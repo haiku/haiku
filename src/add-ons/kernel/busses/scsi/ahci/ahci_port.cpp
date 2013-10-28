@@ -802,14 +802,6 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 {
 	TRACE("%s unimplemented: TRIM call\n", __func__);
 
-	sata_request* sreq = new(std::nothrow) sata_request();
-	if (sreq == NULL) {
-		TRACE("out of memory when allocating unmap request\n");
-		request->subsys_status = SCSI_REQ_ABORTED;
-		gSCSI->finished(request, 1);
-		return;
-	}
-
 	// Determine how many ranges we'll need
 	// We assume that the SCSI unmap ranges cannot be merged together
 	uint32 scsiRangeCount = unmapBlocks->block_data_length
@@ -846,19 +838,26 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 		}
 	}
 
-	sreq->set_ata_cmd(ATA_COMMAND_DATA_SET_MANAGEMENT);
-	sreq->set_data(lbaRanges, lbaRangesSize);
+	sata_request sreq;
+	sreq.set_ata_cmd(ATA_COMMAND_DATA_SET_MANAGEMENT);
+	sreq.set_data(lbaRanges, lbaRangesSize);
 
-	bool success = ExecuteSataRequest(sreq);
+	ExecuteSataRequest(&sreq);
+	sreq.wait_for_completion();
+
+	if ((sreq.completion_status() & ATA_ERR) != 0) {
+		TRACE("trim failed (%" B_PRIu32 " ranges)!", lbaRangeCount);
+		request->subsys_status = SCSI_REQ_CMP_ERR;
+	} else
+		request->subsys_status = SCSI_REQ_CMP;
 
 	request->data_resid = 0;
 	request->device_status = SCSI_STATUS_GOOD;
-	request->subsys_status = success ? SCSI_REQ_CMP : SCSI_REQ_CMP_ERR;
 	gSCSI->finished(request, 1);
 }
 
 
-bool
+void
 AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 {
 	FLOW("ExecuteAtaRequest port %d\n", fIndex);
@@ -902,7 +901,7 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 		ResetPort();
 		FinishTransfer();
 		request->abort();
-		return false;
+		return;
 	}
 
 	cpu_status cpu = disable_interrupts();
@@ -946,11 +945,10 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 	if (status == B_TIMED_OUT) {
 		TRACE("ExecuteAtaRequest port %d: device timeout\n", fIndex);
 		request->abort();
-		return false;
+		return;
 	}
 
 	request->finish(tfd, bytesTransfered);
-	return true;
 }
 
 
