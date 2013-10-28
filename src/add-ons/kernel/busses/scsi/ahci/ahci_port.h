@@ -39,7 +39,7 @@ private:
 	void		ScsiUnmap(scsi_ccb* request,
 					struct scsi_unmap_parameter_list* unmapBlocks);
 
-	void		ExecuteSataRequest(sata_request *request, bool isWrite = false);
+	bool		ExecuteSataRequest(sata_request *request, bool isWrite = false);
 
 	void		ResetDevice();
 	status_t	ResetPort(bool forceDeviceReset = false);

@@ -15,6 +15,7 @@
 
 #include <ATACommands.h>
 #include <ATAInfoBlock.h>
+#include <AutoDeleter.h>
 
 #include "ahci_controller.h"
 #include "ahci_tracing.h"
@@ -801,7 +802,7 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 {
 	TRACE("%s unimplemented: TRIM call\n", __func__);
 
-	sata_request* sreq = new(std::nothrow) sata_request(request);
+	sata_request* sreq = new(std::nothrow) sata_request();
 	if (sreq == NULL) {
 		TRACE("out of memory when allocating unmap request\n");
 		request->subsys_status = SCSI_REQ_ABORTED;
@@ -809,12 +810,55 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 		return;
 	}
 
+	// Determine how many ranges we'll need
+	// We assume that the SCSI unmap ranges cannot be merged together
+	uint32 scsiRangeCount = unmapBlocks->block_data_length
+		/ sizeof(scsi_unmap_block_descriptor);
+	uint32 lbaRangeCount = 0;
+	for (uint32 i = 0; i < scsiRangeCount; i++) {
+		lbaRangeCount += ((uint32)B_BENDIAN_TO_HOST_INT32(
+			unmapBlocks->blocks[i].block_count) + 65534) / 65535;
+	}
+
+	uint32 lbaRangesSize = lbaRangeCount * sizeof(uint64);
+	uint64* lbaRanges
+		= (uint64*)malloc(lbaRangesSize);
+	if (lbaRanges == NULL) {
+		TRACE("out of memory when allocating %" B_PRIu32 " unmap ranges\n",
+			lbaRangeCount);
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
+		return;
+	}
+
+	MemoryDeleter deleter(lbaRanges);
+
+	for (uint32 i = 0, scsiIndex = 0; scsiIndex < scsiRangeCount; scsiIndex++) {
+		uint64 lba = (uint64)B_BENDIAN_TO_HOST_INT64(
+			unmapBlocks->blocks[scsiIndex].lba);
+		uint64 bytesLeft = (uint32)B_BENDIAN_TO_HOST_INT32(
+			unmapBlocks->blocks[scsiIndex].block_count);
+		while (bytesLeft > 0) {
+			uint16 blocks = bytesLeft > 65535 ? 65535 : (uint16)bytesLeft;
+			lbaRanges[i++] = B_HOST_TO_LENDIAN_INT64(
+				((uint64)blocks << 48) | lba);
+			lba += blocks;
+		}
+	}
+
 	sreq->set_ata_cmd(ATA_COMMAND_DATA_SET_MANAGEMENT);
-	delete sreq;
+	sreq->set_data(lbaRanges, lbaRangesSize);
+
+	bool success = ExecuteSataRequest(sreq);
+
+	request->data_resid = 0;
+	request->device_status = SCSI_STATUS_GOOD;
+	request->subsys_status = success ? SCSI_REQ_CMP : SCSI_REQ_CMP_ERR;
+	gSCSI->finished(request, 1);
 }
 
 
-void
+bool
 AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 {
 	FLOW("ExecuteAtaRequest port %d\n", fIndex);
@@ -858,7 +902,7 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 		ResetPort();
 		FinishTransfer();
 		request->abort();
-		return;
+		return false;
 	}
 
 	cpu_status cpu = disable_interrupts();
@@ -902,9 +946,11 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 	if (status == B_TIMED_OUT) {
 		TRACE("ExecuteAtaRequest port %d: device timeout\n", fIndex);
 		request->abort();
-	} else {
-		request->finish(tfd, bytesTransfered);
+		return false;
 	}
+
+	request->finish(tfd, bytesTransfered);
+	return true;
 }
 
 
