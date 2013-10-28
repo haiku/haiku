@@ -30,7 +30,7 @@ struct vregs
 	ulong r14;	/* link register */
 	ulong r15;	/* program counter */
 	ulong cpsr;
-#warning ARM: fix floats in vregs, add missing stuff.
+// TODO: ARM: fix floats in vregs, add missing stuff.
 };
 #endif /* __ARM__ */
 
