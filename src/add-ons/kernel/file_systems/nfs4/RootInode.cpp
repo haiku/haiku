@@ -206,7 +206,7 @@ RootInode::GetLocations(AttrValue** attrv)
 		if (result != B_OK)
 			return result;
 		if (count < 1) {
-			delete *attrv;
+			delete[] *attrv;
 			return B_ERROR;
 		}
 
