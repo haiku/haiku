@@ -837,12 +837,14 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 			lbaRanges[i++] = B_HOST_TO_LENDIAN_INT64(
 				((uint64)blocks << 48) | lba);
 			lba += blocks;
+			bytesLeft -= blocks;
 		}
 	}
 
 	sata_request sreq;
 	sreq.set_ata48_cmd(ATA_COMMAND_DATA_SET_MANAGEMENT, 0,
 		(lbaRangesSize + 511) / 512);
+	sreq.SetFeature(1);
 	sreq.set_data(lbaRanges, lbaRangesSize);
 
 	ExecuteSataRequest(&sreq);

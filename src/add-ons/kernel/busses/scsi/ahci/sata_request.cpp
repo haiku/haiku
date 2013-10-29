@@ -95,6 +95,14 @@ sata_request::set_ata48_cmd(uint8 command, uint64 lba, uint16 sectorCount)
 
 
 void
+sata_request::SetFeature(uint16 feature)
+{
+	fFis[3] = (uint8)(feature & 0xff);
+	fFis[11] = (uint8)(feature >> 8);
+}
+
+
+void
 sata_request::set_atapi_cmd(size_t transferLength)
 {
 	fIsATAPI = true;
