@@ -571,13 +571,13 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 	}
 
 	sata_request sreq;
-	sreq.set_data(&ataData, sizeof(ataData));
-	sreq.set_ata_cmd(fIsATAPI
+	sreq.SetData(&ataData, sizeof(ataData));
+	sreq.SetATACommand(fIsATAPI
 		? ATA_COMMAND_IDENTIFY_PACKET_DEVICE : ATA_COMMAND_IDENTIFY_DEVICE);
 	ExecuteSataRequest(&sreq);
-	sreq.wait_for_completion();
+	sreq.WaitForCompletion();
 
-	if (sreq.completion_status() & ATA_ERR) {
+	if ((sreq.CompletionStatus() & ATA_ERR) != 0) {
 		TRACE("identify device failed\n");
 		request->subsys_status = SCSI_REQ_CMP_ERR;
 		gSCSI->finished(request, 1);
@@ -585,7 +585,7 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 	}
 
 /*
-	uint8* data = (uint8*) &ataData;
+	uint8* data = (uint8*)&ataData;
 	for (int i = 0; i < 512; i += 8) {
 		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1],
 			data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
@@ -681,7 +681,7 @@ AHCIPort::ScsiSynchronizeCache(scsi_ccb* request)
 		return;
 	}
 
-	sreq->set_ata_cmd(fUse48BitCommands
+	sreq->SetATACommand(fUse48BitCommands
 		? ATA_COMMAND_FLUSH_CACHE_EXT : ATA_COMMAND_FLUSH_CACHE);
 	ExecuteSataRequest(sreq);
 }
@@ -782,7 +782,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb* request, uint64 lba, size_t sectorCount,
 		}
 		if (lba > MAX_SECTOR_LBA_48)
 			panic("achi: ScsiReadWrite position too large for 48-bit LBA\n");
-		sreq->set_ata48_cmd(
+		sreq->SetATA48Command(
 			isWrite ? ATA_COMMAND_WRITE_DMA_EXT : ATA_COMMAND_READ_DMA_EXT,
 			lba, sectorCount);
 	} else {
@@ -792,7 +792,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb* request, uint64 lba, size_t sectorCount,
 		}
 		if (lba > MAX_SECTOR_LBA_28)
 			panic("achi: ScsiReadWrite position too large for normal LBA\n");
-		sreq->set_ata28_cmd(isWrite
+		sreq->SetATA28Command(isWrite
 			? ATA_COMMAND_WRITE_DMA : ATA_COMMAND_READ_DMA, lba, sectorCount);
 	}
 
@@ -842,15 +842,15 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 	}
 
 	sata_request sreq;
-	sreq.set_ata48_cmd(ATA_COMMAND_DATA_SET_MANAGEMENT, 0,
+	sreq.SetATA48Command(ATA_COMMAND_DATA_SET_MANAGEMENT, 0,
 		(lbaRangesSize + 511) / 512);
 	sreq.SetFeature(1);
-	sreq.set_data(lbaRanges, lbaRangesSize);
+	sreq.SetData(lbaRanges, lbaRangesSize);
 
 	ExecuteSataRequest(&sreq);
-	sreq.wait_for_completion();
+	sreq.WaitForCompletion();
 
-	if ((sreq.completion_status() & ATA_ERR) != 0) {
+	if ((sreq.CompletionStatus() & ATA_ERR) != 0) {
 		TRACE("trim failed (%" B_PRIu32 " ranges)!", lbaRangeCount);
 		request->subsys_status = SCSI_REQ_CMP_ERR;
 	} else
@@ -871,13 +871,13 @@ AHCIPort::ExecuteSataRequest(sata_request* request, bool isWrite)
 
 	int prdEntrys;
 
-	if (request->ccb() && request->ccb()->data_length) {
+	if (request->CCB() && request->CCB()->data_length) {
 		FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT,
-			request->ccb()->sg_list, request->ccb()->sg_count,
-			request->ccb()->data_length);
-	} else if (request->data() && request->size()) {
+			request->CCB()->sg_list, request->CCB()->sg_count,
+			request->CCB()->data_length);
+	} else if (request->Data() && request->Size()) {
 		FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT,
-			request->data(), request->size());
+			request->Data(), request->Size());
 	} else
 		prdEntrys = 0;
 
@@ -885,14 +885,14 @@ AHCIPort::ExecuteSataRequest(sata_request* request, bool isWrite)
 
 	fCommandList->prdtl_flags_cfl = 0;
 	fCommandList->cfl = 5; // 20 bytes, length in DWORDS
-	memcpy((char*)fCommandTable->cfis, request->fis(), 20);
+	memcpy((char*)fCommandTable->cfis, request->FIS(), 20);
 
-	fTestUnitReadyActive = request->is_test_unit_ready();
-	if (request->is_atapi()) {
+	fTestUnitReadyActive = request->IsTestUnitReady();
+	if (request->IsATAPI()) {
 		// ATAPI PACKET is a 12 or 16 byte SCSI command
 		memset((char*)fCommandTable->acmd, 0, 32);
-		memcpy((char*)fCommandTable->acmd, request->ccb()->cdb,
-			request->ccb()->cdb_length);
+		memcpy((char*)fCommandTable->acmd, request->CCB()->cdb,
+			request->CCB()->cdb_length);
 		fCommandList->a = 1;
 	}
 
@@ -905,7 +905,7 @@ AHCIPort::ExecuteSataRequest(sata_request* request, bool isWrite)
 		TRACE("ExecuteAtaRequest port %d: device is busy\n", fIndex);
 		ResetPort();
 		FinishTransfer();
-		request->abort();
+		request->Abort();
 		return;
 	}
 
@@ -949,11 +949,11 @@ AHCIPort::ExecuteSataRequest(sata_request* request, bool isWrite)
 
 	if (status == B_TIMED_OUT) {
 		TRACE("ExecuteAtaRequest port %d: device timeout\n", fIndex);
-		request->abort();
+		request->Abort();
 		return;
 	}
 
-	request->finish(tfd, bytesTransfered);
+	request->Finish(tfd, bytesTransfered);
 }
 
 
@@ -989,7 +989,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb* request)
 			return;
 		}
 
-		sreq->set_atapi_cmd(request->data_length);
+		sreq->SetATAPICommand(request->data_length);
 //		uint8* data = (uint8*) sreq->ccb()->cdb;
 //		for (int i = 0; i < 16; i += 8) {
 //			TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);

@@ -25,7 +25,7 @@ sata_request::sata_request()
 }
 
 
-sata_request::sata_request(scsi_ccb *ccb)
+sata_request::sata_request(scsi_ccb* ccb)
 	:
 	fCcb(ccb),
 	fIsATAPI(false),
@@ -45,16 +45,16 @@ sata_request::~sata_request()
 
 
 void
-sata_request::set_data(void *data, size_t dataSize)
+sata_request::SetData(void* data, size_t dataSize)
 {
-	if (fCcb) panic("wrong usage");
- 	fData = data;
- 	fDataSize = dataSize;
+	ASSERT(fCcb == NULL);
+	fData = data;
+	fDataSize = dataSize;
 }
 
 
 void
-sata_request::set_ata_cmd(uint8 command)
+sata_request::SetATACommand(uint8 command)
 {
 	memset(fFis, 0, sizeof(fFis));
 	fFis[0] = FIS_TYPE_REGISTER_HOST_TO_DEVICE;
@@ -65,9 +65,9 @@ sata_request::set_ata_cmd(uint8 command)
 
 
 void
-sata_request::set_ata28_cmd(uint8 command, uint32 lba, uint8 sectorCount)
+sata_request::SetATA28Command(uint8 command, uint32 lba, uint8 sectorCount)
 {
-	set_ata_cmd(command);
+	SetATACommand(command);
 	fFis[4] = lba & 0xff;
 	fFis[5] = (lba >> 8) & 0xff;
 	fFis[6] = (lba >> 16) & 0xff;
@@ -78,9 +78,9 @@ sata_request::set_ata28_cmd(uint8 command, uint32 lba, uint8 sectorCount)
 
 
 void
-sata_request::set_ata48_cmd(uint8 command, uint64 lba, uint16 sectorCount)
+sata_request::SetATA48Command(uint8 command, uint64 lba, uint16 sectorCount)
 {
-	set_ata_cmd(command);
+	SetATACommand(command);
 	fFis[4] = lba & 0xff;
 	fFis[5] = (lba >> 8) & 0xff;
 	fFis[6] = (lba >> 16) & 0xff;
@@ -103,10 +103,10 @@ sata_request::SetFeature(uint16 feature)
 
 
 void
-sata_request::set_atapi_cmd(size_t transferLength)
+sata_request::SetATAPICommand(size_t transferLength)
 {
 	fIsATAPI = true;
-	set_ata_cmd(0xa0);
+	SetATACommand(0xa0);
 	if (1 /* isPIO */) {
 		if (transferLength == 0)
 			transferLength = 2;
@@ -119,13 +119,13 @@ sata_request::set_atapi_cmd(size_t transferLength)
 
 
 void
-sata_request::finish(int tfd, size_t bytesTransfered)
+sata_request::Finish(int tfd, size_t bytesTransfered)
 {
-	if (tfd & (ATA_ERR | ATA_DF)) {
+	if ((tfd & (ATA_ERR | ATA_DF)) != 0) {
 		uint8 status = tfd & 0xff;
 		uint8 error = (tfd >> 8) & 0xff;
 
-		if (!is_test_unit_ready()) {
+		if (!IsTestUnitReady()) {
 			dprintf("ahci: sata_request::finish ATA command 0x%02x failed\n",
 				fFis[2]);
 			dprintf("ahci: sata_request::finish status 0x%02x, error 0x%02x\n",
@@ -140,7 +140,7 @@ sata_request::finish(int tfd, size_t bytesTransfered)
 		if (tfd & (ATA_ERR | ATA_DF)) {
 			fCcb->subsys_status = SCSI_REQ_CMP_ERR;
 			if (fIsATAPI) {
-				if (!is_test_unit_ready()) {
+				if (!IsTestUnitReady()) {
 					dprintf("ahci: sata_request::finish ATAPI packet %02x %02x "
 						"%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x "
 						"%02x %02x %02x %02x (len %d)\n",
@@ -181,10 +181,10 @@ sata_request::finish(int tfd, size_t bytesTransfered)
 
 
 void
-sata_request::abort()
+sata_request::Abort()
 {
 	dprintf("ahci: sata_request::abort called for command 0x%02x\n", fFis[2]);
-	if (fCcb) {
+	if (fCcb != NULL) {
 		fCcb->subsys_status = SCSI_REQ_ABORTED;
 		gSCSI->finished(fCcb, 1);
 		delete this;
@@ -196,16 +196,16 @@ sata_request::abort()
 
 
 void
-sata_request::wait_for_completion()
+sata_request::WaitForCompletion()
 {
-	if (fCcb) panic("wrong usage");
+	ASSERT(fCcb == NULL);
 	acquire_sem(fCompletionSem);
 }
 
 
 int
-sata_request::completion_status()
+sata_request::CompletionStatus()
 {
-	if (fCcb) panic("wrong usage");
+	ASSERT(fCcb == NULL);
 	return fCompletionStatus;
 }

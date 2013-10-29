@@ -5,88 +5,91 @@
 #ifndef _SATA_REQUEST_H
 #define _SATA_REQUEST_H
 
+
 #include "ahci_defs.h"
 #include "scsi_cmds.h"
 
-class sata_request
-{
+
+class sata_request {
 public:
-					sata_request();
-					sata_request(scsi_ccb *ccb);
-					~sata_request();
+								sata_request();
+								sata_request(scsi_ccb* ccb);
+								~sata_request();
 
-	void			set_data(void *data, size_t dataSize);
+			void				SetData(void* data, size_t dataSize);
 
-	void			set_ata_cmd(uint8 command);
-	void			set_ata28_cmd(uint8 command, uint32 lba, uint8 sectorCount);
-	void			set_ata48_cmd(uint8 command, uint64 lba, uint16 sectorCount);
-	void			SetFeature(uint16 feature);
+			void				SetATACommand(uint8 command);
+			void				SetATA28Command(uint8 command, uint32 lba,
+									uint8 sectorCount);
+			void				SetATA48Command(uint8 command, uint64 lba,
+									uint16 sectorCount);
+			void				SetFeature(uint16 feature);
 
-	void			set_atapi_cmd(size_t transferLength);
-	bool 			is_atapi();
-	bool			is_test_unit_ready();
+			void				SetATAPICommand(size_t transferLength);
+			bool				IsATAPI();
+			bool				IsTestUnitReady();
 
-	scsi_ccb *		ccb();
-	const void *	fis();
-	void *			data();
-	int				size();
-	void			finish(int tfd, size_t bytesTransfered);
-	void			abort();
+			scsi_ccb*			CCB();
+			const void*			FIS();
+			void*				Data();
+			int					Size();
+			void				Finish(int tfd, size_t bytesTransfered);
+			void				Abort();
 
-	void			wait_for_completion();
-	int				completion_status();
+			void				WaitForCompletion();
+			int					CompletionStatus();
 
 private:
-	scsi_ccb *		fCcb;
-	uint8			fFis[20];
-	bool			fIsATAPI;
-	sem_id			fCompletionSem;
-	int				fCompletionStatus;
-	void *			fData;
-	size_t			fDataSize;
+			scsi_ccb*			fCcb;
+			uint8				fFis[20];
+			bool				fIsATAPI;
+			sem_id				fCompletionSem;
+			int					fCompletionStatus;
+			void*				fData;
+			size_t				fDataSize;
 };
 
 
-inline scsi_ccb *
-sata_request::ccb()
+inline scsi_ccb*
+sata_request::CCB()
 {
 	return fCcb;
 }
 
 
-inline const void *
-sata_request::fis()
+inline const void*
+sata_request::FIS()
 {
 	return fFis;
 }
 
 
 inline bool
-sata_request::is_atapi()
+sata_request::IsATAPI()
 {
 	return fIsATAPI;
 }
 
 
 inline bool
-sata_request::is_test_unit_ready()
+sata_request::IsTestUnitReady()
 {
 	return fIsATAPI && fCcb != NULL && fCcb->cdb[0] == SCSI_OP_TEST_UNIT_READY;
 }
 
 
-inline void *
-sata_request::data()
+inline void*
+sata_request::Data()
 {
 	return fData;
 }
 
 
 inline int
-sata_request::size()
+sata_request::Size()
 {
 	return fDataSize;
 }
 
 
-#endif
+#endif	/* _SATA_REQUEST_H */
