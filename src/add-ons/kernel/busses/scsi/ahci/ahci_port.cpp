@@ -830,14 +830,14 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 	for (uint32 i = 0, scsiIndex = 0; scsiIndex < scsiRangeCount; scsiIndex++) {
 		uint64 lba = (uint64)B_BENDIAN_TO_HOST_INT64(
 			unmapBlocks->blocks[scsiIndex].lba);
-		uint64 bytesLeft = (uint32)B_BENDIAN_TO_HOST_INT32(
+		uint64 blocksLeft = (uint32)B_BENDIAN_TO_HOST_INT32(
 			unmapBlocks->blocks[scsiIndex].block_count);
-		while (bytesLeft > 0) {
-			uint16 blocks = bytesLeft > 65535 ? 65535 : (uint16)bytesLeft;
+		while (blocksLeft > 0) {
+			uint16 blocks = blocksLeft > 65535 ? 65535 : (uint16)blocksLeft;
 			lbaRanges[i++] = B_HOST_TO_LENDIAN_INT64(
 				((uint64)blocks << 48) | lba);
 			lba += blocks;
-			bytesLeft -= blocks;
+			blocksLeft -= blocks;
 		}
 	}
 
