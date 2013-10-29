@@ -187,6 +187,7 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 	if (result != B_OK)
 		return result;
 	MemoryDeleter pathDeleter(path);
+	MemoryDeleter serverNameDeleter(serverName);
 
 	RPC::Server* server;
 	result = gRPCServerManager->Acquire(&server, resolver, CreateNFS4Server);
@@ -197,7 +198,6 @@ nfs4_mount(fs_volume* volume, const char* device, uint32 flags,
 	FileSystem* fs;
 	result = FileSystem::Mount(&fs, server, serverName, path, volume->id,
 		config);
-	free(serverName);
 	if (result != B_OK) {
 		gRPCServerManager->Release(server);
 		return result;
