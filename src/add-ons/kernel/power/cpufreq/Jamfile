@@ -1,0 +1,4 @@
+SubDir HAIKU_TOP src add-ons kernel power cpufreq ;
+
+SubInclude HAIKU_TOP src add-ons kernel power cpufreq intel_pstates ;
+
