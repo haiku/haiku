@@ -9,7 +9,7 @@
 #define NFS4SERVER_H
 
 
-#include <lock.h>
+#include <util/AutoLock.h>
 
 #include "ReplyBuilder.h"
 #include "RequestInterpreter.h"

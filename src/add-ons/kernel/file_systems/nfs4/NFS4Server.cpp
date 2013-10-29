@@ -7,9 +7,12 @@
  */
 
 
+#include "NFS4Server.h"
+
+#include <AutoDeleter.h>
+
 #include "FileSystem.h"
 #include "Inode.h"
-#include "NFS4Server.h"
 #include "Request.h"
 #include "WorkQueue.h"
 
@@ -173,12 +176,11 @@ NFS4Server::_GetLeaseTime()
 	result = reply.GetAttr(&values, &count);
 	if (result != B_OK)
 		return result;
+	ArrayDeleter<AttrValue> valuesDeleter(values);
 
 	// FATTR4_LEASE_TIME is mandatory
-	if (count < 1 || values[0].fAttribute != FATTR4_LEASE_TIME) {
-		delete[] values;
+	if (count < 1 || values[0].fAttribute != FATTR4_LEASE_TIME)
 		return B_BAD_VALUE;
-	}
 
 	fLeaseTime = values[0].fData.fValue32;
 
