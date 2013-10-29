@@ -30,6 +30,8 @@
 #include <util/Heap.h>
 #include <util/MinMaxHeap.h>
 
+#include <cpufreq.h>
+
 #include "RunQueue.h"
 #include "scheduler_common.h"
 #include "scheduler_tracing.h"
@@ -56,7 +58,9 @@ const bigtime_t kMinimalWaitTime = kThreadQuantum / 4;
 
 const bigtime_t kCacheExpire = 100000;
 
-const bigtime_t kHighLoad = 600;
+const int kTargetLoad = 550;
+const int kHighLoad = 700;
+const int kMaxLoad = 1000;
 const int kLoadDifference = 200;
 
 static bigtime_t sDisableSmallTaskPacking;
@@ -534,8 +538,8 @@ update_load_heaps(int32 core)
 	int newKey = entry->fLoad / cpuPerCore;
 	int oldKey = CoreLoadHeap::GetKey(entry);
 
-	ASSERT(oldKey >= 0 && oldKey <= 1000);
-	ASSERT(newKey >= 0 && newKey <= 1000);
+	ASSERT(oldKey >= 0 && oldKey <= kMaxLoad);
+	ASSERT(newKey >= 0 && newKey <= kMaxLoad);
 
 	if (oldKey == newKey)
 		return;
@@ -851,7 +855,7 @@ should_rebalance_power_saving(Thread* thread)
 		if (coreEntry->fLoad > kHighLoad) {
 			if (!is_task_small(thread))
 				return true;
-		} else if (coreEntry->fLoad > (kHighLoad + 1000) / 2)
+		} else if (coreEntry->fLoad > (kHighLoad + kMaxLoad) / 2)
 			disable_small_task_packing();
 	}
 
@@ -899,11 +903,11 @@ compute_load(bigtime_t& measureTime, bigtime_t& measureActiveTime, int& load)
 		return -1;
 
 	int oldLoad = load;
-	ASSERT(oldLoad >= 0 && oldLoad <= 1000);
+	ASSERT(oldLoad >= 0 && oldLoad <= kMaxLoad);
 
-	int newLoad = measureActiveTime * 1000;
+	int newLoad = measureActiveTime * kMaxLoad;
 	newLoad /= max_c(deltaTime, 1);
-	newLoad = max_c(min_c(newLoad, 1000), 0);
+	newLoad = max_c(min_c(newLoad, kMaxLoad), 0);
 
 	measureActiveTime = 0;
 	measureTime = now;
@@ -917,7 +921,7 @@ compute_load(bigtime_t& measureTime, bigtime_t& measureActiveTime, int& load)
 	else {
 		newLoad *= (1 << n) - 1;
 		load = (load + newLoad) / (1 << n);
-		ASSERT(load >= 0 && load <= 1000);
+		ASSERT(load >= 0 && load <= kMaxLoad);
 	}
 
 	return oldLoad;
@@ -1369,6 +1373,33 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 }
 
 
+static inline void
+update_cpu_performance(Thread* thread, int32 thisCore)
+{
+	int load = max_c(thread->scheduler_data->load,
+			sCoreEntries[thisCore].fLoad);
+	load = min_c(max_c(load, 0), kMaxLoad);
+
+	if (load < kTargetLoad) {
+		int delta = kTargetLoad - load;
+
+		delta *= kTargetLoad;
+		delta /= kCPUPerformanceScaleMax;
+
+		decrease_cpu_performance(delta);
+	} else {
+		bool allowBoost = sSchedulerMode != SCHEDULER_MODE_POWER_SAVING;
+		allowBoost = allowBoost || thread->scheduler_data->priority_penalty > 0;
+
+		int delta = load - kTargetLoad;
+		delta *= kMaxLoad - kTargetLoad;
+		delta /= kCPUPerformanceScaleMax;
+
+		increase_cpu_performance(delta, allowBoost);
+	}
+}
+
+
 static void
 _scheduler_reschedule(void)
 {
@@ -1477,6 +1508,8 @@ _scheduler_reschedule(void)
 			bigtime_t quantum = compute_quantum(oldThread);
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
+
+			update_cpu_performance(nextThread, thisCore);
 		} else
 			nextThread->scheduler_data->quantum_start = system_time();
 
