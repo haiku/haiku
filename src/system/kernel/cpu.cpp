@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -14,6 +15,8 @@
 
 #include <string.h>
 
+#include <cpufreq.h>
+
 #include <boot/kernel_args.h>
 #include <thread_types.h>
 #include <util/AutoLock.h>
@@ -24,6 +27,8 @@ cpu_ent gCPU[MAX_BOOT_CPUS];
 
 uint32 gCPUCacheLevelCount;
 static cpu_topology_node sCPUTopology;
+
+static cpufreq_module_info* sCPUPerformanceModule;
 
 static spinlock sSetCpuLock;
 
@@ -49,10 +54,40 @@ cpu_init_post_vm(kernel_args *args)
 }
 
 
+static void
+load_cpufreq_module()
+{
+	void* cookie = open_module_list(CPUFREQ_MODULES_PREFIX);
+
+	while (true) {
+		char name[B_FILE_NAME_LENGTH];
+		size_t nameLength = sizeof(name);
+
+		if (read_next_module_name(cookie, name, &nameLength) != B_OK)
+			break;
+
+		if (get_module(name, (module_info**)&sCPUPerformanceModule) == B_OK) {
+			dprintf("found cpufreq module: %s\n", name);
+			break;
+		}
+	}
+
+	close_module_list(cookie);
+
+	if (sCPUPerformanceModule == NULL)
+		dprintf("no valid cpufreq module found\n");
+}
+
+
 status_t
 cpu_init_post_modules(kernel_args *args)
 {
-	return arch_cpu_init_post_modules(args);
+	status_t result = arch_cpu_init_post_modules(args);
+	if (result != B_OK)
+		return result;
+
+	load_cpufreq_module();
+	return B_OK;
 }
 
 
@@ -191,6 +226,24 @@ cpu_topology_node*
 get_cpu_topology(void)
 {
 	return &sCPUTopology;
+}
+
+
+status_t
+increase_cpu_performance(int delta, bool allowBoost)
+{
+	if (sCPUPerformanceModule != NULL)
+		return sCPUPerformanceModule->increase_performance(delta, allowBoost);
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+decrease_cpu_performance(int delta)
+{
+	if (sCPUPerformanceModule != NULL)
+		return sCPUPerformanceModule->decrease_performance(delta);
+	return B_NOT_SUPPORTED;
 }
 
 
