@@ -58,14 +58,23 @@ rule PreprocessPackageInfo source : directory : architecture
 	}
 
 	local revisionFile = [ DetermineHaikuRevision ] ;
+	local updateRequiresFiles ;
+	local haikuPortsRepositoryFile ;
+	if ! $(HAIKU_BOOTSTRAP_BUILD) {
+		updateRequiresFiles =
+			<build>update_package_requires
+			[ on <repository>HaikuPorts return $(HAIKU_REPOSITORY_CACHE_FILE) ]
+			;
+	}
 
 	MakeLocate $(target) : $(directory) ;
-	Depends $(target) : $(source) $(revisionFile) ;
+	Depends $(target) : $(source) $(revisionFile) $(updateRequiresFiles) ;
 
 	CCDEFS on $(target) = [ FDefines $(defines) ] ;
 	HAIKU_SED_REPLACEMENTS on $(target) = "-e s,$(sedReplacements),g" ;
 
-	PreprocessPackageInfo1 $(target) : $(source) $(revisionFile) ;
+	PreprocessPackageInfo1 $(target) : $(source) $(revisionFile)
+		$(updateRequiresFiles) ;
 
 	return $(target) ;
 }
@@ -77,6 +86,11 @@ actions PreprocessPackageInfo1
 	sed $(HAIKU_SED_REPLACEMENTS) \
 			-e s,%HAIKU_VERSION%,$(HAIKU_VERSION)_${revision:-0}-1, < $(2[1]) \
 		| $(HOST_CC) -E -w $(CCDEFS) - -o $(1)
+
+	if [ -n "$(2[4]:E)" ]; then
+		$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+		"$(2[3])" "$(1)" "$(2[4])" || exit 1
+	fi
 }
 
 
