@@ -375,7 +375,7 @@ reset_fixed_event(uint32 event)
 
 
 status_t
-install_fixed_event_handler(uint32 event, interrupt_handler* handler,
+install_fixed_event_handler(uint32 event, acpi_event_handler handler,
 	void *data)
 {
 	return AcpiInstallFixedEventHandler(event, (ACPI_EVENT_HANDLER)handler, data) == AE_OK
@@ -384,7 +384,7 @@ install_fixed_event_handler(uint32 event, interrupt_handler* handler,
 
 
 status_t
-remove_fixed_event_handler(uint32 event, interrupt_handler* handler)
+remove_fixed_event_handler(uint32 event, acpi_event_handler handler)
 {
 	return AcpiRemoveFixedEventHandler(event, (ACPI_EVENT_HANDLER)handler) == AE_OK
 		? B_OK : B_ERROR;

@@ -154,9 +154,9 @@ typedef struct acpi_resource acpi_resource;
 #endif	// __ACTYPES_H__
 
 
-typedef uint32 (*acpi_event_handler)(void *Context);
+typedef uint32 (*acpi_event_handler)(void *context);
 typedef uint32 (*acpi_gpe_handler) (acpi_handle GpeDevice, uint32 GpeNumber,
-	void *Context);
+	void *context);
 
 typedef acpi_status (*acpi_adr_space_handler)(uint32 function,
 	acpi_physical_address address, uint32 bitWidth, int *value,
@@ -225,9 +225,9 @@ struct acpi_module_info {
 	void		(*reset_fixed_event) (uint32 event);
 
 	status_t	(*install_fixed_event_handler)(uint32 event,
-					interrupt_handler *handler, void *data);
+					acpi_event_handler handler, void *data);
 	status_t	(*remove_fixed_event_handler)(uint32 event,
-					interrupt_handler *handler);
+					acpi_event_handler handler);
 
 	/* Namespace Access */
 

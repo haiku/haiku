@@ -97,9 +97,9 @@ typedef struct acpi_root_info {
 	void		(*reset_fixed_event) (uint32 event);
 
 	status_t	(*install_fixed_event_handler)(uint32 event,
-					interrupt_handler *handler, void *data);
+					acpi_event_handler handler, void *data);
 	status_t	(*remove_fixed_event_handler)(uint32 event,
-					interrupt_handler *handler);
+					acpi_event_handler handler);
 
 	/* Namespace Access */
 
@@ -196,9 +196,9 @@ void disable_fixed_event(uint32 event);
 uint32 fixed_event_status(uint32 event);
 void reset_fixed_event(uint32 event);
 
-status_t install_fixed_event_handler(uint32 event, interrupt_handler* handler,
+status_t install_fixed_event_handler(uint32 event, acpi_event_handler handler,
 	void* data);
-status_t remove_fixed_event_handler(uint32 event, interrupt_handler* handler);
+status_t remove_fixed_event_handler(uint32 event, acpi_event_handler handler);
 
 status_t get_next_entry(uint32 object_type, const char* base, char* result,
 	size_t length, void** _counter);
