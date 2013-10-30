@@ -1447,8 +1447,7 @@ wake_up_page_reservation_waiters()
 
 		sPageReservationWaiters.Remove(waiter);
 
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-		thread_unblock_locked(waiter->thread, B_OK);
+		thread_unblock(waiter->thread, B_OK);
 	}
 }
 

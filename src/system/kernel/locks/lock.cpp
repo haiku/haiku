@@ -197,9 +197,7 @@ rw_lock_unblock(rw_lock* lock)
 		lock->holder = waiter->thread->id;
 
 		// unblock thread
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-		thread_unblock_locked(waiter->thread, B_OK);
-		schedulerLocker.Unlock();
+		thread_unblock(waiter->thread, B_OK);
 
 		waiter->thread = NULL;
 		return RW_LOCK_WRITER_COUNT_BASE;
@@ -216,9 +214,7 @@ rw_lock_unblock(rw_lock* lock)
 		readerCount++;
 
 		// unblock thread
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-		thread_unblock_locked(waiter->thread, B_OK);
-		schedulerLocker.Unlock();
+		thread_unblock(waiter->thread, B_OK);
 
 		waiter->thread = NULL;
 	} while ((waiter = lock->waiters) != NULL && !waiter->writer);
@@ -293,8 +289,7 @@ rw_lock_destroy(rw_lock* lock)
 		lock->waiters = waiter->next;
 
 		// unblock thread
-		InterruptsSpinLocker _(gSchedulerLock);
-		thread_unblock_locked(waiter->thread, B_ERROR);
+		thread_unblock(waiter->thread, B_ERROR);
 	}
 
 	lock->name = NULL;
@@ -637,8 +632,7 @@ mutex_destroy(mutex* lock)
 		lock->waiters = waiter->next;
 
 		// unblock thread
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-		thread_unblock_locked(waiter->thread, B_ERROR);
+		thread_unblock(waiter->thread, B_ERROR);
 	}
 
 	lock->name = NULL;
@@ -783,9 +777,7 @@ _mutex_unlock(mutex* lock)
 			lock->waiters->last = waiter->last;
 
 		// unblock thread
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-		thread_unblock_locked(waiter->thread, B_OK);
-		schedulerLocker.Unlock();
+		thread_unblock(waiter->thread, B_OK);
 
 #if KDEBUG
 		// Already set the holder to the unblocked thread. Besides that this

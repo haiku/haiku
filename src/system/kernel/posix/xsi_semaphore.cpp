@@ -101,15 +101,13 @@ public:
 	{
 		// For some reason the semaphore is getting destroyed.
 		// Wake up any remaing awaiting threads
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 		while (queued_thread *entry = fWaitingToIncreaseQueue.RemoveHead()) {
 			entry->queued = false;
-			thread_unblock_locked(entry->thread, EIDRM);
+			thread_unblock(entry->thread, EIDRM);
 		}
 		while (queued_thread *entry = fWaitingToBeZeroQueue.RemoveHead()) {
 			entry->queued = false;
-			thread_unblock_locked(entry->thread, EIDRM);
+			thread_unblock(entry->thread, EIDRM);
 		}
 		// No need to remove any sem_undo request still
 		// hanging. When the process exit and doesn't found
@@ -218,20 +216,19 @@ public:
 
 	void WakeUpThread(bool waitingForZero)
 	{
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 		if (waitingForZero) {
 			// Wake up all threads waiting on zero
 			while (queued_thread *entry = fWaitingToBeZeroQueue.RemoveHead()) {
 				entry->queued = false;
 				fThreadsWaitingToBeZero--;
-				thread_unblock_locked(entry->thread, 0);
+				thread_unblock(entry->thread, 0);
 			}
 		} else {
 			// Wake up all threads even though they might go back to sleep
 			while (queued_thread *entry = fWaitingToIncreaseQueue.RemoveHead()) {
 				entry->queued = false;
 				fThreadsWaitingToIncrease--;
-				thread_unblock_locked(entry->thread, 0);
+				thread_unblock(entry->thread, 0);
 			}
 		}
 	}

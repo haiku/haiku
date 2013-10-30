@@ -298,8 +298,7 @@ SystemProfiler::~SystemProfiler()
 	// inactive.
 	InterruptsSpinLocker locker(fLock);
 	if (fWaitingProfilerThread != NULL) {
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-		thread_unblock_locked(fWaitingProfilerThread, B_OK);
+		thread_unblock(fWaitingProfilerThread, B_OK);
 		fWaitingProfilerThread = NULL;
 	}
 	fProfilingActive = false;

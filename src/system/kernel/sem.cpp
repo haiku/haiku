@@ -330,12 +330,10 @@ uninit_sem_locked(struct sem_entry& sem, char** _name)
 	sem.u.used.select_infos = NULL;
 
 	// free any threads waiting for this semaphore
-	SpinLocker schedulerLocker(gSchedulerLock);
 	while (queued_thread* entry = sem.queue.RemoveHead()) {
 		entry->queued = false;
-		thread_unblock_locked(entry->thread, B_BAD_SEM_ID);
+		thread_unblock(entry->thread, B_BAD_SEM_ID);
 	}
-	schedulerLocker.Unlock();
 
 	int32 id = sem.id;
 	sem.id = -1;

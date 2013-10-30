@@ -132,6 +132,7 @@ status_t thread_block();
 status_t thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout);
 status_t thread_block_with_timeout_locked(uint32 timeoutFlags,
 			bigtime_t timeout);
+void thread_unblock(Thread* thread, status_t status);
 
 // used in syscalls.c
 status_t _user_set_thread_priority(thread_id thread, int32 newPriority);

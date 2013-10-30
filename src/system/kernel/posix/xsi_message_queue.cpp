@@ -246,8 +246,6 @@ public:
 
 	void WakeUpThread(bool waitForMessage)
 	{
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 		if (waitForMessage) {
 			// Wake up all waiting thread for a message
 			// TODO: this can cause starvation for any
@@ -255,14 +253,14 @@ public:
 			while (queued_thread *entry = fWaitingToReceive.RemoveHead()) {
 				entry->queued = false;
 				fThreadsWaitingToReceive--;
-				thread_unblock_locked(entry->thread, 0);
+				thread_unblock(entry->thread, 0);
 			}
 		} else {
 			// Wake up only one thread waiting to send
 			if (queued_thread *entry = fWaitingToSend.RemoveHead()) {
 				entry->queued = false;
 				fThreadsWaitingToSend--;
-				thread_unblock_locked(entry->thread, 0);
+				thread_unblock(entry->thread, 0);
 			}
 		}
 	}
@@ -400,15 +398,13 @@ XsiMessageQueue::~XsiMessageQueue()
 
 	// Wake up any threads still waiting
 	if (fThreadsWaitingToSend || fThreadsWaitingToReceive) {
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 		while (queued_thread *entry = fWaitingToReceive.RemoveHead()) {
 			entry->queued = false;
-			thread_unblock_locked(entry->thread, EIDRM);
+			thread_unblock(entry->thread, EIDRM);
 		}
 		while (queued_thread *entry = fWaitingToSend.RemoveHead()) {
 			entry->queued = false;
-			thread_unblock_locked(entry->thread, EIDRM);
+			thread_unblock(entry->thread, EIDRM);
 		}
 	}
 

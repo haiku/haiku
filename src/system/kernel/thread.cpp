@@ -2889,6 +2889,19 @@ thread_block_with_timeout_locked(uint32 timeoutFlags, bigtime_t timeout)
 }
 
 
+/*!	Unblocks a thread.
+
+	Acquires the scheduler lock and calls thread_unblock_locked().
+	See there for more information.
+*/
+void
+thread_unblock(Thread* thread, status_t status)
+{
+	InterruptsSpinLocker _(gSchedulerLock);
+	thread_unblock_locked(thread, status);
+}
+
+
 /*!	Unblocks a userland-blocked thread.
 	The caller must not hold any locks.
 */
