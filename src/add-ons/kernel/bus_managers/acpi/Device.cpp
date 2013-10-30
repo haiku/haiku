@@ -57,6 +57,8 @@ acpi_get_object_type(acpi_device device)
 static status_t
 acpi_get_object(acpi_device device, const char *path, acpi_object_type **return_value)
 {
+	if (device->path == NULL)
+		return B_BAD_VALUE;
 	if (path) {
 		char objname[255];
 		snprintf(objname, sizeof(objname), "%s.%s", device->path, path);
@@ -86,13 +88,12 @@ static status_t
 acpi_device_init_driver(device_node *node, void **cookie)
 {
 	ACPI_HANDLE handle;
-	const char *path;
+	const char *path = NULL;
 	uint32 type;
 
 	if (gDeviceManager->get_attr_uint32(node, ACPI_DEVICE_TYPE_ITEM, &type, false) != B_OK)
 		return B_ERROR;
-	if (gDeviceManager->get_attr_string(node, ACPI_DEVICE_PATH_ITEM, &path, false) != B_OK)
-		return B_ERROR;
+	gDeviceManager->get_attr_string(node, ACPI_DEVICE_PATH_ITEM, &path, false);
 
 	acpi_device_cookie *device = (acpi_device_cookie*)malloc(sizeof(*device));
 	if (device == NULL)
@@ -100,13 +101,13 @@ acpi_device_init_driver(device_node *node, void **cookie)
 
 	memset(device, 0, sizeof(*device));
 
-	if (AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK) {
+	if (path != NULL && AcpiGetHandle(NULL, (ACPI_STRING)path, &handle) != AE_OK) {
 		free(device);
 		return B_ENTRY_NOT_FOUND;
 	}
 
 	device->handle = handle;
-	device->path = strdup(path);
+	device->path = path != NULL ? strdup(path) : NULL;
 	device->type = type;
 	device->node = node;
 

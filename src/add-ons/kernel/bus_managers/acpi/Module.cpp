@@ -9,8 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ACPIPrivate.h"
 
+#include "ACPIPrivate.h"
+extern "C" {
+#include "acpi.h"
+}
 #include <dpc.h>
 #include <PCI.h>
 
@@ -132,6 +135,44 @@ acpi_module_register_child_devices(void* cookie)
 		ACPI_NS_DUMP_DEVICE_MODULE_NAME);
 	if (status != B_OK)
 		return status;
+
+	if ((AcpiGbl_FADT.Flags & ACPI_FADT_POWER_BUTTON) == 0) {
+		dprintf("registering power button\n");
+		device_attr attrs[] = {
+			// info about device
+			{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
+
+			// info about the device
+			{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: "ACPI_FPB" }},
+			{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: ACPI_TYPE_DEVICE }},
+
+			// consumer specification
+			{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_MULTIPLE_CHILDREN }},
+			{ NULL }
+		};
+		device_node* deviceNode;
+		gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs,
+				NULL, &deviceNode);
+	}
+	if ((AcpiGbl_FADT.Flags & ACPI_FADT_SLEEP_BUTTON) == 0) {
+		dprintf("registering sleep button\n");
+		device_attr attrs[] = {
+			// info about device
+			{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
+
+			// info about the device
+			{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: "ACPI_FSB" }},
+			{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: ACPI_TYPE_DEVICE }},
+
+			// consumer specification
+			{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_MULTIPLE_CHILDREN }},
+			{ NULL }
+		};
+		device_node* deviceNode;
+		gDeviceManager->register_node(node, ACPI_DEVICE_MODULE_NAME, attrs,
+				NULL, &deviceNode);
+
+	}
 
 	return acpi_enumerate_child_devices(node, "\\");
 }
