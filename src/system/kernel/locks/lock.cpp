@@ -168,9 +168,7 @@ rw_lock_wait(rw_lock* lock, bool writer, InterruptsSpinLocker& locker)
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_RW_LOCK, lock);
 	locker.Unlock();
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-	status_t result = thread_block_locked(thread_get_current_thread());
-	schedulerLocker.Unlock();
+	status_t result = thread_block();
 
 	locker.Lock();
 	return result;
@@ -386,10 +384,7 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_RW_LOCK, lock);
 	locker.Unlock();
 
-	InterruptsSpinLocker schedulerLock(gSchedulerLock);
-	status_t error = thread_block_with_timeout_locked(timeoutFlags, timeout);
-	schedulerLock.Unlock();
-
+	status_t error = thread_block_with_timeout(timeoutFlags, timeout);
 	if (error == B_OK || waiter.thread == NULL) {
 		// We were unblocked successfully -- potentially our unblocker overtook
 		// us after we already failed. In either case, we've got the lock, now.
@@ -752,10 +747,7 @@ _mutex_lock(mutex* lock, void* _locker)
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_MUTEX, lock);
 	locker->Unlock();
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-	status_t error = thread_block_locked(waiter.thread);
-	schedulerLocker.Unlock();
-
+	status_t error = thread_block();
 #if KDEBUG
 	if (error == B_OK)
 		atomic_set(&lock->holder, waiter.thread->id);
@@ -875,16 +867,15 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_MUTEX, lock);
 	locker.Unlock();
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-	status_t error = thread_block_with_timeout_locked(timeoutFlags, timeout);
-	schedulerLocker.Unlock();
+	status_t error = thread_block_with_timeout(timeoutFlags, timeout);
 
-	locker.Lock();
 	if (error == B_OK) {
 #if KDEBUG
 		lock->holder = waiter.thread->id;
 #endif
 	} else {
+		locker.Lock();
+
 		// If the timeout occurred, we must remove our waiter structure from
 		// the queue.
 		mutex_waiter* previousWaiter = NULL;
