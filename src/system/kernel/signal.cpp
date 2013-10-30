@@ -315,7 +315,6 @@ Signal::SetTo(uint32 number)
 	fErrorCode = 0;
 	fSendingProcess = team->id;
 	fSendingUser = team->effective_uid;
-		// assuming scheduler lock is being held
 	fStatus = 0;
 	fPollBand = 0;
 	fAddress = NULL;
@@ -1322,19 +1321,13 @@ has_signals_pending(Thread* thread)
 /*!	Checks whether the current user has permission to send a signal to the given
 	target team.
 
-	The caller must hold the scheduler lock or \a team's lock.
-
 	\param team The target team.
-	\param schedulerLocked \c true, if the caller holds the scheduler lock,
-		\c false otherwise.
 */
 static bool
-has_permission_to_signal(Team* team, bool schedulerLocked)
+has_permission_to_signal(Signal* signal, Team* team)
 {
 	// get the current user
-	uid_t currentUser = schedulerLocked
-		? thread_get_current_thread()->team->effective_uid
-		: geteuid();
+	uid_t currentUser = signal->SendingUser();
 
 	// root is omnipotent -- in the other cases the current user must match the
 	// target team's
@@ -1372,7 +1365,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 	BReference<Signal> signalReference(signal, true);
 
 	if ((flags & B_CHECK_PERMISSION) != 0) {
-		if (!has_permission_to_signal(thread->team, true))
+		if (!has_permission_to_signal(signal, thread->team))
 			return EPERM;
 	}
 
@@ -1566,7 +1559,7 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 	BReference<Signal> signalReference(signal, true);
 
 	if ((flags & B_CHECK_PERMISSION) != 0) {
-		if (!has_permission_to_signal(team, true))
+		if (!has_permission_to_signal(signal, team))
 			return EPERM;
 	}
 
