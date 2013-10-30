@@ -18,6 +18,15 @@
 
 #define ACPI_BUTTON_DEVICE_MODULE_NAME "drivers/power/acpi_button/device_v1"
 
+#define ACPI_NOTIFY_BUTTON_SLEEP		0x80
+#define ACPI_NOTIFY_BUTTON_WAKEUP		0x2
+
+//#define TRACE_BUTTON
+#ifdef TRACE_BUTTON
+#	define TRACE(x...) dprintf("acpi_button: "x)
+#else
+#	define TRACE(x...)
+#endif
 
 static device_manager_info *sDeviceManager;
 static struct acpi_module_info *sAcpi;
@@ -28,7 +37,35 @@ typedef struct acpi_ns_device_info {
 	acpi_device_module_info *acpi;
 	acpi_device acpi_cookie;
 	uint32 type;
+	bool fixed;
+	uint8 last_status;
 } acpi_button_device_info;
+
+
+static void
+acpi_button_notify_handler(acpi_handle _device, uint32 value, void *context)
+{
+	acpi_button_device_info *device = (acpi_button_device_info *)context;
+	if (value == ACPI_NOTIFY_BUTTON_SLEEP) {
+		TRACE("acpi_button: sleep\n");
+		device->last_status = 1;
+	} else if (value == ACPI_NOTIFY_BUTTON_WAKEUP) {
+		TRACE("acpi_button: wakeup\n");
+	} else {
+		dprintf("acpi_button: unknown notification\n");
+	}
+
+}
+
+
+static uint32
+acpi_button_fixed_handler(void *context)
+{
+	acpi_button_device_info *device = (acpi_button_device_info *)context;
+	TRACE("acpi_button: sleep\n");
+	device->last_status = 1;
+	return B_OK;
+}
 
 
 //	#pragma mark - device module API
@@ -50,7 +87,34 @@ acpi_button_init_device(void *_cookie, void **cookie)
 	parent = sDeviceManager->get_parent_node(node);
 	sDeviceManager->get_driver(parent, (driver_module_info **)&device->acpi,
 		(void **)&device->acpi_cookie);
+
+	const char *hid;
+	if (sDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &hid,
+		false) != B_OK) {
+		sDeviceManager->put_node(parent);
+		return B_ERROR;
+	}
+
 	sDeviceManager->put_node(parent);
+
+	device->fixed = strcmp(hid, "PNP0C0C") != 0 && strcmp(hid, "PNP0C0E") != 0;
+	if (strcmp(hid, "PNP0C0C") == 0 || strcmp(hid, "ACPI_FPB") == 0)
+		device->type = ACPI_EVENT_POWER_BUTTON;
+	else if (strcmp(hid, "PNP0C0E") == 0 || strcmp(hid, "ACPI_FSB") == 0)
+		device->type = ACPI_EVENT_SLEEP_BUTTON;
+	else
+		return B_ERROR;
+	device->last_status = 0;
+
+	if (device->fixed) {
+		sAcpi->reset_fixed_event(device->type);
+		sAcpi->install_fixed_event_handler(device->type,
+			acpi_button_fixed_handler, device);
+	} else {
+		device->acpi->install_notify_handler(device->acpi_cookie,
+			ACPI_DEVICE_NOTIFY, acpi_button_notify_handler, device);
+	}
+
 
 	*cookie = device;
 	return B_OK;
@@ -61,6 +125,13 @@ static void
 acpi_button_uninit_device(void *_cookie)
 {
 	acpi_button_device_info *device = (acpi_button_device_info *)_cookie;
+	if (device->fixed) {
+		sAcpi->remove_fixed_event_handler(device->type,
+			acpi_button_fixed_handler);
+	} else {
+		device->acpi->remove_notify_handler(device->acpi_cookie,
+			ACPI_DEVICE_NOTIFY, acpi_button_notify_handler);
+	}
 	free(device);
 }
 
@@ -69,12 +140,6 @@ static status_t
 acpi_button_open(void *_cookie, const char *path, int flags, void** cookie)
 {
 	acpi_button_device_info *device = (acpi_button_device_info *)_cookie;
-	if (strcmp(path,"power/button/power") == 0)
-		device->type = ACPI_EVENT_POWER_BUTTON;
-	else if (strcmp(path,"power/button/sleep") == 0)
-		device->type = ACPI_EVENT_SLEEP_BUTTON;
-	else
-		return B_ERROR;
 
 	sAcpi->enable_fixed_event(device->type);
 
@@ -90,9 +155,8 @@ acpi_button_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
 	if (*num_bytes < 1)
 		return B_IO_ERROR;
 
-	*((uint8 *)(buf)) = sAcpi->fixed_event_status(device->type) ? 1 : 0;
-
-	sAcpi->reset_fixed_event(device->type);
+	*((uint8 *)(buf)) = device->last_status;
+	device->last_status = 0;
 
 	*num_bytes = 1;
 	return B_OK;
@@ -100,7 +164,8 @@ acpi_button_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
 
 
 static status_t
-acpi_button_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
+acpi_button_write(void* cookie, off_t position, const void* buffer,
+	size_t* num_bytes)
 {
 	return B_ERROR;
 }
@@ -116,8 +181,6 @@ acpi_button_control(void* _cookie, uint32 op, void* arg, size_t len)
 static status_t
 acpi_button_close (void* cookie)
 {
-	acpi_button_device_info* device = (acpi_button_device_info*)cookie;
-	sAcpi->disable_fixed_event(device->type);
 	return B_OK;
 }
 
@@ -139,8 +202,6 @@ acpi_button_support(device_node *parent)
 	uint32 device_type;
 	const char *hid;
 
-	dprintf("acpi_button_support\n");
-
 	// make sure parent is really the ACPI bus manager
 	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return -1;
@@ -154,14 +215,15 @@ acpi_button_support(device_node *parent)
 		return 0.0;
 	}
 
-	// check whether it's a lid device
+	// check whether it's a button device
 	if (sDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &hid,
-		false) != B_OK || (strcmp(hid, "PNP0C0C") && strcmp(hid, "ACPI_FPB")
-			&& strcmp(hid, "PNP0C0E") && strcmp(hid, "ACPI_FSB"))) {
+		false) != B_OK || (strcmp(hid, "PNP0C0C") != 0
+			&& strcmp(hid, "ACPI_FPB") != 0 && strcmp(hid, "PNP0C0E") != 0
+			&& strcmp(hid, "ACPI_FSB") != 0)) {
 		return 0.0;
 	}
 
-	dprintf("acpi_button_support button device found\n");
+	TRACE("acpi_button_support button device found\n");
 
 	return 0.6;
 }
@@ -175,7 +237,8 @@ acpi_button_register_device(device_node *node)
 		{ NULL }
 	};
 
-	return sDeviceManager->register_node(node, ACPI_BUTTON_MODULE_NAME, attrs, NULL, NULL);
+	return sDeviceManager->register_node(node, ACPI_BUTTON_MODULE_NAME, attrs,
+		NULL, NULL);
 }
 
 
@@ -197,16 +260,26 @@ static status_t
 acpi_button_register_child_devices(void *_cookie)
 {
 	device_node *node = (device_node*)_cookie;
+	device_node *parent = sDeviceManager->get_parent_node(node);
+	const char *hid;
+	if (sDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &hid,
+		false) != B_OK) {
+		sDeviceManager->put_node(parent);
+		return B_ERROR;
+	}
 
-	dprintf("acpi_button_register_child_devices\n");
+	sDeviceManager->put_node(parent);
 
-	status_t status = sDeviceManager->publish_device(node,
-		"power/button/power", ACPI_BUTTON_DEVICE_MODULE_NAME);
-	if (status != B_OK)
-		return status;
+	status_t status = B_ERROR;
+	if (strcmp(hid, "PNP0C0C") == 0 || strcmp(hid, "ACPI_FPB") == 0) {
+		status = sDeviceManager->publish_device(node,
+			"power/button/power", ACPI_BUTTON_DEVICE_MODULE_NAME);
+	} else if (strcmp(hid, "PNP0C0E") == 0 || strcmp(hid, "ACPI_FSB") == 0) {
+		status = sDeviceManager->publish_device(node, "power/button/sleep",
+			ACPI_BUTTON_DEVICE_MODULE_NAME);
+	}
 
-	return sDeviceManager->publish_device(node, "power/button/sleep",
-		ACPI_BUTTON_DEVICE_MODULE_NAME);
+	return status;
 }
 
 
