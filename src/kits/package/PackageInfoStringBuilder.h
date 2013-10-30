@@ -130,21 +130,16 @@ private:
 		// encapsulating the stringification via templates seems to result in
 		// an Internal Compiler Error with gcc 2.
 
+		_Write("{\n", 2);
+
 		int32 count = value.CountItems();
-		if (count == 1) {
-			_WriteListElement(value.ItemAt(0));
-		} else {
-			_Write("{\n", 2);
-
-			int32 count = value.CountItems();
-			for (int32 i = 0; i < count; i++) {
-				_Write('\t');
-				_WriteListElement(value.ItemAt(i));
-				_Write('\n');
-			}
-
-			_Write('}');
+		for (int32 i = 0; i < count; i++) {
+			_Write('\t');
+			_WriteListElement(value.ItemAt(i));
+			_Write('\n');
 		}
+
+		_Write('}');
 	}
 
 	template<typename Value>
