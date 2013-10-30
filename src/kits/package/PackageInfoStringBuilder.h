@@ -282,7 +282,11 @@ private:
 
 				replacement[0] = '\\';
 				_Write(replacement, 2);
+				start = ++end;
 			}
+
+			if (start < end)
+				_Write(start, end - start);
 		} else
 			_Write(data);
 
