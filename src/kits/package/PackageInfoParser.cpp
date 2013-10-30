@@ -600,6 +600,7 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 
 			BPackageVersion version;
 			Token op = parser._NextToken();
+			BPackageResolvableOperator resolvableOperator;
 			if (op.type == TOKEN_OPERATOR_LESS
 				|| op.type == TOKEN_OPERATOR_LESS_EQUAL
 				|| op.type == TOKEN_OPERATOR_EQUAL
@@ -621,17 +622,18 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 					} else
 						parser._RewindTo(base);
 				}
+
+				resolvableOperator = (BPackageResolvableOperator)
+					(op.type - TOKEN_OPERATOR_LESS);
 			} else if (op.type == TOKEN_ITEM_SEPARATOR
 				|| op.type == TOKEN_CLOSE_BRACE) {
 				parser._RewindTo(op);
+				resolvableOperator = B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT;
 			} else {
 				throw ParseError(
 					"expected '<', '<=', '==', '!=', '>=', '>', comma or '}'",
 					op.pos);
 			}
-
-			BPackageResolvableOperator resolvableOperator
-				= (BPackageResolvableOperator)(op.type - TOKEN_OPERATOR_LESS);
 
 			value->AddItem(new BPackageResolvableExpression(token.text,
 				resolvableOperator, version));
