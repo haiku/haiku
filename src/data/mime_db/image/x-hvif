@@ -1,0 +1,14 @@
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "image/x-hvif";
+
+resource(2, "META:SNIFF_RULE") "0.5 (\"ncif\")";
+
+resource(3, "META:S:DESC") #'MSDC' "HVIF image";
+
+resource(4, "META:L:DESC") #'MLDC' "Haiku vector icon";
+
+resource(5, "META:EXTENS") message(234) {
+	"extensions" = "hvif",
+	"type" = "image/x-hvif"
+};

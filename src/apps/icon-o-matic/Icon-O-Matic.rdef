@@ -22,7 +22,8 @@ resource app_flags B_SINGLE_LAUNCH;
 
 resource file_types message {
 	"types" = "application/x-vnd.Haiku-icon",
-	"types" = "image/svg+xml"
+	"types" = "image/svg+xml",
+	"types" = "image/x-hvif"
 };
 
 resource vector_icon {
