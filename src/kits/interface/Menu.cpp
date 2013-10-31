@@ -458,7 +458,7 @@ BMenu::MessageReceived(BMessage* msg)
 			window->GetSteps(&smallStep, &largeStep);
 
 			// pressing the option/command/control key scrolls faster
-			if (modifiers() & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY))
+			if ((modifiers() & B_SHIFT_KEY) != 0)
 				deltaY *= largeStep;
 			else
 				deltaY *= smallStep;
