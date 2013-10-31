@@ -1507,7 +1507,7 @@ _scheduler_reschedule(void)
 		if (!thread_is_idle_thread(nextThread)) {
 			bigtime_t quantum = compute_quantum(oldThread);
 			add_timer(quantumTimer, &reschedule_event, quantum,
-				B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_SCHEDULER_LOCK);
+				B_ONE_SHOT_RELATIVE_TIMER);
 
 			update_cpu_performance(nextThread, thisCore);
 		} else

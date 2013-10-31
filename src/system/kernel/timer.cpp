@@ -274,25 +274,8 @@ timer_interrupt()
 		// call the callback
 		// note: if the event is not periodic, it is ok
 		// to delete the event structure inside the callback
-		if (event->hook) {
-			bool callHook = true;
-
-			// we may need to acquire the scheduler lock
-			if ((mode & B_TIMER_ACQUIRE_SCHEDULER_LOCK) != 0) {
-				acquire_spinlock(&gSchedulerLock);
-
-				// If the event has been cancelled in the meantime, we don't
-				// call the hook anymore.
-				if (cpuData.current_event == NULL)
-					callHook = false;
-			}
-
-			if (callHook)
-				rc = event->hook(event);
-
-			if ((mode & B_TIMER_ACQUIRE_SCHEDULER_LOCK) != 0)
-				release_spinlock(&gSchedulerLock);
-		}
+		if (event->hook)
+			rc = event->hook(event);
 
 		cpuData.current_event_in_progress = 0;
 
@@ -461,8 +444,7 @@ cancel_timer(timer* event)
 	// lock to be held while calling the event hook, we'll have to wait
 	// for the hook to complete. When called from the timer hook we don't
 	// wait either, of course.
-	if ((event->flags & B_TIMER_ACQUIRE_SCHEDULER_LOCK) == 0
-		&& cpu != smp_get_current_cpu()) {
+	if (cpu != smp_get_current_cpu()) {
 		spinLocker.Unlock();
 
 		while (cpuData.current_event_in_progress == 1) {

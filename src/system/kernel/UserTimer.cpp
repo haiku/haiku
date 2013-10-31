@@ -191,6 +191,7 @@ UserTimer::Cancel()
 /*static*/ int32
 UserTimer::HandleTimerHook(struct timer* timer)
 {
+	InterruptsSpinLocker _(gSchedulerLock);
 	((UserTimer*)timer->user_data)->HandleTimer();
 	return B_HANDLED_INTERRUPT;
 }
@@ -352,9 +353,7 @@ SystemTimeUserTimer::ScheduleKernelTimer(bigtime_t now,
 		CheckPeriodicOverrun(now);
 
 	uint32 timerFlags = B_ONE_SHOT_ABSOLUTE_TIMER
-			| B_TIMER_USE_TIMER_STRUCT_TIMES | B_TIMER_ACQUIRE_SCHEDULER_LOCK;
-		// We use B_TIMER_ACQUIRE_SCHEDULER_LOCK to avoid race conditions
-		// between setting/canceling the timer and the event handler.
+			| B_TIMER_USE_TIMER_STRUCT_TIMES;
 
 	fTimer.schedule_time = std::max(fNextTime, (bigtime_t)0);
 	fTimer.period = 0;
@@ -692,10 +691,7 @@ TeamTimeUserTimer::_Update(bool unscheduling)
 		// rounding errors.
 
 	add_timer(&fTimer, &HandleTimerHook, fTimer.schedule_time,
-		B_ONE_SHOT_ABSOLUTE_TIMER | B_TIMER_USE_TIMER_STRUCT_TIMES
-			| B_TIMER_ACQUIRE_SCHEDULER_LOCK);
-		// We use B_TIMER_ACQUIRE_SCHEDULER_LOCK to avoid race conditions
-		// between setting/canceling the timer and the event handler.
+		B_ONE_SHOT_ABSOLUTE_TIMER | B_TIMER_USE_TIMER_STRUCT_TIMES);
 		// We use B_TIMER_USE_TIMER_STRUCT_TIMES, so period remains 0, which
 		// our base class expects.
 
@@ -989,11 +985,7 @@ ThreadTimeUserTimer::Start()
 		fTimer.schedule_time = 0;
 	fTimer.period = 0;
 
-	uint32 flags = B_ONE_SHOT_ABSOLUTE_TIMER
-		| B_TIMER_USE_TIMER_STRUCT_TIMES | B_TIMER_ACQUIRE_SCHEDULER_LOCK;
-		// We use B_TIMER_ACQUIRE_SCHEDULER_LOCK to avoid race conditions
-		// between setting/canceling the timer and the event handler.
-
+	uint32 flags = B_ONE_SHOT_ABSOLUTE_TIMER | B_TIMER_USE_TIMER_STRUCT_TIMES;
 	add_timer(&fTimer, &HandleTimerHook, fTimer.schedule_time, flags);
 
 	fScheduled = true;

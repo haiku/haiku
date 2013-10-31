@@ -23,13 +23,8 @@ struct kernel_args;
 #define B_TIMER_USE_TIMER_STRUCT_TIMES	0x4000
 	// For add_timer(): Use the timer::schedule_time (absolute time) and
 	// timer::period values instead of the period parameter.
-#define B_TIMER_ACQUIRE_SCHEDULER_LOCK	0x8000
-	// The timer hook is invoked with the scheduler lock held. When invoking
-	// cancel_timer() with the scheduler lock held, too, this helps to avoid
-	// race conditions.
 #define B_TIMER_FLAGS	\
-	(B_TIMER_USE_TIMER_STRUCT_TIMES | B_TIMER_ACQUIRE_SCHEDULER_LOCK	\
-	| B_TIMER_REAL_TIME_BASE)
+	(B_TIMER_USE_TIMER_STRUCT_TIMES | B_TIMER_REAL_TIME_BASE)
 
 /* Timer info structure */
 struct timer_info {

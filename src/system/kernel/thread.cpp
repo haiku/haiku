@@ -1923,13 +1923,8 @@ thread_exit(void)
 	}
 
 	if (team != kernelTeam) {
-		// Cancel previously installed alarm timer, if any. Hold the scheduler
-		// lock to make sure that when cancel_timer() returns, the alarm timer
-		// hook will not be invoked anymore (since
-		// B_TIMER_ACQUIRE_SCHEDULER_LOCK is used).
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+		// Cancel previously installed alarm timer, if any.
 		cancel_timer(&thread->alarm);
-		schedulerLocker.Unlock();
 
 		// Delete all user timers associated with the thread.
 		ThreadLocker threadLocker(thread);
@@ -2782,12 +2777,8 @@ thread_preboot_init_percpu(struct kernel_args *args, int32 cpuNum)
 static status_t
 thread_block_timeout(timer* timer)
 {
-	// The timer has been installed with B_TIMER_ACQUIRE_SCHEDULER_LOCK, so
-	// we're holding the scheduler lock already. This makes things comfortably
-	// easy.
-
 	Thread* thread = (Thread*)timer->user_data;
-	thread_unblock_locked(thread, B_TIMED_OUT);
+	thread_unblock(thread, B_TIMED_OUT);
 
 	return B_HANDLED_INTERRUPT;
 }
@@ -2858,10 +2849,7 @@ thread_block_with_timeout_locked(uint32 timeoutFlags, bigtime_t timeout)
 		&& timeout != B_INFINITE_TIMEOUT;
 
 	if (useTimer) {
-		// Timer flags: absolute/relative + "acquire thread lock". The latter
-		// avoids nasty race conditions and deadlock problems that could
-		// otherwise occur between our cancel_timer() and a concurrently
-		// executing thread_block_timeout().
+		// Timer flags: absolute/relative.
 		uint32 timerFlags;
 		if ((timeoutFlags & B_RELATIVE_TIMEOUT) != 0) {
 			timerFlags = B_ONE_SHOT_RELATIVE_TIMER;
@@ -2870,7 +2858,6 @@ thread_block_with_timeout_locked(uint32 timeoutFlags, bigtime_t timeout)
 			if ((timeoutFlags & B_TIMEOUT_REAL_TIME_BASE) != 0)
 				timerFlags |= B_TIMER_REAL_TIME_BASE;
 		}
-		timerFlags |= B_TIMER_ACQUIRE_SCHEDULER_LOCK;
 
 		// install the timer
 		thread->wait.unblock_timer.user_data = thread;
