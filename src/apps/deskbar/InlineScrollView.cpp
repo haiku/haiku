@@ -156,8 +156,8 @@ UpScrollArrow::MouseDown(BPoint where)
 	BMessage* message = Window()->CurrentMessage();
 	int32 modifiers = 0;
 	message->FindInt32("modifiers", &modifiers);
-	// pressing the option/command/control key scrolls faster
-	if ((modifiers & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) != 0)
+	// pressing the shift key scrolls faster
+	if ((modifiers & B_SHIFT_KEY) != 0)
 		parent->ScrollBy(-largeStep);
 	else
 		parent->ScrollBy(-smallStep);
@@ -222,8 +222,8 @@ DownScrollArrow::MouseDown(BPoint where)
 	BMessage* message = Window()->CurrentMessage();
 	int32 modifiers = 0;
 	message->FindInt32("modifiers", &modifiers);
-	// pressing the option/command/control key scrolls faster
-	if ((modifiers & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) != 0)
+	// pressing the shift key scrolls faster
+	if ((modifiers & B_SHIFT_KEY) != 0)
 		grandparent->ScrollBy(largeStep);
 	else
 		grandparent->ScrollBy(smallStep);
@@ -285,8 +285,8 @@ LeftScrollArrow::MouseDown(BPoint where)
 	BMessage* message = Window()->CurrentMessage();
 	int32 modifiers = 0;
 	message->FindInt32("modifiers", &modifiers);
-	// pressing the option/command/control key scrolls faster
-	if ((modifiers & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) != 0)
+	// pressing the shift key scrolls faster
+	if ((modifiers & B_SHIFT_KEY) != 0)
 		parent->ScrollBy(-largeStep);
 	else
 		parent->ScrollBy(-smallStep);
@@ -350,8 +350,8 @@ RightScrollArrow::MouseDown(BPoint where)
 	BMessage* message = Window()->CurrentMessage();
 	int32 modifiers = 0;
 	message->FindInt32("modifiers", &modifiers);
-	// pressing the option/command/control key scrolls faster
-	if ((modifiers & (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) != 0)
+	// pressing the shift key scrolls faster
+	if ((modifiers & B_SHIFT_KEY) != 0)
 		grandparent->ScrollBy(largeStep);
 	else
 		grandparent->ScrollBy(smallStep);
