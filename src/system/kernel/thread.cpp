@@ -141,6 +141,7 @@ public:
 
 
 static DoublyLinkedList<UndertakerEntry> sUndertakerEntries;
+static spinlock sUndertakerLock = B_SPINLOCK_INITIALIZER;
 static ConditionVariable sUndertakerCondition;
 static ThreadNotificationService sNotificationService;
 
@@ -1076,20 +1077,20 @@ undertaker(void* /*args*/)
 {
 	while (true) {
 		// wait for a thread to bury
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+		InterruptsSpinLocker locker(sUndertakerLock);
 
 		while (sUndertakerEntries.IsEmpty()) {
 			ConditionVariableEntry conditionEntry;
 			sUndertakerCondition.Add(&conditionEntry);
-			schedulerLocker.Unlock();
+			locker.Unlock();
 
 			conditionEntry.Wait();
 
-			schedulerLocker.Lock();
+			locker.Lock();
 		}
 
 		UndertakerEntry* _entry = sUndertakerEntries.RemoveHead();
-		schedulerLocker.Unlock();
+		locker.Unlock();
 
 		UndertakerEntry entry = *_entry;
 			// we need a copy, since the original entry is on the thread's stack
@@ -1102,7 +1103,7 @@ undertaker(void* /*args*/)
 		Team* kernelTeam = team_get_kernel_team();
 		TeamLocker kernelTeamLocker(kernelTeam);
 		thread->Lock();
-		schedulerLocker.Lock();
+		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
 		remove_thread_from_team(kernelTeam, thread);
 
@@ -2230,11 +2231,13 @@ thread_exit(void)
 	UndertakerEntry undertakerEntry(thread, teamID);
 
 	disable_interrupts();
-	schedulerLocker.Lock();
 
+	SpinLocker undertakerLocker(sUndertakerLock);
 	sUndertakerEntries.Add(&undertakerEntry);
-	sUndertakerCondition.NotifyOne(true);
+	sUndertakerCondition.NotifyOne();
+	undertakerLocker.Unlock();
 
+	schedulerLocker.Lock();
 	thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
 	scheduler_reschedule();
 
