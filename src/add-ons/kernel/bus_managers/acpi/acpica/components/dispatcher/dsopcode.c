@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Module Name: dsopcode - Dispatcher suport for regions and fields
+ * Module Name: dsopcode - Dispatcher support for regions and fields
  *
  *****************************************************************************/
 
@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -752,6 +752,7 @@ AcpiDsEvalDataObjectOperands (
         break;
 
     default:
+
         return_ACPI_STATUS (AE_AML_BAD_OPCODE);
     }
 

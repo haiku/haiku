@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -123,17 +123,6 @@
 #define _COMPONENT          ACPI_TABLES
         ACPI_MODULE_NAME    ("tbxfroot")
 
-/* Local prototypes */
-
-static UINT8 *
-AcpiTbScanMemoryForRsdp (
-    UINT8                   *StartAddress,
-    UINT32                  Length);
-
-static ACPI_STATUS
-AcpiTbValidateRsdp (
-    ACPI_TABLE_RSDP         *Rsdp);
-
 
 /*******************************************************************************
  *
@@ -147,7 +136,7 @@ AcpiTbValidateRsdp (
  *
  ******************************************************************************/
 
-static ACPI_STATUS
+ACPI_STATUS
 AcpiTbValidateRsdp (
     ACPI_TABLE_RSDP         *Rsdp)
 {
@@ -158,8 +147,7 @@ AcpiTbValidateRsdp (
      * Note: Sometimes there exists more than one RSDP in memory; the valid
      * RSDP has a valid checksum, all others have an invalid checksum.
      */
-    if (ACPI_STRNCMP ((char *) Rsdp, ACPI_SIG_RSDP,
-            sizeof (ACPI_SIG_RSDP)-1) != 0)
+    if (!ACPI_VALIDATE_RSDP_SIG (Rsdp->Signature))
     {
         /* Nope, BAD Signature */
 
@@ -324,7 +312,7 @@ ACPI_EXPORT_SYMBOL (AcpiFindRootPointer)
  *
  ******************************************************************************/
 
-static UINT8 *
+UINT8 *
 AcpiTbScanMemoryForRsdp (
     UINT8                   *StartAddress,
     UINT32                  Length)

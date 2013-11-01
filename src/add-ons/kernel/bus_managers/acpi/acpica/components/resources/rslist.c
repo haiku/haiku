@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -144,7 +144,7 @@ AcpiRsConvertAmlToResources (
     UINT32                  Length,
     UINT32                  Offset,
     UINT8                   ResourceIndex,
-    void                    *Context)
+    void                    **Context)
 {
     ACPI_RESOURCE           **ResourcePtr = ACPI_CAST_INDIRECT_PTR (
                                 ACPI_RESOURCE, Context);
@@ -271,6 +271,15 @@ AcpiRsConvertResourcesToAml (
             return_ACPI_STATUS (AE_BAD_DATA);
         }
 
+        /* Sanity check the length. It must not be zero, or we loop forever */
+
+        if (!Resource->Length)
+        {
+            ACPI_ERROR ((AE_INFO,
+                "Invalid zero length descriptor in resource list\n"));
+            return_ACPI_STATUS (AE_AML_BAD_RESOURCE_LENGTH);
+        }
+
         /* Perform the conversion */
 
         if (Resource->Type == ACPI_RESOURCE_TYPE_SERIAL_BUS)
@@ -313,7 +322,7 @@ AcpiRsConvertResourcesToAml (
 
         /* Perform final sanity check on the new AML resource descriptor */
 
-        Status = AcpiUtValidateResource (
+        Status = AcpiUtValidateResource (NULL,
                     ACPI_CAST_PTR (AML_RESOURCE, Aml), NULL);
         if (ACPI_FAILURE (Status))
         {

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -124,7 +124,7 @@
 /* Common info for tool signons */
 
 #define ACPICA_NAME                 "Intel ACPI Component Architecture"
-#define ACPICA_COPYRIGHT            "Copyright (c) 2000 - 2012 Intel Corporation"
+#define ACPICA_COPYRIGHT            "Copyright (c) 2000 - 2013 Intel Corporation"
 
 #if ACPI_MACHINE_WIDTH == 64
 #define ACPI_WIDTH          "-64"
@@ -175,11 +175,18 @@ AcpiGetopt(
     char                    **argv,
     char                    *opts);
 
+int
+AcpiGetoptArgument (
+    int                     argc,
+    char                    **argv);
+
 extern int                  AcpiGbl_Optind;
 extern int                  AcpiGbl_Opterr;
+extern int                  AcpiGbl_SubOptChar;
 extern char                 *AcpiGbl_Optarg;
 
 
+#ifndef ACPI_DUMP_APP
 /*
  * adisasm
  */
@@ -284,5 +291,6 @@ AdWriteTable (
     UINT32                  Length,
     char                    *TableName,
     char                    *OemTableId);
+#endif
 
 #endif /* _ACAPPS */

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -266,6 +266,7 @@
 /* Maximum SpaceIds for Operation Regions */
 
 #define ACPI_MAX_ADDRESS_SPACE          255
+#define ACPI_NUM_DEFAULT_SPACES         4
 
 /* Array sizes. Used for range checking also */
 
@@ -294,7 +295,7 @@
  *
  *****************************************************************************/
 
-#define ACPI_DEBUGGER_MAX_ARGS          ACPI_METHOD_NUM_ARGS + 2 /* Max command line arguments */
+#define ACPI_DEBUGGER_MAX_ARGS          ACPI_METHOD_NUM_ARGS + 4 /* Max command line arguments */
 #define ACPI_DB_LINE_BUFFER_SIZE        512
 
 #define ACPI_DEBUGGER_COMMAND_PROMPT    '-'

@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Module Name: tbxface - ACPI table oriented external interfaces
+ * Module Name: tbxface - ACPI table-oriented external interfaces
  *
  *****************************************************************************/
 
@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -158,7 +158,7 @@ AcpiAllocateRootTable (
  *                                    array is dynamically allocated.
  *              InitialTableCount   - Size of InitialTableArray, in number of
  *                                    ACPI_TABLE_DESC structures
- *              AllowRealloc        - Flag to tell Table Manager if resize of
+ *              AllowResize         - Flag to tell Table Manager if resize of
  *                                    pre-allocated array is allowed. Ignored
  *                                    if InitialTableArray is NULL.
  *
@@ -189,8 +189,8 @@ AcpiInitializeTables (
 
 
     /*
-     * Set up the Root Table Array
-     * Allocate the table array if requested
+     * Setup the Root Table Array and allocate the table array
+     * if requested
      */
     if (!InitialTableArray)
     {
@@ -376,9 +376,10 @@ ACPI_EXPORT_SYMBOL (AcpiGetTableHeader)
  *              Instance            - Which instance (for SSDTs)
  *              OutTable            - Where the pointer to the table is returned
  *
- * RETURN:      Status and pointer to table
+ * RETURN:      Status and pointer to the requested table
  *
- * DESCRIPTION: Finds and verifies an ACPI table.
+ * DESCRIPTION: Finds and verifies an ACPI table. Table must be in the
+ *              RSDT/XSDT.
  *
  ******************************************************************************/
 
@@ -437,9 +438,10 @@ ACPI_EXPORT_SYMBOL (AcpiGetTable)
  * PARAMETERS:  TableIndex          - Table index
  *              Table               - Where the pointer to the table is returned
  *
- * RETURN:      Status and pointer to the table
+ * RETURN:      Status and pointer to the requested table
  *
- * DESCRIPTION: Obtain a table by an index into the global table list.
+ * DESCRIPTION: Obtain a table by an index into the global table list. Used
+ *              internally also.
  *
  ******************************************************************************/
 
@@ -500,7 +502,7 @@ ACPI_EXPORT_SYMBOL (AcpiGetTableByIndex)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Install table event handler
+ * DESCRIPTION: Install a global table event handler.
  *
  ******************************************************************************/
 
@@ -556,7 +558,7 @@ ACPI_EXPORT_SYMBOL (AcpiInstallTableHandler)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Remove table event handler
+ * DESCRIPTION: Remove a table event handler
  *
  ******************************************************************************/
 

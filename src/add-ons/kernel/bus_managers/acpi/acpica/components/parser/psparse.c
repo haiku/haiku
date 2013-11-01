@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -263,10 +263,10 @@ AcpiPsCompleteThisOp (
         switch (ParentInfo->Class)
         {
         case AML_CLASS_CONTROL:
+
             break;
 
         case AML_CLASS_CREATE:
-
             /*
              * These opcodes contain TermArg operands. The current
              * op must be replaced by a placeholder return op
@@ -279,7 +279,6 @@ AcpiPsCompleteThisOp (
             break;
 
         case AML_CLASS_NAMED_OBJECT:
-
             /*
              * These opcodes contain TermArg operands. The current
              * op must be replaced by a placeholder return op
@@ -424,7 +423,6 @@ AcpiPsNextParseState (
         Status = AE_CTRL_TERMINATE;
         break;
 
-
     case AE_CTRL_BREAK:
 
         ParserState->Aml = WalkState->AmlLastWhile;
@@ -432,13 +430,11 @@ AcpiPsNextParseState (
         Status = AE_CTRL_BREAK;
         break;
 
-
     case AE_CTRL_CONTINUE:
 
         ParserState->Aml = WalkState->AmlLastWhile;
         Status = AE_CTRL_CONTINUE;
         break;
-
 
     case AE_CTRL_PENDING:
 
@@ -462,7 +458,6 @@ AcpiPsNextParseState (
         Status = AE_CTRL_PENDING;
         break;
 
-
     case AE_CTRL_FALSE:
         /*
          * Either an IF/WHILE Predicate was false or we encountered a BREAK
@@ -479,7 +474,6 @@ AcpiPsNextParseState (
         Status = AE_CTRL_END;
         break;
 
-
     case AE_CTRL_TRANSFER:
 
         /* A method call (invocation) -- transfer control */
@@ -493,7 +487,6 @@ AcpiPsNextParseState (
 
         WalkState->ReturnUsed = AcpiDsIsResultUsed (Op, WalkState);
         break;
-
 
     default:
 

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -447,14 +447,17 @@ AcpiUtExecute_CID (
         switch (CidObjects[i]->Common.Type)
         {
         case ACPI_TYPE_INTEGER:
+
             StringAreaSize += ACPI_EISAID_STRING_SIZE;
             break;
 
         case ACPI_TYPE_STRING:
+
             StringAreaSize += CidObjects[i]->String.Length + 1;
             break;
 
         default:
+
             Status = AE_TYPE;
             goto Cleanup;
         }

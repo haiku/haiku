@@ -36,6 +36,7 @@ local events_src =
 	evgpeblk.c
 	evgpeinit.c
 	evgpeutil.c
+	evhandler.c
 	evmisc.c
 	evregion.c
 	evrgnini.c
@@ -89,6 +90,8 @@ local hardware_src =
 local namespace_src =
 	nsaccess.c
 	nsalloc.c
+	nsarguments.c
+	nsconvert.c
 	nsdump.c
 	nsdumpdv.c
 	nseval.c
@@ -98,6 +101,7 @@ local namespace_src =
 	nsobject.c
 	nsparse.c
 	nspredef.c
+	nsprepkg.c
 	nsrepair.c
 	nsrepair2.c
 	nssearch.c
@@ -111,7 +115,9 @@ local namespace_src =
 local parser_src =
 	psargs.c
 	psloop.c
+	psobject.c
 	psopcode.c
+	psopinfo.c
 	psparse.c
 	psscope.c
 	pstree.c
@@ -140,6 +146,7 @@ local tables_src =
 	tbfadt.c
 	tbfind.c
 	tbinstal.c
+	tbprint.c
 	tbutils.c
 	tbxface.c
 	tbxfload.c
@@ -149,12 +156,14 @@ local tables_src =
 local utilities_src =
 	utaddress.c
 	utalloc.c
+	utbuffer.c
 	utcache.c
 	utclib.c
 	utcopy.c
 	utdecode.c
 	utdebug.c
 	utdelete.c
+	uterror.c
 	uteval.c
 	utexcep.c
 	utglobal.c
@@ -166,8 +175,11 @@ local utilities_src =
 	utmutex.c
 	utobject.c
 	utosi.c
+	utownerid.c
+	utpredef.c
 	utresrc.c
 	utstate.c
+	utstring.c
 	uttrack.c
 	utxface.c
 	utxferror.c

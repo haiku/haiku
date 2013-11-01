@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -445,16 +445,27 @@ AcpiDmDumpDescending (
     switch (Op->Common.AmlOpcode)
     {
     case AML_BYTE_OP:
+
+        AcpiOsPrintf ("%2.2X", (UINT32) Op->Common.Value.Integer);
+        break;
+
     case AML_WORD_OP:
+
+        AcpiOsPrintf ("%4.4X", (UINT32) Op->Common.Value.Integer);
+        break;
+
     case AML_DWORD_OP:
-        AcpiOsPrintf ("%X", (UINT32) Op->Common.Value.Integer);
+
+        AcpiOsPrintf ("%8.8X", (UINT32) Op->Common.Value.Integer);
         break;
 
     case AML_QWORD_OP:
+
         AcpiOsPrintf ("%8.8X%8.8X", ACPI_FORMAT_UINT64 (Op->Common.Value.Integer));
         break;
 
     case AML_INT_NAMEPATH_OP:
+
         if (Op->Common.Value.String)
         {
             AcpiNsExternalizeName (ACPI_UINT32_MAX, Op->Common.Value.String,
@@ -472,10 +483,12 @@ AcpiDmDumpDescending (
     case AML_METHOD_OP:
     case AML_DEVICE_OP:
     case AML_INT_NAMEDFIELD_OP:
+
         AcpiOsPrintf ("%4.4s", ACPI_CAST_PTR (char, &Op->Named.Name));
         break;
 
     default:
+
         break;
     }
 
@@ -522,6 +535,7 @@ AcpiDmFindOrphanDescending (
     {
 #ifdef ACPI_UNDER_DEVELOPMENT
     case AML_ADD_OP:
+
         ChildOp = Op->Common.Value.Arg;
         if ((ChildOp->Common.AmlOpcode == AML_INT_NAMEPATH_OP) &&
             !ChildOp->Common.Node)
@@ -628,6 +642,7 @@ AcpiDmFindOrphanDescending (
         break;
 
     default:
+
         break;
     }
 
@@ -909,7 +924,7 @@ AcpiDmXrefDescendingOp (
             }
         }
 
-        AcpiDmAddToExternalList (Op, Path, (UINT8) ObjectType2, ParamCount);
+        AcpiDmAddToExternalList (Op, Path, (UINT8) ObjectType2, ParamCount | 0x80);
         Op->Common.Node = Node;
     }
     else

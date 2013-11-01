@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -445,7 +445,11 @@ AcpiInstallInterface (
         return (AE_BAD_PARAMETER);
     }
 
-    (void) AcpiOsAcquireMutex (AcpiGbl_OsiMutex, ACPI_WAIT_FOREVER);
+    Status = AcpiOsAcquireMutex (AcpiGbl_OsiMutex, ACPI_WAIT_FOREVER);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
 
     /* Check if the interface name is already in the global list */
 
@@ -506,7 +510,11 @@ AcpiRemoveInterface (
         return (AE_BAD_PARAMETER);
     }
 
-    (void) AcpiOsAcquireMutex (AcpiGbl_OsiMutex, ACPI_WAIT_FOREVER);
+    Status = AcpiOsAcquireMutex (AcpiGbl_OsiMutex, ACPI_WAIT_FOREVER);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
 
     Status = AcpiUtRemoveInterface (InterfaceName);
 
@@ -536,10 +544,14 @@ ACPI_STATUS
 AcpiInstallInterfaceHandler (
     ACPI_INTERFACE_HANDLER  Handler)
 {
-    ACPI_STATUS             Status = AE_OK;
+    ACPI_STATUS             Status;
 
 
-    (void) AcpiOsAcquireMutex (AcpiGbl_OsiMutex, ACPI_WAIT_FOREVER);
+    Status = AcpiOsAcquireMutex (AcpiGbl_OsiMutex, ACPI_WAIT_FOREVER);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
 
     if (Handler && AcpiGbl_InterfaceHandler)
     {
@@ -555,6 +567,40 @@ AcpiInstallInterfaceHandler (
 }
 
 ACPI_EXPORT_SYMBOL (AcpiInstallInterfaceHandler)
+
+
+/*****************************************************************************
+ *
+ * FUNCTION:    AcpiUpdateInterfaces
+ *
+ * PARAMETERS:  Action              - Actions to be performed during the
+ *                                    update
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Update _OSI interface strings, disabling or enabling OS vendor
+ *              string or/and feature group strings.
+ *
+ ****************************************************************************/
+
+ACPI_STATUS
+AcpiUpdateInterfaces (
+    UINT8                   Action)
+{
+    ACPI_STATUS             Status;
+
+
+    Status = AcpiOsAcquireMutex (AcpiGbl_OsiMutex, ACPI_WAIT_FOREVER);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
+
+    Status = AcpiUtUpdateInterfaces (Action);
+
+    AcpiOsReleaseMutex (AcpiGbl_OsiMutex);
+    return (Status);
+}
 
 
 /*****************************************************************************

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -302,6 +302,13 @@ AcpiRsGetAmlLength (
             return_ACPI_STATUS (AE_AML_INVALID_RESOURCE_TYPE);
         }
 
+        /* Sanity check the length. It must not be zero, or we loop forever */
+
+        if (!Resource->Length)
+        {
+            return_ACPI_STATUS (AE_AML_BAD_RESOURCE_LENGTH);
+        }
+
         /* Get the base size of the (external stream) resource descriptor */
 
         TotalSize = AcpiGbl_AmlResourceSizes [Resource->Type];
@@ -436,8 +443,8 @@ AcpiRsGetAmlLength (
 
             break;
 
-
         default:
+
             break;
         }
 
@@ -502,7 +509,7 @@ AcpiRsGetListLength (
     {
         /* Validate the Resource Type and Resource Length */
 
-        Status = AcpiUtValidateResource (AmlBuffer, &ResourceIndex);
+        Status = AcpiUtValidateResource (NULL, AmlBuffer, &ResourceIndex);
         if (ACPI_FAILURE (Status))
         {
             /*
@@ -627,6 +634,7 @@ AcpiRsGetListLength (
             break;
 
         default:
+
             break;
         }
 
@@ -741,7 +749,9 @@ AcpiRsGetPciRoutingTableLength (
 
         NameFound = FALSE;
 
-        for (TableIndex = 0; TableIndex < 4 && !NameFound; TableIndex++)
+        for (TableIndex = 0;
+             TableIndex < PackageElement->Package.Count && !NameFound;
+             TableIndex++)
         {
             if (*SubObjectList && /* Null object allowed */
 

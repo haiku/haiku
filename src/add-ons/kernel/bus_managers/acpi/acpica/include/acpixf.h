@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -119,7 +119,7 @@
 
 /* Current ACPICA subsystem version in YYYYMMDD format */
 
-#define ACPI_CA_VERSION                 0x20121018
+#define ACPI_CA_VERSION                 0x20130823
 
 #include "acconfig.h"
 #include "actypes.h"
@@ -133,6 +133,7 @@ extern UINT32               AcpiCurrentGpeCount;
 extern ACPI_TABLE_FADT      AcpiGbl_FADT;
 extern BOOLEAN              AcpiGbl_SystemAwakeAndRunning;
 extern BOOLEAN              AcpiGbl_ReducedHardware;        /* ACPI 5.0 */
+extern UINT8                AcpiGbl_OsiData;
 
 /* Runtime configuration of debug print levels */
 
@@ -151,6 +152,7 @@ extern UINT8                AcpiGbl_EnableAmlDebugObject;
 extern UINT8                AcpiGbl_CopyDsdtLocally;
 extern UINT8                AcpiGbl_TruncateIoAddresses;
 extern UINT8                AcpiGbl_DisableAutoRepair;
+extern UINT8                AcpiGbl_DisableSsdtTableLoad;
 
 
 /*
@@ -248,6 +250,10 @@ ACPI_STATUS
 AcpiRemoveInterface (
     ACPI_STRING             InterfaceName);
 
+ACPI_STATUS
+AcpiUpdateInterfaces (
+    UINT8                   Action);
+
 UINT32
 AcpiCheckAddressRange (
     ACPI_ADR_SPACE_TYPE     SpaceId,
@@ -339,8 +345,8 @@ AcpiWalkNamespace (
     ACPI_OBJECT_TYPE        Type,
     ACPI_HANDLE             StartObject,
     UINT32                  MaxDepth,
-    ACPI_WALK_CALLBACK      PreOrderVisit,
-    ACPI_WALK_CALLBACK      PostOrderVisit,
+    ACPI_WALK_CALLBACK      DescendingCallback,
+    ACPI_WALK_CALLBACK      AscendingCallback,
     void                    *Context,
     void                    **ReturnValue);
 
@@ -440,6 +446,17 @@ ACPI_STATUS
 AcpiInstallInitializationHandler (
     ACPI_INIT_HANDLER       Handler,
     UINT32                  Function);
+
+ACPI_HW_DEPENDENT_RETURN_STATUS (
+ACPI_STATUS
+AcpiInstallSciHandler (
+    ACPI_SCI_HANDLER        Address,
+    void                    *Context))
+
+ACPI_HW_DEPENDENT_RETURN_STATUS (
+ACPI_STATUS
+AcpiRemoveSciHandler (
+    ACPI_SCI_HANDLER        Address))
 
 ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
@@ -688,6 +705,12 @@ ACPI_STATUS
 AcpiGetEventResources (
     ACPI_HANDLE             DeviceHandle,
     ACPI_BUFFER             *RetBuffer);
+
+ACPI_STATUS
+AcpiWalkResourceBuffer (
+    ACPI_BUFFER                 *Buffer,
+    ACPI_WALK_RESOURCE_CALLBACK UserFunction,
+    void                        *Context);
 
 ACPI_STATUS
 AcpiWalkResources (

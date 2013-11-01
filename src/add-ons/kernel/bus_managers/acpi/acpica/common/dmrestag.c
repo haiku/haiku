@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -161,7 +161,7 @@ AcpiDmAddResourceToNamespace (
     UINT32                  Length,
     UINT32                  Offset,
     UINT8                   ResourceIndex,
-    void                    *Context);
+    void                    **Context);
 
 static void
 AcpiDmAddResourcesToNamespace (
@@ -697,7 +697,7 @@ AcpiGetTagPathname (
     Aml = ACPI_CAST_PTR (AML_RESOURCE,
             &Op->Named.Data[ResourceNode->Value]);
 
-    Status = AcpiUtValidateResource (Aml, &ResourceTableIndex);
+    Status = AcpiUtValidateResource (NULL, Aml, &ResourceTableIndex);
     if (ACPI_FAILURE (Status))
     {
         return (NULL);
@@ -738,6 +738,7 @@ AcpiGetTagPathname (
     Status = AcpiNsBuildExternalPath (BufferNode, RequiredSize, Pathname);
     if (ACPI_FAILURE (Status))
     {
+        ACPI_FREE (Pathname);
         return (NULL);
     }
 
@@ -870,7 +871,6 @@ AcpiDmGetResourceTag (
     case ACPI_RESOURCE_NAME_ADDRESS32:
     case ACPI_RESOURCE_NAME_ADDRESS64:
     case ACPI_RESOURCE_NAME_EXTENDED_ADDRESS64:
-
         /*
          * Subtype differentiation is the flags.
          * Kindof brute force, but just blindly search for an index match
@@ -918,6 +918,7 @@ AcpiDmGetResourceTag (
         break;
 
     default:
+
         break;
     }
 
@@ -1010,7 +1011,7 @@ AcpiDmFindResources (
                  * resource descriptors to the namespace, as children of the
                  * buffer node.
                  */
-                if (ACPI_SUCCESS (AcpiDmIsResourceTemplate (Op)))
+                if (ACPI_SUCCESS (AcpiDmIsResourceTemplate (NULL, Op)))
                 {
                     Op->Common.DisasmOpcode = ACPI_DASM_RESOURCE;
                     AcpiDmAddResourcesToNamespace (Parent->Common.Node, Op);
@@ -1063,9 +1064,9 @@ AcpiDmAddResourcesToNamespace (
      * Insert each resource into the namespace
      * NextOp contains the Aml pointer and the Aml length
      */
-    AcpiUtWalkAmlResources ((UINT8 *) NextOp->Named.Data,
+    AcpiUtWalkAmlResources (NULL, (UINT8 *) NextOp->Named.Data,
         (ACPI_SIZE) NextOp->Common.Value.Integer,
-        AcpiDmAddResourceToNamespace, BufferNode);
+        AcpiDmAddResourceToNamespace, (void **) BufferNode);
 }
 
 
@@ -1091,7 +1092,7 @@ AcpiDmAddResourceToNamespace (
     UINT32                  Length,
     UINT32                  Offset,
     UINT8                   ResourceIndex,
-    void                    *Context)
+    void                    **Context)
 {
     ACPI_STATUS             Status;
     ACPI_GENERIC_STATE      ScopeInfo;

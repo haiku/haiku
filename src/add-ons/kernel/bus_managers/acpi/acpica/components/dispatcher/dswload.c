@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -153,6 +153,7 @@ AcpiDsInitCallbacks (
     switch (PassNumber)
     {
     case 1:
+
         WalkState->ParseFlags         = ACPI_PARSE_LOAD_PASS1 |
                                         ACPI_PARSE_DELETE_TREE;
         WalkState->DescendingCallback = AcpiDsLoad1BeginOp;
@@ -160,6 +161,7 @@ AcpiDsInitCallbacks (
         break;
 
     case 2:
+
         WalkState->ParseFlags         = ACPI_PARSE_LOAD_PASS1 |
                                         ACPI_PARSE_DELETE_TREE;
         WalkState->DescendingCallback = AcpiDsLoad2BeginOp;
@@ -167,6 +169,7 @@ AcpiDsInitCallbacks (
         break;
 
     case 3:
+
 #ifndef ACPI_NO_METHOD_EXECUTION
         WalkState->ParseFlags        |= ACPI_PARSE_EXECUTE  |
                                         ACPI_PARSE_DELETE_TREE;
@@ -176,6 +179,7 @@ AcpiDsInitCallbacks (
         break;
 
     default:
+
         return (AE_BAD_PARAMETER);
     }
 
@@ -246,7 +250,6 @@ AcpiDsLoad1BeginOp (
     switch (WalkState->Opcode)
     {
     case AML_SCOPE_OP:
-
         /*
          * The target name of the Scope() operator must exist at this point so
          * that we can actually open the scope to enter new names underneath it.
@@ -293,7 +296,6 @@ AcpiDsLoad1BeginOp (
         case ACPI_TYPE_INTEGER:
         case ACPI_TYPE_STRING:
         case ACPI_TYPE_BUFFER:
-
             /*
              * These types we will allow, but we will change the type.
              * This enables some existing code of the form:
@@ -314,7 +316,6 @@ AcpiDsLoad1BeginOp (
             break;
 
         case ACPI_TYPE_METHOD:
-
             /*
              * Allow scope change to root during execution of module-level
              * code. Root is typed METHOD during this time.
@@ -339,7 +340,6 @@ AcpiDsLoad1BeginOp (
             return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
         }
         break;
-
 
     default:
         /*

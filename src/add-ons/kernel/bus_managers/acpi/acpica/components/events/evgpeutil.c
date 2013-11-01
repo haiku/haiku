@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -288,7 +288,7 @@ AcpiEvGetGpeDevice (
  *
  * FUNCTION:    AcpiEvGetGpeXruptBlock
  *
- * PARAMETERS:  InterruptNumber      - Interrupt for a GPE block
+ * PARAMETERS:  InterruptNumber             - Interrupt for a GPE block
  *
  * RETURN:      A GPE interrupt block
  *

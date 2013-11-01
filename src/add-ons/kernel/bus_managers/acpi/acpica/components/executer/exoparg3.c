@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -202,7 +202,6 @@ AcpiExOpcode_3A_0T_0R (
         ACPI_FREE (Fatal);
         break;
 
-
     default:
 
         ACPI_ERROR ((AE_INFO, "Unknown AML opcode 0x%X",
@@ -249,7 +248,6 @@ AcpiExOpcode_3A_1T_1R (
     switch (WalkState->Opcode)
     {
     case AML_MID_OP:    /* Mid (Source[0], Index[1], Length[2], Result[3]) */
-
         /*
          * Create the return object. The Source operand is guaranteed to be
          * either a String or a Buffer, so just use its type.
@@ -340,7 +338,6 @@ AcpiExOpcode_3A_1T_1R (
 
         ReturnDesc->Buffer.Flags |= AOPOBJ_DATA_VALID;
         break;
-
 
     default:
 

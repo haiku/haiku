@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -339,26 +339,31 @@ AcpiExDecodeFieldAccess (
 
     case AML_FIELD_ACCESS_BYTE:
     case AML_FIELD_ACCESS_BUFFER:   /* ACPI 2.0 (SMBus Buffer) */
+
         ByteAlignment = 1;
         BitLength     = 8;
         break;
 
     case AML_FIELD_ACCESS_WORD:
+
         ByteAlignment = 2;
         BitLength     = 16;
         break;
 
     case AML_FIELD_ACCESS_DWORD:
+
         ByteAlignment = 4;
         BitLength     = 32;
         break;
 
     case AML_FIELD_ACCESS_QWORD:    /* ACPI 2.0 */
+
         ByteAlignment = 8;
         BitLength     = 64;
         break;
 
     default:
+
         /* Invalid field access type */
 
         ACPI_ERROR ((AE_INFO,
@@ -608,7 +613,6 @@ AcpiExPrepFieldValue (
             ObjDesc->Field.AccessByteWidth, ObjDesc->Field.RegionObj));
         break;
 
-
     case ACPI_TYPE_LOCAL_BANK_FIELD:
 
         ObjDesc->BankField.Value = Info->BankValue;
@@ -642,7 +646,6 @@ AcpiExPrepFieldValue (
             Info->DataRegisterNode)->Named.Length;
 
         break;
-
 
     case ACPI_TYPE_LOCAL_INDEX_FIELD:
 
@@ -697,7 +700,9 @@ AcpiExPrepFieldValue (
         break;
 
     default:
+
         /* No other types should get here */
+
         break;
     }
 

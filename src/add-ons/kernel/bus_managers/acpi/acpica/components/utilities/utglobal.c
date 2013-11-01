@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -346,7 +346,7 @@ AcpiUtInitGlobals (
 
 #if (!ACPI_REDUCED_HARDWARE)
 
-    /* GPE support */
+    /* GPE/SCI support */
 
     AcpiGbl_AllGpesInitialized          = FALSE;
     AcpiGbl_GpeXruptListHead            = NULL;
@@ -355,6 +355,7 @@ AcpiUtInitGlobals (
     AcpiCurrentGpeCount                 = 0;
 
     AcpiGbl_GlobalEventHandler          = NULL;
+    AcpiGbl_SciHandlerList              = NULL;
 
 #endif /* !ACPI_REDUCED_HARDWARE */
 
@@ -391,7 +392,6 @@ AcpiUtInitGlobals (
     AcpiGbl_TraceDbgLayer               = 0;
     AcpiGbl_DebuggerConfiguration       = DEBUGGER_THREADING;
     AcpiGbl_DbOutputFlags               = ACPI_DB_CONSOLE_OUTPUT;
-    AcpiGbl_OsiData                     = 0;
     AcpiGbl_OsiMutex                    = NULL;
     AcpiGbl_RegMethodsExecuted          = FALSE;
 
@@ -415,6 +415,8 @@ AcpiUtInitGlobals (
 
 #ifdef ACPI_DISASSEMBLER
     AcpiGbl_ExternalList                = NULL;
+    AcpiGbl_NumExternalMethods          = 0;
+    AcpiGbl_ResolvedExternalMethods     = 0;
 #endif
 
 #ifdef ACPI_DEBUG_OUTPUT

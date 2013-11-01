@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -251,7 +251,7 @@ AcpiHwLegacySleep (
          * to still read the right value. Ideally, this block would go
          * away entirely.
          */
-        AcpiOsStall (10000000);
+        AcpiOsStall (10 * ACPI_USEC_PER_SEC);
 
         Status = AcpiHwRegisterWrite (ACPI_REGISTER_PM1_CONTROL,
                     SleepEnableRegInfo->AccessBitMask);

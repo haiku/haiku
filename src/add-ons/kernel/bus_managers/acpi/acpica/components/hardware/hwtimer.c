@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -187,8 +187,14 @@ AcpiGetTimer (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    Status = AcpiHwRead (Ticks, &AcpiGbl_FADT.XPmTimerBlock);
+    /* ACPI 5.0A: PM Timer is optional */
 
+    if (!AcpiGbl_FADT.XPmTimerBlock.Address)
+    {
+        return_ACPI_STATUS (AE_SUPPORT);
+    }
+
+    Status = AcpiHwRead (Ticks, &AcpiGbl_FADT.XPmTimerBlock);
     return_ACPI_STATUS (Status);
 }
 
@@ -243,6 +249,13 @@ AcpiGetTimerDuration (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
+    /* ACPI 5.0A: PM Timer is optional */
+
+    if (!AcpiGbl_FADT.XPmTimerBlock.Address)
+    {
+        return_ACPI_STATUS (AE_SUPPORT);
+    }
+
     /*
      * Compute Tick Delta:
      * Handle (max one) timer rollovers on 24-bit versus 32-bit timers.
@@ -275,10 +288,11 @@ AcpiGetTimerDuration (
     /*
      * Compute Duration (Requires a 64-bit multiply and divide):
      *
-     * TimeElapsed = (DeltaTicks * 1000000) / PM_TIMER_FREQUENCY;
+     * TimeElapsed (microseconds) =
+     *  (DeltaTicks * ACPI_USEC_PER_SEC) / ACPI_PM_TIMER_FREQUENCY;
      */
-    Status = AcpiUtShortDivide (((UINT64) DeltaTicks) * 1000000,
-                PM_TIMER_FREQUENCY, &Quotient, NULL);
+    Status = AcpiUtShortDivide (((UINT64) DeltaTicks) * ACPI_USEC_PER_SEC,
+                ACPI_PM_TIMER_FREQUENCY, &Quotient, NULL);
 
     *TimeElapsed = (UINT32) Quotient;
     return_ACPI_STATUS (Status);

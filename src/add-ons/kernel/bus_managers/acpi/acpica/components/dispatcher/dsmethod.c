@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -235,6 +235,7 @@ AcpiDsCreateMethodMutex (
     Status = AcpiOsCreateMutex (&MutexDesc->Mutex.OsMutex);
     if (ACPI_FAILURE (Status))
     {
+        AcpiUtDeleteObjectDesc (MutexDesc);
         return_ACPI_STATUS (Status);
     }
 
@@ -481,7 +482,8 @@ AcpiDsCallControlMethod (
     Info = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_EVALUATE_INFO));
     if (!Info)
     {
-        return_ACPI_STATUS (AE_NO_MEMORY);
+        Status = AE_NO_MEMORY;
+        goto Cleanup;
     }
 
     Info->Parameters = &ThisWalkState->Operands[0];

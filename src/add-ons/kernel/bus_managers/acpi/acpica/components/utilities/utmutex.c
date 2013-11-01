@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -168,7 +168,7 @@ AcpiUtMutexInitialize (
         }
     }
 
-    /* Create the spinlocks for use at interrupt level */
+    /* Create the spinlocks for use at interrupt level or for speed */
 
     Status = AcpiOsCreateLock (&AcpiGbl_GpeLock);
     if (ACPI_FAILURE (Status))
@@ -182,7 +182,14 @@ AcpiUtMutexInitialize (
         return_ACPI_STATUS (Status);
     }
 
+    Status = AcpiOsCreateLock (&AcpiGbl_ReferenceCountLock);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
     /* Mutex for _OSI support */
+
     Status = AcpiOsCreateMutex (&AcpiGbl_OsiMutex);
     if (ACPI_FAILURE (Status))
     {
@@ -232,6 +239,7 @@ AcpiUtMutexTerminate (
 
     AcpiOsDeleteLock (AcpiGbl_GpeLock);
     AcpiOsDeleteLock (AcpiGbl_HardwareLock);
+    AcpiOsDeleteLock (AcpiGbl_ReferenceCountLock);
 
     /* Delete the reader/writer lock */
 

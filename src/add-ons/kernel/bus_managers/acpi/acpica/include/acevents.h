@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -239,6 +239,7 @@ AcpiEvGpeDispatch (
     ACPI_GPE_EVENT_INFO     *GpeEventInfo,
     UINT32                  GpeNumber);
 
+
 /*
  * evgpeinit - GPE initialization and update
  */
@@ -257,6 +258,7 @@ AcpiEvMatchGpeMethod (
     UINT32                  Level,
     void                    *Context,
     void                    **ReturnValue);
+
 
 /*
  * evgpeutil - GPE utilities
@@ -292,12 +294,29 @@ AcpiEvDeleteGpeHandlers (
 
 
 /*
- * evregion - Address Space handling
+ * evhandler - Address space handling
  */
+BOOLEAN
+AcpiEvHasDefaultHandler (
+    ACPI_NAMESPACE_NODE     *Node,
+    ACPI_ADR_SPACE_TYPE     SpaceId);
+
 ACPI_STATUS
 AcpiEvInstallRegionHandlers (
     void);
 
+ACPI_STATUS
+AcpiEvInstallSpaceHandler (
+    ACPI_NAMESPACE_NODE     *Node,
+    ACPI_ADR_SPACE_TYPE     SpaceId,
+    ACPI_ADR_SPACE_HANDLER  Handler,
+    ACPI_ADR_SPACE_SETUP    Setup,
+    void                    *Context);
+
+
+/*
+ * evregion - Operation region support
+ */
 ACPI_STATUS
 AcpiEvInitializeOpRegions (
     void);
@@ -321,14 +340,6 @@ void
 AcpiEvDetachRegion (
     ACPI_OPERAND_OBJECT    *RegionObj,
     BOOLEAN                 AcpiNsIsLocked);
-
-ACPI_STATUS
-AcpiEvInstallSpaceHandler (
-    ACPI_NAMESPACE_NODE     *Node,
-    ACPI_ADR_SPACE_TYPE     SpaceId,
-    ACPI_ADR_SPACE_HANDLER  Handler,
-    ACPI_ADR_SPACE_SETUP    Setup,
-    void                    *Context);
 
 ACPI_STATUS
 AcpiEvExecuteRegMethods (
@@ -400,16 +411,16 @@ AcpiEvGpeXruptHandler (
     void                    *Context);
 
 UINT32
+AcpiEvSciDispatch (
+    void);
+
+UINT32
 AcpiEvInstallSciHandler (
     void);
 
 ACPI_STATUS
-AcpiEvRemoveSciHandler (
+AcpiEvRemoveAllSciHandlers (
     void);
-
-UINT32
-AcpiEvInitializeSCI (
-    UINT32                  ProgramSCI);
 
 ACPI_HW_DEPENDENT_RETURN_VOID (
 void

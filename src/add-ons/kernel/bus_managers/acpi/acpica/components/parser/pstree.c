@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -394,7 +394,6 @@ AcpiPsGetChild (
         Child = AcpiPsGetArg (Op, 0);
         break;
 
-
     case AML_BUFFER_OP:
     case AML_PACKAGE_OP:
     case AML_METHOD_OP:
@@ -405,13 +404,11 @@ AcpiPsGetChild (
         Child = AcpiPsGetArg (Op, 1);
         break;
 
-
     case AML_POWER_RES_OP:
     case AML_INDEX_FIELD_OP:
 
         Child = AcpiPsGetArg (Op, 2);
         break;
-
 
     case AML_PROCESSOR_OP:
     case AML_BANK_FIELD_OP:
@@ -419,9 +416,10 @@ AcpiPsGetChild (
         Child = AcpiPsGetArg (Op, 3);
         break;
 
-
     default:
+
         /* All others have no children */
+
         break;
     }
 

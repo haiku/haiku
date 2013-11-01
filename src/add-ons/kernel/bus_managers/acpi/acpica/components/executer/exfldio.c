@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -552,9 +552,7 @@ AcpiExFieldDatumIo (
         Status = AE_OK;
         break;
 
-
     case ACPI_TYPE_LOCAL_BANK_FIELD:
-
         /*
          * Ensure that the BankValue is not beyond the capacity of
          * the register
@@ -584,7 +582,6 @@ AcpiExFieldDatumIo (
 
         /*lint -fallthrough */
 
-
     case ACPI_TYPE_LOCAL_REGION_FIELD:
         /*
          * For simple RegionFields, we just directly access the owning
@@ -594,10 +591,7 @@ AcpiExFieldDatumIo (
                     ReadWrite);
         break;
 
-
     case ACPI_TYPE_LOCAL_INDEX_FIELD:
-
-
         /*
          * Ensure that the IndexValue is not beyond the capacity of
          * the register
@@ -646,7 +640,6 @@ AcpiExFieldDatumIo (
                         Value, sizeof (UINT64));
         }
         break;
-
 
     default:
 
@@ -838,7 +831,18 @@ AcpiExExtractFromField (
     if ((ObjDesc->CommonField.StartFieldBitOffset == 0) &&
         (ObjDesc->CommonField.BitLength == AccessBitWidth))
     {
-        Status = AcpiExFieldDatumIo (ObjDesc, 0, Buffer, ACPI_READ);
+        if (BufferLength >= sizeof (UINT64))
+        {
+            Status = AcpiExFieldDatumIo (ObjDesc, 0, Buffer, ACPI_READ);
+        }
+        else
+        {
+            /* Use RawDatum (UINT64) to handle buffers < 64 bits */
+
+            Status = AcpiExFieldDatumIo (ObjDesc, 0, &RawDatum, ACPI_READ);
+            ACPI_MEMCPY (Buffer, &RawDatum, BufferLength);
+        }
+
         return_ACPI_STATUS (Status);
     }
 

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -562,12 +562,12 @@ AcpiUtRemoveAllocation (
     ACPI_STATUS             Status;
 
 
-    ACPI_FUNCTION_TRACE (UtRemoveAllocation);
+    ACPI_FUNCTION_NAME (UtRemoveAllocation);
 
 
     if (AcpiGbl_DisableMemTracking)
     {
-        return_ACPI_STATUS (AE_OK);
+        return (AE_OK);
     }
 
     MemList = AcpiGbl_GlobalList;
@@ -578,13 +578,13 @@ AcpiUtRemoveAllocation (
         ACPI_ERROR ((Module, Line,
             "Empty allocation list, nothing to free!"));
 
-        return_ACPI_STATUS (AE_OK);
+        return (AE_OK);
     }
 
     Status = AcpiUtAcquireMutex (ACPI_MTX_MEMORY);
     if (ACPI_FAILURE (Status))
     {
-        return_ACPI_STATUS (Status);
+        return (Status);
     }
 
     /* Unlink */
@@ -603,15 +603,15 @@ AcpiUtRemoveAllocation (
         (Allocation->Next)->Previous = Allocation->Previous;
     }
 
+    ACPI_DEBUG_PRINT ((ACPI_DB_ALLOCATIONS, "Freeing %p, size 0%X\n",
+        &Allocation->UserSpace, Allocation->Size));
+
     /* Mark the segment as deleted */
 
     ACPI_MEMSET (&Allocation->UserSpace, 0xEA, Allocation->Size);
 
-    ACPI_DEBUG_PRINT ((ACPI_DB_ALLOCATIONS, "Freeing size 0%X\n",
-        Allocation->Size));
-
     Status = AcpiUtReleaseMutex (ACPI_MTX_MEMORY);
-    return_ACPI_STATUS (Status);
+    return (Status);
 }
 
 
@@ -747,6 +747,7 @@ AcpiUtDumpAllocations (
                     switch (ACPI_GET_DESCRIPTOR_TYPE (Descriptor))
                     {
                     case ACPI_DESC_TYPE_OPERAND:
+
                         if (Element->Size == sizeof (ACPI_OPERAND_OBJECT))
                         {
                             DescriptorType = ACPI_DESC_TYPE_OPERAND;
@@ -754,6 +755,7 @@ AcpiUtDumpAllocations (
                         break;
 
                     case ACPI_DESC_TYPE_PARSER:
+
                         if (Element->Size == sizeof (ACPI_PARSE_OBJECT))
                         {
                             DescriptorType = ACPI_DESC_TYPE_PARSER;
@@ -761,6 +763,7 @@ AcpiUtDumpAllocations (
                         break;
 
                     case ACPI_DESC_TYPE_NAMED:
+
                         if (Element->Size == sizeof (ACPI_NAMESPACE_NODE))
                         {
                             DescriptorType = ACPI_DESC_TYPE_NAMED;
@@ -768,6 +771,7 @@ AcpiUtDumpAllocations (
                         break;
 
                     default:
+
                         break;
                     }
 
@@ -776,22 +780,26 @@ AcpiUtDumpAllocations (
                     switch (DescriptorType)
                     {
                     case ACPI_DESC_TYPE_OPERAND:
+
                         AcpiOsPrintf ("%12.12s  RefCount 0x%04X\n",
                             AcpiUtGetTypeName (Descriptor->Object.Common.Type),
                             Descriptor->Object.Common.ReferenceCount);
                         break;
 
                     case ACPI_DESC_TYPE_PARSER:
+
                         AcpiOsPrintf ("AmlOpcode 0x%04hX\n",
                             Descriptor->Op.Asl.AmlOpcode);
                         break;
 
                     case ACPI_DESC_TYPE_NAMED:
+
                         AcpiOsPrintf ("%4.4s\n",
                             AcpiUtGetNodeName (&Descriptor->Node));
                         break;
 
                     default:
+
                         AcpiOsPrintf ( "\n");
                         break;
                     }

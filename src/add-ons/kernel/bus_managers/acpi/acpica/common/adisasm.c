@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -141,11 +141,11 @@ extern int                  AslCompilerdebug;
 #endif
 
 ACPI_STATUS
-LsDisplayNamespace (
+NsDisplayNamespace (
     void);
 
 void
-LsSetupNsList (
+NsSetupNamespaceListing (
     void                    *Handle);
 
 
@@ -159,17 +159,6 @@ static void
 AdCreateTableHeader (
     char                    *Filename,
     ACPI_TABLE_HEADER       *Table);
-
-static ACPI_STATUS
-AdDeferredParse (
-    ACPI_PARSE_OBJECT       *Op,
-    UINT8                   *Aml,
-    UINT32                  AmlLength);
-
-static ACPI_STATUS
-AdParseDeferredOps (
-    ACPI_PARSE_OBJECT       *Root);
-
 
 /* Stubs for ASL compiler */
 
@@ -424,6 +413,10 @@ AdAmlDisassemble (
         {
             AcpiDmClearExternalList ();
         }
+
+        /* Load any externals defined in the optional external ref file */
+
+        AcpiDmGetExternalsFromFile ();
     }
     else
     {
@@ -455,7 +448,7 @@ AdAmlDisassemble (
     }
 
     /*
-     * Output:  ASL code. Redirect to a file if requested
+     * Output: ASL code. Redirect to a file if requested
      */
     if (OutToFile)
     {
@@ -512,8 +505,8 @@ AdAmlDisassemble (
         {
             AcpiOsPrintf ("/**** Before second load\n");
 
-            LsSetupNsList (File);
-            LsDisplayNamespace ();
+            NsSetupNamespaceListing (File);
+            NsDisplayNamespace ();
             AcpiOsPrintf ("*****/\n");
         }
 
@@ -581,8 +574,8 @@ AdAmlDisassemble (
             if (AslCompilerdebug)
             {
                 AcpiOsPrintf ("/**** After second load and resource conversion\n");
-                LsSetupNsList (File);
-                LsDisplayNamespace ();
+                NsSetupNamespaceListing (File);
+                NsDisplayNamespace ();
                 AcpiOsPrintf ("*****/\n");
 
                 AcpiDmDumpTree (AcpiGbl_ParseOpRoot);
@@ -623,17 +616,12 @@ Cleanup:
         ACPI_FREE (Table);
     }
 
-    if (DisasmFilename)
-    {
-        ACPI_FREE (DisasmFilename);
-    }
-
     if (OutToFile && File)
     {
         if (AslCompilerdebug) /* Display final namespace, with transforms */
         {
-            LsSetupNsList (File);
-            LsDisplayNamespace ();
+            NsSetupNamespaceListing (File);
+            NsDisplayNamespace ();
         }
 
         fclose (File);
@@ -716,10 +704,12 @@ AdCreateTableHeader (
     switch (Table->Revision)
     {
     case 0:
+
         AcpiOsPrintf (" **** Invalid Revision");
         break;
 
     case 1:
+
         /* Revision of DSDT controls the ACPI integer width */
 
         if (ACPI_COMPARE_NAME (Table->Signature, ACPI_SIG_DSDT))
@@ -729,6 +719,7 @@ AdCreateTableHeader (
         break;
 
     default:
+
         break;
     }
     AcpiOsPrintf ("\n");
@@ -750,7 +741,7 @@ AdCreateTableHeader (
     AcpiOsPrintf (" *     OEM Revision     0x%8.8X (%u)\n", Table->OemRevision, Table->OemRevision);
     AcpiOsPrintf (" *     Compiler ID      \"%.4s\"\n",     Table->AslCompilerId);
     AcpiOsPrintf (" *     Compiler Version 0x%8.8X (%u)\n", Table->AslCompilerRevision, Table->AslCompilerRevision);
-    AcpiOsPrintf (" */\n\n");
+    AcpiOsPrintf (" */\n");
 
     /* Create AML output filename based on input filename */
 
@@ -820,207 +811,6 @@ AdDisplayTables (
     }
 
     return (AE_OK);
-}
-
-
-/******************************************************************************
- *
- * FUNCTION:    AdDeferredParse
- *
- * PARAMETERS:  Op                  - Root Op of the deferred opcode
- *              Aml                 - Pointer to the raw AML
- *              AmlLength           - Length of the AML
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Parse one deferred opcode
- *              (Methods, operation regions, etc.)
- *
- *****************************************************************************/
-
-static ACPI_STATUS
-AdDeferredParse (
-    ACPI_PARSE_OBJECT       *Op,
-    UINT8                   *Aml,
-    UINT32                  AmlLength)
-{
-    ACPI_WALK_STATE         *WalkState;
-    ACPI_STATUS             Status;
-    ACPI_PARSE_OBJECT       *SearchOp;
-    ACPI_PARSE_OBJECT       *StartOp;
-    UINT32                  BaseAmlOffset;
-    ACPI_PARSE_OBJECT       *ExtraOp;
-
-
-    ACPI_FUNCTION_TRACE (AdDeferredParse);
-
-
-    fprintf (stderr, ".");
-
-    if (!Aml || !AmlLength)
-    {
-        return_ACPI_STATUS (AE_OK);
-    }
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Parsing %s [%4.4s]\n",
-        Op->Common.AmlOpName, (char *) &Op->Named.Name));
-
-    WalkState = AcpiDsCreateWalkState (0, Op, NULL, NULL);
-    if (!WalkState)
-    {
-        return_ACPI_STATUS (AE_NO_MEMORY);
-    }
-
-    Status = AcpiDsInitAmlWalk (WalkState, Op, NULL, Aml,
-                    AmlLength, NULL, ACPI_IMODE_LOAD_PASS1);
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
-
-    /* Parse the method */
-
-    WalkState->ParseFlags &= ~ACPI_PARSE_DELETE_TREE;
-    WalkState->ParseFlags |= ACPI_PARSE_DISASSEMBLE;
-    Status = AcpiPsParseAml (WalkState);
-
-    /*
-     * We need to update all of the Aml offsets, since the parser thought
-     * that the method began at offset zero. In reality, it began somewhere
-     * within the ACPI table, at the BaseAmlOffset. Walk the entire tree that
-     * was just created and update the AmlOffset in each Op
-     */
-    BaseAmlOffset = (Op->Common.Value.Arg)->Common.AmlOffset + 1;
-    StartOp = (Op->Common.Value.Arg)->Common.Next;
-    SearchOp = StartOp;
-
-    /* Walk the parse tree */
-
-    while (SearchOp)
-    {
-        SearchOp->Common.AmlOffset += BaseAmlOffset;
-        SearchOp = AcpiPsGetDepthNext (StartOp, SearchOp);
-    }
-
-    /*
-     * Link the newly parsed subtree into the main parse tree
-     */
-    switch (Op->Common.AmlOpcode)
-    {
-    case AML_BUFFER_OP:
-    case AML_PACKAGE_OP:
-    case AML_VAR_PACKAGE_OP:
-
-        switch (Op->Common.AmlOpcode)
-        {
-        case AML_PACKAGE_OP:
-            ExtraOp = Op->Common.Value.Arg;
-            ExtraOp = ExtraOp->Common.Next;
-            Op->Common.Value.Arg = ExtraOp->Common.Value.Arg;
-            break;
-
-        case AML_VAR_PACKAGE_OP:
-        case AML_BUFFER_OP:
-        default:
-            ExtraOp = Op->Common.Value.Arg;
-            Op->Common.Value.Arg = ExtraOp->Common.Value.Arg;
-            break;
-        }
-
-        /* Must point all parents to the main tree */
-
-        StartOp = Op;
-        SearchOp = StartOp;
-        while (SearchOp)
-        {
-            if (SearchOp->Common.Parent == ExtraOp)
-            {
-                SearchOp->Common.Parent = Op;
-            }
-            SearchOp = AcpiPsGetDepthNext (StartOp, SearchOp);
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    return_ACPI_STATUS (AE_OK);
-}
-
-
-/******************************************************************************
- *
- * FUNCTION:    AdParseDeferredOps
- *
- * PARAMETERS:  Root                - Root of the parse tree
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Parse the deferred opcodes (Methods, regions, etc.)
- *
- *****************************************************************************/
-
-static ACPI_STATUS
-AdParseDeferredOps (
-    ACPI_PARSE_OBJECT       *Root)
-{
-    ACPI_PARSE_OBJECT       *Op = Root;
-    ACPI_STATUS             Status = AE_OK;
-    const ACPI_OPCODE_INFO  *OpInfo;
-
-
-    ACPI_FUNCTION_NAME (AdParseDeferredOps);
-    fprintf (stderr, "Parsing Deferred Opcodes (Methods/Buffers/Packages/Regions)\n");
-
-    while (Op)
-    {
-        OpInfo = AcpiPsGetOpcodeInfo (Op->Common.AmlOpcode);
-        if (!(OpInfo->Flags & AML_DEFER))
-        {
-            Op = AcpiPsGetDepthNext (Root, Op);
-            continue;
-        }
-
-        switch (Op->Common.AmlOpcode)
-        {
-        case AML_METHOD_OP:
-        case AML_BUFFER_OP:
-        case AML_PACKAGE_OP:
-        case AML_VAR_PACKAGE_OP:
-
-            Status = AdDeferredParse (Op, Op->Named.Data, Op->Named.Length);
-            if (ACPI_FAILURE (Status))
-            {
-                return (Status);
-            }
-            break;
-
-        case AML_REGION_OP:
-        case AML_DATA_REGION_OP:
-        case AML_CREATE_QWORD_FIELD_OP:
-        case AML_CREATE_DWORD_FIELD_OP:
-        case AML_CREATE_WORD_FIELD_OP:
-        case AML_CREATE_BYTE_FIELD_OP:
-        case AML_CREATE_BIT_FIELD_OP:
-        case AML_CREATE_FIELD_OP:
-        case AML_BANK_FIELD_OP:
-
-            /* Nothing to do in these cases */
-
-            break;
-
-        default:
-            ACPI_ERROR ((AE_INFO, "Unhandled deferred opcode [%s]",
-                Op->Common.AmlOpName));
-            break;
-        }
-
-        Op = AcpiPsGetDepthNext (Root, Op);
-    }
-
-    fprintf (stderr, "\n");
-    return (Status);
 }
 
 
@@ -1263,7 +1053,9 @@ AdParseTable (
 
     /* Pass 3: Parse control methods and link their parse trees into the main parse tree */
 
-    Status = AdParseDeferredOps (AcpiGbl_ParseOpRoot);
+    fprintf (stderr, "Parsing Deferred Opcodes (Methods/Buffers/Packages/Regions)\n");
+    Status = AcpiDmParseDeferredOps (AcpiGbl_ParseOpRoot);
+    fprintf (stderr, "\n");
 
     /* Process Resource Templates */
 

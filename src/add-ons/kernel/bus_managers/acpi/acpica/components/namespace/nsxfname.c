@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -192,7 +192,7 @@ AcpiGetHandle (
      *
      * Error for <null Parent + relative path>
      */
-    if (AcpiNsValidRootPrefix (Pathname[0]))
+    if (ACPI_IS_ROOT_PREFIX (Pathname[0]))
     {
         /* Pathname is fully qualified (starts with '\') */
 
@@ -249,6 +249,7 @@ AcpiGetName (
 {
     ACPI_STATUS             Status;
     ACPI_NAMESPACE_NODE     *Node;
+    char                    *NodeName;
 
 
     /* Parameter validation */
@@ -299,7 +300,8 @@ AcpiGetName (
 
     /* Just copy the ACPI name from the Node and zero terminate it */
 
-    ACPI_MOVE_NAME (Buffer->Pointer, AcpiUtGetNodeName (Node));
+    NodeName = AcpiUtGetNodeName (Node);
+    ACPI_MOVE_NAME (Buffer->Pointer, NodeName);
     ((char *) Buffer->Pointer) [ACPI_NAME_SIZE] = 0;
     Status = AE_OK;
 
@@ -397,7 +399,7 @@ AcpiGetObjectInfo (
     Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
     if (ACPI_FAILURE (Status))
     {
-        goto Cleanup;
+        return (Status);
     }
 
     Node = AcpiNsValidateHandle (Handle);
@@ -495,9 +497,14 @@ AcpiGetObjectInfo (
          * Get extra info for ACPI Device/Processor objects only:
          * Run the _STA, _ADR and, SxW, and _SxD methods.
          *
-         * Note: none of these methods are required, so they may or may
+         * Notes: none of these methods are required, so they may or may
          * not be present for this device. The Info->Valid bitfield is used
          * to indicate which methods were found and run successfully.
+         *
+         * For _STA, if the method does not exist, then (as per the ACPI
+         * specification), the returned CurrentStatus flags will indicate
+         * that the device is present/functional/enabled. Otherwise, the
+         * CurrentStatus flags reflect the value returned from _STA.
          */
 
         /* Execute the Device._STA method */

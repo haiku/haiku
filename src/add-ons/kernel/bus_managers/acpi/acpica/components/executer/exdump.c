@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -429,6 +429,7 @@ AcpiExDumpObject (
 {
     UINT8                   *Target;
     char                    *Name;
+    const char              *ReferenceName;
     UINT8                   Count;
 
 
@@ -452,6 +453,7 @@ AcpiExDumpObject (
         switch (Info->Opcode)
         {
         case ACPI_EXD_INIT:
+
             break;
 
         case ACPI_EXD_TYPE:
@@ -512,8 +514,8 @@ AcpiExDumpObject (
 
         case ACPI_EXD_REFERENCE:
 
-            AcpiExOutString ("Class Name",
-                ACPI_CAST_PTR (char, AcpiUtGetReferenceName (ObjDesc)));
+            ReferenceName = AcpiUtGetReferenceName (ObjDesc);
+            AcpiExOutString ("Class Name", ACPI_CAST_PTR (char, ReferenceName));
             AcpiExDumpReferenceObj (ObjDesc);
             break;
 
@@ -555,7 +557,9 @@ AcpiExDumpOperand (
     ACPI_FUNCTION_NAME (ExDumpOperand)
 
 
-    if (!((ACPI_LV_EXEC & AcpiDbgLevel) && (_COMPONENT & AcpiDbgLayer)))
+    /* Check if debug output enabled */
+
+    if (!ACPI_IS_DEBUG_ENABLED (ACPI_LV_EXEC, _COMPONENT))
     {
         return;
     }
@@ -611,18 +615,15 @@ AcpiExDumpOperand (
             AcpiOsPrintf ("\n");
             break;
 
-
         case ACPI_REFCLASS_INDEX:
 
             AcpiOsPrintf ("%p\n", ObjDesc->Reference.Object);
             break;
 
-
         case ACPI_REFCLASS_TABLE:
 
             AcpiOsPrintf ("Table Index %X\n", ObjDesc->Reference.Value);
             break;
-
 
         case ACPI_REFCLASS_REFOF:
 
@@ -631,12 +632,10 @@ AcpiExDumpOperand (
                     ObjDesc->Reference.Object)->Common.Type));
             break;
 
-
         case ACPI_REFCLASS_NAME:
 
             AcpiOsPrintf ("- [%4.4s]\n", ObjDesc->Reference.Node->Name.Ascii);
             break;
-
 
         case ACPI_REFCLASS_ARG:
         case ACPI_REFCLASS_LOCAL:
@@ -644,14 +643,12 @@ AcpiExDumpOperand (
             AcpiOsPrintf ("%X\n", ObjDesc->Reference.Value);
             break;
 
-
         default:    /* Unknown reference class */
 
             AcpiOsPrintf ("%2.2X\n", ObjDesc->Reference.Class);
             break;
         }
         break;
-
 
     case ACPI_TYPE_BUFFER:
 
@@ -674,13 +671,11 @@ AcpiExDumpOperand (
         }
         break;
 
-
     case ACPI_TYPE_INTEGER:
 
         AcpiOsPrintf ("Integer %8.8X%8.8X\n",
             ACPI_FORMAT_UINT64 (ObjDesc->Integer.Value));
         break;
-
 
     case ACPI_TYPE_PACKAGE:
 
@@ -701,7 +696,6 @@ AcpiExDumpOperand (
             }
         }
         break;
-
 
     case ACPI_TYPE_REGION:
 
@@ -725,7 +719,6 @@ AcpiExDumpOperand (
         }
         break;
 
-
     case ACPI_TYPE_STRING:
 
         AcpiOsPrintf ("String length %X @ %p ",
@@ -736,12 +729,10 @@ AcpiExDumpOperand (
         AcpiOsPrintf ("\n");
         break;
 
-
     case ACPI_TYPE_LOCAL_BANK_FIELD:
 
         AcpiOsPrintf ("BankField\n");
         break;
-
 
     case ACPI_TYPE_LOCAL_REGION_FIELD:
 
@@ -757,12 +748,10 @@ AcpiExDumpOperand (
         AcpiExDumpOperand (ObjDesc->Field.RegionObj, Depth+1);
         break;
 
-
     case ACPI_TYPE_LOCAL_INDEX_FIELD:
 
         AcpiOsPrintf ("IndexField\n");
         break;
-
 
     case ACPI_TYPE_BUFFER_FIELD:
 
@@ -786,12 +775,10 @@ AcpiExDumpOperand (
         }
         break;
 
-
     case ACPI_TYPE_EVENT:
 
         AcpiOsPrintf ("Event\n");
         break;
-
 
     case ACPI_TYPE_METHOD:
 
@@ -801,38 +788,33 @@ AcpiExDumpOperand (
             ObjDesc->Method.AmlLength);
         break;
 
-
     case ACPI_TYPE_MUTEX:
 
         AcpiOsPrintf ("Mutex\n");
         break;
-
 
     case ACPI_TYPE_DEVICE:
 
         AcpiOsPrintf ("Device\n");
         break;
 
-
     case ACPI_TYPE_POWER:
 
         AcpiOsPrintf ("Power\n");
         break;
-
 
     case ACPI_TYPE_PROCESSOR:
 
         AcpiOsPrintf ("Processor\n");
         break;
 
-
     case ACPI_TYPE_THERMAL:
 
         AcpiOsPrintf ("Thermal\n");
         break;
 
-
     default:
+
         /* Unknown Type */
 
         AcpiOsPrintf ("Unknown Type %X\n", ObjDesc->Common.Type);
@@ -945,7 +927,9 @@ AcpiExDumpNamespaceNode (
 
     if (!Flags)
     {
-        if (!((ACPI_LV_OBJECTS & AcpiDbgLevel) && (_COMPONENT & AcpiDbgLayer)))
+        /* Check if debug output enabled */
+
+        if (!ACPI_IS_DEBUG_ENABLED (ACPI_LV_OBJECTS, _COMPONENT))
         {
             return;
         }
@@ -1073,14 +1057,12 @@ AcpiExDumpPackageObj (
             ACPI_FORMAT_UINT64 (ObjDesc->Integer.Value));
         break;
 
-
     case ACPI_TYPE_STRING:
 
         AcpiOsPrintf ("[String]  Value: ");
         AcpiUtPrintString (ObjDesc->String.Pointer, ACPI_UINT8_MAX);
         AcpiOsPrintf ("\n");
         break;
-
 
     case ACPI_TYPE_BUFFER:
 
@@ -1096,7 +1078,6 @@ AcpiExDumpPackageObj (
         }
         break;
 
-
     case ACPI_TYPE_PACKAGE:
 
         AcpiOsPrintf ("[Package] Contains %u Elements:\n",
@@ -1108,7 +1089,6 @@ AcpiExDumpPackageObj (
         }
         break;
 
-
     case ACPI_TYPE_LOCAL_REFERENCE:
 
         AcpiOsPrintf ("[Object Reference] Type [%s] %2.2X",
@@ -1116,7 +1096,6 @@ AcpiExDumpPackageObj (
             ObjDesc->Reference.Class);
         AcpiExDumpReferenceObj (ObjDesc);
         break;
-
 
     default:
 
@@ -1152,7 +1131,9 @@ AcpiExDumpObjectDescriptor (
 
     if (!Flags)
     {
-        if (!((ACPI_LV_OBJECTS & AcpiDbgLevel) && (_COMPONENT & AcpiDbgLayer)))
+        /* Check if debug output enabled */
+
+        if (!ACPI_IS_DEBUG_ENABLED (ACPI_LV_OBJECTS, _COMPONENT))
         {
             return_VOID;
         }

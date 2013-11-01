@@ -11,7 +11,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -461,6 +461,29 @@ AcpiOsGetLine (
     char                    *Buffer,
     UINT32                  BufferLength,
     UINT32                  *BytesRead);
+
+
+/*
+ * Obtain ACPI table(s)
+ */
+ACPI_STATUS
+AcpiOsGetTableByName (
+    char                    *Signature,
+    UINT32                  Instance,
+    ACPI_TABLE_HEADER       **Table,
+    ACPI_PHYSICAL_ADDRESS   *Address);
+
+ACPI_STATUS
+AcpiOsGetTableByIndex (
+    UINT32                  Index,
+    ACPI_TABLE_HEADER       **Table,
+    UINT32                  *Instance,
+    ACPI_PHYSICAL_ADDRESS   *Address);
+
+ACPI_STATUS
+AcpiOsGetTableByAddress (
+    ACPI_PHYSICAL_ADDRESS   Address,
+    ACPI_TABLE_HEADER       **Table);
 
 
 /*

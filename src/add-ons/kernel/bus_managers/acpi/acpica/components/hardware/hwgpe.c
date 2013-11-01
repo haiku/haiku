@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -214,15 +214,18 @@ AcpiHwLowSetGpe (
         /*lint -fallthrough */
 
     case ACPI_GPE_ENABLE:
+
         ACPI_SET_BIT (EnableMask, RegisterBit);
         break;
 
     case ACPI_GPE_DISABLE:
+
         ACPI_CLEAR_BIT (EnableMask, RegisterBit);
         break;
 
     default:
-        ACPI_ERROR ((AE_INFO, "Invalid GPE Action, %u\n", Action));
+
+        ACPI_ERROR ((AE_INFO, "Invalid GPE Action, %u", Action));
         return (AE_BAD_PARAMETER);
     }
 

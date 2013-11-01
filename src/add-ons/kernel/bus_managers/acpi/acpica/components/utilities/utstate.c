@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -179,15 +179,14 @@ AcpiUtPushGenericState (
     ACPI_GENERIC_STATE      **ListHead,
     ACPI_GENERIC_STATE      *State)
 {
-    ACPI_FUNCTION_TRACE (UtPushGenericState);
+    ACPI_FUNCTION_ENTRY ();
 
 
     /* Push the state object onto the front of the list (stack) */
 
     State->Common.Next = *ListHead;
     *ListHead = State;
-
-    return_VOID;
+    return;
 }
 
 
@@ -210,7 +209,7 @@ AcpiUtPopGenericState (
     ACPI_GENERIC_STATE      *State;
 
 
-    ACPI_FUNCTION_TRACE (UtPopGenericState);
+    ACPI_FUNCTION_ENTRY ();
 
 
     /* Remove the state object at the head of the list (stack) */
@@ -223,7 +222,7 @@ AcpiUtPopGenericState (
         *ListHead = State->Common.Next;
     }
 
-    return_PTR (State);
+    return (State);
 }
 
 
@@ -281,7 +280,7 @@ AcpiUtCreateThreadState (
     ACPI_GENERIC_STATE      *State;
 
 
-    ACPI_FUNCTION_TRACE (UtCreateThreadState);
+    ACPI_FUNCTION_ENTRY ();
 
 
     /* Create the generic state object */
@@ -289,7 +288,7 @@ AcpiUtCreateThreadState (
     State = AcpiUtCreateGenericState ();
     if (!State)
     {
-        return_PTR (NULL);
+        return (NULL);
     }
 
     /* Init fields specific to the update struct */
@@ -305,7 +304,7 @@ AcpiUtCreateThreadState (
         State->Thread.ThreadId = (ACPI_THREAD_ID) 1;
     }
 
-    return_PTR ((ACPI_THREAD_STATE *) State);
+    return ((ACPI_THREAD_STATE *) State);
 }
 
 
@@ -332,7 +331,7 @@ AcpiUtCreateUpdateState (
     ACPI_GENERIC_STATE      *State;
 
 
-    ACPI_FUNCTION_TRACE_PTR (UtCreateUpdateState, Object);
+    ACPI_FUNCTION_ENTRY ();
 
 
     /* Create the generic state object */
@@ -340,7 +339,7 @@ AcpiUtCreateUpdateState (
     State = AcpiUtCreateGenericState ();
     if (!State)
     {
-        return_PTR (NULL);
+        return (NULL);
     }
 
     /* Init fields specific to the update struct */
@@ -348,8 +347,7 @@ AcpiUtCreateUpdateState (
     State->Common.DescriptorType = ACPI_DESC_TYPE_STATE_UPDATE;
     State->Update.Object = Object;
     State->Update.Value = Action;
-
-    return_PTR (State);
+    return (State);
 }
 
 
@@ -375,7 +373,7 @@ AcpiUtCreatePkgState (
     ACPI_GENERIC_STATE      *State;
 
 
-    ACPI_FUNCTION_TRACE_PTR (UtCreatePkgState, InternalObject);
+    ACPI_FUNCTION_ENTRY ();
 
 
     /* Create the generic state object */
@@ -383,7 +381,7 @@ AcpiUtCreatePkgState (
     State = AcpiUtCreateGenericState ();
     if (!State)
     {
-        return_PTR (NULL);
+        return (NULL);
     }
 
     /* Init fields specific to the update struct */
@@ -393,8 +391,7 @@ AcpiUtCreatePkgState (
     State->Pkg.DestObject = ExternalObject;
     State->Pkg.Index= Index;
     State->Pkg.NumPackages = 1;
-
-    return_PTR (State);
+    return (State);
 }
 
 
@@ -418,7 +415,7 @@ AcpiUtCreateControlState (
     ACPI_GENERIC_STATE      *State;
 
 
-    ACPI_FUNCTION_TRACE (UtCreateControlState);
+    ACPI_FUNCTION_ENTRY ();
 
 
     /* Create the generic state object */
@@ -426,15 +423,14 @@ AcpiUtCreateControlState (
     State = AcpiUtCreateGenericState ();
     if (!State)
     {
-        return_PTR (NULL);
+        return (NULL);
     }
 
     /* Init fields specific to the control struct */
 
     State->Common.DescriptorType = ACPI_DESC_TYPE_STATE_CONTROL;
     State->Common.State = ACPI_CONTROL_CONDITIONAL_EXECUTING;
-
-    return_PTR (State);
+    return (State);
 }
 
 
@@ -455,7 +451,7 @@ void
 AcpiUtDeleteGenericState (
     ACPI_GENERIC_STATE      *State)
 {
-    ACPI_FUNCTION_TRACE (UtDeleteGenericState);
+    ACPI_FUNCTION_ENTRY ();
 
 
     /* Ignore null state */
@@ -464,5 +460,5 @@ AcpiUtDeleteGenericState (
     {
         (void) AcpiOsReleaseObject (AcpiGbl_StateCache, State);
     }
-    return_VOID;
+    return;
 }

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -175,8 +175,11 @@ typedef UINT32                          ACPI_RSDESC_SIZE;  /* Max Resource Descr
 
 #define ACPI_EXCLUSIVE                  (UINT8) 0x00
 #define ACPI_SHARED                     (UINT8) 0x01
-#define ACPI_EXCLUSIVE_AND_WAKE         (UINT8) 0x02
-#define ACPI_SHARED_AND_WAKE            (UINT8) 0x03
+
+/* Wake */
+
+#define ACPI_NOT_WAKE_CAPABLE           (UINT8) 0x00
+#define ACPI_WAKE_CAPABLE               (UINT8) 0x01
 
 /*
  * DMA Attributes
@@ -249,6 +252,7 @@ typedef struct acpi_resource_irq
     UINT8                           Triggering;
     UINT8                           Polarity;
     UINT8                           Sharable;
+    UINT8                           WakeCapable;
     UINT8                           InterruptCount;
     UINT8                           Interrupts[1];
 
@@ -474,6 +478,7 @@ typedef struct acpi_resource_extended_irq
     UINT8                           Triggering;
     UINT8                           Polarity;
     UINT8                           Sharable;
+    UINT8                           WakeCapable;
     UINT8                           InterruptCount;
     ACPI_RESOURCE_SOURCE            ResourceSource;
     UINT32                          Interrupts[1];
@@ -497,6 +502,7 @@ typedef struct acpi_resource_gpio
     UINT8                           ProducerConsumer;   /* For values, see Producer/Consumer above */
     UINT8                           PinConfig;
     UINT8                           Sharable;           /* For values, see Interrupt Attributes above */
+    UINT8                           WakeCapable;        /* For values, see Interrupt Attributes above */
     UINT8                           IoRestriction;
     UINT8                           Triggering;         /* For values, see Interrupt Attributes above */
     UINT8                           Polarity;           /* For values, see Interrupt Attributes above */
@@ -747,7 +753,10 @@ typedef struct acpi_resource
 #define ACPI_RS_SIZE_MIN                    (UINT32) ACPI_ROUND_UP_TO_NATIVE_WORD (12)
 #define ACPI_RS_SIZE(Type)                  (UINT32) (ACPI_RS_SIZE_NO_DATA + sizeof (Type))
 
-#define ACPI_NEXT_RESOURCE(Res)             (ACPI_RESOURCE *)((UINT8 *) Res + Res->Length)
+/* Macro for walking resource templates with multiple descriptors */
+
+#define ACPI_NEXT_RESOURCE(Res) \
+    ACPI_ADD_PTR (ACPI_RESOURCE, (Res), (Res)->Length)
 
 
 typedef struct acpi_pci_routing_table

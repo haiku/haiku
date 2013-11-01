@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2012, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2013, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -280,6 +280,7 @@ AcpiExDoDebugObject (
             return_VOID;
 
         default:
+
             break;
         }
 
@@ -313,6 +314,7 @@ AcpiExDoDebugObject (
                     break;
 
                 default:
+
                     AcpiExDoDebugObject ((SourceDesc->Reference.Node)->Object,
                         Level+4, 0);
                     break;
