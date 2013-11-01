@@ -1,15 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers power acpi_lid ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
-if $(TARGET_PLATFORM) != haiku {
-	# Needed for <ACPI.h>. Unfortunately we also get the other headers there,
-	# that we don't really want.
-	UsePublicHeaders drivers ;
-}
-
 KernelAddon acpi_lid :
-	acpi_lid.c
+	acpi_lid.cpp
 	;
-
-Depends acpi_lid : acpi ;

@@ -1,19 +1,16 @@
 /*
- * Copyright 2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008-2013, Jérôme Duval, korli@users.berlios.de.
  *
  * Distributed under the terms of the MIT License.
  */
 
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <Errors.h>
-#include <string.h>
+
+#include <ACPI.h>
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include <ACPI.h>
-#include "acpi_lid.h"
 
 #define ACPI_LID_MODULE_NAME "drivers/power/acpi_lid/driver_v1"
 
@@ -25,13 +22,35 @@
 // name of pnp generator of path ids
 #define ACPI_LID_PATHID_GENERATOR "acpi_lid/path_id"
 
+#define TRACE_LID
+#ifdef TRACE_LID
+#	define TRACE(x...) dprintf("acpi_lid: "x)
+#else
+#	define TRACE(x...)
+#endif
+#define ERROR(x...)	dprintf("acpi_lid: "x)
+
 static device_manager_info *sDeviceManager;
+
 
 typedef struct acpi_ns_device_info {
 	device_node *node;
 	acpi_device_module_info *acpi;
 	acpi_device acpi_cookie;
+	uint8 last_status;
 } acpi_lid_device_info;
+
+
+static void
+acpi_lid_notify_handler(acpi_handle device, uint32 value, void *context)
+{
+	if (value == 0x80) {
+		dprintf("acpi_lid: status changed\n");
+	} else {
+		dprintf("acpi_lid: unknown notification\n");
+	}
+
+}
 
 
 //	#pragma mark - device module API
@@ -43,7 +62,8 @@ acpi_lid_init_device(void *_cookie, void **cookie)
 	device_node *node = (device_node *)_cookie;
 	acpi_lid_device_info *device;
 	device_node *parent;
-	
+	status_t status;
+
 	device = (acpi_lid_device_info *)calloc(1, sizeof(*device));
 	if (device == NULL)
 		return B_NO_MEMORY;
@@ -55,6 +75,28 @@ acpi_lid_init_device(void *_cookie, void **cookie)
 		(void **)&device->acpi_cookie);
 	sDeviceManager->put_node(parent);
 
+	status = device->acpi->install_notify_handler(device->acpi_cookie, ACPI_DEVICE_NOTIFY,
+		acpi_lid_notify_handler, device);
+	if (status != B_OK) {
+		ERROR("can't install notify handler\n");
+	}
+
+	device->last_status = 0;
+	acpi_data buf;
+	buf.pointer = NULL;
+	buf.length = ACPI_ALLOCATE_BUFFER;
+	if (device->acpi->evaluate_method(device->acpi_cookie, "_LID", NULL,
+			&buf) != B_OK
+		|| buf.pointer == NULL
+		|| ((acpi_object_type*)buf.pointer)->object_type != ACPI_TYPE_INTEGER) {
+		ERROR("couldn't get status\n");
+	} else {
+		acpi_object_type* object = (acpi_object_type*)buf.pointer;
+		device->last_status = object->integer.integer;
+		free(buf.pointer);
+		TRACE("status %d\n", device->last_status);
+	}
+
 	*cookie = device;
 	return B_OK;
 }
@@ -64,6 +106,10 @@ static void
 acpi_lid_uninit_device(void *_cookie)
 {
 	acpi_lid_device_info *device = (acpi_lid_device_info *)_cookie;
+
+	device->acpi->remove_notify_handler(device->acpi_cookie, ACPI_DEVICE_NOTIFY,
+		acpi_lid_notify_handler);
+
 	free(device);
 }
 
@@ -94,8 +140,6 @@ acpi_lid_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 static status_t
 acpi_lid_control(void* _cookie, uint32 op, void* arg, size_t len)
 {
-	acpi_lid_device_info* device = (acpi_lid_device_info*)_cookie;
-	
 	return B_ERROR;
 }
 
@@ -109,7 +153,7 @@ acpi_lid_close (void* cookie)
 
 static status_t
 acpi_lid_free (void* cookie)
-{	
+{
 	return B_OK;
 }
 
@@ -124,26 +168,27 @@ acpi_lid_support(device_node *parent)
 	uint32 device_type;
 	const char *hid;
 
-	dprintf("acpi_lid_support\n");
-
 	// make sure parent is really the ACPI bus manager
 	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return -1;
-	
+
 	if (strcmp(bus, "acpi"))
 		return 0.0;
 
 	// check whether it's really a device
-	if (sDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM, &device_type, false) != B_OK
+	if (sDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM,
+			&device_type, false) != B_OK
 		|| device_type != ACPI_TYPE_DEVICE) {
 		return 0.0;
 	}
 
 	// check whether it's a lid device
-	if (sDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &hid, false) != B_OK
-		|| strcmp(hid, "PNP0C0D")) {
+	if (sDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &hid,
+		false) != B_OK || strcmp(hid, "PNP0C0D")) {
 		return 0.0;
 	}
+
+	dprintf("acpi_lid_support lid device found\n");
 
 	return 0.6;
 }
@@ -157,7 +202,8 @@ acpi_lid_register_device(device_node *node)
 		{ NULL }
 	};
 
-	return sDeviceManager->register_node(node, ACPI_LID_MODULE_NAME, attrs, NULL, NULL);
+	return sDeviceManager->register_node(node, ACPI_LID_MODULE_NAME, attrs,
+		NULL, NULL);
 }
 
 
@@ -178,20 +224,18 @@ acpi_lid_uninit_driver(void *driverCookie)
 static status_t
 acpi_lid_register_child_devices(void *_cookie)
 {
-	device_node *node = _cookie;
+	device_node *node = (device_node *)_cookie;
 	int path_id;
 	char name[128];
 
-	dprintf("acpi_lid_register_child_devices\n");
-		
 	path_id = sDeviceManager->create_id(ACPI_LID_PATHID_GENERATOR);
 	if (path_id < 0) {
 		dprintf("acpi_lid_register_child_devices: couldn't create a path_id\n");
 		return B_ERROR;
 	}
-	
+
 	snprintf(name, sizeof(name), ACPI_LID_BASENAME, path_id);
-		
+
 	return sDeviceManager->publish_device(node, name, ACPI_LID_DEVICE_MODULE_NAME);
 }
 
