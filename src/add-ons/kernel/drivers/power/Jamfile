@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers power ;
 
+SubInclude HAIKU_TOP src add-ons kernel drivers power acpi_ac ;
 SubInclude HAIKU_TOP src add-ons kernel drivers power acpi_battery ;
 SubInclude HAIKU_TOP src add-ons kernel drivers power acpi_button ;
 SubInclude HAIKU_TOP src add-ons kernel drivers power acpi_lid ;

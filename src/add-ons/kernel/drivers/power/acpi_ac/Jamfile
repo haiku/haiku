@@ -1,0 +1,5 @@
+SubDir HAIKU_TOP src add-ons kernel drivers power acpi_ac ;
+
+KernelAddon acpi_ac :
+	acpi_ac.cpp
+	;
