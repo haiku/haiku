@@ -37,7 +37,7 @@ private:
 
 			double					fStartTime;
 			double					fOldFrameTime;
-			flurry_info_t*			fFlurryInfo_t;
+			flurry_info_t*			fFlurryInfo;
 
 			BTime					fTime;
 			BDateTime				fDateTime;

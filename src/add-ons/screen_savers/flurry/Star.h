@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _STAR_H_
 #define _STAR_H_
 
+
 struct flurry_info_t;
+
 
 typedef struct Star
 {
@@ -42,7 +44,9 @@ typedef struct Star
 	int ate;
 } Star;
 
+
 void InitStar(Star *s);
 void UpdateStar(flurry_info_t *flurry, Star *s);
+
 
 #endif	// _STAR_H

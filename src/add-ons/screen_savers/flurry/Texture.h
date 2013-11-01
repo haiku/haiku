@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TEXTURE_H_
 #define _TEXTURE_H_
 
+
 void MakeTexture();
+
 
 #endif	// _TEXTURE_H_

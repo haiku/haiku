@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons screen_savers flurry ;
 UseBuildFeatureHeaders glu ;
 UseBuildFeatureHeaders mesa ;
 
-AddResources Message : Flurry.rdef ;
+AddResources Flurry : Flurry.rdef ;
 
 local sources =
 	Flurry.cpp
@@ -21,7 +21,7 @@ Includes [ FGristFiles $(sources) ] :
 
 ScreenSaver Flurry :
 	$(sources) :
-	be screensaver GL libshared.a localestub $(TARGET_LIBSUPC++)
+	be screensaver GL localestub $(TARGET_LIBSUPC++)
 	[ BuildFeatureAttribute glu : library ]
 ;
 

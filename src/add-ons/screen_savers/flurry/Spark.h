@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _SPARK_H_
 #define _SPARK_H_
 
+
 struct flurry_info_t;
+
 
 typedef struct Spark
 {
@@ -42,9 +44,11 @@ typedef struct Spark
 	float color[4];
 } Spark;
 
+
 void InitSpark(Spark *s);
 void DrawSpark(flurry_info_t *info, Spark *s);
 void UpdateSparkColour(flurry_info_t *info, Spark *s);
 void UpdateSpark(flurry_info_t *info, Spark *s);
+
 
 #endif	// _SPARK_H_

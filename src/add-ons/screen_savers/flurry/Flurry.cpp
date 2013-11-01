@@ -29,10 +29,13 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 /*
  * Copyright Karsten Heimrich, host.haiku@gmx.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
+
 #include "Flurry.h"
 
 #include <new>
@@ -52,12 +55,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace BPrivate;
 
 
+//	#pragma mark - FlurryView
+
+
 FlurryView::FlurryView(BRect bounds)
 	:
-	BGLView(bounds, (const char *)NULL, B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW,
+	BGLView(bounds, (const char *)NULL, B_FOLLOW_ALL,
+		B_FRAME_EVENTS | B_WILL_DRAW,
 		BGL_RGB | BGL_ALPHA | BGL_DEPTH | BGL_DOUBLE),
 	fOldFrameTime(-1.0),
-	fFlurryInfo_t(NULL)
+	fFlurryInfo(NULL)
 {
 	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("Flurry");
 
@@ -68,21 +75,19 @@ FlurryView::FlurryView(BRect bounds)
 	LockGL();
 	_SetupFlurryBaseInfo();
 	UnlockGL();
-
-
 }
 
 
 FlurryView::~FlurryView()
 {
-	if (fFlurryInfo_t) {
+	if (fFlurryInfo != NULL) {
 		LockGL();
 
-		free(fFlurryInfo_t->s);
-		free(fFlurryInfo_t->star);
+		free(fFlurryInfo->s);
+		free(fFlurryInfo->star);
 		for (int32 i = 0; i < MAX_SPARKS; ++i)
-			free(fFlurryInfo_t->spark[i]);
-		free(fFlurryInfo_t);
+			free(fFlurryInfo->spark[i]);
+		free(fFlurryInfo);
 
 		UnlockGL();
 	}
@@ -92,7 +97,7 @@ FlurryView::~FlurryView()
 status_t
 FlurryView::InitCheck() const
 {
-	return (fFlurryInfo_t != NULL) ? B_OK : B_ERROR;
+	return (fFlurryInfo != NULL) ? B_OK : B_ERROR;
 }
 
 
@@ -159,36 +164,36 @@ FlurryView::DrawFlurryScreenSaver()
 	glColor4f(0.0, 0.0, 0.0, alpha);
 	glRectd(0.0, 0.0, fWidth, fHeight);
 
-	fFlurryInfo_t->dframe++;
-	fFlurryInfo_t->fOldTime = fFlurryInfo_t->fTime;
-	fFlurryInfo_t->fTime = _SecondsSinceStart() + fFlurryInfo_t->randomSeed;
-	fFlurryInfo_t->fDeltaTime = fFlurryInfo_t->fTime - fFlurryInfo_t->fOldTime;
-	fFlurryInfo_t->drag = (float)pow(0.9965, fFlurryInfo_t->fDeltaTime * 85.0);
+	fFlurryInfo->dframe++;
+	fFlurryInfo->fOldTime = fFlurryInfo->fTime;
+	fFlurryInfo->fTime = _SecondsSinceStart() + fFlurryInfo->randomSeed;
+	fFlurryInfo->fDeltaTime = fFlurryInfo->fTime - fFlurryInfo->fOldTime;
+	fFlurryInfo->drag = (float)pow(0.9965, fFlurryInfo->fDeltaTime * 85.0);
 
-	UpdateStar(fFlurryInfo_t, fFlurryInfo_t->star);
+	UpdateStar(fFlurryInfo, fFlurryInfo->star);
 
 	glEnable(GL_BLEND);
 	glShadeModel(GL_SMOOTH);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-	for (int32 i = 0; i < fFlurryInfo_t->numStreams; ++i) {
-		fFlurryInfo_t->spark[i]->color[0] = 1.0;
-		fFlurryInfo_t->spark[i]->color[1] = 1.0;
-		fFlurryInfo_t->spark[i]->color[2] = 1.0;
-		fFlurryInfo_t->spark[i]->color[3] = 1.0;
+	for (int32 i = 0; i < fFlurryInfo->numStreams; ++i) {
+		fFlurryInfo->spark[i]->color[0] = 1.0;
+		fFlurryInfo->spark[i]->color[1] = 1.0;
+		fFlurryInfo->spark[i]->color[2] = 1.0;
+		fFlurryInfo->spark[i]->color[3] = 1.0;
 
-		UpdateSpark(fFlurryInfo_t, fFlurryInfo_t->spark[i]);
+		UpdateSpark(fFlurryInfo, fFlurryInfo->spark[i]);
 	}
 
-	UpdateSmoke_ScalarBase(fFlurryInfo_t, fFlurryInfo_t->s);
+	UpdateSmoke_ScalarBase(fFlurryInfo, fFlurryInfo->s);
 
 	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
 	const double brite = pow(deltaFrameTime, 0.75) * 10.0;
-	DrawSmoke_Scalar(fFlurryInfo_t, fFlurryInfo_t->s,
-		brite * fFlurryInfo_t->briteFactor);
+	DrawSmoke_Scalar(fFlurryInfo, fFlurryInfo->s,
+		brite * fFlurryInfo->briteFactor);
 
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
@@ -207,12 +212,12 @@ FlurryView::FrameResized(float newWidth, float newHeight)
 
 	BGLView::FrameResized(newWidth, newHeight);
 
-	if (fFlurryInfo_t) {
+	if (fFlurryInfo != NULL) {
 		fWidth = newWidth;
 		fHeight = newHeight;
 
-		fFlurryInfo_t->sys_glWidth = fWidth;
-		fFlurryInfo_t->sys_glHeight = fHeight;
+		fFlurryInfo->sys_glWidth = fWidth;
+		fFlurryInfo->sys_glHeight = fHeight;
 
 		glViewport(0, 0, int(fWidth), int(fHeight));
 		glMatrixMode(GL_PROJECTION);
@@ -233,44 +238,44 @@ FlurryView::FrameResized(float newWidth, float newHeight)
 void
 FlurryView::_SetupFlurryBaseInfo()
 {
-	fFlurryInfo_t = (flurry_info_t *)malloc(sizeof(flurry_info_t));
+	fFlurryInfo = (flurry_info_t*)malloc(sizeof(flurry_info_t));
 
-	if (!fFlurryInfo_t)
+	if (fFlurryInfo == NULL)
 		return;
 
-	fFlurryInfo_t->next = NULL;
-	fFlurryInfo_t->randomSeed = RandFlt(0.0, 300.0);
+	fFlurryInfo->next = NULL;
+	fFlurryInfo->randomSeed = RandFlt(0.0, 300.0);
 
-	fFlurryInfo_t->dframe = 0;
-	fFlurryInfo_t->fOldTime = 0.0;
-	fFlurryInfo_t->sys_glWidth = fWidth;
-	fFlurryInfo_t->sys_glHeight = fHeight;
-	fFlurryInfo_t->fTime = _SecondsSinceStart() + fFlurryInfo_t->randomSeed;
-	fFlurryInfo_t->fDeltaTime = fFlurryInfo_t->fTime - fFlurryInfo_t->fOldTime;
+	fFlurryInfo->dframe = 0;
+	fFlurryInfo->fOldTime = 0.0;
+	fFlurryInfo->sys_glWidth = fWidth;
+	fFlurryInfo->sys_glHeight = fHeight;
+	fFlurryInfo->fTime = _SecondsSinceStart() + fFlurryInfo->randomSeed;
+	fFlurryInfo->fDeltaTime = fFlurryInfo->fTime - fFlurryInfo->fOldTime;
 
-	fFlurryInfo_t->numStreams = 5;
-	fFlurryInfo_t->briteFactor = 1.0;
-	fFlurryInfo_t->streamExpansion = 10000.0;
-	fFlurryInfo_t->currentColorMode = tiedyeColorMode;
+	fFlurryInfo->numStreams = 5;
+	fFlurryInfo->briteFactor = 1.0;
+	fFlurryInfo->streamExpansion = 10000.0;
+	fFlurryInfo->currentColorMode = tiedyeColorMode;
 
-	fFlurryInfo_t->s = (SmokeV*)malloc(sizeof(SmokeV));
-	InitSmoke(fFlurryInfo_t->s);
+	fFlurryInfo->s = (SmokeV*)malloc(sizeof(SmokeV));
+	InitSmoke(fFlurryInfo->s);
 
-	fFlurryInfo_t->star = (Star*)malloc(sizeof(Star));
-	InitStar(fFlurryInfo_t->star);
+	fFlurryInfo->star = (Star*)malloc(sizeof(Star));
+	InitStar(fFlurryInfo->star);
 
-	fFlurryInfo_t->star->rotSpeed = 1.0;
+	fFlurryInfo->star->rotSpeed = 1.0;
 
 	for (int32 i = 0; i < MAX_SPARKS; ++i) {
-		fFlurryInfo_t->spark[i] = (Spark*)malloc(sizeof(Spark));
-		InitSpark(fFlurryInfo_t->spark[i]);
-		fFlurryInfo_t->spark[i]->mystery = 1800 * (i + 1) / 13;
-		UpdateSpark(fFlurryInfo_t, fFlurryInfo_t->spark[i]);
+		fFlurryInfo->spark[i] = (Spark*)malloc(sizeof(Spark));
+		InitSpark(fFlurryInfo->spark[i]);
+		fFlurryInfo->spark[i]->mystery = 1800 * (i + 1) / 13;
+		UpdateSpark(fFlurryInfo, fFlurryInfo->spark[i]);
 	}
 
 	for (int32 i = 0; i < NUMSMOKEPARTICLES / 4; ++i) {
 		for (int32 k = 0; k < 4; ++k)
-			fFlurryInfo_t->s->p[i].dead.i[k] = 1;
+			fFlurryInfo->s->p[i].dead.i[k] = 1;
 	}
 }
 
@@ -301,8 +306,9 @@ instantiate_screen_saver(BMessage* archive, image_id imageId)
 
 
 Flurry::Flurry(BMessage* archive, image_id imageId)
-	: BScreenSaver(archive, imageId),
-	  fFlurryView(NULL)
+	:
+	BScreenSaver(archive, imageId),
+	fFlurryView(NULL)
 {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
@@ -326,25 +332,25 @@ Flurry::InitCheck()
 status_t
 Flurry::StartSaver(BView* view, bool preview)
 {
-	status_t status = B_ERROR;
+	status_t result = B_ERROR;
 
 	if (preview)
-		return status;
+		return result;
 
 	SetTickSize(50000);
 
 	fFlurryView = new (std::nothrow) FlurryView(view->Bounds());
-	if (fFlurryView) {
+	if (fFlurryView != NULL) {
 		if (fFlurryView->InitCheck() != B_OK) {
 			delete fFlurryView;
 			fFlurryView = NULL;
 		} else {
-			status = B_OK;
+			result = B_OK;
 			view->AddChild(fFlurryView);
 		}
 	}
 
-	return status;
+	return result;
 }
 
 
@@ -367,12 +373,10 @@ void
 Flurry::DirectConnected(direct_buffer_info* info)
 {
 	// Enable or disable direct rendering
-	#if 1
 	if (fFlurryView != NULL) {
 		fFlurryView->DirectConnected(info);
 		fFlurryView->EnableDirectMode(true);
 	}
-	#endif
 }
 
 

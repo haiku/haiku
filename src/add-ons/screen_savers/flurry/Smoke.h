@@ -32,9 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _SMOKE_H_
 #define _SMOKE_H_
 
+
 struct flurry_info_t;
 
+
 #define NUMSMOKEPARTICLES 3600
+
 
 typedef union {
 	float		f[4];
@@ -43,6 +46,7 @@ typedef union {
 typedef union {
 	unsigned int	i[4];
 } intToVector;
+
 
 typedef struct SmokeParticleV
 {
@@ -69,8 +73,10 @@ typedef struct SmokeV
 	float seraphimTextures[NUMSMOKEPARTICLES*2*4];
 } SmokeV;
 
+
 void InitSmoke(SmokeV *s);
 void UpdateSmoke_ScalarBase(flurry_info_t *flurry, SmokeV *s);
 void DrawSmoke_Scalar(flurry_info_t *flurry, SmokeV *s, float);
+
 
 #endif	// _SMOKE_H_

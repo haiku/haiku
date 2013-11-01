@@ -29,52 +29,71 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+
 #include "Star.h"
 #include "Shared.h"
+
 
 #define BIGMYSTERY 1800.0
 #define MAXANGLES 16384
 
-/* Construction/Destruction */
-void InitStar(Star *s)
+
+// Construction/Destruction
+void
+InitStar(Star* s)
 {
-	int i;
-	for (i=0;i<3;i++) {
+	for (int i=0; i < 3; i++)
 		s->position[i] = RandFlt(-10000.0, 10000.0);
-	}
+
 	s->rotSpeed = RandFlt(0.4, 0.9);
 	s->mystery = RandFlt(0.0, 10.0);
 }
 
-void UpdateStar(flurry_info_t *info, Star *s)
+
+void
+UpdateStar(flurry_info_t* info, Star* s)
 {
 	 /* speed control */
-	float rotationsPerSecond = (float) (2.0*M_PI*12.0/MAXANGLES) * s->rotSpeed;
+	float rotationsPerSecond = (float)(2.0 * M_PI * 12.0 / MAXANGLES)
+		* s->rotSpeed;
 	double thisPointInRadians;
-	double thisAngle = info->fTime*rotationsPerSecond;
+	double thisAngle = info->fTime * rotationsPerSecond;
 	float cf;
-	double tmpX1,tmpY1,tmpZ1;
-	double tmpX2,tmpY2,tmpZ2;
-	double tmpX3,tmpY3,tmpZ3;
-	double tmpX4,tmpY4,tmpZ4;
+	double tmpX1;
+	double tmpY1;
+	double tmpZ1;
+	double tmpX2;
+	double tmpY2;
+	double tmpZ2;
+	double tmpX3;
+	double tmpY3;
+	double tmpZ3;
+	double tmpX4;
+	double tmpY4;
+	double tmpZ4;
 	double rotation;
 	double cr;
 	double sr;
 
 	s->ate = 0;
 
-	cf = ((float) (cos(7.0*((info->fTime)*rotationsPerSecond)) +
-		cos(3.0*((info->fTime)*rotationsPerSecond)) +
-		cos(13.0*((info->fTime)*rotationsPerSecond))));
+	cf = ((float)(cos(7.0 * ((info->fTime) * rotationsPerSecond))
+		+ cos(3.0 * ((info->fTime) * rotationsPerSecond))
+		+ cos(13.0 * ((info->fTime) * rotationsPerSecond))));
 	cf /= 6.0f;
 	cf += 0.75f;
 	thisPointInRadians = 2.0 * M_PI * (double) s->mystery / (double) BIGMYSTERY;
 
-	s->position[0] = 250.0f * cf * (float) cos(11.0 * (thisPointInRadians + (3.0*thisAngle)));
-	s->position[1] = 250.0f * cf * (float) sin(12.0 * (thisPointInRadians + (4.0*thisAngle)));
-	s->position[2] = 250.0f * (float) cos((23.0 * (thisPointInRadians + (12.0*thisAngle))));
+	s->position[0] = 250.0f * cf * (float)cos(11.0 * (thisPointInRadians
+		+ (3.0 * thisAngle)));
+	s->position[1] = 250.0f * cf * (float)sin(12.0 * (thisPointInRadians
+		+ (4.0 * thisAngle)));
+	s->position[2] = 250.0f * (float)cos((23.0 * (thisPointInRadians
+		+ (12.0 * thisAngle))));
 
-	rotation = thisAngle*0.501 + 5.01 * (double) s->mystery / (double) BIGMYSTERY;
+	rotation = thisAngle * 0.501 + 5.01 * (double)s->mystery
+		/ (double)BIGMYSTERY;
 	cr = cos(rotation);
 	sr = sin(rotation);
 	tmpX1 = s->position[0] * cr - s->position[1] * sr;
@@ -89,14 +108,15 @@ void UpdateStar(flurry_info_t *info, Star *s)
 	tmpY3 = tmpY2 * cr - tmpZ2 * sr;
 	tmpZ3 = tmpZ2 * cr + tmpY2 * sr + seraphDistance;
 
-	rotation = thisAngle*2.501 + 85.01 * (double) s->mystery / (double) BIGMYSTERY;
+	rotation = thisAngle * 2.501 + 85.01 * (double)s->mystery
+		/ (double) BIGMYSTERY;
 	cr = cos(rotation);
 	sr = sin(rotation);
 	tmpX4 = tmpX3 * cr - tmpY3 * sr;
 	tmpY4 = tmpY3 * cr + tmpX3 * sr;
 	tmpZ4 = tmpZ3;
 
-	s->position[0] = (float) tmpX4;
-	s->position[1] = (float) tmpY4;
-	s->position[2] = (float) tmpZ4;
+	s->position[0] = (float)tmpX4;
+	s->position[1] = (float)tmpY4;
+	s->position[2] = (float)tmpZ4;
 }

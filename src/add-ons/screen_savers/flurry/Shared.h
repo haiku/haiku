@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _SHARED_H_
 #define _SHARED_H_
 
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,9 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+
 struct SmokeV;
 struct Spark;
 struct Star;
+
 
 #define MAX_SPARKS 64
 #define seraphDistance 2000.0f
@@ -53,6 +56,7 @@ struct Star;
 #define random() rand()
 #define RandFlt(min, max) (min + (max - min) * rand() / (float) RAND_MAX)
 #define RandBell(scale) (scale * (1.0f - (rand() + rand() + rand()) / ((float) RAND_MAX * 1.5f)))
+
 
 typedef enum _ColorModes
 {
@@ -70,6 +74,7 @@ typedef enum _ColorModes
 	multiColorMode,
 	darkColorMode
 } ColorModes;
+
 
 typedef struct flurry_info_t {
 	flurry_info_t *next;
