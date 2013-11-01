@@ -27,6 +27,7 @@
 #else
 #	define TRACE(x...)
 #endif
+#define ERROR(x...)	dprintf("acpi_button: "x)
 
 static device_manager_info *sDeviceManager;
 static struct acpi_module_info *sAcpi;
@@ -47,12 +48,12 @@ acpi_button_notify_handler(acpi_handle _device, uint32 value, void *context)
 {
 	acpi_button_device_info *device = (acpi_button_device_info *)context;
 	if (value == ACPI_NOTIFY_BUTTON_SLEEP) {
-		TRACE("acpi_button: sleep\n");
+		TRACE("sleep\n");
 		device->last_status = 1;
 	} else if (value == ACPI_NOTIFY_BUTTON_WAKEUP) {
-		TRACE("acpi_button: wakeup\n");
+		TRACE("wakeup\n");
 	} else {
-		dprintf("acpi_button: unknown notification\n");
+		ERROR("unknown notification\n");
 	}
 
 }
@@ -62,7 +63,7 @@ static uint32
 acpi_button_fixed_handler(void *context)
 {
 	acpi_button_device_info *device = (acpi_button_device_info *)context;
-	TRACE("acpi_button: sleep\n");
+	TRACE("sleep\n");
 	device->last_status = 1;
 	return B_OK;
 }
@@ -108,11 +109,15 @@ acpi_button_init_device(void *_cookie, void **cookie)
 
 	if (device->fixed) {
 		sAcpi->reset_fixed_event(device->type);
-		sAcpi->install_fixed_event_handler(device->type,
-			acpi_button_fixed_handler, device);
+		if (sAcpi->install_fixed_event_handler(device->type,
+			acpi_button_fixed_handler, device) != B_OK) {
+			ERROR("can't install notify handler\n");
+		}
 	} else {
-		device->acpi->install_notify_handler(device->acpi_cookie,
-			ACPI_DEVICE_NOTIFY, acpi_button_notify_handler, device);
+		if (device->acpi->install_notify_handler(device->acpi_cookie,
+			ACPI_DEVICE_NOTIFY, acpi_button_notify_handler, device) != B_OK) {
+			ERROR("can't install notify handler\n");
+		}
 	}
 
 
