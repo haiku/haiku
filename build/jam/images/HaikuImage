@@ -13,7 +13,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	diskimage draggers driveinfo dstcheck du dumpcatalog
 	echo eject env error expand expr
 	factor false fdinfo ffm filepanel find finddir FirstBootPrompt fmt fold
-	fortune frcode ftp ftpd funzip fwcontrol
+	fortune frcode ftp ftpd funzip fwcontrol@x86
 	gawk gdb@x86 getlimits groupadd groupdel groupmod groups gzip gzexe
 	hd head hey hostname
 	id ident ifconfig <bin>install installsound iroster isvolume
