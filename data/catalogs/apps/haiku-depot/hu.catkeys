@@ -2,7 +2,7 @@
 Name	PackageListView		Név
 Installed packages	Model		Telepített csomagok
 User modified packages	Model		Módosított csomagok
-Update available	Model		Frissítés érhető el
+Update available	Model		Elérhető frissítések
 Changelog	PackageInfoView		Változásnapló
 for %Version%	PackageInfoView		%Version% verzióhoz
 Depot:	FilterView		Raktár:
@@ -42,7 +42,7 @@ Uninstalled	PackageListView		Eltávolítva
 Unknown	PackageListView		Ismeretlen
 All depots	FilterView		Összes raktár
 Available	PackageListView		Elérhető
-n/a	PackageInfoView		nincs megadva
+n/a	PackageInfoView		nincs értékelve
 Show	FilterView		Megjelenítés
 Uninstalled packages	Model		Eltávolított csomagok
 Audio	Model		Audió

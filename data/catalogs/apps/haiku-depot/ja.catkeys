@@ -1,0 +1,49 @@
+1	japanese	x-vnd.Haiku-HaikuDepot	3583979899
+Name	PackageListView		名前
+Installed packages	Model		インストール済パッケージ
+User modified packages	Model		ユーザーが変更したパッケージ
+Update available	Model		更新があります
+Changelog	PackageInfoView		変更履歴
+Depot:	FilterView		Depot:
+Description	PackageListView		説明
+Install	PackageManager		インストール
+HaikuDepot	System name		HaikuDepot
+Uninstall	PackageManager		アンインストール
+An error occurred while initializing the package manager: %message%	MainWindow		パッケージマネジャーの初期化中にエラーが発生しました: %message%
+Status	PackageListView		状態
+Development	Model		開発
+Ratings	PackageInfoView		評価
+1 item	PackageListView		1 個のアイテム
+Inactive	PackageListView		無効
+Refresh depots	MainWindow		Depot を更新
+Main Menu	MainWindow		メインメニュー
+Command line	Model		コマンドライン
+(%Votes%)	PackageInfoView		(%Votes%)
+Package	MainWindow		パッケージ
+Search terms:	FilterView		検索語句:
+%Version%	PackageInfoView		%Version%
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		リポジトリの更新中にエラーが発生しました: %error% (%details%)
+Productivity	Model		ビジネス
+Show:	FilterView		表示:
+Size	PackageListView		サイズ
+Games	Model		ゲーム
+Rating	PackageListView		評価
+Downloading	Model		ダウンロード中
+%ld items	PackageListView		%ld 個のアイテム
+Graphics	Model		グラフィック
+Local	MainWindow		ローカル
+Close	MainWindow		閉じる
+Video	Model		ビデオ
+An error occurred while refreshing the repository: %error%	MainWindow		リポジトリの更新中にエラーが発生しました: %error%
+All packages	FilterView		すべてのパッケージ
+Depot	FilterView		Depot
+Uninstalled	PackageListView		アンインストール済み
+Unknown	PackageListView		不明
+All depots	FilterView		すべて
+Available	PackageListView		利用可能
+n/a	PackageInfoView		利用不可
+Show	FilterView		表示
+Uninstalled packages	Model		アンインストール済みパッケージ
+Audio	Model		オーディオ
+About	PackageInfoView		パッケージについて
+Active	PackageListView		有効

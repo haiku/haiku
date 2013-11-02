@@ -37,13 +37,13 @@ Close	MainWindow		Закрыть
 Video	Model		Видео
 An error occurred while refreshing the repository: %error%	MainWindow		Возникла ошибка при обновлении репозитория: %error%
 All packages	FilterView		Все пакеты
-Depot	FilterView		Склад:
+Depot	FilterView		Все склады
 Uninstalled	PackageListView		Удаленные
 Unknown	PackageListView		Неизвестно
 All depots	FilterView		Все склады
 Available	PackageListView		Доступен
 n/a	PackageInfoView		н/д
-Show	FilterView		Показать пакеты:
+Show	FilterView		Все пакеты:
 Uninstalled packages	Model		Удаленные пакеты
 Audio	Model		Аудио
 About	PackageInfoView		О программе

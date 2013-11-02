@@ -1,10 +1,11 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	827100590
+1	swedish	x-vnd.Haiku-HaikuDepot	2627573468
 Name	PackageListView		Namn
 Installed packages	Model		Installerade paket
 User modified packages	Model		Användarmodifierade paket
 Update available	Model		Uppdateringar tillgängliga
 Changelog	PackageInfoView		Ändringslogg
 for %Version%	PackageInfoView		för %Version%
+Depot:	FilterView		Depot:
 Description	PackageListView		Beskrivning
 Install	PackageManager		Installera
 HaikuDepot	System name		HaikuDepot
@@ -36,8 +37,10 @@ Close	MainWindow		Stäng
 Video	Model		Video
 An error occurred while refreshing the repository: %error%	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error%
 All packages	FilterView		Alla paket
+Depot	FilterView		Depot
 Uninstalled	PackageListView		Avinstallera
 Unknown	PackageListView		Okänd
+All depots	FilterView		All depots
 Available	PackageListView		Tillgänglig
 n/a	PackageInfoView		oviktigt
 Show	FilterView		Visa

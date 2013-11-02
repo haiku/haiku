@@ -1,0 +1,50 @@
+1	french	x-vnd.Haiku-HaikuDepot	2627573468
+Name	PackageListView		Nom
+Installed packages	Model		Paquets installés
+User modified packages	Model		Paquets modifiés par l'utilisateur
+Update available	Model		Mise à jour disponible
+Changelog	PackageInfoView		Journal des modifications
+for %Version%	PackageInfoView		pour %Version%
+Depot:	FilterView		Dépôt :
+Description	PackageListView		Description
+Install	PackageManager		Installer
+HaikuDepot	System name		Dépôt Haiku
+Uninstall	PackageManager		Désinstaller
+An error occurred while initializing the package manager: %message%	MainWindow		Une erreur est survenue à l'initialisation du gestionnaire de paquet : %message%
+Status	PackageListView		État
+Development	Model		Développement
+Ratings	PackageInfoView		Évaluations
+1 item	PackageListView		1 élément
+Inactive	PackageListView		Inactif
+Refresh depots	MainWindow		Rafraîchir les dépôts
+Main Menu	MainWindow		Menu principal
+Command line	Model		Ligne de commande
+(%Votes%)	PackageInfoView		(%Votes%)
+Package	MainWindow		Paquet
+Search terms:	FilterView		Termes à rechercher :
+%Version%	PackageInfoView		%Version%
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error% (%details%)
+Productivity	Model		Bureautique
+Show:	FilterView		Afficher :
+Size	PackageListView		Taille
+Games	Model		Jeux
+Rating	PackageListView		Évaluation
+Downloading	Model		Téléchargement en cours
+%ld items	PackageListView		%ld éléments
+Graphics	Model		Graphisme
+Local	MainWindow		Local
+Close	MainWindow		Fermer
+Video	Model		Vidéo
+An error occurred while refreshing the repository: %error%	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error%
+All packages	FilterView		Tous les paquets
+Depot	FilterView		Dépôt
+Uninstalled	PackageListView		Désinstallé
+Unknown	PackageListView		Inconnu
+All depots	FilterView		Tous les dépôts
+Available	PackageListView		Disponible
+n/a	PackageInfoView		n/a
+Show	FilterView		Afficher
+Uninstalled packages	Model		Paquets désinstallés
+Audio	Model		Son
+About	PackageInfoView		À propos
+Active	PackageListView		Actif
