@@ -122,9 +122,6 @@ status_t
 periph_trim_device(scsi_periph_device_info *device, scsi_ccb *request,
 	scsi_block_range* ranges, uint32 rangeCount)
 {
-	err_res res;
-	int retries = 0;
-
 	size_t unmapBlockSize = (rangeCount - 1)
 			* sizeof(scsi_unmap_block_descriptor)
 		+ sizeof(scsi_unmap_parameter_list);
@@ -155,35 +152,27 @@ periph_trim_device(scsi_periph_device_info *device, scsi_ccb *request,
 			ranges[i].size / device->block_size);
 	}
 
-	do {
-		request->flags = SCSI_DIR_OUT;
-		request->sort = ranges[0].offset / device->block_size;
-		request->timeout = device->std_timeout;
+	request->flags = SCSI_DIR_OUT;
+	request->sort = ranges[0].offset / device->block_size;
+	request->timeout = device->std_timeout;
 
-		scsi_cmd_unmap* cmd = (scsi_cmd_unmap*)request->cdb;
+	scsi_cmd_unmap* cmd = (scsi_cmd_unmap*)request->cdb;
 
-		memset(cmd, 0, sizeof(*cmd));
-		cmd->opcode = SCSI_OP_UNMAP;
-		cmd->length = B_HOST_TO_BENDIAN_INT16(unmapBlockSize);
+	memset(cmd, 0, sizeof(*cmd));
+	cmd->opcode = SCSI_OP_UNMAP;
+	cmd->length = B_HOST_TO_BENDIAN_INT16(unmapBlockSize);
 
-		request->data = (uint8*)unmapBlocks;
-		request->data_length = unmapBlockSize;
+	request->data = (uint8*)unmapBlocks;
+	request->data_length = unmapBlockSize;
 
-		request->cdb_length = sizeof(*cmd);
+	request->cdb_length = sizeof(*cmd);
 
-		device->scsi->async_io(request);
-
-		acquire_sem(request->completion_sem);
-
-		// ask generic peripheral layer what to do now
-		res = periph_check_error(device, request);
-	} while ((res.action == err_act_retry && retries++ < 3)
-		|| (res.action == err_act_many_retries && retries++ < 30));
+	status_t status = periph_safe_exec(device, request);
 
 	// peripheral layer only creates "read" error
-	if (res.error_code == B_DEV_READ_ERROR)
+	if (status == B_DEV_READ_ERROR)
 		return B_DEV_WRITE_ERROR;
 
-	return res.error_code;
+	return status;
 }
 
