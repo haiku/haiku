@@ -6,14 +6,23 @@
 #define _FS_TRIM_SUPPORT_H
 
 
-#include <Drivers.h>
+#include <KernelExport.h>
 
 #include <kernel.h>
+#include <syscall_restart.h>
 
 
 static inline status_t
-copy_trim_data_from_user(void* buffer, size_t size, fs_trim_data*& _trimData)
+get_trim_data_from_user(void* buffer, size_t size, MemoryDeleter& deleter,
+	fs_trim_data*& _trimData)
 {
+	if (!is_called_via_syscall() && !IS_USER_ADDRESS(buffer)) {
+		// Called from kernel
+		_trimData = (fs_trim_data*)buffer;
+		return B_OK;
+	}
+
+	// Called from userland
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
@@ -29,8 +38,10 @@ copy_trim_data_from_user(void* buffer, size_t size, fs_trim_data*& _trimData)
 	if (trimBuffer == NULL)
 		return B_NO_MEMORY;
 
-	if (user_memcpy(trimBuffer, buffer, bytes) != B_OK)
+	if (user_memcpy(trimBuffer, buffer, bytes) != B_OK) {
+		free(trimBuffer);
 		return B_BAD_ADDRESS;
+	}
 
 	_trimData = (fs_trim_data*)trimBuffer;
 	return B_OK;
@@ -40,6 +51,12 @@ copy_trim_data_from_user(void* buffer, size_t size, fs_trim_data*& _trimData)
 static inline status_t
 copy_trim_data_to_user(void* buffer, fs_trim_data* trimData)
 {
+	if (!is_called_via_syscall() && !IS_USER_ADDRESS(buffer))
+		return B_OK;
+
+	if (!IS_USER_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
+
 	// Do not copy any ranges
 	return user_memcpy(buffer, trimData, sizeof(uint64) * 2);
 }

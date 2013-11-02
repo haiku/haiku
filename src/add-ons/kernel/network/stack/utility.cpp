@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -699,8 +699,7 @@ uninit_timers(void)
 bool
 is_syscall(void)
 {
-	Thread* thread = thread_get_current_thread();
-	return (thread->flags & THREAD_FLAGS_SYSCALL) != 0;
+	return is_called_via_syscall();
 }
 
 

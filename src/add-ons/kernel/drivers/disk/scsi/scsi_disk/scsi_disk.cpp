@@ -416,12 +416,11 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 		case B_TRIM_DEVICE:
 		{
 			fs_trim_data* trimData;
-			status_t status = copy_trim_data_from_user(buffer, length,
+			MemoryDeleter deleter;
+			status_t status = get_trim_data_from_user(buffer, length, deleter,
 				trimData);
 			if (status != B_OK)
 				return status;
-
-			MemoryDeleter deleter(trimData);
 
 			status = trim_device(info, trimData);
 			if (status != B_OK)

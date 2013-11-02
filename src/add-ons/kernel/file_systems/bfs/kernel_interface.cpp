@@ -629,12 +629,12 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 		case B_TRIM_DEVICE:
 		{
 			fs_trim_data* trimData;
-			status_t status = copy_trim_data_from_user(buffer, bufferLength,
-				trimData);
+			MemoryDeleter deleter;
+			status_t status = get_trim_data_from_user(buffer, bufferLength,
+				deleter, trimData);
 			if (status != B_OK)
 				return status;
 
-			MemoryDeleter deleter(trimData);
 			trimData->trimmed_size = 0;
 
 			for (uint32 i = 0; i < trimData->range_count; i++) {

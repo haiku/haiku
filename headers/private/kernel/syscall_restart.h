@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2011, Haiku Inc. All rights reserved.
+ * Copyright 2008-2013, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_SYSCALL_RESTART_H
@@ -97,6 +97,20 @@ syscall_restart_is_restarted()
 
 	return (thread->flags & THREAD_FLAGS_SYSCALL) != 0
 		&& (thread->flags & THREAD_FLAGS_SYSCALL_RESTARTED) != 0;
+}
+
+
+/*!	Returns whether or not a function has been called via a syscall. The flag
+	to determine this is currently only used where actually needed, such as
+	ioctl().
+
+	TODO: this function is actually needed as part of the public API for ioctl()
+*/
+static inline bool
+is_called_via_syscall(void)
+{
+	Thread* thread = thread_get_current_thread();
+	return (thread->flags & THREAD_FLAGS_SYSCALL) != 0;
 }
 
 
