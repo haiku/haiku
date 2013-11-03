@@ -46,34 +46,8 @@ PackageLinkDirectory::~PackageLinkDirectory()
 status_t
 PackageLinkDirectory::Init(Directory* parent, Package* package)
 {
-	// compute the allocation size needed for the versioned name
-	size_t nameLength = strlen(package->Name());
-	size_t size = nameLength + 1;
-
-	Version* version = package->Version();
-	if (version != NULL) {
-		size += 1 + version->ToString(NULL, 0);
-			// + 1 for the '-'
-	}
-
-	// allocate the name and compose it
-	char* name = (char*)malloc(size);
-	if (name == NULL)
-		return B_NO_MEMORY;
-	MemoryDeleter nameDeleter(name);
-
-	memcpy(name, package->Name(), nameLength + 1);
-	if (version != NULL) {
-		name[nameLength] = '-';
-		version->ToString(name + nameLength + 1, size - nameLength - 1);
-	}
-
-	String nameString;
-	if (!nameString.SetTo(name))
-		return B_NO_MEMORY;
-
 	// init the directory/node
-	status_t error = Init(parent, nameString);
+	status_t error = Init(parent, package->VersionedName());
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

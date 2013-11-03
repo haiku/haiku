@@ -761,6 +761,7 @@ Package::Package(::Volume* volume, dev_t deviceID, ino_t nodeID)
 	fFileName(),
 	fName(),
 	fInstallPath(),
+	fVersionedName(),
 	fVersion(NULL),
 	fArchitecture(B_PACKAGE_ARCHITECTURE_ENUM_COUNT),
 	fLinkDirectory(NULL),
@@ -806,59 +807,11 @@ Package::Init(const char* fileName)
 status_t
 Package::Load()
 {
-	// open package file
-	int fd = Open();
-	if (fd < 0)
-		RETURN_ERROR(fd);
-	PackageCloser packageCloser(this);
-
-	// initialize package reader
-	LoaderErrorOutput errorOutput(this);
-
-	// try current package file format version
-	{
-		CachingPackageReader packageReader(&errorOutput);
-		status_t error = packageReader.Init(fd, false,
-			BHPKG::B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE);
-		if (error == B_OK) {
-			// parse content
-			LoaderContentHandler handler(this);
-			error = handler.Init();
-			if (error != B_OK)
-				RETURN_ERROR(error);
-
-			error = packageReader.ParseContent(&handler);
-			if (error != B_OK)
-				RETURN_ERROR(error);
-
-			// get the heap reader
-			fHeapReader = packageReader.DetachCachedHeapReader();
-			return B_OK;
-		}
-
-		if (error != B_MISMATCHED_VALUES)
-			RETURN_ERROR(error);
-	}
-
-	// try package file format version 1
-	PackageReaderImplV1 packageReader(&errorOutput);
-	status_t error = packageReader.Init(fd, false);
+	status_t error = _Load();
 	if (error != B_OK)
-		RETURN_ERROR(error);
+		return error;
 
-	// parse content
-	LoaderContentHandlerV1 handler(this);
-	error = handler.Init();
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	error = packageReader.ParseContent(&handler);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	// create a heap reader
-	fHeapReader = new(std::nothrow) HeapReaderV1(fd);
-	if (fHeapReader == NULL)
+	if (!_InitVersionedName())
 		RETURN_ERROR(B_NO_MEMORY);
 
 	return B_OK;
@@ -990,4 +943,94 @@ Package::CreateDataReader(const PackageData& data,
 		return B_BAD_VALUE;
 
 	return fHeapReader->CreateDataReader(data, _reader);
+}
+
+
+status_t
+Package::_Load()
+{
+	// open package file
+	int fd = Open();
+	if (fd < 0)
+		RETURN_ERROR(fd);
+	PackageCloser packageCloser(this);
+
+	// initialize package reader
+	LoaderErrorOutput errorOutput(this);
+
+	// try current package file format version
+	{
+		CachingPackageReader packageReader(&errorOutput);
+		status_t error = packageReader.Init(fd, false,
+			BHPKG::B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE);
+		if (error == B_OK) {
+			// parse content
+			LoaderContentHandler handler(this);
+			error = handler.Init();
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			error = packageReader.ParseContent(&handler);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			// get the heap reader
+			fHeapReader = packageReader.DetachCachedHeapReader();
+			return B_OK;
+		}
+
+		if (error != B_MISMATCHED_VALUES)
+			RETURN_ERROR(error);
+	}
+
+	// try package file format version 1
+	PackageReaderImplV1 packageReader(&errorOutput);
+	status_t error = packageReader.Init(fd, false);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// parse content
+	LoaderContentHandlerV1 handler(this);
+	error = handler.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = packageReader.ParseContent(&handler);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// create a heap reader
+	fHeapReader = new(std::nothrow) HeapReaderV1(fd);
+	if (fHeapReader == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	return B_OK;
+}
+
+
+bool
+Package::_InitVersionedName()
+{
+	// compute the allocation size needed for the versioned name
+	size_t nameLength = strlen(fName);
+	size_t size = nameLength + 1;
+
+	if (fVersion != NULL) {
+		size += 1 + fVersion->ToString(NULL, 0);
+			// + 1 for the '-'
+	}
+
+	// allocate the name and compose it
+	char* name = (char*)malloc(size);
+	if (name == NULL)
+		return false;
+	MemoryDeleter nameDeleter(name);
+
+	memcpy(name, fName, nameLength + 1);
+	if (fVersion != NULL) {
+		name[nameLength] = '-';
+		fVersion->ToString(name + nameLength + 1, size - nameLength - 1);
+	}
+
+	return fVersionedName.SetTo(name);
 }

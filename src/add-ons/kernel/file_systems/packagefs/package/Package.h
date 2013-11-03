@@ -48,6 +48,9 @@ public:
 			void				SetName(const String& name);
 			const String&		Name() const		{ return fName; }
 
+			const String&		VersionedName() const
+									{ return fVersionedName; }
+
 			dev_t				DeviceID() const
 									{ return fDeviceID; }
 			ino_t				NodeID() const
@@ -103,11 +106,16 @@ private:
 			struct CachingPackageReader;
 
 private:
+			status_t			_Load();
+			bool				_InitVersionedName();
+
+private:
 			mutex				fLock;
 			::Volume*			fVolume;
 			String				fFileName;
 			String				fName;
 			String				fInstallPath;
+			String				fVersionedName;
 			::Version*			fVersion;
 			BPackageArchitecture fArchitecture;
 			PackageLinkDirectory* fLinkDirectory;
