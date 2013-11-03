@@ -626,19 +626,19 @@ EOF
 }
 
 
-rule BuildRemoteHaikuPortsRepository target : packages
+rule UploadPackages target : packages
 {
 	local packageListFile = <repository-package-list>HaikuPorts-packages ;
 	Depends $(target) : $(packageListFile) ;
 	
 	HAIKU_REMOTE_REPOSITORY_PACKAGES on $(target) = $(packages) ;
-	BuildRemoteHaikuPortsRepository1 $(target) : $(packageListFile) ;
+	UploadPackages1 $(target) : $(packageListFile) ;
 }
 
 
-actions BuildRemoteHaikuPortsRepository1
+actions UploadPackages1
 {
-	remote=haiku_files@haiku-files.org
+	remote=git.haiku-os.org
 	
 	if [ -n "$(HAIKU_REMOTE_REPOSITORY_PACKAGES:E=:J)" ]; then
 		for package in $(HAIKU_REMOTE_REPOSITORY_PACKAGES) ; do
@@ -648,14 +648,7 @@ actions BuildRemoteHaikuPortsRepository1
 				exit 1
 			fi 
 		done
-		scp $(HAIKU_REMOTE_REPOSITORY_PACKAGES) \
-			$remote:haiku-files.org/files/hpkg/
+		ssh $remote mkdir -p 'hpkg-upload'
+		scp $(HAIKU_REMOTE_REPOSITORY_PACKAGES) $remote:hpkg-upload/
 	fi
-
-	packageList=package-list.$(TARGET_PACKAGING_ARCH)		
-	scp $(2) $remote:build_repository/$packageList
-	
-	ssh $remote \
-		"cd build_repository \
-			&& ./build_repo.sh $(TARGET_PACKAGING_ARCH) $packageList"
 }

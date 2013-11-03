@@ -66,11 +66,11 @@ rule ProcessCommandLineArguments
 				}
 			}
 
-			# Copy the given set of local package files to the remote repository
-			# and create a new version of that remote repository.
-			case build-remote-repository : {
-				BuildRemoteHaikuPortsRepository $(JAM_TARGETS[1])
-					: $(JAM_TARGETS[2-]) ;
+			# Copy the given set of local package files to the git repository
+			# server, where they will be used for creating a new repository
+			# during the push hook.
+			case upload-packages : {
+				UploadPackages $(JAM_TARGETS[1]) : $(JAM_TARGETS[2-]) ;
 				JAM_TARGETS = $(JAM_TARGETS[1]) ;
 				NotFile $(JAM_TARGETS) ;
 				Always $(JAM_TARGETS) ;
