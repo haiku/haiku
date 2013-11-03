@@ -106,6 +106,14 @@ AutoPackageAttributes::GetAttributeValue(const Package* package,
 	switch (attribute) {
 		case AUTO_PACKAGE_ATTRIBUTE_PACKAGE:
 		{
+			const char* value = package->VersionedName();
+			_size = strlen(value) + 1;
+			_type = B_STRING_TYPE;
+			return value;
+		}
+
+		case AUTO_PACKAGE_ATTRIBUTE_PACKAGE_FILE:
+		{
 			const char* value = package->FileName();
 			_size = strlen(value) + 1;
 			_type = B_STRING_TYPE;
