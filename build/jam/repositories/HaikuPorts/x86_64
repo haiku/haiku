@@ -1,6 +1,6 @@
 RemotePackageRepository HaikuPorts
 	: x86_64
-	: http://haiku-files.org/files/repo
+	: http://packages.haiku-os.org/build_system/repo/x86_64
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
