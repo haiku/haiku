@@ -807,8 +807,8 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 
 	// Determine how many ranges we'll need
 	// We assume that the SCSI unmap ranges cannot be merged together
-	uint32 scsiRangeCount = unmapBlocks->block_data_length
-		/ sizeof(scsi_unmap_block_descriptor);
+	uint32 scsiRangeCount = B_BENDIAN_TO_HOST_INT16(
+		unmapBlocks->block_data_length) / sizeof(scsi_unmap_block_descriptor);
 	uint32 lbaRangeCount = 0;
 	for (uint32 i = 0; i < scsiRangeCount; i++) {
 		lbaRangeCount += ((uint32)B_BENDIAN_TO_HOST_INT32(
