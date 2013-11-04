@@ -62,10 +62,8 @@ public:
 									uint32 reservedSlots);
 			void				Close(bool cancelPending);
 
-			status_t			Add(DPCCallback* callback,
-									bool schedulerLocked);
-			status_t			Add(void (*function)(void*), void* argument,
-									bool schedulerLocked);
+			status_t			Add(DPCCallback* callback);
+			status_t			Add(void (*function)(void*), void* argument);
 			bool				Cancel(DPCCallback* callback);
 
 			thread_id			Thread() const
