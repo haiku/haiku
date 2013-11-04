@@ -26,6 +26,17 @@
 status_t
 boot_arch_cpu_init(void)
 {
+	int32 busFrequency = 0;
+
+	int root = of_finddevice("/");
+	if (root == OF_FAILED) {
+		printf("boot_arch_cpu_init(): Failed to open \"/\"!\n");
+		return B_ERROR;
+	}
+
+	of_getprop(root, "clock-frequency", &busFrequency, 4);
+		// we might find it in /cpus instead
+
 	// iterate through the "/cpus" node to find all CPUs
 	int cpus = of_finddevice("/cpus");
 	if (cpus == OF_FAILED) {
@@ -58,8 +69,8 @@ boot_arch_cpu_init(void)
 					"frequency!\n");
 				return B_ERROR;
 			}
-			int32 busFrequency;
-			if (of_getprop(cpu, "bus-frequency", &busFrequency, 4)
+			if (busFrequency == 0
+				&& of_getprop(cpu, "bus-frequency", &busFrequency, 4)
 					== OF_FAILED) {
 				printf("boot_arch_cpu_init: Failed to get bus clock "
 					"frequency!\n");

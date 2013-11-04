@@ -793,7 +793,7 @@ status_t
 arch_vm_translation_map_early_query(addr_t va, phys_addr_t *out_physical)
 {
 	//PANIC_UNIMPLEMENTED();
-	panic("vm_translation_map_quick_query(): not yet implemented\n");
+	panic("vm_translation_map_early_query(): not yet implemented\n");
 	return B_OK;
 }
 
