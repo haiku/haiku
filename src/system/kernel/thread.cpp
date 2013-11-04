@@ -1364,11 +1364,9 @@ common_snooze_etc(bigtime_t timeout, clockid_t clockID, uint32 flags,
 
 			Thread* thread = thread_get_current_thread();
 
-			InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 			thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_SNOOZE,
 				NULL);
-			status_t status = thread_block_with_timeout_locked(flags, timeout);
+			status_t status = thread_block_with_timeout(flags, timeout);
 
 			if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
 				return B_OK;
@@ -2802,26 +2800,13 @@ thread_block()
 
 /*!	Blocks the current thread with a timeout.
 
-	Acquires the scheduler lock and calls thread_block_with_timeout_locked().
-	See there for more information.
-*/
-status_t
-thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout)
-{
-	InterruptsSpinLocker _(gSchedulerLock);
-	return thread_block_with_timeout_locked(timeoutFlags, timeout);
-}
-
-
-/*!	Blocks the current thread with a timeout.
-
 	The thread is blocked until someone else unblock it or the specified timeout
 	occurs. Must be called after a call to thread_prepare_to_block(). If the
 	thread has already been unblocked after the previous call to
 	thread_prepare_to_block(), this function will return immediately. See
 	thread_prepare_to_block() for more details.
 
-	The caller must hold the scheduler lock.
+	The caller must not hold the scheduler lock.
 
 	\param thread The current thread.
 	\param timeoutFlags The standard timeout flags:
@@ -2841,9 +2826,11 @@ thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout)
 		client code).
 */
 status_t
-thread_block_with_timeout_locked(uint32 timeoutFlags, bigtime_t timeout)
+thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout)
 {
 	Thread* thread = thread_get_current_thread();
+
+	InterruptsSpinLocker locker(gSchedulerLock);
 
 	if (thread->wait.status != 1)
 		return thread->wait.status;
@@ -2870,6 +2857,8 @@ thread_block_with_timeout_locked(uint32 timeoutFlags, bigtime_t timeout)
 
 	// block
 	status_t error = thread_block_locked(thread);
+
+	locker.Unlock();
 
 	// cancel timer, if it didn't fire
 	if (error != B_TIMED_OUT && useTimer)
@@ -3584,11 +3573,9 @@ _user_block_thread(uint32 flags, bigtime_t timeout)
 	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_OTHER, "user");
 
 	threadLocker.Unlock();
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
-	status_t status = thread_block_with_timeout_locked(flags, timeout);
+	status_t status = thread_block_with_timeout(flags, timeout);
 
-	schedulerLocker.Unlock();
 	threadLocker.Lock();
 
 	// Interruptions or timeouts can race with other threads unblocking us.

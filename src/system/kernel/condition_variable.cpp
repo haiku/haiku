@@ -134,15 +134,11 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 
 	conditionLocker.Unlock();
 
-	SpinLocker schedulerLocker(gSchedulerLock);
-
 	status_t error;
 	if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0)
-		error = thread_block_with_timeout_locked(flags, timeout);
+		error = thread_block_with_timeout(flags, timeout);
 	else
-		error = thread_block_locked(thread_get_current_thread());
-
-	schedulerLocker.Unlock();
+		error = thread_block();
 
 	conditionLocker.Lock();
 

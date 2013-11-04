@@ -852,13 +852,9 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 			semToBeReleased = -1;
 		}
 
-		schedulerLocker.Lock();
-
 		status_t acquireStatus = timeout == B_INFINITE_TIMEOUT
-			? thread_block_locked(thread)
-			: thread_block_with_timeout_locked(flags, timeout);
+			? thread_block() : thread_block_with_timeout(flags, timeout);
 
-		schedulerLocker.Unlock();
 		GRAB_SEM_LOCK(sSems[slot]);
 
 		// If we're still queued, this means the acquiration failed, and we

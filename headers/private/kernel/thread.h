@@ -130,8 +130,6 @@ status_t deselect_thread(int32 object, struct select_info *info, bool kernel);
 
 status_t thread_block();
 status_t thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout);
-status_t thread_block_with_timeout_locked(uint32 timeoutFlags,
-			bigtime_t timeout);
 void thread_unblock(Thread* thread, status_t status);
 
 // used in syscalls.c
@@ -230,22 +228,22 @@ thread_is_blocked(Thread* thread)
 	If a client lock other than the scheduler lock is used, this function must
 	be called with that lock being held. Afterwards that lock should be dropped
 	and the function that actually blocks the thread shall be invoked
-	(thread_block[_locked]() or thread_block_with_timeout[_locked]()). In
-	between these two steps no functionality that uses the thread blocking API
-	for this thread shall be used.
+	(thread_block[_locked]() or thread_block_with_timeout()). In between these
+	two steps no functionality that uses the thread blocking API for this thread
+	shall be used.
 
 	When the caller determines that the condition for unblocking the thread
 	occurred, it calls thread_unblock_locked() to unblock the thread. At that
 	time one of locks that are held when calling thread_prepare_to_block() must
 	be held. Usually that would be the client lock. In two cases it generally
 	isn't, however, since the unblocking code doesn't know about the client
-	lock: 1. When thread_block_with_timeout[_locked]() had been used and the
-	timeout occurs. 2. When thread_prepare_to_block() had been called with one
-	or both of the \c B_CAN_INTERRUPT or \c B_KILL_CAN_INTERRUPT flags specified
-	and someone calls thread_interrupt() that is supposed to wake up the thread.
+	lock: 1. When thread_block_with_timeout() had been used and the timeout
+	occurs. 2. When thread_prepare_to_block() had been called with one or both
+	of the \c B_CAN_INTERRUPT or \c B_KILL_CAN_INTERRUPT flags specified and
+	someone calls thread_interrupt() that is supposed to wake up the thread.
 	In either of these two cases only the scheduler lock is held by the
 	unblocking code. A timeout can only happen after
-	thread_block_with_timeout_locked() has been called, but an interruption is
+	thread_block_with_timeout() has been called, but an interruption is
 	possible at any time. The client code must deal with those situations.
 
 	Generally blocking and unblocking threads proceed in the following manner:

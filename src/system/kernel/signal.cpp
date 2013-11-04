@@ -2041,16 +2041,22 @@ sigwait_internal(const sigset_t* set, siginfo_t* info, uint32 flags,
 			thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_SIGNAL,
 				NULL);
 
+			schedulerLocker.Unlock();
+
 			if ((flags & B_ABSOLUTE_TIMEOUT) != 0) {
-				error = thread_block_with_timeout_locked(flags, timeout);
+				error = thread_block_with_timeout(flags, timeout);
 				if (error == B_WOULD_BLOCK || error == B_TIMED_OUT) {
 					error = B_WOULD_BLOCK;
 						// POSIX requires EAGAIN (B_WOULD_BLOCK) on timeout
 					timedOut = true;
+
+					schedulerLocker.Lock();
 					break;
 				}
 			} else
-				thread_block_locked(thread);
+				thread_block();
+
+			schedulerLocker.Lock();
 		}
 
 		// restore the original block mask
