@@ -119,9 +119,9 @@ static page_num_t sNonExistingPages;
 static uint64 sIgnoredPages;
 	// pages of physical memory ignored by the boot loader (and thus not
 	// available here)
-static vint32 sUnreservedFreePages;
-static vint32 sUnsatisfiedPageReservations;
-static vint32 sModifiedTemporaryPages;
+static int32 sUnreservedFreePages;
+static int32 sUnsatisfiedPageReservations;
+static int32 sModifiedTemporaryPages;
 
 static ConditionVariable sFreePageCondition;
 static mutex sPageDeficitLock = MUTEX_INITIALIZER("page deficit");
@@ -1407,7 +1407,7 @@ static uint32
 reserve_some_pages(uint32 count, uint32 dontTouch)
 {
 	while (true) {
-		int32 freePages = sUnreservedFreePages;
+		int32 freePages = atomic_get(&sUnreservedFreePages);
 		if (freePages <= (int32)dontTouch)
 			return 0;
 
@@ -1456,7 +1456,7 @@ static inline void
 unreserve_pages(uint32 count)
 {
 	atomic_add(&sUnreservedFreePages, count);
-	if (sUnsatisfiedPageReservations != 0)
+	if (atomic_get(&sUnsatisfiedPageReservations) != 0)
 		wake_up_page_reservation_waiters();
 }
 
@@ -1744,7 +1744,8 @@ page_scrubber(void *unused)
 		snooze(100000); // 100ms
 
 		if (sFreePageQueue.Count() == 0
-				|| sUnreservedFreePages < (int32)sFreePagesTarget) {
+				|| atomic_get(&sUnreservedFreePages)
+					< (int32)sFreePagesTarget) {
 			continue;
 		}
 
@@ -1880,7 +1881,7 @@ private:
 	uint32				fMaxPages;
 	uint32				fWrapperCount;
 	uint32				fTransferCount;
-	vint32				fPendingTransfers;
+	int32				fPendingTransfers;
 	PageWriteWrapper*	fWrappers;
 	PageWriteTransfer*	fTransfers;
 	ConditionVariable	fAllFinishedCondition;
@@ -2206,7 +2207,7 @@ PageWriterRun::AddPage(vm_page* page)
 uint32
 PageWriterRun::Go()
 {
-	fPendingTransfers = fTransferCount;
+	atomic_set(&fPendingTransfers, fTransferCount);
 
 	fAllFinishedCondition.Init(this, "page writer wait for I/O");
 	ConditionVariableEntry waitEntry;
@@ -3005,7 +3006,7 @@ reserve_pages(uint32 count, int priority, bool dontWait)
 		bool notifyDaemon = sUnsatisfiedPageReservations == 0;
 		sUnsatisfiedPageReservations += count;
 
-		if (sUnreservedFreePages > dontTouch) {
+		if (atomic_get(&sUnreservedFreePages) > dontTouch) {
 			// the situation changed
 			sUnsatisfiedPageReservations -= count;
 			continue;

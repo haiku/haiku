@@ -54,7 +54,7 @@ private:
 	virtual status_t	_Reserved_Renderer_3(int32, void *);
 	virtual status_t	_Reserved_Renderer_4(int32, void *);
 
-	volatile int32		fRefCount;	// How much we're still usefull?
+	int32			fRefCount;	// How much we're still usefull?
 	BGLView*		fView;		// Never forget who is the boss!
 	ulong			fOptions;	// Keep that tune in memory
 	BGLDispatcher*		fDispatcher;	// Our personal OpenGL API call dispatcher

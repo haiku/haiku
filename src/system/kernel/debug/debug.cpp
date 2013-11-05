@@ -139,10 +139,10 @@ static int32 sCurrentLine = 0;
 static debugger_demangle_module_info* sDemangleModule;
 
 static Thread* sDebuggedThread;
-static vint32 sInDebugger = 0;
+static int32 sInDebugger = 0;
 static bool sPreviousDprintfState;
 static volatile bool sHandOverKDL = false;
-static vint32 sHandOverKDLToCPU = -1;
+static int32 sHandOverKDLToCPU = -1;
 static bool sCPUTrapped[B_MAX_CPU_COUNT];
 
 
@@ -1007,7 +1007,7 @@ hand_over_kernel_debugger()
 	// hand over to another CPU without us noticing. Since this is only
 	// initiated by the user, it is harmless, though.
 	sHandOverKDL = true;
-	while (sHandOverKDLToCPU >= 0)
+	while (atomic_get(&sHandOverKDLToCPU) >= 0)
 		PAUSE();
 }
 

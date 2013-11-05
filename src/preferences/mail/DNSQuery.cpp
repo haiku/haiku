@@ -19,7 +19,7 @@
 #endif
 
 
-static vint32 gID = 1;
+static int32 gID = 1;
 
 
 BRawNetBuffer::BRawNetBuffer()

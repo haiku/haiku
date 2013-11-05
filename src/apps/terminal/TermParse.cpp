@@ -1205,9 +1205,9 @@ TermParse::_ReadParserBuffer()
 	fBuffer->Unlock();
 
 	// wait for new input from pty
-	if (fReadBufferSize == 0) {
+	if (atomic_get(&fReadBufferSize) == 0) {
 		status_t status = B_OK;
-		while (fReadBufferSize == 0 && status == B_OK) {
+		while (atomic_get(&fReadBufferSize) == 0 && status == B_OK) {
 			do {
 				status = acquire_sem(fReaderSem);
 			} while (status == B_INTERRUPTED);
@@ -1224,7 +1224,7 @@ TermParse::_ReadParserBuffer()
 		}
 	}
 
-	int32 toRead = fReadBufferSize;
+	int32 toRead = atomic_get(&fReadBufferSize);
 	if (toRead > ESC_PARSER_BUFFER_SIZE)
 		toRead = ESC_PARSER_BUFFER_SIZE;
 

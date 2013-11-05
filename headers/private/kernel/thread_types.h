@@ -406,7 +406,7 @@ private:
 			TeamTimeUserTimerList fCPUTimeUserTimers;
 									// protected by scheduler lock
 			TeamUserTimeUserTimerList fUserTimeUserTimers;
-			vint32				fUserDefinedTimerCount;	// accessed atomically
+			int32				fUserDefinedTimerCount;	// accessed atomically
 };
 
 

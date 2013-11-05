@@ -21,7 +21,7 @@ class Referenceable {
 			bool				Release();
 
  private:
-			vint32				fReferenceCount;
+			int32				fReferenceCount;
 };
 
 #endif // REFERENCABLE_H

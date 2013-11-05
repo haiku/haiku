@@ -107,7 +107,7 @@ private:
 			uint32					fRepairCount;
 			mutex					fRepairLock;
 
-			vint32					fXID;
+			int32					fXID;
 };
 
 

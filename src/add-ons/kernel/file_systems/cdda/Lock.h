@@ -63,7 +63,7 @@ class Semaphore {
 	private:
 		sem_id	fSemaphore;
 #ifdef USE_BENAPHORE
-		vint32	fCount;
+		int32	fCount;
 #endif
 };
 

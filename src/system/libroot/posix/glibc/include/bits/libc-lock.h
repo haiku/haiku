@@ -19,7 +19,7 @@ extern char	_single_threaded;
 static inline int
 __compare_and_swap (volatile int32 *p, int oldval, int newval)
 {
-	int32 readval = atomic_test_and_set(p, newval, oldval);
+	int32 readval = atomic_test_and_set((int32*)p, newval, oldval);
 	return (readval == oldval ? 1 : 0);
 }
 

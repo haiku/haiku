@@ -29,7 +29,7 @@ struct per_cpu_timer_data {
 	spinlock		lock;
 	timer* volatile	events;
 	timer* volatile	current_event;
-	vint32			current_event_in_progress;
+	int32			current_event_in_progress;
 	bigtime_t		real_time_offset;
 };
 
@@ -264,7 +264,7 @@ timer_interrupt()
 
 		cpuData.events = (timer*)event->next;
 		cpuData.current_event = event;
-		cpuData.current_event_in_progress = 1;
+		atomic_set(&cpuData.current_event_in_progress, 1);
 
 		release_spinlock(spinlock);
 
@@ -277,7 +277,7 @@ timer_interrupt()
 		if (event->hook)
 			rc = event->hook(event);
 
-		cpuData.current_event_in_progress = 0;
+		atomic_set(&cpuData.current_event_in_progress, 0);
 
 		acquire_spinlock(spinlock);
 
@@ -447,7 +447,7 @@ cancel_timer(timer* event)
 	if (cpu != smp_get_current_cpu()) {
 		spinLocker.Unlock();
 
-		while (cpuData.current_event_in_progress == 1) {
+		while (atomic_get(&cpuData.current_event_in_progress) == 1) {
 			PAUSE();
 		}
 	}

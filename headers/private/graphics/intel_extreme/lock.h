@@ -14,7 +14,7 @@
 
 typedef struct lock {
 	sem_id	sem;
-	vint32	count;
+	int32	count;
 } lock;
 
 

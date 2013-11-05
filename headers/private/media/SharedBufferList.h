@@ -54,7 +54,7 @@ private:
 
 private:
 			sem_id				fSemaphore;
-			vint32				fAtom;
+			int32				fAtom;
 
 			_shared_buffer_info	fInfos[kMaxBuffers];
 			int32				fCount;

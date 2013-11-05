@@ -151,7 +151,7 @@ struct acpi_ec_cookie {
 	mutex						ec_lock;
 	int							ec_burstactive;
 	int							ec_sci_pending;
-	vint32						ec_gencount;
+	int32						ec_gencount;
 	ConditionVariable			ec_condition_var;
 	int							ec_suspending;
 };

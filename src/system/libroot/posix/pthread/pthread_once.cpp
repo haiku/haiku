@@ -55,7 +55,7 @@ pthread_once(pthread_once_t* onceControl, void (*initRoutine)(void))
 	// initRoutine. All following threads will return right away.
 
 	while (true) {
-		int32 value = atomic_test_and_set((vint32*)&onceControl->state,
+		int32 value = atomic_test_and_set((int32*)&onceControl->state,
 			STATE_INITIALIZING, STATE_UNINITIALIZED);
 
 		if (value == STATE_INITIALIZED)
@@ -83,7 +83,7 @@ pthread_once(pthread_once_t* onceControl, void (*initRoutine)(void))
 			sem_id semaphore = create_sem(0, "pthread once");
 			if (semaphore >= 0) {
 				// successfully created -- set it
-				value = atomic_test_and_set((vint32*)&onceControl->state,
+				value = atomic_test_and_set((int32*)&onceControl->state,
 					semaphore, STATE_INITIALIZING);
 				if (value == STATE_INITIALIZING)
 					value = semaphore;
@@ -93,7 +93,7 @@ pthread_once(pthread_once_t* onceControl, void (*initRoutine)(void))
 				// Failed to create the semaphore. Can only happen when the
 				// system runs out of semaphores, but we can still handle the
 				// situation gracefully by spinning.
-				value = atomic_test_and_set((vint32*)&onceControl->state,
+				value = atomic_test_and_set((int32*)&onceControl->state,
 					STATE_SPINNING, STATE_INITIALIZING);
 				if (value == STATE_INITIALIZING)
 					value = STATE_SPINNING;

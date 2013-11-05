@@ -50,7 +50,7 @@ struct MimeSnifferAddonManager::AddonReference {
 
 private:
 	BMimeSnifferAddon*	fAddon;
-	vint32				fReferenceCount;
+	int32				fReferenceCount;
 };
 
 

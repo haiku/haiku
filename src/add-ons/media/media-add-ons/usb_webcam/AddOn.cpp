@@ -179,7 +179,7 @@ WebCamMediaAddOn::FillDefaultFlavorInfo(flavor_info* info)
 	info->info = "USB Web Camera";
 	info->kinds = B_BUFFER_PRODUCER | B_CONTROLLABLE | B_PHYSICAL_INPUT;
 	info->flavor_flags = 0;//B_FLAVOR_IS_GLOBAL;
-	info->internal_id = atomic_add((vint32 *)&fInternalIDCounter, 1);
+	info->internal_id = atomic_add((int32*)&fInternalIDCounter, 1);
 	info->possible_count = 1;//0;
 	info->in_format_count = 0;
 	info->in_format_flags = 0;

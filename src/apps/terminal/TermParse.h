@@ -73,7 +73,7 @@ private:
 
 	uint fBufferPosition;
 	uchar fReadBuffer[READ_BUF_SIZE];
-	vint32 fReadBufferSize;
+	int32 fReadBufferSize;
 
 	uchar fParserBuffer[ESC_PARSER_BUFFER_SIZE];
 	int32 fParserBufferSize;

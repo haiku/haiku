@@ -47,7 +47,7 @@ typedef struct rw_lock {
 	struct rw_lock_waiter*	waiters;
 	spinlock				lock;
 	thread_id				holder;
-	vint32					count;
+	int32					count;
 	int32					owner_count;
 	int16					active_readers;
 								// Only > 0 while a writer is waiting: number

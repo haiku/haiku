@@ -149,7 +149,7 @@ private:
 	bool			fStarted; // has Start() been called?
 	sem_id			fWaitForThreads; // to exit
 	int32			fN; // the number of used filter threads
-	volatile int32	fNumberOfThreads; // the current number of FilterThreads
+	int32			fNumberOfThreads; // the current number of FilterThreads
 	volatile bool	fIsRunning; // FilterThreads should process data as long as it is true
 	BBitmap*		fSrcImage;
 	bool			fDestImageInitialized;

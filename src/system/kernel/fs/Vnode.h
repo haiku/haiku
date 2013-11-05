@@ -104,7 +104,7 @@ private:
 			void				_WakeUpLocker();
 
 private:
-			vint32				fFlags;
+			int32				fFlags;
 
 	static	Bucket				sBuckets[kBucketCount];
 };

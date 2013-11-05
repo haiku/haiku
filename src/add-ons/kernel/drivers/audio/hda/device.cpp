@@ -25,7 +25,7 @@ hda_open(const char* name, uint32 flags, void** cookie)
 	if (controller == NULL)
 		return ENODEV;
 
-	if (controller->opened != 0)
+	if (atomic_get(&controller->opened) != 0)
 		return B_BUSY;
 
 	status_t status = hda_hw_init(controller);

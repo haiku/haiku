@@ -631,8 +631,8 @@ static mutex sIpcLock;
 static mutex sXsiSemaphoreSetLock;
 
 static uint32 sGlobalSequenceNumber = 1;
-static vint32 sXsiSemaphoreCount = 0;
-static vint32 sXsiSemaphoreSetCount = 0;
+static int32 sXsiSemaphoreCount = 0;
+static int32 sXsiSemaphoreSetCount = 0;
 
 
 //	#pragma mark -

@@ -74,7 +74,7 @@ private:
 			uint32				fBeginHeader[3];
 			uint32				fEndHeader[3];
 			thread_id			fRescanThread;
-			vint32 				fRescanRequested;
+			int32 				fRescanRequested;
 			BLocker				fRescanLock;
 };
 
