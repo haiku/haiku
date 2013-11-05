@@ -39,6 +39,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			NodeMonitor.cpp
 			OffsetFile.cpp
 			Path.cpp
+			PathFinder.cpp
 			PathMonitor.cpp
 			Query.cpp
 			QueryPredicate.cpp
