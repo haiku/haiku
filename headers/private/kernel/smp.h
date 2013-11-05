@@ -103,4 +103,49 @@ release_spinlock_inline(spinlock* lock)
 #endif	// !DEBUG_SPINLOCKS && !B_DEBUG_SPINLOCK_CONTENTION
 
 
+static inline bool
+try_acquire_write_seqlock_inline(seqlock* lock) {
+	bool succeed = try_acquire_spinlock(&lock->lock);
+	if (succeed)
+		atomic_add(&lock->count, 1);
+	return succeed;
+}
+
+
+static inline void
+acquire_write_seqlock_inline(seqlock* lock) {
+	acquire_spinlock(&lock->lock);
+	atomic_add(&lock->count, 1);
+}
+
+
+static inline void
+release_write_seqlock_inline(seqlock* lock) {
+	atomic_add(&lock->count, 1);
+	release_spinlock(&lock->lock);
+}
+
+
+static inline uint32
+acquire_read_seqlock_inline(seqlock* lock) {
+	return atomic_get(&lock->count);
+}
+
+
+static inline bool
+release_read_seqlock_inline(seqlock* lock, uint32 count) {
+	uint32 current = atomic_get(&lock->count);
+
+	return count % 2 == 0 && current == count;
+}
+
+
+#define try_acquire_write_seqlock(lock)	try_acquire_write_seqlock_inline(lock)
+#define acquire_write_seqlock(lock)		acquire_write_seqlock_inline(lock)
+#define release_write_seqlock(lock)		release_write_seqlock_inline(lock)
+#define acquire_read_seqlock(lock)		acquire_read_seqlock_inline(lock)
+#define release_read_seqlock(lock, count)	\
+	release_read_seqlock_inline(lock, count)
+
+
 #endif	/* KERNEL_SMP_H */

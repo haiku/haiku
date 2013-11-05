@@ -40,6 +40,17 @@ typedef ulong cpu_status;
 #	define B_SPINLOCK_IS_LOCKED(lock)	(*(lock) > 0)
 #endif
 
+typedef struct {
+	spinlock	lock;
+	uint32		count;
+} seqlock;
+
+#define B_SEQLOCK_INITIALIZER	{ B_SPINLOCK_INITIALIZER, 0 }
+#define B_INITIALIZE_SEQLOCK(seqlock)	do {	\
+		B_INITIALIZE_SPINLOCK((seqlock)->lock);	\
+		(seqlock)->count = 0;					\
+	} while (false)
+
 /* interrupt handling support for device drivers */
 
 typedef int32 (*interrupt_handler)(void *data);
@@ -125,6 +136,12 @@ extern void			restore_interrupts(cpu_status status);
 
 extern void			acquire_spinlock(spinlock *lock);
 extern void			release_spinlock(spinlock *lock);
+
+extern bool			try_acquire_write_seqlock(seqlock* lock);
+extern void			acquire_write_seqlock(seqlock* lock);
+extern void			release_write_seqlock(seqlock* lock);
+extern uint32		acquire_read_seqlock(seqlock* lock);
+extern bool			release_read_seqlock(seqlock* lock, uint32 count);
 
 extern status_t		install_io_interrupt_handler(long interrupt_number,
 						interrupt_handler handler, void *data, ulong flags);

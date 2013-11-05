@@ -160,6 +160,52 @@ private:
 typedef AutoLocker<spinlock, InterruptsSpinLocking> InterruptsSpinLocker;
 
 
+class WriteSequentialLocking {
+public:
+	inline bool Lock(seqlock* lockable)
+	{
+		acquire_write_seqlock(lockable);
+		return true;
+	}
+
+	inline void Unlock(seqlock* lockable)
+	{
+		release_write_seqlock(lockable);
+	}
+};
+
+typedef AutoLocker<seqlock, WriteSequentialLocking> WriteSequentialLocker;
+
+
+class InterruptsWriteSequentialLocking {
+public:
+	InterruptsWriteSequentialLocking()
+		:
+		fState(0)
+	{
+	}
+
+	inline bool Lock(seqlock* lockable)
+	{
+		fState = disable_interrupts();
+		acquire_write_seqlock(lockable);
+		return true;
+	}
+
+	inline void Unlock(seqlock* lockable)
+	{
+		release_write_seqlock(lockable);
+		restore_interrupts(fState);
+	}
+
+private:
+	int	fState;
+};
+
+typedef AutoLocker<seqlock, InterruptsWriteSequentialLocking>
+	InterruptsWriteSequentialLocker;
+
+
 class ThreadCPUPinLocking {
 public:
 	inline bool Lock(Thread* thread)
@@ -191,6 +237,8 @@ using BPrivate::WriteLocker;
 using BPrivate::InterruptsLocker;
 using BPrivate::SpinLocker;
 using BPrivate::InterruptsSpinLocker;
+using BPrivate::WriteSequentialLocker;
+using BPrivate::InterruptsWriteSequentialLocker;
 using BPrivate::ThreadCPUPinner;
 using BPrivate::TeamLocker;
 using BPrivate::ThreadLocker;

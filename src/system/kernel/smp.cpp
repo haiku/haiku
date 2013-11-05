@@ -45,6 +45,12 @@
 #undef acquire_spinlock
 #undef release_spinlock
 
+#undef try_acquire_write_seqlock
+#undef acquire_write_seqlock
+#undef release_write_seqlock
+#undef acquire_read_seqlock
+#undef release_read_seqlock
+
 
 #define MSG_POOL_SIZE (SMP_MAX_CPUS * 4)
 
@@ -509,6 +515,48 @@ release_spinlock(spinlock *lock)
 		test_latency(lock);
 #endif
 	}
+}
+
+
+bool
+try_acquire_write_seqlock(seqlock* lock) {
+	bool succeed = try_acquire_spinlock(&lock->lock);
+	if (succeed)
+		atomic_add(&lock->count, 1);
+	return succeed;
+}
+
+
+void
+acquire_write_seqlock(seqlock* lock) {
+	acquire_spinlock(&lock->lock);
+	atomic_add(&lock->count, 1);
+}
+
+
+void
+release_write_seqlock(seqlock* lock) {
+	atomic_add(&lock->count, 1);
+	release_spinlock(&lock->lock);
+}
+
+
+uint32
+acquire_read_seqlock(seqlock* lock) {
+	return atomic_get(&lock->count);
+}
+
+
+bool
+release_read_seqlock(seqlock* lock, uint32 count) {
+	uint32 current = atomic_get(&lock->count);
+
+	if (count % 2 == 1 || current != count) {
+		PAUSE();
+		return false;
+	}
+
+	return true;
 }
 
 
