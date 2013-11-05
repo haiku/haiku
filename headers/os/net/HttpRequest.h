@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_URL_PROTOCOL_HTTP_H_
@@ -7,7 +7,6 @@
 
 
 #include <deque>
-
 
 #include <HttpForm.h>
 #include <HttpHeaders.h>
@@ -29,22 +28,22 @@ public:
 									BUrlContext* context = NULL);
 	virtual						~BHttpRequest();
 
-            void                SetMethod(const char* const method);
-            void                SetFollowLocation(bool follow);
-            void                SetMaxRedirections(int8 maxRedirections);
-            void                SetReferrer(const BString& referrer);
-            void                SetUserAgent(const BString& agent);
-            void                SetDiscardData(bool discard);
-            void                SetDisableListener(bool disable);
-            void                SetAutoReferrer(bool enable);
-            void                SetUserName(const BString& name);
-            void                SetPassword(const BString& password);
+			void				SetMethod(const char* const method);
+			void				SetFollowLocation(bool follow);
+			void				SetMaxRedirections(int8 maxRedirections);
+			void				SetReferrer(const BString& referrer);
+			void				SetUserAgent(const BString& agent);
+			void				SetDiscardData(bool discard);
+			void				SetDisableListener(bool disable);
+			void				SetAutoReferrer(bool enable);
+			void				SetUserName(const BString& name);
+			void				SetPassword(const BString& password);
 
-            void                SetPostFields(const BHttpForm& fields);
-            void                SetHeaders(const BHttpHeaders& headers);
+			void				SetPostFields(const BHttpForm& fields);
+			void				SetHeaders(const BHttpHeaders& headers);
 
-            void                AdoptPostFields(BHttpForm* const fields);
-            void                AdoptInputData(BDataIO* const data,
+			void				AdoptPostFields(BHttpForm* const fields);
+			void				AdoptInputData(BDataIO* const data,
 									const ssize_t size = -1);
             void                AdoptHeaders(BHttpHeaders* const headers);
 

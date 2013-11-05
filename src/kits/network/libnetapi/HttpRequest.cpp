@@ -1,23 +1,26 @@
 /*
- * Copyright 2010-2011 Haiku Inc. All rights reserved.
+ * Copyright 2010-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
- *      Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  */
 
+
+#include <HttpRequest.h>
+
+#include <arpa/inet.h>
+#include <stdio.h>
 
 #include <cstdlib>
 #include <deque>
 #include <new>
 
-#include <arpa/inet.h>
 #include <Debug.h>
 #include <File.h>
 #include <Socket.h>
 #include <SecureSocket.h>
-#include <HttpRequest.h>
 
 
 static const int32 kHttpBufferSize = 4096;
@@ -260,13 +263,13 @@ BHttpRequest::_ResetOptions()
 
 	fOptFollowLocation = true;
 	fOptMaxRedirs = 8;
-	fOptReferer	= "";
+	fOptReferer = "";
 	fOptUserAgent = "Services Kit (Haiku)";
 	fOptUsername = "";
 	fOptPassword = "";
 	fOptAuthMethods = B_HTTP_AUTHENTICATION_BASIC | B_HTTP_AUTHENTICATION_DIGEST
 		| B_HTTP_AUTHENTICATION_IE_DIGEST;
-	fOptHeaders	= NULL;
+	fOptHeaders = NULL;
 	fOptPostFields = NULL;
 	fOptSetCookies = true;
 	fOptDiscardData = false;
@@ -274,7 +277,7 @@ BHttpRequest::_ResetOptions()
 	fOptAutoReferer = true;
 }
 
-#include <stdio.h>
+
 status_t
 BHttpRequest::_ProtocolLoop()
 {
@@ -344,13 +347,12 @@ BHttpRequest::_ProtocolLoop()
 				break;
 
 			case B_HTTP_STATUS_CLASS_CLIENT_ERROR:
-				if(fResult.StatusCode() == B_HTTP_STATUS_UNAUTHORIZED) {
+				if (fResult.StatusCode() == B_HTTP_STATUS_UNAUTHORIZED) {
 					BHttpAuthentication* authentication
 						= &fContext->GetAuthentication(fUrl);
 					status_t status = B_OK;
 
-					if (authentication->Method() == B_HTTP_AUTHENTICATION_NONE)
-					{
+					if (authentication->Method() == B_HTTP_AUTHENTICATION_NONE) {
 						// There is no authentication context for this
 						// url yet, so let's create one.
 						authentication = new BHttpAuthentication();
@@ -506,15 +508,15 @@ BHttpRequest::_MakeRequest()
 	} else if ((fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT)
 		&& fOptInputData != NULL) {
 
-		for(;;) {
+		for (;;) {
 			char outputTempBuffer[kHttpBufferSize];
 			ssize_t read = fOptInputData->Read(outputTempBuffer,
 				sizeof(outputTempBuffer));
 
-			if(read <= 0) break;
+			if (read <= 0)
+				break;
 
-			if (fOptInputDataSize < 0)
-			{
+			if (fOptInputDataSize < 0) {
 				// Chunked transfer
 				char hexSize[16];
 				size_t hexLength = sprintf(hexSize, "%ld", read);
@@ -564,8 +566,7 @@ BHttpRequest::_MakeRequest()
 				receiveEnd = true;
 
 			fInputBuffer.AppendData(chunk.Data(), bytesRead);
-		}
-		else
+		} else
 			bytesRead = 0;
 
 		if (fRequestStatus < kRequestStatusReceived) {
@@ -651,9 +652,8 @@ BHttpRequest::_MakeRequest()
 
 				// A chunk of 0 bytes indicates the end of the chunked
 				// transfer
-				if (bytesRead == 0) {
+				if (bytesRead == 0)
 					receiveEnd = true;
-				}
 			} else {
 				bytesRead = fInputBuffer.Size();
 
@@ -855,13 +855,11 @@ BHttpRequest::_AddHeaders()
 		fOutputHeaders.AddHeader("Content-Length",
 			fOptPostFields->ContentLength());
 	} else if (fOptInputData != NULL
-			&& (fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT))
-	{
-		if(fOptInputDataSize >= 0) {
+			&& (fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT)) {
+		if (fOptInputDataSize >= 0)
 			fOutputHeaders.AddHeader("Content-Length", fOptInputDataSize);
-		} else {
+		else
 			fOutputHeaders.AddHeader("Transfer-Encoding", "chunked");
-		}
 	}
 
 	// Optional headers specified by the user
@@ -901,8 +899,9 @@ BHttpRequest::_AddHeaders()
 
 	// Write output headers to output stream
 	for (int32 headerIndex = 0; headerIndex < fOutputHeaders.CountHeaders();
-			headerIndex++)
+			headerIndex++) {
 		_AddOutputBufferLine(fOutputHeaders.HeaderAt(headerIndex).Header());
+	}
 }
 
 
