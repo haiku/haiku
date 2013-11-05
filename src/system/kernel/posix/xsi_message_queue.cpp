@@ -385,8 +385,8 @@ static mutex sIpcLock;
 static mutex sXsiMessageQueueLock;
 
 static uint32 sGlobalSequenceNumber = 1;
-static vint32 sXsiMessageCount = 0;
-static vint32 sXsiMessageQueueCount = 0;
+static int32 sXsiMessageCount = 0;
+static int32 sXsiMessageQueueCount = 0;
 
 
 //	#pragma mark -
@@ -690,7 +690,7 @@ _user_xsi_msgget(key_t key, int flags)
 
 	if (create) {
 		// Create a new message queue for this key
-		if (sXsiMessageQueueCount >= MAX_XSI_MESSAGE_QUEUE) {
+		if (atomic_get(&sXsiMessageQueueCount) >= MAX_XSI_MESSAGE_QUEUE) {
 			TRACE_ERROR(("xsi_msgget: reached limit of maximun number of "
 				"message queues\n"));
 			return ENOSPC;

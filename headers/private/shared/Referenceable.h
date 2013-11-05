@@ -30,7 +30,7 @@ protected:
 	virtual	void				LastReferenceReleased();
 
 protected:
-			vint32				fReferenceCount;
+			int32				fReferenceCount;
 };
 
 

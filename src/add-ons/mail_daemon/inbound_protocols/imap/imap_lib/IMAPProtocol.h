@@ -120,7 +120,7 @@ private:
 
 			BString				fCommandError;
 
-			vint32				fStopNow;
+			int32				fStopNow;
 
 			bool				fIsConnected;
 };

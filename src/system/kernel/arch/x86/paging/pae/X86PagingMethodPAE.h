@@ -158,7 +158,7 @@ X86PagingMethodPAE::PageDirEntryForAddress(
 X86PagingMethodPAE::SetPageTableEntry(pae_page_table_entry* entry,
 	pae_page_table_entry newEntry)
 {
-	return atomic_set64((int64*)entry, newEntry);
+	return atomic_get_and_set64((int64*)entry, newEntry);
 }
 
 

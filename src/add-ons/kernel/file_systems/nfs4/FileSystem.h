@@ -109,7 +109,7 @@ private:
 
 			RPC::Server*		fServer;
 
-			vint64				fId;
+			int64				fId;
 			dev_t				fDevId;
 
 			InodeIdMap			fInoIdMap;

@@ -28,7 +28,7 @@ struct ps2_dev {
 	bool			active;
 	uint8           idx;
 	sem_id			result_sem;
-	vint32			flags;
+	int32			flags;
 	uint8 *			result_buf;
 	int				result_buf_idx;
 	int				result_buf_cnt;

@@ -20,9 +20,9 @@ typedef ulong cpu_status;
 
 #if B_DEBUG_SPINLOCK_CONTENTION
 	typedef struct {
-		vint32	lock;
-		vint32	count_low;
-		vint32	count_high;
+		int32	lock;
+		int32	count_low;
+		int32	count_high;
 	} spinlock;
 
 #	define B_SPINLOCK_INITIALIZER { 0, 0, 0 }
@@ -33,7 +33,7 @@ typedef ulong cpu_status;
 		} while (false)
 #	define B_SPINLOCK_IS_LOCKED(spinlock)	((spinlock)->lock > 0)
 #else
-	typedef vint32 spinlock;
+	typedef int32 spinlock;
 
 #	define B_SPINLOCK_INITIALIZER 0
 #	define B_INITIALIZE_SPINLOCK(lock)	do { *(lock) = 0; } while (false)

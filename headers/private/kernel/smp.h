@@ -47,7 +47,7 @@ status_t smp_per_cpu_init(struct kernel_args *args, int32 cpu);
 status_t smp_init_post_generic_syscalls(void);
 bool smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous);
 void smp_wake_up_non_boot_cpus(void);
-void smp_cpu_rendezvous(volatile uint32 *var, int current_cpu);
+void smp_cpu_rendezvous(uint32 *var, int current_cpu);
 void smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2, addr_t data3,
 		void *data_ptr, uint32 flags);
 void smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, addr_t data,
@@ -107,7 +107,7 @@ static inline bool
 try_acquire_write_seqlock_inline(seqlock* lock) {
 	bool succeed = try_acquire_spinlock(&lock->lock);
 	if (succeed)
-		atomic_add(&lock->count, 1);
+		atomic_add((int32*)&lock->count, 1);
 	return succeed;
 }
 
@@ -115,26 +115,26 @@ try_acquire_write_seqlock_inline(seqlock* lock) {
 static inline void
 acquire_write_seqlock_inline(seqlock* lock) {
 	acquire_spinlock(&lock->lock);
-	atomic_add(&lock->count, 1);
+	atomic_add((int32*)&lock->count, 1);
 }
 
 
 static inline void
 release_write_seqlock_inline(seqlock* lock) {
-	atomic_add(&lock->count, 1);
+	atomic_add((int32*)&lock->count, 1);
 	release_spinlock(&lock->lock);
 }
 
 
 static inline uint32
 acquire_read_seqlock_inline(seqlock* lock) {
-	return atomic_get(&lock->count);
+	return atomic_get((int32*)&lock->count);
 }
 
 
 static inline bool
 release_read_seqlock_inline(seqlock* lock, uint32 count) {
-	uint32 current = atomic_get(&lock->count);
+	uint32 current = atomic_get((int32*)&lock->count);
 
 	return count % 2 == 0 && current == count;
 }

@@ -34,14 +34,14 @@ struct EntryCacheEntry {
 			EntryCacheEntry*	hash_link;
 			ino_t				node_id;
 			ino_t				dir_id;
-			vint32				generation;
-			vint32				index;
+			int32				generation;
+			int32				index;
 			char				name[1];
 };
 
 
 struct EntryCacheGeneration {
-			vint32				next_index;
+			int32				next_index;
 			EntryCacheEntry**	entries;
 
 								EntryCacheGeneration();

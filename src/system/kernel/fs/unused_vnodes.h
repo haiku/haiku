@@ -30,15 +30,15 @@ const static uint32 kMaxUnusedVnodes = 8192;
 */
 static mutex sUnusedVnodesLock = MUTEX_INITIALIZER("unused vnodes");
 static list sUnusedVnodeList;
-static vuint32 sUnusedVnodes = 0;
+static uint32 sUnusedVnodes = 0;
 
 static const int32 kMaxHotVnodes = 1024;
 static rw_lock sHotVnodesLock = RW_LOCK_INITIALIZER("hot vnodes");
 static Vnode* sHotVnodes[kMaxHotVnodes];
-static vint32 sNextHotVnodeIndex = 0;
+static int32 sNextHotVnodeIndex = 0;
 
 static const int32 kUnusedVnodesCheckInterval = 64;
-static vint32 sUnusedVnodesCheckCount = 0;
+static int32 sUnusedVnodesCheckCount = 0;
 
 
 /*!	Must be called with sHotVnodesLock write-locked.
@@ -48,7 +48,7 @@ flush_hot_vnodes_locked()
 {
 	MutexLocker unusedLocker(sUnusedVnodesLock);
 
-	int32 count = std::min((int32)sNextHotVnodeIndex, kMaxHotVnodes);
+	int32 count = std::min(sNextHotVnodeIndex, kMaxHotVnodes);
 	for (int32 i = 0; i < count; i++) {
 		Vnode* vnode = sHotVnodes[i];
 		if (vnode == NULL)
@@ -87,7 +87,7 @@ vnode_unused(Vnode* vnode)
 	bool result = false;
 	int32 checkCount = atomic_add(&sUnusedVnodesCheckCount, 1);
 	if (checkCount == kUnusedVnodesCheckInterval) {
-		uint32 unusedCount = sUnusedVnodes;
+		uint32 unusedCount = atomic_get((int32*)&sUnusedVnodes);
 		if (unusedCount > kMaxUnusedVnodes
 			&& low_resource_state(
 				B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY)
@@ -164,7 +164,7 @@ vnode_to_be_freed(Vnode* vnode)
 	if (vnode->IsHot()) {
 		// node is hot -- remove it from the array
 // TODO: Maybe better completely flush the array while at it?
-		int32 count = sNextHotVnodeIndex;
+		int32 count = atomic_get(&sNextHotVnodeIndex);
 		count = std::min(count, kMaxHotVnodes);
 		for (int32 i = 0; i < count; i++) {
 			if (sHotVnodes[i] == vnode) {

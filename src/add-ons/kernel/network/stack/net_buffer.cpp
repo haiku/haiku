@@ -166,12 +166,12 @@ static status_t read_data(net_buffer* _buffer, size_t offset, void* data,
 
 
 #if ENABLE_STATS
-static vint32 sAllocatedDataHeaderCount = 0;
-static vint32 sAllocatedNetBufferCount = 0;
-static vint32 sEverAllocatedDataHeaderCount = 0;
-static vint32 sEverAllocatedNetBufferCount = 0;
-static vint32 sMaxAllocatedDataHeaderCount = 0;
-static vint32 sMaxAllocatedNetBufferCount = 0;
+static int32 sAllocatedDataHeaderCount = 0;
+static int32 sAllocatedNetBufferCount = 0;
+static int32 sEverAllocatedDataHeaderCount = 0;
+static int32 sEverAllocatedNetBufferCount = 0;
+static int32 sMaxAllocatedDataHeaderCount = 0;
+static int32 sMaxAllocatedNetBufferCount = 0;
 #endif
 
 

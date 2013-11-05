@@ -165,7 +165,8 @@ EntryCache::Lookup(ino_t dirID, const char* name, ino_t& _nodeID)
 	if (entry == NULL)
 		return false;
 
-	int32 oldGeneration = atomic_set(&entry->generation, fCurrentGeneration);
+	int32 oldGeneration = atomic_get_and_set(&entry->generation,
+			fCurrentGeneration);
 	if (oldGeneration == fCurrentGeneration || entry->index < 0) {
 		// The entry is already in the current generation or is being moved to
 		// it by another thread.

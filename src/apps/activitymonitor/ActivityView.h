@@ -76,7 +76,7 @@ public:
 			void		RemoveAllDataSources();
 
 			bigtime_t	RefreshInterval() const
-							{ return atomic_get64((vint64*)&fRefreshInterval); }
+							{ return atomic_get64((int64*)&fRefreshInterval); }
 
 protected:
 	virtual	void		AttachedToWindow();

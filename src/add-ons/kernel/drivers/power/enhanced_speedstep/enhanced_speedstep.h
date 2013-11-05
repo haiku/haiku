@@ -22,7 +22,7 @@ struct est_cookie {
 	freq_info*				available_states;
 	uint8					number_states;
 	
-	vint32					stop_watching;
+	int32					stop_watching;
 };
 
 

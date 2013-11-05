@@ -71,7 +71,7 @@ int32		recursive_lock_get_recursion(recursive_lock *lock);
 #define		INIT_ONCE_UNINITIALIZED	-1
 #define		INIT_ONCE_INITIALIZED	-4
 
-status_t	__init_once(vint32* control, status_t (*initRoutine)(void*),
+status_t	__init_once(int32* control, status_t (*initRoutine)(void*),
 				void* data);
 
 #ifdef __cplusplus

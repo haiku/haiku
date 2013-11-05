@@ -33,7 +33,7 @@ struct SignalEvent::EventSignal : Signal {
 
 	bool MarkUsed()
 	{
-		return atomic_set(&fInUse, 1) != 0;
+		return atomic_get_and_set(&fInUse, 1) != 0;
 	}
 
 	void SetUnused()
@@ -216,7 +216,7 @@ CreateThreadEvent::Create(const ThreadCreationAttributes& attributes)
 status_t
 CreateThreadEvent::Fire()
 {
-	bool wasPending = atomic_set(&fPendingDPC, 1) != 0;
+	bool wasPending = atomic_get_and_set(&fPendingDPC, 1) != 0;
 	if (wasPending)
 		return B_BUSY;
 

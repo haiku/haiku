@@ -26,7 +26,8 @@ init_function_canceled(void* data)
 	pthread_once_t* onceControl = (pthread_once_t*)data;
 
 	// reset the control state to uninitialized
-	int32 value = atomic_set((vint32*)&onceControl->state, STATE_UNINITIALIZED);
+	int32 value = atomic_get_and_set((int32*)&onceControl->state,
+			STATE_UNINITIALIZED);
 
 	// If someone has set a semaphore, delete it.
 	if (value >= 0)
@@ -66,7 +67,8 @@ pthread_once(pthread_once_t* onceControl, void (*initRoutine)(void))
 			initRoutine();
 			pthread_cleanup_pop(false);
 
-			value = atomic_set((vint32*)&onceControl->state, STATE_INITIALIZED);
+			value = atomic_get_and_set((int32*)&onceControl->state,
+					STATE_INITIALIZED);
 
 			// If someone else is waiting, we need to delete the semaphore.
 			if (value >= 0)
@@ -105,7 +107,7 @@ pthread_once(pthread_once_t* onceControl, void (*initRoutine)(void))
 			return 0;
 		} else if (value == STATE_SPINNING) {
 			// out of semaphores -- spin
-			while (atomic_get((vint32*)&onceControl->state) == STATE_SPINNING);
+			while (atomic_get((int32*)&onceControl->state) == STATE_SPINNING);
 		}
 	}
 }

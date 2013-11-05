@@ -205,7 +205,7 @@ set_mtrr(void* _parameter, int cpu)
 	// sCpuRendezvous2 before the last CPU has actually left the loop in
 	// smp_cpu_rendezvous();
 	if (cpu == 0)
-		atomic_set((vint32*)&sCpuRendezvous3, 0);
+		atomic_set((int32*)&sCpuRendezvous3, 0);
 
 	disable_caches();
 
@@ -233,7 +233,7 @@ set_mtrrs(void* _parameter, int cpu)
 	// sCpuRendezvous2 before the last CPU has actually left the loop in
 	// smp_cpu_rendezvous();
 	if (cpu == 0)
-		atomic_set((vint32*)&sCpuRendezvous3, 0);
+		atomic_set((int32*)&sCpuRendezvous3, 0);
 
 	disable_caches();
 
@@ -259,7 +259,7 @@ init_mtrrs(void* _unused, int cpu)
 	// sCpuRendezvous2 before the last CPU has actually left the loop in
 	// smp_cpu_rendezvous();
 	if (cpu == 0)
-		atomic_set((vint32*)&sCpuRendezvous3, 0);
+		atomic_set((int32*)&sCpuRendezvous3, 0);
 
 	disable_caches();
 

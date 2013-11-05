@@ -35,7 +35,7 @@
 
 static device_manager_info *sDeviceManager;
 static ConditionVariable sFrequencyCondition;
-static vint32 sCurrentID;
+static int32 sCurrentID;
 
 
 static status_t

@@ -183,14 +183,14 @@ BStringRef::operator&()
 //	#pragma mark - BString
 
 
-inline vint32&
+inline int32&
 BString::_ReferenceCount()
 {
 	return Private::DataRefCount(fPrivateData);
 }
 
 
-inline const vint32&
+inline const int32&
 BString::_ReferenceCount() const
 {
 	return Private::DataRefCount(fPrivateData);

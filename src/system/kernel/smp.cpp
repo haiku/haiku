@@ -79,9 +79,9 @@ enum mailbox_source {
 	MAILBOX_BCAST,
 };
 
-static vint32 sBootCPUSpin = 0;
+static int32 sBootCPUSpin = 0;
 
-static vint32 sEarlyCPUCall = 0;
+static int32 sEarlyCPUCall = 0;
 static void (*sEarlyCPUCallFunction)(void*, int);
 void* sEarlyCPUCallCookie;
 
@@ -109,7 +109,7 @@ static struct {
 	spinlock	*lock;
 } sLastCaller[NUM_LAST_CALLERS];
 
-static vint32 sLastIndex = 0;
+static int32 sLastIndex = 0;
 	// Is incremented atomically. Must be % NUM_LAST_CALLERS before being used
 	// as index into sLastCaller. Note, that it has to be casted to uint32
 	// before applying the modulo operation, since otherwise after overflowing
@@ -129,7 +129,7 @@ push_lock_caller(void* caller, spinlock* lock)
 static void*
 find_lock_caller(spinlock* lock)
 {
-	int32 lastIndex = (uint32)sLastIndex % NUM_LAST_CALLERS;
+	int32 lastIndex = (uint32)atomic_get(&sLastIndex) % NUM_LAST_CALLERS;
 
 	for (int32 i = 0; i < NUM_LAST_CALLERS; i++) {
 		int32 index = (NUM_LAST_CALLERS + lastIndex - 1 - i) % NUM_LAST_CALLERS;
@@ -522,7 +522,7 @@ bool
 try_acquire_write_seqlock(seqlock* lock) {
 	bool succeed = try_acquire_spinlock(&lock->lock);
 	if (succeed)
-		atomic_add(&lock->count, 1);
+		atomic_add((int32*)&lock->count, 1);
 	return succeed;
 }
 
@@ -530,26 +530,26 @@ try_acquire_write_seqlock(seqlock* lock) {
 void
 acquire_write_seqlock(seqlock* lock) {
 	acquire_spinlock(&lock->lock);
-	atomic_add(&lock->count, 1);
+	atomic_add((int32*)&lock->count, 1);
 }
 
 
 void
 release_write_seqlock(seqlock* lock) {
-	atomic_add(&lock->count, 1);
+	atomic_add((int32*)&lock->count, 1);
 	release_spinlock(&lock->lock);
 }
 
 
 uint32
 acquire_read_seqlock(seqlock* lock) {
-	return atomic_get(&lock->count);
+	return atomic_get((int32*)&lock->count);
 }
 
 
 bool
 release_read_seqlock(seqlock* lock, uint32 count) {
-	uint32 current = atomic_get(&lock->count);
+	uint32 current = atomic_get((int32*)&lock->count);
 
 	if (count % 2 == 1 || current != count) {
 		PAUSE();
@@ -870,10 +870,10 @@ call_all_cpus_early(void (*function)(void*, int), void* cookie)
 		uint32 cpuMask = (1 << sNumCPUs) - 2;
 			// all CPUs but the boot cpu
 
-		sEarlyCPUCall = cpuMask;
+		atomic_set(&sEarlyCPUCall, cpuMask);
 
 		// wait for all CPUs to finish
-		while ((sEarlyCPUCall & cpuMask) != 0)
+		while ((atomic_get(&sEarlyCPUCall) & cpuMask) != 0)
 			PAUSE();
 	}
 
@@ -1166,8 +1166,8 @@ smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 
 	smp_cpu_rendezvous(rendezVous, cpu);
 
-	while (sBootCPUSpin == 0) {
-		if ((sEarlyCPUCall & (1 << cpu)) != 0)
+	while (atomic_get(&sBootCPUSpin) == 0) {
+		if ((atomic_get(&sEarlyCPUCall) & (1 << cpu)) != 0)
 			process_early_cpu_call(cpu);
 
 		PAUSE();
@@ -1185,7 +1185,7 @@ smp_wake_up_non_boot_cpus()
 		sICIEnabled = true;
 
 	// resume non boot CPUs
-	sBootCPUSpin = 1;
+	atomic_set(&sBootCPUSpin, 1);
 }
 
 
@@ -1200,11 +1200,12 @@ smp_wake_up_non_boot_cpus()
 	ensured via another rendez-vous) the variable can be reset.
 */
 void
-smp_cpu_rendezvous(volatile uint32* var, int current_cpu)
+smp_cpu_rendezvous(uint32* var, int current_cpu)
 {
-	atomic_or((vint32*)var, 1 << current_cpu);
+	atomic_or((int32*)var, 1 << current_cpu);
 
-	while (*var != (((uint32)1 << sNumCPUs) - 1))
+	uint32 allReady = ((uint32)1 << sNumCPUs) - 1;
+	while ((uint32)atomic_get((int32*)var) != allReady)
 		PAUSE();
 }
 

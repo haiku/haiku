@@ -16,7 +16,7 @@ enum {
 
 
 status_t
-__init_once(vint32* control, status_t (*initRoutine)(void*), void* data)
+__init_once(int32* control, status_t (*initRoutine)(void*), void* data)
 {
 	// Algorithm:
 	// The control variable goes through at most four states:
@@ -41,7 +41,7 @@ __init_once(vint32* control, status_t (*initRoutine)(void*), void* data)
 		// we're the first -- perform the initialization
 		initRoutine(data);
 
-		value = atomic_set(control, STATE_INITIALIZED);
+		value = atomic_get_and_set(control, STATE_INITIALIZED);
 
 		// If someone else is waiting, we need to delete the semaphore.
 		if (value >= 0)

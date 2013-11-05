@@ -50,12 +50,12 @@ typedef struct _pthread_rwlockattr {
 typedef void (*pthread_key_destructor)(void *data);
 
 struct pthread_key {
-	vint32		sequence;
+	int32		sequence;
 	pthread_key_destructor destructor;
 };
 
 struct pthread_key_data {
-	vint32		sequence;
+	int32		sequence;
 	void		*value;
 };
 
