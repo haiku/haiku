@@ -15,7 +15,6 @@
 /*!
 	\file HttpForm.h
 	\ingroup network
-	\ingroup libbe
 	\brief Management of HTTP form data
 */
 
@@ -65,7 +64,6 @@
 /*!
 	\class BHttpFormData
 	\ingroup network
-	\ingroup libbe
 	\brief Stores a form data entry sent or received during an HTTP request.
 
 	Each element in a form is stored in an instance of this class. The values
@@ -203,7 +201,6 @@
 /*!
 	\class BHttpForm
 	\ingroup network
-	\ingroup libbe
 	\brief Container for all the BHttpFormData instances making up an HTTP form contents.
 */
 
@@ -366,7 +363,6 @@
 /*!
 	\class BHttpForm::Iterator
 	\ingroup network
-	\ingroup libbe
 	\brief Form Iterator.
 */
 

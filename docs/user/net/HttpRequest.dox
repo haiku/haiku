@@ -15,7 +15,6 @@
 /*!
 	\file HttpRequest.h
 	\ingroup network
-	\ingroup libbe
 	\brief Management of HTTP or HTTPS protocol requests
 */
 
@@ -23,7 +22,6 @@
 /*!
 	\class BHttpRequest
 	\ingroup network
-	\ingroup libbe
 	\brief Handles a request over HTTP or HTTPS.
 
 	Instances of ths class will be created by the BUrlProtocolRoster for
