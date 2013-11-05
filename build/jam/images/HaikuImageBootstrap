@@ -12,7 +12,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	csplit cut date dc dd desklink df diff diff3 dircolors dirname
 	diskimage draggers driveinfo dstcheck du dumpcatalog
 	echo eject env error expand expr
-	factor false fdinfo ffm filepanel find finddir fmt fold
+	factor false fdinfo ffm filepanel find finddir findpaths fmt fold
 	fortune frcode ftp ftpd funzip
 	gawk gdb@x86 getlimits groupadd groupdel groupmod groups gzip gzexe
 	hd head hey hostname

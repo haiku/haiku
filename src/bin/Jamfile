@@ -114,6 +114,7 @@ if $(TARGET_PLATFORM) = libbe_test {
 StdBinCommands
 	alert.cpp
 	eject.cpp
+	findpaths.cpp
 	hey.cpp
 	reindex.cpp
 	resattr.cpp
