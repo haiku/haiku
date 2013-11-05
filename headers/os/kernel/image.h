@@ -56,6 +56,12 @@ typedef struct {
 #define	B_TERM_BEFORE_FUNCTION_NAME	"terminate_before"
 #define B_TERM_AFTER_FUNCTION_NAME	"terminate_after"
 
+#define B_APP_IMAGE_SYMBOL		((void*)(addr_t)0)
+	// value that can be used instead of a pointer to a symbol in the program
+	// image.
+#define B_CURRENT_IMAGE_SYMBOL	((void*)&__haiku_init_before)
+	// pointer to a symbol in the callers image
+
 // flags for _kern_load_image() (private API)
 enum {
 	B_WAIT_TILL_LOADED	= 0x01,
@@ -90,6 +96,9 @@ void clear_caches(void *address, size_t length, uint32 flags);
 status_t _get_image_info(image_id image, image_info *info, size_t size);
 status_t _get_next_image_info(team_id team, int32 *cookie, image_info *info,
 				size_t size);
+
+/* private */
+void __haiku_init_before(image_id id);
 
 #ifdef __cplusplus
 }
