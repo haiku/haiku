@@ -101,41 +101,43 @@
 
 	\var directory_which B_SYSTEM_DATA_DIRECTORY
 	The system data directory.
+*/
 
-	\var directory_which B_COMMON_DIRECTORY
-	The common directory.
+//	\var directory_which B_COMMON_DIRECTORY
+//	The common directory.
 
-	\var directory_which B_COMMON_SYSTEM_DIRECTORY
-	\var directory_which B_COMMON_ADDONS_DIRECTORY
-	\var directory_which B_COMMON_BOOT_DIRECTORY
-	\var directory_which B_COMMON_FONTS_DIRECTORY
-	\var directory_which B_COMMON_LIB_DIRECTORY
-	\var directory_which B_COMMON_SERVERS_DIRECTORY
-	\var directory_which B_COMMON_BIN_DIRECTORY
-	\var directory_which B_COMMON_ETC_DIRECTORY
-	\var directory_which B_COMMON_DOCUMENTATION_DIRECTORY
-	\var directory_which B_COMMON_SETTINGS_DIRECTORY
-	\var directory_which B_COMMON_DEVELOP_DIRECTORY
-	The common development directory. Contains toolchains, include files,
-	and other tools related to application development.
+//	\var directory_which B_COMMON_SYSTEM_DIRECTORY
+//	\var directory_which B_COMMON_ADDONS_DIRECTORY
+//	\var directory_which B_COMMON_BOOT_DIRECTORY
+//	\var directory_which B_COMMON_FONTS_DIRECTORY
+//	\var directory_which B_COMMON_LIB_DIRECTORY
+//	\var directory_which B_COMMON_SERVERS_DIRECTORY
+//	\var directory_which B_COMMON_BIN_DIRECTORY
+//	\var directory_which B_COMMON_ETC_DIRECTORY
+//	\var directory_which B_COMMON_DOCUMENTATION_DIRECTORY
+//	\var directory_which B_COMMON_SETTINGS_DIRECTORY
+//	\var directory_which B_COMMON_DEVELOP_DIRECTORY
+//	The common development directory. Contains toolchains, include files,
+//	and other tools related to application development.
 
-	\var directory_which B_COMMON_LOG_DIRECTORY
-	The common log directory. Log files are stored here.
+//	\var directory_which B_COMMON_LOG_DIRECTORY
+//	The common log directory. Log files are stored here.
 
-	\var directory_which B_COMMON_SPOOL_DIRECTORY
-	\var directory_which B_COMMON_TEMP_DIRECTORY
-	\var directory_which B_COMMON_VAR_DIRECTORY
-	\var directory_which B_COMMON_TRANSLATORS_DIRECTORY
-	\var directory_which B_COMMON_MEDIA_NODES_DIRECTORY
-	\var directory_which B_COMMON_SOUNDS_DIRECTORY
-	\var directory_which B_COMMON_DATA_DIRECTORY
-	The common data directory. You may store application data here, such as
-	resources (graphics, music) for your application.
+//	\var directory_which B_COMMON_SPOOL_DIRECTORY
+//	\var directory_which B_COMMON_TEMP_DIRECTORY
+//	\var directory_which B_COMMON_VAR_DIRECTORY
+//	\var directory_which B_COMMON_TRANSLATORS_DIRECTORY
+//	\var directory_which B_COMMON_MEDIA_NODES_DIRECTORY
+//	\var directory_which B_COMMON_SOUNDS_DIRECTORY
+//	\var directory_which B_COMMON_DATA_DIRECTORY
+//	The common data directory. You may store application data here, such as
+//	resources (graphics, music) for your application.
 
-	\var directory_which B_COMMON_CACHE_DIRECTORY
-	The common cache directory. You may store temporary data here, such as
-	thumbnails for a picture viewer application, or a web browser data cache.
+//	\var directory_which B_COMMON_CACHE_DIRECTORY
+//	The common cache directory. You may store temporary data here, such as
+//	thumbnails for a picture viewer application, or a web browser data cache.
 
+/*!
 	\var directory_which B_USER_DIRECTORY
 	The user home directory. Do NOT store application settings here as on unix,
 	instead use B_USER_SETTINGS_DIRECTORY.
