@@ -313,7 +313,7 @@ try_acquire_spinlock(spinlock* lock)
 	if (atomic_add(&lock->lock, 1) != 0)
 		return false;
 #else
-	if (atomic_or((int32*)lock, 1) != 0)
+	if (atomic_get_and_set((int32*)lock, 1) != 0)
 		return false;
 
 #	if DEBUG_SPINLOCKS
@@ -353,7 +353,7 @@ acquire_spinlock(spinlock* lock)
 				process_all_pending_ici(currentCPU);
 				PAUSE();
 			}
-			if (atomic_or((int32*)lock, 1) == 0)
+			if (atomic_get_and_set((int32*)lock, 1) == 0)
 				break;
 		}
 
@@ -364,7 +364,7 @@ acquire_spinlock(spinlock* lock)
 	} else {
 #if DEBUG_SPINLOCKS
 		int32 oldValue;
-		oldValue = atomic_or((int32*)lock, 1);
+		oldValue = atomic_get_and_set((int32*)lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock: attempt to acquire lock %p twice on "
 				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
@@ -407,13 +407,13 @@ acquire_spinlock_nocheck(spinlock *lock)
 				PAUSE();
 			}
 
-			if (atomic_or((int32*)lock, 1) == 0)
+			if (atomic_get_and_set((int32*)lock, 1) == 0)
 				break;
 		}
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
-		if (atomic_or((int32*)lock, 1) != 0) {
+		if (atomic_get_and_set((int32*)lock, 1) != 0) {
 			panic("acquire_spinlock_nocheck: attempt to acquire lock %p twice "
 				"on non-SMP system\n", lock);
 		}
@@ -450,7 +450,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 				process_all_pending_ici(currentCPU);
 				PAUSE();
 			}
-			if (atomic_or((int32*)lock, 1) == 0)
+			if (atomic_get_and_set((int32*)lock, 1) == 0)
 				break;
 		}
 
@@ -461,7 +461,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 	} else {
 #if DEBUG_SPINLOCKS
 		int32 oldValue;
-		oldValue = atomic_or((int32*)lock, 1);
+		oldValue = atomic_get_and_set((int32*)lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
 				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
@@ -498,9 +498,11 @@ release_spinlock(spinlock *lock)
 				}
 			}
 		}
-#else
-		if (atomic_and((int32*)lock, 0) != 1)
+#elif DEBUG_SPINLOCKS
+		if (atomic_get_and_set((int32*)lock, 0) != 1)
 			panic("release_spinlock: lock %p was already released\n", lock);
+#else
+		atomic_set((int32*)lock, 0);
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
@@ -508,7 +510,7 @@ release_spinlock(spinlock *lock)
 			panic("release_spinlock: attempt to release lock %p with "
 				"interrupts enabled\n", lock);
 		}
-		if (atomic_and((int32*)lock, 0) != 1)
+		if (atomic_get_and_set((int32*)lock, 0) != 1)
 			panic("release_spinlock: lock %p was already released\n", lock);
 #endif
 #if DEBUG_SPINLOCK_LATENCIES

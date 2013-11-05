@@ -76,7 +76,7 @@ int smp_intercpu_int_handler(int32 cpu);
 static inline bool
 try_acquire_spinlock_inline(spinlock* lock)
 {
-	return atomic_or((int32*)lock, 1) == 0;
+	return atomic_get_and_set((int32*)lock, 1) == 0;
 }
 
 
@@ -92,7 +92,7 @@ acquire_spinlock_inline(spinlock* lock)
 static inline void
 release_spinlock_inline(spinlock* lock)
 {
-	atomic_and((int32*)lock, 0);
+	atomic_set((int32*)lock, 0);
 }
 
 
