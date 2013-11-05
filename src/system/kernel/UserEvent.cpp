@@ -27,30 +27,33 @@ struct SignalEvent::EventSignal : Signal {
 		pid_t sendingProcess)
 		:
 		Signal(number, signalCode, errorCode, sendingProcess),
-		fInUse(false)
+		fInUse(0)
 	{
 	}
 
 	bool MarkUsed()
 	{
-		return atomic_set(reinterpret_cast<vint32*>(&fInUse), true);
+		return atomic_set(&fInUse, 1) != 0;
 	}
 
 	void SetUnused()
 	{
-		fInUse = false;
+		fInUse = 0;
 	}
 
 	virtual void Handled()
 	{
 		// mark not-in-use
-		fInUse = false;
+		{
+			InterruptsSpinLocker _(gSchedulerLock);
+			fInUse = 0;
+		}
 
 		Signal::Handled();
 	}
 
 private:
-	bool				fInUse;
+	int32				fInUse;
 };
 
 
@@ -118,12 +121,10 @@ TeamSignalEvent::Fire()
 	InterruptsSpinLocker locker(gSchedulerLock);
 	status_t error = send_signal_to_team_locked(fTeam, fSignal->Number(),
 		fSignal, B_DO_NOT_RESCHEDULE);
-	if (error == B_OK) {
-		// There are situations (for certain signals), in which
-		// send_signal_to_team_locked() succeeds without queuing the signal.
-		if (!fSignal->IsPending())
-			fSignal->SetUnused();
-	}
+	// There are situations (for certain signals), in which
+	// send_signal_to_team_locked() succeeds without queuing the signal.
+	if (error != B_OK || !fSignal->IsPending())
+		fSignal->SetUnused();
 	locker.Unlock();
 
 	return error;
@@ -165,6 +166,8 @@ ThreadSignalEvent::Create(Thread* thread, uint32 signalNumber, int32 signalCode,
 status_t
 ThreadSignalEvent::Fire()
 {
+	dprintf("THREAD\n");
+
 	if (fSignal->MarkUsed())
 		return B_BUSY;
 
@@ -174,12 +177,10 @@ ThreadSignalEvent::Fire()
 	InterruptsSpinLocker locker(gSchedulerLock);
 	status_t error = send_signal_to_thread_locked(fThread, fSignal->Number(),
 		fSignal, B_DO_NOT_RESCHEDULE);
-	if (error == B_OK) {
-		// There are situations (for certain signals), in which
-		// send_signal_to_team_locked() succeeds without queuing the signal.
-		if (!fSignal->IsPending())
-			fSignal->SetUnused();
-	}
+	// There are situations (for certain signals), in which
+	// send_signal_to_team_locked() succeeds without queuing the signal.
+	if (error != B_OK || !fSignal->IsPending())
+		fSignal->SetUnused();
 	locker.Unlock();
 
 	return error;
@@ -192,7 +193,7 @@ ThreadSignalEvent::Fire()
 CreateThreadEvent::CreateThreadEvent(const ThreadCreationAttributes& attributes)
 	:
 	fCreationAttributes(attributes),
-	fPendingDPC(false)
+	fPendingDPC(0)
 {
 	// attributes.name is a pointer to a temporary buffer. Copy the name into
 	// our own buffer and replace the name pointer.
@@ -218,7 +219,7 @@ CreateThreadEvent::Create(const ThreadCreationAttributes& attributes)
 status_t
 CreateThreadEvent::Fire()
 {
-	bool wasPending = atomic_set(reinterpret_cast<vint32*>(&fPendingDPC), true);
+	bool wasPending = atomic_set(&fPendingDPC, 1) != 0;
 	if (wasPending)
 		return B_BUSY;
 
@@ -232,7 +233,7 @@ void
 CreateThreadEvent::DoDPC(DPCQueue* queue)
 {
 	// We're no longer queued in the DPC queue, so we can be reused.
-	fPendingDPC = false;
+	fPendingDPC = 0;
 
 	// create the thread
 	thread_id threadID = thread_create_thread(fCreationAttributes, false);

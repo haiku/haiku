@@ -54,6 +54,8 @@ protected:
 	inline	void				UpdatePeriodicStartTime();
 	inline	void				CheckPeriodicOverrun(bigtime_t now);
 
+	inline	void				CancelTimer();
+
 protected:
 			int32				fID;
 			timer				fTimer;
@@ -62,6 +64,7 @@ protected:
 			bigtime_t			fInterval;
 			uint32				fOverrunCount;
 			bool				fScheduled;	// fTimer scheduled
+			int32				fSkip;
 };
 
 

@@ -29,6 +29,8 @@ static const bigtime_t kMinPeriodicTimerInterval = 100;
 static RealTimeUserTimerList sAbsoluteRealTimeTimers;
 static spinlock sAbsoluteRealTimeTimersLock = B_SPINLOCK_INITIALIZER;
 
+static seqlock sUserTimerLock = B_SEQLOCK_INITIALIZER;
+
 
 // #pragma mark - TimerLocker
 
@@ -116,7 +118,8 @@ UserTimer::UserTimer()
 	fNextTime(0),
 	fInterval(0),
 	fOverrunCount(0),
-	fScheduled(false)
+	fScheduled(false),
+	fSkip(0)
 {
 	// mark the timer unused
 	fTimer.user_data = this;
@@ -191,8 +194,22 @@ UserTimer::Cancel()
 /*static*/ int32
 UserTimer::HandleTimerHook(struct timer* timer)
 {
-	InterruptsSpinLocker _(gSchedulerLock);
-	((UserTimer*)timer->user_data)->HandleTimer();
+	UserTimer* userTimer = reinterpret_cast<UserTimer*>(timer->user_data);
+
+	InterruptsLocker _;
+
+	bool locked = false;
+	while (!locked && atomic_get(&userTimer->fSkip) == 0) {
+		locked = try_acquire_write_seqlock(&sUserTimerLock);
+		if (!locked)
+			PAUSE();
+	}
+
+	if (locked) {
+		userTimer->HandleTimer();
+		release_write_seqlock(&sUserTimerLock);
+	}
+
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -219,7 +236,7 @@ UserTimer::HandleTimer()
 /*!	Updates the start time for a periodic timer after it expired, enforcing
 	sanity limits and updating \c fOverrunCount, if necessary.
 
-	The caller must not hold the scheduler lock.
+	The caller must not hold \c sUserTimerLock.
 */
 void
 UserTimer::UpdatePeriodicStartTime()
@@ -243,7 +260,7 @@ UserTimer::UpdatePeriodicStartTime()
 /*!	Checks whether the timer start time lies too much in the past and, if so,
 	adjusts it and updates \c fOverrunCount.
 
-	The caller must not hold the scheduler lock.
+	The caller must not hold \c sUserTimerLock.
 
 	\param now The current time.
 */
@@ -265,6 +282,17 @@ UserTimer::CheckPeriodicOverrun(bigtime_t now)
 }
 
 
+void
+UserTimer::CancelTimer()
+{
+	ASSERT(fScheduled);
+
+	fSkip = 1;
+	cancel_timer(&fTimer);
+	fSkip = 0;
+}
+
+
 // #pragma mark - SystemTimeUserTimer
 
 
@@ -272,14 +300,14 @@ void
 SystemTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsWriteSequentialLocker locker(sUserTimerLock);
 
 	// get the current time
 	bigtime_t now = system_time();
 
 	// Cancel the old timer, if still scheduled, and get the previous values.
 	if (fScheduled) {
-		cancel_timer(&fTimer);
+		CancelTimer();
 
 		_oldRemainingTime = fNextTime - now;
 		_oldInterval = fInterval;
@@ -309,17 +337,20 @@ void
 SystemTimeUserTimer::GetInfo(bigtime_t& _remainingTime, bigtime_t& _interval,
 	uint32& _overrunCount)
 {
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	uint32 count;
+	do {
+		count = acquire_read_seqlock(&sUserTimerLock);
 
-	if (fScheduled) {
-		_remainingTime = fNextTime - system_time();
-		_interval = fInterval;
-	} else {
-		_remainingTime = B_INFINITE_TIMEOUT;
-		_interval = 0;
-	}
+		if (fScheduled) {
+			_remainingTime = fNextTime - system_time();
+			_interval = fInterval;
+		} else {
+			_remainingTime = B_INFINITE_TIMEOUT;
+			_interval = 0;
+		}
 
-	_overrunCount = fOverrunCount;
+		_overrunCount = fOverrunCount;
+	} while (!release_read_seqlock(&sUserTimerLock, count));
 }
 
 
@@ -338,7 +369,7 @@ SystemTimeUserTimer::HandleTimer()
 
 /*!	Schedules the kernel timer.
 
-	The caller must hold the scheduler lock.
+	The caller must hold \c sUserTimerLock.
 
 	\param now The current system time to be used.
 	\param checkPeriodicOverrun If \c true, calls CheckPeriodicOverrun() first,
@@ -371,14 +402,14 @@ void
 RealTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsWriteSequentialLocker locker(sUserTimerLock);
 
 	// get the current time
 	bigtime_t now = system_time();
 
 	// Cancel the old timer, if still scheduled, and get the previous values.
 	if (fScheduled) {
-		cancel_timer(&fTimer);
+		CancelTimer();
 
 		_oldRemainingTime = fNextTime - now;
 		_oldInterval = fInterval;
@@ -424,7 +455,7 @@ RealTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 
 /*!	Called when the real-time clock has been changed.
 
-	The caller must hold the scheduler lock. Optionally the caller may also
+	The caller must hold \c sUserTimerLock. Optionally the caller may also
 	hold \c sAbsoluteRealTimeTimersLock.
 */
 void
@@ -439,7 +470,7 @@ RealTimeUserTimer::TimeWarped()
 		return;
 
 	// cancel the kernel timer and reschedule it
-	cancel_timer(&fTimer);
+	CancelTimer();
 
 	fNextTime += oldRealTimeOffset - fRealTimeOffset;
 
@@ -481,6 +512,7 @@ void
 TeamTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
+	InterruptsWriteSequentialLocker locker(sUserTimerLock);
 	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
 	// get the current time, but only if needed
@@ -490,7 +522,7 @@ TeamTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	// Cancel the old timer, if still scheduled, and get the previous values.
 	if (fTeam != NULL) {
 		if (fScheduled) {
-			cancel_timer(&fTimer);
+			CancelTimer();
 			fScheduled = false;
 		}
 
@@ -539,23 +571,27 @@ void
 TeamTimeUserTimer::GetInfo(bigtime_t& _remainingTime, bigtime_t& _interval,
 	uint32& _overrunCount)
 {
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	uint32 count;
+	do {
+		count = acquire_read_seqlock(&sUserTimerLock);
 
-	if (fTeam != NULL) {
-		_remainingTime = fNextTime - fTeam->CPUTime(false);
-		_interval = fInterval;
-	} else {
-		_remainingTime = B_INFINITE_TIMEOUT;
-		_interval = 0;
-	}
+		if (fTeam != NULL) {
+			InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+			_remainingTime = fNextTime - fTeam->CPUTime(false);
+			_interval = fInterval;
+		} else {
+			_remainingTime = B_INFINITE_TIMEOUT;
+			_interval = 0;
+		}
 
-	_overrunCount = fOverrunCount;
+		_overrunCount = fOverrunCount;
+	} while (!release_read_seqlock(&sUserTimerLock, count));
 }
 
 
 /*!	Deactivates the timer, if it is activated.
 
-	The caller must hold the scheduler lock.
+	The caller must hold the scheduler lock and \c sUserTimerLock.
 */
 void
 TeamTimeUserTimer::Deactivate()
@@ -565,7 +601,7 @@ TeamTimeUserTimer::Deactivate()
 
 	// unschedule, if scheduled
 	if (fScheduled) {
-		cancel_timer(&fTimer);
+		CancelTimer();
 		fScheduled = false;
 	}
 
@@ -583,7 +619,7 @@ TeamTimeUserTimer::Deactivate()
 	was just set. Schedules a kernel timer for the remaining time, respectively
 	cancels it.
 
-	The caller must hold the scheduler lock.
+	The caller must hold the scheduler lock and \c sUserTimerLock.
 
 	\param unscheduledThread If not \c NULL, this is the thread that is
 		currently running and which is in the process of being unscheduled.
@@ -610,7 +646,7 @@ TeamTimeUserTimer::Update(Thread* unscheduledThread)
 /*!	Called when the team's CPU time clock which this timer refers to has been
 	set.
 
-	The caller must hold the scheduler lock.
+	The caller must hold the scheduler lock and \c sUserTimerLock.
 
 	\param changedBy The value by which the clock has changed.
 */
@@ -653,7 +689,7 @@ TeamTimeUserTimer::HandleTimer()
 /*!	Schedules/cancels the kernel timer as necessary.
 
 	\c fRunningThreads must be up-to-date.
-	The caller must hold the scheduler lock.
+	The caller must hold the scheduler lock and \c sUserTimerLock.
 
 	\param unscheduling \c true, when the current thread is in the process of
 		being unscheduled.
@@ -663,7 +699,7 @@ TeamTimeUserTimer::_Update(bool unscheduling)
 {
 	// unschedule the kernel timer, if scheduled
 	if (fScheduled)
-		cancel_timer(&fTimer);
+		CancelTimer();
 
 	// if no more threads are running, we're done
 	if (fRunningThreads == 0) {
@@ -720,6 +756,7 @@ void
 TeamUserTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
+	InterruptsWriteSequentialLocker locker(sUserTimerLock);
 	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
 	// get the current time, but only if needed
@@ -771,23 +808,27 @@ void
 TeamUserTimeUserTimer::GetInfo(bigtime_t& _remainingTime, bigtime_t& _interval,
 	uint32& _overrunCount)
 {
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	uint32 count;
+	do {
+		count = acquire_read_seqlock(&sUserTimerLock);
 
-	if (fTeam != NULL) {
-		_remainingTime = fNextTime - fTeam->UserCPUTime();
-		_interval = fInterval;
-	} else {
-		_remainingTime = B_INFINITE_TIMEOUT;
-		_interval = 0;
-	}
+		if (fTeam != NULL) {
+			InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+			_remainingTime = fNextTime - fTeam->UserCPUTime();
+			_interval = fInterval;
+		} else {
+			_remainingTime = B_INFINITE_TIMEOUT;
+			_interval = 0;
+		}
 
-	_overrunCount = fOverrunCount;
+		_overrunCount = fOverrunCount;
+	} while (!release_read_seqlock(&sUserTimerLock, count));
 }
 
 
 /*!	Deactivates the timer, if it is activated.
 
-	The caller must hold the scheduler lock.
+	The caller must hold the scheduler lock and \c sUserTimerLock.
 */
 void
 TeamUserTimeUserTimer::Deactivate()
@@ -804,7 +845,7 @@ TeamUserTimeUserTimer::Deactivate()
 
 /*!	Checks whether the timer is up, firing an event, if so.
 
-	The caller must hold the scheduler lock.
+	The caller must hold the scheduler lock and \c sUserTimerLock.
 */
 void
 TeamUserTimeUserTimer::Check()
@@ -857,6 +898,7 @@ void
 ThreadTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
+	InterruptsWriteSequentialLocker locker(sUserTimerLock);
 	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
 	// get the current time, but only if needed
@@ -866,7 +908,7 @@ ThreadTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	// Cancel the old timer, if still scheduled, and get the previous values.
 	if (fThread != NULL) {
 		if (fScheduled) {
-			cancel_timer(&fTimer);
+			CancelTimer();
 			fScheduled = false;
 		}
 
@@ -916,23 +958,27 @@ void
 ThreadTimeUserTimer::GetInfo(bigtime_t& _remainingTime, bigtime_t& _interval,
 	uint32& _overrunCount)
 {
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	uint32 count;
+	do {
+		count = acquire_read_seqlock(&sUserTimerLock);
 
-	if (fThread != NULL) {
-		_remainingTime = fNextTime - fThread->CPUTime(false);
-		_interval = fInterval;
-	} else {
-		_remainingTime = B_INFINITE_TIMEOUT;
-		_interval = 0;
-	}
+		if (fThread != NULL) {
+			InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+			_remainingTime = fNextTime - fThread->CPUTime(false);
+			_interval = fInterval;
+		} else {
+			_remainingTime = B_INFINITE_TIMEOUT;
+			_interval = 0;
+		}
 
-	_overrunCount = fOverrunCount;
+		_overrunCount = fOverrunCount;
+	} while (!release_read_seqlock(&sUserTimerLock, count));
 }
 
 
 /*!	Deactivates the timer, if it is activated.
 
-	The caller must hold the scheduler lock.
+	The caller must hold the scheduler lock and \c sUserTimerLock.
 */
 void
 ThreadTimeUserTimer::Deactivate()
@@ -942,7 +988,7 @@ ThreadTimeUserTimer::Deactivate()
 
 	// unschedule, if scheduled
 	if (fScheduled) {
-		cancel_timer(&fTimer);
+		CancelTimer();
 		fScheduled = false;
 	}
 
@@ -959,7 +1005,7 @@ ThreadTimeUserTimer::Deactivate()
 	scheduled, or, when the timer was just set and the thread is already
 	running. Schedules a kernel timer for the remaining time.
 
-	The caller must hold the scheduler lock.
+	The caller must hold the scheduler lock and \c sUserTimerLock.
 */
 void
 ThreadTimeUserTimer::Start()
@@ -997,7 +1043,7 @@ ThreadTimeUserTimer::Start()
 	Called when the thread whose CPU time is referred to by the timer is
 	unscheduled, or, when the timer is canceled.
 
-	The caller must hold the scheduler lock.
+	The caller must hold \c sUserTimerLock.
 */
 void
 ThreadTimeUserTimer::Stop()
@@ -1008,7 +1054,7 @@ ThreadTimeUserTimer::Stop()
 	ASSERT(fScheduled);
 
 	// cancel the kernel timer
-	cancel_timer(&fTimer);
+	CancelTimer();
 	fScheduled = false;
 
 	// TODO: To avoid odd race conditions, we should check the current time of
@@ -1020,7 +1066,7 @@ ThreadTimeUserTimer::Stop()
 /*!	Called when the team's CPU time clock which this timer refers to has been
 	set.
 
-	The caller must hold the scheduler lock.
+	The caller must hold the scheduler lock and \c sUserTimerLock.
 
 	\param changedBy The value by which the clock has changed.
 */
@@ -1480,7 +1526,7 @@ void
 user_timer_real_time_clock_changed()
 {
 	// we need to update all absolute real-time timers
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsWriteSequentialLocker locker(sUserTimerLock);
 	SpinLocker globalListLocker(sAbsoluteRealTimeTimersLock);
 
 	for (RealTimeUserTimerList::Iterator it
