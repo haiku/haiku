@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2013, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FIND_DIRECTORY_H
 #define _FIND_DIRECTORY_H
 
 
-#include <SupportDefs.h>
+#include <image.h>
 
 
 typedef enum {
@@ -120,6 +120,47 @@ typedef enum {
 	B_BEOS_DATA_DIRECTORY,
 } directory_which;
 
+
+/* find_path[s]() flags */
+enum {
+	B_FIND_PATH_CREATE_DIRECTORY			= 0x0001,
+	B_FIND_PATH_CREATE_PARENT_DIRECTORY		= 0x0002,
+	B_FIND_PATH_EXISTING_ONLY				= 0x0004,
+};
+
+
+typedef enum path_base_directory {
+	B_FIND_PATH_INSTALLATION_LOCATION_DIRECTORY,
+	B_FIND_PATH_ADD_ONS_DIRECTORY,
+	B_FIND_PATH_APPS_DIRECTORY,
+	B_FIND_PATH_BIN_DIRECTORY,
+	B_FIND_PATH_BOOT_DIRECTORY,
+	B_FIND_PATH_CACHE_DIRECTORY,
+	B_FIND_PATH_DATA_DIRECTORY,
+	B_FIND_PATH_DEVELOP_DIRECTORY,
+	B_FIND_PATH_DEVELOP_LIB_DIRECTORY,
+	B_FIND_PATH_DOCUMENTATION_DIRECTORY,
+	B_FIND_PATH_ETC_DIRECTORY,
+	B_FIND_PATH_FONTS_DIRECTORY,
+	B_FIND_PATH_HEADERS_DIRECTORY,
+	B_FIND_PATH_LIB_DIRECTORY,
+	B_FIND_PATH_LOG_DIRECTORY,
+	B_FIND_PATH_MEDIA_NODES_DIRECTORY,
+	B_FIND_PATH_PACKAGES_DIRECTORY,
+	B_FIND_PATH_PREFERENCES_DIRECTORY,
+	B_FIND_PATH_SERVERS_DIRECTORY,
+	B_FIND_PATH_SETTINGS_DIRECTORY,
+	B_FIND_PATH_SOUNDS_DIRECTORY,
+	B_FIND_PATH_SPOOL_DIRECTORY,
+	B_FIND_PATH_TRANSLATORS_DIRECTORY,
+	B_FIND_PATH_VAR_DIRECTORY,
+
+	/* find_path() only */
+	B_FIND_PATH_IMAGE_PATH			= 1000,
+	B_FIND_PATH_IMAGE_PACKAGE_PATH,
+} path_base_directory;
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -129,6 +170,18 @@ extern "C" {
 status_t find_directory(directory_which which, dev_t volume, bool createIt,
 	char* pathString, int32 length);
 
+status_t find_path(const void* codePointer, const char* dependency,
+	path_base_directory baseDirectory, const char* subPath, uint32 flags,
+	char* pathBuffer, size_t bufferSize);
+
+status_t find_path_for_path(const char* path, const char* dependency,
+	path_base_directory baseDirectory, const char* subPath, uint32 flags,
+	char* pathBuffer, size_t bufferSize);
+
+status_t find_paths(path_base_directory baseDirectory, const char* subPath,
+	uint32 flags, char*** _paths, size_t* _pathCount);
+
+
 #ifdef __cplusplus
 }
 
@@ -137,8 +190,10 @@ status_t find_directory(directory_which which, dev_t volume, bool createIt,
 class BVolume;
 class BPath;
 
+
 status_t find_directory(directory_which which, BPath* path,
 	bool createIt = false, BVolume* volume = NULL);
+
 
 #endif	/* __cplusplus */
 
