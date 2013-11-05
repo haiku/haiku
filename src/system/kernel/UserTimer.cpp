@@ -287,9 +287,9 @@ UserTimer::CancelTimer()
 {
 	ASSERT(fScheduled);
 
-	fSkip = 1;
+	atomic_set(&fSkip, 1);
 	cancel_timer(&fTimer);
-	fSkip = 0;
+	atomic_set(&fSkip, 0);
 }
 
 

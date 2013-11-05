@@ -38,16 +38,13 @@ struct SignalEvent::EventSignal : Signal {
 
 	void SetUnused()
 	{
-		fInUse = 0;
+		// mark not-in-use
+		atomic_set(&fInUse, 0);
 	}
 
 	virtual void Handled()
 	{
-		// mark not-in-use
-		{
-			InterruptsSpinLocker _(gSchedulerLock);
-			fInUse = 0;
-		}
+		SetUnused();
 
 		Signal::Handled();
 	}
@@ -121,11 +118,12 @@ TeamSignalEvent::Fire()
 	InterruptsSpinLocker locker(gSchedulerLock);
 	status_t error = send_signal_to_team_locked(fTeam, fSignal->Number(),
 		fSignal, B_DO_NOT_RESCHEDULE);
+	locker.Unlock();
+
 	// There are situations (for certain signals), in which
 	// send_signal_to_team_locked() succeeds without queuing the signal.
 	if (error != B_OK || !fSignal->IsPending())
 		fSignal->SetUnused();
-	locker.Unlock();
 
 	return error;
 }
@@ -166,8 +164,6 @@ ThreadSignalEvent::Create(Thread* thread, uint32 signalNumber, int32 signalCode,
 status_t
 ThreadSignalEvent::Fire()
 {
-	dprintf("THREAD\n");
-
 	if (fSignal->MarkUsed())
 		return B_BUSY;
 
@@ -177,11 +173,12 @@ ThreadSignalEvent::Fire()
 	InterruptsSpinLocker locker(gSchedulerLock);
 	status_t error = send_signal_to_thread_locked(fThread, fSignal->Number(),
 		fSignal, B_DO_NOT_RESCHEDULE);
+	locker.Unlock();
+
 	// There are situations (for certain signals), in which
 	// send_signal_to_team_locked() succeeds without queuing the signal.
 	if (error != B_OK || !fSignal->IsPending())
 		fSignal->SetUnused();
-	locker.Unlock();
 
 	return error;
 }
@@ -233,7 +230,7 @@ void
 CreateThreadEvent::DoDPC(DPCQueue* queue)
 {
 	// We're no longer queued in the DPC queue, so we can be reused.
-	fPendingDPC = 0;
+	atomic_set(&fPendingDPC, 0);
 
 	// create the thread
 	thread_id threadID = thread_create_thread(fCreationAttributes, false);
