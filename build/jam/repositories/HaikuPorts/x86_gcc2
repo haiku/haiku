@@ -1,6 +1,6 @@
 RemotePackageRepository HaikuPorts
 	: x86_gcc2
-	: http://packages.haiku-os.org/build_system/repo/x86_gcc2
+	: http://packages.haiku-os.org/haikuports/master/repo/x86_gcc2
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
