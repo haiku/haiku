@@ -4,25 +4,30 @@
  *
  * Authors:
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/net/HttpRequest.h rev 46234
- *		src/kits/network/libnetapi/HttpRequest.cpp rev 46242
+ *		headers/os/net/HttpRequest.h hrev46314
+ *		src/kits/network/libnetapi/HttpRequest.cpp hrev46314
  */
+
 
 /*!
 	\file HttpRequest.h
 	\ingroup network
+	\ingroup libbe
 	\brief Management of HTTP or HTTPS protocol requests
 */
+
 
 /*!
 	\class BHttpRequest
 	\ingroup network
-	\brief Handles a request over HTTP or HTTPS
+	\ingroup libbe
+	\brief Handles a request over HTTP or HTTPS.
 
-	Instances of ths class wil lbe created by the \ref BUrlProtocolRoster for
-	\ref BUrl with the "http" or "https" protocol. The HTTP protocol is
+	Instances of ths class will be created by the BUrlProtocolRoster for
+	BUrl with the "http" or "https" protocol. The HTTP protocol is
 	implemented as specified in RFC2616. The request headers and body can be
 	customized, then sent to the server. The reply is then parsed and made
 	available to the application.
@@ -30,6 +35,7 @@
 	This class only implements the client-side part of HTTP, it can't be used
 	to build an HTTP server.
 */
+
 
 /*!
 	\fn void BHttpRequest::SetMethod(const char* method)
@@ -41,31 +47,34 @@
 	B_HTTP_CONNECT.
 */
 
+
 /*!
 	\fn void BHttpRequest::SetFollowLocation(bool follow)
-	\brief Enable or disable following HTTP redirects
+	\brief Enable or disable following HTTP redirects.
 
 	An HTTP server can redirect a request to another address, either on the
-	same host or elseswhere. When FollowLocation is set (the default), these
+	same host or elsewhere. When FollowLocation is set (the default), these
 	redirections will be followed until an actual page (or an error) is found.
 	When it is unset, the redirection will not be followed and will be reported
 	to the client.
 */
 
+
 /*!
 	\fn void BHttpRequest::SetMaxRedirections(int8 maxRedirections)
-	\brief Set the maximal number of redirections to follow before giving up
+	\brief Set the maximal number of redirections to follow before giving up.
 
-	This is only useful when \ref SetFollowLocation is enabled. It will abort
+	This is only useful when SetFollowLocation is enabled. It will abort
 	the request after the given number of redirections. This avoids and helps
 	diagnosing redirection cycles, where two addresses redirect to each other.
 
 	The default is to follow at most 8 redirections before giving up.
 */
 
+
 /*!
-	\fn void BHttpRequest::SetReferred(const BString& referrer)
-	\brief Set the referrer
+	\fn void BHttpRequest::SetReferrer(const BString& referrer)
+	\brief Set the referrer.
 
 	The referrer is a string sent to the server in the "Referrer:" HTTP header
 	field. It helps the server know where the request comes from. When
@@ -73,9 +82,10 @@
 	page.
 */
 
+
 /*!
 	\fn void BHttpRequest::SetUserAgent(const BString& userAgent)
-	\brief Set the user agent
+	\brief Set the user agent.
 
 	The user agent is an identifier for the client sending an HTTP request.
 	Some servers will use this to send different content depending on the
@@ -84,9 +94,10 @@
 	The default user agent is "Services Kit (Haiku)".
 */
 
+
 /*!
 	\fn void BHttpRequest::SetHeaders(const BHttpHeaders& headers)
-	\brief Set the HTTP headers
+	\brief Set the HTTP headers.
 
 	This method replaces the whole set of headers for this request with a copy
 	of the given ones.
@@ -94,13 +105,15 @@
 	\param headers the header template to copy from.
 */
 
+
 /*!
 	\fn void BHttpRequest::AdoptHeaders(BHttpHeaders* const headers)
-	\brief Set the HTTP headers
+	\brief Set the HTTP headers.
 
 	This method replaces the whole set of headers for this request. It takes
 	ownership of the parameter, which must not be used afterwards.
 */
+
 
 /*
 	\fn void BHttpRequest::SetDiscardDate(bool discard)
@@ -108,10 +121,12 @@
 	This is currently unused.
 */
 
+
 /*
 	\fn void BHttpRequest::DisableListener(bool disable)
 	This is currently unused.
 */
+
 
 /*!
 	\fn void BHttpRequest::SetAutoReferrer(bool enable)
@@ -122,16 +137,18 @@
 	uses that one.
 */
 
+
 /*!
 	\fn void BHttpRequest::SetPostFields(const BHttpForm& fields)
-	\brief Set the fields for form POST data
+	\brief Set the fields for form POST data.
 
 	Replaces the content of the request with a copy of the given POST fields.
 */
 
+
 /*!
 	\fn void BHttpRequest::AdoptPostFields(BHttpForm* const fields)
-	\brief Set the fields for form POST data
+	\brief Set the fields for form POST data.
 
 	Replaces the content of the request with the given POST fields.
 
@@ -139,9 +156,10 @@
 	elsewhere afterwards.
 */
 
+
 /*!
 	\fn void BHttpRequest::AdoptInputData(BDataIO* const data, const ssize_t size = -1)
-	\brief Set the request body
+	\brief Set the request body.
 
 	If the size is -1 (the default), the data will be sent using chunked
 	transfers. If the size is known, it will be sent using the Content-Length
@@ -153,10 +171,12 @@
 	This method takes ownership of the data, which must not be used elsewhere.
 */
 
+
 /*!
 	\fn void BHttpRequest::SetUserName(const BString& userName)
 	\brief Set the user name for HTTP authentication.
 */
+
 
 /*!
 	\fn void BHttpRequest::SetPassword(const BString& password)
