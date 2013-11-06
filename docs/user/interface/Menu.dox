@@ -1,0 +1,821 @@
+/*
+ * Copyright 2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Menu.h	 hrev46318
+ *		src/kits/interface/Menu.cpp	 hrev46318
+ */
+
+
+/*!
+	\file Menu.h
+	\ingroup interface
+	\ingroup libbe
+	\brief Menu class definition and support structures.
+*/
+
+
+/*!
+	\enum menu_layout
+	\ingroup interface
+
+	Constants to define the layout of the menu items in a menu.
+*/
+
+
+/*!
+	\var menu_layout B_ITEMS_IN_ROW
+
+	Items are arranged in a row, one next to the other.
+*/
+
+
+/*!
+	\var menu_layout B_ITEMS_IN_COLUMN
+
+	Items are arranged in a column, one on top of the other.
+*/
+
+
+/*!
+	\var menu_layout B_ITEMS_IN_MATRIX
+
+	Items are arranged in a matrix, a free-form arrangement that you create.
+*/
+
+
+/*!
+	\struct menu_info
+	\ingroup interface
+	\ingroup libbe
+	\brief Information about a menu such as font size and family, background
+	       color, and flags.
+*/
+
+
+/*!
+	\var menu_info::font_size
+
+	The font size to draw menu items with.
+*/
+
+
+/*!
+	\var menu_info::f_family
+
+	The font family used to draw menu items.
+*/
+
+
+/*!
+	\var menu_info::f_style
+
+	The font style used to draw menu items.
+*/
+
+
+/*!
+	\var menu_info::background_color
+
+	The menu's background color.
+*/
+
+
+/*!
+	\var menu_info::separator
+
+	The style of horizontal line to use to separates groups of items in a menu.
+*/
+
+
+/*!
+	\var menu_info::click_to_open
+
+	Whether or not the menu opens on click. The default value is \c true.
+*/
+
+
+/*!
+	\var menu_info::triggers_always_shown
+
+	Whether or not trigger underlines should always be shown. The default value
+	is \c false.
+*/
+
+
+/*!
+	\fn status_t get_menu_info(menu_info* info)
+	\brief Fill out the menu_info struct into \a info.
+*/
+
+
+/*!
+	\fn status_t set_menu_info(menu_info* info)
+	\brief Set the menu's menu_info struct to \a info adjusting how the menu
+	       will look and work.
+*/
+
+
+/*!
+	\typedef bool (*menu_tracking_hook)(BMenu* menu, void* state)
+	\brief Defines the function passed into BMenu::SetTrackingHook().
+*/
+
+
+/*!
+	\class BMenu
+	\ingroup interface
+	\ingroup libbe
+	\brief Displays a list of menu items including additional menus
+	       arranged hierarchically.
+
+	A newly created BMenu object doesn't contain any menu items, you need to call
+	BMenu::AddItem() or BMenu::AddList() to add some.
+
+	In addition to BMenuItem objects you can also add additional BMenu objects in
+	order to create a menu hierarchy. Unlike menus in other operating systems you
+	can always select both the submenu and menu items, although selecting the
+	submenu might not actually produce any action other than to close the menu.
+	The name of a submenu is used to draw its label.
+
+	\image html BMenu_example.png
+
+	BMenu is the basis of several other Interface Kit classes including BMenuBar
+	and BPopUpMenu. See BMenu::SetRadioMode() and BMenu::SetLabelFromMarked()
+	for additional details on how BMenu and BPopUpMenu are related.
+
+	Menus arrange their items in one of three possible layouts:
+	<table>
+		<tr>
+			<td>\c B_ITEMS_IN_COLUMN</td>
+			<td>
+				The menu items are stacked vertically in a column, one on top
+				of another, as in a typical pop-up menu.
+			</td>
+		</tr>
+		<tr>
+			<td>\c B_ITEMS_IN_ROW</td>
+			<td>
+				The menu items are laid out horizontally in a row, from end to
+				end, as in a typical menu bar.
+			</td>
+		</tr>
+		<tr>
+			<td>\c B_ITEMS_IN_MATRIX</td>
+			<td>
+				The menu items are arranged in a free-form arrangement that you
+				create, such as a matrix.
+			</td>
+		</tr>
+	</table>
+
+	Either \c B_ITEMS_IN_COLUMN or \c B_ITEMS_IN_ROW can be passed into the
+	default constructor, but, you should use the constructor that allows you to
+	set the height and width of the menu in order to utilize the
+	\c B_ITEMS_IN_MATRIX layout.
+
+	Several methods will only work in some layouts as noted in the method
+	description below.
+*/
+
+
+/*!
+	\fn BMenu::BMenu(const char* name, menu_layout layout)
+	\brief Creates a new menu object with the specified \a name and \a layout.
+
+	Don't pass \c B_ITEMS_IN_MATRIX into \a layout with this method, use
+	BMenu::BMenu(const char* name, float width, float height) instead.
+
+	\param name The menu's \a name, serves as a label for submenus.
+	\param layout The menu layout, possibilities include:
+	       - \c B_ITEMS_IN_ROW items are displayed in a single row,
+	       - \c B_ITEMS_IN_COLUMN items are displayed in a single column.
+*/
+
+
+/*!
+	\fn BMenu::BMenu(const char* name, float width, float height)
+	\brief Creates a new menu object with a \c B_ITEMS_IN_MATRIX layout and the
+	       specified \a name, \a width, and \a height.
+
+	\param name The menu's \a name, serves as a label for submenus.
+	\param width The menu \a width.
+	\param height The menu \a height.
+*/
+
+
+/*!
+	\fn BMenu::BMenu(BMessage* archive)
+	\brief Archive constructor.
+
+	\param archive The message data to construct the menu from.
+*/
+
+
+/*!
+	\fn BMenu::~BMenu()
+	\brief Destructor.
+
+	Also destroys any attached menu items and submenus.
+*/
+
+
+/*!
+	\fn BArchivable* BMenu::Instantiate(BMessage* archive)
+	\brief Creates a new BMenu object from an \a archive message.
+
+	\returns A newly created BMenu object or \c NULL if the message doesn't
+	         contain an archived BMenu.
+*/
+
+
+/*!
+	\name Reimplemented Hook Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BMenu::AttachedToWindow()
+	\brief Lays out the menu items and resizes the menu to fit.
+*/
+
+
+/*!
+	\fn void BMenu::Draw(BRect updateRect)
+	\brief Draws the menu.
+
+	\param updateRect The area to draw in.
+*/
+
+
+/*!
+	\fn void BMenu::MessageReceived(BMessage* message)
+	\brief Handles a \a message received by the associated looper.
+
+	Responds to mouse wheel events scrolling the menu if it is too
+	long to fit in the window. Hold \c B_SHIFT_KEY to cause the menu
+	to scroll faster.
+
+	\param message The \a message received by the associated looper.
+*/
+
+
+/*!
+	\fn void BMenu::KeyDown(const char* bytes, int32 numBytes)
+	\brief Hook method that is called when a keyboard key is pressed.
+
+	Handles keyboard navigation and triggers.
+
+	\param bytes The bytes of the key combination pressed.
+	\param numBytes The number of bytes in \a bytes.
+*/
+
+
+//! @}
+
+
+/*!
+	\fn bool BMenu::AddItem(BMenuItem* item)
+	\brief Adds a menu \a item to the end of the list.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\param item The menu \a item to add.
+
+	\return Whether or not the \a item was added to the menu.
+*/
+
+
+/*!
+	\fn bool BMenu::AddItem(BMenuItem* item, int32 index)
+	\brief Adds a menu \a item at the specified \a index.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\param item The menu \a item to add.
+	\param index The \a index where to add the \a item to the menu.
+
+	\return Whether or not the \a item was added to the menu.
+*/
+
+
+/*!
+	\fn bool BMenu::AddItem(BMenuItem* item, BRect frame)
+	\brief Adds a menu \a item in the specified \a frame rectangle within the menu.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_MATRIX
+	         layout, it is an error to use this method for a menu in
+	         \c B_ITEMS_IN_COLUMN or \c B_ITEMS_IN_ROW layout.
+
+	\param item The menu \a item to add.
+	\param frame The \a frame rectangle where to add the \a item to the menu.
+
+	\return Whether or not the \a item was added to the menu.
+*/
+
+
+/*!
+	\fn bool BMenu::AddItem(BMenu* submenu)
+	\brief Add a \a submenu to the end of the list.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\param submenu The submenu to add.
+
+	\return Whether or not the \a submenu was added to the menu.
+*/
+
+
+/*!
+	\fn bool BMenu::AddItem(BMenu* submenu, int32 index)
+	\brief Add a \a submenu at the specified \a index.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\param submenu The \a submenu to add.
+	\param index The \a index where to add the \a submenu to the menu.
+
+	\return Whether or not the \a submenu was added to the menu.
+*/
+
+
+/*!
+	\fn bool BMenu::AddItem(BMenu* submenu, BRect frame)
+	\brief Adds a \a submenu in the specified \a frame rectangle within the
+	       menu.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_MATRIX
+	         layout, it is an error to use this method for a menu in
+	         \c B_ITEMS_IN_COLUMN or \c B_ITEMS_IN_ROW layout.
+
+	\param submenu The submenu to add.
+	\param frame The \a frame rectangle where to add the submenu to the menu.
+
+	\return Whether or not the \a submenu was added to the menu.
+*/
+
+
+/*!
+	\fn bool BMenu::AddList(BList* list, int32 index)
+	\brief Add a \a list of menu items at the specified \a index.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\param list The \a list of menu items to add.
+	\param index The \a index where to add the \a list to the menu.
+
+	\return Whether or not the \a list of menu items was added to the menu.
+*/
+
+
+/*!
+	\fn bool BMenu::AddSeparatorItem()
+	\brief Adds a separator item to the end of the menu.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         layout, it is an error to use this method for a menu in
+	         \c B_ITEMS_IN_ROW or \c B_ITEMS_IN_MATRIX layout.
+
+	\return Whether or not the separator item was added to the menu.
+*/
+
+
+/*!
+	\fn bool BMenu::RemoveItem(BMenuItem* item)
+	\brief Remove and delete the specified \a item from the menu.
+
+	\return Whether or not the \a item was removed from the menu.
+*/
+
+
+/*!
+	\fn BMenuItem* BMenu::RemoveItem(int32 index)
+	\brief Remove the item at the specified \a index from the menu.
+
+	The menu item object is not deleted.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\param index The \a index of where to remove the menu item.
+
+	\return The menu item object or \c NULL if not found.
+*/
+
+
+/*!
+	\fn bool BMenu::RemoveItems(int32 index, int32 count, bool deleteItems)
+	\brief Remove \a count number of items from the menu starting at the specified
+	       \a index and delete them if \a deleteItems is \c true.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\param index The \a index of where to start removing menu items.
+	\param count The number of items to remove.
+	\param deleteItems Whether or not to delete the items after removing them.
+
+	\return Whether or not the items were removed from the menu.
+*/
+
+
+/*!
+	\fn bool BMenu::RemoveItem(BMenu* submenu)
+	\brief Remove and delete a \a submenu from the menu.
+
+	\param submenu The submenu to remove.
+
+	\return Whether or not the \a submenu was removed from the menu.
+*/
+
+
+/*!
+	\fn int32 BMenu::CountItems() const
+	\brief Returns the number of items added to the menu.
+
+	\return The number of items added to the menu.
+*/
+
+
+/*!
+	\fn BMenuItem* BMenu::ItemAt(int32 index) const
+	\brief Returns a pointer to the menu item at the specified \a index.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\return A pointer to a menu item or \c NULL if not found.
+*/
+
+
+/*!
+	\fn BMenu* BMenu::SubmenuAt(int32 index) const
+	\brief Returns a pointer to a submenu at the specified \a index.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for a
+	         menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\return A pointer to a submenu or \c NULL if not found.
+*/
+
+
+/*!
+	\fn int32 BMenu::IndexOf(BMenuItem* item) const
+	\brief Returns the index of the specified menu \a item.
+
+	The index starts at the left for a menu in \c B_ITEMS_IN_COLUMN layout going
+	right or start at the top for a menu in \c B_ITEMS_IN_ROW layout going down.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\return The index of the menu \a item or \c B_ERROR of not found.
+*/
+
+
+/*!
+	\fn int32 BMenu::IndexOf(BMenu* submenu) const
+	\brief Returns the index of the specified \a submenu.
+
+	The index starts at the left for a menu in \c B_ITEMS_IN_COLUMN layout going
+	right or at the top for a menu in \c B_ITEMS_IN_ROW layout going down.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\return The index of the \a submenu or \c B_ERROR of not found.
+*/
+
+
+/*!
+	\fn BMenuItem* BMenu::FindItem(const char* label) const
+	\brief Returns a pointer to the menu item with the specified \a label.
+
+	\param label The \a label of the menu item to find.
+
+	\return A pointer to a menu item or \c NULL if not found.
+*/
+
+
+/*!
+	\fn BMenuItem* BMenu::FindItem(uint32 command) const
+	\brief Returns a pointer to the menu item with the specified \a command for
+	       its associated message.
+
+	\param command The \a command of the associated message of the menu item to
+	       find.
+
+	\return A pointer to a menu item or \c NULL if not found.
+*/
+
+
+/*!
+	\fn status_t BMenu::SetTargetForItems(BHandler* handler)
+	\brief Set the target to \a handler for each item in the menu.
+
+	This is a convenient way to set the target for all the items in a menu.
+
+	\param handler The BHandler object to set the target of the menu item to.
+
+	This method doesn't descend into submenus recursively and only acts on items
+	that have already been added to the menu.
+
+	\return \c B_OK on success or an error code on error.
+*/
+
+
+/*!
+	\fn status_t BMenu::SetTargetForItems(BMessenger messenger)
+	\brief Set the target to \a messenger for each item in the menu.
+
+	This is a convenient way to set the target for all the items in a menu.
+
+	This method doesn't descend into submenus recursively and only acts on items
+	that have already been added to the menu.
+
+	\param messenger The BMessenger object to set the target of the menu item
+	                 to.
+
+	\return \c B_OK on success or an error code on error.
+*/
+
+
+/*!
+	\fn void BMenu::SetEnabled(bool enable)
+	\brief Enables or disables the menu.
+
+	\param enable \c true to enable, \c false to disable.
+*/
+
+
+/*!
+	\fn void BMenu::SetRadioMode(bool on)
+	\brief Turns radio mode on or off.
+
+	Turning radio mode off also turns label-from-marked mode off.
+
+	\param on \c true to turn radio mode on, \c false to turn it off.
+*/
+
+
+/*!
+	\fn void BMenu::SetTriggersEnabled(bool enable)
+	\brief Enables or disables triggers.
+
+	\param enable \c true to enable triggers, \c false to disable triggers.
+*/
+
+
+/*!
+	\fn void BMenu::SetMaxContentWidth(float width)
+	\brief Sets the maximum width of the menu items' content area.
+
+	This is the maximum width that a menu item can draw in. Note that menu
+	items have built-in margins on the left and right sides that are not
+	included as part of the maximum content width.
+
+	\param width The maximum width for the menu item contents to draw in.
+*/
+
+
+/*!
+	\fn void BMenu::SetLabelFromMarked(bool on)
+	\brief Sets whether or not the label of the menu is set according to the
+	       marked item.
+
+	Turning label-from-marked mode on also turns radio mode on.
+
+	\param on \c true to turn label-from-marked mode on, \c false to turn it
+	          off.
+*/
+
+
+/*!
+	\fn bool BMenu::IsLabelFromMarked()
+	\brief Returns whether or not the menu is in label-from-marked mode.
+
+	\return \c true if menu is in label-from-marked mode, \c false if not.
+*/
+
+
+/*!
+	\fn bool BMenu::IsEnabled() const
+	\brief Returns whether or not the menu is enabled.
+
+	\return \c true if menu is enabled, \c false if it is disabled.
+*/
+
+
+/*!
+	\fn bool BMenu::IsRadioMode() const
+	\brief Returns whether or not the menu is in radio mode.
+
+	\return \c true if menu is in radio mode, \c false if not.
+*/
+
+
+/*!
+	\fn bool BMenu::AreTriggersEnabled() const
+	\brief Returns whether or not triggers are enabled.
+
+	\return \c true if triggers are enabled, \c false if triggers are disabled.
+*/
+
+
+/*!
+	\fn bool BMenu::IsRedrawAfterSticky() const
+	\brief Returns whether or not the menu is in redraw-after-sticky mode.
+
+	\return \c true if menu is in redraw-after-sticky mode, \c false if not.
+*/
+
+
+/*!
+	\fn float BMenu::MaxContentWidth() const
+	\brief Return the maximum width of the menu items' content area.
+
+	\return The maximum width of the menu items' content area as a float.
+*/
+
+
+/*!
+	\fn BMenuItem* BMenu::FindMarked()
+	\brief Return a pointer to the first marked menu item.
+
+	The index starts at the left for a menu in \c B_ITEMS_IN_COLUMN layout going
+	right or at the top for a menu in \c B_ITEMS_IN_ROW layout going down.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\return A pointer to the first marked menu item or \c NULL if not found.
+*/
+
+
+/*!
+	\fn int32 BMenu::FindMarkedIndex()
+	\brief Return the index of the first marked menu item.
+
+	The index starts at the left for a menu in \c B_ITEMS_IN_COLUMN layout going
+	right or at the top for a menu in \c B_ITEMS_IN_ROW layout going down.
+
+	\warning This method should only be used for a menu in \c B_ITEMS_IN_COLUMN
+	         or \c B_ITEMS_IN_ROW layout, it is an error to use this method for
+	         a menu in \c B_ITEMS_IN_MATRIX layout.
+
+	\return The index of the first marked menu item or -1 if not found.
+*/
+
+
+/*!
+	\fn BMenu* BMenu::Supermenu() const
+	\brief Returns the pointer to the menu that this menu it attached to.
+
+	\return A pointer to a BMenu object or \c NULL if not found.
+*/
+
+
+/*!
+	\fn BMenuItem* BMenu::Superitem() const
+	\brief Returns the pointer to the menu item that this menu it attached to.
+
+	\return A pointer to a BMenuItem object or \c NULL if not found.
+*/
+
+
+/*!
+	\fn BMenu::BMenu(BRect frame, const char* name, uint32 resizingMode,
+		uint32 flags, menu_layout layout, bool resizeToFit)
+	\brief Implemented by derived classes to create a new menu object.
+
+	This method is intended to be used by derived classes that don't simply wish
+	to utilize different sorts of menu items or arrange them in a different way,
+	but wish to invent a different kind of menu altogether. If the \a layout is
+	set to \c B_ITEMS_IN_MATRIX then the \a resizeToFit flag should be set to
+	\c false.
+
+	\param frame The \a frame rectangle to create the menu from.
+	\param name The menu's \a name, serves as a label for submenus.
+	\param resizingMode The resizing mode flags, see BView for more details.
+	\param flags The view \a flags, see BView for more details.
+	\param layout The menu layout, possibilities include:
+	       - \c B_ITEMS_IN_ROW items are displayed in a single row,
+	       - \c B_ITEMS_IN_COLUMN items are displayed in a single column,
+	       - \c B_ITEMS_IN_MATRIX items are displayed in a custom matrix.
+	\param resizeToFit Whether or not the menu should automatically resize
+	       itself to fit its contents, this will not work in
+	       \c B_ITEMS_IN_MATRIX layout.
+*/
+
+
+/*!
+	\fn void BMenu::SetItemMargins(float left, float top, float right,
+		float bottom)
+	\brief Set the menu item margins.
+
+	\param left The left margin to set.
+	\param top The top margin to set.
+	\param right The right margin to set.
+	\param bottom The bottom margin to set.
+*/
+
+
+/*!
+	\fn void BMenu::GetItemMargins(float* _left, float* _top, float* _right,
+		float* _bottom) const
+	\brief Fill out the margins into the passed in float pointers.
+
+	\param _left The left margin to fill out, can be \c NULL.
+	\param _top The top margin to fill out, can be \c NULL.
+	\param _right The right margin to fill out, can be \c NULL.
+	\param _bottom The bottom margin to fill out, can be \c NULL.
+*/
+
+
+/*!
+	\fn menu_layout BMenu::Layout() const
+	\brief Returns the current menu_layout constant.
+*/
+
+
+/*!
+	\fn BMenuItem* BMenu::Track(bool sticky, BRect* clickToOpenRect)
+	\brief Initiates tracking the cursor within the menu.
+
+	This method passes tracking control to submenus hierarchically depending on
+	where the user moves their mouse.
+
+	You only need to call this method yourself if you are implementing a menu
+	that needs to track the cursor under nonstandard circumstances.
+
+	\param sticky If \c true Track() leaves the menu open even after the mouse
+	       button is no longer held down.
+	\param clickToOpenRect If \a sticky is \c true, leave the menu open even if
+	       the user releases the mouse button while the cursor is inside
+		   \a clickToOpenRect.
+
+	\return A BMenuItem object if the user ends tracking by invoking an item or
+	        \c NULL if the user didn't invoke an item.
+*/
+
+
+/*!
+	\fn bool BMenu::AddDynamicItem(add_state state)
+	\brief Implemented by subclasses to Add a dynamic item to the menu.
+
+	\param state Possibilities include:
+	       - \c B_INITIAL_ADD,
+	       - \c B_PROCESSING,
+	       - \c B_ABORT
+
+	\return \c true if the dynamic item was added, \c false otherwise.
+*/
+
+
+/*!
+	\fn void BMenu::DrawBackground(BRect updateRect)
+	\brief Draw the menu background within the bounds of \a updateRect.
+
+	\param updateRect The area to draw the background in.
+*/
+
+
+/*!
+	\fn void BMenu::SetTrackingHook(menu_tracking_hook func, void* state)
+	\brief Sets a hook function that is called when tracking begins.
+
+	\param func The hook function to call.
+	\param state A variable passed to the hook function.
+*/
+
+
+/*!
+	\fn void BMenu::_DrawItems(BRect updateRect)
+	\brief Draw the menu items within \a updateRect.
+
+	\param updateRect The area to draw the menu items in.
+*/
