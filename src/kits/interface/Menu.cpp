@@ -439,13 +439,13 @@ BMenu::Draw(BRect updateRect)
 
 
 void
-BMenu::MessageReceived(BMessage* msg)
+BMenu::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case B_MOUSE_WHEEL_CHANGED:
 		{
 			float deltaY = 0;
-			msg->FindFloat("be:wheel_delta_y", &deltaY);
+			message->FindFloat("be:wheel_delta_y", &deltaY);
 			if (deltaY == 0)
 				return;
 
@@ -468,7 +468,7 @@ BMenu::MessageReceived(BMessage* msg)
 		}
 
 		default:
-			BView::MessageReceived(msg);
+			BView::MessageReceived(message);
 			break;
 	}
 }
@@ -1017,34 +1017,34 @@ BMenu::SetTargetForItems(BMessenger messenger)
 
 
 void
-BMenu::SetEnabled(bool enabled)
+BMenu::SetEnabled(bool enable)
 {
-	if (fEnabled == enabled)
+	if (fEnabled == enable)
 		return;
 
-	fEnabled = enabled;
+	fEnabled = enable;
 
 	if (dynamic_cast<_BMCMenuBar_*>(Supermenu()) != NULL)
-		Supermenu()->SetEnabled(enabled);
+		Supermenu()->SetEnabled(enable);
 
 	if (fSuperitem)
-		fSuperitem->SetEnabled(enabled);
+		fSuperitem->SetEnabled(enable);
 }
 
 
 void
-BMenu::SetRadioMode(bool flag)
+BMenu::SetRadioMode(bool on)
 {
-	fRadioMode = flag;
-	if (!flag)
+	fRadioMode = on;
+	if (!on)
 		SetLabelFromMarked(false);
 }
 
 
 void
-BMenu::SetTriggersEnabled(bool flag)
+BMenu::SetTriggersEnabled(bool enable)
 {
-	fTriggerEnabled = flag;
+	fTriggerEnabled = enable;
 }
 
 
@@ -1056,10 +1056,10 @@ BMenu::SetMaxContentWidth(float width)
 
 
 void
-BMenu::SetLabelFromMarked(bool flag)
+BMenu::SetLabelFromMarked(bool on)
 {
-	fDynamicName = flag;
-	if (flag)
+	fDynamicName = on;
+	if (on)
 		SetRadioMode(true);
 }
 
@@ -1319,17 +1319,17 @@ BMenu::SetItemMargins(float left, float top, float right, float bottom)
 
 
 void
-BMenu::GetItemMargins(float* left, float* top, float* right,
-	float* bottom) const
+BMenu::GetItemMargins(float* _left, float* _top, float* _right,
+	float* _bottom) const
 {
-	if (left != NULL)
-		*left = fPad.left;
-	if (top != NULL)
-		*top = fPad.top;
-	if (right != NULL)
-		*right = fPad.right;
-	if (bottom != NULL)
-		*bottom = fPad.bottom;
+	if (_left != NULL)
+		*_left = fPad.left;
+	if (_top != NULL)
+		*_top = fPad.top;
+	if (_right != NULL)
+		*_right = fPad.right;
+	if (_bottom != NULL)
+		*_bottom = fPad.bottom;
 }
 
 
@@ -1398,7 +1398,7 @@ BMenu::AddDynamicItem(add_state state)
 
 
 void
-BMenu::DrawBackground(BRect update)
+BMenu::DrawBackground(BRect updateRect)
 {
 	if (be_control_look != NULL) {
 		rgb_color base = sMenuInfo.background_color;
@@ -1419,7 +1419,7 @@ BMenu::DrawBackground(BRect update)
 			borders |= BControlLook::B_TOP_BORDER
 				| BControlLook::B_BOTTOM_BORDER;
 		}
-		be_control_look->DrawMenuBackground(this, rect, update, base, 0,
+		be_control_look->DrawMenuBackground(this, rect, updateRect, base, 0,
 			borders);
 
 		return;
@@ -1427,7 +1427,7 @@ BMenu::DrawBackground(BRect update)
 
 	rgb_color oldColor = HighColor();
 	SetHighColor(sMenuInfo.background_color);
-	FillRect(Bounds() & update, B_SOLID_HIGH);
+	FillRect(Bounds() & updateRect, B_SOLID_HIGH);
 	SetHighColor(oldColor);
 }
 
