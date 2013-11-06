@@ -14,7 +14,7 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer as
  *    the first lines of this file unmodified.
@@ -23,7 +23,7 @@
  *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -231,7 +231,11 @@ bus_space_barrier(bus_space_tag_t tag, bus_space_handle_t handle,
 	bus_size_t offset, bus_size_t len, int flags)
 {
 	if (flags & BUS_SPACE_BARRIER_READ)
+#ifdef __x86_64__
+		__asm__ __volatile__ ("lock; addl $0,0(%%rsp)" : : : "memory");
+#else
 		__asm__ __volatile__ ("lock; addl $0,0(%%esp)" : : : "memory");
+#endif
 	else
 		__asm__ __volatile__ ("" : : : "memory");
 }
