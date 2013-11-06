@@ -6,8 +6,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/View.h	 hrev45799
- *		src/kits/interface/View.cpp	 hrev45799
+ *		headers/os/interface/View.h	 hrev46322
+ *		src/kits/interface/View.cpp	 hrev46322
  */
 
 
@@ -769,11 +769,11 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
-	\fn void BView::DrawAfterChildren(BRect r)
+	\fn void BView::DrawAfterChildren(BRect updateRect)
 	\brief Perform any drawing that needs to be done after child view have
 		already been drawn.
 
-	\param r The rectangular area to be drawn.
+	\param updateRect The rectangular area to drawn in.
 
 	The default implementation does nothing.
 */

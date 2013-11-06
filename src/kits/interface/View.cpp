@@ -1191,7 +1191,7 @@ BView::Draw(BRect updateRect)
 
 
 void
-BView::DrawAfterChildren(BRect r)
+BView::DrawAfterChildren(BRect updateRect)
 {
 	// Hook function
 	STRACE(("\tHOOK: BView(%s)::DrawAfterChildren()\n", Name()));

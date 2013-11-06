@@ -540,7 +540,7 @@ public:
 
 	virtual	status_t			Perform(perform_code code, void* data);
 
-	virtual	void				DrawAfterChildren(BRect r);
+	virtual	void				DrawAfterChildren(BRect updateRect);
 
 	// layout related
 
