@@ -47,7 +47,7 @@ BootMergeObject boot_platform_bios_ia32.o :
 	decode_edid.c
 	dump_edid.c
 
-	: -fno-pic
+	:
 	: boot_platform_generic.a
 ;
 

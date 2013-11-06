@@ -9,7 +9,6 @@ BootStaticLibrary boot_platform_generic :
 	text_menu.cpp
 	video_blit.cpp
 	video_splash.cpp
-	: -fno-pic
 ;
 
 Includes [ FGristFiles video_splash.cpp ] 

@@ -18,7 +18,6 @@ BootStaticLibrary boot_bfs :
 	Stream.cpp
 	BPlusTree.cpp
 	QueryParserUtils.cpp
-	: -fno-pic
 	;
 
 SEARCH on [ FGristFiles BPlusTree.cpp ]

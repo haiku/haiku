@@ -57,7 +57,7 @@ BootMergeObject boot_platform_pxe_ia32.o :
 	$(bios_ia32_src)
 	$(bios_ia32_edid_src)
 
-	: -fno-pic
+	:
 	: boot_platform_generic.a
 ;
 

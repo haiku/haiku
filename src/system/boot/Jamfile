@@ -47,7 +47,6 @@ BootMergeObject boot_libroot.o :
 	strrchr.c
 	strtol.c
 	$(extraSources)
-	: -fno-pic
 ;
 
 AddResources haiku_loader : boot_loader.rdef ;

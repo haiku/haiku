@@ -12,7 +12,7 @@ SubDirC++Flags -fno-rtti ;
 
 BootMergeObject boot_platform_u-boot_ppc_amcc440.o :
 	arch_mmu_amcc440.cpp
-	: -fno-pic -mcpu=440
+	: -mcpu=440
 ;
 
 BootMergeObject boot_platform_u-boot_ppc.o :
@@ -24,7 +24,7 @@ BootMergeObject boot_platform_u-boot_ppc.o :
 	arch_start_kernel.S
 	arch_cpu.cpp
 	#mmu.cpp
-	: -fno-pic
+	:
 	: boot_platform_u-boot_ppc_amcc440.o
 ;
 

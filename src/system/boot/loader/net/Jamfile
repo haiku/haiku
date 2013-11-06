@@ -23,6 +23,4 @@ BootStaticLibrary boot_net :
 	UDP.cpp
 	$(tcp)
 	$(iscsi)
-
-	: -fno-pic
 ;

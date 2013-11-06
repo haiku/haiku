@@ -40,7 +40,7 @@ BootMergeObject boot_platform_raspberrypi_arm.o :
 	arch_framebuffer_bcm2835.cpp
 
 	$(genericPlatformSources)
-	: -fno-pic
+	:
 	: boot_platform_generic.a
 ;
 

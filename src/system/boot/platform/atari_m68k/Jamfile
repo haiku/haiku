@@ -54,7 +54,7 @@ BootMergeObject boot_platform_atari_m68k_other.o :
 	#decode_edid.c
 	#dump_edid.c
 
-	: -fno-pic #-Wa,--pcrel
+	: #-Wa,--pcrel
 	: boot_platform_generic.a
 ;
 

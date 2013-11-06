@@ -420,6 +420,9 @@ rule KernelArchitectureSetup architecture
 		HAIKU_BOOT_C++FLAGS += -fpic -fno-stack-protector -fPIC -fshort-wchar -mno-red-zone
 			-maccumulate-outgoing-args -Wno-error=unused-variable ;
 		HAIKU_BOOT_LDFLAGS = -Bstatic -Bsymbolic -shared -nostdlib -znocombreloc -nostartfiles ;
+	} else {
+		HAIKU_BOOT_CCFLAGS += -fno-pic ;
+		HAIKU_BOOT_C++FLAGS += -fno-pic ;
 	}
 
 	# warning flags

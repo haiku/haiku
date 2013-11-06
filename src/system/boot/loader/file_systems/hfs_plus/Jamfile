@@ -8,5 +8,4 @@ SubDirC++Flags -fno-rtti ;
 
 BootStaticLibrary boot_hfs_plus :
 	hfs_plus.cpp
-	: -fno-pic
 	;

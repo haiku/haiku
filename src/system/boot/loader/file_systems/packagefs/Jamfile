@@ -46,8 +46,6 @@ BootStaticLibrary boot_packagefs :
 	# support kit
 	CompressionAlgorithm.cpp
 	ZlibCompressionAlgorithm.cpp
-
-	: -fno-pic
 ;
 
 Includes [ FGristFiles ZlibCompressionAlgorithm.cpp ]

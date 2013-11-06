@@ -20,5 +20,4 @@ BootStaticLibrary boot_fatfs :
 	Directory.cpp
 	File.cpp
 	Stream.cpp
-	: -fno-pic
 	;
