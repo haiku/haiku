@@ -6,8 +6,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/Menu.h	 hrev46318
- *		src/kits/interface/Menu.cpp	 hrev46318
+ *		headers/os/interface/Menu.h	 hrev46321
+ *		src/kits/interface/Menu.cpp	 hrev46321
  */
 
 
@@ -134,7 +134,7 @@
 	       arranged hierarchically.
 
 	A newly created BMenu object doesn't contain any menu items, you need to call
-	BMenu::AddItem() or BMenu::AddList() to add some.
+	AddItem() or AddList() to add some.
 
 	In addition to BMenuItem objects you can also add additional BMenu objects in
 	order to create a menu hierarchy. Unlike menus in other operating systems you
@@ -220,7 +220,7 @@
 	\fn BMenu::~BMenu()
 	\brief Destructor.
 
-	Also destroys any attached menu items and submenus.
+	Also frees the memory used by any attached menu items and submenus.
 */
 
 
@@ -234,7 +234,21 @@
 
 
 /*!
-	\name Reimplemented Hook Methods
+	\fn status_t BMenu::Archive(BMessage* data, bool deep) const
+	\brief Archives the the BMenu object into the \a data message.
+
+	\param data A pointer to the BMessage to archive the object into.
+	\param deep Whether or not to archive attached menu items as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived successfully.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+*/
+
+
+/*!
+	\name Hook Methods Reimplemented from BView
 */
 
 
@@ -714,11 +728,12 @@
 
 	This method is intended to be used by derived classes that don't simply wish
 	to utilize different sorts of menu items or arrange them in a different way,
-	but wish to invent a different kind of menu altogether. If the \a layout is
-	set to \c B_ITEMS_IN_MATRIX then the \a resizeToFit flag should be set to
-	\c false.
+	but wish to invent a different kind of menu altogether.
 
-	\param frame The \a frame rectangle to create the menu from.
+	If the \a layout is set to \c B_ITEMS_IN_MATRIX the \a resizeToFit flag should
+	be set to \c false.
+
+	\param frame The \a frame rectangle to create the menu in.
 	\param name The menu's \a name, serves as a label for submenus.
 	\param resizingMode The resizing mode flags, see BView for more details.
 	\param flags The view \a flags, see BView for more details.
