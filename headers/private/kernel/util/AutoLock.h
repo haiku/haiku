@@ -160,6 +160,98 @@ private:
 typedef AutoLocker<spinlock, InterruptsSpinLocking> InterruptsSpinLocker;
 
 
+class ReadSpinLocking {
+public:
+	inline bool Lock(rw_spinlock* lockable)
+	{
+		acquire_read_spinlock(lockable);
+		return true;
+	}
+
+	inline void Unlock(rw_spinlock* lockable)
+	{
+		release_read_spinlock(lockable);
+	}
+};
+
+typedef AutoLocker<rw_spinlock, ReadSpinLocking> ReadSpinLocker;
+
+
+class InterruptsReadSpinLocking {
+public:
+	InterruptsReadSpinLocking()
+		:
+		fState(0)
+	{
+	}
+
+	inline bool Lock(rw_spinlock* lockable)
+	{
+		fState = disable_interrupts();
+		acquire_read_spinlock(lockable);
+		return true;
+	}
+
+	inline void Unlock(rw_spinlock* lockable)
+	{
+		release_read_spinlock(lockable);
+		restore_interrupts(fState);
+	}
+
+private:
+	int	fState;
+};
+
+typedef AutoLocker<rw_spinlock, InterruptsReadSpinLocking>
+	InterruptsReadSpinLocker;
+
+
+class WriteSpinLocking {
+public:
+	inline bool Lock(rw_spinlock* lockable)
+	{
+		acquire_write_spinlock(lockable);
+		return true;
+	}
+
+	inline void Unlock(rw_spinlock* lockable)
+	{
+		release_write_spinlock(lockable);
+	}
+};
+
+typedef AutoLocker<rw_spinlock, WriteSpinLocking> WriteSpinLocker;
+
+
+class InterruptsWriteSpinLocking {
+public:
+	InterruptsWriteSpinLocking()
+		:
+		fState(0)
+	{
+	}
+
+	inline bool Lock(rw_spinlock* lockable)
+	{
+		fState = disable_interrupts();
+		acquire_write_spinlock(lockable);
+		return true;
+	}
+
+	inline void Unlock(rw_spinlock* lockable)
+	{
+		release_write_spinlock(lockable);
+		restore_interrupts(fState);
+	}
+
+private:
+	int	fState;
+};
+
+typedef AutoLocker<rw_spinlock, InterruptsWriteSpinLocking>
+	InterruptsWriteSpinLocker;
+
+
 class WriteSequentialLocking {
 public:
 	inline bool Lock(seqlock* lockable)
@@ -237,6 +329,10 @@ using BPrivate::WriteLocker;
 using BPrivate::InterruptsLocker;
 using BPrivate::SpinLocker;
 using BPrivate::InterruptsSpinLocker;
+using BPrivate::ReadSpinLocker;
+using BPrivate::InterruptsReadSpinLocker;
+using BPrivate::WriteSpinLocker;
+using BPrivate::InterruptsWriteSpinLocker;
 using BPrivate::WriteSequentialLocker;
 using BPrivate::InterruptsWriteSequentialLocker;
 using BPrivate::ThreadCPUPinner;

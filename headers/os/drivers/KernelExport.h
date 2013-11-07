@@ -41,6 +41,15 @@ typedef ulong cpu_status;
 #endif
 
 typedef struct {
+	int32		lock;
+} rw_spinlock;
+
+#define B_RW_SPINLOCK_INITIALIZER	{ 0 }
+#define B_INITIALIZE_RW_SPINLOCK(rw_spinlock)	do {	\
+		(rw_spinlock)->lock = 0;						\
+	} while (false)
+
+typedef struct {
 	spinlock	lock;
 	uint32		count;
 } seqlock;
@@ -136,6 +145,13 @@ extern void			restore_interrupts(cpu_status status);
 
 extern void			acquire_spinlock(spinlock *lock);
 extern void			release_spinlock(spinlock *lock);
+
+extern bool			try_acquire_write_spinlock(rw_spinlock* lock);
+extern void			acquire_write_spinlock(rw_spinlock* lock);
+extern void			release_write_spinlock(rw_spinlock* lock);
+extern bool			try_acquire_read_spinlock(rw_spinlock* lock);
+extern void			acquire_read_spinlock(rw_spinlock* lock);
+extern void			release_read_spinlock(rw_spinlock* lock);
 
 extern bool			try_acquire_write_seqlock(seqlock* lock);
 extern void			acquire_write_seqlock(seqlock* lock);

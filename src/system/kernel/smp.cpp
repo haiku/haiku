@@ -45,6 +45,13 @@
 #undef acquire_spinlock
 #undef release_spinlock
 
+#undef try_acquire_read_spinlock
+#undef acquire_read_spinlock
+#undef release_read_spinlock
+#undef try_acquire_write_spinlock
+#undef acquire_write_spinlock
+#undef release_write_spinlock
+
 #undef try_acquire_write_seqlock
 #undef acquire_write_seqlock
 #undef release_write_seqlock
@@ -517,6 +524,86 @@ release_spinlock(spinlock *lock)
 		test_latency(lock);
 #endif
 	}
+}
+
+
+bool
+try_acquire_write_spinlock(rw_spinlock* lock)
+{
+	return atomic_test_and_set(&lock->lock, 1 << 31, 0) == 0;
+}
+
+
+void
+acquire_write_spinlock(rw_spinlock* lock)
+{
+	if (sNumCPUs < 2)
+		return;
+
+	uint32 count = 0;
+	int currentCPU = smp_get_current_cpu();
+	while (true) {
+		if (try_acquire_write_spinlock(lock))
+			break;
+
+		if (++count == SPINLOCK_DEADLOCK_COUNT) {
+			panic("acquire_write_spinlock(): Failed to acquire spinlock %p "
+				"for a long time!", lock);
+			count = 0;
+		}
+
+		process_all_pending_ici(currentCPU);
+		PAUSE();
+	}
+}
+
+
+void
+release_write_spinlock(rw_spinlock* lock)
+{
+	atomic_set(&lock->lock, 0);
+}
+
+
+bool
+try_acquire_read_spinlock(rw_spinlock* lock)
+{
+	uint32 previous = atomic_add(&lock->lock, 1);
+	if ((previous & (1 << 31)) == 0)
+		return true;
+	atomic_test_and_set(&lock->lock, 1 << 31, previous);
+	return false;
+}
+
+
+void
+acquire_read_spinlock(rw_spinlock* lock)
+{
+	if (sNumCPUs < 2)
+		return;
+
+	uint32 count = 0;
+	int currentCPU = smp_get_current_cpu();
+	while (1) {
+		if (try_acquire_read_spinlock(lock))
+			break;
+
+		if (++count == SPINLOCK_DEADLOCK_COUNT) {
+			panic("acquire_read_spinlock(): Failed to acquire spinlock %p "
+				"for a long time!", lock);
+			count = 0;
+		}
+
+		process_all_pending_ici(currentCPU);
+		PAUSE();
+	}
+}
+
+
+void
+release_read_spinlock(rw_spinlock* lock)
+{
+	atomic_add(&lock->lock, -1);
 }
 
 

@@ -104,6 +104,65 @@ release_spinlock_inline(spinlock* lock)
 
 
 static inline bool
+try_acquire_write_spinlock_inline(rw_spinlock* lock)
+{
+	return atomic_test_and_set(&lock->lock, 1 << 31, 0) == 0;
+}
+
+
+static inline void
+acquire_write_spinlock_inline(rw_spinlock* lock)
+{
+	if (try_acquire_write_spinlock(lock))
+		return;
+	acquire_write_spinlock(lock);
+}
+
+
+static inline void
+release_write_spinlock_inline(rw_spinlock* lock)
+{
+	atomic_set(&lock->lock, 0);
+}
+
+
+static inline bool
+try_acquire_read_spinlock_inline(rw_spinlock* lock)
+{
+	uint32 previous = atomic_add(&lock->lock, 1);
+	if ((previous & (1 << 31)) == 0)
+		return true;
+	atomic_test_and_set(&lock->lock, 1 << 31, previous);
+	return false;
+}
+
+
+static inline void
+acquire_read_spinlock_inline(rw_spinlock* lock)
+{
+	if (try_acquire_read_spinlock(lock))
+		return;
+	acquire_read_spinlock(lock);
+}
+
+
+static inline void
+release_read_spinlock_inline(rw_spinlock* lock)
+{
+	atomic_add(&lock->lock, -1);
+}
+
+
+#define try_acquire_read_spinlock(lock)	try_acquire_read_spinlock_inline(lock)
+#define acquire_read_spinlock(lock)		acquire_read_spinlock_inline(lock)
+#define release_read_spinlock(lock)		release_read_spinlock_inline(lock)
+#define try_acquire_write_spinlock(lock) \
+	try_acquire_write_spinlock(lock)
+#define acquire_write_spinlock(lock)	acquire_write_spinlock_inline(lock)
+#define release_write_spinlock(lock)	release_write_spinlock_inline(lock)
+
+
+static inline bool
 try_acquire_write_seqlock_inline(seqlock* lock) {
 	bool succeed = try_acquire_spinlock(&lock->lock);
 	if (succeed)
