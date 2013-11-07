@@ -44,10 +44,10 @@ struct menubar_data {
 };
 
 
-BMenuBar::BMenuBar(BRect frame, const char* title, uint32 resizeMask,
+BMenuBar::BMenuBar(BRect frame, const char* name, uint32 resizingMode,
 		menu_layout layout, bool resizeToFit)
 	:
-	BMenu(frame, title, resizeMask, B_WILL_DRAW | B_FRAME_EVENTS
+	BMenu(frame, name, resizingMode, B_WILL_DRAW | B_FRAME_EVENTS
 		| B_FULL_UPDATE_ON_RESIZE, layout, resizeToFit),
 	fBorder(B_BORDER_FRAME),
 	fTrackingPID(-1),
@@ -60,9 +60,9 @@ BMenuBar::BMenuBar(BRect frame, const char* title, uint32 resizeMask,
 }
 
 
-BMenuBar::BMenuBar(const char* title, menu_layout layout, uint32 flags)
+BMenuBar::BMenuBar(const char* name, menu_layout layout, uint32 flags)
 	:
-	BMenu(BRect(), title, B_FOLLOW_NONE,
+	BMenu(BRect(), name, B_FOLLOW_NONE,
 		flags | B_WILL_DRAW | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT,
 		layout, false),
 	fBorder(B_BORDER_FRAME),
@@ -76,9 +76,9 @@ BMenuBar::BMenuBar(const char* title, menu_layout layout, uint32 flags)
 }
 
 
-BMenuBar::BMenuBar(BMessage* data)
+BMenuBar::BMenuBar(BMessage* archive)
 	:
-	BMenu(data),
+	BMenu(archive),
 	fBorder(B_BORDER_FRAME),
 	fTrackingPID(-1),
 	fPrevFocusToken(-1),
@@ -88,11 +88,11 @@ BMenuBar::BMenuBar(BMessage* data)
 {
 	int32 border;
 
-	if (data->FindInt32("_border", &border) == B_OK)
+	if (archive->FindInt32("_border", &border) == B_OK)
 		SetBorder((menu_bar_border)border);
 
 	menu_layout layout = B_ITEMS_IN_COLUMN;
-	data->FindInt32("_layout", (int32*)&layout);
+	archive->FindInt32("_layout", (int32*)&layout);
 
 	_InitData(layout);
 }

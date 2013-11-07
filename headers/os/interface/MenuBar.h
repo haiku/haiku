@@ -25,12 +25,12 @@ class BMenuField;
 
 class BMenuBar : public BMenu {
 public:
-								BMenuBar(BRect frame, const char* title,
-									uint32 resizeMask = B_FOLLOW_LEFT_RIGHT
+								BMenuBar(BRect frame, const char* name,
+									uint32 resizingMode = B_FOLLOW_LEFT_RIGHT
 										| B_FOLLOW_TOP,
 									menu_layout layout = B_ITEMS_IN_ROW,
 									bool resizeToFit = true);
-								BMenuBar(const char* title,
+								BMenuBar(const char* name,
 									menu_layout layout = B_ITEMS_IN_ROW,
 									uint32 flags = B_WILL_DRAW
 										| B_FRAME_EVENTS);
