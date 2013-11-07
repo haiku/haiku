@@ -214,8 +214,6 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 	else
 		strcpy(this->name, "unnamed thread");
 
-	alarm.period = 0;
-
 	exit.status = 0;
 
 	list_init(&exit.waiters);
@@ -1925,9 +1923,6 @@ thread_exit(void)
 	}
 
 	if (team != kernelTeam) {
-		// Cancel previously installed alarm timer, if any.
-		cancel_timer(&thread->alarm);
-
 		// Delete all user timers associated with the thread.
 		ThreadLocker threadLocker(thread);
 		thread->DeleteUserTimers(false);
@@ -2345,8 +2340,6 @@ thread_reset_for_exec(void)
 
 	// reset thread CPU time clock
 	thread->cpu_clock_offset = -thread->CPUTime(false);
-
-	// Note: We don't cancel an alarm. It is supposed to survive exec*().
 }
 
 
