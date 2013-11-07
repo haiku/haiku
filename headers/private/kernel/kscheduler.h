@@ -18,7 +18,7 @@ struct SchedulerListener;
 
 
 typedef enum scheduler_mode {
-	SCHEDULER_MODE_PERFORMANCE,
+	SCHEDULER_MODE_LOW_LATENCY,
 	SCHEDULER_MODE_POWER_SAVING,
 	// ...
 	SCHEDULER_MODE_COUNT

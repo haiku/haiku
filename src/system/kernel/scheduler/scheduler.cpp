@@ -481,7 +481,7 @@ has_cache_expired(Thread* thread)
 
 	CoreEntry* coreEntry = &sCoreEntries[schedulerThreadData->previous_core];
 	switch (sSchedulerMode) {
-		case SCHEDULER_MODE_PERFORMANCE:
+		case SCHEDULER_MODE_LOW_LATENCY:
 			return coreEntry->fActiveTime
 					- schedulerThreadData->went_sleep_active > kCacheExpire;
 
@@ -708,7 +708,7 @@ update_priority_heaps(int32 cpu, int32 priority)
 
 
 static int32
-choose_core_performance(Thread* thread)
+choose_core_low_latency(Thread* thread)
 {
 	CoreEntry* entry;
 
@@ -800,7 +800,7 @@ choose_cpu(int32 core)
 
 
 static bool
-should_rebalance_performance(Thread* thread)
+should_rebalance_low_latency(Thread* thread)
 {
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 	ASSERT(schedulerThreadData->previous_core >= 0);
@@ -1575,7 +1575,7 @@ scheduler_start(void)
 status_t
 scheduler_set_operation_mode(scheduler_mode mode)
 {
-	if (mode != SCHEDULER_MODE_PERFORMANCE
+	if (mode != SCHEDULER_MODE_LOW_LATENCY
 		&& mode != SCHEDULER_MODE_POWER_SAVING) {
 		return B_BAD_VALUE;
 	}
@@ -1587,11 +1587,11 @@ scheduler_set_operation_mode(scheduler_mode mode)
 
 	sSchedulerMode = mode;
 	switch (mode) {
-		case SCHEDULER_MODE_PERFORMANCE:
+		case SCHEDULER_MODE_LOW_LATENCY:
 			sDisableSmallTaskPacking = -1;
 			sSmallTaskCore = -1;
-			sChooseCore = choose_core_performance;
-			sShouldRebalance = should_rebalance_performance;
+			sChooseCore = choose_core_low_latency;
+			sShouldRebalance = should_rebalance_low_latency;
 			break;
 
 		case SCHEDULER_MODE_POWER_SAVING:
@@ -1802,7 +1802,7 @@ _scheduler_init()
 	}
 
 #if 1
-	scheduler_set_operation_mode(SCHEDULER_MODE_PERFORMANCE);
+	scheduler_set_operation_mode(SCHEDULER_MODE_LOW_LATENCY);
 #else
 	scheduler_set_operation_mode(SCHEDULER_MODE_POWER_SAVING);
 #endif
