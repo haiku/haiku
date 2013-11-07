@@ -264,10 +264,11 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 
 	struct team_debug_info debug_info;
 
-	// protected by scheduler lock
+	// protected by time_lock
 	bigtime_t		dead_threads_kernel_time;
 	bigtime_t		dead_threads_user_time;
 	bigtime_t		cpu_clock_offset;
+	spinlock		time_lock;
 
 	// user group information; protected by fLock, the *_uid/*_gid fields also
 	// by the scheduler lock
@@ -516,7 +517,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
 	bigtime_t		user_time;			// protected by time_lock
 	bigtime_t		kernel_time;		// protected by time_lock
 	bigtime_t		last_time;			// protected by time_lock
-	bigtime_t		cpu_clock_offset;	// protected by scheduler lock
+	bigtime_t		cpu_clock_offset;	// protected by time_lock
 
 	void			(*post_interrupt_callback)(void*);
 	void*			post_interrupt_data;
@@ -610,7 +611,7 @@ private:
 
 			UserTimerList		fUserTimers;			// protected by fLock
 			ThreadTimeUserTimerList fCPUTimeUserTimers;
-									// protected by scheduler lock
+									// protected by time_lock
 };
 
 
@@ -749,7 +750,7 @@ Thread::DequeuePendingSignal(sigset_t nonBlocked, Signal& buffer)
 
 /*!	Returns the thread's current total CPU time (kernel + user + offset).
 
-	The caller must hold the scheduler lock.
+	The caller must hold \c time_lock.
 
 	\param ignoreCurrentRun If \c true and the thread is currently running,
 		don't add the time since the last time \c last_time was updated. Should
@@ -764,7 +765,7 @@ Thread::CPUTime(bool ignoreCurrentRun) const
 
 	// If currently running, also add the time since the last check, unless
 	// requested otherwise.
-	if (!ignoreCurrentRun && cpu != NULL)
+	if (!ignoreCurrentRun && last_time != 0)
 		time += system_time() - last_time;
 
 	return time;

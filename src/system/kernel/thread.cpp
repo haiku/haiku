@@ -696,17 +696,21 @@ common_thread_entry(void* _args)
 	// The thread is new and has been scheduled the first time.
 
 	// start CPU time based user timers
+	acquire_spinlock(&thread->team->time_lock);
+	acquire_spinlock(&thread->time_lock);
 	if (thread->HasActiveCPUTimeUserTimers()
 		|| thread->team->HasActiveCPUTimeUserTimers()) {
 		user_timer_continue_cpu_timers(thread, thread->cpu->previous_thread);
 	}
 
+	// start tracking time
+	thread->last_time = system_time();
+	release_spinlock(&thread->time_lock);
+	release_spinlock(&thread->team->time_lock);
+
 	// notify the user debugger code
 	if ((thread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
 		user_debug_thread_scheduled(thread);
-
-	// start tracking time
-	thread->last_time = system_time();
 
 	// unlock the scheduler lock and enable interrupts
 	release_spinlock(&gSchedulerLock);
@@ -1991,10 +1995,10 @@ thread_exit(void)
 
 		// remember how long this thread lasted
 		bigtime_t now = system_time();
-		InterruptsSpinLocker threadTimeLocker(thread->time_lock);
+		InterruptsSpinLocker teamTimeLocker(team->time_lock);
+		SpinLocker threadTimeLocker(thread->time_lock);
 		thread->kernel_time += now - thread->last_time;
 		thread->last_time = now;
-		threadTimeLocker.Unlock();
 
 		team->dead_threads_kernel_time += thread->kernel_time;
 		team->dead_threads_user_time += thread->user_time;
@@ -2008,6 +2012,9 @@ thread_exit(void)
 		// deactivate CPU time user timers for the thread
 		if (thread->HasActiveCPUTimeUserTimers())
 			thread->DeactivateCPUTimeUserTimers();
+
+		threadTimeLocker.Unlock();
+		teamTimeLocker.Unlock();
 
 		// put the thread into the kernel team until it dies
 		remove_thread_from_team(team, thread);
@@ -2334,11 +2341,10 @@ thread_reset_for_exec(void)
 	thread->user_stack_size = 0;
 
 	// reset signals
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 	thread->ResetSignalsOnExec();
 
 	// reset thread CPU time clock
+	InterruptsSpinLocker timeLocker(thread->time_lock);
 	thread->cpu_clock_offset = -thread->CPUTime(false);
 }
 

@@ -490,6 +490,7 @@ Team::Team(team_id id, bool kernel)
 	// init dead/stopped/continued children condition vars
 	dead_children.condition_variable.Init(&dead_children, "team children");
 
+	B_INITIALIZE_SPINLOCK(&time_lock);
 	B_INITIALIZE_SPINLOCK(&signal_lock);
 
 	fQueuedSignalsCounter = new(std::nothrow) BKernel::QueuedSignalsCounter(
@@ -908,7 +909,7 @@ Team::DeactivateCPUTimeUserTimers()
 
 /*!	Returns the team's current total CPU time (kernel + user + offset).
 
-	The caller must hold the scheduler lock.
+	The caller must hold \c time_lock.
 
 	\param ignoreCurrentRun If \c true and the current thread is one team's
 		threads, don't add the time since the last time \c last_time was
@@ -931,7 +932,7 @@ Team::CPUTime(bool ignoreCurrentRun) const
 		SpinLocker threadTimeLocker(thread->time_lock);
 		time += thread->kernel_time + thread->user_time;
 
-		if (thread->IsRunning()) {
+		if (thread->last_time != 0) {
 			if (!ignoreCurrentRun || thread != currentThread)
 				time += now - thread->last_time;
 		}
@@ -943,7 +944,7 @@ Team::CPUTime(bool ignoreCurrentRun) const
 
 /*!	Returns the team's current user CPU time.
 
-	The caller must hold the scheduler lock.
+	The caller must hold \c time_lock.
 
 	\return The team's current user CPU time.
 */
@@ -959,7 +960,7 @@ Team::UserCPUTime() const
 		SpinLocker threadTimeLocker(thread->time_lock);
 		time += thread->user_time;
 
-		if (thread->IsRunning() && !thread->in_kernel)
+		if (thread->last_time != 0 && !thread->in_kernel)
 			time += now - thread->last_time;
 	}
 
@@ -3093,12 +3094,12 @@ team_shutdown_team(Team* team)
 	team->DeleteUserTimers(false);
 
 	// deactivate CPU time user timers for the team
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker timeLocker(team->time_lock);
 
 	if (team->HasActiveCPUTimeUserTimers())
 		team->DeactivateCPUTimeUserTimers();
 
-	schedulerLocker.Unlock();
+	timeLocker.Unlock();
 
 	// kill all threads but the main thread
 	team_death_entry deathEntry;

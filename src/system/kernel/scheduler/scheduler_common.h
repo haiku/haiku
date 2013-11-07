@@ -26,10 +26,14 @@ scheduler_switch_thread(Thread* fromThread, Thread* toThread)
 		user_debug_thread_unscheduled(fromThread);
 
 	// stop CPU time based user timers
+	acquire_spinlock(&fromThread->team->time_lock);
+	acquire_spinlock(&fromThread->time_lock);
 	if (fromThread->HasActiveCPUTimeUserTimers()
 		|| fromThread->team->HasActiveCPUTimeUserTimers()) {
 		user_timer_stop_cpu_timers(fromThread, toThread);
 	}
+	release_spinlock(&fromThread->time_lock);
+	release_spinlock(&fromThread->team->time_lock);
 
 	// update CPU and Thread structures and perform the context switch
 	cpu_ent* cpu = fromThread->cpu;
@@ -46,10 +50,14 @@ scheduler_switch_thread(Thread* fromThread, Thread* toThread)
 	// first time the same is done in thread.cpp:common_thread_entry().
 
 	// continue CPU time based user timers
+	acquire_spinlock(&fromThread->team->time_lock);
+	acquire_spinlock(&fromThread->time_lock);
 	if (fromThread->HasActiveCPUTimeUserTimers()
 		|| fromThread->team->HasActiveCPUTimeUserTimers()) {
 		user_timer_continue_cpu_timers(fromThread, cpu->previous_thread);
 	}
+	release_spinlock(&fromThread->time_lock);
+	release_spinlock(&fromThread->team->time_lock);
 
 	// notify the user debugger code
 	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
@@ -69,6 +77,7 @@ scheduler_update_thread_times(Thread* oldThread, Thread* nextThread)
 	} else {
 		acquire_spinlock(&oldThread->time_lock);
 		oldThread->kernel_time += now - oldThread->last_time;
+		oldThread->last_time = 0;
 		release_spinlock(&oldThread->time_lock);
 
 		acquire_spinlock(&nextThread->time_lock);
@@ -78,8 +87,11 @@ scheduler_update_thread_times(Thread* oldThread, Thread* nextThread)
 
 	// If the old thread's team has user time timers, check them now.
 	Team* team = oldThread->team;
+
+	acquire_spinlock(&team->time_lock);
 	if (team->HasActiveUserTimeUserTimers())
 		user_timer_check_team_user_timers(team);
+	release_spinlock(&team->time_lock);
 }
 
 
