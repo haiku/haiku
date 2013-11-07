@@ -1,0 +1,247 @@
+/*
+ * Copyright 2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/MenuBar.h	 hrev46323
+ *		src/kits/interface/MenuBar.cpp	 hrev46323
+ */
+
+
+/*!
+	\file MenuBar.h
+	\ingroup interface
+	\ingroup libbe
+	\brief MenuBar class definition and support structures.
+*/
+
+
+/*!
+	\enum menu_bar_border
+	\ingroup interface
+
+	Menu bar border style constants.
+
+	\see BMenuBar::SetBorder()
+*/
+
+
+/*!
+	\var menu_bar_border B_BORDER_FRAME
+
+	The border is drawn around the entire menu bar.
+*/
+
+
+/*!
+	\var menu_bar_border B_BORDER_CONTENTS
+
+	The border is drawn around the list of items.
+*/
+
+
+
+/*!
+	\var menu_bar_border B_BORDER_EACH_ITEM
+
+	The border is drawn around each individual item.
+*/
+
+
+/*!
+	\class BMenuBar
+	\ingroup interface
+	\ingroup libbe
+	\brief A window's root menu.
+
+	A menu bar, if a window has one, is typically drawn across the top of the
+	window just below the tab and a window typically has just a single menu bar,
+	although this is up to you.
+
+	One menu bar attached to a window is considered to be the "key" menu bar
+	that can be navigated by the user using the keyboard. The last menu bar
+	attached to a window is automatically set as the key menu bar for the
+	window. To override this behavior and set a different key menu bar use the
+	BWindow::SetKeyMenuBar() method.
+
+	When either the \key{Menu} key or \key{Command}+\key{Esc} keys are pressed
+	the key menu bar opens and focuses it's first menu item, typically a BMenu.
+	Once the menu bar is open the user can navigate around the attached menus
+	and menu items using the arrow keys.
+
+	Like a BMenu, a BMenuBar object starts without any items attached to it,
+	you'll need to call AddItem() or AddList() to add some. The top-level items
+	in a menu bar are typically menus which have menu items and menus added to
+	them in turn.
+*/
+
+
+/*!
+	\fn BMenuBar::BMenuBar(BRect frame, const char* name, uint32 resizingMode,
+		menu_layout layout, bool resizeToFit)
+	\brief Create a new BMenuBar object.
+
+	The default resizing mode, \c B_FOLLOW_LEFT_RIGHT | \c B_FOLLOW_TOP is
+	meant to be used by a typical menu bar that is positioned along the top
+	edge of a window. This resizing mode allows the menu bar to resize itself
+	based on changes to the window's width while keeping it attached to the
+	top of the window frame.
+
+	For menu bars in \c B_ITEMS_IN_ROW layout the height is automatically
+	set to be the height of a single item, while menus bars in
+	\c B_ITEMS_IN_COLUMN layout the width is automatically set to be the width
+	of the widest item.
+
+	The width of a menu bar is set equal to the width of its parent for menu
+	bars in \c B_ITEMS_IN_ROW layout and a \a resizingMode mask that includes
+	\c B_FOLLOW_LEFT_RIGHT so that the menu bar will always be as wide as its
+	attached window.
+
+	Likewise, the height of a menu bar is set equal to the height of its parent
+	for menu bars in \c B_ITEMS_IN_COLUMN layout and a \a resizingMode mask that
+	includes \c B_FOLLOW_TOP_BOTTOM so that the menu bar will always be as high
+	as its attached window.
+
+	When \a resizeToFit is set to \c true, as is the default, the \a frame
+	rectangle determines only where the menu bar is located, not its size.
+	If the \a layout is set to \c B_ITEMS_IN_MATRIX the \a resizeToFit flag
+	should be set to \c false.
+
+	\param frame The \a frame rectangle to create the menu bar in.
+	\param name The \a name of the menu bar, used internally only.
+	\param resizingMode The resizing mode flags, see BView for more details.
+	\param layout The menu layout, possibilities include:
+	       - \c B_ITEMS_IN_ROW items are displayed in a single row,
+	       - \c B_ITEMS_IN_COLUMN items are displayed in a single column,
+	       - \c B_ITEMS_IN_MATRIX items are displayed in a custom matrix.
+	\param resizeToFit Whether or not the menu bar should automatically resize
+	       itself to fit its contents, this will not work in
+	       \c B_ITEMS_IN_MATRIX layout.
+*/
+
+
+/*!
+	\fn BMenuBar::BMenuBar(const char* name, menu_layout layout, uint32 flags)
+	\brief Create a new BMenuBar object suitable to use with the layout APIs.
+
+	\param name The \a name of the menu bar, used internally only.
+	\param flags The view \a flags, see BView for more details.
+	\param layout The menu layout, possibilities include:
+	       - \c B_ITEMS_IN_ROW items are displayed in a single row,
+	       - \c B_ITEMS_IN_COLUMN items are displayed in a single column,
+	       - \c B_ITEMS_IN_MATRIX items are displayed in a custom matrix.
+*/
+
+
+/*!
+	\fn BMenuBar::BMenuBar(BMessage* archive)
+	\brief Archive constructor.
+
+	\param archive The message data to construct the menu from.
+*/
+
+
+/*!
+	\fn BMenuBar::~BMenuBar()
+	\brief Destructor.
+
+	Also frees the memory used by any attached menus and menu items.
+*/
+
+
+/*!
+	\fn BArchivable* BMenuBar::Instantiate(BMessage* data)
+	\brief Creates a new BMenuBar object from an \a archive message.
+
+	\returns A newly created BMenuBar object or \c NULL if the message
+	         doesn't contain an archived BMenuBar.
+*/
+
+
+/*!
+	\fn status_t BMenuBar::Archive(BMessage* data, bool deep) const
+	\brief Archives the the BMenuBar object into the \a data message.
+
+	\param data A pointer to the BMessage to archive the object into.
+	\param deep Whether or not to archive attached menu items as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived successfully.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+*/
+
+
+/*!
+	\name Hook Methods Reimplemented from BMenu
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BMenuBar::AttachedToWindow()
+	\brief Sets this as the key menubar for the window, lays out the menu items
+	       and resizes the menu to fit.
+
+	\see BWindow::SetKeyMenuBar()
+*/
+
+
+/*!
+	\fn void BMenuBar::FrameResized(float newWidth, float newHeight)
+	\brief Hook method that gets called when the menu bar is resized.
+
+	Redraws the affected borders.
+
+	\param newWidth The new \a width of the menu bar.
+	\param newHeight The new \a height of the menu bar.
+*/
+
+
+/*!
+	\fn void BMenuBar::Draw(BRect updateRect)
+	\brief Draws the menu bar.
+
+	\param updateRect The area to draw in.
+*/
+
+
+/*!
+	\fn void BMenuBar::MouseDown(BPoint where)
+	\brief Hook method that is called when a mouse button is pressed.
+
+	Right clicking on a menu bar sends the window to back or brings it to front.
+
+	\param where The point on the screen where to mouse pointer is when
+		the mouse button is pressed.
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BMenuBar::SetBorder(menu_bar_border border)
+	\brief Sets how the menu bar border is drawn.
+
+	The default is \c B_BORDER_FRAME.
+
+	\param border Options include:
+	       - \c B_BORDER_FRAME The border is drawn around the entire menu bar.
+	       - \c B_BORDER_CONTENTS The border is drawn around the list of items.
+	       - \c B_BORDER_EACH_ITEM The border is drawn around each individual
+	            item.
+*/
+
+
+/*!
+	\fn menu_bar_border BMenuBar::Border() const
+	\brief Returns the currently set border style.
+
+	/see BMenuBar::SetBorder() for details.
+*/
