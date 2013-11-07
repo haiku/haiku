@@ -206,6 +206,7 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 	mutex_init_etc(&fLock, lockName, MUTEX_FLAG_CLONE_NAME);
 
 	B_INITIALIZE_SPINLOCK(&time_lock);
+	B_INITIALIZE_SPINLOCK(&team_lock);
 
 	// init name
 	if (name != NULL)
@@ -1103,11 +1104,13 @@ undertaker(void* /*args*/)
 		Team* kernelTeam = team_get_kernel_team();
 		TeamLocker kernelTeamLocker(kernelTeam);
 		thread->Lock();
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+		InterruptsSpinLocker signalLocker(kernelTeam->signal_lock);
+		SpinLocker schedulerLocker(gSchedulerLock);
 
 		remove_thread_from_team(kernelTeam, thread);
 
 		schedulerLocker.Unlock();
+		signalLocker.Unlock();
 		kernelTeamLocker.Unlock();
 
 		// free the thread structure
@@ -1986,6 +1989,7 @@ thread_exit(void)
 		// swap address spaces, to make sure we're running on the kernel's pgdir
 		vm_swap_address_space(team->address_space, VMAddressSpace::Kernel());
 
+		SpinLocker teamLocker(thread->team_lock);
 		SpinLocker schedulerLocker(gSchedulerLock);
 			// removing the thread and putting its death entry to the parent
 			// team needs to be an atomic operation
@@ -2013,6 +2017,8 @@ thread_exit(void)
 		// put the thread into the kernel team until it dies
 		remove_thread_from_team(team, thread);
 		insert_thread_into_team(kernelTeam, thread);
+
+		teamLocker.Unlock();
 
 		if (team->death_entry != NULL) {
 			if (--team->death_entry->remaining_threads == 0)
@@ -3282,7 +3288,8 @@ _user_cancel_thread(thread_id threadID, void (*cancelFunction)(int))
 	thread->cancel_function = cancelFunction;
 
 	// send the cancellation signal to the thread
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker teamLocker(thread->team_lock);
+	SpinLocker locker(thread->team->signal_lock);
 	return send_signal_to_thread_locked(thread, SIGNAL_CANCEL_THREAD, NULL, 0);
 }
 

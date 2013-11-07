@@ -490,6 +490,8 @@ Team::Team(team_id id, bool kernel)
 	// init dead/stopped/continued children condition vars
 	dead_children.condition_variable.Init(&dead_children, "team children");
 
+	B_INITIALIZE_SPINLOCK(&signal_lock);
+
 	fQueuedSignalsCounter = new(std::nothrow) BKernel::QueuedSignalsCounter(
 		kernel ? -1 : MAX_QUEUED_SIGNALS);
 	memset(fSignalActions, 0, sizeof(fSignalActions));

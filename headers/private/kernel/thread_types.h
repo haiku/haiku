@@ -291,6 +291,8 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 		bool		initialized;	// true when the state has been initialized
 	} exit;
 
+	spinlock		signal_lock;
+
 public:
 								~Team();
 
@@ -398,7 +400,7 @@ private:
 
 			BKernel::QueuedSignalsCounter* fQueuedSignalsCounter;
 			BKernel::PendingSignals	fPendingSignals;
-									// protected by scheduler lock
+									// protected by signal_lock
 			struct sigaction 	fSignalActions[MAX_SIGNAL_NUMBER];
 									// indexed signal - 1, protected by fLock
 
@@ -429,7 +431,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
 	int32			pinned_to_cpu;	// only accessed by this thread or in the
 									// scheduler, when thread is not running
 
-	sigset_t		sig_block_mask;	// protected by scheduler lock,
+	sigset_t		sig_block_mask;	// protected by team->signal_lock,
 									// only modified by the thread itself
 	sigset_t		sigsuspend_original_unblocked_mask;
 		// non-0 after a return from _user_sigsuspend(), containing the inverted
@@ -481,7 +483,8 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
 		/* this field may only stay in debug builds in the future */
 
 	BKernel::Team	*team;	// protected by team lock, thread lock, scheduler
-							// lock
+							// lock, team_lock
+	spinlock		team_lock;
 
 	struct {
 		sem_id		sem;		// immutable after thread creation
@@ -604,7 +607,7 @@ private:
 			mutex				fLock;
 
 			BKernel::PendingSignals	fPendingSignals;
-									// protected by scheduler lock
+									// protected by team->signal_lock
 
 			UserTimerList		fUserTimers;			// protected by fLock
 			ThreadTimeUserTimerList fCPUTimeUserTimers;

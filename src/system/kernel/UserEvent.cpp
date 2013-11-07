@@ -115,7 +115,7 @@ TeamSignalEvent::Fire()
 	fSignal->AcquireReference();
 		// one reference is transferred to send_signal_to_team_locked
 
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker locker(fTeam->signal_lock);
 	status_t error = send_signal_to_team_locked(fTeam, fSignal->Number(),
 		fSignal, B_DO_NOT_RESCHEDULE);
 	locker.Unlock();
@@ -169,11 +169,12 @@ ThreadSignalEvent::Fire()
 
 	fSignal->AcquireReference();
 		// one reference is transferred to send_signal_to_team_locked
-
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker teamLocker(fThread->team_lock);
+	SpinLocker locker(fThread->team->signal_lock);
 	status_t error = send_signal_to_thread_locked(fThread, fSignal->Number(),
 		fSignal, B_DO_NOT_RESCHEDULE);
 	locker.Unlock();
+	teamLocker.Unlock();
 
 	// There are situations (for certain signals), in which
 	// send_signal_to_team_locked() succeeds without queuing the signal.
