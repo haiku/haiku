@@ -206,7 +206,7 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 	mutex_init_etc(&fLock, lockName, MUTEX_FLAG_CLONE_NAME);
 
 	B_INITIALIZE_SPINLOCK(&time_lock);
-	B_INITIALIZE_SPINLOCK(&team_lock);
+	B_INITIALIZE_RW_SPINLOCK(&team_lock);
 
 	// init name
 	if (name != NULL)
@@ -1984,7 +1984,7 @@ thread_exit(void)
 		// swap address spaces, to make sure we're running on the kernel's pgdir
 		vm_swap_address_space(team->address_space, VMAddressSpace::Kernel());
 
-		SpinLocker teamLocker(thread->team_lock);
+		WriteSpinLocker teamLocker(thread->team_lock);
 		SpinLocker schedulerLocker(gSchedulerLock);
 			// removing the thread and putting its death entry to the parent
 			// team needs to be an atomic operation
@@ -3281,7 +3281,7 @@ _user_cancel_thread(thread_id threadID, void (*cancelFunction)(int))
 	thread->cancel_function = cancelFunction;
 
 	// send the cancellation signal to the thread
-	InterruptsSpinLocker teamLocker(thread->team_lock);
+	InterruptsReadSpinLocker teamLocker(thread->team_lock);
 	SpinLocker locker(thread->team->signal_lock);
 	return send_signal_to_thread_locked(thread, SIGNAL_CANCEL_THREAD, NULL, 0);
 }

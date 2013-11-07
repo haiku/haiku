@@ -1494,7 +1494,7 @@ send_signal_to_thread(Thread* thread, const Signal& signal, uint32 flags)
 	if (error != B_OK)
 		return error;
 
-	InterruptsSpinLocker teamLocker(thread->team_lock);
+	InterruptsReadSpinLocker teamLocker(thread->team_lock);
 	SpinLocker locker(thread->team->signal_lock);
 
 	error = send_signal_to_thread_locked(thread, signal.Number(), signalToQueue,

@@ -483,7 +483,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
 
 	BKernel::Team	*team;	// protected by team lock, thread lock, scheduler
 							// lock, team_lock
-	spinlock		team_lock;
+	rw_spinlock		team_lock;
 
 	struct {
 		sem_id		sem;		// immutable after thread creation

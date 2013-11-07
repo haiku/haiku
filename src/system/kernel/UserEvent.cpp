@@ -169,7 +169,7 @@ ThreadSignalEvent::Fire()
 
 	fSignal->AcquireReference();
 		// one reference is transferred to send_signal_to_team_locked
-	InterruptsSpinLocker teamLocker(fThread->team_lock);
+	InterruptsReadSpinLocker teamLocker(fThread->team_lock);
 	SpinLocker locker(fThread->team->signal_lock);
 	status_t error = send_signal_to_thread_locked(fThread, fSignal->Number(),
 		fSignal, B_DO_NOT_RESCHEDULE);
