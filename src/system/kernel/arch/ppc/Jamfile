@@ -7,6 +7,30 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging classic ] ;
 
+# cpu-specific stuff
+KernelMergeObject arch_ppc_classic.o :
+
+	# paging/classic
+	PPCPagingMethodClassic.cpp
+	PPCPagingStructuresClassic.cpp
+	PPCVMTranslationMapClassic.cpp
+
+	# XXX: compile with correct -mcpu ?
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+;
+
+KernelMergeObject arch_ppc_460.o :
+
+	# TODO: compile with correct -mcpu
+	# paging/460
+	#PPCPagingMethod460.cpp
+	#PPCPagingStructures460.cpp
+	#PPCVMTranslationMap460.cpp
+
+
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -mcpu=440fp
+;
+
 KernelMergeObject kernel_arch_ppc.o :
 	arch_commpage.cpp
 	arch_cpu.cpp
@@ -39,20 +63,11 @@ KernelMergeObject kernel_arch_ppc.o :
 	PPCPagingStructures.cpp
 	PPCVMTranslationMap.cpp
 
-	# TODO: compile with correct -mcpu
-	# paging/classic
-	PPCPagingMethodClassic.cpp
-	PPCPagingStructuresClassic.cpp
-	PPCVMTranslationMapClassic.cpp
-
-	# TODO: compile with correct -mcpu
-	# paging/460
-	#PPCPagingMethod460.cpp
-	#PPCPagingStructures460.cpp
-	#PPCVMTranslationMap460.cpp
 
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+	:
+	arch_ppc_classic.o
 ;
 
 CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
