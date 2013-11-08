@@ -81,8 +81,12 @@ static const struct {
 } kCodecQuirks[] = {
 	{ HDA_ALL, HDA_ALL, HDA_ALL, HDA_ALL, HDA_QUIRK_IVREF, 0 },
 	{ HDA_ALL, HDA_ALL, HDA_ALL, HDA_ALL, HDA_QUIRK_IVREF, 0 },
+	{ 0x10de, 0x0d94, CIRRUSLOGIC_VENDORID, HDA_ALL,
+		HDA_QUIRK_GPIO1 | HDA_QUIRK_GPIO3, 0 },		// MacBookAir 3,1(2)
 	{ 0x10de, 0xcb79, CIRRUSLOGIC_VENDORID, 0x4206,
-		HDA_QUIRK_GPIO1 | HDA_QUIRK_GPIO3, 0 },		// MacBook Pro 5.5
+		HDA_QUIRK_GPIO1 | HDA_QUIRK_GPIO3, 0 },		// MacBook Pro 5,5
+	{ 0x10de, 0xcb89, CIRRUSLOGIC_VENDORID, 0x4206,
+		HDA_QUIRK_GPIO1 | HDA_QUIRK_GPIO3, 0 },		// MacBookPro 7,1
 	{ 0x8384, 0x7680, SIGMATEL_VENDORID, 0x7680,
 		HDA_QUIRK_GPIO0 | HDA_QUIRK_GPIO1, 0},		// Apple Intel Mac
 	{ 0x106b, 0x00a1, REALTEK_VENDORID, 0x0885,
@@ -1285,7 +1289,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 	if (hda_audio_group_build_tree(audioGroup) != B_OK)
 		goto err;
 	hda_audio_group_switch_init(audioGroup);
-	
+
 	audioGroup->playback_stream = hda_stream_new(audioGroup, STREAM_PLAYBACK);
 	audioGroup->record_stream = hda_stream_new(audioGroup, STREAM_RECORD);
 	TRACE("hda: streams playback %p, record %p\n", audioGroup->playback_stream,
@@ -1501,8 +1505,9 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	hda_codec_get_quirks(codec);
 
 	TRACE("Codec %ld Vendor: %04lx Product: %04lx, Revision: "
-		"%lu.%lu.%lu.%lu\n", codecAddress, response.vendor, response.device,
-		response.major, response.minor, response.revision, response.stepping);
+		"%lu.%lu.%lu.%lu Quirks: %04lx\n", codecAddress, response.vendor,
+		response.device, response.major, response.minor, response.revision,
+		response.stepping, codec->quirks);
 
 	for (uint32 nodeID = response.start;
 			nodeID < response.start + response.count; nodeID++) {
