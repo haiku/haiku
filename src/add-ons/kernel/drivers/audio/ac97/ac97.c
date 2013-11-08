@@ -99,6 +99,7 @@ static void stac9708_init(ac97_dev *dev);
 static void stac9721_init(ac97_dev *dev);
 static void stac9744_init(ac97_dev *dev);
 static void stac9756_init(ac97_dev *dev);
+static void stac9758_init(ac97_dev *dev);
 static void tr28028_init(ac97_dev *dev);
 static void wm9701_init(ac97_dev *dev);
 static void wm9703_init(ac97_dev *dev);
@@ -136,6 +137,8 @@ codec_table codecs[] =
 	{ CODEC_ID_AK4540,	0xffffffff, default_init,	"Asahi Kasei AK4540" },
 	{ CODEC_ID_AK4542,	0xffffffff, default_init,	"Asahi Kasei AK4542" },
 	{ CODEC_ID_AK4543,	0xffffffff, default_init,	"Asahi Kasei AK4543" },
+	{ 0x414b4d06,		0xffffffff, default_init,	"Asahi Kasei AK4544A" },
+	{ 0x414b4d07,		0xffffffff, default_init,	"Asahi Kasei AK4545" },
 	{ 0x414c4300, 		0xffffff00, default_init,	"Avance Logic (Realtek) ALC100" }, /* 0x4300 = ALC100 */
 	{ 0x414c4320,		0xfffffff0, default_init,	"Avance Logic (Realtek) ALC100/ALC100P, RL5383/RL5522" },
 	{ CODEC_ID_ALC201A, 0xfffffff0, default_init,	"Avance Logic (Realtek) ALC200/ALC200A, ALC201/ALC201A" }, /* 0x4710 = ALC201A */
@@ -161,6 +164,9 @@ codec_table codecs[] =
 	{ 0x43525941,		0xffffffff, default_init,	"Cirrus Logic CS4201A" },
 	{ 0x43525951,		0xffffffff, default_init,	"Cirrus Logic CS4205A" },
 	{ 0x43525961,		0xffffffff, default_init,	"Cirrus Logic CS4291A" },
+	{ 0x43585421,		0xffffffff, default_init,	"HSD11246" },
+	{ 0x44543031,		0xffffffff, default_init,	"DT0398" },
+	{ 0x454d4328,		0xffffffff, default_init,	"EM28028" },
 	{ 0x45838308,		0xffffffff, default_init,	"ESS Technology ES1921" },
 	{ 0x49434501,		0xffffffff, default_init,	"ICEnsemble ICE1230" },
 	{ 0x49434511,		0xffffffff, default_init,	"ICEnsemble ICE1232" },
@@ -175,11 +181,14 @@ codec_table codecs[] =
 	{ CODEC_ID_STAC9708,0xffffffff, stac9708_init,	"SigmaTel STAC9708/9711" },
 	{ CODEC_ID_STAC9721,0xffffffff, stac9721_init,	"SigmaTel STAC9721/9723" },
 	{ CODEC_ID_STAC9744,0xffffffff, stac9744_init,	"SigmaTel STAC9744" },
+	{ CODEC_ID_STAC9750,0xffffffff, default_init,	"SigmaTel STAC9750/51" },
 	{ CODEC_ID_STAC9752,0xffffffff, default_init,	"SigmaTel STAC9752/53" },
 	{ CODEC_ID_STAC9756,0xffffffff, stac9756_init,	"SigmaTel STAC9756/9757" },
+	{ CODEC_ID_STAC9758,0xffffffff, stac9758_init,	"SigmaTel STAC9758/59" },
 	{ CODEC_ID_STAC9766,0xffffffff, default_init,	"SigmaTel STAC9766/67" },
 	{ 0x53494c22,		0xffffffff, default_init,	"Silicon Laboratory Si3036" },
 	{ 0x53494c23,		0xffffffff, default_init,	"Silicon Laboratory Si3038" },
+	{ 0x53544d02,		0xffffffff, default_init,	"ST7597" },
 	{ 0x54524103,		0xffffffff, default_init,	"TriTech TR28023" },
 	{ 0x54524106,		0xffffffff, default_init,	"TriTech TR28026" },
 	{ 0x54524108,		0xffffffff, tr28028_init,	"TriTech TR28028" },
@@ -207,6 +216,7 @@ codec_table codecs[] =
 	{ 0x83847600,		0xffffff00, default_init,	"SigmaTel" },
 	{ 0x53494c00,		0xffffff00, default_init,	"Silicon Laboratory" },
 	{ 0x54524100,		0xffffff00, default_init,	"TriTech" },
+	{ 0x54584e00,		0xffffff00, default_init,	"Texas Instruments" },
 	{ 0x56494100,		0xffffff00, default_init,	"VIA Technologies" },
 	{ 0x574d4c00,		0xffffff00, default_init,	"Wolfson" },
 	{ 0x594d4800,		0xffffff00, default_init,	"Yamaha" },
@@ -1036,6 +1046,28 @@ stac9756_init(ac97_dev *dev)
 	ac97_reg_cached_write(dev, 0x76, 0xabba);
 	/* Set Clock Access to default */
 	ac97_reg_cached_write(dev, 0x78, 0x0000);
+}
+
+
+
+void
+stac9758_init(ac97_dev *dev)
+{
+	LOG(("stac9758_init\n"));
+
+	ac97_reg_update_bits(dev, AC97_PAGING, 0xf, 0);
+
+	if (dev->subsystem == 0x107b0601) {
+		ac97_reg_cached_write(dev, 0x64, 0xfc70);
+		ac97_reg_cached_write(dev, 0x68, 0x2102);
+		ac97_reg_cached_write(dev, 0x66, 0x0203);
+		ac97_reg_cached_write(dev, 0x72, 0x0041);
+	} else {
+		ac97_reg_cached_write(dev, 0x64, 0xd794);
+		ac97_reg_cached_write(dev, 0x68, 0x2001);
+		ac97_reg_cached_write(dev, 0x66, 0x0201);
+		ac97_reg_cached_write(dev, 0x72, 0x0040);
+	}
 }
 
 

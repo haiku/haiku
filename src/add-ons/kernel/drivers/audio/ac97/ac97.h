@@ -5,24 +5,24 @@
  * Copyright (c) 2008, Jérôme Duval
  *
  * All rights reserved.
- * Redistribution and use in source and binary forms, with or without modification, 
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
+ * - Redistributions of source code must retain the above copyright notice,
  *   this list of conditions and the following disclaimer.
  * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation 
+ *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR 
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS 
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
@@ -51,7 +51,7 @@ enum AC97_REGISTER {
 	AC97_3D_CONTROL			= 0x22,
 	AC97_PAGING				= 0x24,
 	AC97_POWERDOWN			= 0x26,
-	
+
 	/* Extended audio register set */
 	AC97_EXTENDED_ID		= 0x28,
 	AC97_EXTENDED_STAT_CTRL = 0x2A,
@@ -67,14 +67,14 @@ enum AC97_REGISTER {
 	/* Vendor ID */
 	AC97_VENDOR_ID1			= 0x7C,
 	AC97_VENDOR_ID2			= 0x7E,
-	
+
 	/* Analog Devices */
 	AC97_AD_JACK_SENSE		= 0x72,
 	AC97_AD_SERIAL_CONFIG	= 0x74,
 	AC97_AD_MISC_CONTROL	= 0x76,
 	AC97_AD_SAMPLE_RATE_0	= 0x78,
 	AC97_AD_SAMPLE_RATE_1	= 0x7a,
-	
+
 	/* Realtek ALC650 */
 	AC97_ALC650_SPDIF_INPUT_CHAN_STATUS_LO = 0x60, /* only ALC650 Rev. E and later */
 	AC97_ALC650_SPDIF_INPUT_CHAN_STATUS_HI = 0x62, /* only ALC650 Rev. E and later */
@@ -134,8 +134,10 @@ enum {
 	CODEC_ID_STAC9708	= 0x83847608, // ok, STAC9708/11
 	CODEC_ID_STAC9721	= 0x83847609, // ok, STAC9721/23
 	CODEC_ID_STAC9744	= 0x83847644, // ok, STAC9744
+	CODEC_ID_STAC9750	= 0x83847650, // ok, STAC9750/51
 	CODEC_ID_STAC9752	= 0x83847652, // ok, STAC9752/53
 	CODEC_ID_STAC9756	= 0x83847656, // ok, STAC9756/57
+	CODEC_ID_STAC9758	= 0x83847658, // ????, STAC9758/59
 	CODEC_ID_STAC9766	= 0x83847666, // ok, STAC9766/67
 };
 
@@ -193,19 +195,19 @@ struct ac97_dev {
 	uint16				reg_cache[0x7f];
 
 	void *				cookie;
-	
+
 	uint32				codec_id;
 	const char *		codec_info;
 	const char *		codec_3d_stereo_enhancement;
-	
+
 	codec_init			init;
 	codec_reg_read		reg_read;
 	codec_reg_write		reg_write;
 	codec_set_rate		set_rate;
 	codec_get_rate		get_rate;
 
-	uint32				max_vsr;	
-	uint32				min_vsr;	
+	uint32				max_vsr;
+	uint32				min_vsr;
 	uint32 				clock;
 	uint64				capabilities;
 	bool				reversed_eamp_polarity;
@@ -216,8 +218,9 @@ struct ac97_dev {
 extern "C" {
 #endif
 
-void	ac97_attach(ac97_dev **dev, codec_reg_read reg_read, codec_reg_write reg_write, void *cookie, 
-	ushort subvendor_id, ushort subsystem_id);
+void	ac97_attach(ac97_dev **dev, codec_reg_read reg_read,
+	codec_reg_write reg_write, void *cookie, ushort subvendor_id,
+	ushort subsystem_id);
 void	ac97_detach(ac97_dev *dev);
 void	ac97_suspend(ac97_dev *dev);
 void	ac97_resume(ac97_dev *dev);
@@ -228,7 +231,8 @@ void	ac97_reg_uncached_write(ac97_dev *dev, uint8 reg, uint16 value);
 uint16	ac97_reg_uncached_read(ac97_dev *dev, uint8 reg);
 
 bool	ac97_reg_update(ac97_dev *dev, uint8 reg, uint16 value);
-bool	ac97_reg_update_bits(ac97_dev *dev, uint8 reg, uint16 mask, uint16 value);
+bool	ac97_reg_update_bits(ac97_dev *dev, uint8 reg, uint16 mask,
+	uint16 value);
 
 bool	ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate);
 bool	ac97_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate);
@@ -256,7 +260,7 @@ typedef enum {
 typedef struct _ac97_source_info {
 	const char *name;
 	ac97_mixer_type  type;
-	
+
 	int32	id;
 	uint8	reg;
 	uint16	default_value;
