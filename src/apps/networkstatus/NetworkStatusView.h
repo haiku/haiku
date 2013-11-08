@@ -56,8 +56,6 @@ class NetworkStatusView : public BView {
 		void			_Init();
 		void			_UpdateBitmaps();
 		void			_ShowConfiguration(BMessage* message);
-		bool			_PrepareRequest(struct ifreq& request,
-							const char* name);
 		int32			_DetermineInterfaceStatus(
 							const BNetworkInterface& interface);
 		void			_Update(bool force = false);

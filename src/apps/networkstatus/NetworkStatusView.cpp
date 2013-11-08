@@ -73,33 +73,6 @@ const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
 
 
-class SocketOpener {
-public:
-	SocketOpener()
-	{
-		fSocket = socket(AF_INET, SOCK_DGRAM, 0);
-	}
-
-	~SocketOpener()
-	{
-		close(fSocket);
-	}
-
-	status_t InitCheck()
-	{
-		return fSocket >= 0 ? B_OK : B_ERROR;
-	}
-
-	operator int() const
-	{
-		return fSocket;
-	}
-
-private:
-	int	fSocket;
-};
-
-
 //	#pragma mark -
 
 
@@ -352,57 +325,26 @@ NetworkStatusView::Draw(BRect updateRect)
 void
 NetworkStatusView::_ShowConfiguration(BMessage* message)
 {
-	static const struct information_entry {
-		const char*	label;
-		int32		control;
-	} kInformationEntries[] = {
-		{ B_TRANSLATE("Address"), SIOCGIFADDR },
-		{ B_TRANSLATE("Broadcast"), SIOCGIFBRDADDR },
-		{ B_TRANSLATE("Netmask"), SIOCGIFNETMASK },
-		{ NULL }
-	};
-
-	SocketOpener socket;
-	if (socket.InitCheck() != B_OK)
-		return;
-
 	const char* name;
 	if (message->FindString("interface", &name) != B_OK)
 		return;
 
-	ifreq request;
-	if (!_PrepareRequest(request, name))
+	BNetworkInterface networkInterface(name);
+	if (!networkInterface.Exists())
 		return;
 
+	BNetworkInterfaceAddress address;
+	networkInterface.GetAddressAt(0, address);
+		// TODO: We should get all addresses,
+		// not just the first one.
 	BString text(B_TRANSLATE("%ifaceName information:\n"));
 	text.ReplaceFirst("%ifaceName", name);
 
 	size_t boldLength = text.Length();
 
-	for (int i = 0; kInformationEntries[i].label; i++) {
-		if (ioctl(socket, kInformationEntries[i].control, &request,
-				sizeof(request)) < 0) {
-			continue;
-		}
-
-		char address[32];
-		sockaddr_in* inetAddress = NULL;
-		switch (kInformationEntries[i].control) {
-			case SIOCGIFNETMASK:
-				inetAddress = (sockaddr_in*)&request.ifr_mask;
-				break;
-			default:
-				inetAddress = (sockaddr_in*)&request.ifr_addr;
-				break;
-		}
-
-		if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,
-				sizeof(address)) == NULL) {
-			return;
-		}
-
-		text << "\n" << kInformationEntries[i].label << ": " << address;
-	}
+	text << "\n" << B_TRANSLATE("Address") << ": " << address.Address().ToString();
+	text << "\n" << B_TRANSLATE("Broadcast") << ": " << address.Broadcast().ToString();
+	text << "\n" << B_TRANSLATE("Netmask") << ": " << address.Mask().ToString();
 
 	BAlert* alert = new BAlert(name, text.String(), B_TRANSLATE("OK"));
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -520,17 +462,6 @@ NetworkStatusView::_AboutRequested()
 	window->AddAuthors(authors);
 
 	window->Show();
-}
-
-
-bool
-NetworkStatusView::_PrepareRequest(struct ifreq& request, const char* name)
-{
-	if (strlen(name) > IF_NAMESIZE)
-		return false;
-
-	strcpy(request.ifr_name, name);
-	return true;
 }
 
 
