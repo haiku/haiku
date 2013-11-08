@@ -684,8 +684,8 @@ uninit_port_locked(Port* port)
 
 	// Release the threads that were blocking on this port.
 	// read_port() will see the B_BAD_PORT_ID return value, and act accordingly
-	port->read_condition.NotifyAll(false, B_BAD_PORT_ID);
-	port->write_condition.NotifyAll(false, B_BAD_PORT_ID);
+	port->read_condition.NotifyAll(B_BAD_PORT_ID);
+	port->write_condition.NotifyAll(B_BAD_PORT_ID);
 	sNotificationService.Notify(PORT_REMOVED, port->id);
 }
 
@@ -891,8 +891,8 @@ close_port(port_id id)
 	notify_port_select_events(port, B_EVENT_INVALID);
 	port->select_infos = NULL;
 
-	port->read_condition.NotifyAll(false, B_BAD_PORT_ID);
-	port->write_condition.NotifyAll(false, B_BAD_PORT_ID);
+	port->read_condition.NotifyAll(B_BAD_PORT_ID);
+	port->write_condition.NotifyAll(B_BAD_PORT_ID);
 
 	return B_OK;
 }

@@ -217,13 +217,11 @@ ConditionVariable::Publish(const void* object, const char* objectType)
 
 
 void
-ConditionVariable::Unpublish(bool schedulerLocked)
+ConditionVariable::Unpublish()
 {
 	ASSERT(fObject != NULL);
 
-	InterruptsLocker _;
-	SpinLocker schedulerLocker(schedulerLocked ? NULL : &gSchedulerLock);
-	SpinLocker locker(sConditionVariablesLock);
+	InterruptsSpinLocker locker(sConditionVariablesLock);
 
 #if KDEBUG
 	ConditionVariable* variable = sConditionVariableHash.Lookup(fObject);
@@ -259,8 +257,7 @@ ConditionVariable::Wait(uint32 flags, bigtime_t timeout)
 
 
 /*static*/ void
-ConditionVariable::NotifyOne(const void* object, bool schedulerLocked,
-	status_t result)
+ConditionVariable::NotifyOne(const void* object, status_t result)
 {
 	InterruptsSpinLocker locker(sConditionVariablesLock);
 	ConditionVariable* variable = sConditionVariableHash.Lookup(object);
@@ -268,13 +265,12 @@ ConditionVariable::NotifyOne(const void* object, bool schedulerLocked,
 	if (variable == NULL)
 		return;
 
-	variable->NotifyOne(schedulerLocked, result);
+	variable->NotifyOne(result);
 }
 
 
 /*static*/ void
-ConditionVariable::NotifyAll(const void* object, bool schedulerLocked,
-	status_t result)
+ConditionVariable::NotifyAll(const void* object, status_t result)
 {
 	InterruptsSpinLocker locker(sConditionVariablesLock);
 	ConditionVariable* variable = sConditionVariableHash.Lookup(object);
@@ -282,7 +278,7 @@ ConditionVariable::NotifyAll(const void* object, bool schedulerLocked,
 	if (variable == NULL)
 		return;
 
-	variable->NotifyAll(schedulerLocked, result);
+	variable->NotifyAll(result);
 }
 
 
@@ -318,11 +314,9 @@ ConditionVariable::Dump() const
 
 
 void
-ConditionVariable::_Notify(bool all, bool schedulerLocked, status_t result)
+ConditionVariable::_Notify(bool all, status_t result)
 {
-	InterruptsLocker _;
-	SpinLocker schedulerLocker(schedulerLocked ? NULL : &gSchedulerLock);
-	SpinLocker locker(sConditionVariablesLock);
+	InterruptsSpinLocker locker(sConditionVariablesLock);
 
 	if (!fEntries.IsEmpty()) {
 		if (result > B_OK) {
@@ -348,8 +342,10 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 		if (entry->fWaitStatus <= 0)
 			continue;
 
-		if (entry->fWaitStatus == STATUS_WAITING)
+		if (entry->fWaitStatus == STATUS_WAITING) {
+			SpinLocker _(entry->fThread->scheduler_lock);
 			thread_unblock_locked(entry->fThread, result);
+		}
 
 		entry->fWaitStatus = result;
 

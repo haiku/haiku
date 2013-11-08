@@ -39,12 +39,6 @@ invalidate_loop(void *data)
 static void
 exit_debugger()
 {
-	// If someone holds the scheduler lock at this point, release_sem_etc()
-	// will block forever. So avoid that.
-	if (!try_acquire_spinlock(&gSchedulerLock))
-		return;
-	release_spinlock(&gSchedulerLock);
-
 	release_sem_etc(sRequestSem, 1, B_DO_NOT_RESCHEDULE);
 }
 

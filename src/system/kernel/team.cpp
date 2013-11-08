@@ -1794,11 +1794,13 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 	// wait for the loader of the new team to finish its work
 	if ((flags & B_WAIT_TILL_LOADED) != 0) {
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+		if (mainThread != NULL) {
+			InterruptsSpinLocker schedulerLocker(mainThread->scheduler_lock);
 
-		// resume the team's main thread
-		if (mainThread != NULL && mainThread->state == B_THREAD_SUSPENDED)
-			scheduler_enqueue_in_run_queue(mainThread);
+			// resume the team's main thread
+	 		if (mainThread->state == B_THREAD_SUSPENDED)
+				scheduler_enqueue_in_run_queue(mainThread);
+		}
 
 		// Now suspend ourselves until loading is finished. We will be woken
 		// either by the thread, when it finished or aborted loading, or when
@@ -1806,11 +1808,12 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		// setting `loadingInfo.done' is responsible for removing the info from
 		// the team structure.
 		while (!loadingInfo.done) {
-			thread_get_current_thread()->next_state = B_THREAD_SUSPENDED;
+			Thread* thread = thread_get_current_thread();
+
+			InterruptsSpinLocker schedulerLocker(thread->scheduler_lock);
+			thread->next_state = B_THREAD_SUSPENDED;
 			scheduler_reschedule();
 		}
-
-		schedulerLocker.Unlock();
 
 		if (loadingInfo.result < B_OK)
 			return loadingInfo.result;
@@ -2444,7 +2447,7 @@ wait_for_child(pid_t child, uint32 flags, siginfo_t& _info)
 				} else {
 					// The child is well. Reset its job control state.
 					team_set_job_control_state(entry->team,
-						JOB_CONTROL_STATE_NONE, NULL, false);
+						JOB_CONTROL_STATE_NONE, NULL);
 				}
 			}
 		}
@@ -2531,14 +2534,16 @@ wait_for_child(pid_t child, uint32 flags, siginfo_t& _info)
 	// If SIGCHLD is blocked, we shall clear pending SIGCHLDs, if no other child
 	// status is available.
 	TeamLocker teamLocker(team);
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker signalLocker(team->signal_lock);
+	SpinLocker threadCreationLocker(gThreadCreationLock);
 
 	if (is_team_signal_blocked(team, SIGCHLD)) {
 		if (get_job_control_entry(team, child, flags) == NULL)
 			team->RemovePendingSignals(SIGNAL_TO_MASK(SIGCHLD));
 	}
 
-	schedulerLocker.Unlock();
+	threadCreationLocker.Unlock();
+	signalLocker.Unlock();
 	teamLocker.Unlock();
 
 	// When the team is dead, the main thread continues to live in the kernel
@@ -2925,12 +2930,12 @@ team_set_foreground_process_group(int32 ttyIndex, pid_t processGroupID)
 	if (session->foreground_group != -1
 		&& session->foreground_group != team->group_id
 		&& team->SignalActionFor(SIGTTOU).sa_handler != SIG_IGN) {
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+		InterruptsSpinLocker signalLocker(team->signal_lock);
 
 		if (!is_team_signal_blocked(team, SIGTTOU)) {
 			pid_t groupID = team->group_id;
 
-			schedulerLocker.Unlock();
+			signalLocker.Unlock();
 			sessionLocker.Unlock();
 			teamLocker.Unlock();
 
@@ -3170,7 +3175,7 @@ team_delete_team(Team* team, port_id debuggerPort)
 		loadingInfo->result = B_ERROR;
 		loadingInfo->done = true;
 
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+		InterruptsSpinLocker _(loadingInfo->thread->scheduler_lock);
 
 		// wake up the waiting thread
 		if (loadingInfo->thread->state == B_THREAD_SUSPENDED)
@@ -3256,8 +3261,7 @@ team_get_address_space(team_id id, VMAddressSpace** _addressSpace)
 
 /*!	Sets the team's job control state.
 	The caller must hold the parent team's lock. Interrupts are allowed to be
-	enabled or disabled. In the latter case the scheduler lock may be held as
-	well.
+	enabled or disabled.
 	\a team The team whose job control state shall be set.
 	\a newState The new state to be set.
 	\a signal The signal the new state was caused by. Can \c NULL, if none. Then
@@ -3266,11 +3270,10 @@ team_get_address_space(team_id id, VMAddressSpace** _addressSpace)
 		\c JOB_CONTROL_STATE_NONE:
 		- \c signal: The number of the signal causing the state change.
 		- \c signaling_user: The real UID of the user sending the signal.
-	\a schedulerLocked indicates whether the scheduler lock is being held, too.
 */
 void
 team_set_job_control_state(Team* team, job_control_state newState,
-	Signal* signal, bool schedulerLocked)
+	Signal* signal)
 {
 	if (team == NULL || team->job_control_entry == NULL)
 		return;
@@ -3326,8 +3329,7 @@ team_set_job_control_state(Team* team, job_control_state newState,
 
 	if (childList != NULL) {
 		childList->entries.Add(entry);
-		team->parent->dead_children.condition_variable.NotifyAll(
-			schedulerLocked);
+		team->parent->dead_children.condition_variable.NotifyAll();
 	}
 }
 
@@ -4087,7 +4089,7 @@ _user_setpgid(pid_t processID, pid_t groupID)
 
 		// Changing the process group might have changed the situation for a
 		// parent waiting in wait_for_child(). Hence we notify it.
-		team->parent->dead_children.condition_variable.NotifyAll(false);
+		team->parent->dead_children.condition_variable.NotifyAll();
 
 		return group->id;
 	}
@@ -4129,7 +4131,7 @@ _user_setsid(void)
 
 	// Changing the process group might have changed the situation for a
 	// parent waiting in wait_for_child(). Hence we notify it.
-	team->parent->dead_children.condition_variable.NotifyAll(false);
+	team->parent->dead_children.condition_variable.NotifyAll();
 
 	return group->id;
 }

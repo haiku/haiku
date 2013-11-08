@@ -45,10 +45,11 @@
 #endif
 
 
-spinlock gSchedulerLock = B_SPINLOCK_INITIALIZER;
 SchedulerListenerList gSchedulerListeners;
+spinlock gSchedulerListenersLock = B_SPINLOCK_INITIALIZER;
 
-bool sSchedulerEnabled;
+static spinlock sSchedulerInternalLock;
+static bool sSchedulerEnabled;
 
 const bigtime_t kThreadQuantum = 1000;
 const bigtime_t kMinThreadQuantum = 3000;
@@ -1129,6 +1130,8 @@ enqueue(Thread* thread, bool newOne)
 void
 scheduler_enqueue_in_run_queue(Thread *thread)
 {
+	InterruptsSpinLocker _(sSchedulerInternalLock);
+
 	TRACE("enqueueing new thread %ld with static priority %ld\n", thread->id,
 		thread->priority);
 	enqueue(thread, true);
@@ -1156,17 +1159,19 @@ put_back(Thread* thread)
 
 
 /*!	Sets the priority of a thread.
-	Note: thread lock must be held when entering this function
 */
-void
+int32
 scheduler_set_thread_priority(Thread *thread, int32 priority)
 {
+	InterruptsSpinLocker _(sSchedulerInternalLock);
+
 	if (priority == thread->priority)
-		return;
+		return thread->priority;
+
+	int32 oldPriority = thread->priority;
 
 	TRACE("changing thread %ld priority to %ld (old: %ld, effective: %ld)\n",
-		thread->id, priority, thread->priority,
-		get_effective_priority(thread));
+		thread->id, priority, oldPriority, get_effective_priority(thread));
 
 	if (thread->state != B_THREAD_READY) {
 		cancel_penalty(thread);
@@ -1174,7 +1179,7 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 
 		if (thread->state == B_THREAD_RUNNING)
 			update_priority_heaps(thread->cpu->cpu_num, priority);
-		return;
+		return oldPriority;
 	}
 
 	// The thread is in the run queue. We need to remove it and re-insert it at
@@ -1194,8 +1199,9 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 	// set priority and re-insert
 	cancel_penalty(thread);
 	thread->priority = priority;
+	enqueue(thread, true);
 
-	scheduler_enqueue_in_run_queue(thread);
+	return oldPriority;
 }
 
 
@@ -1403,6 +1409,8 @@ update_cpu_performance(Thread* thread, int32 thisCore)
 static void
 _scheduler_reschedule(void)
 {
+	InterruptsSpinLocker internalLocker(sSchedulerInternalLock);
+
 	Thread* oldThread = thread_get_current_thread();
 
 	int32 thisCPU = smp_get_current_cpu();
@@ -1473,6 +1481,8 @@ _scheduler_reschedule(void)
 		nextThread = dequeue_thread(thisCPU);
 	if (!nextThread)
 		panic("reschedule(): run queues are empty!\n");
+	if (nextThread != oldThread)
+		acquire_spinlock(&nextThread->scheduler_lock);
 
 	TRACE("reschedule(): cpu %ld, next thread = %ld\n", thisCPU,
 		nextThread->id);
@@ -1513,6 +1523,7 @@ _scheduler_reschedule(void)
 		} else
 			nextThread->scheduler_data->quantum_start = system_time();
 
+		internalLocker.Unlock();
 		if (nextThread != oldThread)
 			scheduler_switch_thread(oldThread, nextThread);
 	}
@@ -1566,7 +1577,7 @@ scheduler_on_thread_destroy(Thread* thread)
 void
 scheduler_start(void)
 {
-	SpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker _(thread_get_current_thread()->scheduler_lock);
 
 	_scheduler_reschedule();
 }
@@ -1583,7 +1594,7 @@ scheduler_set_operation_mode(scheduler_mode mode)
 	const char* modeNames[] = { "performance", "power saving" };
 	dprintf("scheduler: switching to %s mode\n", modeNames[mode]);
 
-	InterruptsSpinLocker _(gSchedulerLock);
+	InterruptsSpinLocker _(sSchedulerInternalLock);
 
 	sSchedulerMode = mode;
 	switch (mode) {
@@ -1877,6 +1888,7 @@ SchedulerListener::~SchedulerListener()
 void
 scheduler_add_listener(struct SchedulerListener* listener)
 {
+	InterruptsSpinLocker _(gSchedulerListenersLock);
 	gSchedulerListeners.Add(listener);
 }
 
@@ -1886,6 +1898,7 @@ scheduler_add_listener(struct SchedulerListener* listener)
 void
 scheduler_remove_listener(struct SchedulerListener* listener)
 {
+	InterruptsSpinLocker _(gSchedulerListenersLock);
 	gSchedulerListeners.Remove(listener);
 }
 

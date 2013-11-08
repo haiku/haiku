@@ -231,7 +231,7 @@ x86_hardware_interrupt(struct iframe* frame)
 
 	cpu_status state = disable_interrupts();
 	if (thread->cpu->invoke_scheduler) {
-		SpinLocker schedulerLocker(gSchedulerLock);
+		SpinLocker schedulerLocker(thread->scheduler_lock);
 		scheduler_reschedule();
 		schedulerLocker.Unlock();
 		restore_interrupts(state);

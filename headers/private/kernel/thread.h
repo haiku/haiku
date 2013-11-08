@@ -69,6 +69,9 @@ public:
 using BKernel::ThreadCreationAttributes;
 
 
+extern spinlock gThreadCreationLock;
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -243,10 +243,10 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	struct job_control_entry* job_control_entry;
 
 	VMAddressSpace	*address_space;
-	Thread			*main_thread;	// protected by fLock and the scheduler
-									// lock (and the thread's lock), immutable
+	Thread			*main_thread;	// protected by fLock, immutable
 									// after first set
-	Thread			*thread_list;	// protected by fLock and the scheduler lock
+	Thread			*thread_list;	// protected by fLock, signal_lock and
+									// gThreadCreationLock
 	struct team_loading_info *loading_info;	// protected by fLock
 	struct list		image_list;		// protected by sImageMutex
 	struct list		watcher_list;
@@ -270,8 +270,7 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	bigtime_t		cpu_clock_offset;
 	spinlock		time_lock;
 
-	// user group information; protected by fLock, the *_uid/*_gid fields also
-	// by the scheduler lock
+	// user group information; protected by fLock
 	uid_t			saved_set_uid;
 	uid_t			real_uid;
 	uid_t			effective_uid;
@@ -430,6 +429,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
 	struct cpu_ent	*previous_cpu;	// protected by scheduler lock
 	int32			pinned_to_cpu;	// only accessed by this thread or in the
 									// scheduler, when thread is not running
+	spinlock		scheduler_lock;
 
 	sigset_t		sig_block_mask;	// protected by team->signal_lock,
 									// only modified by the thread itself

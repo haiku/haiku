@@ -1064,7 +1064,7 @@ handle_signals(Thread* thread)
 						team->LockTeamAndParent(false);
 
 						team_set_job_control_state(team,
-							JOB_CONTROL_STATE_CONTINUED, signal, false);
+							JOB_CONTROL_STATE_CONTINUED, signal);
 
 						team->UnlockTeamAndParent();
 
@@ -1099,7 +1099,7 @@ handle_signals(Thread* thread)
 						team->LockTeamAndParent(false);
 
 						team_set_job_control_state(team,
-							JOB_CONTROL_STATE_STOPPED, signal, false);
+							JOB_CONTROL_STATE_STOPPED, signal);
 
 						// send a SIGCHLD to the parent (if it does have
 						// SA_NOCLDSTOP defined)
@@ -1128,7 +1128,7 @@ handle_signals(Thread* thread)
 					locker.Unlock();
 
 					if (!resume) {
-						InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+						InterruptsSpinLocker _(thread->scheduler_lock);
 						thread->next_state = B_THREAD_SUSPENDED;
 						scheduler_reschedule();
 					}
@@ -1377,7 +1377,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 
 	if (thread->team == team_get_kernel_team()) {
 		// Signals to kernel threads will only wake them up
-		SpinLocker _(gSchedulerLock);
+		SpinLocker _(thread->scheduler_lock);
 		if (thread->state == B_THREAD_SUSPENDED)
 			scheduler_enqueue_in_run_queue(thread);
 		return B_OK;
@@ -1401,7 +1401,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 				mainThread->AddPendingSignal(SIGKILLTHR);
 
 				// wake up main thread
-				SpinLocker locker(gSchedulerLock);
+				SpinLocker locker(mainThread->scheduler_lock);
 				if (mainThread->state == B_THREAD_SUSPENDED)
 					scheduler_enqueue_in_run_queue(mainThread);
 				else
@@ -1416,7 +1416,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 		case SIGKILLTHR:
 		{
 			// Wake up suspended threads and interrupt waiting ones
-			SpinLocker locker(gSchedulerLock);
+			SpinLocker locker(thread->scheduler_lock);
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
 			else
@@ -1427,7 +1427,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 		case SIGNAL_CONTINUE_THREAD:
 		{
 			// wake up thread, and interrupt its current syscall
-			SpinLocker locker(gSchedulerLock);
+			SpinLocker locker(thread->scheduler_lock);
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
 
@@ -1438,7 +1438,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 		{
 			// Wake up thread if it was suspended, otherwise interrupt it, if
 			// the signal isn't blocked.
-			SpinLocker locker(gSchedulerLock);
+			SpinLocker locker(thread->scheduler_lock);
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
 			else if ((SIGNAL_TO_MASK(SIGCONT) & ~thread->sig_block_mask) != 0)
@@ -1455,7 +1455,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 						& (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD)))
 					!= 0) {
 				// Interrupt thread if it was waiting
-				SpinLocker locker(gSchedulerLock);
+				SpinLocker locker(thread->scheduler_lock);
 				thread_interrupt(thread, false);
 			}
 			break;
@@ -1605,7 +1605,7 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 				mainThread->AddPendingSignal(SIGKILLTHR);
 
 				// wake up main thread
-				SpinLocker _(gSchedulerLock);
+				SpinLocker _(mainThread->scheduler_lock);
 				if (mainThread->state == B_THREAD_SUSPENDED)
 					scheduler_enqueue_in_run_queue(mainThread);
 				else
@@ -1619,7 +1619,7 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 			// don't block the signal.
 			for (Thread* thread = team->thread_list; thread != NULL;
 					thread = thread->team_next) {
-				SpinLocker _(gSchedulerLock);
+				SpinLocker _(thread->scheduler_lock);
 				if (thread->state == B_THREAD_SUSPENDED) {
 					scheduler_enqueue_in_run_queue(thread);
 				} else if ((SIGNAL_TO_MASK(SIGCONT) & ~thread->sig_block_mask)
@@ -1662,7 +1662,7 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 				sigset_t nonBlocked = ~thread->sig_block_mask
 					| SIGNAL_TO_MASK(SIGCHLD);
 				if ((thread->AllPendingSignals() & nonBlocked) != 0) {
-					SpinLocker _(gSchedulerLock);
+					SpinLocker _(thread->scheduler_lock);
 					thread_interrupt(thread, false);
 				}
 			}

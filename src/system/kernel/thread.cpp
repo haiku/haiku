@@ -81,6 +81,8 @@ static thread_id sNextThreadID = 2;
 static int32 sMaxThreads = 4096;
 static int32 sUsedThreads = 0;
 
+spinlock gThreadCreationLock = B_SPINLOCK_INITIALIZER;
+
 
 struct UndertakerEntry : DoublyLinkedListLinkImpl<UndertakerEntry> {
 	Thread*	thread;
@@ -206,6 +208,7 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 	mutex_init_etc(&fLock, lockName, MUTEX_FLAG_CLONE_NAME);
 
 	B_INITIALIZE_SPINLOCK(&time_lock);
+	B_INITIALIZE_SPINLOCK(&scheduler_lock);
 	B_INITIALIZE_RW_SPINLOCK(&team_lock);
 
 	// init name
@@ -713,7 +716,8 @@ common_thread_entry(void* _args)
 		user_debug_thread_scheduled(thread);
 
 	// unlock the scheduler lock and enable interrupts
-	release_spinlock(&gSchedulerLock);
+	release_spinlock(&thread->cpu->previous_thread->scheduler_lock);
+	release_spinlock(&thread->scheduler_lock);
 	enable_interrupts();
 
 	// call the kernel function, if any
@@ -1020,7 +1024,8 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 	// for our own use (and threadReference remains armed).
 
 	ThreadLocker threadLocker(thread);
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+
+	InterruptsSpinLocker threadCreationLocker(gThreadCreationLock);
 	SpinLocker threadHashLocker(sThreadHashLock);
 
 	// check the thread limit
@@ -1028,7 +1033,7 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 		// Clean up the user_thread structure. It's a bit unfortunate that the
 		// Thread destructor cannot do that, so we have to do that explicitly.
 		threadHashLocker.Unlock();
-		schedulerLocker.Unlock();
+		threadCreationLocker.Unlock();
 
 		user_thread* userThread = thread->user_thread;
 		thread->user_thread = NULL;
@@ -1044,6 +1049,7 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 	// make thread visible in global hash/list
 	thread->visible = true;
 	sUsedThreads++;
+
 	scheduler_on_thread_init(thread);
 
 	thread->AcquireReference();
@@ -1060,11 +1066,16 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 		}
 	}
 
-	// insert thread into team
-	insert_thread_into_team(team, thread);
+	{
+		SpinLocker signalLocker(team->signal_lock);
+		SpinLocker timeLocker(team->time_lock);
+
+		// insert thread into team
+		insert_thread_into_team(team, thread);
+	}
 
 	threadHashLocker.Unlock();
-	schedulerLocker.Unlock();
+	threadCreationLocker.Unlock();
 	threadLocker.Unlock();
 	teamLocker.Unlock();
 
@@ -1106,13 +1117,17 @@ undertaker(void* /*args*/)
 		Team* kernelTeam = team_get_kernel_team();
 		TeamLocker kernelTeamLocker(kernelTeam);
 		thread->Lock();
-		InterruptsSpinLocker signalLocker(kernelTeam->signal_lock);
-		SpinLocker schedulerLocker(gSchedulerLock);
+
+		InterruptsSpinLocker threadCreationLocker(gThreadCreationLock);
+		SpinLocker signalLocker(kernelTeam->signal_lock);
+		SpinLocker timeLocker(kernelTeam->time_lock);
 
 		remove_thread_from_team(kernelTeam, thread);
 
-		schedulerLocker.Unlock();
+		timeLocker.Unlock();
 		signalLocker.Unlock();
+		threadCreationLocker.Unlock();
+
 		kernelTeamLocker.Unlock();
 
 		// free the thread structure
@@ -1921,10 +1936,7 @@ thread_exit(void)
 		panic("thread_exit() called with interrupts disabled!\n");
 
 	// boost our priority to get this over with
-	{
-		InterruptsSpinLocker _(gSchedulerLock);
-		scheduler_set_thread_priority(thread, B_URGENT_DISPLAY_PRIORITY);
-	}
+	scheduler_set_thread_priority(thread, B_URGENT_DISPLAY_PRIORITY);
 
 	if (team != kernelTeam) {
 		// Delete all user timers associated with the thread.
@@ -1989,14 +2001,17 @@ thread_exit(void)
 		vm_swap_address_space(team->address_space, VMAddressSpace::Kernel());
 
 		WriteSpinLocker teamLocker(thread->team_lock);
-		SpinLocker schedulerLocker(gSchedulerLock);
+		SpinLocker threadCreationLocker(gThreadCreationLock);
 			// removing the thread and putting its death entry to the parent
 			// team needs to be an atomic operation
 
 		// remember how long this thread lasted
 		bigtime_t now = system_time();
-		InterruptsSpinLocker teamTimeLocker(team->time_lock);
+
+		InterruptsSpinLocker signalLocker(kernelTeam->signal_lock);
+		SpinLocker teamTimeLocker(kernelTeam->time_lock);
 		SpinLocker threadTimeLocker(thread->time_lock);
+
 		thread->kernel_time += now - thread->last_time;
 		thread->last_time = now;
 
@@ -2014,17 +2029,19 @@ thread_exit(void)
 			thread->DeactivateCPUTimeUserTimers();
 
 		threadTimeLocker.Unlock();
-		teamTimeLocker.Unlock();
 
 		// put the thread into the kernel team until it dies
 		remove_thread_from_team(team, thread);
 		insert_thread_into_team(kernelTeam, thread);
 
+		teamTimeLocker.Unlock();
+		signalLocker.Unlock();
+
 		teamLocker.Unlock();
 
 		if (team->death_entry != NULL) {
 			if (--team->death_entry->remaining_threads == 0)
-				team->death_entry->condition.NotifyOne(true, B_OK);
+				team->death_entry->condition.NotifyOne();
 		}
 
 		if (deleteTeam) {
@@ -2032,8 +2049,7 @@ thread_exit(void)
 
 			// Set the team job control state to "dead" and detach the job
 			// control entry from our team struct.
-			team_set_job_control_state(team, JOB_CONTROL_STATE_DEAD, NULL,
-				true);
+			team_set_job_control_state(team, JOB_CONTROL_STATE_DEAD, NULL);
 			death = team->job_control_entry;
 			team->job_control_entry = NULL;
 
@@ -2050,7 +2066,7 @@ thread_exit(void)
 					death = NULL;
 			}
 
-			schedulerLocker.Unlock();
+			threadCreationLocker.Unlock();
 			restore_interrupts(state);
 
 			threadLocker.Unlock();
@@ -2113,7 +2129,7 @@ thread_exit(void)
 				}
 			}
 
-			schedulerLocker.Unlock();
+			threadCreationLocker.Unlock();
 			restore_interrupts(state);
 
 			threadLocker.Unlock();
@@ -2138,7 +2154,7 @@ thread_exit(void)
 	ThreadLocker threadLocker(thread);
 
 	state = disable_interrupts();
-	SpinLocker schedulerLocker(gSchedulerLock);
+	SpinLocker threadCreationLocker(gThreadCreationLock);
 
 	// mark invisible in global hash/list, so it's no longer accessible
 	SpinLocker threadHashLocker(sThreadHashLock);
@@ -2156,7 +2172,7 @@ thread_exit(void)
 	select_info* selectInfos = thread->select_infos;
 	thread->select_infos = NULL;
 
-	schedulerLocker.Unlock();
+	threadCreationLocker.Unlock();
 	restore_interrupts(state);
 
 	threadLocker.Unlock();
@@ -2243,7 +2259,7 @@ thread_exit(void)
 	sUndertakerCondition.NotifyOne();
 	undertakerLocker.Unlock();
 
-	schedulerLocker.Lock();
+	SpinLocker schedulerLocker(thread->scheduler_lock);
 	thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
 	scheduler_reschedule();
 
@@ -2392,7 +2408,7 @@ thread_yield(void)
 	if (thread == NULL)
 		return;
 
-	InterruptsSpinLocker _(gSchedulerLock);
+	InterruptsSpinLocker _(thread->scheduler_lock);
 
 	thread->has_yielded = true;
 	scheduler_reschedule();
@@ -2604,7 +2620,6 @@ thread_get_io_priority(thread_id id)
 	int32 priority = thread->io_priority;
 	if (priority < 0) {
 		// negative I/O priority means using the (CPU) priority
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 		priority = thread->priority;
 	}
 
@@ -2798,7 +2813,7 @@ thread_block_timeout(timer* timer)
 status_t
 thread_block()
 {
-	InterruptsSpinLocker _(gSchedulerLock);
+	InterruptsSpinLocker _(thread_get_current_thread()->scheduler_lock);
 	return thread_block_locked(thread_get_current_thread());
 }
 
@@ -2835,7 +2850,7 @@ thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout)
 {
 	Thread* thread = thread_get_current_thread();
 
-	InterruptsSpinLocker locker(gSchedulerLock);
+	InterruptsSpinLocker locker(thread->scheduler_lock);
 
 	if (thread->wait.status != 1)
 		return thread->wait.status;
@@ -2881,7 +2896,7 @@ thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout)
 void
 thread_unblock(Thread* thread, status_t status)
 {
-	InterruptsSpinLocker _(gSchedulerLock);
+	InterruptsSpinLocker locker(thread->scheduler_lock);
 	thread_unblock_locked(thread, status);
 }
 
@@ -2902,7 +2917,7 @@ user_unblock_thread(thread_id threadID, status_t status)
 	if (thread->user_thread == NULL)
 		return B_NOT_ALLOWED;
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker locker(thread->scheduler_lock);
 
 	if (thread->user_thread->wait_status > 0) {
 		thread->user_thread->wait_status = status;
@@ -3005,7 +3020,7 @@ _get_thread_info(thread_id id, thread_info *info, size_t size)
 	ThreadLocker threadLocker(thread, true);
 
 	// fill the info -- also requires the scheduler lock to be held
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker locker(thread->scheduler_lock);
 
 	fill_thread_info(thread, info, size);
 
@@ -3055,7 +3070,7 @@ _get_next_thread_info(team_id teamID, int32 *_cookie, thread_info *info,
 	*_cookie = lastID;
 
 	ThreadLocker threadLocker(thread);
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker locker(thread->scheduler_lock);
 
 	fill_thread_info(thread, info, size);
 
@@ -3121,8 +3136,6 @@ rename_thread(thread_id id, const char* name)
 status_t
 set_thread_priority(thread_id id, int32 priority)
 {
-	int32 oldPriority;
-
 	// make sure the passed in priority is within bounds
 	if (priority > THREAD_MAX_SET_PRIORITY)
 		priority = THREAD_MAX_SET_PRIORITY;
@@ -3140,12 +3153,7 @@ set_thread_priority(thread_id id, int32 priority)
 	if (thread_is_idle_thread(thread))
 		return B_NOT_ALLOWED;
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
-	oldPriority = thread->priority;
-	scheduler_set_thread_priority(thread, priority);
-
-	return oldPriority;
+	return scheduler_set_thread_priority(thread, priority);
 }
 
 

@@ -440,7 +440,7 @@ finish_debugger_change(Team* team)
 	ConditionVariable* condition = team->debug_info.debugger_changed_condition;
 	team->debug_info.debugger_changed_condition = NULL;
 
-	condition->NotifyAll(false);
+	condition->NotifyAll();
 }
 
 
@@ -2901,7 +2901,7 @@ _user_debug_thread(thread_id threadID)
 
 	// resume/interrupt the thread, if necessary
 	threadDebugInfoLocker.Unlock();
-	SpinLocker schedulerLocker(gSchedulerLock);
+	SpinLocker schedulerLocker(thread->scheduler_lock);
 
 	switch (thread->state) {
 		case B_THREAD_SUSPENDED:
@@ -2916,6 +2916,10 @@ _user_debug_thread(thread_id threadID)
 				// about to acquire a semaphore (before
 				// thread_prepare_to_block()), we won't interrupt it.
 				// Maybe we should rather send a signal (SIGTRAP).
+			schedulerLocker.Unlock();
+
+			schedulerLocker.SetTo(thread_get_current_thread()->scheduler_lock,
+				false);
 			scheduler_reschedule_if_necessary_locked();
 			break;
 	}

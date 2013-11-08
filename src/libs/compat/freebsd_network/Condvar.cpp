@@ -77,5 +77,5 @@ publishedConditionTimedWait(const void* waitChannel, const int timeout)
 void
 publishedConditionNotifyAll(const void* waitChannel)
 {
-	ConditionVariable::NotifyAll(waitChannel);
+	ConditionVariable::NotifyAll(waitChannel, B_OK);
 }

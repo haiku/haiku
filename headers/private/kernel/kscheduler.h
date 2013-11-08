@@ -24,15 +24,13 @@ typedef enum scheduler_mode {
 	SCHEDULER_MODE_COUNT
 } scheduler_mode;
 
-extern spinlock gSchedulerLock;
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*!	Enqueues the thread in the ready-to-run queue.
-	The caller must hold the scheduler lock (with disabled interrupts).
+	The caller must hold the enqueued thread \c scheduler_lock.
 */
 void scheduler_enqueue_in_run_queue(Thread* thread);
 
@@ -42,15 +40,14 @@ void scheduler_enqueue_in_run_queue(Thread* thread);
 	If it's the same thread, the thread will just continue to run.
 	In either case, unless the thread is dead or is sleeping/waiting
 	indefinitely, the function will eventually return.
-	The caller must hold the scheduler lock (with disabled interrupts).
+	The caller must hold the current thread \c scheduler_lock.
 */
 void scheduler_reschedule(void);
 
 /*!	Sets the given thread's priority.
 	The thread may be running or may be in the ready-to-run queue.
-	The caller must hold the scheduler lock (with disabled interrupts).
 */
-void scheduler_set_thread_priority(Thread* thread, int32 priority);
+int32 scheduler_set_thread_priority(Thread* thread, int32 priority);
 
 /*!	Called when the Thread structure is first created.
 	Per-thread housekeeping resources can be allocated.
@@ -61,7 +58,6 @@ status_t scheduler_on_thread_create(Thread* thread, bool idleThread);
 /*!	Called when a Thread structure is initialized and made ready for
 	use.
 	The per-thread housekeeping data structures are reset, if needed.
-	The caller must hold the scheduler lock (with disabled interrupts).
 */
 void  scheduler_on_thread_init(Thread* thread);
 
@@ -75,8 +71,6 @@ void scheduler_on_thread_destroy(Thread* thread);
 /*!	Called in the early boot process to start thread scheduling on the
 	current CPU.
 	The function is called once for each CPU.
-	Interrupts must be disabled, but the caller must not hold the scheduler
-	lock.
 */
 void scheduler_start(void);
 
@@ -122,11 +116,14 @@ scheduler_reschedule_if_necessary()
 {
 	if (are_interrupts_enabled()) {
 		cpu_status state = disable_interrupts();
-		acquire_spinlock(&gSchedulerLock);
+
+		Thread* thread = get_cpu_struct()->running_thread;
+		acquire_spinlock(&thread->scheduler_lock);
 
 		scheduler_reschedule_if_necessary_locked();
 
-		release_spinlock(&gSchedulerLock);
+		release_spinlock(&thread->scheduler_lock);
+
 		restore_interrupts(state);
 	}
 }

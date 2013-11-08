@@ -45,6 +45,8 @@ scheduler_switch_thread(Thread* fromThread, Thread* toThread)
 	arch_thread_set_current_thread(toThread);
 	arch_thread_context_switch(fromThread, toThread);
 
+	release_spinlock(&fromThread->cpu->previous_thread->scheduler_lock);
+
 	// The use of fromThread below looks weird, but is correct. fromThread had
 	// been unscheduled earlier, but is back now. For a thread scheduled the
 	// first time the same is done in thread.cpp:common_thread_entry().
