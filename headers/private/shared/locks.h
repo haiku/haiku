@@ -18,6 +18,7 @@ typedef struct mutex {
 } mutex;
 
 #define MUTEX_FLAG_CLONE_NAME		0x1
+#define MUTEX_FLAG_ADAPTIVE			0x2
 #define MUTEX_INITIALIZER(name)		{ name, 0, 0 }
 
 void		mutex_init(mutex *lock, const char *name);

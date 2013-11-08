@@ -362,7 +362,7 @@ hoardUnsbrk(void *ptr, long size)
 void
 hoardLockInit(hoardLockType &lock, const char *name)
 {
-	mutex_init(&lock, name);
+	mutex_init_etc(&lock, name, MUTEX_FLAG_ADAPTIVE);
 }
 
 
