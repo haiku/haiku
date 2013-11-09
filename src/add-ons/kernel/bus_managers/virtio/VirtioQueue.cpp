@@ -85,6 +85,7 @@ TransferDescriptor::TransferDescriptor(VirtioQueue* queue, uint16 indirectMaxSiz
 	fIndirect(NULL),
 	fAreaSize(0),
 	fArea(-1),
+	fPhysAddr(0),
 	fDescriptorCount(0)
 {
 	fStatus = B_OK;
