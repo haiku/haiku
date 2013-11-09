@@ -124,6 +124,9 @@ ethernet_init(const char *name, net_device **_device)
 		|| !strcmp(name, "/dev/net/userland_server"))
 		return B_BAD_VALUE;
 
+	if (access(name, F_OK) != 0)
+		return errno;
+
 	status_t status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
 	if (status < B_OK)
 		return status;
