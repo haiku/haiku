@@ -27,14 +27,14 @@ Update time interval:	SettingsWindow		Интервал обновления:
 TX	DataSource	Shorter version for Sending	Передача
 Quit	ActivityWindow		Выход
 Block cache memory	DataSource		Память блокового кэша
-%.1f KiB/s	DataSource		%.1f КиБ/с
+%.1f KiB/s	DataSource		%.1f КБ/с
 Remove graph	ActivityView		Удалить график
 %lld sec.	SettingsWindow		%lld сек.
 %lld ms	SettingsWindow		%lld мс
 CPU usage	DataSource		Использование ЦПУ
 Raw clipboard	DataSource		Полный буфер обмена
 Sems	DataSource		Семафоры
-%.1f MiB	DataSource		%.1f МиБ
+%.1f MiB	DataSource		%.1f МБ
 ActivityMonitor	System name		Монитор активности
 Running applications	DataSource		Запущенные приложения
 Semaphores	DataSource		Семафоры

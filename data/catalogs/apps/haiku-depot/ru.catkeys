@@ -30,7 +30,7 @@ Size	PackageListView		Размер
 Games	Model		Игры
 Rating	PackageListView		Оценка
 Downloading	Model		Загружаемые
-%ld items	PackageListView		%ld объектов
+%ld items	PackageListView		объектов: %ld
 Graphics	Model		Графика
 Local	MainWindow		Локальные
 Close	MainWindow		Закрыть
@@ -43,7 +43,7 @@ Unknown	PackageListView		Неизвестно
 All depots	FilterView		Все склады
 Available	PackageListView		Доступен
 n/a	PackageInfoView		н/д
-Show	FilterView		Все пакеты:
+Show	FilterView		Все пакеты
 Uninstalled packages	Model		Удаленные пакеты
 Audio	Model		Аудио
 About	PackageInfoView		О программе

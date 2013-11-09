@@ -15,7 +15,7 @@ None of the files you wanted to play appear to be media files.	MediaPlayer-Main	
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Lejátszási lista mentése sikertelen.\n\nHiba:
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 New player…	MediaPlayer-Main		Új lejátszó…
-100% scale	MediaPlayer-Main		100%-os méretezés
+100% scale	MediaPlayer-Main		100%-os méret
 Subtitle placement:	MediaPlayer-SettingsWindow		Felirat helye:
 Close	MediaPlayer-Main		Bezárás
 Display Mode	MediaPlayer-InfoWin		Megjelenítési mód
@@ -104,7 +104,7 @@ unknown format	MediaPlayer-InfoWin		ismeretlen formátum
 Skip to the next track.	MediaPlayer-Main		Ugrás a következő számra.
 Play	MediaPlayer-Main		Lejátszás
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Bejegyzések Szemetesbe helyezése
-200% scale	MediaPlayer-Main		200%-es méret
+200% scale	MediaPlayer-Main		200%-os méret
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Úgy tűnik a médiakiszolgáló nem fut.\nEl kívánja indítani?
 Duration	MediaPlayer-InfoWin		Időtartam
 Aspect ratio	MediaPlayer-Main		Képarány
