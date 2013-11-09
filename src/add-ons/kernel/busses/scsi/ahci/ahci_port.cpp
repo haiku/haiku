@@ -615,11 +615,21 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 		fSectorCount = ataData.SectorCount(fUse48BitCommands, true);
 		fSectorSize = ataData.SectorSize();
 		fTrimSupported = ataData.data_set_management_support;
+		fMaxTrimRangeBlocks = B_LENDIAN_TO_HOST_INT16(
+			ataData.max_data_set_management_lba_range_blocks);
 		TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %" B_PRIu32
 			", sectors48 %" B_PRIu64 ", size %" B_PRIu64 "\n",
 			ataData.dma_supported != 0, ataData.lba48_supported != 0,
 			fUse48BitCommands, ataData.lba_sector_count,
 			ataData.lba48_sector_count, fSectorCount * fSectorSize);
+		if (fTrimSupported) {
+			bool deterministic = ataData.supports_deterministic_read_after_trim;
+			TRACE("trim supported, %" B_PRIu32 " ranges blocks, reads are "
+				"%sdeterministic%s.\n", fMaxTrimRangeBlocks,
+				deterministic ? "" : "non-", deterministic
+					? (ataData.supports_read_zero_after_trim
+						? ", zero" : ", random") : "");
+		}
 	}
 
 #if 0
@@ -803,8 +813,6 @@ AHCIPort::ScsiReadWrite(scsi_ccb* request, uint64 lba, size_t sectorCount,
 void
 AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 {
-	TRACE("%s unimplemented: TRIM call\n", __func__);
-
 	// Determine how many ranges we'll need
 	// We assume that the SCSI unmap ranges cannot be merged together
 	uint32 scsiRangeCount = B_BENDIAN_TO_HOST_INT16(
@@ -851,7 +859,7 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 	sreq.WaitForCompletion();
 
 	if ((sreq.CompletionStatus() & ATA_ERR) != 0) {
-		TRACE("trim failed (%" B_PRIu32 " ranges)!", lbaRangeCount);
+		TRACE("trim failed (%" B_PRIu32 " ranges)!\n", lbaRangeCount);
 		request->subsys_status = SCSI_REQ_CMP_ERR;
 	} else
 		request->subsys_status = SCSI_REQ_CMP;

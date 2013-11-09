@@ -74,6 +74,7 @@ private:
 	bool							fResetPort;
 	bool							fError;
 	bool							fTrimSupported;
+	uint32							fMaxTrimRangeBlocks;
 
 	volatile fis *					fFIS;
 	volatile command_list_entry *	fCommandList;

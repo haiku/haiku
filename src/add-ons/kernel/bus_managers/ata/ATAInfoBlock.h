@@ -124,7 +124,21 @@ typedef struct ata_device_infoblock {
 	uint16	recommended_multiword_dma_cycle_time;
 	uint16	min_pio_cycle_time;
 	uint16	min_pio_cycle_time_io_ready;
-	uint16	word_69_70_reserved[2];
+	LBITFIELD12(
+		word_69_bit_0_4_reserved				: 5,
+		supports_read_zero_after_trim			: 1,
+		supports_ata28_commands					: 1,
+		word_69_bit_7_reserved					: 1,
+		supports_download_microcode_dma			: 1,
+		supports_set_max_password_unlock_dma	: 1,
+		supports_write_buffer_dma				: 1,
+		supports_read_buffer_dma				: 1,
+		supports_device_configuration_identify_dma		: 1,
+		supports_long_physical_sector_error_reporting	: 1,
+		supports_deterministic_read_after_trim	: 1,
+		supports_cfast_specification			: 1
+	);
+	uint16	word_70_reserved;
 	uint16	atapi_packet_received_to_bus_release_time_ns;
 	uint16	atapi_service_command_to_busy_clear_time_ns;
 	uint16	word_71_74_reserved[2];
@@ -136,10 +150,9 @@ typedef struct ata_device_infoblock {
 
 	uint16	word_76_79_reserved[4];
 
-	LBITFIELD15(
+	LBITFIELD14(
 		word_80_bit_0_reserved					: 1,
-		word_80_bot_1_2_obsolete				: 2,
-		supports_ata_3							: 1,
+		word_80_bit_1_3_obsolete				: 3,
 		supports_ata_atapi_4					: 1,
 		supports_ata_atapi_5					: 1,
 		supports_ata_atapi_6					: 1,
@@ -294,7 +307,8 @@ typedef struct ata_device_infoblock {
 
 	uint16	word_95_99_reserved[5];
 	uint64	lba48_sector_count;
-	uint16	word_104_105_reserved[2];
+	uint16	word_104_reserved;
+	uint16	max_data_set_management_lba_range_blocks;
 
 	LBITFIELD6(
 		logical_sectors_per_physical_sector		: 4,	// 2^x exponent
