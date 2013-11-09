@@ -225,7 +225,7 @@ scsi_scan_lun(scsi_bus_info *bus, uchar target_id, uchar target_lun)
 	//   the bus_manager should really take care of
 	res = scsi_register_device(bus, target_id, target_lun, &new_inquiry_data);
 	if (res == B_NAME_IN_USE) {
-		SHOW_FLOW0(3, "name in use");			
+		SHOW_FLOW0(3, "name in use");
 		if (scsi_force_get_device(bus, target_id, target_lun, &device) != B_OK)
 			return B_OK;
 		// the device was already registered, let's tell our child to rescan it
@@ -282,14 +282,14 @@ scsi_scan_bus(scsi_bus_info *bus)
 		// anything but LUN 0, so we should probably add a black-list
 		// or something
 		for (lun = 0; lun <= MAX_LUN_ID; ++lun) {
-			status_t res;
+			status_t status;
 
 			SHOW_FLOW(3, "lun: %d", lun);
 
-			res = scsi_scan_lun(bus, target_id, lun);
+			status = scsi_scan_lun(bus, target_id, lun);
 
 			// if there is no device at lun 0, there's probably no device at all
-			if (lun == 0 && res != SCSI_REQ_CMP)
+			if (lun == 0 && status != B_OK)
 				break;
 		}
 	}
