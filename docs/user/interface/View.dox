@@ -561,6 +561,8 @@ SetViewColor(Parent()->ViewColor());
 	\c B_SUPPORTS_LAYOUT is automatically set to the view. The view flags can be
 	set after the view has been constructed by calling the SetFlags() methods.
 
+	\note This method was not available in BeOS R5.
+
 	\param name The name of the view, can be \c NULL.
 	\param flags The view flags, a mask of one or more of the following:
 	       - \c B_FULL_UPDATE_ON_RESIZE Redraw the entire view on resize.
@@ -598,8 +600,7 @@ SetViewColor(Parent()->ViewColor());
 
 	\param frame The \a frame rectangle of the view.
 	\param name The name of the view, can be \c NULL.
-	\param resizingMode Defines the view's behavior of the when its parent is
-	       resized.
+	\param resizingMode Defines the view's behavior when its parent is resized.
 	       \n\n It combines one of the following horizontal resizing constants:
 	       \li \c B_FOLLOW_TOP The margin between the top of the view and the top
 	           of its parent remains constant.
@@ -718,8 +719,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::AttachedToWindow()
-	\brief Hook method that is called when the object is attached to a
-		window.
+	\brief Hook method called when the object is attached to a window.
 
 	The default implementation does nothing.
 */
@@ -728,7 +728,7 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::AllAttached()
 	\brief Similar to AttachedToWindow() but this method is triggered after
-		all child views have already been attached to a window.
+	       all child views have already been attached to a window.
 
 	The default implementation does nothing.
 */
@@ -736,8 +736,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::DetachedFromWindow()
-	\brief Hook method that is called when the object is detached from a
-		window.
+	\brief Hook method called when the object is detached from a window.
 
 	The default implementation does nothing.
 */
@@ -746,7 +745,7 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::AllDetached()
 	\brief Similar to AttachedToWindow() but this method is triggered after
-		all child views have already been detached from a window.
+	       all child views have already been detached from a window.
 
 	The default implementation does nothing.
 */
@@ -771,7 +770,7 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::DrawAfterChildren(BRect updateRect)
 	\brief Perform any drawing that needs to be done after child view have
-		already been drawn.
+	       already been drawn.
 
 	\param updateRect The rectangular area to drawn in.
 
@@ -781,10 +780,10 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::FrameMoved(BPoint newPosition)
-	\brief Hook method that gets called when the view is moved.
+	\brief Hook method called when the view is moved.
 
 	\param newPosition The point of the top left corner of the frame
-		that the view has been moved to.
+	       that the view has been moved to.
 
 	The default implementation does nothing.
 */
@@ -792,7 +791,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::FrameResized(float newWidth, float newHeight)
-	\brief Hook method that gets called when the view is resized.
+	\brief Hook method called when the view is resized.
 
 	\param newWidth The new \a width of the view.
 	\param newHeight The new \a height of the view.
@@ -803,7 +802,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::KeyDown(const char* bytes, int32 numBytes)
-	\brief Hook method that is called when a keyboard key is pressed.
+	\brief Hook method called when a keyboard key is pressed.
 
 	\param bytes The bytes of the key combination pressed.
 	\param numBytes The number of bytes in \a bytes.
@@ -814,7 +813,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::KeyUp(const char* bytes, int32 numBytes)
-	\brief Hook method that is called when a keyboard key is released.
+	\brief Hook method called when a keyboard key is released.
 
 	\param bytes The bytes of the key combination pressed.
 	\param numBytes The number of bytes in \a bytes.
@@ -825,7 +824,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::LayoutInvalidated(bool descendants)
-	\brief Hook method that is called when the layout is invalidated.
+	\brief Hook method called when the layout is invalidated.
 
 	\note This method was not available in BeOS R5.
 
@@ -847,10 +846,10 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::MouseDown(BPoint where)
-	\brief Hook method that is called when a mouse button is pressed.
+	\brief Hook method called when a mouse button is pressed.
 
 	\param where The point on the screen where to mouse pointer is when
-		the mouse button is pressed.
+	       the mouse button is pressed.
 
 	The default implementation does nothing.
 */
@@ -858,10 +857,10 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::MouseUp(BPoint where)
-	\brief Hook method that is called when a mouse button is released.
+	\brief Hook method called when a mouse button is released.
 
 	\param where The point on the screen where to mouse pointer is when
-		the mouse button is released.
+	       the mouse button is released.
 
 	The default implementation does nothing.
 */
@@ -870,7 +869,7 @@ SetViewColor(Parent()->ViewColor());
 /*!
 	\fn void BView::MouseMoved(BPoint where, uint32 code,
 		const BMessage* a_message)
-	\brief Hook method that is called when the mouse is moved.
+	\brief Hook method called when the mouse is moved.
 
 	The default implementation does nothing.
 */
@@ -878,7 +877,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::Pulse()
-	\brief Hook method that gets called when the view receives a \c B_PULSE
+	\brief Hook method called when the view receives a \c B_PULSE
 	       message.
 
 	An action is performed each time the App Server calls the Pulse() method. 
@@ -886,9 +885,9 @@ SetViewColor(Parent()->ViewColor());
 	anything you want. The default version does nothing. The pulse granularity
 	is no better than once per 100,000 microseconds.
 
-	The default implementation does nothing.
-
 	\sa SetPulseRate()
+
+	The default implementation does nothing.
 */
 
 
@@ -897,21 +896,21 @@ SetViewColor(Parent()->ViewColor());
 	\brief Hook method called when the view becomes the target of
 	       \a scrollView.
 
-	The default implementation does nothing.
-
 	\param scrollView The BScrollView object that has targeted the view.
+
+	The default implementation does nothing.
 */
 
 
 /*!
 	\fn void BView::WindowActivated(bool state)
-	\brief Hook method called when the attached window becomes activated or
+	\brief Hook method called when the attached window is activated or
 	       deactivated.
 
-	The default implementation does nothing.
-
 	\param state \c true if the window becomes activated, \c false if the
-		window becomes deactivated.
+	       window becomes deactivated.
+
+	The default implementation does nothing.
 */
 
 
@@ -1290,6 +1289,9 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::ResizeToPreferred()
 	\brief Resizes the view to its preferred size keeping the left top corner
 	       constant.
+
+	\warning It is not recommended to use this method for views that are part of
+	         a BLayout.
 */
 
 
@@ -1418,7 +1420,7 @@ SetViewColor(Parent()->ViewColor());
 	MakeFocus() on the previously focused view with \a focusState set to
 	\c false.
 
-	The focus doesn't automatically change when MouseDown is called so calling
+	The focus doesn't automatically change when MouseDown() is called so calling
 	MakeFocus() is the only way to make a view the focus view of a window.
 	Classes derived from BView that can display the current selection, or that
 	can accept pasted data should call MakeFocus() in their MouseDown() method
@@ -3470,7 +3472,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::SetExplicitMinSize(BSize size)
-	\brief Set this item's explicit min size, to be used by MinSize().
+	\brief Set this view's min size, to be used by MinSize().
 
 	\sa BAbstractLayout::SetExplicitMinSize()
 */
@@ -3478,7 +3480,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::SetExplicitMaxSize(BSize size)
-	\brief Set this item's explicit max size, to be used by MaxSize().
+	\brief Set this view's max size, to be used by MaxSize().
 
 	\sa BAbstractLayout::SetExplicitMaxSize()
 */
@@ -3486,8 +3488,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::SetExplicitPreferredSize(BSize size)
-	\brief Set this item's explicit preferred size, to be used by
-		PreferredSize().
+	\brief Set this view's preferred size, to be used by PreferredSize().
 
 	\sa BAbstractLayout::SetExplicitPreferredSize()
 */
@@ -3495,7 +3496,7 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::SetExplicitAlignment(BAlignment alignment)
-	\brief Set this item's explicit alignment, to be used by Alignment().
+	\brief Set this view's alignment, to be used by Alignment().
 
 	\sa BAbstractLayout::SetExplicitAlignment()
 */
