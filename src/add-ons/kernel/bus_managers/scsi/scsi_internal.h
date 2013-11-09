@@ -90,6 +90,7 @@ typedef struct scsi_bus_info {
 
 	uchar path_id;				// SCSI path id
 	uint32 max_target_count;	// maximum count of target_ids on the bus
+	uint32 max_lun_count;		// maximum count of lun_ids on the bus
 
 	thread_id service_thread;	// service thread
 	sem_id start_service;		// released whenever service thread has work to do

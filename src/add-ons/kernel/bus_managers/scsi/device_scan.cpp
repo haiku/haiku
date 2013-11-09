@@ -251,18 +251,16 @@ err:
 status_t
 scsi_scan_bus(scsi_bus_info *bus)
 {
-	int initiator_id, target_id;
 	scsi_path_inquiry inquiry;
-	uchar res;
 
 	SHOW_FLOW0( 3, "" );
 
 	// get ID of initiator (i.e. controller)
-	res = scsi_inquiry_path(bus, &inquiry);
+	uchar res = scsi_inquiry_path(bus, &inquiry);
 	if (res != SCSI_REQ_CMP)
 		return B_ERROR;
 
-	initiator_id = inquiry.initiator_id;
+	uint initiator_id = inquiry.initiator_id;
 
 	SHOW_FLOW(3, "initiator_id=%d", initiator_id);
 
@@ -270,9 +268,7 @@ scsi_scan_bus(scsi_bus_info *bus)
 	// as this function is optional for SIM, we ignore its result
 	bus->interface->scan_bus(bus->sim_cookie);
 
-	for (target_id = 0; target_id < (int)bus->max_target_count; ++target_id) {
-		int lun;
-
+	for (uint target_id = 0; target_id < bus->max_target_count; ++target_id) {
 		SHOW_FLOW(3, "target: %d", target_id);
 
 		if (target_id == initiator_id)
@@ -281,12 +277,10 @@ scsi_scan_bus(scsi_bus_info *bus)
 		// TODO: there are a lot of devices out there that go mad if you probe
 		// anything but LUN 0, so we should probably add a black-list
 		// or something
-		for (lun = 0; lun <= MAX_LUN_ID; ++lun) {
-			status_t status;
-
+		for (uint lun = 0; lun < bus->max_lun_count; ++lun) {
 			SHOW_FLOW(3, "lun: %d", lun);
 
-			status = scsi_scan_lun(bus, target_id, lun);
+			status_t status = scsi_scan_lun(bus, target_id, lun);
 
 			// if there is no device at lun 0, there's probably no device at all
 			if (lun == 0 && status != B_OK)

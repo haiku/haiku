@@ -288,6 +288,8 @@ typedef struct {
 
 // maximum targets on scsi bus
 #define SCSI_DEVICE_MAX_TARGET_COUNT "scsi/max_target_count"
+// maximum luns on scsi bus
+#define SCSI_DEVICE_MAX_LUN_COUNT "scsi/max_lun_count"
 
 // directory containing links to peripheral drivers
 #define SCSI_PERIPHERAL_DRIVERS_DIR "scsi"

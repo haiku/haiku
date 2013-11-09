@@ -101,6 +101,15 @@ scsi_create_bus(device_node *node, uint8 path_id)
 
 	if (pnp->get_attr_uint32(node, SCSI_DEVICE_MAX_TARGET_COUNT, &bus->max_target_count, true) != B_OK)
 		bus->max_target_count = MAX_TARGET_ID + 1;
+	if (pnp->get_attr_uint32(node, SCSI_DEVICE_MAX_LUN_COUNT, &bus->max_lun_count, true) != B_OK)
+		bus->max_lun_count = MAX_LUN_ID + 1;
+
+	// our scsi_ccb only has a uchar for target_id
+	if (bus->max_target_count > 256)
+		bus->max_target_count = 256;
+	// our scsi_ccb only has a uchar for target_lun
+	if (bus->max_lun_count > 256)
+		bus->max_lun_count = 256;
 
 	bus->node = node;
 	bus->lock_count = bus->blocked[0] = bus->blocked[1] = 0;

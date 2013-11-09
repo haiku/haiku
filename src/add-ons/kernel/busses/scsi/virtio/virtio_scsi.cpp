@@ -205,6 +205,7 @@ virtio_scsi_register_device(device_node *parent)
 		return status;
 
 	uint32 max_targets = config.max_target + 1;
+	uint32 max_luns = config.max_lun + 1;
 	uint32 max_blocks = 0x10000;
 	if (config.max_sectors != 0)
 		max_blocks = config.max_sectors;
@@ -212,6 +213,8 @@ virtio_scsi_register_device(device_node *parent)
 	device_attr attrs[] = {
 		{ SCSI_DEVICE_MAX_TARGET_COUNT, B_UINT32_TYPE,
 			{ ui32: max_targets }},
+		{ SCSI_DEVICE_MAX_LUN_COUNT, B_UINT32_TYPE,
+			{ ui32: max_luns }},
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
 			{ string: VIRTIO_SCSI_BRIDGE_PRETTY_NAME }},
 
