@@ -157,14 +157,17 @@ Hub::ResetPort(uint8 index)
 		if (result < B_OK)
 			return result;
 
-		if (fPortStatus[index].change & PORT_STATUS_RESET) {
+		if ((fPortStatus[index].change & PORT_STATUS_RESET) != 0
+			|| (fPortStatus[index].status & PORT_STATUS_RESET) == 0) {
 			// reset is done
 			break;
 		}
 	}
 
-	if ((fPortStatus[index].change & PORT_STATUS_RESET) == 0) {
-		TRACE_ERROR("port %d won't reset\n", index);
+	if ((fPortStatus[index].change & PORT_STATUS_RESET) == 0
+			&& (fPortStatus[index].status & PORT_STATUS_RESET) != 0) {
+		TRACE_ERROR("port %d won't reset (%#x, %#x)\n", index,
+			fPortStatus[index].change, fPortStatus[index].status);
 		return B_ERROR;
 	}
 
