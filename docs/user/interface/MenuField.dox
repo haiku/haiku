@@ -1,0 +1,420 @@
+/*
+ * Copyright 2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/MenuField.h	 hrev46323
+ *		src/kits/interface/MenuField.cpp	 hrev46323
+ */
+
+
+/*!
+	\file MenuField.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BMenuField class definition and support structures.
+*/
+
+
+/*!
+	\class BMenuField
+	\ingroup interface
+	\ingroup libbe
+	\brief A labeled pop-up menu.
+
+	A menu field consists of a label and a menu bar. The label, if used, is
+	located to the left of the menu bar. The frame rectangle is divided
+	in half by default. You can call SetDivider() to change the ratio used by
+	the label and menu bar.
+
+	\image html BMenuField_example.png
+
+	A fixed-size menu field's menu bar width and height are limited
+	by the bounds set by the divider position and \a frame rectangle.
+
+	A variable-size menu field's menu bar is only as wide as it needs to
+	be in order to fit the currently selected menu item, and it's height
+	depends on the user's menu font size preference. The height of the
+	frame rectangle is ignored.
+
+	If a menu field's frame rectangle is less than 20 pixels wide, the width
+	is unbounded, the menu bar grows as wide as it needs to in order to fit
+	the currently selected item. If the frame rectangle is wider than 20
+	pixels then the divider position and the width of the frame rectangle set
+	the maximum menu bar width.
+
+	\remark Layout-enabled menu field's are always fixed-size, however, you can
+	        make them act like variable-size menu fields by adding them to a
+	        horizontal group followed by glue.
+
+	If you're using the menu field as part of a BLayout you can get better
+	control over the placement of the label and menu bar by splitting the
+	label and menu field into separate BLayoutItem objects using the
+	CreateLabelLayoutItem() and CreateMenuBarLayoutItem() methods.
+
+	You must pass a menu object into the constructor containing the choices
+	the user can select from. The menu is owned by the menu field and its
+	memory will be freed when the menu field is deleted. A BPopUpMenu is
+	typically used instead of a regular BMenu because it opens directly
+	underneath the mouse pointer and is set to radio mode and
+	label-from-marked mode by default, but, this is entirely up to you.
+*/
+
+
+/*!
+	\fn BMenuField::BMenuField(BRect frame, const char* name, const char* label,
+		BMenu* menu, uint32 resizingMode, uint32 flags)
+	\brief Creates a new variable-size BMenuField object.
+
+	\param frame The \a frame rectangle of the menu field including the label.
+	\param name The \a name of the menu field, internal only, can be \c NULL.
+	\param label The \a label shown to the user, can be blank.
+	\param menu The \a menu of choices shown to the user, typically a BPopUpMenu.
+	\param resizingMode Defines the menu field's behavior when its parent is
+	       resized, see BView for details.
+	\param flags The view flags, see BView for details.
+*/
+
+
+/*!
+	\fn BMenuField::BMenuField(BRect frame, const char* name, const char* label,
+		BMenu* menu, bool fixedSize, uint32 resizingMode, uint32 flags)
+	\brief Creates a new BMenuField object. This constructor allows a you to
+	       create either a fixed-size or variable-size menu field.
+
+	\param frame The \a frame rectangle of the menu field including the label.
+	\param name The \a name of the menu field, internal only, can be \c NULL.
+	\param label The \a label shown to the user, can be blank.
+	\param menu The \a menu of choices shown to the user, typically a BPopUpMenu.
+	\param fixedSize \c true for fixed-size, \c false for variable-size.
+	\param resizingMode Defines the menu field's behavior when its parent is
+	       resized, see BView for details.
+	\param flags The view flags, see BView for details.
+*/
+
+
+/*!
+	\fn BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
+		uint32 flags)
+	\brief Creates a new BMenuField object suitable as part of a BLayout.
+
+	\note This method was not available in BeOS R5.
+
+	\param name The \a name of the menu field, internal only, can be \c NULL.
+	\param label The \a label shown to the user, can be blank.
+	\param menu The \a menu of choices shown to the user, typically a BPopUpMenu.
+	\param flags The view flags, see BView for details.
+*/
+
+
+/*!
+	\fn BMenuField::BMenuField(const char* label, BMenu* menu, uint32 flags)
+	\brief Creates a new BMenuField object suitable as part of a BLayout.
+	       This constructor omits the internal name parameter.
+
+	\note This method was not available in BeOS R5.
+
+	\param label The \a label shown to the user, can be blank.
+	\param menu The \a menu of choices shown to the user, typically a BPopUpMenu.
+	\param flags The view flags, see BView for details.
+*/
+
+
+/*!
+	\fn BMenuField::BMenuField(BMessage* data)
+	\brief Archive constructor.
+
+	\param data The message \a data to construct the menu field from.
+*/
+
+
+/*!
+	\fn BMenuField::~BMenuField()
+	\brief Destructor.
+
+	Also frees the memory used by the label and menu.
+*/
+
+
+/*!
+	\fn BArchivable* BMenuField::Instantiate(BMessage* data)
+	\brief Creates a new BMenuField object from an \a data message.
+
+	\returns A newly created BMenuField object or \c NULL if the message
+	         doesn't contain an archived BMenuField.
+*/
+
+
+/*!
+	\fn status_t BMenuField::Archive(BMessage* data, bool deep) const
+	\brief Archives the the BMenuField object into the \a data message.
+
+	Adds the label, divider, and current state of the BMenuField to the archive.
+
+	\param data A pointer to the BMessage to archive the object into.
+	\param deep Whether or not to archive attached menu and menu items as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived successfully.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+*/
+
+
+/*!
+	\fn status_t BMenuField::AllArchived(BMessage* into) const
+	\brief Hook method called when all views have been archived.
+
+	Also archives the label and menu bar.
+
+	\param into Archived data message.
+*/
+
+
+/*!
+	\fn status_t BMenuField::AllUnarchived(const BMessage* from)
+	\brief Hook method called when all views have been unarchived.
+
+	Also unarchives the label and menu bar.
+
+	\param from Unarchived data message.
+*/
+
+
+/*!
+	\fn void BMenuField::AttachedToWindow()
+	\brief Hook method called when the menu field is attached to a window.
+
+	Adjusts the background color to match the background color of the parent
+	view and adjusts the height to be the attached menu bar which depends on
+	the user's current menu font setting.
+*/
+
+
+/*!
+	\fn void BMenuField::AllAttached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+	       all child views have already been attached to a window.
+
+	If the attached menu bar is too narrow it is resized it to fit the menu
+	items.
+*/
+
+
+/*!
+	\fn void BMenuField::Draw(BRect updateRect)
+	\brief Draws the area of the menu field that intersects \a updateRect.
+
+	The menu field is drawn differently based on whether or not it is the
+	current focus view and whether or not it is enabled.
+
+	\param updateRect The rectangular area to be drawn.
+*/
+
+
+/*!
+	\fn void BMenuField::FrameResized(float newWidth, float newHeight)
+	\brief Hook method called when the menu bar is resized.
+
+	Adjusts the menu bar size and location.
+
+	\param newWidth The new \a width of the menu field.
+	\param newHeight The new \a height of the menu field.
+*/
+
+
+/*!
+	\fn void BMenuField::KeyDown(const char* bytes, int32 numBytes)
+	\brief Hook method called when a keyboard key is pressed.
+
+	Provides for keyboard navigation allowing users to open the menu by pressing
+	the space bar, right arrow, or down arrow.
+
+	\param bytes The bytes of the key combination pressed.
+	\param numBytes The number of bytes in \a bytes.
+*/
+
+
+/*!
+	\fn void BMenuField::MouseDown(BPoint where)
+	\brief Hook method called when a mouse button is pressed.
+
+	Provides the ability to open the menu field menu using the mouse, even if
+	the user clicks on the menu field label.
+
+	\param where The point on the screen where to mouse pointer is when
+	       the mouse button is pressed.
+*/
+
+
+/*!
+	\fn void BMenuField::WindowActivated(bool state)
+	\brief Hook method called when the attached window is activated or
+	       deactivated.
+
+	Redraws the focus ring around the menu field when the window is activated
+	and deactivated if it is the window's current focus view.
+
+	\param state \c true if the window becomes activated, \c false if the
+	       window becomes deactivated.
+*/
+
+
+/*!
+	\fn void BMenuField::MakeFocus(bool focused)
+	\brief Makes the view the current focus view of the window or gives up
+	       being the focus view of the window.
+
+	Enables or disables keyboard navigation and invalidates the menu field.
+
+	\param focused \a true to set focus, \a false to remove it.
+*/
+
+
+/*!
+	\fn BMenu* BMenuField::Menu() const
+	\brief Returns a pointer to the menu attached to the menu bar that opens
+	       when the user clicks on the menu field.
+*/
+
+
+/*!
+	\fn BMenuBar* BMenuField::MenuBar() const
+	\brief Returns a pointer to the attached menu bar that contains the pop-up
+	       menu.
+*/
+
+
+/*!
+	\fn BMenuItem* BMenuField::MenuItem() const
+	\brief Returns the first menu item attached to the menu bar containing
+	       the pop-up menu.
+*/
+
+
+/*!
+	\fn void BMenuField::SetLabel(const char* label)
+	\brief Sets the menu field label to \a label.
+
+	\param label The \a label to set to the menu field.
+*/
+
+
+/*!
+	\fn const char* BMenuField::Label() const
+	\brief Returns the menu field label.
+
+	\return The menu field label or \c NULL if not assigned.
+*/
+
+
+/*!
+	\fn void BMenuField::SetEnabled(bool on)
+	\brief Enables or disables the menu field.
+
+	\param on \c true to enable the menu field, \c false to disable it.
+*/
+
+
+/*!
+	\fn bool BMenuField::IsEnabled() const
+	\brief Returns whether or not the menu is enabled.
+
+	\return \c true if the menu is enabled, \c false if disabled.
+*/
+
+
+/*!
+	\fn void BMenuField::SetAlignment(alignment label)
+	\brief Set the alignment of the menu field label. The default alignment
+	       is \c B_ALIGN_LEFT.
+
+	\remark For menu fields that are part of a BLayout consider
+	        using BLayoutItem::SetExplicitAlignment() instead.
+
+	\param label The alignment to set, choices include:
+		- \c B_ALIGN_LEFT
+		- \c B_ALIGN_CENTER
+		- \c B_ALIGN_RIGHT
+*/
+
+
+/*!
+	\fn alignment BMenuField::Alignment() const
+	\brief Returns the label's current alignment.
+
+	\return The label's current alignment constant.
+
+	\see SetAlignment() for more details.
+*/
+
+
+/*!
+	\fn void BMenuField::SetDivider(float position)
+	\brief Sets the horizontal \a position of the divider that separates the
+	       label from the menu bar.
+
+	\remark It is not recommended to use this method for menu fields that are
+	        part of a BLayout. Instead split the label and menu bar into
+	        separate layout items using CreateLabelLayoutItem() and
+	        CreateMenuBarLayoutItem(). This allows you to have better control
+	        over the position of the label and menu bar portions of your
+	        menu fields.
+
+	\param position The divider \a position to set, should be an integral value.
+*/
+
+
+/*!
+	\fn float BMenuField::Divider() const
+	\brief Returns the current divider position.
+
+	\return The current divider position as a float.
+
+	\see SetDivider() for more details.
+*/
+
+
+/*!
+	\fn void BMenuField::ShowPopUpMarker()
+	\brief Shows the pop-up marker located on the right edge of the menu bar.
+
+	\note This method was not available in BeOS R5.
+
+	\sa HidePopUpMarker()
+*/
+
+
+/*!
+	\fn void BMenuField::HidePopUpMarker()
+	\brief Hides to pop-up marker.
+
+	\note This method was not available in BeOS R5.
+
+	\sa ShowPopUpMarker()
+*/
+
+
+/*!
+	\fn BLayoutItem* BMenuField::CreateLabelLayoutItem()
+	\brief Returns a pointer to the label layout item.
+	       (Layout constructor only)
+
+	\note This method was not available in BeOS R5.
+
+	\sa CreateMenuBarLayoutItem()
+*/
+
+
+/*!
+	\fn BLayoutItem* BMenuField::CreateMenuBarLayoutItem()
+	\brief Returns a pointer to the menu bar layout item.
+	       (Layout constructor only)
+
+	\note This method was not available in BeOS R5.
+
+	\sa CreateLabelLayoutItem()
+*/
