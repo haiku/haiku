@@ -13,6 +13,7 @@
 VirtioSCSIRequest::VirtioSCSIRequest(bool hasLock)
 	:
 	fHasLock(hasLock),
+	fStatus(SCSI_REQ_CMP),
 	fTimeout(0),
 	fBytesLeft(0),
 	fIsWrite(false),
@@ -164,11 +165,12 @@ VirtioSCSIRequest::FillRequest(uint32 inCount, uint32 outCount,
 	fRequest->tag = (addr_t)fCCB;
 	fRequest->lun[0] = 1;
 	fRequest->lun[1] = fCCB->target_id;
-	fRequest->lun[2] = 0x40 | ((fCCB->target_lun >> 8) & 0x3f);
-	fRequest->lun[3] = (fCCB->target_lun >> 8) & 0xff;
+	// we don't support lun >= 256
+	fRequest->lun[2] = 0x40;
+	fRequest->lun[3] = fCCB->target_lun & 0xff;
 
 	memcpy(fRequest->cdb, fCCB->cdb, min_c(fCCB->cdb_length,
-		sizeof(fRequest->cdb)));
+		min_c(sizeof(fRequest->cdb), sizeof(fCCB->cdb))));
 
 	get_memory_map(fBuffer, sizeof(struct virtio_scsi_cmd_req)
 		+ sizeof(struct virtio_scsi_cmd_resp), &entries[0], 1);
@@ -225,4 +227,3 @@ VirtioSCSIRequest::_ResponseStatus()
 
 	return status;
 }
-
