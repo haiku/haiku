@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Haiku Inc. All rights reserved.
+ * Copyright 2011-2013 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,11 +56,10 @@
 
 
 /*!
-	\fn BControl::BControl(BRect frame, const char *name, const char *label,
-						   BMessage *message, uint32 resizingMode,
-						   uint32 flags)
+	\fn BControl::BControl(BRect frame, const char* name, const char* label,
+		BMessage* message, uint32 resizingMode, uint32 flags)
 	\brief Construct a control in the \a frame with a \a name, \a label,
-		model \a message, \a resizingMode, and creation \a flags.
+	       model \a message, \a resizingMode, and creation \a flags.
 
 	The initial value of the control is set to 0 (\c B_CONTROL_OFF).
 	The \a label and the \a message parameters can be set to \c NULL.
@@ -70,37 +69,39 @@
 	\param label The \a label displayed along with the control.
 	\param message The \a message to send when the control is activated.
 	\param resizingMode Defines the behavior of the control as the parent
-		view resizes.
-	\param flags Behavior \a flags for the control. See BView for details.
+	       view resizes, see BView for more details.
+	\param flags Behavior \a flags for the control, see BView for details.
 */
 
 
 /*!
-	\fn BControl::BControl(const char *name, const char *label,
-						   BMessage *message, uint32 flags)
+	\fn BControl::BControl(const char* name, const char* label,
+		BMessage* message, uint32 flags)
 	\brief Construct a control with a \a name, \a label, model \a message,
-		and creation \a flags suitable for use with the Layout API.
+	       and creation \a flags suitable for use with the Layout API.
 
 	The initial value of the control is set to 0 (\c B_CONTROL_OFF).
 	The \a label and the \a message parameters can be set to \c NULL.
 
+	\note This method was not available in BeOS R5.
+
 	\param name The \a name of the control.
 	\param label The \a label displayed along with the control.
 	\param message The \a message to send when the control is activated.
-	\param flags Behavior \a flags for the control. See BView for details.
+	\param flags Behavior \a flags for the control, see BView for details.
 */
 
 
 /*!
 	\fn BControl::~BControl()
 	\brief Frees all memory used by the BControl object including the memory
-		used by the model message.
+	       used by the model message.
 */
 
 
 /*!
-	\fn BControl::BControl(BMessage *archive)
-	\brief Constructs a BControl object from an \a archive message.
+	\fn BControl::BControl(BMessage* archive)
+	\brief Creates a new BControl object from an \a archive message.
 
 	This method is usually not called directly. If you want to build a
 	control from a message you should call Instantiate() which can
@@ -114,7 +115,7 @@
 
 
 /*!
-	\fn BArchivable* BControl::Instantiate(BMessage *archive)
+	\fn BArchivable* BControl::Instantiate(BMessage* archive)
 	\brief Creates a new object from an \a archive.
 
 	If the message is a valid object then the instance created from the
@@ -130,12 +131,12 @@
 
 
 /*!
-	\fn status_t BControl::Archive(BMessage *archive, bool deep) const
-	\brief Archives the object into \a archive.
+	\fn status_t BControl::Archive(BMessage* archive, bool deep) const
+	\brief Archives the control into \a archive.
 
 	\param archive The target \a archive that the data will go into.
 	\param deep Whether or not to recursively archive child views.
-	
+
 	\retval B_OK The archive operation was successful.
 	\retval B_BAD_VALUE \c NULL \a archive message.
 	\retval B_ERROR The archive operation failed.
@@ -146,13 +147,14 @@
 
 /*!
 	\fn void BControl::WindowActivated(bool active)
-	\brief Hook method that is called when the attached window becomes
-		activated or deactivated.
+	\brief Hook method called when the attached window is activated or
+	       deactivated.
 
-	The BControl is redrawn if it is a child of the focused view.
+	Redraws the focus ring around the menu field when the window is activated
+	or deactivated if it is the window's current focus view.
 
 	\param active \c true if the window becomes activated, \c false if the
-		window becomes deactivated.
+	       window becomes deactivated.
 
 	\sa BView::WindowActivated()
 */
@@ -160,8 +162,7 @@
 
 /*!
 	\fn void BControl::AttachedToWindow()
-	\brief Hook method that is called when the object is attached to a
-		window.
+	\brief Hook method called when the control is attached to a window.
 
 	This method overrides BView::AttachedToWindow() setting the low color
 	and view color of the BControl so that it matches the view color of the
@@ -176,7 +177,7 @@
 
 /*!
 	\fn void BControl::DetachedFromWindow()
-	\brief Hook method that is called when the object is detached from a
+	\brief Hook method called when the object is detached from a
 		window.
 
 	\sa BView::DetachedFromWindow()
@@ -186,7 +187,7 @@
 /*!
 	\fn void BControl::AllAttached()
 	\brief Similar to AttachedToWindow() but this method is triggered after
-		all child views have already been attached to a window.
+	       all child views have already been attached to a window.
 
 	\sa BView::AllAttached()
 */
@@ -195,7 +196,7 @@
 /*!
 	\fn void BControl::AllDetached()
 	\brief Similar to AttachedToWindow() but this method is triggered after
-		all child views have already been detached from a window.
+	       all child views have already been detached from a window.
 
 	\sa BView::AllDetached()
 */
@@ -220,7 +221,7 @@
 
 /*!
 	\fn void BControl::KeyDown(const char *bytes, int32 numBytes)
-	\brief Hook method that is called when a keyboard key is pressed.
+	\brief Hook method called when a keyboard key is pressed.
 
 	Overrides BView::KeyDown() to toggle the control value and then
 	calls Invoke() for \c B_SPACE or \c B_ENTER. If this is not desired
@@ -240,10 +241,10 @@
 
 /*!
 	\fn void BControl::MouseDown(BPoint point)
-	\brief Hook method that is called when a mouse button is pressed.
+	\brief Hook method called when a mouse button is pressed.
 
 	\param point The point on the screen where to mouse pointer is when
-		the mouse button is pressed.
+	       the mouse button is pressed.
 
 	\sa BView::MouseDown()
 */
@@ -251,10 +252,10 @@
 
 /*!
 	\fn void BControl::MouseUp(BPoint point)
-	\brief Hook method that is called when a mouse button is released.
+	\brief Hook method called when a mouse button is released.
 
 	\param point The point on the screen where to mouse pointer is when
-		the mouse button is released.
+	       the mouse button is released.
 
 	\sa BView::MouseUp()
 */
@@ -262,8 +263,8 @@
 
 /*!
 	\fn void BControl::MouseMoved(BPoint point, uint32 transit,
-								  const BMessage *message)
-	\brief Hook method that is called when the mouse is moved.
+		const BMessage *message)
+	\brief Hook method called when the mouse is moved.
 
 	\sa BView::MouseMoved()
 */
@@ -283,7 +284,7 @@
 	\fn const char* BControl::Label() const
 	\brief Gets the label of the control.
 
-	returns The control's label.
+	\return The control's label.
 */
 
 
@@ -303,6 +304,8 @@
 	\fn void BControl::SetValueNoUpdate(int32 value)
 	\brief Sets the value of the control without redrawing.
 
+	\note This method was not available in BeOS R5.
+
 	\param value The \a value to set.
 
 	\sa SetValue()
@@ -313,7 +316,7 @@
 	\fn int32 BControl::Value() const
 	\brief Gets the value of the control.
 
-	\returns The control's value.
+	\return The control's value.
 */
 
 
@@ -339,7 +342,7 @@
 	\fn bool BControl::IsEnabled() const
 	\brief Gets whether or not the control is currently enabled.
 
-	\returns \c true if the control is enabled, \c false if it is disabled.
+	\return \c true if the control is enabled, \c false if it is disabled.
 */
 
 
@@ -367,7 +370,7 @@
 
 
 /*!
-	\fn status_t BControl::Invoke(BMessage *message)
+	\fn status_t BControl::Invoke(BMessage* message)
 	\brief Sends a copy of the model \a message to the designated target.
 
 	BControl::Invoke() overrides BInvoker::Invoke(). Derived classes
@@ -387,9 +390,8 @@
 
 
 /*!
-	\fn BHandler* BControl::ResolveSpecifier(BMessage *message, int32 index,
-											 BMessage *specifier, int32 what,
-											 const char *property)
+	\fn BHandler* BControl::ResolveSpecifier(BMessage* message, int32 index,
+		BMessage* specifier, int32 what, const char* property)
 	\brief Determine the proper specifier for scripting messages.
 
 	\sa BHandler::ResolveSpecifier()
@@ -397,7 +399,7 @@
 
 
 /*!
-	\fn status_t BControl::GetSupportedSuites(BMessage *message)
+	\fn status_t BControl::GetSupportedSuites(BMessage* message)
 	\brief Report the suites of understood messages.
 
 	\sa BHandler::GetSupportedSuites();
