@@ -228,8 +228,6 @@ random_register_child_devices(void* _cookie)
 	device_node* node;
 	return gDeviceManager->register_node(info->node,
 		YARROW_RNG_SIM_MODULE_NAME, attrs, NULL, &node);
-
-	return status;
 }
 
 
