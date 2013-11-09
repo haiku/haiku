@@ -118,10 +118,13 @@ ethernet_link_checker(void *)
 status_t
 ethernet_init(const char *name, net_device **_device)
 {
-	// make sure this is a device in /dev/net, but not the
-	// networking (userland) stack driver
+	// Make sure this is a device in /dev/net, but not the
+	// networking (userland) stack driver.
+	// Also make sure the user didn't pass a path like
+	// /dev/net/../etc.
 	if (strncmp(name, "/dev/net/", 9)
-		|| !strcmp(name, "/dev/net/userland_server"))
+		|| !strcmp(name, "/dev/net/userland_server")
+		|| strstr(name, "..") != NULL)
 		return B_BAD_VALUE;
 
 	if (access(name, F_OK) != 0)
