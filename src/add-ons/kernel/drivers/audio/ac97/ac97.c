@@ -32,6 +32,7 @@
 #include <OS.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <MediaDefs.h>
 #include "ac97.h"
 
@@ -244,6 +245,7 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	int i;
 
 	*_dev = dev = (ac97_dev *) malloc(sizeof(ac97_dev));
+	memset(dev->reg_cache, 0, sizeof(dev->reg_cache));
 	dev->cookie = cookie;
 	dev->reg_read = reg_read;
 	dev->reg_write = reg_write;
