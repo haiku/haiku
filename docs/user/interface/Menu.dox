@@ -15,7 +15,7 @@
 	\file Menu.h
 	\ingroup interface
 	\ingroup libbe
-	\brief Menu class definition and support structures.
+	\brief BMenu class definition and support structures.
 */
 
 
@@ -248,14 +248,6 @@
 
 
 /*!
-	\name Hook Methods Reimplemented from BView
-*/
-
-
-//! @{
-
-
-/*!
 	\fn void BMenu::AttachedToWindow()
 	\brief Lays out the menu items and resizes the menu to fit.
 */
@@ -290,9 +282,6 @@
 	\param bytes The bytes of the key combination pressed.
 	\param numBytes The number of bytes in \a bytes.
 */
-
-
-//! @}
 
 
 /*!

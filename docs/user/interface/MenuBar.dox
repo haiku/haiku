@@ -15,7 +15,7 @@
 	\file MenuBar.h
 	\ingroup interface
 	\ingroup libbe
-	\brief MenuBar class definition and support structures.
+	\brief BMenuBar class definition and support structures.
 */
 
 
@@ -176,14 +176,6 @@
 
 
 /*!
-	\name Hook Methods Reimplemented from BMenu
-*/
-
-
-//! @{
-
-
-/*!
 	\fn void BMenuBar::AttachedToWindow()
 	\brief Sets this as the key menubar for the window, lays out the menu items
 	       and resizes the menu to fit.
@@ -220,9 +212,6 @@
 	\param where The point on the screen where to mouse pointer is when
 		the mouse button is pressed.
 */
-
-
-//! @}
 
 
 /*!
