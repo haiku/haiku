@@ -28,7 +28,8 @@ VirtioRNGDevice::VirtioRNGDevice(device_node *node)
 	fVirtio(NULL),
 	fVirtioDevice(NULL),
 	fStatus(B_NO_INIT),
-	fOffset(BUFFER_SIZE)
+	fOffset(BUFFER_SIZE),
+	fExpectsInterrupt(false)
 {
 	CALLED();
 
