@@ -188,23 +188,23 @@ if [ IsOptionalHaikuImagePackageAdded NetFS ] {
 # 	# userlandfs module
 # 	AddFilesToHaikuImage home config add-ons userlandfs
 # 		: netfs ;
-# 
+#
 # 	# servers
 # 	AddFilesToHaikuImage system servers : netfs_server ;
 # 	AddFilesToHaikuImage system servers
 # 		: authentication_server ;
-# 
+#
 # 	# tools
 # 	AddFilesToHaikuImage system bin : netfs_config ;
 # 	AddFilesToHaikuImage system bin : netfs_server_prefs ;
-# 
+#
 # 	#example settings for netfs_server
 # 	local netfsServerSettingsFiles = <driver-settings>netfs-server ;
 # 	SEARCH on $(netfsServerSettingsFiles)
 # 		= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems netfs ] ;
 # 	AddFilesToHaikuImage home config settings kernel drivers
 # 	: $(netfsServerSettingsFiles) ;
-# 
+#
 # 	#userlandfs settings are needed for netfs_config to work (ioctls)
 # 	local userlandfsServerSettingsFiles = <driver-settings>userlandfs ;
 # 	SEARCH on $(userlandfsServerSettingsFiles)
@@ -219,14 +219,14 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 # TODO: Make this an actual package!
 # 	local arch = $(TARGET_ARCH) ;
 # 	local abi = gcc$(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) ;
-# 
+#
 # 	# kernel module
 # 	AddFilesToHaikuImage system add-ons kernel file_systems
 # 		: userlandfs ;
-# 
+#
 # 	# server
 # 	AddFilesToHaikuImage system servers : userlandfs_server ;
-# 
+#
 # 	# libs
 # 	local userlandfsLibs =
 # 		libuserlandfs_beos_kernel.so
@@ -234,21 +234,21 @@ if [ IsOptionalHaikuImagePackageAdded UserlandFS ] {
 # 		libuserlandfs_fuse.so
 # 	;
 # 	AddFilesToHaikuImage system lib : $(userlandfsLibs) ;
-# 
+#
 # 	# development goodies
 # 	if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] {
 # 		if ! ( $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) in 2 4 ) {
 # 			Exit "Optional package UserlandFS: Unsupported GCC version:"
 # 				$(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) ;
 # 		}
-# 
+#
 # 		# library symlinks
 # 		local lib ;
 # 		for lib in $(userlandfsLibs) {
 # 			AddSymlinkToHaikuImage develop abi $(arch) $(abi) lib
 # 				: /system/lib/$(lib:BS) ;
 # 		}
-# 
+#
 # 		# FUSE headers
 # 		local fuseHeaders =
 # 			fuse_common_compat.h
@@ -318,7 +318,7 @@ if [ IsOptionalHaikuImagePackageAdded WifiFirmwareScriptData ] {
 # 		AddFilesToHaikuImage
 # 			system data firmware broadcom43xx b43-fwcutter
 # 			: $(broadcomFWCutterFile) ;
-# 
+#
 # 		# headers needed to compile firmware cutter
 # 		local glibcDir = [ FDirName
 # 			$(HAIKU_TOP) src system libroot posix glibc ] ;
@@ -331,14 +331,14 @@ if [ IsOptionalHaikuImagePackageAdded WifiFirmwareScriptData ] {
 # 		AddFilesToHaikuImage
 # 			system data firmware broadcom43xx b43-fwcutter bits
 # 			: $(bitByteswapHeader) ;
-# 
+#
 # 		# file containing firmware
 # 		local broadcom43xxFile ;
 # 		broadcom43xxFile = [ DownloadFile wl_apsta-3.130.20.0.o
 # 			: http://www.haiku-files.org/files/wifi-firmwares/b43/wl_apsta-3.130.20.0.o ] ;
 # 		AddFilesToHaikuImage system data firmware broadcom43xx
 # 			: $(broadcom43xxFile) ;
-# 
+#
 # 		# marvell88w8335
 # 		local marvellArchive = malo-firmware-1.4.tgz ;
 # 		local marvellURL = http://www.haiku-files.org/files/wifi-firmwares/marvell/$(marvellArchive) ;
