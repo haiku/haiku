@@ -2585,49 +2585,39 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 	// efficient and does all we need from get_vnode()
 	inc_vnode_ref_count(vnode);
 
-	if (vnode != ioContext->root) {
-		// we don't hit the IO context root
-		// resolve a vnode to its covered vnode
-		if (Vnode* coveredVnode = get_covered_vnode(vnode)) {
-			put_vnode(vnode);
-			vnode = coveredVnode;
-		}
-	}
-
 	path[--insert] = '\0';
 		// the path is filled right to left
 
 	while (true) {
-		// the name buffer is also used for fs_read_dir()
-		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
-		char* name = &((struct dirent*)nameBuffer)->d_name[0];
-		struct vnode* parentVnode;
+		// If the node is the context's root, bail out. Otherwise resolve mount
+		// points.
+		if (vnode == ioContext->root)
+			break;
+
+		if (Vnode* coveredVnode = get_covered_vnode(vnode)) {
+			put_vnode(vnode);
+			vnode = coveredVnode;
+		}
 
 		// lookup the parent vnode
-		if (vnode == ioContext->root) {
-			// we hit the IO context root
-			parentVnode = vnode;
-			inc_vnode_ref_count(vnode);
-		} else {
-			status = lookup_dir_entry(vnode, "..", &parentVnode);
-			if (status != B_OK)
-				goto out;
+		struct vnode* parentVnode;
+		status = lookup_dir_entry(vnode, "..", &parentVnode);
+		if (status != B_OK)
+			goto out;
+
+		if (parentVnode == vnode) {
+			// The caller apparently got their hands on a node outside of their
+			// context's root. Now we've hit the global root.
+			put_vnode(parentVnode);
+			break;
 		}
 
 		// get the node's name
+		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+			// also used for fs_read_dir()
+		char* name = &((struct dirent*)nameBuffer)->d_name[0];
 		status = get_vnode_name(vnode, parentVnode, (struct dirent*)nameBuffer,
 			sizeof(nameBuffer), ioContext);
-
-		if (vnode != ioContext->root) {
-			// we don't hit the IO context root
-			// resolve a vnode to its covered vnode
-			if (Vnode* coveredVnode = get_covered_vnode(parentVnode)) {
-				put_vnode(parentVnode);
-				parentVnode = coveredVnode;
-			}
-		}
-
-		bool hitRoot = (parentVnode == vnode);
 
 		// release the current vnode, we only need its parent from now on
 		put_vnode(vnode);
@@ -2635,12 +2625,6 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 
 		if (status != B_OK)
 			goto out;
-
-		if (hitRoot) {
-			// we have reached "/", which means we have constructed the full
-			// path
-			break;
-		}
 
 		// TODO: add an explicit check for loops in about 10 levels to do
 		// real loop detection
