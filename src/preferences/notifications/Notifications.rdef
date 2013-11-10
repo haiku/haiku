@@ -12,7 +12,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Notifications",
-	long_info = "Notifications ©2009 Pier Luigi Fiorini ©2010 Haiku"
+	long_info = "Notifications ©2009 Pier Luigi Fiorini ©2010-2013 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2013, Haiku, Inc. All Rights Reserved.
  * Copyright 2009, Pier Luigi Fiorini.
  * Distributed under the terms of the MIT License.
  *
@@ -295,11 +295,11 @@ GeneralView::Save()
 	BPath serverPath(&ref);
 
 	// Start server at boot time
-	ret = find_directory(B_USER_BOOT_DIRECTORY, &path, true);
+	ret = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
 	if (ret != B_OK) {
 		BAlert* alert = new BAlert("",
 			B_TRANSLATE("Can't save preferences, you probably don't have "
-			"write access to the boot settings directory."), B_TRANSLATE("OK"),
+			"write access to the settings directory."), B_TRANSLATE("OK"),
 			NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -307,7 +307,7 @@ GeneralView::Save()
 		return ret;
 	}
 
-	path.Append("launch");
+	path.Append("boot/launch");
 	BDirectory directory(path.Path());
 	BEntry entry(&directory, serverPath.Leaf());
 
