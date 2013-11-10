@@ -182,7 +182,7 @@ private:
 };
 
 
-// #pragma mark - AboutView
+// #pragma mark - rating stats
 
 
 class RatingView : public BView {
@@ -400,19 +400,24 @@ public:
 
 		BLayoutBuilder::Group<>(this)
 			.Add(fIconView)
-			.AddGroup(B_VERTICAL, 1.0f)
+			.AddGroup(B_VERTICAL, 1.0f, 2.2f)
 				.Add(fTitleView)
 				.Add(fPublisherView)
+				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 			.End()
 			.AddGlue(0.1f)
-			.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
+			.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING, 0.8f)
 				.Add(fRatingView)
 				.Add(fAvgRating)
 				.Add(fVoteInfo)
+				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 			.End()
 			.AddGlue(0.2f)
-			.Add(fVersionInfo)
-			.AddGlue(3.0f)
+			.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING, 2.0f)
+				.Add(fVersionInfo)
+				.AddGlue()
+				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
+			.End()
 		;
 
 		Clear();
@@ -502,6 +507,7 @@ public:
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 		SetLayout(fLayout);
+		fLayout->AddItem(BSpaceLayoutItem::CreateGlue());
 	}
 
 	virtual ~PackageActionView()
@@ -557,7 +563,7 @@ public:
 		else {
 			for (int32 i = 0; i < actions.CountItems(); i++) {
 				if (actions.ItemAtFast(i)->Type()
-					!= fPackageActions.ItemAtFast(i)->Type()) {
+						!= fPackageActions.ItemAtFast(i)->Type()) {
 					clearNeeded = true;
 					break;
 				}
@@ -1252,12 +1258,14 @@ PackageInfoView::PackageInfoView(BLocker* modelLock,
 {
 	fTitleView = new TitleView();
 	fPackageActionView = new PackageActionView(handler);
+	fPackageActionView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
+		B_SIZE_UNSET));
 	fPagesView = new PagesView();
 
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_HORIZONTAL, 0.0f)
-			.Add(fTitleView)
-			.Add(fPackageActionView)
+			.Add(fTitleView, 6.0f)
+			.Add(fPackageActionView, 1.0f)
 			.SetInsets(
 				B_USE_DEFAULT_SPACING, 0.0f,
 				B_USE_DEFAULT_SPACING, 0.0f)
