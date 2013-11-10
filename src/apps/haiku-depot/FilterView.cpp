@@ -90,6 +90,8 @@ FilterView::AttachedToWindow()
 	fShowField->Menu()->SetTargetForItems(Window());
 	fRepositoryField->Menu()->SetTargetForItems(Window());
 	fSearchTermsText->SetTarget(this);
+
+	fSearchTermsText->MakeFocus();
 }
 
 
