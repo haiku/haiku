@@ -44,6 +44,9 @@ public:
 									{ return fPackage; }
 
 protected:
+			PackageInfoRef		FindPackageByName(const BString& name);
+
+protected:
 			PackageManager*		fPackageManager;
 
 private:

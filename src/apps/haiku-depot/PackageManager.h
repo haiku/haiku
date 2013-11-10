@@ -36,17 +36,26 @@ using BPackageKit::BPrivate::BDaemonClient;
 using BPackageKit::BManager::BPrivate::BPackageManager;
 
 
-class DownloadProgressListener {
+class PackageProgressListener {
 	public:
-	virtual	~DownloadProgressListener();
+	virtual	~PackageProgressListener();
 
 	virtual	void				DownloadProgressChanged(
 									const char* packageName,
-									float progress) = 0;
+									float progress);
+	virtual	void				DownloadProgressComplete(
+									const char* packageName);
+
+	virtual	void				StartApplyingChanges(
+									BPackageManager::InstalledRepository&
+										repository);
+	virtual	void				ApplyingChangesDone(
+									BPackageManager::InstalledRepository&
+										repository);
 };
 
 
-typedef BObjectList<DownloadProgressListener> DownloadProgressListenerList;
+typedef BObjectList<PackageProgressListener> PackageProgressListenerList;
 
 
 class PackageManager : public BPackageManager,
@@ -71,9 +80,9 @@ public:
 									const BString& checksum);
 
 			void				AddProgressListener(
-									DownloadProgressListener* listener);
+									PackageProgressListener* listener);
 			void				RemoveProgressListener(
-									DownloadProgressListener* listener);
+									PackageProgressListener* listener);
 
 private:
 	// UserInteractionHandler
@@ -122,8 +131,8 @@ private:
 			BPackageKit::BSolverPackage*
 								fCurrentUninstallPackage;
 
-			DownloadProgressListenerList
-								fDownloadProgressListeners;
+			PackageProgressListenerList
+								fPackageProgressListeners;
 };
 
 #endif // PACKAGE_MANAGER_H

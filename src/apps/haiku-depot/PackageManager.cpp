@@ -44,19 +44,50 @@ using BPackageKit::BSolverPackage;
 using BPackageKit::BSolverRepository;
 
 
-// #pragma mark - DownloadProgressListener
+typedef std::set<PackageInfoRef> PackageInfoSet;
 
 
-DownloadProgressListener::~DownloadProgressListener()
+// #pragma mark - PackageProgressListener
+
+
+PackageProgressListener::~PackageProgressListener()
 {
 }
+
+
+void
+PackageProgressListener::DownloadProgressChanged(const char* packageName,
+	float progress)
+{
+}
+
+
+void
+PackageProgressListener::DownloadProgressComplete(const char* packageName)
+{
+}
+
+
+void
+PackageProgressListener::StartApplyingChanges(
+	BPackageManager::InstalledRepository& repository)
+{
+}
+
+
+void
+PackageProgressListener::ApplyingChangesDone(
+	BPackageManager::InstalledRepository& repository)
+{
+}
+
 
 
 // #pragma mark - InstallPackageAction
 
 
 class InstallPackageAction : public PackageAction,
-	private DownloadProgressListener {
+	private PackageProgressListener {
 public:
 	InstallPackageAction(PackageInfoRef package, Model* model)
 		:
@@ -87,17 +118,20 @@ public:
 				ex.Details().String());
 			return ex.Error();
 		} catch (BAbortedByUserException ex) {
+			_SetDownloadedPackagesState(NONE);
 			return B_OK;
 		} catch (BNothingToDoException ex) {
 			return B_OK;
 		} catch (BException ex) {
 			fprintf(stderr, "Exception occurred while installing package "
 				"%s: %s\n", packageName, ex.Message().String());
+			_SetDownloadedPackagesState(NONE);
 			return B_ERROR;;
 		}
 
 		fPackageManager->RemoveProgressListener(this);
-		ref->SetState(ACTIVATED);
+
+		_SetDownloadedPackagesState(ACTIVATED);
 
 		return B_OK;
 	}
@@ -107,11 +141,11 @@ public:
 		float progress)
 	{
 		bigtime_t now = system_time();
-		if (now - fLastDownloadUpdate > 250000) {
+		if (now - fLastDownloadUpdate > 250000 || progress == 1.0) {
 			BString tempName(packageName);
 			tempName.Truncate(tempName.FindFirst('-'));
 				// strip version suffix off package filename
-			PackageInfoRef ref(_FindPackageByName(tempName));
+			PackageInfoRef ref(FindPackageByName(tempName));
 			if (ref.Get() != NULL) {
 				ref->SetDownloadProgress(progress);
 				fLastDownloadUpdate = now;
@@ -119,35 +153,38 @@ public:
 		}
 	}
 
+	virtual void DownloadProgressComplete(const char* packageName)
+	{
+		BString tempName(packageName);
+		tempName.Truncate(tempName.FindFirst('-'));
+			// strip version suffix off package filename
+		PackageInfoRef ref(FindPackageByName(tempName));
+		if (ref.Get() != NULL) {
+			ref->SetDownloadProgress(1.0);
+			fDownloadedPackages.insert(ref);
+		}
+	}
 
 private:
-	PackageInfoRef _FindPackageByName(const BString& name)
+	void _SetDownloadedPackagesState(PackageState state)
 	{
-		Model* model = GetModel();
-		const DepotList& depots = model->Depots();
-		// TODO: optimize!
-		for (int32 i = 0; i < depots.CountItems(); i++) {
-			const DepotInfo& depot = depots.ItemAtFast(i);
-			const PackageList& packages = depot.Packages();
-			for (int32 j = 0; j < packages.CountItems(); j++) {
-				PackageInfoRef info = packages.ItemAtFast(j);
-				if (info->Title() == name)
-					return info;
-			}
+		for (PackageInfoSet::iterator it = fDownloadedPackages.begin();
+			it != fDownloadedPackages.end(); ++it) {
+			(*it)->SetState(state);
 		}
-
-		return PackageInfoRef();
 	}
 
 private:
 	bigtime_t fLastDownloadUpdate;
+	PackageInfoSet fDownloadedPackages;
 };
 
 
 // #pragma mark - UninstallPackageAction
 
 
-class UninstallPackageAction : public PackageAction {
+class UninstallPackageAction : public PackageAction,
+	private PackageProgressListener {
 public:
 	UninstallPackageAction(PackageInfoRef package, Model* model)
 		:
@@ -165,6 +202,7 @@ public:
 		fPackageManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES);
 		PackageInfoRef ref(Package());
 		fPackageManager->SetCurrentActionPackage(ref, false);
+		fPackageManager->AddProgressListener(this);
 		const char* packageName = ref->Title().String();
 		try {
 			fPackageManager->Uninstall(&packageName, 1);
@@ -183,10 +221,36 @@ public:
 			return B_ERROR;
 		}
 
+		fPackageManager->RemoveProgressListener(this);
+
 		ref->SetState(NONE);
 
 		return B_OK;
 	}
+
+	void StartApplyingChanges(
+		BPackageManager::InstalledRepository& repository)
+
+	{
+		BPackageManager::InstalledRepository::PackageList& packages
+			= repository.PackagesToDeactivate();
+		for (int32 i = 0; i < packages.CountItems(); i++) {
+			PackageInfoRef ref(FindPackageByName(packages.ItemAt(i)
+					->Name()));
+			if (ref.Get() != NULL)
+				fRemovedPackages.Add(ref);
+		}
+	}
+
+	void ApplyingChangesDone(
+		BPackageManager::InstalledRepository& repository)
+	{
+		for (int32 i = 0; i < fRemovedPackages.CountItems(); i++)
+			fRemovedPackages.ItemAt(i)->SetState(NONE);
+	}
+
+private:
+	PackageList fRemovedPackages;
 };
 
 
@@ -298,16 +362,16 @@ PackageManager::DownloadPackage(const BString& fileURL,
 
 
 void
-PackageManager::AddProgressListener(DownloadProgressListener* listener)
+PackageManager::AddProgressListener(PackageProgressListener* listener)
 {
-	fDownloadProgressListeners.AddItem(listener);
+	fPackageProgressListeners.AddItem(listener);
 }
 
 
 void
-PackageManager::RemoveProgressListener(DownloadProgressListener* listener)
+PackageManager::RemoveProgressListener(PackageProgressListener* listener)
 {
-	fDownloadProgressListeners.RemoveItem(listener);
+	fPackageProgressListeners.RemoveItem(listener);
 }
 
 
@@ -375,8 +439,8 @@ void
 PackageManager::ProgressPackageDownloadActive(const char* packageName,
 	float completionPercentage)
 {
-	for (int32 i = 0; i < fDownloadProgressListeners.CountItems(); i++) {
-		fDownloadProgressListeners.ItemAt(i)->DownloadProgressChanged(
+	for (int32 i = 0; i < fPackageProgressListeners.CountItems(); i++) {
+		fPackageProgressListeners.ItemAt(i)->DownloadProgressChanged(
 			packageName, completionPercentage);
 	}
 }
@@ -385,7 +449,10 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 void
 PackageManager::ProgressPackageDownloadComplete(const char* packageName)
 {
-	// TODO: implement
+	for (int32 i = 0; i < fPackageProgressListeners.CountItems(); i++) {
+		fPackageProgressListeners.ItemAt(i)->DownloadProgressComplete(
+			packageName);
+	}
 }
 
 
@@ -406,7 +473,8 @@ PackageManager::ProgressPackageChecksumComplete(const char* title)
 void
 PackageManager::ProgressStartApplyingChanges(InstalledRepository& repository)
 {
-	// TODO: implement
+	for (int32 i = 0; i < fPackageProgressListeners.CountItems(); i++)
+		fPackageProgressListeners.ItemAt(i)->StartApplyingChanges(repository);
 }
 
 
@@ -421,7 +489,8 @@ PackageManager::ProgressTransactionCommitted(InstalledRepository& repository,
 void
 PackageManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 {
-	// TODO: implement
+	for (int32 i = 0; i < fPackageProgressListeners.CountItems(); i++)
+		fPackageProgressListeners.ItemAt(i)->ApplyingChangesDone(repository);
 }
 
 
