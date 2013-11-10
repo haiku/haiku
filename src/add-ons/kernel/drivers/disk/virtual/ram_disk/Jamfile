@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src add-ons kernel drivers disk virtual ram_disk ;
+
+
+SubDirHdrs $(HAIKU_TOP) src system kernel device_manager ;
+UsePrivateKernelHeaders ;
+
+
+KernelAddon ram_disk : ram_disk.cpp ;
