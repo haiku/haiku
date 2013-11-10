@@ -414,8 +414,7 @@ NetworkStatusView::MouseDown(BPoint point)
 			message->AddFlat("address", &network.address);
 
 			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
-				network.signal_strength,
-				(network.flags & B_NETWORK_IS_ENCRYPTED) != 0, message);
+				network.signal_strength, network.authentication_mode, message);
 			menu->AddItem(item);
 			if (associated.find(network.address) != associated.end())
 				item->SetMarked(true);

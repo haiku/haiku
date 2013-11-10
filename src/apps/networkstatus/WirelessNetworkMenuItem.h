@@ -12,15 +12,14 @@
 class WirelessNetworkMenuItem : public BMenuItem {
 public:
 								WirelessNetworkMenuItem(const char* name,
-									int32 signalQuality, bool encrypted,
+									int32 signalQuality, int32 authenticationMode,
 									BMessage* message);
 	virtual						~WirelessNetworkMenuItem();
 
 			void				SetSignalQuality(int32 quality);
 			int32				SignalQuality() const
 									{ return fQuality; }
-			bool				IsEncrypted() const
-									{ return fIsEncrypted; }
+			BString 			AuthenticationName(int32 mode);
 
 protected:
 	virtual	void				DrawContent();
@@ -30,7 +29,6 @@ protected:
 
 private:
 			int32				fQuality;
-			bool				fIsEncrypted;
 };
 
 

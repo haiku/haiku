@@ -6,16 +6,29 @@
 
 #include "WirelessNetworkMenuItem.h"
 
+#include <Catalog.h>
+#include <NetworkDevice.h>
+#include <String.h>
+
 #include "RadioView.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "WirelessNetworkMenuItem"
 
 
 WirelessNetworkMenuItem::WirelessNetworkMenuItem(const char* name,
-	int32 signalQuality, bool encrypted, BMessage* message)
+	int32 signalQuality, int32 authenticationMode, BMessage* message)
 	:
 	BMenuItem(name, message),
-	fQuality(signalQuality),
-	fIsEncrypted(encrypted)
+	fQuality(signalQuality)
 {
+	// Append authentication mode to label
+	BString label = B_TRANSLATE("%name% (%authenticationMode%)");
+	label.Replace("%name%", name, 1);
+	label.Replace("%authenticationMode%",
+		AuthenticationName(authenticationMode), 1);
+
+	SetLabel(label.String());
 }
 
 
@@ -30,6 +43,28 @@ WirelessNetworkMenuItem::SetSignalQuality(int32 quality)
 	fQuality = quality;
 }
 
+BString
+WirelessNetworkMenuItem::AuthenticationName(int32 mode)
+{
+	switch (mode) {
+		default:
+		case B_NETWORK_AUTHENTICATION_NONE:
+			return B_TRANSLATE_CONTEXT("open", "Open network");
+			break;
+		case B_NETWORK_AUTHENTICATION_WEP:
+			return B_TRANSLATE_CONTEXT("WEP", "WEP protected network");
+			break;
+		case B_NETWORK_AUTHENTICATION_WPA:
+			return B_TRANSLATE_CONTEXT("WPA", "WPA protected network");
+			break;
+		case B_NETWORK_AUTHENTICATION_WPA2:
+			return B_TRANSLATE_CONTEXT("WPA2", "WPA2 protected network");
+			break;
+		case B_NETWORK_AUTHENTICATION_EAP:
+			return B_TRANSLATE_CONTEXT("EAP", "EAP protected network");
+			break;
+	}
+}
 
 void
 WirelessNetworkMenuItem::DrawContent()
