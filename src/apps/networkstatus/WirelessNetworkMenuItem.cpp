@@ -43,6 +43,7 @@ WirelessNetworkMenuItem::SetSignalQuality(int32 quality)
 	fQuality = quality;
 }
 
+
 BString
 WirelessNetworkMenuItem::AuthenticationName(int32 mode)
 {
@@ -65,6 +66,7 @@ WirelessNetworkMenuItem::AuthenticationName(int32 mode)
 			break;
 	}
 }
+
 
 void
 WirelessNetworkMenuItem::DrawContent()
