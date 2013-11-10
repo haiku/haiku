@@ -17,19 +17,21 @@
 #include "Volume.h"
 
 
+static const char* const kUnknownLinkTarget = "?";
+
 static const char* const kLinkPaths[PackageLinkSymlink::TYPE_ENUM_COUNT]
 		[PACKAGE_FS_MOUNT_TYPE_ENUM_COUNT] = {
 	{
 		"../..",
-		"../../../home/config"
+		"../../../home/config",
+		kUnknownLinkTarget
 	},
 	{
 		"../../../system/settings",
-		"../../../home/config/settings/global"
+		"../../../home/config/settings/global",
+		kUnknownLinkTarget
 	}
 };
-
-static const char* const kUnknownLinkTarget = "?";
 
 
 static const char*
