@@ -3070,18 +3070,22 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 	const uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
 		| HEAP_DONT_LOCK_KERNEL_SPACE;
 
-	PageWriteWrapper stackWrappers[2];
+	PageWriteWrapper stackWrappersPool[2];
+	PageWriteWrapper* stackWrappers[1];
 	PageWriteWrapper* wrapperPool
 		= new(malloc_flags(allocationFlags)) PageWriteWrapper[maxPages + 1];
-	if (wrapperPool == NULL) {
+	PageWriteWrapper** wrappers
+		= new(malloc_flags(allocationFlags)) PageWriteWrapper*[maxPages];
+	if (wrapperPool == NULL || wrappers == NULL) {
 		// don't fail, just limit our capabilities
-		wrapperPool = stackWrappers;
+		free(wrapperPool);
+		free(wrappers);
+		wrapperPool = stackWrappersPool;
+		wrappers = stackWrappers;
 		maxPages = 1;
 	}
 
 	int32 nextWrapper = 0;
-
-	PageWriteWrapper* wrappers[maxPages];
 	int32 usedWrappers = 0;
 
 	PageWriteTransfer transfer;
@@ -3151,8 +3155,10 @@ vm_page_write_modified_page_range(struct VMCache* cache, uint32 firstPage,
 			transferEmpty = true;
 	}
 
-	if (wrapperPool != stackWrappers)
+	if (wrapperPool != stackWrappersPool) {
 		delete[] wrapperPool;
+		delete[] wrappers;
+	}
 
 	return B_OK;
 }
@@ -3846,7 +3852,7 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 				offsetStart = (offsetStart + alignmentMask) & ~alignmentMask;
 
 			// enforce boundary
-			if (boundaryMask != 0 && ((offsetStart ^ (offsetStart 
+			if (boundaryMask != 0 && ((offsetStart ^ (offsetStart
 				+ length - 1)) & boundaryMask) != 0) {
 				offsetStart = (offsetStart + length - 1) & boundaryMask;
 			}
