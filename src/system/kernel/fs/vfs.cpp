@@ -3401,29 +3401,17 @@ dump_vnode_usage(int argc, char** argv)
 
 #endif	// ADD_DEBUGGER_COMMANDS
 
-/*!	Clears an iovec array of physical pages.
-	Returns in \a _bytes the number of bytes successfully cleared.
+
+/*!	Clears memory specified by an iovec array.
 */
-static status_t
-zero_pages(const iovec* vecs, size_t vecCount, size_t* _bytes)
+static void
+zero_iovecs(const iovec* vecs, size_t vecCount, size_t bytes)
 {
-	size_t bytes = *_bytes;
-	size_t index = 0;
-
-	while (bytes > 0) {
-		size_t length = min_c(vecs[index].iov_len, bytes);
-
-		status_t status = vm_memset_physical((addr_t)vecs[index].iov_base, 0,
-			length);
-		if (status != B_OK) {
-			*_bytes -= bytes;
-			return status;
-		}
-
+	for (size_t i = 0; i < vecCount && bytes > 0; i++) {
+		size_t length = std::min(vecs[i].iov_len, bytes);
+		memset(vecs[i].iov_base, 0, length);
 		bytes -= length;
 	}
-
-	return B_OK;
 }
 
 
@@ -3463,7 +3451,8 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 				&vecs[vecIndex], vecCount - vecIndex, &size);
 		} else {
 			// sparse read
-			status = zero_pages(&vecs[vecIndex], vecCount - vecIndex, &size);
+			zero_iovecs(&vecs[vecIndex], vecCount - vecIndex, size);
+			status = B_OK;
 		}
 		if (status != B_OK)
 			return status;
@@ -3566,7 +3555,8 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 					status = B_IO_ERROR;
 				} else {
 					// sparse read
-					status = zero_pages(tempVecs, tempCount, &bytes);
+					zero_iovecs(tempVecs, tempCount, bytes);
+					status = B_OK;
 				}
 			} else if (doWrite) {
 				status = FS_CALL(vnode, write_pages, cookie, fileOffset,
