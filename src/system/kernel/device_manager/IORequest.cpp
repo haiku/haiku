@@ -724,6 +724,8 @@ status_t
 IORequest::Init(off_t offset, generic_addr_t buffer, generic_size_t length,
 	bool write, uint32 flags)
 {
+	ASSERT(offset >= 0);
+
 	generic_io_vec vec;
 	vec.base = buffer;
 	vec.length = length;
@@ -736,6 +738,8 @@ IORequest::Init(off_t offset, generic_size_t firstVecOffset,
 	const generic_io_vec* vecs, size_t count, generic_size_t length, bool write,
 	uint32 flags)
 {
+	ASSERT(offset >= 0);
+
 	fBuffer = IOBuffer::Create(count, (flags & B_VIP_IO_REQUEST) != 0);
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
