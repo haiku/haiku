@@ -30,7 +30,7 @@ HAIKU_FIRMWARE_NAME_MAP(8) = {
 	{"iwn5000fw", "iwlwifi-5000-5.ucode"},
 	{"iwn5150fw", "iwlwifi-5150-2.ucode"},
 	{"iwn6000fw", "iwlwifi-6000-4.ucode"},
-	{"iwn6000g2afw", "iwlwifi-6000g2a-5.ucode"},
+	{"iwn6000g2afw", "iwlwifi-6000g2a-6.ucode"},
 	{"iwn6000g2bfw", "iwlwifi-6000g2b-6.ucode"},
 	{"iwn6050fw", "iwlwifi-6050-5.ucode"}
 };
