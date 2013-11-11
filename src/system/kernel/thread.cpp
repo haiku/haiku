@@ -1112,6 +1112,11 @@ undertaker(void* /*args*/)
 		// we've got an entry
 		Thread* thread = entry.thread;
 
+		// make sure the thread isn't running anymore
+		InterruptsSpinLocker schedulerLocker(thread->scheduler_lock);
+		ASSERT(thread->state == THREAD_STATE_FREE_ON_RESCHED);
+		schedulerLocker.Unlock();
+
 		// remove this thread from from the kernel team -- this makes it
 		// unaccessible
 		Team* kernelTeam = team_get_kernel_team();
@@ -2254,12 +2259,13 @@ thread_exit(void)
 
 	disable_interrupts();
 
+	SpinLocker schedulerLocker(thread->scheduler_lock);
+
 	SpinLocker undertakerLocker(sUndertakerLock);
 	sUndertakerEntries.Add(&undertakerEntry);
 	sUndertakerCondition.NotifyOne();
 	undertakerLocker.Unlock();
 
-	SpinLocker schedulerLocker(thread->scheduler_lock);
 	thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
 	scheduler_reschedule();
 
