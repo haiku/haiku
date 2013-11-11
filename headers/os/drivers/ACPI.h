@@ -151,6 +151,9 @@ typedef uint32 acpi_status;
 
 typedef struct acpi_resource acpi_resource;
 
+#define ACPI_REENABLE_GPE	0x80
+
+
 #endif	// __ACTYPES_H__
 
 

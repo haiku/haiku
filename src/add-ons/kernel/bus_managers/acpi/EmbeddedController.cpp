@@ -604,7 +604,7 @@ EcGpeHandler(acpi_handle gpeDevice, uint32 gpeNumber, void* context)
 		else
 			dprintf("EcGpeHandler: queuing GPE query handler failed\n");
 	}
-	return B_INVOKE_SCHEDULER;
+	return ACPI_REENABLE_GPE;
 }
 
 
