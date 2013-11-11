@@ -165,11 +165,32 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 
 	// create subrequests for the file vecs we've got
 	size_t subRequestCount = 0;
-	for (size_t i = 0; i < vecCount && subRequestCount < kMaxSubRequests; i++) {
+	for (size_t i = 0;
+		i < vecCount && subRequestCount < kMaxSubRequests && error == B_OK;
+		i++) {
 		off_t vecOffset = vecs[i].offset;
 		off_t vecLength = min_c(vecs[i].length, (off_t)requestLength);
 		TRACE_RIO("[%ld]    vec %lu offset: %lld, length: %lld\n",
 			find_thread(NULL), i, vecOffset, vecLength);
+
+		// Special offset -1 means that this is part of sparse file that is
+		// zero. We fill it in right here.
+		if (vecOffset == -1) {
+			if (request->IsWrite()) {
+				panic("do_iterative_fd_io_iterate(): write to sparse file "
+					"vector");
+				error = B_BAD_VALUE;
+				break;
+			}
+
+			error = request->ClearData(requestOffset, vecLength);
+			if (error != B_OK)
+				break;
+
+			requestOffset += vecLength;
+			requestLength -= vecLength;
+			continue;
+		}
 
 		while (vecLength > 0 && subRequestCount < kMaxSubRequests) {
 			TRACE_RIO("[%ld]    creating subrequest: offset: %lld, length: "
@@ -199,6 +220,14 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 
 	request->Advance(requestOffset - cookie->request_offset);
 	cookie->request_offset = requestOffset;
+
+	// If we don't have any sub requests at this point, that means all that
+	// remained were zeroed sparse file vectors. So the request is done now.
+	if (subRequestCount == 0) {
+		ASSERT(request->RemainingBytes() == 0);
+		request->SetStatusAndNotify(B_OK);
+		return B_OK;
+	}
 
 	// Schedule the subrequests.
 	IORequest* nextSubRequest = request->FirstSubRequest();
