@@ -465,14 +465,15 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 		}
 
 		offset += blockLength;
-		size -= blockLength;
 
-		if ((off_t)size <= vecs[index - 1].length || offset >= inode->Size()) {
+		if (offset >= inode->Size() || size <= blockLength) {
 			// We're done!
 			*_count = index;
 			TRACE("ext2_get_file_map for inode %" B_PRIdINO "\n", inode->ID());
 			return B_OK;
 		}
+
+		size -= blockLength;
 	}
 
 	// can never get here
