@@ -1173,7 +1173,7 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 	if (fBuffer->IsPhysical()) {
 		copyFunction = &IORequest::_CopyPhysical;
 	} else {
-		copyFunction = fBuffer->IsUser()
+		copyFunction = fBuffer->IsUser() && fTeam != team_get_current_team_id()
 			? &IORequest::_CopyUser : &IORequest::_CopySimple;
 	}
 
