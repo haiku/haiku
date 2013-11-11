@@ -77,60 +77,71 @@ ExtentStream::FindBlock(off_t offset, fsblock_t& block, uint32 *_count)
 			panic("ExtentStream::FindBlock() invalid header\n");
 	}
 
+	// find the extend following the one that should contain the logical block
+	int32 extentIndex;
 	if (stream->extent_header.NumEntries() > 7) {
 		// binary search when enough entries
 		int32 low = 0;
 		int32 high = stream->extent_header.NumEntries() - 1;
-		int32 middle = 0;
-		while (low <= high) {
-			middle = (high + low) >> 1;
-			if (stream->extent_entries[middle].LogicalBlock() == index)
-				break;
-			if (stream->extent_entries[middle].LogicalBlock() < index)
-				low = middle + 1;
-			else
+		while (low < high) {
+			int32 middle = (high + low + 1) / 2;
+			if (stream->extent_entries[middle].LogicalBlock() > index)
 				high = middle - 1;
-		}
-		if (stream->extent_entries[middle].LogicalBlock() > index)
-			middle--;
-		fileblock_t diff = index 
-			- stream->extent_entries[middle].LogicalBlock();
-		if (diff > stream->extent_entries[middle].Length()) {
-			// sparse block
-			TRACE("FindBlock() sparse block index %" B_PRIu64 " at %" B_PRIu32
-				"\n", index, stream->extent_entries[middle].LogicalBlock());
-			block = 0xffffffff;
-			return B_OK;
+			else
+				low = middle;
 		}
 
-		block = stream->extent_entries[middle].PhysicalBlock() + diff;
-		if (_count)
-			*_count = stream->extent_entries[middle].Length() - diff;
-		TRACE("FindBlock(offset %" B_PRIdOFF "): %" B_PRIu64 " %" B_PRIu32
-			"\n", offset, block, _count != NULL ? *_count : 1);
+		extentIndex = low + 1;
+	} else {
+		extentIndex = stream->extent_header.NumEntries();
+		for (int32 i = 0; i < stream->extent_header.NumEntries(); i++) {
+			if (stream->extent_entries[i].LogicalBlock() > index) {
+				extentIndex = i;
+				break;
+			}
+		}
+	}
+
+	fileblock_t logicalEndIndex
+		= (fSize + fVolume->BlockSize() - 1) >> fVolume->BlockShift();
+
+	if (extentIndex == 0) {
+		// sparse block at the beginning of the stream
+		block = 0;
+		if (_count != NULL) {
+			*_count = stream->extent_header.NumEntries() == 0
+				? logicalEndIndex - index
+				: stream->extent_entries[0].LogicalBlock() - index;
+		}
+		TRACE("FindBlock() sparse block index %" B_PRIu64 " at beginning of "
+			"stream\n", index);
 		return B_OK;
 	}
 
-	for (int32 i = 0; i < stream->extent_header.NumEntries(); i++) {
-		if (stream->extent_entries[i].LogicalBlock() > index) {
-			// sparse block
-			TRACE("FindBlock() sparse block index %" B_PRIu64 " at %" B_PRIu32
-				"\n", index, stream->extent_entries[i].LogicalBlock());
-			block = 0xffffffff;
-			return B_OK;
+	const ext2_extent_entry& extent = stream->extent_entries[extentIndex - 1];
+		// the extent supposedly containing the offset
+	fileblock_t diff = index - extent.LogicalBlock();
+	if (diff >= extent.Length()) {
+		// sparse block between extends or at the end of the stream
+		TRACE("FindBlock() sparse block index %" B_PRIu64 " at %" B_PRIu32
+			"\n", index, extent.LogicalBlock());
+		block = 0;
+		if (_count != NULL) {
+			*_count = stream->extent_header.NumEntries() == extentIndex
+				? logicalEndIndex - index
+				: stream->extent_entries[extentIndex].LogicalBlock() - index;
 		}
-		fileblock_t diff = index - stream->extent_entries[i].LogicalBlock();
-		if (diff < stream->extent_entries[i].Length()) {
-			block = stream->extent_entries[i].PhysicalBlock() + diff;
-			if (_count)
-				*_count = stream->extent_entries[i].Length() - diff;
-			TRACE("FindBlock(offset %" B_PRIdOFF "): %" B_PRIu64 " %" B_PRIu32
-				"\n", offset, block, _count != NULL ? *_count : 1);
-			return B_OK;
-		}
+		return B_OK;
 	}
 
-	return B_ERROR;
+	block = extent.PhysicalBlock() + diff;
+	if (_count != NULL)
+		*_count = extent.Length() - diff;
+
+	TRACE("FindBlock(offset %" B_PRIdOFF "): %" B_PRIu64 " %" B_PRIu32
+		"\n", offset, block, _count != NULL ? *_count : 1);
+
+	return B_OK;
 }
 
 
