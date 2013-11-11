@@ -71,6 +71,15 @@ static const char* kCurrentKeymapName = "(Current)";
 static const char* kDefaultKeymapName = "US-International";
 
 
+static int
+compare_key_list_items(const void* a, const void* b)
+{
+	KeymapListItem* item1 = *(KeymapListItem**)a;
+	KeymapListItem* item2 = *(KeymapListItem**)b;
+	return BLocale::Default()->StringCompare(item1->Text(), item2->Text());
+}
+
+
 KeymapWindow::KeymapWindow()
 	:
 	BWindow(BRect(80, 50, 880, 380), B_TRANSLATE_SYSTEM_NAME("Keymap"),
@@ -855,6 +864,8 @@ KeymapWindow::_FillSystemMaps()
 			fSystemListView->AddItem(new KeymapListItem(ref));
 		}
 	}
+
+	fSystemListView->SortItems(&compare_key_list_items);
 }
 
 
@@ -884,6 +895,8 @@ KeymapWindow::_FillUserMaps()
 			fUserListView->AddItem(new KeymapListItem(ref));
 		}
 	}
+
+	fUserListView->SortItems(&compare_key_list_items);
 }
 
 
