@@ -759,7 +759,7 @@ ext2_create(fs_volume* _volume, fs_vnode* _directory, const char* name,
 
 	TRACE("ext2_create(): Created inode\n");
 
-	if ((openMode & O_NOCACHE) != 0 && !inode->IsFileCacheDisabled()) {
+	if ((openMode & O_NOCACHE) != 0) {
 		status = inode->DisableFileCache();
 		if (status != B_OK)
 			return status;
@@ -830,8 +830,8 @@ ext2_create_symlink(fs_volume* _volume, fs_vnode* _directory, const char* name,
 			link->Mode(), 0);
 		put_vnode(volume->FSVolume(), id);
 
-		if (link->IsFileCacheDisabled()) {
-			status = link->EnableFileCache();
+		if (!link->HasFileCache()) {
+			status = link->CreateFileCache();
 			if (status != B_OK)
 				return status;
 		}
@@ -1132,10 +1132,12 @@ ext2_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	cookie->last_size = inode->Size();
 	cookie->last_notification = system_time();
 
+	MethodDeleter<Inode, status_t> fileCacheEnabler(&Inode::EnableFileCache);
 	if ((openMode & O_NOCACHE) != 0) {
 		status = inode->DisableFileCache();
 		if (status != B_OK)
 			return status;
+		fileCacheEnabler.SetTo(inode);
 	}
 
 	// Should we truncate the file?
@@ -1157,6 +1159,7 @@ ext2_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 		// TODO: No need to notify file size changed?
 	}
 
+	fileCacheEnabler.Detach();
 	cookieDeleter.Detach();
 	*_cookie = cookie;
 
@@ -1245,6 +1248,9 @@ ext2_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 
 	if (inode->Size() != cookie->last_size)
 		notify_stat_changed(volume->ID(), inode->ID(), B_STAT_SIZE);
+
+	if ((cookie->open_mode & O_NOCACHE) != 0)
+		inode->EnableFileCache();
 
 	delete cookie;
 	return B_OK;

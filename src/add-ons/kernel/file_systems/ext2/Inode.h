@@ -112,9 +112,11 @@ public:
 	
 			void*		FileCache() const { return fCache; }
 			void*		Map() const { return fMap; }
+			status_t	CreateFileCache();
+			void		DeleteFileCache();
+			bool		HasFileCache() { return fCache != NULL; }
 			status_t	EnableFileCache();
 			status_t	DisableFileCache();
-			bool		IsFileCacheDisabled() const { return !fCached; }
 
 			status_t	Sync();
 
@@ -144,7 +146,6 @@ private:
 			ino_t		fID;
 			void*		fCache;
 			void*		fMap;
-			bool		fCached;
 			bool		fUnlinked;
 			bool		fHasExtraAttributes;
 			ext2_inode	fNode;

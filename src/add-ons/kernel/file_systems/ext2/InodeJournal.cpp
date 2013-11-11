@@ -39,32 +39,30 @@ InodeJournal::InodeJournal(Inode* inode)
 		fJournalVolume = volume;
 		fJournalBlockCache = volume->BlockCache();
 
-		if (!inode->IsFileCacheDisabled())
-			fInitStatus = inode->DisableFileCache();
-		else
-			fInitStatus = B_OK;
-		
-		if (fInitStatus == B_OK) {
-			TRACE("InodeJournal::InodeJournal(): Inode's file cache disabled "
-				"successfully\n");
-			HashRevokeManager* revokeManager = new(std::nothrow)
-				HashRevokeManager;
-			TRACE("InodeJournal::InodeJournal(): Allocated a hash revoke "
-				"manager at %p\n", revokeManager);
+		if (inode->HasFileCache())
+			inode->DeleteFileCache();
 
-			if (revokeManager == NULL) {
-				TRACE("InodeJournal::InodeJournal(): Insufficient memory to "
-					"create the hash revoke manager\n");
-				fInitStatus = B_NO_MEMORY;
-			} else {
-				fInitStatus = revokeManager->Init();
-				
-				if (fInitStatus == B_OK) {
-					fRevokeManager = revokeManager;
-					fInitStatus = _LoadSuperBlock();
-				} else
-					delete revokeManager;
-			}
+		fInitStatus = B_OK;
+
+		TRACE("InodeJournal::InodeJournal(): Inode's file cache disabled "
+			"successfully\n");
+		HashRevokeManager* revokeManager = new(std::nothrow)
+			HashRevokeManager;
+		TRACE("InodeJournal::InodeJournal(): Allocated a hash revoke "
+			"manager at %p\n", revokeManager);
+
+		if (revokeManager == NULL) {
+			TRACE("InodeJournal::InodeJournal(): Insufficient memory to "
+				"create the hash revoke manager\n");
+			fInitStatus = B_NO_MEMORY;
+		} else {
+			fInitStatus = revokeManager->Init();
+
+			if (fInitStatus == B_OK) {
+				fRevokeManager = revokeManager;
+				fInitStatus = _LoadSuperBlock();
+			} else
+				delete revokeManager;
 		}
 	}
 }

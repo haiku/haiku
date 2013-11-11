@@ -37,7 +37,6 @@ Inode::Inode(Volume* volume, ino_t id)
 	fID(id),
 	fCache(NULL),
 	fMap(NULL),
-	fCached(false),
 	fHasExtraAttributes(false)
 {
 	rw_lock_init(&fLock, "ext2 inode");
@@ -56,11 +55,9 @@ Inode::Inode(Volume* volume, ino_t id)
 
 		if (IsDirectory() || (IsSymLink() && Size() < 60)) {
 			TRACE("Inode::Inode(): Not creating the file cache\n");
-			fCached = false;
-
 			fInitStatus = B_OK;
 		} else
-			fInitStatus = EnableFileCache();
+			fInitStatus = CreateFileCache();
 	} else
 		TRACE("Inode: Failed initialization\n");
 }
@@ -72,7 +69,6 @@ Inode::Inode(Volume* volume)
 	fID(0),
 	fCache(NULL),
 	fMap(NULL),
-	fCached(false),
 	fInitStatus(B_NO_INIT)
 {
 	rw_lock_init(&fLock, "ext2 inode");
@@ -89,11 +85,7 @@ Inode::~Inode()
 {
 	TRACE("Inode destructor\n");
 
-	if (fCached) {
-		TRACE("Deleting the file cache and file map\n");
-		file_cache_delete(FileCache());
-		file_map_delete(Map());
-	}
+	DeleteFileCache();
 
 	TRACE("Inode destructor: Done\n");
 }
@@ -269,7 +261,7 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 		buffer, _length, *_length);
 	ReadLocker readLocker(fLock);
 
-	if (IsFileCacheDisabled())
+	if (!HasFileCache())
 		return B_BAD_VALUE;
 
 	if (pos < 0)
@@ -697,7 +689,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	if (!inode->IsSymLink()) {
 		// Vnode::Publish doesn't publish symlinks
 		if (!inode->IsDirectory()) {
-			status = inode->EnableFileCache();
+			status = inode->CreateFileCache();
 			if (status != B_OK)
 				return status;
 		}
@@ -726,31 +718,59 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 
 
 status_t
-Inode::EnableFileCache()
+Inode::CreateFileCache()
 {
-	TRACE("Inode::EnableFileCache()\n");
+	TRACE("Inode::CreateFileCache()\n");
 
-	if (fCached)
+	if (fCache != NULL)
 		return B_OK;
-	if (fCache != NULL) {
-		fCached = true;
-		return B_OK;
-	}
 
-	TRACE("Inode::EnableFileCache(): Creating file cache: %" B_PRIu32 ", %"
+	TRACE("Inode::CreateFileCache(): Creating file cache: %" B_PRIu32 ", %"
 		B_PRIdINO ", %" B_PRIdOFF "\n", fVolume->ID(), ID(), Size());
-	fCache = file_cache_create(fVolume->ID(), ID(), Size());
-	fMap = file_map_create(fVolume->ID(), ID(), Size());
 
+	fCache = file_cache_create(fVolume->ID(), ID(), Size());
 	if (fCache == NULL) {
-		ERROR("Inode::EnableFileCache(): Failed to create file cache\n");
-		fCached = false;
+		ERROR("Inode::CreateFileCache(): Failed to create file cache\n");
 		return B_ERROR;
 	}
 
-	fCached = true;
-	TRACE("Inode::EnableFileCache(): Done\n");
+	fMap = file_map_create(fVolume->ID(), ID(), Size());
+	if (fMap == NULL) {
+		ERROR("Inode::CreateFileCache(): Failed to create file map\n");
+		file_cache_delete(fCache);
+		fCache = NULL;
+		return B_ERROR;
+	}
 
+	TRACE("Inode::CreateFileCache(): Done\n");
+
+	return B_OK;
+}
+
+
+void
+Inode::DeleteFileCache()
+{
+	TRACE("Inode::DeleteFileCache()\n");
+
+	if (fCache == NULL)
+		return;
+
+	file_cache_delete(fCache);
+	file_map_delete(fMap);
+
+	fCache = NULL;
+	fMap = NULL;
+}
+
+
+status_t
+Inode::EnableFileCache()
+{
+	if (fCache == NULL)
+		return B_BAD_VALUE;
+
+	file_cache_enable(fCache);
 	return B_OK;
 }
 
@@ -758,15 +778,9 @@ Inode::EnableFileCache()
 status_t
 Inode::DisableFileCache()
 {
-	TRACE("Inode::DisableFileCache()\n");
-
-	if (!fCached)
-		return B_OK;
-
-	file_cache_delete(FileCache());
-	file_map_delete(Map());
-
-	fCached = false;
+	status_t error = file_cache_disable(fCache);
+	if (error != B_OK)
+		return error;
 
 	return B_OK;
 }
@@ -775,7 +789,7 @@ Inode::DisableFileCache()
 status_t
 Inode::Sync()
 {
-	if (!IsFileCacheDisabled())
+	if (HasFileCache())
 		return file_cache_sync(fCache);
 
 	return B_OK;
