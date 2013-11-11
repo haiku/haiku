@@ -13,6 +13,7 @@
 #include <debug.h>
 #include <heap.h>
 #include <kernel.h>
+#include <team.h>
 #include <thread.h>
 #include <util/AutoLock.h>
 #include <vm/vm.h>
@@ -1154,6 +1155,60 @@ IORequest::CopyData(const void* buffer, off_t offset, size_t size)
 
 
 status_t
+IORequest::ClearData(off_t offset, generic_size_t size)
+{
+	if (size == 0)
+		return B_OK;
+
+	if (offset < fOffset || offset + (off_t)size > fOffset + (off_t)fLength) {
+		panic("IORequest::ClearData(): invalid range: (%" B_PRIdOFF
+			", %" B_PRIuGENADDR ")", offset, size);
+		return B_BAD_VALUE;
+	}
+
+	// If we can, we directly copy from/to the virtual buffer. The memory is
+	// locked in this case.
+	status_t (*clearFunction)(generic_addr_t, generic_size_t, team_id);
+	if (fBuffer->IsPhysical()) {
+		clearFunction = &IORequest::_ClearDataPhysical;
+	} else {
+		clearFunction = fBuffer->IsUser() && fTeam != team_get_current_team_id()
+			? &IORequest::_ClearDataUser : &IORequest::_ClearDataSimple;
+	}
+
+	// skip bytes if requested
+	generic_io_vec* vecs = fBuffer->Vecs();
+	generic_size_t skipBytes = offset - fOffset;
+	generic_size_t vecOffset = 0;
+	while (skipBytes > 0) {
+		if (vecs[0].length > skipBytes) {
+			vecOffset = skipBytes;
+			break;
+		}
+
+		skipBytes -= vecs[0].length;
+		vecs++;
+	}
+
+	// clear vector-wise
+	while (size > 0) {
+		generic_size_t toClear = min_c(size, vecs[0].length - vecOffset);
+		status_t error = clearFunction(vecs[0].base + vecOffset, toClear,
+			fTeam);
+		if (error != B_OK)
+			return error;
+
+		size -= toClear;
+		vecs++;
+		vecOffset = 0;
+	}
+
+	return B_OK;
+
+}
+
+
+status_t
 IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 {
 	if (size == 0)
@@ -1263,6 +1318,57 @@ IORequest::_CopyUser(void* _bounceBuffer, generic_addr_t _external, size_t size,
 
 			size -= entry.size;
 			bounceBuffer += entry.size;
+			external += entry.size;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*static*/ status_t
+IORequest::_ClearDataSimple(generic_addr_t external, generic_size_t size,
+	team_id team)
+{
+	memset((void*)(addr_t)external, 0, (size_t)size);
+	return B_OK;
+}
+
+
+/*static*/ status_t
+IORequest::_ClearDataPhysical(generic_addr_t external, generic_size_t size,
+	team_id team)
+{
+	return vm_memset_physical((phys_addr_t)external, 0, (phys_size_t)size);
+}
+
+
+/*static*/ status_t
+IORequest::_ClearDataUser(generic_addr_t _external, generic_size_t size,
+	team_id team)
+{
+	uint8* external = (uint8*)(addr_t)_external;
+
+	while (size > 0) {
+		static const int32 kEntryCount = 8;
+		physical_entry entries[kEntryCount];
+
+		uint32 count = kEntryCount;
+		status_t error = get_memory_map_etc(team, external, size, entries,
+			&count);
+		if (error != B_OK && error != B_BUFFER_OVERFLOW) {
+			panic("IORequest::_ClearDataUser(): Failed to get physical memory "
+				"for user memory %p\n", external);
+			return B_BAD_ADDRESS;
+		}
+
+		for (uint32 i = 0; i < count; i++) {
+			const physical_entry& entry = entries[i];
+			error = _ClearDataPhysical(entry.address, entry.size, team);
+			if (error != B_OK)
+				return error;
+
+			size -= entry.size;
 			external += entry.size;
 		}
 	}

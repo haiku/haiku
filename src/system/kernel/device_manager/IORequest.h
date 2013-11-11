@@ -302,6 +302,7 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 									size_t size);
 			status_t			CopyData(const void* buffer, off_t offset,
 									size_t size);
+			status_t			ClearData(off_t offset, generic_size_t size);
 
 			void				Dump() const;
 
@@ -317,6 +318,12 @@ private:
 	static	status_t			_CopyUser(void* bounceBuffer,
 									generic_addr_t external, size_t size,
 									team_id team, bool copyIn);
+	static	status_t			_ClearDataSimple(generic_addr_t external,
+									generic_size_t size, team_id team);
+	static	status_t			_ClearDataPhysical(generic_addr_t external,
+									generic_size_t size, team_id team);
+	static	status_t			_ClearDataUser(generic_addr_t external,
+									generic_size_t size, team_id team);
 
 			mutex				fLock;
 			IORequestOwner*		fOwner;
