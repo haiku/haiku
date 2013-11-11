@@ -57,47 +57,9 @@ acpi_ac_notify_handler(acpi_handle device, uint32 value, void *context)
 
 
 static status_t
-acpi_ac_init_device(void *_cookie, void **cookie)
+acpi_ac_init_device(void *driverCookie, void **cookie)
 {
-	device_node *node = (device_node *)_cookie;
-	acpi_ac_device_info *device;
-	device_node *parent;
-	status_t status;
-
-	device = (acpi_ac_device_info *)calloc(1, sizeof(*device));
-	if (device == NULL)
-		return B_NO_MEMORY;
-
-	device->node = node;
-
-	parent = sDeviceManager->get_parent_node(node);
-	sDeviceManager->get_driver(parent, (driver_module_info **)&device->acpi,
-		(void **)&device->acpi_cookie);
-	sDeviceManager->put_node(parent);
-
-	status = device->acpi->install_notify_handler(device->acpi_cookie,
-		ACPI_DEVICE_NOTIFY, acpi_ac_notify_handler, device);
-	if (status != B_OK) {
-		ERROR("can't install notify handler\n");
-	}
-
-	device->last_status = 0;
-	acpi_data buf;
-	buf.pointer = NULL;
-	buf.length = ACPI_ALLOCATE_BUFFER;
-	if (device->acpi->evaluate_method(device->acpi_cookie, "_PSR", NULL,
-			&buf) != B_OK
-		|| buf.pointer == NULL
-		|| ((acpi_object_type*)buf.pointer)->object_type != ACPI_TYPE_INTEGER) {
-		ERROR("couldn't get status\n");
-	} else {
-		acpi_object_type* object = (acpi_object_type*)buf.pointer;
-		device->last_status = object->integer.integer;
-		free(buf.pointer);
-		TRACE("status %d\n", device->last_status);
-	}
-
-	*cookie = device;
+	*cookie = driverCookie;
 	return B_OK;
 }
 
@@ -105,12 +67,7 @@ acpi_ac_init_device(void *_cookie, void **cookie)
 static void
 acpi_ac_uninit_device(void *_cookie)
 {
-	acpi_ac_device_info *device = (acpi_ac_device_info *)_cookie;
 
-	device->acpi->remove_notify_handler(device->acpi_cookie,
-		ACPI_DEVICE_NOTIFY, acpi_ac_notify_handler);
-
-	free(device);
 }
 
 
@@ -217,7 +174,44 @@ acpi_ac_register_device(device_node *node)
 static status_t
 acpi_ac_init_driver(device_node *node, void **_driverCookie)
 {
-	*_driverCookie = node;
+	acpi_ac_device_info *device;
+	device_node *parent;
+	status_t status;
+
+	device = (acpi_ac_device_info *)calloc(1, sizeof(*device));
+	if (device == NULL)
+		return B_NO_MEMORY;
+
+	device->node = node;
+
+	parent = sDeviceManager->get_parent_node(node);
+	sDeviceManager->get_driver(parent, (driver_module_info **)&device->acpi,
+		(void **)&device->acpi_cookie);
+	sDeviceManager->put_node(parent);
+
+	status = device->acpi->install_notify_handler(device->acpi_cookie,
+		ACPI_DEVICE_NOTIFY, acpi_ac_notify_handler, device);
+	if (status != B_OK) {
+		ERROR("can't install notify handler\n");
+	}
+
+	device->last_status = 0;
+	acpi_data buf;
+	buf.pointer = NULL;
+	buf.length = ACPI_ALLOCATE_BUFFER;
+	if (device->acpi->evaluate_method(device->acpi_cookie, "_PSR", NULL,
+			&buf) != B_OK
+		|| buf.pointer == NULL
+		|| ((acpi_object_type*)buf.pointer)->object_type != ACPI_TYPE_INTEGER) {
+		ERROR("couldn't get status\n");
+	} else {
+		acpi_object_type* object = (acpi_object_type*)buf.pointer;
+		device->last_status = object->integer.integer;
+		free(buf.pointer);
+		TRACE("status %d\n", device->last_status);
+	}
+
+	*_driverCookie = device;
 	return B_OK;
 }
 
@@ -225,25 +219,32 @@ acpi_ac_init_driver(device_node *node, void **_driverCookie)
 static void
 acpi_ac_uninit_driver(void *driverCookie)
 {
+	acpi_ac_device_info *device = (acpi_ac_device_info *)driverCookie;
+
+	device->acpi->remove_notify_handler(device->acpi_cookie,
+		ACPI_DEVICE_NOTIFY, acpi_ac_notify_handler);
+
+	free(device);
 }
 
 
 static status_t
-acpi_ac_register_child_devices(void *_cookie)
+acpi_ac_register_child_devices(void *driverCookie)
 {
-	device_node *node = (device_node *)_cookie;
+	acpi_ac_device_info *device = (acpi_ac_device_info *)driverCookie;
 	int path_id;
 	char name[128];
 
 	path_id = sDeviceManager->create_id(ACPI_AC_PATHID_GENERATOR);
 	if (path_id < 0) {
-		dprintf("acpi_ac_register_child_devices: couldn't create a path_id\n");
+		ERROR("register_child_devices: couldn't create a path_id\n");
 		return B_ERROR;
 	}
 
 	snprintf(name, sizeof(name), ACPI_AC_BASENAME, path_id);
 
-	return sDeviceManager->publish_device(node, name, ACPI_AC_DEVICE_MODULE_NAME);
+	return sDeviceManager->publish_device(device->node, name,
+		ACPI_AC_DEVICE_MODULE_NAME);
 }
 
 
