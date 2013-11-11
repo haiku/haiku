@@ -4975,7 +4975,7 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 
 status_t
-vm_memset_physical(phys_addr_t address, int value, size_t length)
+vm_memset_physical(phys_addr_t address, int value, phys_size_t length)
 {
 	return sPhysicalPageMapper->MemsetPhysical(address, value, length);
 }

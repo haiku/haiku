@@ -149,7 +149,7 @@ off_t vm_available_not_needed_memory(void);
 off_t vm_available_not_needed_memory_debug(void);
 size_t vm_kernel_address_space_left(void);
 
-status_t vm_memset_physical(phys_addr_t address, int value, size_t length);
+status_t vm_memset_physical(phys_addr_t address, int value, phys_size_t length);
 status_t vm_memcpy_from_physical(void* to, phys_addr_t from, size_t length,
 			bool user);
 status_t vm_memcpy_to_physical(phys_addr_t to, const void* from, size_t length,
