@@ -45,6 +45,9 @@
 #endif
 
 
+#define CACHE_LINE_ALIGN	 __attribute__((aligned(64)))
+
+
 SchedulerListenerList gSchedulerListeners;
 spinlock gSchedulerListenersLock = B_SPINLOCK_INITIALIZER;
 
@@ -87,8 +90,9 @@ struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
 	bigtime_t	fMeasureTime;
 
 	int			fLoad;
-};
-typedef MinMaxHeap<CPUEntry, int32> CPUHeap;
+} CACHE_LINE_ALIGN;
+typedef MinMaxHeap<CPUEntry, int32> CPUHeap CACHE_LINE_ALIGN;
+
 static CPUEntry* sCPUEntries;
 static CPUHeap* sCPUPriorityHeaps;
 
@@ -106,17 +110,16 @@ struct CoreEntry : public DoublyLinkedListLinkImpl<CoreEntry> {
 	bigtime_t	fActiveTime;
 
 	int			fLoad;
-};
-
-static CoreEntry* sCoreEntries;
+} CACHE_LINE_ALIGN;
 typedef Heap<CoreEntry, int32, HeapLesserCompare<int32>,
 		HeapMemberGetLink<CoreEntry, int32, &CoreEntry::fPriorityHeapLink> >
 	CorePriorityHeap;
-static CorePriorityHeap* sCorePriorityHeap;
-
 typedef MinMaxHeap<CoreEntry, int, MinMaxHeapCompare<int>,
 		MinMaxHeapMemberGetLink<CoreEntry, int, &CoreEntry::fLoadHeapLink> >
 	CoreLoadHeap;
+
+static CoreEntry* sCoreEntries;
+static CorePriorityHeap* sCorePriorityHeap;
 static CoreLoadHeap* sCoreLoadHeap;
 static CoreLoadHeap* sCoreHighLoadHeap;
 
@@ -137,7 +140,7 @@ struct PackageEntry : public MinMaxHeapLinkImpl<PackageEntry, int32>,
 	int32						fIdleCoreCount;
 
 	int32						fCoreCount;
-};
+} CACHE_LINE_ALIGN;
 typedef MinMaxHeap<PackageEntry, int32> PackageHeap;
 typedef DoublyLinkedList<PackageEntry> IdlePackageList;
 
@@ -150,8 +153,9 @@ static IdlePackageList* sIdlePackageList;
 // logical processor has its sPinnedRunQueues used for scheduling
 // pinned threads.
 typedef RunQueue<Thread, THREAD_MAX_SET_PRIORITY> ThreadRunQueue;
-static ThreadRunQueue* sRunQueues;
-static ThreadRunQueue* sPinnedRunQueues;
+
+static ThreadRunQueue* sRunQueues CACHE_LINE_ALIGN;
+static ThreadRunQueue* sPinnedRunQueues CACHE_LINE_ALIGN;
 static int32 sRunQueueCount;
 
 // Since CPU IDs used internally by the kernel bear no relation to the actual
@@ -159,7 +163,6 @@ static int32 sRunQueueCount;
 // and the package that CPU in question belongs to.
 static int32* sCPUToCore;
 static int32* sCPUToPackage;
-
 
 struct scheduler_thread_data {
 						scheduler_thread_data() { Init(); }
