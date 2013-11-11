@@ -112,6 +112,13 @@ NotificationWindow::FrameResized(float width, float height)
 
 
 void
+NotificationWindow::ScreenChanged(BRect frame, color_space mode)
+{
+	SetPosition();
+}
+
+
+void
 NotificationWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {

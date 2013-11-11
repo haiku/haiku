@@ -46,6 +46,7 @@ public:
 	virtual	void					MessageReceived(BMessage*);
 	virtual	void					WorkspaceActivated(int32, bool);
 	virtual	void					FrameResized(float width, float height);
+	virtual	void					ScreenChanged(BRect frame, color_space mode);
 	virtual	BHandler*				ResolveSpecifier(BMessage*, int32, BMessage*,
 										int32, const char*);
 										
