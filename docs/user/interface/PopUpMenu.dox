@@ -1,0 +1,208 @@
+/*
+ * Copyright 2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/PopUpMenu.h	 hrev46360
+ *		src/kits/interface/PopUpMenu.cpp	 hrev46360
+ */
+
+
+/*!
+	\file PopUpMenu.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BPopUpMenu class definition and support structures.
+*/
+
+
+/*!
+	\class BPopUpMenu
+	\ingroup interface
+	\ingroup libbe
+	\brief Displays a pop-up menu.
+
+	A BPopUpMenu is typically used to display a limited set of
+	mutually-exclusive choices rather than as part of a deeply nested
+	menu hierarchy. A BPopUpMenu is similar to a BMenu but has a few
+	additional methods to make it easier to use the menu as a stand-alone
+	menu and to manage the object's lifetime.
+
+	Pop-up menus are used either as a stand-alone menu, usually as
+	a context menu activated by \c B_SECONDARY_MOUSE_BUTTON, or
+	as a menu attached to a BMenuField or BMenuBar.
+
+	If the pop-up menu is used as a stand-alone menu, the Go() method
+	controls how and where the menu pops up and provides several options
+	for how the pop-up menu works.
+
+	Once Go() returns the BPopUpMenu object should be destroyed. You can call
+	SetAsyncAutoDestruct() passing \c true to destroy the object automatically
+	when it returns. This is not advisable if the \a deliversMessage parameter
+	of Go() is set \c false because you'll want to examine the return value
+	before destroying the BPopUpMenu object.
+
+	If the pop-up menu is used as part of a BMenuField or BMenuBar it behaves
+	almost exactly like a BMenu would, but, the menu pops up directly under the
+	mouse pointer instead of underneath the BMenuBar or BMenuField.
+*/
+
+
+/*!
+	\fn BPopUpMenu::BPopUpMenu(const char* name, bool radioMode,
+		bool labelFromMarked, menu_layout layout)
+	\brief Creates a new BPopUpMenu object.
+
+	\attention A BPopUpMenu should never be set to \a B_ITEMS_IN_MATRIX
+	           layout. The menu is automatically resized so that its
+	           menu items will fit exactly in the menu.
+
+	\param name The menu's name, serves as a label for submenus.
+	\param radioMode Whether or not the menu is in radio mode, default is
+	       \c true.
+	\param labelFromMarked Whether or not the menu is in label-from-marked mode,
+	       default is \c true.
+	\param layout The menu layout, possibilities include:
+	       - \c B_ITEMS_IN_ROW items are displayed in a single row,
+	       - \c B_ITEMS_IN_COLUMN items are displayed in a single column,
+	            the default layout.
+
+	\see BMenu::SetRadioMode()
+	\see BMenu::SetLabelFromMarked()
+*/
+
+
+/*!
+	\fn BPopUpMenu::BPopUpMenu(BMessage* archive)
+	\brief Archive constructor.
+
+	\param archive The message data to construct the pop-up menu from.
+*/
+
+
+/*!
+	\fn BPopUpMenu::~BPopUpMenu()
+	\brief Destructor method.
+
+	Also frees the memory used by any attached menu items.
+*/
+
+
+/*!
+	\fn status_t BPopUpMenu::Archive(BMessage* data, bool deep) const
+	\brief Archives the the BMenuField object into the \a data message.
+
+	\param data A pointer to the BMessage to archive the object into.
+	\param deep Whether or not to archive attached menu items as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived successfully.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+*/
+
+
+/*!
+	\fn BArchivable* BPopUpMenu::Instantiate(BMessage* data)
+	\brief Creates a new BPopUpMenu object from the \a data message.
+
+	\returns A newly created BPopUpMenu object or \c NULL if the message
+	         doesn't contain an archived BPopUpMenu.
+*/
+
+
+/*!
+	\fn BMenuItem* BPopUpMenu::Go(BPoint where, bool deliversMessage,
+		bool openAnyway, bool async)
+	\brief Places the menu on screen.
+
+	\param where The location to open the left-top-corner of the pop-up menu
+	       in the screen's coordinate system.
+	\param deliversMessage if \c true, the menu item posts a message to its
+	       target as it normally would when selected by the user.
+	       If \a deliversMessage is \c false no message is sent and you are
+	       expected to decide what action to take based on the return value.
+	\param openAnyway If \c true, the pop-up menu will stay open even once the
+	       user has released the mouse button. To dismiss the menu, either a
+	       menu item must be selected or it must be dismissed programmatically.
+	\param async If \c true the menu will return \c NULL immediately, if
+	       \c false the menu will not return until a menu item is selected
+	       or it is dismissed by the user. If a menu item was selected a
+	       pointer to the menu item is returned, if not, \c NULL is returned.
+*/
+
+
+/*!
+	\fn BMenuItem* BPopUpMenu::Go(BPoint where, bool deliversMessage,
+		bool openAnyway, BRect clickToOpen, bool async)
+	\brief Places the menu on screen, with \a clickToOpen option.
+
+	The \a clickToOpen rectangle should be specified in the screen's
+	coordinate system. \a openAnyway must be set \c true for the \a clickToOpen
+	rectangle to work.
+
+	\param where The location to open the left-top-corner of the pop-up menu
+	       in the screen's coordinate system.
+	\param deliversMessage if \c true, the menu item posts a message to its
+	       target as it normally would when selected by the user.
+	       If \a deliversMessage is \c false no message is sent and you are
+	       expected to decide what action to take based on the return value.
+	\param openAnyway If \c true, the pop-up menu will stay open even once the
+	       user has released the mouse button. To dismiss the menu, either a
+	       menu item must be selected or it must be dismissed programmatically.
+	\param clickToOpen If the user releases the mouse button while the cursor
+	       is inside the \a clickToOpen rectangle the menu is kept on-screen,
+	       if the cursor is located outside of the \a clickToOpen rectangle
+	       the menu is removed from the screen and Go() returns.
+	\param async If \c true the menu will return \c NULL immediately, if
+	       \c false the menu will not return until a menu item is selected
+	       or it is dismissed by the user. If a menu item was selected a
+	       pointer to the menu item is returned, if not, \c NULL is returned.
+*/
+
+
+/*!
+	\fn void BPopUpMenu::SetAsyncAutoDestruct(bool on)
+	\brief Indicates whether or not the BPopUpMenu will delete itself after
+	       closing, async-auto-destruct mode is set to \c false by default.
+
+	\param on \c true to turn async-auto-destruct mode on, \c false to turn
+	       async-auto-destruct mode off.
+*/
+
+
+/*!
+	\fn bool BPopUpMenu::AsyncAutoDestruct() const
+	\brief Returns the current async-auto-destruct setting.
+
+	\return \c true if async-auto-destruct mode is turned on, \c false if
+	        async-auto-destruct mode is turned off.
+
+	\see SetAsyncAutoDestruct()
+*/
+
+
+/*!
+	\fn BPoint BPopUpMenu::ScreenLocation()
+	\brief Returns where the pop-up menu will appear on screen when it is
+	       opened.
+
+	You can override this method in your BPopUpMenu derived class to return
+	where the pop-up menu will appear on screen.
+
+	\returns The location that the pop-up-menu will appear on screen in the
+	         screen's coordinate system.
+*/
+
+
+/*!
+	\fn BPopUpMenu& BPopUpMenu::operator=(const BPopUpMenu& other)
+	\brief Assignment overload method.
+
+	\param other The BPopUpMenu object to assign from.
+
+	\return The newly assigned BPopUpMenu object.
+*/
