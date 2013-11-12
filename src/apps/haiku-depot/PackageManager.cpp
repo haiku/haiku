@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Catalog.h>
 
 #include <package/DownloadFileRequest.h>
@@ -113,9 +114,16 @@ public:
 		try {
 			fPackageManager->Install(&packageName, 1);
 		} catch (BFatalErrorException ex) {
-			fprintf(stderr, "Fatal error occurred while installing package "
-				"%s: %s (%s)\n", packageName, ex.Message().String(),
+			_SetDownloadedPackagesState(NONE);
+			BString errorString;
+			errorString.SetToFormat(
+				"Fatal error occurred while installing package %s: "
+				"%s (%s)\n", packageName, ex.Message().String(),
 				ex.Details().String());
+			BAlert* alert(new(std::nothrow) BAlert(B_TRANSLATE("Fatal error"),
+				errorString, B_TRANSLATE("Close")));
+			if (alert != NULL)
+				alert->Go(NULL);
 			return ex.Error();
 		} catch (BAbortedByUserException ex) {
 			_SetDownloadedPackagesState(NONE);
@@ -207,9 +215,15 @@ public:
 		try {
 			fPackageManager->Uninstall(&packageName, 1);
 		} catch (BFatalErrorException ex) {
-			fprintf(stderr, "Fatal error occurred while uninstalling package "
-				"%s: %s (%s)\n", packageName, ex.Message().String(),
+			BString errorString;
+			errorString.SetToFormat(
+				"Fatal error occurred while uninstalling package %s: "
+				"%s (%s)\n", packageName, ex.Message().String(),
 				ex.Details().String());
+			BAlert* alert(new(std::nothrow) BAlert(B_TRANSLATE("Fatal error"),
+				errorString, B_TRANSLATE("Close")));
+			if (alert != NULL)
+				alert->Go(NULL);
 			return ex.Error();
 		} catch (BAbortedByUserException ex) {
 			return B_OK;
