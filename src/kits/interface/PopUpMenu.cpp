@@ -36,10 +36,10 @@ struct popup_menu_data {
 };
 
 
-BPopUpMenu::BPopUpMenu(const char* title, bool radioMode, bool autoRename,
+BPopUpMenu::BPopUpMenu(const char* name, bool radioMode, bool labelFromMarked,
 	menu_layout layout)
 	:
-	BMenu(title, layout),
+	BMenu(name, layout),
 	fUseWhere(false),
 	fAutoDestruct(false),
 	fTrackThread(-1)
@@ -47,7 +47,7 @@ BPopUpMenu::BPopUpMenu(const char* title, bool radioMode, bool autoRename,
 	if (radioMode)
 		SetRadioMode(true);
 
-	if (autoRename)
+	if (labelFromMarked)
 		SetLabelFromMarked(true);
 }
 
@@ -267,9 +267,9 @@ BPopUpMenu::AllDetached()
 
 
 void
-BPopUpMenu::SetAsyncAutoDestruct(bool state)
+BPopUpMenu::SetAsyncAutoDestruct(bool on)
 {
-	fAutoDestruct = state;
+	fAutoDestruct = on;
 }
 
 

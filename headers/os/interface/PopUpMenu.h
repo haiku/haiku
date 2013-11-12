@@ -11,9 +11,9 @@
 
 class BPopUpMenu : public BMenu {
 public:
-								BPopUpMenu(const char* title,
+								BPopUpMenu(const char* name,
 									bool radioMode = true,
-									bool autoRename = true,
+									bool labelFromMarked = true,
 									menu_layout layout = B_ITEMS_IN_COLUMN);
 								BPopUpMenu(BMessage* data);
 	virtual						~BPopUpMenu();
@@ -52,7 +52,7 @@ public:
 	virtual void				AllAttached();
 	virtual void				AllDetached();
 
-			void				SetAsyncAutoDestruct(bool state);
+			void				SetAsyncAutoDestruct(bool on);
 			bool				AsyncAutoDestruct() const;
 
 protected:
