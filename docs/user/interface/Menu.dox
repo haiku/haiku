@@ -578,7 +578,18 @@
 	\fn void BMenu::SetRadioMode(bool on)
 	\brief Turns radio mode on or off.
 
-	Turning radio mode off also turns label-from-marked mode off.
+	Turning radio mode off also turns off label-from-marked mode.
+
+	Radio mode means that only one menu item can be set as marked at a time.
+	Marking a menu item automatically unmarks all other menu items and draws
+	a check mark on the left side of the marked menu item. You don't have to
+	call BMenuItem::SetMarked() yourself for a menu in radio mode, this is done
+	for you automatically.
+
+	Radio mode does not work recursively, only the current menu is considered.
+	If you want to make a menu work in radio mode recursively you'll have to
+	turn radio mode off and iterate through each menu marking and unmarking
+	the items yourself.
 
 	\param on \c true to turn radio mode on, \c false to turn it off.
 */
