@@ -91,18 +91,16 @@ struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
 	bigtime_t	fMeasureActiveTime;
 	bigtime_t	fMeasureTime;
 
-	int			fLoad;
+	int32		fLoad;
 } CACHE_LINE_ALIGN;
 typedef MinMaxHeap<CPUEntry, int32> CPUHeap CACHE_LINE_ALIGN;
 
 static CPUEntry* sCPUEntries;
 static CPUHeap* sCPUPriorityHeaps;
 
-struct CoreEntry : public DoublyLinkedListLinkImpl<CoreEntry> {
+struct CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
+	DoublyLinkedListLinkImpl<CoreEntry> {
 				CoreEntry();
-
-	HeapLink<CoreEntry, int32>	fPriorityHeapLink;
-	MinMaxHeapLink<CoreEntry, int>	fLoadHeapLink;
 
 	int32		fCoreID;
 
@@ -113,11 +111,9 @@ struct CoreEntry : public DoublyLinkedListLinkImpl<CoreEntry> {
 
 	bigtime_t	fActiveTime;
 
-	int			fLoad;
+	int32		fLoad;
 } CACHE_LINE_ALIGN;
-typedef MinMaxHeap<CoreEntry, int, MinMaxHeapCompare<int>,
-		MinMaxHeapMemberGetLink<CoreEntry, int, &CoreEntry::fLoadHeapLink> >
-	CoreLoadHeap;
+typedef MinMaxHeap<CoreEntry, int32> CoreLoadHeap;
 
 static CoreEntry* sCoreEntries;
 static CoreLoadHeap* sCoreLoadHeap;
@@ -182,7 +178,7 @@ struct scheduler_thread_data {
 
 			bigtime_t	measure_active_time;
 			bigtime_t	measure_time;
-			int			load;
+			int32		load;
 
 			bigtime_t	went_sleep;
 			bigtime_t	went_sleep_active;
@@ -336,7 +332,7 @@ dump_heap(CPUHeap* heap)
 	while (entry) {
 		int32 cpu = entry->fCPUNumber;
 		int32 key = CPUHeap::GetKey(entry);
-		kprintf("%3" B_PRId32 " %8" B_PRId32 " %3d%%\n", cpu, key,
+		kprintf("%3" B_PRId32 " %8" B_PRId32 " %3" B_PRId32 "%%\n", cpu, key,
 			sCPUEntries[cpu].fLoad / 10);
 
 		heap->RemoveMinimum();
@@ -363,7 +359,7 @@ dump_core_load_heap(CoreLoadHeap* heap)
 
 	CoreEntry* entry = heap->PeekMinimum();
 	while (entry) {
-		int key = CoreLoadHeap::GetKey(entry);
+		int32 key = CoreLoadHeap::GetKey(entry);
 		kprintf("%4" B_PRId32 " %3" B_PRId32 "%%\n", entry->fCoreID,
 			entry->fLoad / cpuPerCore / 10);
 
@@ -375,7 +371,7 @@ dump_core_load_heap(CoreLoadHeap* heap)
 
 	entry = temp.PeekMinimum();
 	while (entry) {
-		int key = CoreLoadHeap::GetKey(entry);
+		int32 key = CoreLoadHeap::GetKey(entry);
 		temp.RemoveMinimum();
 		heap->Insert(entry, key);
 		entry = temp.PeekMinimum();
@@ -517,7 +513,7 @@ scheduler_dump_thread_data(Thread* thread)
 		additionalPenalty, schedulerThreadData->additional_penalty);
 	kprintf("\tstolen_time:\t\t%" B_PRId64 "\n",
 		schedulerThreadData->stolen_time);
-	kprintf("\tload:\t\t\t%d%%\n", schedulerThreadData->load / 10);
+	kprintf("\tload:\t\t\t%" B_PRId32 "%%\n", schedulerThreadData->load / 10);
 	kprintf("\twent_sleep:\t\t%" B_PRId64 "\n",
 		schedulerThreadData->went_sleep);
 	kprintf("\twent_sleep_active:\t%" B_PRId64 "\n",
@@ -539,8 +535,8 @@ update_load_heaps(int32 core)
 	CoreEntry* entry = &sCoreEntries[core];
 
 	int32 cpuPerCore = smp_get_num_cpus() / sRunQueueCount;
-	int newKey = entry->fLoad / cpuPerCore;
-	int oldKey = CoreLoadHeap::GetKey(entry);
+	int32 newKey = entry->fLoad / cpuPerCore;
+	int32 oldKey = CoreLoadHeap::GetKey(entry);
 
 	ASSERT(oldKey >= 0 && oldKey <= kMaxLoad);
 	ASSERT(newKey >= 0 && newKey <= kMaxLoad);
@@ -741,8 +737,6 @@ choose_core_power_saving(Thread* thread)
 {
 	CoreEntry* entry;
 
-	int32 priority = get_effective_priority(thread);
-
 	if (is_small_task_packing_enabled() && is_task_small(thread)
 		&& sCoreLoadHeap->PeekMaximum() != NULL) {
 		// try to pack all threads on one core
@@ -892,7 +886,7 @@ should_rebalance(Thread* thread)
 
 
 static inline int
-compute_load(bigtime_t& measureTime, bigtime_t& measureActiveTime, int& load)
+compute_load(bigtime_t& measureTime, bigtime_t& measureActiveTime, int32& load)
 {
 	const bigtime_t kLoadMeasureInterval = 50000;
 	const bigtime_t kIntervalInaccuracy = kLoadMeasureInterval / 4;
@@ -948,7 +942,7 @@ compute_cpu_load(int32 cpu)
 	if (oldLoad != sCPUEntries[cpu].fLoad) {
 		int32 core = sCPUToCore[cpu];
 
-		int delta = sCPUEntries[cpu].fLoad - oldLoad;
+		int32 delta = sCPUEntries[cpu].fLoad - oldLoad;
 		atomic_add(&sCoreEntries[core].fLoad, delta);
 
 		update_load_heaps(core);
@@ -1116,8 +1110,6 @@ scheduler_enqueue_in_run_queue(Thread *thread)
 
 	int32 core = schedulerThreadData->previous_core;
 	if (core >= 0) {
-		int32 priority = get_effective_priority(thread);
-
 		if (should_cancel_penalty(thread))
 			cancel_penalty(thread);
 	}
@@ -1369,12 +1361,12 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 static inline void
 update_cpu_performance(Thread* thread, int32 thisCore)
 {
-	int load = max_c(thread->scheduler_data->load,
+	int32 load = max_c(thread->scheduler_data->load,
 			sCoreEntries[thisCore].fLoad);
 	load = min_c(max_c(load, 0), kMaxLoad);
 
 	if (load < kTargetLoad) {
-		int delta = kTargetLoad - load;
+		int32 delta = kTargetLoad - load;
 
 		delta *= kTargetLoad;
 		delta /= kCPUPerformanceScaleMax;
@@ -1384,7 +1376,7 @@ update_cpu_performance(Thread* thread, int32 thisCore)
 		bool allowBoost = sSchedulerMode != SCHEDULER_MODE_POWER_SAVING;
 		allowBoost = allowBoost || thread->scheduler_data->priority_penalty > 0;
 
-		int delta = load - kTargetLoad;
+		int32 delta = load - kTargetLoad;
 		delta *= kMaxLoad - kTargetLoad;
 		delta /= kCPUPerformanceScaleMax;
 
