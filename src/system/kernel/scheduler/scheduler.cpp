@@ -115,15 +115,11 @@ struct CoreEntry : public DoublyLinkedListLinkImpl<CoreEntry> {
 
 	int			fLoad;
 } CACHE_LINE_ALIGN;
-typedef Heap<CoreEntry, int32, HeapLesserCompare<int32>,
-		HeapMemberGetLink<CoreEntry, int32, &CoreEntry::fPriorityHeapLink> >
-	CorePriorityHeap;
 typedef MinMaxHeap<CoreEntry, int, MinMaxHeapCompare<int>,
 		MinMaxHeapMemberGetLink<CoreEntry, int, &CoreEntry::fLoadHeapLink> >
 	CoreLoadHeap;
 
 static CoreEntry* sCoreEntries;
-static CorePriorityHeap* sCorePriorityHeap;
 static CoreLoadHeap* sCoreLoadHeap;
 static CoreLoadHeap* sCoreHighLoadHeap;
 
@@ -390,33 +386,6 @@ dump_core_load_heap(CoreLoadHeap* heap)
 static int
 dump_cpu_heap(int argc, char** argv)
 {
-	CorePriorityHeap temp(sRunQueueCount);
-
-	CoreEntry* entry = sCorePriorityHeap->PeekRoot();
-	if (entry != NULL)
-		kprintf("core priority\n");
-	else
-		kprintf("No active cores.\n");
-
-	while (entry) {
-		int32 core = entry->fCoreID;
-		int32 key = CorePriorityHeap::GetKey(entry);
-		kprintf("%4" B_PRId32 " %8" B_PRId32 "\n", core, key);
-
-		sCorePriorityHeap->RemoveRoot();
-		temp.Insert(entry, key);
-
-		entry = sCorePriorityHeap->PeekRoot();
-	}
-
-	entry = temp.PeekRoot();
-	while (entry) {
-		int32 key = CorePriorityHeap::GetKey(entry);
-		temp.RemoveRoot();
-		sCorePriorityHeap->Insert(entry, key);
-		entry = temp.PeekRoot();
-	}
-
 	kprintf("\ncore load\n");
 	dump_core_load_heap(sCoreLoadHeap);
 	kprintf("---------\n");
@@ -664,6 +633,8 @@ update_priority_heaps(int32 cpu, int32 priority)
 {
 	int32 core = sCPUToCore[cpu];
 
+	int32 corePriority = CPUHeap::GetKey(sCPUPriorityHeaps[core].PeekMaximum());
+
 	sCPUPriorityHeaps[core].ModifyKey(&sCPUEntries[cpu], priority);
 
 	if (sSingleCore)
@@ -671,72 +642,63 @@ update_priority_heaps(int32 cpu, int32 priority)
 
 	int32 maxPriority
 		= CPUHeap::GetKey(sCPUPriorityHeaps[core].PeekMaximum());
-	int32 corePriority = CorePriorityHeap::GetKey(&sCoreEntries[core]);
 
-	if (corePriority != maxPriority) {
-		if (maxPriority == B_IDLE_PRIORITY) {
-			sCorePriorityHeap->ModifyKey(&sCoreEntries[core], B_IDLE_PRIORITY);
-			ASSERT(sCorePriorityHeap->PeekRoot() == &sCoreEntries[core]);
-			sCorePriorityHeap->RemoveRoot();
-		} else if (corePriority == B_IDLE_PRIORITY)
-			sCorePriorityHeap->Insert(&sCoreEntries[core], maxPriority);
-		else
-			sCorePriorityHeap->ModifyKey(&sCoreEntries[core], maxPriority);
+	if (corePriority == maxPriority)
+		return;
 
-		int32 package = sCPUToPackage[cpu];
-		PackageEntry* packageEntry = &sPackageEntries[package];
-		if (maxPriority == B_IDLE_PRIORITY) {
-			// core goes idle
-			ASSERT(packageEntry->fIdleCoreCount >= 0);
-			ASSERT(packageEntry->fIdleCoreCount < packageEntry->fCoreCount);
+	int32 package = sCPUToPackage[cpu];
+	PackageEntry* packageEntry = &sPackageEntries[package];
+	if (maxPriority == B_IDLE_PRIORITY) {
+		// core goes idle
+		ASSERT(packageEntry->fIdleCoreCount >= 0);
+		ASSERT(packageEntry->fIdleCoreCount < packageEntry->fCoreCount);
 
-			packageEntry->fIdleCoreCount++;
-			packageEntry->fIdleCores.Add(&sCoreEntries[core]);
+		packageEntry->fIdleCoreCount++;
+		packageEntry->fIdleCores.Add(&sCoreEntries[core]);
 
-			if (packageEntry->fIdleCoreCount == 1) {
-				// first core on that package to go idle
+		if (packageEntry->fIdleCoreCount == 1) {
+			// first core on that package to go idle
 
-				if (packageEntry->fCoreCount > 1)
-					sPackageUsageHeap->Insert(packageEntry, 1);
-				else
-					sIdlePackageList->Add(packageEntry);
-			} else if (packageEntry->fIdleCoreCount
-				== packageEntry->fCoreCount) {
-				// package goes idle
-				sPackageUsageHeap->ModifyKey(packageEntry, 0);
-				ASSERT(sPackageUsageHeap->PeekMinimum() == packageEntry);
-				sPackageUsageHeap->RemoveMinimum();
-
+			if (packageEntry->fCoreCount > 1)
+				sPackageUsageHeap->Insert(packageEntry, 1);
+			else
 				sIdlePackageList->Add(packageEntry);
-			} else {
-				sPackageUsageHeap->ModifyKey(packageEntry,
+		} else if (packageEntry->fIdleCoreCount
+			== packageEntry->fCoreCount) {
+			// package goes idle
+			sPackageUsageHeap->ModifyKey(packageEntry, 0);
+			ASSERT(sPackageUsageHeap->PeekMinimum() == packageEntry);
+			sPackageUsageHeap->RemoveMinimum();
+
+			sIdlePackageList->Add(packageEntry);
+		} else {
+			sPackageUsageHeap->ModifyKey(packageEntry,
+				packageEntry->fIdleCoreCount);
+		}
+	} else if (corePriority == B_IDLE_PRIORITY) {
+		// core wakes up
+		ASSERT(packageEntry->fIdleCoreCount > 0);
+		ASSERT(packageEntry->fIdleCoreCount <= packageEntry->fCoreCount);
+
+		packageEntry->fIdleCoreCount--;
+		packageEntry->fIdleCores.Remove(&sCoreEntries[core]);
+
+		if (packageEntry->fIdleCoreCount + 1 == packageEntry->fCoreCount) {
+			// package wakes up
+			sIdlePackageList->Remove(packageEntry);
+
+			if (packageEntry->fIdleCoreCount > 0) {
+				sPackageUsageHeap->Insert(packageEntry,
 					packageEntry->fIdleCoreCount);
 			}
-		} else if (corePriority == B_IDLE_PRIORITY) {
-			// core wakes up
-			ASSERT(packageEntry->fIdleCoreCount > 0);
-			ASSERT(packageEntry->fIdleCoreCount <= packageEntry->fCoreCount);
-
-			packageEntry->fIdleCoreCount--;
-			packageEntry->fIdleCores.Remove(&sCoreEntries[core]);
-
-			if (packageEntry->fIdleCoreCount + 1 == packageEntry->fCoreCount) {
-				// package wakes up
-				sIdlePackageList->Remove(packageEntry);
-
-				if (packageEntry->fIdleCoreCount > 0) {
-					sPackageUsageHeap->Insert(packageEntry,
-						packageEntry->fIdleCoreCount);
-				}
-			} else if (packageEntry->fIdleCoreCount == 0) {
-				// no more idle cores in the package
-				sPackageUsageHeap->ModifyKey(packageEntry, 0);
-				ASSERT(sPackageUsageHeap->PeekMinimum() == packageEntry);
-				sPackageUsageHeap->RemoveMinimum();
-			} else {
-				sPackageUsageHeap->ModifyKey(packageEntry,
-					packageEntry->fIdleCoreCount);
-			}
+		} else if (packageEntry->fIdleCoreCount == 0) {
+			// no more idle cores in the package
+			sPackageUsageHeap->ModifyKey(packageEntry, 0);
+			ASSERT(sPackageUsageHeap->PeekMinimum() == packageEntry);
+			sPackageUsageHeap->RemoveMinimum();
+		} else {
+			sPackageUsageHeap->ModifyKey(packageEntry,
+				packageEntry->fIdleCoreCount);
 		}
 	}
 }
@@ -757,14 +719,9 @@ choose_core_low_latency(Thread* thread)
 		entry = package->fIdleCores.Last();
 	} else {
 		// no idle cores, use least occupied core
-		entry = sCorePriorityHeap->PeekRoot();
-
-		int32 priority = get_effective_priority(thread);
-		if (CorePriorityHeap::GetKey(entry) >= priority) {
-			entry = sCoreLoadHeap->PeekMinimum();
-			if (entry == NULL)
-				entry = sCoreHighLoadHeap->PeekMinimum();
-		}
+		entry = sCoreLoadHeap->PeekMinimum();
+		if (entry == NULL)
+			entry = sCoreHighLoadHeap->PeekMinimum();
 	}
 
 	ASSERT(entry != NULL);
@@ -792,11 +749,9 @@ choose_core_power_saving(Thread* thread)
 		if (sSmallTaskCore < 0)
 			sSmallTaskCore = sCoreLoadHeap->PeekMaximum()->fCoreID;
 		entry = &sCoreEntries[sSmallTaskCore];
-	} else if (sCorePriorityHeap->PeekRoot() != NULL
-		&& CorePriorityHeap::GetKey(sCorePriorityHeap->PeekRoot())
-			< priority) {
+	} else if (sCoreLoadHeap->PeekMinimum() != NULL) {
 		// run immediately on already woken core
-		entry = sCorePriorityHeap->PeekRoot();
+		entry = sCoreLoadHeap->PeekMinimum();
 	} else if (sPackageUsageHeap->PeekMinimum() != NULL) {
 		// wake new core
 		PackageEntry* package = sPackageUsageHeap->PeekMinimum();
@@ -1749,11 +1704,6 @@ _scheduler_init()
 		return B_NO_MEMORY;
 	ArrayDeleter<CoreEntry> coreEntriesDeleter(sCoreEntries);
 
-	sCorePriorityHeap = new CorePriorityHeap(coreCount);
-	if (sCorePriorityHeap == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<CorePriorityHeap> corePriorityHeapDeleter(sCorePriorityHeap);
-
 	sCoreLoadHeap = new CoreLoadHeap;
 	if (sCoreLoadHeap == NULL)
 		return B_NO_MEMORY;
@@ -1770,11 +1720,6 @@ _scheduler_init()
 		status_t result = sCoreLoadHeap->Insert(&sCoreEntries[i], 0);
 		if (result != B_OK)
 			return result;
-
-		result = sCorePriorityHeap->Insert(&sCoreEntries[i], B_IDLE_PRIORITY);
-		if (result != B_OK)
-			return result;
-		sCorePriorityHeap->RemoveRoot();
 	}
 
 	sCPUPriorityHeaps = new CPUHeap[coreCount];
@@ -1845,7 +1790,6 @@ _scheduler_init()
 	pinnedRunQueuesDeleter.Detach();
 	coreHighLoadHeapDeleter.Detach();
 	coreLoadHeapDeleter.Detach();
-	corePriorityHeapDeleter.Detach();
 	cpuPriorityHeapDeleter.Detach();
 	coreEntriesDeleter.Detach();
 	cpuEntriesDeleter.Detach();
