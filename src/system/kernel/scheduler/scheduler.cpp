@@ -834,6 +834,23 @@ choose_cpu(int32 core)
 }
 
 
+static void
+choose_core_and_cpu(Thread* thread, int32& targetCore, int32& targetCPU)
+{
+	if (targetCore == -1 && targetCPU != -1)
+		targetCore = sCPUToCore[targetCPU];
+	else if (targetCore != -1 && targetCPU == -1)
+		targetCPU = choose_cpu(targetCore);
+	else if (targetCore == -1 && targetCPU == -1) {
+		targetCore = choose_core(thread);
+		targetCPU = choose_cpu(targetCore);
+	}
+
+	ASSERT(targetCore >= 0 && targetCore < sRunQueueCount);
+	ASSERT(targetCPU >= 0 && targetCPU < smp_get_num_cpus());
+}
+
+
 static bool
 should_rebalance_low_latency(Thread* thread)
 {
@@ -1066,53 +1083,32 @@ enqueue(Thread* thread, bool newOne)
 
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 
-	int32 core = schedulerThreadData->previous_core;
-	if (newOne && core >= 0) {
-		int32 priority = get_effective_priority(thread);
-
-		if (should_cancel_penalty(thread))
-			cancel_penalty(thread);
-	}
-
 	int32 threadPriority = get_effective_priority(thread);
 
 	T(EnqueueThread(thread, threadPriority));
 
 	bool pinned = thread->pinned_to_cpu > 0;
 	int32 targetCPU = -1;
-	int32 targetCore;
-	if (pinned) {
+	int32 targetCore = -1;
+	if (pinned)
 		targetCPU = thread->previous_cpu->cpu_num;
-		targetCore = sCPUToCore[targetCPU];
-		ASSERT(targetCore == schedulerThreadData->previous_core);
-	} else if (sSingleCore) {
+	else if (sSingleCore)
 		targetCore = 0;
-		targetCPU = choose_cpu(targetCore);
-
-		schedulerThreadData->previous_core = targetCore;
-	} else if (schedulerThreadData->previous_core < 0
+	else if (schedulerThreadData->previous_core < 0
 		|| (newOne && has_cache_expired(thread))
 		|| should_rebalance(thread)) {
 
-		if (thread_is_idle_thread(thread)) {
+		if (thread_is_idle_thread(thread))
 			targetCPU = thread->previous_cpu->cpu_num;
-			targetCore = sCPUToCore[targetCPU];
-		} else {
-			targetCore = choose_core(thread);
-			targetCPU = choose_cpu(targetCore);
-		}
-
-		schedulerThreadData->previous_core = targetCore;
-	} else {
+		
+	} else
 		targetCore = schedulerThreadData->previous_core;
-		targetCPU = choose_cpu(targetCore);
-	}
 
-	ASSERT(targetCore >= 0 && targetCore < sRunQueueCount);
-	ASSERT(targetCPU >= 0 && targetCPU < smp_get_num_cpus());
+	choose_core_and_cpu(thread, targetCore, targetCPU);
+	schedulerThreadData->previous_core = targetCore;
 
-	TRACE("enqueueing thread %ld with priority %ld %ld\n", thread->id,
-		threadPriority, targetCore);
+	TRACE("enqueueing thread %ld with priority %ld\n", thread->id,
+		threadPriority);
 	if (pinned)
 		sPinnedRunQueues[targetCPU].PushBack(thread, threadPriority);
 	else
@@ -1129,8 +1125,8 @@ enqueue(Thread* thread, bool newOne)
 	Thread* targetThread = gCPU[targetCPU].running_thread;
 	int32 targetPriority = get_effective_priority(targetThread);
 
-	TRACE("choosing CPU %ld with current priority %ld\n", targetCPU,
-		targetPriority);
+	TRACE("choosing CPU %ld (core %ld) with current priority %ld\n", targetCPU,
+		targetCore, targetPriority);
 
 	if (threadPriority > targetPriority) {
 		targetThread->scheduler_data->lost_cpu = true;
@@ -1160,6 +1156,17 @@ scheduler_enqueue_in_run_queue(Thread *thread)
 
 	TRACE("enqueueing new thread %ld with static priority %ld\n", thread->id,
 		thread->priority);
+
+	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+
+	int32 core = schedulerThreadData->previous_core;
+	if (core >= 0) {
+		int32 priority = get_effective_priority(thread);
+
+		if (should_cancel_penalty(thread))
+			cancel_penalty(thread);
+	}
+
 	enqueue(thread, true);
 }
 
@@ -1169,9 +1176,7 @@ put_back(Thread* thread)
 {
 	compute_thread_load(thread);
 
-	bool pinned = sPinnedRunQueues != NULL && thread->pinned_to_cpu > 0;
-
-	if (pinned) {
+	if (thread->pinned_to_cpu > 0) {
 		int32 pinnedCPU = thread->previous_cpu->cpu_num;
 		sPinnedRunQueues[pinnedCPU].PushFront(thread,
 			get_effective_priority(thread));
@@ -1240,7 +1245,7 @@ reschedule_event(timer *unused)
 
 	thread->scheduler_data->lost_cpu = true;
 	thread->cpu->invoke_scheduler = true;
-	thread->cpu->preempted = 1;
+	thread->cpu->preempted = true;
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -1324,14 +1329,11 @@ static inline Thread*
 dequeue_thread(int32 thisCPU)
 {
 	int32 thisCore = sCPUToCore[thisCPU];
+
 	Thread* sharedThread = sRunQueues[thisCore].PeekMaximum();
+	Thread* pinnedThread = sPinnedRunQueues[thisCPU].PeekMaximum();
 
-	Thread* pinnedThread = NULL;
-	if (sPinnedRunQueues != NULL)
-		pinnedThread = sPinnedRunQueues[thisCPU].PeekMaximum();
-
-	if (sharedThread == NULL && pinnedThread == NULL)
-		return NULL;
+	ASSERT(sharedThread != NULL || pinnedThread != NULL);
 
 	int32 pinnedPriority = -1;
 	if (pinnedThread != NULL)
@@ -1497,20 +1499,7 @@ _scheduler_reschedule(void)
 	schedulerOldThreadData->lost_cpu = false;
 
 	// select thread with the biggest priority
-	if (oldThread->cpu->disabled) {
-		ASSERT(sPinnedRunQueues != NULL);
-		nextThread = sPinnedRunQueues[thisCPU].PeekMaximum();
-		if (nextThread != NULL)
-			sPinnedRunQueues[thisCPU].Remove(nextThread);
-		else {
-			nextThread = sRunQueues[thisCore].GetHead(B_IDLE_PRIORITY);
-			if (nextThread != NULL)
-				sRunQueues[thisCore].Remove(nextThread);
-		}
-	} else
-		nextThread = dequeue_thread(thisCPU);
-	if (!nextThread)
-		panic("reschedule(): run queues are empty!\n");
+	nextThread = dequeue_thread(thisCPU);
 	if (nextThread != oldThread)
 		acquire_spinlock(&nextThread->scheduler_lock);
 
@@ -1543,7 +1532,7 @@ _scheduler_reschedule(void)
 		if (!oldThread->cpu->preempted)
 			cancel_timer(quantumTimer);
 
-		oldThread->cpu->preempted = 0;
+		oldThread->cpu->preempted = false;
 		if (!thread_is_idle_thread(nextThread)) {
 			bigtime_t quantum = compute_quantum(oldThread);
 			add_timer(quantumTimer, &reschedule_event, quantum,
@@ -1621,7 +1610,7 @@ scheduler_set_operation_mode(scheduler_mode mode)
 		return B_BAD_VALUE;
 	}
 
-	const char* modeNames[] = { "performance", "power saving" };
+	const char* modeNames[] = { "low latency", "power saving" };
 	dprintf("scheduler: switching to %s mode\n", modeNames[mode]);
 
 	InterruptsSpinLocker _(sSchedulerInternalLock);

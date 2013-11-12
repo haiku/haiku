@@ -55,7 +55,7 @@ typedef struct cpu_ent {
 	int				cpu_num;
 
 	// thread.c: used to force a reschedule at quantum expiration time
-	int				preempted;
+	bool			preempted;
 	timer			quantum_timer;
 
 	// keeping track of CPU activity
