@@ -84,6 +84,8 @@ static bool (*sShouldRebalance)(Thread* thread);
 // the core the only real concern is to make lower priority threads give way to
 // the higher priority threads.
 struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
+				CPUEntry();
+
 	int32		fCPUNumber;
 
 	bigtime_t	fMeasureActiveTime;
@@ -97,6 +99,8 @@ static CPUEntry* sCPUEntries;
 static CPUHeap* sCPUPriorityHeaps;
 
 struct CoreEntry : public DoublyLinkedListLinkImpl<CoreEntry> {
+				CoreEntry();
+
 	HeapLink<CoreEntry, int32>	fPriorityHeapLink;
 	MinMaxHeapLink<CoreEntry, int>	fLoadHeapLink;
 
@@ -134,6 +138,8 @@ static CoreLoadHeap* sCoreHighLoadHeap;
 // idle are stored in sPackageIdleList (in LIFO manner).
 struct PackageEntry : public MinMaxHeapLinkImpl<PackageEntry, int32>,
 	DoublyLinkedListLinkImpl<PackageEntry> {
+								PackageEntry();
+
 	int32						fPackageID;
 
 	DoublyLinkedList<CoreEntry>	fIdleCores;
@@ -187,6 +193,31 @@ struct scheduler_thread_data {
 
 			int32		previous_core;
 };
+
+
+CPUEntry::CPUEntry()
+	:
+	fMeasureActiveTime(0),
+	fMeasureTime(0),
+	fLoad(0)
+{
+}
+
+
+CoreEntry::CoreEntry()
+	:
+	fActiveTime(0),
+	fLoad(0)
+{
+}
+
+
+PackageEntry::PackageEntry()
+	:
+	fIdleCoreCount(0),
+	fCoreCount(0)
+{
+}
 
 
 void
@@ -1746,8 +1777,6 @@ _scheduler_init()
 
 	for (int32 i = 0; i < coreCount; i++) {
 		sCoreEntries[i].fCoreID = i;
-		sCoreEntries[i].fActiveTime = 0;
-		sCoreEntries[i].fLoad = 0;
 
 		status_t result = sCoreLoadHeap->Insert(&sCoreEntries[i], 0);
 		if (result != B_OK)
@@ -1766,10 +1795,6 @@ _scheduler_init()
 
 	for (int32 i = 0; i < cpuCount; i++) {
 		sCPUEntries[i].fCPUNumber = i;
-
-		sCPUEntries[i].fMeasureActiveTime = 0;
-		sCPUEntries[i].fMeasureTime = 0;
-		sCPUEntries[i].fLoad = 0;
 
 		int32 core = sCPUToCore[i];
 
