@@ -486,7 +486,7 @@ has_cache_expired(Thread* thread)
 	CoreEntry* coreEntry = &sCoreEntries[schedulerThreadData->previous_core];
 	switch (sSchedulerMode) {
 		case SCHEDULER_MODE_LOW_LATENCY:
-			return coreEntry->fActiveTime
+			return atomic_get64(&coreEntry->fActiveTime)
 					- schedulerThreadData->went_sleep_active > kCacheExpire;
 
 		case SCHEDULER_MODE_POWER_SAVING:
@@ -945,8 +945,8 @@ compute_cpu_load(int32 cpu)
 	if (oldLoad != sCPUEntries[cpu].fLoad) {
 		int32 core = sCPUToCore[cpu];
 
-		sCoreEntries[core].fLoad -= oldLoad;
-		sCoreEntries[core].fLoad += sCPUEntries[cpu].fLoad;
+		int delta = sCPUEntries[cpu].fLoad - oldLoad;
+		atomic_add(&sCoreEntries[core].fLoad, delta);
 
 		update_load_heaps(core);
 	}
@@ -974,7 +974,8 @@ thread_goes_away(Thread* thread)
 	int32 core = schedulerThreadData->previous_core;
 
 	schedulerThreadData->went_sleep = system_time();
-	schedulerThreadData->went_sleep_active = sCoreEntries[core].fActiveTime;
+	schedulerThreadData->went_sleep_active
+		= atomic_get64(&sCoreEntries[core].fActiveTime);
 }
 
 
@@ -990,32 +991,32 @@ should_cancel_penalty(Thread* thread)
 	bigtime_t now = system_time();
 	bigtime_t wentSleep = schedulerThreadData->went_sleep;
 
-	if (wentSleep < sCoreEntries[core].fReachedIdle)
+	if (wentSleep < atomic_get64(&sCoreEntries[core].fReachedIdle))
 		return true;
 
-	if (sCoreEntries[core].fStartedIdle != 0) {
-		if (wentSleep < sCoreEntries[core].fStartedIdle
-			&& now - sCoreEntries[core].fStartedIdle >= kMinimalWaitTime) {
+	bigtime_t startedIdle = atomic_get64(&sCoreEntries[core].fStartedIdle);
+	if (startedIdle != 0) {
+		if (wentSleep < startedIdle && now - startedIdle >= kMinimalWaitTime)
 			return true;
-		}
 
-		if (wentSleep - sCoreEntries[core].fStartedIdle >= kMinimalWaitTime)
+		if (wentSleep - startedIdle >= kMinimalWaitTime)
 			return true;
 	}
 
 	if (get_effective_priority(thread) == B_LOWEST_ACTIVE_PRIORITY)
 		return false;
 
-	if (wentSleep < sCoreEntries[core].fReachedIdle)
+	if (wentSleep < atomic_get64(&sCoreEntries[core].fReachedBottom))
 		return true;
 
+	bigtime_t startedBottom = atomic_get64(&sCoreEntries[core].fStartedBottom);
 	if (sCoreEntries[core].fStartedBottom != 0) {
-		if (wentSleep < sCoreEntries[core].fStartedBottom
-			&& now - sCoreEntries[core].fStartedBottom >= kMinimalWaitTime) {
+		if (wentSleep < startedBottom
+			&& now - startedBottom >= kMinimalWaitTime) {
 			return true;
 		}
 
-		if (wentSleep - sCoreEntries[core].fStartedBottom >= kMinimalWaitTime)
+		if (wentSleep - startedBottom >= kMinimalWaitTime)
 			return true;
 	}
 
@@ -1038,17 +1039,8 @@ enqueue(Thread* thread, bool newOne)
 	if (newOne && core >= 0) {
 		int32 priority = get_effective_priority(thread);
 
-		if (priority == B_LOWEST_ACTIVE_PRIORITY) {
-			if (schedulerThreadData->went_sleep
-				< sCoreEntries[core].fReachedIdle) {
-				cancel_penalty(thread);
-			}
-		} else {
-			if (schedulerThreadData->went_sleep
-				< sCoreEntries[core].fReachedBottom) {
-				cancel_penalty(thread);
-			}
-		}
+		if (should_cancel_penalty(thread))
+			cancel_penalty(thread);
 	}
 
 	int32 threadPriority = get_effective_priority(thread);
@@ -1335,13 +1327,16 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 	bigtime_t usedTime = now - oldThread->scheduler_data->quantum_start;
 
 	if (thread_is_idle_thread(oldThread) && usedTime >= kMinimalWaitTime) {
-		sCoreEntries[thisCore].fReachedBottom = now - kMinimalWaitTime;
-		sCoreEntries[thisCore].fReachedIdle = now - kMinimalWaitTime;
+		atomic_set64(&sCoreEntries[thisCore].fReachedBottom,
+			now - kMinimalWaitTime);
+		atomic_set64(&sCoreEntries[thisCore].fReachedIdle,
+			now - kMinimalWaitTime);
 	}
 
 	if (get_effective_priority(oldThread) == B_LOWEST_ACTIVE_PRIORITY
 		&& usedTime >= kMinimalWaitTime) {
-		sCoreEntries[thisCore].fReachedBottom = now - kMinimalWaitTime;
+		atomic_set64(&sCoreEntries[thisCore].fReachedBottom,
+			now - kMinimalWaitTime);
 	}
 
 	if (!thread_is_idle_thread(oldThread)) {
@@ -1351,8 +1346,9 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 
 		atomic_add64(&oldThread->cpu->active_time, active);
 		oldThread->scheduler_data->measure_active_time += active;
+
 		sCPUEntries[smp_get_current_cpu()].fMeasureActiveTime += active;
-		sCoreEntries[thisCore].fActiveTime += active;
+		atomic_add64(&sCoreEntries[thisCore].fActiveTime, active);
 	}
 
 	if (!sSingleCore)
@@ -1363,16 +1359,16 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 
 	if (thread_is_idle_thread(nextThread)) {
 		if (!thread_is_idle_thread(oldThread))
-			sCoreEntries[thisCore].fStartedIdle = now;
+			atomic_set64(&sCoreEntries[thisCore].fStartedIdle, now);
 		if (oldPriority > B_LOWEST_ACTIVE_PRIORITY)
-			sCoreEntries[thisCore].fStartedBottom = now;
+			atomic_set64(&sCoreEntries[thisCore].fStartedBottom, now);
 	} else if (nextPriority == B_LOWEST_ACTIVE_PRIORITY) {
-		sCoreEntries[thisCore].fStartedIdle = 0;
+		atomic_set64(&sCoreEntries[thisCore].fStartedIdle, 0);
 		if (oldPriority > B_LOWEST_ACTIVE_PRIORITY)
-			sCoreEntries[thisCore].fStartedBottom = now;
+			atomic_set64(&sCoreEntries[thisCore].fStartedBottom, now);
 	} else {
-		sCoreEntries[thisCore].fStartedBottom = 0;
-		sCoreEntries[thisCore].fStartedIdle = 0;
+		atomic_set64(&sCoreEntries[thisCore].fStartedBottom, 0);
+		atomic_set64(&sCoreEntries[thisCore].fStartedIdle, 0);
 	}
 
 	if (!thread_is_idle_thread(nextThread)) {
