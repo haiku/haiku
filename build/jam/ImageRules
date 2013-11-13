@@ -197,6 +197,8 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 	# Supported flags:
 	#	computeName - <destName> is the name of a shell command/function that
 	#		computes the destination name.
+	#	alwaysUpdate - When only updating the container, always also update the
+	#		given targets.
 
 	local containerGrist = [ on $(container) return $(HAIKU_CONTAINER_GRIST) ] ;
 	local systemDirTokens
@@ -207,7 +209,8 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 	# If the image shall only be updated, we filter out all targets not marked
 	# accordingly.
 	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
-		&& ! [ IncludeAllTargetsInContainer $(container) ] {
+		&& ! [ IncludeAllTargetsInContainer $(container) ]
+		&& ! alwaysUpdate in $(flags) {
 		local filterVar
 			= [ on $(container) return $(HAIKU_INCLUDE_IN_CONTAINER_VAR) ] ;
 		if $(filterVar) {
@@ -499,10 +502,14 @@ rule AddDriversToContainer container : relativeDirectoryTokens : targets
 }
 
 rule AddNewDriversToContainer container : relativeDirectoryTokens
-	: targets
+	: targets : flags
 {
-	# AddNewDriversToContainer <container> : <directory> : <targets> ;
+	# AddNewDriversToContainer <container> : <directory> : <targets> : <flags> ;
 	#
+	# Supported flags:
+	#	alwaysUpdate - When only updating the container, always also update the
+	#		given targets.
+
 	local systemDirTokens
 		= [ on $(container) return $(HAIKU_CONTAINER_SYSTEM_DIR_TOKENS) ] ;
 	local directoryTokens = $(systemDirTokens) add-ons kernel drivers
@@ -511,7 +518,7 @@ rule AddNewDriversToContainer container : relativeDirectoryTokens
 	targets = [ FFilterByBuildFeatures $(targets) ] ;
 
 	AddFilesToContainer $(container) : $(directoryTokens)
-		: $(targets) ;
+		: $(targets) : : $(flags) ;
 }
 
 rule AddBootModuleSymlinksToContainer container : targets
@@ -1001,12 +1008,12 @@ rule AddDriversToHaikuImage relativeDirectoryTokens : targets
 		: $(relativeDirectoryTokens) : $(targets) ;
 }
 
-rule AddNewDriversToHaikuImage relativeDirectoryTokens : targets
+rule AddNewDriversToHaikuImage relativeDirectoryTokens : targets : flags
 {
-	# AddNewDriversToHaikuImage <relative directory> : <targets> ;
+	# AddNewDriversToHaikuImage <relative directory> : <targets> : <flags> ;
 
 	AddNewDriversToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
-		: $(relativeDirectoryTokens) : $(targets) ;
+		: $(relativeDirectoryTokens) : $(targets) : $(flags) ;
 }
 
 rule AddBootModuleSymlinksToHaikuImage targets
