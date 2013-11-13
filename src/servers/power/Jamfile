@@ -5,6 +5,7 @@ UsePrivateHeaders app ;
 AddResources power_daemon : power_daemon.rdef ;
 
 Server power_daemon :
+	lid_monitor.cpp
 	power_daemon.cpp
 	power_button_monitor.cpp
 	;

@@ -9,21 +9,16 @@
 #define _POWER_BUTTON_MONITOR_H
 
 
-#include <Handler.h>
-
-
-#define POLL_POWER_BUTTON_STATUS 'ppbs'
-
-
-class PowerButtonMonitor : public BHandler {
+class PowerButtonMonitor {
 public:
 								PowerButtonMonitor();
-	virtual 					~PowerButtonMonitor();
+			 					~PowerButtonMonitor();
 
-	virtual void				MessageReceived(BMessage *msg);
+			void				HandleEvent();
 
+			int					FD() const { return fFD; }
 private:
-			int					fPowerButtonFD;
+			int					fFD;
 };
 
 

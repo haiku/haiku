@@ -16,31 +16,26 @@
 
 
 PowerButtonMonitor::PowerButtonMonitor()
-	:
-	BHandler ("power_button_monitor")
 {
-	fPowerButtonFD = open("/dev/power/button/power", O_RDONLY);
+	fFD = open("/dev/power/button/power", O_RDONLY);
 }
 
 
 PowerButtonMonitor::~PowerButtonMonitor()
 {
-	if (fPowerButtonFD > 0)
-		close(fPowerButtonFD);
+	if (fFD > 0)
+		close(fFD);
 }
 
 
 void
-PowerButtonMonitor::MessageReceived(BMessage *msg)
+PowerButtonMonitor::HandleEvent()
 {
-	if (msg->what != POLL_POWER_BUTTON_STATUS)
-		return;
-
-	if (fPowerButtonFD <= 0)
+	if (fFD <= 0)
 		return;
 
 	uint8 button_pressed;
-	read(fPowerButtonFD, &button_pressed, 1);
+	read(fFD, &button_pressed, 1);
 
 	if (button_pressed) {
 		BRoster roster;
