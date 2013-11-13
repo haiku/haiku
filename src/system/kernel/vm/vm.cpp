@@ -5352,6 +5352,8 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 		return B_ERROR;
 
 	AddressSpaceReadLocker addressSpaceLocker(addressSpace, true);
+		// We get a new address space reference here. The one we got above will
+		// be freed by unlock_memory_etc().
 
 	VMTranslationMap* map = addressSpace->TranslationMap();
 	status_t error = B_OK;
@@ -5508,7 +5510,9 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 	if (addressSpace == NULL)
 		return B_ERROR;
 
-	AddressSpaceReadLocker addressSpaceLocker(addressSpace, true);
+	AddressSpaceReadLocker addressSpaceLocker(addressSpace, false);
+		// Take over the address space reference. We don't unlock until we're
+		// done.
 
 	VMTranslationMap* map = addressSpace->TranslationMap();
 	status_t error = B_OK;
@@ -5594,7 +5598,7 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 			break;
 	}
 
-	// get rid of the address space reference
+	// get rid of the address space reference lock_memory_etc() acquired
 	addressSpace->Put();
 
 	return error;
