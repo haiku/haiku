@@ -34,6 +34,8 @@ extern "C" {
 */
 void scheduler_enqueue_in_run_queue(Thread* thread);
 
+void scheduler_reschedule_ici(void);
+
 /*!	Selects a thread from the ready-to-run queue and, if that's not the
 	calling thread, switches the current CPU's context to run the selected
 	thread.
@@ -59,7 +61,7 @@ status_t scheduler_on_thread_create(Thread* thread, bool idleThread);
 	use.
 	The per-thread housekeeping data structures are reset, if needed.
 */
-void  scheduler_on_thread_init(Thread* thread);
+void scheduler_on_thread_init(Thread* thread);
 
 /*!	Called when a Thread structure is freed.
 	Frees up any per-thread resources allocated on the scheduler's part. The

@@ -51,7 +51,6 @@
 SchedulerListenerList gSchedulerListeners;
 spinlock gSchedulerListenersLock = B_SPINLOCK_INITIALIZER;
 
-static spinlock sSchedulerInternalLock;
 static bool sSchedulerEnabled;
 
 const bigtime_t kThreadQuantum = 1000;
@@ -73,6 +72,7 @@ static int32 sSmallTaskCore;
 static bool sSingleCore;
 
 static scheduler_mode sSchedulerMode;
+static rw_spinlock sSchedulerModeLock = B_RW_SPINLOCK_INITIALIZER;
 
 static int32 (*sChooseCore)(Thread* thread);
 static bool (*sShouldRebalance)(Thread* thread);
@@ -87,6 +87,8 @@ struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
 				CPUEntry();
 
 	int32		fCPUNumber;
+
+	int32		fPriority;
 
 	bigtime_t	fMeasureActiveTime;
 	bigtime_t	fMeasureTime;
@@ -104,6 +106,8 @@ struct CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 
 	int32		fCoreID;
 
+	spinlock	fLock;
+
 	bigtime_t	fStartedBottom;
 	bigtime_t	fReachedBottom;
 	bigtime_t	fStartedIdle;
@@ -118,6 +122,7 @@ typedef MinMaxHeap<CoreEntry, int32> CoreLoadHeap;
 static CoreEntry* sCoreEntries;
 static CoreLoadHeap* sCoreLoadHeap;
 static CoreLoadHeap* sCoreHighLoadHeap;
+static spinlock sCoreHeapsLock = B_SPINLOCK_INITIALIZER;
 
 // sPackageUsageHeap is used to decide which core should be woken up from the
 // idle state. When aiming for performance we should use as many packages as
@@ -145,6 +150,7 @@ typedef DoublyLinkedList<PackageEntry> IdlePackageList;
 static PackageEntry* sPackageEntries;
 static PackageHeap* sPackageUsageHeap;
 static IdlePackageList* sIdlePackageList;
+static spinlock sIdlePackageLock = B_SPINLOCK_INITIALIZER;
 
 // The run queues. Holds the threads ready to run ordered by priority.
 // One queue per schedulable target per core. Additionally, each
@@ -184,11 +190,14 @@ struct scheduler_thread_data {
 			bigtime_t	went_sleep_active;
 
 			int32		previous_core;
+
+			bool		enqueued;
 };
 
 
 CPUEntry::CPUEntry()
 	:
+	fPriority(B_IDLE_PRIORITY),
 	fMeasureActiveTime(0),
 	fMeasureTime(0),
 	fLoad(0)
@@ -201,6 +210,7 @@ CoreEntry::CoreEntry()
 	fActiveTime(0),
 	fLoad(0)
 {
+	B_INITIALIZE_SPINLOCK(&fLock);
 }
 
 
@@ -232,6 +242,7 @@ scheduler_thread_data::Init()
 	cpu_bound = true;
 
 	previous_core = -1;
+	enqueued = false;
 }
 
 
@@ -534,6 +545,8 @@ update_load_heaps(int32 core)
 
 	CoreEntry* entry = &sCoreEntries[core];
 
+	SpinLocker coreLocker(sCoreHeapsLock);
+
 	int32 cpuPerCore = smp_get_num_cpus() / sRunQueueCount;
 	int32 newKey = entry->fLoad / cpuPerCore;
 	int32 oldKey = CoreLoadHeap::GetKey(entry);
@@ -625,12 +638,13 @@ cancel_penalty(Thread* thread)
 
 
 static inline void
-update_priority_heaps(int32 cpu, int32 priority)
+update_cpu_priority(int32 cpu, int32 priority)
 {
 	int32 core = sCPUToCore[cpu];
 
 	int32 corePriority = CPUHeap::GetKey(sCPUPriorityHeaps[core].PeekMaximum());
 
+	sCPUEntries[cpu].fPriority = priority;
 	sCPUPriorityHeaps[core].ModifyKey(&sCPUEntries[cpu], priority);
 
 	if (sSingleCore)
@@ -645,6 +659,8 @@ update_priority_heaps(int32 cpu, int32 priority)
 	int32 package = sCPUToPackage[cpu];
 	PackageEntry* packageEntry = &sPackageEntries[package];
 	if (maxPriority == B_IDLE_PRIORITY) {
+		SpinLocker _(sIdlePackageLock);
+
 		// core goes idle
 		ASSERT(packageEntry->fIdleCoreCount >= 0);
 		ASSERT(packageEntry->fIdleCoreCount < packageEntry->fCoreCount);
@@ -672,6 +688,8 @@ update_priority_heaps(int32 cpu, int32 priority)
 				packageEntry->fIdleCoreCount);
 		}
 	} else if (corePriority == B_IDLE_PRIORITY) {
+		SpinLocker _(sIdlePackageLock);
+
 		// core wakes up
 		ASSERT(packageEntry->fIdleCoreCount > 0);
 		ASSERT(packageEntry->fIdleCoreCount <= packageEntry->fCoreCount);
@@ -783,9 +801,11 @@ choose_cpu(int32 core)
 }
 
 
-static void
+static bool
 choose_core_and_cpu(Thread* thread, int32& targetCore, int32& targetCPU)
 {
+	SpinLocker coreLocker(sCoreHeapsLock);
+
 	if (targetCore == -1 && targetCPU != -1)
 		targetCore = sCPUToCore[targetCPU];
 	else if (targetCore != -1 && targetCPU == -1)
@@ -797,6 +817,19 @@ choose_core_and_cpu(Thread* thread, int32& targetCore, int32& targetCPU)
 
 	ASSERT(targetCore >= 0 && targetCore < sRunQueueCount);
 	ASSERT(targetCPU >= 0 && targetCPU < smp_get_num_cpus());
+
+	int32 targetPriority = sCPUEntries[targetCPU].fPriority;
+	int32 threadPriority = get_effective_priority(thread);
+
+	if (threadPriority > targetPriority) {
+		// It is possible that another CPU schedules the thread before the
+		// target CPU. However, since the target CPU is sent an ICI it will
+		// reschedule anyway and update its heap key to the correct value.
+		update_cpu_priority(targetCPU, threadPriority);
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -816,6 +849,8 @@ should_rebalance_low_latency(Thread* thread)
 	// If there is high load on this core but this thread does not contribute
 	// significantly consider giving it to someone less busy.
 	if (coreEntry->fLoad > kHighLoad) {
+		SpinLocker coreLocker(sCoreHeapsLock);
+
 		CoreEntry* other = sCoreLoadHeap->PeekMinimum();
 		if (other != NULL && coreEntry->fLoad - other->fLoad >= kLoadDifference)
 			return true;
@@ -823,6 +858,8 @@ should_rebalance_low_latency(Thread* thread)
 
 	// No cpu bound threads - the situation is quite good. Make sure it
 	// won't get much worse...
+	SpinLocker coreLocker(sCoreHeapsLock);
+
 	CoreEntry* other = sCoreLoadHeap->PeekMinimum();
 	if (other == NULL)
 		other = sCoreHighLoadHeap->PeekMinimum();
@@ -866,6 +903,8 @@ should_rebalance_power_saving(Thread* thread)
 
 	// No cpu bound threads - the situation is quite good. Make sure it
 	// won't get much worse...
+	SpinLocker coreLocker(sCoreHeapsLock);
+
 	CoreEntry* other = sCoreLoadHeap->PeekMinimum();
 	if (other == NULL)
 		other = sCoreHighLoadHeap->PeekMinimum();
@@ -1031,7 +1070,8 @@ enqueue(Thread* thread, bool newOne)
 	compute_thread_load(thread);
 
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
-
+	schedulerThreadData->cpu_bound = true;
+	schedulerThreadData->time_left = 0;
 	int32 threadPriority = get_effective_priority(thread);
 
 	T(EnqueueThread(thread, threadPriority));
@@ -1043,48 +1083,31 @@ enqueue(Thread* thread, bool newOne)
 		targetCPU = thread->previous_cpu->cpu_num;
 	else if (sSingleCore)
 		targetCore = 0;
-	else if (schedulerThreadData->previous_core < 0
-		|| (newOne && has_cache_expired(thread))
-		|| should_rebalance(thread)) {
-
-		if (thread_is_idle_thread(thread))
-			targetCPU = thread->previous_cpu->cpu_num;
-		
-	} else
+	else if (schedulerThreadData->previous_core >= 0
+		&& (!newOne || !has_cache_expired(thread))
+		&& !should_rebalance(thread)) {
 		targetCore = schedulerThreadData->previous_core;
+	}
 
-	choose_core_and_cpu(thread, targetCore, targetCPU);
+	bool shouldReschedule = choose_core_and_cpu(thread, targetCore, targetCPU);
 	schedulerThreadData->previous_core = targetCore;
 
-	TRACE("enqueueing thread %ld with priority %ld\n", thread->id,
-		threadPriority);
+	TRACE("enqueueing thread %ld with priority %ld on CPU %ld (core %ld)\n",
+		thread->id, threadPriority, targetCPU, targetCore);
+
+	SpinLocker runQueueLocker(sCoreEntries[targetCore].fLock);
+	thread->scheduler_data->enqueued = true;
 	if (pinned)
 		sPinnedRunQueues[targetCPU].PushBack(thread, threadPriority);
 	else
 		sRunQueues[targetCore].PushBack(thread, threadPriority);
-
-	schedulerThreadData->cpu_bound = true;
-	schedulerThreadData->time_left = 0;
-	schedulerThreadData->stolen_time = 0;
+	runQueueLocker.Unlock();
 
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
 
-	Thread* targetThread = gCPU[targetCPU].running_thread;
-	int32 targetPriority = get_effective_priority(targetThread);
-
-	TRACE("choosing CPU %ld (core %ld) with current priority %ld\n", targetCPU,
-		targetCore, targetPriority);
-
-	if (threadPriority > targetPriority) {
-		targetThread->scheduler_data->lost_cpu = true;
-
-		// It is possible that another CPU schedules the thread before the
-		// target CPU. However, since the target CPU is sent an ICI it will
-		// reschedule anyway and update its heap key to the correct value.
-		update_priority_heaps(targetCPU, threadPriority);
-
+	if (shouldReschedule) {
 		if (targetCPU == smp_get_current_cpu())
 			gCPU[targetCPU].invoke_scheduler = true;
 		else {
@@ -1101,7 +1124,7 @@ enqueue(Thread* thread, bool newOne)
 void
 scheduler_enqueue_in_run_queue(Thread *thread)
 {
-	InterruptsSpinLocker _(sSchedulerInternalLock);
+	InterruptsReadSpinLocker modeLocker(sSchedulerModeLock);
 
 	TRACE("enqueueing new thread %ld with static priority %ld\n", thread->id,
 		thread->priority);
@@ -1123,13 +1146,21 @@ put_back(Thread* thread)
 {
 	compute_thread_load(thread);
 
+	int32 core = sCPUToCore[smp_get_current_cpu()];
+
+	SpinLocker runQueueLocker(sCoreEntries[core].fLock);
+	thread->scheduler_data->enqueued = true;
 	if (thread->pinned_to_cpu > 0) {
 		int32 pinnedCPU = thread->previous_cpu->cpu_num;
+
+		ASSERT(pinnedCPU == smp_get_current_cpu());
 		sPinnedRunQueues[pinnedCPU].PushFront(thread,
 			get_effective_priority(thread));
 	} else {
 		int32 previousCore = thread->scheduler_data->previous_core;
 		ASSERT(previousCore >= 0);
+
+		ASSERT(previousCore == core);
 		sRunQueues[previousCore].PushFront(thread,
 			get_effective_priority(thread));
 	}
@@ -1141,58 +1172,88 @@ put_back(Thread* thread)
 int32
 scheduler_set_thread_priority(Thread *thread, int32 priority)
 {
-	InterruptsSpinLocker _(sSchedulerInternalLock);
-
-	if (priority == thread->priority)
-		return thread->priority;
+	InterruptsSpinLocker _(thread->scheduler_lock);
+	InterruptsReadSpinLocker modeLocker(sSchedulerModeLock);
 
 	int32 oldPriority = thread->priority;
 
 	TRACE("changing thread %ld priority to %ld (old: %ld, effective: %ld)\n",
 		thread->id, priority, oldPriority, get_effective_priority(thread));
 
+	cancel_penalty(thread);
+
+	if (priority == thread->priority)
+		return thread->priority;
+
+	thread->priority = priority;
+
 	if (thread->state != B_THREAD_READY) {
 		cancel_penalty(thread);
 		thread->priority = priority;
 
-		if (thread->state == B_THREAD_RUNNING)
-			update_priority_heaps(thread->cpu->cpu_num, priority);
+		if (thread->state == B_THREAD_RUNNING) {
+			SpinLocker coreLocker(sCoreHeapsLock);
+			update_cpu_priority(thread->cpu->cpu_num, priority);
+		}
 		return oldPriority;
 	}
 
 	// The thread is in the run queue. We need to remove it and re-insert it at
 	// a new position.
 
-	T(RemoveThread(thread));
-
-	// notify listeners
-	NotifySchedulerListeners(&SchedulerListener::ThreadRemovedFromRunQueue,
-		thread);
-
-	// remove thread from run queue
+	bool pinned = thread->pinned_to_cpu > 0;
+	int32 previousCPU = thread->previous_cpu->cpu_num;
 	int32 previousCore = thread->scheduler_data->previous_core;
 	ASSERT(previousCore >= 0);
-	sRunQueues[previousCore].Remove(thread);
 
-	// set priority and re-insert
-	cancel_penalty(thread);
-	thread->priority = priority;
-	enqueue(thread, true);
+	SpinLocker runQueueLocker(sCoreEntries[previousCore].fLock);
+
+	// the thread might have been already dequeued and is about to start
+	// running once we release its scheduler_lock, in such case we can not
+	// attempt to dequeue it
+	if (thread->scheduler_data->enqueued) {
+		T(RemoveThread(thread));
+
+		// notify listeners
+		NotifySchedulerListeners(&SchedulerListener::ThreadRemovedFromRunQueue,
+			thread);
+
+		thread->scheduler_data->enqueued = false;
+		if (pinned)
+			sPinnedRunQueues[previousCPU].Remove(thread);
+		else
+			sRunQueues[previousCore].Remove(thread);
+		runQueueLocker.Unlock();
+
+		enqueue(thread, true);
+	}
 
 	return oldPriority;
 }
 
 
-static int32
-reschedule_event(timer *unused)
+static inline void
+reschedule_needed()
 {
-	// This function is called as a result of the timer event set by the
-	// scheduler. Make sure the reschedule() is invoked.
-	Thread* thread= thread_get_current_thread();
+	// This function is called as a result of either the timer event set by the
+	// scheduler or an incoming ICI. Make sure the reschedule() is invoked.
+	thread_get_current_thread()->scheduler_data->lost_cpu = true;
+	get_cpu_struct()->invoke_scheduler = true;
+}
 
-	thread->scheduler_data->lost_cpu = true;
-	thread->cpu->invoke_scheduler = true;
-	thread->cpu->preempted = true;
+
+void
+scheduler_reschedule_ici()
+{
+	reschedule_needed();
+}
+
+
+static int32
+reschedule_event(timer* /* unused */)
+{
+	reschedule_needed();
+	get_cpu_struct()->preempted = true;
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -1273,14 +1334,16 @@ compute_quantum(Thread* thread)
 
 
 static inline Thread*
-dequeue_thread(int32 thisCPU)
+choose_next_thread(int32 thisCPU, Thread* oldThread, bool putAtBack)
 {
 	int32 thisCore = sCPUToCore[thisCPU];
+
+	SpinLocker runQueueLocker(sCoreEntries[thisCore].fLock);
 
 	Thread* sharedThread = sRunQueues[thisCore].PeekMaximum();
 	Thread* pinnedThread = sPinnedRunQueues[thisCPU].PeekMaximum();
 
-	ASSERT(sharedThread != NULL || pinnedThread != NULL);
+	ASSERT(sharedThread != NULL || pinnedThread != NULL || oldThread != NULL);
 
 	int32 pinnedPriority = -1;
 	if (pinnedThread != NULL)
@@ -1290,10 +1353,26 @@ dequeue_thread(int32 thisCPU)
 	if (sharedThread != NULL)
 		sharedPriority = get_effective_priority(sharedThread);
 
+	int32 oldPriority = -1;
+	if (oldThread != NULL)
+		oldPriority = get_effective_priority(oldThread);
+
+	int32 rest = max_c(pinnedPriority, sharedPriority);
+	if (oldPriority > rest || (!putAtBack && oldPriority == rest)) {
+		ASSERT(!oldThread->scheduler_data->enqueued);
+		return oldThread;
+	}
+
 	if (sharedPriority > pinnedPriority) {
+		ASSERT(sharedThread->scheduler_data->enqueued);
+		sharedThread->scheduler_data->enqueued = false;
+
 		sRunQueues[thisCore].Remove(sharedThread);
 		return sharedThread;
 	}
+
+	ASSERT(pinnedThread->scheduler_data->enqueued);
+	pinnedThread->scheduler_data->enqueued = false;
 
 	sPinnedRunQueues[thisCPU].Remove(pinnedThread);
 	return pinnedThread;
@@ -1388,7 +1467,7 @@ update_cpu_performance(Thread* thread, int32 thisCore)
 static void
 _scheduler_reschedule(void)
 {
-	InterruptsSpinLocker internalLocker(sSchedulerInternalLock);
+	InterruptsReadSpinLocker modeLocker(sSchedulerModeLock);
 
 	Thread* oldThread = thread_get_current_thread();
 
@@ -1401,14 +1480,13 @@ _scheduler_reschedule(void)
 	oldThread->state = oldThread->next_state;
 	scheduler_thread_data* schedulerOldThreadData = oldThread->scheduler_data;
 
-	// update CPU heap so that old thread would have CPU properly chosen
-	Thread* nextThread = sRunQueues[thisCore].PeekMaximum();
-	if (nextThread != NULL)
-		update_priority_heaps(thisCPU, get_effective_priority(nextThread));
-
+	bool enqueueOldThread = false;
+	bool putOldThreadAtBack = false;
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
+			enqueueOldThread = true;
+
 			if (!schedulerOldThreadData->lost_cpu)
 				schedulerOldThreadData->cpu_bound = false;
 
@@ -1419,11 +1497,11 @@ _scheduler_reschedule(void)
 
 				TRACE("enqueueing thread %ld into run queue priority = %ld\n",
 					oldThread->id, get_effective_priority(oldThread));
-				enqueue(oldThread, false);
+				putOldThreadAtBack = true;
 			} else {
 				TRACE("putting thread %ld back in run queue priority = %ld\n",
 					oldThread->id, get_effective_priority(oldThread));
-				put_back(oldThread);
+				putOldThreadAtBack = false;
 			}
 
 			break;
@@ -1445,10 +1523,20 @@ _scheduler_reschedule(void)
 	oldThread->has_yielded = false;
 	schedulerOldThreadData->lost_cpu = false;
 
-	// select thread with the biggest priority
-	nextThread = dequeue_thread(thisCPU);
-	if (nextThread != oldThread)
+	// select thread with the biggest priority and enqueue back the old thread
+	Thread* nextThread
+		= choose_next_thread(thisCPU, enqueueOldThread ? oldThread : NULL,
+			putOldThreadAtBack);
+	if (nextThread != oldThread) {
+		if (enqueueOldThread) {
+			if (putOldThreadAtBack)
+				enqueue(oldThread, false);
+			else
+				put_back(oldThread);
+		}
+
 		acquire_spinlock(&nextThread->scheduler_lock);
+	}
 
 	TRACE("reschedule(): cpu %ld, next thread = %ld\n", thisCPU,
 		nextThread->id);
@@ -1460,12 +1548,16 @@ _scheduler_reschedule(void)
 		oldThread, nextThread);
 
 	// update CPU heap
-	update_priority_heaps(thisCPU,
-		get_effective_priority(nextThread));
+	{
+		SpinLocker coreLocker(sCoreHeapsLock);
+		update_cpu_priority(thisCPU, get_effective_priority(nextThread));
+	}
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
+
 	ASSERT(nextThread->scheduler_data->previous_core == thisCore);
+
 	compute_thread_load(nextThread);
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
@@ -1489,7 +1581,7 @@ _scheduler_reschedule(void)
 		} else
 			nextThread->scheduler_data->quantum_start = system_time();
 
-		internalLocker.Unlock();
+		modeLocker.Unlock();
 		if (nextThread != oldThread)
 			scheduler_switch_thread(oldThread, nextThread);
 	}
@@ -1527,6 +1619,16 @@ void
 scheduler_on_thread_init(Thread* thread)
 {
 	thread->scheduler_data->Init();
+
+	if (thread_is_idle_thread(thread)) {
+		static int32 sIdleThreadsID;
+		int32 cpu = atomic_add(&sIdleThreadsID, 1);
+
+		thread->previous_cpu = &gCPU[cpu];
+		thread->pinned_to_cpu = 1;
+
+		thread->scheduler_data->previous_core = sCPUToCore[cpu];
+	}
 }
 
 
@@ -1560,7 +1662,7 @@ scheduler_set_operation_mode(scheduler_mode mode)
 	const char* modeNames[] = { "low latency", "power saving" };
 	dprintf("scheduler: switching to %s mode\n", modeNames[mode]);
 
-	InterruptsSpinLocker _(sSchedulerInternalLock);
+	InterruptsWriteSpinLocker _(sSchedulerModeLock);
 
 	sSchedulerMode = mode;
 	switch (mode) {

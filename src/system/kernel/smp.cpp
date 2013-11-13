@@ -874,11 +874,8 @@ process_pending_ici(int32 currentCPU)
 			break;
 		}
 		case SMP_MSG_RESCHEDULE:
-		{
-			cpu_ent* cpu = thread_get_current_thread()->cpu;
-			cpu->invoke_scheduler = true;
+			scheduler_reschedule_ici();
 			break;
-		}
 
 		default:
 			dprintf("smp_intercpu_int_handler: got unknown message %" B_PRId32 "\n",
