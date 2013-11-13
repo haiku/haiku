@@ -5459,8 +5459,8 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 		// even if not a single page was wired, unlock_memory_etc() is called
 		// to put the address space reference.
 		addressSpaceLocker.Unlock();
-		unlock_memory_etc(team, (void*)address, nextAddress - lockBaseAddress,
-			flags);
+		unlock_memory_etc(team, (void*)lockBaseAddress,
+			nextAddress - lockBaseAddress, flags);
 	}
 
 	return error;
