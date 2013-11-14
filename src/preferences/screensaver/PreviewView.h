@@ -24,6 +24,7 @@ public:
 
 			BView*				AddPreview();
 			BView*				RemovePreview();
+			BView*				SaverView();
 
 private:
 			BView*				fSaverView;

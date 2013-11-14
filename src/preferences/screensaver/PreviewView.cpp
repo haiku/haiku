@@ -117,3 +117,10 @@ PreviewView::RemovePreview()
 	fSaverView = NULL;
 	return saverView;
 }
+
+
+BView*
+PreviewView::SaverView()
+{
+	return fSaverView;
+}
