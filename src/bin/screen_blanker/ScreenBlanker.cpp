@@ -40,8 +40,7 @@ ScreenBlanker::ScreenBlanker()
 	:
 	BApplication(SCREEN_BLANKER_SIG),
 	fWindow(NULL),
-	fSaver(NULL),
-	fRunner(NULL),
+	fSaverRunner(NULL),
 	fPasswordWindow(NULL),
 	fResumeRunner(NULL),
 	fStandByScreenRunner(NULL),
@@ -70,15 +69,18 @@ ScreenBlanker::ReadyToRun()
 	BScreen screen(B_MAIN_SCREEN_ID);
 	fWindow = new ScreenSaverWindow(screen.Frame());
 	fPasswordWindow = new PasswordWindow();
-	fRunner = new ScreenSaverRunner(fWindow, fWindow->ChildAt(0), false, fSettings);
 
-	fSaver = fRunner->ScreenSaver();
-	if (fSaver) {
-		fWindow->SetSaver(fSaver);
-		fRunner->Run();
-	} else {
+	BView* view = fWindow->ChildAt(0);
+	fSaverRunner = new ScreenSaverRunner(view, fSettings);
+	fWindow->SetSaverRunner(fSaverRunner);
+
+	BScreenSaver* saver = fSaverRunner->ScreenSaver();
+	if (saver != NULL && saver->StartSaver(view, false) == B_OK)
+		fSaverRunner->Run();
+	else {
 		fprintf(stderr, "could not load the screensaver addon\n");
-		fWindow->ChildAt(0)->SetViewColor(0, 0, 0);
+		view->SetViewColor(0, 0, 0);
+			// needed for Blackness saver
 	}
 
 	fWindow->SetFullScreen(true);
@@ -110,7 +112,7 @@ ScreenBlanker::_SetDPMSMode(uint32 mode)
 	screen.SetDPMS(mode);
 
 	if (fWindow->Lock()) {
-		fRunner->Suspend();
+		fSaverRunner->Suspend();
 		fWindow->Unlock();
 	}
 }
@@ -122,7 +124,7 @@ ScreenBlanker::_ShowPasswordWindow()
 	_TurnOnScreen();
 
 	if (fWindow->Lock()) {
-		fRunner->Suspend();
+		fSaverRunner->Suspend();
 
 		fWindow->Sync();
 			// TODO: is that needed?
@@ -239,7 +241,7 @@ ScreenBlanker::MessageReceived(BMessage* message)
 				fPasswordWindow->SetPassword("");
 				fPasswordWindow->Hide();
 
-				fRunner->Resume();
+				fSaverRunner->Resume();
 				fWindow->Unlock();
 			}
 
@@ -301,7 +303,8 @@ ScreenBlanker::_Shutdown()
 			fWindow->Quit();
 	}
 
-	delete fRunner;
+	delete fSaverRunner;
+	fSaverRunner = NULL;
 }
 
 

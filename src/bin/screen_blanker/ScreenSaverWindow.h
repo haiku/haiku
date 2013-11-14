@@ -11,6 +11,8 @@
 #include <DirectWindow.h>
 #include <MessageFilter.h>
 
+#include "ScreenSaverRunner.h"
+
 
 const static uint32 kMsgEnableFilter = 'eflt';
 
@@ -37,16 +39,18 @@ public:
 								ScreenSaverWindow(BRect frame);
 								~ScreenSaverWindow();
 
-		void SetSaver(BScreenSaver *saver);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 	virtual	void				DirectConnected(direct_buffer_info* info);
 
+			void				SetSaverRunner(ScreenSaverRunner* runner);
+			BScreenSaver*		_ScreenSaver();
 
-	private:
-		BView *fTopView;
-		BScreenSaver *fSaver;
-		ScreenSaverFilter *fFilter;
+private:
+			BView*				fTopView;
+			ScreenSaverRunner*	fSaverRunner;
+			ScreenSaverFilter*	fFilter;
 };
+
 
 #endif	// SCREEN_SAVER_WINDOW_H

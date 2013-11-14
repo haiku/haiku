@@ -24,37 +24,37 @@ const static uint32 kMsgResumeSaver = 'RSSV';
 
 
 class ScreenBlanker : public BApplication {
-	public:
-		ScreenBlanker();
-		~ScreenBlanker();
+public:
+								ScreenBlanker();
+								~ScreenBlanker();
 
-		virtual void ReadyToRun();
+	virtual	void				ReadyToRun();
 
-		virtual bool QuitRequested();
-		virtual void MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
+	virtual	void				MessageReceived(BMessage* message);
 
-	private:
-		bool _LoadAddOn();
-		void _ShowPasswordWindow();
-		void _QueueResumeScreenSaver();
-		void _TurnOnScreen();
-		void _SetDPMSMode(uint32 mode);
-		void _QueueTurnOffScreen();
-		void _Shutdown();
-
-		ScreenSaverSettings fSettings;
-		ScreenSaverWindow *fWindow;
-		BScreenSaver *fSaver;
-		ScreenSaverRunner *fRunner;
-		PasswordWindow *fPasswordWindow;
-
-		bigtime_t fBlankTime;
-		BMessageRunner* fResumeRunner;
-
-		BMessageRunner* fStandByScreenRunner;
-		BMessageRunner* fSuspendScreenRunner;
-		BMessageRunner* fTurnOffScreenRunner;
 			bool				IsPasswordWindowShown() const;
+
+private:
+			bool				_LoadAddOn();
+			void				_ShowPasswordWindow();
+			void				_QueueResumeScreenSaver();
+			void				_TurnOnScreen();
+			void				_SetDPMSMode(uint32 mode);
+			void				_QueueTurnOffScreen();
+			void				_Shutdown();
+
+			ScreenSaverSettings	fSettings;
+			ScreenSaverWindow*	fWindow;
+			ScreenSaverRunner*	fSaverRunner;
+			PasswordWindow*		fPasswordWindow;
+
+			bigtime_t			fBlankTime;
+			BMessageRunner*		fResumeRunner;
+
+			BMessageRunner*		fStandByScreenRunner;
+			BMessageRunner*		fSuspendScreenRunner;
+			BMessageRunner*		fTurnOffScreenRunner;
 };
 
 #endif	// SCREEN_SAVER_APP_H

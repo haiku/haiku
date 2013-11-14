@@ -11,29 +11,27 @@
 
 
 #include "ScreenSaverRunner.h"
-#include "ScreenSaverSettings.h"
-
-#include <FindDirectory.h>
-#include <Screen.h>
-#include <ScreenSaver.h>
-#include <View.h>
 
 #include <stdio.h>
 
+#include <DirectWindow.h>
+#include <FindDirectory.h>
+#include <Message.h>
+#include <Window.h>
 
-ScreenSaverRunner::ScreenSaverRunner(BWindow* window, BView* view,
-		bool preview, ScreenSaverSettings& settings)
+
+ScreenSaverRunner::ScreenSaverRunner(BView* view,
+	ScreenSaverSettings& settings)
 	:
-	fSaver(NULL),
-	fWindow(window),
 	fView(view),
+	fIsDirectDraw(view != NULL
+		&& dynamic_cast<BDirectWindow*>(view->Window()) != NULL),
 	fSettings(settings),
-	fPreview(preview),
+	fSaver(NULL),
 	fAddonImage(-1),
 	fThread(-1),
 	fQuitting(false)
 {
-	fDirectWindow = dynamic_cast<BDirectWindow *>(fWindow);
 	_LoadAddOn();
 }
 
@@ -44,20 +42,6 @@ ScreenSaverRunner::~ScreenSaverRunner()
 		Quit();
 
 	_CleanUp();
-}
-
-
-BScreenSaver*
-ScreenSaverRunner::ScreenSaver() const
-{
-	return fSaver;
-}
-
-
-bool
-ScreenSaverRunner::HasStarted() const
-{
-	return fHasStarted;
 }
 
 
@@ -184,13 +168,12 @@ ScreenSaverRunner::_Run()
 {
 	static const uint32 kInitialTickRate = 50000;
 
-	if (fWindow->Lock()) {
-		fView->SetViewColor(0, 0, 0);
-		fView->SetLowColor(0, 0, 0);
+	if (fView == NULL || fView->Window() == NULL) {
+		// view is NULL or not connected to app server, bail out
 		if (fSaver != NULL)
-			fHasStarted = fSaver->StartSaver(fView, fPreview) == B_OK;
+			fSaver->StopSaver();
 
-		fWindow->Unlock();
+		return B_BAD_VALUE;
 	}
 
 	// TODO: This code is getting awfully complicated and should
@@ -199,7 +182,7 @@ ScreenSaverRunner::_Run()
 	int32 snoozeCount = 0;
 	int32 frame = 0;
 	bigtime_t lastTickTime = 0;
-	bigtime_t tick = fSaver ? fSaver->TickSize() : tickBase;
+	bigtime_t tick = fSaver != NULL ? fSaver->TickSize() : tickBase;
 
 	while (!fQuitting) {
 		// break the idle time up into ticks so that we can evaluate
@@ -214,7 +197,7 @@ ScreenSaverRunner::_Run()
 			// re-evaluate the tick time after each successful wakeup
 			// screensavers can adjust it on the fly, and we must be
 			// prepared to accomodate that
-			tick = fSaver ? fSaver->TickSize() : tickBase;
+			tick = fSaver != NULL ? fSaver->TickSize() : tickBase;
 
 			if (tick < tickBase) {
 				if (tick < 0)
@@ -229,22 +212,22 @@ ScreenSaverRunner::_Run()
 		if (snoozeCount) {
 			// if we are sleeping, do nothing
 			snoozeCount--;
-		} else if (fSaver != NULL && fHasStarted) {
+		} else if (fSaver != NULL) {
 			if (fSaver->LoopOnCount() && frame >= fSaver->LoopOnCount()) {
 				// Time to nap
 				frame = 0;
 				snoozeCount = fSaver->LoopOffCount();
-			} else if (fWindow->LockWithTimeout(5000LL) == B_OK) {
+			} else if (fView->Window()->LockWithTimeout(5000LL) == B_OK) {
 				if (!fQuitting) {
-					// NOTE: R5 really calls DirectDraw()
+					// NOTE: BeOS R5 really calls DirectDraw()
 					// and then Draw() for the same frame
-					if (fDirectWindow)
+					if (fIsDirectDraw)
 						fSaver->DirectDraw(frame);
 					fSaver->Draw(fView, frame);
 					fView->Sync();
 					frame++;
 				}
-				fWindow->Unlock();
+				fView->Window()->Unlock();
 			}
 		} else
 			snoozeCount = 1000;

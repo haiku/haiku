@@ -12,18 +12,14 @@
 #define SCREEN_SAVER_WINDOW_H
 
 
+#include <Window.h>
+
 #include "PasswordWindow.h"
-
-#include <Box.h>
-#include <CheckBox.h>
-#include <FilePanel.h>
-#include <Slider.h>
-#include <ListView.h>
-
 #include "ScreenSaverSettings.h"
 
 
-class BButton;
+class BMessage;
+class BRect;
 class BTabView;
 
 class FadeView;

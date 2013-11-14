@@ -12,24 +12,19 @@
 #define SCREEN_SAVER_RUNNER_H
 
 
-#include <SupportDefs.h>
-#include <DirectWindow.h>
+#include <ScreenSaver.h>
+#include <View.h>
 
-
-class BScreenSaver;
-class BView;
-class ScreenSaverSettings;
+#include "ScreenSaverSettings.h"
 
 
 class ScreenSaverRunner {
 public:
-								ScreenSaverRunner(BWindow* window, BView* view,
-									bool preview,
+								ScreenSaverRunner(BView* view,
 									ScreenSaverSettings& settings);
 								~ScreenSaverRunner();
 
-			BScreenSaver*		ScreenSaver() const;
-			bool				HasStarted() const;
+			BScreenSaver*		ScreenSaver() const { return fSaver; };
 
 			status_t			Run();
 			void				Quit();
@@ -43,13 +38,11 @@ private:
 	static	status_t			_ThreadFunc(void* data);
 			status_t			_Run();
 
-			BScreenSaver*		fSaver;
-			BWindow*			fWindow;
-			BDirectWindow*		fDirectWindow;
 			BView*				fView;
+			bool				fIsDirectDraw;
 			ScreenSaverSettings& fSettings;
-			bool				fPreview;
-			bool				fHasStarted;
+
+			BScreenSaver*		fSaver;
 
 			image_id			fAddonImage;
 			thread_id			fThread;

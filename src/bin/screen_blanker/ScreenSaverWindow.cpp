@@ -71,11 +71,7 @@ ScreenSaverFilter::Filter(BMessage* message, BHandler** target)
 }
 
 
-void
-ScreenSaverFilter::SetEnabled(bool enabled)
-{
-	fEnabled = enabled;
-}
+//	#pragma mark - ScreenSaverWindow
 
 
 /*!
@@ -88,7 +84,9 @@ ScreenSaverWindow::ScreenSaverWindow(BRect frame)
 		B_NO_BORDER_WINDOW_LOOK, kWindowScreenFeel,
 		B_NOT_RESIZABLE | B_NOT_MOVABLE | B_NOT_MINIMIZABLE
 		| B_NOT_ZOOMABLE | B_NOT_CLOSABLE, B_ALL_WORKSPACES),
-	fSaver(NULL)
+	fTopView(NULL),
+	fSaverRunner(NULL),
+	fFilter(NULL)
 {
 	frame.OffsetTo(0, 0);
 	fTopView = new BView(frame, "ScreenSaver View", B_FOLLOW_ALL, B_WILL_DRAW);
@@ -99,22 +97,16 @@ ScreenSaverWindow::ScreenSaverWindow(BRect frame)
 
 	AddChild(fTopView);
 
-	// Ensure that this view receives keyboard input
+	// Ensure that this view receives keyboard and mouse input
 	fTopView->MakeFocus(true);
-	fTopView->SetEventMask(B_KEYBOARD_EVENTS, 0);
+	fTopView->SetEventMask(B_KEYBOARD_EVENTS | B_POINTER_EVENTS,
+		B_NO_POINTER_HISTORY);
 }
 
 
 ScreenSaverWindow::~ScreenSaverWindow()
 {
 	Hide();
-}
-
-
-void
-ScreenSaverWindow::SetSaver(BScreenSaver *saver)
-{
-	fSaver = saver;
 }
 
 
@@ -148,3 +140,19 @@ ScreenSaverWindow::DirectConnected(direct_buffer_info* info)
 		saver->DirectConnected(info);
 }
 
+
+void
+ScreenSaverWindow::SetSaverRunner(ScreenSaverRunner* runner)
+{
+	fSaverRunner = runner;
+}
+
+
+BScreenSaver*
+ScreenSaverWindow::_ScreenSaver()
+{
+	if (fSaverRunner != NULL)
+		return fSaverRunner->ScreenSaver();
+
+	return NULL;
+}

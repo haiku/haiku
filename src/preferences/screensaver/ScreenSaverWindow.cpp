@@ -19,11 +19,13 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <CheckBox.h>
 #include <ControlLook.h>
 #include <Directory.h>
 #include <DurationFormat.h>
 #include <Entry.h>
 #include <File.h>
+#include <FilePanel.h>
 #include <FindDirectory.h>
 #include <Font.h>
 #include <Layout.h>
@@ -31,6 +33,7 @@
 #include <ListItem.h>
 #include <ListView.h>
 #include <Path.h>
+#include <Rect.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <ScreenSaver.h>
@@ -807,8 +810,7 @@ ModulesView::_OpenSaver()
 
 	BView* view = fPreviewView->AddPreview();
 	fCurrentName = fSettings.ModuleName();
-	fSaverRunner = new ScreenSaverRunner(Window(), view, true, fSettings);
-	BScreenSaver* saver = _ScreenSaver();
+	fSaverRunner = new ScreenSaverRunner(view, fSettings);
 
 #ifdef __HAIKU__
 	BRect rect = fSettingsBox->InnerFrame().InsetByCopy(4, 4);
@@ -821,8 +823,12 @@ ModulesView::_OpenSaver()
 	fSettingsView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fSettingsBox->AddChild(fSettingsView);
 
-	if (saver != NULL && fSaverRunner->Run() == B_OK)
+	BScreenSaver* saver = _ScreenSaver();
+	if (saver != NULL && fSettingsView != NULL) {
 		saver->StartConfig(fSettingsView);
+		if (saver->StartSaver(view, false) == B_OK)
+			fSaverRunner->Run();
+	}
 
 	if (fSettingsView->ChildAt(0) == NULL) {
 		// There are no settings at all, we add the module name here to
