@@ -85,17 +85,17 @@ ScreenSaverRunner::Quit()
 }
 
 
-void
+status_t
 ScreenSaverRunner::Suspend()
 {
-	suspend_thread(fThread);
+	return suspend_thread(fThread);
 }
 
 
-void
+status_t
 ScreenSaverRunner::Resume()
 {
-	resume_thread(fThread);
+	return resume_thread(fThread);
 }
 
 

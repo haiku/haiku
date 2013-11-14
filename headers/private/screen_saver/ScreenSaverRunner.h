@@ -34,8 +34,8 @@ public:
 			status_t			Run();
 			void				Quit();
 
-			void				Suspend();
-			void				Resume();
+			status_t			Suspend();
+			status_t			Resume();
 
 private:
 			void				_LoadAddOn();
