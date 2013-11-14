@@ -652,3 +652,26 @@ actions UploadPackages1
 		scp $(HAIKU_REMOTE_REPOSITORY_PACKAGES) $remote:hpkg-upload/
 	fi
 }
+
+
+rule BuildRemoteHaikuPortsRepository target : packages
+{
+	UploadPackages $(target) : $(packages) ;
+	
+	local packageListFile = <repository-package-list>HaikuPorts-packages ;
+	BuildRemoteHaikuPortsRepository1 $(target) : $(packageListFile) ;
+}
+
+
+actions BuildRemoteHaikuPortsRepository1
+{
+	remote=git.haiku-os.org
+
+	repoArch=$(TARGET_PACKAGING_ARCH)
+	scp $(2) $remote:hpkg-upload/$repoArch
+
+	cd $(HAIKU_TOP)
+	branch=`git branch | cut -c3-`
+	
+	ssh $remote "build_repository_for_testing.sh $branch $repoArch"
+}

@@ -76,6 +76,17 @@ rule ProcessCommandLineArguments
 				Always $(JAM_TARGETS) ;
 			}
 
+			# Copy the given set of local package files to the remote repository
+			# and create a new version of that remote repository (useful for
+			# testing the package repository before pushing).
+			case build-remote-test-repository : {
+				BuildRemoteHaikuPortsRepository $(JAM_TARGETS[1])
+					: $(JAM_TARGETS[2-]) ;
+				JAM_TARGETS = $(JAM_TARGETS[1]) ;
+				NotFile $(JAM_TARGETS) ;
+				Always $(JAM_TARGETS) ;
+			}
+
 			# A target starting with "@" is a build profile.
 			case @* : {
 				HAIKU_BUILD_PROFILE = [ Match "@(.*)" : $(JAM_TARGETS[1]) ] ;
