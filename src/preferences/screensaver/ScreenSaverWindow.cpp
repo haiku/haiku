@@ -593,7 +593,7 @@ void
 ModulesView::AllAttached()
 {
 	PopulateScreenSaverList();
-	fScreenSaversListView->Invoke(new BMessage(kMsgSaverSelected));
+	fScreenSaversListView->Invoke();
 }
 
 
