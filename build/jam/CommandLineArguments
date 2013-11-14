@@ -46,9 +46,16 @@ rule ProcessCommandLineArguments
 					" the Haiku" ;
 				Echo "                         image/installation." ;
 				Echo "  update-all           - Update all targets in the Haiku"
-					"image/installation." ;
+					" image/installation." ;
 				Echo "  mount                - Mount the Haiku image in the"
-					"bfs_shell." ;
+					" bfs_shell." ;
+				Echo ;
+				Echo "Package upload to (git.haiku-os.org/hpkg-upload):" ;
+				Echo "  jam upload-packages <packages ...> " ;
+				Echo ;
+				Echo "Remote repository creation (for testing a set of"
+					" packages):" ;
+				Echo "  jam build-remote-test-repository <packages ...> " ;
 				Echo ;
 				Echo "For more details on how to customize Haiku builds read" ;
 				Echo "build/jam/UserBuildConfig.ReadMe." ;
