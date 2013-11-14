@@ -15,7 +15,7 @@
 
 #include <Entry.h>
 #include <ObjectList.h>
-#include <Path.h>
+#include <String.h>
 
 #include <package/hpkg/HPKGDefs.h>
 #include <package/hpkg/PackageInfoAttributeValue.h>
@@ -257,27 +257,47 @@ command_update(int argc, const char* const* argv)
 	const char* targetRepositoryFileName = argv[optind++];
 	const char* packageListFileName = argv[optind++];
 
-	// open source repository
 	BStandardErrorOutput errorOutput;
-	BRepositoryReader repositoryReader(&errorOutput);
-	status_t error = repositoryReader.Init(sourceRepositoryFileName);
-	if (error != B_OK)
-		return 1;
-
-	// collect package infos and repository info from source repository
-	PackageInfos packageInfos;
-	PackageInfosCollector packageInfosCollector(packageInfos, &errorOutput);
-	error = repositoryReader.ParseContent(&packageInfosCollector);
-	if (error != B_OK)
-		return 1;
-
 	RepositoryWriterListener listener(verbose, quiet);
-	BRepositoryInfo repositoryInfo = packageInfosCollector.RepositoryInfo();
+
+	BEntry sourceRepositoryEntry(sourceRepositoryFileName);
+	if (!sourceRepositoryEntry.Exists()) {
+		listener.PrintError(
+			"Error: given source repository file '%s' doesn't exist!\n",
+			sourceRepositoryFileName);
+		return 1;
+	}
+	// determine path for 'repo.info' file from given new repository file
+	BString repositoryInfoFileName(targetRepositoryFileName);
+	repositoryInfoFileName.Append(".info");
+	BEntry repositoryInfoEntry(repositoryInfoFileName.String());
+	BRepositoryInfo repositoryInfo(repositoryInfoEntry);
 	status_t result = repositoryInfo.InitCheck();
 	if (result != B_OK) {
 		listener.PrintError(
-			"Error: didn't get a proper repository-info from source repository"
-			": %s - error: %s\n", sourceRepositoryFileName, strerror(result));
+			"Error: can't parse/read repository-info file %s : %s\n",
+			repositoryInfoFileName.String(), strerror(result));
+		return 1;
+	}
+
+	// open source repository
+	BRepositoryReader repositoryReader(&errorOutput);
+	result = repositoryReader.Init(sourceRepositoryFileName);
+	if (result != B_OK) {
+		listener.PrintError(
+			"Error: can't read from old repository file : %s\n",
+			strerror(result));
+		return 1;
+	}
+
+	// collect package infos from source repository
+	PackageInfos packageInfos;
+	PackageInfosCollector packageInfosCollector(packageInfos, &errorOutput);
+	result = repositoryReader.ParseContent(&packageInfosCollector);
+	if (result != B_OK) {
+		listener.PrintError(
+			"Error: couldn't fetch package infos from old repository : %s\n",
+			strerror(result));
 		return 1;
 	}
 
