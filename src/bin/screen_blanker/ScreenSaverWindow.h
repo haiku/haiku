@@ -16,30 +16,32 @@ const static uint32 kMsgEnableFilter = 'eflt';
 
 
 class ScreenSaverFilter : public BMessageFilter {
-	public:
-		ScreenSaverFilter()
-			: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
-			fEnabled(true) {}
+public:
+								ScreenSaverFilter()
+								:
+								BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE),
+									fEnabled(true) {}
 
-		virtual filter_result Filter(BMessage* message, BHandler** target);
+	virtual	filter_result		Filter(BMessage* message, BHandler** target);
 
-		void SetEnabled(bool enabled);
-	
-	private:
-		bool fEnabled;
+			void				SetEnabled(bool enabled)
+									{ fEnabled = enabled; };
+
+private:
+			bool				fEnabled;
 };
 
 
 class ScreenSaverWindow : public BDirectWindow {
-	public:
-		ScreenSaverWindow(BRect frame);
-		~ScreenSaverWindow();
+public:
+								ScreenSaverWindow(BRect frame);
+								~ScreenSaverWindow();
 
 		void SetSaver(BScreenSaver *saver);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
+	virtual	void				DirectConnected(direct_buffer_info* info);
 
-		virtual void MessageReceived(BMessage *message);
-		virtual bool QuitRequested();
-		virtual void DirectConnected(direct_buffer_info *info);
 
 	private:
 		BView *fTopView;

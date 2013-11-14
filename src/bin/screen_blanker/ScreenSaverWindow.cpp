@@ -20,6 +20,9 @@
 #include <syslog.h>
 
 
+//	#pragma mark - ScreenSaverFilter
+
+
 /* This message filter is what will close the screensaver upon user activity. */
 filter_result
 ScreenSaverFilter::Filter(BMessage* message, BHandler** target)
@@ -77,7 +80,8 @@ ScreenSaverFilter::SetEnabled(bool enabled)
 	A view is added to it so that BView based screensavers will work.
 */
 ScreenSaverWindow::ScreenSaverWindow(BRect frame)
-	: BDirectWindow(frame, "ScreenSaver Window",
+	:
+	BDirectWindow(frame, "ScreenSaver Window",
 		B_NO_BORDER_WINDOW_LOOK, kWindowScreenFeel,
 		B_NOT_RESIZABLE | B_NOT_MOVABLE | B_NOT_MINIMIZABLE
 		| B_NOT_ZOOMABLE | B_NOT_CLOSABLE, B_ALL_WORKSPACES),
@@ -112,7 +116,7 @@ ScreenSaverWindow::SetSaver(BScreenSaver *saver)
 
 
 void
-ScreenSaverWindow::MessageReceived(BMessage *message)
+ScreenSaverWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgEnableFilter:
@@ -121,7 +125,6 @@ ScreenSaverWindow::MessageReceived(BMessage *message)
 
 		default:
 			BWindow::MessageReceived(message);
- 			break;
 	}
 }
 
@@ -135,9 +138,10 @@ ScreenSaverWindow::QuitRequested()
 
 
 void
-ScreenSaverWindow::DirectConnected(direct_buffer_info *info)
+ScreenSaverWindow::DirectConnected(direct_buffer_info* info)
 {
-	if (fSaver)
-		fSaver->DirectConnected(info);
+	BScreenSaver* saver = _ScreenSaver();
+	if (saver != NULL)
+		saver->DirectConnected(info);
 }
 

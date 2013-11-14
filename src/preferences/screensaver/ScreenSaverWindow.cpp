@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,9 +11,6 @@
 
 
 #include "ScreenSaverWindow.h"
-
-#include <algorithm>
-	// for std::max and std::min
 
 #include <stdio.h>
 
@@ -43,6 +40,9 @@
 #include <StringView.h>
 #include <TabView.h>
 #include <TextView.h>
+
+#include <algorithm>
+	// for std::max and std::min
 
 #include <BuildScreenSaverDefaultSettingsView.h>
 

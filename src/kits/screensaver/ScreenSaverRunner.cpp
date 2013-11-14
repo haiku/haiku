@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013, Haiku, Inc. All Rights Reserved
+ * Copyright 2003-2013 Haiku, Inc. All rights reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -111,7 +111,8 @@ ScreenSaverRunner::_LoadAddOn()
 	}
 	_CleanUp();
 
-	if (strcmp("", fSettings.ModuleName()) == 0) {
+	const char* moduleName = fSettings.ModuleName();
+	if (*moduleName == '\0') {
 		Resume();
 		return;
 	}
@@ -257,7 +258,7 @@ ScreenSaverRunner::_Run()
 
 
 status_t
-ScreenSaverRunner::_ThreadFunc(void *data)
+ScreenSaverRunner::_ThreadFunc(void* data)
 {
 	ScreenSaverRunner* runner = (ScreenSaverRunner*)data;
 	return runner->_Run();

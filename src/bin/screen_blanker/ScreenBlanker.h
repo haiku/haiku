@@ -1,10 +1,11 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * 		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
+ * 		Michael Phipps
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef SCREEN_SAVER_APP_H
 #define SCREEN_SAVER_APP_H

@@ -1,12 +1,13 @@
 /*
- * Copyright 2003-2009, Haiku.
+ * Copyright 2003-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Phipps
  *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
  *		Ryan Leavengood, leavengood@gmail.com
+ *		Michael Phipps
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -32,8 +33,12 @@ const static uint32 kMsgSuspendScreen = 'suss';
 const static uint32 kMsgStandByScreen = 'stbs';
 
 
+//	#pragma mark - ScreenBlanker
+
+
 ScreenBlanker::ScreenBlanker()
-	: BApplication(SCREEN_BLANKER_SIG),
+	:
+	BApplication(SCREEN_BLANKER_SIG),
 	fWindow(NULL),
 	fSaver(NULL),
 	fRunner(NULL),
@@ -57,9 +62,8 @@ ScreenBlanker::~ScreenBlanker()
 void
 ScreenBlanker::ReadyToRun()
 {
-	if (!fSettings.Load()) {
+	if (!fSettings.Load())
 		fprintf(stderr, "could not load settings, using defaults\n");
-	}
 
 	// create a BDirectWindow and start the render thread.
 	// TODO: we need a window per screen...
@@ -173,10 +177,12 @@ ScreenBlanker::_QueueTurnOffScreen()
 		return;
 
 	if (fSettings.OffTime() == fSettings.SuspendTime()
-		&& (flags & (ENABLE_DPMS_OFF | ENABLE_DPMS_SUSPEND)) == (ENABLE_DPMS_OFF | ENABLE_DPMS_SUSPEND))
+		&& (flags & (ENABLE_DPMS_OFF | ENABLE_DPMS_SUSPEND))
+			== (ENABLE_DPMS_OFF | ENABLE_DPMS_SUSPEND))
 		flags &= ~ENABLE_DPMS_SUSPEND;
 	if (fSettings.SuspendTime() == fSettings.StandByTime()
-		&& (flags & (ENABLE_DPMS_SUSPEND | ENABLE_DPMS_STAND_BY)) == (ENABLE_DPMS_SUSPEND | ENABLE_DPMS_STAND_BY))
+		&& (flags & (ENABLE_DPMS_SUSPEND | ENABLE_DPMS_STAND_BY))
+			== (ENABLE_DPMS_SUSPEND | ENABLE_DPMS_STAND_BY))
 		flags &= ~ENABLE_DPMS_STAND_BY;
 
 	// start them off again
@@ -248,16 +254,17 @@ ScreenBlanker::MessageReceived(BMessage* message)
 		case kMsgTurnOffScreen:
 			_SetDPMSMode(B_DPMS_OFF);
 			break;
+
 		case kMsgSuspendScreen:
 			_SetDPMSMode(B_DPMS_SUSPEND);
 			break;
+
 		case kMsgStandByScreen:
 			_SetDPMSMode(B_DPMS_STAND_BY);
 			break;
 
 		default:
 			BApplication::MessageReceived(message);
- 			break;
 	}
 }
 
@@ -266,7 +273,8 @@ bool
 ScreenBlanker::QuitRequested()
 {
 	if (fSettings.LockEnable()
-		&& system_time() - fBlankTime > fSettings.PasswordTime() - fSettings.BlankTime()) {
+		&& system_time() - fBlankTime > fSettings.PasswordTime()
+			- fSettings.BlankTime()) {
 		_ShowPasswordWindow();
 		return false;
 	}
@@ -279,7 +287,7 @@ ScreenBlanker::QuitRequested()
 void
 ScreenBlanker::_Shutdown()
 {
-	if (fWindow) {
+	if (fWindow != NULL) {
 		fWindow->Hide();
 
 		if (fWindow->Lock())
@@ -290,13 +298,14 @@ ScreenBlanker::_Shutdown()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - main
 
 
 int
-main(int, char**)
+main(int argc, char** argv)
 {
 	ScreenBlanker app;
 	app.Run();
+
 	return 0;
 }
