@@ -9,7 +9,6 @@
 
 
 #include "PreviewView.h"
-#include "Constants.h"
 #include "Utility.h"
 
 #include <Point.h>
@@ -63,31 +62,6 @@ PreviewView::~PreviewView()
 }
 
 
-BView*
-PreviewView::AddPreview()
-{
-	BRect rect = scale2(1, 8, 1, 2, Bounds());
-	rect.InsetBy(1, 1);
-	fSaverView = new BView(rect, "preview", B_FOLLOW_NONE, B_WILL_DRAW);
-	fSaverView->SetViewColor(0, 0, 0);
-	AddChild(fSaverView);
-
-	return fSaverView;
-}
-
-
-BView*
-PreviewView::RemovePreview()
-{
-	if (fSaverView != NULL)
-		RemoveChild(fSaverView);
-
-	BView* saverView = fSaverView;
-	fSaverView = NULL;
-	return saverView;
-}
-
-
 void
 PreviewView::Draw(BRect update)
 {
@@ -103,7 +77,7 @@ PreviewView::Draw(BRect update)
 	StrokeRoundRect(scale2(0, 9, 0, 3, Bounds()), 4, 4);
 		// Outline outer shape
 
-	SetHighColor(kBlack);
+	SetHighColor(0, 0, 0);
 	FillRect(scale2(1, 8, 1, 2, Bounds()));
 
 	SetHighColor(184, 184, 184);
@@ -116,4 +90,30 @@ PreviewView::Draw(BRect update)
 	FillRect(scale2(3, 4, 4, 5, Bounds()));
 	SetHighColor(96, 96, 96);
 	FillRect(scale2(5, 6, 4, 5, Bounds()));
+}
+
+
+BView*
+PreviewView::AddPreview()
+{
+	BRect rect = scale2(1, 8, 1, 2, Bounds());
+	fSaverView = new BView(rect.InsetBySelf(1, 1), "preview", B_FOLLOW_NONE,
+		B_WILL_DRAW);
+	fSaverView->SetViewColor(0, 0, 0);
+	fSaverView->SetLowColor(0, 0, 0);
+	AddChild(fSaverView);
+
+	return fSaverView;
+}
+
+
+BView*
+PreviewView::RemovePreview()
+{
+	if (fSaverView != NULL)
+		RemoveChild(fSaverView);
+
+	BView* saverView = fSaverView;
+	fSaverView = NULL;
+	return saverView;
 }
