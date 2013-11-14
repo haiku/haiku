@@ -284,6 +284,13 @@ ScreenBlanker::QuitRequested()
 }
 
 
+bool
+ScreenBlanker::IsPasswordWindowShown() const
+{
+	return fPasswordWindow != NULL && !fPasswordWindow->IsHidden();
+}
+
+
 void
 ScreenBlanker::_Shutdown()
 {

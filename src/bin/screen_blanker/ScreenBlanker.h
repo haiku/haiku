@@ -54,6 +54,7 @@ class ScreenBlanker : public BApplication {
 		BMessageRunner* fStandByScreenRunner;
 		BMessageRunner* fSuspendScreenRunner;
 		BMessageRunner* fTurnOffScreenRunner;
+			bool				IsPasswordWindowShown() const;
 };
 
 #endif	// SCREEN_SAVER_APP_H
