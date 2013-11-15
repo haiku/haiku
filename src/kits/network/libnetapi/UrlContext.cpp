@@ -21,8 +21,7 @@ BUrlContext::BUrlContext()
 	fAuthenticationMap(NULL)
 {
 	fAuthenticationMap = new(std::nothrow) BHttpAuthenticationMap();
-	if(!fAuthenticationMap)
-		return;
+
 	// This is the default authentication, used when nothing else is found.
 	// The empty string used as a key will match all the domain strings, once
 	// we have removed all components.
@@ -35,7 +34,7 @@ BUrlContext::~BUrlContext()
 	BHttpAuthenticationMap::Iterator iterator =
 		fAuthenticationMap->GetIterator();
 	while(iterator.HasNext())
-		delete iterator.Remove().value;
+		delete *iterator.NextValue();
 
 	delete fAuthenticationMap;
 }
@@ -59,10 +58,15 @@ BUrlContext::AddAuthentication(const BUrl& url,
 	domain += url.Path();
 	BPrivate::HashString hostHash(domain.String(), domain.Length());
 
-	delete fAuthenticationMap->Get(hostHash);
-		// Make sure we don't leak memory by overriding a previous
-		// authentication for the same domain.
-	fAuthenticationMap->Put(hostHash, authentication);
+	BHttpAuthentication* previous = fAuthenticationMap->Get(hostHash);
+
+	// Make sure we don't leak memory by overriding a previous
+	// authentication for the same domain.
+	if(authentication != previous) {
+		fAuthenticationMap->Put(hostHash, authentication);
+			// replaces the old one
+		delete previous;
+	}
 }
 
 

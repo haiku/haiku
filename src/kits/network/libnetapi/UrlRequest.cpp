@@ -231,17 +231,6 @@ BUrlRequest::_ThreadEntry(void* arg)
 }
 
 
-status_t
-BUrlRequest::_ProtocolLoop()
-{
-	// Dummy _ProtocolLoop
-	while (!fQuit)
-		snooze(1000);
-
-	return B_PROT_SUCCESS;
-}
-
-
 void
 BUrlRequest::_EmitDebug(BUrlProtocolDebugMessage type,
 	const char* format, ...)

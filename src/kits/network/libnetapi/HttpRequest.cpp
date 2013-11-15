@@ -57,6 +57,8 @@ BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
 
 BHttpRequest::~BHttpRequest()
 {
+	Stop();
+
 	delete fSocket;
 
 	delete fOptInputData;
@@ -550,7 +552,6 @@ BHttpRequest::_MakeRequest()
 	ssize_t bytesTotal = 0;
 	char* inputTempBuffer = NULL;
 	ssize_t chunkSize = -1;
-	fQuit = false;
 
 	while (!fQuit && !(receiveEnd && parseEnd)) {
 		if (!receiveEnd) {
@@ -560,8 +561,7 @@ BHttpRequest::_MakeRequest()
 
 			if (bytesRead < 0) {
 				readError = true;
-				fQuit = true;
-				continue;
+				break;
 			} else if (bytesRead == 0)
 				receiveEnd = true;
 

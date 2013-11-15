@@ -29,11 +29,8 @@ BUrlProtocolRoster::MakeRequest(const BUrl& url,
 		return new(std::nothrow) BHttpRequest(url, true, "HTTPS", listener,
 			context);
 	} else if (url.Protocol() == "file") {
-		puts("*** FILE URL");
 		return new(std::nothrow) BFileRequest(url, listener, context);
 	}
-
-	puts("*** UNKNOWN protocol");
 
 	return NULL;
 }
