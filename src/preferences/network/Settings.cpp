@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <net/if.h>
+#include <net/route.h>
 #include <netinet/in.h>
 #include <resolv.h>
 #include <stdio.h>
@@ -28,6 +29,7 @@
 #include <FindDirectory.h>
 #include <NetworkDevice.h>
 #include <NetworkInterface.h>
+#include <NetworkRoster.h>
 #include <Path.h>
 #include <String.h>
 
@@ -35,59 +37,18 @@
 
 
 static status_t
-GetDefaultGateway(BString& gateway)
+GetDefaultGateway(const char* name, BString& gateway)
 {
-	// TODO: This method is here because BNetworkInterface
-	// doesn't yet have any route getting methods
-
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
-		return errno;
-
-	FileDescriptorCloser fdCloser(socket);
-
-	// Obtain gateway
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
-		return errno;
-
-	uint32 size = (uint32)config.ifc_value;
-	if (size == 0)
-		return B_ERROR;
-
-	void* buffer = malloc(size);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	MemoryDeleter bufferDeleter(buffer);
-	config.ifc_len = size;
-	config.ifc_buf = buffer;
-
-	if (ioctl(socket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
-		return errno;
-
-	ifreq* interface = (ifreq*)buffer;
-	ifreq* end = (ifreq*)((uint8*)buffer + size);
-
-	while (interface < end) {
-		route_entry& route = interface->ifr_route;
-
-		if ((route.flags & RTF_GATEWAY) != 0) {
-			sockaddr_in* inetAddress = (sockaddr_in*)route.gateway;
+	uint32 index = 0;
+	BNetworkRoster& roster = BNetworkRoster::Default();
+	route_entry routeEntry;
+	while (roster.GetNextRoute(&index, routeEntry, name) == B_OK) {
+		if ((routeEntry.flags & RTF_GATEWAY) != 0) {
+			sockaddr_in* inetAddress = (sockaddr_in*)routeEntry.gateway;
 			gateway = inet_ntoa(inetAddress->sin_addr);
+			break;
 		}
-
-		int32 addressSize = 0;
-		if (route.destination != NULL)
-			addressSize += route.destination->sa_len;
-		if (route.mask != NULL)
-			addressSize += route.mask->sa_len;
-		if (route.gateway != NULL)
-			addressSize += route.gateway->sa_len;
-
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
-			+ sizeof(route_entry) + addressSize);
+		index++;
 	}
 
 	return B_OK;
@@ -145,7 +106,7 @@ Settings::ReadConfiguration()
 	fIP = address.Address().ToString();
 	fNetmask = address.Mask().ToString();
 
-	if (GetDefaultGateway(fGateway) != B_OK)
+	if (GetDefaultGateway(fName.String(), fGateway) != B_OK)
 		return;
 
 	uint32 flags = interface.Flags();
