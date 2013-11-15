@@ -21,8 +21,8 @@ private:
 	static	status_t			_EventLooper(void *arg);
 
 			thread_id			fEventThread;
-			PowerButtonMonitor*	fPowerButtonMonitor;
-			LidMonitor*			fLidMonitor;
+			PowerMonitor*		fPowerMonitors[2];
+			uint32				fMonitorCount;
 
 			bool				fQuitRequested;
 };
@@ -41,11 +41,21 @@ main(void)
 PowerManagementDaemon::PowerManagementDaemon()
 	:
 	BApplication("application/x-vnd.Haiku-powermanagement"),
-	fPowerButtonMonitor(NULL),
+	fMonitorCount(0),
 	fQuitRequested(false)
 {
-	fPowerButtonMonitor = new PowerButtonMonitor;
-	fLidMonitor = new LidMonitor;
+	PowerMonitor* powerButtonMonitor = new PowerButtonMonitor;
+	if (powerButtonMonitor->FD() > 0)
+		fPowerMonitors[fMonitorCount++] = powerButtonMonitor;
+	else
+		delete powerButtonMonitor;
+
+	PowerMonitor* lidMonitor = new LidMonitor;
+	if (lidMonitor->FD() > 0)
+		fPowerMonitors[fMonitorCount++] = lidMonitor;
+	else
+		delete lidMonitor;
+
 	fEventThread = spawn_thread(_EventLooper, "_power_daemon_event_loop_",
 		B_NORMAL_PRIORITY, this);
 	if (fEventThread < B_OK)
@@ -61,8 +71,8 @@ PowerManagementDaemon::PowerManagementDaemon()
 PowerManagementDaemon::~PowerManagementDaemon()
 {
 	fQuitRequested = true;
-	delete fPowerButtonMonitor;
-	delete fLidMonitor;
+	for (uint32 i = 0; i < fMonitorCount; i++)
+		delete fPowerMonitors[i];
 	status_t status;
 	wait_for_thread(fEventThread, &status);
 }
@@ -80,17 +90,23 @@ PowerManagementDaemon::_EventLooper(void* arg)
 void
 PowerManagementDaemon::_EventLoop()
 {
+	if (fMonitorCount == 0)
+		return;
+	object_wait_info info[fMonitorCount];
+	for (uint32 i = 0; i < fMonitorCount; i++) {
+		info[i].object = fPowerMonitors[i]->FD();
+		info[i].type = B_OBJECT_TYPE_FD;
+		info[i].events = B_EVENT_READ;
+	}
 	while (!fQuitRequested) {
-		object_wait_info info[] = {
-			{ fPowerButtonMonitor->FD(), B_OBJECT_TYPE_FD, B_EVENT_READ },
-			{ fLidMonitor->FD(), B_OBJECT_TYPE_FD, B_EVENT_READ }
-		};
-
-		if (wait_for_objects_etc(info, 2, 0, 1000000LL) < B_OK)
+		if (wait_for_objects(info, fMonitorCount) < B_OK)
 			continue;
-		if (info[0].events & B_EVENT_READ)
-			fPowerButtonMonitor->HandleEvent();
-		if (info[1].events & B_EVENT_READ)
-			fLidMonitor->HandleEvent();
+		// handle events and reset events
+		for (uint32 i = 0; i < fMonitorCount; i++) {
+			if (info[i].events & B_EVENT_READ)
+				fPowerMonitors[i]->HandleEvent();
+			else
+				info[i].events = B_EVENT_READ;
+		}
 	}
 }

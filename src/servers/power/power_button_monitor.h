@@ -9,14 +9,17 @@
 #define _POWER_BUTTON_MONITOR_H
 
 
-class PowerButtonMonitor {
+#include "power_monitor.h"
+
+
+class PowerButtonMonitor : public PowerMonitor {
 public:
 								PowerButtonMonitor();
-			 					~PowerButtonMonitor();
+	virtual	 					~PowerButtonMonitor();
 
-			void				HandleEvent();
+	virtual void				HandleEvent();
 
-			int					FD() const { return fFD; }
+	virtual int					FD() const { return fFD; }
 private:
 			int					fFD;
 };

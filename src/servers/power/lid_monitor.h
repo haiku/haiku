@@ -9,14 +9,17 @@
 #define _LID_MONITOR_H
 
 
-class LidMonitor {
+#include "power_monitor.h"
+
+
+class LidMonitor : public PowerMonitor {
 public:
 								LidMonitor();
-			 					~LidMonitor();
+	virtual	 					~LidMonitor();
 
-			void				HandleEvent();
+	virtual	void				HandleEvent();
 
-			int					FD() const { return fFD; }
+	virtual	int					FD() const { return fFD; }
 private:
 			int					fFD;
 };
