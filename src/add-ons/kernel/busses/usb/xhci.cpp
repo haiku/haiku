@@ -597,6 +597,8 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	bool directionIn = (pipe->Direction() == Pipe::In);
 
 	xhci_td *descriptor = CreateDescriptorChain(transfer->DataLength());
+	if (descriptor == NULL)
+		return B_NO_MEMORY;
 	descriptor->trb_count = descriptor->buffer_count;
 
 	// set NormalStage
@@ -1004,12 +1006,16 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	uint8 rhPort = 0;
 	for (Device *hubDevice = parent; hubDevice != RootObject();
 		hubDevice = (Device *)hubDevice->Parent()) {
+
+		rhPort = routePort;
+		if (hubDevice->Parent() == RootObject())
+			break;
 		route *= 16;
 		if (hubPort > 15)
 			route += 15;
 		else
 			route += routePort;
-		rhPort = routePort;
+
 		routePort = hubDevice->HubPort();
 	}
 
