@@ -25,7 +25,7 @@ RemotePackageRepository HaikuPorts
 	bzip2-1.0.6-3
 	caya-2013.07.31-3
 	cdrtools-3.01~a07-3
-	cmake-2.8.11.2-2
+	cmake-2.8.11.2-4
 	ctags-5.8-3
 	curl-7.26.0-5
 	curl_devel-7.26.0-5
@@ -148,8 +148,8 @@ RemotePackageRepository HaikuPorts
 	gettext_x86_libintl-0.18.1.1-5
 	glu_x86-9.0.0-2
 	glu_x86_devel-9.0.0-2
-	haikuwebkit_x86-1.1.3_2013_08_09-2
-	haikuwebkit_x86_devel-1.1.3_2013_08_09-2
+	haikuwebkit_x86-1.2.0-2
+	haikuwebkit_x86_devel-1.2.0-2
 	icu_x86-4.8.1.1-4
 	icu_x86_devel-4.8.1.1-4
 	jpeg_x86-9-3
@@ -218,7 +218,6 @@ RemotePackageRepository HaikuPorts
 	gperf
 	grep
 	groff
-	haikuwebkit_x86
 	htmldoc
 	icu
 	jam

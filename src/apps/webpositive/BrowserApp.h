@@ -35,6 +35,7 @@
 
 
 class BNetworkCookieJar;
+class BUrlContext;
 class DownloadWindow;
 class BrowserWindow;
 class SettingsMessage;
@@ -74,7 +75,7 @@ private:
 
 			SettingsMessage*	fSettings;
 			SettingsMessage*	fCookies;
-			BNetworkCookieJar*	fCookieJar;
+			BUrlContext*		fContext;
 
 			DownloadWindow*		fDownloadWindow;
 			SettingsWindow*		fSettingsWindow;

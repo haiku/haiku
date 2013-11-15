@@ -38,6 +38,7 @@
 #include <Locale.h>
 #include <Path.h>
 #include <Screen.h>
+#include <UrlContext.h>
 #include <debugger.h>
 
 #include <stdio.h>
@@ -61,7 +62,7 @@ const char* kApplicationSignature = "application/x-vnd.Haiku-WebPositive";
 const char* kApplicationName = B_TRANSLATE_SYSTEM_NAME("WebPositive");
 static const uint32 PRELOAD_BROWSING_HISTORY = 'plbh';
 
-#define ENABLE_NATIVE_COOKIES 0
+#define ENABLE_NATIVE_COOKIES 1
 
 
 BrowserApp::BrowserApp()
@@ -73,10 +74,19 @@ BrowserApp::BrowserApp()
 	fInitialized(false),
 	fSettings(NULL),
 	fCookies(NULL),
-	fCookieJar(NULL),
+	fContext(NULL),
 	fDownloadWindow(NULL),
 	fSettingsWindow(NULL)
 {
+#if ENABLE_NATIVE_COOKIES
+	BString cookieStorePath = kApplicationName;
+	cookieStorePath << "/Cookies";
+	fCookies = new SettingsMessage(B_USER_SETTINGS_DIRECTORY,
+		cookieStorePath.String());
+	BMessage cookieArchive = fCookies->GetValue("cookies", cookieArchive);
+	fContext = new BUrlContext();
+	fContext->SetCookieJar(BNetworkCookieJar(&cookieArchive));
+#endif
 }
 
 
@@ -85,7 +95,7 @@ BrowserApp::~BrowserApp()
 	delete fLaunchRefsMessage;
 	delete fSettings;
 	delete fCookies;
-	delete fCookieJar;
+	delete fContext;
 }
 
 
@@ -166,16 +176,6 @@ BrowserApp::ReadyToRun()
 	mainSettingsPath << "/Application";
 	fSettings = new SettingsMessage(B_USER_SETTINGS_DIRECTORY,
 		mainSettingsPath.String());
-#if ENABLE_NATIVE_COOKIES
-	mainSettingsPath = kApplicationName;
-	mainSettingsPath << "/Cookies";
-	fCookies = new SettingsMessage(B_USER_SETTINGS_DIRECTORY,
-		mainSettingsPath.String());
-	BMessage cookieArchive;
-	cookieArchive = fCookies->GetValue("cookies", cookieArchive);
-	fCookieJar = new BNetworkCookieJar(cookieArchive);
-	BWebPage::SetCookieJar(fCookieJar);
-#endif
 
 	fLastWindowFrame = fSettings->GetValue("window frame", fLastWindowFrame);
 	BRect defaultDownloadWindowFrame(-10, -10, 365, 265);
@@ -344,7 +344,8 @@ BrowserApp::QuitRequested()
 	}
 
 	BMessage cookieArchive;
-	if (fCookieJar != NULL && fCookieJar->Archive(&cookieArchive) == B_OK)
+	BNetworkCookieJar& cookieJar = fContext->GetCookieJar();
+	if (cookieJar.Archive(&cookieArchive) == B_OK)
 		fCookies->SetValue("cookies", cookieArchive);
 
 	return true;
@@ -429,7 +430,7 @@ BrowserApp::_CreateNewWindow(const BString& url, bool fullscreen)
 		fLastWindowFrame.OffsetTo(50, 50);
 
 	BrowserWindow* window = new BrowserWindow(fLastWindowFrame, fSettings,
-		url);
+		url, fContext);
 	if (fullscreen)
 		window->ToggleFullscreen();
 	window->Show();

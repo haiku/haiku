@@ -398,10 +398,7 @@ if [ IsPackageAvailable haikuwebkit_devel ] {
 		file: devel haikuwebkit_devel
 			depends: base
 			libraries:
-				$(developLibDir)/libwtf.so
-				$(developLibDir)/libjavascriptcore.so
-				$(developLibDir)/libwebcore.so
-				$(developLibDir)/libwebkit.so
+				$(developLibDir)/libWebKit.so
 			headers: $(developHeadersDir)
 		;
 

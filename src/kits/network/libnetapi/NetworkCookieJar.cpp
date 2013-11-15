@@ -29,11 +29,11 @@ BNetworkCookieJar::BNetworkCookieJar()
 }
 
 
-BNetworkCookieJar::BNetworkCookieJar(const BNetworkCookieJar&)
+BNetworkCookieJar::BNetworkCookieJar(const BNetworkCookieJar& other)
 	:
 	fCookieHashMap(new PrivateHashMap())
 {
-	// TODO
+	*this = other;
 }
 
 

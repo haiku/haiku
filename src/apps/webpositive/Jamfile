@@ -72,7 +72,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ BuildFeatureAttribute webkit : libraries ]
 			$(TARGET_LIBSTDC++) localestub
 			[ MultiArchDefaultGristFiles libshared.a ]
-			be network tracker translation
+			be network bnetapi tracker translation
 			:
 			WebPositive.rdef
 			;

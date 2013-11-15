@@ -322,7 +322,8 @@ private:
 
 
 BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
-		const BString& url, uint32 interfaceElements, BWebView* webView)
+		const BString& url, BUrlContext* context, uint32 interfaceElements,
+		BWebView* webView)
 	:
 	BWebWindow(frame, kApplicationName,
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
@@ -331,6 +332,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	fInterfaceVisible(false),
 	fPulseRunner(NULL),
 	fVisibleInterfaceElements(interfaceElements),
+	fContext(context),
 	fAppSettings(appSettings),
 	fZoomTextOnly(true),
 	fShowTabsIfSinglePageOpen(true),
@@ -1200,12 +1202,15 @@ BrowserWindow::IsBlankTab() const
 
 
 void
-BrowserWindow::CreateNewTab(const BString& _url, bool select, BWebView* webView)
+BrowserWindow::CreateNewTab(const BString& _url, bool select,
+	BWebView* webView)
 {
 	bool applyNewPagePolicy = webView == NULL;
 	// Executed in app thread (new BWebPage needs to be created in app thread).
 	if (webView == NULL)
 		webView = new BWebView("web view");
+
+	webView->SetContext(fContext);
 
 	bool isNewWindow = fTabManager->CountTabs() == 0;
 
@@ -1298,7 +1303,8 @@ BrowserWindow::NewPageCreated(BWebView* view, BRect windowFrame,
 {
 	if (windowFrame.IsValid()) {
 		BrowserWindow* window = new BrowserWindow(windowFrame, fAppSettings,
-			BString(), INTERFACE_ELEMENT_STATUS, view);
+			BString(), fContext, INTERFACE_ELEMENT_STATUS,
+			view);
 		window->Show();
 	} else
 		CreateNewTab(BString(), activate, view);

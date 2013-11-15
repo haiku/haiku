@@ -46,6 +46,7 @@ class BPath;
 class BStatusBar;
 class BStringView;
 class BTextControl;
+class BUrlContext;
 class BWebView;
 class SettingsMessage;
 class TabManager;
@@ -90,6 +91,7 @@ public:
 								BrowserWindow(BRect frame,
 									SettingsMessage* appSettings,
 									const BString& url,
+									BUrlContext* context,
 									uint32 interfaceElements
 										= INTERFACE_ELEMENT_ALL,
 									BWebView* webView = NULL);
@@ -248,6 +250,8 @@ private:
 			uint32				fVisibleInterfaceElements;
 			bigtime_t			fLastMouseMovedTime;
 			BPoint				fLastMousePos;
+
+			BUrlContext*		fContext;
 
 			// cached settings
 			SettingsMessage*	fAppSettings;
