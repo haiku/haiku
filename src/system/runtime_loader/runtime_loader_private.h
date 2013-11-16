@@ -58,6 +58,8 @@ int runtime_loader(void* arg, void* commpage);
 int open_executable(char* name, image_type type, const char* rpath,
 	const char* programPath, const char* abiSpecificSubDir);
 status_t test_executable(const char* path, char* interpreter);
+status_t get_executable_architecture(const char* path,
+	const char** _architecture);
 
 void terminate_program(void);
 image_id load_program(char const* path, void** entry);

@@ -9,16 +9,21 @@
 
 #include "runtime_loader_private.h"
 
-#include <syscalls.h>
-#include <user_runtime.h>
-
-#include <directories.h>
-
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 
 #include <algorithm>
+
+#include <ByteOrder.h>
+
+#include <directories.h>
+#include <image_defs.h>
+#include <syscalls.h>
+#include <user_runtime.h>
+#include <vm_defs.h>
+
+#include "elf_symbol_lookup.h"
 
 
 struct user_space_program_args *gProgramArgs;
@@ -382,6 +387,231 @@ test_executable(const char *name, char *invoker)
 out:
 	_kern_close(fd);
 	return status;
+}
+
+
+static bool
+determine_x86_abi(int fd, const Elf32_Ehdr& elfHeader, bool& _isGcc2)
+{
+	// Unless we're a little-endian CPU, don't bother. We're not x86, so it
+	// doesn't matter all that much whether we can determine the correct gcc
+	// ABI. This saves the code below from having to deal with endianess
+	// conversion.
+#if B_HOST_IS_LENDIAN
+
+	// Since we don't want to load the complete image, we can't use the
+	// functions that normally determine the Haiku version and ABI. Instead
+	// we'll load the symbol and string tables and resolve the ABI symbol
+	// manually.
+
+	// map the file into memory
+	struct stat st;
+	if (_kern_read_stat(fd, NULL, true, &st, sizeof(st)) != B_OK)
+		return false;
+
+	void* fileBaseAddress;
+	area_id area = _kern_map_file("mapped file", &fileBaseAddress,
+		B_ANY_ADDRESS, st.st_size, B_READ_AREA, REGION_NO_PRIVATE_MAP, false,
+		fd, 0);
+	if (area < 0)
+		return false;
+
+	struct AreaDeleter {
+		AreaDeleter(area_id area)
+			:
+			fArea(area)
+		{
+		}
+
+		~AreaDeleter()
+		{
+			_kern_delete_area(fArea);
+		}
+
+	private:
+		area_id	fArea;
+	} areaDeleter(area);
+
+	// get the section headers
+	if (elfHeader.e_shoff == 0 || elfHeader.e_shentsize < sizeof(Elf32_Shdr))
+		return false;
+
+	size_t sectionHeadersSize = elfHeader.e_shentsize * elfHeader.e_shnum;
+	if (elfHeader.e_shoff + (off_t)sectionHeadersSize > st.st_size)
+		return false;
+
+	void* sectionHeaders = (uint8*)fileBaseAddress + elfHeader.e_shoff;
+
+	// find the sections we need
+	uint32* symbolHash = NULL;
+	uint32 symbolHashSize = 0;
+	uint32 symbolHashChainSize = 0;
+	Elf32_Sym* symbolTable = NULL;
+	uint32 symbolTableSize = 0;
+	const char* stringTable = NULL;
+	off_t stringTableSize = 0;
+
+	for (int32 i = 0; i < elfHeader.e_shnum; i++) {
+		Elf32_Shdr* sectionHeader
+			= (Elf32_Shdr*)((uint8*)sectionHeaders + i * elfHeader.e_shentsize);
+		if ((off_t)sectionHeader->sh_offset + (off_t)sectionHeader->sh_size
+				> st.st_size) {
+			continue;
+		}
+
+		void* sectionAddress = (uint8*)fileBaseAddress
+			+ sectionHeader->sh_offset;
+
+		switch (sectionHeader->sh_type) {
+			case SHT_HASH:
+				symbolHash = (uint32*)sectionAddress;
+				if (sectionHeader->sh_size < (off_t)sizeof(symbolHash[0]))
+					return false;
+				symbolHashSize = symbolHash[0];
+				symbolHashChainSize
+					= sectionHeader->sh_size / sizeof(symbolHash[0]);
+				if (symbolHashChainSize < symbolHashSize + 2)
+					return false;
+				symbolHashChainSize -= symbolHashSize + 2;
+				break;
+			case SHT_DYNSYM:
+				symbolTable = (Elf32_Sym*)sectionAddress;
+				symbolTableSize = sectionHeader->sh_size;
+				break;
+			case SHT_STRTAB:
+				// .shstrtab has the same type as .dynstr, but it isn't loaded
+				// into memory.
+				if (sectionHeader->sh_addr == 0)
+					continue;
+				stringTable = (const char*)sectionAddress;
+				stringTableSize = (off_t)sectionHeader->sh_size;
+				break;
+			default:
+				continue;
+		}
+	}
+
+	if (symbolHash == NULL || symbolTable == NULL || stringTable == NULL)
+		return false;
+	uint32 symbolCount
+		= std::min(symbolTableSize / sizeof(Elf32_Sym), symbolHashChainSize);
+	if (symbolCount < symbolHashSize)
+		return false;
+
+	// look up the ABI symbol
+	const char* name = B_SHARED_OBJECT_HAIKU_ABI_VARIABLE_NAME;
+	size_t nameLength = strlen(name);
+	uint32 bucket = elf_hash(name) % symbolHashSize;
+
+	for (uint32 i = symbolHash[bucket + 2]; i < symbolCount && i != STN_UNDEF;
+		i = symbolHash[2 + symbolHashSize + i]) {
+		Elf32_Sym* symbol = symbolTable + i;
+		if (symbol->st_shndx != SHN_UNDEF
+			&& ((symbol->Bind() == STB_GLOBAL) || (symbol->Bind() == STB_WEAK))
+			&& symbol->Type() == STT_OBJECT
+			&& (off_t)symbol->st_name + (off_t)nameLength < stringTableSize
+			&& strcmp(stringTable + symbol->st_name, name) == 0) {
+			if (symbol->st_value > 0 && symbol->st_size >= sizeof(uint32)
+				&& symbol->st_shndx < elfHeader.e_shnum) {
+				Elf32_Shdr* sectionHeader = (Elf32_Shdr*)((uint8*)sectionHeaders
+					+ symbol->st_shndx * elfHeader.e_shentsize);
+				if (symbol->st_value >= sectionHeader->sh_addr
+					&& symbol->st_value
+						<= sectionHeader->sh_addr + sectionHeader->sh_size) {
+					off_t fileOffset = symbol->st_value - sectionHeader->sh_addr
+						+ sectionHeader->sh_offset;
+					if (fileOffset + sizeof(uint32) <= st.st_size) {
+						uint32 abi
+							= *(uint32*)((uint8*)fileBaseAddress + fileOffset);
+						_isGcc2 = (abi & B_HAIKU_ABI_MAJOR)
+							== B_HAIKU_ABI_GCC_2;
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+	}
+
+	// ABI symbol not found. That means the object pre-dates its introduction
+	// in Haiku. So this is most likely gcc 2. We don't fall back to reading
+	// the comment sections to verify.
+	_isGcc2 = true;
+	return true;
+#else	// not little endian
+	return false;
+#endif
+}
+
+
+static status_t
+get_executable_architecture(int fd, const char** _architecture)
+{
+	// Read the ELF header. We read the 32 bit header. Generally the e_machine
+	// field is the last one that interests us and the 64 bit header is still
+	// identical at that point.
+	Elf32_Ehdr elfHeader;
+	ssize_t bytesRead = _kern_read(fd, 0, &elfHeader, sizeof(elfHeader));
+	if (bytesRead < 0)
+		return bytesRead;
+	if ((size_t)bytesRead != sizeof(elfHeader))
+		return B_NOT_AN_EXECUTABLE;
+
+	// check whether this is indeed an ELF file
+	if (memcmp(elfHeader.e_ident, ELF_MAGIC, 4) != 0)
+		return B_NOT_AN_EXECUTABLE;
+
+	// check the architecture
+	uint16 machine = elfHeader.e_machine;
+	if ((elfHeader.e_ident[EI_DATA] == ELFDATA2LSB) != (B_HOST_IS_LENDIAN != 0))
+		machine = (machine >> 8) | (machine << 8);
+
+	const char* architecture = NULL;
+	switch (machine) {
+		case EM_386:
+		case EM_486:
+		{
+			bool isGcc2;
+			if (determine_x86_abi(fd, elfHeader, isGcc2) && isGcc2)
+				architecture = "x86_gcc2";
+			else
+				architecture = "x86";
+			break;
+		}
+		case EM_68K:
+			architecture = "m68k";
+			break;
+		case EM_PPC:
+			architecture = "ppc";
+			break;
+		case EM_ARM:
+			architecture = "arm";
+			break;
+		case EM_X86_64:
+			architecture = "x86_64";
+			break;
+	}
+
+	if (architecture == NULL)
+		return B_NOT_SUPPORTED;
+
+	*_architecture = architecture;
+	return B_OK;
+}
+
+
+status_t
+get_executable_architecture(const char* path, const char** _architecture)
+{
+	int fd = _kern_open(-1, path, O_RDONLY, 0);
+	if (fd < 0)
+		return fd;
+
+	status_t error = get_executable_architecture(fd, _architecture);
+
+	_kern_close(fd);
+	return error;
 }
 
 
