@@ -92,6 +92,12 @@ static const char* kUsage =
 	"modify this behavior.\n"
 	"\n"
 	"Options:\n"
+	"  -a <architecture>\n"
+	"    If the path(s) specified by <kind> are architecture specific, use\n"
+	"    architecture <architecture>. If not specified, the primary\n"
+	"    architecture is used, unless the -p/--path option is specified, in\n"
+	"    which case the architecture associated with the given <path> is\n"
+	"    used.\n"
 	"  -c <separator>\n"
 	"    Concatenate the resulting paths, separated only by <separator>,\n"
 	"    instead of printing a path per line.\n"
@@ -123,6 +129,7 @@ print_usage_and_exit(bool error)
 int
 main(int argc, const char* const* argv)
 {
+	const char* architecture = NULL;
 	const char* dependency = NULL;
 	const char* referencePath = NULL;
 	bool existingOnly = false;
@@ -130,6 +137,7 @@ main(int argc, const char* const* argv)
 
 	while (true) {
 		static struct option sLongOptions[] = {
+			{ "architecture", required_argument, 0, 'a' },
 			{ "dependency", required_argument, 0, 'd' },
 			{ "help", no_argument, 0, 'h' },
 			{ "path", required_argument, 0, 'p' },
@@ -137,12 +145,16 @@ main(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+c:d:ehlp:",
+		int c = getopt_long(argc, (char**)argv, "+a:c:d:ehlp:",
 			sLongOptions, NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
+			case 'a':
+				architecture = optarg;
+				break;
+
 			case 'c':
 				separator = optarg;
 				break;
@@ -208,7 +220,7 @@ main(int argc, const char* const* argv)
 	if (referencePath != NULL) {
 		BPath path;
 		status_t error = BPathFinder(referencePath, dependency).FindPath(
-			baseDirectory, subPath,
+			architecture, baseDirectory, subPath,
 			existingOnly ? B_FIND_PATH_EXISTING_ONLY : 0, path);
 		if (error != B_OK) {
 			fprintf(stderr, "Error: Failed to find path: %s\n",
@@ -219,8 +231,8 @@ main(int argc, const char* const* argv)
 		printf("%s\n", path.Path());
 	} else {
 		BStringList paths;
-		status_t error = BPathFinder::FindPaths(baseDirectory, subPath,
-			existingOnly ? B_FIND_PATH_EXISTING_ONLY : 0, paths);
+		status_t error = BPathFinder::FindPaths(architecture, baseDirectory,
+			subPath, existingOnly ? B_FIND_PATH_EXISTING_ONLY : 0, paths);
 		if (error != B_OK) {
 			fprintf(stderr, "Error: Failed to find paths: %s\n",
 				strerror(error));
