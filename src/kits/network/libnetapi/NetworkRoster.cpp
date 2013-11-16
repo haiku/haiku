@@ -17,37 +17,6 @@
 #include <NetServer.h>
 
 
-enum preferredPrefixFormat {
-	PREFIX_PREFER_NETMASK = 0,
-	PREFIX_PREFER_CIDR,
-};
-
-struct address_family {
-	int			family;
-	const char*	name;
-	const char*	identifiers[4];
-	int			maxAddressLength;
-	int			preferredPrefixFormat;
-};
-
-static const address_family kFamilies[] = {
-	{
-		AF_INET,
-		"IPv4",
-		{"AF_INET", "inet", "ipv4", NULL},
-		15,
-		PREFIX_PREFER_NETMASK,
-	},
-	{
-		AF_INET6,
-		"IPv6",
-		{"AF_INET6", "inet6", "ipv6", NULL},
-		39,
-		PREFIX_PREFER_CIDR,
-	},
-	{ -1, NULL, {NULL}, -1, -1 }
-};
-
 // TODO: using AF_INET for the socket isn't really a smart idea, as one
 // could completely remove IPv4 support from the stack easily.
 // Since in the stack, device_interfaces are pretty much interfaces now, we
@@ -194,14 +163,8 @@ BNetworkRoster::RemoveInterface(const BNetworkInterface& interface)
 
 
 status_t
-BNetworkRoster::GetNextRoute(uint32* cookie, route_entry& entry,
-		const char* interfaceName) const
+BNetworkRoster::GetRoutes(BObjectList<route_entry>& routes) const
 {
-	// TODO: Cache the routes ?
-
-	if (cookie == NULL)
-		return B_BAD_VALUE;
-
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 	if (socket < 0)
 		return errno;
@@ -232,32 +195,30 @@ BNetworkRoster::GetNextRoute(uint32* cookie, route_entry& entry,
 	ifreq* interface = (ifreq*)buffer;
 	ifreq* end = (ifreq*)((uint8*)buffer + size);
 
-	uint32 index = 0;
 	while (interface < end) {
-		route_entry& route = interface->ifr_route;
-		// Filter by interface name
-		if (interfaceName == NULL
-			|| !strcmp(interfaceName, interface->ifr_name)) {
-			if (index == *cookie) {
-				entry = route;
-				return B_OK;
-			}
-			index++;
+		route_entry* route = new (std::nothrow) route_entry;
+		if (route == NULL)
+			return B_NO_MEMORY;
+
+		memcpy(route, &interface->ifr_route, sizeof(route_entry));
+		if (!routes.AddItem(route)) {
+			delete route;
+			return B_NO_MEMORY;
 		}
 
 		int32 addressSize = 0;
-		if (route.destination != NULL)
-			addressSize += route.destination->sa_len;
-		if (route.mask != NULL)
-			addressSize += route.mask->sa_len;
-		if (route.gateway != NULL)
-			addressSize += route.gateway->sa_len;
+		if (route->destination != NULL)
+			addressSize += route->destination->sa_len;
+		if (route->mask != NULL)
+			addressSize += route->mask->sa_len;
+		if (route->gateway != NULL)
+			addressSize += route->gateway->sa_len;
 
 		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
 			+ sizeof(route_entry) + addressSize);
 	}
 
-	return B_BAD_VALUE;
+	return B_OK;
 }
 
 

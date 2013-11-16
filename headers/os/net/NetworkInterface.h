@@ -9,7 +9,7 @@
 #include <net/if.h>
 #include <net/if_types.h>
 
-#include <List.h>
+#include <ObjectList.h>
 #include <NetworkAddress.h>
 
 
@@ -106,6 +106,8 @@ public:
 			status_t			RemoveRoute(int family,
 									const route_entry& route);
 			status_t			RemoveDefaultRoute(int family);
+			status_t			GetRoutes(BObjectList<route_entry>& routes) const;
+			status_t			GetDefaultRoute(BNetworkAddress& gateway) const;
 
 			status_t			AutoConfigure(int family);
 

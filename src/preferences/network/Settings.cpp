@@ -36,25 +36,6 @@
 #include <AutoDeleter.h>
 
 
-static status_t
-GetDefaultGateway(const char* name, BString& gateway)
-{
-	uint32 index = 0;
-	BNetworkRoster& roster = BNetworkRoster::Default();
-	route_entry routeEntry;
-	while (roster.GetNextRoute(&index, routeEntry, name) == B_OK) {
-		if ((routeEntry.flags & RTF_GATEWAY) != 0) {
-			sockaddr_in* inetAddress = (sockaddr_in*)routeEntry.gateway;
-			gateway = inet_ntoa(inetAddress->sin_addr);
-			break;
-		}
-		index++;
-	}
-
-	return B_OK;
-}
-
-
 // #pragma mark -
 
 
@@ -106,8 +87,11 @@ Settings::ReadConfiguration()
 	fIP = address.Address().ToString();
 	fNetmask = address.Mask().ToString();
 
-	if (GetDefaultGateway(fName.String(), fGateway) != B_OK)
+	BNetworkAddress gatewayAddress;
+	if (interface.GetDefaultRoute(gatewayAddress) != B_OK)
 		return;
+
+	fGateway = gatewayAddress.ToString();
 
 	uint32 flags = interface.Flags();
 

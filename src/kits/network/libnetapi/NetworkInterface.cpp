@@ -567,6 +567,91 @@ BNetworkInterface::RemoveDefaultRoute(int family)
 
 
 status_t
+BNetworkInterface::GetRoutes(BObjectList<route_entry>& routes) const
+{
+	// TODO: Code duplication between this method
+	// and BNetworkRoster::GetRoutes(). Move code into
+	// common function
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
+
+	FileDescriptorCloser fdCloser(socket);
+
+	// Obtain gateway
+	ifconf config;
+	config.ifc_len = sizeof(config.ifc_value);
+	if (ioctl(socket, SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
+		return errno;
+
+	uint32 size = (uint32)config.ifc_value;
+	if (size == 0)
+		return B_ERROR;
+
+	void* buffer = malloc(size);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	MemoryDeleter bufferDeleter(buffer);
+	config.ifc_len = size;
+	config.ifc_buf = buffer;
+
+	if (ioctl(socket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
+		return errno;
+
+	ifreq* interface = (ifreq*)buffer;
+	ifreq* end = (ifreq*)((uint8*)buffer + size);
+
+	while (interface < end) {
+		route_entry& route = interface->ifr_route;
+		if (!strcmp(interface->ifr_name, Name())) {
+			route_entry* newRoute = new (std::nothrow) route_entry;
+			if (newRoute == NULL)
+				return B_NO_MEMORY;
+			memcpy(newRoute, &interface->ifr_route, sizeof(route_entry));
+			if (!routes.AddItem(newRoute)) {
+				delete newRoute;
+				return B_NO_MEMORY;
+			}
+		}
+
+		int32 addressSize = 0;
+		if (route.destination != NULL)
+			addressSize += route.destination->sa_len;
+		if (route.mask != NULL)
+			addressSize += route.mask->sa_len;
+		if (route.gateway != NULL)
+			addressSize += route.gateway->sa_len;
+
+		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
+			+ sizeof(route_entry) + addressSize);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+BNetworkInterface::GetDefaultRoute(BNetworkAddress& gateway) const
+{
+	BObjectList<route_entry> routes(1, true);
+	status_t status = GetRoutes(routes);
+	if (status != B_OK)
+		return status;
+
+	for (int32 i = routes.CountItems() - 1; i >= 0; i--) {
+		route_entry* entry = routes.ItemAt(i);
+		if (entry->flags & RTF_DEFAULT) {
+			gateway.SetTo(*entry->gateway);
+			break;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
 BNetworkInterface::AutoConfigure(int family)
 {
 	BMessage message(kMsgConfigureInterface);

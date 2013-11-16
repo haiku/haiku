@@ -8,7 +8,7 @@
 
 #include <Locker.h>
 #include <NetworkNotifications.h>
-
+#include <ObjectList.h>
 
 class BMessenger;
 class BNetworkInterface;
@@ -31,9 +31,7 @@ public:
 			status_t			RemoveInterface(
 									const BNetworkInterface& interface);
 
-			status_t			GetNextRoute(uint32* cookie,
-									route_entry& entry,
-									const char* interface = NULL) const;
+			status_t			GetRoutes(BObjectList<route_entry>& routes) const;
 
 			int32				CountPersistentNetworks() const;
 			status_t			GetNextPersistentNetwork(uint32* cookie,
