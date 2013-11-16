@@ -170,16 +170,26 @@ extern "C" {
 status_t find_directory(directory_which which, dev_t volume, bool createIt,
 	char* pathString, int32 length);
 
-status_t find_path(const void* codePointer, const char* dependency,
-	path_base_directory baseDirectory, const char* subPath, uint32 flags,
-	char* pathBuffer, size_t bufferSize);
+status_t find_path(const void* codePointer, path_base_directory baseDirectory,
+	const char* subPath, char* pathBuffer, size_t bufferSize);
 
-status_t find_path_for_path(const char* path, const char* dependency,
-	path_base_directory baseDirectory, const char* subPath, uint32 flags,
-	char* pathBuffer, size_t bufferSize);
+status_t find_path_etc(const void* codePointer, const char* dependency,
+	const char* architecture, path_base_directory baseDirectory,
+	const char* subPath, uint32 flags, char* pathBuffer, size_t bufferSize);
+
+status_t find_path_for_path(const char* path, path_base_directory baseDirectory,
+	const char* subPath, char* pathBuffer, size_t bufferSize);
+
+status_t find_path_for_path_etc(const char* path, const char* dependency,
+	const char* architecture, path_base_directory baseDirectory,
+	const char* subPath, uint32 flags, char* pathBuffer, size_t bufferSize);
 
 status_t find_paths(path_base_directory baseDirectory, const char* subPath,
-	uint32 flags, char*** _paths, size_t* _pathCount);
+	char*** _paths, size_t* _pathCount);
+
+status_t find_paths_etc(const char* architecture,
+	path_base_directory baseDirectory, const char* subPath, uint32 flags,
+	char*** _paths, size_t* _pathCount);
 
 
 #ifdef __cplusplus

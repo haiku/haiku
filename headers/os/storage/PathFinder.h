@@ -31,6 +31,10 @@ public:
 			status_t			SetTo(const entry_ref& ref,
 									const char* dependency = NULL);
 
+			status_t			FindPath(const char* architecture,
+									path_base_directory baseDirectory,
+									const char* subPath, uint32 flags,
+									BPath& path);
 			status_t			FindPath(path_base_directory baseDirectory,
 									const char* subPath, uint32 flags,
 									BPath& path);
@@ -39,6 +43,10 @@ public:
 			status_t			FindPath(path_base_directory baseDirectory,
 									BPath& path);
 
+	static	status_t			FindPaths(const char* architecture,
+									path_base_directory baseDirectory,
+									const char* subPath, uint32 flags,
+							 		BStringList& paths);
 	static	status_t			FindPaths(path_base_directory baseDirectory,
 									const char* subPath, uint32 flags,
 							 		BStringList& paths);
