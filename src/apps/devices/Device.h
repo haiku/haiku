@@ -68,6 +68,7 @@ typedef enum {
 
 
 extern const char* kCategoryString[];
+extern const int kCategoryStringLength;
 
 
 class Device : public BStringItem {

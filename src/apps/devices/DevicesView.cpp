@@ -146,6 +146,13 @@ DevicesView::CreateCategoryMap()
 	CategoryMapIterator iter;
 	for (unsigned int i = 0; i < fDevices.size(); i++) {
 		Category category = fDevices[i]->GetCategory();
+		if (category < 0 || category >= kCategoryStringLength) {
+			std::cerr << "CreateCategoryMap: device " << fDevices[i]->GetName()
+				<< " returned an unknown category index (" << category << "). "
+				<< "Skipping device." << std::endl;
+			continue;
+		}
+
 		const char* categoryName = kCategoryString[category];
 
 		iter = fCategoryMap.find(category);

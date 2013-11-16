@@ -16,7 +16,7 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Device"
 
-// This list comes from the pciid list, except for the last one
+// This list comes from the pciid list, except for the last ones
 const char* kCategoryString[] = {
 	B_TRANSLATE("Unclassified device"), 				// 0x00
 	B_TRANSLATE("Mass storage controller"),				// 0x01
@@ -39,6 +39,7 @@ const char* kCategoryString[] = {
 	B_TRANSLATE("Computer"),							// 0x12 (added later)
 	B_TRANSLATE("ACPI controller")						// 0x13 (added later)
 };
+const int kCategoryStringLength	= sizeof(kCategoryString)/sizeof(char *);
 
 // This list is only used to translate Device properties
 B_TRANSLATE_MARK_VOID("unknown");
