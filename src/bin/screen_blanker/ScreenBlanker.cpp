@@ -71,7 +71,7 @@ ScreenBlanker::ReadyToRun()
 	fPasswordWindow = new PasswordWindow();
 
 	BView* view = fWindow->ChildAt(0);
-	fSaverRunner = new ScreenSaverRunner(view, fSettings);
+	fSaverRunner = new ScreenSaverRunner(fWindow, view, fSettings);
 	fWindow->SetSaverRunner(fSaverRunner);
 
 	BScreenSaver* saver = fSaverRunner->ScreenSaver();

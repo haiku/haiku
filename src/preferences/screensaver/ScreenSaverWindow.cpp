@@ -810,7 +810,7 @@ ModulesView::_OpenSaver()
 
 	BView* view = fPreviewView->AddPreview();
 	fCurrentName = fSettings.ModuleName();
-	fSaverRunner = new ScreenSaverRunner(view, fSettings);
+	fSaverRunner = new ScreenSaverRunner(view->Window(), view, fSettings);
 
 #ifdef __HAIKU__
 	BRect rect = fSettingsBox->InnerFrame().InsetByCopy(4, 4);

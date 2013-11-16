@@ -20,12 +20,12 @@
 #include <Window.h>
 
 
-ScreenSaverRunner::ScreenSaverRunner(BView* view,
+ScreenSaverRunner::ScreenSaverRunner(BWindow* window, BView* view,
 	ScreenSaverSettings& settings)
 	:
+	fWindow(window),
 	fView(view),
-	fIsDirectDraw(view != NULL
-		&& dynamic_cast<BDirectWindow*>(view->Window()) != NULL),
+	fIsDirectDraw(dynamic_cast<BDirectWindow*>(window) != NULL),
 	fSettings(settings),
 	fSaver(NULL),
 	fAddonImage(-1),
@@ -168,14 +168,6 @@ ScreenSaverRunner::_Run()
 {
 	static const uint32 kInitialTickRate = 50000;
 
-	if (fView == NULL || fView->Window() == NULL) {
-		// view is NULL or not connected to app server, bail out
-		if (fSaver != NULL)
-			fSaver->StopSaver();
-
-		return B_BAD_VALUE;
-	}
-
 	// TODO: This code is getting awfully complicated and should
 	// probably be refactored.
 	uint32 tickBase = kInitialTickRate;
@@ -203,8 +195,10 @@ ScreenSaverRunner::_Run()
 				if (tick < 0)
 					tick = 0;
 				tickBase = tick;
-			} else if (tickBase < kInitialTickRate && tick >= kInitialTickRate)
+			} else if (tickBase < kInitialTickRate
+				&& tick >= kInitialTickRate) {
 				tickBase = kInitialTickRate;
+			}
 
 			lastTickTime = system_time();
 		}
@@ -217,7 +211,7 @@ ScreenSaverRunner::_Run()
 				// Time to nap
 				frame = 0;
 				snoozeCount = fSaver->LoopOffCount();
-			} else if (fView->Window()->LockWithTimeout(5000LL) == B_OK) {
+			} else if (fWindow->LockWithTimeout(5000LL) == B_OK) {
 				if (!fQuitting) {
 					// NOTE: BeOS R5 really calls DirectDraw()
 					// and then Draw() for the same frame
@@ -227,7 +221,7 @@ ScreenSaverRunner::_Run()
 					fView->Sync();
 					frame++;
 				}
-				fView->Window()->Unlock();
+				fWindow->Unlock();
 			}
 		} else
 			snoozeCount = 1000;

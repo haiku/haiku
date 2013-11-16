@@ -89,7 +89,8 @@ ScreenSaverWindow::ScreenSaverWindow(BRect frame)
 	fFilter(NULL)
 {
 	frame.OffsetTo(0, 0);
-	fTopView = new BView(frame, "ScreenSaver View", B_FOLLOW_ALL, B_WILL_DRAW);
+	fTopView = new BView(frame, "ScreenSaver View", B_FOLLOW_ALL,
+		B_WILL_DRAW);
 	fTopView->SetViewColor(B_TRANSPARENT_COLOR);
 
 	fFilter = new ScreenSaverFilter();

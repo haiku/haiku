@@ -14,13 +14,15 @@
 
 #include <ScreenSaver.h>
 #include <View.h>
+#include <Window.h>
 
 #include "ScreenSaverSettings.h"
 
 
 class ScreenSaverRunner {
 public:
-								ScreenSaverRunner(BView* view,
+								ScreenSaverRunner(BWindow* window,
+									BView* view,
 									ScreenSaverSettings& settings);
 								~ScreenSaverRunner();
 
@@ -38,6 +40,7 @@ private:
 	static	status_t			_ThreadFunc(void* data);
 			status_t			_Run();
 
+			BWindow*			fWindow;
 			BView*				fView;
 			bool				fIsDirectDraw;
 			ScreenSaverSettings& fSettings;
