@@ -32,7 +32,7 @@ Rating	PackageListView		Оценка
 Downloading	Model		Загружаемые
 %ld items	PackageListView		объектов: %ld
 Graphics	Model		Графика
-Local	MainWindow		Локальные
+Local	MainWindow		Локальный
 Close	MainWindow		Закрыть
 Video	Model		Видео
 An error occurred while refreshing the repository: %error%	MainWindow		Возникла ошибка при обновлении репозитория: %error%

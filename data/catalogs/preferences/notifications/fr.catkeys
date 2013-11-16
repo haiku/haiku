@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	2177286129
+1	french	x-vnd.Haiku-Notifications	1398224574
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Une erreur est survenue lors de la sauvegarde des préférences.\nVous n'avez peut-être plus suffisamment d'espace libre sur votre disque.
 Notifications	GeneralView		Notifications
 seconds of inactivity	GeneralView		secondes d'inactivités
@@ -40,7 +40,6 @@ Application	NotificationView		Application
 Enabled	NotificationView		Activer
 OK	DisplayView		OK
 Unknown	NotificationView		Inconnu
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Impossible d'enregistrer les préférences, vous n'avez probablement pas le droit d'écrire dans le répertoire des réglages du démarrage.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Il y a eu un problème à la sauvegarde des préférences.\nIl est possible que vous n'ayez pas le droit d'écrire dans le répertoire des réglages.
 Enable notifications at startup	GeneralView		Activer les notifications au démarrage

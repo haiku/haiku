@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Notifications	2177286129
+1	japanese	x-vnd.Haiku-Notifications	1398224574
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		設定ファイルの保存中にエラーが発生しました。\nディスク容量が不足している可能性があります。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		秒後に画面から隠されます。
@@ -40,7 +40,6 @@ Application	NotificationView		アプリケーション
 Enabled	NotificationView		有効
 OK	DisplayView		OK
 Unknown	NotificationView		不明
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		設定を保存できません。おそらく、boot settings ディレクトリに書き込み権限がありません。
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		設定の保存時に問題があります。\nsettings ディレクトリに書き込み権限がない可能性があります。
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		設定の保存時に問題があります。\nsettings ディレクトリに書き込み権限がない可能性があります。
 Enable notifications at startup	GeneralView		起動時に通知を有効にする

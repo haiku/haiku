@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Notifications	2177286129
+1	finnish	x-vnd.Haiku-Notifications	1398224574
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Tapahtui virhe tallennettaessa asetuksia.\nOn mahdollista, että levytila on loppunut.
 Notifications	GeneralView		Ilmoitukset
 seconds of inactivity	GeneralView		joutilaisuussekunnit
@@ -40,7 +40,6 @@ Application	NotificationView		Sovellus
 Enabled	NotificationView		Otettu käyttöön
 OK	DisplayView		Valmis
 Unknown	NotificationView		Tuntematon
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Asetusten tallentaminen epäonnistui. Sinulla ei luultavasti ole kirjoitusoikeutta alkulatausasetushakemistoon.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Asetusten tallentamisessa oli pulma.\nOn mahdollista, että sinulla ei ole kirjoitusoikeutta asetushakemistoon.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Asetusten tallentamisessa oli pulma.\nOn mahdollista, että sinulla ei ole kirjoitusoikeutta asetushakemistoon.
 Enable notifications at startup	GeneralView		Ota käyttöön ilmoitukset käynnistymisen yhteydessä

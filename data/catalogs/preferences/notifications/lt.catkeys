@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Notifications	814394708
+1	lithuanian	x-vnd.Haiku-Notifications	35333153
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog diske nepakanka laisvos vietos.
 Notifications	GeneralView		Pranešimai
 seconds of inactivity	GeneralView		sek. pasyvumo
@@ -39,7 +39,6 @@ Application	NotificationView		Programa
 Enabled	NotificationView		Įjungta
 OK	DisplayView		Gerai
 Unknown	NotificationView		Nežinoma
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nuostatų įrašyti nepavyko. Gali būti, jog Jums trūksta rašymo į paleisties nuostatų aplanką teisių.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog Jums trūksta rašymo į nuostatų aplanką teisių.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog Jums trūksta rašymo į nuostatų aplanką teisių.
 Enable notifications at startup	GeneralView		Įjungti pranešimus sistemos paleisties metu

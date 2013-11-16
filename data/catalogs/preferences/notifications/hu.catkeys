@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Notifications	2177286129
+1	hungarian	x-vnd.Haiku-Notifications	1398224574
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Hiba történt a beállítások mentése során.\nLehet hogy elfogyott a hely a lemezen.
 Notifications	GeneralView		Értesítések
 seconds of inactivity	GeneralView		másodpercnyi inaktivitás után
@@ -40,7 +40,6 @@ Application	NotificationView		Program
 Enabled	NotificationView		Engedélyezve
 OK	DisplayView		Rendben
 Unknown	NotificationView		Ismeretlen
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nem lehet menteni a beállításokat, valószínűleg nem rendelkezik írási jogosultságokkal a boot beállításmappához.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Nem sikerült menteni a beállításokat.\nValószínűleg nem rendelkezik írási jogosultságokkal a beállításmappához.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Nem sikerült menteni a beállításokat.\nValószínűleg nem rendelkezik írási jogosultságokkal a beállításmappához.
 Enable notifications at startup	GeneralView		Értesítések engedélyezése indításkor

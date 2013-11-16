@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Notifications	814394708
+1	dutch; flemish	x-vnd.Haiku-Notifications	35333153
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Er ontstond een fout tijdens het opslaan van de voorkeuren.\nHet is mogelijk dat uw schijfruimte opraakt.
 Notifications	GeneralView		Aankondigingen
 seconds of inactivity	GeneralView		seconden inactief
@@ -39,7 +39,6 @@ Application	NotificationView		Toepassing
 Enabled	NotificationView		Aangezet
 OK	DisplayView		Oké
 Unknown	NotificationView		Onbekend
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Kan voorkeuren niet opslaan, u hebt waarschijnlijk geen schrijftoegang naar het directory voor de opstartinstellingen.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Er was een probleem bij het opslaan van de voorkeuren.\nHet is mogelijk dat u geen schrijftoegang hebt naar het directory voor de instellingen.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Er was een probleem bij het opslaan van de voorkeuren.\nHet is mogelijk dat u geen schrijftoegang hebt naar het directory voor de instellingen.
 Enable notifications at startup	GeneralView		Aankondigingen aanzetten bij opstarten

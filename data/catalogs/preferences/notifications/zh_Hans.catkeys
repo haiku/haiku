@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Notifications	814394708
+1	english	x-vnd.Haiku-Notifications	35333153
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		首选项保存出错。\n您可能已经用尽了磁盘空间。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		静止秒数
@@ -39,7 +39,6 @@ Application	NotificationView		应用程序
 Enabled	NotificationView		启用
 OK	DisplayView		确定
 Unknown	NotificationView		未知
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		无法保存首选项，您可能不具有引导设置目录的写入权限。
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		保存首选项存在问题。\n你可能不具有设置目录的写入权限。
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		保存首选项存在问题。\n你可能不具有设置目录的写入权限。
 Enable notifications at startup	GeneralView		启动时启用通知

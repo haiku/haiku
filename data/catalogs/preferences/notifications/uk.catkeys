@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Notifications	814394708
+1	ukrainian	x-vnd.Haiku-Notifications	35333153
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Виникла помилка збереження настройок.\nМожливо, що закінчилось місце на диску.
 Notifications	GeneralView		Повідомлення
 seconds of inactivity	GeneralView		секунд бездіяльності
@@ -39,7 +39,6 @@ Application	NotificationView		Додаток
 Enabled	NotificationView		Включити
 OK	DisplayView		Гаразд
 Unknown	NotificationView		Невідомий
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Неможливо зберегти настройки, бо Ви не маєте доступу до директорії налаштувань загрузки.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Виникла проблема в збережені настройок.\nМожливо у Вас немає доступу на запис до директорії налаштувань.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Виникла проблема в збереженні настройок.\nМожливо у Вас немає доступу на запис до директорії налаштувань.
 Enable notifications at startup	GeneralView		Включити повідомлення при старті

@@ -63,7 +63,7 @@ Strong	AntialiasingSettingsView		Erős
 Panel text	Colors tab		Panel szövege
 Arrow style	DecorSettingsView		Nyíl stílusa
 Monospaced fonts only	AntialiasingSettingsView		Csak rögzített szélességű betűtípusok
-Look and feel	APRWindow		Megjelenés
+Look and feel	APRWindow		Arculat
 Antialiasing menu	AntialiasingSettingsView		Élsimítási menü
 Fonts	APRWindow		Betűtípusok
 Glyph hinting:	AntialiasingSettingsView		Betűképek körvonala:

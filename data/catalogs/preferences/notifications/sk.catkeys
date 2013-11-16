@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Notifications	814394708
+1	slovak	x-vnd.Haiku-Notifications	35333153
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Vyskytla sa chyba pri ukladaní nastavení.\nJe možné, že vám dochádza miesto na disku.
 Notifications	GeneralView		Oznamy
 seconds of inactivity	GeneralView		sekundách nečinnosti
@@ -39,7 +39,6 @@ Application	NotificationView		Aplikácia
 Enabled	NotificationView		Zapnuté
 OK	DisplayView		OK
 Unknown	NotificationView		Neznáme
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Nie je možné uložiť nastavenia, pravdepodobne nemáte oprávnenie na zápis do adresára nastavení zavádzania systému.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Vyskytol sa problém pri ukladaní nastavení.\nJe možné, že nemáte oprávnenie na zápis do adresára nastavení.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Vyskytol sa problém pri ukladaní nastavení.\nJe možné, že nemáte oprávnenie na zápis do adresára nastavení.
 Enable notifications at startup	GeneralView		Zapnúť oznamy pri štarte

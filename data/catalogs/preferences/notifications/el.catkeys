@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Notifications	814394708
+1	greek, modern (1453-)	x-vnd.Haiku-Notifications	35333153
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Ένα σφάλμα παρουσιάστικε κατά την διαδικάσια αποθήκευσεις των προτιμήσεων.\nΠιθανα να μην υπάρχει αρκετός αποθηκευτικός χώρος στο δίσκο. 
 Notifications	GeneralView		Κοινοποιήσεις
 seconds of inactivity	GeneralView		δευτερόλεπτα αδράνειας
@@ -39,7 +39,6 @@ Application	NotificationView		Εφαρμογή
 Enabled	NotificationView		Ενεργό
 OK	DisplayView		Εντάξει
 Unknown	NotificationView		Άγνωστο
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		Αδυναμία αποθήκευσης των ρυθμίσεων, δεν έχετε πιθανόν δικαιώματα εγγραφής στον κατάλογο ρυθμίσεων εκκίνησης.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Υπήρξε ένα πρόβλημα κατά την αποθήκευση των προτιμήσεων σας.\nΕίναι πιθανό να μην έχετε δικαιώματα εγγραφής στον κατάλογο ρυθμίσεων.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Υπήρξε ένα πρόβλημα κατά την αποθήκευση των προτιμήσεων σας.\nΕίναι πιθανό να μην έχετε δικαιώματα εγγραφής στον κατάλογο ρυθμίσεων.
 Enable notifications at startup	GeneralView		Ενεργοποίηση ειδοποιήσεων κατά την εκκίνηση

@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Notifications	814394708
+1	hindi	x-vnd.Haiku-Notifications	35333153
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		एक त्रुटि हो गई,वरीयताओं को सहेजने मे.\nयह संभव है आपकी डिस्क स्पेस खत्म हो गयी है
 Notifications	GeneralView		सूचनाएँ
 seconds of inactivity	GeneralView		निष्क्रियता के सेकेंड
@@ -39,7 +39,6 @@ Application	NotificationView		आवेदन
 Enabled	NotificationView		सक्षम
 OK	DisplayView		ठीक है
 Unknown	NotificationView		अज्ञात
-Can't save preferences, you probably don't have write access to the boot settings directory.	GeneralView		वरीयताओं को सहेज नहीं सकते,यह संभव है बूट सेटिंग्स निर्देशिका में लिखने की अनुमति है नहीं है.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		वहाँ एक समस्या थी वरीयताओं को सहेजने मे.\nसेटिंग्स निर्देशिका में.यह संभव है सेटिंग्स निर्देशिका में लिखने की अनुमति है नहीं है.
 There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		वहाँ एक समस्या थी वरीयताओं को सहेजने मे.\nसेटिंग्स निर्देशिका में.यह संभव है सेटिंग्स निर्देशिका में लिखने की अनुमति है नहीं है.
 Enable notifications at startup	GeneralView		स्टार्टअप पर अधिसूचना सक्रिय करें
