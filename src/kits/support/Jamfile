@@ -10,6 +10,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
 		MergeObject <libbe!$(architecture)>support_kit.o :
+			Architecture.cpp
 			Archivable.cpp
 			ArchivingManagers.cpp
 			Beep.cpp

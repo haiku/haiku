@@ -85,6 +85,17 @@ __get_secondary_architectures(const char** architectures, size_t count)
 }
 
 
+size_t
+__get_architectures(const char** architectures, size_t count)
+{
+	if (count == 0)
+		return __get_secondary_architectures(NULL, 0) + 1;
+
+	architectures[0] = __get_primary_architecture();
+	return __get_secondary_architectures(architectures + 1, count -1) + 1;
+}
+
+
 const char*
 __guess_architecture_for_path(const char* path)
 {
@@ -114,4 +125,5 @@ __guess_architecture_for_path(const char* path)
 B_DEFINE_WEAK_ALIAS(__get_architecture, get_architecture);
 B_DEFINE_WEAK_ALIAS(__get_primary_architecture, get_primary_architecture);
 B_DEFINE_WEAK_ALIAS(__get_secondary_architectures, get_secondary_architectures);
+B_DEFINE_WEAK_ALIAS(__get_architectures, get_architectures);
 B_DEFINE_WEAK_ALIAS(__guess_architecture_for_path, guess_architecture_for_path);

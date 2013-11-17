@@ -16,6 +16,7 @@ const char*	__get_architecture();
 const char*	__get_primary_architecture();
 size_t		__get_secondary_architectures(const char** architectures,
 				size_t count);
+size_t		__get_architectures(const char** architectures, size_t count);
 const char*	__guess_architecture_for_path(const char* path);
 
 
