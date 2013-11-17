@@ -15,6 +15,7 @@
 #include <libroot_private.h>
 #include <locks.h>
 #include <runtime_loader.h>
+#include <stdlib_private.h>
 #include <syscall_utils.h>
 #include <user_runtime.h>
 
@@ -313,5 +314,23 @@ putenv(const char *string)
 	unlock_variables();
 
 	RETURN_AND_SET_ERRNO(status);
+}
+
+
+ssize_t
+__getenv_reentrant(const char* name, char* buffer, size_t bufferSize)
+{
+	size_t nameLength = strlen(name);
+
+	lock_variables();
+
+	char* value = find_variable(name, nameLength, NULL);
+	ssize_t result = value != NULL
+		? strlcpy(buffer, value + nameLength + 1, bufferSize)
+		: B_NAME_NOT_FOUND;
+
+	unlock_variables();
+
+	return result;
 }
 
