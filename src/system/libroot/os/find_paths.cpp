@@ -131,7 +131,7 @@ get_relative_directory_path(size_t installationLocationIndex,
 		case B_FIND_PATH_LOG_DIRECTORY:
 			return "/log";
 		case B_FIND_PATH_MEDIA_NODES_DIRECTORY:
-			return "/add-ons/media";
+			return "/add-ons%/media";
 		case B_FIND_PATH_PACKAGES_DIRECTORY:
 			return "/packages";
 		case B_FIND_PATH_PREFERENCES_DIRECTORY:
