@@ -14,7 +14,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	echo eject env error expand expr
 	factor false fdinfo ffm filepanel find finddir findpaths FirstBootPrompt fmt
 	fold fortune frcode fstrim ftp ftpd funzip fwcontrol@x86
-	gawk gdb@x86 getlimits groupadd groupdel groupmod groups gzip gzexe
+	gawk gdb@x86 getarch getlimits groupadd groupdel groupmod groups gzip gzexe
 	hd head hey hostname
 	id ident ifconfig <bin>install installsound iroster isvolume
 	ideinfo@ide idestatus@ide
@@ -31,9 +31,9 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	query quit
 	rc readlink reindex release renice rlog rm rmattr rmindex rmdir roster
 	route
-	safemode screen_blanker screenmode screenshot sdiff setdecor setmime settype
-	setversion setvolume seq sha1sum sha256sum shar shred shuf shutdown sleep
-	sort spamdbm split stat strace stty su sum sync sysinfo
+	safemode screen_blanker screenmode screenshot sdiff setarch setdecor setmime
+	settype setversion setvolume seq sha1sum sha256sum shar shred shuf shutdown
+	sleep sort spamdbm split stat strace stty su sum sync sysinfo
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
 	tr traceroute translate trash true truncate tsort tty
 	uname unchop unexpand unmount uniq unlink unshar unzip unzipsfx

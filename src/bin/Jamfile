@@ -116,9 +116,11 @@ StdBinCommands
 	alert.cpp
 	eject.cpp
 	findpaths.cpp
+	getarch.cpp
 	hey.cpp
 	reindex.cpp
 	resattr.cpp
+	setarch.cpp
 	setdecor.cpp
 	settype.cpp
 	spybmessage.cpp
