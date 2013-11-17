@@ -9,29 +9,31 @@ CCFLAGS += -include $(kernelLibHeader) ;
 C++FLAGS += -include $(kernelLibHeader) ;
 
 
+local librootSources = [ FDirName $(HAIKU_TOP) src system libroot ] ;
+local librootOSSources = [ FDirName $(librootSources) os ] ;
+local posixSources = [ FDirName $(librootSources) posix ] ;
+
+
 # kernel libroot os files
 
-KernelMergeObject kernel_os_main.o :
+local sources =
 	driver_settings.cpp
 	find_directory.cpp
 	fs_info.c
 	system_revision.c
 	wait_for_objects.cpp
+	;
+
+SourceHdrs $(sources) : $(librootOSSources) ;
+
+KernelMergeObject kernel_os_main.o : $(sources)
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
-SEARCH on [ FGristFiles
-	driver_settings.cpp
-	find_directory.cpp
-	fs_info.c
-	system_revision.c
-	wait_for_objects.cpp
-	] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
+SEARCH on [ FGristFiles $(sources) ]
+	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
 # kernel libroot posix files
-
-local librootSources = [ FDirName $(HAIKU_TOP) src system libroot ] ;
-local posixSources = [ FDirName $(librootSources) posix ] ;
 
 SEARCH_SOURCE += [ FDirName $(posixSources) ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) locale ] ;

@@ -1,7 +1,8 @@
 /*
  * Copyright 2004, François Revol.
  * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
+ * Copyright 2011, Oliver Tappe, zooey@hirschkaefer.de.
+ * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  *
  * Distributed under the terms of the MIT license.
  */
@@ -26,10 +27,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <architecture_private.h>
 #include <errno_private.h>
 #include <find_directory_private.h>
+#include <stdlib_private.h>
 #include <symbol_versioning.h>
 #include <user_group.h>
+
+#include <AutoDeleter.h>
+
+#include "PathBuffer.h"
+
 
 /* use pwents to find home */
 #define USE_PWENTS
@@ -77,23 +85,23 @@ enum {
 static const char *kSystemDirectories[] = {
 	SYSTEM,										// B_SYSTEM_DIRECTORY
 	SYSTEM,										// B_BEOS_SYSTEM_DIRECTORY
-	SYSTEM "/add-ons",
+	SYSTEM "/add-ons$a",
 	SYSTEM "/boot",
 	SYSTEM "/data/fonts",
-	SYSTEM "/lib",
+	SYSTEM "/lib$a",
 	SYSTEM "/servers",
 	SYSTEM "/apps",
-	SYSTEM "/bin",
+	SYSTEM "/bin$a",
 	SYSTEM "/settings/etc",
 	SYSTEM "/documentation",
 	SYSTEM "/preferences",
-	SYSTEM "/add-ons/Translators",
-	SYSTEM "/add-ons/media",
+	SYSTEM "/add-ons$a/Translators",
+	SYSTEM "/add-ons$a/media",
 	SYSTEM "/data/sounds",
 	SYSTEM "/data",
 	SYSTEM "/develop",
 	SYSTEM "/packages",
-	SYSTEM "/develop/headers",
+	SYSTEM "/develop/headers$a",
 };
 
 /* Common directories, shared among users */
@@ -101,12 +109,12 @@ static const char *kSystemDirectories[] = {
 static const char *kCommonDirectories[] = {
 	COMMON,									// B_COMMON_DIRECTORY
 	COMMON,									// B_COMMON_SYSTEM_DIRECTORY
-	COMMON "/add-ons",
+	COMMON "/add-ons$a",
 	COMMON "/boot",
 	COMMON "/data/fonts",
-	COMMON "/lib",
+	COMMON "/lib$a",
 	COMMON "/servers",
-	COMMON "/bin",
+	COMMON "/bin$a",
 	SYSTEM "/settings/etc",					// B_SYSTEM_ETC_DIRECTORY
 	COMMON "/documentation",
 	SYSTEM "/settings",						// B_SYSTEM_SETTINGS_DIRECTORY
@@ -115,24 +123,24 @@ static const char *kCommonDirectories[] = {
 	SYSTEM "/var/spool",					// B_SYSTEM_SPOOL_DIRECTORY
 	SYSTEM "/cache/tmp",					// B_SYSTEM_TEMP_DIRECTORY
 	SYSTEM "/var",							// B_SYSTEM_VAR_DIRECTORY
-	COMMON "/add-ons/Translators",
-	COMMON "/add-ons/media",
+	COMMON "/add-ons$a/Translators",
+	COMMON "/add-ons$a/media",
 	COMMON "/data/sounds",
 	COMMON "/data",
 	SYSTEM "/cache",						// B_SYSTEM_CACHE_DIRECTORY
 	COMMON "/packages",
-	COMMON "/develop/headers",
+	COMMON "/develop/headers$a",
 	SYSTEM NON_PACKAGED,
-	SYSTEM NON_PACKAGED "/add-ons",
-	SYSTEM NON_PACKAGED "/add-ons/Translators",
-	SYSTEM NON_PACKAGED "/add-ons/media",
-	SYSTEM NON_PACKAGED "/bin",
+	SYSTEM NON_PACKAGED "/add-ons$a",
+	SYSTEM NON_PACKAGED "/add-ons$a/Translators",
+	SYSTEM NON_PACKAGED "/add-ons$a/media",
+	SYSTEM NON_PACKAGED "/bin$a",
 	SYSTEM NON_PACKAGED "/data",
 	SYSTEM NON_PACKAGED "/data/fonts",
 	SYSTEM NON_PACKAGED "/data/sounds",
 	SYSTEM NON_PACKAGED "/documentation",
-	SYSTEM NON_PACKAGED "/lib",
-	SYSTEM NON_PACKAGED "/develop/headers",
+	SYSTEM NON_PACKAGED "/lib$a",
+	SYSTEM NON_PACKAGED "/develop/headers$a",
 	SYSTEM NON_PACKAGED "/develop",
 };
 
@@ -144,37 +152,37 @@ static const char *kCommonDirectories[] = {
 static const char *kUserDirectories[] = {
 	HOME,									// B_USER_DIRECTORY
 	HOME CONFIG,							// B_USER_CONFIG_DIRECTORY
-	HOME CONFIG "/add-ons",
+	HOME CONFIG "/add-ons$a",
 	HOME CONFIG "/boot",
 	HOME CONFIG "/data/fonts",
-	HOME CONFIG "/lib",
+	HOME CONFIG "/lib$a",
 	HOME CONFIG "/settings",
 	HOME CONFIG "/settings/deskbar/menu",
 	HOME CONFIG "/settings/printers",
-	HOME CONFIG "/add-ons/Translators",
-	HOME CONFIG "/add-ons/media",
+	HOME CONFIG "/add-ons$a/Translators",
+	HOME CONFIG "/add-ons$a/media",
 	HOME CONFIG "/data/sounds",
 	HOME CONFIG "/data",
 	HOME CONFIG "/cache",
 	HOME CONFIG "/packages",
-	HOME CONFIG "/develop/headers",
+	HOME CONFIG "/develop/headers$a",
 	HOME CONFIG NON_PACKAGED,
-	HOME CONFIG NON_PACKAGED "/add-ons",
-	HOME CONFIG NON_PACKAGED "/add-ons/Translators",
-	HOME CONFIG NON_PACKAGED "/add-ons/media",
-	HOME CONFIG NON_PACKAGED "/bin",
+	HOME CONFIG NON_PACKAGED "/add-ons$a",
+	HOME CONFIG NON_PACKAGED "/add-ons$a/Translators",
+	HOME CONFIG NON_PACKAGED "/add-ons$a/media",
+	HOME CONFIG NON_PACKAGED "/bin$a",
 	HOME CONFIG NON_PACKAGED "/data",
 	HOME CONFIG NON_PACKAGED "/data/fonts",
 	HOME CONFIG NON_PACKAGED "/data/sounds",
 	HOME CONFIG NON_PACKAGED "/documentation",
-	HOME CONFIG NON_PACKAGED "/lib",
-	HOME CONFIG NON_PACKAGED "/develop/headers",
+	HOME CONFIG NON_PACKAGED "/lib$a",
+	HOME CONFIG NON_PACKAGED "/develop/headers$a",
 	HOME CONFIG NON_PACKAGED "/develop",
 	HOME CONFIG "/develop",
 	HOME CONFIG "/documentation",
 	HOME CONFIG "/servers",
 	HOME CONFIG "/apps",
-	HOME CONFIG "/bin",
+	HOME CONFIG "/bin$a",
 	HOME CONFIG "/preferences",
 	HOME CONFIG "/settings/etc",
 	HOME CONFIG "/var/log",
@@ -217,23 +225,59 @@ create_path(const char *path, mode_t mode)
 }
 
 
+static size_t
+get_user_home_path(char* buffer, size_t bufferSize)
+{
+	const char* home = NULL;
+#ifndef _KERNEL_MODE
+#ifdef USE_PWENTS
+	struct passwd pwBuffer;
+	char pwStringBuffer[MAX_PASSWD_BUFFER_SIZE];
+	struct passwd* pw;
+
+	if (getpwuid_r(geteuid(), &pwBuffer, pwStringBuffer,
+			sizeof(pwStringBuffer), &pw) == 0
+		&& pw != NULL) {
+		home = pw->pw_dir;
+	}
+#endif	// USE_PWENTS
+	if (home == NULL) {
+		/* use env var */
+		ssize_t result = __getenv_reentrant("HOME", buffer, bufferSize);
+		if (result >= 0)
+			return result;
+	}
+#endif	// !_KERNEL_MODE
+	if (home == NULL)
+		home = kUserDirectory;
+
+	return strlcpy(buffer, home, bufferSize);
+}
+
+
 //	#pragma mark -
 
 
 status_t
 __find_directory(directory_which which, dev_t device, bool createIt,
-	char *returnedPath, int32 pathLength)
+	char *returnedPath, int32 _pathLength)
 {
+	if (_pathLength <= 0)
+		return E2BIG;
+	size_t pathLength = _pathLength;
+
 	status_t err = B_OK;
 	dev_t bootDevice = -1;
 	struct fs_info fsInfo;
 	struct stat st;
-	char *buffer = NULL;
-	const char *home = NULL;
 	const char *templatePath = NULL;
 
 	/* as with the R5 version, no on-stack buffer */
-	buffer = (char *)malloc(pathLength);
+	char *buffer = (char*)malloc(pathLength);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter bufferDeleter(buffer);
+
 	memset(buffer, 0, pathLength);
 
 	/* fiddle with non-boot volume for items that need it */
@@ -243,10 +287,8 @@ __find_directory(directory_which which, dev_t device, bool createIt,
 			bootDevice = dev_for_path("/boot");
 			if (device <= 0)
 				device = bootDevice;
-			if (fs_stat_dev(device, &fsInfo) < B_OK) {
-				free(buffer);
+			if (fs_stat_dev(device, &fsInfo) != B_OK)
 				return ENODEV;
-			}
 			if (device != bootDevice) {
 #ifdef _KERNEL_MODE
 				err = _user_entry_ref_to_path(device, fsInfo.root, /*"."*/
@@ -255,6 +297,8 @@ __find_directory(directory_which which, dev_t device, bool createIt,
 				err = _kern_entry_ref_to_path(device, fsInfo.root, /*"."*/
 					NULL, buffer, pathLength);
 #endif
+				if (err != B_OK)
+					return err;
 			} else {
 				/* use the user id to find the home folder */
 				/* done later */
@@ -267,11 +311,6 @@ __find_directory(directory_which which, dev_t device, bool createIt,
 		default:
 			strlcat(buffer, "/boot", pathLength);
 			break;
-	}
-
-	if (err < B_OK) {
-		free(buffer);
-		return err;
 	}
 
 	switch ((int)which) {
@@ -394,71 +433,69 @@ __find_directory(directory_which which, dev_t device, bool createIt,
 
 		/* Global directories */
 		case B_APPS_DIRECTORY:
+		case B_UTILITIES_DIRECTORY:
 			templatePath = SYSTEM "/apps";
 			break;
 		case B_PREFERENCES_DIRECTORY:
 			templatePath = SYSTEM "/preferences";
-			break;
-		case B_UTILITIES_DIRECTORY:
-			templatePath = "utilities";
 			break;
 		case B_PACKAGE_LINKS_DIRECTORY:
 			templatePath = "packages";
 			break;
 
 		default:
-			free(buffer);
 			return EINVAL;
 	}
 
-	err = B_OK;
-	if (templatePath) {
-		if (!strncmp(templatePath, "$h", 2)) {
-			if (bootDevice > -1 && device != bootDevice) {
-				int l = pathLength - strlen(buffer);
-				if (l > 5)
-					strncat(buffer, "/home", 5);
-			} else {
+	if (templatePath == NULL)
+		return ENOENT;
+
+	PathBuffer pathBuffer(buffer, pathLength, strlen(buffer));
+
+	// resolve "$h" placeholder to the user's home directory
+	if (!strncmp(templatePath, "$h", 2)) {
+		if (bootDevice > -1 && device != bootDevice) {
+			pathBuffer.Append("/home");
+		} else {
+			size_t length = get_user_home_path(buffer, pathLength);
+			if (length >= pathLength)
+				return E2BIG;
+			pathBuffer.SetTo(buffer, pathLength, length);
+		}
+		templatePath += 2;
+	} else if (templatePath[0] != '\0')
+		pathBuffer.Append('/');
+
+	// resolve "$a" placeholder to the architecture subdirectory, if not
+	// primary
+	if (char* dollar = strchr(templatePath, '$')) {
+		if (dollar[1] == 'a') {
+			pathBuffer.Append(templatePath, dollar - templatePath);
 #ifndef _KERNEL_MODE
-#ifdef USE_PWENTS
-				struct passwd pwBuffer;
-				char pwStringBuffer[MAX_PASSWD_BUFFER_SIZE];
-				struct passwd *pw;
-
-				if (getpwuid_r(geteuid(), &pwBuffer, pwStringBuffer,
-						sizeof(pwStringBuffer), &pw) == 0
-					&& pw != NULL) {
-					home = pw->pw_dir;
-				}
-#endif	// USE_PWENTS
-				if (!home) {
-					/* use env var */
-					home = getenv("HOME");
-				}
-#endif	// !_KERNEL_MODE
-				if (!home)
-					home = kUserDirectory;
-				strncpy(buffer, home, pathLength);
+			const char* architecture = __get_architecture();
+			if (strcmp(architecture, __get_primary_architecture()) != 0) {
+				pathBuffer.Append('/');
+				pathBuffer.Append(architecture);
 			}
-			templatePath += 2;
-		} else
-			strlcat(buffer, "/", pathLength);
+#endif
+			templatePath = dollar + 2;
+		}
+	}
 
-		if (!err && strlen(buffer) + 2 + strlen(templatePath)
-				< (uint32)pathLength) {
-			strcat(buffer, templatePath);
-		} else
-			err = err ? err : E2BIG;
-	} else
-		err = err ? err : ENOENT;
+	// append (remainder of) template path
+	pathBuffer.Append(templatePath);
 
-	if (!err && createIt && stat(buffer, &st) < 0)
+	if (pathBuffer.Length() >= pathLength)
+		return E2BIG;
+
+	if (createIt && stat(buffer, &st) < 0) {
 		err = create_path(buffer, 0755);
-	if (!err)
-		strlcpy(returnedPath, buffer, pathLength);
+		if (err != B_OK)
+			return err;
+	}
 
-	free(buffer);
-	return err;
+	strlcpy(returnedPath, buffer, pathLength);
+	return B_OK;
 }
 
 

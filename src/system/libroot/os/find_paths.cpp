@@ -19,6 +19,8 @@
 #include <AutoDeleter.h>
 #include <syscalls.h>
 
+#include "PathBuffer.h"
+
 
 static const char* const kInstallationLocations[] = {
 	"/boot/home/config/non-packaged",
@@ -41,53 +43,6 @@ static const path_base_directory kArchitectureSpecificBaseDirectories[] = {
 static size_t kArchitectureSpecificBaseDirectoryCount =
 	sizeof(kArchitectureSpecificBaseDirectories)
 		/ sizeof(kArchitectureSpecificBaseDirectories[0]);
-
-
-namespace {
-
-struct PathBuffer {
-	PathBuffer(char* buffer, size_t size)
-		:
-		fBuffer(buffer),
-		fSize(size),
-		fLength(0)
-	{
-		if (fSize > 0)
-			fBuffer[0] = '\0';
-	}
-
-	bool Append(const char* toAppend, size_t length)
-	{
-		if (fLength < fSize) {
-			size_t toCopy = std::min(length, fSize - fLength);
-			if (toCopy > 0) {
-				memcpy(fBuffer + fLength, toAppend, toCopy);
-				fBuffer[fLength + toCopy] = '\0';
-			}
-		}
-
-		fLength += length;
-		return fLength < fSize;
-	}
-
-	bool Append(const char* toAppend)
-	{
-		return Append(toAppend, strlen(toAppend));
-	}
-
-	size_t Length() const
-	{
-		return fLength;
-	}
-
-private:
-	char*	fBuffer;
-	size_t	fSize;
-	size_t	fLength;
-};
-
-}
-
 
 
 /*!	Returns the installation location relative path for the given base directory
