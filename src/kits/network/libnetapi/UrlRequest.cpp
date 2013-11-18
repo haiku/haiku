@@ -224,7 +224,6 @@ BUrlRequest::_ThreadEntry(void* arg)
 	if (urlProtocol->fListener != NULL) {
 		urlProtocol->fListener->RequestCompleted(urlProtocol,
 			protocolLoopExitStatus == B_PROT_SUCCESS);
-		printf("Notified to %p\n", urlProtocol->fListener);
 	}
 
 	return B_OK;
