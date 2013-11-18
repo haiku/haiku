@@ -53,8 +53,8 @@ dump_info(int argc, char **argv)
 	kprintf("cpu count: %" B_PRId32 "\n", smp_get_num_cpus());
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++)
-		kprintf("  [%" B_PRId32 "] active time: %12" B_PRId64 ", interrupt"
-			" time: %12" B_PRId64 ", irq time: %12" B_PRId64 "\n", i + 1,
+		kprintf("  [%" B_PRId32 "] active time: %10" B_PRId64 ", interrupt"
+			" time: %10" B_PRId64 ", irq time: %10" B_PRId64 "\n", i + 1,
 			gCPU[i].active_time, gCPU[i].interrupt_time, gCPU[i].irq_time);
 
 	// ToDo: Add page_faults

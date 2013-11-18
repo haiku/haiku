@@ -68,6 +68,7 @@ typedef struct interrupt_controller_s {
 	bool	(*is_spurious_interrupt)(int32 num);
 	bool	(*is_level_triggered_interrupt)(int32 num);
 	bool	(*end_of_interrupt)(int32 num);
+	void	(*assign_interrupt_to_cpu)(int32 num, int32 cpu);
 } interrupt_controller;
 
 

@@ -11,6 +11,7 @@
 
 #include <setjmp.h>
 
+#include <int.h>
 #include <smp.h>
 #include <timer.h>
 #include <arch/cpu.h>
@@ -79,8 +80,12 @@ typedef struct cpu_ent {
 	int				topology_id[CPU_TOPOLOGY_LEVELS];
 	int				cache_id[CPU_MAX_CACHE_LEVEL];
 
+	// IRQs assigned to this CPU
+	struct list		irqs;
+	spinlock		irqs_lock;
+
 	// arch-specific stuff
-	arch_cpu_info arch;
+	arch_cpu_info 	arch;
 } cpu_ent __attribute__((aligned(64)));
 
 

@@ -12,6 +12,8 @@
 #include <KernelExport.h>
 #include <arch/int.h>
 
+#include <util/list.h>
+
 // private install_io_interrupt_handler() flags
 #define B_NO_LOCK_VECTOR	0x100
 #define B_NO_HANDLED_INFO	0x200
@@ -26,6 +28,18 @@ enum interrupt_type {
 	INTERRUPT_TYPE_SYSCALL,
 	INTERRUPT_TYPE_ICI,
 	INTERRUPT_TYPE_UNKNOWN
+};
+
+struct irq_assignment {
+	list_link	link;
+	uint32		irq;
+
+	spinlock	load_lock;
+	bigtime_t	last_measure_time;
+	bigtime_t	last_measure_active;
+	int32		load;
+
+	int32		cpu;
 };
 
 
@@ -67,5 +81,7 @@ status_t reserve_io_interrupt_vectors(long count, long startVector,
 	enum interrupt_type type);
 status_t allocate_io_interrupt_vectors(long count, long *startVector);
 void free_io_interrupt_vectors(long count, long startVector);
+
+void assign_io_interrupt_to_cpu(long vector, int32 cpu);
 
 #endif /* _KERNEL_INT_H */

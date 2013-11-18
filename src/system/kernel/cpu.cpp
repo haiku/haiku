@@ -99,6 +99,9 @@ cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 	memset(&gCPU[curr_cpu], 0, sizeof(gCPU[curr_cpu]));
 	gCPU[curr_cpu].cpu_num = curr_cpu;
 
+	list_init(&gCPU[curr_cpu].irqs);
+	B_INITIALIZE_SPINLOCK(&gCPU[curr_cpu].irqs_lock);
+
 	return arch_cpu_preboot_init_percpu(args, curr_cpu);
 }
 

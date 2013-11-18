@@ -196,7 +196,8 @@ pic_init()
 		&pic_configure_io_interrupt,
 		&pic_is_spurious_interrupt,
 		&pic_is_level_triggered_interrupt,
-		&pic_end_of_interrupt
+		&pic_end_of_interrupt,
+		NULL
 	};
 
 	// Start initialization sequence for the master and slave PICs

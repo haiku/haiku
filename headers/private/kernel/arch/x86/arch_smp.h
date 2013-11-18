@@ -99,4 +99,18 @@ enum {
 	MP_INTR_TYPE_ExtINT,
 };
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+uint32 x86_get_cpu_apic_id(int32 cpu);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif	/* _KERNEL_ARCH_x86_ARCH_SMP_H */

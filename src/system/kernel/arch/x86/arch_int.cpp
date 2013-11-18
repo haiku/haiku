@@ -389,6 +389,14 @@ arch_int_are_interrupts_enabled(void)
 }
 
 
+void
+arch_int_assign_to_cpu(int32 irq, int32 cpu)
+{
+	if (sCurrentPIC->assign_interrupt_to_cpu != NULL)
+		sCurrentPIC->assign_interrupt_to_cpu(irq, cpu);
+}
+
+
 status_t
 arch_int_init(kernel_args* args)
 {
