@@ -87,8 +87,12 @@ Settings::ReadConfiguration()
 	fIP = address.Address().ToString();
 	fNetmask = address.Mask().ToString();
 
+	int family = AF_INET;
+	if (address.Address().Family() != AF_UNSPEC)
+		family = address.Address().Family();
+
 	BNetworkAddress gatewayAddress;
-	if (interface.GetDefaultRoute(AF_INET, gatewayAddress) != B_OK)
+	if (interface.GetDefaultRoute(family, gatewayAddress) != B_OK)
 		return;
 
 	fGateway = gatewayAddress.ToString();
