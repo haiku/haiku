@@ -16,8 +16,8 @@ AddFilesToPackage develop lib $(architecture) :
 	;
 
 # additional libraries
-local developmentLibs = <revisioned>libroot_debug.so ;
-AddFilesToPackage lib : $(developmentLibs) ;
+local developmentLibs = [ MultiArchDefaultGristFiles libroot_debug.so : revisioned ] ;
+AddFilesToPackage lib $(architecture) : $(developmentLibs) ;
 
 # library symlinks
 local lib ;
