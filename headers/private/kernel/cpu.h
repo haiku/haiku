@@ -60,6 +60,8 @@ typedef struct cpu_ent {
 
 	// keeping track of CPU activity
 	bigtime_t		active_time;
+	bigtime_t		irq_time;
+	bigtime_t		interrupt_time;
 	bigtime_t		last_kernel_time;
 	bigtime_t		last_user_time;
 

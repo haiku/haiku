@@ -243,6 +243,10 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 
 	bigtime_t start = system_time();
 
+	// exceptions and syscalls have their own handlers
+	ASSERT(sVectors[vector].type != INTERRUPT_TYPE_EXCEPTION
+		&& sVectors[vector].type != INTERRUPT_TYPE_SYSCALL);
+
 	if (!sVectors[vector].no_lock_vector)
 		acquire_spinlock(&sVectors[vector].vector_lock);
 
@@ -322,9 +326,13 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 		release_spinlock(&sVectors[vector].vector_lock);
 
 	SpinLocker locker(sVectors[vector].load_lock);
-	sVectors[vector].last_measure_active += system_time() - start;
+	bigtime_t deltaTime = system_time() - start;
+	sVectors[vector].last_measure_active += deltaTime;
 	locker.Unlock();
 
+	atomic_add64(&get_cpu_struct()->interrupt_time, deltaTime);
+	if (sVectors[vector].type == INTERRUPT_TYPE_IRQ)
+		atomic_add64(&get_cpu_struct()->irq_time, deltaTime);
 	update_int_load(vector);
 
 	if (levelTriggered)

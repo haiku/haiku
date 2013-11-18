@@ -50,10 +50,12 @@ dump_info(int argc, char **argv)
 		__VERSION__);
 	kprintf("revision: %s\n\n", get_haiku_revision());
 
-	kprintf("cpu count: %" B_PRId32 ", active times:\n", smp_get_num_cpus());
+	kprintf("cpu count: %" B_PRId32 "\n", smp_get_num_cpus());
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++)
-		kprintf("  [%" B_PRId32 "] %" B_PRId64 "\n", i + 1, gCPU[i].active_time);
+		kprintf("  [%" B_PRId32 "] active time: %12" B_PRId64 ", interrupt"
+			" time: %12" B_PRId64 ", irq time: %12" B_PRId64 "\n", i + 1,
+			gCPU[i].active_time, gCPU[i].interrupt_time, gCPU[i].irq_time);
 
 	// ToDo: Add page_faults
 	kprintf("pages:\t\t%" B_PRIuPHYSADDR " (%" B_PRIuPHYSADDR " max)\n",
