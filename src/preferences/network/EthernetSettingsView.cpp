@@ -386,7 +386,7 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 
 			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
 				network.signal_strength,
-				(network.flags & B_NETWORK_IS_ENCRYPTED) != 0, message);
+				network.authentication_mode, message);
 			if (associated.find(network.address) != associated.end())
 				item->SetMarked(true);
 			menu->AddItem(item);
