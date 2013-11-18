@@ -64,7 +64,9 @@ const bigtime_t kCacheExpire = 100000;
 
 const int kTargetLoad = kMaxLoad * 55 / 100;
 const int kHighLoad = kMaxLoad * 70 / 100;
+const int kVeryHighLoad = (kMaxLoad + kHighLoad) / 2;
 const int kLoadDifference = kMaxLoad * 20 / 100;
+const int kLowLoad = kLoadDifference / 2;
 
 static bigtime_t sDisableSmallTaskPacking;
 static int32 sSmallTaskCore;
@@ -76,6 +78,7 @@ static rw_spinlock sSchedulerModeLock = B_RW_SPINLOCK_INITIALIZER;
 
 static int32 (*sChooseCore)(Thread* thread);
 static bool (*sShouldRebalance)(Thread* thread);
+static void (*sRebalanceIRQs)(void);
 
 
 // Heaps in sCPUPriorityHeaps are used for load balancing on a core the logical
@@ -893,7 +896,7 @@ should_rebalance_power_saving(Thread* thread)
 		if (coreEntry->fLoad > kHighLoad) {
 			if (!is_task_small(thread))
 				return true;
-		} else if (coreEntry->fLoad > (kHighLoad + kMaxLoad) / 2)
+		} else if (coreEntry->fLoad > kVeryHighLoad)
 			disable_small_task_packing();
 	}
 
@@ -924,6 +927,48 @@ should_rebalance(Thread* thread)
 }
 
 
+static void
+rebalance_irqs_low_latency(void)
+{
+	cpu_ent* cpu = get_cpu_struct();
+	SpinLocker locker(cpu->irqs_lock);
+
+	irq_assignment* chosen = NULL;
+	irq_assignment* irq = (irq_assignment*)list_get_first_item(&cpu->irqs);
+
+	int32 totalLoad = 0;
+	while (irq != NULL) {
+		if (chosen == NULL || chosen->load < irq->load)
+			chosen = irq;
+		totalLoad += irq->load;
+		irq = (irq_assignment*)list_get_next_item(&cpu->irqs, irq);
+	}
+
+	locker.Unlock();
+
+	if (chosen == NULL || totalLoad < kLowLoad)
+		return;
+
+	SpinLocker coreLocker(sCoreHeapsLock);
+	CoreEntry* other = sCoreLoadHeap->PeekMinimum();
+	if (other == NULL)
+		other = sCoreHighLoadHeap->PeekMinimum();
+	coreLocker.Unlock();
+
+	ASSERT(other != NULL);
+
+	int32 thisCore = sCPUToCore[smp_get_current_cpu()];
+	if (other->fCoreID == thisCore)
+		return;
+
+	if (other->fLoad + kLoadDifference >= sCoreEntries[thisCore].fLoad)
+		return;
+
+	int32 newCPU = choose_cpu(other->fCoreID);
+	assign_io_interrupt_to_cpu(chosen->irq, newCPU);
+}
+
+
 static inline void
 compute_cpu_load(int32 cpu)
 {
@@ -933,6 +978,9 @@ compute_cpu_load(int32 cpu)
 		sCPUEntries[cpu].fMeasureActiveTime, sCPUEntries[cpu].fLoad);
 	if (oldLoad < 0)
 		return;
+
+	if (sCPUEntries[cpu].fLoad > kVeryHighLoad)
+		sRebalanceIRQs();
 
 	if (oldLoad != sCPUEntries[cpu].fLoad) {
 		int32 core = sCPUToCore[cpu];
@@ -1625,13 +1673,16 @@ scheduler_set_operation_mode(scheduler_mode mode)
 		case SCHEDULER_MODE_LOW_LATENCY:
 			sDisableSmallTaskPacking = -1;
 			sSmallTaskCore = -1;
+
 			sChooseCore = choose_core_low_latency;
 			sShouldRebalance = should_rebalance_low_latency;
+			sRebalanceIRQs = rebalance_irqs_low_latency;
 			break;
 
 		case SCHEDULER_MODE_POWER_SAVING:
 			sDisableSmallTaskPacking = 0;
 			sSmallTaskCore = -1;
+
 			sChooseCore = choose_core_power_saving;
 			sShouldRebalance = should_rebalance_power_saving;
 			break;
