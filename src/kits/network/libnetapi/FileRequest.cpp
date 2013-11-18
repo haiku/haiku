@@ -35,7 +35,7 @@ BFileRequest::_ProtocolLoop()
 	// FIXME error handling (file does not exists, etc.)
 	BFile file(fUrl.Path().String(), B_READ_ONLY); 
 
-	if(file.InitCheck() != B_OK)
+	if(file.InitCheck() != B_OK || !file.IsFile())
 		return B_PROT_CONNECTION_FAILED;
 
 	// Send all notifications to listener, if any
@@ -45,7 +45,7 @@ BFileRequest::_ProtocolLoop()
 		file.GetSize(&size);
 		fListener->DownloadProgress(this, size, size);
 
-		size_t chunkSize;
+		ssize_t chunkSize;
 		char chunk[4096];
 		while((chunkSize = file.Read(chunk, sizeof(chunk))) > 0)
 			fListener->DataReceived(this, chunk, chunkSize);
