@@ -67,7 +67,8 @@ struct io_vector {
 #endif
 };
 
-static uint32 sLastCPU;
+static int32 sLastCPU;
+
 static struct io_vector sVectors[NUM_IO_VECTORS];
 static bool sAllocatedIOInterruptVectors[NUM_IO_VECTORS];
 static mutex sIOInterruptVectorAllocationLock
@@ -387,6 +388,22 @@ restore_interrupts(cpu_status status)
 }
 
 
+static
+uint32 assign_cpu(void)
+{
+	int32 nextID = atomic_add(&sLastCPU, 1);
+	cpu_topology_node* node = get_cpu_topology();
+
+	while (node->level != CPU_TOPOLOGY_SMT) {
+		int levelSize = node->children_count;
+		node = node->children[nextID % levelSize];
+		nextID /= levelSize;
+	}
+
+	return node->id;
+}
+
+
 /*!	Install a handler to be called when an interrupt is triggered
 	for the given interrupt number with \a data as the argument.
 */
@@ -426,7 +443,7 @@ install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 	if (sVectors[vector].type == INTERRUPT_TYPE_IRQ
 		&& sVectors[vector].handler_list == NULL) {
 
-		int32 cpuID = atomic_add(&sLastCPU, 1) % smp_get_num_cpus();
+		int32 cpuID = assign_cpu();
 		arch_int_assign_to_cpu(vector, cpuID);
 
 		ASSERT(sVectors[vector].assigned_cpu.cpu == -1);
