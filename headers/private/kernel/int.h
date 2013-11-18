@@ -19,6 +19,16 @@
 struct kernel_args;
 
 
+enum interrupt_type {
+	INTERRUPT_TYPE_EXCEPTION,
+	INTERRUPT_TYPE_IRQ,
+	INTERRUPT_TYPE_LOCAL_IRQ,
+	INTERRUPT_TYPE_SYSCALL,
+	INTERRUPT_TYPE_ICI,
+	INTERRUPT_TYPE_UNKNOWN
+};
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,7 +63,8 @@ are_interrupts_enabled(void)
 #define restore_interrupts(status)	arch_int_restore_interrupts(status)
 
 
-status_t reserve_io_interrupt_vectors(long count, long startVector);
+status_t reserve_io_interrupt_vectors(long count, long startVector,
+	enum interrupt_type type);
 status_t allocate_io_interrupt_vectors(long count, long *startVector);
 void free_io_interrupt_vectors(long count, long startVector);
 

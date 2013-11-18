@@ -106,7 +106,8 @@ apic_timer_init(struct kernel_args *args)
 
 	sApicTicsPerSec = args->arch_args.apic_time_cv_factor;
 
-	reserve_io_interrupt_vectors(1, 0xfb - ARCH_INTERRUPT_BASE);
+	reserve_io_interrupt_vectors(1, 0xfb - ARCH_INTERRUPT_BASE,
+		INTERRUPT_TYPE_LOCAL_IRQ);
 	install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE,
 		&apic_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
 

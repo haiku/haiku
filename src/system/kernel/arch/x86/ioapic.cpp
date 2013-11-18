@@ -774,7 +774,7 @@ ioapic_init(kernel_args* args)
 	current = sIOAPICs;
 	while (current != NULL) {
 		reserve_io_interrupt_vectors(current->max_redirection_entry + 1,
-			current->global_interrupt_base);
+			current->global_interrupt_base, INTERRUPT_TYPE_IRQ);
 		current = current->next;
 	}
 

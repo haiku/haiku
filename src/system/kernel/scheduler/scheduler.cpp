@@ -23,6 +23,7 @@
 #include <kernel.h>
 #include <kscheduler.h>
 #include <listeners.h>
+#include <load_tracking.h>
 #include <scheduler_defs.h>
 #include <smp.h>
 #include <thread.h>
@@ -61,10 +62,9 @@ const bigtime_t kMinimalWaitTime = kThreadQuantum / 4;
 
 const bigtime_t kCacheExpire = 100000;
 
-const int kTargetLoad = 550;
-const int kHighLoad = 700;
-const int kMaxLoad = 1000;
-const int kLoadDifference = 200;
+const int kTargetLoad = kMaxLoad * 55 / 100;
+const int kHighLoad = kMaxLoad * 70 / 100;
+const int kLoadDifference = kMaxLoad * 20 / 100;
 
 static bigtime_t sDisableSmallTaskPacking;
 static int32 sSmallTaskCore;
@@ -921,50 +921,6 @@ should_rebalance(Thread* thread)
 		return false;
 
 	return sShouldRebalance(thread);
-}
-
-
-static inline int
-compute_load(bigtime_t& measureTime, bigtime_t& measureActiveTime, int32& load)
-{
-	const bigtime_t kLoadMeasureInterval = 50000;
-	const bigtime_t kIntervalInaccuracy = kLoadMeasureInterval / 4;
-
-	bigtime_t now = system_time();
-
-	if (measureTime == 0) {
-		measureTime = now;
-		return -1;
-	}
-
-	bigtime_t deltaTime = now - measureTime;
-
-	if (deltaTime < kLoadMeasureInterval)
-		return -1;
-
-	int oldLoad = load;
-	ASSERT(oldLoad >= 0 && oldLoad <= kMaxLoad);
-
-	int newLoad = measureActiveTime * kMaxLoad;
-	newLoad /= max_c(deltaTime, 1);
-	newLoad = max_c(min_c(newLoad, kMaxLoad), 0);
-
-	measureActiveTime = 0;
-	measureTime = now;
-
-	deltaTime += kIntervalInaccuracy;
-	int n = deltaTime / kLoadMeasureInterval;
-	ASSERT(n > 0);
-
-	if (n > 10)
-		load = newLoad;
-	else {
-		newLoad *= (1 << n) - 1;
-		load = (load + newLoad) / (1 << n);
-		ASSERT(load >= 0 && load <= kMaxLoad);
-	}
-
-	return oldLoad;
 }
 
 

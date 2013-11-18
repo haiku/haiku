@@ -231,7 +231,7 @@ pic_init()
 
 	TRACE(("PIC level trigger mode: 0x%08lx\n", sLevelTriggeredInterrupts));
 
-	reserve_io_interrupt_vectors(16, 0);
+	reserve_io_interrupt_vectors(16, 0, INTERRUPT_TYPE_EXCEPTION);
 
 	// make the pic controller the current one
 	arch_int_set_interrupt_controller(picController);

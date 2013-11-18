@@ -311,7 +311,7 @@ x86_descriptors_init(kernel_args* args)
 	set_trap_gate(0, 98, &trap98);	// for performance testing only
 	set_trap_gate(0, 99, &trap99);	// syscall interrupt
 
-	reserve_io_interrupt_vectors(2, 98);
+	reserve_io_interrupt_vectors(2, 98, INTERRUPT_TYPE_SYSCALL);
 
 	// configurable msi or msi-x interrupts
 	set_interrupt_gate(0, 100, &trap100);

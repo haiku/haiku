@@ -20,6 +20,7 @@
 #include <arch/int.h>
 #include <boot/kernel_args.h>
 #include <elf.h>
+#include <load_tracking.h>
 #include <util/AutoLock.h>
 #include <util/kqueue.h>
 #include <smp.h>
@@ -51,6 +52,13 @@ struct io_vector {
 	spinlock			vector_lock;
 	int32				enable_count;
 	bool				no_lock_vector;
+	interrupt_type		type;
+
+	spinlock			load_lock;
+	bigtime_t			last_measure_time;
+	bigtime_t			last_measure_active;
+	int32				load;
+
 #if DEBUG_INTERRUPTS
 	int64				handled_count;
 	int64				unhandled_count;
@@ -116,6 +124,29 @@ dump_int_statistics(int argc, char **argv)
 #endif
 
 
+static int
+dump_int_load(int argc, char** argv)
+{
+	static const char* typeNames[]
+		= { "exception", "irq", "local irq", "syscall", "ici", "unknown" };
+
+	for (int i = 0; i < NUM_IO_VECTORS; i++) {
+		if (!B_SPINLOCK_IS_LOCKED(&sVectors[i].vector_lock)
+			&& sVectors[i].handler_list == NULL
+			&& sVectors[i].enable_count == 0)
+			continue;
+
+		kprintf("int %3d, type %s, enabled %" B_PRId32 ", load %" B_PRId32
+			"%%%s\n", i, typeNames[min_c(sVectors[i].type,
+					INTERRUPT_TYPE_UNKNOWN)],
+			sVectors[i].enable_count, sVectors[i].load / 10,
+			B_SPINLOCK_IS_LOCKED(&sVectors[i].vector_lock) ? ", ACTIVE" : "");
+	}
+
+	return 0;
+}
+
+
 //	#pragma mark - private kernel API
 
 
@@ -145,6 +176,13 @@ int_init_post_vm(kernel_args* args)
 		B_INITIALIZE_SPINLOCK(&sVectors[i].vector_lock);
 		sVectors[i].enable_count = 0;
 		sVectors[i].no_lock_vector = false;
+		sVectors[i].type = INTERRUPT_TYPE_UNKNOWN;
+
+		B_INITIALIZE_SPINLOCK(&sVectors[i].load_lock);
+		sVectors[i].last_measure_time = 0;
+		sVectors[i].last_measure_active = 0;
+		sVectors[i].load = 0;
+
 #if DEBUG_INTERRUPTS
 		sVectors[i].handled_count = 0;
 		sVectors[i].unhandled_count = 0;
@@ -158,6 +196,9 @@ int_init_post_vm(kernel_args* args)
 	add_debugger_command("ints", &dump_int_statistics,
 		"list interrupt statistics");
 #endif
+
+	add_debugger_command("int_load", &dump_int_load,
+		"list interrupt usage statistics");
 
 	return arch_int_init_post_vm(args);
 }
@@ -179,6 +220,17 @@ int_init_post_device_manager(kernel_args* args)
 }
 
 
+static void
+update_int_load(int i)
+{
+	if (!try_acquire_spinlock(&sVectors[i].load_lock))
+		return;
+	compute_load(sVectors[i].last_measure_time, sVectors[i].last_measure_active,
+		sVectors[i].load);
+	release_spinlock(&sVectors[i].load_lock);
+}
+
+
 /*!	Actually process an interrupt via the handlers registered for that
 	vector (IRQ).
 */
@@ -188,6 +240,8 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	int status = B_UNHANDLED_INTERRUPT;
 	struct io_handler* io;
 	bool handled = false;
+
+	bigtime_t start = system_time();
 
 	if (!sVectors[vector].no_lock_vector)
 		acquire_spinlock(&sVectors[vector].vector_lock);
@@ -266,6 +320,12 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 
 	if (!sVectors[vector].no_lock_vector)
 		release_spinlock(&sVectors[vector].vector_lock);
+
+	SpinLocker locker(sVectors[vector].load_lock);
+	sVectors[vector].last_measure_active += system_time() - start;
+	locker.Unlock();
+
+	update_int_load(vector);
 
 	if (levelTriggered)
 		return status;
@@ -435,7 +495,7 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	vectors using allocate_io_interrupt_vectors() instead.
 */
 status_t
-reserve_io_interrupt_vectors(long count, long startVector)
+reserve_io_interrupt_vectors(long count, long startVector, interrupt_type type)
 {
 	MutexLocker locker(&sIOInterruptVectorAllocationLock);
 
@@ -448,6 +508,7 @@ reserve_io_interrupt_vectors(long count, long startVector)
 			return B_BUSY;
 		}
 
+		sVectors[startVector + i].type = type;
 		sAllocatedIOInterruptVectors[startVector + i] = true;
 	}
 
