@@ -17,21 +17,13 @@
 
 #include <architecture_private.h>
 #include <AutoDeleter.h>
+#include <directories.h>
 #include <syscalls.h>
 
 #include "PathBuffer.h"
 
 
-static const char* const kInstallationLocations[] = {
-	"/boot/home/config/non-packaged",
-	"/boot/home/config",
-	"/boot/system/non-packaged",
-	"/boot/system",
-};
-
 static size_t kHomeInstallationLocationIndex = 1;
-static size_t kInstallationLocationCount
-	= sizeof(kInstallationLocations) / sizeof(kInstallationLocations[0]);
 
 static const path_base_directory kArchitectureSpecificBaseDirectories[] = {
 	B_FIND_PATH_ADD_ONS_DIRECTORY,
@@ -43,6 +35,124 @@ static const path_base_directory kArchitectureSpecificBaseDirectories[] = {
 static size_t kArchitectureSpecificBaseDirectoryCount =
 	sizeof(kArchitectureSpecificBaseDirectories)
 		/ sizeof(kArchitectureSpecificBaseDirectories[0]);
+
+
+namespace {
+
+
+struct InstallationLocations {
+public:
+	static const size_t	kCount = 4;
+
+public:
+	InstallationLocations()
+		:
+		fReferenceCount(1)
+	{
+		fLocations[0] = kUserNonpackagedDirectory;
+		fLocations[1] = kUserConfigDirectory;
+		fLocations[2] = kSystemNonpackagedDirectory;
+		fLocations[3] = kSystemDirectory;
+	}
+
+	InstallationLocations(const char* home)
+		:
+		fReferenceCount(1)
+	{
+		static const char* const kNonPackagedSuffix = "/non-packaged";
+		char* homeNonPackaged
+			= (char*)malloc(strlen(home) + strlen(kNonPackagedSuffix) + 1);
+		fLocations[0] = homeNonPackaged;
+		if (homeNonPackaged != NULL) {
+			strcpy(homeNonPackaged, home);
+			strcat(homeNonPackaged, kNonPackagedSuffix);
+		}
+
+		fLocations[1] = strdup(home);
+
+		fLocations[2] = kSystemNonpackagedDirectory;
+		fLocations[3] = kSystemDirectory;
+	}
+
+	~InstallationLocations()
+	{
+		free(const_cast<char*>(fLocations[0]));
+		free(const_cast<char*>(fLocations[1]));
+	}
+
+	bool IsValid() const
+	{
+		return fLocations[0] != NULL && fLocations[1] != NULL;
+	}
+
+	static InstallationLocations* Default()
+	{
+		char sBuffer[sizeof(InstallationLocations)];
+		InstallationLocations* sDefaultLocations
+			= new(&sBuffer) InstallationLocations;
+		return sDefaultLocations;
+	}
+
+	static InstallationLocations* Get()
+	{
+		InstallationLocations* defaultLocations = Default();
+
+		// Get the home config installation location and create a new object,
+		// if it differs from the default.
+		char homeInstallationLocation[B_PATH_NAME_LENGTH];
+		if (__find_directory(B_USER_CONFIG_DIRECTORY, -1, false,
+					homeInstallationLocation, sizeof(homeInstallationLocation))
+				== B_OK) {
+			_kern_normalize_path(homeInstallationLocation, true,
+				homeInstallationLocation);
+				// failure is OK
+			if (strcmp(homeInstallationLocation,
+						defaultLocations->At(kHomeInstallationLocationIndex))
+					!= 0) {
+				InstallationLocations* locations
+					= new(std::nothrow) InstallationLocations(
+						homeInstallationLocation);
+				if (locations != NULL && locations->IsValid())
+					return locations;
+			}
+		}
+
+		atomic_add(&defaultLocations->fReferenceCount, 1);
+		return defaultLocations;
+	}
+
+	void Put()
+	{
+		if (atomic_add(&fReferenceCount, -1) == 1)
+			delete this;
+	}
+
+	const char* At(size_t index) const
+	{
+		return fLocations[index];
+	}
+
+	const char* LocationFor(const char* path, size_t& _index)
+	{
+		for (size_t i = 0; i < kCount; i++) {
+			size_t length = strlen(fLocations[i]);
+			if (strncmp(path, fLocations[i], length) == 0
+				&& (path[length] == '/' || path[length] == '\0')) {
+				_index = i;
+				return fLocations[i];
+			}
+		}
+
+		return NULL;
+	}
+
+private:
+	int32		fReferenceCount;
+	const char*	fLocations[kCount];
+};
+
+
+}	// unnamed namespace
 
 
 /*!	Returns the installation location relative path for the given base directory
@@ -271,22 +381,6 @@ normalize_longest_existing_path_prefix(const char* path, char* buffer,
 }
 
 
-static const char*
-get_installation_location(const char* path, size_t& _index)
-{
-	for (size_t i = 0; i < kInstallationLocationCount; i++) {
-		size_t length = strlen(kInstallationLocations[i]);
-		if (strncmp(path, kInstallationLocations[i], length) == 0
-			&& (path[length] == '/' || path[length] == '\0')) {
-			_index = i;
-			return kInstallationLocations[i];
-		}
-	}
-
-	return NULL;
-}
-
-
 static status_t
 get_file_attribute(const char* path, const char* attribute, char* nameBuffer,
 	size_t bufferSize)
@@ -406,9 +500,13 @@ internal_path_for_path(char* referencePath, size_t referencePathSize,
 		return copy_path(referencePath, pathBuffer, bufferSize);
 
 	// get the installation location
+	InstallationLocations* installationLocations = InstallationLocations::Get();
+	MethodDeleter<InstallationLocations> installationLocationsDeleter(
+		installationLocations, &InstallationLocations::Put);
+
 	size_t installationLocationIndex;
-	const char* installationLocation = get_installation_location(referencePath,
-		installationLocationIndex);
+	const char* installationLocation = installationLocations->LocationFor(
+		referencePath, installationLocationIndex);
 	if (installationLocation == NULL)
 		return B_ENTRY_NOT_FOUND;
 
@@ -456,7 +554,7 @@ internal_path_for_path(char* referencePath, size_t referencePathSize,
 			return error;
 
 		// get the installation location
-		installationLocation = get_installation_location(referencePath,
+		installationLocation = installationLocations->LocationFor(referencePath,
 			installationLocationIndex);
 		if (installationLocation == NULL)
 			return B_ENTRY_NOT_FOUND;
@@ -569,23 +667,28 @@ __find_paths_etc(const char* architecture, path_base_directory baseDirectory,
 
 	size_t subPathLength = subPath != NULL ? strlen(subPath) + 1 : 0;
 
+	// get the installation locations
+	InstallationLocations* installationLocations = InstallationLocations::Get();
+	MethodDeleter<InstallationLocations> installationLocationsDeleter(
+		installationLocations, &InstallationLocations::Put);
+
 	// Get the relative paths and compute the total size to allocate.
-	const char* relativePaths[kInstallationLocationCount];
+	const char* relativePaths[InstallationLocations::kCount];
 	size_t totalSize = 0;
 
-	for (size_t i = 0; i < kInstallationLocationCount; i++) {
+	for (size_t i = 0; i < InstallationLocations::kCount; i++) {
 		relativePaths[i] = get_relative_directory_path(i, baseDirectory);
 		if (relativePaths[i] == NULL)
 			return B_BAD_VALUE;
 
-		totalSize += strlen(kInstallationLocations[i])
+		totalSize += strlen(installationLocations->At(i))
 			+ strlen(relativePaths[i]) + subPathLength + 1;
 		if (strchr(relativePaths[i], '%') != NULL)
 			totalSize += architectureSize - 1;
 	}
 
 	// allocate storage
-	char** paths = (char**)malloc(sizeof(char*) * kInstallationLocationCount
+	char** paths = (char**)malloc(sizeof(char*) * InstallationLocations::kCount
 		+ totalSize);
 	if (paths == NULL)
 		return B_NO_MEMORY;
@@ -593,10 +696,10 @@ __find_paths_etc(const char* architecture, path_base_directory baseDirectory,
 
 	// construct and process the paths
 	size_t count = 0;
-	char* pathBuffer = (char*)(paths + kInstallationLocationCount);
+	char* pathBuffer = (char*)(paths + InstallationLocations::kCount);
 	const char* pathBufferEnd = pathBuffer + totalSize;
-	for (size_t i = 0; i < kInstallationLocationCount; i++) {
-		ssize_t pathSize = process_path(kInstallationLocations[i],
+	for (size_t i = 0; i < InstallationLocations::kCount; i++) {
+		ssize_t pathSize = process_path(installationLocations->At(i),
 			architecture, relativePaths[i], subPath, flags, pathBuffer,
 			pathBufferEnd - pathBuffer);
 		if (pathSize < 0)
@@ -631,9 +734,13 @@ __guess_secondary_architecture_from_path(const char* path,
 	}
 
 	// get an installation location relative path
+	InstallationLocations* installationLocations = InstallationLocations::Get();
+	MethodDeleter<InstallationLocations> installationLocationsDeleter(
+		installationLocations, &InstallationLocations::Put);
+
 	size_t installationLocationIndex;
-	const char* installationLocation = get_installation_location(prefix,
-		installationLocationIndex);
+	const char* installationLocation = installationLocations->LocationFor(
+		prefix, installationLocationIndex);
 	if (installationLocation == NULL)
 		return NULL;
 
