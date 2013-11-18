@@ -166,7 +166,7 @@ BNetworkRoster::RemoveInterface(const BNetworkInterface& interface)
 status_t
 BNetworkRoster::GetRoutes(int family, BObjectList<route_entry>& routes) const
 {
-	return get_routes(NULL, family, routes);
+	return BPrivate::get_routes(NULL, family, routes);
 }
 
 

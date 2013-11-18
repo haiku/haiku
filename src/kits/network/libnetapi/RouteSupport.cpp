@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <errno.h>
 #include <net/if.h>
 #include <sys/sockio.h>
@@ -10,6 +11,10 @@
 #include <AutoDeleter.h>
 #include <ObjectList.h>
 #include <RouteSupport.h>
+
+
+namespace BPrivate {
+
 
 status_t
 get_routes(const char* interfaceName, int family, BObjectList<route_entry>& routes)
@@ -71,4 +76,7 @@ get_routes(const char* interfaceName, int family, BObjectList<route_entry>& rout
 	}
 
 	return B_OK;
+}
+
+
 }
