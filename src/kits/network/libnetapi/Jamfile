@@ -45,7 +45,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			NetworkDevice.cpp
 			NetworkInterface.cpp
 			NetworkRoster.cpp
-
+			RouteSupport.cpp
+			
 			AbstractSocket.cpp
 			DatagramSocket.cpp
 			Socket.cpp

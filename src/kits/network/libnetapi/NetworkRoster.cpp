@@ -15,6 +15,7 @@
 #include <net_notifications.h>
 #include <AutoDeleter.h>
 #include <NetServer.h>
+#include <RouteSupport.h>
 
 
 // TODO: using AF_INET for the socket isn't really a smart idea, as one
@@ -163,62 +164,9 @@ BNetworkRoster::RemoveInterface(const BNetworkInterface& interface)
 
 
 status_t
-BNetworkRoster::GetRoutes(BObjectList<route_entry>& routes) const
+BNetworkRoster::GetRoutes(int family, BObjectList<route_entry>& routes) const
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
-		return errno;
-
-	FileDescriptorCloser fdCloser(socket);
-
-	// Obtain gateway
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
-		return errno;
-
-	uint32 size = (uint32)config.ifc_value;
-	if (size == 0)
-		return B_ERROR;
-
-	void* buffer = malloc(size);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	MemoryDeleter bufferDeleter(buffer);
-	config.ifc_len = size;
-	config.ifc_buf = buffer;
-
-	if (ioctl(socket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
-		return errno;
-
-	ifreq* interface = (ifreq*)buffer;
-	ifreq* end = (ifreq*)((uint8*)buffer + size);
-
-	while (interface < end) {
-		route_entry* route = new (std::nothrow) route_entry;
-		if (route == NULL)
-			return B_NO_MEMORY;
-
-		memcpy(route, &interface->ifr_route, sizeof(route_entry));
-		if (!routes.AddItem(route)) {
-			delete route;
-			return B_NO_MEMORY;
-		}
-
-		int32 addressSize = 0;
-		if (route->destination != NULL)
-			addressSize += route->destination->sa_len;
-		if (route->mask != NULL)
-			addressSize += route->mask->sa_len;
-		if (route->gateway != NULL)
-			addressSize += route->gateway->sa_len;
-
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
-			+ sizeof(route_entry) + addressSize);
-	}
-
-	return B_OK;
+	return get_routes(NULL, family, routes);
 }
 
 

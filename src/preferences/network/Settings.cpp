@@ -88,7 +88,7 @@ Settings::ReadConfiguration()
 	fNetmask = address.Mask().ToString();
 
 	BNetworkAddress gatewayAddress;
-	if (interface.GetDefaultRoute(gatewayAddress) != B_OK)
+	if (interface.GetDefaultRoute(AF_INET, gatewayAddress) != B_OK)
 		return;
 
 	fGateway = gatewayAddress.ToString();

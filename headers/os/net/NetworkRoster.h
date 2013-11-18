@@ -31,7 +31,8 @@ public:
 			status_t			RemoveInterface(
 									const BNetworkInterface& interface);
 
-			status_t			GetRoutes(BObjectList<route_entry>& routes) const;
+			status_t			GetRoutes(int family,
+									BObjectList<route_entry>& routes) const;
 
 			int32				CountPersistentNetworks() const;
 			status_t			GetNextPersistentNetwork(uint32* cookie,
