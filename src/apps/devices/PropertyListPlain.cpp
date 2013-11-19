@@ -23,10 +23,12 @@
 
 PropertyListPlain::PropertyListPlain(const char* name)
 	:
-	BView(name, 0, NULL)
+	BTextView(name)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLayout(new BGroupLayout(B_VERTICAL));
+	//SetLayout(new BGroupLayout(B_VERTICAL));
+	//	SetText("xx");
+	MakeEditable(false);
 }
 
 
@@ -40,10 +42,11 @@ void
 PropertyListPlain::AddAttributes(const Attributes& attributes)
 {
 	RemoveAll();
-	BGridLayoutBuilder builder(5, 5);
+	//BGridLayoutBuilder builder(5, 5);
 	unsigned int i;
+	string txt="";
 	for (i = 0; i < attributes.size(); i++) {
-		const char* name = attributes[i].fName;
+		/*const char* name = attributes[i].fName;
 		const char* value = attributes[i].fValue;
 		
 		BString tempViewName(name);
@@ -58,27 +61,29 @@ PropertyListPlain::AddAttributes(const Attributes& attributes)
 
 		builder
 			.Add(nameView, 0, i)
-			.Add(valueView, 1, i);
+			.Add(valueView, 1, i);*/
+		//SetText("aa");
+		BString tempViewName(attributes[i].fName);
+		const char* value = attributes[i].fValue;
+		//txt+=attributes[i].fName;
+		txt=txt+tempViewName.String()+": "+value;
 	}
 
+	SetText(txt.c_str());
 	// make sure that all content is left and top aligned
-	builder.Add(BSpaceLayoutItem::CreateGlue(), 2, i);
+	//builder.Add(BSpaceLayoutItem::CreateGlue(), 2, i);
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL,5)
+	/*AddChild(BGroupLayoutBuilder(B_VERTICAL,5)
 		.Add(builder)
 		.SetInsets(5, 5, 5, 5)
-	);
+	);*/
 }
 
 
 void
 PropertyListPlain::RemoveAll()
 {
-	BView *child;
-	while((child = ChildAt(0))) {
-		RemoveChild(child);
-		delete child;
-	}
+	SetText("");
 }
 
 
@@ -87,7 +92,7 @@ PropertyListPlain::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		default:
-			BView::MessageReceived(message);
+			BTextView::MessageReceived(message);
 	}	
 }
 
@@ -102,3 +107,5 @@ void
 PropertyListPlain::DetachedFromWindow()
 {
 }
+
+
