@@ -623,6 +623,9 @@ __find_path_for_path_etc(const char* path, const char* dependency,
 	const char* architecture, path_base_directory baseDirectory,
 	const char* subPath, uint32 flags, char* pathBuffer, size_t bufferSize)
 {
+	if (baseDirectory == B_FIND_PATH_IMAGE_PATH)
+		return B_BAD_VALUE;
+
 	char referencePath[B_PATH_NAME_LENGTH];
 	if (strlcpy(referencePath, path, sizeof(referencePath))
 			>= sizeof(referencePath)) {
