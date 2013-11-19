@@ -494,7 +494,8 @@ determine_x86_abi(int fd, const Elf32_Ehdr& elfHeader, bool& _isGcc2)
 	if (symbolHash == NULL || symbolTable == NULL || stringTable == NULL)
 		return false;
 	uint32 symbolCount
-		= std::min(symbolTableSize / sizeof(Elf32_Sym), symbolHashChainSize);
+		= std::min(symbolTableSize / (uint32)sizeof(Elf32_Sym),
+			symbolHashChainSize);
 	if (symbolCount < symbolHashSize)
 		return false;
 
@@ -520,7 +521,7 @@ determine_x86_abi(int fd, const Elf32_Ehdr& elfHeader, bool& _isGcc2)
 						<= sectionHeader->sh_addr + sectionHeader->sh_size) {
 					off_t fileOffset = symbol->st_value - sectionHeader->sh_addr
 						+ sectionHeader->sh_offset;
-					if (fileOffset + sizeof(uint32) <= st.st_size) {
+					if (fileOffset + (off_t)sizeof(uint32) <= st.st_size) {
 						uint32 abi
 							= *(uint32*)((uint8*)fileBaseAddress + fileOffset);
 						_isGcc2 = (abi & B_HAIKU_ABI_MAJOR)
