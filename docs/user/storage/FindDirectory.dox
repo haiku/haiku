@@ -1,14 +1,15 @@
 /*
- * Copyright 2011-2013 Haiku Inc. All rights reserved.
+ * Copyright 2011-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Documentation by:
  *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
  *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
  *
  * Corresponds to:
- *		headers/os/storage/FindDirectory.h	 hrev46316
- *		src/kits/storage/FindDirectory.cpp	 hrev46316
+ *		headers/os/storage/FindDirectory.h	 hrev46390
+ *		src/kits/storage/FindDirectory.cpp	 hrev46390
  */
 
 
@@ -16,17 +17,45 @@
 	\file FindDirectory.h
 	\ingroup storage
 	\ingroup libbe
-	\brief Provides the find_directory function.
+	\brief Provides the find_directory(), find_path(), find_paths(), etc.
+		functions.
 
 	Haiku provides a set of directories for applications to use. These can be
-	accessed using the find_directory function. It is very important to use the
-	function at runtime and not hardcode the path, as it may change in future
-	versions of Haiku, and already changed in past ones. Using this function
-	makes your application more future-proof, and makes sure everyone puts data
-	in the same place, which makes the system cleaner and easier to manage.
+	accessed using the functions find_directory(), find_path(), find_path_etc(),
+	find_paths(), find_paths_etc(), find_path_for_path(),
+	find_path_for_path_etc(). It is very important to use the functions at
+	runtime and not hardcode the path, as it may change in future versions of
+	Haiku, and already changed in past ones. Using these functions makes your
+	application more future-proof, and makes sure everyone puts data in the same
+	place, which makes the system cleaner and easier to manage.
 
-	Note this function can be accessed from C code, to make it easy to use also
-	in ported applications.
+	Note that while the find_directory() function is still needed for some, it
+	is deprecated for many other use cases, like:
+	- When collecting files from all installation locations, be it data files
+	  (like fonts) or add-ons your application/library supports, use
+	  find_paths(), find_paths_etc(), or BPathFinder::FindPaths() instead.
+	  Formerly you had to use find_directory() and iterate through all possible
+	  constants manually. Not only is this less convenient, it also doesn't
+	  account for the possibility of installation locations being added or
+	  removed in a later Haiku release.
+	- If your code needs to access another file that also belongs to your
+	  software (i.e. if packaged it is included in the same package), use
+	  find_path() or BPathFinder::FindPath() instead.
+	  Formerly this case could not really be handled properly. Either you had
+	  to hard-code the installation location by using the respective directory
+	  constant or you had to manually construct a path relative to your code's
+	  image file.
+
+	Cases for which find_directory() is still useful:
+	- Getting per-volume paths like for the trash directory.
+	- Getting specific paths like for the user's home directory or the user's
+	  settings directory.
+
+	Note that these functions can be accessed from C code (they are implemented
+	in libroot), to make it easy to use also in ported applications. However,
+	there are also a C++ version of find_directory() and the BPathFinder class
+	(both implemented in libbe), which may be more convenient to use in C++
+	code.
 */
 
 
@@ -77,15 +106,15 @@
 	The system servers directory.
 
 	\var directory_which B_SYSTEM_APPS_DIRECTORY
-	The system applications directory. Contains applications executable from
-	Tracker.
+	The system applications directory. Contains applications with graphical
+	user interface.
 
 	\var directory_which B_SYSTEM_BIN_DIRECTORY
 	The system bin directory. Contains command-line applications runnable from
 	Terminal.
 
 	\var directory_which B_SYSTEM_DOCUMENTATION_DIRECTORY
-	The system documentation directory. Contains manpages.
+	The system documentation directory. Contains e.g. man pages.
 
 	\var directory_which B_SYSTEM_PREFERENCES_DIRECTORY
 	The system preferences directory.
@@ -101,41 +130,76 @@
 
 	\var directory_which B_SYSTEM_DATA_DIRECTORY
 	The system data directory.
+
+	\var directory_which B_SYSTEM_DEVELOP_DIRECTORY
+	The system directory containing development related files.
+
+	\var directory_which B_SYSTEM_PACKAGES_DIRECTORY
+	The system directory where activated packages live.
+
+	\var directory_which B_SYSTEM_HEADERS_DIRECTORY
+	The system directory for development header files.
+
+	\var directory_which B_SYSTEM_ETC_DIRECTORY
+	The system directory used for Unix-like installation location wide settings
+	(Unix "etc" directory).
+
+	\var directory_which B_SYSTEM_SETTINGS_DIRECTORY
+	The system directory used for installation location wide settings.
+
+	\var directory_which B_SYSTEM_LOG_DIRECTORY
+	The system directory where log files are put.
+
+	\var directory_which B_SYSTEM_SPOOL_DIRECTORY
+	The system directory for spool data (e.g. pending printer jobs).
+
+	\var directory_which B_SYSTEM_TEMP_DIRECTORY
+	The global directory for temporary files.
+
+	\var directory_which B_SYSTEM_VAR_DIRECTORY
+	The system directory for variable data (Unix "var" directory).
+
+	\var directory_which B_SYSTEM_CACHE_DIRECTORY
+	The system directory used for cache files.
+
+	\var directory_which B_SYSTEM_NONPACKAGED_DIRECTORY
+	The system non-packaged installation location directory.
+
+	\var directory_which B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY
+	The system non-packaged add-ons directory
+
+	\var directory_which B_SYSTEM_NONPACKAGED_TRANSLATORS_DIRECTORY
+	The system non-packaged translator directory.
+
+	\var directory_which B_SYSTEM_NONPACKAGED_MEDIA_NODES_DIRECTORY
+	The system non-packaged media nodes directory.
+
+	\var directory_which B_SYSTEM_NONPACKAGED_BIN_DIRECTORY
+	The system non-packaged bin directory. Contains command-line applications
+	runnable from Terminal.
+
+	\var directory_which B_SYSTEM_NONPACKAGED_DATA_DIRECTORY
+	The system non-packaged data directory.
+
+	\var directory_which B_SYSTEM_NONPACKAGED_FONTS_DIRECTORY
+	The system non-packaged fonts directory
+
+	\var directory_which B_SYSTEM_NONPACKAGED_SOUNDS_DIRECTORY
+	The system non-packaged sounds directory.
+
+	\var directory_which B_SYSTEM_NONPACKAGED_DOCUMENTATION_DIRECTORY
+	The system non-packaged documentation directory. Contains e.g. man pages.
+
+	\var directory_which B_SYSTEM_NONPACKAGED_LIB_DIRECTORY
+	The system non-packaged lib directory.
+
+	\var directory_which B_SYSTEM_NONPACKAGED_HEADERS_DIRECTORY
+	The system non-packaged directory for development header files.
+
+	\var directory_which B_SYSTEM_NONPACKAGED_DEVELOP_DIRECTORY
+	The system non-packaged directory containing development related files.
 */
 
-//	\var directory_which B_COMMON_DIRECTORY
-//	The common directory.
-
-//	\var directory_which B_COMMON_SYSTEM_DIRECTORY
-//	\var directory_which B_COMMON_ADDONS_DIRECTORY
-//	\var directory_which B_COMMON_BOOT_DIRECTORY
-//	\var directory_which B_COMMON_FONTS_DIRECTORY
-//	\var directory_which B_COMMON_LIB_DIRECTORY
-//	\var directory_which B_COMMON_SERVERS_DIRECTORY
-//	\var directory_which B_COMMON_BIN_DIRECTORY
-//	\var directory_which B_COMMON_ETC_DIRECTORY
-//	\var directory_which B_COMMON_DOCUMENTATION_DIRECTORY
-//	\var directory_which B_COMMON_SETTINGS_DIRECTORY
-//	\var directory_which B_COMMON_DEVELOP_DIRECTORY
-//	The common development directory. Contains toolchains, include files,
-//	and other tools related to application development.
-
-//	\var directory_which B_COMMON_LOG_DIRECTORY
-//	The common log directory. Log files are stored here.
-
-//	\var directory_which B_COMMON_SPOOL_DIRECTORY
-//	\var directory_which B_COMMON_TEMP_DIRECTORY
-//	\var directory_which B_COMMON_VAR_DIRECTORY
-//	\var directory_which B_COMMON_TRANSLATORS_DIRECTORY
-//	\var directory_which B_COMMON_MEDIA_NODES_DIRECTORY
-//	\var directory_which B_COMMON_SOUNDS_DIRECTORY
-//	\var directory_which B_COMMON_DATA_DIRECTORY
-//	The common data directory. You may store application data here, such as
-//	resources (graphics, music) for your application.
-
-//	\var directory_which B_COMMON_CACHE_DIRECTORY
-//	The common cache directory. You may store temporary data here, such as
-//	thumbnails for a picture viewer application, or a web browser data cache.
 
 /*!
 	\var directory_which B_USER_DIRECTORY
@@ -143,10 +207,20 @@
 	instead use B_USER_SETTINGS_DIRECTORY.
 
 	\var directory_which B_USER_CONFIG_DIRECTORY
+	The user's packaged installation location directory.
+
 	\var directory_which B_USER_ADDONS_DIRECTORY
+	The user add-ons directory
+
 	\var directory_which B_USER_BOOT_DIRECTORY
+	The user directory containing booting related files.
+
 	\var directory_which B_USER_FONTS_DIRECTORY
+	The user fonts directory
+
 	\var directory_which B_USER_LIB_DIRECTORY
+	The user lib directory.
+
 	\var directory_which B_USER_SETTINGS_DIRECTORY
 	The user settings directory. You may store your application settings here.
 	Create a subdirectory for your application if you have multiple files to
@@ -158,15 +232,237 @@
 	it shows up in the user deskbar's leaf menu.
 
 	\var directory_which B_USER_PRINTERS_DIRECTORY
-	\var directory_which B_USER_TRANSLATORS_DIRECTORY
-	\var directory_which B_USER_MEDIA_NODES_DIRECTORY
-	\var directory_which B_USER_SOUNDS_DIRECTORY
-	\var directory_which B_USER_DATA_DIRECTORY
-	\var directory_which B_USER_CACHE_DIRECTORY
+	The user directory for printer settings.
 
+	\var directory_which B_USER_TRANSLATORS_DIRECTORY
+	The user translator directory.
+
+	\var directory_which B_USER_MEDIA_NODES_DIRECTORY
+	The user media nodes directory.
+
+	\var directory_which B_USER_SOUNDS_DIRECTORY
+	The user sounds directory.
+
+	\var directory_which B_USER_DATA_DIRECTORY
+	The user data directory.
+
+	\var directory_which B_USER_CACHE_DIRECTORY
+	The system directory used for cache files.
+
+	\var directory_which B_USER_PACKAGES_DIRECTORY
+	The user directory where activated packages live.
+
+	\var directory_which B_USER_HEADERS_DIRECTORY
+	The user directory for development header files.
+
+	\var directory_which B_USER_DEVELOP_DIRECTORY
+	The user directory containing development related files.
+
+	\var directory_which B_USER_DOCUMENTATION_DIRECTORY
+	The user documentation directory. Contains e.g. man pages.
+
+ 	\var directory_which B_USER_SERVERS_DIRECTORY
+	The user servers directory.
+
+	\var directory_which B_USER_APPS_DIRECTORY
+	The user applications directory. Contains applications with graphical
+	user interface.
+
+	\var directory_which B_USER_BIN_DIRECTORY
+	The user bin directory. Contains command-line applications runnable from
+	Terminal.
+
+	\var directory_which B_USER_PREFERENCES_DIRECTORY
+	The user preference applications directory.
+
+	\var directory_which B_USER_ETC_DIRECTORY
+	The user directory used for Unix-like installation location wide settings
+	(Unix "etc" directory).
+
+	\var directory_which B_USER_LOG_DIRECTORY
+	The user directory where log files are put.
+
+	\var directory_which B_USER_SPOOL_DIRECTORY
+	The user directory for spool data (e.g. pending printer jobs).
+
+	\var directory_which B_USER_VAR_DIRECTORY
+	The user directory for variable data (Unix "var" directory).
+
+	\var directory_which B_USER_NONPACKAGED_DIRECTORY
+	The user non-packaged installation location directory.
+
+	\var directory_which B_USER_NONPACKAGED_ADDONS_DIRECTORY
+	The user non-packaged add-ons directory
+
+	\var directory_which B_USER_NONPACKAGED_TRANSLATORS_DIRECTORY
+	The user non-packaged translator directory.
+
+	\var directory_which B_USER_NONPACKAGED_MEDIA_NODES_DIRECTORY
+	The user non-packaged media nodes directory.
+
+	\var directory_which B_USER_NONPACKAGED_BIN_DIRECTORY
+	The user non-packaged bin directory. Contains command-line applications
+	runnable from Terminal.
+
+	\var directory_which B_USER_NONPACKAGED_DATA_DIRECTORY
+	The user non-packaged data directory.
+
+	\var directory_which B_USER_NONPACKAGED_FONTS_DIRECTORY
+	The user non-packaged fonts directory
+
+	\var directory_which B_USER_NONPACKAGED_SOUNDS_DIRECTORY
+	The user non-packaged sounds directory.
+
+	\var directory_which B_USER_NONPACKAGED_DOCUMENTATION_DIRECTORY
+	The user non-packaged documentation directory. Contains e.g. man pages.
+
+	\var directory_which B_USER_NONPACKAGED_LIB_DIRECTORY
+	The user non-packaged lib directory.
+
+	\var directory_which B_USER_NONPACKAGED_HEADERS_DIRECTORY
+	The user non-packaged directory for development header files.
+
+	\var directory_which B_USER_NONPACKAGED_DEVELOP_DIRECTORY
+	The user non-packaged directory containing development related files.
+*/
+
+
+/*!
 	\var directory_which B_APPS_DIRECTORY
+	The global applications directory. Contains applications with graphical
+	user interface.
+
 	\var directory_which B_PREFERENCES_DIRECTORY
+	The global preference applications directory.
+
 	\var directory_which B_UTILITIES_DIRECTORY
+	The global utility applications directory.
+
+	\var directory_which B_PACKAGE_LINKS_DIRECTORY
+	The global package links directory. This is where symlink directories for
+	all activated packages are exposed.
+*/
+
+
+/* find_path[s]() flags */
+
+
+/*!
+	\var B_FIND_PATH_CREATE_DIRECTORY
+	Flag for the find_path_etc(), find_path_for_path_etc(), find_paths_etc(),
+	and BPathFinder API. Specifies that, if the resulting path doesn't exist,
+	it shall be created as a directory, including all missing ancestors. Failure
+	to create the path will cause the respective function to fail.
+
+	\var B_FIND_PATH_CREATE_PARENT_DIRECTORY
+	Flag for the find_path_etc(), find_path_for_path_etc(), find_paths_etc(),
+	and BPathFinder API. Specifies that, if the resulting path's parent doesn't
+	exist, the parent shall be created as a directory, including all missing
+	ancestors. Failure to create the directory will cause the respective
+	function to fail.
+
+	\var B_FIND_PATH_EXISTING_ONLY
+	Flag for the find_path_etc(), find_path_for_path_etc(), find_paths_etc(),
+	and BPathFinder API. Specifies that, if the resulting path doesn't exist,
+	the respective function shall skip it. In case multiple paths shall be
+	retrieved and none of the paths exists, the function shall fail with
+	\c B_ENTRY_NOT_FOUND.
+*/
+
+
+/*!
+	\enum path_base_directory
+	\brief Path constants to use with find_path(), find_paths(), et al.
+
+	There are two kinds of constants. Those that are based off an installation
+	location and those that based off an image or given path. The latter are not
+	valid argument for all functions.
+
+	\var B_FIND_PATH_INSTALLATION_LOCATION_DIRECTORY
+	The installation location base directory.
+
+	\var B_FIND_PATH_ADD_ONS_DIRECTORY
+	The add-ons directory.
+
+	\var B_FIND_PATH_APPS_DIRECTORY
+	The application directory.
+
+	\var B_FIND_PATH_BIN_DIRECTORY
+	The command line application directory (Unix "bin" directory).
+
+	\var B_FIND_PATH_BOOT_DIRECTORY
+	The directory containing booting related files.
+
+	\var B_FIND_PATH_CACHE_DIRECTORY
+	The directory used for cache files.
+
+	\var B_FIND_PATH_DATA_DIRECTORY
+	The base directory used for read-only data.
+
+	\var B_FIND_PATH_DEVELOP_DIRECTORY
+	The directory containing development related files.
+
+	\var B_FIND_PATH_DEVELOP_LIB_DIRECTORY
+	The the development library directory. This is the directory where the
+	linker finds libraries.
+
+	\var B_FIND_PATH_DOCUMENTATION_DIRECTORY
+	The base directory used for documentation.
+
+	\var B_FIND_PATH_ETC_DIRECTORY
+	The directory used for Unix-like installation location wide settings (Unix
+	"etc" directory).
+
+	\var B_FIND_PATH_FONTS_DIRECTORY
+	The fonts directory.
+
+	\var B_FIND_PATH_HEADERS_DIRECTORY
+	The development header files directory.
+
+	\var B_FIND_PATH_LIB_DIRECTORY
+	The runtime library directory. This is where the runtime loader finds
+	libraries.
+
+	\var B_FIND_PATH_LOG_DIRECTORY
+	The directory where log files are put.
+
+	\var B_FIND_PATH_MEDIA_NODES_DIRECTORY
+	The media node add-ons directory.
+
+	\var B_FIND_PATH_PACKAGES_DIRECTORY
+	The directory where activated packages live.
+
+	\var B_FIND_PATH_PREFERENCES_DIRECTORY
+	The preference application directory.
+
+	\var B_FIND_PATH_SERVERS_DIRECTORY
+	The server and daemon program directory.
+
+	\var B_FIND_PATH_SETTINGS_DIRECTORY
+	The directory used for installation location wide settings. Note that for
+	the user's home config installation location, this is not the same as the
+	user's settings directory. Software installed in that installation location
+	puts their global settings files here.
+
+	\var B_FIND_PATH_SOUNDS_DIRECTORY
+	The directory for sound files.
+
+	\var B_FIND_PATH_SPOOL_DIRECTORY
+	The directory for spool data (e.g. pending printer jobs).
+
+	\var B_FIND_PATH_TRANSLATORS_DIRECTORY
+	The translator add-ons directory.
+
+	\var B_FIND_PATH_VAR_DIRECTORY
+	The directory for variable data (Unix "var" directory).
+
+	\var B_FIND_PATH_IMAGE_PATH
+	The path of the image file that was identified by a pointer argument passed
+	to the respective function.
+
+	\var B_FIND_PATH_PACKAGE_PATH
+	The path of the package the file referred to by the specified path belongs
+	to.
 */
 
 
@@ -187,4 +483,284 @@
 	\brief C++ interface to find_directory
 
 	Set \a path to \a which on \a volume.
+*/
+
+
+/*!
+	\fn status_t find_path(const void* codePointer,
+		path_base_directory baseDirectory, const char* subPath,
+		char* pathBuffer, size_t bufferSize)
+	\brief Retrieves a path in the file system layout based on a loaded image
+		file.
+
+	The function determines the path of the image (i.e. executable, library, or
+	add-on) file associated with \a codePointer, a pointer to a location in the
+	code or static data of an image loaded in the caller's team. Based on that,
+	path \a baseDirectory is evaluated. In most cases that means first
+	determining the path of the installation location from the path, then
+	appending the relative path corresponding to the given \a baseDirectory
+	constant, and finally appending \a subPath, if given.
+
+	If \a baseDirectory specifies a path that is architecture dependent, the
+	caller's architecture (as returned by get_architecture()) is used for
+	constructing the path.
+
+	If \c B_FIND_PATH_IMAGE_PATH or \c B_FIND_PATH_PACKAGE_PATH are
+	specified, \a subPath is ignored. In the former case the path of the image
+	file is returned. In the latter case the path of the package containing the
+	image file, if any.
+
+	\param codePointer A pointer to code or static data belonging to the image
+		based on which the path shall be computed. The special value
+		\c B_APP_IMAGE_SYMBOL can be used to refer to the program image, and
+		\c B_CURRENT_IMAGE_SYMBOL for the caller's image.
+	\param baseDirectory Constant indicating which path to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param pathBuffer Pointer to a pre-allocated buffer the retrieved path
+		shall be stored in.
+	\param bufferSize Size of the \a pathBuffer buffer.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BUFFER_OVERFLOW The provided \a pathBuffer wasn't large enough.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+		and the image file doesn't belong to a package.
+*/
+
+
+/*!
+	\fn status_t find_path_etc(const void* codePointer, const char* dependency,
+		const char* architecture, path_base_directory baseDirectory,
+		const char* subPath, uint32 flags, char* pathBuffer, size_t bufferSize)
+	\brief Retrieves a path in the file system layout based on a loaded image
+		file.
+
+	The function determines the path of the image (i.e. executable, library, or
+	add-on) file associated with \a codePointer, a pointer to a location in the
+	code or static data of an image loaded in the caller's team. Based on that,
+	path \a baseDirectory is evaluated. In most cases that means first
+	determining the path of the installation location from the path, then
+	appending the relative path corresponding to the given \a baseDirectory
+	constant, and finally appending \a subPath, if given.
+
+	If \a dependency is specified, instead of determining the installation
+	location path from the image path, the installation location path of the
+	dependency \a dependency of the package containing the image file is used.
+
+	If \a baseDirectory specifies a path that is architecture dependent,
+	\a architecture is used for constructing the path. If \a architecture is
+	\c NULL, the caller's architecture (as returned by get_architecture()) is
+	used.
+
+	If \c B_FIND_PATH_IMAGE_PATH or \c B_FIND_PATH_PACKAGE_PATH are
+	specified, \a dependency and \a subPath are ignored. In the former case the
+	path of the image file is returned. In the latter case the path of the
+	package containing the image file, if any.
+
+	\param codePointer A pointer to code or static data belonging to the image
+		based on which the path shall be computed. The special value
+		\c B_APP_IMAGE_SYMBOL can be used to refer to the program image, and
+		\c B_CURRENT_IMAGE_SYMBOL for the caller's image.
+	\param dependency The name of the package's "requires" entry to be used for
+		resolving the installation location. Can be \c NULL.
+	\param architecture The name of the architecture to be used for resolving
+		architecture dependent paths. Can be \c NULL, in which case the caller's
+		architecture is used.
+	\param baseDirectory Constant indicating which path to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param flags Bitwise OR of any of the following flags:
+		- \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't exist,
+			create it as a directory (including all missing ancestors).
+		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's parent
+			doesn't exist, create the parent directory (including all missing
+			ancestors).
+		- \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
+			fail with \c B_ENTRY_NOT_FOUND.
+	\param pathBuffer Pointer to a pre-allocated buffer the retrieved path
+		shall be stored in.
+	\param bufferSize Size of the \a pathBuffer buffer.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BUFFER_OVERFLOW The provided \a pathBuffer wasn't large enough.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+		and the image file doesn't belong to a package, or \c dependency was
+		specified, but isn't a "requires" entry of the package, or
+		\c B_FIND_PATH_EXISTING_ONLY was specified and the resulting path
+		doesn't exist.
+*/
+
+
+/*!
+	\fn status_t find_path_for_path(const char* path,
+		path_base_directory baseDirectory, const char* subPath,
+		char* pathBuffer, size_t bufferSize)
+	\brief Retrieves a path in the file system layout based on a given path.
+
+	Based on the given path \a path the function evaluates \a baseDirectory. In
+	most cases that means first determining the path of the installation
+	location from the given path, then appending the relative path corresponding
+	to the given \a baseDirectory constant, and finally appending \a subPath, if
+	given.
+
+	If \a baseDirectory specifies a path that is architecture dependent, the
+	architecture associated with the given path (as returned by
+	guess_architecture_for_path()) is used for constructing the path.
+
+	If \c B_FIND_PATH_PACKAGE_PATH is specified, \a subPath is ignored. In
+	this case the path of the package containing the file referred to by \a path
+	is returned. \c B_FIND_PATH_IMAGE_PATH is not a valid argument for this
+	function.
+
+	\param path A path based on which the path shall be computed.
+	\param baseDirectory Constant indicating which path to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param pathBuffer Pointer to a pre-allocated buffer the retrieved path
+		shall be stored in.
+	\param bufferSize Size of the \a pathBuffer buffer.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BUFFER_OVERFLOW The provided \a pathBuffer wasn't large enough.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+		and \a path does refer to a file that belongs to a package.
+*/
+
+
+/*!
+	\fn status_t find_path_for_path_etc(const char* path,
+		const char* dependency, const char* architecture,
+		path_base_directory baseDirectory, const char* subPath, uint32 flags,
+		char* pathBuffer, size_t bufferSize)
+	\brief Retrieves a path in the file system layout based on a given path.
+
+	Based on the given path \a path the function evaluates \a baseDirectory. In
+	most cases that means first determining the path of the installation
+	location from the given path, then appending the relative path corresponding
+	to the given \a baseDirectory constant, and finally appending \a subPath, if
+	given.
+
+	If \a dependency is specified, instead of determining the installation
+	location path from the given path, the installation location path of the
+	dependency \a dependency of the package containing the file referred to by
+	\a path is used.
+
+	If \a baseDirectory specifies a path that is architecture dependent,
+	\a architecture is used for constructing the path. If \a architecture is
+	\c NULL, the architecture associated with the given path (as returned by
+	guess_architecture_for_path()) is used.
+
+	If \c B_FIND_PATH_PACKAGE_PATH is specified, \a dependency and
+	\a subPath are ignored. In this case the path of the package containing the
+	file referred to by \a path is returned. \c B_FIND_PATH_IMAGE_PATH is not
+	a valid argument for this function.
+
+	\param path A path based on which the path shall be computed.
+	\param dependency The name of the package's "requires" entry to be used for
+		resolving the installation location. Can be \c NULL.
+	\param architecture The name of the architecture to be used for resolving
+		architecture dependent paths. Can be \c NULL, in which case the
+		architecture associated with \a path is used.
+	\param baseDirectory Constant indicating which path to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param flags Bitwise OR of any of the following flags:
+		- \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't exist,
+			create it as a directory (including all missing ancestors).
+		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's parent
+			doesn't exist, create the parent directory (including all missing
+			ancestors).
+		- \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
+			fail with \c B_ENTRY_NOT_FOUND.
+	\param pathBuffer Pointer to a pre-allocated buffer the retrieved path
+		shall be stored in.
+	\param bufferSize Size of the \a pathBuffer buffer.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_BUFFER_OVERFLOW The provided \a pathBuffer wasn't large enough.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+		and \a path does refer to a file that belongs to a package, or
+		\c dependency was specified, but isn't a "requires" entry of the
+		package, or \c B_FIND_PATH_EXISTING_ONLY was specified and the resulting
+		path doesn't exist.
+*/
+
+
+/*!
+	\fn status_t find_paths(path_base_directory baseDirectory,
+		const char* subPath, char*** _paths, size_t* _pathCount)
+	\brief Retrieves a list of paths in the file system layout.
+
+	For each installation location -- in the order most specific to most
+	generic, non-packaged before packaged -- the function evaluates
+	\a baseDirectory to a path and appends \a subPath, if given.
+
+	If \a baseDirectory specifies a path that is architecture dependent,
+	the caller's architecture (as returned by get_architecture()) is used for
+	constructing each path.
+
+	\c B_FIND_PATH_PACKAGE_PATH and \c B_FIND_PATH_IMAGE_PATH are not
+	valid arguments for this function.
+
+	The array of paths retrieved is allocated on the heap and returned via
+	\a _paths. The caller is responsible for calling free() for the returned
+	pointer.
+
+	\param baseDirectory Constant indicating which paths to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param _paths Pointer to a pre-allocated variable where the pointer to the
+		allocated path array shall be stored on success.
+	\param _pathCount Pointer to a pre-allocated variable where the number of
+		paths in the path array shall be stored on success.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		paths doesn't exist.
+*/
+
+
+/*!
+	\fn status_t find_paths_etc(const char* architecture,
+		path_base_directory baseDirectory, const char* subPath, uint32 flags,
+		char*** _paths, size_t* _pathCount)
+	\brief Retrieves a list of paths in the file system layout.
+
+	For each installation location -- in the order most specific to most
+	generic, non-packaged before packaged -- the function evaluates
+	\a baseDirectory to a path and appends \a subPath, if given.
+
+	If \a baseDirectory specifies a path that is architecture dependent,
+	\a architecture is used for constructing each path. If \a architecture is
+	\c NULL, the caller's architecture (as returned by get_architecture()) is
+	used.
+
+	\c B_FIND_PATH_PACKAGE_PATH and \c B_FIND_PATH_IMAGE_PATH are not
+	valid arguments for this function.
+
+	The array of paths retrieved is allocated on the heap and returned via
+	\a _paths. The caller is responsible for calling free() for the returned
+	pointer.
+
+	\param architecture The name of the architecture to be used for resolving
+		architecture dependent paths. Can be \c NULL, in which case the caller's
+		architecture is used.
+	\param baseDirectory Constant indicating which paths to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param flags Bitwise OR of any of the following flags:
+		- \c B_FIND_PATH_CREATE_DIRECTORY: If a resulting path doesn't exist,
+			create it as a directory (including all missing ancestors).
+		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If a resulting path's parent
+			doesn't exist, create the parent directory (including all missing
+			ancestors).
+		- \c B_FIND_PATH_EXISTING_ONLY: If a resulting path doesn't exist, skip
+			it. If none of the paths exist, fail with \c B_ENTRY_NOT_FOUND.
+	\param _paths Pointer to a pre-allocated variable where the pointer to the
+		allocated path array shall be stored on success.
+	\param _pathCount Pointer to a pre-allocated variable where the number of
+		paths in the path array shall be stored on success.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was specified and
+		none of the resulting paths do exist.
 */
