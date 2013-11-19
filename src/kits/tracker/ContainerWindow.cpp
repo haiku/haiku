@@ -4056,6 +4056,8 @@ BContainerWindow::SetSingleWindowBrowseShortcuts(bool enabled)
 			new BMessage(kNavigatorCommandUp), Navigator());
 		AddShortcut(B_DOWN_ARROW, B_OPTION_KEY | B_COMMAND_KEY,
 			new BMessage(kOpenSelection), PoseView());
+		AddShortcut('L', B_COMMAND_KEY,
+			new BMessage(kNavigatorCommandSetFocus), Navigator());
 
 	} else {
 		RemoveShortcut(B_LEFT_ARROW, B_COMMAND_KEY);
@@ -4078,6 +4080,7 @@ BContainerWindow::SetSingleWindowBrowseShortcuts(bool enabled)
 		AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_OPTION_KEY,
 			new BMessage(kOpenParentDir), PoseView());
 			// command + option results in closing the parent window
+		RemoveShortcut('L', B_COMMAND_KEY);
 	}
 }
 

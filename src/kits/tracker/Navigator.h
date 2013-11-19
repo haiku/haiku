@@ -58,7 +58,8 @@ enum NavigationAction
 	kNavigatorCommandBackward = 'NVBW',
 	kNavigatorCommandForward = 'NVFW',
 	kNavigatorCommandUp = 'NVUP',
-	kNavigatorCommandLocation = 'NVLC'
+	kNavigatorCommandLocation = 'NVLC',
+	kNavigatorCommandSetFocus = 'NVSF'
 };
 
 

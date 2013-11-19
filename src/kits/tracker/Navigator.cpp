@@ -234,6 +234,10 @@ BNavigator::MessageReceived(BMessage* message)
 			GoTo();
 			break;
 
+		case kNavigatorCommandSetFocus:
+			fLocation->MakeFocus();
+			break;
+
 		default:
 		{
 			// Catch any dropped refs and try to switch to this new directory
