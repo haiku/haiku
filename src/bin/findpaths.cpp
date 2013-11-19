@@ -76,7 +76,7 @@ static const DirectoryConstantEntry kDirectoryConstants[] = {
 		"the translator add-ons directory"),
 	DEFINE_CONSTANT(B_FIND_PATH_VAR_DIRECTORY,
 		"the Unix var directory (global writable data)"),
-	DEFINE_CONSTANT(B_FIND_PATH_IMAGE_PACKAGE_PATH,
+	DEFINE_CONSTANT(B_FIND_PATH_PACKAGE_PATH,
 		"the path of the package the file specified via -p belongs to"),
 };
 

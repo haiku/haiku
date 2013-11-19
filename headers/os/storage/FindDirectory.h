@@ -157,7 +157,7 @@ typedef enum path_base_directory {
 
 	/* find_path() only */
 	B_FIND_PATH_IMAGE_PATH			= 1000,
-	B_FIND_PATH_IMAGE_PACKAGE_PATH,
+	B_FIND_PATH_PACKAGE_PATH,
 } path_base_directory;
 
 

@@ -216,7 +216,7 @@ get_relative_directory_path(size_t installationLocationIndex,
 			return "/var";
 
 		case B_FIND_PATH_IMAGE_PATH:
-		case B_FIND_PATH_IMAGE_PACKAGE_PATH:
+		case B_FIND_PATH_PACKAGE_PATH:
 		default:
 			return NULL;
 	}
@@ -510,11 +510,11 @@ internal_path_for_path(char* referencePath, size_t referencePathSize,
 	if (installationLocation == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	// Handle B_FIND_PATH_IMAGE_PACKAGE_PATH: get the package file name and
+	// Handle B_FIND_PATH_PACKAGE_PATH: get the package file name and
 	// simply adjust our arguments to look the package file up in the packages
 	// directory.
 	char packageName[B_FILE_NAME_LENGTH];
-	if (baseDirectory == B_FIND_PATH_IMAGE_PACKAGE_PATH) {
+	if (baseDirectory == B_FIND_PATH_PACKAGE_PATH) {
 		error = get_file_attribute(referencePath, "SYS:PACKAGE_FILE",
 			packageName, sizeof(packageName));
 		if (error != B_OK)
