@@ -1,0 +1,140 @@
+/*
+ * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *
+ * Corresponds to:
+ *		headers/os/storage/PathFinder.h	 hrev46390
+ *		src/kits/storage/PathFinder.cpp	 hrev46390
+ */
+
+
+/*!
+	\file Architecture.h
+	\ingroup support
+	\ingroup libbe
+	\brief Provides functions for getting the primary and secondary
+		architectures of the system.
+*/
+
+
+/*!
+	\fn const char* get_architecture()
+	\brief Returns the name of the caller's architecture.
+
+	This is the packaging architecture the caller's code has been built for,
+	which may not be the system's primary architecture.
+
+	\return The name of the caller's architecture.
+
+	\see get_primary_architecture()
+*/
+
+
+/*!
+	\fn const char* get_primary_architecture()
+	\brief Returns the name of the system's primary architecture.
+
+	This is the packaging architecture the main system has been built for.
+
+	\return The name of the system's primary architecture.
+*/
+
+
+/*!
+	\fn size_t get_secondary_architectures(const char** architectures,
+		size_t count)
+	\brief Returns the names of the system's secondary architectures.
+
+	These are the packaging architectures the system does provide additional
+	support for (i.e. not including the primary architecture). Only actually
+	installed support is considered. E.g. on a pure x86 gcc 2 system
+	(primary architecture "x86_gcc2") without any support installed for gcc 4
+	executables, the function will not return any secondary architectures, even
+	if it would be possible to install the support for gcc 4.
+
+	\param architectures A pre-allocated array of size \a count where the names
+		of the secondary architectures will be stored. Can be \c NULL, if
+		\a count is 0.
+	\param count The size of the \a architectures array.
+	\return The actual number of secondary architectures. May be greater than
+		\a count, but at most \a count names will be written to
+		\a architectures.
+*/
+
+
+/*!
+	\fn status_t get_secondary_architectures(BStringList& _architectures)
+	\brief Returns the names of the system's secondary architectures.
+
+	This is a C++ interface similar to
+	get_secondary_architectures(const char**,size_t). Instead of returning the
+	architecture names in a pre-allocated array, it expects a BStringList.
+	Note that this version can fail when running out of memory.
+
+	\param _architectures Reference to a BStringList that will be set to the
+		list of names of secondary architectures. On error the list will be
+		emptied.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY A memory allocation failed.
+
+	\see get_secondary_architectures(const char**,size_t)
+*/
+
+
+/*!
+	\fn size_t get_architectures(const char** architectures,
+		size_t count)
+	\brief Returns the names of the system's primary and secondary
+		architectures.
+
+	This is a convenience function that returns both the primary architecture
+	as returned by get_primary_architecture() and the secondary architectures
+	as returned by get_secondary_architectures() in the provided array.
+
+	\param architectures A pre-allocated array of size \a count where the names
+		of the architectures will be stored. Can be \c NULL, if \a count is 0.
+	\param count The size of the \a architectures array.
+	\return The actual number of architectures. May be greater than \a count,
+		but at most \a count names will be written to \a architectures.
+*/
+
+
+/*!
+	\fn status_t get_architectures(BStringList& _architectures)
+	\brief Returns the names of the system's primary and secondary
+		architectures.
+
+	This is a C++ interface similar to
+	get_architectures(const char**,size_t). Instead of returning the
+	architecture names in a pre-allocated array, it expects a BStringList.
+	Note that this version can fail when running out of memory.
+
+	\param _architectures Reference to a BStringList that will be set to the
+		list of names of primary and secondary architectures. On error the list
+		will be emptied.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_MEMORY A memory allocation failed.
+
+	\see get_architectures(const char**,size_t)
+*/
+
+
+/*!
+	\fn const char* guess_architecture_for_path(const char* path)
+	\brief Returns the name of the architecture associated with the given path.
+
+	If the given path refers to an executable, library, or add-on, the function
+	determines for which architecture it has been built and returns that.
+	Otherwise it analyzes the path itself, checking whether it points to/into a
+	directory where files for a secondary architectures reside. If that proved
+	inconclusive the name of the primary architecture is returned.
+
+	\param path The path to be analyzed. It doesn't necessarily have to point to
+		an existing file or directory.
+	\return The name of the architecture determined from \a path.
+*/
