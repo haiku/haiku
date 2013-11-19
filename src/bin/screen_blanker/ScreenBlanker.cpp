@@ -274,11 +274,14 @@ ScreenBlanker::MessageReceived(BMessage* message)
 bool
 ScreenBlanker::QuitRequested()
 {
-	if (fSettings.LockEnable()
-		&& system_time() - fBlankTime > fSettings.PasswordTime()
-			- fSettings.BlankTime()) {
-		_ShowPasswordWindow();
-		return false;
+	if (fSettings.LockEnable()) {
+		bigtime_t minTime = fSettings.PasswordTime() - fSettings.BlankTime();
+		if (minTime == 0)
+			minTime = 5000000;
+		if (system_time() - fBlankTime > minTime) {
+			_ShowPasswordWindow();
+			return false;
+		}
 	}
 
 	_Shutdown();
