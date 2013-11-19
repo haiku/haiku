@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku Inc. All Rights Reserved.
+ * Copyright 2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PATH_FINDER_H
@@ -34,26 +34,26 @@ public:
 			status_t			FindPath(const char* architecture,
 									path_base_directory baseDirectory,
 									const char* subPath, uint32 flags,
-									BPath& path);
+									BPath& _path);
 			status_t			FindPath(path_base_directory baseDirectory,
 									const char* subPath, uint32 flags,
-									BPath& path);
+									BPath& _path);
 			status_t			FindPath(path_base_directory baseDirectory,
-									const char* subPath, BPath& path);
+									const char* subPath, BPath& _path);
 			status_t			FindPath(path_base_directory baseDirectory,
-									BPath& path);
+									BPath& _path);
 
 	static	status_t			FindPaths(const char* architecture,
 									path_base_directory baseDirectory,
 									const char* subPath, uint32 flags,
-							 		BStringList& paths);
+							 		BStringList& _paths);
 	static	status_t			FindPaths(path_base_directory baseDirectory,
 									const char* subPath, uint32 flags,
-							 		BStringList& paths);
+							 		BStringList& _paths);
 	static	status_t			FindPaths(path_base_directory baseDirectory,
-									const char* subPath, BStringList& paths);
+									const char* subPath, BStringList& _paths);
 	static	status_t			FindPaths(path_base_directory baseDirectory,
-									BStringList& paths);
+									BStringList& _paths);
 
 private:
 			status_t			_SetTo(const void* codePointer,
