@@ -11,11 +11,13 @@
 
 
 #include <View.h>
-
+#include <TextView.h>
+#include <string>
 #include "Device.h"
 
 
-class PropertyListPlain : public BView {
+
+class PropertyListPlain : public BTextView{
 public:
 					PropertyListPlain(const char* name);
 	virtual			~PropertyListPlain();
@@ -26,8 +28,6 @@ public:
 	virtual	void	MessageReceived(BMessage* message);
 	virtual	void	AttachedToWindow();
 	virtual	void	DetachedFromWindow();
-private:
-	BView*			rootView;
 };
 
 #endif /* PROPERTY_LIST_PLAIN_H */
