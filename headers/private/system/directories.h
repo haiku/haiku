@@ -38,6 +38,7 @@
 #define kSystemPackageLinksDirectory 		"/boot/system/package-links"
 #define kSystemPreferencesDirectory 	"/boot/system/preferences"
 #define kSystemServersDirectory 		"/boot/system/servers"
+#define kSystemSettingsDirectory 		"/boot/system/settings"
 
 #define kSystemEtcDirectory 			"/boot/system/settings/etc"
 #define kSystemTempDirectory 			"/boot/system/cache/tmp"
@@ -55,6 +56,7 @@
 #define kUserLibDirectory 				"/boot/home/config/lib"
 #define kUserPackagesDirectory	 		"/boot/home/config/packages"
 #define kUserSettingsDirectory 			"/boot/home/config/settings"
+#define kUserSettingsGlobalDirectory 	"/boot/home/config/settings/global"
 #define kUserNonpackagedDirectory		"/boot/home/config/non-packaged"
 #define kUserNonpackagedAddonsDirectory "/boot/home/config/non-packaged/add-ons"
 #define kUserNonpackagedBinDirectory 	"/boot/home/config/non-packaged/bin"

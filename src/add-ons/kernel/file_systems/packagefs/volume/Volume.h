@@ -21,6 +21,7 @@
 #include "NodeListener.h"
 #include "Package.h"
 #include "PackageLinksListener.h"
+#include "PackageSettings.h"
 #include "Query.h"
 
 
@@ -179,6 +180,7 @@ private:
 			::PackageFSRoot*	fPackageFSRoot;
 			::MountType			fMountType;
 			PackagesDirectory*	fPackagesDirectory;
+			PackageSettings		fPackageSettings;
 
 			struct {
 				dev_t			deviceID;

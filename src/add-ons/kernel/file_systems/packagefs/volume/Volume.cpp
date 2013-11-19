@@ -275,6 +275,7 @@ Volume::Volume(fs_volume* fsVolume)
 	fRootDirectory(NULL),
 	fPackageFSRoot(NULL),
 	fPackagesDirectory(NULL),
+	fPackageSettings(),
 	fNextNodeID(kRootDirectoryID + 1)
 {
 	rw_lock_init(&fLock, "packagefs volume");
@@ -448,6 +449,13 @@ Volume::Mount(const char* parameterString)
 	error = vfs_get_mount_point(fFSVolume->id, &fMountPoint.deviceID,
 		&fMountPoint.nodeID);
 	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// load package settings
+	error = fPackageSettings.Load(fMountPoint.deviceID, fMountPoint.nodeID,
+		fMountType);
+	// abort only in case of serious issues (memory shortage)
+	if (error == B_NO_MEMORY)
 		RETURN_ERROR(error);
 
 	// create package domain
@@ -1434,7 +1442,7 @@ Volume::_LoadPackage(const char* name, Package*& _package)
 	if (error != B_OK)
 		return error;
 
-	error = package->Load();
+	error = package->Load(fPackageSettings);
 	if (error != B_OK)
 		return error;
 

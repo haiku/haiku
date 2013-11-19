@@ -25,6 +25,8 @@
 
 #include <boot/platform.h>
 
+#include "PackageSettingsItem.h"
+
 
 #if 0
 #	define RETURN_ERROR(error) return (error);
@@ -43,6 +45,8 @@ using namespace BPackageKit;
 using namespace BPackageKit::BHPKG;
 using BPackageKit::BHPKG::BPrivate::PackageFileHeapReader;
 using BPackageKit::BHPKG::BPrivate::PackageReaderImpl;
+
+using PackageFS::PackageSettingsItem;
 
 
 namespace {
@@ -325,9 +329,13 @@ private:
 
 
 struct PackageLoaderContentHandler : BPackageContentHandler {
-	PackageLoaderContentHandler(PackageVolume* volume)
+	PackageLoaderContentHandler(PackageVolume* volume,
+		PackageSettingsItem* settingsItem)
 		:
 		fVolume(volume),
+		fSettingsItem(settingsItem),
+		fLastSettingsEntry(NULL),
+		fLastSettingsEntryEntry(NULL),
 		fErrorOccurred(false)
 	{
 	}
@@ -339,8 +347,11 @@ struct PackageLoaderContentHandler : BPackageContentHandler {
 
 	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
-		if (fErrorOccurred)
+		if (fErrorOccurred
+			|| (fLastSettingsEntry != NULL
+				&& fLastSettingsEntry->IsBlackListed())) {
 			return B_OK;
+		}
 
 		PackageDirectory* parentDir = NULL;
 		if (const BPackageEntry* parentEntry = entry->Parent()) {
@@ -349,6 +360,19 @@ struct PackageLoaderContentHandler : BPackageContentHandler {
 
 			parentDir = static_cast<PackageDirectory*>(
 				(PackageNode*)parentEntry->UserToken());
+		}
+
+		if (fSettingsItem != NULL
+			&& (parentDir == NULL
+				|| entry->Parent() == fLastSettingsEntryEntry)) {
+			PackageSettingsItem::Entry* settingsEntry
+				= fSettingsItem->FindEntry(fLastSettingsEntry, entry->Name());
+			if (settingsEntry != NULL) {
+				fLastSettingsEntry = settingsEntry;
+				fLastSettingsEntryEntry = entry;
+				if (fLastSettingsEntry->IsBlackListed())
+					return B_OK;
+			}
 		}
 
 		if (parentDir == NULL)
@@ -412,6 +436,11 @@ struct PackageLoaderContentHandler : BPackageContentHandler {
 
 	virtual status_t HandleEntryDone(BPackageEntry* entry)
 	{
+		if (entry == fLastSettingsEntryEntry) {
+			fLastSettingsEntryEntry = entry->Parent();
+			fLastSettingsEntry = fLastSettingsEntry->Parent();
+		}
+
 		return B_OK;
 	}
 
@@ -428,8 +457,11 @@ struct PackageLoaderContentHandler : BPackageContentHandler {
 	}
 
 private:
-	PackageVolume*	fVolume;
-	bool			fErrorOccurred;
+	PackageVolume*				fVolume;
+	const PackageSettingsItem*	fSettingsItem;
+	PackageSettingsItem::Entry*	fLastSettingsEntry;
+	const BPackageEntry*		fLastSettingsEntryEntry;
+	bool						fErrorOccurred;
 };
 
 
@@ -761,7 +793,8 @@ create_node(PackageNode* packageNode, ::Node*& _node)
 
 
 status_t
-packagefs_mount_file(int fd, ::Directory*& _mountedDirectory)
+packagefs_mount_file(int fd, ::Directory* systemDirectory,
+	::Directory*& _mountedDirectory)
 {
 	PackageLoaderErrorOutput errorOutput;
  	PackageReaderImpl packageReader(&errorOutput);
@@ -779,8 +812,13 @@ packagefs_mount_file(int fd, ::Directory*& _mountedDirectory)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
+	// load settings for the package
+	PackageSettingsItem* settings = PackageSettingsItem::Load(systemDirectory,
+		"haiku");
+	ObjectDeleter<PackageSettingsItem> settingsDeleter(settings);
+
 	// parse content -- this constructs the entry/node tree
-	PackageLoaderContentHandler handler(volume);
+	PackageLoaderContentHandler handler(volume, settings);
 	error = handler.Init();
 	if (error != B_OK)
 		RETURN_ERROR(error);

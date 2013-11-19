@@ -15,6 +15,7 @@ KernelMergeObject kernel_util.o :
 	ring_buffer.cpp
 	RadixBitmap.cpp
 	Random.cpp
+	StringHash.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS) -DUSING_LIBGCC
 ;

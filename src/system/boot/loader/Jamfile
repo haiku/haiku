@@ -79,6 +79,7 @@ BootStaticLibrary boot_loader :
 	list.cpp
 	ring_buffer.cpp
 	safemode_settings.cpp
+	StringHash.cpp
 
 	Referenceable.cpp
 
@@ -105,7 +106,7 @@ BootStaticLibrary boot_partitions :
 	;
 
 # Tell Jam where to find the utility sources
-SEARCH on [ FGristFiles kernel_cpp.cpp list.cpp ring_buffer.cpp ]
+SEARCH on [ FGristFiles kernel_cpp.cpp list.cpp ring_buffer.cpp StringHash.cpp ]
     = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]

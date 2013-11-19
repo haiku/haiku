@@ -445,7 +445,8 @@ BootVolume::SetTo(Directory* rootDirectory)
 
 	// the system is packaged -- mount the packagefs
 	Directory* packageRootDirectory;
-	status_t error = packagefs_mount_file(packageFD, packageRootDirectory);
+	status_t error = packagefs_mount_file(packageFD, fSystemDirectory,
+		packageRootDirectory);
 	close(packageFD);
 	if (error != B_OK) {
 		Unset();

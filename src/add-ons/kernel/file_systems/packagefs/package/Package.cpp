@@ -30,6 +30,7 @@
 #include "GlobalFactory.h"
 #include "PackageDirectory.h"
 #include "PackageFile.h"
+#include "PackageSettings.h"
 #include "PackageSymlink.h"
 #include "Version.h"
 #include "Volume.h"
@@ -93,9 +94,13 @@ private:
 
 
 struct Package::LoaderContentHandler : BPackageContentHandler {
-	LoaderContentHandler(Package* package)
+	LoaderContentHandler(Package* package, const PackageSettings& settings)
 		:
 		fPackage(package),
+		fSettings(settings),
+		fSettingsItem(NULL),
+		fLastSettingsEntry(NULL),
+		fLastSettingsEntryEntry(NULL),
 		fErrorOccurred(false)
 	{
 	}
@@ -107,8 +112,11 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 
 	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
-		if (fErrorOccurred)
+		if (fErrorOccurred
+			|| (fLastSettingsEntry != NULL
+				&& fLastSettingsEntry->IsBlackListed())) {
 			return B_OK;
+		}
 
 		PackageDirectory* parentDir = NULL;
 		if (entry->Parent() != NULL) {
@@ -116,6 +124,19 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 				(PackageNode*)entry->Parent()->UserToken());
 			if (parentDir == NULL)
 				RETURN_ERROR(B_BAD_DATA);
+		}
+
+		if (fSettingsItem != NULL
+			&& (parentDir == NULL
+				|| entry->Parent() == fLastSettingsEntryEntry)) {
+			PackageSettingsItem::Entry* settingsEntry
+				= fSettingsItem->FindEntry(fLastSettingsEntry, entry->Name());
+			if (settingsEntry != NULL) {
+				fLastSettingsEntry = settingsEntry;
+				fLastSettingsEntryEntry = entry;
+				if (fLastSettingsEntry->IsBlackListed())
+					return B_OK;
+			}
 		}
 
 		// get the file mode -- filter out write permissions
@@ -174,8 +195,11 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
 		BPackageEntryAttribute* attribute)
 	{
-		if (fErrorOccurred)
+		if (fErrorOccurred
+			|| (fLastSettingsEntry != NULL
+				&& fLastSettingsEntry->IsBlackListed())) {
 			return B_OK;
+		}
 
 		PackageNode* node = (PackageNode*)entry->UserToken();
 
@@ -197,6 +221,11 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 
 	virtual status_t HandleEntryDone(BPackageEntry* entry)
 	{
+		if (entry == fLastSettingsEntryEntry) {
+			fLastSettingsEntryEntry = entry->Parent();
+			fLastSettingsEntry = fLastSettingsEntry->Parent();
+		}
+
 		return B_OK;
 	}
 
@@ -210,6 +239,9 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 				if (!name.SetTo(value.string))
 					return B_NO_MEMORY;
 				fPackage->SetName(name);
+
+				fSettingsItem = fSettings.PackageItemFor(fPackage->Name());
+
 				return B_OK;
 			}
 
@@ -232,7 +264,6 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 					RETURN_ERROR(error);
 
 				fPackage->SetVersion(version);
-
 				break;
 			}
 
@@ -336,8 +367,12 @@ struct Package::LoaderContentHandler : BPackageContentHandler {
 	}
 
 private:
-	Package*	fPackage;
-	bool		fErrorOccurred;
+	Package*					fPackage;
+	const PackageSettings&		fSettings;
+	const PackageSettingsItem*	fSettingsItem;
+	PackageSettingsItem::Entry*	fLastSettingsEntry;
+	const BPackageEntry*		fLastSettingsEntryEntry;
+	bool						fErrorOccurred;
 };
 
 
@@ -805,9 +840,9 @@ Package::Init(const char* fileName)
 
 
 status_t
-Package::Load()
+Package::Load(const PackageSettings& settings)
 {
-	status_t error = _Load();
+	status_t error = _Load(settings);
 	if (error != B_OK)
 		return error;
 
@@ -947,7 +982,7 @@ Package::CreateDataReader(const PackageData& data,
 
 
 status_t
-Package::_Load()
+Package::_Load(const PackageSettings& settings)
 {
 	// open package file
 	int fd = Open();
@@ -965,7 +1000,7 @@ Package::_Load()
 			BHPKG::B_HPKG_READER_DONT_PRINT_VERSION_MISMATCH_MESSAGE);
 		if (error == B_OK) {
 			// parse content
-			LoaderContentHandler handler(this);
+			LoaderContentHandler handler(this, settings);
 			error = handler.Init();
 			if (error != B_OK)
 				RETURN_ERROR(error);

@@ -50,6 +50,7 @@ HAIKU_PACKAGE_FS_SOURCES =
 	PackageLinkSymlink.cpp
 	PackageNode.cpp
 	PackageNodeAttribute.cpp
+	PackageSettings.cpp
 	PackageSymlink.cpp
 	Resolvable.cpp
 	ResolvableFamily.cpp

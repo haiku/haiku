@@ -17,6 +17,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 
 BootStaticLibrary boot_packagefs :
 	packagefs.cpp
+	PackageSettingsItem.cpp
 
 	# package kit
 

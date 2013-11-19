@@ -28,6 +28,7 @@ using BPackageKit::BHPKG::BAbstractBufferedDataReader;
 
 
 class PackageLinkDirectory;
+class PackageSettings;
 class Volume;
 class Version;
 
@@ -40,7 +41,7 @@ public:
 								~Package();
 
 			status_t			Init(const char* fileName);
-			status_t			Load();
+			status_t			Load(const PackageSettings& settings);
 
 			::Volume*			Volume() const		{ return fVolume; }
 			const String&		FileName() const	{ return fFileName; }
@@ -106,7 +107,7 @@ private:
 			struct CachingPackageReader;
 
 private:
-			status_t			_Load();
+			status_t			_Load(const PackageSettings& settings);
 			bool				_InitVersionedName();
 
 private:
