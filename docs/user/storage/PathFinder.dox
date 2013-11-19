@@ -1,0 +1,423 @@
+/*
+ * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *
+ * Corresponds to:
+ *		headers/os/storage/PathFinder.h	 hrev46390
+ *		src/kits/storage/PathFinder.cpp	 hrev46390
+ */
+
+
+/*!
+	\file PathFinder.h
+	\ingroup storage
+	\ingroup libbe
+	\brief Provides the BPathFinder class interface.
+*/
+
+
+/*!
+	\class BPathFinder
+	\ingroup storage
+	\ingroup libbe
+	\brief Helper class to retrieve paths in the file system layout.
+
+	The BPathFinder provides two sets of methods for retrieving paths:
+	FindPath() for getting a single path in an installation location specified
+	via a constructor or a SetTo() invocation, and the static FindPaths() for
+	getting a list of paths for all installation locations.
+*/
+
+
+/*!
+	\fn BPathFinder::BPathFinder(const void* codePointer,
+		const char* dependency)
+	\brief Creates an object referring to an installation location based on a
+		loaded image file.
+
+	When initialized with this constructor a FindPath() method called afterward
+	determines the path of the image (i.e. executable, library, or add-on) file
+	associated with \a codePointer, a pointer to a location in the code or
+	static data of an image loaded in the caller's team. Based on that path the
+	path constant passed to FindPath() will be evaluated. In most cases that
+	means first determining the path of the installation location from the path.
+
+	If \a dependency is specified, instead of determining the installation
+	location path from the image path, the installation location path of the
+	dependency \a dependency of the package containing the image file is used.
+
+	If the initialization fails, e.g. due to insufficient memory or invalid
+	arguments, subsequent calls to FindPath() will return an error.
+
+	\param codePointer A pointer to code or static data belonging to the image
+		based on which FindPath() shall compute the path. The special value
+		\c B_APP_IMAGE_SYMBOL (the default) can be used to refer to the program
+		image, and \c B_CURRENT_IMAGE_SYMBOL for the caller's image.
+	\param dependency The name of the package's "requires" entry to be used for
+		resolving the installation location. Can be \c NULL (the default).
+*/
+
+
+/*!
+	\fn BPathFinder::BPathFinder(const char* path, const char* dependency)
+	\brief Creates an object referring to an installation location based on a
+		given path.
+
+	When initialized with this constructor a FindPath() method called afterward
+	evaluates the path constant passed to it based on \a path. In most cases
+	that means first determining the path of the installation location from the
+	given path.
+
+	If \a dependency is specified, instead of determining the installation
+	location path from the given path, the installation location path of the
+	dependency \a dependency of the package containing the file referred to by
+	\a path is used.
+
+	If the initialization fails, e.g. due to insufficient memory or invalid
+	arguments, subsequent calls to FindPath() will return an error.
+
+	\param path A path based on which FindPath() shall compute the path.
+	\param dependency The name of the package's "requires" entry to be used for
+		resolving the installation location. Can be \c NULL.
+*/
+
+
+/*!
+	\fn BPathFinder::BPathFinder(const entry_ref& ref, const char* dependency)
+	\brief Creates an object referring to an installation location based on a
+		given entry_ref.
+
+	The constructor converts the given entry_ref \a ref to a path and then
+	initializes the object like
+	BPathFinder::BPathFinder(const char*, const char*).
+
+	\param ref A reference to be resolved to a path based on which FindPath()
+		shall compute the path.
+	\param dependency The name of the package's "requires" entry to be used for
+		resolving the installation location. Can be \c NULL.
+
+	\see BPathFinder::BPathFinder(const char*, const char*)
+*/
+
+
+/*!
+	\fn status_t BPathFinder::SetTo(const void* codePointer,
+		const char* dependency)
+	\brief Reinitializes the object to refer to an installation location based
+		on a loaded image file.
+
+	When reinitialized with this method a FindPath() method called afterward
+	determines the path of the image (i.e. executable, library, or add-on) file
+	associated with \a codePointer, a pointer to a location in the code or
+	static data of an image loaded in the caller's team. Based on that path the
+	path constant passed to FindPath() will be evaluated. In most cases that
+	means first determining the path of the installation location from the path.
+
+	If \a dependency is specified, instead of determining the installation
+	location path from the image path, the installation location path of the
+	dependency \a dependency of the package containing the image file is used.
+
+	If the initialization fails, e.g. due to insufficient memory or invalid
+	arguments, this method and subsequent calls to FindPath() will return an
+	error.
+
+	\param codePointer A pointer to code or static data belonging to the image
+		based on which FindPath() shall compute the path. The special value
+		\c B_APP_IMAGE_SYMBOL (the default) can be used to refer to the program
+		image, and \c B_CURRENT_IMAGE_SYMBOL for the caller's image.
+	\param dependency The name of the package's "requires" entry to be used for
+		resolving the installation location. Can be \c NULL (the default).
+	\return A status code.
+	\retval B_OK Everything went fine.
+*/
+
+
+/*!
+	\fn status_t BPathFinder::SetTo(const char* path, const char* dependency)
+	\brief Reinitializes the object to refer to an installation location based
+		on a given path.
+
+	When reinitialized with this method a FindPath() method called afterward
+	evaluates the path constant passed to it based on \a path. In most cases
+	that means first determining the path of the installation location from the
+	given path.
+
+	If \a dependency is specified, instead of determining the installation
+	location path from the given path, the installation location path of the
+	dependency \a dependency of the package containing the file referred to by
+	\a path is used.
+
+	If the initialization fails, e.g. due to insufficient memory or invalid
+	arguments, this method and subsequent calls to FindPath() will return an
+	error.
+
+	\param path A path based on which FindPath() shall compute the path.
+	\param dependency The name of the package's "requires" entry to be used for
+		resolving the installation location. Can be \c NULL.
+	\return A status code.
+	\retval B_OK Everything went fine.
+*/
+
+
+/*!
+	\fn status_t BPathFinder::SetTo(const entry_ref& ref,
+		const char* dependency)
+	\brief Reinitializes the object to refer to an installation location based
+		on a given entry_ref.
+
+	This method converts the given entry_ref \a ref to a path and then calls
+	calls BPathFinder::SetTo(const char*, const char*).
+
+	\param ref A reference to be resolved to a path based on which FindPath()
+		shall compute the path.
+	\param dependency The name of the package's "requires" entry to be used for
+		resolving the installation location. Can be \c NULL.
+
+	\see status_t BPathFinder::SetTo(const char*, const char*)
+*/
+
+
+/*!
+	\fn status_t BPathFinder::FindPath(const char* architecture,
+		path_base_directory baseDirectory, const char* subPath, uint32 flags,
+		BPath& _path)
+	\brief Retrieves a path in the file system layout based.
+
+	Depending on how the object was initialized this method starts with a path
+	(from an image file or as given) and based on it evaluates \a baseDirectory.
+	In most cases that means first determining the path of the installation
+	location from the path, then appending the relative path corresponding to
+	the given \a baseDirectory constant, and finally appending \a subPath, if
+	given.
+
+	If a dependency string was passed to the previous constructor or SetTo()
+	method, instead of determining the installation location path from the
+	initial path, the installation location path of the dependency of the
+	package containing the file the initial path refers to is used.
+
+	If \a baseDirectory specifies a path that is architecture dependent,
+	\a architecture is used for constructing the path. If \a architecture is
+	\c NULL, the architecture associated with the initial path (as returned by
+	guess_architecture_for_path()) is used. Note that if an image was specified,
+	this is the same as the caller's architecture (as returned by
+	get_architecture()).
+
+	If \c B_FIND_PATH_IMAGE_PATH or \c B_FIND_PATH_PACKAGE_PATH are
+	specified, \a dependency and \a subPath are ignored. In the former case,
+	which is only valid, if an image was specified for initialization, the
+	path of the image file is returned. In the latter case the path of the
+	package containing the file the initial path refers to, if any.
+
+	\param architecture The name of the architecture to be used for resolving
+		architecture dependent paths. Can be \c NULL, in which case the
+		architecture associated with the initial path is used.
+	\param baseDirectory Constant indicating which path to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param flags Bitwise OR of any of the following flags:
+		- \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't exist,
+			create it as a directory (including all missing ancestors).
+		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's parent
+			doesn't exist, create the parent directory (including all missing
+			ancestors).
+		- \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
+			fail with \c B_ENTRY_NOT_FOUND.
+	\param _path The variable to be set to the resulting path on success.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+		and the image file doesn't belong to a package, or \c dependency was
+		specified, but isn't a "requires" entry of the package, or
+		\c B_FIND_PATH_EXISTING_ONLY was specified and the resulting path
+		doesn't exist.
+*/
+
+
+/*!
+	\fn status_t BPathFinder::FindPath(path_base_directory baseDirectory,
+		const char* subPath, uint32 flags, BPath& _path)
+	\brief Retrieves a path in the file system layout based.
+
+	Equivalent to a call to BPathFinder::FindPath(const char*,
+	path_base_directory, const char*, uint32, BPath&) with a \c NULL
+	architecture.
+
+	\param baseDirectory Constant indicating which path to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param flags Bitwise OR of any of the following flags:
+		- \c B_FIND_PATH_CREATE_DIRECTORY: If the resulting path doesn't exist,
+			create it as a directory (including all missing ancestors).
+		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If the resulting path's parent
+			doesn't exist, create the parent directory (including all missing
+			ancestors).
+		- \c B_FIND_PATH_EXISTING_ONLY: If the resulting path doesn't exist,
+			fail with \c B_ENTRY_NOT_FOUND.
+	\param _path The variable to be set to the resulting path on success.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+		and the image file doesn't belong to a package, or \c dependency was
+		specified, but isn't a "requires" entry of the package, or
+		\c B_FIND_PATH_EXISTING_ONLY was specified and the resulting path
+		doesn't exist.
+*/
+
+
+/*!
+	\fn status_t BPathFinder::FindPath(path_base_directory baseDirectory,
+		const char* subPath, BPath& _path)
+	\brief Retrieves a path in the file system layout based.
+
+	Equivalent to a call to BPathFinder::FindPath(const char*,
+	path_base_directory, const char*, uint32, BPath&) with a \c NULL
+	architecture and 0 flags.
+
+	\param baseDirectory Constant indicating which path to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param _path The variable to be set to the resulting path on success.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+		and the image file doesn't belong to a package, or \c dependency was
+		specified, but isn't a "requires" entry of the package.
+*/
+
+
+/*!
+	\fn status_t BPathFinder::FindPath(path_base_directory baseDirectory,
+		BPath& _path)
+	\brief Retrieves a path in the file system layout based.
+
+	Equivalent to a call to BPathFinder::FindPath(const char*,
+	path_base_directory, const char*, uint32, BPath&) with a \c NULL
+	architecture, 0 flags, and \c NULL subpath.
+
+	\param baseDirectory Constant indicating which path to retrieve.
+	\param _path The variable to be set to the resulting path on success.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		path doesn't exist. E.g. \c B_FIND_PATH_PACKAGE_PATH was specified
+		and the image file doesn't belong to a package, or \c dependency was
+		specified, but isn't a "requires" entry of the package.
+*/
+
+
+/*!
+	\fn status_t BPathFinder::FindPaths(const char* architecture,
+		path_base_directory baseDirectory, const char* subPath, uint32 flags,
+		BStringList& _paths)
+	\brief Retrieves a list of paths in the file system layout.
+
+	For each installation location -- in the order most specific to most
+	generic, non-packaged before packaged -- the function evaluates
+	\a baseDirectory to a path and appends \a subPath, if given.
+
+	If \a baseDirectory specifies a path that is architecture dependent,
+	\a architecture is used for constructing each path. If \a architecture is
+	\c NULL, the caller's architecture (as returned by get_architecture()) is
+	used.
+
+	\c B_FIND_PATH_PACKAGE_PATH and \c B_FIND_PATH_IMAGE_PATH are not
+	valid arguments for this function.
+
+	\param architecture The name of the architecture to be used for resolving
+		architecture dependent paths. Can be \c NULL, in which case the caller's
+		architecture is used.
+	\param baseDirectory Constant indicating which paths to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param flags Bitwise OR of any of the following flags:
+		- \c B_FIND_PATH_CREATE_DIRECTORY: If a resulting path doesn't exist,
+			create it as a directory (including all missing ancestors).
+		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If a resulting path's parent
+			doesn't exist, create the parent directory (including all missing
+			ancestors).
+		- \c B_FIND_PATH_EXISTING_ONLY: If a resulting path doesn't exist, skip
+			it. If none of the paths exist, fail with \c B_ENTRY_NOT_FOUND.
+	\param _paths The BStringList variable where the retrieved paths shall be
+		stored. The list is emptied before adding the paths. It is also emptied
+		on error.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was specified and
+		none of the resulting paths do exist.
+*/
+
+
+/*!
+	\fn status_t BPathFinder::FindPaths(path_base_directory baseDirectory,
+		const char* subPath, uint32 flags, BStringList& _paths)
+	\brief Retrieves a list of paths in the file system layout.
+
+	Equivalent to a call to BPathFinder::FindPaths(const char*,
+	path_base_directory, const char*, uint32, BStringList&) with a \c NULL
+	architecture.
+
+	\param baseDirectory Constant indicating which paths to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param flags Bitwise OR of any of the following flags:
+		- \c B_FIND_PATH_CREATE_DIRECTORY: If a resulting path doesn't exist,
+			create it as a directory (including all missing ancestors).
+		- \c B_FIND_PATH_CREATE_PARENT_DIRECTORY: If a resulting path's parent
+			doesn't exist, create the parent directory (including all missing
+			ancestors).
+		- \c B_FIND_PATH_EXISTING_ONLY: If a resulting path doesn't exist, skip
+			it. If none of the paths exist, fail with \c B_ENTRY_NOT_FOUND.
+	\param _paths The BStringList variable where the retrieved paths shall be
+		stored. The list is emptied before adding the paths. It is also emptied
+		on error.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was specified and
+		none of the resulting paths do exist.
+*/
+
+
+/*!
+	\fn status_t BPathFinder::FindPaths(path_base_directory baseDirectory,
+		const char* subPath, BStringList& _paths)
+	\brief Retrieves a list of paths in the file system layout.
+
+	Equivalent to a call to BPathFinder::FindPaths(const char*,
+	path_base_directory, const char*, uint32, BStringList&) with a \c NULL
+	architecture and 0 flags.
+
+	\param baseDirectory Constant indicating which paths to retrieve.
+	\param subPath Relative subpath that shall be appended. Can be \c NULL.
+	\param _paths The BStringList variable where the retrieved paths shall be
+		stored. The list is emptied before adding the paths. It is also emptied
+		on error.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was specified and
+		none of the resulting paths do exist.
+*/
+
+
+/*!
+	\fn status_t BPathFinder::FindPaths(path_base_directory baseDirectory,
+		BStringList& _paths)
+	\brief Retrieves a list of paths in the file system layout.
+
+	Equivalent to a call to BPathFinder::FindPaths(const char*,
+	path_base_directory, const char*, uint32, BStringList&) with a \c NULL
+	architecture, 0 flags, and \c NULL subpath.
+
+	\param baseDirectory Constant indicating which paths to retrieve.
+	\param _paths The BStringList variable where the retrieved paths shall be
+		stored. The list is emptied before adding the paths. It is also emptied
+		on error.
+	\return A status code.
+	\retval B_OK Everything went fine.
+	\retval B_ENTRY_NOT_FOUND A file system entry required for retrieving the
+		paths doesn't exist. E.g. \c B_FIND_PATH_EXISTING_ONLY was specified and
+		none of the resulting paths do exist.
+*/
