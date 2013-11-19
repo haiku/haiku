@@ -801,38 +801,6 @@ load_driver_settings(const char *driverName)
 }
 
 
-/** Loads a driver settings file using the full path, instead of
- *	only defining the leaf name (as load_driver_settings() does).
- *	I am not sure if this function is really necessary - I would
- *	probably prefer something like a search order (if it's not
- *	an absolute path):
- *		~/config/settings/kernel/driver
- *		current directory
- *	That would render this function useless.
- */
-
-#if 0
-void *
-load_driver_settings_from_path(const char *path)
-{
-	settings_handle *handle;
-	int file;
-
-	if (path == NULL)
-		return NULL;
-
-	file = open(path, O_RDONLY);
-	if (file < B_OK)
-		return NULL;
-
-	handle = load_driver_settings_from_file(file);
-
-	close(file);
-	return (void *)handle;
-}
-#endif
-
-
 /*!
 	Returns a new driver_settings handle that has the parsed contents
 	of the passed string.
