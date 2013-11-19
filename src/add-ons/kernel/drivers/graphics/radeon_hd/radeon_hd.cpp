@@ -644,9 +644,9 @@ radeon_hd_init(radeon_info &info)
 	info.shared_info->dceMajor = info.dceMajor;
 	info.shared_info->dceMinor = info.dceMinor;
 	info.shared_info->registers_area = info.registers_area;
-	strncpy(info.shared_info->deviceName,
+	strlcpy(info.shared_info->deviceName,
 		info.deviceName, MAX_NAME_LENGTH);
-	strncpy(info.shared_info->chipsetName,
+	strlcpy(info.shared_info->chipsetName,
 		radeon_chip_name[info.chipsetID], MAX_NAME_LENGTH);
 
 	// *** AtomBIOS mapping
