@@ -409,8 +409,10 @@ new_settings(char *buffer, const char *driverName)
 	handle->text = buffer;
 
 #ifdef _KERNEL_MODE
-	handle->ref_count = 1;
-	strlcpy(handle->name, driverName, sizeof(handle->name));
+	if (driverName != NULL) {
+		handle->ref_count = 1;
+		strlcpy(handle->name, driverName, sizeof(handle->name));
+	}
 #endif
 
 	if (parse_settings(handle) == B_OK)
@@ -798,6 +800,13 @@ load_driver_settings(const char *driverName)
 
 	close(file);
 	return (void *)handle;
+}
+
+
+void*
+load_driver_settings_file(int fd)
+{
+	return load_driver_settings_from_file(fd, NULL);
 }
 
 

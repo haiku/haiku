@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 extern void			*load_driver_settings(const char *driverName);
+extern void			*load_driver_settings_file(int fd);
 extern status_t		unload_driver_settings(void *handle);
 
 extern void			*parse_driver_settings_string(const char *settingsString);
