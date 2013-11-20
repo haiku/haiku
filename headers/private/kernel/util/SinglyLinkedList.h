@@ -8,6 +8,9 @@
 #define KERNEL_UTIL_SINGLY_LINKED_LIST_H
 
 
+#include <SupportDefs.h>
+
+
 #ifdef __cplusplus
 
 // SinglyLinkedListLink
