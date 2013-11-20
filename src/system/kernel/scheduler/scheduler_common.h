@@ -40,11 +40,12 @@ const bigtime_t kMinimalWaitTime = kThreadQuantum / 4;
 
 const bigtime_t kCacheExpire = 100000;
 
+const int kLowLoad = kMaxLoad * 20 / 100;
 const int kTargetLoad = kMaxLoad * 55 / 100;
 const int kHighLoad = kMaxLoad * 70 / 100;
 const int kVeryHighLoad = (kMaxLoad + kHighLoad) / 2;
+
 const int kLoadDifference = kMaxLoad * 20 / 100;
-const int kLowLoad = kLoadDifference / 2;
 
 extern bool gSingleCore;
 

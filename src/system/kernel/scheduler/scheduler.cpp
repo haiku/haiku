@@ -1508,7 +1508,7 @@ _scheduler_init()
 			return result;
 	}
 
-#if 1
+#if 0
 	scheduler_set_operation_mode(SCHEDULER_MODE_LOW_LATENCY);
 #else
 	scheduler_set_operation_mode(SCHEDULER_MODE_POWER_SAVING);

@@ -13,7 +13,6 @@
 using namespace Scheduler;
 
 
-static bigtime_t sDisableSmallTaskPacking;
 static int32 sSmallTaskCore;
 
 
@@ -32,40 +31,36 @@ has_cache_expired(Thread* thread)
 }
 
 
-static inline bool
-is_small_task_packing_enabled(void)
-{
-	if (sDisableSmallTaskPacking == -1)
-		return false;
-	return sDisableSmallTaskPacking < system_time();
-}
-
-
-static inline void
-disable_small_task_packing(void)
-{
-	ASSERT(!gSingleCore);
-
-	ASSERT(is_small_task_packing_enabled());
-	ASSERT(sSmallTaskCore == gCPUToCore[smp_get_current_cpu()]);
-
-	sDisableSmallTaskPacking = system_time() + kThreadQuantum * 100;
-	sSmallTaskCore = -1;
-}
-
-
-static inline bool
-is_task_small(Thread* thread)
-{
-	return thread->scheduler_data->load <= 200;
-}
-
-
 static void
 switch_to_mode(void)
 {
-	sDisableSmallTaskPacking = -1;
 	sSmallTaskCore = -1;
+}
+
+
+static bool
+try_small_task_packing(Thread* thread)
+{
+	int32 core = sSmallTaskCore;
+	return (core == -1 && gCoreLoadHeap->PeekMaximum() != NULL)
+		|| (core != -1
+			&& gCoreEntries[core].fLoad + thread->scheduler_data->load
+				< kHighLoad);
+}
+
+
+static int32
+choose_small_task_core(void)
+{
+	CoreEntry* candidate = gCoreLoadHeap->PeekMaximum();
+	if (candidate == NULL)
+		return sSmallTaskCore;
+
+	int32 core = candidate->fCoreID;
+	int32 smallTaskCore = atomic_test_and_set(&sSmallTaskCore, core, -1);
+	if (smallTaskCore == -1)
+		return core;
+	return smallTaskCore;
 }
 
 
@@ -74,12 +69,9 @@ choose_core(Thread* thread)
 {
 	CoreEntry* entry;
 
-	if (is_small_task_packing_enabled() && is_task_small(thread)
-		&& gCoreLoadHeap->PeekMaximum() != NULL) {
+	if (try_small_task_packing(thread)) {
 		// try to pack all threads on one core
-		if (sSmallTaskCore < 0)
-			sSmallTaskCore = gCoreLoadHeap->PeekMaximum()->fCoreID;
-		entry = &gCoreEntries[sSmallTaskCore];
+		entry = &gCoreEntries[choose_small_task_core()];
 	} else if (gCoreLoadHeap->PeekMinimum() != NULL) {
 		// run immediately on already woken core
 		entry = gCoreLoadHeap->PeekMinimum();
@@ -117,34 +109,28 @@ should_rebalance(Thread* thread)
 	int32 core = schedulerThreadData->previous_core;
 	CoreEntry* coreEntry = &gCoreEntries[core];
 
-	// If the thread produces more than 50% of the load, leave it here. In
-	// such situation it is better to move other threads away.
-	// Unless we are trying to pack small tasks here, in such case get rid
-	// of CPU hungry thread and continue packing.
-	if (schedulerThreadData->load >= coreEntry->fLoad / 2)
-		return is_small_task_packing_enabled() && sSmallTaskCore == core;
-
-	// All cores try to give us small tasks, check whether we have enough.
-	if (is_small_task_packing_enabled() && sSmallTaskCore == core) {
-		if (coreEntry->fLoad > kHighLoad) {
-			if (!is_task_small(thread))
+	if (coreEntry->fLoad > kHighLoad) {
+		if (sSmallTaskCore == core) {
+			SpinLocker coreLocker(gCoreHeapsLock);
+			CoreEntry* other = gCoreLoadHeap->PeekMaximum();
+				
+			if (other == NULL)
+				sSmallTaskCore = -1;
+			else if (coreEntry->fLoad - schedulerThreadData->load < kHighLoad)
 				return true;
-		} else if (coreEntry->fLoad > kVeryHighLoad)
-			disable_small_task_packing();
+			else 
+				sSmallTaskCore = other->fCoreID;
+			return coreEntry->fLoad > kVeryHighLoad;
+		}
+	} else if (coreEntry->fLoad < kHighLoad) {
+		int32 newCore = choose_small_task_core();
+		return newCore != core;
 	}
 
-	// Try small task packing.
-	if (is_small_task_packing_enabled() && is_task_small(thread))
-		return sSmallTaskCore != core;
-
-	// No cpu bound threads - the situation is quite good. Make sure it
-	// won't get much worse...
-	SpinLocker coreLocker(gCoreHeapsLock);
-
-	CoreEntry* other = gCoreLoadHeap->PeekMinimum();
+	CoreEntry* other = gCoreHighLoadHeap->PeekMinimum();
 	if (other == NULL)
-		other = gCoreHighLoadHeap->PeekMinimum();
-	return coreEntry->fLoad - other->fLoad >= kLoadDifference;
+		return false;
+	return coreEntry->fLoad - other->fLoad >= kLoadDifference / 2;
 }
 
 
@@ -175,12 +161,12 @@ pack_irqs(void)
 static void
 rebalance_irqs(bool idle)
 {
-	if (idle && !is_small_task_packing_enabled() && sSmallTaskCore != -1) {
+	if (idle && sSmallTaskCore != -1) {
 		pack_irqs();
 		return;
 	}
 
-	if (idle)
+	if (idle || sSmallTaskCore != -1)
 		return;
 
 	cpu_ent* cpu = get_cpu_struct();
