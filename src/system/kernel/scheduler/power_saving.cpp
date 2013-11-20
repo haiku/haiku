@@ -110,8 +110,8 @@ should_rebalance(Thread* thread)
 	CoreEntry* coreEntry = &gCoreEntries[core];
 
 	if (coreEntry->fLoad > kHighLoad) {
+		SpinLocker coreLocker(gCoreHeapsLock);
 		if (sSmallTaskCore == core) {
-			SpinLocker coreLocker(gCoreHeapsLock);
 			CoreEntry* other = gCoreLoadHeap->PeekMaximum();
 				
 			if (other == NULL)
@@ -122,15 +122,14 @@ should_rebalance(Thread* thread)
 				sSmallTaskCore = other->fCoreID;
 			return coreEntry->fLoad > kVeryHighLoad;
 		}
-	} else if (coreEntry->fLoad < kHighLoad) {
-		int32 newCore = choose_small_task_core();
-		return newCore != core;
+
+		CoreEntry* other = gCoreHighLoadHeap->PeekMinimum();
+		if (other == NULL)
+			other = gCoreHighLoadHeap->PeekMaximum();
+		return coreEntry->fLoad - other->fLoad >= kLoadDifference / 2;
 	}
 
-	CoreEntry* other = gCoreHighLoadHeap->PeekMinimum();
-	if (other == NULL)
-		return false;
-	return coreEntry->fLoad - other->fLoad >= kLoadDifference / 2;
+	return choose_small_task_core() != core;
 }
 
 
