@@ -49,6 +49,11 @@ enum be_task_flags {
 	B_MIDI_PROCESSING			= 0x800
 };
 
+enum scheduler_mode {
+	SCHEDULER_MODE_LOW_LATENCY,
+	SCHEDULER_MODE_POWER_SAVING,
+};
+
 #if defined(__cplusplus)
 extern "C" {
 
@@ -58,6 +63,9 @@ int32 suggest_thread_priority(uint32 task_flags = B_DEFAULT_MEDIA_PRIORITY,
 bigtime_t estimate_max_scheduling_latency(thread_id th = -1);
 	/* default is current thread */
 
+status_t set_scheduler_mode(int32 mode);
+int32 get_scheduler_mode(void);
+
 }
 #else
 
@@ -66,6 +74,9 @@ int32 suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter,
 
 bigtime_t estimate_max_scheduling_latency(thread_id th);
 	/* default is current thread */
+
+status_t set_scheduler_mode(int32 mode);
+int32 get_scheduler_mode(void);
 
 #endif
 

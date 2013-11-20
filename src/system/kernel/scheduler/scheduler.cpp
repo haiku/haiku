@@ -43,8 +43,9 @@ static bool sSchedulerEnabled;
 SchedulerListenerList gSchedulerListeners;
 spinlock gSchedulerListenersLock = B_SPINLOCK_INITIALIZER;
 
-static struct scheduler_mode_operations* sCurrentMode;
-static struct scheduler_mode_operations* sSchedulerModes[] = {
+static scheduler_mode sCurrentModeID;
+static scheduler_mode_operations* sCurrentMode;
+static scheduler_mode_operations* sSchedulerModes[] = {
 	&gSchedulerLowLatencyMode,
 	&gSchedulerPowerSavingMode,
 };
@@ -1353,6 +1354,7 @@ scheduler_set_operation_mode(scheduler_mode mode)
 	for (int32_t i = 0; i < smp_get_num_cpus(); i++)
 		acquire_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
 
+	sCurrentModeID = mode;
 	sCurrentMode = sSchedulerModes[mode];
 	sCurrentMode->switch_to_mode();
 
@@ -1539,11 +1541,7 @@ _scheduler_init()
 			return result;
 	}
 
-#if 0
 	scheduler_set_operation_mode(SCHEDULER_MODE_LOW_LATENCY);
-#else
-	scheduler_set_operation_mode(SCHEDULER_MODE_POWER_SAVING);
-#endif
 
 	add_debugger_command_etc("run_queue", &dump_run_queue,
 		"List threads in run queue", "\nLists threads in run queue", 0);
@@ -1663,3 +1661,16 @@ _user_estimate_max_scheduling_latency(thread_id id)
 	return 2 * kMinThreadQuantum;
 }
 
+
+status_t
+_user_set_scheduler_mode(int32 mode)
+{
+	return scheduler_set_operation_mode(static_cast<scheduler_mode>(mode));
+}
+
+
+int32
+_user_get_scheduler_mode(void)
+{
+	return sCurrentModeID;
+}

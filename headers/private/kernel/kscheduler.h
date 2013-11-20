@@ -18,12 +18,10 @@ struct scheduling_analysis;
 struct SchedulerListener;
 
 
-typedef enum scheduler_mode {
+enum scheduler_mode {
 	SCHEDULER_MODE_LOW_LATENCY,
 	SCHEDULER_MODE_POWER_SAVING,
-	// ...
-	SCHEDULER_MODE_COUNT
-} scheduler_mode;
+};
 
 
 #ifdef __cplusplus
@@ -94,6 +92,9 @@ void scheduler_enable_scheduling(void);
 bigtime_t _user_estimate_max_scheduling_latency(thread_id thread);
 status_t _user_analyze_scheduling(bigtime_t from, bigtime_t until, void* buffer,
 	size_t size, struct scheduling_analysis* analysis);
+
+status_t _user_set_scheduler_mode(int32 mode);
+int32 _user_get_scheduler_mode(void);
 
 #ifdef __cplusplus
 }

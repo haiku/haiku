@@ -192,6 +192,9 @@ extern status_t		_kern_unblock_threads(thread_id* threads, uint32 count,
 
 extern bigtime_t	_kern_estimate_max_scheduling_latency(thread_id thread);
 
+extern status_t		_kern_set_scheduler_mode(int32 mode);
+extern int32		_kern_get_scheduler_mode(void);
+
 // user/group functions
 extern gid_t		_kern_getgid(bool effective);
 extern uid_t		_kern_getuid(bool effective);

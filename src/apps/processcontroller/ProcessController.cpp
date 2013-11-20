@@ -42,6 +42,7 @@
 #include <Screen.h>
 #include <TextView.h>
 
+#include <scheduler.h>
 #include <syscalls.h>
 
 #include "AutoIcon.h"
@@ -441,6 +442,14 @@ ProcessController::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case 'Schd':
+		{
+			int32 mode;
+			if (message->FindInt32 ("mode", &mode) == B_OK)
+				set_scheduler_mode(mode);
+			break;
+		}
+
 		case B_ABOUT_REQUESTED:
 			AboutRequested();
 			break;
@@ -785,6 +794,21 @@ thread_popup(void *arg)
 		}
 		addtopbottom (new BSeparatorItem ());
 	}
+
+	// Scheduler modes
+	static const char* schedulerModes[] = { "Low Latency", "Power Saving" };
+	unsigned int modesCount = sizeof(schedulerModes) / sizeof(const char*);
+	int32 currentMode = get_scheduler_mode();
+	for (unsigned int i = 0; i < modesCount; i++) {
+		BMessage* m = new BMessage('Schd');
+		m->AddInt32("mode", i);
+		item = new BMenuItem(B_TRANSLATE(schedulerModes[i]), m);
+		if ((uint32)currentMode == i)
+			item->SetMarked(true);
+		item->SetTarget(gPCView);
+		addtopbottom(item);
+	}
+	addtopbottom(new BSeparatorItem());
 
 	if (!be_roster->IsRunning(kTrackerSig)) {
 		item = new IconMenuItem(gPCView->fTrackerIcon,

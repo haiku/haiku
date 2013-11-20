@@ -60,3 +60,17 @@ estimate_max_scheduling_latency(thread_id thread)
 	return _kern_estimate_max_scheduling_latency(thread);
 }
 
+
+status_t
+set_scheduler_mode(int32 mode)
+{
+	return _kern_set_scheduler_mode(mode);
+}
+
+
+int32
+get_scheduler_mode(void)
+{
+	return _kern_get_scheduler_mode();
+}
+
