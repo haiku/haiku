@@ -8,15 +8,14 @@
 
 #include "DebugSupport.h"
 #include "PackageNode.h"
-#include "Utils.h"
 
 
 UnpackingAttributeDirectoryCookie::UnpackingAttributeDirectoryCookie(
 	PackageNode* packageNode)
 	:
+	AutoPackageAttributeDirectoryCookie(),
 	fPackageNode(packageNode),
-	fAttribute(NULL),
-	fState(AUTO_PACKAGE_ATTRIBUTE_ENUM_FIRST)
+	fAttribute(NULL)
 {
 	if (fPackageNode != NULL) {
 		fPackageNode->AcquireReference();
@@ -47,74 +46,26 @@ UnpackingAttributeDirectoryCookie::Open(PackageNode* packageNode,
 
 
 status_t
-UnpackingAttributeDirectoryCookie::Read(dev_t volumeID, ino_t nodeID,
-	struct dirent* buffer, size_t bufferSize, uint32* _count)
-{
-	uint32 maxCount = *_count;
-	uint32 count = 0;
-
-	dirent* previousEntry = NULL;
-
-	while (fState < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT || fAttribute != NULL) {
-		// don't read more entries than requested
-		if (count >= maxCount)
-			break;
-
-		// align the buffer for subsequent entries
-		if (count > 0) {
-			addr_t offset = (addr_t)buffer % 8;
-			if (offset > 0) {
-				offset = 8 - offset;
-				if (bufferSize <= offset)
-					break;
-
-				previousEntry->d_reclen += offset;
-				buffer = (dirent*)((addr_t)buffer + offset);
-				bufferSize -= offset;
-			}
-		}
-
-		// get the attribute name
-		const String& name = fState < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT
-			? AutoPackageAttributes::NameForAttribute(
-				(AutoPackageAttribute)fState)
-			: fAttribute->Name();
-
-		// fill in the entry name -- checks whether the entry fits into the
-		// buffer
-		if (!set_dirent_name(buffer, bufferSize, name, strlen(name))) {
-			if (count == 0)
-				RETURN_ERROR(B_BUFFER_OVERFLOW);
-			break;
-		}
-
-		// fill in the other data
-		buffer->d_dev = volumeID;
-		buffer->d_ino = nodeID;
-
-		count++;
-		previousEntry = buffer;
-		bufferSize -= buffer->d_reclen;
-		buffer = (dirent*)((addr_t)buffer + buffer->d_reclen);
-
-		if (fState < AUTO_PACKAGE_ATTRIBUTE_ENUM_COUNT)
-			fState++;
-		else
-			fAttribute = fPackageNode->Attributes().GetNext(fAttribute);
-	}
-
-	*_count = count;
-	return B_OK;
-}
-
-
-status_t
 UnpackingAttributeDirectoryCookie::Rewind()
 {
 	if (fPackageNode != NULL)
 		fAttribute = fPackageNode->Attributes().Head();
 
-	fState = AUTO_PACKAGE_ATTRIBUTE_ENUM_FIRST;
+	return AutoPackageAttributeDirectoryCookie::Rewind();
+}
 
-	return B_OK;
+
+String
+UnpackingAttributeDirectoryCookie::CurrentCustomAttributeName()
+{
+	return fAttribute != NULL ? fAttribute->Name() : String();
+}
+
+
+String
+UnpackingAttributeDirectoryCookie::NextCustomAttributeName()
+{
+	if (fAttribute != NULL)
+		fAttribute = fPackageNode->Attributes().GetNext(fAttribute);
+	return fAttribute != NULL ? fAttribute->Name() : String();
 }
