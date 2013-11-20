@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2005-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
