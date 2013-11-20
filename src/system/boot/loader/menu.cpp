@@ -1,6 +1,7 @@
 /*
  * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,7 +15,9 @@
 
 #include <OS.h>
 
+#include <AutoDeleter.h>
 #include <boot/menu.h>
+#include <boot/PathBlacklist.h>
 #include <boot/stage2.h>
 #include <boot/vfs.h>
 #include <boot/platform.h>
@@ -22,6 +25,7 @@
 #include <boot/stdio.h>
 #include <safemode.h>
 #include <util/ring_buffer.h>
+#include <util/SinglyLinkedList.h>
 
 #include "kernel_debug_config.h"
 
@@ -31,7 +35,7 @@
 #include "RootFileSystem.h"
 
 
-#define TRACE_MENU
+//#define TRACE_MENU
 #ifdef TRACE_MENU
 #	define TRACE(x) dprintf x
 #else
@@ -39,7 +43,11 @@
 #endif
 
 
-static char sSafeModeOptionsBuffer[2048];
+// only set while in user_menu()
+static Menu* sMainMenu = NULL;
+static Menu* sBlacklistRootMenu = NULL;
+static BootVolume* sBootVolume = NULL;
+static PathBlacklist* sPathBlacklist;
 
 
 MenuItem::MenuItem(const char *label, Menu *subMenu)
@@ -489,22 +497,340 @@ size_to_string(off_t size, char* buffer, size_t bufferSize)
 }
 
 
+// #pragma mark - blacklist menu
+
+
+class BlacklistMenuItem : public MenuItem {
+public:
+	BlacklistMenuItem(char* label, Node* node, Menu* subMenu)
+		:
+		MenuItem(label, subMenu),
+		fNode(node),
+		fSubMenu(subMenu)
+	{
+		fNode->Acquire();
+		SetType(MENU_ITEM_MARKABLE);
+	}
+
+	~BlacklistMenuItem()
+	{
+		fNode->Release();
+
+		// make sure the submenu is destroyed
+		SetSubmenu(fSubMenu);
+	}
+
+	bool IsDirectoryItem() const
+	{
+		return fNode->Type() == S_IFDIR;
+	}
+
+	bool GetPath(BlacklistedPath& _path) const
+	{
+		Menu* menu = Supermenu();
+		if (menu != NULL && menu != sBlacklistRootMenu
+			&& menu->Superitem() != NULL) {
+			return static_cast<BlacklistMenuItem*>(menu->Superitem())
+					->GetPath(_path)
+			   && _path.Append(Label());
+		}
+
+		return _path.SetTo(Label());
+	}
+
+	void UpdateBlacklisted()
+	{
+		BlacklistedPath path;
+		if (GetPath(path))
+			_SetMarked(sPathBlacklist->Contains(path.Path()), false);
+	}
+
+	virtual void SetMarked(bool marked)
+	{
+		_SetMarked(marked, true);
+	}
+
+	static bool Less(const MenuItem* a, const MenuItem* b)
+	{
+		const BlacklistMenuItem* item1
+			= static_cast<const BlacklistMenuItem*>(a);
+		const BlacklistMenuItem* item2
+			= static_cast<const BlacklistMenuItem*>(b);
+
+		// directories come first
+		if (item1->IsDirectoryItem() != item2->IsDirectoryItem())
+			return item1->IsDirectoryItem();
+
+		// compare the labels
+		return strcasecmp(item1->Label(), item2->Label()) < 0;
+	}
+
+private:
+	void _SetMarked(bool marked, bool updateBlacklist)
+	{
+		if (marked == IsMarked())
+			return;
+
+		// For directories toggle the availability of the submenu.
+		if (IsDirectoryItem())
+			SetSubmenu(marked ? NULL : fSubMenu);
+
+		if (updateBlacklist) {
+			BlacklistedPath path;
+			if (GetPath(path)) {
+				if (marked)
+					sPathBlacklist->Add(path.Path());
+				else
+					sPathBlacklist->Remove(path.Path());
+			}
+		}
+
+		MenuItem::SetMarked(marked);
+	}
+
+private:
+	Node*	fNode;
+	Menu*	fSubMenu;
+};
+
+
+class BlacklistMenu : public Menu {
+public:
+	BlacklistMenu()
+		:
+		Menu(STANDARD_MENU, "Mark the entries to blacklist"),
+		fDirectory(NULL)
+	{
+	}
+
+	~BlacklistMenu()
+	{
+		SetDirectory(NULL);
+	}
+
+	virtual void Entered()
+	{
+		_DeleteItems();
+
+		if (fDirectory == NULL)
+			return;
+
+		void* cookie;
+		if (fDirectory->Open(&cookie, O_RDONLY) == B_OK) {
+			Node* node;
+			while (fDirectory->GetNextNode(cookie, &node) == B_OK) {
+				BlacklistMenuItem* item = _CreateItem(node);
+				node->Release();
+				if (item == NULL)
+					break;
+
+				AddItem(item);
+
+				item->UpdateBlacklisted();
+			}
+			fDirectory->Close(cookie);
+		}
+
+		SortItems(&BlacklistMenuItem::Less);
+	}
+
+	virtual void Exited()
+	{
+		_DeleteItems();
+	}
+
+protected:
+	void SetDirectory(Directory* directory)
+	{
+		if (fDirectory != NULL)
+			fDirectory->Release();
+
+		fDirectory = directory;
+
+		if (fDirectory != NULL)
+			fDirectory->Acquire();
+	}
+
+private:
+	static BlacklistMenuItem* _CreateItem(Node* node)
+	{
+		// Get the node name and duplicate it, so we can use it as a label.
+		char name[B_FILE_NAME_LENGTH];
+		if (node->GetName(name, sizeof(name)) != B_OK)
+			return NULL;
+
+		// append '/' to directory labels
+		bool isDirectory = node->Type() == S_IFDIR;
+		if (isDirectory)
+			strlcat(name, "/", sizeof(name));
+
+		// If this is a directory, create the submenu.
+		BlacklistMenu* subMenu = NULL;
+		if (isDirectory) {
+			subMenu = new(std::nothrow) BlacklistMenu;
+			if (subMenu != NULL)
+				subMenu->SetDirectory(static_cast<Directory*>(node));
+
+		}
+		ObjectDeleter<BlacklistMenu> subMenuDeleter(subMenu);
+
+		// create the menu item
+		BlacklistMenuItem* item = new(std::nothrow) BlacklistMenuItem(name,
+			node, subMenu);
+		if (item == NULL)
+			return NULL;
+
+		subMenuDeleter.Detach();
+		return item;
+	}
+
+	void _DeleteItems()
+	{
+		int32 count = CountItems();
+		for (int32 i = 0; i < count; i++)
+			delete RemoveItemAt(0);
+	}
+
+private:
+	Directory*	fDirectory;
+};
+
+
+class BlacklistRootMenu : public BlacklistMenu {
+public:
+	BlacklistRootMenu()
+		:
+		BlacklistMenu()
+	{
+	}
+
+	virtual void Entered()
+	{
+		// Get the system directory, but only if this is a packaged Haiku.
+		// Otherwise blacklisting isn't supported.
+		if (sBootVolume != NULL && sBootVolume->IsValid()
+			&& sBootVolume->IsPackaged()) {
+			SetDirectory(sBootVolume->SystemDirectory());
+		} else
+			SetDirectory(NULL);
+
+		BlacklistMenu::Entered();
+	}
+
+	virtual void Exited()
+	{
+		BlacklistMenu::Exited();
+		SetDirectory(NULL);
+	}
+};
+
+
 // #pragma mark -
+
+
+class StringBuffer {
+public:
+	StringBuffer()
+		:
+		fBuffer(NULL),
+		fLength(0),
+		fCapacity(0)
+	{
+	}
+
+	~StringBuffer()
+	{
+		free(fBuffer);
+	}
+
+	const char* String() const
+	{
+		return fBuffer != NULL ? fBuffer : "";
+	}
+
+	size_t Length() const
+	{
+		return fLength;
+	}
+
+	bool Append(const char* toAppend)
+	{
+		return Append(toAppend, strlen(toAppend));
+	}
+
+	bool Append(const char* toAppend, size_t length)
+	{
+		size_t oldLength = fLength;
+		if (!_Resize(fLength + length))
+			return false;
+
+		memcpy(fBuffer + oldLength, toAppend, length);
+		return true;
+	}
+
+private:
+	bool _Resize(size_t newLength)
+	{
+		if (newLength >= fCapacity) {
+			size_t newCapacity = std::max(fCapacity, size_t(32));
+			while (newLength >= newCapacity)
+				newCapacity *= 2;
+
+			char* buffer = (char*)realloc(fBuffer, newCapacity);
+			if (buffer == NULL)
+				return false;
+
+			fBuffer = buffer;
+			fCapacity = newCapacity;
+		}
+
+		fBuffer[newLength] = '\0';
+		fLength = newLength;
+		return true;
+	}
+
+private:
+	char*	fBuffer;
+	size_t	fLength;
+	size_t	fCapacity;
+};
+
+
+// #pragma mark -
+
+
+static StringBuffer sSafeModeOptionsBuffer;
+
+
+static MenuItem*
+get_continue_booting_menu_item()
+{
+	// It's the last item in the main menu.
+	if (sMainMenu == NULL || sMainMenu->CountItems() == 0)
+		return NULL;
+	return sMainMenu->ItemAt(sMainMenu->CountItems() - 1);
+}
 
 
 static bool
 user_menu_boot_volume(Menu* menu, MenuItem* item)
 {
-	Menu* super = menu->Supermenu();
-	if (super == NULL) {
+	MenuItem* bootItem = get_continue_booting_menu_item();
+	if (bootItem == NULL) {
 		// huh?
 		return true;
 	}
 
-	MenuItem *bootItem = super->ItemAt(super->CountItems() - 1);
-	bootItem->SetEnabled(true);
-	bootItem->Select(true);
-	bootItem->SetData(item->Data());
+	if (sBootVolume->IsValid() && sBootVolume->RootDirectory() == item->Data())
+		return true;
+
+	sPathBlacklist->MakeEmpty();
+
+	bool valid = sBootVolume->SetTo((Directory*)item->Data()) == B_OK;
+
+	bootItem->SetEnabled(valid);
+	if (valid)
+		bootItem->Select(true);
 
 	gBootVolume.SetBool(BOOT_VOLUME_USER_SELECTED, true);
 	return true;
@@ -653,10 +979,10 @@ debug_menu_add_advanced_option(Menu* menu, MenuItem* item)
 
 	if (size > 0) {
 		buffer[size] = '\n';
-		size_t pos = strlen(sSafeModeOptionsBuffer);
-		if (pos + size + 1 < sizeof(sSafeModeOptionsBuffer))
-			strlcat(sSafeModeOptionsBuffer, buffer,
-				sizeof(sSafeModeOptionsBuffer));
+		if (!sSafeModeOptionsBuffer.Append(buffer)) {
+			dprintf("debug_menu_add_advanced_option(): failed to append option "
+				"to buffer\n");
+		}
 	}
 
 	return true;
@@ -699,7 +1025,7 @@ add_boot_volume_menu(Directory* bootVolume)
 		Directory* volume;
 		while (gRoot->GetNextNode(cookie, (Node**)&volume) == B_OK) {
 			// only list bootable volumes
-			if (!is_bootable(volume))
+			if (volume != bootVolume && !is_bootable(volume))
 				continue;
 
 			char name[B_FILE_NAME_LENGTH];
@@ -792,6 +1118,13 @@ add_safe_mode_menu()
 #endif
 
 	platform_add_menus(safeMenu);
+
+	safeMenu->AddSeparatorItem();
+	sBlacklistRootMenu = new(std::nothrow) BlacklistRootMenu;
+	safeMenu->AddItem(item = new(std::nothrow) MenuItem("Blacklist entries",
+		sBlacklistRootMenu));
+	item->SetHelpText("Allows to select system files that shall be ignored. "
+		"Useful e.g. to disable drivers temporarily.");
 
 	safeMenu->AddSeparatorItem();
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Return to main menu"));
@@ -962,18 +1295,43 @@ add_debug_menu()
 static void
 apply_safe_mode_options(Menu* menu)
 {
-	int32 pos = strlen(sSafeModeOptionsBuffer);
-	size_t bufferSize = sizeof(sSafeModeOptionsBuffer);
-
 	MenuItemIterator iterator = menu->ItemIterator();
 	while (MenuItem* item = iterator.Next()) {
 		if (item->Type() == MENU_ITEM_SEPARATOR || !item->IsMarked()
-			|| item->Data() == NULL || (uint32)pos >= bufferSize)
+			|| item->Data() == NULL) {
 			continue;
+		}
 
-		size_t totalBytes = snprintf(sSafeModeOptionsBuffer + pos,
-			bufferSize - pos, "%s true\n", (const char*)item->Data());
-		pos += std::min(totalBytes, bufferSize - pos - 1);
+		char buffer[256];
+		if (snprintf(buffer, sizeof(buffer), "%s true\n",
+				(const char*)item->Data()) >= (int)sizeof(buffer)
+			|| !sSafeModeOptionsBuffer.Append(buffer)) {
+			dprintf("apply_safe_mode_options(): failed to append option to "
+				"buffer\n");
+		}
+	}
+}
+
+
+static void
+apply_safe_mode_path_blacklist()
+{
+	if (sPathBlacklist->IsEmpty())
+		return;
+
+	bool success = sSafeModeOptionsBuffer.Append("EntryBlacklist {\n");
+
+	for (PathBlacklist::Iterator it = sPathBlacklist->GetIterator();
+		BlacklistedPath* path = it.Next();) {
+		success &= sSafeModeOptionsBuffer.Append(path->Path());
+		success &= sSafeModeOptionsBuffer.Append("\n", 1);
+	}
+
+	success &= sSafeModeOptionsBuffer.Append("}\n");
+
+	if (!success) {
+		dprintf("apply_safe_mode_options(): failed to append path "
+			"blacklist to buffer\n");
 	}
 }
 
@@ -987,16 +1345,20 @@ user_menu_reboot(Menu* menu, MenuItem* item)
 
 
 status_t
-user_menu(BootVolume& _bootVolume)
+user_menu(BootVolume& _bootVolume, PathBlacklist& _pathBlacklist)
 {
+
 	Menu* menu = new(std::nothrow) Menu(MAIN_MENU);
+
+	sMainMenu = menu;
+	sBootVolume = &_bootVolume;
+	sPathBlacklist = &_pathBlacklist;
+
 	Menu* safeModeMenu = NULL;
 	Menu* debugMenu = NULL;
 	MenuItem* item;
 
 	TRACE(("user_menu: enter\n"));
-
-	memset(sSafeModeOptionsBuffer, 0, sizeof(sSafeModeOptionsBuffer));
 
 	// Add boot volume
 	menu->AddItem(item = new(std::nothrow) MenuItem("Select boot volume",
@@ -1028,18 +1390,18 @@ user_menu(BootVolume& _bootVolume)
 
 	menu->Run();
 
-	// See if a new boot device has been selected, and propagate that back
-	if (item->Data() != NULL)
-		_bootVolume.SetTo((Directory*)item->Data());
-
 	apply_safe_mode_options(safeModeMenu);
 	apply_safe_mode_options(debugMenu);
-	add_safe_mode_settings(sSafeModeOptionsBuffer);
+	apply_safe_mode_path_blacklist();
+	add_safe_mode_settings(sSafeModeOptionsBuffer.String());
 	delete menu;
 
 
 	TRACE(("user_menu: leave\n"));
 
+	sMainMenu = NULL;
+	sBlacklistRootMenu = NULL;
+	sBootVolume = NULL;
+	sPathBlacklist = NULL;
 	return B_OK;
 }
-

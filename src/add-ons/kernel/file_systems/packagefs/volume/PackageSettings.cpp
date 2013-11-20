@@ -16,6 +16,9 @@
 #include "DebugSupport.h"
 
 
+static const char* const kEntryBlacklistParameterName = "EntryBlacklist";
+
+
 // #pragma mark - PackageSettingsItem
 
 
@@ -39,14 +42,21 @@ PackageSettingsItem::~PackageSettingsItem()
 
 
 status_t
-PackageSettingsItem::Init(const driver_parameter& parameter)
+PackageSettingsItem::Init(const char* name)
 {
-	if (!fName.SetTo(parameter.values[0]) || fEntries.Init() != B_OK)
+	if (!fName.SetTo(name) || fEntries.Init() != B_OK)
 		RETURN_ERROR(B_NO_MEMORY);
+	return B_OK;
+}
 
-	for (int i = 0; i < parameter.parameter_count; i++) {
-		const driver_parameter& subParameter = parameter.parameters[i];
-		if (strcmp(subParameter.name, "EntryBlacklist") != 0)
+
+status_t
+PackageSettingsItem::ApplySettings(const driver_parameter* parameters,
+	int parameterCount)
+{
+	for (int i = 0; i < parameterCount; i++) {
+		const driver_parameter& subParameter = parameters[i];
+		if (strcmp(subParameter.name, kEntryBlacklistParameterName) != 0)
 			continue;
 
 		status_t error = _AddBlackListedEntries(subParameter);
@@ -165,6 +175,22 @@ PackageSettings::Load(dev_t mountPointDeviceID, ino_t mountPointNodeID,
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
+	// First get the safe mode options. Those apply to the system package.
+	if (mountType == PACKAGE_FS_MOUNT_TYPE_SYSTEM) {
+		void* settingsHandle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+		if (settingsHandle != NULL) {
+			if (const driver_settings* settings
+					= get_driver_settings(settingsHandle)) {
+				error = _AddPackageSettingsItem("haiku", settings->parameters,
+					settings->parameter_count);
+				// abort only in case of serious issues (memory shortage)
+				if (error == B_NO_MEMORY)
+					return error;
+			}
+			unload_driver_settings(settingsHandle);
+		}
+	}
+
 	// get the mount point relative settings file path
 	const char* settingsFilePath = mountType == PACKAGE_FS_MOUNT_TYPE_HOME
 		? kUserSettingsGlobalDirectory "/packages"
@@ -201,7 +227,8 @@ PackageSettings::Load(dev_t mountPointDeviceID, ino_t mountPointNodeID,
 			continue;
 		}
 
-		error = _AddPackageSettingsItem(parameter);
+		error = _AddPackageSettingsItem(parameter.values[0],
+			parameter.parameters, parameter.parameter_count);
 		// abort only in case of serious issues (memory shortage)
 		if (error == B_NO_MEMORY)
 			return error;
@@ -219,14 +246,21 @@ PackageSettings::PackageItemFor(const String& name) const
 
 
 status_t
-PackageSettings::_AddPackageSettingsItem(const driver_parameter& parameter)
+PackageSettings::_AddPackageSettingsItem(const char* name,
+	const driver_parameter* parameters, int parameterCount)
 {
-	PackageSettingsItem* packageItem = new(std::nothrow) PackageSettingsItem;
-	if (packageItem == NULL || packageItem->Init(parameter) != B_OK) {
-		delete packageItem;
-		RETURN_ERROR(B_NO_MEMORY);
+	// get/create the package item
+	PackageSettingsItem* packageItem = fPackageItems.Lookup(StringKey(name));
+	if (packageItem == NULL) {
+		packageItem = new(std::nothrow) PackageSettingsItem;
+		if (packageItem == NULL || packageItem->Init(name) != B_OK) {
+			delete packageItem;
+			RETURN_ERROR(B_NO_MEMORY);
+		}
+
+		fPackageItems.Insert(packageItem);
 	}
 
-	fPackageItems.Insert(packageItem);
-	return B_OK;
+	// apply the settings
+	return packageItem->ApplySettings(parameters, parameterCount);
 }

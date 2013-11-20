@@ -9,7 +9,11 @@
 #include <boot/vfs.h>
 
 
-extern status_t user_menu(BootVolume& _bootVolume);
+class PathBlacklist;
+
+
+extern status_t user_menu(BootVolume& _bootVolume,
+	PathBlacklist& _pathBlacklist);
 
 
 #endif	/* MENU_H */

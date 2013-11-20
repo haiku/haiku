@@ -23,6 +23,7 @@
 
 #include <Referenceable.h>
 
+#include <boot/PathBlacklist.h>
 #include <boot/platform.h>
 
 #include "PackageSettingsItem.h"
@@ -46,10 +47,10 @@ using namespace BPackageKit::BHPKG;
 using BPackageKit::BHPKG::BPrivate::PackageFileHeapReader;
 using BPackageKit::BHPKG::BPrivate::PackageReaderImpl;
 
-using PackageFS::PackageSettingsItem;
+using namespace PackageFS;
 
 
-namespace {
+namespace PackageFS {
 
 
 struct PackageDirectory;
@@ -118,6 +119,10 @@ struct PackageNode : DoublyLinkedListLinkImpl<PackageNode> {
 	const timespec& ModifiedTime() const
 	{
 		return fModifiedTime;
+	}
+
+	virtual void RemoveEntry(const char* path)
+	{
 	}
 
 protected:
@@ -226,17 +231,45 @@ struct PackageDirectory : PackageNode {
 		if (strcmp(name, "..") == 0)
 			return fParentDirectory;
 
-		for (NodeList::Iterator it = fEntries.GetIterator();
-				PackageNode* child = it.Next();) {
-			if (strcmp(child->Name(), name) == 0)
-				return child;
-		}
+		return _LookupChild(name, strlen(name));
+	}
 
-		return NULL;
+	virtual void RemoveEntry(const char* path)
+	{
+		const char* componentEnd = strchr(path, '/');
+		if (componentEnd == NULL)
+			componentEnd = path + strlen(path);
+
+		PackageNode* child = _LookupChild(path, componentEnd - path);
+		if (child == NULL)
+			return;
+
+		if (*componentEnd == '\0') {
+			// last path component -- delete the child
+			fEntries.Remove(child);
+			delete child;
+		} else {
+			// must be a directory component -- continue resolving the path
+			child->RemoveEntry(componentEnd + 1);
+		}
 	}
 
 private:
 	typedef DoublyLinkedList<PackageNode>	NodeList;
+
+private:
+	PackageNode* _LookupChild(const char* name, size_t nameLength)
+	{
+		for (NodeList::Iterator it = fEntries.GetIterator();
+				PackageNode* child = it.Next();) {
+			if (strncmp(child->Name(), name, nameLength) == 0
+				&& child->Name()[nameLength] == '\0') {
+				return child;
+			}
+		}
+
+		return NULL;
+	}
 
 private:
 	NodeList	fEntries;
@@ -641,6 +674,11 @@ struct Directory : ::Directory {
 		fDirectory->Volume()->ReleaseReference();
 	}
 
+	void RemoveEntry(const char* path)
+	{
+		fDirectory->RemoveEntry(path);
+	}
+
 	virtual ssize_t ReadAt(void* cookie, off_t pos, void* buffer,
 		size_t bufferSize)
 	{
@@ -789,7 +827,7 @@ create_node(PackageNode* packageNode, ::Node*& _node)
 }
 
 
-}	// unnamed namespace
+}	// namespace PackageFS
 
 
 status_t
@@ -836,3 +874,18 @@ packagefs_mount_file(int fd, ::Directory* systemDirectory,
 	_mountedDirectory = static_cast< ::Directory*>(rootNode);
 	return B_OK;
 }
+
+
+void
+packagefs_apply_path_blacklist(::Directory* systemDirectory,
+	const PathBlacklist& pathBlacklist)
+{
+	PackageFS::Directory* directory
+		= static_cast<PackageFS::Directory*>(systemDirectory);
+
+	for (PathBlacklist::Iterator it = pathBlacklist.GetIterator();
+		BlacklistedPath* path = it.Next();) {
+		directory->RemoveEntry(path->Path());
+	}
+}
+

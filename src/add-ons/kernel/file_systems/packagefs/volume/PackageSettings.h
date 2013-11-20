@@ -9,7 +9,7 @@
 #include <packagefs.h>
 #include <util/OpenHashTable.h>
 
-#include "String.h"
+#include "StringKey.h"
 
 
 struct driver_parameter;
@@ -102,7 +102,10 @@ public:
 								PackageSettingsItem();
 								~PackageSettingsItem();
 
-			status_t			Init(const driver_parameter& parameter);
+			status_t			Init(const char* name);
+			status_t			ApplySettings(
+									const driver_parameter* parameters,
+									int parameterCount);
 
 			const String&		Name() const
 									{ return fName; }
@@ -158,10 +161,10 @@ private:
 
 
 struct PackageSettingsItemHashDefinition {
-	typedef String				KeyType;
+	typedef StringKey			KeyType;
 	typedef	PackageSettingsItem	ValueType;
 
-	size_t HashKey(const String& key) const
+	size_t HashKey(const StringKey& key) const
 	{
 		return key.Hash();
 	}
@@ -171,7 +174,7 @@ struct PackageSettingsItemHashDefinition {
 		return HashKey(value->Name());
 	}
 
-	bool Compare(const String& key, const PackageSettingsItem* value) const
+	bool Compare(const StringKey& key, const PackageSettingsItem* value) const
 	{
 		return key == value->Name();
 	}
@@ -199,8 +202,9 @@ private:
 				PackageItemTable;
 
 private:
-			status_t			_AddPackageSettingsItem(
-									const driver_parameter& parameter);
+			status_t			_AddPackageSettingsItem(const char* name,
+									const driver_parameter* parameters,
+									int parameterCount);
 
 private:
 			PackageItemTable	fPackageItems;

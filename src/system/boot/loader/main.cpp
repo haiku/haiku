@@ -12,7 +12,10 @@
 #include <boot/vfs.h>
 #include <boot/platform.h>
 #include <boot/heap.h>
+#include <boot/PathBlacklist.h>
 #include <boot/stdio.h>
+
+#include "file_systems/packagefs/packagefs.h"
 
 
 //#define TRACE_MAIN
@@ -53,6 +56,7 @@ main(stage2_args *args)
 	bool mountedAllVolumes = false;
 
 	BootVolume bootVolume;
+	PathBlacklist pathBlacklist;
 
 	if (get_boot_file_system(args, bootVolume) != B_OK
 		|| (platform_boot_options() & BOOT_OPTION_MENU) != 0) {
@@ -69,7 +73,7 @@ main(stage2_args *args)
 
 		mountedAllVolumes = true;
 
-		if (user_menu(bootVolume) < B_OK) {
+		if (user_menu(bootVolume, pathBlacklist) < B_OK) {
 			// user requested to quit the loader
 			goto out;
 		}
@@ -91,7 +95,8 @@ main(stage2_args *args)
 				mountedAllVolumes = true;
 			}
 
-			if (user_menu(bootVolume) < B_OK || !bootVolume.IsValid()) {
+			if (user_menu(bootVolume, pathBlacklist) != B_OK
+				|| !bootVolume.IsValid()) {
 				// user requested to quit the loader
 				goto out;
 			}
@@ -101,6 +106,11 @@ main(stage2_args *args)
 		// is already loaded at this point and we definitely
 		// know our boot volume, too
 		if (status == B_OK) {
+			if (bootVolume.IsPackaged()) {
+				packagefs_apply_path_blacklist(bootVolume.SystemDirectory(),
+					pathBlacklist);
+			}
+
 			register_boot_file_system(bootVolume);
 
 			if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) == 0)
