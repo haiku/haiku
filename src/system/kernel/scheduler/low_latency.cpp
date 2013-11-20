@@ -124,19 +124,20 @@ rebalance_irqs(bool idle)
 	CoreEntry* other = gCoreLoadHeap->PeekMinimum();
 	if (other == NULL)
 		other = gCoreHighLoadHeap->PeekMinimum();
+
+	int32 newCPU = gCPUPriorityHeaps[other->fCoreID].PeekMinimum()->fCPUNumber;
 	coreLocker.Unlock();
 
 	ASSERT(other != NULL);
 
-	int32 thigCore = gCPUToCore[smp_get_current_cpu()];
-	if (other->fCoreID == thigCore)
+	int32 thisCore = gCPUToCore[smp_get_current_cpu()];
+	if (other->fCoreID == thisCore)
 		return;
 
-	if (other->fLoad + kLoadDifference >= gCoreEntries[thigCore].fLoad)
+	if (other->fLoad + kLoadDifference >= gCoreEntries[thisCore].fLoad)
 		return;
 
-	coreLocker.Lock();
-	gCPUPriorityHeaps[other->fCoreID].PeekMinimum();
+	assign_io_interrupt_to_cpu(chosen->irq, newCPU);
 }
 
 

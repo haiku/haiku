@@ -28,7 +28,6 @@ has_cache_expired(Thread* thread)
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 	ASSERT(schedulerThreadData->previous_core >= 0);
 
-	CoreEntry* coreEntry = &gCoreEntries[schedulerThreadData->previous_core];
 	return system_time() - schedulerThreadData->went_sleep > kCacheExpire;
 }
 
@@ -149,6 +148,76 @@ should_rebalance(Thread* thread)
 }
 
 
+static inline void
+pack_irqs(void)
+{
+	cpu_ent* cpu = get_cpu_struct();
+	int32 core = gCPUToCore[cpu->cpu_num];
+
+	SpinLocker locker(cpu->irqs_lock);
+	while (sSmallTaskCore != core && list_get_first_item(&cpu->irqs) != NULL) {
+		irq_assignment* irq = (irq_assignment*)list_get_first_item(&cpu->irqs);
+		locker.Unlock();
+
+		SpinLocker coreLocker(gCoreHeapsLock);
+		int32 newCPU
+			= gCPUPriorityHeaps[sSmallTaskCore].PeekMinimum()->fCPUNumber;
+		coreLocker.Unlock();
+
+		if (newCPU != cpu->cpu_num)
+			assign_io_interrupt_to_cpu(irq->irq, newCPU);
+
+		locker.Lock();
+	}
+}
+
+
+static void
+rebalance_irqs(bool idle)
+{
+	if (idle && !is_small_task_packing_enabled() && sSmallTaskCore != -1) {
+		pack_irqs();
+		return;
+	}
+
+	if (idle)
+		return;
+
+	cpu_ent* cpu = get_cpu_struct();
+	SpinLocker locker(cpu->irqs_lock);
+
+	irq_assignment* chosen = NULL;
+	irq_assignment* irq = (irq_assignment*)list_get_first_item(&cpu->irqs);
+
+	while (irq != NULL) {
+		if (chosen == NULL || chosen->load < irq->load)
+			chosen = irq;
+		irq = (irq_assignment*)list_get_next_item(&cpu->irqs, irq);
+	}
+
+	locker.Unlock();
+
+	if (chosen == NULL || chosen->load < kLowLoad)
+		return;
+
+	SpinLocker coreLocker(gCoreHeapsLock);
+	CoreEntry* other = gCoreLoadHeap->PeekMinimum();
+	if (other == NULL)
+		return;
+	int32 newCPU = gCPUPriorityHeaps[other->fCoreID].PeekMinimum()->fCPUNumber;
+	coreLocker.Unlock();
+
+	int32 thisCore = gCPUToCore[smp_get_current_cpu()];
+	if (other->fCoreID == thisCore)
+		return;
+
+	if (other->fLoad + kLoadDifference >= gCoreEntries[thisCore].fLoad)
+		return;
+
+	assign_io_interrupt_to_cpu(chosen->irq, newCPU);
+}
+
+
 scheduler_mode_operations gSchedulerPowerSavingMode = {
 	"power saving",
 
@@ -158,7 +227,6 @@ scheduler_mode_operations gSchedulerPowerSavingMode = {
 	has_cache_expired,
 	choose_core,
 	should_rebalance,
-	NULL,
+	rebalance_irqs,
 };
-
 

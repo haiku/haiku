@@ -994,14 +994,14 @@ compute_quantum(Thread* thread)
 
 
 static inline Thread*
-choose_next_thread(int32 thigCPU, Thread* oldThread, bool putAtBack)
+choose_next_thread(int32 thisCPU, Thread* oldThread, bool putAtBack)
 {
-	int32 thigCore = gCPUToCore[thigCPU];
+	int32 thisCore = gCPUToCore[thisCPU];
 
-	SpinLocker runQueueLocker(gCoreEntries[thigCore].fLock);
+	SpinLocker runQueueLocker(gCoreEntries[thisCore].fLock);
 
-	Thread* sharedThread = gRunQueues[thigCore].PeekMaximum();
-	Thread* pinnedThread = gPinnedRunQueues[thigCPU].PeekMaximum();
+	Thread* sharedThread = gRunQueues[thisCore].PeekMaximum();
+	Thread* pinnedThread = gPinnedRunQueues[thisCPU].PeekMaximum();
 
 	ASSERT(sharedThread != NULL || pinnedThread != NULL || oldThread != NULL);
 
@@ -1027,34 +1027,34 @@ choose_next_thread(int32 thigCPU, Thread* oldThread, bool putAtBack)
 		ASSERT(sharedThread->scheduler_data->enqueued);
 		sharedThread->scheduler_data->enqueued = false;
 
-		gRunQueues[thigCore].Remove(sharedThread);
+		gRunQueues[thisCore].Remove(sharedThread);
 		return sharedThread;
 	}
 
 	ASSERT(pinnedThread->scheduler_data->enqueued);
 	pinnedThread->scheduler_data->enqueued = false;
 
-	gPinnedRunQueues[thigCPU].Remove(pinnedThread);
+	gPinnedRunQueues[thisCPU].Remove(pinnedThread);
 	return pinnedThread;
 }
 
 
 static inline void
-track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thigCore)
+track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 {
 	bigtime_t now = system_time();
 	bigtime_t usedTime = now - oldThread->scheduler_data->quantum_start;
 
 	if (thread_is_idle_thread(oldThread) && usedTime >= kMinimalWaitTime) {
-		atomic_set64(&gCoreEntries[thigCore].fReachedBottom,
+		atomic_set64(&gCoreEntries[thisCore].fReachedBottom,
 			now - kMinimalWaitTime);
-		atomic_set64(&gCoreEntries[thigCore].fReachedIdle,
+		atomic_set64(&gCoreEntries[thisCore].fReachedIdle,
 			now - kMinimalWaitTime);
 	}
 
 	if (get_effective_priority(oldThread) == B_LOWEST_ACTIVE_PRIORITY
 		&& usedTime >= kMinimalWaitTime) {
-		atomic_set64(&gCoreEntries[thigCore].fReachedBottom,
+		atomic_set64(&gCoreEntries[thisCore].fReachedBottom,
 			now - kMinimalWaitTime);
 	}
 
@@ -1067,7 +1067,7 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thigCore)
 		oldThread->scheduler_data->measure_active_time += active;
 
 		gCPUEntries[smp_get_current_cpu()].fMeasureActiveTime += active;
-		atomic_add64(&gCoreEntries[thigCore].fActiveTime, active);
+		atomic_add64(&gCoreEntries[thisCore].fActiveTime, active);
 	}
 
 	if (!gSingleCore)
@@ -1078,16 +1078,16 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thigCore)
 
 	if (thread_is_idle_thread(nextThread)) {
 		if (!thread_is_idle_thread(oldThread))
-			atomic_set64(&gCoreEntries[thigCore].fStartedIdle, now);
+			atomic_set64(&gCoreEntries[thisCore].fStartedIdle, now);
 		if (oldPriority > B_LOWEST_ACTIVE_PRIORITY)
-			atomic_set64(&gCoreEntries[thigCore].fStartedBottom, now);
+			atomic_set64(&gCoreEntries[thisCore].fStartedBottom, now);
 	} else if (nextPriority == B_LOWEST_ACTIVE_PRIORITY) {
-		atomic_set64(&gCoreEntries[thigCore].fStartedIdle, 0);
+		atomic_set64(&gCoreEntries[thisCore].fStartedIdle, 0);
 		if (oldPriority > B_LOWEST_ACTIVE_PRIORITY)
-			atomic_set64(&gCoreEntries[thigCore].fStartedBottom, now);
+			atomic_set64(&gCoreEntries[thisCore].fStartedBottom, now);
 	} else {
-		atomic_set64(&gCoreEntries[thigCore].fStartedBottom, 0);
-		atomic_set64(&gCoreEntries[thigCore].fStartedIdle, 0);
+		atomic_set64(&gCoreEntries[thisCore].fStartedBottom, 0);
+		atomic_set64(&gCoreEntries[thisCore].fStartedIdle, 0);
 	}
 
 	if (!thread_is_idle_thread(nextThread)) {
@@ -1098,10 +1098,10 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thigCore)
 
 
 static inline void
-update_cpu_performance(Thread* thread, int32 thigCore)
+update_cpu_performance(Thread* thread, int32 thisCore)
 {
 	int32 load = max_c(thread->scheduler_data->load,
-			gCoreEntries[thigCore].fLoad);
+			gCoreEntries[thisCore].fLoad);
 	load = min_c(max_c(load, 0), kMaxLoad);
 
 	if (load < kTargetLoad) {
@@ -1131,10 +1131,10 @@ _scheduler_reschedule(void)
 
 	Thread* oldThread = thread_get_current_thread();
 
-	int32 thigCPU = smp_get_current_cpu();
-	int32 thigCore = gCPUToCore[thigCPU];
+	int32 thisCPU = smp_get_current_cpu();
+	int32 thisCore = gCPUToCore[thisCPU];
 
-	TRACE("reschedule(): cpu %ld, current thread = %ld\n", thigCPU,
+	TRACE("reschedule(): cpu %ld, current thread = %ld\n", thisCPU,
 		oldThread->id);
 
 	oldThread->state = oldThread->next_state;
@@ -1185,7 +1185,7 @@ _scheduler_reschedule(void)
 
 	// select thread with the biggest priority and enqueue back the old thread
 	Thread* nextThread
-		= choose_next_thread(thigCPU, enqueueOldThread ? oldThread : NULL,
+		= choose_next_thread(thisCPU, enqueueOldThread ? oldThread : NULL,
 			putOldThreadAtBack);
 	if (nextThread != oldThread) {
 		if (enqueueOldThread) {
@@ -1198,7 +1198,7 @@ _scheduler_reschedule(void)
 		acquire_spinlock(&nextThread->scheduler_lock);
 	}
 
-	TRACE("reschedule(): cpu %ld, next thread = %ld\n", thigCPU,
+	TRACE("reschedule(): cpu %ld, next thread = %ld\n", thisCPU,
 		nextThread->id);
 
 	T(ScheduleThread(nextThread, oldThread));
@@ -1210,13 +1210,13 @@ _scheduler_reschedule(void)
 	// update CPU heap
 	{
 		SpinLocker coreLocker(gCoreHeapsLock);
-		update_cpu_priority(thigCPU, get_effective_priority(nextThread));
+		update_cpu_priority(thisCPU, get_effective_priority(nextThread));
 	}
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
 
-	ASSERT(nextThread->scheduler_data->previous_core == thigCore);
+	ASSERT(nextThread->scheduler_data->previous_core == thisCore);
 
 	compute_thread_load(nextThread);
 
@@ -1224,7 +1224,7 @@ _scheduler_reschedule(void)
 	scheduler_update_thread_times(oldThread, nextThread);
 
 	// track CPU activity
-	track_cpu_activity(oldThread, nextThread, thigCore);
+	track_cpu_activity(oldThread, nextThread, thisCore);
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
 		timer* quantumTimer = &oldThread->cpu->quantum_timer;
@@ -1237,7 +1237,7 @@ _scheduler_reschedule(void)
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER);
 
-			update_cpu_performance(nextThread, thigCore);
+			update_cpu_performance(nextThread, thisCore);
 		} else {
 			nextThread->scheduler_data->quantum_start = system_time();
 
@@ -1631,3 +1631,4 @@ _user_estimate_max_scheduling_latency(thread_id id)
 
 	return 2 * kMinThreadQuantum;
 }
+
