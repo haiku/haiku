@@ -87,6 +87,10 @@ HAIKU_DONT_CLEAR_IMAGE = 1 ;
 # several times larger than even with level 1.
 HAIKU_PACKAGE_COMPRESSION_LEVEL = 1 ;
 
+# Override the Haiku revision string determined via git. This is e.g. useful,
+# when your git repository doesn't have hrev tags. You may need to remove the
+# file <generated>/build/haiku-revision whenever you change this variable.
+HAIKU_REVISION = hrev66666 ;
 
 # Affects the haiku-image, haiku-vmware-image, and install-haiku targets. Only
 # targets on which the HAIKU_INCLUDE_IN_IMAGE variable has been set will be
