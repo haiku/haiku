@@ -99,6 +99,10 @@ public:
 
 }	// namespace Scheduler
 
+static CPUHeap* sDebugCPUHeap;
+static CoreLoadHeap* sDebugCoreHeap;
+static PackageHeap* sDebugPackageHeap;
+
 
 CPUEntry::CPUEntry()
 	:
@@ -248,8 +252,6 @@ dump_run_queue(int argc, char **argv)
 static void
 dump_heap(CPUHeap* heap)
 {
-	CPUHeap temp(smp_get_num_cpus());
-
 	kprintf("cpu priority load\n");
 	CPUEntry* entry = heap->PeekMinimum();
 	while (entry) {
@@ -259,17 +261,17 @@ dump_heap(CPUHeap* heap)
 			gCPUEntries[cpu].fLoad / 10);
 
 		heap->RemoveMinimum();
-		temp.Insert(entry, key);
+		sDebugCPUHeap->Insert(entry, key);
 
 		entry = heap->PeekMinimum();
 	}
 
-	entry = temp.PeekMinimum();
+	entry = sDebugCPUHeap->PeekMinimum();
 	while (entry) {
 		int32 key = CPUHeap::GetKey(entry);
-		temp.RemoveMinimum();
+		sDebugCPUHeap->RemoveMinimum();
 		heap->Insert(entry, key);
-		entry = temp.PeekMinimum();
+		entry = sDebugCPUHeap->PeekMinimum();
 	}
 }
 
@@ -277,7 +279,6 @@ dump_heap(CPUHeap* heap)
 static void
 dump_core_load_heap(CoreLoadHeap* heap)
 {
-	CoreLoadHeap temp(gRunQueueCount);
 	int32 cpuPerCore = smp_get_num_cpus() / gRunQueueCount;
 
 	CoreEntry* entry = heap->PeekMinimum();
@@ -287,17 +288,17 @@ dump_core_load_heap(CoreLoadHeap* heap)
 			entry->fLoad / cpuPerCore / 10);
 
 		heap->RemoveMinimum();
-		temp.Insert(entry, key);
+		sDebugCoreHeap->Insert(entry, key);
 
 		entry = heap->PeekMinimum();
 	}
 
-	entry = temp.PeekMinimum();
+	entry = sDebugCoreHeap->PeekMinimum();
 	while (entry) {
 		int32 key = CoreLoadHeap::GetKey(entry);
-		temp.RemoveMinimum();
+		sDebugCoreHeap->RemoveMinimum();
 		heap->Insert(entry, key);
-		entry = temp.PeekMinimum();
+		entry = sDebugCoreHeap->PeekMinimum();
 	}
 }
 
@@ -348,7 +349,6 @@ dump_idle_cores(int argc, char** argv)
 	} else
 		kprintf("No idle packages.\n");
 
-	PackageHeap temp(smp_get_num_cpus());
 	kprintf("\nPackages with idle cores:\n");
 
 	PackageEntry* entry = gPackageUsageHeap->PeekMinimum();
@@ -374,17 +374,17 @@ dump_idle_cores(int argc, char** argv)
 		kprintf("\n");
 
 		gPackageUsageHeap->RemoveMinimum();
-		temp.Insert(entry, entry->fIdleCoreCount);
+		sDebugPackageHeap->Insert(entry, entry->fIdleCoreCount);
 
 		entry = gPackageUsageHeap->PeekMinimum();
 	}
 
-	entry = temp.PeekMinimum();
+	entry = sDebugPackageHeap->PeekMinimum();
 	while (entry != NULL) {
 		int32 key = PackageHeap::GetKey(entry);
-		temp.RemoveMinimum();
+		sDebugPackageHeap->RemoveMinimum();
 		gPackageUsageHeap->Insert(entry, key);
-		entry = temp.PeekMinimum();
+		entry = sDebugPackageHeap->PeekMinimum();
 	}
 
 	return 0;
@@ -1430,6 +1430,29 @@ build_topology_mappings(int32& cpuCount, int32& coreCount, int32& packageCount)
 
 
 static status_t
+create_debug_heaps()
+{
+	sDebugCPUHeap = new(std::nothrow) CPUHeap(smp_get_num_cpus());
+	if (sDebugCPUHeap == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<CPUHeap> cpuDeleter(sDebugCPUHeap);
+
+	sDebugCoreHeap = new(std::nothrow) CoreLoadHeap(smp_get_num_cpus());
+	if (sDebugCoreHeap == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<CoreLoadHeap> coreDeleter(sDebugCoreHeap);
+
+	sDebugPackageHeap = new(std::nothrow) PackageHeap(smp_get_num_cpus());
+	if (sDebugPackageHeap == NULL)
+		return B_NO_MEMORY;
+
+	coreDeleter.Detach();
+	cpuDeleter.Detach();
+	return B_OK;
+}
+
+
+static status_t
 _scheduler_init()
 {
 	// create logical processor to core and package mappings
@@ -1488,7 +1511,7 @@ _scheduler_init()
 	for (int32 i = 0; i < coreCount; i++) {
 		gCoreEntries[i].fCoreID = i;
 
-		status_t result = gCoreLoadHeap->Insert(&gCoreEntries[i], 0);
+		result = gCoreLoadHeap->Insert(&gCoreEntries[i], 0);
 		if (result != B_OK)
 			return result;
 	}
@@ -1507,7 +1530,7 @@ _scheduler_init()
 		if (gCPUPriorityHeaps[core].PeekMaximum() == NULL)
 			gPackageEntries[package].fIdleCores.Insert(&gCoreEntries[core]);
 
-		status_t result
+		result
 			= gCPUPriorityHeaps[core].Insert(&gCPUEntries[i], B_IDLE_PRIORITY);
 		if (result != B_OK)
 			return result;
@@ -1522,7 +1545,7 @@ _scheduler_init()
 		return B_NO_MEMORY;
 	ArrayDeleter<ThreadRunQueue> pinnedRunQueuesDeleter(gPinnedRunQueues);
 	for (int i = 0; i < cpuCount; i++) {
-		status_t result = gPinnedRunQueues[i].GetInitStatus();
+		result = gPinnedRunQueues[i].GetInitStatus();
 		if (result != B_OK)
 			return result;
 	}
@@ -1536,10 +1559,15 @@ _scheduler_init()
 		return B_NO_MEMORY;
 	ArrayDeleter<ThreadRunQueue> runQueuesDeleter(gRunQueues);
 	for (int i = 0; i < coreCount; i++) {
-		status_t result = gRunQueues[i].GetInitStatus();
+		result = gRunQueues[i].GetInitStatus();
 		if (result != B_OK)
 			return result;
 	}
+
+	// create temporary heaps for debugging commands
+	result = create_debug_heaps();
+	if (result != B_OK)
+		return result;
 
 	scheduler_set_operation_mode(SCHEDULER_MODE_LOW_LATENCY);
 

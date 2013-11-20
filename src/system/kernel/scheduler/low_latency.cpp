@@ -91,6 +91,7 @@ should_rebalance(Thread* thread)
 	CoreEntry* other = gCoreLoadHeap->PeekMinimum();
 	if (other == NULL)
 		other = gCoreHighLoadHeap->PeekMinimum();
+	ASSERT(other != NULL);
 	return coreEntry->fLoad - other->fLoad >= kLoadDifference * 2;
 }
 
