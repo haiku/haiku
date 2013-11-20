@@ -125,7 +125,7 @@ add_stage2_driver_settings(stage2_args* args)
 
 
 status_t
-add_safe_mode_settings(char* settings)
+add_safe_mode_settings(const char* settings)
 {
 	if (settings == NULL || settings[0] == '\0')
 		return B_OK;

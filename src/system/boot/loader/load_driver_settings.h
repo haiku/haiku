@@ -9,7 +9,7 @@
 #include <boot/vfs.h>
 
 
-extern status_t add_safe_mode_settings(char *buffer);
+extern status_t add_safe_mode_settings(const char *buffer);
 extern status_t add_stage2_driver_settings(stage2_args *args);
 extern status_t load_driver_settings(stage2_args *args, Directory *volume);
 
