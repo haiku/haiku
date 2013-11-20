@@ -1484,11 +1484,11 @@ swap_init_post_modules()
 					// User specified a size / volume that seems valid
 					swapAutomatic = false;
 					swapSize = atoll(size);
-					strncpy(selectedVolume.name, volume,
+					strlcpy(selectedVolume.name, volume,
 						sizeof(selectedVolume.name));
-					strncpy(selectedVolume.device, device,
+					strlcpy(selectedVolume.device, device,
 						sizeof(selectedVolume.device));
-					strncpy(selectedVolume.filesystem, filesystem,
+					strlcpy(selectedVolume.filesystem, filesystem,
 						sizeof(selectedVolume.filesystem));
 					selectedVolume.capacity = atoll(capacity);
 				} else {
@@ -1498,8 +1498,8 @@ swap_init_post_modules()
 						"using automatic swap\n", __func__);
 				}
 			}
-			unload_driver_settings(settings);
 		}
+		unload_driver_settings(settings);
 	}
 
 	if (swapAutomatic) {
