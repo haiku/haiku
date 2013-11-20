@@ -21,7 +21,8 @@ FUNCTION_END(atomic_set)
 
 /* int32 atomic_get_and_set(int32* value, int32 newValue) */
 FUNCTION(atomic_get_and_set):
-	xchgl		%esi, (%rdi)
+	movl		%esi, %eax
+	xchgl		%eax, (%rdi)
 	ret
 FUNCTION_END(atomic_get_and_set)
 
@@ -37,8 +38,9 @@ FUNCTION_END(atomic_test_and_set)
 
 /* int32 atomic_add(int32* value, int32 addValue) */
 FUNCTION(atomic_add):
+	movl		%esi, %eax
 	lock
-	xaddl		%esi, (%rdi)
+	xaddl		%eax, (%rdi)
 	ret
 FUNCTION_END(atomic_add)
 
@@ -75,6 +77,7 @@ FUNCTION_END(atomic_or)
 FUNCTION(atomic_get):
 	movl		(%rdi), %eax
 	lfence
+	ret
 FUNCTION_END(atomic_get)
 
 
@@ -88,7 +91,8 @@ FUNCTION_END(atomic_set64)
 
 /* int64 atomic_get_and_set64(int64* value, int64 newValue) */
 FUNCTION(atomic_get_and_set64):
-	xchgq		%rsi, (%rdi)
+	movq		%rsi, %rax
+	xchgq		%rax, (%rdi)
 	ret
 FUNCTION_END(atomic_get_and_set64)
 
@@ -144,5 +148,6 @@ FUNCTION_END(atomic_or64)
 FUNCTION(atomic_get64):
 	movq		(%rdi), %rax
 	lfence
+	ret
 FUNCTION_END(atomic_get64)
 
