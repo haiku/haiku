@@ -365,6 +365,10 @@ public:
 	inline int32 Count() const;
 		// O(n)!
 
+	template<typename Less>
+	void Sort(const Less& less);
+		// O(n^2)
+
 	inline Iterator GetIterator()				{ return Iterator(this); }
 	inline ConstIterator GetIterator() const	{ return ConstIterator(this); }
 
@@ -644,6 +648,31 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Count() const
 		count++;
 	return count;
 }
+
+
+DOUBLY_LINKED_LIST_TEMPLATE_LIST
+template<typename Less>
+void
+DOUBLY_LINKED_LIST_CLASS_NAME::Sort(const Less& less)
+{
+	// selection sort
+	Element* tail = Head();
+	while (tail != NULL) {
+		Element* leastElement = tail;
+		Element* element = tail;
+		while ((element = GetNext(element)) != NULL) {
+			if (less(element, leastElement))
+				leastElement = element;
+		}
+
+		if (leastElement != tail) {
+			Remove(leastElement);
+			InsertBefore(tail, leastElement);
+		} else
+			tail = GetNext(tail);
+	}
+}
+
 
 // sGetLink
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
