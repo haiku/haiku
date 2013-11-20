@@ -385,7 +385,8 @@ static status_t
 get_file_attribute(const char* path, const char* attribute, char* nameBuffer,
 	size_t bufferSize)
 {
-	int fd = fs_open_attr(path, attribute, B_STRING_TYPE, O_RDONLY);
+	int fd = fs_open_attr(path, attribute, B_STRING_TYPE,
+		O_RDONLY | O_NOTRAVERSE);
 	if (fd < 0)
 		return errno;
 
@@ -489,47 +490,13 @@ internal_path_for_path(char* referencePath, size_t referencePathSize,
 	if (strcmp(architecture, __get_primary_architecture()) == 0)
 		architecture = NULL;
 
-	// normalize
-	status_t error = normalize_path(referencePath, referencePath,
-		referencePathSize);
-	if (error != B_OK)
-		return error;
-
-	// handle B_FIND_PATH_IMAGE_PATH
-	if (baseDirectory == B_FIND_PATH_IMAGE_PATH)
-		return copy_path(referencePath, pathBuffer, bufferSize);
-
-	// get the installation location
-	InstallationLocations* installationLocations = InstallationLocations::Get();
-	MethodDeleter<InstallationLocations> installationLocationsDeleter(
-		installationLocations, &InstallationLocations::Put);
-
-	size_t installationLocationIndex;
-	const char* installationLocation = installationLocations->LocationFor(
-		referencePath, installationLocationIndex);
-	if (installationLocation == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	// Handle B_FIND_PATH_PACKAGE_PATH: get the package file name and
-	// simply adjust our arguments to look the package file up in the packages
-	// directory.
-	char packageName[B_FILE_NAME_LENGTH];
-	if (baseDirectory == B_FIND_PATH_PACKAGE_PATH) {
-		error = get_file_attribute(referencePath, "SYS:PACKAGE_FILE",
-			packageName, sizeof(packageName));
-		if (error != B_OK)
-			return error;
-
-		dependency = NULL;
-		subPath = packageName;
-		baseDirectory = B_FIND_PATH_PACKAGES_DIRECTORY;
-		flags = B_FIND_PATH_EXISTING_ONLY;
-	}
-
 	// resolve dependency
+	char packageName[B_FILE_NAME_LENGTH];
+		// Temporarily used here, permanently used below where
+		// B_FIND_PATH_PACKAGE_PATH is handled.
 	if (dependency != NULL) {
 		// get the versioned package name
-		error = get_file_attribute(referencePath, "SYS:PACKAGE",
+		status_t error = get_file_attribute(referencePath, "SYS:PACKAGE",
 			packageName, sizeof(packageName));
 		if (error != B_OK)
 			return error;
@@ -541,24 +508,51 @@ internal_path_for_path(char* referencePath, size_t referencePathSize,
 		if (error != B_OK)
 			return error;
 
-		// Compute the path of the dependency symlink and normalize it. This
-		// should yield the installation location path.
-		if (snprintf(referencePath, referencePathSize, "/packages/%s/%s",
-					packageName, normalizedDependency)
+		// Compute the path of the dependency symlink. This will yield the
+		// installation location path when normalized.
+		if (snprintf(referencePath, referencePathSize,
+					kSystemPackageLinksDirectory "/%s/%s", packageName,
+					normalizedDependency)
 				>= (ssize_t)referencePathSize) {
 			return B_BUFFER_OVERFLOW;
 		}
+	}
 
-		error = normalize_path(referencePath, referencePath, referencePathSize);
+	// handle B_FIND_PATH_IMAGE_PATH
+	if (baseDirectory == B_FIND_PATH_IMAGE_PATH)
+		return copy_path(referencePath, pathBuffer, bufferSize);
+
+	// Handle B_FIND_PATH_PACKAGE_PATH: get the package file name and
+	// simply adjust our arguments to look the package file up in the packages
+	// directory.
+	if (baseDirectory == B_FIND_PATH_PACKAGE_PATH) {
+		status_t error = get_file_attribute(referencePath, "SYS:PACKAGE_FILE",
+			packageName, sizeof(packageName));
 		if (error != B_OK)
 			return error;
 
-		// get the installation location
-		installationLocation = installationLocations->LocationFor(referencePath,
-			installationLocationIndex);
-		if (installationLocation == NULL)
-			return B_ENTRY_NOT_FOUND;
+		dependency = NULL;
+		subPath = packageName;
+		baseDirectory = B_FIND_PATH_PACKAGES_DIRECTORY;
+		flags = B_FIND_PATH_EXISTING_ONLY;
 	}
+
+	// normalize
+	status_t error = normalize_path(referencePath, referencePath,
+		referencePathSize);
+	if (error != B_OK)
+		return error;
+
+	// get the installation location
+	InstallationLocations* installationLocations = InstallationLocations::Get();
+	MethodDeleter<InstallationLocations> installationLocationsDeleter(
+		installationLocations, &InstallationLocations::Put);
+
+	size_t installationLocationIndex;
+	const char* installationLocation = installationLocations->LocationFor(
+		referencePath, installationLocationIndex);
+	if (installationLocation == NULL)
+		return B_ENTRY_NOT_FOUND;
 
 	// get base dir and process the path
 	const char* relativePath = get_relative_directory_path(
