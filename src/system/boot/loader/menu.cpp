@@ -51,21 +51,18 @@ MenuItem::MenuItem(const char *label, Menu *subMenu)
 	fIsEnabled(true),
 	fType(MENU_ITEM_STANDARD),
 	fMenu(NULL),
-	fSubMenu(subMenu),
+	fSubMenu(NULL),
 	fData(NULL),
 	fHelpText(NULL),
 	fShortcut(0)
 {
-	if (subMenu != NULL)
-		subMenu->fSuperItem = this;
+	SetSubmenu(subMenu);
 }
 
 
 MenuItem::~MenuItem()
 {
-	if (fSubMenu != NULL)
-		fSubMenu->fSuperItem = NULL;
-
+	delete fSubMenu;
 	free(const_cast<char *>(fLabel));
 }
 
@@ -176,6 +173,16 @@ MenuItem::SetShortcut(char key)
 
 
 void
+MenuItem::SetSubmenu(Menu* subMenu)
+{
+	fSubMenu = subMenu;
+
+	if (fSubMenu != NULL)
+		fSubMenu->fSuperItem = this;
+}
+
+
+void
 MenuItem::SetMenu(Menu* menu)
 {
 	fMenu = menu;
@@ -207,6 +214,18 @@ Menu::~Menu()
 		fItems.Remove(item);
 		delete item;
 	}
+}
+
+
+void
+Menu::Entered()
+{
+}
+
+
+void
+Menu::Exited()
+{
 }
 
 
@@ -394,6 +413,13 @@ Menu::FindItemByShortcut(char key)
 	}
 
 	return NULL;
+}
+
+
+void
+Menu::SortItems(bool (*less)(const MenuItem*, const MenuItem*))
+{
+	fItems.Sort(less);
 }
 
 

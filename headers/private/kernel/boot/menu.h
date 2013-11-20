@@ -30,12 +30,12 @@ class MenuItem : public DoublyLinkedListLinkImpl<MenuItem> {
 public:
 								MenuItem(const char* label = NULL,
 									Menu* subMenu = NULL);
-								~MenuItem();
+	virtual						~MenuItem();
 
 			void				SetTarget(menu_item_hook target);
 			menu_item_hook		Target() const { return fTarget; }
 
-			void				SetMarked(bool marked);
+	virtual	void				SetMarked(bool marked);
 			bool				IsMarked() const { return fIsMarked; }
 
 			void				Select(bool selected);
@@ -57,7 +57,11 @@ public:
 			char				Shortcut() const { return fShortcut; }
 
 			const char*			Label() const { return fLabel; }
+
 			Menu*				Submenu() const { return fSubMenu; }
+			void				SetSubmenu(Menu* subMenu);
+
+			Menu*				Supermenu() const { return fMenu; }
 
 private:
 			friend class Menu;
@@ -93,9 +97,12 @@ enum menu_type {
 class Menu {
 public:
 								Menu(menu_type type, const char* title = NULL);
-								~Menu();
+	virtual						~Menu();
 
 			menu_type			Type() const { return fType; }
+
+	virtual	void				Entered();
+	virtual	void				Exited();
 
 			void				Hide() { fIsHidden = true; }
 			void				Show() { fIsHidden = false; }
@@ -130,6 +137,9 @@ public:
 			void				AddShortcut(char key, shortcut_hook function);
 			shortcut_hook		FindShortcut(char key) const;
 			MenuItem*			FindItemByShortcut(char key);
+
+			void				SortItems(bool (*less)(const MenuItem*,
+									const MenuItem*));
 
 			void				Run();
 
