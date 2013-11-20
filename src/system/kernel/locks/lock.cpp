@@ -775,6 +775,9 @@ _mutex_unlock(mutex* lock)
 		lock->waiters = waiter->next;
 		if (lock->waiters != NULL)
 			lock->waiters->last = waiter->last;
+#if KDEBUG
+		thread_id unblockedThread = waiter->thread->id;
+#endif
 
 		// unblock thread
 		thread_unblock(waiter->thread, B_OK);
@@ -784,7 +787,7 @@ _mutex_unlock(mutex* lock)
 		// actually reflects the current situation, setting it to -1 would
 		// cause a race condition, since another locker could think the lock
 		// is not held by anyone.
-		lock->holder = waiter->thread->id;
+		lock->holder = unblockedThread;
 #endif
 	} else {
 		// We've acquired the spinlock before the locker that is going to wait.
