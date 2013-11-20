@@ -40,11 +40,17 @@ public:
 
 	virtual	status_t			ReadSymlink(void* buffer, size_t* bufferSize);
 
+	virtual	status_t			OpenAttributeDirectory(
+									AttributeDirectoryCookie*& _cookie);
+	virtual	status_t			OpenAttribute(const StringKey& name,
+									int openMode, AttributeCookie*& _cookie);
+
 private:
 			struct OldAttributes;
 
 private:
 			timespec			fModifiedTime;
+			BReference<Package>	fPackage;
 			const char*			fLinkPath;
 			Type				fType;
 };

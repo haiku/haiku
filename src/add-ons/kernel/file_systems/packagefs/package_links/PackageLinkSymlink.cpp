@@ -10,6 +10,7 @@
 
 #include <NodeMonitor.h>
 
+#include "AutoPackageAttributeDirectoryCookie.h"
 #include "DebugSupport.h"
 #include "NodeListener.h"
 #include "PackageLinksListener.h"
@@ -79,6 +80,7 @@ private:
 PackageLinkSymlink::PackageLinkSymlink(Package* package, Type type)
 	:
 	Node(0),
+	fPackage(),
 	fLinkPath(kUnknownLinkTarget),
 	fType(type)
 {
@@ -95,6 +97,8 @@ void
 PackageLinkSymlink::Update(Package* package, PackageLinksListener* listener)
 {
 	OldAttributes oldAttributes(fModifiedTime, FileSize());
+
+	fPackage = package;
 
 	if (package != NULL) {
 		fLinkPath = package->InstallPath();
@@ -160,4 +164,28 @@ PackageLinkSymlink::ReadSymlink(void* buffer, size_t* bufferSize)
 	*bufferSize = toCopy;
 
 	return B_OK;
+}
+
+
+status_t
+PackageLinkSymlink::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
+{
+	AutoPackageAttributeDirectoryCookie* cookie = new(std::nothrow)
+		AutoPackageAttributeDirectoryCookie();
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	_cookie = cookie;
+	return B_OK;
+}
+
+
+status_t
+PackageLinkSymlink::OpenAttribute(const StringKey& name, int openMode,
+	AttributeCookie*& _cookie)
+{
+	if (fPackage.Get() == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	return AutoPackageAttributes::OpenCookie(fPackage, name, openMode, _cookie);
 }

@@ -24,6 +24,11 @@ public:
 
 	virtual	timespec			ModifiedTime() const;
 
+	virtual	status_t			OpenAttributeDirectory(
+									AttributeDirectoryCookie*& _cookie);
+	virtual	status_t			OpenAttribute(const StringKey& name,
+									int openMode, AttributeCookie*& _cookie);
+
 			void				AddPackage(Package* package,
 									PackageLinksListener* listener);
 			void				RemovePackage(Package* package,

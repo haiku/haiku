@@ -12,6 +12,7 @@
 
 #include <AutoDeleter.h>
 
+#include "AutoPackageAttributeDirectoryCookie.h"
 #include "DebugSupport.h"
 #include "PackageLinksListener.h"
 #include "StringConstants.h"
@@ -70,6 +71,36 @@ PackageLinkDirectory::ModifiedTime() const
 {
 	return fModifiedTime;
 }
+
+
+status_t
+PackageLinkDirectory::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
+{
+	Package* package = fPackages.Head();
+	if (package == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	AutoPackageAttributeDirectoryCookie* cookie = new(std::nothrow)
+		AutoPackageAttributeDirectoryCookie();
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	_cookie = cookie;
+	return B_OK;
+}
+
+
+status_t
+PackageLinkDirectory::OpenAttribute(const StringKey& name, int openMode,
+	AttributeCookie*& _cookie)
+{
+	Package* package = fPackages.Head();
+	if (package == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	return AutoPackageAttributes::OpenCookie(package, name, openMode, _cookie);
+}
+
 
 void
 PackageLinkDirectory::AddPackage(Package* package,
