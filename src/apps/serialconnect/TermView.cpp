@@ -19,19 +19,19 @@ TermView::TermView()
 	:
 	BView("TermView", B_WILL_DRAW | B_FRAME_EVENTS)
 {
+	SetFont(be_fixed_font);
+
 	font_height height;
 	GetFontHeight(&height);
 	fFontHeight = height.ascent + height.descent + height.leading;
 	fFontWidth = be_fixed_font->StringWidth("X");
 	fTerm = vterm_new(kDefaultHeight, kDefaultWidth);
 
-	vterm_parser_set_utf8(fTerm, 1);
-
 	fTermScreen = vterm_obtain_screen(fTerm);
 	vterm_screen_set_callbacks(fTermScreen, &sScreenCallbacks, this);
 	vterm_screen_reset(fTermScreen, 1);
 
-	SetFont(be_fixed_font);
+	vterm_parser_set_utf8(fTerm, 1);
 }
 
 
@@ -61,52 +61,60 @@ void TermView::Draw(BRect updateRect)
 	for (pos.row = updatedChars.start_row; pos.row <= updatedChars.end_row;
 			pos.row++) {
 		float x = updatedChars.start_col * fFontWidth + kBorderSpacing;
-		float y = pos.row * fFontHeight + height.ascent + kBorderSpacing;
+		float y = pos.row * fFontHeight + height.ascent + kBorderSpacing + 1;
 		MovePenTo(x, y);
 
 		for (pos.col = updatedChars.start_col;
 				pos.col <= updatedChars.end_col;) {
+			VTermScreenCell cell;
+
 			if (pos.col < 0 || pos.row < 0 || pos.col >= availableCols 
 					|| pos.row >= availableRows) {
+
+				// All cells outside the used terminal area are drawn with the
+				// same background color as the top-left one.
+				VTermPos firstPos;
+				firstPos.row = 0;
+				firstPos.col = 0;
+				vterm_screen_get_cell(fTermScreen, firstPos, &cell);
+				cell.chars[0] = 0;
+				cell.width = 1;
+			} else
+				vterm_screen_get_cell(fTermScreen, pos, &cell);
+
+			rgb_color foreground, background;
+			foreground.red = cell.fg.red;
+			foreground.green = cell.fg.green;
+			foreground.blue = cell.fg.blue;
+			background.red = cell.bg.red;
+			background.green = cell.bg.green;
+			background.blue = cell.bg.blue;
+
+			if(cell.attrs.reverse) {
+				SetLowColor(foreground);
+				SetViewColor(foreground);
+				SetHighColor(background);
+			} else {
+				SetLowColor(background);
+				SetViewColor(background);
+				SetHighColor(foreground);
+			}
+
+			BPoint penLocation = PenLocation();
+			FillRect(BRect(penLocation.x, penLocation.y - height.ascent,
+				penLocation.x + cell.width * fFontWidth, penLocation.y + 1),
+				B_SOLID_LOW);
+
+			if (cell.chars[0] == 0) {
 				DrawString(" ");
 				pos.col ++;
 			} else {
-				VTermScreenCell cell;
-				vterm_screen_get_cell(fTermScreen, pos, &cell);
-
-				rgb_color foreground, background;
-				foreground.red = cell.fg.red;
-				foreground.green = cell.fg.green;
-				foreground.blue = cell.fg.blue;
-				background.red = cell.bg.red;
-				background.green = cell.bg.green;
-				background.blue = cell.bg.blue;
-
-				if(cell.attrs.reverse) {
-					SetLowColor(foreground);
-					SetViewColor(foreground);
-					SetHighColor(background);
-				} else {
-					SetLowColor(background);
-					SetViewColor(background);
-					SetHighColor(foreground);
-				}
-
-				BPoint penLocation = PenLocation();
-				FillRect(BRect(penLocation.x, penLocation.y - height.ascent,
-					penLocation.x + cell.width * fFontWidth, penLocation.y), B_SOLID_LOW);
-
-				if (cell.chars[0] == 0) {
-					DrawString(" ");
-					pos.col ++;
-				} else {
-					char buffer[VTERM_MAX_CHARS_PER_CELL];
-					wcstombs(buffer, (wchar_t*)cell.chars,
+				char buffer[VTERM_MAX_CHARS_PER_CELL];
+				wcstombs(buffer, (wchar_t*)cell.chars,
 						VTERM_MAX_CHARS_PER_CELL);
 
-					DrawString(buffer);
-					pos.col += cell.width;
-				}
+				DrawString(buffer);
+				pos.col += cell.width;
 			}
 		}
 	}
@@ -116,7 +124,7 @@ void TermView::Draw(BRect updateRect)
 void TermView::FrameResized(float width, float height)
 {
 	VTermRect newSize = PixelsToGlyphs(BRect(0, 0, width - 2 * kBorderSpacing,
-		height - 2 * kBorderSpacing));
+				height - 2 * kBorderSpacing));
 	vterm_set_size(fTerm, newSize.end_row, newSize.end_col);
 }
 

@@ -23,7 +23,13 @@ class SerialWindow: public BWindow
 	private:
 		TermView* fTermView;
 		BMenu* fConnectionMenu;
+		BMenu* fDatabitsMenu;
+		BMenu* fStopbitsMenu;
+		BMenu* fParityMenu;
+		BMenu* fFlowcontrolMenu;
+		BMenu* fBaudrateMenu;
 		BFilePanel* fLogFilePanel;
 
+		static const int kBaudrates[];
 		static const char* kWindowTitle;
 };

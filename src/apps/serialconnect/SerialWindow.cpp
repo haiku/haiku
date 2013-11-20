@@ -19,6 +19,14 @@
 #include "TermView.h"
 
 
+const int SerialWindow::kBaudrates[] = { 50, 75, 110, 134, 150, 200, 300, 600,
+	1200, 1800, 2400, 4800, 9600, 19200, 31250, 38400, 57600, 115200, 230400
+};
+
+
+const char* SerialWindow::kWindowTitle = "SerialConnect";
+
+
 SerialWindow::SerialWindow()
 	: BWindow(BRect(100, 100, 400, 400), SerialWindow::kWindowTitle,
 		B_DOCUMENT_WINDOW, B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS)
@@ -49,34 +57,37 @@ SerialWindow::SerialWindow()
 	BMenuItem* logFile = new BMenuItem("Log to file" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgLogfile));
 	fileMenu->AddItem(logFile);
+#if 0
+	// TODO implement these
 	BMenuItem* xmodemSend = new BMenuItem("X/Y/ZModem send" B_UTF8_ELLIPSIS,
 		NULL);
 	fileMenu->AddItem(xmodemSend);
 	BMenuItem* xmodemReceive = new BMenuItem(
 		"X/Y/Zmodem receive" B_UTF8_ELLIPSIS, NULL);
 	fileMenu->AddItem(xmodemReceive);
+#endif
 
 	// Configuring all this by menus may be a bit unhandy. Make a setting
 	// window instead ?
-	BMenu* baudRate = new BMenu("Baud rate"); 
-	baudRate->SetRadioMode(true);
-	settingsMenu->AddItem(baudRate);
+	fBaudrateMenu = new BMenu("Baud rate"); 
+	fBaudrateMenu->SetRadioMode(true);
+	settingsMenu->AddItem(fBaudrateMenu);
 
-	BMenu* parity = new BMenu("Parity"); 
-	parity->SetRadioMode(true);
-	settingsMenu->AddItem(parity);
+	fParityMenu = new BMenu("Parity"); 
+	fParityMenu->SetRadioMode(true);
+	settingsMenu->AddItem(fParityMenu);
 
-	BMenu* stopBits = new BMenu("Stop bits"); 
-	stopBits->SetRadioMode(true);
-	settingsMenu->AddItem(stopBits);
+	fStopbitsMenu = new BMenu("Stop bits"); 
+	fStopbitsMenu->SetRadioMode(true);
+	settingsMenu->AddItem(fStopbitsMenu);
 
-	BMenu* flowControl = new BMenu("Flow control"); 
-	flowControl->SetRadioMode(true);
-	settingsMenu->AddItem(flowControl);
+	fFlowcontrolMenu = new BMenu("Flow control"); 
+	fFlowcontrolMenu->SetRadioMode(true);
+	settingsMenu->AddItem(fFlowcontrolMenu);
 
-	BMenu* dataBits = new BMenu("Data bits"); 
-	dataBits->SetRadioMode(true);
-	settingsMenu->AddItem(dataBits);
+	fDatabitsMenu = new BMenu("Data bits"); 
+	fDatabitsMenu->SetRadioMode(true);
+	settingsMenu->AddItem(fDatabitsMenu);
 
 
 	BMessage* message = new BMessage(kMsgSettings);
@@ -90,12 +101,11 @@ SerialWindow::SerialWindow()
 	message = new BMessage(kMsgSettings);
 	message->AddInt32("parity", B_EVEN_PARITY);
 	BMenuItem* parityEven = new BMenuItem("Even", message);
-	parityNone->SetMarked(true);
 
-	parity->AddItem(parityNone);
-	parity->AddItem(parityOdd);
-	parity->AddItem(parityEven);
-	parity->SetTargetForItems(be_app);
+	fParityMenu->AddItem(parityNone);
+	fParityMenu->AddItem(parityOdd);
+	fParityMenu->AddItem(parityEven);
+	fParityMenu->SetTargetForItems(be_app);
 
 	message = new BMessage(kMsgSettings);
 	message->AddInt32("databits", B_DATA_BITS_7);
@@ -104,52 +114,41 @@ SerialWindow::SerialWindow()
 	message = new BMessage(kMsgSettings);
 	message->AddInt32("databits", B_DATA_BITS_8);
 	BMenuItem* data8 = new BMenuItem("8", message);
-	data8->SetMarked(true);
 
-	dataBits->AddItem(data7);
-	dataBits->AddItem(data8);
-	dataBits->SetTargetForItems(be_app);
+	fDatabitsMenu->AddItem(data7);
+	fDatabitsMenu->AddItem(data8);
+	fDatabitsMenu->SetTargetForItems(be_app);
 
 	message = new BMessage(kMsgSettings);
 	message->AddInt32("stopbits", B_STOP_BITS_1);
-	BMenuItem* stop1 = new BMenuItem("1", NULL);
+	BMenuItem* stop1 = new BMenuItem("1", message);
 
 	message = new BMessage(kMsgSettings);
 	message->AddInt32("stopbits", B_STOP_BITS_2);
-	BMenuItem* stop2 = new BMenuItem("2", NULL);
-	stop1->SetMarked(true);
+	BMenuItem* stop2 = new BMenuItem("2", message);
 
-	stopBits->AddItem(stop1);
-	stopBits->AddItem(stop2);
-	stopBits->SetTargetForItems(be_app);
-
-	static const int baudrates[] = { 50, 75, 110, 134, 150, 200, 300, 600,
-		1200, 1800, 2400, 4800, 9600, 19200, 31250, 38400, 57600, 115200,
-		230400
-	};
+	fStopbitsMenu->AddItem(stop1);
+	fStopbitsMenu->AddItem(stop2);
+	fStopbitsMenu->SetTargetForItems(be_app);
 
 	// Loop backwards to add fastest rates at top of menu
-	for (int i = sizeof(baudrates) / sizeof(char*); --i >= 0;)
+	for (int i = sizeof(kBaudrates) / sizeof(char*); --i >= 0;)
 	{
 		message = new BMessage(kMsgSettings);
-		message->AddInt32("baudrate", baudrates[i]);
+		message->AddInt32("baudrate", kBaudrates[i]);
 
 		char buffer[7];
-		sprintf(buffer,"%d", baudrates[i]);
+		sprintf(buffer,"%d", kBaudrates[i]);
 		BMenuItem* item = new BMenuItem(buffer, message);
 
-		if (baudrates[i] == 19200)
-			item->SetMarked(true);
-
-		baudRate->AddItem(item);
+		fBaudrateMenu->AddItem(item);
 	}
 
-	baudRate->SetTargetForItems(be_app);
+	fBaudrateMenu->SetTargetForItems(be_app);
 
 	message = new BMessage(kMsgSettings);
 	message->AddInt32("flowcontrol", B_HARDWARE_CONTROL);
 	BMenuItem* hardware = new BMenuItem("Hardware", message);
-	hardware->SetMarked(true);
 
 	message = new BMessage(kMsgSettings);
 	message->AddInt32("flowcontrol", B_SOFTWARE_CONTROL);
@@ -163,11 +162,11 @@ SerialWindow::SerialWindow()
 	message->AddInt32("flowcontrol", 0);
 	BMenuItem* noFlow = new BMenuItem("None", message);
 
-	flowControl->AddItem(hardware);
-	flowControl->AddItem(software);
-	flowControl->AddItem(both);
-	flowControl->AddItem(noFlow);
-	flowControl->SetTargetForItems(be_app);
+	fFlowcontrolMenu->AddItem(hardware);
+	fFlowcontrolMenu->AddItem(software);
+	fFlowcontrolMenu->AddItem(both);
+	fFlowcontrolMenu->AddItem(noFlow);
+	fFlowcontrolMenu->SetTargetForItems(be_app);
 
 	CenterOnScreen();
 }
@@ -188,6 +187,7 @@ void SerialWindow::MenusBeginning()
 	// fill it with the (updated) serial port list
 	BSerialPort serialPort;
 	int deviceCount = serialPort.CountDevices();
+	bool connected = false;
 
 	for(int i = 0; i < deviceCount; i++)
 	{
@@ -199,6 +199,13 @@ void SerialWindow::MenusBeginning()
 		BMenuItem* portItem = new BMenuItem(buffer, message);
 		portItem->SetTarget(be_app);
 
+		const BString& connectedPort = ((SerialApp*)be_app)->GetPort();
+
+		if(connectedPort == buffer) {
+			connected = true;
+			portItem->SetMarked(true);
+		}
+
 		fConnectionMenu->AddItem(portItem);
 	}
 
@@ -207,6 +214,8 @@ void SerialWindow::MenusBeginning()
 
 		BMenuItem* disconnect = new BMenuItem("Disconnect",
 			new BMessage(kMsgOpenPort), 'Z', B_OPTION_KEY);
+		if(!connected)
+			disconnect->SetEnabled(false);
 		fConnectionMenu->AddItem(disconnect);
 	} else {
 		BMenuItem* noDevices = new BMenuItem("<no serial port available>", NULL);
@@ -246,10 +255,82 @@ void SerialWindow::MessageReceived(BMessage* message)
 			fLogFilePanel->Show();
 			break;
 		}
+		case kMsgSettings:
+		{
+			int32 baudrate;
+			stop_bits stopBits;
+			data_bits dataBits;
+			parity_mode parity;
+			uint32 flowcontrol;
+
+			if(message->FindInt32("databits", (int32*)&dataBits) == B_OK)
+			{
+				for(int i = 0; i < fDatabitsMenu->CountItems(); i++)
+				{
+					BMenuItem* item = fDatabitsMenu->ItemAt(i);
+					int32 code;
+					item->Message()->FindInt32("databits", &code);
+
+					if(code == dataBits)
+						item->SetMarked(true);
+				}
+			}
+
+			if(message->FindInt32("stopbits", (int32*)&stopBits) == B_OK)
+			{
+				for(int i = 0; i < fStopbitsMenu->CountItems(); i++)
+				{
+					BMenuItem* item = fStopbitsMenu->ItemAt(i);
+					int32 code;
+					item->Message()->FindInt32("stopbits", &code);
+
+					if(code == stopBits)
+						item->SetMarked(true);
+				}
+			}
+
+			if(message->FindInt32("parity", (int32*)&parity) == B_OK)
+			{
+				for(int i = 0; i < fParityMenu->CountItems(); i++)
+				{
+					BMenuItem* item = fParityMenu->ItemAt(i);
+					int32 code;
+					item->Message()->FindInt32("parity", &code);
+
+					if(code == parity)
+						item->SetMarked(true);
+				}
+			}
+
+			if(message->FindInt32("flowcontrol", (int32*)&flowcontrol) == B_OK)
+			{
+				for(int i = 0; i < fFlowcontrolMenu->CountItems(); i++)
+				{
+					BMenuItem* item = fFlowcontrolMenu->ItemAt(i);
+					int32 code;
+					item->Message()->FindInt32("flowcontrol", &code);
+
+					if(code == (int32)flowcontrol)
+						item->SetMarked(true);
+				}
+			}
+
+			if(message->FindInt32("baudrate", &baudrate) == B_OK)
+			{
+				for(int i = 0; i < fBaudrateMenu->CountItems(); i++)
+				{
+					BMenuItem* item = fBaudrateMenu->ItemAt(i);
+					int32 code;
+					item->Message()->FindInt32("baudrate", &code);
+
+					if(code == kBaudrates[baudrate])
+						item->SetMarked(true);
+				}
+			}
+			
+			break;
+		}
 		default:
 			BWindow::MessageReceived(message);
 	}
 }
-
-
-const char* SerialWindow::kWindowTitle = "SerialConnect";

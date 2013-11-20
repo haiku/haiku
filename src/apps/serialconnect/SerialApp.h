@@ -10,6 +10,7 @@
 
 #include <Application.h>
 #include <SerialPort.h>
+#include <String.h>
 
 
 class BFile;
@@ -23,12 +24,20 @@ class SerialApp: public BApplication
 		~SerialApp();
 		void ReadyToRun();
 		void MessageReceived(BMessage* message);
+		bool QuitRequested();
 
+		const BString& GetPort();
+
+	private:
+		void LoadSettings();
+		void SaveSettings();
+		
 	private:
 		BSerialPort fSerialPort;
 		sem_id fSerialLock;
 		SerialWindow* fWindow;
 		BFile* fLogFile;
+		BString fPortPath;
 
 		static status_t PollSerial(void*);
 

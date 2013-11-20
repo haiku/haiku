@@ -12,6 +12,8 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <FindDirectory.h>
+#include <Path.h>
 
 #include "SerialWindow.h"
 
@@ -37,6 +39,7 @@ SerialApp::~SerialApp()
 
 void SerialApp::ReadyToRun()
 {
+	LoadSettings();
 	fWindow->Show();
 }
 
@@ -47,10 +50,9 @@ void SerialApp::MessageReceived(BMessage* message)
 	{
 		case kMsgOpenPort:
 		{
-			const char* portName;
-			if(message->FindString("port name", &portName) == B_OK)
+			if(message->FindString("port name", &fPortPath) == B_OK)
 			{
-				fSerialPort.Open(portName);
+				fSerialPort.Open(fPortPath);
 				release_sem(fSerialLock);
 			} else {
 				fSerialPort.Close();
@@ -204,6 +206,62 @@ void SerialApp::MessageReceived(BMessage* message)
 		default:
 			BApplication::MessageReceived(message);
 	}
+}
+
+
+bool SerialApp::QuitRequested()
+{
+	if(BApplication::QuitRequested()) {
+		SaveSettings();
+		return true;
+	}
+	return false;
+}
+
+
+const BString& SerialApp::GetPort()
+{
+	return fPortPath;
+}
+
+
+void SerialApp::LoadSettings()
+{
+	BPath path;
+	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	path.Append("SerialConnect");
+
+	BFile file(path.Path(), B_READ_ONLY);
+	BMessage message(kMsgSettings);
+	if(message.Unflatten(&file) != B_OK)
+	{
+		message.AddInt32("parity", fSerialPort.ParityMode());
+		message.AddInt32("databits", fSerialPort.DataBits());
+		message.AddInt32("stopbits", fSerialPort.StopBits());
+		message.AddInt32("baudrate", fSerialPort.DataRate());
+		message.AddInt32("flowcontrol", fSerialPort.FlowControl());
+	}
+
+	be_app->PostMessage(&message);
+	fWindow->PostMessage(&message);
+}
+
+
+void SerialApp::SaveSettings()
+{
+	BMessage message(kMsgSettings);
+	message.AddInt32("parity", fSerialPort.ParityMode());
+	message.AddInt32("databits", fSerialPort.DataBits());
+	message.AddInt32("stopbits", fSerialPort.StopBits());
+	message.AddInt32("baudrate", fSerialPort.DataRate());
+	message.AddInt32("flowcontrol", fSerialPort.FlowControl());
+
+	BPath path;
+	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	path.Append("SerialConnect");
+
+	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
+	message.Flatten(&file);
 }
 
 
