@@ -65,6 +65,8 @@ struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
 	bigtime_t	fMeasureTime;
 
 	int32		fLoad;
+
+	rw_spinlock fSchedulerModeLock;
 } CACHE_LINE_ALIGN;
 typedef MinMaxHeap<CPUEntry, int32> CPUHeap CACHE_LINE_ALIGN;
 

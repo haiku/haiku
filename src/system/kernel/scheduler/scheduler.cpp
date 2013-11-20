@@ -43,7 +43,6 @@ static bool sSchedulerEnabled;
 SchedulerListenerList gSchedulerListeners;
 spinlock gSchedulerListenersLock = B_SPINLOCK_INITIALIZER;
 
-static rw_spinlock sSchedulerModeLock = B_RW_SPINLOCK_INITIALIZER;
 static struct scheduler_mode_operations* sCurrentMode;
 static struct scheduler_mode_operations* sSchedulerModes[] = {
 	&gSchedulerLowLatencyMode,
@@ -74,6 +73,29 @@ int32 gRunQueueCount;
 int32* gCPUToCore;
 int32* gCPUToPackage;
 
+class SchedulerModeLocker : public ReadSpinLocker {
+public:
+	inline SchedulerModeLocker(bool alreadyLocked = false,
+		bool lockIfNotLocked = true)
+		:
+		ReadSpinLocker(gCPUEntries[smp_get_current_cpu()].fSchedulerModeLock,
+			alreadyLocked, lockIfNotLocked)
+		{
+		}
+};
+
+class InterruptsSchedulerModeLocker : public InterruptsReadSpinLocker {
+public:
+	inline InterruptsSchedulerModeLocker(bool alreadyLocked = false,
+		bool lockIfNotLocked = true)
+		:
+		InterruptsReadSpinLocker(
+			gCPUEntries[smp_get_current_cpu()].fSchedulerModeLock,
+			alreadyLocked, lockIfNotLocked)
+		{
+		}
+};
+
 }	// namespace Scheduler
 
 
@@ -84,6 +106,7 @@ CPUEntry::CPUEntry()
 	fMeasureTime(0),
 	fLoad(0)
 {
+	B_INITIALIZE_RW_SPINLOCK(&fSchedulerModeLock);
 }
 
 
@@ -784,7 +807,7 @@ enqueue(Thread* thread, bool newOne)
 void
 scheduler_enqueue_in_run_queue(Thread *thread)
 {
-	InterruptsReadSpinLocker modeLocker(sSchedulerModeLock);
+	InterruptsSchedulerModeLocker _;
 
 	TRACE("enqueueing new thread %ld with static priority %ld\n", thread->id,
 		thread->priority);
@@ -833,7 +856,7 @@ int32
 scheduler_set_thread_priority(Thread *thread, int32 priority)
 {
 	InterruptsSpinLocker _(thread->scheduler_lock);
-	InterruptsReadSpinLocker modeLocker(sSchedulerModeLock);
+	SchedulerModeLocker modeLocker;
 
 	int32 oldPriority = thread->priority;
 
@@ -1127,7 +1150,9 @@ update_cpu_performance(Thread* thread, int32 thisCore)
 static void
 _scheduler_reschedule(void)
 {
-	InterruptsReadSpinLocker modeLocker(sSchedulerModeLock);
+	ASSERT(!are_interrupts_enabled());
+
+	SchedulerModeLocker modeLocker;
 
 	Thread* oldThread = thread_get_current_thread();
 
@@ -1324,9 +1349,15 @@ scheduler_set_operation_mode(scheduler_mode mode)
 
 	dprintf("scheduler: switching to %s mode\n", sSchedulerModes[mode]->name);
 
-	InterruptsWriteSpinLocker _(sSchedulerModeLock);
+	InterruptsLocker _;
+	for (int32_t i = 0; i < smp_get_num_cpus(); i++)
+		acquire_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
+
 	sCurrentMode = sSchedulerModes[mode];
 	sCurrentMode->switch_to_mode();
+
+	for (int32_t i = 0; i < smp_get_num_cpus(); i++)
+		release_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
 
 	return B_OK;
 }
