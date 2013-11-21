@@ -115,7 +115,6 @@ if $(TARGET_PLATFORM) = libbe_test {
 StdBinCommands
 	alert.cpp
 	eject.cpp
-	findpaths.cpp
 	getarch.cpp
 	hey.cpp
 	reindex.cpp
@@ -189,6 +188,11 @@ StdBinCommands
 StdBinCommands
 	mail.cpp
 	: be libmail.so : $(haiku-utils_rsrc) ;
+
+# standard commands that need libbe.so, libpackage.so, libsupc++.so
+StdBinCommands
+	findpaths.cpp
+	: be package $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libdevice.so
 StdBinCommands

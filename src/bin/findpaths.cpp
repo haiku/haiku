@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <package/PackageResolvableExpression.h>
 #include <Path.h>
 #include <PathFinder.h>
 #include <StringList.h>
@@ -115,6 +116,12 @@ static const char* kUsage =
 	"  -p, --path <path>\n"
 	"    Print only one path, the one for the installation location that\n"
 	"    contains the path <path>.\n"
+	"  -r, --resolvable <expression>\n"
+	"    Print only one path, the one for the installation location for the\n"
+	"    package providing the resolvable matching the expression\n"
+	"    <expression>. The expressions can be a simple resolvable name or\n"
+	"    a resolvable name with operator and version (e.g.\n"
+	"    \"cmd:perl >= 5\"; must be one argument).\n"
 ;
 
 
@@ -132,6 +139,7 @@ main(int argc, const char* const* argv)
 	const char* architecture = NULL;
 	const char* dependency = NULL;
 	const char* referencePath = NULL;
+	const char* resolvable = NULL;
 	bool existingOnly = false;
 	const char* separator = NULL;
 
@@ -141,11 +149,12 @@ main(int argc, const char* const* argv)
 			{ "dependency", required_argument, 0, 'd' },
 			{ "help", no_argument, 0, 'h' },
 			{ "path", required_argument, 0, 'p' },
+			{ "resolvable", required_argument, 0, 'pr' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+a:c:d:ehlp:",
+		int c = getopt_long(argc, (char**)argv, "+a:c:d:ehlp:r:",
 			sLongOptions, NULL);
 		if (c == -1)
 			break;
@@ -183,6 +192,10 @@ main(int argc, const char* const* argv)
 				referencePath = optarg;
 				break;
 
+			case 'r':
+				resolvable = optarg;
+				break;
+
 			default:
 				print_usage_and_exit(true);
 				break;
@@ -198,6 +211,10 @@ main(int argc, const char* const* argv)
 	const char* subPath = NULL;
 	if (optind >= argc)
 		subPath = argv[optind++];
+
+	// only one of path or resolvable may be specified
+	if (referencePath != NULL && resolvable != NULL)
+		print_usage_and_exit(true);
 
 	// resolve the directory constant
 	path_base_directory baseDirectory = B_FIND_PATH_IMAGE_PATH;
@@ -217,11 +234,19 @@ main(int argc, const char* const* argv)
 		exit(1);
 	}
 
-	if (referencePath != NULL) {
+	if (referencePath != NULL || resolvable != NULL) {
+		BPathFinder pathFinder;
+		if (referencePath != NULL) {
+			pathFinder.SetTo(referencePath, dependency);
+		} else {
+			pathFinder.SetTo(
+				BPackageKit::BPackageResolvableExpression(resolvable),
+				dependency);
+		}
+
 		BPath path;
-		status_t error = BPathFinder(referencePath, dependency).FindPath(
-			architecture, baseDirectory, subPath,
-			existingOnly ? B_FIND_PATH_EXISTING_ONLY : 0, path);
+		status_t error =pathFinder.FindPath(architecture, baseDirectory,
+			subPath, existingOnly ? B_FIND_PATH_EXISTING_ONLY : 0, path);
 		if (error != B_OK) {
 			fprintf(stderr, "Error: Failed to find path: %s\n",
 				strerror(error));
