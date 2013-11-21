@@ -100,8 +100,6 @@ release_spinlock_inline(spinlock* lock)
 #define acquire_spinlock(lock)		acquire_spinlock_inline(lock)
 #define release_spinlock(lock)		release_spinlock_inline(lock)
 
-#endif	// !DEBUG_SPINLOCKS && !B_DEBUG_SPINLOCK_CONTENTION
-
 
 static inline bool
 try_acquire_write_spinlock_inline(rw_spinlock* lock)
@@ -205,6 +203,9 @@ release_read_seqlock_inline(seqlock* lock, uint32 count) {
 #define acquire_read_seqlock(lock)		acquire_read_seqlock_inline(lock)
 #define release_read_seqlock(lock, count)	\
 	release_read_seqlock_inline(lock, count)
+
+
+#endif	// !DEBUG_SPINLOCKS && !B_DEBUG_SPINLOCK_CONTENTION
 
 
 #endif	/* KERNEL_SMP_H */

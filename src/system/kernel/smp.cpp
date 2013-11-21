@@ -350,7 +350,7 @@ acquire_spinlock(spinlock* lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (*lock != 0) {
+			while (atomic_get(lock) != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
 						"for a long time!", lock);
@@ -404,7 +404,7 @@ acquire_spinlock_nocheck(spinlock *lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (*lock != 0) {
+			while (atomic_get(lock) != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT_NO_CHECK) {
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
 						"for a long time!", lock);
@@ -447,7 +447,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (*lock != 0) {
+			while (atomic_get(lock) != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
 					panic("acquire_spinlock_cpu(): Failed to acquire spinlock "
 						"%p for a long time!", lock);
@@ -530,15 +530,31 @@ release_spinlock(spinlock *lock)
 bool
 try_acquire_write_spinlock(rw_spinlock* lock)
 {
-	return atomic_test_and_set(&lock->lock, 1 << 31, 0) == 0;
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("try_acquire_write_spinlock: attempt to acquire lock %p with"
+			" interrupts enabled", lock);
+	}
+
+	if (sNumCPUs < 2 && lock->lock != 0) {
+		panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
+			"non-SMP system", lock);
+	}
+#endif
+
+	return atomic_test_and_set(&lock->lock, 1u << 31, 0) == 0;
 }
 
 
 void
 acquire_write_spinlock(rw_spinlock* lock)
 {
-	if (sNumCPUs < 2)
-		return;
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("acquire_write_spinlock: attempt to acquire lock %p with"
+			" interrupts enabled", lock);
+	}
+#endif
 
 	uint32 count = 0;
 	int currentCPU = smp_get_current_cpu();
@@ -546,14 +562,16 @@ acquire_write_spinlock(rw_spinlock* lock)
 		if (try_acquire_write_spinlock(lock))
 			break;
 
-		if (++count == SPINLOCK_DEADLOCK_COUNT) {
-			panic("acquire_write_spinlock(): Failed to acquire spinlock %p "
-				"for a long time!", lock);
-			count = 0;
-		}
+		while (atomic_get(&lock->lock) != 0) {
+			if (++count == SPINLOCK_DEADLOCK_COUNT) {
+				panic("acquire_write_spinlock(): Failed to acquire spinlock %p "
+					"for a long time!", lock);
+				count = 0;
+			}
 
-		process_all_pending_ici(currentCPU);
-		PAUSE();
+			process_all_pending_ici(currentCPU);
+			PAUSE();
+		}
 	}
 }
 
@@ -561,16 +579,37 @@ acquire_write_spinlock(rw_spinlock* lock)
 void
 release_write_spinlock(rw_spinlock* lock)
 {
+#if DEBUG_SPINLOCKS
+	uint32 previous = atomic_get_and_set(&lock->lock, 0);
+	if ((previous & 1u << 31) == 0) {
+		panic("release_write_spinlock: lock %p was already released (value:"
+			" %x)\n", lock, previous);
+	}
+#else
 	atomic_set(&lock->lock, 0);
+#endif
 }
 
 
 bool
 try_acquire_read_spinlock(rw_spinlock* lock)
 {
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("try_acquire_read_spinlock: attempt to acquire lock %p with"
+			" interrupts enabled", lock);
+	}
+
+	if (sNumCPUs < 2 && lock->lock != 0) {
+		panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
+			"non-SMP system", lock);
+	}
+#endif
+
 	uint32 previous = atomic_add(&lock->lock, 1);
 	if ((previous & (1 << 31)) == 0)
 		return true;
+
 	atomic_test_and_set(&lock->lock, 1 << 31, previous);
 	return false;
 }
@@ -579,8 +618,12 @@ try_acquire_read_spinlock(rw_spinlock* lock)
 void
 acquire_read_spinlock(rw_spinlock* lock)
 {
-	if (sNumCPUs < 2)
-		return;
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("acquire_read_spinlock: attempt to acquire lock %p with"
+			" interrupts enabled", lock);
+	}
+#endif
 
 	uint32 count = 0;
 	int currentCPU = smp_get_current_cpu();
@@ -588,14 +631,16 @@ acquire_read_spinlock(rw_spinlock* lock)
 		if (try_acquire_read_spinlock(lock))
 			break;
 
-		if (++count == SPINLOCK_DEADLOCK_COUNT) {
-			panic("acquire_read_spinlock(): Failed to acquire spinlock %p "
-				"for a long time!", lock);
-			count = 0;
-		}
+		while (atomic_get(&lock->lock) != 0) {
+			if (++count == SPINLOCK_DEADLOCK_COUNT) {
+				panic("acquire_read_spinlock(): Failed to acquire spinlock %p "
+					"for a long time!", lock);
+				count = 0;
+			}
 
-		process_all_pending_ici(currentCPU);
-		PAUSE();
+			process_all_pending_ici(currentCPU);
+			PAUSE();
+		}
 	}
 }
 
@@ -603,7 +648,16 @@ acquire_read_spinlock(rw_spinlock* lock)
 void
 release_read_spinlock(rw_spinlock* lock)
 {
+#if DEBUG_SPINLOCKS
+	uint32 previous = atomic_add(&lock->lock, -1);
+	if ((previous & 1 << 31) != 0) {
+		panic("release_read_spinlock: lock %p was already released (value:"
+			" %x)\n", lock, previous);
+	}
+#else
 	atomic_add(&lock->lock, -1);
+#endif
+
 }
 
 
