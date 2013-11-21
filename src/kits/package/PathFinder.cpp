@@ -80,7 +80,7 @@ BPathFinder::SetTo(const BResolvableExpression& expression,
 		return fInitStatus;
 
 	BString packageLinksPath;
-	packageLinksPath.SetToFormat(kSystemPackageLinksDirectory "/%s",
+	packageLinksPath.SetToFormat(kSystemPackageLinksDirectory "/%s/.self",
 		versionedPackageName.String());
 	if (packageLinksPath.IsEmpty())
 		return fInitStatus = B_NO_MEMORY;
