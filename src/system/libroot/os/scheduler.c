@@ -62,15 +62,19 @@ estimate_max_scheduling_latency(thread_id thread)
 
 
 status_t
-set_scheduler_mode(int32 mode)
+__set_scheduler_mode(int32 mode)
 {
 	return _kern_set_scheduler_mode(mode);
 }
 
 
 int32
-get_scheduler_mode(void)
+__get_scheduler_mode(void)
 {
 	return _kern_get_scheduler_mode();
 }
+
+
+B_DEFINE_WEAK_ALIAS(__set_scheduler_mode, set_scheduler_mode);
+B_DEFINE_WEAK_ALIAS(__get_scheduler_mode, get_scheduler_mode);
 
