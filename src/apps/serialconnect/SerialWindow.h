@@ -7,6 +7,7 @@
 #include <Window.h>
 
 
+class BFilePanel;
 class BMenu;
 class TermView;
 
