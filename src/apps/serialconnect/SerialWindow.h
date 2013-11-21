@@ -4,7 +4,6 @@
  */
 
 
-#include <FilePanel.h>
 #include <Window.h>
 
 

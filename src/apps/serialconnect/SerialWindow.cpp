@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include <FilePanel.h>
 #include <GroupLayout.h>
 #include <Menu.h>
 #include <MenuBar.h>
