@@ -104,6 +104,28 @@
 
 
 /*!
+	\fn BPathFinder::BPathFinder(const BResolvableExpression& expression,
+		const char* dependency)
+	\brief Creates an object referring to an installation location based on the
+		path of a package satisfying the given resolvable expression.
+
+	The constructor finds the latest package that satisfies the resolvable
+	expression \a expression and then uses its path to initialize the object
+	like BPathFinder::BPathFinder(const char*, const char*).
+
+	\note When using this constructor linking against libpackage.so is required.
+
+	\param expression A resolvable expression to be resolved to the path of the
+		latest package satisfying it, based on which FindPath() shall compute
+		the path.
+	\param dependency The name of the package's "requires" entry to be used for
+		resolving the installation location. Can be \c NULL.
+
+	\see BPathFinder::BPathFinder(const char*, const char*)
+*/
+
+
+/*!
 	\fn status_t BPathFinder::SetTo(const void* codePointer,
 		const char* dependency)
 	\brief Reinitializes the object to refer to an installation location based
@@ -181,6 +203,28 @@
 
 
 /*!
+	\fn status_t BPathFinder::SetTo(const BResolvableExpression& expression,
+		const char* dependency)
+	\brief Reinitializes the object to refer to an installation location based
+		on a given resolvable expression.
+
+	This method finds the latest package that satisfies the resolvable
+	expression \a expression and then passes its path to
+	BPathFinder::SetTo(const char*, const char*).
+
+	\note When using this method linking against libpackage.so is required.
+
+	\param expression A resolvable expression to be resolved to the path of the
+		latest package satisfying it, based on which FindPath() shall compute
+		the path.
+	\param dependency The name of the package's "requires" entry to be used for
+		resolving the installation location. Can be \c NULL.
+
+	\see status_t BPathFinder::SetTo(const char*, const char*)
+*/
+
+
+/*!
 	\fn status_t BPathFinder::FindPath(const char* architecture,
 		path_base_directory baseDirectory, const char* subPath, uint32 flags,
 		BPath& _path)
@@ -206,10 +250,12 @@
 	get_architecture()).
 
 	If \c B_FIND_PATH_IMAGE_PATH or \c B_FIND_PATH_PACKAGE_PATH are
-	specified, \a dependency and \a subPath are ignored. In the former case,
-	which is only valid, if an image was specified for initialization, the
-	path of the image file is returned. In the latter case the path of the
-	package containing the file the initial path refers to, if any.
+	specified, \a subPath is ignored. In the former case, which is only valid,
+	if an image was specified for initialization, \a dependency is ignored as
+	well and the path of the image file is returned. In the latter case the path
+	of the package containing the file the initial path refers to, respectively,
+	if \a dependency was specified, that of the package \a dependency was
+	resolved to is returned.
 
 	\param architecture The name of the architecture to be used for resolving
 		architecture dependent paths. Can be \c NULL, in which case the
