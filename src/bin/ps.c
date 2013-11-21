@@ -6,6 +6,7 @@
  *		Francois Revol (mmu_man)
  *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
  *		Bjoern Herzig (xRaich[o]2x)
+ *		Thomas Schmidt <thomas.compix@googlemail.com>
  */
 #include <stdio.h>
 #include <unistd.h>
@@ -13,34 +14,82 @@
 
 #include <OS.h>
 
-#define SNOOZE_TIME 100000
 
-char *sStates[] = {"run", "rdy", "msg", "zzz", "sus", "wait" };
+enum {
+	Team = 0,
+	Id,
+	Threads,
+	Gid,
+	Uid
+};
 
-static void printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo); 
-static void printTeamInfo(team_info *teamInfo, bool printHeader);
+struct ColumnIndo {
+	const char* name;
+	const char* header;
+	const char* format;
+} Infos[] = {
+	{ "Team",		"%-50s",	"%-50s"  },
+	{ "Id",			"%5s",		"%5" B_PRId32  },
+	{ "Threads",	"#%7s",		"%8" B_PRId32 },
+	{ "Gid",		"%4s",		"%4d" },
+	{ "Uid",		"%4s",		"%4d" }
+};
+
+#define maxColumns  10
+int Columns[maxColumns] = { Team, Id, Threads, Gid, Uid, 0 };
+int ColumnsCount = 5;
+
+const char* sStates[] = {"run", "rdy", "msg", "zzz", "sus", "wait"};
+
+static void printTeamThreads(team_info* teamInfo, bool printSemaphoreInfo);
+static void printTeamInfo(team_info* teamInfo, bool printHeader);
+
 
 static void
-printTeamInfo(team_info *teamInfo, bool printHeader)
+printTeamInfo(team_info* teamInfo, bool printHeader)
 {
-	// Print team info
-	if (printHeader)
-		printf("%-50s %5s %8s %4s %4s\n", "Team", "Id", "#Threads", "Gid", \
-			"Uid");
-		
-	printf("%-50s %5" B_PRId32 " %8" B_PRId32 " %4d %4d\n", teamInfo->args,
-		teamInfo->team, teamInfo->thread_count, teamInfo->gid, teamInfo->uid);
+	int i = 0;
+	if (printHeader) {
+		for (i = 0; i < ColumnsCount; i++) {
+			printf(Infos[Columns[i]].header, Infos[Columns[i]].name);
+			putchar(' ');
+		}
+		puts("");
+	}
+
+
+	for (i = 0; i < ColumnsCount; i++) {
+		switch (Columns[i]) {
+			case Team:
+				printf(Infos[Team].format, teamInfo->args);
+				break;
+			case Id:
+				printf(Infos[Id].format, teamInfo->team);
+				break;
+			case Threads:
+				printf(Infos[Threads].format, teamInfo->thread_count);
+				break;
+			case Gid:
+				printf(Infos[Gid].format, teamInfo->gid);
+				break;
+			case Uid:
+				printf(Infos[Uid].format, teamInfo->uid);
+				break;
+		}
+		putchar(' ');
+	}
+	puts("");
 }
 
 
 static void
-printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo)
+printTeamThreads(team_info* teamInfo, bool printSemaphoreInfo)
 {
-	char *threadState;
+	const char* threadState;
 	int32 threadCookie = 0;
 	sem_info semaphoreInfo;
 	thread_info threadInfo;
-	
+
 	// Print all info about its threads too
 	while (get_next_thread_info(teamInfo->team, &threadCookie, &threadInfo)
 		>= B_OK) {
@@ -73,8 +122,9 @@ printTeamThreads(team_info *teamInfo, bool printSemaphoreInfo)
 	}
 }
 
+
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 	team_info teamInfo;
 	int32 teamCookie = 0;
@@ -83,23 +133,25 @@ main(int argc, char **argv)
 	bool printThreads = false;
 	bool printHeader = true;
 	bool printSemaphoreInfo = false;
+	bool customizeColumns = false;
 	// match this in team name
-	char *string_to_match;
-	
+	char* string_to_match;
+
 	int c;
-	
-	while ((c = getopt(argc, argv,"ihas")) != EOF) {
-		switch(c) {
+
+	while ((c = getopt(argc, argv, "-ihaso:")) != EOF) {
+		switch (c) {
 			case 'i':
 				printSystemInfo = true;
 				break;
 			case 'h':
-				printf( "usage: ps [-hais] [team]\n"
-			   			"-h : show help\n"
-			   			"-i : show system info\n"
-			   			"-s : show semaphore info\n"
-			   			"-a : show threads too (by default only teams are " \
-			   				"displayed)\n");
+				printf( "usage: ps [-hais] [-o columns list] [team]\n"
+						"-h : show help\n"
+						"-i : show system info\n"
+						"-s : show semaphore info\n"
+						"-o : display team info associated with the list\n"
+						"-a : show threads too (by default only teams are "
+							"displayed)\n");
 				return 0;
 				break;
 			case 'a':
@@ -108,27 +160,45 @@ main(int argc, char **argv)
 			case 's':
 				printSemaphoreInfo = true;
 				break;
+			case 'o':
+				if (!customizeColumns)
+					ColumnsCount = 0;
+				customizeColumns = true;
+				/* fallthrough */
+			case 1:
+			{
+				size_t i = 0;
+				if (c == 1 && !customizeColumns)
+					break;
+				for (i = 0; i < sizeof(Infos) / sizeof(Infos[0]); i++)
+					if (strcmp(optarg, Infos[i].name) == 0
+							&& ColumnsCount < maxColumns) {
+						Columns[ColumnsCount++] = i;
+						continue;
+					}
+				break;
+			}
 		}
 	}
 
 	// TODO: parse command line
 	// Possible command line options:
-	// 		-t	pstree like output
-	
-	if (argc == 2 && (printSystemInfo||printThreads))
+	//      -t  pstree like output
+
+	if (argc == 2 && (printSystemInfo || printThreads))
 		string_to_match = NULL;
 	else
-		string_to_match = (argc >= 2) ? argv[argc-1] : NULL;
-	
+		string_to_match = (argc >= 2 && !customizeColumns)
+			? argv[argc - 1] : NULL;
+
 	if (!string_to_match) {
 		while (get_next_team_info(&teamCookie, &teamInfo) >= B_OK) {
-			
-			printTeamInfo(&teamInfo,printHeader);
+			printTeamInfo(&teamInfo, printHeader);
 			printHeader = false;
 			if (printThreads) {
 				printf("\n%-37s %5s %8s %4s %8s %8s\n", "Thread", "Id", \
 					"State", "Prio", "UTime", "KTime");
-				printTeamThreads(&teamInfo,printSemaphoreInfo);
+				printTeamThreads(&teamInfo, printSemaphoreInfo);
 				printf("----------------------------------------------" \
 					"-----------------------------\n");
 				printHeader = true;
@@ -136,8 +206,7 @@ main(int argc, char **argv)
 		}
 	} else {
 		while (get_next_team_info(&teamCookie, &teamInfo) >= B_OK) {
-			char *p;
-			p = teamInfo.args;
+			char* p = teamInfo.args;
 			if ((p = strchr(p, ' ')))
 				*p = '\0'; /* remove arguments, keep only argv[0] */
 			p = strrchr(teamInfo.args, '/'); /* forget the path */
@@ -145,10 +214,10 @@ main(int argc, char **argv)
 				p = teamInfo.args;
 			if (strstr(p, string_to_match) == NULL)
 				continue;
-			printTeamInfo(&teamInfo,true);
+			printTeamInfo(&teamInfo, true);
 			printf("\n%-37s %5s %8s %4s %8s %8s\n", "Thread", "Id", "State", \
 				"Prio", "UTime", "KTime");
-			printTeamThreads(&teamInfo,printSemaphoreInfo);
+			printTeamThreads(&teamInfo, printSemaphoreInfo);
 		}
 	}
 
