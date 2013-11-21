@@ -503,12 +503,20 @@ PackageWriterImpl::AddEntry(const char* fileName, int fd)
 		if (strcmp(fileName, B_HPKG_PACKAGE_INFO_FILE_NAME) == 0) {
 			struct ErrorListener : public BPackageInfo::ParseErrorListener {
 				ErrorListener(BPackageWriterListener* _listener)
-					: listener(_listener) {}
+					:
+					listener(_listener),
+					errorSeen(false)
+				{
+				}
+
 				virtual void OnError(const BString& msg, int line, int col) {
 					listener->PrintError("Parse error in %s(%d:%d) -> %s\n",
 						B_HPKG_PACKAGE_INFO_FILE_NAME, line, col, msg.String());
+					errorSeen = true;
 				}
+
 				BPackageWriterListener* listener;
+				bool errorSeen;
 			} errorListener(fListener);
 
 			if (fd >= 0) {
@@ -543,6 +551,10 @@ PackageWriterImpl::AddEntry(const char* fileName, int fd)
 					packageInfoEntry, &errorListener);
 				if (result != B_OK
 					|| (result = fPackageInfo.InitCheck()) != B_OK) {
+					if (!errorListener.errorSeen) {
+						fListener->PrintError("Failed to read %s: %s\n",
+							fileName, strerror(result));
+					}
 					return result;
 				}
 			}
