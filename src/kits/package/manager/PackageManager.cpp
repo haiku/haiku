@@ -928,6 +928,83 @@ BPackageManager::UserInteractionHandler::~UserInteractionHandler()
 }
 
 
+void
+BPackageManager::UserInteractionHandler::HandleProblems()
+{
+	throw BAbortedByUserException();
+}
+
+
+void
+BPackageManager::UserInteractionHandler::ConfirmChanges(bool fromMostSpecific)
+{
+	throw BAbortedByUserException();
+}
+
+
+void
+BPackageManager::UserInteractionHandler::Warn(status_t error,
+	const char* format, ...)
+{
+}
+
+
+void
+BPackageManager::UserInteractionHandler::ProgressPackageDownloadStarted(
+	const char* packageName)
+{
+}
+
+
+void
+BPackageManager::UserInteractionHandler::ProgressPackageDownloadActive(
+	const char* packageName, float completionPercentage)
+{
+}
+
+
+void
+BPackageManager::UserInteractionHandler::ProgressPackageDownloadComplete(
+	const char* packageName)
+{
+}
+
+
+void
+BPackageManager::UserInteractionHandler::ProgressPackageChecksumStarted(
+	const char* title)
+{
+}
+
+
+void
+BPackageManager::UserInteractionHandler::ProgressPackageChecksumComplete(
+	const char* title)
+{
+}
+
+
+void
+BPackageManager::UserInteractionHandler::ProgressStartApplyingChanges(
+	InstalledRepository& repository)
+{
+}
+
+
+void
+BPackageManager::UserInteractionHandler::ProgressTransactionCommitted(
+	InstalledRepository& repository, const char* transactionDirectoryName)
+{
+}
+
+
+void
+BPackageManager::UserInteractionHandler::ProgressApplyingChangesDone(
+	InstalledRepository& repository)
+{
+}
+
+
 }	// namespace BPrivate
 
 }	// namespace BManager

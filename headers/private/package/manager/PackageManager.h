@@ -261,31 +261,30 @@ class BPackageManager::UserInteractionHandler {
 public:
 	virtual						~UserInteractionHandler();
 
-	virtual	void				HandleProblems() = 0;
-	virtual	void				ConfirmChanges(bool fromMostSpecific) = 0;
+	virtual	void				HandleProblems();
+	virtual	void				ConfirmChanges(bool fromMostSpecific);
 
-	virtual	void				Warn(status_t error, const char* format, ...)
-									= 0;
+	virtual	void				Warn(status_t error, const char* format, ...);
 
 	virtual	void				ProgressPackageDownloadStarted(
-									const char* packageName) = 0;
+									const char* packageName);
 	virtual	void				ProgressPackageDownloadActive(
 									const char* packageName,
-									float completionPercentage) = 0;
+									float completionPercentage);
 	virtual	void				ProgressPackageDownloadComplete(
-									const char* packageName) = 0;
+									const char* packageName);
 	virtual	void				ProgressPackageChecksumStarted(
-									const char* title) = 0;
+									const char* title);
 	virtual	void				ProgressPackageChecksumComplete(
-									const char* title) = 0;
+									const char* title);
 
 	virtual	void				ProgressStartApplyingChanges(
-									InstalledRepository& repository) = 0;
+									InstalledRepository& repository);
 	virtual	void				ProgressTransactionCommitted(
 									InstalledRepository& repository,
-									const char* transactionDirectoryName) = 0;
+									const char* transactionDirectoryName);
 	virtual	void				ProgressApplyingChangesDone(
-									InstalledRepository& repository) = 0;
+									InstalledRepository& repository);
 };
 
 
