@@ -349,5 +349,12 @@ RUN_QUEUE_CLASS_NAME::GetConstIterator() const
 }
 
 
+RUN_QUEUE_TEMPLATE_LIST
+GetLink RUN_QUEUE_CLASS_NAME::sGetLink;
+
+RUN_QUEUE_TEMPLATE_LIST
+GetLink RUN_QUEUE_CLASS_NAME::ConstIterator::sGetLink;
+
+
 #endif	// RUN_QUEUE_H
 

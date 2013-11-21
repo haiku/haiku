@@ -346,5 +346,12 @@ HEAP_CLASS_NAME::_MoveDown(HeapLink<Element, Key>* link)
 }
 
 
+HEAP_TEMPLATE_LIST
+Compare HEAP_CLASS_NAME::sCompare;
+
+HEAP_TEMPLATE_LIST
+GetLink HEAP_CLASS_NAME::sGetLink;
+
+
 #endif	// KERNEL_UTIL_HEAP_H
 
