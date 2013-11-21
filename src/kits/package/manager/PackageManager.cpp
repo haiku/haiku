@@ -46,7 +46,9 @@ namespace BPrivate {
 // #pragma mark - BPackageManager
 
 
-BPackageManager::BPackageManager(BPackageInstallationLocation location)
+BPackageManager::BPackageManager(BPackageInstallationLocation location,
+	InstallationInterface* installationInterface,
+	UserInteractionHandler* userInteractionHandler)
 	:
 	fLocation(location),
 	fSolver(NULL),
@@ -57,8 +59,8 @@ BPackageManager::BPackageManager(BPackageInstallationLocation location)
 	fInstalledRepositories(10),
 	fOtherRepositories(10, true),
 	fTransactions(5, true),
-	fInstallationInterface(NULL),
-	fUserInteractionHandler(NULL)
+	fInstallationInterface(installationInterface),
+	fUserInteractionHandler(userInteractionHandler)
 {
 }
 

@@ -24,14 +24,12 @@ using namespace BPackageKit::BPrivate;
 
 PackageManager::PackageManager(BPackageInstallationLocation location)
 	:
-	BPackageManager(location),
+	BPackageManager(location, &fClientInstallationInterface, this),
 	BPackageManager::UserInteractionHandler(),
 	fDecisionProvider(),
 	fClientInstallationInterface(),
 	fPreviousDownloadPercentage(0)
 {
-	fInstallationInterface = &fClientInstallationInterface;
-	fUserInteractionHandler = this;
 }
 
 

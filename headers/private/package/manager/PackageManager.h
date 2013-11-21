@@ -57,7 +57,11 @@ public:
 
 public:
 								BPackageManager(
-									BPackageInstallationLocation location);
+									BPackageInstallationLocation location,
+									InstallationInterface*
+										installationInterface,
+									UserInteractionHandler*
+										userInteractionHandler);
 	virtual						~BPackageManager();
 
 			void				Init(uint32 flags);

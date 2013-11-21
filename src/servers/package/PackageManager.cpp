@@ -32,7 +32,7 @@ using BPackageKit::BManager::BPrivate::BRepositoryBuilder;
 
 PackageManager::PackageManager(Root* root, Volume* volume)
 	:
-	BPackageManager(volume->Location()),
+	BPackageManager(volume->Location(), this, this),
 	BPackageManager::UserInteractionHandler(),
 	fRoot(root),
 	fVolume(volume),
@@ -41,8 +41,6 @@ PackageManager::PackageManager(Root* root, Volume* volume)
 	fPackagesRemovedByUser(),
 	fProblemWindow(NULL)
 {
-	fInstallationInterface = this;
-	fUserInteractionHandler = this;
 }
 
 

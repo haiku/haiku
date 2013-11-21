@@ -273,7 +273,7 @@ private:
 
 PackageManager::PackageManager(BPackageInstallationLocation location)
 	:
-	BPackageManager(location),
+	BPackageManager(location, &fClientInstallationInterface, this),
 	BPackageManager::UserInteractionHandler(),
 	fDecisionProvider(),
 	fClientInstallationInterface(),
@@ -281,8 +281,6 @@ PackageManager::PackageManager(BPackageInstallationLocation location)
 	fCurrentInstallPackage(NULL),
 	fCurrentUninstallPackage(NULL)
 {
-	fInstallationInterface = &fClientInstallationInterface;
-	fUserInteractionHandler = this;
 }
 
 
@@ -291,7 +289,6 @@ PackageManager::~PackageManager()
 	if (fProblemWindow != NULL)
 		fProblemWindow->PostMessage(B_QUIT_REQUESTED);
 }
-
 
 
 PackageState
