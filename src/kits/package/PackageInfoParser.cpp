@@ -103,6 +103,31 @@ BPackageInfo::Parser::ParseVersion(const BString& versionString,
 }
 
 
+status_t
+BPackageInfo::Parser::ParseResolvableExpression(const BString& expressionString,
+	BPackageResolvableExpression& _expression)
+{
+	fPos = expressionString.String();
+
+	try {
+		Token token(TOKEN_STRING, fPos, expressionString.Length());
+		_ParseResolvableExpression(_NextToken(), _expression, NULL);
+	} catch (const ParseError& error) {
+		if (fListener != NULL) {
+			int32 offset = error.pos - expressionString.String();
+			fListener->OnError(error.message, 1, offset);
+		}
+		return B_BAD_DATA;
+	} catch (const std::bad_alloc& e) {
+		if (fListener != NULL)
+			fListener->OnError("out of memory", 0, 0);
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
 BPackageInfo::Parser::Token
 BPackageInfo::Parser::_NextToken()
 {
@@ -400,6 +425,61 @@ BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
 
 
 void
+BPackageInfo::Parser::_ParseResolvableExpression(const Token& token,
+	BPackageResolvableExpression& _value, BString* _basePackage)
+{
+	if (token.type != TOKEN_STRING) {
+		throw ParseError("expected word (a resolvable name)",
+			token.pos);
+	}
+
+	int32 errorPos;
+	if (!_IsValidResolvableName(token.text, &errorPos)) {
+		throw ParseError("invalid character in resolvable name",
+			token.pos + errorPos);
+	}
+
+	BPackageVersion version;
+	Token op = _NextToken();
+	BPackageResolvableOperator resolvableOperator;
+	if (op.type == TOKEN_OPERATOR_LESS
+		|| op.type == TOKEN_OPERATOR_LESS_EQUAL
+		|| op.type == TOKEN_OPERATOR_EQUAL
+		|| op.type == TOKEN_OPERATOR_NOT_EQUAL
+		|| op.type == TOKEN_OPERATOR_GREATER_EQUAL
+		|| op.type == TOKEN_OPERATOR_GREATER) {
+		_ParseVersionValue(&version, true);
+
+		if (_basePackage != NULL) {
+			Token base = _NextToken();
+			if (base.type == TOKEN_STRING && base.text == "base") {
+				if (!_basePackage->IsEmpty()) {
+					throw ParseError("multiple packages marked as base package",
+						token.pos);
+				}
+
+				*_basePackage = token.text;
+			} else
+				_RewindTo(base);
+		}
+
+		resolvableOperator = (BPackageResolvableOperator)
+			(op.type - TOKEN_OPERATOR_LESS);
+	} else if (op.type == TOKEN_ITEM_SEPARATOR
+		|| op.type == TOKEN_CLOSE_BRACE || op.type == TOKEN_EOF) {
+		_RewindTo(op);
+		resolvableOperator = B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT;
+	} else {
+		throw ParseError(
+			"expected '<', '<=', '==', '!=', '>=', '>', comma or '}'",
+			op.pos);
+	}
+
+	_value.SetTo(token.text, resolvableOperator, version);
+}
+
+
+void
 BPackageInfo::Parser::_ParseList(ListElementParser& elementParser,
 	bool allowSingleNonListElement)
 {
@@ -587,56 +667,9 @@ BPackageInfo::Parser::_ParseResolvableExprList(
 
 		virtual void operator()(const Token& token)
 		{
-			if (token.type != TOKEN_STRING) {
-				throw ParseError("expected word (a resolvable name)",
-					token.pos);
-			}
-
-			int32 errorPos;
-			if (!_IsValidResolvableName(token.text, &errorPos)) {
-				throw ParseError("invalid character in resolvable name",
-					token.pos + errorPos);
-			}
-
-			BPackageVersion version;
-			Token op = parser._NextToken();
-			BPackageResolvableOperator resolvableOperator;
-			if (op.type == TOKEN_OPERATOR_LESS
-				|| op.type == TOKEN_OPERATOR_LESS_EQUAL
-				|| op.type == TOKEN_OPERATOR_EQUAL
-				|| op.type == TOKEN_OPERATOR_NOT_EQUAL
-				|| op.type == TOKEN_OPERATOR_GREATER_EQUAL
-				|| op.type == TOKEN_OPERATOR_GREATER) {
-				parser._ParseVersionValue(&version, true);
-
-				if (basePackage != NULL) {
-					Token base = parser._NextToken();
-					if (base.type == TOKEN_STRING && base.text == "base") {
-						if (!basePackage->IsEmpty()) {
-						throw ParseError(
-							"multiple packages marked as base package",
-							token.pos);
-						}
-
-						*basePackage = token.text;
-					} else
-						parser._RewindTo(base);
-				}
-
-				resolvableOperator = (BPackageResolvableOperator)
-					(op.type - TOKEN_OPERATOR_LESS);
-			} else if (op.type == TOKEN_ITEM_SEPARATOR
-				|| op.type == TOKEN_CLOSE_BRACE) {
-				parser._RewindTo(op);
-				resolvableOperator = B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT;
-			} else {
-				throw ParseError(
-					"expected '<', '<=', '==', '!=', '>=', '>', comma or '}'",
-					op.pos);
-			}
-
-			value->AddItem(new BPackageResolvableExpression(token.text,
-				resolvableOperator, version));
+			BPackageResolvableExpression expression;
+			parser._ParseResolvableExpression(token, expression, basePackage);
+			value->AddItem(new BPackageResolvableExpression(expression));
 		}
 	} resolvableExpressionParser(*this, value, _basePackage);
 

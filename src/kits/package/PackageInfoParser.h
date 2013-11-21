@@ -26,6 +26,9 @@ public:
 			status_t			ParseVersion(const BString& versionString,
 									bool revisionIsOptional,
 									BPackageVersion& _version);
+			status_t			ParseResolvableExpression(
+									const BString& expressionString,
+									BPackageResolvableExpression& _expression);
 
 private:
 			struct ParseError;
@@ -63,6 +66,10 @@ private:
 	static	void				_ParseVersionValue(Token& word,
 									BPackageVersion* value,
 									bool revisionIsOptional);
+			void				_ParseResolvableExpression(
+									const Token& token,
+									BPackageResolvableExpression& _value,
+									BString* _basePackage);
 			void				_ParseList(ListElementParser& elementParser,
 									bool allowSingleNonListElement);
 			void				_ParseStringList(BStringList* value,

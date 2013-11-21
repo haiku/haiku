@@ -7,6 +7,7 @@
 #include <package/PackageResolvableExpression.h>
 
 #include <package/hpkg/PackageInfoAttributeValue.h>
+#include <package/PackageInfo.h>
 #include <package/PackageResolvable.h>
 
 
@@ -51,6 +52,17 @@ BPackageResolvableExpression::BPackageResolvableExpression(const BString& name,
 	fVersion(version)
 {
 	fName.ToLower();
+}
+
+
+BPackageResolvableExpression::BPackageResolvableExpression(
+	const BString& expressionString)
+	:
+	fName(),
+	fOperator(B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT),
+	fVersion()
+{
+	SetTo(expressionString);
 }
 
 
@@ -99,6 +111,18 @@ BPackageResolvableExpression::ToString() const
 		string << kOperatorNames[fOperator] << fVersion.ToString();
 
 	return string;
+}
+
+
+status_t
+BPackageResolvableExpression::SetTo(const BString& expressionString)
+{
+	fName.Truncate(0);
+	fOperator = B_PACKAGE_RESOLVABLE_OP_ENUM_COUNT;
+	fVersion.Clear();
+
+	return BPackageInfo::ParseResolvableExpressionString(expressionString,
+		*this);
 }
 
 

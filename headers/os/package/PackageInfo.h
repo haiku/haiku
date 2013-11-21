@@ -196,6 +196,10 @@ public:
 									bool revisionIsOptional,
 									BPackageVersion& _version,
 									ParseErrorListener* listener = NULL);
+	static	status_t			ParseResolvableExpressionString(
+									const BString& string,
+									BPackageResolvableExpression& _expression,
+									ParseErrorListener* listener = NULL);
 
 public:
 	static	const char*	const	kElementNames[];
