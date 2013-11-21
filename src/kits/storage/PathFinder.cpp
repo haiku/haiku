@@ -11,6 +11,10 @@
 #include <StringList.h>
 
 
+// NOTE: The package kit specific part of BPathFinder (BResolvableExpression
+// constructor and SetTo()) is implemented in the package kit.
+
+
 BPathFinder::BPathFinder(const void* codePointer, const char* dependency)
 {
 	_SetTo(codePointer, NULL, dependency);

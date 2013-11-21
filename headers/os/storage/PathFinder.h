@@ -15,7 +15,16 @@ class BStringList;
 struct entry_ref;
 
 
+namespace BPackageKit {
+	class BPackageResolvableExpression;
+}
+
+
 class BPathFinder {
+public:
+			typedef BPackageKit::BPackageResolvableExpression
+				BResolvableExpression;
+
 public:
 								BPathFinder(const void* codePointer = NULL,
 									const char* dependency = NULL);
@@ -23,6 +32,10 @@ public:
 									const char* dependency = NULL);
 								BPathFinder(const entry_ref& ref,
 									const char* dependency = NULL);
+								BPathFinder(
+									const BResolvableExpression& expression,
+									const char* dependency = NULL);
+									// requires libpackage
 
 			status_t			SetTo(const void* codePointer = NULL,
 									const char* dependency = NULL);
@@ -30,6 +43,9 @@ public:
 									const char* dependency = NULL);
 			status_t			SetTo(const entry_ref& ref,
 									const char* dependency = NULL);
+			status_t			SetTo(const BResolvableExpression& expression,
+									const char* dependency = NULL);
+									// requires libpackage
 
 			status_t			FindPath(const char* architecture,
 									path_base_directory baseDirectory,
@@ -64,7 +80,7 @@ private:
 			BString				fPath;
 			BString				fDependency;
 			status_t			fInitStatus;
-			uint32				fReserved[4];
+			addr_t				fReserved[4];
 };
 
 
