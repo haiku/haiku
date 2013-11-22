@@ -53,7 +53,7 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 	StyledEdit Terminal TextSearch Workspaces
 ] ;
 SYSTEM_PREFERENCES = [ FFilterByBuildFeatures
-	Appearance Backgrounds CPUFrequency
+	Appearance Backgrounds
 	<preference>Deskbar FileTypes Keyboard Keymap Locale
 	Mouse Network Notifications Screen ScreenSaver
 	Shortcuts Time Touchpad <preference>Tracker VirtualMemory
