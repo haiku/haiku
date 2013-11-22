@@ -41,6 +41,8 @@ switch_to_mode(void)
 static bool
 try_small_task_packing(Thread* thread)
 {
+	ReadSpinLocker locker(gCoreHeapsLock);
+
 	int32 core = sSmallTaskCore;
 	return (core == -1 && gCoreLoadHeap->PeekMaximum() != NULL)
 		|| (core != -1
@@ -52,7 +54,9 @@ try_small_task_packing(Thread* thread)
 static int32
 choose_small_task_core(void)
 {
+	ReadSpinLocker locker(gCoreHeapsLock);
 	CoreEntry* candidate = gCoreLoadHeap->PeekMaximum();
+	locker.Unlock();
 	if (candidate == NULL)
 		return sSmallTaskCore;
 
@@ -64,6 +68,32 @@ choose_small_task_core(void)
 }
 
 
+static CoreEntry*
+choose_idle_core(void)
+{
+	PackageEntry* current = NULL;
+	for (int32 i = 0; i < gPackageCount; i++) {
+		if (gPackageEntries[i].fIdleCoreCount != 0 && (current == NULL
+				|| gPackageEntries[i].fIdleCoreCount
+					< current->fIdleCoreCount)) {
+			current = &gPackageEntries[i];
+		}
+	}
+
+	if (current == NULL) {
+		SpinLocker _(gIdlePackageLock);
+		current = gIdlePackageList->Last();
+	}
+
+	if (current != NULL) {
+		SpinLocker _(current->fCoreLock);
+		return current->fIdleCores.Last();
+	}
+
+	return NULL;
+}
+
+
 static int32
 choose_core(Thread* thread)
 {
@@ -72,22 +102,22 @@ choose_core(Thread* thread)
 	if (try_small_task_packing(thread)) {
 		// try to pack all threads on one core
 		entry = &gCoreEntries[choose_small_task_core()];
-	} else if (gCoreLoadHeap->PeekMinimum() != NULL) {
-		// run immediately on already woken core
-		entry = gCoreLoadHeap->PeekMinimum();
-	} else if (gPackageUsageHeap->PeekMinimum() != NULL) {
-		// wake new core
-		PackageEntry* package = gPackageUsageHeap->PeekMinimum();
-		entry = package->fIdleCores.Last();
-	} else if (gIdlePackageList->Last() != NULL) {
-		// wake new package
-		PackageEntry* package = gIdlePackageList->Last();
-		entry = package->fIdleCores.Last();
 	} else {
-		// no idle cores, use least occupied core
-		entry = gCoreLoadHeap->PeekMinimum();
-		if (entry == NULL)
-			entry = gCoreHighLoadHeap->PeekMinimum();
+		ReadSpinLocker coreLocker(gCoreHeapsLock);
+		if (gCoreLoadHeap->PeekMinimum() != NULL) {
+			// run immediately on already woken core
+			entry = gCoreLoadHeap->PeekMinimum();
+		} else {
+			coreLocker.Unlock();
+
+			entry = choose_idle_core();
+
+			coreLocker.Lock();
+			if (entry == NULL)
+				entry = gCoreLoadHeap->PeekMinimum();
+			if (entry == NULL)
+				entry = gCoreHighLoadHeap->PeekMinimum();
+		}
 	}
 
 	ASSERT(entry != NULL);
@@ -110,26 +140,26 @@ should_rebalance(Thread* thread)
 	CoreEntry* coreEntry = &gCoreEntries[core];
 
 	if (coreEntry->fLoad > kHighLoad) {
-		SpinLocker coreLocker(gCoreHeapsLock);
+		ReadSpinLocker coreLocker(gCoreHeapsLock);
 		if (sSmallTaskCore == core) {
-			CoreEntry* other = gCoreLoadHeap->PeekMaximum();
-				
-			if (other == NULL)
-				sSmallTaskCore = -1;
-			else if (coreEntry->fLoad - schedulerThreadData->load < kHighLoad)
+			if (coreEntry->fLoad - schedulerThreadData->load < kHighLoad)
 				return true;
-			else 
-				sSmallTaskCore = other->fCoreID;
+
+			choose_small_task_core();
 			return coreEntry->fLoad > kVeryHighLoad;
 		}
 
-		CoreEntry* other = gCoreHighLoadHeap->PeekMinimum();
+		CoreEntry* other = gCoreLoadHeap->PeekMaximum();
 		if (other == NULL)
-			other = gCoreHighLoadHeap->PeekMaximum();
+			other = gCoreHighLoadHeap->PeekMinimum();
+		ASSERT(other != NULL);
 		return coreEntry->fLoad - other->fLoad >= kLoadDifference / 2;
 	}
 
-	return choose_small_task_core() != core;
+	int32 smallTaskCore = choose_small_task_core();
+	if (smallTaskCore == -1)
+		return false;
+	return smallTaskCore != core;
 }
 
 
@@ -144,7 +174,7 @@ pack_irqs(void)
 		irq_assignment* irq = (irq_assignment*)list_get_first_item(&cpu->irqs);
 		locker.Unlock();
 
-		SpinLocker coreLocker(gCoreHeapsLock);
+		ReadSpinLocker coreLocker(gCoreHeapsLock);
 		int32 newCPU
 			= gCPUPriorityHeaps[sSmallTaskCore].PeekMinimum()->fCPUNumber;
 		coreLocker.Unlock();
@@ -185,12 +215,14 @@ rebalance_irqs(bool idle)
 	if (chosen == NULL || chosen->load < kLowLoad)
 		return;
 
-	SpinLocker coreLocker(gCoreHeapsLock);
+	ReadSpinLocker coreLocker(gCoreHeapsLock);
 	CoreEntry* other = gCoreLoadHeap->PeekMinimum();
+	coreLocker.Unlock();
 	if (other == NULL)
 		return;
+	SpinLocker cpuLocker(other->fCPULock);
 	int32 newCPU = gCPUPriorityHeaps[other->fCoreID].PeekMinimum()->fCPUNumber;
-	coreLocker.Unlock();
+	cpuLocker.Unlock();
 
 	int32 thisCore = gCPUToCore[smp_get_current_cpu()];
 	if (other->fCoreID == thisCore)

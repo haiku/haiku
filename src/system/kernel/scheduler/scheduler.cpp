@@ -60,12 +60,12 @@ CPUHeap* gCPUPriorityHeaps;
 CoreEntry* gCoreEntries;
 CoreLoadHeap* gCoreLoadHeap;
 CoreLoadHeap* gCoreHighLoadHeap;
-spinlock gCoreHeapsLock = B_SPINLOCK_INITIALIZER;
+rw_spinlock gCoreHeapsLock = B_RW_SPINLOCK_INITIALIZER;
 
 PackageEntry* gPackageEntries;
-PackageHeap* gPackageUsageHeap;
 IdlePackageList* gIdlePackageList;
-spinlock gIdlePackageLock = B_SPINLOCK_INITIALIZER;
+spinlock gIdlePackageLock;
+int32 gPackageCount = B_SPINLOCK_INITIALIZER;
 
 ThreadRunQueue* gRunQueues;
 ThreadRunQueue* gPinnedRunQueues;
@@ -101,7 +101,6 @@ public:
 
 static CPUHeap* sDebugCPUHeap;
 static CoreLoadHeap* sDebugCoreHeap;
-static PackageHeap* sDebugPackageHeap;
 
 
 CPUEntry::CPUEntry()
@@ -120,7 +119,8 @@ CoreEntry::CoreEntry()
 	fActiveTime(0),
 	fLoad(0)
 {
-	B_INITIALIZE_SPINLOCK(&fLock);
+	B_INITIALIZE_SPINLOCK(&fCPULock);
+	B_INITIALIZE_SPINLOCK(&fQueueLock);
 }
 
 
@@ -129,6 +129,7 @@ PackageEntry::PackageEntry()
 	fIdleCoreCount(0),
 	fCoreCount(0)
 {
+	B_INITIALIZE_SPINLOCK(&fCoreLock);
 }
 
 
@@ -349,44 +350,6 @@ dump_idle_cores(int argc, char** argv)
 	} else
 		kprintf("No idle packages.\n");
 
-	kprintf("\nPackages with idle cores:\n");
-
-	PackageEntry* entry = gPackageUsageHeap->PeekMinimum();
-	if (entry == NULL)
-		kprintf("No packages.\n");
-	else
-		kprintf("package count cores\n");
-
-	while (entry != NULL) {
-		kprintf("%-7" B_PRId32 " %-5" B_PRId32 " ", entry->fPackageID,
-			entry->fIdleCoreCount);
-
-		DoublyLinkedList<CoreEntry>::ReverseIterator iterator
-			= entry->fIdleCores.GetReverseIterator();
-		if (iterator.HasNext()) {
-			while (iterator.HasNext()) {
-				CoreEntry* coreEntry = iterator.Next();
-				kprintf("%" B_PRId32 "%s", coreEntry->fCoreID,
-					iterator.HasNext() ? ", " : "");
-			}
-		} else
-			kprintf("-");
-		kprintf("\n");
-
-		gPackageUsageHeap->RemoveMinimum();
-		sDebugPackageHeap->Insert(entry, entry->fIdleCoreCount);
-
-		entry = gPackageUsageHeap->PeekMinimum();
-	}
-
-	entry = sDebugPackageHeap->PeekMinimum();
-	while (entry != NULL) {
-		int32 key = PackageHeap::GetKey(entry);
-		sDebugPackageHeap->RemoveMinimum();
-		gPackageUsageHeap->Insert(entry, key);
-		entry = sDebugPackageHeap->PeekMinimum();
-	}
-
 	return 0;
 }
 
@@ -437,7 +400,7 @@ update_load_heaps(int32 core)
 
 	CoreEntry* entry = &gCoreEntries[core];
 
-	SpinLocker coreLocker(gCoreHeapsLock);
+	WriteSpinLocker coreLocker(gCoreHeapsLock);
 
 	int32 cpuPerCore = smp_get_num_cpus() / gRunQueueCount;
 	int32 newKey = entry->fLoad / cpuPerCore;
@@ -512,6 +475,8 @@ update_cpu_priority(int32 cpu, int32 priority)
 {
 	int32 core = gCPUToCore[cpu];
 
+	SpinLocker coreLocker(gCoreEntries[core].fCPULock);
+
 	int32 corePriority = CPUHeap::GetKey(gCPUPriorityHeaps[core].PeekMaximum());
 
 	gCPUEntries[cpu].fPriority = priority;
@@ -529,7 +494,7 @@ update_cpu_priority(int32 cpu, int32 priority)
 	int32 package = gCPUToPackage[cpu];
 	PackageEntry* packageEntry = &gPackageEntries[package];
 	if (maxPriority == B_IDLE_PRIORITY) {
-		SpinLocker _(gIdlePackageLock);
+		SpinLocker _(packageEntry->fCoreLock);
 
 		// core goes idle
 		ASSERT(packageEntry->fIdleCoreCount >= 0);
@@ -538,27 +503,13 @@ update_cpu_priority(int32 cpu, int32 priority)
 		packageEntry->fIdleCoreCount++;
 		packageEntry->fIdleCores.Add(&gCoreEntries[core]);
 
-		if (packageEntry->fIdleCoreCount == 1) {
-			// first core on that package to go idle
-
-			if (packageEntry->fCoreCount > 1)
-				gPackageUsageHeap->Insert(packageEntry, 1);
-			else
-				gIdlePackageList->Add(packageEntry);
-		} else if (packageEntry->fIdleCoreCount
-			== packageEntry->fCoreCount) {
+		if (packageEntry->fIdleCoreCount == packageEntry->fCoreCount) {
 			// package goes idle
-			gPackageUsageHeap->ModifyKey(packageEntry, 0);
-			ASSERT(gPackageUsageHeap->PeekMinimum() == packageEntry);
-			gPackageUsageHeap->RemoveMinimum();
-
+			SpinLocker _(gIdlePackageLock);
 			gIdlePackageList->Add(packageEntry);
-		} else {
-			gPackageUsageHeap->ModifyKey(packageEntry,
-				packageEntry->fIdleCoreCount);
 		}
 	} else if (corePriority == B_IDLE_PRIORITY) {
-		SpinLocker _(gIdlePackageLock);
+		SpinLocker _(packageEntry->fCoreLock);
 
 		// core wakes up
 		ASSERT(packageEntry->fIdleCoreCount > 0);
@@ -569,20 +520,8 @@ update_cpu_priority(int32 cpu, int32 priority)
 
 		if (packageEntry->fIdleCoreCount + 1 == packageEntry->fCoreCount) {
 			// package wakes up
+			SpinLocker _(gIdlePackageLock);
 			gIdlePackageList->Remove(packageEntry);
-
-			if (packageEntry->fIdleCoreCount > 0) {
-				gPackageUsageHeap->Insert(packageEntry,
-					packageEntry->fIdleCoreCount);
-			}
-		} else if (packageEntry->fIdleCoreCount == 0) {
-			// no more idle cores in the package
-			gPackageUsageHeap->ModifyKey(packageEntry, 0);
-			ASSERT(gPackageUsageHeap->PeekMinimum() == packageEntry);
-			gPackageUsageHeap->RemoveMinimum();
-		} else {
-			gPackageUsageHeap->ModifyKey(packageEntry,
-				packageEntry->fIdleCoreCount);
 		}
 	}
 }
@@ -599,6 +538,7 @@ choose_core(Thread* thread)
 static inline int32
 choose_cpu(int32 core)
 {
+	SpinLocker cpuLocker(gCoreEntries[core].fCPULock);
 	CPUEntry* entry = gCPUPriorityHeaps[core].PeekMinimum();
 	ASSERT(entry != NULL);
 	return entry->fCPUNumber;
@@ -608,8 +548,6 @@ choose_cpu(int32 core)
 static bool
 choose_core_and_cpu(Thread* thread, int32& targetCore, int32& targetCPU)
 {
-	SpinLocker coreLocker(gCoreHeapsLock);
-
 	if (targetCore == -1 && targetCPU != -1)
 		targetCore = gCPUToCore[targetCPU];
 	else if (targetCore != -1 && targetCPU == -1)
@@ -779,7 +717,7 @@ enqueue(Thread* thread, bool newOne)
 	TRACE("enqueueing thread %ld with priority %ld on CPU %ld (core %ld)\n",
 		thread->id, threadPriority, targetCPU, targetCore);
 
-	SpinLocker runQueueLocker(gCoreEntries[targetCore].fLock);
+	SpinLocker runQueueLocker(gCoreEntries[targetCore].fQueueLock);
 	thread->scheduler_data->enqueued = true;
 	if (pinned)
 		gPinnedRunQueues[targetCPU].PushBack(thread, threadPriority);
@@ -832,7 +770,7 @@ put_back(Thread* thread)
 
 	int32 core = gCPUToCore[smp_get_current_cpu()];
 
-	SpinLocker runQueueLocker(gCoreEntries[core].fLock);
+	SpinLocker runQueueLocker(gCoreEntries[core].fQueueLock);
 	thread->scheduler_data->enqueued = true;
 	if (thread->pinned_to_cpu > 0) {
 		int32 pinnedCPU = thread->previous_cpu->cpu_num;
@@ -875,10 +813,8 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 		cancel_penalty(thread);
 		thread->priority = priority;
 
-		if (thread->state == B_THREAD_RUNNING) {
-			SpinLocker coreLocker(gCoreHeapsLock);
+		if (thread->state == B_THREAD_RUNNING)
 			update_cpu_priority(thread->cpu->cpu_num, priority);
-		}
 		return oldPriority;
 	}
 
@@ -890,7 +826,7 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 	int32 previougCore = thread->scheduler_data->previous_core;
 	ASSERT(previougCore >= 0);
 
-	SpinLocker runQueueLocker(gCoreEntries[previougCore].fLock);
+	SpinLocker runQueueLocker(gCoreEntries[previougCore].fQueueLock);
 
 	// the thread might have been already dequeued and is about to start
 	// running once we release its scheduler_lock, in such case we can not
@@ -1022,7 +958,7 @@ choose_next_thread(int32 thisCPU, Thread* oldThread, bool putAtBack)
 {
 	int32 thisCore = gCPUToCore[thisCPU];
 
-	SpinLocker runQueueLocker(gCoreEntries[thisCore].fLock);
+	SpinLocker runQueueLocker(gCoreEntries[thisCore].fQueueLock);
 
 	Thread* sharedThread = gRunQueues[thisCore].PeekMaximum();
 	Thread* pinnedThread = gPinnedRunQueues[thisCPU].PeekMaximum();
@@ -1234,10 +1170,7 @@ _scheduler_reschedule(void)
 		oldThread, nextThread);
 
 	// update CPU heap
-	{
-		SpinLocker coreLocker(gCoreHeapsLock);
-		update_cpu_priority(thisCPU, get_effective_priority(nextThread));
-	}
+	update_cpu_priority(thisCPU, get_effective_priority(nextThread));
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
@@ -1440,13 +1373,7 @@ create_debug_heaps()
 	sDebugCoreHeap = new(std::nothrow) CoreLoadHeap(smp_get_num_cpus());
 	if (sDebugCoreHeap == NULL)
 		return B_NO_MEMORY;
-	ObjectDeleter<CoreLoadHeap> coreDeleter(sDebugCoreHeap);
 
-	sDebugPackageHeap = new(std::nothrow) PackageHeap(smp_get_num_cpus());
-	if (sDebugPackageHeap == NULL)
-		return B_NO_MEMORY;
-
-	coreDeleter.Detach();
 	cpuDeleter.Detach();
 	return B_OK;
 }
@@ -1463,17 +1390,13 @@ _scheduler_init()
 		return result;
 	gRunQueueCount = coreCount;
 	gSingleCore = coreCount == 1;
+	gPackageCount = packageCount;
 
 	// create package heap and idle package stack
 	gPackageEntries = new(std::nothrow) PackageEntry[packageCount];
 	if (gPackageEntries == NULL)
 		return B_NO_MEMORY;
 	ArrayDeleter<PackageEntry> packageEntriesDeleter(gPackageEntries);
-
-	gPackageUsageHeap = new(std::nothrow) PackageHeap(packageCount);
-	if (gPackageUsageHeap == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<PackageHeap> packageHeapDeleter(gPackageUsageHeap);
 
 	gIdlePackageList = new(std::nothrow) IdlePackageList;
 	if (gIdlePackageList == NULL)
@@ -1589,7 +1512,6 @@ _scheduler_init()
 	coreEntriesDeleter.Detach();
 	cpuEntriesDeleter.Detach();
 	packageEntriesDeleter.Detach();
-	packageHeapDeleter.Detach();
 	packageListDeleter.Detach();
 	return B_OK;
 }

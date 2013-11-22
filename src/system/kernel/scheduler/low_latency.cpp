@@ -36,20 +36,43 @@ has_cache_expired(Thread* thread)
 }
 
 
+static inline PackageEntry*
+get_most_idle_package(void)
+{
+	PackageEntry* current = &gPackageEntries[0];
+	for (int32 i = 1; i < gPackageCount; i++) {
+		if (gPackageEntries[i].fIdleCoreCount > current->fIdleCoreCount)
+			current = &gPackageEntries[i];
+	}
+
+	if (current->fIdleCoreCount == 0)
+		return NULL;
+
+	return current;
+}
+
+
 static int32
 choose_core(Thread* thread)
 {
-	CoreEntry* entry;
+	CoreEntry* entry = NULL;
 
-	if (gIdlePackageList->Last() != NULL) {
-		// wake new package
-		PackageEntry* package = gIdlePackageList->Last();
-		entry = package->fIdleCores.Last();
-	} else if (gPackageUsageHeap->PeekMaximum() != NULL) {
+	SpinLocker locker(gIdlePackageLock);
+	// wake new package
+	PackageEntry* package = gIdlePackageList->Last();
+	if (package == NULL) {
 		// wake new core
-		PackageEntry* package = gPackageUsageHeap->PeekMaximum();
+		package = get_most_idle_package();
+	}
+	locker.Unlock();
+
+	if (package != NULL) {
+		SpinLocker _(package->fCoreLock);
 		entry = package->fIdleCores.Last();
-	} else {
+	}
+
+	if (entry == NULL) {
+		ReadSpinLocker coreLocker(gCoreHeapsLock);
 		// no idle cores, use least occupied core
 		entry = gCoreLoadHeap->PeekMinimum();
 		if (entry == NULL)
@@ -77,7 +100,7 @@ should_rebalance(Thread* thread)
 	// If there is high load on this core but this thread does not contribute
 	// significantly consider giving it to someone less busy.
 	if (coreEntry->fLoad > kHighLoad) {
-		SpinLocker coreLocker(gCoreHeapsLock);
+		ReadSpinLocker coreLocker(gCoreHeapsLock);
 
 		CoreEntry* other = gCoreLoadHeap->PeekMinimum();
 		if (other != NULL && coreEntry->fLoad - other->fLoad >= kLoadDifference)
@@ -86,7 +109,7 @@ should_rebalance(Thread* thread)
 
 	// No cpu bound threads - the situation is quite good. Make sure it
 	// won't get much worse...
-	SpinLocker coreLocker(gCoreHeapsLock);
+	ReadSpinLocker coreLocker(gCoreHeapsLock);
 
 	CoreEntry* other = gCoreLoadHeap->PeekMinimum();
 	if (other == NULL)
@@ -121,13 +144,16 @@ rebalance_irqs(bool idle)
 	if (chosen == NULL || totalLoad < kLowLoad)
 		return;
 
-	SpinLocker coreLocker(gCoreHeapsLock);
+	ReadSpinLocker coreLocker(gCoreHeapsLock);
 	CoreEntry* other = gCoreLoadHeap->PeekMinimum();
 	if (other == NULL)
 		other = gCoreHighLoadHeap->PeekMinimum();
-
-	int32 newCPU = gCPUPriorityHeaps[other->fCoreID].PeekMinimum()->fCPUNumber;
 	coreLocker.Unlock();
+
+	SpinLocker cpuLocker(other->fCPULock);
+	int32 newCPU = gCPUPriorityHeaps[other->fCoreID].PeekMinimum()->fCPUNumber;
+	cpuLocker.Unlock();
+
 
 	ASSERT(other != NULL);
 

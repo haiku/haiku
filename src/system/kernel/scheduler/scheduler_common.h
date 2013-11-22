@@ -79,7 +79,8 @@ struct CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 
 	int32		fCoreID;
 
-	spinlock	fLock;
+	spinlock	fCPULock;
+	spinlock	fQueueLock;
 
 	bigtime_t	fStartedBottom;
 	bigtime_t	fReachedBottom;
@@ -95,9 +96,9 @@ typedef MinMaxHeap<CoreEntry, int32> CoreLoadHeap;
 extern CoreEntry* gCoreEntries;
 extern CoreLoadHeap* gCoreLoadHeap;
 extern CoreLoadHeap* gCoreHighLoadHeap;
-extern spinlock gCoreHeapsLock;
+extern rw_spinlock gCoreHeapsLock;
 
-// sPackageUsageHeap is used to decide which core should be woken up from the
+// gPackageEntries are used to decide which core should be woken up from the
 // idle state. When aiming for performance we should use as many packages as
 // possible with as little cores active in each package as possible (so that the
 // package can enter any boost mode if it has one and the active core have more
@@ -106,24 +107,24 @@ extern spinlock gCoreHeapsLock;
 // packages can go to the deep state of sleep). The heap stores only packages
 // with at least one core active and one core idle. The packages with all cores
 // idle are stored in sPackageIdleList (in LIFO manner).
-struct PackageEntry : public MinMaxHeapLinkImpl<PackageEntry, int32>,
-	DoublyLinkedListLinkImpl<PackageEntry> {
+struct PackageEntry : public DoublyLinkedListLinkImpl<PackageEntry> {
 								PackageEntry();
 
 	int32						fPackageID;
+
+	spinlock					fCoreLock;
 
 	DoublyLinkedList<CoreEntry>	fIdleCores;
 	int32						fIdleCoreCount;
 
 	int32						fCoreCount;
 } CACHE_LINE_ALIGN;
-typedef MinMaxHeap<PackageEntry, int32> PackageHeap;
 typedef DoublyLinkedList<PackageEntry> IdlePackageList;
 
 extern PackageEntry* gPackageEntries;
-extern PackageHeap* gPackageUsageHeap;
 extern IdlePackageList* gIdlePackageList;
 extern spinlock gIdlePackageLock;
+extern int32 gPackageCount;
 
 // The run queues. Holds the threads ready to run ordered by priority.
 // One queue per schedulable target per core. Additionally, each
