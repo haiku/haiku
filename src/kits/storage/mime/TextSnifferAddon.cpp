@@ -289,6 +289,14 @@ file_ascmagic(DatabaseLocation* databaseLocation, const unsigned char *buf,
 		i = end;
 	}
 
+	(void)code;
+	(void)code_mime;
+	(void)type;
+	(void)subtype;
+	(void)has_escapes;
+	(void)has_backspace;
+	(void)has_long_lines;
+
 subtype_identified:
 
 	/*
