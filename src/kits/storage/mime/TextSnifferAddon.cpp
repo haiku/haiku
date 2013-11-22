@@ -8,18 +8,22 @@
 
 #include <MimeType.h>
 
+#include <mime/DatabaseLocation.h>
+
 
 namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
 
-static int file_ascmagic(const unsigned char *buf, size_t nbytes,
-	BMimeType* mimeType);
+static int file_ascmagic(DatabaseLocation* databaseLocation,
+	const unsigned char *buf, size_t nbytes, BMimeType* mimeType);
 
 
 // constructor
-TextSnifferAddon::TextSnifferAddon()
+TextSnifferAddon::TextSnifferAddon(DatabaseLocation* databaseLocation)
+	:
+	fDatabaseLocation(databaseLocation)
 {
 }
 
@@ -48,7 +52,8 @@ float
 TextSnifferAddon::GuessMimeType(BFile* file, const void* buffer, int32 length,
 	BMimeType* type)
 {
-	if (file_ascmagic((const unsigned char*)buffer, length, type)) {
+	if (file_ascmagic(fDatabaseLocation, (const unsigned char*)buffer, length,
+			type)) {
 		// If the buffer is very short, we return a lower priority. Maybe
 		// someone else knows better.
 		if (length < 20)
@@ -128,7 +133,8 @@ static int ascmatch(const unsigned char *, const my_unichar *, size_t);
 
 
 static int
-file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType)
+file_ascmagic(DatabaseLocation* databaseLocation, const unsigned char *buf,
+	size_t nbytes, BMimeType* mimeType)
 {
 	size_t i;
 	unsigned char *nbuf = NULL;
@@ -330,14 +336,16 @@ done:
 
 		bool found = false;
 		if (subtypeMimeSpecific != NULL) {
-			mimeType->SetTo(subtypeMimeSpecific);
-			if (mimeType->IsInstalled())
-				found = true;			
+			if (databaseLocation->IsInstalled(subtypeMimeSpecific)) {
+				mimeType->SetTo(subtypeMimeSpecific);
+				found = true;
+			}
 		}
 		if (!found && subtypeMimeGeneric != NULL) {
-			mimeType->SetTo(subtypeMimeGeneric);
-			if (mimeType->IsInstalled())
-				found = true;			
+			if (databaseLocation->IsInstalled(subtypeMimeGeneric)) {
+				mimeType->SetTo(subtypeMimeGeneric);
+				found = true;
+			}
 		}
 		if (!found)
 			mimeType->SetTo("text/plain");

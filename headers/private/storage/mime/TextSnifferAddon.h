@@ -14,9 +14,13 @@ namespace Storage {
 namespace Mime {
 
 
+class DatabaseLocation;
+
+
 class TextSnifferAddon : public BMimeSnifferAddon {
 public:
-								TextSnifferAddon();
+								TextSnifferAddon(
+									DatabaseLocation* databaseLocation);
 	virtual						~TextSnifferAddon();
 
 	virtual	size_t				MinimalBufferSize();
@@ -26,6 +30,9 @@ public:
 	virtual	float				GuessMimeType(BFile* file,
 									const void* buffer, int32 length,
 									BMimeType* type);
+
+private:
+			DatabaseLocation*	fDatabaseLocation;
 };
 
 

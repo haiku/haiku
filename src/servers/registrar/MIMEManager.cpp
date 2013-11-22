@@ -51,7 +51,8 @@ init_mime_sniffer_add_on_manager()
 		return NULL;
 
 	MimeSnifferAddonManager* manager = MimeSnifferAddonManager::Default();
-	manager->AddMimeSnifferAddon(new(nothrow) TextSnifferAddon());
+	manager->AddMimeSnifferAddon(new(nothrow) TextSnifferAddon(
+		BPrivate::Storage::Mime::default_database_location()));
 	return manager;
 }
 
