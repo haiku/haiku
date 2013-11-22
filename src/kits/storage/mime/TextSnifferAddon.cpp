@@ -11,13 +11,16 @@
 #include <mime/DatabaseLocation.h>
 
 
-namespace BPrivate {
-namespace Storage {
-namespace Mime {
+using BPrivate::Storage::Mime::DatabaseLocation;
 
 
 static int file_ascmagic(DatabaseLocation* databaseLocation,
 	const unsigned char *buf, size_t nbytes, BMimeType* mimeType);
+
+
+namespace BPrivate {
+namespace Storage {
+namespace Mime {
 
 
 // constructor
@@ -63,6 +66,11 @@ TextSnifferAddon::GuessMimeType(BFile* file, const void* buffer, int32 length,
 
 	return -1;
 }
+
+
+} // namespace Mime
+} // namespace Storage
+} // namespace BPrivate
 
 
 // #pragma mark - ascmagic.c from the BSD file tool
@@ -708,8 +716,3 @@ from_ebcdic(const unsigned char *buf, size_t nbytes, unsigned char *out)
 		out[i] = ebcdic_to_ascii[buf[i]];
 	}
 }
-
-
-} // namespace Mime
-} // namespace Storage
-} // namespace BPrivate
