@@ -16,6 +16,7 @@
 #include <Box.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Input.h>
@@ -404,13 +405,19 @@ TouchpadPrefView::SetupView()
 		B_TRANSLATE("Horizontal scrolling"),
 		new BMessage(SCROLL_CONTROL_CHANGED));
 
-	BGroupView* scrollPrefLeftLayout = new BGroupView(B_VERTICAL);
-	BLayoutBuilder::Group<>(scrollPrefLeftLayout)
+	float spacing = be_control_look->DefaultItemSpacing();
+
+	BView* scrollPrefLeftLayout
+		= BLayoutBuilder::Group<>(B_VERTICAL, 0)
 		.Add(fTouchpadView)
+		.AddStrut(spacing)
 		.Add(fTwoFingerBox)
-		.AddGroup(B_HORIZONTAL)
-			.AddStrut(20)
-			.Add(fTwoFingerHorizontalBox);
+		.AddGroup(B_HORIZONTAL, 0)
+			.AddStrut(spacing * 2)
+			.Add(fTwoFingerHorizontalBox)
+			.End()
+		.AddGlue()
+		.View();
 
 	BGroupView* scrollPrefRightLayout = new BGroupView(B_VERTICAL);
 	scrollPrefRightLayout->AddChild(fScrollAccelSlider);
@@ -418,24 +425,26 @@ TouchpadPrefView::SetupView()
 	scrollPrefRightLayout->AddChild(fScrollStepYSlider);
 
 	BGroupLayout* scrollPrefLayout = new BGroupLayout(B_HORIZONTAL);
-	scrollPrefLayout->SetSpacing(10);
-	scrollPrefLayout->SetInsets(10, scrollBox->TopBorderOffset() * 2 + 10, 10,
-		10);
+	scrollPrefLayout->SetSpacing(spacing);
+	scrollPrefLayout->SetInsets(spacing,
+		scrollBox->TopBorderOffset() * 2 + spacing, spacing, spacing);
 	scrollBox->SetLayout(scrollPrefLayout);
 
 	scrollPrefLayout->AddView(scrollPrefLeftLayout);
-	scrollPrefLayout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(15));
+	scrollPrefLayout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(spacing
+		* 1.5));
 	scrollPrefLayout->AddView(scrollPrefRightLayout);
 
 	BBox* tapBox = new BBox("tapbox");
 	tapBox->SetLabel(B_TRANSLATE("Tapping"));
 
 	BGroupLayout* tapPrefLayout = new BGroupLayout(B_HORIZONTAL);
-	tapPrefLayout->SetInsets(10, tapBox->TopBorderOffset() * 2 + 10, 10, 10);
+	tapPrefLayout->SetInsets(spacing, tapBox->TopBorderOffset() * 2 + spacing,
+		spacing, spacing);
 	tapBox->SetLayout(tapPrefLayout);
 
 	fTapSlider = new BSlider("tap_sens", B_TRANSLATE("Sensitivity"),
-		new BMessage(TAP_CONTROL_CHANGED), 0, 20, B_HORIZONTAL);
+		new BMessage(TAP_CONTROL_CHANGED), 0, spacing * 2, B_HORIZONTAL);
 	fTapSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fTapSlider->SetHashMarkCount(7);
 	fTapSlider->SetLimitLabels(B_TRANSLATE("Off"), B_TRANSLATE("High"));
@@ -448,7 +457,7 @@ TouchpadPrefView::SetupView()
 
 	buttonView->AddChild(fDefaultButton);
 	buttonView->GetLayout()->AddItem(
-		BSpaceLayoutItem::CreateHorizontalStrut(7));
+		BSpaceLayoutItem::CreateHorizontalStrut(B_USE_SMALL_SPACING));
 	fRevertButton = new BButton(B_TRANSLATE("Revert"),
 		new BMessage(REVERT_SETTINGS));
 	fRevertButton->SetEnabled(false);
@@ -456,8 +465,8 @@ TouchpadPrefView::SetupView()
 	buttonView->GetLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
-	layout->SetInsets(10, 10, 10, 10);
-	layout->SetSpacing(10);
+	layout->SetInsets(spacing, spacing, spacing, spacing);
+	layout->SetSpacing(spacing);
 	BView* rootView = new BView("root view", 0, layout);
 	AddChild(rootView);
 	rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
