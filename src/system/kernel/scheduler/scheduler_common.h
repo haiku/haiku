@@ -162,6 +162,7 @@ struct scheduler_thread_data {
 			bigtime_t	time_left;
 			bigtime_t	stolen_time;
 			bigtime_t	quantum_start;
+			bigtime_t	last_interrupt_time;
 
 			bigtime_t	measure_active_time;
 			bigtime_t	measure_time;

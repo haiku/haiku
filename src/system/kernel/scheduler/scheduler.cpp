@@ -1101,6 +1101,11 @@ _scheduler_reschedule(void)
 	oldThread->state = oldThread->next_state;
 	scheduler_thread_data* schedulerOldThreadData = oldThread->scheduler_data;
 
+	// return time spent in interrupts
+	schedulerOldThreadData->stolen_time
+		+= gCPU[thisCPU].interrupt_time
+			- schedulerOldThreadData->last_interrupt_time;
+
 	bool enqueueOldThread = false;
 	bool putOldThreadAtBack = false;
 	switch (oldThread->next_state) {
@@ -1183,6 +1188,10 @@ _scheduler_reschedule(void)
 
 	// track CPU activity
 	track_cpu_activity(oldThread, nextThread, thisCore);
+
+	// start counting time spent in interrupts
+	nextThread->scheduler_data->last_interrupt_time
+		= gCPU[thisCPU].interrupt_time;
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
 		timer* quantumTimer = &oldThread->cpu->quantum_timer;
