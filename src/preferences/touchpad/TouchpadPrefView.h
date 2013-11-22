@@ -84,9 +84,9 @@ class TouchpadPrefView : public BGroupView {
 public:
 							TouchpadPrefView();
 	virtual					~TouchpadPrefView();
-	virtual	void			MessageReceived(BMessage* msg);
-	virtual void			AttachedToWindow();
-	virtual void			DetachedFromWindow();
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			AttachedToWindow();
+	virtual	void			DetachedFromWindow();
 			void			SetupView();
 
 			void			SetValues(touchpad_settings *settings);

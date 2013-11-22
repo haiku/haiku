@@ -104,12 +104,13 @@ TouchpadView::MouseUp(BPoint point)
 		|| GetBottomScrollRatio() > kSoftScrollLimit) {
 		BAlert* alert = new BAlert(B_TRANSLATE("Please confirm"),
 			B_TRANSLATE("The new scroll area is very large and may impede "
-			"normal mouse operation. Do you really want to change it?"),
+				"normal mouse operation. Do you really want to change it?"),
 			B_TRANSLATE("OK"), B_TRANSLATE("Cancel"),
 			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(1, B_ESCAPE);
 		result = alert->Go();
 	}
+
 	if (result == 0) {
 		BMessage msg(SCROLL_AREA_CHANGED);
 		Invoke(&msg);
@@ -126,9 +127,9 @@ TouchpadView::MouseUp(BPoint point)
 void
 TouchpadView::AttachedToWindow()
 {
-	if (!fOffScreenView) {
+	if (!fOffScreenView)
 		fOffScreenView = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW);
-	}
+
 	if (!fOffScreenBitmap) {
 		fOffScreenBitmap = new BBitmap(Bounds(), B_CMAP8, true, false);
 
@@ -188,11 +189,7 @@ TouchpadView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 void
 TouchpadView::DrawSliders()
 {
-	BView* view;
-	if (fOffScreenView != NULL)
-		view = fOffScreenView;
-	else
-		view = this;
+	BView* view = fOffScreenView != NULL ? fOffScreenView : this;
 
 	if (!LockLooper())
 		return;
@@ -283,16 +280,18 @@ TouchpadPrefView::~TouchpadPrefView()
 
 
 void
-TouchpadPrefView::MessageReceived(BMessage* msg)
+TouchpadPrefView::MessageReceived(BMessage* message)
 {
 	touchpad_settings& settings = fTouchpadPref.Settings();
-	switch (msg->what) {
+
+	switch (message->what) {
 		case SCROLL_AREA_CHANGED:
 			settings.scroll_rightrange = fTouchpadView->GetRightScrollRatio();
 			settings.scroll_bottomrange = fTouchpadView->GetBottomScrollRatio();
 			fRevertButton->SetEnabled(true);
 			fTouchpadPref.UpdateSettings();
 			break;
+
 		case SCROLL_CONTROL_CHANGED:
 			settings.scroll_twofinger = fTwoFingerBox->Value() == B_CONTROL_ON;
 			settings.scroll_twofinger_horizontal
@@ -304,27 +303,30 @@ TouchpadPrefView::MessageReceived(BMessage* msg)
 			fTwoFingerHorizontalBox->SetEnabled(settings.scroll_twofinger);
 			fTouchpadPref.UpdateSettings();
 			break;
+
 		case TAP_CONTROL_CHANGED:
 			settings.tapgesture_sensibility = fTapSlider->Value();
 			fRevertButton->SetEnabled(true);
 			fTouchpadPref.UpdateSettings();
 			break;
+
 		case DEFAULT_SETTINGS:
 			fTouchpadPref.Defaults();
 			fRevertButton->SetEnabled(true);
 			fTouchpadPref.UpdateSettings();
 			SetValues(&settings);
 			break;
+
 		case REVERT_SETTINGS:
 			fTouchpadPref.Revert();
 			fTouchpadPref.UpdateSettings();
 			fRevertButton->SetEnabled(false);
 			SetValues(&settings);
 			break;
-		default:
-			BView::MessageReceived(msg);
-	}
 
+		default:
+			BView::MessageReceived(message);
+	}
 }
 
 
@@ -481,4 +483,3 @@ TouchpadPrefView::SetValues(touchpad_settings* settings)
 	fScrollAccelSlider->SetValue(settings->scroll_acceleration);
 	fTapSlider->SetValue(settings->tapgesture_sensibility);
 }
-
