@@ -630,7 +630,7 @@ rule UploadPackages target : packages
 {
 	local packageListFile = <repository-package-list>HaikuPorts-packages ;
 	Depends $(target) : $(packageListFile) ;
-	
+
 	HAIKU_REMOTE_REPOSITORY_PACKAGES on $(target) = $(packages) ;
 	UploadPackages1 $(target) : $(packageListFile) ;
 }
@@ -639,14 +639,14 @@ rule UploadPackages target : packages
 actions UploadPackages1
 {
 	remote=git.haiku-os.org
-	
+
 	if [ -n "$(HAIKU_REMOTE_REPOSITORY_PACKAGES:E=:J)" ]; then
 		for package in $(HAIKU_REMOTE_REPOSITORY_PACKAGES) ; do
 			file=`basename $package`
 			if ! grep -q $file $(2); then
 				echo "Error: $file is not being referenced in $(2)"
 				exit 1
-			fi 
+			fi
 		done
 		ssh $remote mkdir -p 'hpkg-upload'
 		scp $(HAIKU_REMOTE_REPOSITORY_PACKAGES) $remote:hpkg-upload/
@@ -657,7 +657,7 @@ actions UploadPackages1
 rule BuildRemoteHaikuPortsRepository target : packages
 {
 	UploadPackages $(target) : $(packages) ;
-	
+
 	local packageListFile = <repository-package-list>HaikuPorts-packages ;
 	BuildRemoteHaikuPortsRepository1 $(target) : $(packageListFile) ;
 }
@@ -672,6 +672,6 @@ actions BuildRemoteHaikuPortsRepository1
 
 	cd $(HAIKU_TOP)
 	branch=`git branch | cut -c3-`
-	
+
 	ssh $remote "build_repository_for_testing.sh $branch $repoArch"
 }
