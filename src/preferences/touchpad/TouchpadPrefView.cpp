@@ -1,9 +1,10 @@
 /*
- * Copyright 2008-2010, Haiku, Inc.
+ * Copyright 2008-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Clemens Zeidler (haiku@Clemens-Zeidler.de)
+ *		John Scipione, jscipione@gmail.com
+ *		Clemens Zeidler, haiku@Clemens-Zeidler.de
  */
 
 
