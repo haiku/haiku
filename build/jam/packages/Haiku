@@ -61,7 +61,6 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 # drivers
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ;
-AddNewDriversToPackage power		: enhanced_speedstep@x86 ;
 AddNewDriversToPackage power		: acpi_battery@x86 ;
 #AddNewDriversToPackage display		: display_controls@x86 ;
 
