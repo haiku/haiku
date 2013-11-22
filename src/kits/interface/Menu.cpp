@@ -1499,6 +1499,9 @@ BMenu::_InitData(BMessage* archive)
 bool
 BMenu::_Show(bool selectFirstItem, bool keyDown)
 {
+	if (Window() != NULL)
+		return false;
+
 	// See if the supermenu has a cached menuwindow,
 	// and use that one if possible.
 	BMenuWindow* window = NULL;
