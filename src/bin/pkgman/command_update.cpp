@@ -36,6 +36,9 @@ static const char* const kLongUsage =
 	"  -H, --home\n"
 	"    Update the packages in the user's home directory. Default is to\n"
 	"    update in the system directory.\n"
+	"  -y\n"
+	"    Non-interactive mode. Automatically confirm changes, but fail when\n"
+	"    encountering problems.\n"
 	"\n";
 
 
@@ -48,6 +51,7 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 {
 	BPackageInstallationLocation location
 		= B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
+	bool interactive = true;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -57,7 +61,7 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "hH", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "hHy", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -68,6 +72,10 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 
 			case 'H':
 				location = B_PACKAGE_INSTALLATION_LOCATION_HOME;
+				break;
+
+			case 'y':
+				interactive = false;
 				break;
 
 			default:
@@ -81,7 +89,7 @@ UpdateCommand::Execute(int argc, const char* const* argv)
 	const char* const* packages = argv + optind;
 
 	// perform the update
-	PackageManager packageManager(location);
+	PackageManager packageManager(location, interactive);
 	packageManager.Update(packages, packageCount);
 
 	return 0;

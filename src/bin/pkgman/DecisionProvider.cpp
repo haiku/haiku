@@ -10,6 +10,13 @@
 #include "DecisionProvider.h"
 
 
+DecisionProvider::DecisionProvider(bool interactive)
+	:
+	fInteractive(interactive)
+{
+}
+
+
 bool
 DecisionProvider::YesNoDecisionNeeded(const BString& description,
 	const BString& question, const BString& yes, const BString& no,
@@ -24,6 +31,11 @@ DecisionProvider::YesNoDecisionNeeded(const BString& description,
 		printf("%s [%s/%s]%s: ", question.String(), yes.String(), no.String(),
 			haveDefault
 				? (BString(" (") << defaultChoice << ") ").String() : "");
+
+		if (!fInteractive) {
+			printf("%s\n", yes.String());
+			return true;
+		}
 
 		char buffer[32];
 		if (fgets(buffer, 32, stdin)) {

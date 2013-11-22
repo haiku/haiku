@@ -25,8 +25,11 @@ class PackageManager : public BPackageManager,
 	private BPackageManager::UserInteractionHandler {
 public:
 								PackageManager(
-									BPackageInstallationLocation location);
+									BPackageInstallationLocation location,
+									bool interactive = true);
 								~PackageManager();
+
+			void				SetInteractive(bool interactive);
 
 	virtual	void				JobFailed(BJob* job);
 	virtual	void				JobAborted(BJob* job);
@@ -68,6 +71,7 @@ private:
 			BPackageManager::ClientInstallationInterface
 									fClientInstallationInterface;
 			int32				fPreviousDownloadPercentage;
+			bool				fInteractive;
 };
 
 

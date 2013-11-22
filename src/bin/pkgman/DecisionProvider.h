@@ -9,10 +9,20 @@
 #include <package/Context.h>
 
 
-struct DecisionProvider : public BPackageKit::BDecisionProvider {
-	virtual bool YesNoDecisionNeeded(const BString& description,
-		const BString& question, const BString& yes, const BString& no,
-		const BString& defaultChoice);
+class DecisionProvider : public BPackageKit::BDecisionProvider {
+public:
+								DecisionProvider(bool interactive = true);
+
+			void				SetInteractive(bool interactive)
+									{ fInteractive = interactive; }
+
+	virtual	bool				YesNoDecisionNeeded(const BString& description,
+									const BString& question, const BString& yes,
+									const BString& no,
+									 const BString& defaultChoice);
+
+private:
+			bool				fInteractive;
 };
 
 

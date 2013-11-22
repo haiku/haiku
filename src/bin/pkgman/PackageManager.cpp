@@ -22,19 +22,29 @@
 using namespace BPackageKit::BPrivate;
 
 
-PackageManager::PackageManager(BPackageInstallationLocation location)
+PackageManager::PackageManager(BPackageInstallationLocation location,
+	bool interactive)
 	:
 	BPackageManager(location, &fClientInstallationInterface, this),
 	BPackageManager::UserInteractionHandler(),
-	fDecisionProvider(),
+	fDecisionProvider(interactive),
 	fClientInstallationInterface(),
-	fPreviousDownloadPercentage(0)
+	fPreviousDownloadPercentage(0),
+	fInteractive(interactive)
 {
 }
 
 
 PackageManager::~PackageManager()
 {
+}
+
+
+void
+PackageManager::SetInteractive(bool interactive)
+{
+	fInteractive = interactive;
+	fDecisionProvider.SetInteractive(interactive);
 }
 
 
@@ -80,6 +90,9 @@ PackageManager::HandleProblems()
 			}
 		}
 
+		if (!fInteractive)
+			continue;
+
 		// let the user choose a solution
 		printf("Please select a solution, skip the problem for now or quit.\n");
 		for (;;) {
@@ -112,6 +125,9 @@ PackageManager::HandleProblems()
 			break;
 		}
 	}
+
+	if (problemCount > 0 && !fInteractive)
+		exit(1);
 }
 
 

@@ -35,6 +35,9 @@ static const char* const kLongUsage =
 	"  -H, --home\n"
 	"    Uninstall the packages from the user's home directory. Default is to\n"
 	"    uninstall from the system directory.\n"
+	"  -y\n"
+	"    Non-interactive mode. Automatically confirm changes, but fail when\n"
+	"    encountering problems.\n"
 	"\n";
 
 
@@ -47,6 +50,7 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 {
 	BPackageInstallationLocation location
 		= B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
+	bool interactive = true;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -56,7 +60,7 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "hH", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "hHy", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -67,6 +71,10 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 
 			case 'H':
 				location = B_PACKAGE_INSTALLATION_LOCATION_HOME;
+				break;
+
+			case 'y':
+				interactive = false;
 				break;
 
 			default:
@@ -83,7 +91,7 @@ UninstallCommand::Execute(int argc, const char* const* argv)
 	const char* const* packages = argv + optind;
 
 	// perform the installation
-	PackageManager packageManager(location);
+	PackageManager packageManager(location, interactive);
 	packageManager.Uninstall(packages, packageCount);
 
 	return 0;
