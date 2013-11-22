@@ -17,6 +17,8 @@
 #include <mime/Database.h>
 #include <mime/DatabaseLocation.h>
 #include <mime/MimeInfoUpdater.h>
+#include <mime/MimeSnifferAddonManager.h>
+#include <mime/TextSnifferAddon.h>
 
 
 using namespace BPrivate::Storage::Mime;
@@ -204,13 +206,24 @@ main(int argc, const char** argv)
 		for (int32 i = 0; i < count; i++)
 			databaseLocation.AddDirectory(databaseDirectories.StringAt(i));
 
-		sDatabase = new(std::nothrow) Database(&databaseLocation, NULL, NULL);
+		status_t error = MimeSnifferAddonManager::CreateDefault();
+		if (error != B_OK) {
+			fprintf(stderr, "%s: Failed to create MIME sniffer add-on "
+				"manager: %s\n", sProgramName, strerror(error));
+			exit(1);
+		}
+		MimeSnifferAddonManager* manager = MimeSnifferAddonManager::Default();
+		manager->AddMimeSnifferAddon(
+			new(std::nothrow) TextSnifferAddon(&databaseLocation));
+
+		sDatabase = new(std::nothrow) Database(&databaseLocation, manager,
+			NULL);
 		if (sDatabase == NULL) {
 			fprintf(stderr, "%s: Out of memory!\n", sProgramName);
 			exit(1);
 		}
 
-		status_t error = sDatabase->InitCheck();
+		error = sDatabase->InitCheck();
 		if (error != B_OK) {
 			fprintf(stderr, "%s: Failed to init MIME DB: %s\n", sProgramName,
 				strerror(error));

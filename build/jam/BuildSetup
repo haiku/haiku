@@ -599,6 +599,7 @@ if $(HOST_PLATFORM) = freebsd {
 HOST_BE_API_HEADERS =
 	[ FDirName $(HAIKU_TOP) headers build ]
 	[ FDirName $(HAIKU_TOP) headers build os ]
+	[ FDirName $(HAIKU_TOP) headers build os add-ons registrar ]
 	[ FDirName $(HAIKU_TOP) headers build os app ]
 	[ FDirName $(HAIKU_TOP) headers build os drivers ]
 	[ FDirName $(HAIKU_TOP) headers build os kernel ]

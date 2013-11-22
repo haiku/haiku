@@ -45,9 +45,12 @@ BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	MimeEntryProcessor.cpp
 	MimeInfoUpdater.cpp
 	MimeSniffer.cpp
+	MimeSnifferAddon.cpp
+	MimeSnifferAddonManager.cpp
 	SnifferRules.cpp
 	Supertype.cpp
 	SupportingApps.cpp
+	TextSnifferAddon.cpp
 
 	# sniffer
 	CharStream.cpp
