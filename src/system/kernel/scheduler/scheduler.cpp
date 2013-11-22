@@ -116,6 +116,7 @@ CPUEntry::CPUEntry()
 
 CoreEntry::CoreEntry()
 	:
+	fCPUCount(0),
 	fActiveTime(0),
 	fLoad(0)
 {
@@ -280,13 +281,11 @@ dump_heap(CPUHeap* heap)
 static void
 dump_core_load_heap(CoreLoadHeap* heap)
 {
-	int32 cpuPerCore = smp_get_num_cpus() / gRunQueueCount;
-
 	CoreEntry* entry = heap->PeekMinimum();
 	while (entry) {
 		int32 key = CoreLoadHeap::GetKey(entry);
 		kprintf("%4" B_PRId32 " %3" B_PRId32 "%%\n", entry->fCoreID,
-			entry->fLoad / cpuPerCore / 10);
+			get_core_load(entry) / 10);
 
 		heap->RemoveMinimum();
 		sDebugCoreHeap->Insert(entry, key);
@@ -402,8 +401,7 @@ update_load_heaps(int32 core)
 
 	WriteSpinLocker coreLocker(gCoreHeapsLock);
 
-	int32 cpuPerCore = smp_get_num_cpus() / gRunQueueCount;
-	int32 newKey = entry->fLoad / cpuPerCore;
+	int32 newKey = get_core_load(entry);
 	int32 oldKey = CoreLoadHeap::GetKey(entry);
 
 	ASSERT(oldKey >= 0 && oldKey <= kMaxLoad);
@@ -1062,6 +1060,7 @@ update_cpu_performance(Thread* thread, int32 thisCore)
 {
 	int32 load = max_c(thread->scheduler_data->load,
 			gCoreEntries[thisCore].fLoad);
+	load /= gCoreEntries[thisCore].fCPUCount;
 	load = min_c(max_c(load, 0), kMaxLoad);
 
 	if (load < kTargetLoad) {
@@ -1433,6 +1432,7 @@ _scheduler_init()
 
 	for (int32 i = 0; i < coreCount; i++) {
 		gCoreEntries[i].fCoreID = i;
+		gCoreEntries[i].fCPUCount = cpuCount / coreCount;
 
 		result = gCoreLoadHeap->Insert(&gCoreEntries[i], 0);
 		if (result != B_OK)

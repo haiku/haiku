@@ -79,6 +79,8 @@ struct CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 
 	int32		fCoreID;
 
+	int32		fCPUCount;
+
 	spinlock	fCPULock;
 	spinlock	fQueueLock;
 
@@ -172,6 +174,13 @@ struct scheduler_thread_data {
 
 			bool		enqueued;
 };
+
+
+static inline int32
+get_core_load(struct Scheduler::CoreEntry* core)
+{
+	return core->fLoad / core->fCPUCount;
+}
 
 
 /*!	Switches the currently running thread.

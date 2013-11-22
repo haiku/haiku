@@ -46,7 +46,7 @@ try_small_task_packing(Thread* thread)
 	int32 core = sSmallTaskCore;
 	return (core == -1 && gCoreLoadHeap->PeekMaximum() != NULL)
 		|| (core != -1
-			&& gCoreEntries[core].fLoad + thread->scheduler_data->load
+			&& get_core_load(&gCoreEntries[core]) + thread->scheduler_data->load
 				< kHighLoad);
 }
 
@@ -139,21 +139,22 @@ should_rebalance(Thread* thread)
 	int32 core = schedulerThreadData->previous_core;
 	CoreEntry* coreEntry = &gCoreEntries[core];
 
-	if (coreEntry->fLoad > kHighLoad) {
+	int32 coreLoad = get_core_load(coreEntry);
+	if (coreLoad > kHighLoad) {
 		ReadSpinLocker coreLocker(gCoreHeapsLock);
 		if (sSmallTaskCore == core) {
-			if (coreEntry->fLoad - schedulerThreadData->load < kHighLoad)
+			if (coreLoad - schedulerThreadData->load < kHighLoad)
 				return true;
 
 			choose_small_task_core();
-			return coreEntry->fLoad > kVeryHighLoad;
+			return coreLoad > kVeryHighLoad;
 		}
 
 		CoreEntry* other = gCoreLoadHeap->PeekMaximum();
 		if (other == NULL)
 			other = gCoreHighLoadHeap->PeekMinimum();
 		ASSERT(other != NULL);
-		return coreEntry->fLoad - other->fLoad >= kLoadDifference / 2;
+		return coreLoad - get_core_load(other) >= kLoadDifference / 2;
 	}
 
 	int32 smallTaskCore = choose_small_task_core();
@@ -228,8 +229,10 @@ rebalance_irqs(bool idle)
 	if (other->fCoreID == thisCore)
 		return;
 
-	if (other->fLoad + kLoadDifference >= gCoreEntries[thisCore].fLoad)
+	if (get_core_load(other) + kLoadDifference
+			>= get_core_load(&gCoreEntries[thisCore])) {
 		return;
+	}
 
 	assign_io_interrupt_to_cpu(chosen->irq, newCPU);
 }

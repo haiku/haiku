@@ -92,19 +92,23 @@ should_rebalance(Thread* thread)
 
 	CoreEntry* coreEntry = &gCoreEntries[schedulerThreadData->previous_core];
 
+	int32 coreLoad = get_core_load(coreEntry);
+
 	// If the thread produces more than 50% of the load, leave it here. In
 	// such situation it is better to move other threads away.
-	if (schedulerThreadData->load >= coreEntry->fLoad / 2)
+	if (schedulerThreadData->load >= coreLoad / 2)
 		return false;
 
 	// If there is high load on this core but this thread does not contribute
 	// significantly consider giving it to someone less busy.
-	if (coreEntry->fLoad > kHighLoad) {
+	if (coreLoad > kHighLoad) {
 		ReadSpinLocker coreLocker(gCoreHeapsLock);
 
 		CoreEntry* other = gCoreLoadHeap->PeekMinimum();
-		if (other != NULL && coreEntry->fLoad - other->fLoad >= kLoadDifference)
+		if (other != NULL && coreLoad - get_core_load(other)
+				>= kLoadDifference) {
 			return true;
+		}
 	}
 
 	// No cpu bound threads - the situation is quite good. Make sure it
@@ -115,7 +119,7 @@ should_rebalance(Thread* thread)
 	if (other == NULL)
 		other = gCoreHighLoadHeap->PeekMinimum();
 	ASSERT(other != NULL);
-	return coreEntry->fLoad - other->fLoad >= kLoadDifference * 2;
+	return coreLoad - get_core_load(other) >= kLoadDifference * 2;
 }
 
 
@@ -161,8 +165,10 @@ rebalance_irqs(bool idle)
 	if (other->fCoreID == thisCore)
 		return;
 
-	if (other->fLoad + kLoadDifference >= gCoreEntries[thisCore].fLoad)
+	if (get_core_load(other) + kLoadDifference
+			>= get_core_load(&gCoreEntries[thisCore])) {
 		return;
+	}
 
 	assign_io_interrupt_to_cpu(chosen->irq, newCPU);
 }
