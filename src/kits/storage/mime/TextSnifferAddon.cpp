@@ -1,11 +1,17 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2006-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
  */
 
-#include "TextSnifferAddon.h"
+
+#include <mime/TextSnifferAddon.h>
 
 #include <MimeType.h>
+
+
+namespace BPrivate {
+namespace Storage {
+namespace Mime {
 
 
 static int file_ascmagic(const unsigned char *buf, size_t nbytes,
@@ -686,3 +692,8 @@ from_ebcdic(const unsigned char *buf, size_t nbytes, unsigned char *out)
 		out[i] = ebcdic_to_ascii[buf[i]];
 	}
 }
+
+
+} // namespace Mime
+} // namespace Storage
+} // namespace BPrivate

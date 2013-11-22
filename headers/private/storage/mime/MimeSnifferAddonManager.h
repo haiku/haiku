@@ -1,12 +1,14 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2006-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
  */
-#ifndef MIME_SNIFFER_ADDON_MANAGER_H
-#define MIME_SNIFFER_ADDON_MANAGER_H
+#ifndef _MINE_MIME_SNIFFER_ADDON_MANAGER_H
+#define _MINE_MIME_SNIFFER_ADDON_MANAGER_H
+
 
 #include <List.h>
 #include <Locker.h>
+
 
 #include <mime/MimeSniffer.h>
 
@@ -14,6 +16,7 @@
 class BFile;
 class BMimeSnifferAddon;
 class BMimeType;
+
 
 namespace BPrivate {
 namespace Storage {
@@ -59,7 +62,6 @@ private:
 }	// namespace Storage
 }	// namespace BPrivate
 
-using BPrivate::Storage::Mime::MimeSnifferAddonManager;
 
-#endif	// MIME_SNIFFER_ADDON_MANAGER_H
+#endif	// _MINE_MIME_SNIFFER_ADDON_MANAGER_H
 

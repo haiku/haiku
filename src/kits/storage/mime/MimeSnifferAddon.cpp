@@ -1,9 +1,11 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2006-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
  */
 
-#include "MimeSnifferAddon.h"
+
+#include <MimeSnifferAddon.h>
+
 
 // constructor
 BMimeSnifferAddon::BMimeSnifferAddon()

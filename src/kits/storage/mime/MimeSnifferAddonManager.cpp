@@ -1,18 +1,22 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2006-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
  */
 
-#include "MimeSnifferAddonManager.h"
+
+#include <mime/MimeSnifferAddonManager.h>
 
 #include <new>
 
 #include <Autolock.h>
 #include <MimeType.h>
 
-#include "MimeSnifferAddon.h"
+#include <MimeSnifferAddon.h>
 
-using std::nothrow;
+
+namespace BPrivate {
+namespace Storage {
+namespace Mime {
 
 
 // singleton instance
@@ -78,7 +82,8 @@ MimeSnifferAddonManager::Default()
 status_t
 MimeSnifferAddonManager::CreateDefault()
 {
-	MimeSnifferAddonManager* manager = new(nothrow) MimeSnifferAddonManager;
+	MimeSnifferAddonManager* manager
+		= new(std::nothrow) MimeSnifferAddonManager;
 	if (!manager)
 		return B_NO_MEMORY;
 
@@ -109,7 +114,7 @@ MimeSnifferAddonManager::AddMimeSnifferAddon(BMimeSnifferAddon* addon)
 		return B_ERROR;
 
 	// create a reference for the addon
-	AddonReference* reference = new(nothrow) AddonReference(addon);
+	AddonReference* reference = new(std::nothrow) AddonReference(addon);
 	if (!reference)
 		return B_NO_MEMORY;
 
@@ -202,7 +207,7 @@ MimeSnifferAddonManager::_GetAddons(AddonReference**& references, int32& count)
 		return B_ERROR;
 
 	count = fAddons.CountItems();
-	references = new(nothrow) AddonReference*[count];
+	references = new(std::nothrow) AddonReference*[count];
 	if (!references)
 		return B_NO_MEMORY;
 
@@ -223,3 +228,8 @@ MimeSnifferAddonManager::_PutAddons(AddonReference** references, int32 count)
 
 	delete[] references;
 }
+
+
+}	// namespace Mime
+}	// namespace Storage
+}	// namespace BPrivate

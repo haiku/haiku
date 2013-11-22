@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku Inc.
+ * Copyright 2002-2013, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,16 +23,18 @@
 
 #include <mime/AppMetaMimeCreator.h>
 #include <mime/database_support.h>
+#include <mime/MimeSnifferAddonManager.h>
+#include <mime/TextSnifferAddon.h>
 
 #include "CreateAppMetaMimeThread.h"
 #include "MessageDeliverer.h"
-#include "MimeSnifferAddonManager.h"
-#include "TextSnifferAddon.h"
 #include "UpdateMimeInfoThread.h"
 
 
 using namespace std;
 using namespace BPrivate;
+using BPrivate::Storage::Mime::MimeSnifferAddonManager;
+using BPrivate::Storage::Mime::TextSnifferAddon;
 
 
 /*!	\class MIMEManager

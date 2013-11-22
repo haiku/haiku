@@ -20,9 +20,12 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			MimeEntryProcessor.cpp
 			MimeInfoUpdater.cpp
 			MimeSniffer.cpp
+			MimeSnifferAddon.cpp
+			MimeSnifferAddonManager.cpp
 			SnifferRules.cpp
 			Supertype.cpp
 			SupportingApps.cpp
+			TextSnifferAddon.cpp
 			;
 	}
 }
