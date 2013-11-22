@@ -615,11 +615,12 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		}
 	}
 
-	if (done <= 0)
+	if (done <= 0) {
+		close(master);
 		return B_ERROR;
+	}
 
 	fFd = master;
 
 	return B_OK;
 }
-
