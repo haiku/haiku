@@ -554,7 +554,7 @@ rule BuildHaikuPortsSourcePackageDirectory
 
 actions BuildHaikuPortsPackageList
 {
-	HAIKU_BOOTSTRAP_BUILD= $(JAM:E=jam) @alpha-raw build-package-list $(1) \
+	HAIKU_BOOTSTRAP_BUILD= $(JAM:E=jam) @release-raw build-package-list $(1) \
 		$(HAIKU_REPOSITORY_BUILD_ADDITIONAL_PACKAGES)
 }
 
