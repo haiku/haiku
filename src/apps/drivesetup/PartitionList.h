@@ -97,6 +97,7 @@ public:
 	virtual	void				AttachedToWindow();
 
 	virtual	bool				InitiateDrag(BPoint rowPoint, bool wasSelected);
+	virtual	void 				ExpandOrCollapse(BRow* row, bool expand);
 
 			PartitionListRow*	FindRow(partition_id id,
 									PartitionListRow* parent = NULL);

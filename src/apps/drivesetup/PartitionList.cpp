@@ -20,6 +20,7 @@
 #include <driver_settings.h>
 
 #include "Support.h"
+#include "MainWindow.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -381,6 +382,14 @@ PartitionListView::InitiateDrag(BPoint rowPoint, bool wasSelected)
 
 	DragMessage(&dragMessage, draggedRowRect, NULL);
 	return true;
+}
+
+
+void
+PartitionListView::ExpandOrCollapse(BRow* row, bool expand)
+{
+	BColumnListView::ExpandOrCollapse(row, expand);
+	Window()->PostMessage(MSG_UPDATE_ZOOM_LIMITS);
 }
 
 

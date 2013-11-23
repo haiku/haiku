@@ -35,12 +35,14 @@
 #include <PartitioningInfo.h>
 #include <Roster.h>
 #include <Screen.h>
+#include <ScrollBar.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 
 #include <tracker_private.h>
 
 #include "ChangeParametersPanel.h"
+#include "ColumnListView.h"
 #include "CreateParametersPanel.h"
 #include "DiskView.h"
 #include "InitParametersPanel.h"
@@ -199,12 +201,12 @@ private:
 MainWindow::MainWindow()
 	:
 	BWindow(BRect(50, 50, 600, 500), B_TRANSLATE_SYSTEM_NAME("DriveSetup"),
-		B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
+		B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
 	fCurrentDisk(NULL),
 	fCurrentPartitionID(-1),
 	fSpaceIDMap()
 {
-	BMenuBar* menuBar = new BMenuBar(Bounds(), "root menu");
+	fMenuBar = new BMenuBar(Bounds(), "root menu");
 
 	// create all the menu items
 	fWipeMenuItem = new BMenuItem(B_TRANSLATE("Wipe (not implemented)"),
@@ -245,7 +247,7 @@ MainWindow::MainWindow()
 	// fDiskMenu->AddItem(fSurfaceTestMenuItem);
 	fDiskMenu->AddItem(fRescanMenuItem);
 
-	menuBar->AddItem(fDiskMenu);
+	fMenuBar->AddItem(fDiskMenu);
 
 	// Parition menu
 	fPartitionMenu = new BMenu(B_TRANSLATE("Partition"));
@@ -265,9 +267,9 @@ MainWindow::MainWindow()
 	fPartitionMenu->AddSeparatorItem();
 
 	fPartitionMenu->AddItem(fMountAllMenuItem);
-	menuBar->AddItem(fPartitionMenu);
+	fMenuBar->AddItem(fPartitionMenu);
 
-	AddChild(menuBar);
+	AddChild(fMenuBar);
 
 	// Partition / Drives context menu
 	fContextMenu = new BPopUpMenu("Partition");
@@ -295,7 +297,7 @@ MainWindow::MainWindow()
 
 	// add DiskView
 	BRect r(Bounds());
-	r.top = menuBar->Frame().bottom + 1;
+	r.top = fMenuBar->Frame().bottom + 1;
 	r.bottom = floorf(r.top + r.Height() * 0.33);
 	fDiskView = new DiskView(r, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
 		fSpaceIDMap);
@@ -427,6 +429,10 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_UPDATE_ZOOM_LIMITS:
+			_UpdateWindowZoomLimits();
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -540,6 +546,8 @@ MainWindow::_ScanDrives()
 	} else {
 		_UpdateMenus(NULL, -1, -1);
 	}
+
+	PostMessage(MSG_UPDATE_ZOOM_LIMITS);
 }
 
 
@@ -1358,3 +1366,46 @@ MainWindow::_ChangeParameters(BDiskDevice* disk, partition_id selectedPartition)
 	_ScanDrives();
 	fDiskView->ForceUpdate();
 }
+
+
+float
+MainWindow::_ColumnListViewHeight(BColumnListView* list, BRow* currentRow)
+{
+	float height = 0;
+	int32 rows = list->CountRows(currentRow);
+	for (int32 i = 0; i < rows; i++) {
+		BRow* row = list->RowAt(i, currentRow);
+		height += row->Height() + 1;
+		if (row->IsExpanded() && list->CountRows(row) > 0)
+			height += _ColumnListViewHeight(list, row);
+	}
+	return height;
+}
+
+
+void
+MainWindow::_UpdateWindowZoomLimits()
+{
+	float maxHeight = 0;
+	int32 numColumns = fListView->CountColumns();
+	BRow* parentRow = NULL;
+	BColumn* column = NULL;
+
+	maxHeight += _ColumnListViewHeight(fListView, NULL);
+
+	float maxWidth = fListView->LatchWidth();
+	for (int32 i = 0; i < numColumns; i++) {
+		column = fListView->ColumnAt(i);
+		maxWidth += column->Width();
+	}
+
+	parentRow = fListView->RowAt(0, NULL);
+	maxHeight += B_H_SCROLL_BAR_HEIGHT;
+	maxHeight += 1.5 * parentRow->Height();	// the label row
+	maxHeight += fDiskView->Bounds().Height();
+	maxHeight += fMenuBar->Bounds().Height();
+	maxWidth += 1.5 * B_V_SCROLL_BAR_WIDTH;	// scroll bar & borders
+
+	SetZoomLimits(maxWidth, maxHeight);
+}
+
