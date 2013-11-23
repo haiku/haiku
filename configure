@@ -755,8 +755,10 @@ else
 			crossToolsDir="$outputDir/cross-tools-$targetArch"
 			targetMachine=`get_variable buildCrossToolsMachine_$targetArch`
 			script="$buildCrossToolsScript"
+			scriptArgs=
 			if [ $targetArch != x86_gcc2 ]; then
-				script="${script}_gcc4 $targetMachine"
+				script="${script}_gcc4"
+				scriptArgs="$targetMachine"
 			fi
 			secondaryArch=
 			if [ -z "$isPrimaryArch" ]; then
@@ -772,8 +774,8 @@ else
 			SECONDARY_ARCH=$secondaryArch \
 			HAIKU_USE_GCC_GRAPHITE=`get_variable \
 				HAIKU_USE_GCC_GRAPHITE_$targetArch` \
-			$script "$sourceDir" "$buildCrossTools" "$crossToolsDir" \
-				$buildCrossToolsJobs || exit 1
+			"$script" $scriptArgs "$sourceDir" "$buildCrossTools" \
+				"$crossToolsDir" $buildCrossToolsJobs || exit 1
 			crossToolsPrefix="$crossToolsDir/bin/${targetMachine}-"
 		fi
 
