@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Notifications	1398224574
+1	hungarian	x-vnd.Haiku-Notifications	3366464357
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Hiba történt a beállítások mentése során.\nLehet hogy elfogyott a hely a lemezen.
 Notifications	GeneralView		Értesítések
 seconds of inactivity	GeneralView		másodpercnyi inaktivitás után
@@ -45,5 +45,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 Enable notifications at startup	GeneralView		Értesítések engedélyezése indításkor
 Notifications	PrefletView		Értesítések
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Nem sikerült elérni a kiszolgálót, és ebből következően az InfoPopper telepítése sem volt sikeres.
+Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Nem sikerült elmenteni a beállításokat. Lehetséges, hogy nincs írási joga a beállítások mappához.
 Applications	NotificationView		Programok
 Events are notified	GeneralView		Az eseményekről lesz értesítés

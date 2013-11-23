@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Notifications	1398224574
+1	german	x-vnd.Haiku-Notifications	3366464357
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Beim Speichern der Einstellungen ist ein Fehler aufgetreten.\nVermutlich ist nicht mehr genügend Speicher auf dem Datenträger verfügbar.
 Notifications	GeneralView		Notifications - Benachrichtigungen
 seconds of inactivity	GeneralView		Sekunden Leerlauf.
@@ -45,5 +45,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 Enable notifications at startup	GeneralView		Benachrichtigungen beim Systemstart aktivieren
 Notifications	PrefletView		Benachrichtigungen
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Der Benachrichtiguns-Server wurde nicht gefunden.\nWahrscheinlich war die Installation nicht erfolgreich.
+Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Die Einstellungen konnten nicht gespeichert werden. Wahrscheinlich ist der entsprechende Ordner schreibgeschützt.
 Applications	NotificationView		Anwendungen
 Events are notified	GeneralView		Ereignisse werden gemeldet

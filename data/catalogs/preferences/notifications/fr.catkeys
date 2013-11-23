@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	1398224574
+1	french	x-vnd.Haiku-Notifications	3366464357
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Une erreur est survenue lors de la sauvegarde des préférences.\nVous n'avez peut-être plus suffisamment d'espace libre sur votre disque.
 Notifications	GeneralView		Notifications
 seconds of inactivity	GeneralView		secondes d'inactivités
@@ -45,5 +45,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 Enable notifications at startup	GeneralView		Activer les notifications au démarrage
 Notifications	PrefletView		Notifications
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Impossible de trouver le serveur de notifications.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.
+Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Impossible d'enregistrer les préférences, vous n'avez probablement pas accès en écriture au répertoire des réglages.
 Applications	NotificationView		Applications
 Events are notified	GeneralView		Les événements sont notifiés

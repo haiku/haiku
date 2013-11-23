@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	2058853918
+1	french	x-vnd.haiku-icon_o_matic	484570110
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -49,6 +49,7 @@ Error: 	Icon-O-Matic-Main		Erreur :
 Name	Icon-O-Matic-PropertyNames		Nom
 bad news	Icon-O-Matic-Exporter		mauvaises nouvelles
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<rien à annuler>
+Off	Icon-O-Matic-Menu-Settings		Éteint
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Figer la forme
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Enlever le style
 Scale X	Icon-O-Matic-PropertyNames		Échelle en X
@@ -61,6 +62,7 @@ Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Réinitialiser les Tr
 Settings	Icon-O-Matic-Menus		Réglages
 All	Icon-O-Matic-Properties		Tout
 Undo	Icon-O-Matic-Main		Annuler
+Click on a shape above	Empty transformers list - 1st line		Cliquer sur une forme ci-dessus
 Add Shape	Icon-O-Matic-AddShapesCmd		Ajouter une forme
 Contour	Transformation		Contour
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<rien à restaurer>
@@ -76,6 +78,7 @@ Saving your document failed!	Icon-O-Matic-Exporter		L'enregistrement du document
 Split	Icon-O-Matic-PathManipulator		Diviser
 Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Orner les points de contrôle
 Remove	Icon-O-Matic-StylesList		Enlever
+Add with path & style	Icon-O-Matic-ShapesList		Ajouter avec le chemin & le style
 META:ICON Attribute	Icon-O-Matic-SavePanel		Attribut META:ICON
 Translation Y	Icon-O-Matic-PropertyNames		Translation en Y
 Rotate	Icon-O-Matic-TransformationBoxStates		Pivoter
@@ -99,6 +102,7 @@ Settings…	Icon-O-Matic-SavePanel		Réglages…
 Remove	Icon-O-Matic-PathManipulator		Enlever
 Radial	Icon-O-Matic-StyleTypes		Radial
 Perspective	Icon-O-Matic-TransformersList		Perspective
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Ajoute une forme avec le chemin & le style
 Gradient	Icon-O-Matic-StyleTypes		Dégradé
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Attribut BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Inverser la sélection
@@ -128,9 +132,11 @@ Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGIm
 Swatches	Icon-O-Matic-Menus		Nuancier
 <unavailable>	Icon-O-Matic-StyleTypes		<indisponible>
 Rotation	Icon-O-Matic-PropertyNames		Rotation
+Add with style	Icon-O-Matic-ShapesList		Ajouter avec le style
 Add	Icon-O-Matic-PathsList		Ajouter
 Add Shapes	Icon-O-Matic-AddShapesCmd		Ajouter des Formes
 Move Style	Icon-O-Matic-MoveStylesCmd		Déplacer le style
+Bummer	Cancel button - error alert		Poisse
 Snap to grid	Icon-O-Matic-Menu-Settings		Aligner sur la grille
 Remove	Icon-O-Matic-ShapesList		Enlever
 Yes	Icon-O-Matic-StyledTextImport		Oui
@@ -142,14 +148,18 @@ Format	Icon-O-Matic-SavePanel		Format
 Add rect	Icon-O-Matic-PathsList		Ajouter un rectangle
 Edit	Icon-O-Matic-Menus		Éditer
 Duplicate	Icon-O-Matic-StylesList		Dupliquer
+Add Paths	Icon-O-Matic-AddPathsCmd		Ajouter les chemins
+Style type	Icon-O-Matic-StyleTypes		Type de style
 too big	Icon-O-Matic-StyledTextImport		trop grand
 Assign Style	Icon-O-Matic-AssignStyleCmd		Assigner un style
+Add Path	Icon-O-Matic-AddPathsCmd		Ajouter un chemin
 Color	Icon-O-Matic-PropertyNames		Couleur
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Insérer un point de contrôle
 Flip Control Point	Icon-O-Matic-FlipPointsCmd		Retourner le Point de Contrôle
 Redo	Icon-O-Matic-Main		Rétablir
 Assign Paths	Icon-O-Matic-AddPathsCmd		Assigner les chemins
 OK	Icon-O-Matic-SVGImport		OK
+Multi paste	Icon-O-Matic-Properties		Collage multiple
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Réinitialiser la transformation
 Scale	Icon-O-Matic-TransformationBoxStates		Échelle
 Duplicate	Icon-O-Matic-PathsList		Dupliquer
