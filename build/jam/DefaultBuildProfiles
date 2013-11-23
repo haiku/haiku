@@ -7,12 +7,12 @@ switch $(HAIKU_BUILD_PROFILE) {
 
 rule DefineDefaultBuildProfiles
 {
-	# alpha release profiles
-	DefineBuildProfile alpha-raw : image : "haiku-alpha.image" ;
-	DefineBuildProfile alpha-vmware : vmware-image : "haiku-alpha.vmdk" ;
-	DefineBuildProfile alpha-cd : cd-image : "haiku-alpha.iso" ;
-	DefineBuildProfile alpha-anyboot : anyboot-image
-		: "haiku-alpha-anyboot.image" ;
+	# release profiles
+	DefineBuildProfile release-raw : image : "haiku-release.image" ;
+	DefineBuildProfile release-vmware : vmware-image : "haiku-release.vmdk" ;
+	DefineBuildProfile release-cd : cd-image : "haiku-release.iso" ;
+	DefineBuildProfile release-anyboot : anyboot-image
+		: "haiku-release-anyboot.image" ;
 
 	# nightly profiles
 	DefineBuildProfile nightly-raw : image : "haiku-nightly.image" ;
@@ -27,8 +27,8 @@ rule DefineDefaultBuildProfiles
 		: "haiku-bootstrap.vmdk" ;
 
 	switch $(HAIKU_BUILD_PROFILE) {
-		case "alpha-*" : {
-			Echo Building Haiku R1/alpha ;
+		case "release-*" : {
+			Echo Building Haiku R1/development preview ;
 			HAIKU_ROOT_USER_NAME ?= user ;
 			HAIKU_ROOT_USER_REAL_NAME ?= "Yourself" ;
 			AddGroupToHaikuImage party : 101 : user sshd ;
@@ -75,8 +75,8 @@ rule DefineDefaultBuildProfiles
 				Welcome ;
 		}
 
-		case "beta-*" : {
-			Echo You wish. ;
+		case "alpha-*" : {
+			Echo The alpha-* build profiles have been renamed to release-* ;
 		}
 
 		case "nightly-*" : {
