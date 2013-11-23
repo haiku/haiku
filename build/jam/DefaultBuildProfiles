@@ -71,8 +71,13 @@ rule DefineDefaultBuildProfiles
 				}
 			}
 
-			AddOptionalHaikuImagePackages BeBook Development Git WebPositive
+			AddOptionalHaikuImagePackages BeBook Development Git
 				Welcome ;
+
+			# Temporary until WebPositive is fixed on x86_64
+            if $(HAIKU_PACKAGING_ARCHS) != x86_64 {
+				AddHaikuImagePackages WebPositive ;
+			}
 		}
 
 		case "alpha-*" : {
@@ -99,7 +104,12 @@ rule DefineDefaultBuildProfiles
 				xz_utils
 				;
 
-			AddOptionalHaikuImagePackages Development Git WebPositive ;
+			AddOptionalHaikuImagePackages Development Git ;
+
+			# Temporary until WebPositive is fixed on x86_64
+            if $(HAIKU_PACKAGING_ARCHS) != x86_64 {
+				AddHaikuImagePackages WebPositive ;
+			}
 		}
 
 		case "bootstrap-*" : {
