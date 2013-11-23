@@ -1,0 +1,23 @@
+# Builds the Haiku packages repository.
+
+local haikuRepository = <repository>haiku ;
+MakeLocate $(haikuRepository)
+	: $(HAIKU_PACKAGE_REPOSITORIES_DIR_$(HAIKU_PACKAGING_ARCH)) ;
+
+local repoInfo = <repository-info>haiku ;
+SEARCH on $(repoInfo) = $(HAIKU_TOP)/src/data/repository_infos ;
+
+local secondaryArchs = $(TARGET_PACKAGING_ARCHS[2-]) ;
+local packages =
+	haiku
+	haiku_devel
+	haiku_loader
+	haiku_userguide
+	haiku_welcome
+	makefile_engine
+
+	haiku_$(secondaryArchs)
+	haiku_$(secondaryArchs)_devel
+	;
+
+HaikuRepository $(haikuRepository) : $(repoInfo) : $(packages:S=.hpkg) ;

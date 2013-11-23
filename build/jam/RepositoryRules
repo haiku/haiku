@@ -675,3 +675,40 @@ actions BuildRemoteHaikuPortsRepository1
 
 	ssh $remote "build_repository_for_testing.sh $branch $repoArch"
 }
+
+
+rule HaikuRepository repository : repoInfo : packages
+{
+	# prepare the script that initializes the shell variables
+	local initVariablesScript = $(repository)-repository-init-vars ;
+	MakeLocate $(initVariablesScript)
+		: $(HAIKU_PACKAGE_REPOSITORIES_DIR_$(HAIKU_PACKAGING_ARCH)) ;
+	Always $(initVariablesScript) ;
+
+	local script = $(initVariablesScript) ;
+	AddVariableToScript $(script) : addBuildCompatibilityLibDir
+		: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+	AddVariableToScript $(script) : sha256 : $(HOST_SHA256) ;
+	AddVariableToScript $(script) : sedExtendedRegex
+		: $(HOST_EXTENDED_REGEX_SED) ;
+	AddTargetVariableToScript $(script) : <build>package ;
+	AddTargetVariableToScript $(script) : <build>package_repo : packageRepo ;
+
+	# call the build actions
+	local mainScript = build_haiku_repository ;
+	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
+
+	Depends $(repository) : $(mainScript) $(initVariablesScript) $(repoInfo)
+		$(packages) ;
+	HaikuRepository1 $(repository) : $(mainScript) $(initVariablesScript)
+		$(repoInfo) $(packages) ;
+	Always $(repository) ;
+
+	RmTemps $(repository) : $(initVariablesScript) ;
+}
+
+
+actions HaikuRepository1
+{
+	$(2[1]) "$(2[2])" "$(1)" "$(2[3-])"
+}

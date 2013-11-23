@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# Usage: build_haiku_repository <initScript> <repositoryDir> <repoInfo>
+#			<packages> ...
+
+set -o errexit
+
+if [ $# -le 2 ]; then
+	echo "$0: Missing parameters!" >&2
+	exit 1
+fi
+
+. $1
+shift
+
+repositoryDir="$1"
+repoInfo="$2"
+shift 2
+# the remaining arguments are the packages
+
+# this adds the build library dir to LD_LIBRARY_PATH
+eval "$addBuildCompatibilityLibDir"
+
+# create a clean repository directory
+rm -rf "$repositoryDir"
+mkdir "$repositoryDir"
+
+packageDir="$repositoryDir/packages"
+mkdir "$packageDir"
+
+# Get the canonical names for the packages and copy them to the package
+# directory.
+for packageFile in "$@"; do
+	fileName=`"$package" info -f "%fileName%" "$packageFile"`
+	cp "$packageFile" "$packageDir/$fileName"
+done
+
+# prepare the repo info file
+fileName=`basename "$packageDir"/haiku-*.hpkg .hpkg`
+version=${fileName#*-}
+version=${version%%-*}
+arch=${fileName##*-}
+
+sed -e "s/%HAIKU_ARCHITECTURE%/$arch/g" \
+	-e "s/%HAIKU_VERSION%/$version/g" \
+	"$repoInfo" > "$repositoryDir/repo.info"
+
+# build the repository file
+"$packageRepo" create -C "$repositoryDir" "$repositoryDir/repo.info" \
+	"$packageDir"/*.hpkg
+
+# create the checksum file
+$sha256 "$repositoryDir/repo" \
+	| $sedExtendedRegex 's,([^[:space:]]*).*,\1,' > "$repositoryDir/repo.sha256"
+		# The sed part is only necessary for sha256sum, but it doesn't harm for
+		# sha256 either.
