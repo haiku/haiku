@@ -182,7 +182,7 @@ SerialWindow::~SerialWindow()
 void SerialWindow::MenusBeginning()
 {
 	// remove all items from the menu
-	while(fConnectionMenu->RemoveItem(0L));
+	fConnectionMenu->RemoveItems(0, fConnectionMenu->CountItems(), true);
 
 	// fill it with the (updated) serial port list
 	BSerialPort serialPort;
