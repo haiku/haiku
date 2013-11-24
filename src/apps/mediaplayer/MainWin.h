@@ -121,6 +121,8 @@ private:
 			void				_ShowFullscreenControls(bool show,
 									bool animate = true);
 
+			void				_Wind(bigtime_t howMuch, int64 frames);
+
 			void				_UpdatePlaylistItemFile();
 			void				_UpdateAttributesMenu(const BNode& node);
 			void				_SetRating(int32 rating);

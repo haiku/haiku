@@ -844,9 +844,6 @@ MainWin::MessageReceived(BMessage* msg)
 
 		case M_WIND:
 		{
-			if (!fAllowWinding)
-				break;
-
 			bigtime_t howMuch;
 			int64 frames;
 			if (msg->FindInt64("how much", &howMuch) != B_OK
@@ -854,25 +851,7 @@ MainWin::MessageReceived(BMessage* msg)
 				break;
 			}
 
-			if (fController->Lock()) {
-				if (fHasVideo && !fController->IsPlaying()) {
-					int64 newFrame = fController->CurrentFrame() + frames;
-					fController->SetFramePosition(newFrame);
-				} else {
-					bigtime_t seekTime = fController->TimePosition() + howMuch;
-					if (seekTime < 0) {
-						fInitialSeekPosition = seekTime;
-						PostMessage(M_SKIP_PREV);
-					} else if (seekTime > fController->TimeDuration()) {
-						fInitialSeekPosition = 0;
-						PostMessage(M_SKIP_NEXT);
-					} else
-						fController->SetTimePosition(seekTime);
-				}
-				fController->Unlock();
-
-				fAllowWinding = false;
-			}
+			_Wind(howMuch, frames);
 			break;
 		}
 
@@ -2394,6 +2373,35 @@ MainWin::_ShowFullscreenControls(bool show, bool animate)
 		while (!fControls->IsHidden())
 			fControls->Hide();
 	}
+}
+
+
+// #pragma mark -
+
+
+void
+MainWin::_Wind(bigtime_t howMuch, int64 frames)
+{
+	if (!fAllowWinding || !fController->Lock())
+		return;
+
+	if (frames != 0 && fHasVideo && !fController->IsPlaying()) {
+		int64 newFrame = fController->CurrentFrame() + frames;
+		fController->SetFramePosition(newFrame);
+	} else {
+		bigtime_t seekTime = fController->TimePosition() + howMuch;
+		if (seekTime < 0) {
+			fInitialSeekPosition = seekTime;
+			PostMessage(M_SKIP_PREV);
+		} else if (seekTime > fController->TimeDuration()) {
+			fInitialSeekPosition = 0;
+			PostMessage(M_SKIP_NEXT);
+		} else
+			fController->SetTimePosition(seekTime);
+	}
+
+	fController->Unlock();
+	fAllowWinding = false;
 }
 
 
