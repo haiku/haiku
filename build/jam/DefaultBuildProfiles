@@ -66,9 +66,11 @@ rule DefineDefaultBuildProfiles
 
 			AddOptionalHaikuImagePackages BeBook Development Git Welcome ;
 
-			# Temporary until WebPositive is fixed on x86_64
-            if $(HAIKU_PACKAGING_ARCHS) != x86_64 {
+			# WebPositive is only built for x86 and x86_gcc2 at the moment
+			if $(HAIKU_PACKAGING_ARCHS) in x86_gcc2 x86 {
 				AddOptionalHaikuImagePackages WebPositive ;
+			} else {
+				Echo "WebPositive not available on $(HAIKU_PACKAGING_ARCHS)" ;
 			}
 		}
 
@@ -101,9 +103,11 @@ rule DefineDefaultBuildProfiles
 
 			AddOptionalHaikuImagePackages Development Git ;
 
-			# Temporary until WebPositive is fixed on x86_64
-            if $(HAIKU_PACKAGING_ARCHS) != x86_64 {
+			# WebPositive is only built for x86 and x86_gcc2 at the moment
+			if $(HAIKU_PACKAGING_ARCHS) in x86_gcc2 x86 {
 				AddOptionalHaikuImagePackages WebPositive ;
+			} else {
+				Echo "WebPositive not available on $(HAIKU_PACKAGING_ARCHS)" ;
 			}
 		}
 
