@@ -391,14 +391,17 @@ restore_interrupts(cpu_status status)
 static
 uint32 assign_cpu(void)
 {
-	int32 nextID = atomic_add(&sLastCPU, 1);
-	cpu_topology_node* node = get_cpu_topology();
+	cpu_topology_node* node;
+	do {
+		int32 nextID = atomic_add(&sLastCPU, 1);
+		node = get_cpu_topology();
 
-	while (node->level != CPU_TOPOLOGY_SMT) {
-		int levelSize = node->children_count;
-		node = node->children[nextID % levelSize];
-		nextID /= levelSize;
-	}
+		while (node->level != CPU_TOPOLOGY_SMT) {
+			int levelSize = node->children_count;
+			node = node->children[nextID % levelSize];
+			nextID /= levelSize;
+		}
+	} while (gCPU[node->id].disabled);
 
 	return node->id;
 }
@@ -680,6 +683,12 @@ void assign_io_interrupt_to_cpu(long vector, int32 newCPU)
 
 	int32 oldCPU = sVectors[vector].assigned_cpu.cpu;
 
+	if (newCPU == -1)
+		newCPU = assign_cpu();
+	dprintf_no_syslog("IRQ %ld CPU %" B_PRId32 " -> CPU %" B_PRId32 "\n", vector, oldCPU, newCPU);
+	if (newCPU == oldCPU)
+		return;
+
 	ASSERT(oldCPU != -1);
 	cpu_ent* cpu = &gCPU[oldCPU];
 
@@ -693,6 +702,5 @@ void assign_io_interrupt_to_cpu(long vector, int32 newCPU)
 	sVectors[vector].assigned_cpu.cpu = newCPU;
 	arch_int_assign_to_cpu(vector, newCPU);
 	list_add_item(&cpu->irqs, &sVectors[vector].assigned_cpu);
-	locker.Unlock();
 }
 

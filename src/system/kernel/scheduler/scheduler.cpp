@@ -399,6 +399,11 @@ update_load_heaps(int32 core)
 
 	CoreEntry* entry = &gCoreEntries[core];
 
+	if (entry->fCPUCount == 0) {
+		entry->fLoad = 0;
+		return;
+	}
+
 	WriteSpinLocker coreLocker(gCoreHeapsLock);
 
 	int32 newKey = get_core_load(entry);
@@ -626,12 +631,9 @@ thread_goes_away(Thread* thread)
 
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 
-	ASSERT(schedulerThreadData->previous_core >= 0);
-	int32 core = schedulerThreadData->previous_core;
-
 	schedulerThreadData->went_sleep = system_time();
 	schedulerThreadData->went_sleep_active
-		= atomic_get64(&gCoreEntries[core].fActiveTime);
+		= atomic_get64(&gCoreEntries[smp_get_current_cpu()].fActiveTime);
 }
 
 
@@ -1028,7 +1030,7 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 		atomic_add64(&gCoreEntries[thisCore].fActiveTime, active);
 	}
 
-	if (!gSingleCore)
+	if (!gSingleCore && !gCPU[smp_get_current_cpu()].disabled)
 		compute_cpu_load(smp_get_current_cpu());
 
 	int32 oldPriority = get_effective_priority(oldThread);
@@ -1150,9 +1152,24 @@ _scheduler_reschedule(void)
 	schedulerOldThreadData->lost_cpu = false;
 
 	// select thread with the biggest priority and enqueue back the old thread
-	Thread* nextThread
-		= choose_next_thread(thisCPU, enqueueOldThread ? oldThread : NULL,
-			putOldThreadAtBack);
+	Thread* nextThread;
+	if (gCPU[thisCPU].disabled) {
+		if (!thread_is_idle_thread(oldThread)) {
+			SpinLocker runQueueLocker(gCoreEntries[thisCore].fQueueLock);
+
+			nextThread = gPinnedRunQueues[thisCPU].GetHead(B_IDLE_PRIORITY);
+		 	gPinnedRunQueues[thisCPU].Remove(nextThread);
+			nextThread->scheduler_data->enqueued = false;
+
+			putOldThreadAtBack = oldThread->pinned_to_cpu == 0;
+		} else
+			nextThread = oldThread;
+	} else {
+		nextThread
+			= choose_next_thread(thisCPU, enqueueOldThread ? oldThread : NULL,
+				putOldThreadAtBack);
+	}
+
 	if (nextThread != oldThread) {
 		if (enqueueOldThread) {
 			if (putOldThreadAtBack)
@@ -1174,7 +1191,8 @@ _scheduler_reschedule(void)
 		oldThread, nextThread);
 
 	// update CPU heap
-	update_cpu_priority(thisCPU, get_effective_priority(nextThread));
+	if (!gCPU[thisCPU].disabled)
+		update_cpu_priority(thisCPU, get_effective_priority(nextThread));
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
@@ -1281,6 +1299,22 @@ scheduler_start(void)
 }
 
 
+static inline void
+acquire_big_scheduler_lock(void)
+{
+	for (int32_t i = 0; i < smp_get_num_cpus(); i++)
+		acquire_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
+}
+
+
+static inline void
+release_big_scheduler_lock(void)
+{
+	for (int32_t i = 0; i < smp_get_num_cpus(); i++)
+		release_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
+}
+
+
 status_t
 scheduler_set_operation_mode(scheduler_mode mode)
 {
@@ -1292,17 +1326,141 @@ scheduler_set_operation_mode(scheduler_mode mode)
 	dprintf("scheduler: switching to %s mode\n", sSchedulerModes[mode]->name);
 
 	InterruptsLocker _;
-	for (int32_t i = 0; i < smp_get_num_cpus(); i++)
-		acquire_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
+	acquire_big_scheduler_lock();
 
 	sCurrentModeID = mode;
 	sCurrentMode = sSchedulerModes[mode];
 	sCurrentMode->switch_to_mode();
 
-	for (int32_t i = 0; i < smp_get_num_cpus(); i++)
-		release_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
+	release_big_scheduler_lock();
 
 	return B_OK;
+}
+
+
+static void
+unassign_thread(Thread* thread, void* data)
+{
+	int32 core = *(int32*)data;
+
+	if (thread->scheduler_data->previous_core == core
+		&& thread->pinned_to_cpu == 0) {
+		thread->scheduler_data->previous_core = -1;
+	}
+}
+
+
+void
+scheduler_set_cpu_enabled(int32 cpu, bool enabled)
+{
+	dprintf("scheduler: %s CPU %" B_PRId32 "\n",
+		enabled ? "enabling" : "disabling", cpu);
+
+	InterruptsLocker _;
+	acquire_big_scheduler_lock();
+
+	gCPU[cpu].disabled = !enabled;
+
+	CoreEntry* core = &gCoreEntries[gCPUToCore[cpu]];
+	PackageEntry* package = &gPackageEntries[gCPUToPackage[cpu]];
+
+	int32 oldCPUCount = core->fCPUCount;
+	ASSERT(oldCPUCount >= 0);
+	if (enabled)
+		core->fCPUCount++;
+	else {
+		update_cpu_priority(cpu, B_IDLE_PRIORITY);
+		core->fCPUCount--;
+	}
+
+	if (core->fCPUCount == 0) {
+		// core has been disabled
+		ASSERT(!enabled);
+
+		int32 load = CoreLoadHeap::GetKey(core);
+		if (load > kHighLoad) {
+			gCoreHighLoadHeap->ModifyKey(core, -1);
+			ASSERT(gCoreHighLoadHeap->PeekMinimum() == core);
+			gCoreHighLoadHeap->RemoveMinimum();
+		} else {
+			gCoreLoadHeap->ModifyKey(core, -1);
+			ASSERT(gCoreLoadHeap->PeekMinimum() == core);
+			gCoreLoadHeap->RemoveMinimum();
+		}
+
+		package->fIdleCores.Remove(core);
+		package->fIdleCoreCount--;
+		package->fCoreCount--;
+
+		if (package->fCoreCount == 0)
+			gIdlePackageList->Remove(package);
+
+		// get rid of threads
+		thread_map(unassign_thread, &core->fCoreID);
+
+		while (gRunQueues[core->fCoreID].PeekMaximum() != NULL) {
+			Thread* thread = gRunQueues[core->fCoreID].PeekMaximum();
+			gRunQueues[core->fCoreID].Remove(thread);
+			thread->scheduler_data->enqueued = false;
+
+			ASSERT(thread->scheduler_data->previous_core == -1);
+			enqueue(thread, false);
+		}
+	} else if (oldCPUCount == 0) {
+		// core has been reenabled
+		ASSERT(enabled);
+
+		gCPUEntries[cpu].fLoad = 0;
+		core->fLoad = 0;
+		gCoreLoadHeap->Insert(core, 0);
+
+		package->fCoreCount++;
+		package->fIdleCoreCount++;
+		package->fIdleCores.Add(core);
+
+		if (package->fCoreCount == 1)
+			gIdlePackageList->Add(package);		
+	}
+
+	if (enabled) {
+		gCPUPriorityHeaps[core->fCoreID].Insert(&gCPUEntries[cpu],
+			B_IDLE_PRIORITY);
+		gCPUEntries[cpu].fLoad = 0;
+	} else {
+		gCPUPriorityHeaps[core->fCoreID].ModifyKey(&gCPUEntries[cpu],
+			THREAD_MAX_SET_PRIORITY + 1);
+		ASSERT(gCPUPriorityHeaps[core->fCoreID].PeekMaximum()
+			== &gCPUEntries[cpu]);
+		gCPUPriorityHeaps[core->fCoreID].RemoveMaximum();
+
+		core->fLoad -= gCPUEntries[cpu].fLoad;
+	}
+
+	if (!enabled) {
+		cpu_ent* entry = &gCPU[cpu];
+
+		// get rid of irqs
+		SpinLocker locker(entry->irqs_lock);
+		irq_assignment* irq
+			= (irq_assignment*)list_get_first_item(&entry->irqs);
+		while (irq != NULL) {
+			locker.Unlock();
+
+			assign_io_interrupt_to_cpu(irq->irq, -1);
+
+			locker.Lock();
+			irq = (irq_assignment*)list_get_first_item(&entry->irqs);
+		}
+		locker.Unlock();
+
+		// don't wait until the thread quantum ends
+		if (smp_get_current_cpu() != cpu) {
+			smp_send_ici(cpu, SMP_MSG_RESCHEDULE, 0, 0, 0, NULL,
+				SMP_MSG_FLAG_ASYNC);
+		}
+	}
+
+	release_big_scheduler_lock();
 }
 
 

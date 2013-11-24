@@ -18,6 +18,7 @@
 #include <cpufreq.h>
 
 #include <boot/kernel_args.h>
+#include <kscheduler.h>
 #include <thread_types.h>
 #include <util/AutoLock.h>
 
@@ -273,7 +274,6 @@ _user_cpu_enabled(int32 cpu)
 status_t
 _user_set_cpu_enabled(int32 cpu, bool enabled)
 {
-	status_t status = B_OK;
 	cpu_status state;
 	int32 i, count;
 
@@ -283,8 +283,7 @@ _user_set_cpu_enabled(int32 cpu, bool enabled)
 	// We need to lock here to make sure that no one can disable
 	// the last CPU
 
-	state = disable_interrupts();
-	acquire_spinlock(&sSetCpuLock);
+	InterruptsSpinLocker locker(sSetCpuLock);
 
 	if (!enabled) {
 		// check if this is the last CPU to be disabled
@@ -294,14 +293,37 @@ _user_set_cpu_enabled(int32 cpu, bool enabled)
 		}
 
 		if (count == 1)
-			status = B_NOT_ALLOWED;
+			return B_NOT_ALLOWED;
 	}
 
-	if (status == B_OK)
-		gCPU[cpu].disabled = !enabled;
+	bool oldState = gCPU[cpu].disabled;
 
-	release_spinlock(&sSetCpuLock);
-	restore_interrupts(state);
-	return status;
+	if (oldState != !enabled)
+		scheduler_set_cpu_enabled(cpu, enabled);
+
+	if (!enabled) {
+		if (smp_get_current_cpu() == cpu) {
+			locker.Unlock();
+			thread_yield();
+			locker.Lock();
+		}
+
+		// someone reenabled the CPU while we were rescheduling
+		if (!gCPU[cpu].disabled)
+			return B_OK;
+
+		ASSERT(smp_get_current_cpu() != cpu);
+		while (!thread_is_idle_thread(gCPU[cpu].running_thread)) {
+			locker.Unlock();
+			thread_yield();
+			locker.Lock();
+
+			if (!gCPU[cpu].disabled)
+				return B_OK;
+			ASSERT(smp_get_current_cpu() != cpu);
+		}
+	}
+
+	return B_OK;
 }
 

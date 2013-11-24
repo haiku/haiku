@@ -2408,8 +2408,6 @@ peek_next_thread_id()
 void
 thread_yield(void)
 {
-	// Yielding is for being nice, not for making things work.
-#if !KDEBUG
 	Thread *thread = thread_get_current_thread();
 	if (thread == NULL)
 		return;
@@ -2418,7 +2416,18 @@ thread_yield(void)
 
 	thread->has_yielded = true;
 	scheduler_reschedule();
-#endif
+}
+
+
+void
+thread_map(void (*function)(Thread* thread, void* data), void* data)
+{
+	InterruptsSpinLocker threadHashLocker(sThreadHashLock);
+
+	for (ThreadHashTable::Iterator it = sThreadHash.GetIterator();
+		Thread* thread = it.Next();) {
+		function(thread, data);
+	}
 }
 
 
