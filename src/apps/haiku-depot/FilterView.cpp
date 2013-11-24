@@ -69,8 +69,11 @@ FilterView::FilterView()
 
 	// Build layout
 	BLayoutBuilder::Group<>(this)
-		.Add(fShowField, 0.0f)
-		.Add(fRepositoryField, 0.0f)
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1.2f)
+			.Add(fShowField, 0.0f)
+			.Add(fRepositoryField, 0.0f)
+			.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
+		.End()
 		.AddGlue(0.5f)
 		.Add(fSearchTermsText, 1.0f)
 
