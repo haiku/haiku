@@ -86,7 +86,7 @@ typedef struct cpu_ent {
 
 	// arch-specific stuff
 	arch_cpu_info 	arch;
-} cpu_ent __attribute__((aligned(64)));
+} cpu_ent CACHE_LINE_ALIGN;
 
 
 //extern cpu_ent gCPU[MAX_BOOT_CPUS];

@@ -55,4 +55,6 @@ void arch_cpu_memory_read_write_barrier(void);
 
 #include <arch_cpu.h>
 
+#define CACHE_LINE_ALIGN	 __attribute__((aligned(CACHE_LINE_SIZE)))
+
 #endif /* _KERNEL_ARCH_CPU_H */

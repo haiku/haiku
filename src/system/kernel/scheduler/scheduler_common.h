@@ -18,9 +18,6 @@
 #include "RunQueue.h"
 
 
-#define CACHE_LINE_ALIGN	 __attribute__((aligned(64)))
-
-
 //#define TRACE_SCHEDULER
 #ifdef TRACE_SCHEDULER
 #	define TRACE(...) dprintf_no_syslog(__VA_ARGS__)

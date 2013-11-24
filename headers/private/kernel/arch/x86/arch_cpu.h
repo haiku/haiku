@@ -26,6 +26,8 @@
 
 #define CPU_MAX_CACHE_LEVEL	8
 
+#define CACHE_LINE_SIZE		64
+
 
 // MSR registers (possibly Intel specific)
 #define IA32_MSR_TSC					0x10
