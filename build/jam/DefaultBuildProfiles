@@ -49,34 +49,26 @@ rule DefineDefaultBuildProfiles
 				subversion
 				timgmsoundfont
 				vision
-				wonderbrush
 				wpa_supplicant
 				wqy_microhei
+				# xz_utils can't be built with gcc2, so we install it for
+				# primary gcc 4 architectures or gcc 2 hybrids.
 				xz_utils@!gcc2
+				gcc2 @{ xz_utils_x86@secondary_x86 }@
 				;
-
-			# xz_utils can't be built with gcc2, so a mere gcc2 system doesn't
-			# have it. However, xz_utils does exist for the secondary (gcc4)
-			# architecture of a gcc2 hybrid.
-			if $(HAIKU_PACKAGING_ARCHS) != x86_gcc2 {
-				AddHaikuImagePackages
-					xz_utils_x86@gcc2
-					;
-			}
 
 			local architectureObject ;
 			for architectureObject in [ MultiArchSubDirSetup ] {
 				on $(architectureObject) {
-					AddHaikuImagePackages openssl ;
+					AddHaikuImagePackages openssl wonderbrush@gcc2 ;
 				}
 			}
 
-			AddOptionalHaikuImagePackages BeBook Development Git
-				Welcome ;
+			AddOptionalHaikuImagePackages BeBook Development Git Welcome ;
 
 			# Temporary until WebPositive is fixed on x86_64
             if $(HAIKU_PACKAGING_ARCHS) != x86_64 {
-				AddHaikuImagePackages WebPositive ;
+				AddOptionalHaikuImagePackages WebPositive ;
 			}
 		}
 
@@ -101,14 +93,17 @@ rule DefineDefaultBuildProfiles
 				pe
 				vision
 				wpa_supplicant
-				xz_utils
+				# xz_utils can't be built with gcc2, so we install it for
+				# primary gcc 4 architectures or gcc 2 hybrids.
+				xz_utils@!gcc2
+				gcc2 @{ xz_utils_x86@secondary_x86 }@
 				;
 
 			AddOptionalHaikuImagePackages Development Git ;
 
 			# Temporary until WebPositive is fixed on x86_64
             if $(HAIKU_PACKAGING_ARCHS) != x86_64 {
-				AddHaikuImagePackages WebPositive ;
+				AddOptionalHaikuImagePackages WebPositive ;
 			}
 		}
 
