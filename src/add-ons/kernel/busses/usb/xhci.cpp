@@ -19,7 +19,6 @@
 
 #include <util/AutoLock.h>
 
-#define TRACE_USB
 #include "xhci.h"
 
 #define USB_MODULE_NAME	"xhci"
