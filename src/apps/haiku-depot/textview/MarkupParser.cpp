@@ -195,16 +195,33 @@ MarkupParser::_ParseText(const BString& text)
 				break;
 
 			case ' ':
-				// Detect bullets at line starts
+				// Detect bullets at line starts (preceeding space)
 				if (offset == start
 					&& fCurrentParagraph.IsEmpty()
 					&& offset + 2 < charCount
-					&& c[0] == '*' && c[1] == ' ') {
+					&& (c[0] == '*' || c[0] == '-') && c[1] == ' ') {
 
 					fCurrentParagraph.SetStyle(fBulletStyle);
 
 					offset += 2;
 					c += 2;
+
+					start = offset + 1;
+				}
+				break;
+
+			case '*':
+			case '-':
+				// Detect bullets at line starts (no preceeding space)
+				if (offset == start
+					&& fCurrentParagraph.IsEmpty()
+					&& offset + 1 < charCount
+					&& c[0] == ' ') {
+
+					fCurrentParagraph.SetStyle(fBulletStyle);
+
+					offset += 1;
+					c += 1;
 
 					start = offset + 1;
 				}
