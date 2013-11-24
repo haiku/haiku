@@ -42,7 +42,7 @@ Stack::Stack()
 	memset(fObjectArray, 0, objectArraySize);
 
 	fAllocator = new(std::nothrow) PhysicalMemoryAllocator("USB Stack Allocator",
-		8, B_PAGE_SIZE * 4, 64);
+		8, B_PAGE_SIZE * 32, 64);
 	if (!fAllocator || fAllocator->InitCheck() < B_OK) {
 		TRACE_ERROR("failed to allocate the allocator\n");
 		delete fAllocator;
@@ -64,6 +64,7 @@ Stack::Stack()
 		"busses/usb/uhci",
 		"busses/usb/ohci",
 		"busses/usb/ehci",
+		"busses/usb/xhci",
 		NULL
 	};
 
