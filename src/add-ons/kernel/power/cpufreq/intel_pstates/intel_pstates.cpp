@@ -222,6 +222,8 @@ static cpufreq_module_info sIntelPStates = {
 		std_ops,
 	},
 
+	1.0f,
+
 	increase_performance,
 	decrease_performance,
 };

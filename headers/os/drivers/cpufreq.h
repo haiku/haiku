@@ -17,6 +17,8 @@ const int kCPUPerformanceScaleMax = 1000;
 typedef struct cpufreq_module_info {
 	module_info		info;
 
+	float			rank;
+
 	status_t		(*increase_performance)(int delta, bool allowBoost);
 	status_t		(*decrease_performance)(int delta);
 } cpufreq_module_info;

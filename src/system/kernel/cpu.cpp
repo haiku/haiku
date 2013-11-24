@@ -63,13 +63,22 @@ load_cpufreq_module()
 	while (true) {
 		char name[B_FILE_NAME_LENGTH];
 		size_t nameLength = sizeof(name);
+		cpufreq_module_info* current = NULL;
 
 		if (read_next_module_name(cookie, name, &nameLength) != B_OK)
 			break;
 
-		if (get_module(name, (module_info**)&sCPUPerformanceModule) == B_OK) {
+		if (get_module(name, (module_info**)&current) == B_OK) {
 			dprintf("found cpufreq module: %s\n", name);
-			break;
+
+			if (sCPUPerformanceModule != NULL) {
+				if (sCPUPerformanceModule->rank < current->rank) {
+					put_module(sCPUPerformanceModule->info.name);
+					sCPUPerformanceModule = current;
+				} else
+					put_module(name);
+			} else
+				sCPUPerformanceModule = current; 
 		}
 	}
 
