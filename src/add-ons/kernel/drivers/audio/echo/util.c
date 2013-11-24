@@ -34,7 +34,7 @@
 #include "debug.h"
 #include "util.h"
 
-spinlock slock = 0;
+spinlock slock = B_SPINLOCK_INITIALIZER;
 
 uint32 round_to_pagesize(uint32 size);
 
@@ -71,7 +71,7 @@ alloc_mem(phys_addr_t *phy, void **log, size_t size, const char *name)
 	area_id area;
 	status_t rv;
 
-	LOG(("allocating %d bytes for %s\n",size,name));
+	LOG(("allocating %d bytes for %s\n", size, name));
 
 	size = round_to_pagesize(size);
 	area = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS, size,
@@ -79,7 +79,7 @@ alloc_mem(phys_addr_t *phy, void **log, size_t size, const char *name)
 		// TODO: The rest of the code doesn't deal correctly with physical
 		// addresses > 4 GB, so we have to force 32 bit addresses here.
 	if (area < B_OK) {
-		PRINT(("couldn't allocate area %s\n",name));
+		PRINT(("couldn't allocate area %s\n", name));
 		return B_ERROR;
 	}
 	rv = get_memory_map(logadr, size, &pe, 1);
@@ -109,16 +109,15 @@ map_mem(void **log, phys_addr_t phy, size_t size, const char *name)
 
 	LOG(("mapping physical address %p with %#x bytes for %s\n",phy,size,name));
 
-	offset = phy & (B_PAGE_SIZE - 1);
+	offset = (uint32)phy & (B_PAGE_SIZE - 1);
 	phyadr = phy - offset;
 	size = round_to_pagesize(size + offset);
 	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_ADDRESS,
 		0, &mapadr);
-	*log = (void*) ((uint32)mapadr + offset);
+	*log = mapadr + offset;
 
 	LOG(("physical = %p, logical = %p, offset = %#x, phyadr = %p, mapadr = %p, size = %#x, area = %#x\n",
 		phy, *log, offset, phyadr, mapadr, size, area));
 
 	return area;
 }
-
