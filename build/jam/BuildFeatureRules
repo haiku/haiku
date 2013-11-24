@@ -88,7 +88,7 @@ rule FFilterByBuildFeatures list
 				# Pop the topmost specification off the stack.
 				evaluationStack = $(evaluationStack[2-]) ;
 				if ! $(evaluationStack) {
-					Exit "FFilterByBuildFeatures: Unbalanced @( in: " $(list) ;
+					Exit "FFilterByBuildFeatures: Unbalanced @{ in: " $(list) ;
 				}
 
 				processElement = $(previousElement) ;
@@ -98,7 +98,7 @@ rule FFilterByBuildFeatures list
 			{
 				if ! $(previousElement) {
 					Exit "FFilterByBuildFeatures: No feature specification"
-						"after )@ in: " $(list) ;
+						"after }@ in: " $(list) ;
 				}
 
 				if $(evaluationStack[1]) = 1
