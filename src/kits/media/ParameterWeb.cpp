@@ -2016,17 +2016,27 @@ BDiscreteParameter::AddItem(int32 value, const char* name)
 {
 	CALLED();
 
-	int32* valueCopy = new int32(value);
+	int32* valueCopy = new(std::nothrow) int32(value);
+	if (valueCopy == NULL)
+		return B_NO_MEMORY;
 	char* nameCopy = strndup(name, 255);
 	if (name != NULL && nameCopy == NULL) {
 		delete valueCopy;
 		return B_NO_MEMORY;
 	}
 
-	if (!fValues->AddItem(valueCopy) || !fSelections->AddItem(nameCopy))
-		return B_NO_MEMORY;
-
+	if (!fValues->AddItem(valueCopy))
+		goto err;
+	if (!fSelections->AddItem(nameCopy)) {
+		fValues->RemoveItem(valueCopy);
+		goto err;
+	}
 	return B_OK;
+
+err:
+	free(nameCopy);
+	delete valueCopy;
+	return B_NO_MEMORY;
 }
 
 
