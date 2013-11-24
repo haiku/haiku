@@ -22,6 +22,7 @@
 #include <TabView.h>
 #include <ScrollView.h>
 #include <SpaceLayoutItem.h>
+#include <StatusBar.h>
 #include <StringView.h>
 
 #include <support/Url.h>
@@ -502,7 +503,9 @@ public:
 		:
 		BView("about view", B_WILL_DRAW),
 		fLayout(new BGroupLayout(B_HORIZONTAL)),
-		fPackageActionHandler(handler)
+		fPackageActionHandler(handler),
+		fStatusLabel(NULL),
+		fStatusBar(NULL)
 	{
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -547,6 +550,16 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
+		if (package.State() == DOWNLOADING) {
+			AdoptDownloadProgress(package);
+		} else {
+			AdoptActions(package);
+		}
+
+	}
+
+	void AdoptActions(const PackageInfo& package)
+	{
 		PackageManager manager(
 			BPackageKit::B_PACKAGE_INSTALLATION_LOCATION_HOME);
 
@@ -557,15 +570,17 @@ public:
 			const_cast<PackageInfo*>(&package),
 			fPackageActionHandler->GetModel());
 
-		bool clearNeeded = false;
-		if (actions.CountItems() != fPackageActions.CountItems())
-			clearNeeded = true;
-		else {
-			for (int32 i = 0; i < actions.CountItems(); i++) {
-				if (actions.ItemAtFast(i)->Type()
-						!= fPackageActions.ItemAtFast(i)->Type()) {
-					clearNeeded = true;
-					break;
+		bool clearNeeded = fStatusBar != NULL;
+		if (!clearNeeded) {
+			if (actions.CountItems() != fPackageActions.CountItems())
+				clearNeeded = true;
+			else {
+				for (int32 i = 0; i < actions.CountItems(); i++) {
+					if (actions.ItemAtFast(i)->Type()
+							!= fPackageActions.ItemAtFast(i)->Type()) {
+						clearNeeded = true;
+						break;
+					}
 				}
 			}
 		}
@@ -591,6 +606,27 @@ public:
 		}
 	}
 
+	void AdoptDownloadProgress(const PackageInfo& package)
+	{
+		if (fButtons.CountItems() > 0)
+			Clear();
+		
+		if (fStatusBar == NULL) {
+			fStatusLabel = new BStringView("progress label",
+				B_TRANSLATE("Downloading:"));
+			fLayout->AddView(fStatusLabel);
+			
+			fStatusBar = new BStatusBar("progress");
+			fStatusBar->SetMaxValue(100.0);
+			fStatusBar->SetExplicitMinSize(
+				BSize(StringWidth("XXX") * 5, B_SIZE_UNSET));
+
+			fLayout->AddView(fStatusBar);
+		}
+		
+		fStatusBar->SetTo(package.DownloadProgress() * 100.0);
+	}
+
 	void Clear()
 	{
 		for (int32 i = fButtons.CountItems() - 1; i >= 0; i--) {
@@ -599,6 +635,17 @@ public:
 			delete button;
 		}
 		fButtons.MakeEmpty();
+
+		if (fStatusBar != NULL) {
+			fStatusBar->RemoveSelf();
+			delete fStatusBar;
+			fStatusBar = NULL;
+		}
+		if (fStatusLabel != NULL) {
+			fStatusLabel->RemoveSelf();
+			delete fStatusLabel;
+			fStatusLabel = NULL;
+		}
 	}
 
 private:
@@ -606,6 +653,9 @@ private:
 	PackageActionList	fPackageActions;
 	PackageActionHandler* fPackageActionHandler;
 	BList				fButtons;
+
+	BStringView*		fStatusLabel;
+	BStatusBar*			fStatusBar;
 };
 
 
