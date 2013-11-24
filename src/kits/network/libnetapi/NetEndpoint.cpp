@@ -105,6 +105,23 @@ BNetEndpoint::BNetEndpoint(const BNetEndpoint& endpoint)
 }
 
 
+// Private constructor only used from BNetEndpoint::Accept().
+BNetEndpoint::BNetEndpoint(const BNetEndpoint& endpoint, int socket,
+	const struct sockaddr_in& localAddress,
+	const struct sockaddr_in& peerAddress)
+	:
+	fStatus(endpoint.fStatus),
+	fFamily(endpoint.fFamily),
+	fType(endpoint.fType),
+	fProtocol(endpoint.fProtocol),
+	fSocket(socket),
+	fTimeout(endpoint.fTimeout),
+	fAddr(localAddress),
+	fPeer(peerAddress)
+{
+}
+
+
 BNetEndpoint&
 BNetEndpoint::operator=(const BNetEndpoint& endpoint)
 {
@@ -422,33 +439,33 @@ BNetEndpoint::Accept(int32 timeout)
 	if (!IsDataPending(timeout < 0 ? B_INFINITE_TIMEOUT : 1000LL * timeout))
 		return NULL;
 
-	struct sockaddr_in addr;
-	socklen_t addrSize = sizeof(addr);
+	struct sockaddr_in peerAddress;
+	socklen_t peerAddressSize = sizeof(peerAddress);
 
-	int socket = accept(fSocket, (struct sockaddr *) &addr, &addrSize);
+	int socket
+		= accept(fSocket, (struct sockaddr *)&peerAddress, &peerAddressSize);
 	if (socket < 0) {
 		Close();
 		fStatus = errno;
 		return NULL;
 	}
 
-	BNetEndpoint* endpoint = new (std::nothrow) BNetEndpoint(*this);
+	struct sockaddr_in localAddress;
+	socklen_t localAddressSize = sizeof(localAddress);
+	if (getsockname(socket, (struct sockaddr *)&localAddress,
+			&localAddressSize) < 0) {
+		fStatus = errno;
+		return NULL;
+	}
+
+	BNetEndpoint* endpoint = new (std::nothrow) BNetEndpoint(*this, socket,
+		localAddress, peerAddress);
 	if (endpoint == NULL) {
 		close(socket);
 		fStatus = B_NO_MEMORY;
 		return NULL;
 	}
 
-	endpoint->fSocket = socket;
-	endpoint->fPeer.SetTo(addr);
-
-	if (getsockname(socket, (struct sockaddr *)&addr, &addrSize) < 0) {
-		delete endpoint;
-		fStatus = errno;
-		return NULL;
-	}
-
-	endpoint->fAddr.SetTo(addr);
 	return endpoint;
 }
 

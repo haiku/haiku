@@ -78,6 +78,10 @@ class BNetEndpoint : public BArchivable {
 		const BNetAddress& RemoteAddr();
 
 	private:
+		BNetEndpoint(const BNetEndpoint& other, int socket,
+			const struct sockaddr_in& localAddress,
+			const struct sockaddr_in& peerAddress);
+
 		status_t _SetupSocket();
 
 		virtual	void _ReservedBNetEndpointFBCCruft1();
