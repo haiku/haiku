@@ -16,6 +16,7 @@ struct scheduler_mode_operations {
 	bool			avoid_boost;
 
 	void			(*switch_to_mode)(void);
+	void			(*set_cpu_enabled)(int32 cpu, bool enabled);
 	bool			(*has_cache_expired)(Thread* thread);
 	int32			(*choose_core)(Thread* thread);
 	bool			(*should_rebalance)(Thread* thread);

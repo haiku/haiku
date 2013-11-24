@@ -19,6 +19,12 @@ switch_to_mode(void)
 }
 
 
+static void
+set_cpu_enabled(int32 /* cpu */, bool /* enabled */)
+{
+}
+
+
 static bool
 has_cache_expired(Thread* thread)
 {
@@ -180,6 +186,7 @@ scheduler_mode_operations gSchedulerLowLatencyMode = {
 	true,
 
 	switch_to_mode,
+	set_cpu_enabled,
 	has_cache_expired,
 	choose_core,
 	should_rebalance,

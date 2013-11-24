@@ -583,9 +583,6 @@ should_rebalance(Thread* thread)
 {
 	ASSERT(!gSingleCore);
 
-	if (thread_is_idle_thread(thread))
-		return false;
-
 	return sCurrentMode->should_rebalance(thread);
 }
 
@@ -600,9 +597,6 @@ compute_cpu_load(int32 cpu)
 	if (oldLoad < 0)
 		return;
 
-	if (gCPUEntries[cpu].fLoad > kVeryHighLoad)
-		sCurrentMode->rebalance_irqs(false);
-
 	if (oldLoad != gCPUEntries[cpu].fLoad) {
 		int32 core = gCPUToCore[cpu];
 
@@ -611,6 +605,9 @@ compute_cpu_load(int32 cpu)
 
 		update_load_heaps(core);
 	}
+
+	if (gCPUEntries[cpu].fLoad > kVeryHighLoad)
+		sCurrentMode->rebalance_irqs(false);
 }
 
 
@@ -1069,8 +1066,7 @@ static inline void
 update_cpu_performance(Thread* thread, int32 thisCore)
 {
 	int32 load = max_c(thread->scheduler_data->load,
-			gCoreEntries[thisCore].fLoad);
-	load /= gCoreEntries[thisCore].fCPUCount;
+			get_core_load(&gCoreEntries[thisCore]));
 	load = min_c(max_c(load, 0), kMaxLoad);
 
 	if (load < kTargetLoad) {
@@ -1368,6 +1364,8 @@ scheduler_set_cpu_enabled(int32 cpu, bool enabled)
 	acquire_big_scheduler_lock();
 
 	gCPU[cpu].disabled = !enabled;
+
+	sCurrentMode->set_cpu_enabled(cpu, enabled);
 
 	CoreEntry* core = &gCoreEntries[gCPUToCore[cpu]];
 	PackageEntry* package = &gPackageEntries[gCPUToPackage[cpu]];

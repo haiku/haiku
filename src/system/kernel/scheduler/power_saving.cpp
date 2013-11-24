@@ -16,6 +16,21 @@ using namespace Scheduler;
 static int32 sSmallTaskCore;
 
 
+static void
+switch_to_mode(void)
+{
+	sSmallTaskCore = -1;
+}
+
+
+static void
+set_cpu_enabled(int32 cpu, bool enabled)
+{
+	if (!enabled)
+		sSmallTaskCore = -1;
+}
+
+
 static bool
 has_cache_expired(Thread* thread)
 {
@@ -28,13 +43,6 @@ has_cache_expired(Thread* thread)
 	ASSERT(schedulerThreadData->previous_core >= 0);
 
 	return system_time() - schedulerThreadData->went_sleep > kCacheExpire;
-}
-
-
-static void
-switch_to_mode(void)
-{
-	sSmallTaskCore = -1;
 }
 
 
@@ -244,6 +252,7 @@ scheduler_mode_operations gSchedulerPowerSavingMode = {
 	false,
 
 	switch_to_mode,
+	set_cpu_enabled,
 	has_cache_expired,
 	choose_core,
 	should_rebalance,

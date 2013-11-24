@@ -685,7 +685,7 @@ void assign_io_interrupt_to_cpu(long vector, int32 newCPU)
 
 	if (newCPU == -1)
 		newCPU = assign_cpu();
-	dprintf_no_syslog("IRQ %ld CPU %" B_PRId32 " -> CPU %" B_PRId32 "\n", vector, oldCPU, newCPU);
+
 	if (newCPU == oldCPU)
 		return;
 
