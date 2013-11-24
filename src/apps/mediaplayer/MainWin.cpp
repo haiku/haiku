@@ -160,6 +160,22 @@ static property_info sPropertyInfo[] = {
 		{ B_DIRECT_SPECIFIER, 0 },
 		B_TRANSLATE("Toggle fullscreen."), 0
 	},
+	{ B_TRANSLATE("Duration"), { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		B_TRANSLATE("Gets the duration of the currently playing item "
+			"in microseconds."), 0,
+		{ B_INT64_TYPE }
+	},
+	{ B_TRANSLATE("Position"), { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		B_TRANSLATE("Gets/sets the current playing position in microseconds."),
+		0, { B_INT64_TYPE }
+	},
+	{ B_TRANSLATE("Seek"), { B_SET_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 },
+		B_TRANSLATE("Seek by the specified amounts of microseconds."), 0,
+		{ B_INT64_TYPE }
+	},
 	{ 0, { 0 }, { 0 }, 0, 0 }
 };
 
@@ -539,6 +555,43 @@ MainWin::MessageReceived(BMessage* msg)
 				case 9:
 					PostMessage(M_TOGGLE_FULLSCREEN);
 					break;
+
+				case 10:
+					if (msg->what != B_GET_PROPERTY)
+						break;
+
+					result = reply.AddInt64("result",
+						fController->TimeDuration());
+					break;
+
+				case 11:
+				{
+					if (msg->what == B_GET_PROPERTY) {
+						result = reply.AddInt64("result",
+							fController->TimePosition());
+					} else if (msg->what == B_SET_PROPERTY) {
+						int64 newTime;
+						result = msg->FindInt64("data", &newTime);
+						if (result == B_OK)
+							fController->SetTimePosition(newTime);
+					}
+
+					break;
+				}
+
+				case 12:
+				{
+					if (msg->what != B_SET_PROPERTY)
+						break;
+
+					bigtime_t seekBy;
+					result = msg->FindInt64("data", &seekBy);
+					if (result != B_OK)
+						break;
+
+					_Wind(seekBy, 0);
+					break;
+				}
 
 				default:
 					return BWindow::MessageReceived(msg);
@@ -1234,6 +1287,9 @@ MainWin::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
 		case 7:
 		case 8:
 		case 9:
+		case 10:
+		case 11:
+		case 12:
 			return this;
 	}
 
