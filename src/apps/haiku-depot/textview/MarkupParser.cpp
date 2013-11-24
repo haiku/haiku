@@ -137,7 +137,28 @@ MarkupParser::_ParseText(const BString& text)
 		uint32 nextChar = UTF8ToCharCode(&c);
 
 		switch (nextChar) {
+// Requires two line-breaks to start a new paragraph, unles the current
+// paragraph is already considered a bullet list item. Doesn't work well
+// with current set of packages.
+//			case '\n':
+//				_CopySpan(text, start, offset);
+//				if (offset + 1 < charCount && c[0] == '\n') {
+//					_FinishParagraph();
+//					offset += 1;
+//					c += 1;
+//				} else if (fCurrentParagraph.Style() == fBulletStyle) {
+//					_FinishParagraph();
+//				}
+//				start = offset + 1;
+//				break;
+
 			case '\n':
+				_CopySpan(text, start, offset);
+				if (offset > 0 && c[-1] != ' ')
+					_FinishParagraph();
+				start = offset + 1;
+				break;
+
 			case '\0':
 				_CopySpan(text, start, offset);
 				_FinishParagraph();
