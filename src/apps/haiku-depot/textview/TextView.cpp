@@ -111,6 +111,7 @@ TextView::SetText(const BString& text)
 	fTextLayout.SetParagraph(fText);
 
 	InvalidateLayout();
+	Invalidate();
 }
 
 
@@ -121,5 +122,6 @@ TextView::SetParagraphStyle(const ::ParagraphStyle& style)
 	fTextLayout.SetParagraph(fText);
 
 	InvalidateLayout();
+	Invalidate();
 }
 

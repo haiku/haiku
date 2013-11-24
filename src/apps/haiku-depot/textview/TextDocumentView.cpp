@@ -107,6 +107,7 @@ TextDocumentView::SetTextDocument(const TextDocumentRef& document)
 	fTextDocument = document;
 	fTextDocumentLayout.SetTextDocument(fTextDocument);
 	InvalidateLayout();
+	Invalidate();
 	_UpdateScrollBars();
 }
 
@@ -139,6 +140,7 @@ TextDocumentView::SetInsets(float left, float top, float right, float bottom)
 	fInsetBottom = bottom;
 
 	InvalidateLayout();
+	Invalidate();
 }
 
 
