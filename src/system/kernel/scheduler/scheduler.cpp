@@ -617,6 +617,12 @@ compute_cpu_load(int32 cpu)
 static inline void
 compute_thread_load(Thread* thread)
 {
+	if (thread->scheduler_data->last_interrupt_time > 0) {
+		bigtime_t interruptTime = gCPU[smp_get_current_cpu()].interrupt_time;
+		interruptTime -= thread->scheduler_data->last_interrupt_time;
+		thread->scheduler_data->measure_active_time -= interruptTime;
+	}
+
 	compute_load(thread->scheduler_data->measure_time,
 		thread->scheduler_data->measure_active_time,
 		thread->scheduler_data->load);
@@ -630,6 +636,8 @@ thread_goes_away(Thread* thread)
 		return;
 
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
+
+	schedulerThreadData->last_interrupt_time = 0;
 
 	schedulerThreadData->went_sleep = system_time();
 	schedulerThreadData->went_sleep_active
