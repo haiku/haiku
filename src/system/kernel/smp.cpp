@@ -532,13 +532,13 @@ try_acquire_write_spinlock(rw_spinlock* lock)
 {
 #if DEBUG_SPINLOCKS
 	if (are_interrupts_enabled()) {
-		panic("try_acquire_write_spinlock: attempt to acquire lock %p with"
-			" interrupts enabled", lock);
+		panic("try_acquire_write_spinlock: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
 	}
 
 	if (sNumCPUs < 2 && lock->lock != 0) {
-		panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
-			"non-SMP system", lock);
+		panic("try_acquire_write_spinlock(): attempt to acquire lock %p twice "
+			"on non-SMP system", lock);
 	}
 #endif
 
@@ -551,8 +551,8 @@ acquire_write_spinlock(rw_spinlock* lock)
 {
 #if DEBUG_SPINLOCKS
 	if (are_interrupts_enabled()) {
-		panic("acquire_write_spinlock: attempt to acquire lock %p with"
-			" interrupts enabled", lock);
+		panic("acquire_write_spinlock: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
 	}
 #endif
 
@@ -582,8 +582,8 @@ release_write_spinlock(rw_spinlock* lock)
 #if DEBUG_SPINLOCKS
 	uint32 previous = atomic_get_and_set(&lock->lock, 0);
 	if ((previous & 1u << 31) == 0) {
-		panic("release_write_spinlock: lock %p was already released (value:"
-			" %x)\n", lock, previous);
+		panic("release_write_spinlock: lock %p was already released (value: "
+			"%x)\n", lock, previous);
 	}
 #else
 	atomic_set(&lock->lock, 0);
@@ -596,13 +596,13 @@ try_acquire_read_spinlock(rw_spinlock* lock)
 {
 #if DEBUG_SPINLOCKS
 	if (are_interrupts_enabled()) {
-		panic("try_acquire_read_spinlock: attempt to acquire lock %p with"
-			" interrupts enabled", lock);
+		panic("try_acquire_read_spinlock: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
 	}
 
 	if (sNumCPUs < 2 && lock->lock != 0) {
-		panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
-			"non-SMP system", lock);
+		panic("try_acquire_read_spinlock(): attempt to acquire lock %p twice "
+			"on non-SMP system", lock);
 	}
 #endif
 
@@ -620,8 +620,8 @@ acquire_read_spinlock(rw_spinlock* lock)
 {
 #if DEBUG_SPINLOCKS
 	if (are_interrupts_enabled()) {
-		panic("acquire_read_spinlock: attempt to acquire lock %p with"
-			" interrupts enabled", lock);
+		panic("acquire_read_spinlock: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
 	}
 #endif
 
