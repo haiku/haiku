@@ -703,7 +703,7 @@ kgetc(void)
 			}
 		}
 
-		PAUSE();
+		cpu_pause();
 	}
 }
 
@@ -1008,7 +1008,7 @@ hand_over_kernel_debugger()
 	// initiated by the user, it is harmless, though.
 	sHandOverKDL = true;
 	while (atomic_get(&sHandOverKDLToCPU) >= 0)
-		PAUSE();
+		cpu_wait(&sHandOverKDLToCPU, -1);
 }
 
 

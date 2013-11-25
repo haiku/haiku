@@ -185,6 +185,10 @@
 											| IA32_FEATURE_AMD_EXT_RDTSCP	\
 											| IA32_FEATURE_AMD_EXT_LONG)
 
+// x86 defined features from cpuid eax 5, ecx register
+#define IA32_FEATURE_POWER_MWAIT		(1 << 0)
+#define IA32_FEATURE_INTERRUPT_MWAIT	(1 << 1)
+
 // x86 defined features from cpuid eax 6, eax register
 // reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-11)
 #define IA32_FEATURE_DTS	(1 << 0) //Digital Thermal Sensor
@@ -198,6 +202,9 @@
 // reference http://www.intel.com/Assets/en_US/PDF/appnote/241618.pdf (Table 5-11)
 #define IA32_FEATURE_APERFMPERF	(1 << 0) //IA32_APERF, IA32_MPERF
 #define IA32_FEATURE_EPB	(1 << 3) //IA32_ENERGY_PERF_BIAS
+
+// x86 defined features from cpuid eax 0x80000007, edx register
+#define IA32_FEATURE_INVARIANT_TSC		(1 << 8)
 
 // cr4 flags
 #define IA32_CR4_PAE					(1UL << 5)
@@ -282,8 +289,10 @@ enum x86_feature_type {
 	FEATURE_EXT,            // cpuid eax=1, edx register
 	FEATURE_EXT_AMD_ECX,	// cpuid eax=0x80000001, ecx register (AMD)
 	FEATURE_EXT_AMD,        // cpuid eax=0x80000001, edx register (AMD)
+	FEATURE_5_ECX,			// cpuid eax=5, ecx register
 	FEATURE_6_EAX,          // cpuid eax=6, eax registers
 	FEATURE_6_ECX,          // cpuid eax=6, ecx registers
+	FEATURE_EXT_7_EDX,		// cpuid eax=0x80000007, edx register
 
 	FEATURE_NUM
 };
@@ -329,9 +338,6 @@ typedef struct arch_cpu_info {
 #endif
 } arch_cpu_info;
 
-
-#undef PAUSE
-#define PAUSE() asm volatile ("pause;")
 
 #define nop() __asm__ ("nop"::)
 
@@ -426,6 +432,9 @@ typedef struct arch_cpu_info {
 })
 
 
+extern void (*gCpuIdleFunc)(void);
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -476,6 +485,20 @@ void x86_frstor(const void* fpuState);
 void x86_fnsave_swap(void* oldFpuState, const void* newFpuState);
 
 #endif
+
+
+static inline void
+arch_cpu_idle(void)
+{
+	gCpuIdleFunc();
+}
+
+
+static inline void
+arch_cpu_pause(void)
+{
+	asm volatile("pause");
+}
 
 
 #ifdef __cplusplus

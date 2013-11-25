@@ -447,9 +447,8 @@ cancel_timer(timer* event)
 	if (cpu != smp_get_current_cpu()) {
 		spinLocker.Unlock();
 
-		while (atomic_get(&cpuData.current_event_in_progress) == 1) {
-			PAUSE();
-		}
+		while (atomic_get(&cpuData.current_event_in_progress) == 1)
+			cpu_wait(&cpuData.current_event_in_progress, 0);
 	}
 
 	return true;
@@ -461,7 +460,6 @@ spin(bigtime_t microseconds)
 {
 	bigtime_t time = system_time();
 
-	while ((system_time() - time) < microseconds) {
-		PAUSE();
-	}
+	while ((system_time() - time) < microseconds)
+		cpu_pause();
 }

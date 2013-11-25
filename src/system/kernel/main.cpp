@@ -262,7 +262,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 #endif
 
 	for (;;)
-		arch_cpu_idle();
+		cpu_idle();
 
 	return 0;
 }

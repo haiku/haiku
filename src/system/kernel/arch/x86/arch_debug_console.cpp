@@ -316,7 +316,7 @@ arch_debug_blue_screen_getchar(void)
 		if (c >= 0)
 			return (char)c;
 
-		PAUSE();
+		arch_cpu_pause();
 	}
 }
 
@@ -352,7 +352,7 @@ arch_debug_serial_getchar(void)
 		if ((lineStatus & 0x1) != 0)
 			break;
 
-		PAUSE();
+		arch_cpu_pause();
 	}
 
 	return in8(sSerialBasePort + SERIAL_RECEIVE_BUFFER);

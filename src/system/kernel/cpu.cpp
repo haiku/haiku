@@ -16,6 +16,7 @@
 #include <string.h>
 
 #include <cpufreq.h>
+#include <cpuidle.h>
 
 #include <boot/kernel_args.h>
 #include <kscheduler.h>
@@ -30,6 +31,7 @@ uint32 gCPUCacheLevelCount;
 static cpu_topology_node sCPUTopology;
 
 static cpufreq_module_info* sCPUPerformanceModule;
+static cpuidle_module_info* sCPUIdleModule;
 
 static spinlock sSetCpuLock;
 
@@ -89,6 +91,40 @@ load_cpufreq_module()
 }
 
 
+static void
+load_cpuidle_module()
+{
+	void* cookie = open_module_list(CPUIDLE_MODULES_PREFIX);
+
+	while (true) {
+		char name[B_FILE_NAME_LENGTH];
+		size_t nameLength = sizeof(name);
+		cpuidle_module_info* current = NULL;
+
+		if (read_next_module_name(cookie, name, &nameLength) != B_OK)
+			break;
+
+		if (get_module(name, (module_info**)&current) == B_OK) {
+			dprintf("found cpuidle module: %s\n", name);
+
+			if (sCPUIdleModule != NULL) {
+				if (sCPUIdleModule->rank < current->rank) {
+					put_module(sCPUIdleModule->info.name);
+					sCPUIdleModule = current;
+				} else
+					put_module(name);
+			} else
+				sCPUIdleModule = current; 
+		}
+	}
+
+	close_module_list(cookie);
+
+	if (sCPUIdleModule == NULL)
+		dprintf("no valid cpuidle module found\n");
+}
+
+
 status_t
 cpu_init_post_modules(kernel_args *args)
 {
@@ -97,6 +133,7 @@ cpu_init_post_modules(kernel_args *args)
 		return result;
 
 	load_cpufreq_module();
+	load_cpuidle_module();
 	return B_OK;
 }
 
@@ -232,6 +269,8 @@ cpu_build_topology_tree(void)
 	int32 lastID[CPU_TOPOLOGY_LEVELS];
 	memset(&lastID, 0, sizeof(lastID));
 	cpu_rebuild_topology_tree(&sCPUTopology, lastID);
+
+	return B_OK;
 }
 
 
@@ -260,6 +299,31 @@ decrease_cpu_performance(int delta)
 }
 
 
+void
+cpu_idle(void)
+{
+#if KDEBUG
+	if (!are_interrupts_enabled())
+		panic("cpu_idle() called with interrupts disabled.");
+#endif
+
+	if (sCPUIdleModule != NULL)
+		sCPUIdleModule->idle();
+	else
+		arch_cpu_idle();
+}
+
+
+void
+cpu_wait(int32* variable, int32 test)
+{
+	if (sCPUIdleModule != NULL)
+		sCPUIdleModule->wait(variable, test);
+	else
+		arch_cpu_pause();
+}
+
+
 //	#pragma mark -
 
 
@@ -283,7 +347,6 @@ _user_cpu_enabled(int32 cpu)
 status_t
 _user_set_cpu_enabled(int32 cpu, bool enabled)
 {
-	cpu_status state;
 	int32 i, count;
 
 	if (cpu < 0 || cpu >= smp_get_num_cpus())

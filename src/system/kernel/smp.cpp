@@ -358,7 +358,7 @@ acquire_spinlock(spinlock* lock)
 				}
 
 				process_all_pending_ici(currentCPU);
-				PAUSE();
+				cpu_wait(lock, 0);
 			}
 			if (atomic_get_and_set((int32*)lock, 1) == 0)
 				break;
@@ -411,7 +411,7 @@ acquire_spinlock_nocheck(spinlock *lock)
 					count = 0;
 				}
 
-				PAUSE();
+				cpu_wait(lock, 0);
 			}
 
 			if (atomic_get_and_set((int32*)lock, 1) == 0)
@@ -455,7 +455,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 				}
 
 				process_all_pending_ici(currentCPU);
-				PAUSE();
+				cpu_wait(lock, 0);
 			}
 			if (atomic_get_and_set((int32*)lock, 1) == 0)
 				break;
@@ -570,7 +570,7 @@ acquire_write_spinlock(rw_spinlock* lock)
 			}
 
 			process_all_pending_ici(currentCPU);
-			PAUSE();
+			cpu_wait(&lock->lock, 0);
 		}
 	}
 }
@@ -583,7 +583,7 @@ release_write_spinlock(rw_spinlock* lock)
 	uint32 previous = atomic_get_and_set(&lock->lock, 0);
 	if ((previous & 1u << 31) == 0) {
 		panic("release_write_spinlock: lock %p was already released (value: "
-			"%x)\n", lock, previous);
+			"%#" B_PRIx32 ")\n", lock, previous);
 	}
 #else
 	atomic_set(&lock->lock, 0);
@@ -639,7 +639,7 @@ acquire_read_spinlock(rw_spinlock* lock)
 			}
 
 			process_all_pending_ici(currentCPU);
-			PAUSE();
+			cpu_wait(&lock->lock, 0);
 		}
 	}
 }
@@ -652,7 +652,7 @@ release_read_spinlock(rw_spinlock* lock)
 	uint32 previous = atomic_add(&lock->lock, -1);
 	if ((previous & 1 << 31) != 0) {
 		panic("release_read_spinlock: lock %p was already released (value:"
-			" %x)\n", lock, previous);
+			" %#" B_PRIx32 ")\n", lock, previous);
 	}
 #else
 	atomic_add(&lock->lock, -1);
@@ -695,7 +695,7 @@ release_read_seqlock(seqlock* lock, uint32 count) {
 	uint32 current = atomic_get((int32*)&lock->count);
 
 	if (count % 2 == 1 || current != count) {
-		PAUSE();
+		cpu_pause();
 		return false;
 	}
 
@@ -719,7 +719,7 @@ retry:
 		state = disable_interrupts();
 		process_all_pending_ici(smp_get_current_cpu());
 		restore_interrupts(state);
-		PAUSE();
+		cpu_pause();
 	}
 	state = disable_interrupts();
 	acquire_spinlock(&sFreeMessageSpinlock);
@@ -757,7 +757,7 @@ find_free_message_interrupts_disabled(int32 currentCPU,
 	while (sFreeMessageCount <= 0) {
 		release_spinlock(&sFreeMessageSpinlock);
 		process_all_pending_ici(currentCPU);
-		PAUSE();
+		cpu_pause();
 		acquire_spinlock_cpu(currentCPU, &sFreeMessageSpinlock);
 	}
 
@@ -1014,7 +1014,7 @@ call_all_cpus_early(void (*function)(void*, int), void* cookie)
 
 		// wait for all CPUs to finish
 		while ((atomic_get(&sEarlyCPUCall) & cpuMask) != 0)
-			PAUSE();
+			cpu_pause();
 	}
 
 	function(cookie, 0);
@@ -1085,7 +1085,7 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 			// if the message is sync after it has removed it from the mailbox
 			while (msg->done == false) {
 				process_all_pending_ici(currentCPU);
-				PAUSE();
+				cpu_pause();
 			}
 			// for SYNC messages, it's our responsibility to put it
 			// back into the free list
@@ -1148,7 +1148,7 @@ smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, addr_t data,
 		// if the message is sync after it has removed it from the mailbox
 		while (msg->done == false) {
 			process_all_pending_ici(currentCPU);
-			PAUSE();
+			cpu_pause();
 		}
 
 		// for SYNC messages, it's our responsibility to put it
@@ -1210,7 +1210,7 @@ smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 
 			while (msg->done == false) {
 				process_all_pending_ici(currentCPU);
-				PAUSE();
+				cpu_pause();
 			}
 
 			TRACE(("smp_send_broadcast_ici: returning message to free list\n"));
@@ -1274,7 +1274,7 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 
 		while (msg->done == false) {
 			process_all_pending_ici(currentCPU);
-			PAUSE();
+			cpu_pause();
 		}
 
 		TRACE(("smp_send_broadcast_ici_interrupts_disabled %ld: returning "
@@ -1310,7 +1310,7 @@ smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 		if ((atomic_get(&sEarlyCPUCall) & (1 << cpu)) != 0)
 			process_early_cpu_call(cpu);
 
-		PAUSE();
+		cpu_pause();
 	}
 
 	return false;
@@ -1346,7 +1346,7 @@ smp_cpu_rendezvous(uint32* var, int current_cpu)
 
 	uint32 allReady = ((uint32)1 << sNumCPUs) - 1;
 	while ((uint32)atomic_get((int32*)var) != allReady)
-		PAUSE();
+		cpu_wait((int32*)var, allReady);
 }
 
 

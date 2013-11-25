@@ -196,7 +196,7 @@ UserTimer::HandleTimerHook(struct timer* timer)
 	while (!locked && atomic_get(&userTimer->fSkip) == 0) {
 		locked = try_acquire_write_seqlock(&sUserTimerLock);
 		if (!locked)
-			PAUSE();
+			cpu_pause();
 	}
 
 	if (locked) {

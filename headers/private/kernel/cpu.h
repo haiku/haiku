@@ -17,12 +17,6 @@
 #include <arch/cpu.h>
 
 
-// define PAUSE, if not done in arch/cpu.h
-#ifndef PAUSE
-#	define PAUSE()
-#endif
-
-
 struct kernel_args;
 
 namespace BKernel {
@@ -113,6 +107,17 @@ cpu_topology_node* get_cpu_topology(void);
 
 status_t increase_cpu_performance(int delta, bool allowBoost);
 status_t decrease_cpu_performance(int delta);
+
+void cpu_idle(void);
+void cpu_wait(int32* variable, int32 test);
+
+
+static inline void
+cpu_pause(void)
+{
+	arch_cpu_pause();
+}
+
 
 void _user_clear_caches(void *address, size_t length, uint32 flags);
 bool _user_cpu_enabled(int32 cpu);
