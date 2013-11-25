@@ -64,8 +64,8 @@ public:
 			status_t			CreateBuffer();
 			void				DeleteBuffer();
 
-			size_t				Write(const void* buffer, size_t length);
-			size_t				Read(void* buffer, size_t length);
+			ssize_t				Write(const void* buffer, size_t length);
+			ssize_t				Read(void* buffer, size_t length);
 			ssize_t				UserWrite(const void* buffer, ssize_t length);
 			ssize_t				UserRead(void* buffer, ssize_t length);
 
@@ -267,7 +267,7 @@ RingBuffer::DeleteBuffer()
 }
 
 
-inline size_t
+inline ssize_t
 RingBuffer::Write(const void* buffer, size_t length)
 {
 	if (fBuffer == NULL)
@@ -277,7 +277,7 @@ RingBuffer::Write(const void* buffer, size_t length)
 }
 
 
-inline size_t
+inline ssize_t
 RingBuffer::Read(void* buffer, size_t length)
 {
 	if (fBuffer == NULL)
@@ -418,7 +418,7 @@ Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking)
 		if (toWrite > dataSize)
 			toWrite = dataSize;
 
-		if (toWrite > 0 && fBuffer.UserWrite(data, toWrite) < B_OK)
+		if (toWrite > 0 && fBuffer.UserWrite(data, toWrite) < 0)
 			return B_BAD_ADDRESS;
 
 		data += toWrite;
@@ -474,7 +474,7 @@ Inode::ReadDataFromBuffer(void* data, size_t* _length, bool nonBlocking,
 	if (toRead > dataSize)
 		toRead = dataSize;
 
-	if (fBuffer.UserRead(data, toRead) < B_OK)
+	if (fBuffer.UserRead(data, toRead) < 0)
 		return B_BAD_ADDRESS;
 
 	NotifyBytesRead(toRead);
