@@ -30,6 +30,7 @@
 #include <util/AutoLock.h>
 #include <util/ring_buffer.h>
 #include <vfs.h>
+#include <vfs_defs.h>
 #include <vm/vm.h>
 
 
@@ -42,11 +43,6 @@
 
 
 #define PIPEFS_HASH_SIZE		16
-#define PIPEFS_MAX_BUFFER_SIZE	32768
-
-
-// TODO: PIPE_BUF is supposed to be defined somewhere else.
-#define PIPE_BUF	_POSIX_PIPE_BUF
 
 
 namespace fifo {
@@ -252,7 +248,7 @@ RingBuffer::CreateBuffer()
 	if (fBuffer != NULL)
 		return B_OK;
 
-	fBuffer = create_ring_buffer(PIPEFS_MAX_BUFFER_SIZE);
+	fBuffer = create_ring_buffer(VFS_FIFO_BUFFER_CAPACITY);
 	return fBuffer != NULL ? B_OK : B_NO_MEMORY;
 }
 
@@ -376,10 +372,10 @@ Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking)
 	TRACE("Inode %p::WriteDataToBuffer(data = %p, bytes = %zu)\n", this, data,
 		dataSize);
 
-	// According to the standard, request up to PIPE_BUF bytes shall not be
+	// A request up to VFS_FIFO_ATOMIC_WRITE_SIZE bytes shall not be
 	// interleaved with other writer's data.
 	size_t minToWrite = 1;
-	if (dataSize <= PIPE_BUF)
+	if (dataSize <= VFS_FIFO_ATOMIC_WRITE_SIZE)
 		minToWrite = dataSize;
 
 	while (dataSize > 0) {

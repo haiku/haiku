@@ -24,6 +24,7 @@
 #include <thread_defs.h>
 #include <user_group.h>
 #include <user_timer_defs.h>
+#include <vfs_defs.h>
 
 #include <errno_private.h>
 #include <libroot_private.h>
@@ -257,7 +258,7 @@ __pathconf_common(struct statvfs *fs, struct stat *st,
 			return PATH_MAX;
 
 		case _PC_PIPE_BUF:
-			return 4096;
+			return VFS_FIFO_ATOMIC_WRITE_SIZE;
 
 		case _PC_LINK_MAX:
 			return LINK_MAX;
