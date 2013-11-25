@@ -188,7 +188,7 @@ public:
 			void				NotifyEndClosed(bool writer);
 
 			void				Open(int openMode);
-			void				Close(int openMode, file_cookie* cookie);
+			void				Close(file_cookie* cookie);
 			int32				ReaderCount() const { return fReaderCount; }
 			int32				WriterCount() const { return fWriterCount; }
 
@@ -239,7 +239,8 @@ private:
 
 
 struct file_cookie {
-	int				open_mode;
+	int	open_mode;
+			// guarded by Inode::fRequestLock
 };
 
 
@@ -654,11 +655,13 @@ Inode::Open(int openMode)
 
 
 void
-Inode::Close(int openMode, file_cookie* cookie)
+Inode::Close(file_cookie* cookie)
 {
 	TRACE("Inode %p::Close(openMode = %d)\n", this, openMode);
 
 	MutexLocker locker(RequestLock());
+
+	int openMode = cookie->open_mode;
 
 	// Notify all currently reading file descriptors
 	ReadRequestList::Iterator iterator = fReadRequests.GetIterator();
@@ -898,7 +901,7 @@ fifo_close(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 	file_cookie* cookie = (file_cookie*)_cookie;
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 
-	fifo->Close(cookie->open_mode, cookie);
+	fifo->Close(cookie);
 
 	return B_OK;
 }
@@ -934,10 +937,10 @@ fifo_read(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	TRACE("fifo_read(vnode = %p, cookie = %p, length = %lu, mode = %d)\n",
 		inode, cookie, *_length, cookie->open_mode);
 
+	MutexLocker locker(inode->RequestLock());
+
 	if ((cookie->open_mode & O_RWMASK) != O_RDONLY)
 		return B_NOT_ALLOWED;
-
-	MutexLocker locker(inode->RequestLock());
 
 	if (inode->IsActive() && inode->WriterCount() == 0) {
 		// as long there is no writer, and the pipe is empty,
@@ -982,10 +985,10 @@ fifo_write(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	TRACE("fifo_write(vnode = %p, cookie = %p, length = %lu)\n",
 		_node, cookie, *_length);
 
+	MutexLocker locker(inode->RequestLock());
+
 	if ((cookie->open_mode & O_RWMASK) != O_WRONLY)
 		return B_NOT_ALLOWED;
-
-	MutexLocker locker(inode->RequestLock());
 
 	size_t length = *_length;
 	if (length == 0)
@@ -1067,12 +1070,15 @@ fifo_ioctl(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, uint32 op,
 
 
 static status_t
-fifo_set_flags(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
+fifo_set_flags(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	int flags)
 {
+	Inode* inode = (Inode*)_node->private_node;
 	file_cookie* cookie = (file_cookie*)_cookie;
 
 	TRACE("fifo_set_flags(vnode = %p, flags = %x)\n", _vnode, flags);
+
+	MutexLocker locker(inode->RequestLock());
 	cookie->open_mode = (cookie->open_mode & ~(O_APPEND | O_NONBLOCK)) | flags;
 	return B_OK;
 }
