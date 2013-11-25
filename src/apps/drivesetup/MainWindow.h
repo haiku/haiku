@@ -11,6 +11,7 @@
 
 
 #include <DiskDeviceRoster.h>
+#include <PopUpMenu.h>
 #include <Window.h>
 
 #include "Support.h"
@@ -101,6 +102,14 @@ private:
 			BMenuItem*			fMountMenuItem;
 			BMenuItem*			fUnmountMenuItem;
 			BMenuItem*			fMountAllMenuItem;
+
+			BMenu*				fFormatContextMenuItem;
+			BMenuItem*			fCreateContextMenuItem;
+			BMenuItem*			fChangeContextMenuItem;
+			BMenuItem*			fDeleteContextMenuItem;
+			BMenuItem*			fMountContextMenuItem;
+			BMenuItem*			fUnmountContextMenuItem;
+			BPopUpMenu*			fContextMenu;
 };
 
 

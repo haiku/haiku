@@ -269,6 +269,30 @@ MainWindow::MainWindow()
 
 	AddChild(menuBar);
 
+	// Partition / Drives context menu
+	fContextMenu = new BPopUpMenu("Partition");
+	fCreateContextMenuItem = new BMenuItem(B_TRANSLATE("Create" B_UTF8_ELLIPSIS),
+		new BMessage(MSG_CREATE), 'C');
+	fChangeContextMenuItem = new BMenuItem(
+		B_TRANSLATE("Change parameters" B_UTF8_ELLIPSIS),
+		new BMessage(MSG_CHANGE));
+	fDeleteContextMenuItem = new BMenuItem(B_TRANSLATE("Delete"),
+		new BMessage(MSG_DELETE), 'D');
+	fMountContextMenuItem = new BMenuItem(B_TRANSLATE("Mount"),
+		new BMessage(MSG_MOUNT), 'M');
+	fUnmountContextMenuItem = new BMenuItem(B_TRANSLATE("Unmount"),
+		new BMessage(MSG_UNMOUNT), 'U');
+	fFormatContextMenuItem = new BMenu(B_TRANSLATE("Format"));
+
+	fContextMenu->AddItem(fCreateContextMenuItem);
+	fContextMenu->AddItem(fFormatContextMenuItem);
+	fContextMenu->AddItem(fChangeContextMenuItem);
+	fContextMenu->AddItem(fDeleteContextMenuItem);
+	fContextMenu->AddSeparatorItem();
+	fContextMenu->AddItem(fMountContextMenuItem);
+	fContextMenu->AddItem(fUnmountContextMenuItem);
+	fContextMenu->SetTargetForItems(this);
+
 	// add DiskView
 	BRect r(Bounds());
 	r.top = menuBar->Frame().bottom + 1;
@@ -308,6 +332,7 @@ MainWindow::~MainWindow()
 {
 	BDiskDeviceRoster().StopWatching(this);
 	delete fCurrentDisk;
+	delete fContextMenu;
 }
 
 
@@ -369,10 +394,19 @@ MainWindow::MessageReceived(BMessage* message)
 			_ScanDrives();
 			break;
 
-		case MSG_PARTITION_ROW_SELECTED:
+		case MSG_PARTITION_ROW_SELECTED: {
 			// selection of partitions via list view
 			_AdaptToSelectedPartition();
+
+			BPoint where;
+			uint32 buttons;
+			fListView->GetMouse(&where, &buttons);
+			where.x += 2; // to prevent occasional select
+			if (buttons & B_SECONDARY_MOUSE_BUTTON)
+				fContextMenu->Go(fListView->ConvertToScreen(where),
+					true, false, true);
 			break;
+		}
 		case MSG_SELECTED_PARTITION_ID: {
 			// selection of partitions via disk view
 			partition_id id;
@@ -383,6 +417,13 @@ MainWindow::MessageReceived(BMessage* message)
 					_AdaptToSelectedPartition();
 				}
 			}
+			BPoint where;
+			uint32 buttons;
+			fListView->GetMouse(&where, &buttons);
+			where.x += 2; // to prevent occasional select
+			if (buttons & B_SECONDARY_MOUSE_BUTTON)
+				fContextMenu->Go(fListView->ConvertToScreen(where),
+					true, false, true);
 			break;
 		}
 
@@ -576,11 +617,17 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		delete item;
 	while (BMenuItem* item = fDiskInitMenu->RemoveItem((int32)0))
 		delete item;
+	while (BMenuItem* item = fFormatContextMenuItem->RemoveItem((int32)0))
+		delete item;
 
 	fCreateMenuItem->SetEnabled(false);
 	fUnmountMenuItem->SetEnabled(false);
 	fDiskInitMenu->SetEnabled(false);
 	fFormatMenu->SetEnabled(false);
+
+	fCreateContextMenuItem->SetEnabled(false);
+	fUnmountContextMenuItem->SetEnabled(false);
+	fFormatContextMenuItem->SetEnabled(false);
 
 	if (!disk) {
 		fWipeMenuItem->SetEnabled(false);
@@ -600,13 +647,19 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			parentPartition = disk->FindDescendant(parentID);
 		}
 
-		if (parentPartition && parentPartition->ContainsPartitioningSystem())
+		if (parentPartition && parentPartition->ContainsPartitioningSystem()) {
 			fCreateMenuItem->SetEnabled(true);
-
+			fCreateContextMenuItem->SetEnabled(true);
+		}
 		bool prepared = disk->PrepareModifications() == B_OK;
+
 		fFormatMenu->SetEnabled(prepared);
 		fDeleteMenuItem->SetEnabled(prepared);
 		fChangeMenuItem->SetEnabled(prepared);
+
+		fChangeContextMenuItem->SetEnabled(prepared);
+		fDeleteContextMenuItem->SetEnabled(prepared);
+		fFormatContextMenuItem->SetEnabled(prepared);
 
 		BPartition* partition = disk->FindDescendant(selectedPartition);
 
@@ -635,6 +688,16 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 			} else if (diskSystem.IsFileSystem()) {
 				// Otherwise a filesystem
 				fFormatMenu->AddItem(item);
+
+				// Context menu
+				BMessage* message = new BMessage(MSG_INITIALIZE);
+				message->AddInt32("parent id", parentID);
+				message->AddString("disk system", diskSystem.PrettyName());
+				BMenuItem* popUpItem = new BMenuItem(label.String(), message);
+				popUpItem->SetEnabled(partition != NULL
+					&& partition->CanInitialize(diskSystem.PrettyName()));
+				fFormatContextMenuItem->AddItem(popUpItem);
+				fFormatContextMenuItem->SetTargetForItems(this);
 			}
 		}
 
@@ -658,6 +721,13 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 
 			fMountMenuItem->SetEnabled(!partition->IsMounted());
 
+			fFormatContextMenuItem->SetEnabled(notMountedAndWritable
+				&& fFormatContextMenuItem->CountItems() > 0);
+			fChangeContextMenuItem->SetEnabled(notMountedAndWritable);
+			fDeleteContextMenuItem->SetEnabled(notMountedAndWritable
+				&& !partition->IsDevice());
+			fMountContextMenuItem->SetEnabled(notMountedAndWritable);
+
 			bool unMountable = false;
 			if (partition->IsMounted()) {
 				// see if this partition is the boot volume
@@ -670,12 +740,18 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 					unMountable = true;
 			}
 			fUnmountMenuItem->SetEnabled(unMountable);
+			fUnmountContextMenuItem->SetEnabled(unMountable);
 		} else {
 			fDeleteMenuItem->SetEnabled(false);
 			fChangeMenuItem->SetEnabled(false);
 			fMountMenuItem->SetEnabled(false);
 			fFormatMenu->SetEnabled(false);
 			fDiskInitMenu->SetEnabled(false);
+
+			fDeleteContextMenuItem->SetEnabled(false);
+			fChangeContextMenuItem->SetEnabled(false);
+			fMountContextMenuItem->SetEnabled(false);
+			fFormatContextMenuItem->SetEnabled(false);
 		}
 
 		if (prepared)
@@ -687,6 +763,10 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 		fDeleteMenuItem->SetEnabled(false);
 		fChangeMenuItem->SetEnabled(false);
 		fMountMenuItem->SetEnabled(false);
+
+		fDeleteContextMenuItem->SetEnabled(false);
+		fChangeContextMenuItem->SetEnabled(false);
+		fMountContextMenuItem->SetEnabled(false);
 	}
 }
 
