@@ -46,42 +46,42 @@ if [ `uname -s` = 'Haiku' ]; then
 	buildHostSpec="--build=$buildhostMachine --host=$buildhostMachine"
 fi
 
-if [ ! -d $haikuSourceDir ]; then
+if [ ! -d "$haikuSourceDir" ]; then
 	echo "No such directory: \"$haikuSourceDir\"" >&2
 	exit 1
 fi
 
-if [ ! -d $buildToolsDir ]; then
+if [ ! -d "$buildToolsDir" ]; then
 	echo "No such directory: \"$buildToolsDir\"" >&2
 	exit 1
 fi
 
 
 # create the output dir
-mkdir -p $installDir || exit 1
+mkdir -p "$installDir" || exit 1
 
 
 # get absolute paths
 currentDir=$(pwd)
 
-cd $haikuSourceDir
+cd "$haikuSourceDir"
 haikuSourceDir=$(pwd)
-cd $currentDir
+cd "$currentDir"
 
-cd $buildToolsDir
+cd "$buildToolsDir"
 buildToolsDir=$(pwd)
-cd $currentDir
+cd "$currentDir"
 
-cd $installDir
+cd "$installDir"
 installDir=$(pwd)
-cd $currentDir
+cd "$currentDir"
 
-binutilsSourceDir=$buildToolsDir/binutils
-gccSourceDir=$buildToolsDir/gcc
+binutilsSourceDir="$buildToolsDir/binutils"
+gccSourceDir="$buildToolsDir/gcc"
 
 
 # get gcc version
-gccVersion=$(cat $gccSourceDir/gcc/BASE-VER)
+gccVersion=$(cat "$gccSourceDir/gcc/BASE-VER")
 
 if [ -z "$gccVersion" ]; then
 	echo "Failed to find out gcc version." >&2
@@ -92,36 +92,36 @@ fi
 # (which apparently doesn't work reliably on all the different host 
 # configurations and changes files which in turn appear as local changes
 # to the VCS).
-find $binutilsSourceDir $gccSourceDir -name \*.info -print0 | xargs -0 touch
+find "$binutilsSourceDir" "$gccSourceDir" -name \*.info -print0 | xargs -0 touch
 
 # create the object and installation directories for the cross compilation tools
-objDir=${installDir}-build
-binutilsObjDir=$objDir/binutils
-gccObjDir=$objDir/gcc
-stdcxxObjDir=$objDir/stdcxx
-sysrootDir=$installDir/sysroot
-tmpIncludeDir=$sysrootDir/boot/system/develop/headers
-tmpLibDir=$sysrootDir/boot/system/develop/lib
+objDir="${installDir}-build"
+binutilsObjDir="$objDir/binutils"
+gccObjDir="$objDir/gcc"
+stdcxxObjDir="$objDir/stdcxx"
+sysrootDir="$installDir/sysroot"
+tmpIncludeDir="$sysrootDir/boot/system/develop/headers"
+tmpLibDir="$sysrootDir/boot/system/develop/lib"
 
-rm -rf $installDir $objDir
+rm -rf "$installDir" "$objDir"
 
-mkdir -p $installDir $objDir $binutilsObjDir $gccObjDir $stdcxxObjDir \
-	$tmpIncludeDir $tmpLibDir || exit 1
-mkdir -p $installDir/lib/gcc/$haikuMachine/$gccVersion
+mkdir -p "$installDir" "$objDir" "$binutilsObjDir" "$gccObjDir" "$stdcxxObjDir" \
+	"$tmpIncludeDir" "$tmpLibDir" || exit 1
+mkdir -p "$installDir/lib/gcc/$haikuMachine/$gccVersion"
 
 if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
-	cloogSourceDir=$buildToolsDir/cloog
-	gmpSourceDir=$buildToolsDir/gcc/gmp
-	pplSourceDir=$buildToolsDir/ppl
+	cloogSourceDir="$buildToolsDir/cloog"
+	gmpSourceDir="$buildToolsDir/gcc/gmp"
+	pplSourceDir="$buildToolsDir/ppl"
 
-	pplObjDir=$objDir/ppl
-	gmpObjDir=$objDir/gmp
-	cloogObjDir=$objDir/cloog
-	mkdir -p $pplObjDir $gmpObjDir $cloogObjDir || exit 1
+	pplObjDir="$objDir/ppl"
+	gmpObjDir="$objDir/gmp"
+	cloogObjDir="$objDir/cloog"
+	mkdir -p "$pplObjDir" "$gmpObjDir" "$cloogObjDir" || exit 1
 
-	gccConfigureArgs="$gccConfigureArgs --with-cloog=$installDir \
-		--enable-cloog-backend=isl --with-ppl=$installDir \
-		--disable-cloog-version-check --with-gmp=$installDir \
+	gccConfigureArgs="$gccConfigureArgs --with-cloog=\"$installDir\" \
+		--enable-cloog-backend=isl --with-ppl=\"$installDir\" \
+		--disable-cloog-version-check --with-gmp=\"$installDir\" \
 		--with-host-libstdcxx=\"-lstdc++\""
 fi
 
@@ -133,30 +133,30 @@ fi
 export LC_ALL=POSIX
 
 # build binutils
-cd $binutilsObjDir
-CFLAGS="-O2" CXXFLAGS="-O2" $binutilsSourceDir/configure \
-	--prefix=$installDir $buildHostSpec --target=$haikuMachine \
+cd "$binutilsObjDir"
+CFLAGS="-O2" CXXFLAGS="-O2" "$binutilsSourceDir/configure" \
+	--prefix="$installDir" $buildHostSpec --target=$haikuMachine \
 	--enable-targets=$haikuMachine,i386-efi-pe,x86_64-efi-pe \
 	--disable-nls --disable-shared --disable-werror \
-	--with-sysroot=$sysrootDir \
+	--with-sysroot="$sysrootDir" \
 	$binutilsConfigureArgs \
 	|| exit 1
 $MAKE $additionalMakeArgs || exit 1
 $MAKE $additionalMakeArgs install || exit 1
 
-export PATH=$PATH:$installDir/bin
+export PATH=$PATH:"$installDir/bin"
 
 if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	# build gmp
-	cd $gmpObjDir
-	$gmpSourceDir/configure --prefix=$installDir \
+	cd "$gmpObjDir"
+	"$gmpSourceDir/configure" --prefix="$installDir" \
 		--disable-shared --enable-cxx || exit 1
 	$MAKE $additionalMakeArgs || exit 1
 	$MAKE $additionalMakeArgs install || exit 1
 
 	# build ppl
-	cd $pplObjDir
-	CFLAGS="-O2" CXXFLAGS="-O2" $pplSourceDir/configure --prefix=$installDir \
+	cd "$pplObjDir"
+	CFLAGS="-O2" CXXFLAGS="-O2" "$pplSourceDir/configure" --prefix="$installDir" \
 		--disable-nls --disable-shared --disable-watchdog \
 		--disable-maintainer-mode || exit 1
 	$MAKE $additionalMakeArgs AUTOCONF:=true AUTOHEADER:=true ACLOCAL:=true \
@@ -165,10 +165,10 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 		ACLOCAL:=true AUTOMAKE:=true || exit 1
 
 	# build cloog
-	cd $cloogObjDir
-	CFLAGS="-O2" CXXFLAGS="-O2" $cloogSourceDir/configure \
-		--prefix=$installDir --disable-nls --disable-shared \
-		--with-gmp-prefix=$installDir || exit 1
+	cd "$cloogObjDir"
+	CFLAGS="-O2" CXXFLAGS="-O2" "$cloogSourceDir/configure" \
+		--prefix="$installDir" --disable-nls --disable-shared \
+		--with-gmp-prefix="$installDir" || exit 1
 	$MAKE $additionalMakeArgs || exit 1
 	$MAKE $additionalMakeArgs install || exit 1
 fi
@@ -184,23 +184,23 @@ copy_headers()
 	headers="$(find $sourceDir -name \*\.h)"
 	headers="$(echo $headers | sed -e s@$sourceDir/@@g)"
 	for f in $headers; do
-		headerTargetDir=$targetDir/$(dirname $f)
-		mkdir -p $headerTargetDir
-		cp $sourceDir/$f $headerTargetDir
+		headerTargetDir="$targetDir/$(dirname $f)"
+		mkdir -p "$headerTargetDir"
+		cp "$sourceDir/$f" "$headerTargetDir"
 	done
 }
 
-copy_headers $haikuSourceDir/headers/config $tmpIncludeDir/config
-copy_headers $haikuSourceDir/headers/os $tmpIncludeDir/os
-copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
+copy_headers "$haikuSourceDir/headers/config" "$tmpIncludeDir/config"
+copy_headers "$haikuSourceDir/headers/os" "$tmpIncludeDir/os"
+copy_headers "$haikuSourceDir/headers/posix" "$tmpIncludeDir/posix"
 
 # configure gcc
-cd $gccObjDir
-CFLAGS="-O2" CXXFLAGS="-O2" $gccSourceDir/configure \
-	--prefix=$installDir $buildHostSpec --target=$haikuMachine \
+cd "$gccObjDir"
+CFLAGS="-O2" CXXFLAGS="-O2" "$gccSourceDir/configure" \
+	--prefix="$installDir" $buildHostSpec --target=$haikuMachine \
 	--disable-nls --disable-shared --with-system-zlib \
 	--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
-	--with-sysroot=$sysrootDir \
+	--with-sysroot="$sysrootDir" \
 	$gccConfigureArgs \
 	|| exit 1
 
@@ -218,37 +218,37 @@ $MAKE $additionalMakeArgs install || {
 
 # build libraries for the kernel if the target arch requires it
 if [ -n "$kernelCcFlags" ]; then
-	$MAKE -C $haikuMachine/libgcc clean
-	$MAKE -C $haikuMachine/libgcc CFLAGS="-g -O2 $kernelCcFlags" || {
+	$MAKE -C "$haikuMachine/libgcc" clean
+	$MAKE -C "$haikuMachine/libgcc" CFLAGS="-g -O2 $kernelCcFlags" || {
 		echo "Error: Building kernel libgcc failed." >&2
 		exit 1
 	}
 
-	cp $haikuMachine/libgcc/libgcc.a \
-		$installDir/$haikuMachine/lib/libgcc-kernel.a || exit 1
+	cp "$haikuMachine/libgcc/libgcc.a" \
+		"$installDir/$haikuMachine/lib/libgcc-kernel.a" || exit 1
 
-	$MAKE -C $haikuMachine/libstdc++-v3/libsupc++ clean
-	$MAKE -C $haikuMachine/libstdc++-v3/libsupc++ CFLAGS="-g -O2 $kernelCcFlags" \
+	$MAKE -C "$haikuMachine/libstdc++-v3/libsupc++" clean
+	$MAKE -C "$haikuMachine/libstdc++-v3/libsupc++" CFLAGS="-g -O2 $kernelCcFlags" \
 		CXXFLAGS="-g -O2 $kernelCcFlags" || {
 		echo "Error: Building kernel libsupc++ failed." >&2
 		exit 1
 	}
 
-	cp $haikuMachine/libstdc++-v3/libsupc++/.libs/libsupc++.a \
-		$installDir/$haikuMachine/lib/libsupc++-kernel.a || exit 1
+	cp "$haikuMachine/libstdc++-v3/libsupc++/.libs/libsupc++.a" \
+		"$installDir/$haikuMachine/lib/libsupc++-kernel.a" || exit 1
 fi
 
 # cleanup
 
 # remove the system headers from the installation dir
 # Only the ones from the source tree should be used.
-rm -rf $installDir/$haikuMachine/sys-include
+rm -rf "$installDir/$haikuMachine/sys-include"
 
 # remove the sysroot dir
-rm -rf $sysrootDir
+rm -rf "$sysrootDir"
 
 # remove the objects dir
-rm -rf $objDir
+rm -rf "$objDir"
 
 
 echo "binutils and gcc for cross compilation have been built successfully!"
