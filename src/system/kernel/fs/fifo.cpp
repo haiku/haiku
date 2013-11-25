@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 
 #include <new>
@@ -24,6 +25,7 @@
 #include <khash.h>
 #include <lock.h>
 #include <select_sync_pool.h>
+#include <syscall_restart.h>
 #include <team.h>
 #include <thread.h>
 #include <util/DoublyLinkedList.h>
@@ -241,6 +243,14 @@ private:
 struct file_cookie {
 	int	open_mode;
 			// guarded by Inode::fRequestLock
+
+	void SetNonBlocking(bool nonBlocking)
+	{
+		if (nonBlocking)
+			open_mode |= O_NONBLOCK;
+		else
+			open_mode &= ~(int)O_NONBLOCK;
+	}
 };
 
 
@@ -1059,11 +1069,64 @@ fifo_write_stat(fs_volume* volume, fs_vnode* vnode, const struct ::stat* st,
 
 
 static status_t
-fifo_ioctl(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, uint32 op,
+fifo_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 op,
 	void* buffer, size_t length)
 {
+	file_cookie* cookie = (file_cookie*)_cookie;
+	Inode* inode = (Inode*)_node->private_node;
+
 	TRACE("fifo_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
 		_vnode, _cookie, op, buffer, length);
+
+	switch (op) {
+		case FIONBIO:
+		{
+			if (buffer == NULL)
+				return B_BAD_VALUE;
+
+			int value;
+			if (is_called_via_syscall()) {
+				if (!IS_USER_ADDRESS(buffer)
+					|| user_memcpy(&value, buffer, sizeof(int)) != B_OK) {
+					return B_BAD_ADDRESS;
+				}
+			} else
+				value = *(int*)buffer;
+
+			MutexLocker locker(inode->RequestLock());
+			cookie->SetNonBlocking(value != 0);
+			return B_OK;
+		}
+
+		case FIONREAD:
+		{
+			if (buffer == NULL)
+				return B_BAD_VALUE;
+
+			MutexLocker locker(inode->RequestLock());
+			int available = (int)inode->BytesAvailable();
+			locker.Unlock();
+
+			if (is_called_via_syscall()) {
+				if (!IS_USER_ADDRESS(buffer)
+					|| user_memcpy(buffer, &available, sizeof(available))
+						!= B_OK) {
+					return B_BAD_ADDRESS;
+				}
+			} else
+				*(int*)buffer = available;
+
+			return B_OK;
+		}
+
+		case B_SET_BLOCKING_IO:
+		case B_SET_NONBLOCKING_IO:
+		{
+			MutexLocker locker(inode->RequestLock());
+			cookie->SetNonBlocking(op == B_SET_NONBLOCKING_IO);
+			return B_OK;
+		}
+	}
 
 	return EINVAL;
 }
