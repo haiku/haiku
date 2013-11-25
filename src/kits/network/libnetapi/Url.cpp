@@ -21,7 +21,7 @@ static const char* kArchivedUrl = "be:url string";
 
 
 BUrl::BUrl(const char* url)
-	: 
+	:
 	fUrlString(),
 	fProtocol(),
 	fUser(),
@@ -37,7 +37,7 @@ BUrl::BUrl(const char* url)
 
 
 BUrl::BUrl(BMessage* archive)
-	: 
+	:
 	fUrlString(),
 	fProtocol(),
 	fUser(),
@@ -58,7 +58,7 @@ BUrl::BUrl(BMessage* archive)
 
 
 BUrl::BUrl(const BUrl& other)
-	: 
+	:
 	BArchivable(),
 	fUrlString(),
 	fProtocol(),
@@ -75,7 +75,7 @@ BUrl::BUrl(const BUrl& other)
 
 
 BUrl::BUrl(const BUrl& base, const BString& location)
-	: 
+	:
 	fUrlString(),
 	fProtocol(),
 	fUser(),
@@ -89,20 +89,20 @@ BUrl::BUrl(const BUrl& base, const BString& location)
 	// This implements the algorithm in RFC3986, Section 5.2.
 
 	BUrl relative(location);
-	if(relative.HasProtocol()) {
+	if (relative.HasProtocol()) {
 		SetProtocol(relative.Protocol());
 		SetAuthority(relative.Authority());
 		SetPath(relative.Path()); // TODO _RemoveDotSegments()
 		SetRequest(relative.Request());
 	} else {
-		if(relative.HasAuthority()) {
+		if (relative.HasAuthority()) {
 			SetAuthority(relative.Authority());
 			SetPath(relative.Path()); // TODO _RemoveDotSegments()
 			SetRequest(relative.Request());
 		} else {
-			if(relative.Path().IsEmpty()) {
+			if (relative.Path().IsEmpty()) {
 				SetPath(base.Path());
-				if(relative.HasRequest())
+				if (relative.HasRequest())
 					SetRequest(relative.Request());
 				else
 					SetRequest(Request());
@@ -341,7 +341,7 @@ BUrl::Authority() const
 
 		if (HasPort())
 			fAuthority << ':' << fPort;
-			
+
 		fAuthorityValid = true;
 	}
 	return fAuthority;
@@ -502,7 +502,7 @@ BUrl::Archive(BMessage* into, bool deep) const
 
 	if (ret == B_OK)
 		ret = into->AddString(kArchivedUrl, UrlString());
-	
+
 	return ret;
 }
 
@@ -524,7 +524,7 @@ BUrl::operator==(BUrl& other) const
 {
 	UrlString();
 	other.UrlString();
-	
+
 	return fUrlString == other.fUrlString;
 }
 
@@ -545,15 +545,15 @@ BUrl::operator=(const BUrl& other)
 	fUrlStringValid		= other.fUrlStringValid;
 	if (fUrlStringValid)
 		fUrlString			= other.fUrlString;
-	
+
 	fAuthorityValid		= other.fAuthorityValid;
 	if (fAuthorityValid)
 		fAuthority			= other.fAuthority;
-	
+
 	fUserInfoValid		= other.fUserInfoValid;
 	if (fUserInfoValid)
 		fUserInfo			= other.fUserInfo;
-	
+
 	fProtocol			= other.fProtocol;
 	fUser				= other.fUser;
 	fPassword			= other.fPassword;
@@ -562,7 +562,7 @@ BUrl::operator=(const BUrl& other)
 	fPath				= other.fPath;
 	fRequest			= other.fRequest;
 	fFragment			= other.fFragment;
-	
+
 	fHasProtocol		= other.fHasProtocol;
 	fHasUserName		= other.fHasUserName;
 	fHasPassword		= other.fHasPassword;
@@ -573,7 +573,7 @@ BUrl::operator=(const BUrl& other)
 	fHasPath			= other.fHasPath;
 	fHasRequest			= other.fHasRequest;
 	fHasFragment		= other.fHasFragment;
-	
+
 	return *this;
 }
 
@@ -644,7 +644,7 @@ BUrl::_ExplodeUrlString(const BString& url)
 
 	RegExp::MatchResult match = urlMatcher.Match(url.String());
 
-	if(!match.HasMatched())
+	if (!match.HasMatched())
 		return; // TODO error reporting
 
 	// Scheme/Protocol
@@ -664,19 +664,19 @@ BUrl::_ExplodeUrlString(const BString& url)
 	// Path
 	url.CopyInto(fPath, match.GroupStartOffsetAt(4),
 		match.GroupEndOffsetAt(4) - match.GroupStartOffsetAt(4));
-	if(!fPath.IsEmpty())
+	if (!fPath.IsEmpty())
 		fHasPath = true;
 
 	// Query
 	url.CopyInto(fRequest, match.GroupStartOffsetAt(6),
 		match.GroupEndOffsetAt(6) - match.GroupStartOffsetAt(6));
-	if(!fRequest.IsEmpty())
+	if (!fRequest.IsEmpty())
 		fHasRequest = true;
 
 	// Fragment
 	url.CopyInto(fFragment, match.GroupStartOffsetAt(8),
 		match.GroupEndOffsetAt(8) - match.GroupStartOffsetAt(8));
-	if(!fFragment.IsEmpty())
+	if (!fFragment.IsEmpty())
 		fHasFragment = true;
 }
 
@@ -690,7 +690,7 @@ BUrl::SetAuthority(const BString& authority)
 	fHasUserInfo = false;
 	fHasHost = false;
 
-	if(fAuthority.IsEmpty())
+	if (fAuthority.IsEmpty())
 		return;
 
 	fHasAuthority = true;
@@ -723,8 +723,7 @@ BUrl::SetAuthority(const BString& authority)
 	int16 hostEnd = fAuthority.FindFirst(':', userInfoEnd);
 	userInfoEnd++;
 
-	if(hostEnd < 0)
-	{
+	if (hostEnd < 0) {
 		// no ':' found, the host extends to the end of the URL
 		hostEnd = fAuthority.Length() + 1;
 	}
@@ -757,7 +756,7 @@ BUrl::SetAuthority(const BString& authority)
 BUrl::_DoUrlEncodeChunk(const BString& chunk, bool strict, bool directory)
 {
 	BString result;
-	
+
 	for (int32 i = 0; i < chunk.Length(); i++) {
 		if (_IsUnreserved(chunk[i])
 			|| (directory && (chunk[i] == '/' || chunk[i] == '\\')))
@@ -769,12 +768,12 @@ BUrl::_DoUrlEncodeChunk(const BString& chunk, bool strict, bool directory)
 			} else {
 				char hexString[5];
 				snprintf(hexString, 5, "%X", chunk[i]);
-				
+
 				result << '%' << hexString;
 			}
 		}
 	}
-	
+
 	return result;
 }
 
@@ -783,7 +782,7 @@ BUrl::_DoUrlEncodeChunk(const BString& chunk, bool strict, bool directory)
 BUrl::_DoUrlDecodeChunk(const BString& chunk, bool strict)
 {
 	BString result;
-	
+
 	for (int32 i = 0; i < chunk.Length(); i++) {
 		if (chunk[i] == '+' && !strict)
 			result << ' ';
@@ -792,7 +791,7 @@ BUrl::_DoUrlDecodeChunk(const BString& chunk, bool strict)
 		else {
 			char hexString[] = { chunk[i+1], chunk[i+2], 0 };
 			result << (char)strtol(hexString, NULL, 16);
-			
+
 			i += 2;
 		}
 	}
@@ -829,7 +828,7 @@ BUrl::_IsUnreserved(char c)
 bool
 BUrl::_IsGenDelim(char c)
 {
-	if (c == ':' || c == '/' || c == '?' || c == '#' || c == '[' 
+	if (c == ':' || c == '/' || c == '?' || c == '#' || c == '['
 		|| c == ']' || c == '@')
 		return true;
 	else
@@ -840,7 +839,7 @@ BUrl::_IsGenDelim(char c)
 bool
 BUrl::_IsSubDelim(char c)
 {
-	if (c == '!' || c == '$' || c == '&' || c == '\'' || c == '(' 
+	if (c == '!' || c == '$' || c == '&' || c == '\'' || c == '('
 		|| c == ')' || c == '*' || c == '+' || c == ',' || c == ';'
 		|| c == '=')
 		return true;

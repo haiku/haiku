@@ -203,7 +203,7 @@ BNetworkCookie::SetValue(const BString& value)
 status_t
 BNetworkCookie::SetPath(const BString& path)
 {
-	if(path[0] != '/')
+	if (path[0] != '/')
 		return B_BAD_DATA;
 
 	// TODO: canonicalize the path
@@ -225,11 +225,11 @@ BNetworkCookie::SetDomain(const BString& domain)
 	// not specified at all (in this case it has to exactly match the Url of
 	// the page that set the cookie). In any case, we don't need to handle
 	// dot-cookies specifically anymore, so just remove the extra dot.
-	if(newDomain[0] == '.')
+	if (newDomain[0] == '.')
 		newDomain.Remove(0, 1);
 
 	// check we're not trying to set a cookie on a TLD or empty domain
-	if(newDomain.FindLast('.') <= 0)
+	if (newDomain.FindLast('.') <= 0)
 		return B_BAD_DATA;
 
 	fDomain = newDomain.ToLower();
@@ -453,7 +453,7 @@ BNetworkCookie::IsValidForDomain(const BString& domain) const
 	// Otherwise, the domains must match exactly, or the domain must have a dot
 	// character just before the common suffix.
 	const char* suffix = domain.String() + difference;
-	if (strcmp(suffix, cookieDomain.String()) == 0 && (difference == 0 
+	if (strcmp(suffix, cookieDomain.String()) == 0 && (difference == 0
 			|| domain[difference - 1] == '.'))
 		return true;
 
@@ -468,7 +468,7 @@ BNetworkCookie::IsValidForPath(const BString& path) const
 	BString normalizedPath = path;
 
 	int slashPos = normalizedPath.FindLast('/');
-	if(slashPos != normalizedPath.Length() - 1)
+	if (slashPos != normalizedPath.Length() - 1)
 		normalizedPath.Truncate(slashPos + 1);
 
 	if (normalizedPath.Length() < cookiePath.Length())
@@ -745,8 +745,7 @@ BNetworkCookie::_ExtractAttributeValuePair(const BString& cookieString,
 		value.SetTo("");
 
 	// values may (or may not) have quotes around them.
-	if(value[0] == '"' && value[value.Length() - 1] == '"')
-	{
+	if (value[0] == '"' && value[value.Length() - 1] == '"') {
 		value.Remove(0, 1);
 		value.Remove(value.Length() - 1, 1);
 	}

@@ -16,7 +16,7 @@
 
 
 BUrlContext::BUrlContext()
-	: 
+	:
 	fCookieJar(),
 	fAuthenticationMap(NULL)
 {
@@ -33,7 +33,7 @@ BUrlContext::~BUrlContext()
 {
 	BHttpAuthenticationMap::Iterator iterator =
 		fAuthenticationMap->GetIterator();
-	while(iterator.HasNext())
+	while (iterator.HasNext())
 		delete *iterator.NextValue();
 
 	delete fAuthenticationMap;
@@ -62,7 +62,7 @@ BUrlContext::AddAuthentication(const BUrl& url,
 
 	// Make sure we don't leak memory by overriding a previous
 	// authentication for the same domain.
-	if(authentication != previous) {
+	if (authentication != previous) {
 		fAuthenticationMap->Put(hostHash, authentication);
 			// replaces the old one
 		delete previous;
@@ -94,7 +94,7 @@ BUrlContext::GetAuthentication(const BUrl& url)
 
 		domain.Truncate(domain.FindLast('/'));
 
-	} while(authentication == NULL);
+	} while (authentication == NULL);
 
 	return *authentication;
 }

@@ -24,7 +24,7 @@ static BUrlContext gDefaultContext;
 BUrlProtocolRoster::MakeRequest(const BUrl& url,
 	BUrlProtocolListener* listener, BUrlContext* context)
 {
-	if(context == NULL)
+	if (context == NULL)
 		context = &gDefaultContext;
 
 	// TODO: instanciate the correct BUrlProtocol using add-on interface

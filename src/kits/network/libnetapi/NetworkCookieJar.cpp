@@ -361,7 +361,7 @@ BNetworkCookieJar::Unflatten(type_code, const void* buffer, ssize_t size)
 BNetworkCookieJar&
 BNetworkCookieJar::operator=(const BNetworkCookieJar& other)
 {
-	if(&other == this)
+	if (&other == this)
 		return *this;
 
 	BArchivable::operator=(other);
@@ -372,8 +372,7 @@ BNetworkCookieJar::operator=(const BNetworkCookieJar& other)
 	delete fCookieHashMap;
 	fCookieHashMap = new PrivateHashMap();
 
-	for (Iterator it = other.GetIterator(); it.HasNext();)
-	{
+	for (Iterator it = other.GetIterator(); it.HasNext();) {
 		BNetworkCookie* cookie = it.Next();
 		AddCookie(*cookie); // Pass by reference so the cookie is copied.
 	}
