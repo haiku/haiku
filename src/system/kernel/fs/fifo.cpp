@@ -62,12 +62,11 @@ public:
 			status_t			CreateBuffer();
 			void				DeleteBuffer();
 
-			ssize_t				Write(const void* buffer, size_t length);
-			ssize_t				Read(void* buffer, size_t length);
+			ssize_t				Write(const void* buffer, size_t length,
+									bool isUser);
+			ssize_t				Read(void* buffer, size_t length, bool isUser);
 			ssize_t				Peek(size_t offset, void* buffer,
 									size_t length) const;
-			ssize_t				UserWrite(const void* buffer, ssize_t length);
-			ssize_t				UserRead(void* buffer, ssize_t length);
 
 			size_t				Readable() const;
 			size_t				Writable() const;
@@ -172,9 +171,11 @@ public:
 			mutex*				RequestLock() { return &fRequestLock; }
 
 			status_t			WriteDataToBuffer(const void* data,
-									size_t* _length, bool nonBlocking);
+									size_t* _length, bool nonBlocking,
+									bool isUser);
 			status_t			ReadDataFromBuffer(void* data, size_t* _length,
-									bool nonBlocking, ReadRequest& request);
+									bool nonBlocking, bool isUser,
+									ReadRequest& request);
 			size_t				BytesAvailable() const
 									{ return fBuffer.Readable(); }
 			size_t				BytesWritable() const
@@ -292,22 +293,30 @@ RingBuffer::DeleteBuffer()
 
 
 inline ssize_t
-RingBuffer::Write(const void* buffer, size_t length)
+RingBuffer::Write(const void* buffer, size_t length, bool isUser)
 {
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
+	if (isUser && !IS_USER_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
 
-	return ring_buffer_write(fBuffer, (const uint8*)buffer, length);
+	return isUser
+		? ring_buffer_user_write(fBuffer, (const uint8*)buffer, length)
+		: ring_buffer_write(fBuffer, (const uint8*)buffer, length);
 }
 
 
 inline ssize_t
-RingBuffer::Read(void* buffer, size_t length)
+RingBuffer::Read(void* buffer, size_t length, bool isUser)
 {
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
+	if (isUser && !IS_USER_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
 
-	return ring_buffer_read(fBuffer, (uint8*)buffer, length);
+	return isUser
+		? ring_buffer_user_read(fBuffer, (uint8*)buffer, length)
+		: ring_buffer_read(fBuffer, (uint8*)buffer, length);
 }
 
 
@@ -318,26 +327,6 @@ RingBuffer::Peek(size_t offset, void* buffer, size_t length) const
 		return B_NO_MEMORY;
 
 	return ring_buffer_peek(fBuffer, offset, (uint8*)buffer, length);
-}
-
-
-inline ssize_t
-RingBuffer::UserWrite(const void* buffer, ssize_t length)
-{
-	if (fBuffer == NULL)
-		return B_NO_MEMORY;
-
-	return ring_buffer_user_write(fBuffer, (const uint8*)buffer, length);
-}
-
-
-inline ssize_t
-RingBuffer::UserRead(void* buffer, ssize_t length)
-{
-	if (fBuffer == NULL)
-		return B_NO_MEMORY;
-
-	return ring_buffer_user_read(fBuffer, (uint8*)buffer, length);
 }
 
 
@@ -400,7 +389,8 @@ Inode::InitCheck()
 	the returned length is > 0, the returned error code can be ignored.
 */
 status_t
-Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking)
+Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking,
+	bool isUser)
 {
 	const uint8* data = (const uint8*)_data;
 	size_t dataSize = *_length;
@@ -452,8 +442,11 @@ Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking)
 		if (toWrite > dataSize)
 			toWrite = dataSize;
 
-		if (toWrite > 0 && fBuffer.UserWrite(data, toWrite) < 0)
-			return B_BAD_ADDRESS;
+		if (toWrite > 0) {
+			ssize_t bytesWritten = fBuffer.Write(data, toWrite, isUser);
+			if (bytesWritten < 0)
+				return bytesWritten;
+		}
 
 		data += toWrite;
 		dataSize -= toWrite;
@@ -468,7 +461,7 @@ Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking)
 
 status_t
 Inode::ReadDataFromBuffer(void* data, size_t* _length, bool nonBlocking,
-	ReadRequest& request)
+	bool isUser, ReadRequest& request)
 {
 	size_t dataSize = *_length;
 	*_length = 0;
@@ -508,8 +501,9 @@ Inode::ReadDataFromBuffer(void* data, size_t* _length, bool nonBlocking,
 	if (toRead > dataSize)
 		toRead = dataSize;
 
-	if (fBuffer.UserRead(data, toRead) < 0)
-		return B_BAD_ADDRESS;
+	ssize_t bytesRead = fBuffer.Read(data, toRead, isUser);
+	if (bytesRead < 0)
+		return bytesRead;
 
 	NotifyBytesRead(toRead);
 
@@ -970,7 +964,8 @@ fifo_read(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	size_t length = *_length;
 	status_t status = inode->ReadDataFromBuffer(buffer, &length,
-		(cookie->open_mode & O_NONBLOCK) != 0, request);
+		(cookie->open_mode & O_NONBLOCK) != 0, is_called_via_syscall(),
+		request);
 
 	inode->RemoveReadRequest(request);
 	inode->NotifyReadDone();
@@ -1006,7 +1001,7 @@ fifo_write(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	// copy data into ring buffer
 	status_t status = inode->WriteDataToBuffer(buffer, &length,
-		(cookie->open_mode & O_NONBLOCK) != 0);
+		(cookie->open_mode & O_NONBLOCK) != 0, is_called_via_syscall());
 
 	if (length > 0)
 		status = B_OK;
