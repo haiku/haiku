@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2007-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -20,7 +20,7 @@
 #include <Select.h>
 
 #include <condition_variable.h>
-#include <debug.h>
+#include <debug_hex_dump.h>
 #include <khash.h>
 #include <lock.h>
 #include <select_sync_pool.h>
@@ -62,6 +62,8 @@ public:
 
 			ssize_t				Write(const void* buffer, size_t length);
 			ssize_t				Read(void* buffer, size_t length);
+			ssize_t				Peek(size_t offset, void* buffer,
+									size_t length) const;
 			ssize_t				UserWrite(const void* buffer, ssize_t length);
 			ssize_t				UserRead(void* buffer, ssize_t length);
 
@@ -102,6 +104,11 @@ public:
 		}
 	}
 
+	Thread* GetThread() const
+	{
+		return fThread;
+	}
+
 	file_cookie* Cookie() const
 	{
 		return fCookie;
@@ -117,10 +124,16 @@ private:
 
 class WriteRequest : public DoublyLinkedListLinkImpl<WriteRequest> {
 public:
-	WriteRequest(size_t minimalWriteCount)
+	WriteRequest(Thread* thread, size_t minimalWriteCount)
 		:
+		fThread(thread),
 		fMinimalWriteCount(minimalWriteCount)
 	{
+	}
+
+	Thread* GetThread() const
+	{
+		return fThread;
 	}
 
 	size_t MinimalWriteCount() const
@@ -129,6 +142,7 @@ public:
 	}
 
 private:
+	Thread*	fThread;
 	size_t	fMinimalWriteCount;
 };
 
@@ -182,6 +196,9 @@ public:
 									int openMode);
 			status_t			Deselect(uint8 event, selectsync* sync,
 									int openMode);
+
+			void				Dump(bool dumpData) const;
+	static	int					Dump(int argc, char** argv);
 
 private:
 			timespec			fCreationTime;
@@ -280,6 +297,16 @@ RingBuffer::Read(void* buffer, size_t length)
 		return B_NO_MEMORY;
 
 	return ring_buffer_read(fBuffer, (uint8*)buffer, length);
+}
+
+
+inline ssize_t
+RingBuffer::Peek(size_t offset, void* buffer, size_t length) const
+{
+	if (fBuffer == NULL)
+		return B_NO_MEMORY;
+
+	return ring_buffer_peek(fBuffer, offset, (uint8*)buffer, length);
 }
 
 
@@ -388,7 +415,7 @@ Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking)
 			ConditionVariableEntry entry;
 			entry.Add(this);
 
-			WriteRequest request(minToWrite);
+			WriteRequest request(thread_get_current_thread(), minToWrite);
 			fWriteRequests.Add(&request);
 
 			mutex_unlock(&fRequestLock);
@@ -710,6 +737,101 @@ Inode::Deselect(uint8 event, selectsync* sync, int openMode)
 
 	remove_select_sync_pool_entry(pool, sync, event);
 	return B_OK;
+}
+
+
+void
+Inode::Dump(bool dumpData) const
+{
+	kprintf("FIFO %p\n", this);
+	kprintf("  active:        %s\n", fActive ? "true" : "false");
+	kprintf("  readers:       %" B_PRId32 "\n", fReaderCount);
+	kprintf("  writers:       %" B_PRId32 "\n", fWriterCount);
+
+	if (!fReadRequests.IsEmpty()) {
+		kprintf(" pending readers:\n");
+		for (ReadRequestList::ConstIterator it = fReadRequests.GetIterator();
+			ReadRequest* request = it.Next();) {
+			kprintf("    %p: thread %" B_PRId32 ", cookie: %p\n", request,
+				request->GetThread()->id, request->Cookie());
+		}
+	}
+
+	if (!fWriteRequests.IsEmpty()) {
+		kprintf(" pending writers:\n");
+		for (WriteRequestList::ConstIterator it = fWriteRequests.GetIterator();
+			WriteRequest* request = it.Next();) {
+			kprintf("    %p:  thread %" B_PRId32 ", min count: %zu\n", request,
+				request->GetThread()->id, request->MinimalWriteCount());
+		}
+	}
+
+	kprintf("  %zu bytes buffered\n", fBuffer.Readable());
+
+	if (dumpData && fBuffer.Readable() > 0) {
+		struct DataProvider : BKernel::HexDumpDataProvider {
+			DataProvider(const RingBuffer& buffer)
+				:
+				fBuffer(buffer),
+				fOffset(0)
+			{
+			}
+
+			virtual bool HasMoreData() const
+			{
+				return fOffset < fBuffer.Readable();
+			}
+
+			virtual uint8 NextByte()
+			{
+				uint8 byte = '\0';
+				if (fOffset < fBuffer.Readable()) {
+					fBuffer.Peek(fOffset, &byte, 1);
+					fOffset++;
+				}
+				return byte;
+			}
+
+			virtual bool GetAddressString(char* buffer, size_t bufferSize) const
+			{
+				snprintf(buffer, bufferSize, "    %4zx", fOffset);
+				return true;
+			}
+
+		private:
+			const RingBuffer&	fBuffer;
+			size_t				fOffset;
+		};
+
+		DataProvider dataProvider(fBuffer);
+		BKernel::print_hex_dump(dataProvider, fBuffer.Readable());
+	}
+}
+
+
+/*static*/ int
+Inode::Dump(int argc, char** argv)
+{
+	bool dumpData = false;
+	int argi = 1;
+	if (argi < argc && strcmp(argv[argi], "-d") == 0) {
+		dumpData = true;
+		argi++;
+	}
+
+	if (argi >= argc || argi + 2 < argc) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	Inode* node = (Inode*)parse_expression(argv[argi]);
+	if (IS_USER_ADDRESS(node)) {
+		kprintf("invalid FIFO address\n");
+		return 0;
+	}
+
+	node->Dump(dumpData);
+	return 0;
 }
 
 
@@ -1134,4 +1256,17 @@ create_fifo_vnode(fs_volume* superVolume, fs_vnode* vnode)
 	vnode->ops = &sFIFOVnodeOps;
 
 	return B_OK;
+}
+
+
+void
+fifo_init()
+{
+	add_debugger_command_etc("fifo", &Inode::Dump,
+		"Print info about the specified FIFO node",
+		"[ \"-d\" ] <address>\n"
+		"Prints information about the FIFO node specified by address\n"
+		"<address>. If \"-d\" is given, the data in the FIFO's ring buffer\n"
+		"hexdumped as well.\n",
+		0);
 }

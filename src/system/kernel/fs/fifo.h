@@ -9,6 +9,7 @@
 
 
 status_t	create_fifo_vnode(fs_volume* superVolume, fs_vnode* vnode);
+void		fifo_init();
 
 
 #endif	// _VFS_FIFO_H

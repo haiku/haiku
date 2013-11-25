@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2011, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -5152,6 +5152,7 @@ vfs_init(kernel_args* args)
 			| B_KERNEL_RESOURCE_ADDRESS_SPACE,
 		0);
 
+	fifo_init();
 	file_map_init();
 
 	return file_cache_init();
