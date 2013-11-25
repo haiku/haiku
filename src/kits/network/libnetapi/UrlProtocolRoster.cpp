@@ -17,10 +17,16 @@
 #include <Debug.h>
 
 
+static BUrlContext gDefaultContext;
+
+
 /* static */ BUrlRequest*
 BUrlProtocolRoster::MakeRequest(const BUrl& url,
 	BUrlProtocolListener* listener, BUrlContext* context)
 {
+	if(context == NULL)
+		context = &gDefaultContext;
+
 	// TODO: instanciate the correct BUrlProtocol using add-on interface
 	if (url.Protocol() == "http") {
 		return new(std::nothrow) BHttpRequest(url, false, "HTTP", listener,
