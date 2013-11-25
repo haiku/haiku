@@ -242,7 +242,8 @@ StreamBase::~StreamBase()
 		avformat_close_input(&fContext);
 	av_free_packet(&fPacket);
 	av_free(fContext);
-	av_free(fIOContext->buffer);
+	if(fIOContext)
+		av_free(fIOContext->buffer);
 	av_free(fIOContext);
 }
 
