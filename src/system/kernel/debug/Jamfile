@@ -15,6 +15,7 @@ KernelMergeObject kernel_debug.o :
 	debug_builtin_commands.cpp
 	debug_commands.cpp
 	debug_heap.cpp
+	debug_hex_dump.cpp
 	debug_paranoia.cpp
 	debug_parser.cpp
 	debug_variables.cpp
