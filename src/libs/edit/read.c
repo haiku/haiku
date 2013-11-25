@@ -419,7 +419,7 @@ el_gets(EditLine *el, int *nread)
 
 #ifdef FIONREAD
 	if (el->el_tty.t_mode == EX_IO && ma->level < 0) {
-		long chrs = 0;
+		int chrs = 0;
 
 		(void) ioctl(el->el_infd, FIONREAD, (ioctl_t) & chrs);
 		if (chrs == 0) {

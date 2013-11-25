@@ -550,17 +550,18 @@ socket_control(net_socket* socket, int32 op, void* data, size_t length)
 			if (data == NULL)
 				return B_BAD_VALUE;
 
-			ssize_t available = socket_read_avail(socket);
-			if (available < B_OK)
+			int available = (int)socket_read_avail(socket);
+			if (available < 0)
 				return available;
 
 			if (is_syscall()) {
 				if (!IS_USER_ADDRESS(data)
-					|| user_memcpy(data, &available, sizeof(ssize_t)) != B_OK) {
+					|| user_memcpy(data, &available, sizeof(available))
+						!= B_OK) {
 					return B_BAD_ADDRESS;
 				}
 			} else
-				*(ssize_t *)data = available;
+				*(int*)data = available;
 
 			return B_OK;
 		}

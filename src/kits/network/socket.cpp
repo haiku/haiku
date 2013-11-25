@@ -315,9 +315,10 @@ getsockopt(int socket, int level, int option, void *value, socklen_t *_length)
 {
 	if (check_r5_compatibility()) {
 		if (option == R5_SO_FIONREAD) {
-			// there is no SO_FIONREAD in our stack; we're using FIONREAD instead
+			// there is no SO_FIONREAD in our stack; we're using FIONREAD
+			// instead
 			*_length = sizeof(int);
-			return ioctl(socket, FIONREAD, &value);
+			return ioctl(socket, FIONREAD, value);
 		}
 
 		convert_from_r5_sockopt(level, option);
