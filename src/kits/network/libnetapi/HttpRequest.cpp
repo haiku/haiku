@@ -463,6 +463,7 @@ BHttpRequest::_MakeRequest()
 					it.MultipartHeader().Length());
 
 				switch (currentField->Type()) {
+					default:
 					case B_HTTPFORM_UNKNOWN:
 						ASSERT(0);
 						break;
@@ -486,9 +487,9 @@ BHttpRequest::_MakeRequest()
 								readSize = upFile.Read(readBuffer,
 									sizeof(readBuffer));
 							}
-						}
-						break;
 
+							break;
+						}
 					case B_HTTPFORM_BUFFER:
 						fSocket->Write(currentField->Buffer(),
 							currentField->BufferSize());
@@ -539,18 +540,18 @@ BHttpRequest::_MakeRequest()
 	bool parseEnd = false;
 	bool readByChunks = false;
 	bool readError = false;
-	int32 receiveBufferSize = 32;
 	ssize_t bytesRead = 0;
 	ssize_t bytesReceived = 0;
 	ssize_t bytesTotal = 0;
-	char* inputTempBuffer = NULL;
+	char* inputTempBuffer = new char[kHttpBufferSize];
+	ssize_t inputTempSize = kHttpBufferSize;
 	ssize_t chunkSize = -1;
 
 	while (!fQuit && !(receiveEnd && parseEnd)) {
 		if (!receiveEnd) {
 			fSocket->WaitForReadable();
-			BNetBuffer chunk(receiveBufferSize);
-			bytesRead = fSocket->Read(chunk.Data(), receiveBufferSize);
+			BNetBuffer chunk(kHttpBufferSize);
+			bytesRead = fSocket->Read(chunk.Data(), kHttpBufferSize);
 
 			if (bytesRead < 0) {
 				readError = true;
@@ -568,11 +569,12 @@ BHttpRequest::_MakeRequest()
 			//! ProtocolHook:ResponseStarted
 			if (fRequestStatus >= kRequestStatusReceived && fListener != NULL)
 				fListener->ResponseStarted(this);
-		} else if (fRequestStatus < kRequestHeadersReceived) {
+		}
+
+		if (fRequestStatus < kRequestHeadersReceived) {
 			_ParseHeaders();
 
 			if (fRequestStatus >= kRequestHeadersReceived) {
-				receiveBufferSize = kHttpBufferSize;
 				_ResultHeaders() = fHeaders;
 
 				//! ProtocolHook:HeadersReceived
@@ -598,7 +600,9 @@ BHttpRequest::_MakeRequest()
 				else
 					bytesTotal = 0;
 			}
-		} else {
+		}
+
+		if (fRequestStatus >= kRequestHeadersReceived) {
 			// If Transfer-Encoding is chunked, we should read a complete
 			// chunk in buffer before handling it
 			if (readByChunks) {
@@ -606,20 +610,23 @@ BHttpRequest::_MakeRequest()
 					if ((ssize_t)fInputBuffer.Size() >= chunkSize + 2) {
 							// 2 more bytes to handle the closing CR+LF
 						bytesRead = chunkSize;
-						inputTempBuffer = new char[chunkSize + 2];
+						if (inputTempSize < chunkSize + 2)
+						{
+							delete[] inputTempBuffer;
+							inputTempSize = chunkSize + 2;
+							inputTempBuffer = new char[inputTempSize];
+						}
 						fInputBuffer.RemoveData(inputTempBuffer,
 							chunkSize + 2);
 						chunkSize = -1;
 					} else {
 						// Not enough data, try again later
 						bytesRead = -1;
-						inputTempBuffer = NULL;
 					}
 				} else {
 					BString chunkHeader;
 					if (_GetLine(chunkHeader) == B_ERROR) {
 						chunkSize = -1;
-						inputTempBuffer = NULL;
 						bytesRead = -1;
 					} else {
 						// Format of a chunk header:
@@ -639,7 +646,6 @@ BHttpRequest::_MakeRequest()
 							fRequestStatus = kRequestContentReceived;
 
 						bytesRead = -1;
-						inputTempBuffer = NULL;
 					}
 				}
 
@@ -651,7 +657,11 @@ BHttpRequest::_MakeRequest()
 				bytesRead = fInputBuffer.Size();
 
 				if (bytesRead > 0) {
-					inputTempBuffer = new char[bytesRead];
+					if (inputTempSize < bytesRead) {
+						inputTempSize = bytesRead;
+						delete[] inputTempBuffer;
+						inputTempBuffer = new char[bytesRead];
+					}
 					fInputBuffer.RemoveData(inputTempBuffer, bytesRead);
 				}
 			}
@@ -667,8 +677,6 @@ BHttpRequest::_MakeRequest()
 
 				if (bytesTotal > 0 && bytesReceived >= bytesTotal)
 					receiveEnd = true;
-
-				delete[] inputTempBuffer;
 			}
 		}
 
@@ -676,6 +684,7 @@ BHttpRequest::_MakeRequest()
 	}
 
 	fSocket->Disconnect();
+	delete[] inputTempBuffer;
 
 	if (readError)
 		return B_PROT_READ_FAILED;
