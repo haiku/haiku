@@ -63,15 +63,13 @@ private:
 			bool 				_ResolveHostName();
 			status_t			_MakeRequest();
 
-			void				_CreateRequest();
-			void				_AddHeaders();
+			void				_SendRequest();
+			void				_SendHeaders();
 
 			status_t			_GetLine(BString& destString);
 
 			void				_ParseStatus();
 			void				_ParseHeaders();
-
-			void				_AddOutputBufferLine(const char* line);
 
 	// URL result parameters access
 			BPositionIO*			_ResultRawData();
@@ -87,7 +85,6 @@ private:
 			BString				fRequestMethod;
 			int8				fHttpVersion;
 
-			BString				fOutputBuffer;
 			BNetBuffer			fInputBuffer;
 
 			BHttpHeaders		fHeaders;

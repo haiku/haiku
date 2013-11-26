@@ -293,7 +293,6 @@ BHttpRequest::_ProtocolLoop()
 		newRequest = false;
 
 		// Result reset
-		fOutputBuffer.Truncate(0, true);
 		fOutputHeaders.Clear();
 		fHeaders.Clear();
 		_ResultHeaders().Clear();
@@ -304,10 +303,6 @@ BHttpRequest::_ProtocolLoop()
 					fUrl.Host().String());
 			return B_PROT_CANT_RESOLVE_HOSTNAME;
 		}
-
-		_CreateRequest();
-		_AddHeaders();
-		_AddOutputBufferLine("");
 
 		status_t requestStatus = _MakeRequest();
 		if (requestStatus != B_PROT_SUCCESS)
@@ -445,20 +440,19 @@ BHttpRequest::_MakeRequest()
 	if (fListener != NULL)
 		fListener->ConnectionOpened(this);
 
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Connection opened.");
+	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Connection opened, sending request.");
 
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Sending request (size=%d)",
-		fOutputBuffer.Length());
-	fSocket->Write(fOutputBuffer.String(), fOutputBuffer.Length());
-	fOutputBuffer.Truncate(0);
+	_SendRequest();
+	_SendHeaders();
+	fSocket->Write("\r\n", 2);
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Request sent.");
 
 	if (fRequestMethod == B_HTTP_POST && fOptPostFields != NULL) {
 		if (fOptPostFields->GetFormType() != B_HTTP_FORM_MULTIPART) {
-			fOutputBuffer = fOptPostFields->RawData();
+			BString outputBuffer = fOptPostFields->RawData();
 			_EmitDebug(B_URL_PROTOCOL_DEBUG_TRANSFER_OUT,
-				"%s", fOutputBuffer.String());
-			fSocket->Write(fOutputBuffer.String(), fOutputBuffer.Length());
+				"%s", outputBuffer.String());
+			fSocket->Write(outputBuffer.String(), outputBuffer.Length());
 		} else {
 			for (BHttpForm::Iterator it = fOptPostFields->GetIterator();
 				const BHttpFormData* currentField = it.Next();
@@ -537,7 +531,6 @@ BHttpRequest::_MakeRequest()
 			fSocket->Write("0\r\n\r\n", 5);
 		}
 	}
-	fOutputBuffer.Truncate(0, true);
 
 	fRequestStatus = kRequestInitialState;
 
@@ -766,7 +759,7 @@ BHttpRequest::_ParseHeaders()
 
 
 void
-BHttpRequest::_CreateRequest()
+BHttpRequest::_SendRequest()
 {
 	BString request(fRequestMethod);
 
@@ -778,28 +771,23 @@ BHttpRequest::_CreateRequest()
 	if (Url().HasRequest())
 		request << '?' << Url().Request();
 
-	if (Url().HasFragment())
-		request << '#' << Url().Fragment();
-
-	request << ' ';
-
 	switch (fHttpVersion) {
 		case B_HTTP_11:
-			request << "HTTP/1.1";
+			request << " HTTP/1.1\r\n";
 			break;
 
 		default:
 		case B_HTTP_10:
-			request << "HTTP/1.0";
+			request << " HTTP/1.0\r\n";
 			break;
 	}
 
-	_AddOutputBufferLine(request.String());
+	fSocket->Write(request.String(), request.Length());
 }
 
 
 void
-BHttpRequest::_AddHeaders()
+BHttpRequest::_SendHeaders()
 {
 	// HTTP 1.1 additional headers
 	if (fHttpVersion == B_HTTP_11) {
@@ -900,16 +888,10 @@ BHttpRequest::_AddHeaders()
 	// Write output headers to output stream
 	for (int32 headerIndex = 0; headerIndex < fOutputHeaders.CountHeaders();
 			headerIndex++) {
-		_AddOutputBufferLine(fOutputHeaders.HeaderAt(headerIndex).Header());
+		const char* header = fOutputHeaders.HeaderAt(headerIndex).Header();
+		fSocket->Write(header, strlen(header));
+		fSocket->Write("\r\n", 2);
 	}
-}
-
-
-void
-BHttpRequest::_AddOutputBufferLine(const char* line)
-{
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_OUT, "%s", line);
-	fOutputBuffer << line << "\r\n";
 }
 
 
