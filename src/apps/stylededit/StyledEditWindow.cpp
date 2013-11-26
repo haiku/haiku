@@ -82,7 +82,8 @@ bs_printf(BString* string, const char* format, ...)
 
 
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
-	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+	fFindWindow(NULL), fReplaceWindow(NULL)
 {
 	_InitWindow(encoding);
 	BString unTitled(B_TRANSLATE("Untitled "));
@@ -95,7 +96,8 @@ StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 
 
 StyledEditWindow::StyledEditWindow(BRect frame, entry_ref* ref, uint32 encoding)
-	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+	fFindWindow(NULL), fReplaceWindow(NULL)
 {
 	_InitWindow(encoding);
 	OpenFile(ref);
@@ -236,10 +238,20 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			break;
 		case MENU_FIND:
 		{
-			BRect findWindowFrame(100, 100, 400, 235);
-			BWindow* window = new FindWindow(findWindowFrame, this,
-				&fStringToFind, fCaseSensitive, fWrapAround, fBackSearch);
-			window->Show();
+			if (fFindWindow == NULL) {
+				BRect findWindowFrame(Frame());
+				findWindowFrame.InsetBy(
+					(findWindowFrame.Width() - 400) / 2,
+					(findWindowFrame.Height() - 235) / 2);
+
+				fFindWindow = new FindWindow(findWindowFrame, this,
+					&fStringToFind, fCaseSensitive, fWrapAround, fBackSearch);
+				fFindWindow->Show();
+
+			} else if (fFindWindow->IsHidden())
+				fFindWindow->Show();
+			else
+				fFindWindow->Activate();
 			break;
 		}
 		case MSG_SEARCH:
@@ -259,11 +271,21 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			break;
 		case MENU_REPLACE:
 		{
-			BRect replaceWindowFrame(100, 100, 400, 284);
-			BWindow* window = new ReplaceWindow(replaceWindowFrame, this,
-				&fStringToFind, &fReplaceString, fCaseSensitive, fWrapAround,
-				fBackSearch);
-			window->Show();
+			if (fReplaceWindow == NULL) {
+				BRect replaceWindowFrame(Frame());
+				replaceWindowFrame.InsetBy(
+					(replaceWindowFrame.Width() - 400) / 2,
+					(replaceWindowFrame.Height() - 284) / 2);
+
+				fReplaceWindow = new ReplaceWindow(replaceWindowFrame, this,
+					&fStringToFind, &fReplaceString, fCaseSensitive,
+					fWrapAround, fBackSearch);
+				fReplaceWindow->Show();
+
+			} else if (fReplaceWindow->IsHidden())
+				fReplaceWindow->Show();
+			else
+				fReplaceWindow->Activate();
 			break;
 		}
 		case MSG_REPLACE:

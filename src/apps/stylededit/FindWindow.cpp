@@ -28,18 +28,18 @@
 
 FindWindow::FindWindow(BRect frame, BHandler* _handler, BString* searchString,
 	bool caseState, bool wrapState, bool backState)
-	: BWindow(frame, "FindWindow", B_MODAL_WINDOW,
+	: BWindow(frame, B_TRANSLATE("Find"), B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_CURRENT_WORKSPACE)
 {
-	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+	AddShortcut('W', B_COMMAND_KEY, new BMessage(MSG_HIDE_WINDOW));
 
 	fSearchString = new BTextControl("", B_TRANSLATE("Find:"), NULL, NULL);
 	fCaseSensBox = new BCheckBox("", B_TRANSLATE("Case-sensitive"), NULL);
 	fWrapBox = new BCheckBox("", B_TRANSLATE("Wrap-around search"), NULL);
 	fBackSearchBox = new BCheckBox("", B_TRANSLATE("Search backwards"), NULL);
 	fCancelButton = new BButton("", B_TRANSLATE("Cancel"),
-		new BMessage(B_QUIT_REQUESTED));
+		new BMessage(MSG_HIDE_WINDOW));
 	fSearchButton = new BButton("", B_TRANSLATE("Find"),
 		new BMessage(MSG_SEARCH));
 
@@ -78,8 +78,9 @@ void
 FindWindow::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-		case B_QUIT_REQUESTED:
-			Quit();
+		case MSG_HIDE_WINDOW:
+			if (!IsHidden())
+				Hide();
 			break;
 		case MSG_SEARCH:
 			_SendMessage();
@@ -100,7 +101,7 @@ FindWindow::DispatchMessage(BMessage* message, BHandler* handler)
 		if (message->FindInt8("byte", 0, &key) == B_OK) {
 			if (key == B_ESCAPE) {
 				message->MakeEmpty();
-				message->what = B_QUIT_REQUESTED;
+				message->what = MSG_HIDE_WINDOW;
 			}
 		}
 	}
@@ -124,5 +125,5 @@ FindWindow::_SendMessage()
 
 	fHandler->Looper()->PostMessage(&message, fHandler);
 
-	PostMessage(B_QUIT_REQUESTED);
+	PostMessage(MSG_HIDE_WINDOW);
 }

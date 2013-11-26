@@ -171,6 +171,9 @@ private:
 			node_ref			fNodeRef;
 			node_ref			fFolderNodeRef;
 			bool				fNagOnNodeChange;
+
+			BWindow*			fFindWindow;
+			BWindow*			fReplaceWindow;
 };
 
 

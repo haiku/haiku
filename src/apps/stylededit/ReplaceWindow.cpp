@@ -31,11 +31,11 @@
 ReplaceWindow::ReplaceWindow(BRect frame, BHandler* _handler,
 	BString* searchString, 	BString* replaceString,
 	bool caseState, bool wrapState, bool backState)
-	: BWindow(frame, "ReplaceWindow", B_MODAL_WINDOW,
+	: BWindow(frame, B_TRANSLATE("Replace"), B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_CURRENT_WORKSPACE)
 {
-	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+	AddShortcut('W', B_COMMAND_KEY, new BMessage(MSG_HIDE_WINDOW));
 
 	fSearchString = new BTextControl("", B_TRANSLATE("Find:"), NULL, NULL);
 	fReplaceString = new BTextControl("", B_TRANSLATE("Replace with:"),
@@ -50,7 +50,7 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler* _handler,
 	fReplaceAllButton = new BButton("", B_TRANSLATE("Replace all"),
 		new BMessage(MSG_REPLACE_ALL));
 	fCancelButton = new BButton("", B_TRANSLATE("Cancel"),
-		new BMessage(B_QUIT_REQUESTED));
+		new BMessage(MSG_HIDE_WINDOW));
 	fReplaceButton = new BButton("", B_TRANSLATE("Replace"),
 		new BMessage(MSG_REPLACE));
 
@@ -106,6 +106,10 @@ ReplaceWindow::MessageReceived(BMessage* msg)
 			_SendMessage(MSG_REPLACE_ALL);
 			break;
 
+		case MSG_HIDE_WINDOW:
+			if (!IsHidden())
+				Hide();
+			break;
 		default:
 			BWindow::MessageReceived(msg);
 			break;
@@ -139,12 +143,12 @@ ReplaceWindow::DispatchMessage(BMessage* message, BHandler* handler)
 		if (message->FindInt8("byte", 0, &key) == B_OK) {
 			if (key == B_ESCAPE) {
 				message->MakeEmpty();
-				message->what = B_QUIT_REQUESTED;
+				message->what = MSG_HIDE_WINDOW;
 
 				// This is a hack, but it actually does what is expected,
 				// unlike the hack above. This kind of key filtering probably
 				// ought to be handled by a BMessageFilter, though.
-				BMessenger (this).SendMessage(B_QUIT_REQUESTED);
+				BMessenger (this).SendMessage(MSG_HIDE_WINDOW);
 			}
 		}
 	}
@@ -170,6 +174,6 @@ ReplaceWindow::_SendMessage(uint32 what)
 
 	fHandler->Looper()->PostMessage(&message, fHandler);
 
-	PostMessage(B_QUIT_REQUESTED);
+	PostMessage(MSG_HIDE_WINDOW);
 }
 

@@ -6,8 +6,8 @@
  *		Mattias Sundblad
  *		Andrew Bachmann
  */
-#ifndef FIND_WINDOW_H 
-#define FIND_WINDOW_H 
+#ifndef FIND_WINDOW_H
+#define FIND_WINDOW_H
 
 
 #include <Window.h>

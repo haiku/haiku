@@ -42,6 +42,7 @@ const uint32 MENU_REPLACE_SAME			= 'MErs';
 const uint32 MSG_SEARCH					= 'msea';
 const uint32 MSG_REPLACE				= 'msre';
 const uint32 MSG_REPLACE_ALL			= 'mrea';
+const uint32 MSG_HIDE_WINDOW			= 'mhdw';
 
 // "Font"-menu
 const uint32 FONT_SIZE					= 'FMsi';
