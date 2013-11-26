@@ -1,14 +1,15 @@
 /*
- * Copyright 2004-2012, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2013 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Mike Berg <mike@berg-net.us>
- *		Julun <host.haiku@gmx.de>
- *		Philippe Saint-Pierre <stpere@gmail.com>
- *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
- *		Oliver Tappe <zooey@hirschkaefer.de>
- *		Hamish Morrison <hamish@lavabit.com>
+ *		Mike Berg, mike@berg-net.us
+ *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
+ *		Julun, host.haiku@gmx.de
+ *		Hamish Morrison, hamish@lavabit.com
+ *		Philippe Saint-Pierre, stpere@gmail.com
+ *		John Scipione, jscipione@gmail.com
+ *		Oliver Tappe, zooey@hirschkaefer.de
  */
 
 
@@ -316,15 +317,19 @@ TimeZoneView::_BuildZoneMenu()
 
 	ZonesByCountyMap::const_iterator countryIter = zonesByCountryMap.begin();
 	for (; countryIter != zonesByCountryMap.end(); ++countryIter) {
-		BCountry country(countryIter->first.String());
-		BString countryName;
-		country.GetName(countryName);
+		const char* countryCode = countryIter->first.String();
+		if (countryCode == NULL)
+			continue;
 
 		size_t zoneCountInCountry = countryIter->second.size();
 		for (size_t tz = 0; tz < zoneCountInCountry; tz++) {
 			BString zoneID(countryIter->second[tz]);
-			int32 slashPos = zoneID.FindFirst('/');
+			BTimeZone* timeZone
+				= new(std::nothrow) BTimeZone(zoneID, &language);
+			if (timeZone == NULL)
+				continue;
 
+			int32 slashPos = zoneID.FindFirst('/');
 			BString region(zoneID, slashPos);
 			if (region == "Etc")
 				region = kOtherRegion;
@@ -336,29 +341,35 @@ TimeZoneView::_BuildZoneMenu()
 				continue;
 
 			BString fullCountryID = regionIter->second;
+			BCountry* country = new(std::nothrow) BCountry(countryCode);
+			if (country == NULL)
+				continue;
+
+			BString countryName;
+			country->GetName(countryName);
+			bool hasUsedCountry = false;
 			bool countryIsRegion = countryName == regionIter->second
 				|| region == kOtherRegion;
 			if (!countryIsRegion)
 				fullCountryID << "/" << countryName;
 
-			BTimeZone* timeZone = new BTimeZone(zoneID, &language);
-			BString tzName;
+			BString timeZoneName;
 			BString fullZoneID = fullCountryID;
 			if (zoneCountInCountry > 1) {
 				// we can't use the country name as timezone name, since there
 				// are more than one timezones in this country - fetch the
 				// localized name of the timezone and use that
-				tzName = timeZone->Name();
-				int32 openParenthesisPos = tzName.FindFirst('(');
+				timeZoneName = timeZone->Name();
+				int32 openParenthesisPos = timeZoneName.FindFirst('(');
 				if (openParenthesisPos >= 0) {
-					tzName.Remove(0, openParenthesisPos + 1);
-					int32 closeParenthesisPos = tzName.FindLast(')');
+					timeZoneName.Remove(0, openParenthesisPos + 1);
+					int32 closeParenthesisPos = timeZoneName.FindLast(')');
 					if (closeParenthesisPos >= 0)
-						tzName.Truncate(closeParenthesisPos);
+						timeZoneName.Truncate(closeParenthesisPos);
 				}
-				fullZoneID << "/" << tzName;
+				fullZoneID << "/" << timeZoneName;
 			} else {
-				tzName = countryName;
+				timeZoneName = countryName;
 				fullZoneID << "/" << zoneID;
 			}
 
@@ -375,17 +386,22 @@ TimeZoneView::_BuildZoneMenu()
 				ZoneItemMap::iterator countryIter
 					= zoneItemMap.find(fullCountryID);
 				if (countryIter == zoneItemMap.end()) {
-					countryItem = new TimeZoneListItem(countryName, NULL, NULL);
+					countryItem = new TimeZoneListItem(countryName.String(),
+						country, NULL);
 					countryItem->SetOutlineLevel(1);
 					zoneItemMap[fullCountryID] = countryItem;
+					hasUsedCountry = true;
 				} else
 					countryItem = countryIter->second;
 
-				zoneItem = new TimeZoneListItem(tzName, NULL, timeZone);
+				zoneItem = new TimeZoneListItem(timeZoneName.String(),
+					NULL, timeZone);
 				zoneItem->SetOutlineLevel(countryIsRegion ? 1 : 2);
 			} else {
-				zoneItem = new TimeZoneListItem(tzName, NULL, timeZone);
+				zoneItem = new TimeZoneListItem(timeZoneName.String(),
+					country, timeZone);
 				zoneItem->SetOutlineLevel(1);
+				hasUsedCountry = true;
 			}
 			zoneItemMap[fullZoneID] = zoneItem;
 
@@ -399,6 +415,9 @@ TimeZoneView::_BuildZoneMenu()
 				if (regionItemIter != zoneItemMap.end())
 					regionItemIter->second->SetExpanded(true);
 			}
+
+			if (!hasUsedCountry)
+				delete country;
 		}
 	}
 
@@ -406,7 +425,7 @@ TimeZoneView::_BuildZoneMenu()
 
 	ZoneItemMap::iterator zoneIter;
 	bool lastWasCountryItem = false;
-	TimeZoneListItem* currentCountryItem = NULL;
+	TimeZoneListItem* currentItem = NULL;
 	for (zoneIter = zoneItemMap.begin(); zoneIter != zoneItemMap.end();
 			++zoneIter) {
 		if (zoneIter->second->OutlineLevel() == 2 && lastWasCountryItem) {
@@ -418,17 +437,23 @@ TimeZoneView::_BuildZoneMenu()
 			++next;
 			if (next != zoneItemMap.end()
 				&& next->second->OutlineLevel() != 2) {
-				fZoneList->RemoveItem(currentCountryItem);
-				zoneIter->second->SetText(currentCountryItem->Text());
+				fZoneList->RemoveItem(currentItem);
+				zoneIter->second->SetText(currentItem->Text());
+				zoneIter->second->SetCountry(currentItem->HasCountry()
+					? new(std::nothrow) BCountry(currentItem->Country())
+					: NULL);
+				zoneIter->second->SetTimeZone(currentItem->HasTimeZone()
+					? new(std::nothrow) BTimeZone(currentItem->TimeZone())
+					: NULL);
 				zoneIter->second->SetOutlineLevel(1);
-				delete currentCountryItem;
+				delete currentItem;
 			}
 		}
 
 		fZoneList->AddItem(zoneIter->second);
 		if (zoneIter->second->OutlineLevel() == 1) {
 			lastWasCountryItem = true;
-			currentCountryItem = zoneIter->second;
+			currentItem = zoneIter->second;
 		} else
 			lastWasCountryItem = false;
 	}

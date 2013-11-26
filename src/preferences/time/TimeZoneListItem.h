@@ -21,20 +21,36 @@ class TimeZoneListItem : public BStringItem {
 public:
 								TimeZoneListItem(const char* text,
 									BCountry* country, BTimeZone* timeZone);
-								~TimeZoneListItem();
+	virtual						~TimeZoneListItem();
 
-			void				DrawItem(BView* owner, BRect frame,
+	virtual	void				DrawItem(BView* owner, BRect frame,
 									bool complete = false);
 
-			bool				HasTimeZone() const;
-			const BTimeZone&	TimeZone() const;
+	virtual	void				Update(BView* owner, const BFont* font);
+
+			bool				HasCountry() const
+									{ return fCountry != NULL; };
+			const BCountry&		Country() const { return *fCountry; };
+			void				SetCountry(BCountry* country);
+
+			bool				HasTimeZone() const
+									{ return fTimeZone != NULL; };
+			const BTimeZone&	TimeZoneListItem::TimeZone() const
+									{ return *fTimeZone; };
+			void				SetTimeZone(BTimeZone* timeZone);
+
 			const BString&		ID() const;
 			const BString&		Name() const;
 			int					OffsetFromGMT() const;
 
 private:
-			BBitmap*			fIcon;
+			void				_DrawItemWithTextOffset(BView* owner,
+									BRect frame, bool complete,
+									float textOffset);
+
+			BCountry*			fCountry;
 			BTimeZone*			fTimeZone;
+			BBitmap*			fIcon;
 };
 
 
