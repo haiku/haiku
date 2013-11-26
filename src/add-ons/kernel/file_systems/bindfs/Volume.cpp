@@ -33,6 +33,7 @@ Volume::Volume(fs_volume* fsVolume)
 	:
 	fFSVolume(fsVolume),
 	fSourceFSVolume(NULL),
+	fSourceVnode(NULL),
 	fRootNode(NULL)
 {
 }
@@ -40,6 +41,8 @@ Volume::Volume(fs_volume* fsVolume)
 
 Volume::~Volume()
 {
+	if (fSourceVnode != NULL)
+		vfs_put_vnode(fSourceVnode);
 }
 
 
@@ -57,13 +60,12 @@ Volume::Mount(const char* parameterString)
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
-	struct vnode* sourceVnode;
-	status_t error = vfs_get_vnode_from_path(source, true, &sourceVnode);
+	status_t error = vfs_get_vnode_from_path(source, true, &fSourceVnode);
 	if (error != B_OK)
 		RETURN_ERROR(error);
-	if (sourceVnode == NULL)
+	if (fSourceVnode == NULL)
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
-	fs_vnode* sourceFSNode = vfs_fsnode_for_vnode(sourceVnode);
+	fs_vnode* sourceFSNode = vfs_fsnode_for_vnode(fSourceVnode);
 	fSourceFSVolume = volume_for_vnode(sourceFSNode);
 
 	struct stat st;

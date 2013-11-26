@@ -10,6 +10,7 @@
 
 
 class Node;
+struct vnode;
 
 
 class Volume {
@@ -41,6 +42,7 @@ private:
 private:
 			fs_volume*			fFSVolume;
 			fs_volume*			fSourceFSVolume;
+			vnode*				fSourceVnode;
 			Node*				fRootNode;
 
 			fs_vnode_ops		fVnodeOps;
