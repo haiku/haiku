@@ -778,11 +778,11 @@ put_back(Thread* thread)
 		gPinnedRunQueues[pinnedCPU].PushFront(thread,
 			get_effective_priority(thread));
 	} else {
-		int32 previougCore = thread->scheduler_data->previous_core;
-		ASSERT(previougCore >= 0);
+		int32 previousCore = thread->scheduler_data->previous_core;
+		ASSERT(previousCore >= 0);
 
-		ASSERT(previougCore == core);
-		gRunQueues[previougCore].PushFront(thread,
+		ASSERT(previousCore == core);
+		gRunQueues[previousCore].PushFront(thread,
 			get_effective_priority(thread));
 	}
 }
@@ -809,9 +809,6 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 	thread->priority = priority;
 
 	if (thread->state != B_THREAD_READY) {
-		cancel_penalty(thread);
-		thread->priority = priority;
-
 		if (thread->state == B_THREAD_RUNNING)
 			update_cpu_priority(thread->cpu->cpu_num, priority);
 		return oldPriority;
@@ -821,11 +818,15 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 	// a new position.
 
 	bool pinned = thread->pinned_to_cpu > 0;
-	int32 previougCPU = thread->previous_cpu->cpu_num;
-	int32 previougCore = thread->scheduler_data->previous_core;
-	ASSERT(previougCore >= 0);
+	int32 previousCPU;
+	if (pinned) {
+		ASSERT(thread->previous_cpu != NULL);
+		previousCPU = thread->previous_cpu->cpu_num;
+	}
+	int32 previousCore = thread->scheduler_data->previous_core;
+	ASSERT(previousCore >= 0);
 
-	SpinLocker runQueueLocker(gCoreEntries[previougCore].fQueueLock);
+	SpinLocker runQueueLocker(gCoreEntries[previousCore].fQueueLock);
 
 	// the thread might have been already dequeued and is about to start
 	// running once we release its scheduler_lock, in such case we can not
@@ -839,9 +840,9 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 
 		thread->scheduler_data->enqueued = false;
 		if (pinned)
-			gPinnedRunQueues[previougCPU].Remove(thread);
+			gPinnedRunQueues[previousCPU].Remove(thread);
 		else
-			gRunQueues[previougCore].Remove(thread);
+			gRunQueues[previousCore].Remove(thread);
 		runQueueLocker.Unlock();
 
 		enqueue(thread, true);
