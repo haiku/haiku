@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src apps stylededit ;
 
 UsePrivateHeaders textencoding ;
+UsePublicHeaders [ FDirName be_apps Tracker ] ;
 
 local styled_edit_rsrc =
 	[ FGristFiles StyledEdit.rsrc ]

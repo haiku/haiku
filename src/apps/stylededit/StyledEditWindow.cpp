@@ -39,6 +39,7 @@
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <PrintJob.h>
+#include <RecentItems.h>
 #include <Rect.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -572,34 +573,6 @@ StyledEditWindow::MessageReceived(BMessage* message)
 void
 StyledEditWindow::MenusBeginning()
 {
-	// set up the recent documents menu
-	BMessage documents;
-	be_roster->GetRecentDocuments(&documents, 9, NULL, APP_SIGNATURE);
-
-	// delete old items..
-	//    shatty: it would be preferable to keep the old
-	//            menu around instead of continuously thrashing
-	//            the menu, but unfortunately there does not
-	//            seem to be a straightforward way to update it
-	// going backwards may simplify memory management
-	for (int i = fRecentMenu->CountItems(); i-- > 0;) {
-		delete fRecentMenu->RemoveItem(i);
-	}
-
-	// add new items
-	int count = 0;
-	entry_ref ref;
-	while (documents.FindRef("refs", count++, &ref) == B_OK) {
-		if (ref.device != -1 && ref.directory != -1) {
-			// sanity check passed
-			BMessage* openRecent = new BMessage(B_REFS_RECEIVED);
-			openRecent->AddRef("refs", &ref);
-			BMenuItem* item = new BMenuItem(ref.name, openRecent);
-			item->SetTarget(be_app);
-			fRecentMenu->AddItem(item);
-		}
-	}
-
 	// update the font menu
 	// unselect the old values
 	if (fCurrentFontItem != NULL) {
@@ -793,10 +766,6 @@ StyledEditWindow::Save(BMessage* message)
 		fSaveMessage = new BMessage(*message);
 	}
 
-	entry_ref ref;
-	if (entry.GetRef(&ref) == B_OK)
-		be_roster->AddToRecentDocuments(&ref, APP_SIGNATURE);
-
 	// clear clean modes
 	fSaveItem->SetEnabled(false);
 	fUndoCleans = false;
@@ -873,7 +842,6 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 		return;
 	}
 
-	be_roster->AddToRecentDocuments(ref, APP_SIGNATURE);
 	fSaveMessage = new BMessage(B_SAVE_REQUESTED);
 	if (fSaveMessage) {
 		BEntry entry(ref, true);
@@ -1118,9 +1086,9 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		new BMessage(MENU_NEW), 'N'));
 	menuItem->SetTarget(be_app);
 
-	menu->AddItem(menuItem = new BMenuItem(fRecentMenu
-		= new BMenu(B_TRANSLATE("Open" B_UTF8_ELLIPSIS)),
-			new BMessage(MENU_OPEN)));
+	menu->AddItem(menuItem = new BMenuItem(BRecentFilesList::NewFileListMenu(
+		B_TRANSLATE("Open"B_UTF8_ELLIPSIS), NULL, NULL, be_app, 9, true,
+		NULL, APP_SIGNATURE), new BMessage(MENU_OPEN)));
 	menuItem->SetShortcut('O', 0);
 	menuItem->SetTarget(be_app);
 	menu->AddSeparatorItem();
@@ -2053,7 +2021,6 @@ StyledEditWindow::_HandleNodeMonitorEvent(BMessage *message)
 				}
 
 				SetTitle(name);
-				be_roster->AddToRecentDocuments(&newRef, APP_SIGNATURE);
 
 				if (srcFolder != dstFolder) {
 					_SwitchNodeMonitor(false);

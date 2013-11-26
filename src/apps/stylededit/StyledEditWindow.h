@@ -105,7 +105,6 @@ private:
 			BMenuBar*			fMenuBar;
 			BMessage*			fPrintSettings;
 			BMessage*			fSaveMessage;
-			BMenu*				fRecentMenu;
 
 			BMenu*				fFontMenu;
 			BMenu*				fFontSizeMenu;
@@ -140,6 +139,7 @@ private:
 			BMenuItem*			fAlignCenter;
 			BMenuItem*			fAlignRight;
 			BMenuItem*			fEncodingItem;
+			BMenuItem*			fRecentMenuItem;
 
 			BString				fStringToFind;
 			BString				fReplaceString;
