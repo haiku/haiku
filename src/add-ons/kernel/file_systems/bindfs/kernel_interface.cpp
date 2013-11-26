@@ -587,8 +587,26 @@ bindfs_create(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
-	return sourceNode->ops->create(sourceVolume, sourceNode, name, openMode,
+	error = sourceNode->ops->create(sourceVolume, sourceNode, name, openMode,
 		perms, _cookie, _newVnodeID);
+	if (error != B_OK)
+		return error;
+
+	error = get_vnode(fsVolume, *_newVnodeID, NULL);
+
+	// on error remove the newly created source entry
+	if (error != B_OK)
+		sourceNode->ops->unlink(sourceVolume, sourceNode, name);
+
+	// create() on the source gave us a reference we don't need any longer
+	vnode* newSourceVnode;
+	if (vfs_lookup_vnode(sourceVolume->id, *_newVnodeID, &newSourceVnode)
+			== B_OK) {
+		vfs_put_vnode(newSourceVnode);
+	}
+
+	return error;
+
 }
 
 
