@@ -638,7 +638,7 @@ BHttpForm::_ExtractNameValuePair(const BString& formString, int32* index)
 
 		*index = firstAmpersand + 1;
 	}
-	
+
 	AddString(name, value);
 }
 
@@ -675,10 +675,10 @@ BHttpForm::_GetMultipartHeader(const BHttpFormData* element) const
 		case B_HTTPFORM_FILE:
 		{
 			result << "; filename=\"" << element->File().Leaf() << '"';
-			
+
 			BNode fileNode(element->File().Path());
 			BNodeInfo fileInfo(&fileNode);
-			
+
 			result << "\r\nContent-Type: ";
 			char tempMime[128];
 			if (fileInfo.GetType(tempMime) == B_OK)
@@ -778,7 +778,6 @@ BHttpForm::Iterator::_FindNext()
 	if (fStdIterator != fForm->fFields.end()) {
 		fElement = &fStdIterator->second;
 		fStdIterator++;
-	}
-	else
+	} else
 		fElement = NULL;
 }

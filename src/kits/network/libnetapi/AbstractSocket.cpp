@@ -97,8 +97,9 @@ BAbstractSocket::SetTimeout(bigtime_t timeout)
 
 	if (setsockopt(fSocket, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(timeval)) != 0
 		|| setsockopt(fSocket, SOL_SOCKET, SO_RCVTIMEO, &tv,
-				sizeof(timeval)) != 0)
+			sizeof(timeval)) != 0) {
 		return errno;
+	}
 
 	return B_OK;
 }

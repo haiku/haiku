@@ -12,7 +12,7 @@
 #include <stdio.h>
 
 
-static const char* kProtocolThreadStrStatus[B_PROT_THREAD_STATUS__END+1]
+static const char* kProtocolThreadStrStatus[B_PROT_THREAD_STATUS__END + 1]
 	=  {
 		"Request successfully completed",
 		"Request running",

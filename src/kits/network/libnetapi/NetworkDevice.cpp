@@ -844,8 +844,9 @@ BNetworkDevice::GetNextAssociatedNetwork(uint32& cookie,
 		return status;
 
 	if (mac[0] == 0 && mac[1] == 0 && mac[2] == 0 && mac[3] == 0 && mac[4] == 0
-		&& mac[5] == 0)
+			&& mac[5] == 0) {
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	address.SetToLinkLevel(mac, IEEE80211_ADDR_LEN);
 	cookie++;

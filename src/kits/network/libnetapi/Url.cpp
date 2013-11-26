@@ -759,9 +759,9 @@ BUrl::_DoUrlEncodeChunk(const BString& chunk, bool strict, bool directory)
 
 	for (int32 i = 0; i < chunk.Length(); i++) {
 		if (_IsUnreserved(chunk[i])
-			|| (directory && (chunk[i] == '/' || chunk[i] == '\\')))
+				|| (directory && (chunk[i] == '/' || chunk[i] == '\\'))) {
 			result << chunk[i];
-		else {
+		} else {
 			if (chunk[i] == ' ' && !strict) {
 				result << '+';
 					// In non-strict mode, spaces are encoded by a plus sign
@@ -789,7 +789,7 @@ BUrl::_DoUrlDecodeChunk(const BString& chunk, bool strict)
 		else if (chunk[i] != '%')
 			result << chunk[i];
 		else {
-			char hexString[] = { chunk[i+1], chunk[i+2], 0 };
+			char hexString[] = { chunk[i + 1], chunk[i + 2], 0 };
 			result << (char)strtol(hexString, NULL, 16);
 
 			i += 2;
@@ -818,31 +818,22 @@ BUrl::_IsProtocolValid()
 bool
 BUrl::_IsUnreserved(char c)
 {
-	if (isalnum(c) || c == '-' || c == '.' || c == '_' || c == '~')
-		return true;
-	else
-		return false;
+	return isalnum(c) || c == '-' || c == '.' || c == '_' || c == '~';
 }
 
 
 bool
 BUrl::_IsGenDelim(char c)
 {
-	if (c == ':' || c == '/' || c == '?' || c == '#' || c == '['
-		|| c == ']' || c == '@')
-		return true;
-	else
-		return false;
+	return c == ':' || c == '/' || c == '?' || c == '#' || c == '['
+		|| c == ']' || c == '@';
 }
 
 
 bool
 BUrl::_IsSubDelim(char c)
 {
-	if (c == '!' || c == '$' || c == '&' || c == '\'' || c == '('
+	return c == '!' || c == '$' || c == '&' || c == '\'' || c == '('
 		|| c == ')' || c == '*' || c == '+' || c == ',' || c == ';'
-		|| c == '=')
-		return true;
-	else
-		return false;
+		|| c == '=';
 }

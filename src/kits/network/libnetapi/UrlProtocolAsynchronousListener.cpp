@@ -30,9 +30,10 @@ BUrlProtocolAsynchronousListener::BUrlProtocolAsynchronousListener(
 	else
 		PRINT(("Cannot lock be_app\n"));
 
-	if (transparent)
+	if (transparent) {
 		fSynchronousListener
 			= new(std::nothrow) BUrlProtocolDispatchingListener(this);
+	}
 }
 
 
@@ -65,13 +66,11 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 	}
 
 	BUrlRequest* caller;
-	if (message->FindPointer(kUrlProtocolCaller,
-		reinterpret_cast<void**>(&caller)) != B_OK)
+	if (message->FindPointer(kUrlProtocolCaller, (void**)&caller) != B_OK)
 		return;
 
 	int8 notification;
-	if (message->FindInt8(kUrlProtocolMessageType, &notification)
-		!= B_OK)
+	if (message->FindInt8(kUrlProtocolMessageType, &notification) != B_OK)
 		return;
 
 	switch (notification) {

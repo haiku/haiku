@@ -142,10 +142,10 @@ void BNetDebug::Dump(const char* data, size_t size, const char* title)
 
     if ( ! g_NetDebugEnabled)
         return;
-        
+
     fprintf( stderr, "----------\n%s\n(dumping %ld bytes)\n",
     	title ? title : "(untitled)", size );
-    
+
     if (! data)
     	fprintf(stderr, "NULL data!\n");
     else {
@@ -157,18 +157,18 @@ void BNetDebug::Dump(const char* data, size_t size, const char* title)
 		for ( i = 0; i < size; i += 16 )	{
 			ptr = text;
 
-	      	for ( j = i; j < i+16 ; j++ ) {
+	      	for ( j = i; j < i + 16 ; j++ ) {
 				if ( j < size )
 					sprintf(ptr, "%02x ", byte[j]);
 				else
 					sprintf(ptr, "   ");
 				ptr += 3;
 			};
-			
+
 			strcat(ptr, "| ");
 			ptr += 2;
-			
-			for (j = i; j < size && j < i+16;j++) {
+
+			for (j = i; j < size && j < i + 16;j++) {
 				if ( byte[j] >= 0x20 && byte[j] < 0x7e )
 					*ptr = byte[j];
 				else
@@ -187,4 +187,3 @@ void BNetDebug::Dump(const char* data, size_t size, const char* title)
 
 
 /*=------------------------------------------------------------------- End -=*/
-

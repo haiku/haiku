@@ -453,11 +453,8 @@ BNetworkCookie::IsValidForDomain(const BString& domain) const
 	// Otherwise, the domains must match exactly, or the domain must have a dot
 	// character just before the common suffix.
 	const char* suffix = domain.String() + difference;
-	if (strcmp(suffix, cookieDomain.String()) == 0 && (difference == 0
-			|| domain[difference - 1] == '.'))
-		return true;
-
-	return false;
+	return (strcmp(suffix, cookieDomain.String()) == 0 && (difference == 0
+		|| domain[difference - 1] == '.'));
 }
 
 

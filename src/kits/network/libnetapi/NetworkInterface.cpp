@@ -401,8 +401,9 @@ BNetworkInterface::FindAddress(const BNetworkAddress& address)
 	memcpy(&request.ifra_addr, &address.SockAddr(), address.Length());
 
 	if (ioctl(socket, B_SOCKET_GET_ALIAS, &request, sizeof(struct ifaliasreq))
-			< 0)
+			< 0) {
 		return -1;
+	}
 
 	return request.ifra_index;
 }
@@ -425,8 +426,9 @@ BNetworkInterface::FindFirstAddress(int family)
 	request.ifra_addr.ss_family = AF_UNSPEC;
 
 	if (ioctl(socket, B_SOCKET_GET_ALIAS, &request, sizeof(struct ifaliasreq))
-			< 0)
+			< 0) {
 		return -1;
+	}
 
 	return request.ifra_index;
 }

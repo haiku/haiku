@@ -603,11 +603,12 @@ BHttpRequest::_MakeRequest()
 			// chunk in buffer before handling it
 			if (readByChunks) {
 				if (chunkSize >= 0) {
-					if ((ssize_t)fInputBuffer.Size() >= chunkSize + 2)  {
+					if ((ssize_t)fInputBuffer.Size() >= chunkSize + 2) {
 							// 2 more bytes to handle the closing CR+LF
 						bytesRead = chunkSize;
-						inputTempBuffer = new char[chunkSize+2];
-						fInputBuffer.RemoveData(inputTempBuffer, chunkSize+2);
+						inputTempBuffer = new char[chunkSize + 2];
+						fInputBuffer.RemoveData(inputTempBuffer,
+							chunkSize + 2);
 						chunkSize = -1;
 					} else {
 						// Not enough data, try again later
@@ -634,9 +635,8 @@ BHttpRequest::_MakeRequest()
 						chunkSize = strtol(chunkHeader.String(), NULL, 16);
 						PRINT(("BHP[%p] Chunk %s=%ld\n", this,
 							chunkHeader.String(), chunkSize));
-						if (chunkSize == 0) {
+						if (chunkSize == 0)
 							fRequestStatus = kRequestContentReceived;
-						}
 
 						bytesRead = -1;
 						inputTempBuffer = NULL;

@@ -512,8 +512,7 @@ BNetworkCookieJar::Iterator::Remove()
 		if (fLastList->CountItems() == 1) {
 			fIterator->fCookieMapIterator.Remove();
 			delete fLastList;
-		}
-		else
+		} else
 			fLastList->RemoveItemAt(fLastList->CountItems() - 1);
 	} else {
 		fIndex--;

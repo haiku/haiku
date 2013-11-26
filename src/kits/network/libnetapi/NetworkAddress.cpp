@@ -1008,8 +1008,9 @@ BNetworkAddress::Equals(const BNetworkAddress& other, bool includePort) const
 		return true;
 
 	if (Family() != other.Family()
-		|| (includePort && Port() != other.Port()))
+			|| (includePort && Port() != other.Port())) {
 		return false;
+	}
 
 	switch (fAddress.ss_family) {
 		case AF_INET:

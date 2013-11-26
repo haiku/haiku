@@ -18,8 +18,9 @@ strip_port(BString& host, BString& port)
 	int32 first = host.FindFirst(':');
 	int32 separator = host.FindLast(':');
 	if (separator != first
-		&& (separator == 0 || host.ByteAt(separator - 1) != ']'))
+			&& (separator == 0 || host.ByteAt(separator - 1) != ']')) {
 		return false;
+	}
 
 	if (separator != -1) {
 		// looks like there is a port
