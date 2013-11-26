@@ -141,7 +141,14 @@ bindfs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	return get_vnode(fsVolume, *_vnid, NULL);
+	error = get_vnode(fsVolume, *_vnid, NULL);
+
+	// lookup() on the source gave us a reference we don't need any longer
+	vnode* sourceChildVnode;
+	if (vfs_lookup_vnode(sourceVolume->id, *_vnid, &sourceChildVnode) == B_OK)
+		vfs_put_vnode(sourceChildVnode);
+
+	return error;
 }
 
 
