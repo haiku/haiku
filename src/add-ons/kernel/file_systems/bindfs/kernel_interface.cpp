@@ -29,6 +29,12 @@
 
 	TODO: path filter, such that /dev can be bind-mounted with only a subset
 		  of entries
+
+	TODO: Since the source node IDs are used for our nodes, this doesn't work
+		  for source trees with submounts.
+
+	TODO: There's no file cache support (required for mmap()). We implement the
+		  hooks, but they aren't used.
 */
 
 
@@ -228,6 +234,10 @@ bindfs_remove_vnode(fs_volume* fsVolume, fs_vnode* fsNode, bool reenter)
 // #pragma mark - VM access
 
 
+// TODO: These hooks are obsolete. Since we don't create a file cache, they
+// aren't needed anyway.
+
+
 static bool
 bindfs_can_page(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 {
@@ -280,6 +290,9 @@ bindfs_write_pages(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 
 
 // #pragma mark - Request I/O
+
+
+// TODO: Since we don't create a file cache, these hooks aren't needed.
 
 
 static status_t
