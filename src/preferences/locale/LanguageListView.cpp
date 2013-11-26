@@ -18,6 +18,7 @@
 
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <FormattingConventions.h>
 #include <GradientLinear.h>
 #include <LocaleRoster.h>
@@ -31,8 +32,6 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "LanguageListView"
 
-
-static const float kLeftInset = 4;
 
 LanguageListItem::LanguageListItem(const char* text, const char* id,
 	const char* languageCode)
@@ -64,6 +63,9 @@ void
 LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
 	bool complete, float textOffset)
 {
+	rgb_color highColor = owner->HighColor();
+	rgb_color lowColor = owner->LowColor();
+
 	if (IsSelected() || complete) {
 		rgb_color color;
 		if (IsSelected())
@@ -93,9 +95,13 @@ LanguageListItem::DrawItemWithTextOffset(BView* owner, BRect frame,
 			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	}
 
-	owner->MovePenTo(frame.left + kLeftInset + textOffset,
+	owner->MovePenTo(
+		frame.left + be_control_look->DefaultLabelSpacing() + textOffset,
 		frame.top + BaselineOffset());
 	owner->DrawString(text.String());
+
+	owner->SetHighColor(highColor);
+	owner->SetLowColor(lowColor);
 }
 
 
@@ -134,7 +140,7 @@ LanguageListItemWithFlag::Update(BView* owner, const BFont* font)
 	LanguageListItem::Update(owner, font);
 
 	float iconSize = Height();
-	SetWidth(Width() + iconSize + 4);
+	SetWidth(Width() + iconSize + be_control_look->DefaultLabelSpacing());
 
 	if (fCountryCode.IsEmpty())
 		return;
@@ -158,10 +164,13 @@ LanguageListItemWithFlag::DrawItem(BView* owner, BRect frame, bool complete)
 	}
 
 	float iconSize = fIcon->Bounds().Width();
-	DrawItemWithTextOffset(owner, frame, complete, iconSize + 4);
+	DrawItemWithTextOffset(owner, frame, complete,
+		iconSize + be_control_look->DefaultLabelSpacing());
 
-	BRect iconFrame(frame.left + kLeftInset, frame.top,
-		frame.left + kLeftInset + iconSize - 1, frame.top + iconSize - 1);
+	BRect iconFrame(frame.left + be_control_look->DefaultLabelSpacing(),
+		frame.top,
+		frame.left + iconSize - 1 + be_control_look->DefaultLabelSpacing(),
+		frame.top + iconSize - 1);
 	owner->SetDrawingMode(B_OP_OVER);
 	owner->DrawBitmap(fIcon, iconFrame);
 	owner->SetDrawingMode(B_OP_COPY);
