@@ -130,7 +130,7 @@ BStringItem::Text() const
 void
 BStringItem::Update(BView *owner, const BFont *font)
 {
-	if (fText) {
+	if (fText != NULL) {
 		SetWidth(font->StringWidth(fText)
 			+ be_control_look->DefaultLabelSpacing());
 	}
