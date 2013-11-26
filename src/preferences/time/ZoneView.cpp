@@ -223,7 +223,8 @@ TimeZoneView::_InitView()
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
 
 	fLocalTime = new BRadioButton("localTime",
-		B_TRANSLATE("Local time (Windows compatible)"), new BMessage(kRTCUpdate));
+		B_TRANSLATE("Local time (Windows compatible)"),
+			new BMessage(kRTCUpdate));
 	fGmtTime = new BRadioButton("greenwichMeanTime",
 		B_TRANSLATE("GMT (UNIX compatible)"), new BMessage(kRTCUpdate));
 
@@ -267,11 +268,9 @@ TimeZoneView::_BuildZoneMenu()
 	BLanguage language;
 	BLocale::Default()->GetLanguage(&language);
 
-	/*
-	 * Group timezones by regions, but filter out unwanted (duplicate) regions
-	 * and add an additional region with generic GMT-offset timezones at the end
-	 */
-	typedef	std::map<BString, TimeZoneListItem*, TimeZoneItemLess> ZoneItemMap;
+	// Group timezones by regions, but filter out unwanted (duplicate) regions
+	// and add an additional region with generic GMT-offset timezones at the end
+	typedef std::map<BString, TimeZoneListItem*, TimeZoneItemLess> ZoneItemMap;
 	ZoneItemMap zoneItemMap;
 	const char* kOtherRegion = B_TRANSLATE_MARK("<Other>");
 	const char* kSupportedRegions[] = {
@@ -283,9 +282,10 @@ TimeZoneView::_BuildZoneMenu()
 		kOtherRegion,
 		NULL
 	};
+
 	// Since the zone-map contains translated country-names (we get those from
 	// ICU), we need to use translated region names in the zone-map, too:
-	typedef	std::map<BString, BString> TranslatedRegionMap;
+	typedef std::map<BString, BString> TranslatedRegionMap;
 	TranslatedRegionMap regionMap;
 	for (const char** region = kSupportedRegions; *region != NULL; ++region) {
 		BString translatedRegion = B_TRANSLATE_NOCOLLECT(*region);
@@ -303,15 +303,15 @@ TimeZoneView::_BuildZoneMenu()
 
 	typedef std::map<BString, std::vector<const char*> > ZonesByCountyMap;
 	ZonesByCountyMap zonesByCountryMap;
-	const char *zoneID;
-	BString countryCode;
+	const char* zoneID;
+	BString timeZoneCode;
 	for (int tz = 0; zoneList.FindString("timeZone", tz, &zoneID) == B_OK
-			&& zoneList.FindString("region", tz, &countryCode) == B_OK; tz++) {
+			&& zoneList.FindString("region", tz, &timeZoneCode) == B_OK; tz++) {
 		// From the global ("001") timezones, we only accept the generic GMT
 		// timezones, as all the other world-zones are duplicates of others.
-		if (countryCode == "001" && strncmp(zoneID, "Etc/GMT", 7) != 0)
+		if (timeZoneCode == "001" && strncmp(zoneID, "Etc/GMT", 7) != 0)
 			continue;
-		zonesByCountryMap[countryCode].push_back(zoneID);
+		zonesByCountryMap[timeZoneCode].push_back(zoneID);
 	}
 
 	ZonesByCountyMap::const_iterator countryIter = zonesByCountryMap.begin();
@@ -336,16 +336,15 @@ TimeZoneView::_BuildZoneMenu()
 				continue;
 
 			BString fullCountryID = regionIter->second;
-			bool countryIsRegion
-				= countryName == regionIter->second || region == kOtherRegion;
+			bool countryIsRegion = countryName == regionIter->second
+				|| region == kOtherRegion;
 			if (!countryIsRegion)
 				fullCountryID << "/" << countryName;
 
 			BTimeZone* timeZone = new BTimeZone(zoneID, &language);
 			BString tzName;
 			BString fullZoneID = fullCountryID;
-			if (zoneCountInCountry > 1)
-			{
+			if (zoneCountInCountry > 1) {
 				// we can't use the country name as timezone name, since there
 				// are more than one timezones in this country - fetch the
 				// localized name of the timezone and use that
@@ -394,6 +393,7 @@ TimeZoneView::_BuildZoneMenu()
 				fCurrentZoneItem = zoneItem;
 				if (countryItem != NULL)
 					countryItem->SetExpanded(true);
+
 				ZoneItemMap::iterator regionItemIter
 					= zoneItemMap.find(regionIter->second);
 				if (regionItemIter != zoneItemMap.end())
@@ -408,13 +408,12 @@ TimeZoneView::_BuildZoneMenu()
 	bool lastWasCountryItem = false;
 	TimeZoneListItem* currentCountryItem = NULL;
 	for (zoneIter = zoneItemMap.begin(); zoneIter != zoneItemMap.end();
-		++zoneIter) {
+			++zoneIter) {
 		if (zoneIter->second->OutlineLevel() == 2 && lastWasCountryItem) {
-			/* Some countries (e.g. Spain and Chile) have their timezones
-			 * spread across different regions. As a result, there might still
-			 * be country items with only one timezone below them. We manually
-			 * filter those country items here.
-			 */
+			// Some countries (e.g. Spain and Chile) have their timezones
+			// spread across different regions. As a result, there might still
+			// be country items with only one timezone below them. We manually
+			// filter those country items here.
 			ZoneItemMap::iterator next = zoneIter;
 			++next;
 			if (next != zoneItemMap.end()
@@ -469,7 +468,7 @@ TimeZoneView::_UpdatePreview()
 	TimeZoneListItem* item
 		= selection < 0
 			? NULL
-			: (TimeZoneListItem*)fZoneList->ItemAt(selection);
+			: static_cast<TimeZoneListItem*>(fZoneList->ItemAt(selection));
 
 	if (item == NULL || !item->HasTimeZone()) {
 		fPreview->SetText("");
