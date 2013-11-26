@@ -77,14 +77,17 @@ BStringItem::DrawItem(BView *owner, BRect frame, bool complete)
 	rgb_color lowColor = owner->LowColor();
 
 	if (IsSelected() || complete) {
-		if (IsSelected()) {
-			owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
-			owner->SetLowColor(owner->HighColor());
-		} else
-			owner->SetHighColor(lowColor);
+		rgb_color color;
+		if (IsSelected())
+			color = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+		else
+			color = owner->ViewColor();
 
+		owner->SetLowColor(color);
+		owner->SetHighColor(color);
 		owner->FillRect(frame);
-	}
+	} else
+		owner->SetLowColor(owner->ViewColor());
 
 	owner->MovePenTo(frame.left + be_control_look->DefaultLabelSpacing(),
 		frame.top + fBaselineOffset);
