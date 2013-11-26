@@ -548,7 +548,7 @@ choose_cpu(int32 core)
 }
 
 
-static bool
+static void
 choose_core_and_cpu(Thread* thread, int32& targetCore, int32& targetCPU)
 {
 	if (targetCore == -1 && targetCPU != -1)
@@ -562,19 +562,6 @@ choose_core_and_cpu(Thread* thread, int32& targetCore, int32& targetCPU)
 
 	ASSERT(targetCore >= 0 && targetCore < gRunQueueCount);
 	ASSERT(targetCPU >= 0 && targetCPU < smp_get_num_cpus());
-
-	int32 targetPriority = gCPUEntries[targetCPU].fPriority;
-	int32 threadPriority = get_effective_priority(thread);
-
-	if (threadPriority > targetPriority) {
-		// It is possible that another CPU schedules the thread before the
-		// target CPU. However, since the target CPU is sent an ICI it will
-		// reschedule anyway and update its heap key to the correct value.
-		update_cpu_priority(targetCPU, threadPriority);
-		return true;
-	}
-
-	return false;
 }
 
 
@@ -716,7 +703,7 @@ enqueue(Thread* thread, bool newOne)
 		targetCore = schedulerThreadData->previous_core;
 	}
 
-	bool shouldReschedule = choose_core_and_cpu(thread, targetCore, targetCPU);
+	choose_core_and_cpu(thread, targetCore, targetCPU);
 	schedulerThreadData->previous_core = targetCore;
 
 	TRACE("enqueueing thread %ld with priority %ld on CPU %ld (core %ld)\n",
@@ -734,7 +721,14 @@ enqueue(Thread* thread, bool newOne)
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
 
-	if (shouldReschedule) {
+	int32 targetPriority = gCPUEntries[targetCPU].fPriority;
+
+	if (threadPriority > targetPriority) {
+		// It is possible that another CPU schedules the thread before the
+		// target CPU. However, since the target CPU is sent an ICI it will
+		// reschedule anyway and update its heap key to the correct value.
+		update_cpu_priority(targetCPU, threadPriority);
+
 		if (targetCPU == smp_get_current_cpu())
 			gCPU[targetCPU].invoke_scheduler = true;
 		else {
@@ -1638,7 +1632,7 @@ create_debug_heaps()
 
 
 static status_t
-_scheduler_init()
+init()
 {
 	// create logical processor to core and package mappings
 	int32 cpuCount, coreCount, packageCount;
@@ -1751,18 +1745,6 @@ _scheduler_init()
 	if (result != B_OK)
 		return result;
 
-	scheduler_set_operation_mode(SCHEDULER_MODE_LOW_LATENCY);
-
-	add_debugger_command_etc("run_queue", &dump_run_queue,
-		"List threads in run queue", "\nLists threads in run queue", 0);
-	add_debugger_command_etc("cpu_heap", &dump_cpu_heap,
-		"List CPUs in CPU priority heap", "\nList CPUs in CPU priority heap",
-		0);
-	if (!gSingleCore) {
-		add_debugger_command_etc("idle_cores", &dump_idle_cores,
-			"List idle cores", "\nList idle cores", 0);
-	}
-
 	runQueuesDeleter.Detach();
 	pinnedRunQueuesDeleter.Detach();
 	coreHighLoadHeapDeleter.Detach();
@@ -1784,9 +1766,21 @@ scheduler_init(void)
 		" cache level%s\n", cpuCount, cpuCount != 1 ? "s" : "",
 		gCPUCacheLevelCount, gCPUCacheLevelCount != 1 ? "s" : "");
 
-	status_t result = _scheduler_init();
+	status_t result = init();
 	if (result != B_OK)
 		panic("scheduler_init: failed to initialize scheduler\n");
+
+	scheduler_set_operation_mode(SCHEDULER_MODE_LOW_LATENCY);
+
+	add_debugger_command_etc("run_queue", &dump_run_queue,
+		"List threads in run queue", "\nLists threads in run queue", 0);
+	add_debugger_command_etc("cpu_heap", &dump_cpu_heap,
+		"List CPUs in CPU priority heap", "\nList CPUs in CPU priority heap",
+		0);
+	if (!gSingleCore) {
+		add_debugger_command_etc("idle_cores", &dump_idle_cores,
+			"List idle cores", "\nList idle cores", 0);
+	}
 
 #if SCHEDULER_TRACING
 	add_debugger_command_etc("scheduler", &cmd_scheduler,
@@ -1883,3 +1877,4 @@ _user_get_scheduler_mode(void)
 {
 	return sCurrentModeID;
 }
+
