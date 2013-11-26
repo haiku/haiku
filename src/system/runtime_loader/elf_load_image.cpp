@@ -377,7 +377,7 @@ parse_elf_header(elf_ehdr* eheader, int32* _pheaderSize,
 
 status_t
 load_image(char const* name, image_type type, const char* rpath,
-	image_t** _image)
+	const char* requestingObjectPath, image_t** _image)
 {
 	int32 pheaderSize, sheaderSize;
 	char path[PATH_MAX];
@@ -421,7 +421,7 @@ load_image(char const* name, image_type type, const char* rpath,
 
 	// find and open the file
 	fd = open_executable(path, type, rpath, get_program_path(),
-		sSearchPathSubDir);
+		requestingObjectPath, sSearchPathSubDir);
 	if (fd < 0) {
 		FATAL("Cannot open file %s: %s\n", name, strerror(fd));
 		KTRACE("rld: load_container(\"%s\"): failed to open file", name);

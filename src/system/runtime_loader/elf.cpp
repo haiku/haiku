@@ -119,7 +119,7 @@ load_immediate_dependencies(image_t *image)
 				const char *name = STRING(image, neededOffset);
 
 				status_t loadStatus = load_image(name, B_LIBRARY_IMAGE,
-					rpath, &image->needed[j]);
+					rpath, image->path, &image->needed[j]);
 				if (loadStatus < B_OK) {
 					status = loadStatus;
 					// correct error code in case the file could not been found
@@ -308,7 +308,7 @@ preload_image(char const* path)
 	KTRACE("rld: preload_image(\"%s\")", path);
 
 	image_t *image = NULL;
-	status_t status = load_image(path, B_LIBRARY_IMAGE, NULL, &image);
+	status_t status = load_image(path, B_LIBRARY_IMAGE, NULL, NULL, &image);
 	if (status < B_OK) {
 		KTRACE("rld: preload_image(\"%s\") failed to load container: %s", path,
 			strerror(status));
@@ -410,7 +410,7 @@ load_program(char const *path, void **_entry)
 
 	TRACE(("rld: load %s\n", path));
 
-	status = load_image(path, B_APP_IMAGE, NULL, &gProgramImage);
+	status = load_image(path, B_APP_IMAGE, NULL, NULL, &gProgramImage);
 	if (status < B_OK)
 		goto err;
 
@@ -516,7 +516,7 @@ load_library(char const *path, uint32 flags, bool addOn, void** _handle)
 		}
 	}
 
-	status = load_image(path, type, NULL, &image);
+	status = load_image(path, type, NULL, NULL, &image);
 	if (status < B_OK) {
 		rld_unlock();
 		KTRACE("rld: load_library(\"%s\") failed to load container: %s", path,

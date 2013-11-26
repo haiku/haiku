@@ -94,10 +94,59 @@ search_path_for_type(image_type type)
 }
 
 
+static bool
+replace_executable_path_placeholder(const char*& dir, int& dirLength,
+	const char* placeholder, size_t placeholderLength,
+	const char* replacementSubPath, char*& buffer, size_t& bufferSize,
+	status_t& _error)
+{
+	if (dirLength < (int)placeholderLength
+		|| strncmp(dir, placeholder, placeholderLength) != 0) {
+		return false;
+	}
+
+	if (replacementSubPath == NULL) {
+		_error = B_ENTRY_NOT_FOUND;
+		return true;
+	}
+
+	char* lastSlash = strrchr(replacementSubPath, '/');
+
+	// Copy replacementSubPath without the last component (the application file
+	// name, respectively the requesting executable file name).
+	size_t toCopy;
+	if (lastSlash != NULL) {
+		toCopy = lastSlash - replacementSubPath;
+		strlcpy(buffer, replacementSubPath,
+			std::min((ssize_t)bufferSize, lastSlash + 1 - replacementSubPath));
+	} else {
+		replacementSubPath = ".";
+		toCopy = 1;
+		strlcpy(buffer, ".", bufferSize);
+	}
+
+	if (toCopy >= bufferSize) {
+		_error = B_NAME_TOO_LONG;
+		return true;
+	}
+
+	memcpy(buffer, replacementSubPath, toCopy);
+	buffer[toCopy] = '\0';
+
+	buffer += toCopy;
+	bufferSize -= toCopy;
+	dir += placeholderLength;
+	dirLength -= placeholderLength;
+
+	_error = B_OK;
+	return true;
+}
+
+
 static int
 try_open_executable(const char *dir, int dirLength, const char *name,
-	const char *programPath, const char *abiSpecificSubDir, char *path,
-	size_t pathLength)
+	const char *programPath, const char *requestingObjectPath,
+	const char *abiSpecificSubDir, char *path, size_t pathLength)
 {
 	size_t nameLength = strlen(name);
 	struct stat stat;
@@ -111,24 +160,12 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 		if (programPath == NULL)
 			programPath = gProgramArgs->program_path;
 
-		if (dirLength >= 2 && strncmp(dir, "%A", 2) == 0) {
-			// Replace %A with current app folder path (of course,
-			// this must be the first part of the path)
-			char *lastSlash = strrchr(programPath, '/');
-			int bytesCopied;
-
-			// copy what's left (when the application name is removed)
-			if (lastSlash != NULL) {
-				strlcpy(buffer, programPath,
-					std::min((long)pathLength, lastSlash + 1 - programPath));
-			} else
-				strlcpy(buffer, ".", pathLength);
-
-			bytesCopied = strlen(buffer);
-			buffer += bytesCopied;
-			pathLength -= bytesCopied;
-			dir += 2;
-			dirLength -= 2;
+		if (replace_executable_path_placeholder(dir, dirLength, "%A", 2,
+				programPath, buffer, pathLength, status)
+			|| replace_executable_path_placeholder(dir, dirLength, "$ORIGIN", 7,
+				requestingObjectPath, buffer, pathLength, status)) {
+			if (status != B_OK)
+				return status;
 		} else if (abiSpecificSubDir != NULL) {
 			// We're looking for a library or an add-on and the executable has
 			// not been compiled with a compiler using the same ABI as the one
@@ -187,8 +224,8 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 
 static int
 search_executable_in_path_list(const char *name, const char *pathList,
-	int pathListLen, const char *programPath, const char *abiSpecificSubDir,
-	char *pathBuffer, size_t pathBufferLength)
+	int pathListLen, const char *programPath, const char *requestingObjectPath,
+	const char *abiSpecificSubDir, char *pathBuffer, size_t pathBufferLength)
 {
 	const char *pathListEnd = pathList + pathListLen;
 	status_t status = B_ENTRY_NOT_FOUND;
@@ -205,7 +242,8 @@ search_executable_in_path_list(const char *name, const char *pathList,
 			pathEnd++;
 
 		fd = try_open_executable(pathList, pathEnd - pathList, name,
-			programPath, abiSpecificSubDir, pathBuffer, pathBufferLength);
+			programPath, requestingObjectPath, abiSpecificSubDir, pathBuffer,
+			pathBufferLength);
 		if (fd >= 0) {
 			// see if it's a dir
 			struct stat stat;
@@ -228,7 +266,8 @@ search_executable_in_path_list(const char *name, const char *pathList,
 
 int
 open_executable(char *name, image_type type, const char *rpath,
-	const char *programPath, const char *abiSpecificSubDir)
+	const char *programPath, const char *requestingObjectPath,
+	const char *abiSpecificSubDir)
 {
 	char buffer[PATH_MAX];
 	int fd = B_ENTRY_NOT_FOUND;
@@ -266,12 +305,13 @@ open_executable(char *name, image_type type, const char *rpath,
 			// If there is no ';', we set only secondList to simplify things.
 		if (firstList) {
 			fd = search_executable_in_path_list(name, firstList,
-				semicolon - firstList, programPath, NULL, buffer,
-				sizeof(buffer));
+				semicolon - firstList, programPath, requestingObjectPath, NULL,
+				buffer, sizeof(buffer));
 		}
 		if (fd < 0) {
 			fd = search_executable_in_path_list(name, secondList,
-				strlen(secondList), programPath, NULL, buffer, sizeof(buffer));
+				strlen(secondList), programPath, requestingObjectPath, NULL,
+				buffer, sizeof(buffer));
 		}
 	}
 
@@ -280,7 +320,7 @@ open_executable(char *name, image_type type, const char *rpath,
 	if (fd < 0) {
 		if (const char *paths = search_path_for_type(type)) {
 			fd = search_executable_in_path_list(name, paths, strlen(paths),
-				programPath, abiSpecificSubDir, buffer, sizeof(buffer));
+				programPath, NULL, abiSpecificSubDir, buffer, sizeof(buffer));
 		}
 	}
 
@@ -337,7 +377,7 @@ test_executable(const char *name, char *invoker)
 
 	strlcpy(path, name, sizeof(path));
 
-	fd = open_executable(path, B_APP_IMAGE, NULL, NULL, NULL);
+	fd = open_executable(path, B_APP_IMAGE, NULL, NULL, NULL, NULL);
 	if (fd < B_OK)
 		return fd;
 

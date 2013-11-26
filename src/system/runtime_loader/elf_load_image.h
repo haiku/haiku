@@ -11,7 +11,7 @@
 status_t	parse_elf_header(elf_ehdr* eheader, int32* _pheaderSize,
 				int32* _sheaderSize);
 status_t	load_image(char const* name, image_type type, const char* rpath,
-				image_t** _image);
+				const char* requestingObjectPath, image_t** _image);
 
 
 #endif	// ELF_LOAD_IMAGE_H
