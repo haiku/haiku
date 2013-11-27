@@ -51,6 +51,13 @@ public:
 									// does a natural compare over major, minor
 									// and micro, finally comparing revision
 
+	inline	bool				operator==(const BPackageVersion& other) const;
+	inline	bool				operator!=(const BPackageVersion& other) const;
+	inline	bool				operator<(const BPackageVersion& other) const;
+	inline	bool				operator>(const BPackageVersion& other) const;
+	inline	bool				operator<=(const BPackageVersion& other) const;
+	inline	bool				operator>=(const BPackageVersion& other) const;
+
 private:
 			BString				fMajor;
 			BString				fMinor;
@@ -58,6 +65,48 @@ private:
 			BString				fPreRelease;
 			uint32				fRevision;
 };
+
+
+inline bool
+BPackageVersion::operator==(const BPackageVersion& other) const
+{
+	return Compare(other) == 0;
+}
+
+
+inline bool
+BPackageVersion::operator!=(const BPackageVersion& other) const
+{
+	return Compare(other) != 0;
+}
+
+
+inline bool
+BPackageVersion::operator<(const BPackageVersion& other) const
+{
+	return Compare(other) < 0;
+}
+
+
+inline bool
+BPackageVersion::operator>(const BPackageVersion& other) const
+{
+	return Compare(other) > 0;
+}
+
+
+inline bool
+BPackageVersion::operator<=(const BPackageVersion& other) const
+{
+	return Compare(other) <= 0;
+}
+
+
+inline bool
+BPackageVersion::operator>=(const BPackageVersion& other) const
+{
+	return Compare(other) >= 0;
+}
 
 
 }	// namespace BPackageKit
