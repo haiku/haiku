@@ -30,8 +30,6 @@ namespace Scheduler {
 
 
 const bigtime_t kThreadQuantum = 1000;
-const bigtime_t kMinThreadQuantum = 3000;
-const bigtime_t kMaxThreadQuantum = 10000;
 
 const bigtime_t kCacheExpire = 100000;
 

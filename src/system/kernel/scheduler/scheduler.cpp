@@ -27,6 +27,7 @@
 #include <scheduler_defs.h>
 #include <smp.h>
 #include <timer.h>
+#include <util/Random.h>
 
 #include <cpufreq.h>
 
@@ -1768,18 +1769,20 @@ _user_estimate_max_scheduling_latency(thread_id id)
 	}
 	BReference<Thread> threadReference(thread, true);
 
-	// TODO: This is probably meant to be called periodically to return the
-	// current estimate depending on the system usage; we return fixed estimates
-	// per thread priority, though.
+	int32 core = thread->scheduler_data->previous_core;
+	if (core == -1)
+		core = get_random<int32>() % gCoreCount;
 
-	if (thread->priority >= B_REAL_TIME_DISPLAY_PRIORITY)
-		return kMinThreadQuantum / 4;
-	if (thread->priority >= B_DISPLAY_PRIORITY)
-		return kMinThreadQuantum;
-	if (thread->priority < B_NORMAL_PRIORITY)
-		return 2 * kMaxThreadQuantum;
+	int32 threadCount = gCoreEntries[core].fThreadCount;
+	if (gCoreEntries[core].fCPUCount > 0)
+		threadCount /= gCoreEntries[core].fCPUCount;
 
-	return 2 * kMinThreadQuantum;
+	if (get_effective_priority(thread) > 0) {
+		threadCount -= threadCount * THREAD_MAX_SET_PRIORITY
+				/ get_effective_priority(thread);
+	}
+
+	return max_c(threadCount * kThreadQuantum, kThreadQuantum / 5);
 }
 
 
