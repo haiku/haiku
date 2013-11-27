@@ -27,6 +27,7 @@ public:
 
 			BString				Name() const;
 			BString				VersionedName() const;
+			const BPackageVersion& Version() const;
 
 			BSolverPackage&		operator=(const BSolverPackage& other);
 

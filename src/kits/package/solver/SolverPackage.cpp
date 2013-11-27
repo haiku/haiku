@@ -66,6 +66,13 @@ BSolverPackage::VersionedName() const
 }
 
 
+const BPackageVersion&
+BSolverPackage::Version() const
+{
+	return fInfo.Version();
+}
+
+
 BSolverPackage&
 BSolverPackage::operator=(const BSolverPackage& other)
 {
