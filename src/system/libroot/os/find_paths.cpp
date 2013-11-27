@@ -87,8 +87,8 @@ public:
 
 	static InstallationLocations* Default()
 	{
-		char sBuffer[sizeof(InstallationLocations)];
-		InstallationLocations* sDefaultLocations
+		static char sBuffer[sizeof(InstallationLocations)];
+		static InstallationLocations* sDefaultLocations
 			= new(&sBuffer) InstallationLocations;
 		return sDefaultLocations;
 	}
