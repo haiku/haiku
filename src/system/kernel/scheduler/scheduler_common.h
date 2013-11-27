@@ -106,7 +106,7 @@ struct PackageEntry : public DoublyLinkedListLinkImpl<PackageEntry> {
 
 	int32						fPackageID;
 
-	spinlock					fCoreLock;
+	rw_spinlock					fCoreLock;
 
 	DoublyLinkedList<CoreEntry>	fIdleCores;
 	int32						fIdleCoreCount;
@@ -117,7 +117,7 @@ typedef DoublyLinkedList<PackageEntry> IdlePackageList;
 
 extern PackageEntry* gPackageEntries;
 extern IdlePackageList* gIdlePackageList;
-extern spinlock gIdlePackageLock;
+extern rw_spinlock gIdlePackageLock;
 extern int32 gPackageCount;
 
 // The run queues. Holds the threads ready to run ordered by priority.

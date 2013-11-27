@@ -89,12 +89,12 @@ choose_idle_core(void)
 	}
 
 	if (current == NULL) {
-		SpinLocker _(gIdlePackageLock);
+		ReadSpinLocker _(gIdlePackageLock);
 		current = gIdlePackageList->Last();
 	}
 
 	if (current != NULL) {
-		SpinLocker _(current->fCoreLock);
+		ReadSpinLocker _(current->fCoreLock);
 		return current->fIdleCores.Last();
 	}
 

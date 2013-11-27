@@ -63,7 +63,7 @@ choose_core(Thread* thread)
 {
 	CoreEntry* entry = NULL;
 
-	SpinLocker locker(gIdlePackageLock);
+	ReadSpinLocker locker(gIdlePackageLock);
 	// wake new package
 	PackageEntry* package = gIdlePackageList->Last();
 	if (package == NULL) {
@@ -73,7 +73,7 @@ choose_core(Thread* thread)
 	locker.Unlock();
 
 	if (package != NULL) {
-		SpinLocker _(package->fCoreLock);
+		ReadSpinLocker _(package->fCoreLock);
 		entry = package->fIdleCores.Last();
 	}
 

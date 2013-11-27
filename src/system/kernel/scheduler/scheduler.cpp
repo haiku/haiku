@@ -66,7 +66,7 @@ int32 gCoreCount;
 
 PackageEntry* gPackageEntries;
 IdlePackageList* gIdlePackageList;
-spinlock gIdlePackageLock = B_SPINLOCK_INITIALIZER;
+rw_spinlock gIdlePackageLock = B_RW_SPINLOCK_INITIALIZER;
 int32 gPackageCount;
 
 ThreadRunQueue* gRunQueues;
@@ -132,7 +132,7 @@ PackageEntry::PackageEntry()
 	fIdleCoreCount(0),
 	fCoreCount(0)
 {
-	B_INITIALIZE_SPINLOCK(&fCoreLock);
+	B_INITIALIZE_RW_SPINLOCK(&fCoreLock);
 }
 
 
@@ -457,7 +457,7 @@ update_cpu_priority(int32 cpu, int32 priority)
 	int32 package = gCPUToPackage[cpu];
 	PackageEntry* packageEntry = &gPackageEntries[package];
 	if (maxPriority == B_IDLE_PRIORITY) {
-		SpinLocker _(packageEntry->fCoreLock);
+		WriteSpinLocker _(packageEntry->fCoreLock);
 
 		// core goes idle
 		ASSERT(packageEntry->fIdleCoreCount >= 0);
@@ -468,11 +468,11 @@ update_cpu_priority(int32 cpu, int32 priority)
 
 		if (packageEntry->fIdleCoreCount == packageEntry->fCoreCount) {
 			// package goes idle
-			SpinLocker _(gIdlePackageLock);
+			WriteSpinLocker _(gIdlePackageLock);
 			gIdlePackageList->Add(packageEntry);
 		}
 	} else if (corePriority == B_IDLE_PRIORITY) {
-		SpinLocker _(packageEntry->fCoreLock);
+		WriteSpinLocker _(packageEntry->fCoreLock);
 
 		// core wakes up
 		ASSERT(packageEntry->fIdleCoreCount > 0);
@@ -483,7 +483,7 @@ update_cpu_priority(int32 cpu, int32 priority)
 
 		if (packageEntry->fIdleCoreCount + 1 == packageEntry->fCoreCount) {
 			// package wakes up
-			SpinLocker _(gIdlePackageLock);
+			WriteSpinLocker _(gIdlePackageLock);
 			gIdlePackageList->Remove(packageEntry);
 		}
 	}
@@ -956,9 +956,6 @@ choose_next_thread(int32 thisCPU, Thread* oldThread, bool putAtBack)
 static inline void
 track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 {
-	bigtime_t now = system_time();
-	bigtime_t usedTime = now - oldThread->scheduler_data->quantum_start;
-
 	if (!thread_is_idle_thread(oldThread)) {
 		bigtime_t active
 			= (oldThread->kernel_time - oldThread->cpu->last_kernel_time)
@@ -975,9 +972,6 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 	compute_thread_load(nextThread);
 	if (!gSingleCore && !gCPU[smp_get_current_cpu()].disabled)
 		compute_cpu_load(smp_get_current_cpu());
-
-	int32 oldPriority = get_effective_priority(oldThread);
-	int32 nextPriority = get_effective_priority(nextThread);
 
 	if (!thread_is_idle_thread(nextThread)) {
 		oldThread->cpu->last_kernel_time = nextThread->kernel_time;
