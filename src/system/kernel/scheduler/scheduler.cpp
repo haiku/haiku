@@ -61,15 +61,15 @@ CoreEntry* gCoreEntries;
 CoreLoadHeap* gCoreLoadHeap;
 CoreLoadHeap* gCoreHighLoadHeap;
 rw_spinlock gCoreHeapsLock = B_RW_SPINLOCK_INITIALIZER;
+int32 gCoreCount;
 
 PackageEntry* gPackageEntries;
 IdlePackageList* gIdlePackageList;
-spinlock gIdlePackageLock;
-int32 gPackageCount = B_SPINLOCK_INITIALIZER;
+spinlock gIdlePackageLock = B_SPINLOCK_INITIALIZER;
+int32 gPackageCount;
 
 ThreadRunQueue* gRunQueues;
 ThreadRunQueue* gPinnedRunQueues;
-int32 gRunQueueCount;
 
 int32* gCPUToCore;
 int32* gCPUToPackage;
@@ -163,46 +163,6 @@ scheduler_thread_data::Init()
 }
 
 
-static inline int
-get_minimal_priority(Thread* thread)
-{
-	return max_c(min_c(thread->priority, 25) / 5, 1);
-}
-
-
-static inline int32
-get_thread_penalty(Thread* thread)
-{
-	int32 penalty = thread->scheduler_data->priority_penalty;
-
-	const int kMinimalPriority = get_minimal_priority(thread);
-	if (kMinimalPriority > 0) {
-		penalty
-			+= thread->scheduler_data->additional_penalty % kMinimalPriority;
-	}
-
-	return penalty;
-}
-
-
-static inline int32
-get_effective_priority(Thread* thread)
-{
-	if (thread->priority == B_IDLE_PRIORITY)
-		return thread->priority;
-	if (thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
-		return thread->priority;
-
-	int32 effectivePriority = thread->priority;
-	effectivePriority -= get_thread_penalty(thread);
-
-	ASSERT(effectivePriority < B_FIRST_REAL_TIME_PRIORITY);
-	ASSERT(effectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
-
-	return effectivePriority;
-}
-
-
 static void
 dump_queue(ThreadRunQueue::ConstIterator& iterator)
 {
@@ -224,7 +184,7 @@ static int
 dump_run_queue(int argc, char **argv)
 {
 	int32 cpuCount = smp_get_num_cpus();
-	int32 coreCount = gRunQueueCount;
+	int32 coreCount = gCoreCount;
 
 	ThreadRunQueue::ConstIterator iterator;
 	for (int32 i = 0; i < coreCount; i++) {
@@ -305,7 +265,7 @@ dump_cpu_heap(int argc, char** argv)
 	dump_core_load_heap(gCoreLoadHeap);
 	dump_core_load_heap(gCoreHighLoadHeap);
 
-	for (int32 i = 0; i < gRunQueueCount; i++) {
+	for (int32 i = 0; i < gCoreCount; i++) {
 		if (gCoreEntries[i].fCPUCount < 2)
 			continue;
 
@@ -559,7 +519,7 @@ choose_core_and_cpu(Thread* thread, int32& targetCore, int32& targetCPU)
 		targetCPU = choose_cpu(targetCore);
 	}
 
-	ASSERT(targetCore >= 0 && targetCore < gRunQueueCount);
+	ASSERT(targetCore >= 0 && targetCore < gCoreCount);
 	ASSERT(targetCPU >= 0 && targetCPU < smp_get_num_cpus());
 }
 
@@ -1598,7 +1558,7 @@ init()
 		packageCount);
 	if (result != B_OK)
 		return result;
-	gRunQueueCount = coreCount;
+	gCoreCount = coreCount;
 	gSingleCore = coreCount == 1;
 	gPackageCount = packageCount;
 

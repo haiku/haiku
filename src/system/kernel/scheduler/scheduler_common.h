@@ -33,8 +33,6 @@ const bigtime_t kThreadQuantum = 1000;
 const bigtime_t kMinThreadQuantum = 3000;
 const bigtime_t kMaxThreadQuantum = 10000;
 
-const bigtime_t kMinimalWaitTime = kThreadQuantum / 4;
-
 const bigtime_t kCacheExpire = 100000;
 
 const int kLowLoad = kMaxLoad * 20 / 100;
@@ -94,6 +92,7 @@ extern CoreEntry* gCoreEntries;
 extern CoreLoadHeap* gCoreLoadHeap;
 extern CoreLoadHeap* gCoreHighLoadHeap;
 extern rw_spinlock gCoreHeapsLock;
+extern int32 gCoreCount;
 
 // gPackageEntries are used to decide which core should be woken up from the
 // idle state. When aiming for performance we should use as many packages as
@@ -132,7 +131,6 @@ typedef RunQueue<Thread, THREAD_MAX_SET_PRIORITY> CACHE_LINE_ALIGN
 
 extern ThreadRunQueue* gRunQueues;
 extern ThreadRunQueue* gPinnedRunQueues;
-extern int32 gRunQueueCount;
 
 // Since CPU IDs used internally by the kernel bear no relation to the actual
 // CPU topology the following arrays are used to efficiently get the core
@@ -175,6 +173,46 @@ static inline int32
 get_core_load(struct Scheduler::CoreEntry* core)
 {
 	return core->fLoad / core->fCPUCount;
+}
+
+
+static inline int32
+get_minimal_priority(Thread* thread)
+{
+	return max_c(min_c(thread->priority, 25) / 5, 1);
+}
+
+
+static inline int32
+get_thread_penalty(Thread* thread)
+{
+	int32 penalty = thread->scheduler_data->priority_penalty;
+
+	const int kMinimalPriority = get_minimal_priority(thread);
+	if (kMinimalPriority > 0) {
+		penalty
+			+= thread->scheduler_data->additional_penalty % kMinimalPriority;
+	}
+
+	return penalty;
+}
+
+
+static inline int32
+get_effective_priority(Thread* thread)
+{
+	if (thread->priority == B_IDLE_PRIORITY)
+		return thread->priority;
+	if (thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+		return thread->priority;
+
+	int32 effectivePriority = thread->priority;
+	effectivePriority -= get_thread_penalty(thread);
+
+	ASSERT(effectivePriority < B_FIRST_REAL_TIME_PRIORITY);
+	ASSERT(effectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
+
+	return effectivePriority;
 }
 
 
