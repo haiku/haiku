@@ -117,6 +117,7 @@ CPUEntry::CPUEntry()
 CoreEntry::CoreEntry()
 	:
 	fCPUCount(0),
+	fThreadCount(0),
 	fActiveTime(0),
 	fLoad(0)
 {
@@ -155,9 +156,7 @@ scheduler_thread_data::Init()
 
 	went_sleep = 0;
 	went_sleep_active = 0;
-
-	lost_cpu = false;
-	cpu_bound = true;
+	went_sleep_count = -1;
 
 	previous_core = -1;
 	enqueued = false;
@@ -383,6 +382,8 @@ scheduler_dump_thread_data(Thread* thread)
 		schedulerThreadData->went_sleep);
 	kprintf("\twent_sleep_active:\t%" B_PRId64 "\n",
 		schedulerThreadData->went_sleep_active);
+	kprintf("\twent_sleep_count:\t%" B_PRId32 "\n",
+		schedulerThreadData->went_sleep_count);
 	kprintf("\tprevious_core:\t\t%" B_PRId32 "\n",
 		schedulerThreadData->previous_core);
 	if (schedulerThreadData->previous_core > 0
@@ -626,51 +627,23 @@ thread_goes_away(Thread* thread)
 	schedulerThreadData->went_sleep = system_time();
 	schedulerThreadData->went_sleep_active
 		= atomic_get64(&gCoreEntries[smp_get_current_cpu()].fActiveTime);
+	schedulerThreadData->went_sleep_count
+		= atomic_get(&gCoreEntries[smp_get_current_cpu()].fThreadCount);
 }
 
 
 static inline bool
 should_cancel_penalty(Thread* thread)
 {
-	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
-	int32 core = schedulerThreadData->previous_core;
+	int32 core = thread->scheduler_data->previous_core;
 
-	if (core < -1)
+	if (core < 0)
 		return false;
 
-	bigtime_t now = system_time();
-	bigtime_t wentSleep = schedulerThreadData->went_sleep;
-
-	if (wentSleep < atomic_get64(&gCoreEntries[core].fReachedIdle))
-		return true;
-
-	bigtime_t startedIdle = atomic_get64(&gCoreEntries[core].fStartedIdle);
-	if (startedIdle != 0) {
-		if (wentSleep < startedIdle && now - startedIdle >= kMinimalWaitTime)
-			return true;
-
-		if (wentSleep - startedIdle >= kMinimalWaitTime)
-			return true;
-	}
-
-	if (get_effective_priority(thread) == B_LOWEST_ACTIVE_PRIORITY)
-		return false;
-
-	if (wentSleep < atomic_get64(&gCoreEntries[core].fReachedBottom))
-		return true;
-
-	bigtime_t startedBottom = atomic_get64(&gCoreEntries[core].fStartedBottom);
-	if (gCoreEntries[core].fStartedBottom != 0) {
-		if (wentSleep < startedBottom
-			&& now - startedBottom >= kMinimalWaitTime) {
-			return true;
-		}
-
-		if (wentSleep - startedBottom >= kMinimalWaitTime)
-			return true;
-	}
-
-	return false;
+	return atomic_get(&gCoreEntries[core].fThreadCount)
+			!= thread->scheduler_data->went_sleep_count
+		&& system_time() - thread->scheduler_data->went_sleep
+			> kThreadQuantum;
 }
 
 
@@ -684,8 +657,9 @@ enqueue(Thread* thread, bool newOne)
 	compute_thread_load(thread);
 
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
-	schedulerThreadData->cpu_bound = true;
 	schedulerThreadData->time_left = 0;
+	if (!thread_is_idle_thread(thread))
+		schedulerThreadData->went_sleep_count = 0;
 	int32 threadPriority = get_effective_priority(thread);
 
 	T(EnqueueThread(thread, threadPriority));
@@ -713,8 +687,11 @@ enqueue(Thread* thread, bool newOne)
 	thread->scheduler_data->enqueued = true;
 	if (pinned)
 		gPinnedRunQueues[targetCPU].PushBack(thread, threadPriority);
-	else
+	else {
 		gRunQueues[targetCore].PushBack(thread, threadPriority);
+		if (!thread_is_idle_thread(thread))
+			gCoreEntries[targetCore].fThreadList.Insert(thread->scheduler_data);
+	}
 	runQueueLocker.Unlock();
 
 	// notify listeners
@@ -766,6 +743,7 @@ static inline void
 put_back(Thread* thread)
 {
 	compute_thread_load(thread);
+	thread->scheduler_data->went_sleep_count = -1;
 
 	int32 core = gCPUToCore[smp_get_current_cpu()];
 
@@ -841,8 +819,15 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 		thread->scheduler_data->enqueued = false;
 		if (pinned)
 			gPinnedRunQueues[previousCPU].Remove(thread);
-		else
+		else {
 			gRunQueues[previousCore].Remove(thread);
+
+			ASSERT(thread->scheduler_data->went_sleep_count < 1);
+			if (thread->scheduler_data->went_sleep_count == 0) {
+				gCoreEntries[previousCore].fThreadList.Remove(
+					thread->scheduler_data);
+			}
+		}
 		runQueueLocker.Unlock();
 
 		enqueue(thread, true);
@@ -857,7 +842,6 @@ reschedule_needed()
 {
 	// This function is called as a result of either the timer event set by the
 	// scheduler or an incoming ICI. Make sure the reschedule() is invoked.
-	thread_get_current_thread()->scheduler_data->lost_cpu = true;
 	get_cpu_struct()->invoke_scheduler = true;
 }
 
@@ -988,6 +972,17 @@ choose_next_thread(int32 thisCPU, Thread* oldThread, bool putAtBack)
 		sharedThread->scheduler_data->enqueued = false;
 
 		gRunQueues[thisCore].Remove(sharedThread);
+		if (thread_is_idle_thread(sharedThread)
+			|| gCoreEntries[thisCore].fThreadList.Head()
+				== sharedThread->scheduler_data) {
+			atomic_add(&gCoreEntries[thisCore].fThreadCount, 1);
+		}
+
+		if (sharedThread->scheduler_data->went_sleep_count == 0) {
+			gCoreEntries[thisCore].fThreadList.Remove(
+				sharedThread->scheduler_data);
+		}
+
 		return sharedThread;
 	}
 
@@ -1005,19 +1000,6 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 	bigtime_t now = system_time();
 	bigtime_t usedTime = now - oldThread->scheduler_data->quantum_start;
 
-	if (thread_is_idle_thread(oldThread) && usedTime >= kMinimalWaitTime) {
-		atomic_set64(&gCoreEntries[thisCore].fReachedBottom,
-			now - kMinimalWaitTime);
-		atomic_set64(&gCoreEntries[thisCore].fReachedIdle,
-			now - kMinimalWaitTime);
-	}
-
-	if (get_effective_priority(oldThread) == B_LOWEST_ACTIVE_PRIORITY
-		&& usedTime >= kMinimalWaitTime) {
-		atomic_set64(&gCoreEntries[thisCore].fReachedBottom,
-			now - kMinimalWaitTime);
-	}
-
 	if (!thread_is_idle_thread(oldThread)) {
 		bigtime_t active
 			= (oldThread->kernel_time - oldThread->cpu->last_kernel_time)
@@ -1030,25 +1012,13 @@ track_cpu_activity(Thread* oldThread, Thread* nextThread, int32 thisCore)
 		atomic_add64(&gCoreEntries[thisCore].fActiveTime, active);
 	}
 
+	compute_thread_load(oldThread);
+	compute_thread_load(nextThread);
 	if (!gSingleCore && !gCPU[smp_get_current_cpu()].disabled)
 		compute_cpu_load(smp_get_current_cpu());
 
 	int32 oldPriority = get_effective_priority(oldThread);
 	int32 nextPriority = get_effective_priority(nextThread);
-
-	if (thread_is_idle_thread(nextThread)) {
-		if (!thread_is_idle_thread(oldThread))
-			atomic_set64(&gCoreEntries[thisCore].fStartedIdle, now);
-		if (oldPriority > B_LOWEST_ACTIVE_PRIORITY)
-			atomic_set64(&gCoreEntries[thisCore].fStartedBottom, now);
-	} else if (nextPriority == B_LOWEST_ACTIVE_PRIORITY) {
-		atomic_set64(&gCoreEntries[thisCore].fStartedIdle, 0);
-		if (oldPriority > B_LOWEST_ACTIVE_PRIORITY)
-			atomic_set64(&gCoreEntries[thisCore].fStartedBottom, now);
-	} else {
-		atomic_set64(&gCoreEntries[thisCore].fStartedBottom, 0);
-		atomic_set64(&gCoreEntries[thisCore].fStartedIdle, 0);
-	}
 
 	if (!thread_is_idle_thread(nextThread)) {
 		oldThread->cpu->last_kernel_time = nextThread->kernel_time;
@@ -1200,13 +1170,9 @@ reschedule(void)
 		case B_THREAD_READY:
 			enqueueOldThread = true;
 
-			if (!schedulerOldThreadData->lost_cpu)
-				schedulerOldThreadData->cpu_bound = false;
-
 			if (quantum_ended(oldThread, oldThread->cpu->preempted,
 					oldThread->has_yielded)) {
-				if (schedulerOldThreadData->cpu_bound)
-					increase_penalty(oldThread);
+				increase_penalty(oldThread);
 
 				TRACE("enqueueing thread %ld into run queue priority = %ld\n",
 					oldThread->id, get_effective_priority(oldThread));
@@ -1217,11 +1183,6 @@ reschedule(void)
 				putOldThreadAtBack = false;
 			}
 
-			break;
-		case B_THREAD_SUSPENDED:
-			increase_penalty(oldThread);
-			thread_goes_away(oldThread);
-			TRACE("reschedule(): suspending thread %ld\n", oldThread->id);
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
 			break;
@@ -1234,7 +1195,6 @@ reschedule(void)
 	}
 
 	oldThread->has_yielded = false;
-	schedulerOldThreadData->lost_cpu = false;
 
 	// select thread with the biggest priority and enqueue back the old thread
 	Thread* nextThread;
@@ -1284,8 +1244,6 @@ reschedule(void)
 
 	ASSERT(nextThread->scheduler_data->previous_core == thisCore);
 
-	compute_thread_load(nextThread);
-
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	update_thread_times(oldThread, nextThread);
 
@@ -1295,6 +1253,9 @@ reschedule(void)
 	// start counting time spent in interrupts
 	nextThread->scheduler_data->last_interrupt_time
 		= gCPU[thisCPU].interrupt_time;
+
+	if (!thread_is_idle_thread(nextThread)) 
+		update_cpu_performance(nextThread, thisCore);
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
 		timer* quantumTimer = &oldThread->cpu->quantum_timer;
@@ -1306,8 +1267,6 @@ reschedule(void)
 			bigtime_t quantum = compute_quantum(oldThread);
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER);
-
-			update_cpu_performance(nextThread, thisCore);
 		} else {
 			nextThread->scheduler_data->quantum_start = system_time();
 
@@ -1775,10 +1734,10 @@ scheduler_init(void)
 
 	add_debugger_command_etc("run_queue", &dump_run_queue,
 		"List threads in run queue", "\nLists threads in run queue", 0);
-	add_debugger_command_etc("cpu_heap", &dump_cpu_heap,
-		"List CPUs in CPU priority heap", "\nList CPUs in CPU priority heap",
-		0);
 	if (!gSingleCore) {
+		add_debugger_command_etc("cpu_heap", &dump_cpu_heap,
+			"List CPUs in CPU priority heap",
+			"\nList CPUs in CPU priority heap", 0);
 		add_debugger_command_etc("idle_cores", &dump_idle_cores,
 			"List idle cores", "\nList idle cores", 0);
 	}

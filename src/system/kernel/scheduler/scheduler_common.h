@@ -81,10 +81,8 @@ struct CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 	spinlock	fCPULock;
 	spinlock	fQueueLock;
 
-	bigtime_t	fStartedBottom;
-	bigtime_t	fReachedBottom;
-	bigtime_t	fStartedIdle;
-	bigtime_t	fReachedIdle;
+	int32		fThreadCount;
+	DoublyLinkedList<scheduler_thread_data>	fThreadList;
 
 	bigtime_t	fActiveTime;
 
@@ -146,15 +144,13 @@ extern int32* gCPUToPackage;
 }	// namespace Scheduler
 
 
-struct scheduler_thread_data {
+struct scheduler_thread_data :
+	public DoublyLinkedListLinkImpl<scheduler_thread_data> {
 	inline				scheduler_thread_data();
 			void		Init();
 
 			int32		priority_penalty;
 			int32		additional_penalty;
-
-			bool		lost_cpu;
-			bool		cpu_bound;
 
 			bigtime_t	time_left;
 			bigtime_t	stolen_time;
@@ -167,6 +163,7 @@ struct scheduler_thread_data {
 
 			bigtime_t	went_sleep;
 			bigtime_t	went_sleep_active;
+			int32		went_sleep_count;
 
 			int32		previous_core;
 
