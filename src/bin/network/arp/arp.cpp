@@ -285,7 +285,7 @@ set_entries_from_file(const char *filename)
 				continue;
 			}
 			if (host->h_addrtype != AF_INET) {
-				fprintf(stderr, "%s: Line " B_PRId32 ", host \"%s\" is not known in the IPv4 domain.\n",
+				fprintf(stderr, "%s: Line %" B_PRId32 ", host \"%s\" is not known in the IPv4 domain.\n",
 					kProgramName, counter, argument);
 				continue;
 			}
