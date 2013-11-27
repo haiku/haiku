@@ -15,17 +15,18 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <set>
 
 #include <package/solver/SolverPackage.h>
 
 #include "Command.h"
 #include "PackageManager.h"
 #include "pkgman.h"
+#include "TextTable.h"
 
 
 // TODO: internationalization!
-// The printing code will need serious attention wrt. dealing with UTF-8 and,
-// even worse, full-width characters.
+// The table code doesn't support full-width characters yet.
 
 
 using namespace BPackageKit;
@@ -42,10 +43,20 @@ static const char* const kLongUsage =
 	"Options:\n"
 	"  -a, --all\n"
 	"    List all packages. Specified instead of <search-string>.\n"
+	"  -D, --details\n"
+	"    Print more details. Matches in each installation location and each\n"
+	"    repository will be listed individually with their version.\n"
 	"  -i, --installed-only\n"
 	"    Only find installed packages.\n"
 	"  -u, --uninstalled-only\n"
 	"    Only find not installed packages.\n"
+	"\n"
+	"Status flags in non-detailed listings:\n"
+	"  S - installed in system with a matching version in a repository\n"
+	"  s - installed in system without a matching version in a repository\n"
+	"  H - installed in home with a matching version in a repository\n"
+	"  h - installed in home without a matching version in a repository\n"
+	"  v - multiple different versions available in repositories\n"
 	"\n";
 
 
@@ -65,16 +76,64 @@ get_terminal_width()
 }
 
 
+struct PackageComparator {
+	PackageComparator(const BSolverRepository* systemRepository,
+		const BSolverRepository* homeRepository)
+		:
+		fSystemRepository(systemRepository),
+		fHomeRepository(homeRepository)
+	{
+	}
+
+	int operator()(const BSolverPackage* a, const BSolverPackage* b) const
+	{
+		int cmp = a->Name().Compare(b->Name());
+		if (cmp != 0)
+			return cmp;
+
+		// Names are equal. Sort by installation location and then by repository
+		// name.
+		if (a->Repository() == b->Repository())
+			return 0;
+
+		if (a->Repository() == fSystemRepository)
+			return -1;
+		if (b->Repository() == fSystemRepository)
+			return 1;
+		if (a->Repository() == fHomeRepository)
+			return -1;
+		if (b->Repository() == fHomeRepository)
+			return 1;
+
+		return a->Repository()->Name().Compare(b->Repository()->Name());
+	}
+
+private:
+	const BSolverRepository*	fSystemRepository;
+	const BSolverRepository*	fHomeRepository;
+};
+
+
+static int
+compare_packages(const BSolverPackage* a, const BSolverPackage* b,
+	void* comparator)
+{
+	return (*(PackageComparator*)comparator)(a, b);
+}
+
+
 int
 SearchCommand::Execute(int argc, const char* const* argv)
 {
 	bool installedOnly = false;
 	bool uninstalledOnly = false;
 	bool listAll = false;
+	bool details = false;
 
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "all", no_argument, 0, 'a' },
+			{ "details", no_argument, 0, 'D' },
 			{ "help", no_argument, 0, 'h' },
 			{ "installed-only", no_argument, 0, 'i' },
 			{ "uninstalled-only", no_argument, 0, 'u' },
@@ -82,13 +141,17 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "ahiu", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "aDhiu", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
 			case 'a':
 				listAll = true;
+				break;
+
+			case 'D':
+				details = true;
 				break;
 
 			case 'h':
@@ -139,66 +202,93 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		return 0;
 	}
 
+	// sort packages by name and installation location/repository
+	const BSolverRepository* systemRepository
+		= static_cast<const BSolverRepository*>(
+			packageManager.SystemRepository());
+	const BSolverRepository* homeRepository
+		= static_cast<const BSolverRepository*>(
+			packageManager.HomeRepository());
+	PackageComparator comparator(systemRepository, homeRepository);
+	packages.SortItems(&compare_packages, &comparator);
+
 	// print table
+	TextTable table;
 
-	// determine column widths
-	BString installedColumnTitle("Installed");
-	BString nameColumnTitle("Name");
-	BString descriptionColumnTitle("Description");
+	if (details) {
+		table.AddColumn("Repository");
+		table.AddColumn("Name");
+		table.AddColumn("Version");
+		table.AddColumn("Arch");
 
-	int installedColumnWidth = installedColumnTitle.Length();
-	int nameColumnWidth = nameColumnTitle.Length();
-	int descriptionColumnWidth = descriptionColumnTitle.Length();
+		int32 packageCount = packages.CountItems();
+		for (int32 i = 0; i < packageCount; i++) {
+			BSolverPackage* package = packages.ItemAt(i);
 
-	int32 packageCount = packages.CountItems();
-	for (int32 i = 0; i < packageCount; i++) {
-		BSolverPackage* package = packages.ItemAt(i);
-		nameColumnWidth = std::max(nameColumnWidth,
-			(int)package->Name().Length());
-		descriptionColumnWidth = std::max(descriptionColumnWidth,
-			(int)package->Info().Summary().Length());
+			BString repository = "";
+			if (package->Repository() == systemRepository)
+				repository = "<system>";
+			else if (package->Repository() == homeRepository)
+				repository = "<home>";
+			else
+				repository = package->Repository()->Name();
+
+			table.SetTextAt(i, 0, repository);
+			table.SetTextAt(i, 1, package->Name());
+			table.SetTextAt(i, 2, package->Version().ToString());
+			table.SetTextAt(i, 3, package->Info().ArchitectureName());
+		}
+	} else {
+		table.AddColumn("Status");
+		table.AddColumn("Name");
+		table.AddColumn("Description", B_ALIGN_LEFT, true);
+
+		int32 packageCount = packages.CountItems();
+		for (int32 i = 0; i < packageCount;) {
+			// find the next group of equally named packages
+			int32 groupStart = i;
+			std::set<BPackageVersion> versions;
+			BSolverPackage* systemPackage = NULL;
+			BSolverPackage* homePackage = NULL;
+			while (i < packageCount) {
+				BSolverPackage* package = packages.ItemAt(i);
+				if (i > groupStart
+					&& package->Name() != packages.ItemAt(groupStart)->Name()) {
+					break;
+				}
+
+				if (package->Repository() == systemRepository)
+					systemPackage = package;
+				else if (package->Repository() == homeRepository)
+					homePackage = package;
+				else
+					versions.insert(package->Version());
+
+				i++;
+			}
+
+			// add a table row for the group
+			BString status;
+			if (systemPackage != NULL) {
+				status << (versions.find(systemPackage->Version())
+					!= versions.end() ? 'S' : 's');
+			}
+			if (homePackage != NULL) {
+				status << (versions.find(homePackage->Version())
+					!= versions.end() ? 'H' : 'h');
+			}
+			if (versions.size() > 1)
+				status << 'v';
+
+			int32 rowIndex = table.CountRows();
+			BSolverPackage* package = packages.ItemAt(groupStart);
+			table.SetTextAt(rowIndex, 0, status);
+			table.SetTextAt(rowIndex, 1, package->Name());
+			table.SetTextAt(rowIndex, 2, package->Info().Summary());
+		}
 	}
 
-	// print header
-	BString header;
-	header.SetToFormat("%-*s  %-*s  %s",
-		installedColumnWidth, installedColumnTitle.String(),
-		nameColumnWidth, nameColumnTitle.String(),
-		descriptionColumnTitle.String());
-	printf("%s\n", header.String());
-
-	int minLineWidth = header.Length();
-	int lineWidth = minLineWidth + descriptionColumnWidth
-		- descriptionColumnTitle.Length();
-	int terminalWidth = get_terminal_width();
-	if (lineWidth > terminalWidth) {
-		// truncate description
-		int actualLineWidth = std::max(minLineWidth, terminalWidth);
-		descriptionColumnWidth -= lineWidth - actualLineWidth;
-		lineWidth = actualLineWidth;
-	}
-
-	header.SetTo('-', lineWidth);
-	printf("%s\n", header.String());
-
-	// print packages
-	for (int32 i = 0; i < packageCount; i++) {
-		BSolverPackage* package = packages.ItemAt(i);
-
-		const char* installed = "";
-		if (package->Repository() == static_cast<const BSolverRepository*>(
-				packageManager.SystemRepository()))
-			installed = "system";
-		else if (package->Repository() == static_cast<const BSolverRepository*>(
-				packageManager.HomeRepository()))
-			installed = "home";
-
-		printf("%-*s  %-*s  %-*.*s\n",
-			installedColumnWidth, installed,
-			nameColumnWidth, package->Name().String(),
-			descriptionColumnWidth, descriptionColumnWidth,
-			package->Info().Summary().String());
-	}
+	table.Print(get_terminal_width());
 
 	return 0;
 }
