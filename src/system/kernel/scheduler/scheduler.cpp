@@ -224,15 +224,11 @@ static int
 dump_run_queue(int argc, char **argv)
 {
 	int32 cpuCount = smp_get_num_cpus();
-	int32 coreCount = 0;
-	for (int32 i = 0; i < cpuCount; i++) {
-		if (gCPU[i].topology_id[CPU_TOPOLOGY_SMT] == 0)
-			gCPUToCore[i] = coreCount++;
-	}
+	int32 coreCount = gRunQueueCount;
 
 	ThreadRunQueue::ConstIterator iterator;
 	for (int32 i = 0; i < coreCount; i++) {
-		kprintf("\nCore %" B_PRId32 " run queue:\n", i);
+		kprintf("%sCore %" B_PRId32 " run queue:\n", i > 0 ? "\n" : "", i);
 		iterator = gRunQueues[i].GetConstIterator();
 		dump_queue(iterator);
 	}
@@ -240,7 +236,7 @@ dump_run_queue(int argc, char **argv)
 	for (int32 i = 0; i < cpuCount; i++) {
 		iterator = gPinnedRunQueues[i].GetConstIterator();
 
-		if (iterator.HasNext()) {
+		if (iterator.HasNext() && !thread_is_idle_thread(iterator.Next())) {
 			kprintf("\nCPU %" B_PRId32 " run queue:\n", i);
 			dump_queue(iterator);
 		}
@@ -251,7 +247,7 @@ dump_run_queue(int argc, char **argv)
 
 
 static void
-dump_heap(CPUHeap* heap)
+dump_cpu_load_heap(CPUHeap* heap)
 {
 	kprintf("cpu priority load\n");
 	CPUEntry* entry = heap->PeekMinimum();
@@ -305,14 +301,16 @@ dump_core_load_heap(CoreLoadHeap* heap)
 static int
 dump_cpu_heap(int argc, char** argv)
 {
-	kprintf("\ncore load\n");
+	kprintf("core load\n");
 	dump_core_load_heap(gCoreLoadHeap);
-	kprintf("---------\n");
 	dump_core_load_heap(gCoreHighLoadHeap);
 
 	for (int32 i = 0; i < gRunQueueCount; i++) {
+		if (gCoreEntries[i].fCPUCount < 2)
+			continue;
+
 		kprintf("\nCore %" B_PRId32 " heap:\n", i);
-		dump_heap(&gCPUPriorityHeaps[i]);
+		dump_cpu_load_heap(&gCPUPriorityHeaps[i]);
 	}
 
 	return 0;
