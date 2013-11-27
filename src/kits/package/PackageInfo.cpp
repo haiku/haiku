@@ -470,6 +470,17 @@ BPackageInfo::Architecture() const
 }
 
 
+const char*
+BPackageInfo::ArchitectureName() const
+{
+	if ((int)fArchitecture < 0
+		|| fArchitecture >= B_PACKAGE_ARCHITECTURE_ENUM_COUNT) {
+		return NULL;
+	}
+	return kArchitectureNames[fArchitecture];
+}
+
+
 const BPackageVersion&
 BPackageInfo::Version() const
 {

@@ -77,6 +77,8 @@ public:
 			uint32				Flags() const;
 
 			BPackageArchitecture	Architecture() const;
+			const char*			ArchitectureName() const;
+									// NULL, if invalid
 
 			const BPackageVersion&	Version() const;
 
