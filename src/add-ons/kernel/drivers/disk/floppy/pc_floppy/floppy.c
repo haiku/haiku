@@ -222,7 +222,7 @@ init_driver(void)
 									B_FULL_LOCK, B_READ_AREA|B_WRITE_AREA);
 		if (master->buffer_area < B_OK)
 			goto config_error2;
-		master->slock = 0;
+		B_INITIALIZE_SPINLOCK(&master->slock);
 		master->isa = isa;
 		if (install_io_interrupt_handler(master->irq, flo_intr, (void *)master, 0) < B_OK)
 			goto config_error2;

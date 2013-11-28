@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -26,6 +27,7 @@
 #include <int.h>
 #include <spinlock_contention.h>
 #include <thread.h>
+#include <util/atomic.h>
 #if DEBUG_SPINLOCK_LATENCIES
 #	include <safemode.h>
 #endif
@@ -350,7 +352,7 @@ acquire_spinlock(spinlock* lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (atomic_get(lock) != 0) {
+			while (atomic_get(&lock->lock) != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
 						"for a long time!", lock);
@@ -358,9 +360,9 @@ acquire_spinlock(spinlock* lock)
 				}
 
 				process_all_pending_ici(currentCPU);
-				cpu_wait(lock, 0);
+				cpu_wait(&lock->lock, 0);
 			}
-			if (atomic_get_and_set((int32*)lock, 1) == 0)
+			if (atomic_get_and_set(&lock->lock, 1) == 0)
 				break;
 		}
 
@@ -371,7 +373,7 @@ acquire_spinlock(spinlock* lock)
 	} else {
 #if DEBUG_SPINLOCKS
 		int32 oldValue;
-		oldValue = atomic_get_and_set((int32*)lock, 1);
+		oldValue = atomic_get_and_set(&lock->lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock: attempt to acquire lock %p twice on "
 				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
@@ -404,23 +406,23 @@ acquire_spinlock_nocheck(spinlock *lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (atomic_get(lock) != 0) {
+			while (atomic_get(&lock->lock) != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT_NO_CHECK) {
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
 						"for a long time!", lock);
 					count = 0;
 				}
 
-				cpu_wait(lock, 0);
+				cpu_wait(&lock->lock, 0);
 			}
 
-			if (atomic_get_and_set((int32*)lock, 1) == 0)
+			if (atomic_get_and_set(&lock->lock, 1) == 0)
 				break;
 		}
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
-		if (atomic_get_and_set((int32*)lock, 1) != 0) {
+		if (atomic_get_and_set(&lock->lock, 1) != 0) {
 			panic("acquire_spinlock_nocheck: attempt to acquire lock %p twice "
 				"on non-SMP system\n", lock);
 		}
@@ -447,7 +449,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (atomic_get(lock) != 0) {
+			while (atomic_get(&lock->lock) != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
 					panic("acquire_spinlock_cpu(): Failed to acquire spinlock "
 						"%p for a long time!", lock);
@@ -455,9 +457,9 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 				}
 
 				process_all_pending_ici(currentCPU);
-				cpu_wait(lock, 0);
+				cpu_wait(&lock->lock, 0);
 			}
-			if (atomic_get_and_set((int32*)lock, 1) == 0)
+			if (atomic_get_and_set(&lock->lock, 1) == 0)
 				break;
 		}
 
@@ -468,7 +470,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 	} else {
 #if DEBUG_SPINLOCKS
 		int32 oldValue;
-		oldValue = atomic_get_and_set((int32*)lock, 1);
+		oldValue = atomic_get_and_set(&lock->lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
 				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
@@ -506,10 +508,10 @@ release_spinlock(spinlock *lock)
 			}
 		}
 #elif DEBUG_SPINLOCKS
-		if (atomic_get_and_set((int32*)lock, 0) != 1)
+		if (atomic_get_and_set(&lock->lock, 0) != 1)
 			panic("release_spinlock: lock %p was already released\n", lock);
 #else
-		atomic_set((int32*)lock, 0);
+		atomic_set(&lock->lock, 0);
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
@@ -517,7 +519,7 @@ release_spinlock(spinlock *lock)
 			panic("release_spinlock: attempt to release lock %p with "
 				"interrupts enabled\n", lock);
 		}
-		if (atomic_get_and_set((int32*)lock, 0) != 1)
+		if (atomic_get_and_set(&lock->lock, 0) != 1)
 			panic("release_spinlock: lock %p was already released\n", lock);
 #endif
 #if DEBUG_SPINLOCK_LATENCIES

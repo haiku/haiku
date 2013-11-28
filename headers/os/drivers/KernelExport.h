@@ -31,14 +31,18 @@ typedef ulong cpu_status;
 			(spinlock)->count_low = 0;				\
 			(spinlock)->count_high = 0;				\
 		} while (false)
-#	define B_SPINLOCK_IS_LOCKED(spinlock)	((spinlock)->lock > 0)
 #else
-	typedef int32 spinlock;
+	typedef struct {
+		int32	lock;
+	} spinlock;
 
-#	define B_SPINLOCK_INITIALIZER 0
-#	define B_INITIALIZE_SPINLOCK(lock)	do { *(lock) = 0; } while (false)
-#	define B_SPINLOCK_IS_LOCKED(lock)	(*(lock) > 0)
+#	define B_SPINLOCK_INITIALIZER { 0 }
+#	define B_INITIALIZE_SPINLOCK(spinlock)	do {	\
+			(spinlock)->lock = 0;					\
+		} while (false)
 #endif
+
+#define B_SPINLOCK_IS_LOCKED(spinlock)	(atomic_get(&(spinlock)->lock) > 0)
 
 typedef struct {
 	int32		lock;

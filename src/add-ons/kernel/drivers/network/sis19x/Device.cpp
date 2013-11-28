@@ -23,7 +23,6 @@ Device::Device(Device::Info &DeviceInfo, pci_info &PCIInfo)
 		fPCIInfo(PCIInfo),
 		fInfo(DeviceInfo),
 		fIOBase(0),
-		fHWSpinlock(0),
 		fInterruptsNest(0),
 		fFrameSize(MaxFrameSize),
 		fMII(this),
@@ -35,6 +34,8 @@ Device::Device(Device::Info &DeviceInfo, pci_info &PCIInfo)
 		fRxDataRing(this, false)
 {
 	memset((struct timer*)this, 0, sizeof(struct timer));	
+
+	B_INITIALIZE_SPINLOCK(&fHWSpinlock);
 
 	uint32 cmdRegister = gPCIModule->read_pci_config(PCIInfo.bus,
 			PCIInfo.device,	PCIInfo.function, PCI_command, 2);
