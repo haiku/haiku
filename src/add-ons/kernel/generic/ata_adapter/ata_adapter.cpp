@@ -538,14 +538,14 @@ ata_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 	api = pci->read_pci_config(pci_device, PCI_class_api, 1);
 
 	if (supports_compatibility_mode
-		&& channel_index == 0 && (api & ATA_API_PRIMARY_NATIVE) == 0) {
+		&& channel_index == 0 && (api & PCI_ide_primary_native) == 0) {
 		command_block_base = 0x1f0;
 		control_block_base = 0x3f6;
 		intnum = 14;
 		TRACE("PCI-ATA: Controller in legacy mode: cmd %#x, ctrl %#x, irq %d\n",
 			  command_block_base, control_block_base, intnum);
 	} else if (supports_compatibility_mode
-		&& channel_index == 1 && (api & ATA_API_SECONDARY_NATIVE) == 0) {
+		&& channel_index == 1 && (api & PCI_ide_secondary_native) == 0) {
 		command_block_base = 0x170;
 		control_block_base = 0x376;
 		intnum = 15;

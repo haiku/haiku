@@ -55,15 +55,6 @@ enum {
 		// offset of PRDT register; content must be dword-aligned
 };
 
-// bit mask in class_api of PCI configuration
-// (for adapters that can run in compatability mode)
-enum {
-	ATA_API_PRIMARY_NATIVE		= 1,	// primary channel is in native mode
-	ATA_API_PRIMARY_FIXED		= 2,	// primary channel can be switched to native mode
-	ATA_API_SECONDARY_NATIVE	= 4,	// secondary channel is in native mode
-	ATA_API_SECONDARY_FIXED		= 8		// secondary channel can be switched to native mode
-};
-
 
 // (maximum) size of S/G table
 // there are so many restrictions that we want to keep it inside one page

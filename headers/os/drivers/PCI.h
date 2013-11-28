@@ -328,6 +328,18 @@ struct pci_module_info {
 #define PCI_mass_storage_other 0x80			/* other mass storage controller */
 
 /* ---
+	bit mask of the class_api field for
+		class_base	= 0x01 (mass storage)
+		class_sub	= 0x01 (IDE controller)
+--- */
+
+#define PCI_ide_primary_native		0x01	/* primary channel is in native mode */
+#define PCI_ide_primary_fixed		0x02	/* primary channel can be switched to native mode */
+#define PCI_ide_secondary_native	0x04	/* secondary channel is in native mode */
+#define PCI_ide_secondary_fixed		0x08	/* secondary channel can be switched to native mode */
+#define PCI_ide_master				0x80	/* master device */
+
+/* ---
 	values of the class_api field for
 		class_base	= 0x01 (mass storage)
 		class_sub	= 0x06 (Serial ATA controller)
