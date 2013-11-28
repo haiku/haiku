@@ -120,7 +120,8 @@ CoreEntry::CoreEntry()
 	fCPUCount(0),
 	fThreadCount(0),
 	fActiveTime(0),
-	fLoad(0)
+	fLoad(0),
+	fHighLoad(false)
 {
 	B_INITIALIZE_SPINLOCK(&fCPULock);
 	B_INITIALIZE_SPINLOCK(&fQueueLock);
@@ -264,6 +265,7 @@ dump_cpu_heap(int argc, char** argv)
 {
 	kprintf("core load\n");
 	dump_core_load_heap(gCoreLoadHeap);
+	kprintf("\n");
 	dump_core_load_heap(gCoreHighLoadHeap);
 
 	for (int32 i = 0; i < gCoreCount; i++) {
@@ -376,22 +378,31 @@ update_load_heaps(int32 core)
 		return;
 
 	if (newKey > kHighLoad) {
-		if (oldKey <= kHighLoad) {
+		if (!entry->fHighLoad) {
 			gCoreLoadHeap->ModifyKey(entry, -1);
 			ASSERT(gCoreLoadHeap->PeekMinimum() == entry);
 			gCoreLoadHeap->RemoveMinimum();
 
 			gCoreHighLoadHeap->Insert(entry, newKey);
+
+			entry->fHighLoad = true;
 		} else
 			gCoreHighLoadHeap->ModifyKey(entry, newKey);
-	} else {
-		if (oldKey > kHighLoad) {
+	} else if (newKey < kMediumLoad) {
+		if (entry->fHighLoad) {
 			gCoreHighLoadHeap->ModifyKey(entry, -1);
 			ASSERT(gCoreHighLoadHeap->PeekMinimum() == entry);
 			gCoreHighLoadHeap->RemoveMinimum();
 
 			gCoreLoadHeap->Insert(entry, newKey);
+
+			entry->fHighLoad = false;
 		} else
+			gCoreLoadHeap->ModifyKey(entry, newKey);
+	} else {
+		if (entry->fHighLoad)
+			gCoreHighLoadHeap->ModifyKey(entry, newKey);
+		else
 			gCoreLoadHeap->ModifyKey(entry, newKey);
 	}
 }

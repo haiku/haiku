@@ -36,6 +36,7 @@ const bigtime_t kCacheExpire = 100000;
 const int kLowLoad = kMaxLoad * 20 / 100;
 const int kTargetLoad = kMaxLoad * 55 / 100;
 const int kHighLoad = kMaxLoad * 70 / 100;
+const int kMediumLoad = (kHighLoad + kTargetLoad) / 2;
 const int kVeryHighLoad = (kMaxLoad + kHighLoad) / 2;
 
 const int kLoadDifference = kMaxLoad * 20 / 100;
@@ -83,6 +84,7 @@ struct CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 	bigtime_t	fActiveTime;
 
 	int32		fLoad;
+	bool		fHighLoad;
 } CACHE_LINE_ALIGN;
 typedef MinMaxHeap<CoreEntry, int32> CoreLoadHeap;
 

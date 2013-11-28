@@ -36,26 +36,10 @@ has_cache_expired(Thread* thread)
 {
 	ASSERT(!gSingleCore);
 
-	if (thread_is_idle_thread(thread))
-		return false;
-
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 	ASSERT(schedulerThreadData->previous_core >= 0);
 
 	return system_time() - schedulerThreadData->went_sleep > kCacheExpire;
-}
-
-
-static bool
-try_small_task_packing(Thread* thread)
-{
-	ReadSpinLocker locker(gCoreHeapsLock);
-
-	int32 core = sSmallTaskCore;
-	return (core == -1 && gCoreLoadHeap->PeekMaximum() != NULL)
-		|| (core != -1
-			&& get_core_load(&gCoreEntries[core]) + thread->scheduler_data->load
-				< kHighLoad);
 }
 
 
@@ -107,24 +91,27 @@ choose_core(Thread* thread)
 {
 	CoreEntry* entry;
 
-	if (try_small_task_packing(thread)) {
-		// try to pack all threads on one core
-		entry = &gCoreEntries[choose_small_task_core()];
+	int32 core = -1;
+	// try to pack all threads on one core
+	core = choose_small_task_core();
+
+	if (core != -1
+		&& get_core_load(&gCoreEntries[core]) + thread->scheduler_data->load
+			< kHighLoad) {
+		entry = &gCoreEntries[core];
 	} else {
 		ReadSpinLocker coreLocker(gCoreHeapsLock);
-		if (gCoreLoadHeap->PeekMinimum() != NULL) {
-			// run immediately on already woken core
-			entry = gCoreLoadHeap->PeekMinimum();
-		} else {
+		// run immediately on already woken core
+		entry = gCoreLoadHeap->PeekMinimum();
+		if (entry == NULL) {
 			coreLocker.Unlock();
 
 			entry = choose_idle_core();
 
-			coreLocker.Lock();
-			if (entry == NULL)
-				entry = gCoreLoadHeap->PeekMinimum();
-			if (entry == NULL)
+			if (entry == NULL) {
+				coreLocker.Lock();
 				entry = gCoreHighLoadHeap->PeekMinimum();
+			}
 		}
 	}
 
@@ -138,9 +125,6 @@ should_rebalance(Thread* thread)
 {
 	ASSERT(!gSingleCore);
 
-	if (thread_is_idle_thread(thread))
-		return false;
-
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 	ASSERT(schedulerThreadData->previous_core >= 0);
 
@@ -151,12 +135,15 @@ should_rebalance(Thread* thread)
 	if (coreLoad > kHighLoad) {
 		ReadSpinLocker coreLocker(gCoreHeapsLock);
 		if (sSmallTaskCore == core) {
-			if (coreLoad - schedulerThreadData->load < kHighLoad)
-				return true;
-
+			sSmallTaskCore = -1;
 			choose_small_task_core();
+			if (schedulerThreadData->load > coreLoad / 3)
+				return false;
 			return coreLoad > kVeryHighLoad;
 		}
+
+		if (schedulerThreadData->load >= coreLoad / 2)
+			return false;
 
 		CoreEntry* other = gCoreLoadHeap->PeekMaximum();
 		if (other == NULL)
@@ -165,10 +152,15 @@ should_rebalance(Thread* thread)
 		return coreLoad - get_core_load(other) >= kLoadDifference / 2;
 	}
 
+	if (coreLoad >= kMediumLoad)
+		return false;
+
 	int32 smallTaskCore = choose_small_task_core();
 	if (smallTaskCore == -1)
 		return false;
-	return smallTaskCore != core;
+	return smallTaskCore != core
+		&& get_core_load(&gCoreEntries[smallTaskCore])
+				+ thread->scheduler_data->load < kHighLoad;
 }
 
 

@@ -30,9 +30,6 @@ has_cache_expired(Thread* thread)
 {
 	ASSERT(!gSingleCore);
 
-	if (thread_is_idle_thread(thread))
-		return false;
-
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 	ASSERT(schedulerThreadData->previous_core >= 0);
 
