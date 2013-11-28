@@ -525,7 +525,7 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 		TRACE("PCI-IDE: Controller in legacy mode: cmd %#x, ctrl %#x, irq %d\n",
 			  command_block_base, control_block_base, intnum);
 	} else if (supports_compatibility_mode
-		&& channel_index == 1 && (api & IDE_API_PRIMARY_NATIVE) == 0) {
+		&& channel_index == 1 && (api & IDE_API_SECONDARY_NATIVE) == 0) {
 		command_block_base = 0x170;
 		control_block_base = 0x376;
 		intnum = 15;

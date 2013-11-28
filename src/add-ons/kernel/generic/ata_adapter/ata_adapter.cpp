@@ -258,9 +258,9 @@ ata_adapter_prepare_dma(ata_adapter_channel_info *channel,
 
 		TRACE_DMA("ata_adapter: %#" B_PRIxPHYSADDR ", %" B_PRIuPHYSADDR " => "
 			"%#010" B_PRIx32 ", %" B_PRIu16 ", %d\n",
-			sgList->address, sgList->size, 
+			sgList->address, sgList->size,
 			prd->address, prd->count, prd->EOT);
-		SHOW_FLOW( 4, "%#010" B_PRIx32 ", %" B_PRIu16 ", %d", 
+		SHOW_FLOW( 4, "%#010" B_PRIx32 ", %" B_PRIu16 ", %d",
 			prd->address, prd->count, prd->EOT);
 	}
 
@@ -545,7 +545,7 @@ ata_adapter_detect_channel(pci_device_module_info *pci, pci_device *pci_device,
 		TRACE("PCI-ATA: Controller in legacy mode: cmd %#x, ctrl %#x, irq %d\n",
 			  command_block_base, control_block_base, intnum);
 	} else if (supports_compatibility_mode
-		&& channel_index == 1 && (api & ATA_API_PRIMARY_NATIVE) == 0) {
+		&& channel_index == 1 && (api & ATA_API_SECONDARY_NATIVE) == 0) {
 		command_block_base = 0x170;
 		control_block_base = 0x376;
 		intnum = 15;
