@@ -43,8 +43,8 @@ RateBuffer::AddRate(int32 rate)
 int32
 RateBuffer::GetMeanRate()
 {
-	int mean = 0;
-	for (int i = 0; i < fCurrentSize; i++) {
+	int32 mean = 0;
+	for (int8 i = 0; i < fCurrentSize; i++) {
 		mean += fRateBuffer[i];
 	}
 
@@ -98,7 +98,7 @@ Battery::GetBatteryInfoCached(battery_info* info)
 	info->capacity = fCachedAcpiInfo.capacity;
 	info->full_capacity = fExtendedBatteryInfo.last_full_charge;
 	fRateBuffer.AddRate(fCachedAcpiInfo.current_rate);
-	if (fCachedAcpiInfo.current_rate > 0)
+	if (fCachedAcpiInfo.current_rate > 0 && fRateBuffer.GetMeanRate() != 0)
 		info->time_left = 3600 * fCachedAcpiInfo.capacity
 			/ fRateBuffer.GetMeanRate();
 	else
@@ -254,5 +254,3 @@ ACPIDriverInterface::_FindDrivers(const char* dirpath)
 	}
 	return status;
 }
-
-

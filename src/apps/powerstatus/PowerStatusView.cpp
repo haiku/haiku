@@ -5,7 +5,7 @@
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Clemens Zeidler, haiku@Clemens-Zeidler.de
- *		Alexander von Gluck, kallisti5@unixzen.com 
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 
 
@@ -336,7 +336,7 @@ void
 PowerStatusView::Update(bool force)
 {
 	int32 previousPercent = fPercent;
-	bool previousTimeLeft = fTimeLeft;
+	time_t previousTimeLeft = fTimeLeft;
 	bool wasOnline = fOnline;
 
 	_GetBatteryInfo(&fBatteryInfo, fBatteryID);
@@ -350,7 +350,7 @@ PowerStatusView::Update(bool force)
 	} else {
 		fPercent = 0;
 		fOnline = false;
-		fTimeLeft = false;
+		fTimeLeft = -1;
 	}
 
 
@@ -375,7 +375,7 @@ PowerStatusView::Update(bool force)
 			if (fHasBattery) {
 				size_t length = snprintf(text, sizeof(text), "%s%" B_PRId32
 					"%%%s", open, fPercent, close);
-				if (fTimeLeft) {
+				if (fTimeLeft >= 0) {
 					length += snprintf(text + length, sizeof(text) - length,
 						"\n%" B_PRId32 ":%02" B_PRId32, fTimeLeft / 3600,
 						(fTimeLeft / 60) % 60);
@@ -421,7 +421,7 @@ PowerStatusView::FromMessage(const BMessage* archive)
 		fShowStatusIcon = value;
 	if (archive->FindBool("show time", &value) == B_OK)
 		fShowTime = value;
-	
+
 	//Incase we have a bad saving and none are showed..
 	if (!fShowLabel && !fShowStatusIcon)
 		fShowLabel = true;
@@ -548,7 +548,7 @@ PowerStatusReplicant::MessageReceived(BMessage *message)
 				fShowLabel = !fShowLabel;
 			else
 				fShowLabel = true;
-				
+
 			Update(true);
 			break;
 
@@ -610,7 +610,7 @@ PowerStatusReplicant::MouseDown(BPoint point)
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("About" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED)));
 	menu->SetTargetForItems(this);
 
@@ -751,4 +751,3 @@ instantiate_deskbar_item(void)
 {
 	return new PowerStatusReplicant(BRect(0, 0, 15, 15), B_FOLLOW_NONE, true);
 }
-
