@@ -587,9 +587,6 @@ compute_thread_load(Thread* thread)
 static inline void
 thread_goes_away(Thread* thread)
 {
-	if (thread_is_idle_thread(thread))
-		return;
-
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 
 	schedulerThreadData->last_interrupt_time = 0;
@@ -628,8 +625,7 @@ enqueue(Thread* thread, bool newOne)
 
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
 	schedulerThreadData->time_left = 0;
-	if (!thread_is_idle_thread(thread))
-		schedulerThreadData->went_sleep_count = 0;
+	schedulerThreadData->went_sleep_count = 0;
 	int32 threadPriority = get_effective_priority(thread);
 
 	T(EnqueueThread(thread, threadPriority));
@@ -659,8 +655,7 @@ enqueue(Thread* thread, bool newOne)
 		gPinnedRunQueues[targetCPU].PushBack(thread, threadPriority);
 	else {
 		gRunQueues[targetCore].PushBack(thread, threadPriority);
-		if (!thread_is_idle_thread(thread))
-			gCoreEntries[targetCore].fThreadList.Insert(thread->scheduler_data);
+		gCoreEntries[targetCore].fThreadList.Insert(thread->scheduler_data);
 	}
 	runQueueLocker.Unlock();
 
