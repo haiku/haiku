@@ -118,6 +118,7 @@ CPUEntry::CPUEntry()
 CoreEntry::CoreEntry()
 	:
 	fCPUCount(0),
+	fStarvationCounter(0),
 	fThreadCount(0),
 	fActiveTime(0),
 	fLoad(0),
@@ -595,7 +596,7 @@ thread_goes_away(Thread* thread)
 	schedulerThreadData->went_sleep_active
 		= atomic_get64(&gCoreEntries[smp_get_current_cpu()].fActiveTime);
 	schedulerThreadData->went_sleep_count
-		= atomic_get(&gCoreEntries[smp_get_current_cpu()].fThreadCount);
+		= atomic_get(&gCoreEntries[smp_get_current_cpu()].fStarvationCounter);
 }
 
 
@@ -607,7 +608,7 @@ should_cancel_penalty(Thread* thread)
 	if (core < 0)
 		return false;
 
-	return atomic_get(&gCoreEntries[core].fThreadCount)
+	return atomic_get(&gCoreEntries[core].fStarvationCounter)
 			!= thread->scheduler_data->went_sleep_count
 		&& system_time() - thread->scheduler_data->went_sleep
 			> kThreadQuantum;
@@ -656,6 +657,8 @@ enqueue(Thread* thread, bool newOne)
 	else {
 		gRunQueues[targetCore].PushBack(thread, threadPriority);
 		gCoreEntries[targetCore].fThreadList.Insert(thread->scheduler_data);
+
+		atomic_add(&gCoreEntries[targetCore].fThreadCount, 1);
 	}
 	runQueueLocker.Unlock();
 
@@ -721,12 +724,10 @@ put_back(Thread* thread)
 		gPinnedRunQueues[pinnedCPU].PushFront(thread,
 			get_effective_priority(thread));
 	} else {
-		int32 previousCore = thread->scheduler_data->previous_core;
-		ASSERT(previousCore >= 0);
+		ASSERT(thread->scheduler_data->previous_core == core);
 
-		ASSERT(previousCore == core);
-		gRunQueues[previousCore].PushFront(thread,
-			get_effective_priority(thread));
+		gRunQueues[core].PushFront(thread, get_effective_priority(thread));
+		atomic_add(&gCoreEntries[core].fThreadCount, 1);
 	}
 }
 
@@ -792,6 +793,8 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 				gCoreEntries[previousCore].fThreadList.Remove(
 					thread->scheduler_data);
 			}
+
+			atomic_add(&gCoreEntries[previousCore].fThreadCount, -1);
 		}
 		runQueueLocker.Unlock();
 
@@ -872,12 +875,12 @@ get_base_quantum(Thread* thread)
 	if (priority >= B_URGENT_DISPLAY_PRIORITY)
 		return kThreadQuantum;
 	if (priority > B_NORMAL_PRIORITY) {
-		return quantum_linear_interpolation(kThreadQuantum * 4,
+		return quantum_linear_interpolation(kThreadQuantum * 2,
 			kThreadQuantum, B_URGENT_DISPLAY_PRIORITY, B_NORMAL_PRIORITY,
 			priority);
 	}
-	return quantum_linear_interpolation(kThreadQuantum * 64,
-		kThreadQuantum * 4, B_NORMAL_PRIORITY, B_IDLE_PRIORITY, priority);
+	return quantum_linear_interpolation(kThreadQuantum * 30,
+		kThreadQuantum * 2, B_NORMAL_PRIORITY, B_IDLE_PRIORITY, priority);
 }
 
 
@@ -895,9 +898,17 @@ compute_quantum(Thread* thread)
 	quantum += schedulerThreadData->stolen_time;
 	schedulerThreadData->stolen_time = 0;
 
+	ASSERT(schedulerThreadData->previous_core
+		== gCPUToCore[smp_get_current_cpu()]);
+	CoreEntry* core = &gCoreEntries[schedulerThreadData->previous_core];
+	int32 threadCount = (core->fThreadCount + 1) / core->fCPUCount;
+	if (threadCount > 1) { 
+		quantum = max_c(min_c(kMaximumLatency / threadCount, quantum),
+				kThreadQuantum / 3);
+	}
+
 	schedulerThreadData->time_left = quantum;
 	schedulerThreadData->quantum_start = system_time();
-
 	return quantum;
 }
 
@@ -940,7 +951,7 @@ choose_next_thread(int32 thisCPU, Thread* oldThread, bool putAtBack)
 		if (thread_is_idle_thread(sharedThread)
 			|| gCoreEntries[thisCore].fThreadList.Head()
 				== sharedThread->scheduler_data) {
-			atomic_add(&gCoreEntries[thisCore].fThreadCount, 1);
+			atomic_add(&gCoreEntries[thisCore].fStarvationCounter, 1);
 		}
 
 		if (sharedThread->scheduler_data->went_sleep_count == 0) {
@@ -948,6 +959,7 @@ choose_next_thread(int32 thisCPU, Thread* oldThread, bool putAtBack)
 				sharedThread->scheduler_data);
 		}
 
+		atomic_add(&gCoreEntries[thisCore].fThreadCount, -1);
 		return sharedThread;
 	}
 
@@ -1250,7 +1262,7 @@ reschedule(void)
 
 		oldThread->cpu->preempted = false;
 		if (!thread_is_idle_thread(nextThread)) {
-			bigtime_t quantum = compute_quantum(oldThread);
+			bigtime_t quantum = compute_quantum(nextThread);
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER);
 		} else {
@@ -1430,6 +1442,7 @@ scheduler_set_cpu_enabled(int32 cpu, bool enabled)
 		// get rid of threads
 		thread_map(unassign_thread, &core->fCoreID);
 
+		core->fThreadCount = 0;
 		while (gRunQueues[core->fCoreID].PeekMaximum() != NULL) {
 			Thread* thread = gRunQueues[core->fCoreID].PeekMaximum();
 			gRunQueues[core->fCoreID].Remove(thread);

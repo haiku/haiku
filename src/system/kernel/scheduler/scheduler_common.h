@@ -29,7 +29,8 @@
 namespace Scheduler {
 
 
-const bigtime_t kThreadQuantum = 1000;
+const bigtime_t kThreadQuantum = 2000;
+const bigtime_t kMaximumLatency = 600000;
 
 const bigtime_t kCacheExpire = 100000;
 
@@ -77,6 +78,8 @@ struct CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 
 	spinlock	fCPULock;
 	spinlock	fQueueLock;
+
+	int32		fStarvationCounter;
 
 	int32		fThreadCount;
 	DoublyLinkedList<scheduler_thread_data>	fThreadList;
