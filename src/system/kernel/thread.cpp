@@ -698,25 +698,9 @@ common_thread_entry(void* _args)
 
 	// The thread is new and has been scheduled the first time.
 
-	// start CPU time based user timers
-	acquire_spinlock(&thread->team->time_lock);
-	acquire_spinlock(&thread->time_lock);
-	if (thread->HasActiveCPUTimeUserTimers()
-		|| thread->team->HasActiveCPUTimeUserTimers()) {
-		user_timer_continue_cpu_timers(thread, thread->cpu->previous_thread);
-	}
-
-	// start tracking time
-	thread->last_time = system_time();
-	release_spinlock(&thread->time_lock);
-	release_spinlock(&thread->team->time_lock);
-
-	// notify the user debugger code
-	if ((thread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
-		user_debug_thread_scheduled(thread);
+	scheduler_new_thread_entry(thread);
 
 	// unlock the scheduler lock and enable interrupts
-	release_spinlock(&thread->cpu->previous_thread->scheduler_lock);
 	release_spinlock(&thread->scheduler_lock);
 	enable_interrupts();
 

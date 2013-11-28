@@ -1007,6 +1007,58 @@ update_cpu_performance(Thread* thread, int32 thisCore)
 }
 
 
+static inline void
+stop_cpu_timers(Thread* fromThread, Thread* toThread)
+{
+	SpinLocker teamLocker(&fromThread->team->time_lock);
+	SpinLocker threadLocker(&fromThread->time_lock);
+
+	if (fromThread->HasActiveCPUTimeUserTimers()
+		|| fromThread->team->HasActiveCPUTimeUserTimers()) {
+		user_timer_stop_cpu_timers(fromThread, toThread);
+	}
+}
+
+
+static inline void
+continue_cpu_timers(Thread* thread, cpu_ent* cpu)
+{
+	SpinLocker teamLocker(&thread->team->time_lock);
+	SpinLocker threadLocker(&thread->time_lock);
+
+	if (thread->HasActiveCPUTimeUserTimers()
+		|| thread->team->HasActiveCPUTimeUserTimers()) {
+		user_timer_continue_cpu_timers(thread, cpu->previous_thread);
+	}
+}
+
+
+static void
+thread_resumes(Thread* thread)
+{
+	cpu_ent* cpu = thread->cpu;
+
+	release_spinlock(&cpu->previous_thread->scheduler_lock);
+
+	// continue CPU time based user timers
+	continue_cpu_timers(thread, cpu);
+
+	// notify the user debugger code
+	if ((thread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
+		user_debug_thread_scheduled(thread);
+}
+
+
+void
+scheduler_new_thread_entry(Thread* thread)
+{
+	thread_resumes(thread);
+
+	SpinLocker locker(thread->time_lock);
+	thread->last_time = system_time();
+}
+
+
 /*!	Switches the currently running thread.
 	This is a service function for scheduler implementations.
 
@@ -1022,14 +1074,7 @@ switch_thread(Thread* fromThread, Thread* toThread)
 		user_debug_thread_unscheduled(fromThread);
 
 	// stop CPU time based user timers
-	acquire_spinlock(&fromThread->team->time_lock);
-	acquire_spinlock(&fromThread->time_lock);
-	if (fromThread->HasActiveCPUTimeUserTimers()
-		|| fromThread->team->HasActiveCPUTimeUserTimers()) {
-		user_timer_stop_cpu_timers(fromThread, toThread);
-	}
-	release_spinlock(&fromThread->time_lock);
-	release_spinlock(&fromThread->team->time_lock);
+	stop_cpu_timers(fromThread, toThread);
 
 	// update CPU and Thread structures and perform the context switch
 	cpu_ent* cpu = fromThread->cpu;
@@ -1041,25 +1086,10 @@ switch_thread(Thread* fromThread, Thread* toThread)
 	arch_thread_set_current_thread(toThread);
 	arch_thread_context_switch(fromThread, toThread);
 
-	release_spinlock(&fromThread->cpu->previous_thread->scheduler_lock);
-
 	// The use of fromThread below looks weird, but is correct. fromThread had
 	// been unscheduled earlier, but is back now. For a thread scheduled the
 	// first time the same is done in thread.cpp:common_thread_entry().
-
-	// continue CPU time based user timers
-	acquire_spinlock(&fromThread->team->time_lock);
-	acquire_spinlock(&fromThread->time_lock);
-	if (fromThread->HasActiveCPUTimeUserTimers()
-		|| fromThread->team->HasActiveCPUTimeUserTimers()) {
-		user_timer_continue_cpu_timers(fromThread, cpu->previous_thread);
-	}
-	release_spinlock(&fromThread->time_lock);
-	release_spinlock(&fromThread->team->time_lock);
-
-	// notify the user debugger code
-	if ((fromThread->flags & THREAD_FLAGS_DEBUGGER_INSTALLED) != 0)
-		user_debug_thread_scheduled(fromThread);
+	thread_resumes(fromThread);
 }
 
 
@@ -1068,28 +1098,25 @@ update_thread_times(Thread* oldThread, Thread* nextThread)
 {
 	bigtime_t now = system_time();
 	if (oldThread == nextThread) {
-		acquire_spinlock(&oldThread->time_lock);
+		SpinLocker _(oldThread->time_lock);
 		oldThread->kernel_time += now - oldThread->last_time;
 		oldThread->last_time = now;
-		release_spinlock(&oldThread->time_lock);
 	} else {
-		acquire_spinlock(&oldThread->time_lock);
+		SpinLocker locker(oldThread->time_lock);
 		oldThread->kernel_time += now - oldThread->last_time;
 		oldThread->last_time = 0;
-		release_spinlock(&oldThread->time_lock);
+		locker.Unlock();
 
-		acquire_spinlock(&nextThread->time_lock);
+		locker.SetTo(nextThread->time_lock, false);
 		nextThread->last_time = now;
-		release_spinlock(&nextThread->time_lock);
 	}
 
 	// If the old thread's team has user time timers, check them now.
 	Team* team = oldThread->team;
 
-	acquire_spinlock(&team->time_lock);
+	SpinLocker _(team->time_lock);
 	if (team->HasActiveUserTimeUserTimers())
 		user_timer_check_team_user_timers(team);
-	release_spinlock(&team->time_lock);
 }
 
 
