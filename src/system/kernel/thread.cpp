@@ -2807,6 +2807,39 @@ thread_block_timeout(timer* timer)
 
 /*!	Blocks the current thread.
 
+	The thread is blocked until someone else unblock it. Must be called after a
+	call to thread_prepare_to_block(). If the thread has already been unblocked
+	after the previous call to thread_prepare_to_block(), this function will
+	return immediately. Cf. the documentation of thread_prepare_to_block() for
+	more details.
+
+	The caller must hold the scheduler lock.
+
+	\param thread The current thread.
+	\return The error code passed to the unblocking function. thread_interrupt()
+		uses \c B_INTERRUPTED. By convention \c B_OK means that the wait was
+		successful while another error code indicates a failure (what that means
+		depends on the client code).
+*/
+static inline status_t
+thread_block_locked(Thread* thread)
+{
+	if (thread->wait.status == 1) {
+		// check for signals, if interruptible
+		if (thread_is_interrupted(thread, thread->wait.flags)) {
+			thread->wait.status = B_INTERRUPTED;
+		} else {
+			thread->next_state = B_THREAD_WAITING;
+			scheduler_reschedule();
+		}
+	}
+
+	return thread->wait.status;
+}
+
+
+/*!	Blocks the current thread.
+
 	The function acquires the scheduler lock and calls thread_block_locked().
 	See there for more information.
 */
