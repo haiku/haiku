@@ -1082,70 +1082,6 @@ devfs_remove_vnode(fs_volume* _volume, fs_vnode* _v, bool reenter)
 
 
 static status_t
-devfs_create(fs_volume* _volume, fs_vnode* _dir, const char* name, int openMode,
-	int perms, void** _cookie, ino_t* _newVnodeID)
-{
-	struct devfs_vnode* dir = (struct devfs_vnode*)_dir->private_node;
-	struct devfs* fs = (struct devfs*)_volume->private_volume;
-	struct devfs_cookie* cookie;
-	struct devfs_vnode* vnode;
-	status_t status = B_OK;
-
-	TRACE(("devfs_create: dir %p, name \"%s\", openMode 0x%x, fs_cookie %p \n",
-		dir, name, openMode, _cookie));
-
-	RecursiveLocker locker(fs->lock);
-
-	// look it up
-	vnode = devfs_find_in_dir(dir, name);
-	if (vnode == NULL)
-		return EROFS;
-
-	if ((openMode & O_EXCL) != 0)
-		return B_FILE_EXISTS;
-
-	status = get_vnode(fs->volume, vnode->id, NULL);
-	if (status != B_OK)
-		return status;
-
-	locker.Unlock();
-
-	*_newVnodeID = vnode->id;
-
-	cookie = (struct devfs_cookie*)malloc(sizeof(struct devfs_cookie));
-	if (cookie == NULL) {
-		status = B_NO_MEMORY;
-		goto err1;
-	}
-
-	if (S_ISCHR(vnode->stream.type)) {
-		BaseDevice* device = vnode->stream.u.dev.device;
-		status = device->InitDevice();
-		if (status != B_OK)
-			goto err2;
-
-		char path[B_FILE_NAME_LENGTH];
-		get_device_name(vnode, path, sizeof(path));
-
-		status = device->Open(path, openMode, &cookie->device_cookie);
-		if (status != B_OK) {
-			device->UninitDevice();
-			goto err2;
-		}
-	}
-
-	*_cookie = cookie;
-	return B_OK;
-
-err2:
-	free(cookie);
-err1:
-	put_vnode(fs->volume, vnode->id);
-	return status;
-}
-
-
-static status_t
 devfs_open(fs_volume* _volume, fs_vnode* _vnode, int openMode,
 	void** _cookie)
 {
@@ -1978,7 +1914,7 @@ fs_vnode_ops kVnodeOps = {
 	NULL,
 
 	/* file */
-	&devfs_create,
+	NULL,	// create
 	&devfs_open,
 	&devfs_close,
 	&devfs_free_cookie,
