@@ -757,21 +757,17 @@ unpublish_device(device_node *node, const char *path)
 	if (path == NULL)
 		return B_BAD_VALUE;
 
-	RecursiveLocker _(sLock);
+	BaseDevice* baseDevice;
+	status_t error = devfs_get_device(path, baseDevice);
+	if (error != B_OK)
+		return error;
+	CObjectDeleter<BaseDevice> baseDevicePutter(baseDevice, &devfs_put_device);
 
-#if 0
-	DeviceList::ConstIterator iterator = node->Devices().GetIterator();
-	while (iterator.HasNext()) {
-		Device* device = iterator.Next();
-		if (!strcmp(device->Path(), path)) {
-			node->RemoveDevice(device);
-			delete device;
-			return B_OK;
-		}
-	}
-#endif
+	Device* device = dynamic_cast<Device*>(baseDevice);
+	if (device == NULL || device->Node() != node)
+		return B_BAD_VALUE;
 
-	return B_ENTRY_NOT_FOUND;
+	return devfs_unpublish_device(device, true);
 }
 
 
