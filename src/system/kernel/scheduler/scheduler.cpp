@@ -903,6 +903,9 @@ compute_quantum(Thread* thread)
 	else
 		quantum = get_base_quantum(thread);
 
+	if (thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+		return quantum;
+
 	quantum += schedulerThreadData->stolen_time;
 	schedulerThreadData->stolen_time = 0;
 
