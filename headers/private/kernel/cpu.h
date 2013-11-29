@@ -60,6 +60,8 @@ typedef struct cpu_ent {
 	bigtime_t		last_kernel_time;
 	bigtime_t		last_user_time;
 
+	int32			ici_counter;
+
 	// used in the kernel debugger
 	addr_t			fault_handler;
 	addr_t			fault_handler_stack_pointer;

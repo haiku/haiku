@@ -497,7 +497,7 @@ arch_cpu_idle(void)
 static inline void
 arch_cpu_pause(void)
 {
-	asm volatile("pause");
+	asm volatile("pause" : : : "memory");
 }
 
 
