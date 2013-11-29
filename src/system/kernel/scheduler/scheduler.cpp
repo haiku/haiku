@@ -611,7 +611,7 @@ should_cancel_penalty(Thread* thread)
 	return atomic_get(&gCoreEntries[core].fStarvationCounter)
 			!= thread->scheduler_data->went_sleep_count
 		&& system_time() - thread->scheduler_data->went_sleep
-			> kThreadQuantum;
+			> sCurrentMode->base_quantum;
 }
 
 
@@ -845,7 +845,9 @@ quantum_ended(Thread* thread, bool wasPreempted, bool hasYielded)
 	schedulerThreadData->time_left = max_c(0, schedulerThreadData->time_left);
 
 	// too little time left, it's better make the next quantum a bit longer
-	if (wasPreempted || schedulerThreadData->time_left <= kThreadQuantum / 50) {
+	if (wasPreempted
+		|| schedulerThreadData->time_left <= sCurrentMode->minimal_quantum) {
+
 		schedulerThreadData->stolen_time += schedulerThreadData->time_left;
 		schedulerThreadData->time_left = 0;
 	}
@@ -872,15 +874,21 @@ get_base_quantum(Thread* thread)
 {
 	int32 priority = get_effective_priority(thread);
 
+	const bigtime_t kQuantum0 = sCurrentMode->base_quantum;
 	if (priority >= B_URGENT_DISPLAY_PRIORITY)
-		return kThreadQuantum;
+		return kQuantum0;
+
+	const bigtime_t kQuantum1
+		= kQuantum0 * sCurrentMode->quantum_multipliers[0];
 	if (priority > B_NORMAL_PRIORITY) {
-		return quantum_linear_interpolation(kThreadQuantum * 2,
-			kThreadQuantum, B_URGENT_DISPLAY_PRIORITY, B_NORMAL_PRIORITY,
-			priority);
+		return quantum_linear_interpolation(kQuantum1, kQuantum0,
+			B_URGENT_DISPLAY_PRIORITY, B_NORMAL_PRIORITY, priority);
 	}
-	return quantum_linear_interpolation(kThreadQuantum * 30,
-		kThreadQuantum * 2, B_NORMAL_PRIORITY, B_IDLE_PRIORITY, priority);
+
+	const bigtime_t kQuantum2
+		= kQuantum0 * sCurrentMode->quantum_multipliers[1];
+	return quantum_linear_interpolation(kQuantum2, kQuantum1, B_NORMAL_PRIORITY,
+		B_IDLE_PRIORITY, priority);
 }
 
 
@@ -902,10 +910,8 @@ compute_quantum(Thread* thread)
 		== gCPUToCore[smp_get_current_cpu()]);
 	CoreEntry* core = &gCoreEntries[schedulerThreadData->previous_core];
 	int32 threadCount = (core->fThreadCount + 1) / core->fCPUCount;
-	if (threadCount > 1) {
-		quantum = max_c(min_c(kMaximumLatency / threadCount, quantum),
-				kThreadQuantum / 3);
-	}
+	quantum	= max_c(min_c(sCurrentMode->maximum_latency / threadCount, quantum),
+			sCurrentMode->minimal_quantum);
 
 	schedulerThreadData->time_left = quantum;
 	schedulerThreadData->quantum_start = system_time();
@@ -1312,7 +1318,7 @@ scheduler_on_thread_init(Thread* thread)
 
 	if (thread_is_idle_thread(thread)) {
 		static int32 sIdleThreadsID;
-		int32 cpu = atomic_add(&gIdleThreadsID, 1);
+		int32 cpu = atomic_add(&sIdleThreadsID, 1);
 
 		thread->previous_cpu = &gCPU[cpu];
 		thread->pinned_to_cpu = 1;
@@ -1421,7 +1427,6 @@ scheduler_set_cpu_enabled(int32 cpu, bool enabled)
 		// core has been disabled
 		ASSERT(!enabled);
 
-		int32 load = CoreLoadHeap::GetKey(core);
 		if (core->fHighLoad) {
 			gCoreHighLoadHeap->ModifyKey(core, -1);
 			ASSERT(gCoreHighLoadHeap->PeekMinimum() == core);
@@ -1833,7 +1838,9 @@ _user_estimate_max_scheduling_latency(thread_id id)
 				/ get_effective_priority(thread);
 	}
 
-	return max_c(threadCount * kThreadQuantum, kThreadQuantum / 5);
+	return min_c(max_c(threadCount * sCurrentMode->base_quantum,
+			sCurrentMode->minimal_quantum),
+		sCurrentMode->maximum_latency);
 }
 
 

@@ -13,6 +13,9 @@
 using namespace Scheduler;
 
 
+const bigtime_t kCacheExpire = 100000;
+
+
 static void
 switch_to_mode(void)
 {
@@ -181,6 +184,12 @@ scheduler_mode_operations gSchedulerLowLatencyMode = {
 	"low latency",
 
 	true,
+
+	2000,
+	700,
+	{ 2, 30 },
+
+	60000,
 
 	switch_to_mode,
 	set_cpu_enabled,

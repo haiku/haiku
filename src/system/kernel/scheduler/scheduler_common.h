@@ -29,11 +29,6 @@
 namespace Scheduler {
 
 
-const bigtime_t kThreadQuantum = 2000;
-const bigtime_t kMaximumLatency = 600000;
-
-const bigtime_t kCacheExpire = 100000;
-
 const int kLowLoad = kMaxLoad * 20 / 100;
 const int kTargetLoad = kMaxLoad * 55 / 100;
 const int kHighLoad = kMaxLoad * 70 / 100;

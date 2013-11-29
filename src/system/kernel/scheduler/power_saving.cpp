@@ -13,6 +13,8 @@
 using namespace Scheduler;
 
 
+const bigtime_t kCacheExpire = 100000;
+
 static int32 sSmallTaskCore;
 
 
@@ -242,6 +244,12 @@ scheduler_mode_operations gSchedulerPowerSavingMode = {
 	"power saving",
 
 	false,
+
+	3000,
+	1000,
+	{ 3, 60 },
+
+	200000,
 
 	switch_to_mode,
 	set_cpu_enabled,

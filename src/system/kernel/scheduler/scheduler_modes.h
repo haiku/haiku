@@ -15,6 +15,12 @@ struct scheduler_mode_operations {
 
 	bool			avoid_boost;
 
+	bigtime_t		base_quantum;
+	bigtime_t		minimal_quantum;
+	bigtime_t		quantum_multipliers[2];
+
+	bigtime_t		maximum_latency;
+
 	void			(*switch_to_mode)(void);
 	void			(*set_cpu_enabled)(int32 cpu, bool enabled);
 	bool			(*has_cache_expired)(Thread* thread);
