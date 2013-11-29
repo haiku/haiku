@@ -43,7 +43,7 @@ void scheduler_reschedule_ici(void);
 	indefinitely, the function will eventually return.
 	The caller must hold the current thread \c scheduler_lock.
 */
-void scheduler_reschedule(void);
+void scheduler_reschedule(int32 next_state);
 
 /*!	Sets the given thread's priority.
 	The thread may be running or may be in the ready-to-run queue.
@@ -112,7 +112,7 @@ static inline void
 scheduler_reschedule_if_necessary_locked()
 {
 	if (gCPU[smp_get_current_cpu()].invoke_scheduler)
-		scheduler_reschedule();
+		scheduler_reschedule(B_THREAD_READY);
 }
 
 

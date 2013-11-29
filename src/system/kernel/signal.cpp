@@ -1129,8 +1129,7 @@ handle_signals(Thread* thread)
 
 					if (!resume) {
 						InterruptsSpinLocker _(thread->scheduler_lock);
-						thread->next_state = B_THREAD_SUSPENDED;
-						scheduler_reschedule();
+						scheduler_reschedule(B_THREAD_SUSPENDED);
 					}
 
 					continue;

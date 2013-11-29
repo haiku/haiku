@@ -424,7 +424,6 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
 	int32			priority;		// protected by scheduler lock
 	int32			io_priority;	// protected by fLock
 	int32			state;			// protected by scheduler lock
-	int32			next_state;		// protected by scheduler lock
 	struct cpu_ent	*cpu;			// protected by scheduler lock
 	struct cpu_ent	*previous_cpu;	// protected by scheduler lock
 	int32			pinned_to_cpu;	// only accessed by this thread or in the

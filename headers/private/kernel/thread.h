@@ -211,7 +211,7 @@ thread_is_interrupted(Thread* thread, uint32 flags)
 static inline bool
 thread_is_blocked(Thread* thread)
 {
-	return thread->wait.status == 1;
+	return atomic_get(&thread->wait.status) == 1;
 }
 
 

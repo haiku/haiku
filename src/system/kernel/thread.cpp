@@ -892,7 +892,6 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 	thread->priority = attributes.priority == -1
 		? B_NORMAL_PRIORITY : attributes.priority;
 	thread->state = B_THREAD_SUSPENDED;
-	thread->next_state = B_THREAD_SUSPENDED;
 
 	thread->sig_block_mask = attributes.signal_mask;
 
@@ -1501,7 +1500,9 @@ make_thread_suspended(int argc, char **argv)
 		if (thread->id != id)
 			continue;
 
-		thread->next_state = B_THREAD_SUSPENDED;
+		Signal signal(SIGSTOP, SI_USER, B_OK, team_get_kernel_team()->id);
+		send_signal_to_thread(thread, signal, B_DO_NOT_RESCHEDULE);
+
 		kprintf("thread %" B_PRId32 " suspended\n", id);
 		found = true;
 		break;
@@ -1710,7 +1711,6 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 	kprintf("priority:           %" B_PRId32 " (I/O: %" B_PRId32 ")\n",
 		thread->priority, thread->io_priority);
 	kprintf("state:              %s\n", state_to_text(thread, thread->state));
-	kprintf("next_state:         %s\n", state_to_text(thread, thread->next_state));
 	kprintf("cpu:                %p ", thread->cpu);
 	if (thread->cpu)
 		kprintf("(%d)\n", thread->cpu->cpu_num);
@@ -2250,8 +2250,7 @@ thread_exit(void)
 	sUndertakerCondition.NotifyOne();
 	undertakerLocker.Unlock();
 
-	thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
-	scheduler_reschedule();
+	scheduler_reschedule(THREAD_STATE_FREE_ON_RESCHED);
 
 	panic("never can get here\n");
 }
@@ -2399,7 +2398,7 @@ thread_yield(void)
 	InterruptsSpinLocker _(thread->scheduler_lock);
 
 	thread->has_yielded = true;
-	scheduler_reschedule();
+	scheduler_reschedule(B_THREAD_READY);
 }
 
 
@@ -2678,7 +2677,6 @@ thread_init(kernel_args *args)
 		thread->team = team_get_kernel_team();
 		thread->priority = B_IDLE_PRIORITY;
 		thread->state = B_THREAD_RUNNING;
-		thread->next_state = B_THREAD_READY;
 		sprintf(name, "idle thread %" B_PRIu32 " kstack", i + 1);
 		thread->kernel_stack_area = find_area(name);
 
@@ -2828,10 +2826,8 @@ thread_block_locked(Thread* thread)
 		// check for signals, if interruptible
 		if (thread_is_interrupted(thread, thread->wait.flags)) {
 			thread->wait.status = B_INTERRUPTED;
-		} else {
-			thread->next_state = B_THREAD_WAITING;
-			scheduler_reschedule();
-		}
+		} else
+			scheduler_reschedule(B_THREAD_WAITING);
 	}
 
 	return thread->wait.status;

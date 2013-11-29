@@ -620,7 +620,7 @@ enqueue(Thread* thread, bool newOne)
 {
 	ASSERT(thread != NULL);
 
-	thread->state = thread->next_state = B_THREAD_READY;
+	thread->state = B_THREAD_READY;
 
 	compute_thread_load(thread);
 
@@ -1148,7 +1148,7 @@ update_thread_times(Thread* oldThread, Thread* nextThread)
 
 
 static void
-reschedule(void)
+reschedule(int32 nextState)
 {
 	ASSERT(!are_interrupts_enabled());
 
@@ -1162,7 +1162,7 @@ reschedule(void)
 	TRACE("reschedule(): cpu %ld, current thread = %ld\n", thisCPU,
 		oldThread->id);
 
-	oldThread->state = oldThread->next_state;
+	oldThread->state = nextState;
 	scheduler_thread_data* schedulerOldThreadData = oldThread->scheduler_data;
 
 	// return time spent in interrupts
@@ -1172,7 +1172,7 @@ reschedule(void)
 
 	bool enqueueOldThread = false;
 	bool putOldThreadAtBack = false;
-	switch (oldThread->next_state) {
+	switch (nextState) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
 			enqueueOldThread = true;
@@ -1197,7 +1197,7 @@ reschedule(void)
 			increase_penalty(oldThread);
 			thread_goes_away(oldThread);
 			TRACE("not enqueueing thread %ld into run queue next_state = %ld\n",
-				oldThread->id, oldThread->next_state);
+				oldThread->id, nextState);
 			break;
 	}
 
@@ -1247,7 +1247,6 @@ reschedule(void)
 		update_cpu_priority(thisCPU, get_effective_priority(nextThread));
 
 	nextThread->state = B_THREAD_RUNNING;
-	nextThread->next_state = B_THREAD_READY;
 
 	ASSERT(nextThread->scheduler_data->previous_core == thisCore);
 
@@ -1291,16 +1290,16 @@ reschedule(void)
 	Note: expects thread spinlock to be held
 */
 void
-scheduler_reschedule(void)
+scheduler_reschedule(int32 nextState)
 {
 	if (!sSchedulerEnabled) {
 		Thread* thread = thread_get_current_thread();
-		if (thread != NULL && thread->next_state != B_THREAD_READY)
+		if (thread != NULL && nextState != B_THREAD_READY)
 			panic("scheduler_reschedule_no_op() called in non-ready thread");
 		return;
 	}
 
-	reschedule();
+	reschedule(nextState);
 }
 
 
@@ -1346,7 +1345,7 @@ scheduler_start(void)
 {
 	InterruptsSpinLocker _(thread_get_current_thread()->scheduler_lock);
 
-	reschedule();
+	reschedule(B_THREAD_READY);
 }
 
 

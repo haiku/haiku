@@ -1811,8 +1811,7 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 			Thread* thread = thread_get_current_thread();
 
 			InterruptsSpinLocker schedulerLocker(thread->scheduler_lock);
-			thread->next_state = B_THREAD_SUSPENDED;
-			scheduler_reschedule();
+			scheduler_reschedule(B_THREAD_SUSPENDED);
 		}
 
 		if (loadingInfo.result < B_OK)
