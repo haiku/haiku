@@ -1422,7 +1422,7 @@ scheduler_set_cpu_enabled(int32 cpu, bool enabled)
 		ASSERT(!enabled);
 
 		int32 load = CoreLoadHeap::GetKey(core);
-		if (load > kHighLoad) {
+		if (core->fHighLoad) {
 			gCoreHighLoadHeap->ModifyKey(core, -1);
 			ASSERT(gCoreHighLoadHeap->PeekMinimum() == core);
 			gCoreHighLoadHeap->RemoveMinimum();
@@ -1448,6 +1448,12 @@ scheduler_set_cpu_enabled(int32 cpu, bool enabled)
 			gRunQueues[core->fCoreID].Remove(thread);
 			thread->scheduler_data->enqueued = false;
 
+			if (thread->scheduler_data->went_sleep_count == 0) {
+				gCoreEntries[core->fCoreID].fThreadList.Remove(
+					thread->scheduler_data);
+				thread->scheduler_data->went_sleep_count = -1;;
+			}
+
 			ASSERT(thread->scheduler_data->previous_core == -1);
 			enqueue(thread, false);
 		}
@@ -1457,6 +1463,7 @@ scheduler_set_cpu_enabled(int32 cpu, bool enabled)
 
 		gCPUEntries[cpu].fLoad = 0;
 		core->fLoad = 0;
+		core->fHighLoad = false;
 		gCoreLoadHeap->Insert(core, 0);
 
 		package->fCoreCount++;
@@ -1478,7 +1485,11 @@ scheduler_set_cpu_enabled(int32 cpu, bool enabled)
 			== &gCPUEntries[cpu]);
 		gCPUPriorityHeaps[core->fCoreID].RemoveMaximum();
 
+		ASSERT(gCPUEntries[cpu].fLoad >= 0
+			&& gCPUEntries[cpu].fLoad <= kMaxLoad);
+
 		core->fLoad -= gCPUEntries[cpu].fLoad;
+		ASSERT(core->fLoad >= 0);
 	}
 
 	if (!enabled) {
