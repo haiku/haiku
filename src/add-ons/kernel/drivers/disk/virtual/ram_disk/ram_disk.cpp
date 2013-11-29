@@ -343,8 +343,10 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 			// mark all pages we want to write busy
 			size_t pagesToWrite = previousModifiedIndex + 1;
 			for (size_t i = 0; i < pagesToWrite; i++) {
-				if (pages[i] != NULL)
+				if (vm_page* page = pages[i]) {
+					DEBUG_PAGE_ACCESS_START(page);
 					pages[i]->busy = true;
+				}
 			}
 
 			locker.Unlock();
@@ -390,6 +392,7 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 					if (error == B_OK)
 						page->modified = false;
 					fCache->MarkPageUnbusy(page);
+					DEBUG_PAGE_ACCESS_END(page);
 				}
 			}
 
@@ -485,6 +488,7 @@ private:
 					continue;
 				}
 
+				DEBUG_PAGE_ACCESS_START(page);
 				page->busy = true;
 			} else
 				missingPages++;
@@ -531,10 +535,13 @@ private:
 					if (success) {
 						fCache->InsertPage(page, offset);
 						fCache->MarkPageUnbusy(page);
+						DEBUG_PAGE_ACCESS_END(page);
 					} else
 						vm_page_free(NULL, page);
-				} else
+				} else {
 					fCache->MarkPageUnbusy(page);
+					DEBUG_PAGE_ACCESS_END(page);
+				}
 			}
 
 			offset += B_PAGE_SIZE;
@@ -687,10 +694,12 @@ private:
 				for (size_t k = 0; isClear && k < B_PAGE_SIZE / 8; k++)
 					isClear = pageData[k] == 0;
 
-				if (isClear)
+				if (isClear) {
 					pages[clearPages++] = pages[i];
-				else
+				} else {
 					fCache->InsertPage(pages[i], offset + i * B_PAGE_SIZE);
+					DEBUG_PAGE_ACCESS_END(pages[i]);
+				}
 			}
 
 			locker.Unlock();
