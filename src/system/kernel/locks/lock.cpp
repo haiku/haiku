@@ -231,7 +231,7 @@ rw_lock_init(rw_lock* lock, const char* name)
 {
 	lock->name = name;
 	lock->waiters = NULL;
-	lock->lock = B_SPINLOCK_INITIALIZER;
+	B_INITIALIZE_SPINLOCK(&lock->lock);
 	lock->holder = -1;
 	lock->count = 0;
 	lock->owner_count = 0;
@@ -249,7 +249,7 @@ rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags)
 {
 	lock->name = (flags & RW_LOCK_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
 	lock->waiters = NULL;
-	lock->lock = B_SPINLOCK_INITIALIZER;
+	B_INITIALIZE_SPINLOCK(&lock->lock);
 	lock->holder = -1;
 	lock->count = 0;
 	lock->owner_count = 0;
@@ -574,7 +574,7 @@ mutex_init(mutex* lock, const char *name)
 {
 	lock->name = name;
 	lock->waiters = NULL;
-	lock->lock = B_SPINLOCK_INITIALIZER;
+	B_INITIALIZE_SPINLOCK(&lock->lock);
 #if KDEBUG
 	lock->holder = -1;
 #else
@@ -593,7 +593,7 @@ mutex_init_etc(mutex* lock, const char *name, uint32 flags)
 {
 	lock->name = (flags & MUTEX_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
 	lock->waiters = NULL;
-	lock->lock = B_SPINLOCK_INITIALIZER;
+	B_INITIALIZE_SPINLOCK(&lock->lock);
 #if KDEBUG
 	lock->holder = -1;
 #else
