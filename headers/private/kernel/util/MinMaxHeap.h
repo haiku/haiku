@@ -198,7 +198,7 @@ MIN_MAX_HEAP_CLASS_NAME::PeekMinimum()
 		ASSERT(fMaxLastElement == 1);
 		return fMaxElements[0];
 	}
-		
+
 	return NULL;
 }
 
@@ -213,7 +213,7 @@ MIN_MAX_HEAP_CLASS_NAME::PeekMaximum()
 		ASSERT(fMinLastElement == 1);
 		return fMinElements[0];
 	}
-		
+
 	return NULL;
 }
 

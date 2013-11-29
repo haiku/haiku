@@ -156,7 +156,7 @@ RUN_QUEUE_CLASS_NAME::ConstIterator::Next()
 	fNext = link->fNext;
 	if (fNext == NULL)
 		_FindNextPriority();
-		
+
 	return current;
 }
 

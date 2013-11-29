@@ -830,7 +830,7 @@ reschedule_event(timer* /* unused */)
 }
 
 
-static inline bool 
+static inline bool
 quantum_ended(Thread* thread, bool wasPreempted, bool hasYielded)
 {
 	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
@@ -902,7 +902,7 @@ compute_quantum(Thread* thread)
 		== gCPUToCore[smp_get_current_cpu()]);
 	CoreEntry* core = &gCoreEntries[schedulerThreadData->previous_core];
 	int32 threadCount = (core->fThreadCount + 1) / core->fCPUCount;
-	if (threadCount > 1) { 
+	if (threadCount > 1) {
 		quantum = max_c(min_c(kMaximumLatency / threadCount, quantum),
 				kThreadQuantum / 3);
 	}
@@ -1252,7 +1252,7 @@ reschedule(void)
 	nextThread->scheduler_data->last_interrupt_time
 		= gCPU[thisCPU].interrupt_time;
 
-	if (!thread_is_idle_thread(nextThread)) 
+	if (!thread_is_idle_thread(nextThread))
 		update_cpu_performance(nextThread, thisCore);
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
@@ -1311,7 +1311,7 @@ scheduler_on_thread_init(Thread* thread)
 	thread->scheduler_data->Init();
 
 	if (thread_is_idle_thread(thread)) {
-		static int32 gIdleThreadsID;
+		static int32 sIdleThreadsID;
 		int32 cpu = atomic_add(&gIdleThreadsID, 1);
 
 		thread->previous_cpu = &gCPU[cpu];
@@ -1344,7 +1344,7 @@ scheduler_start(void)
 static inline void
 acquire_big_scheduler_lock(void)
 {
-	for (int32_t i = 0; i < smp_get_num_cpus(); i++)
+	for (int32 i = 0; i < smp_get_num_cpus(); i++)
 		acquire_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
 }
 
@@ -1352,7 +1352,7 @@ acquire_big_scheduler_lock(void)
 static inline void
 release_big_scheduler_lock(void)
 {
-	for (int32_t i = 0; i < smp_get_num_cpus(); i++)
+	for (int32 i = 0; i < smp_get_num_cpus(); i++)
 		release_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
 }
 
@@ -1471,7 +1471,7 @@ scheduler_set_cpu_enabled(int32 cpu, bool enabled)
 		package->fIdleCores.Add(core);
 
 		if (package->fCoreCount == 1)
-			gIdlePackageList->Add(package);		
+			gIdlePackageList->Add(package);
 	}
 
 	if (enabled) {
