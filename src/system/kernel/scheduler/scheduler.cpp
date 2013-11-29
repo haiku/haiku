@@ -449,12 +449,7 @@ static inline void
 update_cpu_priority(int32 cpu, int32 priority)
 {
 	int32 core = gCPUToCore[cpu];
-
-	SpinLocker coreLocker(gCoreEntries[core].fCPULock);
-
 	int32 corePriority = CPUHeap::GetKey(gCPUPriorityHeaps[core].PeekMaximum());
-
-	gCPUEntries[cpu].fPriority = priority;
 	gCPUPriorityHeaps[core].ModifyKey(&gCPUEntries[cpu], priority);
 
 	if (gSingleCore)
@@ -511,29 +506,41 @@ choose_core(Thread* thread)
 
 
 static inline int32
-choose_cpu(int32 core)
+choose_cpu(int32 core, Thread* thread, bool& rescheduleNeeded)
 {
 	SpinLocker cpuLocker(gCoreEntries[core].fCPULock);
 	CPUEntry* entry = gCPUPriorityHeaps[core].PeekMinimum();
 	ASSERT(entry != NULL);
+
+	int32 threadPriority = get_effective_priority(thread);
+	if (CPUHeap::GetKey(entry) < threadPriority) {
+		update_cpu_priority(entry->fCPUNumber, threadPriority);
+		rescheduleNeeded = true;
+	} else
+		rescheduleNeeded = false;
+
 	return entry->fCPUNumber;
 }
 
 
-static void
+static bool
 choose_core_and_cpu(Thread* thread, int32& targetCore, int32& targetCPU)
 {
+	bool rescheduleNeeded = false;
+
 	if (targetCore == -1 && targetCPU != -1)
 		targetCore = gCPUToCore[targetCPU];
 	else if (targetCore != -1 && targetCPU == -1)
-		targetCPU = choose_cpu(targetCore);
+		targetCPU = choose_cpu(targetCore, thread, rescheduleNeeded);
 	else if (targetCore == -1 && targetCPU == -1) {
 		targetCore = choose_core(thread);
-		targetCPU = choose_cpu(targetCore);
+		targetCPU = choose_cpu(targetCore, thread, rescheduleNeeded);
 	}
 
 	ASSERT(targetCore >= 0 && targetCore < gCoreCount);
 	ASSERT(targetCPU >= 0 && targetCPU < smp_get_num_cpus());
+
+	return rescheduleNeeded;
 }
 
 
@@ -644,7 +651,7 @@ enqueue(Thread* thread, bool newOne)
 		targetCore = schedulerThreadData->previous_core;
 	}
 
-	choose_core_and_cpu(thread, targetCore, targetCPU);
+	bool rescheduleNeeded = choose_core_and_cpu(thread, targetCore, targetCPU);
 	schedulerThreadData->previous_core = targetCore;
 
 	TRACE("enqueueing thread %ld with priority %ld on CPU %ld (core %ld)\n",
@@ -666,13 +673,10 @@ enqueue(Thread* thread, bool newOne)
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
 		thread);
 
-	int32 targetPriority = gCPUEntries[targetCPU].fPriority;
-
-	if (threadPriority > targetPriority) {
-		// It is possible that another CPU schedules the thread before the
-		// target CPU. However, since the target CPU is sent an ICI it will
-		// reschedule anyway and update its heap key to the correct value.
-		update_cpu_priority(targetCPU, threadPriority);
+	int32 heapPriority = CPUHeap::GetKey(&gCPUEntries[targetCPU]);
+	if (threadPriority > atomic_get(&gCPUEntries[targetCPU].fPriority)
+		&& (threadPriority > heapPriority
+			|| (threadPriority == heapPriority && rescheduleNeeded))) {
 
 		if (targetCPU == smp_get_current_cpu())
 			gCPU[targetCPU].invoke_scheduler = true;
@@ -752,9 +756,18 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 
 	thread->priority = priority;
 
+	int32 previousCore = thread->scheduler_data->previous_core;
+	ASSERT(previousCore >= 0);
+
 	if (thread->state != B_THREAD_READY) {
-		if (thread->state == B_THREAD_RUNNING)
+		if (thread->state == B_THREAD_RUNNING) {
+			ASSERT(thread->previous_cpu != NULL);
+
+			SpinLocker coreLocker(gCoreEntries[previousCore].fCPULock);
+
+			gCPUEntries[thread->cpu->cpu_num].fPriority = priority;
 			update_cpu_priority(thread->cpu->cpu_num, priority);
+		}
 		return oldPriority;
 	}
 
@@ -767,8 +780,6 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 		ASSERT(thread->previous_cpu != NULL);
 		previousCPU = thread->previous_cpu->cpu_num;
 	}
-	int32 previousCore = thread->scheduler_data->previous_core;
-	ASSERT(previousCore >= 0);
 
 	SpinLocker runQueueLocker(gCoreEntries[previousCore].fQueueLock);
 
@@ -913,6 +924,8 @@ compute_quantum(Thread* thread)
 		== gCPUToCore[smp_get_current_cpu()]);
 	CoreEntry* core = &gCoreEntries[schedulerThreadData->previous_core];
 	int32 threadCount = (core->fThreadCount + 1) / core->fCPUCount;
+	threadCount = max_c(threadCount, 1);
+
 	quantum	= max_c(min_c(sCurrentMode->maximum_latency / threadCount, quantum),
 			sCurrentMode->minimal_quantum);
 
@@ -1222,6 +1235,9 @@ reschedule(int32 nextState)
 				putOldThreadAtBack);
 	}
 
+	atomic_set(&gCPUEntries[thisCPU].fPriority,
+		get_effective_priority(nextThread));
+
 	if (nextThread != oldThread) {
 		if (enqueueOldThread) {
 			if (putOldThreadAtBack)
@@ -1243,8 +1259,10 @@ reschedule(int32 nextState)
 		oldThread, nextThread);
 
 	// update CPU heap
-	if (!gCPU[thisCPU].disabled)
+	if (!gCPU[thisCPU].disabled) {
+		SpinLocker coreLocker(gCoreEntries[thisCore].fCPULock);
 		update_cpu_priority(thisCPU, get_effective_priority(nextThread));
+	}
 
 	nextThread->state = B_THREAD_RUNNING;
 
@@ -1421,6 +1439,7 @@ scheduler_set_cpu_enabled(int32 cpu, bool enabled)
 	if (enabled)
 		core->fCPUCount++;
 	else {
+		gCPUEntries[cpu].fPriority = B_IDLE_PRIORITY;
 		update_cpu_priority(cpu, B_IDLE_PRIORITY);
 		core->fCPUCount--;
 	}
