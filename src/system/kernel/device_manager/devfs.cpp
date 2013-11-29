@@ -2143,6 +2143,34 @@ devfs_unpublish_device(BaseDevice* device, bool disconnect)
 }
 
 
+/*!	Gets the device for a given devfs relative path.
+	If successful the call must be balanced with a call to devfs_put_device().
+*/
+status_t
+devfs_get_device(const char* path, BaseDevice*& _device)
+{
+	devfs_vnode* node;
+	status_t status = get_node_for_path(sDeviceFileSystem, path, &node);
+	if (status != B_OK)
+		return status;
+
+	if (!S_ISCHR(node->stream.type) || node->stream.u.dev.partition != NULL) {
+		put_vnode(sDeviceFileSystem->volume, node->id);
+		return B_BAD_VALUE;
+	}
+
+	_device = node->stream.u.dev.device;
+	return B_OK;
+}
+
+
+void
+devfs_put_device(BaseDevice* device)
+{
+	put_vnode(sDeviceFileSystem->volume, device->ID());
+}
+
+
 void
 devfs_compute_geometry_size(device_geometry* geometry, uint64 blockCount,
 	uint32 blockSize)
@@ -2175,5 +2203,3 @@ devfs_publish_device(const char* path, device_hooks* hooks)
 {
 	return legacy_driver_publish(path, hooks);
 }
-
-
