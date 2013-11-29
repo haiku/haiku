@@ -100,12 +100,12 @@ struct ControlDevice : Device {
 	{
 	}
 
-	status_t Register(const char* fileName, uint64 deviceSize)
+	status_t Register(const char* filePath, uint64 deviceSize)
 	{
 		device_attr attrs[] = {
 			{B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
 				{string: "RAM Disk Raw Device"}},
-			{kFilePathItem, B_STRING_TYPE, {string: fileName}},
+			{kFilePathItem, B_STRING_TYPE, {string: filePath}},
 			{kDeviceSizeItem, B_UINT64_TYPE, {ui64: deviceSize}},
 			{NULL}
 		};
@@ -130,6 +130,7 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 		fIndex(-1),
 		fDeviceSize(0),
 		fDeviceName(NULL),
+		fFilePath(NULL),
 		fCache(NULL),
 		fDMAResource(NULL),
 		fIOScheduler(NULL)
@@ -144,14 +145,19 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 		}
 
 		free(fDeviceName);
+		free(fFilePath);
 	}
 
 	int32 Index() const				{ return fIndex; }
 	off_t DeviceSize() const		{ return fDeviceSize; }
 	const char* DeviceName() const	{ return fDeviceName; }
 
-	status_t Init(uint64 deviceSize)
+	status_t Init(const char* filePath, uint64 deviceSize)
 	{
+		fFilePath = filePath != NULL ? strdup(filePath) : NULL;
+		if (filePath != NULL && fFilePath == NULL)
+			return B_NO_MEMORY;
+
 		fDeviceSize = (deviceSize + B_PAGE_SIZE - 1) / B_PAGE_SIZE
 			* B_PAGE_SIZE;
 
@@ -206,6 +212,14 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 			return error;
 		}
 
+		if (fFilePath != NULL) {
+			error = _LoadFile();
+			if (error != B_OK) {
+				Unprepare();
+				return error;
+			}
+		}
+
 		// no DMA restrictions
 		const dma_restrictions restrictions = {};
 
@@ -254,6 +268,140 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 		}
 	}
 
+	status_t Flush()
+	{
+		static const size_t kPageCountPerIteration = 1024;
+		static const size_t kMaxGapSize = 15;
+
+		int fd = open(fFilePath, O_WRONLY);
+		if (fd < 0)
+			return errno;
+		FileDescriptorCloser fdCloser(fd);
+
+		vm_page** pages = new(std::nothrow) vm_page*[kPageCountPerIteration];
+		ArrayDeleter<vm_page*> pagesDeleter(pages);
+
+		uint8* buffer = (uint8*)malloc(kPageCountPerIteration * B_PAGE_SIZE);
+		MemoryDeleter bufferDeleter(buffer);
+
+		if (pages == NULL || buffer == NULL)
+			return B_NO_MEMORY;
+
+		// Iterate through all pages of the cache and write those back that have
+		// been modified.
+		AutoLocker<VMCache> locker(fCache);
+
+		status_t error = B_OK;
+
+		for (off_t offset = 0; offset < fDeviceSize;) {
+			// find the first modified page at or after the current offset
+			VMCachePagesTree::Iterator it
+				= fCache->pages.GetIterator(offset / B_PAGE_SIZE, true, true);
+			vm_page* firstModified;
+			while ((firstModified = it.Next()) != NULL
+				&& !firstModified->modified) {
+			}
+
+			if (firstModified == NULL)
+				break;
+
+			if (firstModified->busy) {
+				fCache->WaitForPageEvents(firstModified, PAGE_EVENT_NOT_BUSY,
+					true);
+				continue;
+			}
+
+			pages[0] = firstModified;
+			page_num_t firstPageIndex = firstModified->cache_offset;
+			offset = firstPageIndex * B_PAGE_SIZE;
+
+			// Collect more pages until the gap between two modified pages gets
+			// too large or we hit the end of our array.
+			size_t previousModifiedIndex = 0;
+			size_t previousIndex = 0;
+			while (vm_page* page = it.Next()) {
+				page_num_t index = page->cache_offset - firstPageIndex;
+				if (page->busy
+					|| index >= kPageCountPerIteration
+					|| index - previousModifiedIndex > kMaxGapSize) {
+					break;
+				}
+
+				pages[index] = page;
+
+				// clear page array gap since the previous page
+				if (previousIndex + 1 < index) {
+					memset(pages + previousIndex + 1, 0,
+						(index - previousIndex - 1) * sizeof(vm_page*));
+				}
+
+				previousIndex = index;
+				if (page->modified)
+					previousModifiedIndex = index;
+			}
+
+			// mark all pages we want to write busy
+			size_t pagesToWrite = previousModifiedIndex + 1;
+			for (size_t i = 0; i < pagesToWrite; i++) {
+				if (pages[i] != NULL)
+					pages[i]->busy = true;
+			}
+
+			locker.Unlock();
+
+			// copy the pages to our buffer
+			for (size_t i = 0; i < pagesToWrite; i++) {
+				if (vm_page* page = pages[i]) {
+					error = vm_memcpy_from_physical(buffer + i * B_PAGE_SIZE,
+						page->physical_page_number * B_PAGE_SIZE, B_PAGE_SIZE,
+						false);
+					if (error != B_OK) {
+						dprintf("ramdisk: error copying page %" B_PRIu64
+							" data: %s\n", (uint64)page->physical_page_number,
+							strerror(error));
+						break;
+					}
+				} else
+					memset(buffer + i * B_PAGE_SIZE, 0, B_PAGE_SIZE);
+			}
+
+			// write the buffer
+			if (error == B_OK) {
+				ssize_t bytesWritten = pwrite(fd, buffer,
+					pagesToWrite * B_PAGE_SIZE, offset);
+				if (bytesWritten < 0) {
+					dprintf("ramdisk: error writing pages to file: %s\n",
+						strerror(bytesWritten));
+					error = bytesWritten;
+				}
+				else if ((size_t)bytesWritten != pagesToWrite * B_PAGE_SIZE) {
+					dprintf("ramdisk: error writing pages to file: short "
+						"write (%zd/%zu)\n", bytesWritten,
+						pagesToWrite * B_PAGE_SIZE);
+					error = B_ERROR;
+				}
+			}
+
+			// mark the pages unbusy, on success also unmodified
+			locker.Lock();
+
+			for (size_t i = 0; i < pagesToWrite; i++) {
+				if (vm_page* page = pages[i]) {
+					if (error == B_OK)
+						page->modified = false;
+					fCache->MarkPageUnbusy(page);
+				}
+			}
+
+			if (error != B_OK)
+				break;
+
+			offset += pagesToWrite * B_PAGE_SIZE;
+		}
+
+		return error;
+	}
+
 	status_t DoIO(IORequest* request)
 	{
 		return fIOScheduler->ScheduleRequest(request);
@@ -295,6 +443,9 @@ private:
 
 		while (length > 0) {
 			vm_page* page = pages[index];
+
+			if (isWrite)
+				page->modified = true;
 
 			error = _CopyData(page, vecs, vecOffset, isWrite);
 			if (error != B_OK)
@@ -412,6 +563,7 @@ private:
 			pageData = (uint8*)virtualAddress;
 		}
 
+		status_t error = B_OK;
 		size_t length = B_PAGE_SIZE;
 		while (length > 0) {
 			size_t toCopy = std::min((generic_size_t)length,
@@ -425,13 +577,13 @@ private:
 
 			phys_addr_t vecAddress = vecs->base + vecOffset;
 
-			status_t error = toPage
+			error = toPage
 				? vm_memcpy_from_physical(pageData, vecAddress, toCopy, false)
 				: (page != NULL
 					? vm_memcpy_to_physical(vecAddress, pageData, toCopy, false)
 					: vm_memset_physical(vecAddress, 0, toCopy));
 			if (error != B_OK)
-				return error;
+				break;
 
 			pageData += toCopy;
 			length -= toCopy;
@@ -443,13 +595,132 @@ private:
 			thread_unpin_from_current_cpu(thread);
 		}
 
-		return B_OK;
+		return error;
+	}
+
+	status_t _LoadFile()
+	{
+		static const size_t kPageCountPerIteration = 1024;
+
+		int fd = open(fFilePath, O_RDONLY);
+		if (fd < 0)
+			return errno;
+		FileDescriptorCloser fdCloser(fd);
+
+		vm_page** pages = new(std::nothrow) vm_page*[kPageCountPerIteration];
+		ArrayDeleter<vm_page*> pagesDeleter(pages);
+
+		uint8* buffer = (uint8*)malloc(kPageCountPerIteration * B_PAGE_SIZE);
+		MemoryDeleter bufferDeleter(buffer);
+			// TODO: Ideally we wouldn't use a buffer to read the file content,
+			// but read into the pages we allocated directly. Unfortunately
+			// there's no API to do that yet.
+
+		if (pages == NULL || buffer == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = B_OK;
+
+		page_num_t allocatedPages = 0;
+		off_t offset = 0;
+		off_t sizeRemaining = fDeviceSize;
+		while (sizeRemaining > 0) {
+			// Note: fDeviceSize is B_PAGE_SIZE aligned.
+			size_t pagesToRead = std::min(kPageCountPerIteration,
+				size_t(sizeRemaining / B_PAGE_SIZE));
+
+			// allocate the missing pages
+			if (allocatedPages < pagesToRead) {
+				vm_page_reservation reservation;
+				vm_page_reserve_pages(&reservation,
+					pagesToRead - allocatedPages, VM_PRIORITY_SYSTEM);
+
+				while (allocatedPages < pagesToRead) {
+					pages[allocatedPages++]
+						= vm_page_allocate_page(&reservation, PAGE_STATE_WIRED);
+				}
+
+				vm_page_unreserve_pages(&reservation);
+			}
+
+			// read from the file
+			size_t bytesToRead = pagesToRead * B_PAGE_SIZE;
+			ssize_t bytesRead = pread(fd, buffer, bytesToRead, offset);
+			if (bytesRead < 0) {
+				error = bytesRead;
+				break;
+			}
+			size_t pagesRead = (bytesRead + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+			if (pagesRead < pagesToRead) {
+				error = B_ERROR;
+				break;
+			}
+
+			// clear the last read page, if partial
+			if ((size_t)bytesRead < pagesRead * B_PAGE_SIZE) {
+				memset(buffer + bytesRead, 0,
+					pagesRead * B_PAGE_SIZE - bytesRead);
+			}
+
+			// copy data to allocated pages
+			for (size_t i = 0; i < pagesRead; i++) {
+				vm_page* page = pages[i];
+				error = vm_memcpy_to_physical(
+					page->physical_page_number * B_PAGE_SIZE,
+					buffer + i * B_PAGE_SIZE, B_PAGE_SIZE, false);
+				if (error != B_OK)
+					break;
+			}
+
+			if (error != B_OK)
+				break;
+
+			// Add pages to cache. Ignore clear pages, though. Move those to the
+			// beginning of the array, so we can reuse them in the next
+			// iteration.
+			AutoLocker<VMCache> locker(fCache);
+
+			size_t clearPages = 0;
+			for (size_t i = 0; i < pagesRead; i++) {
+				uint64* pageData = (uint64*)(buffer + i * B_PAGE_SIZE);
+				bool isClear = true;
+				for (size_t k = 0; isClear && k < B_PAGE_SIZE / 8; k++)
+					isClear = pageData[k] == 0;
+
+				if (isClear)
+					pages[clearPages++] = pages[i];
+				else
+					fCache->InsertPage(pages[i], offset + i * B_PAGE_SIZE);
+			}
+
+			locker.Unlock();
+
+			// Move any left-over allocated pages to the end of the empty pages
+			// and compute the new allocated pages count.
+			if (pagesRead < allocatedPages) {
+				size_t count = allocatedPages - pagesRead;
+				memcpy(pages + clearPages, pages + pagesRead,
+					count * sizeof(vm_page*));
+				clearPages += count;
+			}
+			allocatedPages = clearPages;
+
+			offset += pagesRead * B_PAGE_SIZE;
+			sizeRemaining -= pagesRead * B_PAGE_SIZE;
+		}
+
+		// free left-over allocated pages
+		for (size_t i = 0; i < allocatedPages; i++)
+			vm_page_free(NULL, pages[i]);
+
+		return error;
 	}
 
 private:
 	int32			fIndex;
 	off_t			fDeviceSize;
 	char*			fDeviceName;
+	char*			fFilePath;
 	VMCache*		fCache;
 	DMAResource*	fDMAResource;
 	IOScheduler*	fIOScheduler;
@@ -557,6 +828,22 @@ parse_command_line(char* buffer, char**& _argv, int& _argc)
 }
 
 
+static RawDevice*
+find_raw_device(const char* deviceName)
+{
+	if (strncmp(deviceName, "/dev/", 5) == 0)
+		deviceName += 5;
+
+	for (RawDeviceList::Iterator it = sDeviceList.GetIterator();
+			RawDevice* device = it.Next();) {
+		if (strcmp(device->DeviceName(), deviceName) == 0)
+			return device;
+	}
+
+	return NULL;
+}
+
+
 //	#pragma mark - driver
 
 
@@ -591,18 +878,17 @@ ram_disk_driver_register_device(device_node* parent)
 static status_t
 ram_disk_driver_init_driver(device_node* node, void** _driverCookie)
 {
-//	const char* fileName;
 	uint64 deviceSize;
-// 	if (sDeviceManager->get_attr_string(node, kFilePathItem, &fileName, false)
-// 			== B_OK) {
 	if (sDeviceManager->get_attr_uint64(node, kDeviceSizeItem, &deviceSize,
 			false) == B_OK) {
+		const char* filePath = NULL;
+		sDeviceManager->get_attr_string(node, kFilePathItem, &filePath, false);
+
 		RawDevice* device = new(std::nothrow) RawDevice(node);
 		if (device == NULL)
 			return B_NO_MEMORY;
 
-//		status_t error = device->Init(fileName);
-		status_t error = device->Init(deviceSize);
+		status_t error = device->Init(filePath, deviceSize);
 		if (error != B_OK) {
 			delete device;
 			return error;
@@ -686,6 +972,7 @@ ram_disk_control_device_read(void* cookie, off_t position, void* buffer,
 }
 
 
+
 static status_t
 ram_disk_control_device_write(void* cookie, off_t position, const void* data,
 	size_t* _length)
@@ -724,38 +1011,68 @@ ram_disk_control_device_write(void* cookie, off_t position, const void* data,
 	// execute command
 	if (strcmp(argv[0], "help") == 0) {
 		// help
-// 		dprintf("register <path>\n");
-// 		dprintf("  Registers file <path> as a new ram disk device.\n");
-		dprintf("register <size>\n");
-		dprintf("  Registers a new ram disk device with size <size>.\n");
+		dprintf("register (<path> | -s <size>)\n");
+		dprintf("  Registers a new ram disk device backed by file <path> or\n"
+			"  an unbacked ram disk device with size <size>.\n");
 		dprintf("unregister <device>\n");
 		dprintf("  Unregisters <device>.\n");
+		dprintf("flush <device>\n");
+		dprintf("  Writes <device> changes back to the file associated with\n"
+			"  it, if any.\n");
 	} else if (strcmp(argv[0], "register") == 0) {
 		// register
-		if (argc != 2) {
-			dprintf("Usage: register <size>\n");
+		if (argc < 2 || argc > 3 || (argc == 3 && strcmp(argv[1], "-s") != 0)) {
+			dprintf("Usage: register (<path> | -s <size>)\n");
 			return B_BAD_VALUE;
 		}
 
-		// parse size argument
-		char* end;
-		uint64 deviceSize = strtoll(argv[1], &end, 0);
-		if (end == argv[1]) {
-			dprintf("Invalid size argument: \"%s\"\n", argv[1]);
-			return B_BAD_VALUE;
+		KPath path;
+		uint64 deviceSize = 0;
+
+		if (argc == 2) {
+			// get a normalized file path
+			status_t error = path.SetTo(argv[1], true);
+			if (error != B_OK) {
+				dprintf("Invalid path \"%s\": %s\n", argv[1], strerror(error));
+				return B_BAD_VALUE;
+			}
+
+			struct stat st;
+			if (lstat(path.Path(), &st) != 0) {
+				dprintf("Failed to stat \"%s\": %s\n", path.Path(),
+					strerror(errno));
+				return errno;
+			}
+
+			if (!S_ISREG(st.st_mode)) {
+				dprintf("\"%s\" is not a file!\n", path.Path());
+				return B_BAD_VALUE;
+			}
+
+			deviceSize = st.st_size;
+		} else {
+			// parse size argument
+			const char* sizeString = argv[2];
+			char* end;
+			deviceSize = strtoll(sizeString, &end, 0);
+			if (end == sizeString) {
+				dprintf("Invalid size argument: \"%s\"\n", sizeString);
+				return B_BAD_VALUE;
+			}
+
+			switch (*end) {
+				case 'g':
+					deviceSize *= 1024;
+				case 'm':
+					deviceSize *= 1024;
+				case 'k':
+					deviceSize *= 1024;
+					break;
+			}
 		}
 
-		switch (*end) {
-			case 'g':
-				deviceSize *= 1024;
-			case 'm':
-				deviceSize *= 1024;
-			case 'k':
-				deviceSize *= 1024;
-				break;
-		}
-
-		return device->Register(NULL, deviceSize);
+		return device->Register(path.Length() > 0 ? path.Path() : NULL,
+			deviceSize);
 	} else if (strcmp(argv[0], "unregister") == 0) {
 		// unregister
 		if (argc != 2) {
@@ -764,41 +1081,65 @@ ram_disk_control_device_write(void* cookie, off_t position, const void* data,
 		}
 
 		const char* deviceName = argv[1];
-		if (strncmp(deviceName, "/dev/", 5) == 0)
-			deviceName += 5;
 
 		// find the device in the list and unregister it
 		MutexLocker locker(sDeviceListLock);
-		for (RawDeviceList::Iterator it = sDeviceList.GetIterator();
-				RawDevice* device = it.Next();) {
-			if (strcmp(device->DeviceName(), deviceName) == 0) {
-				// TODO: Race condition: We should mark the device as going to
-				// be unregistered, so no one else can try the same after we
-				// unlock!
-				locker.Unlock();
+		if (RawDevice* device = find_raw_device(deviceName)) {
+			// TODO: Race condition: We should mark the device as going to
+			// be unregistered, so no one else can try the same after we
+			// unlock!
+			locker.Unlock();
 // TODO: The following doesn't work! unpublish_device(), as per implementation
 // (partially commented out) and unregister_node() returns B_BUSY.
-				status_t error = sDeviceManager->unpublish_device(
-					device->Node(), device->DeviceName());
-				if (error != B_OK) {
-					dprintf("Failed to unpublish device \"%s\": %s\n",
-						deviceName, strerror(error));
-					return error;
-				}
-
-				error = sDeviceManager->unregister_node(device->Node());
-				if (error != B_OK) {
-					dprintf("Failed to unregister node \"%s\": %s\n",
-						deviceName, strerror(error));
-					return error;
-				}
-
-				return B_OK;
+			status_t error = sDeviceManager->unpublish_device(
+				device->Node(), device->DeviceName());
+			if (error != B_OK) {
+				dprintf("Failed to unpublish device \"%s\": %s\n",
+					deviceName, strerror(error));
+				return error;
 			}
+
+			error = sDeviceManager->unregister_node(device->Node());
+			if (error != B_OK) {
+				dprintf("Failed to unregister node \"%s\": %s\n",
+					deviceName, strerror(error));
+				return error;
+			}
+
+			return B_OK;
 		}
 
 		dprintf("Device \"%s\" not found!\n", deviceName);
 		return B_BAD_VALUE;
+	} else if (strcmp(argv[0], "flush") == 0) {
+		// flush
+		if (argc != 2) {
+			dprintf("Usage: unregister <device>\n");
+			return B_BAD_VALUE;
+		}
+
+		const char* deviceName = argv[1];
+
+		// find the device in the list and flush it
+		MutexLocker locker(sDeviceListLock);
+		RawDevice* device = find_raw_device(deviceName);
+		if (device == NULL) {
+			dprintf("Device \"%s\" not found!\n", deviceName);
+			return B_BAD_VALUE;
+		}
+
+		// TODO: Race condition: Once we unlock someone could unregister the
+		// device. We should probably open the device by path, and use a
+		// special ioctl.
+		locker.Unlock();
+
+		status_t error = device->Flush();
+		if (error != B_OK) {
+			dprintf("Failed to flush device: %s\n", strerror(error));
+			return error;
+		}
+
+		return B_OK;
 	} else {
 		dprintf("Invalid command \"%s\"!\n", argv[0]);
 		return B_BAD_VALUE;
