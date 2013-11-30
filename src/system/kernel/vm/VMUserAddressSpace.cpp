@@ -12,6 +12,8 @@
 
 #include <stdlib.h>
 
+#include <algorithm>
+
 #include <KernelExport.h>
 
 #include <heap.h>
@@ -175,7 +177,7 @@ VMUserAddressSpace::InsertArea(VMArea* _area, size_t size,
 	// TODO: remove this again when vm86 mode is moved into the kernel
 	// completely (currently needs a userland address space!)
 	if (addressRestrictions->address_specification != B_EXACT_ADDRESS)
-		searchBase = max_c(searchBase, USER_BASE_ANY);
+		searchBase = std::max(searchBase, (addr_t)USER_BASE_ANY);
 
 	status = _InsertAreaSlot(searchBase, size, searchEnd,
 		addressRestrictions->address_specification,
@@ -404,9 +406,9 @@ VMUserAddressSpace::_RandomizeAddress(addr_t start, addr_t end,
 
 	addr_t range = end - start + 1;
 	if (initial)
-		range = min_c(range, kMaxInitialRandomize);
+		range = std::min(range, kMaxInitialRandomize);
 	else
-		range = min_c(range, kMaxRandomize);
+		range = std::min(range, kMaxRandomize);
 
 	addr_t random = secure_get_random<addr_t>();
 	random %= range;
@@ -569,10 +571,11 @@ second_chance:
 			if (last == NULL) {
 				// see if we can build it at the beginning of the virtual map
 				addr_t alignedBase = ROUNDUP(start, alignment);
-				addr_t nextBase = next == NULL ? end : min_c(next->Base() - 1, end);
+				addr_t nextBase = next == NULL
+					? end : std::min(next->Base() - 1, end);
 				if (is_valid_spot(start, alignedBase, size, nextBase)) {
 
-					addr_t rangeEnd = min_c(nextBase - size + 1, end);
+					addr_t rangeEnd = std::min(nextBase - size + 1, end);
 					if (is_randomized(addressSpec)) {
 						alignedBase = _RandomizeAddress(alignedBase, rangeEnd,
 							alignment);
@@ -591,11 +594,11 @@ second_chance:
 			while (next != NULL && next->Base() + next->Size() - 1 <= end) {
 				addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
 					alignment);
-				addr_t nextBase = min_c(end, next->Base() - 1);
+				addr_t nextBase = std::min(end, next->Base() - 1);
 				if (is_valid_spot(last->Base() + (last->Size() - 1),
 						alignedBase, size, nextBase)) {
 
-					addr_t rangeEnd = min_c(nextBase - size + 1, end);
+					addr_t rangeEnd = std::min(nextBase - size + 1, end);
 					if (is_randomized(addressSpec)) {
 						alignedBase = _RandomizeAddress(alignedBase,
 							rangeEnd, alignment);
@@ -677,7 +680,7 @@ second_chance:
 						&& alignedBase == next->Base()
 						&& next->Size() >= size) {
 
-						addr_t rangeEnd = min_c(
+						addr_t rangeEnd = std::min(
 							next->Base() + next->Size() - size, end);
 						if (is_randomized(addressSpec)) {
 							alignedBase = _RandomizeAddress(next->Base(),
@@ -696,7 +699,7 @@ second_chance:
 					}
 
 					if (is_valid_spot(next->Base(), alignedBase, size,
-							min_c(next->Base() + next->Size() - 1, end))) {
+							std::min(next->Base() + next->Size() - 1, end))) {
 						// The new area will be placed at the end of the
 						// reserved area, and the reserved area will be resized
 						// to make space
@@ -709,10 +712,10 @@ second_chance:
 							startRange -= size + kMaxRandomize;
 							startRange = ROUNDDOWN(startRange, alignment);
 
-							startRange = max_c(startRange, alignedNextBase);
+							startRange = std::max(startRange, alignedNextBase);
 
 							addr_t rangeEnd
-								= min_c(next->Base() + next->Size() - size,
+								= std::min(next->Base() + next->Size() - size,
 									end);
 							alignedBase = _RandomizeAddress(startRange,
 								rangeEnd, alignment);
