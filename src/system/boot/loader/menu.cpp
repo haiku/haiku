@@ -608,7 +608,7 @@ class BlacklistMenu : public Menu {
 public:
 	BlacklistMenu()
 		:
-		Menu(STANDARD_MENU, "Mark the entries to blacklist"),
+		Menu(STANDARD_MENU, kDefaultMenuTitle),
 		fDirectory(NULL)
 	{
 	}
@@ -706,7 +706,14 @@ private:
 
 private:
 	Directory*	fDirectory;
+
+protected:
+	static const char* const kDefaultMenuTitle;
 };
+
+
+const char* const BlacklistMenu::kDefaultMenuTitle
+	= "Mark the entries to blacklist";
 
 
 class BlacklistRootMenu : public BlacklistMenu {
@@ -724,8 +731,13 @@ public:
 		if (sBootVolume != NULL && sBootVolume->IsValid()
 			&& sBootVolume->IsPackaged()) {
 			SetDirectory(sBootVolume->SystemDirectory());
-		} else
+			SetTitle(kDefaultMenuTitle);
+		} else {
 			SetDirectory(NULL);
+			SetTitle(sBootVolume != NULL && sBootVolume->IsValid()
+				? "The selected boot volume doesn't support blacklisting!"
+				: "No boot volume selected!");
+		}
 
 		BlacklistMenu::Entered();
 
