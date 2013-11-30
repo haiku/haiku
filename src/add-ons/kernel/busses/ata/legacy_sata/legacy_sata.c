@@ -45,8 +45,6 @@
 
 #define ID(v,d) (((v)<< 16) | (d))
 
-/* XXX: To be moved to PCI.h */
-#define PCI_command_interrupt	0x400
 
 static const char * const kChannelNames[] = {
 	"Primary Channel", "Secondary Channel",
@@ -153,7 +151,7 @@ controller_probe(device_node *parent)
 
 	/* enable PCI interrupt */
 	pci->write_pci_config(device, PCI_command, 2,
-		pci->read_pci_config(device, PCI_command, 2) & ~PCI_command_interrupt);
+		pci->read_pci_config(device, PCI_command, 2) & ~PCI_command_int_disable);
 
 	if (vendor_id == PCI_vendor_NVIDIA) {
 		/* enable control access */
