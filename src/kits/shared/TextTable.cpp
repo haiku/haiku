@@ -4,11 +4,14 @@
  */
 
 
-#include "TextTable.h"
+#include <TextTable.h>
 
 #include <stdio.h>
 
 #include <algorithm>
+
+
+namespace BPrivate {
 
 
 // #pragma mark - Column
@@ -272,3 +275,6 @@ TextTable::Print(int32 maxWidth)
 		fputs(line.String(), stdout);
 	}
 }
+
+
+} // namespace BPrivate

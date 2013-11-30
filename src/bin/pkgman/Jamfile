@@ -17,8 +17,7 @@ BinCommand pkgman :
 	JobStateListener.cpp
 	PackageManager.cpp
 	pkgman.cpp
-	TextTable.cpp
 	:
-	package be
+	libshared.a package be
 	$(TARGET_LIBSUPC++) $(TARGET_LIBSTDC++)
 ;

@@ -45,6 +45,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ShakeTrackingFilter.cpp
 			StringForRate.cpp
 			StringForSize.cpp
+			TextTable.cpp
 			Thread.cpp
 			Variant.cpp
 			;

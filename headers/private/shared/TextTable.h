@@ -11,6 +11,9 @@
 #include <StringList.h>
 
 
+namespace BPrivate {
+
+
 class TextTable {
 public:
 								TextTable();
@@ -37,6 +40,12 @@ private:
 			ColumnList			fColumns;
 			RowList				fRows;
 };
+
+
+} // namespace BPrivate
+
+
+using ::BPrivate::TextTable;
 
 
 #endif	// TEXT_TABLE_H

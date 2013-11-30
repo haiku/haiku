@@ -18,11 +18,11 @@
 #include <set>
 
 #include <package/solver/SolverPackage.h>
+#include <TextTable.h>
 
 #include "Command.h"
 #include "PackageManager.h"
 #include "pkgman.h"
-#include "TextTable.h"
 
 
 // TODO: internationalization!
