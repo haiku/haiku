@@ -574,7 +574,6 @@ second_chance:
 				addr_t nextBase = next == NULL
 					? end : std::min(next->Base() - 1, end);
 				if (is_valid_spot(start, alignedBase, size, nextBase)) {
-
 					addr_t rangeEnd = std::min(nextBase - size + 1, end);
 					if (is_randomized(addressSpec)) {
 						alignedBase = _RandomizeAddress(alignedBase, rangeEnd,
@@ -597,7 +596,6 @@ second_chance:
 				addr_t nextBase = std::min(end, next->Base() - 1);
 				if (is_valid_spot(last->Base() + (last->Size() - 1),
 						alignedBase, size, nextBase)) {
-
 					addr_t rangeEnd = std::min(nextBase - size + 1, end);
 					if (is_randomized(addressSpec)) {
 						alignedBase = _RandomizeAddress(alignedBase,
@@ -620,7 +618,6 @@ second_chance:
 				alignment);
 			if (next == NULL && is_valid_spot(last->Base() + (last->Size() - 1),
 					alignedBase, size, end)) {
-
 				if (is_randomized(addressSpec)) {
 					alignedBase = _RandomizeAddress(alignedBase, end - size + 1,
 						alignment);
@@ -632,7 +629,6 @@ second_chance:
 				break;
 			} else if (addressSpec == B_BASE_ADDRESS
 				|| addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
-
 				// we didn't find a free spot in the requested range, so we'll
 				// try again without any restrictions
 				if (!is_randomized(addressSpec)) {
@@ -679,7 +675,6 @@ second_chance:
 					if ((next->protection & RESERVED_AVOID_BASE) == 0
 						&& alignedBase == next->Base()
 						&& next->Size() >= size) {
-
 						addr_t rangeEnd = std::min(
 							next->Base() + next->Size() - size, end);
 						if (is_randomized(addressSpec)) {
@@ -711,7 +706,6 @@ second_chance:
 							addr_t startRange = next->Base() + next->Size();
 							startRange -= size + kMaxRandomize;
 							startRange = ROUNDDOWN(startRange, alignment);
-
 							startRange = std::max(startRange, alignedNextBase);
 
 							addr_t rangeEnd
