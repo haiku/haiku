@@ -21,7 +21,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <algorithm>
 
+#include <fs_attr.h>
+#define READ_BUFFER_SIZE 2048
 
 struct conversion_context {
 	conversion_context()
@@ -643,5 +646,100 @@ convert_to_plain_text(RTF::Header &header, BPositionIO &target)
 		file->RemoveAttr("styles");
 
 	free(flattenedRuns);
+	return B_OK;
+}
+
+
+status_t convert_styled_text_to_rtf(
+	BPositionIO* source, BPositionIO* target)
+{
+	if (source->Seek(0, SEEK_SET) != 0)
+		return B_ERROR;
+
+	const ssize_t kstxtsize = sizeof(TranslatorStyledTextStreamHeader);
+	const ssize_t ktxtsize = sizeof(TranslatorStyledTextTextHeader);
+	TranslatorStyledTextStreamHeader stxtheader;
+	TranslatorStyledTextTextHeader txtheader;
+	char buffer[READ_BUFFER_SIZE];
+	
+	if (source->Read(&stxtheader, kstxtsize) != kstxtsize)
+		return B_ERROR;
+	if (source->Read(&txtheader, ktxtsize) != ktxtsize)
+		return B_ERROR;
+	
+
+	BString plainText;	
+	ssize_t nread = 0, nreed = 0, ntotalread = 0;
+	nreed = min((size_t)READ_BUFFER_SIZE,
+		(size_t)txtheader.header.data_size - ntotalread);
+	nread = source->Read(buffer, nreed);
+	while (nread > 0) {
+		plainText << buffer;
+
+		ntotalread += nread;
+		nreed = min((size_t)READ_BUFFER_SIZE,
+			(size_t)txtheader.header.data_size - ntotalread);
+		nread = source->Read(buffer, nreed);
+	}	
+	if ((ssize_t)txtheader.header.data_size != ntotalread)
+		return B_NO_TRANSLATOR;
+		
+	BString rtfFile = 
+		"{\\rtf1\\ansi{\\fonttbl\\f0\\fswiss Helvetica;}\\f0\\pard ";
+		
+	rtfFile << plainText << " }";
+	target->Write((const void*)rtfFile, rtfFile.Length());
+	
+
+	BNode* node = (BNode*)source;
+	const char* kAttrName = "styles";
+	attr_info info;
+	
+	if (node->GetAttrInfo(kAttrName, &info) != B_OK
+		|| info.type != B_RAW_TYPE || info.size < 160)
+		return B_ERROR;
+
+	uint8* flatRunArray = new (std::nothrow) uint8[info.size];
+	if (flatRunArray == NULL)
+		return B_NO_MEMORY;
+
+	if (node->ReadAttr(kAttrName, B_RAW_TYPE, 0, flatRunArray, info.size
+		!= info.size))
+		return B_OK;
+			
+	//todo: convert stxt attributes to rtf commands	
+			
+	//text_run_array* styles = (text_run_array*)flatRunArray;
+	size_t stylesSize = info.size / 3;
+	
+	for(uint32 i = 0; i < stylesSize; i++) {
+	
+	}
+	
+	delete[] flatRunArray;
+	return B_OK;
+}
+
+		
+status_t convert_plain_text_to_rtf(
+	BPositionIO& source, BPositionIO& target)
+{
+	BString rtfFile = 
+		"{\\rtf1\\ansi{\\fonttbl\\f0\\fswiss Helvetica;}\\f0\\pard ";
+		
+	BFile* fileSource = (BFile*)&source;
+	off_t size;
+	fileSource->GetSize(&size);
+	char* sourceBuf = (char*)malloc(size);
+	fileSource->Read((void*)sourceBuf, size);
+	
+	BString sourceTxt = sourceBuf;
+	sourceTxt.CharacterEscape("\\{}", '\\');
+	sourceTxt.ReplaceAll("\n", " \\par ");
+	rtfFile << sourceTxt << " }";
+	
+	BFile* fileTarget = (BFile*)&target;
+	fileTarget->Write((const void*)rtfFile, rtfFile.Length());
+	
 	return B_OK;
 }
