@@ -117,7 +117,7 @@ mmap(void* address, size_t length, int protection, int flags, int fd,
 	if ((flags & MAP_FIXED) != 0)
 		addressSpec = B_EXACT_ADDRESS;
 	else if (address != NULL)
-		addressSpec = B_RANDOMIZED_BASE_ADDRESS;
+		addressSpec = B_BASE_ADDRESS;
 	else
 		addressSpec = B_RANDOMIZED_ANY_ADDRESS;
 
