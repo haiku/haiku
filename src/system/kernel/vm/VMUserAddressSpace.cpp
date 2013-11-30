@@ -60,6 +60,34 @@ is_randomized(uint32 addressSpec)
 }
 
 
+static inline bool
+is_base_address_spec(uint32 addressSpec)
+{
+	return addressSpec == B_BASE_ADDRESS
+		|| addressSpec == B_RANDOMIZED_BASE_ADDRESS;
+}
+
+
+static inline addr_t
+align_address(addr_t address, size_t alignment)
+{
+	return ROUNDUP(address, alignment);
+}
+
+
+static inline addr_t
+align_address(addr_t address, size_t alignment, uint32 addressSpec,
+	addr_t baseAddress)
+{
+	if (is_base_address_spec(addressSpec))
+		address = std::max(address, baseAddress);
+	return align_address(address, alignment);
+}
+
+
+// #pragma mark - VMUserAddressSpace
+
+
 VMUserAddressSpace::VMUserAddressSpace(team_id id, addr_t base, size_t size)
 	:
 	VMAddressSpace(id, base, size, "address space"),
@@ -591,9 +619,10 @@ second_chance:
 
 			// keep walking
 			while (next != NULL && next->Base() + next->Size() - 1 <= end) {
-				addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
-					alignment);
+				addr_t alignedBase = align_address(last->Base() + last->Size(),
+					alignment, addressSpec, start);
 				addr_t nextBase = std::min(end, next->Base() - 1);
+
 				if (is_valid_spot(last->Base() + (last->Size() - 1),
 						alignedBase, size, nextBase)) {
 					addr_t rangeEnd = std::min(nextBase - size + 1, end);
@@ -614,8 +643,9 @@ second_chance:
 			if (foundSpot)
 				break;
 
-			addr_t alignedBase = ROUNDUP(last->Base() + last->Size(),
-				alignment);
+			addr_t alignedBase = align_address(last->Base() + last->Size(),
+				alignment, addressSpec, start);
+
 			if (next == NULL && is_valid_spot(last->Base() + (last->Size() - 1),
 					alignedBase, size, end)) {
 				if (is_randomized(addressSpec)) {
@@ -627,8 +657,7 @@ second_chance:
 				foundSpot = true;
 				area->SetBase(alignedBase);
 				break;
-			} else if (addressSpec == B_BASE_ADDRESS
-				|| addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
+			} else if (is_base_address_spec(addressSpec)) {
 				// we didn't find a free spot in the requested range, so we'll
 				// try again without any restrictions
 				if (!is_randomized(addressSpec)) {
