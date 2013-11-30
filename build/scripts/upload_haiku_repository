@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# Usage: upload_haiku_repository <arch> <generatedDir> <sshUserName> <sshServer> <sshDestPath>
+
+set -o errexit
+
+if [ $# -lt 5 ]; then
+	echo "$0: Missing parameters!" >&2
+	exit 1
+fi
+
+arch="$1"
+generatedDir="$2"
+sshUserName="$3"
+sshServer="$4"
+sshDestPath="$5"
+repositoryDir="$generatedDir/objects/haiku/$arch/packaging/repositories/haiku"
+packageDir="$repositoryDir/packages"
+
+# determine the version
+fileName=`basename "$packageDir"/haiku-*.hpkg .hpkg`
+version=${fileName#*-}
+version=${version%%-*}
+
+# upload the repo
+scp -r "$repositoryDir/" "$sshUserName@$sshServer:$sshDestPath/$arch/$version"
+ssh "$sshUserName@$sshServer" "chmod -R 755 $sshDestPath/$arch/$version"
+sshSymlinkCommand="ln -sfT $version $sshDestPath/$arch/current"
+ssh "$sshUserName@$sshServer" "$sshSymlinkCommand"
+
