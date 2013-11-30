@@ -130,6 +130,8 @@ public:
 										? fSuperItem->fMenu : NULL; }
 
 			const char*			Title() const { return fTitle; }
+			void				SetTitle(const char* title)
+									{ fTitle = title; }
 
 			void				SetChoiceText(const char* text)
 									{ fChoiceText = text; }
