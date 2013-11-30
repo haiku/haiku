@@ -23,7 +23,7 @@ static const char IDLE_NAME[] = "idle thread ";
 static bigtime_t lastMeasure = 0;
 
 /*
- * Keeps track of a single thread's times 
+ * Keeps track of a single thread's times
  */
 typedef struct {
 	thread_id thid;
@@ -44,7 +44,15 @@ typedef struct {
 #define FREELIST_SIZE 3
 static thread_time_list_t freelist[FREELIST_SIZE];
 
-static char *clear_string; /* output string for clearing the screen */
+static char *clear_string; /*output string for clearing the screen */
+static char *enter_ca_mode; /* output string for switching screen buffer */
+static char *exit_ca_mode; /* output string for releasing screen buffer */
+static char *cursor_home;	/* Places cursor back to (1,1) */
+static char *restore_cursor;
+static char *save_cursor;
+static char buf[2048];
+static char *entries = &buf[0];
+static int columns;	/* Columns on screen */
 static int rows;	/* how many rows on the screen */
 static int screen_size_changed = 0;	/* tells to refresh the screen size */
 static int cpus;	/* how many cpus we are runing on */
@@ -57,6 +65,17 @@ winch_handler(int notused)
 	screen_size_changed = 1;
 }
 
+
+/* SIGINT handler */
+static void
+sigint_handler()
+{
+	printf(exit_ca_mode);
+	printf(restore_cursor);
+	exit(1);
+}
+
+
 /*
  * Grow the list to add just one more entry
  */
@@ -67,8 +86,7 @@ grow(thread_time_list_t *times)
 
 	if (times->nthreads == times->maxthreads) {
 		times->thread_times = realloc(times->thread_times,
-									  (sizeof(times->thread_times[0]) *
-									   (times->nthreads + 1)));
+			(sizeof(times->thread_times[0]) * (times->nthreads + 1)));
 		times->maxthreads = times->nthreads + 1;
 	}
 	i = times->nthreads;
@@ -77,6 +95,24 @@ grow(thread_time_list_t *times)
 	times->thread_times[i].kernel_time = 0;
 	times->nthreads++;
 }
+
+
+static void
+init_term()
+{
+	tgetent(buf, getenv("TERM"));
+	exit_ca_mode = tgetstr("te", &entries);
+	enter_ca_mode = tgetstr("ti", &entries);
+	cursor_home = tgetstr("ho", &entries);
+	clear_string = tgetstr("cl", &entries);
+	restore_cursor = tgetstr("rc", &entries);
+	save_cursor = tgetstr("sc", &entries);
+
+	printf(save_cursor);
+	printf(enter_ca_mode);
+	printf(clear_string);
+}
+
 
 static void
 init_times(thread_time_list_t *times)
@@ -93,6 +129,7 @@ init_times(thread_time_list_t *times)
 	fprintf(stderr, "This can't happen\n");
 }
 
+
 static void
 free_times(thread_time_list_t *times)
 {
@@ -108,6 +145,7 @@ free_times(thread_time_list_t *times)
 	fprintf(stderr, "This can't happen\n");
 }
 
+
 /*
  * Compare two thread snapshots (for qsort)
  */
@@ -117,9 +155,10 @@ comparetime(const void *a, const void *b)
 	thread_times_t *ta = (thread_times_t *)a;
 	thread_times_t *tb = (thread_times_t *)b;
 
-	return ((tb->user_time + tb->kernel_time) -
-			(ta->user_time + ta->kernel_time));
+	return ((tb->user_time + tb->kernel_time)
+			- (ta->user_time + ta->kernel_time));
 }
+
 
 /*
  * Calculate the cpu percentage used by a given thread
@@ -132,17 +171,6 @@ cpu_perc(bigtime_t spent, bigtime_t interval)
 	return ((100.0 * spent) / (cpus * interval));
 }
 
-/*
- * Clear the screen
- */
-static void
-clear(void)
-{
-	if (clear_string) {
-		printf(clear_string);
-		fflush(stdout);
-	}
-}
 
 /*
  * Compare an old snapshot with the new one
@@ -195,20 +223,20 @@ compare(
 				continue;
 			}
 			newthread = 0;
-			oldtime = (old->thread_times[i].user_time +
-					   old->thread_times[i].kernel_time);
-			newtime = (new->thread_times[j].user_time +
-					   new->thread_times[j].kernel_time);
+			oldtime = (old->thread_times[i].user_time
+				+ old->thread_times[i].kernel_time);
+			newtime = (new->thread_times[j].user_time
+				+ new->thread_times[j].kernel_time);
 			if (oldtime == newtime) {
 				ignore = 1;
 				break;
 			}
 			grow(&times);
 			times.thread_times[k].thid = new->thread_times[j].thid;
-			times.thread_times[k].user_time = (new->thread_times[j].user_time -
-											   old->thread_times[i].user_time);
-			times.thread_times[k].kernel_time = (new->thread_times[j].kernel_time -
-												 old->thread_times[i].kernel_time);
+			times.thread_times[k].user_time = (new->thread_times[j].user_time
+					- old->thread_times[i].user_time);
+			times.thread_times[k].kernel_time = (new->thread_times[j].kernel_time
+					- old->thread_times[i].kernel_time);
 		}
 		if (newthread) {
 			grow(&times);
@@ -217,8 +245,8 @@ compare(
 			times.thread_times[k].kernel_time = new->thread_times[j].kernel_time;
 		}
 		if (!ignore) {
-			total = (times.thread_times[k].user_time +
-					 times.thread_times[k].kernel_time);
+			total = (times.thread_times[k].user_time
+					+ times.thread_times[k].kernel_time);
 			gtotal += total;
 			utotal += times.thread_times[k].user_time;
 			ktotal += times.thread_times[k].kernel_time;
@@ -229,14 +257,11 @@ compare(
 	/*
 	 * Sort what we found and print
 	 */
-	qsort(times.thread_times, times.nthreads, 
-		  sizeof(times.thread_times[0]), comparetime);
+	qsort(times.thread_times, times.nthreads,
+		sizeof(times.thread_times[0]), comparetime);
 
-	if (refresh) {
-		clear();
-	}
-	printf("%6s %7s %7s %7s %4s %16s %16s\n", "thid", "total", "user", "kernel",
-		   "%cpu", "team name", "thread name");
+	printf("%6s %7s %7s %7s %4s %16s %-16s \n", "THID", "TOTAL", "USER", "KERNEL",
+		"%CPU", "TEAM NAME", "THREAD NAME");
 	linecount = 1;
 	idletime = new_busy - old_busy;
 	gtotal = 0;
@@ -261,9 +286,14 @@ compare(
 		}
 
 		tm.args[16] = 0;
-		t.name[16] = 0;
-		total = (times.thread_times[i].user_time +
-				 times.thread_times[i].kernel_time);
+
+		if (columns <= 80)
+			t.name[16] = 0;
+		else
+			t.name[columns - 64] = 0;
+
+		total = (times.thread_times[i].user_time
+			+ times.thread_times[i].kernel_time);
 		if (ignore) {
 			idletime += total;
 		} else {
@@ -273,38 +303,34 @@ compare(
 		}
 		if (!ignore && (!refresh || (linecount < (rows - 1)))) {
 
-			printf("%6ld %7.2f %7.2f %7.2f %4.1f %16s %16s\n",
-				   times.thread_times[i].thid,
-				   total / 1000.0,
-				   (double)(times.thread_times[i].user_time / 1000),
-				   (double)(times.thread_times[i].kernel_time / 1000),
-				   cpu_perc(total, uinterval),
-				   tm.args,
-				   t.name);
+			printf("%6ld %7.2f %7.2f %7.2f %4.1f %16s %s \n",
+				times.thread_times[i].thid,
+				total / 1000.0,
+				(double)(times.thread_times[i].user_time / 1000),
+				(double)(times.thread_times[i].kernel_time / 1000),
+				cpu_perc(total, uinterval),
+				tm.args,
+				t.name);
 			linecount++;
 		}
 	}
 	free_times(&times);
 	printf("------ %7.2f %7.2f %7.2f %4.1f%% TOTAL (%4.1f%% idle time, %4.1f%% unknown)", 
-		   (double) (gtotal / 1000),
-		   (double) (utotal / 1000),
-		   (double) (ktotal / 1000),
-		   cpu_perc(gtotal, uinterval),
-		   cpu_perc(idletime, uinterval),
-		   cpu_perc(cpus * uinterval - (gtotal + idletime), uinterval));
+		(double) (gtotal / 1000),
+		(double) (utotal / 1000),
+		(double) (ktotal / 1000),
+		cpu_perc(gtotal, uinterval),
+		cpu_perc(idletime, uinterval),
+		cpu_perc(cpus * uinterval - (gtotal + idletime), uinterval));
 	fflush(stdout);
-	if (!refresh) {
-		printf("\n\n");
-	}
+	printf(clear_string);
+	printf(cursor_home);
 }
 
+
 static int
-setup_term(bool onlyRows)
+adjust_term(bool onlyRows)
 {
-	char *term;
-	char *str;
-	char buf[2048];
-	char *entries;
 	struct winsize ws;
 
 	if (ioctl(1, TIOCGWINSZ, &ws) < 0) {
@@ -313,24 +339,14 @@ setup_term(bool onlyRows)
 	if (ws.ws_row <= 0) {
 		return (0);
 	}
+	columns = ws.ws_col;
 	rows = ws.ws_row;
 	if (onlyRows)
 		return 1;
-	term = getenv("TERM");
-	if (term == NULL) {
-		return (0);
-	}
-	if (tgetent(buf, term) <= 0) {
-		return (0);
-	}
-	entries = &buf[0];
-	str = tgetstr("cl", &entries);
-	if (str == NULL) {
-		return (0);
-	}
-	clear_string = strdup(str);
+
 	return (1);
 }
+
 
 /*
  * Gather up thread data for uinterval microseconds
@@ -374,7 +390,7 @@ gather(
 	}
 	if (old != NULL) {
 		if (screen_size_changed) {
-			setup_term(true);
+			adjust_term(true);
 			screen_size_changed = 0;
 		}
 		compare(old, &times, old_busy, *busy_wait_time,
@@ -384,6 +400,7 @@ gather(
 	return (times);
 }
 
+
 /*
  * print usage message and exit
  */
@@ -391,15 +408,16 @@ static void
 usage(const char *myname)
 {
 	fprintf(stderr, "usage: %s [-d] [-i interval] [-n ntimes]\n", myname);
-	fprintf(stderr, 
+	fprintf(stderr,
 			" -d,          do not clear the screen between displays\n");
-	fprintf(stderr, 
+	fprintf(stderr,
 			" -i interval, wait `interval' seconds before displaying\n");
-	fprintf(stderr, 
+	fprintf(stderr,
 			" -n ntimes,   display `ntimes' times before exiting\n");
 	fprintf(stderr, "Default is clear screen, interval=5, ntimes=infinite\n");
 	exit(1);
 }
+
 
 int
 main(int argc, char **argv)
@@ -411,7 +429,7 @@ main(int argc, char **argv)
 	int refresh = 1;
 	system_info sysinfo;
 	//bigtime_t now;
-	bigtime_t then;
+	//bigtime_t then;
 	bigtime_t uinterval;
 	bigtime_t elapsed;
 	bigtime_t busy;
@@ -443,19 +461,23 @@ main(int argc, char **argv)
 	if (argc) {
 		usage(myname);
 	}
+
+	init_term();
+
 	if (refresh) {
-		if (!setup_term(false)) {
+		if (!adjust_term(false)) {
 			refresh = 0;
 		}
 	}
-	if (iters >= 0) { 
-		printf("Starting: %d interval%s of %d second%s each\n", iters, 
-			   (iters == 1) ? "" : "s", interval,
-			   (interval == 1) ? "" : "s");
+	if (iters >= 0) {
+		printf("Starting: %d interval%s of %d second%s each\n", iters,
+			(iters == 1) ? "" : "s", interval,
+			(interval == 1) ? "" : "s");
 	}
-	
+
 	signal(SIGWINCH, winch_handler);
-	
+	signal(SIGINT, sigint_handler);
+
 	lastMeasure = system_time();
 	if (iters < 0) {
 		// You will only have to wait half a second for the first iteration.
@@ -464,7 +486,7 @@ main(int argc, char **argv)
 		elapsed = system_time() - lastMeasure;
 		if (elapsed < uinterval)
 			snooze(uinterval - elapsed);
-		then = system_time();
+		// then = system_time();
 		baseline = gather(&baseline, &busy, refresh);
 
 	} else
@@ -477,5 +499,9 @@ main(int argc, char **argv)
 			snooze(uinterval - elapsed);
 		baseline = gather(&baseline, &busy, refresh);
 	}
+
+	printf(exit_ca_mode);
+	printf(restore_cursor);
+
 	exit(0);
 }
