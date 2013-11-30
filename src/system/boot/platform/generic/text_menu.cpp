@@ -413,6 +413,9 @@ run_menu(Menu* menu)
 		item = menu->ItemAt(selected);
 
 		if (TEXT_CONSOLE_IS_CURSOR_KEY(key)) {
+			if (item == NULL)
+				continue;
+
 			int32 oldSelected = selected;
 
 			switch (key) {
@@ -460,7 +463,7 @@ run_menu(Menu* menu)
 			}
 		} else if (key == TEXT_CONSOLE_KEY_RETURN
 			|| key == TEXT_CONSOLE_KEY_SPACE) {
-			if (invoke_item(menu, item, selected, key))
+			if (item != NULL && invoke_item(menu, item, selected, key))
 				break;
 		} else if (key == TEXT_CONSOLE_KEY_ESCAPE
 			&& menu->Type() != MAIN_MENU) {
