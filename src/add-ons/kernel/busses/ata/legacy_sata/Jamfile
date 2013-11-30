@@ -3,6 +3,5 @@ SubDir HAIKU_TOP src add-ons kernel busses ata legacy_sata ;
 UsePrivateHeaders drivers kernel ;
 
 KernelAddon legacy_sata :
-	legacy_sata.c
+	legacy_sata.cpp
 	;
-

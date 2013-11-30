@@ -3,10 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+
+#include <ata_adapter.h>
 #include <KernelExport.h>
+#include <PCI_x86.h>
+
 #include <stdlib.h>
 #include <string.h>
-#include <ata_adapter.h>
 
 
 #define DRIVER_PRETTY_NAME	"Legacy SATA"
@@ -232,15 +235,14 @@ controller_init(device_node *node, void **controller_cookie)
 static void
 controller_uninit(void *controller_cookie)
 {
-	sATAAdapter->uninit_controller(controller_cookie);
+	sATAAdapter->uninit_controller((ata_adapter_controller_info*)controller_cookie);
 }
 
 
 static void
 controller_removed(void *controller_cookie)
 {
-	sATAAdapter->controller_removed(
-		(ata_adapter_controller_info*)controller_cookie);
+	sATAAdapter->controller_removed((ata_adapter_controller_info*)controller_cookie);
 }
 
 
@@ -249,92 +251,100 @@ channel_init(device_node *node, void **channel_cookie)
 {
 	return sATAAdapter->init_channel(node,
 		(ata_adapter_channel_info**)channel_cookie,
-		sizeof(ata_adapter_channel_info),
-		sATAAdapter->inthand);
+		sizeof(ata_adapter_channel_info), sATAAdapter->inthand);
 }
 
 
 static void
 channel_uninit(void *channel_cookie)
 {
-	sATAAdapter->uninit_channel(channel_cookie);
+	sATAAdapter->uninit_channel((ata_adapter_channel_info*)channel_cookie);
 }
 
 
 static void
 channel_removed(void *channel_cookie)
 {
-	sATAAdapter->channel_removed(channel_cookie);
+	sATAAdapter->channel_removed((ata_adapter_channel_info*)channel_cookie);
 }
 
 
 static void
-channel_set(void *cookie, ata_channel channel)
+channel_set(void *channel_cookie, ata_channel channel)
 {
-	sATAAdapter->set_channel((ata_adapter_channel_info *)cookie, channel);
+	sATAAdapter->set_channel((ata_adapter_channel_info*)channel_cookie,
+		channel);
 }
 
 
 static status_t
 task_file_write(void *channel_cookie, ata_task_file *tf, ata_reg_mask mask)
 {
-	return sATAAdapter->write_command_block_regs(channel_cookie,tf,mask);
+	return sATAAdapter->write_command_block_regs(
+		(ata_adapter_channel_info*)channel_cookie, tf, mask);
 }
 
 
 static status_t
 task_file_read(void *channel_cookie, ata_task_file *tf, ata_reg_mask mask)
 {
-	return sATAAdapter->read_command_block_regs(channel_cookie,tf,mask);
+	return sATAAdapter->read_command_block_regs(
+		(ata_adapter_channel_info*)channel_cookie, tf, mask);
 }
 
 
 static uint8
 altstatus_read(void *channel_cookie)
 {
-	return sATAAdapter->get_altstatus(channel_cookie);
+	return sATAAdapter->get_altstatus(
+		(ata_adapter_channel_info*)channel_cookie);
 }
 
 
 static status_t
 device_control_write(void *channel_cookie, uint8 val)
 {
-	return sATAAdapter->write_device_control(channel_cookie,val);
+	return sATAAdapter->write_device_control(
+		(ata_adapter_channel_info*)channel_cookie, val);
 }
 
 
 static status_t
 pio_write(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return sATAAdapter->write_pio(channel_cookie,data,count,force_16bit);
+	return sATAAdapter->write_pio((ata_adapter_channel_info*)channel_cookie,
+		data, count, force_16bit);
 }
 
 
 static status_t
 pio_read(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return sATAAdapter->read_pio(channel_cookie,data,count,force_16bit);
+	return sATAAdapter->read_pio((ata_adapter_channel_info*)channel_cookie,
+		data, count, force_16bit);
 }
 
 
 static status_t
-dma_prepare(void *channel_cookie, const physical_entry *sg_list, size_t sg_list_count, bool write)
+dma_prepare(void *channel_cookie, const physical_entry *sg_list,
+	size_t sg_list_count, bool write)
 {
-	return sATAAdapter->prepare_dma(channel_cookie,sg_list,sg_list_count,write);
+	return sATAAdapter->prepare_dma((ata_adapter_channel_info*)channel_cookie,
+		sg_list, sg_list_count, write);
 }
 
 
 static status_t
 dma_start(void *channel_cookie)
 {
-	return sATAAdapter->start_dma(channel_cookie);
+	return sATAAdapter->start_dma((ata_adapter_channel_info*)channel_cookie);
 }
 
 
 static status_t
 dma_finish(void *channel_cookie)
 {
-	return sATAAdapter->finish_dma(channel_cookie);
+	return sATAAdapter->finish_dma((ata_adapter_channel_info*)channel_cookie);
 }
 
 
@@ -385,11 +395,13 @@ static driver_module_info sControllerInterface = {
 		NULL
 	},
 
-	.init_driver		= &controller_init,
-	.uninit_driver		= &controller_uninit,
-	.supports_device	= &controller_supports,
-	.register_device	= &controller_probe,
-	.device_removed		= &controller_removed,
+	controller_supports,
+	controller_probe,
+	controller_init,
+	controller_uninit,
+	NULL,	// register child devices
+	NULL,	// rescan
+	controller_removed,
 };
 
 module_info *modules[] = {
