@@ -565,7 +565,7 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 			alignment <<= 1;
 	}
 
-	start = ROUNDUP(start, alignment);
+	start = align_address(start, alignment);
 
 	if (addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
 		originalStart = start;
@@ -598,7 +598,7 @@ second_chance:
 			// find a hole big enough for a new area
 			if (last == NULL) {
 				// see if we can build it at the beginning of the virtual map
-				addr_t alignedBase = ROUNDUP(start, alignment);
+				addr_t alignedBase = align_address(start, alignment);
 				addr_t nextBase = next == NULL
 					? end : std::min(next->Base() - 1, end);
 				if (is_valid_spot(start, alignedBase, size, nextBase)) {
@@ -688,7 +688,7 @@ second_chance:
 
 					// TODO: take free space after the reserved area into
 					// account!
-					addr_t alignedBase = ROUNDUP(next->Base(), alignment);
+					addr_t alignedBase = align_address(next->Base(), alignment);
 					if (next->Base() == alignedBase && next->Size() == size) {
 						// The reserved area is entirely covered, and thus,
 						// removed
@@ -729,7 +729,7 @@ second_chance:
 						// to make space
 
 						if (is_randomized(addressSpec)) {
-							addr_t alignedNextBase = ROUNDUP(next->Base(),
+							addr_t alignedNextBase = align_address(next->Base(),
 								alignment);
 
 							addr_t startRange = next->Base() + next->Size();
