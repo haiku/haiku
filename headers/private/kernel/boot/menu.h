@@ -57,6 +57,7 @@ public:
 			char				Shortcut() const { return fShortcut; }
 
 			const char*			Label() const { return fLabel; }
+			void				SetLabel(const char* label);
 
 			Menu*				Submenu() const { return fSubMenu; }
 			void				SetSubmenu(Menu* subMenu);

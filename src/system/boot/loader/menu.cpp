@@ -181,6 +181,16 @@ MenuItem::SetShortcut(char key)
 
 
 void
+MenuItem::SetLabel(const char* label)
+{
+	if (char* newLabel = strdup(label)) {
+		free(const_cast<char*>(fLabel));
+		fLabel = newLabel;
+	}
+}
+
+
+void
 MenuItem::SetSubmenu(Menu* subMenu)
 {
 	fSubMenu = subMenu;
