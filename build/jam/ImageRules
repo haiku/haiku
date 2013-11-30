@@ -1591,7 +1591,8 @@ rule BuildCDBootImage image : bootfloppy : extrafiles
 actions BuildCDBootImage1
 {
 	$(RM) $(<)
-	mkisofs -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-])
+	mkisofs -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-]) \
+		|| genisoimage  -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-])
 }
 
 
