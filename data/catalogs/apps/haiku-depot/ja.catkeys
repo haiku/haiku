@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3583979899
+1	japanese	x-vnd.Haiku-HaikuDepot	2969079095
 Name	PackageListView		名前
 Installed packages	Model		インストール済パッケージ
 User modified packages	Model		ユーザーが変更したパッケージ
@@ -10,8 +10,10 @@ Install	PackageManager		インストール
 HaikuDepot	System name		HaikuDepot
 Uninstall	PackageManager		アンインストール
 An error occurred while initializing the package manager: %message%	MainWindow		パッケージマネジャーの初期化中にエラーが発生しました: %message%
+Close	PackageManager		閉じる
 Status	PackageListView		状態
 Development	Model		開発
+Fatal error	PackageManager		致命的なエラー
 Ratings	PackageInfoView		評価
 1 item	PackageListView		1 個のアイテム
 Inactive	PackageListView		無効

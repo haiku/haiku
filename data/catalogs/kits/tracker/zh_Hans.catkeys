@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1271663904
+1	english	x-vnd.Haiku-libtracker	484583014
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
 Add-ons	FilePanelPriv		附加组件
@@ -423,6 +423,7 @@ New	ContainerWindow		新建
 Name matches wildcard expression:###	SelectionWindow		名称匹配通配符表达式：###
 less than	FindPanel		少于
 64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		开发
 Modified	ContainerWindow		修改
 Edit Query template	FindPanel		编辑查询模板
 Prompt	FSUtils		提示

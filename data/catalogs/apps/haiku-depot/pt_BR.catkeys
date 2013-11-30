@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2627573468
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2012672664
 Name	PackageListView		Nome
 Installed packages	Model		Pacotes instalados
 User modified packages	Model		Pacotes modificados pelo usuário
@@ -11,8 +11,10 @@ Install	PackageManager		Instalar
 HaikuDepot	System name		Depósito Haiku
 Uninstall	PackageManager		Desinstalar
 An error occurred while initializing the package manager: %message%	MainWindow		Um erro ocorreu ao inicializar o gerenciador de pacotes: %message%
+Close	PackageManager		Fechar
 Status	PackageListView		Estado
 Development	Model		Desenvolvimento
+Fatal error	PackageManager		Erro fatal
 Ratings	PackageInfoView		Classificações
 1 item	PackageListView		1 item
 Inactive	PackageListView		Inativo

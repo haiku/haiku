@@ -1,0 +1,43 @@
+1	polish	x-vnd.Haiku-HaikuDepot	518430771
+Name	PackageListView		Nazwa
+Installed packages	Model		Zainstalowane pakiety
+User modified packages	Model		Pakiety zmodyfikowane przez użytkownika
+Update available	Model		Dostępna aktualizacja
+Changelog	PackageInfoView		Dziennik zmian
+for %Version%	PackageInfoView		dla %Version%
+Description	PackageListView		Opis
+Install	PackageManager		Zainstaluj
+HaikuDepot	System name		HaikuDepot
+Uninstall	PackageManager		Odinstaluj
+An error occurred while initializing the package manager: %message%	MainWindow		Wystąpił błąd podczas inicjalizacji menedżera pakietów: %message%
+Status	PackageListView		Status
+Ratings	PackageInfoView		Oceny
+1 item	PackageListView		1 element
+Inactive	PackageListView		Nieaktywny
+Refresh depots	MainWindow		Odśwież listy pakietów
+Main Menu	MainWindow		Menu główne
+Command line	Model		Wiersz poleceń
+(%Votes%)	PackageInfoView		(%Oceny%)
+Package	MainWindow		Pakiet
+Search terms:	FilterView		Szukana fraza:
+%Version%	PackageInfoView		%Wersja%
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error% (%details%)
+Productivity	Model		Programy użytkowe
+Show:	FilterView		Pokaż:
+Size	PackageListView		Rozmiar
+Games	Model		Gry
+Rating	PackageListView		Ocena
+Downloading	Model		Pobieranie
+%ld items	PackageListView		%ld elementów
+Graphics	Model		Grafika
+Local	MainWindow		Lokalne
+Close	MainWindow		Zamknij
+Video	Model		Wideo
+An error occurred while refreshing the repository: %error%	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error%
+All packages	FilterView		Wszystkie pakiety
+Uninstalled	PackageListView		Niezainstalowany
+Unknown	PackageListView		Nieznany
+Available	PackageListView		Dostępny
+n/a	PackageInfoView		Nie dotyczy
+Uninstalled packages	Model		Niezainstalowane pakiety
+Active	PackageListView		Aktywny

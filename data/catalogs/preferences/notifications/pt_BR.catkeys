@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Notifications	1398224574
+1	portuguese (brazil)	x-vnd.Haiku-Notifications	3366464357
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Um erro ocorreu salvando as preferências.\nÉ possível que esteja executando fora do espaço de disco.
 Notifications	GeneralView		Notificações
 seconds of inactivity	GeneralView		segundos de inatividade
@@ -45,5 +45,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 Enable notifications at startup	GeneralView		Habilitar notificações ao iniciar
 Notifications	PrefletView		Notificações
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		O servidor de notificações não pode ser encontrado, isto significa que a instalação do InfoPopper não foi completada com sucesso.
+Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Não é possível salvar as preferências, você provavelmente não possui acesso a gravação no diretório de configuração.
 Applications	NotificationView		Aplicativos
 Events are notified	GeneralView		Eventos são notificados

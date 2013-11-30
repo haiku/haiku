@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Notifications	1398224574
+1	swedish	x-vnd.Haiku-Notifications	3366464357
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Ett fel uppstod när inställningarna skulle sparas.\nDet är möjligt att hårddiskutrymmet håller på att ta slut.
 Notifications	GeneralView		Aviseringar
 seconds of inactivity	GeneralView		sekunder av inaktivitet
@@ -45,5 +45,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 Enable notifications at startup	GeneralView		Aktivera aviseringar vid start
 Notifications	PrefletView		Aviseringar
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Aviseringsservern hittas ej. Det betyder att din InfoPopper installation inte avslutades korrekt.
+Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Kan inte spara inställningarna. Du har förmodligen inga skrivrättigheter på Settings mappen
 Applications	NotificationView		Program
 Events are notified	GeneralView		Händelserna är aviserade
