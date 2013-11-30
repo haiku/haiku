@@ -10,7 +10,8 @@
 
 
 #define TRACE(a...) dprintf("ahci: " a)
-#define FLOW(a...)	dprintf("ahci: " a)
+//#define FLOW(a...)	dprintf("ahci: " a)
+#define FLOW(a...)
 
 #define AHCI_ID_GENERATOR "ahci/id"
 #define AHCI_ID_ITEM "ahci/id"
@@ -210,7 +211,7 @@ ahci_supports_device(device_node *parent)
 	const char *name;
 	const char *bus;
 
-	TRACE("ahci_supports_device\n");
+	FLOW("ahci_supports_device\n");
 
 	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false)
 			< B_OK)
