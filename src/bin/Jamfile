@@ -126,6 +126,11 @@ StdBinCommands
 	urlwrapper.cpp
 	: be $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
 
+# standard commands that need libbe.so, libsupc++.so, and libshared.a
+StdBinCommands
+	ramdisk.cpp
+	: libshared.a be $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+
 # commands that need libbe.so and the stub catalog
 StdBinCommands
 	clockconfig.cpp

@@ -4,6 +4,8 @@
  */
 
 
+#include <file_systems/ram_disk/ram_disk.h>
+
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -50,12 +52,12 @@ static const char* const kControlDeviceModuleName
 static const char* const kRawDeviceModuleName
 	= "drivers/disk/virtual/ram_disk/raw/device_v1";
 
-static const char* const kControlDeviceName
-	= "disk/virtual/ram/control";
-static const char* const kRawDeviceBaseName = "disk/virtual/ram";
+static const char* const kControlDeviceName = RAM_DISK_CONTROL_DEVICE_NAME;
+static const char* const kRawDeviceBaseName = RAM_DISK_RAW_DEVICE_BASE_NAME;
 
 static const char* const kFilePathItem = "ram_disk/file_path";
 static const char* const kDeviceSizeItem = "ram_disk/device_size";
+static const char* const kDeviceIDItem = "ram_disk/id";
 
 
 struct RawDevice;
@@ -65,6 +67,11 @@ struct device_manager_info* sDeviceManager;
 
 static RawDeviceList sDeviceList;
 static mutex sDeviceListLock = MUTEX_INITIALIZER("ram disk device list");
+static uint64 sUsedRawDeviceIDs = 0;
+
+
+static int32	allocate_raw_device_id();
+static void		free_raw_device_id(int32 id);
 
 
 struct Device {
@@ -100,19 +107,37 @@ struct ControlDevice : Device {
 	{
 	}
 
-	status_t Register(const char* filePath, uint64 deviceSize)
+	status_t Register(const char* filePath, uint64 deviceSize, int32& _id)
 	{
+		int32 id = allocate_raw_device_id();
+		if (id < 0)
+			return B_BUSY;
+
 		device_attr attrs[] = {
 			{B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
 				{string: "RAM Disk Raw Device"}},
-			{kFilePathItem, B_STRING_TYPE, {string: filePath}},
 			{kDeviceSizeItem, B_UINT64_TYPE, {ui64: deviceSize}},
+			{kDeviceIDItem, B_UINT32_TYPE, {ui32: (uint32)id}},
+			{kFilePathItem, B_STRING_TYPE, {string: filePath}},
 			{NULL}
 		};
 
-		return sDeviceManager->register_node(
+		// If filePath is NULL, remove the attribute.
+		if (filePath == NULL) {
+			size_t count = sizeof(attrs) / sizeof(attrs[0]);
+			memset(attrs + count - 2, 0, sizeof(attrs[0]));
+		}
+
+		status_t error = sDeviceManager->register_node(
 			sDeviceManager->get_parent_node(Node()), kDriverModuleName, attrs,
 			NULL, NULL);
+		if (error != B_OK) {
+			free_raw_device_id(id);
+			return error;
+		}
+
+		_id = id;
+		return B_OK;
 	}
 
 	virtual status_t PublishDevice()
@@ -127,7 +152,8 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 	RawDevice(device_node* node)
 		:
 		Device(node),
-		fIndex(-1),
+		fID(-1),
+		fUnregistered(false),
 		fDeviceSize(0),
 		fDeviceName(NULL),
 		fFilePath(NULL),
@@ -139,7 +165,7 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 
 	virtual ~RawDevice()
 	{
-		if (fIndex >= 0) {
+		if (fID >= 0) {
 			MutexLocker locker(sDeviceListLock);
 			sDeviceList.Remove(this);
 		}
@@ -148,12 +174,20 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 		free(fFilePath);
 	}
 
-	int32 Index() const				{ return fIndex; }
+	int32 ID() const				{ return fID; }
 	off_t DeviceSize() const		{ return fDeviceSize; }
 	const char* DeviceName() const	{ return fDeviceName; }
 
-	status_t Init(const char* filePath, uint64 deviceSize)
+	bool IsUnregistered() const		{ return fUnregistered; }
+
+	void SetUnregistered(bool unregistered)
 	{
+		fUnregistered = unregistered;
+	}
+
+	status_t Init(int32 id, const char* filePath, uint64 deviceSize)
+	{
+		fID = id;
 		fFilePath = filePath != NULL ? strdup(filePath) : NULL;
 		if (filePath != NULL && fFilePath == NULL)
 			return B_NO_MEMORY;
@@ -167,29 +201,27 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 			return B_BAD_VALUE;
 		}
 
-		// find a free slot
-		fIndex = 0;
-		RawDevice* nextDevice = NULL;
-		MutexLocker locker(sDeviceListLock);
-		for (RawDeviceList::Iterator it = sDeviceList.GetIterator();
-				(nextDevice = it.Next()) != NULL;) {
-			if (nextDevice->Index() > fIndex)
-				break;
-			fIndex = nextDevice->Index() + 1;
-		}
-
-		sDeviceList.InsertBefore(nextDevice, this);
-
 		// construct our device path
 		KPath path(kRawDeviceBaseName);
 		char buffer[32];
-		snprintf(buffer, sizeof(buffer), "%" B_PRId32 "/raw", fIndex);
+		snprintf(buffer, sizeof(buffer), "%" B_PRId32 "/raw", fID);
 
 		status_t error = path.Append(buffer);
 		if (error != B_OK)
 			return error;
 
 		fDeviceName = path.DetachBuffer();
+
+		// insert into device list
+		RawDevice* nextDevice = NULL;
+		MutexLocker locker(sDeviceListLock);
+		for (RawDeviceList::Iterator it = sDeviceList.GetIterator();
+				(nextDevice = it.Next()) != NULL;) {
+			if (nextDevice->ID() > fID)
+				break;
+		}
+
+		sDeviceList.InsertBefore(nextDevice, this);
 
 		return B_OK;
 	}
@@ -266,6 +298,15 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 			fCache->ReleaseRefAndUnlock();
 			fCache = NULL;
 		}
+	}
+
+	void GetInfo(ram_disk_ioctl_info& _info) const
+	{
+		_info.id = fID;
+		_info.size = fDeviceSize;
+		memset(&_info.path, 0, sizeof(_info.path));
+		if (fFilePath != NULL)
+			strlcpy(_info.path, fFilePath, sizeof(_info.path));
 	}
 
 	status_t Flush()
@@ -726,7 +767,8 @@ private:
 	}
 
 private:
-	int32			fIndex;
+	int32			fID;
+	bool			fUnregistered;
 	off_t			fDeviceSize;
 	char*			fDeviceName;
 	char*			fFilePath;
@@ -756,100 +798,157 @@ private:
 // #pragma mark -
 
 
-static bool
-parse_command_line(char* buffer, char**& _argv, int& _argc)
+static int32
+allocate_raw_device_id()
 {
-	// Process the argument string. We split at whitespace, heeding quotes and
-	// escaped characters. The processed arguments are written to the given
-	// buffer, separated by single null chars.
-	char* start = buffer;
-	char* out = buffer;
-	bool pendingArgument = false;
-	int argc = 0;
-	while (*start != '\0') {
-		// ignore whitespace
-		if (isspace(*start)) {
-			if (pendingArgument) {
-				*out = '\0';
-				out++;
-				argc++;
-				pendingArgument = false;
-			}
-			start++;
-			continue;
-		}
-
-		pendingArgument = true;
-
-		if (*start == '"' || *start == '\'') {
-			// quoted text -- continue until closing quote
-			char quote = *start;
-			start++;
-			while (*start != '\0' && *start != quote) {
-				if (*start == '\\' && quote == '"') {
-					start++;
-					if (*start == '\0')
-						break;
-				}
-				*out = *start;
-				start++;
-				out++;
-			}
-
-			if (*start != '\0')
-				start++;
-		} else {
-			// unquoted text
-			if (*start == '\\') {
-				// escaped char
-				start++;
-				if (start == '\0')
-					break;
-			}
-
-			*out = *start;
-			start++;
-			out++;
+	MutexLocker deviceListLocker(sDeviceListLock);
+	for (size_t i = 0; i < sizeof(sUsedRawDeviceIDs) * 8; i++) {
+		if ((sUsedRawDeviceIDs & ((uint64)1 << i)) == 0) {
+			sUsedRawDeviceIDs |= (uint64)1 << i;
+			return (int32)i;
 		}
 	}
 
-	if (pendingArgument) {
-		*out = '\0';
-		argc++;
-	}
+	return -1;
+}
 
-	// allocate argument vector
-	char** argv = new(std::nothrow) char*[argc + 1];
-	if (argv == NULL)
-		return false;
 
-	// fill vector
-	start = buffer;
-	for (int i = 0; i < argc; i++) {
-		argv[i] = start;
-		start += strlen(start) + 1;
-	}
-	argv[argc] = NULL;
-
-	_argv = argv;
-	_argc = argc;
-	return true;
+static void
+free_raw_device_id(int32 id)
+{
+	MutexLocker deviceListLocker(sDeviceListLock);
+	sUsedRawDeviceIDs &= ~((uint64)1 << id);
 }
 
 
 static RawDevice*
-find_raw_device(const char* deviceName)
+find_raw_device(int32 id)
 {
-	if (strncmp(deviceName, "/dev/", 5) == 0)
-		deviceName += 5;
-
 	for (RawDeviceList::Iterator it = sDeviceList.GetIterator();
 			RawDevice* device = it.Next();) {
-		if (strcmp(device->DeviceName(), deviceName) == 0)
+		if (device->ID() == id)
 			return device;
 	}
 
 	return NULL;
+}
+
+
+static status_t
+ioctl_register(ControlDevice* controlDevice, ram_disk_ioctl_register* request)
+{
+	KPath path;
+	uint64 deviceSize = 0;
+
+	if (request->path[0] != '\0') {
+		// check if the path is null-terminated
+		if (strnlen(request->path, sizeof(request->path))
+				== sizeof(request->path)) {
+			return B_BAD_VALUE;
+		}
+
+		// get a normalized file path
+		status_t error = path.SetTo(request->path, true);
+		if (error != B_OK) {
+			dprintf("ramdisk: register: Invalid path \"%s\": %s\n",
+				request->path, strerror(error));
+			return B_BAD_VALUE;
+		}
+
+		struct stat st;
+		if (lstat(path.Path(), &st) != 0) {
+			dprintf("ramdisk: register: Failed to stat \"%s\": %s\n",
+				path.Path(), strerror(errno));
+			return errno;
+		}
+
+		if (!S_ISREG(st.st_mode)) {
+			dprintf("ramdisk: register: \"%s\" is not a file!\n", path.Path());
+			return B_BAD_VALUE;
+		}
+
+		deviceSize = st.st_size;
+	} else {
+		deviceSize = request->size;
+	}
+
+	return controlDevice->Register(path.Length() > 0 ? path.Path() : NULL,
+		deviceSize, request->id);
+}
+
+
+static status_t
+ioctl_unregister(ControlDevice* controlDevice,
+	ram_disk_ioctl_unregister* request)
+{
+	// find the device in the list and unregister it
+	MutexLocker locker(sDeviceListLock);
+	RawDevice* device = find_raw_device(request->id);
+	if (device == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// mark unregistered before we unlock
+	if (device->IsUnregistered())
+		return B_BUSY;
+	device->SetUnregistered(true);
+	locker.Unlock();
+
+	device_node* node = device->Node();
+	status_t error = sDeviceManager->unpublish_device(node,
+		device->DeviceName());
+	if (error != B_OK) {
+		dprintf("ramdisk: unregister: Failed to unpublish device \"%s\": %s\n",
+			device->DeviceName(), strerror(error));
+		return error;
+	}
+
+	error = sDeviceManager->unregister_node(node);
+	// Note: B_BUSY is OK. The node will removed as soon as possible.
+	if (error != B_OK && error != B_BUSY) {
+		dprintf("ramdisk: unregister: Failed to unregister node for device %"
+			B_PRId32 ": %s\n", request->id, strerror(error));
+		return error;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+ioctl_info(RawDevice* device, ram_disk_ioctl_info* request)
+{
+	device->GetInfo(*request);
+	return B_OK;
+}
+
+
+template<typename DeviceType, typename Request>
+static status_t
+handle_ioctl(DeviceType* device,
+	status_t (*handler)(DeviceType*, Request*), void* buffer)
+{
+	// copy request to the kernel heap
+	if (buffer == NULL || !IS_USER_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
+
+	Request* request = new(std::nothrow) Request;
+	if (request == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<Request> requestDeleter(request);
+
+	if (user_memcpy(request, buffer, sizeof(Request)) != B_OK)
+		return B_BAD_ADDRESS;
+
+	// handle the ioctl
+	status_t error = handler(device, request);
+	if (error != B_OK)
+		return error;
+
+	// copy the request back to userland
+	if (user_memcpy(buffer, request, sizeof(Request)) != B_OK)
+		return B_BAD_ADDRESS;
+
+	return B_OK;
 }
 
 
@@ -890,6 +989,12 @@ ram_disk_driver_init_driver(device_node* node, void** _driverCookie)
 	uint64 deviceSize;
 	if (sDeviceManager->get_attr_uint64(node, kDeviceSizeItem, &deviceSize,
 			false) == B_OK) {
+		int32 id = -1;
+		sDeviceManager->get_attr_uint32(node, kDeviceIDItem, (uint32*)&id,
+			false);
+		if (id < 0)
+			return B_ERROR;
+
 		const char* filePath = NULL;
 		sDeviceManager->get_attr_string(node, kFilePathItem, &filePath, false);
 
@@ -897,7 +1002,7 @@ ram_disk_driver_init_driver(device_node* node, void** _driverCookie)
 		if (device == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = device->Init(filePath, deviceSize);
+		status_t error = device->Init(id, filePath, deviceSize);
 		if (error != B_OK) {
 			delete device;
 			return error;
@@ -920,6 +1025,8 @@ static void
 ram_disk_driver_uninit_driver(void* driverCookie)
 {
 	Device* device = (Device*)driverCookie;
+	if (RawDevice* rawDevice = dynamic_cast<RawDevice*>(device))
+		free_raw_device_id(rawDevice->ID());
 	delete device;
 }
 
@@ -976,185 +1083,15 @@ static status_t
 ram_disk_control_device_read(void* cookie, off_t position, void* buffer,
 	size_t* _length)
 {
-	*_length = 0;
-	return B_OK;
+	return B_BAD_VALUE;
 }
-
 
 
 static status_t
 ram_disk_control_device_write(void* cookie, off_t position, const void* data,
 	size_t* _length)
 {
-	ControlDevice* device = (ControlDevice*)cookie;
-
-	if (position != 0)
-		return B_BAD_VALUE;
-
-	// copy data to stack buffer
-	char* buffer = (char*)malloc(*_length + 1);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-	MemoryDeleter bufferDeleter(buffer);
-
-	if (IS_USER_ADDRESS(data)) {
-		if (user_memcpy(buffer, data, *_length) != B_OK)
-			return B_BAD_ADDRESS;
-	} else
-		memcpy(buffer, data, *_length);
-
-	buffer[*_length] = '\0';
-
-	// parse arguments
-	char** argv;
-	int argc;
-	if (!parse_command_line(buffer, argv, argc))
-		return B_NO_MEMORY;
-	ArrayDeleter<char*> argvDeleter(argv);
-
-	if (argc == 0) {
-		dprintf("\"help\" for usage!\n");
-		return B_BAD_VALUE;
-	}
-
-	// execute command
-	if (strcmp(argv[0], "help") == 0) {
-		// help
-		dprintf("register (<path> | -s <size>)\n");
-		dprintf("  Registers a new ram disk device backed by file <path> or\n"
-			"  an unbacked ram disk device with size <size>.\n");
-		dprintf("unregister <device>\n");
-		dprintf("  Unregisters <device>.\n");
-		dprintf("flush <device>\n");
-		dprintf("  Writes <device> changes back to the file associated with\n"
-			"  it, if any.\n");
-	} else if (strcmp(argv[0], "register") == 0) {
-		// register
-		if (argc < 2 || argc > 3 || (argc == 3 && strcmp(argv[1], "-s") != 0)) {
-			dprintf("Usage: register (<path> | -s <size>)\n");
-			return B_BAD_VALUE;
-		}
-
-		KPath path;
-		uint64 deviceSize = 0;
-
-		if (argc == 2) {
-			// get a normalized file path
-			status_t error = path.SetTo(argv[1], true);
-			if (error != B_OK) {
-				dprintf("Invalid path \"%s\": %s\n", argv[1], strerror(error));
-				return B_BAD_VALUE;
-			}
-
-			struct stat st;
-			if (lstat(path.Path(), &st) != 0) {
-				dprintf("Failed to stat \"%s\": %s\n", path.Path(),
-					strerror(errno));
-				return errno;
-			}
-
-			if (!S_ISREG(st.st_mode)) {
-				dprintf("\"%s\" is not a file!\n", path.Path());
-				return B_BAD_VALUE;
-			}
-
-			deviceSize = st.st_size;
-		} else {
-			// parse size argument
-			const char* sizeString = argv[2];
-			char* end;
-			deviceSize = strtoll(sizeString, &end, 0);
-			if (end == sizeString) {
-				dprintf("Invalid size argument: \"%s\"\n", sizeString);
-				return B_BAD_VALUE;
-			}
-
-			switch (*end) {
-				case 'g':
-					deviceSize *= 1024;
-				case 'm':
-					deviceSize *= 1024;
-				case 'k':
-					deviceSize *= 1024;
-					break;
-			}
-		}
-
-		return device->Register(path.Length() > 0 ? path.Path() : NULL,
-			deviceSize);
-	} else if (strcmp(argv[0], "unregister") == 0) {
-		// unregister
-		if (argc != 2) {
-			dprintf("Usage: unregister <device>\n");
-			return B_BAD_VALUE;
-		}
-
-		const char* deviceName = argv[1];
-
-		// find the device in the list and unregister it
-		MutexLocker locker(sDeviceListLock);
-		if (RawDevice* device = find_raw_device(deviceName)) {
-			// TODO: Race condition: We should mark the device as going to
-			// be unregistered, so no one else can try the same after we
-			// unlock!
-			locker.Unlock();
-// TODO: The following doesn't work! unpublish_device(), as per implementation
-// (partially commented out) and unregister_node() returns B_BUSY.
-			status_t error = sDeviceManager->unpublish_device(
-				device->Node(), device->DeviceName());
-			if (error != B_OK) {
-				dprintf("Failed to unpublish device \"%s\": %s\n",
-					deviceName, strerror(error));
-				return error;
-			}
-
-			error = sDeviceManager->unregister_node(device->Node());
-			if (error != B_OK) {
-				dprintf("Failed to unregister node \"%s\": %s\n",
-					deviceName, strerror(error));
-				return error;
-			}
-
-			return B_OK;
-		}
-
-		dprintf("Device \"%s\" not found!\n", deviceName);
-		return B_BAD_VALUE;
-	} else if (strcmp(argv[0], "flush") == 0) {
-		// flush
-		if (argc != 2) {
-			dprintf("Usage: unregister <device>\n");
-			return B_BAD_VALUE;
-		}
-
-		const char* deviceName = argv[1];
-
-		// find the device in the list and flush it
-		MutexLocker locker(sDeviceListLock);
-		RawDevice* device = find_raw_device(deviceName);
-		if (device == NULL) {
-			dprintf("Device \"%s\" not found!\n", deviceName);
-			return B_BAD_VALUE;
-		}
-
-		// TODO: Race condition: Once we unlock someone could unregister the
-		// device. We should probably open the device by path, and use a
-		// special ioctl.
-		locker.Unlock();
-
-		status_t error = device->Flush();
-		if (error != B_OK) {
-			dprintf("Failed to flush device: %s\n", strerror(error));
-			return error;
-		}
-
-		return B_OK;
-	} else {
-		dprintf("Invalid command \"%s\"!\n", argv[0]);
-		return B_BAD_VALUE;
-	}
-
-	return B_OK;
+	return B_BAD_VALUE;
 }
 
 
@@ -1162,6 +1099,16 @@ static status_t
 ram_disk_control_device_control(void* cookie, uint32 op, void* buffer,
 	size_t length)
 {
+	ControlDevice* device = (ControlDevice*)cookie;
+
+	switch (op) {
+		case RAM_DISK_IOCTL_REGISTER:
+			return handle_ioctl(device, &ioctl_register, buffer);
+
+		case RAM_DISK_IOCTL_UNREGISTER:
+			return handle_ioctl(device, &ioctl_unregister, buffer);
+	}
+
 	return B_BAD_VALUE;
 }
 
@@ -1347,6 +1294,21 @@ ram_disk_raw_device_control(void* _cookie, uint32 op, void* buffer,
 		case B_SET_INTERRUPTABLE_IO:
 		case B_FLUSH_DRIVE_CACHE:
 			return B_OK;
+
+		case RAM_DISK_IOCTL_FLUSH:
+		{
+			status_t error = device->Flush();
+			if (error != B_OK) {
+				dprintf("ramdisk: flush: Failed to flush device: %s\n",
+					strerror(error));
+				return error;
+			}
+
+			return B_OK;
+		}
+
+		case RAM_DISK_IOCTL_INFO:
+			return handle_ioctl(device, &ioctl_info, buffer);
 	}
 
 	return B_BAD_VALUE;
