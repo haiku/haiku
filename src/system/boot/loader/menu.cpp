@@ -622,26 +622,29 @@ public:
 	{
 		_DeleteItems();
 
-		if (fDirectory == NULL)
-			return;
+		if (fDirectory != NULL) {
+			void* cookie;
+			if (fDirectory->Open(&cookie, O_RDONLY) == B_OK) {
+				Node* node;
+				while (fDirectory->GetNextNode(cookie, &node) == B_OK) {
+					BlacklistMenuItem* item = _CreateItem(node);
+					node->Release();
+					if (item == NULL)
+						break;
 
-		void* cookie;
-		if (fDirectory->Open(&cookie, O_RDONLY) == B_OK) {
-			Node* node;
-			while (fDirectory->GetNextNode(cookie, &node) == B_OK) {
-				BlacklistMenuItem* item = _CreateItem(node);
-				node->Release();
-				if (item == NULL)
-					break;
+					AddItem(item);
 
-				AddItem(item);
-
-				item->UpdateBlacklisted();
+					item->UpdateBlacklisted();
+				}
+				fDirectory->Close(cookie);
 			}
-			fDirectory->Close(cookie);
+
+			SortItems(&BlacklistMenuItem::Less);
 		}
 
-		SortItems(&BlacklistMenuItem::Less);
+		if (CountItems() > 0)
+			AddSeparatorItem();
+		AddItem(new(nothrow) MenuItem("Return to parent directory"));
 	}
 
 	virtual void Exited()
@@ -725,6 +728,10 @@ public:
 			SetDirectory(NULL);
 
 		BlacklistMenu::Entered();
+
+		// rename last item
+		if (MenuItem* item = ItemAt(CountItems() - 1))
+			item->SetLabel("Return to safe mode menu");
 	}
 
 	virtual void Exited()
