@@ -5,11 +5,13 @@
 
 /*!	Generic PCI bus mastering IDE driver. */
 
+
+#include <ata_adapter.h>
 #include <KernelExport.h>
+
 #include <stdlib.h>
 #include <string.h>
 
-#include <ata_adapter.h>
 
 #define GENERIC_IDE_PCI_CONTROLLER_MODULE_NAME "busses/ata/generic_ide_pci/driver_v1"
 #define GENERIC_IDE_PCI_CHANNEL_MODULE_NAME "busses/ata/generic_ide_pci/channel/v1"
@@ -29,44 +31,52 @@ set_channel(void *cookie, ata_channel channel)
 
 
 static status_t
-write_command_block_regs(void *channel_cookie, ata_task_file *tf, ata_reg_mask mask)
+write_command_block_regs(void *channel_cookie, ata_task_file *tf,
+	ata_reg_mask mask)
 {
-	return sATAAdapter->write_command_block_regs((ata_adapter_channel_info *)channel_cookie, tf, mask);
+	return sATAAdapter->write_command_block_regs(
+		(ata_adapter_channel_info *)channel_cookie, tf, mask);
 }
 
 
 static status_t
-read_command_block_regs(void *channel_cookie, ata_task_file *tf, ata_reg_mask mask)
+read_command_block_regs(void *channel_cookie, ata_task_file *tf,
+	ata_reg_mask mask)
 {
-	return sATAAdapter->read_command_block_regs((ata_adapter_channel_info *)channel_cookie, tf, mask);
+	return sATAAdapter->read_command_block_regs(
+		(ata_adapter_channel_info *)channel_cookie, tf, mask);
 }
 
 
 static uint8
 get_altstatus(void *channel_cookie)
 {
-	return sATAAdapter->get_altstatus((ata_adapter_channel_info *)channel_cookie);
+	return sATAAdapter->get_altstatus(
+		(ata_adapter_channel_info *)channel_cookie);
 }
 
 
 static status_t
 write_device_control(void *channel_cookie, uint8 val)
 {
-	return sATAAdapter->write_device_control((ata_adapter_channel_info *)channel_cookie, val);
+	return sATAAdapter->write_device_control(
+		(ata_adapter_channel_info *)channel_cookie, val);
 }
 
 
 static status_t
 write_pio(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return sATAAdapter->write_pio((ata_adapter_channel_info *)channel_cookie, data, count, force_16bit);
+	return sATAAdapter->write_pio((ata_adapter_channel_info *)channel_cookie,
+		data, count, force_16bit);
 }
 
 
 static status_t
 read_pio(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 {
-	return sATAAdapter->read_pio((ata_adapter_channel_info *)channel_cookie, data, count, force_16bit);
+	return sATAAdapter->read_pio((ata_adapter_channel_info *)channel_cookie,
+		data, count, force_16bit);
 }
 
 
@@ -75,7 +85,8 @@ prepare_dma(void *channel_cookie,
 	const physical_entry *sg_list, size_t sg_list_count,
 	bool to_device)
 {
-	return sATAAdapter->prepare_dma((ata_adapter_channel_info *)channel_cookie, sg_list, sg_list_count, to_device);
+	return sATAAdapter->prepare_dma((ata_adapter_channel_info *)channel_cookie,
+		sg_list, sg_list_count, to_device);
 }
 
 
