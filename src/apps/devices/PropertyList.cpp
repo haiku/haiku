@@ -10,6 +10,7 @@
 #include "PropertyList.h"
 
 #include <Catalog.h>
+#include <Clipboard.h>
 #include <ColumnTypes.h>
 
 #undef B_TRANSLATION_CONTEXT
@@ -90,4 +91,41 @@ PropertyList::RemoveAll()
 void
 PropertyList::SelectionChanged()
 {
+}
+
+
+void
+PropertyList::MessageReceived(BMessage* msg)
+{
+	switch (msg->what) {
+		case B_COPY:
+		{
+			BString strings;
+			uint32 rowsCount = CountRows();
+
+			for (uint32 i = 0; i < rowsCount; i++) {
+				PropertyRow* current = (PropertyRow*)RowAt(i);
+				if (current->IsSelected())
+					strings << current->Name()
+						<< "\t" << current->Value() << "\n";
+			}
+
+			if (!be_clipboard->Lock())
+				break;
+
+			be_clipboard->Clear();
+			BMessage* data = be_clipboard->Data();
+			if (data != NULL) {
+				data->AddData("text/plain", B_MIME_TYPE,
+						strings, strings.Length());
+				be_clipboard->Commit();
+			}
+
+			be_clipboard->Unlock();
+			break;
+		}
+		default:
+			BColumnListView::MessageReceived(msg);
+			break;
+	}
 }

@@ -17,6 +17,7 @@
 #include <SpaceLayoutItem.h>
 #include <String.h>
 #include <StringView.h>
+#include <TextView.h>
 
 #include "Device.h"
 
@@ -32,7 +33,7 @@ PropertyListPlain::PropertyListPlain(const char* name)
 
 PropertyListPlain::~PropertyListPlain()
 {
-	
+
 }
 
 
@@ -40,34 +41,22 @@ void
 PropertyListPlain::AddAttributes(const Attributes& attributes)
 {
 	RemoveAll();
-	BGridLayoutBuilder builder(5, 5);
-	unsigned int i;
-	for (i = 0; i < attributes.size(); i++) {
-		const char* name = attributes[i].fName;
-		const char* value = attributes[i].fValue;
-		
-		BString tempViewName(name);
-		BStringView *nameView = new BStringView(tempViewName.String(), name);
-		tempViewName.Append("Value");
-		BStringView *valueView = new BStringView(tempViewName.String(), value);
+	BGroupLayoutBuilder layout(B_VERTICAL);
+	BTextView* view = new BTextView(BRect(0, 0, 1000, 1000),
+		"", BRect(5, 5, 995, 995), B_FOLLOW_ALL_SIDES);
 
-		nameView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-			B_ALIGN_VERTICAL_UNSET));
-		valueView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-			B_ALIGN_VERTICAL_UNSET));
+	for (unsigned int i = 0; i < attributes.size(); i++) {
+		BString attributeLine;
+		attributeLine << attributes[i].fName
+			<< "\t" << attributes[i].fValue << "\n";
+		view->Insert(attributeLine);
 
-		builder
-			.Add(nameView, 0, i)
-			.Add(valueView, 1, i);
+		view->SetExplicitAlignment(
+			BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET));
 	}
+	layout.Add(view);
 
-	// make sure that all content is left and top aligned
-	builder.Add(BSpaceLayoutItem::CreateGlue(), 2, i);
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL,5)
-		.Add(builder)
-		.SetInsets(5, 5, 5, 5)
-	);
+	AddChild(layout);
 }
 
 
@@ -75,7 +64,7 @@ void
 PropertyListPlain::RemoveAll()
 {
 	BView *child;
-	while((child = ChildAt(0))) {
+	while ((child = ChildAt(0))) {
 		RemoveChild(child);
 		delete child;
 	}
@@ -88,7 +77,7 @@ PropertyListPlain::MessageReceived(BMessage* message)
 	switch (message->what) {
 		default:
 			BView::MessageReceived(message);
-	}	
+	}
 }
 
 

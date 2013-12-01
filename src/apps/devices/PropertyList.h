@@ -26,7 +26,7 @@ class PropertyRow : public BRow {
 public:
 						PropertyRow(const char* name, const char* value);
 	virtual				~PropertyRow();
-		
+
 			const char*	Name() const { return fName.String(); }
 			const char*	Value() const { return fValue.String(); }
 			void		SetName(const char* name);
@@ -43,6 +43,8 @@ public:
 	virtual			~PropertyList();
 			void	RemoveAll();
 			void	AddAttributes(const Attributes& attributes);
+
+			void	MessageReceived(BMessage* msg);
 protected:
 	virtual	void	SelectionChanged();
 };
