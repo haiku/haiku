@@ -53,14 +53,6 @@ is_valid_spot(addr_t base, addr_t alignedBase, addr_t size, addr_t limit)
 
 
 static inline bool
-is_randomized(uint32 addressSpec)
-{
-	return addressSpec == B_RANDOMIZED_ANY_ADDRESS
-		|| addressSpec == B_RANDOMIZED_BASE_ADDRESS;
-}
-
-
-static inline bool
 is_base_address_spec(uint32 addressSpec)
 {
 	return addressSpec == B_BASE_ADDRESS
@@ -422,6 +414,15 @@ VMUserAddressSpace::Dump() const
 }
 
 
+inline bool
+VMUserAddressSpace::_IsRandomized(uint32 addressSpec) const
+{
+	return fRandomizingEnabled
+		&& (addressSpec == B_RANDOMIZED_ANY_ADDRESS
+			|| addressSpec == B_RANDOMIZED_BASE_ADDRESS);
+}
+
+
 addr_t
 VMUserAddressSpace::_RandomizeAddress(addr_t start, addr_t end,
 	size_t alignment, bool initial)
@@ -567,7 +568,7 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 
 	start = align_address(start, alignment);
 
-	if (addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
+	if (fRandomizingEnabled && addressSpec == B_RANDOMIZED_BASE_ADDRESS) {
 		originalStart = start;
 		start = _RandomizeAddress(start, end - size + 1, alignment, true);
 	}
@@ -603,7 +604,7 @@ second_chance:
 					? end : std::min(next->Base() - 1, end);
 				if (is_valid_spot(start, alignedBase, size, nextBase)) {
 					addr_t rangeEnd = std::min(nextBase - size + 1, end);
-					if (is_randomized(addressSpec)) {
+					if (_IsRandomized(addressSpec)) {
 						alignedBase = _RandomizeAddress(alignedBase, rangeEnd,
 							alignment);
 					}
@@ -626,7 +627,7 @@ second_chance:
 				if (is_valid_spot(last->Base() + (last->Size() - 1),
 						alignedBase, size, nextBase)) {
 					addr_t rangeEnd = std::min(nextBase - size + 1, end);
-					if (is_randomized(addressSpec)) {
+					if (_IsRandomized(addressSpec)) {
 						alignedBase = _RandomizeAddress(alignedBase,
 							rangeEnd, alignment);
 					}
@@ -648,7 +649,7 @@ second_chance:
 
 			if (next == NULL && is_valid_spot(last->Base() + (last->Size() - 1),
 					alignedBase, size, end)) {
-				if (is_randomized(addressSpec)) {
+				if (_IsRandomized(addressSpec)) {
 					alignedBase = _RandomizeAddress(alignedBase, end - size + 1,
 						alignment);
 				}
@@ -660,7 +661,7 @@ second_chance:
 			} else if (is_base_address_spec(addressSpec)) {
 				// we didn't find a free spot in the requested range, so we'll
 				// try again without any restrictions
-				if (!is_randomized(addressSpec)) {
+				if (!_IsRandomized(addressSpec)) {
 					start = USER_BASE_ANY;
 					addressSpec = B_ANY_ADDRESS;
 				} else if (start == originalStart) {
@@ -706,7 +707,7 @@ second_chance:
 						&& next->Size() >= size) {
 						addr_t rangeEnd = std::min(
 							next->Base() + next->Size() - size, end);
-						if (is_randomized(addressSpec)) {
+						if (_IsRandomized(addressSpec)) {
 							alignedBase = _RandomizeAddress(next->Base(),
 								rangeEnd, alignment);
 						}
@@ -728,7 +729,7 @@ second_chance:
 						// reserved area, and the reserved area will be resized
 						// to make space
 
-						if (is_randomized(addressSpec)) {
+						if (_IsRandomized(addressSpec)) {
 							addr_t alignedNextBase = align_address(next->Base(),
 								alignment);
 

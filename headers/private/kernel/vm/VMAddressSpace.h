@@ -61,6 +61,11 @@ public:
 			void				IncrementChangeCount()
 									{ fChangeCount++; }
 
+	inline	bool				IsRandomizingEnabled() const
+									{ return fRandomizingEnabled; }
+	inline	void				SetRandomizingEnabled(bool enabled)
+									{ fRandomizingEnabled = enabled; }
+
 	inline	AreaIterator		GetAreaIterator();
 
 			VMAddressSpace*&	HashTableLink()	{ return fHashTableLink; }
@@ -143,6 +148,7 @@ protected:
 			int32				fFaultCount;
 			int32				fChangeCount;
 			VMTranslationMap*	fTranslationMap;
+			bool				fRandomizingEnabled;
 			bool				fDeleting;
 	static	VMAddressSpace*		sKernelAddressSpace;
 };

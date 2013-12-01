@@ -78,9 +78,12 @@ struct team_arg {
 	uint32	arg_count;
 	uint32	env_count;
 	mode_t	umask;
+	uint32	flags;
 	port_id	error_port;
 	uint32	error_token;
 };
+
+#define TEAM_ARGS_FLAG_NO_ASLR	0x01
 
 
 namespace {
@@ -1482,14 +1485,23 @@ create_team_arg(struct team_arg** _teamArg, const char* path, char** flatArgs,
 	}
 
 	// copy the args over
-
 	teamArg->flat_args = flatArgs;
 	teamArg->flat_args_size = flatArgsSize;
 	teamArg->arg_count = argCount;
 	teamArg->env_count = envCount;
+	teamArg->flags = 0;
 	teamArg->umask = umask;
 	teamArg->error_port = port;
 	teamArg->error_token = token;
+
+	// determine the flags from the environment
+	const char* const* env = flatArgs + argCount + 1;
+	for (int32 i = 0; i < envCount; i++) {
+		if (strcmp(env[i], "DISABLE_ASLR=1") == 0) {
+			teamArg->flags |= TEAM_ARGS_FLAG_NO_ASLR;
+			break;
+		}
+	}
 
 	*_teamArg = teamArg;
 	return B_OK;
@@ -1763,6 +1775,9 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	if (status != B_OK)
 		goto err2;
 
+	team->address_space->SetRandomizingEnabled(
+		(teamArgs->flags & TEAM_ARGS_FLAG_NO_ASLR) == 0);
+
 	// create the user data area
 	status = create_team_user_data(team);
 	if (status != B_OK)
@@ -1934,10 +1949,13 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	delete_realtime_sem_context(team->realtime_sem_context);
 	team->realtime_sem_context = NULL;
 
+	// update ASLR
+	team->address_space->SetRandomizingEnabled(
+		(teamArgs->flags & TEAM_ARGS_FLAG_NO_ASLR) == 0);
+
 	status = create_team_user_data(team);
 	if (status != B_OK) {
 		// creating the user data failed -- we're toast
-		// TODO: We should better keep the old user area in the first place.
 		free_team_arg(teamArgs);
 		exit_thread(status);
 		return status;

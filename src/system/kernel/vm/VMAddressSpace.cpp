@@ -89,6 +89,7 @@ VMAddressSpace::VMAddressSpace(team_id id, addr_t base, size_t size,
 	fFaultCount(0),
 	fChangeCount(0),
 	fTranslationMap(NULL),
+	fRandomizingEnabled(true),
 	fDeleting(false)
 {
 	rw_lock_init(&fLock, name);
