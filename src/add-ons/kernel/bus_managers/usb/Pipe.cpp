@@ -165,6 +165,20 @@ BulkPipe::BulkPipe(Object *parent)
 }
 
 
+void
+BulkPipe::InitCommon(int8 deviceAddress, uint8 endpointAddress,
+	usb_speed speed, pipeDirection direction, size_t maxPacketSize,
+	uint8 interval, int8 hubAddress, uint8 hubPort)
+{
+	// some devices have bogus descriptors
+	if (speed == USB_SPEED_HIGHSPEED && maxPacketSize != 512)
+		maxPacketSize = 512;
+
+	Pipe::InitCommon(deviceAddress, endpointAddress, speed, direction,
+		maxPacketSize, interval, hubAddress, hubPort);
+}
+
+
 status_t
 BulkPipe::QueueBulk(void *data, size_t dataLength, usb_callback_func callback,
 	void *callbackCookie)
