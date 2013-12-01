@@ -29,6 +29,7 @@ public:
 							BView* exceptToView = NULL);
 
 			bigtime_t	RefreshInterval() const;
+			bool		IsAlwaysOnTop() const;
 
 private:
 			status_t	_OpenSettings(BFile& file, uint32 mode);

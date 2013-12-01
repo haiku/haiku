@@ -105,6 +105,8 @@ SettingsWindow::SettingsWindow(ActivityWindow* target)
 		.Add(fIntervalSlider)
 		.SetInsets(10, 10, 10, 10)
 	);
+	if (target->IsAlwaysOnTop())
+		SetFeel(B_MODAL_ALL_WINDOW_FEEL);
 }
 
 
@@ -151,4 +153,3 @@ SettingsWindow::_RelativeTo(BWindow* window)
 	return BRect(frame.right - 150, frame.top + frame.Height() / 4,
 		frame.right + 200, frame.top + frame.Height() / 4 + 50);
 }
-

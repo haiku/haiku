@@ -253,6 +253,13 @@ ActivityWindow::ActivityViewAt(int32 index) const
 }
 
 
+bool
+ActivityWindow::IsAlwaysOnTop() const
+{
+	return fAlwaysOnTop->IsMarked();	
+}
+
+
 void
 ActivityWindow::BroadcastToActivityViews(BMessage* message, BView* exceptToView)
 {
