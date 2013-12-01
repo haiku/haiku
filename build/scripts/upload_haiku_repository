@@ -23,7 +23,7 @@ version=${fileName#*-}
 version=${version%%-*}
 
 # upload the repo
-scp -r "$repositoryDir/" "$sshUserName@$sshServer:$sshDestPath/$arch/$version"
+scp -r "$repositoryDir/*" "$sshUserName@$sshServer:$sshDestPath/$arch/$version/"
 ssh "$sshUserName@$sshServer" "chmod -R 755 $sshDestPath/$arch/$version"
 sshSymlinkCommand="ln -sfT $version $sshDestPath/$arch/current"
 ssh "$sshUserName@$sshServer" "$sshSymlinkCommand"
