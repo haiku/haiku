@@ -189,7 +189,11 @@ int
 pthread_join(pthread_t thread, void** _value)
 {
 	status_t dummy;
-	status_t error = wait_for_thread(thread->id, &dummy);
+	status_t error;
+	do {
+		error = wait_for_thread(thread->id, &dummy);
+	} while (error == B_INTERRUPTED);
+
 	if (error == B_BAD_THREAD_ID)
 		RETURN_AND_TEST_CANCEL(ESRCH);
 
