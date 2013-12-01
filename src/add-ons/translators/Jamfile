@@ -21,3 +21,4 @@ SubInclude HAIKU_TOP src add-ons translators tiff ;
 SubInclude HAIKU_TOP src add-ons translators webp ;
 SubInclude HAIKU_TOP src add-ons translators wonderbrush ;
 SubInclude HAIKU_TOP src add-ons translators icns ;
+SubInclude HAIKU_TOP src add-ons translators psd ;
