@@ -26,85 +26,57 @@ if $(NET_BOOT) = 1 {
 }
 
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
-	acpi@x86 ata@ata config_manager dpc pci
-	ide@ide isa@x86 scsi $(USB_ONLY)usb
+	acpi@x86,x86_64 ata@ata config_manager dpc pci
+	ide@ide isa@x86,x86_64 scsi $(USB_ONLY)usb
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS =
 	attribute_overlay bfs iso9660 packagefs write_overlay
 	;
 
+# modules
+AddFilesToFloppyBootArchive system add-ons kernel bus_managers
+	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 
-if $(TARGET_ARCH) = x86_64 {
-	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
-		: ata config_manager dpc pci isa scsi $(USB_ONLY)usb ;
+if $(HAIKU_ATA_STACK) = 1 {
 	AddFilesToFloppyBootArchive system add-ons kernel busses ata
-		: generic_ide_pci legacy_sata ;
-	AddFilesToFloppyBootArchive system add-ons kernel busses scsi
-		: ahci ;
-	AddFilesToFloppyBootArchive system add-ons kernel file_systems
-		: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
-	AddFilesToFloppyBootArchive system add-ons kernel generic
-		: ata_adapter locked_pool scsi_periph ;
-	AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
-		: intel session ;
-
-	if $(USB_BOOT) = 1 {
-		AddFilesToFloppyBootArchive system add-ons kernel busses usb
-			: <usb>uhci <usb>ohci <usb>ehci ;
-	}
-
-	AddFilesToFloppyBootArchive system add-ons kernel cpu : generic_x86 ;
-
-	AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
-	if $(USB_BOOT) = 1 {
-		AddDriversToFloppyBootArchive disk usb : usb_disk ;
-	}
+		: generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
+			it8211 ;
 } else {
-	# modules
-	AddFilesToFloppyBootArchive system add-ons kernel bus_managers
-		: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
+	AddFilesToFloppyBootArchive system add-ons kernel busses ide
+		: generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
+			it8211 ;
+}
 
-	if $(HAIKU_ATA_STACK) = 1 {
-		AddFilesToFloppyBootArchive system add-ons kernel busses ata
-			: generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
-				it8211 ;
-	} else {
-		AddFilesToFloppyBootArchive system add-ons kernel busses ide
-			: generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
-				it8211 ;
-	}
+AddFilesToFloppyBootArchive system add-ons kernel busses scsi
+	: ahci ;
+AddFilesToFloppyBootArchive system add-ons kernel console : vga_text ;
+AddFilesToFloppyBootArchive system add-ons kernel file_systems
+	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
+AddFilesToFloppyBootArchive system add-ons kernel generic
+	: ata_adapter@ata ide_adapter@ide locked_pool scsi_periph ;
+AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
+	: intel session ;
+AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
+	: openpic@ppc ;
 
-	AddFilesToFloppyBootArchive system add-ons kernel busses scsi
-		: ahci ;
-	AddFilesToFloppyBootArchive system add-ons kernel console : vga_text ;
-	AddFilesToFloppyBootArchive system add-ons kernel file_systems
-		: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
-	AddFilesToFloppyBootArchive system add-ons kernel generic
-		: ata_adapter@ata ide_adapter@ide locked_pool scsi_periph ;
-	AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
-		: intel session ;
-	AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
-		: openpic@ppc ;
+if $(USB_BOOT) = 1 {
+	AddFilesToFloppyBootArchive system add-ons kernel busses usb
+		: <usb>uhci <usb>ohci <usb>ehci ;
+}
 
-	if $(USB_BOOT) = 1 {
-		AddFilesToFloppyBootArchive system add-ons kernel busses usb
-			: <usb>uhci <usb>ohci <usb>ehci ;
-	}
+if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
+	AddFilesToFloppyBootArchive system add-ons kernel cpu : generic_x86 ;
+}
 
-	if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
-		AddFilesToFloppyBootArchive system add-ons kernel cpu : generic_x86 ;
-	}
-
-	# drivers
-	AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
-	AddNewDriversToFloppyBootArchive disk : norflash@arm ;
-	if $(USB_BOOT) = 1 {
-		AddDriversToFloppyBootArchive disk usb : usb_disk ;
-	}
-	if $(NET_BOOT) = 1 {
-		AddDriversToFloppyBootArchive disk virtual : remote_disk ;
-		AddDriversToFloppyBootArchive net : $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
-	}
+# drivers
+AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
+AddNewDriversToFloppyBootArchive disk : norflash@arm ;
+if $(USB_BOOT) = 1 {
+	AddDriversToFloppyBootArchive disk usb : usb_disk ;
+}
+if $(NET_BOOT) = 1 {
+	AddDriversToFloppyBootArchive disk virtual : remote_disk ;
+	AddDriversToFloppyBootArchive net : $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 }
 
 # kernel
@@ -222,5 +194,3 @@ RmTemps $(HAIKU_BOOT_FLOPPY) : $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
 
 NotFile haiku-boot-floppy ;
 Depends haiku-boot-floppy : $(HAIKU_BOOT_FLOPPY) ;
-
-
