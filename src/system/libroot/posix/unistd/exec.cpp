@@ -103,7 +103,7 @@ do_exec(const char *path, char * const args[], char * const environment[],
 	char** flatArgs = NULL;
 	size_t flatArgsSize;
 	status = __flatten_process_args(newArgs ? newArgs : args, argCount,
-		environment, envCount, &flatArgs, &flatArgsSize);
+		environment, &envCount, path, &flatArgs, &flatArgsSize);
 
 	if (status == B_OK) {
 		__set_errno(_kern_exec(path, flatArgs, flatArgsSize, argCount, envCount,

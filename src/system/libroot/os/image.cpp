@@ -9,12 +9,194 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <OS.h>
+#include <algorithm>
+#include <new>
+
+#include <fs_attr.h>
+
+#include <AutoDeleter.h>
 
 #include <libroot_private.h>
 #include <runtime_loader.h>
 #include <syscalls.h>
 #include <user_runtime.h>
+
+
+struct EnvironmentFilter {
+	EnvironmentFilter()
+		:
+		fBuffer(NULL),
+		fEntries(NULL),
+		fBufferSize(0),
+		fEntryCount(0),
+		fAdditionalEnvCount(0),
+		fNextEntryIndex(0)
+	{
+	}
+
+	~EnvironmentFilter()
+	{
+		free(fBuffer);
+		delete[] fEntries;
+	}
+
+	void Init(const char* path, const char* const* env, size_t envCount)
+	{
+		int fd = open(path, O_RDONLY);
+		if (fd < 0)
+			return;
+		FileDescriptorCloser fdCloser(fd);
+
+		static const char* const kEnvAttribute = "SYS:ENV";
+		attr_info info;
+		if (fs_stat_attr(fd, kEnvAttribute, &info) < 0)
+			return;
+
+		_Init(fd, kEnvAttribute, info.size, env, envCount);
+	}
+
+	size_t AdditionalSlotsNeeded() const
+	{
+		return fAdditionalEnvCount;
+	}
+
+	size_t AdditionalSizeNeeded() const
+	{
+		return fBufferSize + fAdditionalEnvCount * sizeof(char*);
+	}
+
+	size_t PrepareSlot(const char* env, int32 index, char* buffer)
+	{
+		if (fNextEntryIndex < fEntryCount
+			&& fEntries[fNextEntryIndex].index == index) {
+			env = fEntries[fNextEntryIndex].replacement;
+			fNextEntryIndex++;
+		}
+
+		return _FillSlot(env, buffer);
+	}
+
+	void PrepareAdditionalSlots(char**& slot, char*& buffer)
+	{
+		for (size_t i = 0; i < fAdditionalEnvCount; i++) {
+			size_t envSize = _FillSlot(fEntries[i].replacement, buffer);
+			*slot++ = buffer;
+			buffer += envSize;
+		}
+	}
+
+private:
+	void _Init(int fd, const char* attribute, size_t size,
+		const char* const* env, size_t envCount)
+	{
+		if (size == 0)
+			return;
+
+		// read the attribute
+		char* buffer = (char*)malloc(size + 1);
+		if (buffer == NULL)
+			return;
+		MemoryDeleter bufferDeleter(buffer);
+
+		ssize_t bytesRead = fs_read_attr(fd, attribute, B_STRING_TYPE, 0,
+			buffer, size);
+		if (bytesRead < 0 || (size_t)bytesRead != size)
+			return;
+		buffer[size] = '\0';
+
+		// deescape the buffer and count the entries
+		size_t entryCount = 1;
+		char* out = buffer;
+		for (const char* c = buffer; *c != '\0'; c++) {
+			if (*c == '\\') {
+				c++;
+				if (*c == '\0')
+					break;
+				if (*c == '0') {
+					*out++ = '\0';
+					entryCount++;
+				} else
+					*out++ = *c;
+			} else
+				*out++ = *c;
+		}
+		*out++ = '\0';
+		size = out - buffer + 1;
+
+		// create an entry array
+		fEntries = new(std::nothrow) Entry[entryCount];
+		if (fEntries == NULL)
+			return;
+
+		bufferDeleter.Detach();
+		fBuffer = buffer;
+		fBufferSize = size;
+
+		// init the entries
+		out = buffer;
+		for (size_t i = 0; i < entryCount; i++) {
+			const char* separator = strchr(out, '=');
+			if (separator != NULL && separator != out) {
+				fEntries[fEntryCount].replacement = out;
+				fEntries[fEntryCount].index = _FindEnvEntry(env, envCount, out,
+					separator - out);
+				if (fEntries[fEntryCount].index < 0)
+					fAdditionalEnvCount++;
+				fEntryCount++;
+			}
+			out += strlen(out) + 1;
+		}
+
+		if (fEntryCount > 1)
+			std::sort(fEntries, fEntries + fEntryCount);
+
+		// Advance fNextEntryIndex to the first entry pointing to an existing
+		// env variable.
+		while (fNextEntryIndex < fEntryCount
+			&& fEntries[fNextEntryIndex].index < 0) {
+			fNextEntryIndex++;
+		}
+	}
+
+	int32 _FindEnvEntry(const char* const* env, size_t envCount,
+		const char* variable, size_t variableLength)
+	{
+		for (size_t i = 0; i < envCount; i++) {
+			if (strncmp(env[i], variable, variableLength) == 0
+				&& env[i][variableLength] == '=') {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	size_t _FillSlot(const char* env, char* buffer)
+	{
+		size_t envSize = strlen(env) + 1;
+		memcpy(buffer, env, envSize);
+		return envSize;
+	}
+
+private:
+	struct Entry {
+		char*	replacement;
+		int32	index;
+
+		bool operator<(const Entry& other) const
+		{
+			return index < other.index;
+		}
+	};
+
+private:
+	char*	fBuffer;
+	Entry*	fEntries;
+	size_t	fBufferSize;
+	size_t	fEntryCount;
+	size_t	fAdditionalEnvCount;
+	size_t	fNextEntryIndex;
+};
 
 
 thread_id
@@ -48,8 +230,8 @@ load_image(int32 argCount, const char **args, const char **environ)
 
 	char** flatArgs = NULL;
 	size_t flatArgsSize;
-	status_t status = __flatten_process_args(args, argCount, environ, envCount,
-		&flatArgs, &flatArgsSize);
+	status_t status = __flatten_process_args(args, argCount, environ,
+		&envCount, args[0], &flatArgs, &flatArgsSize);
 
 	if (status == B_OK) {
 		thread = _kern_load_image(flatArgs, flatArgsSize, argCount, envCount,
@@ -230,14 +412,19 @@ __test_executable(const char *path, char *invoker)
 	into it. The buffer starts with a char* array which contains pointers to
 	the strings of the arguments and environment, followed by the strings. Both
 	arguments and environment arrays are NULL-terminated.
+	If executablePath is non-NULL, it should refer to the executable to be
+	executed. If the executable file specifies changes to environment variable
+	values, those will be performed.
 */
 status_t
 __flatten_process_args(const char* const* args, int32 argCount,
-	const char* const* env, int32 envCount, char*** _flatArgs,
-	size_t* _flatSize)
+	const char* const* env, int32* _envCount, const char* executablePath,
+	char*** _flatArgs, size_t* _flatSize)
 {
-	if (args == NULL || env == NULL)
+	if (args == NULL || env == NULL || _envCount == NULL)
 		return B_BAD_VALUE;
+
+	int32 envCount = *_envCount;
 
 	// determine total needed size
 	int32 argSize = 0;
@@ -254,7 +441,14 @@ __flatten_process_args(const char* const* args, int32 argCount,
 		envSize += strlen(env[i]) + 1;
 	}
 
-	int32 size = (argCount + envCount + 2) * sizeof(char*) + argSize + envSize;
+	EnvironmentFilter envFilter;
+	if (executablePath != NULL)
+		envFilter.Init(executablePath, env, envCount);
+
+	int32 totalSlotCount = argCount + envCount + 2
+		+ envFilter.AdditionalSlotsNeeded();
+	int32 size = totalSlotCount * sizeof(char*) + argSize + envSize
+		+ envFilter.AdditionalSizeNeeded();
 	if (size > MAX_PROCESS_ARGS_SIZE)
 		return B_TOO_MANY_ARGS;
 
@@ -264,7 +458,7 @@ __flatten_process_args(const char* const* args, int32 argCount,
 		return B_NO_MEMORY;
 
 	char** slot = flatArgs;
-	char* stringSpace = (char*)(flatArgs + argCount + envCount + 2);
+	char* stringSpace = (char*)(flatArgs + totalSlotCount);
 
 	// copy arguments and environment
 	for (int32 i = 0; i < argCount; i++) {
@@ -277,16 +471,18 @@ __flatten_process_args(const char* const* args, int32 argCount,
 	*slot++ = NULL;
 
 	for (int32 i = 0; i < envCount; i++) {
-		int32 envSize = strlen(env[i]) + 1;
-		memcpy(stringSpace, env[i], envSize);
+		size_t envSize = envFilter.PrepareSlot(env[i], i, stringSpace);
 		*slot++ = stringSpace;
 		stringSpace += envSize;
 	}
 
+	envFilter.PrepareAdditionalSlots(slot, stringSpace);
+
 	*slot++ = NULL;
 
+	*_envCount = envCount + envFilter.AdditionalSlotsNeeded();
 	*_flatArgs = flatArgs;
-	*_flatSize = size;
+	*_flatSize = stringSpace - (char*)flatArgs;
 	return B_OK;
 }
 

@@ -29,8 +29,8 @@ status_t __get_next_image_dependency(image_id id, uint32 *cookie,
 			const char **_name);
 status_t __test_executable(const char *path, char *invoker);
 status_t __flatten_process_args(const char* const* args, int32 argCount,
-			const char* const* env, int32 envCount, char*** _flatArgs,
-			size_t* _flatSize);
+			const char* const* env, int32* envCount, const char* executablePath,
+			char*** _flatArgs, size_t* _flatSize);
 void _call_atexit_hooks_for_range(addr_t start, addr_t size);
 void __init_env(const struct user_space_program_args *args);
 status_t __init_heap(void);

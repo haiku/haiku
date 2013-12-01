@@ -72,6 +72,8 @@ respective holders. All rights reserved.
 #include <sys/utsname.h>
 
 #include <AutoLocker.h>
+#include <libroot/libroot_private.h>
+#include <system/syscalls.h>
 
 #include "Attributes.h"
 #include "Bitmaps.h"
@@ -3334,13 +3336,6 @@ _TrackerLaunchAppWithDocuments(const entry_ref* appRef, const BMessage* refs,
 
 extern "C" char** environ;
 
-extern "C" status_t _kern_load_image(const char* const* flatArgs,
-	size_t flatArgsSize, int32 argCount, int32 envCount, int32 priority,
-	uint32 flags, port_id errorPort, uint32 errorToken);
-extern "C" status_t __flatten_process_args(const char* const* args,
-	int32 argCount, const char* const* env, int32 envCount, char***_flatArgs,
-	size_t* _flatSize);
-
 
 static status_t
 LoaderErrorDetails(const entry_ref* app, BString &details)
@@ -3357,14 +3352,14 @@ LoaderErrorDetails(const entry_ref* app, BString &details)
 	port_id errorPort = create_port(1, "Tracker loader error");
 
 	// count environment variables
-	uint32 envCount = 0;
+	int32 envCount = 0;
 	while (environ[envCount] != NULL)
 		envCount++;
 
 	char** flatArgs = NULL;
 	size_t flatArgsSize;
 	result = __flatten_process_args((const char**)argv, 1,
-		environ, envCount, &flatArgs, &flatArgsSize);
+		environ, &envCount, argv[0], &flatArgs, &flatArgsSize);
 	if (result != B_OK)
 		return result;
 

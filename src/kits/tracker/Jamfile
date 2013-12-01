@@ -3,7 +3,8 @@ SubDir HAIKU_TOP src kits tracker ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders interface mount shared storage support system tracker ;
+UsePrivateHeaders interface mount shared storage support tracker ;
+UsePrivateSystemHeaders ;
 
 SubDirC++Flags
 	-D_BUILDING_tracker=1

@@ -134,15 +134,15 @@ BTeamDebugger::_LoadProgram(const char* const* args, int32 argCount,
 	mutableArgs[0] = programPath.Path();
 
 	// count environment variables
-	int envCount = 0;
+	int32 envCount = 0;
 	while (environ[envCount] != NULL)
 		envCount++;
 
 	// flatten the program args and environment
 	char** flatArgs = NULL;
 	size_t flatArgsSize;
-	error = __flatten_process_args(mutableArgs, argCount, environ, envCount,
-		&flatArgs, &flatArgsSize);
+	error = __flatten_process_args(mutableArgs, argCount, environ, &envCount,
+		mutableArgs[0], &flatArgs, &flatArgsSize);
 
 	// load the program
 	thread_id thread;
