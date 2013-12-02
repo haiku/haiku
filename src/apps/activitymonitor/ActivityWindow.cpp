@@ -196,7 +196,6 @@ ActivityWindow::MessageReceived(BMessage* message)
 				// Just bring the window to front (via scripting)
 				BMessage toFront(B_SET_PROPERTY);
 				toFront.AddSpecifier("Active");
-				toFront.AddSpecifier("Window", B_TRANSLATE("Settings"));
 				toFront.AddBool("data", true);
 				fSettingsWindow.SendMessage(&toFront);
 			} else {
@@ -256,7 +255,7 @@ ActivityWindow::ActivityViewAt(int32 index) const
 bool
 ActivityWindow::IsAlwaysOnTop() const
 {
-	return fAlwaysOnTop->IsMarked();	
+	return fAlwaysOnTop->IsMarked();
 }
 
 
@@ -399,5 +398,11 @@ ActivityWindow::_SetAlwaysOnTop(bool alwaysOnTop)
 {
 	SetFeel(alwaysOnTop ? B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
 	fAlwaysOnTop->SetMarked(alwaysOnTop);
+	if (fSettingsWindow.IsValid() && alwaysOnTop) {
+		// Change the settings window feel to modal (via scripting)
+		BMessage toFront(B_SET_PROPERTY);
+		toFront.AddSpecifier("Feel");
+		toFront.AddInt32("data", B_MODAL_ALL_WINDOW_FEEL);
+		fSettingsWindow.SendMessage(&toFront);
+	}
 }
-
