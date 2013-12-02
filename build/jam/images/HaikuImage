@@ -125,11 +125,10 @@ SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
 	}@ # x86
 ] ;
 SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
-	HVIFTranslator ICOTranslator JPEGTranslator JPEG2000Translator
-	PCXTranslator PNGTranslator PPMTranslator
+	HVIFTranslator ICOTranslator ICNSTranslator JPEGTranslator
+	JPEG2000Translator PCXTranslator PNGTranslator PPMTranslator PSDTranslator
 	RAWTranslator RTFTranslator SGITranslator STXTTranslator TGATranslator
-	TIFFTranslator WebPTranslator WonderBrushTranslator ICNSTranslator
-	PSDTranslator
+	TIFFTranslator WebPTranslator WonderBrushTranslator
 ;
 SYSTEM_ADD_ONS_LOCALE_CATALOGS = <catalog-addon>plaintext ;
 SYSTEM_ADD_ONS_MEDIA = [ FFilterByBuildFeatures
