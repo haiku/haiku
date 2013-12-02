@@ -80,6 +80,8 @@ private:
 			friend struct PhysicalPageSlotPool;
 
 private:
+	inline	int32				_GetInitialPoolCount();
+
 	static	void				_EarlyPreparePageTables(
 									page_table_entry* pageTables,
 									addr_t address, size_t size);

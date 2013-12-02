@@ -11,6 +11,15 @@
 #include <util/DoublyLinkedList.h>
 
 
+#define USER_SLOTS_PER_CPU				16
+#define KERNEL_SLOTS_PER_CPU			16
+#define TOTAL_SLOTS_PER_CPU				(USER_SLOTS_PER_CPU \
+											+ KERNEL_SLOTS_PER_CPU + 1)
+	// one slot is for use in interrupts
+
+#define EXTRA_SLOTS						2
+
+
 class TranslationMapPhysicalPageMapper;
 class X86PhysicalPageMapper;
 struct kernel_args;
@@ -53,7 +62,8 @@ protected:
 
 
 status_t large_memory_physical_page_ops_init(kernel_args* args,
-	X86LargePhysicalPageMapper::PhysicalPageSlotPool* initialPool,
+	X86LargePhysicalPageMapper::PhysicalPageSlotPool* initialPools,
+	int32 initialPoolCount, size_t poolSize,
 	X86PhysicalPageMapper*& _pageMapper,
 	TranslationMapPhysicalPageMapper*& _kernelPageMapper);
 
