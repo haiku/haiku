@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -114,6 +114,13 @@ Job::WaitFor(const JobKey& key)
 }
 
 
+status_t
+Job::WaitForUserInput()
+{
+	return fWorker->WaitForUserInput(this);
+}
+
+
 void
 Job::SetWorker(Worker* worker)
 {
@@ -141,6 +148,7 @@ Job::SetWaitStatus(job_wait_status status)
 	fWaitStatus = status;
 	switch (fWaitStatus) {
 		case JOB_DEPENDENCY_ACTIVE:
+		case JOB_USER_INPUT_WAITING:
 			fState = JOB_STATE_WAITING;
 			break;
 		default:
@@ -316,6 +324,25 @@ Worker::GetJob(const JobKey& key)
 
 
 status_t
+Worker::ResumeJob(Job* job)
+{
+	AutoLocker<Worker> locker(this);
+
+	for (JobList::Iterator it = fSuspendedJobs.GetIterator(); it.Next();) {
+		if (it.Current() == job) {
+			it.Remove();
+			job->SetState(JOB_STATE_UNSCHEDULED);
+			fUnscheduledJobs.Add(job);
+			release_sem(fWorkToDoSem);
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
 Worker::AddListener(const JobKey& key, JobListener* listener)
 {
 	AutoLocker<Worker> locker(this);
@@ -356,6 +383,21 @@ Worker::WaitForJob(Job* waitingJob, const JobKey& key)
 	job->DependentJobs().Add(waitingJob);
 
 	return waitingJob->WaitStatus();
+}
+
+
+status_t
+Worker::WaitForUserInput(Job* waitingJob)
+{
+	AutoLocker<Worker> locker(this);
+
+	if (fTerminating || waitingJob->State() == JOB_STATE_ABORTED)
+		return B_INTERRUPTED;
+
+	waitingJob->SetWaitStatus(JOB_USER_INPUT_WAITING);
+	fSuspendedJobs.Add(waitingJob);
+
+	return B_OK;
 }
 
 
@@ -439,10 +481,13 @@ Worker::_AbortJob(Job* job, bool removeFromTable)
 			break;
 
 		case JOB_STATE_WAITING:
-			job->Dependency()->DependentJobs().Remove(job);
+		{
+			Job* dependency = job->Dependency();
+			if (dependency != NULL)
+				dependency->DependentJobs().Remove(job);
 			job->SetDependency(NULL);
 			break;
-
+		}
 		case JOB_STATE_ACTIVE:
 		case JOB_STATE_FAILED:
 		case JOB_STATE_SUCCEEDED:

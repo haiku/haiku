@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef WORKER_H
@@ -31,7 +32,9 @@ enum job_wait_status {
 	JOB_DEPENDENCY_SUCCEEDED,
 	JOB_DEPENDENCY_FAILED,
 	JOB_DEPENDENCY_ABORTED,
-	JOB_DEPENDENCY_ACTIVE
+	JOB_DEPENDENCY_ACTIVE,
+
+	JOB_USER_INPUT_WAITING
 		// internal only
 };
 
@@ -88,6 +91,7 @@ public:
 
 protected:
 			job_wait_status		WaitFor(const JobKey& key);
+			status_t			WaitForUserInput();
 
 private:
 			friend class Worker;
@@ -141,6 +145,10 @@ public:
 			void				AbortJob(const JobKey& key);
 			Job*				GetJob(const JobKey& key);
 
+			status_t			ResumeJob(Job* job);
+									// only valid for jobs that are
+									// suspended pending user input
+
 			status_t			AddListener(const JobKey& key,
 									JobListener* listener);
 			void				RemoveListener(const JobKey& key,
@@ -178,6 +186,7 @@ private:
 
 private:
 			job_wait_status		WaitForJob(Job* waitingJob, const JobKey& key);
+			status_t			WaitForUserInput(Job* waitingJob);
 
 	static	status_t			_WorkerLoopEntry(void* data);
 			status_t			_WorkerLoop();
@@ -191,6 +200,7 @@ private:
 			JobTable			fJobs;
 			JobList				fUnscheduledJobs;
 			JobList				fAbortedJobs;
+			JobList				fSuspendedJobs;
 			sem_id				fWorkToDoSem;
 			thread_id			fWorkerThread;
 	volatile bool				fTerminating;
