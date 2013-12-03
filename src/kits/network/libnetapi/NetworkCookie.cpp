@@ -38,6 +38,13 @@ BNetworkCookie::BNetworkCookie(const char* name, const char* value,
 	fValue = value;
 
 	SetDomain(url.Host());
+
+    if(url.Protocol() == "file" && url.Host().Length() == 0)
+    {
+        SetDomain("localhost");
+            // make sure cookies set from a file:// URL are stored somewhere.
+    }
+
 	SetPath(_DefaultPathForUrl(url));
 }
 
@@ -93,6 +100,13 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 	SetPath(_DefaultPathForUrl(url));
 	SetDomain(url.Host());
 	fHostOnly = true;
+    if(url.Protocol() == "file" && url.Host().Length() == 0)
+    {
+        fDomain = "localhost";
+            // make sure cookies set from a file:// URL are stored somewhere.
+            // not going through SetDomain as it requires at least one '.'
+            // in the domain (to avoid setting cookies on TLDs).
+    }
 
 	BString name;
 	BString value;
@@ -166,12 +180,11 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 		}
 	}
 
-	if (!IsValidForDomain(url.Host())) {
+	if (!IsValidForUrl(url)) {
 		// Invalidate the cookie.
 		_Reset();
 		return B_NOT_ALLOWED;
 	}
-
 
 	return result;
 }
@@ -422,6 +435,9 @@ BNetworkCookie::IsValidForUrl(const BUrl& url) const
 {
 	if (Secure() && url.Protocol() != "https")
 		return false;
+
+    if (url.Protocol() == "file")
+        return Domain() == "localhost" && IsValidForPath(url.Path());
 
 	return IsValidForDomain(url.Host()) && IsValidForPath(url.Path());
 }

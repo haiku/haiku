@@ -591,8 +591,12 @@ BNetworkCookieJar::UrlIterator::UrlIterator(const BNetworkCookieJar* cookieJar,
 {
 	BString domain = url.Host();
 
-	if (!domain.Length())
-		return;
+	if (!domain.Length()) {
+        if (url.Protocol() == "file")
+            domain = "localhost";
+        else
+		    return;
+    }
 
 	fIterator = new(std::nothrow) PrivateIterator(
 		fCookieJar->fCookieHashMap->fHashMap.GetIterator());
