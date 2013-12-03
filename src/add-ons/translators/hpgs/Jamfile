@@ -2,9 +2,6 @@ SubDir HAIKU_TOP src add-ons translators hpgs ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) lib ] ;
 SubDirCcFlags -DHPGS_SHARED -std=c99 ;
-UseLibraryHeaders iconv ;
-UseBuildFeatureHeaders libpng ;
-UseBuildFeatureHeaders zlib ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 local sources = 
@@ -46,17 +43,28 @@ Includes [ FGristFiles hpgsimage.c ]
 Includes [ FGristFiles hpgszostream.c ]
 	: [ BuildFeatureAttribute zlib : headers ] ;
 
-Translator HPGSTranslator :
-	# HPGSTranslator classes
-	ConfigView.cpp
-	HPGSTranslator.cpp
-	$(sources)
-	: be translation libtextencoding.so
-		[ BuildFeatureAttribute libpng : library ]
-		[ BuildFeatureAttribute zlib : library ]
-		libtranslatorsutils.a $(TARGET_LIBSUPC++) localestub
-	: true
-;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+UseLibraryHeaders iconv ;
+UseBuildFeatureHeaders libpng ;
+UseBuildFeatureHeaders zlib ;
+
+		Translator [ MultiArchDefaultGristFiles HPGSTranslator ] :
+			# HPGSTranslator classes
+			ConfigView.cpp
+			HPGSTranslator.cpp
+			$(sources)
+			: be translation libtextencoding.so
+				[ BuildFeatureAttribute libpng : library ]
+				[ BuildFeatureAttribute zlib : library ]
+				[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+				$(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs HPGSTranslator :
 	x-vnd.Haiku-HPGSTranslator

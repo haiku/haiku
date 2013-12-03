@@ -15,9 +15,6 @@ CCFLAGS += -DEXCLUDE_MIF_SUPPORT
 	-DEXCLUDE_JPG_SUPPORT 
 	-DEXCLUDE_PGX_SUPPORT ;
 
-# Let Jam know where to find some of our source files
-SEARCH_SOURCE += [ FDirName $(SUBDIR) libjasper ] ;
-
 SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
 
 local jasper_files = 
@@ -60,21 +57,30 @@ local jasper_files =
 	jpc_util.c
 	;
 
-ObjectCcFlags [ FGristFiles $(jasper_files:S=$(SUFOBJ)) ] : -w ;
-
 AddResources JPEG2000Translator : JPEG2000Translator.rdef ;
 
-Translator JPEG2000Translator :
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		# Let Jam know where to find some of our source files
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) libjasper ] ;
 
-	# JPEG2000Translator
-	JPEG2000Translator.cpp
+		ObjectCcFlags [ FGristFiles $(jasper_files:S=$(SUFOBJ)) ] : -w ;
 
-	$(jasper_files)
+		Translator [ MultiArchDefaultGristFiles JPEG2000Translator ] :
 
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	localestub
-	: true
-;
+			# JPEG2000Translator
+			JPEG2000Translator.cpp
+
+			$(jasper_files)
+
+			: be translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs JPEG2000Translator :
 	x-vnd.Haiku-JPEG2000Translator

@@ -7,20 +7,25 @@ SubDirHdrs [ FDirName $(SUBDIR) libwebp ] ;
 
 AddResources WebPTranslator : WebPTranslator.rdef ;
 
-Translator WebPTranslator :
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles WebPTranslator ] :
 
-	main.cpp
+			main.cpp
 
-	WebPTranslator.cpp
-	ConfigView.cpp
+			WebPTranslator.cpp
+			ConfigView.cpp
 
-	:
-	<libwebp>webpdecode.o
-	<libwebp>webpencode.o
-	be translation libtranslatorsutils.a
-	$(TARGET_LIBSUPC++)	localestub
-	: true
-;
+			:
+			<libwebp>webpdecode.o
+			<libwebp>webpencode.o
+			be translation [ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++)	localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs WebPTranslator :
 	x-vnd.Haiku-WebPTranslator

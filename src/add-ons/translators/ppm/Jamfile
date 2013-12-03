@@ -4,11 +4,16 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddResources PPMTranslator : PPMTranslator.rdef ;
 
-Translator PPMTranslator
-	: PPMMain.cpp PPMTranslator.cpp colorspace.cpp
-	: be translation $(TARGET_LIBSUPC++) localestub
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles PPMTranslator ]
+			: PPMMain.cpp PPMTranslator.cpp colorspace.cpp
+			: be translation $(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs PPMTranslator :
 	x-vnd.Haiku-PPMTranslator

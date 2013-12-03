@@ -6,16 +6,23 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources ICOTranslator : ICOTranslator.rdef ;
 
-Translator ICOTranslator :
-	# ICOTranslator classes
-	main.cpp
-	ICOTranslator.cpp
-	ConfigView.cpp
-	ICO.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	localestub
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles ICOTranslator ] :
+			# ICOTranslator classes
+			main.cpp
+			ICOTranslator.cpp
+			ConfigView.cpp
+			ICO.cpp
+			: be translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++)
+			localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs ICOTranslator :
 	x-vnd.Haiku-ICOTranslator

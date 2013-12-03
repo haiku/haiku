@@ -10,14 +10,20 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources STXTTranslator : STXTTranslator.rdef ;
 
-Translator STXTTranslator :
-	STXTMain.cpp
-	STXTTranslator.cpp
-	STXTView.cpp
-	: be translation libtextencoding.so libtranslatorsutils.a 
-	$(TARGET_LIBSUPC++) localestub
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles STXTTranslator ] :
+			STXTMain.cpp
+			STXTTranslator.cpp
+			STXTView.cpp
+			: be translation textencoding
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs STXTTranslator :
 	x-vnd.Haiku-STXTTranslator

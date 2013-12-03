@@ -6,15 +6,21 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources PSDTranslator : PSDTranslator.rdef ;
 
-Translator PSDTranslator :
-	PSDTranslatorApp.cpp
-	PSDTranslator.cpp
-	PSDLoader.cpp
-	ConfigView.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	localestub
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles PSDTranslator ] :
+			PSDTranslatorApp.cpp
+			PSDTranslator.cpp
+			PSDLoader.cpp
+			ConfigView.cpp
+			: be translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs PSDTranslator :
 	x-vnd.Haiku-PSDTranslator

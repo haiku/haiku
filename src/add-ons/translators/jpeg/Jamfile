@@ -16,17 +16,23 @@ Includes [ FGristFiles be_jdatadst.cpp be_jdatasrc.cpp be_jerror.cpp
 		JPEGTranslator.cpp ]
 	: [ BuildFeatureAttribute jpeg : headers ] ;
 
-Translator JPEGTranslator :
-	be_jdatadst.cpp
-	be_jdatasrc.cpp
-	be_jerror.cpp
-	exif_parser.cpp
-	JPEGTranslator.cpp
-	: be translation libtranslatorsutils.a
-	[ BuildFeatureAttribute jpeg : library ]
-	$(TARGET_LIBSTDC++) localestub
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles JPEGTranslator ] :
+			be_jdatadst.cpp
+			be_jdatasrc.cpp
+			be_jerror.cpp
+			exif_parser.cpp
+			JPEGTranslator.cpp
+			: be translation
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			[ BuildFeatureAttribute jpeg : library ]
+			$(TARGET_LIBSTDC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs JPEGTranslator :
 	x-vnd.Haiku-JPEGTranslator

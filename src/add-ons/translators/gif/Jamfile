@@ -6,22 +6,27 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources GIFTranslator : GIFTranslator.rdef ;
 
-Translator GIFTranslator :
-	# Main Source
-	GIFTranslator.cpp
-	GIFView.cpp
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles GIFTranslator ] :
+			# Main Source
+			GIFTranslator.cpp
+			GIFView.cpp
 
-	# Real Work
-	GIFLoad.cpp
-	LoadPalette.cpp
-	GIFSave.cpp
-	SavePalette.cpp
-	SFHash.cpp
-	:
-	be translation $(TARGET_LIBSUPC++) localestub
-	libtranslatorsutils.a
-	: true
-;
+			# Real Work
+			GIFLoad.cpp
+			LoadPalette.cpp
+			GIFSave.cpp
+			SavePalette.cpp
+			SFHash.cpp
+			:
+			be translation $(TARGET_LIBSUPC++) localestub
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			: true
+		;
+	}
+}
 
 DoCatalogs GIFTranslator :
 	x-vnd.Haiku-GIFTranslator

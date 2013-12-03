@@ -6,13 +6,20 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources TGATranslator : TGATranslator.rdef ;
 
-Translator TGATranslator :
-	TGAMain.cpp
-	TGATranslator.cpp
-	TGAView.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) localestub
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles TGATranslator ] :
+			TGAMain.cpp
+			TGATranslator.cpp
+			TGAView.cpp
+			: be translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs TGATranslator :
 	x-vnd.Haiku-TGATranslator

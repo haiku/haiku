@@ -6,18 +6,24 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources RAWTranslator : RAWTranslator.rdef ;
 
-Translator RAWTranslator :
-	# RawTranslator classes
-	main.cpp
-	RAWTranslator.cpp
-	ConfigView.cpp
-	RAW.cpp
-	: 
-	be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) 
-	localestub
-	: 
-	true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles RAWTranslator ] :
+			# RawTranslator classes
+			main.cpp
+			RAWTranslator.cpp
+			ConfigView.cpp
+			RAW.cpp
+			: 
+			be translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+			: 
+			true
+		;
+	}
+}
 
 DoCatalogs RAWTranslator :
 	x-vnd.Haiku-RAWTranslator

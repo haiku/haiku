@@ -4,14 +4,20 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources HVIFTranslator : HVIFTranslator.rdef ;
 
-Translator HVIFTranslator : 
-	HVIFMain.cpp
-	HVIFTranslator.cpp
-	HVIFView.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	localestub
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles HVIFTranslator ] :
+			HVIFMain.cpp
+			HVIFTranslator.cpp
+			HVIFView.cpp
+			: be translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs HVIFTranslator :
 	x-vnd.Haiku-HVIFTranslator

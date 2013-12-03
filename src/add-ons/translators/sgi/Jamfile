@@ -6,14 +6,21 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources SGITranslator : SGITranslator.rdef ; 
 
-Translator SGITranslator :
-	SGIImage.cpp
-	SGIMain.cpp
-	SGITranslator.cpp
-	SGIView.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) localestub
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles SGITranslator ] :
+			SGIImage.cpp
+			SGIMain.cpp
+			SGITranslator.cpp
+			SGIView.cpp
+			: be translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs SGITranslator :
 	x-vnd.Haiku-SGITranslator

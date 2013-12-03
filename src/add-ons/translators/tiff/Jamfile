@@ -8,18 +8,24 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources TIFFTranslator : TIFFTranslator.rdef ;
 
-Translator TIFFTranslator : 
-	# [ FGristFiles $(tiff_files:S=$(SUFOBJ)) ]
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles TIFFTranslator ] :
+			# [ FGristFiles $(tiff_files:S=$(SUFOBJ)) ]
 
-	# TIFFTranslator classes
-	TIFFMain.cpp
-	TIFFTranslator.cpp
-	TIFFView.cpp
+			# TIFFTranslator classes
+			TIFFMain.cpp
+			TIFFTranslator.cpp
+			TIFFView.cpp
 
-	: be libtiff.so translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	localestub
-	: true
-;
+			: be libtiff.so translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs TIFFTranslator :
 	x-vnd.Haiku-TIFFTranslator

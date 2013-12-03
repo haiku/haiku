@@ -6,15 +6,22 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources PCXTranslator : PCXTranslator.rdef ;
 
-Translator PCXTranslator :
-	# PCXTranslator classes
-	main.cpp
-	PCXTranslator.cpp
-	ConfigView.cpp
-	PCX.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) localestub
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles PCXTranslator ] :
+			# PCXTranslator classes
+			main.cpp
+			PCXTranslator.cpp
+			ConfigView.cpp
+			PCX.cpp
+			: be translation
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs PCXTranslator :
 	x-vnd.Haiku-PCXTranslator

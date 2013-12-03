@@ -10,17 +10,24 @@ UsePrivateHeaders shared storage ;
 
 AddResources RTFTranslator : RTFTranslator.rdef ;
 
-Translator RTFTranslator :
-	main.cpp
-	ConfigView.cpp
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles RTFTranslator ] :
+			main.cpp
+			ConfigView.cpp
 
-	convert.cpp
-	RTF.cpp
-	RTFTranslator.cpp
+			convert.cpp
+			RTF.cpp
+			RTFTranslator.cpp
 
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++) localestub
-	: true
-;
+			: be translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs RTFTranslator :
 	x-vnd.Haiku-RTFTranslator

@@ -6,14 +6,20 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources BMPTranslator : BMPTranslator.rdef ;
 
-Translator BMPTranslator :
-	BMPMain.cpp
-	BMPTranslator.cpp
-	BMPView.cpp
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	localestub
-	: true
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Translator [ MultiArchDefaultGristFiles BMPTranslator ] :
+			BMPMain.cpp
+			BMPTranslator.cpp
+			BMPView.cpp
+		: be translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++) localestub
+		: true
+		;
+	}
+}
 
 DoCatalogs BMPTranslator :
 	x-vnd.Haiku-BMPTranslator

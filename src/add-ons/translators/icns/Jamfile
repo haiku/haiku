@@ -2,18 +2,12 @@ SubDir HAIKU_TOP src add-ons translators icns ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UseBuildFeatureHeaders libpng ;
-
 SubDirSysHdrs [ FDirName $(SUBDIR) openjpeg ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) libicns ] ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 	#for BaseTranslator.h and friends
 	
-# Let Jam know where to find some of our source files
-SEARCH_SOURCE += [ FDirName $(SUBDIR) openjpeg ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) libicns ] ;
-
 SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
 
 local openjpeg_files = 
@@ -63,23 +57,35 @@ ObjectCcFlags [ FGristFiles $(libicns_files:S=$(SUFOBJ)) ] : -w ;
 
 AddResources ICNSTranslator : ICNSTranslator.rdef ;
 
-Translator ICNSTranslator :
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		# Let Jam know where to find some of our source files
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) openjpeg ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) libicns ] ;
 
-	# ICNSTranslator
-	ICNSTranslator.cpp
-	ICNSLoader.cpp
-	ConfigView.cpp
-	main.cpp
+		UseBuildFeatureHeaders libpng ;
+		Translator [ MultiArchDefaultGristFiles ICNSTranslator ] :
 
-	$(openjpeg_files)
-	
-	$(libicns_files)
+			# ICNSTranslator
+			ICNSTranslator.cpp
+			ICNSLoader.cpp
+			ConfigView.cpp
+			main.cpp
 
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
-	[ BuildFeatureAttribute libpng : library ]
-	localestub
-	: true
-;
+			$(openjpeg_files)
+			
+			$(libicns_files)
+
+			: be translation 
+			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			$(TARGET_LIBSUPC++)
+			[ BuildFeatureAttribute libpng : library ]
+			localestub
+			: true
+		;
+	}
+}
 
 DoCatalogs ICNSTranslator :
 	x-vnd.Haiku-ICNSTranslator

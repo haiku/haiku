@@ -115,8 +115,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "jasper/jas_types.h"
 #include "jasper/jas_debug.h"
+#include "jasper/jas_types.h"
 
 /******************************************************************************\
 * Local data.
@@ -145,7 +145,7 @@ int jas_setdbglevel(int dbglevel)
 }
 
 /* Get the library debug level. */
-int jas_getdbglevel()
+int jas_getdbglevel(void)
 {
 	return jas_dbglevel;
 }
@@ -169,8 +169,8 @@ int jas_eprintf(const char *fmt, ...)
 /* Dump memory to a stream. */
 int jas_memdump(FILE *out, void *data, size_t len)
 {
-	int i;
-	int j;
+	unsigned int i;
+	unsigned int j;
 	jpr_uchar_t *dp;
 	dp = data;
 	for (i = 0; i < len; i += 16) {
