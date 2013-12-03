@@ -70,7 +70,7 @@ enum radeon_register {
         C_RADEON_I2C_ABORT                     	= BITS(11:11),
         C_RADEON_I2C_GO                        	= BITS(12:12),
 		C_RADEON_I2C_PRESCALE					= BITS(31:16),
-		
+
     C_RADEON_I2C_CNTL_1                        	= 0x0094,
         C_RADEON_I2C_DATA_COUNT                	= BITS(3:0),
         C_RADEON_I2C_ADDR_COUNT                	= BITS(10:8),
@@ -96,7 +96,7 @@ enum radeon_register {
 		C_RADEON_CAP0_VBI3_INT_EN				= BITS(10:10),
 		C_RADEON_CAP0_ANC2_INT_EN				= BITS(11:11),
 		C_RADEON_CAP0_ANC3_INT_EN				= BITS(12:12),
-	
+
 	C_RADEON_CAP_INT_STATUS						= 0x090C,
 		C_RADEON_CAP0_BUF0_INT					= BITS(0:0),
 		C_RADEON_CAP0_BUF0_INT_AK				= BITS(0:0),
@@ -124,7 +124,7 @@ enum radeon_register {
 		C_RADEON_CAP0_ANC2_INT_AK				= BITS(11:11),
 		C_RADEON_CAP0_ANC3_INT					= BITS(12:12),
 		C_RADEON_CAP0_ANC3_INT_AK				= BITS(12:12),
-	
+
 	C_RADEON_FCP_CNTL							= 0x0910,
 		C_RADEON_FCP0_SRC_SEL					= BITS(2:0),
 			C_RADEON_FCP0_SRC_PCICLK			= 0 << 0,
@@ -138,10 +138,10 @@ enum radeon_register {
 	C_RADEON_CAP0_BUF1_OFFSET                   = 0x0924,
 	C_RADEON_CAP0_BUF0_EVEN_OFFSET              = 0x0928,
 	C_RADEON_CAP0_BUF1_EVEN_OFFSET              = 0x092C,
-	
+
 	C_RADEON_CAP0_BUF_PITCH                     = 0x0930,
 		C_RADEON_CAP0_BUF_PITCH_MASK			= BITS(11:0),
-		
+
 	C_RADEON_CAP0_V_WINDOW                      = 0x0934,
 		C_RADEON_CAP0_V_START					= BITS(11:0),
 		C_RADEON_CAP0_V_END						= BITS(27:16),
@@ -149,18 +149,18 @@ enum radeon_register {
 	C_RADEON_CAP0_H_WINDOW                      = 0x0938,
 		C_RADEON_CAP0_H_START					= BITS(11:0),
 		C_RADEON_CAP0_H_WIDTH					= BITS(27:16),
-		
-	C_RADEON_CAP0_VBI0_OFFSET                   = 0x093C, 
+
+	C_RADEON_CAP0_VBI0_OFFSET                   = 0x093C,
 	C_RADEON_CAP0_VBI1_OFFSET                   = 0x0940,
-	
+
 	C_RADEON_CAP0_VBI_V_WINDOW                  = 0x0944,
 		C_RADEON_CAP0_VBI_V_START				= BITS(11:0),
 		C_RADEON_CAP0_VBI_V_END					= BITS(27:16),
-		
+
 	C_RADEON_CAP0_VBI_H_WINDOW                  = 0x0948,
 		C_RADEON_CAP0_VBI_H_START				= BITS(11:0),
 		C_RADEON_CAP0_VBI_H_WIDTH				= BITS(27:16),
-	
+
 	C_RADEON_CAP0_PORT_MODE_CNTL                = 0x094C,
 		C_RADEON_CAP0_PORT_WIDTH				= BITS(1:1),
 			C_RADEON_CAP0_PORT_WIDTH_8_BITS		= 0 << 1,
@@ -168,7 +168,7 @@ enum radeon_register {
 		C_RADEON_CAP0_PORT_BYTE_USED			= BITS(2:2),
 			C_RADEON_CAP0_PORT_LOWER_BYTE_USED	= 0 << 2,
 			C_RADEON_CAP0_PORT_UPPER_BYTE_USED	= 1 << 2,
-		
+
 	C_RADEON_CAP0_TRIG_CNTL                     = 0x0950,
 		C_RADEON_CAP0_TRIGGER_R					= BITS(1:0),
 			C_RADEON_CAP0_TRIGGER_R_COMPLETE	= 0 << 0,
@@ -180,12 +180,12 @@ enum radeon_register {
 		C_RADEON_CAP0_EN						= BITS(4:4),
 		C_RADEON_CAP0_VSYNC_CNT_R				= BITS(15:8),
 		C_RADEON_CAP0_VSYNC_CLR					= BITS(16:16),
-		
+
 	C_RADEON_CAP0_DEBUG                         = 0x0954,
 		C_RADEON_CAP0_H_STATUS					= BITS(11:0),
 		C_RADEON_CAP0_V_STATUS					= BITS(27:16),
 		C_RADEON_CAP0_V_SYNC					= BITS(28:28),
-		
+
 	C_RADEON_CAP0_CONFIG                        = 0x0958,
 		C_RADEON_CAP0_INPUT_MODE				= BITS(0:0),
 			C_RADEON_CAP0_INPUT_MODE_ONESHOT	= 0 << 0,
@@ -238,23 +238,23 @@ enum radeon_register {
 		C_RADEON_CAP0_VBI_HORZ_DOWN				= BITS(31:30),
 			C_RADEON_CAP0_VBI_HORZ_DOWN_1X		= 0 << 30,
 			C_RADEON_CAP0_VBI_HORZ_DOWN_2X		= 1 << 30,
-			C_RADEON_CAP0_VBI_HORZ_DOWN_4X		= 2 << 30,
-		
-	C_RADEON_CAP0_ANC0_OFFSET                   = 0x095C, 
+			C_RADEON_CAP0_VBI_HORZ_DOWN_4X		= 2U << 30,
+
+	C_RADEON_CAP0_ANC0_OFFSET                   = 0x095C,
 	C_RADEON_CAP0_ANC1_OFFSET                   = 0x0960,
-	
+
 	C_RADEON_CAP0_ANC_H_WINDOW                  = 0x0964,
 		C_RADEON_CAP0_ANC_WIDTH					= BITS(11:0),
-	
+
 	C_RADEON_CAP0_VIDEO_SYNC_TEST               = 0x0968,
 		C_RADEON_CAP0_TEST_VID_SOF				= BITS(0:0),
 		C_RADEON_CAP0_TEST_VID_EOF				= BITS(1:1),
 		C_RADEON_CAP0_TEST_VID_EOL				= BITS(2:2),
 		C_RADEON_CAP0_TEST_VID_FIELD			= BITS(3:3),
 		C_RADEON_CAP0_TEST_SYNC_EN				= BITS(5:5),
-	
+
 	C_RADEON_CAP0_ONESHOT_BUF_OFFSET            = 0x096C,
-	
+
 	C_RADEON_CAP0_BUF_STATUS                    = 0x0970,
 		C_RADEON_CAP0_PRE_VID_BUF				= BITS(1:0),
 		C_RADEON_CAP0_CUR_VID_BUF				= BITS(3:2),
@@ -270,7 +270,7 @@ enum radeon_register {
 		C_RADEON_CAP0_VIP_INC					= BITS(28:28),
 		C_RADEON_CAP0_VIP_PRE_REPEAT_FIELD		= BITS(29:29),
 		C_RADEON_CAP0_CAP_BUF_STATUS			= BITS(30:30),
-		
+
 	C_RADEON_CAP0_VBI2_OFFSET                   = 0x0980,
 	C_RADEON_CAP0_VBI3_OFFSET                   = 0x0984,
 	C_RADEON_CAP0_ANC2_OFFSET                   = 0x0988,
@@ -283,7 +283,7 @@ enum radeon_register {
 		C_RADEON_VID_BUFFER_RESET				= BITS(20:20),
 		C_RADEON_CAP_SWAP						= BITS(22:21),
 		C_RADEON_CAP0_BUFFER_EMPTY_R			= BITS(24:24),
-	
+
 	// Test and Debug control
     C_RADEON_TEST_DEBUG_CNTL                    = 0x0120,
         C_RADEON_TEST_DEBUG_OUT_EN              = 0x00000001
@@ -297,67 +297,67 @@ public:
 	CRadeonRect(int left, int top, int right, int bottom);
 
 	int Left() const;
-	
+
 	int Top() const;
-	
+
 	int Right() const;
-	
+
 	int Bottom() const;
 
 	int Width() const;
-	
+
 	int Height() const;
-	
+
 	void SetLeft(int value);
-		
+
 	void SetTop(int value);
-	
+
 	void SetRight(int value);
-	
+
 	void SetBottom(int value);
-	
+
 	void SetTo(int left, int top, int right, int bottom);
 
 	void MoveTo(int left, int top);
 
 	void ResizeTo(int width, int height);
-			
+
 private:
-	int fLeft;	
+	int fLeft;
 	int fTop;
-	int fRight;	
-	int fBottom;	
+	int fRight;
+	int fBottom;
 };
 
 class CRadeon {
 public:
 	CRadeon( const char *dev_name );
-	
+
 	~CRadeon();
-	
+
 	status_t InitCheck() const;
 
 	uint32 VirtualMemoryBase() const;
-		
+
 public:
 	int Register(radeon_register index) const;
-	
+
 	void SetRegister(radeon_register index, int value);
 
 	int Register(radeon_register index, int mask) const;
-	
+
 	void SetRegister(radeon_register index, int mask, int value);
-	
+
 	int VIPRegister(int device, int address);
-	
+
 	void SetVIPRegister(int device, int address, int value);
-	
+
 	int VIPReadFifo(int device, uint32 address, uint32 count, uint8 *buffer);
-	
+
 	int VIPWriteFifo(int device, uint32 address, uint32 count, uint8 *buffer);
-	
+
 	int FindVIPDevice( uint32 device_id );
-	
+
 public:
 	void GetPLLParameters(int & refFreq, int & refDiv, int & minFreq, int & maxFreq, int & xclock);
 
@@ -367,26 +367,26 @@ public:
 						 int & tunerPort,
 						 int & compositePort,
 						 int & svideoPort);
-	
+
 public:
-	status_t AllocateGraphicsMemory( 
+	status_t AllocateGraphicsMemory(
 		memory_type_e memory_type, int32 size,
 		int32 *offset, int32 *handle );
-		
-	void FreeGraphicsMemory( 
+
+	void FreeGraphicsMemory(
 		memory_type_e memory_type, int32 handle );
-		
-	status_t DMACopy( 
+
+	status_t DMACopy(
 		uint32 src, void *target, size_t size, bool lock_mem, bool contiguous );
 
 public:
 	status_t GetDeviceInformation(radeon_get_private_data & info);
-	
+
 	status_t WaitInterrupt(int * mask, int * sequence, bigtime_t * time, bigtime_t timeout);
-	
-	status_t CloneArea(const char * name, area_id src_area, 
+
+	status_t CloneArea(const char * name, area_id src_area,
 		area_id *cloned_area, void ** map);
-	
+
 	shared_info* GetSharedInfo();
 private:
 	int fHandle;
@@ -394,12 +394,12 @@ private:
 	unsigned char * fROM;
 	virtual_card *fVirtualCard;
 	shared_info *fSharedInfo;
-	
+
 	area_id fRegisterArea;
 	area_id fROMArea;
 	area_id fVirtualCardArea;
 	area_id fSharedInfoArea;
-	
+
 	uint32 caps_video_in;
 };
 

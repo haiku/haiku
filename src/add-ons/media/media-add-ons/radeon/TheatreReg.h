@@ -917,8 +917,8 @@ enum theater_register {
 		VIN_REF_CLK_SEL				= BITS(31:30),	//   VIN reference source select
 			VIN_REF_CLK				= 0 << 30,		//     Reference clock
 			VIN_SEC_REF_CLK			= 1 << 30,		//     Secondary Reference Clock
-			VIN_L54_CLK				= 2 << 30,		//     L54 PLL Clock
-			VIN_SLIP_L54_CLK		= 3 << 30,		//     Slippable L54 PLL Clock
+			VIN_L54_CLK				= 2U << 30,		//     L54 PLL Clock
+			VIN_SLIP_L54_CLK		= 3U << 30,		//     Slippable L54 PLL Clock
 
 	VIP_VIN_PLL_FINE_CNTL			= 0x00d8,
 		VIN_M1						= BITS(10:0),
@@ -1329,8 +1329,8 @@ enum theater_register {
 /* RT200 */
 #define VIP_FB_INT                                 0x0314
 #define VIP_FB_INT__INT_7                          0x00000080
-#define VIP_FB_SCRATCH0                            0x0318 
-#define VIP_FB_SCRATCH1                            0x031c 
+#define VIP_FB_SCRATCH0                            0x0318
+#define VIP_FB_SCRATCH1                            0x031c
 
 struct rt200_microc_head
 {

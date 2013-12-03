@@ -213,7 +213,7 @@ typedef struct ehci_qtd {
 } _PACKED ehci_qtd;
 
 
-#define EHCI_QTD_DATA_TOGGLE	(1 << 31)
+#define EHCI_QTD_DATA_TOGGLE	(1U << 31)
 #define EHCI_QTD_BYTES_SHIFT	16
 #define EHCI_QTD_BYTES_MASK		0x7fff
 #define EHCI_QTD_IOC			(1 << 15)
@@ -337,7 +337,7 @@ typedef struct {
 #define EHCI_QH_OL_NAK_SHIFT	1
 #define EHCI_QH_OL_NAK_MASK		0x0f
 #define EHCI_QH_OL_TOGGLE_INDEX	2			// Data Toggle
-#define EHCI_QH_OL_TOGGLE		(1 << 31)
+#define EHCI_QH_OL_TOGGLE		(1U << 31)
 #define EHCI_QH_OL_IOC_INDEX	2			// Interrupt on Complete
 #define EHCI_QH_OL_IOC			(1 << 15)
 #define EHCI_QH_OL_ERRC_INDEX	2			// Error Counter

@@ -21,7 +21,7 @@ extern "C" {
 
 
 enum {
-	CAP_S64A		= (1 << 31),	// Supports 64-bit Addressing
+	CAP_S64A		= (1U << 31),	// Supports 64-bit Addressing
 	CAP_SNCQ		= (1 << 30),	// Supports Native Command Queuing
 	CAP_SSNTF		= (1 << 29),	// Supports SNotification Register
 	CAP_SMPS		= (1 << 28),	// Supports Mechanical Presence Switch
@@ -49,7 +49,7 @@ enum {
 
 
 enum {
-	GHC_AE			= (1 << 31),	// AHCI Enable
+	GHC_AE			= (1U << 31),	// AHCI Enable
 	GHC_MRSM		= (1 << 2),		// MSI Revert to Single Message
 	GHC_IE			= (1 << 1),		// Interrupt Enable
 	GHC_HR			= (1 << 0),		// HBA Reset **RW1**
@@ -128,9 +128,9 @@ enum {
 	PORT_INT_DI		= (1 << 7),		// Device Interlock Status/Enable
 	PORT_INT_PC		= (1 << 6),		// Port Change Status/Enable
 	PORT_INT_DP		= (1 << 5),		// Descriptor Processed Interrupt
-	PORT_INT_UF		= (1 << 4),		// Unknown FIS Interrupt 
-	PORT_INT_SDB	= (1 << 3),		// Set Device Bits FIS Interrupt 
-	PORT_INT_DS		= (1 << 2),		// DMA Setup FIS Interrupt 
+	PORT_INT_UF		= (1 << 4),		// Unknown FIS Interrupt
+	PORT_INT_SDB	= (1 << 3),		// Set Device Bits FIS Interrupt
+	PORT_INT_DS		= (1 << 2),		// DMA Setup FIS Interrupt
 	PORT_INT_PS		= (1 << 1),		// PIO Setup FIS Interrupt
 	PORT_INT_DHR	= (1 << 0),		// Device to Host Register FIS Interrupt
 };
@@ -187,12 +187,12 @@ typedef struct {
 	uint16		a : 1;			// ATAPI
 	uint16		w : 1;			// Write
 	uint16		p : 1;			// Prefetchable
-	uint16		r : 1;			// Reset 
+	uint16		r : 1;			// Reset
 	uint16		b : 1;			// Build In Self Test
 	uint16		c : 1;			// Clear Busy upon R_OK
 	uint16		: 1;
 	uint16		pmp : 4;		// Port Multiplier Port
-	uint16		prdtl;			// physical region description table length;		
+	uint16		prdtl;			// physical region description table length;
    } _PACKED;
     uint32		prdtl_flags_cfl;
   } _PACKED;
