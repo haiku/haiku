@@ -38,9 +38,6 @@ local openjpeg_files =
 
 ObjectCcFlags [ FGristFiles $(openjpeg_files:S=$(SUFOBJ)) ] : -w ;
 
-Includes [ FGristFiles icns_png.c ]
-	: [ BuildFeatureAttribute libpng : headers ] ;
-
 local libicns_files = 
 	icns_debug.c
 	icns_element.c
@@ -65,6 +62,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) libicns ] ;
 
 		UseBuildFeatureHeaders libpng ;
+		Includes [ FGristFiles icns_png.cpp ]
+			: [ BuildFeatureAttribute libpng : headers ] ;
 		Translator [ MultiArchDefaultGristFiles ICNSTranslator ] :
 
 			# ICNSTranslator
