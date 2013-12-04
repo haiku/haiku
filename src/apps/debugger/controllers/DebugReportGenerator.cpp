@@ -478,7 +478,7 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 		}
 
 		if (frame->CountParameters() == 0 && frame->CountLocalVariables() == 0)
-				continue;
+			continue;
 
 		_output << "\t\t\tVariables:\n";
 		status_t result = fNodeManager->SetStackFrame(thread, frame);
