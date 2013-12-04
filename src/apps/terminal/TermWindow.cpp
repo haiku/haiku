@@ -296,7 +296,7 @@ TermWindow::_InitWindow()
 	BRect textFrame = Bounds();
 	textFrame.top = fMenuBar->Bounds().bottom + 1.0;
 
-	fTabView = new SmartTabView(textFrame, "tab view", B_WIDTH_FROM_WIDEST);
+	fTabView = new SmartTabView(textFrame, "tab view", B_WIDTH_FROM_LABEL);
 	fTabView->SetListener(this);
 	AddChild(fTabView);
 
