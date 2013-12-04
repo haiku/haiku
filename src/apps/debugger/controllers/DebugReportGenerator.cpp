@@ -466,19 +466,19 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 				sizeof(functionName)));
 
 		_output << data;
-		if (frame->CountParameters() == 0
-			&& frame->CountLocalVariables() == 0) {
-			// only dump the topmost frame
-			if (i == 0) {
-				locker.Unlock();
-				_DumpFunctionDisassembly(_output, frame->InstructionPointer());
-				_DumpStackFrameMemory(_output, thread->GetCpuState(),
-					frame->FrameAddress(), thread->GetTeam()->GetArchitecture()
-						->StackGrowthDirection());
-				locker.Lock();
-			}
-			continue;
+
+		// only dump the topmost frame
+		if (i == 0) {
+			locker.Unlock();
+			_DumpFunctionDisassembly(_output, frame->InstructionPointer());
+			_DumpStackFrameMemory(_output, thread->GetCpuState(),
+				frame->FrameAddress(), thread->GetTeam()->GetArchitecture()
+					->StackGrowthDirection());
+			locker.Lock();
 		}
+
+		if (frame->CountParameters() == 0 && frame->CountLocalVariables() == 0)
+				continue;
 
 		_output << "\t\t\tVariables:\n";
 		status_t result = fNodeManager->SetStackFrame(thread, frame);
@@ -538,6 +538,10 @@ DebugReportGenerator::_DumpFunctionDisassembly(BString& _output,
 	if (code == NULL) {
 		switch (function->SourceCodeState()) {
 			case FUNCTION_SOURCE_NOT_LOADED:
+			case FUNCTION_SOURCE_LOADED:
+				// FUNCTION_SOURCE_LOADED is included since, if we entered
+				// here, it implies that the high level source for the
+				// function has been loaded, but the disassembly has not.
 				function->AddListener(this);
 				fSourceWaitingFunction = function;
 				fListener->FunctionSourceCodeRequested(instance, true);
