@@ -3,7 +3,7 @@
  *
  *	This module is part of ntfs-3g library
  *
- * Copyright (c) 2008-2009 Jean-Pierre Andre
+ * Copyright (c) 2008-2012 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -46,8 +46,10 @@
 #include <sys/sysmacros.h>
 #endif
 
+#include "compat.h"
 #include "types.h"
 #include "debug.h"
+#include "layout.h"
 #include "attrib.h"
 #include "inode.h"
 #include "dir.h"
@@ -58,18 +60,6 @@
 #include "logging.h"
 #include "misc.h"
 #include "reparse.h"
-
-/* the definitions in layout.h are wrong, we use names defined in
-  http://msdn.microsoft.com/en-us/library/aa365740(VS.85).aspx
-*/
-
-#define IO_REPARSE_TAG_DFS         const_cpu_to_le32(0x8000000A)
-#define IO_REPARSE_TAG_DFSR        const_cpu_to_le32(0x80000012)
-#define IO_REPARSE_TAG_HSM         const_cpu_to_le32(0xC0000004)
-#define IO_REPARSE_TAG_HSM2        const_cpu_to_le32(0x80000006)
-#define IO_REPARSE_TAG_MOUNT_POINT const_cpu_to_le32(0xA0000003)
-#define IO_REPARSE_TAG_SIS         const_cpu_to_le32(0x80000007)
-#define IO_REPARSE_TAG_SYMLINK     const_cpu_to_le32(0xA000000C)
 
 struct MOUNT_POINT_REPARSE_DATA {      /* reparse data for junctions */
 	le16	subst_name_offset;
@@ -235,6 +225,17 @@ static char *search_absolute(ntfs_volume *vol, ntfschar *path,
 	ni = ntfs_inode_open(vol, (MFT_REF)FILE_root);
 	if (ni) {
 		start = 0;
+		/*
+		 * Examine and translate the path, until we reach either
+		 *  - the end,
+		 *  - an unknown item
+		 *  - a non-directory
+		 *  - another reparse point,
+		 * A reparse point is not dereferenced, it will be
+		 * examined later when the translated path is dereferenced,
+		 * however the final part of the path will not be adjusted
+		 * to correct case.
+		 */
 		do {
 			len = 0;
 			while (((start + len) < count)
@@ -252,9 +253,11 @@ static char *search_absolute(ntfs_volume *vol, ntfschar *path,
 			}
 		} while (ni
 		    && (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
+		    && !(ni->flags & FILE_ATTR_REPARSE_POINT)
 		    && (start < count));
 	if (ni
-	    && (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY ? isdir : !isdir))
+	    && ((ni->mrec->flags & MFT_RECORD_IS_DIRECTORY ? isdir : !isdir)
+		|| (ni->flags & FILE_ATTR_REPARSE_POINT)))
 		if (ntfs_ucstombs(path, count, &target, 0) < 0) {
 			if (target) {
 				free(target);
@@ -288,12 +291,25 @@ static char *search_relative(ntfs_inode *ni, ntfschar *path, int count)
 	int pos;
 	int lth;
 	BOOL ok;
+	BOOL morelinks;
 	int max = 32; /* safety */
 
 	pos = 0;
 	ok = TRUE;
+	morelinks = FALSE;
 	curni = ntfs_dir_parent_inode(ni);
-	while (curni && ok && (pos < (count - 1)) && --max) {
+		/*
+		 * Examine and translate the path, until we reach either
+		 *  - the end,
+		 *  - an unknown item
+		 *  - a non-directory
+		 *  - another reparse point,
+		 * A reparse point is not dereferenced, it will be
+		 * examined later when the translated path is dereferenced,
+		 * however the final part of the path will not be adjusted
+		 * to correct case.
+		 */
+	while (curni && ok && !morelinks && (pos < (count - 1)) && --max) {
 		if ((count >= (pos + 2))
 		    && (path[pos] == const_cpu_to_le16('.'))
 		    && (path[pos+1] == const_cpu_to_le16('\\'))) {
@@ -331,12 +347,18 @@ static char *search_relative(ntfs_inode *ni, ntfschar *path, int count)
 					if (!curni)
 						ok = FALSE;
 					else {
+						if (curni->flags & FILE_ATTR_REPARSE_POINT)
+							morelinks = TRUE;
 						if (ok && ((pos + lth) < count)) {
 							path[pos + lth] = const_cpu_to_le16('/');
 							pos += lth + 1;
+							if (morelinks
+							   && ntfs_inode_close(curni))
+								ok = FALSE;
 						} else {
 							pos += lth;
-							if ((ni->mrec->flags ^ curni->mrec->flags)
+							if (!morelinks
+							  && (ni->mrec->flags ^ curni->mrec->flags)
 							    & MFT_RECORD_IS_DIRECTORY)
 								ok = FALSE;
 							if (ntfs_inode_close(curni))

@@ -46,6 +46,7 @@
 #include <sys/sysmacros.h>
 #endif
 
+#include "compat.h"
 #include "types.h"
 #include "debug.h"
 #include "attrib.h"

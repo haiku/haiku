@@ -43,23 +43,6 @@
 #include <mntent.h>
 #endif
 
-/*
- * Under Cygwin, DJGPP and FreeBSD we do not have MS_RDONLY,
- * so we define them ourselves.
- */
-#ifndef MS_RDONLY
-#define MS_RDONLY 1
-#endif
-
-#define MS_EXCLUSIVE 0x08000000
-
-#ifndef MS_RECOVER
-#define MS_RECOVER   0x10000000
-#endif
-
-#define MS_IGNORE_HIBERFILE   0x20000000
-#define MS_FORENSIC	      0x04000000 /* No modification during mount */
-
 /* Forward declaration */
 typedef struct _ntfs_volume ntfs_volume;
 
@@ -74,13 +57,29 @@ typedef struct _ntfs_volume ntfs_volume;
 /**
  * enum ntfs_mount_flags -
  *
+ * Flags for the ntfs_mount() function.
+ */
+enum {
+	NTFS_MNT_NONE                   = 0x00000000,
+	NTFS_MNT_RDONLY                 = 0x00000001,
+	NTFS_MNT_FORENSIC               = 0x04000000, /* No modification during
+	                                               * mount. */
+	NTFS_MNT_EXCLUSIVE              = 0x08000000,
+	NTFS_MNT_RECOVER                = 0x10000000,
+	NTFS_MNT_IGNORE_HIBERFILE       = 0x20000000,
+};
+typedef unsigned long ntfs_mount_flags;
+
+/**
+ * enum ntfs_mounted_flags -
+ *
  * Flags returned by the ntfs_check_if_mounted() function.
  */
 typedef enum {
 	NTFS_MF_MOUNTED		= 1,	/* Device is mounted. */
 	NTFS_MF_ISROOT		= 2,	/* Device is mounted as system root. */
 	NTFS_MF_READONLY	= 4,	/* Device is mounted read-only. */
-} ntfs_mount_flags;
+} ntfs_mounted_flags;
 
 extern int ntfs_check_if_mounted(const char *file, unsigned long *mnt_flags);
 
@@ -284,12 +283,12 @@ extern const char *ntfs_home;
 extern ntfs_volume *ntfs_volume_alloc(void);
 
 extern ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev,
-		unsigned long flags);
+		ntfs_mount_flags flags);
 
 extern ntfs_volume *ntfs_device_mount(struct ntfs_device *dev,
-		unsigned long flags);
+		ntfs_mount_flags flags);
 
-extern ntfs_volume *ntfs_mount(const char *name, unsigned long flags);
+extern ntfs_volume *ntfs_mount(const char *name, ntfs_mount_flags flags);
 extern int ntfs_umount(ntfs_volume *vol, const BOOL force);
 
 extern int ntfs_version_is_supported(ntfs_volume *vol);
@@ -302,7 +301,8 @@ extern int ntfs_volume_error(int err);
 extern void ntfs_mount_error(const char *vol, const char *mntpoint, int err);
 
 extern int ntfs_volume_get_free_space(ntfs_volume *vol);
-extern int ntfs_volume_rename(ntfs_volume *vol, ntfschar *label, int label_len);
+extern int ntfs_volume_rename(ntfs_volume *vol, const ntfschar *label,
+		int label_len);
 
 extern int ntfs_set_shown_files(ntfs_volume *vol,
 		BOOL show_sys_files, BOOL show_hid_files, BOOL hide_dot_files);

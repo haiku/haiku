@@ -185,7 +185,8 @@ char *ntfs_build_descr_posix(struct MAPPING* const mapping[],
 #endif /* POSIXACLS */
 
 int ntfs_inherit_acl(const ACL *oldacl, ACL *newacl,
-			const SID *usid, const SID *gsid, BOOL fordir);
+			const SID *usid, const SID *gsid,
+			BOOL fordir, le16 inherited);
 int ntfs_build_permissions(const char *securattr,
 			const SID *usid, const SID *gsid, BOOL isdir);
 char *ntfs_build_descr(mode_t mode,

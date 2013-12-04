@@ -85,7 +85,6 @@ struct mft_search_ctx {
 struct mft_search_ctx * mft_get_search_ctx(ntfs_volume *vol);
 void mft_put_search_ctx(struct mft_search_ctx *ctx);
 int mft_next_record(struct mft_search_ctx *ctx);
-MFT_REF ntfs_mft_get_parent_ref(ntfs_inode *ni);
 
 // Flags for dump mem
 #define DM_DEFAULTS	0

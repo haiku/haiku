@@ -84,13 +84,21 @@ static BOOL ntfs_check_restart_page_header(RESTART_PAGE_HEADER *rp, s64 pos)
 				"position in $LogFile.\n");
 		return FALSE;
 	}
-	/* We only know how to handle version 1.1. */
-	if (sle16_to_cpu(rp->major_ver) != 1 ||
-			sle16_to_cpu(rp->minor_ver) != 1) {
+	/*
+	 * We only know how to handle version 1.1 and 2.0, though
+	 * version 2.0 is probably related to cached metadata in
+	 * Windows 8, and we will refuse to mount.
+	 * Nevertheless, do all the relevant checks before rejecting.
+	 */
+	if (((rp->major_ver != const_cpu_to_le16(1))
+			 || (rp->minor_ver != const_cpu_to_le16(1)))
+	   && ((rp->major_ver != const_cpu_to_le16(2))
+			 || (rp->minor_ver != const_cpu_to_le16(0)))) {
 		ntfs_log_error("$LogFile version %i.%i is not "
-				"supported.  (This driver supports version "
-				"1.1 only.)\n", (int)sle16_to_cpu(rp->major_ver),
-				(int)sle16_to_cpu(rp->minor_ver));
+				"supported.\n   (This driver supports version "
+				"1.1 and 2.0 only.)\n",
+					(int)sle16_to_cpu(rp->major_ver),
+					(int)sle16_to_cpu(rp->minor_ver));
 		return FALSE;
 	}
 	/*

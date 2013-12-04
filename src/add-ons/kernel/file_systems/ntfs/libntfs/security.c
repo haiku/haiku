@@ -4,7 +4,7 @@
  * Copyright (c) 2004 Anton Altaparmakov
  * Copyright (c) 2005-2006 Szabolcs Szakacsits
  * Copyright (c) 2006 Yura Pakhuchiy
- * Copyright (c) 2007-2010 Jean-Pierre Andre
+ * Copyright (c) 2007-2012 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -52,6 +52,7 @@
 #include <pwd.h>
 #include <grp.h>
 
+#include "compat.h"
 #include "param.h"
 #include "types.h"
 #include "layout.h"
@@ -68,6 +69,7 @@
 #define getgrgid(a) NULL
 #define getpwuid(a) NULL
 #endif
+
 
 /*
  *	JPA NTFS constants or structs
@@ -1133,10 +1135,93 @@ static BOOL staticgroupmember(struct SECURITY_CONTEXT *scx, uid_t uid, gid_t gid
 	return (ingroup);
 }
 
+#if defined(__sun) && defined (__SVR4)
 
 /*
  *		Check whether current thread owner is member of file group
+ *				Solaris/OpenIndiana version
+ *	Should not be called for user root, however the group may be root
  *
+ * The group list is available in "/proc/$PID/cred"
+ *
+ */
+
+static BOOL groupmember(struct SECURITY_CONTEXT *scx, uid_t uid, gid_t gid)
+{
+	typedef struct prcred {
+		uid_t pr_euid;	    /* effective user id */
+		uid_t pr_ruid;	    /* real user id */
+		uid_t pr_suid;	    /* saved user id (from exec) */
+		gid_t pr_egid;	    /* effective group id */
+		gid_t pr_rgid;	    /* real group id */
+		gid_t pr_sgid;	    /* saved group id (from exec) */
+		int pr_ngroups;     /* number of supplementary groups */
+		gid_t pr_groups[1]; /* array of supplementary groups */
+	} prcred_t;
+	enum { readset = 16 };
+
+	prcred_t basecreds;
+	gid_t groups[readset];
+	char filename[64];
+	int fd;
+	int k;
+	int cnt;
+	gid_t *p;
+	BOOL ismember;
+	int got;
+	pid_t tid;
+
+	if (scx->vol->secure_flags & (1 << SECURITY_STATICGRPS))
+		ismember = staticgroupmember(scx, uid, gid);
+	else {
+		ismember = FALSE; /* default return */
+		tid = scx->tid;
+		sprintf(filename,"/proc/%u/cred",tid);
+		fd = open(filename,O_RDONLY);
+		if (fd >= 0) {
+			got = read(fd, &basecreds, sizeof(prcred_t));
+			if (got == sizeof(prcred_t)) {
+				if (basecreds.pr_egid == gid)
+					ismember = TRUE;
+				p = basecreds.pr_groups;
+				cnt = 1;
+				k = 0;
+				while (!ismember
+				    && (k < basecreds.pr_ngroups)
+				    && (cnt > 0)
+				    && (*p != gid)) {
+					k++;
+					cnt--;
+					p++;
+					if (cnt <= 0) {
+						got = read(fd, groups,
+							readset*sizeof(gid_t));
+						cnt = got/sizeof(gid_t);
+						p = groups;
+					}
+				}
+				if ((cnt > 0)
+				    && (k < basecreds.pr_ngroups))
+					ismember = TRUE;
+			}
+		close(fd);
+		}
+	}
+	return (ismember);
+}
+
+#elif defined(__HAIKU__)
+
+static BOOL groupmember(struct SECURITY_CONTEXT *scx, uid_t uid, gid_t gid)
+{
+	return TRUE;
+}
+
+#else /* defined(__sun) && defined (__SVR4) */
+
+/*
+ *		Check whether current thread owner is member of file group
+ *				Linux version
  *	Should not be called for user root, however the group may be root
  *
  * As indicated by Miklos Szeredi :
@@ -1155,12 +1240,6 @@ static BOOL staticgroupmember(struct SECURITY_CONTEXT *scx, uid_t uid, gid_t gid
  * contains the same data.
  */
 
-#ifdef __HAIKU__
-static BOOL groupmember(struct SECURITY_CONTEXT *scx, uid_t uid, gid_t gid)
-{
-	return TRUE;
-}
-#else
 static BOOL groupmember(struct SECURITY_CONTEXT *scx, uid_t uid, gid_t gid)
 {
 	static char key[] = "\nGroups:";
@@ -1244,7 +1323,8 @@ static BOOL groupmember(struct SECURITY_CONTEXT *scx, uid_t uid, gid_t gid)
 	}
 	return (ismember);
 }
-#endif
+
+#endif /* defined(__sun) && defined (__SVR4) */
 
 /*
  *	Cacheing is done two-way :
@@ -1809,7 +1889,7 @@ static int access_check_posix(struct SECURITY_CONTEXT *scx,
 		if (!scx->uid) {
 					/* root access if owner or other execution */
 			if (perms & 0101)
-				perms = 07777;
+				perms |= 01777;
 			else {
 					/* root access if some group execution */
 				groupperms = 0;
@@ -2225,7 +2305,7 @@ static int ntfs_get_perm(struct SECURITY_CONTEXT *scx,
 			if (!scx->uid) {
 				/* root access and execution */
 				if (perm & 0111)
-					perm = 07777;
+					perm |= 01777;
 				else
 					perm = 0;
 			} else
@@ -3328,6 +3408,56 @@ int ntfs_allowed_access(struct SECURITY_CONTEXT *scx,
 	return (allow);
 }
 
+/*
+ *		Check whether user can create a file (or directory)
+ *
+ *	Returns TRUE if access is allowed,
+ *	Also returns the gid and dsetgid applicable to the created file
+ */
+
+int ntfs_allowed_create(struct SECURITY_CONTEXT *scx,
+		ntfs_inode *dir_ni, gid_t *pgid, mode_t *pdsetgid)
+{
+	int perm;
+	int res;
+	int allow;
+	struct stat stbuf;
+
+	/*
+	 * Always allow for root.
+	 * Also always allow if no mapping has been defined
+	 */
+	if (!scx->mapping[MAPUSERS])
+		perm = 0777;
+	else
+		perm = ntfs_get_perm(scx, dir_ni, S_IWRITE + S_IEXEC);
+	if (!scx->mapping[MAPUSERS]
+	    || !scx->uid) {
+		allow = 1;
+	} else {
+		perm = ntfs_get_perm(scx, dir_ni, S_IWRITE + S_IEXEC);
+		if (perm >= 0) {
+			res = EACCES;
+			allow = ((perm & (S_IWUSR | S_IWGRP | S_IWOTH)) != 0)
+				    && ((perm & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0);
+			if (!allow)
+				errno = res;
+		} else
+			allow = 0;
+	}
+	*pgid = scx->gid;
+	*pdsetgid = 0;
+		/* return directory group if S_ISGID is set */
+	if (allow && (perm & S_ISGID)) {
+		if (ntfs_get_owner_mode(scx, dir_ni, &stbuf) >= 0) {
+			*pdsetgid = stbuf.st_mode & S_ISGID;
+			if (perm & S_ISGID)
+				*pgid = stbuf.st_gid;
+		}
+	}
+	return (allow);
+}
+
 #if 0 /* not needed any more */
 
 /*
@@ -3479,10 +3609,12 @@ int ntfs_set_owner(struct SECURITY_CONTEXT *scx, ntfs_inode *ni,
 				uid = fileuid;
 			if ((int)gid < 0)
 				gid = filegid;
+#if !defined(__sun) || !defined (__SVR4)
 			/* clear setuid and setgid if owner has changed */
                         /* unless request originated by root */
 			if (uid && (fileuid != uid))
 				mode &= 01777;
+#endif
 #if POSIXACLS
 			res = ntfs_set_owner_mode(scx, ni, uid, gid, 
 				mode, pxdesc);
@@ -3691,7 +3823,9 @@ static le32 build_inherited_id(struct SECURITY_CONTEXT *scx,
 		pnhead = (SECURITY_DESCRIPTOR_RELATIVE*)newattr;
 		pnhead->revision = SECURITY_DESCRIPTOR_REVISION;
 		pnhead->alignment = 0;
-		pnhead->control = SE_SELF_RELATIVE;
+		pnhead->control = (pphead->control
+			& (SE_DACL_AUTO_INHERITED | SE_SACL_AUTO_INHERITED))
+				| SE_SELF_RELATIVE;
 		pos = sizeof(SECURITY_DESCRIPTOR_RELATIVE);
 			/*
 			 * locate and inherit DACL
@@ -3702,7 +3836,9 @@ static le32 build_inherited_id(struct SECURITY_CONTEXT *scx,
 			offpacl = le32_to_cpu(pphead->dacl);
 			ppacl = (const ACL*)&parentattr[offpacl];
 			pnacl = (ACL*)&newattr[pos];
-			aclsz = ntfs_inherit_acl(ppacl, pnacl, usid, gsid, fordir);
+			aclsz = ntfs_inherit_acl(ppacl, pnacl, usid, gsid,
+				fordir, pphead->control
+					& SE_DACL_AUTO_INHERITED);
 			if (aclsz) {
 				pnhead->dacl = cpu_to_le32(pos);
 				pos += aclsz;
@@ -3717,7 +3853,9 @@ static le32 build_inherited_id(struct SECURITY_CONTEXT *scx,
 			offpacl = le32_to_cpu(pphead->sacl);
 			ppacl = (const ACL*)&parentattr[offpacl];
 			pnacl = (ACL*)&newattr[pos];
-			aclsz = ntfs_inherit_acl(ppacl, pnacl, usid, gsid, fordir);
+			aclsz = ntfs_inherit_acl(ppacl, pnacl, usid, gsid,
+				fordir, pphead->control
+					& SE_SACL_AUTO_INHERITED);
 			if (aclsz) {
 				pnhead->sacl = cpu_to_le32(pos);
 				pos += aclsz;
@@ -3735,7 +3873,7 @@ static le32 build_inherited_id(struct SECURITY_CONTEXT *scx,
 			 */
 		memcpy(&newattr[pos],gsid,gsidsz);
 		pnhead->group = cpu_to_le32(pos);
-		pos += usidsz;
+		pos += gsidsz;
 		securid = setsecurityattr(scx->vol,
 			(SECURITY_DESCRIPTOR_RELATIVE*)newattr, pos);
 		free(newattr);

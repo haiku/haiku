@@ -215,8 +215,8 @@ int ntfs_boot_sector_parse(ntfs_volume *vol, const NTFS_BOOT_SECTOR *bs)
 	vol->mftmirr_lcn = sle64_to_cpu(bs->mftmirr_lcn);
 	ntfs_log_debug("MFT LCN = %lld\n", (long long)vol->mft_lcn);
 	ntfs_log_debug("MFTMirr LCN = %lld\n", (long long)vol->mftmirr_lcn);
-	if (vol->mft_lcn     > vol->nr_clusters ||
-	    vol->mftmirr_lcn > vol->nr_clusters) {
+	if ((vol->mft_lcn     < 0 || vol->mft_lcn     > vol->nr_clusters) ||
+	    (vol->mftmirr_lcn < 0 || vol->mftmirr_lcn > vol->nr_clusters)) {
 		ntfs_log_error("$MFT LCN (%lld) or $MFTMirr LCN (%lld) is "
 			      "greater than the number of clusters (%lld).\n",
 			      (long long)vol->mft_lcn, (long long)vol->mftmirr_lcn,

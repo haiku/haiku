@@ -275,11 +275,11 @@ ntfs_volume * utils_mount_volume(const char *device, unsigned long flags)
 	 *
 	 * libntfs-3g only has safety check number 2. The dirty flag is simply
 	 * ignored because we are confident that we can handle a dirty volume.
-	 * So we treat MS_RECOVER like NTFS_MNT_FORCE, knowing that the first
-	 * check is always bypassed.
+	 * So we treat NTFS_MNT_RECOVER like NTFS_MNT_FORCE, knowing that the
+	 * first check is always bypassed.
 	 */
 
-	if (!utils_valid_device(device, flags & MS_RECOVER))
+	if (!utils_valid_device(device, flags & NTFS_MNT_RECOVER))
 		return NULL;
 
 	vol = ntfs_mount(device, flags);
@@ -305,7 +305,7 @@ ntfs_volume * utils_mount_volume(const char *device, unsigned long flags)
 	 * before mount, so we can only warn if the VOLUME_IS_DIRTY flag is set
 	 * in VOLUME_INFORMATION. */
 	if (vol->flags & VOLUME_IS_DIRTY) {
-		if (!(flags & MS_RECOVER)) {
+		if (!(flags & NTFS_MNT_RECOVER)) {
 			ntfs_log_error("%s", dirty_volume_msg);
 			ntfs_umount(vol, FALSE);
 			return NULL;
@@ -1120,71 +1120,6 @@ int mft_next_record(struct mft_search_ctx *ctx)
 	}
 
 	return (ctx->inode == NULL);
-}
-
-/**
- * ntfs_mft_get_parent_ref - find mft reference of parent directory of an inode
- * @ni:		ntfs inode whose parent directory to find
- *
- * Find the parent directory of the ntfs inode @ni. To do this, find the first
- * file name attribute in the mft record of @ni and return the parent mft
- * reference from that.
- *
- * Note this only makes sense for directories, since files can be hard linked
- * from multiple directories and there is no way for us to tell which one is
- * being looked for.
- *
- * Technically directories can have hard links, too, but we consider that as
- * illegal as Linux/UNIX do not support directory hard links.
- *
- * Return the mft reference of the parent directory on success or -1 on error
- * with errno set to the error code.
- */
-MFT_REF ntfs_mft_get_parent_ref(ntfs_inode *ni)
-{
-	MFT_REF mref;
-	ntfs_attr_search_ctx *ctx;
-	FILE_NAME_ATTR *fn;
-	int eo;
-
-	ntfs_log_trace("Entering.\n");
-	
-	if (!ni) {
-		errno = EINVAL;
-		return ERR_MREF(-1);
-	}
-
-	ctx = ntfs_attr_get_search_ctx(ni, NULL);
-	if (!ctx)
-		return ERR_MREF(-1);
-	if (ntfs_attr_lookup(AT_FILE_NAME, AT_UNNAMED, 0, 0, 0, NULL, 0, ctx)) {
-		ntfs_log_error("No file name found in inode %lld\n", 
-			       (unsigned long long)ni->mft_no);
-		goto err_out;
-	}
-	if (ctx->attr->non_resident) {
-		ntfs_log_error("File name attribute must be resident (inode "
-			       "%lld)\n", (unsigned long long)ni->mft_no);
-		goto io_err_out;
-	}
-	fn = (FILE_NAME_ATTR*)((u8*)ctx->attr +
-			le16_to_cpu(ctx->attr->value_offset));
-	if ((u8*)fn +	le32_to_cpu(ctx->attr->value_length) >
-			(u8*)ctx->attr + le32_to_cpu(ctx->attr->length)) {
-		ntfs_log_error("Corrupt file name attribute in inode %lld.\n",
-			       (unsigned long long)ni->mft_no);
-		goto io_err_out;
-	}
-	mref = le64_to_cpu(fn->parent_directory);
-	ntfs_attr_put_search_ctx(ctx);
-	return mref;
-io_err_out:
-	errno = EIO;
-err_out:
-	eo = errno;
-	ntfs_attr_put_search_ctx(ctx);
-	errno = eo;
-	return ERR_MREF(-1);
 }
 
 

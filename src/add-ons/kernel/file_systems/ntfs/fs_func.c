@@ -264,7 +264,7 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	// get path for device
 	if (ioctl(fd, B_GET_PATH_FOR_DEVICE, devpath) != 0) {
 		// try mount
-		ntVolume = utils_mount_volume(devpath, MS_RDONLY | MS_RECOVER);
+		ntVolume = utils_mount_volume(devpath, NTFS_MNT_RDONLY | NTFS_MNT_RECOVER);
 		if (ntVolume != NULL) {
 			if (ntVolume->vol_name && ntVolume->vol_name[0] != '\0')
 				strcpy(cookie->label, ntVolume->vol_name);
@@ -384,7 +384,7 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 
 	if (ns->ro || (flags & B_MOUNT_READ_ONLY) != 0
 		|| is_device_read_only(device)) {
-		mountFlags |= MS_RDONLY;
+		mountFlags |= NTFS_MNT_RDONLY;
 		ns->flags |= B_FS_IS_READONLY;
 	}
 
@@ -418,7 +418,7 @@ fs_mount(fs_volume *_vol, const char *device, ulong flags, const char *args,
 		gNTFSVnodeOps.remove_attr = fs_remove_attrib;		
 	}
 
-	ns->ntvol = utils_mount_volume(device, mountFlags | MS_RECOVER);
+	ns->ntvol = utils_mount_volume(device, mountFlags | NTFS_MNT_RECOVER);
 	if (ns->ntvol != NULL)
 		result = B_NO_ERROR;
 	else

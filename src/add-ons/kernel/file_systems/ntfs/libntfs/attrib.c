@@ -1849,6 +1849,13 @@ s64 ntfs_attr_pwrite(ntfs_attr *na, const s64 pos, s64 count, const void *b)
 			ntfs_log_perror("Failed to enlarge attribute");
 			goto errno_set;
 		}
+		/*
+		 * If we avoided updating the runlist, we must be sure
+		 * to cancel the enlargement and put back the runlist to
+		 * a clean state if we get into some error.
+		 */
+		if (NAttrDataAppending(na))
+			need_to.undo_data_size = 1;
 #else
 		if (ntfs_attr_truncate_i(na, pos + count, HOLES_OK)) {
 			ntfs_log_perror("Failed to enlarge attribute");
@@ -3732,8 +3739,8 @@ int ntfs_make_room_for_attr(MFT_RECORD *m, u8 *pos, u32 size)
  *	EIO	- I/O error occurred or damaged filesystem.
  */
 int ntfs_resident_attr_record_add(ntfs_inode *ni, ATTR_TYPES type,
-			ntfschar *name, u8 name_len, u8 *val, u32 size,
-			ATTR_FLAGS data_flags)
+			const ntfschar *name, u8 name_len, const u8 *val,
+			u32 size, ATTR_FLAGS data_flags)
 {
 	ntfs_attr_search_ctx *ctx;
 	u32 length;
@@ -3864,7 +3871,7 @@ put_err_out:
  *	EIO	- I/O error occurred or damaged filesystem.
  */
 int ntfs_non_resident_attr_record_add(ntfs_inode *ni, ATTR_TYPES type,
-		ntfschar *name, u8 name_len, VCN lowest_vcn, int dataruns_size,
+		const ntfschar *name, u8 name_len, VCN lowest_vcn, int dataruns_size,
 		ATTR_FLAGS flags)
 {
 	ntfs_attr_search_ctx *ctx;
@@ -4147,7 +4154,7 @@ int ntfs_attr_record_rm(ntfs_attr_search_ctx *ctx)
  * On success return 0. On error return -1 with errno set to the error code.
  */
 int ntfs_attr_add(ntfs_inode *ni, ATTR_TYPES type,
-		ntfschar *name, u8 name_len, u8 *val, s64 size)
+		ntfschar *name, u8 name_len, const u8 *val, s64 size)
 {
 	u32 attr_rec_size;
 	int err, i, offset;
@@ -4342,8 +4349,8 @@ err_out:
  *		Change an attribute flag
  */
 
-int ntfs_attr_set_flags(ntfs_inode *ni, ATTR_TYPES type,
-		ntfschar *name, u8 name_len, ATTR_FLAGS flags, ATTR_FLAGS mask)
+int ntfs_attr_set_flags(ntfs_inode *ni, ATTR_TYPES type, const ntfschar *name,
+		u8 name_len, ATTR_FLAGS flags, ATTR_FLAGS mask)
 {
 	ntfs_attr_search_ctx *ctx;
 	int res;
@@ -6232,10 +6239,18 @@ static int ntfs_non_resident_attr_expand_i(ntfs_attr *na, const s64 newsize,
 
 		/* Prepare to mapping pairs update. */
 		na->allocated_size = first_free_vcn << vol->cluster_size_bits;
-		/* Write mapping pairs for new runlist. */
 #if PARTIAL_RUNLIST_UPDATING
-		if (ntfs_attr_update_mapping_pairs_i(na, start_update, holes)) {
+		/*
+		 * Write mapping pairs for new runlist, unless this is
+		 * a temporary state before appending data.
+		 * If the update is not done, we must be sure to do
+		 * it later, and to get to a clean state even on errors.
+		 */
+		if ((holes != HOLES_DELAY)
+		   && ntfs_attr_update_mapping_pairs_i(na, start_update,
+					holes)) {
 #else
+		/* Write mapping pairs for new runlist. */
 		if (ntfs_attr_update_mapping_pairs(na, 0)) {
 #endif
 			err = errno;
@@ -6646,9 +6661,8 @@ exit:
  *	Returns the amount of data written, negative if there was an error
  */
 
-int ntfs_attr_data_write(ntfs_inode *ni,
-		ntfschar *stream_name, int stream_name_len,
-		char *buf, size_t size, off_t offset)
+int ntfs_attr_data_write(ntfs_inode *ni, ntfschar *stream_name,
+		int stream_name_len, const char *buf, size_t size, off_t offset)
 {
 	ntfs_attr *na = NULL;
 	int res, total = 0;
@@ -6680,7 +6694,7 @@ exit:
 }
 
 
-int ntfs_attr_exist(ntfs_inode *ni, const ATTR_TYPES type, ntfschar *name,
+int ntfs_attr_exist(ntfs_inode *ni, const ATTR_TYPES type, const ntfschar *name,
 		    u32 name_len)
 {
 	ntfs_attr_search_ctx *ctx;

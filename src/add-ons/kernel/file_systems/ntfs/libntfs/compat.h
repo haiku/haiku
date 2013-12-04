@@ -31,6 +31,12 @@
 #include <sys/param.h>
 #endif
 
+#include <errno.h>	/* ENODATA */
+
+#ifndef ENODATA
+#define ENODATA ENOENT
+#endif
+
 #ifndef PATH_MAX
 #define PATH_MAX 4096
 #endif

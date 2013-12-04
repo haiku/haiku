@@ -255,6 +255,8 @@ int ntfs_set_mode(struct SECURITY_CONTEXT *scx, ntfs_inode *ni, mode_t mode);
 BOOL ntfs_allowed_as_owner(struct SECURITY_CONTEXT *scx, ntfs_inode *ni);
 int ntfs_allowed_access(struct SECURITY_CONTEXT *scx,
 		ntfs_inode *ni, int accesstype);
+int ntfs_allowed_create(struct SECURITY_CONTEXT *scx,
+		ntfs_inode *ni, gid_t *pgid, mode_t *pdsetgid);
 BOOL old_ntfs_allowed_dir_access(struct SECURITY_CONTEXT *scx,
 		const char *path, int accesstype);
 
