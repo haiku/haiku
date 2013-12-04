@@ -31,7 +31,7 @@ typedef struct cache_entry {
 
 
 typedef struct dircookie {
-	u64					pos;
+	s64					pos;
 	dev_t				dev_id;
 	BOOL 				show_sys_files;
 	cache_entry 		*cache_root;
