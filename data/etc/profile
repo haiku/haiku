@@ -106,6 +106,16 @@ function dir {
 	ls -lF "$@";
 }
 
+for dir in `findpaths -Re B_FIND_PATH_DATA_DIRECTORY profile.d 2> /dev/null`; do
+  for i in $dir/*.sh; do
+    if [ -r $i ]; then
+      . $i
+    fi
+  done
+  unset i
+done
+unset dir
+
 if [ -d /etc/profile.d ]; then
   for i in /etc/profile.d/*.sh; do
     if [ -r $i ]; then
