@@ -20,10 +20,17 @@ local sources =
 	
 	gfx_conv_c.cpp
 	gfx_conv_c_lookup.cpp
-	gfx_conv_mmx.cpp
 	gfx_util.cpp
 	;
 
+if $(TARGET_ARCH) != x86_64 {
+	sources += 
+		gfx_conv_mmx.cpp 
+		yuvrgb_sse.nasm
+		yuvrgb_sse2.nasm
+		yuvrgb_ssse3.nasm
+	;
+}
 
 UseBuildFeatureHeaders ffmpeg ;
 Includes [ FGristFiles $(sources) ]
@@ -40,21 +47,17 @@ UseHeaders [ FDirName $(ffmpegHeaders) libswscale ] ;
 
 Addon ffmpeg :
 	$(sources)
-
-	yuvrgb_sse.nasm
-	yuvrgb_sse2.nasm
-	yuvrgb_ssse3.nasm
 	:
 
 	# FFmpeg libraries (from FFmpeg optional package):
 	[ BuildFeatureAttribute ffmpeg : libraries ]
 
+	[ BuildFeatureAttribute libbz2 : libraries ]
 	[ BuildFeatureAttribute speex : libraries ]
 	[ BuildFeatureAttribute libtheora : libraries ]
 	[ BuildFeatureAttribute libvorbis : libraries ]
 	[ BuildFeatureAttribute libogg : libraries ]
 	[ BuildFeatureAttribute libvpx : libraries ]
-	libbz2_ffmpeg.a
 
 	be
 	media
@@ -63,5 +66,4 @@ Addon ffmpeg :
 	$(TARGET_NETWORK_LIBS)
 ;
 
-SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libbz2 ;
 

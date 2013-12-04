@@ -42,6 +42,7 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 
 			if (pixelFormat == PIX_FMT_YUV420P 
 				|| pixelFormat == PIX_FMT_YUVJ420P) {
+#ifndef __x86_64__
 				if (cpu.HasSSSE3() && width % 8 == 0 && height % 2 == 0) {
 					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgba32_ssse3\n");
 					return gfx_conv_yuv420p_rgba32_ssse3;
@@ -52,14 +53,15 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 					&& height % 2 == 0) {
 					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgba32_sse\n");
 					return gfx_conv_yuv420p_rgba32_sse;
-				} else {
-					TRACE("resolve_colorspace: gfx_conv_YCbCr420p_RGB32_c\n");
-					return gfx_conv_YCbCr420p_RGB32_c;
 				}
+#endif
+				TRACE("resolve_colorspace: gfx_conv_YCbCr420p_RGB32_c\n");
+				return gfx_conv_YCbCr420p_RGB32_c;
 			}
 
 			if (pixelFormat == PIX_FMT_YUV422P
 				|| pixelFormat == PIX_FMT_YUVJ422P) {
+#ifndef __x86_64__
 				if (cpu.HasSSSE3() && width % 8 == 0) {
 					TRACE("resolve_colorspace: gfx_conv_yuv422p_RGB32_ssse3\n");
 					return gfx_conv_yuv422p_rgba32_ssse3;
@@ -69,14 +71,15 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 				} else if (cpu.HasSSE1() && width % 4 == 0) {
 					TRACE("resolve_colorspace: gfx_conv_yuv422p_RGB32_sse\n");
 					return gfx_conv_yuv422p_rgba32_sse;
-				} else {
-					TRACE("resolve_colorspace: gfx_conv_YCbCr422p_RGB32_c\n");
-					return gfx_conv_YCbCr422_RGB32_c;
 				}
+#endif
+				TRACE("resolve_colorspace: gfx_conv_YCbCr422p_RGB32_c\n");
+				return gfx_conv_YCbCr422_RGB32_c;
 			}
 			
 			// Packed Formats
 			if (pixelFormat == PIX_FMT_YUYV422) {
+#ifndef __x86_64__
 				if (cpu.HasSSSE3() && width % 8 == 0) {
 					return gfx_conv_yuv422_rgba32_ssse3;
 				} else if (cpu.HasSSE2() && width % 8 == 0) {
@@ -84,9 +87,9 @@ resolve_colorspace(color_space colorSpace, PixelFormat pixelFormat, int width,
 				} else if (cpu.HasSSE1() && width % 4 == 0
 					&& height % 2 == 0) {
 					return gfx_conv_yuv422_rgba32_sse;
-				} else {
-					return gfx_conv_YCbCr422_RGB32_c;
 				}
+#endif
+				return gfx_conv_YCbCr422_RGB32_c;
 			}
 			
 			TRACE("resolve_colorspace: %s => B_RGB32: NULL\n",

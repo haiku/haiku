@@ -21,18 +21,19 @@ CPUCapabilities::~CPUCapabilities()
 
 
 CPUCapabilities::CPUCapabilities()
+	: fCapabilities(0)
 {
-	#ifdef __INTEL__
-		setIntelCapabilities();
-	#endif
+#if defined(__INTEL__) || defined(__x86_64__)
+	_SetIntelCapabilities();
+#endif
 	
 	PrintCapabilities();
 }
 
 
-#ifdef __INTEL__
+#if defined(__INTEL__) || defined(__x86_64__)
 void
-CPUCapabilities::setIntelCapabilities()
+CPUCapabilities::_SetIntelCapabilities()
 {
 	cpuid_info baseInfo;
 	cpuid_info cpuInfo;
@@ -61,83 +62,83 @@ CPUCapabilities::setIntelCapabilities()
 
 		get_cpuid(&cpuInfo, 1L, 0L);
 		if (cpuInfo.eax_1.features & (1UL << 23)) {
-			capabilities = CAPABILITY_MMX;
+			fCapabilities = CAPABILITY_MMX;
 		}
 	
 		if (cpuInfo.eax_1.features & (1UL << 25)) {
-			capabilities = CAPABILITY_SSE1;
+			fCapabilities = CAPABILITY_SSE1;
 		}
 
 		if (cpuInfo.eax_1.features & (1UL << 26)) {
-			capabilities = CAPABILITY_SSE2;
+			fCapabilities = CAPABILITY_SSE2;
 		}
 
 		if (maxStandardFunction >= 1) {
 			/* Extended features */
 			if (cpuInfo.eax_1.extended_features & (1UL << 0)) {
-				capabilities = CAPABILITY_SSE3;
+				fCapabilities = CAPABILITY_SSE3;
 			}
 			if (cpuInfo.eax_1.extended_features & (1UL << 9)) {
-				capabilities = CAPABILITY_SSSE3;
+				fCapabilities = CAPABILITY_SSSE3;
 			}
 			if (cpuInfo.eax_1.extended_features & (1UL << 19)) {
-				capabilities = CAPABILITY_SSE41;
+				fCapabilities = CAPABILITY_SSE41;
 			}
 			if (cpuInfo.eax_1.extended_features & (1UL << 20)) {
-				capabilities = CAPABILITY_SSE42;
+				fCapabilities = CAPABILITY_SSE42;
 			}
 		}
 	}
 }
-#endif // __INTEL__
+#endif // __INTEL__ || __x86_64__
 
 
 bool
 CPUCapabilities::HasMMX()
 {
-	return capabilities >= CAPABILITY_MMX;
+	return fCapabilities >= CAPABILITY_MMX;
 }
 
 
 bool
 CPUCapabilities::HasSSE1()
 {
-	return capabilities >= CAPABILITY_SSE1;
+	return fCapabilities >= CAPABILITY_SSE1;
 }
 
 
 bool
 CPUCapabilities::HasSSE2()
 {
-	return capabilities >= CAPABILITY_SSE2;
+	return fCapabilities >= CAPABILITY_SSE2;
 }
 
 
 bool
 CPUCapabilities::HasSSE3()
 {
-	return capabilities >= CAPABILITY_SSE3;
+	return fCapabilities >= CAPABILITY_SSE3;
 }
 
 
 bool
 CPUCapabilities::HasSSSE3()
 {
-	return capabilities >= CAPABILITY_SSSE3;
+	return fCapabilities >= CAPABILITY_SSSE3;
 }
 
 
 bool
 CPUCapabilities::HasSSE41()
 {
-	return capabilities >= CAPABILITY_SSE41;
+	return fCapabilities >= CAPABILITY_SSE41;
 }
 
 
 bool
 CPUCapabilities::HasSSE42()
 {
-	return capabilities >= CAPABILITY_SSE42;
+	return fCapabilities >= CAPABILITY_SSE42;
 }
 
 
@@ -149,10 +150,9 @@ CPUCapabilities::PrintCapabilities()
 	};
 
 	printf("CPU is capable of running ");
-	if (capabilities) {
-		for (uint32 i=1;i<=capabilities;i++) {
+	if (fCapabilities > 0) {
+		for (uint32 i = 1; i <= fCapabilities; i++)
 			printf("%s ",CapArray[i]);
-		}
 	} else {
 		printf("no extensions");
 	}

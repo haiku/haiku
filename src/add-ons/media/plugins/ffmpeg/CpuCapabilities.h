@@ -20,24 +20,26 @@
 
 
 class CPUCapabilities {
-	public:
-		CPUCapabilities();
-		~CPUCapabilities();
+public:
+								CPUCapabilities();
+								~CPUCapabilities();
 	
-		bool HasMMX();
-		bool HasSSE1();
-		bool HasSSE2();
-		bool HasSSE3();
-		bool HasSSSE3();
-		bool HasSSE41();
-		bool HasSSE42();
+			bool 				HasMMX();
+			bool 				HasSSE1();
+			bool 				HasSSE2();
+			bool 				HasSSE3();
+			bool 				HasSSSE3();
+			bool 				HasSSE41();
+			bool 				HasSSE42();
 	
-		void PrintCapabilities();
+			void 				PrintCapabilities();
 	
-	private:
-		uint32		capabilities;
-	
-		void setIntelCapabilities();
+private:
+#if defined(__INTEL__) || defined(__x86_64__)
+			void 				_SetIntelCapabilities();
+#endif // __INTEL__ || __x86_64__
+
+			uint32				fCapabilities;
 };
 
 #endif	//__CPU_CAPABILITIES__
