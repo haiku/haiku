@@ -49,10 +49,10 @@ public:
 
 			void*				AllocatedAddress() const;
 	static	FreeChunk*			SetToAllocated(void* allocated);
-	static	addr_t				NextOffset() { return sizeof(uint32); }
+	static	addr_t				NextOffset() { return sizeof(size_t); }
 
 private:
-			uint32				fSize;
+			size_t				fSize;
 			FreeChunk*			fNext;
 };
 
@@ -198,7 +198,7 @@ FreeChunk::AllocatedAddress() const
 FreeChunk*
 FreeChunk::SetToAllocated(void* allocated)
 {
-	return (FreeChunk*)((uint8*)allocated - FreeChunk::NextOffset());
+	return (FreeChunk*)((addr_t)allocated - FreeChunk::NextOffset());
 }
 
 
@@ -386,7 +386,7 @@ rtm_alloc(rtm_pool* pool, size_t size)
 		last->SetNext(chunk->Next());
 	}
 
-	pool->available -= size + sizeof(uint32);
+	pool->available -= size + sizeof(size_t);
 
 	TRACE("malloc(%lu) -> %p\n", size, chunk->AllocatedAddress());
 	return chunk->AllocatedAddress();
