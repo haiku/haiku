@@ -88,6 +88,8 @@ extern int ntfs_delete(ntfs_volume *vol, const char *path,
 extern int ntfs_link(ntfs_inode *ni, ntfs_inode *dir_ni, const ntfschar *name,
 		u8 name_len);
 
+extern MFT_REF ntfs_mft_get_parent_ref(ntfs_inode *ni);
+
 /*
  * File types (adapted from include <linux/fs.h>)
  */

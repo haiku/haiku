@@ -1112,7 +1112,7 @@ static int upgrade_secur_desc(ntfs_volume *vol,
  *	Should not be called for user root, however the group may be root
  *
  */
-
+#ifndef __HAIKU__
 static BOOL staticgroupmember(struct SECURITY_CONTEXT *scx, uid_t uid, gid_t gid)
 {
 	BOOL ingroup;
@@ -1134,6 +1134,7 @@ static BOOL staticgroupmember(struct SECURITY_CONTEXT *scx, uid_t uid, gid_t gid
 	}
 	return (ingroup);
 }
+#endif //__HAIKU__
 
 #if defined(__sun) && defined (__SVR4)
 

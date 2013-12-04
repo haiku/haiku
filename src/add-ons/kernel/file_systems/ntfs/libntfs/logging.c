@@ -276,7 +276,6 @@ static const char * ntfs_log_get_prefix(u32 level)
 
 	return prefix;
 }
-#endif //__HAIKU___
 
 /**
  * ntfs_log_set_handler - Provide an alternate logging handler
@@ -296,6 +295,7 @@ void ntfs_log_set_handler(ntfs_log_handler *handler)
 	} else
 		ntfs_log.handler = ntfs_log_handler_null;
 }
+#endif //__HAIKU___
 
 /**
  * ntfs_log_redirect - Pass on the request to the real handler
