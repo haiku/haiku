@@ -209,7 +209,7 @@ main(int argc, const char* const* argv)
 	const char* kindConstant = argv[optind++];
 
 	const char* subPath = NULL;
-	if (optind >= argc)
+	if (optind < argc)
 		subPath = argv[optind++];
 
 	// only one of path or resolvable may be specified
