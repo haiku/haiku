@@ -122,6 +122,9 @@ static const char* kUsage =
 	"    <expression>. The expressions can be a simple resolvable name or\n"
 	"    a resolvable name with operator and version (e.g.\n"
 	"    \"cmd:perl >= 5\"; must be one argument).\n"
+	"  -R, --reverse\n"
+	"    Print paths in reverse order, i.e. from most general to most\n"
+	"    specific.\n"
 ;
 
 
@@ -141,6 +144,7 @@ main(int argc, const char* const* argv)
 	const char* referencePath = NULL;
 	const char* resolvable = NULL;
 	bool existingOnly = false;
+	bool reverseOrder = false;
 	const char* separator = NULL;
 
 	while (true) {
@@ -150,11 +154,12 @@ main(int argc, const char* const* argv)
 			{ "help", no_argument, 0, 'h' },
 			{ "path", required_argument, 0, 'p' },
 			{ "resolvable", required_argument, 0, 'pr' },
+			{ "reverse", no_argument, 0, 'R' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+a:c:d:ehlp:r:",
+		int c = getopt_long(argc, (char**)argv, "+a:c:d:ehlp:r:R",
 			sLongOptions, NULL);
 		if (c == -1)
 			break;
@@ -194,6 +199,10 @@ main(int argc, const char* const* argv)
 
 			case 'r':
 				resolvable = optarg;
+				break;
+
+			case 'R':
+				reverseOrder = true;
 				break;
 
 			default:
@@ -245,7 +254,7 @@ main(int argc, const char* const* argv)
 		}
 
 		BPath path;
-		status_t error =pathFinder.FindPath(architecture, baseDirectory,
+		status_t error = pathFinder.FindPath(architecture, baseDirectory,
 			subPath, existingOnly ? B_FIND_PATH_EXISTING_ONLY : 0, path);
 		if (error != B_OK) {
 			fprintf(stderr, "Error: Failed to find path: %s\n",
@@ -264,6 +273,12 @@ main(int argc, const char* const* argv)
 			exit(1);
 		}
 
+		int32 count = paths.CountStrings();
+		if (reverseOrder) {
+			for (int32 i = 0; i < count / 2; i++)
+				paths.Swap(i, count - i - 1);
+		}
+
 		if (separator != NULL) {
 			BString result = paths.Join(separator);
 			if (result.IsEmpty()) {
@@ -272,7 +287,6 @@ main(int argc, const char* const* argv)
 			}
 			printf("%s\n", result.String());
 		} else {
-			int32 count = paths.CountStrings();
 			for (int32 i = 0; i < count; i++)
 				printf("%s\n", paths.StringAt(i).String());
 		}
