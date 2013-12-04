@@ -14,6 +14,8 @@
 #include <Entry.h>
 #include <FindDirectory.h>
 #include <Path.h>
+#include <PathFinder.h>
+#include <StringList.h>
 
 #include "AttributeClasses.h"
 #include "AttributeValue.h"
@@ -2748,13 +2750,6 @@ status_t
 DwarfFile::_GetDebugInfoPath(const char* debugFileName,
 	BString& _infoPath) const
 {
-	const directory_which dirLocations[] = {
-		B_USER_NONPACKAGED_DEVELOP_DIRECTORY,
-		B_USER_DEVELOP_DIRECTORY,
-		B_SYSTEM_NONPACKAGED_DEVELOP_DIRECTORY,
-		B_SYSTEM_DEVELOP_DIRECTORY
-	};
-
 	// first, see if we have a relative match to our local directory
 	BPath basePath;
 	status_t result = basePath.SetTo(fName);
@@ -2777,13 +2772,15 @@ DwarfFile::_GetDebugInfoPath(const char* debugFileName,
 
 	// See if our image is in any of the system locations.
 	// if so, look for its debug info in the corresponding location.
-	for (uint16 i = 0; i < sizeof(dirLocations) / sizeof(directory_which);
-		i++) {
-		result = find_directory(dirLocations[i], &basePath);
-		if (result != B_OK)
-			return result;
+	BPathFinder finder;
+	BStringList paths;
+	result = finder.FindPaths(B_FIND_PATH_DEVELOP_DIRECTORY, paths);
+	if (result != B_OK)
+		return result;
+	for (int32 i = 0; i < paths.CountStrings(); i++) {
+		BString tempPath = paths.StringAt(i);
 
-		if (strncmp(fName, basePath.Path(), strlen(basePath.Path())) == 0) {
+		if (tempPath.Compare(fName, tempPath.Length()) == 0) {
 			_infoPath.SetToFormat("%s/debug/%s", basePath.Path(),
 				debugFileName);
 			entry.SetTo(_infoPath.String());
