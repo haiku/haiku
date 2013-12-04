@@ -13,6 +13,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Architecture.cpp
 			Archivable.cpp
 			ArchivingManagers.cpp
+			Base64.cpp
 			Beep.cpp
 			BlockCache.cpp
 			BufferedDataIO.cpp
