@@ -62,7 +62,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) libicns ] ;
 
 		UseBuildFeatureHeaders libpng ;
-		Includes [ FGristFiles icns_png.cpp ]
+		Includes [ FGristFiles icns_png.c ]
 			: [ BuildFeatureAttribute libpng : headers ] ;
 		Translator [ MultiArchDefaultGristFiles ICNSTranslator ] :
 
