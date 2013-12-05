@@ -282,6 +282,9 @@ rule Cc
 			# warning flags
 			if $(WARNINGS) != 0 {
 				flags += $(HOST_WARNING_CCFLAGS) ;
+				if $(WARNINGS) = treatAsErrors {
+					flags += -Werror $(HOST_WERROR_FLAGS) ;
+				}
 			}
 
 			# debug and other flags
@@ -302,6 +305,10 @@ rule Cc
 			# warning flags
 			if $(WARNINGS) != 0 {
 				flags += $(TARGET_WARNING_CCFLAGS_$(TARGET_PACKAGING_ARCH)) ;
+				if $(WARNINGS) = treatAsErrors {
+					flags += -Werror
+						$(TARGET_WERROR_FLAGS_$(TARGET_PACKAGING_ARCH)) ;
+				}
 			}
 
 			# debug and other flags
@@ -353,6 +360,9 @@ rule C++
 			# warning flags
 			if $(WARNINGS) != 0 {
 				flags += $(HOST_WARNING_C++FLAGS) ;
+				if $(WARNINGS) = treatAsErrors {
+					flags += -Werror $(HOST_WERROR_FLAGS) ;
+				}
 			}
 
 			# debug and other flags
@@ -373,6 +383,10 @@ rule C++
 			# warning flags
 			if $(WARNINGS) != 0 {
 				flags += $(TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCH)) ;
+				if $(WARNINGS) = treatAsErrors {
+					flags += -Werror
+						$(TARGET_WERROR_FLAGS_$(TARGET_PACKAGING_ARCH)) ;
+				}
 			}
 
 			# debug and other flags

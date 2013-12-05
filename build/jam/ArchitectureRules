@@ -125,6 +125,16 @@ rule ArchitectureSetup architecture
 		-Wno-ctor-dtor-privacy -Woverloaded-virtual -Wpointer-arith -Wcast-align
 		-Wsign-compare -Wno-multichar ;
 
+	HAIKU_WERROR_FLAGS_$(architecture) = ;
+
+	if $(gccVersion[1]) >= 4 {
+		# -Wuninitialized gives too many false positives.
+		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=uninitialized ;
+
+		# TODO: remove the -Wno-unused-but-set-variable option
+		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-unused-but-set-variable ;
+	}
+
 	# debug flags
 	local debugFlags = -ggdb ;
 
@@ -459,32 +469,18 @@ rule ArchitectureSetupWarnings architecture
 				# we use #warning as placeholders for things to write...
 	}
 
-
 	# enable -Werror for certain parts of the source tree
-	HAIKU_WERRORFLAGS = ;
-	local gccVersion = $(HAIKU_GCC_VERSION_$(architecture)) ;
-	if $(gccVersion[1]) >= 4 {
-		# -Wuninitialized gives too many false positives.
-		HAIKU_WERRORFLAGS = -Wno-error=uninitialized ;
-
-		# TODO: remove the -Wno-unused-but-set-variable option
-		HAIKU_WERRORFLAGS += -Wno-unused-but-set-variable ;
-	}
-
 	HAIKU_WERROR_ARCH = $(architecture) ;
 
 	rule EnableWerror dirTokens : scope {
-		AppendToConfigVar TARGET_WARNING_CCFLAGS_$(HAIKU_WERROR_ARCH)
-			: HAIKU_TOP $(dirTokens)
-			: -Werror $(HAIKU_WERRORFLAGS) : $(scope) ;
-		AppendToConfigVar TARGET_WARNING_C++FLAGS_$(HAIKU_WERROR_ARCH)
-			: HAIKU_TOP $(dirTokens)
-			: -Werror $(HAIKU_WERRORFLAGS) : $(scope) ;
+		SetConfigVar WARNINGS : HAIKU_TOP $(dirTokens) : treatAsErrors
+			: $(scope) ;
 	}
 
 	# Work-around for GCC 2 problem -- despite -Wno-multichar it reports
 	# multichar warnings in headers/private/kernel/debugger_keymaps.h included
 	# by src/system/kernel/arch/x86/arch_debug_console.cpp.
+	local gccVersion = $(HAIKU_GCC_VERSION_$(architecture)) ;
 	if $(gccVersion[1]) = 2 {
 		local file = <src!system!kernel!arch!x86>arch_debug_console.o ;
 		TARGET_WARNING_C++FLAGS_$(architecture) on $(file)
