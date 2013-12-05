@@ -11,26 +11,40 @@
 
 
 struct scheduler_mode_operations {
-	const char*		name;
+	const char*				name;
 
-	bool			avoid_boost;
+	bool					avoid_boost;
 
-	bigtime_t		base_quantum;
-	bigtime_t		minimal_quantum;
-	bigtime_t		quantum_multipliers[2];
+	bigtime_t				base_quantum;
+	bigtime_t				minimal_quantum;
+	bigtime_t				quantum_multipliers[2];
 
-	bigtime_t		maximum_latency;
+	bigtime_t				maximum_latency;
 
-	void			(*switch_to_mode)(void);
-	void			(*set_cpu_enabled)(int32 cpu, bool enabled);
-	bool			(*has_cache_expired)(Thread* thread);
-	int32			(*choose_core)(Thread* thread);
-	bool			(*should_rebalance)(Thread* thread);
-	void			(*rebalance_irqs)(bool idle);
+	void					(*switch_to_mode)(void);
+	void					(*set_cpu_enabled)(int32 cpu, bool enabled);
+	bool					(*has_cache_expired)(
+								const Scheduler::ThreadData* threadData);
+	Scheduler::CoreEntry*	(*choose_core)(
+								const Scheduler::ThreadData* threadData);
+	bool					(*should_rebalance)(
+								const Scheduler::ThreadData* threadData);
+	void					(*rebalance_irqs)(bool idle);
 };
 
 extern struct scheduler_mode_operations gSchedulerLowLatencyMode;
 extern struct scheduler_mode_operations gSchedulerPowerSavingMode;
+
+
+namespace Scheduler {
+
+
+extern scheduler_mode gCurrentModeID;
+extern scheduler_mode_operations* gCurrentMode;
+
+
+}
+
 
 #endif	// KERNEL_SCHEDULER_MODES_H
 

@@ -17,7 +17,6 @@
 #include <heap.h>
 #include <ksignal.h>
 #include <lock.h>
-#include <RunQueueLink.h>
 #include <smp.h>
 #include <thread_defs.h>
 #include <timer.h>
@@ -58,11 +57,14 @@ struct cpu_ent;
 struct image;					// defined in image.c
 struct io_context;
 struct realtime_sem_context;	// defined in realtime_sem.cpp
-struct scheduler_thread_data;
 struct select_info;
 struct user_thread;				// defined in libroot/user_thread.h
 struct VMAddressSpace;
 struct xsi_sem_context;			// defined in xsi_semaphore.cpp
+
+namespace Scheduler {
+	struct ThreadData;
+}
 
 namespace BKernel {
 	struct Team;
@@ -412,8 +414,7 @@ private:
 };
 
 
-struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
-	RunQueueLinkImpl<Thread> {
+struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 	int32			flags;			// summary of events relevant in interrupt
 									// handlers (signals pending, user debugging
 									// enabled, etc.)
@@ -444,7 +445,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable,
 	bool			in_kernel;		// protected by time_lock, only written by
 									// this thread
 	bool			has_yielded;	// protected by scheduler lock
-	struct scheduler_thread_data* scheduler_data; // protected by scheduler lock
+	Scheduler::ThreadData*	scheduler_data; // protected by scheduler lock
 
 	struct user_thread*	user_thread;	// write-protected by fLock, only
 										// modified by the thread itself and

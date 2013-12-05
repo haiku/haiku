@@ -10,6 +10,8 @@
 
 #include <SupportDefs.h>
 
+#include <debug.h>
+
 
 #ifdef __cplusplus
 

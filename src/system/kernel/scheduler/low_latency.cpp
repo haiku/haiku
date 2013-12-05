@@ -7,7 +7,9 @@
 #include <util/AutoLock.h>
 
 #include "scheduler_common.h"
+#include "scheduler_cpu.h"
 #include "scheduler_modes.h"
+#include "scheduler_thread.h"
 
 
 using namespace Scheduler;
@@ -29,16 +31,12 @@ set_cpu_enabled(int32 /* cpu */, bool /* enabled */)
 
 
 static bool
-has_cache_expired(Thread* thread)
+has_cache_expired(const ThreadData* threadData)
 {
 	ASSERT(!gSingleCore);
 
-	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
-	ASSERT(schedulerThreadData->previous_core >= 0);
-
-	CoreEntry* coreEntry = &gCoreEntries[schedulerThreadData->previous_core];
-	return atomic_get64(&coreEntry->fActiveTime)
-			- schedulerThreadData->went_sleep_active > kCacheExpire;
+	return atomic_get64(&threadData->GetCore()->fActiveTime)
+			- threadData->fWentSleepActive > kCacheExpire;
 }
 
 
@@ -58,51 +56,45 @@ get_most_idle_package(void)
 }
 
 
-static int32
-choose_core(Thread* thread)
+static CoreEntry*
+choose_core(const ThreadData* /* threadData */)
 {
-	CoreEntry* entry = NULL;
-
 	ReadSpinLocker locker(gIdlePackageLock);
 	// wake new package
-	PackageEntry* package = gIdlePackageList->Last();
+	PackageEntry* package = gIdlePackageList.Last();
 	if (package == NULL) {
 		// wake new core
 		package = get_most_idle_package();
 	}
 	locker.Unlock();
 
+	CoreEntry* core = NULL;
 	if (package != NULL) {
 		ReadSpinLocker _(package->fCoreLock);
-		entry = package->fIdleCores.Last();
+		core = package->fIdleCores.Last();
 	}
 
-	if (entry == NULL) {
+	if (core == NULL) {
 		ReadSpinLocker coreLocker(gCoreHeapsLock);
 		// no idle cores, use least occupied core
-		entry = gCoreLoadHeap->PeekMinimum();
-		if (entry == NULL)
-			entry = gCoreHighLoadHeap->PeekMinimum();
+		core = gCoreLoadHeap.PeekMinimum();
+		if (core == NULL)
+			core = gCoreHighLoadHeap.PeekMinimum();
 	}
 
-	ASSERT(entry != NULL);
-	return entry->fCoreID;
+	ASSERT(core != NULL);
+	return core;
 }
 
 
 static bool
-should_rebalance(Thread* thread)
+should_rebalance(const ThreadData* threadData)
 {
-	scheduler_thread_data* schedulerThreadData = thread->scheduler_data;
-	ASSERT(schedulerThreadData->previous_core >= 0);
-
-	CoreEntry* coreEntry = &gCoreEntries[schedulerThreadData->previous_core];
-
-	int32 coreLoad = get_core_load(coreEntry);
+	int32 coreLoad = threadData->GetCore()->GetLoad();
 
 	// If the thread produces more than 50% of the load, leave it here. In
 	// such situation it is better to move other threads away.
-	if (schedulerThreadData->load >= coreLoad / 2)
+	if (threadData->GetLoad() >= coreLoad / 2)
 		return false;
 
 	// If there is high load on this core but this thread does not contribute
@@ -110,22 +102,20 @@ should_rebalance(Thread* thread)
 	if (coreLoad > kHighLoad) {
 		ReadSpinLocker coreLocker(gCoreHeapsLock);
 
-		CoreEntry* other = gCoreLoadHeap->PeekMinimum();
-		if (other != NULL && coreLoad - get_core_load(other)
-				>= kLoadDifference) {
+		CoreEntry* other = gCoreLoadHeap.PeekMinimum();
+		if (other != NULL && coreLoad - other->GetLoad() >= kLoadDifference)
 			return true;
-		}
 	}
 
 	// No cpu bound threads - the situation is quite good. Make sure it
 	// won't get much worse...
 	ReadSpinLocker coreLocker(gCoreHeapsLock);
 
-	CoreEntry* other = gCoreLoadHeap->PeekMinimum();
+	CoreEntry* other = gCoreLoadHeap.PeekMinimum();
 	if (other == NULL)
-		other = gCoreHighLoadHeap->PeekMinimum();
+		other = gCoreHighLoadHeap.PeekMinimum();
 	ASSERT(other != NULL);
-	return coreLoad - get_core_load(other) >= kLoadDifference * 2;
+	return coreLoad - other->GetLoad() >= kLoadDifference * 2;
 }
 
 
@@ -155,26 +145,22 @@ rebalance_irqs(bool idle)
 		return;
 
 	ReadSpinLocker coreLocker(gCoreHeapsLock);
-	CoreEntry* other = gCoreLoadHeap->PeekMinimum();
+	CoreEntry* other = gCoreLoadHeap.PeekMinimum();
 	if (other == NULL)
-		other = gCoreHighLoadHeap->PeekMinimum();
+		other = gCoreHighLoadHeap.PeekMinimum();
 	coreLocker.Unlock();
 
 	SpinLocker cpuLocker(other->fCPULock);
-	int32 newCPU = gCPUPriorityHeaps[other->fCoreID].PeekMinimum()->fCPUNumber;
+	int32 newCPU = other->fCPUHeap.PeekMinimum()->fCPUNumber;
 	cpuLocker.Unlock();
-
 
 	ASSERT(other != NULL);
 
-	int32 thisCore = gCPUToCore[smp_get_current_cpu()];
-	if (other->fCoreID == thisCore)
+	CoreEntry* core = CoreEntry::GetCore(cpu->cpu_num);
+	if (other == core)
 		return;
-
-	if (get_core_load(other) + kLoadDifference
-			>= get_core_load(&gCoreEntries[thisCore])) {
+	if (other->GetLoad() + kLoadDifference >= core->GetLoad())
 		return;
-	}
 
 	assign_io_interrupt_to_cpu(chosen->irq, newCPU);
 }
