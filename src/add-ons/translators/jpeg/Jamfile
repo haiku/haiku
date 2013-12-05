@@ -8,17 +8,13 @@ SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) raw ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 	#for BaseTranslator.h and friends
 
-UseBuildFeatureHeaders jpeg ;
-
 AddResources JPEGTranslator : JPEGTranslator.rdef ;
-
-Includes [ FGristFiles be_jdatadst.cpp be_jdatasrc.cpp be_jerror.cpp
-		JPEGTranslator.cpp ]
-	: [ BuildFeatureAttribute jpeg : headers ] ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		UseBuildFeatureHeaders jpeg ;
+
 		Translator [ MultiArchDefaultGristFiles JPEGTranslator ] :
 			be_jdatadst.cpp
 			be_jdatasrc.cpp
@@ -30,7 +26,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ BuildFeatureAttribute jpeg : library ]
 			$(TARGET_LIBSTDC++) localestub
 			: true
-		;
+			;
+
+		Includes [ FGristFiles be_jdatadst.cpp be_jdatasrc.cpp be_jerror.cpp
+				JPEGTranslator.cpp ]
+			: [ BuildFeatureAttribute jpeg : headers ] ;
 	}
 }
 
