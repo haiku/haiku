@@ -3410,6 +3410,147 @@ dump_available_memory(int argc, char** argv)
 }
 
 
+static int
+dump_mapping_info(int argc, char** argv)
+{
+	bool reverseLookup = false;
+	bool pageLookup = false;
+
+	int argi = 1;
+	for (; argi < argc && argv[argi][0] == '-'; argi++) {
+		const char* arg = argv[argi];
+		if (strcmp(arg, "-r") == 0) {
+			reverseLookup = true;
+		} else if (strcmp(arg, "-p") == 0) {
+			reverseLookup = true;
+			pageLookup = true;
+		} else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	// We need at least one argument, the address. Optionally a team ID can be
+	// specified.
+	if (argi >= argc || argi + 1 < argc) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	uint64 addressValue;
+	if (!evaluate_debug_expression(argv[argi++], &addressValue, false))
+		return 0;
+
+	uint64 teamID = B_CURRENT_TEAM;
+	bool teamSpecified = argi < argc;
+	if (teamSpecified) {
+		if (!evaluate_debug_expression(argv[argi++], &teamID, false))
+			return 0;
+	}
+
+	if (reverseLookup) {
+		phys_addr_t physicalAddress;
+		if (pageLookup) {
+			vm_page* page = (vm_page*)(addr_t)addressValue;
+			physicalAddress = page->physical_page_number * B_PAGE_SIZE;
+		} else {
+			physicalAddress = (phys_addr_t)addressValue;
+			physicalAddress -= physicalAddress % B_PAGE_SIZE;
+		}
+
+		kprintf("    Team     Virtual Address      Area\n");
+		kprintf("--------------------------------------\n");
+
+		struct Callback : VMTranslationMap::ReverseMappingInfoCallback {
+			Callback()
+				:
+				fAddressSpace(NULL)
+			{
+			}
+
+			void SetAddressSpace(VMAddressSpace* addressSpace)
+			{
+				fAddressSpace = addressSpace;
+			}
+
+			virtual bool HandleVirtualAddress(addr_t virtualAddress)
+			{
+				kprintf("%8" B_PRId32 "  %#18" B_PRIxADDR, fAddressSpace->ID(),
+					virtualAddress);
+				if (VMArea* area = fAddressSpace->LookupArea(virtualAddress))
+					kprintf("  %8" B_PRId32 " %s\n", area->id, area->name);
+				else
+					kprintf("\n");
+				return false;
+			}
+
+		private:
+			VMAddressSpace*	fAddressSpace;
+		} callback;
+
+		if (teamSpecified) {
+			// team specified -- get its address space
+			VMAddressSpace* addressSpace;
+			if (teamID == B_CURRENT_TEAM) {
+				Thread* thread = debug_get_debugged_thread();
+				if (thread == NULL || thread->team == NULL) {
+					kprintf("Failed to get team!\n");
+					return 0;
+				}
+
+				addressSpace = thread->team->address_space;
+			} else
+				addressSpace = VMAddressSpace::DebugGet(teamID);
+
+			if (addressSpace == NULL) {
+				kprintf("Failed to get address space!\n");
+				return 0;
+			}
+
+			callback.SetAddressSpace(addressSpace);
+			addressSpace->TranslationMap()->DebugGetReverseMappingInfo(
+				physicalAddress, callback);
+		} else {
+			// no team specified -- iterate through all address spaces
+			for (VMAddressSpace* addressSpace = VMAddressSpace::DebugFirst();
+				addressSpace != NULL;
+				addressSpace = VMAddressSpace::DebugNext(addressSpace)) {
+				callback.SetAddressSpace(addressSpace);
+				addressSpace->TranslationMap()->DebugGetReverseMappingInfo(
+					physicalAddress, callback);
+			}
+		}
+	} else {
+		// get the address space
+		addr_t virtualAddress = (addr_t)addressValue;
+		virtualAddress -= virtualAddress % B_PAGE_SIZE;
+		VMAddressSpace* addressSpace;
+		if (IS_KERNEL_ADDRESS(virtualAddress)) {
+			addressSpace = VMAddressSpace::Kernel();
+		} else if (!teamSpecified || teamID == B_CURRENT_TEAM) {
+			Thread* thread = debug_get_debugged_thread();
+			if (thread == NULL || thread->team == NULL) {
+				kprintf("Failed to get team!\n");
+				return 0;
+			}
+
+			addressSpace = thread->team->address_space;
+		} else
+			addressSpace = VMAddressSpace::DebugGet(teamID);
+
+		if (addressSpace == NULL) {
+			kprintf("Failed to get address space!\n");
+			return 0;
+		}
+
+		// let the translation map implementation do the job
+		addressSpace->TranslationMap()->DebugPrintMappingInfo(virtualAddress);
+	}
+
+	return 0;
+}
+
+
 /*!	Deletes all areas and reserved regions in the given address space.
 
 	The caller must ensure that none of the areas has any wired ranges.
@@ -3934,6 +4075,20 @@ vm_init(kernel_args* args)
 	add_debugger_command("ds", &display_mem, "dump memory shorts (16-bit)");
 	add_debugger_command("db", &display_mem, "dump memory bytes (8-bit)");
 	add_debugger_command("string", &display_mem, "dump strings");
+
+	add_debugger_command_etc("mapping", &dump_mapping_info,
+		"Print address mapping information",
+		"[ \"-r\" | \"-p\" ] <address> [ <team ID> ]\n"
+		"Prints low-level page mapping information for a given address. If\n"
+		"neither \"-r\" nor \"-p\" are specified, <address> is a virtual\n"
+		"address that is looked up in the translation map of the current\n"
+		"team, respectively the team specified by ID <team ID>. If \"-r\" is\n"
+		"specified, <address> is a physical address that is searched in the\n"
+		"translation map of all teams, respectively the team specified by ID\n"
+		" <team ID>. If \"-p\" is specified, <address> is the address of a\n"
+		"vm_page structure. The behavior is equivalent to specifying \"-r\"\n"
+		"with the physical address of that page.\n",
+		0);
 
 	TRACE(("vm_init: exit\n"));
 

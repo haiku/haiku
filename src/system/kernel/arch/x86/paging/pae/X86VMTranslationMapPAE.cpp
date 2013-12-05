@@ -1091,6 +1091,137 @@ X86VMTranslationMapPAE::ClearAccessedAndModified(VMArea* area, addr_t address,
 }
 
 
+void
+X86VMTranslationMapPAE::DebugPrintMappingInfo(addr_t virtualAddress)
+{
+	// get the page directory
+	pae_page_directory_entry* const* pdpt
+		= fPagingStructures->VirtualPageDirs();
+	pae_page_directory_entry* pageDirectory = pdpt[virtualAddress >> 30];
+	kprintf("page directory: %p (PDPT[%zu])\n", pageDirectory,
+		virtualAddress >> 30);
+
+	// get the page directory entry
+	pae_page_directory_entry* pageDirEntry
+		= X86PagingMethodPAE::PageDirEntryForAddress(pdpt, virtualAddress);
+	kprintf("page directory entry %zu (%p): %#" B_PRIx64 "\n",
+		pageDirEntry - pageDirectory, pageDirEntry, *pageDirEntry);
+
+	kprintf("  access: ");
+	if ((*pageDirEntry & X86_PAE_PDE_PRESENT) != 0)
+		kprintf(" present");
+	if ((*pageDirEntry & X86_PAE_PDE_WRITABLE) != 0)
+		kprintf(" writable");
+	if ((*pageDirEntry & X86_PAE_PDE_USER) != 0)
+		kprintf(" user");
+	if ((*pageDirEntry & X86_PAE_PDE_NOT_EXECUTABLE) == 0)
+		kprintf(" executable");
+	if ((*pageDirEntry & X86_PAE_PDE_LARGE_PAGE) != 0)
+		kprintf(" large");
+
+	kprintf("\n  caching:");
+	if ((*pageDirEntry & X86_PAE_PDE_WRITE_THROUGH) != 0)
+		kprintf(" write-through");
+	if ((*pageDirEntry & X86_PAE_PDE_CACHING_DISABLED) != 0)
+		kprintf(" uncached");
+
+	kprintf("\n  flags:  ");
+	if ((*pageDirEntry & X86_PAE_PDE_ACCESSED) != 0)
+		kprintf(" accessed");
+	kprintf("\n");
+
+	if ((*pageDirEntry & X86_PAE_PDE_PRESENT) == 0)
+		return;
+
+	// get the page table entry
+	pae_page_table_entry* pageTable
+		= (pae_page_table_entry*)X86PagingMethodPAE::Method()
+			->PhysicalPageMapper()->InterruptGetPageTableAt(
+				*pageDirEntry & X86_PAE_PDE_ADDRESS_MASK);
+	kprintf("page table: %#" B_PRIx64 "\n",
+		*pageDirEntry & X86_PAE_PDE_ADDRESS_MASK);
+	size_t pteIndex = virtualAddress / B_PAGE_SIZE % kPAEPageTableEntryCount;
+	pae_page_table_entry entry = pageTable[pteIndex];
+	kprintf("page table entry %zu (phys: %#" B_PRIx64 "): %#" B_PRIx64 "\n",
+		pteIndex,
+		(*pageDirEntry & X86_PAE_PDE_ADDRESS_MASK)
+			+ pteIndex * sizeof(pae_page_table_entry),
+		entry);
+
+	kprintf("  access: ");
+	if ((entry & X86_PAE_PTE_PRESENT) != 0)
+		kprintf(" present");
+	if ((entry & X86_PAE_PTE_WRITABLE) != 0)
+		kprintf(" writable");
+	if ((entry & X86_PAE_PTE_USER) != 0)
+		kprintf(" user");
+	if ((entry & X86_PAE_PTE_NOT_EXECUTABLE) == 0)
+		kprintf(" executable");
+	if ((entry & X86_PAE_PTE_GLOBAL) == 0)
+		kprintf(" global");
+
+	kprintf("\n  caching:");
+	if ((entry & X86_PAE_PTE_WRITE_THROUGH) != 0)
+		kprintf(" write-through");
+	if ((entry & X86_PAE_PTE_CACHING_DISABLED) != 0)
+		kprintf(" uncached");
+	if ((entry & X86_PAE_PTE_PAT) != 0)
+		kprintf(" PAT");
+
+	kprintf("\n  flags:  ");
+	if ((entry & X86_PAE_PTE_ACCESSED) != 0)
+		kprintf(" accessed");
+	if ((entry & X86_PAE_PTE_DIRTY) != 0)
+		kprintf(" dirty");
+	kprintf("\n");
+
+	if ((entry & X86_PAE_PTE_PRESENT) != 0) {
+		kprintf("  address: %#" B_PRIx64 "\n",
+			entry & X86_PAE_PTE_ADDRESS_MASK);
+	}
+}
+
+
+bool
+X86VMTranslationMapPAE::DebugGetReverseMappingInfo(phys_addr_t physicalAddress,
+	ReverseMappingInfoCallback& callback)
+{
+	pae_page_directory_entry* const* pdpt
+		= fPagingStructures->VirtualPageDirs();
+	for (uint32 pageDirIndex = fIsKernelMap ? 2 : 0;
+		pageDirIndex < (fIsKernelMap ? 4 : 2); pageDirIndex++) {
+		// iterate through the page directory
+		pae_page_directory_entry* pageDirectory = pdpt[pageDirIndex];
+		for (uint32 pdeIndex = 0; pdeIndex < kPAEPageDirEntryCount;
+			pdeIndex++) {
+			pae_page_directory_entry& pageDirEntry = pageDirectory[pdeIndex];
+			if ((pageDirEntry & X86_PAE_PDE_ADDRESS_MASK) == 0)
+				continue;
+
+			// get and iterate through the page table
+			pae_page_table_entry* pageTable
+				= (pae_page_table_entry*)X86PagingMethodPAE::Method()
+					->PhysicalPageMapper()->InterruptGetPageTableAt(
+						pageDirEntry & X86_PAE_PDE_ADDRESS_MASK);
+			for (uint32 pteIndex = 0; pteIndex < kPAEPageTableEntryCount;
+				pteIndex++) {
+				pae_page_table_entry entry = pageTable[pteIndex];
+				if ((entry & X86_PAE_PTE_PRESENT) != 0
+					&& (entry & X86_PAE_PTE_ADDRESS_MASK) == physicalAddress) {
+					addr_t virtualAddress = pageDirIndex * kPAEPageDirRange
+						+ pdeIndex * kPAEPageTableRange
+						+ pteIndex * B_PAGE_SIZE;
+					if (callback.HandleVirtualAddress(virtualAddress))
+						return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+
 X86PagingStructures*
 X86VMTranslationMapPAE::PagingStructures() const
 {

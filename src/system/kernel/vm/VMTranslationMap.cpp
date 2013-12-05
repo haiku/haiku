@@ -116,6 +116,39 @@ VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 }
 
 
+/*!	Print mapping information for a virtual address.
+	The method navigates the paging structures and prints all relevant
+	information on the way.
+	The method is invoked from a KDL command. The default implementation is a
+	no-op.
+	\param virtualAddress The virtual address to look up.
+*/
+void
+VMTranslationMap::DebugPrintMappingInfo(addr_t virtualAddress)
+{
+}
+
+
+/*!	Find virtual addresses mapped to the given physical address.
+	For each virtual address the method finds, it invokes the callback object's
+	HandleVirtualAddress() method. When that method returns \c true, the search
+	is terminated and \c true is returned.
+	The method is invoked from a KDL command. The default implementation is a
+	no-op.
+	\param physicalAddress The physical address to search for.
+	\param callback Callback object to be notified of each found virtual
+		address.
+	\return \c true, if for a found virtual address the callback's
+		HandleVirtualAddress() returned \c true, \c false otherwise.
+*/
+bool
+VMTranslationMap::DebugGetReverseMappingInfo(phys_addr_t physicalAddress,
+	ReverseMappingInfoCallback& callback)
+{
+	return false;
+}
+
+
 /*!	Called by UnmapPage() after performing the architecture specific part.
 	Looks up the page, updates its flags, removes the page-area mapping, and
 	requeues the page, if necessary.
@@ -224,6 +257,14 @@ VMTranslationMap::UnaccessedPageUnmapped(VMArea* area, page_num_t pageNumber)
 			// Since this is called by the page daemon, we never want to lock
 			// the kernel address space.
 	}
+}
+
+
+// #pragma mark - ReverseMappingInfoCallback
+
+
+VMTranslationMap::ReverseMappingInfoCallback::~ReverseMappingInfoCallback()
+{
 }
 
 

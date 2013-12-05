@@ -20,6 +20,9 @@ struct vm_page_reservation;
 
 
 struct VMTranslationMap {
+			struct ReverseMappingInfoCallback;
+
+public:
 								VMTranslationMap();
 	virtual						~VMTranslationMap();
 
@@ -72,6 +75,12 @@ struct VMTranslationMap {
 
 	virtual	void				Flush() = 0;
 
+	// backends for KDL commands
+	virtual	void				DebugPrintMappingInfo(addr_t virtualAddress);
+	virtual	bool				DebugGetReverseMappingInfo(
+									phys_addr_t physicalAddress,
+									ReverseMappingInfoCallback& callback);
+
 protected:
 			void				PageUnmapped(VMArea* area,
 									page_num_t pageNumber, bool accessed,
@@ -82,6 +91,13 @@ protected:
 protected:
 			recursive_lock		fLock;
 			int32				fMapCount;
+};
+
+
+struct VMTranslationMap::ReverseMappingInfoCallback {
+	virtual						~ReverseMappingInfoCallback();
+
+	virtual	bool				HandleVirtualAddress(addr_t virtualAddress) = 0;
 };
 
 

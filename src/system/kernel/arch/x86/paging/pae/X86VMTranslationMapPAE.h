@@ -59,6 +59,11 @@ struct X86VMTranslationMapPAE : X86VMTranslationMap {
 									bool unmapIfUnaccessed,
 									bool& _modified);
 
+	virtual	void				DebugPrintMappingInfo(addr_t virtualAddress);
+	virtual	bool				DebugGetReverseMappingInfo(
+									phys_addr_t physicalAddress,
+									ReverseMappingInfoCallback& callback);
+
 	virtual	X86PagingStructures* PagingStructures() const;
 	inline	X86PagingStructuresPAE* PagingStructuresPAE() const
 									{ return fPagingStructures; }
