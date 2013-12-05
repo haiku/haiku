@@ -741,7 +741,7 @@ void GlutWindow::MouseCheck()
  *	DESCRIPTION:  handles entry, motion, and passive events
  ***********************************************************/
 void GlutWindow::MouseMoved(BPoint point,
-						ulong transit, const BMessage *msg)
+						uint32 transit, const BMessage *msg)
 {
 	BGLView::MouseMoved(point,transit,msg);
 
@@ -880,7 +880,7 @@ void GlutWindow::ErrorCallback(unsigned long errorCode) {
  *			wait for response, then clean up afterwards and
  *			send appropriate messages
  ***********************************************************/
-long GlutWindow::MenuThread(void *m) {
+status_t GlutWindow::MenuThread(void *m) {
 	GlutPopUp *bmenu = static_cast<GlutPopUp*>(m);
 	GlutWindow *win = bmenu->win;	// my window
 	GlutBMenuItem *result = (GlutBMenuItem*)bmenu->Go(bmenu->point);
@@ -901,5 +901,5 @@ long GlutWindow::MenuThread(void *m) {
 	win->Window()->Unlock();
 	gBlock.NewEvent();
 	delete bmenu;
-	return 0;
+	return B_OK;
 }

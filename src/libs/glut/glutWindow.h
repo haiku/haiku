@@ -33,7 +33,7 @@ public:
 	void MouseCheck();	// check for button state changes
 	void ErrorCallback(unsigned long errorCode);
 
-	static long MenuThread(void *menu);
+	static status_t MenuThread(void *menu);
 
 	int num;			// window number returned to user
 	int cursor;			// my cursor

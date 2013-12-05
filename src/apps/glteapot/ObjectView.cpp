@@ -74,7 +74,7 @@ light lights[] = {
 long
 signalEvent(sem_id event)
 {
-	long c;
+	int32 c;
 	get_sem_count(event,&c);
 	if (c < 0)
 		release_sem_etc(event,-c,0);
@@ -86,7 +86,7 @@ signalEvent(sem_id event)
 long
 setEvent(sem_id event)
 {
-	long c;
+	int32 c;
 	get_sem_count(event,&c);
 	if (c < 0)
 	  release_sem_etc(event,-c,0);
@@ -100,7 +100,7 @@ waitEvent(sem_id event)
 {
 	acquire_sem(event);
 
-	long c;
+	int32 c;
 	get_sem_count(event,&c);
 	if (c > 0)
 		acquire_sem_etc(event,c,0,0);
@@ -265,7 +265,7 @@ ObjectView::DetachedFromWindow()
 {
 	BGLView::DetachedFromWindow();
 
-	long dummy;
+	status_t dummy;
 	long locks = 0;
 
 	while (Window()->IsLocked()) {
