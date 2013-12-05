@@ -483,8 +483,7 @@ rule ArchitectureSetupWarnings architecture
 	local gccVersion = $(HAIKU_GCC_VERSION_$(architecture)) ;
 	if $(gccVersion[1]) = 2 {
 		local file = <src!system!kernel!arch!x86>arch_debug_console.o ;
-		TARGET_WARNING_C++FLAGS_$(architecture) on $(file)
-			= [ on $(file) return $(TARGET_WARNING_C++FLAGS_$(architecture)) ] ;
+		WARNINGS on $(file) = $(WARNINGS) ;
 	}
 
 	EnableWerror src add-ons accelerants 3dfx ;
