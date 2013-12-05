@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku. All rights reserved.
+ * Copyright 2003-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,7 @@
  *		Jonas Sundström
  *		Axel Dörfler, axeld@pinc-software.de.
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Puck Meerburg, puck@puckipedia.nl
  */
 
 
@@ -90,19 +91,29 @@ public:
 		if (!Lock())
 			return;
 
-		MixerControl control;
-		control.Connect(fWhich);
+		if (fMuteMessage.Length() != 0)
+			fView->SetText(fMuteMessage.String());
+		else {
+			MixerControl control;
+			control.Connect(fWhich);
 
-		BString text;
-		text.SetToFormat(B_TRANSLATE("%g dB"), control.Volume());
-		fView->SetText(text.String());
+			BString text;
+			text.SetToFormat(B_TRANSLATE("%g dB"), control.Volume());
+			fView->SetText(text.String());
+		}
 
 		Unlock();
+	}
+
+	void SetMuteMessage(const char* message)
+	{
+		fMuteMessage = message == NULL ? "" : message;
 	}
 
 private:
 	BStringView*	fView;
 	int32			fWhich;
+	BString			fMuteMessage;
 };
 
 
@@ -110,7 +121,8 @@ class MediaReplicant : public BView {
 public:
 							MediaReplicant(BRect frame, const char* name,
 								uint32 resizeMask = B_FOLLOW_ALL,
-								uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+								uint32 flags = B_WILL_DRAW | B_NAVIGABLE
+									| B_PULSE_NEEDED);
 							MediaReplicant(BMessage* archive);
 
 	virtual					~MediaReplicant();
@@ -124,6 +136,7 @@ public:
 	virtual void			MouseDown(BPoint point);
 	virtual void			Draw(BRect updateRect);
 	virtual void			MessageReceived(BMessage* message);
+	virtual void			Pulse();
 
 private:
 			status_t		_LaunchByPath(const char* path);
@@ -136,11 +149,13 @@ private:
 			void			_Init();
 
 			BBitmap*		fIcon;
+			BBitmap*		fMutedIcon;
 			VolumeWindow*	fVolumeSlider;
 			bool 			fDontBeep;
 				// don't beep on volume change
 			int32 			fVolumeWhich;
 				// which volume parameter to act on (Mixer/Phys.Output)
+			bool				fMuted;
 };
 
 
@@ -148,7 +163,8 @@ MediaReplicant::MediaReplicant(BRect frame, const char* name,
 		uint32 resizeMask, uint32 flags)
 	:
 	BView(frame, name, resizeMask, flags),
-	fVolumeSlider(NULL)
+	fVolumeSlider(NULL),
+	fMuted(false)
 {
 	_Init();
 }
@@ -157,7 +173,8 @@ MediaReplicant::MediaReplicant(BRect frame, const char* name,
 MediaReplicant::MediaReplicant(BMessage* message)
 	:
 	BView(message),
-	fVolumeSlider(NULL)
+	fVolumeSlider(NULL),
+	fMuted(false)
 {
 	_Init();
 }
@@ -206,7 +223,7 @@ void
 MediaReplicant::Draw(BRect rect)
 {
 	SetDrawingMode(B_OP_OVER);
-	DrawBitmap(fIcon);
+	DrawBitmap(fMuted ? fMutedIcon : fIcon);
 }
 
 
@@ -255,11 +272,47 @@ MediaReplicant::MouseDown(BPoint point)
 
 		menu->Go(where, true, true, BRect(where - BPoint(4, 4),
 			where + BPoint(4, 4)));
+
+	} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
+		MixerControl mixerControl;
+		if (mixerControl.Connect(fVolumeWhich)) {
+			mixerControl.SetMute(!fMuted);
+			fMuted = mixerControl.Mute();
+			VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip());
+			if (tip != NULL) {
+				tip->SetMuteMessage(fMuted ? B_TRANSLATE("Muted"): NULL);
+				ShowToolTip(tip);
+			}
+			Invalidate();
+		}
+
 	} else {
 		// Show VolumeWindow
 		fVolumeSlider = new VolumeWindow(BRect(where.x, where.y,
 			where.x + 207, where.y + 19), fDontBeep, fVolumeWhich);
 		fVolumeSlider->Show();
+	}
+}
+
+
+void
+MediaReplicant::Pulse()
+{
+	bool setMuted = false;
+	MixerControl mixerControl;
+	const char* errorString = NULL;
+	if (!mixerControl.Connect(fVolumeWhich, NULL, &errorString)) {
+		fMuted = true;
+		errorString = NULL;
+	} else
+		setMuted = mixerControl.Mute();
+
+	if (setMuted != fMuted) {
+		fMuted = setMuted;
+		VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip());
+		if (tip != NULL)
+			tip->SetMuteMessage(errorString);
+		Invalidate();
 	}
 }
 
@@ -451,6 +504,11 @@ MediaReplicant::_Init()
 	fIcon = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1),
 		B_RGBA32);
 	BIconUtils::GetVectorIcon(kSpeakerIcon, sizeof(kSpeakerIcon), fIcon);
+
+	fMutedIcon = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1),
+		B_RGBA32);
+	BIconUtils::GetVectorIcon(kMutedSpeakerIcon, sizeof(kMutedSpeakerIcon),
+		fMutedIcon);
 
 	_LoadSettings();
 

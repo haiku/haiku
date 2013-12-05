@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2009, Haiku, Inc.
+ * Copyright 2003-2013, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Jérôme Duval
  *		François Revol
  *		Axel Dörfler, axeld@pinc-software.de.
+ *		Puck Meerburg, puck@puckipedia.nl
  */
 
 
@@ -23,6 +24,7 @@ MixerControl::MixerControl(int32 volumeWhich)
 	fGainMediaNode(media_node::null),
 	fParameterWeb(NULL),
 	fMixerParameter(NULL),
+	fMuteParameter(NULL),
 	fMin(0.0f),
 	fMax(0.0f),
 	fStep(0.0f)
@@ -85,6 +87,11 @@ retry:
 				bool foundMixerLabel = false;
 				for (int i = 0; i < numParams; i++) {
 					p = fParameterWeb->ParameterAt(i);
+
+					// assume the mute preceeding master gain control
+					if (!strcmp(p->Kind(), B_MUTE))
+						fMuteParameter = p;
+
 					PRINT(("BParameter[%i]: %s\n", i, p->Name()));
 					if (volumeWhich == VOLUME_USE_MIXER) {
 						if (!strcmp(p->Kind(), B_MASTER_GAIN))
@@ -193,6 +200,31 @@ int32
 MixerControl::VolumeWhich() const
 {
 	return fVolumeWhich;
+}
+
+
+void
+MixerControl::SetMute(bool muted)
+{
+	if (fMuteParameter == NULL)
+		return;
+
+	int32 mute = muted ? 1 : 0;
+	fMuteParameter->SetValue(&mute, sizeof(int32), system_time());
+}
+
+
+bool
+MixerControl::Mute()
+{
+	if (fMuteParameter == NULL)
+		return false;
+
+	int32 mute = 0;
+	bigtime_t lastChange = 0;
+	size_t size = sizeof(int32);
+	fMuteParameter->GetValue(&mute, &size, &lastChange);
+	return mute != 0;
 }
 
 

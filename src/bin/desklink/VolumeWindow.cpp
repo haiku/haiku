@@ -67,7 +67,7 @@ VolumeWindow::~VolumeWindow()
 {
 }
 
-#include <stdio.h>
+
 void
 VolumeWindow::MessageReceived(BMessage *msg)
 {

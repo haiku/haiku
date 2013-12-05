@@ -1,10 +1,11 @@
 /*
- * Copyright 2003-2009, Haiku, Inc.
+ * Copyright 2003-2013, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Jérôme Duval
  *		François Revol
+ *		Puck Meerburg, puck@puckipedia.nl
  */
 #ifndef MIXER_CONTROL_H
 #define MIXER_CONTROL_H
@@ -12,9 +13,9 @@
 
 #include <MediaRoster.h>
 
-class BParameterWeb;
 class BContinuousParameter;
-
+class BParameter;
+class BParameterWeb;
 
 // The volume which choices
 #define VOLUME_USE_MIXER		0 // default
@@ -36,6 +37,9 @@ public:
 			void			SetVolume(float volume);
 			void			ChangeVolumeBy(float value);
 
+			void			SetMute(bool muted);
+			bool			Mute();
+
 			float			Minimum() const { return fMin; }
 			float			Maximum() const { return fMax; }
 
@@ -48,6 +52,7 @@ private:
 			media_node		fGainMediaNode;
 			BParameterWeb*	fParameterWeb;
 			BContinuousParameter* fMixerParameter;
+			BParameter*		fMuteParameter;
 			float			fMin;
 			float			fMax;
 			float			fStep;
