@@ -101,8 +101,8 @@ void
 AppMenuItem::GetContentSize(float* _width, float* _height)
 {
 	if (_width)
-		*_width = fIcon->Bounds().Width() +
-			be_plain_font->StringWidth(Label());
+		*_width = fIcon->Bounds().Width()
+			+ be_plain_font->StringWidth(Label());
 
 	if (_height) {
 		struct font_height fh;
@@ -166,6 +166,8 @@ void
 PieView::AttachedToWindow()
 {
 	fWindow = (MainWindow*)Window();
+	if (Parent())
+		SetViewColor(Parent()->ViewColor());
 }
 
 
@@ -196,7 +198,7 @@ PieView::MessageReceived(BMessage* message)
 				Invalidate();
 			}
 			break;
-		
+
 		case kScanDone:
 			fWindow->EnableRescan();
 		case kScanProgress:
@@ -354,8 +356,6 @@ PieView::_DrawProgressBar(BRect updateRect)
 
 	fMouseOverInfo.clear();
 
-	FillRect(updateRect, B_SOLID_LOW);
-
 	// Draw the progress bar.
 	BRect b = Bounds();
 	float bx = floorf((b.left + b.Width() - kProgBarWidth) / 2.0);
@@ -387,9 +387,6 @@ PieView::_DrawPieChart(BRect updateRect)
 		return;
 
 	pieRect.InsetBy(kPieOuterMargin, kPieOuterMargin);
-
-	SetHighColor(kPieBGColor);
-	FillRect(updateRect);
 
 	// constraint proportions
 	if (pieRect.Width() > pieRect.Height()) {
@@ -563,7 +560,7 @@ PieView::_FileAt(const BPoint& where)
 	float cy = b.top + b.Height() / 2.0;
 	float dx = where.x - cx;
 	float dy = where.y - cy;
-	float dist = sqrt(dx*dx + dy*dy);
+	float dist = sqrt(dx * dx + dy * dy);
 
 	int level;
 	if (dist < kPieCenterSize)
@@ -731,11 +728,9 @@ PieView::_ShowContextMenu(FileInfo* info, BPoint p)
 
 		fMouseOverMenu->RemoveItem(openWith);
 		delete openWith;
-	}
-	else {
+	} else
 		// The file is no longer available.
 		fFileUnavailableMenu->Go(p, false, true, openRect);
-	}
 }
 
 
@@ -763,7 +758,7 @@ PieView::_OpenInfo(FileInfo* info, BPoint p)
 	BMessenger tracker(kTrackerSignature);
 	if (!tracker.IsValid()) {
 		new InfoWin(p, info, Window());
- 	} else {
+	} else {
 		BMessage message(kGetInfo);
 		message.AddRef("refs", &info->ref);
 		tracker.SendMessage(&message);
