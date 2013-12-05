@@ -189,7 +189,7 @@ set_mtrr(void* _parameter, int cpu)
 		= (struct set_mtrr_parameter*)_parameter;
 
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous);
 
 	// One CPU has to reset sCpuRendezvous3 -- it is needed to prevent the CPU
 	// that initiated the call_all_cpus() from doing that again and clearing
@@ -206,8 +206,8 @@ set_mtrr(void* _parameter, int cpu)
 	enable_caches();
 
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
-	smp_cpu_rendezvous(&sCpuRendezvous3, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous2);
+	smp_cpu_rendezvous(&sCpuRendezvous3);
 }
 
 
@@ -217,7 +217,7 @@ set_mtrrs(void* _parameter, int cpu)
 	set_mtrrs_parameter* parameter = (set_mtrrs_parameter*)_parameter;
 
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous);
 
 	// One CPU has to reset sCpuRendezvous3 -- it is needed to prevent the CPU
 	// that initiated the call_all_cpus() from doing that again and clearing
@@ -234,8 +234,8 @@ set_mtrrs(void* _parameter, int cpu)
 	enable_caches();
 
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
-	smp_cpu_rendezvous(&sCpuRendezvous3, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous2);
+	smp_cpu_rendezvous(&sCpuRendezvous3);
 }
 
 
@@ -243,7 +243,7 @@ static void
 init_mtrrs(void* _unused, int cpu)
 {
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous);
 
 	// One CPU has to reset sCpuRendezvous3 -- it is needed to prevent the CPU
 	// that initiated the call_all_cpus() from doing that again and clearing
@@ -259,8 +259,8 @@ init_mtrrs(void* _unused, int cpu)
 	enable_caches();
 
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
-	smp_cpu_rendezvous(&sCpuRendezvous3, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous2);
+	smp_cpu_rendezvous(&sCpuRendezvous3);
 }
 
 

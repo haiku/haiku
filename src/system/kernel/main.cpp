@@ -100,13 +100,13 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 	smp_set_num_cpus(bootKernelArgs->num_cpus);
 
 	// wait for all the cpus to get here
-	smp_cpu_rendezvous(&sCpuRendezvous, currentCPU);
+	smp_cpu_rendezvous(&sCpuRendezvous);
 
 	// the passed in kernel args are in a non-allocated range of memory
 	if (currentCPU == 0)
 		memcpy(&sKernelArgs, bootKernelArgs, sizeof(kernel_args));
 
-	smp_cpu_rendezvous(&sCpuRendezvous2, currentCPU);
+	smp_cpu_rendezvous(&sCpuRendezvous2);
 
 	// do any pre-booting cpu config
 	cpu_preboot_init_percpu(&sKernelArgs, currentCPU);
@@ -221,13 +221,13 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("waking up AP cpus\n");
 		sCpuRendezvous = sCpuRendezvous2 = 0;
 		smp_wake_up_non_boot_cpus();
-		smp_cpu_rendezvous(&sCpuRendezvous, 0); // wait until they're booted
+		smp_cpu_rendezvous(&sCpuRendezvous); // wait until they're booted
 
 		// exit the kernel startup phase (mutexes, etc work from now on out)
 		TRACE("exiting kernel startup\n");
 		gKernelStartup = false;
 
-		smp_cpu_rendezvous(&sCpuRendezvous2, 0);
+		smp_cpu_rendezvous(&sCpuRendezvous2);
 			// release the AP cpus to go enter the scheduler
 
 		TRACE("starting scheduler on cpu 0 and enabling interrupts\n");
@@ -244,8 +244,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		smp_per_cpu_init(&sKernelArgs, currentCPU);
 
 		// wait for all other AP cpus to get to this point
-		smp_cpu_rendezvous(&sCpuRendezvous, currentCPU);
-		smp_cpu_rendezvous(&sCpuRendezvous2, currentCPU);
+		smp_cpu_rendezvous(&sCpuRendezvous);
+		smp_cpu_rendezvous(&sCpuRendezvous2);
 
 		// welcome to the machine
 		scheduler_start();

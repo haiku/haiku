@@ -1313,11 +1313,11 @@ bool
 smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 {
 	if (cpu == 0) {
-		smp_cpu_rendezvous(rendezVous, cpu);
+		smp_cpu_rendezvous(rendezVous);
 		return true;
 	}
 
-	smp_cpu_rendezvous(rendezVous, cpu);
+	smp_cpu_rendezvous(rendezVous);
 
 	while (atomic_get(&sBootCPUSpin) == 0) {
 		if ((atomic_get(&sEarlyCPUCall) & (1 << cpu)) != 0)
@@ -1353,13 +1353,12 @@ smp_wake_up_non_boot_cpus()
 	ensured via another rendez-vous) the variable can be reset.
 */
 void
-smp_cpu_rendezvous(uint32* var, int current_cpu)
+smp_cpu_rendezvous(uint32* var)
 {
-	atomic_or((int32*)var, 1 << current_cpu);
+	atomic_add((int32*)var, 1);
 
-	uint32 allReady = ((uint32)1 << sNumCPUs) - 1;
-	while ((uint32)atomic_get((int32*)var) != allReady)
-		cpu_wait((int32*)var, allReady);
+	while ((uint32)atomic_get((int32*)var) < sNumCPUs)
+		cpu_wait((int32*)var, sNumCPUs);
 }
 
 
