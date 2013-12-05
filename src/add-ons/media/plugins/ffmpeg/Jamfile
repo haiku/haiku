@@ -52,18 +52,9 @@ Addon ffmpeg :
 	# FFmpeg libraries (from FFmpeg optional package):
 	[ BuildFeatureAttribute ffmpeg : libraries ]
 
-	[ BuildFeatureAttribute libbz2 : libraries ]
-	[ BuildFeatureAttribute speex : libraries ]
-	[ BuildFeatureAttribute libtheora : libraries ]
-	[ BuildFeatureAttribute libvorbis : libraries ]
-	[ BuildFeatureAttribute libogg : libraries ]
-	[ BuildFeatureAttribute libvpx : libraries ]
-
 	be
 	media
-	[ BuildFeatureAttribute zlib : library ]
 	$(TARGET_LIBSUPC++)
-	$(TARGET_NETWORK_LIBS)
 ;
 
 

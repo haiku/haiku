@@ -299,25 +299,18 @@ if [ IsPackageAvailable mesa_devel ] {
 if [ IsPackageAvailable ffmpeg_devel ] {
 	local ffmpegLibs = libavformat.so libavcodec.so libavdevice.so
 		libavfilter.so libswscale.so libavutil.so ;
-	local speexLibs = libspeex.so ;
-	local libtheoraLibs = libtheora.so libtheoradec.so libtheoraenc.so ;
-	local libvorbisLibs = libvorbis.so libvorbisenc.so ;
-	local liboggLibs = libogg.so ;
-	local libvpxLibs = libvpx.so ;
+	
+	ExtractBuildFeatureArchives ffmpeg :
+		file: base ffmpeg
+			runtime: lib
+		file: devel ffmpeg_devel
+			depends: base
+			libraries: $(developLibDir)/$(ffmpegLibs)
+			headers: $(developHeadersDir)
+		;
 
-	local feature ;
-	for feature in ffmpeg speex libtheora libvorbis libogg libvpx {
-		ExtractBuildFeatureArchives $(feature) :
-			file: base $(feature)
-				runtime: lib
-			file: devel $(feature)_devel
-				depends: base
-				libraries: $(developLibDir)/$($(feature)Libs)
-				headers: $(developHeadersDir)
-			;
-
-		EnableBuildFeatures $(feature) ;
-	}
+	EnableBuildFeatures ffmpeg ;
+	
 } else {
 	Echo "FFMpeg support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
