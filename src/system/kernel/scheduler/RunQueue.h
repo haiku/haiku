@@ -9,9 +9,26 @@
 #define RUN_QUEUE_H
 
 
-#include <RunQueueLink.h>
 #include <util/Bitmap.h>
 
+
+template<typename Element>
+struct RunQueueLink {
+					RunQueueLink();
+
+	unsigned int	fPriority;
+	Element*		fPrevious;
+	Element*		fNext;
+};
+
+template<typename Element>
+class RunQueueLinkImpl {
+public:
+	inline	RunQueueLink<Element>*	GetRunQueueLink();
+
+private:
+			RunQueueLink<Element>	fRunQueueLink;
+};
 
 template<typename Element>
 class RunQueueStandardGetLink {
@@ -88,6 +105,30 @@ private:
 
 	static	GetLink		sGetLink;
 };
+
+
+#if KDEBUG
+template<typename Element>
+RunQueueLink<Element>::RunQueueLink()
+	:
+	fPrevious(NULL),
+	fNext(NULL)
+{
+}
+#else
+template<typename Element>
+RunQueueLink<Element>::RunQueueLink()
+{
+}
+#endif
+
+
+template<typename Element>
+RunQueueLink<Element>*
+RunQueueLinkImpl<Element>::GetRunQueueLink()
+{
+	return &fRunQueueLink;
+}
 
 
 template<typename Element>
