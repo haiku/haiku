@@ -38,7 +38,7 @@
 
 
 #define MAX_INITIAL_POOLS	\
-	((SMP_MAX_CPUS * TOTAL_SLOTS_PER_CPU + EXTRA_SLOTS + 1023) / 1024)
+	(ROUNDUP(SMP_MAX_CPUS * TOTAL_SLOTS_PER_CPU + EXTRA_SLOTS, 1024) / 1024)
 
 
 using X86LargePhysicalPageMapper::PhysicalPageSlot;
