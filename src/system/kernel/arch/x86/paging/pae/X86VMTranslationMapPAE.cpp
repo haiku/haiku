@@ -88,7 +88,7 @@ public:
 
 private:
 	X86VMTranslationMapPAE*	fMap;
-	addr_t					fVirtualAddress,
+	addr_t					fVirtualAddress;
 	phys_addr_t				fPhysicalAddress;
 };
 
@@ -114,7 +114,7 @@ public:
 
 private:
 	X86VMTranslationMapPAE*	fMap;
-	addr_t					fVirtualAddress,
+	addr_t					fVirtualAddress;
 	phys_addr_t				fPhysicalAddress;
 };
 
