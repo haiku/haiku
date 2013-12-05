@@ -623,7 +623,7 @@ AddPathsFromVertexSource(Icon* icon, Shape* shape,
 		return B_NO_MEMORY;
 
 	source.rewind(index);
-	double x1, y1;
+	double x1 = 0, y1 = 0;
 	unsigned cmd = source.vertex(&x1, &y1);
 	bool keepGoing = true;
 	int32 subPath = 0;
@@ -688,7 +688,7 @@ AddPathsFromVertexSource(Icon* icon, Shape* shape,
 				break;
 
 			case agg::path_cmd_curve3: {
-				double x2, y2;
+				double x2 = 0, y2 = 0;
 				cmd = source.vertex(&x2, &y2);
 //printf("curve3 (%.2f, %.2f)\n", x1, y1);
 //printf("	   (%.2f, %.2f)\n", x2, y2);
@@ -715,8 +715,8 @@ AddPathsFromVertexSource(Icon* icon, Shape* shape,
 			}
 
 			case agg::path_cmd_curve4: {
-				double x2, y2;
-				double x3, y3;
+				double x2 = 0, y2 = 0;
+				double x3 = 0, y3 = 0;
 				cmd = source.vertex(&x2, &y2);
 				cmd = source.vertex(&x3, &y3);
 

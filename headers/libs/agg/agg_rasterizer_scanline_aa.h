@@ -187,8 +187,8 @@ namespace agg
         template<class VertexSource>
         void add_path(VertexSource& vs, unsigned path_id=0)
         {
-            double x;
-            double y;
+            double x = 0;
+            double y = 0;
 
             unsigned cmd;
             vs.rewind(path_id);

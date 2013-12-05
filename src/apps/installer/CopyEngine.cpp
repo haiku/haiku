@@ -541,7 +541,7 @@ CopyEngine::_WriteThread()
 
 		bigtime_t now = system_time();
 
-		Buffer* buffer;
+		Buffer* buffer = NULL;
 		status_t ret = fBufferQueue.Pop(&buffer, bufferWaitTimeout);
 		if (ret == B_TIMED_OUT) {
 			// no buffer, timeout

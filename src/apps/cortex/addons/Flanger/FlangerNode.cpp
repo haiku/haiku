@@ -1453,7 +1453,7 @@ void FlangerNode::filterBuffer(
 	for(uint32 inPos = 0; inPos < samples; ++inPos) {
 
 		// read from input buffer
-		_frame inFrame;
+		_frame inFrame = {};
 		inFrame.channel[0] = ((float*)input.data())[inPos];
 		if(stereo)
 			inFrame.channel[1] = ((float*)input.data())[inPos + 1];
@@ -1468,7 +1468,7 @@ void FlangerNode::filterBuffer(
 
 
 		// read low-index (possibly only) frame
-		_frame delayedFrame;
+		_frame delayedFrame = {};
 
 		int32 readFrameLo = (int32)floor(fReadFrame);
 		uint32 pos = readFrameLo * channels;

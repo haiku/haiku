@@ -457,7 +457,7 @@ TWO_KEY_AVL_TREE_CLASS_NAME::FindFirstClosest(const PrimaryKey& key, bool less,
 {
 	const NodeStrategy& strategy = fTreeMap.GetNodeStrategy();
 
-	Node* parent;
+	Node* parent = NULL;
 	Node* node = _FindFirst(key, &parent);
 	if (node == NULL) {
 		// not found -- try to get the closest node

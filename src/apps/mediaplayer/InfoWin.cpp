@@ -313,7 +313,7 @@ printf("InfoWin::Update(0x%08" B_PRIx32 ")\n", which);
 		fLabelsView->Insert(label << "\n\n\n");
 		BString s;
 		media_format format;
-		media_raw_video_format videoFormat;
+		media_raw_video_format videoFormat = {};
 		err = fController->GetEncodedVideoFormat(&format);
 		if (err < B_OK) {
 			s << "(" << strerror(err) << ")\n";
@@ -350,7 +350,7 @@ printf("InfoWin::Update(0x%08" B_PRIx32 ")\n", which);
 		fLabelsView->Insert(label << "\n\n\n");
 		BString s;
 		media_format format;
-		media_raw_audio_format audioFormat;
+		media_raw_audio_format audioFormat = {};
 		err = fController->GetEncodedAudioFormat(&format);
 		//string_for_format(format, buf, sizeof(buf));
 		//printf("%s\n", buf);
