@@ -15,7 +15,6 @@
 #include <FindDirectory.h>
 #include <Path.h>
 #include <PathFinder.h>
-#include <StringList.h>
 
 #include "AttributeClasses.h"
 #include "AttributeValue.h"
@@ -2770,25 +2769,18 @@ DwarfFile::_GetDebugInfoPath(const char* debugFileName,
 	if (entry.Exists())
 		return B_OK;
 
-	// See if our image is in any of the system locations.
-	// if so, look for its debug info in the corresponding location.
-	BPathFinder finder;
-	BStringList paths;
-	result = finder.FindPaths(B_FIND_PATH_DEVELOP_DIRECTORY, paths);
-	if (result != B_OK)
-		return result;
-	for (int32 i = 0; i < paths.CountStrings(); i++) {
-		BString tempPath = paths.StringAt(i);
+	// If the above search failed, check if our image is located in any
+	// of the system installation paths, and attempt to locate the debug info
+	// file in the corresponding well-known location
+	BString pathSuffix;
+	pathSuffix.SetToFormat("debug/%s", debugFileName);
 
-		if (tempPath.Compare(fName, tempPath.Length()) == 0) {
-			_infoPath.SetToFormat("%s/debug/%s", basePath.Path(),
-				debugFileName);
-			entry.SetTo(_infoPath.String());
-			result = entry.InitCheck();
-			if (result != B_OK && result != B_ENTRY_NOT_FOUND)
-				return result;
-			return entry.Exists() ? B_OK : B_ENTRY_NOT_FOUND;
-		}
+	BPathFinder finder(fName);
+	result = finder.FindPath(B_FIND_PATH_DEVELOP_DIRECTORY,
+		pathSuffix.String(), B_FIND_PATH_EXISTING_ONLY, basePath);
+	if (result == B_OK) {
+		_infoPath = basePath.Path();
+		return B_OK;
 	}
 
 	return B_ENTRY_NOT_FOUND;
