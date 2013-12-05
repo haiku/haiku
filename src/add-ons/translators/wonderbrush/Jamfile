@@ -2,19 +2,21 @@ SubDir HAIKU_TOP src add-ons translators wonderbrush ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UseBuildFeatureHeaders zlib ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources WonderBrushTranslator : WonderBrushTranslator.rdef ;
 
-Includes [ FGristFiles bitmap_compression.cpp ]
-	: [ BuildFeatureAttribute zlib : headers ] ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		# Include support sub folder
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators wonderbrush support ] ;
+
+		UseBuildFeatureHeaders zlib ;
+
+		Includes [ FGristFiles bitmap_compression.cpp ]
+			: [ BuildFeatureAttribute zlib : headers ] ;
 
 		Translator [ MultiArchDefaultGristFiles WonderBrushTranslator ] :
 			Canvas.cpp

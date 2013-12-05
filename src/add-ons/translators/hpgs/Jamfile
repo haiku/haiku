@@ -38,18 +38,18 @@ hpgstransform.c
 hpgszostream.c
 ;
 
-Includes [ FGristFiles hpgsimage.c ]
-	: [ BuildFeatureAttribute libpng : headers ] ;
-Includes [ FGristFiles hpgszostream.c ]
-	: [ BuildFeatureAttribute zlib : headers ] ;
-
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
-UseLibraryHeaders iconv ;
-UseBuildFeatureHeaders libpng ;
-UseBuildFeatureHeaders zlib ;
+		UseLibraryHeaders iconv ;
+		UseBuildFeatureHeaders libpng ;
+		UseBuildFeatureHeaders zlib ;
+
+		Includes [ FGristFiles hpgsimage.c ]
+			: [ BuildFeatureAttribute libpng : headers ] ;
+		Includes [ FGristFiles hpgszostream.c ]
+			: [ BuildFeatureAttribute zlib : headers ] ;
 
 		Translator [ MultiArchDefaultGristFiles HPGSTranslator ] :
 			# HPGSTranslator classes
