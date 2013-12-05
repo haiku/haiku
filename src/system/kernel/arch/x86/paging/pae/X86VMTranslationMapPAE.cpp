@@ -1189,7 +1189,7 @@ X86VMTranslationMapPAE::DebugGetReverseMappingInfo(phys_addr_t physicalAddress,
 	pae_page_directory_entry* const* pdpt
 		= fPagingStructures->VirtualPageDirs();
 	for (uint32 pageDirIndex = fIsKernelMap ? 2 : 0;
-		pageDirIndex < (fIsKernelMap ? 4 : 2); pageDirIndex++) {
+		pageDirIndex < uint32(fIsKernelMap ? 4 : 2); pageDirIndex++) {
 		// iterate through the page directory
 		pae_page_directory_entry* pageDirectory = pdpt[pageDirIndex];
 		for (uint32 pdeIndex = 0; pdeIndex < kPAEPageDirEntryCount;
