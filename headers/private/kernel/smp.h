@@ -112,7 +112,7 @@ CPUSet::SetAll()
 inline void
 CPUSet::SetBit(int32 cpu)
 {
-	uint32* element = &fBitmap[cpu % kArraySize];
+	int32* element = (int32*)&fBitmap[cpu % kArraySize];
 	atomic_or(element, 1u << (cpu / kArraySize));
 }
 
@@ -120,7 +120,7 @@ CPUSet::SetBit(int32 cpu)
 inline void
 CPUSet::ClearBit(int32 cpu)
 {
-	uint32* element = &fBitmap[cpu % kArraySize];
+	int32* element = (int32*)&fBitmap[cpu % kArraySize];
 	atomic_and(element, ~uint32(1u << (cpu / kArraySize)));
 }
 
