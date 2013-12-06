@@ -62,6 +62,9 @@ public:
 
 			bool				Append(const Paragraph& paragraph);
 
+			// Query information
+			int32				Length() const;
+
 private:
 			ParagraphList		fParagraphs;
 			Paragraph			fEmptyLastParagraph;

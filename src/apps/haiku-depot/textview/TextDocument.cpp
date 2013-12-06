@@ -165,6 +165,8 @@ TextDocument::ParagraphStyleAt(int32 textOffset) const
 const Paragraph&
 TextDocument::ParagraphAt(int32 textOffset, int32& paragraphOffset) const
 {
+	// TODO: Could binary search the Paragraphs if they were wrapped in classes
+	// that knew there text offset in the document.
 	int32 textLength = 0;
 	paragraphOffset = 0;
 	int32 count = fParagraphs.CountItems();
@@ -191,6 +193,21 @@ bool
 TextDocument::Append(const Paragraph& paragraph)
 {
 	return fParagraphs.Add(paragraph);
+}
+
+
+int32
+TextDocument::Length() const
+{
+	// TODO: Could be O(1) if the Paragraphs were wrapped in classes that
+	// knew there text offset in the document.
+	int32 textLength = 0;
+	int32 count = fParagraphs.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
+		textLength += paragraph.Length();
+	}
+	return textLength;
 }
 
 
