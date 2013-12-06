@@ -104,10 +104,8 @@
 /* TODO: check */
 #define _SC_IOV_MAX						32
 #define _SC_UIO_MAXIOV					_SC_IOV_MAX
-#define _SC_NPROCESSORS_MAX				33
 #define _SC_NPROCESSORS_CONF			34
 #define _SC_NPROCESSORS_ONLN			35
-#define _SC_CPUID_MAX					36
 #define _SC_ATEXIT_MAX					37
 #define _SC_PASS_MAX					39
 #define _SC_PHYS_PAGES					40
