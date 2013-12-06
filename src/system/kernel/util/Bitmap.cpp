@@ -60,7 +60,7 @@ Bitmap::GetHighestSet() const
 	if (sizeof(addr_t) == sizeof(uint32))
 		return log2(fBits[i]) + i * kBitsPerElement;
 
-	uint32 v = fBits[i] >> 32;
+	uint32 v = (uint64)fBits[i] >> 32;
 	if (v != 0)
 		return log2(v) + sizeof(uint32) * 8 + i * kBitsPerElement;
 	return log2(fBits[i]) + i * kBitsPerElement;
