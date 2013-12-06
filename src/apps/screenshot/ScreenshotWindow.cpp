@@ -184,7 +184,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	BButton* showSettings =  new BButton("", B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
 			new BMessage(kSettings));
 	showSettings->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
-	
+
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
@@ -206,7 +206,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 				.Add(fWindowBorder)
 				.Add(fShowCursor)
 				.AddStrut(kSpacing)
-				.AddGrid(0.0, kSpacing/2)
+				.AddGrid(0.0, kSpacing / 2)
 					.Add(fDelayControl->CreateLabelLayoutItem(), 0, 0)
 					.Add(fDelayControl->CreateTextViewLayoutItem(), 1, 0)
 					.Add(BSpaceLayoutItem::CreateHorizontalStrut(kLabelSpacing),
@@ -481,19 +481,19 @@ ScreenshotWindow::_SetupOutputPathMenu(const BMessage& settings)
 
 	BString label(B_TRANSLATE("Home folder"));
 	_AddItemToPathMenu(path.Path(), label, 0,
-		(path.Path() == lastSelectedPath));
+		(path.Path() == lastSelectedPath), 'H');
 
 	path.Append("Desktop");
 	label.SetTo(B_TRANSLATE("Desktop"));
 	_AddItemToPathMenu(path.Path(), label, 0, (
-		path.Path() == lastSelectedPath));
+		path.Path() == lastSelectedPath), 'D');
 
 	find_directory(B_BEOS_ETC_DIRECTORY, &path);
 	path.Append("artwork");
 
 	label.SetTo(B_TRANSLATE("Artwork folder"));
 	_AddItemToPathMenu(path.Path(), label, 2,
-		(path.Path() == lastSelectedPath));
+		(path.Path() == lastSelectedPath), 'A');
 
 	int32 i = 0;
 	BString userPath;
@@ -513,13 +513,13 @@ ScreenshotWindow::_SetupOutputPathMenu(const BMessage& settings)
 
 	fOutputPathMenu->AddItem(new BSeparatorItem());
 	fOutputPathMenu->AddItem(new BMenuItem(B_TRANSLATE("Choose folder..."),
-		new BMessage(kChooseLocation)));
+		new BMessage(kChooseLocation), 'F'));
 }
 
 
 void
 ScreenshotWindow::_AddItemToPathMenu(const char* path, BString& label,
-	int32 index, bool markItem)
+	int32 index, bool markItem, uint32 shortcutKey)
 {
 	// Make sure that item won't be a duplicate of an existing one
 	for (int32 i = fOutputPathMenu->CountItems() - 1; i >= 0; --i) {
@@ -544,7 +544,8 @@ ScreenshotWindow::_AddItemToPathMenu(const char* path, BString& label,
 	fOutputPathMenu->TruncateString(&label, B_TRUNCATE_MIDDLE,
 		fOutputPathMenu->StringWidth("SomethingLongHere"));
 
-	fOutputPathMenu->AddItem(new BMenuItem(label.String(), message), index);
+	fOutputPathMenu->AddItem(new BMenuItem(label.String(), message,
+		shortcutKey), index);
 
 	if (markItem) {
 		fOutputPathMenu->ItemAt(index)->SetMarked(true);

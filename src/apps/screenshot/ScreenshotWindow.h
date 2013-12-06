@@ -45,7 +45,8 @@ private:
 			void			_DisallowChar(BTextView* textView);
 			void			_SetupOutputPathMenu(const BMessage& settings);
 			void			_AddItemToPathMenu(const char* path,
-								BString& label, int32 index, bool markItem);
+								BString& label, int32 index, bool markItem,
+								uint32 shortcutKey = 0);
 			void			_UpdateFilenameSelection();
 			void			_SetupTranslatorMenu();
 			status_t		_SaveScreenshot();
