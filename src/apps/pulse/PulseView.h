@@ -32,8 +32,10 @@ class PulseView : public BView {
 		BMenuItem *mode1, *mode2, *preferences, *about;
 		BMenuItem **cpu_menu_items;
 
-		double cpu_times[B_MAX_CPU_COUNT];
-		bigtime_t prev_active[B_MAX_CPU_COUNT];
+		const int32 kCPUCount;
+
+		double* cpu_times;
+		bigtime_t* prev_active;
 		bigtime_t prev_time;
 };
 

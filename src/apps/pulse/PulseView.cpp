@@ -26,8 +26,14 @@
 #define B_TRANSLATION_CONTEXT "PulseView"
 
 
-PulseView::PulseView(BRect rect, const char *name) :
-	BView(rect, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS) {
+PulseView::PulseView(BRect rect, const char *name)
+	:
+	BView(rect, name, B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS),
+	kCPUCount(sysconf(_SC_NPROCESSORS_CONF)),
+	cpu_times(new double[kCPUCount]),
+	prev_active(new bigtime_t[kCPUCount])
+{
 
 	popupmenu = NULL;
 	cpu_menu_items = NULL;
@@ -40,7 +46,13 @@ PulseView::PulseView(BRect rect, const char *name) :
 }
 
 // This version will be used by the instantiated replicant
-PulseView::PulseView(BMessage *message) : BView(message) {
+PulseView::PulseView(BMessage *message)
+	:
+	BView(message),
+	kCPUCount(sysconf(_SC_NPROCESSORS_CONF)),
+	cpu_times(new double[kCPUCount]),
+	prev_active(new bigtime_t[kCPUCount])
+{
 	SetResizingMode(B_FOLLOW_ALL_SIDES);
 	SetFlags(B_WILL_DRAW | B_PULSE_NEEDED);
 
@@ -138,5 +150,8 @@ void PulseView::ChangeCPUState(BMessage *message) {
 PulseView::~PulseView() {
 	if (popupmenu != NULL) delete popupmenu;
 	if (cpu_menu_items != NULL) delete cpu_menu_items;
+
+	delete[] prev_active;
+	delete[] cpu_times;
 }
 

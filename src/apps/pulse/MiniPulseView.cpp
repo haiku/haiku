@@ -64,7 +64,7 @@ MiniPulseView::MiniPulseView(BMessage *message)
 void MiniPulseView::Draw(BRect rect) {
 	system_info sys_info;
 	get_system_info(&sys_info);
-	if (sys_info.cpu_count > B_MAX_CPU_COUNT || sys_info.cpu_count <= 0)
+	if (sys_info.cpu_count <= 0)
 		return;
 	
 	BRect bounds(Bounds());

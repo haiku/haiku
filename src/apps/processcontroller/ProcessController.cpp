@@ -158,7 +158,11 @@ ProcessController::ProcessController(BRect frame, bool temp)
 	fTrackerIcon(kTrackerSig),
 	fDeskbarIcon(kDeskbarSig),
 	fTerminalIcon(kTerminalSig),
-	fTemp(temp)
+	kCPUCount(sysconf(_SC_NPROCESSORS_CONF)),
+	fTemp(temp),
+	fLastBarHeight(new float[kCPUCount]),
+	fCPUTimes(new double[kCPUCount]),
+	fPrevActive(new bigtime_t[kCPUCount])
 {
 	if (!temp) {
 		Init();
@@ -178,7 +182,11 @@ ProcessController::ProcessController(BMessage *data)
 	fTrackerIcon(kTrackerSig),
 	fDeskbarIcon(kDeskbarSig),
 	fTerminalIcon(kTerminalSig),
-	fTemp(false)
+	kCPUCount(sysconf(_SC_NPROCESSORS_CONF)),
+	fTemp(false),
+	fLastBarHeight(new float[kCPUCount]),
+	fCPUTimes(new double[kCPUCount]),
+	fPrevActive(new bigtime_t[kCPUCount])
 {
 	Init();
 }
@@ -191,7 +199,11 @@ ProcessController::ProcessController()
 	fTrackerIcon(kTrackerSig),
 	fDeskbarIcon(kDeskbarSig),
 	fTerminalIcon(kTerminalSig),
-	fTemp(false)
+	kCPUCount(sysconf(_SC_NPROCESSORS_CONF)),
+	fTemp(false),
+	fLastBarHeight(new float[kCPUCount]),
+	fCPUTimes(new double[kCPUCount]),
+	fPrevActive(new bigtime_t[kCPUCount])
 {
 	Init();
 }
@@ -208,6 +220,10 @@ ProcessController::~ProcessController()
 
 	delete fMessageRunner;
 	gPCView = NULL;
+
+	delete[] fPrevActive;
+	delete[] fCPUTimes;
+	delete[] fLastBarHeight;
 }
 
 

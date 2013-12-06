@@ -420,23 +420,6 @@ extern void			ktrace_vprintf(const char *format, va_list args);
 
 /* System information */
 
-#if __INTEL__
-#	define B_MAX_CPU_COUNT	8
-#elif __x86_64__
-#	define B_MAX_CPU_COUNT	8
-#elif __POWERPC__
-#	define B_MAX_CPU_COUNT	8
-#elif __M68K__
-#	define B_MAX_CPU_COUNT	1
-#elif __ARM__
-#	define B_MAX_CPU_COUNT	1
-#elif __MIPSEL__
-#	define B_MAX_CPU_COUNT	1
-#else
-#	warning Unknown cpu
-#	define B_MAX_CPU_COUNT	1
-#endif
-
 typedef enum cpu_types {
 	/* TODO: add latest models */
 
@@ -740,7 +723,7 @@ typedef struct {
 	int32			cpu_count;			/* number of cpus */
 	enum cpu_types	cpu_type;			/* type of cpu */
 	int32			cpu_revision;		/* revision # of cpu */
-	cpu_info		cpu_infos[B_MAX_CPU_COUNT];	/* info about individual cpus */
+	cpu_info		cpu_infos[8];		/* info about individual cpus */
 	int64			cpu_clock_speed;	/* processor clock speed (Hz) */
 	int64			bus_clock_speed;	/* bus clock speed (Hz) */
 	enum platform_types platform_type;	/* type of machine we're on */

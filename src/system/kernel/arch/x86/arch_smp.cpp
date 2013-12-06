@@ -73,7 +73,7 @@ x86_smp_error_interrupt(void *data)
 uint32
 x86_get_cpu_apic_id(int32 cpu)
 {
-	ASSERT(cpu >= 0 && cpu < B_MAX_CPU_COUNT);
+	ASSERT(cpu >= 0 && cpu < SMP_MAX_CPUS);
 	return sCPUAPICIds[cpu];
 }
 
