@@ -105,25 +105,35 @@ TextDocumentLayout::Draw(BView* view, const BPoint& offset,
 }
 
 
+int32
+TextDocumentLayout::LineIndexForOffset(int32 textOffset)
+{
+	int32 index = _ParagraphLayoutIndexForOffset(textOffset);
+	if (index >= 0) {
+		int32 lineIndex = 0;
+		for (int32 i = 0; i < index; i++) {
+			lineIndex += fParagraphLayouts.ItemAtFast(index)
+				.layout->CountLines();
+		}
+	
+		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
+		return lineIndex + info.layout->LineIndexForOffset(textOffset);
+	}
+	
+	return 0;
+}
+
+
 void
 TextDocumentLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 	float& x2, float& y2)
 {
-	_ValidateLayout();
-
-	int32 paragraphs = fParagraphLayouts.CountItems();
-	for (int32 i = 0; i < paragraphs; i++) {
-		const ParagraphLayoutInfo& layout = fParagraphLayouts.ItemAtFast(i);
-		
-		int32 length = layout.layout->CountGlyphs();
-		if (textOffset > length) {
-			textOffset -= length;
-			continue;
-		}
-		
-		layout.layout->GetTextBounds(textOffset, x1, y1, x2, y2);
-		y1 += layout.y;
-		y2 += layout.y;
+	int32 index = _ParagraphLayoutIndexForOffset(textOffset);
+	if (index >= 0) {
+		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
+		info.layout->GetTextBounds(textOffset, x1, y1, x2, y2);
+		y1 += info.y;
+		y2 += info.y;
 		return;
 	}
 
@@ -187,3 +197,26 @@ TextDocumentLayout::_Layout()
 		y += info.layout->Height() + style.SpacingBottom();
 	}
 }
+
+
+int32
+TextDocumentLayout::_ParagraphLayoutIndexForOffset(int32& textOffset)
+{
+	_ValidateLayout();
+
+	int32 paragraphs = fParagraphLayouts.CountItems();
+	for (int32 i = 0; i < paragraphs; i++) {
+		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
+		
+		int32 length = info.layout->CountGlyphs();
+		if (textOffset > length) {
+			textOffset -= length;
+			continue;
+		}
+		
+		return i;
+	}
+	
+	return -1;
+}
+

@@ -86,6 +86,7 @@ public:
 			void				Draw(BView* view, const BPoint& offset,
 									const BRect& updateRect);
 
+			int32				LineIndexForOffset(int32 textOffset);
 
 			void				GetTextBounds(int32 textOffset,
 									float& x1, float& y1,
@@ -98,6 +99,9 @@ private:
 
 			void				_DrawLayout(BView* view,
 									const ParagraphLayoutInfo& layout) const;
+
+			int32				_ParagraphLayoutIndexForOffset(
+									int32& textOffset);
 
 private:
 			float				fWidth;
