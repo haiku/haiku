@@ -190,6 +190,9 @@ public:
 			void				Draw(BView* view, const BPoint& offset);
 
 			int32				CountGlyphs() const;
+			int32				CountLines();
+
+			int32				LineIndexForOffset(int32 textOffset);
 
 			void				GetTextBounds(int32 textOffset,
 									float& x1, float& y1,
