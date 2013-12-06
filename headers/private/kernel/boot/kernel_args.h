@@ -59,7 +59,7 @@ typedef struct kernel_args {
 	uint64		ignored_physical_memory;
 
 	uint32		num_cpus;
-	addr_range	cpu_kstack[MAX_BOOT_CPUS];
+	addr_range	cpu_kstack[SMP_MAX_CPUS];
 
 	// boot volume KMessage data
 	FixedWidthPointer<void> boot_volume;

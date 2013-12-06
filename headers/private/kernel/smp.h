@@ -17,9 +17,6 @@
 #include <string.h>
 
 
-#define SMP_MAX_CPUS MAX_BOOT_CPUS
-
-
 struct kernel_args;
 
 

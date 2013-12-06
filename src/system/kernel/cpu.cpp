@@ -25,7 +25,7 @@
 
 
 /* global per-cpu structure */
-cpu_ent gCPU[MAX_BOOT_CPUS];
+cpu_ent gCPU[SMP_MAX_CPUS];
 
 uint32 gCPUCacheLevelCount;
 static cpu_topology_node sCPUTopology;

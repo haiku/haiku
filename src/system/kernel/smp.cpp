@@ -188,9 +188,9 @@ dump_spinlock(int argc, char** argv)
 static struct {
 	spinlock	*lock;
 	bigtime_t	timestamp;
-} sLatency[B_MAX_CPU_COUNT][NUM_LATENCY_LOCKS];
+} sLatency[SMP_MAX_CPUS][NUM_LATENCY_LOCKS];
 
-static int32 sLatencyIndex[B_MAX_CPU_COUNT];
+static int32 sLatencyIndex[SMP_MAX_CPUS];
 static bool sEnableLatencyCheck;
 
 
