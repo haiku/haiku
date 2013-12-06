@@ -272,7 +272,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("page reserve:   %lu", fCount);
+		out.Print("page reserve:   %" B_PRIu32, fCount);
 	}
 
 private:
@@ -291,7 +291,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("page unreserve: %lu", fCount);
+		out.Print("page unreserve: %" B_PRId32, fCount);
 	}
 
 private:
@@ -376,7 +376,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("page scrubbing: %lu", fCount);
+		out.Print("page scrubbing: %" B_PRId32, fCount);
 	}
 
 private:
@@ -395,7 +395,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("page scrubbed:  %lu", fCount);
+		out.Print("page scrubbed:  %" B_PRId32, fCount);
 	}
 
 private:

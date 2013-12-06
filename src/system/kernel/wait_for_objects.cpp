@@ -188,7 +188,7 @@ class SelectBegin : public SelectTraceEntry {
 		virtual void AddDump(TraceOutput& out)
 		{
 			SelectTraceEntry::AddDump(out, "select begin: ");
-			out.Print(", timeout: %lld", fTimeout);
+			out.Print(", timeout: %" B_PRIdBIGTIME, fTimeout);
 		}
 
 	private:
@@ -213,7 +213,7 @@ class SelectDone : public SelectTraceEntry {
 			if (fStatus == B_OK)
 				SelectTraceEntry::AddDump(out, "select done:  ");
 			else
-				out.Print("select done:  error: 0x%lx", fStatus);
+				out.Print("select done:  error: %#" B_PRIx32, fStatus);
 		}
 
 	private:
@@ -319,7 +319,7 @@ class PollBegin : public PollTraceEntry {
 		{
 			out.Print("poll begin: ");
 			PollTraceEntry::AddDump(out);
-			out.Print(", timeout: %lld", fTimeout);
+			out.Print(", timeout: %" B_PRIdBIGTIME, fTimeout);
 		}
 
 	private:
@@ -343,7 +343,7 @@ class PollDone : public PollTraceEntry {
 				out.Print("poll done:  count: %d: ", fResult);
 				PollTraceEntry::AddDump(out);
 			} else
-				out.Print("poll done:  error: 0x%x", fResult);
+				out.Print("poll done:  error: %#x", fResult);
 		}
 
 	private:

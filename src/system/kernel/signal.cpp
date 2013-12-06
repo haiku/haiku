@@ -621,8 +621,9 @@ class SendSignal : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("signal send: target: %ld, signal: %lu (%s), "
-				"flags: 0x%lx", fTarget, fSignal, signal_name(fSignal), fFlags);
+			out.Print("signal send: target: %" B_PRId32 ", signal: %" B_PRIu32
+				" (%s), flags: %#" B_PRIx32, fTarget, fSignal,
+				signal_name(fSignal), fFlags);
 		}
 
 	private:
@@ -644,10 +645,10 @@ class SigAction : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("signal action: signal: %lu (%s), "
-				"action: {handler: %p, flags: 0x%x, mask: 0x%llx}", fSignal,
-				signal_name(fSignal), fAction.sa_handler, fAction.sa_flags,
-				(long long)fAction.sa_mask);
+			out.Print("signal action: signal: %" B_PRIu32 " (%s), "
+				"action: {handler: %p, flags: %#x, mask: %#" B_PRIx64 "}",
+				fSignal, signal_name(fSignal), fAction.sa_handler,
+				fAction.sa_flags, (uint64)fAction.sa_mask);
 		}
 
 	private:

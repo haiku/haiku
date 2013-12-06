@@ -50,7 +50,7 @@ public:
 			return B_BAD_VALUE;
 
 		size_t toCopy = *bufferSize;
-		if (offset + toCopy > size)
+		if (offset + (off_t)toCopy > size)
 			toCopy = size - offset;
 
 		if (toCopy > 0)

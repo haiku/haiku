@@ -412,7 +412,7 @@ class PreSyscall : public AbstractTraceEntry {
 					}
 
 					if (printValue)
-						out.Print("%s0x%llx", (i == 0 ? "" : ", "), value);
+						out.Print("%s%#" B_PRIx64, (i == 0 ? "" : ", "), value);
 				}
 			}
 
@@ -448,7 +448,7 @@ class PostSyscall : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("syscall post: %s() -> 0x%llx",
+			out.Print("syscall post: %s() -> %#" B_PRIx64,
 				get_syscall_name(fSyscall), fReturnValue);
 		}
 

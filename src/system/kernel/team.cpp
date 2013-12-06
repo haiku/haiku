@@ -216,7 +216,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("team forked, new thread %ld", fForkedThread);
+		out.Print("team forked, new thread %" B_PRId32, fForkedThread);
 	}
 
 private:
@@ -310,7 +310,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("team set job control state, team %ld, "
+		out.Print("team set job control state, team %" B_PRId32 ", "
 			"new state: %s, signal: %d",
 			fTeam, job_control_state_name(fNewState), fSignal);
 	}
@@ -334,8 +334,8 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("team wait for child, child: %ld, "
-			"flags: 0x%lx", fChild, fFlags);
+		out.Print("team wait for child, child: %" B_PRId32 ", "
+			"flags: %#" B_PRIx32, fChild, fFlags);
 	}
 
 private:
@@ -367,13 +367,13 @@ public:
 	virtual void AddDump(TraceOutput& out)
 	{
 		if (fTeam >= 0) {
-			out.Print("team wait for child done, team: %ld, "
-				"state: %s, status: 0x%lx, reason: 0x%x, signal: %d\n",
+			out.Print("team wait for child done, team: %" B_PRId32 ", "
+				"state: %s, status: %#" B_PRIx32 ", reason: %#x, signal: %d\n",
 				fTeam, job_control_state_name(fState), fStatus, fReason,
 				fSignal);
 		} else {
 			out.Print("team wait for child failed, error: "
-				"0x%lx, ", fTeam);
+				"%#" B_PRIx32 ", ", fTeam);
 		}
 	}
 

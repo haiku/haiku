@@ -1181,7 +1181,7 @@ ram_disk_raw_device_read(void* _cookie, off_t pos, void* buffer,
 
 	if (pos >= device->DeviceSize())
 		return B_BAD_VALUE;
-	if (pos + length > device->DeviceSize())
+	if (pos + (off_t)length > device->DeviceSize())
 		length = device->DeviceSize() - pos;
 
 	IORequest request;
@@ -1211,7 +1211,7 @@ ram_disk_raw_device_write(void* _cookie, off_t pos, const void* buffer,
 
 	if (pos >= device->DeviceSize())
 		return B_BAD_VALUE;
-	if (pos + length > device->DeviceSize())
+	if (pos + (off_t)length > device->DeviceSize())
 		length = device->DeviceSize() - pos;
 
 	IORequest request;

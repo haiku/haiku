@@ -800,7 +800,7 @@ Volume::_AddInitialPackagesFromActivationFile()
 		RETURN_ERROR(errno);
 	}
 
-	if (st.st_size > kMaxActivationFileSize) {
+	if (st.st_size > (off_t)kMaxActivationFileSize) {
 		ERROR("The packages activation file is too big.\n");
 		RETURN_ERROR(B_BAD_DATA);
 	}
