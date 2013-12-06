@@ -122,6 +122,8 @@ TextDocumentLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 		}
 		
 		layout.layout->GetTextBounds(textOffset, x1, y1, x2, y2);
+		y1 += layout.y;
+		y2 += layout.y;
 		return;
 	}
 
