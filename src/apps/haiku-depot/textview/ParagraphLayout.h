@@ -191,6 +191,10 @@ public:
 
 			int32				CountGlyphs() const;
 
+			void				GetTextBounds(int32 textOffset,
+									float& x1, float& y1,
+									float& x2, float& y2);
+
 private:
 			void				_Init();
 

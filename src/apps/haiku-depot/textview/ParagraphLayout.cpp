@@ -278,6 +278,46 @@ ParagraphLayout::CountGlyphs() const
 }
 
 
+void
+ParagraphLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
+	float& x2, float& y2)
+{
+	_ValidateLayout();
+
+	if (fGlyphInfos.CountItems() == 0) {
+		x1 = 0.0f;
+		y1 = 0.0f;
+		x2 = 0.0f;
+		y2 = 0.0f;
+
+		return;
+	}
+
+	if (textOffset >= fGlyphInfos.CountItems()) {
+		const GlyphInfo& glyph = fGlyphInfos.LastItem();
+		const LineInfo& line = fLineInfos.ItemAt(glyph.lineIndex);
+
+		x1 = glyph.x + glyph.width;
+		x2 = x1;
+		y1 = line.y;
+		y1 = y1 + line.height;
+
+		return;
+	}
+
+	if (textOffset < 0)
+		textOffset = 0;
+	
+	const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
+	const LineInfo& line = fLineInfos.ItemAt(glyph.lineIndex);
+
+	x1 = glyph.x;
+	x2 = x1 + glyph.width;
+	y1 = line.y;
+	y1 = y1 + line.height;
+}
+
+
 // #pragma mark - private
 
 
