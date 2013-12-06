@@ -86,6 +86,11 @@ public:
 			void				Draw(BView* view, const BPoint& offset,
 									const BRect& updateRect);
 
+
+			void				GetTextBounds(int32 textOffset,
+									float& x1, float& y1,
+									float& x2, float& y2);
+
 private:
 			void				_Init();
 			void				_ValidateLayout();

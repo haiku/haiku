@@ -105,6 +105,33 @@ TextDocumentLayout::Draw(BView* view, const BPoint& offset,
 }
 
 
+void
+TextDocumentLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
+	float& x2, float& y2)
+{
+	_ValidateLayout();
+
+	int32 paragraphs = fParagraphLayouts.CountItems();
+	for (int32 i = 0; i < paragraphs; i++) {
+		const ParagraphLayoutInfo& layout = fParagraphLayouts.ItemAtFast(i);
+		
+		int32 length = layout.layout->CountGlyphs();
+		if (textOffset > length) {
+			textOffset -= length;
+			continue;
+		}
+		
+		layout.layout->GetTextBounds(textOffset, x1, y1, x2, y2);
+		return;
+	}
+
+	x1 = 0.0f;
+	y1 = 0.0f;
+	x2 = 0.0f;
+	y2 = 0.0f;
+}
+
+
 // #pragma mark - private
 
 
