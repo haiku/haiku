@@ -332,7 +332,6 @@ X86PagingMethod32Bit::InitPostArea(kernel_args* args)
 	// now that the vm is initialized, create an area that represents
 	// the page hole
 	void *temp;
-	status_t error;
 	area_id area;
 
 	// unmap the page hole hack we were using before
