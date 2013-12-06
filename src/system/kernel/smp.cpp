@@ -1366,7 +1366,7 @@ smp_cpu_rendezvous(uint32* var)
 {
 	atomic_add((int32*)var, 1);
 
-	while ((uint32)atomic_get((int32*)var) < sNumCPUs)
+	while (atomic_get((int32*)var) < sNumCPUs)
 		cpu_wait((int32*)var, sNumCPUs);
 }
 
