@@ -189,6 +189,8 @@ public:
 			float				Height();
 			void				Draw(BView* view, const BPoint& offset);
 
+			int32				CountGlyphs() const;
+
 private:
 			void				_Init();
 

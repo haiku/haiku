@@ -271,6 +271,13 @@ ParagraphLayout::Draw(BView* view, const BPoint& offset)
 }
 
 
+int32
+ParagraphLayout::CountGlyphs() const
+{
+	return fGlyphInfos.CountItems();
+}
+
+
 // #pragma mark - private
 
 
