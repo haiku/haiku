@@ -70,7 +70,7 @@ typedef BKernel::TeamThreadTable<Thread> ThreadHashTable;
 
 
 // thread list
-static Thread sIdleThreads[B_MAX_CPU_COUNT];
+static Thread sIdleThreads[SMP_MAX_CPUS];
 static ThreadHashTable sThreadHash;
 static spinlock sThreadHashLock = B_SPINLOCK_INITIALIZER;
 static thread_id sNextThreadID = 2;

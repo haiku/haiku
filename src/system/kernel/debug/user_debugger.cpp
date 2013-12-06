@@ -53,7 +53,7 @@
 static port_id sDefaultDebuggerPort = -1;
 	// accessed atomically
 
-static timer sProfilingTimers[B_MAX_CPU_COUNT];
+static timer sProfilingTimers[SMP_MAX_CPUS];
 	// a profiling timer for each CPU -- used when a profiled thread is running
 	// on that CPU
 

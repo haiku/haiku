@@ -199,8 +199,8 @@ private:
 			bool				fWaitObjectNotificationsRequested;
 			Thread* volatile	fWaitingProfilerThread;
 			bool				fProfilingActive;
-			bool				fReentered[B_MAX_CPU_COUNT];
-			CPUProfileData		fCPUData[B_MAX_CPU_COUNT];
+			bool				fReentered[SMP_MAX_CPUS];
+			CPUProfileData		fCPUData[SMP_MAX_CPUS];
 			WaitObject*			fWaitObjectBuffer;
 			int32				fWaitObjectCount;
 			WaitObjectList		fUsedWaitObjects;

@@ -33,7 +33,7 @@ struct per_cpu_timer_data {
 	bigtime_t		real_time_offset;
 };
 
-static per_cpu_timer_data sPerCPU[B_MAX_CPU_COUNT];
+static per_cpu_timer_data sPerCPU[SMP_MAX_CPUS];
 
 
 //#define TRACE_TIMER
@@ -383,7 +383,7 @@ cancel_timer(timer* event)
 	int cpu = event->cpu;
 	SpinLocker spinLocker;
 	while (true) {
-		if (cpu >= B_MAX_CPU_COUNT)
+		if (cpu >= SMP_MAX_CPUS)
 			return false;
 
 		spinLocker.SetTo(sPerCPU[cpu].lock, false);

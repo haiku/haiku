@@ -28,7 +28,7 @@
 #include "interrupts.h"
 
 
-static interrupt_descriptor* sIDTs[B_MAX_CPU_COUNT];
+static interrupt_descriptor* sIDTs[SMP_MAX_CPUS];
 
 // table with functions handling respective interrupts
 typedef void interrupt_handler_function(struct iframe* frame);

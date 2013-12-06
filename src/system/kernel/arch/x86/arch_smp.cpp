@@ -34,8 +34,8 @@
 #endif
 
 
-static uint32 sCPUAPICIds[B_MAX_CPU_COUNT];
-static uint32 sAPICVersions[B_MAX_CPU_COUNT];
+static uint32 sCPUAPICIds[SMP_MAX_CPUS];
+static uint32 sAPICVersions[SMP_MAX_CPUS];
 
 
 static int32

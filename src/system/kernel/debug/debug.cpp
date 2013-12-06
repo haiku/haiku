@@ -81,7 +81,7 @@ void call_modules_hook(bool enter);
 
 static void syslog_write(const char* text, int32 length, bool notify);
 
-static arch_debug_registers sDebugRegisters[B_MAX_CPU_COUNT];
+static arch_debug_registers sDebugRegisters[SMP_MAX_CPUS];
 
 static debug_page_fault_info sPageFaultInfo;
 
@@ -143,7 +143,7 @@ static int32 sInDebugger = 0;
 static bool sPreviousDprintfState;
 static volatile bool sHandOverKDL = false;
 static int32 sHandOverKDLToCPU = -1;
-static bool sCPUTrapped[B_MAX_CPU_COUNT];
+static bool sCPUTrapped[SMP_MAX_CPUS];
 
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))

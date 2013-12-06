@@ -168,7 +168,7 @@ private:
 			PhysicalPageSlot* fDebugSlot;
 			PhysicalPageSlotPool* fInitialPool;
 			LargeMemoryTranslationMapPhysicalPageMapper	fKernelMapper;
-			PhysicalPageOpsCPUData fPerCPUData[B_MAX_CPU_COUNT];
+			PhysicalPageOpsCPUData fPerCPUData[SMP_MAX_CPUS];
 };
 
 static LargeMemoryPhysicalPageMapper sPhysicalPageMapper;
