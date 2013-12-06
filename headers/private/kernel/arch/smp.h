@@ -11,9 +11,6 @@
 struct kernel_args;
 
 
-// must match MAX_BOOT_CPUS in platform_kernel_args.h
-#define SMP_MAX_CPUS MAX_BOOT_CPUS
-
 #ifdef __cplusplus
 extern "C" {
 #endif

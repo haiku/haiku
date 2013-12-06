@@ -229,9 +229,8 @@ arch_thread_context_switch(Thread* from, Thread* to)
 					!= activePagingStructures) {
 		// update on which CPUs the address space is used
 		int cpu = cpuData->cpu_num;
-		atomic_and(&activePagingStructures->active_on_cpus,
-			~((uint32)1 << cpu));
-		atomic_or(&toPagingStructures->active_on_cpus, (uint32)1 << cpu);
+		activePagingStructures->active_on_cpus.ClearBit(cpu);
+		toPagingStructures->active_on_cpus.SetBit(cpu);
 
 		// assign the new paging structures to the CPU
 		toPagingStructures->AddReference();

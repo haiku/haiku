@@ -9,7 +9,16 @@
 #define KERNEL_SMP_H
 
 
+#include <boot/kernel_args.h>
+#include <kernel.h>
+
 #include <KernelExport.h>
+
+#include <string.h>
+
+
+#define SMP_MAX_CPUS MAX_BOOT_CPUS
+
 
 struct kernel_args;
 
@@ -35,6 +44,26 @@ typedef uint32 cpu_mask_t;
 
 typedef void (*smp_call_func)(addr_t data1, int32 currentCPU, addr_t data2, addr_t data3);
 
+class CPUSet {
+public:
+						CPUSet() { ClearAll(); }
+
+	inline	void		ClearAll();
+	inline	void		SetAll();
+
+	inline	void		SetBit(int32 cpu);
+	inline	void		ClearBit(int32 cpu);
+
+	inline	bool		GetBit(int32 cpu) const;
+
+	inline	bool		IsEmpty() const;
+
+private:
+	static	const int	kArraySize = ROUNDUP(SMP_MAX_CPUS, 32) / 32;
+
+			uint32		fBitmap[kArraySize];
+};
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,10 +76,10 @@ status_t smp_per_cpu_init(struct kernel_args *args, int32 cpu);
 status_t smp_init_post_generic_syscalls(void);
 bool smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous);
 void smp_wake_up_non_boot_cpus(void);
-void smp_cpu_rendezvous(uint32 *var);
+void smp_cpu_rendezvous(uint32* var);
 void smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2, addr_t data3,
 		void *data_ptr, uint32 flags);
-void smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, addr_t data,
+void smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 		addr_t data2, addr_t data3, void *data_ptr, uint32 flags);
 void smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 		void *data_ptr, uint32 flags);
@@ -66,6 +95,56 @@ int smp_intercpu_int_handler(int32 cpu);
 #ifdef __cplusplus
 }
 #endif
+
+
+inline void
+CPUSet::ClearAll()
+{
+	memset(fBitmap, 0, sizeof(fBitmap));
+}
+
+
+inline void
+CPUSet::SetAll()
+{
+	memset(fBitmap, ~uint8(0), sizeof(fBitmap));
+}
+
+
+inline void
+CPUSet::SetBit(int32 cpu)
+{
+	uint32* element = &fBitmap[cpu % kArraySize];
+	atomic_or(element, 1u << (cpu / kArraySize));
+}
+
+
+inline void
+CPUSet::ClearBit(int32 cpu)
+{
+	uint32* element = &fBitmap[cpu % kArraySize];
+	atomic_and(element, ~uint32(1u << (cpu / kArraySize)));
+}
+
+
+inline bool
+CPUSet::GetBit(int32 cpu) const
+{
+	int32* element = (int32*)&fBitmap[cpu % kArraySize];
+	return ((uint32)atomic_get(element) & (1u << (cpu / kArraySize))) != 0;
+}
+
+
+inline bool
+CPUSet::IsEmpty() const
+{
+	for (int i = 0; i < kArraySize; i++) {
+		if (fBitmap[i] != 0)
+			return false;
+	}
+
+	return true;
+}
 
 
 // Unless spinlock debug features are enabled, try to inline
