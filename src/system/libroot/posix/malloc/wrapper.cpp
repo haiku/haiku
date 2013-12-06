@@ -250,7 +250,7 @@ inline static processHeap *
 getAllocator(void)
 {
 	static char *buffer = (char *)hoardSbrk(sizeof(processHeap));
-	static processHeap *theAllocator = new (buffer) processHeap;
+	static processHeap *theAllocator = new (buffer) processHeap();
 
 	return theAllocator;
 }

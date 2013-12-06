@@ -51,7 +51,7 @@ class processHeap : public hoardHeap {
 		// we parcel out.
 		enum { REFILL_NUMBER_OF_SUPERBLOCKS = 16 };
 
-		processHeap(void);
+		processHeap();
 		~processHeap(void)
 		{
 #if HEAP_STATS
@@ -132,8 +132,14 @@ class processHeap : public hoardHeap {
 		processHeap(const processHeap &);
 		const processHeap & operator=(const processHeap &);
 
+		// The maximum number of thread heaps we allow.  (NOT the maximum
+		// number of threads -- Hoard imposes no such limit.)  This must be
+		// a power of two! NB: This number is twice the maximum number of
+		// PROCESSORS supported by Hoard.
+		const int kMaxThreadHeaps;
+
 		// The per-thread heaps.
-		HEAPTYPE theap[MAX_HEAPS];
+		HEAPTYPE* theap;
 
 #if HEAP_FRAG_STATS
 		// Statistics required to compute fragmentation.  We cannot
@@ -152,7 +158,7 @@ class processHeap : public hoardHeap {
 #endif
 
 #if HEAP_LOG
-		Log < MemoryRequest > _log[MAX_HEAPS + 1];
+		Log < MemoryRequest >* _log;
 #endif
 
 		// A lock for the superblock buffer.
@@ -166,8 +172,9 @@ class processHeap : public hoardHeap {
 HEAPTYPE &
 processHeap::getHeap(int i)
 {
+	assert(theap != NULL);
 	assert(i >= 0);
-	assert(i < MAX_HEAPS);
+	assert(i < kMaxThreadHeaps);
 	return theap[i];
 }
 
@@ -176,8 +183,9 @@ processHeap::getHeap(int i)
 Log<MemoryRequest > &
 processHeap::getLog(int i)
 {
+	assert(_log != NULL);
 	assert(i >= 0);
-	assert(i < MAX_HEAPS + 1);
+	assert(i < kMaxThreadHeaps + 1);
 	return _log[i];
 }
 #endif
@@ -192,7 +200,7 @@ processHeap::getHeapIndex(void)
 	// In fact, for efficiency, we just round up to the highest power of two,
 	// times two.
 	int tid = find_thread(NULL) & _numProcessorsMask;
-	assert(tid < MAX_HEAPS);
+	assert(tid < kMaxThreadHeaps);
 	return tid;
 }
 
