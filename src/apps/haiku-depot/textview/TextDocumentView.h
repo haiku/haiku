@@ -22,6 +22,11 @@ public:
 	virtual	void				AttachedToWindow();
 	virtual void				FrameResized(float width, float height);
 
+	virtual	void				MouseDown(BPoint where);
+	virtual	void				MouseUp(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 transit,
+									const BMessage* dragMessage);
+
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
@@ -42,6 +47,12 @@ private:
 
 			void				_UpdateScrollBars();
 
+			void				_SetCaretOffset(int32 offset, bool updateAnchor,
+									bool lockSelectionAnchor);
+
+			void				_GetSelectionShape(BShape& shape,
+									int32 start, int32 end);
+
 private:
 			TextDocumentRef		fTextDocument;
 			TextDocumentLayout	fTextDocumentLayout;
@@ -50,6 +61,13 @@ private:
 			float				fInsetTop;
 			float				fInsetRight;
 			float				fInsetBottom;
+
+			int32				fSelectionAnchorOffset;
+			int32				fCaretOffset;
+			float				fCaretAnchorX;
+			bool				fShowCaret;
+
+			bool				fMouseDown;
 };
 
 #endif // TEXT_DOCUMENT_VIEW_H

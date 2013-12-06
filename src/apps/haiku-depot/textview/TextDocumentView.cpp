@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include <ScrollBar.h>
+#include <Shape.h>
 
 
 TextDocumentView::TextDocumentView(const char* name)
@@ -16,7 +17,14 @@ TextDocumentView::TextDocumentView(const char* name)
 	fInsetLeft(0.0f),
 	fInsetTop(0.0f),
 	fInsetRight(0.0f),
-	fInsetBottom(0.0f)
+	fInsetBottom(0.0f),
+
+	fSelectionAnchorOffset(0),
+	fCaretOffset(0),
+	fCaretAnchorX(0.0f),
+	fShowCaret(false),
+
+	fMouseDown(false)
 {
 	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
 
@@ -37,6 +45,28 @@ TextDocumentView::Draw(BRect updateRect)
 
 	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
 	fTextDocumentLayout.Draw(this, BPoint(fInsetLeft, fInsetTop), updateRect);
+
+	if (fSelectionAnchorOffset == fCaretOffset)
+		return;
+
+	int32 start;
+	int32 end;
+	if (fSelectionAnchorOffset <= fCaretOffset) {
+		start = fSelectionAnchorOffset;
+		end = fCaretOffset;
+	} else {
+		start = fCaretOffset;
+		end = fSelectionAnchorOffset;
+	}
+
+	BShape shape;
+	_GetSelectionShape(shape, start, end);
+
+	SetHighColor(60, 40, 0);
+	SetDrawingMode(B_OP_SUBTRACT);
+
+	MovePenTo(fInsetLeft, fInsetTop);
+	FillShape(&shape);
 }
 
 
@@ -52,6 +82,25 @@ TextDocumentView::FrameResized(float width, float height)
 {
 	fTextDocumentLayout.SetWidth(width);
 	_UpdateScrollBars();
+}
+
+
+void
+TextDocumentView::MouseDown(BPoint where)
+{
+}
+
+
+void
+TextDocumentView::MouseUp(BPoint where)
+{
+}
+
+
+void
+TextDocumentView::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
 }
 
 
@@ -106,6 +155,11 @@ TextDocumentView::SetTextDocument(const TextDocumentRef& document)
 {
 	fTextDocument = document;
 	fTextDocumentLayout.SetTextDocument(fTextDocument);
+
+	fSelectionAnchorOffset = 0;
+	fCaretOffset = 0;
+	fCaretAnchorX = 0.0f;
+
 	InvalidateLayout();
 	Invalidate();
 	_UpdateScrollBars();
@@ -192,3 +246,112 @@ TextDocumentView::_UpdateScrollBars()
 	}
 }
 
+
+void
+TextDocumentView::_SetCaretOffset(int32 offset, bool updateAnchor,
+	bool lockSelectionAnchor)
+{
+	if (offset < 0)
+		offset = 0;
+	int32 length = fTextDocument->Length();
+	if (offset > length)
+		offset = length;
+
+	if (offset == fCaretOffset && (lockSelectionAnchor
+			|| offset == fSelectionAnchorOffset)) {
+		return;
+	}
+
+	if (!lockSelectionAnchor)
+		fSelectionAnchorOffset = offset;
+
+	fCaretOffset = offset;
+	fShowCaret = true;
+
+	if (updateAnchor) {
+		float x1;
+		float y1;
+		float x2;
+		float y2;
+
+		fTextDocumentLayout.GetTextBounds(fCaretOffset, x1, y1, x2, y2);
+		fCaretAnchorX = x1;
+	}
+
+	Invalidate();
+}
+
+
+// _GetSelectionShape
+void
+TextDocumentView::_GetSelectionShape(BShape& shape,
+	int32 start, int32 end)
+{
+	float startX1;
+	float startY1;
+	float startX2;
+	float startY2;
+	fTextDocumentLayout.GetTextBounds(start, startX1, startY1, startX2,
+		startY2);
+
+	float endX1;
+	float endY1;
+	float endX2;
+	float endY2;
+	fTextDocumentLayout.GetTextBounds(end, endX1, endY1, endX2, endY2);
+
+	int32 startLineIndex = fTextDocumentLayout.LineIndexForOffset(start);
+	int32 endLineIndex = fTextDocumentLayout.LineIndexForOffset(end);
+
+	if (startLineIndex == endLineIndex) {
+		// Selection on one line
+		BPoint lt(startX1, startY1);
+		BPoint rt(endX1, endY1);
+		BPoint rb(endX1, endY2);
+		BPoint lb(startX1, startY2);
+
+		shape.MoveTo(lt);
+		shape.LineTo(rt);
+		shape.LineTo(rb);
+		shape.LineTo(lb);
+		shape.Close();
+	} else if (startLineIndex == endLineIndex - 1 && endX1 <= startX1) {
+		// Selection on two lines, with gap:
+		// ---------
+		// ------###
+		// ##-------
+		// ---------
+		BPoint lt(startX1, startY1);
+		BPoint rt(fTextDocumentLayout.Width(), startY1);
+		BPoint rb(fTextDocumentLayout.Width(), startY2);
+		BPoint lb(startX1, startY2);
+
+		shape.MoveTo(lt);
+		shape.LineTo(rt);
+		shape.LineTo(rb);
+		shape.LineTo(lb);
+		shape.Close();
+
+		lt = BPoint(0, endY1);
+		rt = BPoint(endX1, endY1);
+		rb = BPoint(endX1, endY2);
+		lb = BPoint(0, endY2);
+
+		shape.MoveTo(lt);
+		shape.LineTo(rt);
+		shape.LineTo(rb);
+		shape.LineTo(lb);
+		shape.Close();
+	} else {
+		// Selection over multiple lines
+		shape.MoveTo(BPoint(startX1, startY1));
+		shape.LineTo(BPoint(fTextDocumentLayout.Width(), startY1));
+		shape.LineTo(BPoint(fTextDocumentLayout.Width(), endY1));
+		shape.LineTo(BPoint(endX1, endY1));
+		shape.LineTo(BPoint(endX1, endY2));
+		shape.LineTo(BPoint(0, endY2));
+		shape.LineTo(BPoint(0, startY2));
+		shape.LineTo(BPoint(startX1, startY2));
+		shape.Close();
+	}
+}
