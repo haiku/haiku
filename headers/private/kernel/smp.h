@@ -40,8 +40,6 @@ enum {
 	SMP_MSG_FLAG_FREE_ARG	= 0x2,
 };
 
-typedef uint32 cpu_mask_t;
-
 typedef void (*smp_call_func)(addr_t data1, int32 currentCPU, addr_t data2, addr_t data3);
 
 class CPUSet {
