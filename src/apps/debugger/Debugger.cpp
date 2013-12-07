@@ -698,7 +698,7 @@ CliDebugger::Run(const Options& options)
 	// create the command line UI
 	CommandLineUserInterface* userInterface
 		= new(std::nothrow) CommandLineUserInterface(options.saveReport,
-			options.reportPath);
+			options.reportPath, options.thread);
 	if (userInterface == NULL) {
 		fprintf(stderr, "Error: Out of memory!\n");
 		return false;

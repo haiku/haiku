@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -21,7 +21,8 @@ class CommandLineUserInterface : public UserInterface,
 	public ::Team::Listener {
 public:
 								CommandLineUserInterface(bool saveReport,
-									const char* reportPath);
+									const char* reportPath,
+									thread_id reportTargetThread);
 	virtual						~CommandLineUserInterface();
 
 	virtual	const char*			ID() const;
@@ -76,11 +77,14 @@ private:
 									const CommandEntry* command1,
 									const CommandEntry* command2);
 
+			bool				_ReportTargetThreadStopNeeded() const;
+
 private:
 			CliContext			fContext;
 			CommandList			fCommands;
 			const char*			fReportPath;
 			bool				fSaveReport;
+			thread_id			fReportTargetThread;
 			sem_id				fShowSemaphore;
 			bool				fShown;
 	volatile bool				fTerminating;

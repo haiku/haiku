@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -13,6 +13,7 @@
 
 #include <ArgumentVector.h>
 #include <AutoDeleter.h>
+#include <AutoLocker.h>
 #include <Referenceable.h>
 
 #include "CliContext.h"
@@ -93,11 +94,12 @@ private:
 
 
 CommandLineUserInterface::CommandLineUserInterface(bool saveReport,
-	const char* reportPath)
+	const char* reportPath, thread_id reportTargetThread)
 	:
 	fCommands(20, true),
 	fReportPath(reportPath),
 	fSaveReport(saveReport),
+	fReportTargetThread(reportTargetThread),
 	fShowSemaphore(-1),
 	fShown(false),
 	fTerminating(false)
@@ -219,6 +221,12 @@ CommandLineUserInterface::Run()
 		ArgumentVector args;
 		char buffer[256];
 		const char* parseErrorLocation;
+		if (_ReportTargetThreadStopNeeded()) {
+			snprintf(buffer, sizeof(buffer), "stop %" B_PRId32,
+				fReportTargetThread);
+			args.Parse(buffer, &parseErrorLocation);
+			_ExecuteCommand(args.ArgumentCount(), args.Arguments());
+		}
 		snprintf(buffer, sizeof(buffer), "save-report %s",
 			fReportPath != NULL ? fReportPath : "");
 		args.Parse(buffer, &parseErrorLocation);
@@ -443,3 +451,17 @@ CommandLineUserInterface::_CompareCommandEntries(const CommandEntry* command1,
 }
 
 
+bool
+CommandLineUserInterface::_ReportTargetThreadStopNeeded() const
+{
+	if (fReportTargetThread < 0)
+		return false;
+
+	Team* team = fContext.GetTeam();
+	AutoLocker<Team> teamLocker(team);
+	Thread* thread = team->ThreadByID(fReportTargetThread);
+	if (thread == NULL)
+		return false;
+
+	return thread->State() != THREAD_STATE_STOPPED;
+}
