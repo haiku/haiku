@@ -728,25 +728,6 @@ TraceOutput::PrintStackTrace(tracing_stack_trace* stackTrace)
 {
 #if ENABLE_TRACING
 	print_stack_trace(stackTrace, TraceOutputPrint(*this));
-	if (stackTrace == NULL || stackTrace->depth <= 0)
-		return;
-
-	for (int32 i = 0; i < stackTrace->depth; i++) {
-		addr_t address = stackTrace->return_addresses[i];
-
-		const char* symbol;
-		const char* imageName;
-		bool exactMatch;
-		addr_t baseAddress;
-
-		if (elf_debug_lookup_symbol_address(address, &baseAddress, &symbol,
-				&imageName, &exactMatch) == B_OK) {
-			Print("  %p  %s + 0x%lx (%s)%s\n", (void*)address, symbol,
-				address - baseAddress, imageName,
-				exactMatch ? "" : " (nearest)");
-		} else
-			Print("  %p\n", (void*)address);
-	}
 #endif
 }
 
