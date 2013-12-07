@@ -65,6 +65,8 @@ public:
 			// Query information
 			int32				Length() const;
 
+			BString				GetText(int32 start, int32 length) const;
+
 private:
 			ParagraphList		fParagraphs;
 			Paragraph			fEmptyLastParagraph;

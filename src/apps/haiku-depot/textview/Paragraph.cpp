@@ -5,6 +5,8 @@
 
 #include "Paragraph.h"
 
+#include <algorithm>
+
 
 Paragraph::Paragraph()
 	:
@@ -148,4 +150,48 @@ bool
 Paragraph::IsEmpty() const
 {
 	return fTextSpans.CountItems() == 0;
+}
+
+
+BString
+Paragraph::GetText(int32 start, int32 length) const
+{
+	if (start < 0)
+		start = 0;
+	
+	BString text;
+	
+	int32 count = fTextSpans.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const TextSpan& span = fTextSpans.ItemAtFast(i);
+		int32 spanLength = span.CharCount();
+		if (spanLength == 0)
+			continue;
+		if (start > spanLength) {
+			// Skip span if its before start
+			start -= spanLength;
+			continue;
+		}
+
+		// Remaining span length after start
+		spanLength -= start;
+		int32 copyLength = std::min(spanLength, length);
+
+		if (start == 0 && length == spanLength) {
+			text << span.Text();
+		} else {
+			BString subString;
+			span.Text().CopyCharsInto(subString, start, copyLength);
+			text << subString;
+		}
+		
+		length -= copyLength;
+		if (length == 0)
+			break;
+
+		// Next span is copied from its beginning
+		start = 0;
+	}
+
+	return text;
 }

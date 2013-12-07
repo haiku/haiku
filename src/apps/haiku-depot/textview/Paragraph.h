@@ -37,6 +37,8 @@ public:
 			int32				Length() const;
 			bool				IsEmpty() const;
 
+			BString				GetText(int32 start, int32 length) const;
+
 private:
 			ParagraphStyle		fStyle;
 			TextSpanList		fTextSpans;

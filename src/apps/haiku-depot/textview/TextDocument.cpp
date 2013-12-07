@@ -5,6 +5,8 @@
 
 #include "TextDocument.h"
 
+#include <algorithm>
+
 
 TextDocument::TextDocument()
 	:
@@ -172,9 +174,11 @@ TextDocument::ParagraphAt(int32 textOffset, int32& paragraphOffset) const
 	int32 count = fParagraphs.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
-		paragraphOffset = textLength;
-		if (textLength + paragraph.Length() > textOffset)
+		paragraphOffset = textOffset - textLength;
+		int32 paragraphLength = paragraph.Length();
+		if (textLength + paragraphLength > textOffset)
 			return paragraph;
+		textLength += paragraphLength;
 	}
 	return fEmptyLastParagraph;
 }
@@ -211,3 +215,41 @@ TextDocument::Length() const
 }
 
 
+BString
+TextDocument::GetText(int32 start, int32 length) const
+{
+	if (start < 0)
+		start = 0;
+	
+	BString text;
+	
+	int32 count = fParagraphs.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
+		int32 paragraphLength = paragraph.Length();
+		if (paragraphLength == 0)
+			continue;
+		if (start > paragraphLength) {
+			// Skip paragraph if its before start
+			start -= paragraphLength;
+			continue;
+		}
+
+		// Remaining paragraph length after start
+		paragraphLength -= start;
+		int32 copyLength = std::min(paragraphLength, length);
+		
+		text << paragraph.GetText(start, copyLength);
+		
+		length -= copyLength;
+		if (length == 0)
+			break;
+		else if (i < count - 1)
+			text << '\n';
+
+		// Next paragraph is copied from its beginning
+		start = 0;
+	}
+
+	return text;
+}
