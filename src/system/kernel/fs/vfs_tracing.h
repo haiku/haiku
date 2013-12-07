@@ -20,32 +20,20 @@
 namespace FileDescriptorTracing {
 
 
-class FDTraceEntry : public AbstractTraceEntry {
+class FDTraceEntry
+	: public TRACE_ENTRY_SELECTOR(FILE_DESCRIPTOR_TRACING_STACK_TRACE) {
 public:
 	FDTraceEntry(file_descriptor* descriptor)
 		:
+		TraceEntryBase(FILE_DESCRIPTOR_TRACING_STACK_TRACE, 0, true),
 		fDescriptor(descriptor),
 		fReferenceCount(descriptor->ref_count)
 	{
-#if FILE_DESCRIPTOR_TRACING_STACK_TRACE
-		fStackTrace = capture_tracing_stack_trace(
-			FILE_DESCRIPTOR_TRACING_STACK_TRACE, 0, false);
-#endif
 	}
-
-#if FILE_DESCRIPTOR_TRACING_STACK_TRACE
-	virtual void DumpStackTrace(TraceOutput& out)
-	{
-		out.PrintStackTrace(fStackTrace);
-	}
-#endif
 
 protected:
 	file_descriptor*		fDescriptor;
 	int32					fReferenceCount;
-#if FILE_DESCRIPTOR_TRACING_STACK_TRACE
-	tracing_stack_trace*	fStackTrace;
-#endif
 };
 
 
