@@ -39,6 +39,7 @@
 #include <Volume.h>
 #include <VolumeRoster.h>
 
+#include <fs_volume.h>
 #include <tracker_private.h>
 
 #include "ChangeParametersPanel.h"
@@ -864,6 +865,25 @@ MainWindow::_Unmount(BDiskDevice* disk, partition_id selectedPartition)
 		BPath path;
 		partition->GetMountPoint(&path);
 		status_t status = partition->Unmount();
+		if (status != B_OK) {
+			BString message = B_TRANSLATE("Could not unmount partition");
+			message << " \"" << partition->ContentName() << "\":\n\t"
+				<< strerror(status) << "\n\n"
+				<< B_TRANSLATE("Should unmounting be forced?\n\n"
+				"Note: If an application is currently writing to the volume, "
+				"unmounting it now might result in loss of data.\n");
+
+			BAlert* alert = new BAlert(B_TRANSLATE("Force unmount"), message,
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Force unmount"), NULL,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+
+			if (alert->Go() == 1)
+				status = partition->Unmount(B_FORCE_UNMOUNT);
+			else
+				return;
+		}
+
 		if (status != B_OK) {
 			_DisplayPartitionError(
 				B_TRANSLATE("Could not unmount partition %s."),
