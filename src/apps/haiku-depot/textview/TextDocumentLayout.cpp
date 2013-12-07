@@ -112,8 +112,7 @@ TextDocumentLayout::LineIndexForOffset(int32 textOffset)
 	if (index >= 0) {
 		int32 lineIndex = 0;
 		for (int32 i = 0; i < index; i++) {
-			lineIndex += fParagraphLayouts.ItemAtFast(index)
-				.layout->CountLines();
+			lineIndex += fParagraphLayouts.ItemAtFast(i).layout->CountLines();
 		}
 	
 		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
