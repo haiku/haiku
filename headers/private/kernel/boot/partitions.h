@@ -30,6 +30,8 @@ class Partition : public Node, public partition_data {
 		status_t Mount(Directory **_fileSystem = NULL, bool isBootDevice = false);
 		status_t Scan(bool mountFileSystems, bool isBootDevice = false);
 
+		static Partition *Lookup(partition_id id, NodeList *list = NULL);
+
 		void SetParent(Partition *parent);
 		Partition *Parent() const;
 

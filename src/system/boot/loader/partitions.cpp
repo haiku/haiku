@@ -16,7 +16,6 @@
 #include <boot/stdio.h>
 #include <boot/vfs.h>
 #include <ddm_modules.h>
-#include <HashMap.h>
 
 #include "RootFileSystem.h"
 
@@ -101,7 +100,6 @@ private:
 
 
 static int32 sIdCounter = 0;
-static HashMap<HashKey32<int32>, Partition*> sIdPartitionMap;
 
 
 //	#pragma mark -
@@ -118,7 +116,6 @@ Partition::Partition(int fd)
 	memset((partition_data *)this, 0, sizeof(partition_data));
 
 	id = atomic_add(&sIdCounter, 1);
-	sIdPartitionMap.Put(id, this);
 
 	// it's safe to close the file
 	fFD = dup(fd);
@@ -139,8 +136,30 @@ Partition::~Partition()
 			child->SetParent(NULL);
 	}
 
-	sIdPartitionMap.Remove(id);
 	close(fFD);
+}
+
+
+Partition *
+Partition::Lookup(partition_id id, NodeList *list)
+{
+	Partition *p;
+
+	if (list == NULL)
+		list = &gPartitions;
+
+	NodeIterator iterator = list->GetIterator();
+
+	while ((p = (Partition *)iterator.Next()) != NULL) {
+		if (p->id == id)
+			return p;
+		if (!p->fChildren.IsEmpty()) {
+			Partition *c = Lookup(id, &p->fChildren);
+			if (c)
+				return c;
+		}
+	}
+	return NULL;
 }
 
 
@@ -379,7 +398,7 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		Partition *child = NULL;
 
 		while ((child = (Partition *)iterator.Next()) != NULL) {
-			TRACE(("%p Partition::Scan(): scan child %p (start = %" B_PRId64
+			TRACE(("%p Partition::Scan(): scan child %p (start = %" B_PRIdOFF
 				", size = %" B_PRIdOFF ", parent = %p)!\n", this, child,
 				child->offset, child->size, child->Parent()));
 
@@ -439,16 +458,19 @@ add_partitions_for(int fd, bool mountFileSystems, bool isBootDevice)
 	partition->block_size = 512;
 	partition->size = partition->Size();
 
-	// add this partition to the list of partitions, if it contains
-	// or might contain a file system
+	// add this partition to the list of partitions
+	// temporarily for Lookup() to work
+	gPartitions.Add(partition);
+
+	// keep it, if it contains or might contain a file system
 	if ((partition->Scan(mountFileSystems, isBootDevice) == B_OK
 			&& partition->IsFileSystem())
 		|| (!partition->IsPartitioningSystem() && !mountFileSystems)) {
-		gPartitions.Add(partition);
 		return B_OK;
 	}
 
 	// if not, we no longer need the partition
+	gPartitions.Remove(partition);
 	delete partition;
 	return B_OK;
 }
@@ -477,7 +499,7 @@ partition_data *
 create_child_partition(partition_id id, int32 index, off_t offset, off_t size,
 	partition_id childID)
 {
-	Partition *partition = sIdPartitionMap.Get(id);
+	Partition *partition = Partition::Lookup(id);
 	if (partition == NULL) {
 		dprintf("creating partition failed: could not find partition.\n");
 		return NULL;
@@ -515,7 +537,7 @@ get_child_partition(partition_id id, int32 index)
 partition_data *
 get_parent_partition(partition_id id)
 {
-	Partition *partition = sIdPartitionMap.Get(id);
+	Partition *partition = Partition::Lookup(id);
 	if (partition == NULL) {
 		dprintf("could not find parent partition.\n");
 		return NULL;
