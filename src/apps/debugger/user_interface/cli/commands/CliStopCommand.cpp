@@ -17,9 +17,11 @@
 
 CliStopCommand::CliStopCommand()
 	:
-	CliCommand("stop the current thread",
-		"%s\n"
-		"Stops the current thread.")
+	CliCommand("stop a thread",
+		"%s [ <thread ID> ]\n"
+		"Stops the thread specified by <thread ID>, if supplied. Otherwise "
+			"stops\n"
+		"the current thread.")
 {
 }
 
@@ -28,15 +30,41 @@ void
 CliStopCommand::Execute(int argc, const char* const* argv,
 	CliContext& context)
 {
-	AutoLocker<Team> teamLocker(context.GetTeam());
-	Thread* thread = context.CurrentThread();
-	if (thread == NULL) {
-		printf("Error: No current thread.\n");
+	if (argc > 2) {
+		PrintUsage(argv[0]);
 		return;
 	}
 
+
+	AutoLocker<Team> teamLocker(context.GetTeam());
+	Thread* thread = NULL;
+	if (argc < 2) {
+		thread = context.CurrentThread();
+		if (thread == NULL) {
+			printf("Error: No current thread.\n");
+			return;
+		}
+	} else if (argc == 2) {
+		// parse the argument
+		char* endPointer;
+		long threadID = strtol(argv[1], &endPointer, 0);
+		if (*endPointer != '\0' || threadID < 0) {
+			printf("Error: Invalid parameter \"%s\"\n", argv[1]);
+			return;
+		}
+
+		// get the thread and change the current thread
+		Team* team = context.GetTeam();
+		thread = team->ThreadByID(threadID);
+		if (thread == NULL) {
+			printf("Error: No thread with ID %ld\n", threadID);
+			return;
+		}
+	}
+
 	if (thread->State() == THREAD_STATE_STOPPED) {
-		printf("Error: The current thread is already stopped.\n");
+		printf("Error: thread %" B_PRId32 " is already stopped.\n",
+			thread->ID());
 		return;
 	}
 
