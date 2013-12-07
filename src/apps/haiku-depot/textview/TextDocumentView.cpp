@@ -94,6 +94,8 @@ TextDocumentView::MouseDown(BPoint where)
 		Window()->CurrentMessage()->FindInt32("modifiers", modifiers);
 	
 	fMouseDown = true;
+	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	
 	bool extendSelection = (modifiers & B_SHIFT_KEY) != 0;
 	SetCaret(where, extendSelection);
 }
