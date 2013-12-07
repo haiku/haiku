@@ -41,67 +41,68 @@
 namespace TranslationMapTracing {
 
 
-class TraceEntryBase : public AbstractTraceEntry {
+class TranslationMapTraceEntryBase
+	: public TRACE_ENTRY_SELECTOR(TRANSLATION_MAP_TRACING_STACK_TRACE) {
 public:
-	TraceEntryBase()
+	TranslationMapTraceEntryBase()
+		:
+		TraceEntryBase(TRANSLATION_MAP_TRACING_STACK_TRACE, 0, true)
 	{
-#if TRANSLATION_MAP_TRACING_STACK_TRACE
-		fStackTrace = capture_tracing_stack_trace(
-			TRANSLATION_MAP_TRACING_STACK_TRACE, 0, true);
-			// Don't capture userland stack trace to avoid potential
-			// deadlocks.
-#endif
 	}
 
-#if TRANSLATION_MAP_TRACING_STACK_TRACE
-	virtual void DumpStackTrace(TraceOutput& out)
+	void PrintPageTableEntry(TraceOutput& out, pae_page_table_entry entry)
 	{
-		out.PrintStackTrace(fStackTrace);
+		out.Print("%#" B_PRIx64  " %c%c%c%c%c %s %s %c%c",
+			entry & X86_PAE_PTE_ADDRESS_MASK,
+			(entry & X86_PAE_PTE_PRESENT) != 0 ? 'P' : '-',
+			(entry & X86_PAE_PTE_WRITABLE) != 0 ? 'W' : '-',
+			(entry & X86_PAE_PTE_USER) != 0 ? 'U' : '-',
+			(entry & X86_PAE_PTE_NOT_EXECUTABLE) != 0 ? '-' : 'X',
+			(entry & X86_PAE_PTE_GLOBAL) != 0 ? 'G' : '-',
+			(entry & X86_PAE_PTE_WRITE_THROUGH) != 0 ? "WT" : "--",
+			(entry & X86_PAE_PTE_CACHING_DISABLED) != 0 ? "UC" : "--",
+			(entry & X86_PAE_PTE_ACCESSED) != 0 ? 'A' : '-',
+			(entry & X86_PAE_PTE_DIRTY) != 0 ? 'D' : '-');
 	}
-#endif
-
-private:
-#if TRANSLATION_MAP_TRACING_STACK_TRACE
-	tracing_stack_trace*	fStackTrace;
-#endif
 };
 
 
-class Map : public TraceEntryBase {
+class Map : public TranslationMapTraceEntryBase {
 public:
 	Map(X86VMTranslationMapPAE* map, addr_t virtualAddress,
-		phys_addr_t physicalAddress)
+		pae_page_table_entry entry)
 		:
-		TraceEntryBase(),
+		TranslationMapTraceEntryBase(),
 		fMap(map),
 		fVirtualAddress(virtualAddress),
-		fPhysicalAddress(physicalAddress)
+		fEntry(entry)
 	{
 		Initialized();
 	}
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("translation map map: %p: %#" B_PRIxADDR
-			" -> %#" B_PRIxPHYSADDR, fMap, fVirtualAddress, fPhysicalAddress);
+		out.Print("translation map map: %p: %#" B_PRIxADDR " -> ", fMap,
+			fVirtualAddress);
+		PrintPageTableEntry(out, fEntry);
 	}
 
 private:
 	X86VMTranslationMapPAE*	fMap;
 	addr_t					fVirtualAddress;
-	phys_addr_t				fPhysicalAddress;
+	pae_page_table_entry	fEntry;
 };
 
 
-class Unmap : public TraceEntryBase {
+class Unmap : public TranslationMapTraceEntryBase {
 public:
 	Unmap(X86VMTranslationMapPAE* map, addr_t virtualAddress,
-		phys_addr_t physicalAddress)
+		pae_page_table_entry entry)
 		:
-		TraceEntryBase(),
+		TranslationMapTraceEntryBase(),
 		fMap(map),
 		fVirtualAddress(virtualAddress),
-		fPhysicalAddress(physicalAddress)
+		fEntry(entry)
 	{
 		Initialized();
 	}
@@ -109,13 +110,108 @@ public:
 	virtual void AddDump(TraceOutput& out)
 	{
 		out.Print("translation map unmap: %p: %#" B_PRIxADDR
-			" -> %#" B_PRIxPHYSADDR, fMap, fVirtualAddress, fPhysicalAddress);
+			" -> ", fMap, fVirtualAddress);
+		PrintPageTableEntry(out, fEntry);
 	}
 
 private:
 	X86VMTranslationMapPAE*	fMap;
 	addr_t					fVirtualAddress;
-	phys_addr_t				fPhysicalAddress;
+	pae_page_table_entry	fEntry;
+};
+
+
+class Protect : public TranslationMapTraceEntryBase {
+public:
+	Protect(X86VMTranslationMapPAE* map, addr_t virtualAddress,
+		pae_page_table_entry oldEntry, pae_page_table_entry newEntry)
+		:
+		TranslationMapTraceEntryBase(),
+		fMap(map),
+		fVirtualAddress(virtualAddress),
+		fOldEntry(oldEntry),
+		fNewEntry(newEntry)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("translation map protect: %p: %#" B_PRIxADDR
+			" -> ", fMap, fVirtualAddress);
+		PrintPageTableEntry(out, fNewEntry);
+		out.Print(" (%c%c%c)",
+			(fOldEntry & X86_PAE_PTE_WRITABLE) != 0 ? 'W' : '-',
+			(fOldEntry & X86_PAE_PTE_USER) != 0 ? 'U' : '-',
+			(fOldEntry & X86_PAE_PTE_NOT_EXECUTABLE) != 0 ? '-' : 'X');
+	}
+
+private:
+	X86VMTranslationMapPAE*	fMap;
+	addr_t					fVirtualAddress;
+	pae_page_table_entry	fOldEntry;
+	pae_page_table_entry	fNewEntry;
+};
+
+
+class ClearFlags : public TranslationMapTraceEntryBase {
+public:
+	ClearFlags(X86VMTranslationMapPAE* map, addr_t virtualAddress,
+		pae_page_table_entry oldEntry, pae_page_table_entry flagsCleared)
+		:
+		TranslationMapTraceEntryBase(),
+		fMap(map),
+		fVirtualAddress(virtualAddress),
+		fOldEntry(oldEntry),
+		fFlagsCleared(flagsCleared)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("translation map clear flags: %p: %#" B_PRIxADDR
+			" -> ", fMap, fVirtualAddress);
+		PrintPageTableEntry(out, fOldEntry & ~fFlagsCleared);
+		out.Print(", cleared %c%c (%c%c)",
+			(fOldEntry & fFlagsCleared & X86_PAE_PTE_ACCESSED) != 0 ? 'A' : '-',
+			(fOldEntry & fFlagsCleared & X86_PAE_PTE_DIRTY) != 0 ? 'D' : '-',
+			(fFlagsCleared & X86_PAE_PTE_ACCESSED) != 0 ? 'A' : '-',
+			(fFlagsCleared & X86_PAE_PTE_DIRTY) != 0 ? 'D' : '-');
+	}
+
+private:
+	X86VMTranslationMapPAE*	fMap;
+	addr_t					fVirtualAddress;
+	pae_page_table_entry	fOldEntry;
+	pae_page_table_entry	fFlagsCleared;
+};
+
+
+class ClearFlagsUnmap : public TranslationMapTraceEntryBase {
+public:
+	ClearFlagsUnmap(X86VMTranslationMapPAE* map, addr_t virtualAddress,
+		pae_page_table_entry entry)
+		:
+		TranslationMapTraceEntryBase(),
+		fMap(map),
+		fVirtualAddress(virtualAddress),
+		fEntry(entry)
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("translation map clear flags unmap: %p: %#" B_PRIxADDR
+			" -> ", fMap, fVirtualAddress);
+		PrintPageTableEntry(out, fEntry);
+	}
+
+private:
+	X86VMTranslationMapPAE*	fMap;
+	addr_t					fVirtualAddress;
+	pae_page_table_entry	fEntry;
 };
 
 
@@ -283,7 +379,6 @@ X86VMTranslationMapPAE::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 {
 	TRACE("X86VMTranslationMapPAE::Map(): %#" B_PRIxADDR " -> %#" B_PRIxPHYSADDR
 		"\n", virtualAddress, physicalAddress);
-	T(Map(this, virtualAddress, physicalAddress));
 
 	// check to see if a page table exists for this range
 	pae_page_directory_entry* pageDirEntry
@@ -328,6 +423,8 @@ X86VMTranslationMapPAE::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 
 	X86PagingMethodPAE::PutPageTableEntryInTable(entry, physicalAddress,
 		attributes, memoryType, fIsKernelMap);
+
+	T(Map(this, virtualAddress, *entry));
 
 	pinner.Unlock();
 
@@ -383,7 +480,7 @@ X86VMTranslationMapPAE::Unmap(addr_t start, addr_t end)
 				= X86PagingMethodPAE::ClearPageTableEntryFlags(
 					&pageTable[index], X86_PAE_PTE_PRESENT);
 
-			T(Unmap(this, start, oldEntry & X86_PAE_PDE_ADDRESS_MASK));
+			T(Unmap(this, start, oldEntry));
 
 			fMapCount--;
 
@@ -487,7 +584,7 @@ X86VMTranslationMapPAE::UnmapPage(VMArea* area, addr_t address,
 	pae_page_table_entry oldEntry = X86PagingMethodPAE::ClearPageTableEntry(
 		&pageTable[address / B_PAGE_SIZE % kPAEPageTableEntryCount]);
 
-	T(Unmap(this, address, oldEntry & X86_PAE_PDE_ADDRESS_MASK));
+	T(Unmap(this, address, oldEntry));
 
 	pinner.Unlock();
 
@@ -572,7 +669,7 @@ X86VMTranslationMapPAE::UnmapPages(VMArea* area, addr_t base, size_t size,
 			if ((oldEntry & X86_PAE_PTE_PRESENT) == 0)
 				continue;
 
-			T(Unmap(this, start, oldEntry & X86_PAE_PDE_ADDRESS_MASK));
+			T(Unmap(this, start, oldEntry));
 
 			fMapCount--;
 
@@ -714,7 +811,7 @@ X86VMTranslationMapPAE::UnmapArea(VMArea* area, bool deletingAddressSpace,
 				continue;
 			}
 
-			T(Unmap(this, address, oldEntry & X86_PAE_PDE_ADDRESS_MASK));
+			T(Unmap(this, address, oldEntry));
 
 			// transfer the accessed/dirty flags to the page and invalidate
 			// the mapping, if necessary
@@ -759,10 +856,8 @@ X86VMTranslationMapPAE::UnmapArea(VMArea* area, bool deletingAddressSpace,
 
 				pinner.Unlock();
 
-				if ((oldEntry & X86_PAE_PTE_PRESENT) != 0) {
-					T(Unmap(this, address,
-						oldEntry & X86_PAE_PDE_ADDRESS_MASK));
-				}
+				if ((oldEntry & X86_PAE_PTE_PRESENT) != 0)
+					T(Unmap(this, address, oldEntry));
 			}
 #endif
 		}
@@ -896,18 +991,19 @@ X86VMTranslationMapPAE::Protect(addr_t start, addr_t end, uint32 attributes,
 	TRACE("X86VMTranslationMapPAE::Protect(): %#" B_PRIxADDR " - %#" B_PRIxADDR
 		", attributes: %#" B_PRIx32 "\n", start, end, attributes);
 
-	// compute protection flags
-	uint64 newProtectionFlags = 0;
+	// compute protection/memory type flags
+	uint64 newFlags
+		= X86PagingMethodPAE::MemoryTypeToPageTableEntryFlags(memoryType);
 	if ((attributes & B_USER_PROTECTION) != 0) {
-		newProtectionFlags = X86_PAE_PTE_USER;
+		newFlags |= X86_PAE_PTE_USER;
 		if ((attributes & B_WRITE_AREA) != 0)
-			newProtectionFlags |= X86_PAE_PTE_WRITABLE;
+			newFlags |= X86_PAE_PTE_WRITABLE;
 		if ((attributes & B_EXECUTE_AREA) == 0
 			&& x86_check_feature(IA32_FEATURE_AMD_EXT_NX, FEATURE_EXT_AMD)) {
-			newProtectionFlags |= X86_PAE_PTE_NOT_EXECUTABLE;
+			newFlags |= X86_PAE_PTE_NOT_EXECUTABLE;
 		}
 	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
-		newProtectionFlags = X86_PAE_PTE_WRITABLE;
+		newFlags |= X86_PAE_PTE_WRITABLE;
 
 	do {
 		pae_page_directory_entry* pageDirEntry
@@ -947,14 +1043,17 @@ X86VMTranslationMapPAE::Protect(addr_t start, addr_t end, uint32 attributes,
 					&pageTable[index],
 					(entry & ~(X86_PAE_PTE_PROTECTION_MASK
 							| X86_PAE_PTE_MEMORY_TYPE_MASK))
-						| newProtectionFlags
-						| X86PagingMethodPAE::MemoryTypeToPageTableEntryFlags(
-							memoryType),
+						| newFlags,
 					entry);
 				if (oldEntry == entry)
 					break;
 				entry = oldEntry;
 			}
+
+			T(Protect(this, start, entry,
+				(entry & ~(X86_PAE_PTE_PROTECTION_MASK
+						| X86_PAE_PTE_MEMORY_TYPE_MASK))
+					| newFlags));
 
 			if ((oldEntry & X86_PAE_PTE_ACCESSED) != 0) {
 				// Note, that we only need to invalidate the address, if the
@@ -996,6 +1095,8 @@ X86VMTranslationMapPAE::ClearFlags(addr_t address, uint32 flags)
 		= X86PagingMethodPAE::ClearPageTableEntryFlags(entry, flagsToClear);
 
 	pinner.Unlock();
+
+	T(ClearFlags(this, address, oldEntry, flagsToClear));
 
 	if ((oldEntry & flagsToClear) != 0)
 		InvalidatePage(address);
@@ -1044,12 +1145,15 @@ X86VMTranslationMapPAE::ClearAccessedAndModified(VMArea* area, addr_t address,
 				// page was accessed -- just clear the flags
 				oldEntry = X86PagingMethodPAE::ClearPageTableEntryFlags(entry,
 					X86_PAE_PTE_ACCESSED | X86_PAE_PTE_DIRTY);
+				T(ClearFlags(this, address, oldEntry,
+					X86_PAE_PTE_ACCESSED | X86_PAE_PTE_DIRTY));
 				break;
 			}
 
 			// page hasn't been accessed -- unmap it
 			if (X86PagingMethodPAE::TestAndSetPageTableEntry(entry, 0, oldEntry)
 					== oldEntry) {
+				T(ClearFlagsUnmap(this, address, oldEntry));
 				break;
 			}
 
@@ -1058,6 +1162,8 @@ X86VMTranslationMapPAE::ClearAccessedAndModified(VMArea* area, addr_t address,
 	} else {
 		oldEntry = X86PagingMethodPAE::ClearPageTableEntryFlags(entry,
 			X86_PAE_PTE_ACCESSED | X86_PAE_PTE_DIRTY);
+		T(ClearFlags(this, address, oldEntry,
+			X86_PAE_PTE_ACCESSED | X86_PAE_PTE_DIRTY));
 	}
 
 	pinner.Unlock();
