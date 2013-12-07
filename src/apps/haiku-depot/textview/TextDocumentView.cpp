@@ -9,6 +9,7 @@
 
 #include <ScrollBar.h>
 #include <Shape.h>
+#include <Window.h>
 
 
 TextDocumentView::TextDocumentView(const char* name)
@@ -88,12 +89,20 @@ TextDocumentView::FrameResized(float width, float height)
 void
 TextDocumentView::MouseDown(BPoint where)
 {
+	int32 modifiers = 0;
+	if (Window() != NULL && Window()->CurrentMessage() != NULL)
+		Window()->CurrentMessage()->FindInt32("modifiers", modifiers);
+	
+	fMouseDown = true;
+	bool extendSelection = (modifiers & B_SHIFT_KEY) != 0;
+	SetCaret(where, extendSelection);
 }
 
 
 void
 TextDocumentView::MouseUp(BPoint where)
 {
+	fMouseDown = false;
 }
 
 
@@ -101,6 +110,8 @@ void
 TextDocumentView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 {
+	if (fMouseDown)
+		SetCaret(where, true);
 }
 
 
@@ -195,6 +206,23 @@ TextDocumentView::SetInsets(float left, float top, float right, float bottom)
 
 	InvalidateLayout();
 	Invalidate();
+}
+
+
+void
+TextDocumentView::SetCaret(const BPoint& location, bool extendSelection)
+{
+	if (fTextDocument.Get() == NULL)
+		return;
+
+	bool rightOfChar = false;
+	int32 caretOffset = fTextDocumentLayout.TextOffsetAt(
+		location.x - fInsetLeft, location.y - fInsetTop, rightOfChar);
+
+	if (rightOfChar)
+		caretOffset++;
+
+	_SetCaretOffset(caretOffset, true, extendSelection);
 }
 
 

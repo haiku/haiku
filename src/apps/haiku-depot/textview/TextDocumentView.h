@@ -42,6 +42,10 @@ public:
 			void				SetInsets(float horizontal, float vertical);
 			void				SetInsets(float left, float top, float right,
 									float bottom);
+
+			void				SetCaret(const BPoint& where,
+									bool extendSelection);
+
 private:
 			float				_TextLayoutWidth(float viewWidth) const;
 
