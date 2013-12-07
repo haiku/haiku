@@ -144,6 +144,29 @@ TextDocumentLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 }
 
 
+int32
+TextDocumentLayout::TextOffsetAt(float x, float y, bool& rightOfCenter)
+{
+	_ValidateLayout();
+
+	int32 textOffset = 0;
+	rightOfCenter = false;
+
+	int32 paragraphs = fParagraphLayouts.CountItems();
+	for (int32 i = 0; i < paragraphs; i++) {
+		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
+		if (y > info.y + info.layout->Height()) {
+			textOffset += info.layout->CountGlyphs();
+			continue;
+		}
+
+		textOffset += info.layout->TextOffsetAt(x, y - info.y, rightOfCenter);
+		break;
+	}
+	
+	return textOffset;
+}
+
 // #pragma mark - private
 
 

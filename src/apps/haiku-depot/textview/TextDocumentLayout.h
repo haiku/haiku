@@ -92,6 +92,9 @@ public:
 									float& x1, float& y1,
 									float& x2, float& y2);
 
+			int32				TextOffsetAt(float x, float y,
+									bool& rightOfCenter);
+
 private:
 			void				_Init();
 			void				_ValidateLayout();
