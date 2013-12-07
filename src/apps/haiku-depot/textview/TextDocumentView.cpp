@@ -6,7 +6,9 @@
 #include "TextDocumentView.h"
 
 #include <algorithm>
+#include <stdio.h>
 
+#include <Cursor.h>
 #include <ScrollBar.h>
 #include <Shape.h>
 #include <Window.h>
@@ -63,11 +65,15 @@ TextDocumentView::Draw(BRect updateRect)
 	BShape shape;
 	_GetSelectionShape(shape, start, end);
 
-	SetHighColor(60, 40, 0);
 	SetDrawingMode(B_OP_SUBTRACT);
+	SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
+	MovePenTo(fInsetLeft - 0.5f, fInsetTop - 0.5f);
 
-	MovePenTo(fInsetLeft, fInsetTop);
+	SetHighColor(30, 30, 30);
 	FillShape(&shape);
+
+	SetHighColor(40, 40, 40);
+	StrokeShape(&shape);
 }
 
 
@@ -112,6 +118,9 @@ void
 TextDocumentView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 {
+	BCursor iBeamCursor(B_CURSOR_ID_I_BEAM);
+	SetViewCursor(&iBeamCursor);
+
 	if (fMouseDown)
 		SetCaret(where, true);
 }
@@ -314,8 +323,7 @@ TextDocumentView::_SetCaretOffset(int32 offset, bool updateAnchor,
 
 // _GetSelectionShape
 void
-TextDocumentView::_GetSelectionShape(BShape& shape,
-	int32 start, int32 end)
+TextDocumentView::_GetSelectionShape(BShape& shape, int32 start, int32 end)
 {
 	float startX1;
 	float startY1;
@@ -324,11 +332,21 @@ TextDocumentView::_GetSelectionShape(BShape& shape,
 	fTextDocumentLayout.GetTextBounds(start, startX1, startY1, startX2,
 		startY2);
 
+	startX1 = floorf(startX1);
+	startY1 = floorf(startY1);
+	startX2 = ceilf(startX2);
+	startY2 = ceilf(startY2);
+
 	float endX1;
 	float endY1;
 	float endX2;
 	float endY2;
 	fTextDocumentLayout.GetTextBounds(end, endX1, endY1, endX2, endY2);
+
+	endX1 = floorf(endX1);
+	endY1 = floorf(endY1);
+	endX2 = ceilf(endX2);
+	endY2 = ceilf(endY2);
 
 	int32 startLineIndex = fTextDocumentLayout.LineIndexForOffset(start);
 	int32 endLineIndex = fTextDocumentLayout.LineIndexForOffset(end);
@@ -351,9 +369,11 @@ TextDocumentView::_GetSelectionShape(BShape& shape,
 		// ------###
 		// ##-------
 		// ---------
+		float width = ceilf(fTextDocumentLayout.Width());
+
 		BPoint lt(startX1, startY1);
-		BPoint rt(fTextDocumentLayout.Width(), startY1);
-		BPoint rb(fTextDocumentLayout.Width(), startY2);
+		BPoint rt(width, startY1);
+		BPoint rb(width, startY2);
 		BPoint lb(startX1, startY2);
 
 		shape.MoveTo(lt);
@@ -374,9 +394,11 @@ TextDocumentView::_GetSelectionShape(BShape& shape,
 		shape.Close();
 	} else {
 		// Selection over multiple lines
+		float width = ceilf(fTextDocumentLayout.Width());
+		
 		shape.MoveTo(BPoint(startX1, startY1));
-		shape.LineTo(BPoint(fTextDocumentLayout.Width(), startY1));
-		shape.LineTo(BPoint(fTextDocumentLayout.Width(), endY1));
+		shape.LineTo(BPoint(width, startY1));
+		shape.LineTo(BPoint(width, endY1));
 		shape.LineTo(BPoint(endX1, endY1));
 		shape.LineTo(BPoint(endX1, endY2));
 		shape.LineTo(BPoint(0, endY2));
