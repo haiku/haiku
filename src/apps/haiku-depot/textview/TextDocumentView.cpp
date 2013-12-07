@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <stdio.h>
 
+#include <Clipboard.h>
 #include <Cursor.h>
 #include <ScrollBar.h>
 #include <Shape.h>
@@ -42,6 +43,20 @@ TextDocumentView::~TextDocumentView()
 
 
 void
+TextDocumentView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case B_COPY:
+			Copy(be_clipboard);
+			break;
+
+		default:
+			BView::MessageReceived(message);
+	}
+}
+
+
+void
 TextDocumentView::Draw(BRect updateRect)
 {
 	FillRect(updateRect, B_SOLID_LOW);
@@ -54,13 +69,7 @@ TextDocumentView::Draw(BRect updateRect)
 
 	int32 start;
 	int32 end;
-	if (fSelectionAnchorOffset <= fCaretOffset) {
-		start = fSelectionAnchorOffset;
-		end = fCaretOffset;
-	} else {
-		start = fCaretOffset;
-		end = fSelectionAnchorOffset;
-	}
+	GetSelection(start, end);
 
 	BShape shape;
 	_GetSelectionShape(shape, start, end);
@@ -69,8 +78,10 @@ TextDocumentView::Draw(BRect updateRect)
 	SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
 	MovePenTo(fInsetLeft - 0.5f, fInsetTop - 0.5f);
 
-	SetHighColor(30, 30, 30);
-	FillShape(&shape);
+	if (IsFocus() && Window() != NULL && Window()->IsActive()) {
+		SetHighColor(30, 30, 30);
+		FillShape(&shape);
+	}
 
 	SetHighColor(40, 40, 40);
 	StrokeShape(&shape);
@@ -93,8 +104,26 @@ TextDocumentView::FrameResized(float width, float height)
 
 
 void
+TextDocumentView::WindowActivated(bool active)
+{
+	Invalidate();
+}
+
+
+void
+TextDocumentView::MakeFocus(bool focus)
+{
+	if (focus != IsFocus())
+		Invalidate();
+	BView::MakeFocus(focus);
+}
+
+
+void
 TextDocumentView::MouseDown(BPoint where)
 {
+	MakeFocus();
+
 	int32 modifiers = 0;
 	if (Window() != NULL && Window()->CurrentMessage() != NULL)
 		Window()->CurrentMessage()->FindInt32("modifiers", &modifiers);
@@ -234,6 +263,59 @@ TextDocumentView::SetCaret(const BPoint& location, bool extendSelection)
 		caretOffset++;
 
 	_SetCaretOffset(caretOffset, true, extendSelection);
+}
+
+
+bool
+TextDocumentView::HasSelection() const
+{
+	return fSelectionAnchorOffset != fCaretOffset;
+}
+
+
+void
+TextDocumentView::GetSelection(int32& start, int32& end) const
+{
+	if (fSelectionAnchorOffset <= fCaretOffset) {
+		start = fSelectionAnchorOffset;
+		end = fCaretOffset;
+	} else {
+		start = fCaretOffset;
+		end = fSelectionAnchorOffset;
+	}
+}
+
+
+void
+TextDocumentView::Copy(BClipboard* clipboard)
+{
+	if (fSelectionAnchorOffset == fCaretOffset
+		|| fTextDocument.Get() == NULL) {
+		// Nothing to copy, don't clear clipboard contents for now reason.
+		return;
+	}
+	
+	if (clipboard == NULL || !clipboard->Lock())
+		return;
+	
+	clipboard->Clear();
+
+	BMessage* clip = clipboard->Data();
+	if (clip != NULL) {
+		int32 start;
+		int32 end;
+		GetSelection(start, end);
+		
+		BString text = fTextDocument->GetText(start, end - start);
+		clip->AddData("text/plain", B_MIME_TYPE, text.String(),
+			text.Length());
+		
+		// TODO: Support for "application/x-vnd.Be-text_run_array"
+		
+		clipboard->Commit();
+	}
+
+	clipboard->Unlock();
 }
 
 

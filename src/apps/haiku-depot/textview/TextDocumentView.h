@@ -12,15 +12,22 @@
 #include "TextDocumentLayout.h"
 
 
+class BClipboard;
+
+
 class TextDocumentView : public BView {
 public:
 								TextDocumentView(const char* name = NULL);
 	virtual						~TextDocumentView();
 
+	virtual	void				MessageReceived(BMessage* message);
+
 	virtual void				Draw(BRect updateRect);
 
 	virtual	void				AttachedToWindow();
 	virtual void				FrameResized(float width, float height);
+	virtual	void				WindowActivated(bool active);
+	virtual	void				MakeFocus(bool focus = true);
 
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseUp(BPoint where);
@@ -45,6 +52,11 @@ public:
 
 			void				SetCaret(const BPoint& where,
 									bool extendSelection);
+
+			bool				HasSelection() const;
+			void				GetSelection(int32& start, int32& end) const;
+
+			void				Copy(BClipboard* clipboard);
 
 private:
 			float				_TextLayoutWidth(float viewWidth) const;
