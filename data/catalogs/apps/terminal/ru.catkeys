@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	2967760334
+1	russian	x-vnd.Haiku-Terminal	1655135592
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -55,6 +55,7 @@ Blinking cursor	Terminal AppearancePrefView		Мигающий курсор
 Don't save	Terminal PrefWindow		Не сохранять
 Set window title	Terminal TermWindow		Установить заголовок окна
 Terminal	System name		Терминал
+Copy path	Terminal TermView		Скопировать путь
 Close other tabs	Terminal TermWindow		Закрыть остальные вкладки
 Match word	Terminal FindWindow		Только слово целиком
 Nothing is selected.	Terminal TermWindow		Ничего не выделено
@@ -80,10 +81,12 @@ Text encoding	Terminal TermWindow		Кодировка
 size	Terminal TermView		размер
 Close window	Terminal TermWindow		Закрыть окно
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%T\t-\tИмя приложения Терминал для текущей локали.\n\t%e\t-\tКодировка текущей вкладки. Для UTF-8 не отображается.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n\t%%\t-\tСимвол процента - '%'.
+Copy absolute path	Terminal TermView		Скопировать абсолютный адрес
 Save as default	Terminal TermWindow		Сохранить
 Set tab title	Terminal TermWindow		Переименовть вкладку
 Settings…	Terminal TermWindow		Настройки…
 Abort	Terminal Shell		Отменить
+Open link	Terminal TermView		Открыть ссылку
 Edit	Terminal TermWindow		Изменить
 Color:	Terminal AppearancePrefView		Цвет:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок окна.\nВозможно использовать следующие переменные:\n
@@ -94,7 +97,9 @@ OK	Terminal TermApp		ОК
 Find failed	Terminal TermWindow		Строка не найдена
 Search forward	Terminal FindWindow		Искать сверху вниз
 Edit tab title…	Terminal TermWindow		Переименовать вкладку…
+Open path	Terminal TermView		Открыть путь
 Find previous	Terminal TermWindow		Найти ранее
+Copy link location	Terminal TermView		Скопировать ссылку
 Tab title:	Terminal TermWindow		Заголовок вкладки:
 Find next	Terminal TermWindow		Найти далее
 Close active tab	Terminal TermWindow		Закрыть активную вкладку

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2969079095
+1	japanese	x-vnd.Haiku-HaikuDepot	1933313737
 Name	PackageListView		名前
 Installed packages	Model		インストール済パッケージ
 User modified packages	Model		ユーザーが変更したパッケージ
@@ -21,6 +21,7 @@ Refresh depots	MainWindow		Depot を更新
 Main Menu	MainWindow		メインメニュー
 Command line	Model		コマンドライン
 (%Votes%)	PackageInfoView		(%Votes%)
+Downloading:	PackageInfoView		ダウンロード中:
 Package	MainWindow		パッケージ
 Search terms:	FilterView		検索語句:
 %Version%	PackageInfoView		%Version%

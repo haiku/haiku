@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	2969013755
+1	german	x-vnd.Haiku-MediaPlayer	1727923642
 raw audio	MediaPlayer-InfoWin		Raw-Audio
 Location	MediaPlayer-InfoWin		Ort
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
@@ -21,10 +21,12 @@ Close	MediaPlayer-Main		Schließen
 Display Mode	MediaPlayer-InfoWin		Anzeigemodus
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Einige Dateien konnten nicht in den Papierkorb verschoben werden.
 <unknown>	MediaPlayer-InfoWin		<unbekannt>
+Seek	MediaPlayer-Main		Suchlauf
 Open	MediaPlayer-Main		Öffnen
 Next	MediaPlayer-Main		Nächster
 OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Track %d
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Zeigt/setzt die aktuelle Abspielposition in Mikrosekunden.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Anzeigemodus
 Medium	MediaPlayer-SettingsWindow		Mittel
@@ -69,6 +71,7 @@ Select all	MediaPlayer-PlaylistWindow		Alles auswählen
 Move Entry	MediaPlayer-MovePLItemsCmd		Eintrag verschieben
 Open	MediaPlayer-PlaylistWindow		Öffnen
 Stop playing.	MediaPlayer-Main		Wiedergabe stoppen.
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		Suchlauf um die angegebene Zahl an Mikrosekunden.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Die Datei '%filename' konnte nicht geöffnet werden.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Fehler: 
 Audio	MediaPlayer-InfoWin		Audio
@@ -100,6 +103,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Es konnte
 <untitled>	PlaylistItem-title		<unbenannt>
 Track	Audio Track Menu		Track
 unknown format	MediaPlayer-InfoWin		unbekanntes Format
+Position	MediaPlayer-Main		Position
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nichts zu wiederholen>
 Skip to the next track.	MediaPlayer-Main		Zum nächsten Track springen.
 Play	MediaPlayer-Main		Wiedergabe
@@ -135,12 +139,14 @@ Edit	MediaPlayer-PlaylistWindow		Bearbeiten
 Start media server	MediaPlayer-Main		Mediaserver starten
 %.3f fps	MediaPlayer-InfoWin		%.3f Bilder/s
 Toggle fullscreen.	MediaPlayer-Main		Vollbild
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Zeigt die Spieldauer des aktuell abspielenden Objekts in Mikrosekunden.
 ToggleFullscreen	MediaPlayer-Main		Vollbild
 <unnamed>	PlaylistItem-name		<unbenannt>
 Open Clips	MediaPlayer-Main		Clips öffnen
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		keine
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Zeigt/Setzt die Lautstärke (0,0-2,0)
+Duration	MediaPlayer-Main		Spieldauer
 Playlist…	MediaPlayer-Main		Playliste…
 <unknown>	PlaylistItem-author		<unbekannt>
 Save as…	MediaPlayer-PlaylistWindow		Speichern als…

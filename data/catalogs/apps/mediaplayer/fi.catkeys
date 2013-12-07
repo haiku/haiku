@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	2969013755
+1	finnish	x-vnd.Haiku-MediaPlayer	1727923642
 raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -21,10 +21,12 @@ Close	MediaPlayer-Main		Sulje
 Display Mode	MediaPlayer-InfoWin		Näyttötila
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Joidenkin tiedostojen siirtäminen roskakoriin epäonnistui.
 <unknown>	MediaPlayer-InfoWin		<tuntematon>
+Seek	MediaPlayer-Main		Etsi
 Open	MediaPlayer-Main		Avaa
 Next	MediaPlayer-Main		Seuraava
 OK	MediaPlayer-SettingsWindow		Valmis
 Track %d	MediaPlayer-Main		Kappale %d
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Hakee/asettaa nykyisen soittosijainnin mikrosekunneissa.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Näyttötila
 Medium	MediaPlayer-SettingsWindow		Media
@@ -69,6 +71,7 @@ Select all	MediaPlayer-PlaylistWindow		Valitse kaikki
 Move Entry	MediaPlayer-MovePLItemsCmd		Siirrä kappale
 Open	MediaPlayer-PlaylistWindow		Avaa
 Stop playing.	MediaPlayer-Main		Lopeta soittaminen.
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		Etsii määritellyn mikrosekuntimäärän.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Tiedoston ’%filename’ avaaminen epäonnistui.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Virhe: 
 Audio	MediaPlayer-InfoWin		Ääni
@@ -100,6 +103,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kaikkien 
 <untitled>	PlaylistItem-title		<otsikoton>
 Track	Audio Track Menu		Kappale
 unknown format	MediaPlayer-InfoWin		tuntematon muoto
+Position	MediaPlayer-Main		Sijainti
 <nothing to redo>	MediaPlayer-PlaylistWindow		<ei mitään uudelleensuoritettavaa>
 Skip to the next track.	MediaPlayer-Main		Hyppää seuraavan kappaleen yli.
 Play	MediaPlayer-Main		Soita
@@ -135,12 +139,14 @@ Edit	MediaPlayer-PlaylistWindow		Muokkaa
 Start media server	MediaPlayer-Main		Käynnistä mediapalvelin
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Täysruututila päälle/pois.
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Hakee nykyisen soittokappaleen keston mikrosekunteina.
 ToggleFullscreen	MediaPlayer-Main		ToggleFullscreen
 <unnamed>	PlaylistItem-name		<nimetön>
 Open Clips	MediaPlayer-Main		Avaa videoleikkeet
 OK	MediaPlayer-PlaylistWindow		Valmis
 none	Audio track menu		ei mitään
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Hakee/asettaa voimakkuuden (0,0 - 2,0).
+Duration	MediaPlayer-Main		Kesto
 Playlist…	MediaPlayer-Main		Soittoluettelo...
 <unknown>	PlaylistItem-author		<tuntematon>
 Save as…	MediaPlayer-PlaylistWindow		Tallenna nimellä...

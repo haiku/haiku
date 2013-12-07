@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	2969013755
+1	hungarian	x-vnd.Haiku-MediaPlayer	1727923642
 raw audio	MediaPlayer-InfoWin		nyers audio
 Location	MediaPlayer-InfoWin		Útvonal
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikai)
@@ -21,10 +21,12 @@ Close	MediaPlayer-Main		Bezárás
 Display Mode	MediaPlayer-InfoWin		Megjelenítési mód
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Néhány elemet nem lehetett a Szemetesbe helyezni.
 <unknown>	MediaPlayer-InfoWin		<ismeretlen>
+Seek	MediaPlayer-Main		Keresés
 Open	MediaPlayer-Main		Megnyitás
 Next	MediaPlayer-Main		Következő
 OK	MediaPlayer-SettingsWindow		Rendben
 Track %d	MediaPlayer-Main		Szám %d
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Aktuális lejátszási pozíció lekérése/megadása mikroszekundumban.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Megjelenítési mód
 Medium	MediaPlayer-SettingsWindow		Közepes
@@ -69,6 +71,7 @@ Select all	MediaPlayer-PlaylistWindow		Mind kijelölése
 Move Entry	MediaPlayer-MovePLItemsCmd		Bejegyzés áthelyezése
 Open	MediaPlayer-PlaylistWindow		Megnyitás
 Stop playing.	MediaPlayer-Main		Lejátszás leállítása.
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		Keresés a megadott mikroszekundummal.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		A fájlt (%filename) nem sikerült megnyitni.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Hiba:
 Audio	MediaPlayer-InfoWin		Audió
@@ -100,6 +103,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nem siker
 <untitled>	PlaylistItem-title		<névtelen>
 Track	Audio Track Menu		Sáv
 unknown format	MediaPlayer-InfoWin		ismeretlen formátum
+Position	MediaPlayer-Main		Pozíció
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nincs mit újra csinálni>
 Skip to the next track.	MediaPlayer-Main		Ugrás a következő számra.
 Play	MediaPlayer-Main		Lejátszás
@@ -135,12 +139,14 @@ Edit	MediaPlayer-PlaylistWindow		Szerkesztés
 Start media server	MediaPlayer-Main		Médiakiszolgáló indítása
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Teljes képernyő.
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		A jelenleg lejátszott elem hossza mikroszekundumban megadva.
 ToggleFullscreen	MediaPlayer-Main		Teljes képernyő
 <unnamed>	PlaylistItem-name		<névtelen>
 Open Clips	MediaPlayer-Main		Klippek megnyitása
 OK	MediaPlayer-PlaylistWindow		Rendben
 none	Audio track menu		nincs
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Megadja/beállítja a hangerőt (0.0-2.0)
+Duration	MediaPlayer-Main		Időtartam
 Playlist…	MediaPlayer-Main		Lejátszási lista…
 <unknown>	PlaylistItem-author		<névtelen>
 Save as…	MediaPlayer-PlaylistWindow		Mentés másként…

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	2967760334
+1	german	x-vnd.Haiku-Terminal	1655135592
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -55,6 +55,7 @@ Blinking cursor	Terminal AppearancePrefView		Blinkender Cursor
 Don't save	Terminal PrefWindow		Verwerfen
 Set window title	Terminal TermWindow		Setze Fenstertitel
 Terminal	System name		Terminal
+Copy path	Terminal TermView		Pfad kopieren
 Close other tabs	Terminal TermWindow		Andere Reiter schließen
 Match word	Terminal FindWindow		Ganze Wörter suchen
 Nothing is selected.	Terminal TermWindow		Es wurde nichts ausgewählt.
@@ -80,10 +81,12 @@ Text encoding	Terminal TermWindow		Kodierung
 size	Terminal TermView		Größe
 Close window	Terminal TermWindow		Fenster schließen
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%T\t-\tName der Terminalanwendung in der aktuellen Systemsprache\n\t%T\t-\tKodierung des aktuellen Reiters. Unterdrückt bei UTF-8\n\t%i\t-\tLaufende Nummer des Fensters\n\t%p\t-\tName des laufenden Prozesses im aktuellen Reiter\n\t%t\t-\tTitel des aktuellen Reiters\n\t%%\t-\tDas Zeichen '%'
+Copy absolute path	Terminal TermView		Absoluten Pfad kopieren
 Save as default	Terminal TermWindow		Als Standard speichern
 Set tab title	Terminal TermWindow		Reiter umbenennen
 Settings…	Terminal TermWindow		Einstellungen...
 Abort	Terminal Shell		Abbrechen
+Open link	Terminal TermView		Link öffnen
 Edit	Terminal TermWindow		Bearbeiten
 Color:	Terminal AppearancePrefView		Farbe:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für den Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
@@ -94,7 +97,9 @@ OK	Terminal TermApp		OK
 Find failed	Terminal TermWindow		Suche fehlgeschlagen
 Search forward	Terminal FindWindow		Vorwärts suchen
 Edit tab title…	Terminal TermWindow		Reiter umbenennen...
+Open path	Terminal TermView		Pfad öffnen
 Find previous	Terminal TermWindow		Rückwärts suchen
+Copy link location	Terminal TermView		Link-Adresse kopieren
 Tab title:	Terminal TermWindow		Reitertitel:
 Find next	Terminal TermWindow		Weitersuchen
 Close active tab	Terminal TermWindow		Aktiven Reiter schließen

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2012672664
+1	german	x-vnd.Haiku-HaikuDepot	976907306
 Name	PackageListView		Name
 Installed packages	Model		Installierte Pakete
 User modified packages	Model		Veränderte Pakete
@@ -22,6 +22,7 @@ Refresh depots	MainWindow		Depots aktualisieren
 Main Menu	MainWindow		Hauptmenü
 Command line	Model		Kommandozeile
 (%Votes%)	PackageInfoView		(%Votes%)
+Downloading:	PackageInfoView		Aktueller Download:
 Package	MainWindow		Paket
 Search terms:	FilterView		Suchbegriffe:
 %Version%	PackageInfoView		%Version%

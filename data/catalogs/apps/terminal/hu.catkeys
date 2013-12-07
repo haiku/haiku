@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	2967760334
+1	hungarian	x-vnd.Haiku-Terminal	1655135592
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -55,6 +55,7 @@ Blinking cursor	Terminal AppearancePrefView		Villogó kurzor
 Don't save	Terminal PrefWindow		Nincs mentés
 Set window title	Terminal TermWindow		Ablak címének beállítása
 Terminal	System name		Terminál
+Copy path	Terminal TermView		Útvonal másolása
 Close other tabs	Terminal TermWindow		Többi lap bezárása
 Match word	Terminal FindWindow		Szóegyeszés
 Nothing is selected.	Terminal TermWindow		Nincs semmi kijelölve.
@@ -80,10 +81,12 @@ Text encoding	Terminal TermWindow		Szöveg kódolása
 size	Terminal TermView		méret
 Close window	Terminal TermWindow		Ablak bezárása
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t %d\t -\t A jelenlegi mappa az aktuális fülön.\n\t \t \t Kiegészítésként a maximálisan megjelenő mappá száma\n\t \t \t is megadható. Például '%2d' a legutóbbi 2 részre.\n\t %T\t -\t A Terminál program neve az aktuális nyelven.\n\t %e\t -\t Az aktuális fül kódolása. UTF-8 esetében nem jelenik meg.\n\t %i\t -\t Az ablak sorszáma.\n\t %p\t -\t Az aktív parancs neve az aktuális fülön.\n\t %t\t -\t Aktuális fül címe.\n\t %%\t -\t '%' karakter.
+Copy absolute path	Terminal TermView		Teljes útvonal másolása
 Save as default	Terminal TermWindow		Mentés alapértelmezettként
 Set tab title	Terminal TermWindow		Lap címének beállítása
 Settings…	Terminal TermWindow		Beállítások…
 Abort	Terminal Shell		Megszakítás
+Open link	Terminal TermView		Hivatkozás megnyitása
 Edit	Terminal TermWindow		Szerkesztés
 Color:	Terminal AppearancePrefView		Szín:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Az ablak címét meghatározó minta. A következő kódok használhatóak:
@@ -94,7 +97,9 @@ OK	Terminal TermApp		Rendben
 Find failed	Terminal TermWindow		Sikertelen keresés
 Search forward	Terminal FindWindow		Keresés előre
 Edit tab title…	Terminal TermWindow		Lap címének szerkesztése…
+Open path	Terminal TermView		Útvonal megnyitása
 Find previous	Terminal TermWindow		Előző keresése
+Copy link location	Terminal TermView		Hivatkozás másolása
 Tab title:	Terminal TermWindow		Lap címe:
 Find next	Terminal TermWindow		Következő keresése
 Close active tab	Terminal TermWindow		Aktív lap bezárása

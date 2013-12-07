@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	2969013755
+1	japanese	x-vnd.Haiku-MediaPlayer	1727923642
 raw audio	MediaPlayer-InfoWin		raw オーディオ
 Location	MediaPlayer-InfoWin		場所
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
@@ -21,10 +21,12 @@ Close	MediaPlayer-Main		閉じる
 Display Mode	MediaPlayer-InfoWin		表示モード
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		いくつかのファイルはごみ箱に移動できませんでした。
 <unknown>	MediaPlayer-InfoWin		<不明>
+Seek	MediaPlayer-Main		シーク
 Open	MediaPlayer-Main		開く
 Next	MediaPlayer-Main		次
 OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		トラック %d
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		現在再生中の位置をマイクロセコンド単位で得る / 設定する。
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (シネマスコープ)
 Display mode	MediaPlayer-InfoWin		表示モード
 Medium	MediaPlayer-SettingsWindow		中
@@ -69,6 +71,7 @@ Select all	MediaPlayer-PlaylistWindow		すべて選択
 Move Entry	MediaPlayer-MovePLItemsCmd		項目を移動
 Open	MediaPlayer-PlaylistWindow		開く
 Stop playing.	MediaPlayer-Main		再生を停止
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		指定されたマイクロセコンド分シークする。
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		ファイル'%filename'を開けませんでした。\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		エラー:
 Audio	MediaPlayer-InfoWin		オーディオ
@@ -100,6 +103,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		すべて
 <untitled>	PlaylistItem-title		<無題>
 Track	Audio Track Menu		トラック
 unknown format	MediaPlayer-InfoWin		不明なフォーマット
+Position	MediaPlayer-Main		位置
 <nothing to redo>	MediaPlayer-PlaylistWindow		<やり直すものがありません>
 Skip to the next track.	MediaPlayer-Main		次のトラックに飛ぶ
 Play	MediaPlayer-Main		再生
@@ -135,12 +139,14 @@ Edit	MediaPlayer-PlaylistWindow		編集
 Start media server	MediaPlayer-Main		メディアサーバーを起動する
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		全画面表示 / 解除
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		現在再生中の項目の再生時間をマイクロセコンド単位で得る。
 ToggleFullscreen	MediaPlayer-Main		全画面表示 / 解除
 <unnamed>	PlaylistItem-name		<名前が無い>
 Open Clips	MediaPlayer-Main		クリップを開く
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		無し
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		ボリュームの取得および設定 (0.0-2.0) 。
+Duration	MediaPlayer-Main		再生時間
 Playlist…	MediaPlayer-Main		プレイリスト…
 <unknown>	PlaylistItem-author		<不明>
 Save as…	MediaPlayer-PlaylistWindow		名前を付けて保存…

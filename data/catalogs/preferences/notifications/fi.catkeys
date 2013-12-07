@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Notifications	1398224574
+1	finnish	x-vnd.Haiku-Notifications	3366464357
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Tapahtui virhe tallennettaessa asetuksia.\nOn mahdollista, että levytila on loppunut.
 Notifications	GeneralView		Ilmoitukset
 seconds of inactivity	GeneralView		joutilaisuussekunnit
@@ -45,5 +45,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 Enable notifications at startup	GeneralView		Ota käyttöön ilmoitukset käynnistymisen yhteydessä
 Notifications	PrefletView		Ilmoitusasetukset
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Ilmoituspalvelinta ei löytynyt. Tämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
+Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Asetusten tallentaminen epäonnistui, sinulla ei luultavasti ole kirjoitusoikeuksia asetuskansioon.
 Applications	NotificationView		Sovellukset
 Events are notified	GeneralView		Tapahtumista on ilmoitettu

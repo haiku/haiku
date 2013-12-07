@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2012672664
+1	russian	x-vnd.Haiku-HaikuDepot	976907306
 Name	PackageListView		Имя
 Installed packages	Model		Установленные пакеты
 User modified packages	Model		Пакеты измененные пользователем
@@ -22,6 +22,7 @@ Refresh depots	MainWindow		Обновить склады
 Main Menu	MainWindow		Главное меню
 Command line	Model		Командная строка
 (%Votes%)	PackageInfoView		(%Votes%)
+Downloading:	PackageInfoView		Загружаемые:
 Package	MainWindow		Пакет
 Search terms:	FilterView		Условия поиска:
 %Version%	PackageInfoView		%Version%

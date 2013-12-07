@@ -1,0 +1,53 @@
+1	finnish	x-vnd.Haiku-HaikuDepot	976907306
+Name	PackageListView		Nimi
+Installed packages	Model		Asennetut paketit
+User modified packages	Model		Käyttäjän muokkaamat paketit
+Update available	Model		Päivitys saatavilla
+Changelog	PackageInfoView		Muutosloki
+for %Version%	PackageInfoView		%Version%
+Depot:	FilterView		Varasto:
+Description	PackageListView		Kuvaus
+Install	PackageManager		Asenna
+HaikuDepot	System name		HaikuDepot
+Uninstall	PackageManager		Poista asennus
+An error occurred while initializing the package manager: %message%	MainWindow		Pakkaushallintaa alustettaessa tapahtui virhe: %message%
+Close	PackageManager		Sulje
+Status	PackageListView		Tila
+Development	Model		Ohjelmakehitys
+Fatal error	PackageManager		Kriittinen virhe
+Ratings	PackageInfoView		Arvosanat
+1 item	PackageListView		1 kohde
+Inactive	PackageListView		Ei käytössä
+Refresh depots	MainWindow		Päivitä varastot
+Main Menu	MainWindow		Päävalikko
+Command line	Model		Komentorivi
+(%Votes%)	PackageInfoView		(%Votes%)
+Downloading:	PackageInfoView		Ladataan:
+Package	MainWindow		Pakkaus
+Search terms:	FilterView		Hakusanat:
+%Version%	PackageInfoView		%Version%
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error% (%details%)
+Productivity	Model		Tuottavuus
+Show:	FilterView		Näytä:
+Size	PackageListView		Koko
+Games	Model		Pelit
+Rating	PackageListView		Arvosana
+Downloading	Model		Ladataan
+%ld items	PackageListView		%ld kohdetta
+Graphics	Model		Grafiikka
+Local	MainWindow		Paikallinen
+Close	MainWindow		Sulje
+Video	Model		Video
+An error occurred while refreshing the repository: %error%	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error%
+All packages	FilterView		Kaikki pakkaukset
+Depot	FilterView		Varasto
+Uninstalled	PackageListView		Poistetut asennukset
+Unknown	PackageListView		Tuntematon
+All depots	FilterView		Kaikki varastot
+Available	PackageListView		Käytettävissä
+n/a	PackageInfoView		–
+Show	FilterView		Näytä
+Uninstalled packages	Model		Pakkaukset, joiden asennus on poistettu
+Audio	Model		Ääni
+About	PackageInfoView		Ohjelmasta
+Active	PackageListView		Käytössä

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Notifications	1398224574
+1	japanese	x-vnd.Haiku-Notifications	3366464357
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		設定ファイルの保存中にエラーが発生しました。\nディスク容量が不足している可能性があります。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		秒後に画面から隠されます。
@@ -45,5 +45,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 Enable notifications at startup	GeneralView		起動時に通知を有効にする
 Notifications	PrefletView		通知
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		通知サーバーが見つかりません。これは、InfoPopper のインストールがうまく完了していないことを示しています。
+Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		設定を保存できません。おそらく settings ディレクトリに書き込み権限がありません。
 Applications	NotificationView		アプリケーション
 Events are notified	GeneralView		イベントは通知されます

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2012672664
+1	hungarian	x-vnd.Haiku-HaikuDepot	976907306
 Name	PackageListView		Név
 Installed packages	Model		Telepített csomagok
 User modified packages	Model		Módosított csomagok
@@ -22,6 +22,7 @@ Refresh depots	MainWindow		Raktárak frissítése
 Main Menu	MainWindow		Főmenü
 Command line	Model		Parancssor
 (%Votes%)	PackageInfoView		(%Votes%)
+Downloading:	PackageInfoView		Letöltés:
 Package	MainWindow		Csomag
 Search terms:	FilterView		Keresési feltétel:
 %Version%	PackageInfoView		%Version%
