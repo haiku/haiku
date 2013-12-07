@@ -97,7 +97,7 @@ TextDocumentView::MouseDown(BPoint where)
 {
 	int32 modifiers = 0;
 	if (Window() != NULL && Window()->CurrentMessage() != NULL)
-		Window()->CurrentMessage()->FindInt32("modifiers", modifiers);
+		Window()->CurrentMessage()->FindInt32("modifiers", &modifiers);
 	
 	fMouseDown = true;
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
