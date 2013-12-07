@@ -347,6 +347,75 @@ ParagraphLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 }
 
 
+int32
+ParagraphLayout::TextOffsetAt(float x, float y, bool& rightOfCenter)
+{
+	_ValidateLayout();
+
+	rightOfCenter = false;
+
+	int32 lineCount = fLineInfos.CountItems();
+	if (fGlyphInfos.CountItems() == 0 || lineCount == 0
+		|| fLineInfos.ItemAtFast(0).y > y) {
+		// Above first line or empty text
+		return 0;
+	}
+
+	int32 lineIndex = 0;
+	if (floorf(fLineInfos.LastItem().y
+			+ fLineInfos.LastItem().height + 0.5) > y) {
+		// TODO: Optimize, can binary search line here:
+		for (; lineIndex < lineCount; lineIndex++) {
+			const LineInfo& line = fLineInfos.ItemAtFast(lineIndex);
+			float lineBottom = floorf(line.y + line.height + 0.5);
+			if (lineBottom > y)
+				break;
+		}
+	} else {
+		lineIndex = lineCount - 1;
+	}
+
+	// Found line
+	const LineInfo& line = fLineInfos.ItemAtFast(lineIndex);
+	int32 textOffset = line.textOffset;
+	int32 end;
+	if (lineIndex < lineCount - 1)
+		end = fLineInfos.ItemAtFast(lineIndex + 1).textOffset - 1;
+	else
+		end = fGlyphInfos.CountItems() - 1;
+
+	// TODO: Optimize, can binary search offset here:
+	for (; textOffset <= end; textOffset++) {
+		const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
+		float x1 = glyph.x;
+		if (x1 > x)
+			return textOffset;
+
+		// x2 is the location at the right bounding box of the glyph
+		float x2 = x1 + glyph.width;
+
+		// x3 is the location of the next glyph, which may be different from
+		// x2 in case the line is justified.
+		float x3;
+		if (textOffset < end - 1)
+			x3 = fGlyphInfos.ItemAtFast(textOffset + 1).x;
+		else
+			x3 = x2;
+
+		if (x3 > x) {
+			rightOfCenter = x > (x1 + x2) / 2.0f;
+			return textOffset;
+		}
+	}
+
+	// Account for trailing line break at end of line, the
+	// returned offset should be before that.
+	rightOfCenter = fGlyphInfos.ItemAtFast(end).charCode != '\n';
+
+	return end;
+}
+
+
 // #pragma mark - private
 
 
