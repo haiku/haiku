@@ -11,6 +11,7 @@
 #include "PackageInfoListener.h"
 
 
+class BCardLayout;
 class BLocker;
 class TitleView;
 class PackageActionHandler;
@@ -23,7 +24,7 @@ enum {
 };
 
 
-class PackageInfoView : public BGroupView {
+class PackageInfoView : public BView {
 public:
 								PackageInfoView(BLocker* modelLock,
 									PackageActionHandler* handler);
@@ -41,6 +42,7 @@ private:
 private:
 			BLocker*			fModelLock;
 
+			BCardLayout*		fCardLayout;
 			TitleView*			fTitleView;
 			PackageActionView*	fPackageActionView;
 			PagesView*			fPagesView;

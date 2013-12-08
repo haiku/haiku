@@ -1303,17 +1303,39 @@ private:
 PackageInfoView::PackageInfoView(BLocker* modelLock,
 		PackageActionHandler* handler)
 	:
-	BGroupView("package info view", B_VERTICAL),
+	BView("package info view", 0),
 	fModelLock(modelLock),
 	fPackageListener(new(std::nothrow) Listener(this))
 {
+	fCardLayout = new BCardLayout();
+	SetLayout(fCardLayout);
+	
+	BGroupView* noPackageCard = new BGroupView("no package card", B_VERTICAL);
+	AddChild(noPackageCard);
+
+	BStringView* noPackageView = new BStringView("no package view",
+		B_TRANSLATE("Click a package to view information"));
+	noPackageView->SetHighColor(kLightBlack);
+	noPackageView->SetExplicitAlignment(BAlignment(
+		B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
+
+	BLayoutBuilder::Group<>(noPackageCard)
+		.Add(noPackageView)
+		.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED))
+	;
+
+	BGroupView* packageCard = new BGroupView("package card", B_VERTICAL);
+	AddChild(packageCard);
+
+	fCardLayout->SetVisibleItem(0L);
+
 	fTitleView = new TitleView();
 	fPackageActionView = new PackageActionView(handler);
 	fPackageActionView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNSET));
 	fPagesView = new PagesView();
 
-	BLayoutBuilder::Group<>(this)
+	BLayoutBuilder::Group<>(packageCard)
 		.AddGroup(B_HORIZONTAL, 0.0f)
 			.Add(fTitleView, 6.0f)
 			.Add(fPackageActionView, 1.0f)
@@ -1378,7 +1400,7 @@ PackageInfoView::MessageReceived(BMessage* message)
 			break;
 		}
 		default:
-			BGroupView::MessageReceived(message);
+			BView::MessageReceived(message);
 			break;
 	}
 }
@@ -1395,8 +1417,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 	fPackageActionView->SetPackage(package);
 	fPagesView->SetPackage(package);
 
-	if (fPagesView->IsHidden(fPagesView))
-		fPagesView->Show();
+	fCardLayout->SetVisibleItem(1L);
 
 	fPackageListener->SetPackage(packageRef);
 }
@@ -1409,8 +1430,7 @@ PackageInfoView::Clear()
 	fPackageActionView->Clear();
 	fPagesView->Clear();
 
-	if (!fPagesView->IsHidden(fPagesView))
-		fPagesView->Hide();
+	fCardLayout->SetVisibleItem(0L);
 
 	BAutolock _(fModelLock);
 
