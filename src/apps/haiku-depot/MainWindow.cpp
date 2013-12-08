@@ -53,7 +53,9 @@
 enum {
 	MSG_MODEL_WORKER_DONE = 'mmwd',
 	MSG_REFRESH_DEPOTS = 'mrdp',
-	MSG_PACKAGE_STATE_CHANGED = 'mpsc'
+	MSG_PACKAGE_STATE_CHANGED = 'mpsc',
+	MSG_SHOW_SOURCE_PACKAGES = 'ssrc',
+	MSG_SHOW_DEVELOP_PACKAGES = 'sdvl'
 };
 
 
@@ -117,6 +119,12 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	if (settings.FindMessage("column settings", &columnSettings) == B_OK)
 		fPackageListView->LoadState(&columnSettings);
 
+	bool showOption;
+	if (settings.FindBool("show develop packages", &showOption) == B_OK)
+		fModel.SetShowDevelopPackages(showOption);
+	if (settings.FindBool("show source packages", &showOption) == B_OK)
+		fModel.SetShowSourcePackages(showOption);
+
 	_StartRefreshWorker();
 
 	fPendingActionsSem = create_sem(0, "PendingPackageActions");
@@ -175,10 +183,25 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_REFRESH_DEPOTS:
-		{
 			_StartRefreshWorker(true);
 			break;
-		}
+
+		case MSG_SHOW_SOURCE_PACKAGES:
+			{
+				BAutolock _(fModel.Lock());
+				fModel.SetShowSourcePackages(!fModel.ShowSourcePackages());
+			}
+			_AdoptModel();
+			break;
+
+		case MSG_SHOW_DEVELOP_PACKAGES:
+			{
+				BAutolock _(fModel.Lock());
+				fModel.SetShowDevelopPackages(!fModel.ShowDevelopPackages());
+			}
+			_AdoptModel();
+			break;
+
 		case MSG_PACKAGE_SELECTED:
 		{
 			BString title;
@@ -254,6 +277,9 @@ MainWindow::StoreSettings(BMessage& settings) const
 	fPackageListView->SaveState(&columnSettings);
 
 	settings.AddMessage("column settings", &columnSettings);
+
+	settings.AddBool("show develop packages", fModel.ShowDevelopPackages());
+	settings.AddBool("show source packages", fModel.ShowSourcePackages());
 }
 
 
@@ -295,11 +321,24 @@ MainWindow::GetModel()
 void
 MainWindow::_BuildMenu(BMenuBar* menuBar)
 {
-	BMenu* menu = new BMenu(B_TRANSLATE("Package"));
+	BMenu* menu = new BMenu(B_TRANSLATE("Tools"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh depots"),
 			new BMessage(MSG_REFRESH_DEPOTS)));
 	menuBar->AddItem(menu);
 
+	menu = new BMenu(B_TRANSLATE("Options"));
+	
+	fShowDevelopPackagesItem = new BMenuItem(
+		B_TRANSLATE("Show develop packages"),
+		new BMessage(MSG_SHOW_DEVELOP_PACKAGES));
+	menu->AddItem(fShowDevelopPackagesItem);
+
+	fShowSourcePackagesItem = new BMenuItem(
+		B_TRANSLATE("Show source packages"),
+		new BMessage(MSG_SHOW_SOURCE_PACKAGES));
+	menu->AddItem(fShowSourcePackagesItem);
+
+	menuBar->AddItem(menu);
 }
 
 
@@ -313,6 +352,10 @@ MainWindow::_AdoptModel()
 		BAutolock _(fModel.Lock());
 		fPackageListView->AddPackage(fVisiblePackages.ItemAtFast(i));
 	}
+
+	BAutolock _(fModel.Lock());
+	fShowSourcePackagesItem->SetMarked(fModel.ShowSourcePackages());
+	fShowDevelopPackagesItem->SetMarked(fModel.ShowDevelopPackages());
 }
 
 

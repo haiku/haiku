@@ -68,6 +68,12 @@ public:
 			void				SetCategory(const BString& category);
 			void				SetDepot(const BString& depot);
 			void				SetSearchTerms(const BString& searchTerms);
+			void				SetShowSourcePackages(bool show);
+			bool				ShowSourcePackages() const
+									{ return fShowSourcePackages; }
+			void				SetShowDevelopPackages(bool show);
+			bool				ShowDevelopPackages() const
+									{ return fShowDevelopPackages; }
 
 			// Retrieve package information
 			void				PopulatePackage(const PackageInfoRef& package);
@@ -100,6 +106,9 @@ private:
 			PackageFilterRef	fCategoryFilter;
 			BString				fDepotFilter;
 			PackageFilterRef	fSearchTermsFilter;
+
+			bool				fShowSourcePackages;
+			bool				fShowDevelopPackages;
 };
 
 

@@ -75,6 +75,8 @@ private:
 			PackageListView*	fPackageListView;
 			PackageInfoView*	fPackageInfoView;
 			BSplitView*			fSplitView;
+			BMenuItem*			fShowDevelopPackagesItem;
+			BMenuItem*			fShowSourcePackagesItem;
 
 			Model				fModel;
 			PackageList			fVisiblePackages;

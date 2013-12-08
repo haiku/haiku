@@ -179,6 +179,22 @@ private:
 };
 
 
+static inline bool
+is_source_package(const PackageInfoRef& package)
+{
+	const BString& packageName = package->Title();
+	return packageName.EndsWith("_source");
+}
+
+
+static inline bool
+is_develop_package(const PackageInfoRef& package)
+{
+	const BString& packageName = package->Title();
+	return packageName.EndsWith("_devel");
+}
+
+
 // #pragma mark - Model
 
 
@@ -210,7 +226,10 @@ Model::Model()
 
 	fCategoryFilter(PackageFilterRef(new AnyFilter(), true)),
 	fDepotFilter(""),
-	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true))
+	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
+	
+	fShowSourcePackages(false),
+	fShowDevelopPackages(false)
 {
 	// Don't forget to add new categories to this list:
 	fCategories.Add(fCategoryAudio);
@@ -270,7 +289,9 @@ Model::CreatePackageList() const
 		for (int32 j = 0; j < packages.CountItems(); j++) {
 			const PackageInfoRef& package = packages.ItemAtFast(j);
 			if (fCategoryFilter->AcceptsPackage(package)
-				&& fSearchTermsFilter->AcceptsPackage(package)) {
+				&& fSearchTermsFilter->AcceptsPackage(package)
+				&& (fShowSourcePackages || !is_source_package(package))
+				&& (fShowDevelopPackages || !is_develop_package(package))) {
 				resultList.Add(package);
 			}
 		}
@@ -375,6 +396,21 @@ Model::SetSearchTerms(const BString& searchTerms)
 
 	fSearchTermsFilter.SetTo(filter, true);
 }
+
+
+void
+Model::SetShowSourcePackages(bool show)
+{
+	fShowSourcePackages = show;
+}
+
+
+void
+Model::SetShowDevelopPackages(bool show)
+{
+	fShowDevelopPackages = show;
+}
+
 
 
 // #pragma mark - information retrival
