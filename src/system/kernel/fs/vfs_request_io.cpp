@@ -165,9 +165,7 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 
 	// create subrequests for the file vecs we've got
 	size_t subRequestCount = 0;
-	for (size_t i = 0;
-		i < vecCount && subRequestCount < kMaxSubRequests && error == B_OK;
-		i++) {
+	for (size_t i = 0; i < vecCount && subRequestCount < kMaxSubRequests; i++) {
 		off_t vecOffset = vecs[i].offset;
 		off_t vecLength = min_c(vecs[i].length, (off_t)requestLength);
 		TRACE_RIO("[%ld]    vec %lu offset: %lld, length: %lld\n",
