@@ -17,7 +17,8 @@
 LoadImageDebugInfoJob::LoadImageDebugInfoJob(Image* image)
 	:
 	fKey(image, JOB_TYPE_LOAD_IMAGE_DEBUG_INFO),
-	fImage(image)
+	fImage(image),
+	fState()
 {
 	fImage->AcquireReference();
 }
@@ -47,10 +48,16 @@ LoadImageDebugInfoJob::Do()
 	// create the debug info
 	ImageDebugInfo* debugInfo;
 	status_t error = fImage->GetTeam()->DebugInfo()->LoadImageDebugInfo(
-		imageInfo, fImage->ImageFile(), debugInfo);
+		imageInfo, fImage->ImageFile(), fState, debugInfo);
 
 	// set the result
 	locker.Lock();
+
+	if (fState.UserInputRequired()) {
+		// TODO: notify the user interface
+		return WaitForUserInput();
+	}
+
 	if (error == B_OK) {
 		error = fImage->SetImageDebugInfo(debugInfo, IMAGE_DEBUG_INFO_LOADED);
 		debugInfo->ReleaseReference();

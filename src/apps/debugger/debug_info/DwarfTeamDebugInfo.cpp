@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,8 +13,10 @@
 #include "DebuggerInterface.h"
 #include "DwarfFile.h"
 #include "DwarfImageDebugInfo.h"
+#include "DwarfImageDebugInfoLoadingState.h"
 #include "DwarfManager.h"
 #include "GlobalTypeLookup.h"
+#include "ImageDebugInfoLoadingState.h"
 #include "LocatableFile.h"
 
 
@@ -58,7 +61,8 @@ DwarfTeamDebugInfo::Init()
 
 status_t
 DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
-	LocatableFile* imageFile, SpecificImageDebugInfo*& _imageDebugInfo)
+	LocatableFile* imageFile, ImageDebugInfoLoadingState& _state,
+	SpecificImageDebugInfo*& _imageDebugInfo)
 {
 	// We only like images whose file we can play with.
 	BString filePath;
@@ -66,11 +70,22 @@ DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
 		return B_ENTRY_NOT_FOUND;
 
 	// try to load the DWARF file
-	DwarfFile* file;
-	status_t error = fManager->LoadFile(filePath, file);
+	DwarfImageDebugInfoLoadingState* dwarfState;
+	if (_state.HasSpecificDebugInfoLoadingState()) {
+		dwarfState = dynamic_cast<DwarfImageDebugInfoLoadingState*>(
+			_state.GetSpecificDebugInfoLoadingState());
+		if (dwarfState == NULL)
+			return B_BAD_VALUE;
+	} else {
+	 	dwarfState = new(std::nothrow) DwarfImageDebugInfoLoadingState();
+		if (dwarfState == NULL)
+			return B_NO_MEMORY;
+		_state.SetSpecificDebugInfoLoadingState(dwarfState);
+	}
+
+	status_t error = fManager->LoadFile(filePath, dwarfState->GetFileState());
 	if (error != B_OK)
 		return error;
-	BReference<DwarfFile> fileReference(file, true);
 
 	error = fManager->FinishLoading();
 	if (error != B_OK)
@@ -79,7 +94,7 @@ DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
 	// create the image debug info
 	DwarfImageDebugInfo* debugInfo = new(std::nothrow) DwarfImageDebugInfo(
 		imageInfo, fDebuggerInterface, fArchitecture, fFileManager,
-		fTypeLookup, fTypeCache, file);
+		fTypeLookup, fTypeCache, dwarfState->GetFileState().dwarfFile);
 	if (debugInfo == NULL)
 		return B_NO_MEMORY;
 

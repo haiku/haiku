@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +24,7 @@
 #include "Function.h"
 #include "FunctionID.h"
 #include "ImageDebugInfo.h"
+#include "ImageDebugInfoLoadingState.h"
 #include "LocatableFile.h"
 #include "SourceFile.h"
 #include "SourceLanguage.h"
@@ -426,7 +427,8 @@ TeamDebugInfo::GetType(GlobalTypeCache* cache, const BString& name,
 
 status_t
 TeamDebugInfo::LoadImageDebugInfo(const ImageInfo& imageInfo,
-	LocatableFile* imageFile, ImageDebugInfo*& _imageDebugInfo)
+	LocatableFile* imageFile, ImageDebugInfoLoadingState& _state,
+	ImageDebugInfo*& _imageDebugInfo)
 {
 	ImageDebugInfo* imageDebugInfo = new(std::nothrow) ImageDebugInfo(
 		imageInfo);
@@ -438,15 +440,23 @@ TeamDebugInfo::LoadImageDebugInfo(const ImageInfo& imageInfo,
 			= fSpecificInfos.ItemAt(i); i++) {
 		SpecificImageDebugInfo* specificImageInfo;
 		status_t error = specificTeamInfo->CreateImageDebugInfo(imageInfo,
-			imageFile, specificImageInfo);
+			imageFile, _state, specificImageInfo);
 		if (error == B_OK) {
 			if (!imageDebugInfo->AddSpecificInfo(specificImageInfo)) {
 				delete specificImageInfo;
 				return B_NO_MEMORY;
 			}
+		} else if (_state.UserInputRequired()) {
+			_state.SetSpecificInfoIndex(i);
+			return error;
 		} else if (error == B_NO_MEMORY)
 			return error;
 				// fail only when out of memory
+
+		_state.ClearSpecificDebugInfoLoadingState();
+			// if we made it this far, then we're done with current specific
+			// info, and its corresponding state object, if any, is no longer
+			// needed
 	}
 
 	status_t error = imageDebugInfo->FinishInit(fDebuggerInterface);

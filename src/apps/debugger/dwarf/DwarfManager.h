@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_MANAGER_H
@@ -11,6 +12,7 @@
 
 
 class DwarfFile;
+struct DwarfFileLoadingState;
 
 
 class DwarfManager {
@@ -24,8 +26,10 @@ public:
 			void				Unlock()	{ fLock.Unlock(); }
 
 			status_t			LoadFile(const char* fileName,
-									DwarfFile*& _file);
-									// returns a reference
+									DwarfFileLoadingState& _loadingState);
+									// _loadingState receives a reference
+									// to the corresponding DwarfFile.
+
 			status_t			FinishLoading();
 
 private:

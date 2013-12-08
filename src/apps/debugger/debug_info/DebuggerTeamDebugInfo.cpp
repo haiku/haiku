@@ -33,7 +33,8 @@ DebuggerTeamDebugInfo::Init()
 
 status_t
 DebuggerTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
-	LocatableFile* imageFile, SpecificImageDebugInfo*& _imageDebugInfo)
+	LocatableFile* imageFile, ImageDebugInfoLoadingState& _state,
+	SpecificImageDebugInfo*& _imageDebugInfo)
 {
 	DebuggerImageDebugInfo* debuggerInfo
 		= new(std::nothrow) DebuggerImageDebugInfo(imageInfo,

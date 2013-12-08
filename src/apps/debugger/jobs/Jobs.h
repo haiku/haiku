@@ -1,12 +1,13 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef JOBS_H
 #define JOBS_H
 
 
+#include "ImageDebugInfoLoadingState.h"
 #include "ImageDebugInfoProvider.h"
 #include "Types.h"
 #include "Worker.h"
@@ -128,6 +129,8 @@ public:
 private:
 			SimpleJobKey		fKey;
 			Image*				fImage;
+			ImageDebugInfoLoadingState
+								fState;
 };
 
 

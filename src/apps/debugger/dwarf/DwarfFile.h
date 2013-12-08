@@ -35,7 +35,9 @@ public:
 								DwarfFile();
 								~DwarfFile();
 
-			status_t			Load(const char* fileName);
+			status_t			StartLoading(const char* fileName,
+									BString& _requiredExternalFile);
+			status_t			Load(const BString& externalFilePath);
 			status_t			FinishLoading();
 
 			const char*			Name() const		{ return fName; }
@@ -172,7 +174,10 @@ private:
 									const void*& _expression,
 									off_t& _length) const;
 
-			status_t			_LocateDebugInfo();
+			status_t			_LocateDebugInfo(
+									BString& _requiredExternalFileName,
+									const char* locatedFilePath = NULL);
+
 			status_t			_GetDebugInfoPath(const char* fileName,
 									BString& _infoPath) const;
 
