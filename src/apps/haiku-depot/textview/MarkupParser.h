@@ -24,6 +24,11 @@ public:
 			const ParagraphStyle& HeadingParagraphStyle() const
 									{ return fHeadingParagraphStyle; }
 
+			const CharacterStyle& NormalCharacterStyle() const
+									{ return fNormalStyle; }
+			const ParagraphStyle& NormalParagraphStyle() const
+									{ return fParagraphStyle; }
+
 			TextDocumentRef		CreateDocumentFromMarkup(const BString& text);
 			void				AppendMarkup(const TextDocumentRef& document,
 									const BString& text);
