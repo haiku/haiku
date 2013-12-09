@@ -123,11 +123,13 @@ public:
 		fMarkupParser.SetStyles(regularStyle, paragraphStyle);
 	}
 
-	void SetText(const BString& markupText) {
+	void SetText(const BString& markupText)
+	{
 		SetTextDocument(fMarkupParser.CreateDocumentFromMarkup(markupText));
 	}
 
-	void SetText(const BString heading, const BString& markupText) {
+	void SetText(const BString heading, const BString& markupText)
+	{
 		TextDocumentRef document(new(std::nothrow) TextDocument(), true);
 
 		Paragraph paragraph(fMarkupParser.HeadingParagraphStyle());
@@ -136,6 +138,23 @@ public:
 		document->Append(paragraph);
 
 		fMarkupParser.AppendMarkup(document, markupText);
+
+		SetTextDocument(document);
+	}
+
+	void SetDisabledText(const BString& text)
+	{
+		TextDocumentRef document(new(std::nothrow) TextDocument(), true);
+
+		ParagraphStyle paragraphStyle;
+		paragraphStyle.SetAlignment(ALIGN_CENTER);
+
+		CharacterStyle disabledStyle(fMarkupParser.NormalCharacterStyle());
+		disabledStyle.SetForegroundColor(kLightBlack);
+
+		Paragraph paragraph(paragraphStyle);
+		paragraph.Append(TextSpan(text, disabledStyle));
+		document->Append(paragraph);
 
 		SetTextDocument(document);
 	}
@@ -153,33 +172,60 @@ public:
 		BStringView(name, string),
 		BInvoker(message, NULL),
 		fNormalColor(color),
-		fHoverColor(make_color(1, 141, 211))
+		fHoverColor(make_color(1, 141, 211)),
+		fEnabled(true),
+		fMouseInside(false)
 	{
+		_UpdateLinkColor();
 	}
 
 	virtual void MouseMoved(BPoint where, uint32 transit,
 		const BMessage* dragMessage)
 	{
 		if (transit == B_ENTERED_VIEW) {
+			fMouseInside = true;
+			_UpdateLinkColor();
+		} else if (transit == B_EXITED_VIEW) {
+			fMouseInside = false;
+			_UpdateLinkColor();
+		}
+	}
+
+	virtual void MouseDown(BPoint where)
+	{
+		if (fEnabled)
+			Invoke(Message());
+	}
+
+	void SetEnabled(bool enabled)
+	{
+		if (fEnabled != enabled) {
+			fEnabled = enabled;
+			_UpdateLinkColor();
+		}
+	}
+
+private:
+	void _UpdateLinkColor()
+	{
+		if (fEnabled && fMouseInside) {
 			SetHighColor(fHoverColor);
 			BCursor cursor(B_CURSOR_ID_FOLLOW_LINK);
 			SetViewCursor(&cursor, true);
 			Invalidate();
-		} else if (transit == B_EXITED_VIEW) {
+		} else {
 			SetHighColor(fNormalColor);
 			SetViewCursor(NULL);
 			Invalidate();
 		}
 	}
 
-	virtual void MouseDown(BPoint where)
-	{
-		Invoke(Message());
-	}
-
 private:
 	rgb_color	fNormalColor;
 	rgb_color	fHoverColor;
+
+	bool		fEnabled;
+	bool		fMouseInside;
 };
 
 
@@ -753,6 +799,15 @@ public:
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
+			case MSG_EMAIL_PUBLISHER:
+			{
+				// TODO: Implement. If memory serves, there is a
+				// standard command line interface which mail apps should
+				// support, i.e. to open a compose window with the TO: field
+				// already set.
+				break;
+			}
+
 			case MSG_VISIT_PUBLISHER_WEBSITE:
 			{
 				BPrivate::Support::BUrl url(fWebsiteLinkView->Text());
@@ -772,9 +827,9 @@ public:
 			package.FullDescription());
 
 		fEmailIconView->SetBitmap(fEmailIcon.Bitmap(SharedBitmap::SIZE_16));
-		fEmailLinkView->SetText(package.Publisher().Email());
+		_SetContactInfo(fEmailLinkView, package.Publisher().Email());
 		fWebsiteIconView->SetBitmap(fWebsiteIcon.Bitmap(SharedBitmap::SIZE_16));
-		fWebsiteLinkView->SetText(package.Publisher().Website());
+		_SetContactInfo(fWebsiteLinkView, package.Publisher().Website());
 
 		const BBitmap* screenshot = NULL;
 		const BitmapList& screenShots = package.Screenshots();
@@ -798,13 +853,25 @@ public:
 	}
 
 private:
+	void _SetContactInfo(LinkView* view, const BString& string)
+	{
+		if (string.Length() > 0) {
+			view->SetText(string);
+			view->SetEnabled(true);
+		} else {
+			view->SetText(B_TRANSLATE("<no info>"));
+			view->SetEnabled(false);
+		}
+	}
+
+private:
 	MarkupTextView*		fDescriptionView;
 
 	BitmapView*			fScreenshotView;
 
 	SharedBitmap		fEmailIcon;
 	BitmapView*			fEmailIconView;
-	BStringView*		fEmailLinkView;
+	LinkView*			fEmailLinkView;
 
 	SharedBitmap		fWebsiteIcon;
 	BitmapView*			fWebsiteIconView;
@@ -1088,10 +1155,22 @@ public:
 
 		const UserRatingList& userRatings = package.UserRatings();
 
+		int count = userRatings.CountItems();
+		if (count == 0) {
+			BStringView* noRatingsView = new BStringView("no ratings",
+				B_TRANSLATE("No user ratings available."));
+			noRatingsView->SetAlignment(B_ALIGN_CENTER);
+			noRatingsView->SetHighColor(kLightBlack);
+			noRatingsView->SetExplicitMaxSize(
+				BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+			fRatingContainerLayout->AddView(0, noRatingsView);
+			return;
+		}
+
 		// TODO: Sort by age or usefullness rating
 		// TODO: Optionally hide ratings that are not in the system language
 
-		for (int i = userRatings.CountItems() - 1; i >= 0; i--) {
+		for (int i = count - 1; i >= 0; i--) {
 			const UserRating& rating = userRatings.ItemAtFast(i);
 			RatingItemView* view = new RatingItemView(rating, fThumbsUpIcon,
 				fThumbsDownIcon);
@@ -1109,8 +1188,9 @@ public:
 	{
 		for (int32 i = fRatingContainerLayout->CountItems() - 1;
 				BLayoutItem* item = fRatingContainerLayout->ItemAt(i); i--) {
-			RatingItemView* view = dynamic_cast<RatingItemView*>(
-				item->View());
+			BView* view = dynamic_cast<RatingItemView*>(item->View());
+			if (view == NULL)
+				view = dynamic_cast<BStringView*>(item->View());
 			if (view != NULL) {
 				view->RemoveSelf();
 				delete view;
@@ -1165,7 +1245,11 @@ public:
 
 	void SetPackage(const PackageInfo& package)
 	{
-		fTextView->SetText(package.Changelog());
+		const BString& changelog = package.Changelog();
+		if (changelog.Length() > 0)
+			fTextView->SetText(changelog);
+		else
+			fTextView->SetDisabledText(B_TRANSLATE("No changelog available."));
 	}
 
 	void Clear()
