@@ -50,6 +50,8 @@ public:
 									// input loop.
 
 	// Team::Listener
+	virtual	void				ThreadStateChanged(
+									const Team::ThreadEvent& event);
 	virtual	void				DebugReportChanged(
 									const Team::DebugReportEvent& event);
 
@@ -78,6 +80,7 @@ private:
 									const CommandEntry* command2);
 
 			bool				_ReportTargetThreadStopNeeded() const;
+			void				_SubmitSaveReport();
 
 private:
 			CliContext			fContext;

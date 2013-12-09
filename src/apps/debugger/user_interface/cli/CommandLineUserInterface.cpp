@@ -226,11 +226,26 @@ CommandLineUserInterface::Run()
 				fReportTargetThread);
 			args.Parse(buffer, &parseErrorLocation);
 			_ExecuteCommand(args.ArgumentCount(), args.Arguments());
+		} else
+			_SubmitSaveReport();
+	}
+}
+
+
+void
+CommandLineUserInterface::ThreadStateChanged(const Team::ThreadEvent& event)
+{
+	if (fSaveReport) {
+		Thread* thread = event.GetThread();
+		// If we were asked to attach/report on a specific thread
+		// rather than a team, and said thread was still
+		// running, when we attached, we need to wait for its corresponding
+		// stop state before generating a report, else we might not get its
+		// stack trace.
+		if (thread->ID() == fReportTargetThread
+			&& thread->State() == THREAD_STATE_STOPPED) {
+			_SubmitSaveReport();
 		}
-		snprintf(buffer, sizeof(buffer), "save-report %s",
-			fReportPath != NULL ? fReportPath : "");
-		args.Parse(buffer, &parseErrorLocation);
-		_ExecuteCommand(args.ArgumentCount(), args.Arguments());
 	}
 }
 
@@ -464,4 +479,17 @@ CommandLineUserInterface::_ReportTargetThreadStopNeeded() const
 		return false;
 
 	return thread->State() != THREAD_STATE_STOPPED;
+}
+
+
+void
+CommandLineUserInterface::_SubmitSaveReport()
+{
+	ArgumentVector args;
+	char buffer[256];
+	const char* parseErrorLocation;
+	snprintf(buffer, sizeof(buffer), "save-report %s",
+		fReportPath != NULL ? fReportPath : "");
+	args.Parse(buffer, &parseErrorLocation);
+	_ExecuteCommand(args.ArgumentCount(), args.Arguments());
 }
