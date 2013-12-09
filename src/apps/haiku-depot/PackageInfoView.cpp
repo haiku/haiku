@@ -1327,7 +1327,7 @@ PackageInfoView::PackageInfoView(BLocker* modelLock,
 	BGroupView* packageCard = new BGroupView("package card", B_VERTICAL);
 	AddChild(packageCard);
 
-	fCardLayout->SetVisibleItem(0L);
+	fCardLayout->SetVisibleItem((int32)0);
 
 	fTitleView = new TitleView();
 	fPackageActionView = new PackageActionView(handler);
@@ -1417,7 +1417,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 	fPackageActionView->SetPackage(package);
 	fPagesView->SetPackage(package);
 
-	fCardLayout->SetVisibleItem(1L);
+	fCardLayout->SetVisibleItem(1);
 
 	fPackageListener->SetPackage(packageRef);
 }
@@ -1430,7 +1430,7 @@ PackageInfoView::Clear()
 	fPackageActionView->Clear();
 	fPagesView->Clear();
 
-	fCardLayout->SetVisibleItem(0L);
+	fCardLayout->SetVisibleItem((int32)0);
 
 	BAutolock _(fModelLock);
 
