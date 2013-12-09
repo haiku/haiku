@@ -550,7 +550,7 @@ BShelf::~BShelf()
 	Save();
 
 	// we own fStream only when fEntry is set
-	if (fEntry) {
+	if (fEntry != NULL) {
 		delete fEntry;
 		delete fStream;
 	}
@@ -701,10 +701,11 @@ BShelf::Save()
 	if (fEntry != NULL) {
 		BFile *file = new BFile(fEntry, B_READ_WRITE | B_ERASE_FILE);
 		status = file->InitCheck();
-		if (status < B_OK) {
+		if (status != B_OK) {
 			delete file;
 			return status;
 		}
+		delete fStream;
 		fStream = file;
 	}
 
@@ -901,7 +902,7 @@ BShelf::SetSaveLocation(BDataIO *data_io)
 {
 	fDirty = true;
 
-	if (fEntry) {
+	if (fEntry != NULL) {
 		delete fEntry;
 		fEntry = NULL;
 	}
@@ -1145,7 +1146,7 @@ BShelf::_InitData(BEntry *entry, BDataIO *stream, BView *view,
 	fAllowZombies = true;
 	fTypeEnforced = false;
 
-	if (entry)
+	if (fEntry != NULL)
 		fStream = new BFile(entry, B_READ_ONLY);
 	else
 		fStream = stream;
@@ -1155,7 +1156,7 @@ BShelf::_InitData(BEntry *entry, BDataIO *stream, BView *view,
 	fContainerView->AddFilter(fFilter);
 	fContainerView->_SetShelf(this);
 
-	if (fStream) {
+	if (fStream != NULL) {
 		BMessage archive;
 
 		if (archive.Unflatten(fStream) == B_OK) {
@@ -1195,10 +1196,10 @@ BShelf::_DeleteReplicant(replicant_data* item)
 	if (view == NULL)
 		view = item->zombie_view;
 
-	if (view)
+	if (view != NULL)
 		view->RemoveSelf();
 
-	if (item->dragger)
+	if (item->dragger != NULL)
 		item->dragger->RemoveSelf();
 
 	int32 index = replicant_data::IndexOf(&fReplicants, item->message);
@@ -1291,27 +1292,25 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	
 	BView *view = NULL;
 	
-	if (archivable) {
+	if (archivable != NULL) {
 		view = dynamic_cast<BView*>(archivable);
 		
-		if (!view) {
+		if (view == NULL)
 			return send_reply(data, B_ERROR, uniqueID);
-		}
 	}
 	
 	BDragger* dragger = NULL;
 	BView* replicant = NULL;
 	BDragger::relation relation = BDragger::TARGET_UNKNOWN;
 	_BZombieReplicantView_* zombie = NULL;
-	if (view) {
+	if (view != NULL) {
 		const BPoint point = location ? *location : view->Frame().LeftTop();
 		replicant = _GetReplicant(data, view, point, dragger, relation);
 		if (replicant == NULL)
 			return send_reply(data, B_ERROR, uniqueID);
-	} else if (fDisplayZombies && fAllowZombies)
+	} else if (fDisplayZombies && fAllowZombies) {
 		zombie = _CreateZombie(data, dragger);
-
-	else if (!fAllowZombies) {
+	} else if (!fAllowZombies) {
 		// There was no view, and we're not allowed to have any zombies
 		// in the house
 		return send_reply(data, B_ERROR, uniqueID);
@@ -1334,7 +1333,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		}
 	}
 
-	if (!zombie) {
+	if (zombie == NULL) {
 		data->RemoveName("_drop_point_");
 		data->RemoveName("_drop_offset_");
 	}
@@ -1353,7 +1352,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 
 BView *
 BShelf::_GetReplicant(BMessage *data, BView *view, const BPoint &point,
-		BDragger *&dragger, BDragger::relation &relation)
+	BDragger *&dragger, BDragger::relation &relation)
 {
 	// TODO: test me -- there seems to be lots of bugs parked here!
 	BView *replicant = NULL;
@@ -1401,7 +1400,7 @@ BShelf::_GetReplicant(BMessage *data, BView *view, const BPoint &point,
 /* static */
 void
 BShelf::_GetReplicantData(BMessage *data, BView *view, BView *&replicant,
-			BDragger *&dragger, BDragger::relation &relation)
+	BDragger *&dragger, BDragger::relation &relation)
 {
 	// Check if we have a dragger archived as "__widget" inside the message
 	BMessage widget;
