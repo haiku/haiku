@@ -19,6 +19,7 @@ flags			system_package
 
 provides {
 	haiku_%HAIKU_SECONDARY_PACKAGING_ARCH% = %HAIKU_VERSION% compat>=R1~alpha1
+	lib:libtiff_%HAIKU_SECONDARY_PACKAGING_ARCH% = 3.9.4 compat >= 3
 }
 
 requires {
