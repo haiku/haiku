@@ -7,25 +7,31 @@
  */
 
 
-#include <new>
 #include <stdlib.h>
-
-#include <arpa/inet.h>
 
 #include <File.h>
 #include <FileRequest.h>
+#include <NodeInfo.h>
 
 
 BFileRequest::BFileRequest(const BUrl& url, BUrlProtocolListener* listener,
 	BUrlContext* context)
 	:
-	BUrlRequest(url, listener, context, "BUrlProtocol.File", "file")
+	BUrlRequest(url, listener, context, "BUrlProtocol.File", "file"),
+	fResult()
 {
 }
 
 
 BFileRequest::~BFileRequest()
 {
+}
+
+
+const BUrlResult&
+BFileRequest::Result() const
+{
+	return fResult;
 }
 
 
@@ -44,12 +50,18 @@ BFileRequest::_ProtocolLoop()
 		off_t size = 0;
 		file.GetSize(&size);
 		fListener->DownloadProgress(this, size, size);
+		fResult.SetLength(size);
 
 		ssize_t chunkSize;
 		char chunk[4096];
 		while ((chunkSize = file.Read(chunk, sizeof(chunk))) > 0)
 			fListener->DataReceived(this, chunk, chunkSize);
 	}
+
+	BNodeInfo info(&file);
+	char mimeType[B_MIME_TYPE_LENGTH + 1];
+	if (info.GetType(mimeType) == B_OK)
+		fResult.SetContentType(mimeType);
 
 	return B_PROT_SUCCESS;
 }

@@ -58,6 +58,23 @@ BHttpResult::Url() const
 }
 
 
+BString
+BHttpResult::ContentType() const
+{
+	return Headers()["Content-Type"];
+}
+
+
+size_t
+BHttpResult::Length() const
+{
+	const char* length = Headers()["Content-Length"];
+	if (length == NULL)
+		return 0;
+	return atoi(length);
+}
+
+
 const BHttpHeaders&
 BHttpResult::Headers() const
 {

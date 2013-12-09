@@ -2,22 +2,22 @@
  * Copyright 2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _B_URL_RESULT_H_
-#define _B_URL_RESULT_H_
+#ifndef _B_HTTP_RESULT_H_
+#define _B_HTTP_RESULT_H_
 
 
 #include <iostream>
 
-#include <DataIO.h>
 #include <HttpHeaders.h>
 #include <String.h>
 #include <Url.h>
+#include <UrlResult.h>
 
 
 class BUrlRequest;
 
 
-class BHttpResult {
+class BHttpResult: public BUrlResult {
 			friend class 				BHttpRequest;
 			
 public:
@@ -30,6 +30,8 @@ public:
 		
 	// Result parameters access
 			const BUrl&					Url() const;
+			BString						ContentType() const;
+			size_t						Length() const;
 
 	// HTTP-Specific stuff
 			const BHttpHeaders&			Headers() const;
@@ -45,7 +47,6 @@ public:
 private:
 			BUrl						fUrl;
 			
-			// TODO: HTTP specific stuff should not live here.
 			BHttpHeaders 				fHeaders;
 			int32						fStatusCode;
 			BString						fStatusString;

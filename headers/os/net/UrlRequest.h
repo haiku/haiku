@@ -9,6 +9,7 @@
 #include <Url.h>
 #include <UrlContext.h>
 #include <UrlProtocolListener.h>
+#include <UrlResult.h>
 #include <OS.h>
 
 
@@ -43,6 +44,7 @@ public:
 			status_t				Status() const;
 	virtual const char*				StatusString(status_t threadStatus)
 										const;
+	virtual const BUrlResult&		Result() const = 0;
 
 
 protected:

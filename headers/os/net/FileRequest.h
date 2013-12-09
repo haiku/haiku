@@ -19,10 +19,13 @@ public:
 									BUrlContext* context = NULL);
 	virtual						~BFileRequest();
 
+	const 	BUrlResult&			Result() const;
             void                SetDisableListener(bool disable);
 
 private:
 			status_t			_ProtocolLoop();
+private:
+			BUrlResult			fResult;
 };
 
 

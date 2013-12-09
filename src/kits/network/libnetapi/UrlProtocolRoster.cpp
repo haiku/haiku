@@ -11,10 +11,11 @@
 
 #include <new>
 
-#include <UrlRequest.h>
+#include <DataRequest.h>
+#include <Debug.h>
 #include <FileRequest.h>
 #include <HttpRequest.h>
-#include <Debug.h>
+#include <UrlRequest.h>
 
 
 static BUrlContext gDefaultContext;
@@ -36,6 +37,8 @@ BUrlProtocolRoster::MakeRequest(const BUrl& url,
 			context);
 	} else if (url.Protocol() == "file") {
 		return new(std::nothrow) BFileRequest(url, listener, context);
+	} else if (url.Protocol() == "data") {
+		return new(std::nothrow) BDataRequest(url, listener, context);
 	}
 
 	return NULL;

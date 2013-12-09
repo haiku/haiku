@@ -47,7 +47,7 @@ public:
 									const ssize_t size = -1);
             void                AdoptHeaders(BHttpHeaders* const headers);
 
-			const BHttpResult&	Result() const;
+			const BUrlResult&	Result() const;
 			const char*			StatusString(status_t threadStatus) const;
 
 	static	bool				IsInformationalStatusCode(int16 code);
