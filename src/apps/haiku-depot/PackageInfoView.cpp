@@ -1471,11 +1471,13 @@ PackageInfoView::MessageReceived(BMessage* message)
 
 			if ((changes & PKG_CHANGED_DESCRIPTION) != 0
 				|| (changes & PKG_CHANGED_SCREENSHOTS) != 0) {
-				fTitleView->SetPackage(package);
+				fPagesView->SetPackage(package);
 			}
 
-			if ((changes & PKG_CHANGED_RATINGS) != 0)
+			if ((changes & PKG_CHANGED_RATINGS) != 0) {
 				fPagesView->SetPackage(package);
+				fTitleView->SetPackage(package);
+			}
 
 			if ((changes & PKG_CHANGED_STATE) != 0) {
 				fPackageActionView->SetPackage(package);
