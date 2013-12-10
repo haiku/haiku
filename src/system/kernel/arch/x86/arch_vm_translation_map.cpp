@@ -11,6 +11,7 @@
 #include <arch/vm_translation_map.h>
 
 #include <boot/kernel_args.h>
+#include <safemode.h>
 
 #ifdef __x86_64__
 #	include "paging/64bit/X86PagingMethod64Bit.h"
@@ -99,12 +100,17 @@ arch_vm_translation_map_init(kernel_args *args,
 		}
 	}
 
-	if (paeAvailable && paeNeeded) {
+	bool paeDisabled = get_safemode_boolean_early(args,
+		B_SAFEMODE_4_GB_MEMORY_LIMIT, false);
+
+	if (paeAvailable && paeNeeded && !paeDisabled) {
 		dprintf("using PAE paging\n");
 		gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethodPAE;
 	} else {
-		dprintf("using 32 bit paging (PAE not %s)\n",
-			paeNeeded ? "available" : "needed");
+		dprintf("using 32 bit paging (PAE %s)\n",
+			paeNeeded
+				? "not available"
+				: (paeDisabled ? "disabled" : "not needed"));
 		gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethod32Bit;
 	}
 #else
