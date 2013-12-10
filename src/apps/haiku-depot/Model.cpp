@@ -417,7 +417,7 @@ Model::SetShowDevelopPackages(bool show)
 
 
 void
-Model::PopulatePackage(const PackageInfoRef& package)
+Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 {
 	if (fPopulatedPackages.Contains(package))
 		return;
@@ -439,59 +439,23 @@ Model::PopulatePackage(const PackageInfoRef& package)
 
 	fPopulatedPackages.Add(package);
 
-	if (package->Title() == "WonderBrush") {
+	if (package->Title() == "wonderbrush") {
 
-		package->AddUserRating(
-			UserRating(UserInfo("humdinger"), 4.5f,
-			"Awesome!", "en", "2.1.2", 0, 0)
-		);
-		package->AddUserRating(
-			UserRating(UserInfo("bonefish"), 5.0f,
-			"The best!", "en", "2.1.2", 3, 1)
-		);
-		package->AddScreenshot(
-			BitmapRef(new SharedBitmap(603), true));
+		if ((flags & POPULATE_CATEGORIES) != 0) {
+			package->AddCategory(CategoryGraphics());
+			package->AddCategory(CategoryProductivity());
+		}
 
-	} else if (package->Title() == "Paladin") {
-
-		package->AddUserRating(
-			UserRating(UserInfo("stippi"), 3.5f,
-			"Could be more integrated from the sounds of it.",
-			"en", "1.2.0", 0, 1)
-		);
-		package->AddUserRating(
-			UserRating(UserInfo("mmadia"), 5.0f,
-			"It rocks! Give a try",
-			"en", "1.1.0", 1, 0)
-		);
-		package->AddUserRating(
-			UserRating(UserInfo("bonefish"), 2.0f,
-			"It just needs to use my jam-rewrite 'ham' and it will be great.",
-			"en", "1.1.0", 3, 1)
-		);
-		package->AddScreenshot(
-			BitmapRef(new SharedBitmap(605), true));
-
-	} else if (package->Title() == "Sequitur") {
-
-		package->AddUserRating(
-			UserRating(UserInfo("pete"), 4.5f,
-			"I can weave a web of sound! And it connects to PatchBay. Check "
-			"it out, I can wholeheartly recommend this app!! This rating "
-			"comment is of course only so long, because the new TextView "
-			"layout needs some testing. Oh, and did I mention it works with "
-			"custom installed sound fonts? Reading through this comment I find "
-			"that I did not until now. Hopefully there are enough lines now to "
-			"please the programmer with the text layouting and scrolling of "
-			"long ratings!", "en", "2.1.0", 4, 1)
-		);
-		package->AddUserRating(
-			UserRating(UserInfo("stippi"), 3.5f,
-			"It seems very capable. Still runs fine on Haiku. The interface "
-			"is composed of many small, hard to click items. But you can "
-			"configure a tool for each mouse button, which is great for the "
-			"work flow.", "en", "2.1.0", 2, 1)
-		);
+		if ((flags & POPULATE_USER_RATINGS) != 0) {
+			package->AddUserRating(
+				UserRating(UserInfo("binky"), 4.5f,
+				"Awesome!", "en", "2.1.2", 0, 0)
+			);
+			package->AddUserRating(
+				UserRating(UserInfo("twinky"), 5.0f,
+				"The best!", "en", "2.1.2", 3, 1)
+			);
+		}
 
 	}
 }

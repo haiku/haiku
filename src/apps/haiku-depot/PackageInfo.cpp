@@ -456,18 +456,18 @@ PackageInfo::PackageInfo()
 }
 
 
-PackageInfo::PackageInfo(const BitmapRef& icon, const BString& title,
+PackageInfo::PackageInfo(const BString& title,
 		const BString& version, const PublisherInfo& publisher,
 		const BString& shortDescription, const BString& fullDescription,
-		const BString& changelog, int32 flags)
+		int32 flags)
 	:
-	fIcon(icon),
+	fIcon(),
 	fTitle(title),
 	fVersion(version),
 	fPublisher(publisher),
 	fShortDescription(shortDescription),
 	fFullDescription(fullDescription),
-	fChangelog(changelog),
+	fChangelog(),
 	fCategories(),
 	fUserRatings(),
 	fScreenshots(),
@@ -549,6 +549,26 @@ PackageInfo::operator!=(const PackageInfo& other) const
 }
 
 
+void
+PackageInfo::SetIcon(const BitmapRef& icon)
+{
+	if (fIcon != icon) {
+		fIcon = icon;
+		_NotifyListeners(PKG_CHANGED_ICON);
+	}
+}
+
+
+void
+PackageInfo::SetChangelog(const BString& changelog)
+{
+	if (fChangelog != changelog) {
+		fChangelog = changelog;
+		_NotifyListeners(PKG_CHANGED_CHANGELOG);
+	}
+}
+
+
 bool
 PackageInfo::IsSystemPackage() const
 {
@@ -559,7 +579,11 @@ PackageInfo::IsSystemPackage() const
 bool
 PackageInfo::AddCategory(const CategoryRef& category)
 {
-	return fCategories.Add(category);
+	if (fCategories.Add(category)) {
+		_NotifyListeners(PKG_CHANGED_CATEGORIES);
+		return true;
+	}
+	return false;
 }
 
 

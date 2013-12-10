@@ -76,7 +76,15 @@ public:
 									{ return fShowDevelopPackages; }
 
 			// Retrieve package information
-			void				PopulatePackage(const PackageInfoRef& package);
+	static	const uint32		POPULATE_CACHED_RATING	= 1 << 0;
+	static	const uint32		POPULATE_CACHED_ICON	= 1 << 1;
+	static	const uint32		POPULATE_USER_RATINGS	= 1 << 2;
+	static	const uint32		POPULATE_SCREEN_SHOTS	= 1 << 3;
+	static	const uint32		POPULATE_CHANGELOG		= 1 << 4;
+	static	const uint32		POPULATE_CATEGORIES		= 1 << 5;
+
+			void				PopulatePackage(const PackageInfoRef& package,
+									uint32 flags);
 
 private:
 			BLocker				fLock;

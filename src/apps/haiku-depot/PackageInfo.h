@@ -199,13 +199,12 @@ enum PackageState {
 class PackageInfo : public BReferenceable {
 public:
 								PackageInfo();
-								PackageInfo(const BitmapRef& icon,
+								PackageInfo(
 									const BString& title,
 									const BString& version,
 									const PublisherInfo& publisher,
 									const BString& shortDescription,
 									const BString& fullDescription,
-									const BString& changelog,
 									int32 packageFlags);
 								PackageInfo(const PackageInfo& other);
 
@@ -213,8 +212,6 @@ public:
 			bool				operator==(const PackageInfo& other) const;
 			bool				operator!=(const PackageInfo& other) const;
 
-			const BitmapRef&	Icon() const
-									{ return fIcon; }
 			const BString&		Title() const
 									{ return fTitle; }
 			const BString&		Version() const
@@ -225,6 +222,11 @@ public:
 									{ return fFullDescription; }
 			const PublisherInfo& Publisher() const
 									{ return fPublisher; }
+
+			void				SetIcon(const BitmapRef& icon);
+			const BitmapRef&	Icon() const
+									{ return fIcon; }
+			void				SetChangelog(const BString& changelog);
 			const BString&		Changelog() const
 									{ return fChangelog; }
 

@@ -363,7 +363,9 @@ void
 MainWindow::_AdoptPackage(const PackageInfoRef& package)
 {
 	fPackageInfoView->SetPackage(package);
-	fModel.PopulatePackage(package);
+	fModel.PopulatePackage(package,
+		Model::POPULATE_USER_RATINGS | Model::POPULATE_SCREEN_SHOTS
+		| Model::POPULATE_CHANGELOG | Model::POPULATE_CATEGORIES);
 }
 
 
@@ -501,12 +503,12 @@ MainWindow::_RefreshPackageList()
 			BString publisherName = repoPackageInfo.Vendor();
 			if (rightsList.CountStrings() > 0)
 				publisherName = rightsList.StringAt(0);
-			modelInfo.SetTo(new(std::nothrow) PackageInfo(NULL,
+			modelInfo.SetTo(new(std::nothrow) PackageInfo(
 					repoPackageInfo.Name(),
 					repoPackageInfo.Version().ToString(),
 					PublisherInfo(BitmapRef(), publisherName,
 					"", publisherURL), repoPackageInfo.Summary(),
-					repoPackageInfo.Description(), "",
+					repoPackageInfo.Description(),
 					repoPackageInfo.Flags()),
 				true);
 
