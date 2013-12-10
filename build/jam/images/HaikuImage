@@ -301,28 +301,6 @@ AddFilesToHaikuImage system settings : <post-install>fresh_install ;
 AddDirectoryToHaikuImage home config non-packaged add-ons decorators ;
 #AddFilesToHaikuImage home config add-ons decorators : ;
 
-# create directories that will remain empty
-AddDirectoryToHaikuImage system cache tmp ;
-AddDirectoryToHaikuImage system non-packaged ;
-AddDirectoryToHaikuImage system var empty ;
-AddDirectoryToHaikuImage system var log ;
-AddDirectoryToHaikuImage home Desktop ;
-AddDirectoryToHaikuImage home mail ;
-AddDirectoryToHaikuImage home config packages ;
-AddDirectoryToHaikuImage home config non-packaged bin ;
-AddDirectoryToHaikuImage home config non-packaged data fonts ;
-AddDirectoryToHaikuImage home config non-packaged lib ;
-AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers bin ;
-AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers dev ;
-AddDirectoryToHaikuImage home config non-packaged add-ons input_server devices ;
-AddDirectoryToHaikuImage home config non-packaged add-ons input_server filters ;
-AddDirectoryToHaikuImage home config non-packaged add-ons input_server methods ;
-AddDirectoryToHaikuImage home config non-packaged add-ons media plugins ;
-AddDirectoryToHaikuImage home config non-packaged add-ons Tracker ;
-AddDirectoryToHaikuImage home config non-packaged add-ons Print ;
-AddDirectoryToHaikuImage home config non-packaged add-ons Screen\ Savers ;
-AddDirectoryToHaikuImage home config non-packaged add-ons Translators ;
-
 # printers
 AddDirectoryToHaikuImage home config settings printers Preview
 	: home-config-settings-printers-preview.rdef ;

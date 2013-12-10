@@ -240,26 +240,5 @@ SEARCH on <post-install>fresh_install
 	= [ FDirName $(HAIKU_TOP) data system settings ] ;
 AddFilesToHaikuImage system settings : <post-install>fresh_install ;
 
-# create directories that will remain empty
-AddDirectoryToHaikuImage system cache tmp ;
-AddDirectoryToHaikuImage system non-packaged ;
-AddDirectoryToHaikuImage system var empty ;
-AddDirectoryToHaikuImage system var log ;
-AddDirectoryToHaikuImage home Desktop ;
-AddDirectoryToHaikuImage home mail ;
-AddDirectoryToHaikuImage home config packages ;
-AddDirectoryToHaikuImage home config non-packaged bin ;
-AddDirectoryToHaikuImage home config non-packaged lib ;
-AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers bin ;
-AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers dev ;
-AddDirectoryToHaikuImage home config non-packaged add-ons input_server devices ;
-AddDirectoryToHaikuImage home config non-packaged add-ons input_server filters ;
-AddDirectoryToHaikuImage home config non-packaged add-ons input_server methods ;
-AddDirectoryToHaikuImage home config non-packaged add-ons media plugins ;
-AddDirectoryToHaikuImage home config non-packaged add-ons Tracker ;
-AddDirectoryToHaikuImage home config non-packaged add-ons Print ;
-AddDirectoryToHaikuImage home config non-packaged add-ons Screen\ Savers ;
-AddDirectoryToHaikuImage home config non-packaged add-ons Translators ;
-
 
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImageCommon ] ;
