@@ -3432,7 +3432,7 @@ dump_mapping_info(int argc, char** argv)
 
 	// We need at least one argument, the address. Optionally a team ID can be
 	// specified.
-	if (argi >= argc || argi + 1 < argc) {
+	if (argi >= argc || argi + 2 < argc) {
 		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
