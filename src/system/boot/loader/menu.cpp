@@ -1135,8 +1135,12 @@ add_safe_mode_menu()
 		}
 	}
 
-	// ... add the menu, if so
-	if (hasMemoryBeyond4GB) {
+	bool needs64BitPaging = true;
+		// TODO: Determine whether 64 bit paging (i.e. PAE for x86) is needed
+		// for other reasons (NX support).
+
+	// ... add the menu item, if so
+	if (hasMemoryBeyond4GB || needs64BitPaging) {
 		safeMenu->AddItem(
 			item = new(nothrow) MenuItem("Ignore memory beyond 4 GiB"));
 		item->SetData(B_SAFEMODE_4_GB_MEMORY_LIMIT);
