@@ -3430,7 +3430,7 @@ dump_mapping_info(int argc, char** argv)
 		}
 	}
 
-	// We need at least one argument, the address. Optionally a team ID can be
+	// We need at least one argument, the address. Optionally a thread ID can be
 	// specified.
 	if (argi >= argc || argi + 2 < argc) {
 		print_debugger_command_usage(argv[0]);
@@ -3441,11 +3441,19 @@ dump_mapping_info(int argc, char** argv)
 	if (!evaluate_debug_expression(argv[argi++], &addressValue, false))
 		return 0;
 
-	uint64 teamID = B_CURRENT_TEAM;
-	bool teamSpecified = argi < argc;
-	if (teamSpecified) {
-		if (!evaluate_debug_expression(argv[argi++], &teamID, false))
+	Team* team = NULL;
+	if (argi < argc) {
+		uint64 threadID = -1;
+		if (!evaluate_debug_expression(argv[argi++], &threadID, false))
 			return 0;
+
+		Thread* thread = Thread::GetDebug(threadID);
+		if (thread == NULL) {
+			kprintf("Invalid thread/team ID \"%s\"\n", argv[argi - 1]);
+			return 0;
+		}
+
+		team = thread->team;
 	}
 
 	if (reverseLookup) {
@@ -3488,20 +3496,9 @@ dump_mapping_info(int argc, char** argv)
 			VMAddressSpace*	fAddressSpace;
 		} callback;
 
-		if (teamSpecified) {
+		if (team != NULL) {
 			// team specified -- get its address space
-			VMAddressSpace* addressSpace;
-			if (teamID == B_CURRENT_TEAM) {
-				Thread* thread = debug_get_debugged_thread();
-				if (thread == NULL || thread->team == NULL) {
-					kprintf("Failed to get team!\n");
-					return 0;
-				}
-
-				addressSpace = thread->team->address_space;
-			} else
-				addressSpace = VMAddressSpace::DebugGet(teamID);
-
+			VMAddressSpace* addressSpace = team->address_space;
 			if (addressSpace == NULL) {
 				kprintf("Failed to get address space!\n");
 				return 0;
@@ -3527,7 +3524,9 @@ dump_mapping_info(int argc, char** argv)
 		VMAddressSpace* addressSpace;
 		if (IS_KERNEL_ADDRESS(virtualAddress)) {
 			addressSpace = VMAddressSpace::Kernel();
-		} else if (!teamSpecified || teamID == B_CURRENT_TEAM) {
+		} else if (team != NULL) {
+			addressSpace = team->address_space;
+		} else {
 			Thread* thread = debug_get_debugged_thread();
 			if (thread == NULL || thread->team == NULL) {
 				kprintf("Failed to get team!\n");
@@ -3535,8 +3534,7 @@ dump_mapping_info(int argc, char** argv)
 			}
 
 			addressSpace = thread->team->address_space;
-		} else
-			addressSpace = VMAddressSpace::DebugGet(teamID);
+		}
 
 		if (addressSpace == NULL) {
 			kprintf("Failed to get address space!\n");
@@ -4078,16 +4076,17 @@ vm_init(kernel_args* args)
 
 	add_debugger_command_etc("mapping", &dump_mapping_info,
 		"Print address mapping information",
-		"[ \"-r\" | \"-p\" ] <address> [ <team ID> ]\n"
+		"[ \"-r\" | \"-p\" ] <address> [ <thread ID> ]\n"
 		"Prints low-level page mapping information for a given address. If\n"
 		"neither \"-r\" nor \"-p\" are specified, <address> is a virtual\n"
 		"address that is looked up in the translation map of the current\n"
-		"team, respectively the team specified by ID <team ID>. If \"-r\" is\n"
-		"specified, <address> is a physical address that is searched in the\n"
-		"translation map of all teams, respectively the team specified by ID\n"
-		" <team ID>. If \"-p\" is specified, <address> is the address of a\n"
-		"vm_page structure. The behavior is equivalent to specifying \"-r\"\n"
-		"with the physical address of that page.\n",
+		"team, respectively the team specified by thread ID <thread ID>. If\n"
+		"\"-r\" is specified, <address> is a physical address that is\n"
+		"searched in the translation map of all teams, respectively the team\n"
+		"specified by thread ID <thread ID>. If \"-p\" is specified,\n"
+		"<address> is the address of a vm_page structure. The behavior is\n"
+		"equivalent to specifying \"-r\" with the physical address of that\n"
+		"page.\n",
 		0);
 
 	TRACE(("vm_init: exit\n"));
