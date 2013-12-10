@@ -3443,7 +3443,7 @@ dump_mapping_info(int argc, char** argv)
 
 	Team* team = NULL;
 	if (argi < argc) {
-		uint64 threadID = -1;
+		uint64 threadID;
 		if (!evaluate_debug_expression(argv[argi++], &threadID, false))
 			return 0;
 
