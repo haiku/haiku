@@ -120,10 +120,8 @@ public:
 
 	inline bool Add(const ItemType& copyFrom, int32 index)
 	{
-		if (index < 0)
-			index = 0;
-		if (index > (int32)fCount)
-			index = fCount;
+		if (index < 0 || index >= (int32)fCount)
+			return false;
 
 		if (!_Resize(fCount + 1))
 			return false;
@@ -190,7 +188,7 @@ public:
 
 	inline const ItemType& ItemAt(int32 index) const
 	{
-		if (index >= (int32)fCount)
+		if (index < 0 || index >= (int32)fCount)
 			return fNullItem;
 		return ItemAtFast(index);
 	}
@@ -202,6 +200,8 @@ public:
 
 	inline const ItemType& LastItem() const
 	{
+		if (fCount == 0)
+			return fNullItem;
 		return ItemAt((int32)fCount - 1);
 	}
 
