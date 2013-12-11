@@ -273,7 +273,7 @@ MainWindow::MainWindow()
 	AddChild(fMenuBar);
 
 	// Partition / Drives context menu
-	fContextMenu = new BPopUpMenu("Partition");
+	fContextMenu = new BPopUpMenu("Partition", false, false);
 	fCreateContextMenuItem = new BMenuItem(B_TRANSLATE("Create" B_UTF8_ELLIPSIS),
 		new BMessage(MSG_CREATE), 'C');
 	fChangeContextMenuItem = new BMenuItem(

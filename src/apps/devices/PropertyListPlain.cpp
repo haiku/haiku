@@ -45,6 +45,9 @@ PropertyListPlain::AddAttributes(const Attributes& attributes)
 	BTextView* view = new BTextView(BRect(0, 0, 1000, 1000),
 		"", BRect(5, 5, 995, 995), B_FOLLOW_ALL_SIDES);
 
+	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	view->MakeEditable(false);
+
 	for (unsigned int i = 0; i < attributes.size(); i++) {
 		BString attributeLine;
 		attributeLine << attributes[i].fName

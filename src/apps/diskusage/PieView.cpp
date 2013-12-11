@@ -166,8 +166,10 @@ void
 PieView::AttachedToWindow()
 {
 	fWindow = (MainWindow*)Window();
-	if (Parent())
+	if (Parent()) {
 		SetViewColor(Parent()->ViewColor());
+		SetLowColor(Parent()->ViewColor());
+	}
 }
 
 

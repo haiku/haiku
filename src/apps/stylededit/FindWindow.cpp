@@ -29,8 +29,8 @@
 FindWindow::FindWindow(BRect frame, BHandler* _handler, BString* searchString,
 	bool caseState, bool wrapState, bool backState)
 	: BWindow(frame, B_TRANSLATE("Find"), B_FLOATING_WINDOW,
-		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS,
-		B_CURRENT_WORKSPACE)
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
+		| B_AUTO_UPDATE_SIZE_LIMITS, B_CURRENT_WORKSPACE)
 {
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(MSG_HIDE_WINDOW));
 
@@ -107,6 +107,14 @@ FindWindow::DispatchMessage(BMessage* message, BHandler* handler)
 	}
 
 	BWindow::DispatchMessage(message, handler);
+}
+
+
+void
+FindWindow::Show()
+{
+	fSearchString->TextView()->SelectAll();
+	BWindow::Show();
 }
 
 
