@@ -10,7 +10,7 @@
 #include "amd.h"
 #include "generic_x86.h"
 
-#include <OS.h>
+#include <cpu.h>
 
 
 static void
@@ -23,16 +23,12 @@ amd_init_mtrrs(void)
 static status_t
 amd_init(void)
 {
-	system_info info;
-	if (get_system_info(&info) != B_OK)
-		return B_ERROR;
-
-	if ((info.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_AMD_x86)
+	if (gCPU[0].arch.vendor != VENDOR_AMD)
 		return B_ERROR;
 
 	// The K6-2 doesn't seem to support write-combining (before model 9),
 	// so we ignore anything before that one.
-	if (info.cpu_type <= B_CPU_AMD_K6_2)
+	if (gCPU[0].arch.family <= 5 || gCPU[0].arch.model < 9)
 		return B_ERROR;
 
 	generic_mtrr_compute_physical_mask();
