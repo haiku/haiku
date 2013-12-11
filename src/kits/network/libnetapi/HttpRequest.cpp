@@ -119,7 +119,7 @@ BHttpRequest::SetDisableListener(bool disable)
 void
 BHttpRequest::SetAutoReferrer(bool enable)
 {
-    fOptAutoReferer = enable;
+	fOptAutoReferer = enable;
 }
 
 
@@ -250,7 +250,7 @@ BHttpRequest::StatusString(status_t threadStatus) const
 }
 
 
-const BHttpResult&
+const BUrlResult&
 BHttpRequest::Result() const
 {
 	return fResult;
@@ -283,8 +283,6 @@ BHttpRequest::_ResetOptions()
 status_t
 BHttpRequest::_ProtocolLoop()
 {
-	printf("UHP[%p]::{Loop} %s\n", this, fUrl.UrlString().String());
-
 	// Initialize the request redirection loop
 	int8 maxRedirs = fOptMaxRedirs;
 	bool newRequest;
@@ -610,8 +608,7 @@ BHttpRequest::_MakeRequest()
 					if ((ssize_t)fInputBuffer.Size() >= chunkSize + 2) {
 							// 2 more bytes to handle the closing CR+LF
 						bytesRead = chunkSize;
-						if (inputTempSize < chunkSize + 2)
-						{
+						if (inputTempSize < chunkSize + 2) {
 							delete[] inputTempBuffer;
 							inputTempSize = chunkSize + 2;
 							inputTempBuffer = new char[inputTempSize];
@@ -710,7 +707,7 @@ BHttpRequest::_GetLine(BString& destString)
 	fInputBuffer.RemoveData(temporaryBuffer, characterIndex + 1);
 
 	// Strip end-of-line character(s)
-	if (temporaryBuffer[characterIndex-1] == '\r')
+	if (temporaryBuffer[characterIndex - 1] == '\r')
 		destString.SetTo(temporaryBuffer, characterIndex - 1);
 	else
 		destString.SetTo(temporaryBuffer, characterIndex);
