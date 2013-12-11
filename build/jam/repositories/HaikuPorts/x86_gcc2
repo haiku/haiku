@@ -152,8 +152,8 @@ RemotePackageRepository HaikuPorts
 	gettext_x86_libintl-0.18.1.1-5
 	glu_x86-9.0.0-2
 	glu_x86_devel-9.0.0-2
-	haikuwebkit_x86-1.2.0-3
-	haikuwebkit_x86_devel-1.2.0-3
+	haikuwebkit_x86-1.2.1-1
+	haikuwebkit_x86_devel-1.2.1-1
 	icu_x86-4.8.1.1-4
 	icu_x86_devel-4.8.1.1-4
 	jpeg_x86-9-3
