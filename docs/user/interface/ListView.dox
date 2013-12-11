@@ -25,27 +25,30 @@
 	\ingroup libbe
 	\brief Displays a list of items that the user can select and invoke.
 
-	BListView's can be one of two types set by the type parameter of the constructor:
-	- \c B_SINGLE_SELECTION_LIST	Can select only one item in the list at a time.
-	     This is the default.
-	- \c B_MULTIPLE_SELECTION_LIST	Can select any number of items by holding down
-	     Option for a discontinuous selection, or Shift for a contiguous selection.
+	BListView's can be one of two types set by the type parameter of the
+	constructor:
+	- \c B_SINGLE_SELECTION_LIST Can select only one item in the list at a
+	     time. This is the default.
+	- \c B_MULTIPLE_SELECTION_LIST	Can select any number of items by
+	     holding down Option for a discontinuous selection, or Shift for
+	     a contiguous selection.
 
 	An example of a BListView looks like this:
 	\image html BListView_example.png
 
 	Click on an item to select it and double-click an item to invoke it. The
 	BListView doesn't define what it means to "invoke" an item. See
-	BListView::SetSelectionMessage() and BListView::SetInvocationMessage() to set
-	a message to be set when these actions occur. You can also select and invoke
-	items with keyboard keys such as the up and down arrow keys, Page Up and Page
-	Down and the Enter key or Space key to invoke the item.
+	BListView::SetSelectionMessage() and BListView::SetInvocationMessage()
+	to set a message to be set when these actions occur. You can also select
+	and invoke items with keyboard keys such as the up and down arrow keys,
+	Page Up and Page Down and the Enter key or Space key to invoke the item.
 
-	This class is based on the BList class from the Support Kit and many of the
-	methods it uses behave similarly.
+	This class is based on the BList class from the Support Kit and many of
+	the methods it uses behave similarly.
 
-	Although a BListView is scrollable, it doesn't provide scroll bars by itself.
-	You should add the BListView as a child of a BScrollView to make it scrollable.
+	Although a BListView is scrollable, it doesn't provide scroll bars by
+	itself. You should add the BListView as a child of a BScrollView to make
+	it scrollable.
 
 	The code to add a BListView to a BScrollView looks something like this:
 
@@ -74,20 +77,21 @@
 	\param name The name of the view.
 	\param type Whether the list view supports a single selection or multiple
 	       selections.
-	\param resizingMode The resizing mode flags.
-	\param flags The view flags.
+	\param resizingMode The resizing mode flags. See BView for details.
+	\param flags The view flags. See BView for details.
 */
 
 
 /*!
-	\fn BListView::BListView(const char* name, list_view_type type, uint32 flags)
-	\brief Creates a new list view suitable as part of a layout with the specified
-	       \a name, \a type, and \a flags.
+	\fn BListView::BListView(const char* name, list_view_type type,
+		uint32 flags)
+	\brief Creates a new list view suitable as part of a layout with the
+	       specified \a name, \a type, and \a flags.
 
 	\param name The name of the view.
 	\param type Whether the list view supports a single selection or multiple
 	       selections.
-	\param flags The view flags.
+	\param flags The view flags. See BView for details.
 */
 
 
@@ -102,17 +106,17 @@
 
 /*!
 	\fn BListView::BListView(BMessage* archive)
-	\brief Creates a list view from an \a archive message.
+	\brief Creates a BListView object from the \a archive message.
 
-	\param archive The message to create the list view from.
+	\param archive The message to create the object from.
 */
 
 
 /*!
 	\fn BListView::~BListView()
-	\brief Delete the list view and free the memory used.
+	\brief Delete the BListView object and free the memory used by it.
 
-	This method does not free the list items.
+	This method does not free the attached list items.
 */
 
 
@@ -126,17 +130,17 @@
 
 /*!
 	\fn BArchivable* BListView::Instantiate(BMessage* archive)
-	\brief Create a new list view from the message \a archive.
+	\brief Create a new BListView object from the message \a archive.
 
-	\param archive The message to create the list view from.
+	\param archive The message to create the object from.
 */
 
 
 /*!
 	\fn status_t BListView::Archive(BMessage* archive, bool deep) const
-	\brief Archive the list view to a message.
+	\brief Archive the BListView object to a message.
 
-	\param archive The message to archive the list view to.
+	\param archive The message to archive the object to.
 	\param deep \c true to archive child views.
 */
 
@@ -229,7 +233,7 @@
 	\brief Hook method that is called when the window becomes the active window
 	       or gives up that status.
 
-	\param state If \c true, window has just been activated. If \c false the 
+	\param state If \c true, window has just been activated. If \c false the
 	       window has just been deactivated.
 
 	\see BView::WindowActivated()
@@ -238,7 +242,7 @@
 
 /*!
 	\fn void BListView::MessageReceived(BMessage* message)
-	\brief Hook method called with a message is received by the list view.
+	\brief Hook method called when a message is received by the list view.
 
 	\param message The message received by the list view.
 
@@ -254,8 +258,10 @@
 	The following keys are used by the list view by default:
 	- Up Arrow				Selects the previous item.
 	- Down Arrow			Selects the next item.
-	- Page Up				Selects the item one view height above the current item.
-	- Page Down				Selects the item one view height below the current item.
+	- Page Up				Selects the item one view height above the
+	                        current item.
+	- Page Down				Selects the item one view height below the
+	                        current item.
 	- Home					Selects the first item in the list.
 	- End					Select the last item in the list.
 	- Enter and Spacebar	Invokes the currently selected item.
@@ -311,16 +317,18 @@
 	\fn bool BListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
 	\brief Hook method called when a drag and drop operation is initiated.
 
-	This method is used by derived classes to implement drag and drop. This method
-	is called by the MouseDown() method. If the derived class initiates the drag &
-	drop operation you should return \c true, otherwise return \c false. By default
-	this method returns \c false.
+	This method is used by derived classes to implement drag and drop.
+	This method is called by the MouseDown() method. If the derived
+	class initiates the drag & drop operation you should return
+	\c true, otherwise return \c false. By default this method returns
+	\c false.
 
 	\param point Where the drag & drop operation started.
 	\param index
 	\param wasSelected Indicates whether or not the item was selected.
 
-	\returns \c true if a drag & drop operation was initiated, \c false if not.
+	\returns \c true if a drag & drop operation was initiated, \c false
+	         otherwise.
 */
 
 
@@ -400,7 +408,7 @@
 /*!
 	\fn void BListView::MakeFocus(bool focused)
 	\brief Highlight or unhighlight the selection when the list view acquires
-		or loses its focus state.
+	       or loses its focus state.
 
 	\param focused \c true to receive focus or \c false to lose it.
 
@@ -410,8 +418,8 @@
 
 /*!
 	\fn void BListView::SetFont(const BFont* font, uint32 mask)
-	\brief Sets the font of the list view to \a font with the font parameters set
-	       by \a mask.
+	\brief Sets the font of the list view to \a font with the font
+	       parameters set by \a mask.
 
 	\param font The \a font to set the list view to.
 	\param mask A \a mask indicating which properties of \a font to set.
@@ -443,8 +451,8 @@
 	\brief Add an \a item to the list view at the specified \a index.
 
 	\param item The list item to add.
-	\param index The \a index of where to add the list item, if not specified the
-	       item is added to the end.
+	\param index The \a index of where to add the list item, if not
+	       specified the item is added to the end.
 
 	\return \c true if the list item was added, \c false otherwise.
 */
@@ -452,7 +460,8 @@
 
 /*!
 	\fn bool BListView::AddList(BList* list, int32 index)
-	\brief Add a \a list of list items to the list view at the specified \a index.
+	\brief Add a \a list of list items to the list view at the specified
+	       \a index.
 
 	\param list The \a list of list items to add.
 	\param index The \a index of where to add the list, if not specified the
@@ -516,7 +525,8 @@
 
 /*!
 	\fn void BListView::SetSelectionMessage(BMessage* message)
-	\brief Sets the \a message that the list view sends when a new item is selected.
+	\brief Sets the \a message that the list view sends when a new item
+	       is selected.
 
 	\param message The selection \a message to set.
 */
@@ -639,50 +649,49 @@
 
 /*!
 	\fn BListItem* BListView::FirstItem() const
-	\brief Returns the first list item.
+	\brief Returns a pointer to the first list item.
 
-	\return The first item in the list.
+	\return A pointer to the first item in the list or \c NULL there are no items.
 */
 
 
 /*!
 	\fn BListItem* BListView::LastItem() const
-	\brief Returns the last list item.
+	\brief Returns a pointer to the last list item.
 
-	\return The last item in the list.
+	\return A pointer to the last item in the list or \c NULL there are no items.
 */
 
 
 /*!
-	\fn bool BListView::HasItem(BListItem *item) const
+	\fn bool BListView::HasItem(BListItem* item) const
 	\brief Returns whether or not the list contains the specified \a item.
 
 	\param item The list item to check.
 
-	\return \c true if the list item is contained in the list view, \c false
-	        otherwise.
+	\return \c true if \a item is in the list, \c false otherwise.
 */
 
 
 /*!
 	\fn int32 BListView::CountItems() const
-	\brief Returns the number of list items contained in the list view.
+	\brief Returns the number of items contained in the list view.
 
-	\return The number of list items.
+	\return The number of items.
 */
 
 
 /*!
 	\fn void BListView::MakeEmpty()
-	\brief Empties the list view of all list items.
+	\brief Empties the list view of all items.
 */
 
 
 /*!
 	\fn bool BListView::IsEmpty() const
-	\brief Returns whether or not the list view is empty or not.
+	\brief Returns whether or not the list view is empty.
 
-	\return \c true if the list view was empty, \c false otherwize.
+	\return \c true if the list view is empty, \c false otherwise.
 */
 
 
@@ -690,9 +699,10 @@
 	\fn void BListView::DoForEach(bool (*func)(BListItem* item))
 	\brief Calls the specified function on each item in the list.
 
-	The \a func is called on the items in order starting with the item at index 0
-	and ending at the last item in the list. This method stops calling the \a func
-	once it returns \a true or the end of the list is reached.
+	The \a func is called on the items in order starting with the item at
+	index 0 and ending at the last item in the list. This method stops
+	calling the \a func once it returns \a true or the end of the list
+	is reached.
 
 	The first argument of \a func is a pointer to the list item.
 
@@ -705,12 +715,13 @@
 		void* arg)
 	\brief Calls the specified function on each item in the list.
 
-	The \a func is called on the items in order starting with the item at index 0
-	and ending at the last item in the list. This method stops calling the \a func
-	once it returns \a true or the end of the list is reached.
+	The \a func is called on the items in order starting with the item at
+	index 0 and ending at the last item in the list. This method stops
+	calling the \a func once it returns \a true or the end of the list
+	is reached.
 
-	The first argument of \a func is a pointer to the list item, \a arg is passed in
-	as the second argument.
+	The first argument of \a func is a pointer to the list item, \a arg is
+	passed in as the second argument.
 
 	\param func The function to call on each item.
 	\param arg The second argument of the function.
@@ -787,7 +798,7 @@
 	value returned is positive. If the index of the selected item is equal to
 	\a index then 0 is returned.
 
-	\brief index The \a index of the item to get relative to the selected item's
+	\param index The \a index of the item to get relative to the selected item's
 	       index.
 */
 
@@ -844,7 +855,7 @@
 
 /*!
 	\fn void BListView::SortItems(int (*cmp)(const void *, const void *))
-	\brief sort the items according the the passed in \a cmp function.
+	\brief Sort the items according the the passed in \a cmp function.
 
 	\param cmp The compare function to use to sort the items.
 */
