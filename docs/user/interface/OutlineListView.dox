@@ -1,0 +1,627 @@
+/*
+ * Copyright 2013 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/OutlineListView.h	 hrev46526
+ *		src/kits/interface/OutlineListView.cpp	 hrev46526
+ */
+
+
+/*!
+	\file OutlineListView.h
+	\ingroup interface
+	\ingroup libbe
+	\brief Provides the BOutlineListView class.
+*/
+
+
+/*!
+	\class BOutlineListView
+	\ingroup interface
+	\ingroup libbe
+	\brief Expands upon BListView to display a hierarchical list of items.
+
+	Items with subitems underneath them are called super items and are drawn
+	with a small arrow to the left of their label. The label faces right if
+	the item is collapsed and faces down if the item is expanded.
+
+	An example of an outline list view looks like this:
+
+	\image html BOutlineListView_example.png
+
+	\see BListView for more info on how to use a list view, most of which also
+	     applies to an outline list view.
+*/
+
+
+/*!
+	\fn BOutlineListView::BOutlineListView(BRect frame, const char* name,
+		list_view_type type, uint32 resizingMode, uint32 flags)
+	\brief Creates a new BOutlineListView object.
+
+	\param frame The \a frame rectangle to create the view in.
+	\param name The name of the view.
+	\param type Whether the list view supports a single selection or multiple
+	       selections.
+	\param resizingMode The resizing mode flags. See BView for details.
+	\param flags The view flags. See BView for details.
+*/
+
+
+/*!
+	\fn BOutlineListView::BOutlineListView(const char* name,
+		list_view_type type, uint32 flags)
+	\brief Creates a new BOutlineListView object suitable for use in a BLayout.
+
+	\param name The name of the view.
+	\param type Whether the list view supports a single selection or multiple
+	       selections.
+	\param flags The view flags. See BView for details.
+*/
+
+
+/*!
+	\fn BOutlineListView::BOutlineListView(BMessage* archive)
+	\brief Creates a BOutlineListView object from the \a archive message.
+
+	\param archive The message to create the object from.
+*/
+
+
+/*!
+	\fn BOutlineListView::~BOutlineListView()
+	\brief Delete the outline BOutlineListView object and free the memory used
+	       by it.
+
+	This method does not free the attached list items.
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BArchivable* BOutlineListView::Instantiate(BMessage* archive)
+	\brief Create a new BOutlineListView object from the message \a archive.
+
+	\param archive The message to create the object from.
+*/
+
+
+/*!
+	\fn status_t BOutlineListView::Archive(BMessage* archive, bool deep) const
+	\brief Archive the BOutlineListView object to a message.
+
+	\param archive The message to archive the object to.
+	\param deep \c true to archive child views.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Hook methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BOutlineListView::AllAttached()
+	\brief Hook method called once all views are attached to the outline list
+	       view.
+
+	\see BView::AllAttached()
+*/
+
+
+/*!
+	\fn void BOutlineListView::AllDetached()
+	\brief Hook method called once all views are detached from the outline list
+	       view.
+
+	\see BView::AllDetached()
+*/
+
+
+/*!
+	\fn void BOutlineListView::DetachedFromWindow()
+	\brief Hook method that is called when the outline list view is removed from
+	       the view hierarchy.
+
+	\see BView::DetachedFromWindow()
+*/
+
+
+/*!
+	\fn void BOutlineListView::FrameMoved(BPoint new_position)
+	\brief Hook method called when the outline list view is moved.
+
+	\param new_position The list view's new position.
+
+	\see BView::FrameMoved()
+*/
+
+
+/*!
+	\fn void BOutlineListView::FrameResized(float width, float height)
+	\brief Hook method called when the outline list view is resized.
+
+	\param width The new \a width of the view.
+	\param height The new \a height of the view.
+
+	\see BView::FrameResized()
+*/
+
+
+/*!
+	\fn void BOutlineListView::KeyDown(const char* bytes, int32 numBytes)
+	\brief Hook method that is called when a key is pressed while the view is
+	       the focus view of the active window.
+
+	Responds to arrow keys to provide the ability to navigate the outline list
+	or to expand or collapse sections of the outline. Inherits the keys
+	recognized by BListView.
+
+	The following keys are used by the outline list view by default:
+	- Right Arrow				Expands the selected item.
+	- Left Arrow				Collapses the selected item.
+
+	\param bytes The bytes of the key combination pressed.
+	\param numBytes The number of bytes in \a bytes.
+
+	\see BListView::KeyDown()
+*/
+
+
+/*!
+	\fn void BOutlineListView::MessageReceived(BMessage* message)
+	\brief Hook method called when a message is received by the outline list
+	       view.
+
+	\param message The message received by the view.
+
+	\see BView::MessageReceived()
+*/
+
+
+/*!
+	\fn void BOutlineListView::MouseDown(BPoint where)
+	\brief Hook method called when a mouse button is pressed while the cursor
+	       is contained in the frame of the outline list view.
+
+	Responds to mouse clicks expanding or collapsing sections of the outline
+	when the user clicks on a latch.
+
+	\param where The point on the screen where to mouse pointer is when
+	       the mouse button is pressed.
+
+	\see BListView::MouseDown()
+*/
+
+
+/*!
+	\fn void BOutlineListView::MouseUp(BPoint where)
+	\brief Hook method that is called when a mouse button is released while
+	       the cursor is contained in the frame of the outline list view.
+
+	\param where The location that the mouse button was released.
+
+	\see BView::MouseUp()
+*/
+
+
+//! @}
+
+
+/*!
+	\name Add and remove item methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BOutlineListView::AddUnder(BListItem* item, BListItem* superItem)
+	\brief Adds the \a item one level deeper and immediately after \a superItem.
+
+	\param item The \a item to add.
+	\param superItem The item to add under, if \c NULL adds to end.
+
+	\return \c true if the \a item was added, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BOutlineListView::AddItem(BListItem* item)
+	\brief Adds the \a item to the end of the list.
+
+	\param item The \a item to add.
+
+	\return \c true if the \a item was added, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BOutlineListView::AddItem(BListItem* item, int32 fullListIndex)
+	\brief Adds the \a item at \a fullListIndex.
+
+	\param item The \a item to add.
+	\param fullListIndex The index to add \a item at.
+
+	\return \c true if the \a item was added, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BOutlineListView::AddList(BList* newItems)
+	\brief Adds a list of items to the end of the list.
+
+	\param newItems The list of items to add.
+
+	\return \c true if the items was added, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BOutlineListView::AddList(BList* newItems, int32 fullListIndex)
+	\brief Adds a list of items at \a fullListIndex
+
+	\param newItems The list of items to add.
+	\param fullListIndex The index to add \a item at.
+
+	\return \c true if the items was added, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BOutlineListView::RemoveItem(BListItem* item)
+	\brief Removes the \a item from the list.
+
+	\param item The \a item to remove.
+
+	\return \c true if the \a item was removed, \c false otherwise.
+*/
+
+
+/*!
+	\fn BListItem* BOutlineListView::RemoveItem(int32 fullListIndex)
+	\brief Removes the \a item located at \a fullListIndex from the list.
+
+	\return A pointer to the BListItem removed.
+*/
+
+
+/*!
+	\fn bool BOutlineListView::RemoveItems(int32 fullListIndex, int32 count)
+	\brief Removes \a count items starting at \a fullListIndex from the list.
+
+	\return \c true if the items were removed, \c false otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Full list methods
+
+	These methods replicate similar methods in BListView except work on the
+	full list.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BListItem* BOutlineListView::FullListItemAt(int32 fullListIndex) const
+	\brief Returns a pointer to the BListItem at \a fullListIndex.
+
+	\return A pointer to the the BListItem at \a fullListIndex or \c NULL if not
+	        found.
+
+	\see BListView::ItemAt(int32 index)
+*/
+
+
+/*!
+	\fn int32 BOutlineListView::FullListIndexOf(BPoint where) const
+	\brief Returns the full list index of the item at \a where.
+
+	\return The index of the item at \a where or -1 if not found.
+
+	\see BListView::IndexOf(BListItem* item)
+*/
+
+
+/*!
+	\fn int32 BOutlineListView::FullListIndexOf(BListItem* item) const
+	\brief Returns the full list index of \a item.
+
+	\return The index of the item at \a where or -1 if not found.
+
+	\see BListView::IndexOf(BPoint point)
+*/
+
+
+/*!
+	\fn BListItem* BOutlineListView::FullListFirstItem() const
+	\brief Returns a pointer to the first BListItem in the list.
+
+	\return A pointer to the first item in the list or \c NULL there are no
+	        items.
+
+	\see BListView::FirstItem()
+*/
+
+
+/*!
+	\fn BListItem* BOutlineListView::FullListLastItem() const
+	\brief Returns a pointer to the list BListItem in the list
+
+	\return A pointer to the last item in the list or \c NULL there are no
+	        items.
+
+	\see BListView::LastItem()
+*/
+
+
+/*!
+	\fn bool BOutlineListView::FullListHasItem(BListItem* item) const
+	\brief Returns whether or not the list contains the specified \a item.
+
+	\param item The list item to check.
+
+	\return \c true if \a item is in the list, \c false otherwise.
+
+	\see BListView::HasItem(BListItem* item)
+*/
+
+
+/*!
+	\fn int32 BOutlineListView::FullListCountItems() const
+	\brief Returns the number of items contained in the outline list view.
+
+	\return The number of items.
+
+	\see BListView::CountItems()
+*/
+
+
+/*!
+	\fn int32 BOutlineListView::FullListCurrentSelection(int32 index) const
+	\brief Returns the index of a currently selected item relative to the passed
+	       in \a index.
+
+	\param index The \a index of the item to get relative to the selected item's
+	       index.
+
+	\see BListView::CurrentSelection(int32 index)
+*/
+
+
+/*!
+	\fn void BOutlineListView::MakeEmpty()
+	\brief Empties the outline list view of all items.
+*/
+
+
+/*!
+	\fn bool BOutlineListView::FullListIsEmpty() const
+	\brief Returns whether or not the outline list view is empty.
+
+	\return \c true if the outline list view is empty, \c false otherwise.
+
+	\see BListView::IsEmpty()
+*/
+
+
+/*!
+	\fn void BOutlineListView::FullListDoForEach(bool(*func)(BListItem* item))
+	\brief Calls the specified function on each item in the outline list.
+
+	\param func The function to call on each item.
+
+	\see BListView::DoForEach(bool (*func)(BListItem* item))
+*/
+
+
+/*!
+	\fn void BOutlineListView::FullListDoForEach(bool(*func)(BListItem* item,
+		void* arg), void* arg)
+	\brief Calls the specified function on each item in the outline list.
+
+	\param func The function to call on each item.
+	\param arg The second argument of the function.
+
+	\sa BListView::DoForEach(bool (*func)(BListItem* item, void* arg),
+		void* arg)
+*/
+
+
+//! @}
+
+
+/*!
+	\fn BListItem* BOutlineListView::Superitem(const BListItem* item)
+	\brief Returns a pointer to the item at one level above \a item.
+
+	\return A pointer to the superitem of \a item or \c NULL if the \a item
+	       is at the outermost level or not found.
+*/
+
+
+/*!
+	\fn void BOutlineListView::Expand(BListItem* item)
+	\brief Expands the section referenced by \a item.
+*/
+
+
+/*!
+	\fn void BOutlineListView::Collapse(BListItem* item)
+	\brief Collapses the section referenced by \a item.
+*/
+
+
+/*!
+	\fn bool BOutlineListView::IsExpanded(int32 fullListIndex)
+	\brief Returns whether or not the section that the item at \a fullListIndex
+	       is expanded or not.
+
+	\return \c true if the section is expanded, \c false if it is collapsed.
+*/
+
+
+/*!
+	\name Sort methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BOutlineListView::FullListSortItems(
+		int (*compareFunc)(const BListItem* a, const BListItem* b))
+	\brief Sort the items according the the passed in compare function.
+
+	\param compareFunc The compare function to use to sort the items.
+
+	\see BListView::SortItems(int (*cmp)(const void *, const void *))
+*/
+
+
+/*!
+	\fn void BOutlineListView::SortItemsUnder(BListItem* superItem,
+		bool oneLevelOnly, int (*compareFunc)(const BListItem* a,
+			const BListItem* b))
+	\brief Sorts the items under \a superItem.
+
+	\param superItem The base item.
+	\param oneLevelOnly if \c true, only items located one level under
+	       superItem are considered.
+	\param compareFunc The compare function to use to sort the items.
+*/
+
+
+//! @}
+
+
+/*!
+	\fn int32 BOutlineListView::CountItemsUnder(BListItem* superItem,
+		bool oneLevelOnly) const
+	\brief Returns the number of items under \a superItem.
+
+	\param superItem The base item.
+	\param oneLevelOnly if \c true, only items located one level under
+	       superItem are considered.
+
+	\return The number of items under \a superItem.
+*/
+
+
+/*!
+	\fn BListItem* BOutlineListView::EachItemUnder(BListItem* superItem,
+		bool oneLevelOnly, BListItem* (*eachFunc)(BListItem* item, void* arg),
+		void* arg)
+	\brief Calls \a eachFunc for each item under \a superItem.
+
+	\param superItem The base item.
+	\param oneLevelOnly if \c true, only items located one level under
+	       superItem are considered.
+	\param eachFunc The function to call on each item.
+	\param arg The second argument of \a eachFunc.
+*/
+
+
+/*!
+	\fn BListItem* BOutlineListView::ItemUnderAt(BListItem* superItem,
+		bool oneLevelOnly, int32 index) const
+	\brief Returns a pointer to the item at \a index under \a superItem.
+
+	\note If \a oneLevelOnly is \a false, this method acts like
+	      FullListItemAt() except the first item in the list is
+	      considered to be \a superItem.
+
+	\param superItem The base item.
+	\param oneLevelOnly if \c true, only items located one level under
+	       superItem are considered.
+	\param index The index of the item to get.
+
+	\return A pointer to the item at \a index under \a superItem or \c NULL
+	        if not found.
+*/
+
+
+/*!
+	\fn bool BOutlineListView::DoMiscellaneous(MiscCode code, MiscData* data)
+	\brief If \a code is \a B_SWAP_OP, swap the items in \a data, otherwise
+	       pass the arguments to BListView::DoMiscellaneous().
+
+	\param code The action \a code to use.
+	\param data The \a data to act on.
+
+	\see BListView::DoMiscellaneous()
+*/
+
+
+/*!
+	\fn void BOutlineListView::ExpandOrCollapse(BListItem* item, bool expand)
+	\brief Toggle the expanded state of \a item.
+
+	\param item The \a item to toggle.
+	\param expand If \c true, expand the \a item, if \c false, collapse the
+	        \a item.
+*/
+
+
+/*!
+	\fn BRect BOutlineListView::LatchRect(BRect itemRect, int32 level) const
+	\brief Used by derived classes to return the latch area.
+
+	\param itemRect The area of the item to get the latch area of.
+	\param level The \a level of the item to get the latch area of.
+*/
+
+
+/*!
+	\fn void BOutlineListView::DrawLatch(BRect itemRect, int32 level,
+		bool collapsed, bool highlighted, bool misTracked)
+	\brief Used by derived classes to draw the latch.
+
+	\param itemRect The area of the item to get the latch area of,
+	       this is passed to LatchRect() to get the latch area.
+	\param level The \a level of the item to get the latch area of,
+	       also passed to LatchRect().
+	\param collapsed \c true to draw the latch in a collapsed state,
+	       \c false to draw the latch in an expanded state.
+	\param highlighted \c true to draw the latch in a selected state,
+	       \c false to draw the latch in an unselected state. Unused
+	       by the base class.
+	\param misTracked Unused by the base class.
+*/
+
+
+/*!
+	\fn void BOutlineListView::DrawItem(BListItem* item, BRect itemRect,
+		bool complete)
+	\brief Used by derived classes to draw the \a item.
+
+	\param item The \a item to draw.
+	\param itemRect The area of the \a item to draw.
+	\param complete Whether or not to draw the background in addition to the
+	       contents.
+*/
