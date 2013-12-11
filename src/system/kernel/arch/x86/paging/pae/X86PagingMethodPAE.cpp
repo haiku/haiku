@@ -595,10 +595,10 @@ X86PagingMethodPAE::Init(kernel_args* args,
 
 	// create the initial pools for the physical page mapper
 	int32 poolCount = _GetInitialPoolCount();
-	PhysicalPageSlotPool* pool
-		= new(&PhysicalPageSlotPool::sInitialPhysicalPagePool)
-			PhysicalPageSlotPool[poolCount];
+	PhysicalPageSlotPool* pool = PhysicalPageSlotPool::sInitialPhysicalPagePool;
+
 	for (int32 i = 0; i < poolCount; i++) {
+		new(&pool[i]) PhysicalPageSlotPool;
 		status_t error = pool[i].InitInitial(this, args);
 		if (error != B_OK) {
 			panic("X86PagingMethodPAE::Init(): Failed to create initial pool "
