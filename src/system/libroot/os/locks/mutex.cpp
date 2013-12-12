@@ -59,7 +59,7 @@ mutex_destroy(mutex *lock)
 status_t
 mutex_lock(mutex *lock)
 {
-	uint32 count;
+	uint32 count = 0;
 	const uint32 kMaxCount
 		= (lock->flags & MUTEX_FLAG_ADAPTIVE) != 0 ? MAX_UNSUCCESSFUL_SPINS : 1;
 
