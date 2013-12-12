@@ -32,6 +32,9 @@ static struct {
 	{(uint32)-1, -1}
 };
 
+status_t __set_scheduler_mode(int32 mode);
+int32 __get_scheduler_mode(void);
+
 
 int32
 suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter,
