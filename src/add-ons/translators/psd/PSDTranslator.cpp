@@ -88,7 +88,9 @@ PSDTranslator::DerivedIdentify(BPositionIO *stream,
 	info->group = B_TRANSLATOR_BITMAP;
 	info->quality = PSD_IN_QUALITY;
 	info->capability = PSD_IN_CAPABILITY;
-	strcpy(info->name, kPSDName);
+	BString name(kPSDName);
+	name << " (" << psdFile.ColorFormatName() << ")";
+	strcpy(info->name, name.String());
 	strcpy(info->MIME, kPSDMimeType);
 	
 	return B_OK;
@@ -112,8 +114,8 @@ PSDTranslator::DerivedTranslate(BPositionIO *source,
 			PSDLoader psdFile(source);
 			if (!psdFile.IsLoaded())
 				return B_NO_TRANSLATOR;
-			
-			return psdFile.Decode(target);			
+
+			return psdFile.Decode(target);
 		}
 
 		default:
