@@ -205,6 +205,12 @@ class hoardHeap {
 		static void initNumProcs(void);
 
 	protected:
+		// The maximum number of thread heaps we allow.  (NOT the maximum
+		// number of threads -- Hoard imposes no such limit.)  This must be
+		// a power of two! NB: This number is twice the maximum number of
+		// PROCESSORS supported by Hoard.
+		static int fMaxThreadHeaps;
+
 		// number of CPUs, cached
 		static int _numProcessors;
 		static int _numProcessorsMask;

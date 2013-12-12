@@ -132,12 +132,6 @@ class processHeap : public hoardHeap {
 		processHeap(const processHeap &);
 		const processHeap & operator=(const processHeap &);
 
-		// The maximum number of thread heaps we allow.  (NOT the maximum
-		// number of threads -- Hoard imposes no such limit.)  This must be
-		// a power of two! NB: This number is twice the maximum number of
-		// PROCESSORS supported by Hoard.
-		const int kMaxThreadHeaps;
-
 		// The per-thread heaps.
 		HEAPTYPE* theap;
 
@@ -174,7 +168,7 @@ processHeap::getHeap(int i)
 {
 	assert(theap != NULL);
 	assert(i >= 0);
-	assert(i < kMaxThreadHeaps);
+	assert(i < fMaxThreadHeaps);
 	return theap[i];
 }
 
@@ -185,7 +179,7 @@ processHeap::getLog(int i)
 {
 	assert(_log != NULL);
 	assert(i >= 0);
-	assert(i < kMaxThreadHeaps + 1);
+	assert(i < fMaxThreadHeaps + 1);
 	return _log[i];
 }
 #endif
@@ -200,7 +194,7 @@ processHeap::getHeapIndex(void)
 	// In fact, for efficiency, we just round up to the highest power of two,
 	// times two.
 	int tid = find_thread(NULL) & _numProcessorsMask;
-	assert(tid < kMaxThreadHeaps);
+	assert(tid < fMaxThreadHeaps);
 	return tid;
 }
 
