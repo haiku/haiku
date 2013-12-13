@@ -8,6 +8,7 @@
 
 #include <new>
 #include <stdlib.h>
+#include <string.h>
 
 #include <SupportDefs.h>
 
