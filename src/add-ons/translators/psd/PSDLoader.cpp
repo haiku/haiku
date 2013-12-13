@@ -76,7 +76,7 @@ PSDLoader::IsSupported(void)
 	if (fChannels < 0 || fChannels > 16)
 		return false;
 
-	if (fDepth != 8)
+	if (fDepth > 16)
 		return false;
 
 	if (_ColorFormat() == PSD_COLOR_FORMAT_UNSUPPORTED)
@@ -121,35 +121,38 @@ PSDLoader::_ColorFormat(void)
 		return format;
 
 	switch (fColorFormat) {
+		case PSD_COLOR_MODE_BITS:
+			format = PSD_COLOR_FORMAT_BITMAP;
+			break;
 		case PSD_COLOR_MODE_RGB:
 			if (fChannels == 3)
-				format = PSD_COLOR_FORMAT_RGB_8;
-			if (fChannels >= 4)
-				format = PSD_COLOR_FORMAT_RGB_A_8;
+				format = PSD_COLOR_FORMAT_RGB;
+			else if (fChannels >= 4)
+				format = PSD_COLOR_FORMAT_RGB_A;
 			break;
 		case PSD_COLOR_MODE_GRAYSCALE:
 			if (fChannels == 1)
-				format = PSD_COLOR_FORMAT_GRAY_8;
-			if (fChannels == 2)
-				format = PSD_COLOR_FORMAT_GRAY_A_8;
+				format = PSD_COLOR_FORMAT_GRAY;
+			else if (fChannels == 2)
+				format = PSD_COLOR_FORMAT_GRAY_A;
 			break;		
 		case PSD_COLOR_MODE_MULTICHANNEL:
 			if (fChannels == 3)
-				format = PSD_COLOR_FORMAT_MULTICHANNEL_8;
+				format = PSD_COLOR_FORMAT_MULTICHANNEL;
 			break;
 		case PSD_COLOR_MODE_CMYK:
 			if (fChannels == 3)
-				format = PSD_COLOR_FORMAT_MULTICHANNEL_8;
-			if (fChannels == 4)
-				format = PSD_COLOR_FORMAT_CMYK_8;
-			if (fChannels > 4)
-				format = PSD_COLOR_FORMAT_CMYK_A_8;
+				format = PSD_COLOR_FORMAT_MULTICHANNEL;
+			else if (fChannels == 4)
+				format = PSD_COLOR_FORMAT_CMYK;
+			else if (fChannels > 4)
+				format = PSD_COLOR_FORMAT_CMYK_A;
 			break;
 		case PSD_COLOR_MODE_LAB:
 			if (fChannels == 3)
-				format = PSD_COLOR_FORMAT_LAB_8;
-			if (fChannels > 3)
-				format = PSD_COLOR_FORMAT_LAB_A_8;
+				format = PSD_COLOR_FORMAT_LAB;
+			else if (fChannels > 3)
+				format = PSD_COLOR_FORMAT_LAB_A;
 			break;
 		default:
 			break;
@@ -169,51 +172,64 @@ PSDLoader::Decode(BPositionIO *target)
 	fStream->Seek(0, SEEK_SET);
 	fStream->Read(fStreamBuffer, fStreamSize);
 
+	int32 depthBytes = fDepth / 8;
+	int32 rowBytes = (fWidth * fDepth) / 8;
+	int32 channelBytes = rowBytes * fHeight;
+	
 	uint8 *imageData[5];
 	for (int i = 0; i < fChannels; i++)
-		imageData[i] = new uint8[fWidth * fHeight];
+		imageData[i] = new uint8[channelBytes];
 
-	int pixelCount = fWidth * fHeight;
-
-	if (fCompression == PSD_COMPRESSED_RAW) {
-		for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
-			uint8 *ptr = imageData[channelIdx];
-			for (int i = 0; i < pixelCount; i++, ptr++)
-				*ptr = (uint8)fStreamBuffer[fStreamPos++];
+	
+	switch (fCompression) {
+		case PSD_COMPRESSED_RAW:
+		{
+			for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
+				uint8 *ptr = imageData[channelIdx];
+				for (int i = 0; i < channelBytes; i++, ptr++)
+					*ptr = (uint8)fStreamBuffer[fStreamPos++];
+			}
+			break;
 		}
-	}
-
-	if (fCompression == PSD_COMPRESSED_RLE) {
-		fStreamPos += fHeight * fChannels * 2;
-		for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
-			uint8 *ptr = imageData[channelIdx];
-			// Read the RLE data.
-			int count = 0;
-			while (count < pixelCount) {
-				uint8 len = (uint8)fStreamBuffer[fStreamPos++];
-				if (len == 128) {
-					continue;
-				} else if (len < 128) {
-					len++;
-					count += len;
-					while (len) {
-						*ptr++ = (int8)fStreamBuffer[fStreamPos++];
-						len--;
-					}
-				} else if (len > 128) {
-					int8 val = (int8)fStreamBuffer[fStreamPos++];
-					len ^= 255;
-					len += 2;
-					count += len;
-					while (len) {
-						*ptr++ = val;
-						len--;
+		case PSD_COMPRESSED_RLE:
+		{
+			fStreamPos += fHeight * fChannels * 2;
+			for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
+				uint8 *ptr = imageData[channelIdx];
+				// Read the RLE data.
+				int count = 0;
+				while (count < channelBytes) {
+					uint8 len = (uint8)fStreamBuffer[fStreamPos++];
+					if (len == 128) {
+						continue;
+					} else if (len < 128) {
+						len++;
+						count += len;
+						while (len) {
+							*ptr++ = (int8)fStreamBuffer[fStreamPos++];
+							len--;
+						}
+					} else if (len > 128) {
+						int8 val = (int8)fStreamBuffer[fStreamPos++];
+						len ^= 255;
+						len += 2;
+						count += len;
+						while (len) {
+							*ptr++ = val;
+							len--;
+						}
 					}
 				}
 			}
+			break;
 		}
+		default:
+			delete fStreamBuffer;
+			for (int i = 0; i < fChannels; i++)
+				delete imageData[i];
+			return 	B_NO_TRANSLATOR;
 	}
-	
+
 	delete fStreamBuffer;
 
 	TranslatorBitmap bitsHeader;
@@ -222,9 +238,18 @@ PSDLoader::Decode(BPositionIO *target)
 	bitsHeader.bounds.top = 0;
 	bitsHeader.bounds.right = fWidth - 1;
 	bitsHeader.bounds.bottom = fHeight - 1;
-	bitsHeader.rowBytes = sizeof(uint32) * fWidth;
-	bitsHeader.colors = B_RGBA32;
-	bitsHeader.dataSize = bitsHeader.rowBytes * fHeight;
+
+	psd_color_format colorFormat = _ColorFormat();
+
+	if (colorFormat == PSD_COLOR_FORMAT_BITMAP) {
+		bitsHeader.rowBytes = rowBytes;
+		bitsHeader.dataSize = channelBytes;
+		bitsHeader.colors = B_GRAY1;
+	} else {
+		bitsHeader.rowBytes = sizeof(uint32) * fWidth;
+		bitsHeader.colors = B_RGBA32;
+		bitsHeader.dataSize = bitsHeader.rowBytes * fHeight;
+	}
 
 	if (swap_data(B_UINT32_TYPE, &bitsHeader,
 		sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN) != B_OK) {
@@ -234,34 +259,40 @@ PSDLoader::Decode(BPositionIO *target)
 	target->Write(&bitsHeader, sizeof(TranslatorBitmap));
 	
 	uint8 *lineData = new uint8[fWidth * sizeof(uint32)];
-	
-	psd_color_format colorFormat = _ColorFormat();
-	
+		
 	switch (colorFormat) {
-		case PSD_COLOR_FORMAT_GRAY_8:
-		case PSD_COLOR_FORMAT_GRAY_A_8:
+		case PSD_COLOR_FORMAT_BITMAP:
+		{			
+			int32 rowBytes = (fWidth / 8 ) * fHeight;
+			for (int32 i = 0; i < rowBytes; i++)
+				imageData[0][i]^=255;
+			target->Write(imageData[0], rowBytes);
+			break;
+		}
+		case PSD_COLOR_FORMAT_GRAY:
+		case PSD_COLOR_FORMAT_GRAY_A:
 		{
-			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_GRAY_A_8;
+			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_GRAY_A;
 			uint8 *yCh = imageData[0];
 			uint8 *alphaCh = isAlpha ? imageData[1] : NULL;
 			for (int h = 0; h < fHeight; h++) {
 				uint8 *ptr = lineData;
 				for (int w = 0; w < fWidth; w++) {
-					uint8 y = *yCh++;
+					uint8 y = *(yCh += depthBytes);
 					*ptr++ = y;
 					*ptr++ = y;
 					*ptr++ = y;
-					*ptr++ = isAlpha ? *alphaCh++ : 255;
+					*ptr++ = isAlpha ? *(alphaCh += depthBytes) : 255;
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}
 			break;
 		}
-		case PSD_COLOR_FORMAT_MULTICHANNEL_8:
-		case PSD_COLOR_FORMAT_RGB_8:
-		case PSD_COLOR_FORMAT_RGB_A_8:
+		case PSD_COLOR_FORMAT_MULTICHANNEL:
+		case PSD_COLOR_FORMAT_RGB:
+		case PSD_COLOR_FORMAT_RGB_A:
 		{
-			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_RGB_A_8;
+			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_RGB_A;
 			uint8 *rCh = imageData[0];
 			uint8 *gCh = imageData[1];
 			uint8 *bCh = imageData[2];
@@ -269,19 +300,19 @@ PSDLoader::Decode(BPositionIO *target)
 			for (int h = 0; h < fHeight; h++) {
 				uint8 *ptr = lineData;
 				for (int w = 0; w < fWidth; w++) {
-					*ptr++ = *bCh++;
-					*ptr++ = *gCh++;
-					*ptr++ = *rCh++;
-					*ptr++ = isAlpha ? *alphaCh++ : 255;
+					*ptr++ = *(bCh += depthBytes);
+					*ptr++ = *(gCh += depthBytes);
+					*ptr++ = *(rCh += depthBytes);
+					*ptr++ = isAlpha ? *(alphaCh += depthBytes) : 255;
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}
 			break;
 		}	
-		case PSD_COLOR_FORMAT_CMYK_8:
-		case PSD_COLOR_FORMAT_CMYK_A_8:
+		case PSD_COLOR_FORMAT_CMYK:
+		case PSD_COLOR_FORMAT_CMYK_A:
 		{
-			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_CMYK_A_8;
+			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_CMYK_A;
 			uint8 *cCh = imageData[0];
 			uint8 *mCh = imageData[1];
 			uint8 *yCh = imageData[2];
@@ -290,23 +321,23 @@ PSDLoader::Decode(BPositionIO *target)
 			for (int h = 0; h < fHeight; h++) {
 				uint8 *ptr = lineData;
 				for (int w = 0; w < fWidth; w++) {
-					double c = 1.0 - (*cCh++ / 255.0);
-					double m = 1.0 - (*mCh++ / 255.0);
-					double y = 1.0 - (*yCh++ / 255.0);
-					double k = 1.0 - (*kCh++ / 255.0);
+					double c = 1.0 - *(cCh += depthBytes) / 255.0;
+					double m = 1.0 - *(mCh += depthBytes) / 255.0;
+					double y = 1.0 - *(yCh += depthBytes) / 255.0;
+					double k = 1.0 - *(kCh += depthBytes) / 255.0;
 					*ptr++ = (uint8)((1.0 - (y * (1.0 - k) + k)) * 255.0);
 					*ptr++ = (uint8)((1.0 - (m * (1.0 - k) + k)) * 255.0);
 					*ptr++ = (uint8)((1.0 - (c * (1.0 - k) + k)) * 255.0);
-					*ptr++ = alphaCh ? *alphaCh++ : 255;
+					*ptr++ = alphaCh ? *(alphaCh += depthBytes) : 255;
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}
 			break;
 		}
-		case PSD_COLOR_FORMAT_LAB_8:
-		case PSD_COLOR_FORMAT_LAB_A_8:
+		case PSD_COLOR_FORMAT_LAB:
+		case PSD_COLOR_FORMAT_LAB_A:
 		{
-			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_LAB_A_8;
+			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_LAB_A;
 			uint8 *lCh = imageData[0];
 			uint8 *aCh = imageData[1];
 			uint8 *bCh = imageData[2];
@@ -314,9 +345,9 @@ PSDLoader::Decode(BPositionIO *target)
 			for (int h = 0; h < fHeight; h++) {
 				uint8 *ptr = lineData;
 				for (int w = 0; w < fWidth; w++) {
-					double L = ((*lCh++) / 255.0) * 100.0;
-					double a = (*aCh++) - 128.0;
-					double b = (*bCh++) - 128.0;
+					double L = *(lCh += depthBytes) / 255.0 * 100.0;
+					double a = *(aCh += depthBytes) - 128.0;
+					double b = *(bCh += depthBytes) - 128.0;
 
 					double Y = L * (1.0 / 116.0) + 16.0 / 116.0;
 					double X = a * (1.0 / 500.0) + Y;
@@ -352,7 +383,7 @@ PSDLoader::Decode(BPositionIO *target)
 					*ptr++ = (uint8)(B * 255.0);
 					*ptr++ = (uint8)(G * 255.0);
 					*ptr++ = (uint8)(R * 255.0);
-					*ptr++ = isAlpha ? *alphaCh++ : 255;
+					*ptr++ = isAlpha ? *(alphaCh += depthBytes) : 255;
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}

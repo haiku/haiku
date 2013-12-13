@@ -42,15 +42,16 @@ enum psd_color_mode {
 
 enum psd_color_format {
 	PSD_COLOR_FORMAT_UNSUPPORTED,
-	PSD_COLOR_FORMAT_RGB_8,
-	PSD_COLOR_FORMAT_RGB_A_8,
-	PSD_COLOR_FORMAT_GRAY_8,
-	PSD_COLOR_FORMAT_GRAY_A_8,
-	PSD_COLOR_FORMAT_MULTICHANNEL_8,
-	PSD_COLOR_FORMAT_CMYK_8,
-	PSD_COLOR_FORMAT_CMYK_A_8,
-	PSD_COLOR_FORMAT_LAB_8,
-	PSD_COLOR_FORMAT_LAB_A_8
+	PSD_COLOR_FORMAT_BITMAP,
+	PSD_COLOR_FORMAT_RGB,
+	PSD_COLOR_FORMAT_RGB_A,
+	PSD_COLOR_FORMAT_GRAY,
+	PSD_COLOR_FORMAT_GRAY_A,
+	PSD_COLOR_FORMAT_MULTICHANNEL,
+	PSD_COLOR_FORMAT_CMYK,
+	PSD_COLOR_FORMAT_CMYK_A,
+	PSD_COLOR_FORMAT_LAB,
+	PSD_COLOR_FORMAT_LAB_A
 };
 
 
@@ -58,11 +59,11 @@ class PSDLoader {
 public:
 					PSDLoader(BPositionIO *stream);
 					~PSDLoader();
-		
+
 	status_t		Decode(BPositionIO *target);
 	bool			IsLoaded(void);
 	bool			IsSupported(void);
-	
+
 	BString			ColorFormatName(void);
 
 private:
@@ -71,14 +72,14 @@ private:
 	uint8			_GetUInt8FromStream(BPositionIO *in);
 	int8			_GetInt8FromStream(BPositionIO *in);
 	void			_SkipStreamBlock(BPositionIO *in, size_t count);
-	
+
 	psd_color_format _ColorFormat(void);
 
 	BPositionIO 	*fStream;
 	uint8			*fStreamBuffer;
 	size_t			fStreamSize;
 	size_t			fStreamPos;
-	
+
 	int32 			fSignature;
 	int16 			fVersion;
 	int16 			fChannels;
@@ -87,7 +88,7 @@ private:
 	int16			fDepth;
 	int16			fColorFormat;
 	int16			fCompression;
-	
+
 	bool			fLoaded;
 };
 
