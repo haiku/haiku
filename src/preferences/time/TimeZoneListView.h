@@ -15,7 +15,7 @@
 class TimeZoneListView : public BOutlineListView {
 public:
 								TimeZoneListView(void);
-								~TimeZoneListView();
+	virtual						~TimeZoneListView();
 
 protected:
 	virtual	bool				GetToolTipAt(BPoint point, BToolTip** _tip);
