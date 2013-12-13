@@ -114,6 +114,7 @@ RemotePackageRepository HaikuPorts
 	tar-1.26-6
 	texinfo-4.13a-7
 	vision-0.9.7.r945-1
+	which-2.20-2
 	wpa_supplicant-2.0-3
 	xz_utils-5.0.4-2
 	yasm-1.2.0-3
@@ -190,6 +191,7 @@ RemotePackageRepository HaikuPorts
 	texi2html
 	texinfo
 	vision
+	which
 	wpa_supplicant
 	yasm
 	xz_utils
