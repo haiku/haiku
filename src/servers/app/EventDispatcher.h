@@ -106,8 +106,9 @@ class EventDispatcher : public BLocker {
 		bool _SendMessage(BMessenger& messenger, BMessage* message,
 				float importance);
 
-		bool _AddTokens(BMessage* message, EventTarget* target, uint32 eventMask,
-				BMessage* nextMouseMoved = NULL, int32* _viewToken = NULL);
+		bool _AddTokens(BMessage* message, EventTarget* target,
+				uint32 eventMask, BMessage* nextMouseMoved = NULL,
+				int32* _viewToken = NULL);
 		void _RemoveTokens(BMessage* message);
 		void _SetFeedFocus(BMessage* message);
 		void _UnsetFeedFocus(BMessage* message);
