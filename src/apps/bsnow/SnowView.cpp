@@ -87,7 +87,7 @@ SnowView::SnowView(BMessage *archive)
 	fShowClickMe = false;
 	SetFlags(Flags() & ~B_PULSE_NEEDED); /* it's only used when in the app */
 	get_system_info(&si);
-	fNumFlakes = ((int32)(si.cpu_clock_speed/1000000)) * si.cpu_count / 3; //;
+	fNumFlakes = 1000 * si.cpu_count / 3;
 	printf("BSnow: using %ld flakes\n", fNumFlakes);
 	for (int i = 0; i < WORKSPACES_COUNT; i++) {
 		fFlakes[i] = new flake[fNumFlakes];
