@@ -70,7 +70,7 @@ BUrlRequest::Run()
 
 	status_t launchErr = resume_thread(fThreadId);
 	if (launchErr < B_OK) {
-		PRINT(("BUrlRequest::Run() : Failed to resume thread %ld\n",
+		PRINT(("BUrlRequest::Run() : Failed to resume thread %" B_PRId32 "\n",
 			fThreadId));
 		return launchErr;
 	}
