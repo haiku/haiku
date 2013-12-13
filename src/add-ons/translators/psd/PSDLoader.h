@@ -59,7 +59,7 @@ public:
 					PSDLoader(BPositionIO *stream);
 					~PSDLoader();
 		
-	int 			Decode(BPositionIO *target);
+	status_t		Decode(BPositionIO *target);
 	bool			IsLoaded(void);
 	bool			IsSupported(void);
 	
@@ -72,7 +72,7 @@ private:
 	int8			_GetInt8FromStream(BPositionIO *in);
 	void			_SkipStreamBlock(BPositionIO *in, size_t count);
 	
-	int32			_ColorFormat(void);
+	psd_color_format _ColorFormat(void);
 
 	BPositionIO 	*fStream;
 	uint8			*fStreamBuffer;

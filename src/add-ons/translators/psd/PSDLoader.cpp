@@ -113,10 +113,10 @@ PSDLoader::ColorFormatName(void)
 }
 
 
-int32
+psd_color_format
 PSDLoader::_ColorFormat(void)
 {
-	int32 format = PSD_COLOR_FORMAT_UNSUPPORTED;
+	psd_color_format format = PSD_COLOR_FORMAT_UNSUPPORTED;
 	if (!fLoaded)
 		return format;
 
@@ -159,7 +159,7 @@ PSDLoader::_ColorFormat(void)
 }
 
 
-int
+status_t
 PSDLoader::Decode(BPositionIO *target)
 {
 	if (!IsSupported())
@@ -235,7 +235,7 @@ PSDLoader::Decode(BPositionIO *target)
 	
 	uint8 *lineData = new uint8[fWidth * sizeof(uint32)];
 	
-	int32 colorFormat = _ColorFormat();
+	psd_color_format colorFormat = _ColorFormat();
 	
 	switch (colorFormat) {
 		case PSD_COLOR_FORMAT_GRAY_8:
