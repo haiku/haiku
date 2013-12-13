@@ -158,6 +158,7 @@ retry:
 				}
 			} else {
 				errorString = "No parameter web";
+				fParameterWeb = NULL;
 			}
 		} else {
 			if (!retrying) {

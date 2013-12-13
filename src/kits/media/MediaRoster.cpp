@@ -2262,8 +2262,8 @@ BMediaRoster::GetParameterWebFor(const media_node& node, BParameterWeb** _web)
 		}
 		if (reply.size > 0) {
 			// we got a flattened parameter web!
-			*_web = new (std::nothrow) BParameterWeb();
-			if (*_web == NULL)
+			BParameterWeb* web = new (std::nothrow) BParameterWeb();
+			if (web == NULL)
 				rv = B_NO_MEMORY;
 			else {
 				printf("BMediaRoster::GetParameterWebFor Unflattening %"
@@ -2272,13 +2272,15 @@ BMediaRoster::GetParameterWebFor(const media_node& node, BParameterWeb** _web)
 					((uint32*)data)[0], ((uint32*)data)[1], ((uint32*)data)[2],
 					((uint32*)data)[3]);
 
-				rv = (*_web)->Unflatten(reply.code, data, reply.size);
+				rv = web->Unflatten(reply.code, data, reply.size);
+				if (rv != B_OK) {
+					ERROR("BMediaRoster::GetParameterWebFor Unflatten failed, "
+						"%s\n", strerror(rv));
+					delete web;
+				} else
+					*_web = web;
 			}
-			if (rv != B_OK) {
-				ERROR("BMediaRoster::GetParameterWebFor Unflatten failed, "
-					"%s\n", strerror(rv));
-				delete *_web;
-			}
+
 			delete_area(area);
 			return rv;
 		}
