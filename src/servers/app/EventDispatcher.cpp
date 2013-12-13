@@ -1028,7 +1028,7 @@ EventDispatcher::_CursorLoop()
 		} else if (status == B_TIMED_OUT) {
 			mouseIdleSent = true;
 			BMessage* mouseIdle = new BMessage(B_MOUSE_IDLE);
-			mouseIdle->AddPoint("be:view_where", fLastCursorPosition);
+			mouseIdle->AddPoint("screen_where", fLastCursorPosition);
 			fStream->InsertEvent(mouseIdle);
 		}
 	}
