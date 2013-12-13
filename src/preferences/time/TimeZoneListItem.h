@@ -35,7 +35,7 @@ public:
 
 			bool				HasTimeZone() const
 									{ return fTimeZone != NULL; };
-			const BTimeZone&	TimeZoneListItem::TimeZone() const
+			const BTimeZone&	TimeZone() const
 									{ return *fTimeZone; };
 			void				SetTimeZone(BTimeZone* timeZone);
 
