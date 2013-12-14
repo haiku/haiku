@@ -47,7 +47,7 @@ PSDLoader::PSDLoader(BPositionIO *src)
 	fCompression = _GetInt16FromStream(fStream);
 
 	fStreamPos = fStream->Position();
-	
+
 	fLoaded = true;
 }
 
@@ -108,6 +108,8 @@ PSDLoader::ColorFormatName(void)
 			return "Multichannel";
 		case PSD_COLOR_MODE_LAB:
 			return "Lab";
+		case PSD_COLOR_MODE_DUOTONE:
+			return "Duotone";
 	}
 	return "";
 }
@@ -153,6 +155,10 @@ PSDLoader::_ColorFormat(void)
 				format = PSD_COLOR_FORMAT_LAB;
 			else if (fChannels > 3)
 				format = PSD_COLOR_FORMAT_LAB_A;
+			break;
+		case PSD_COLOR_MODE_DUOTONE:
+			if (fChannels >= 1)
+				format = PSD_COLOR_FORMAT_DUOTONE;
 			break;
 		default:
 			break;
@@ -269,6 +275,7 @@ PSDLoader::Decode(BPositionIO *target)
 			target->Write(imageData[0], rowBytes);
 			break;
 		}
+		case PSD_COLOR_FORMAT_DUOTONE:
 		case PSD_COLOR_FORMAT_GRAY:
 		case PSD_COLOR_FORMAT_GRAY_A:
 		{
