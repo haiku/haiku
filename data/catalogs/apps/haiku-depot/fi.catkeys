@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	976907306
+1	finnish	x-vnd.Haiku-HaikuDepot	3005327638
 Name	PackageListView		Nimi
 Installed packages	Model		Asennetut paketit
 User modified packages	Model		Käyttäjän muokkaamat paketit
@@ -23,7 +23,6 @@ Main Menu	MainWindow		Päävalikko
 Command line	Model		Komentorivi
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Ladataan:
-Package	MainWindow		Pakkaus
 Search terms:	FilterView		Hakusanat:
 %Version%	PackageInfoView		%Version%
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error% (%details%)

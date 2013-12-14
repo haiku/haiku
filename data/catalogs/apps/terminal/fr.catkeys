@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	2967760334
+1	french	x-vnd.Haiku-Terminal	1655135592
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -55,6 +55,7 @@ Blinking cursor	Terminal AppearancePrefView		Curseur clignotant
 Don't save	Terminal PrefWindow		Ne pas sauver
 Set window title	Terminal TermWindow		Changer le titre de la fenêtre
 Terminal	System name		Terminal
+Copy path	Terminal TermView		Copier le chemin
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Match word	Terminal FindWindow		Rechercher le mot
 Nothing is selected.	Terminal TermWindow		Rien n'est selectionné.
@@ -80,10 +81,12 @@ Text encoding	Terminal TermWindow		Encodage texte
 size	Terminal TermView		taille
 Close window	Terminal TermWindow		Fermer la fenêtre
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail du processus actif dans l'onglet courant.\n\t\t\tVous pouvez éventuellement spécifier le nombre d'éléments maximum\n\t\t\tdans le chemin. Par exemple, '%2d' pour au plus deux éléments.\n\t%T\t-\tLe nom de l'application Terminal suivant les préférences linguistique en cours.\n\t%e\t-\tJeu de caractère utilisé par l'onglet courant. Masqué pour UTF-8.\n\t%i\t-\tL'indice de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l'onglet courant.\n\t%t\t-\tLe titre de l'onglet courant.\n\t%%\t-\tLe caractère '%'.
+Copy absolute path	Terminal TermView		Copier le chemin absolu
 Save as default	Terminal TermWindow		Enregistrer les préférences
 Set tab title	Terminal TermWindow		Changer le titre de l'onglet
 Settings…	Terminal TermWindow		Réglages…
 Abort	Terminal Shell		Abandonner
+Open link	Terminal TermView		Ouvrir le lien
 Edit	Terminal TermWindow		Éditer
 Color:	Terminal AppearancePrefView		Couleur :
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
@@ -94,7 +97,9 @@ OK	Terminal TermApp		OK
 Find failed	Terminal TermWindow		Échec de la recherche
 Search forward	Terminal FindWindow		Rechercher en avant
 Edit tab title…	Terminal TermWindow		Éditer le titre de l'onglet…
+Open path	Terminal TermView		Ouvrir l'emplacement
 Find previous	Terminal TermWindow		Rechercher le précédent
+Copy link location	Terminal TermView		Copier l'emplacement du lien
 Tab title:	Terminal TermWindow		Titre de l'onglet :
 Find next	Terminal TermWindow		Rechercher le suivant
 Close active tab	Terminal TermWindow		Fermer l'onglet actif

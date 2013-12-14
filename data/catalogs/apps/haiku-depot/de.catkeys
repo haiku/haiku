@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	976907306
+1	german	x-vnd.Haiku-HaikuDepot	3005327638
 Name	PackageListView		Name
 Installed packages	Model		Installierte Pakete
 User modified packages	Model		Veränderte Pakete
@@ -23,7 +23,6 @@ Main Menu	MainWindow		Hauptmenü
 Command line	Model		Kommandozeile
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Aktueller Download:
-Package	MainWindow		Paket
 Search terms:	FilterView		Suchbegriffe:
 %Version%	PackageInfoView		%Version%
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Bei der Aktualisierung des Depots trat ein Fehler auf: %error% (%details%)

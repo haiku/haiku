@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	2627573468
+1	belarusian	x-vnd.Haiku-HaikuDepot	361026504
 Name	PackageListView		Імя
 Installed packages	Model		Усталяваныя пакункі
 User modified packages	Model		Пакункі мадыфікаваныя карыстальнікам
@@ -20,7 +20,6 @@ Refresh depots	MainWindow		Перачытаць сховішчы
 Main Menu	MainWindow		Галоўнае меню
 Command line	Model		Загадны радок
 (%Votes%)	PackageInfoView		(%Votes%)
-Package	MainWindow		Пакунак
 Search terms:	FilterView		Умовы пошуку:
 %Version%	PackageInfoView		%Version%
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Падчас аднаўлення інфармацыі сховішчаў адбылася памылка: %error% (%details%)

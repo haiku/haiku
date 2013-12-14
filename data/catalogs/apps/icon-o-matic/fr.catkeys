@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	484570110
+1	french	x-vnd.haiku-icon_o_matic	379019315
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -65,6 +65,7 @@ Undo	Icon-O-Matic-Main		Annuler
 Click on a shape above	Empty transformers list - 1st line		Cliquer sur une forme ci-dessus
 Add Shape	Icon-O-Matic-AddShapesCmd		Ajouter une forme
 Contour	Transformation		Contour
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Sauvegarder les changements de l'icône actuelle avant de fermer ?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<rien à restaurer>
 Perspective	Transformation		Perspective
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Déplacer la Transformation
@@ -161,6 +162,7 @@ Assign Paths	Icon-O-Matic-AddPathsCmd		Assigner les chemins
 OK	Icon-O-Matic-SVGImport		OK
 Multi paste	Icon-O-Matic-Properties		Collage multiple
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Réinitialiser la transformation
+Reverse Path	Icon-O-Matic-ReversePathCmd		Inverser le chemin
 Scale	Icon-O-Matic-TransformationBoxStates		Échelle
 Duplicate	Icon-O-Matic-PathsList		Dupliquer
 Save	Icon-O-Matic-Menu-File		Enregistrer

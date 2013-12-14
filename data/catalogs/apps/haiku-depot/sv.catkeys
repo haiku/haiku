@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2012672664
+1	swedish	x-vnd.Haiku-HaikuDepot	3005327638
 Name	PackageListView		Namn
 Installed packages	Model		Installerade paket
 User modified packages	Model		Användarmodifierade paket
@@ -22,7 +22,7 @@ Refresh depots	MainWindow		Uppdatera depå
 Main Menu	MainWindow		Huvudmeny
 Command line	Model		Kommandoraden
 (%Votes%)	PackageInfoView		(%Votes%)
-Package	MainWindow		Paket
+Downloading:	PackageInfoView		Hämtar:
 Search terms:	FilterView		Sökvillkor
 %Version%	PackageInfoView		%Version%
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error% (%details%)

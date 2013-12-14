@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	2969013755
+1	swedish	x-vnd.Haiku-MediaPlayer	1727923642
 raw audio	MediaPlayer-InfoWin		raw-ljud
 Location	MediaPlayer-InfoWin		Plats
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -21,10 +21,12 @@ Close	MediaPlayer-Main		Stäng
 Display Mode	MediaPlayer-InfoWin		Visningsläge
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Några filer kunde inte flyttas till Papperskorgen.
 <unknown>	MediaPlayer-InfoWin		<okänd>
+Seek	MediaPlayer-Main		Sök
 Open	MediaPlayer-Main		Öppna
 Next	MediaPlayer-Main		Nästa
 OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Spår %d
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Få/sätt spelar markörens position i mikrosekunder.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Visningsläge
 Medium	MediaPlayer-SettingsWindow		Medium
@@ -69,6 +71,7 @@ Select all	MediaPlayer-PlaylistWindow		Markera alla
 Move Entry	MediaPlayer-MovePLItemsCmd		Flytta post
 Open	MediaPlayer-PlaylistWindow		Öppna
 Stop playing.	MediaPlayer-Main		Stoppa uppspelning.
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		Sök med den specificerade antal mikrosekunder.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Filen '%filename' kunde inte öppnas.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Fel:
 Audio	MediaPlayer-InfoWin		Ljud
@@ -100,6 +103,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Alla file
 <untitled>	PlaylistItem-title		<odöpt>
 Track	Audio Track Menu		Spår
 unknown format	MediaPlayer-InfoWin		okänt format
+Position	MediaPlayer-Main		Position
 <nothing to redo>	MediaPlayer-PlaylistWindow		<inget att göra om>
 Skip to the next track.	MediaPlayer-Main		Hoppa till nästa spår.
 Play	MediaPlayer-Main		Spela
@@ -135,12 +139,14 @@ Edit	MediaPlayer-PlaylistWindow		Redigera
 Start media server	MediaPlayer-Main		Starta mediaserver
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Växla helskärmsläge.
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Få varaktigheten på det som spelas nu i mikrosekunder.
 ToggleFullscreen	MediaPlayer-Main		Växla helskärmsläge
 <unnamed>	PlaylistItem-name		<odöpt>
 Open Clips	MediaPlayer-Main		Öppna klipp
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		ingen
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Hämta/sätt volymen (0.0-2.0)
+Duration	MediaPlayer-Main		Speltid
 Playlist…	MediaPlayer-Main		Spellista...
 <unknown>	PlaylistItem-author		<okänd>
 Save as…	MediaPlayer-PlaylistWindow		Spara som...
