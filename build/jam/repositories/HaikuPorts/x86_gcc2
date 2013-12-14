@@ -183,6 +183,7 @@ RemotePackageRepository HaikuPorts
 	ninja_x86-1.4.0-1
 	openssl_x86-1.0.0j-4
 	openssl_x86_devel-1.0.0j-4
+	quicklaunch-0.9.6-1
 	speex_x86-1.2~rc1-2
 	speex_x86_devel-1.2~rc1-2
 	sqlite_x86-3.8.0.2-1
@@ -260,6 +261,7 @@ RemotePackageRepository HaikuPorts
 	perl
 	pkgconfig
 	python
+	quicklaunch
 	readline
 	ruby
 	scons
