@@ -53,7 +53,8 @@ enum psd_color_format {
 	PSD_COLOR_FORMAT_CMYK_A,
 	PSD_COLOR_FORMAT_LAB,
 	PSD_COLOR_FORMAT_LAB_A,
-	PSD_COLOR_FORMAT_DUOTONE
+	PSD_COLOR_FORMAT_DUOTONE,
+	PSD_COLOR_FORMAT_INDEXED
 };
 
 
@@ -81,6 +82,9 @@ private:
 	uint8			*fStreamBuffer;
 	size_t			fStreamSize;
 	size_t			fStreamPos;
+
+	size_t			fColorModeDataSize;
+	size_t			fColorModeDataPos;
 
 	int32 			fSignature;
 	int16 			fVersion;

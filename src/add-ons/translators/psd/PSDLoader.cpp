@@ -37,8 +37,10 @@ PSDLoader::PSDLoader(BPositionIO *src)
 	fDepth = _GetInt16FromStream(fStream);	
 	fColorFormat = _GetInt16FromStream(fStream);
 
-	// Skip mode data
-	_SkipStreamBlock(fStream, _GetInt32FromStream(fStream));
+	fColorModeDataSize = _GetInt32FromStream(fStream);
+	fColorModeDataPos = fStream->Position();
+	_SkipStreamBlock(fStream, fColorModeDataSize);
+
 	// Skip image resources
 	_SkipStreamBlock(fStream, _GetInt32FromStream(fStream));
 	// Skip reserved data
@@ -160,6 +162,10 @@ PSDLoader::_ColorFormat(void)
 			if (fChannels >= 1)
 				format = PSD_COLOR_FORMAT_DUOTONE;
 			break;
+		case PSD_COLOR_MODE_INDEXED:
+			if (fChannels >= 1 && fColorModeDataSize >= 3)
+				format = PSD_COLOR_FORMAT_INDEXED;
+			break;
 		default:
 			break;
 	};
@@ -273,6 +279,32 @@ PSDLoader::Decode(BPositionIO *target)
 			for (int32 i = 0; i < rowBytes; i++)
 				imageData[0][i]^=255;
 			target->Write(imageData[0], rowBytes);
+			break;
+		}
+		case PSD_COLOR_FORMAT_INDEXED:
+		{
+			int32 paletteSize = fColorModeDataSize / 3;		
+
+			uint8 *colorData = new uint8[fColorModeDataSize];
+			fStream->Seek(fColorModeDataPos, SEEK_SET);
+			fStream->Read(colorData, fColorModeDataSize);
+
+			uint8 *redPalette = colorData;
+			uint8 *greenPalette = colorData + paletteSize;
+			uint8 *bluePalette = colorData + paletteSize * 2;
+			uint8 *cCh = imageData[0];
+			for (int h = 0; h < fHeight; h++) {
+				uint8 *ptr = lineData;
+				for (int w = 0; w < fWidth; w++) {
+					uint8 c = *cCh++;
+					*ptr++ = bluePalette[c];
+					*ptr++ = greenPalette[c];
+					*ptr++ = redPalette[c];
+					*ptr++ = 255;
+				}
+				target->Write(lineData, fWidth * sizeof(uint32));
+			}
+			delete colorData;
 			break;
 		}
 		case PSD_COLOR_FORMAT_DUOTONE:

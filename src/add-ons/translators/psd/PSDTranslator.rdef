@@ -7,9 +7,9 @@ resource app_signature "application/x-vnd.Haiku-PSDTranslator";
 resource app_version {
 	major  = 1,
 	middle = 1,
-	minor  = 0,
+	minor  = 2,
 	variety = 0,
 	internal = 0,
-	short_info = "1.1.0",
+	short_info = "1.1.2",
 	long_info = "Haiku PSDTranslator Add-Ons."
 };
