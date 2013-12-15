@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2011, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,40 +58,33 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h1>Приложения</h1>
 
-<p>Перед тем как перейти к приложениям, которые идут вместе с Haiku, давайте более детально изучим как установить или удалить приложения, которые вы скачали, например с одного сайтов упомянутых на странице <a href="../../welcome/welcome_ru.html#software">приветствия</a>.</p>
-<div class="box-info">Вам следует распаковывать/устанавливать архивы под Haiku. Если вы сначала извлечете содержимое архива под Linux или Windows, к примеру, а потом просто скопируете его в Haiku, то вы лишитесь всех жизненно важных атрибутов, т.к. эти операционные системы обычно не умеют обрабатывать метаданные.</div>
+<p>Before diving into all the applications that come with Haiku, let's have a more detailed look at how to install and uninstall programs. The most convenient way to find, install, update and uninstall applications is via Haiku's package management system. However, since Haiku is largely binary and source compatible to its ancestor BeOS, you might find older archives (.zip and .pkg) that can still be installed as well.</p>
+<div class="box-info">Below you'll always find the <tt>~/config/</tt> hierarchy of the Home folder mentioned. If you intend to share packages for all users (once Haiku becomes multi-user aware), you should use the mirrored filesystem hierarchy under <tt>/system/</tt>. See topic <a href="filesystem-layout.html">Filesystem layout</a> for more information.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="install" name="install">Установка приложений</a></h2>
-<p>Приложения для Haiku всегда поставляются в архиве. В большинстве случаев это ZIP-архивы, однако некоторые старые BeOS приложения поставляются в формате Software Valet PKG. Software Valet позволял автоматически выполнять сценарии установки, вам нужно было лишь дважды щелкнуть по пакету и выбрать, куда произвести установку и больше ни о чем не заботиться.<br />
-Если это ZIP-архив, двойной щелчок мыши запустит <span class="app">Распаковщик</span>, где вы также выбираете куда распаковать и распаковываете согласно рекомендациям в теме <a href="filesystem-layout.html">иерархия файловой системы</a>.</p>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>для приложений доступных для всех пользователей.</td></tr>
-<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>для приложений доступных только для вас.</td></tr>
-</table>
-<p>Конечно же, это различие станет актуальным лишь только тогда, когда Haiku станет многопользовательской системой.</p>
-<p>После распаковки архива было бы неплохо заглянуть внутрь только что созданной папки. Зачастую внутри помимо самого приложения Вы найдете ReadMe-файл и другую документацию.</p>
-<p>После установки некоторые приложения требуют последующей настройки. Например, <a href="tracker-add-ons.html">дополнения для Tracker</a>, <a href="preferences/datatranslations.html">трансляторы</a> или другие компоненты, расширяющие возможности системы. В одном случае вы найдете небольшой файл-сценарий (обычно имеющий расширение <span class="cli">.sh</span>), типа <span class="cli">install</span>, который нужно просто запустить двойным щелчком мыши .<br />
-В другом - папки, которые ссылаются на нужное место назначения. Они обычно называются "<span class="cli">drag [filename] here...</span>". Таким образом, просто следуя этим инструкциям, вы сможете все успешно настроить.</p>
-<p>Однако в большинстве случаев от вас кроме распаковки архива ничего не потребуется.<br />
-В темах <a href="deskbar.html">Deskbar - панель задачи</a> и <a href="desktop-applets/launchbox.html">LaunchBox - Панель запуска</a>  описано, как добавить значок для новых приложений.</p>
+<a id="hpkg" name="hpkg">Haiku packages (.hpkg)</a></h2>
+<p>The simplest way is to use <a href="">HaikuDepot</a> to find, download and automatically install and uninstall a package. If that isn't an option  maybe you downloaded a package somewhere, because it's not (yet) in a public repository  it's just as easy to install it manually: Just move the .hpkg file into <tt>~/config/packages/</tt>. </p>
+<p>You'll find the newly installed application in <tt>~/config/apps/</tt> or, in case of a commandline application, in <tt>~/config/bin/</tt>. All other files the program depends upon (libraries, data, add-ons, etc.) appear automatically in the right locations in the filesystem.</p>
+<p>Topics <a href="deskbar.html">Deskbar</a> or <a href="desktop-applets/launchbox.html">LaunchBox</a> describe how to add shortcuts to your newly installed application.</p>
+<p>Uninstalling is just as easy: move the package out of <tt>~/config/packages/</tt>.</p>
+<div class="box-info">By the way, although you can unpack a .hpkg file like any other archive, this is not what the package mangement is doing when you're installing a package. The underlying filesystem only appears to spread files in their respective folders, there's no physical moving around taking place. This is why installing/uninstalling is so very fast and clean.</div>
+<p>If the package depends on some other library or package, a window will pop up, asking if the necessary files shall be downloaded and installed as well.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="uninstall" name="uninstall">Удаление приложений</a></h2>
-<p>Если для установки был использован сценарий установки, то и для удаления должен существовать сценарий. В этом случае для удаления вам нужно его лишь запустить двойным щелчком мыши.<br />
-В остальных случаях для удаления просто удалите папку с приложением.</p>
-<p>Это, конечно, оставляет возможность вернуть файлы настроек, которые хранятся в вашей папке по адресу <span class="path">~/config/settings</span>. Это удобно - сохранить их на тот случай, если вы снова установите приложение в будущем. Также сохранятся файлы, при установке которых вам следует перетащить их в папку с названием "<span class="cli">drag [filename] here...</span>" (этот  метод описан выше).</p>
-<p>Один из способов быстро найти все файлы, относящиеся к приложению, это сделать запрос по названию программы или его части. Это позволит выявить бинарный файл приложения, папку, где оно установлено и файлы его настроек и т.д. Просто выделите все соответствующие файлы и удалите их.</p>
+<a id="beos_apps" name="beos_apps">Old BeOS archives (.zip and .pkg)</a></h2>
+<p>BeOS archives that include all they need in their app's folder can simply be unpacked (double clicking opens <span class="app">Expander</span>) anywhere in <tt>/boot/home/</tt> and run from there. Uninstalling such self-contained applications is easy: just delete the app's folder.</p>
+<p>This is true for the majority of old BeOS applications. If you happen upon one that doesn't work out-of-the-box, because it wants to spread its files to hard-coded locations that are not guaranteed to exist, you can try to fix things manually. The folder <tt>~/config/non-packaged/</tt> allows you to recreate the needed folder hierarchy. As more and more real .hpkg packages become available and old BeOS applications get re-packaged, this will become less needed. Please consult this <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">online article</a> on how to use the <tt>non-packaged</tt> hierarchy.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Haiku-приложения</a></h2>
-<p>Haiku поставляется с небольшим набором необходимых приложений. Вы можете найти их по адресу <span class="path">/boot/system/apps/</span> или <span class="path">/boot/common/apps/</span>. Приложения, которые обычно не запускаются по двойному щелчку по файлу (например, ShowImage для просмотра изображений) могут быть найдены в меню <span class="menu">Приложения (Applications)</span> панели Deskbar.</p>
+<p>Haiku comes with a set of mostly small but essential applications. You'll find all of them at <span class="path">/boot/system/apps/</span>. Applications that are not usually launched by a double-click on a data file (e.g. ShowImage for image files) can be found in the <span class="menu">Applications</span> menu of the Deskbar.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">Монитор активности</a></td><td style="width:10px;"> </td>
 		<td valign="top">Приложение для отслеживания системных ресурсов, например использование ЦП и оперативной памяти.</td></tr>
@@ -113,6 +106,8 @@
 		<td valign="top">Приложение для работы с разделами жесткого диска.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Распаковщик</a></td><td> </td>
 		<td valign="top">Приложение для распаковки архивов.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/haikudepot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/haikudepot.html">HaikuDepot</a></td><td> </td>
+		<td valign="top"><span style="color:silver">A tool to find, download, install, update and uninstall (application) packages [<i>still missing</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Икономатик</a></td><td> </td>
 		<td valign="top">Приложениe для создания векторных иконок Haiku.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Установщик</a></td><td> </td>

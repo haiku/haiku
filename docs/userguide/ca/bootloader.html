@@ -66,36 +66,34 @@ També pot ser útil després que hagueu instal·lat un component de programari 
 <p>Un cop aquí se us ofereixen quatre menús:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Selecció del volum d'arrencada</b></td><td> </td><td>Trieu la instal·lació del Haiku que voleu executar.</td></tr>
-<tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
+<tr><td><b>Select safe mode options</b></td><td> </td><td>En cas de problemes amb el maquinari, hi ha algunes opcions que podeu provar. A la part inferior de la pantalla podeu veure una breu explicació de la opció seleccionada.</td></tr>
+<tr><td></td><td></td><td>
+<p><i>- Mode segur</i><br />
+<i>- Inhabilita les extensions de l'usuari</i><br />
+<i>- Inhabilita la DMA del IDE</i><br />
+<i>- Usa el mode de vídeo segur</i><br />
+<i>- Inhabilita la IO-APIC</i><br />
+<i>- Inhabilita l'APIC LOCAL</i><br />
+<i>- No cridis a la BIOS</i><br />
+<i>- Inhabilita l'APM</i><br />
+<i>- Inhabilita l'ACPI</i>
+</p></td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Trobareu algunes opcions que us poden ajudar a depurar i obtenir més detalls sobre <a href="../welcome/en/bugreports.html">l'error</a>. De nou, a la part inferior de la pantalla podeu veure una breu explicació de l'opció seleccionada.</td></tr>
 <tr><td></td><td></td><td>
 	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
-	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
-	</table>
-</td></tr>
-<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
-<tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
-	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
-	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
-<tr><td></td><td></td><td>If "Enable debug syslog" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+	<tr><td><i>- Habilita la sortida de depuració cap a una connexió en sèrie</i></td><td width="15"></td><td></td></tr>
+	<tr><td><i>- Activa la sortida de depuració cap a la pantallat</i></td><td></td><td></td></tr>
+	<tr><td><i>- Desactiva la paginació de la pantalla</i></td><td></td><td></td></tr>
+	<tr><td><i>- Activa el registre de depuració syslog</i></td><td></td><td></td></tr>
+	<tr><td class="onelinetop"><i>- Mostra el registre actual de gestor d'arrencada</i></td><td></td><td>(Premeu <span class="key">Q</span> per a sortir)</td></tr>
+	<tr><td><i>- Afegiu opcions de depuració avançades</i></td><td></td><td></td></tr>
+</table></td></tr>
+<tr><td></td><td></td><td>Si està activat "registre de depuració syslog", en reiniciar després d'un error, a més es mostren aquestes opcions:</td></tr>
 <tr><td></td><td></td><td>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
-	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
+	<tr><td class="onelinetop"><i>- Mostra el registre syslog de la sessió anterior</i></td><td></td><td></td></tr>
+	<tr><td><i>- Desa el registre syslog de la sessió anterior</i></td><td></td><td></td></tr>
+</table></td></tr>
 <tr><td class="onelinetop"><b>Selecció del mode de vídeo segur</b></td><td> </td><td>Si heu activat l'opció <i>Usa el mode de vídeo segur</i>, podeu indicar la resolució i la profunditat de color.</td></tr>
 </table>
 <p><br /></p>

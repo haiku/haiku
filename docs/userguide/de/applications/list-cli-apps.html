@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,21 +56,20 @@
 
 <div id="content">
 <div>
-<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Liste aller Konsolenprogramme</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Ort:</td><td style="width:15px;"></td><td><span class="path"><acronym title="/boot/system/bin">/boot/System/bin</acronym></span><br /><span class="path"><acronym title="/boot/common/bin">/boot/Allgemein/bin</acronym></span><br /><span class="path"><acronym title="~/config/bin">~/Konfiguration/bin</acronym></span></td></tr>
+<tr><td>Ort:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Alle Konsolenprogramme, die mit Haiku geliefert werden, befinden sich entweder in <span class="path"><acronym title="/boot/system/bin">/boot/System/bin</acronym></span> oder in <span class="path"><acronym title="/boot/common/bin">/boot/Allgemein/bin</acronym></span>. Eigene oder zusätzlich installierte Konsolenprogramme kommen in <span class="path"><acronym title="~/config/bin">~/Konfiguration/bin</acronym></span>. Diese Orte sind alle Teil der PATH Variable und werden daher automatisch gefunden.<br />
+<p>Alle Konsolenprogramme, die zusammen mit Haiku installiert werden, befinden sich in <span class="path">/boot/system/bin</span>. Eigene oder zusätzliche Konsolenprogramme erscheinen in <span class="path">~/config/bin/</span> falls sie aus einem .hpkg Paket stammen. Ansonsten werden sie in <span class="path">~/config/non-packaged/bin/</span> abgelegt. Diese Orte sind alle Teil der PATH Variable und werden daher automatisch gefunden.<br />
 Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer kurzen Beschreibung. Mehr Information zur Benutzung erhält man durch das Aufrufen eines Befehls mit dem Parameter <tt>--help</tt>.</p>
 <p><br /></p>
 <p>Index:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 <tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Startet einen Dienst zum Überwachen von gerade benutzten Audio und Video Add-ons.</td></tr>
-<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>Spracheinstellungen</td></tr>
+<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Einstellungen zu Sprache und Tastaturlayout.</td></tr>
 <tr><td><tt>[</tt></td><td> </td><td>Vergleicht Werte und Dateien.</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
 <tr><td><tt>addattr</tt></td><td> </td><td>Hängt ein Attribut an eine Datei, achtet dabei auf den Typ und konvertiert Werte entsprechend. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
@@ -82,7 +81,6 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-Again Shell</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Eine Rechen-Sprache mit belieber Genauigkeit.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Gibt einen Klang aus.</td></tr>
-<tr><td><tt>bootman</tt></td><td> </td><td>Installiert oder Deinstalliert ein Bootmenü.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Siehe <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Datei-Komprimierer</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++ Kompiler</td></tr>
@@ -146,6 +144,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>fortune</tt></td><td> </td><td>Gibt einen zufälligen, hoffentlich interessanten, Sinnspruch aus.</td></tr>
 <tr><td><tt>frcode</tt></td><td> </td><td>Wird von updatedb benutzt um die Liste mit Dateinamen zu komprimieren.</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Zeigt Informationen über FreeType's Kompilierung und Verlinkung.</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>Sendet einen TRIM Befehl zu einem SSD Laufwerk.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>Programm zur Datenübertragung per FTP</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP Daemon</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Entpackt das erste Objekt eines Archivs und gibt es zur Standardausgabe aus.</td></tr>
@@ -190,7 +189,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>listsem</tt></td><td> </td><td>Listet die Semaphoren, die von einem Team belegt sind.</td></tr>
 <tr><td><tt>listusb</tt></td><td> </td><td>Listet alle USB-Geräte auf.</td></tr>
 <tr><td><tt>ln</tt></td><td> </td><td>Erzeugt eine Verknüpfung zu einer Datei.</td></tr>
-<tr><td><tt>locale</tt></td><td> </td><td>Shows the set preferred language, its LC_CTYPE and the preferred formatting.</td></tr>
+<tr><td><tt>locale</tt></td><td> </td><td>Zeigt die momentane eingestellte Sprache, ihren LC_CTYPE und die Formattierungseinstellung.</td></tr>
 <tr><td><tt>locate</tt></td><td> </td><td>Findet eine Datei.</td></tr>
 <tr><td><tt>logger</tt></td><td> </td><td>Sendet eine Nachricht zum System Log.</td></tr>
 <tr><td><tt>login</tt></td><td> </td><td>Startet eine Sitzung auf dem System.</td></tr>
@@ -226,12 +225,16 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>od</tt></td><td> </td><td>Gibt eine eindeutige Darstellung einer Datei aus.</td></tr>
 <tr><td><tt>open</tt></td><td> </td><td>Öffnet eine Anwendung oder ein Dokument von der Konsole aus. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
+<tr><td><tt>package</tt></td><td> </td><td>Erzeugt, untersucht oder entpackt ein Haiku Paket.</td></tr>
+<tr><td><tt>package_repo</tt></td><td> </td><td>Erzeugt oder untersucht eine Haiku Repository Datei.</td></tr>
 <tr><td><tt>passwd</tt></td><td> </td><td>Ändert das Passwort des Benutzers.</td></tr>
 <tr><td><tt>paste</tt></td><td> </td><td>Gibt durch einem Tab getrennte, korrespondierende Zeilen zweier Dateien aus.</td></tr>
 <tr><td><tt>patch</tt></td><td> </td><td>Wendet eine Diff-Datei auf ein Original an.</td></tr>
 <tr><td><tt>pathchk</tt></td><td> </td><td>Erkennt ungültige oder nicht portierbare Dateinamen.</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Ein Taschenrechner für Programmierer.</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Schickt ICMP-Echo-Request übers Netzwerk.</td></tr>
+<tr><td><tt>pkg-config</tt></td><td> </td><td>Untersucht und konfiguriert ein Haiku Paket.</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>Verwaltet Pakete und Repositories.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Spielt Tracks einer CD ab.</td></tr>
 <tr><td><tt>playfile</tt></td><td> </td><td>Spielt Audio Dateien ab.</td></tr>
 <tr><td><tt>playsound</tt></td><td> </td><td>Spielt Audio Dateien ab.</td></tr>

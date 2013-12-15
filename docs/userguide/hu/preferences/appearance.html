@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -73,7 +73,11 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">Új betűtípusok telepítése</a></h3>
-<p>Új betűtípusok esetében azokat csak be kell másolni a megfelelő mappába (<span class="path">/boot/common/data/fonts/</span> vagy <span class="path">/boot/home/config/data/fonts/</span>) (további információk a <a href="../filesystem-layout.html">Fájlrendszer szerkezete</a> fejezetben).</p>
+<p>Azok a betűtípusok, melyek nem egy .hpkg részeként érkeznek, azok a betűtípusnak megfelelő almappába (a <tt>non-packed</tt> mappán belül) másolással telepíthetőek (<tt>psfonts</tt> vagy <tt>ttfonts</tt>). További információk a <a href="../filesystem-layout.html">Fájlrendszer szerkezete</a> fejezetben. TrueType betűk esetében:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>minden felhasználó számára elérhető betűtípusok számára.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>csak a saját betűtípusok.</td></tr>
+</table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

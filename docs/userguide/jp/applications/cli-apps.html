@@ -55,14 +55,15 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku 固有のコマンドラインアプリケーション</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>場所:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>場所:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Haiku に同梱されているすべてのコマンドラインアプリケーションは、<span class="path">/boot/system/bin</span> または <span class="path">/boot/common/bin</span> にあります。ユーザー自身が作成、または追加インストールしたコマンドラインアプリケーションは、<span class="path">~/config/bin</span> に配置する必要があります。これらの場所は PATH 環境変数に含まれているため、自動的に検出されます。<br />
-以下は Haiku 固有のすべての CLI アプリケーションを網羅的にリストアップしたものではなく、一例として示すのにもっとも効果的なアプリケーションのいくつかに注目したに過ぎません。ほんの少し勇気を出して、ご自身で <span class="path">bin/</span> フォルダー内に何があるのか探索してみてください。<tt>--help</tt> という引数を付けてアプリケーションを実行すると、そのコマンドの使い方とさまざまなオプションすべてに関する説明が表示されます。</p>
+<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
+The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-attributes" name="cli-attributes">属性に関するコマンド: <span class="cli">listattr</span>, <span class="cli">catattr</span>、<span class="cli">addattr</span>、<span class="cli">rmattr</span>、<span class="cli">copyattr</span></a></h3>
@@ -122,7 +123,7 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="list-cli-apps.html">コマンドの一覧表</a> 
-::  <a href="../applications.html#cli-apps" class="uplink">アプリケーション</a> 
+::  <a href="../applications.html#cli-apps" class="uplink">Applications (アプリケーション)</a> 
 </span></div>
 </div>
 

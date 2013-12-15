@@ -4,12 +4,14 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Daniel Marth
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Paco Rivière
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -55,32 +57,31 @@
 <div>
 <div class="box-info">La traducció d'aquesta pàgina encara no està acabada. Fins que ho sigui, algunes part correspondrà a la versió anglesa.</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />List of all commandline applications</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Llista de totes les aplicacions de la linia d'ordres</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Ubicació:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>Ubicació:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in either <span class="path">/boot/system/bin</span> or <span class="path">/boot/common/bin</span>. Your own or additionally installed commandline apps should go in <span class="path">~/config/bin</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
+<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
 Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
 <p><br /></p>
 <p>Index:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 <tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Starts service to monitor audio and video media add-ons in use. </td></tr>
-<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>Language setup. </td></tr>
+<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Language and keymap setup. </td></tr>
 <tr><td><tt>[</tt></td><td> </td><td>Returns true/false after comparing items.</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
 <tr><td><tt>addattr</tt></td><td> </td><td>Writes an attribute to a file, taking the type into account and converting the values accordingly. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>alert</tt></td><td> </td><td>Shows a message box. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>arp</tt></td><td> </td><td>Manipulates the system ARP cache. </td></tr>
-<tr><td><tt>awk</tt></td><td> </td><td>See <tt>gawk</tt>.</td></tr>
+<tr><td><tt>awk</tt></td><td> </td><td>Veieu <tt>gawk</tt>.</td></tr>
 <tr><td><tt>base64</tt></td><td> </td><td>Base64 encode or decode to standard output. </td></tr>
 <tr><td><tt>basename</tt></td><td> </td><td>Strips directory and optionally suffix from a /path/to/filename string.</td></tr>
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>An arbitrary precision calculator language.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Rings a bell. </td></tr>
-<tr><td><tt>bootman</tt></td><td> </td><td>Installs or uninstalls a boot-menu. </td></tr>
-<tr><td><tt>bunzip2</tt></td><td> </td><td>See <tt>bzip2</tt>.</td></tr>
+<tr><td><tt>bunzip2</tt></td><td> </td><td>Veieu <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>File compressor</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler</td></tr>
 <tr><td><tt>cal</tt></td><td> </td><td>Displays a calendar. </td></tr>
@@ -123,7 +124,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>du</tt></td><td> </td><td>Summarizes disk usage of each file, recursively for directories. </td></tr>
 <tr><td><tt>dumpcatalog</tt></td><td> </td><td>[Leftover from the move of locale-kit.] </td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>Displays a line of text.</td></tr>
-<tr><td><tt>egrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
+<tr><td><tt>egrep</tt></td><td> </td><td>Veieu <tt>grep</tt>.</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>Ejects removable media. </td></tr>
 <tr><td><tt>env</tt></td><td> </td><td>Runs a program in a modified environment. </td></tr>
 <tr><td><tt>error</tt></td><td> </td><td>Prints clear text error messages for given error numbers. </td></tr>
@@ -134,7 +135,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>false</tt></td><td> </td><td>Does nothing, indicates "unsuccessful" and returns the value "1".</td></tr>
 <tr><td><tt>fdinfo</tt></td><td> </td><td>Shows info about the used file descriptors in the system. </td></tr>
 <tr><td><tt>ffm</tt></td><td> </td><td>Sets focus follows mouse. </td></tr>
-<tr><td><tt>fgrep</tt></td><td> </td><td>See <tt>grep</tt>.</td></tr>
+<tr><td><tt>fgrep</tt></td><td> </td><td>Veieu <tt>grep</tt>.</td></tr>
 <tr><td><tt>filepanel</tt></td><td> </td><td>Displays a load/save file panel. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Searches for files in a directory hierarchy.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>Finds special directories defined by the system.</td></tr>
@@ -143,6 +144,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>fortune</tt></td><td> </td><td>Prints a random, hopefully interesting, adage. </td></tr>
 <tr><td><tt>frcode</tt></td><td> </td><td>Called by updatedb to compress the list of file names.</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Shows FreeType compilation and linking information.</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>Send a TRIM command to an SSD drive.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>File transfer program</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP daemon</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Extracts the first item of an archive to standard output.</td></tr>
@@ -152,7 +154,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>getlimits</tt></td><td> </td><td>Prints platform dependent limits in a format useful for shell scripts. </td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Search for a pattern.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Prints group memberships for each username. </td></tr>
-<tr><td><tt>gunzip</tt></td><td> </td><td>See <tt>gzip</tt>.</td></tr>
+<tr><td><tt>gunzip</tt></td><td> </td><td>Veieu <tt>gzip</tt>.</td></tr>
 <tr><td><tt>gzexe</tt></td><td> </td><td>De/Compresses executables. </td></tr>
 <tr><td><tt>gzip</tt></td><td> </td><td>De/Compresses files. </td></tr>
 <tr><td><tt>hd</tt></td><td> </td><td>Hexdump</td></tr>
@@ -210,7 +212,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>mkindex</tt></td><td> </td><td>Creates a new index for an attribute.  <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>mktemp</tt></td><td> </td><td>Safely creates a temporary file or directory.</td></tr>
 <tr><td><tt>modifiers</tt></td><td> </td><td>Prints currently (un)pressed modifier keys. </td></tr>
-<tr><td><tt>more</tt></td><td> </td><td>See <tt>less</tt>. </td></tr>
+<tr><td><tt>more</tt></td><td> </td><td>Veieu <tt>less</tt>. </td></tr>
 <tr><td><tt>mount</tt></td><td> </td><td>Mounts a file system. </td></tr>
 <tr><td><tt>mount_nfs</tt></td><td> </td><td>Mounts a NFS partition. </td></tr>
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Mounts a volume by name.</td></tr>
@@ -223,12 +225,16 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>od</tt></td><td> </td><td>Writes an unambiguous representation of a file.</td></tr>
 <tr><td><tt>open</tt></td><td> </td><td>Launches an application/document from the shell. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
+<tr><td><tt>package</tt></td><td> </td><td>Creates, inspects, or extracts a Haiku package.</td></tr>
+<tr><td><tt>package_repo</tt></td><td> </td><td>Creates or inspects a Haiku package repository file.</td></tr>
 <tr><td><tt>passwd</tt></td><td> </td><td>Changes the user password. </td></tr>
 <tr><td><tt>paste</tt></td><td> </td><td>Prints lines consisting of the sequentially corresponding lines from each file, separated by tabs.</td></tr>
 <tr><td><tt>patch</tt></td><td> </td><td>Applies a diff file to an original. </td></tr>
 <tr><td><tt>pathchk</tt></td><td> </td><td>Diagnoses invalid or unportable file names. </td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Programmer's calculator</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Sends ICMP-echo-request to network host. </td></tr>
+<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzes and configures a Haiku package.</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>Manages packages and package repositories.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Plays tracks from CD. </td></tr>
 <tr><td><tt>playfile</tt></td><td> </td><td>Plays an audio file. </td></tr>
 <tr><td><tt>playsound</tt></td><td> </td><td>Plays an audio file.</td></tr>
@@ -266,7 +272,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>setversion</tt></td><td> </td><td>Shows the version of a file.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Sets the system sound volume. </td></tr>
 <tr><td><tt>setwep</tt></td><td> </td><td>Provides WEP encryption for wireless networks. </td></tr>
-<tr><td><tt>sh</tt></td><td> </td><td>See <tt>bash</tt>. </td></tr>
+<tr><td><tt>sh</tt></td><td> </td><td>Veieu <tt>bash</tt>. </td></tr>
 <tr><td><tt>sha1sum</tt></td><td> </td><td>Prints or checks SHA1 checksums. </td></tr>
 <tr><td><tt>shar</tt></td><td> </td><td>Creates shell archives.</td></tr>
 <tr><td><tt>shred</tt></td><td> </td><td>Overwrites a file repeatedly. </td></tr>
@@ -312,7 +318,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>unmount</tt></td><td> </td><td>Unmounts a volume.</td></tr>
 <tr><td><tt>unrar</tt></td><td> </td><td>Expands a rar archive.</td></tr>
 <tr><td><tt>unshar</tt></td><td> </td><td>Expands a shar archive.</td></tr>
-<tr><td><tt>untrash</tt></td><td> </td><td>See <tt>trash</tt>. </td></tr>
+<tr><td><tt>untrash</tt></td><td> </td><td>Veieu <tt>trash</tt>. </td></tr>
 <tr><td><tt>unzip</tt></td><td> </td><td>Expands a zip archive.</td></tr>
 <tr><td><tt>unzipsfx</tt></td><td> </td><td>Used to make existing zip archives self-extracting.</td></tr>
 <tr><td><tt>updatedb</tt></td><td> </td><td>Updates a localization database.</td></tr>
@@ -333,15 +339,15 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>xargs</tt></td><td> </td><td>Builds and executes command lines from standard input. </td></tr>
 <tr><td><tt>xres</tt></td><td> </td><td>Lists and manipulates resources. </td></tr>
 <tr><td><tt>yes</tt></td><td> </td><td>Prints out a string repeatedly until killed. </td></tr>
-<tr><td><tt>zcat</tt></td><td> </td><td>See <tt>gzip</tt>.</td></tr>
-<tr><td><tt>zcmp</tt></td><td> </td><td>See <tt>zdiff</tt>. </td></tr>
+<tr><td><tt>zcat</tt></td><td> </td><td>Veieu <tt>gzip</tt>.</td></tr>
+<tr><td><tt>zcmp</tt></td><td> </td><td>Veieu <tt>zdiff</tt>. </td></tr>
 <tr><td><tt>zdiff</tt></td><td> </td><td>Compares compressed files. </td></tr>
 <tr><td><tt>zforce</tt></td><td> </td><td>Forces a '.gz' extension on gzip files. </td></tr>
 <tr><td><tt>zgrep</tt></td><td> </td><td>Scan through possibly compressed files for a regular expression. </td></tr>
 <tr><td><tt>zip</tt></td><td> </td><td>Adds or replaces items in a zip archive.</td></tr>
 <tr><td><tt>zipcloak</tt></td><td> </td><td>Encrypts all unencrypted items in a zip archive. </td></tr>
 <tr><td><tt>zipgrep</tt></td><td> </td><td>Scans the given zip items for a string or pattern. </td></tr>
-<tr><td><tt>zipinfo</tt></td><td> </td><td>See <tt>unzip</tt>.</td></tr>
+<tr><td><tt>zipinfo</tt></td><td> </td><td>Veieu <tt>unzip</tt>.</td></tr>
 <tr><td><tt>zipnote</tt></td><td> </td><td>Prints the comments in a zip archive.</td></tr>
 <tr><td><tt>zipsplit</tt></td><td> </td><td>Splits a zip archive into smaller pieces. </td></tr>
 <tr><td><tt>zmore</tt></td><td> </td><td>Like <tt>more</tt> but operates on the uncompressed contents of any compressed file.</td></tr>

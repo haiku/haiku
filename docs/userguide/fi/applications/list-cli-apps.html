@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,17 +59,17 @@
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Kaikkien komentorivisovellusten luettelo</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Sijainti</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>Sijainti</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Kaikki Haikun mukana tulevat komentoriviohjelmat sijaitsevat joko hakemistossa <span class="path">/boot/system/bin</span> tai hakemistossa <span class="path">/boot/common/bin</span>. Omat tai muut lisäämäsi komentoriviohjelmat pitäisi sijoittaa hakemistoon <span class="path">~/config/bin</span>. Kaikki nämä sijainnit ovat osa PATH-ympäristömuuttujaa ja löytyvät siksi automaattisesti.<br />
-Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen kohdalla on vain lyhyt kuvaus siitä, mitä ne tekevät, yksityiskohtaisempia tietoja ohjelman käytöstä saa komentoriviparametrilla <tt>--help</tt>.</p>
+<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
+Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
 <p><br /></p>
 <p>Indeksi:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 <tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Aloittaa palvelun, joka valvoo käytössä olevia ääni- ja videoliitännäisiä. </td></tr>
-<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>Kieliasetukset. </td></tr>
+<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Language and keymap setup. </td></tr>
 <tr><td><tt>[</tt></td><td> </td><td>Palauttaa tosiarvot tosi/epätosi alkioiden vertailun jälkeen.</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a>
 </td></tr>
@@ -82,7 +82,6 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Satunnaistarkkuuksinen laskinkieli.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Soittaa kelloa. </td></tr>
-<tr><td><tt>bootman</tt></td><td> </td><td>Asentaa alkulatausvalikon ja poistaa sen. </td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Katso <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Tiedoston tiivistysohjelma</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++-kääntäjä</td></tr>
@@ -146,6 +145,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>fortune</tt></td><td> </td><td>Tulostaa satunnaisia, toivon mukaan mielenkiintoisia, mietelauseita.</td></tr>
 <tr><td><tt>frcode</tt></td><td> </td><td>Komento updatedb kutsuu tiivistämään tiedostonimen luettelon.</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Näyttää FreeType-käännös- ja -linkitystiedot.</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>Send a TRIM command to an SSD drive.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>Tiedostonsiirto-ohjelma</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP-taustaprosessi</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Poimii arkiston ensimmäisen kohdan vakiotulosteeseen.</td></tr>
@@ -226,12 +226,16 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>od</tt></td><td> </td><td>Kirjoittaa tiedoston yksiselitteisen esityksen.</td></tr>
 <tr><td><tt>open</tt></td><td> </td><td>Käynnistää sovelluksen tai asiakirjan komentotulkki-ikkunasta. <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
+<tr><td><tt>package</tt></td><td> </td><td>Creates, inspects, or extracts a Haiku package.</td></tr>
+<tr><td><tt>package_repo</tt></td><td> </td><td>Creates or inspects a Haiku package repository file.</td></tr>
 <tr><td><tt>passwd</tt></td><td> </td><td>Vaihtaa käyttäjän salasanan. </td></tr>
 <tr><td><tt>paste</tt></td><td> </td><td>Tulostaa rivit, jotka koostuvat vastaavien rivien sekvensseistä jokaisesta tiedostosta, eroteltuna sarkainmerkeillä.</td></tr>
 <tr><td><tt>patch</tt></td><td> </td><td>Toteuttaa diff-tiedoston alkuperäisestä. </td></tr>
 <tr><td><tt>pathchk</tt></td><td> </td><td>Diagnostoi virheelliset ja siirtokelvottomat tiedostonimet. </td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Ohjelmoijan laskin.</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Lähettää pyynnön ICMP-echo-request verkkolaitteelle. </td></tr>
+<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzes and configures a Haiku package.</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>Manages packages and package repositories.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Soittaa kappaleita CD-levyltä. </td></tr>
 <tr><td><tt>playfile</tt></td><td> </td><td>Soittaa äänitiedoston. </td></tr>
 <tr><td><tt>playsound</tt></td><td> </td><td>Soittaa äänitiedoston.</td></tr>

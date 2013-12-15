@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -61,8 +61,8 @@
 <tr><td>Barra d'eines:</td><td style="width:15px;"></td><td><span class="menu">Aplicacions</span></td></tr>
 <tr><td>Ubicació:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>Preferències:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/common/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/common/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
 <p>The Terminal is Haiku's interface to bash, the Bourne Again Shell.</p>
@@ -95,12 +95,15 @@ Pressing <span class="button">OK</span> will save the current settings as defaul
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Dreceres del teclat</a></h2>
 <p>You'll find a list of useful shortcuts in <a href="../keyboard-shortcuts.html#terminal">Shortcuts and key combinations</a>.</p>
+<p>Another nice feature that is more a key &amp; mouse combination: When holding <span class="key">ALT</span> a path or URL under the mouse pointer gets highlighted. A left-click opens the file/folder or website. A right-click opens a context menu to either <span class="menu">Copy path</span> or <span class="menu">Copy absolute path</span>. Imagine you're in <span class="path">/MyData/source/haiku/</span> and have the path <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> under the mouse pointer, the latter menu item  will result in the combined, absolute path &lt;<i>deep breath</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
+<p>By the way, right-clicking into the Terminal window will insert the clipboard. In combination with copying parts of highlighted paths, this can be used for speedy navigation of deep folder hierarchies.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Personalització del Bash</a></h2>
 <p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
-Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/common/etc/</span>.</p>
+Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/settings/etc/</span>.</p>
 
 <h3>.profile</h3>
 <p>The <span class="cli">.profile</span> is loaded every time you open a new Terminal. It sets all kinds of aliases and variables that will affect bash's behavior and appearance. You'll find many online resources that will detail all possibilities.</p>

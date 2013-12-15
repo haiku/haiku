@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,17 +59,17 @@
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />所有命令行程序列表</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>位置：</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>位置：</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>所有与 Haiku 集成的命令行程序放置在 <span class="path">/boot/system/bin</span> 或者 <span class="path">/boot/common/bin</span>。您自己的或者附加安装的命令行程序应该放置于 <span class="path">~/config/bin</span>。所有这些位置是 PATH 变量的一部分，因此会自动被发现。<br />
-下面是与 Haiku 集成的所有命令行程序列表。每个程序都有一个简短的功能描述，关于用法的更多详细信息，请使用 <tt>--help</tt> 参数运行该命令。</p>
+<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
+Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
 <p><br /></p>
 <p>索引:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 <tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>开启音频和视频附加组件的管理服务。</td></tr>
-<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>语言设置。 </td></tr>
+<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Language and keymap setup. </td></tr>
 <tr><td><tt>[</tt></td><td> </td><td>比较文件之后，返回其真/假值。</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
 <tr><td><tt>addattr</tt></td><td> </td><td>写入属性到文件，包括类型和相应值的转换。<a href="cli-apps.html">（Haiku 专用）</a></td></tr>
@@ -81,7 +81,6 @@
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-Again Shell，使用广泛的 Shell 解释器。</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>一个任意精度的计算机语言。</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>响铃。 </td></tr>
-<tr><td><tt>bootman</tt></td><td> </td><td>安装或者卸载 引导菜单（boot-menu）。 </td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>查看 <tt>bzip2</tt> 说明。</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>信息分块 文件压缩工具。</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++ 编译器</td></tr>
@@ -145,6 +144,7 @@
 <tr><td><tt>fortune</tt></td><td> </td><td>打印一个随机，非常有趣的格言。</td></tr>
 <tr><td><tt>frcode</tt></td><td> </td><td>由 updatedb 调用，压缩文件名列表。</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>显示 FreeType 编辑和链接信息。</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>Send a TRIM command to an SSD drive.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>文件传输程序。</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP 后台程序。</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>提取压缩档的首个项目到标准输出。</td></tr>
@@ -225,12 +225,16 @@
 <tr><td><tt>od</tt></td><td> </td><td>写入文件的清晰表述。</td></tr>
 <tr><td><tt>open</tt></td><td> </td><td>从 Shell 载入应用程序或者文档。 <a href="cli-apps.html">（Haiku 专用）</a></td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
+<tr><td><tt>package</tt></td><td> </td><td>Creates, inspects, or extracts a Haiku package.</td></tr>
+<tr><td><tt>package_repo</tt></td><td> </td><td>Creates or inspects a Haiku package repository file.</td></tr>
 <tr><td><tt>passwd</tt></td><td> </td><td>修改用户密码。 </td></tr>
 <tr><td><tt>paste</tt></td><td> </td><td>打印每个文件中包含的连续行，并使用制表符将其分开。</td></tr>
 <tr><td><tt>patch</tt></td><td> </td><td>应用修改文件到原文件。 </td></tr>
 <tr><td><tt>pathchk</tt></td><td> </td><td>判断无效或者不可移植的文件名。 </td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>程序员计算器。</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>发送 ICMP回应请求 到网络主机。 </td></tr>
+<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzes and configures a Haiku package.</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>Manages packages and package repositories.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>播放 CD 轨道。</td></tr>
 <tr><td><tt>playfile</tt></td><td> </td><td>播放音频文件。 </td></tr>
 <tr><td><tt>playsound</tt></td><td> </td><td>播放音频文件。</td></tr>

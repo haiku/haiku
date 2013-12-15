@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -74,7 +74,11 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">Instalando novas fontes</a></h3>
-<p>Instale novas fontes copiando-as para dentro de suas respectivas pastas de usuário, ou seja <span class="path">/boot/common/data/fonts/</span> ou <span class="path">/boot/home/config/data/fonts/</span> (veja o tópico <a href="../filesystem-layout.html">Disposição do sistema de arquivos</a>).</p>
+<p>Novas fontes que não vêm como parte de um pacote .hpkg regular podem ser instaladas copiando-as dentro de uma subpasta, de acordo com o tipo da fonte (<tt>psfonts</tt> ou <tt>ttfonts</tt>) dentro de sua respectiva pasta <tt>non-packaged</tt> (veja o tópico <a href="../filesystem-layout.html">Disposição do sistema de arquivos</a>). Para fontes TrueType devem ser:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> para fontes disponíveis a todos os usuários.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> para fontes disponíveis apenas para si mesmo.</td></tr>
+</table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

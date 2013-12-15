@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,6 +54,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h1>Rozloženie súborového systému Haiku</h1>
 
@@ -61,81 +62,79 @@
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
 <p>Druhá výstraha  vyskočí, keď sa pokúsite premenovať alebo zmazať niečo v hierarchii system. Tu sa na tlačidlo „<span class="button">Premenovať</span>“ bude dať kliknúť iba ak podržíte kláves <span class="key">SHIFT</span>.</p>
-<p>Vo všeobecnosti existujú tri samostatné vetvy začínajúce v koreňovom priečinku zavádzacieho zväzku:</p>
+<p>Generally, there are two separate branches springing from the root folder of the boot volume:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>patrí systému. Nedotýkajte sa ho!</td></tr>
-<tr><td><span class="path">/boot/common/</span></td><td> </td><td>obsahuje súbory, ktoré môžu využívať všetci používatelia súčasne.</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>je váš osobný priečinok, kde máte svoje dáta a nastavenia.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Contains system files and applications/packages shared by all users.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>This is your personal folder where you keep your data and settings and the applications/packages that are <i>not</i> shared by all users.</td></tr>
 </table>
+<p>As long as Haiku isn't multi-user, this distinction between shared and not-shared applications/packages has no apparent effect, as there's only one user with one home folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">Systémový priečinok - <span class="path">/boot/system/</span></a></h2>
-<p>V predchodcovi Haiku - BeOS - sa tento priečinok nazýval <span class="path">/boot/beos/</span>. Ešte stále ho môžete nájsť v staršej dokumentácii (napr. v pôvodnej BeBook).<br />
-Bez ohľadu na jeho názov, nemali by ste meniť jeho obsah. Každá aktualizácia Haiku však môže pridať, odstrániť alebo zmeniť čokoľvek v ňom. Ak chcete pridať funkcie, povedzme ďalšími Doplnkami alebo Prekladačmi Trackera alebo povedzme ďalší ovládač hardvéru, tieto veci inštalujte do vašej vlastnej hierarchie <span class="path">/boot/home/</span> alebo ak majú byť dostupné každému používateľovu, pod <span class="path">/boot/common/</span>. Pokým Haiku nemá podporu pre viacerých používateľov, takéto rozlíšenie zjavne nemá žiaden zmysel, pretože existuje len jeden používateľ s jedným domovským priečinkom. Ale preto, že podpora viacerých používateľov bude nakoniec pridaná, je rozumné naučiť sa správny postup hneď od začiatku.</p>
-<p>Takže povedzme, že chcete nainštalovať nový Prekladač pre najnovší formát obrázkov. <b>Nekopírujte</b> ho jednoducho do príslušného systémového priečinka. Pamätajte: Nedotýkať sa!<br />
-Namiesto toho ho dajte do zodpovedajúceho priečinka v hierarchie <span class="path">/boot/common/</span> alebo <span class="path">/boot/home/config/</span>.</p>
-<p>V našom príklade by bolo umiestnenie Prekladačov v systémovom priečinku</p>
-<p><span class="path">/boot/system/add-ons/Translators/</span></p>
-<p>Takže zodpovedajúci priečinok je buď</p>
-<p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
-alebo<br />
-<span class="path">/boot/common/add-ons/Translators/</span></p>
-<p>To má ďalšiu výhodu: Ak komponent, ktorý ste nainštalovali niečo pokazí (čo je možné, pretože takto sa inštalujú aj ovládače hardvéru) budete môcť vybrať voľbu „<i>Vypnúť používateľské doplnky</i>“ z menu <a href="bootloader.html">Zavádzača systému</a> a tak budete vždy môcť zaviesť systém bez problematického komponentu.</p>
-<p>Väčšinou sa však týmito vecami nebudete musieť vôbec zaoberať, pretože každý softvér, ktorý pochádza z dôveryhodného zdroja  by mal obsahovať inštalačný program,  ktorý sa o tieto veci postará.<br />
-<!--
-If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
-</p>
-<p><i>TODO.... Table to be added ....</i>
-<table>
+<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
+Most of the folders inside <span class="path">/boot/system/</span> are read-only, which is sensible as they contain the files necessary for Haiku to function correctly and therefore have to be safe from (accidental) alteration. The only user-writable folders are:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>Contains cached files and the temporary folder linked to <span class="path">/tmp/</span>.</td></tr>
+<tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives).</td></tr>
+<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Besides holding Haiku's system packages, you can add/remove packages shared by all users.</td></tr>
+<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Contains system-wide settings.</td></tr>
+<tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Contains logs like the syslog (important when troubleshooting) and is the default location for the swap file.</td></tr>
 </table>
--->
-</p>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="common" name="common">Spoločný priečinok - <span class="path">/boot/common/</span></a></h2>
-<p>Haiku zatiaľ nie je viacpoužívateľský systém. Keď však bude, každý používateľ bude má vlastný <i>domovský</i> priečinok, ktorý je neprístupný komukoľvek inému. Každá aplikácia alebo pridaný komponent ako Doplnky Trackera, Prekladače atď. ako aj akékoľvek dáta, ktoré majú byť zdieľané medzi používateľmi musí byť pod <span class="path">/boot/common/</span>.</p>
+<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="home" name="home">Domovský priečinok - <span class="path">/boot/home/</span></a></h2>
-<p>Tento priečinok patrí vám. Tu môžete vytvárať a mazať súbory a priečinky ako si želáte. Nemali by ste sa však príliš babrať s priečinkom <span class="path">~/config/</span> a jeho podpriečinkami. Hoci by ste <i>mohli</i> zmazať napr. priečinok <span class="path">~/config/settings/</span> bez poškodenia samotného operačného systému, ale kto chce stratiť všetku konfiguráciu a nastavenia aplikácií? V každom prípade vás predtým systém upozorní hore spomínanou výstrahou.</p>
-<p>Okrem priečinka <span class="path">~/config/add-ons/</span> ktorý zrkadlí štruktúru priečinka doplnkov systému pre ďalšie komponenty ako je popísané vyššie, existuje niekoľˇko ďalších zaujímavých priečinkov. (Mimochodom, tilda („<tt>~</tt>“) je skratka pre váš domovský priečinok, takže nemusíte zakaždým v Termináli písať „<span class="path">/boot/home/</span>“)</p>
+<p>This folder belongs to you. Here you can create and delete files and folders as you wish. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)<br />
+Files that you'd like to share with other users in a future multi-user environment have do be put outside <span class="path">/boot/home/</span>. For example, you could create a folder <span class="path">/boot/all-users/</span> and put the stuff there.</p>
+
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
-<td>Tu sa štandardne uchováva vaša pošta.</td></tr>
+<tr><td><span class="path">~/Desktop/</span></td><td style="width:10px;"> </td>
+<td>Holds the files of your desktop. Double-clicking won't open it, as it is already always visible. When your files happen to be obscured by open windows, just switch quickly to another <a href="workspaces.html">Workspace</a>. Of course, <a href="tracker.html#drill-down">drilling</a> down by right-clicking is also possible.</td></tr>
+<tr><td><span class="path">~/mail/</span></td><td style="width:10px;"> </td>
+<td>This is the default location for your mails.</td></tr>
+<tr><td><span class="path">~/people/</span></td><td style="width:10px;"> </td>
+<td>This is the default location for you contact files, see <a href="applications/people.html">People</a>.</td></tr>
+<tr><td><span class="path">~/queries/</span></td><td style="width:10px;"> </td>
+<td><a href="queries.html">Queries</a> are stored here, by default temporarily for 7 days.</td></tr>
+</table>
 
-<tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
-<td><a href="queries.html">Požiadavky</a> sa ukladajú v tomto priečinku, štandardne na 7 dní.</td></tr>
+<p>The folder <span class="path">/boot/home/config/</span> is special: just like <span class="path">/boot/system/</span> it's mostly under the control of the package management and therefore read-only. It too contains these similar user-writable folders:</p>
 
-<tr><td><span class="path">~/config/be/</span></td><td> </td>
-<td>Opäť dedičstvo z BeOS. Priečinok <span class="path">be</span> obsahuje, čo sa zobrazuje v <a href="deskbar.html#deskbar-menu">menu Panelu</a>. Položky môžete pridávať a odstraňovať vkladaním súborov, priečinkov, odkazov alebo požiadaviek do tohto priečinka.</td></tr>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">~/config/packages/</span></td><td style="width:10px;"> </td>
+<td>Here you can add/remove packages that are <i>not</i> shared by all users.</td></tr>
 
-<tr><td><span class="path">~/config/bin/</span></td><td> </td>
-<td>Dopĺňa systémový priečinok <span class="path">/boot/system/bin/</span> a obsahuje všetky vaše programy príkazového riadka.</td></tr>
-
-<tr><td><span class="path">~/config/boot/</span></td><td> </td>
-<td>Tento priečinok je miestom pre <a href="bash-scripting.html#user-scripts">Používateľské skripty</a>, ktoré sa spúšťajú pred alebo po štarte či vypnutí systému.</td></tr>
-
-<tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
-<td>Odkazy na programy alebo dokumenty v tomto priečinku sa automaticky spúšťajú pri každom štarte.</td></tr>
-
-<tr><td><span class="path">~/config/data/fonts/</span></td><td> </td>
-<td>Do tohto priečinka jednoducho skopírujte písmo TrueType alebo Postscript a bude okamžite použiteľné.</td></tr>
+<tr><td class="onelinetop"><span class="path">~/config/non-packaged/</span></td><td> </td>
+<td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives) and are <i>not</i> shared by all users.</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
 <td>Tento priečinok obsahuje nastavenia všetkých aplikácií a časť konfigurácie systému. Niektoré aplikácie svoje  nastavenia ukladajú do vlastných podpriečinkov, iné jednoducho umiestnia svoj konfiguračný súbor sem.</td></tr>
+</table>
 
-<tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
+<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
+<p>Here are some of the more interesting subfolders in <span class="path">~/config/settings</span>:</p>
+
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">boot/</span></td><td style="width:10px;"> </td>
+<td>Tento priečinok je miestom pre <a href="bash-scripting.html#user-scripts">Používateľské skripty</a>, ktoré sa spúšťajú pred alebo po štarte či vypnutí systému.</td></tr>
+
+<tr><td><span class="path">boot/launch/</span></td><td> </td>
+<td>Odkazy na programy alebo dokumenty v tomto priečinku sa automaticky spúšťajú pri každom štarte.</td></tr>
+
+<tr><td><span class="path">beos_mime/</span></td><td> </td>
 <td>V tejto databáze <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> Haiku sleduje všetky rozličné <a href="filetypes.html">typy súborov</a> a ich nastavenia.</td></tr>
 
-<tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
+<tr><td class="onelinetop"><span class="path">deskbar/menu/</span></td><td> </td>
+<td>Copied or linked to files/folders/queries in this folder appear in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>.</td></tr>
+
+<tr><td class="onelinetop"><span class="path">kernel/drivers/</span></td><td> </td>
 <td>Jeden zo súbory nastavení môže byť zaujímavý: <span class="cli">kernel</span> ponúka niektoré nízkoúrovňové konfiguračné voľby ako vypnutie <acronym title="Symmetric Multi Processing">SMP</acronym>, výstup ladiacich informácií na sériový port alebo zapnutie pokročilej správy napájania. Riadok konfigurácie aktivujete odstránením symbolu komentára „<tt>#</tt>“. Buďte tu opatrní!</td></tr>
 
-<tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
-<td>Okrem rozličných konfiguračných súborov Trackera sú tu niektoré zaujímavé podpriečinky:</td></tr>
+<tr><td><span class="path">Tracker/</span></td><td> </td>
 
+<td>Okrem rozličných konfiguračných súborov Trackera sú tu niektoré zaujímavé podpriečinky:</td></tr>
 <tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Zobrazenie a prispôsobenie všetkých atribútov a veľkosti okna vaším potrebám. Každý nový priečinok, ktorý vytvoríte ho použije ako šablónu.</td></tr>
 
 <tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Môžete definovať rozloženie okien výsledkov požiadaviek pre niektoré typy súborov. Pozri tému <a href="queries.html#result-window">Požiadavka: Okno výsledkov</a>.</td></tr>

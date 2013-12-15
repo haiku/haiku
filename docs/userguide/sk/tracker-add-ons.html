@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,15 +54,15 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h1>Doplnky Trackera</h1>
 
 <p>Aplikácie môžu inštalovať doplnky, ktoré je možné jednoducho vyvolať pri vybraní súboru v Trackeri. Iba doplnky, ktoré dokážu pracovať s konkrétnym typom súboru sa zobrazia v kontextovom menu <span class="menu">Doplnky</span> alebo v menu <span class="menu">Súbor</span> okna Trackera. Niektoré doplnky nepotrebujú nutne súbor, s ktorým by pracovali a preto sú prítomné vždy.</p>
-<p>Doplnky Trackera alebo odkazy na aplikácie, ktoré sa môžu správať ako doplnky možno nainštalovať na tri rôzne miesta (pozri tému <a href="filesystem-layout.html">Rozloženie súborového systému</a>):</p>
+<p>New Tracker add-ons that don't come as part of a regular .hpkg package, can be installed by copying them into their respective non-packaged folder (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td> pre doplnky, ktoré poskytuje systém.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> pre doplnky dostupné každému používateľovi.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> pre doplnky dostupné iba vám.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td> pre doplnky dostupné každému používateľovi.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td> pre doplnky dostupné iba vám.</td></tr>
 </table>
 <p>K názvu súboru doplnku je možné pridať pomlčku a veľké písmeno a ten je potom dostupný prostredníctvom klávesovej skratky. Napríklad <span class="app">Otvoriť cieľový priečinok-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
 Samozrejme, keď skratku vyberáte musíte dávať pozor na možné konflikty klávesových skratiek. Nemôžete mať rovnakú skratku pre viaceré doplnky.</p>

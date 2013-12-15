@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -60,16 +60,17 @@
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Zoznam všetkých aplikácií príkazového riadka</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Umiestnenie:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>Umiestnenie:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Všetky aplikácie príkazového riadka v Haiku sa nachádzajú buď v <span class="path">/boot/system/bin</span>, alebo <span class="path">/boot/common/bin</span>. Vaše vlastné alebo dodatočne nainštalované aplikácie príkazového riadka by mali ísť do <span class="path">~/config/bin</span>. Všetky tieto lokality sú súčasťou premennej PATH, teda budú automaticky nájdené.<br /> Tu je zoznam aplikácií príkazového riadka, ktoré sa nachádzajú v Haiku. Každej je pridelený iba krátky popis toho, čo robí. Ďalšie informácií o ich použití získate spustením daného príkazu spolu s parametrom <tt>--help</tt>.</p>
+<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
+Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
 <p><br /></p>
 <p>Obsah:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 <tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>Spustí službu na monitorovanie multimediálnych audio a video  doplnkov.</td></tr>
-<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>Nastavenie jazyka.</td></tr>
+<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Language and keymap setup. </td></tr>
 <tr><td><tt>[</tt></td><td> </td><td>Porovná dve položky a vráti hodnotu pravda (ak sa zhodujú) alebo nepravda (ak sa nezhodujú).</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
 <tr><td><tt>addattr</tt></td><td> </td><td>Pripíše súboru atribút s ohľadom na jeho typ a podľa toho prevedie hodnoty. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
@@ -81,7 +82,6 @@
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Jazyk na výpočty s ľubovoľnou presnosťou.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Zazvoní zvonček.</td></tr>
-<tr><td><tt>bootman</tt></td><td> </td><td>Nainštaluje alebo odinštaluje menu zavádzača.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Pozrite <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Kompresia súborov</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>Kompilátor jazyka C++</td></tr>
@@ -145,6 +145,7 @@
 <tr><td><tt>fortune</tt></td><td> </td><td>Vypíše náhodné, snáď zaujímavé, porekadlo.</td></tr>
 <tr><td><tt>frcode</tt></td><td> </td><td>Zavolaním tohto príkazu updatedb skomprimuje zoznam názvov súborov.</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>Zobrazí informácie o kompilácii a linkovaní FreeType.</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>Send a TRIM command to an SSD drive.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>Program na prenos súborov</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP démon</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>Rozbalí prvý súbor z archívu na štandardný výstup.</td></tr>
@@ -225,12 +226,16 @@
 <tr><td><tt>od</tt></td><td> </td><td>Zapíše jednoznačnú reprezentáciu súboru.</td></tr>
 <tr><td><tt>open</tt></td><td> </td><td>Spustí aplikáciu alebo dokument zo shellu. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
+<tr><td><tt>package</tt></td><td> </td><td>Creates, inspects, or extracts a Haiku package.</td></tr>
+<tr><td><tt>package_repo</tt></td><td> </td><td>Creates or inspects a Haiku package repository file.</td></tr>
 <tr><td><tt>passwd</tt></td><td> </td><td>Zmení heslo používateľa.</td></tr>
 <tr><td><tt>paste</tt></td><td> </td><td>Vypíše riadky pozostávajúce zo sekvenčne zodpovedajúcich riadkov z každého súboru, oddelené tabulátormi.</td></tr>
 <tr><td><tt>patch</tt></td><td> </td><td>Aplikuje rozdielový súbor diff na originál. </td></tr>
 <tr><td><tt>pathchk</tt></td><td> </td><td>Diagnostikuje neplatné alebo neprenosné názvy súborov.</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>Programátorská kalkulačka</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>Pošle počítaču v sieti paket ICMP-echo-request.</td></tr>
+<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzes and configures a Haiku package.</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>Manages packages and package repositories.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>Prehrá stopu z CD.</td></tr>
 <tr><td><tt>playfile</tt></td><td> </td><td>Prehrá zvukový súbor.</td></tr>
 <tr><td><tt>playsound</tt></td><td> </td><td>Prehrá zvukový súbor.</td></tr>

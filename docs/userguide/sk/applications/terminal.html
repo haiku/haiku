@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,14 +55,15 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminál</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Aplikácie</span></td></tr>
 <tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - pridá/prepíše predvolené nastavenie v <span class="path">/boot/common/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - pridá/prepíše predvolené nastavenie v <span class="path">/boot/common/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
 <p>Terminál je Haiku rozhranie pre bash, Bourne Again Shell.</p>
@@ -97,12 +98,15 @@ Stlačenie <span class="button">OK</span> uloží aktuálne nastavenia ako predv
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Klávesové skratky</a></h2>
 <p>Zoznam užitočných skratiek nájdete v <a href="../keyboard-shortcuts.html#terminal">Klávesové skratky a kombinácie klávesov</a>.</p>
+<p>Another nice feature that is more a key &amp; mouse combination: When holding <span class="key">ALT</span> a path or URL under the mouse pointer gets highlighted. A left-click opens the file/folder or website. A right-click opens a context menu to either <span class="menu">Copy path</span> or <span class="menu">Copy absolute path</span>. Imagine you're in <span class="path">/MyData/source/haiku/</span> and have the path <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> under the mouse pointer, the latter menu item  will result in the combined, absolute path &lt;<i>deep breath</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
+<p>By the way, right-clicking into the Terminal window will insert the clipboard. In combination with copying parts of highlighted paths, this can be used for speedy navigation of deep folder hierarchies.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Prispôsobenie bashu</a></h2>
-<p>Pretože pochádza z unixových systémov, existuje nespočetné množstvo možností, ako upraviť samotný bash. Existujú dva súbory, ktoré sú pre používateľa obzvlášť dôležité: <span class="cli">.profile</span> a <span class="cli">.inputrc</span><br />
-Oba súbory môžu byť vytvorené v priečinku <span class="path">home/</span> a pridať alebo prepísať predvolené nastavenia systému, ktoré sú definované v <span class="path">/boot/common/etc/</span>.</p>
+<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
+Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/settings/etc/</span>.</p>
 
 <h3>.profile</h3>
 <p><span class="cli">.profile</span> sa načíta pri každom otvorení nového Terminálu. Nastavuje to všetky druhy aliasov a premenných, ktoré ovplyvňujú správanie bashu a jeho výzor. Nájdete veľa online zdrojov, ktoré vám priblížia všetky možnosti.</p>

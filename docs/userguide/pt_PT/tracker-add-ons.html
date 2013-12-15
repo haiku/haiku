@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,11 +57,10 @@
 <h1>Tracker Add-Ons</h1>
 
 <p>Applications can install add-ons so they can be invoked easily on a selection of files from Tracker. Only the add-ons that can handle a specific filetype are presented under <span class="menu">Add-Ons</span> from the context menu or the <span class="menu">File</span> menu of a Tracker window. Some add-ons don't necessarily need a file to work on and are thus always present.</p>
-<p>Tracker Add-Ons, or links to applications that can act as add-ons, can be installed in three different locations (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
+<p>New Tracker add-ons that don't come as part of a regular .hpkg package, can be installed by copying them into their respective non-packaged folder (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td> for system provided add-ons.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> for add-ons available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> for add-ons only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td> for add-ons available to every user.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td> for add-ons only available to yourself.</td></tr>
 </table>
 <p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
 Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>

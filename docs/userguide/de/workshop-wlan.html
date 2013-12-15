@@ -70,7 +70,7 @@
 <h1>Workshop: Funknetzwerke nutzen</h1>
 
 <p>Bei der heutzutage üblichen Drang zur permanenten Internetverbindung ist es unerlässlich eine funktionierende Netzwerkumgebung zu haben. Weil es für ein so kleines Projekt wie Haiku unmöglich ist mit der laufend neuen Hardware und ihre Treiber Schritt zu halten, verlässt sich Haiku auf eine <a href="http://www.freebsd.org">FreeBSD</a> Kompatibilitätsschicht für seine Netzwerktreiber.<br />
-Dadurch erhält man eine große Anzahl an unterstützter Hardware, wenn auch wahrscheinlich nicht für alles was es so gibt. Online existiert eine <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">Liste unterstützter Hardware</a> und <a href="http://www.freebsd.org/releases/9.1R/hardware.html#WLAN">FreeBSD 9.1's Release Hardware Notes</a>.</p>
+Dadurch erhält man eine große Anzahl an unterstützter Hardware, wenn auch wahrscheinlich nicht für alles was es so gibt. Online existiert eine <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">Liste unterstützter Hardware</a> und <a href="http://www.freebsd.org/releases/9.2R/hardware.html#wlan">FreeBSD 9.2's Release Hardware Notes</a>.</p>
 <div class="box-info">Zur Zeit werden nur PCI, PCI-X, PCI-Express, Mini PCI, und Mini PCI-Express Geräte unterstützt.<br />
 PCMCIA, CardBus, ExpressCard, USB und ISA Geräte funktionieren noch nicht.</div>
 
@@ -98,7 +98,7 @@ Je nach verwendeter Hardware und Konfiguration kann das eine Weile dauern. Über
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="commandline" name="commandline">Vom Terminal aus verbinden</a></h2>
-<p>Wer die Konsole bevorzugt oder Skripte nutzen möchte oder das <span class="path"><acronym title="~/config/boot/UserBootscript">~/Konfiguration/boot/UserBootscript</acronym></span>, um sich nach dem Hochfahren automatisch mit einem bestimmten Funknetzwerk zu verbinden, für den gibt es den Befehl <tt>ifconfig</tt>.</p>
+<p>Wer die Konsole bevorzugt oder Skripte nutzen möchte oder das <span class="path">~/config/settings/boot/UserBootscript</span>, um sich nach dem Hochfahren automatisch mit einem bestimmten Funknetzwerk zu verbinden, für den gibt es den Befehl <tt>ifconfig</tt>.</p>
 <p>Um nach verfügbaren Funknetzwerken zu suchen, öffnet man ein Terminal und gibt die erste Zeile ein:</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 scan
 name                             address              signal  auth

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,15 +57,15 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h1>Tracker Add-Ons</h1>
 
 <p>Anwendungen können Add-Ons installieren, um im Tracker von einer Dateiauswahl aus aufgerufen werden zu können. Im Kontextmenü unter <span class="menu">Add-ons</span> oder dem <span class="menu"><acronym title="File">Datei</acronym></span> Menü des Tracker-Fensters werden nur die Add-Ons angezeigt, die auch mit dem betreffenden Dateityp umgehen können. Add-Ons, die auch ohne eine markierte Datei benutzt werden können, werden immer angezeigt.</p>
-<p>Tracker Add-Ons, oder Verknüpfungen zu Programmen, die auch als Add-Ons funktionieren, können an drei Orten installiert werden (siehe auch <a href="filesystem-layout.html">Dateisystem Layout</a>):</p>
+<p>Tracker Add-Ons, die nicht als ordentliches .hpkg Paket vorliegen, können in den entsprechenden <tt>non-packaged</tt> Ordner kopiert werden (siehe <a href="../filesystem-layout.html">Dateisystem Layout</a>:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path"><acronym title="/boot/system/add-ons/Tracker/">/boot/System/add-ons/Tracker/</acronym></span></td><td>   </td><td>Vom System mitgelieferte Add-Ons.</td></tr>
-<tr><td><span class="path"><acronym title="/boot/common/add-ons/Tracker/">/boot/Allgemein/add-ons/Tracker/</acronym></span></td><td>   </td><td>Add-Ons, die für jeden Benutzer verfügbar sind</td></tr>
-<tr><td><span class="path"><acronym title="/boot/home/config/add-ons/Tracker/">/boot/Benutzer/Konfiguration/add-ons/Tracker/</acronym></span></td><td>   </td><td>Add-Ons, die nur für einen selbst verfügbar sind.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>Add-Ons, die für jeden Benutzer verfügbar sind</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>Add-Ons, die nur für einen selbst verfügbar sind</td></tr>
 </table>
 <p>Wenn der Dateiname eines Add-On mit einem Bindestrich und einem Buchstaben endet, kann das Add-On über diesen Buchstaben mit einer Tastenkombination aufgerufen werden, zum Beispiel: <span class="app">Open Target Folder-O</span> kann mit <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span> gestartet werden.<br />
 Da es keine zwei Add-On mit dem gleichen Kürzel geben kann, muss man bei der Vergabe des Buchstabens rücksichtsvoll vorgehen.</p>

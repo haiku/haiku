@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,14 +56,15 @@
 
 <div id="content">
 <div>
+<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - acrescenta/substitui os defaults em <span class="path">/boot/common/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - acrescenta/substitui os defaults em <span class="path">/boot/common/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - acrescenta/substitui os padrões em <span class="path">/boot/system/settings/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - acrescenta/substitui os padrões em <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
 <p>O Terminal é a interface do Haiku para o bash, o Bourne Again Shell.</p>
@@ -96,12 +97,15 @@ Pressionar <span class="button">OK</span> salvará as definições atuais como p
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Atalhos de teclado</a></h2>
 <p>Você encontrará uma lista de atalhos úteis em <a href="../keyboard-shortcuts.html#terminal">Atalhos e combinações de teclas</a>.</p>
+<p>Outra funcionalidade bacana que é mais uma combinação mouse &amp; teclado: Ao apertar <span class="key">ALT</span> um caminho ou URL abaixo do ponteiro do mouse fica destacado. Um clique com o botão esquerdo abre o arquivo/pasta ou sítio da web. Um clique com o botão direito abre um menu de contexto para <span class="menu">Copiar caminho</span> ou <span class="menu">Copiar caminho absoluto</span>. Imagine que esteja em  <span class="path">/MyData/source/haiku/</span> e tenha o caminho <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> sob o ponteiro do mouse, o último item do menu resultará no caminho absoluto, combinado &lt;<i>suspiro profundo</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
+<p>By the way, right-clicking into the Terminal window will insert the clipboard. In combination with copying parts of highlighted paths, this can be used for speedy navigation of deep folder hierarchies.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Personalização do Bash</a></h2>
 <p>Vindo do Unix, existem incontáveis possibilidades para personalizar o próprio bash. Existem dois arquivos que são especialmente importantes para o usuário: <span class="cli">.profile</span> e <span class="cli">.inputrc</span>.<br />
-Ambos podem ser criados na pasta <span class="path">home/</span> e adicionar ou sobrepor os padrões do sistema que são definidos em <span class="path">/boot/common/etc/</span>.</p>
+Ambos podem ser criados na pasta <span class="path">home/</span> e adicionar ou sobrepor os padrões do sistema que são definidos em <span class="path">/boot/system/settings/etc/</span>.</p>
 
 <h3>.profile</h3>
 <p>O <span class="cli">.profile</span> é carregado toda vez que se abre um novo Terminal. Ele define todos os tipos de apelidos e variáveis que afetarão o comportamento e a aparência do bash. Você encontrará muitos recursos online que detalharão todas as possibilidades.</p>

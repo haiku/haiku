@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -64,81 +64,79 @@
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
 <p>The second alert pops up if you try to rename or delete something in the system hierarchy. Here, the "<span class="button">Rename</span>" button will only become clickable when you're holding down the <span class="key">SHIFT</span> key.</p>
-<p>Generalmente, ci sono tre directory separate che partono dalla cartella principale del volume di avvio:</p>
+<p>Generally, there are two separate branches springing from the root folder of the boot volume:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>appartiene al sistema. Non deve essere modificata!</td></tr>
-<tr><td><span class="path">/boot/common/</span></td><td> </td><td>contiene i file che sono condivisi tra gli utenti.</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>è la cartella personale dove sono conservati i dati e le informazioni.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Contains system files and applications/packages shared by all users.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>This is your personal folder where you keep your data and settings and the applications/packages that are <i>not</i> shared by all users.</td></tr>
 </table>
+<p>As long as Haiku isn't multi-user, this distinction between shared and not-shared applications/packages has no apparent effect, as there's only one user with one home folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">La cartella system - <span class="path">/boot/system/</span></a></h2>
-<p>Su BeOS, il predecessore di Haiku, questa cartella era chiamata <span class="path">/boot/beos/</span>. È possibile incontrarla leggendo della vecchia documetazione (ad esempio quella originale come il BeBook).<br />
-Qualunque sia il suo nome, non bisogna alterare ciò che contiene, poiché ogni aggiornamento di Haiku potrebbe aggiungere, rimuovere o sovrascrivere qualsiasi cosa all'interno della cartella. Se si vogliono aggiungere funzionalità, magari altri Add-On del Tracker o dei Translator oppure un altro driver, bisognerà installare i file nella cartella <span class="path">/boot/home/</span> altrimenti se si vuole rendere disponibile il componente a tutti gli utenti, in <span class="path">/boot/common/</span>. Finché Haiku non sarà multi-utente, questa distinzione non avrà alcun effetto apparente, in quanto non c'è nessun utente con la cartella <i>home</i>. E' sensato invece imparare la via corretta fin dall'inizio nell'eventualità che ci sia il supporto per più utenti.</p>
-<p>Dunque, diciamo che se si volesse installare un nuovo translator per l'ultimo formato immagine, <b>non bisognerà </b> semplicemente copiarlo nella rispettiva cartella di sistema. Si faccia presente che non bisogna modificarla.<br />
-Invece, è consigliato collocarlo nella directory speculare sotto <span class="path">/boot/common/</span> oppure <span class="path">/boot/home/config/</span>.</p>
-<p>Nel nostro caso la posizione per i translator nella cartella di sistema è:</p>
-<p><span class="path">/boot/system/add-ons/Translators/</span></p>
-<p>Dunque la cartella speculare dell'utente è sia</p>
-<p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
-sia<br />
-<span class="path">/boot/common/add-ons/Translators/</span></p>
-<p>Questo è un altro vantaggio: Se il componente installato crea disordine (il che è possibile se installi un driver hardware) c'è la possibilità di disabilitare gli <i>"User Add-On"</i> tramite il menu del <a href="bootloader.html">Boot Loader</a> e si potrà quindi di avviare il sistema senza il componente incriminato.</p>
-<p>La maggior parte delle volte, però, non si avrà a che fare con queste cose, dato che ogni software che viene da una fonte attendibile dovrebbe includere una routine di installazione che gestisce questi procedimenti.<br />
-<!--
-If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
-</p>
-<p><i>TODO.... Table to be added ....</i>
-<table>
+<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
+Most of the folders inside <span class="path">/boot/system/</span> are read-only, which is sensible as they contain the files necessary for Haiku to function correctly and therefore have to be safe from (accidental) alteration. The only user-writable folders are:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>Contains cached files and the temporary folder linked to <span class="path">/tmp/</span>.</td></tr>
+<tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives).</td></tr>
+<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Besides holding Haiku's system packages, you can add/remove packages shared by all users.</td></tr>
+<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Contains system-wide settings.</td></tr>
+<tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Contains logs like the syslog (important when troubleshooting) and is the default location for the swap file.</td></tr>
 </table>
--->
-</p>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="common" name="common">La cartella comune - <span class="path">/boot/common/</span></a></h2>
-<p>Haiku non è ancora un sistema multi-utente. Quando lo diventerà, ogni utente avrà la sua cartella <i>home</i> che non sarà accessibile a nessun altro. Ogni applicazione o componente aggiuntivo come gli Add-On del Tracker, Translator etc. così come tutti i dati che si suppone essere condivisi tra diversi utenti, devono essere collocati all'interno di <span class="path">/boot/common/</span>.</p>
+<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="home" name="home">La cartella Home - <span class="path">/boot/home/</span></a></h2>
-<p>Questa cartella appartiene all'utente. Qui è possibile creare e cancellare file e cartelle come desiderato. Comunque è consigliabile non toccare troppo la directory <span class="path">~/config/</span> e le sue sottocartelle. Si potrebbe ad esempio cancellare la cartella <span class="path">~/config/settings/</span> senza danneggiare il sistema operativo, ma chi è che vorrebbe perdere tutte le configurazioni e le impostazioni delle applicazioni? In ogni caso il sistema avvisa con gli allarmi citati in precedenza.</p>
-<p>Oltre alla directory <span class="path">~/config/add-ons/</span>,  che rispecchia la cartella add-on del sistema per i componenti aggiuntivi come descritto sopra, ci sono altre cartelle di interesse. (A proposito, la tilde ("<tt>~</tt>") è una scorciatoia per la cartella home, così non bisogna sempre scrivere "<span class="path">/boot/home/</span>" nel terminale.)</p>
+<p>This folder belongs to you. Here you can create and delete files and folders as you wish. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)<br />
+Files that you'd like to share with other users in a future multi-user environment have do be put outside <span class="path">/boot/home/</span>. For example, you could create a folder <span class="path">/boot/all-users/</span> and put the stuff there.</p>
+
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
-<td>Dove vengono tenute di default le mail dell'utente.</td></tr>
+<tr><td><span class="path">~/Desktop/</span></td><td style="width:10px;"> </td>
+<td>Holds the files of your desktop. Double-clicking won't open it, as it is already always visible. When your files happen to be obscured by open windows, just switch quickly to another <a href="workspaces.html">Workspace</a>. Of course, <a href="tracker.html#drill-down">drilling</a> down by right-clicking is also possible.</td></tr>
+<tr><td><span class="path">~/mail/</span></td><td style="width:10px;"> </td>
+<td>This is the default location for your mails.</td></tr>
+<tr><td><span class="path">~/people/</span></td><td style="width:10px;"> </td>
+<td>This is the default location for you contact files, see <a href="applications/people.html">People</a>.</td></tr>
+<tr><td><span class="path">~/queries/</span></td><td style="width:10px;"> </td>
+<td><a href="queries.html">Queries</a> are stored here, by default temporarily for 7 days.</td></tr>
+</table>
 
-<tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
-<td>Le <a href="queries.html">Query</a>, di default, sono tempraneamente memorizzate in questa cartella per 7 giorni.</td></tr>
+<p>The folder <span class="path">/boot/home/config/</span> is special: just like <span class="path">/boot/system/</span> it's mostly under the control of the package management and therefore read-only. It too contains these similar user-writable folders:</p>
 
-<tr><td><span class="path">~/config/be/</span></td><td> </td>
-<td>Dall'eredità di BeOS, la cartella <span class="path">be</span> contiene ciò che è mostrato nel <a href="deskbar.html#deskbar-menu">menu della Deskbar</a>. E' possibile aggiungere e rimuovere elementi, mettendo file, cartelle, links o query dentro questa cartella.</td></tr>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">~/config/packages/</span></td><td style="width:10px;"> </td>
+<td>Here you can add/remove packages that are <i>not</i> shared by all users.</td></tr>
 
-<tr><td><span class="path">~/config/bin/</span></td><td> </td>
-<td>La cartella<span class="path">/boot/system/bin/</span> contiene tutti i programmi a linea di comando.</td></tr>
-
-<tr><td><span class="path">~/config/boot/</span></td><td> </td>
-<td>Questa cartella è il luogo per gli <a href="bash-scripting.html#user-scripts">User Scripts</a> che sono eseguiti prima o dopo l'avvio o lo spegnimento del sistema.</td></tr>
-
-<tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
-<td>I link a programmi o documenti in questa cartella partono automaticamente ad ogni avvio del sistema.</td></tr>
-
-<tr><td><span class="path">~/config/data/fonts/</span></td><td> </td>
-<td>Basta copiare un font TrueType o Postscript dentro questa cartella per poterlo utilizzare.</td></tr>
+<tr><td class="onelinetop"><span class="path">~/config/non-packaged/</span></td><td> </td>
+<td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives) and are <i>not</i> shared by all users.</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
 <td>Questa cartella contiene le impostazioni per ogni applicazione e alcune configurazioni del sistema. Alcune applicazioni gestiscono le proprie impostazioni nelle loro sottocartelle, altre collocano semplicemente i loro file di configurazione qua.</td></tr>
+</table>
 
-<tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
+<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
+<p>Here are some of the more interesting subfolders in <span class="path">~/config/settings</span>:</p>
+
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">boot/</span></td><td style="width:10px;"> </td>
+<td>Questa cartella è il luogo per gli <a href="bash-scripting.html#user-scripts">User Scripts</a> che sono eseguiti prima o dopo l'avvio o lo spegnimento del sistema.</td></tr>
+
+<tr><td><span class="path">boot/launch/</span></td><td> </td>
+<td>I link a programmi o documenti in questa cartella partono automaticamente ad ogni avvio del sistema.</td></tr>
+
+<tr><td><span class="path">beos_mime/</span></td><td> </td>
 <td>Nel database <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> Haiku tiene traccia di ogni differente <a href="filetypes.html">tipo di file</a> e delle sue impostazioni.</td></tr>
 
-<tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
+<tr><td class="onelinetop"><span class="path">deskbar/menu/</span></td><td> </td>
+<td>Copied or linked to files/folders/queries in this folder appear in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>.</td></tr>
+
+<tr><td class="onelinetop"><span class="path">kernel/drivers/</span></td><td> </td>
 <td>C'è un file di impostazioni che può essere interessante: Il <span class="cli">kernel</span> permette alcune configurazioni di basso livello come la disattivazione del <acronym title="Symmetric Multi Processing">SMP</acronym>, l'attivazione del debugging seriale or la possibilità di attivare la gestione avanzata del risparmio energetico. Attiva una linea di configurazione rimuovendo il simbolo del commento "<tt>#</tt>". Fai attenzione!</td></tr>
 
-<tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
-<td>Oltre alle varie impostazioni per i file del Tracker, ci sono alcune interessanti sottocartelle :</td></tr>
+<tr><td><span class="path">Tracker/</span></td><td> </td>
 
+<td>Oltre alle varie impostazioni per i file del Tracker, ci sono alcune interessanti sottocartelle :</td></tr>
 <tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Mostra e stabilisce tutte le proprietà e le dimensioni della finestra a proprio piacimento. Ogni nuova cartella che si crea lo userà come modello.</td></tr>
 
 <tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Si può definire il layout di una "Query result window" per determinati tipi di file <a href="queries.html#result-window">Query: La finestra dei risultati </a>.</td></tr>

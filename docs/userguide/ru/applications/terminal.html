@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,14 +57,15 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Терминал (Terminal)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Приложения (Applications)</span></td></tr>
 <tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - дополняет/переопределяет параметры  указанные в <span class="path">/boot/system/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - дополняет/переопределяет параметры  указанные в <span class="path">/boot/system/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
 <p>Терминал - это интерфейс Haiku к командной оболочке bash (Bourne Again Shell)</p>
@@ -97,12 +98,15 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Горячие клавиши</a></h2>
 <p>Список полезных сочетаний клавиш  вы можете найти <a href="../keyboard-shortcuts.html#terminal">в данной теме</a>.</p>
+<p>Another nice feature that is more a key &amp; mouse combination: When holding <span class="key">ALT</span> a path or URL under the mouse pointer gets highlighted. A left-click opens the file/folder or website. A right-click opens a context menu to either <span class="menu">Copy path</span> or <span class="menu">Copy absolute path</span>. Imagine you're in <span class="path">/MyData/source/haiku/</span> and have the path <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> under the mouse pointer, the latter menu item  will result in the combined, absolute path &lt;<i>deep breath</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
+<p>By the way, right-clicking into the Terminal window will insert the clipboard. In combination with copying parts of highlighted paths, this can be used for speedy navigation of deep folder hierarchies.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Настройка командной оболочки Bash</a></h2>
-<p>Пришедшая из Unix, командная оболочка Bash имеет очень широкие возможности по настройке. Существуют два наиболее важных для пользователя файла: <span class="cli">.profile</span> и <span class="cli">.inputrc</span><br />
-Оба файла могут быть созданы в домашней папке (<span class="path">/boot/home/</span>), где они дополняют или переопределяют (т. к. являются более приоритетными) системные настройки по умолчанию, расположенные по адресу  <span class="path">/boot/common/etc/</span>.</p>
+<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
+Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/settings/etc/</span>.</p>
 
 <h3>.profile</h3>
 <p><span class="cli">.profile</span> загружается каждый раз, когда вы открываете новый Терминал. Этот файл устанавливает все виды псевдонимов и переменных, которые затрагивают поведение командной оболочки и её внешнего вида. Существует множество онлайн ресурсов, на которых детально описаны все эти возможности.</p>

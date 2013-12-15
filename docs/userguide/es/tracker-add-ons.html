@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -60,11 +60,10 @@
 <h1>Agregados de Tracker</h1>
 
 <p>Las aplicaciones pueden instalar agregados para que puedan invocarse fácilmente en una selección de archivos desde Tracker. Únicamente los agregados que pueden manejar un tipo de archivo específico se presentan bajo <span class="menu">Add-Ons</span> del menú contextual o del menú <span class="menu">File</span> (archivo) de una ventana de Tracker. Algunos agregados no necesitan necesariamente de un archivo para trabajar y por ello siempre están presentes.</p>
-<p>Los agregados de Tracker, o enlaces a aplicaciones que pueden actuar como agregados, pueden instalarse en tres diferentes ubicaciones (vea el tema <a href="filesystem-layout.html">Disposición del sistema de archivos</a>):</p>
+<p>New Tracker add-ons that don't come as part of a regular .hpkg package, can be installed by copying them into their respective non-packaged folder (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td> para los agregados proporcionados por el sistema.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> para los agregados visibles para todos los usuarios.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> para los agregados disponibles únicamente para usted.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td> para los agregados visibles para todos los usuarios.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td> para los agregados disponibles únicamente para usted.</td></tr>
 </table>
 <p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-O</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
 Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>

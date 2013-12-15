@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,15 +56,15 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h1>Дополнения для Tracker (Tracker add-ons)</h1>
 
 <p>Некоторые приложения устанавливают дополнения (<span class="menu">Add-ons</span>), и они могут быть легко вызваны для выбранных файлов в Tracker. В контекстном меню отображаются только те дополнения, которые применимы для выделенного файла (определяются по идентификатору типа), также их можно вызвать через меню File окна Tracker. Некоторые дополнения не обязательно нуждаются в файле для работы и присутствуют в меню всегда.</p>
-<p>Дополнения Tracker или ссылки на программы, которые могут действовать как дополнения, могут быть установлены в трех различных местоположениях (подробнее см. <a href="filesystem-layout.html">Иерархия файловой системы</a>):</p>
+<p>New Tracker add-ons that don't come as part of a regular .hpkg package, can be installed by copying them into their respective non-packaged folder (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, поставляемых с системой.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, доступных всем пользователям.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, доступных только текущему пользователю.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, доступных всем пользователям.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, доступных только текущему пользователю.</td></tr>
 </table>
 <p>К имени файла дополнения может быть добавлено тире с заглавной буквой, и тогда оно станет доступно через горячие клавиши. Например, <span class="app">Open Target Folder-O (Открыть целевую папку)</span> откроется при нажатии <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span>.<br />
 Конечно, вы должны позаботиться о возможных конфликтах, выбирая горячую клавишу. У разных дополнений они должны быть разными.</p>

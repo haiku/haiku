@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -61,10 +61,10 @@
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Applications">Anwendungen</acronym></span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/apps/Terminal">/boot/System/apps/Terminal</acronym></span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/Terminal">~/Konfiguration/settings/Terminal</acronym></span><br />
-<span class="path">~/.profile</span> - ergänzen/ändern von Standardwerten, die in <span class="path"><acronym title="/boot/common/etc/profile">/boot/Allgemein/etc/profile</acronym></span> definiert sind<br />
-<span class="path">~/.inputrc</span> - ergänzen/ändern von Standardwerten, die in <span class="path"><acronym title="/boot/common/etc/inputrc">/boot/Allgemein/etc/inputrc</acronym></span> definiert sind</td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
+<span class="path">~/.profile</span> - ergänzen/ändern von Standardwerten, die in <span class="path">/boot/system/settings/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - ergänzen/ändern von Standardwerten, die in <span class="path">/boot/system/settings/etc/inputrc</span> definiert sind</td></tr>
 </table>
 <p><br /></p>
 <p>Das Terminal ist Haikus Schnittstelle zur Bash, der "Bourne Again Shell".</p>
@@ -97,12 +97,15 @@ Unterschiedliche Einstellungen lassen sich in getrennten Profilen speichern, die
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Tastaturkürzel</a></h2>
 <p>Eine Liste mit Tastaturkürzeln ist unter <a href="../keyboard-shortcuts.html#terminal">Abkürzungen und Tastenkombinationen</a> aufgelistet.</p>
+<p>Ein weiteres nettes Feature is eher eine Tasten &amp; Maus-Kombination: Hält man  <span class="key">ALT</span> gedrückt, werden Pfade und URLs hervorgehoben, die sich unter dem Mauszeiger befinden. Ein Linksklick öffnet die Datei, Ordner oder Webseite. Ein Rechtsklick zeigt ein Kontextmenü zum <span class="menu">Pfad kopieren</span> oder <span class="menu">Absoluten Pfad kopieren</span>. Angenommen man befindet sich in <span class="path">/MyData/source/haiku/</span> und hat den Pfad <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> unter dem Mauszeiger, kopiert letzterer Menüpunkt den kombinierten, absoluten Pfad:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>Wird <span class="key">ALT</span> <span class="key">SHIFT</span> gehalten, wird ein Pfad nur von seinem Anfang bis zum Mauszeiger hervorgehoben.</p>
+<p>Übrigens fügt ein Rechtsklick im Terminalfenster den Inhalt der Zwischenablage ein. In Kombination mit dem Kopieren von Teilen hervorgehobener Pfade, lassen sich so zügig verschachtelte Dateihierachien durchstreifen..</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Personalisierung der Bash</a></h2>
 <p>Da die Bash aus der Unix-Welt stammt, gibt es unzählige Möglichkeiten sie anzupassen. Zwei davon sind für den Anwender besonders interessant: <span class="cli">.profile</span> und <span class="cli">.inputrc</span><br />
-Werden diese beiden Dateien im <span class="path"><acronym title="home/">Benutzer/</acronym></span> Verzeichnis angelegt, erweiteren oder ersetzen die Standardwerte, die in <span class="path"><acronym title="/boot/common/etc/">/boot/Allgemein/etc/</acronym></span> festgelegt sind, </p>
+Werden diese beiden Dateien im <span class="path">home/</span> Verzeichnis angelegt, erweiteren oder ersetzen die Standardwerte, die in <span class="path">/boot/system/settings/etc/</span> festgelegt sind, </p>
 
 <h3>.profile</h3>
 <p>Die Datei <span class="cli">.profile</span> wird jedes Mal geladen, wenn ein neues Terminal gestartet wird. Durch sie werden die verschiedensten Variablen und Verhalten innerhalb der Bash definiert. Im Internet findet man eine Unmenge an Dokumentation, die alle Möglichkeiten im Detail zeigt.</p>

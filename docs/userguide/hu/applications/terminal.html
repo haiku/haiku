@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -60,8 +60,8 @@
 <tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Programok</span></td></tr>
 <tr><td>Útvonal:</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>Beállítások:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - a <span class="path">/boot/common/etc/profile</span> fájl kibővítése/felülírása<br />
-<span class="path">~/.inputrc</span> - a <span class="path">/boot/common/etc/inputrc</span> fájl kibővítése/felülírása</td></tr>
+<span class="path">~/.profile</span> - a <span class="path">/boot/system/settings/etc/profile</span> fájl kibővítése/felülírása<br />
+<span class="path">~/.inputrc</span> - a <span class="path">/boot/system/settings/etc/inputrc</span> fájl kibővítése/felülírása</td></tr>
 </table>
 <p><br /></p>
 <p>A Terminál a Haiku bash (Bourne Again Shell) felületete.</p>
@@ -94,12 +94,16 @@ A <span class="button">Rendben</span> megnyomásával ezeket a beállításokat 
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Billentyűzet parancsok</a></h2>
 <p>A hasznos kombinációk listája a <a href="../keyboard-shortcuts.html#terminal">Billentyűzet-kombinációk</a> fejezetben található.</p>
+<p>
+A Terminál tartalmaz egy remek funkciót, ami több, mint egy egér-billentyű kombináció: Az <span class="key">ALT</span> lenyomásakor a kurzor alatti útvonal illetve URL kiemelésre kerül. A bal egérgomb lenyomásakor megnyílik a kiemelt útvonal vagy oldal. Jobb egérgombbal az alábbi lehetőségeket kapjuk: <span class="menu">Útvonal másolása</span> vagy <span class="menu">Teljes útvonal másolása</span>. Gondoljunk bele, hogy most a <span class="path">/MyData/source/haiku/</span> mappában vagyunk és a kurzor alatt a <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> útvonal található. Az utóbbi lehetőség használata az útvonalak összefűzését eredményezi, vagyis a teljes elérési útvonalat:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>Az <span class="key">ALT</span> <span class="key">SHIFT</span> lenyomásával az egér pozícióig kerül kiemelésre az útvonal.</p>
+<p>Jobb kattintással a vágólap tartalma kerül a Terminál ablakba. Ezt kombinálva az útvonalak kiemelésével gyorsan navigálhatunk a hierarchiában mélyebben lévő mappákba is.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Bash személyre szabása</a></h2>
 <p>Számtalan lehetőség van a bash konfigurálására. Két fájl kifejezetten fontos a felhasználók számára: <span class="cli">.profile</span> és <span class="cli">.inputrc</span><br />
-Mind a kettőt a <span class="path">home/</span> mappában kell létrehozni, és a <span class="path">/boot/common/etc/</span> mappában lévő eredeti fájlok tartalmát átmásolni az újonnan létrehozottakba.</p>
+Mind a kettőt a <span class="path">home/</span> mappában kell létrehozni, és a <span class="path">/boot/system/settings/etc/</span> mappában lévő eredeti fájlok tartalmát átmásolni az újonnan létrehozottakba.</p>
 
 <h3>.profile</h3>
 <p>A <span class="cli">.profile</span> minden alkalommal betöltődik mikor egy új Terminált nyitunk meg. Ebben minden, a bash-el kapcsolatos működési és megjelenítési beállítás megtalálható. További információk találhatóak az interneten.</p>

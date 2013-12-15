@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,6 +57,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h1>ファイルシステムの設計</h1>
 
@@ -65,83 +66,79 @@
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
 <p>システム階層下の何かをリネームまたは削除しようとすると、第二の警告が表示されます。 "<span class="button">Rename</span>" ボタンは <span class="key">SHIFT</span> キーを押している間だけクリックできます。</p>
-<p>通常、ブートボリュームのルートフォルダーから、次の 3 つのフォルダーが別々に枝分かれしています： </p>
+<p>Generally, there are two separate branches springing from the root folder of the boot volume:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>システムのフォルダー。変更を加えてはいけません！</td></tr>
-<tr><td><span class="path">/boot/common/</span></td><td> </td><td>ユーザ間で共有されるファイルを格納します。</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>ユーザの個人フォルダーです。データと設定が保存されます。</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Contains system files and applications/packages shared by all users.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>This is your personal folder where you keep your data and settings and the applications/packages that are <i>not</i> shared by all users.</td></tr>
 </table>
+<p>As long as Haiku isn't multi-user, this distinction between shared and not-shared applications/packages has no apparent effect, as there's only one user with one home folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">システムフォルダー - <span class="path">/boot/system/</span></a></h2>
-<p>Haiku の前身である BeOS では、このフォルダーは <span class="path">/boot/beos/</span> と名付けられていました。まだその名称をいくつかの古いドキュメント (たとえば、オリジナルの BeBook) の中に見ることができます。<br />
-システムフォルダーの名称にかかわらず、その内部にあるものを変更すべきではありません。 Haiku をアップデートするたびに、システムフォルダー内にファイルやフォルダーが追加されたり、システムフォルダー内のファイルやフォルダーが削除・上書きされたりする可能性があります。他の Tracker アドオンや Translator 、あるいは他のハードウェアドライバで機能を追加したい場合は、自分の <span class="path">/boot/home/</span> の階層に、あるいはこれがすべてのユーザ向けであると思われる時は、 <span class="path">/boot/common/</span> の下にこれらをインストールします。 Haiku が現在同様マルチユーザに対応していない間は、1 つの <i>home</i> フォルダーを持った 1 人のユーザしか存在しないので、この区別には明白な効果がありません。しかし、将来的には 1 人以上の複数ユーザがサポートされるため、最初から正しい方法を知っておくことには意味があります。</p>
-<p>それでは、仮に最新の画像形式のための新しい Translator をインストールするとしましょう。各自のシステムフォルダーにそれを単純にコピーしてはいけません。思い出してください： システムフォルダーに変更を加えてはいけません！<br />
-その代わりに、それを <span class="path">/boot/common/</span> あるいは <span class="path">/boot/home/config/</span> の下にある、システムフォルダーがミラーされている階層に入れます。</p>
-<p>この例では、システムフォルダー下の Translator の位置は</p>
-<p><span class="path">/boot/system/add-ons/Translators/</span>
-となります。</p>
-<p>したがって、ユーザの「ミラー」フォルダーは</p>
-<p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
-または<br />
-<span class="path">/boot/common/add-ons/Translators/</span>
-となります。</p>
-<p>これには別の長所があります： インストールしたコンポーネントがうまく動かない場合（上の手順に従ってハードウェアドライバをインストールする場合にも起こりえます）は、 <a href="bootloader.html">ブートローダー</a>メニューから "<i>Disable user add-ons</i>" を選択することで、問題を起こすコンポーネントをいつでも無効化してブートすることができます。</p>
-<p>しかしほとんどのケースにおいて、どのフォルダーにソフトウェアコンポーネントを配置すべきか気にする必要はまったくないでしょう。信頼できるソースからのすべてのソフトウェアは、適切なフォルダーにコンポーネントを配置するためのインストールルーチンを含むはずだからです。<br />
-<!--
-If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
-</p>
-<p><i>TODO.... Table to be added ....</i>
-<table>
+<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
+Most of the folders inside <span class="path">/boot/system/</span> are read-only, which is sensible as they contain the files necessary for Haiku to function correctly and therefore have to be safe from (accidental) alteration. The only user-writable folders are:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>Contains cached files and the temporary folder linked to <span class="path">/tmp/</span>.</td></tr>
+<tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives).</td></tr>
+<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Besides holding Haiku's system packages, you can add/remove packages shared by all users.</td></tr>
+<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Contains system-wide settings.</td></tr>
+<tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Contains logs like the syslog (important when troubleshooting) and is the default location for the swap file.</td></tr>
 </table>
--->
-</p>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="common" name="common">共有フォルダー - <span class="path">/boot/common/</span></a></h2>
-<p>Haiku はまだマルチユーザシステムではありません。しかしながら、マルチユーザに対応すれば、すべてのユーザが他人にアクセスされない個人のホームフォルダーを持つことになります。すべてのアプリケーション、 Tracker アドオンや Translator などの追加コンポーネントは異なるユーザ間で共有されると思われるあらゆるデータと同様に、 <span class="path">/boot/common/</span> に入ります。</p>
+<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="home" name="home">ホームフォルダー - <span class="path">/boot/home/</span></a></h2>
-<p>このフォルダーはユーザが所有しています。ここでは自由にファイルやフォルダーを作成、削除できます。しかしながら <span class="path">~/config/</span> ディレクトリおよびそのサブフォルダーをむやみに操作してはいけません。例えば <span class="path">~/config/settings/</span> フォルダーがオペレーティングシステム自体にダメージを与えることなく削除<i>できるとしても</i>、自分の構成とアプリケーションの設定をすべて失いたい人がいるでしょうか？どのような場合であれ、システムは最初に述べたアラートで警告します。</p>
-<p>システムの、上記ような追加のコンポーネントのためのアドオンフォルダーのミラーである <span class="path">~/config/add-ons/</span> フォルダーに加えて、他にもいくつか興味を引くフォルダーがあります。（なお、チルダ ("<tt>~</tt>") はホームフォルダーへのショートカットです。 ターミナルで毎回 "<span class="path">/boot/home/</span>" と入力する必要はありません。）</p>
+<p>This folder belongs to you. Here you can create and delete files and folders as you wish. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)<br />
+Files that you'd like to share with other users in a future multi-user environment have do be put outside <span class="path">/boot/home/</span>. For example, you could create a folder <span class="path">/boot/all-users/</span> and put the stuff there.</p>
+
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
-<td>標準ではここにメールが保存されています。</td></tr>
+<tr><td><span class="path">~/Desktop/</span></td><td style="width:10px;"> </td>
+<td>Holds the files of your desktop. Double-clicking won't open it, as it is already always visible. When your files happen to be obscured by open windows, just switch quickly to another <a href="workspaces.html">Workspace</a>. Of course, <a href="tracker.html#drill-down">drilling</a> down by right-clicking is also possible.</td></tr>
+<tr><td><span class="path">~/mail/</span></td><td style="width:10px;"> </td>
+<td>This is the default location for your mails.</td></tr>
+<tr><td><span class="path">~/people/</span></td><td style="width:10px;"> </td>
+<td>This is the default location for you contact files, see <a href="applications/people.html">People</a>.</td></tr>
+<tr><td><span class="path">~/queries/</span></td><td style="width:10px;"> </td>
+<td><a href="queries.html">Queries</a> are stored here, by default temporarily for 7 days.</td></tr>
+</table>
 
-<tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
-<td><a href="queries.html">クエリ</a>は初期設定で7日間このフォルダーに一時保存されます。</td></tr>
+<p>The folder <span class="path">/boot/home/config/</span> is special: just like <span class="path">/boot/system/</span> it's mostly under the control of the package management and therefore read-only. It too contains these similar user-writable folders:</p>
 
-<tr><td><span class="path">~/config/be/</span></td><td> </td>
-<td>先と同様に、BeOS から受け継いだ <span class="path">be</span> フォルダーは<a href="deskbar.html#deskbar-menu">デスクバーメニュー</a>で表示される項目を含んでいます。このフォルダーにファイルやフォルダー、リンク、クエリを入れることで 項目の追加や削除ができます。</td></tr>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">~/config/packages/</span></td><td style="width:10px;"> </td>
+<td>Here you can add/remove packages that are <i>not</i> shared by all users.</td></tr>
 
-<tr><td><span class="path">~/config/bin/</span></td><td> </td>
-<td>システムの <span class="path">/boot/system/bin/</span> フォルダーを補完するもので、ユーザのコマンドラインプログラムをすべて保持します。</td></tr>
-
-<tr><td><span class="path">~/config/boot/</span></td><td> </td>
-<td>このフォルダーにはシステムのブート前またはシャットダウン後に実行される<a href="bash-scripting.html#user-scripts">ユーザスクリプト</a>が置かれます。</td></tr>
-
-<tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
-<td>このフォルダー下にあるプログラムやドキュメントへのリンクは、ブートごとに自動で起動します。</td></tr>
-
-<tr><td><span class="path">~/config/data/fonts/</span></td><td> </td>
-<td>このフォルダーに TrueType フォントまたは Postscript フォントをコピーするだけでそのフォントはすぐに使えるようになります。</td></tr>
+<tr><td class="onelinetop"><span class="path">~/config/non-packaged/</span></td><td> </td>
+<td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives) and are <i>not</i> shared by all users.</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
 <td>このフォルダーは、すべてのアプリケーションの設定と、システムに関する 2、3 の設定を含んでいます。個別のサブフォルダーによって設定を管理するアプリケーションと、単に設定ファイルを置くだけのアプリケーションがあります。</td></tr>
+</table>
 
-<tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
+<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
+<p>Here are some of the more interesting subfolders in <span class="path">~/config/settings</span>:</p>
+
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">boot/</span></td><td style="width:10px;"> </td>
+<td>このフォルダーにはシステムのブート前またはシャットダウン後に実行される<a href="bash-scripting.html#user-scripts">ユーザスクリプト</a>が置かれます。</td></tr>
+
+<tr><td><span class="path">boot/launch/</span></td><td> </td>
+<td>このフォルダー下にあるプログラムやドキュメントへのリンクは、ブートごとに自動で起動します。</td></tr>
+
+<tr><td><span class="path">beos_mime/</span></td><td> </td>
 <td>この <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> データベースで、 Haiku はすべての異なる<a href="filetypes.html">ファイルタイプ</a>、およびそれらの設定を管理します。</td></tr>
 
-<tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
+<tr><td class="onelinetop"><span class="path">deskbar/menu/</span></td><td> </td>
+<td>Copied or linked to files/folders/queries in this folder appear in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>.</td></tr>
+
+<tr><td class="onelinetop"><span class="path">kernel/drivers/</span></td><td> </td>
 <td>興味を引きそうな設定ファイルである <span class="cli">kernel</span> は、 <acronym title="Symmetric Multi Processing">SMP</acronym> を無効にする、シリアルデバッギングを有効にする、あるいは高度な電源管理を可能にするといったいくつかの低レベルの設定を提供します。コメント記号 "<tt>#</tt>" を削除することで設定行が有効になります。このフォルダー内では慎重になってください！</td></tr>
 
-<tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
-<td>ここには、 Tracker のための様々な設定ファイルに加え、興味を引くサブフォルダがいくつかあります：</td></tr>
+<tr><td><span class="path">Tracker/</span></td><td> </td>
 
+<td>ここには、 Tracker のための様々な設定ファイルに加え、興味を引くサブフォルダがいくつかあります：</td></tr>
 <tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>すべての属性とウィンドウサイズを好きなように表示、アレンジできます。作成されるすべての新規フォルダーがテンプレートとしてそれを使用します。</td></tr>
 
 <tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>特定のファイルタイプのためのクエリ結果ウィンドウのレイアウトを定義できます。トピック<a href="queries.html#result-window">クエリ： 結果ウィンドウ</a>を参照してください。</td></tr>

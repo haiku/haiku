@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Pengphei Han
+ *		dill
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -86,7 +87,7 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="move-resize" name="move-resize">快速移动或调整窗口</a></h2>
 <p>移动和调整窗口时和多个并发运行程序交互的重要部分。除了通过微小的黄色标签和更窄的窗口边框，还有更为方便的方法可供使用。而且，该边角不仅很小，而且还有另外限制：它仅允许在右下角，并且沿右下角方向使用。<br />右键拖动边角将会改变其大小，但是您必须仔细进行操作。</p>
-<p>为了定位这些问题，Haiku 提供了使用组合键 <span class="key">CTRL</span> <span class="key">ALT</span> 和鼠标的灵活方法。更多窗口管理快捷键的信息，请查阅 <a href="keyboard-shortcuts.html#general">快捷键和组合键</a> 。</p>
+<p>为了处理这些问题，Haiku 提供了一个简洁的方案：使用窗口管理组合键 <span class="key">CTRL</span> <span class="key">ALT</span> 和鼠标。更多窗口管理快捷键的信息，请查阅 <a href="keyboard-shortcuts.html#general">快捷键和组合键</a> 。</p>
 <img src="images/gui-images/resizing.png" alt="resizing.png" />
 <p>按下 <span class="key">CTRL</span> <span class="key">ALT</span> 将会高亮显示最接近鼠标的窗口边界。向另一个边界方向移动将会激活该目标。点击并使用 <i>鼠标右键</i> 拖动将会重定义高亮边界的窗口。</p>
 <p>按下 <span class="key">CTRL</span> <span class="key">ALT</span> 并点击使用 <i>鼠标左键</i> 在窗口中拖动将会移动窗口。快速点击 <i>鼠标右键</i> 会将其置后。</p>
@@ -94,10 +95,10 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="stack-tile" name="stack-tile">重叠与拼贴</a></h2>
-<p>Haiku 的用户界面提供了一个特别的功能，根据其窗口仅拥有的一个黄色标签而非全部安度标题栏的实际情况，提供了非常精巧的功能。它称之为“重叠与拼贴”。<br />
-在下述图示中，一个具有书签的 Tracker 窗口拼贴到了其左边的 WebPositive 窗口，而其本身则与另一个显示源目录 <tt>haiku</tt> 的窗口相重叠。在这个动画中，用户点击重叠窗口的标签以便将它们交替置顶。 </p> 
+<p>Haiku 的用户界面提供了一个特别的功能，根据其窗口仅拥有一个黄色标签而非窗口全长的标题栏的实际情况，提供了非常精巧的功能，称之为“重叠与拼贴”。<br />
+在下述图示中，一个具有黄色标签的文件浏览器（Tracker）窗口拼贴到了WebPositive网络浏览器窗口的左侧，而其本身则与另一个显示 <tt>haiku</tt> 源文件夹的窗口相叠加。在这个动画中，用户点击叠加窗口的标签将它们切换到前面。 </p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>与此相关联，一组窗口可以移动并放置到一起，- 这样可以方便的在一个以项目为中心的环境中进行管理工作。不仅可以在文档窗口中进行便利的查找，甚至是与当前项目有关的编辑器，文件浏览器，以及电子邮件，你也可以将它们重叠拼贴起来。</p>
+<p>像上述这样拼贴到一起，一组窗口就可以一起移动或改变大小，这样可以在一个多窗口的项目工作环境中更便捷的进行管理。而不必去不同的窗口中查找文档、编辑器、文件浏览器，甚至相关的电子邮件，你只需将它们叠加拼贴起来就行了。</p>
 <p>窗口的排布也非常简单：按下 <span class="key">OPT</span> 键，通过标签拖动窗口到另一个窗口的标签或边界，直到其显示为高亮后，然后再释放鼠标按键。</p>
 <p>重叠和拼贴由两个相关部分组成。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -117,7 +118,7 @@
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
 <p>它具有所有常用的东西：当前文件夹下可选的文件列表，用于输入文件名的文本框，用于不同文件格式的弹出菜单，以及有关的设置。<br />
 您可以使用文件列表上面的弹出菜单进入上层文件夹。</p>
-<p>如果您已经拥有一个Tracker窗口用于打开文件，您可以将任何的文件或者代表的文件夹（例如，在菜单栏最右边的标志）拖拽到该面板。然后，它将会修改面板指向新的位置。</p>
+<p>如果您已经有一个打开的文件浏览器（Tracker）窗口，您可以将里边的任何文件或文件夹或类似的东西（例如，在菜单栏最右边的标志）拖拽到这个打开与保存面板。之后，它会修改这个面板指向新的位置。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

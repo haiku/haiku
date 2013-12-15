@@ -58,10 +58,10 @@
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku-spezifische Konsolenprogramme</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Ort:</td><td style="width:15px;"></td><td><span class="path"><acronym title="/boot/system/bin">/boot/System/bin</acronym></span><br /><span class="path"><acronym title="/boot/common/bin">/boot/Allgemein/bin</acronym></span><br /><span class="path"><acronym title="~/config/bin">~/Konfiguration/bin</acronym></span></td></tr>
+<tr><td>Ort:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Alle Konsolenprogramme, die zusammen mit Haiku installiert werden, befinden sich entweder in <span class="path">/boot/system/bin</span> oder <span class="path">/boot/common/bin</span>. Eigene oder zusätzliche Konsolenprogramme sollten nach <span class="path">~/config/bin</span> wandern. Diese Orte sind alle Teil der PATH Variable und werden daher automatisch gefunden.<br />
+<p>Alle Konsolenprogramme, die zusammen mit Haiku installiert werden, befinden sich in <span class="path">/boot/system/bin</span>. Eigene oder zusätzliche Konsolenprogramme erscheinen in <span class="path">~/config/bin/</span> falls sie aus einem .hpkg Paket stammen. Ansonsten werden sie in <span class="path">~/config/non-packaged/bin/</span> abgelegt. Diese Orte sind alle Teil der PATH Variable und werden daher automatisch gefunden.<br />
 Die folgende Liste an Haiku-spezifischen Programmen ist natürlich nicht vollständig; sie beschreibt nur einige der nützlichsten um auf den Geschmack zu kommen. Es ist empfehlenswert die <span class="path">bin/</span> Verzeichnisse selbst etwas zu erkunden. Wird ein Konsolenprogramm mit dem Parameter <tt>--help</tt> aufgerufen, wird der Gebrauch des Befehls mit sämtlichen Optionen angezeigt.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

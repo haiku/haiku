@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Pengphei Han
+ *		dill
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -67,7 +68,7 @@
 在开始拷贝之前，会弹出一个显示重要信息的开始窗口。它不是毫无意义的你可以忽略的最终用户许可协议（EULA），它包括了如下的声明：</p>
 <ul>
 <li><p>这是测试质量的软件。一定要做好备份，否则要遭受无法预计的后果。</p></li>
-<li><p>安装器需要一个预备的分区。在Haiku的驱动安装器足够成熟来处理这个任务，否则您可能需要使用 <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> 或者一个类似的工具。</p></li>
+<li><p>安装器需要一个预备的分区。在 Haiku 的DriveSetup 足够成熟之前，您可能需要使用 <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> 或者一个类似的工具来处理分区任务。</p></li>
 <li>Haiku可以手动添加到 <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a> 启动管理器。具体的操作方法，请查阅 <a href="http://www.haiku-os.org/get-haiku/installation-guide">在线手册</a>。</li>
 </ul>
 <p><br /><br /></p>
@@ -82,8 +83,8 @@
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tools" name="tools">工具</a></h2>
 <p>在安装进程的结尾，目标分区会自动的设置为可启动分区。然而，也有可能发生一些情况，其他的操作系统或者分区工具覆盖了您的Haiku磁卷的引导扇区。遇到这种情况，从您的安装光盘启动，然后打开安装器 。在 <span class="menu">Onto: Please choose target</span> 菜单中选择您的Haiku启动分区，然后从 <span class="menu">Tools</span> 菜单中选择 <span class="menu">Write boot sector</span> 来恢复分区的可引导扇区。</p>
-<p>在 <span class="menu">Tools</span> 菜单中的 另一个项目是 <span class="menu">Boot Manager</span> ，它在启动扇区中放置了系统列表用于选择启动的操作系统。<br />
-如果您经常使用启动管理器，或者Haiku是机器上唯一的操作系统系统，您不就需要运行 <span class="app">Boot Manager</span>。如果您使用了Grub启动管理器，您就需要手动的添加Haiku（参看上文）。</p>
+<p>在 <span class="menu">Tools</span> 菜单中的另一个项目是 <span class="menu">Set up a boot menu</span> ，它用于在启动扇区中建立一个菜单来选择启动的操作系统。更多信息参见主题 <a href="bootmanager.html">启动管理器</a> 。<br />
+如果您已经使用了 GRUB 之类的启动管理器或者Haiku 是机器上唯一的操作系统，就不需要运行  <span class="app">启动管理器</span> ，对于前者您只能手动的在启动管理器中添加 Haiku 启动项（参看上文）。</p>
 
 
 </div>

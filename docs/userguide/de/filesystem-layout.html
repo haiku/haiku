@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,97 +55,95 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h1>Dateisystem Layout</h1>
 
 <p>In Haikus Dateisystem werden nach Möglichkeit allgemein verständliche Datei- und Ordnernamen verwendet, um den Benutzer nicht unnötig im Dunkeln zu lassen. Dateien und Ordner, die für das Funktionieren des Systems wichtig sind, werden gegen zufällige Änderungen durch einen der folgenden Hinweise geschützt:</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
-<p>Der zweite Hinweis erscheint wenn versucht wird etwas in der Systemhierarchie umzubenennen oder zu löschen. Der "<span class="button">Umbenennen</span>" Button wird nur geklickt werden während die <span class="key">SHIFT</span> Taste gehalten wird.</p>
-<p>Grundsätzlich verzweigt sich das Hauptverzeichnis der Bootpartition in drei getrennte Bereiche:</p>
+<p>Der zweite Hinweis erscheint wenn versucht wird etwas in der Systemhierarchie umzubenennen oder zu löschen. Der "<span class="button">Umbenennen</span>" Button kann nur geklickt werden während die <span class="key">SHIFT</span> Taste gehalten wird.</p>
+<p>Grundsätzlich verzweigt sich das Hauptverzeichnis der Bootpartition in zwei Äste:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path"><acronym title="/boot/system/">/boot/System/</acronym></span></td><td> </td><td>gehört allein dem System. Nicht anfassen!</td></tr>
-<tr><td><span class="path"><acronym title="/boot/common/">/boot/Allgemein/</acronym></span></td><td> </td><td>enthält gemeinsame Dateien aller Benutzer.</td></tr>
-<tr><td><span class="path"><acronym title="/boot/home/">/boot/Benutzer/</acronym></span></td><td> </td><td>ist der persönliche Ordner des Benutzers mit all seinen Daten und Einstellungen.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Hier liegen die Systemdateien und die Anwendungen/Pakete, auf die alle Benutzer Zugriff haben.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>Das ist der persönliche Ordner des Benutzers mit all seinen Daten und Einstellungen. Außerdem liegen hier die Anwendungen/Pakete auf die andere Benutzer <i>keinen</i> Zugriff haben.</td></tr>
 </table>
+<p>Solange Haiku noch nicht mehrbenutzerfähig ist, hat diese Aufteilung in gemeinsame und persönliche Anwendungen/Pakete keine Auswrkungen. Schließlich gibt es nur einen Benutzer mit nur einem Home Ordner. Weil Haiku aber irgendwann auch mehrere Benutzerkonten unterstützen wird, ist es sinnvoll sich schon jetzt daran zu gewöhnen.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">Der System Ordner - <span class="path"><acronym title="/boot/system/">/boot/System/</acronym></span></a></h2>
+<a id="system" name="system">Der System Ordner - <span class="path">/boot/system/</span></a></h2>
 <p>Bei Haikus Vorgänger BeOS hieß dieser Ordner <span class="path">/boot/beos/</span>. Ihn trifft man immer mal wieder in älterer Dokumentation an (z.B. im original BeBook).
 <br />
-Wie immer er auch heißt, man sollte nichts darin ändern. Bei jedem Update von Haiku können hier Sachen dazukommen, gelöscht oder überschrieben werden. Soll etwas erweitert werden, vielleicht durch andere Tracker Add-Ons oder Translatoren oder auch einen neuen Hardwaretreiber, muss dies im eigenen Verzeichnis unter der <span class="path"><acronym title="/boot/home/">/boot/Benutzer/</acronym></span> Hierarchie oder, wenn es für alle Benutzer gedacht ist, unter <span class="path"><acronym title="/boot/common/">/boot/Allgemein/</acronym></span> geschehen.
-Solange Haiku noch nicht mehrbenutzerfähig ist, hat diese Unterscheidung noch keine offensichtlichen Auswirkungen, weil es ja nur einen Benutzer mit nur einem <i>home</i> Ordner gibt. Weil es aber doch irgendwann Unterstützung für mehrere Benutzer geben wird, ist es sinnvoll sich von Anfang an die richtige Vorgehensweise anzugewöhnen.</p>
-<p>Möchte man also einen neuen Translator für das neueste Bildformat installieren, kopiert man ihn <b>nicht</b> einfach in den entsprechenden Systemordner. Wie gesagt, nicht anfassen!<br />
-Stattdessen wandert er in die gespiegelte Hierarchie unter <span class="path"><acronym title="/boot/common/">/boot/Allgemein/</acronym></span> oder <span class="path"><acronym title="/boot/home/config/">/boot/Benutzer/Konfiguration/</acronym></span>.</p>
-<p>In diesem Beispiel befindet sich der Ort für Translatoren im Systemordner unter</p>
-<p><span class="path"><acronym title="/boot/system/add-ons/Translators/">/boot/System/add-ons/Translators/</acronym></span></p>
-<p>Der gespiegelte Ordner für Benutzer ist also entweder</p>
-<p><span class="path"><acronym title="/boot/home/config/add-ons/Translators/">/boot/Benutzer/Konfiguration/add-ons/Translators</acronym></span><br />
-oder<br />
-<span class="path"><acronym title="/boot/common/add-ons/Translators/">/boot/Allgemein/add-ons/Translators/</acronym></span></p>
-<p>Das hat noch einen weiteren Vorteil: Falls die installierte Komponente etwas arg durcheinander bringt (durchaus möglich, Hardwaretreiber werden ja auch so installiert), lässt sich immer noch die Option "<i>Disable User Add-Ons</i>" im <a href="bootloader.html">Boot Loader</a> Menü auswählen. So lässt sich das System immer ohne die Probleme verursachende Komponente starten.</p>
-<p>Meistens muss man sich allerdings nicht mit diesen Dingen beschäftigen, da jede Software aus einer vertrauensvollen Quelle normalerweise über eine entsprechende Installationsroutine verfügt, die sich um alles kümmert.<br />
-<!--
-If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
-</p>
-<p><i>TODO.... Table to be added ....</i>
-<table>
+Die meisten Ordner in <span class="path"><acronym title="/boot/system/">/boot/System/</acronym></span> sind schreibgeschützt. Das ist auch vernünftig, schließlich befinden sich hier Dateien, die wichtig für das funktionieren von Haiku sind und daher für (zufälligen) Änderungen geschützt werden müssen. Die einzigen vom Benutzer veränderbaren Ordner sind:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>Enthält Cache-Dateien und den Ordner für temporäre Dateien, auf den <span class="path">/tmp/</span> verlinkt ist.</td></tr>
+<tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>Enthält die Ordner-Hierarchie für Dateien, die nicht Teil eines .hpkg sind (wahrscheinlich aus einem alten BeOS Archiv).</td></tr>
+<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Neben den hier liegenden Haiku System-Paketen können hier gemeinsam von allen Benutzern genutzte Pakete hinzugefügt und entfernt werden.</td></tr>
+<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Enthält systemweite Einstellungen.</td></tr>
+<tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Enthält Log-Dateien wie das syslog (wichtig bei der Fehlersuche) und standardmäßig die Auslagerungsdatei.</td></tr>
 </table>
--->
-</p>
+<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="common" name="common">Der allgemeine Ordner - <span class="path"><acronym title="/boot/common/">/boot/Allgemein/</acronym></span></a></h2>
-<p>Haiku ist noch kein Mehrbenutzersystem. Aber sobald es das ist, bekommt jeder Benutzer einen eigenen <i>home</i> Ordner, auf den niemand der anderen Zugriff hat. Jede Anwendung oder zusätzliche Komponente wie Tracker Add-Ons oder Translatoren etc., ebenso wie alle Daten, die mit den anderen Benutzern geteilt werden sollen, müssen daher nach <span class="path"><acronym title="/boot/common/">/boot/Allgemein/</acronym></span>.</p>
+<a id="home" name="home">Der Home Ordner - <span class="path">/boot/home/</span></a></h2>
+<p>Dieser Ordner gehört dem Benutzer. Hier können Ordner und Dateien nach Lust und Laune erstellt und gelöscht werden. (Übrigens, die Tilde ("<tt>~</tt>") ist eine Abkürung für den Home Ordner, damit man im Terminal nicht immer "<span class="path">/boot/home/</span>" schreiben muss).<br />
+Dateien, auf die später mal in einer Mehrbenutzer-Umgebung die anderen Benutzer zugreifen können sollen, müssen außerhalb von <span class="path">/boot/home/</span> angelegt werden. Zum Beispiel könnte man einen Ordner <span class="path">/boot/alle-Benutzer/</span> anlegen und die Sachen dort ablegen.</p>
 
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="home" name="home">Der Home Ordner - <span class="path"><acronym title="/boot/home/">/boot/Benutzer/</acronym></span></a></h2>
-<p>Dieser Ordner gehört einzig und allein dem Benutzer. Hier können beliebig Dateien und Verzeichnisse erstellt und gelöscht werden. Mit dem <span class="path"><acronym title="~/config/">~/Konfiguration</acronym></span> Ordner und seinen Unterverzeichnissen sollte man sich jedoch zurückhalten. Zwar <i>kann</i> man z.B. den <span class="path"><acronym title="~/config/settings/">~/Konfiguration/settings/</acronym></span> Ordner löschen ohne dadurch das Betriebssystem selbst zu beeinträchtigen, aber wer will schon all seine Konfigurationen und Einstellungen verlieren? In jedem Falle warnt einen das System mit dem oben erwähnten Hinweis.</p>
-<p>Neben dem <span class="path"><acronym title="~/config/add-ons/">~/Konfiguration/add-ons/</acronym></span> Ordner, der wie oben beschrieben das System Add-On Verzeichnis für zusätzliche Komponenten spiegelt, existieren noch einige weitere Ordner von Interesse. (Die Tilde ("<tt>~</tt>") ist übrigens eine Abkürzung für das Home Verzeichnis. So muss man im Terminal nicht immer "<span class="path">/boot/home/</span>" schreiben.)</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="path"><acronym title="~/mail">~/Mail</acronym></span></td><td style="width:10px;"> </td>
+<tr><td><span class="path">~/Desktop/</span></td><td style="width:10px;"> </td>
+<td>Hier befinden sich die Dateien, die auf dem Desktop liegen. Ein Doppelklick öffnet den Ordner nicht, weil er ja bereits geöffnet ist. Falls die Datei-Icons mal von Fenstern verdeckt sind, kann man einfach mal schnell die <a href="workspaces.html">Arbeitsfläche</a> wechseln. Natürlich ist auch eine <a href="tracker.html#drill-down">Navigation über Untermenüs</a> per Rechtsklick möglich.</td></tr>
+<tr><td><span class="path">~/mail/</span></td><td style="width:10px;"> </td>
 <td>Standardmäßig werden hier alle Mails abgelegt.</td></tr>
-
-<tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
+<tr><td><span class="path">~/people/</span></td><td style="width:10px;"> </td>
+<td>Standardmäßig werden hier alle Kontaktdateien abgelegt, siehe <a href="applications/people.html">Kontakte</a>.</td></tr>
+<tr><td><span class="path">~/queries/</span></td><td style="width:10px;"> </td>
 <td><a href="queries.html">Queries</a> werden generell für 7 Tage in diesem Ordner gespeichert, danach werden sie automatisch gelöscht.</td></tr>
+</table>
 
-<tr><td><span class="path"><acronym title="~/config/be/">~/Konfiguration/be/</acronym></span></td><td> </td>
-<td>Aus der BeOS Geschichte heraus beinhaltet der Ordner <span class="path">be</span> was im <a href="deskbar.html#deskbar-menu">Deskbar Menü</a> angezeigt wird. Einträge können durch Anlegen bzw. Löschen von Dateien, Verzeichnissen, Verknüpfungen oder Queries in diesem Ordner hinzugefügt bzw. entfernt werden.</td></tr>
+<p>Der Ordner <span class="path">/boot/home/config/</span> ist besonders: Genauso wie <span class="path">/boot/system/</span> befindet der sich größtenteils unter der Kontrolle des Paketmanagments und daher schreibgeschützt. Und er enthält auch die gleichen vom Benutzer beschreibbaren Ordner:</p>
 
-<tr><td><span class="path"><acronym title="~/config/bin/">~/Konfiguration/bin/</acronym></span></td><td> </td>
-<td>Ergänzt den <span class="path"><acronym title="/boot/system/bin/">/boot/System/bin/</acronym></span> Systemordner mit selbst installierten Kommandozeilen-Befehlen.</td></tr>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">~/config/packages/</span></td><td style="width:10px;"> </td>
+<td>Hier können Pakete hinzugefügt und entfernt werden, auf die die anderen Benutzer <i>keinen</i> Zugriff haben.</td></tr>
 
-<tr><td><span class="path"><acronym title="~/config/boot/">~/Konfiguration/boot/</acronym></span></td><td> </td>
+<tr><td class="onelinetop"><span class="path">~/config/non-packaged/</span></td><td> </td>
+<td>Enthält die Ordner-Hierarchie für Dateien, die nicht Teil eines .hpkg sind (wahrscheinlich aus einem alten BeOS Archiv) und auf die die anderen Benutzer <i>keinen</i> Zugriff haben.</td></tr>
+
+<tr><td><span class="path">~/config/settings/</span></td><td> </td>
+<td>Dieser Ordner enthält die eigenen Einstellungen für alle Anwendungen, sowie einige Systemkonfigurationen. Einige Anwendungen verwalten ihre Einstellungen in eigenen Unterverzeichnissen, andere schreiben ihre Einstellungsdatei direkt in diesen Ordner.</td></tr>
+</table>
+
+<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
+<p>Hier einige der interessanteren Unterordner von <span class="path">~/config/settings</span>:</p>
+
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">boot/</span></td><td style="width:10px;"> </td>
 <td>Dieser Ordner enthält <a href="bash-scripting.html#user-scripts">User Skripte</a> die vor oder nach dem Hoch- bzw. Herunterfahren des Systems ausgeführt werden.</td></tr>
 
-<tr><td><span class="path"><acronym title="~/config/boot/launch/">~/Konfiguration/boot/launch/</acronym></span></td><td> </td>
+<tr><td><span class="path">boot/launch/</span></td><td> </td>
 <td>In diesem Ordner enthaltene Verknüpfungen zu Programmen oder Dokumenten werden automatisch beim jedem Hochfahren geöffnet.</td></tr>
 
-<tr><td><span class="path"><acronym title="~/config/data/fonts/">~/Konfiguration/data/fonts/</acronym></span></td><td> </td>
-<td>In diesen Ordner kopierte TrueType oder Postscript Schriften sind automatisch sofort verfügbar.</td></tr>
-
-<tr><td><span class="path"><acronym title="~/config/settings/">~/Konfiguration/settings/</acronym></span></td><td> </td>
-<td>Dieser Ordner enthält die eigenen Einstellungen für alle Anwendungen, sowie einige Systemkonfigurationen. Einige Anwendungen verwalten ihre Einstellungen in eigenen Unterverzeichnissen, andere schreiben ihre Einstellungsdatei direkt in diesen Ordner.</td></tr>
-
-<tr><td><span class="path"><acronym title="~/config/settings/beos_mime/">~/Konfiguration/settings/beos_mime/</acronym></span></td><td> </td>
+<tr><td><span class="path">beos_mime/</span></td><td> </td>
 <td>In dieser <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> Datenbank sammelt Haiku all die verschiedenen <a href="filetypes.html">Dateitypen</a> und ihre Einstellungen.</td></tr>
 
-<tr><td class="onelinetop"><span class="path"><acronym title="~/config/settings/kernel/drivers/">~/Konfiguration/settings/kernel/drivers/</acronym></span></td><td> </td>
+<tr><td class="onelinetop"><span class="path">deskbar/menu/</span></td><td> </td>
+<td>Hierher kopierte oder verlinkte Dateien/Ordner/Queries erscheinen im Menü der <a href="deskbar.html#deskbar-menu">Deskbar</a>.</td></tr>
+
+<tr><td class="onelinetop"><span class="path">kernel/drivers/</span></td><td> </td>
 <td>Hier gibt es vor allem eine interessante Datei: <span class="cli">kernel</span> bietet einige hardwarenahe Konfigurationen, wie Auschalten von <acronym title="Symmetric Multi Processing">SMP</acronym>, Aktivieren von Debugging über die serielle Schnittstelle oder Einschalten von erweitertem Power-Management. Eine Konfigurationszeile wird aktiviert, indem das Rautesymbol  "<tt>#</tt>" entfernt wird. Hier ist Vorsicht angeraten!</td></tr>
 
-<tr><td><span class="path"><acronym title="~/config/settings/Tracker/">~/Konfiguration/settings/Tracker/</acronym></span></td><td> </td>
-<td>Neben diversen Konfigurationsdateien für den Tracker, finden sich hier einige interessante Unterverzeichnisse:</td></tr>
+<tr><td><span class="path">Tracker/</span></td><td> </td>
 
+<td>Neben diversen Konfigurationsdateien für den Tracker, finden sich hier einige interessante Unterverzeichnisse:</td></tr>
 <tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Jedes neu erstellte Verzeichnis erbt die Fenstergröße und das Layout der angezeigten Attribute dieses Ordners.</td></tr>
 
 <tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Das Layout von Query-Ergebnissen lässt sich je nach Dateityp individuell definieren. Siehe <a href="queries.html#result-window">Query: Das Ergebnisfenster</a>.</td></tr>
 
 <tr><td align="right"><span class="path">Go/</span></td><td></td><td>Hier verknüpfte Ordner zu bevorzugten Speicherorten erscheinen z.B. in Öffnen- und Speicherdialogen. Siehe <a href="gui.html#favorites-recent">Haikus GUI: Favoriten und kürzliche benutzte Ordner</a>.</td></tr>
 
-<tr><td align="right"><span class="path"><acronym title="Tracker New Template/">Tracker Neu-Vorlagen</acronym></span></td><td></td><td>Hier angelegte Dateien eines bestimmten Dateityps sind sofort in Trackers <span class="menu">Datei | Neu...</span> Menü verfügbar. Siehe <a href="tracker.html#working-with-files">Tracker: Arbeiten mit Dateien</a>.</td></tr>
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Hier angelegte Dateien eines bestimmten Dateityps sind sofort in Trackers <span class="menu">Datei | Neu...</span> Menü verfügbar. Siehe <a href="tracker.html#working-with-files">Tracker: Arbeiten mit Dateien</a>.</td></tr>
 </table>
 
 </div>

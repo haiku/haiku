@@ -49,39 +49,38 @@
 </ul>
 <span>
  «  <a href="diskprobe.html">DiskProbe</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications (アプリケーション)</a> 
 ::  <a href="drivesetup.html">DriveSetup</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications (アプリケーション)</span></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
 </table>
 <p><br /></p>
 <p>DiskUsage はディスクの容量がどのように使われているのかをグラフィカルに表示します。<br />
 <i>「ディスク容量がどこに費やされているの?」</i>といったことがわかる便利なツールです。</p>
-<p>After launching, DiskUsage shows only a white window with all mounted volumes as tabs at the top. You'll have to choose the one you're interested in and click <span class="button">Scan</span> to start chugging through the disk. For larger disks this can take some time... While you wait, you may switch to a different tab and start exploring that volume or begin the scan process there as well.<br />
-It's not recommended to start several concurrent scan processes on the same physical disk, as the constant repositioning of the heads of the drive will only extend the wait.</p>
+<p>起動後、DiskUsage は、白いウインドウを表示します。その上には、すべてのマウントされたボリュームがタブとして表示されます。ディスクの読み込みを開始するために、興味のあるボリュームを選んで、<span class="button">スキャン (Scan)</span> をクリックする必要があります。大きなディスクに対しては、多少時間がかかるかもしれません…待っている間、別のタブに移動して、そのボリュームを調べることや、そこで同様にスキャンプロセスを開始することができます<br />
+ドライブヘッドの一定の再ポジショニングは待ち時間を伸ばすだけなので、同じ物理ディスク上で同時にいくつかのスキャンを行うことはお勧めしません。</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
 <p>同心円のそれぞれがファイルシステムの階層を表しています。上記のように、一番中心の円が <span class="path">/boot/home/</span> フォルダーを、そのすぐ外側の円形のブロックが <span class="path">/boot/home/</span> 以下のファイルやフォルダーを示しています。ファイルシステムの階層が深くなるごとに円形のブロックが外側に追加されていくので、深い階層のフォルダーの情報を見るためにはウィンドウサイズを変更する必要があるかもしれません。</p>
 <div class="box-info"><ul>
 <li>図で角度が 2゜に満たないサイズのファイルやフォルダーは表示されません。</li>
 <li>フォルダー内のファイルの数には、サブフォルダー内のファイルの数も含まれていて、フォルダーもファイルと同じように数えられます。</li>
-<li>使用量にはシンボリックリンクは含まれません。</li>
+<li>シンボリックリンクは無視します。</li>
 </ul></div>
 <p>マウスをあるブロックの上に重ねると、ポインタの下の部分のファイルやフォルダーの情報が一番下のステータスバーに表示されます。</p>
-<p>Right-clicking a segment offers a context menu to <span class="menu">Get info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open with</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
-Left-clicking a segment makes that file/folder the center circle.<br />
-Left-clicking the center circle moves you up one level.</p>
+<p>セグメントを右クリックして表示されるコンテキストメニューには次のものがあります。<span class="menu">情報を表示 (Get Info)</span>、Tracker で <span class="menu">開く (Open)</span>、<span class="menu">アプリケーションで開く (Open With)</span>、または、 指定領域を<span class="menu">再スキャン (Rescan)</span><br />
+セグメントの左クリックで、そのファイルやフォルダーを中心円に持ってくることができます。<br />
+中心円で左クリックをすると、表示されている階層がひとつ上がります。</p>
 <p>ファイルとフォルダーを DiskUsage からドラッグすることで、ほかのアプリケーション、デスクトップ、またはTracker にコピーできます。同様に、ディスクやフォルダーを DiskUsage のウィンドウにドロップすることで、その使用量が中心に表示されます。</p>
-<p>You can also use the Tracker add-on from the context menu of any folder to start DiskUsage with that particular location.</p>
+<p>また、DiskUsage を特定の場所から起動するために、どのフォルダーのコンテキストメニューからでも Tracker アドオンを使うことができます。</p>
 
 </div>
 </div>
@@ -89,7 +88,7 @@ Left-clicking the center circle moves you up one level.</p>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="diskprobe.html">DiskProbe</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications (アプリケーション)</a> 
 ::  <a href="drivesetup.html">DriveSetup</a>  »
 </span></div>
 </div>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h1>Иерархия файловой системы</h1>
 
@@ -62,81 +63,79 @@
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
 <p>Второе предупреждение появляется в случае, если Вы попытаетесь удалить или переименовать что-нибудь в иерархии системы. Для того чтобы активировать кнопку "<span class="button">Сделать это</span>" нужно удерживать клавишу <span class="key">SHIFT</span>.</p>
-<p>В основном выделяют три направления корневой папки загрузочного раздела:</p>
+<p>Generally, there are two separate branches springing from the root folder of the boot volume:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>принадлежит системе. Не стоит её трогать!</td></tr>
-<tr><td><span class="path">/boot/common/</span></td><td> </td><td>содержит общие файлы для всех пользователей.</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>это Ваша персональная папка для хранения Ваших данных и настроек.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Contains system files and applications/packages shared by all users.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>This is your personal folder where you keep your data and settings and the applications/packages that are <i>not</i> shared by all users.</td></tr>
 </table>
+<p>As long as Haiku isn't multi-user, this distinction between shared and not-shared applications/packages has no apparent effect, as there's only one user with one home folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">Системная папка - <span class="path">/boot/system/</span></a></h2>
-<p>У BeOS, предшественника Haiku, эта папка находилась по следующему адресу <span class="path">/boot/beos/</span>. Вы всё ещё можете её найти в старых документациях (например, в оригинальной BeBook).<br />
-Неважно как она называется, главное ничего не изменять внутри неё. Каждое обновление в Haiku может добавить, удалить или перезаписать что-либо, находящееся в ней. Если вы хотите расширить функциональность при помощи дополнений для файлового менеджера Tracker или трансляторов, либо драйвера для устройства, вы должны устанавливать их в свою папку <span class="path">/boot/home/</span>. Однако если они предназначены для всех пользователей, то они должны быть установлены в <span class="path">/boot/common/</span>. Пока Haiku не поддерживает многопользовательский режим, это различие не имеет очевидного эффекта: в данный момент существует один пользователь с единственной <i>домашней (home)</i> папкой. Однако когда появится поддержка многопользовательского режима, это будет иметь значение, так что стоит с самого начала выбрать правильный путь.</p>
-<p>Давайте представим, что вы хотите установить новый транслятор для нового формата изображения. Тогда вы <b>не должны</b> копировать его в соответствующую системную папку. Запомните: Не трогать!<br />
-Вместо этого вы должны скопировать его в аналогичную по назначению папку, находящуюся по адресу <span class="path">/boot/common/</span> или <span class="path">/boot/home/config/</span>.</p>
-<p>В нашем примере расположение трансляторов в системной папке будет</p>
-<p><span class="path">/boot/system/add-ons/Translators/</span></p>
-<p>Аналогичная пользовательская папка находится по адресу</p>
-<p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
-либо<br />
-<span class="path">/boot/common/add-ons/Translators/</span></p>
-<p>Это дает ещё один положительный момент: Если компонент, который вы установили, работает некорректно (например, драйвер), вы можете выбрать "<i>Запретить загрузку пользовательских дополнений (Disable User Add-Ons)</i>" в меню <a href="bootloader.html">загрузчика</a> и тогда вы всегда сможете загрузиться без проблемного компонента..</p>
-<p>В основном вы не будете иметь дело с подобными вещами, т.к. каждое программное обеспечение, поставляемое из надежного источника, должно уметь делать эти вещи автоматически.<br />
-<!--
-If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
-</p>
-<p><i>TODO.... Table to be added ....</i>
-<table>
+<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
+Most of the folders inside <span class="path">/boot/system/</span> are read-only, which is sensible as they contain the files necessary for Haiku to function correctly and therefore have to be safe from (accidental) alteration. The only user-writable folders are:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>Contains cached files and the temporary folder linked to <span class="path">/tmp/</span>.</td></tr>
+<tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives).</td></tr>
+<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Besides holding Haiku's system packages, you can add/remove packages shared by all users.</td></tr>
+<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Contains system-wide settings.</td></tr>
+<tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Contains logs like the syslog (important when troubleshooting) and is the default location for the swap file.</td></tr>
 </table>
--->
-</p>
-
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="common" name="common">Общая папка - <span class="path">/boot/common/</span></a></h2>
-<p>В настоящее время Haiku не является многопользовательской системой. Когда она станет таковой, каждый пользователь будет иметь свою <i>домашнюю</i> папку, которая будет недоступна кому-либо ещё. Каждое приложение или дополнительный компонент (дополнение для файлового менедждера, трансляторы и т.д.), либо другие данные, которые предполагают использование всеми пользователями, должны находиться по адресу <span class="path">/boot/common/</span></p>
+<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="home" name="home">Домашняя папка - <span class="path">/boot/home/</span></a></h2>
-<p>Эта папка принадлежит вам. Здесь вы можете создавать и удалять файлы и папки по своему желанию. Тем не менее не стоит засорять папку <span class="path">~/config/</span> и все папки, находящиеся в ней. Вы <i>можете</i>, например, удалить папку <span class="path">~/config/settings/</span> без ущерба для системы, но кто захочет потерять все свои настройки? В любом случае, система предупредит вас, как показано в примере выше.</p>
-<p>Кроме того, папка <span class="path">~/config/add-ons/</span>, как и системная, предназначена для дополнительных компонентов. (Кстати, знак тильда ("<tt>~</tt>") это ссылка на Вашу домашнюю папку, так что Вам не придется каждый раз писать "<span class="path">/boot/home/</span>" в терминале.)</p>
+<p>This folder belongs to you. Here you can create and delete files and folders as you wish. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)<br />
+Files that you'd like to share with other users in a future multi-user environment have do be put outside <span class="path">/boot/home/</span>. For example, you could create a folder <span class="path">/boot/all-users/</span> and put the stuff there.</p>
+
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
-<td>По умолчанию здесь хранится ваша почта.</td></tr>
+<tr><td><span class="path">~/Desktop/</span></td><td style="width:10px;"> </td>
+<td>Holds the files of your desktop. Double-clicking won't open it, as it is already always visible. When your files happen to be obscured by open windows, just switch quickly to another <a href="workspaces.html">Workspace</a>. Of course, <a href="tracker.html#drill-down">drilling</a> down by right-clicking is also possible.</td></tr>
+<tr><td><span class="path">~/mail/</span></td><td style="width:10px;"> </td>
+<td>This is the default location for your mails.</td></tr>
+<tr><td><span class="path">~/people/</span></td><td style="width:10px;"> </td>
+<td>This is the default location for you contact files, see <a href="applications/people.html">People</a>.</td></tr>
+<tr><td><span class="path">~/queries/</span></td><td style="width:10px;"> </td>
+<td><a href="queries.html">Queries</a> are stored here, by default temporarily for 7 days.</td></tr>
+</table>
 
-<tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
-<td>В этой папке хранятся <a href="queries.html">запросы</a> в течении 7-ми дней.</td></tr>
+<p>The folder <span class="path">/boot/home/config/</span> is special: just like <span class="path">/boot/system/</span> it's mostly under the control of the package management and therefore read-only. It too contains these similar user-writable folders:</p>
 
-<tr><td><span class="path">~/config/be/</span></td><td> </td>
-<td>Папка <span class="path">be</span>, содержит все что показывается в <a href="deskbar.html#deskbar-menu">в меню панели задач Deskbar</a>. Вы можете добавлять или удалять элементы при помощи панели конфигурации или просто путем копирования файлов, папок или ссылок непосредственно в эту папку.</td></tr>
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">~/config/packages/</span></td><td style="width:10px;"> </td>
+<td>Here you can add/remove packages that are <i>not</i> shared by all users.</td></tr>
 
-<tr><td><span class="path">~/config/bin/</span></td><td> </td>
-<td>Дополняет системную папку <span class="path">/boot/system/bin/</span> и хранит все ваши приложения для командной строки (терминала).</td></tr>
-
-<tr><td><span class="path">~/config/boot/</span></td><td> </td>
-<td>Эта папка для хранения <a href="bash-scripting.html#user-scripts">сценариев пользователя</a>, которые выполняются до или после загрузки/выключения системы.</td></tr>
-
-<tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
-<td>Создайте ссылку на приложение или документ в этой папке, и при каждой загрузке они будут запускаться.</td></tr>
-
-<tr><td><span class="path">~/config/data/fonts/</span></td><td> </td>
-<td>Просто скопируйте TrueType или Postscript шрифт в эту папку и вы сможете ими мгновенно воспользоваться.</td></tr>
+<tr><td class="onelinetop"><span class="path">~/config/non-packaged/</span></td><td> </td>
+<td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives) and are <i>not</i> shared by all users.</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
 <td>Эта папка содержит настройки для всех приложений и некоторые настройки системы. Некоторые приложения хранят свои настройки в собственных папках, другие просто хранят конфигурационные файлы прямо здесь.</td></tr>
+</table>
 
-<tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
+<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
+<p>Here are some of the more interesting subfolders in <span class="path">~/config/settings</span>:</p>
+
+<table summary="layout" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="path">boot/</span></td><td style="width:10px;"> </td>
+<td>Эта папка для хранения <a href="bash-scripting.html#user-scripts">сценариев пользователя</a>, которые выполняются до или после загрузки/выключения системы.</td></tr>
+
+<tr><td><span class="path">boot/launch/</span></td><td> </td>
+<td>Создайте ссылку на приложение или документ в этой папке, и при каждой загрузке они будут запускаться.</td></tr>
+
+<tr><td><span class="path">beos_mime/</span></td><td> </td>
 <td>В этой <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> -базе данных Haiku отслеживает все <a href="filetypes.html">типы файлов</a> и их настройки (примечание: MIME - Multipurpose Internet Mail Extension — многоцелевые расширения интернет-почты, произносится как «майм»).</td></tr>
 
-<tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
+<tr><td class="onelinetop"><span class="path">deskbar/menu/</span></td><td> </td>
+<td>Copied or linked to files/folders/queries in this folder appear in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>.</td></tr>
+
+<tr><td class="onelinetop"><span class="path">kernel/drivers/</span></td><td> </td>
 <td>Здесь располагается один из файлов с настройками, которые могут быть интересны: файл <span class="cli">kernel</span> предлагает некоторые низкоуровневые настройки, например, отключение <acronym title="Symmetric Multi Processing">SMP</acronym>, активация APM. Вы можете активировать настройки путем удаления символа комментария "<tt>#</tt>". Будьте осторожны!</td></tr>
 
-<tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
-<td>Здесь располагаются несколько интересных папок:</td></tr>
+<tr><td><span class="path">Tracker/</span></td><td> </td>
 
+<td>Здесь располагаются несколько интересных папок:</td></tr>
 <tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Показывает и упорядочивает все атрибуты и размеры окна по вашему вкусу. Каждая новая папка, которую вы создадите, будет использовать этот шаблон.</td></tr>
 
 <tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Вы можете определить формат окна результатов поиска для определенных типов файлов. Для более подробного изучения следует обратиться к теме <a href="queries.html#result-window">запросы: Окно результатов поиска.</a>.</td></tr>

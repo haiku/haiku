@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -68,14 +68,18 @@
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="fonts" name="fonts">Fonts</a></h2>
+<a id="fonts" name="fonts">Fonts (Шрифти)</a></h2>
 <img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
-<p>Haiku defines three standard fonts for different purposes. You set plain, bold and fixed font types and sizes that will be used throughout the system. Besides these, there's also a separate setting for the font used in menus.</p>
+<p>Haiku визначає три стандартні шрифти для різних цілей. Ви можете встановити звичайний, потовщений і моноширинний шрифти і їхні розміри для використання в системі.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">Installing new fonts</a></h3>
-<p>You install new fonts by copying them into their respective user folder, i.e. <span class="path">/boot/common/data/fonts/</span> or <span class="path">/boot/home/config/data/fonts/</span> (see topic <a href="../filesystem-layout.html">Filesystem layout</a>).</p>
+<p>New fonts that don't come as part of a regular .hpkg package, can be installed by copying them into a subfolder according to the font type (<tt>psfonts</tt> or <tt>ttfonts</tt>) into their respective <tt>non-packaged</tt> folder (see topic <a href="../filesystem-layout.html">Filesystem layout</a>). For TrueType fonts that would be:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts available to every user.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts only available to yourself.</td></tr>
+</table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -117,7 +121,7 @@
 </table>
 <p>Субпіксельне зглажування додає кольорові артефакти на межах об'єктів, що наврядчи сподобаєтьбся будь-кому. Haiku дозволяє Вам одночасно використовувати обидва методи зглажування і вибрати оптимальне їх співвідношення переміщуючи бігунок</p>
 <div class="box-info">Субпіксельне зглажування в комбінації з уточненням поки що проходять перевірку патентної чистоти програмного забезпечення тому цей режим не є доступним по замовчуванню. В залежності від місця проживання Ви можете отримати розблоковану версію. Вибачте, звяжіться з Вашим представником.</div>
-<p>Якщо Ви активуєте Уточненняз субпіксельним зглажуванням шляхом модифікації і перекомпіляції вихідного коду, то зможете порівняти результат зі зглажуванням відтінками сірого:</p>
+<p>Якщо Ви активуєте Уточнення з субпіксельним зглажуванням шляхом модифікації і перекомпіляції вихідного коду, то зможете порівняти результат зі зглажуванням відтінками сірого:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Відтінки сірого і Уточнення увімкнені</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />Субпіксельне зглажування і Уточнення увімкнені</td></tr>
 </table>

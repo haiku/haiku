@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2011, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,41 +56,33 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h1>Aplikácie</h1>
 
-<p>Predtým, než sa bližšie pozrieme na všetky aplikácie, ktoré sa v Haiku nachádzajú, najprv si popíšeme proces inštalácie a odinštalovania aplikácií, ktoré ste si odniekadiaľ stiahli. Napríklad tie, ktoré sú spomenuté na <a href="../../welcome/welcome_sk.html#software">Úvodnej stránke</a>.</p>
-<div class="box-info">Archívy by ste mali rozbaľovať/inštalovať iba vrámci Haiku. Ak balík rozbalíte napr. vo Windows alebo v Linuxe a len skopírujete rozbalený priečinok do Haiku, všetky vitálne atribúty budú orezané, pretože tieto operačné systémy bežne nevedia spracovať metadáta.</div>
+<p>Before diving into all the applications that come with Haiku, let's have a more detailed look at how to install and uninstall programs. The most convenient way to find, install, update and uninstall applications is via Haiku's package management system. However, since Haiku is largely binary and source compatible to its ancestor BeOS, you might find older archives (.zip and .pkg) that can still be installed as well.</p>
+<div class="box-info">Below you'll always find the <tt>~/config/</tt> hierarchy of the Home folder mentioned. If you intend to share packages for all users (once Haiku becomes multi-user aware), you should use the mirrored filesystem hierarchy under <tt>/system/</tt>. See topic <a href="filesystem-layout.html">Filesystem layout</a> for more information.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="install" name="install">Inštalácia aplikácií</a></h2>
-<p>Softvér Haiku vždy nájdete vo forme archívu.
-Väčšinou je to ZIP, niektoré staré balíky BeOS nájdete vo formáte Software Valet PKG. Software Valet dokáže automaticky spustiť inštalačné skripty, takže po dvojitom kliknutí iba vyberiete cieľový priečinok a všetko je vybavené.<br />
-Ak je to archív ZIP, dvojitým kliknutím otvoríte <span class="app">Rozbaľovač</span>, z ktorého nastavíte cieľový priečinok a rozbalíte archív. Ako bolo vysvetlené v téme <a href="filesystem-layout.html">Rozvrhnutie súborového systému</a>, tento cieľový priečinok je buď</p>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>pre aplikácie dostupné pre každého používateľa</td></tr>
-<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>pre aplikácie dostupné iba vám</td></tr>
-</table>
-<p>Toto rozdelenie bude mať samozrejme zmysel až vtedy, keď bude v Haiku zabudovaná podpora pre viacerých používateľov</p>
-<p>Keď už je archív rozbalený, mali by ste sa pozrieť do novo vytvoreného priečinku. Často tam nájdete súbory ReadMe alebo inú dokumentáciu.</p>
-<p>Niektoré programy budú potrebovať ďalšiu konfiguráciu. Napríklad <a href="tracker-add-ons.html">Doplnky Trackera</a>, <a href="preferences/datatranslations.html">Prekladače</a> alebo iné komponenty na zlepšenie systému musíte dať do správnych priečinkov. Často nájdete pomocný skript (často s príponou <span class="cli">.sh</span>) ako <span class="cli">install</span>, na ktorý jednoducho dvakrát kliknete a o všetko bude postarané.<br />
-Niekedy nájdete súbory spojené so správnou cieľovou zložkou pomenované „<span class="cli">drag [názov súboru] here...</span>“. V tom prípade jednoducho postupujte podľa tejto inštrukcie.</p>
-<p>Ale väčšinou nie je nič takéto potrebné a po rozbalení je už o všetko postarané.<br />
-Sekcie <a href="deskbar.html">Panel</a> alebo <a href="desktop-applets/launchbox.html">Spúšťač</a> popisujú ako pridať odkazy na vaše novo nainštalované aplikácie.</p>
+<a id="hpkg" name="hpkg">Haiku packages (.hpkg)</a></h2>
+<p>The simplest way is to use <a href="">HaikuDepot</a> to find, download and automatically install and uninstall a package. If that isn't an option  maybe you downloaded a package somewhere, because it's not (yet) in a public repository  it's just as easy to install it manually: Just move the .hpkg file into <tt>~/config/packages/</tt>. </p>
+<p>You'll find the newly installed application in <tt>~/config/apps/</tt> or, in case of a commandline application, in <tt>~/config/bin/</tt>. All other files the program depends upon (libraries, data, add-ons, etc.) appear automatically in the right locations in the filesystem.</p>
+<p>Topics <a href="deskbar.html">Deskbar</a> or <a href="desktop-applets/launchbox.html">LaunchBox</a> describe how to add shortcuts to your newly installed application.</p>
+<p>Uninstalling is just as easy: move the package out of <tt>~/config/packages/</tt>.</p>
+<div class="box-info">By the way, although you can unpack a .hpkg file like any other archive, this is not what the package mangement is doing when you're installing a package. The underlying filesystem only appears to spread files in their respective folders, there's no physical moving around taking place. This is why installing/uninstalling is so very fast and clean.</div>
+<p>If the package depends on some other library or package, a window will pop up, asking if the necessary files shall be downloaded and installed as well.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="uninstall" name="uninstall">Odinštalovanie aplikácií</a></h2>
-<p>Ak bola inštalácia vykonaná pomocou inštalačného skriptu, je pravdepodobné že existuje aj skript na odinštalovanie. V tom prípade naň iba dvakrát kliknite.<br />
-V opačnom prípade odinštalujte odstránením priečinku aplikácie.</p>
-<p>Týmto vám samozrejme môžu zostať konfiguračné súbory v priečinku <span class="path">~/config/settings</span>. To sa vám môže zísť, ak chcete program niekedy v budúcnosti znova nainštalovať. Ak inštalácia obsahovala súbory „<span class="cli">drag [názov súboru] here...</span>“, tie tiež zostanú nevymazané.</p>
-<p>Ak chcete rýchlo nájsť všetky súbory niektorej aplikácie, jednoducho uskutočnite vyhľadávanie tak, že zadáte kľúčovú časť názvu aplikácie. Dostanete tak binárny súbor, inštalačný priečinok a nastavania ako aj možné odkazy v Paneli. Jednoducho vyberte všetky relevantné súbory a odstráňte ich.</p>
+<a id="beos_apps" name="beos_apps">Old BeOS archives (.zip and .pkg)</a></h2>
+<p>BeOS archives that include all they need in their app's folder can simply be unpacked (double clicking opens <span class="app">Expander</span>) anywhere in <tt>/boot/home/</tt> and run from there. Uninstalling such self-contained applications is easy: just delete the app's folder.</p>
+<p>This is true for the majority of old BeOS applications. If you happen upon one that doesn't work out-of-the-box, because it wants to spread its files to hard-coded locations that are not guaranteed to exist, you can try to fix things manually. The folder <tt>~/config/non-packaged/</tt> allows you to recreate the needed folder hierarchy. As more and more real .hpkg packages become available and old BeOS applications get re-packaged, this will become less needed. Please consult this <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">online article</a> on how to use the <tt>non-packaged</tt> hierarchy.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-apps" name="list-of-apps">Aplikácie Haiku</a></h2>
-<p>Haiku obsahuje súpravu malých, no veľmi podstatných aplikácií. Všetky ich nájdete v <span class="path">/boot/system/apps/</span> alebo <span class="path">/boot/common/apps/</span>. Aplikácie, ktoré sa bežne nespúšťajú dvojitým kliknutím na dátový súbor (napr. Prehliadač obrázkov na obrázkové súbory) môžete nájsť v menu <span class="menu">Aplikácií</span> v Paneli.</p>
+<p>Haiku comes with a set of mostly small but essential applications. You'll find all of them at <span class="path">/boot/system/apps/</span>. Applications that are not usually launched by a double-click on a data file (e.g. ShowImage for image files) can be found in the <span class="menu">Applications</span> menu of the Deskbar.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td style="width:24px;"><img src="../images/apps-images/activitymonitor-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/activitymonitor.html">Monitor aktivity</a></td><td style="width:10px;"> </td>
 		<td valign="top">Nástroj na monitorovanie systémových zdrojov ako CPU a využitie pamäte.</td></tr>
@@ -112,6 +104,8 @@ V opačnom prípade odinštalujte odstránením priečinku aplikácie.</p>
 		<td valign="top">Nástroj na rozdeľovanie pevného disku.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Rozbaľovač</a></td><td> </td>
 		<td valign="top">Nástroj na rozbaľovanie bežných archívov.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/haikudepot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/haikudepot.html">HaikuDepot</a></td><td> </td>
+		<td valign="top"><span style="color:silver">A tool to find, download, install, update and uninstall (application) packages [<i>still missing</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Matic</a></td><td> </td>
 		<td valign="top">Aplikácia na tvorenie vektorových ikon Haiku.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Inštalátor</a></td><td> </td>

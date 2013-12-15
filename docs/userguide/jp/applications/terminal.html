@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2010, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,21 +48,22 @@
 </ul>
 <span>
  «  <a href="stylededit.html">StyledEdit</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications (アプリケーション)</a> 
 ::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />ターミナル (Terminal)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Applications (アプリケーション)</span></td></tr>
+<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/ターミナル</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/ターミナル</span><br />
-<span class="path">~/.profile</span> -  <span class="path">/boot/common/etc/profile</span> のデフォルトに追加 / 上書き<br />
-<span class="path">~/.inputrc</span> -  <span class="path">/boot/common/etc/inputrc</span> のデフォルトに追加 / 上書き</td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
+<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
 <p>ターミナルは、Haiku の Bash (Bourne Again Shell) へのインターフェースです。</p>
@@ -94,12 +95,15 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">キーボードショートカット</a></h2>
 <p><a href="../keyboard-shortcuts.html#terminal">ショートカットとキーの組み合わせ</a>に、便利なショートカットの一覧が載っています。</p>
+<p>Another nice feature that is more a key &amp; mouse combination: When holding <span class="key">ALT</span> a path or URL under the mouse pointer gets highlighted. A left-click opens the file/folder or website. A right-click opens a context menu to either <span class="menu">Copy path</span> or <span class="menu">Copy absolute path</span>. Imagine you're in <span class="path">/MyData/source/haiku/</span> and have the path <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> under the mouse pointer, the latter menu item  will result in the combined, absolute path &lt;<i>deep breath</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
+<p>By the way, right-clicking into the Terminal window will insert the clipboard. In combination with copying parts of highlighted paths, this can be used for speedy navigation of deep folder hierarchies.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Bash カスタマイズ</a></h2>
-<p>bash は Unix 由来なので、カスタマイズする方法は数え切れないほどあります。ユーザーにとって重要なファイルは、<span class="cli">.profile</span> と <span class="cli">.inputrc</span> の 2 つです。<br />
-ファイルは両方とも <span class="path">home/</span> 内に作成することができ、<span class="path">/boot/common/etc/</span> で設定されたシステムデフォルトを上書きできます。</p>
+<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
+Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/settings/etc/</span>.</p>
 
 <h3>.profile</h3>
 <p><span class="cli">.profile</span> は新しいターミナルを開くたびにロードされます。bash の動作に影響するさまざまなエイリアスや変数を設定します。これについてのヘルプはオンラインで見つけられるでしょう。</p>
@@ -140,7 +144,7 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="stylededit.html">StyledEdit</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications (アプリケーション)</a> 
 ::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>

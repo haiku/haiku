@@ -56,6 +56,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -70,8 +71,8 @@
 
 <h1>Työpaja: Langaton verkko</h1>
 
-<p>Verkkoyhteyksien saaminen toimimaan on olennasta nykypäivän tarpeessa pysyvään internet-yhteytteen. Koska erilaisten ja jatkuvasti muuttuvien laitteistojen ja ajurien pitäminen ajan tasalla on aika mahdotonta pienelle projektille, Haiku käyttää <a href="http://www.freebsd.org">FreeBSD</a>-yhteensopivuuskerrosta verkkoajureissaan.<br />
-Tämä takaa valtavan joukon tuettuja laitteita, vaikka se ei luultavasti kata 100 prosenttia markkinoilla olevista. Katso <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">tätä luetteloa verkossa</a> tuetuista malleista tai tarkista <a href="http://www.freebsd.org/releases/9.1R/hardware.html#WLAN">FreeBSD 9.1:n julkistettujen laitteiden tiedot</a>.</p>
+<p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
+This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">this list online</a> for a list of supported models or check <a href="http://www.freebsd.org/releases/9.2R/hardware.html#wlan">FreeBSD 9.2's release hardware notes</a>.</p>
 <div class="box-info">Nykyisin vain PCI-, PCI-X-, PCI-Express-, Mini PCI-, ja Mini PCI-Express-laitteiden otaksutaan toimivan.<br />
 PCMCIA-, CardBus-, ExpressCard-, USB- ja ISA-laitteet tarvitsevat vielä työtä tullakseen toimiviksi.</div>
 
@@ -98,7 +99,7 @@ PCMCIA-, CardBus-, ExpressCard-, USB- ja ISA-laitteet tarvitsevat vielä työtä
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="commandline" name="commandline">Liittyminen komentoriviltä</a></h2>
-<p>Jos komentorivin käyttö tuntuu paremmalta tai haluaisit käyttää skriptausta tai <span class="path">~/config/boot/UserBootscript</span>-skriptiä liittyäksesi automaattisesti tiettyyn verkkoon alkulatauksen yhteydessä, sitä varten on komento <tt>ifconfig</tt>.</p>
+<p>If you prefer to use the command line or would like to use scripting or the <span class="path">~/config/settings/boot/UserBootscript</span> to automate things to join a specific network on bootup, there's the command <tt>ifconfig</tt>.</p>
 <p>Käynnistä Pääteikkuna ja kirjoita ensimmäinen rivi, jolla käynnistät käytettävissä olevien langattomien  verkkojen etsinnän:</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 scan
 name                             address              signal  auth

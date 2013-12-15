@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2012, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,17 +59,17 @@
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />コマンドラインアプリケーションの一覧表</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>場所:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>場所:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Haiku に同梱されているすべてのコマンドラインアプリケーションは、<span class="path">/boot/system/bin</span>、または <span class="path">/boot/common/bin</span> にあります。ユーザー自身が作ったコマンドラインアプリケーションや、追加インストールしたコマンドラインアプリケーションは、<span class="path">~/config/bin</span> に配置する必要があります。これらの場所は PATH 環境変数に含まれているため、自動的に検出されます。<br />
-以下は、Haiku に同梱されているすべてのコマンドラインアプリケーションの一覧表です。それぞれの動作について短い説明があります。使い方についてさらに詳しい情報を見るには、<tt>--help</tt> という引数を付けてアプリケーションを実行してください。</p>
+<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
+Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
 <p><br /></p>
 <p>索引:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 <tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>使用中の、オーディオおよびビデオアドオンをモニターするサービスを起動します。</td></tr>
-<tr><td><tt>ReadOnlyBootPrompt</tt></td><td> </td><td>使用言語の設定</td></tr>
+<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Language and keymap setup. </td></tr>
 <tr><td><tt>[</tt></td><td> </td><td>要素を比較して、真/偽を返します。</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
 <tr><td><tt>addattr</tt></td><td> </td><td>ファイルに属性を書き込みます。その際、型に配慮して、それに応じて値を変換します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
@@ -81,7 +81,6 @@
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again シェル</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>任意精度の電卓言語です。</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>ベルを鳴らします。</td></tr>
-<tr><td><tt>bootman</tt></td><td> </td><td>ブートメニューのインストール、またはアンインストールを行います。</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td><tt>bzip2</tt> を参照ください。</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>ファイル圧縮</td></tr>
 <tr><td><tt>c++</tt></td><td> </td><td>C++- コンパイラ</td></tr>
@@ -145,6 +144,7 @@
 <tr><td><tt>fortune</tt></td><td> </td><td>ランダムに、願わくは面白い格言を表示します。</td></tr>
 <tr><td><tt>frcode</tt></td><td> </td><td>ファイル名のリストを圧縮するため、updatedb によって呼び出されます。  </td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>FreeType のコンパイル情報と、リンク情報を表示します。</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>Send a TRIM command to an SSD drive.</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>ファイル転送プログラム</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP デーモン</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>アーカイブの最初のアイテムを標準出力に展開します。</td></tr>
@@ -225,12 +225,16 @@
 <tr><td><tt>od</tt></td><td> </td><td>ファイルのはっきりとした表現を書き出します。</td></tr>
 <tr><td><tt>open</tt></td><td> </td><td>シェルから、アプリケーション / ドキュメントを起動します <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
+<tr><td><tt>package</tt></td><td> </td><td>Creates, inspects, or extracts a Haiku package.</td></tr>
+<tr><td><tt>package_repo</tt></td><td> </td><td>Creates or inspects a Haiku package repository file.</td></tr>
 <tr><td><tt>passwd</tt></td><td> </td><td>ユーザーパスワードを変更します。</td></tr>
 <tr><td><tt>paste</tt></td><td> </td><td>タブによって分離された各ファイルからの連続して一致する行を表示します。</td></tr>
 <tr><td><tt>patch</tt></td><td> </td><td>diff file をオリジナルのファイルに適用します。</td></tr>
 <tr><td><tt>pathchk</tt></td><td> </td><td>無効、またはポータブルでないファイル名を診断します。</td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>プログラマ用電卓</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>ICMP エコーリクエストをネットワークホストに送信します。</td></tr>
+<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzes and configures a Haiku package.</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>Manages packages and package repositories.</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>CD のトラックを再生します。</td></tr>
 <tr><td><tt>playfile</tt></td><td> </td><td>オーディオファイルを再生します。</td></tr>
 <tr><td><tt>playsound</tt></td><td> </td><td>オーディオファイルを再生します。</td></tr>
@@ -354,7 +358,7 @@
 
 <div class="nav">
 <div class="inner"><span>
-<a href="../applications.html#cli-apps" class="uplink">アプリケーション</a>
+<a href="../applications.html#cli-apps" class="uplink">Applications (アプリケーション)</a>
 ::  <a href="cli-apps.html">Haiku-specific commands</a>  »
 </span></div>
 </div>

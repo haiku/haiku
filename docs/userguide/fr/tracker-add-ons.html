@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,17 +54,17 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h1>Extensions du Tracker</h1>
 
 <p>Les applications peuvent installer des extensions qui peuvent être aisément invoquées depuis le Tracker.
 Seules les extensions sachant manipuler un type de fichier donné sont présentées dans l'option <span class="menu">Add-Ons</span> du menu contextuel du fichier, ou dans le menu <span class="menu">File</span> de la fenêtre du Tracker.
 Les extensions n'ayant pas besoin d'un fichier pour fonctionner sont tout le temps disponibles.</p>
-<p>Les extensions du Tracker, ou des liens vers des applications qui peuvent agir en tant que add-ons, peuvent être installés dans trois endroits différents (voir le sujet <a href="filesystem-layout.html">Structure du système de fichiers</a>):</p>
+<p>New Tracker add-ons that don't come as part of a regular .hpkg package, can be installed by copying them into their respective non-packaged folder (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/system/add-ons/Tracker/</span></td><td>   </td><td> pour les extension fournies par le système.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> Pour les extensions disponibles pour tous les utilisateurs.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> pour les extensions seulement disponibles pour vous.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td> Pour les extensions disponibles pour tous les utilisateurs.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td> pour les extensions seulement disponibles pour vous.</td></tr>
 </table>
 <p>Le nom de fichier d'une extension peut être suffixé d'un tiret et d'une lettre capitale, afin d'être accessible par un raccourci clavier.
 Par exemple, <span class="app">Open Target Folder-O</span> s'ouvre avec <span class="key">OPT</span> <span class="key">Alt</span> <span class="key">O</span>.<br />

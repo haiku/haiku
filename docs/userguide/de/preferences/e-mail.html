@@ -72,8 +72,8 @@
 <h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" /><acronym title="E-Mail">E-Mail-Dienst</acronym></h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Preferences">Einstellungen</acronym></span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/preferences/E-mail">/boot/System/preferences/E-Mail-Dienst</acronym></span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/Mail/*">~/Konfiguration/settings/Mail/*</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
 <p>In Haiku wird der Empfang und Versand von E-Mails vom Mail Service (auch mail_daemon genannt) gehandhabt. Dieser Systemdienst kümmert sich darum, dass eingegangene Mails als Datei gespeichert werden und die Attribute zu dieser Datei aus den entsprechenden E-Mail Informationen befüllt werden. So können die E-Mails von jedem Programm oder vom Benutzer direkt verwendet werden und ein Wechsel des Mail-Programms ist jederzeit möglich.<br />
 Die Konfiguration des Mail-Verkehrs wird in den <acronym title="&quot;E-Mail&quot;">E-Mail-Dienst</acronym>-Einstellungen vorgenommen.</p>
@@ -109,7 +109,7 @@ Mehr Informationen zu den verschiedenen Einstellungen und weiteren Optionen im F
 <p>Bei Verwendung des <i>POP3</i>-Protokolls für eingehende E-Mails kann die Option <span class="menu">E-Mails auf dem Server belassen</span> eingeschaltet werden. So kann auch von einem anderen Computer aus auf die Mails zugegriffen werden. Mit <span class="menu">Gelöschte E-Mails auch vom Server löschen</span> werden die E-Mails erst dann auf dem Server gelöscht, wenn sie auch auf dem Rechner entfernt werden.</p>
 <p>Sollte stattdessen <i>IMAP</i> als Übertragungsprotokoll verwendet werden, steht nur die Option <span class="menu">Gelöschte E-Mails auch vom Server löschen</span> zur Verfügung. Zusätzlich kann man noch <span class="menu">IMAP-Ordner</span> angeben, um nur von einem bestimmten Postfach und dessen Unterverzeichnissen die E-Mails zu synchronisieren.</p>
 <p>Außerdem kann man durch Aktivieren der Option <span class="menu">Nur Kopfzeilen herunterladen bei E-Mails über ... KB</span> bestimmen, dass E-Mails lediglich teilweise (bis zu einer bestimten Größe) heruntergeladen werden. Dadurch werden von Mails, die größer als der eingestellte Wert sind, nur die Kopfzeilen heruntergeladen. So kann man erstmal die Betreffzeile und Absender prüfen, bevor man den Rest der Nachricht plus eventuelle Anhänge runterlädt. Die Einstellung ist vor allem bei langsamen Netzwerkverbindungen sinnvoll.</p>
-<p>Der Speicherpfad für das lokale Postfach ist unter <i>Zielverzeichnis</i> eingetragen (Standard ist <span class="path"><acronym title="/boot/home/mail/in">/boot/Benutzer/mail/in/</acronym></span>) und kann jederzeit geändert werden. Dies ist sinnvoll, wenn man für jedes E-Mail Konto ein eigenes Unterverzeichnis verwenden möchte. Zwingend notwendig ist es aber nicht, denn über die "Queries" -  Haikus mächtige Suchfunktion - kann man gleiches erreichen.</p>
+<p>Der Speicherpfad für das lokale Postfach ist unter <i>Zielverzeichnis</i> eingetragen (Standard ist <span class="path">/boot/home/mail/in/</span>) und kann jederzeit geändert werden. Dies ist sinnvoll, wenn man für jedes E-Mail Konto ein eigenes Unterverzeichnis verwenden möchte. Zwingend notwendig ist es aber nicht, denn über die "Queries" -  Haikus mächtige Suchfunktion - kann man gleiches erreichen.</p>
 
 
 <h2>
@@ -209,7 +209,7 @@ Wenn man seine Netzwerkverbindung über eine Wählverbindung aufbaut, ist es rat
 <p>Der E-Mail-Dienst kann entweder <span class="menu">Nie</span>, <span class="menu">Beim Senden</span>, <span class="menu">Beim Senden und Empfangen</span> oder <span class="menu">Immer</span> ein Statusfenster anzeigen.</p>
 <p>Nur wenn der mail_daemon schon während dem Hochfahren gestartet wird (<span class="menu">Starte E-Mail-Dienst beim Systemstart</span>), werden E-Mails automatisch empfangen und versendet.</p>
 <img src="../images/prefs-images/e-mail-mailbox.png" alt="e-mail-mailbox.png" />
-<p><span class="menu">Mailbox-Menü bearbeiten...</span> öffnet das Verzeichnis <span class="path">~/Konfiguration/Mail/Menu Links/</span>. Alle Ordner oder auch Queries(!) - beziehungsweise Verknüpfungen hierzu - erscheinen im Kontextmenü des E-Mail-Dienst Icons in der Deskbar.</p>
+<p><span class="menu">Mailbox-Menü bearbeiten...</span> öffnet das Verzeichnis <span class="path">/boot/home/config/Mail/Menu Links/</span>. Alle Ordner oder auch Queries(!) - beziehungsweise Verknüpfungen hierzu - erscheinen im Kontextmenü des E-Mail-Dienst Icons in der Deskbar.</p>
 <p>Über dieses Kontextmenü kann man auch eine neue <span class="menu">Nachricht verfassen...</span>, sofort nach neuen E-Mails schauen (<span class="menu">E-Mails jetzt abrufen</span>), oder die E-Mail-Dienst <span class="menu">Einstellungen...</span> aufrufen.</p>
 <p>Hält man beim Aufrufen des Kontextmenüs <span class="key">SHIFT</span> gedrückt, erhält man Zugriff auf weitere Befehle:</p>
 <table summary="notofications" border="0" cellpadding="2" cellspacing="0"> 

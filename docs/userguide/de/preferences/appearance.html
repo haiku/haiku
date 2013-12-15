@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,10 +59,10 @@
 <h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" /><acronym title="Appearance">Erscheinungsbild</acronym></h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Preferences">Einstellungen</acronym></span></td></tr>
-<tr><td>Ort:</td><td></td><td><span class="path"><acronym title="/boot/system/preferences/Appearance">/boot/System/preferences/Erscheinungsbild</acronym></span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path"><acronym title="~/config/settings/system/app_server/appearance">~/Konfiguration/settings/system/app_server/appearance</acronym></span><br />
-<span class="path"><acronym title="~/config/settings/system/app_server/decorator_setting">~/Konfiguration/settings/system/app_server/decorator_setting</acronym></span><br />
-<span class="path"><acronym title="~/config/settings/system/app_server/fonts">~/Konfiguration/settings/system/app_server/fonts</acronym></span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
+<span class="path">~/config/settings/system/app_server/decorator_settings</span><br />
+<span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
 <p>Im <acronym title="Appearance">Erscheinungsbild</acronym> Panel lassen sich einige Details von Haikus Erscheinungsbild anpassen.</p>
 
@@ -75,7 +75,11 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">Installation neuer Schriftarten</a></h3>
-<p>Neue Schriftarten werden installiert, indem sie an ihren Platz im Dateisystem kopiert werden. Diese sind: <span class="path"><acronym title="/boot/common/data/fonts/">/boot/Allgemein/data/fonts/</acronym></span>, beziehungsweise <span class="path"><acronym title="/boot/home/config/data/fonts/">/boot/Benutzer/Konfiguration/data/fonts/</acronym></span> (unter <a href="../filesystem-layout.html">Dateisystem Layout</a> wird der Unterschied dieser beiden Speicherorte näher erläutert).</p>
+<p>Neue Schriften, die nicht als ordentliches .hpkg Paket vorliegen, können installiert werden, indem sie in einen ihrem Schrifttyp benannten Unterordner (<tt>psfonts</tt> oder <tt>ttfonts</tt>) in den entsprechenden <tt>non-packaged</tt> Ordner kopiert werden (siehe <a href="../filesystem-layout.html">Dateisystem Layout</a>). Bei TrueType Schriften wären das:</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>Schriften, die für jeden Benutzer verfügbar sind</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>Schriften, die nur für einen selbst verfügbar sind</td></tr>
+</table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

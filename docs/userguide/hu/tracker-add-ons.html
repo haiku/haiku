@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,15 +54,15 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 <h1>Nyomkövető kiegészítők</h1>
 
 <p>A programok különféle kiegészítőket telepíthetnek a gépre, amik egyszerűen előhívhatóak a kijelölt fájlokkal a Nyomkövetőben. Csak azok jelennek meg a <span class="menu">Kiegészítők</span> közt, amik tudják kezelni a kiválasztott fájltípust. Ezek szintén elérhetőek a <span class="menu">Fájl</span> menüben a Nyomkövető ablakban. Néhány kiegészítőnek nem szükséges, hogy egy fájlon nyissuk meg (tehát fájl-függetlenek), így mindig megtaláljuk őket a listában.</p>
-<p>A Nyomkövető kiegészítők, vagy olyan programok hivatkozásai, amik kiegészítőként is működhetnek, az alábbi 3 mappába telepíthetőek (további információk a <a href="filesystem-layout.html">Fájlrendszer felépítése</a> fejezetben):</p>
+<p>A Nyomkövető kiegészítők, melyek nem egy .hpkg csomag részei, az alábbi 2 mappába telepíthetőek (további információk a <a href="filesystem-layout.html">Fájlrendszer felépítése</a> fejezetben):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/add-ons/Tracker/</span></td><td>   </td><td>A rendszer kiegészítői.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>Az összes felhasználó számára elérhető kiegészítők.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>Csak a jelenlegi felhasználó kiegészítői.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>Az összes felhasználó számára elérhető kiegészítők.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>Csak a jelenlegi felhasználó kiegészítői.</td></tr>
 </table>
 <p>A kiegészítő neve végződhet egy kötőjellel és egy nagy betűvel, így billentyű kombinációval is előhívhatóak. Például a <span class="app">Cél mappa megnyitása-O</span> az <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span> kombinációval is előhívható.<br />
 Természetesen, meg kell gondolni, hogy milyen betűt választunk, ugyanis nem lehet azonos betű megadva két kiegészítőnek.</p>

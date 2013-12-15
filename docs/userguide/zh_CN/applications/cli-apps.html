@@ -54,14 +54,15 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Haiku专用命令行程序</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>位置：</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>位置：</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>所有 Haiku 附带的命令行程序都放置在 <span class="path">/boot/system/bin</span> 或者 <span class="path">/boot/common/bin</span> 目录。您自己的或另行安装的命令行程序应该放置在 <span class="path">~/config/bin</span> 目录。所有这些位置都是 PATH 变量的一部分，而且是自动查询的。<br />
-下面给出的列表并没有包含所有的用于 Haiku 的命令行程序，它只是给出了最常用的几个以方便您的尝试使用。您需要勇敢地去探索 <span class="path">bin/</span> 文件夹中的命令。以 <tt>--help</tt> 参数来运行命令行程序，这样会给出该命令的用途和相应的参数选项。</p>
+<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
+The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-attributes" name="cli-attributes">关于文件属性的命令： <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
