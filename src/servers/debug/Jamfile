@@ -4,6 +4,7 @@ UsePrivateHeaders app ;
 UsePrivateHeaders debug ;
 UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
 
 AddResources debug_server : debug_server.rdef ;
 
@@ -13,6 +14,7 @@ Server debug_server
 	:
 	be
 	libdebug.so
+	libshared.a
 	$(TARGET_LIBSTDC++)
 	localestub
 ;

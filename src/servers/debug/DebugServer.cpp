@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
  * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
@@ -25,7 +25,9 @@
 #include <Locale.h>
 #include <Path.h>
 
+#include <DriverSettings.h>
 #include <MessengerPrivate.h>
+#include <RegExp.h>
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
 #include <Server.h>
@@ -37,7 +39,8 @@
 enum {
 	kActionKillTeam,
 	kActionDebugTeam,
-	kActionSaveReportTeam
+	kActionSaveReportTeam,
+	kActionPromptUser
 };
 
 
@@ -63,6 +66,95 @@ using std::nothrow;
 
 
 static const char *kSignature = "application/x-vnd.Haiku-debug_server";
+
+
+static status_t
+action_for_string(const char* action, int32& _action)
+{
+	if (strcmp(action, "kill") == 0)
+		_action = kActionKillTeam;
+	else if (strcmp(action, "debug") == 0)
+		_action = kActionDebugTeam;
+	else if (strcmp(action, "log") == 0
+		|| strcmp(action, "report") == 0) {
+		_action = kActionSaveReportTeam;
+	}
+	else if (strcasecmp(action, "user") == 0)
+		_action = kActionPromptUser;
+	else
+		return B_BAD_VALUE;
+
+	return B_OK;
+}
+
+
+static bool
+match_team_name(const char* teamName, const char* parameterName)
+{
+	RegExp expressionMatcher;
+	if (expressionMatcher.SetPattern(parameterName,
+		RegExp::PATTERN_TYPE_WILDCARD)) {
+		BString value = teamName;
+		if (parameterName[0] != '/') {
+			// the expression in question is a team name match only,
+			// so we need to extract that.
+			BPath path(teamName);
+			if (path.InitCheck() == B_OK)
+				value = path.Leaf();
+		}
+
+		RegExp::MatchResult match = expressionMatcher.Match(value);
+		if (match.HasMatched())
+			return true;
+	}
+
+	return false;
+}
+
+
+static
+status_t action_for_team(const char* teamName, int32& _action,
+	bool& _explicitActionFound)
+{
+	status_t error = B_OK;
+	BPath path;
+	error = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (error != B_OK)
+		return error;
+
+	path.Append("system/debug_server/settings");
+	BDriverSettings settings;
+	error = settings.Load(path.Path());
+	if (error != B_OK)
+		return error;
+
+	int32 tempAction;
+	if (action_for_string(settings.GetParameterValue("default_action",
+		"user", "user"), tempAction) == B_OK) {
+		_action = tempAction;
+	} else
+		_action = kActionPromptUser;
+	_explicitActionFound = false;
+
+	BDriverParameter parameter = settings.GetParameter("executable_actions");
+	for (BDriverParameterIterator iterator = parameter.ParameterIterator();
+		iterator.HasNext();) {
+		BDriverParameter child = iterator.Next();
+		if (!match_team_name(teamName, child.Name()))
+			continue;
+
+		if (child.CountValues() > 0) {
+			if (action_for_string(child.ValueAt(0), tempAction) == B_OK) {
+				_action = tempAction;
+				_explicitActionFound = true;
+			}
+		}
+
+		break;
+	}
+
+	return B_OK;
+}
 
 
 static void
@@ -274,6 +366,7 @@ private:
 
 	TeamDebugHandlerMap				fHandlers;
 };
+
 
 TeamDebugHandlerRoster *TeamDebugHandlerRoster::sRoster = NULL;
 
@@ -693,13 +786,22 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 
 	_PrintStackTrace(thread);
 
-	int32 debugAction = kActionKillTeam;
+	int32 debugAction;
+	bool explicitActionFound;
+	if (action_for_team(fExecutablePath, debugAction, explicitActionFound)
+			!= B_OK) {
+		debugAction = kActionPromptUser;
+		explicitActionFound = false;
+	}
 
 	// ask the user whether to debug or kill the team
 	if (_IsGUIServer()) {
 		// App server, input server, or registrar. We always debug those.
-		debugAction = kActionDebugTeam;
-	} else if (USE_GUI && _AreGUIServersAlive() && _InitGUI() == B_OK) {
+		// if not specifically overridden.
+		if (!explicitActionFound)
+			debugAction = kActionDebugTeam;
+	} else if (debugAction == kActionPromptUser && USE_GUI
+		&& _AreGUIServersAlive() && _InitGUI() == B_OK) {
 		// normal app -- tell the user
 		_NotifyAppServer(fTeam);
 		_NotifyRegistrar(fTeam, true, false);
