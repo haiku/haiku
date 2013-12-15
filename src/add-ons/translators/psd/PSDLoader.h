@@ -75,6 +75,8 @@ private:
 	uint8			_GetUInt8FromStream(BPositionIO *in);
 	int8			_GetInt8FromStream(BPositionIO *in);
 	void			_SkipStreamBlock(BPositionIO *in, size_t count);
+	
+	status_t		_ParseImageResources(void);
 
 	psd_color_format _ColorFormat(void);
 
@@ -85,7 +87,10 @@ private:
 
 	size_t			fColorModeDataSize;
 	size_t			fColorModeDataPos;
-
+	
+	size_t			fImageResourceSectionSize;
+	size_t			fImageResourceSectionPos;
+	
 	int32 			fSignature;
 	int16 			fVersion;
 	int16 			fChannels;
@@ -94,6 +99,8 @@ private:
 	int16			fDepth;
 	int16			fColorFormat;
 	int16			fCompression;
+
+	uint16			fTransparentIndex;
 
 	bool			fLoaded;
 };

@@ -23,7 +23,7 @@ PSDLoader::PSDLoader(BPositionIO *src)
 	fStream->Seek(0, SEEK_SET);
 
 	fSignature = _GetInt32FromStream(fStream);
-	if (fSignature != 0x38425053)
+	if (fSignature != 0x38425053) // 8BPS
 		return;
 
 	fVersion = _GetInt16FromStream(fStream);
@@ -41,9 +41,11 @@ PSDLoader::PSDLoader(BPositionIO *src)
 	fColorModeDataPos = fStream->Position();
 	_SkipStreamBlock(fStream, fColorModeDataSize);
 
-	// Skip image resources
-	_SkipStreamBlock(fStream, _GetInt32FromStream(fStream));
-	// Skip reserved data
+	fImageResourceSectionSize = _GetInt32FromStream(fStream);
+	fImageResourceSectionPos = fStream->Position();
+	_SkipStreamBlock(fStream, fImageResourceSectionSize);
+
+	// Skip [layer and mask] block
 	_SkipStreamBlock(fStream, _GetInt32FromStream(fStream));
 
 	fCompression = _GetInt16FromStream(fStream);
@@ -288,6 +290,9 @@ PSDLoader::Decode(BPositionIO *target)
 			uint8 *colorData = new uint8[fColorModeDataSize];
 			fStream->Seek(fColorModeDataPos, SEEK_SET);
 			fStream->Read(colorData, fColorModeDataSize);
+			
+			if (_ParseImageResources() != B_OK)
+				fTransparentIndex = 256;
 
 			uint8 *redPalette = colorData;
 			uint8 *greenPalette = colorData + paletteSize;
@@ -300,7 +305,7 @@ PSDLoader::Decode(BPositionIO *target)
 					*ptr++ = bluePalette[c];
 					*ptr++ = greenPalette[c];
 					*ptr++ = redPalette[c];
-					*ptr++ = 255;
+					*ptr++ = c == fTransparentIndex ? 0 : 255;
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}
@@ -480,4 +485,56 @@ void
 PSDLoader::_SkipStreamBlock(BPositionIO *in, size_t count)
 {	
 	in->Seek(count, SEEK_CUR);
+}
+
+
+status_t
+PSDLoader::_ParseImageResources(void)
+{
+	if (!fLoaded && fImageResourceSectionSize == 0)
+		return B_ERROR;
+
+	size_t currentPos = fStream->Position();
+	fStream->Seek(fImageResourceSectionPos, SEEK_SET);
+	
+	while (fStream->Position() < currentPos + fImageResourceSectionSize) {
+		int32 resBlockSignature = _GetInt32FromStream(fStream);		
+		if (resBlockSignature != 0x3842494D) // 8BIM
+			return B_ERROR;
+	
+		uint16 resID = _GetInt16FromStream(fStream);	
+			
+		BString resName, name;		
+		int nameLength = 0;
+		while (true) {
+			int charData = _GetUInt8FromStream(fStream);
+			nameLength++;
+			if (charData == 0) {
+				if (nameLength % 2 == 1) {
+					_GetUInt8FromStream(fStream);
+					nameLength++;
+				}
+				break;
+			} else
+				name += charData;
+			resName = name;
+		}
+
+		uint32 resSize = _GetInt32FromStream(fStream);
+
+		if (resSize % 2 == 1)
+			resSize++;
+
+		switch (resID) {
+			case 0x0417:
+				fTransparentIndex = _GetInt16FromStream(fStream);
+				break;
+			default:
+				_SkipStreamBlock(fStream, resSize);
+		}
+	}
+
+	fStream->Seek(currentPos, SEEK_SET);
+	
+	return B_OK;
 }
