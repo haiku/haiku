@@ -42,6 +42,8 @@ public:
 
 			bigtime_t	Time() const { return fTime; }
 			uint32		CPUCount() const { return fSystemInfo.cpu_count; }
+			bigtime_t	CPUActiveTime(uint32 cpu) const
+							{ return fCPUInfos[cpu].active_time; }
 			const system_info& Info() const { return fSystemInfo; }
 
 			uint64		NetworkReceived();
@@ -61,6 +63,7 @@ private:
 			void		_RetrieveNetwork();
 
 	system_info			fSystemInfo;
+	cpu_info*			fCPUInfos;
 	system_memory_info	fMemoryInfo;
 	bigtime_t			fTime;
 	bool				fRetrievedNetwork;

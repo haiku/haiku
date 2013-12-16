@@ -514,7 +514,13 @@ extern int64		_kern_atomic_get64(vint64 *value);
 #endif	// ATOMIC64_FUNCS_ARE_SYSCALLS
 
 /* System informations */
-extern status_t		_kern_get_system_info(system_info *info, size_t size);
+extern status_t		_kern_get_system_info(system_info* info);
+extern status_t		_kern_get_cpu_info(uint32 firstCPU, uint32 cpuCount,
+						cpu_info* info);
+extern status_t		_kern_get_cpu_topology_info(
+						cpu_topology_node_info* topologyInfos,
+						uint32* topologyInfoCount);
+
 extern status_t		_kern_get_system_info_etc(int32 id, void *buffer,
 						size_t bufferSize);
 extern status_t		_kern_analyze_scheduling(bigtime_t from, bigtime_t until,

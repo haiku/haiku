@@ -187,7 +187,7 @@ TypeEditorView::TypeMatches()
 	system_info info;
 	get_system_info(&info);
 
-	return fEditor.FileSize() / B_PAGE_SIZE < info.max_pages / 2;
+	return uint64(fEditor.FileSize()) / B_PAGE_SIZE < info.max_pages / 2;
 }
 
 

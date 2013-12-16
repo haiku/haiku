@@ -24,6 +24,8 @@ SystemInfo::SystemInfo(SystemInfoHandler* handler)
 	fMediaBuffers(0)
 {
 	get_system_info(&fSystemInfo);
+	fCPUInfos = new cpu_info[fSystemInfo.cpu_count];
+	get_cpu_info(0, fSystemInfo.cpu_count, fCPUInfos);
 	__get_system_info_etc(B_MEMORY_INFO, &fMemoryInfo,
 		sizeof(system_memory_info));
 
@@ -40,6 +42,7 @@ SystemInfo::SystemInfo(SystemInfoHandler* handler)
 
 SystemInfo::~SystemInfo()
 {
+	delete[] fCPUInfos;
 }
 
 

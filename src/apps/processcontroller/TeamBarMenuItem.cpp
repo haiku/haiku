@@ -51,7 +51,7 @@ TeamBarMenuItem::Init()
 	if (fTeamID == B_SYSTEM_TEAM) {
 		thread_info	thinfos;
 		bigtime_t idle = 0;
-		for (int t = 1; t <= gCPUcount; t++)
+		for (unsigned int t = 1; t <= gCPUcount; t++)
 			if (get_thread_info(t, &thinfos) == B_OK)
 				idle += thinfos.kernel_time + thinfos.user_time;
 		fTeamUsageInfo.kernel_time += fTeamUsageInfo.user_time;
@@ -213,9 +213,10 @@ TeamBarMenuItem::BarUpdate()
 		bigtime_t idle = 0;
 		if (fTeamID == B_SYSTEM_TEAM) {
 			thread_info	thinfos;
-			for (int t = 1; t <= gCPUcount; t++)
+			for (unsigned int t = 1; t <= gCPUcount; t++) {
 				if (get_thread_info(t, &thinfos) == B_OK)
 					idle += thinfos.kernel_time + thinfos.user_time;
+			}
 			usage.kernel_time += usage.user_time;
 			usage.user_time = idle;
 			idle -= fTeamUsageInfo.user_time;

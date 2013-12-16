@@ -82,7 +82,7 @@ void PulseView::Init() {
 	if (sys_info.cpu_count >= 2) {
 		cpu_menu_items = new BMenuItem *[sys_info.cpu_count];
 		char temp[20];
-		for (int x = 0; x < sys_info.cpu_count; x++) {
+		for (unsigned int x = 0; x < sys_info.cpu_count; x++) {
 			sprintf(temp, "CPU %d", x + 1);
 			BMessage *message = new BMessage(PV_CPU_MENU_ITEM);
 			message->AddInt32("which", x);
@@ -115,10 +115,14 @@ void PulseView::Update() {
 	get_system_info(&sys_info);
 	bigtime_t now = system_time();
 
+	cpu_info* cpuInfos = new cpu_info[sys_info.cpu_count];
+	get_cpu_info(0, sys_info.cpu_count, cpuInfos);
+
 	// Calculate work done since last call to Update() for each CPU
-	for (int x = 0; x < sys_info.cpu_count; x++) {
-		double cpu_time = (double)(sys_info.cpu_infos[x].active_time - prev_active[x]) / (now - prev_time);
-		prev_active[x] = sys_info.cpu_infos[x].active_time;
+	for (unsigned int x = 0; x < sys_info.cpu_count; x++) {
+		double cpu_time = (double)(cpuInfos[x].active_time - prev_active[x])
+				/ (now - prev_time);
+		prev_active[x] = cpuInfos[x].active_time;
 		if (cpu_time < 0) cpu_time = 0;
 		if (cpu_time > 1) cpu_time = 1;
 		cpu_times[x] = cpu_time;
@@ -131,6 +135,8 @@ void PulseView::Update() {
 		}
 	}
 	prev_time = now;
+
+	delete[] cpuInfos;
 }
 
 void PulseView::ChangeCPUState(BMessage *message) {

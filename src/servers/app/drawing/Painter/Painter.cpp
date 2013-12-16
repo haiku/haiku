@@ -125,7 +125,7 @@ detect_simd()
 	// supported across all CPUs found.
 	uint32 systemSIMD = 0xffffffff;
 
-	for (int32 cpu = 0; cpu < systemInfo.cpu_count; cpu++) {
+	for (uint32 cpu = 0; cpu < systemInfo.cpu_count; cpu++) {
 		cpuid_info cpuInfo;
 		get_cpuid(&cpuInfo, 0, cpu);
 

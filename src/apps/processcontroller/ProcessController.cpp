@@ -77,7 +77,7 @@ const rgb_color kKernelBlue = {20, 20, 231,	255};
 const rgb_color kIdleGreen = {110, 190,110,	255};
 
 ProcessController* gPCView;
-int32 gCPUcount;
+uint32 gCPUcount;
 rgb_color gUserColor;
 rgb_color gUserColorSelected;
 rgb_color gIdleColor;
@@ -435,10 +435,10 @@ ProcessController::MessageReceived(BMessage *message)
 
 		case 'CPU ':
 		{
-			int32 cpu;
-			if (message->FindInt32 ("cpu", &cpu) == B_OK) {
+			uint32 cpu;
+			if (message->FindInt32("cpu", (int32*)&cpu) == B_OK) {
 				bool last = true;
-				for (int p = 0; p < gCPUcount; p++) {
+				for (unsigned int p = 0; p < gCPUcount; p++) {
 					if (p != cpu && _kern_cpu_enabled(p)) {
 						last = false;
 						break;
@@ -609,7 +609,7 @@ ProcessController::DoDraw(bool force)
 		SetHighColor(frame_color);
 		StrokeRect(BRect(left - 1, top - 1, right, bottom + 1));
 		if (gCPUcount > 1 && layout[gCPUcount].cpu_inter == 1) {
-			for (int x = 1; x < gCPUcount; x++)
+			for (unsigned int x = 1; x < gCPUcount; x++)
 				StrokeLine(BPoint(left + x * barWidth + x - 1, top),
 					BPoint(left + x * barWidth + x - 1, bottom));
 		}
@@ -619,7 +619,7 @@ ProcessController::DoDraw(bool force)
 		StrokeRect(BRect(leftMem - 1, top - 1,
 			leftMem + layout[gCPUcount].mem_width, bottom + 1));
 
-	for (int x = 0; x < gCPUcount; x++) {
+	for (unsigned int x = 0; x < gCPUcount; x++) {
 		right = left + barWidth - 1;
 		float rem = fCPUTimes[x] * (h + 1);
 		float barHeight = floorf (rem);
@@ -697,14 +697,17 @@ ProcessController::Update()
 	get_system_info(&info);
 	bigtime_t now = system_time();
 
+	cpu_info* cpuInfos = new cpu_info[gCPUcount];
+	get_cpu_info(0, gCPUcount, cpuInfos);
+
 	fMemoryUsage = float(info.used_pages) / float(info.max_pages);
 	// Calculate work done since last call to Update() for each CPU
-	for (int x = 0; x < gCPUcount; x++) {
-		bigtime_t load = info.cpu_infos[x].active_time - fPrevActive[x];
+	for (unsigned int x = 0; x < gCPUcount; x++) {
+		bigtime_t load = cpuInfos[x].active_time - fPrevActive[x];
 		bigtime_t passed = now - fPrevTime;
 		float cpuTime = float(load) / float(passed);
 
-		fPrevActive[x] = info.cpu_infos[x].active_time;
+		fPrevActive[x] = cpuInfos[x].active_time;
 		if (load > passed)
 			fPrevActive[x] -= load - passed; // save overload for next period...
 		if (cpuTime < 0)
@@ -714,6 +717,8 @@ ProcessController::Update()
 		fCPUTimes[x] = cpuTime;
 	}
 	fPrevTime = now;
+
+	delete[] cpuInfos;
 }
 
 
@@ -725,7 +730,8 @@ thread_popup(void *arg)
 {
 	Tpopup_param* param = (Tpopup_param*) arg;
 	int32 mcookie, hcookie;
-	long m, h;
+	unsigned long m;
+	long h;
 	BMenuItem* item;
 	bool top = param->top;
 
@@ -797,7 +803,7 @@ thread_popup(void *arg)
 
 	// CPU on/off section
 	if (gCPUcount > 1) {
-		for (int i = 0; i < gCPUcount; i++) {
+		for (unsigned int i = 0; i < gCPUcount; i++) {
 			char item_name[32];
 			sprintf (item_name, B_TRANSLATE("Processor %d"), i + 1);
 			BMessage* m = new BMessage ('CPU ');

@@ -63,6 +63,10 @@ extern "C" {
 #endif
 
 
+status_t __get_system_info(system_info* info);
+status_t __get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* info);
+status_t __get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
+			uint32* topologyInfoCount);
 status_t __get_system_info_etc(int32 id, void* buffer, size_t bufferSize);
 
 status_t __start_watching_system(int32 object, uint32 flags, port_id port,

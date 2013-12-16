@@ -45,6 +45,21 @@ enum {
 	P_SCRIPT
 };
 
+typedef enum {
+    B_BEBOX_PLATFORM = 0,
+    B_MAC_PLATFORM,
+    B_AT_CLONE_PLATFORM,
+    B_ENIAC_PLATFORM,
+    B_APPLE_II_PLATFORM,
+    B_CRAY_PLATFORM,
+    B_LISA_PLATFORM,
+    B_TI_994A_PLATFORM,
+    B_TIMEX_SINCLAIR_PLATFORM,
+    B_ORAC_1_PLATFORM,
+    B_HAL_PLATFORM,
+	B_INVALID_PLATFORM
+} platform_type;
+
 
 PackageInfo::PackageInfo()
 	:
@@ -131,8 +146,19 @@ PackageInfo::Parse()
 
 	const char padding[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
-	system_info sysinfo;
-	get_system_info(&sysinfo);
+	platform_type thisPlatform = B_INVALID_PLATFORM;
+	cpu_topology_node_info topologyRoot;
+	uint32 topologyNodeCount = 1;
+	if (get_cpu_topology_info(&topologyRoot, &topologyNodeCount) == B_OK) {
+		switch (topologyRoot.data.root.platform) {
+			case B_CPU_x86:
+				thisPlatform = B_AT_CLONE_PLATFORM;
+				break;
+
+			default:
+				break;
+		}
+	}
 
 	uint64 infoOffset = 0, groupsOffset = 0;
 	uint64 length = 0;
@@ -843,8 +869,7 @@ PackageInfo::Parse()
 
 			parser_debug("Padding!\n");
 			if (platform != 0xffffffff
-				&& static_cast<platform_types>(platform)
-					!= sysinfo.platform_type) {
+				&& static_cast<platform_type>(platform) != thisPlatform) {
 				// If the file/directory/item's platform is different than the
 				// target platform (or different than the 'any' constant),
 				// ignore this file

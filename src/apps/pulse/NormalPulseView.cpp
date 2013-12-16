@@ -129,16 +129,34 @@ NormalPulseView::DetermineVendorAndProcessor()
 	logo = PowerPCLogo;
 #endif
 #if __INTEL__
-	
-	switch (sys_info.cpu_type & B_CPU_x86_VENDOR_MASK) {
-	case B_CPU_INTEL_x86:
-		logo = IntelLogo;
-		break;
-		
-	case B_CPU_AMD_x86:
-		logo = AmdLogo;
-		break;
-	};
+	uint32 topologyNodeCount = 0;
+	cpu_topology_node_info* topology = NULL;
+
+	get_cpu_topology_info(NULL, &topologyNodeCount);
+	if (topologyNodeCount != 0)
+		topology = new cpu_topology_node_info[topologyNodeCount];
+	get_cpu_topology_info(topology, &topologyNodeCount);
+
+	for (uint32 i = 0; i < topologyNodeCount; i++) {
+		if (topology[i].type == B_TOPOLOGY_PACKAGE) {
+			switch (topology[i].data.package.vendor) {
+				case B_CPU_VENDOR_INTEL:
+					logo = IntelLogo;
+					break;
+
+				case B_CPU_VENDOR_AMD:
+					logo = AmdLogo;
+					break;
+
+				default:
+					break;
+			}
+
+			break;
+		}
+	}
+
+	delete[] topology;
 #endif
 
 	fCpuLogo->SetBits(logo, fCpuLogo->BitsLength(), 0, B_CMAP8);
@@ -255,9 +273,8 @@ NormalPulseView::AttachedToWindow()
 	system_info sys_info;
 	get_system_info(&sys_info);
 	if (sys_info.cpu_count >= 2) {
-		for (int x = 0; x < sys_info.cpu_count; x++) {
+		for (unsigned int x = 0; x < sys_info.cpu_count; x++)
 			cpu_menu_items[x]->SetTarget(messenger);
-		}
 	}
 }
 
@@ -270,7 +287,7 @@ NormalPulseView::UpdateColors(BMessage *message)
 	system_info sys_info;
 	get_system_info(&sys_info);
 
-	for (int x = 0; x < sys_info.cpu_count; x++) {
+	for (unsigned int x = 0; x < sys_info.cpu_count; x++) {
 		fProgressBars[x]->UpdateColors(color, fade);
 		fCpuButtons[x]->UpdateColors(color);
 	}

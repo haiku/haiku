@@ -48,7 +48,6 @@ StdBinCommands
 	release.c
 	renice.c
 	rescan.c
-	sysinfo.cpp
 	unchop.c
 	uptime.cpp
 	vmstat.cpp
@@ -159,6 +158,7 @@ StdBinCommands
 # commands that need libstdc++ only
 StdBinCommands
 	diff_zip.cpp
+	sysinfo.cpp
 	: $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libtranslation.so, libsupc++.so

@@ -73,7 +73,7 @@ class ProcessController : public BView {
 };
 
 extern	ProcessController*	gPCView;
-extern	int32				gCPUcount;
+extern	uint32				gCPUcount;
 extern	rgb_color			gIdleColor;
 extern	rgb_color			gIdleColorSelected;
 extern	rgb_color			gKernelColor;
