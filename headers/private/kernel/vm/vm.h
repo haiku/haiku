@@ -142,7 +142,7 @@ status_t vm_get_physical_page_debug(phys_addr_t paddr, addr_t* vaddr,
 			void** _handle);
 status_t vm_put_physical_page_debug(addr_t vaddr, void* handle);
 
-void vm_get_info(struct system_memory_info *info);
+void vm_get_info(system_info *info);
 uint32 vm_num_page_faults(void);
 off_t vm_available_memory(void);
 off_t vm_available_not_needed_memory(void);

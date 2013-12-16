@@ -521,8 +521,6 @@ extern status_t		_kern_get_cpu_topology_info(
 						cpu_topology_node_info* topologyInfos,
 						uint32* topologyInfoCount);
 
-extern status_t		_kern_get_system_info_etc(int32 id, void *buffer,
-						size_t bufferSize);
 extern status_t		_kern_analyze_scheduling(bigtime_t from, bigtime_t until,
 						void* buffer, size_t size,
 						struct scheduling_analysis* analysis);

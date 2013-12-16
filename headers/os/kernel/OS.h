@@ -433,14 +433,15 @@ typedef struct {
 
 	uint64			max_pages;			/* total # of accessible pages */
 	uint64			used_pages;			/* # of accessible pages in use */
-	uint64			free_pages;
-	uint64			reserved_pages;
 	uint64			cached_pages;
 	uint64			block_cache_pages;
 	uint64			ignored_pages;		/* # of ignored/inaccessible pages */
 
+	uint64			needed_memory;
+	uint64			free_memory;
+
 	uint64			max_swap_pages;
-	uint64			used_swap_pages;
+	uint64			free_swap_pages;
 
 	uint32			page_faults;		/* # of page faults */
 

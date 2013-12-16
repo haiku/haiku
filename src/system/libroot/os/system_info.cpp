@@ -199,16 +199,6 @@ __get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
 
 
 status_t
-__get_system_info_etc(int32 id, void *info, size_t size)
-{
-	if (info == NULL || size == 0 || id < 0)
-		return B_BAD_VALUE;
-
-	return _kern_get_system_info_etc(id, info, size);
-}
-
-
-status_t
 __start_watching_system(int32 object, uint32 flags, port_id port, int32 token)
 {
 	return _kern_start_watching_system(object, flags, port, token);

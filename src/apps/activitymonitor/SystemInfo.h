@@ -20,6 +20,7 @@ public:
 						~SystemInfo();
 
 			uint64		CachedMemory() const;
+			uint64		BlockCacheMemory() const;
 			uint64		UsedMemory() const;
 			uint64		MaxMemory() const;
 
@@ -64,7 +65,6 @@ private:
 
 	system_info			fSystemInfo;
 	cpu_info*			fCPUInfos;
-	system_memory_info	fMemoryInfo;
 	bigtime_t			fTime;
 	bool				fRetrievedNetwork;
 	uint64				fBytesReceived;

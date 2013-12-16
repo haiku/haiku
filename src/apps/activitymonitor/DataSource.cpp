@@ -497,13 +497,7 @@ BlockCacheDataSource::Copy() const
 int64
 BlockCacheDataSource::NextValue(SystemInfo& info)
 {
-	system_memory_info memoryInfo;
-	status_t status = __get_system_info_etc(B_MEMORY_INFO, &memoryInfo,
-		sizeof(system_memory_info));
-	if (status != B_OK)
-		return 0;
-
-	return memoryInfo.block_cache_memory;
+	return info.BlockCacheMemory();
 }
 
 

@@ -418,6 +418,7 @@ get_system_info(system_info* info)
 	info->cpu_count = smp_get_num_cpus();
 
 	vm_page_get_stats(info);
+	vm_get_info(info);
 
 	info->used_threads = thread_used_threads();
 	info->max_threads = thread_max_threads();
@@ -427,8 +428,6 @@ get_system_info(system_info* info)
 	info->max_ports = port_max_ports();
 	info->used_sems = sem_used_sems();
 	info->max_sems = sem_max_sems();
-
-	// TODO: fill the new fields
 
 	info->kernel_version = kKernelVersion;
 	strlcpy(info->kernel_name, kKernelName, B_FILE_NAME_LENGTH);
@@ -622,32 +621,6 @@ _user_get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
 	if (error != B_OK)
 		return error;
 	return user_memcpy(topologyInfoCount, &count, sizeof(uint32));
-}
-
-
-status_t
-_user_get_system_info_etc(int32 id, void* userInfo, size_t size)
-{
-	if (userInfo == NULL || !IS_USER_ADDRESS(userInfo))
-		return B_BAD_ADDRESS;
-
-	switch (id) {
-		case B_MEMORY_INFO:
-		{
-			if (size < sizeof(system_memory_info))
-				return B_BAD_VALUE;
-
-			system_memory_info info;
-			vm_get_info(&info);
-
-			info.block_cache_memory = block_cache_used_memory();
-
-			return user_memcpy(userInfo, &info, sizeof(system_memory_info));
-		}
-
-		default:
-			return B_BAD_VALUE;
-	}
 }
 
 
