@@ -3524,7 +3524,8 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 		case _MESSAGE_DROPPED_:
 		{
 			uint32 originalWhat;
-			if (message->FindInt32("_original_what", (int32*)&originalWhat) == B_OK) {
+			if (message->FindInt32("_original_what",
+					(int32*)&originalWhat) == B_OK) {
 				message->what = originalWhat;
 				message->RemoveName("_original_what");
 			}
