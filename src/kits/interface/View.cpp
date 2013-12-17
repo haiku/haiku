@@ -4324,12 +4324,8 @@ BView::MessageReceived(BMessage* message)
 			case B_MOUSE_IDLE:
 			{
 				BPoint where;
-				if (message->FindPoint("be:view_where", &where) != B_OK) {
-					if (message->FindPoint("screen_where", &where) != B_OK)
-						break;
-					else
-						ConvertFromScreen(&where);
-				}
+				if (message->FindPoint("be:view_where", &where) != B_OK)
+					break;
 
 				BToolTip* tip;
 				if (GetToolTipAt(where, &tip))

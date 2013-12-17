@@ -3521,6 +3521,23 @@ BWindow::_SanitizeMessage(BMessage* message, BHandler* target, bool usePreferred
 			break;
 		}
 
+		case B_MOUSE_IDLE:
+		{
+			// App Server sends screen coordinates, convert the point to
+			// local view coordinates, then add the point in be:view_where
+			BPoint where;
+			if (message->FindPoint("screen_where", &where) != B_OK)
+				break;
+
+			BView* view = dynamic_cast<BView*>(target);
+			if (view != NULL) {
+				// add local view coordinates
+				message->AddPoint("be:view_where",
+					view->ConvertFromScreen(where));
+			}
+			break;
+		}
+
 		case _MESSAGE_DROPPED_:
 		{
 			uint32 originalWhat;
