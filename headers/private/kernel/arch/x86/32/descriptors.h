@@ -38,6 +38,8 @@
 #define USER_CODE_SELECTOR	((USER_CODE_SEGMENT << 3) | DPL_USER)
 #define USER_DATA_SELECTOR	((USER_DATA_SEGMENT << 3) | DPL_USER)
 
+#define KERNEL_TLS_SELECTOR	((KERNEL_TLS_SEGMENT << 3) | DPL_KERNEL)
+
 
 #ifndef _ASSEMBLER
 	// this file can also be included from assembler as well

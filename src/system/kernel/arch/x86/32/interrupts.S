@@ -159,7 +159,7 @@
 																		\
 	/* restore pointers and clear fault handler */						\
 	movl	%edx, %esi;				/* syscall info pointer */			\
-	movl	%dr3, %edi;				/* thread pointer */				\
+	movl	%gs:0, %edi;			/* thread pointer */				\
 	movl	$0, THREAD_fault_handler(%edi)
 
 #if SYSCALL_TRACING
@@ -509,6 +509,9 @@ FUNCTION_END(trap14_double_fault)
 STATIC_FUNCTION(int_bottom):
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
 
+	movl	$KERNEL_TLS_SELECTOR, %edx
+	movw	%dx, %gs
+
 	movl	%esp, %ebp		// frame pointer is the iframe
 
 	// Set the RF (resume flag) in EFLAGS. This prevents an instruction
@@ -524,7 +527,7 @@ STATIC_FUNCTION(int_bottom):
 	// so that we have to do it in the instruction before, thus opening a
 	// window for an interrupt while still being in the kernel, but having set
 	// up everything for userland already.
-	movl	%dr3, %edi						// thread pointer
+	movl	%gs:0, %edi						// thread pointer
 	cmpb	$0, THREAD_in_kernel(%edi)
 	je		int_bottom_user
 
@@ -546,7 +549,7 @@ STATIC_FUNCTION(int_bottom_user):
 	movl	%eax,%es
 
 	// disable breakpoints, if installed
-	movl	%dr3, %edi				// thread pointer
+	movl	%gs:0, %edi				// thread pointer
 	cli								// disable interrupts
 	STOP_USER_DEBUGGING()
 
@@ -600,6 +603,9 @@ FUNCTION_END(trap99)
 
 
 STATIC_FUNCTION(handle_syscall):
+	movl	$KERNEL_TLS_SELECTOR, %edx
+	movw	%dx, %gs
+
 	// save %eax, the number of the syscall
 	movl	%eax, %esi
 
@@ -610,7 +616,7 @@ STATIC_FUNCTION(handle_syscall):
 
 	lea		4(%esp), %ebp			// skipping the return address, the stack
 									// frame pointer is the iframe
-	movl	%dr3, %edi				// thread pointer
+	movl	%gs:0, %edi				// thread pointer
 
 	// disable breakpoints, if installed
 	cli								// disable interrupts
@@ -745,7 +751,7 @@ FUNCTION_END(handle_syscall)
 
   STATIC_FUNCTION(bad_syscall_params):
 	// clear the fault handler and exit normally
-	movl	%dr3, %edi
+	movl	%gs:0, %edi
 	movl	$0, THREAD_fault_handler(%edi)
 	jmp		kernel_exit_work
   FUNCTION_END(bad_syscall_params)
@@ -756,7 +762,11 @@ FUNCTION_END(handle_syscall)
 */
 FUNCTION(x86_sysenter):
 	// get the thread
-	movl	%dr3, %edx
+	push	%gs
+	movl	$KERNEL_TLS_SELECTOR, %edx
+	movw	%dx, %gs
+	movl	%gs:0, %edx
+	pop		%gs
 
 	// push the iframe
 	pushl	$USER_DATA_SELECTOR		// user_ss
@@ -816,7 +826,7 @@ FUNCTION(x86_return_to_userland):
 	movl	%ebp, %esp
 
 	// check, if any kernel exit work has to be done
-	movl	%dr3, %edi
+	movl	%gs:0, %edi
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
 			, THREAD_flags(%edi)
