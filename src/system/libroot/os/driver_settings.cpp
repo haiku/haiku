@@ -953,8 +953,8 @@ get_driver_settings(void *handle)
 }
 
 
-// this creates an alias of the above function
-// unload_driver_settings() is the same as delete_driver_settings()
-extern "C" __typeof(unload_driver_settings) delete_driver_settings
-	__attribute__((weak, alias ("unload_driver_settings")));
-
+status_t
+delete_driver_settings(void *_handle)
+{
+	return unload_driver_settings(_handle);
+}
