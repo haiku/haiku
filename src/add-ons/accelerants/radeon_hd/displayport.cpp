@@ -30,7 +30,7 @@
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 
-static int
+static status_t
 dp_aux_speak(uint32 hwPin, uint8* send, int sendBytes,
 	uint8* recv, int recvBytes, uint8 delay, uint8* ack)
 {
@@ -84,11 +84,11 @@ dp_aux_speak(uint32 hwPin, uint8* send, int sendBytes,
 	if (recv && recvBytes)
 		memcpy(recv, base + 16, recvLength);
 
-	return recvLength;
+	return B_OK;
 }
 
 
-int
+status_t
 dp_aux_write(uint32 hwPin, uint16 address,
 	uint8* send, uint8 sendBytes, uint8 delay)
 {
@@ -107,16 +107,16 @@ dp_aux_write(uint32 hwPin, uint16 address,
 	uint8 retry;
 	for (retry = 0; retry < 4; retry++) {
 		uint8 ack;
-		int result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
+		status_t result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
 			NULL, 0, delay, &ack);
 
 		if (result == B_BUSY)
 			continue;
-		else if (result < B_OK)
+		else if (result != B_OK)
 			return result;
 
 		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
-			return sendBytes;
+			return B_OK;
 		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
 			snooze(400);
 		else
@@ -127,7 +127,7 @@ dp_aux_write(uint32 hwPin, uint16 address,
 }
 
 
-int
+status_t
 dp_aux_read(uint32 hwPin, uint16 address,
 	uint8* recv, int recvBytes, uint8 delay)
 {
@@ -142,16 +142,16 @@ dp_aux_read(uint32 hwPin, uint16 address,
 	uint8 retry;
 	for (retry = 0; retry < 4; retry++) {
 		uint8 ack;
-		int result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
+		status_t result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
 			recv, recvBytes, delay, &ack);
 
 		if (result == B_BUSY)
 			continue;
-		else if (result < B_OK)
+		else if (result != B_OK)
 			return result;
 
 		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
-			return result;
+			return B_OK; 
 		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
 			snooze(400);
 		else
@@ -165,7 +165,9 @@ dp_aux_read(uint32 hwPin, uint16 address,
 void
 dpcd_reg_write(uint32 hwPin, uint16 address, uint8 value)
 {
-	dp_aux_write(hwPin, address, &value, 1, 0);
+	status_t result = dp_aux_write(hwPin, address, &value, 1, 0);
+	if (result != B_OK)
+		ERROR("%s: error on DisplayPort aux write (0x%lX)\n", __func__, result);
 }
 
 
@@ -173,14 +175,17 @@ uint8
 dpcd_reg_read(uint32 hwPin, uint16 address)
 {
 	uint8 value = 0;
-	dp_aux_read(hwPin, address, &value, 1, 0);
+	status_t result = dp_aux_read(hwPin, address, &value, 1, 0);
+	if (result != B_OK)
+		ERROR("%s: error on DisplayPort aux read (0x%lX)\n", __func__, result);
 
 	return value;
 }
 
 
 status_t
-dp_aux_get_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool start, bool stop)
+dp_aux_get_i2c_byte(uint32 hwPin, uint16 address, uint8* data,
+	bool start, bool stop)
 {
 	uint8 auxMessage[5];
 	int auxMessageBytes = 4; // 4 for read
@@ -207,12 +212,12 @@ dp_aux_get_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool start, bool 
 		uint8 reply[2];
 		int replyBytes = 1;
 
-		int result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
+		status_t result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
 			reply, replyBytes, 0, &ack);
 		if (result == B_BUSY)
 			continue;
-		else if (result < 0) {
-			ERROR("%s: aux_ch failed: %d\n", __func__, result);
+		else if (result != B_OK) {
+			ERROR("%s: aux_ch speak failed 0x%lX\n", __func__, result);
 			return B_ERROR;
 		}
 
@@ -257,7 +262,8 @@ dp_aux_get_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool start, bool 
 
 
 status_t
-dp_aux_set_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool start, bool stop)
+dp_aux_set_i2c_byte(uint32 hwPin, uint16 address, uint8* data,
+	bool start, bool stop)
 {
 	uint8 auxMessage[5];
 	int auxMessageBytes = 5; // 5 for write
@@ -285,12 +291,12 @@ dp_aux_set_i2c_byte(uint32 hwPin, uint16 address, uint8* data, bool start, bool 
 		uint8 reply[2];
 		int replyBytes = 1;
 
-		int result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
+		status_t result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
 			reply, replyBytes, 0, &ack);
 		if (result == B_BUSY)
 			continue;
-		else if (result < 0) {
-			ERROR("%s: aux_ch failed: %d\n", __func__, result);
+		else if (result != B_OK) {
+			ERROR("%s: aux_ch speak failed 0x%lX\n", __func__, result);
 			return B_ERROR;
 		}
 
@@ -440,10 +446,9 @@ dp_setup_connectors()
 		dpInfo->auxPin = auxPin;
 
 		uint8 auxMessage[25];
-		int result;
 
-		result = dp_aux_read(auxPin, DP_DPCD_REV, auxMessage, 8, 0);
-		if (result > 0) {
+		status_t result = dp_aux_read(auxPin, DP_DPCD_REV, auxMessage, 8, 0);
+		if (result == B_OK) {
 			dpInfo->valid = true;
 			memcpy(dpInfo->config, auxMessage, 8);
 		}
@@ -454,10 +459,10 @@ dp_setup_connectors()
 static bool
 dp_get_link_status(dp_info* dp)
 {
-	int result = dp_aux_read(dp->auxPin, DP_LANE_STATUS_0_1,
+	status_t result = dp_aux_read(dp->auxPin, DP_LANE_STATUS_0_1,
 		dp->linkStatus, DP_LINK_STATUS_SIZE, 100);
 
-	if (result <= 0) {
+	if (result != B_OK) {
 		ERROR("%s: DisplayPort link status failed\n", __func__);
 		return false;
 	}
@@ -913,11 +918,11 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 	dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, rdata, true, false);
 
 	for (uint32 i = 0; i < sizeof(raw); i++) {
-		status_t ret = dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50,
+		status_t result = dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50,
 			rdata++, false, false);
-		if (ret) {
-			TRACE("%s: error reading EDID data at index %d, ret = %d\n",
-					__func__, i, ret);
+		if (result != B_OK) {
+			TRACE("%s: error reading EDID data at index " B_PRIu32 ", "
+				"result = 0x%lX\n", __func__, i, result);
 			dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, &sdata, false, true);
 			return false;
 		}
