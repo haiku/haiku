@@ -677,7 +677,7 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 			gIdlePackageList.Remove(package);
 
 		// get rid of threads
-		thread_map(unassign_thread, &core->fCoreID);
+		thread_map(unassign_thread, core);
 
 		core->fThreadCount = 0;
 		while (core->fRunQueue.PeekMaximum() != NULL) {
