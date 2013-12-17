@@ -25,6 +25,8 @@ static uint16 sMinPState;
 static uint16 sMaxPState;
 static uint16 sBoostPState;
 
+static bool sAvoidBoost;
+
 
 struct CPUEntry {
 				CPUEntry();
@@ -32,7 +34,7 @@ struct CPUEntry {
 	uint16		fCurrentPState;
 
 	bigtime_t	fLastUpdate;
-};
+} CACHE_LINE_ALIGN;
 static CPUEntry* sCPUEntries;
 
 
@@ -41,6 +43,13 @@ CPUEntry::CPUEntry()
 	fCurrentPState(sMinPState - 1),
 	fLastUpdate(0)
 {
+}
+
+
+static void
+pstates_set_scheduler_mode(scheduler_mode mode)
+{
+	sAvoidBoost = mode == SCHEDULER_MODE_POWER_SAVING;
 }
 
 
@@ -83,7 +92,7 @@ set_pstate(uint16 pstate)
 
 
 static status_t
-increase_performance(int delta, bool allowBoost)
+pstates_increase_performance(int delta)
 {
 	CPUEntry* entry = &sCPUEntries[smp_get_current_cpu()];
 
@@ -93,7 +102,7 @@ increase_performance(int delta, bool allowBoost)
 	int pState = measure_pstate(entry);
 	pState += (sBoostPState - pState) * delta / kCPUPerformanceScaleMax;
 
-	if (!allowBoost)
+	if (sAvoidBoost && pState < (sMaxPState + sBoostPState) / 2)
 		pState = min_c(pState, sMaxPState);
 
 	set_pstate(pState);
@@ -102,7 +111,7 @@ increase_performance(int delta, bool allowBoost)
 
 
 static status_t
-decrease_performance(int delta)
+pstates_decrease_performance(int delta)
 {
 	CPUEntry* entry = &sCPUEntries[smp_get_current_cpu()];
 
@@ -184,6 +193,8 @@ init_pstates()
 	if (sCPUEntries == NULL)
 		return B_NO_MEMORY;
 
+	pstates_set_scheduler_mode(SCHEDULER_MODE_LOW_LATENCY);
+
 	call_all_cpus_sync(set_normal_pstate, NULL);
 	return B_OK;
 }
@@ -224,8 +235,10 @@ static cpufreq_module_info sIntelPStates = {
 
 	1.0f,
 
-	increase_performance,
-	decrease_performance,
+	pstates_set_scheduler_mode,
+
+	pstates_increase_performance,
+	pstates_decrease_performance,
 };
 
 

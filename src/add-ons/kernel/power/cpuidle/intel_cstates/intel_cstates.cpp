@@ -27,16 +27,18 @@
 
 #define INTEL_CSTATES_MODULE_NAME	CPUIDLE_MODULES_PREFIX "/intel_cstates/v1"
 
-#define TIME_STEP					250
+#define BASE_TIME_STEP				500
 
 struct CState {
 	uint32	fCode;
 	int		fSubStatesCount;
-	int		fSubStatesStep;
 };
 
 static CState sCStates[CPUIDLE_CSTATE_MAX];
 static int sCStateCount;
+
+static int sTimeStep = BASE_TIME_STEP;
+static bool sEnableWait = false;
 
 static bigtime_t* sIdleTime;
 
@@ -56,18 +58,31 @@ x86_mwait(uint32 eax, uint32 ecx)
 
 
 static void
-idle(void)
+cstates_set_scheduler_mode(scheduler_mode mode)
+{
+	if (mode == SCHEDULER_MODE_POWER_SAVING) {
+		sTimeStep = BASE_TIME_STEP / 4;
+		sEnableWait = true;
+	} else {
+		sTimeStep = BASE_TIME_STEP;
+		sEnableWait = false;
+	}
+}
+
+
+static void
+cstates_idle(void)
 {
 	ASSERT(thread_get_current_thread()->pinned_to_cpu > 0);
 	int32 cpu = smp_get_current_cpu();
 
 	bigtime_t idleTime = sIdleTime[cpu];
-	int state = min_c(idleTime / TIME_STEP, sCStateCount - 1);
+	int state = min_c(idleTime / sTimeStep, sCStateCount - 1);
 
 	ASSERT(state >= 0 && state < sCStateCount);
 
-	int subState = idleTime % TIME_STEP;
-	subState /= sCStates[state].fSubStatesStep;
+	int subState = idleTime % sTimeStep;
+	subState /= sTimeStep / sCStates[state].fSubStatesCount;
 
 	ASSERT(subState >= 0 && subState < sCStates[state].fSubStatesCount);
 
@@ -84,8 +99,11 @@ idle(void)
 
 
 static void
-wait(int32* variable, int32 test)
+cstates_wait(int32* variable, int32 test)
 {
+	if (!sEnableWait)
+		return;
+
 	InterruptsLocker _;
 	x86_monitor(variable, 0, 0);
 	if (*variable != test)
@@ -133,7 +151,6 @@ init_cstates()
 
 		sCStates[sCStateCount].fCode = sCStateCount * 0x10;
 		sCStates[sCStateCount].fSubStatesCount = subStates;
-		sCStates[sCStateCount].fSubStatesStep = TIME_STEP / subStates;
 		sCStateCount++;
 	}
 
@@ -144,6 +161,8 @@ init_cstates()
 	if (sIdleTime == NULL)
 		return B_NO_MEMORY;
 	memset(sIdleTime, 0, sizeof(bigtime_t) * smp_get_num_cpus());
+
+	cstates_set_scheduler_mode(SCHEDULER_MODE_LOW_LATENCY);
 
 	dprintf("using Intel C-States: C0%s\n", cStates);
 	return B_OK;
@@ -183,8 +202,10 @@ static cpuidle_module_info sIntelCStates = {
 
 	0.8f,
 
-	idle,
-	wait
+	cstates_set_scheduler_mode,
+
+	cstates_idle,
+	cstates_wait
 };
 
 

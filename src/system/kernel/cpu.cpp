@@ -281,11 +281,21 @@ get_cpu_topology(void)
 }
 
 
-status_t
-increase_cpu_performance(int delta, bool allowBoost)
+void
+cpu_set_scheduler_mode(enum scheduler_mode mode)
 {
 	if (sCPUPerformanceModule != NULL)
-		return sCPUPerformanceModule->increase_performance(delta, allowBoost);
+		sCPUPerformanceModule->cpufreq_set_scheduler_mode(mode);
+	if (sCPUIdleModule != NULL)
+		sCPUIdleModule->cpuidle_set_scheduler_mode(mode);
+}
+
+
+status_t
+increase_cpu_performance(int delta)
+{
+	if (sCPUPerformanceModule != NULL)
+		return sCPUPerformanceModule->cpufreq_increase_performance(delta);
 	return B_NOT_SUPPORTED;
 }
 
@@ -294,7 +304,7 @@ status_t
 decrease_cpu_performance(int delta)
 {
 	if (sCPUPerformanceModule != NULL)
-		return sCPUPerformanceModule->decrease_performance(delta);
+		return sCPUPerformanceModule->cpufreq_decrease_performance(delta);
 	return B_NOT_SUPPORTED;
 }
 
@@ -308,7 +318,7 @@ cpu_idle(void)
 #endif
 
 	if (sCPUIdleModule != NULL)
-		sCPUIdleModule->idle();
+		sCPUIdleModule->cpuidle_idle();
 	else
 		arch_cpu_idle();
 }
@@ -318,7 +328,7 @@ void
 cpu_wait(int32* variable, int32 test)
 {
 	if (sCPUIdleModule != NULL)
-		sCPUIdleModule->wait(variable, test);
+		sCPUIdleModule->cpuidle_wait(variable, test);
 	else
 		arch_cpu_pause();
 }

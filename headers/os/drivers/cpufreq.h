@@ -8,6 +8,8 @@
 
 #include <module.h>
 
+#include <scheduler.h>
+
 
 #define CPUFREQ_MODULES_PREFIX	"power/cpufreq"
 
@@ -19,8 +21,10 @@ typedef struct cpufreq_module_info {
 
 	float			rank;
 
-	status_t		(*increase_performance)(int delta, bool allowBoost);
-	status_t		(*decrease_performance)(int delta);
+	void			(*cpufreq_set_scheduler_mode)(enum scheduler_mode mode);
+
+	status_t		(*cpufreq_increase_performance)(int delta);
+	status_t		(*cpufreq_decrease_performance)(int delta);
 } cpufreq_module_info;
 
 

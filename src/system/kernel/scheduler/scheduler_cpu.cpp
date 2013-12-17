@@ -215,13 +215,11 @@ CPUEntry::_RequestPerformanceLevel(ThreadData* threadData)
 
 		decrease_cpu_performance(delta);
 	} else {
-		bool allowBoost = !gCurrentMode->avoid_boost;
-
 		int32 delta = load - kTargetLoad;
 		delta *= kMaxLoad - kTargetLoad;
 		delta /= kCPUPerformanceScaleMax;
 
-		increase_cpu_performance(delta, allowBoost);
+		increase_cpu_performance(delta);
 	}
 }
 

@@ -996,7 +996,11 @@ _user_estimate_max_scheduling_latency(thread_id id)
 status_t
 _user_set_scheduler_mode(int32 mode)
 {
-	return scheduler_set_operation_mode(static_cast<scheduler_mode>(mode));
+	scheduler_mode schedulerMode = static_cast<scheduler_mode>(mode);
+	status_t error = scheduler_set_operation_mode(schedulerMode);
+	if (error == B_OK)
+		cpu_set_scheduler_mode(schedulerMode);
+	return error;
 }
 
 

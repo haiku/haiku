@@ -18,12 +18,6 @@ struct scheduling_analysis;
 struct SchedulerListener;
 
 
-enum scheduler_mode {
-	SCHEDULER_MODE_LOW_LATENCY,
-	SCHEDULER_MODE_POWER_SAVING,
-};
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif

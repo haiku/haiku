@@ -16,6 +16,8 @@
 #include <timer.h>
 #include <arch/cpu.h>
 
+#include <scheduler.h>
+
 
 struct kernel_args;
 
@@ -107,7 +109,9 @@ extern inline cpu_ent *get_cpu_struct(void) { return &gCPU[smp_get_current_cpu()
 status_t cpu_build_topology_tree(void);
 const cpu_topology_node* get_cpu_topology(void);
 
-status_t increase_cpu_performance(int delta, bool allowBoost);
+void cpu_set_scheduler_mode(enum scheduler_mode mode);
+
+status_t increase_cpu_performance(int delta);
 status_t decrease_cpu_performance(int delta);
 
 void cpu_idle(void);
