@@ -11,6 +11,7 @@
 #include "ConfigView.h"
 #include "PSDTranslator.h"
 #include "PSDLoader.h"
+#include "PSDWriter.h"
 
 const char *kDocumentCount = "/documentCount";
 const char *kDocumentIndex = "/documentIndex";
@@ -20,13 +21,21 @@ const char *kDocumentIndex = "/documentIndex";
 
 static const translation_format sInputFormats[] = {
 	{
+		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_BITMAP,
+		BITS_IN_QUALITY,
+		BITS_IN_CAPABILITY,
+		"image/x-be-bitmap",
+		"Be Bitmap Format (PSDTranslator)"
+	},
+	{		
 		PSD_IMAGE_FORMAT,
 		B_TRANSLATOR_BITMAP,
 		PSD_IN_QUALITY,
 		PSD_IN_CAPABILITY,
 		kPSDMimeType,
 		kPSDName
-	},
+	}
 };
 
 static const translation_format sOutputFormats[] = {
@@ -38,6 +47,14 @@ static const translation_format sOutputFormats[] = {
 		"image/x-be-bitmap",
 		"Be Bitmap Format (PSDTranslator)"
 	},
+	{		
+		PSD_IMAGE_FORMAT,
+		B_TRANSLATOR_BITMAP,
+		PSD_OUT_QUALITY,
+		PSD_OUT_CAPABILITY,
+		kPSDMimeType,
+		kPSDName
+	}	
 };
 
 
@@ -46,8 +63,10 @@ static const TranSetting sDefaultSettings[] = {
 	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false}
 };
 
-const uint32 kNumInputFormats = 1;
-const uint32 kNumOutputFormats = 1;
+const uint32 kNumInputFormats = sizeof(sInputFormats)
+	/ sizeof(translation_format);
+const uint32 kNumOutputFormats = sizeof(sOutputFormats)
+	/ sizeof(translation_format);
 const uint32 kNumDefaultSettings = sizeof(sDefaultSettings)
 	/ sizeof(TranSetting);
 
@@ -102,7 +121,8 @@ PSDTranslator::DerivedTranslate(BPositionIO *source,
 	const translator_info *info, BMessage *ioExtension,
 	uint32 outType, BPositionIO *target, int32 baseType)
 {
-	if (outType != B_TRANSLATOR_BITMAP)
+	if (outType != B_TRANSLATOR_BITMAP
+		&& outType != PSD_IMAGE_FORMAT)
 		return B_NO_TRANSLATOR;
 
 	switch (baseType) {
@@ -117,10 +137,59 @@ PSDTranslator::DerivedTranslate(BPositionIO *source,
 
 			return psdFile.Decode(target);
 		}
-
+		case 1:
+		{			
+			if (outType == PSD_IMAGE_FORMAT)
+				return _TranslateFromBits(source, ioExtension, outType, target);
+			return B_NO_TRANSLATOR;
+		}
 		default:
 			return B_NO_TRANSLATOR;
 	}
+}
+
+
+
+status_t
+PSDTranslator::_TranslateFromBits(BPositionIO* stream,
+					BMessage* ioExtension, uint32 outType,
+					BPositionIO* target)
+{
+	TranslatorBitmap bitsHeader;
+	status_t result;
+	result = identify_bits_header(stream, NULL, &bitsHeader);
+	if (result != B_OK)
+		return result;
+
+	if (bitsHeader.colors != B_RGB32
+		&& bitsHeader.colors != B_RGBA32)
+		return B_NO_TRANSLATOR;
+
+	uint32 width = bitsHeader.bounds.IntegerWidth() + 1;
+	uint32 height = bitsHeader.bounds.IntegerHeight() + 1;
+	
+	int32 layerSize = height * width;
+	int32 layersCount = bitsHeader.colors == B_RGB32 ? 3 : 4;
+	
+	uint8 *buff = new uint8[layerSize * layersCount];
+	
+	uint8 *ptr = buff;	
+	for(int i = 0; i < layerSize; i++) {
+		uint8 rgba[4];
+		stream->Read(rgba, sizeof(uint32));
+		ptr[i] = rgba[2];
+		ptr[i+layerSize] = rgba[1];
+		ptr[i+layerSize+layerSize] = rgba[0];
+		if (layersCount == 4)
+			ptr[i+layerSize+layerSize+layerSize] = rgba[3];
+	}
+	
+	PSDWriter psdFile(stream);
+	psdFile.EncodeFromRGBA(target, buff, layersCount, width, height);
+	
+	delete buff;
+	
+	return B_OK;
 }
 
 

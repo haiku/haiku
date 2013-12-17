@@ -21,13 +21,18 @@
 #define DOCUMENT_COUNT "/documentCount"
 #define DOCUMENT_INDEX "/documentIndex"
 
-#define PSD_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1, 1, 3)
+#define PSD_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1, 2, 0)
 #define PSD_IMAGE_FORMAT	'PSD '
 
-#define PSD_IN_QUALITY		0.5
-#define PSD_IN_CAPABILITY	0.5
-#define BITS_OUT_QUALITY	1
-#define BITS_OUT_CAPABILITY	0.9
+#define PSD_IN_QUALITY		0.7
+#define PSD_IN_CAPABILITY	0.6
+#define PSD_OUT_QUALITY		0.5
+#define PSD_OUT_CAPABILITY	0.6
+
+#define BITS_IN_QUALITY		0.7
+#define BITS_IN_CAPABILITY	0.6
+#define BITS_OUT_QUALITY	0.7
+#define BITS_OUT_CAPABILITY	0.6
 
 class PSDTranslator : public BaseTranslator {
 	public:
@@ -48,6 +53,9 @@ class PSDTranslator : public BaseTranslator {
 
 	protected:
 		virtual ~PSDTranslator();
+	private:
+		status_t _TranslateFromBits(BPositionIO* stream,
+			BMessage* settings, uint32 outType, BPositionIO* target);
 };
 
 extern const char *kDocumentCount;
