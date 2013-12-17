@@ -377,7 +377,7 @@ rootfs_mount(fs_volume* volume, const char* device, uint32 flags,
 	rw_lock_init(&fs->lock, "rootfs");
 
 	fs->vnode_list_hash = hash_init(ROOTFS_HASH_SIZE,
-		(addr_t)&vnode->all_next - (addr_t)vnode, &rootfs_vnode_compare_func,
+		offsetof(rootfs_vnode, all_next), &rootfs_vnode_compare_func,
 		&rootfs_vnode_hash_func);
 	if (fs->vnode_list_hash == NULL) {
 		err = B_NO_MEMORY;
