@@ -152,8 +152,6 @@ class TreeIterator;
 
 
 #if !_BOOT_MODE
-template<class T> class Stack;
-
 // needed for searching (utilizing a stack)
 struct node_and_key {
 	off_t	nodeOffset;
