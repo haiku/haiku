@@ -38,12 +38,12 @@ init_syscall_registers(void* dummy, int cpuNum)
 	//  - CS is set to IA32_STAR[63:48] + 16
 	//  - SS is set to IA32_STAR[63:48] + 8
 	// From this we get:
-	//  - Entry CS  = KERNEL_CODE_SEG
-	//  - Entry SS  = KERNEL_CODE_SEG + 8  = KERNEL_DATA_SEG
-	//  - Return CS = KERNEL_DATA_SEG + 16 = USER_CODE_SEG
-	//  - Return SS = KERNEL_DATA_SEG + 8  = USER_DATA_SEG
-	x86_write_msr(IA32_MSR_STAR, ((uint64)(KERNEL_DATA_SEG | 3) << 48)
-		| ((uint64)KERNEL_CODE_SEG << 32));
+	//  - Entry CS  = KERNEL_CODE_SELECTOR
+	//  - Entry SS  = KERNEL_CODE_SELECTOR + 8  = KERNEL_DATA_SELECTOR
+	//  - Return CS = KERNEL_DATA_SELECTOR + 16 = USER_CODE_SELECTOR
+	//  - Return SS = KERNEL_DATA_SELECTOR + 8  = USER_DATA_SLECTORG
+	x86_write_msr(IA32_MSR_STAR, ((uint64)(KERNEL_DATA_SELECTOR | 3) << 48)
+		| ((uint64)KERNEL_CODE_SELECTOR << 32));
 }
 
 

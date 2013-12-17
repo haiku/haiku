@@ -238,11 +238,11 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	frame.si = (uint64)args2;
 	frame.di = (uint64)args1;
 	frame.ip = entry;
-	frame.cs = USER_CODE_SEG;
+	frame.cs = USER_CODE_SELECTOR;
 	frame.flags = X86_EFLAGS_RESERVED1 | X86_EFLAGS_INTERRUPT
 		| (3 << X86_EFLAGS_IO_PRIVILEG_LEVEL_SHIFT);
 	frame.sp = stackTop;
-	frame.ss = USER_DATA_SEG;
+	frame.ss = USER_DATA_SELECTOR;
 
 	// Return to userland. Never returns.
 	x86_initial_return_to_userland(thread, &frame);

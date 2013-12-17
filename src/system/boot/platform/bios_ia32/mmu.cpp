@@ -577,20 +577,20 @@ mmu_init_for_kernel(void)
 		clear_segment_descriptor(&virtualGDT[0]);
 
 		// seg 0x08 - kernel 4GB code
-		set_segment_descriptor(&virtualGDT[1], 0, 0xffffffff, DT_CODE_READABLE,
-			DPL_KERNEL);
+		set_segment_descriptor(&virtualGDT[KERNEL_CODE_SEGMENT], 0, 0xffffffff,
+			DT_CODE_READABLE, DPL_KERNEL);
 
 		// seg 0x10 - kernel 4GB data
-		set_segment_descriptor(&virtualGDT[2], 0, 0xffffffff, DT_DATA_WRITEABLE,
-			DPL_KERNEL);
+		set_segment_descriptor(&virtualGDT[KERNEL_DATA_SEGMENT], 0, 0xffffffff,
+			DT_DATA_WRITEABLE, DPL_KERNEL);
 
 		// seg 0x1b - ring 3 user 4GB code
-		set_segment_descriptor(&virtualGDT[3], 0, 0xffffffff, DT_CODE_READABLE,
-			DPL_USER);
+		set_segment_descriptor(&virtualGDT[USER_CODE_SEGMENT], 0, 0xffffffff,
+			DT_CODE_READABLE, DPL_USER);
 
 		// seg 0x23 - ring 3 user 4GB data
-		set_segment_descriptor(&virtualGDT[4], 0, 0xffffffff, DT_DATA_WRITEABLE,
-			DPL_USER);
+		set_segment_descriptor(&virtualGDT[USER_DATA_SEGMENT], 0, 0xffffffff,
+			DT_DATA_WRITEABLE, DPL_USER);
 
 		// virtualGDT[5] and above will be filled later by the kernel
 		// to contain the TSS descriptors, and for TLS (one for every CPU)

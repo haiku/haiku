@@ -33,7 +33,6 @@
 
 #define CARRY_FLAG	0x01
 
-extern segment_descriptor *gGDT;
 extern void *gDmaAddress;
 extern addr_t gBiosBase;
 
@@ -314,49 +313,52 @@ apm_init(kernel_args *args)
 	// (the first 640kB are mapped as DMA area in arch_vm_init()).
 	addr_t biosData = (addr_t)gDmaAddress + 0x400;
 
-	set_segment_descriptor(&gGDT[BIOS_DATA_SEGMENT >> 3],
-		biosData, B_PAGE_SIZE - biosData,
-		DT_DATA_WRITEABLE, DPL_KERNEL);
+	for (uint32 i = 0; i < args->num_cpus; i++) {
+		segment_descriptor* gdt = get_gdt(i);
 
-	// TODO: test if APM segments really are in the BIOS ROM area (especially the
-	//	data segment)
+		set_segment_descriptor(&gdt[BIOS_DATA_SEGMENT], biosData,
+			B_PAGE_SIZE - biosData, DT_DATA_WRITEABLE, DPL_KERNEL);
 
-	// Setup APM GDTs
+		// TODO: test if APM segments really are in the BIOS ROM area
+		// (especially the data segment)
 
-	// We ignore their length, and just set their segments to 64 kB which
-	// shouldn't cause any headaches
+		// Setup APM GDTs
 
-	set_segment_descriptor(&gGDT[APM_CODE32_SEGMENT >> 3],
-		gBiosBase + (info.code32_segment_base << 4) - 0xe0000, 0xffff,
-		DT_CODE_READABLE, DPL_KERNEL);
-	set_segment_descriptor(&gGDT[APM_CODE16_SEGMENT >> 3],
-		gBiosBase + (info.code16_segment_base << 4) - 0xe0000, 0xffff,
-		DT_CODE_READABLE, DPL_KERNEL);
-	gGDT[APM_CODE16_SEGMENT >> 3].d_b = 0;
-		// 16-bit segment
+		// We ignore their length, and just set their segments to 64 kB which
+		// shouldn't cause any headaches
 
-	if ((info.data_segment_base << 4) < 0xe0000) {
-		// use the BIOS data segment as data segment for APM
+		set_segment_descriptor(&gdt[APM_CODE32_SEGMENT],
+			gBiosBase + (info.code32_segment_base << 4) - 0xe0000, 0xffff,
+			DT_CODE_READABLE, DPL_KERNEL);
+		set_segment_descriptor(&gdt[APM_CODE16_SEGMENT],
+			gBiosBase + (info.code16_segment_base << 4) - 0xe0000, 0xffff,
+			DT_CODE_READABLE, DPL_KERNEL);
+		gdt[APM_CODE16_SEGMENT].d_b = 0;
+			// 16-bit segment
 
-		if (info.data_segment_length == 0) {
-			args->platform_args.apm.data_segment_length = B_PAGE_SIZE 
-				- info.data_segment_base;
+		if ((info.data_segment_base << 4) < 0xe0000) {
+			// use the BIOS data segment as data segment for APM
+
+			if (info.data_segment_length == 0) {
+				args->platform_args.apm.data_segment_length = B_PAGE_SIZE 
+					- info.data_segment_base;
+			}
+
+			set_segment_descriptor(&gdt[APM_DATA_SEGMENT],
+				(addr_t)gDmaAddress + (info.data_segment_base << 4),
+				info.data_segment_length,
+				DT_DATA_WRITEABLE, DPL_KERNEL);
+		} else {
+			// use the BIOS area as data segment
+			set_segment_descriptor(&gdt[APM_DATA_SEGMENT],
+				gBiosBase + (info.data_segment_base << 4) - 0xe0000, 0xffff,
+				DT_DATA_WRITEABLE, DPL_KERNEL);
 		}
-
-		set_segment_descriptor(&gGDT[APM_DATA_SEGMENT >> 3],
-			(addr_t)gDmaAddress + (info.data_segment_base << 4),
-			info.data_segment_length,
-			DT_DATA_WRITEABLE, DPL_KERNEL);
-	} else {
-		// use the BIOS area as data segment
-		set_segment_descriptor(&gGDT[APM_DATA_SEGMENT >> 3],
-			gBiosBase + (info.data_segment_base << 4) - 0xe0000, 0xffff,
-			DT_DATA_WRITEABLE, DPL_KERNEL);
 	}
 
 	// setup APM entry point
 
-	sAPMBiosEntry.segment = APM_CODE32_SEGMENT;
+	sAPMBiosEntry.segment = (APM_CODE32_SEGMENT << 3) | DPL_KERNEL;
 	sAPMBiosEntry.offset = info.code32_segment_offset;
 
 	apm_driver_version(info.version);

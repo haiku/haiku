@@ -8,17 +8,26 @@
 
 // Segment definitions.
 // Note that the ordering of these is important to SYSCALL/SYSRET.
-#define KERNEL_CODE_SEG		0x08
-#define KERNEL_DATA_SEG		0x10
-#define USER_DATA_SEG		0x1b
-#define USER_CODE_SEG		0x23
+#define KERNEL_CODE_SEGMENT		1
+#define KERNEL_DATA_SEGMENT		2
+#define USER_DATA_SEGMENT		3
+#define USER_CODE_SEGMENT		4
+
+#define TSS_BASE_SEGMENT		5
+
+#define TSS_SEGMENT(cpu)		(TSS_BASE_SEGMENT + cpu * 2)
+
+#define GDT_SEGMENT_COUNT		(TSS_BASE_SEGMENT + SMP_MAX_CPUS * 2)
+
+
+#define KERNEL_CODE_SELECTOR	((KERNEL_CODE_SEGMENT << 3) | DPL_KERNEL)
+#define KERNEL_DATA_SELECTOR	((KERNEL_DATA_SEGMENT << 3) | DPL_KERNEL)
+
+#define USER_CODE_SELECTOR	((USER_CODE_SEGMENT << 3) | DPL_USER)
+#define USER_DATA_SELECTOR	((USER_DATA_SEGMENT << 3) | DPL_USER)
 
 
 #ifndef _ASSEMBLER
-
-
-#define TSS_BASE_SEGMENT	5
-#define TSS_SEGMENT(cpu)	(TSS_BASE_SEGMENT + cpu * 2)
 
 
 // Structure of a segment descriptor.

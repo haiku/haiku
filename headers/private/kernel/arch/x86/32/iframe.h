@@ -37,7 +37,7 @@ struct iframe {
 	uint32 user_ss;
 };
 
-#define IFRAME_IS_USER(f)	((f)->cs == USER_CODE_SEG \
+#define IFRAME_IS_USER(f)	((f)->cs == USER_CODE_SELECTOR \
 								|| ((f)->flags & 0x20000) != 0)
 
 

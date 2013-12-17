@@ -335,6 +335,7 @@ typedef struct arch_cpu_info {
 	struct tss			tss;
 #ifndef __x86_64__
 	struct tss			double_fault_tss;
+	void*				kernel_tls;
 #endif
 } arch_cpu_info;
 

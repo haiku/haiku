@@ -61,6 +61,12 @@ x86_64_general_protection_fault(iframe* frame)
 
 
 void
+x86_descriptors_preboot_init_percpu(kernel_args* /* args */, int /* cpu */)
+{
+}
+
+
+void
 x86_descriptors_init(kernel_args* args)
 {
 	// The boot loader sets up a GDT and allocates an empty IDT for us.
@@ -83,7 +89,7 @@ x86_descriptors_init(kernel_args* args)
 		uint32 dpl = (i == 3) ? DPL_USER : DPL_KERNEL;
 
 		set_interrupt_descriptor(&sIDT[i], (addr_t)&isr_array[i],
-			GATE_INTERRUPT, KERNEL_CODE_SEG, dpl, ist);
+			GATE_INTERRUPT, KERNEL_CODE_SELECTOR, dpl, ist);
 	}
 
 	// Initialize the interrupt handler table.

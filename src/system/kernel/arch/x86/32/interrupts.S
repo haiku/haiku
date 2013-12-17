@@ -223,7 +223,7 @@ FUNCTION(double_fault):
 	pushl	$-1;	// user-ss
 	pushl	$-1;	// user-esp
 	pushl	$-1;	// flags
-	pushl	$KERNEL_CODE_SEG;	// cs
+	pushl	$KERNEL_CODE_SELECTOR	// cs
 	pushl	$-1;	// eip
 	pushl	$0;		// error-code
 	pushl	$8;
@@ -516,7 +516,7 @@ STATIC_FUNCTION(int_bottom):
 	// exception.
 	orl		$0x10000, IFRAME_flags(%ebp);
 
-	cmp		$USER_CODE_SEG, IFRAME_cs(%ebp)	// user mode
+	cmpw	$USER_CODE_SELECTOR, IFRAME_cs(%ebp)	// user mode
 	je		int_bottom_user
 
 	// We need to recheck user mode using the thread's in_kernel flag, since
@@ -540,7 +540,7 @@ FUNCTION_END(int_bottom)
 
 
 STATIC_FUNCTION(int_bottom_user):
-	movl	$KERNEL_DATA_SEG,%eax
+	movl	$KERNEL_DATA_SELECTOR, %eax
 	cld
 	movl	%eax,%ds
 	movl	%eax,%es
@@ -564,7 +564,7 @@ STATIC_FUNCTION(int_bottom_user):
 	// were already/still prepared for userland), since the iframe in this case
 	// will be a kernel iframe and e.g. trying to set up a signal stack will not
 	// be a very healthy endeavor.
-	cmp		$USER_CODE_SEG, IFRAME_cs(%ebp)
+	cmpw	$USER_CODE_SELECTOR, IFRAME_cs(%ebp)
 	jne		1f
 
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
@@ -603,7 +603,7 @@ STATIC_FUNCTION(handle_syscall):
 	// save %eax, the number of the syscall
 	movl	%eax, %esi
 
-	movl	$KERNEL_DATA_SEG,%eax
+	movl	$KERNEL_DATA_SELECTOR, %eax
 	cld
 	movl	%eax,%ds
 	movl	%eax,%es
@@ -759,11 +759,11 @@ FUNCTION(x86_sysenter):
 	movl	%dr3, %edx
 
 	// push the iframe
-	pushl	$USER_DATA_SEG			// user_ss
+	pushl	$USER_DATA_SELECTOR		// user_ss
 	pushl	%ecx					// user_esp
 	pushfl							// eflags
 	orl		$(1 << 9), (%esp)		// set the IF (interrupts) bit
-	pushl	$USER_CODE_SEG			// user cs
+	pushl	$USER_CODE_SELECTOR		// user cs
 
 	// user_eip
 	movl	THREAD_team(%edx), %edx

@@ -9,6 +9,10 @@
 #define _KERNEL_ARCH_x86_DESCRIPTORS_H
 
 
+#define DPL_KERNEL	0
+#define DPL_USER	3
+
+
 #ifndef _ASSEMBLER
 
 
@@ -17,11 +21,6 @@
 
 struct kernel_args;
 
-
-enum descriptor_privilege_levels {
-	DPL_KERNEL = 0,
-	DPL_USER = 3,
-};
 
 enum descriptor_types {
 	// segment types
@@ -48,6 +47,7 @@ enum gate_types {
 };
 
 
+void x86_descriptors_preboot_init_percpu(kernel_args* args, int cpu);
 void x86_descriptors_init(kernel_args* args);
 void x86_descriptors_init_percpu(kernel_args* args, int cpu);
 status_t x86_descriptors_init_post_vm(kernel_args* args);

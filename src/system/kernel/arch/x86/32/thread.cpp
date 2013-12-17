@@ -69,7 +69,6 @@ class RestartSyscall : public AbstractTraceEntry {
 
 // from arch_cpu.cpp
 extern bool gHasSSE;
-extern segment_descriptor* gGDT;
 
 static struct arch_thread sInitialState _ALIGNED(16);
 	// the fpu_state must be aligned on a 16 byte boundary, so that fxsave can use it
@@ -103,10 +102,10 @@ x86_restart_syscall(struct iframe* frame)
 void
 x86_set_tls_context(Thread *thread)
 {
-	int entry = smp_get_current_cpu() + TLS_BASE_SEGMENT;
-
-	set_segment_descriptor_base(&gGDT[entry], thread->user_local_storage);
-	set_fs_register((entry << 3) | DPL_USER);
+	segment_descriptor* gdt = get_gdt(smp_get_current_cpu());
+	set_segment_descriptor_base(&gdt[USER_TLS_SEGMENT],
+		thread->user_local_storage);
+	set_fs_register((USER_TLS_SEGMENT << 3) | DPL_USER);
 }
 
 
@@ -197,7 +196,7 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 
 	// save the stack position
 	thread->arch_info.current_stack.esp = stackTop;
-	thread->arch_info.current_stack.ss = (addr_t*)KERNEL_DATA_SEG;
+	thread->arch_info.current_stack.ss = (addr_t*)KERNEL_DATA_SELECTOR;
 }
 
 
@@ -242,16 +241,16 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	// prepare the user iframe
 	iframe frame = {};
 	frame.type = IFRAME_TYPE_SYSCALL;
-	frame.gs = USER_DATA_SEG;
+	frame.gs = USER_DATA_SELECTOR;
 	// frame.fs not used, we call x86_set_tls_context() on context switch
-	frame.es = USER_DATA_SEG;
-	frame.ds = USER_DATA_SEG;
+	frame.es = USER_DATA_SELECTOR;
+	frame.ds = USER_DATA_SELECTOR;
 	frame.ip = entry;
-	frame.cs = USER_CODE_SEG;
+	frame.cs = USER_CODE_SELECTOR;
 	frame.flags = X86_EFLAGS_RESERVED1 | X86_EFLAGS_INTERRUPT
 		| (3 << X86_EFLAGS_IO_PRIVILEG_LEVEL_SHIFT);
 	frame.user_sp = stackTop;
-	frame.user_ss = USER_DATA_SEG;
+	frame.user_ss = USER_DATA_SELECTOR;
 
 	// return to userland
 	x86_initial_return_to_userland(thread, &frame);

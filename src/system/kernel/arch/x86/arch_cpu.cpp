@@ -1008,6 +1008,8 @@ arch_cpu_preboot_init_percpu(kernel_args* args, int cpu)
 		x86_write_msr(IA32_MSR_TSC, 0);
 	}
 
+	x86_descriptors_preboot_init_percpu(args, cpu);
+
 	return B_OK;
 }
 
@@ -1049,7 +1051,6 @@ detect_amdc1e_noarat()
 status_t
 arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
-	// Load descriptor tables for this CPU.
 	x86_descriptors_init_percpu(args, cpu);
 
 	detect_cpu(cpu);
