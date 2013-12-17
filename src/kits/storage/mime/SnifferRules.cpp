@@ -87,7 +87,7 @@ SnifferRules::sniffer_rule::~sniffer_rule()
 	rules for supertypes *after* sniffer rules for subtypes
 	of said supertype when both rules have identical priorities).
 */
-bool operator<(SnifferRules::sniffer_rule &left, SnifferRules::sniffer_rule &right)
+bool operator<(const SnifferRules::sniffer_rule &left, const SnifferRules::sniffer_rule &right)
 {
 	if (left.rule && right.rule) {
 		double leftPriority = left.rule->Priority();
