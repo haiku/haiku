@@ -751,7 +751,7 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 
 
 static void
-traverse_topology_tree(cpu_topology_node* node, int packageID, int coreID)
+traverse_topology_tree(const cpu_topology_node* node, int packageID, int coreID)
 {
 	switch (node->level) {
 		case CPU_TOPOLOGY_SMT:
@@ -805,7 +805,7 @@ build_topology_mappings(int32& cpuCount, int32& coreCount, int32& packageCount)
 		}
 	}
 
-	cpu_topology_node* root = get_cpu_topology();
+	const cpu_topology_node* root = get_cpu_topology();
 	traverse_topology_tree(root, 0, 0);
 
 	cpuToCoreDeleter.Detach();

@@ -391,7 +391,7 @@ restore_interrupts(cpu_status status)
 static
 uint32 assign_cpu(void)
 {
-	cpu_topology_node* node;
+	const cpu_topology_node* node;
 	do {
 		int32 nextID = atomic_add(&sLastCPU, 1);
 		node = get_cpu_topology();

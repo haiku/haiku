@@ -105,7 +105,7 @@ cpu_ent *get_cpu_struct(void);
 extern inline cpu_ent *get_cpu_struct(void) { return &gCPU[smp_get_current_cpu()]; }
 
 status_t cpu_build_topology_tree(void);
-cpu_topology_node* get_cpu_topology(void);
+const cpu_topology_node* get_cpu_topology(void);
 
 status_t increase_cpu_performance(int delta, bool allowBoost);
 status_t decrease_cpu_performance(int delta);

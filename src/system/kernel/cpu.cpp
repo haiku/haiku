@@ -274,7 +274,7 @@ cpu_build_topology_tree(void)
 }
 
 
-cpu_topology_node*
+const cpu_topology_node*
 get_cpu_topology(void)
 {
 	return &sCPUTopology;
