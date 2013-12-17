@@ -62,7 +62,7 @@ void arch_syscall_64_bit_return_value(void);
 static inline void
 arch_thread_set_current_thread(Thread* t)
 {
-	asm volatile("mov %0, %%gs:0" : : "r" (t));
+	asm volatile("mov %0, %%gs:0" : : "r" (t) : "memory");
 }
 
 

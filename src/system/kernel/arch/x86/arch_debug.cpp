@@ -1202,13 +1202,13 @@ arch_debug_get_interrupt_pc(bool* _isSyscall)
 void
 arch_debug_unset_current_thread(void)
 {
-#ifdef __x86_64__
 	// Can't just write 0 to the GS base, that will cause the read from %gs:0
 	// to fault. Instead point it at a NULL pointer, %gs:0 will get this value.
 	static Thread* unsetThread = NULL;
+#ifdef __x86_64__
 	x86_write_msr(IA32_MSR_GS_BASE, (addr_t)&unsetThread);
 #else
-	x86_write_dr3(NULL);
+	asm volatile("mov %0, %%gs:0" : : "r" (unsetThread) : "memory");
 #endif
 }
 
