@@ -77,7 +77,7 @@ PSDLoader::IsSupported(void)
 	if (fVersion != 1)
 		return false;
 
-	if (fChannels < 0 || fChannels > 16)
+	if (fChannels < 0 || fChannels > PSD_MAX_CHANNELS)
 		return false;
 
 	if (fDepth > 16)
@@ -190,7 +190,7 @@ PSDLoader::Decode(BPositionIO *target)
 	int32 rowBytes = (fWidth * fDepth) / 8;
 	int32 channelBytes = rowBytes * fHeight;
 	
-	uint8 *imageData[5];
+	uint8 *imageData[PSD_MAX_CHANNELS];
 	for (int i = 0; i < fChannels; i++)
 		imageData[i] = new uint8[channelBytes];
 

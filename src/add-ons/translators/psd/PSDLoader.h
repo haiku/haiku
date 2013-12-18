@@ -22,6 +22,8 @@
 #include <ByteOrder.h>
 #include <List.h>
 
+#define PSD_MAX_CHANNELS 16
+
 
 enum psd_compressed_type {
 	PSD_COMPRESSED_RAW	= 0,
