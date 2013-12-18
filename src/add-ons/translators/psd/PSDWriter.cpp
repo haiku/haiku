@@ -30,7 +30,7 @@ PSDWriter::EncodeFromRGBA(BPositionIO *target, uint8 *buff,
 	_WriteUInt32ToStream(target, 0x38425053); // 8BPS
 	_WriteUInt16ToStream(target, 1); // Version = 1
 	_WriteFillBlockToStream(target, 0, 6); // reserved
-	_WriteInt16ToStream(target, layers); // Channels = 4
+	_WriteInt16ToStream(target, layers); // Channels
 	_WriteInt32ToStream(target, height); // Height
 	_WriteInt32ToStream(target, width); // Width
 	_WriteInt16ToStream(target, 8); // Depth = 8
@@ -75,30 +75,29 @@ PSDWriter::EncodeFromRGBA(BPositionIO *target, uint8 *buff,
 
 	for (int channels = 0; channels < 3; channels++) {
 		_WriteInt16ToStream(target, channels); // Channel num
-		_WriteUInt32ToStream(target, channelSize + 2); // Layer data size
+		_WriteUInt32ToStream(target, channelSize + 2); // Channel size
 	}
-	
+
 	if (layers == 4) {
-		uint8 resBlock2[2] = {0xFF, 0xFF};
-		_WriteBlockToStream(target, resBlock2, 2);
-		_WriteUInt32ToStream(target, channelSize + 2); // Alpha layer data size
+		_WriteInt16ToStream(target, -1);
+		_WriteUInt32ToStream(target, channelSize + 2); // Alpha channel size
 	}
 
 	_WriteUInt32ToStream(target, 0x3842494D); // 8BIM
-		
+
 	uint8 blendModeKey[4] = {'n','o','r','m'};
 	_WriteBlockToStream(target, blendModeKey, 4);  // Blend mode norm
-	
+
 	_WriteUInt8ToStream(target, 255); // Alpha
-	
+
 	_WriteUInt8ToStream(target, 0); // Clipping
 	_WriteUInt8ToStream(target, 1); // Flags
 	_WriteUInt8ToStream(target, 0); // Flags
-	
-	_WriteUInt32ToStream(target, 4 + 4 + 16); // Extra data length
+
+	_WriteUInt32ToStream(target, 24); // Extra data length
 	_WriteUInt32ToStream(target, 0); // Mask info
 	_WriteUInt32ToStream(target, 0);
-	
+
 	_WriteUInt8ToStream(target, 15); // Layer name length
 	uint8 layerName[16] = {"Layer #1       "};
 	_WriteBlockToStream(target, layerName, 15); // Layer name
@@ -124,7 +123,7 @@ PSDWriter::EncodeFromRGBA(BPositionIO *target, uint8 *buff,
 
 	_WriteUInt16ToStream(target, PSD_COMPRESSED_RAW); // Compression mode
 	_WriteBlockToStream(target, buff,  channelSize * layers);
-	
+
 	return B_OK;
 }
 
@@ -141,7 +140,7 @@ void
 PSDWriter::_WriteUInt32ToStream(BPositionIO *stream, uint32 val)
 {
 	val = B_HOST_TO_BENDIAN_INT32(val);
-	stream->Write(&val, sizeof(uint32));	
+	stream->Write(&val, sizeof(uint32));
 }
 
 
@@ -149,7 +148,7 @@ void
 PSDWriter::_WriteInt16ToStream(BPositionIO *stream, int16 val)
 {
 	val = B_HOST_TO_BENDIAN_INT16(val);
-	stream->Write(&val, sizeof(int16));	
+	stream->Write(&val, sizeof(int16));
 }
 
 
