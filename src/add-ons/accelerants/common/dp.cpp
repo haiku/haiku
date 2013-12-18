@@ -36,8 +36,8 @@ dp_encode_link_rate(uint32 linkRate)
 			return DP_LINK_RATE_540;
 	}
 
-	ERROR("%s: Unknown DisplayPort Link Rate!\n",
-		__func__);
+	ERROR("%s: Unknown DisplayPort Link Rate! (0x%" B_PRIX32 ")\n",
+		__func__, linkRate);
 	return DP_LINK_RATE_162;
 }
 
@@ -53,8 +53,8 @@ dp_decode_link_rate(uint32 rawLinkRate)
 		case DP_LINK_RATE_540:
 			return 540000;
 	}
-	ERROR("%s: Unknown DisplayPort Link Rate!\n",
-		__func__);
+	ERROR("%s: Unknown DisplayPort Link Rate! (0x%" B_PRIX32 ")\n",
+		__func__, rawLinkRate);
 	return 162000;
 }
 
