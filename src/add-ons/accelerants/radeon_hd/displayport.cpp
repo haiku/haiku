@@ -921,7 +921,7 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 		status_t result = dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50,
 			rdata++, false, false);
 		if (result != B_OK) {
-			TRACE("%s: error reading EDID data at index " B_PRIu32 ", "
+			TRACE("%s: error reading EDID data at index %" B_PRIu32 ", "
 				"result = 0x%lX\n", __func__, i, result);
 			dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, &sdata, false, true);
 			return false;
