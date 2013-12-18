@@ -49,8 +49,8 @@ dp_aux_speak(uint32 hwPin, uint8* send, int sendBytes,
 	union auxChannelTransaction args;
 	memset(&args, 0, sizeof(args));
 
-	args.v1.lpAuxRequest = 0;
-	args.v1.lpDataOut = 16;
+	args.v1.lpAuxRequest = B_HOST_TO_LENDIAN_INT16(0 + 4);
+	args.v1.lpDataOut = B_HOST_TO_LENDIAN_INT16(16 + 4);
 	args.v1.ucDataOutLen = 0;
 	args.v1.ucChannelID = hwPin;
 	args.v1.ucDelay = delay / 10;
@@ -58,7 +58,10 @@ dp_aux_speak(uint32 hwPin, uint8* send, int sendBytes,
 	//if (ASIC_IS_DCE4(rdev))
 	//	args.v2.ucHPD_ID = chan->rec.hpd;
 
-	unsigned char* base = (unsigned char*)gAtomContext->scratch;
+	unsigned char* base = (unsigned char*)(gAtomContext->scratch + 1);
+
+	// TODO: This isn't correct for big endian systems!
+	// send needs to be swapped on big endian.
 	memcpy(base, send, sendBytes);
 
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
@@ -81,6 +84,8 @@ dp_aux_speak(uint32 hwPin, uint8* send, int sendBytes,
 	if (recvLength > recvBytes)
 		recvLength = recvBytes;
 
+	// TODO: This isn't correct for big endian systems!
+	// recv needs to be swapped on big endian.
 	if (recv && recvBytes)
 		memcpy(recv, base + 16, recvLength);
 
@@ -151,7 +156,7 @@ dp_aux_read(uint32 hwPin, uint16 address,
 			return result;
 
 		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
-			return B_OK; 
+			return B_OK;
 		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
 			snooze(400);
 		else
