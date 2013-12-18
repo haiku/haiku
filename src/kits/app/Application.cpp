@@ -175,7 +175,9 @@ extern const char * const *__libc_argv;
 // prototypes of helper functions
 static const char* looper_name_for(const char *signature);
 static status_t check_app_signature(const char *signature);
+#ifndef RUN_WITHOUT_REGISTRAR
 static void fill_argv_message(BMessage &message);
+#endif
 
 
 BApplication::BApplication(const char *signature)
@@ -1598,6 +1600,7 @@ looper_name_for(const char *signature)
 /*!
 	\brief Fills the passed BMessage with B_ARGV_RECEIVED infos.
 */
+#ifndef RUN_WITHOUT_REGISTRAR
 static void
 fill_argv_message(BMessage &message)
 {
@@ -1620,4 +1623,5 @@ fill_argv_message(BMessage &message)
 	if (getcwd(cwd, B_PATH_NAME_LENGTH))
 		message.AddString("cwd", cwd);
 }
+#endif
 
