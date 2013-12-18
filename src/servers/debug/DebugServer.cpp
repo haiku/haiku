@@ -786,8 +786,8 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 
 	_PrintStackTrace(thread);
 
-	int32 debugAction;
-	bool explicitActionFound;
+	int32 debugAction = kActionPromptUser;
+	bool explicitActionFound = false;
 	if (action_for_team(fExecutablePath, debugAction, explicitActionFound)
 			!= B_OK) {
 		debugAction = kActionPromptUser;
