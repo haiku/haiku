@@ -5,9 +5,11 @@
 #ifndef INSTALLER_APP_H
 #define INSTALLER_APP_H
 
+
 #include <Application.h>
 #include <Catalog.h>
 
+#include "EULAWindow.h"
 #include "InstallerWindow.h"
 
 
@@ -20,7 +22,7 @@ public:
 	virtual	void				ReadyToRun();
 
 private:
-			BWindow*			fEULAWindow;
+			EULAWindow*			fEULAWindow;
 };
 
 #endif // INSTALLER_APP_H
