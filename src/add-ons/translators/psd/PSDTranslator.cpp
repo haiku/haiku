@@ -98,11 +98,11 @@ PSDTranslator::DerivedIdentify(BPositionIO *stream,
 		outType = B_TRANSLATOR_BITMAP;
 	if (outType != B_TRANSLATOR_BITMAP && outType != PSD_IMAGE_FORMAT)
 		return B_NO_TRANSLATOR;
-	
+
 	PSDLoader psdFile(stream);
 	if (!psdFile.IsSupported())
 		return B_ILLEGAL_DATA;
-		
+
 	info->type = PSD_IMAGE_FORMAT;
 	info->group = B_TRANSLATOR_BITMAP;
 	info->quality = PSD_IN_QUALITY;
@@ -122,12 +122,13 @@ PSDTranslator::DerivedTranslate(BPositionIO *source,
 	uint32 outType, BPositionIO *target, int32 baseType)
 {
 	if (outType != B_TRANSLATOR_BITMAP
-		&& outType != PSD_IMAGE_FORMAT)
+		&& outType != PSD_IMAGE_FORMAT) {
 		return B_NO_TRANSLATOR;
+	}
 
 	switch (baseType) {
 		case 0:
-		{								
+		{
 			if (outType != B_TRANSLATOR_BITMAP)
 				return B_NO_TRANSLATOR;
 
@@ -138,7 +139,7 @@ PSDTranslator::DerivedTranslate(BPositionIO *source,
 			return psdFile.Decode(target);
 		}
 		case 1:
-		{			
+		{
 			if (outType == PSD_IMAGE_FORMAT)
 				return _TranslateFromBits(source, ioExtension, outType, target);
 			return B_NO_TRANSLATOR;
@@ -149,11 +150,10 @@ PSDTranslator::DerivedTranslate(BPositionIO *source,
 }
 
 
-
 status_t
 PSDTranslator::_TranslateFromBits(BPositionIO* stream,
-					BMessage* ioExtension, uint32 outType,
-					BPositionIO* target)
+	BMessage* ioExtension, uint32 outType,
+	BPositionIO* target)
 {
 	TranslatorBitmap bitsHeader;
 	status_t result;
@@ -162,19 +162,20 @@ PSDTranslator::_TranslateFromBits(BPositionIO* stream,
 		return result;
 
 	if (bitsHeader.colors != B_RGB32
-		&& bitsHeader.colors != B_RGBA32)
+		&& bitsHeader.colors != B_RGBA32) {
 		return B_NO_TRANSLATOR;
+	}
 
 	uint32 width = bitsHeader.bounds.IntegerWidth() + 1;
 	uint32 height = bitsHeader.bounds.IntegerHeight() + 1;
-	
+
 	int32 layerSize = height * width;
 	int32 layersCount = bitsHeader.colors == B_RGB32 ? 3 : 4;
-	
+
 	uint8 *buff = new uint8[layerSize * layersCount];
-	
-	uint8 *ptr = buff;	
-	for(int i = 0; i < layerSize; i++) {
+
+	uint8 *ptr = buff;
+	for (int i = 0; i < layerSize; i++) {
 		uint8 rgba[4];
 		stream->Read(rgba, sizeof(uint32));
 		ptr[i] = rgba[2];
@@ -183,12 +184,12 @@ PSDTranslator::_TranslateFromBits(BPositionIO* stream,
 		if (layersCount == 4)
 			ptr[i+layerSize+layerSize+layerSize] = rgba[3];
 	}
-	
+
 	PSDWriter psdFile(stream);
 	psdFile.EncodeFromRGBA(target, buff, layersCount, width, height);
-	
+
 	delete buff;
-	
+
 	return B_OK;
 }
 
