@@ -297,15 +297,18 @@ PSDLoader::Decode(BPositionIO *target)
 			uint8 *redPalette = colorData;
 			uint8 *greenPalette = colorData + paletteSize;
 			uint8 *bluePalette = colorData + paletteSize * 2;
-			uint8 *cCh = imageData[0];
+			int32 index = 0;
 			for (int h = 0; h < fHeight; h++) {
 				uint8 *ptr = lineData;
 				for (int w = 0; w < fWidth; w++) {
-					uint8 c = *cCh++;
-					*ptr++ = bluePalette[c];
-					*ptr++ = greenPalette[c];
-					*ptr++ = redPalette[c];
-					*ptr++ = c == fTransparentIndex ? 0 : 255;
+					uint8 colorIndex = imageData[0][index];
+					ptr[0] = bluePalette[colorIndex];
+					ptr[1] = greenPalette[colorIndex];
+					ptr[2] = redPalette[colorIndex];
+					ptr[3] = colorIndex == fTransparentIndex ? 0 : 255;
+
+					ptr += sizeof(uint32);
+					index++;
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}
@@ -317,16 +320,17 @@ PSDLoader::Decode(BPositionIO *target)
 		case PSD_COLOR_FORMAT_GRAY_A:
 		{
 			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_GRAY_A;
-			uint8 *yCh = imageData[0];
-			uint8 *alphaCh = isAlpha ? imageData[1] : NULL;
+			int32 index = 0;
 			for (int h = 0; h < fHeight; h++) {
 				uint8 *ptr = lineData;
 				for (int w = 0; w < fWidth; w++) {
-					uint8 y = *(yCh += depthBytes);
-					*ptr++ = y;
-					*ptr++ = y;
-					*ptr++ = y;
-					*ptr++ = isAlpha ? *(alphaCh += depthBytes) : 255;
+					ptr[0] = imageData[0][index];
+					ptr[1] = imageData[0][index];
+					ptr[2] = imageData[0][index];
+					ptr[3] = isAlpha ? imageData[1][index] : 255;
+
+					ptr += sizeof(uint32);
+					index += depthBytes;
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}
@@ -337,42 +341,41 @@ PSDLoader::Decode(BPositionIO *target)
 		case PSD_COLOR_FORMAT_RGB_A:
 		{
 			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_RGB_A;
-			uint8 *rCh = imageData[0];
-			uint8 *gCh = imageData[1];
-			uint8 *bCh = imageData[2];
-			uint8 *alphaCh =  isAlpha ?	imageData[3] : NULL;
+			int32 index = 0;
 			for (int h = 0; h < fHeight; h++) {
 				uint8 *ptr = lineData;
 				for (int w = 0; w < fWidth; w++) {
-					*ptr++ = *(bCh += depthBytes);
-					*ptr++ = *(gCh += depthBytes);
-					*ptr++ = *(rCh += depthBytes);
-					*ptr++ = isAlpha ? *(alphaCh += depthBytes) : 255;
+					ptr[0] = imageData[2][index];
+					ptr[1] = imageData[1][index];
+					ptr[2] = imageData[0][index];
+					ptr[3] = isAlpha ? imageData[3][index] : 255;
+
+					ptr += sizeof(uint32);
+					index += depthBytes;
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}
 			break;
-		}	
+		}
 		case PSD_COLOR_FORMAT_CMYK:
 		case PSD_COLOR_FORMAT_CMYK_A:
 		{
 			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_CMYK_A;
-			uint8 *cCh = imageData[0];
-			uint8 *mCh = imageData[1];
-			uint8 *yCh = imageData[2];
-			uint8 *kCh = imageData[3];
-			uint8 *alphaCh = isAlpha ? imageData[4] : NULL;
+			int32 index = 0;
 			for (int h = 0; h < fHeight; h++) {
 				uint8 *ptr = lineData;
 				for (int w = 0; w < fWidth; w++) {
-					double c = 1.0 - *(cCh += depthBytes) / 255.0;
-					double m = 1.0 - *(mCh += depthBytes) / 255.0;
-					double y = 1.0 - *(yCh += depthBytes) / 255.0;
-					double k = 1.0 - *(kCh += depthBytes) / 255.0;
-					*ptr++ = (uint8)((1.0 - (y * (1.0 - k) + k)) * 255.0);
-					*ptr++ = (uint8)((1.0 - (m * (1.0 - k) + k)) * 255.0);
-					*ptr++ = (uint8)((1.0 - (c * (1.0 - k) + k)) * 255.0);
-					*ptr++ = alphaCh ? *(alphaCh += depthBytes) : 255;
+					double c = 1.0 - imageData[0][index] / 255.0;
+					double m = 1.0 - imageData[1][index] / 255.0;
+					double y = 1.0 - imageData[2][index] / 255.0;
+					double k = 1.0 - imageData[3][index] / 255.0;
+					ptr[0] = (uint8)((1.0 - (y * (1.0 - k) + k)) * 255.0);
+					ptr[1] = (uint8)((1.0 - (m * (1.0 - k) + k)) * 255.0);
+					ptr[2] = (uint8)((1.0 - (c * (1.0 - k) + k)) * 255.0);
+					ptr[3] = isAlpha ?  imageData[4][index] : 255;
+					
+					ptr += sizeof(uint32);
+					index += depthBytes;
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}
@@ -382,16 +385,13 @@ PSDLoader::Decode(BPositionIO *target)
 		case PSD_COLOR_FORMAT_LAB_A:
 		{
 			bool isAlpha = colorFormat == PSD_COLOR_FORMAT_LAB_A;
-			uint8 *lCh = imageData[0];
-			uint8 *aCh = imageData[1];
-			uint8 *bCh = imageData[2];
-			uint8 *alphaCh = isAlpha ? imageData[3] : NULL;
+			int32 index = 0;
 			for (int h = 0; h < fHeight; h++) {
 				uint8 *ptr = lineData;
 				for (int w = 0; w < fWidth; w++) {
-					double L = *(lCh += depthBytes) / 255.0 * 100.0;
-					double a = *(aCh += depthBytes) - 128.0;
-					double b = *(bCh += depthBytes) - 128.0;
+					double L = imageData[0][index] / 255.0 * 100.0;
+					double a = imageData[1][index] - 128.0;
+					double b = imageData[2][index] - 128.0;
 
 					double Y = L * (1.0 / 116.0) + 16.0 / 116.0;
 					double X = a * (1.0 / 500.0) + Y;
@@ -423,11 +423,14 @@ PSDLoader::Decode(BPositionIO *target)
 					R = (R < 0) ? 0 : ((R > 1) ? 1 : R);
 					G = (G < 0) ? 0 : ((G > 1) ? 1 : G);
 					B = (B < 0) ? 0 : ((B > 1) ? 1 : B);
-					
-					*ptr++ = (uint8)(B * 255.0);
-					*ptr++ = (uint8)(G * 255.0);
-					*ptr++ = (uint8)(R * 255.0);
-					*ptr++ = isAlpha ? *(alphaCh += depthBytes) : 255;
+
+					ptr[0] = (uint8)(B * 255.0);
+					ptr[1] = (uint8)(G * 255.0);
+					ptr[2] = (uint8)(R * 255.0);
+					ptr[3] = isAlpha ? imageData[3][index] : 255;
+
+					ptr += sizeof(uint32);
+					index += depthBytes;
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}
