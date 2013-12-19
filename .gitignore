@@ -13,5 +13,5 @@ build/user_config_headers
 # repository, it finds the file name in NFD and can't match it to the file name
 # in NFC.
 #
-# WARNING: The following line MUST use NFD, DO NOT convert it to NFD!
+# WARNING: The following line MUST use NFD, DO NOT convert it to NFC!
 src/data/keymaps/French (Bépo).keymap
