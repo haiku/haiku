@@ -140,57 +140,15 @@ PSDTranslator::DerivedTranslate(BPositionIO *source,
 		}
 		case 1:
 		{
-			if (outType == PSD_IMAGE_FORMAT)
-				return _TranslateFromBits(source, ioExtension, outType, target);
+			if (outType == PSD_IMAGE_FORMAT) {
+				PSDWriter psdFile(source);
+				return psdFile.Encode(target);
+			}
 			return B_NO_TRANSLATOR;
 		}
 		default:
 			return B_NO_TRANSLATOR;
 	}
-}
-
-
-status_t
-PSDTranslator::_TranslateFromBits(BPositionIO* stream,
-	BMessage* ioExtension, uint32 outType,
-	BPositionIO* target)
-{
-	TranslatorBitmap bitsHeader;
-	status_t result;
-	result = identify_bits_header(stream, NULL, &bitsHeader);
-	if (result != B_OK)
-		return result;
-
-	if (bitsHeader.colors != B_RGB32
-		&& bitsHeader.colors != B_RGBA32) {
-		return B_NO_TRANSLATOR;
-	}
-
-	uint32 width = bitsHeader.bounds.IntegerWidth() + 1;
-	uint32 height = bitsHeader.bounds.IntegerHeight() + 1;
-
-	int32 layerSize = height * width;
-	int32 layersCount = bitsHeader.colors == B_RGB32 ? 3 : 4;
-
-	uint8 *buff = new uint8[layerSize * layersCount];
-
-	uint8 *ptr = buff;
-	for (int i = 0; i < layerSize; i++) {
-		uint8 rgba[4];
-		stream->Read(rgba, sizeof(uint32));
-		ptr[i] = rgba[2];
-		ptr[i+layerSize] = rgba[1];
-		ptr[i+layerSize+layerSize] = rgba[0];
-		if (layersCount == 4)
-			ptr[i+layerSize+layerSize+layerSize] = rgba[3];
-	}
-
-	PSDWriter psdFile(stream);
-	psdFile.EncodeFromRGBA(target, buff, layersCount, width, height);
-
-	delete buff;
-
-	return B_OK;
 }
 
 

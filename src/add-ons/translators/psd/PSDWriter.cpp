@@ -8,11 +8,39 @@
 
 #include "BaseTranslator.h"
 #include "PSDWriter.h"
+#include "DataArray.h"
 
 
 PSDWriter::PSDWriter(BPositionIO *stream)
 {	
 	fStream = stream;
+	fReady = false;
+
+	TranslatorBitmap header;
+	stream->Seek(0, SEEK_SET);
+	status_t err = stream->Read(&header, sizeof(TranslatorBitmap));
+	if (err < B_OK)
+		return;
+	else if (err < (int)sizeof(TranslatorBitmap))
+		return;
+		
+	fBitmapDataPos = stream->Position();
+
+	BRect bounds;
+	bounds.left = B_BENDIAN_TO_HOST_FLOAT(header.bounds.left);
+	bounds.top = B_BENDIAN_TO_HOST_FLOAT(header.bounds.top);
+	bounds.right = B_BENDIAN_TO_HOST_FLOAT(header.bounds.right);
+	bounds.bottom = B_BENDIAN_TO_HOST_FLOAT(header.bounds.bottom);
+	fInRowBytes = B_BENDIAN_TO_HOST_INT32(header.rowBytes);
+	fColorSpace = (color_space)B_BENDIAN_TO_HOST_INT32(header.colors);
+	fChannels = fColorSpace == B_RGB32 ? 3 : 4;
+
+	fWidth = bounds.IntegerWidth() + 1;
+	fHeight = bounds.IntegerHeight() + 1;
+	
+	fCompression = PSD_COMPRESSED_RAW;
+
+	fReady = true;
 }
 
 
@@ -21,108 +49,126 @@ PSDWriter::~PSDWriter()
 }
 
 
-status_t
-PSDWriter::EncodeFromRGBA(BPositionIO *target, uint8 *buff,
-	int32 layers, int32 width, int32 height)
+bool
+PSDWriter::IsReady(void)
 {
-	int32 channelSize = width * height;
+	return fReady;
+}
 
-	_WriteUInt32ToStream(target, 0x38425053); // 8BPS
-	_WriteUInt16ToStream(target, 1); // Version = 1
-	_WriteFillBlockToStream(target, 0, 6); // reserved
-	_WriteInt16ToStream(target, layers); // Channels
-	_WriteInt32ToStream(target, height); // Height
-	_WriteInt32ToStream(target, width); // Width
-	_WriteInt16ToStream(target, 8); // Depth = 8
-	_WriteInt16ToStream(target, PSD_COLOR_MODE_RGB); // ColorMode
-	_WriteUInt32ToStream(target, 0); // ColorModeBlockSize = 0
 
-	size_t sizePos = target->Position();
-	_WriteUInt32ToStream(target, 0); // ImageResourceBlockSize = 0 for now
-	_WriteUInt32ToStream(target, 0x3842494D); // 8BIM
-	_WriteUInt16ToStream(target, 1005);
-	_WriteUInt16ToStream(target, 0);
-	_WriteUInt32ToStream(target, 16);
-	uint8 resBlock[16] = {0x00, 0x48, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01,
-		0x00, 0x48, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01};
-	_WriteBlockToStream(target, resBlock, 16);
+void
+PSDWriter::SetCompression(int16 compression)
+{
+	fCompression = compression;
+}
 
-	// current layer info
-	_WriteUInt32ToStream(target, 0x3842494D); // 8BIM
-	_WriteUInt16ToStream(target, 1024);
-	_WriteUInt16ToStream(target, 0);
-	_WriteUInt32ToStream(target, 2);
-	_WriteUInt16ToStream(target, 0); // Set current layer to 0
 
-	int32 resBlockSize = target->Position() - sizePos;
-	size_t lastPos = target->Position();
-	target->Seek(sizePos, SEEK_SET);
-	_WriteUInt32ToStream(target, resBlockSize - sizeof(uint32));
-	target->Seek(lastPos, SEEK_SET);
+status_t
+PSDWriter::Encode(BPositionIO *target)
+{
+	if (!fReady)
+		return B_NO_TRANSLATOR;
 
-	sizePos = target->Position();
-	_WriteUInt32ToStream(target, 0); // Layer & mask block size = 0
-	_WriteUInt32ToStream(target, 0); // Layer info block size = 0
+	int32 channelSize = fWidth * fHeight;		
 
-	_WriteUInt16ToStream(target, 1); // Layers count
+	fStream->Seek(fBitmapDataPos, SEEK_SET);
 
-	_WriteUInt32ToStream(target, 0); // Layer rect
-	_WriteUInt32ToStream(target, 0);
-	_WriteUInt32ToStream(target, height);
-	_WriteUInt32ToStream(target, width);
-
-	_WriteInt16ToStream(target, layers); // Layer Channels
-
-	for (int channels = 0; channels < 3; channels++) {
-		_WriteInt16ToStream(target, channels); // Channel num
-		_WriteUInt32ToStream(target, channelSize + 2); // Channel size
+	BDataArray psdChannel[4];
+	
+	for (int i = 0; i < channelSize; i++) {
+		uint8 rgba[4];
+		fStream->Read(rgba, sizeof(uint32));
+		psdChannel[0].Append((uint8)rgba[2]); // Red channel
+		psdChannel[1].Append((uint8)rgba[1]); // Green channel
+		psdChannel[2].Append((uint8)rgba[0]); // Blue channel
+		if (fChannels == 4)
+			psdChannel[3].Append((uint8)rgba[3]); // Alpha channel
 	}
 
-	if (layers == 4) {
-		_WriteInt16ToStream(target, -1);
-		_WriteUInt32ToStream(target, channelSize + 2); // Alpha channel size
+	// PSD header
+	BDataArray psdHeader(64);
+	psdHeader << "8BPS"; // Signature
+	psdHeader << (uint16)1; // Version = 1
+	psdHeader.Repeat(0, 6); // Reserved
+	psdHeader << fChannels; // Channels
+	psdHeader << fHeight << fWidth; // Image size
+	psdHeader << (int16)8; // Depth
+	psdHeader << (int16)PSD_COLOR_MODE_RGB; // ColorMode
+
+	// Color mode section
+	BDataArray psdColorModeSection(16);
+	psdColorModeSection << (uint32)0;
+
+	// Image resource section
+	BDataArray psdImageResourceSection(64);
+	psdImageResourceSection << "8BIM"; // Block signature
+	psdImageResourceSection << (uint16)1005;
+	psdImageResourceSection << (uint16)0;
+	psdImageResourceSection << (uint32)16;
+	uint8 resBlock[16] = {0x00, 0x48, 0x00, 0x00,
+		0x00, 0x01, 0x00, 0x01,
+		0x00, 0x48, 0x00, 0x00,
+		0x00, 0x01, 0x00, 0x01};
+	psdImageResourceSection.Append(resBlock, 16);	
+	// Current layer info
+	psdImageResourceSection << "8BIM"; // Block signature
+	psdImageResourceSection << (uint16)1024;
+	psdImageResourceSection << (uint16)0;
+	psdImageResourceSection << (uint32)2;
+	psdImageResourceSection << (uint16)0; // Set current layer to 0
+
+	// Layer & mask section
+	BDataArray psdLayersSection;
+	psdLayersSection << (uint16)1; // Layers count
+	psdLayersSection << (uint32)0; // Layer rect
+	psdLayersSection << (uint32)0;
+	psdLayersSection << (uint32)fHeight;
+	psdLayersSection << (uint32)fWidth;	
+	psdLayersSection << (uint16)fChannels;
+	
+	for (int dataChannel = 0; dataChannel < 3; dataChannel++) {
+		psdLayersSection << (int16)dataChannel; // Channel num
+		psdLayersSection << (uint32)(psdChannel[dataChannel].Length() + 2);
 	}
+	if (fChannels == 4) {
+		psdLayersSection << (int16)-1; // Alpha channel id (-1)
+		psdLayersSection << (uint32)(psdChannel[4].Length() + 2);
+	}
+	psdLayersSection << "8BIM";
+	psdLayersSection << "norm"; // Blend mode = norm
+	psdLayersSection << (uint8)255; // Opacity
+	psdLayersSection << (uint8)0; // Clipping
+	psdLayersSection << (uint8)1; // Flags
+	psdLayersSection << (uint8)0; // Flags
+	psdLayersSection << (uint32)24; // Extra data length
+	psdLayersSection << (uint32)0; // Mask info
+	psdLayersSection << (uint32)0;
 
-	_WriteUInt32ToStream(target, 0x3842494D); // 8BIM
-
-	uint8 blendModeKey[4] = {'n','o','r','m'};
-	_WriteBlockToStream(target, blendModeKey, 4);  // Blend mode norm
-
-	_WriteUInt8ToStream(target, 255); // Alpha
-
-	_WriteUInt8ToStream(target, 0); // Clipping
-	_WriteUInt8ToStream(target, 1); // Flags
-	_WriteUInt8ToStream(target, 0); // Flags
-
-	_WriteUInt32ToStream(target, 24); // Extra data length
-	_WriteUInt32ToStream(target, 0); // Mask info
-	_WriteUInt32ToStream(target, 0);
-
-	_WriteUInt8ToStream(target, 15); // Layer name length
+	psdLayersSection << (uint8)15; // Layer name length
 	uint8 layerName[16] = {"Layer #1       "};
-	_WriteBlockToStream(target, layerName, 15); // Layer name
+	psdLayersSection.Append(layerName, 15); // Layer name
 
-	for (int dataChannel = 0; dataChannel < layers; dataChannel++) {
-		_WriteInt16ToStream(target, PSD_COMPRESSED_RAW); // Compression mode
-		_WriteBlockToStream(target, buff + dataChannel * channelSize,
-			channelSize); // Layer image data
+	for (int dataChannel = 0; dataChannel < fChannels; dataChannel++) {
+		psdLayersSection << fCompression; // Compression mode
+		psdLayersSection.Append(psdChannel[dataChannel].Buffer(),
+			psdChannel[dataChannel].Length()); // Layer image data
 	}
+		
+	psdHeader.WriteToStream(target);
+	
+	psdColorModeSection.WriteToStream(target);
+	
+	_WriteUInt32ToStream(target, psdImageResourceSection.Length());
+	psdImageResourceSection.WriteToStream(target);
 
-	uint32 layerBlockSize = target->Position() - sizePos;
+	_WriteUInt32ToStream(target, psdLayersSection.Length() + 4);
+	_WriteUInt32ToStream(target, psdLayersSection.Length());
+	psdLayersSection.WriteToStream(target);
 
-/*	if (layerBlockSize % 2 != 0) {
-		_WriteUInt8ToStream(target, 0);
-		layerBlockSize++;
-	}*/
-
-	lastPos = target->Position();
-	target->Seek(sizePos, SEEK_SET);
-	_WriteUInt32ToStream(target, layerBlockSize - 4);
-	_WriteUInt32ToStream(target, layerBlockSize - 8);
-	target->Seek(lastPos, SEEK_SET);
-
-	_WriteUInt16ToStream(target, PSD_COMPRESSED_RAW); // Compression mode
-	_WriteBlockToStream(target, buff,  channelSize * layers);
+	// Merged layer
+	_WriteUInt16ToStream(target, fCompression); // Compression mode
+	for (int dataChannel = 0; dataChannel < fChannels; dataChannel++)
+		psdChannel[dataChannel].WriteToStream(target);
 
 	return B_OK;
 }

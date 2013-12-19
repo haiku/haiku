@@ -29,8 +29,9 @@ public:
 					PSDWriter(BPositionIO *stream);
 					~PSDWriter();
 
-	status_t		EncodeFromRGBA(BPositionIO *target, uint8 *buff,
-						int32 layers, int32 width, int32 height);
+	bool			IsReady(void);	
+	void			SetCompression(int16 compression);
+	status_t		Encode(BPositionIO *target);
 
 private:
 	void			_WriteInt32ToStream(BPositionIO *stream, int32);
@@ -44,7 +45,17 @@ private:
 	void			_WriteBlockToStream(BPositionIO *stream,
 						uint8 *block, size_t count);
 
-	BPositionIO 	*fStream;
+	BPositionIO 	*fStream;	
+	size_t			fBitmapDataPos;
+
+	color_space		fColorSpace;
+	int32			fInRowBytes;
+	int16			fChannels;
+	int32			fWidth;
+	int32			fHeight;
+	int16			fCompression;
+	
+	bool			fReady;
 };
 
 

@@ -21,7 +21,7 @@
 #define DOCUMENT_COUNT "/documentCount"
 #define DOCUMENT_INDEX "/documentIndex"
 
-#define PSD_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1, 2, 0)
+#define PSD_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1, 2, 1)
 #define PSD_IMAGE_FORMAT	'PSD '
 
 #define PSD_IN_QUALITY		0.7
@@ -53,9 +53,6 @@ class PSDTranslator : public BaseTranslator {
 
 	protected:
 		virtual ~PSDTranslator();
-	private:
-		status_t _TranslateFromBits(BPositionIO* stream,
-			BMessage* settings, uint32 outType, BPositionIO* target);
 };
 
 extern const char *kDocumentCount;
