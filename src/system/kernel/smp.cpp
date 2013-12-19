@@ -1112,11 +1112,16 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 	if (!sICIEnabled)
 		return;
 
+	int currentCPU = smp_get_current_cpu();
+	bool broadcast = true;
+
 	// count target CPUs
 	int32 targetCPUs = 0;
 	for (int32 i = 0; i < sNumCPUs; i++) {
 		if (cpuMask.GetBit(i))
 			targetCPUs++;
+		else if (i != currentCPU)
+			broadcast = false;
 	}
 
 	// find_free_message leaves interrupts disabled
@@ -1132,7 +1137,6 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 	msg->flags = flags;
 	msg->done = 0;
 
-	int currentCPU = smp_get_current_cpu();
 	msg->proc_bitmap = cpuMask;
 	msg->proc_bitmap.ClearBit(currentCPU);
 	if (msg->proc_bitmap.IsEmpty()) {
@@ -1153,8 +1157,10 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 			atomic_add(&gCPU[i].ici_counter, 1);
 	}
 
-	arch_smp_send_broadcast_ici();
-		// TODO: Introduce a call that only bothers the target CPUs!
+	if (broadcast)
+		arch_smp_send_broadcast_ici();
+	else
+		arch_smp_send_multicast_ici(cpuMask);
 
 	if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
 		// wait for the other cpus to finish processing it

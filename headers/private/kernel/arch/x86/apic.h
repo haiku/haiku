@@ -52,7 +52,7 @@
 #define APIC_TRIGGER_MODE_LEVEL					(1 << 15)
 
 /* Interrupt Command defines */
-#define APIC_INTR_COMMAND_1_MASK				0xfff3f000
+#define APIC_INTR_COMMAND_1_MASK				0xfff32000
 #define APIC_INTR_COMMAND_2_MASK				0x00ffffff
 
 #define APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL	0
@@ -110,6 +110,7 @@
 #if !_BOOT_MODE
 
 bool		apic_available();
+bool		x2apic_available();
 uint32		apic_read(uint32 offset);
 void		apic_write(uint32 offset, uint32 data);
 uint32		apic_local_id();
@@ -122,10 +123,9 @@ void		apic_disable_local_ints();
 
 uint32		apic_spurious_intr_vector();
 void		apic_set_spurious_intr_vector(uint32 config);
-uint32		apic_intr_command_1();
-void		apic_set_intr_command_1(uint32 config);
-uint32		apic_intr_command_2();
-void		apic_set_intr_command_2(uint32 config);
+
+void		apic_set_interrupt_command(uint32 destination, uint32 mode);
+bool		apic_interrupt_delivered(void);
 
 uint32		apic_lvt_timer();
 void		apic_set_lvt_timer(uint32 config);

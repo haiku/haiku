@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -25,6 +26,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <algorithm>
+
 
 //#define TRACE_ARCH_SMP
 #ifdef TRACE_ARCH_SMP
@@ -32,6 +35,9 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+
+#define	ICI_VECTOR		0xfd
 
 
 static uint32 sCPUAPICIds[SMP_MAX_CPUS];
@@ -125,46 +131,94 @@ arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
 
 
 void
+arch_smp_send_multicast_ici(CPUSet& cpuSet)
+{
+#if KDEBUG
+	if (are_interrupts_enabled())
+		panic("arch_smp_send_multicast_ici: called with interrupts enabled");
+#endif
+
+	arch_cpu_memory_write_barrier();
+
+	int32 i = 0;
+	int32 cpuCount = smp_get_num_cpus();
+
+	int32 logicalModeCPUs;
+	if (x2apic_available())
+		logicalModeCPUs = cpuCount;
+	else
+		logicalModeCPUs = std::min(cpuCount, int32(8));
+
+	uint32 destination = 0;
+	for (; i < logicalModeCPUs; i++) {
+		if (cpuSet.GetBit(i) && i != smp_get_current_cpu())
+			destination |= gCPU[i].arch.logical_apic_id;
+	}
+
+	uint32 mode = ICI_VECTOR | APIC_DELIVERY_MODE_FIXED
+			| APIC_INTR_COMMAND_1_ASSERT
+			| APIC_INTR_COMMAND_1_DEST_MODE_LOGICAL
+			| APIC_INTR_COMMAND_1_DEST_FIELD;
+
+	while (!apic_interrupt_delivered())
+		cpu_pause();
+	apic_set_interrupt_command(destination, mode);
+
+	for (; i < cpuCount; i++) {
+		if (cpuSet.GetBit(i)) {
+			uint32 destination = sCPUAPICIds[i];
+			uint32 mode = ICI_VECTOR | APIC_DELIVERY_MODE_FIXED
+					| APIC_INTR_COMMAND_1_ASSERT
+					| APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL
+					| APIC_INTR_COMMAND_1_DEST_FIELD;
+
+			while (!apic_interrupt_delivered())
+				cpu_pause();
+			apic_set_interrupt_command(destination, mode);
+		}
+	}
+}
+
+
+void
 arch_smp_send_broadcast_ici(void)
 {
-	uint32 config;
-	cpu_status state = disable_interrupts();
+#if KDEBUG
+	if (are_interrupts_enabled())
+		panic("arch_smp_send_broadcast_ici: called with interrupts enabled");
+#endif
 
-	config = apic_intr_command_1() & APIC_INTR_COMMAND_1_MASK;
-	apic_set_intr_command_1(config | 0xfd | APIC_DELIVERY_MODE_FIXED
-		| APIC_INTR_COMMAND_1_ASSERT
-		| APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL
-		| APIC_INTR_COMMAND_1_DEST_ALL_BUT_SELF);
+	arch_cpu_memory_write_barrier();
 
-	restore_interrupts(state);
+	uint32 mode = ICI_VECTOR | APIC_DELIVERY_MODE_FIXED
+			| APIC_INTR_COMMAND_1_ASSERT
+			| APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL
+			| APIC_INTR_COMMAND_1_DEST_ALL_BUT_SELF;
+
+	while (!apic_interrupt_delivered())
+		cpu_pause();
+	apic_set_interrupt_command(0, mode);
 }
 
 
 void
 arch_smp_send_ici(int32 target_cpu)
 {
-	uint32 config;
-	uint32 timeout;
-	cpu_status state;
+#if KDEBUG
+	if (are_interrupts_enabled())
+		panic("arch_smp_send_ici: called with interrupts enabled");
+#endif
 
-	state = disable_interrupts();
+	arch_cpu_memory_write_barrier();
 
-	config = apic_intr_command_2() & APIC_INTR_COMMAND_2_MASK;
-	apic_set_intr_command_2(config | sCPUAPICIds[target_cpu] << 24);
+	uint32 destination = sCPUAPICIds[target_cpu];
+	uint32 mode = ICI_VECTOR | APIC_DELIVERY_MODE_FIXED
+			| APIC_INTR_COMMAND_1_ASSERT
+			| APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL
+			| APIC_INTR_COMMAND_1_DEST_FIELD;
 
-	config = apic_intr_command_1() & APIC_INTR_COMMAND_1_MASK;
-	apic_set_intr_command_1(config | 0xfd | APIC_DELIVERY_MODE_FIXED
-		| APIC_INTR_COMMAND_1_ASSERT
-		| APIC_INTR_COMMAND_1_DEST_MODE_PHYSICAL
-		| APIC_INTR_COMMAND_1_DEST_FIELD);
-
-	timeout = 100000000;
-	// wait for message to be sent
-	while ((apic_intr_command_1() & APIC_DELIVERY_STATUS) != 0 && --timeout != 0)
-		asm volatile ("pause;");
-
-	if (timeout == 0)
-		panic("arch_smp_send_ici: timeout, target_cpu %" B_PRId32, target_cpu);
-
-	restore_interrupts(state);
+	while (!apic_interrupt_delivered())
+		cpu_pause();
+	apic_set_interrupt_command(destination, mode);
 }
+
