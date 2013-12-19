@@ -76,13 +76,14 @@ cstates_idle(void)
 	ASSERT(thread_get_current_thread()->pinned_to_cpu > 0);
 	int32 cpu = smp_get_current_cpu();
 
+	bigtime_t timeStep = sTimeStep;
 	bigtime_t idleTime = sIdleTime[cpu];
-	int state = min_c(idleTime / sTimeStep, sCStateCount - 1);
+	int state = min_c(idleTime / timeStep, sCStateCount - 1);
 
 	ASSERT(state >= 0 && state < sCStateCount);
 
-	int subState = idleTime % sTimeStep;
-	subState /= sTimeStep / sCStates[state].fSubStatesCount;
+	int subState = idleTime % timeStep;
+	subState /= timeStep / sCStates[state].fSubStatesCount;
 
 	ASSERT(subState >= 0 && subState < sCStates[state].fSubStatesCount);
 
