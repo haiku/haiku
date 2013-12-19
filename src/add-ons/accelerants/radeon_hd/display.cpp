@@ -577,7 +577,7 @@ display_crtc_dpms(uint8 crtcID, int mode)
 				return;
 			display_crtc_power(crtcID, ATOM_ENABLE);
 			gDisplay[crtcID]->powered = true;
-			if (info.dceMajor >= 3)
+			if (info.dceMajor >= 3 && info.dceMajor < 6)
 				display_crtc_memreq(crtcID, ATOM_ENABLE);
 			display_crtc_blank(crtcID, ATOM_BLANKING_OFF);
 			break;
@@ -589,7 +589,7 @@ display_crtc_dpms(uint8 crtcID, int mode)
 				return;
 			if (gDisplay[crtcID]->powered == true)
 				display_crtc_blank(crtcID, ATOM_BLANKING);
-			if (info.dceMajor >= 3)
+			if (info.dceMajor >= 3 && info.dceMajor < 6)
 				display_crtc_memreq(crtcID, ATOM_DISABLE);
 			display_crtc_power(crtcID, ATOM_DISABLE);
 			gDisplay[crtcID]->powered = false;
