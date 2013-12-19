@@ -142,6 +142,7 @@ PSDTranslator::DerivedTranslate(BPositionIO *source,
 		{
 			if (outType == PSD_IMAGE_FORMAT) {
 				PSDWriter psdFile(source);
+				psdFile.SetCompression(PSD_COMPRESSED_RLE);
 				return psdFile.Encode(target);
 			}
 			return B_NO_TRANSLATOR;

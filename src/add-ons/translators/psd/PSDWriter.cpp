@@ -74,16 +74,45 @@ PSDWriter::Encode(BPositionIO *target)
 	fStream->Seek(fBitmapDataPos, SEEK_SET);
 
 	BDataArray psdChannel[4];
-	
-	for (int i = 0; i < channelSize; i++) {
-		uint8 rgba[4];
-		fStream->Read(rgba, sizeof(uint32));
-		psdChannel[0].Append((uint8)rgba[2]); // Red channel
-		psdChannel[1].Append((uint8)rgba[1]); // Green channel
-		psdChannel[2].Append((uint8)rgba[0]); // Blue channel
-		if (fChannels == 4)
-			psdChannel[3].Append((uint8)rgba[3]); // Alpha channel
-	}
+	BDataArray psdByteCounts[4];
+
+	if (fCompression == PSD_COMPRESSED_RAW) {
+		for (int i = 0; i < channelSize; i++) {
+			uint8 rgba[4];
+			fStream->Read(rgba, sizeof(uint32));
+			psdChannel[0].Append((uint8)rgba[2]); // Red channel
+			psdChannel[1].Append((uint8)rgba[1]); // Green channel
+			psdChannel[2].Append((uint8)rgba[0]); // Blue channel
+			if (fChannels == 4)
+				psdChannel[3].Append((uint8)rgba[3]); // Alpha channel
+		}
+	} else if (fCompression == PSD_COMPRESSED_RLE) {
+		for (int32 h = 0; h < fHeight; h++) {
+			BDataArray lineData[4];
+			
+			for (int32 w = 0; w < fWidth; w++) {
+				uint8 rgba[4];
+				fStream->Read(rgba, sizeof(uint32));
+				lineData[0].Append((uint8)rgba[2]); // Red channel
+				lineData[1].Append((uint8)rgba[1]); // Green channel
+				lineData[2].Append((uint8)rgba[0]); // Blue channel
+				if (fChannels == 4)
+					lineData[3].Append((uint8)rgba[3]); // Alpha channel
+				else
+					lineData[3].Append((uint8)255);
+			}
+			
+			for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
+				BDataArray *packedLine = PackBits(lineData[channelIdx].Buffer(),
+					lineData[channelIdx].Length());
+				psdByteCounts[channelIdx].Append((uint16)packedLine->Length());
+				psdChannel[channelIdx].Append(packedLine->Buffer(),
+					packedLine->Length());
+				delete packedLine;
+			}
+		}
+	} else
+		return B_NO_TRANSLATOR;
 
 	// PSD header
 	BDataArray psdHeader(64);
@@ -126,13 +155,25 @@ PSDWriter::Encode(BPositionIO *target)
 	psdLayersSection << (uint32)fWidth;	
 	psdLayersSection << (uint16)fChannels;
 	
-	for (int dataChannel = 0; dataChannel < 3; dataChannel++) {
-		psdLayersSection << (int16)dataChannel; // Channel num
-		psdLayersSection << (uint32)(psdChannel[dataChannel].Length() + 2);
+	for (int channelIdx = 0; channelIdx < 3; channelIdx++) {
+		psdLayersSection << (int16)channelIdx; // Channel num
+		if (fCompression == PSD_COMPRESSED_RAW) {
+			psdLayersSection << (uint32)(psdChannel[channelIdx].Length()
+				+ sizeof(int16));
+		} else {
+			psdLayersSection << (uint32)(psdChannel[channelIdx].Length()
+				+ psdByteCounts[channelIdx].Length() + sizeof(int16));
+		}
 	}
 	if (fChannels == 4) {
 		psdLayersSection << (int16)-1; // Alpha channel id (-1)
-		psdLayersSection << (uint32)(psdChannel[4].Length() + 2);
+		if (fCompression == PSD_COMPRESSED_RAW) {
+			psdLayersSection << (uint32)(psdChannel[4].Length()
+				+ sizeof(int16));
+		} else {
+			psdLayersSection << (uint32)(psdChannel[4].Length()
+				+ psdByteCounts[4].Length() + sizeof(int16));			
+		}
 	}
 	psdLayersSection << "8BIM";
 	psdLayersSection << "norm"; // Blend mode = norm
@@ -148,12 +189,27 @@ PSDWriter::Encode(BPositionIO *target)
 	uint8 layerName[16] = {"Layer #1       "};
 	psdLayersSection.Append(layerName, 15); // Layer name
 
-	for (int dataChannel = 0; dataChannel < fChannels; dataChannel++) {
-		psdLayersSection << fCompression; // Compression mode
-		psdLayersSection.Append(psdChannel[dataChannel].Buffer(),
-			psdChannel[dataChannel].Length()); // Layer image data
+	if (fCompression == PSD_COMPRESSED_RAW) {
+		for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
+			psdLayersSection << fCompression; // Compression mode
+			psdLayersSection.Append(psdChannel[channelIdx].Buffer(),
+				psdChannel[channelIdx].Length()); // Layer image data
+		}
+	} else {	
+		for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
+			psdLayersSection << fCompression; // Compression mode
+			psdLayersSection.Append(psdByteCounts[channelIdx].Buffer(),
+				psdByteCounts[channelIdx].Length()); // Bytes count
+			psdLayersSection.Append(psdChannel[channelIdx].Buffer(),
+				psdChannel[channelIdx].Length()); // Layer image data
+		}
 	}
-		
+
+	if (fCompression == PSD_COMPRESSED_RLE
+		&& psdLayersSection.Length() % 2 != 0) {
+		psdLayersSection << (uint8)0;
+	}
+
 	psdHeader.WriteToStream(target);
 	
 	psdColorModeSection.WriteToStream(target);
@@ -161,16 +217,67 @@ PSDWriter::Encode(BPositionIO *target)
 	_WriteUInt32ToStream(target, psdImageResourceSection.Length());
 	psdImageResourceSection.WriteToStream(target);
 
-	_WriteUInt32ToStream(target, psdLayersSection.Length() + 4);
+	_WriteUInt32ToStream(target, psdLayersSection.Length() + sizeof(int32));
 	_WriteUInt32ToStream(target, psdLayersSection.Length());
 	psdLayersSection.WriteToStream(target);
 
 	// Merged layer
 	_WriteUInt16ToStream(target, fCompression); // Compression mode
-	for (int dataChannel = 0; dataChannel < fChannels; dataChannel++)
-		psdChannel[dataChannel].WriteToStream(target);
+	
+	if (fCompression == PSD_COMPRESSED_RLE) {
+		for (int channelIdx = 0; channelIdx < fChannels; channelIdx++)
+			psdByteCounts[channelIdx].WriteToStream(target);
+	}
+
+	for (int channelIdx = 0; channelIdx < fChannels; channelIdx++)
+		psdChannel[channelIdx].WriteToStream(target);
 
 	return B_OK;
+}
+
+
+BDataArray*
+PSDWriter::PackBits(uint8 *buff, int32  len)
+{
+	BDataArray *packedBits = new BDataArray();
+
+	int32  count = len;  
+	len = 0;
+
+	while (count > 0) {
+		int i;
+		for (i = 0; (i < 128) && (buff[0] == buff[i]) && (count - i > 0); i++);
+		if (i < 2) {
+			for (i = 0; i < 128; i++) {
+				bool b1 = buff[i] != buff[i + 1];
+				bool b3 = buff[i] != buff[i + 2];
+				bool b2 = count - (i + 2) < 1;
+				if (count - (i + 1) <= 0)
+					break;
+				if (!(b1 || b2 || b3))
+					break;
+			}
+
+			if (count == 1)
+				i = 1;
+
+			if (i > 0) {
+				packedBits->Append((uint8)(i - 1));
+				for (int j = 0; j < i; j++)
+					packedBits->Append((uint8)buff[j]);
+				buff += i;
+				count -= i;
+				len += (i + 1);
+			}
+		} else {
+			packedBits->Append((uint8)(-(i - 1)));
+			packedBits->Append((uint8)(*buff));
+			buff += i;
+			count -= i;
+			len += 2;
+		}
+	}
+	return packedBits;
 }
 
 

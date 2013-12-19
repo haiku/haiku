@@ -23,6 +23,7 @@
 #include <List.h>
 
 #include "PSDLoader.h"
+#include "DataArray.h"
 
 class PSDWriter {
 public:
@@ -44,6 +45,8 @@ private:
 						uint8 val, size_t count);
 	void			_WriteBlockToStream(BPositionIO *stream,
 						uint8 *block, size_t count);
+						
+	BDataArray*		PackBits(uint8 *buff, int32  len);
 
 	BPositionIO 	*fStream;	
 	size_t			fBitmapDataPos;
