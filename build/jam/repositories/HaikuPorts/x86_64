@@ -20,9 +20,10 @@ RemotePackageRepository HaikuPorts
 #	bepdf-1.1.1~beta5_2013_04_28-1
 	binutils-2.23.2_2013_04_09-2
 	bison-2.4.3-6
-	bzip2-1.0.6-3
+	bzip2-1.0.6-4
+	bzip2_devel-1.0.6-4
 	cdrtools-3.01~a07-3
-	cmake-2.8.5-6
+	cmake-2.8.11.2-6
 	ctags-5.8-3
 	curl-7.26.0-5
 	curl_devel-7.26.0-5
@@ -50,8 +51,8 @@ RemotePackageRepository HaikuPorts
 	gperf-3.0.4-1
 	grep-2.14-5
 	groff-1.20.1-3
-	haikuwebkit-1.1.3_2013_08_09-2
-	haikuwebkit_devel-1.1.3_2013_08_09-2
+	haikuwebkit-1.2.1-1
+	haikuwebkit_devel-1.2.1-1
 	htmldoc-1.8.27-3
 	icu-4.8.1.1-4
 	icu_devel-4.8.1.1-4
@@ -79,9 +80,11 @@ RemotePackageRepository HaikuPorts
 	libvorbis_devel-1.3.2-2
 	libvpx-1.0.0-2
 	libvpx_devel-1.0.0-2
-	libxml2-2.8.0-5
-	libxml2_devel-2.8.0-5
-	libxml2_python-2.8.0-5
+	libxml2-2.8.0-7
+	libxml2_devel-2.8.0-7
+	libxml2_python-2.8.0-7
+	libxslt-1.1.28-2
+	libxslt_devel-1.1.28-2
 	m4-1.4.16-5
 	make-3.82-5
 	man-1.6g-3
@@ -100,9 +103,11 @@ RemotePackageRepository HaikuPorts
 	p7zip-9.20.1-5
 	pe-2.4.3_hg611-1
 	perl-5.18.1-1
-	pkgconfig-0.27.1-1
+	pkgconfig-0.27.1-2
 	python-2.6.8-6
 	readline-6.2-3
+	ruby-1.9.1-2
+	ruby_devel-1.9.1-2
 	scons-2.2.0-2
 	sed-4.2.1-6
 	speex-1.2~rc1-2
@@ -165,6 +170,7 @@ RemotePackageRepository HaikuPorts
 	libvorbis
 	libvpx
 	libxml2
+	libxslt
 	m4
 	make
 	man
@@ -182,6 +188,7 @@ RemotePackageRepository HaikuPorts
 	pkgconfig
 	python
 	readline
+	ruby
 	scons
 	sed
 	speex
