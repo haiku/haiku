@@ -574,7 +574,7 @@ generate_topology_array(cpu_topology_node_info* topology,
 
 	count--;
 	topology++;
-	for (int32 i = 0; i < node->children_count && count > 0; i++, count--)
+	for (int32 i = 0; i < node->children_count && count > 0; i++)
 		topology = generate_topology_array(topology, node->children[i], count);
 	return topology;
 }
