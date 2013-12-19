@@ -14,6 +14,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			PSDTranslator.cpp
 			PSDLoader.cpp
 			PSDWriter.cpp
+			DataArray.cpp
 			ConfigView.cpp
 			: be translation 
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
@@ -30,5 +31,6 @@ DoCatalogs PSDTranslator :
 	PSDTranslator.cpp
 	PSDLoader.cpp
 	PSDWriter.cpp
+	DataArray.cpp
 	ConfigView.cpp
 ;
