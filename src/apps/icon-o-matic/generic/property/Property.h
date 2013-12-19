@@ -59,8 +59,8 @@ class IntProperty : public Property {
  public:
 								IntProperty(uint32 identifier,
 											int32 value = 0,
-											int32 min = LONG_MIN,
-											int32 max = LONG_MAX);
+											int32 min = INT32_MIN,
+											int32 max = INT32_MAX);
 								IntProperty(const IntProperty& other);
 								IntProperty(BMessage* archive);
 	virtual						~IntProperty();
