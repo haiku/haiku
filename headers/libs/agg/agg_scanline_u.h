@@ -464,21 +464,28 @@ namespace agg
         typedef base_type::coord_type coord_type;
 
 
-        scanline32_u8_am() : base_type(), m_alpha_mask(0) {}
-        scanline32_u8_am(const AlphaMask& am) : base_type(), m_alpha_mask(&am) {}
+        scanline32_u8_am() : m_alpha_mask(0)
+		{
+			this->base_type();
+		}
+
+        scanline32_u8_am(const AlphaMask& am) : m_alpha_mask(&am)
+		{
+			this->base_type();
+		}
 
         //--------------------------------------------------------------------
         void finalize(int span_y)
         {
-            base_type::finalize(span_y);
+            this->base_type::finalize(span_y);
             if(m_alpha_mask)
             {
-                typename base_type::iterator span = base_type::begin();
-                unsigned count = base_type::num_spans();
+                typename base_type::iterator span = this->base_type::begin();
+                unsigned count = this->base_type::num_spans();
                 do
                 {
                     m_alpha_mask->combine_hspan(span->x, 
-                                                base_type::y(), 
+                                                this->base_type::y(),
                                                 span->covers, 
                                                 span->len);
                     ++span;
