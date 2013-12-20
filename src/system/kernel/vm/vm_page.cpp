@@ -4077,7 +4077,7 @@ vm_page_get_stats(system_info *info)
 	//	active + inactive + unused + wired + modified + cached + free + clear
 	// So taking out the cached (including modified non-temporary), free and
 	// clear ones leaves us with all used pages.
-	int32 subtractPages = info->cached_pages + sFreePageQueue.Count()
+	uint32 subtractPages = info->cached_pages + sFreePageQueue.Count()
 		+ sClearPageQueue.Count();
 	info->used_pages = subtractPages > info->max_pages
 		? 0 : info->max_pages - subtractPages;
