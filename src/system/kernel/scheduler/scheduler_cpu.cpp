@@ -53,6 +53,9 @@ CPUEntry::CPUEntry()
 void
 CPUEntry::UpdatePriority(int32 priority)
 {
+	if (gCPU[fCPUNumber].disabled)
+		return;
+
 	int32 corePriority = CPUPriorityHeap::GetKey(fCore->fCPUHeap.PeekMaximum());
 	fCore->fCPUHeap.ModifyKey(this, priority);
 

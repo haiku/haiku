@@ -501,10 +501,9 @@ reschedule(int32 nextState)
 	nextThread->state = B_THREAD_RUNNING;
 
 	// update CPU heap
-	if (!gCPU[thisCPU].disabled) {
-		SpinLocker coreLocker(core->fCPULock);
-		cpu->UpdatePriority(nextThreadData->GetEffectivePriority());
-	}
+	SpinLocker coreLocker(core->fCPULock);
+	cpu->UpdatePriority(nextThreadData->GetEffectivePriority());
+	coreLocker.Unlock();
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	update_thread_times(oldThread, nextThread);
@@ -637,8 +636,6 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 
 	InterruptsBigSchedulerLocker _;
 
-	gCPU[cpuID].disabled = !enabled;
-
 	gCurrentMode->set_cpu_enabled(cpuID, enabled);
 
 	CPUEntry* cpu = &gCPUEntries[cpuID];
@@ -653,6 +650,8 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 		cpu->UpdatePriority(B_IDLE_PRIORITY);
 		core->fCPUCount--;
 	}
+
+	gCPU[cpuID].disabled = !enabled;
 
 	if (core->fCPUCount == 0) {
 		// core has been disabled
