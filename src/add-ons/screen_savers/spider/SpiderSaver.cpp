@@ -66,7 +66,8 @@ SpiderSaver::SpiderSaver(BMessage *message, image_id id)
 	  fQueueNumber(20),
 	  fMaxPolyPoints(MAX_POLY_POINTS),
 	  fMaxQueueDepth(MAX_QUEUE_DEPTH),
-	  fColor(RED)
+	  fColor(RED),
+	  fPreview(false)
 {
 	for (int32 i = 0; i < MAX_QUEUE_NUMBER; i++)
 		fQueues[i] = NULL;
