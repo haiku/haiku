@@ -57,7 +57,12 @@ struct io_vector {
 	bool				no_lock_vector;
 	interrupt_type		type;
 
-	irq_assignment		assigned_cpu;
+	spinlock			load_lock;
+	bigtime_t			last_measure_time;
+	bigtime_t			last_measure_active;
+	int32				load;
+
+	irq_assignment*		assigned_cpu;
 
 #if DEBUG_INTERRUPTS
 	int64				handled_count;
@@ -69,8 +74,9 @@ struct io_vector {
 
 static int32 sLastCPU;
 
-static struct io_vector sVectors[NUM_IO_VECTORS];
+static io_vector sVectors[NUM_IO_VECTORS];
 static bool sAllocatedIOInterruptVectors[NUM_IO_VECTORS];
+static irq_assignment sVectorCPUAssignments[NUM_IO_VECTORS];
 static mutex sIOInterruptVectorAllocationLock
 	= MUTEX_INITIALIZER("io_interrupt_vector_allocation");
 
@@ -141,11 +147,15 @@ dump_int_load(int argc, char** argv)
 		kprintf("int %3d, type %s, enabled %" B_PRId32 ", load %" B_PRId32
 			"%%", i, typeNames[min_c(sVectors[i].type,
 					INTERRUPT_TYPE_UNKNOWN)],
-			sVectors[i].enable_count, sVectors[i].assigned_cpu.load / 10);
+			sVectors[i].enable_count,
+			sVectors[i].assigned_cpu != NULL
+				? sVectors[i].assigned_cpu->load / 10 : 0);
 
 		if (sVectors[i].type == INTERRUPT_TYPE_IRQ) {
-			if (sVectors[i].assigned_cpu.cpu != -1)
-				kprintf(", cpu %" B_PRId32, sVectors[i].assigned_cpu.cpu);
+			ASSERT(sVectors[i].assigned_cpu != NULL);
+
+			if (sVectors[i].assigned_cpu->cpu != -1)
+				kprintf(", cpu %" B_PRId32, sVectors[i].assigned_cpu->cpu);
 			else
 				kprintf(", cpu -");
 		}
@@ -190,15 +200,10 @@ int_init_post_vm(kernel_args* args)
 		sVectors[i].no_lock_vector = false;
 		sVectors[i].type = INTERRUPT_TYPE_UNKNOWN;
 
-		irq_assignment* assigned_cpu = &sVectors[i].assigned_cpu;
-		assigned_cpu->irq = i;
-
-		B_INITIALIZE_SPINLOCK(&assigned_cpu->load_lock);
-		assigned_cpu->last_measure_time = 0;
-		assigned_cpu->last_measure_active = 0;
-		assigned_cpu->load = 0;
-
-		assigned_cpu->cpu = -1;
+		B_INITIALIZE_SPINLOCK(&sVectors[i].load_lock);
+		sVectors[i].last_measure_time = 0;
+		sVectors[i].last_measure_active = 0;
+		sVectors[i].load = 0;
 
 #if DEBUG_INTERRUPTS
 		sVectors[i].handled_count = 0;
@@ -207,6 +212,12 @@ int_init_post_vm(kernel_args* args)
 		sVectors[i].ignored_count = 0;
 #endif
 		sVectors[i].handler_list = NULL;
+
+		sVectorCPUAssignments[i].irq = i;
+		sVectorCPUAssignments[i].count = 1;
+		sVectorCPUAssignments[i].handlers_count = 0;
+		sVectorCPUAssignments[i].load = 0;
+		sVectorCPUAssignments[i].cpu = -1;
 	}
 
 #if DEBUG_INTERRUPTS
@@ -240,14 +251,17 @@ int_init_post_device_manager(kernel_args* args)
 static void
 update_int_load(int i)
 {
-	if (!try_acquire_spinlock(&sVectors[i].assigned_cpu.load_lock))
+	if (!try_acquire_spinlock(&sVectors[i].load_lock))
 		return;
 
-	compute_load(sVectors[i].assigned_cpu.last_measure_time,
-		sVectors[i].assigned_cpu.last_measure_active,
-		sVectors[i].assigned_cpu.load);
+	int32 oldLoad = sVectors[i].load;
+	compute_load(sVectors[i].last_measure_time, sVectors[i].last_measure_active,
+		sVectors[i].load);
 
-	release_spinlock(&sVectors[i].assigned_cpu.load_lock);
+	if (oldLoad != sVectors[i].load)
+		atomic_add(&sVectors[i].assigned_cpu->load, sVectors[i].load - oldLoad);
+
+	release_spinlock(&sVectors[i].load_lock);
 }
 
 
@@ -345,9 +359,9 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	if (!sVectors[vector].no_lock_vector)
 		release_spinlock(&sVectors[vector].vector_lock);
 
-	SpinLocker locker(sVectors[vector].assigned_cpu.load_lock);
+	SpinLocker locker(sVectors[vector].load_lock);
 	bigtime_t deltaTime = system_time() - start;
-	sVectors[vector].assigned_cpu.last_measure_active += deltaTime;
+	sVectors[vector].last_measure_active += deltaTime;
 	locker.Unlock();
 
 	atomic_add64(&get_cpu_struct()->interrupt_time, deltaTime);
@@ -444,18 +458,17 @@ install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 	// Initial attempt to balance IRQs, the scheduler will correct this
 	// if some cores end up being overloaded.
 	if (sVectors[vector].type == INTERRUPT_TYPE_IRQ
-		&& sVectors[vector].handler_list == NULL) {
+		&& sVectors[vector].handler_list == NULL
+		&& sVectors[vector].assigned_cpu->cpu == -1) {
 
 		int32 cpuID = assign_cpu();
 		arch_int_assign_to_cpu(vector, cpuID);
-
-		ASSERT(sVectors[vector].assigned_cpu.cpu == -1);
-
-		sVectors[vector].assigned_cpu.cpu = cpuID;
+		sVectors[vector].assigned_cpu->cpu = cpuID;
 
 		cpu_ent* cpu = &gCPU[cpuID];
 		SpinLocker _(cpu->irqs_lock);
-		list_add_item(&cpu->irqs, &sVectors[vector].assigned_cpu);
+		atomic_add(&sVectors[vector].assigned_cpu->handlers_count, 1);
+		list_add_item(&cpu->irqs, sVectors[vector].assigned_cpu);
 	}
 
 	if ((flags & B_NO_HANDLED_INFO) != 0
@@ -544,25 +557,32 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	}
 
 	if (sVectors[vector].handler_list == NULL
-		&& sVectors[vector].type == INTERRUPT_TYPE_IRQ) {
+		&& sVectors[vector].type == INTERRUPT_TYPE_IRQ
+		&& sVectors[vector].assigned_cpu != NULL
+		&& sVectors[vector].assigned_cpu->handlers_count > 0) {
 
-		int32 oldCPU;
-		SpinLocker locker;
-		cpu_ent* cpu;
+		int32 oldHandlersCount
+			= atomic_add(&sVectors[vector].assigned_cpu->handlers_count, -1);
 
-		do {
-			locker.Unlock();
+		if (oldHandlersCount == 1) {
+			int32 oldCPU;
+			SpinLocker locker;
+			cpu_ent* cpu;
 
-			oldCPU = sVectors[vector].assigned_cpu.cpu;
+			do {
+				locker.Unlock();
 
-			ASSERT(oldCPU != -1);
-			cpu = &gCPU[oldCPU];
+				oldCPU = sVectors[vector].assigned_cpu->cpu;
 
-			locker.SetTo(cpu->irqs_lock, false);
-		} while (sVectors[vector].assigned_cpu.cpu != oldCPU);
+				ASSERT(oldCPU != -1);
+				cpu = &gCPU[oldCPU];
 
-		sVectors[vector].assigned_cpu.cpu = -1;
-		list_remove_item(&cpu->irqs, &sVectors[vector].assigned_cpu);
+				locker.SetTo(cpu->irqs_lock, false);
+			} while (sVectors[vector].assigned_cpu->cpu != oldCPU);
+
+			sVectors[vector].assigned_cpu->cpu = -1;
+			list_remove_item(&cpu->irqs, sVectors[vector].assigned_cpu);
+		}
 	}
 
 	release_spinlock(&sVectors[vector].vector_lock);
@@ -596,6 +616,9 @@ reserve_io_interrupt_vectors(long count, long startVector, interrupt_type type)
 		}
 
 		sVectors[startVector + i].type = type;
+		sVectors[startVector + i].assigned_cpu
+			= &sVectorCPUAssignments[startVector + i];
+		sVectorCPUAssignments[startVector + i].count = 1;
 		sAllocatedIOInterruptVectors[startVector + i] = true;
 	}
 
@@ -610,7 +633,8 @@ reserve_io_interrupt_vectors(long count, long startVector, interrupt_type type)
 	The first vector to be used is returned in \a startVector on success.
 */
 status_t
-allocate_io_interrupt_vectors(long count, long *startVector)
+allocate_io_interrupt_vectors(long count, long *startVector,
+	interrupt_type type)
 {
 	MutexLocker locker(&sIOInterruptVectorAllocationLock);
 
@@ -639,8 +663,14 @@ allocate_io_interrupt_vectors(long count, long *startVector)
 		return B_NO_MEMORY;
 	}
 
-	for (long i = 0; i < count; i++)
+	for (long i = 0; i < count; i++) {
+		sVectors[vector + i].type = type;
+		sVectors[vector + i].assigned_cpu = &sVectorCPUAssignments[vector];
 		sAllocatedIOInterruptVectors[vector + i] = true;
+	}
+
+	sVectorCPUAssignments[vector].irq = vector;
+	sVectorCPUAssignments[vector].count = count;
 
 	*startVector = vector;
 	dprintf("allocate_io_interrupt_vectors: allocated %ld vectors starting "
@@ -672,6 +702,7 @@ free_io_interrupt_vectors(long count, long startVector)
 				startVector + i);
 		}
 
+		sVectors[startVector + i].assigned_cpu = NULL;
 		sAllocatedIOInterruptVectors[startVector + i] = false;
 	}
 }
@@ -681,7 +712,7 @@ void assign_io_interrupt_to_cpu(long vector, int32 newCPU)
 {
 	ASSERT(sVectors[vector].type == INTERRUPT_TYPE_IRQ);
 
-	int32 oldCPU = sVectors[vector].assigned_cpu.cpu;
+	int32 oldCPU = sVectors[vector].assigned_cpu->cpu;
 
 	if (newCPU == -1)
 		newCPU = assign_cpu();
@@ -693,14 +724,14 @@ void assign_io_interrupt_to_cpu(long vector, int32 newCPU)
 	cpu_ent* cpu = &gCPU[oldCPU];
 
 	SpinLocker locker(cpu->irqs_lock);
-	sVectors[vector].assigned_cpu.cpu = -1;
-	list_remove_item(&cpu->irqs, &sVectors[vector].assigned_cpu);
+	sVectors[vector].assigned_cpu->cpu = -1;
+	list_remove_item(&cpu->irqs, sVectors[vector].assigned_cpu);
 	locker.Unlock();
 
 	cpu = &gCPU[newCPU];
 	locker.SetTo(cpu->irqs_lock, false);
-	sVectors[vector].assigned_cpu.cpu = newCPU;
+	sVectors[vector].assigned_cpu->cpu = newCPU;
 	arch_int_assign_to_cpu(vector, newCPU);
-	list_add_item(&cpu->irqs, &sVectors[vector].assigned_cpu);
+	list_add_item(&cpu->irqs, sVectors[vector].assigned_cpu);
 }
 

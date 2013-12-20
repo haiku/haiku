@@ -11,6 +11,13 @@
 #define NUM_IO_VECTORS		(256 - ARCH_INTERRUPT_BASE)
 
 
+enum irq_source {
+	IRQ_SOURCE_INVALID,
+	IRQ_SOURCE_IOAPIC,
+	IRQ_SOURCE_MSI,
+};
+
+
 static inline void
 arch_int_enable_interrupts_inline(void)
 {
@@ -71,6 +78,8 @@ typedef struct interrupt_controller_s {
 	void	(*assign_interrupt_to_cpu)(int32 num, int32 cpu);
 } interrupt_controller;
 
+
+void x86_set_irq_source(int irq, irq_source source);
 
 void arch_int_set_interrupt_controller(const interrupt_controller &controller);
 

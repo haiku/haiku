@@ -280,6 +280,8 @@ ioapic_enable_io_interrupt(int32 gsi)
 	if (ioapic == NULL)
 		return;
 
+	x86_set_irq_source(gsi, IRQ_SOURCE_IOAPIC);
+
 	uint8 pin = gsi - ioapic->global_interrupt_base;
 	TRACE("ioapic_enable_io_interrupt: gsi %ld -> io-apic %u pin %u\n",
 		gsi, ioapic->number, pin);
@@ -801,6 +803,12 @@ ioapic_init(kernel_args* args)
 	while (current != NULL) {
 		reserve_io_interrupt_vectors(current->max_redirection_entry + 1,
 			current->global_interrupt_base, INTERRUPT_TYPE_IRQ);
+
+		for (int32 i = 0; i < current->max_redirection_entry + 1; i++) {
+			x86_set_irq_source(current->global_interrupt_base + i,
+				IRQ_SOURCE_IOAPIC);
+		}
+
 		current = current->next;
 	}
 

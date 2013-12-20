@@ -32,13 +32,13 @@ enum interrupt_type {
 
 struct irq_assignment {
 	list_link	link;
+
 	uint32		irq;
+	uint32		count;
 
-	spinlock	load_lock;
-	bigtime_t	last_measure_time;
-	bigtime_t	last_measure_active;
+	int32		handlers_count;
+
 	int32		load;
-
 	int32		cpu;
 };
 
@@ -79,7 +79,8 @@ are_interrupts_enabled(void)
 
 status_t reserve_io_interrupt_vectors(long count, long startVector,
 	enum interrupt_type type);
-status_t allocate_io_interrupt_vectors(long count, long *startVector);
+status_t allocate_io_interrupt_vectors(long count, long *startVector,
+	enum interrupt_type type);
 void free_io_interrupt_vectors(long count, long startVector);
 
 void assign_io_interrupt_to_cpu(long vector, int32 cpu);
