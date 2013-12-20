@@ -169,9 +169,18 @@ Message::StartSaver(BView *view, bool preview)
 void 
 Message::Draw(BView *view, int32 frame)
 {
+	if (view == NULL || view->Window() == NULL || !view->Window()->IsLocked())
+		return;
+
+	BScreen screen(view->Window());
+	if (!screen.IsValid())
+		return;
+
 	// Double-buffered drawing
-	BScreen screen;
 	BBitmap buffer(view->Bounds(), screen.ColorSpace(), true);
+	if (buffer.InitCheck() != B_OK)
+		return;
+
 	BView offscreen(view->Bounds(), NULL, 0, 0);
 	buffer.AddChild(&offscreen);
 	buffer.Lock();
