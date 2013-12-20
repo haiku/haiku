@@ -59,9 +59,9 @@ typedef struct {
 } seqlock;
 
 #define B_SEQLOCK_INITIALIZER	{ B_SPINLOCK_INITIALIZER, 0 }
-#define B_INITIALIZE_SEQLOCK(seqlock)	do {	\
-		B_INITIALIZE_SPINLOCK((seqlock)->lock);	\
-		(seqlock)->count = 0;					\
+#define B_INITIALIZE_SEQLOCK(seqlock)	do {		\
+		B_INITIALIZE_SPINLOCK(&(seqlock)->lock);	\
+		(seqlock)->count = 0;						\
 	} while (false)
 
 /* interrupt handling support for device drivers */

@@ -177,8 +177,13 @@ ThreadData::GoesAway()
 	fLastInterruptTime = 0;
 
 	fWentSleep = system_time();
-	fWentSleepActive = atomic_get64(&fCore->fActiveTime);
 	fWentSleepCount = atomic_get(&fCore->fStarvationCounter);
+
+	uint32 count;
+	do {
+		count = acquire_read_seqlock(&fCore->fActiveTimeLock);
+		fWentSleepActive = fCore->fActiveTime;
+	} while (!release_read_seqlock(&fCore->fActiveTimeLock, count));
 }
 
 
@@ -262,7 +267,10 @@ ThreadData::UpdateActivity(bigtime_t active)
 {
 	fMeasureActiveTime += active;
 	gCPUEntries[smp_get_current_cpu()].fMeasureActiveTime += active;
-	atomic_add64(&fCore->fActiveTime, active);
+
+	WriteSequentialLocker locker(fCore->fActiveTimeLock);
+	fCore->fActiveTime += active;
+	locker.Unlock();
 }
 
 

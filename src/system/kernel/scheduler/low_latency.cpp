@@ -35,8 +35,16 @@ has_cache_expired(const ThreadData* threadData)
 {
 	ASSERT(!gSingleCore);
 
-	return atomic_get64(&threadData->GetCore()->fActiveTime)
-			- threadData->fWentSleepActive > kCacheExpire;
+	CoreEntry* core = threadData->GetCore();
+
+	bigtime_t activeTime;
+	uint32 count;
+	do {
+		count = acquire_read_seqlock(&core->fActiveTimeLock);
+		activeTime = core->fActiveTime;
+	} while (!release_read_seqlock(&core->fActiveTimeLock, count));
+
+	return activeTime - threadData->fWentSleepActive > kCacheExpire;
 }
 
 

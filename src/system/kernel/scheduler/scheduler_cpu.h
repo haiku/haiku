@@ -100,6 +100,7 @@ struct CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 						spinlock		fQueueLock;
 
 						bigtime_t		fActiveTime;
+						seqlock			fActiveTimeLock;
 
 						int32			fLoad;
 						bool			fHighLoad;

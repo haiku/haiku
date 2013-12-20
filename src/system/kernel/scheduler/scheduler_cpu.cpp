@@ -272,6 +272,7 @@ CoreEntry::CoreEntry()
 {
 	B_INITIALIZE_SPINLOCK(&fCPULock);
 	B_INITIALIZE_SPINLOCK(&fQueueLock);
+	B_INITIALIZE_SEQLOCK(&fActiveTimeLock);
 }
 
 
