@@ -187,8 +187,8 @@ IFS::IFS(BRect bounds)
 			Fractal->dr2_mean = .3;
 			break;
 
-		default:
 		case 2:
+		default:
 			Fractal->Depth = fAdditive ? MAX_DEPTH_2 + 1 : MAX_DEPTH_2;
 			Fractal->r_mean = .7;
 			Fractal->dr_mean = .3;
