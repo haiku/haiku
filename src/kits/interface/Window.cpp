@@ -3037,12 +3037,17 @@ BWindow::task_looper()
 
 		bool dispatchNextMessage = true;
 		while (!fTerminating && dispatchNextMessage) {
-			// Get next message from queue (assign to fLastMessage)
-			fLastMessage = fDirectTarget->Queue()->NextMessage();
+			// Get next message from queue (assign to fLastMessage after
+			// locking)
+			BMessage* message = fDirectTarget->Queue()->NextMessage();
 
 			// Lock the looper
-			if (!Lock())
+			if (!Lock()) {
+				delete message;
 				break;
+			}
+
+			fLastMessage = message;
 
 			if (fLastMessage == NULL) {
 				// No more messages: Unlock the looper and terminate the

@@ -52,6 +52,8 @@ public:
 	virtual	void			MessageReceived(BMessage* message);
 			BMessage*		CurrentMessage() const;
 			BMessage*		DetachCurrentMessage();
+			void			DispatchExternalMessage(BMessage* message,
+								BHandler* handler, bool& _detached);
 			BMessageQueue*	MessageQueue() const;
 			bool			IsMessageWaiting() const;
 

@@ -300,6 +300,22 @@ BLooper::DetachCurrentMessage()
 }
 
 
+void
+BLooper::DispatchExternalMessage(BMessage* message, BHandler* handler,
+	bool& _detached)
+{
+	AssertLocked();
+
+	BMessage* previousMessage = fLastMessage;
+	fLastMessage = message;
+
+	DispatchMessage(message, handler);
+
+	_detached = fLastMessage == NULL;
+	fLastMessage = previousMessage;
+}
+
+
 BMessageQueue*
 BLooper::MessageQueue() const
 {
@@ -1115,10 +1131,13 @@ BLooper::task_looper()
 		bool dispatchNextMessage = true;
 		while (!fTerminating && dispatchNextMessage) {
 			PRINT(("LOOPER: inner loop\n"));
-			// Get next message from queue (assign to fLastMessage)
-			fLastMessage = fDirectTarget->Queue()->NextMessage();
+			// Get next message from queue (assign to fLastMessage after
+			// locking)
+			BMessage* message = fDirectTarget->Queue()->NextMessage();
 
 			Lock();
+
+			fLastMessage = message;
 
 			if (!fLastMessage) {
 				// No more messages: Unlock the looper and terminate the
@@ -1173,14 +1192,15 @@ BLooper::task_looper()
 				return;
 			}
 
+			message = fLastMessage;
+			fLastMessage = NULL;
+
 			// Unlock the looper
 			Unlock();
 
 			// Delete the current message (fLastMessage)
-			if (fLastMessage) {
-				delete fLastMessage;
-				fLastMessage = NULL;
-			}
+			if (message != NULL)
+				delete message;
 
 			// Are any messages on the port?
 			if (port_count(fMsgPort) > 0) {
