@@ -175,9 +175,8 @@ enqueue(Thread* thread, bool newOne)
 		thread);
 
 	int32 heapPriority = CPUPriorityHeap::GetKey(targetCPU);
-	if (threadPriority > atomic_get(&targetCPU->fPriority)
-		&& (threadPriority > heapPriority
-			|| (threadPriority == heapPriority && rescheduleNeeded))) {
+	if (threadPriority > heapPriority
+		|| (threadPriority == heapPriority && rescheduleNeeded)) {
 
 		if (targetCPU->fCPUNumber == smp_get_current_cpu())
 			gCPU[targetCPU->fCPUNumber].invoke_scheduler = true;
@@ -237,7 +236,6 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 			CPUEntry* cpu = &gCPUEntries[thread->cpu->cpu_num];
 
 			SpinLocker coreLocker(threadData->GetCore()->fCPULock);
-			cpu->fPriority = priority;
 			cpu->UpdatePriority(priority);
 		}
 
@@ -475,7 +473,9 @@ reschedule(int32 nextState)
 	}
 
 	Thread* nextThread = nextThreadData->GetThread();
-	atomic_set(&cpu->fPriority, nextThreadData->GetEffectivePriority());
+	SpinLocker cpuLocker(core->fCPULock);
+	cpu->UpdatePriority(nextThreadData->GetEffectivePriority());
+	cpuLocker.Unlock();
 
 	if (nextThread != oldThread) {
 		if (enqueueOldThread) {
@@ -650,7 +650,6 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 	if (enabled)
 		core->fCPUCount++;
 	else {
-		cpu->fPriority = B_IDLE_PRIORITY;
 		cpu->UpdatePriority(B_IDLE_PRIORITY);
 		core->fCPUCount--;
 	}

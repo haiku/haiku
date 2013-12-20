@@ -54,7 +54,6 @@ struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
 
 						rw_spinlock 	fSchedulerModeLock;
 
-						int32			fPriority;
 						ThreadRunQueue	fRunQueue;
 
 						int32			fLoad;

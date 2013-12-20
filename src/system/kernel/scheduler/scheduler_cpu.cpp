@@ -42,7 +42,6 @@ ThreadRunQueue::Dump() const
 
 CPUEntry::CPUEntry()
 	:
-	fPriority(B_IDLE_PRIORITY),
 	fLoad(0),
 	fMeasureActiveTime(0),
 	fMeasureTime(0)

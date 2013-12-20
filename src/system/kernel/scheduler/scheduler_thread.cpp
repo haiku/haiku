@@ -121,6 +121,45 @@ ThreadData::ComputeQuantum()
 }
 
 
+inline CoreEntry*
+ThreadData::_ChooseCore() const
+{
+	ASSERT(!gSingleCore);
+	return gCurrentMode->choose_core(this);
+}
+
+
+inline CPUEntry*
+ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
+{
+	int32 threadPriority = GetEffectivePriority();
+
+	if (fThread->previous_cpu != NULL) {
+		CPUEntry* previousCPU = &gCPUEntries[fThread->previous_cpu->cpu_num];
+		if (previousCPU->fCore == core) {
+			SpinLocker cpuLocker(core->fCPULock);
+			if (CPUPriorityHeap::GetKey(previousCPU) < threadPriority) {
+				previousCPU->UpdatePriority(threadPriority);
+				rescheduleNeeded = true;
+				return previousCPU;
+			}
+		}
+	}
+
+	SpinLocker cpuLocker(core->fCPULock);
+	CPUEntry* cpu = core->fCPUHeap.PeekMinimum();
+	ASSERT(cpu != NULL);
+
+	if (CPUPriorityHeap::GetKey(cpu) < threadPriority) {
+		cpu->UpdatePriority(threadPriority);
+		rescheduleNeeded = true;
+	} else
+		rescheduleNeeded = false;
+
+	return cpu;
+}
+
+
 inline bigtime_t
 ThreadData::_GetBaseQuantum() const
 {

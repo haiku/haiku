@@ -335,32 +335,6 @@ ThreadData::_GetMinimalPriority() const
 }
 
 
-inline CoreEntry*
-ThreadData::_ChooseCore() const
-{
-	ASSERT(!gSingleCore);
-	return gCurrentMode->choose_core(this);
-}
-
-
-inline CPUEntry*
-ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
-{
-	SpinLocker cpuLocker(core->fCPULock);
-	CPUEntry* cpu = core->fCPUHeap.PeekMinimum();
-	ASSERT(cpu != NULL);
-
-	int32 threadPriority = GetEffectivePriority();
-	if (CPUPriorityHeap::GetKey(cpu) < threadPriority) {
-		cpu->UpdatePriority(threadPriority);
-		rescheduleNeeded = true;
-	} else
-		rescheduleNeeded = false;
-
-	return cpu;
-}
-
-
 }	// namespace Scheduler
 
 
