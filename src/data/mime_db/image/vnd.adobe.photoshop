@@ -9,5 +9,6 @@ resource(3, "META:S:DESC") #'MSDC' "Photoshop Image";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "psd",
+	"extensions" = "psb",
 	"type" = "image/vnd.adobe.photoshop"
 };
