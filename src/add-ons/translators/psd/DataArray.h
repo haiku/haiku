@@ -23,17 +23,20 @@ public:
 					BDataArray(int32 blockSize = DATAARRAY_BLOCK_SIZE);
 					~BDataArray();
 
-	status_t		Append(int8 val);
-	status_t		Append(uint8 val);
-	status_t		Append(int16 val);
-	status_t		Append(uint16 val);
-	status_t		Append(int32 val);
-	status_t		Append(uint32 val);
-	status_t		Append(const char *str);
-	status_t		Append(BString str);
-	status_t		Append(uint8 *ptr, int32 len);
+	BDataArray&		Append(int8 val);
+	BDataArray&		Append(uint8 val);
+	BDataArray&		Append(int16 val);
+	BDataArray&		Append(uint16 val);
+	BDataArray&		Append(int32 val);
+	BDataArray&		Append(uint32 val);
+	BDataArray&		Append(int64 val);
+	BDataArray&		Append(uint64 val);
+	BDataArray&		Append(const char *str);
+	BDataArray&		Append(BString& str);
+	BDataArray&		Append(BDataArray& str);
+	BDataArray&		Append(uint8 *ptr, int32 len);
 	
-	status_t		Repeat(uint8 byte, int32 count);
+	BDataArray&		Repeat(uint8 byte, int32 count);
 
 	BDataArray&		operator<<(int8);
 	BDataArray&		operator<<(uint8);
@@ -41,7 +44,10 @@ public:
 	BDataArray&		operator<<(uint16);
 	BDataArray&		operator<<(int32);
 	BDataArray&		operator<<(uint32);
+	BDataArray&		operator<<(int64);
+	BDataArray&		operator<<(uint64);
 	BDataArray&		operator<<(const char*);
+	BDataArray&		operator<<(BDataArray&);
 
 	uint8			*Buffer(void);
 	int32			Length(void);

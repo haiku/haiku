@@ -57,106 +57,132 @@ BDataArray::WriteToStream(BPositionIO *stream)
 }
 
 
-status_t
+BDataArray&
 BDataArray::Append(uint8 val)
 {
 	status_t status = _ReallocArrayFor(sizeof(val));
-	if (status != B_OK)
-		return status;
-	fData[fDataSize] = val;
-	fDataSize++;
-	return B_OK;
+	if (status == B_OK) {
+		fData[fDataSize] = val;
+		fDataSize++;
+	}
+	return *this;
 }
 
 
-status_t
+BDataArray&
 BDataArray::Append(int8 val)
 {
 	return Append((uint8)val);
 }
 
 
-status_t
+BDataArray&
 BDataArray::Append(uint16 val)
 {
 	status_t status = _ReallocArrayFor(sizeof(val));
-	if (status != B_OK)
-		return status;
-	val = B_HOST_TO_BENDIAN_INT16(val);
-	memcpy(fData + fDataSize, &val, sizeof(val));
-	fDataSize += sizeof(val);
-	return B_OK;	
+	if (status == B_OK) {
+		val = B_HOST_TO_BENDIAN_INT16(val);
+		memcpy(fData + fDataSize, &val, sizeof(val));
+		fDataSize += sizeof(val);
+	}
+	return *this;	
 }
 
 
-status_t
+BDataArray&
 BDataArray::Append(int16 val)
 {
 	return Append((uint16)val);
 }
 
 
-status_t
+BDataArray&
 BDataArray::Append(uint32 val)
 {
 	status_t status = _ReallocArrayFor(sizeof(val));
-	if (status != B_OK)
-		return status;
-	val = B_HOST_TO_BENDIAN_INT32(val);
-	memcpy(fData + fDataSize, &val, sizeof(val));
-	fDataSize += sizeof(val);
-	return B_OK;
+	if (status == B_OK) {
+		val = B_HOST_TO_BENDIAN_INT32(val);
+		memcpy(fData + fDataSize, &val, sizeof(val));
+		fDataSize += sizeof(val);
+	}
+	return *this;
 }
 
 
-status_t
+BDataArray&
+BDataArray::Append(int64 val)
+{
+	return Append((uint64)val);
+}
+
+
+BDataArray&
+BDataArray::Append(uint64 val)
+{
+	status_t status = _ReallocArrayFor(sizeof(val));
+	if (status == B_OK) {
+		val = B_HOST_TO_BENDIAN_INT64(val);
+		memcpy(fData + fDataSize, &val, sizeof(val));
+		fDataSize += sizeof(val);
+	}
+	return *this;
+}
+
+
+BDataArray&
 BDataArray::Append(int32 val)
 {
 	return Append((uint32)val);
 }
 
-
-status_t
+BDataArray&
 BDataArray::Append(const char *str)
 {
 	int32 len = strlen(str);
 	status_t status = _ReallocArrayFor(len);
-	if (status != B_OK)
-		return status;
-	memcpy(fData + fDataSize, str, len);
-	fDataSize += len;
-	return B_OK;	
+	if (status == B_OK) {
+		memcpy(fData + fDataSize, str, len);
+		fDataSize += len;
+	}
+	return *this;
 }
 
 
-status_t
-BDataArray::Append(BString str)
+BDataArray&
+BDataArray::Append(BString& str)
 {
 	return Append(str.String());
 }
 
 
-status_t
-BDataArray::Append(uint8 *ptr, int32 len)
+BDataArray&
+BDataArray::Append(BDataArray& array)
 {
-	status_t status = _ReallocArrayFor(len);
-	if (status != B_OK)
-		return status;
-	memcpy(fData + fDataSize, ptr, len);
-	fDataSize += len;
-	return B_OK;
+	return Append(array.Buffer(), array.Length());
 }
 
 
-status_t
+BDataArray&
+BDataArray::Append(uint8 *ptr, int32 len)
+{
+	status_t status = _ReallocArrayFor(len);
+	if (status == B_OK) {
+		memcpy(fData + fDataSize, ptr, len);
+		fDataSize += len;
+	}
+	return *this;
+}
+
+
+BDataArray&
 BDataArray::Repeat(uint8 byte, int32 count)
 {
 	status_t status = _ReallocArrayFor(count);
-	if (status != B_OK)
-		return status;
-	memset(fData + fDataSize, byte, count);
-	fDataSize += count;
-	return B_OK;	
+	if (status == B_OK) {
+		memset(fData + fDataSize, byte, count);
+		fDataSize += count;
+	}
+	return *this;
 }
 
 
@@ -209,8 +235,32 @@ BDataArray::operator<<(uint32 val)
 
 
 BDataArray&
+BDataArray::operator<<(int64 val)
+{
+	Append(val);
+	return *this;
+}
+
+
+BDataArray&
+BDataArray::operator<<(uint64 val)
+{
+	Append(val);
+	return *this;
+}
+
+
+BDataArray&
 BDataArray::operator<<(const char* str)
 {
 	Append(str);
+	return *this;
+}
+
+
+BDataArray&
+BDataArray::operator<<(BDataArray& array)
+{
+	Append(array);
 	return *this;
 }
