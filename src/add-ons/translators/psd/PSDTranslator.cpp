@@ -61,7 +61,8 @@ static const translation_format sOutputFormats[] = {
 static const TranSetting sDefaultSettings[] = {
 	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
 	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false},
-	{PSD_SETTING_COMPRESSION, TRAN_SETTING_INT32, PSD_COMPRESSED_RLE}
+	{PSD_SETTING_COMPRESSION, TRAN_SETTING_INT32, PSD_COMPRESSED_RLE},
+	{PSD_SETTING_VERSION, TRAN_SETTING_INT32, PSD_FILE}
 };
 
 const uint32 kNumInputFormats = sizeof(sInputFormats)
@@ -141,11 +142,17 @@ PSDTranslator::DerivedTranslate(BPositionIO *source,
 		}
 		case 1:
 		{
-			if (outType == PSD_IMAGE_FORMAT) {
+			if (outType == PSD_IMAGE_FORMAT) {				
 				PSDWriter psdFile(source);
+
 				uint32 compression =
 					fSettings->SetGetInt32(PSD_SETTING_COMPRESSION);
+				uint32 version =
+					fSettings->SetGetInt32(PSD_SETTING_VERSION);
+
 				psdFile.SetCompression(compression);
+				psdFile.SetVersion(version);
+
 				if (psdFile.IsReady())
 					return psdFile.Encode(target);
 			}

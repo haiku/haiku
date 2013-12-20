@@ -25,6 +25,12 @@
 #define PSD_MAX_CHANNELS 16
 
 
+enum psd_version {
+	PSD_FILE = 1,
+	PSB_FILE = 2
+};
+
+
 enum psd_compressed_type {
 	PSD_COMPRESSED_RAW	= 0,
 	PSD_COMPRESSED_RLE = 1
@@ -72,6 +78,7 @@ public:
 	BString			ColorFormatName(void);
 
 private:
+	int64			_GetInt64FromStream(BPositionIO *in);
 	int32			_GetInt32FromStream(BPositionIO *in);
 	int16			_GetInt16FromStream(BPositionIO *in);
 	uint8			_GetUInt8FromStream(BPositionIO *in);

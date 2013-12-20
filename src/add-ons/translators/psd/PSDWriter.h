@@ -30,11 +30,14 @@ public:
 					PSDWriter(BPositionIO *stream);
 					~PSDWriter();
 
-	bool			IsReady(void);	
+	bool			IsReady(void);
 	void			SetCompression(int16 compression);
+	void			SetVersion(int16 version);
 	status_t		Encode(BPositionIO *target);
 
 private:
+	void			_WriteInt64ToStream(BPositionIO *stream, int64);
+	void			_WriteUInt64ToStream(BPositionIO *stream, uint64);
 	void			_WriteInt32ToStream(BPositionIO *stream, int32);
 	void			_WriteUInt32ToStream(BPositionIO *stream, uint32);
 	void			_WriteInt16ToStream(BPositionIO *stream, int16);
@@ -57,6 +60,7 @@ private:
 	int32			fWidth;
 	int32			fHeight;
 	int16			fCompression;
+	int16			fVersion;
 	
 	bool			fReady;
 };

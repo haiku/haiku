@@ -22,18 +22,31 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 {
 	fSettings = settings;
 
-	BPopUpMenu* popupMenu = new BPopUpMenu("popup_compression");
+	BPopUpMenu* compressionPopupMenu = new BPopUpMenu("popup_compression");
 
 	uint32 currentCompression = 
 		fSettings->SetGetInt32(PSD_SETTING_COMPRESSION);
 
-	_AddItemToMenu(popupMenu, "Uncompressed",
-		PSD_COMPRESSED_RAW, currentCompression);
-	_AddItemToMenu(popupMenu, "RLE",
-		PSD_COMPRESSED_RLE, currentCompression);
+	_AddItemToMenu(compressionPopupMenu, "Uncompressed",
+		MSG_COMPRESSION_CHANGED, PSD_COMPRESSED_RAW, currentCompression);
+	_AddItemToMenu(compressionPopupMenu, "RLE",
+		MSG_COMPRESSION_CHANGED, PSD_COMPRESSED_RLE, currentCompression);
 
-	fCompressionField = new BMenuField("compression", 
-		"Compression: ", popupMenu);
+	fCompressionField = new BMenuField("compression",
+		"Compression: ", compressionPopupMenu);
+
+	BPopUpMenu* versionPopupMenu = new BPopUpMenu("popup_version");
+
+	uint32 currentVersion = 
+		fSettings->SetGetInt32(PSD_SETTING_VERSION);
+
+	_AddItemToMenu(versionPopupMenu, "Photoshop Document (PSD File)",
+		MSG_VERSION_CHANGED, PSD_FILE, currentVersion);
+	_AddItemToMenu(versionPopupMenu, "Photoshop Big Document (PSB File)",
+		MSG_VERSION_CHANGED, PSB_FILE, currentVersion);
+
+	fVersionField = new BMenuField("version",
+		"Format: ", versionPopupMenu);
 
 	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
 
@@ -66,6 +79,8 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
 	
+	AddChild(fVersionField);
+
 	AddChild(fCompressionField);
 
 	AddChild(BSpaceLayoutItem::CreateGlue());
@@ -86,6 +101,7 @@ void
 ConfigView::AllAttached()
 {
 	fCompressionField->Menu()->SetTargetForItems(this);
+	fVersionField->Menu()->SetTargetForItems(this);
 }
 
 
@@ -101,6 +117,14 @@ ConfigView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case MSG_VERSION_CHANGED: {
+			int32 value;
+			if (message->FindInt32("value", &value) >= B_OK) {
+				fSettings->SetGetInt32(PSD_SETTING_VERSION, &value);
+				fSettings->SaveSettings();
+			}
+			break;
+		}		
 		default:
 			BView::MessageReceived(message);
 	}
@@ -109,9 +133,9 @@ ConfigView::MessageReceived(BMessage* message)
 
 void
 ConfigView::_AddItemToMenu(BMenu* menu, const char* label,
-	uint32 value, uint32 current_value)
+	uint32 mess, uint32 value, uint32 current_value)
 {
-	BMessage* message = new BMessage(MSG_COMPRESSION_CHANGED);
+	BMessage* message = new BMessage(mess);
 	message->AddInt32("value", value);
 	BMenuItem* item = new BMenuItem(label, message);
 	item->SetMarked(value == current_value);

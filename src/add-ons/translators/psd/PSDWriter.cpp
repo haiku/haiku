@@ -33,11 +33,14 @@ PSDWriter::PSDWriter(BPositionIO *stream)
 	bounds.bottom = B_BENDIAN_TO_HOST_FLOAT(header.bounds.bottom);
 	fInRowBytes = B_BENDIAN_TO_HOST_INT32(header.rowBytes);
 	fColorSpace = (color_space)B_BENDIAN_TO_HOST_INT32(header.colors);
+	if (fColorSpace != B_RGB32 && fColorSpace != B_RGBA32)
+		return;
 	fChannels = fColorSpace == B_RGB32 ? 3 : 4;
 
 	fWidth = bounds.IntegerWidth() + 1;
 	fHeight = bounds.IntegerHeight() + 1;
 	
+	fVersion = PSD_FILE;
 	fCompression = PSD_COMPRESSED_RAW;
 
 	fReady = true;
@@ -60,6 +63,13 @@ void
 PSDWriter::SetCompression(int16 compression)
 {
 	fCompression = compression;
+}
+
+
+void
+PSDWriter::SetVersion(int16 ver)
+{
+	fVersion = ver;
 }
 
 
@@ -98,16 +108,18 @@ PSDWriter::Encode(BPositionIO *target)
 				lineData[2].Append((uint8)rgba[0]); // Blue channel
 				if (fChannels == 4)
 					lineData[3].Append((uint8)rgba[3]); // Alpha channel
-				else
-					lineData[3].Append((uint8)255);
 			}
 			
 			for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
 				BDataArray *packedLine = PackBits(lineData[channelIdx].Buffer(),
 					lineData[channelIdx].Length());
-				psdByteCounts[channelIdx].Append((uint16)packedLine->Length());
-				psdChannel[channelIdx].Append(packedLine->Buffer(),
-					packedLine->Length());
+
+				if (fVersion == PSD_FILE)
+					psdByteCounts[channelIdx].Append((uint16)packedLine->Length());
+				else
+					psdByteCounts[channelIdx].Append((uint32)packedLine->Length());
+
+				psdChannel[channelIdx].Append(*packedLine);
 				delete packedLine;
 			}
 		}
@@ -117,7 +129,7 @@ PSDWriter::Encode(BPositionIO *target)
 	// PSD header
 	BDataArray psdHeader(64);
 	psdHeader << "8BPS"; // Signature
-	psdHeader << (uint16)1; // Version = 1
+	psdHeader << (uint16)fVersion; // Version
 	psdHeader.Repeat(0, 6); // Reserved
 	psdHeader << fChannels; // Channels
 	psdHeader << fHeight << fWidth; // Image size
@@ -155,26 +167,31 @@ PSDWriter::Encode(BPositionIO *target)
 	psdLayersSection << (uint32)fWidth;	
 	psdLayersSection << (uint16)fChannels;
 	
-	for (int channelIdx = 0; channelIdx < 3; channelIdx++) {
-		psdLayersSection << (int16)channelIdx; // Channel num
+	for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
+		if (channelIdx == 3)
+			psdLayersSection << (int16)-1; // Alpha channel id (-1)
+		else
+			psdLayersSection << (int16)channelIdx; // Channel num
+			
 		if (fCompression == PSD_COMPRESSED_RAW) {
-			psdLayersSection << (uint32)(psdChannel[channelIdx].Length()
-				+ sizeof(int16));
+			if (fVersion == PSD_FILE) {
+					psdLayersSection << (uint32)(psdChannel[channelIdx].Length()
+						+ sizeof(int16));
+			} else {
+					psdLayersSection << (uint64)(psdChannel[channelIdx].Length()
+						+ sizeof(int16));
+			}
 		} else {
-			psdLayersSection << (uint32)(psdChannel[channelIdx].Length()
-				+ psdByteCounts[channelIdx].Length() + sizeof(int16));
+			if (fVersion == PSD_FILE) {
+				psdLayersSection << (uint32)(psdChannel[channelIdx].Length()
+					+ psdByteCounts[channelIdx].Length() + sizeof(int16));
+			} else {
+				psdLayersSection << (uint64)(psdChannel[channelIdx].Length()
+					+ psdByteCounts[channelIdx].Length() + sizeof(int16));
+			}
 		}
 	}
-	if (fChannels == 4) {
-		psdLayersSection << (int16)-1; // Alpha channel id (-1)
-		if (fCompression == PSD_COMPRESSED_RAW) {
-			psdLayersSection << (uint32)(psdChannel[3].Length()
-				+ sizeof(int16));
-		} else {
-			psdLayersSection << (uint32)(psdChannel[3].Length()
-				+ psdByteCounts[3].Length() + sizeof(int16));			
-		}
-	}
+
 	psdLayersSection << "8BIM";
 	psdLayersSection << "norm"; // Blend mode = norm
 	psdLayersSection << (uint8)255; // Opacity
@@ -192,16 +209,13 @@ PSDWriter::Encode(BPositionIO *target)
 	if (fCompression == PSD_COMPRESSED_RAW) {
 		for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
 			psdLayersSection << fCompression; // Compression mode
-			psdLayersSection.Append(psdChannel[channelIdx].Buffer(),
-				psdChannel[channelIdx].Length()); // Layer image data
+			psdLayersSection.Append(psdChannel[channelIdx]); // Channel data
 		}
 	} else {	
 		for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
 			psdLayersSection << fCompression; // Compression mode
-			psdLayersSection.Append(psdByteCounts[channelIdx].Buffer(),
-				psdByteCounts[channelIdx].Length()); // Bytes count
-			psdLayersSection.Append(psdChannel[channelIdx].Buffer(),
-				psdChannel[channelIdx].Length()); // Layer image data
+			psdLayersSection.Append(psdByteCounts[channelIdx]); // Bytes count
+			psdLayersSection.Append(psdChannel[channelIdx]); // Channel data
 		}
 	}
 
@@ -217,8 +231,13 @@ PSDWriter::Encode(BPositionIO *target)
 	_WriteUInt32ToStream(target, psdImageResourceSection.Length());
 	psdImageResourceSection.WriteToStream(target);
 
-	_WriteUInt32ToStream(target, psdLayersSection.Length() + sizeof(int32));
-	_WriteUInt32ToStream(target, psdLayersSection.Length());
+	if (fVersion == PSD_FILE) {
+		_WriteUInt32ToStream(target, psdLayersSection.Length() + sizeof(int32));
+		_WriteUInt32ToStream(target, psdLayersSection.Length());
+	} else {
+		_WriteUInt64ToStream(target, psdLayersSection.Length() + sizeof(int64));
+		_WriteUInt64ToStream(target, psdLayersSection.Length());		
+	}
 	psdLayersSection.WriteToStream(target);
 
 	// Merged layer
@@ -278,6 +297,22 @@ PSDWriter::PackBits(uint8 *buff, int32  len)
 		}
 	}
 	return packedBits;
+}
+
+
+void
+PSDWriter::_WriteInt64ToStream(BPositionIO *stream, int64 val)
+{
+	val = B_HOST_TO_BENDIAN_INT64(val);
+	stream->Write(&val, sizeof(int32));
+}
+
+
+void
+PSDWriter::_WriteUInt64ToStream(BPositionIO *stream, uint64 val)
+{
+	val = B_HOST_TO_BENDIAN_INT64(val);
+	stream->Write(&val, sizeof(uint64));
 }
 
 

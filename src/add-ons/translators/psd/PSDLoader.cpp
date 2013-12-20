@@ -46,7 +46,12 @@ PSDLoader::PSDLoader(BPositionIO *src)
 	_SkipStreamBlock(fStream, fImageResourceSectionSize);
 
 	// Skip [layer and mask] block
-	_SkipStreamBlock(fStream, _GetInt32FromStream(fStream));
+	if (fVersion == PSD_FILE)
+		_SkipStreamBlock(fStream, _GetInt32FromStream(fStream));
+	else if (fVersion == PSB_FILE)
+		_SkipStreamBlock(fStream, _GetInt64FromStream(fStream));
+	else
+		return;
 
 	fCompression = _GetInt16FromStream(fStream);
 
@@ -74,8 +79,10 @@ PSDLoader::IsSupported(void)
 	if (!fLoaded)
 		return false;
 
-	if (fVersion != 1)
+	if (fVersion != PSD_FILE
+		&& fVersion != PSB_FILE) {
 		return false;
+	}
 
 	if (fChannels < 0 || fChannels > PSD_MAX_CHANNELS)
 		return false;
@@ -87,8 +94,9 @@ PSDLoader::IsSupported(void)
 		return false;
 
 	if (fCompression != PSD_COMPRESSED_RAW
-		&& fCompression != PSD_COMPRESSED_RLE)
+		&& fCompression != PSD_COMPRESSED_RLE) {
 		return false;
+	}
 
 	return true;
 }
@@ -207,7 +215,11 @@ PSDLoader::Decode(BPositionIO *target)
 		}
 		case PSD_COMPRESSED_RLE:
 		{
-			fStreamPos += fHeight * fChannels * 2;
+			if (fVersion == PSD_FILE)
+				fStreamPos += fHeight * fChannels * 2;
+			else if (fVersion == PSB_FILE)
+				fStreamPos += fHeight * fChannels * 4;
+
 			for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
 				uint8 *ptr = imageData[channelIdx];
 				// Read the RLE data.
@@ -445,6 +457,15 @@ PSDLoader::Decode(BPositionIO *target)
 		delete imageData[i];
 
 	return B_OK;
+}
+
+
+int64
+PSDLoader::_GetInt64FromStream(BPositionIO *in)
+{
+	int64 ret;
+	in->Read(&ret, sizeof(int64));
+	return B_BENDIAN_TO_HOST_INT64(ret);
 }
 
 

@@ -22,8 +22,9 @@
 #define DOCUMENT_INDEX "/documentIndex"
 
 #define PSD_SETTING_COMPRESSION "psd /compression"
+#define PSD_SETTING_VERSION 	"psd /psdversion"
 
-#define PSD_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1, 2, 1)
+#define PSD_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1, 3, 0)
 #define PSD_IMAGE_FORMAT	'PSD '
 
 #define PSD_IN_QUALITY		0.7

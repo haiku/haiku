@@ -16,6 +16,7 @@
 #include <MenuField.h>
 	
 #define MSG_COMPRESSION_CHANGED 'cchg'
+#define MSG_VERSION_CHANGED 	'vchg'
 	
 class ConfigView : public BGroupView {
 	public:
@@ -27,10 +28,11 @@ class ConfigView : public BGroupView {
 
 	private:
 		void _AddItemToMenu(BMenu* menu, const char* label,
-			uint32 value, uint32 current_value);
+			uint32 mess, uint32 value, uint32 current_value);
 
 		BTextView*			fCopyrightView;
 		BMenuField*			fCompressionField;
+		BMenuField*			fVersionField;
 
 		TranslatorSettings *fSettings;
 };
