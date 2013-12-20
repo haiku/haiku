@@ -9,8 +9,12 @@
 #include <StringView.h>
 #include <SpaceLayoutItem.h>
 #include <ControlLook.h>
+#include <PopUpMenu.h>
+#include <MenuItem.h>
 
 #include <stdio.h>
+
+#include "PSDLoader.h"
 
 
 ConfigView::ConfigView(TranslatorSettings *settings)
@@ -18,9 +22,23 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 {
 	fSettings = settings;
 
+	BPopUpMenu* popupMenu = new BPopUpMenu("popup_compression");
+
+	uint32 currentCompression = 
+		fSettings->SetGetInt32(PSD_SETTING_COMPRESSION);
+
+	_AddItemToMenu(popupMenu, "Uncompressed",
+		PSD_COMPRESSED_RAW, currentCompression);
+	_AddItemToMenu(popupMenu, "RLE",
+		PSD_COMPRESSED_RLE, currentCompression);
+
+	fCompressionField = new BMenuField("compression", 
+		"Compression: ", popupMenu);
+
 	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
 
-	BStringView *stringView = new BStringView("title", "Photoshop image translator");
+	BStringView *stringView = new BStringView("title",
+		"Photoshop image translator");
 	stringView->SetFont(be_bold_font);
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
@@ -47,6 +65,8 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		B_UTF8_COPYRIGHT "2012-2013 Gerasim Troeglazov <3dEyes@gmail.com>");
 	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
+	
+	AddChild(fCompressionField);
 
 	AddChild(BSpaceLayoutItem::CreateGlue());
 	GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
@@ -65,6 +85,7 @@ ConfigView::~ConfigView()
 void
 ConfigView::AllAttached()
 {
+	fCompressionField->Menu()->SetTargetForItems(this);
 }
 
 
@@ -72,7 +93,27 @@ void
 ConfigView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_COMPRESSION_CHANGED: {
+			int32 value;
+			if (message->FindInt32("value", &value) >= B_OK) {
+				fSettings->SetGetInt32(PSD_SETTING_COMPRESSION, &value);
+				fSettings->SaveSettings();
+			}
+			break;
+		}
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+void
+ConfigView::_AddItemToMenu(BMenu* menu, const char* label,
+	uint32 value, uint32 current_value)
+{
+	BMessage* message = new BMessage(MSG_COMPRESSION_CHANGED);
+	message->AddInt32("value", value);
+	BMenuItem* item = new BMenuItem(label, message);
+	item->SetMarked(value == current_value);
+	menu->AddItem(item);
 }

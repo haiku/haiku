@@ -21,6 +21,8 @@
 #define DOCUMENT_COUNT "/documentCount"
 #define DOCUMENT_INDEX "/documentIndex"
 
+#define PSD_SETTING_COMPRESSION "psd /compression"
+
 #define PSD_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1, 2, 1)
 #define PSD_IMAGE_FORMAT	'PSD '
 

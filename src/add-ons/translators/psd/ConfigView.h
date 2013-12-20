@@ -13,7 +13,10 @@
 #include <String.h>
 #include <GroupView.h>
 #include <CheckBox.h>
-
+#include <MenuField.h>
+	
+#define MSG_COMPRESSION_CHANGED 'cchg'
+	
 class ConfigView : public BGroupView {
 	public:
 		ConfigView(TranslatorSettings *settings);
@@ -23,7 +26,12 @@ class ConfigView : public BGroupView {
 		virtual void MessageReceived(BMessage* message);
 
 	private:
+		void _AddItemToMenu(BMenu* menu, const char* label,
+			uint32 value, uint32 current_value);
+
 		BTextView*			fCopyrightView;
+		BMenuField*			fCompressionField;
+
 		TranslatorSettings *fSettings;
 };
 
