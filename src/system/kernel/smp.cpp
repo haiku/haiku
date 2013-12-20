@@ -701,6 +701,7 @@ acquire_read_seqlock(seqlock* lock) {
 
 bool
 release_read_seqlock(seqlock* lock, uint32 count) {
+	arch_cpu_memory_read_barrier();
 	uint32 current = atomic_get((int32*)&lock->count);
 
 	if (count % 2 == 1 || current != count) {

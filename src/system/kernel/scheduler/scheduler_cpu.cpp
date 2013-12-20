@@ -180,7 +180,10 @@ CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 			= (oldThread->kernel_time - cpuEntry->last_kernel_time)
 				+ (oldThread->user_time - cpuEntry->last_user_time);
 
-		atomic_add64(&cpuEntry->active_time, active);
+		WriteSequentialLocker locker(cpuEntry->active_time_lock);
+		cpuEntry->active_time += active;
+		locker.Unlock();
+
 		oldThreadData->UpdateActivity(active);
 	}
 

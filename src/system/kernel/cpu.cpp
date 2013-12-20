@@ -159,7 +159,15 @@ cpu_get_active_time(int32 cpu)
 	if (cpu < 0 || cpu > smp_get_num_cpus())
 		return 0;
 
-	return atomic_get64(&gCPU[cpu].active_time);
+	bigtime_t activeTime;
+	uint32 count;
+
+	do {
+		count = acquire_read_seqlock(&gCPU[cpu].active_time_lock);
+		activeTime = gCPU[cpu].active_time;
+	} while (!release_read_seqlock(&gCPU[cpu].active_time_lock, count));
+
+	return activeTime;
 }
 
 

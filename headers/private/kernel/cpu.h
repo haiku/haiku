@@ -56,6 +56,7 @@ typedef struct cpu_ent {
 	timer			quantum_timer;
 
 	// keeping track of CPU activity
+	seqlock			active_time_lock;
 	bigtime_t		active_time;
 	bigtime_t		irq_time;
 	bigtime_t		interrupt_time;
