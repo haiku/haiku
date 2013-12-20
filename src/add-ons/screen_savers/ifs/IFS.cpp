@@ -147,9 +147,13 @@ transform(SIMI* Simi, int32 xo, int32 yo, int32* x, int32* y)
 
 // constructor
 IFS::IFS(BRect bounds)
-	: fRoot(NULL),
-	  fAdditive(false),
-	  fCurrentMarkValue(1)
+	:
+	fRoot(NULL),
+	fCurrentFractal(NULL),
+	fPointBuffer(NULL),
+	fCurrentPoint(0),
+	fAdditive(false),
+	fCurrentMarkValue(1)
 {
 	ya_rand_init(system_time());
 
