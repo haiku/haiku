@@ -168,11 +168,11 @@ PSDWriter::Encode(BPositionIO *target)
 	if (fChannels == 4) {
 		psdLayersSection << (int16)-1; // Alpha channel id (-1)
 		if (fCompression == PSD_COMPRESSED_RAW) {
-			psdLayersSection << (uint32)(psdChannel[4].Length()
+			psdLayersSection << (uint32)(psdChannel[3].Length()
 				+ sizeof(int16));
 		} else {
-			psdLayersSection << (uint32)(psdChannel[4].Length()
-				+ psdByteCounts[4].Length() + sizeof(int16));			
+			psdLayersSection << (uint32)(psdChannel[3].Length()
+				+ psdByteCounts[3].Length() + sizeof(int16));			
 		}
 	}
 	psdLayersSection << "8BIM";
