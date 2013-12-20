@@ -402,7 +402,6 @@ arch_int_are_interrupts_enabled(void)
 void
 arch_int_assign_to_cpu(int32 irq, int32 cpu)
 {
-	dprintf("ASSIGN IRQ TO CPU\n");
 	switch (sVectorSources[irq]) {
 		case IRQ_SOURCE_IOAPIC:
 			if (sCurrentPIC->assign_interrupt_to_cpu != NULL)
