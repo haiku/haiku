@@ -420,8 +420,10 @@ BRadioButton::MouseUp(BPoint point)
 	fOutlined = Bounds().Contains(point);
 	if (fOutlined) {
 		fOutlined = false;
-		SetValue(B_CONTROL_ON);
-		Invoke();
+		if (Value() != B_CONTROL_ON) {
+			SetValue(B_CONTROL_ON);
+			Invoke();
+		}
 	}
 	Invalidate();
 
