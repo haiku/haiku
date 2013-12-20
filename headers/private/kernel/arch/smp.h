@@ -8,23 +8,18 @@
 
 #include <kernel.h>
 
+
 struct kernel_args;
 
 class CPUSet;
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+status_t arch_smp_init(kernel_args* args);
+status_t arch_smp_per_cpu_init(kernel_args* args, int32 cpu);
 
-status_t arch_smp_init(struct kernel_args *args);
-status_t arch_smp_per_cpu_init(struct kernel_args *args, int32 cpu);
 void arch_smp_send_ici(int32 target_cpu);
-void arch_smp_send_broadcast_ici(void);
+void arch_smp_send_broadcast_ici();
 void arch_smp_send_multicast_ici(CPUSet& cpuSet);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif	/* KERNEL_ARCH_SMP_H */

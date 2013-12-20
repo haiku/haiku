@@ -14,7 +14,6 @@
 #include <arch/x86/apic.h>
 
 #include <arch/cpu.h>
-#include <arch/smp.h>
 
 #include "apic_timer.h"
 
