@@ -135,69 +135,7 @@ void SerialApp::MessageReceived(BMessage* message)
 				fSerialPort.SetFlowControl(flowcontrol);
 
 			if(message->FindInt32("baudrate", &baudrate) == B_OK) {
-				data_rate rate;
-				switch(baudrate) {
-					case 50:
-						rate = B_50_BPS;
-						break;
-					case 75:
-						rate = B_75_BPS;
-						break;
-					case 110:
-						rate = B_110_BPS;
-						break;
-					case 134:
-						rate = B_134_BPS;
-						break;
-					case 150:
-						rate = B_150_BPS;
-						break;
-					case 200:
-						rate = B_200_BPS;
-						break;
-					case 300:
-						rate = B_300_BPS;
-						break;
-					case 600:
-						rate = B_600_BPS;
-						break;
-					case 1200:
-						rate = B_1200_BPS;
-						break;
-					case 1800:
-						rate = B_1800_BPS;
-						break;
-					case 2400:
-						rate = B_2400_BPS;
-						break;
-					case 4800:
-						rate = B_4800_BPS;
-						break;
-					case 9600:
-						rate = B_9600_BPS;
-						break;
-					case 19200:
-						rate = B_19200_BPS;
-						break;
-					case 31250:
-						rate = B_31250_BPS;
-						break;
-					case 38400:
-						rate = B_38400_BPS;
-						break;
-					case 57600:
-						rate = B_57600_BPS;
-						break;
-					case 115200:
-						rate = B_115200_BPS;
-						break;
-					case 230400:
-						rate = B_230400_BPS;
-						break;
-					default:
-						rate = B_0_BPS;
-						break;
-				}
+				data_rate rate = (data_rate)baudrate;
 				fSerialPort.SetDataRate(rate);
 			}
 
@@ -275,7 +213,7 @@ status_t SerialApp::PollSerial(void*)
 	{
 		ssize_t bytesRead;
 
-		bytesRead = application->fSerialPort.Read(buffer, 256);
+		bytesRead = application->fSerialPort.Read(buffer, sizeof(buffer));
 		if (bytesRead == B_FILE_ERROR)
 		{
 			// Port is not open - wait for it and start over

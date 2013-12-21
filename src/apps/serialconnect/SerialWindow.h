@@ -32,5 +32,6 @@ class SerialWindow: public BWindow
 		BFilePanel* fLogFilePanel;
 
 		static const int kBaudrates[];
+		static const int kBaudrateConstants[];
 		static const char* kWindowTitle;
 };

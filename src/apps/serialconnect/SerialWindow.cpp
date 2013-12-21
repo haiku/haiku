@@ -24,6 +24,15 @@ const int SerialWindow::kBaudrates[] = { 50, 75, 110, 134, 150, 200, 300, 600,
 };
 
 
+// The values for these constants are not in the expected order, so we have to
+// rely on this lookup table if we want to keep the menu items sorted.
+const int SerialWindow::kBaudrateConstants[] = { B_50_BPS, B_75_BPS, B_110_BPS,
+	B_134_BPS, B_150_BPS, B_200_BPS, B_300_BPS, B_600_BPS, B_1200_BPS,
+	B_1800_BPS, B_2400_BPS, B_4800_BPS, B_9600_BPS, B_19200_BPS, B_31250_BPS,
+	B_38400_BPS, B_57600_BPS, B_115200_BPS, B_230400_BPS
+};
+
+
 const char* SerialWindow::kWindowTitle = "SerialConnect";
 
 
@@ -135,7 +144,7 @@ SerialWindow::SerialWindow()
 	for (int i = sizeof(kBaudrates) / sizeof(char*); --i >= 0;)
 	{
 		message = new BMessage(kMsgSettings);
-		message->AddInt32("baudrate", kBaudrates[i]);
+		message->AddInt32("baudrate", kBaudrateConstants[i]);
 
 		char buffer[7];
 		sprintf(buffer,"%d", kBaudrates[i]);
@@ -323,7 +332,7 @@ void SerialWindow::MessageReceived(BMessage* message)
 					int32 code;
 					item->Message()->FindInt32("baudrate", &code);
 
-					if(code == kBaudrates[baudrate])
+					if(baudrate == code)
 						item->SetMarked(true);
 				}
 			}
