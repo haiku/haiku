@@ -1,5 +1,19 @@
 
-resource(0) #'VICN' array {
+resource app_signature "application/x-vnd.haiku.SerialConnect";
+
+resource app_version {
+	major  = 0, 
+	middle = 0,
+	minor  = 1,
+
+	variety = B_APPV_BETA,
+	internal = 0,
+
+	short_info = "SerialConnect",
+	long_info = "SerialConnect ©2012-2013 Haiku, Inc."
+};
+
+resource vector_icon {
 	$"6E6369660C0500020016023AE1E7AED7F03173CB3D7FE449031D420E2000F3FF"
 	$"C4020016023B243D3CD85EBD486D3B9FF848FB27498BD200FFFFC3020016023A"
 	$"A45F38DDFFBBD0B93D840B4A428549300400FFFF7904017E020016023B2AAD3C"
