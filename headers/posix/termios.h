@@ -111,9 +111,6 @@ struct termios {
 #define B115200		0x11
 #define B230400		0x12
 #define	B31250		0x13			/* for MIDI */
-	// Yes, this last one is out of order. Don't change it, it would break ABI.
-	// If you change it anyway, make sure the constants in SerialPort.h are
-	// matching.
 
 #define	CSIZE		0x20			/* character size */
 #define	CS5			0x00			/* only 7 and 8 bits supported */
