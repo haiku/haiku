@@ -1706,7 +1706,7 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
 			new BMessage(M_DUMMY)));
 		subTitleTrackMenu->ItemAt(0)->SetMarked(true);
 	}
-	subTitleTrackMenu->SetEnabled(count > 1);
+	subTitleTrackMenu->SetEnabled(count > 0);
 }
 
 
