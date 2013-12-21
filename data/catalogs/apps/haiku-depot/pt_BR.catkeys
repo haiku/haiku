@@ -1,15 +1,19 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	3005327638
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	4291855824
 Name	PackageListView		Nome
 Installed packages	Model		Pacotes instalados
 User modified packages	Model		Pacotes modificados pelo usuário
 Update available	Model		Atualização disponível
 Changelog	PackageInfoView		Registro de alterações
+Click a package to view information	PackageInfoView		Clique em um pacote para visualizar a informação
 for %Version%	PackageInfoView		para %Version%
+No changelog available.	PackageInfoView		Nenhum relatório de mudanças disponível.
 Depot:	FilterView		Depósito:
 Description	PackageListView		Descrição
 Install	PackageManager		Instalar
+Tools	MainWindow		Ferramentas
 HaikuDepot	System name		Depósito Haiku
 Uninstall	PackageManager		Desinstalar
+<no info>	PackageInfoView		<sem informação>
 An error occurred while initializing the package manager: %message%	MainWindow		Um erro ocorreu ao inicializar o gerenciador de pacotes: %message%
 Close	PackageManager		Fechar
 Status	PackageListView		Estado
@@ -25,10 +29,13 @@ Command line	Model		Linha de comando
 Downloading:	PackageInfoView		Baixando:
 Search terms:	FilterView		Termos para pesquisa:
 %Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Nenhuma avaliação de usuário disponível.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Um erro ocorreu ao atualizar o repositório: %error% (%details%)
+Show source packages	MainWindow		Exibir pacotes fonte
 Productivity	Model		Produtividade
 Show:	FilterView		Mostrar:
 Size	PackageListView		Tamanho
+Options	MainWindow		Opções
 Games	Model		Jogos
 Rating	PackageListView		Avaliação
 Downloading	Model		Baixando
@@ -45,6 +52,7 @@ Unknown	PackageListView		Desconhecido
 All depots	FilterView		Todos os depósitos
 Available	PackageListView		Disponível
 n/a	PackageInfoView		n/a
+Show develop packages	MainWindow		Exibir pacotes de desenvolvimento
 Show	FilterView		Mostrar
 Uninstalled packages	Model		Pacotes não instalados
 Audio	Model		Áudio

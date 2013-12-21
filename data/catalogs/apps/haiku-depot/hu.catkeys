@@ -1,15 +1,19 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3005327638
+1	hungarian	x-vnd.Haiku-HaikuDepot	4291855824
 Name	PackageListView		Név
 Installed packages	Model		Telepített csomagok
 User modified packages	Model		Módosított csomagok
 Update available	Model		Elérhető frissítések
 Changelog	PackageInfoView		Változásnapló
+Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
 for %Version%	PackageInfoView		%Version% verzióhoz
+No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 Depot:	FilterView		Raktár:
 Description	PackageListView		Leírás
 Install	PackageManager		Telepítés
+Tools	MainWindow		Eszközök
 HaikuDepot	System name		Raktár
 Uninstall	PackageManager		Eltávolítás
+<no info>	PackageInfoView		<nincs információ>
 An error occurred while initializing the package manager: %message%	MainWindow		Hiba történt a csomagkezelő indításakor: %message%
 Close	PackageManager		Bezárás
 Status	PackageListView		Állapot
@@ -25,10 +29,13 @@ Command line	Model		Parancssor
 Downloading:	PackageInfoView		Letöltés:
 Search terms:	FilterView		Keresési feltétel:
 %Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Hiba történt a raktár frissítésekor: %error% (%details%)
+Show source packages	MainWindow		Forráskód csomagok megjelenítése
 Productivity	Model		Alkalmazások
 Show:	FilterView		Megjelenítés:
 Size	PackageListView		Méret
+Options	MainWindow		Beállítások
 Games	Model		Játékok
 Rating	PackageListView		Értékelés
 Downloading	Model		Letöltés
@@ -45,6 +52,7 @@ Unknown	PackageListView		Ismeretlen
 All depots	FilterView		Összes raktár
 Available	PackageListView		Elérhető
 n/a	PackageInfoView		nincs értékelve
+Show develop packages	MainWindow		Fejlesztői csomagok megjelenítése
 Show	FilterView		Megjelenítés
 Uninstalled packages	Model		Eltávolított csomagok
 Audio	Model		Audió

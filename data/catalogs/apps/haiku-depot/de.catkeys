@@ -1,15 +1,19 @@
-1	german	x-vnd.Haiku-HaikuDepot	3005327638
+1	german	x-vnd.Haiku-HaikuDepot	4291855824
 Name	PackageListView		Name
 Installed packages	Model		Installierte Pakete
 User modified packages	Model		Veränderte Pakete
 Update available	Model		Update verfügbar
 Changelog	PackageInfoView		Änderungsprotokoll
+Click a package to view information	PackageInfoView		Paket anklicken, um Infos anzuzeigen
 for %Version%	PackageInfoView		für %Version%
+No changelog available.	PackageInfoView		Änderungsprotokoll nicht vorhanden.
 Depot:	FilterView		Depot:
 Description	PackageListView		Beschreibung
 Install	PackageManager		Installieren
+Tools	MainWindow		Werkzeuge
 HaikuDepot	System name		HaikuDepot
 Uninstall	PackageManager		Deinstallieren
+<no info>	PackageInfoView		<keine Info>
 An error occurred while initializing the package manager: %message%	MainWindow		Bei der Initialisierung des Paketmanagers trat ein Fehler auf: %message%
 Close	PackageManager		Schließen
 Status	PackageListView		Status
@@ -25,10 +29,13 @@ Command line	Model		Kommandozeile
 Downloading:	PackageInfoView		Aktueller Download:
 Search terms:	FilterView		Suchbegriffe:
 %Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Bei der Aktualisierung des Depots trat ein Fehler auf: %error% (%details%)
+Show source packages	MainWindow		Quellcode-Pakete anzeigen
 Productivity	Model		Büro
 Show:	FilterView		Zeige:
 Size	PackageListView		Größe
+Options	MainWindow		Einstellungen
 Games	Model		Spiele
 Rating	PackageListView		Bewertung
 Downloading	Model		Aktuelle Downloads
@@ -45,6 +52,7 @@ Unknown	PackageListView		Unbekannt
 All depots	FilterView		Alle Depots
 Available	PackageListView		Verfügbar
 n/a	PackageInfoView		n.v.
+Show develop packages	MainWindow		Entwicklungs-Pakete anzeigen
 Show	FilterView		Zeige
 Uninstalled packages	Model		Deinstallierte Pakete
 Audio	Model		Audio

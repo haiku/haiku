@@ -1,15 +1,19 @@
-1	french	x-vnd.Haiku-HaikuDepot	3005327638
+1	french	x-vnd.Haiku-HaikuDepot	4291855824
 Name	PackageListView		Nom
 Installed packages	Model		Paquets installés
 User modified packages	Model		Paquets modifiés par l'utilisateur
 Update available	Model		Mise à jour disponible
 Changelog	PackageInfoView		Journal des modifications
+Click a package to view information	PackageInfoView		Cliquez sur un paquet pour afficher ses informations
 for %Version%	PackageInfoView		pour %Version%
+No changelog available.	PackageInfoView		La liste des modifications n'est pas disponible.
 Depot:	FilterView		Dépôt :
 Description	PackageListView		Description
 Install	PackageManager		Installer
+Tools	MainWindow		Outils
 HaikuDepot	System name		Dépôt Haiku
 Uninstall	PackageManager		Désinstaller
+<no info>	PackageInfoView		<pas d'info>
 An error occurred while initializing the package manager: %message%	MainWindow		Une erreur est survenue à l'initialisation du gestionnaire de paquet : %message%
 Close	PackageManager		Fermer
 Status	PackageListView		État
@@ -25,10 +29,13 @@ Command line	Model		Ligne de commande
 Downloading:	PackageInfoView		Téléchargement en cours :
 Search terms:	FilterView		Termes à rechercher :
 %Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Aucun avis d'utilisateurs.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error% (%details%)
+Show source packages	MainWindow		Afficher les paquets de sources
 Productivity	Model		Bureautique
 Show:	FilterView		Afficher :
 Size	PackageListView		Taille
+Options	MainWindow		Options
 Games	Model		Jeux
 Rating	PackageListView		Évaluation
 Downloading	Model		Téléchargement en cours
@@ -45,6 +52,7 @@ Unknown	PackageListView		Inconnu
 All depots	FilterView		Tous les dépôts
 Available	PackageListView		Disponible
 n/a	PackageInfoView		n/a
+Show develop packages	MainWindow		Afficher les paquets de développements
 Show	FilterView		Afficher
 Uninstalled packages	Model		Paquets désinstallés
 Audio	Model		Son

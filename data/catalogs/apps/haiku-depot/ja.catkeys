@@ -1,14 +1,18 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3961734069
+1	japanese	x-vnd.Haiku-HaikuDepot	953294959
 Name	PackageListView		名前
 Installed packages	Model		インストール済パッケージ
 User modified packages	Model		ユーザーが変更したパッケージ
 Update available	Model		更新があります
 Changelog	PackageInfoView		変更履歴
+Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
+No changelog available.	PackageInfoView		変更記録はありません。
 Depot:	FilterView		Depot:
 Description	PackageListView		説明
 Install	PackageManager		インストール
+Tools	MainWindow		ツール
 HaikuDepot	System name		HaikuDepot
 Uninstall	PackageManager		アンインストール
+<no info>	PackageInfoView		<情報無し>
 An error occurred while initializing the package manager: %message%	MainWindow		パッケージマネジャーの初期化中にエラーが発生しました: %message%
 Close	PackageManager		閉じる
 Status	PackageListView		状態
@@ -24,10 +28,13 @@ Command line	Model		コマンドライン
 Downloading:	PackageInfoView		ダウンロード中:
 Search terms:	FilterView		検索語句:
 %Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		ユーザー格付けがありません。
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		リポジトリの更新中にエラーが発生しました: %error% (%details%)
+Show source packages	MainWindow		ソースパッケージを表示する
 Productivity	Model		ビジネス
 Show:	FilterView		表示:
 Size	PackageListView		サイズ
+Options	MainWindow		オプション
 Games	Model		ゲーム
 Rating	PackageListView		評価
 Downloading	Model		ダウンロード中
@@ -44,6 +51,7 @@ Unknown	PackageListView		不明
 All depots	FilterView		すべて
 Available	PackageListView		利用可能
 n/a	PackageInfoView		利用不可
+Show develop packages	MainWindow		開発用パッケージを表示する
 Show	FilterView		表示
 Uninstalled packages	Model		アンインストール済みパッケージ
 Audio	Model		オーディオ

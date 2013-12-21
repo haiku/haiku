@@ -1,15 +1,19 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3005327638
+1	russian	x-vnd.Haiku-HaikuDepot	4291855824
 Name	PackageListView		Имя
 Installed packages	Model		Установленные пакеты
 User modified packages	Model		Пакеты измененные пользователем
 Update available	Model		Доступны обновления
 Changelog	PackageInfoView		История изменений
+Click a package to view information	PackageInfoView		Нажмите на пакет, чтобы увидеть информацию о нем
 for %Version%	PackageInfoView		для %Version%
+No changelog available.	PackageInfoView		Список изменений недоступен.
 Depot:	FilterView		Склад:
 Description	PackageListView		Описание
 Install	PackageManager		Установить
+Tools	MainWindow		Инструменты
 HaikuDepot	System name		Склад
 Uninstall	PackageManager		Удалить
+<no info>	PackageInfoView		<нет информации>
 An error occurred while initializing the package manager: %message%	MainWindow		Возникла ошибка при инициализации менеджера пакетов: %message%
 Close	PackageManager		Закрыть
 Status	PackageListView		Статус
@@ -25,10 +29,13 @@ Command line	Model		Командная строка
 Downloading:	PackageInfoView		Загружаемые:
 Search terms:	FilterView		Условия поиска:
 %Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
+Show source packages	MainWindow		Отображать пакеты с исходным кодом
 Productivity	Model		Офис
 Show:	FilterView		Показать:
 Size	PackageListView		Размер
+Options	MainWindow		Настройки
 Games	Model		Игры
 Rating	PackageListView		Оценка
 Downloading	Model		Загружаемые
@@ -45,6 +52,7 @@ Unknown	PackageListView		Неизвестно
 All depots	FilterView		Все склады
 Available	PackageListView		Доступен
 n/a	PackageInfoView		н/д
+Show develop packages	MainWindow		Отображать пакеты для разработчиков
 Show	FilterView		Все пакеты
 Uninstalled packages	Model		Удаленные пакеты
 Audio	Model		Аудио

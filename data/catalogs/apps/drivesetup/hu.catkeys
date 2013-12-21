@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	3775412465
+1	hungarian	x-vnd.Haiku-DriveSetup	758245016
 DriveSetup	System name		Lemezkezelő
 Cancel	AbstractParametersPanel		Mégse
 Delete	MainWindow		Törlés
@@ -7,6 +7,7 @@ Rescan	MainWindow		Frissítés
 OK	MainWindow		Rendben
 Could not aquire partitioning information.	MainWindow		A partíciók állapotát nem lehetett lekérdezni.
 There's no space on the partition where a child partition could be created.	MainWindow		Nincs hely már a partíción, ahol alpartíciót kellene létrehozni.
+Could not unmount partition	MainWindow		Nem lehet leválasztani a partíciót
 Initialize	InitializeParametersPanel		Előkészítés
 OK	AbstractParametersPanel		Rendben
 <empty>	PartitionList		<üres>
@@ -16,6 +17,7 @@ No disk devices have been recognized.	DiskView		Nem található tárolóeszköz.
 Failed to initialize the disk %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: „%s”.\n
 The selected disk is read-only.	MainWindow		A kiválasztott lemez nem írható.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Biztosan meg akarja formázni a partíciót (%s)? A végleleges művelet előtt még egyszer meg kell ezt erősítenie.
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Megpróbáljuk kényszeríteni a leválasztást?\n\nMegjegyzés: ha egy program épp ír a lemezre, akkor az adatvesztést okozhat.\n
 Could not mount partition %s.	MainWindow		A partíció (%s) nem csatolható.
 The partition %s has been successfully formatted.\n	MainWindow		A partíció (%s) hiba nélkül elő lett készítve.\n
 Change parameters	MainWindow		Paraméterek módosítása
@@ -70,6 +72,7 @@ Are you sure you want to change parameters of the selected partition?\n\nThe par
 Eject	MainWindow		Kiadás
 Partition	MainWindow		Partíció
 Validation of the given parameters failed.	MainWindow		A megadott paramétereket nem sikerült érvényesíteni.
+Force unmount	MainWindow		Leválasztás kényszerítése
 Create	CreateParametersPanel		Létrehoz
 File system	PartitionList		Fájlrendszer
 Validation of the given creation parameters failed.	MainWindow		A létrehozáshoz megadott paramétereket nem sikerült érvényesíteni.

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	3775412465
+1	portuguese (brazil)	x-vnd.Haiku-DriveSetup	758245016
 DriveSetup	System name		Configuração de Unidade
 Cancel	AbstractParametersPanel		Cancelar
 Delete	MainWindow		Excluir
@@ -7,6 +7,7 @@ Rescan	MainWindow		Re-examinar
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Não foi possível obter informações sobre a divisão em partições
 There's no space on the partition where a child partition could be created.	MainWindow		Não existe espaço suficiente na partição para criar uma partição dentro dela.
+Could not unmount partition	MainWindow		Não foi possível desmontar a partição
 Initialize	InitializeParametersPanel		Inicializar
 OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<vazio>
@@ -16,6 +17,7 @@ No disk devices have been recognized.	DiskView		Nenhum dispositivo de disco foi 
 Failed to initialize the disk %s!\n	MainWindow		Falha ao inicializar o disco %s!\n
 The selected disk is read-only.	MainWindow		O disco selecionado está marcado como somente leitura
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Deseja realmente formatar a partição \"%s\"? Você será consultado novamente antes que as alterações sejam gravadas no disco.
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		A desmontagem deve ser forçada?\n\nNota: se um aplicativo está atualmente gravando no volume, desmontá-lo agora pode resultar em perda de dados.\n
 Could not mount partition %s.	MainWindow		Não foi possível montar a partição %s.
 The partition %s has been successfully formatted.\n	MainWindow		A partição %s foi formatada com sucesso.\n
 Change parameters	MainWindow		Modificar parâmetros
@@ -70,6 +72,7 @@ Are you sure you want to change parameters of the selected partition?\n\nThe par
 Eject	MainWindow		Ejetar
 Partition	MainWindow		Partição
 Validation of the given parameters failed.	MainWindow		A validação dos parâmetros dados falhou.
+Force unmount	MainWindow		Forçar desmontagem
 Create	CreateParametersPanel		Criar
 File system	PartitionList		Sistema de arquivos
 Validation of the given creation parameters failed.	MainWindow		A validação dos parâmetros de criação inseridas falhou.

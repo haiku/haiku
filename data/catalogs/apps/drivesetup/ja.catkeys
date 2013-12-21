@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	3775412465
+1	japanese	x-vnd.Haiku-DriveSetup	758245016
 DriveSetup	System name		DriveSetup
 Cancel	AbstractParametersPanel		中止
 Delete	MainWindow		削除
@@ -7,6 +7,7 @@ Rescan	MainWindow		ディスクを再検出
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		パーティション情報の取得に失敗しました。
 There's no space on the partition where a child partition could be created.	MainWindow		子パーティションを作成するスペースがありません。
+Could not unmount partition	MainWindow		パーティションをマウント解除できませんでした。
 Initialize	InitializeParametersPanel		初期化
 OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<空>
@@ -16,6 +17,7 @@ No disk devices have been recognized.	DiskView		ディスクデバイスが検�
 Failed to initialize the disk %s!\n	MainWindow		ディスク %s の初期化に失敗しました。\n
 The selected disk is read-only.	MainWindow		選択されたディスクは読み取り専用です。
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" をフォーマットしますか?  変更をディスクに書き込む直前に再度確認します。
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		強制的にマウント解除しても良いですか?\n\n注: アプリケーションが現在ボリュームに書き込み中の場合、マウント解除するとデータが失われるかもしれません。\n
 Could not mount partition %s.	MainWindow		パーティション %s をマウントできませんでした。
 The partition %s has been successfully formatted.\n	MainWindow		%s パーティションは正常にフォーマットされました。\n
 Change parameters	MainWindow		パラメーターを変更
@@ -70,6 +72,7 @@ Are you sure you want to change parameters of the selected partition?\n\nThe par
 Eject	MainWindow		取り出す
 Partition	MainWindow		パーティション
 Validation of the given parameters failed.	MainWindow		指定されたパラメーターの検証に失敗しました。
+Force unmount	MainWindow		強制的にマウント解除
 Create	CreateParametersPanel		新規作成
 File system	PartitionList		ファイルシステム
 Validation of the given creation parameters failed.	MainWindow		作成パラメーターの検証に失敗しました。

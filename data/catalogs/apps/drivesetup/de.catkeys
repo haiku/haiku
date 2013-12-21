@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	3775412465
+1	german	x-vnd.Haiku-DriveSetup	758245016
 DriveSetup	System name		Datenträgerverwaltung
 Cancel	AbstractParametersPanel		Abbrechen
 Delete	MainWindow		Löschen
@@ -7,6 +7,7 @@ Rescan	MainWindow		Aktualisieren
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Partitionierungsinformationen konnten nicht ermittelt werden.
 There's no space on the partition where a child partition could be created.	MainWindow		Es gibt keinen Platz auf der Partition, in der eine Tochterpartition angelegt werden könnte.
+Could not unmount partition	MainWindow		Partition konnte nicht ausgehangen werden.
 Initialize	InitializeParametersPanel		Initialisieren
 OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<leer>
@@ -16,6 +17,7 @@ No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erk
 Failed to initialize the disk %s!\n	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen!\n
 The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist schreibgeschützt.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Soll das Aushängen erzwungen werden?\n\nAchtung: Sollte der Datenträger gerade durch eine Anwendung beschrieben werden, können beim erzwungenen Aushängen Daten verloren gehen.\n
 Could not mount partition %s.	MainWindow		Die Partition \"%s\" konnte nicht eingehangen werden.
 The partition %s has been successfully formatted.\n	MainWindow		Die Partition \"%s\" wurde erfolgreich formatiert.\n
 Change parameters	MainWindow		Parameter ändern
@@ -70,6 +72,7 @@ Are you sure you want to change parameters of the selected partition?\n\nThe par
 Eject	MainWindow		Auswerfen
 Partition	MainWindow		Partition
 Validation of the given parameters failed.	MainWindow		Die Überprüfung der angegebenen Parameter ist fehlgeschlagen.
+Force unmount	MainWindow		Aushängen erzwingen
 Create	CreateParametersPanel		Anlegen
 File system	PartitionList		Dateisystem
 Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
