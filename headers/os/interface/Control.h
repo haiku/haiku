@@ -12,7 +12,8 @@
 
 enum {
 	B_CONTROL_OFF = 0,
-	B_CONTROL_ON = 1
+	B_CONTROL_ON = 1,
+	B_CONTROL_PARTIALLY_ON = 2
 };
 
 class BWindow;

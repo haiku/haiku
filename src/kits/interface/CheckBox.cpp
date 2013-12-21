@@ -26,7 +26,8 @@ BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 	:
 	BControl(frame, name, label, message, resizingMode, flags),
 	fPreferredSize(),
-	fOutlined(false)
+	fOutlined(false),
+	fPartialToOff(false)
 {
 	// Resize to minimum height if needed
 	font_height fontHeight;
@@ -43,7 +44,8 @@ BCheckBox::BCheckBox(const char *name, const char *label, BMessage *message,
 	:
 	BControl(name, label, message, flags | B_WILL_DRAW | B_NAVIGABLE),
 	fPreferredSize(),
-	fOutlined(false)
+	fOutlined(false),
+	fPartialToOff(false)
 {
 }
 
@@ -52,7 +54,8 @@ BCheckBox::BCheckBox(const char *label, BMessage *message)
 	:
 	BControl(NULL, label, message, B_WILL_DRAW | B_NAVIGABLE),
 	fPreferredSize(),
-	fOutlined(false)
+	fOutlined(false),
+	fPartialToOff(false)
 {
 }
 
@@ -60,7 +63,8 @@ BCheckBox::BCheckBox(const char *label, BMessage *message)
 BCheckBox::BCheckBox(BMessage *archive)
 	:
 	BControl(archive),
-	fOutlined(false)
+	fOutlined(false),
+	fPartialToOff(false)
 {
 }
 
@@ -322,7 +326,16 @@ BCheckBox::MessageReceived(BMessage *message)
 void
 BCheckBox::KeyDown(const char *bytes, int32 numBytes)
 {
-	BControl::KeyDown(bytes, numBytes);
+	if (*bytes == B_ENTER || *bytes == B_SPACE) {
+		if (!IsEnabled())
+			return;
+
+		SetValue(_NextState());
+		Invoke();
+	} else {
+		// skip the BControl implementation
+		BView::KeyDown(bytes, numBytes);
+	}
 }
 
 
@@ -360,7 +373,7 @@ BCheckBox::MouseDown(BPoint point)
 
 		if (fOutlined) {
 			fOutlined = false;
-			SetValue(!Value());
+			SetValue(_NextState());
 			Invoke();
 		} else {
 			Invalidate();
@@ -385,7 +398,7 @@ BCheckBox::MouseUp(BPoint point)
 
 	if (fOutlined) {
 		fOutlined = false;
-		SetValue(!Value());
+		SetValue(_NextState());
 		Invoke();
 	} else {
 		Invalidate();
@@ -485,8 +498,16 @@ BCheckBox::MakeFocus(bool focused)
 void
 BCheckBox::SetValue(int32 value)
 {
-	value = value ? B_CONTROL_ON : B_CONTROL_OFF;
-		// we only accept boolean values
+	// We only accept three possible values.
+	switch (value) {
+		case B_CONTROL_OFF:
+		case B_CONTROL_ON:
+		case B_CONTROL_PARTIALLY_ON:
+			break;
+		default:
+			value = B_CONTROL_ON;
+			break;
+	}
 
 	if (value != Value()) {
 		BControl::SetValueNoUpdate(value);
@@ -582,6 +603,20 @@ BCheckBox::LayoutInvalidated(bool descendants)
 }
 
 
+bool
+BCheckBox::IsPartialStateToOff() const
+{
+	return fPartialToOff;
+}
+
+
+void
+BCheckBox::SetPartialStateToOff(bool partialToOff)
+{
+	fPartialToOff = partialToOff;
+}
+
+
 // #pragma mark - FBC padding
 
 
@@ -622,6 +657,21 @@ BCheckBox::_ValidatePreferredSize()
 	}
 
 	return fPreferredSize;
+}
+
+
+int32
+BCheckBox::_NextState() const
+{
+	switch (Value()) {
+		case B_CONTROL_OFF:
+			return B_CONTROL_ON;
+		case B_CONTROL_PARTIALLY_ON:
+			return fPartialToOff ? B_CONTROL_OFF : B_CONTROL_ON;
+		case B_CONTROL_ON:
+		default:
+			return B_CONTROL_OFF;
+	}
 }
 
 

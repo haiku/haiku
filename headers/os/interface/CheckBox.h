@@ -69,6 +69,9 @@ public:
 
 	virtual	status_t			Perform(perform_code code, void* data);
 
+			bool				IsPartialStateToOff() const;
+			void				SetPartialStateToOff(bool partialToOff);
+
 protected:
 	virtual	void				LayoutInvalidated(bool descendants = false);
 
@@ -81,6 +84,7 @@ private:
 private:
 			BRect				_CheckBoxFrame() const;
 			BSize				_ValidatePreferredSize();
+			int32				_NextState() const;
 
 private:
 	// Forbidden
@@ -89,6 +93,7 @@ private:
 private:
 			BSize				fPreferredSize;
 			bool				fOutlined;
+			bool				fPartialToOff;
 };
 
 #endif // _CHECK_BOX_H

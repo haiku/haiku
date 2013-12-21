@@ -92,8 +92,14 @@ BControlLook::Flags(BControl* control) const
 		flags |= B_FOCUSED;
 	}
 
-	if (control->Value() == B_CONTROL_ON)
-		flags |= B_ACTIVATED;
+	switch (control->Value()) {
+		case B_CONTROL_ON:
+			flags |= B_ACTIVATED;
+			break;
+		case B_CONTROL_PARTIALLY_ON:
+			flags |= B_PARTIALLY_ACTIVATED;
+			break;
+	}
 
 	if (control->Parent() != NULL
 		&& (control->Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
@@ -3198,7 +3204,7 @@ bool
 BControlLook::_RadioButtonAndCheckBoxMarkColor(const rgb_color& base,
 	rgb_color& color, uint32 flags) const
 {
-	if ((flags & (B_ACTIVATED | B_CLICKED)) == 0) {
+	if ((flags & (B_ACTIVATED | B_PARTIALLY_ACTIVATED | B_CLICKED)) == 0) {
 		// no mark to be drawn at all
 		return false;
 	}
@@ -3212,12 +3218,15 @@ BControlLook::_RadioButtonAndCheckBoxMarkColor(const rgb_color& base,
 		mix = 0.4;
 	} else if ((flags & B_CLICKED) != 0) {
 		if ((flags & B_ACTIVATED) != 0) {
-			// loosing activation
+			// losing activation
 			mix = 0.7;
 		} else {
-			// becoming activated
+			// becoming activated (or losing partial activation)
 			mix = 0.3;
 		}
+	} else if ((flags & B_PARTIALLY_ACTIVATED) != 0) {
+		// partially activated
+		mix = 0.5;
 	} else {
 		// simply activated
 	}

@@ -69,13 +69,14 @@ public:
 	};
 
 	enum {
-		B_FOCUSED			= 1 << 0,
-		B_CLICKED			= 1 << 1, // some controls activate on mouse up
-		B_ACTIVATED			= 1 << 2,
-		B_HOVER				= 1 << 3,
-		B_DISABLED			= 1 << 4,
-		B_DEFAULT_BUTTON	= 1 << 5,
-		B_IGNORE_OUTLINE	= 1 << 6,
+		B_FOCUSED				= 1 << 0,
+		B_CLICKED				= 1 << 1, // some controls activate on mouse up
+		B_ACTIVATED				= 1 << 2,
+		B_HOVER					= 1 << 3,
+		B_DISABLED				= 1 << 4,
+		B_DEFAULT_BUTTON		= 1 << 5,
+		B_IGNORE_OUTLINE		= 1 << 6,
+		B_PARTIALLY_ACTIVATED	= 1 << 7, // like B_ACTIVATED, but for tri-state
 
 		B_BLEND_FRAME		= 1 << 16
 	};
