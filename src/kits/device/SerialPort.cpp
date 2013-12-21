@@ -562,7 +562,7 @@ BSerialPort::_DriverControl()
 		
 	// Reset all flags	
 	options.c_iflag &= ~(IXON | IXOFF | IXANY | INPCK);
-	options.c_cflag &= ~(CRTSCTS | CSIZE | CBAUD | CSTOPB | PARODD | PARENB);
+	options.c_cflag &= ~(CRTSCTS | CSIZE | CSTOPB | PARODD | PARENB);
 	options.c_lflag &= ~(ECHO | ECHONL | ISIG | ICANON);
 	
 	// Local line
@@ -589,7 +589,8 @@ BSerialPort::_DriverControl()
 	}
 	
 	//Set the baud rate		
-	options.c_cflag |= (fBaudRate & CBAUD); 
+	cfsetispeed(&options, fBaudRate);
+	cfsetospeed(&options, fBaudRate);
 	
 	//Set the timeout
 	options.c_cc[VTIME] = 0;	
