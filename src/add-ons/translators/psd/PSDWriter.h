@@ -48,15 +48,20 @@ private:
 						uint8 val, size_t count);
 	void			_WriteBlockToStream(BPositionIO *stream,
 						uint8 *block, size_t count);
-						
-	BDataArray*		PackBits(uint8 *buff, int32  len);
+
+	BDataArray*		_PackBits(uint8 *buff, int32  len);
+	status_t		_LoadChannelsFromRGBA32(void);
 
 	BPositionIO 	*fStream;	
 	size_t			fBitmapDataPos;
 
+	BDataArray 		psdChannel[4];
+	BDataArray 		psdByteCounts[4];
+
 	color_space		fColorSpace;
 	int32			fInRowBytes;
 	int16			fChannels;
+	int16			fAlphaChannel;
 	int32			fWidth;
 	int32			fHeight;
 	int16			fCompression;

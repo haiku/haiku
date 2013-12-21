@@ -13,6 +13,7 @@
 
 PSDWriter::PSDWriter(BPositionIO *stream)
 {	
+	fAlphaChannel = -1;
 	fStream = stream;
 	fReady = false;
 
@@ -33,9 +34,22 @@ PSDWriter::PSDWriter(BPositionIO *stream)
 	bounds.bottom = B_BENDIAN_TO_HOST_FLOAT(header.bounds.bottom);
 	fInRowBytes = B_BENDIAN_TO_HOST_INT32(header.rowBytes);
 	fColorSpace = (color_space)B_BENDIAN_TO_HOST_INT32(header.colors);
-	if (fColorSpace != B_RGB32 && fColorSpace != B_RGBA32)
-		return;
-	fChannels = fColorSpace == B_RGB32 ? 3 : 4;
+	
+	switch (fColorSpace) {
+		case B_GRAY8:
+		case B_CMAP8:
+			fChannels = 1;
+			break;
+		case B_RGBA32:
+			fChannels = 4;
+			fAlphaChannel = 3;
+			break;
+		case B_RGB32:
+			fChannels = 3;
+			break;
+		default:
+			return;
+	};
 
 	fWidth = bounds.IntegerWidth() + 1;
 	fHeight = bounds.IntegerHeight() + 1;
@@ -79,52 +93,9 @@ PSDWriter::Encode(BPositionIO *target)
 	if (!fReady)
 		return B_NO_TRANSLATOR;
 
-	int32 channelSize = fWidth * fHeight;		
-
-	fStream->Seek(fBitmapDataPos, SEEK_SET);
-
-	BDataArray psdChannel[4];
-	BDataArray psdByteCounts[4];
-
-	if (fCompression == PSD_COMPRESSED_RAW) {
-		for (int i = 0; i < channelSize; i++) {
-			uint8 rgba[4];
-			fStream->Read(rgba, sizeof(uint32));
-			psdChannel[0].Append((uint8)rgba[2]); // Red channel
-			psdChannel[1].Append((uint8)rgba[1]); // Green channel
-			psdChannel[2].Append((uint8)rgba[0]); // Blue channel
-			if (fChannels == 4)
-				psdChannel[3].Append((uint8)rgba[3]); // Alpha channel
-		}
-	} else if (fCompression == PSD_COMPRESSED_RLE) {
-		for (int32 h = 0; h < fHeight; h++) {
-			BDataArray lineData[4];
-			
-			for (int32 w = 0; w < fWidth; w++) {
-				uint8 rgba[4];
-				fStream->Read(rgba, sizeof(uint32));
-				lineData[0].Append((uint8)rgba[2]); // Red channel
-				lineData[1].Append((uint8)rgba[1]); // Green channel
-				lineData[2].Append((uint8)rgba[0]); // Blue channel
-				if (fChannels == 4)
-					lineData[3].Append((uint8)rgba[3]); // Alpha channel
-			}
-			
-			for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
-				BDataArray *packedLine = PackBits(lineData[channelIdx].Buffer(),
-					lineData[channelIdx].Length());
-
-				if (fVersion == PSD_FILE)
-					psdByteCounts[channelIdx].Append((uint16)packedLine->Length());
-				else
-					psdByteCounts[channelIdx].Append((uint32)packedLine->Length());
-
-				psdChannel[channelIdx].Append(*packedLine);
-				delete packedLine;
-			}
-		}
-	} else
-		return B_NO_TRANSLATOR;
+	status_t status = _LoadChannelsFromRGBA32();
+	if (status != B_OK)
+		return status;
 
 	// PSD header
 	BDataArray psdHeader(64);
@@ -256,7 +227,7 @@ PSDWriter::Encode(BPositionIO *target)
 
 
 BDataArray*
-PSDWriter::PackBits(uint8 *buff, int32  len)
+PSDWriter::_PackBits(uint8 *buff, int32  len)
 {
 	BDataArray *packedBits = new BDataArray();
 
@@ -297,6 +268,60 @@ PSDWriter::PackBits(uint8 *buff, int32  len)
 		}
 	}
 	return packedBits;
+}
+
+
+status_t
+PSDWriter::_LoadChannelsFromRGBA32(void)
+{
+	if (fColorSpace != B_RGB32 && fColorSpace != B_RGBA32)
+		return B_NO_TRANSLATOR;
+
+	int32 channelSize = fWidth * fHeight;
+
+	fStream->Seek(fBitmapDataPos, SEEK_SET);
+
+	if (fCompression == PSD_COMPRESSED_RAW) {
+		for (int i = 0; i < channelSize; i++) {
+			uint8 rgba[4];
+			fStream->Read(rgba, sizeof(uint32));
+			psdChannel[0].Append((uint8)rgba[2]); // Red channel
+			psdChannel[1].Append((uint8)rgba[1]); // Green channel
+			psdChannel[2].Append((uint8)rgba[0]); // Blue channel
+			if (fChannels == 4)
+				psdChannel[3].Append((uint8)rgba[3]); // Alpha channel
+		}
+		return B_OK;
+	} else if (fCompression == PSD_COMPRESSED_RLE) {
+		for (int32 h = 0; h < fHeight; h++) {
+			BDataArray lineData[4];
+			
+			for (int32 w = 0; w < fWidth; w++) {
+				uint8 rgba[4];
+				fStream->Read(rgba, sizeof(uint32));
+				lineData[0].Append((uint8)rgba[2]); // Red channel
+				lineData[1].Append((uint8)rgba[1]); // Green channel
+				lineData[2].Append((uint8)rgba[0]); // Blue channel
+				if (fChannels == 4)
+					lineData[3].Append((uint8)rgba[3]); // Alpha channel
+			}
+			
+			for (int channelIdx = 0; channelIdx < fChannels; channelIdx++) {
+				BDataArray *packedLine = _PackBits(lineData[channelIdx].Buffer(),
+					lineData[channelIdx].Length());
+
+				if (fVersion == PSD_FILE)
+					psdByteCounts[channelIdx].Append((uint16)packedLine->Length());
+				else
+					psdByteCounts[channelIdx].Append((uint32)packedLine->Length());
+
+				psdChannel[channelIdx].Append(*packedLine);
+				delete packedLine;
+			}
+		}
+		return B_OK;
+	}
+	return B_NO_TRANSLATOR;
 }
 
 
