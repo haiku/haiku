@@ -25,8 +25,8 @@
 	algorithm overview:
 
 	* VEC_ENTRY
-	* ppc_44x_exception_vector_common
-	* ppc_44x_exception_tail
+	* ppc_440_exception_vector_common
+	* ppc_440_exception_tail
 		- dump iframe
 		- ppc_exception_entry()
 		- restore registers and return from interrupt
@@ -49,7 +49,7 @@
 	* VEC_ENTRY
 		- save r1 in SPRG1 and load cpu_exception_context into r1
 		- save r0, save LR in r0
-	* ppc_44x_exception_vector_common
+	* ppc_440_exception_vector_common
 		- params:
 			. r0: old LR
 			. r1: exception context (physical address)
@@ -59,7 +59,7 @@
 		- turn on BAT for exception vector code
 		- turn on address translation
 		- get exception vector offset from LR
-	* ppc_44x_exception_tail
+	* ppc_440_exception_tail
 		- params:
 			. r1: exception context (virtual address)
 			. r3: exception vector offset
@@ -80,17 +80,17 @@
 	mfsprg0	%r1					; /* ppc_cpu_exception_context* -> r1 */	\
 	stw		%r0, 16(%r1)		; /* save r0 */								\
 	mflr	%r0					; /* save LR in r0 */						\
-	bl		ppc_44x_exception_vector_common	; /* continue with the common part */
+	bl		ppc_440_exception_vector_common	; /* continue with the common part */
 
 /* defines an exception vector */
 #define DEFINE_VECTOR(offset, name) 	\
-.skip	offset - (. - __44x_irqvec_start);	\
-FUNCTION(ppc_44x_##name):							\
+.skip	offset - (. - __440_irqvec_start);	\
+FUNCTION(ppc_440_##name):							\
 	VEC_ENTRY()
 
 
-.global __44x_irqvec_start
-__44x_irqvec_start:
+.global __440_irqvec_start
+__440_irqvec_start:
 	.long	0
 
 /* Called by the exception vector code.
@@ -99,7 +99,7 @@ __44x_irqvec_start:
  * r1:    ppc_cpu_exception_context* (physical address)
  * SPRG1: original r1
  */
-ppc_44x_exception_vector_common:
+ppc_440_exception_vector_common:
 	stw		%r0, 20(%r1)			/* save original LR */
 	stw		%r2, 24(%r1)			/* save r2 */
 	stw		%r3, 28(%r1)			/* save r3 */
@@ -159,16 +159,16 @@ DEFINE_VECTOR(0x1400, system_management_exception)
 DEFINE_VECTOR(0x1600, altivec_assist_exception)
 DEFINE_VECTOR(0x1700, thermal_management_exception)
 
-.global __44x_irqvec_end
-__44x_irqvec_end:
+.global __440_irqvec_end
+__440_irqvec_end:
 
 
-/* This is where ppc_44x_exception_vector_common continues. We're in the kernel here.
+/* This is where ppc_440_exception_vector_common continues. We're in the kernel here.
    r1:    ppc_cpu_exception_context* (virtual address)
    r3:    exception vector offset
    SPRG1: original r1
  */
-FUNCTION(ppc_44x_exception_tail):
+FUNCTION(ppc_440_exception_tail):
 	/* turn off BAT */
 	li		%r2, 0
 	mtibatu	0, %r2
@@ -202,7 +202,7 @@ FUNCTION(ppc_44x_exception_tail):
 	rlwinm	%r1, %r1, 0, 0, 28
 
 	/* save the registers */
-	bl		__44x_save_regs
+	bl		__440_save_regs
 
 	/* iframe pointer to r4 and a backup to r20 */
 	mr		%r4, %r1
@@ -224,10 +224,10 @@ FUNCTION(ppc_44x_exception_tail):
 	/* move the iframe to r1 */
 	mr		%r1, %r20
 
-	b		__44x_restore_regs_and_rfi
+	b		__440_restore_regs_and_rfi
 
 
-/* called by ppc_44x_exception_tail
+/* called by ppc_440_exception_tail
  * register expectations:
  *  r1:        stack
  *  r2:        ppc_cpu_exception_context*
@@ -236,7 +236,7 @@ FUNCTION(ppc_44x_exception_tail):
  * all other regs should have been unmodified by the exception handler,
  * and ready to be saved
  */
-__44x_save_regs:
+__440_save_regs:
 	/* Note: The iframe must be 8 byte aligned. The stack pointer we are passed
 	   in r1 is aligned. So we store the floating point registers first and
 	   need to take care that an even number of 4 byte registers is stored,
@@ -344,7 +344,7 @@ __44x_save_regs:
 /* called at the tail end of each of the exceptions
  * r1: iframe pointer
  */
-__44x_restore_regs_and_rfi:
+__440_restore_regs_and_rfi:
 	lwzu	%r0, 4(%r1)		/* SRR0 (skip vector offset) */
 	mtspr	%srr0, %r0
 	lwzu	%r0, 4(%r1)		/* SRR1 */
