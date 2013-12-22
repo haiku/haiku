@@ -89,143 +89,22 @@ BRadioButton::Draw(BRect updateRect)
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
-	if (be_control_look != NULL) {
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-		uint32 flags = be_control_look->Flags(this);
-		if (fOutlined)
-			flags |= BControlLook::B_CLICKED;
+	uint32 flags = be_control_look->Flags(this);
+	if (fOutlined)
+		flags |= BControlLook::B_CLICKED;
 
-		BRect knobRect(_KnobFrame(fontHeight));
-		BRect rect(knobRect);
-		be_control_look->DrawRadioButton(this, rect, updateRect, base, flags);
+	BRect knobRect(_KnobFrame(fontHeight));
+	BRect rect(knobRect);
+	be_control_look->DrawRadioButton(this, rect, updateRect, base, flags);
 
-		BRect labelRect(Bounds());
-		labelRect.left = knobRect.right
-			+ be_control_look->DefaultLabelSpacing();
+	BRect labelRect(Bounds());
+	labelRect.left = knobRect.right
+		+ be_control_look->DefaultLabelSpacing();
 
-		be_control_look->DrawLabel(this, Label(), labelRect, updateRect,
-			base, flags);
-		return;
-	}
-
-	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
-
-	// layout the rect for the dot
-	BRect rect = _KnobFrame(fontHeight);
-
-	BPoint labelPos(rect.right + floorf(textHeight / 2.0),
-		floorf((rect.top + rect.bottom + textHeight) / 2.0
-			- fontHeight.descent + 0.5) + 1.0);
-
-	// if the focus is changing, just redraw the focus indicator
-	if (IsFocusChanging()) {
-		if (IsFocus())
-			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		else
-			SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-		BPoint underLine = labelPos;
-		underLine.y += fontHeight.descent;
-		StrokeLine(underLine, underLine + BPoint(StringWidth(Label()), 0.0));
-
-		return;
-	}
-
-	// colors
-	rgb_color bg = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color lightenmax;
-	rgb_color lighten1;
-	rgb_color darken1;
-	rgb_color darken2;
-	rgb_color darken3;
-	rgb_color darkenmax;
-
-	rgb_color naviColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
-	rgb_color knob;
-	rgb_color knobDark;
-	rgb_color knobLight;
-
-	if (IsEnabled()) {
-		lightenmax	= tint_color(bg, B_LIGHTEN_MAX_TINT);
-		lighten1	= tint_color(bg, B_LIGHTEN_1_TINT);
-		darken1		= tint_color(bg, B_DARKEN_1_TINT);
-		darken2		= tint_color(bg, B_DARKEN_2_TINT);
-		darken3		= tint_color(bg, B_DARKEN_3_TINT);
-		darkenmax	= tint_color(bg, B_DARKEN_MAX_TINT);
-
-		knob		= naviColor;
-		knobDark	= tint_color(naviColor, B_DARKEN_3_TINT);
-		knobLight	= tint_color(naviColor, 0.15);
-	} else {
-		lightenmax	= tint_color(bg, B_LIGHTEN_2_TINT);
-		lighten1	= bg;
-		darken1		= bg;
-		darken2		= tint_color(bg, B_DARKEN_1_TINT);
-		darken3		= tint_color(bg, B_DARKEN_2_TINT);
-		darkenmax	= tint_color(bg, B_DISABLED_LABEL_TINT);
-
-		knob		= tint_color(naviColor, B_LIGHTEN_2_TINT);
-		knobDark	= tint_color(naviColor, B_LIGHTEN_1_TINT);
-		knobLight	= tint_color(naviColor, (B_LIGHTEN_2_TINT
-			+ B_LIGHTEN_MAX_TINT) / 2.0);
-	}
-
-	// dot
-	if (Value() == B_CONTROL_ON) {
-		// full
-		SetHighColor(knobDark);
-		FillEllipse(rect);
-
-		SetHighColor(knob);
-		FillEllipse(BRect(rect.left + 2, rect.top + 2, rect.right - 3,
-			rect.bottom - 3));
-
-		SetHighColor(knobLight);
-		FillEllipse(BRect(rect.left + 3, rect.top + 3, rect.right - 5,
-			rect.bottom - 5));
-	} else {
-		// empty
-		SetHighColor(lightenmax);
-		FillEllipse(rect);
-	}
-
-	rect.InsetBy(-1.0, -1.0);
-
-	// outer circle
-	if (fOutlined) {
-		// indicating "about to change value"
-		SetHighColor(darken3);
-		StrokeEllipse(rect);
-	} else {
-		SetHighColor(darken1);
-		StrokeArc(rect, 45.0, 180.0);
-		SetHighColor(lightenmax);
-		StrokeArc(rect, 45.0, -180.0);
-	}
-
-	rect.InsetBy(1, 1);
-
-	// inner circle
-	SetHighColor(darken3);
-	StrokeArc(rect, 45.0, 180.0);
-	SetHighColor(bg);
-	StrokeArc(rect, 45.0, -180.0);
-
-	// for faster font rendering, we can restore B_OP_COPY
-	SetDrawingMode(B_OP_COPY);
-
-	// label
-	SetHighColor(darkenmax);
-	DrawString(Label(), labelPos);
-
-	// underline label if focused
-	if (IsFocus()) {
-		SetHighColor(naviColor);
-		BPoint underLine = labelPos;
-		underLine.y += fontHeight.descent;
-		StrokeLine(underLine, underLine + BPoint(StringWidth(Label()), 0.0));
-	}
+	be_control_look->DrawLabel(this, Label(), labelRect, updateRect,
+		base, flags);
 }
 
 
@@ -615,26 +494,9 @@ BRadioButton::_KnobFrame() const
 BRect
 BRadioButton::_KnobFrame(const font_height& fontHeight) const
 {
-	if (be_control_look != NULL) {
-		// Same as BCheckBox...
-		return BRect(0.0f, 2.0f, ceilf(3.0f + fontHeight.ascent),
-			ceilf(5.0f + fontHeight.ascent));
-	}
-
-	// layout the rect for the dot
-	BRect rect(Bounds());
-
-	// its size depends on the text height
-	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
-	float inset = -floorf(textHeight / 2 - 2);
-
-	rect.left -= (inset - 1);
-	rect.top = floorf((rect.top + rect.bottom) / 2.0);
-	rect.bottom = rect.top;
-	rect.right = rect.left;
-	rect.InsetBy(inset, inset);
-
-	return rect;
+	// Same as BCheckBox...
+	return BRect(0.0f, 2.0f, ceilf(3.0f + fontHeight.ascent),
+		ceilf(5.0f + fontHeight.ascent));
 }
 
 
