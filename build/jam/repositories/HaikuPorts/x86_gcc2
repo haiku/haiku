@@ -177,7 +177,6 @@ RemotePackageRepository HaikuPorts
 	unrar-4.2.4-1
 	vim-7.3-1
 	vision-0.9.7.r947-2
-	vorbis_tools-1.4.0-1
 	which-2.20-1
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-3
@@ -282,7 +281,6 @@ RemotePackageRepository HaikuPorts
 	speex_x86_devel-1.2~rc1-2
 	sqlite_x86-3.8.0.2-1
 	sqlite_x86_devel-3.8.0.2-1
-	vorbis_tools_x86-1.4.0-1
 	xz_utils_x86-5.0.4-1
 	zlib_x86-1.2.8-3
 	zlib_x86_devel-1.2.8-3
@@ -395,7 +393,6 @@ RemotePackageRepository HaikuPorts
 	texinfo
 	vim
 	vision
-	vorbis_tools
 	which
 	wpa_supplicant
 	yasm
