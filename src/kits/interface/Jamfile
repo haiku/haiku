@@ -74,6 +74,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			GroupLayout.cpp
 			GroupLayoutBuilder.cpp
 			GroupView.cpp
+			Icon.cpp
 			Input.cpp
 			InterfaceDefs.cpp
 			Layout.cpp

@@ -19,6 +19,10 @@ enum {
 class BBitmap;
 class BWindow;
 
+namespace BPrivate {
+	class BIcon;
+};
+
 
 class BControl : public BView, public BInvoker {
 public:
@@ -88,13 +92,6 @@ private:
 			struct IconData;
 
 private:
-	static	BBitmap*			_ConvertToRGB32(const BBitmap* bitmap,
-									bool noAppServerLink = false);
-	static	status_t			_TrimBitmap(const BBitmap* bitmap,
-									bool keepAspect, BBitmap*& _trimmedBitmap);
-			status_t			_MakeBitmaps(const BBitmap* bitmap,
-									uint32 flags);
-
 	virtual	void				_ReservedControl2();
 	virtual	void				_ReservedControl3();
 	virtual	void				_ReservedControl4();
@@ -110,7 +107,7 @@ private:
 			bool				fFocusChanging;
 			bool				fTracking;
 			bool				fWantsNav;
-			IconData*			fIconData;
+			BPrivate::BIcon*	fIcon;
 
 #ifdef B_HAIKU_64_BIT
 			uint32				_reserved[2];
