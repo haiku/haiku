@@ -89,9 +89,9 @@ public:
 
 	bool SetBitmap(BBitmap* bitmap, uint32 which)
 	{
-		IconList& list = (which & B_DISABLED_BITMAP) == 0
+		IconList& list = (which & B_DISABLED_ICON_BITMAP) == 0
 			? fEnabledBitmaps : fDisabledBitmaps;
-		which &= ~uint32(B_DISABLED_BITMAP);
+		which &= ~uint32(B_DISABLED_ICON_BITMAP);
 
 		int32 count = list.CountItems();
 		if ((int32)which < count) {
@@ -109,9 +109,9 @@ public:
 
 	BBitmap* Bitmap(uint32 which) const
 	{
-		const IconList& list = (which & B_DISABLED_BITMAP) == 0
+		const IconList& list = (which & B_DISABLED_ICON_BITMAP) == 0
 			? fEnabledBitmaps : fDisabledBitmaps;
-		return list.ItemAt(which & ~uint32(B_DISABLED_BITMAP));
+		return list.ItemAt(which & ~uint32(B_DISABLED_ICON_BITMAP));
 	}
 
 	void DeleteBitmaps()
@@ -651,16 +651,17 @@ BControl::SetIcon(const BBitmap* bitmap, uint32 flags)
 
 	// trim the bitmap, if requested and the bitmap actually has alpha
 	status_t error;
-	if ((flags & (B_TRIM_BITMAP | B_TRIM_BITMAP_KEEP_ASPECT)) != 0
+	if ((flags & (B_TRIM_ICON_BITMAP | B_TRIM_ICON_BITMAP_KEEP_ASPECT)) != 0
 		&& hasAlpha) {
 		if (bitmap->ColorSpace() == B_RGBA32) {
 			error = _TrimBitmap(bitmap,
-				(flags & B_TRIM_BITMAP_KEEP_ASPECT) != 0, trimmedBitmap);
+				(flags & B_TRIM_ICON_BITMAP_KEEP_ASPECT) != 0, trimmedBitmap);
 		} else {
 			BBitmap* rgb32Bitmap = _ConvertToRGB32(bitmap, true);
 			if (rgb32Bitmap != NULL) {
 				error = _TrimBitmap(rgb32Bitmap,
-					(flags & B_TRIM_BITMAP_KEEP_ASPECT) != 0, trimmedBitmap);
+					(flags & B_TRIM_ICON_BITMAP_KEEP_ASPECT) != 0,
+					trimmedBitmap);
 				delete rgb32Bitmap;
 			} else
 				error = B_NO_MEMORY;
@@ -707,7 +708,7 @@ BControl::SetIconBitmap(const BBitmap* bitmap, uint32 which, uint32 flags)
 		if (!bitmap->IsValid())
 			return B_BAD_VALUE;
 
-		if ((flags & B_KEEP_BITMAP) != 0) {
+		if ((flags & B_KEEP_ICON_BITMAP) != 0) {
 			ourBitmap = const_cast<BBitmap*>(bitmap);
 		} else {
 			ourBitmap = _ConvertToRGB32(bitmap);
@@ -869,21 +870,23 @@ BControl::_MakeBitmaps(const BBitmap* bitmap, uint32 flags)
 	ObjectDeleter<IconData> iconDataDeleter(iconData);
 
 	color_space format = bitmap->ColorSpace();
-	BBitmap* normalBitmap = iconData->CreateBitmap(b, format, B_OFF_BITMAP);
+	BBitmap* normalBitmap = iconData->CreateBitmap(b, format,
+		B_INACTIVE_ICON_BITMAP);
 	if (normalBitmap == NULL)
 		return B_NO_MEMORY;
 
 	BBitmap* disabledBitmap = NULL;
-	if ((flags & B_CREATE_DISABLED_BITMAPS) != 0) {
+	if ((flags & B_CREATE_DISABLED_ICON_BITMAPS) != 0) {
 		disabledBitmap = iconData->CreateBitmap(b, format,
-			B_OFF_BITMAP | B_DISABLED_BITMAP);
+			B_INACTIVE_ICON_BITMAP | B_DISABLED_ICON_BITMAP);
 		if (disabledBitmap == NULL)
 			return B_NO_MEMORY;
 	}
 
 	BBitmap* clickedBitmap = NULL;
-	if ((flags & (B_CREATE_ON_BITMAP | B_CREATE_PARTIALLY_ON_BITMAP)) != 0) {
-		clickedBitmap = iconData->CreateBitmap(b, format, B_ON_BITMAP);
+	if ((flags & (B_CREATE_ACTIVE_ICON_BITMAP
+			| B_CREATE_PARTIALLY_ACTIVE_ICON_BITMAP)) != 0) {
+		clickedBitmap = iconData->CreateBitmap(b, format, B_ACTIVE_ICON_BITMAP);
 		if (clickedBitmap == NULL)
 			return B_NO_MEMORY;
 	}
@@ -891,7 +894,7 @@ BControl::_MakeBitmaps(const BBitmap* bitmap, uint32 flags)
 	BBitmap* disabledClickedBitmap = NULL;
 	if (disabledBitmap != NULL && clickedBitmap != NULL) {
 		disabledClickedBitmap = iconData->CreateBitmap(b, format,
-			B_ON_BITMAP | B_DISABLED_BITMAP);
+			B_ACTIVE_ICON_BITMAP | B_DISABLED_ICON_BITMAP);
 		if (disabledClickedBitmap == NULL)
 			return B_NO_MEMORY;
 	}
@@ -1020,12 +1023,15 @@ BControl::_MakeBitmaps(const BBitmap* bitmap, uint32 flags)
 	}
 
 	// make the partially-on bitmaps a copy of the on bitmaps
-	if ((flags & B_CREATE_PARTIALLY_ON_BITMAP) != 0) {
-		if (iconData->CopyBitmap(clickedBitmap, B_PARTIALLY_ON_BITMAP) == NULL)
+	if ((flags & B_CREATE_PARTIALLY_ACTIVE_ICON_BITMAP) != 0) {
+		if (iconData->CopyBitmap(clickedBitmap,
+				B_PARTIALLY_ACTIVATE_ICON_BITMAP) == NULL) {
 			return B_NO_MEMORY;
-		if ((flags & B_CREATE_DISABLED_BITMAPS) != 0) {
+		}
+		if ((flags & B_CREATE_DISABLED_ICON_BITMAPS) != 0) {
 			if (iconData->CopyBitmap(disabledClickedBitmap,
-					B_PARTIALLY_ON_BITMAP | B_DISABLED_BITMAP) == NULL) {
+					B_PARTIALLY_ACTIVATE_ICON_BITMAP | B_DISABLED_ICON_BITMAP)
+					== NULL) {
 				return B_NO_MEMORY;
 			}
 		}

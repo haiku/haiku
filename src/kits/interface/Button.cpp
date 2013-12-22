@@ -123,8 +123,9 @@ BButton::Draw(BRect updateRect)
 	rect.InsetBy(kLabelMargin, kLabelMargin);
 
 	const BBitmap* icon = IconBitmap(
-		(Value() == B_CONTROL_OFF ? B_OFF_BITMAP : B_ON_BITMAP)
-			| (IsEnabled() ? 0 : B_DISABLED_BITMAP));
+		(Value() == B_CONTROL_OFF
+				? B_INACTIVE_ICON_BITMAP : B_ACTIVE_ICON_BITMAP)
+			| (IsEnabled() ? 0 : B_DISABLED_ICON_BITMAP));
 	be_control_look->DrawLabel(this, Label(), icon, rect, updateRect,
 		base, flags, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 }
@@ -484,7 +485,7 @@ status_t
 BButton::SetIcon(const BBitmap* icon, uint32 flags)
 {
 	return BControl::SetIcon(icon,
-		flags | B_CREATE_ON_BITMAP | B_CREATE_DISABLED_BITMAPS);
+		flags | B_CREATE_ACTIVE_ICON_BITMAP | B_CREATE_DISABLED_ICON_BITMAPS);
 }
 
 
@@ -527,7 +528,7 @@ BButton::_ValidatePreferredSize()
 			width += (float)ceil(StringWidth(label));
 		}
 
-		const BBitmap* icon = IconBitmap(B_OFF_BITMAP);
+		const BBitmap* icon = IconBitmap(B_INACTIVE_ICON_BITMAP);
 		if (icon != NULL)
 			width += icon->Bounds().Width() + 1;
 

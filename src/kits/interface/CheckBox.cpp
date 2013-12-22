@@ -117,7 +117,7 @@ BCheckBox::Draw(BRect updateRect)
 		+ be_control_look->DefaultLabelSpacing();
 
 	const BBitmap* icon = IconBitmap(
-		B_OFF_BITMAP | (IsEnabled() ? 0 : B_DISABLED_BITMAP));
+		B_INACTIVE_ICON_BITMAP | (IsEnabled() ? 0 : B_DISABLED_ICON_BITMAP));
 
 	be_control_look->DrawLabel(this, Label(), icon, labelRect, updateRect,
 		base, flags);
@@ -456,7 +456,7 @@ BCheckBox::Perform(perform_code code, void* _data)
 status_t
 BCheckBox::SetIcon(const BBitmap* icon, uint32 flags)
 {
-	return BControl::SetIcon(icon, flags | B_CREATE_DISABLED_BITMAPS);
+	return BControl::SetIcon(icon, flags | B_CREATE_DISABLED_ICON_BITMAPS);
 }
 
 
@@ -518,7 +518,7 @@ BCheckBox::_ValidatePreferredSize()
 		float width = rect.right + rect.left;
 		float height = rect.bottom + rect.top;
 
-		const BBitmap* icon = IconBitmap(B_OFF_BITMAP);
+		const BBitmap* icon = IconBitmap(B_INACTIVE_ICON_BITMAP);
 		if (icon != NULL) {
 			width += be_control_look->DefaultLabelSpacing()
 				+ icon->Bounds().Width() + 1;
