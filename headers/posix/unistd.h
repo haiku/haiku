@@ -189,7 +189,7 @@ extern ssize_t  write_pos(int fd, off_t pos, const void *buffer,size_t count);
 extern ssize_t	pwrite(int fd, const void *buffer, size_t count, off_t pos);
 extern off_t	lseek(int fd, off_t offset, int whence);
 
-extern int		sync(void);
+extern void		sync(void);
 extern int		fsync(int fd);
 
 extern int		chown(const char *path, uid_t owner, gid_t group);

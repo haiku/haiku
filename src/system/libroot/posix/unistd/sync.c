@@ -22,14 +22,9 @@ fsync(int fd)
 }
 
 
-int
+void
 sync(void)
 {
-	int status = _kern_sync();
-	if (status < 0) {
-		__set_errno(status);
-		status = -1;
-	}
-
-	return status;
+	_kern_sync();
 }
+
