@@ -12,6 +12,7 @@
 #include <Slider.h>
 
 
+class BBitmap;
 class BControl;
 class BGradientLinear;
 class BView;
@@ -335,6 +336,16 @@ public:
 	/*virtual*/	void			DrawLabel(BView* view, const char* label,
 									const rgb_color& base, uint32 flags,
 									const BPoint& where);
+
+			void				DrawLabel(BView* view, const char* label,
+									const BBitmap* icon, BRect rect,
+									const BRect& updateRect,
+									const rgb_color& base, uint32 flags);
+	virtual	void				DrawLabel(BView* view, const char* label,
+									const BBitmap* icon, BRect rect,
+									const BRect& updateRect,
+									const rgb_color& base, uint32 flags,
+									const BAlignment& alignment);
 
 	virtual	void				GetFrameInsets(frame_type frameType,
 									uint32 flags, float& _left, float& _top,

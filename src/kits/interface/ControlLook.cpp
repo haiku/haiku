@@ -10,8 +10,11 @@
 
 #include <ControlLook.h>
 
+#include <algorithm>
+
 #include <Control.h>
 #include <GradientLinear.h>
+#include <LayoutUtils.h>
 #include <Region.h>
 #include <Shape.h>
 #include <String.h>
@@ -1730,7 +1733,7 @@ void
 BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags)
 {
-	DrawLabel(view, label, rect, updateRect, base, flags,
+	DrawLabel(view, label, NULL, rect, updateRect, base, flags,
 		DefaultLabelAlignment());
 }
 
@@ -1740,54 +1743,7 @@ BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	const BAlignment& alignment)
 {
-	if (!rect.Intersects(updateRect))
-		return;
-
-	// truncate the label if necessary and get the width and height
-	BString truncatedLabel(label);
-
-	BFont font;
-	view->GetFont(&font);
-
-	float width = rect.Width();
-	font.TruncateString(&truncatedLabel, B_TRUNCATE_END, width);
-	width = font.StringWidth(truncatedLabel.String());
-
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
-	float height = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
-
-	// handle alignment
-	BPoint location;
-
-	switch (alignment.horizontal) {
-	default:
-		case B_ALIGN_LEFT:
-			location.x = rect.left;
-			break;
-		case B_ALIGN_RIGHT:
-			location.x = rect.right - width;
-			break;
-		case B_ALIGN_CENTER:
-			location.x = (rect.left + rect.right - width) / 2.0f;
-			break;
-	}
-
-	switch (alignment.vertical) {
-		case B_ALIGN_TOP:
-			location.y = rect.top + ceilf(fontHeight.ascent);
-			break;
-		default:
-		case B_ALIGN_MIDDLE:
-			location.y = floorf((rect.top + rect.bottom - height) / 2.0f + 0.5f)
-				+ ceilf(fontHeight.ascent);
-			break;
-		case B_ALIGN_BOTTOM:
-			location.y = rect.bottom - ceilf(fontHeight.descent);
-			break;
-	}
-
-	DrawLabel(view, truncatedLabel.String(), base, flags, location);
+	DrawLabel(view, label, NULL, rect, updateRect, base, flags, alignment);
 }
 
 
@@ -1898,6 +1854,87 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 	view->SetDrawingMode(B_OP_OVER);
 	view->DrawString(label, where);
 	view->SetDrawingMode(oldMode);
+}
+
+
+void
+BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
+	BRect rect, const BRect& updateRect, const rgb_color& base, uint32 flags)
+{
+	DrawLabel(view, label, icon, rect, updateRect, base, flags,
+		DefaultLabelAlignment());
+}
+
+
+void
+BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
+	BRect rect, const BRect& updateRect, const rgb_color& base, uint32 flags,
+	const BAlignment& alignment)
+{
+	if (!rect.Intersects(updateRect))
+		return;
+
+	if (label == NULL && icon == NULL)
+		return;
+
+	if (label == NULL) {
+		// icon only
+		BRect alignedRect = BLayoutUtils::AlignInFrame(rect,
+			icon->Bounds().Size(), alignment);
+		drawing_mode oldMode = view->DrawingMode();
+		view->SetDrawingMode(B_OP_OVER);
+		view->DrawBitmap(icon, alignedRect.LeftTop());
+		view->SetDrawingMode(oldMode);
+		return;
+	}
+
+	// label, possibly with icon
+	float availableWidth = rect.Width();
+	float width = 0;
+	float textOffset = 0;
+	float height = 0;
+
+	if (icon != NULL) {
+		width = icon->Bounds().Width() + DefaultLabelSpacing() + 1;
+		height = icon->Bounds().Height() + 1;
+		textOffset = width;
+		availableWidth -= textOffset;
+	}
+
+	// truncate the label if necessary and get the width and height
+	BString truncatedLabel(label);
+
+	BFont font;
+	view->GetFont(&font);
+
+	font.TruncateString(&truncatedLabel, B_TRUNCATE_END, availableWidth);
+	width += font.StringWidth(truncatedLabel.String());
+
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
+	float textHeight = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
+	height = std::max(height, textHeight);
+
+	// handle alignment
+	BRect alignedRect = BLayoutUtils::AlignInFrame(rect,
+		BSize(width - 1, height - 1), alignment);
+
+	if (icon != NULL) {
+		BPoint location = alignedRect.LeftTop();
+		if (icon->Bounds().Height() + 1 < height)
+			location.y += ceilf((height - icon->Bounds().Height() - 1) / 2);
+
+		drawing_mode oldMode = view->DrawingMode();
+		view->SetDrawingMode(B_OP_OVER);
+		view->DrawBitmap(icon, location);
+		view->SetDrawingMode(oldMode);
+	}
+
+	BPoint location(alignedRect.left + textOffset,
+		alignedRect.top + ceilf(fontHeight.ascent));
+	if (textHeight < height)
+		location.y += ceilf((height - textHeight) / 2);
+	DrawLabel(view, truncatedLabel.String(), base, flags, location);
 }
 
 
