@@ -518,11 +518,13 @@ BPartition::GetMountPoint(BPath* mountPoint) const
 	\param mountFlags Currently only \c B_MOUNT_READ_ONLY is defined, which
 		   forces the volume to be mounted read-only.
 	\param parameters File system specific mount parameters.
+	\param devicePointer Reference to the mounted filesystem for the programs
+		    interested in it
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
-dev_t
+status_t
 BPartition::Mount(const char* mountPoint, uint32 mountFlags,
-	const char* parameters)
+	const char* parameters, dev_t* devicePointer)
 {
 	if (IsMounted() || !ContainsFileSystem())
 		return B_BAD_VALUE;
@@ -569,10 +571,13 @@ BPartition::Mount(const char* mountPoint, uint32 mountFlags,
 	}
 
 	// update object, if successful
-	if (device >= 0)
+	if (device >= 0) {
 		error = Device()->Update();
-
-	return device;
+		if (devicePointer != NULL)
+			*devicePointer = device;
+		return error;
+	}
+	return B_ERROR;
 }
 
 

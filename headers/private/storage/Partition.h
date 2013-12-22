@@ -68,9 +68,10 @@ public:
 									type_code* _type) const;
 			status_t			GetMountPoint(BPath* mountPoint) const;
 
-			dev_t				Mount(const char* mountPoint = NULL,
+			status_t			Mount(const char* mountPoint = NULL,
 									uint32 mountFlags = 0,
-									const char* parameters = NULL);
+									const char* parameters = NULL,
+									dev_t* devicePointer = NULL);
 			status_t			Unmount(uint32 unmountFlags = 0);
 
 	// Hierarchy Info
