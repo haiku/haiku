@@ -19,7 +19,7 @@ const bigtime_t kCacheExpire = 100000;
 
 
 static void
-switch_to_mode(void)
+switch_to_mode()
 {
 }
 
@@ -35,7 +35,7 @@ has_cache_expired(const ThreadData* threadData)
 {
 	ASSERT(!gSingleCore);
 
-	CoreEntry* core = threadData->GetCore();
+	CoreEntry* core = threadData->Core();
 
 	bigtime_t activeTime;
 	uint32 count;
@@ -48,39 +48,19 @@ has_cache_expired(const ThreadData* threadData)
 }
 
 
-static inline PackageEntry*
-get_most_idle_package(void)
-{
-	PackageEntry* current = &gPackageEntries[0];
-	for (int32 i = 1; i < gPackageCount; i++) {
-		if (gPackageEntries[i].fIdleCoreCount > current->fIdleCoreCount)
-			current = &gPackageEntries[i];
-	}
-
-	if (current->fIdleCoreCount == 0)
-		return NULL;
-
-	return current;
-}
-
-
 static CoreEntry*
 choose_core(const ThreadData* /* threadData */)
 {
-	ReadSpinLocker locker(gIdlePackageLock);
 	// wake new package
 	PackageEntry* package = gIdlePackageList.Last();
 	if (package == NULL) {
 		// wake new core
-		package = get_most_idle_package();
+		package = PackageEntry::GetMostIdlePackage();
 	}
-	locker.Unlock();
 
 	CoreEntry* core = NULL;
-	if (package != NULL) {
-		ReadSpinLocker _(package->fCoreLock);
-		core = package->fIdleCores.Last();
-	}
+	if (package != NULL)
+		core = package->GetIdleCore();
 
 	if (core == NULL) {
 		ReadSpinLocker coreLocker(gCoreHeapsLock);
@@ -98,7 +78,7 @@ choose_core(const ThreadData* /* threadData */)
 static bool
 should_rebalance(const ThreadData* threadData)
 {
-	int32 coreLoad = threadData->GetCore()->GetLoad();
+	int32 coreLoad = threadData->Core()->GetLoad();
 
 	// If the thread produces more than 50% of the load, leave it here. In
 	// such situation it is better to move other threads away.

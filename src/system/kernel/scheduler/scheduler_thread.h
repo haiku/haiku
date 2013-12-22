@@ -53,7 +53,7 @@ public:
 	inline	Thread*		GetThread() const	{ return fThread; }
 	inline	int32		GetLoad() const	{ return fLoad; }
 
-	inline	CoreEntry*	GetCore() const	{ return fCore; }
+	inline	CoreEntry*	Core() const	{ return fCore; }
 	inline	void		UnassignCore() { fCore = NULL; }
 
 			bigtime_t	fStolenTime;

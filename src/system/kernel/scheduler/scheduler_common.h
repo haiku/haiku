@@ -45,7 +45,7 @@ const int kLoadDifference = kMaxLoad * 20 / 100;
 extern bool gSingleCore;
 
 
-void init_debug_commands(void);
+void init_debug_commands();
 
 
 }	// namespace Scheduler

@@ -21,7 +21,7 @@ struct scheduler_mode_operations {
 
 	bigtime_t				maximum_latency;
 
-	void					(*switch_to_mode)(void);
+	void					(*switch_to_mode)();
 	void					(*set_cpu_enabled)(int32 cpu, bool enabled);
 	bool					(*has_cache_expired)(
 								const Scheduler::ThreadData* threadData);

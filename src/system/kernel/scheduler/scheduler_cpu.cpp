@@ -16,6 +16,13 @@
 using namespace Scheduler;
 
 
+class Scheduler::DebugDumper {
+public:
+	static	void		DumpIdleCoresInPackage(PackageEntry* package);
+
+};
+
+
 static CPUPriorityHeap sDebugCPUHeap;
 static CoreLoadHeap sDebugCoreHeap;
 
@@ -67,37 +74,10 @@ CPUEntry::UpdatePriority(int32 priority)
 		return;
 
 	PackageEntry* packageEntry = fCore->fPackage;
-	if (maxPriority == B_IDLE_PRIORITY) {
-		WriteSpinLocker _(packageEntry->fCoreLock);
-
-		// core goes idle
-		ASSERT(packageEntry->fIdleCoreCount >= 0);
-		ASSERT(packageEntry->fIdleCoreCount < packageEntry->fCoreCount);
-
-		packageEntry->fIdleCoreCount++;
-		packageEntry->fIdleCores.Add(fCore);
-
-		if (packageEntry->fIdleCoreCount == packageEntry->fCoreCount) {
-			// package goes idle
-			WriteSpinLocker _(gIdlePackageLock);
-			gIdlePackageList.Add(packageEntry);
-		}
-	} else if (corePriority == B_IDLE_PRIORITY) {
-		WriteSpinLocker _(packageEntry->fCoreLock);
-
-		// core wakes up
-		ASSERT(packageEntry->fIdleCoreCount > 0);
-		ASSERT(packageEntry->fIdleCoreCount <= packageEntry->fCoreCount);
-
-		packageEntry->fIdleCoreCount--;
-		packageEntry->fIdleCores.Remove(fCore);
-
-		if (packageEntry->fIdleCoreCount + 1 == packageEntry->fCoreCount) {
-			// package wakes up
-			WriteSpinLocker _(gIdlePackageLock);
-			gIdlePackageList.Remove(packageEntry);
-		}
-	}
+	if (maxPriority == B_IDLE_PRIORITY)
+		packageEntry->CoreGoesIdle(fCore);
+	else if (corePriority == B_IDLE_PRIORITY)
+		packageEntry->CoreWakesUp(fCore);
 }
 
 
@@ -371,6 +351,94 @@ PackageEntry::PackageEntry()
 }
 
 
+void
+PackageEntry::Init(int32 id)
+{
+	fPackageID = id;
+}
+
+
+inline void
+PackageEntry::CoreGoesIdle(CoreEntry* core)
+{
+	WriteSpinLocker _(fCoreLock);
+
+	ASSERT(fIdleCoreCount >= 0);
+	ASSERT(fIdleCoreCount < fCoreCount);
+
+	fIdleCoreCount++;
+	fIdleCores.Add(core);
+
+	if (fIdleCoreCount == fCoreCount) {
+		// package goes idle
+		WriteSpinLocker _(gIdlePackageLock);
+		gIdlePackageList.Add(this);
+	}
+}
+
+
+inline void
+PackageEntry::CoreWakesUp(CoreEntry* core)
+{
+	WriteSpinLocker _(fCoreLock);
+
+	ASSERT(fIdleCoreCount > 0);
+	ASSERT(fIdleCoreCount <= fCoreCount);
+
+	fIdleCoreCount--;
+	fIdleCores.Remove(core);
+
+	if (fIdleCoreCount + 1 == fCoreCount) {
+		// package wakes up
+		WriteSpinLocker _(gIdlePackageLock);
+		gIdlePackageList.Remove(this);
+	}
+}
+
+
+void
+PackageEntry::AddIdleCore(CoreEntry* core)
+{
+	fCoreCount++;
+	fIdleCoreCount++;
+	fIdleCores.Add(core);
+
+	if (fCoreCount == 1)
+		gIdlePackageList.Add(this);
+}
+
+
+void
+PackageEntry::RemoveIdleCore(CoreEntry* core)
+{
+	fIdleCores.Remove(core);
+	fIdleCoreCount--;
+	fCoreCount--;
+
+	if (fCoreCount == 0)
+		gIdlePackageList.Remove(this);
+}
+
+
+/* static */ void
+DebugDumper::DumpIdleCoresInPackage(PackageEntry* package)
+{
+	kprintf("%-7" B_PRId32 " ", package->fPackageID);
+
+	DoublyLinkedList<CoreEntry>::ReverseIterator iterator
+		= package->fIdleCores.GetReverseIterator();
+	if (iterator.HasNext()) {
+		while (iterator.HasNext()) {
+			CoreEntry* coreEntry = iterator.Next();
+			kprintf("%" B_PRId32 "%s", coreEntry->fCoreID,
+				iterator.HasNext() ? ", " : "");
+		}
+	} else
+		kprintf("-");
+	kprintf("\n");
+}
+
+
 static int
 dump_run_queue(int argc, char **argv)
 {
@@ -429,22 +497,8 @@ dump_idle_cores(int argc, char** argv)
 	if (idleIterator.HasNext()) {
 		kprintf("package cores\n");
 
-		while (idleIterator.HasNext()) {
-			PackageEntry* entry = idleIterator.Next();
-			kprintf("%-7" B_PRId32 " ", entry->fPackageID);
-
-			DoublyLinkedList<CoreEntry>::ReverseIterator iterator
-				= entry->fIdleCores.GetReverseIterator();
-			if (iterator.HasNext()) {
-				while (iterator.HasNext()) {
-					CoreEntry* coreEntry = iterator.Next();
-					kprintf("%" B_PRId32 "%s", coreEntry->fCoreID,
-						iterator.HasNext() ? ", " : "");
-				}
-			} else
-				kprintf("-");
-			kprintf("\n");
-		}
+		while (idleIterator.HasNext())
+			DebugDumper::DumpIdleCoresInPackage(idleIterator.Next());
 	} else
 		kprintf("No idle packages.\n");
 
@@ -452,7 +506,7 @@ dump_idle_cores(int argc, char** argv)
 }
 
 
-void Scheduler::init_debug_commands(void)
+void Scheduler::init_debug_commands()
 {
 	new(&sDebugCPUHeap) CPUPriorityHeap(smp_get_num_cpus());
 	new(&sDebugCoreHeap) CoreLoadHeap(smp_get_num_cpus());

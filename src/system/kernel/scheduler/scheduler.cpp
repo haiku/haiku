@@ -61,7 +61,7 @@ public:
 	}
 };
 
-class BigSchedulerLocking {
+class InterruptsBigSchedulerLocking {
 public:
 	bool Lock(int* lockable)
 	{
@@ -80,11 +80,11 @@ public:
 };
 
 class InterruptsBigSchedulerLocker :
-	public AutoLocker<int, BigSchedulerLocking> {
+	public AutoLocker<int, InterruptsBigSchedulerLocking> {
 public:
 	InterruptsBigSchedulerLocker()
 		:
-		AutoLocker<int, BigSchedulerLocking>(&fState, false, true)
+		AutoLocker<int, InterruptsBigSchedulerLocking>(&fState, false, true)
 	{
 	}
 
@@ -157,10 +157,10 @@ enqueue(Thread* thread, bool newOne)
 		targetCPU = &gCPUEntries[thread->previous_cpu->cpu_num];
 	} else if (gSingleCore)
 		targetCore = &gCoreEntries[0];
-	else if (threadData->GetCore() != NULL
+	else if (threadData->Core() != NULL
 		&& (!newOne || !threadData->HasCacheExpired())
 		&& !threadData->ShouldRebalance()) {
-		targetCore = threadData->GetCore();
+		targetCore = threadData->Core();
 	}
 
 	bool rescheduleNeeded = threadData->ChooseCoreAndCPU(targetCore, targetCPU);
@@ -194,7 +194,12 @@ enqueue(Thread* thread, bool newOne)
 void
 scheduler_enqueue_in_run_queue(Thread *thread)
 {
-	InterruptsSchedulerModeLocker _;
+#if KDEBUG
+	if (are_interrupts_enabled())
+		panic("scheduler_enqueue_in_run_queue: called with interrupts enabled");
+#endif
+
+	SchedulerModeLocker _;
 
 	TRACE("enqueueing new thread %ld with static priority %ld\n", thread->id,
 		thread->priority);
@@ -213,6 +218,11 @@ scheduler_enqueue_in_run_queue(Thread *thread)
 int32
 scheduler_set_thread_priority(Thread *thread, int32 priority)
 {
+#if KDEBUG
+	if (!are_interrupts_enabled())
+		panic("scheduler_set_thread_priority: called with interrupts disabled");
+#endif
+
 	InterruptsSpinLocker _(thread->scheduler_lock);
 	SchedulerModeLocker modeLocker;
 
@@ -230,12 +240,12 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 
 	if (thread->state != B_THREAD_READY) {
 		if (thread->state == B_THREAD_RUNNING) {
-			ASSERT(threadData->GetCore() != NULL);
+			ASSERT(threadData->Core() != NULL);
 
 			ASSERT(thread->cpu != NULL);
 			CPUEntry* cpu = &gCPUEntries[thread->cpu->cpu_num];
 
-			SpinLocker coreLocker(threadData->GetCore()->fCPULock);
+			SpinLocker coreLocker(threadData->Core()->fCPULock);
 			cpu->UpdatePriority(priority);
 		}
 
@@ -497,7 +507,7 @@ reschedule(int32 nextState)
 	NotifySchedulerListeners(&SchedulerListener::ThreadScheduled,
 		oldThread, nextThread);
 
-	ASSERT(nextThreadData->GetCore() == core);
+	ASSERT(nextThreadData->Core() == core);
 	nextThread->state = B_THREAD_RUNNING;
 
 	// update CPU heap
@@ -540,6 +550,11 @@ reschedule(int32 nextState)
 void
 scheduler_reschedule(int32 nextState)
 {
+#if KDEBUG
+	if (are_interrupts_enabled())
+		panic("scheduler_reschedule: called with interrupts enabled");
+#endif
+
 	if (!sSchedulerEnabled) {
 		Thread* thread = thread_get_current_thread();
 		if (thread != NULL && nextState != B_THREAD_READY)
@@ -588,7 +603,7 @@ scheduler_on_thread_destroy(Thread* thread)
 	thread. Interrupts must be disabled and will be disabled when returning.
 */
 void
-scheduler_start(void)
+scheduler_start()
 {
 	InterruptsSpinLocker _(thread_get_current_thread()->scheduler_lock);
 
@@ -621,7 +636,7 @@ unassign_thread(Thread* thread, void* data)
 {
 	CoreEntry* core = static_cast<CoreEntry*>(data);
 
-	if (thread->scheduler_data->GetCore() == core
+	if (thread->scheduler_data->Core() == core
 		&& thread->pinned_to_cpu == 0) {
 		thread->scheduler_data->UnassignCore();
 	}
@@ -631,6 +646,11 @@ unassign_thread(Thread* thread, void* data)
 void
 scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 {
+#if KDEBUG
+	if (are_interrupts_enabled())
+		panic("scheduler_set_cpu_enabled: called with interrupts enabled");
+#endif
+
 	dprintf("scheduler: %s CPU %" B_PRId32 "\n",
 		enabled ? "enabling" : "disabling", cpuID);
 
@@ -667,12 +687,7 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 			gCoreLoadHeap.RemoveMinimum();
 		}
 
-		package->fIdleCores.Remove(core);
-		package->fIdleCoreCount--;
-		package->fCoreCount--;
-
-		if (package->fCoreCount == 0)
-			gIdlePackageList.Remove(package);
+		package->RemoveIdleCore(core);
 
 		// get rid of threads
 		thread_map(unassign_thread, core);
@@ -689,7 +704,7 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 				threadData->fWentSleepCount = -1;
 			}
 
-			ASSERT(threadData->GetCore() == NULL);
+			ASSERT(threadData->Core() == NULL);
 			enqueue(threadData->GetThread(), false);
 		}
 	} else if (oldCPUCount == 0) {
@@ -701,12 +716,7 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 		core->fHighLoad = false;
 		gCoreLoadHeap.Insert(core, 0);
 
-		package->fCoreCount++;
-		package->fIdleCoreCount++;
-		package->fIdleCores.Add(core);
-
-		if (package->fCoreCount == 1)
-			gIdlePackageList.Add(package);
+		package->AddIdleCore(core);
 	}
 
 	if (enabled) {
@@ -846,11 +856,8 @@ init()
 
 	new(&gIdlePackageList) IdlePackageList;
 
-	for (int32 i = 0; i < packageCount; i++) {
-		gPackageEntries[i].fPackageID = i;
-		gPackageEntries[i].fCoreCount = coreCount / packageCount;
-		gIdlePackageList.Insert(&gPackageEntries[i]);
-	}
+	for (int32 i = 0; i < packageCount; i++)
+		gPackageEntries[i].Init(i);
 
 	for (int32 i = 0; i < coreCount; i++) {
 		gCoreEntries[i].fCoreID = i;
@@ -869,10 +876,8 @@ init()
 		gCPUEntries[i].fCore = core;
 		core->fPackage = package;
 
-		if (core->fCPUHeap.PeekMaximum() == NULL) {
-			package->fIdleCoreCount++;
-			package->fIdleCores.Insert(core);
-		}
+		if (core->fCPUHeap.PeekMaximum() == NULL)
+			package->AddIdleCore(core);
 
 		result = core->fCPUHeap.Insert(&gCPUEntries[i], B_IDLE_PRIORITY);
 		if (result != B_OK)
@@ -888,7 +893,7 @@ init()
 
 
 void
-scheduler_init(void)
+scheduler_init()
 {
 	int32 cpuCount = smp_get_num_cpus();
 	dprintf("scheduler_init: found %" B_PRId32 " logical cpu%s and %" B_PRId32
@@ -914,7 +919,7 @@ scheduler_init(void)
 
 
 void
-scheduler_enable_scheduling(void)
+scheduler_enable_scheduling()
 {
 	sSchedulerEnabled = true;
 }
@@ -972,7 +977,7 @@ _user_estimate_max_scheduling_latency(thread_id id)
 	BReference<Thread> threadReference(thread, true);
 
 	ThreadData* threadData = thread->scheduler_data;
-	CoreEntry* core = threadData->GetCore();
+	CoreEntry* core = threadData->Core();
 	if (core == NULL)
 		core = &gCoreEntries[get_random<int32>() % gCoreCount];
 
@@ -1003,7 +1008,7 @@ _user_set_scheduler_mode(int32 mode)
 
 
 int32
-_user_get_scheduler_mode(void)
+_user_get_scheduler_mode()
 {
 	return gCurrentModeID;
 }

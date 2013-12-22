@@ -21,6 +21,8 @@
 namespace Scheduler {
 
 
+class DebugDumper;
+
 struct ThreadData;
 
 struct CPUEntry;
@@ -122,15 +124,32 @@ public:
 // packages can go to the deep state of sleep). The heap stores only packages
 // with at least one core active and one core idle. The packages with all cores
 // idle are stored in gPackageIdleList (in LIFO manner).
-struct PackageEntry : public DoublyLinkedListLinkImpl<PackageEntry> {
+class PackageEntry : public DoublyLinkedListLinkImpl<PackageEntry> {
+public:
 											PackageEntry();
 
+						void				Init(int32 id);
+
+	inline				void				CoreGoesIdle(CoreEntry* core);
+	inline				void				CoreWakesUp(CoreEntry* core);
+
+	inline				CoreEntry*			GetIdleCore() const;
+
+						void				AddIdleCore(CoreEntry* core);
+						void				RemoveIdleCore(CoreEntry* core);
+
+	static inline		PackageEntry*		GetMostIdlePackage();
+	static inline		PackageEntry*		GetLeastIdlePackage();
+
+private:
 						int32				fPackageID;
 
 						DoublyLinkedList<CoreEntry>	fIdleCores;
 						int32				fIdleCoreCount;
 						int32				fCoreCount;
 						rw_spinlock			fCoreLock;
+
+						friend class DebugDumper;
 } CACHE_LINE_ALIGN;
 typedef DoublyLinkedList<PackageEntry> IdlePackageList;
 
@@ -160,6 +179,48 @@ CoreEntry::GetLoad() const
 CoreEntry::GetCore(int32 cpu)
 {
 	return gCPUEntries[cpu].fCore;
+}
+
+
+inline CoreEntry*
+PackageEntry::GetIdleCore() const
+{
+	return fIdleCores.Last();
+}
+
+
+/* static */ inline PackageEntry*
+PackageEntry::GetMostIdlePackage()
+{
+	PackageEntry* current = &gPackageEntries[0];
+	for (int32 i = 1; i < gPackageCount; i++) {
+		if (gPackageEntries[i].fIdleCoreCount > current->fIdleCoreCount)
+			current = &gPackageEntries[i];
+	}
+
+	if (current->fIdleCoreCount == 0)
+		return NULL;
+
+	return current;
+}
+
+
+/* static */ inline PackageEntry*
+PackageEntry::GetLeastIdlePackage()
+{
+	PackageEntry* package = NULL;
+
+	for (int32 i = 0; i < gPackageCount; i++) {
+		PackageEntry* current = &gPackageEntries[i];
+
+		int32 currentIdleCoreCount = current->fIdleCoreCount;
+		if (currentIdleCoreCount != 0 && (package == NULL
+				|| currentIdleCoreCount < package->fIdleCoreCount)) {
+			package = current;
+		}
+	}
+
+	return package;
 }
 
 

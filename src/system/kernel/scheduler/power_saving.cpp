@@ -22,7 +22,7 @@ static CoreEntry* sSmallTaskCore;
 
 
 static void
-switch_to_mode(void)
+switch_to_mode()
 {
 	sSmallTaskCore = NULL;
 }
@@ -46,7 +46,7 @@ has_cache_expired(const ThreadData* threadData)
 
 
 static CoreEntry*
-choose_small_task_core(void)
+choose_small_task_core()
 {
 	ReadSpinLocker locker(gCoreHeapsLock);
 	CoreEntry* core = gCoreLoadHeap.PeekMaximum();
@@ -64,27 +64,15 @@ choose_small_task_core(void)
 
 
 static CoreEntry*
-choose_idle_core(void)
+choose_idle_core()
 {
-	PackageEntry* package = NULL;
+	PackageEntry* package = PackageEntry::GetLeastIdlePackage();
 
-	for (int32 i = 0; i < gPackageCount; i++) {
-		PackageEntry* current = &gPackageEntries[i];
-		if (current->fIdleCoreCount != 0 && (package == NULL
-				|| current->fIdleCoreCount < package->fIdleCoreCount)) {
-			package = current;
-		}
-	}
-
-	if (package == NULL) {
-		ReadSpinLocker _(gIdlePackageLock);
+	if (package == NULL)
 		package = gIdlePackageList.Last();
-	}
 
-	if (package != NULL) {
-		ReadSpinLocker _(package->fCoreLock);
-		return package->fIdleCores.Last();
-	}
+	if (package != NULL)
+		return package->GetIdleCore();
 
 	return NULL;
 }
@@ -125,7 +113,7 @@ should_rebalance(const ThreadData* threadData)
 {
 	ASSERT(!gSingleCore);
 
-	CoreEntry* core = threadData->GetCore();
+	CoreEntry* core = threadData->Core();
 
 	int32 coreLoad = core->GetLoad();
 	if (coreLoad > kHighLoad) {
@@ -161,7 +149,7 @@ should_rebalance(const ThreadData* threadData)
 
 
 static inline void
-pack_irqs(void)
+pack_irqs()
 {
 	CoreEntry* smallTaskCore = atomic_pointer_get(&sSmallTaskCore);
 	if (smallTaskCore == NULL)
