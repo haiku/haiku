@@ -84,6 +84,8 @@ private:
 	virtual	void				_ReservedCheckBox3();
 
 private:
+	inline	BRect				_CheckBoxFrame(const font_height& fontHeight)
+									const;
 			BRect				_CheckBoxFrame() const;
 			BSize				_ValidatePreferredSize();
 			int32				_NextState() const;
