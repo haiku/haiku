@@ -51,4 +51,10 @@ struct perform_data_get_tool_tip_at {
 	bool		return_value;
 };
 
+struct perform_data_set_icon {
+	const BBitmap*	icon;
+	uint32			flags;
+};
+
+
 #endif /* _BINARY_COMPATIBILITY_INTERFACE_H_ */
