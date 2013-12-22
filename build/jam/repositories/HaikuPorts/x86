@@ -22,7 +22,7 @@ RemotePackageRepository HaikuPorts
 	bison-2.4.3-6
 	bzip2-1.0.6-3
 	cdrtools-3.01~a07-3
-	cmake-2.8.5-6
+	cmake-2.8.11.2-6
 	ctags-5.8-3
 	curl-7.26.0-5
 	curl_devel-7.26.0-5
