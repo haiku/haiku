@@ -306,7 +306,10 @@ DwarfType::ResolveObjectDataLocation(const ValueLocation& objectLocation,
 	if (count == 0)
 		return B_BAD_VALUE;
 
-	ValuePieceLocation piece = objectLocation.PieceAt(0);
+	ValuePieceLocation piece;
+	if (!piece.Copy(objectLocation.PieceAt(0)))
+		return B_NO_MEMORY;
+
 	if (count > 1 || piece.type != VALUE_PIECE_LOCATION_MEMORY
 		|| piece.size != 0 || piece.bitSize != 0) {
 		ValueLocation* location
@@ -376,7 +379,10 @@ DwarfType::ResolveLocation(DwarfTypeContext* typeContext,
 	bool bigEndian = typeContext->GetArchitecture()->IsBigEndian();
 	int32 count = _location.CountPieces();
 	for (int32 i = 0; i < count; i++) {
-		ValuePieceLocation piece = _location.PieceAt(i);
+		ValuePieceLocation piece;
+		if (!piece.Copy(_location.PieceAt(i)))
+			return B_NO_MEMORY;
+
 		if (piece.type == VALUE_PIECE_LOCATION_REGISTER) {
 			int32 reg = typeContext->FromDwarfRegisterMap()->MapRegisterIndex(
 				piece.reg);
@@ -403,17 +409,22 @@ DwarfType::ResolveLocation(DwarfTypeContext* typeContext,
 		}
 
 		piece.Normalize(bigEndian);
-		_location.SetPieceAt(i, piece);
+		if (!_location.SetPieceAt(i, piece))
+			return B_NO_MEMORY;
 	}
 
 	// If we only have one piece and that doesn't have a size, try to retrieve
 	// the size of the type.
 	if (count == 1) {
-		ValuePieceLocation piece = _location.PieceAt(0);
+		ValuePieceLocation piece;
+		if (!piece.Copy(_location.PieceAt(0)))
+			return B_NO_MEMORY;
+
 		if (piece.IsValid() && piece.size == 0 && piece.bitSize == 0) {
 			piece.SetSize(ByteSize());
 				// TODO: Use bit size and bit offset, if specified!
-			_location.SetPieceAt(0, piece);
+			if (!_location.SetPieceAt(0, piece))
+				return B_NO_MEMORY;
 
 			TRACE_LOCALS("  set single piece size to %" B_PRIu64 "\n",
 				ByteSize());
@@ -904,7 +915,8 @@ DwarfCompoundType::_ResolveDataMemberLocation(DwarfType* memberType,
 			// location to be a memory location.
 			if (parentLocation.CountPieces() != 1)
 				return B_BAD_VALUE;
-			ValuePieceLocation piece = parentLocation.PieceAt(0);
+			const ValuePieceLocation& piece = parentLocation.PieceAt(0);
+
 			if (piece.type != VALUE_PIECE_LOCATION_MEMORY)
 				return B_BAD_VALUE;
 
@@ -938,7 +950,10 @@ DwarfCompoundType::_ResolveDataMemberLocation(DwarfType* memberType,
 			// the location by hand since we don't want the size difference
 			// between the overall union and the member being
 			// factored into the assigned address.
-			ValuePieceLocation piece = parentLocation.PieceAt(0);
+			ValuePieceLocation piece;
+			if (!piece.Copy(parentLocation.PieceAt(0)))
+				return B_NO_MEMORY;
+
 			piece.SetSize(memberType->ByteSize());
 			if (!location->AddPiece(piece))
 				return B_NO_MEMORY;
@@ -1123,7 +1138,10 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 	// If we have a single memory piece location for the array, we compute the
 	// element's location by hand -- not uncommonly the array size isn't known.
 	if (parentLocation.CountPieces() == 1) {
-		ValuePieceLocation piece = parentLocation.PieceAt(0);
+		ValuePieceLocation piece;
+		if (!piece.Copy(parentLocation.PieceAt(0)))
+			return B_NO_MEMORY;
+
 		if (piece.type == VALUE_PIECE_LOCATION_MEMORY) {
 			int64 byteOffset = elementOffset >= 0
 				? elementOffset / 8 : (elementOffset - 7) / 8;

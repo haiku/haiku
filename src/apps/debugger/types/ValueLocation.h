@@ -6,8 +6,11 @@
 #ifndef VALUE_LOCATION_H
 #define VALUE_LOCATION_H
 
+#include <vector>
 
-#include <Array.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <Referenceable.h>
 
 #include "Types.h"
@@ -43,10 +46,41 @@ struct ValuePieceLocation {
 	{
 	}
 
+	ValuePieceLocation(const ValuePieceLocation& other)
+	{
+		if (!Copy(other))
+			throw std::bad_alloc();
+	}
+
 	~ValuePieceLocation()
 	{
 		if (value != NULL)
 			free(value);
+	}
+
+	ValuePieceLocation& operator=(const ValuePieceLocation& other)
+	{
+		if (!Copy(other))
+			throw std::bad_alloc();
+
+		return *this;
+	}
+
+	bool Copy(const ValuePieceLocation& other)
+	{
+		memcpy(this, &other, sizeof(ValuePieceLocation));
+		if (type == VALUE_PIECE_LOCATION_IMPLICIT) {
+			void* tempValue = malloc(size);
+			if (tempValue == NULL) {
+				type = VALUE_PIECE_LOCATION_INVALID;
+				return false;
+			}
+
+			memcpy(tempValue, value, other.size);
+			value = tempValue;
+		}
+
+		return true;
 	}
 
 	bool IsValid() const
@@ -107,6 +141,7 @@ public:
 								ValueLocation(bool bigEndian);
 								ValueLocation(bool bigEndian,
 									const ValuePieceLocation& piece);
+
 								ValueLocation(const ValueLocation& other);
 
 			bool				SetToByteOffset(const ValueLocation& other,
@@ -123,18 +158,17 @@ public:
 
 			int32				CountPieces() const;
 			ValuePieceLocation	PieceAt(int32 index) const;
-			void				SetPieceAt(int32 index,
+			bool				SetPieceAt(int32 index,
 									const ValuePieceLocation& piece);
-
 			ValueLocation&		operator=(const ValueLocation& other);
 
 			void				Dump() const;
 
 private:
-	typedef Array<ValuePieceLocation> PieceArray;
+	typedef std::vector<ValuePieceLocation> PieceVector;
 
 private:
-			PieceArray			fPieces;
+			PieceVector			fPieces;
 			bool				fBigEndian;
 };
 
