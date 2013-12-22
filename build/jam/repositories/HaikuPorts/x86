@@ -108,6 +108,8 @@ RemotePackageRepository HaikuPorts
 	pkgconfig-0.27.1-1
 	python-2.6.8-6
 	readline-6.2-3
+	ruby-1.9.1-2
+	ruby_devel-1.9.1-2
 	scons-2.2.0-2
 	sed-4.2.1-6
 	speex-1.2~rc1-2
@@ -237,6 +239,7 @@ RemotePackageRepository HaikuPorts
 	pkgconfig
 	python
 	readline
+	ruby
 	scons
 	sed
 	speex
