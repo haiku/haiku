@@ -38,13 +38,19 @@ RemotePackageRepository HaikuPorts
 	expat_devel-2.0.1-7
 	ffmpeg-0.10.2-4
 	ffmpeg_devel-0.10.2-4
+	flac-1.3.0-1
+	flac_devel-1.3.0-1
 	flex-2.5.35-6
 	freetype-2.4.9-3
 	freetype_devel-2.4.9-3
+	fribidi-0.19.5-1
+	fribidi_devel-0.19.5-1	
 	friss-0.8beta-1
 	gcc-2.95.3_2013_08_15-2
 	gettext-0.18.1.1-5
 	gettext_libintl-0.18.1.1-5
+	giflib-5.0.5-2
+	giflib_devel-5.0.5-2
 	git-1.8.3.4-2
 	git_arch-1.8.3.4-2
 	git_cvs-1.8.3.4-2
@@ -57,6 +63,8 @@ RemotePackageRepository HaikuPorts
 	gperf-3.0.4-1
 	grep-2.14-5
 	groff-1.20.1-3
+	guilib-1.2.1-1
+	guilib_devel-1.2.1-1
 	htmldoc-1.8.27-3
 	icu-4.8.1.1-4
 	icu_devel-4.8.1.1-4
@@ -65,18 +73,34 @@ RemotePackageRepository HaikuPorts
 	jpeg_devel-9-3
 	jpeg_tools-9-3
 	keymapswitcher-1.2.7.10-1
+	lcms-2.5-1
+	lcms_devel-2.5-1	
 	lha-1.14i-1
+	libao-1.0.0-1
+	libao_devel-1.0.0-1
+	libart_lgpl-2.3.21-1
+	libart_lgpl_devel-2.3.21-1
 	libedit-2012_06_01_3.0-1
 	libiconv-1.13.1-6
 	libiconv_devel-1.13.1-6
 	liblayout-1.4.1-1
 	liblayout_devel-1.4.1-1
+	libmad-0.15.1b-1
+	libmad_devel-0.15.1b-1
+	libmikmod-3.3.3-1
+	libmikmod_devel-3.3.3-1
+	libmodplug-0.8.8.4-1
+	libmodplug_devel-0.8.8.4-1
 	libogg-1.3.0-2
 	libogg_devel-1.3.0-2
+	libpaper-1.1.24-1
+	libpaper_devel-1.1.24-1
 	libpcre-8.21-5
 	libpcre_devel-8.21-5
 	libpng-1.5.12-3
 	libpng_devel-1.5.12-3
+	libsdl-1.2.15-1
+	libsdl_devel-1.2.15-1
 	libsolv-0.3.0_haiku_2013_10_01-1
 	libsolv_devel-0.3.0_haiku_2013_10_01-1
 	libtheora-1.1.1-2
@@ -87,6 +111,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis_devel-1.3.2-2
 	libvpx-1.0.0-2
 	libvpx_devel-1.0.0-2
+	libwebp-0.3.1-1
+	libwebp_devel-0.3.1-1
 	libxml2-2.8.0-6
 	libxml2_devel-2.8.0-6
 	libxml2_python-2.8.0-6
@@ -111,6 +137,8 @@ RemotePackageRepository HaikuPorts
 	p7zip-9.20.1-4
 	pe-2.4.3_hg602-4
 	perl-5.18.1-1
+	phyfs-2.0.3-1
+	phyfs_devel-2.0.3-1
 	pkgconfig-0.27.1-1
 	python-2.6.8-6
 	readline-6.2-3
@@ -118,7 +146,25 @@ RemotePackageRepository HaikuPorts
 	ruby-1.9.1-2
 	ruby_devel-1.9.1-2
 	scons-2.2.0-2
+	sdl_gfx-2.0.24-1
+	sdl_gfx_devel-2.0.24-1
+	sdl_image-1.2.12-1
+	sdl_image_devel-1.2.12-1
+	sdl_mixer-1.2.12-1
+	sdl_mixer_devel-1.2.12-1
+	sdl_net-1.2.8-1
+	sdl_net_devel-1.2.8-1
+	sdl_sound-1.0.3-1
+	sdl_sound_devel-1.0.3-1
+	sdl_ttf-2.0.11-1
+	sdl_ttf_devel-2.0.11-1
 	sed-4.2.1-6
+	sge-030809-1
+	sge_devel-030809-1
+	smjpeg-0.2.1-1
+	smjpeg_devel-0.2.1-1
+	smpeg-0.4.5-1
+	smpeg_devel-0.4.5-1
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
 	sqlite-3.8.0.2-1
@@ -131,6 +177,7 @@ RemotePackageRepository HaikuPorts
 	unrar-4.2.4-1
 	vim-7.3-1
 	vision-0.9.7.r947-2
+	vorbis_tools-1.4.0-1
 	which-2.20-1
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-3
@@ -144,6 +191,10 @@ RemotePackageRepository HaikuPorts
 	curl_x86_devel-7.26.0-5
 	expat_x86-2.0.1-7
 	expat_x86_devel-2.0.1-7
+	flac_x86-1.3.0-1
+	flac_x86_devel-1.3.0-1
+	fribidi_x86-0.19.5-1
+	fribidi_x86_devel-0.19.5-1
 	ffmpeg_x86-0.10.2-3
 	ffmpeg_x86_devel-0.10.2-3
 	freetype_x86-2.4.9-3
@@ -151,20 +202,40 @@ RemotePackageRepository HaikuPorts
 	gcc_x86-4.7.3_2013_08_12-3
 	gettext_x86-0.18.1.1-5
 	gettext_x86_libintl-0.18.1.1-5
+	giflib_x86-5.0.5-2
+	giflib_x86_devel-5.0.5-2
 	glu_x86-9.0.0-2
 	glu_x86_devel-9.0.0-2
+	guilib_x86-1.2.1-1
+	guilib_x86_devel-1.2.1-1
 	haikuwebkit_x86-1.2.1-1
 	haikuwebkit_x86_devel-1.2.1-1
 	icu_x86-4.8.1.1-4
 	icu_x86_devel-4.8.1.1-4
 	jpeg_x86-9-3
 	jpeg_x86_devel-9-3
+	lcms_x86-2.5-1
+	lcms_x86_devel-2.5-1
+	libao_x86-1.0.0-1
+	libao_x86_devel-1.0.0-1
+	libart_lgpl_x86-2.3.21-1
+	libart_lgpl_x86_devel-2.3.21-1
 	libiconv_x86-1.13.1-6
 	libiconv_x86_devel-1.13.1-6
+	libmad_x86-0.15.1b-1
+	libmad_x86_devel-0.15.1b-1
+	libmikmod_x86-3.3.3-1
+	libmikmod_x86_devel-3.3.3-1
+	libmodplug_x86-0.8.8.4-1
+	libmodplug_x86_devel-0.8.8.4-1
 	libogg_x86-1.3.0-2
 	libogg_x86_devel-1.3.0-2
+	libpaper_x86-1.1.24-1
+	libpaper_x86_devel-1.1.24-1
 	libpng_x86-1.5.12-3
 	libpng_x86_devel-1.5.12-3
+	libsdl_x86-1.2.15-1
+	libsdl_x86_devel-1.2.15-1
 	libsolv_x86-0.3.0_haiku_2013_10_01-1
 	libsolv_x86_devel-0.3.0_haiku_2013_10_01-1
 	libtheora_x86-1.1.1-2
@@ -173,6 +244,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis_x86_devel-1.3.2-2
 	libvpx_x86-1.0.0-2
 	libvpx_x86_devel-1.0.0-2
+	libwebp_x86-0.3.1-1
+	libwebp_x86_devel-0.3.1-1
 	libxml2_x86-2.8.0-6
 	libxml2_x86_devel-2.8.0-6
 	libxslt_x86-1.1.28-2
@@ -184,11 +257,32 @@ RemotePackageRepository HaikuPorts
 	ninja_x86-1.4.0-1
 	openssl_x86-1.0.0j-4
 	openssl_x86_devel-1.0.0j-4
+	physfs_x86-2.0.3-1
+	physfs_x86_devel-2.0.3-1
 	quicklaunch-0.9.6-1
+	sdl_gfx_x86-2.0.24-1
+	sdl_gfx_x86_devel-2.0.24-1
+	sdl_image_x86-1.2.12-1
+	sdl_image_x86_devel-1.2.12-1
+	sdl_mixer_x86-1.2.12-1
+	sdl_mixer_x86_devel-1.2.12-1
+	sdl_net_x86-1.2.8-1
+	sdl_net_x86_devel-1.2.8-1
+	sdl_sound_x86-1.0.3-1
+	sdl_sound_x86_devel-1.0.3-1
+	sdl_ttf_x86-2.0.11-1
+	sdl_ttf_x86_devel-2.0.11-1
+	sge_x86-030809-1
+	sge_x86_devel-030809-1
+	smjpeg_x86-0.2.1-1
+	smjpeg_x86_devel-0.2.1-1
+	smpeg_x86-0.4.5-1
+	smpeg_x86_devel-0.4.5-1
 	speex_x86-1.2~rc1-2
 	speex_x86_devel-1.2~rc1-2
 	sqlite_x86-3.8.0.2-1
 	sqlite_x86_devel-3.8.0.2-1
+	vorbis_tools_x86-1.4.0-1
 	xz_utils_x86-5.0.4-1
 	zlib_x86-1.2.8-3
 	zlib_x86_devel-1.2.8-3
@@ -214,33 +308,45 @@ RemotePackageRepository HaikuPorts
 	doxygen
 	expat
 	ffmpeg
+	flac
 	flex
 	freetype
+	fribidi
 	friss
 	gcc
 	gcc_x86
 	gettext
+	giflib
 	git
 	glu
 	gperf
 	grep
 	groff
+	guilib
 	htmldoc
 	icu
 	jam
 	jpeg
 	keymapswitcher
+	lcms
 	lha
+	libao
+	libart_lgpl
 	libedit
 	libiconv
+	libmad
+	libmikmod
+	libmodplug
 	libogg
 	libpcre
 	libpng
 	libsolv
+	libsdl
 	libtheora
 	libtool
 	libvorbis
 	libvpx
+	libwebp
 	libxml2
 	libxml2_x86
 	libxslt
@@ -261,13 +367,23 @@ RemotePackageRepository HaikuPorts
 	p7zip
 	pe
 	perl
+	physfs
 	pkgconfig
 	python
 	quicklaunch
 	readline
 	ruby
 	scons
+	sdl_gfx
+	sdl_image
+	sdl_mixer
+	sdl_net
+	sdl_sound
+	sdl_ttf
 	sed
+	sge
+	smjpeg
+	smpeg
 	speex
 	sqlite
 	sqlite_x86
@@ -278,6 +394,7 @@ RemotePackageRepository HaikuPorts
 	texinfo
 	vim
 	vision
+	vorbis_tools
 	which
 	wpa_supplicant
 	yasm
