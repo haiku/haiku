@@ -150,8 +150,8 @@ RemotePackageRepository HaikuPorts
 	sdl_gfx_devel-2.0.24-1
 	sdl_image-1.2.12-1
 	sdl_image_devel-1.2.12-1
-	sdl_mixer-1.2.12-1
-	sdl_mixer_devel-1.2.12-1
+	sdl_mixer-1.2.12-2
+	sdl_mixer_devel-1.2.12-2
 	sdl_net-1.2.8-1
 	sdl_net_devel-1.2.8-1
 	sdl_sound-1.0.3-1
