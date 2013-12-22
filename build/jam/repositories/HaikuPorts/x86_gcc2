@@ -137,8 +137,8 @@ RemotePackageRepository HaikuPorts
 	p7zip-9.20.1-4
 	pe-2.4.3_hg602-4
 	perl-5.18.1-1
-	phyfs-2.0.3-1
-	phyfs_devel-2.0.3-1
+	physfs-2.0.3-1
+	physfs_devel-2.0.3-1
 	pkgconfig-0.27.1-1
 	python-2.6.8-6
 	readline-6.2-3
