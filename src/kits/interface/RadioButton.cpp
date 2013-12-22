@@ -15,6 +15,8 @@
 
 #include <RadioButton.h>
 
+#include <algorithm>
+
 #include <ControlLook.h>
 #include <Debug.h>
 #include <Box.h>
@@ -100,10 +102,13 @@ BRadioButton::Draw(BRect updateRect)
 	be_control_look->DrawRadioButton(this, rect, updateRect, base, flags);
 
 	BRect labelRect(Bounds());
-	labelRect.left = knobRect.right
+	labelRect.left = knobRect.right + 1
 		+ be_control_look->DefaultLabelSpacing();
 
-	be_control_look->DrawLabel(this, Label(), labelRect, updateRect,
+	const BBitmap* icon = IconBitmap(
+		B_INACTIVE_ICON_BITMAP | (IsEnabled() ? 0 : B_DISABLED_ICON_BITMAP));
+
+	be_control_look->DrawLabel(this, Label(), icon, labelRect, updateRect,
 		base, flags);
 }
 
@@ -246,19 +251,29 @@ BRadioButton::GetPreferredSize(float* _width, float* _height)
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
-	if (_width) {
-		BRect rect = _KnobFrame(fontHeight);
-		float width = rect.right + floorf(ceilf(fontHeight.ascent
-			+ fontHeight.descent) / 2.0);
+	BRect rect(_KnobFrame(fontHeight));
+	float width = rect.right + rect.left;
+	float height = rect.bottom + rect.top;
 
-		if (Label())
-			width += StringWidth(Label());
-	
-		*_width = ceilf(width);
+	const BBitmap* icon = IconBitmap(B_INACTIVE_ICON_BITMAP);
+	if (icon != NULL) {
+		width += be_control_look->DefaultLabelSpacing()
+			+ icon->Bounds().Width() + 1;
+		height = std::max(height, icon->Bounds().Height());
 	}
 
-	if (_height)
-		*_height = ceilf(fontHeight.ascent + fontHeight.descent) + 6.0;
+	if (const char* label = Label()) {
+		width += be_control_look->DefaultLabelSpacing()
+			+ ceilf(StringWidth(label));
+		height = std::max(height,
+			ceilf(6.0f + fontHeight.ascent + fontHeight.descent));
+	}
+
+	if (_width != NULL)
+		*_width = width;
+
+	if (_height != NULL)
+		*_height = height;
 }
 
 
@@ -467,7 +482,7 @@ BRadioButton::LayoutAlignment()
 status_t
 BRadioButton::SetIcon(const BBitmap* icon, uint32 flags)
 {
-	return BControl::SetIcon(icon, flags);
+	return BControl::SetIcon(icon, flags | B_CREATE_DISABLED_ICON_BITMAPS);
 }
 
 
