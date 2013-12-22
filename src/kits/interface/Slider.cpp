@@ -345,6 +345,11 @@ BSlider::Perform(perform_code code, void* _data)
 			BSlider::DoLayout();
 			return B_OK;
 		}
+		case PERFORM_CODE_SET_ICON:
+		{
+			perform_data_set_icon* data = (perform_data_set_icon*)_data;
+			return BSlider::SetIcon(data->icon, data->flags);
+		}
 	}
 
 	return BControl::Perform(code, _data);
@@ -1765,6 +1770,13 @@ BSlider::PreferredSize()
 	else
 		preferredSize.height = max_c(100.0, preferredSize.height);
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), preferredSize);
+}
+
+
+status_t
+BSlider::SetIcon(const BBitmap* icon, uint32 flags)
+{
+	return BControl::SetIcon(icon, flags);
 }
 
 

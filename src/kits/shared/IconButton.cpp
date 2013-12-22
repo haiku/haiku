@@ -382,7 +382,7 @@ BIconButton::SetIcon(const char* pathToBitmap)
 
 
 status_t
-BIconButton::SetIcon(const BBitmap* bitmap)
+BIconButton::SetIcon(const BBitmap* bitmap, uint32 flags)
 {
 	if (bitmap && bitmap->ColorSpace() == B_CMAP8) {
 		status_t status = bitmap->InitCheck();

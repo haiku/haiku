@@ -1037,6 +1037,13 @@ BColorControl::AllDetached()
 
 
 status_t
+BColorControl::SetIcon(const BBitmap* icon, uint32 flags)
+{
+	return BControl::SetIcon(icon, flags);
+}
+
+
+status_t
 BColorControl::Perform(perform_code code, void* _data)
 {
 	switch (code) {
@@ -1085,6 +1092,11 @@ BColorControl::Perform(perform_code code, void* _data)
 		{
 			BColorControl::DoLayout();
 			return B_OK;
+		}
+		case PERFORM_CODE_SET_ICON:
+		{
+			perform_data_set_icon* data = (perform_data_set_icon*)_data;
+			return BColorControl::SetIcon(data->icon, data->flags);
 		}
 	}
 

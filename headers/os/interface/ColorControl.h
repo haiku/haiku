@@ -76,6 +76,8 @@ public:
 	virtual	void				AllAttached();
 	virtual	void				AllDetached();
 
+	virtual	status_t			SetIcon(const BBitmap* icon, uint32 flags = 0);
+
 private:
 	virtual	status_t			Perform(perform_code d, void *arg);
 		// this can be made public again if needed

@@ -79,6 +79,8 @@ public:
 
 	virtual	status_t			Perform(perform_code code, void* data);
 
+	virtual	status_t			SetIcon(const BBitmap* icon, uint32 flags = 0);
+
 private:
 	// FBC padding and forbidden methods
 	virtual	void				_ReservedPictureButton1();

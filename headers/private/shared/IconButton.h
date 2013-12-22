@@ -71,7 +71,8 @@ public:
 
 			status_t			SetIcon(int32 resourceID);
 			status_t			SetIcon(const char* pathToBitmap);
-			status_t			SetIcon(const BBitmap* bitmap);
+	virtual	status_t			SetIcon(const BBitmap* bitmap,
+									uint32 flags = 0);
 			status_t			SetIcon(const BMimeType* fileType,
 									bool small = true);
 			status_t			SetIcon(const unsigned char* bitsFromQuickRes,

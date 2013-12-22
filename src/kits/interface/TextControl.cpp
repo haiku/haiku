@@ -947,6 +947,13 @@ BTextControl::DoLayout()
 }
 
 
+status_t
+BTextControl::SetIcon(const BBitmap* icon, uint32 flags)
+{
+	return BControl::SetIcon(icon, flags);
+}
+
+
 // #pragma mark -
 
 
@@ -981,7 +988,7 @@ BTextControl::Perform(perform_code code, void* _data)
 			BTextControl::GetHeightForWidth(data->width, &data->min, &data->max,
 				&data->preferred);
 			return B_OK;
-}
+		}
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
@@ -999,6 +1006,11 @@ BTextControl::Perform(perform_code code, void* _data)
 		{
 			BTextControl::DoLayout();
 			return B_OK;
+		}
+		case PERFORM_CODE_SET_ICON:
+		{
+			perform_data_set_icon* data = (perform_data_set_icon*)_data;
+			return BTextControl::SetIcon(data->icon, data->flags);
 		}
 		case PERFORM_CODE_ALL_UNARCHIVED:
 		{

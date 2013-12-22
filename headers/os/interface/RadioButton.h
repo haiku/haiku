@@ -63,6 +63,8 @@ public:
 	virtual	BSize				MaxSize();
 	virtual	BAlignment			LayoutAlignment();
 
+	virtual	status_t			SetIcon(const BBitmap* icon, uint32 flags = 0);
+
 private:
 	friend	status_t			_init_interface_kit_();
 

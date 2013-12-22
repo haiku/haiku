@@ -661,6 +661,11 @@ BButton::Perform(perform_code code, void* _data)
 			BButton::DoLayout();
 			return B_OK;
 		}
+		case PERFORM_CODE_SET_ICON:
+		{
+			perform_data_set_icon* data = (perform_data_set_icon*)_data;
+			return BButton::SetIcon(data->icon, data->flags);
+		}
 	}
 
 	return BControl::Perform(code, _data);
@@ -688,6 +693,13 @@ BButton::PreferredSize()
 {
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
 		_ValidatePreferredSize());
+}
+
+
+status_t
+BButton::SetIcon(const BBitmap* icon, uint32 flags)
+{
+	return BControl::SetIcon(icon, flags);
 }
 
 

@@ -470,9 +470,21 @@ BPictureButton::Perform(perform_code code, void* _data)
 			BPictureButton::DoLayout();
 			return B_OK;
 		}
+		case PERFORM_CODE_SET_ICON:
+		{
+			perform_data_set_icon* data = (perform_data_set_icon*)_data;
+			return BPictureButton::SetIcon(data->icon, data->flags);
+		}
 	}
 
 	return BControl::Perform(code, _data);
+}
+
+
+status_t
+BPictureButton::SetIcon(const BBitmap* icon, uint32 flags)
+{
+	return BControl::SetIcon(icon, flags);
 }
 
 
