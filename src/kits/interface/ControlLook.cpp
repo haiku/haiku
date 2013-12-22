@@ -1889,7 +1889,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 	}
 
 	// label, possibly with icon
-	float availableWidth = rect.Width();
+	float availableWidth = rect.Width() + 1;
 	float width = 0;
 	float textOffset = 0;
 	float height = 0;
@@ -1908,7 +1908,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 	view->GetFont(&font);
 
 	font.TruncateString(&truncatedLabel, B_TRUNCATE_END, availableWidth);
-	width += font.StringWidth(truncatedLabel.String());
+	width += ceilf(font.StringWidth(truncatedLabel.String()));
 
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
