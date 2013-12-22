@@ -31,7 +31,8 @@ apic_available()
 }
 
 
-bool x2apic_available()
+bool
+x2apic_available()
 {
 	return sX2APIC;
 }
