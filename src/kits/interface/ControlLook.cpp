@@ -1902,6 +1902,86 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 
 
 void
+BControlLook::GetFrameInsets(frame_type frameType, uint32 flags, float& _left,
+	float& _top, float& _right, float& _bottom)
+{
+	// All frames have the same inset on each side.
+	float inset = 0;
+
+	switch (frameType) {
+		case B_BUTTON_FRAME:
+			inset = (flags & B_DEFAULT_BUTTON) != 0 ? 6 : 3;
+			break;
+		case B_GROUP_FRAME:
+		case B_MENU_FIELD_FRAME:
+			inset = 3;
+			break;
+		case B_SCROLL_VIEW_FRAME:
+		case B_TEXT_CONTROL_FRAME:
+			inset = 2;
+			break;
+	}
+
+	_left = inset;
+	_top = inset;
+	_right = inset;
+	_bottom = inset;
+}
+
+
+void
+BControlLook::GetBackgroundInsets(background_type backgroundType,
+	uint32 flags, float& _left, float& _top, float& _right, float& _bottom)
+{
+	// Most backgrounds have the same inset on each side.
+	float inset = 0;
+
+	switch (backgroundType) {
+		case B_BUTTON_BACKGROUND:
+		case B_MENU_BACKGROUND:
+		case B_MENU_BAR_BACKGROUND:
+		case B_MENU_FIELD_BACKGROUND:
+		case B_MENU_ITEM_BACKGROUND:
+			inset = 1;
+			break;
+		case B_HORIZONTAL_SCROLL_BAR_BACKGROUND:
+			_left = 2;
+			_top = 0;
+			_right = 1;
+			_bottom = 0;
+			return;
+		case B_VERTICAL_SCROLL_BAR_BACKGROUND:
+			_left = 0;
+			_top = 2;
+			_right = 0;
+			_bottom = 1;
+			return;
+	}
+
+	_left = inset;
+	_top = inset;
+	_right = inset;
+	_bottom = inset;
+}
+
+
+void
+BControlLook::GetInsets(frame_type frameType, background_type backgroundType,
+	uint32 flags, float& _left, float& _top, float& _right, float& _bottom)
+{
+	GetFrameInsets(frameType, flags, _left, _top, _right, _bottom);
+
+	float left, top, right, bottom;
+	GetBackgroundInsets(backgroundType, flags, left, top, right, bottom);
+
+	_left += left;
+	_top += top;
+	_right += right;
+	_bottom += bottom;
+}
+
+
+void
 BControlLook::SetBackgroundInfo(const BMessage& backgroundInfo)
 {
 	fBackgroundInfo = backgroundInfo;

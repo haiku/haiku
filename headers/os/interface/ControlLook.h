@@ -35,16 +35,20 @@ public:
 
 	enum frame_type {
 		B_BUTTON_FRAME,
-		B_MENU_FRAME,
-		B_LISTVIEW_FRAME,
-		B_INPUT_FRAME
+		B_GROUP_FRAME,
+		B_MENU_FIELD_FRAME,
+		B_SCROLL_VIEW_FRAME,
+		B_TEXT_CONTROL_FRAME,
 	};
 
 	enum background_type {
 		B_BUTTON_BACKGROUND,
 		B_MENU_BACKGROUND,
-		B_LISTVIEW_BACKGROUND,
-		B_INPUT_BACKGROUND
+		B_MENU_BAR_BACKGROUND,
+		B_MENU_FIELD_BACKGROUND,
+		B_MENU_ITEM_BACKGROUND,
+		B_HORIZONTAL_SCROLL_BAR_BACKGROUND,
+		B_VERTICAL_SCROLL_BAR_BACKGROUND,
 	};
 
 	enum {
@@ -331,6 +335,18 @@ public:
 	/*virtual*/	void			DrawLabel(BView* view, const char* label,
 									const rgb_color& base, uint32 flags,
 									const BPoint& where);
+
+	virtual	void				GetFrameInsets(frame_type frameType,
+									uint32 flags, float& _left, float& _top,
+									float& _right, float& _bottom);
+	virtual	void				GetBackgroundInsets(
+									background_type backgroundType,
+									uint32 flags, float& _left, float& _top,
+									float& _right, float& _bottom);
+			void				GetInsets(frame_type frameType,
+									background_type backgroundType,
+									uint32 flags, float& _left, float& _top,
+									float& _right, float& _bottom);
 
 			void				SetBackgroundInfo(
 									const BMessage& backgroundInfo);
