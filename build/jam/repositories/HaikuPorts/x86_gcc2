@@ -266,8 +266,6 @@ RemotePackageRepository HaikuPorts
 	sdl_gfx_x86_devel-2.0.24-1
 	sdl_image_x86-1.2.12-1
 	sdl_image_x86_devel-1.2.12-1
-	sdl_mixer_x86-1.2.12-1
-	sdl_mixer_x86_devel-1.2.12-1
 	sdl_net_x86-1.2.8-1
 	sdl_net_x86_devel-1.2.8-1
 	sdl_sound_x86-1.0.3-1
