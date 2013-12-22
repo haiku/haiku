@@ -13,8 +13,10 @@
 
 #include <Button.h>
 
+#include <algorithm>
 #include <new>
 
+#include <Bitmap.h>
 #include <ControlLook.h>
 #include <Font.h>
 #include <LayoutUtils.h>
@@ -22,6 +24,9 @@
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
+
+
+static const float kLabelMargin = 3;
 
 
 BButton::BButton(BRect frame, const char* name, const char* label,
@@ -103,246 +108,25 @@ BButton::Archive(BMessage* archive, bool deep) const
 void
 BButton::Draw(BRect updateRect)
 {
-	if (be_control_look != NULL) {
-		BRect rect(Bounds());
-		rgb_color background = LowColor();
-		rgb_color base = background;
-		uint32 flags = be_control_look->Flags(this);
-		if (IsDefault())
-			flags |= BControlLook::B_DEFAULT_BUTTON;
-		be_control_look->DrawButtonFrame(this, rect, updateRect,
-			base, background, flags);
-		be_control_look->DrawButtonBackground(this, rect, updateRect,
-			base, flags);
-
-		// always leave some room around the label
-		rect.InsetBy(3.0, 3.0);
-		be_control_look->DrawLabel(this, Label(), rect, updateRect,
-			base, flags, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
-		return;
-	}
-
-	font_height fh;
-	GetFontHeight(&fh);
-
-	const BRect bounds = Bounds();
-	BRect rect = bounds;
-
-	const bool enabled = IsEnabled();
-	const bool pushed = Value() == B_CONTROL_ON;
-	// Default indicator
+	BRect rect(Bounds());
+	rgb_color background = LowColor();
+	rgb_color base = background;
+	uint32 flags = be_control_look->Flags(this);
 	if (IsDefault())
-		rect = _DrawDefault(rect, enabled);
+		flags |= BControlLook::B_DEFAULT_BUTTON;
+	be_control_look->DrawButtonFrame(this, rect, updateRect,
+		base, background, flags);
+	be_control_look->DrawButtonBackground(this, rect, updateRect,
+		base, flags);
 
-	BRect fillArea = rect;
-	fillArea.InsetBy(3.0, 3.0);
+	// always leave some room around the label
+	rect.InsetBy(kLabelMargin, kLabelMargin);
 
-	BString text = Label();
-
-#if 1
-	// Label truncation
-	BFont font;
-	GetFont(&font);
-	font.TruncateString(&text, B_TRUNCATE_END, fillArea.Width() - 4);
-#endif
-
-	// Label position
-	const float stringWidth = StringWidth(text.String());
-	const float x = (rect.right - stringWidth) / 2.0;
-	const float labelY = bounds.top
-		+ ((bounds.Height() - fh.ascent - fh.descent) / 2.0)
-		+ fh.ascent + 1.0;
-	const float focusLineY = labelY + fh.descent;
-
-	/* speed trick:
-	   if the focus changes but the button is not pressed then we can
-	   redraw only the focus line,
-	   if the focus changes and the button is pressed invert the internal rect
-	   this block takes care of all the focus changes
-	*/
-	if (IsFocusChanging()) {
-		if (pushed) {
-			rect.InsetBy(2.0, 2.0);
-			InvertRect(rect);
-		} else {
-			_DrawFocusLine(x, focusLineY, stringWidth, IsFocus()
-				&& Window()->IsActive());
-		}
-
-		return;
-	}
-
-	// colors
-	rgb_color panelBgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color buttonBgColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);
-	rgb_color lightColor;
-	rgb_color maxLightColor;
-
-	rgb_color dark1BorderColor;
-	rgb_color dark2BorderColor;
-
-	rgb_color bevelColor1;
-	rgb_color bevelColor2;
-	rgb_color bevelColorRBCorner;
-
-	rgb_color borderBevelShadow;
-	rgb_color borderBevelLight;
-
-	if (enabled) {
-		lightColor = tint_color(panelBgColor, B_LIGHTEN_2_TINT);
-		maxLightColor = tint_color(panelBgColor, B_LIGHTEN_MAX_TINT);
-
-		dark1BorderColor = tint_color(panelBgColor, B_DARKEN_3_TINT);
-		dark2BorderColor = tint_color(panelBgColor, B_DARKEN_4_TINT);
-
-		bevelColor1 = tint_color(panelBgColor, B_DARKEN_2_TINT);
-		bevelColor2 = panelBgColor;
-
-		if (IsDefault()) {
-			borderBevelShadow = tint_color(dark1BorderColor,
-				(B_NO_TINT + B_DARKEN_1_TINT) / 2);
-			borderBevelLight = tint_color(dark1BorderColor, B_LIGHTEN_1_TINT);
-
-			borderBevelLight.red = (borderBevelLight.red + panelBgColor.red)
-				/ 2;
-			borderBevelLight.green = (borderBevelLight.green
-				+ panelBgColor.green) / 2;
-			borderBevelLight.blue = (borderBevelLight.blue
-				+ panelBgColor.blue) / 2;
-
-			dark1BorderColor = tint_color(dark1BorderColor, B_DARKEN_3_TINT);
-			dark2BorderColor = tint_color(dark1BorderColor, B_DARKEN_4_TINT);
-
-			bevelColorRBCorner = borderBevelShadow;
-		} else {
-			borderBevelShadow = tint_color(panelBgColor,
-				(B_NO_TINT + B_DARKEN_1_TINT) / 2);
-			borderBevelLight = buttonBgColor;
-
-			bevelColorRBCorner = dark1BorderColor;
-		}
-	} else {
-		lightColor = tint_color(panelBgColor, B_LIGHTEN_2_TINT);
-		maxLightColor = tint_color(panelBgColor, B_LIGHTEN_1_TINT);
-
-		dark1BorderColor = tint_color(panelBgColor, B_DARKEN_1_TINT);
-		dark2BorderColor = tint_color(panelBgColor, B_DARKEN_2_TINT);
-
-		bevelColor1 = panelBgColor;
-		bevelColor2 = buttonBgColor;
-
-		if (IsDefault()) {
-			borderBevelShadow = dark1BorderColor;
-			borderBevelLight = panelBgColor;
-			dark1BorderColor = tint_color(dark1BorderColor, B_DARKEN_1_TINT);
-			dark2BorderColor = tint_color(dark1BorderColor, 1.16);
-
-		} else {
-			borderBevelShadow = panelBgColor;
-			borderBevelLight = panelBgColor;
-		}
-
-		bevelColorRBCorner = tint_color(panelBgColor, 1.08);;
-	}
-
-	// fill the button area
-	SetHighColor(buttonBgColor);
-	FillRect(fillArea);
-
-	BeginLineArray(22);
-	// bevel around external border
-	AddLine(BPoint(rect.left, rect.bottom),
-			BPoint(rect.left, rect.top), borderBevelShadow);
-	AddLine(BPoint(rect.left + 1, rect.top),
-			BPoint(rect.right, rect.top), borderBevelShadow);
-
-	AddLine(BPoint(rect.right, rect.top + 1),
-			BPoint(rect.right, rect.bottom), borderBevelLight);
-	AddLine(BPoint(rect.left + 1, rect.bottom),
-			BPoint(rect.right - 1, rect.bottom), borderBevelLight);
-
-	rect.InsetBy(1.0, 1.0);
-
-	// external border
-	AddLine(BPoint(rect.left, rect.bottom),
-			BPoint(rect.left, rect.top), dark1BorderColor);
-	AddLine(BPoint(rect.left + 1, rect.top),
-			BPoint(rect.right, rect.top), dark1BorderColor);
-	AddLine(BPoint(rect.right, rect.top + 1),
-			BPoint(rect.right, rect.bottom), dark2BorderColor);
-	AddLine(BPoint(rect.right - 1, rect.bottom),
-			BPoint(rect.left + 1, rect.bottom), dark2BorderColor);
-
-	rect.InsetBy(1.0, 1.0);
-
-	// Light
-	AddLine(BPoint(rect.left, rect.top),
-			BPoint(rect.left, rect.top), buttonBgColor);
-	AddLine(BPoint(rect.left, rect.top + 1),
-			BPoint(rect.left, rect.bottom - 1), lightColor);
-	AddLine(BPoint(rect.left, rect.bottom),
-			BPoint(rect.left, rect.bottom), bevelColor2);
-	AddLine(BPoint(rect.left + 1, rect.top),
-			BPoint(rect.right - 1, rect.top), lightColor);
-	AddLine(BPoint(rect.right, rect.top),
-			BPoint(rect.right, rect.top), bevelColor2);
-	// Shadow
-	AddLine(BPoint(rect.left + 1, rect.bottom),
-			BPoint(rect.right - 1, rect.bottom), bevelColor1);
-	AddLine(BPoint(rect.right, rect.bottom),
-			BPoint(rect.right, rect.bottom), bevelColorRBCorner);
-	AddLine(BPoint(rect.right, rect.bottom - 1),
-			BPoint(rect.right, rect.top + 1), bevelColor1);
-
-	rect.InsetBy(1.0, 1.0);
-
-	// Light
-	AddLine(BPoint(rect.left, rect.top),
-			BPoint(rect.left, rect.bottom - 1), maxLightColor);
-	AddLine(BPoint(rect.left, rect.bottom),
-			BPoint(rect.left, rect.bottom), buttonBgColor);
-	AddLine(BPoint(rect.left + 1, rect.top),
-			BPoint(rect.right - 1, rect.top), maxLightColor);
-	AddLine(BPoint(rect.right, rect.top),
-			BPoint(rect.right, rect.top), buttonBgColor);
-	// Shadow
-	AddLine(BPoint(rect.left + 1, rect.bottom),
-			BPoint(rect.right, rect.bottom), bevelColor2);
-	AddLine(BPoint(rect.right, rect.bottom - 1),
-			BPoint(rect.right, rect.top + 1), bevelColor2);
-
-	rect.InsetBy(1.0,1.0);
-
-	EndLineArray();
-
-	// Invert if clicked
-	if (enabled && pushed) {
-		rect.InsetBy(-2.0, -2.0);
-		InvertRect(rect);
-	}
-
-	// Label color
-	if (enabled) {
-		if (pushed) {
-			SetHighColor(maxLightColor);
-			SetLowColor(255 - buttonBgColor.red,
-						255 - buttonBgColor.green,
-						255 - buttonBgColor.blue);
-		} else {
-			SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
-			SetLowColor(buttonBgColor);
-		}
-	} else {
-		SetHighColor(tint_color(panelBgColor, B_DISABLED_LABEL_TINT));
-		SetLowColor(buttonBgColor);
-	}
-
-	// Draw the label
-	DrawString(text.String(), BPoint(x, labelY));
-
-	// Focus line
-	if (enabled && IsFocus() && Window()->IsActive() && !pushed)
-		_DrawFocusLine(x, focusLineY, stringWidth, true);
+	const BBitmap* icon = IconBitmap(
+		(Value() == B_CONTROL_OFF ? B_OFF_BITMAP : B_ON_BITMAP)
+			| (IsEnabled() ? 0 : B_DISABLED_BITMAP));
+	be_control_look->DrawLabel(this, Label(), icon, rect, updateRect,
+		base, flags, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 }
 
 
@@ -699,7 +483,8 @@ BButton::PreferredSize()
 status_t
 BButton::SetIcon(const BBitmap* icon, uint32 flags)
 {
-	return BControl::SetIcon(icon, flags);
+	return BControl::SetIcon(icon,
+		flags | B_CREATE_ON_BITMAP | B_CREATE_DISABLED_BITMAPS);
 }
 
 
@@ -727,23 +512,52 @@ BSize
 BButton::_ValidatePreferredSize()
 {
 	if (fPreferredSize.width < 0) {
+		float left, top, right, bottom;
+		be_control_look->GetInsets(BControlLook::B_BUTTON_FRAME,
+			BControlLook::B_BUTTON_BACKGROUND,
+			fDrawAsDefault ? BControlLook::B_DEFAULT_BUTTON : 0,
+			left, top, right, bottom);
+
 		// width
-		float width = 20.0f + (float)ceil(StringWidth(Label()));
-		if (width < 75.0f)
-			width = 75.0f;
+		float width = left + right + 2 * kLabelMargin - 1;
 
-		if (fDrawAsDefault)
-			width += 6.0f;
+		const char* label = Label();
+		if (label != NULL) {
+			width = std::max(width, 20.0f);
+			width += (float)ceil(StringWidth(label));
+		}
 
-		fPreferredSize.width = width;
+		const BBitmap* icon = IconBitmap(B_OFF_BITMAP);
+		if (icon != NULL)
+			width += icon->Bounds().Width() + 1;
+
+		if (label != NULL && icon != NULL)
+			width += be_control_look->DefaultLabelSpacing();
 
 		// height
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
+		float minHorizontalMargins = top + bottom + 2 * kLabelMargin;
+		float height = -1;
 
-		fPreferredSize.height
-			= ceilf((fontHeight.ascent + fontHeight.descent) * 1.8)
-				+ (fDrawAsDefault ? 6.0f : 0);
+		if (label != NULL) {
+			font_height fontHeight;
+			GetFontHeight(&fontHeight);
+			float textHeight = fontHeight.ascent + fontHeight.descent;
+			height = ceilf(textHeight * 1.8);
+			float margins = height - ceilf(textHeight);
+			if (margins < minHorizontalMargins)
+				height += minHorizontalMargins - margins;
+		}
+
+		if (icon != NULL) {
+			height = std::max(height,
+				icon->Bounds().Height() + minHorizontalMargins);
+		}
+
+		// force some minimum width/height values
+		width = std::max(width, label != NULL ? 75.0f : 5.0f);
+		height = std::max(height, 5.0f);
+
+		fPreferredSize.Set(width, height);
 
 		ResetLayoutInvalidation();
 	}
