@@ -15,8 +15,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 if ! $(HAIKU_BOOTSTRAP_BUILD) {
 	# primary architecture
 	AddHaikuImagePackages
-		bzip2 ctags ffmpeg freetype glu grep icu jpeg libpng libsolv mesa sed
-		tar which zlib
+		bzip2 ctags grep sed tar which zlib
+		ffmpeg freetype icu jpeg libpng libsolv
+		mesa mesa_devel mesa_swrast glu
 		;
 
 	# secondary architectures
