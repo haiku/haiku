@@ -1551,8 +1551,8 @@ BListView::_Select(int32 from, int32 to, bool extend)
 	}
 
 	for (int32 i = from; i <= to; ++i) {
-		if (item && !item->IsSelected()) {
 		BListItem* item = ItemAt(i);
+		if (item != NULL && !item->IsSelected() && item->IsEnabled()) {
 			item->Select();
 			if (Window() != NULL)
 				InvalidateItem(i);
