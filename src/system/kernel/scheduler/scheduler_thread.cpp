@@ -9,6 +9,9 @@
 using namespace Scheduler;
 
 
+bigtime_t Scheduler::gQuantumLengths[THREAD_MAX_SET_PRIORITY + 1];
+
+
 ThreadData::ThreadData(Thread* thread)
 	:
 	fThread(thread)
@@ -116,9 +119,34 @@ ThreadData::ComputeQuantum()
 	quantum = std::max(quantum,	gCurrentMode->minimal_quantum);
 
 	fTimeLeft = quantum;
-	fQuantumStart = system_time();
 
 	return quantum;
+}
+
+
+/* static */ void
+ThreadData::ComputeQuantumLengths()
+{
+	for (int32 priority = 0; priority <= THREAD_MAX_SET_PRIORITY; priority++) {
+		const bigtime_t kQuantum0 = gCurrentMode->base_quantum;
+		if (priority >= B_URGENT_DISPLAY_PRIORITY) {
+			gQuantumLengths[priority] = kQuantum0;
+			continue;
+		}
+
+		const bigtime_t kQuantum1
+			= kQuantum0 * gCurrentMode->quantum_multipliers[0];
+		if (priority > B_NORMAL_PRIORITY) {
+			gQuantumLengths[priority] = _ScaleQuantum(kQuantum1, kQuantum0,
+				B_URGENT_DISPLAY_PRIORITY, B_NORMAL_PRIORITY, priority);
+			continue;
+		}
+
+		const bigtime_t kQuantum2
+			= kQuantum0 * gCurrentMode->quantum_multipliers[1];
+		gQuantumLengths[priority] = _ScaleQuantum(kQuantum2, kQuantum1,
+			B_NORMAL_PRIORITY, B_IDLE_PRIORITY, priority);
+	}
 }
 
 
@@ -181,23 +209,7 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 inline bigtime_t
 ThreadData::_GetBaseQuantum() const
 {
-	int32 priority = GetEffectivePriority();
-
-	const bigtime_t kQuantum0 = gCurrentMode->base_quantum;
-	if (priority >= B_URGENT_DISPLAY_PRIORITY)
-		return kQuantum0;
-
-	const bigtime_t kQuantum1
-		= kQuantum0 * gCurrentMode->quantum_multipliers[0];
-	if (priority > B_NORMAL_PRIORITY) {
-		return _ScaleQuantum(kQuantum1, kQuantum0, B_URGENT_DISPLAY_PRIORITY,
-			B_NORMAL_PRIORITY, priority);
-	}
-
-	const bigtime_t kQuantum2
-		= kQuantum0 * gCurrentMode->quantum_multipliers[1];
-	return _ScaleQuantum(kQuantum2, kQuantum1, B_NORMAL_PRIORITY,
-		B_IDLE_PRIORITY, priority);
+	return gQuantumLengths[GetEffectivePriority()];
 }
 
 

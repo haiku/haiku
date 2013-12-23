@@ -579,10 +579,9 @@ reschedule(int32 nextState)
 			bigtime_t quantum = nextThreadData->ComputeQuantum();
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER);
-		} else {
-			nextThreadData->StartQuantum();
+		} else
 			gCurrentMode->rebalance_irqs(true);
-		}
+		nextThreadData->StartQuantum();
 
 		modeLocker.Unlock();
 		if (nextThread != oldThread)
@@ -673,6 +672,8 @@ scheduler_set_operation_mode(scheduler_mode mode)
 	gCurrentModeID = mode;
 	gCurrentMode = sSchedulerModes[mode];
 	gCurrentMode->switch_to_mode();
+
+	ThreadData::ComputeQuantumLengths();
 
 	return B_OK;
 }

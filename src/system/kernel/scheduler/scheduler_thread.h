@@ -70,6 +70,7 @@ public:
 	inline	CoreEntry*	Core() const	{ return fCore; }
 	inline	void		UnassignCore() { fCore = NULL; }
 
+	static	void		ComputeQuantumLengths();
 private:
 	inline	int32		_GetPenalty() const;
 	inline	int32		_GetMinimalPriority() const;
@@ -117,6 +118,8 @@ public:
 
 	virtual	void		operator()(ThreadData* thread) = 0;
 };
+
+extern bigtime_t gQuantumLengths[THREAD_MAX_SET_PRIORITY + 1];
 
 
 inline bool
