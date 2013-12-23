@@ -73,8 +73,8 @@ public:
 						MinMaxHeap(int initialSize);
 						~MinMaxHeap();
 
-	inline	Element*	PeekMinimum();
-	inline	Element*	PeekMaximum();
+	inline	Element*	PeekMinimum() const;
+	inline	Element*	PeekMaximum() const;
 
 	static	const Key&	GetKey(Element* element);
 
@@ -190,7 +190,7 @@ MIN_MAX_HEAP_CLASS_NAME::~MinMaxHeap()
 
 MIN_MAX_HEAP_TEMPLATE_LIST
 Element*
-MIN_MAX_HEAP_CLASS_NAME::PeekMinimum()
+MIN_MAX_HEAP_CLASS_NAME::PeekMinimum() const
 {
 	if (fMinLastElement > 0)
 		return fMinElements[0];
@@ -205,7 +205,7 @@ MIN_MAX_HEAP_CLASS_NAME::PeekMinimum()
 
 MIN_MAX_HEAP_TEMPLATE_LIST
 Element*
-MIN_MAX_HEAP_CLASS_NAME::PeekMaximum()
+MIN_MAX_HEAP_CLASS_NAME::PeekMaximum() const
 {
 	if (fMaxLastElement > 0)
 		return fMaxElements[0];
