@@ -92,6 +92,11 @@ private:
 	int		fState;
 };
 
+class ThreadEnqueuer : public ThreadProcessing {
+public:
+	void		operator()(ThreadData* thread);
+};
+
 scheduler_mode gCurrentModeID;
 scheduler_mode_operations* gCurrentMode;
 
@@ -131,6 +136,16 @@ static scheduler_mode_operations* sSchedulerModes[] = {
 // and the package that CPU in question belongs to.
 static int32* sCPUToCore;
 static int32* sCPUToPackage;
+
+
+static void enqueue(Thread* thread, bool newOne);
+
+
+void
+ThreadEnqueuer::operator()(ThreadData* thread)
+{
+	enqueue(thread->GetThread(), false);
+}
 
 
 void
@@ -245,7 +260,7 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 			ASSERT(thread->cpu != NULL);
 			CPUEntry* cpu = &gCPUEntries[thread->cpu->cpu_num];
 
-			SpinLocker coreLocker(threadData->Core()->fCPULock);
+			CoreCPUHeapLocker _(threadData->Core());
 			cpu->UpdatePriority(priority);
 		}
 
@@ -467,7 +482,7 @@ reschedule(int32 nextState)
 	ThreadData* nextThreadData;
 	if (gCPU[thisCPU].disabled) {
 		if (!thread_is_idle_thread(oldThread)) {
-			SpinLocker runQueueLocker(core->fQueueLock);
+			CoreRunQueueLocker _(core);
 
 			nextThreadData = cpu->fRunQueue.GetHead(B_IDLE_PRIORITY);
 		 	cpu->fRunQueue.Remove(nextThreadData);
@@ -483,7 +498,7 @@ reschedule(int32 nextState)
 	}
 
 	Thread* nextThread = nextThreadData->GetThread();
-	SpinLocker cpuLocker(core->fCPULock);
+	CoreCPUHeapLocker cpuLocker(core);
 	cpu->UpdatePriority(nextThreadData->GetEffectivePriority());
 	cpuLocker.Unlock();
 
@@ -511,9 +526,9 @@ reschedule(int32 nextState)
 	nextThread->state = B_THREAD_RUNNING;
 
 	// update CPU heap
-	SpinLocker coreLocker(core->fCPULock);
+	cpuLocker.Lock();
 	cpu->UpdatePriority(nextThreadData->GetEffectivePriority());
-	coreLocker.Unlock();
+	cpuLocker.Unlock();
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	update_thread_times(oldThread, nextThread);
@@ -631,18 +646,6 @@ scheduler_set_operation_mode(scheduler_mode mode)
 }
 
 
-static void
-unassign_thread(Thread* thread, void* data)
-{
-	CoreEntry* core = static_cast<CoreEntry*>(data);
-
-	if (thread->scheduler_data->Core() == core
-		&& thread->pinned_to_cpu == 0) {
-		thread->scheduler_data->UnassignCore();
-	}
-}
-
-
 void
 scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 {
@@ -660,77 +663,20 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 
 	CPUEntry* cpu = &gCPUEntries[cpuID];
 	CoreEntry* core = cpu->fCore;
-	PackageEntry* package = core->fPackage;
 
-	int32 oldCPUCount = core->fCPUCount;
+	int32 oldCPUCount = core->CPUCount();
 	ASSERT(oldCPUCount >= 0);
-	if (enabled)
-		core->fCPUCount++;
-	else {
+	if (enabled) {
+		cpu->fLoad = 0;
+		core->AddCPU(cpu);
+	} else {
 		cpu->UpdatePriority(B_IDLE_PRIORITY);
-		core->fCPUCount--;
+
+		ThreadEnqueuer enqueuer;
+		core->RemoveCPU(cpu, enqueuer);
 	}
 
 	gCPU[cpuID].disabled = !enabled;
-
-	if (core->fCPUCount == 0) {
-		// core has been disabled
-		ASSERT(!enabled);
-
-		if (core->fHighLoad) {
-			gCoreHighLoadHeap.ModifyKey(core, -1);
-			ASSERT(gCoreHighLoadHeap.PeekMinimum() == core);
-			gCoreHighLoadHeap.RemoveMinimum();
-		} else {
-			gCoreLoadHeap.ModifyKey(core, -1);
-			ASSERT(gCoreLoadHeap.PeekMinimum() == core);
-			gCoreLoadHeap.RemoveMinimum();
-		}
-
-		package->RemoveIdleCore(core);
-
-		// get rid of threads
-		thread_map(unassign_thread, core);
-
-		core->fThreadCount = 0;
-		while (core->fRunQueue.PeekMaximum() != NULL) {
-			ThreadData* threadData = core->fRunQueue.PeekMaximum();
-
-			core->fRunQueue.Remove(threadData);
-			threadData->fEnqueued = false;
-
-			if (threadData->fWentSleepCount == 0) {
-				core->fThreadList.Remove(threadData);
-				threadData->fWentSleepCount = -1;
-			}
-
-			ASSERT(threadData->Core() == NULL);
-			enqueue(threadData->GetThread(), false);
-		}
-	} else if (oldCPUCount == 0) {
-		// core has been reenabled
-		ASSERT(enabled);
-
-		cpu->fLoad = 0;
-		core->fLoad = 0;
-		core->fHighLoad = false;
-		gCoreLoadHeap.Insert(core, 0);
-
-		package->AddIdleCore(core);
-	}
-
-	if (enabled) {
-		core->fCPUHeap.Insert(cpu, B_IDLE_PRIORITY);
-		cpu->fLoad = 0;
-	} else {
-		core->fCPUHeap.ModifyKey(cpu, THREAD_MAX_SET_PRIORITY + 1);
-		ASSERT(core->fCPUHeap.PeekMaximum() == cpu);
-		core->fCPUHeap.RemoveMaximum();
-
-		ASSERT(cpu->fLoad >= 0 && cpu->fLoad <= kMaxLoad);
-		core->fLoad -= cpu->fLoad;
-		ASSERT(core->fLoad >= 0);
-	}
 
 	if (!enabled) {
 		cpu_ent* entry = &gCPU[cpuID];
@@ -856,32 +802,17 @@ init()
 
 	new(&gIdlePackageList) IdlePackageList;
 
-	for (int32 i = 0; i < packageCount; i++)
-		gPackageEntries[i].Init(i);
-
-	for (int32 i = 0; i < coreCount; i++) {
-		gCoreEntries[i].fCoreID = i;
-		gCoreEntries[i].fCPUCount = cpuCount / coreCount;
-
-		result = gCoreLoadHeap.Insert(&gCoreEntries[i], 0);
-		if (result != B_OK)
-			return result;
-	}
-
 	for (int32 i = 0; i < cpuCount; i++) {
 		CoreEntry* core = &gCoreEntries[sCPUToCore[i]];
 		PackageEntry* package = &gPackageEntries[sCPUToPackage[i]];
 
+		package->Init(sCPUToPackage[i]);
+		core->Init(sCPUToCore[i], package);
+
 		gCPUEntries[i].fCPUNumber = i;
 		gCPUEntries[i].fCore = core;
-		core->fPackage = package;
 
-		if (core->fCPUHeap.PeekMaximum() == NULL)
-			package->AddIdleCore(core);
-
-		result = core->fCPUHeap.Insert(&gCPUEntries[i], B_IDLE_PRIORITY);
-		if (result != B_OK)
-			return result;
+		core->AddCPU(&gCPUEntries[i]);
 	}
 
 	packageEntriesDeleter.Detach();
@@ -981,9 +912,9 @@ _user_estimate_max_scheduling_latency(thread_id id)
 	if (core == NULL)
 		core = &gCoreEntries[get_random<int32>() % gCoreCount];
 
-	int32 threadCount = core->fThreadCount;
-	if (core->fCPUCount > 0)
-		threadCount /= core->fCPUCount;
+	int32 threadCount = core->ThreadCount();
+	if (core->CPUCount() > 0)
+		threadCount /= core->CPUCount();
 
 	if (threadData->GetEffectivePriority() > 0) {
 		threadCount -= threadCount * THREAD_MAX_SET_PRIORITY

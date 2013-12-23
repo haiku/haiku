@@ -164,9 +164,7 @@ pack_irqs()
 		irq_assignment* irq = (irq_assignment*)list_get_first_item(&cpu->irqs);
 		locker.Unlock();
 
-		ReadSpinLocker coreLocker(gCoreHeapsLock);
-		int32 newCPU = smallTaskCore->fCPUHeap.PeekMinimum()->fCPUNumber;
-		coreLocker.Unlock();
+		int32 newCPU = smallTaskCore->CPUHeap()->PeekMinimum()->fCPUNumber;
 
 		if (newCPU != cpu->cpu_num)
 			assign_io_interrupt_to_cpu(irq->irq, newCPU);
@@ -209,9 +207,7 @@ rebalance_irqs(bool idle)
 	coreLocker.Unlock();
 	if (other == NULL)
 		return;
-	SpinLocker cpuLocker(other->fCPULock);
-	int32 newCPU = other->fCPUHeap.PeekMinimum()->fCPUNumber;
-	cpuLocker.Unlock();
+	int32 newCPU = other->CPUHeap()->PeekMinimum()->fCPUNumber;
 
 	CoreEntry* core = CoreEntry::GetCore(smp_get_current_cpu());
 	if (other == core)

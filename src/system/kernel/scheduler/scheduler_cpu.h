@@ -9,6 +9,7 @@
 #include <OS.h>
 
 #include <thread.h>
+#include <util/AutoLock.h>
 #include <util/MinMaxHeap.h>
 
 #include <cpufreq.h>
@@ -24,6 +25,7 @@ namespace Scheduler {
 class DebugDumper;
 
 struct ThreadData;
+class ThreadProcessing;
 
 struct CPUEntry;
 struct CoreEntry;
@@ -77,14 +79,56 @@ public:
 						void			Dump();
 };
 
-struct CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
-	DoublyLinkedListLinkImpl<CoreEntry> {
+class CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
+	public DoublyLinkedListLinkImpl<CoreEntry> {
+public:
 										CoreEntry();
 
+						void			Init(int32 id, PackageEntry* package);
+
+	inline				int32			ID() const	{ return fCoreID; }
+	inline				PackageEntry*	Package() const	{ return fPackage; }
+	inline				int32			CPUCount() const
+											{ return fCPUCount; }
+
+	inline				void			LockCPUHeap();
+	inline				void			UnlockCPUHeap();
+
+	inline				CPUPriorityHeap*	CPUHeap();
+
+	inline				int32			ThreadCount() const
+											{ return fThreadCount; }
+
+	inline				void			LockRunQueue();
+	inline				void			UnlockRunQueue();
+
+						void			PushFront(ThreadData* thread,
+											int32 priority);
+						void			PushBack(ThreadData* thread,
+											int32 priority);
+						void			Remove(ThreadData* thread,
+											bool starving);
+	inline				ThreadData*		PeekThread() const;
+
+	inline				bigtime_t		GetActiveTime() const;
+	inline				void			IncreaseActiveTime(
+											bigtime_t activeTime);
+
 	inline				int32			GetLoad() const;
-						void			UpdateLoad();
+						void			UpdateLoad(int32 delta);
+
+	inline				int32			StarvationCounter() const;
+
+						void			AddCPU(CPUEntry* cpu);
+						void			RemoveCPU(CPUEntry* cpu,
+											ThreadProcessing&
+												threadPostProcessing);
 
 	static inline		CoreEntry*		GetCore(int32 cpu);
+
+private:
+	static				void			_UnassignThread(Thread* thread,
+											void* core);
 
 						int32			fCoreID;
 						PackageEntry*	fPackage;
@@ -101,11 +145,45 @@ struct CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 						spinlock		fQueueLock;
 
 						bigtime_t		fActiveTime;
-						seqlock			fActiveTimeLock;
+	mutable				seqlock			fActiveTimeLock;
 
 						int32			fLoad;
 						bool			fHighLoad;
+
+						friend class DebugDumper;
 } CACHE_LINE_ALIGN;
+
+class CoreRunQueueLocking {
+public:
+	inline bool Lock(CoreEntry* core)
+	{
+		core->LockRunQueue();
+		return true;
+	}
+
+	inline void Unlock(CoreEntry* core)
+	{
+		core->UnlockRunQueue();
+	}
+};
+
+typedef AutoLocker<CoreEntry, CoreRunQueueLocking> CoreRunQueueLocker;
+
+class CoreCPUHeapLocking {
+public:
+	inline bool Lock(CoreEntry* core)
+	{
+		core->LockCPUHeap();
+		return true;
+	}
+
+	inline void Unlock(CoreEntry* core)
+	{
+		core->UnlockCPUHeap();
+	}
+};
+
+typedef AutoLocker<CoreEntry, CoreCPUHeapLocking> CoreCPUHeapLocker;
 
 class CoreLoadHeap : public MinMaxHeap<CoreEntry, int32> {
 public:
@@ -167,11 +245,76 @@ extern rw_spinlock gIdlePackageLock;
 extern int32 gPackageCount;
 
 
+inline void
+CoreEntry::LockCPUHeap()
+{
+	acquire_spinlock(&fCPULock);
+}
+
+
+inline void
+CoreEntry::UnlockCPUHeap()
+{
+	release_spinlock(&fCPULock);
+}
+
+
+inline CPUPriorityHeap*
+CoreEntry::CPUHeap()
+{
+	return &fCPUHeap;
+}
+
+
+inline void
+CoreEntry::LockRunQueue()
+{
+	acquire_spinlock(&fQueueLock);
+}
+
+
+inline void
+CoreEntry::UnlockRunQueue()
+{
+	release_spinlock(&fQueueLock);
+}
+
+
+inline void
+CoreEntry::IncreaseActiveTime(bigtime_t activeTime)
+{
+	WriteSequentialLocker _(fActiveTimeLock);
+	fActiveTime += activeTime;
+}
+
+
+inline bigtime_t
+CoreEntry::GetActiveTime() const
+{
+	bigtime_t activeTime;
+
+	uint32 count;
+	do {
+		count = acquire_read_seqlock(&fActiveTimeLock);
+		activeTime = fActiveTime;
+	} while (!release_read_seqlock(&fActiveTimeLock, count));
+
+	return activeTime;
+}
+
+
 inline int32
 CoreEntry::GetLoad() const
 {
 	ASSERT(fCPUCount >= 0);
 	return fLoad / fCPUCount;
+}
+
+
+inline int32
+CoreEntry::StarvationCounter() const
+{
+	return fStarvationCounter;
 }
 
 

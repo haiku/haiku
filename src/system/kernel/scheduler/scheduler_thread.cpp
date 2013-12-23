@@ -65,7 +65,7 @@ ThreadData::Dump() const
 	kprintf("\twent_sleep_active:\t%" B_PRId64 "\n", fWentSleepActive);
 	kprintf("\twent_sleep_count:\t%" B_PRId32 "\n", fWentSleepCount);
 	kprintf("\tcore:\t\t\t%" B_PRId32 "\n",
-		fCore != NULL ? fCore->fCoreID : -1);
+		fCore != NULL ? fCore->ID() : -1);
 	if (fCore != NULL && HasCacheExpired())
 		kprintf("\tcache affinity has expired\n");
 }
@@ -108,7 +108,7 @@ ThreadData::ComputeQuantum()
 	quantum += fStolenTime;
 	fStolenTime = 0;
 
-	int32 threadCount = (fCore->fThreadCount + 1) / fCore->fCPUCount;
+	int32 threadCount = (fCore->ThreadCount() + 1) / fCore->CPUCount();
 	threadCount = max_c(threadCount, 1);
 
 	quantum = std::min(gCurrentMode->maximum_latency / threadCount, quantum);
@@ -137,7 +137,7 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 	if (fThread->previous_cpu != NULL) {
 		CPUEntry* previousCPU = &gCPUEntries[fThread->previous_cpu->cpu_num];
 		if (previousCPU->fCore == core) {
-			SpinLocker cpuLocker(core->fCPULock);
+			CoreCPUHeapLocker _(core);
 			if (CPUPriorityHeap::GetKey(previousCPU) < threadPriority) {
 				previousCPU->UpdatePriority(threadPriority);
 				rescheduleNeeded = true;
@@ -146,8 +146,8 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 		}
 	}
 
-	SpinLocker cpuLocker(core->fCPULock);
-	CPUEntry* cpu = core->fCPUHeap.PeekMinimum();
+	CoreCPUHeapLocker _(core);
+	CPUEntry* cpu = core->CPUHeap()->PeekMinimum();
 	ASSERT(cpu != NULL);
 
 	if (CPUPriorityHeap::GetKey(cpu) < threadPriority) {
@@ -193,5 +193,10 @@ ThreadData::_ScaleQuantum(bigtime_t maxQuantum, bigtime_t minQuantum,
 	bigtime_t result = (maxQuantum - minQuantum) * (priority - minPriority);
 	result /= maxPriority - minPriority;
 	return maxQuantum - result;
+}
+
+
+ThreadProcessing::~ThreadProcessing()
+{
 }
 

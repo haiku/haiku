@@ -93,6 +93,13 @@ private:
 			CoreEntry*	fCore;
 };
 
+class ThreadProcessing {
+public:
+	virtual				~ThreadProcessing();
+
+	virtual	void		operator()(ThreadData* thread) = 0;
+};
+
 
 inline bool
 ThreadData::HasCacheExpired() const
@@ -166,7 +173,7 @@ ThreadData::ShouldCancelPenalty() const
 	if (fCore == NULL)
 		return false;
 
-	return atomic_get(&fCore->fStarvationCounter) != fWentSleepCount
+	return fCore->StarvationCounter() != fWentSleepCount
 		&& system_time() - fWentSleep > gCurrentMode->base_quantum;
 }
 
@@ -177,13 +184,8 @@ ThreadData::GoesAway()
 	fLastInterruptTime = 0;
 
 	fWentSleep = system_time();
-	fWentSleepCount = atomic_get(&fCore->fStarvationCounter);
-
-	uint32 count;
-	do {
-		count = acquire_read_seqlock(&fCore->fActiveTimeLock);
-		fWentSleepActive = fCore->fActiveTime;
-	} while (!release_read_seqlock(&fCore->fActiveTimeLock, count));
+	fWentSleepCount = fCore->StarvationCounter();
+	fWentSleepActive = fCore->GetActiveTime();
 }
 
 
@@ -195,7 +197,7 @@ ThreadData::PutBack()
 
 	int32 priority = GetEffectivePriority();
 
-	SpinLocker runQueueLocker(fCore->fQueueLock);
+	CoreRunQueueLocker _(fCore);
 	ASSERT(!fEnqueued);
 	fEnqueued = true;
 	if (fThread->pinned_to_cpu > 0) {
@@ -203,10 +205,9 @@ ThreadData::PutBack()
 
 		CPUEntry* cpu = &gCPUEntries[fThread->cpu->cpu_num];
 		cpu->fRunQueue.PushFront(this, priority);
-	} else {
-		fCore->fRunQueue.PushFront(this, priority);
-		atomic_add(&fCore->fThreadCount, 1);
-	}
+	} else
+		fCore->PushFront(this, priority);
+	fCore->UnlockRunQueue();
 }
 
 
@@ -219,7 +220,7 @@ ThreadData::Enqueue()
 
 	int32 priority = GetEffectivePriority();
 
-	SpinLocker runQueueLocker(fCore->fQueueLock);
+	CoreRunQueueLocker _(fCore);
 	ASSERT(!fEnqueued);
 	fEnqueued = true;
 	if (fThread->pinned_to_cpu > 0) {
@@ -227,19 +228,15 @@ ThreadData::Enqueue()
 
 		CPUEntry* cpu = &gCPUEntries[fThread->previous_cpu->cpu_num];
 		cpu->fRunQueue.PushBack(this, priority);
-	} else {
-		fCore->fRunQueue.PushBack(this, priority);
-		fCore->fThreadList.Insert(this);
-
-		atomic_add(&fCore->fThreadCount, 1);
-	}
+	} else
+		fCore->PushBack(this, priority);
 }
 
 
 inline bool
 ThreadData::Dequeue()
 {
-	SpinLocker runQueueLocker(fCore->fQueueLock);
+	CoreRunQueueLocker _(fCore);
 	if (!fEnqueued)
 		return false;
 
@@ -250,12 +247,8 @@ ThreadData::Dequeue()
 		CPUEntry* cpu = &gCPUEntries[fThread->previous_cpu->cpu_num];
 		cpu->fRunQueue.Remove(this);
 	} else {
-		fCore->fRunQueue.Remove(this);
-
 		ASSERT(fWentSleepCount < 1);
-		if (fWentSleepCount == 0)
-			fCore->fThreadList.Remove(this);
-		atomic_add(&fCore->fThreadCount, -1);
+		fCore->Remove(this, fWentSleepCount == 0);
 	}
 
 	return true;
@@ -268,9 +261,8 @@ ThreadData::UpdateActivity(bigtime_t active)
 	fMeasureActiveTime += active;
 	gCPUEntries[smp_get_current_cpu()].fMeasureActiveTime += active;
 
-	WriteSequentialLocker locker(fCore->fActiveTimeLock);
-	fCore->fActiveTime += active;
-	locker.Unlock();
+	fCore->IncreaseActiveTime(active);
+
 }
 
 

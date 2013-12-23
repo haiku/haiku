@@ -37,13 +37,7 @@ has_cache_expired(const ThreadData* threadData)
 
 	CoreEntry* core = threadData->Core();
 
-	bigtime_t activeTime;
-	uint32 count;
-	do {
-		count = acquire_read_seqlock(&core->fActiveTimeLock);
-		activeTime = core->fActiveTime;
-	} while (!release_read_seqlock(&core->fActiveTimeLock, count));
-
+	bigtime_t activeTime = core->GetActiveTime();
 	return activeTime - threadData->fWentSleepActive > kCacheExpire;
 }
 
@@ -138,9 +132,7 @@ rebalance_irqs(bool idle)
 		other = gCoreHighLoadHeap.PeekMinimum();
 	coreLocker.Unlock();
 
-	SpinLocker cpuLocker(other->fCPULock);
-	int32 newCPU = other->fCPUHeap.PeekMinimum()->fCPUNumber;
-	cpuLocker.Unlock();
+	int32 newCPU = other->CPUHeap()->PeekMinimum()->fCPUNumber;
 
 	ASSERT(other != NULL);
 
