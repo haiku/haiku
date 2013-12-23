@@ -476,8 +476,8 @@ reschedule(int32 nextState)
 	ThreadData* oldThreadData = oldThread->scheduler_data;
 
 	// return time spent in interrupts
-	oldThreadData->fStolenTime
-		+= gCPU[thisCPU].interrupt_time - oldThreadData->fLastInterruptTime;
+	oldThreadData->IncreaseStolenTime(
+		gCPU[thisCPU].interrupt_time - oldThreadData->LastInterruptTime());
 
 	bool enqueueOldThread = false;
 	bool putOldThreadAtBack = false;
@@ -520,7 +520,6 @@ reschedule(int32 nextState)
 
 			nextThreadData = cpu->PeekIdleThread();
 			cpu->Remove(nextThreadData);
-			nextThreadData->fEnqueued = false;
 
 			putOldThreadAtBack = oldThread->pinned_to_cpu == 0;
 		} else
@@ -581,8 +580,7 @@ reschedule(int32 nextState)
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER);
 		} else {
-			nextThreadData->fQuantumStart = system_time();
-
+			nextThreadData->StartQuantum();
 			gCurrentMode->rebalance_irqs(true);
 		}
 

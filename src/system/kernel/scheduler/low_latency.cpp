@@ -38,7 +38,7 @@ has_cache_expired(const ThreadData* threadData)
 	CoreEntry* core = threadData->Core();
 
 	bigtime_t activeTime = core->GetActiveTime();
-	return activeTime - threadData->fWentSleepActive > kCacheExpire;
+	return activeTime - threadData->WentSleepActive() > kCacheExpire;
 }
 
 

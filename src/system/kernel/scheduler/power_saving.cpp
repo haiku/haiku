@@ -41,7 +41,7 @@ has_cache_expired(const ThreadData* threadData)
 {
 	ASSERT(!gSingleCore);
 
-	return system_time() - threadData->fWentSleep > kCacheExpire;
+	return system_time() - threadData->WentSleep() > kCacheExpire;
 }
 
 

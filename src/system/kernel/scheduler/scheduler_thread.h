@@ -38,7 +38,17 @@ public:
 			bool		ChooseCoreAndCPU(CoreEntry*& targetCore,
 							CPUEntry*& targetCPU);
 
+	inline	bigtime_t	LastInterruptTime() const
+							{ return fLastInterruptTime; }
+	inline	void		SetLastInterruptTime(bigtime_t interruptTime)
+							{ fLastInterruptTime = interruptTime; }
+
+	inline	void		IncreaseStolenTime(bigtime_t stolenTime);
+
 	inline	void		GoesAway();
+	inline	bigtime_t	WentSleep() const	{ return fWentSleep; }
+	inline	bigtime_t	WentSleepActive() const	{ return fWentSleepActive; }
+	inline	bigtime_t	WentSleepCount() const	{ return fWentSleepCount; }
 
 	inline	void		PutBack();
 	inline	void		Enqueue();
@@ -49,22 +59,16 @@ public:
 
 	inline	bool		HasQuantumEnded(bool wasPreempted, bool hasYielded);
 			bigtime_t	ComputeQuantum();
+	inline	void		StartQuantum();
+
+	inline	bool		IsEnqueued() const	{ return fEnqueued; }
+	inline	void		SetDequeued()	{ fEnqueued = false; }
 
 	inline	Thread*		GetThread() const	{ return fThread; }
 	inline	int32		GetLoad() const	{ return fLoad; }
 
 	inline	CoreEntry*	Core() const	{ return fCore; }
 	inline	void		UnassignCore() { fCore = NULL; }
-
-			bigtime_t	fStolenTime;
-			bigtime_t	fQuantumStart;
-			bigtime_t	fLastInterruptTime;
-
-			bigtime_t	fWentSleep;
-			bigtime_t	fWentSleepActive;
-			int32		fWentSleepCount;
-
-			bool		fEnqueued;
 
 private:
 	inline	int32		_GetPenalty() const;
@@ -78,6 +82,16 @@ private:
 	static	bigtime_t	_ScaleQuantum(bigtime_t maxQuantum,
 							bigtime_t minQuantum, int32 maxPriority,
 							int32 minPriority, int32 priority);
+
+			bigtime_t	fStolenTime;
+			bigtime_t	fQuantumStart;
+			bigtime_t	fLastInterruptTime;
+
+			bigtime_t	fWentSleep;
+			bigtime_t	fWentSleepActive;
+			int32		fWentSleepCount;
+
+			bool		fEnqueued;
 
 			Thread*		fThread;
 
@@ -179,6 +193,13 @@ ThreadData::ShouldCancelPenalty() const
 
 
 inline void
+ThreadData::IncreaseStolenTime(bigtime_t stolenTime)
+{
+	fStolenTime += stolenTime;
+}
+
+
+inline void
 ThreadData::GoesAway()
 {
 	fLastInterruptTime = 0;
@@ -240,7 +261,6 @@ ThreadData::Dequeue()
 	if (!fEnqueued)
 		return false;
 
-	fEnqueued = false;
 	if (fThread->pinned_to_cpu > 0) {
 		ASSERT(fThread->previous_cpu != NULL);
 
@@ -248,9 +268,10 @@ ThreadData::Dequeue()
 		cpu->Remove(this);
 	} else {
 		ASSERT(fWentSleepCount < 1);
-		fCore->Remove(this, fWentSleepCount == 0);
+		fCore->Remove(this);
 	}
 
+	ASSERT(!fEnqueued);
 	return true;
 }
 
@@ -296,6 +317,13 @@ ThreadData::HasQuantumEnded(bool wasPreempted, bool hasYielded)
 	}
 
 	return fTimeLeft == 0;
+}
+
+
+inline void
+ThreadData::StartQuantum()
+{
+	fQuantumStart = system_time();
 }
 
 

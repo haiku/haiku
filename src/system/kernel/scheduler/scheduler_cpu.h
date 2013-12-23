@@ -136,8 +136,7 @@ public:
 											int32 priority);
 						void			PushBack(ThreadData* thread,
 											int32 priority);
-						void			Remove(ThreadData* thread,
-											bool starving);
+						void			Remove(ThreadData* thread);
 	inline				ThreadData*		PeekThread() const;
 
 	inline				bigtime_t		GetActiveTime() const;

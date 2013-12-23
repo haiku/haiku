@@ -113,6 +113,8 @@ CPUEntry::PushBack(ThreadData* thread, int32 priority)
 void
 CPUEntry::Remove(ThreadData* thread)
 {
+	ASSERT(thread->IsEnqueued());
+	thread->SetDequeued();
 	fRunQueue.Remove(thread);
 }
 
@@ -203,14 +205,11 @@ CPUEntry::ChooseNextThread(ThreadData* oldThread, bool putAtBack)
 		return oldThread;
 
 	if (sharedPriority > pinnedPriority) {
-		sharedThread->fEnqueued = false;
-
-		fCore->Remove(sharedThread, sharedThread->fWentSleepCount == 0);
+		fCore->Remove(sharedThread);
 		return sharedThread;
 	}
 
-	pinnedThread->fEnqueued = false;
-	fRunQueue.Remove(pinnedThread);
+	Remove(pinnedThread);
 	return pinnedThread;
 }
 
@@ -243,7 +242,7 @@ CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 		cpuEntry->last_kernel_time = nextThread->kernel_time;
 		cpuEntry->last_user_time = nextThread->user_time;
 
-		nextThreadData->fLastInterruptTime = cpuEntry->interrupt_time;
+		nextThreadData->SetLastInterruptTime(cpuEntry->interrupt_time);
 
 		_RequestPerformanceLevel(nextThreadData);
 	}
@@ -349,13 +348,15 @@ CoreEntry::PushBack(ThreadData* thread, int32 priority)
 
 
 void
-CoreEntry::Remove(ThreadData* thread, bool starving)
+CoreEntry::Remove(ThreadData* thread)
 {
+	ASSERT(thread->IsEnqueued());
+	thread->SetDequeued();
 	if (thread_is_idle_thread(thread->GetThread())
 		|| fThreadList.Head() == thread) {
 		atomic_add(&fStarvationCounter, 1);
 	}
-	if (starving)
+	if (thread->WentSleepCount() == 0)
 		fThreadList.Remove(thread);
 	fRunQueue.Remove(thread);
 	atomic_add(&fThreadCount, -1);
@@ -459,20 +460,16 @@ CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 		// get rid of threads
 		thread_map(CoreEntry::_UnassignThread, this);
 
-		fThreadCount = 0;
 		while (fRunQueue.PeekMaximum() != NULL) {
 			ThreadData* threadData = fRunQueue.PeekMaximum();
 
-			fRunQueue.Remove(threadData);
-			threadData->fEnqueued = false;
-
-			if (threadData->fWentSleepCount == 0)
-				fThreadList.Remove(threadData);
-			threadData->fWentSleepCount = -1;
+			Remove(threadData);
 
 			ASSERT(threadData->Core() == NULL);
 			threadPostProcessing(threadData);
 		}
+
+		fThreadCount = 0;
 	}
 
 	fCPUHeap.ModifyKey(cpu, THREAD_MAX_SET_PRIORITY + 1);
