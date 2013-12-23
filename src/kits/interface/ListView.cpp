@@ -393,18 +393,37 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 	bool extend = fListType == B_MULTIPLE_SELECTION_LIST
 		&& (modifiers() & B_SHIFT_KEY) != 0;
 
+	if (fFirstSelected == -1
+		&& (bytes[0] == B_UP_ARROW || bytes[0] == B_DOWN_ARROW)) {
+		// nothing is selected yet, select the first enabled item
+		int32 lastItem = CountItems() - 1;
+		for (int32 i = 0; i <= lastItem; i++) {
+			if (ItemAt(i)->IsEnabled()) {
+				Select(i);
+				break;
+			}
+		}
+		return;
+	}
+
 	switch (bytes[0]) {
 		case B_UP_ARROW:
 		{
-			if (fFirstSelected == -1) {
-				// if nothing is selected yet, always select the first item
-				Select(0);
-			} else {
-				if (fAnchorIndex > 0) {
-					if (!extend || fAnchorIndex <= fFirstSelected)
-						Select(fAnchorIndex - 1, extend);
-					else
-						Deselect(fAnchorIndex--);
+			if (fAnchorIndex > 0) {
+				if (!extend || fAnchorIndex <= fFirstSelected) {
+					for (int32 i = 1; fAnchorIndex - i >= 0; i++) {
+						if (ItemAt(fAnchorIndex - i)->IsEnabled()) {
+							// Select the previous enabled item
+							Select(fAnchorIndex - i, extend);
+							break;
+						}
+					}
+				} else {
+					Deselect(fAnchorIndex);
+					do
+						fAnchorIndex--;
+					while (fAnchorIndex > 0
+						&& !ItemAt(fAnchorIndex)->IsEnabled());
 				}
 			}
 
@@ -414,15 +433,22 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 
 		case B_DOWN_ARROW:
 		{
-			if (fFirstSelected == -1) {
-				// if nothing is selected yet, always select the first item
-				Select(0);
-			} else {
-				if (fAnchorIndex < CountItems() - 1) {
-					if (!extend || fAnchorIndex >= fLastSelected)
-						Select(fAnchorIndex + 1, extend);
-					else
-						Deselect(fAnchorIndex++);
+			int32 lastItem = CountItems() - 1;
+			if (fAnchorIndex < lastItem) {
+				if (!extend || fAnchorIndex >= fLastSelected) {
+					for (int32 i = 1; fAnchorIndex + i <= lastItem; i++) {
+						if (ItemAt(fAnchorIndex + i)->IsEnabled()) {
+							// Select the next enabled item
+							Select(fAnchorIndex + i, extend);
+							break;
+						}
+					}
+				} else {
+					Deselect(fAnchorIndex);
+					do
+						fAnchorIndex++;
+					while (fAnchorIndex < lastItem
+						&& !ItemAt(fAnchorIndex)->IsEnabled());
 				}
 			}
 
@@ -434,8 +460,16 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 			if (extend) {
 				Select(0, fAnchorIndex, true);
 				fAnchorIndex = 0;
-			} else
-				Select(0, false);
+			} else {
+				// select the first enabled item
+				int32 lastItem = CountItems() - 1;
+				for (int32 i = 0; i <= lastItem; i++) {
+					if (ItemAt(i)->IsEnabled()) {
+						Select(i, false);
+						break;
+					}
+				}
+			}
 
 			ScrollToSelection();
 			break;
@@ -444,8 +478,15 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 			if (extend) {
 				Select(fAnchorIndex, CountItems() - 1, true);
 				fAnchorIndex = CountItems() - 1;
-			} else
-				Select(CountItems() - 1, false);
+			} else {
+				// select the last enabled item
+				for (int32 i = CountItems() - 1; i >= 0; i--) {
+					if (ItemAt(i)->IsEnabled()) {
+						Select(i, false);
+						break;
+					}
+				}
+			}
 
 			ScrollToSelection();
 			break;
@@ -536,8 +577,14 @@ BListView::MouseDown(BPoint point)
 				// select entire block
 				// TODO: maybe review if we want it like in Tracker
 				// (anchor item)
-				Select(min_c(index, fFirstSelected), max_c(index,
-					fLastSelected));
+				if (index >= fFirstSelected && index < fLastSelected) {
+					// clicked inside of selected items block, deselect all
+					// but from the first selected item to the clicked item
+					DeselectExcept(fFirstSelected, index);
+				} else {
+					Select(min_c(index, fFirstSelected), max_c(index,
+						fLastSelected));
+				}
 			} else {
 				if (modifiers & B_COMMAND_KEY) {
 					// toggle selection state of clicked item (like in Tracker)
