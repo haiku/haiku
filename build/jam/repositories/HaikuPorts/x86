@@ -167,8 +167,9 @@ RemotePackageRepository HaikuPorts
 	libvpx_x86_gcc2_devel-1.0.0-2
 	libxml2_x86_gcc2-2.8.0-5
 	libxml2_x86_gcc2_devel-2.8.0-5
-#	mesa_x86_gcc2-7.9.2-3
-#	mesa_x86_gcc2_devel-7.9.2-3
+	mesa_x86_gcc2-7.9.2-3
+	mesa_x86_gcc2_devel-7.9.2-3
+	mesa_x86_gcc2_swrast-7.9.2-3
 	ncurses_x86_gcc2-5.9-10
 	ncurses_x86_gcc2_devel-5.9-10
 	openssl_x86_gcc2-1.0.0j-4
@@ -231,7 +232,7 @@ RemotePackageRepository HaikuPorts
 	man
 	mercurial
 	mesa
-#	mesa_x86_gcc2
+	mesa_x86_gcc2
 	mkdepend
 	nano
 	ncurses
