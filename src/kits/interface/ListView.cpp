@@ -1512,7 +1512,7 @@ BListView::_Select(int32 index, bool extend)
 		fLastSelected = index;
 	}
 
-	ItemAt(index)->Select();
+	item->Select();
 	if (Window() != NULL)
 		InvalidateItem(index);
 
