@@ -132,7 +132,7 @@ rebalance_irqs(bool idle)
 		other = gCoreHighLoadHeap.PeekMinimum();
 	coreLocker.Unlock();
 
-	int32 newCPU = other->CPUHeap()->PeekMinimum()->fCPUNumber;
+	int32 newCPU = other->CPUHeap()->PeekMinimum()->ID();
 
 	ASSERT(other != NULL);
 

@@ -203,8 +203,8 @@ ThreadData::PutBack()
 	if (fThread->pinned_to_cpu > 0) {
 		ASSERT(fThread->cpu != NULL);
 
-		CPUEntry* cpu = &gCPUEntries[fThread->cpu->cpu_num];
-		cpu->fRunQueue.PushFront(this, priority);
+		CPUEntry* cpu = CPUEntry::GetCPU(fThread->cpu->cpu_num);
+		cpu->PushFront(this, priority);
 	} else
 		fCore->PushFront(this, priority);
 	fCore->UnlockRunQueue();
@@ -226,8 +226,8 @@ ThreadData::Enqueue()
 	if (fThread->pinned_to_cpu > 0) {
 		ASSERT(fThread->previous_cpu != NULL);
 
-		CPUEntry* cpu = &gCPUEntries[fThread->previous_cpu->cpu_num];
-		cpu->fRunQueue.PushBack(this, priority);
+		CPUEntry* cpu = CPUEntry::GetCPU(fThread->previous_cpu->cpu_num);
+		cpu->PushBack(this, priority);
 	} else
 		fCore->PushBack(this, priority);
 }
@@ -244,8 +244,8 @@ ThreadData::Dequeue()
 	if (fThread->pinned_to_cpu > 0) {
 		ASSERT(fThread->previous_cpu != NULL);
 
-		CPUEntry* cpu = &gCPUEntries[fThread->previous_cpu->cpu_num];
-		cpu->fRunQueue.Remove(this);
+		CPUEntry* cpu = CPUEntry::GetCPU(fThread->previous_cpu->cpu_num);
+		cpu->Remove(this);
 	} else {
 		ASSERT(fWentSleepCount < 1);
 		fCore->Remove(this, fWentSleepCount == 0);
@@ -259,10 +259,8 @@ inline void
 ThreadData::UpdateActivity(bigtime_t active)
 {
 	fMeasureActiveTime += active;
-	gCPUEntries[smp_get_current_cpu()].fMeasureActiveTime += active;
-
+	CPUEntry::GetCPU(smp_get_current_cpu())->IncreaseActiveTime(active);
 	fCore->IncreaseActiveTime(active);
-
 }
 
 

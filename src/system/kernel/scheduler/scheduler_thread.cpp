@@ -77,7 +77,7 @@ ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 	bool rescheduleNeeded = false;
 
 	if (targetCore == NULL && targetCPU != NULL)
-		targetCore = targetCPU->fCore;
+		targetCore = targetCPU->Core();
 	else if (targetCore != NULL && targetCPU == NULL)
 		targetCPU = _ChooseCPU(targetCore, rescheduleNeeded);
 	else if (targetCore == NULL && targetCPU == NULL) {
@@ -136,7 +136,7 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 
 	if (fThread->previous_cpu != NULL) {
 		CPUEntry* previousCPU = &gCPUEntries[fThread->previous_cpu->cpu_num];
-		if (previousCPU->fCore == core) {
+		if (previousCPU->Core() == core) {
 			CoreCPUHeapLocker _(core);
 			if (CPUPriorityHeap::GetKey(previousCPU) < threadPriority) {
 				previousCPU->UpdatePriority(threadPriority);

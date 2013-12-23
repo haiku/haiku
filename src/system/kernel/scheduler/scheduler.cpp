@@ -39,26 +39,60 @@
 namespace Scheduler {
 
 
-class SchedulerModeLocker : public ReadSpinLocker {
+class SchedulerModeLocking {
+public:
+	bool Lock(int* /* lockable */)
+	{
+		CPUEntry::GetCPU(smp_get_current_cpu())->EnterScheduler();
+		return true;
+	}
+
+	void Unlock(int* /* lockable */)
+	{
+		CPUEntry::GetCPU(smp_get_current_cpu())->ExitScheduler();
+	}
+};
+
+class SchedulerModeLocker :
+	public AutoLocker<int, SchedulerModeLocking> {
 public:
 	SchedulerModeLocker(bool alreadyLocked = false, bool lockIfNotLocked = true)
 		:
-		ReadSpinLocker(gCPUEntries[smp_get_current_cpu()].fSchedulerModeLock,
-			alreadyLocked, lockIfNotLocked)
+		AutoLocker<int, SchedulerModeLocking>(NULL, alreadyLocked,
+			lockIfNotLocked)
 	{
 	}
 };
 
-class InterruptsSchedulerModeLocker : public InterruptsReadSpinLocker {
+class InterruptsSchedulerModeLocking {
+public:
+	bool Lock(int* lockable)
+	{
+		*lockable = disable_interrupts();
+		CPUEntry::GetCPU(smp_get_current_cpu())->EnterScheduler();
+		return true;
+	}
+
+	void Unlock(int* lockable)
+	{
+		CPUEntry::GetCPU(smp_get_current_cpu())->ExitScheduler();
+		restore_interrupts(*lockable);
+	}
+};
+
+class InterruptsSchedulerModeLocker :
+	public AutoLocker<int, InterruptsSchedulerModeLocking> {
 public:
 	InterruptsSchedulerModeLocker(bool alreadyLocked = false,
 		bool lockIfNotLocked = true)
 		:
-		InterruptsReadSpinLocker(
-			gCPUEntries[smp_get_current_cpu()].fSchedulerModeLock,
-			alreadyLocked, lockIfNotLocked)
+		AutoLocker<int, InterruptsSchedulerModeLocking>(&fState, alreadyLocked,
+			lockIfNotLocked)
 	{
 	}
+
+private:
+	int		fState;
 };
 
 class InterruptsBigSchedulerLocking {
@@ -67,14 +101,14 @@ public:
 	{
 		*lockable = disable_interrupts();
 		for (int32 i = 0; i < smp_get_num_cpus(); i++)
-			acquire_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
+			CPUEntry::GetCPU(i)->LockScheduler();
 		return true;
 	}
 
 	void Unlock(int* lockable)
 	{
 		for (int32 i = 0; i < smp_get_num_cpus(); i++)
-			release_write_spinlock(&gCPUEntries[i].fSchedulerModeLock);
+			CPUEntry::GetCPU(i)->UnlockScheduler();
 		restore_interrupts(*lockable);
 	}
 };
@@ -193,10 +227,10 @@ enqueue(Thread* thread, bool newOne)
 	if (threadPriority > heapPriority
 		|| (threadPriority == heapPriority && rescheduleNeeded)) {
 
-		if (targetCPU->fCPUNumber == smp_get_current_cpu())
-			gCPU[targetCPU->fCPUNumber].invoke_scheduler = true;
+		if (targetCPU->ID() == smp_get_current_cpu())
+			gCPU[targetCPU->ID()].invoke_scheduler = true;
 		else {
-			smp_send_ici(targetCPU->fCPUNumber, SMP_MSG_RESCHEDULE, 0, 0, 0,
+			smp_send_ici(targetCPU->ID(), SMP_MSG_RESCHEDULE, 0, 0, 0,
 				NULL, SMP_MSG_FLAG_ASYNC);
 		}
 	}
@@ -484,8 +518,8 @@ reschedule(int32 nextState)
 		if (!thread_is_idle_thread(oldThread)) {
 			CoreRunQueueLocker _(core);
 
-			nextThreadData = cpu->fRunQueue.GetHead(B_IDLE_PRIORITY);
-		 	cpu->fRunQueue.Remove(nextThreadData);
+			nextThreadData = cpu->PeekIdleThread();
+			cpu->Remove(nextThreadData);
 			nextThreadData->fEnqueued = false;
 
 			putOldThreadAtBack = oldThread->pinned_to_cpu == 0;
@@ -662,14 +696,13 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 	gCurrentMode->set_cpu_enabled(cpuID, enabled);
 
 	CPUEntry* cpu = &gCPUEntries[cpuID];
-	CoreEntry* core = cpu->fCore;
+	CoreEntry* core = cpu->Core();
 
 	int32 oldCPUCount = core->CPUCount();
 	ASSERT(oldCPUCount >= 0);
-	if (enabled) {
-		cpu->fLoad = 0;
-		core->AddCPU(cpu);
-	} else {
+	if (enabled)
+		cpu->Start();
+	else {
 		cpu->UpdatePriority(B_IDLE_PRIORITY);
 
 		ThreadEnqueuer enqueuer;
@@ -679,21 +712,7 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 	gCPU[cpuID].disabled = !enabled;
 
 	if (!enabled) {
-		cpu_ent* entry = &gCPU[cpuID];
-
-		// get rid of irqs
-		SpinLocker locker(entry->irqs_lock);
-		irq_assignment* irq
-			= (irq_assignment*)list_get_first_item(&entry->irqs);
-		while (irq != NULL) {
-			locker.Unlock();
-
-			assign_io_interrupt_to_cpu(irq->irq, -1);
-
-			locker.Lock();
-			irq = (irq_assignment*)list_get_first_item(&entry->irqs);
-		}
-		locker.Unlock();
+		cpu->Stop();
 
 		// don't wait until the thread quantum ends
 		if (smp_get_current_cpu() != cpuID) {
@@ -808,9 +827,7 @@ init()
 
 		package->Init(sCPUToPackage[i]);
 		core->Init(sCPUToCore[i], package);
-
-		gCPUEntries[i].fCPUNumber = i;
-		gCPUEntries[i].fCore = core;
+		gCPUEntries[i].Init(i, core);
 
 		core->AddCPU(&gCPUEntries[i]);
 	}

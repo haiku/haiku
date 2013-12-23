@@ -18,6 +18,7 @@ using namespace Scheduler;
 
 class Scheduler::DebugDumper {
 public:
+	static	void		DumpCPURunQueue(CPUEntry* cpu);
 	static	void		DumpCoreRunQueue(CoreEntry* core);
 	static	void		DumpIdleCoresInPackage(PackageEntry* package);
 
@@ -55,6 +56,78 @@ CPUEntry::CPUEntry()
 	fMeasureTime(0)
 {
 	B_INITIALIZE_RW_SPINLOCK(&fSchedulerModeLock);
+}
+
+
+void
+CPUEntry::Init(int32 id, CoreEntry* core)
+{
+	fCPUNumber = id;
+	fCore = core;
+}
+
+
+void
+CPUEntry::Start()
+{
+	fLoad = 0;
+	fCore->AddCPU(this);
+}
+
+
+void
+CPUEntry::Stop()
+{
+	cpu_ent* entry = &gCPU[fCPUNumber];
+
+	// get rid of irqs
+	SpinLocker locker(entry->irqs_lock);
+	irq_assignment* irq
+		= (irq_assignment*)list_get_first_item(&entry->irqs);
+	while (irq != NULL) {
+		locker.Unlock();
+
+		assign_io_interrupt_to_cpu(irq->irq, -1);
+
+		locker.Lock();
+		irq = (irq_assignment*)list_get_first_item(&entry->irqs);
+	}
+	locker.Unlock();
+}
+
+
+void
+CPUEntry::PushFront(ThreadData* thread, int32 priority)
+{
+	fRunQueue.PushFront(thread, priority);
+}
+
+
+void
+CPUEntry::PushBack(ThreadData* thread, int32 priority)
+{
+	fRunQueue.PushBack(thread, priority);
+}
+
+
+void
+CPUEntry::Remove(ThreadData* thread)
+{
+	fRunQueue.Remove(thread);
+}
+
+
+inline ThreadData*
+CPUEntry::PeekThread() const
+{
+	return fRunQueue.PeekMaximum();
+}
+
+
+ThreadData*
+CPUEntry::PeekIdleThread() const
+{
+	return fRunQueue.GetHead(B_IDLE_PRIORITY);
 }
 
 
@@ -213,10 +286,10 @@ CPUPriorityHeap::Dump()
 	kprintf("cpu priority load\n");
 	CPUEntry* entry = PeekMinimum();
 	while (entry) {
-		int32 cpu = entry->fCPUNumber;
+		int32 cpu = entry->ID();
 		int32 key = GetKey(entry);
 		kprintf("%3" B_PRId32 " %8" B_PRId32 " %3" B_PRId32 "%%\n", cpu, key,
-			entry->fLoad / 10);
+			entry->GetLoad() / 10);
 
 		RemoveMinimum();
 		sDebugCPUHeap.Insert(entry, key);
@@ -406,8 +479,8 @@ CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 	ASSERT(fCPUHeap.PeekMaximum() == cpu);
 	fCPUHeap.RemoveMaximum();
 
-	ASSERT(cpu->fLoad >= 0 && cpu->fLoad <= kMaxLoad);
-	fLoad -= cpu->fLoad;
+	ASSERT(cpu->GetLoad() >= 0 && cpu->GetLoad() <= kMaxLoad);
+	fLoad -= cpu->GetLoad();
 	ASSERT(fLoad >= 0);
 }
 
@@ -534,6 +607,19 @@ PackageEntry::RemoveIdleCore(CoreEntry* core)
 
 
 /* static */ void
+DebugDumper::DumpCPURunQueue(CPUEntry* cpu)
+{
+	ThreadRunQueue::ConstIterator iterator = cpu->fRunQueue.GetConstIterator();
+
+	if (iterator.HasNext()
+		&& !thread_is_idle_thread(iterator.Next()->GetThread())) {
+		kprintf("\nCPU %" B_PRId32 " run queue:\n", cpu->ID());
+		cpu->fRunQueue.Dump();
+	}
+}
+
+
+/* static */ void
 DebugDumper::DumpCoreRunQueue(CoreEntry* core)
 {
 	core->fRunQueue.Dump();
@@ -570,17 +656,8 @@ dump_run_queue(int argc, char **argv)
 		DebugDumper::DumpCoreRunQueue(&gCoreEntries[i]);
 	}
 
-	for (int32 i = 0; i < cpuCount; i++) {
-		CPUEntry* cpu = &gCPUEntries[i];
-		ThreadRunQueue::ConstIterator iterator
-			= cpu->fRunQueue.GetConstIterator();
-
-		if (iterator.HasNext()
-			&& !thread_is_idle_thread(iterator.Next()->GetThread())) {
-			kprintf("\nCPU %" B_PRId32 " run queue:\n", i);
-			cpu->fRunQueue.Dump();
-		}
-	}
+	for (int32 i = 0; i < cpuCount; i++)
+		DebugDumper::DumpCPURunQueue(&gCPUEntries[i]);
 
 	return 0;
 }

@@ -40,11 +40,38 @@ public:
 						void			Dump() const;
 };
 
-struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
+class CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
+public:
 										CPUEntry();
+
+						void			Init(int32 id, CoreEntry* core);
+
+	inline				int32			ID() const	{ return fCPUNumber; }
+	inline				CoreEntry*		Core() const	{ return fCore; }
+
+						void			Start();
+						void			Stop();
+
+	inline				void			EnterScheduler();
+	inline				void			ExitScheduler();
+
+	inline				void			LockScheduler();
+	inline				void			UnlockScheduler();
+
+						void			PushFront(ThreadData* thread,
+											int32 priority);
+						void			PushBack(ThreadData* thread,
+											int32 priority);
+						void			Remove(ThreadData* thread);
+	inline				ThreadData*		PeekThread() const;
+						ThreadData*		PeekIdleThread() const;
 
 						void			UpdatePriority(int32 priority);
 
+	inline				void			IncreaseActiveTime(
+											bigtime_t activeTime);
+
+	inline				int32			GetLoad() const	{ return fLoad; }
 						void			ComputeLoad();
 
 						ThreadData*		ChooseNextThread(ThreadData* oldThread,
@@ -52,6 +79,12 @@ struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
 
 						void			TrackActivity(ThreadData* oldThreadData,
 											ThreadData* nextThreadData);
+
+	static inline		CPUEntry*		GetCPU(int32 cpu);
+
+private:
+	inline				void			_RequestPerformanceLevel(
+											ThreadData* threadData);
 
 						int32			fCPUNumber;
 						CoreEntry*		fCore;
@@ -65,10 +98,7 @@ struct CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
 						bigtime_t		fMeasureActiveTime;
 						bigtime_t		fMeasureTime;
 
-private:
-	inline				void			_RequestPerformanceLevel(
-											ThreadData* threadData);
-
+						friend class DebugDumper;
 } CACHE_LINE_ALIGN;
 
 class CPUPriorityHeap : public MinMaxHeap<CPUEntry, int32> {
@@ -246,6 +276,48 @@ extern int32 gPackageCount;
 
 
 inline void
+CPUEntry::EnterScheduler()
+{
+	acquire_read_spinlock(&fSchedulerModeLock);
+}
+
+
+inline void
+CPUEntry::ExitScheduler()
+{
+	release_read_spinlock(&fSchedulerModeLock);
+}
+
+
+inline void
+CPUEntry::LockScheduler()
+{
+	acquire_write_spinlock(&fSchedulerModeLock);
+}
+
+
+inline void
+CPUEntry::UnlockScheduler()
+{
+	release_write_spinlock(&fSchedulerModeLock);
+}
+
+
+inline void
+CPUEntry::IncreaseActiveTime(bigtime_t activeTime)
+{
+	fMeasureActiveTime += activeTime;
+}
+
+
+/* static */ inline CPUEntry*
+CPUEntry::GetCPU(int32 cpu)
+{
+	return &gCPUEntries[cpu];
+}
+
+
+inline void
 CoreEntry::LockCPUHeap()
 {
 	acquire_spinlock(&fCPULock);
@@ -321,7 +393,7 @@ CoreEntry::StarvationCounter() const
 /* static */ inline CoreEntry*
 CoreEntry::GetCore(int32 cpu)
 {
-	return gCPUEntries[cpu].fCore;
+	return gCPUEntries[cpu].Core();
 }
 
 
