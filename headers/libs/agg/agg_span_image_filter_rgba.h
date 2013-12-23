@@ -226,7 +226,7 @@ namespace agg
             value_type back_b = m_back_color.b;
             value_type back_a = m_back_color.a;
 
-            const value_type *fg_ptr;
+            const value_type *fg_ptr = NULL;
             int maxx = base_type::source().width() - 1;
             int maxy = base_type::source().height() - 1;
 
