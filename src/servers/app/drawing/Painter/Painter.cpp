@@ -2722,8 +2722,8 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	agg::span_allocator<pixfmt_image::color_type> spanAllocator;
 
 	// image accessor attached to pixel format of bitmap
-	typedef agg::image_accessor_clip<pixfmt_image> source_type;
-	source_type source(pixf_img, agg::rgba8(0, 0, 0, 0));
+	typedef agg::image_accessor_clone<pixfmt_image> source_type;
+	source_type source(pixf_img);
 
 	// clip to the current clipping region's frame
 	viewRect = viewRect & fClippingRegion->Frame();
