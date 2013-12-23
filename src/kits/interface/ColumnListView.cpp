@@ -2004,7 +2004,7 @@ BColumnListView::DoLayout()
 
 	if (fStatusView != NULL) {
 		BSize size = fStatusView->MinSize();
-		if (size.height > B_H_SCROLL_BAR_HEIGHT);
+		if (size.height > B_H_SCROLL_BAR_HEIGHT)
 			size.height = B_H_SCROLL_BAR_HEIGHT;
 		if (size.width > Bounds().Width() / 2)
 			size.width = floorf(Bounds().Width() / 2);
