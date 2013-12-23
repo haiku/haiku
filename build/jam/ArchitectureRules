@@ -235,8 +235,8 @@ rule ArchitectureSetup architecture
 		libraryGrist = $(architecture) ;
 	}
 	local i ;
-	for i in be bnetapi debug device game GL locale mail media midi midi2
-			network opengl package root screensaver textencoding tracker
+	for i in be bnetapi debug device game locale mail media midi midi2
+			network package root screensaver textencoding tracker
 			translation z {
 		local library = lib$(i).so ;
 		HAIKU_LIBRARY_NAME_MAP_$(architecture)_$(i)
@@ -609,7 +609,6 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons media plugins vorbis ;
 #	EnableWerror src add-ons media plugins wav_reader ;
 	EnableWerror src add-ons media plugins xvid_decoder ;
-	EnableWerror src add-ons opengl ;
 	EnableWerror src add-ons print ;
 	EnableWerror src add-ons screen_savers ;
 	EnableWerror src add-ons tracker ;

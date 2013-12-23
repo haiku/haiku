@@ -31,13 +31,6 @@ AddFilesToPackage $(addOnsDir) Translators
 # AddFilesToPackage $(addOnsDir) locale catalogs
 # 	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 #
-# AddFilesToPackage $(addOnsDir) opengl :
-# 	x86 @{
-# 		Legacy\ Software\ Rasterizer@gcc2
-# 		Software\ Rasterizer@!gcc2
-# 	}@ # x86
-# ;
-#
 # AddFilesToPackage $(addOnsDir) media : $(SYSTEM_ADD_ONS_MEDIA) ;
 # AddFilesToPackage $(addOnsDir) media plugins
 # 	: $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;

@@ -20,5 +20,7 @@ Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
 SimpleTest GLGears :
 	$(sources)
-	: be GL
+	:
+	be
+	[ BuildFeatureAttribute mesa : library ]
 ;

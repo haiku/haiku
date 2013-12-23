@@ -8,6 +8,7 @@ if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) < 3 {
 	SubDirC++Flags --no-warnings ;
 }
 
+
 local sources =
 	Application.cpp
 	MainWindow.cpp
@@ -17,13 +18,16 @@ local sources =
 	ViewCube.cpp
 	ViewSphere.cpp
 	GLUtility.cpp
-    ;
+	;
 
 Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
 Application 3DMov :
 	$(sources)
-	: be GL game localestub media translation $(TARGET_LIBSUPC++)
+	:
+	be game
+	[ BuildFeatureAttribute mesa : library ]
+	localestub media translation $(TARGET_LIBSUPC++)
 	: 3dmov.rdef
 ;
 

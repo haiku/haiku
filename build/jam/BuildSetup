@@ -600,7 +600,6 @@ HOST_BE_API_HEADERS =
 	[ FDirName $(HAIKU_TOP) headers build os kernel ]
 	[ FDirName $(HAIKU_TOP) headers build os interface ]
 	[ FDirName $(HAIKU_TOP) headers build os locale ]
-	[ FDirName $(HAIKU_TOP) headers build os opengl ]
 	[ FDirName $(HAIKU_TOP) headers build os storage ]
 	[ FDirName $(HAIKU_TOP) headers build os support ]
 	[ FDirName $(HAIKU_TOP) headers build private ]

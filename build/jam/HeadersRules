@@ -435,7 +435,7 @@ rule FStandardOSHeaders
 					   add-ons/input_server add-ons/registrar
 					   add-ons/screen_saver
 					   add-ons/tracker app device drivers game interface
-					   kernel locale media mail midi midi2 net opengl storage
+					   kernel locale media mail midi midi2 net storage
 					   support translation ;
 
 	return [ FDirName $(HAIKU_TOP) headers os ]
@@ -449,7 +449,7 @@ rule FStandardHeaders architecture
 					   add-ons/input_server add-ons/registrar
 					   add-ons/screen_saver
 					   add-ons/tracker app device drivers game interface
-					   kernel locale media mail midi midi2 net opengl storage
+					   kernel locale media mail midi midi2 net storage
 					   support translation ;
 
 	local headers = ;

@@ -49,16 +49,5 @@ if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
 		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;
 }
 
-# OpenGL headers
-if $(TARGET_ARCH) = x86 && ! $(HAIKU_BOOTSTRAP_BUILD) {
-	local mesaGlHeaders
-		= [ FDirName [ BuildFeatureAttribute mesa : headers : path ] GL ] ;
-	local mesaGlHeadersDependency = [ BuildFeatureAttribute mesa : headers ] ;
-	mesaGlHeaders = $(mesaGlHeaders:G=$(mesaGlHeadersDependency:G)) ;
-	Depends $(mesaGlHeaders) : $(mesaGlHeadersDependency) ;
-	CopyDirectoryToPackage develop headers $(architecture) os opengl
-		: $(mesaGlHeaders) : : : isTarget ;
-}
-
 
 BuildHaikuPackage $(haikuDevelPackage) : haiku_devel_secondary ;

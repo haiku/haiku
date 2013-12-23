@@ -1,6 +1,9 @@
 SubDir HAIKU_TOP src tests kits opengl glut game_mode ;
 UseBuildFeatureHeaders mesa ;
 
+# GLUT
+UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] ;
+
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 if $(TARGET_PLATFORM) != haiku {
@@ -18,5 +21,7 @@ Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
 
 SimpleTest GLUTGameMode :
 	$(sources)
-	: be GL libglut.so
+	:
+	be libglut.so
+	[ BuildFeatureAttribute mesa : library ]
 ;

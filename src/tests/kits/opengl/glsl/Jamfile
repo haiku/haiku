@@ -23,5 +23,7 @@ StaticLibrary libshaderutil.a :
 
 SimpleTest brick :
 	brick.c
-	: libshaderutil.a be GL
+	:
+	libshaderutil.a be
+	[ BuildFeatureAttribute mesa : library ]
 ;

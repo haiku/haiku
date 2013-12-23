@@ -1,12 +1,8 @@
 SubDir HAIKU_TOP src libs glut ;
 
+UseLibraryHeaders glut ;
+
 SetSubDirSupportedPlatformsBeOSCompatible ;
-
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
-		# We need our public GL headers also when not compiling for Haiku.
-}
-
 
 local sourcesCc =
 	# C sources
@@ -71,7 +67,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			$(sourcesCpp)
 			$(sourcesCc)
 			:
-			GL game be $(TARGET_LIBSTDC++)
+			game be $(TARGET_LIBSTDC++)
+			[ BuildFeatureAttribute mesa : library ]
 			[ BuildFeatureAttribute glu : library ]
 			;
 	}
