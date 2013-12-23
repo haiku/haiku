@@ -411,6 +411,7 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 			ScrollToSelection();
 			break;
 		}
+
 		case B_DOWN_ARROW:
 		{
 			if (fFirstSelected == -1) {
@@ -438,6 +439,7 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 
 			ScrollToSelection();
 			break;
+
 		case B_END:
 			if (extend) {
 				Select(fAnchorIndex, CountItems() - 1, true);
@@ -455,6 +457,7 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 			ScrollTo(scrollOffset);
 			break;
 		}
+
 		case B_PAGE_DOWN:
 		{
 			BPoint scrollOffset(LeftTop());
@@ -1510,7 +1513,7 @@ BListView::_Select(int32 index, bool extend)
 	}
 
 	ItemAt(index)->Select();
-	if (Window())
+	if (Window() != NULL)
 		InvalidateItem(index);
 
 	return true;
@@ -1548,10 +1551,10 @@ BListView::_Select(int32 from, int32 to, bool extend)
 	}
 
 	for (int32 i = from; i <= to; ++i) {
-		BListItem *item = ItemAt(i);
 		if (item && !item->IsSelected()) {
+		BListItem* item = ItemAt(i);
 			item->Select();
-			if (Window())
+			if (Window() != NULL)
 				InvalidateItem(i);
 			changed = true;
 		}
@@ -1567,14 +1570,14 @@ BListView::_Deselect(int32 index)
 	if (index < 0 || index >= CountItems())
 		return false;
 
-	BWindow *window = Window();
+	BWindow* window = Window();
 	BAutolock locker(window);
-	if (window && !locker.IsLocked())
+	if (window != NULL && !locker.IsLocked())
 		return false;
 
-	BListItem *item = ItemAt(index);
+	BListItem* item = ItemAt(index);
 
-	if (item && item->IsSelected()) {
+	if (item != NULL && item->IsSelected()) {
 		BRect frame(ItemFrame(index));
 		BRect bounds(Bounds());
 
@@ -1616,8 +1619,8 @@ BListView::_DeselectAll(int32 exceptFrom, int32 exceptTo)
 		if (exceptFrom != -1 && exceptFrom <= index && exceptTo >= index)
 			continue;
 
-		BListItem *item = ItemAt(index);
-		if (item && item->IsSelected()) {
+		BListItem* item = ItemAt(index);
+		if (item != NULL && item->IsSelected()) {
 			item->Deselect();
 			InvalidateItem(index);
 			changed = true;
@@ -1680,7 +1683,7 @@ BListView::DrawItem(BListItem* item, BRect itemRect, bool complete)
 bool
 BListView::_SwapItems(int32 a, int32 b)
 {
-	// remember frames of items before anyhing happens,
+	// remember frames of items before anything happens,
 	// the tricky situation is when the two items have
 	// a different height
 	BRect aFrame = ItemFrame(a);
