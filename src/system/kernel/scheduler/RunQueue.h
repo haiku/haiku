@@ -83,8 +83,7 @@ public:
 
 	inline	status_t	GetInitStatus();
 
-	inline	Element*	PeekMaximum();
-	inline	Element*	PeekSecondMaximum();
+	inline	Element*	PeekMaximum() const;
 
 	inline	void		PushFront(Element* element, unsigned int priority);
 	inline	void		PushBack(Element* elementt, unsigned int priority);
@@ -251,7 +250,7 @@ RUN_QUEUE_CLASS_NAME::GetInitStatus()
 
 RUN_QUEUE_TEMPLATE_LIST
 Element*
-RUN_QUEUE_CLASS_NAME::PeekMaximum()
+RUN_QUEUE_CLASS_NAME::PeekMaximum() const
 {
 	int priority = fBitmap.GetHighestSet();
 	if (priority < 0)
@@ -266,22 +265,6 @@ RUN_QUEUE_CLASS_NAME::PeekMaximum()
 	ASSERT(elementLink->fPriority == (unsigned int)priority);
 	ASSERT(fTails[priority] != NULL);
 	ASSERT(elementLink->fPrevious == NULL);
-
-	return element;
-}
-
-
-RUN_QUEUE_TEMPLATE_LIST
-Element*
-RUN_QUEUE_CLASS_NAME::PeekSecondMaximum()
-{
-	int priority = fBitmap.GetHighestSet();
-	if (priority < 0)
-		return NULL;
-
-	fBitmap.Clear(priority);
-	Element* element = PeekMaximum();
-	fBitmap.Set(priority);
 
 	return element;
 }
