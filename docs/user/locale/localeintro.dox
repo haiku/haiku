@@ -6,15 +6,15 @@ translating your software. This includes not only replacing string with their
 translations at runtime, but also more complex tasks such as formatting numbers,
 dates, and times in a way that match the locale preferences of the user.
 
-The main way to access locale data is through the be_locale_roster. This is a
-global instance of the BLocaleRoster class, storing the data for localizing an
-application according to the user's preferred settings. Most of the time, you
-should be able to use the default BLocale object and its convenience methods to
-get things formatted according to the user preferences.  However, you can also
-use the various formatter classes directly when you need a more advanced
-formatting.  For example, you may need to format a date with a fixed format in
-english for including in an e-mail header, as it is the only format accepted
-there.
+The main way to access locale data is through BLocaleRoster::Default(). This
+returns a global instance of the BLocaleRoster class, storing the data for
+localizing an application according to the user's preferred settings. Most of
+the time, you should be able to use the default BLocale object and its
+convenience methods to get things formatted according to the user preferences.
+However, you can also use the various formatter classes directly when you need
+a more advanced formatting.  For example, you may need to format a date with a
+fixed format in english for including in an e-mail header, as it is the only
+format accepted there.
 
 Note that creating a new format is a costly operation. The idea is that you
 create your format object once and reuse it accross your application to format
