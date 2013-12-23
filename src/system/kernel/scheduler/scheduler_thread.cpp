@@ -22,6 +22,7 @@ ThreadData::Init()
 {
 	fPriorityPenalty = 0;
 	fAdditionalPenalty = 0;
+	fEffectivePriority = -1;
 
 	fTimeLeft = 0;
 	fStolenTime = 0;
@@ -118,6 +119,23 @@ ThreadData::ComputeQuantum()
 	fQuantumStart = system_time();
 
 	return quantum;
+}
+
+
+void
+ThreadData::_ComputeEffectivePriority() const
+{
+	if (thread_is_idle_thread(fThread))
+		fEffectivePriority = B_IDLE_PRIORITY;
+	else if (fThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+		fEffectivePriority = fThread->priority;
+	else {
+		fEffectivePriority = fThread->priority;
+		fEffectivePriority -= _GetPenalty();
+
+		ASSERT(fEffectivePriority < B_FIRST_REAL_TIME_PRIORITY);
+		ASSERT(fEffectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
+	}
 }
 
 

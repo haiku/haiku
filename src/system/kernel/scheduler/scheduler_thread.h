@@ -74,6 +74,8 @@ private:
 	inline	int32		_GetPenalty() const;
 	inline	int32		_GetMinimalPriority() const;
 
+			void		_ComputeEffectivePriority() const;
+
 	inline	CoreEntry*	_ChooseCore() const;
 	inline	CPUEntry*	_ChooseCPU(CoreEntry* core,
 							bool& rescheduleNeeded) const;
@@ -97,6 +99,8 @@ private:
 
 			int32		fPriorityPenalty;
 			int32		fAdditionalPenalty;
+
+	mutable	int32		fEffectivePriority;
 
 			bigtime_t	fTimeLeft;
 
@@ -133,18 +137,9 @@ ThreadData::ShouldRebalance() const
 inline int32
 ThreadData::GetEffectivePriority() const
 {
-	if (thread_is_idle_thread(fThread))
-		return B_IDLE_PRIORITY;
-	if (fThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
-		return fThread->priority;
-
-	int32 effectivePriority = fThread->priority;
-	effectivePriority -= _GetPenalty();
-
-	ASSERT(effectivePriority < B_FIRST_REAL_TIME_PRIORITY);
-	ASSERT(effectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
-
-	return effectivePriority;
+	if (fEffectivePriority == -1)
+		_ComputeEffectivePriority();
+	return fEffectivePriority;
 }
 
 
@@ -158,6 +153,7 @@ ThreadData::IncreasePenalty()
 
 	TRACE("increasing thread %ld penalty\n", fThread->id);
 
+	fEffectivePriority = -1;
 	int32 oldPenalty = fPriorityPenalty++;
 
 	ASSERT(fThread->priority - oldPenalty >= B_LOWEST_ACTIVE_PRIORITY);
@@ -173,8 +169,10 @@ ThreadData::IncreasePenalty()
 inline void
 ThreadData::CancelPenalty()
 {
-	if (fPriorityPenalty != 0)
+	if (fPriorityPenalty != 0) {
 		TRACE("cancelling thread %ld penalty\n", fThread->id);
+		fEffectivePriority = -1;
+	}
 
 	fAdditionalPenalty = 0;
 	fPriorityPenalty = 0;
