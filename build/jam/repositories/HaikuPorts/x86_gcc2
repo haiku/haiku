@@ -252,8 +252,10 @@ RemotePackageRepository HaikuPorts
 	libxml2_x86_devel-2.8.0-6
 	libxslt_x86-1.1.28-2
 	libxslt_x86_devel-1.1.28-2
-#	mesa_x86-10.0.1-2
-#	mesa_x86_devel-10.0.1-2
+	mesa_x86-10.0.1-4
+	mesa_x86_devel-10.0.1-4
+	mesa_x86_swrast-10.0.1-4
+	mesa_x86_swpipe-10.0.1-4
 	ncurses_x86-5.9-9
 	ncurses_x86_devel-5.9-9
 	ninja_x86-1.4.0-1
@@ -356,7 +358,7 @@ RemotePackageRepository HaikuPorts
 	man
 	mercurial
 	mesa
-#	mesa_x86
+	mesa_x86
 	mkdepend
 	nano
 	ncurses
