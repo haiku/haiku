@@ -220,6 +220,7 @@ PrintServerApp::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 	switch( idx=prop_info.FindMatch(msg,0,spec,form,prop) ) {
 		case B_ERROR:
 			rc = Inherited::ResolveSpecifier(msg,index,spec,form,prop);
+			break;
 
 		case 1:
 			// GET Printer [arg]
