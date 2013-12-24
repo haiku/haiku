@@ -2322,6 +2322,7 @@ BPoseView::MessageReceived(BMessage* message)
 			break;
 
 		case kDelete:
+			ExcludeTrashFromSelection();
 			if (ContainerWindow()->IsTrash())
 				// if trash delete instantly
 				DeleteSelection(true, false);
@@ -2331,6 +2332,7 @@ BPoseView::MessageReceived(BMessage* message)
 
 		case kMoveToTrash:
 		{
+			ExcludeTrashFromSelection();
 			TrackerSettings settings;
 
 			if ((modifiers() & B_SHIFT_KEY) != 0 || settings.DontMoveFilesToTrash())
@@ -6466,6 +6468,7 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 
 		case B_DELETE:
 		{
+			ExcludeTrashFromSelection();
 			if (TargetModel() == NULL) {
 				// Happens if called from within OpenWith window, for example
 				break;
@@ -10155,6 +10158,20 @@ BPoseView::ClearFilter()
 	fFilteredPoseList->MakeEmpty();
 
 	Invalidate();
+}
+
+
+void
+BPoseView::ExcludeTrashFromSelection()
+{
+	int32 count = fSelectionList->CountItems();
+	for (int index = 0; index < count; index++) {
+		BPose* pose = fSelectionList->ItemAt(index);
+		if (CanTrashForeignDrag(pose->TargetModel())) {
+			RemovePoseFromSelection(pose);
+			break;
+		}
+	}
 }
 
 

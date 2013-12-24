@@ -679,6 +679,8 @@ class BPoseView : public BView {
 		void WatchParentOf(const entry_ref*);
 		void StopWatchingParentsOf(const entry_ref*);
 
+		void ExcludeTrashFromSelection();
+
 	private:
 		void DrawOpenAnimation(BRect);
 
