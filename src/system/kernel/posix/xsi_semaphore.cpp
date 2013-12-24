@@ -1158,8 +1158,10 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 				if (operation != 0)
 					semaphore->Revert(operation);
 			}
-			if (result != 0)
+			if (result != 0) {
+				free(operations);
 				return result;
+			}
 
 			// We have to wait: first enqueue the thread
 			// in the appropriate set waiting list, then
@@ -1246,5 +1248,6 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 			semaphore->SetPid(getpid());
 		}
 	}
+	free(operations);
 	return result;
 }
