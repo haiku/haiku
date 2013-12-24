@@ -398,7 +398,7 @@ PackageManager::HandleProblems()
 		installPackages.insert(fCurrentInstallPackage);
 
 	if (fCurrentUninstallPackage != NULL)
-		uninstallPackages.insert(fCurrentInstallPackage);
+		uninstallPackages.insert(fCurrentUninstallPackage);
 
 	if (!fProblemWindow->Go(fSolver,installPackages, uninstallPackages))
 		throw BAbortedByUserException();
