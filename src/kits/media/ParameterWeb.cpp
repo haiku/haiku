@@ -150,7 +150,7 @@ static const uint32 kBufferGroupMagicNoFlags = 0x03040507;
 static const uint32 kParameterMagic = 0x02040607;
 
 static const ssize_t kAdditionalParameterGroupSize = 12;
-static const ssize_t kAdditionalParameterSize = 35;
+static const ssize_t kAdditionalParameterSize = 23 + 3 * sizeof(ssize_t);
 
 /* BContinuousParameter - FlattenedSize() fixed part
  *	Min: 4 bytes (as float)
@@ -160,7 +160,8 @@ static const ssize_t kAdditionalParameterSize = 35;
  *	Factor: 4 bytes (as float)
  *	Offset: 4 bytes (as float)
  */
-static const ssize_t kAdditionalContinuousParameterSize = 24;
+static const ssize_t kAdditionalContinuousParameterSize = 5 * sizeof(float)
+	+ sizeof(BContinuousParameter::response);
 static const ssize_t kAdditionalDiscreteParameterSize = sizeof(ssize_t);
 
 
@@ -488,8 +489,7 @@ BParameterWeb::FlattenedSize() const
 		BParameterGroup* group
 			= static_cast<BParameterGroup*>(fGroups->ItemAt(i));
 		if (group != NULL) {
-			size += 4 + group->FlattenedSize();
-				// 4 bytes for the flattened size
+			size += sizeof(ssize_t) + group->FlattenedSize();
 		}
 	}
 
@@ -892,7 +892,7 @@ BParameterGroup::FlattenedSize() const
 	ssize_t size = 13;
 
 	if (fFlags != 0)
-		size += 4;
+		size += sizeof(uint32);
 
 	if (fName != NULL)
 		size += min_c(strlen(fName), 255);
@@ -902,7 +902,8 @@ BParameterGroup::FlattenedSize() const
 		BParameter* parameter = static_cast<BParameter*>(fControls->ItemAt(i));
 		if (parameter != NULL) {
 			// overhead for each parameter flattened
-			size += 16 + parameter->FlattenedSize();
+			size += sizeof(BParameter*) + sizeof(BParameter::media_parameter_type)
+				 + sizeof(ssize_t) + parameter->FlattenedSize();
 		}
 	}
 
@@ -912,7 +913,8 @@ BParameterGroup::FlattenedSize() const
 			= static_cast<BParameterGroup*>(fGroups->ItemAt(i));
 		if (group != NULL) {
 			// overhead for each group flattened
-			size += 16 + group->FlattenedSize();
+			size += sizeof(BParameterGroup*) + sizeof(type_code)
+				+ sizeof(ssize_t) + group->FlattenedSize();
 		}
 	}
 
@@ -1076,8 +1078,11 @@ BParameterGroup::Unflatten(type_code code, const void* buffer, ssize_t size)
 
 	for (int32 i = 0; i < count; i++) {
 		// make sure we can read as many bytes
-		if (size_left(size, bufferStart, buffer) < 12)
+		if (size_left(size, bufferStart, buffer) < (ssize_t)(
+				sizeof(BParameter*) + sizeof(BParameter::media_parameter_type)
+				+ sizeof(ssize_t))) {
 			return B_BAD_VALUE;
+		}
 
 		BParameter* oldPointer = read_pointer_from_buffer_swap<BParameter*>(
 			&buffer, isSwapped);
@@ -1125,8 +1130,11 @@ BParameterGroup::Unflatten(type_code code, const void* buffer, ssize_t size)
 
 	for (int32 i = 0; i < count; i++) {
 		// make sure we can read as many bytes
-		if (size_left(size, bufferStart, buffer) < 12)
+		if (size_left(size, bufferStart, buffer) < (ssize_t)(
+				sizeof(BParameterGroup*) + sizeof(type_code)
+				+ sizeof(ssize_t))) {
 			return B_BAD_VALUE;
+		}
 
 		BParameterGroup* oldPointer = read_pointer_from_buffer_swap<
 			BParameterGroup*>(&buffer, isSwapped);
@@ -1527,7 +1535,7 @@ BParameter::FlattenedSize() const
 		Flags: 4 bytes
 	*/
 	//35 bytes are guaranteed, after that, add the variable length parts.
-	ssize_t size = 35;
+	ssize_t size = kAdditionalParameterSize;
 
 	if (fName != NULL)
 		size += strlen(fName);
@@ -1659,8 +1667,8 @@ BParameter::Unflatten(type_code code, const void* buffer, ssize_t size)
 	// Channel Count (4 bytes)
 	// Flags (4 bytes)
 	// TOTAL: 27 bytes
-	const ssize_t MinFlattenedParamSize(27);
-	if (parameterSize < MinFlattenedParamSize) {
+	const ssize_t kMinFlattenedParamSize = 15 + 3 * sizeof(ssize_t);
+	if (parameterSize < kMinFlattenedParamSize) {
 		ERROR("BParameter::Unflatten out of memory (2)\n");
 		return B_ERROR;
 	}
@@ -1680,20 +1688,21 @@ BParameter::Unflatten(type_code code, const void* buffer, ssize_t size)
 	// it will directly add the pointers in the flattened message to the list;
 	// these will be fixed to point to the real inputs/outputs later in FixRefs()
 
-	int32 count = read_from_buffer_swap32<int32>(&buffer, fSwapDetected);
+	ssize_t count = read_pointer_from_buffer_swap<ssize_t>(&buffer,
+		fSwapDetected);
 
 	fInputs->MakeEmpty();
-	for (int32 i = 0; i < count; i++) {
+	for (ssize_t i = 0; i < count; i++) {
 		fInputs->AddItem(read_pointer_from_buffer_swap<BParameter * const>(
 			&buffer, fSwapDetected));
 	}
 
 	// read the list of outputs
 
-	count = read_from_buffer_swap32<int32>(&buffer, fSwapDetected);
+	count = read_pointer_from_buffer_swap<ssize_t>(&buffer, fSwapDetected);
 
 	fOutputs->MakeEmpty();
-	for (int32 i = 0; i < count; i++) {
+	for (ssize_t i = 0; i < count; i++) {
 		fOutputs->AddItem(read_pointer_from_buffer_swap<BParameter * const>(
 			&buffer, fSwapDetected));
 	}
