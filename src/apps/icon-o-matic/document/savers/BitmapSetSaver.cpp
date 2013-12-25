@@ -31,21 +31,21 @@ BitmapSetSaver::Save(Document* document)
 	char name[B_OS_NAME_LENGTH];
 
 	// 64x64
-	sprintf(name, "%s_64.png", fRef.name);
+	snprintf(name, sizeof(name), "%s_64.png", fRef.name);
 	actualRef.set_name(name);
 	Exporter* exporter = new BitmapExporter(64);
 	exporter->SetSelfDestroy(true);
 	exporter->Export(document, actualRef);
 
 	// 16x16
-	sprintf(name, "%s_16.png", fRef.name);
+	snprintf(name, sizeof(name), "%s_16.png", fRef.name);
 	actualRef.set_name(name);
 	exporter = new BitmapExporter(16);
 	exporter->SetSelfDestroy(true);
 	exporter->Export(document, actualRef);
 
 	// 32x32
-	sprintf(name, "%s_32.png", fRef.name);
+	snprintf(name, sizeof(name), "%s_32.png", fRef.name);
 	actualRef.set_name(name);
 	exporter = new BitmapExporter(32);
 	exporter->SetSelfDestroy(true);
