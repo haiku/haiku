@@ -375,11 +375,11 @@ rule DetermineHaikuRevision
 	local gitIndex = <haiku-rootdir-git>index ;
 	local revisionFile = <haiku-rootdir-git>haiku-revision ;
 	if ! [ on $(gitIndex) return $(HAIKU_GIT_REVISION_DETERMINED) ] {
+		HAIKU_GIT_REVISION_DETERMINED on $(gitIndex) = 1 ;
 		MakeLocate $(revisionFile) : $(HAIKU_BUILD_OUTPUT_DIR) ;
 		if $(HAIKU_REVISION) {
 			DetermineHaikuRevision2 $(revisionFile) ;
 		} else if [ Glob [ FDirName $(HAIKU_TOP) .git ] : index ] {
-			HAIKU_GIT_REVISION_DETERMINED on $(gitIndex) = 1 ;
 			SEARCH on $(gitIndex) = [ FDirName $(HAIKU_TOP) .git ] ;
 			Depends $(revisionFile) : $(gitIndex) ;
 			DetermineHaikuRevision1 $(revisionFile) : $(gitIndex) ;
