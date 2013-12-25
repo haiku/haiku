@@ -71,16 +71,16 @@ SavePanel::SavePanel(const char* name,
 	if (!window || !window->Lock())
 		return;
 
-	window->SetTitle(B_TRANSLATE("Save image"));
-
 	// add this instance as BHandler to the window's looper
 	window->AddHandler(this);
 	
 	// find a couple of important views and mess with their layout
 	BView* background = Window()->ChildAt(0);
-	BButton* cancel = dynamic_cast<BButton*>(background->FindView("cancel button"));
+	BButton* cancel = dynamic_cast<BButton*>(
+		background->FindView("cancel button"));
 	BView* textview = background->FindView("text view");
-	BScrollBar* hscrollbar = dynamic_cast<BScrollBar*>(background->FindView("HScrollBar"));
+	BScrollBar* hscrollbar = dynamic_cast<BScrollBar*>(
+		background->FindView("HScrollBar"));
 
 	if (!background || !cancel || !textview || !hscrollbar) {
 		printf("SavePanel::SavePanel() - couldn't find necessary controls.\n");
@@ -141,7 +141,8 @@ SavePanel::SavePanel(const char* name,
 	textview->ResizeTo(fSettingsB->Frame().right - fFormatMF->Frame().left,
 					   textview->Frame().Height());
 
-	// Make sure the smallest window won't draw the "Settings" button over anything else
+	// Make sure the smallest window won't draw the "Settings" button over
+	// anything else
 	float minWindowWidth = textview->Bounds().Width()
 							+ cancel->Bounds().Width()
 							+ (insert ? insert->Bounds().Width() : 0.0)
@@ -150,6 +151,9 @@ SavePanel::SavePanel(const char* name,
 	if (Window()->Bounds().IntegerWidth() + 1 < minWindowWidth)
 		Window()->ResizeTo(minWindowWidth, Window()->Bounds().Height());
 
+
+	// Init window title
+	SetExportMode(true);
 
 	window->Unlock();
 }
@@ -201,12 +205,12 @@ SavePanel::SetExportMode(bool exportMode)
 		return;
 
 	// adjust window title and enable format menu
-	BString helper("Icon-O-Matic: ");
+	BString title("Icon-O-Matic: ");
 	if (exportMode) {
 		fFormatMF->SetEnabled(true);
 		SetExportMode(fExportMode);
 		_EnableSettings();
-		helper << B_TRANSLATE_CONTEXT("Export Icon", "Dialog title");
+		title << B_TRANSLATE_CONTEXT("Export icon", "Dialog title");
 	} else {
 		fExportMode = ExportMode();
 			// does not overwrite fExportMode in case we already were
@@ -215,9 +219,10 @@ SavePanel::SetExportMode(bool exportMode)
 
 		fFormatMF->SetEnabled(false);
 		fSettingsB->SetEnabled(false);
-		helper << B_TRANSLATE_CONTEXT("Save Icon", "Dialog title");
+		title << B_TRANSLATE_CONTEXT("Save icon", "Dialog title");
 	}
 
+	window->SetTitle(title);
 	window->Unlock();
 }
 
