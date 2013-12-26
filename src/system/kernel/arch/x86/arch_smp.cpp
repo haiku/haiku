@@ -10,6 +10,7 @@
 
 #include <boot/kernel_args.h>
 #include <vm/vm.h>
+#include <cpu.h>
 #include <int.h>
 #include <smp.h>
 #include <smp_priv.h>
