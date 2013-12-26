@@ -106,7 +106,6 @@ private:
 };
 
 
-#if KDEBUG
 template<typename Element>
 RunQueueLink<Element>::RunQueueLink()
 	:
@@ -114,12 +113,6 @@ RunQueueLink<Element>::RunQueueLink()
 	fNext(NULL)
 {
 }
-#else
-template<typename Element>
-RunQueueLink<Element>::RunQueueLink()
-{
-}
-#endif
 
 
 template<typename Element>
@@ -349,10 +342,8 @@ RUN_QUEUE_CLASS_NAME::Remove(Element* element)
 	if (fHeads[priority] == NULL)
 		fBitmap.Clear(priority);
 
-#if KDEBUG
 	elementLink->fPrevious = NULL;
 	elementLink->fNext = NULL;
-#endif
 }
 
 
