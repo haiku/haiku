@@ -9,6 +9,7 @@
 #include "scheduler_common.h"
 #include "scheduler_cpu.h"
 #include "scheduler_modes.h"
+#include "scheduler_profiler.h"
 #include "scheduler_thread.h"
 
 
@@ -33,10 +34,9 @@ set_cpu_enabled(int32 /* cpu */, bool /* enabled */)
 static bool
 has_cache_expired(const ThreadData* threadData)
 {
-	ASSERT(!gSingleCore);
+	SCHEDULER_ENTER_FUNCTION();
 
 	CoreEntry* core = threadData->Core();
-
 	bigtime_t activeTime = core->GetActiveTime();
 	return activeTime - threadData->WentSleepActive() > kCacheExpire;
 }
@@ -45,6 +45,8 @@ has_cache_expired(const ThreadData* threadData)
 static CoreEntry*
 choose_core(const ThreadData* /* threadData */)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	// wake new package
 	PackageEntry* package = gIdlePackageList.Last();
 	if (package == NULL) {
@@ -72,6 +74,8 @@ choose_core(const ThreadData* /* threadData */)
 static bool
 should_rebalance(const ThreadData* threadData)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	int32 coreLoad = threadData->Core()->GetLoad();
 
 	// If the thread produces more than 50% of the load, leave it here. In
@@ -104,6 +108,8 @@ should_rebalance(const ThreadData* threadData)
 static void
 rebalance_irqs(bool idle)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (idle)
 		return;
 

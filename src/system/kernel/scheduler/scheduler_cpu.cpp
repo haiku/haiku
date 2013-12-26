@@ -99,6 +99,7 @@ CPUEntry::Stop()
 void
 CPUEntry::PushFront(ThreadData* thread, int32 priority)
 {
+	SCHEDULER_ENTER_FUNCTION();
 	fRunQueue.PushFront(thread, priority);
 }
 
@@ -106,6 +107,7 @@ CPUEntry::PushFront(ThreadData* thread, int32 priority)
 void
 CPUEntry::PushBack(ThreadData* thread, int32 priority)
 {
+	SCHEDULER_ENTER_FUNCTION();
 	fRunQueue.PushBack(thread, priority);
 }
 
@@ -113,6 +115,7 @@ CPUEntry::PushBack(ThreadData* thread, int32 priority)
 void
 CPUEntry::Remove(ThreadData* thread)
 {
+	SCHEDULER_ENTER_FUNCTION();
 	ASSERT(thread->IsEnqueued());
 	thread->SetDequeued();
 	fRunQueue.Remove(thread);
@@ -122,6 +125,7 @@ CPUEntry::Remove(ThreadData* thread)
 inline ThreadData*
 CPUEntry::PeekThread() const
 {
+	SCHEDULER_ENTER_FUNCTION();
 	return fRunQueue.PeekMaximum();
 }
 
@@ -129,6 +133,7 @@ CPUEntry::PeekThread() const
 ThreadData*
 CPUEntry::PeekIdleThread() const
 {
+	SCHEDULER_ENTER_FUNCTION();
 	return fRunQueue.GetHead(B_IDLE_PRIORITY);
 }
 
@@ -136,6 +141,8 @@ CPUEntry::PeekIdleThread() const
 void
 CPUEntry::UpdatePriority(int32 priority)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (gCPU[fCPUNumber].disabled)
 		return;
 
@@ -161,6 +168,8 @@ CPUEntry::UpdatePriority(int32 priority)
 void
 CPUEntry::ComputeLoad()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ASSERT(!gSingleCore);
 	ASSERT(fCPUNumber == smp_get_current_cpu());
 
@@ -181,6 +190,8 @@ CPUEntry::ComputeLoad()
 ThreadData*
 CPUEntry::ChooseNextThread(ThreadData* oldThread, bool putAtBack)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	CoreRunQueueLocker _(fCore);
 
 	ThreadData* sharedThread = fCore->PeekThread();
@@ -217,6 +228,8 @@ CPUEntry::ChooseNextThread(ThreadData* oldThread, bool putAtBack)
 void
 CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	cpu_ent* cpuEntry = &gCPU[fCPUNumber];
 
 	Thread* oldThread = oldThreadData->GetThread();
@@ -252,6 +265,8 @@ CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 inline void
 CPUEntry::_RequestPerformanceLevel(ThreadData* threadData)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	int32 load = std::max(threadData->GetLoad(), fCore->GetLoad());
 	load = std::min(std::max(load, int32(0)), kMaxLoad);
 
@@ -332,6 +347,8 @@ CoreEntry::Init(int32 id, PackageEntry* package)
 void
 CoreEntry::PushFront(ThreadData* thread, int32 priority)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	fRunQueue.PushFront(thread, priority);
 	atomic_add(&fThreadCount, 1);
 }
@@ -340,6 +357,8 @@ CoreEntry::PushFront(ThreadData* thread, int32 priority)
 void
 CoreEntry::PushBack(ThreadData* thread, int32 priority)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	fRunQueue.PushBack(thread, priority);
 	fThreadList.Insert(thread);
 
@@ -350,6 +369,8 @@ CoreEntry::PushBack(ThreadData* thread, int32 priority)
 void
 CoreEntry::Remove(ThreadData* thread)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ASSERT(thread->IsEnqueued());
 	thread->SetDequeued();
 	if (thread_is_idle_thread(thread->GetThread())
@@ -366,6 +387,7 @@ CoreEntry::Remove(ThreadData* thread)
 inline ThreadData*
 CoreEntry::PeekThread() const
 {
+	SCHEDULER_ENTER_FUNCTION();
 	return fRunQueue.PeekMaximum();
 }
 
@@ -373,6 +395,8 @@ CoreEntry::PeekThread() const
 void
 CoreEntry::UpdateLoad(int32 delta)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (fCPUCount == 0) {
 		fLoad = 0;
 		return;
@@ -544,6 +568,8 @@ PackageEntry::Init(int32 id)
 inline void
 PackageEntry::CoreGoesIdle(CoreEntry* core)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	WriteSpinLocker _(fCoreLock);
 
 	ASSERT(fIdleCoreCount >= 0);
@@ -563,6 +589,8 @@ PackageEntry::CoreGoesIdle(CoreEntry* core)
 inline void
 PackageEntry::CoreWakesUp(CoreEntry* core)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	WriteSpinLocker _(fCoreLock);
 
 	ASSERT(fIdleCoreCount > 0);

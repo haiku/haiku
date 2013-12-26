@@ -17,6 +17,7 @@
 #include "RunQueue.h"
 #include "scheduler_common.h"
 #include "scheduler_modes.h"
+#include "scheduler_profiler.h"
 
 
 namespace Scheduler {
@@ -277,6 +278,7 @@ extern int32 gPackageCount;
 inline void
 CPUEntry::EnterScheduler()
 {
+	SCHEDULER_ENTER_FUNCTION();
 	acquire_read_spinlock(&fSchedulerModeLock);
 }
 
@@ -284,6 +286,7 @@ CPUEntry::EnterScheduler()
 inline void
 CPUEntry::ExitScheduler()
 {
+	SCHEDULER_ENTER_FUNCTION();
 	release_read_spinlock(&fSchedulerModeLock);
 }
 
@@ -291,6 +294,7 @@ CPUEntry::ExitScheduler()
 inline void
 CPUEntry::LockScheduler()
 {
+	SCHEDULER_ENTER_FUNCTION();
 	acquire_write_spinlock(&fSchedulerModeLock);
 }
 
@@ -298,6 +302,7 @@ CPUEntry::LockScheduler()
 inline void
 CPUEntry::UnlockScheduler()
 {
+	SCHEDULER_ENTER_FUNCTION();
 	release_write_spinlock(&fSchedulerModeLock);
 }
 
@@ -305,6 +310,7 @@ CPUEntry::UnlockScheduler()
 inline void
 CPUEntry::IncreaseActiveTime(bigtime_t activeTime)
 {
+	SCHEDULER_ENTER_FUNCTION();
 	fMeasureActiveTime += activeTime;
 }
 
@@ -312,6 +318,7 @@ CPUEntry::IncreaseActiveTime(bigtime_t activeTime)
 /* static */ inline CPUEntry*
 CPUEntry::GetCPU(int32 cpu)
 {
+	SCHEDULER_ENTER_FUNCTION();
 	return &gCPUEntries[cpu];
 }
 
@@ -319,6 +326,7 @@ CPUEntry::GetCPU(int32 cpu)
 inline void
 CoreEntry::LockCPUHeap()
 {
+	SCHEDULER_ENTER_FUNCTION();
 	acquire_spinlock(&fCPULock);
 }
 
@@ -326,6 +334,7 @@ CoreEntry::LockCPUHeap()
 inline void
 CoreEntry::UnlockCPUHeap()
 {
+	SCHEDULER_ENTER_FUNCTION();
 	release_spinlock(&fCPULock);
 }
 
@@ -333,6 +342,7 @@ CoreEntry::UnlockCPUHeap()
 inline CPUPriorityHeap*
 CoreEntry::CPUHeap()
 {
+	SCHEDULER_ENTER_FUNCTION();
 	return &fCPUHeap;
 }
 
@@ -340,6 +350,7 @@ CoreEntry::CPUHeap()
 inline void
 CoreEntry::LockRunQueue()
 {
+	SCHEDULER_ENTER_FUNCTION();
 	acquire_spinlock(&fQueueLock);
 }
 
@@ -347,6 +358,7 @@ CoreEntry::LockRunQueue()
 inline void
 CoreEntry::UnlockRunQueue()
 {
+	SCHEDULER_ENTER_FUNCTION();
 	release_spinlock(&fQueueLock);
 }
 
@@ -354,6 +366,7 @@ CoreEntry::UnlockRunQueue()
 inline void
 CoreEntry::IncreaseActiveTime(bigtime_t activeTime)
 {
+	SCHEDULER_ENTER_FUNCTION();
 	WriteSequentialLocker _(fActiveTimeLock);
 	fActiveTime += activeTime;
 }
@@ -362,14 +375,14 @@ CoreEntry::IncreaseActiveTime(bigtime_t activeTime)
 inline bigtime_t
 CoreEntry::GetActiveTime() const
 {
-	bigtime_t activeTime;
+	SCHEDULER_ENTER_FUNCTION();
 
+	bigtime_t activeTime;
 	uint32 count;
 	do {
 		count = acquire_read_seqlock(&fActiveTimeLock);
 		activeTime = fActiveTime;
 	} while (!release_read_seqlock(&fActiveTimeLock, count));
-
 	return activeTime;
 }
 
@@ -377,6 +390,8 @@ CoreEntry::GetActiveTime() const
 inline int32
 CoreEntry::GetLoad() const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ASSERT(fCPUCount >= 0);
 	return fLoad / fCPUCount;
 }
@@ -385,6 +400,7 @@ CoreEntry::GetLoad() const
 inline int32
 CoreEntry::StarvationCounter() const
 {
+	SCHEDULER_ENTER_FUNCTION();
 	return fStarvationCounter;
 }
 
@@ -392,6 +408,7 @@ CoreEntry::StarvationCounter() const
 /* static */ inline CoreEntry*
 CoreEntry::GetCore(int32 cpu)
 {
+	SCHEDULER_ENTER_FUNCTION();
 	return gCPUEntries[cpu].Core();
 }
 
@@ -399,6 +416,7 @@ CoreEntry::GetCore(int32 cpu)
 inline CoreEntry*
 PackageEntry::GetIdleCore() const
 {
+	SCHEDULER_ENTER_FUNCTION();
 	return fIdleCores.Last();
 }
 
@@ -406,6 +424,8 @@ PackageEntry::GetIdleCore() const
 /* static */ inline PackageEntry*
 PackageEntry::GetMostIdlePackage()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	PackageEntry* current = &gPackageEntries[0];
 	for (int32 i = 1; i < gPackageCount; i++) {
 		if (gPackageEntries[i].fIdleCoreCount > current->fIdleCoreCount)
@@ -422,6 +442,8 @@ PackageEntry::GetMostIdlePackage()
 /* static */ inline PackageEntry*
 PackageEntry::GetLeastIdlePackage()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	PackageEntry* package = NULL;
 
 	for (int32 i = 0; i < gPackageCount; i++) {

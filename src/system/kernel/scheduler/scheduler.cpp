@@ -32,6 +32,7 @@
 #include "scheduler_common.h"
 #include "scheduler_cpu.h"
 #include "scheduler_modes.h"
+#include "scheduler_profiler.h"
 #include "scheduler_thread.h"
 #include "scheduler_tracing.h"
 
@@ -192,7 +193,7 @@ scheduler_dump_thread_data(Thread* thread)
 static void
 enqueue(Thread* thread, bool newOne)
 {
-	ASSERT(thread != NULL);
+	SCHEDULER_ENTER_FUNCTION();
 
 	ThreadData* threadData = thread->scheduler_data;
 
@@ -243,10 +244,8 @@ enqueue(Thread* thread, bool newOne)
 void
 scheduler_enqueue_in_run_queue(Thread *thread)
 {
-#if KDEBUG
-	if (are_interrupts_enabled())
-		panic("scheduler_enqueue_in_run_queue: called with interrupts enabled");
-#endif
+	ASSERT(!are_interrupts_enabled());
+	SCHEDULER_ENTER_FUNCTION();
 
 	SchedulerModeLocker _;
 
@@ -267,13 +266,12 @@ scheduler_enqueue_in_run_queue(Thread *thread)
 int32
 scheduler_set_thread_priority(Thread *thread, int32 priority)
 {
-#if KDEBUG
-	if (!are_interrupts_enabled())
-		panic("scheduler_set_thread_priority: called with interrupts disabled");
-#endif
+	ASSERT(are_interrupts_enabled());
 
 	InterruptsSpinLocker _(thread->scheduler_lock);
 	SchedulerModeLocker modeLocker;
+
+	SCHEDULER_ENTER_FUNCTION();
 
 	ThreadData* threadData = thread->scheduler_data;
 	int32 oldPriority = thread->priority;
@@ -431,6 +429,8 @@ switch_thread(Thread* fromThread, Thread* toThread)
 static inline void
 update_thread_times(Thread* oldThread, Thread* nextThread)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	bigtime_t now = system_time();
 	if (oldThread == nextThread) {
 		SpinLocker _(oldThread->time_lock);
@@ -459,6 +459,7 @@ static void
 reschedule(int32 nextState)
 {
 	ASSERT(!are_interrupts_enabled());
+	SCHEDULER_ENTER_FUNCTION();
 
 	SchedulerModeLocker modeLocker;
 
@@ -584,6 +585,9 @@ reschedule(int32 nextState)
 		nextThreadData->StartQuantum();
 
 		modeLocker.Unlock();
+
+		SCHEDULER_EXIT_FUNCTION();
+
 		if (nextThread != oldThread)
 			switch_thread(oldThread, nextThread);
 	}
@@ -596,10 +600,8 @@ reschedule(int32 nextState)
 void
 scheduler_reschedule(int32 nextState)
 {
-#if KDEBUG
-	if (are_interrupts_enabled())
-		panic("scheduler_reschedule: called with interrupts enabled");
-#endif
+	ASSERT(!are_interrupts_enabled());
+	SCHEDULER_ENTER_FUNCTION();
 
 	if (!sSchedulerEnabled) {
 		Thread* thread = thread_get_current_thread();
@@ -652,6 +654,7 @@ void
 scheduler_start()
 {
 	InterruptsSpinLocker _(thread_get_current_thread()->scheduler_lock);
+	SCHEDULER_ENTER_FUNCTION();
 
 	reschedule(B_THREAD_READY);
 }
@@ -847,6 +850,10 @@ scheduler_init()
 		" cache level%s\n", cpuCount, cpuCount != 1 ? "s" : "",
 		gCPUCacheLevelCount, gCPUCacheLevelCount != 1 ? "s" : "");
 
+#ifdef SCHEDULER_PROFILING
+	Profiling::Profiler::Initialize();
+#endif
+
 	status_t result = init();
 	if (result != B_OK)
 		panic("scheduler_init: failed to initialize scheduler\n");
@@ -922,6 +929,10 @@ _user_estimate_max_scheduling_latency(thread_id id)
 			return 0;
 	}
 	BReference<Thread> threadReference(thread, true);
+
+#ifdef SCHEDULER_PROFILING
+	InterruptsLocker _;
+#endif
 
 	ThreadData* threadData = thread->scheduler_data;
 	CoreEntry* core = threadData->Core();

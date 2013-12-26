@@ -78,6 +78,8 @@ ThreadData::Dump() const
 bool
 ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	bool rescheduleNeeded = false;
 
 	if (targetCore == NULL && targetCPU != NULL)
@@ -100,6 +102,8 @@ ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 bigtime_t
 ThreadData::ComputeQuantum()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	bigtime_t quantum;
 	if (fTimeLeft != 0)
 		quantum = fTimeLeft;
@@ -127,6 +131,8 @@ ThreadData::ComputeQuantum()
 /* static */ void
 ThreadData::ComputeQuantumLengths()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	for (int32 priority = 0; priority <= THREAD_MAX_SET_PRIORITY; priority++) {
 		const bigtime_t kQuantum0 = gCurrentMode->base_quantum;
 		if (priority >= B_URGENT_DISPLAY_PRIORITY) {
@@ -153,6 +159,8 @@ ThreadData::ComputeQuantumLengths()
 void
 ThreadData::_ComputeEffectivePriority() const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (thread_is_idle_thread(fThread))
 		fEffectivePriority = B_IDLE_PRIORITY;
 	else if (fThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
@@ -170,6 +178,8 @@ ThreadData::_ComputeEffectivePriority() const
 inline CoreEntry*
 ThreadData::_ChooseCore() const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ASSERT(!gSingleCore);
 	return gCurrentMode->choose_core(this);
 }
@@ -178,6 +188,8 @@ ThreadData::_ChooseCore() const
 inline CPUEntry*
 ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	int32 threadPriority = GetEffectivePriority();
 
 	if (fThread->previous_cpu != NULL) {
@@ -209,6 +221,8 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 inline bigtime_t
 ThreadData::_GetBaseQuantum() const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	return sQuantumLengths[GetEffectivePriority()];
 }
 
@@ -217,6 +231,8 @@ ThreadData::_GetBaseQuantum() const
 ThreadData::_ScaleQuantum(bigtime_t maxQuantum, bigtime_t minQuantum,
 	int32 maxPriority, int32 minPriority, int32 priority)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ASSERT(priority <= maxPriority);
 	ASSERT(priority >= minPriority);
 

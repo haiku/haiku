@@ -10,6 +10,7 @@
 #include "scheduler_common.h"
 #include "scheduler_cpu.h"
 #include "scheduler_modes.h"
+#include "scheduler_profiler.h"
 #include "scheduler_thread.h"
 
 
@@ -39,8 +40,7 @@ set_cpu_enabled(int32 cpu, bool enabled)
 static bool
 has_cache_expired(const ThreadData* threadData)
 {
-	ASSERT(!gSingleCore);
-
+	SCHEDULER_ENTER_FUNCTION();
 	return system_time() - threadData->WentSleep() > kCacheExpire;
 }
 
@@ -48,6 +48,8 @@ has_cache_expired(const ThreadData* threadData)
 static CoreEntry*
 choose_small_task_core()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ReadSpinLocker locker(gCoreHeapsLock);
 	CoreEntry* core = gCoreLoadHeap.PeekMaximum();
 	locker.Unlock();
@@ -66,6 +68,8 @@ choose_small_task_core()
 static CoreEntry*
 choose_idle_core()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	PackageEntry* package = PackageEntry::GetLeastIdlePackage();
 
 	if (package == NULL)
@@ -81,6 +85,8 @@ choose_idle_core()
 static CoreEntry*
 choose_core(const ThreadData* threadData)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	CoreEntry* core = NULL;
 
 	// try to pack all threads on one core
@@ -111,6 +117,8 @@ choose_core(const ThreadData* threadData)
 static bool
 should_rebalance(const ThreadData* threadData)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ASSERT(!gSingleCore);
 
 	CoreEntry* core = threadData->Core();
@@ -151,6 +159,8 @@ should_rebalance(const ThreadData* threadData)
 static inline void
 pack_irqs()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	CoreEntry* smallTaskCore = atomic_pointer_get(&sSmallTaskCore);
 	if (smallTaskCore == NULL)
 		return;
@@ -177,6 +187,8 @@ pack_irqs()
 static void
 rebalance_irqs(bool idle)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (idle && sSmallTaskCore != NULL) {
 		pack_irqs();
 		return;

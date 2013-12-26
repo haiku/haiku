@@ -11,6 +11,7 @@
 
 #include "scheduler_common.h"
 #include "scheduler_cpu.h"
+#include "scheduler_profiler.h"
 
 
 namespace Scheduler {
@@ -123,6 +124,7 @@ public:
 inline bool
 ThreadData::HasCacheExpired() const
 {
+	SCHEDULER_ENTER_FUNCTION();
 	return gCurrentMode->has_cache_expired(this);
 }
 
@@ -130,6 +132,8 @@ ThreadData::HasCacheExpired() const
 inline bool
 ThreadData::ShouldRebalance() const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ASSERT(!gSingleCore);
 	return gCurrentMode->should_rebalance(this);
 }
@@ -138,6 +142,8 @@ ThreadData::ShouldRebalance() const
 inline int32
 ThreadData::GetEffectivePriority() const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (fEffectivePriority == -1)
 		_ComputeEffectivePriority();
 	return fEffectivePriority;
@@ -147,6 +153,8 @@ ThreadData::GetEffectivePriority() const
 inline void
 ThreadData::IncreasePenalty()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (fThread->priority < B_LOWEST_ACTIVE_PRIORITY)
 		return;
 	if (fThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
@@ -170,6 +178,8 @@ ThreadData::IncreasePenalty()
 inline void
 ThreadData::CancelPenalty()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (fPriorityPenalty != 0) {
 		TRACE("cancelling thread %ld penalty\n", fThread->id);
 		fEffectivePriority = -1;
@@ -183,6 +193,8 @@ ThreadData::CancelPenalty()
 inline bool
 ThreadData::ShouldCancelPenalty() const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (fCore == NULL)
 		return false;
 
@@ -194,6 +206,7 @@ ThreadData::ShouldCancelPenalty() const
 inline void
 ThreadData::IncreaseStolenTime(bigtime_t stolenTime)
 {
+	SCHEDULER_ENTER_FUNCTION();
 	fStolenTime += stolenTime;
 }
 
@@ -201,6 +214,8 @@ ThreadData::IncreaseStolenTime(bigtime_t stolenTime)
 inline void
 ThreadData::GoesAway()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	fLastInterruptTime = 0;
 
 	fWentSleep = system_time();
@@ -212,6 +227,8 @@ ThreadData::GoesAway()
 inline void
 ThreadData::PutBack()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ComputeLoad();
 	fWentSleepCount = -1;
 
@@ -234,6 +251,8 @@ ThreadData::PutBack()
 inline void
 ThreadData::Enqueue()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	fThread->state = B_THREAD_READY;
 	ComputeLoad();
 	fWentSleepCount = 0;
@@ -256,6 +275,8 @@ ThreadData::Enqueue()
 inline bool
 ThreadData::Dequeue()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	CoreRunQueueLocker _(fCore);
 	if (!fEnqueued)
 		return false;
@@ -278,6 +299,8 @@ ThreadData::Dequeue()
 inline void
 ThreadData::UpdateActivity(bigtime_t active)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	fMeasureActiveTime += active;
 	CPUEntry::GetCPU(smp_get_current_cpu())->IncreaseActiveTime(active);
 	fCore->IncreaseActiveTime(active);
@@ -287,6 +310,8 @@ ThreadData::UpdateActivity(bigtime_t active)
 inline void
 ThreadData::ComputeLoad()
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (fLastInterruptTime > 0) {
 		bigtime_t interruptTime = gCPU[smp_get_current_cpu()].interrupt_time;
 		interruptTime -= fLastInterruptTime;
@@ -300,6 +325,8 @@ ThreadData::ComputeLoad()
 inline bool
 ThreadData::HasQuantumEnded(bool wasPreempted, bool hasYielded)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	if (hasYielded) {
 		fTimeLeft = 0;
 		return true;
@@ -322,6 +349,7 @@ ThreadData::HasQuantumEnded(bool wasPreempted, bool hasYielded)
 inline void
 ThreadData::StartQuantum()
 {
+	SCHEDULER_ENTER_FUNCTION();
 	fQuantumStart = system_time();
 }
 
@@ -329,6 +357,8 @@ ThreadData::StartQuantum()
 inline int32
 ThreadData::_GetPenalty() const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	int32 penalty = fPriorityPenalty;
 
 	const int kMinimalPriority = _GetMinimalPriority();
@@ -342,6 +372,8 @@ ThreadData::_GetPenalty() const
 inline int32
 ThreadData::_GetMinimalPriority() const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	const int32 kDivisor = 5;
 
 	const int32 kMaximalPriority = 25;
