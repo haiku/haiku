@@ -3,9 +3,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "image/vnd.adobe.photoshop";
 
-resource(2, "META:SNIFF_RULE") "0.50 (\"8BPS\")";
+resource(2, "META:SNIFF_RULE") "0.50 (\"8BPS\") ([6:12]\"0\")";
 
-resource(3, "META:S:DESC") #'MSDC' "Photoshop Image";
+resource(3, "META:S:DESC") #'MSDC' "Photoshop image";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "psd",
