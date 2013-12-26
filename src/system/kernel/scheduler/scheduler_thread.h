@@ -119,8 +119,6 @@ public:
 	virtual	void		operator()(ThreadData* thread) = 0;
 };
 
-extern bigtime_t gQuantumLengths[THREAD_MAX_SET_PRIORITY + 1];
-
 
 inline bool
 ThreadData::HasCacheExpired() const
