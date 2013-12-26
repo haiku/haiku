@@ -300,10 +300,7 @@ inline void
 ThreadData::UpdateActivity(bigtime_t active)
 {
 	SCHEDULER_ENTER_FUNCTION();
-
 	fMeasureActiveTime += active;
-	CPUEntry::GetCPU(smp_get_current_cpu())->IncreaseActiveTime(active);
-	fCore->IncreaseActiveTime(active);
 }
 
 

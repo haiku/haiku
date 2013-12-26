@@ -69,9 +69,6 @@ public:
 
 						void			UpdatePriority(int32 priority);
 
-	inline				void			IncreaseActiveTime(
-											bigtime_t activeTime);
-
 	inline				int32			GetLoad() const	{ return fLoad; }
 						void			ComputeLoad();
 
@@ -304,14 +301,6 @@ CPUEntry::UnlockScheduler()
 {
 	SCHEDULER_ENTER_FUNCTION();
 	release_write_spinlock(&fSchedulerModeLock);
-}
-
-
-inline void
-CPUEntry::IncreaseActiveTime(bigtime_t activeTime)
-{
-	SCHEDULER_ENTER_FUNCTION();
-	fMeasureActiveTime += activeTime;
 }
 
 

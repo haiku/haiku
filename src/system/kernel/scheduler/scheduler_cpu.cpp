@@ -242,6 +242,9 @@ CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 		cpuEntry->active_time += active;
 		locker.Unlock();
 
+		fMeasureActiveTime += active;
+		fCore->IncreaseActiveTime(active);
+
 		oldThreadData->UpdateActivity(active);
 	}
 
@@ -268,7 +271,7 @@ CPUEntry::_RequestPerformanceLevel(ThreadData* threadData)
 	SCHEDULER_ENTER_FUNCTION();
 
 	int32 load = std::max(threadData->GetLoad(), fCore->GetLoad());
-	load = std::min(std::max(load, int32(0)), kMaxLoad);
+	ASSERT(load >= 0 && load <= kMaxLoad);
 
 	if (load < kTargetLoad) {
 		int32 delta = kTargetLoad - load;
