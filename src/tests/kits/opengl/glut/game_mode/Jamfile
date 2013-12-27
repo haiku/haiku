@@ -1,27 +1,22 @@
 SubDir HAIKU_TOP src tests kits opengl glut game_mode ;
 UseBuildFeatureHeaders mesa ;
-
-# GLUT
-UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] ;
-
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
-if $(TARGET_PLATFORM) != haiku {
-	# Needed for <GL/glut.h>, not present in R5.
-	# Unfortunately we also get the other headers there,
-	# that we don't really want.
-	UsePublicHeaders opengl ;
-}
+UseBuildFeatureHeaders glu ;
+UseLibraryHeaders glut ;
 
 local sources =
 	game_mode.c
 ;
 
-Includes [ FGristFiles $(sources) ] : [ BuildFeatureAttribute mesa : headers ] ;
+Includes [ FGristFiles $(sources) ]
+	:
+	[ BuildFeatureAttribute mesa : headers ]
+	[ BuildFeatureAttribute glu : headers ]
+;
 
 SimpleTest GLUTGameMode :
 	$(sources)
 	:
 	be libglut.so
 	[ BuildFeatureAttribute mesa : library ]
+	[ BuildFeatureAttribute glu : library ]
 ;
