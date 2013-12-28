@@ -205,7 +205,7 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 	}
 
 	CoreCPUHeapLocker _(core);
-	CPUEntry* cpu = core->CPUHeap()->PeekMinimum();
+	CPUEntry* cpu = core->CPUHeap()->PeekRoot();
 	ASSERT(cpu != NULL);
 
 	if (CPUPriorityHeap::GetKey(cpu) < threadPriority) {

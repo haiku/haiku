@@ -11,6 +11,7 @@
 #include <thread.h>
 #include <util/AutoLock.h>
 #include <util/MinMaxHeap.h>
+#include <util/Heap.h>
 
 #include <cpufreq.h>
 
@@ -41,7 +42,7 @@ public:
 						void			Dump() const;
 };
 
-class CPUEntry : public MinMaxHeapLinkImpl<CPUEntry, int32> {
+class CPUEntry : public HeapLinkImpl<CPUEntry, int32> {
 public:
 										CPUEntry();
 
@@ -99,7 +100,7 @@ private:
 						friend class DebugDumper;
 } CACHE_LINE_ALIGN;
 
-class CPUPriorityHeap : public MinMaxHeap<CPUEntry, int32> {
+class CPUPriorityHeap : public Heap<CPUEntry, int32> {
 public:
 										CPUPriorityHeap() { }
 										CPUPriorityHeap(int32 cpuCount);
@@ -146,6 +147,9 @@ public:
 
 	inline				int32			StarvationCounter() const;
 
+	inline				void			CPUGoesIdle(CPUEntry* cpu);
+	inline				void			CPUWakesUp(CPUEntry* cpu);
+
 						void			AddCPU(CPUEntry* cpu);
 						void			RemoveCPU(CPUEntry* cpu,
 											ThreadProcessing&
@@ -161,6 +165,7 @@ private:
 						PackageEntry*	fPackage;
 
 						int32			fCPUCount;
+						int32			fCPUIdleCount;
 						CPUPriorityHeap	fCPUHeap;
 						spinlock		fCPULock;
 

@@ -146,22 +146,15 @@ CPUEntry::UpdatePriority(int32 priority)
 	if (gCPU[fCPUNumber].disabled)
 		return;
 
-	CPUPriorityHeap* cpuHeap = fCore->CPUHeap();
-	int32 corePriority = CPUPriorityHeap::GetKey(cpuHeap->PeekMaximum());
-	cpuHeap->ModifyKey(this, priority);
-
-	if (gSingleCore)
+	int32 oldPriority = CPUPriorityHeap::GetKey(this);
+	if (oldPriority == priority)
 		return;
+	fCore->CPUHeap()->ModifyKey(this, priority);
 
-	int32 maxPriority = CPUPriorityHeap::GetKey(cpuHeap->PeekMaximum());
-	if (corePriority == maxPriority)
-		return;
-
-	PackageEntry* packageEntry = fCore->Package();
-	if (maxPriority == B_IDLE_PRIORITY)
-		packageEntry->CoreGoesIdle(fCore);
-	else if (corePriority == B_IDLE_PRIORITY)
-		packageEntry->CoreWakesUp(fCore);
+	if (oldPriority == B_IDLE_PRIORITY)
+		fCore->CPUWakesUp(this);
+	else if (priority == B_IDLE_PRIORITY)
+		fCore->CPUGoesIdle(this);
 }
 
 
@@ -292,7 +285,7 @@ CPUEntry::_RequestPerformanceLevel(ThreadData* threadData)
 
 CPUPriorityHeap::CPUPriorityHeap(int32 cpuCount)
 	:
-	MinMaxHeap<CPUEntry, int32>(cpuCount)
+	Heap<CPUEntry, int32>(cpuCount)
 {
 }
 
@@ -301,25 +294,25 @@ void
 CPUPriorityHeap::Dump()
 {
 	kprintf("cpu priority load\n");
-	CPUEntry* entry = PeekMinimum();
+	CPUEntry* entry = PeekRoot();
 	while (entry) {
 		int32 cpu = entry->ID();
 		int32 key = GetKey(entry);
 		kprintf("%3" B_PRId32 " %8" B_PRId32 " %3" B_PRId32 "%%\n", cpu, key,
 			entry->GetLoad() / 10);
 
-		RemoveMinimum();
+		RemoveRoot();
 		sDebugCPUHeap.Insert(entry, key);
 
-		entry = PeekMinimum();
+		entry = PeekRoot();
 	}
 
-	entry = sDebugCPUHeap.PeekMinimum();
+	entry = sDebugCPUHeap.PeekRoot();
 	while (entry) {
 		int32 key = GetKey(entry);
-		sDebugCPUHeap.RemoveMinimum();
+		sDebugCPUHeap.RemoveRoot();
 		Insert(entry, key);
-		entry = sDebugCPUHeap.PeekMinimum();
+		entry = sDebugCPUHeap.PeekRoot();
 	}
 }
 
@@ -327,6 +320,7 @@ CPUPriorityHeap::Dump()
 CoreEntry::CoreEntry()
 	:
 	fCPUCount(0),
+	fCPUIdleCount(0),
 	fStarvationCounter(0),
 	fThreadCount(0),
 	fActiveTime(0),
@@ -449,10 +443,33 @@ CoreEntry::UpdateLoad(int32 delta)
 }
 
 
+inline void
+CoreEntry::CPUGoesIdle(CPUEntry* /* cpu */)
+{
+	ASSERT(fCPUIdleCount < fCPUCount);
+
+	if (++fCPUIdleCount == fCPUCount)
+		fPackage->CoreGoesIdle(this);
+}
+
+
+inline void
+CoreEntry::CPUWakesUp(CPUEntry* /* cpu */)
+{
+	ASSERT(fCPUIdleCount > 0);
+
+	if (fCPUIdleCount-- == fCPUCount)
+		fPackage->CoreWakesUp(this);
+}
+
+
 void
 CoreEntry::AddCPU(CPUEntry* cpu)
 {
 	ASSERT(fCPUCount >= 0);
+	ASSERT(fCPUIdleCount >= 0);
+
+	fCPUIdleCount++;
 	if (fCPUCount++ == 0) {
 		// core has been reenabled
 		fLoad = 0;
@@ -470,6 +487,9 @@ void
 CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 {
 	ASSERT(fCPUCount > 0);
+	ASSERT(fCPUIdleCount > 0);
+
+	fCPUIdleCount--;
 	if (--fCPUCount == 0) {
 		// core has been disabled
 		if (fHighLoad) {
@@ -499,9 +519,9 @@ CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 		fThreadCount = 0;
 	}
 
-	fCPUHeap.ModifyKey(cpu, THREAD_MAX_SET_PRIORITY + 1);
-	ASSERT(fCPUHeap.PeekMaximum() == cpu);
-	fCPUHeap.RemoveMaximum();
+	fCPUHeap.ModifyKey(cpu, -1);
+	ASSERT(fCPUHeap.PeekRoot() == cpu);
+	fCPUHeap.RemoveRoot();
 
 	ASSERT(cpu->GetLoad() >= 0 && cpu->GetLoad() <= kMaxLoad);
 	fLoad -= cpu->GetLoad();
