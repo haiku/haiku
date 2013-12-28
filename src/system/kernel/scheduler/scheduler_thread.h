@@ -244,7 +244,6 @@ ThreadData::PutBack()
 		cpu->PushFront(this, priority);
 	} else
 		fCore->PushFront(this, priority);
-	fCore->UnlockRunQueue();
 }
 
 
