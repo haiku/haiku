@@ -11,6 +11,8 @@
 
 #include <util/Bitmap.h>
 
+#include "scheduler_profiler.h"
+
 
 template<typename Element>
 struct RunQueueLink {
@@ -245,6 +247,8 @@ RUN_QUEUE_TEMPLATE_LIST
 Element*
 RUN_QUEUE_CLASS_NAME::PeekMaximum() const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	int priority = fBitmap.GetHighestSet();
 	if (priority < 0)
 		return NULL;
@@ -268,6 +272,8 @@ void
 RUN_QUEUE_CLASS_NAME::PushFront(Element* element,
 	unsigned int priority)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ASSERT(priority <= MaxPriority);
 
 	RunQueueLink<Element>* elementLink = sGetLink(element);
@@ -295,6 +301,8 @@ void
 RUN_QUEUE_CLASS_NAME::PushBack(Element* element,
 	unsigned int priority)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ASSERT(priority <= MaxPriority);
 
 	RunQueueLink<Element>* elementLink = sGetLink(element);
@@ -321,6 +329,8 @@ RUN_QUEUE_TEMPLATE_LIST
 void
 RUN_QUEUE_CLASS_NAME::Remove(Element* element)
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	RunQueueLink<Element>* elementLink = sGetLink(element);
 	unsigned int priority = elementLink->fPriority;
 
@@ -351,6 +361,8 @@ RUN_QUEUE_TEMPLATE_LIST
 Element*
 RUN_QUEUE_CLASS_NAME::GetHead(unsigned int priority) const
 {
+	SCHEDULER_ENTER_FUNCTION();
+
 	ASSERT(priority <= MaxPriority);
 	return fHeads[priority];
 }
