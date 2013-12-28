@@ -26,6 +26,13 @@
 #include <binary_compatibility/Interface.h>
 
 
+enum {
+	FLAG_DEFAULT 	= 0x01,
+	FLAG_FLAT		= 0x02,
+	FLAG_INSIDE		= 0x04,
+};
+
+
 static const float kLabelMargin = 3;
 
 
@@ -34,7 +41,7 @@ BButton::BButton(BRect frame, const char* name, const char* label,
 	: BControl(frame, name, label, message, resizingMode,
 			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fPreferredSize(-1, -1),
-	fDrawAsDefault(false)
+	fFlags(0)
 {
 	// Resize to minimum height if needed
 	font_height fh;
@@ -50,7 +57,7 @@ BButton::BButton(const char* name, const char* label, BMessage* message,
 	: BControl(name, label, message,
 			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fPreferredSize(-1, -1),
-	fDrawAsDefault(false)
+	fFlags(0)
 {
 }
 
@@ -59,7 +66,7 @@ BButton::BButton(const char* label, BMessage* message)
 	: BControl(NULL, label, message,
 			B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE),
 	fPreferredSize(-1, -1),
-	fDrawAsDefault(false)
+	fFlags(0)
 {
 }
 
@@ -71,10 +78,12 @@ BButton::~BButton()
 
 BButton::BButton(BMessage* archive)
 	: BControl(archive),
-	fPreferredSize(-1, -1)
+	fPreferredSize(-1, -1),
+	fFlags(0)
 {
-	if (archive->FindBool("_default", &fDrawAsDefault) != B_OK)
-		fDrawAsDefault = false;
+	bool isDefault = false;
+	if (archive->FindBool("_default", &isDefault) == B_OK && isDefault)
+		_SetFlag(FLAG_DEFAULT, true);
 	// NOTE: Default button state will be synchronized with the window
 	// in AttachedToWindow().
 }
@@ -112,8 +121,13 @@ BButton::Draw(BRect updateRect)
 	rgb_color background = LowColor();
 	rgb_color base = background;
 	uint32 flags = be_control_look->Flags(this);
-	if (IsDefault())
+	if (_Flag(FLAG_DEFAULT))
 		flags |= BControlLook::B_DEFAULT_BUTTON;
+	if (_Flag(FLAG_FLAT) && !IsTracking())
+		flags |= BControlLook::B_FLAT;
+	if (_Flag(FLAG_INSIDE))
+		flags |= BControlLook::B_HOVER;
+
 	be_control_look->DrawButtonFrame(this, rect, updateRect,
 		base, background, flags);
 	be_control_look->DrawButtonBackground(this, rect, updateRect,
@@ -207,12 +221,10 @@ BButton::MakeDefault(bool flag)
 		oldDefault = window->DefaultButton();
 
 	if (flag) {
-		if (fDrawAsDefault && oldDefault == this)
+		if (_Flag(FLAG_DEFAULT) && oldDefault == this)
 			return;
 
-		if (!fDrawAsDefault) {
-			fDrawAsDefault = true;
-
+		if (_SetFlag(FLAG_DEFAULT, true)) {
 			if ((Flags() & B_SUPPORTS_LAYOUT) != 0)
 				InvalidateLayout();
 			else {
@@ -224,10 +236,8 @@ BButton::MakeDefault(bool flag)
 		if (window && oldDefault != this)
 			window->SetDefaultButton(this);
 	} else {
-		if (!fDrawAsDefault)
+		if (!_SetFlag(FLAG_DEFAULT, false))
 			return;
-
-		fDrawAsDefault = false;
 
 		if ((Flags() & B_SUPPORTS_LAYOUT) != 0)
 			InvalidateLayout();
@@ -252,7 +262,22 @@ BButton::SetLabel(const char *string)
 bool
 BButton::IsDefault() const
 {
-	return fDrawAsDefault;
+	return _Flag(FLAG_DEFAULT);
+}
+
+
+bool
+BButton::IsFlat() const
+{
+	return _Flag(FLAG_FLAT);
+}
+
+
+void
+BButton::SetFlat(bool flat)
+{
+	if (_SetFlag(FLAG_FLAT, flat))
+		Invalidate();
 }
 
 
@@ -273,10 +298,12 @@ BButton::WindowActivated(bool active)
 void
 BButton::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
+	bool inside = Bounds().Contains(point);
+	if (_SetFlag(FLAG_INSIDE, inside))
+		Invalidate();
+
 	if (!IsTracking())
 		return;
-
-	bool inside = Bounds().Contains(point);
 
 	if ((Value() == B_CONTROL_ON) != inside)
 		SetValue(inside ? B_CONTROL_ON : B_CONTROL_OFF);
@@ -291,6 +318,8 @@ BButton::MouseUp(BPoint point)
 
 	if (Bounds().Contains(point))
 		Invoke();
+	else if (_Flag(FLAG_FLAT))
+		Invalidate();
 
 	SetTracking(false);
 }
@@ -516,7 +545,7 @@ BButton::_ValidatePreferredSize()
 		float left, top, right, bottom;
 		be_control_look->GetInsets(BControlLook::B_BUTTON_FRAME,
 			BControlLook::B_BUTTON_BACKGROUND,
-			fDrawAsDefault ? BControlLook::B_DEFAULT_BUTTON : 0,
+			IsDefault() ? BControlLook::B_DEFAULT_BUTTON : 0,
 			left, top, right, bottom);
 
 		// width
@@ -605,6 +634,28 @@ BButton::_DrawFocusLine(float x, float y, float width, bool visible)
 		SetHighColor(255, 255, 255);
 	// White Line
 	StrokeLine(BPoint(x, y + 1.0f), BPoint(x + width, y + 1.0f));
+}
+
+
+inline bool
+BButton::_Flag(uint32 flag) const
+{
+	return (fFlags & flag) != 0;
+}
+
+
+inline bool
+BButton::_SetFlag(uint32 flag, bool set)
+{
+	if (((fFlags & flag) != 0) == set)
+		return false;
+
+	if (set)
+		fFlags |= flag;
+	else
+		fFlags &= ~flag;
+
+	return true;
 }
 
 

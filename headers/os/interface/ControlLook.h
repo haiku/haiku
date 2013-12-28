@@ -82,6 +82,7 @@ public:
 		B_DEFAULT_BUTTON		= 1 << 5,
 		B_IGNORE_OUTLINE		= 1 << 6,
 		B_PARTIALLY_ACTIVATED	= 1 << 7, // like B_ACTIVATED, but for tri-state
+		B_FLAT					= 1 << 8, // flat look (e.g. button background)
 
 		B_BLEND_FRAME		= 1 << 16
 	};

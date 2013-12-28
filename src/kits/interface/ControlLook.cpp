@@ -2046,6 +2046,20 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	BRegion clipping(updateRect);
 	view->ConstrainClippingRegion(&clipping);
 
+	// If the button is flat and neither activated nor otherwise highlighted
+	// (mouse hovering or focussed), draw it flat.
+	if ((flags & B_FLAT) != 0
+		&& (flags & (B_ACTIVATED | B_PARTIALLY_ACTIVATED)) == 0
+		&& ((flags & (B_HOVER | B_FOCUSED)) == 0
+			|| (flags & B_DISABLED) != 0)) {
+		_DrawFrame(view, rect, background, background, background,
+			background, borders);
+		_DrawFrame(view, rect, background, background, background,
+			background, borders);
+		view->PopState();
+		return;
+	}
+
 	// outer edge colors
 	rgb_color edgeLightColor;
 	rgb_color edgeShadowColor;
@@ -2316,6 +2330,19 @@ BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	// set clipping constraints to updateRect
 	BRegion clipping(updateRect);
 	view->ConstrainClippingRegion(&clipping);
+
+	// If the button is flat and neither activated nor otherwise highlighted
+	// (mouse hovering or focussed), draw it flat.
+	if ((flags & B_FLAT) != 0
+		&& (flags & (B_ACTIVATED | B_PARTIALLY_ACTIVATED)) == 0
+		&& ((flags & (B_HOVER | B_FOCUSED)) == 0
+			|| (flags & B_DISABLED) != 0)) {
+		_DrawFrame(view, rect, base, base, base, base, borders);
+		view->SetHighColor(base);
+		view->FillRect(rect);
+		view->PopState();
+		return;
+	}
 
 	// inner bevel colors
 	rgb_color bevelLightColor  = _BevelLightColor(base, flags);

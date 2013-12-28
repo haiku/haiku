@@ -39,6 +39,9 @@ public:
 	virtual	void				SetLabel(const char* string);
 			bool				IsDefault() const;
 
+			bool				IsFlat() const;
+			void				SetFlat(bool flat);
+
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				WindowActivated(bool active);
 	virtual	void				MouseMoved(BPoint point, uint32 transit,
@@ -79,7 +82,6 @@ private:
 	virtual	void				_ReservedButton2();
 	virtual	void				_ReservedButton3();
 
-private:
 			BButton&			operator=(const BButton &);
 
 			BSize				_ValidatePreferredSize();
@@ -87,9 +89,15 @@ private:
 			BRect				_DrawDefault(BRect bounds, bool enabled);
 			void 				_DrawFocusLine(float x, float y, float width, 
 									bool bVisible);
+
+	inline	bool				_Flag(uint32 flag) const;
+	inline	bool				_SetFlag(uint32 flag, bool set);
 			 
+private:
 			BSize				fPreferredSize;
+			uint32				fFlags;
 			bool				fDrawAsDefault;
+			bool				fFlat;
 
 			uint32				_reserved[2];
 };
