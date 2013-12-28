@@ -1345,7 +1345,7 @@ AboutView::_CreateCreditsView()
 	AddCopyrightEntry("The FreeBSD Project",
 		B_TRANSLATE("Contains software from the FreeBSD Project, "
 		"released under the BSD license:\n"
-		"cal, ftpd, getconf, ping, telnet, "
+		"cal, ftpd, ping, telnet, "
 		"telnetd, traceroute\n"
 		COPYRIGHT_STRING "1994-2008 The FreeBSD Project. "
 		"All rights reserved."),
