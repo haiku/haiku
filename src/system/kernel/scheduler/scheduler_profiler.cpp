@@ -55,6 +55,8 @@ Profiler::Profiler()
 void
 Profiler::EnterFunction(int32 cpu, const char* functionName)
 {
+	bigtime_t start = system_time();
+
 	FunctionData* function = _FindFunction(functionName);
 	if (function == NULL)
 		return;
@@ -67,27 +69,39 @@ Profiler::EnterFunction(int32 cpu, const char* functionName)
 	ASSERT(fFunctionStackPointers[cpu] < kMaxFunctionStackEntries);
 
 	stackEntry->fFunction = function;
-	stackEntry->fEntryTime = system_time();
+	stackEntry->fEntryTime = start;
 	stackEntry->fOthersTime = 0;
+
+	bigtime_t stop = system_time();
+	stackEntry->fProfilerTime = stop - start;
 }
 
 
 void
 Profiler::ExitFunction(int32 cpu, const char* functionName)
 {
+	bigtime_t start = system_time();
+
 	ASSERT(fFunctionStackPointers[cpu] > 0);
 	fFunctionStackPointers[cpu]--;
 	FunctionEntry* stackEntry
 		= &fFunctionStacks[cpu][fFunctionStackPointers[cpu]];
 
-	bigtime_t timeSpent = system_time() - stackEntry->fEntryTime;
+	bigtime_t timeSpent = start - stackEntry->fEntryTime;
+	timeSpent -= stackEntry->fProfilerTime;
+
 	atomic_add64(&stackEntry->fFunction->fTimeInclusive, timeSpent);
 	atomic_add64(&stackEntry->fFunction->fTimeExclusive,
 		timeSpent - stackEntry->fOthersTime);
 
+	bigtime_t profilerTime = stackEntry->fProfilerTime;
 	if (fFunctionStackPointers[cpu] > 0) {
 		stackEntry = &fFunctionStacks[cpu][fFunctionStackPointers[cpu] - 1];
 		stackEntry->fOthersTime += timeSpent;
+		stackEntry->fProfilerTime += profilerTime;
+
+		bigtime_t stop = system_time();
+		stackEntry->fProfilerTime += stop - start;
 	}
 }
 

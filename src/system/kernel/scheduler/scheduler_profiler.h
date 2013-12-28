@@ -57,6 +57,7 @@ private:
 
 			bigtime_t		fEntryTime;
 			bigtime_t		fOthersTime;
+			bigtime_t		fProfilerTime;
 	};
 
 			uint32			_FunctionCount() const;
