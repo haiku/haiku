@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	3933520036
+1	hungarian	x-vnd.haiku-icon_o_matic	1336797042
 Select All	Icon-O-Matic-PathManipulator		Mind kijelölése
 Add Style	Icon-O-Matic-AddStylesCmd		Stílus hozzáadása
 Color (#%02x%02x%02x)	Style name after dropping a color		Szín (#%02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		Új
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Az Icon-O-Matic nem biztos hogy az SVG fájl betöltésekor annak minden részét értelmezte. Az eredeti fájl felülírásával ezeket az adatok elvésznek.
 Paste Properties	Icon-O-Matic-Properties		Tulajdonságok beillesztése
 Stroke	Transformation		Kihúzás
-Save Icon	Dialog title		Ikon mentése
 Closed	Icon-O-Matic-PropertyNames		Zárt
 Remove Path	Icon-O-Matic-RemovePathsCmd		Útvonal eltávolítása
 Add shape with path	Icon-O-Matic-Menu-Shape		Hozzáadás útvonallal
@@ -108,7 +107,6 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		Alakzatok áthelyezése
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Stílusok eltávolítása
 The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		A szöveg, amit importálni kíván, nagyon hosszú. Biztos importálja?
 Add	Icon-O-Matic-TransformersList		Hozzáadás
-Export Icon	Dialog title		Ikon exprotálása
 Color	Icon-O-Matic-StyleTypes		Szín
 Settings…	Icon-O-Matic-SavePanel		Beállítások…
 Remove	Icon-O-Matic-PathManipulator		Eltávolítás
@@ -160,7 +158,6 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Rácshoz illesztés
 Remove	Icon-O-Matic-ShapesList		Eltávolítás
 Yes	Icon-O-Matic-StyledTextImport		Igen
 Transformation	Icon-O-Matic-TransformersList		Átalakítás
-Save image	Icon-O-Matic-SavePanel		Kép mentése
 Add Styles	Icon-O-Matic-AddStylesCmd		Stílusok hozzáadása
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Vezérlőpontok eltávolítása
 Format	Icon-O-Matic-SavePanel		Formátum

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	3581603413
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	984880419
 Select All	Icon-O-Matic-PathManipulator		Επιλογή όλων
 Add Style	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
 Color (#%02x%02x%02x)	Style name after dropping a color		Χρώμα (#%02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		Νέο
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Το Ico-O-Matic μπορεί να μην είδε όλα τα δεδομένα από το SVG στη φόρτωση. Με την διαγραφή αυτού του αρχείου, οι πληροφορίες αυτές θα χαθούν.
 Paste Properties	Icon-O-Matic-Properties		Επικόλληση Ιδιοτήτων
 Stroke	Transformation		Κτύπημα
-Save Icon	Dialog title		Αποθήκευση Εικονιδίου
 Closed	Icon-O-Matic-PropertyNames		Κλειστό
 Remove Path	Icon-O-Matic-RemovePathsCmd		Αφαίρεση Μονοπατιού
 Add shape with path	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με μονοπάτι
@@ -105,7 +104,6 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		Μετακίνηση Σχημάτω�
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Αφαίρεση Στυλ
 The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Το κείμενο που προσπαθείτε να εισάγετε είναι αρκετά μεγάλο, είστε σίγουρος;
 Add	Icon-O-Matic-TransformersList		Προσθήκη
-Export Icon	Dialog title		Εξαγωγή Εικονιδίου
 Color	Icon-O-Matic-StyleTypes		Χρώμα
 Settings…	Icon-O-Matic-SavePanel		Ρυθμίσεις...
 Remove	Icon-O-Matic-PathManipulator		Αφαίρεση
@@ -156,7 +154,6 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Συγκράτηση στο πλέγμ�
 Remove	Icon-O-Matic-ShapesList		Αφαίρεση
 Yes	Icon-O-Matic-StyledTextImport		Ναι
 Transformation	Icon-O-Matic-TransformersList		Μετασχηματισμός
-Save image	Icon-O-Matic-SavePanel		Αποθήκευση εικόνας
 Add Styles	Icon-O-Matic-AddStylesCmd		Προσθήκη Στυλ
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Αφαίρεση Σημείων Ελέγχου
 Format	Icon-O-Matic-SavePanel		Μορφή

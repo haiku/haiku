@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	3069426771
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	472703777
 Select All	Icon-O-Matic-PathManipulator		Alles selecteren
 Add Style	Icon-O-Matic-AddStylesCmd		Stijl toevoegen
 Color (#%02x%02x%02x)	Style name after dropping a color		Kleur (#02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		Nieuw
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Tijdens het laden heeft Icon-O-Matic mogelijk niet alle data van de SVG geïnterpreteerd. Door het originele bestand te overschrijven, zou deze informatie nu verloren zijn.
 Paste Properties	Icon-O-Matic-Properties		Plak-eigenschappen
 Stroke	Transformation		Streek
-Save Icon	Dialog title		Icoon opslaan
 Closed	Icon-O-Matic-PropertyNames		Gesloten
 Remove Path	Icon-O-Matic-RemovePathsCmd		Pad verwijderen
 Add shape with path	Icon-O-Matic-Menu-Shape		Pad met vorm toevoegen
@@ -106,7 +105,6 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		Vormen verplaatsen
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Stijlen verwijderen
 The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		De tekst die u wilt importeren is nogal lang, bent u zeker?
 Add	Icon-O-Matic-TransformersList		Toevoegen
-Export Icon	Dialog title		Icoon exporteren
 Color	Icon-O-Matic-StyleTypes		Kleur
 Settings…	Icon-O-Matic-SavePanel		Instellingen...
 Remove	Icon-O-Matic-PathManipulator		Verwijderen
@@ -158,7 +156,6 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Naar rasterpunten
 Remove	Icon-O-Matic-ShapesList		Verwijderen
 Yes	Icon-O-Matic-StyledTextImport		Ja
 Transformation	Icon-O-Matic-TransformersList		Transformatie
-Save image	Icon-O-Matic-SavePanel		Afbeelding opslaan
 Add Styles	Icon-O-Matic-AddStylesCmd		Stijlen toevoegen
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Controlepunten verwijderen
 Format	Icon-O-Matic-SavePanel		Opmaak

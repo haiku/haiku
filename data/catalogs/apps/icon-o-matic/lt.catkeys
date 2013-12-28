@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	1820832755
+1	lithuanian	x-vnd.haiku-icon_o_matic	3519077057
 Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
 Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
 Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		Naujas
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Gali būti, jog, atverdama šį SVG failą, programa nesuinterpretavo visų jo duomenų. Jeigu perrašysite failą, jūs prarasite tuos duomenis.
 Paste Properties	Icon-O-Matic-Properties		Įdėti savybes
 Stroke	Transformation		Linija
-Save Icon	Dialog title		Įrašyti piktogramą
 Closed	Icon-O-Matic-PropertyNames		Uždaras
 Remove Path	Icon-O-Matic-RemovePathsCmd		Pašalinti kreivę
 Add shape with path	Icon-O-Matic-Menu-Shape		Pridėti figūrą su kreive
@@ -105,7 +104,6 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		Perkelti figūras
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Pašalinti stilius
 The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Bandomas importuoti tekstas yra gan ilgas. Ar tikrai to norite?
 Add	Icon-O-Matic-TransformersList		Pridėti
-Export Icon	Dialog title		Eksportuoti piktogramą
 Color	Icon-O-Matic-StyleTypes		Spalva
 Settings…	Icon-O-Matic-SavePanel		Nuostatos…
 Remove	Icon-O-Matic-PathManipulator		Pašalinti
@@ -156,7 +154,6 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Kibti prie tinklelio
 Remove	Icon-O-Matic-ShapesList		Pašalinti
 Yes	Icon-O-Matic-StyledTextImport		Taip
 Transformation	Icon-O-Matic-TransformersList		Transformacija
-Save image	Icon-O-Matic-SavePanel		Paveikslo įrašymas
 Add Styles	Icon-O-Matic-AddStylesCmd		Pridėti stilius
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Pašalinti valdymo taškus
 Format	Icon-O-Matic-SavePanel		Formatas:

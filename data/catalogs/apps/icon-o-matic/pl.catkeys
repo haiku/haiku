@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	3933520036
+1	polish	x-vnd.haiku-icon_o_matic	1336797042
 Select All	Icon-O-Matic-PathManipulator		Zaznacz wszystko
 Add Style	Icon-O-Matic-AddStylesCmd		Dodanie stylu
 Color (#%02x%02x%02x)	Style name after dropping a color		Kolor (#%02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		Nowy
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Gdy Icon-O-Matic otwierał plik SVG, nie mógł przetworzyć wszystkich danych. Po nadpisaniu oryginalnego pliku, te informacje zostaną utracone.
 Paste Properties	Icon-O-Matic-Properties		Wklej właściwości
 Stroke	Transformation		Kreska
-Save Icon	Dialog title		Zapisz ikonę
 Closed	Icon-O-Matic-PropertyNames		Zamknij
 Remove Path	Icon-O-Matic-RemovePathsCmd		Usunięcie ścieżki
 Add shape with path	Icon-O-Matic-Menu-Shape		Dodaj kształt ze ścieżką
@@ -108,7 +107,6 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		Przesunięcie kształtów
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Usunięcie stylów
 The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Tekst, który zamierzasz zaimportować, jest dość długi. Kontynuować?
 Add	Icon-O-Matic-TransformersList		Dodaj
-Export Icon	Dialog title		Eksport ikony
 Color	Icon-O-Matic-StyleTypes		Kolor
 Settings…	Icon-O-Matic-SavePanel		Ustawienia…
 Remove	Icon-O-Matic-PathManipulator		Usuń
@@ -160,7 +158,6 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Przyciągaj do siatki
 Remove	Icon-O-Matic-ShapesList		Usuń
 Yes	Icon-O-Matic-StyledTextImport		Tak
 Transformation	Icon-O-Matic-TransformersList		Transformacja
-Save image	Icon-O-Matic-SavePanel		Zapisz obraz
 Add Styles	Icon-O-Matic-AddStylesCmd		Dodanie stylów
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Usunięcie punktów kontrolnych
 Format	Icon-O-Matic-SavePanel		Format

@@ -6,7 +6,7 @@ Update available	Model		Доступны обновления
 Changelog	PackageInfoView		История изменений
 Click a package to view information	PackageInfoView		Нажмите на пакет, чтобы увидеть информацию о нем
 for %Version%	PackageInfoView		для %Version%
-No changelog available.	PackageInfoView		Список изменений недоступен.
+No changelog available.	PackageInfoView		История изменений недоступен.
 Depot:	FilterView		Склад:
 Description	PackageListView		Описание
 Install	PackageManager		Установить

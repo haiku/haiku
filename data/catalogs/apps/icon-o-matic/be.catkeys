@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	3933520036
+1	belarusian	x-vnd.haiku-icon_o_matic	1336797042
 Select All	Icon-O-Matic-PathManipulator		Выбраць Усё
 Add Style	Icon-O-Matic-AddStylesCmd		Дадаць Стыль
 Color (#%02x%02x%02x)	Style name after dropping a color		Колер (#%02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		Новы
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic, магчыма, не дастаў усю інфармацыю з SVG файла падчас яго загрузкі. Пры перазапісу зыходнага файла гэтая інфармацыя будзе згублена.
 Paste Properties	Icon-O-Matic-Properties		Уставіць Уласцівасці
 Stroke	Transformation		Строчка
-Save Icon	Dialog title		Захаваць Іконку
 Closed	Icon-O-Matic-PropertyNames		Закрыты
 Remove Path	Icon-O-Matic-RemovePathsCmd		Выдаліць Шлях
 Add shape with path	Icon-O-Matic-Menu-Shape		Дадаць фігуру з шляхам
@@ -108,7 +107,6 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		Перамясціць Фігуры
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Выдаліць Стылі
 The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Тэкст, які вы імпартуеце, занадта доўгі. Вы ўпэўнены?
 Add	Icon-O-Matic-TransformersList		Дадаць
-Export Icon	Dialog title		Экспартаваць Іконку
 Color	Icon-O-Matic-StyleTypes		Колер
 Settings…	Icon-O-Matic-SavePanel		Наладкі…
 Remove	Icon-O-Matic-PathManipulator		Выдаліць
@@ -160,7 +158,6 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Прыляпіць да сеткі
 Remove	Icon-O-Matic-ShapesList		Выдаліць
 Yes	Icon-O-Matic-StyledTextImport		Так
 Transformation	Icon-O-Matic-TransformersList		Трасфармацыя
-Save image	Icon-O-Matic-SavePanel		Захаваць выяву
 Add Styles	Icon-O-Matic-AddStylesCmd		Дадаць Стылі
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Выдаліць Кантрольныя Кропкі
 Format	Icon-O-Matic-SavePanel		Фармат

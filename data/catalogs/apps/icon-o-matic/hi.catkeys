@@ -1,4 +1,4 @@
-1	hindi	x-vnd.haiku-icon_o_matic	3467163161
+1	hindi	x-vnd.haiku-icon_o_matic	2420345036
 Select All	Icon-O-Matic-PathManipulator		सभी का चयन करें
 Add Style	Icon-O-Matic-AddStylesCmd		स्टाइल जोड़ें
 Color (#%02x%02x%02x)	Style name after dropping a color		रंग (#%02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		नया
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		आइकॉन-O-मैटिक सभी डेटा की वयाख्या नहीं कर सका SVG. से जो आया था जब यह भरा था .मूल फ़ाइल को अधिलेखि करने से, यह जानकारी खो जाएगी.
 Paste Properties	Icon-O-Matic-Properties		चिपकाने की प्रापर्टीस
 Stroke	Transformation		स्ट्रोक
-Save Icon	Dialog title		चिह्न सहेजें
 Closed	Icon-O-Matic-PropertyNames		बंद
 Remove Path	Icon-O-Matic-RemovePathsCmd		पथ निकालें
 Add shape with path	Icon-O-Matic-Menu-Shape		पथ के साथ आकृति जोड़ें

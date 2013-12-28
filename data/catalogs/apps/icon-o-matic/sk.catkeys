@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-icon_o_matic	3069426771
+1	slovak	x-vnd.haiku-icon_o_matic	472703777
 Select All	Icon-O-Matic-PathManipulator		Vybrať všetky
 Add Style	Icon-O-Matic-AddStylesCmd		Pridať štýl
 Color (#%02x%02x%02x)	Style name after dropping a color		Farba (#%02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		Nový
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Je možné, že Icon-O-Matic neinterpretoval všetky dáta zo SVG pri načítaní. Ak by ste prepísali pôvodný súbor, tieto dáta by sa teraz stratili.
 Paste Properties	Icon-O-Matic-Properties		Vlastnosti vloženia
 Stroke	Transformation		Ťah
-Save Icon	Dialog title		Uložiť ikonu
 Closed	Icon-O-Matic-PropertyNames		Zatvorené
 Remove Path	Icon-O-Matic-RemovePathsCmd		Odstrániť cestu
 Add shape with path	Icon-O-Matic-Menu-Shape		Pridať tvar s cestou
@@ -106,7 +105,6 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		Presunúť tvary
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Odstrániť stýly
 The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Text, ktorý sa pokúšate importovať je dosť dlhý, ste si istý?
 Add	Icon-O-Matic-TransformersList		Pridať
-Export Icon	Dialog title		Exportovať ikonu
 Color	Icon-O-Matic-StyleTypes		Farba
 Settings…	Icon-O-Matic-SavePanel		Nastavenia…
 Remove	Icon-O-Matic-PathManipulator		Odstrániť
@@ -158,7 +156,6 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Prichytávať k mriežke
 Remove	Icon-O-Matic-ShapesList		Odstrániť
 Yes	Icon-O-Matic-StyledTextImport		Áno
 Transformation	Icon-O-Matic-TransformersList		Transformácia
-Save image	Icon-O-Matic-SavePanel		Uložiť obrázok
 Add Styles	Icon-O-Matic-AddStylesCmd		Pridať štýly
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Odstrániť riadiace body
 Format	Icon-O-Matic-SavePanel		Formát

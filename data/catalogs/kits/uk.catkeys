@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libbe	864109244
+1	ukrainian	x-vnd.Haiku-libbe	270491052
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Автор:
 About %app%	AboutMenuItem		Про %app%
@@ -9,6 +9,7 @@ Copy	TextView		Копіювати
 %d bytes	StringForSize		%d байт
 Error	PrintJob		Помилка
 No Pages to print!	PrintJob		Жодної сторінки для друку!
+About %app%	AboutWindow		Про %app%
 OK	Dragger		Гаразд
 OK	PrintJob		Гаразд
 Green:	ColorControl		Зелений:

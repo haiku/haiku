@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-icon_o_matic	2172106000
+1	romanian	x-vnd.haiku-icon_o_matic	984880419
 Select All	Icon-O-Matic-PathManipulator		Selectează tot
 Add Style	Icon-O-Matic-AddStylesCmd		Adaugă stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Culoare (#%02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		Nou
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		S-ar putea că Icon-O-Matic nu a interpretat toate datele de la SVG atunci când a fost încărcat. Prin suprascrierea fișierului original, această informație ar fi pierdută acum.
 Paste Properties	Icon-O-Matic-Properties		Lipește proprietăți
 Stroke	Transformation		Trăsătură
-Save Icon	Dialog title		Salvează pictogramă
 Closed	Icon-O-Matic-PropertyNames		Închis
 Remove Path	Icon-O-Matic-RemovePathsCmd		Elimină cale
 Add shape with path	Icon-O-Matic-Menu-Shape		Adaugă formă cu cale
@@ -105,7 +104,6 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		Mută forme
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Elimină stiluri
 The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		Textul pe care încercați să îl importați este destul de lung, sunteți sigur?
 Add	Icon-O-Matic-TransformersList		Adaugă
-Export Icon	Dialog title		Exportă pictogramă
 Color	Icon-O-Matic-StyleTypes		Culoare
 Settings…	Icon-O-Matic-SavePanel		Configurări...
 Remove	Icon-O-Matic-PathManipulator		Elimină

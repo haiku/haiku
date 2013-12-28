@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	3933520036
+1	english	x-vnd.haiku-icon_o_matic	1336797042
 Select All	Icon-O-Matic-PathManipulator		全选
 Add Style	Icon-O-Matic-AddStylesCmd		添加样式
 Color (#%02x%02x%02x)	Style name after dropping a color		颜色(#%02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		新建
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		数据加载时，图标套件 并未从 SVG 中解析所有数据。覆盖原文件，将不会再显示该信息。
 Paste Properties	Icon-O-Matic-Properties		粘贴属性
 Stroke	Transformation		描边
-Save Icon	Dialog title		保存图标
 Closed	Icon-O-Matic-PropertyNames		关闭
 Remove Path	Icon-O-Matic-RemovePathsCmd		删除路径
 Add shape with path	Icon-O-Matic-Menu-Shape		添加模型（包含路径）
@@ -108,7 +107,6 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		移动模型
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		删除样式
 The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		导入文件太长，是否确定？
 Add	Icon-O-Matic-TransformersList		添加
-Export Icon	Dialog title		导出图标
 Color	Icon-O-Matic-StyleTypes		颜色
 Settings…	Icon-O-Matic-SavePanel		设置...
 Remove	Icon-O-Matic-PathManipulator		删除
@@ -160,7 +158,6 @@ Snap to grid	Icon-O-Matic-Menu-Settings		对齐网格
 Remove	Icon-O-Matic-ShapesList		删除
 Yes	Icon-O-Matic-StyledTextImport		是
 Transformation	Icon-O-Matic-TransformersList		转换
-Save image	Icon-O-Matic-SavePanel		保存图像
 Add Styles	Icon-O-Matic-AddStylesCmd		添加样式
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		删除控制点
 Format	Icon-O-Matic-SavePanel		格式

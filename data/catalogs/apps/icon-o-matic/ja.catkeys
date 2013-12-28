@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-icon_o_matic	3436142351
+1	japanese	x-vnd.haiku-icon_o_matic	839419357
 Select All	Icon-O-Matic-PathManipulator		すべて選択
 Add Style	Icon-O-Matic-AddStylesCmd		スタイルを追加
 Color (#%02x%02x%02x)	Style name after dropping a color		カラー (#%02x%02x%02x)
@@ -12,7 +12,6 @@ New	Icon-O-Matic-Menu-File		新規作成
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic はロードされた SVG のすべてのデータを解釈できなかったかもしれません。元のファイルを上書きすると、この情報は失われるでしょう。
 Paste Properties	Icon-O-Matic-Properties		プロパティを貼り付け
 Stroke	Transformation		ストローク
-Save Icon	Dialog title		アイコンを保存
 Closed	Icon-O-Matic-PropertyNames		閉じている
 Remove Path	Icon-O-Matic-RemovePathsCmd		パスを削除
 Add shape with path	Icon-O-Matic-Menu-Shape		パスつきシェイプを追加
@@ -108,7 +107,6 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		シェイプを移動
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		スタイルを削除
 The text you are trying to import is quite long,are you sure?	Icon-O-Matic-StyledTextImport		インポートしようとしているテキストは非常に長いです。よろしいですか?
 Add	Icon-O-Matic-TransformersList		追加
-Export Icon	Dialog title		アイコンとしてエクスポート
 Color	Icon-O-Matic-StyleTypes		カラー
 Settings…	Icon-O-Matic-SavePanel		設定…
 Remove	Icon-O-Matic-PathManipulator		削除
@@ -159,7 +157,6 @@ Snap to grid	Icon-O-Matic-Menu-Settings		グリッドに沿う
 Remove	Icon-O-Matic-ShapesList		削除
 Yes	Icon-O-Matic-StyledTextImport		はい
 Transformation	Icon-O-Matic-TransformersList		変形
-Save image	Icon-O-Matic-SavePanel		画像を保存
 Add Styles	Icon-O-Matic-AddStylesCmd		スタイルを追加
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		コントロールポイントを削除
 Format	Icon-O-Matic-SavePanel		フォーマット
