@@ -96,8 +96,6 @@ private:
 private:
 			BSize				fPreferredSize;
 			uint32				fFlags;
-			bool				fDrawAsDefault;
-			bool				fFlat;
 
 			uint32				_reserved[2];
 };
