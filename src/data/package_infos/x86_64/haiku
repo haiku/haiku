@@ -63,7 +63,6 @@ provides {
 	cmd:funzip
 	cmd:gawk
 	cmd:gdb
-	cmd:getconf
 	cmd:getlimits
 	cmd:groups
 	cmd:gunzip
