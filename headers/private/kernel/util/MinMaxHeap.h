@@ -418,14 +418,13 @@ MIN_MAX_HEAP_TEMPLATE_LIST
 bool
 MIN_MAX_HEAP_CLASS_NAME::_ChangeTree(MinMaxHeapLink<Element, Key>* link)
 {
-	int currentLastElement = link->fMinTree ? fMinLastElement : fMaxLastElement;
 	int otherLastElement = link->fMinTree ? fMaxLastElement : fMinLastElement;
 
 	Element** currentTree = link->fMinTree ? fMinElements : fMaxElements;
 	Element** otherTree = link->fMinTree ? fMaxElements : fMinElements;
 
 	if (otherLastElement <= 0) {
-		ASSERT(currentLastElement == 1);
+		ASSERT(link->fMinTree ? fMinLastElement : fMaxLastElement == 1);
 		return false;
 	}
 
