@@ -9,7 +9,7 @@
 #define RUN_QUEUE_H
 
 
-#include <util/Bitmap.h>
+#include <util/Heap.h>
 
 #include "scheduler_profiler.h"
 
@@ -97,9 +97,17 @@ public:
 	inline	ConstIterator	GetConstIterator() const;
 
 private:
+	struct PriorityEntry : public HeapLinkImpl<PriorityEntry, unsigned int>
+	{
+	};
+
+	typedef Heap<PriorityEntry, unsigned int, HeapGreaterCompare<unsigned int> >
+		PriorityHeap;
+
 			status_t	fInitStatus;
 
-			Bitmap		fBitmap;
+			PriorityEntry	fPriorityEntries[MaxPriority + 1];
+			PriorityHeap	fPriorityHeap;
 
 			Element*	fHeads[MaxPriority + 1];
 			Element*	fTails[MaxPriority + 1];
@@ -226,10 +234,9 @@ RUN_QUEUE_CLASS_NAME::ConstIterator::_FindNextPriority()
 RUN_QUEUE_TEMPLATE_LIST
 RUN_QUEUE_CLASS_NAME::RunQueue()
 	:
-	fBitmap(MaxPriority + 1)
+	fInitStatus(B_OK),
+	fPriorityHeap(MaxPriority + 1)
 {
-	fInitStatus = fBitmap.GetInitStatus();
-
 	memset(fHeads, 0, sizeof(fHeads));
 	memset(fTails, 0, sizeof(fTails));
 }
@@ -249,17 +256,18 @@ RUN_QUEUE_CLASS_NAME::PeekMaximum() const
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	int priority = fBitmap.GetHighestSet();
-	if (priority < 0)
+	PriorityEntry* maxPriority = fPriorityHeap.PeekRoot();
+	if (maxPriority == NULL)
 		return NULL;
+	unsigned int priority = PriorityHeap::GetKey(maxPriority);
 
-	ASSERT((unsigned int)priority <= MaxPriority);
+	ASSERT(priority <= MaxPriority);
 	ASSERT(fHeads[priority] != NULL);
 
 	Element* element = fHeads[priority];
 	RunQueueLink<Element>* elementLink = sGetLink(element);
 
-	ASSERT(elementLink->fPriority == (unsigned int)priority);
+	ASSERT(elementLink->fPriority == priority);
 	ASSERT(fTails[priority] != NULL);
 	ASSERT(elementLink->fPrevious == NULL);
 
@@ -286,13 +294,13 @@ RUN_QUEUE_CLASS_NAME::PushFront(Element* element,
 
 	elementLink->fPriority = priority;
 	elementLink->fNext = fHeads[priority];
-	if (fHeads[priority])
+	if (fHeads[priority] != NULL)
 		sGetLink(fHeads[priority])->fPrevious = element;
-	else
+	else {
 		fTails[priority] = element;
+		fPriorityHeap.Insert(&fPriorityEntries[priority], priority);
+	}
 	fHeads[priority] = element;
-
-	fBitmap.Set(priority);
 }
 
 
@@ -315,13 +323,13 @@ RUN_QUEUE_CLASS_NAME::PushBack(Element* element,
 
 	elementLink->fPriority = priority;
 	elementLink->fPrevious = fTails[priority];
-	if (fTails[priority])
+	if (fTails[priority] != NULL)
 		sGetLink(fTails[priority])->fNext = element;
-	else
+	else {
 		fHeads[priority] = element;
+		fPriorityHeap.Insert(&fPriorityEntries[priority], priority);
+	}
 	fTails[priority] = element;
-
-	fBitmap.Set(priority);
 }
 
 
@@ -349,8 +357,11 @@ RUN_QUEUE_CLASS_NAME::Remove(Element* element)
 	ASSERT((fHeads[priority] == NULL && fTails[priority] == NULL)
 		|| (fHeads[priority] != NULL && fTails[priority] != NULL));
 
-	if (fHeads[priority] == NULL)
-		fBitmap.Clear(priority);
+	if (fHeads[priority] == NULL) {
+		fPriorityHeap.ModifyKey(&fPriorityEntries[priority], MaxPriority + 1);
+		ASSERT(fPriorityHeap.PeekRoot() == &fPriorityEntries[priority]);
+		fPriorityHeap.RemoveRoot();
+	}
 
 	elementLink->fPrevious = NULL;
 	elementLink->fNext = NULL;

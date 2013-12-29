@@ -78,7 +78,7 @@ public:
 						Heap(int initialSize);
 						~Heap();
 
-	inline	Element*	PeekRoot();
+	inline	Element*	PeekRoot() const;
 
 	static	const Key&	GetKey(Element* element);
 
@@ -188,7 +188,7 @@ HEAP_CLASS_NAME::~Heap()
 
 HEAP_TEMPLATE_LIST
 Element*
-HEAP_CLASS_NAME::PeekRoot()
+HEAP_CLASS_NAME::PeekRoot() const
 {
 	if (fLastElement > 0)
 		return fElements[0];
