@@ -1,5 +1,5 @@
 /*
- *	Copyright 2001-2008, Haiku Inc. All rights reserved.
+ *	Copyright 2001-2013, Haiku Inc. All rights reserved.
  *  Distributed under the terms of the MIT License.
  *
  *	Authors:
@@ -8,6 +8,7 @@
  *		Stefano Ceccherini (burton666@libero.it)
  *		Ivan Tonizza
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 
 
@@ -27,9 +28,10 @@
 
 
 enum {
-	FLAG_DEFAULT 	= 0x01,
-	FLAG_FLAT		= 0x02,
-	FLAG_INSIDE		= 0x04,
+	FLAG_DEFAULT 		= 0x01,
+	FLAG_FLAT			= 0x02,
+	FLAG_INSIDE			= 0x04,
+	FLAG_WAS_PRESSED	= 0x08,
 };
 
 
@@ -41,7 +43,8 @@ BButton::BButton(BRect frame, const char* name, const char* label,
 	: BControl(frame, name, label, message, resizingMode,
 			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fPreferredSize(-1, -1),
-	fFlags(0)
+	fFlags(0),
+	fBehavior(B_BUTTON_BEHAVIOR)
 {
 	// Resize to minimum height if needed
 	font_height fh;
@@ -57,7 +60,8 @@ BButton::BButton(const char* name, const char* label, BMessage* message,
 	: BControl(name, label, message,
 			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fPreferredSize(-1, -1),
-	fFlags(0)
+	fFlags(0),
+	fBehavior(B_BUTTON_BEHAVIOR)
 {
 }
 
@@ -66,7 +70,8 @@ BButton::BButton(const char* label, BMessage* message)
 	: BControl(NULL, label, message,
 			B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE),
 	fPreferredSize(-1, -1),
-	fFlags(0)
+	fFlags(0),
+	fBehavior(B_BUTTON_BEHAVIOR)
 {
 }
 
@@ -79,7 +84,8 @@ BButton::~BButton()
 BButton::BButton(BMessage* archive)
 	: BControl(archive),
 	fPreferredSize(-1, -1),
-	fFlags(0)
+	fFlags(0),
+	fBehavior(B_BUTTON_BEHAVIOR)
 {
 	bool isDefault = false;
 	if (archive->FindBool("_default", &isDefault) == B_OK && isDefault)
@@ -151,7 +157,15 @@ BButton::MouseDown(BPoint point)
 	if (!IsEnabled())
 		return;
 
-	SetValue(B_CONTROL_ON);
+	bool toggleBehavior = fBehavior == B_TOGGLE_BEHAVIOR;
+
+	if (toggleBehavior) {
+		bool wasPressed = Value() == B_CONTROL_ON;
+		_SetFlag(FLAG_WAS_PRESSED, wasPressed);
+		SetValue(wasPressed ? B_CONTROL_OFF : B_CONTROL_ON);
+		Invalidate();
+	} else
+		SetValue(B_CONTROL_ON);
 
 	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
  		SetTracking(true);
@@ -159,6 +173,7 @@ BButton::MouseDown(BPoint point)
  	} else {
 		BRect bounds = Bounds();
 		uint32 buttons;
+		bool inside = false;
 
 		do {
 			Window()->UpdateIfNeeded();
@@ -166,14 +181,26 @@ BButton::MouseDown(BPoint point)
 
 			GetMouse(&point, &buttons, true);
 
- 			bool inside = bounds.Contains(point);
+ 			inside = bounds.Contains(point);
 
-			if ((Value() == B_CONTROL_ON) != inside)
-				SetValue(inside ? B_CONTROL_ON : B_CONTROL_OFF);
+			if (toggleBehavior) {
+				bool pressed = inside ^ _Flag(FLAG_WAS_PRESSED);
+				SetValue(pressed ? B_CONTROL_ON : B_CONTROL_OFF);
+			} else {
+				if ((Value() == B_CONTROL_ON) != inside)
+					SetValue(inside ? B_CONTROL_ON : B_CONTROL_OFF);
+			}
 		} while (buttons != 0);
 
-		if (Value() == B_CONTROL_ON)
+		if (inside) {
+			if (toggleBehavior) {
+				SetValue(
+					_Flag(FLAG_WAS_PRESSED) ? B_CONTROL_OFF : B_CONTROL_ON);
+			}
+
 			Invoke();
+		} else if (_Flag(FLAG_FLAT))
+			Invalidate();
 	}
 }
 
@@ -281,6 +308,21 @@ BButton::SetFlat(bool flat)
 }
 
 
+BButton::BBehavior
+BButton::Behavior() const
+{
+	return fBehavior;
+}
+
+
+void
+BButton::SetBehavior(BBehavior behavior)
+{
+	if (behavior != fBehavior)
+		fBehavior = behavior;
+}
+
+
 void
 BButton::MessageReceived(BMessage *message)
 {
@@ -305,8 +347,13 @@ BButton::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 	if (!IsTracking())
 		return;
 
-	if ((Value() == B_CONTROL_ON) != inside)
-		SetValue(inside ? B_CONTROL_ON : B_CONTROL_OFF);
+	if (fBehavior == B_TOGGLE_BEHAVIOR) {
+		bool pressed = inside ^ _Flag(FLAG_WAS_PRESSED);
+		SetValue(pressed ? B_CONTROL_ON : B_CONTROL_OFF);
+	} else {
+		if ((Value() == B_CONTROL_ON) != inside)
+			SetValue(inside ? B_CONTROL_ON : B_CONTROL_OFF);
+	}
 }
 
 
@@ -316,9 +363,12 @@ BButton::MouseUp(BPoint point)
 	if (!IsTracking())
 		return;
 
-	if (Bounds().Contains(point))
+	if (Bounds().Contains(point)) {
+		if (fBehavior == B_TOGGLE_BEHAVIOR)
+			SetValue(_Flag(FLAG_WAS_PRESSED) ? B_CONTROL_OFF : B_CONTROL_ON);
+
 		Invoke();
-	else if (_Flag(FLAG_FLAT))
+	} else if (_Flag(FLAG_FLAT))
 		Invalidate();
 
 	SetTracking(false);
@@ -368,7 +418,8 @@ BButton::Invoke(BMessage *message)
 
 	status_t err = BControl::Invoke(message);
 
-	SetValue(B_CONTROL_OFF);
+	if (fBehavior != B_TOGGLE_BEHAVIOR)
+		SetValue(B_CONTROL_OFF);
 
 	return err;
 }

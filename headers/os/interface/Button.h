@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2013, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BUTTON_H
@@ -9,6 +9,12 @@
 
 
 class BButton : public BControl {
+public:
+			enum BBehavior {
+				B_BUTTON_BEHAVIOR,
+				B_TOGGLE_BEHAVIOR,
+			};
+
 public:
 								BButton(BRect frame, const char* name,
 									const char* label, BMessage* message,
@@ -41,6 +47,9 @@ public:
 
 			bool				IsFlat() const;
 			void				SetFlat(bool flat);
+
+			BBehavior			Behavior() const;
+			void				SetBehavior(BBehavior behavior);
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				WindowActivated(bool active);
@@ -96,8 +105,9 @@ private:
 private:
 			BSize				fPreferredSize;
 			uint32				fFlags;
+			BBehavior			fBehavior;
 
-			uint32				_reserved[2];
+			uint32				_reserved[1];
 };
 
 #endif // _BUTTON_H
