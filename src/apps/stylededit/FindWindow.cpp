@@ -110,6 +110,16 @@ FindWindow::DispatchMessage(BMessage* message, BHandler* handler)
 }
 
 
+bool
+FindWindow::QuitRequested()
+{
+	BMessenger messenger(fHandler);
+	messenger.SendMessage(MSG_FIND_WINDOW_QUIT);
+
+	return true;
+}
+
+
 void
 FindWindow::Show()
 {

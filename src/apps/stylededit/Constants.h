@@ -43,6 +43,7 @@ const uint32 MSG_SEARCH					= 'msea';
 const uint32 MSG_REPLACE				= 'msre';
 const uint32 MSG_REPLACE_ALL			= 'mrea';
 const uint32 MSG_HIDE_WINDOW			= 'mhdw';
+const uint32 MSG_FIND_WINDOW_QUIT		= 'mfwq';
 
 // "Font"-menu
 const uint32 FONT_SIZE					= 'FMsi';
