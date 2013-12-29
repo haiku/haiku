@@ -452,7 +452,7 @@ get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* info)
 	memset(info, 0, sizeof(cpu_info) * count);
 	for (uint32 i = 0; i < count; i++) {
 		info[i].active_time = cpu_get_active_time(firstCPU + i);
-		// TODO: cpu_info::load
+		info[i].load = scheduler_get_cpu_load(firstCPU + i);
 		info[i].enabled = !gCPU[firstCPU + i].disabled;
 	}
 
