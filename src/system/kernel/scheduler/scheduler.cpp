@@ -700,8 +700,7 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 	CPUEntry* cpu = &gCPUEntries[cpuID];
 	CoreEntry* core = cpu->Core();
 
-	int32 oldCPUCount = core->CPUCount();
-	ASSERT(oldCPUCount >= 0);
+	ASSERT(core->CPUCount() >= 0);
 	if (enabled)
 		cpu->Start();
 	else {

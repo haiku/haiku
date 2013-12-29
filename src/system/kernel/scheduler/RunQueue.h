@@ -265,11 +265,10 @@ RUN_QUEUE_CLASS_NAME::PeekMaximum() const
 	ASSERT(fHeads[priority] != NULL);
 
 	Element* element = fHeads[priority];
-	RunQueueLink<Element>* elementLink = sGetLink(element);
 
-	ASSERT(elementLink->fPriority == priority);
+	ASSERT(sGetLink(element)->fPriority == priority);
 	ASSERT(fTails[priority] != NULL);
-	ASSERT(elementLink->fPrevious == NULL);
+	ASSERT(sGetLink(element)->fPrevious == NULL);
 
 	return element;
 }
