@@ -230,6 +230,10 @@ ProcessController::~ProcessController()
 void
 ProcessController::Init()
 {
+	memset(fLastBarHeight, 0, sizeof(float) * kCPUCount);
+	memset(fCPUTimes, 0, sizeof(double) * kCPUCount);
+	memset(fPrevActive, 0, sizeof(bigtime_t) * kCPUCount);
+
 	gPCView = this;
 	fMessageRunner = NULL;
 	memset(fLastBarHeight, 0, sizeof(fLastBarHeight));
