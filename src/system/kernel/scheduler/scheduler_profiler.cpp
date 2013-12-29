@@ -263,7 +263,11 @@ Profiler::_CompareFunctions(const void* _a, const void* _b)
 	const FunctionData* a = static_cast<const FunctionData*>(_a);
 	const FunctionData* b = static_cast<const FunctionData*>(_b);
 
-	return b->*Member - a->*Member;
+	if (b->*Member > a->*Member)
+		return 1;
+	if (b->*Member < a->*Member)
+		return -1;
+	return 0;
 }
 
 
@@ -274,7 +278,14 @@ Profiler::_CompareFunctionsPerCall(const void* _a, const void* _b)
 	const FunctionData* a = static_cast<const FunctionData*>(_a);
 	const FunctionData* b = static_cast<const FunctionData*>(_b);
 
-	return b->*Member / b->fCalled - a->*Member / a->fCalled;
+	Type valueA = a->*Member / a->fCalled;
+	Type valueB = b->*Member / b->fCalled;
+
+	if (valueB > valueA)
+		return 1;
+	if (valueB < valueA)
+		return -1;
+	return 0;
 }
 
 
