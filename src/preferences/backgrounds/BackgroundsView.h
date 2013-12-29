@@ -1,9 +1,9 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jerome Duval (jerome.duval@free.fr)
+ *		Jerome Duval, jerome.duval@free.fr
  */
 #ifndef BACKGROUNDS_VIEW_H
 #define BACKGROUNDS_VIEW_H
@@ -105,9 +105,9 @@ public:
 								~BackgroundsView();
 
 			void				AllAttached();
-			void				MessageReceived(BMessage* msg);
+			void				MessageReceived(BMessage* message);
 
-			void				RefsReceived(BMessage* msg);
+			void				RefsReceived(BMessage* message);
 
 			void				SaveSettings();
 			void				WorkspaceActivated(uint32 oldWorkspaces,
@@ -177,4 +177,3 @@ protected:
 };
 
 #endif	// BACKGROUNDS_VIEW_H
-

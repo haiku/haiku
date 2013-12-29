@@ -1,9 +1,9 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jerome Duval (jerome.duval@free.fr)
+ *		Jerome Duval, jerome.duval@free.fr
  */
 
 
@@ -23,11 +23,15 @@
 #define B_TRANSLATION_CONTEXT "Image Filepanel"
 
 
+//	#pragma mark - ImageFilePanel
+
+
 ImageFilePanel::ImageFilePanel(file_panel_mode mode, BMessenger* target,
 	const entry_ref* startDirectory, uint32 nodeFlavors,
 	bool allowMultipleSelection, BMessage* message, BRefFilter* filter,
 	bool modal, bool hideWhenDone)
-	: BFilePanel(mode, target, startDirectory, nodeFlavors,
+	:
+	BFilePanel(mode, target, startDirectory, nodeFlavors,
 		allowMultipleSelection, message, filter, modal, hideWhenDone),
 	fImageView(NULL),
 	fResolutionView(NULL),
@@ -167,7 +171,7 @@ ImageFilePanel::SelectionChanged()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - CustomRefFilter
 
 
 CustomRefFilter::CustomRefFilter(bool imageFiltering)
@@ -194,4 +198,3 @@ CustomRefFilter::Filter(const entry_ref* ref, BNode* node,
 
 	return false;
 }
-

@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jerome Duval (jerome.duval@free.fr)
+ *		Jerome Duval, jerome.duval@free.fr
  */
+
 #ifndef IMAGE_FILE_PANEL_H
 #define IMAGE_FILE_PANEL_H
 
@@ -55,4 +56,3 @@ protected:
 };
 
 #endif	// IMAGE_FILE_PANEL_H
-

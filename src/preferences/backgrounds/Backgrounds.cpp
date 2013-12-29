@@ -1,10 +1,10 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Jerome Duval (jerome.duval@free.fr)
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jerome Duval, jerome.duval@free.fr
  */
 
 
@@ -51,7 +51,7 @@ private:
 };
 
 
-//	#pragma mark -
+//	#pragma mark - BackgroundsApplication
 
 
 BackgroundsApplication::BackgroundsApplication()
@@ -85,7 +85,7 @@ BackgroundsApplication::RefsReceived(BMessage* message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BackgroundsWindow
 
 
 BackgroundsWindow::BackgroundsWindow()
@@ -133,7 +133,7 @@ BackgroundsWindow::WorkspaceActivated(int32 oldWorkspaces, bool active)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - main method
 
 
 int
@@ -143,4 +143,3 @@ main(int argc, char** argv)
 	app.Run();
 	return 0;
 }
-
