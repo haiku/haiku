@@ -345,6 +345,8 @@ is_mode_supported(display_mode* mode)
 		}
 	}
 
+	#if 0
+	// Lots of spam, but good for understanding what modelines are in use
 	TRACE("MODE: %d ; %d %d %d %d ; %d %d %d %d is %s\n",
 		mode->timing.pixel_clock, mode->timing.h_display,
 		mode->timing.h_sync_start, mode->timing.h_sync_end,
@@ -352,6 +354,7 @@ is_mode_supported(display_mode* mode)
 		mode->timing.v_sync_start, mode->timing.v_sync_end,
 		mode->timing.v_total,
 		sane ? "OK." : "BAD, out of range!");
+	#endif
 
 	return sane;
 }
