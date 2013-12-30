@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <algorithm>
+
 #include <ACPI.h>
 
 #include <boot_device.h>
@@ -578,7 +580,7 @@ detect_amd_cache_topology(uint32 maxExtendedLeaf)
 		return;
 	
 	uint8 hierarchyLevels[CPU_MAX_CACHE_LEVEL];
-	uint8 maxCacheLevel = 0;
+	int maxCacheLevel = 0;
 
 	int currentLevel = 0;
 	int cacheType;
@@ -587,17 +589,17 @@ detect_amd_cache_topology(uint32 maxExtendedLeaf)
 		get_current_cpuid(&cpuid, 0x8000001d, currentLevel);
 
 		cacheType = cpuid.regs.eax & 0x1f;
-		int cacheLevel = (cpuid.regs.eax >> 5) & 0x7;
+		if (cacheType == 0)
+			break;
 
+		int cacheLevel = (cpuid.regs.eax >> 5) & 0x7;
 		int coresCount = next_power_of_2(((cpuid.regs.eax >> 14) & 0x3f) + 1);
 		hierarchyLevels[cacheLevel - 1]
 			= coresCount * (sHierarchyMask[CPU_TOPOLOGY_SMT] + 1);
-
-		if (cacheType != 0)
-			maxCacheLevel = max_c(maxCacheLevel, cacheLevel);
+		maxCacheLevel = std::max(maxCacheLevel, cacheLevel);
 
 		currentLevel++;
-	} while (cacheType != 0);
+	} while (true);
 
 	for (int i = 0; i < maxCacheLevel; i++)
 		sCacheSharingMask[i] = ~uint32(hierarchyLevels[i] - 1);
@@ -692,7 +694,7 @@ detect_intel_cache_topology(uint32 maxBasicLeaf)
 		return;
 
 	uint8 hierarchyLevels[CPU_MAX_CACHE_LEVEL];
-	uint8 maxCacheLevel = 0;
+	int maxCacheLevel = 0;
 
 	int currentLevel = 0;
 	int cacheType;
@@ -701,16 +703,16 @@ detect_intel_cache_topology(uint32 maxBasicLeaf)
 		get_current_cpuid(&cpuid, 4, currentLevel);
 
 		cacheType = cpuid.regs.eax & 0x1f;
-		int cacheLevel = (cpuid.regs.eax >> 5) & 0x7;
+		if (cacheType == 0)
+			break;
 
+		int cacheLevel = (cpuid.regs.eax >> 5) & 0x7;
 		hierarchyLevels[cacheLevel - 1]
 			= next_power_of_2(((cpuid.regs.eax >> 14) & 0x3f) + 1);
-
-		if (cacheType != 0)
-			maxCacheLevel = max_c(maxCacheLevel, cacheLevel);
+		maxCacheLevel = std::max(maxCacheLevel, cacheLevel);
 
 		currentLevel++;
-	} while (cacheType != 0);
+	} while (true);
 
 	for (int i = 0; i < maxCacheLevel; i++)
 		sCacheSharingMask[i] = ~uint32(hierarchyLevels[i] - 1);
