@@ -766,6 +766,8 @@ debug_connectors()
 			ERROR("   - id:               %" B_PRIu16 "\n", encoder->objectID);
 			ERROR("   - type:             %s\n",
 				encoder_name_lookup(encoder->objectID));
+			ERROR("   - capabilities:     0x%" B_PRIX32 "\n",
+				encoder->capabilities);
 			ERROR("   - enumeration:      %" B_PRIu32 "\n",
 				encoder->linkEnumeration);
 
