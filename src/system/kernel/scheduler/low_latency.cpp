@@ -35,7 +35,8 @@ static bool
 has_cache_expired(const ThreadData* threadData)
 {
 	SCHEDULER_ENTER_FUNCTION();
-
+	if (threadData->WentSleepActive() == 0)
+		return false;
 	CoreEntry* core = threadData->Core();
 	bigtime_t activeTime = core->GetActiveTime();
 	return activeTime - threadData->WentSleepActive() > kCacheExpire;

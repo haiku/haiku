@@ -16,14 +16,12 @@ ThreadData::ThreadData(Thread* thread)
 	:
 	fThread(thread)
 {
-	Init();
 }
 
 
 void
 ThreadData::Init()
 {
-	fPriorityPenalty = 0;
 	fAdditionalPenalty = 0;
 	fEffectivePriority = -1;
 
@@ -40,7 +38,25 @@ ThreadData::Init()
 
 	fEnqueued = false;
 
-	fCore = NULL;
+	Thread* currentThread = thread_get_current_thread();
+	ASSERT(currentThread != NULL);
+	if (!thread_is_idle_thread(currentThread)) {
+		ThreadData* currentThreadData = currentThread->scheduler_data;
+		int32 penalty = currentThreadData->fPriorityPenalty;
+
+		int32 minimalPriority = _GetMinimalPriority();
+		if (fThread->priority - penalty >= minimalPriority)
+			fPriorityPenalty = penalty;
+		else
+			fPriorityPenalty = fThread->priority - minimalPriority;
+
+		fCore = currentThreadData->fCore;
+	} else {
+		fPriorityPenalty = 0;
+		fAdditionalPenalty = 0;
+
+		fCore = NULL;
+	}
 }
 
 

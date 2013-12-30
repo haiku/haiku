@@ -195,7 +195,7 @@ ThreadData::ShouldCancelPenalty() const
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	if (fCore == NULL)
+	if (fCore == NULL || fWentSleep == 0)
 		return false;
 
 	return fCore->StarvationCounter() != fWentSleepCount

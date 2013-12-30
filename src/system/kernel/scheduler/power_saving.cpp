@@ -41,6 +41,8 @@ static bool
 has_cache_expired(const ThreadData* threadData)
 {
 	SCHEDULER_ENTER_FUNCTION();
+	if (threadData->WentSleep() == 0)
+		return false;
 	return system_time() - threadData->WentSleep() > kCacheExpire;
 }
 
