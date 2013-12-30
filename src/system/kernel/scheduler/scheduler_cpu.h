@@ -386,7 +386,7 @@ CoreEntry::GetLoad() const
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	ASSERT(fCPUCount >= 0);
+	ASSERT(fCPUCount > 0);
 	return fLoad / fCPUCount;
 }
 
