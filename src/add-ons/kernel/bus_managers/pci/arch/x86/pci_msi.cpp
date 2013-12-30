@@ -36,8 +36,8 @@ pci_ht_msi_map(PCIDev *device, uint64 address)
 			dprintf("ht msi mapping enabled\n");
 			info->control_value |= PCI_ht_command_msi_enable;
 		}
-		gPCI->WriteConfig(device, info->capability_offset + PCI_ht_command,
-			info->control_value, 2);
+		gPCI->WriteConfig(device, info->capability_offset + PCI_ht_command, 2,
+			info->control_value);
 	}
 }
 
