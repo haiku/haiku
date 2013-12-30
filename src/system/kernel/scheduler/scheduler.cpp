@@ -517,7 +517,7 @@ reschedule(int32 nextState)
 	ThreadData* nextThreadData;
 	if (gCPU[thisCPU].disabled) {
 		if (!thread_is_idle_thread(oldThread)) {
-			CoreRunQueueLocker _(core);
+			CPURunQueueLocker _(cpu);
 
 			nextThreadData = cpu->PeekIdleThread();
 			cpu->Remove(nextThreadData);

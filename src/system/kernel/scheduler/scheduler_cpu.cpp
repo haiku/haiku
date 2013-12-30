@@ -56,6 +56,7 @@ CPUEntry::CPUEntry()
 	fMeasureTime(0)
 {
 	B_INITIALIZE_RW_SPINLOCK(&fSchedulerModeLock);
+	B_INITIALIZE_SPINLOCK(&fQueueLock);
 }
 
 
@@ -185,24 +186,25 @@ CPUEntry::ChooseNextThread(ThreadData* oldThread, bool putAtBack)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	CoreRunQueueLocker _(fCore);
+	int32 oldPriority = -1;
+	if (oldThread != NULL)
+		oldPriority = oldThread->GetEffectivePriority();
 
-	ThreadData* sharedThread = fCore->PeekThread();
+	CPURunQueueLocker cpuLocker(this);
+
 	ThreadData* pinnedThread = fRunQueue.PeekMaximum();
-
-	ASSERT(sharedThread != NULL || pinnedThread != NULL || oldThread != NULL);
-
 	int32 pinnedPriority = -1;
 	if (pinnedThread != NULL)
 		pinnedPriority = pinnedThread->GetEffectivePriority();
 
+	CoreRunQueueLocker coreLocker(fCore);
+
+	ThreadData* sharedThread = fCore->PeekThread();
+	ASSERT(sharedThread != NULL || pinnedThread != NULL || oldThread != NULL);
+
 	int32 sharedPriority = -1;
 	if (sharedThread != NULL)
 		sharedPriority = sharedThread->GetEffectivePriority();
-
-	int32 oldPriority = -1;
-	if (oldThread != NULL)
-		oldPriority = oldThread->GetEffectivePriority();
 
 	int32 rest = std::max(pinnedPriority, sharedPriority);
 	if (oldPriority > rest || (!putAtBack && oldPriority == rest))
@@ -212,6 +214,8 @@ CPUEntry::ChooseNextThread(ThreadData* oldThread, bool putAtBack)
 		fCore->Remove(sharedThread);
 		return sharedThread;
 	}
+
+	coreLocker.Unlock();
 
 	Remove(pinnedThread);
 	return pinnedThread;

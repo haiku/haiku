@@ -60,6 +60,9 @@ public:
 	inline				void			LockScheduler();
 	inline				void			UnlockScheduler();
 
+	inline				void			LockRunQueue();
+	inline				void			UnlockRunQueue();
+
 						void			PushFront(ThreadData* thread,
 											int32 priority);
 						void			PushBack(ThreadData* thread,
@@ -91,6 +94,7 @@ private:
 						rw_spinlock 	fSchedulerModeLock;
 
 						ThreadRunQueue	fRunQueue;
+						spinlock		fQueueLock;
 
 						int32			fLoad;
 
@@ -107,6 +111,22 @@ public:
 
 						void			Dump();
 };
+
+class CPURunQueueLocking {
+public:
+	inline bool Lock(CPUEntry* cpu)
+	{
+		cpu->LockRunQueue();
+		return true;
+	}
+
+	inline void Unlock(CPUEntry* cpu)
+	{
+		cpu->UnlockRunQueue();
+	}
+};
+
+typedef AutoLocker<CPUEntry, CPURunQueueLocking> CPURunQueueLocker;
 
 class CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 	public DoublyLinkedListLinkImpl<CoreEntry> {
@@ -306,6 +326,22 @@ CPUEntry::UnlockScheduler()
 {
 	SCHEDULER_ENTER_FUNCTION();
 	release_write_spinlock(&fSchedulerModeLock);
+}
+
+
+inline void
+CPUEntry::LockRunQueue()
+{
+	SCHEDULER_ENTER_FUNCTION();
+	acquire_spinlock(&fQueueLock);
+}
+
+
+inline void
+CPUEntry::UnlockRunQueue()
+{
+	SCHEDULER_ENTER_FUNCTION();
+	release_spinlock(&fQueueLock);
 }
 
 

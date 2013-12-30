@@ -234,16 +234,22 @@ ThreadData::PutBack()
 
 	int32 priority = GetEffectivePriority();
 
-	CoreRunQueueLocker _(fCore);
-	ASSERT(!fEnqueued);
-	fEnqueued = true;
 	if (fThread->pinned_to_cpu > 0) {
 		ASSERT(fThread->cpu != NULL);
-
 		CPUEntry* cpu = CPUEntry::GetCPU(fThread->cpu->cpu_num);
+
+		CPURunQueueLocker _(cpu);
+		ASSERT(!fEnqueued);
+		fEnqueued = true;
+
 		cpu->PushFront(this, priority);
-	} else
+	} else {
+		CoreRunQueueLocker _(fCore);
+		ASSERT(!fEnqueued);
+		fEnqueued = true;
+
 		fCore->PushFront(this, priority);
+	}
 }
 
 
@@ -258,16 +264,22 @@ ThreadData::Enqueue()
 
 	int32 priority = GetEffectivePriority();
 
-	CoreRunQueueLocker _(fCore);
-	ASSERT(!fEnqueued);
-	fEnqueued = true;
 	if (fThread->pinned_to_cpu > 0) {
 		ASSERT(fThread->previous_cpu != NULL);
-
 		CPUEntry* cpu = CPUEntry::GetCPU(fThread->previous_cpu->cpu_num);
+
+		CPURunQueueLocker _(cpu);
+		ASSERT(!fEnqueued);
+		fEnqueued = true;
+
 		cpu->PushBack(this, priority);
-	} else
+	} else {
+		CoreRunQueueLocker _(fCore);
+		ASSERT(!fEnqueued);
+		fEnqueued = true;
+
 		fCore->PushBack(this, priority);
+	}
 }
 
 
@@ -276,20 +288,23 @@ ThreadData::Dequeue()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
+	if (fThread->pinned_to_cpu > 0) {
+		ASSERT(fThread->previous_cpu != NULL);
+		CPUEntry* cpu = CPUEntry::GetCPU(fThread->previous_cpu->cpu_num);
+
+		CPURunQueueLocker _(cpu);
+		if (!fEnqueued)
+			return false;
+		cpu->Remove(this);
+		ASSERT(!fEnqueued);
+		return true;
+	}
+
 	CoreRunQueueLocker _(fCore);
 	if (!fEnqueued)
 		return false;
-
-	if (fThread->pinned_to_cpu > 0) {
-		ASSERT(fThread->previous_cpu != NULL);
-
-		CPUEntry* cpu = CPUEntry::GetCPU(fThread->previous_cpu->cpu_num);
-		cpu->Remove(this);
-	} else {
-		ASSERT(fWentSleepCount < 1);
-		fCore->Remove(this);
-	}
-
+	ASSERT(fWentSleepCount < 1);
+	fCore->Remove(this);
 	ASSERT(!fEnqueued);
 	return true;
 }
