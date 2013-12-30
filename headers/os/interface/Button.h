@@ -13,6 +13,7 @@ public:
 			enum BBehavior {
 				B_BUTTON_BEHAVIOR,
 				B_TOGGLE_BEHAVIOR,
+				B_POP_UP_BEHAVIOR,
 			};
 
 public:
@@ -51,6 +52,9 @@ public:
 			BBehavior			Behavior() const;
 			void				SetBehavior(BBehavior behavior);
 
+			BMessage*			PopUpMessage() const;
+			void				SetPopUpMessage(BMessage* message);
+
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				WindowActivated(bool active);
 	virtual	void				MouseMoved(BPoint point, uint32 transit,
@@ -82,7 +86,6 @@ public:
 
 	virtual	status_t			SetIcon(const BBitmap* icon, uint32 flags = 0);
 
-
 protected:
 	virtual	void				LayoutInvalidated(bool descendants = false);
 
@@ -95,6 +98,8 @@ private:
 
 			BSize				_ValidatePreferredSize();
 
+			BRect				_PopUpRect() const;
+
 	inline	bool				_Flag(uint32 flag) const;
 	inline	bool				_SetFlag(uint32 flag, bool set);
 			 
@@ -102,8 +107,7 @@ private:
 			BSize				fPreferredSize;
 			uint32				fFlags;
 			BBehavior			fBehavior;
-
-			uint32				_reserved[1];
+			BMessage*			fPopUpMessage;
 };
 
 #endif // _BUTTON_H

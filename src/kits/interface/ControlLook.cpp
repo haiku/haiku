@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
- * Copyright 2012, Haiku Inc. All rights reserved.
+ * Copyright 2012-2013, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,6 +29,9 @@ namespace BPrivate {
 
 static const float kEdgeBevelLightTint = 0.59;
 static const float kEdgeBevelShadowTint = 1.0735;
+static const float kHoverTintFactor = 0.85;
+
+static const float kButtonPopUpIndicatorWidth = 11;
 
 
 BControlLook::BControlLook():
@@ -157,7 +160,7 @@ BControlLook::DrawButtonBackground(BView* view, BRect& rect,
 	uint32 borders, orientation orientation)
 {
 	_DrawButtonBackground(view, rect, updateRect, 0.0f, 0.0f, 0.0f, 0.0f,
-		base, flags, borders, orientation);
+		base, false, flags, borders, orientation);
 }
 
 
@@ -167,7 +170,7 @@ BControlLook::DrawButtonBackground(BView* view, BRect& rect,
 	uint32 borders, orientation orientation)
 {
 	_DrawButtonBackground(view, rect, updateRect, radius, radius, radius,
-		radius, base, flags, borders, orientation);
+		radius, base, false, flags, borders, orientation);
 }
 
 
@@ -178,7 +181,7 @@ BControlLook::DrawButtonBackground(BView* view, BRect& rect,
 	uint32 flags, uint32 borders, orientation orientation)
 {
 	_DrawButtonBackground(view, rect, updateRect, leftTopRadius,
-		rightTopRadius, leftBottomRadius, rightBottomRadius, base, flags,
+		rightTopRadius, leftBottomRadius, rightBottomRadius, base, false, flags,
 		borders, orientation);
 }
 
@@ -1147,7 +1150,6 @@ BControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 		middleTint2 = (middleTint2 + B_NO_TINT) / 2;
 		bottomTint = (bottomTint + B_NO_TINT) / 2;
 	} else if ((flags & B_HOVER) != 0) {
-		static const float kHoverTintFactor = 0.85;
 		topTint *= kHoverTintFactor;
 		middleTint1 *= kHoverTintFactor;
 		middleTint2 *= kHoverTintFactor;
@@ -1981,6 +1983,12 @@ BControlLook::GetBackgroundInsets(background_type backgroundType,
 		case B_MENU_ITEM_BACKGROUND:
 			inset = 1;
 			break;
+		case B_BUTTON_WITH_POP_UP_BACKGROUND:
+			_left = 1;
+			_top = 1;
+			_right = 1 + kButtonPopUpIndicatorWidth;
+			_bottom = 1;
+			return;
 		case B_HORIZONTAL_SCROLL_BAR_BACKGROUND:
 			_left = 2;
 			_top = 0;
@@ -2015,6 +2023,38 @@ BControlLook::GetInsets(frame_type frameType, background_type backgroundType,
 	_top += top;
 	_right += right;
 	_bottom += bottom;
+}
+
+
+void
+BControlLook::DrawButtonWithPopUpBackground(BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base, uint32 flags,
+	uint32 borders, orientation orientation)
+{
+	_DrawButtonBackground(view, rect, updateRect, 0.0f, 0.0f, 0.0f, 0.0f,
+		base, true, flags, borders, orientation);
+}
+
+
+void
+BControlLook::DrawButtonWithPopUpBackground(BView* view, BRect& rect,
+	const BRect& updateRect, float radius, const rgb_color& base, uint32 flags,
+	uint32 borders, orientation orientation)
+{
+	_DrawButtonBackground(view, rect, updateRect, radius, radius, radius,
+		radius, base, true, flags, borders, orientation);
+}
+
+
+void
+BControlLook::DrawButtonWithPopUpBackground(BView* view, BRect& rect,
+	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
+	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
+	uint32 flags, uint32 borders, orientation orientation)
+{
+	_DrawButtonBackground(view, rect, updateRect, leftTopRadius,
+		rightTopRadius, leftBottomRadius, rightBottomRadius, base, true, flags,
+		borders, orientation);
 }
 
 
@@ -2319,7 +2359,7 @@ void
 BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	const BRect& updateRect, float leftTopRadius, float rightTopRadius,
 	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
-	uint32 flags, uint32 borders, orientation orientation)
+	bool popupIndicator, uint32 flags, uint32 borders, orientation orientation)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -2337,13 +2377,51 @@ BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 		&& (flags & (B_ACTIVATED | B_PARTIALLY_ACTIVATED)) == 0
 		&& ((flags & (B_HOVER | B_FOCUSED)) == 0
 			|| (flags & B_DISABLED) != 0)) {
-		_DrawFrame(view, rect, base, base, base, base, borders);
-		view->SetHighColor(base);
-		view->FillRect(rect);
-		view->PopState();
-		return;
+		_DrawFlatButtonBackground(view, rect, updateRect, base, popupIndicator,
+			flags, borders, orientation);
+	} else {
+		_DrawNonFlatButtonBackground(view, rect, updateRect, clipping,
+			leftTopRadius, rightTopRadius, leftBottomRadius, rightBottomRadius,
+			base, popupIndicator, flags, borders, orientation);
 	}
 
+	// restore the clipping constraints of the view
+	view->PopState();
+}
+
+
+void
+BControlLook::_DrawFlatButtonBackground(BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base, bool popupIndicator,
+	uint32 flags, uint32 borders, orientation orientation)
+{
+	_DrawFrame(view, rect, base, base, base, base, borders);
+		// Not an actual frame, but the method insets our rect as needed.
+
+	view->SetHighColor(base);
+	view->FillRect(rect);
+
+	if (popupIndicator) {
+		BRect indicatorRect(rect);
+		rect.right -= kButtonPopUpIndicatorWidth;
+		indicatorRect.left = rect.right + 3;
+			// 2 pixels for the separator
+
+		view->SetHighColor(base);
+		view->FillRect(indicatorRect);
+
+		_DrawPopUpMarker(view, indicatorRect, base, flags);
+	}
+}
+
+
+void
+BControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
+	const BRect& updateRect, BRegion& clipping, float leftTopRadius,
+	float rightTopRadius, float leftBottomRadius, float rightBottomRadius,
+	const rgb_color& base, bool popupIndicator, uint32 flags, uint32 borders,
+	orientation orientation)
+{
 	// inner bevel colors
 	rgb_color bevelLightColor  = _BevelLightColor(base, flags);
 	rgb_color bevelShadowColor = _BevelShadowColor(base, flags);
@@ -2446,11 +2524,77 @@ BControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 			buttonBgColor, buttonBgColor, borders);
 	}
 
+	if (popupIndicator) {
+		BRect indicatorRect(rect);
+		rect.right -= kButtonPopUpIndicatorWidth;
+		indicatorRect.left = rect.right + 3;
+			// 2 pixels for the separator
+
+		// Even when depressed we want the pop-up indicator background and
+		// separator to cover the area up to the top.
+		if ((flags & B_ACTIVATED) != 0)
+			indicatorRect.top--;
+
+		// draw the separator
+		rgb_color separatorBaseColor = base;
+		if ((flags & B_ACTIVATED) != 0)
+			separatorBaseColor = tint_color(base, B_DARKEN_1_TINT);
+		
+		rgb_color separatorLightColor = _EdgeLightColor(separatorBaseColor,
+			(flags & B_DISABLED) != 0 ? 0.7 : 1.0, 1.0, flags);
+		rgb_color separatorShadowColor = _EdgeShadowColor(separatorBaseColor,
+			(flags & B_DISABLED) != 0 ? 0.7 : 1.0, 1.0, flags);
+
+		view->BeginLineArray(2);
+
+		view->AddLine(BPoint(indicatorRect.left - 2, indicatorRect.top),
+			BPoint(indicatorRect.left - 2, indicatorRect.bottom),
+			separatorShadowColor);
+		view->AddLine(BPoint(indicatorRect.left - 1, indicatorRect.top),
+			BPoint(indicatorRect.left - 1, indicatorRect.bottom),
+			separatorLightColor);
+
+		view->EndLineArray();
+
+		// draw background and pop-up marker
+		_DrawMenuFieldBackgroundInside(view, indicatorRect, updateRect,
+			0.0f, rightTopRadius, 0.0f, rightBottomRadius, base, flags, 0);
+
+		if ((flags & B_ACTIVATED) != 0)
+			indicatorRect.top++;
+
+		_DrawPopUpMarker(view, indicatorRect, base, flags);
+	}
+
 	// fill in the background
 	view->FillRect(rect, fillGradient);
+}
 
-	// restore the clipping constraints of the view
-	view->PopState();
+
+void
+BControlLook::_DrawPopUpMarker(BView* view, const BRect& rect,
+	const rgb_color& base, uint32 flags)
+{
+	BPoint center(roundf((rect.left + rect.right) / 2.0),
+		roundf((rect.top + rect.bottom) / 2.0));
+	BPoint triangle[3];
+	triangle[0] = center + BPoint(-2.5, -0.5);
+	triangle[1] = center + BPoint(2.5, -0.5);
+	triangle[2] = center + BPoint(0.0, 2.0);
+
+	uint32 viewFlags = view->Flags();
+	view->SetFlags(viewFlags | B_SUBPIXEL_PRECISE);
+
+	rgb_color markColor;
+	if ((flags & B_DISABLED) != 0)
+		markColor = tint_color(base, 1.35);
+	else
+		markColor = tint_color(base, 1.65);
+
+	view->SetHighColor(markColor);
+	view->FillTriangle(triangle[0], triangle[1], triangle[2]);
+
+	view->SetFlags(viewFlags);
 }
 
 
@@ -2478,25 +2622,7 @@ BControlLook::_DrawMenuFieldBackgroundOutside(BView* view, BRect& rect,
 			0.0f, rightTopRadius, 0.0f, rightBottomRadius, base, flags,
 			B_TOP_BORDER | B_RIGHT_BORDER | B_BOTTOM_BORDER);
 
-		// popup marker
-		BPoint center(roundf((rightRect.left + rightRect.right) / 2.0),
-					  roundf((rightRect.top + rightRect.bottom) / 2.0));
-		BPoint triangle[3];
-		triangle[0] = center + BPoint(-2.5, -0.5);
-		triangle[1] = center + BPoint(2.5, -0.5);
-		triangle[2] = center + BPoint(0.0, 2.0);
-
-		uint32 viewFlags = view->Flags();
-		view->SetFlags(viewFlags | B_SUBPIXEL_PRECISE);
-
-		rgb_color markColor;
-		if ((flags & B_DISABLED) != 0)
-			markColor = tint_color(base, 1.35);
-		else
-			markColor = tint_color(base, 1.65);
-
-		view->SetHighColor(markColor);
-		view->FillTriangle(triangle[0], triangle[1], triangle[2]);
+		_DrawPopUpMarker(view, rightRect, base, flags);
 
 		// draw a line on the left of the popup frame
 		rgb_color bevelShadowColor = _BevelShadowColor(base, flags);
@@ -2506,8 +2632,6 @@ BControlLook::_DrawMenuFieldBackgroundOutside(BView* view, BRect& rect,
 		BPoint leftBottomCorner(floorf(rightRect.left - 1.0),
 			floorf(rightRect.bottom + 1.0));
 		view->StrokeLine(leftTopCorner, leftBottomCorner);
-
-		view->SetFlags(viewFlags);
 
 		rect = leftRect;
 	} else {
@@ -3327,7 +3451,6 @@ BControlLook::_MakeButtonGradient(BGradientLinear& gradient, BRect& rect,
 		middleTint2 = (middleTint2 + B_NO_TINT) / 2;
 		bottomTint = (bottomTint + B_NO_TINT) / 2;
 	} else if ((flags & B_HOVER) != 0) {
-		static const float kHoverTintFactor = 0.85;
 		topTint *= kHoverTintFactor;
 		middleTint1 *= kHoverTintFactor;
 		middleTint2 *= kHoverTintFactor;

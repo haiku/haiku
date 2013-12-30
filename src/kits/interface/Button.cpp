@@ -44,7 +44,8 @@ BButton::BButton(BRect frame, const char* name, const char* label,
 			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fPreferredSize(-1, -1),
 	fFlags(0),
-	fBehavior(B_BUTTON_BEHAVIOR)
+	fBehavior(B_BUTTON_BEHAVIOR),
+	fPopUpMessage(NULL)
 {
 	// Resize to minimum height if needed
 	font_height fh;
@@ -61,7 +62,8 @@ BButton::BButton(const char* name, const char* label, BMessage* message,
 			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fPreferredSize(-1, -1),
 	fFlags(0),
-	fBehavior(B_BUTTON_BEHAVIOR)
+	fBehavior(B_BUTTON_BEHAVIOR),
+	fPopUpMessage(NULL)
 {
 }
 
@@ -71,13 +73,15 @@ BButton::BButton(const char* label, BMessage* message)
 			B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE),
 	fPreferredSize(-1, -1),
 	fFlags(0),
-	fBehavior(B_BUTTON_BEHAVIOR)
+	fBehavior(B_BUTTON_BEHAVIOR),
+	fPopUpMessage(NULL)
 {
 }
 
 
 BButton::~BButton()
 {
+	SetPopUpMessage(NULL);
 }
 
 
@@ -85,7 +89,8 @@ BButton::BButton(BMessage* archive)
 	: BControl(archive),
 	fPreferredSize(-1, -1),
 	fFlags(0),
-	fBehavior(B_BUTTON_BEHAVIOR)
+	fBehavior(B_BUTTON_BEHAVIOR),
+	fPopUpMessage(NULL)
 {
 	bool isDefault = false;
 	if (archive->FindBool("_default", &isDefault) == B_OK && isDefault)
@@ -136,8 +141,14 @@ BButton::Draw(BRect updateRect)
 
 	be_control_look->DrawButtonFrame(this, rect, updateRect,
 		base, background, flags);
-	be_control_look->DrawButtonBackground(this, rect, updateRect,
-		base, flags);
+
+	if (fBehavior == B_POP_UP_BEHAVIOR) {
+		be_control_look->DrawButtonWithPopUpBackground(this, rect, updateRect,
+			base, flags);
+	} else {
+		be_control_look->DrawButtonBackground(this, rect, updateRect,
+			base, flags);
+	}
 
 	// always leave some room around the label
 	rect.InsetBy(kLabelMargin, kLabelMargin);
@@ -156,6 +167,11 @@ BButton::MouseDown(BPoint point)
 {
 	if (!IsEnabled())
 		return;
+
+	if (fBehavior == B_POP_UP_BEHAVIOR && _PopUpRect().Contains(point)) {
+		InvokeNotify(fPopUpMessage, B_CONTROL_MODIFIED);
+		return;
+	}
 
 	bool toggleBehavior = fBehavior == B_TOGGLE_BEHAVIOR;
 
@@ -318,8 +334,26 @@ BButton::Behavior() const
 void
 BButton::SetBehavior(BBehavior behavior)
 {
-	if (behavior != fBehavior)
+	if (behavior != fBehavior) {
 		fBehavior = behavior;
+		InvalidateLayout();
+		Invalidate();
+	}
+}
+
+
+BMessage*
+BButton::PopUpMessage() const
+{
+	return fPopUpMessage;
+}
+
+
+void
+BButton::SetPopUpMessage(BMessage* message)
+{
+	delete fPopUpMessage;
+	fPopUpMessage = message;
 }
 
 
@@ -593,9 +627,12 @@ BSize
 BButton::_ValidatePreferredSize()
 {
 	if (fPreferredSize.width < 0) {
+		BControlLook::background_type backgroundType
+			= fBehavior == B_POP_UP_BEHAVIOR
+				? BControlLook::B_BUTTON_WITH_POP_UP_BACKGROUND
+				: BControlLook::B_BUTTON_BACKGROUND;
 		float left, top, right, bottom;
-		be_control_look->GetInsets(BControlLook::B_BUTTON_FRAME,
-			BControlLook::B_BUTTON_BACKGROUND,
+		be_control_look->GetInsets(BControlLook::B_BUTTON_FRAME, backgroundType,
 			IsDefault() ? BControlLook::B_DEFAULT_BUTTON : 0,
 			left, top, right, bottom);
 
@@ -644,6 +681,24 @@ BButton::_ValidatePreferredSize()
 	}
 
 	return fPreferredSize;
+}
+
+
+BRect
+BButton::_PopUpRect() const
+{
+	if (fBehavior != B_POP_UP_BEHAVIOR)
+		return BRect();
+
+	float left, top, right, bottom;
+	be_control_look->GetInsets(BControlLook::B_BUTTON_FRAME,
+		BControlLook::B_BUTTON_WITH_POP_UP_BACKGROUND,
+		IsDefault() ? BControlLook::B_DEFAULT_BUTTON : 0,
+		left, top, right, bottom);
+
+	BRect rect(Bounds());
+	rect.left = rect.right - right + 1;
+	return rect;
 }
 
 
