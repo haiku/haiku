@@ -42,7 +42,7 @@ void encoder_dpms_set_dvo(uint8 crtcID, int mode);
 void encoder_dpms_set_external(uint8 crtcID, int mode);
 
 const char* encoder_name_lookup(uint32 encoderID);
-uint32 encoder_object_lookup(uint32 encoderFlags, uint8 dacID);
+uint32 encoder_object_lookup(uint32 connectorFlags, uint8 dacID);
 uint32 encoder_type_lookup(uint32 encoderID, uint32 connectorFlags);
 bool encoder_is_external(uint32 encoderID);
 bool encoder_is_dp_bridge(uint32 encoderID);

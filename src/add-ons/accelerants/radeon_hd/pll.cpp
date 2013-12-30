@@ -454,7 +454,7 @@ pll_setup_flags(pll_info* pll, uint8 crtcID)
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint32 connectorFlags = gConnector[connectorIndex]->flags;
 
 	uint32 dceVersion = (info.dceMajor * 100) + info.dceMinor;
 
@@ -469,7 +469,7 @@ pll_setup_flags(pll_info* pll, uint8 crtcID)
 	if (info.chipsetID < RADEON_RV770)
 		pll->flags |= PLL_PREFER_MINM_OVER_MAXP;
 
-	if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 		pll->flags |= PLL_IS_LCD;
 
 		// use reference divider for spread spectrum
@@ -489,7 +489,7 @@ pll_setup_flags(pll_info* pll, uint8 crtcID)
 		}
 	}
 
-	if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
+	if ((connectorFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
 		pll->flags |= PLL_PREFER_CLOSEST_LOWER;
 
 	if ((info.chipsetFlags & CHIP_APU) != 0) {
@@ -512,7 +512,7 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 
 	uint32 encoderID = connector->encoder.objectID;
 	uint32 encoderMode = display_get_encoder_mode(connectorIndex);
-	uint32 encoderFlags = connector->encoder.flags;
+	uint32 connectorFlags = connector->flags;
 
 	uint32 externalEncoderID = 0;
 	pll->adjustedClock = pll->pixelClock;
@@ -584,7 +584,7 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 								= dp_get_link_rate(connectorIndex, mode);
 							args.v3.sInput.usPixelClock
 								= B_HOST_TO_LENDIAN_INT16(dpLinkSpeed / 10);
-						} else if ((encoderFlags & ATOM_DEVICE_DFP_SUPPORT)
+						} else if ((connectorFlags & ATOM_DEVICE_DFP_SUPPORT)
 							!= 0) {
 							#if 0
 							if (encoderMode == ATOM_ENCODER_MODE_HDMI) {

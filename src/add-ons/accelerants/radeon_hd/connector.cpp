@@ -442,7 +442,7 @@ connector_probe_legacy()
 		uint32 encoderID = (encoderObject & OBJECT_ID_MASK) >> OBJECT_ID_SHIFT;
 
 		gConnector[connectorIndex]->valid = true;
-		gConnector[connectorIndex]->encoder.flags = (1 << i);
+		gConnector[connectorIndex]->flags = (1 << i);
 		gConnector[connectorIndex]->encoder.valid = true;
 		gConnector[connectorIndex]->encoder.objectID = encoderID;
 		gConnector[connectorIndex]->encoder.type
@@ -632,41 +632,29 @@ connector_probe()
 								continue;
 							}
 
+							encoder_info* encoder;
+
 							// External encoders are behind DVO or UNIPHY
 							if (encoder_is_external(encoderID)) {
-								encoder_info* encoder
-									= &connector->encoderExternal;
+								encoder = &connector->encoderExternal;
 								encoder->isExternal = true;
-
-								// Set up found connector
-								encoder->valid = true;
-								encoder->flags = connectorFlags;
-								encoder->objectID = encoderID;
-								encoder->type = encoderType;
-								encoder->linkEnumeration
-									= (encoderObjectRaw & ENUM_ID_MASK)
-										>> ENUM_ID_SHIFT;
 								encoder->isDPBridge
 									= encoder_is_dp_bridge(encoderID);
-
-								pll_limit_probe(&encoder->pll);
 							} else {
-								encoder_info* encoder
-									= &connector->encoder;
+								encoder = &connector->encoder;
 								encoder->isExternal = false;
-
-								// Set up found connector
-								encoder->valid = true;
-								encoder->flags = connectorFlags;
-								encoder->objectID = encoderID;
-								encoder->type = encoderType;
-								encoder->linkEnumeration
-									= (encoderObjectRaw & ENUM_ID_MASK)
-										>> ENUM_ID_SHIFT;
 								encoder->isDPBridge = false;
-
-								pll_limit_probe(&encoder->pll);
 							}
+
+							// Set up found connector encoder generics
+							encoder->valid = true;
+							encoder->capabilities = caps;
+							encoder->objectID = encoderID;
+							encoder->type = encoderType;
+							encoder->linkEnumeration
+								= (encoderObjectRaw & ENUM_ID_MASK)
+									>> ENUM_ID_SHIFT;
+							pll_limit_probe(&encoder->pll);
 						}
 					}
 					// END if object is encoder
@@ -800,54 +788,54 @@ debug_connectors()
 					encoder->linkEnumeration);
 			}
 
-			uint32 encoderFlags = gConnector[id]->encoder.flags;
+			uint32 connectorFlags = gConnector[id]->flags;
 			bool flags = false;
 			ERROR(" + flags:\n");
-			if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
 				ERROR("   * device CRT1 support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
 				ERROR("   * device CRT2 support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
 				ERROR("   * device LCD1 support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_LCD2_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_LCD2_SUPPORT) != 0) {
 				ERROR("   * device LCD2 support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
 				ERROR("   * device TV1 support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
 				ERROR("   * device CV support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
 				ERROR("   * device DFP1 support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
 				ERROR("   * device DFP2 support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
 				ERROR("   * device DFP3 support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_DFP4_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_DFP4_SUPPORT) != 0) {
 				ERROR("   * device DFP4 support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_DFP5_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_DFP5_SUPPORT) != 0) {
 				ERROR("   * device DFP5 support\n");
 				flags = true;
 			}
-			if ((encoderFlags & ATOM_DEVICE_DFP6_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_DFP6_SUPPORT) != 0) {
 				ERROR("   * device DFP6 support\n");
 				flags = true;
 			}

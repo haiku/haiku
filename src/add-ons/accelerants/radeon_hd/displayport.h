@@ -46,6 +46,8 @@ status_t dp_link_train(uint8 crtcID);
 status_t dp_link_train_cr(uint32 connectorIndex);
 status_t dp_link_train_ce(uint32 connectorIndex);
 
+bool dp_is_dp12_capable(uint32 connectorIndex);
+
 void debug_dp_info();
 
 status_t dp_get_pixel_size_for(color_space space, size_t *pixelChunk,

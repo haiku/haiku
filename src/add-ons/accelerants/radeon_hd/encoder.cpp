@@ -84,8 +84,8 @@ encoder_assign_crtc(uint8 crtcID)
 		tableMajor, tableMinor);
 
 	uint16 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	uint16 connectorFlags = gConnector[connectorIndex]->flags;
 	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
-	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
 
 	// Prepare AtomBIOS command arguments
 	union crtcSourceParam {
@@ -121,9 +121,10 @@ encoder_assign_crtc(uint8 crtcID)
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
-							if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0) {
+							if ((connectorFlags
+								& ATOM_DEVICE_TV_SUPPORT) != 0) {
 								args.v1.ucDevice = ATOM_DEVICE_TV1_INDEX;
-							} else if ((encoderFlags
+							} else if ((connectorFlags
 								& ATOM_DEVICE_CV_SUPPORT) != 0) {
 								args.v1.ucDevice = ATOM_DEVICE_CV_INDEX;
 							} else
@@ -131,9 +132,10 @@ encoder_assign_crtc(uint8 crtcID)
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_DAC2:
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
-							if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0) {
+							if ((connectorFlags
+								& ATOM_DEVICE_TV_SUPPORT) != 0) {
 								args.v1.ucDevice = ATOM_DEVICE_TV1_INDEX;
-							} else if ((encoderFlags
+							} else if ((connectorFlags
 								& ATOM_DEVICE_CV_SUPPORT) != 0) {
 								args.v1.ucDevice = ATOM_DEVICE_CV_INDEX;
 							} else
@@ -181,18 +183,20 @@ encoder_assign_crtc(uint8 crtcID)
 							args.v2.ucEncoderID = ASIC_INT_DVO_ENCODER_ID;
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
-							if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0) {
+							if ((connectorFlags
+								& ATOM_DEVICE_TV_SUPPORT) != 0) {
 								args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
-							} else if ((encoderFlags
+							} else if ((connectorFlags
 								& ATOM_DEVICE_CV_SUPPORT) != 0) {
 								args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
 							} else
 								args.v2.ucEncoderID = ASIC_INT_DAC1_ENCODER_ID;
 							break;
 						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
-							if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0) {
+							if ((connectorFlags
+								& ATOM_DEVICE_TV_SUPPORT) != 0) {
 								args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
-							} else if ((encoderFlags
+							} else if ((connectorFlags
 								& ATOM_DEVICE_CV_SUPPORT) != 0) {
 								args.v2.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
 							} else
@@ -273,11 +277,11 @@ encoder_apply_quirks(uint8 crtcID)
 	radeon_shared_info &info = *gInfo->shared_info;
 	register_info* regs = gDisplay[crtcID]->regs;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint16 connectorFlags = gConnector[connectorIndex]->flags;
 
 	// Setting the scaler clears this on some chips...
 	if (info.dceMajor >= 3
-		&& (encoderFlags & ATOM_DEVICE_TV_SUPPORT) == 0) {
+		&& (connectorFlags & ATOM_DEVICE_TV_SUPPORT) == 0) {
 		// TODO: assume non interleave mode for now
 		// en: EVERGREEN_INTERLEAVE_EN : AVIVO_D1MODE_INTERLEAVE_EN
 		Write32(OUT, regs->modeDataFormat, 0);
@@ -291,7 +295,7 @@ encoder_mode_set(uint8 crtcID)
 	TRACE("%s\n", __func__);
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint16 connectorFlags = gConnector[connectorIndex]->flags;
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	// TODO: Should this be the adjusted pll or the original?
@@ -305,8 +309,8 @@ encoder_mode_set(uint8 crtcID)
 			encoder_analog_setup(connectorIndex, pixelClock, ATOM_ENABLE);
 			if (info.dceMajor < 5) {
 				// TV encoder was dropped in DCE 5
-				if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0
-					|| (encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
+				if ((connectorFlags & ATOM_DEVICE_TV_SUPPORT) != 0
+					|| (connectorFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
 					encoder_tv_setup(connectorIndex, pixelClock, ATOM_ENABLE);
 				} else {
 					encoder_tv_setup(connectorIndex, pixelClock, ATOM_DISABLE);
@@ -381,7 +385,7 @@ encoder_mode_set(uint8 crtcID)
 status_t
 encoder_tv_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
-	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint16 connectorFlags = gConnector[connectorIndex]->flags;
 
 	TV_ENCODER_CONTROL_PS_ALLOCATION args;
 	memset(&args, 0, sizeof(args));
@@ -390,7 +394,7 @@ encoder_tv_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 
 	args.sTVEncoder.ucAction = command;
 
-	if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+	if ((connectorFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
 		args.sTVEncoder.ucTvStandard = ATOM_TV_CV;
 	else {
 		// TODO: we assume NTSC for now
@@ -409,7 +413,7 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 	TRACE("%s\n", __func__);
 
 	int index = 0;
-	uint16 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint16 connectorFlags = gConnector[connectorIndex]->flags;
 
 	switch (gConnector[connectorIndex]->encoder.objectID) {
 		case ENCODER_OBJECT_ID_INTERNAL_LVDS:
@@ -420,7 +424,7 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 			index = GetIndexIntoMasterTable(COMMAND, TMDS1EncoderControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0)
+			if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, LVDSEncoderControl);
 			else
 				index = GetIndexIntoMasterTable(COMMAND, TMDS2EncoderControl);
@@ -467,7 +471,7 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 					args.v1.ucMisc |= PANEL_ENCODER_MISC_HDMI_TYPE;
 				args.v1.usPixelClock = B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
 
-				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+				if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 					if ((lvdsFlags & ATOM_PANEL_MISC_DUAL) != 0)
 						args.v1.ucMisc |= PANEL_ENCODER_MISC_DUAL;
 					if ((lvdsFlags & ATOM_PANEL_MISC_888RGB) != 0)
@@ -496,7 +500,7 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 				args.v2.ucSpatial = 0;
 				args.v2.ucTemporal = 0;
 				args.v2.ucFRC = 0;
-				if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+				if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 					if ((lvdsFlags & ATOM_PANEL_MISC_DUAL) != 0)
 						args.v2.ucMisc |= PANEL_ENCODER_MISC_DUAL;
 					if ((lvdsFlags & ATOM_PANEL_MISC_SPATIAL) != 0) {
@@ -809,6 +813,7 @@ encoder_external_setup(uint32 connectorIndex, int command)
 		= &gConnector[connectorIndex]->encoder;
 	encoder_info* extEncoder
 		= &gConnector[connectorIndex]->encoderExternal;
+	uint32 connectorFlags = gConnector[connectorIndex]->flags;
 
 	dp_info* dpInfo
 		= &gConnector[connectorIndex]->dpInfo;
@@ -902,9 +907,7 @@ encoder_external_setup(uint32 connectorIndex, int command)
 						args.v3.sExtEncoder.ucLaneNum = 4;
 					}
 
-					uint16 extEncoderFlags = extEncoder->flags;
-
-					switch ((extEncoderFlags & ENUM_ID_MASK) >> ENUM_ID_SHIFT) {
+					switch ((connectorFlags & ENUM_ID_MASK) >> ENUM_ID_SHIFT) {
 						case GRAPH_OBJECT_ENUM_ID1:
 							TRACE("%s: external encoder 1\n", __func__);
 							args.v3.sExtEncoder.ucConfig
@@ -976,7 +979,7 @@ encoder_analog_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
 	TRACE("%s\n", __func__);
 
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint32 connectorFlags = gConnector[connectorIndex]->flags;
 
 	int index = 0;
 	DAC_ENCODER_CONTROL_PS_ALLOCATION args;
@@ -995,9 +998,9 @@ encoder_analog_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 
 	args.ucAction = command;
 
-	if ((encoderFlags & ATOM_DEVICE_CRT_SUPPORT) != 0)
+	if ((connectorFlags & ATOM_DEVICE_CRT_SUPPORT) != 0)
 		args.ucDacStandard = ATOM_DAC1_PS2;
-	else if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+	else if ((connectorFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
 		args.ucDacStandard = ATOM_DAC1_CV;
 	else {
 		TRACE("%s: TODO, hardcoded NTSC TV support\n", __func__);
@@ -1033,12 +1036,12 @@ encoder_dac_load_detect(uint32 connectorIndex)
 {
 	TRACE("%s\n", __func__);
 
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint32 connectorFlags = gConnector[connectorIndex]->flags;
 	uint32 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
-	if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) == 0
-		&& (encoderFlags & ATOM_DEVICE_CV_SUPPORT) == 0
-		&& (encoderFlags & ATOM_DEVICE_CRT_SUPPORT) == 0) {
+	if ((connectorFlags & ATOM_DEVICE_TV_SUPPORT) == 0
+		&& (connectorFlags & ATOM_DEVICE_CV_SUPPORT) == 0
+		&& (connectorFlags & ATOM_DEVICE_CRT_SUPPORT) == 0) {
 		ERROR("%s: executed on non-dac device connector #%" B_PRIu8 "\n",
 			__func__, connectorIndex);
 		return false;
@@ -1069,7 +1072,7 @@ encoder_dac_load_detect(uint32 connectorIndex)
 		args.sDacload.ucDacType = ATOM_DAC_B;
 	}
 
-	if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
 		args.sDacload.usDeviceID
 			= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CRT1_SUPPORT);
 		atom_execute_table(gAtomContext, index, (uint32*)&args);
@@ -1079,7 +1082,7 @@ encoder_dac_load_detect(uint32 connectorIndex)
 		if ((biosScratch0 & ATOM_S0_CRT1_MASK) != 0)
 			return true;
 
-	} else if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
+	} else if ((connectorFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
 		args.sDacload.usDeviceID
 			= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CRT2_SUPPORT);
 		atom_execute_table(gAtomContext, index, (uint32*)&args);
@@ -1089,7 +1092,7 @@ encoder_dac_load_detect(uint32 connectorIndex)
 		if ((biosScratch0 & ATOM_S0_CRT2_MASK) != 0)
 			return true;
 
-	} else if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
+	} else if ((connectorFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
 		args.sDacload.usDeviceID
 			= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_CV_SUPPORT);
 		if (tableMinor >= 3)
@@ -1101,7 +1104,7 @@ encoder_dac_load_detect(uint32 connectorIndex)
 		if ((biosScratch0 & (ATOM_S0_CV_MASK | ATOM_S0_CV_MASK_A)) != 0)
 			return true;
 
-	} else if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
+	} else if ((connectorFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
 		args.sDacload.usDeviceID
 			= B_HOST_TO_LENDIAN_INT16(ATOM_DEVICE_TV1_SUPPORT);
 		if (tableMinor >= 3)
@@ -1139,18 +1142,18 @@ encoder_dig_load_detect(uint32 connectorIndex)
 
 	uint32 biosScratch0 = Read32(OUT, R600_SCRATCH_REG0);
 
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint32 connectorFlags = gConnector[connectorIndex]->flags;
 
-	if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0)
+	if ((connectorFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0)
 		if ((biosScratch0 & ATOM_S0_CRT1_MASK) != 0)
 			return true;
-	if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0)
+	if ((connectorFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0)
 		if ((biosScratch0 & ATOM_S0_CRT2_MASK) != 0)
 			return true;
-	if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+	if ((connectorFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
 		if ((biosScratch0 & (ATOM_S0_CV_MASK | ATOM_S0_CV_MASK_A)) != 0)
 			return true;
-	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
 		if ((biosScratch0
 			& (ATOM_S0_TV1_COMPOSITE | ATOM_S0_TV1_COMPOSITE_A)) != 0)
 			return true; /* Composite connected */
@@ -1305,7 +1308,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 					if (isDP)
 						args.v1.ucConfig |= ATOM_TRANSMITTER_CONFIG_COHERENT;
-					else if ((gConnector[connectorIndex]->encoder.flags
+					else if ((gConnector[connectorIndex]->flags
 						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
 						if (1) {
 							// if coherentMode, i've only ever seen it true
@@ -1358,7 +1361,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 					if (isDP) {
 						args.v2.acConfig.fCoherentMode = 1;
 						args.v2.acConfig.fDPConnector = 1;
-					} else if ((gConnector[connectorIndex]->encoder.flags
+					} else if ((gConnector[connectorIndex]->flags
 						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
 						if (1) {
 							// if coherentMode, i've only ever seen it true
@@ -1427,7 +1430,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 					if (isDP)
 						args.v3.acConfig.fCoherentMode = 1;
-					else if ((gConnector[connectorIndex]->encoder.flags
+					else if ((gConnector[connectorIndex]->flags
 						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
 						if (1) {
 							// if coherentMode, i've only ever seen it true
@@ -1499,7 +1502,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 					if (isDP)
 						args.v4.acConfig.fCoherentMode = 1;
-					else if ((gConnector[connectorIndex]->encoder.flags
+					else if ((gConnector[connectorIndex]->flags
 						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
 						if (1) {
 							// if coherentMode, i've only ever seen it true
@@ -1561,7 +1564,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 					if (isDP) {
 						args.v5.asConfig.ucCoherentMode = 1;
 							// DP always coherent
-					} else if ((gConnector[connectorIndex]->encoder.flags
+					} else if ((gConnector[connectorIndex]->flags
 						& ATOM_DEVICE_DFP_SUPPORT) != 0) {
 						// TODO: dig coherent mode? VVV
 						args.v5.asConfig.ucCoherentMode = 1;
@@ -1591,40 +1594,40 @@ encoder_crtc_scratch(uint8 crtcID)
 	TRACE("%s\n", __func__);
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint32 connectorFlags = gConnector[connectorIndex]->flags;
 
 	// TODO: r500
 	uint32 biosScratch3 = Read32(OUT, R600_SCRATCH_REG3);
 
-	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
 		biosScratch3 &= ~ATOM_S3_TV1_CRTC_ACTIVE;
 		biosScratch3 |= (crtcID << 18);
 	}
-	if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
 		biosScratch3 &= ~ATOM_S3_CV_CRTC_ACTIVE;
 		biosScratch3 |= (crtcID << 24);
 	}
-	if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
 		biosScratch3 &= ~ATOM_S3_CRT1_CRTC_ACTIVE;
 		biosScratch3 |= (crtcID << 16);
 	}
-	if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
 		biosScratch3 &= ~ATOM_S3_CRT2_CRTC_ACTIVE;
 		biosScratch3 |= (crtcID << 20);
 	}
-	if ((encoderFlags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
 		biosScratch3 &= ~ATOM_S3_LCD1_CRTC_ACTIVE;
 		biosScratch3 |= (crtcID << 17);
 	}
-	if ((encoderFlags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
 		biosScratch3 &= ~ATOM_S3_DFP1_CRTC_ACTIVE;
 		biosScratch3 |= (crtcID << 19);
 	}
-	if ((encoderFlags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
 		biosScratch3 &= ~ATOM_S3_DFP2_CRTC_ACTIVE;
 		biosScratch3 |= (crtcID << 23);
 	}
-	if ((encoderFlags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
 		biosScratch3 &= ~ATOM_S3_DFP3_CRTC_ACTIVE;
 		biosScratch3 |= (crtcID << 25);
 	}
@@ -1640,66 +1643,66 @@ encoder_dpms_scratch(uint8 crtcID, bool power)
 	TRACE("%s\n", __func__);
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint32 connectorFlags = gConnector[connectorIndex]->flags;
 
 	// TODO: r500
 	uint32 biosScratch2 = Read32(OUT, R600_SCRATCH_REG2);
 
-	if ((encoderFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_TV1_SUPPORT) != 0) {
 		if (power == true)
 			biosScratch2 &= ~ATOM_S2_TV1_DPMS_STATE;
 		else
 			biosScratch2 |= ATOM_S2_TV1_DPMS_STATE;
 	}
-	if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_CV_SUPPORT) != 0) {
 		if (power == true)
 			biosScratch2 &= ~ATOM_S2_CV_DPMS_STATE;
 		else
 			biosScratch2 |= ATOM_S2_CV_DPMS_STATE;
 	}
-	if ((encoderFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_CRT1_SUPPORT) != 0) {
 		if (power == true)
 			biosScratch2 &= ~ATOM_S2_CRT1_DPMS_STATE;
 		else
 			biosScratch2 |= ATOM_S2_CRT1_DPMS_STATE;
 	}
-	if ((encoderFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_CRT2_SUPPORT) != 0) {
 		if (power == true)
 			biosScratch2 &= ~ATOM_S2_CRT2_DPMS_STATE;
 		else
 			biosScratch2 |= ATOM_S2_CRT2_DPMS_STATE;
 	}
-	if ((encoderFlags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_LCD1_SUPPORT) != 0) {
 		if (power == true)
 			biosScratch2 &= ~ATOM_S2_LCD1_DPMS_STATE;
 		else
 			biosScratch2 |= ATOM_S2_LCD1_DPMS_STATE;
 	}
-	if ((encoderFlags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_DFP1_SUPPORT) != 0) {
 		if (power == true)
 			biosScratch2 &= ~ATOM_S2_DFP1_DPMS_STATE;
 		else
 			biosScratch2 |= ATOM_S2_DFP1_DPMS_STATE;
 	}
-	if ((encoderFlags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_DFP2_SUPPORT) != 0) {
 		if (power == true)
 			biosScratch2 &= ~ATOM_S2_DFP2_DPMS_STATE;
 		else
 			biosScratch2 |= ATOM_S2_DFP2_DPMS_STATE;
 	}
-	if ((encoderFlags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_DFP3_SUPPORT) != 0) {
 		if (power == true)
 			biosScratch2 &= ~ATOM_S2_DFP3_DPMS_STATE;
 		else
 			biosScratch2 |= ATOM_S2_DFP3_DPMS_STATE;
 	}
-	if ((encoderFlags & ATOM_DEVICE_DFP4_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_DFP4_SUPPORT) != 0) {
 		if (power == true)
 			biosScratch2 &= ~ATOM_S2_DFP4_DPMS_STATE;
 		else
 			biosScratch2 |= ATOM_S2_DFP4_DPMS_STATE;
 	}
-	if ((encoderFlags & ATOM_DEVICE_DFP5_SUPPORT) != 0) {
+	if ((connectorFlags & ATOM_DEVICE_DFP5_SUPPORT) != 0) {
 		if (power == true)
 			biosScratch2 &= ~ATOM_S2_DFP5_DPMS_STATE;
 		else
@@ -1721,7 +1724,7 @@ encoder_dpms_set(uint8 crtcID, int mode)
 	memset(&args, 0, sizeof(args));
 
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint32 connectorFlags = gConnector[connectorIndex]->flags;
 	uint16 encoderID = gConnector[connectorIndex]->encoder.objectID;
 
 	switch (encoderID) {
@@ -1751,25 +1754,25 @@ encoder_dpms_set(uint8 crtcID, int mode)
 			index = GetIndexIntoMasterTable(COMMAND, LCD1OutputControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_LVTM1:
-			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0)
+			if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, LCD1OutputControl);
 			else
 				index = GetIndexIntoMasterTable(COMMAND, LVTMAOutputControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DAC1:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
-			if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
+			if ((connectorFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, TV1OutputControl);
-			else if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+			else if ((connectorFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, CV1OutputControl);
 			else
 				index = GetIndexIntoMasterTable(COMMAND, DAC1OutputControl);
 			break;
 		case ENCODER_OBJECT_ID_INTERNAL_DAC2:
 		case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
-			if ((encoderFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
+			if ((connectorFlags & ATOM_DEVICE_TV_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, TV1OutputControl);
-			else if ((encoderFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
+			else if ((connectorFlags & ATOM_DEVICE_CV_SUPPORT) != 0)
 				index = GetIndexIntoMasterTable(COMMAND, CV1OutputControl);
 			else
 				index = GetIndexIntoMasterTable(COMMAND, DAC2OutputControl);
@@ -1792,7 +1795,7 @@ encoder_dpms_set(uint8 crtcID, int mode)
 
 		atom_execute_table(gAtomContext, index, (uint32*)&args);
 		if (info.dceMajor < 5) {
-			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 				args.ucAction = args.ucAction == ATOM_DISABLE
 					? ATOM_LCD_BLOFF : ATOM_LCD_BLON;
 				atom_execute_table(gAtomContext, index, (uint32*)&args);
@@ -1814,7 +1817,7 @@ encoder_dpms_set_dig(uint8 crtcID, int mode)
 
 	radeon_shared_info &info = *gInfo->shared_info;
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
-	uint32 encoderFlags = gConnector[connectorIndex]->encoder.flags;
+	uint32 connectorFlags = gConnector[connectorIndex]->flags;
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	switch (mode) {
@@ -1865,7 +1868,7 @@ encoder_dpms_set_dig(uint8 crtcID, int mode)
 				// register, but it's required to get the video output
 				Write32(OUT, AVIVO_DP_VID_STREAM_CNTL, 0x201);
 			}
-			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 				transmitter_dig_setup(connectorIndex, pll->pixelClock,
 					0, 0, ATOM_TRANSMITTER_ACTION_LCD_BLON);
 			}
@@ -1895,7 +1898,7 @@ encoder_dpms_set_dig(uint8 crtcID, int mode)
 					#endif
 				}
 			}
-			if ((encoderFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
+			if ((connectorFlags & ATOM_DEVICE_LCD_SUPPORT) != 0) {
 				transmitter_dig_setup(connectorIndex, pll->pixelClock,
 					0, 0, ATOM_TRANSMITTER_ACTION_LCD_BLOFF);
 			}
@@ -2015,7 +2018,7 @@ encoder_name_lookup(uint32 encoderID) {
 
 
 uint32
-encoder_object_lookup(uint32 encoderFlags, uint8 dacID)
+encoder_object_lookup(uint32 connectorFlags, uint8 dacID)
 {
 	// used on older cards to take a guess at the encoder
 	// object
@@ -2024,7 +2027,7 @@ encoder_object_lookup(uint32 encoderFlags, uint8 dacID)
 
 	uint32 ret = 0;
 
-	switch (encoderFlags) {
+	switch (connectorFlags) {
 		case ATOM_DEVICE_CRT1_SUPPORT:
 		case ATOM_DEVICE_TV1_SUPPORT:
 		case ATOM_DEVICE_TV2_SUPPORT:

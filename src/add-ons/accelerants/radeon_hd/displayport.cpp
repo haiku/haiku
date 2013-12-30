@@ -414,7 +414,7 @@ dp_get_link_rate(uint32 connectorIndex, display_mode* mode)
 
 	// TODO: DisplayPort 1.2
 	#if 0
-	if (is_dp12_capable(connectorIndex)) {
+	if (dp_is_dp12_capable(connectorIndex)) {
 		maxPixelClock = dp_get_pixel_clock_max(540000, laneCount, bitsPerPixel);
 		if (mode->timing.pixel_clock <= maxPixelClock)
 			return 540000;
@@ -958,6 +958,24 @@ dp_get_pixel_size_for(color_space space, size_t *pixelChunk,
 	}
 
 	return result;
+}
+
+
+bool
+dp_is_dp12_capable(uint32 connectorIndex)
+{
+	TRACE("%s\n", __func__);
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	uint32 capabilities = gConnector[connectorIndex]->encoder.capabilities;
+
+	if (info.dceMajor >= 5
+		&& gInfo->dpExternalClock >= 53900
+		&& (capabilities & ATOM_ENCODER_CAP_RECORD_HBR2) != 0) {
+		return true;
+	}
+
+	return false;
 }
 
 
