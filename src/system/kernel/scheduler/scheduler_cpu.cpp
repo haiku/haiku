@@ -263,6 +263,11 @@ CPUEntry::_RequestPerformanceLevel(ThreadData* threadData)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
+	if (gCPU[fCPUNumber].disabled) {
+		decrease_cpu_performance(kCPUPerformanceScaleMax);
+		return;
+	}
+
 	int32 load = std::max(threadData->GetLoad(), fCore->GetLoad());
 	ASSERT(load >= 0 && load <= kMaxLoad);
 
