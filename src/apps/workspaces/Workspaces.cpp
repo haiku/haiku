@@ -505,6 +505,16 @@ WorkspacesView::MessageReceived(BMessage* message)
 			_AboutRequested();
 			break;
 
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			float dy = message->FindFloat("be:wheel_delta_y");
+			if (dy > 0.1)
+				activate_workspace(current_workspace() + 1);
+			if (dy < -0.1)
+				activate_workspace(current_workspace() - 1);
+			break;
+		}
+
 		case kMsgChangeCount:
 			be_roster->Launch(kScreenPrefletSignature);
 			break;
