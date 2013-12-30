@@ -10,8 +10,8 @@
 
 #include <thread.h>
 #include <util/AutoLock.h>
-#include <util/MinMaxHeap.h>
 #include <util/Heap.h>
+#include <util/MinMaxHeap.h>
 
 #include <cpufreq.h>
 
