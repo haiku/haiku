@@ -1947,7 +1947,7 @@ BControlLook::GetFrameInsets(frame_type frameType, uint32 flags, float& _left,
 
 	switch (frameType) {
 		case B_BUTTON_FRAME:
-			inset = (flags & B_DEFAULT_BUTTON) != 0 ? 6 : 3;
+			inset = (flags & B_DEFAULT_BUTTON) != 0 ? 5 : 2;
 			break;
 		case B_GROUP_FRAME:
 		case B_MENU_FIELD_FRAME:
