@@ -647,47 +647,6 @@ BButton::_ValidatePreferredSize()
 }
 
 
-BRect
-BButton::_DrawDefault(BRect bounds, bool enabled)
-{
-	rgb_color low = LowColor();
-	rgb_color focusColor = tint_color(low, enabled ?
-		(B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2
-		: (B_NO_TINT + B_DARKEN_1_TINT) / 2);
-
-	SetHighColor(focusColor);
-
-	StrokeRect(bounds, B_SOLID_LOW);
-	bounds.InsetBy(1.0, 1.0);
-	StrokeRect(bounds);
-	bounds.InsetBy(1.0, 1.0);
-	StrokeRect(bounds);
-	bounds.InsetBy(1.0, 1.0);
-
-	return bounds;
-}
-
-
-void
-BButton::_DrawFocusLine(float x, float y, float width, bool visible)
-{
-	if (visible)
-		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-	else {
-		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_LIGHTEN_1_TINT));
-	}
-
-	// Blue Line
-	StrokeLine(BPoint(x, y), BPoint(x + width, y));
-
-	if (visible)
-		SetHighColor(255, 255, 255);
-	// White Line
-	StrokeLine(BPoint(x, y + 1.0f), BPoint(x + width, y + 1.0f));
-}
-
-
 inline bool
 BButton::_Flag(uint32 flag) const
 {

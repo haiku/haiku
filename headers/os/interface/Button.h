@@ -94,10 +94,6 @@ private:
 			BButton&			operator=(const BButton &);
 
 			BSize				_ValidatePreferredSize();
-	
-			BRect				_DrawDefault(BRect bounds, bool enabled);
-			void 				_DrawFocusLine(float x, float y, float width, 
-									bool bVisible);
 
 	inline	bool				_Flag(uint32 flag) const;
 	inline	bool				_SetFlag(uint32 flag, bool set);
