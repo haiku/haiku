@@ -344,6 +344,12 @@ MainWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case B_CANCEL:
+			// FilePanel was canceled, do not execute the fMessageAfterSave
+			// next time a file panel is used, in case it was set!
+			delete fMessageAfterSave;
+			fMessageAfterSave = NULL;
+			break;
 
 		case MSG_UNDO:
 			fDocument->CommandStack()->Undo();
