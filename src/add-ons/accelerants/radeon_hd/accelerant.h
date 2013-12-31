@@ -72,7 +72,7 @@ struct accelerant_info {
 
 	volatile uint32	dpms_mode;		// current driver dpms mode
 
-	uint16			maximumPixelClock;
+	uint32			maximumPixelClock;
 	uint32			displayClockFrequency;
 	uint32			dpExternalClock;
 
@@ -138,7 +138,7 @@ struct encoder_info {
 	bool		valid;
 	uint16		objectID;
 	uint32		type;
-	uint16		capabilities;
+	uint32		capabilities;
 	uint32		linkEnumeration; // ex. linkb == GRAPH_OBJECT_ENUM_ID2
 	bool		isExternal;
 	bool		isDPBridge;

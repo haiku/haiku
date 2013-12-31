@@ -267,9 +267,19 @@ detect_displays()
 		if (gConnector[id]->type == VIDEO_CONNECTOR_DP) {
 			TRACE("%s: connector(%" B_PRIu32 "): Checking DP.\n", __func__, id);
 
+			if (gConnector[id]->encoderExternal.valid == true) {
+				// If this has a valid external encoder (dp bridge)
+				// normally TRAVIS (LVDS) or NUTMEG (VGA)
+				TRACE("%s: external encoder, performing bridge DDC setup\n",
+					__func__);
+				encoder_external_setup(id,
+					EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
+			}
 			edid1_info* edid = &gDisplay[displayIndex]->edidData;
 			gDisplay[displayIndex]->attached
 				= ddc2_dp_read_edid1(id, edid);
+
+			// TODO: DDC Router switching for DisplayPort (and others?)
 
 			if (gDisplay[displayIndex]->attached) {
 				TRACE("%s: connector(%" B_PRIu32 "): Found DisplayPort EDID!\n",
@@ -277,19 +287,6 @@ detect_displays()
 			}
 		}
 
-		// TODO: Handle external DP brides - ??
-		#if 0
-		if (gConnector[id]->encoderExternal.isDPBridge == true) {
-			// If this is a DisplayPort Bridge, setup ddc on bus
-			// TRAVIS (LVDS) or NUTMEG (VGA)
-			TRACE("%s: is bridge, performing bridge DDC setup\n", __func__);
-			encoder_external_setup(id, 23860,
-				EXTERNAL_ENCODER_ACTION_V3_DDC_SETUP);
-			gDisplay[displayIndex]->attached = true;
-
-			// TODO: DDC Router switching for DisplayPort (and others?)
-		}
-		#endif
 
 		if (gConnector[id]->type == VIDEO_CONNECTOR_LVDS) {
 			display_mode preferredMode;

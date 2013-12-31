@@ -970,7 +970,7 @@ dp_is_dp12_capable(uint32 connectorIndex)
 	uint32 capabilities = gConnector[connectorIndex]->encoder.capabilities;
 
 	if (info.dceMajor >= 5
-		&& gInfo->dpExternalClock >= 53900
+		&& gInfo->dpExternalClock >= 539000
 		&& (capabilities & ATOM_ENCODER_CAP_RECORD_HBR2) != 0) {
 		return true;
 	}

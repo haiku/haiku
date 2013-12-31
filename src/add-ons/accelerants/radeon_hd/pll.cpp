@@ -34,6 +34,16 @@ extern "C" void _sPrintf(const char* format, ...);
 
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
+// Pixel Clock Storage
+// kHz			Value			Result
+//	Haiku:		104000 khz		104 Mhz
+//	Linux:		104000 khz		104 Mhz
+//	AtomBIOS:	10400 * 10 khz	104 Mhz
+// Ghz
+//	Haiku:		162000 * 10 khz	1.62 Ghz
+//	Linux:		162000 * 10 khz	1.62 Ghz
+//	AtomBIOS:	16200  * 10 Khz	0.162 * 10 Ghz
+
 
 status_t
 pll_limit_probe(pll_info* pll)
@@ -118,9 +128,9 @@ pll_limit_probe(pll_info* pll)
 	pll->pllInMax = B_LENDIAN_TO_HOST_INT16(
 		firmwareInfo->info.usMaxPixelClockPLL_Input) * 10;
 
-	TRACE("%s: referenceFreq: %" B_PRIu16 "; pllOutMin: %" B_PRIu16 "; "
-		" pllOutMax: %" B_PRIu16 "; pllInMin: %" B_PRIu16 ";"
-		"pllInMax: %" B_PRIu16 "\n", __func__, pll->referenceFreq,
+	TRACE("%s: referenceFreq: %" B_PRIu32 "; pllOutMin: %" B_PRIu32 "; "
+		" pllOutMax: %" B_PRIu32 "; pllInMin: %" B_PRIu32 ";"
+		"pllInMax: %" B_PRIu32 "\n", __func__, pll->referenceFreq,
 		pll->pllOutMin, pll->pllOutMax, pll->pllInMin, pll->pllInMax);
 
 	return B_OK;
@@ -205,7 +215,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
-				if (pll->pixelClock > B_LENDIAN_TO_HOST_INT32(
+				if (pll->pixelClock * 10 > B_LENDIAN_TO_HOST_INT32(
 					ss_info->info.asSpreadSpectrum[i].ulTargetClockRange)) {
 					TRACE("%s: pixelClock > targetClockRange!\n", __func__);
 					continue;
@@ -232,7 +242,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
-				if (pll->pixelClock > B_LENDIAN_TO_HOST_INT32(
+				if (pll->pixelClock * 10 > B_LENDIAN_TO_HOST_INT32(
 					ss_info->info_2.asSpreadSpectrum[i].ulTargetClockRange)) {
 					TRACE("%s: pixelClock > targetClockRange!\n", __func__);
 					continue;
@@ -260,7 +270,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 					continue;
 				}
 				TRACE("%s: ss match found\n", __func__);
-				if (pll->pixelClock > B_LENDIAN_TO_HOST_INT32(
+				if (pll->pixelClock * 10 > B_LENDIAN_TO_HOST_INT32(
 					ss_info->info_3.asSpreadSpectrum[i].ulTargetClockRange)) {
 					TRACE("%s: pixelClock > targetClockRange!\n", __func__);
 					continue;
@@ -433,11 +443,15 @@ pll_compute(pll_info* pll)
 		+ (referenceFrequency * pll->feedbackDivFrac))
 		/ (pll->referenceDiv * pll->postDiv * 10);
 
-	TRACE("%s: pixel clock: %" B_PRIu32 " gives:"
-		" feedbackDivider = %" B_PRIu32 ".%" B_PRIu32
-		"; referenceDivider = %" B_PRIu32 "; postDivider = %" B_PRIu32 "\n",
-		__func__, pll->adjustedClock, pll->feedbackDiv, pll->feedbackDivFrac,
-		pll->referenceDiv, pll->postDiv);
+	TRACE("%s: Calculated pixel clock of %" B_PRIu32 " based on:\n", __func__,
+		calculatedClock);
+	TRACE("%s:   referenceFrequency: %" B_PRIu32 "; "
+		"referenceDivider: %" B_PRIu32 "\n", __func__, referenceFrequency,
+		pll->referenceDiv);
+	TRACE("%s:   feedbackDivider: %" B_PRIu32 "; "
+		"feedbackDividerFrac: %" B_PRIu32 "\n", __func__, pll->feedbackDiv,
+		pll->feedbackDivFrac);
+	TRACE("%s:   postDivider: %" B_PRIu32 "\n", __func__, pll->postDiv);
 
 	if (pll->adjustedClock != calculatedClock) {
 		TRACE("%s: pixel clock %" B_PRIu32 " was changed to %" B_PRIu32 "\n",
@@ -579,9 +593,10 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 							TRACE("%s: encoderMode is DP\n", __func__);
 							args.v3.sInput.ucDispPllConfig
 								|= DISPPLL_CONFIG_COHERENT_MODE;
-							/* 16200 or 27000 */
+							/* 162000 or 270000 */
 							uint32 dpLinkSpeed
 								= dp_get_link_rate(connectorIndex, mode);
+							/* 16200 or 27000 */
 							args.v3.sInput.usPixelClock
 								= B_HOST_TO_LENDIAN_INT16(dpLinkSpeed / 10);
 						} else if ((connectorFlags & ATOM_DEVICE_DFP_SUPPORT)
@@ -608,8 +623,7 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 						atom_execute_table(gAtomContext, index, (uint32*)&args);
 
 						// get returned adjusted clock
-						pll->adjustedClock
-							= B_LENDIAN_TO_HOST_INT32(
+						pll->adjustedClock = B_LENDIAN_TO_HOST_INT32(
 								args.v3.sOutput.ulDispPllFreq);
 						pll->adjustedClock *= 10;
 							// convert to kHz for storage
@@ -650,7 +664,7 @@ pll_set(display_mode* mode, uint8 crtcID)
 {
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
-	uint32 dp_clock = gConnector[connectorIndex]->dpInfo.linkRate / 10;
+	uint32 dp_clock = gConnector[connectorIndex]->dpInfo.linkRate;
 	bool ssEnabled = false;
 
 	pll->pixelClock = mode->timing.pixel_clock;
@@ -671,7 +685,7 @@ pll_set(display_mode* mode, uint8 crtcID)
 			if (info.dceMajor >= 4)
 				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_DP);
 			else {
-				if (dp_clock == 16200) {
+				if (dp_clock == 162000) {
 					ssEnabled = pll_ppll_ss_probe(pll, ATOM_DP_SS_ID2);
 					if (!ssEnabled)
 						// id2 failed, try id1
@@ -889,13 +903,14 @@ pll_external_set(uint32 clock)
 					// If the default DC PLL clock is specified,
 					// SetPixelClock provides the dividers.
 					args.v5.ucCRTC = ATOM_CRTC_INVALID;
-					args.v5.usPixelClock = B_HOST_TO_LENDIAN_INT16(clock);
+					args.v5.usPixelClock = B_HOST_TO_LENDIAN_INT16(clock / 10);
 					args.v5.ucPpll = ATOM_DCPLL;
 					break;
 				case 6:
 					// If the default DC PLL clock is specified,
 					// SetPixelClock provides the dividers.
-					args.v6.ulDispEngClkFreq = B_HOST_TO_LENDIAN_INT32(clock);
+					args.v6.ulDispEngClkFreq
+						= B_HOST_TO_LENDIAN_INT32(clock / 10);
 					if (dceVersion == 601)
 						args.v6.ucPpll = ATOM_EXT_PLL1;
 					else if (dceVersion >= 600)

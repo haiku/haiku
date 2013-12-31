@@ -68,21 +68,24 @@ radeon_gpu_probe()
 	if (info.dceMajor >= 4) {
 		gInfo->displayClockFrequency = B_LENDIAN_TO_HOST_INT32(
 			firmwareInfo->info_21.ulDefaultDispEngineClkFreq);
+		gInfo->displayClockFrequency *= 10;
 		if (gInfo->displayClockFrequency == 0) {
 			if (info.dceMajor >= 5)
-				gInfo->displayClockFrequency = 54000;
+				gInfo->displayClockFrequency = 540000;
 			else
-				gInfo->displayClockFrequency = 60000;
+				gInfo->displayClockFrequency = 600000;
 		}
 		gInfo->dpExternalClock = B_LENDIAN_TO_HOST_INT16(
 			firmwareInfo->info_21.usUniphyDPModeExtClkFreq);
+		gInfo->dpExternalClock *= 10;
 	}
 
 	gInfo->maximumPixelClock = B_LENDIAN_TO_HOST_INT16(
 		firmwareInfo->info.usMaxPixelClock);
+	gInfo->maximumPixelClock *= 10;
 
 	if (gInfo->maximumPixelClock == 0)
-		gInfo->maximumPixelClock = 40000;
+		gInfo->maximumPixelClock = 400000;
 
 	return B_OK;
 }
