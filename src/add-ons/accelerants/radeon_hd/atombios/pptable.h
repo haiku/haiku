@@ -23,7 +23,9 @@
 #ifndef _PPTABLE_H
 #define _PPTABLE_H
 
-#pragma pack(push, 1)
+// Haiku GCC2 fix
+//#pragma pack(push, 1)
+#pragma pack(1)
 
 typedef struct _ATOM_PPLIB_THERMALCONTROLLER
 
@@ -677,6 +679,9 @@ typedef struct _ATOM_PPLIB_PPM_Table
       ULONG  ulTjmax;
 } ATOM_PPLIB_PPM_Table;
 
-#pragma pack(pop)
+// Haiku GCC2 fix
+//#pragma pack(pop)
+#pragma pack()
+
 
 #endif
