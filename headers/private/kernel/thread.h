@@ -383,10 +383,12 @@ thread_unblock_locked(Thread* thread, status_t status)
 static inline status_t
 thread_interrupt(Thread* thread, bool kill)
 {
-	if ((thread->wait.flags & B_CAN_INTERRUPT) != 0
-		|| (kill && (thread->wait.flags & B_KILL_CAN_INTERRUPT) != 0)) {
-		thread_unblock_locked(thread, B_INTERRUPTED);
-		return B_OK;
+	if (thread_is_blocked(thread)) {
+		if ((thread->wait.flags & B_CAN_INTERRUPT) != 0
+			|| (kill && (thread->wait.flags & B_KILL_CAN_INTERRUPT) != 0)) {
+			thread_unblock_locked(thread, B_INTERRUPTED);
+			return B_OK;
+		}
 	}
 
 	return B_NOT_ALLOWED;
