@@ -1207,12 +1207,17 @@ atom_execute_table(atom_context *ctx, int index, uint32 *params)
 		ERROR("%s: Timeout to obtain semaphore!\n", __func__);
 		return B_ERROR;
 	}
+	/* reset data block */
+	ctx->data_block = 0;
 	/* reset reg block */
 	ctx->reg_block = 0;
 	/* reset fb window */
 	ctx->fb_base = 0;
 	/* reset io mode */
 	ctx->io_mode = ATOM_IO_MM;
+	/* reset divmul */
+	ctx->divmul[0] = 0;
+	ctx->divmul[1] = 0;
 	status_t result = atom_execute_table_locked(ctx, index, params);
 	if (result != B_OK) {
 		const char* tableName;
@@ -1390,12 +1395,15 @@ atom_allocate_fb_scratch(atom_context *ctx)
 		== B_OK) {
 		firmware = (_ATOM_VRAM_USAGE_BY_FIRMWARE *)(ctx->bios + data_offset);
 
+		_ATOM_FIRMWARE_VRAM_RESERVE_INFO *reserveInfo
+			= &firmware->asFirmwareVramReserveInfo[0];
+
 		TRACE("Atom firmware requested 0x%" B_PRIX32 " %" B_PRIu16 "kb\n",
-			firmware->asFirmwareVramReserveInfo[0].ulStartAddrUsedByFirmware,
-			firmware->asFirmwareVramReserveInfo[0].usFirmwareUseInKb);
+			B_LENDIAN_TO_HOST_INT32(reserveInfo->ulStartAddrUsedByFirmware),
+			B_LENDIAN_TO_HOST_INT16(reserveInfo->usFirmwareUseInKb));
 
 		usage_bytes
-			= firmware->asFirmwareVramReserveInfo[0].usFirmwareUseInKb * 1024;
+			= B_LENDIAN_TO_HOST_INT16(reserveInfo->usFirmwareUseInKb) * 1024;
 	}
 	ctx->scratch_size_bytes = 0;
 	if (usage_bytes == 0)
