@@ -1859,7 +1859,7 @@ encoder_dpms_set_dig(uint8 crtcID, int mode)
 						ATOM_ENCODER_CMD_DP_VIDEO_OFF);
 				}
 				// dp link train
-				dp_link_train(connectorIndex);
+				dp_link_train(crtcID);
 				if (info.dceMajor >= 4) {
 					encoder_dig_setup(connectorIndex, pll->pixelClock,
 						ATOM_ENCODER_CMD_DP_VIDEO_ON);
