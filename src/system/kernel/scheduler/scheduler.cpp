@@ -532,6 +532,9 @@ reschedule(int32 nextState)
 	}
 
 	Thread* nextThread = nextThreadData->GetThread();
+	ASSERT(!gCPU[thisCPU].disabled || thread_is_idle_thread(nextThread));
+
+	// update CPU heap
 	CoreCPUHeapLocker cpuLocker(core);
 	cpu->UpdatePriority(nextThreadData->GetEffectivePriority());
 	cpuLocker.Unlock();
@@ -558,11 +561,6 @@ reschedule(int32 nextState)
 
 	ASSERT(nextThreadData->Core() == core);
 	nextThread->state = B_THREAD_RUNNING;
-
-	// update CPU heap
-	cpuLocker.Lock();
-	cpu->UpdatePriority(nextThreadData->GetEffectivePriority());
-	cpuLocker.Unlock();
 
 	// track kernel time (user time is tracked in thread_at_kernel_entry())
 	update_thread_times(oldThread, nextThread);
