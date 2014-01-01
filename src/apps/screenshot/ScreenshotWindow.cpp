@@ -612,8 +612,8 @@ ScreenshotWindow::_SaveScreenshot()
 	if (entry.Exists()) {
 		BAlert* overwriteAlert = new BAlert(
 			B_TRANSLATE("overwrite"),
-			B_TRANSLATE("This file already exists.\n Are you sure would "
-				"you like to overwrite it?"),
+			B_TRANSLATE("This file already exists.\n Are you sure you would "
+				"like to overwrite it?"),
 			B_TRANSLATE("Cancel"),
 			B_TRANSLATE("Overwrite"),
 			NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
