@@ -22,6 +22,7 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
 #include <MenuBar.h>
@@ -82,13 +83,12 @@ compare_key_list_items(const void* a, const void* b)
 
 KeymapWindow::KeymapWindow()
 	:
-	BWindow(BRect(80, 50, 880, 380), B_TRANSLATE_SYSTEM_NAME("Keymap"),
+	BWindow(BRect(80, 50, 650, 300), B_TRANSLATE_SYSTEM_NAME("Keymap"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	fKeyboardLayoutView = new KeyboardLayoutView("layout");
 	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
+	fKeyboardLayoutView->SetExplicitMinSize(BSize(B_SIZE_UNSET, 192));
 
 	fTextControl = new BTextControl(B_TRANSLATE("Sample and clipboard:"),
 		"", NULL);
@@ -97,27 +97,32 @@ KeymapWindow::KeymapWindow()
 		new BMessage(kMsgSwitchShortcuts));
 
 	// controls pane
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(_CreateMenu())
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING)
 			.Add(_CreateMapLists(), 0.25)
-			.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL)
 				.Add(fKeyboardLayoutView)
-				//.Add(new BStringView("text label", "Sample and clipboard:"))
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+				.AddGroup(B_HORIZONTAL)
 					.Add(_CreateDeadKeyMenuField(), 0.0)
 					.AddGlue()
-					.Add(fSwitchShortcutsButton))
+					.Add(fSwitchShortcutsButton)
+					.End()
 				.Add(fTextControl)
 				.AddGlue(0.0)
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+				.AddGroup(B_HORIZONTAL)
 					.Add(fDefaultsButton = new BButton("defaultsButton",
 						B_TRANSLATE("Defaults"),
 							new BMessage(kMsgDefaultKeymap)))
 					.Add(fRevertButton = new BButton("revertButton",
 						B_TRANSLATE("Revert"), new BMessage(kMsgRevertKeymap)))
-					.AddGlue()))
-			.SetInsets(10, 10, 10, 10)));
+					.AddGlue()
+					.End()
+				.End()
+			.End()
+		.End();
 
 	fKeyboardLayoutView->SetTarget(fTextControl->TextView());
 	fTextControl->MakeFocus();
@@ -554,12 +559,12 @@ KeymapWindow::_CreateMapLists()
 	_SetListViewSize(fSystemListView);
 	_SetListViewSize(fUserListView);
 
-	return BGroupLayoutBuilder(B_VERTICAL)
+	return BLayoutBuilder::Group<>(B_VERTICAL)
 		.Add(new BStringView("system", B_TRANSLATE("System:")))
 		.Add(systemScroller, 3)
 		.Add(new BStringView("user", B_TRANSLATE("User:")))
 		.Add(userScroller)
-		.TopView();
+		.View();
 }
 
 
@@ -995,7 +1000,7 @@ KeymapWindow::_LoadSettings(BRect& windowFrame, BString& keyboardLayout)
 {
 	BScreen screen(this);
 
-	windowFrame.Set(-1, -1, 799, 329);
+	windowFrame.Set(-1, -1, 669, 357);
 	// See if we can use a larger default size
 	if (screen.Frame().Width() > 1200) {
 		windowFrame.right = 899;
