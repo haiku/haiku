@@ -47,6 +47,7 @@ public:
 									const ssize_t size = -1);
             void                AdoptHeaders(BHttpHeaders* const headers);
 
+			status_t			Stop();
 			const BUrlResult&	Result() const;
 			const char*			StatusString(status_t threadStatus) const;
 

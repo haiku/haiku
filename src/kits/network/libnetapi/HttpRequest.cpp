@@ -257,6 +257,15 @@ BHttpRequest::Result() const
 }
 
 
+status_t
+BHttpRequest::Stop()
+{
+	fSocket->Disconnect();
+		// Unlock any pending connect, read or write operation.
+	return BUrlRequest::Stop();
+}
+
+
 void
 BHttpRequest::_ResetOptions()
 {
@@ -880,12 +889,12 @@ BHttpRequest::_SendHeaders()
 		for (BNetworkCookieJar::UrlIterator it
 				= fContext->GetCookieJar().GetUrlIterator(fUrl);
 				(cookie = it.Next()) != NULL;) {
-			cookieString << "; ";
 			cookieString << cookie->RawCookie(false);
+			cookieString << "; ";
 		}
 
-		// Remove the extra "; " we added before the first item
-		cookieString.Remove(0, 2);
+		// Remove the extra "; " we added after the last item.
+		cookieString.Truncate(cookieString.Length() - 2);
 
 		if (cookieString.Length() > 0)
 			fOutputHeaders.AddHeader("Cookie", cookieString);
@@ -897,6 +906,8 @@ BHttpRequest::_SendHeaders()
 		const char* header = fOutputHeaders.HeaderAt(headerIndex).Header();
 		fSocket->Write(header, strlen(header));
 		fSocket->Write("\r\n", 2);
+
+		_EmitDebug(B_URL_PROTOCOL_DEBUG_HEADER_OUT, "%s", header);
 	}
 }
 
