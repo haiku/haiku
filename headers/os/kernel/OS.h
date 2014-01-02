@@ -428,7 +428,7 @@ extern void			ktrace_vprintf(const char *format, va_list args);
 #	define B_MAX_CPU_COUNT	8
 #elif __M68K__
 #	define B_MAX_CPU_COUNT	1
-#elif __ARM__
+#elif __ARM__ || __ARMEL__ || __ARMEB__
 #	define B_MAX_CPU_COUNT	1
 #elif __MIPSEL__
 #	define B_MAX_CPU_COUNT	1

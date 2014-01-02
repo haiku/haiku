@@ -35,9 +35,13 @@
 #elif __MIPSEL__
 #	define __HAIKU_ARCH				mipsel
 #	define __HAIKU_ARCH_MIPSEL		1
-#elif __ARM__
+#elif __ARM__ || __ARMEL__
 #	define __HAIKU_ARCH				arm
 #	define __HAIKU_ARCH_ARM			1
+#elif __ARMEB__
+#	define __HAIKU_ARCH				armeb
+#	define __HAIKU_ARCH_ARM			1
+#	define __HAIKU_BIG_ENDIAN		1
 #else
 #	error Unsupported architecture!
 #endif
