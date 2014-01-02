@@ -71,6 +71,13 @@ KeyboardLayoutView::SetKeymap(Keymap* keymap)
 
 
 void
+KeyboardLayoutView::SetEditable(bool editable)
+{
+	fEditable = editable;
+}
+
+
+void
 KeyboardLayoutView::SetTarget(BMessenger target)
 {
 	fTarget = target;
@@ -235,80 +242,7 @@ void
 KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 	const BMessage* dragMessage)
 {
-	if (fKeymap == NULL)
-		return;
-
-	// prevent dragging for tertiary mouse button
-	if ((fButtons & B_TERTIARY_MOUSE_BUTTON) != 0)
-		return;
-
-	if (dragMessage != NULL) {
-		if (fEditable) {
-			_InvalidateKey(fDropTarget);
-			fDropPoint = point;
-
-			_EvaluateDropTarget(point);
-		}
-
-		return;
-	}
-
-	int32 buttons;
-	if (Window()->CurrentMessage() == NULL
-		|| Window()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK
-		|| buttons == 0)
-		return;
-
-	if (fDragKey == NULL && (fabs(point.x - fClickPoint.x) > 4
-		|| fabs(point.y - fClickPoint.y) > 4)) {
-		// start dragging
-		Key* key = _KeyAt(fClickPoint);
-		if (key == NULL)
-			return;
-
-		BRect frame = _FrameFor(key);
-		BPoint offset = fClickPoint - frame.LeftTop();
-		frame.OffsetTo(B_ORIGIN);
-
-		BRect rect = frame;
-		rect.right--;
-		rect.bottom--;
-		BBitmap* bitmap = new BBitmap(rect, B_RGBA32, true);
-		bitmap->Lock();
-
-		BView* view = new BView(rect, "drag", B_FOLLOW_NONE, 0);
-		bitmap->AddChild(view);
-
-		view->SetHighColor(0, 0, 0, 0);
-		view->FillRect(view->Bounds());
-		view->SetDrawingMode(B_OP_ALPHA);
-		view->SetHighColor(0, 0, 0, 128);
-		// set the level of transparency by value
-		view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-		_DrawKey(view, frame, key, frame, false);
-
-		view->Sync();
-		bitmap->Unlock();
-
-		BMessage drag(B_MIME_DATA);
-		drag.AddInt32("key", key->code);
-
-		char* string;
-		int32 numBytes;
-		fKeymap->GetChars(key->code, fModifiers, fDeadKey, &string,
-			&numBytes);
-		if (string != NULL) {
-			drag.AddData("text/plain", B_MIME_DATA, string, numBytes);
-			delete[] string;
-		}
-
-		DragMessage(&drag, bitmap, B_OP_ALPHA, offset);
-		fDragKey = key;
-		fDragModifiers = fModifiers;
-
-		fKeyState[key->code / 8] &= ~(1 << (7 - (key->code & 7)));
-		_InvalidateKey(key);
-	}
+	
 }
 
 

@@ -2,16 +2,14 @@ SubDir HAIKU_TOP src apps virtualkeyboard ;
 
 UsePrivateHeaders interface shared ;
 
-Application VirtualKeyboard :
+Addon <input> VirtualKeyboard :
 	KeyboardLayout.cpp
 	KeyboardLayoutView.cpp
 	Keymap.cpp
 	KeymapListItem.cpp
-	VirtualKeyboardApp.cpp
 	VirtualKeyboardWindow.cpp
 	
-	: be tracker localestub libshared.a $(TARGET_LIBSTDC++)
-	: VirtualKeyboard.rdef
+	: be tracker input_server localestub libshared.a $(TARGET_LIBSTDC++)
 ;
 
 DoCatalogs Sudoku :
@@ -21,6 +19,5 @@ DoCatalogs Sudoku :
 	KeyboardLayoutView.cpp
 	Keymap.cpp
 	KeymapListItem.cpp
-	VirtualKeyboardApp.cpp
 	VirtualKeyboardWindow.cpp
 ;
