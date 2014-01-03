@@ -723,13 +723,6 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 }
 
 
-int
-scheduler_get_cpu_load(int32 cpu)
-{
-	return CPUEntry::GetCPU(cpu)->GetLoad() / 10;
-}
-
-
 static void
 traverse_topology_tree(const cpu_topology_node* node, int packageID, int coreID)
 {

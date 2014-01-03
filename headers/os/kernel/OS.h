@@ -422,7 +422,6 @@ extern void			ktrace_vprintf(const char *format, va_list args);
 
 typedef struct {
 	bigtime_t	active_time;	/* usec of doing useful work since boot */
-	int32		load;
 	bool		enabled;
 } cpu_info;
 
