@@ -585,8 +585,6 @@ reschedule(int32 nextState)
 
 		modeLocker.Unlock();
 
-		SCHEDULER_EXIT_FUNCTION();
-
 		if (nextThread != oldThread)
 			switch_thread(oldThread, nextThread);
 	}
