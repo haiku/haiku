@@ -659,12 +659,12 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 			0.0f, 0.0f, 4.0f, 4.0f, base, background,
 			pressed ? BControlLook::B_ACTIVATED : 0,
 			BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER
-				 | BControlLook::B_BOTTOM_BORDER);
+				| BControlLook::B_BOTTOM_BORDER);
 		be_control_look->DrawButtonBackground(view, bottomRight, updateRect,
 			0.0f, 0.0f, 4.0f, 4.0f, base,
 			pressed ? BControlLook::B_ACTIVATED : 0,
 			BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER
-				 | BControlLook::B_BOTTOM_BORDER);
+				| BControlLook::B_BOTTOM_BORDER);
 
 		// clip out the bottom left corner
 		bottomLeft.right += 1;
@@ -1073,10 +1073,10 @@ BRect
 KeyboardLayoutView::_FrameFor(BRect keyFrame)
 {
 	BRect rect;
-	rect.left   = ceilf(keyFrame.left * fFactor);
-	rect.top    = ceilf(keyFrame.top * fFactor);
-	rect.right  = floorf((keyFrame.Width()) * fFactor + rect.left - fGap - 1);
-	rect.bottom = floorf((keyFrame.Height()) * fFactor + rect.top - fGap - 1);
+	rect.left	= ceilf(keyFrame.left * fFactor);
+	rect.top	= ceilf(keyFrame.top * fFactor);
+	rect.right	= floorf((keyFrame.Width()) * fFactor + rect.left - fGap - 1);
+	rect.bottom	= floorf((keyFrame.Height()) * fFactor + rect.top - fGap - 1);
 	rect.OffsetBy(fOffset);
 
 	return rect;

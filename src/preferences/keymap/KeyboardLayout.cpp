@@ -99,7 +99,7 @@ KeyboardLayout::DefaultKeySize()
 int32
 KeyboardLayout::IndexForModifier(int32 modifier)
 {
-	switch(modifier) {
+	switch (modifier) {
 		case B_CAPS_LOCK:
 			return 58;
 		case B_NUM_LOCK:

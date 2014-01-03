@@ -729,7 +729,7 @@ ModifierKeysWindow::_DuplicateKeys()
 			uint32 left = 0;
 			uint32 right = 0;
 
-			switch(key) {
+			switch (key) {
 				case MENU_ITEM_SHIFT:
 					left = fCurrentMap->left_shift_key;
 					right = fCurrentMap->right_shift_key;

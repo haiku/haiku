@@ -63,7 +63,7 @@ protected:
 
 			status_t			_GetCurrentKeymap(entry_ref& ref);
 			BString				_GetActiveKeymapName();
-			bool				_SelectCurrentMap(BListView *list);
+			bool				_SelectCurrentMap(BListView* list);
 			void				_SelectCurrentMap();
 
 			status_t			_GetSettings(BFile& file, int mode) const;

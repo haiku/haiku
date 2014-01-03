@@ -28,7 +28,7 @@ static const uint32 kModifierKeys = B_SHIFT_KEY | B_CAPS_LOCK | B_CONTROL_KEY
 
 
 static void
-print_key(char *chars, int32 offset, bool last = false)
+print_key(char* chars, int32 offset, bool last = false)
 {
 	int size = chars[offset++];
 
@@ -46,7 +46,7 @@ print_key(char *chars, int32 offset, bool last = false)
 		default:
 		{
 			// 2-, 3-, or 4-byte UTF-8 character
-			char *str = new char[size + 1];
+			char* str = new char[size + 1];
 			strncpy(str, &chars[offset], size);
 			str[size] = 0;
 			fputs(str, stdout);

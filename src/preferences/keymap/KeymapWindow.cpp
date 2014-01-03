@@ -466,8 +466,8 @@ KeymapWindow::_CreateMenu()
 
 	for (int32 i = 0; i < numFamilies; i++) {
 		if (get_font_family(i, &family, &flags) == B_OK) {
-			BMenuItem* item =
-				new BMenuItem(family, new BMessage(kMsgMenuFontChanged));
+			BMenuItem* item
+				= new BMenuItem(family, new BMessage(kMsgMenuFontChanged));
 			fFontMenu->AddItem(item);
 
 			if (!strcmp(family, currentFamily))
