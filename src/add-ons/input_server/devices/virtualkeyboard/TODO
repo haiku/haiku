@@ -1,0 +1,3 @@
+-Improve the drawing of both Keymap and VirtualKeyboard (Same code)
+-Create a handler class so that Keyboard View does not know about input device
+-Add a window to change layout, font, and maps. The functions to load the items are already there! Just need to create a settings directory for preferences.
