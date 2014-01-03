@@ -100,7 +100,7 @@ BDataRequest::_ProtocolLoop()
 	}
 
 	if (isBase64)
-		delete payload;
+		delete[] payload;
 
 	return B_PROT_SUCCESS;
 }
