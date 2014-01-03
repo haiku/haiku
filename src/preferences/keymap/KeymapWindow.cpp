@@ -21,7 +21,6 @@
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
-#include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
@@ -218,7 +217,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 		case B_SAVE_REQUESTED:
 		{
 			entry_ref ref;
-			const char *name;
+			const char* name;
 			if (message->FindRef("directory", &ref) == B_OK
 				&& message->FindString("name", &name) == B_OK) {
 				BDirectory directory(&ref);
@@ -261,7 +260,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 
 		case kMsgMenuFontChanged:
 		{
-			BMenuItem *item = fFontMenu->FindMarked();
+			BMenuItem* item = fFontMenu->FindMarked();
 			if (item != NULL) {
 				BFont font;
 				font.SetFamilyAndStyle(item->Label(), NULL);
@@ -467,7 +466,7 @@ KeymapWindow::_CreateMenu()
 
 	for (int32 i = 0; i < numFamilies; i++) {
 		if (get_font_family(i, &family, &flags) == B_OK) {
-			BMenuItem *item =
+			BMenuItem* item =
 				new BMenuItem(family, new BMessage(kMsgMenuFontChanged));
 			fFontMenu->AddItem(item);
 
@@ -850,7 +849,7 @@ KeymapWindow::_UseKeymap()
 void
 KeymapWindow::_FillSystemMaps()
 {
-	BListItem *item;
+	BListItem* item;
 	while ((item = fSystemListView->RemoveItem(static_cast<int32>(0))))
 		delete item;
 
@@ -1085,9 +1084,9 @@ KeymapWindow::_GetMarkedKeyboardLayoutPath(BMenu* menu)
 			return _GetMarkedKeyboardLayoutPath(submenu);
 		else {
 			if (item->IsMarked()
-			    && item->Message()->FindRef("ref", &ref) == B_OK) {
+				&& item->Message()->FindRef("ref", &ref) == B_OK) {
 				path.SetTo(&ref);
-		        return path;
+				return path;
 			}
 		}
 	}
