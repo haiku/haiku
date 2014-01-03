@@ -6,6 +6,7 @@ UsePrivateSystemHeaders ;
 AddResources <input>virtualkeyboard : VirtualKeyboard.rdef ;
 
 Addon <input>virtualkeyboard :
+	
 	KeyboardLayout.cpp
 	KeyboardLayoutView.cpp
 	Keymap.cpp

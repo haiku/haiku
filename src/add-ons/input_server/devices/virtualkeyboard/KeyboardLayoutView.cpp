@@ -6,8 +6,11 @@
 
 #include "KeyboardLayoutView.h"
 
+#include <errno.h>
+#include <new>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <Beep.h>
 #include <Bitmap.h>
@@ -24,6 +27,69 @@ static const rgb_color kDarkColor = {200, 200, 200, 255};
 static const rgb_color kSecondDeadKeyColor = {240, 240, 150, 255};
 static const rgb_color kDeadKeyColor = {152, 203, 255, 255};
 static const rgb_color kLitIndicatorColor = {116, 212, 83, 255};
+
+
+#undef TRACE
+
+//#define TRACE_KEYBOARD_DEVICE
+#ifdef TRACE_KEYBOARD_DEVICE
+
+static	int32		sFunctionDepth = -1;
+
+class FunctionTracer {
+public:
+	FunctionTracer(const void* pointer, const char* className,
+			const char* functionName)
+		:
+		fFunctionName(),
+		fPrepend(),
+		fPointer(pointer)
+	{
+		sFunctionDepth++;
+		fPrepend.Append(' ', sFunctionDepth * 2);
+		fFunctionName << className << "::" << functionName << "()";
+
+		debug_printf("%p -> %s%s {\n", fPointer, fPrepend.String(),
+			fFunctionName.String());
+	}
+
+	~FunctionTracer()
+	{
+		debug_printf("%p -> %s}\n", fPointer, fPrepend.String());
+		sFunctionDepth--;
+	}
+
+	static int32 Depth() { return sFunctionDepth; }
+
+private:
+			BString		fFunctionName;
+			BString		fPrepend;
+			const void* fPointer;
+};
+
+#	define KD_CALLED(x...) \
+		FunctionTracer _ft(this, "LayoutView", __FUNCTION__)
+#	define KID_CALLED(x...)	\
+		FunctionTracer _ft(this, "LayoutView", __FUNCTION__)
+#	define TRACE(x...) \
+		do { BString _to; \
+			_to.Append(' ', (FunctionTracer::Depth() + 1) * 2); \
+			debug_printf("%p -> %s", this, _to.String()); \
+			debug_printf(x); } while (0)
+#	define LOG_EVENT(text...) debug_printf(text)
+#	define LOG_ERR(text...) TRACE(text)
+#else
+#	define TRACE(x...) do {} while (0)
+#	define KD_CALLED(x...) TRACE(x)
+#	define KID_CALLED(x...) TRACE(x)
+#	define LOG_ERR(text...) debug_printf(text)
+#	define LOG_EVENT(text...) TRACE(x)
+#endif
+
+
+
+
+
 
 
 KeyboardLayoutView::KeyboardLayoutView(const char* name,
@@ -1077,12 +1143,15 @@ KeyboardLayoutView::_EvaluateDropTarget(BPoint point)
 void
 KeyboardLayoutView::_SendKeyDown(const Key* key)
 {
+	KID_CALLED();
+	
 	BMessage* message = new BMessage(B_KEY_DOWN);
 	message->AddInt64("when", system_time());
 	message->AddData("states", B_UINT8_TYPE, &fKeyState,
 		sizeof(fKeyState));
 	message->AddInt32("key", key->code);
 	message->AddInt32("modifiers", fModifiers);
+	message->AddInt32("be:key_repeat", 1);
 	//message.AddPointer("keymap", fKeymap);
 
 	char* string;
@@ -1101,6 +1170,6 @@ KeyboardLayoutView::_SendKeyDown(const Key* key)
 		delete[] string;
 	}
 
-	if (fDevice->EnqueueMessage(message) == B_OK)
+	if (fDevice->EnqueueMessage(message) != B_OK)
 		delete message;
 }
