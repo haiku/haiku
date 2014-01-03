@@ -55,8 +55,9 @@ VirtualKeyboardWindow::VirtualKeyboardWindow(BInputServerDevice* dev)
 	_LoadFonts();
 
 	KeymapListItem* current = 
-		static_cast<KeymapListItem*>(fMapListView->FirstItem());
+		static_cast<KeymapListItem*>(fMapListView->LastItem());
 	fCurrentKeymap.Load(current->EntryRef());
+	
 	
 	fKeyboardView = new KeyboardLayoutView("Keyboard",fDevice);
 	fKeyboardView->GetKeyboardLayout()->SetDefault();

@@ -8,8 +8,6 @@
 #include <InputServerDevice.h>
 #include <Window.h>
 
-#include <vector.h>
-
 #include "Keymap.h"
 
 class KeyboardLayoutView;

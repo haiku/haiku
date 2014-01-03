@@ -309,7 +309,6 @@ void
 KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 	const BMessage* dragMessage)
 {
-	
 }
 
 
