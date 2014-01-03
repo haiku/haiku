@@ -391,9 +391,9 @@ EOF
 
 function MakeHPKG()
 {
-	cd "$tempFirmwareDir/../.."
+	cd "$tempFirmwareDir/../../.."
 	makePackageInfo
-	package create wifi_firmwares-1-any.hpkg
+	package create -C system wifi_firmwares-1-any.hpkg
 	mv wifi_firmwares-1-any.hpkg `finddir B_SYSTEM_PACKAGES_DIRECTORY`
 	rm -rf "`finddir B_SYSTEM_TEMP_DIRECTORY`/package_me"
 	rm -rf "$tempDir"
