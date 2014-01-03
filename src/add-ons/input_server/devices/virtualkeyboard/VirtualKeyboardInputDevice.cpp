@@ -14,8 +14,6 @@ instantiate_input_device()
 
 
 VirtualKeyboardInputDevice::VirtualKeyboardInputDevice()
-	:
-	BInputServerDevice()
 {
 	fKeyboardWindow = new VirtualKeyboardWindow(this);
 }
@@ -53,5 +51,13 @@ VirtualKeyboardInputDevice::Stop(const char* name, void* cookie)
 		fKeyboardWindow->Quit();
 		fKeyboardWindow = NULL;
 	}
+	return B_OK;
+}
+
+
+status_t
+VirtualKeyboardInputDevice::Control(const char* name, void* cookie, 
+	uint32 command, BMessage* message)
+{
 	return B_OK;
 }

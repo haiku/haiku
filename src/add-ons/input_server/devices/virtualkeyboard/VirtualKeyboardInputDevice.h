@@ -5,7 +5,9 @@
 #ifndef VKID_H
 #define VKID_H
 
+
 #include <InputServerDevice.h>
+#include <Message.h>
 
 #include "VirtualKeyboardWindow.h"
 
@@ -17,7 +19,8 @@ public:
 	virtual status_t					InitCheck();
 	virtual	status_t					Start(const char* name, void* cookie);
 	virtual	status_t					Stop(const char* name, void* cookie);
-						
+	virtual status_t					Control(const char* name, void* cookie,
+											uint32 command, BMessage* message);					
 private:
 			VirtualKeyboardWindow*		fKeyboardWindow;
 			

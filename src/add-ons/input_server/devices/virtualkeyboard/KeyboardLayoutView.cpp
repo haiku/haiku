@@ -1077,29 +1077,30 @@ KeyboardLayoutView::_EvaluateDropTarget(BPoint point)
 void
 KeyboardLayoutView::_SendKeyDown(const Key* key)
 {
-	BMessage message(B_KEY_DOWN);
-	message.AddInt64("when", system_time());
-	message.AddData("states", B_UINT8_TYPE, &fKeyState,
+	BMessage* message = new BMessage(B_KEY_DOWN);
+	message->AddInt64("when", system_time());
+	message->AddData("states", B_UINT8_TYPE, &fKeyState,
 		sizeof(fKeyState));
-	message.AddInt32("key", key->code);
-	message.AddInt32("modifiers", fModifiers);
-	message.AddPointer("keymap", fKeymap);
+	message->AddInt32("key", key->code);
+	message->AddInt32("modifiers", fModifiers);
+	//message.AddPointer("keymap", fKeymap);
 
 	char* string;
 	int32 numBytes;
 	fKeymap->GetChars(key->code, fModifiers, fDeadKey, &string,
 		&numBytes);
 	if (string != NULL) {
-		message.AddString("bytes", string);
+		message->AddString("bytes", string);
 		delete[] string;
 	}
 
 	fKeymap->GetChars(key->code, 0, 0, &string, &numBytes);
 	if (string != NULL) {
-		message.AddInt32("raw_char", string[0]);
-		message.AddInt8("byte", string[0]);
+		message->AddInt32("raw_char", string[0]);
+		message->AddInt8("byte", string[0]);
 		delete[] string;
 	}
-	fDevice->EnqueueMessage(&message);
-		
+
+	if (fDevice->EnqueueMessage(message) == B_OK)
+		delete message;
 }
