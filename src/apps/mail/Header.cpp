@@ -52,6 +52,7 @@ of their respective holders. All rights reserved.
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <ObjectList.h>
 #include <PopUpMenu.h>
 #include <Query.h>
 #include <String.h>
@@ -159,10 +160,37 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	BMenuField* field;
 	BMessage* msg;
 
-	float x = StringWidth( /* The longest title string in the header area */
-		B_TRANSLATE("Attachments: ")) + 9;
+	BString kAttachments(B_TRANSLATE("Attachments: "));
+	BString kDecoding(B_TRANSLATE("Decoding:"));
+	BString kFrom(B_TRANSLATE("From:"));
+	BString kTo(B_TRANSLATE("To:"));
+	BString kEncoding(B_TRANSLATE("Encoding:"));
+	BString kAccount(B_TRANSLATE("Account:"));
+	BString kCc(B_TRANSLATE("Cc:"));
+	BString kSubject(B_TRANSLATE("Subject:"));
+	BString kBcc(B_TRANSLATE("Bcc:"));
+	
+	BObjectList<BString> kToCompare;
+	kToCompare.AddItem(&kAttachments);
+	kToCompare.AddItem(&kDecoding);
+	kToCompare.AddItem(&kFrom);
+	kToCompare.AddItem(&kTo);
+	kToCompare.AddItem(&kEncoding);
+	kToCompare.AddItem(&kAccount);
+	kToCompare.AddItem(&kCc);
+	kToCompare.AddItem(&kSubject);
+	kToCompare.AddItem(&kBcc);
+	
+	float x = 0;
+	// Get the longest translated string's width to use when calculating
+	// horizontal positions
+	for(int i = 0; i < kToCompare.CountItems(); ++i) {
+		float stringWidth = StringWidth(kToCompare.ItemAt(i)->String()) + 9;
+		if (stringWidth > x)
+			x = stringWidth;
+	}
 	float y = TO_FIELD_V;
-
+	
 	BMenuBar* dummy = new BMenuBar(BRect(0, 0, 100, 15), "Dummy");
 	AddChild(dummy);
 	float width, menuBarHeight;
@@ -249,18 +277,18 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	if (fIncoming && !resending) {
 		// Set up the character set pop-up menu on the right of "To" box.
 		r.Set (windowRect.Width() - widestCharacterSet -
-			StringWidth (B_TRANSLATE("Decoding:")) - 2 * SEPARATOR_MARGIN,
+			StringWidth (kDecoding.String()) - 2 * SEPARATOR_MARGIN,
 				y - 2, windowRect.Width() - SEPARATOR_MARGIN,
 				y + menuFieldHeight);
-		field = new BMenuField (r, "decoding", B_TRANSLATE("Decoding:"),
+		field = new BMenuField (r, "decoding", kDecoding.String(),
 			fEncodingMenu, true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-		field->SetDivider(field->StringWidth(B_TRANSLATE("Decoding:")) + 5);
+		field->SetDivider(field->StringWidth(kDecoding.String()) + 5);
 		AddChild(field);
 		r.Set(SEPARATOR_MARGIN, y,
 			  field->Frame().left - SEPARATOR_MARGIN, y + menuFieldHeight);
-		sprintf(string, B_TRANSLATE("From:"));
+		sprintf(string, kFrom.String());
 	} else {
 		r.Set(x - 12, y, windowRect.Width() - SEPARATOR_MARGIN,
 			y + menuFieldHeight);
@@ -288,9 +316,9 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	if (!fIncoming || resending) {
 		r.right = r.left - 5;
 		r.left = r.right - ceilf(be_plain_font->StringWidth(
-			B_TRANSLATE("To:")) + 25);
+			kTo.String()) + 25);
 		r.top -= 1;
-		fToMenu = new QPopupMenu(B_TRANSLATE("To:"));
+		fToMenu = new QPopupMenu(kTo.String());
 		field = new BMenuField(r, "", "", fToMenu, true,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 		field->SetDivider(0.0);
@@ -302,14 +330,14 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	if (!fIncoming || resending) {
 		// Put the character set box on the right of the From field.
 		r.Set(windowRect.Width() - widestCharacterSet -
-			StringWidth(B_TRANSLATE("Encoding:")) - 2 * SEPARATOR_MARGIN,
+			StringWidth(kEncoding.String()) - 2 * SEPARATOR_MARGIN,
 			y - 2, windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 		BMenuField* encodingField = new BMenuField(r, "encoding",
-			B_TRANSLATE("Encoding:"), fEncodingMenu, true /* fixedSize */,
+			kEncoding.String(), fEncodingMenu, true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 		encodingField->SetDivider(encodingField->StringWidth(
-			B_TRANSLATE("Encoding:")) + 5);
+			kEncoding.String()) + 5);
 		AddChild(encodingField);
 
 		field = encodingField;
@@ -359,7 +387,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 
 		r.Set(SEPARATOR_MARGIN, y - 2,
 			  field->Frame().left - SEPARATOR_MARGIN, y + menuFieldHeight);
-		field = new BMenuField(r, "account", B_TRANSLATE("From:"),
+		field = new BMenuField(r, "account", kFrom.String(),
 			fAccountMenu, true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
@@ -375,7 +403,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 			  windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 		if (account)
 			r.right -= SEPARATOR_MARGIN + ACCOUNT_FIELD_WIDTH;
-		fAccountTo = new TTextControl(r, B_TRANSLATE("To:"), NULL, fIncoming,
+		fAccountTo = new TTextControl(r, kTo.String(), NULL, fIncoming,
 			false, B_FOLLOW_LEFT_RIGHT);
 		fAccountTo->SetEnabled(false);
 		fAccountTo->SetDivider(x - 12 - SEPARATOR_MARGIN);
@@ -384,7 +412,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 
 		if (account) {
 			r.left = r.right + 6;  r.right = windowRect.Width() - SEPARATOR_MARGIN;
-			fAccount = new TTextControl(r, B_TRANSLATE("Account:"), NULL,
+			fAccount = new TTextControl(r, kAccount.String(), NULL,
 				fIncoming, false, B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 			fAccount->SetEnabled(false);
 			AddChild(fAccount);
@@ -397,7 +425,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		r.Set(SEPARATOR_MARGIN, y,
 			windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 		y += controlHeight;
-		fCc = new TTextControl(r, B_TRANSLATE("Cc:"),
+		fCc = new TTextControl(r, kCc.String(),
 			NULL, fIncoming, false, B_FOLLOW_LEFT_RIGHT);
 		fCc->SetEnabled(false);
 		fCc->SetDivider(x - 12 - SEPARATOR_MARGIN);
@@ -409,7 +437,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	r.Set(SEPARATOR_MARGIN, y,
 		windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 	y += controlHeight;
-	fSubject = new TTextControl(r, B_TRANSLATE("Subject:"),
+	fSubject = new TTextControl(r, kSubject.String(),
 		new BMessage(SUBJECT_FIELD),fIncoming, false, B_FOLLOW_LEFT_RIGHT);
 	AddChild(fSubject);
 	(msg = new BMessage(FIELD_CHANGED))->AddInt32("bitmask", FIELD_SUBJECT);
@@ -433,9 +461,9 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 
 		r.right = r.left - 5;
 		r.left = r.right - ceilf(be_plain_font->StringWidth(
-			B_TRANSLATE("Cc:")) + 25);
+			kCc.String()) + 25);
 		r.top -= 1;
-		fCcMenu = new QPopupMenu(B_TRANSLATE("Cc:"));
+		fCcMenu = new QPopupMenu(kCc.String());
 		field = new BMenuField(r, "", "", fCcMenu, true,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 
@@ -443,7 +471,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		field->SetEnabled(true);
 		AddChild(field);
 
-		r.Set(BCC_FIELD_H + be_plain_font->StringWidth(B_TRANSLATE("Bcc:")), y,
+		r.Set(BCC_FIELD_H + be_plain_font->StringWidth(kBcc.String()), y,
 			  windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 		y += controlHeight;
 		fBcc = new TTextControl(r, "", new BMessage(BCC_FIELD),
@@ -457,9 +485,9 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 
 		r.right = r.left - 5;
 		r.left = r.right - ceilf(be_plain_font->StringWidth(
-			B_TRANSLATE("Bcc:")) + 25);
+			kBcc.String()) + 25);
 		r.top -= 1;
-		fBccMenu = new QPopupMenu(B_TRANSLATE("Bcc:"));
+		fBccMenu = new QPopupMenu(kBcc.String());
 		field = new BMenuField(r, "", "", fBccMenu, true,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 		field->SetDivider(0.0);
