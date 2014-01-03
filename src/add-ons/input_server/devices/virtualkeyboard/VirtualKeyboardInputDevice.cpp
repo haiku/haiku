@@ -4,6 +4,8 @@
  */
 #include "VirtualKeyboardInputDevice.h"
 
+#include <InterfaceDefs.h>
+
 extern "C" BInputServerDevice*
 instantiate_input_device()
 {
@@ -15,23 +17,24 @@ VirtualKeyboardInputDevice::VirtualKeyboardInputDevice()
 	:
 	BInputServerDevice()
 {
-	fKeyboardWindow = new VirtualKeyboardWindow();
+	fKeyboardWindow = new VirtualKeyboardWindow(this);
 }
 
 
-status_t
-VirtualKeyboardInputDevice::SystemShuttingDown()
+VirtualKeyboardInputDevice::~VirtualKeyboardInputDevice()
 {
-	if (fKeyboardWindow)
-		fKeyboardWindow->PostMessage(SYSTEM_SHUTTING_DOWN);
-	return B_OK;	
 }
 
 
 status_t
 VirtualKeyboardInputDevice::InitCheck()
 {
-	return BInputServerDevice::InitCheck();
+	static input_device_ref keyboard = {"VirtualKeyboard",
+		B_KEYBOARD_DEVICE, (void*) this};
+	static input_device_ref* devices[2] = {&keyboard, NULL};
+
+	RegisterDevices(devices);
+	return B_OK;
 }
 
 
@@ -39,5 +42,16 @@ status_t
 VirtualKeyboardInputDevice::Start(const char* name, void* cookie)
 {
 	fKeyboardWindow->Show();
-	
+	return B_OK;
+}
+
+
+status_t
+VirtualKeyboardInputDevice::Stop(const char* name, void* cookie)
+{
+	if (fKeyboardWindow) {
+		fKeyboardWindow->Quit();
+		fKeyboardWindow = NULL;
+	}
+	return B_OK;
 }

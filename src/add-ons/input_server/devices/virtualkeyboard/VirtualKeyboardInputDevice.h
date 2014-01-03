@@ -9,19 +9,17 @@
 
 #include "VirtualKeyboardWindow.h"
 
+
 class VirtualKeyboardInputDevice : public BInputServerDevice {
 public:
-							VirtualKeyboardInputDevice();
-	virtual status_t		InitCheck();
-	virtual	status_t		Start(const char* name, void* cookie);
-	virtual	status_t		Stop(const char* name, void* cookie);
-	virtual status_t		Control(const char* name, void* cookie,
-								uint32 command, BMessage* message);
-	virtual status_t		SystemShuttingDown();
+										VirtualKeyboardInputDevice();
+										~VirtualKeyboardInputDevice();
+	virtual status_t					InitCheck();
+	virtual	status_t					Start(const char* name, void* cookie);
+	virtual	status_t					Stop(const char* name, void* cookie);
 						
 private:
-	friend class VirtualKeyboardWindow;
-			VirtualKeyboardWindow*	fKeyboardWindow;
+			VirtualKeyboardWindow*		fKeyboardWindow;
 			
 };
 

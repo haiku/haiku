@@ -30,11 +30,12 @@ compare_key_list_items(const void* a, const void* b)
 }
 
 
-VirtualKeyboardWindow::VirtualKeyboardWindow()
+VirtualKeyboardWindow::VirtualKeyboardWindow(BInputServerDevice* dev)
 	:
 	BWindow(BRect(0,0,0,0),"Virtual Keyboard",
 	B_NO_BORDER_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,
-	B_WILL_ACCEPT_FIRST_CLICK | B_AVOID_FRONT)
+	B_WILL_ACCEPT_FIRST_CLICK | B_AVOID_FOCUS),
+	fDevice(dev)
 {
 	BScreen screen;
 	BRect screenRect(screen.Frame());
@@ -57,7 +58,7 @@ VirtualKeyboardWindow::VirtualKeyboardWindow()
 		static_cast<KeymapListItem*>(fMapListView->FirstItem());
 	fCurrentKeymap.Load(current->EntryRef());
 	
-	fKeyboardView = new KeyboardLayoutView("Keyboard");
+	fKeyboardView = new KeyboardLayoutView("Keyboard",fDevice);
 	fKeyboardView->GetKeyboardLayout()->SetDefault();
 	fKeyboardView->SetEditable(false);
 	fKeyboardView->SetKeymap(&fCurrentKeymap);

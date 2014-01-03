@@ -5,6 +5,7 @@
 #ifndef VIRTUAL_KEYBOARD_WINDOW_H
 #define VIRTUAL_KEYBOARD_WINDOW_H
 
+#include <InputServerDevice.h>
 #include <Window.h>
 
 #include <vector.h>
@@ -19,7 +20,7 @@ class BMenu;
 
 class VirtualKeyboardWindow : public BWindow{
 public:
-							VirtualKeyboardWindow();
+							VirtualKeyboardWindow(BInputServerDevice* dev);
 		virtual void		MessageReceived(BMessage* message);			
 							
 private:
@@ -28,6 +29,7 @@ private:
 		BMenu*				fFontMenu;
 		BMenu*				fLayoutMenu;
 		Keymap				fCurrentKeymap;
+		BInputServerDevice*	fDevice;
 		
 private:
 				void		_LoadLayouts(BMenu* menu);

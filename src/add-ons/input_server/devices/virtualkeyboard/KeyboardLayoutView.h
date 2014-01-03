@@ -6,6 +6,7 @@
 #define KEYBOARD_LAYOUT_VIEW_H
 
 
+#include <InputServerDevice.h>
 #include <Messenger.h>
 #include <View.h>
 
@@ -17,7 +18,8 @@ class Keymap;
 
 class KeyboardLayoutView : public BView {
 public:
-								KeyboardLayoutView(const char* name);
+								KeyboardLayoutView(const char* name,
+									BInputServerDevice* dev);
 								~KeyboardLayoutView();
 
 			void				SetKeyboardLayout(KeyboardLayout* layout);
@@ -90,8 +92,8 @@ private:
 			BRect				_FrameFor(const Key* key);
 			void				_SetFontSize(BView* view, key_kind keyKind);
 			void				_EvaluateDropTarget(BPoint point);
-			void				_SendFakeKeyDown(const Key* key);
-
+			void				_SendKeyDown(const Key* key);
+			
 			BBitmap*			fOffscreenBitmap;
 			BView*				fOffscreenView;
 
@@ -119,6 +121,9 @@ private:
 			BPoint				fOffset;
 			float				fFactor;
 			float				fGap;
+			
+			BInputServerDevice*	fDevice;
+
 };
 
 

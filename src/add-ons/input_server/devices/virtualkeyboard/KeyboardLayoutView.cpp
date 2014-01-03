@@ -26,7 +26,8 @@ static const rgb_color kDeadKeyColor = {152, 203, 255, 255};
 static const rgb_color kLitIndicatorColor = {116, 212, 83, 255};
 
 
-KeyboardLayoutView::KeyboardLayoutView(const char* name)
+KeyboardLayoutView::KeyboardLayoutView(const char* name,
+	BInputServerDevice* dev)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 	fOffscreenBitmap(NULL),
@@ -37,7 +38,8 @@ KeyboardLayoutView::KeyboardLayoutView(const char* name)
 	fButtons(0),
 	fDragKey(NULL),
 	fDropTarget(NULL),
-	fOldSize(0, 0)
+	fOldSize(0, 0),
+	fDevice(dev)
 {
 	fLayout = new KeyboardLayout;
 	memset(fKeyState, 0, sizeof(fKeyState));
@@ -229,8 +231,7 @@ KeyboardLayoutView::MouseUp(BPoint point)
 			_InvalidateKey(key);
 
 			if (fDragKey == NULL && fKeymap != NULL) {
-				// Send fake key down message to target
-				_SendFakeKeyDown(key);
+				_SendKeyDown(key);
 			}
 		}
 	}
@@ -373,7 +374,7 @@ KeyboardLayoutView::MessageReceived(BMessage* message)
 				}
 			} else {
 				// Send the old key to the target, so it's not lost entirely
-				_SendFakeKeyDown(fDropTarget);
+				_SendKeyDown(fDropTarget);
 
 				fKeymap->SetKey(fDropTarget->code, fModifiers, fDeadKey,
 					(const char*)data, dataSize);
@@ -1074,7 +1075,7 @@ KeyboardLayoutView::_EvaluateDropTarget(BPoint point)
 
 
 void
-KeyboardLayoutView::_SendFakeKeyDown(const Key* key)
+KeyboardLayoutView::_SendKeyDown(const Key* key)
 {
 	BMessage message(B_KEY_DOWN);
 	message.AddInt64("when", system_time());
@@ -1099,6 +1100,6 @@ KeyboardLayoutView::_SendFakeKeyDown(const Key* key)
 		message.AddInt8("byte", string[0]);
 		delete[] string;
 	}
-
-	fTarget.SendMessage(&message);
+	fDevice->EnqueueMessage(&message);
+		
 }
