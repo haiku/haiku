@@ -115,6 +115,24 @@ ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 }
 
 
+void
+ThreadData::ComputeLoad()
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	if (!gTrackLoad)
+		return;
+
+	if (fLastInterruptTime > 0) {
+		bigtime_t interruptTime = gCPU[smp_get_current_cpu()].interrupt_time;
+		interruptTime -= fLastInterruptTime;
+		fMeasureActiveTime -= interruptTime;
+	}
+
+	compute_load(fMeasureTime, fMeasureActiveTime, fLoad);
+}
+
+
 bigtime_t
 ThreadData::ComputeQuantum()
 {

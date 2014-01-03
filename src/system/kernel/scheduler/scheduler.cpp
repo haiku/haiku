@@ -136,6 +136,8 @@ scheduler_mode gCurrentModeID;
 scheduler_mode_operations* gCurrentMode;
 
 bool gSingleCore;
+bool gCPUFrequencyManagement;
+bool gTrackLoad;
 
 CPUEntry* gCPUEntries;
 
@@ -533,7 +535,6 @@ reschedule(int32 nextState)
 
 	Thread* nextThread = nextThreadData->GetThread();
 	ASSERT(!gCPU[thisCPU].disabled || thread_is_idle_thread(nextThread));
-
 	// update CPU heap
 	CoreCPUHeapLocker cpuLocker(core);
 	cpu->UpdatePriority(nextThreadData->GetEffectivePriority());
@@ -803,8 +804,16 @@ init()
 	if (result != B_OK)
 		return result;
 
-	gCoreCount = coreCount;
+	// disable parts of the scheduler logic that are not needed
 	gSingleCore = coreCount == 1;
+	gCPUFrequencyManagement = increase_cpu_performance(0) == B_OK;
+	gTrackLoad = !gSingleCore || gCPUFrequencyManagement;
+	dprintf("scheduler switches: single core: %s, cpufreq: %s, load tracking:"
+		" %s\n", gSingleCore ? "true" : "false",
+		gCPUFrequencyManagement ? "true" : "false",
+		gTrackLoad ? "true" : "false");
+
+	gCoreCount = coreCount;
 	gPackageCount = packageCount;
 
 	gCPUEntries = new(std::nothrow) CPUEntry[cpuCount];

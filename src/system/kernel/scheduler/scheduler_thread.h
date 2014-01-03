@@ -56,7 +56,7 @@ public:
 	inline	bool		Dequeue();
 
 	inline	void		UpdateActivity(bigtime_t active);
-	inline	void		ComputeLoad();
+			void		ComputeLoad();
 
 	inline	bool		HasQuantumEnded(bool wasPreempted, bool hasYielded);
 			bigtime_t	ComputeQuantum();
@@ -315,21 +315,6 @@ ThreadData::UpdateActivity(bigtime_t active)
 {
 	SCHEDULER_ENTER_FUNCTION();
 	fMeasureActiveTime += active;
-}
-
-
-inline void
-ThreadData::ComputeLoad()
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	if (fLastInterruptTime > 0) {
-		bigtime_t interruptTime = gCPU[smp_get_current_cpu()].interrupt_time;
-		interruptTime -= fLastInterruptTime;
-		fMeasureActiveTime -= interruptTime;
-	}
-
-	compute_load(fMeasureTime, fMeasureActiveTime, fLoad);
 }
 
 

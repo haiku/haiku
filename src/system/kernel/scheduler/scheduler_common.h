@@ -43,6 +43,8 @@ const int kVeryHighLoad = (kMaxLoad + kHighLoad) / 2;
 const int kLoadDifference = kMaxLoad * 20 / 100;
 
 extern bool gSingleCore;
+extern bool gCPUFrequencyManagement;
+extern bool gTrackLoad;
 
 
 void init_debug_commands();

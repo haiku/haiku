@@ -164,7 +164,6 @@ CPUEntry::ComputeLoad()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	ASSERT(!gSingleCore);
 	ASSERT(fCPUNumber == smp_get_current_cpu());
 
 	int oldLoad = compute_load(fMeasureTime, fMeasureActiveTime, fLoad);
@@ -247,7 +246,7 @@ CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 
 	oldThreadData->ComputeLoad();
 	nextThreadData->ComputeLoad();
-	if (!gSingleCore && !cpuEntry->disabled)
+	if (gTrackLoad && !cpuEntry->disabled)
 		ComputeLoad();
 
 	Thread* nextThread = nextThreadData->GetThread();
@@ -266,6 +265,9 @@ inline void
 CPUEntry::_RequestPerformanceLevel(ThreadData* threadData)
 {
 	SCHEDULER_ENTER_FUNCTION();
+
+	if (!gCPUFrequencyManagement)
+		return;
 
 	if (gCPU[fCPUNumber].disabled) {
 		decrease_cpu_performance(kCPUPerformanceScaleMax);
