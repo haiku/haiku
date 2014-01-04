@@ -210,7 +210,7 @@ CLuceneWriteDataBase::_RemoveDocuments(std::vector<entry_ref>& docs)
 				break;
 			}
 		}
-		delete wPath;
+		delete[] wPath;
 
 		if (!status)
 			break;
@@ -296,6 +296,6 @@ CLuceneWriteDataBase::_IndexDocument(const entry_ref& ref)
 
 	if (!status)
 		delete document;
-	delete wPath;
+	delete[] wPath;
 	return status;
 }
