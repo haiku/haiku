@@ -43,25 +43,6 @@ All rights reserved.
 
 namespace BPrivate {
 
-class FocusCheckBox : public BCheckBox {
-	public:
-		FocusCheckBox(BRect rect, const char* name, const char* label,
-			BMessage* message)
-			:	BCheckBox(rect, name, label, message)
-			{
-			}
-
-		virtual void Draw(BRect rect)
-		{
-			BCheckBox::Draw(rect);
-
-			if (IsFocus()) {
-				SetHighColor(0, 0, 255);
-				StrokeRect(BRect(2 , 4, 12, 14));
-			}
-		}
-};
-
 
 class FilePermissionsView : public BView {
 	public:
@@ -76,17 +57,17 @@ class FilePermissionsView : public BView {
 	private:
 		Model* fModel;
 
-		FocusCheckBox* fReadUserCheckBox;
-		FocusCheckBox* fReadGroupCheckBox;
-		FocusCheckBox* fReadOtherCheckBox;
+		BCheckBox* fReadUserCheckBox;
+		BCheckBox* fReadGroupCheckBox;
+		BCheckBox* fReadOtherCheckBox;
 
-		FocusCheckBox* fWriteUserCheckBox;
-		FocusCheckBox* fWriteGroupCheckBox;
-		FocusCheckBox* fWriteOtherCheckBox;
+		BCheckBox* fWriteUserCheckBox;
+		BCheckBox* fWriteGroupCheckBox;
+		BCheckBox* fWriteOtherCheckBox;
 
-		FocusCheckBox* fExecuteUserCheckBox;
-		FocusCheckBox* fExecuteGroupCheckBox;
-		FocusCheckBox* fExecuteOtherCheckBox;
+		BCheckBox* fExecuteUserCheckBox;
+		BCheckBox* fExecuteGroupCheckBox;
+		BCheckBox* fExecuteOtherCheckBox;
 
 		BTextControl* fOwnerTextControl;
 		BTextControl* fGroupTextControl;

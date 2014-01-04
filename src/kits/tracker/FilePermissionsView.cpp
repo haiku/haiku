@@ -135,7 +135,7 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 		kVerticalSpacing = kRowLabelVerticalSpacing,
 		kCheckBoxWidth = 18, kCheckBoxHeight = 18;
 
-	FocusCheckBox** checkBoxArray[3][3] = {
+	BCheckBox** checkBoxArray[3][3] = {
 		{
 			&fReadUserCheckBox,
 			&fReadGroupCheckBox,
@@ -156,7 +156,7 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	for (int32 x = 0; x < 3; x++) {
 		for (int32 y = 0; y < 3; y++) {
 			*checkBoxArray[y][x] =
-				new FocusCheckBox(BRect(kLeftMargin + kHorizontalSpacing * x,
+				new BCheckBox(BRect(kLeftMargin + kHorizontalSpacing * x,
 						kTopMargin + kVerticalSpacing * y,
 						kLeftMargin + kHorizontalSpacing * x + kCheckBoxWidth,
 						kTopMargin + kVerticalSpacing * y + kCheckBoxHeight),
