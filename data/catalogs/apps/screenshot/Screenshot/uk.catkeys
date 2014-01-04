@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-screenshot	1697748405
+1	ukrainian	x-vnd.haiku-screenshot	889794495
 seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Робочий стіл
 Include window border	ScreenshotWindow		Включаючи межу вікна
@@ -18,7 +18,6 @@ screenshot	Screenshot	Base filename of screenshot files	знімок екран�
 New screenshot	ScreenshotWindow		Новий знімок
 Artwork folder	ScreenshotWindow		Папка Artwork
 Home folder	ScreenshotWindow		Папка Home
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Цей файл цілковито присутній.\n Ви впевнені, що бажаєте переписати його?
 Settings…	ScreenshotWindow		Настройки…
 overwrite	ScreenshotWindow		переписати
 Delay:	ScreenshotWindow		Затримка:

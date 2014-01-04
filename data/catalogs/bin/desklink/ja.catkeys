@@ -1,6 +1,7 @@
-1	japanese	x-vnd.Haiku-desklink	2797960853
+1	japanese	x-vnd.Haiku-desklink	3451447865
 Control physical output	MediaReplicant		物理出力のコントロール
 Couldn't launch 	MediaReplicant		起動できませんでした
+Muted	MediaReplicant		ミュート
 OK	MediaReplicant		OK
 Sound preferences…	MediaReplicant		サウンドの設定…
 %g dB	MediaReplicant		%g dB

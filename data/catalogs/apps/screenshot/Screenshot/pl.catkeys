@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-screenshot	1721618877
+1	polish	x-vnd.haiku-screenshot	913664967
 seconds	ScreenshotWindow		sekund
 Desktop	ScreenshotWindow		Pulpit
 Include window border	ScreenshotWindow		Dołącz obramowanie okna
@@ -19,7 +19,6 @@ screenshot	Screenshot	Base filename of screenshot files	screenshot
 New screenshot	ScreenshotWindow		Nowy zrzut ekranu
 Artwork folder	ScreenshotWindow		Folder na obrazki
 Home folder	ScreenshotWindow		Folder domowy
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Plik już istnieje.\n Jesteś pewien, że chcesz go nadpisać?
 Settings…	ScreenshotWindow		Ustawienia…
 overwrite	ScreenshotWindow		nadpisz
 Delay:	ScreenshotWindow		Opóźnienie:

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DriveSetup	3775412465
+1	swedish	x-vnd.Haiku-DriveSetup	758245016
 DriveSetup	System name		DiskHanterare
 Cancel	AbstractParametersPanel		Avbryt
 Delete	MainWindow		Ta bort
@@ -7,6 +7,7 @@ Rescan	MainWindow		Uppdatera
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Kunde inte läsa partitionsinformation.
 There's no space on the partition where a child partition could be created.	MainWindow		Det finns inget utrymme för en underpartition på partitionen.
+Could not unmount partition	MainWindow		Kunde inte avmontera partition
 Initialize	InitializeParametersPanel		Initiera
 OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<tom>
@@ -16,6 +17,7 @@ No disk devices have been recognized.	DiskView		Inga diskenheter har identifiera
 Failed to initialize the disk %s!\n	MainWindow		Misslyckades att initiera partionen %s!\n
 The selected disk is read-only.	MainWindow		Den valda disken är inte skrivbar.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Är du säker att du vill formatera partitionen \"%s\"? Du kommet att få frågan igen innan ändringarna skrivs till disk.
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Ska vi tvinga avmonteringen?\n\nNotering: Om ett program skriver till enheten som avmonteras så kan informationen försvinna.\n
 Could not mount partition %s.	MainWindow		Kunde inte montera partition %s.
 The partition %s has been successfully formatted.\n	MainWindow		Partitionen %s har initierats.\n
 Change parameters	MainWindow		Ändra parametrar
@@ -70,6 +72,7 @@ Are you sure you want to change parameters of the selected partition?\n\nThe par
 Eject	MainWindow		Mata ut
 Partition	MainWindow		Partition
 Validation of the given parameters failed.	MainWindow		Valideringen av den givna parametern misslyckades.
+Force unmount	MainWindow		Tvinga avmontering
 Create	CreateParametersPanel		Skapa
 File system	PartitionList		Filsystem
 Validation of the given creation parameters failed.	MainWindow		Utvärdering av den givna parametern misslyckades.

@@ -1,15 +1,19 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3005327638
+1	swedish	x-vnd.Haiku-HaikuDepot	4291855824
 Name	PackageListView		Namn
 Installed packages	Model		Installerade paket
 User modified packages	Model		Användarmodifierade paket
 Update available	Model		Uppdateringar tillgängliga
 Changelog	PackageInfoView		Ändringslogg
+Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
 for %Version%	PackageInfoView		för %Version%
+No changelog available.	PackageInfoView		Ingen ändringslogg finns.
 Depot:	FilterView		Depot:
 Description	PackageListView		Beskrivning
 Install	PackageManager		Installera
+Tools	MainWindow		Verktyg
 HaikuDepot	System name		HaikuDepot
 Uninstall	PackageManager		Avinstallera
+<no info>	PackageInfoView		<Ingen information>
 An error occurred while initializing the package manager: %message%	MainWindow		Ett fel inträffade när packet manager startade: %message%
 Close	PackageManager		Stäng
 Status	PackageListView		Status
@@ -25,10 +29,13 @@ Command line	Model		Kommandoraden
 Downloading:	PackageInfoView		Hämtar:
 Search terms:	FilterView		Sökvillkor
 %Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Ett fel inträffade när datakatalogen uppdaterades: %error% (%details%)
+Show source packages	MainWindow		Visa källkodspaket
 Productivity	Model		Produktivitet
 Show:	FilterView		Visa:
 Size	PackageListView		Storlek
+Options	MainWindow		Alternativ
 Games	Model		Spel
 Rating	PackageListView		Betyg
 Downloading	Model		Hämtar
@@ -45,6 +52,7 @@ Unknown	PackageListView		Okänd
 All depots	FilterView		All depots
 Available	PackageListView		Tillgänglig
 n/a	PackageInfoView		oviktigt
+Show develop packages	MainWindow		Visa utvecklingspaket
 Show	FilterView		Visa
 Uninstalled packages	Model		Avinstallera paket
 Audio	Model		Ljud

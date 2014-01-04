@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-screenshot	1721618877
+1	belarusian	x-vnd.haiku-screenshot	913664967
 seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Рабочы стол
 Include window border	ScreenshotWindow		Уключыць мяжу вакна
@@ -19,7 +19,6 @@ screenshot	Screenshot	Base filename of screenshot files	здымак
 New screenshot	ScreenshotWindow		Новы здымак экрану
 Artwork folder	ScreenshotWindow		Каталог малюнкаў
 Home folder	ScreenshotWindow		Хатні каталог
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Файл ужо існуе.\n Сапраўды перазапісаць яго?
 Settings…	ScreenshotWindow		Наладкі…
 overwrite	ScreenshotWindow		перазапіс
 Delay:	ScreenshotWindow		Затрымка:

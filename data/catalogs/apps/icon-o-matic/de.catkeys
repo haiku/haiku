@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-icon_o_matic	1336797042
+1	german	x-vnd.haiku-icon_o_matic	28048799
 Select All	Icon-O-Matic-PathManipulator		Alles auswählen
 Add Style	Icon-O-Matic-AddStylesCmd		Stil hinzufügen
 Color (#%02x%02x%02x)	Style name after dropping a color		Farbe (#%02x%02x%02x)
@@ -78,6 +78,7 @@ Perspective	Transformation		Perspektive
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transformator umsortieren
 Opacity	Icon-O-Matic-PropertyNames		Deckkraft
 Add with path	Icon-O-Matic-ShapesList		Mit Pfad hinzufügen
+Export icon	Dialog title		Icon exportieren
 Gradient type	Icon-O-Matic-StyleTypes		Verlaufstyp:
 Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Abbrechen
@@ -190,6 +191,7 @@ Overwrite	Icon-O-Matic-SVGExport		Überschreiben
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Formen einfrieren
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Kontrollpunkt trennen
 Open…	Icon-O-Matic-Menu-File		Öffnen…
+Save icon	Dialog title		Icon speichern
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farbe (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Farbverlauf bearbeiten
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Pfad aufräumen

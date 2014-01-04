@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-screenshot	1721618877
+1	hungarian	x-vnd.haiku-screenshot	913664967
 seconds	ScreenshotWindow		másodperc
 Desktop	ScreenshotWindow		Asztal
 Include window border	ScreenshotWindow		Az ablak keretének belefoglalása a képbe
@@ -19,7 +19,6 @@ screenshot	Screenshot	Base filename of screenshot files	képernyőkép
 New screenshot	ScreenshotWindow		Új képernyőkép
 Artwork folder	ScreenshotWindow		Artwork mappa
 Home folder	ScreenshotWindow		Saját mappa
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ez a fájl már létezik.\n Biztos felül kívánja írni?
 Settings…	ScreenshotWindow		Beállítások…
 overwrite	ScreenshotWindow		felülírás
 Delay:	ScreenshotWindow		Késleltetés:

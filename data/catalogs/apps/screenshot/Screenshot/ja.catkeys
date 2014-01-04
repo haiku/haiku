@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-screenshot	1721618877
+1	japanese	x-vnd.haiku-screenshot	913664967
 seconds	ScreenshotWindow		秒
 Desktop	ScreenshotWindow		デスクトップ
 Include window border	ScreenshotWindow		ウィンドウ境界線も取り込む
@@ -19,7 +19,6 @@ screenshot	Screenshot	Base filename of screenshot files	スクリーンショッ
 New screenshot	ScreenshotWindow		新しいスクリーンショット
 Artwork folder	ScreenshotWindow		アートワークフォルダー
 Home folder	ScreenshotWindow		ホームフォルダー
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		同じ名前のファイルはすでに存在します。\n上書きしてよろしいですか?
 Settings…	ScreenshotWindow		設定…
 overwrite	ScreenshotWindow		上書き
 Delay:	ScreenshotWindow		遅延時間

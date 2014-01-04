@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-screenshot	1721618877
+1	swedish	x-vnd.haiku-screenshot	913664967
 seconds	ScreenshotWindow		sekunder
 Desktop	ScreenshotWindow		Skrivbord
 Include window border	ScreenshotWindow		Inkludera fönsterkant
@@ -19,7 +19,6 @@ screenshot	Screenshot	Base filename of screenshot files	skärmdump
 New screenshot	ScreenshotWindow		Ny skärmdump
 Artwork folder	ScreenshotWindow		Illustrationsmapp
 Home folder	ScreenshotWindow		Hemmapp
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Filen finns redan.\n Är du säker på att du vill skriva över den?
 Settings…	ScreenshotWindow		Inställningar...
 overwrite	ScreenshotWindow		skriv över
 Delay:	ScreenshotWindow		Fördröjning:

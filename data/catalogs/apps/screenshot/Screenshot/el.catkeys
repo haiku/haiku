@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-screenshot	1697748405
+1	greek, modern (1453-)	x-vnd.haiku-screenshot	889794495
 seconds	ScreenshotWindow		δευτερόλεπτα
 Desktop	ScreenshotWindow		Επιφάνεια εργασίας
 Include window border	ScreenshotWindow		Περίληψη συνόρων παραθύρου
@@ -18,7 +18,6 @@ screenshot	Screenshot	Base filename of screenshot files	στιγμιότυπο �
 New screenshot	ScreenshotWindow		Νέο στιγμιότυπο οθόνης
 Artwork folder	ScreenshotWindow		Φάκελος γραφικών
 Home folder	ScreenshotWindow		Αρχικός φάκελος
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Αυτό το αρχείο υπάρχει ήδη.\nΕίστε βέβαιοι ότι θα θέλατε να το αντικαταστήσετε;
 Settings…	ScreenshotWindow		Ρυθμίσεις...
 overwrite	ScreenshotWindow		αντικατάσταση
 Delay:	ScreenshotWindow		Καθυστέρηση:

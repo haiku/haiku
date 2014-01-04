@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	1336797042
+1	hungarian	x-vnd.haiku-icon_o_matic	28048799
 Select All	Icon-O-Matic-PathManipulator		Mind kijelölése
 Add Style	Icon-O-Matic-AddStylesCmd		Stílus hozzáadása
 Color (#%02x%02x%02x)	Style name after dropping a color		Szín (#%02x%02x%02x)
@@ -78,6 +78,7 @@ Perspective	Transformation		Perspektíva
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Átalakító áthelyezése
 Opacity	Icon-O-Matic-PropertyNames		Átlátszóság
 Add with path	Icon-O-Matic-ShapesList		Hozzáadás útvonallal együtt
+Export icon	Dialog title		Ikon exprotálása
 Gradient type	Icon-O-Matic-StyleTypes		Színátmenet típusa
 Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Mégse
@@ -190,6 +191,7 @@ Overwrite	Icon-O-Matic-SVGExport		Felülírás
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Alakzatok rögzítése
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Vezérlőpont felbontása
 Open…	Icon-O-Matic-Menu-File		Megnyitás…
+Save icon	Dialog title		Ikon mentése
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Szín (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Színátmenet szerkesztése
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Útvonal törlése

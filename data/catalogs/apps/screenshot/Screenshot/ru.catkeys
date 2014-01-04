@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-screenshot	1721618877
+1	russian	x-vnd.haiku-screenshot	913664967
 seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Рабочий стол
 Include window border	ScreenshotWindow		Включая заголовок окна
@@ -19,7 +19,6 @@ screenshot	Screenshot	Base filename of screenshot files	screenshot
 New screenshot	ScreenshotWindow		Новый снимок
 Artwork folder	ScreenshotWindow		Папку artwork
 Home folder	ScreenshotWindow		Домашнюю папку
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Такой файл уже существует.\nВы уверены, что хотите его перезаписать?
 Settings…	ScreenshotWindow		Настройки…
 overwrite	ScreenshotWindow		Перезаписать
 Delay:	ScreenshotWindow		Задержка:

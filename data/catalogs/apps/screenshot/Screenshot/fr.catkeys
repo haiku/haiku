@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-screenshot	1721618877
+1	french	x-vnd.haiku-screenshot	913664967
 seconds	ScreenshotWindow		secondes
 Desktop	ScreenshotWindow		Bureau
 Include window border	ScreenshotWindow		Inclure les bords des fenêtres
@@ -19,7 +19,6 @@ screenshot	Screenshot	Base filename of screenshot files	capture
 New screenshot	ScreenshotWindow		Nouvelle capture
 Artwork folder	ScreenshotWindow		Dossier d'images
 Home folder	ScreenshotWindow		Dossier personnel
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Ce fichier existe déjà.\n Voulez-vous vraiment l'écraser ?
 Settings…	ScreenshotWindow		Réglages…
 overwrite	ScreenshotWindow		écraser
 Delay:	ScreenshotWindow		Retard :

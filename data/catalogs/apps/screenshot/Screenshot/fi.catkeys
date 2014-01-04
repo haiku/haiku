@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-screenshot	1721618877
+1	finnish	x-vnd.haiku-screenshot	913664967
 seconds	ScreenshotWindow		sekuntia
 Desktop	ScreenshotWindow		Työpöytä
 Include window border	ScreenshotWindow		Sisällytä ikkunaraja
@@ -19,7 +19,6 @@ screenshot	Screenshot	Base filename of screenshot files	näytönkaappaus
 New screenshot	ScreenshotWindow		Uusi näytönkaappaus
 Artwork folder	ScreenshotWindow		Taideteoskansio
 Home folder	ScreenshotWindow		Kotikansio
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Tiedosto on jo olemassa.\n Oletko varma, etä haluat korvata sen?
 Settings…	ScreenshotWindow		Asetukset...
 overwrite	ScreenshotWindow		korvaa
 Delay:	ScreenshotWindow		Viive:

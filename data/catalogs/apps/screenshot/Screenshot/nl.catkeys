@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-screenshot	1721618877
+1	dutch; flemish	x-vnd.haiku-screenshot	913664967
 seconds	ScreenshotWindow		seconden
 Desktop	ScreenshotWindow		Bureaublad
 Include window border	ScreenshotWindow		Vensterrand insluiten
@@ -19,7 +19,6 @@ screenshot	Screenshot	Base filename of screenshot files	schermafbeelding
 New screenshot	ScreenshotWindow		Nieuwe schermafbeelding
 Artwork folder	ScreenshotWindow		Artwork-map
 Home folder	ScreenshotWindow		Home-map
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Dit bestand bestaat al.\n Bent u zeker dat u het wilt overschrijven?
 Settings…	ScreenshotWindow		Instellingen...
 overwrite	ScreenshotWindow		overschrijven
 Delay:	ScreenshotWindow		Vertraging:

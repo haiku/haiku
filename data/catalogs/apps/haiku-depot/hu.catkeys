@@ -2,7 +2,7 @@
 Name	PackageListView		Név
 Installed packages	Model		Telepített csomagok
 User modified packages	Model		Módosított csomagok
-Update available	Model		Elérhető frissítések
+Update available	Model		Frissítés érhető el
 Changelog	PackageInfoView		Változásnapló
 Click a package to view information	PackageInfoView		Válasszon egy csomagot az információk megtekintéséhez
 for %Version%	PackageInfoView		%Version% verzióhoz

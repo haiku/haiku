@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-screenshot	1721618877
+1	english	x-vnd.haiku-screenshot	913664967
 seconds	ScreenshotWindow		秒
 Desktop	ScreenshotWindow		桌面
 Include window border	ScreenshotWindow		包含窗体边框
@@ -19,7 +19,6 @@ screenshot	Screenshot	Base filename of screenshot files	屏幕截图
 New screenshot	ScreenshotWindow		新建屏幕截图
 Artwork folder	ScreenshotWindow		插图文件夹
 Home folder	ScreenshotWindow		主文件夹
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		该文件已经存在。\n您确定希望覆盖它吗？
 Settings…	ScreenshotWindow		设置...
 overwrite	ScreenshotWindow		覆盖
 Delay:	ScreenshotWindow		延迟：

@@ -1,4 +1,4 @@
-1	hindi	x-vnd.haiku-screenshot	1697748405
+1	hindi	x-vnd.haiku-screenshot	889794495
 seconds	ScreenshotWindow		सेकंडस
 Desktop	ScreenshotWindow		डेस्कटॉप
 Include window border	ScreenshotWindow		विंडो बॉर्डर को शामिल करे
@@ -18,7 +18,6 @@ screenshot	Screenshot	Base filename of screenshot files	स्क्रीनश
 New screenshot	ScreenshotWindow		नया स्क्रीनशॉट
 Artwork folder	ScreenshotWindow		कलाकृति का फ़ोल्डर
 Home folder	ScreenshotWindow		होम फ़ोल्डर
-This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		यह फ़ाइल पहले से मौजूद है.\n क्या आप इसे अधिलेखित करना चाहते हैं?
 Settings…	ScreenshotWindow		रूपरेखाएँ...
 overwrite	ScreenshotWindow		अधिलेखित
 Delay:	ScreenshotWindow		विलंब:
