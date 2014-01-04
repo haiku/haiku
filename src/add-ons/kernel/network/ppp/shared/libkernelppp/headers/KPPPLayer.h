@@ -8,6 +8,7 @@
 
 #include <KPPPDefs.h>
 
+#include <net_buffer.h>
 
 class KPPPLayer {
 	protected:
@@ -48,11 +49,11 @@ class KPPPLayer {
 		virtual bool IsAllowedToSend() const = 0;
 		
 		//!	Send a packet with the given protocol number.
-		virtual status_t Send(struct mbuf *packet, uint16 protocolNumber) = 0;
+		virtual status_t Send(net_buffer *packet, uint16 protocolNumber) = 0;
 		//!	Receive a packet with the given protocol number.
-		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber) = 0;
+		virtual status_t Receive(net_buffer *packet, uint16 protocolNumber) = 0;
 		
-		status_t SendToNext(struct mbuf *packet, uint16 protocolNumber) const;
+		status_t SendToNext(net_buffer *packet, uint16 protocolNumber) const;
 			// send the packet to the next layer
 		
 		virtual void Pulse();

@@ -20,16 +20,49 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
 #include <cctype>
 #include <settings_tools.h>
 #include <unistd.h>
-#include "_libppputils.h"
 
+#include <net/if.h>
+
+#include <net/if_media.h>
+#include <net/if_types.h>
+
+#include <Message.h>
+#include <Messenger.h>
+#include <NetworkDevice.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
+
+#include <NetServer.h>
 
 //!	Constructor. Does nothing special.
 PPPManager::PPPManager()
 {
-	fFD = open(get_stack_driver_path(), O_RDWR);
+	// fFD = open(get_stack_driver_path(), O_RDWR);
+	int family = AF_INET;
+
+	fFD = socket(family, SOCK_DGRAM, 0);
+
+	// FileDescriptorCloser closer(socket);
+
+	// ifaliasreq request;
+	// strlcpy(request.ifra_name, name, IF_NAMESIZE);
+	// request.ifra_index = address.Index();
+	// request.ifra_flags = address.Flags();
+
+	// memcpy(&request.ifra_addr, &address.Address().SockAddr(),
+	//	address.Address().Length());
+	// memcpy(&request.ifra_mask, &address.Mask().SockAddr(),
+	// 	address.Mask().Length());
+	// memcpy(&request.ifra_broadaddr, &address.Broadcast().SockAddr(),
+	//	address.Broadcast().Length());
+
+	// if (ioctl(socket, option, &request, sizeof(struct ifaliasreq)) < 0)
+	//	return errno;
+
 }
 
 
@@ -133,6 +166,7 @@ PPPManager::Control(uint32 op, void *data, size_t length) const
 		return B_ERROR;
 	
 	control_net_module_args args;
+	sprintf(args.ifr_name, "%s", "ppp1");
 	args.name = PPP_INTERFACE_MODULE_NAME;
 	args.op = op;
 	args.data = data;
@@ -169,6 +203,7 @@ PPPManager::ControlModule(const char *name, uint32 op, void *data,
 		return B_ERROR;
 	
 	control_net_module_args args;
+	sprintf(args.ifr_name, "%s", "ppp1");
 	args.name = name;
 	args.op = op;
 	args.data = data;
@@ -207,13 +242,72 @@ PPPManager::CreateInterface(const driver_settings *settings) const
 ppp_interface_id
 PPPManager::CreateInterfaceWithName(const char *name) const
 {
-	ppp_interface_description_info info;
-	info.u.name = name;
+	ppp_interface_id ID = InterfaceWithName(name);
+
+	if (ID != PPP_UNDEFINED_INTERFACE_ID)
+		return ID;
+
+	BNetworkInterface interface(name);
+	if (!interface.Exists()) {
+		// the interface does not exist yet, we have to add it first
+		BNetworkRoster& roster = BNetworkRoster::Default();
+
+		status_t status = roster.AddInterface(interface);
+		if (status != B_OK) {
+			fprintf(stderr, "PPPManager::CreateInterfaceWithName: Could not add interface: %s\n",
+				strerror(status));
+			return PPP_UNDEFINED_INTERFACE_ID;
+		}
+
+		return InterfaceWithName(name);
+	}
+
+	return PPP_UNDEFINED_INTERFACE_ID;
+
+//	ppp_interface_description_info info;
+//	info.u.name = name;
+//	
+//	if (Control(PPPC_CREATE_INTERFACE_WITH_NAME, &info, sizeof(info)) != B_OK)
+//		return PPP_UNDEFINED_INTERFACE_ID;
+//	else
+//		return info.interface;
+
+}
+
+
+/*!	It will remove the complete interface with all
+	of its addresses.
+*/
+bool
+delete_interface(const char* name)
+{
+	BNetworkInterface interface(name);
+
+	// Delete interface
+	BNetworkRoster& roster = BNetworkRoster::Default();
+
+	status_t status = roster.RemoveInterface(interface);
+	if (status != B_OK) {
+		fprintf(stderr, "delete_interface: Could not delete interface %s\n",
+			name);
+		return false;
+	}
+
+	return true;
+}
+
+
+//!	Deletes the interface with the given \a name.
+bool
+PPPManager::DeleteInterface(const char* name) const
+{
+	ppp_interface_id ID = InterfaceWithName(name);
+
+	if (ID == PPP_UNDEFINED_INTERFACE_ID)
+		return false;
+
+	return delete_interface(name);
 	
-	if (Control(PPPC_CREATE_INTERFACE_WITH_NAME, &info, sizeof(info)) != B_OK)
-		return PPP_UNDEFINED_INTERFACE_ID;
-	else
-		return info.interface;
 }
 
 
@@ -253,18 +347,22 @@ PPPManager::Interfaces(int32 *count,
 	// loop until we get all interfaces
 	while (true) {
 		requestCount = *count = CountInterfaces(filter);
-		if (*count == -1)
+		if (*count <= 0) {
+			printf("No interface, count, first round:%ld\n", *count);
 			return NULL;
+		}
 		
 		requestCount += 10;
 			// request some more interfaces in case some are added in the mean time
 		interfaces = new ppp_interface_id[requestCount];
+		// printf("interfaces addr: %p\n, requestCount: %ld", interfaces, requestCount);
 		*count = GetInterfaces(interfaces, requestCount, filter);
-		if (*count == -1) {
+		if (*count <= 0) {
+			printf("No interface, count second round:%ld\n", *count);
 			delete interfaces;
 			return NULL;
 		}
-		
+
 		if (*count < requestCount)
 			break;
 		
@@ -345,12 +443,17 @@ PPPManager::InterfaceWithName(const char *name) const
 	int32 count;
 	ppp_interface_id *interfaces = Interfaces(&count, PPP_REGISTERED_INTERFACES);
 	
-	if (!interfaces)
+	if (!interfaces || count <= 0) {
+		printf("ERROR: Could not get ppp name:%s\n", name);
 		return PPP_UNDEFINED_INTERFACE_ID;
-	
+	}
+
+	// printf("first ID:%ld count:%ld\n", interfaces[0], count);
+
 	ppp_interface_id id = PPP_UNDEFINED_INTERFACE_ID;
 	PPPInterface interface;
 	ppp_interface_info_t info;
+	// printf("internal info is at: %p\n", &info);
 	
 	for (int32 index = 0; index < count; index++) {
 		interface.SetTo(interfaces[index]);
@@ -375,10 +478,78 @@ PPPManager::InterfaceWithName(const char *name) const
 
 
 //!	Returns the number of existing interfaces or a negative value on error.
+bool
+is_ppp_interface(const char* name)
+{
+	// size_t length = strlen(name);
+	// if (length < 8)
+	//	putchar('\t');
+	// else
+	//	printf("\n\t");
+
+	// get link level interface for this interface
+
+	BNetworkInterface interface(name);
+	BNetworkAddress linkAddress;
+	status_t status = interface.GetHardwareAddress(linkAddress);
+	if (status == B_OK) {
+		// const char *type = "unknown";
+		switch (linkAddress.LinkLevelType()) {
+			case IFT_ETHER:
+				// type = "Ethernet";
+				// printf("%s\n", type);
+				break;
+			case IFT_LOOP:
+				// type = "Local Loopback";
+				// printf("%s\n", type);
+				break;
+			case IFT_MODEM:
+				// type = "Modem";
+				// printf("%s\n", type);
+				break;
+			case IFT_PPP:
+				// type = "PPP";
+				// printf("%s\n", type);
+				return true;
+				break;
+			default:
+				// printf("%s\n", type);
+				;
+
+		}
+
+	}
+	return false;
+}
+
+
+//!	Returns the number of ppp interfaces
+int32
+count_ppp_interface(void)
+{
+	int32 count = 0;
+
+	// get a list of all ppp interfaces
+	BNetworkRoster& roster = BNetworkRoster::Default();
+
+	BNetworkInterface interface;
+	uint32 cookie = 0;
+
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		if (is_ppp_interface(interface.Name()))
+			count++;
+	}
+
+	return count;
+}
+
+
+//!	Returns the number of existing interfaces or a negative value on error.
 int32
 PPPManager::CountInterfaces(ppp_interface_filter filter) const
 {
-	return Control(PPPC_COUNT_INTERFACES, &filter, sizeof(filter));
+	// return Control(PPPC_COUNT_INTERFACES, &filter, sizeof(filter));
+	return count_ppp_interface();
 }
 
 

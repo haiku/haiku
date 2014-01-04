@@ -9,9 +9,11 @@
 #include <driver_settings.h>
 
 #include <KPPPProtocol.h>
-#include <Locker.h>
 
 #include <arpa/inet.h>
+#include <net_datalink.h>
+#include <net_datalink_protocol.h>
+#include <net/route.h>
 
 
 #define IPCP_PROTOCOL	0x8021
@@ -60,46 +62,46 @@ class IPCP : public KPPPProtocol {
 	public:
 		IPCP(KPPPInterface& interface, driver_parameter *settings);
 		virtual ~IPCP();
-		
+
 		virtual void Uninit();
-		
+
 		ppp_state State() const
 			{ return fState; }
-		
+
 		virtual status_t StackControl(uint32 op, void *data);
-		
+
 		virtual bool Up();
 		virtual bool Down();
-		
-		virtual status_t Send(struct mbuf *packet,
+
+		virtual status_t Send(net_buffer *packet,
 			uint16 protocolNumber = IPCP_PROTOCOL);
-		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber);
-		status_t ReceiveIPPacket(struct mbuf *packet, uint16 protocolNumber);
+		virtual status_t Receive(net_buffer *packet, uint16 protocolNumber);
+		status_t ReceiveIPPacket(net_buffer *packet, uint16 protocolNumber);
 		virtual void Pulse();
 
 	private:
 		bool ParseSideRequests(const driver_parameter *requests, ppp_side side);
 		void UpdateAddresses();
 		void RemoveRoutes();
-		
+
 		// for state machine
 		void NewState(ppp_state next);
 		uint8 NextID();
 			// return the next id for IPCP packets
-		
+
 		// events
 		void TOGoodEvent();
 		void TOBadEvent();
-		void RCREvent(struct mbuf *packet);
-		void RCRGoodEvent(struct mbuf *packet);
-		void RCRBadEvent(struct mbuf *nak, struct mbuf *reject);
-		void RCAEvent(struct mbuf *packet);
-		void RCNEvent(struct mbuf *packet);
-		void RTREvent(struct mbuf *packet);
-		void RTAEvent(struct mbuf *packet);
-		void RUCEvent(struct mbuf *packet);
-		void RXJBadEvent(struct mbuf *packet);
-		
+		void RCREvent(net_buffer *packet);
+		void RCRGoodEvent(net_buffer *packet);
+		void RCRBadEvent(net_buffer *nak, net_buffer *reject);
+		void RCAEvent(net_buffer *packet);
+		void RCNEvent(net_buffer *packet);
+		void RTREvent(net_buffer *packet);
+		void RTAEvent(net_buffer *packet);
+		void RUCEvent(net_buffer *packet);
+		void RXJBadEvent(net_buffer *packet);
+
 		// actions
 		void IllegalEvent(ppp_event event);
 		void ReportUpFailedEvent();
@@ -108,27 +110,27 @@ class IPCP : public KPPPProtocol {
 		void InitializeRestartCount();
 		void ResetRestartCount();
 		bool SendConfigureRequest();
-		bool SendConfigureAck(struct mbuf *packet);
-		bool SendConfigureNak(struct mbuf *packet);
+		bool SendConfigureAck(net_buffer *packet);
+		bool SendConfigureNak(net_buffer *packet);
 		bool SendTerminateRequest();
-		bool SendTerminateAck(struct mbuf *request = NULL);
-		bool SendCodeReject(struct mbuf *packet);
+		bool SendTerminateAck(net_buffer *request = NULL);
+		bool SendCodeReject(net_buffer *packet);
 
 	private:
 		ipcp_configuration fLocalConfiguration, fPeerConfiguration;
 		ipcp_requests fLocalRequests, fPeerRequests;
-		
+
 		// default route
 		struct sockaddr_in fGateway;
-		rtentry *fDefaultRoute;
-		
+		net_route *fDefaultRoute;
+
 		// used for local requests
 		bool fRequestPrimaryDNS, fRequestSecondaryDNS;
-		
+
 		// for state machine
 		ppp_state fState;
-		vint32 fID;
-		
+		int32 fID;
+
 		// counters and timers
 		int32 fMaxRequest, fMaxTerminate, fMaxNak;
 		int32 fRequestCounter, fTerminateCounter, fNakCounter;

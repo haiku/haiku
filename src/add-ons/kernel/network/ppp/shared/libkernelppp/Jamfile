@@ -10,6 +10,9 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net ;
+
 UsePrivateHeaders libroot net ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
@@ -37,7 +40,6 @@ KernelStaticLibrary libkernelppp.a :
 	KPPPReportManager.cpp
 	KPPPStateMachine.cpp
 	KPPPUtils.cpp
-	Locker.cpp
 	settings_tools.cpp
 	
 	# integrated modules
@@ -49,7 +51,5 @@ KernelStaticLibrary libkernelppp.a :
 
 SEARCH on [ FGristFiles kernel_cpp.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-SEARCH on [ FGristFiles Locker.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager ] ;
 SEARCH on [ FGristFiles atomic.S ]
 	= [ FDirName $(HAIKU_TOP) src system libroot os arch $(TARGET_ARCH) ] ;

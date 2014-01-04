@@ -3,10 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <ByteOrder.h>
+#include <NetBufferUtilities.h>
+#include <net_buffer.h>
+
 #include "DiscoveryPacket.h"
-
-#include <core_funcs.h>
-
 
 DiscoveryPacket::DiscoveryPacket(uint8 code, uint16 sessionID)
 	: fCode(code),
@@ -16,18 +17,26 @@ DiscoveryPacket::DiscoveryPacket(uint8 code, uint16 sessionID)
 }
 
 
-DiscoveryPacket::DiscoveryPacket(struct mbuf *packet, uint32 start)
+DiscoveryPacket::DiscoveryPacket(net_buffer *packet, uint32 start)
 {
 	// decode packet
-	uint8 *data = mtod(packet, uint8*);
-	data += start;
-	pppoe_header *header = (pppoe_header*) data;
+	NetBufferHeaderReader<pppoe_header> bufferheader(packet);
+	if (bufferheader.Status() != B_OK) {
+		dprintf("NetBufferHeaderReader create fail\n");
+		fInitStatus = B_ERROR;
+		return;
+	}
+	pppoe_header &header = bufferheader.Data();
 	
-	SetCode(header->code);
+	SetCode(header.code);
 	
-	uint16 length = ntohs(header->length);
+	uint16 length = ntohs(header.length);
 	
-	if(length > packet->m_len - PPPoE_HEADER_SIZE - start) {
+	if(length > packet->size - PPPoE_HEADER_SIZE) {
+		dprintf("packet size less than pppoe payload\n");
+		dprintf("pppoe payload:%d\n", length);
+		dprintf("PPPoE_HEADER_SIZE:%d\n", PPPoE_HEADER_SIZE);
+		dprintf("packet->size:%ld\n", packet->size);
 		fInitStatus = B_ERROR;
 		return;
 			// there are no tags (or one corrupted tag)
@@ -37,7 +46,7 @@ DiscoveryPacket::DiscoveryPacket(struct mbuf *packet, uint32 start)
 	pppoe_tag *tag;
 	
 	while(position <= length - 4) {
-		tag = (pppoe_tag*) (header->data + position);
+		tag = (pppoe_tag*) (header.data + position);
 		position += ntohs(tag->length) + 4;
 		
 		AddTag(ntohs(tag->type), tag->data, ntohs(tag->length));
@@ -116,13 +125,21 @@ DiscoveryPacket::TagWithType(uint16 type) const
 }
 
 
-struct mbuf*
-DiscoveryPacket::ToMbuf(uint32 MTU, uint32 reserve)
+net_buffer*
+DiscoveryPacket::ToNetBuffer(uint32 MTU)
 {
-	struct mbuf *packet = m_gethdr(MT_DATA);
-	packet->m_data += reserve;
-	
-	pppoe_header *header = mtod(packet, pppoe_header*);
+	net_buffer *packet = gBufferModule->create(256);
+	if (packet == NULL) {
+		dprintf("create buffer failure\n");
+		return NULL;
+	}
+
+	pppoe_header *header ;
+	status_t status = gBufferModule->append_size(packet, 1492, (void **)&header);
+	if (status != B_OK) {
+		dprintf("append size failure\n");
+		return NULL;
+	}
 	
 	header->version = PPPoE_VERSION;
 	header->type = PPPoE_TYPE;
@@ -137,7 +154,7 @@ DiscoveryPacket::ToMbuf(uint32 MTU, uint32 reserve)
 		
 		// make sure we have enough space left
 		if(MTU - length < tag->length) {
-			m_freem(packet);
+			gBufferModule->free(packet);
 			return NULL;
 		}
 		
@@ -150,7 +167,11 @@ DiscoveryPacket::ToMbuf(uint32 MTU, uint32 reserve)
 	}
 	
 	header->length = htons(length);
-	packet->m_pkthdr.len = packet->m_len = length + PPPoE_HEADER_SIZE;
-	
+	status = gBufferModule->trim(packet, length + PPPoE_HEADER_SIZE);
+	if (status != B_OK) {
+		dprintf("trim buffer failure\n");
+		return NULL;
+	}
+
 	return packet;
 }

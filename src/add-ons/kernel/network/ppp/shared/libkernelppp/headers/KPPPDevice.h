@@ -9,6 +9,8 @@
 #include <KPPPDefs.h>
 #include <KPPPLayer.h>
 
+#include <net_buffer.h>
+
 #ifndef _K_PPP_INTERFACE__H
 #include <KPPPInterface.h>
 #endif
@@ -96,8 +98,8 @@ class KPPPDevice : public KPPPLayer {
 			This should enqueue the packet and return immediately (never block).
 			The device is responsible for freeing the packet by calling \c m_freem().
 		*/
-		virtual status_t Send(struct mbuf *packet, uint16 protocolNumber) = 0;
-		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber);
+		virtual status_t Send(net_buffer *packet, uint16 protocolNumber) = 0;
+		virtual status_t Receive(net_buffer *packet, uint16 protocolNumber);
 
 	protected:
 		//!	Use this to set the device's maximum transfer unit (in bytes).

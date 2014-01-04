@@ -6,6 +6,7 @@
 #ifndef _PPP_MANAGER__H
 #define _PPP_MANAGER__H
 
+#include <Directory.h>
 #include <KPPPManager.h>
 #include <String.h>
 
@@ -33,6 +34,7 @@ class PPPManager {
 		ppp_interface_id CreateInterface(const driver_settings *settings) const;
 		ppp_interface_id CreateInterfaceWithName(const char *name) const;
 		bool DeleteInterface(ppp_interface_id ID) const;
+		bool DeleteInterface(const char* name) const;
 		
 		ppp_interface_id *Interfaces(int32 *count,
 			ppp_interface_filter filter = PPP_REGISTERED_INTERFACES) const;

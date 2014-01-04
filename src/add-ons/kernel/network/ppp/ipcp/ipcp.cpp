@@ -5,20 +5,23 @@
 
 #include <KernelExport.h>
 #include <driver_settings.h>
-#include <core_funcs.h>
-#include <net_module.h>
 
+#include <NetBufferUtilities.h>
+#include <net_buffer.h>
+#include <net_stack.h>
+
+#include <KPPPDefs.h>
 #include <KPPPInterface.h>
 #include <KPPPModule.h>
 
 #include "Protocol.h"
 
+#define IPCP_MODULE_NAME		NETWORK_MODULES_ROOT "/ppp/ipcp"
 
-#define IPCP_MODULE_NAME		NETWORK_MODULES_ROOT "ppp/ipcp"
-
-struct protosw *gProto[IPPROTO_MAX];
-struct core_module_info *core = NULL;
 status_t std_ops(int32 op, ...);
+
+net_stack_module_info *gStackModule = NULL;
+net_buffer_module_info *gBufferModule = NULL;
 
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -28,7 +31,7 @@ extern "C"
 int
 isascii(char c)
 {
-	return c & ~0x7f == 0; // If c is a 7 bit value.
+	return ((c & (~0x7f)) == 0); // If c is a 7 bit value.
 }
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
@@ -38,22 +41,22 @@ bool
 add_to(KPPPInterface& mainInterface, KPPPInterface *subInterface,
 	driver_parameter *settings, ppp_module_key_type type)
 {
-	if(type != PPP_PROTOCOL_KEY_TYPE)
+	if (type != PPP_PROTOCOL_KEY_TYPE)
 		return B_ERROR;
-	
+
 	IPCP *ipcp;
 	bool success;
-	if(subInterface) {
+	if (subInterface) {
 		ipcp = new IPCP(*subInterface, settings);
 		success = subInterface->AddProtocol(ipcp);
 	} else {
 		ipcp = new IPCP(mainInterface, settings);
 		success = mainInterface.AddProtocol(ipcp);
 	}
-	
+
 	TRACE("IPCP: add_to(): %s\n",
 		success && ipcp && ipcp->InitCheck() == B_OK ? "OK" : "ERROR");
-	
+
 	return success && ipcp && ipcp->InitCheck() == B_OK;
 }
 
@@ -71,24 +74,30 @@ static ppp_module_info ipcp_module = {
 
 _EXPORT
 status_t
-std_ops(int32 op, ...) 
+std_ops(int32 op, ...)
 {
-	switch(op) {
+	switch (op) {
 		case B_MODULE_INIT:
-			if(get_module(NET_CORE_MODULE_NAME, (module_info**) &core) != B_OK)
+			if (get_module(NET_STACK_MODULE_NAME,
+					(module_info**) &gStackModule) != B_OK)
 				return B_ERROR;
-			memset(gProto, 0, sizeof(struct protosw*) * IPPROTO_MAX);
-			add_protosw(gProto, NET_LAYER1);
-		return B_OK;
-		
+			if (get_module(NET_BUFFER_MODULE_NAME,
+					(module_info **)&gBufferModule) != B_OK) {
+				put_module(NET_STACK_MODULE_NAME);
+				return B_ERROR;
+			}
+			return B_OK;
+			break;
+
 		case B_MODULE_UNINIT:
-			put_module(NET_CORE_MODULE_NAME);
-		break;
-		
+			put_module(NET_BUFFER_MODULE_NAME);
+			put_module(NET_STACK_MODULE_NAME);
+			break;
+
 		default:
 			return B_ERROR;
 	}
-	
+
 	return B_OK;
 }
 

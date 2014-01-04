@@ -250,7 +250,7 @@ AddFilesToPackage add-ons kernel network : dns_resolver ;
 AddFilesToPackage add-ons kernel network devices : $(SYSTEM_NETWORK_DEVICES) ;
 AddFilesToPackage add-ons kernel network datalink_protocols
 	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
-AddFilesToPackage add-ons kernel network ppp: $(SYSTEM_NETWORK_PPP) ;
+AddFilesToPackage add-ons kernel network ppp : $(SYSTEM_NETWORK_PPP) ;
 AddFilesToPackage add-ons kernel network protocols
 	: $(SYSTEM_NETWORK_PROTOCOLS) ;
 

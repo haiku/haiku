@@ -58,6 +58,7 @@ KPPPLCPExtension::InitCheck() const
 status_t
 KPPPLCPExtension::Control(uint32 op, void *data, size_t length)
 {
+	dprintf("KPPPLCPExtension::Control\n");
 	switch (op) {
 		case PPPC_GET_SIMPLE_HANDLER_INFO:
 		{

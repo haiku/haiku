@@ -1,41 +1,51 @@
 SubDir HAIKU_TOP src add-ons kernel network ppp ipcp ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+SubDirC++Flags -fno-rtti ;
 
 if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-		# We need the public network headers also when not compiling for Haiku.
-		# Unfortunately we get more than we want, namely all POSIX headers.
+	UseHeaders [ FStandardOSHeaders ] : true ;
+		# Needed for the atomic_add64() prototype.
 }
 
-# for kernel_cpp.h and BLocker
-UseHeaders [ FDirName $(HAIKU_TOP) headers cpp ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+	# We need the public network headers also when not compiling for Haiku.
+	# Unfortunately we get more than we want, namely all POSIX headers.
+
+UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
+
+UsePrivateHeaders libroot net ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 	libkernelppp headers ] : true ;
-
-
-{
-	SubDirC++Flags -fno-rtti ;
-}
-
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp pppoe
+	] : true ;
 
 KernelAddon ipcp :
-	# imported from libnet
+	atomic.S
+	kernel_cpp.cpp
+
+	# imported from kernel util
 	inet_addr.c
-	
+
 	ipcp.cpp
 	Protocol.cpp
 ;
 
+
 SEARCH on [ FGristFiles inet_addr.c ]
-	= [ FDirName $(HAIKU_TOP) src kits network compat libnet ] ;
+	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+SEARCH on [ FGristFiles kernel_cpp.cpp ]
+        = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+SEARCH on [ FGristFiles atomic.S ]
+        = [ FDirName $(HAIKU_TOP) src system libroot os arch $(TARGET_ARCH) ] ;
 
 LinkAgainst ipcp : libkernelppp.a ;
 
-# Installation
+
 HaikuInstall install-networking
-	: /boot/home/config/add-ons/kernel/obos_network/ppp
+	: /boot/home/config/add-ons/kernel/network/ppp
 	: ipcp ;

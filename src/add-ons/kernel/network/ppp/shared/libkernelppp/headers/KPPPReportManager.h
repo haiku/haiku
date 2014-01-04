@@ -13,10 +13,13 @@
 
 #include <TemplateList.h>
 
+#include <lock.h>
+#include <util/AutoLock.h>
+
 
 class KPPPReportManager {
 	public:
-		KPPPReportManager(BLocker& lock);
+		KPPPReportManager(mutex& lock);
 		~KPPPReportManager();
 		
 		static bool SendReport(thread_id thread, const ppp_report_packet *report);
@@ -30,7 +33,7 @@ class KPPPReportManager {
 			// returns false if reply was bad (or an error occured)
 
 	private:
-		BLocker& fLock;
+		mutex& fLock;
 		TemplateList<ppp_report_request*> fReportRequests;
 };
 

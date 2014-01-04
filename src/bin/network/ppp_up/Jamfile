@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src bin ppp_up ;
+SubDir HAIKU_TOP src bin network ppp_up ;
 
 SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
@@ -8,7 +8,10 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
-UsePrivateHeaders net ;
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net app libroot shared interface libbe be root tracker textencoding
+			root ;
+
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp
 	headers ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
@@ -24,7 +27,7 @@ BinCommand ppp_up :
 	PPPStatusWindow.cpp
 	PPPUpApplication.cpp
 	:
-	libppp.a be
+	libppp.a be $(TARGET_LIBSUPC++) translation $(HAIKU_LOCALE_LIBS) root $(TARGET_NETWORK_LIBS)
 ;
 
 # Installation

@@ -31,11 +31,12 @@ class PAP;
 class PAPHandler : public KPPPOptionHandler {
 	public:
 		PAPHandler(PAP& owner, KPPPInterface& interface);
-		
+
 		PAP& Owner() const
 			{ return fOwner; }
-		
+
 		virtual status_t AddToRequest(KPPPConfigurePacket& request);
+		virtual status_t SendingAck(const KPPPConfigurePacket&);
 		virtual status_t ParseRequest(const KPPPConfigurePacket& request,
 			int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject);
 
@@ -48,17 +49,17 @@ class PAP : public KPPPProtocol {
 	public:
 		PAP(KPPPInterface& interface, driver_parameter *settings);
 		virtual ~PAP();
-		
+
 		virtual status_t InitCheck() const;
-		
+
 		pap_state State() const
 			{ return fState; }
-		
+
 		virtual bool Up();
 		virtual bool Down();
-		
-		virtual status_t Send(struct mbuf *packet, uint16 protocolNumber);
-		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber);
+
+		virtual status_t Send(net_buffer *packet, uint16 protocolNumber);
+		virtual status_t Receive(net_buffer *packet, uint16 protocolNumber);
 		virtual void Pulse();
 
 	private:
@@ -66,28 +67,28 @@ class PAP : public KPPPProtocol {
 		void NewState(pap_state next);
 		uint8 NextID();
 			// return the next id for PAP packets
-		
+
 		// events
 		void TOGoodEvent();
 		void TOBadEvent();
-		void RREvent(struct mbuf *packet);
-		void RAEvent(struct mbuf *packet);
-		void RNEvent(struct mbuf *packet);
-		
+		void RREvent(net_buffer *packet);
+		void RAEvent(net_buffer *packet);
+		void RNEvent(net_buffer *packet);
+
 		// actions
 		void ReportUpFailedEvent();
 		void ReportUpEvent();
 		void ReportDownEvent();
 		void InitializeRestartCount();
 		bool SendRequest();
-		bool SendAck(struct mbuf *packet);
-		bool SendNak(struct mbuf *packet);
+		bool SendAck(net_buffer *packet);
+		bool SendNak(net_buffer *packet);
 
 	private:
 		// for state machine
 		pap_state fState;
-		vint32 fID;
-		
+		int32 fID;
+
 		// counters and timers
 		int32 fMaxRequest;
 		int32 fRequestCounter;

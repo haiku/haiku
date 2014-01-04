@@ -7,8 +7,7 @@
 #define _K_PPP_CONFIGURE_PACKET__H
 
 #include <TemplateList.h>
-
-struct mbuf;
+#include <net_buffer.h>
 
 //!	An abstract configure item.
 typedef struct ppp_configure_item {
@@ -29,7 +28,7 @@ class KPPPConfigurePacket {
 
 	public:
 		KPPPConfigurePacket(uint8 code);
-		KPPPConfigurePacket(struct mbuf *packet);
+		KPPPConfigurePacket(net_buffer *packet);
 		~KPPPConfigurePacket();
 		
 		bool SetCode(uint8 code);
@@ -52,8 +51,8 @@ class KPPPConfigurePacket {
 		ppp_configure_item *ItemAt(int32 index) const;
 		ppp_configure_item *ItemWithType(uint8 type) const;
 		
-		struct mbuf *ToMbuf(uint32 MRU, uint32 reserve = 0);
-			// the user is responsible for freeing the mbuf
+		net_buffer *ToNetBuffer(uint32 MRU);
+			// the user is responsible for freeing the net_buffer
 
 	private:
 		uint8 fCode, fID;

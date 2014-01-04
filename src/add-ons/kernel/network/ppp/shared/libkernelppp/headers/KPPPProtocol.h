@@ -105,9 +105,9 @@ class KPPPProtocol : public KPPPLayer {
 		virtual bool IsAllowedToSend() const;
 		
 		//!	Encapsulate the packet with the given protocol number.
-		virtual status_t Send(struct mbuf *packet, uint16 protocolNumber) = 0;
+		virtual status_t Send(net_buffer *packet, uint16 protocolNumber) = 0;
 		//!	Receive a packet with the given protocol number.
-		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber) = 0;
+		virtual status_t Receive(net_buffer *packet, uint16 protocolNumber) = 0;
 
 	protected:
 		//!	\brief Requests Up() to be called.

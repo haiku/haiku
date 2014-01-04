@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src bin pppconfig ;
+SubDir HAIKU_TOP src bin network pppconfig ;
 
 SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
@@ -8,6 +8,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
+UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp
 	headers ] : true ;
@@ -17,7 +18,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 BinCommand pppconfig :
 	pppconfig.cpp
 	:
-	be libppp.a
+	be libppp.a $(TARGET_LIBSUPC++) $(TARGET_NETWORK_LIBS)
 ;
 
 # Installation -- in the test directory for the time being

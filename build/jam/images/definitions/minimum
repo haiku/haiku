@@ -134,7 +134,7 @@ SYSTEM_NETWORK_DATALINK_PROTOCOLS =
 	loopback_frame
 ;
 
-#SYSTEM_NETWORK_PPP = ipcp modem pap pppoe ;
+#SYSTEM_NETWORK_PPP = ipcp modem pap pppoe KPPPManager ;
 
 SYSTEM_NETWORK_PROTOCOLS =
 	icmp icmp6 ipv4 ipv6

@@ -20,6 +20,9 @@
 #include <KPPPStateMachine.h>
 #endif
 
+#include <net_buffer.h>
+#include <NetBufferUtilities.h>
+
 class KPPPLCPExtension;
 class KPPPOptionHandler;
 
@@ -79,15 +82,12 @@ class KPPPLCP : public KPPPProtocol {
 		KPPPProtocol *Target() const
 			{ return fTarget; }
 		
-		uint32 AdditionalOverhead() const;
-			// the overhead caused by the target, the device, and the interface
-		
 		virtual bool Up();
 		virtual bool Down();
 		
-		virtual status_t Send(struct mbuf *packet,
+		virtual status_t Send(net_buffer *packet,
 			uint16 protocolNumber = PPP_LCP_PROTOCOL);
-		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber);
+		virtual status_t Receive(net_buffer *packet, uint16 protocolNumber);
 		
 		virtual void Pulse();
 

@@ -30,6 +30,12 @@
 
 #include <TemplateList.h>
 
+#include <net_buffer.h>
+#include <net_device.h>
+
+#include <lock.h>
+#include <util/AutoLock.h>
+
 class KPPPDevice;
 class KPPPProtocol;
 class KPPPOptionHandler;
@@ -48,6 +54,8 @@ class KPPPInterface : public KPPPLayer {
 		KPPPInterface(const KPPPInterface& copy);
 		KPPPInterface& operator= (const KPPPInterface& copy);
 		
+	public:
+		// we should set to private after finishing test
 		// only PPPManager may construct us!
 		KPPPInterface(const char *name, ppp_interface_entry *entry,
 			ppp_interface_id ID, const driver_settings *settings,
@@ -75,8 +83,8 @@ class KPPPInterface : public KPPPLayer {
 			{ return fLCP; }
 		
 		//!	Returns the interfac's ifnet structure that is exported to the netstack.
-		struct ifnet *Ifnet() const
-			{ return fIfnet; }
+		net_device *Ifnet() const
+		 	{ return fIfnet; }
 		
 		const char *Username() const;
 		const char *Password() const;
@@ -220,11 +228,11 @@ class KPPPInterface : public KPPPLayer {
 		virtual bool IsAllowedToSend() const;
 			// always returns true
 		
-		virtual status_t Send(struct mbuf *packet, uint16 protocolNumber);
+		virtual status_t Send(net_buffer *packet, uint16 protocolNumber);
 			// sends the packet to the next handler (normally the device)
-		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber);
+		virtual status_t Receive(net_buffer *packet, uint16 protocolNumber);
 		
-		status_t ReceiveFromDevice(struct mbuf *packet);
+		status_t ReceiveFromDevice(net_buffer *packet);
 			// This must not block KPPPDevice::Send()!
 		
 		void Pulse();
@@ -255,7 +263,7 @@ class KPPPInterface : public KPPPLayer {
 		ppp_interface_id fID;
 			// the manager assigns an ID to every interface
 		driver_settings *fSettings;
-		struct ifnet *fIfnet;
+		net_device *fIfnet;
 		
 		char *fUsername, *fPassword;
 		
@@ -288,7 +296,7 @@ class KPPPInterface : public KPPPLayer {
 		KPPPStateMachine fStateMachine;
 		KPPPLCP fLCP;
 		KPPPReportManager fReportManager;
-		BLocker& fLock;
+		mutex& fLock;
 		int32 fDeleteCounter;
 };
 

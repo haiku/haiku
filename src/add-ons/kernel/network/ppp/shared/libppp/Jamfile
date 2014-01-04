@@ -10,6 +10,7 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
+UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp
 	headers ] : true ;
@@ -19,18 +20,18 @@ UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 
 StaticLibrary libppp.a :
 	strlcat.c
-	driver_settings.c
+	driver_settings.cpp
 	settings_tools.cpp
 	KPPPUtils.cpp
-	
-	_libppputils.cpp
+
 	PPPInterface.cpp
 	PPPInterfaceListener.cpp
 	PPPManager.cpp
 	MessageDriverSettingsUtils.cpp
+	: libnetwork.so libbnetapi.so
 ;
 
 SEARCH on [ FGristFiles strlcat.c ] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
-SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
+SEARCH on [ FGristFiles driver_settings.cpp ] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 SEARCH on [ FGristFiles settings_tools.cpp ] = [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 SEARCH on [ FGristFiles KPPPUtils.cpp ] = [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp ] ;

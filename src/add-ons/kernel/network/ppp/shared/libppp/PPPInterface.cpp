@@ -13,12 +13,19 @@
 #include "PPPInterface.h"
 
 #include <cstring>
+#include <cstdlib>
+#include <cstdio>
+#include <cctype>
 #include <unistd.h>
-#include "_libppputils.h"
 
 #include <Path.h>
 #include <Directory.h>
 #include <Entry.h>
+
+#include <net/if.h>
+
+#include <NetworkDevice.h>
+#include <NetworkInterface.h>
 
 
 /*!	\brief Sets the interface to \a ID.
@@ -27,7 +34,9 @@
 */
 PPPInterface::PPPInterface(ppp_interface_id ID)
 {
-	fFD = open(get_stack_driver_path(), O_RDWR);
+	// printf("direct constructor\n");
+	int family = AF_INET;
+	fFD = socket(family, SOCK_DGRAM, 0);
 	
 	SetTo(ID);
 }
@@ -36,7 +45,10 @@ PPPInterface::PPPInterface(ppp_interface_id ID)
 //!	Copy constructor.
 PPPInterface::PPPInterface(const PPPInterface& copy)
 {
-	fFD = open(get_stack_driver_path(), O_RDWR);
+	// printf("Copy constructor\n");
+	// fFD = open(get_stack_driver_path(), O_RDWR);
+	int family = AF_INET;
+	fFD = socket(family, SOCK_DGRAM, 0);
 	
 	SetTo(copy.ID());
 }
@@ -45,6 +57,7 @@ PPPInterface::PPPInterface(const PPPInterface& copy)
 //!	Destructor.
 PPPInterface::~PPPInterface()
 {
+	// printf("Destructor\n");
 	if (fFD >= 0)
 		close(fFD);
 }
@@ -64,6 +77,7 @@ PPPInterface::InitCheck() const
 {
 	if (fFD < 0)
 		return B_ERROR;
+
 	if (fID == PPP_UNDEFINED_INTERFACE_ID)
 		return B_BAD_INDEX;
 	
@@ -87,19 +101,29 @@ PPPInterface::InitCheck() const
 status_t
 PPPInterface::SetTo(ppp_interface_id ID)
 {
-	if (fFD < 0)
+	// printf("Set To %ld begin=============================\n", ID);
+	if (fFD < 0) {
+		printf("No fFD\n");
 		return B_ERROR;
+	}
+
+	fID = ID;
 	
 	ppp_interface_info_t info;
+	// printf("SetTo info:%p\n", &info);
 	if (GetInterfaceInfo(&info)) {
 		fName = info.info.name;
 		fID = ID;
+		// printf("%s fine: name:%s, fID:%ld\n", __func__, info.info.name, fID);
 	} else {
 		fName = "";
 		fID = PPP_UNDEFINED_INTERFACE_ID;
+		// printf("%s fail: name:%s, fID:%ld\n", __func__, "", fID);
 		return B_ERROR;
 	}
 	
+	// printf("Set To %ld end =============================\n", ID);
+
 	return B_OK;
 }
 
@@ -119,23 +143,32 @@ PPPInterface::SetTo(ppp_interface_id ID)
 status_t
 PPPInterface::Control(uint32 op, void *data, size_t length) const
 {
-	if (InitCheck() != B_OK)
+	if (InitCheck() != B_OK) {
+		printf("%s:InitCheck fail\n", __func__);
 		return InitCheck();
-	
-	ppp_control_info control;
+	}
+
+	ppp_control_info info;
 	control_net_module_args args;
-	
+
+	sprintf(args.ifr_name, "%s", "ppp1");
 	args.name = PPP_INTERFACE_MODULE_NAME;
 	args.op = PPPC_CONTROL_INTERFACE;
-	args.data = &control;
-	args.length = sizeof(control);
-	
-	control.index = ID();
-	control.op = op;
-	control.data = data;
-	control.length = length;
-	
-	return ioctl(fFD, NET_STACK_CONTROL_NET_MODULE, &args);
+	args.data = &info;
+	args.length = sizeof(ppp_control_info);
+
+	info.index = ID();
+	info.op = op;
+	info.data = data;
+	info.length = length;
+
+	printf("PPPInterface::Control: ppp_control_info %p control_net_module_args %p data %p \n", &info, &args, data);
+
+	status_t status = ioctl(fFD, NET_STACK_CONTROL_NET_MODULE, &args);
+	if (status != B_OK)
+		printf("%s:%s: fail\n", __FILE__, __func__);
+
+	return status;
 }
 
 
@@ -143,6 +176,7 @@ PPPInterface::Control(uint32 op, void *data, size_t length) const
 bool
 PPPInterface::SetUsername(const char *username) const
 {
+	printf("PPPInterface::SetUsername\n");
 	if (InitCheck() != B_OK || !username)
 		return false;
 	
@@ -155,6 +189,7 @@ PPPInterface::SetUsername(const char *username) const
 bool
 PPPInterface::SetPassword(const char *password) const
 {
+	printf("PPPInterface::SetPassword\n");
 	if (InitCheck() != B_OK || !password)
 		return false;
 	
@@ -167,6 +202,7 @@ PPPInterface::SetPassword(const char *password) const
 bool
 PPPInterface::SetAskBeforeConnecting(bool askBeforeConnecting) const
 {
+	printf("PPPInterface::SetAskBeforeConnecting\n");
 	if (InitCheck() != B_OK)
 		return false;
 	
@@ -188,6 +224,7 @@ PPPInterface::SetAskBeforeConnecting(bool askBeforeConnecting) const
 status_t
 PPPInterface::GetSettingsEntry(BEntry *entry) const
 {
+	printf("PPPInterface::GetSettingsEntry\n");
 	if (InitCheck() != B_OK)
 		return InitCheck();
 	else if (!entry || strlen(Name()) == 0)
@@ -205,10 +242,103 @@ PPPInterface::GetSettingsEntry(BEntry *entry) const
 bool
 PPPInterface::GetInterfaceInfo(ppp_interface_info_t *info) const
 {
+	// printf("%s info at:%p", __func__, info);
+	if (InitCheck() != B_OK || !info) {
+		// printf("InitCheck fail %s info at:%p", __func__, info);
+		return false;
+	}
+	
+	return Control(PPPC_GET_INTERFACE_INFO, info, sizeof(ppp_interface_info_t)) 
+		== B_OK;
+}
+
+
+bool
+PPPInterface::ControlDevice(ppp_device_info_t *info) const
+{
+	// printf("%s info at:%p", __func__, info);
 	if (InitCheck() != B_OK || !info)
 		return false;
-	
-	return Control(PPPC_GET_INTERFACE_INFO, &info, sizeof(ppp_interface_info_t))
+
+	ppp_control_info controlInfo;
+	controlInfo.op = PPPC_GET_DEVICE_INFO;
+	controlInfo.index = 0;
+	controlInfo.data = info;
+	controlInfo.length = sizeof(ppp_device_info_t);
+
+	return Control(PPPC_CONTROL_DEVICE, &controlInfo, sizeof(ppp_control_info))
+		== B_OK;
+}
+
+
+bool
+PPPInterface::ControlOptionHandler(ppp_simple_handler_info_t *info, uint32 handlerindex, uint32 handlerOP) const
+{
+	// printf("%s info at:%p", __func__, info);
+	if (InitCheck() != B_OK || !info)
+		return false;
+
+	ppp_control_info controlInfo;
+	controlInfo.index = handlerindex;
+	controlInfo.op = handlerOP;
+	controlInfo.data = info;
+	controlInfo.length = sizeof(ppp_simple_handler_info_t);
+
+	return Control(PPPC_CONTROL_OPTION_HANDLER, &controlInfo, sizeof(ppp_control_info))
+		== B_OK;
+}
+
+
+bool
+PPPInterface::ControlChild(void *info, uint32 childindex, uint32 childOP) const
+{
+	// printf("%s info at:%p", __func__, info);
+	if (InitCheck() != B_OK || !info)
+		return false;
+
+	ppp_control_info controlInfo;
+	controlInfo.index = childindex;
+	controlInfo.op = childOP;
+	controlInfo.data = info;
+	// controlInfo.length = sizeof(ppp_simple_handler_info_t);
+
+	return Control(PPPC_CONTROL_CHILD, &controlInfo, sizeof(ppp_control_info))
+		== B_OK;
+}
+
+
+bool
+PPPInterface::ControlLCPExtension(ppp_simple_handler_info_t *info, uint32 LCPExtensionindex, uint32 LCPExtensionOP) const
+{
+	// printf("%s info at:%p", __func__, info);
+	if (InitCheck() != B_OK || !info)
+		return false;
+
+	ppp_control_info controlInfo;
+	controlInfo.index = LCPExtensionindex;
+	controlInfo.op = LCPExtensionOP;
+	controlInfo.data = info;
+	controlInfo.length = sizeof(ppp_simple_handler_info_t);
+
+	return Control(PPPC_CONTROL_LCP_EXTENSION, &controlInfo, sizeof(ppp_control_info))
+		== B_OK;
+}
+
+
+bool
+PPPInterface::ControlProtocol(ppp_protocol_info_t *info, uint32 protocolindex, uint32 protocolOP) const
+{
+	// printf("%s info at:%p", __func__, info);
+	if (InitCheck() != B_OK || !info)
+		return false;
+
+	ppp_control_info controlInfo;
+	controlInfo.index = protocolindex;
+	controlInfo.op = protocolOP;
+	controlInfo.data = info;
+	controlInfo.length = sizeof(ppp_protocol_info_t);
+
+	return Control(PPPC_CONTROL_PROTOCOL, &controlInfo, sizeof(ppp_control_info))
 		== B_OK;
 }
 
@@ -222,6 +352,7 @@ PPPInterface::GetInterfaceInfo(ppp_interface_info_t *info) const
 bool
 PPPInterface::GetStatistics(ppp_statistics *statistics) const
 {
+	printf("PPPInterface::GetStatistics\n");
 	if (!statistics)
 		return false;
 	
@@ -233,6 +364,7 @@ PPPInterface::GetStatistics(ppp_statistics *statistics) const
 bool
 PPPInterface::HasSettings(const driver_settings *settings) const
 {
+	printf("PPPInterface::HasSettings\n");
 	if (InitCheck() != B_OK || !settings)
 		return false;
 	
@@ -250,9 +382,24 @@ PPPInterface::Up() const
 {
 	if (InitCheck() != B_OK)
 		return false;
-	
+
+	BNetworkInterface interface(Name());
+	if (!interface.Exists())
+		return false;
+
+	int32 currentFlags = interface.Flags();
+	currentFlags |= IFF_UP;
+
+	status_t status = interface.SetFlags(currentFlags);
+
+	if (status != B_OK)
+		return false;
+
+	return true;
+
 	int32 id = ID();
 	control_net_module_args args;
+	sprintf(args.ifr_name, "%s", "ppp1");
 	args.name = PPP_INTERFACE_MODULE_NAME;
 	args.op = PPPC_BRING_INTERFACE_UP;
 	args.data = &id;
@@ -268,9 +415,24 @@ PPPInterface::Down() const
 {
 	if (InitCheck() != B_OK)
 		return false;
-	
+
+	BNetworkInterface interface(Name());
+	if (!interface.Exists())
+		return false;
+
+	int32 currentFlags = interface.Flags();
+	currentFlags &= ~IFF_UP;
+
+	status_t status = interface.SetFlags(currentFlags);
+
+	if (status != B_OK)
+		return false;
+
+	return true;
+
 	int32 id = ID();
 	control_net_module_args args;
+	sprintf(args.ifr_name, "%s", "ppp1");
 	args.name = PPP_INTERFACE_MODULE_NAME;
 	args.op = PPPC_BRING_INTERFACE_DOWN;
 	args.data = &id;
@@ -292,6 +454,7 @@ bool
 PPPInterface::EnableReports(ppp_report_type type, thread_id thread,
 	int32 flags) const
 {
+	printf("PPPInterface::EnableReports\n");
 	ppp_report_request request;
 	request.type = type;
 	request.thread = thread;
@@ -311,6 +474,7 @@ PPPInterface::EnableReports(ppp_report_type type, thread_id thread,
 bool
 PPPInterface::DisableReports(ppp_report_type type, thread_id thread) const
 {
+	printf("PPPInterface::DisableReports\n");
 	ppp_report_request request;
 	request.type = type;
 	request.thread = thread;
