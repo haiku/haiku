@@ -392,14 +392,6 @@ CoreEntry::Remove(ThreadData* thread)
 }
 
 
-inline ThreadData*
-CoreEntry::PeekThread() const
-{
-	SCHEDULER_ENTER_FUNCTION();
-	return fRunQueue.PeekMaximum();
-}
-
-
 void
 CoreEntry::UpdateLoad(int32 delta)
 {
@@ -451,26 +443,6 @@ CoreEntry::UpdateLoad(int32 delta)
 		else
 			gCoreLoadHeap.ModifyKey(this, newKey);
 	}
-}
-
-
-inline void
-CoreEntry::CPUGoesIdle(CPUEntry* /* cpu */)
-{
-	ASSERT(fCPUIdleCount < fCPUCount);
-
-	if (++fCPUIdleCount == fCPUCount)
-		fPackage->CoreGoesIdle(this);
-}
-
-
-inline void
-CoreEntry::CPUWakesUp(CPUEntry* /* cpu */)
-{
-	ASSERT(fCPUIdleCount > 0);
-
-	if (fCPUIdleCount-- == fCPUCount)
-		fPackage->CoreWakesUp(this);
 }
 
 
@@ -596,48 +568,6 @@ void
 PackageEntry::Init(int32 id)
 {
 	fPackageID = id;
-}
-
-
-inline void
-PackageEntry::CoreGoesIdle(CoreEntry* core)
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	WriteSpinLocker _(fCoreLock);
-
-	ASSERT(fIdleCoreCount >= 0);
-	ASSERT(fIdleCoreCount < fCoreCount);
-
-	fIdleCoreCount++;
-	fIdleCores.Add(core);
-
-	if (fIdleCoreCount == fCoreCount) {
-		// package goes idle
-		WriteSpinLocker _(gIdlePackageLock);
-		gIdlePackageList.Add(this);
-	}
-}
-
-
-inline void
-PackageEntry::CoreWakesUp(CoreEntry* core)
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	WriteSpinLocker _(fCoreLock);
-
-	ASSERT(fIdleCoreCount > 0);
-	ASSERT(fIdleCoreCount <= fCoreCount);
-
-	fIdleCoreCount--;
-	fIdleCores.Remove(core);
-
-	if (fIdleCoreCount + 1 == fCoreCount) {
-		// package wakes up
-		WriteSpinLocker _(gIdlePackageLock);
-		gIdlePackageList.Remove(this);
-	}
 }
 
 

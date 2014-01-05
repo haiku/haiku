@@ -41,7 +41,7 @@ typedef void (*smp_call_func)(addr_t data1, int32 currentCPU, addr_t data2, addr
 
 class CPUSet {
 public:
-						CPUSet() { ClearAll(); }
+	inline				CPUSet();
 
 	inline	void		ClearAll();
 	inline	void		SetAll();
@@ -90,6 +90,13 @@ int smp_intercpu_int_handler(int32 cpu);
 #ifdef __cplusplus
 }
 #endif
+
+
+inline
+CPUSet::CPUSet()
+{
+	memset(fBitmap, 0, sizeof(fBitmap));
+}
 
 
 inline void

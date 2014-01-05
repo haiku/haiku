@@ -31,6 +31,7 @@
 
 #include "scheduler_common.h"
 #include "scheduler_cpu.h"
+#include "scheduler_locking.h"
 #include "scheduler_modes.h"
 #include "scheduler_profiler.h"
 #include "scheduler_thread.h"
@@ -39,93 +40,6 @@
 
 namespace Scheduler {
 
-
-class SchedulerModeLocking {
-public:
-	bool Lock(int* /* lockable */)
-	{
-		CPUEntry::GetCPU(smp_get_current_cpu())->EnterScheduler();
-		return true;
-	}
-
-	void Unlock(int* /* lockable */)
-	{
-		CPUEntry::GetCPU(smp_get_current_cpu())->ExitScheduler();
-	}
-};
-
-class SchedulerModeLocker :
-	public AutoLocker<int, SchedulerModeLocking> {
-public:
-	SchedulerModeLocker(bool alreadyLocked = false, bool lockIfNotLocked = true)
-		:
-		AutoLocker<int, SchedulerModeLocking>(NULL, alreadyLocked,
-			lockIfNotLocked)
-	{
-	}
-};
-
-class InterruptsSchedulerModeLocking {
-public:
-	bool Lock(int* lockable)
-	{
-		*lockable = disable_interrupts();
-		CPUEntry::GetCPU(smp_get_current_cpu())->EnterScheduler();
-		return true;
-	}
-
-	void Unlock(int* lockable)
-	{
-		CPUEntry::GetCPU(smp_get_current_cpu())->ExitScheduler();
-		restore_interrupts(*lockable);
-	}
-};
-
-class InterruptsSchedulerModeLocker :
-	public AutoLocker<int, InterruptsSchedulerModeLocking> {
-public:
-	InterruptsSchedulerModeLocker(bool alreadyLocked = false,
-		bool lockIfNotLocked = true)
-		:
-		AutoLocker<int, InterruptsSchedulerModeLocking>(&fState, alreadyLocked,
-			lockIfNotLocked)
-	{
-	}
-
-private:
-	int		fState;
-};
-
-class InterruptsBigSchedulerLocking {
-public:
-	bool Lock(int* lockable)
-	{
-		*lockable = disable_interrupts();
-		for (int32 i = 0; i < smp_get_num_cpus(); i++)
-			CPUEntry::GetCPU(i)->LockScheduler();
-		return true;
-	}
-
-	void Unlock(int* lockable)
-	{
-		for (int32 i = 0; i < smp_get_num_cpus(); i++)
-			CPUEntry::GetCPU(i)->UnlockScheduler();
-		restore_interrupts(*lockable);
-	}
-};
-
-class InterruptsBigSchedulerLocker :
-	public AutoLocker<int, InterruptsBigSchedulerLocking> {
-public:
-	InterruptsBigSchedulerLocker()
-		:
-		AutoLocker<int, InterruptsBigSchedulerLocking>(&fState, false, true)
-	{
-	}
-
-private:
-	int		fState;
-};
 
 class ThreadEnqueuer : public ThreadProcessing {
 public:
@@ -624,6 +538,8 @@ scheduler_on_thread_create(Thread* thread, bool idleThread)
 void
 scheduler_on_thread_init(Thread* thread)
 {
+	ASSERT(thread->scheduler_data != NULL);
+
 	if (thread_is_idle_thread(thread)) {
 		static int32 sIdleThreadsID;
 		int32 cpuID = atomic_add(&sIdleThreadsID, 1);

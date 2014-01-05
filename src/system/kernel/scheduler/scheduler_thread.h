@@ -11,6 +11,7 @@
 
 #include "scheduler_common.h"
 #include "scheduler_cpu.h"
+#include "scheduler_locking.h"
 #include "scheduler_profiler.h"
 
 
@@ -19,6 +20,17 @@ namespace Scheduler {
 
 struct ThreadData : public DoublyLinkedListLinkImpl<ThreadData>,
 	RunQueueLinkImpl<ThreadData> {
+private:
+	inline	void		_InitBase();
+
+	inline	int32		_GetMinimalPriority() const;
+
+	inline	CoreEntry*	_ChooseCore() const;
+	inline	CPUEntry*	_ChooseCPU(CoreEntry* core,
+							bool& rescheduleNeeded) const;
+
+	inline	bigtime_t	_GetBaseQuantum() const;
+
 public:
 						ThreadData(Thread* thread);
 
@@ -72,17 +84,12 @@ public:
 	inline	void		UnassignCore() { fCore = NULL; }
 
 	static	void		ComputeQuantumLengths();
+
 private:
 	inline	int32		_GetPenalty() const;
-	inline	int32		_GetMinimalPriority() const;
 
 			void		_ComputeEffectivePriority() const;
 
-	inline	CoreEntry*	_ChooseCore() const;
-	inline	CPUEntry*	_ChooseCPU(CoreEntry* core,
-							bool& rescheduleNeeded) const;
-
-	inline	bigtime_t	_GetBaseQuantum() const;
 	static	bigtime_t	_ScaleQuantum(bigtime_t maxQuantum,
 							bigtime_t minQuantum, int32 maxPriority,
 							int32 minPriority, int32 priority);
@@ -119,6 +126,21 @@ public:
 
 	virtual	void		operator()(ThreadData* thread) = 0;
 };
+
+
+inline int32
+ThreadData::_GetMinimalPriority() const
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	const int32 kDivisor = 5;
+
+	const int32 kMaximalPriority = 25;
+	const int32 kMinimalPriority = B_LOWEST_ACTIVE_PRIORITY;
+
+	int32 priority = fThread->priority / kDivisor;
+	return std::max(std::min(priority, kMaximalPriority), kMinimalPriority);
+}
 
 
 inline bool
@@ -259,6 +281,7 @@ ThreadData::Enqueue()
 	SCHEDULER_ENTER_FUNCTION();
 
 	fThread->state = B_THREAD_READY;
+
 	ComputeLoad();
 	fWentSleepCount = 0;
 
@@ -347,36 +370,6 @@ ThreadData::StartQuantum()
 {
 	SCHEDULER_ENTER_FUNCTION();
 	fQuantumStart = system_time();
-}
-
-
-inline int32
-ThreadData::_GetPenalty() const
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	int32 penalty = fPriorityPenalty;
-
-	const int kMinimalPriority = _GetMinimalPriority();
-	if (kMinimalPriority > 0)
-		penalty += fAdditionalPenalty % kMinimalPriority;
-
-	return penalty;
-}
-
-
-inline int32
-ThreadData::_GetMinimalPriority() const
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	const int32 kDivisor = 5;
-
-	const int32 kMaximalPriority = 25;
-	const int32 kMinimalPriority = B_LOWEST_ACTIVE_PRIORITY;
-
-	int32 priority = fThread->priority / kDivisor;
-	return std::max(std::min(priority, kMaximalPriority), kMinimalPriority);
 }
 
 

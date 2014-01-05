@@ -85,7 +85,7 @@ public:
 	static inline		CPUEntry*		GetCPU(int32 cpu);
 
 private:
-	inline				void			_RequestPerformanceLevel(
+						void			_RequestPerformanceLevel(
 											ThreadData* threadData);
 
 						int32			fCPUNumber;
@@ -112,21 +112,6 @@ public:
 						void			Dump();
 };
 
-class CPURunQueueLocking {
-public:
-	inline bool Lock(CPUEntry* cpu)
-	{
-		cpu->LockRunQueue();
-		return true;
-	}
-
-	inline void Unlock(CPUEntry* cpu)
-	{
-		cpu->UnlockRunQueue();
-	}
-};
-
-typedef AutoLocker<CPUEntry, CPURunQueueLocking> CPURunQueueLocker;
 
 class CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 	public DoublyLinkedListLinkImpl<CoreEntry> {
@@ -205,37 +190,6 @@ private:
 						friend class DebugDumper;
 } CACHE_LINE_ALIGN;
 
-class CoreRunQueueLocking {
-public:
-	inline bool Lock(CoreEntry* core)
-	{
-		core->LockRunQueue();
-		return true;
-	}
-
-	inline void Unlock(CoreEntry* core)
-	{
-		core->UnlockRunQueue();
-	}
-};
-
-typedef AutoLocker<CoreEntry, CoreRunQueueLocking> CoreRunQueueLocker;
-
-class CoreCPUHeapLocking {
-public:
-	inline bool Lock(CoreEntry* core)
-	{
-		core->LockCPUHeap();
-		return true;
-	}
-
-	inline void Unlock(CoreEntry* core)
-	{
-		core->UnlockCPUHeap();
-	}
-};
-
-typedef AutoLocker<CoreEntry, CoreCPUHeapLocking> CoreCPUHeapLocker;
 
 class CoreLoadHeap : public MinMaxHeap<CoreEntry, int32> {
 public:
@@ -402,6 +356,14 @@ CoreEntry::IncreaseActiveTime(bigtime_t activeTime)
 }
 
 
+inline ThreadData*
+CoreEntry::PeekThread() const
+{
+	SCHEDULER_ENTER_FUNCTION();
+	return fRunQueue.PeekMaximum();
+}
+
+
 inline bigtime_t
 CoreEntry::GetActiveTime() const
 {
@@ -432,6 +394,73 @@ CoreEntry::StarvationCounter() const
 {
 	SCHEDULER_ENTER_FUNCTION();
 	return fStarvationCounter;
+}
+
+
+/* PackageEntry::CoreGoesIdle and PackageEntry::CoreWakesUp have to be defined
+   before CoreEntry::CPUGoesIdle and CoreEntry::CPUWakesUp. If they weren't
+   GCC2 wouldn't inline them as, apparently, it doesn't do enough optimization
+   passes.
+*/
+inline void
+PackageEntry::CoreGoesIdle(CoreEntry* core)
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	WriteSpinLocker _(fCoreLock);
+
+	ASSERT(fIdleCoreCount >= 0);
+	ASSERT(fIdleCoreCount < fCoreCount);
+
+	fIdleCoreCount++;
+	fIdleCores.Add(core);
+
+	if (fIdleCoreCount == fCoreCount) {
+		// package goes idle
+		WriteSpinLocker _(gIdlePackageLock);
+		gIdlePackageList.Add(this);
+	}
+}
+
+
+inline void
+PackageEntry::CoreWakesUp(CoreEntry* core)
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	WriteSpinLocker _(fCoreLock);
+
+	ASSERT(fIdleCoreCount > 0);
+	ASSERT(fIdleCoreCount <= fCoreCount);
+
+	fIdleCoreCount--;
+	fIdleCores.Remove(core);
+
+	if (fIdleCoreCount + 1 == fCoreCount) {
+		// package wakes up
+		WriteSpinLocker _(gIdlePackageLock);
+		gIdlePackageList.Remove(this);
+	}
+}
+
+
+inline void
+CoreEntry::CPUGoesIdle(CPUEntry* /* cpu */)
+{
+	ASSERT(fCPUIdleCount < fCPUCount);
+
+	if (++fCPUIdleCount == fCPUCount)
+		fPackage->CoreGoesIdle(this);
+}
+
+
+inline void
+CoreEntry::CPUWakesUp(CPUEntry* /* cpu */)
+{
+	ASSERT(fCPUIdleCount > 0);
+
+	if (fCPUIdleCount-- == fCPUCount)
+		fPackage->CoreWakesUp(this);
 }
 
 

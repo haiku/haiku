@@ -12,6 +12,58 @@ using namespace Scheduler;
 static bigtime_t sQuantumLengths[THREAD_MAX_SET_PRIORITY + 1];
 
 
+inline CoreEntry*
+ThreadData::_ChooseCore() const
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	ASSERT(!gSingleCore);
+	return gCurrentMode->choose_core(this);
+}
+
+
+inline CPUEntry*
+ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	int32 threadPriority = GetEffectivePriority();
+
+	if (fThread->previous_cpu != NULL) {
+		CPUEntry* previousCPU = &gCPUEntries[fThread->previous_cpu->cpu_num];
+		if (previousCPU->Core() == core && !fThread->previous_cpu->disabled) {
+			CoreCPUHeapLocker _(core);
+			if (CPUPriorityHeap::GetKey(previousCPU) < threadPriority) {
+				previousCPU->UpdatePriority(threadPriority);
+				rescheduleNeeded = true;
+				return previousCPU;
+			}
+		}
+	}
+
+	CoreCPUHeapLocker _(core);
+	CPUEntry* cpu = core->CPUHeap()->PeekRoot();
+	ASSERT(cpu != NULL);
+
+	if (CPUPriorityHeap::GetKey(cpu) < threadPriority) {
+		cpu->UpdatePriority(threadPriority);
+		rescheduleNeeded = true;
+	} else
+		rescheduleNeeded = false;
+
+	return cpu;
+}
+
+
+inline bigtime_t
+ThreadData::_GetBaseQuantum() const
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	return sQuantumLengths[GetEffectivePriority()];
+}
+
+
 ThreadData::ThreadData(Thread* thread)
 	:
 	fThread(thread)
@@ -190,6 +242,21 @@ ThreadData::ComputeQuantumLengths()
 }
 
 
+inline int32
+ThreadData::_GetPenalty() const
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	int32 penalty = fPriorityPenalty;
+
+	const int kMinimalPriority = _GetMinimalPriority();
+	if (kMinimalPriority > 0)
+		penalty += fAdditionalPenalty % kMinimalPriority;
+
+	return penalty;
+}
+
+
 void
 ThreadData::_ComputeEffectivePriority() const
 {
@@ -206,58 +273,6 @@ ThreadData::_ComputeEffectivePriority() const
 		ASSERT(fEffectivePriority < B_FIRST_REAL_TIME_PRIORITY);
 		ASSERT(fEffectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
 	}
-}
-
-
-inline CoreEntry*
-ThreadData::_ChooseCore() const
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	ASSERT(!gSingleCore);
-	return gCurrentMode->choose_core(this);
-}
-
-
-inline CPUEntry*
-ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	int32 threadPriority = GetEffectivePriority();
-
-	if (fThread->previous_cpu != NULL) {
-		CPUEntry* previousCPU = &gCPUEntries[fThread->previous_cpu->cpu_num];
-		if (previousCPU->Core() == core && !fThread->previous_cpu->disabled) {
-			CoreCPUHeapLocker _(core);
-			if (CPUPriorityHeap::GetKey(previousCPU) < threadPriority) {
-				previousCPU->UpdatePriority(threadPriority);
-				rescheduleNeeded = true;
-				return previousCPU;
-			}
-		}
-	}
-
-	CoreCPUHeapLocker _(core);
-	CPUEntry* cpu = core->CPUHeap()->PeekRoot();
-	ASSERT(cpu != NULL);
-
-	if (CPUPriorityHeap::GetKey(cpu) < threadPriority) {
-		cpu->UpdatePriority(threadPriority);
-		rescheduleNeeded = true;
-	} else
-		rescheduleNeeded = false;
-
-	return cpu;
-}
-
-
-inline bigtime_t
-ThreadData::_GetBaseQuantum() const
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	return sQuantumLengths[GetEffectivePriority()];
 }
 
 
