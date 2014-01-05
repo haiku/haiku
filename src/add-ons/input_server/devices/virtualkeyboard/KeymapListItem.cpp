@@ -11,7 +11,7 @@
  * A BStringItem modified such that it holds
  * the BEntry object it corresponds with
  */
- 
+
 #include "KeymapListItem.h"
 
 

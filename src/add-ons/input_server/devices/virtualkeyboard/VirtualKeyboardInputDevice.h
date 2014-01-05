@@ -2,8 +2,8 @@
  * Copyright 2014 Freeman Lou <freemanlou2430@yahoo.com>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
-#ifndef VKID_H
-#define VKID_H
+#ifndef VIRTUAL_KEYBOARD_INPUT_DEVICE_H
+#define VIRTUAL_KEYBOARD_INPUT_DEVICE_H
 
 
 #include <InputServerDevice.h>
@@ -23,9 +23,9 @@ public:
 											uint32 command, BMessage* message);					
 private:
 			VirtualKeyboardWindow*		fKeyboardWindow;
-			
+
 };
 
 extern "C" BInputServerDevice* instantiate_input_device();
 
-#endif // VKID_H
+#endif // VIRTUAL_KEYBOARD_INPUT_DEVICE_H

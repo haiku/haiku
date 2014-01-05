@@ -87,11 +87,6 @@ private:
 #endif
 
 
-
-
-
-
-
 KeyboardLayoutView::KeyboardLayoutView(const char* name,
 	BInputServerDevice* dev)
 	:

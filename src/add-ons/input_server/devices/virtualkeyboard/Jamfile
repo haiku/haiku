@@ -6,14 +6,14 @@ UsePrivateSystemHeaders ;
 AddResources <input>virtualkeyboard : VirtualKeyboard.rdef ;
 
 Addon <input>virtualkeyboard :
-	
+
 	KeyboardLayout.cpp
 	KeyboardLayoutView.cpp
 	Keymap.cpp
 	KeymapListItem.cpp
 	VirtualKeyboardInputDevice.cpp
 	VirtualKeyboardWindow.cpp
-	
+
 	: be tracker input_server localestub libshared.a $(TARGET_LIBSTDC++)
 ;
 

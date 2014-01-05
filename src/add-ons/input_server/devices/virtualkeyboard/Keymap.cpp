@@ -46,7 +46,7 @@ print_key(char *chars, int32 offset, bool last = false)
 		default:
 		{
 			// 2-, 3-, or 4-byte UTF-8 character
-			char *str = new char[size + 1];
+			char* str = new char[size + 1];
 			strncpy(str, &chars[offset], size);
 			str[size] = 0;
 			fputs(str, stdout);

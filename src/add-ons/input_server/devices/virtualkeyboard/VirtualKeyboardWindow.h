@@ -20,7 +20,7 @@ class VirtualKeyboardWindow : public BWindow{
 public:
 							VirtualKeyboardWindow(BInputServerDevice* dev);
 		virtual void		MessageReceived(BMessage* message);			
-							
+
 private:
 		KeyboardLayoutView* fKeyboardView;
 		BListView*			fMapListView;
@@ -28,7 +28,7 @@ private:
 		BMenu*				fLayoutMenu;
 		Keymap				fCurrentKeymap;
 		BInputServerDevice*	fDevice;
-		
+
 private:
 				void		_LoadLayouts(BMenu* menu);
 				void		_LoadLayoutMenu(BMenu* menu, BDirectory directory);

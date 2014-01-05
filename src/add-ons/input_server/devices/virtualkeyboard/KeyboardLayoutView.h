@@ -93,7 +93,7 @@ private:
 			void				_SetFontSize(BView* view, key_kind keyKind);
 			void				_EvaluateDropTarget(BPoint point);
 			void				_SendKeyDown(const Key* key);
-			
+
 			BBitmap*			fOffscreenBitmap;
 			BView*				fOffscreenView;
 
@@ -121,9 +121,8 @@ private:
 			BPoint				fOffset;
 			float				fFactor;
 			float				fGap;
-			
-			BInputServerDevice*	fDevice;
 
+			BInputServerDevice*	fDevice;
 };
 
 

@@ -56,7 +56,7 @@ VirtualKeyboardInputDevice::Stop(const char* name, void* cookie)
 
 
 status_t
-VirtualKeyboardInputDevice::Control(const char* name, void* cookie, 
+VirtualKeyboardInputDevice::Control(const char* name, void* cookie,
 	uint32 command, BMessage* message)
 {
 	return B_OK;
