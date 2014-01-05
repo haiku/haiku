@@ -15,7 +15,6 @@ instantiate_input_device()
 
 VirtualKeyboardInputDevice::VirtualKeyboardInputDevice()
 {
-	fKeyboardWindow = new VirtualKeyboardWindow(this);
 }
 
 
@@ -39,6 +38,7 @@ VirtualKeyboardInputDevice::InitCheck()
 status_t
 VirtualKeyboardInputDevice::Start(const char* name, void* cookie)
 {
+	fKeyboardWindow = new VirtualKeyboardWindow(this);
 	fKeyboardWindow->Show();
 	return B_OK;
 }
@@ -47,7 +47,7 @@ VirtualKeyboardInputDevice::Start(const char* name, void* cookie)
 status_t
 VirtualKeyboardInputDevice::Stop(const char* name, void* cookie)
 {
-	if (fKeyboardWindow) {
+	if (fKeyboardWindow->Lock()) {
 		fKeyboardWindow->Quit();
 		fKeyboardWindow = NULL;
 	}

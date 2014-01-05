@@ -1143,7 +1143,7 @@ void
 KeyboardLayoutView::_SendKeyDown(const Key* key)
 {
 	KID_CALLED();
-	
+
 	BMessage* message = new BMessage(B_KEY_DOWN);
 	message->AddInt64("when", system_time());
 	message->AddData("states", B_UINT8_TYPE, &fKeyState,
@@ -1171,4 +1171,5 @@ KeyboardLayoutView::_SendKeyDown(const Key* key)
 
 	if (fDevice->EnqueueMessage(message) != B_OK)
 		delete message;
+
 }
