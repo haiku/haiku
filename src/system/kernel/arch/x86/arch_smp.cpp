@@ -15,6 +15,7 @@
 #include <smp.h>
 #include <smp_priv.h>
 
+#include <arch/atomic.h>
 #include <arch/cpu.h>
 #include <arch/vm.h>
 #include <arch/smp.h>
@@ -139,7 +140,7 @@ arch_smp_send_multicast_ici(CPUSet& cpuSet)
 		panic("arch_smp_send_multicast_ici: called with interrupts enabled");
 #endif
 
-	arch_cpu_memory_write_barrier();
+	memory_write_barrier();
 
 	int32 i = 0;
 	int32 cpuCount = smp_get_num_cpus();
@@ -189,7 +190,7 @@ arch_smp_send_broadcast_ici(void)
 		panic("arch_smp_send_broadcast_ici: called with interrupts enabled");
 #endif
 
-	arch_cpu_memory_write_barrier();
+	memory_write_barrier();
 
 	uint32 mode = ICI_VECTOR | APIC_DELIVERY_MODE_FIXED
 			| APIC_INTR_COMMAND_1_ASSERT
@@ -210,7 +211,7 @@ arch_smp_send_ici(int32 target_cpu)
 		panic("arch_smp_send_ici: called with interrupts enabled");
 #endif
 
-	arch_cpu_memory_write_barrier();
+	memory_write_barrier();
 
 	uint32 destination = sCPUAPICIds[target_cpu];
 	uint32 mode = ICI_VECTOR | APIC_DELIVERY_MODE_FIXED

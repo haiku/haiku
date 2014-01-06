@@ -9,6 +9,7 @@
 #define KERNEL_SMP_H
 
 
+#include <arch/atomic.h>
 #include <boot/kernel_args.h>
 #include <kernel.h>
 
@@ -185,7 +186,7 @@ release_spinlock_inline(spinlock* lock)
 static inline bool
 try_acquire_write_spinlock_inline(rw_spinlock* lock)
 {
-	return atomic_test_and_set(&lock->lock, 1 << 31, 0) == 0;
+	return atomic_test_and_set(&lock->lock, 1u << 31, 0) == 0;
 }
 
 
@@ -209,9 +210,9 @@ static inline bool
 try_acquire_read_spinlock_inline(rw_spinlock* lock)
 {
 	uint32 previous = atomic_add(&lock->lock, 1);
-	if ((previous & (1 << 31)) == 0)
+	if ((previous & (1u << 31)) == 0)
 		return true;
-	atomic_test_and_set(&lock->lock, 1 << 31, previous);
+	atomic_test_and_set(&lock->lock, 1u << 31, previous);
 	return false;
 }
 

@@ -1288,38 +1288,3 @@ arch_cpu_sync_icache(void* address, size_t length)
 	// instruction cache is always consistent on x86
 }
 
-
-void
-arch_cpu_memory_read_barrier(void)
-{
-#ifdef __x86_64__
-	asm volatile("lfence" : : : "memory");
-#else
-	asm volatile ("lock;" : : : "memory");
-	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
-#endif
-}
-
-
-void
-arch_cpu_memory_write_barrier(void)
-{
-#ifdef __x86_64__
-	asm volatile("sfence" : : : "memory");
-#else
-	asm volatile ("lock;" : : : "memory");
-	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
-#endif
-}
-
-
-void
-arch_cpu_memory_read_write_barrier(void)
-{
-#ifdef __x86_64__
-	asm volatile("mfence" : : : "memory");
-#else
-	asm volatile ("lock;" : : : "memory");
-	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
-#endif
-}

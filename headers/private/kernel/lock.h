@@ -9,7 +9,10 @@
 #ifndef _KERNEL_LOCK_H
 #define _KERNEL_LOCK_H
 
+
 #include <OS.h>
+
+#include <arch/atomic.h>
 #include <debug.h>
 
 

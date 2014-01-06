@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <arch/atomic.h>
 #include <arch/cpu.h>
 #include <arch/debug.h>
 #include <arch/int.h>
@@ -616,10 +617,10 @@ try_acquire_read_spinlock(rw_spinlock* lock)
 #endif
 
 	uint32 previous = atomic_add(&lock->lock, 1);
-	if ((previous & (1 << 31)) == 0)
+	if ((previous & (1u << 31)) == 0)
 		return true;
 
-	atomic_test_and_set(&lock->lock, 1 << 31, previous);
+	atomic_test_and_set(&lock->lock, 1u << 31, previous);
 	return false;
 }
 
@@ -659,7 +660,7 @@ release_read_spinlock(rw_spinlock* lock)
 {
 #if DEBUG_SPINLOCKS
 	uint32 previous = atomic_add(&lock->lock, -1);
-	if ((previous & 1 << 31) != 0) {
+	if ((previous & 1u << 31) != 0) {
 		panic("release_read_spinlock: lock %p was already released (value:"
 			" %#" B_PRIx32 ")\n", lock, previous);
 	}
@@ -701,7 +702,8 @@ acquire_read_seqlock(seqlock* lock) {
 
 bool
 release_read_seqlock(seqlock* lock, uint32 count) {
-	arch_cpu_memory_read_barrier();
+	memory_read_barrier();
+
 	uint32 current = atomic_get((int32*)&lock->count);
 
 	if (count % 2 == 1 || current != count) {
@@ -1517,15 +1519,20 @@ call_all_cpus_sync(void (*func)(void*, int), void* cookie)
 }
 
 
+#undef memory_read_barrier
+#undef memory_write_barrier
+
+
 void
-memory_read_barrier(void)
+memory_read_barrier()
 {
-	arch_cpu_memory_read_barrier();
+	memory_read_barrier_inline();
 }
 
 
 void
-memory_write_barrier(void)
+memory_write_barrier()
 {
-	arch_cpu_memory_write_barrier();
+	memory_write_barrier_inline();
 }
+

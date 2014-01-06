@@ -11,12 +11,13 @@
 
 
 #include <OS.h>
-#include <thread_types.h>
-#include <arch/thread.h>
 
+#include <arch/atomic.h>
+#include <arch/thread.h>
 // For the thread blocking inline functions only.
 #include <kscheduler.h>
 #include <ksignal.h>
+#include <thread_types.h>
 
 
 struct arch_fork_arg;
