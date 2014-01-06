@@ -2043,6 +2043,7 @@ BPathMonitor::StartWatching(const char* path, uint32 flags,
 			sWatchers->Remove(watcher);
 			delete watcher;
 		}
+		return status;
 	}
 
 	watcher->Insert(handler);
