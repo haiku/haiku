@@ -152,8 +152,7 @@ CPUEntry::UpdatePriority(int32 priority)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	if (gCPU[fCPUNumber].disabled)
-		return;
+	ASSERT(!gCPU[fCPUNumber].disabled);
 
 	int32 oldPriority = CPUPriorityHeap::GetKey(this);
 	if (oldPriority == priority)
@@ -176,6 +175,7 @@ CPUEntry::ComputeLoad()
 	SCHEDULER_ENTER_FUNCTION();
 
 	ASSERT(gTrackLoad);
+	ASSERT(!gCPU[fCPUNumber].disabled);
 	ASSERT(fCPUNumber == smp_get_current_cpu());
 
 	int oldLoad = compute_load(fMeasureTime, fMeasureActiveTime, fLoad);

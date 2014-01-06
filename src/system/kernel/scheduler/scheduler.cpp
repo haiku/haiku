@@ -445,14 +445,14 @@ reschedule(int32 nextState)
 		nextThreadData
 			= cpu->ChooseNextThread(enqueueOldThread ? oldThreadData : NULL,
 				putOldThreadAtBack);
+
+		// update CPU heap
+		CoreCPUHeapLocker cpuLocker(core);
+		cpu->UpdatePriority(nextThreadData->GetEffectivePriority());
 	}
 
 	Thread* nextThread = nextThreadData->GetThread();
 	ASSERT(!gCPU[thisCPU].disabled || thread_is_idle_thread(nextThread));
-	// update CPU heap
-	CoreCPUHeapLocker cpuLocker(core);
-	cpu->UpdatePriority(nextThreadData->GetEffectivePriority());
-	cpuLocker.Unlock();
 
 	if (nextThread != oldThread) {
 		if (enqueueOldThread) {
