@@ -107,12 +107,15 @@ BSecureSocket::Disconnect()
 			SSL_CTX_free(fPrivate->fCTX);
 			fPrivate->fCTX = NULL;
 		}
+
+		BSocket::Disconnect();
+			// Must do this before freeing the BIO, to make sure any pending
+			// read or write gets unlocked properly.
 		if (fPrivate->fBIO != NULL) {
 			BIO_free(fPrivate->fBIO);
 			fPrivate->fBIO = NULL;
 		}
 	}
-	return BSocket::Disconnect();
 }
 
 
