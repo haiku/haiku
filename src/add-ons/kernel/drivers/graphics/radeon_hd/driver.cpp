@@ -170,6 +170,7 @@ const struct supported_device {
 	{0x68e1, 4, 0, RADEON_CEDAR, CHIP_STD, "Radeon HD 5430"},
 	{0x68f9, 4, 0, RADEON_CEDAR, CHIP_STD, "Radeon HD 5450"},
 	{0x68e0, 4, 0, RADEON_CEDAR, CHIP_IGP, "Radeon HD 5470"},
+	{0x68e4, 4, 0, RADEON_CEDAR, CHIP_MOBILE, "Radeon HD 6370"},
 	//  Redwood
 	{0x68da, 4, 0, RADEON_REDWOOD, CHIP_STD, "Radeon HD 5500"},
 	{0x68d9, 4, 0, RADEON_REDWOOD, CHIP_STD, "Radeon HD 5570"},
