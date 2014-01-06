@@ -112,7 +112,6 @@ public:
 						void			Dump();
 };
 
-
 class CoreEntry : public MinMaxHeapLinkImpl<CoreEntry, int32>,
 	public DoublyLinkedListLinkImpl<CoreEntry> {
 public:
@@ -189,7 +188,6 @@ private:
 
 						friend class DebugDumper;
 } CACHE_LINE_ALIGN;
-
 
 class CoreLoadHeap : public MinMaxHeap<CoreEntry, int32> {
 public:
@@ -353,14 +351,6 @@ CoreEntry::IncreaseActiveTime(bigtime_t activeTime)
 	SCHEDULER_ENTER_FUNCTION();
 	WriteSequentialLocker _(fActiveTimeLock);
 	fActiveTime += activeTime;
-}
-
-
-inline ThreadData*
-CoreEntry::PeekThread() const
-{
-	SCHEDULER_ENTER_FUNCTION();
-	return fRunQueue.PeekMaximum();
 }
 
 

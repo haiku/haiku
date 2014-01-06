@@ -124,6 +124,14 @@ CPUEntry::Remove(ThreadData* thread)
 
 
 inline ThreadData*
+CoreEntry::PeekThread() const
+{
+	SCHEDULER_ENTER_FUNCTION();
+	return fRunQueue.PeekMaximum();
+}
+
+
+inline ThreadData*
 CPUEntry::PeekThread() const
 {
 	SCHEDULER_ENTER_FUNCTION();
@@ -152,6 +160,9 @@ CPUEntry::UpdatePriority(int32 priority)
 		return;
 	fCore->CPUHeap()->ModifyKey(this, priority);
 
+	if (gSingleCore)
+		return;
+
 	if (oldPriority == B_IDLE_PRIORITY)
 		fCore->CPUWakesUp(this);
 	else if (priority == B_IDLE_PRIORITY)
@@ -164,6 +175,7 @@ CPUEntry::ComputeLoad()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
+	ASSERT(gTrackLoad);
 	ASSERT(fCPUNumber == smp_get_current_cpu());
 
 	int oldLoad = compute_load(fMeasureTime, fMeasureActiveTime, fLoad);
@@ -244,10 +256,12 @@ CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 		oldThreadData->UpdateActivity(active);
 	}
 
-	oldThreadData->ComputeLoad();
-	nextThreadData->ComputeLoad();
-	if (gTrackLoad && !cpuEntry->disabled)
-		ComputeLoad();
+	if (gTrackLoad) {
+		oldThreadData->ComputeLoad();
+		nextThreadData->ComputeLoad();
+		if (!cpuEntry->disabled)
+			ComputeLoad();
+	}
 
 	Thread* nextThread = nextThreadData->GetThread();
 	if (!thread_is_idle_thread(nextThread)) {
@@ -256,18 +270,16 @@ CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 
 		nextThreadData->SetLastInterruptTime(cpuEntry->interrupt_time);
 
+		if (gCPUFrequencyManagement)
 		_RequestPerformanceLevel(nextThreadData);
 	}
 }
 
 
-inline void
+void
 CPUEntry::_RequestPerformanceLevel(ThreadData* threadData)
 {
 	SCHEDULER_ENTER_FUNCTION();
-
-	if (!gCPUFrequencyManagement)
-		return;
 
 	if (gCPU[fCPUNumber].disabled) {
 		decrease_cpu_performance(kCPUPerformanceScaleMax);

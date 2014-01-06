@@ -165,9 +165,6 @@ inline int32
 ThreadData::GetEffectivePriority() const
 {
 	SCHEDULER_ENTER_FUNCTION();
-
-	if (fEffectivePriority == -1)
-		_ComputeEffectivePriority();
 	return fEffectivePriority;
 }
 
@@ -184,7 +181,6 @@ ThreadData::IncreasePenalty()
 
 	TRACE("increasing thread %ld penalty\n", fThread->id);
 
-	fEffectivePriority = -1;
 	int32 oldPenalty = fPriorityPenalty++;
 
 	ASSERT(fThread->priority - oldPenalty >= B_LOWEST_ACTIVE_PRIORITY);
@@ -194,6 +190,8 @@ ThreadData::IncreasePenalty()
 		fPriorityPenalty = oldPenalty;
 		fAdditionalPenalty++;
 	}
+
+	_ComputeEffectivePriority();
 }
 
 
@@ -202,13 +200,15 @@ ThreadData::CancelPenalty()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	if (fPriorityPenalty != 0) {
-		TRACE("cancelling thread %ld penalty\n", fThread->id);
-		fEffectivePriority = -1;
-	}
+	int32 oldPenalty = fPriorityPenalty;
 
 	fAdditionalPenalty = 0;
 	fPriorityPenalty = 0;
+
+	if (oldPenalty != 0) {
+		TRACE("cancelling thread %ld penalty\n", fThread->id);
+		_ComputeEffectivePriority();
+	}
 }
 
 
@@ -217,7 +217,7 @@ ThreadData::ShouldCancelPenalty() const
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	if (fCore == NULL || fWentSleep == 0)
+	if (fCore == NULL)
 		return false;
 
 	return fCore->StarvationCounter() != fWentSleepCount
@@ -251,7 +251,8 @@ ThreadData::PutBack()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	ComputeLoad();
+	if (gTrackLoad)
+		ComputeLoad();
 	fWentSleepCount = -1;
 
 	int32 priority = GetEffectivePriority();
@@ -282,7 +283,8 @@ ThreadData::Enqueue()
 
 	fThread->state = B_THREAD_READY;
 
-	ComputeLoad();
+	if (gTrackLoad)
+		ComputeLoad();
 	fWentSleepCount = 0;
 
 	int32 priority = GetEffectivePriority();

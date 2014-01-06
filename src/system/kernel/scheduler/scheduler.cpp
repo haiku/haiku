@@ -383,7 +383,7 @@ reschedule(int32 nextState)
 
 	int32 thisCPU = smp_get_current_cpu();
 
-	CPUEntry* cpu = &gCPUEntries[thisCPU];
+	CPUEntry* cpu = CPUEntry::GetCPU(thisCPU);
 	CoreEntry* core = CoreEntry::GetCore(thisCPU);
 
 	TRACE("reschedule(): cpu %ld, current thread = %ld\n", thisCPU,

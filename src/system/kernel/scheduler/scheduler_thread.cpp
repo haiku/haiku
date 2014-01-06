@@ -12,6 +12,28 @@ using namespace Scheduler;
 static bigtime_t sQuantumLengths[THREAD_MAX_SET_PRIORITY + 1];
 
 
+void
+ThreadData::_InitBase()
+{
+	fPriorityPenalty = 0;
+	fAdditionalPenalty = 0;
+	fEffectivePriority = fThread->priority;
+
+	fTimeLeft = 0;
+	fStolenTime = 0;
+
+	fMeasureActiveTime = 0;
+	fMeasureTime = 0;
+	fLoad = 0;
+
+	fWentSleep = 0;
+	fWentSleepActive = 0;
+	fWentSleepCount = -1;
+
+	fEnqueued = false;
+}
+
+
 inline CoreEntry*
 ThreadData::_ChooseCore() const
 {
@@ -30,7 +52,8 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 	int32 threadPriority = GetEffectivePriority();
 
 	if (fThread->previous_cpu != NULL) {
-		CPUEntry* previousCPU = &gCPUEntries[fThread->previous_cpu->cpu_num];
+		CPUEntry* previousCPU
+			= CPUEntry::GetCPU(fThread->previous_cpu->cpu_num);
 		if (previousCPU->Core() == core && !fThread->previous_cpu->disabled) {
 			CoreCPUHeapLocker _(core);
 			if (CPUPriorityHeap::GetKey(previousCPU) < threadPriority) {
@@ -74,48 +97,18 @@ ThreadData::ThreadData(Thread* thread)
 void
 ThreadData::Init()
 {
-	fAdditionalPenalty = 0;
-	fEffectivePriority = -1;
+	_InitBase();
 
-	fTimeLeft = 0;
-	fStolenTime = 0;
-
-	fMeasureActiveTime = 0;
-	fMeasureTime = 0;
-	fLoad = 0;
-
-	fWentSleep = 0;
-	fWentSleepActive = 0;
-	fWentSleepCount = -1;
-
-	fEnqueued = false;
-
-	Thread* currentThread = thread_get_current_thread();
-	ASSERT(currentThread != NULL);
-	if (!thread_is_idle_thread(currentThread)) {
-		ThreadData* currentThreadData = currentThread->scheduler_data;
-		int32 penalty = currentThreadData->fPriorityPenalty;
-
-		int32 minimalPriority = _GetMinimalPriority();
-		if (fThread->priority - penalty >= minimalPriority)
-			fPriorityPenalty = penalty;
-		else
-			fPriorityPenalty = fThread->priority - minimalPriority;
-
-		fCore = currentThreadData->fCore;
-	} else {
-		fPriorityPenalty = 0;
-		fAdditionalPenalty = 0;
-
-		fCore = NULL;
-	}
+	ThreadData* currentThreadData = thread_get_current_thread()->scheduler_data;
+	fCore = currentThreadData->fCore;
 }
 
 
 void
 ThreadData::Init(CoreEntry* core)
 {
-	Init();
+	_InitBase();
+
 	fCore = core;
 }
 
@@ -172,8 +165,7 @@ ThreadData::ComputeLoad()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	if (!gTrackLoad)
-		return;
+	ASSERT(gTrackLoad);
 
 	if (fLastInterruptTime > 0) {
 		bigtime_t interruptTime = gCPU[smp_get_current_cpu()].interrupt_time;
