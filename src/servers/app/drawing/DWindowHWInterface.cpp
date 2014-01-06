@@ -527,6 +527,7 @@ sprintf((char*)cloneInfoData, "graphics/%s", fCardNameInDevFS.String());
 				STRACE(("unable to get B_CLONE_ACCELERANT\n"));
 				unload_add_on(fAccelerantImage);
 				fAccelerantImage = -1;
+				free(cloneInfoData);
 				return B_ERROR;
 			}
 			status_t ret = cloneAccelerant(cloneInfoData);
