@@ -27,7 +27,7 @@ RemotePackageRepository HaikuPorts
 	caya-2013.07.31-3
 	cdrtools-3.01~a18-1
 	cdrtools_devel-3.01~a18-1
-	cmake-2.8.11.2-4
+	cmake-2.8.11.2-7
 	ctags-5.8-3
 	curl-7.26.0-5
 	curl_devel-7.26.0-5
@@ -126,6 +126,7 @@ RemotePackageRepository HaikuPorts
 	mesa-7.9.2-5
 	mesa_devel-7.9.2-5
 	mesa_swrast-7.9.2-5
+	milkytracker-0.90.86-1
 	mkdepend-1.7-3
 	nano-2.2.6-3
 	ncurses-5.9-9
@@ -208,8 +209,8 @@ RemotePackageRepository HaikuPorts
 	glu_x86_devel-9.0.0-2
 	guilib_x86-1.2.1-1
 	guilib_x86_devel-1.2.1-1
-	haikuwebkit_x86-1.2.1-1
-	haikuwebkit_x86_devel-1.2.1-1
+	haikuwebkit_x86-1.2.2-1
+	haikuwebkit_x86_devel-1.2.2-1
 	icu_x86-4.8.1.1-4
 	icu_x86_devel-4.8.1.1-4
 	jpeg_x86-9-3
@@ -248,8 +249,8 @@ RemotePackageRepository HaikuPorts
 	libvpx_x86_devel-1.0.0-2
 	libwebp_x86-0.3.1-1
 	libwebp_x86_devel-0.3.1-1
-	libxml2_x86-2.8.0-6
-	libxml2_x86_devel-2.8.0-6
+	libxml2_x86-2.9.1-1
+	libxml2_x86_devel-2.9.1-1
 	libxslt_x86-1.1.28-2
 	libxslt_x86_devel-1.1.28-2
 	mesa_x86-10.0.1-5
@@ -324,6 +325,7 @@ RemotePackageRepository HaikuPorts
 	grep
 	groff
 	guilib
+	haikuwebkit_x86
 	htmldoc
 	icu
 	jam
@@ -359,6 +361,7 @@ RemotePackageRepository HaikuPorts
 	mercurial
 	mesa
 	mesa_x86
+	milkytracker
 	mkdepend
 	nano
 	ncurses
