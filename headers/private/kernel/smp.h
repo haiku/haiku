@@ -210,10 +210,7 @@ static inline bool
 try_acquire_read_spinlock_inline(rw_spinlock* lock)
 {
 	uint32 previous = atomic_add(&lock->lock, 1);
-	if ((previous & (1u << 31)) == 0)
-		return true;
-	atomic_test_and_set(&lock->lock, 1u << 31, previous);
-	return false;
+	return (previous & (1u << 31)) == 0;
 }
 
 
