@@ -82,10 +82,13 @@ class SchedulerModeLocker :
 public:
 	SchedulerModeLocker(bool alreadyLocked = false, bool lockIfNotLocked = true)
 		:
-		AutoLocker<int, SchedulerModeLocking>(NULL, alreadyLocked,
+		AutoLocker<int, SchedulerModeLocking>(&fDummy, alreadyLocked,
 			lockIfNotLocked)
 	{
 	}
+
+private:
+	int		fDummy;
 };
 
 class InterruptsSchedulerModeLocking {
