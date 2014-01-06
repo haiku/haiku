@@ -501,6 +501,10 @@ JoyWin::_SelectDeselectJoystick(BListView* list, bool enable)
 	PortItem *item;
 	for (int i = 0; i < number; i++) {
 		item = dynamic_cast<PortItem*>(list->ItemAt(i));
+		if (!item) {
+			printf("%s: PortItem at %d is null!\n", __func__, i);
+			continue;
+		}
 		item->SetEnabled(enable);
 	}
 }
