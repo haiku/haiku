@@ -53,12 +53,9 @@ class TTeamMenuItem : public BMenuItem {
 public:
 								TTeamMenuItem(BList* team, BBitmap* icon,
 									char* name, char* sig,
-									float width = -1.0f, float height = -1.0f,
-									bool drawLabel = true,
-									bool vertical = true);
+									float width = -1.0f, float height = -1.0f);
 								TTeamMenuItem(float width = -1.0f,
-									float height = -1.0f,
-									bool vertical = true);
+									float height = -1.0f);
 	virtual						~TTeamMenuItem();
 
 			status_t			Invoke(BMessage* msg = NULL);
@@ -94,9 +91,7 @@ private:
 	friend	class				TExpandoMenuBar;
 			void				_InitData(BList* team, BBitmap* icon,
 									char* name, char* sig,
-									float width = -1.0f, float height = -1.0f,
-									bool drawLabel = true,
-									bool vertical = true);
+									float width = -1.0f, float height = -1.0f);
 
 			bool				_IsSelected() const;
 
@@ -107,8 +102,6 @@ private:
 			char*				fSig;
 			float				fOverrideWidth;
 			float				fOverrideHeight;
-			bool				fDrawLabel;
-			bool				fVertical;
 
 			TBarView*			fBarView;
 			float				fLabelWidth;

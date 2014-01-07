@@ -93,7 +93,7 @@ TTeamMenu::AttachedToWindow()
 		BarTeamInfo* barInfo = (BarTeamInfo*)teamList.ItemAt(i);
 		TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
 			barInfo->icon, barInfo->name, barInfo->sig,
-			width, -1, !settings->hideLabels, true);
+			width, -1);
 
 		if (settings->trackerAlwaysFirst
 			&& strcmp(barInfo->sig, kTrackerSignature) == 0) {

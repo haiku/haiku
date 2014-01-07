@@ -66,20 +66,19 @@ const float kSwitchWidth = 12.0f;
 
 
 TTeamMenuItem::TTeamMenuItem(BList* team, BBitmap* icon, char* name, char* sig,
-	float width, float height, bool drawLabel, bool vertical)
+	float width, float height)
 	:
 	BMenuItem(new TWindowMenu(team, sig))
 {
-	_InitData(team, icon, name, sig, width, height, drawLabel, vertical);
+	_InitData(team, icon, name, sig, width, height);
 }
 
 
-TTeamMenuItem::TTeamMenuItem(float width, float height, bool vertical)
+TTeamMenuItem::TTeamMenuItem(float width, float height)
 	:
 	BMenuItem("", NULL)
 {
-	_InitData(NULL, NULL, strdup(""), strdup(""), width, height, false,
-		vertical);
+	_InitData(NULL, NULL, strdup(""), strdup(""), width, height);
 }
 
 
@@ -169,17 +168,21 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 		*width = fOverrideWidth;
 	else {
 		*width = kHPad + iconBounds.Width() + kHPad;
-		if (iconBounds.Width() <= 32 && fDrawLabel)
+		if (iconBounds.Width() <= 32
+			&& !static_cast<TBarApp*>(be_app)->Settings()->hideLabels) {
 			*width += LabelWidth() + kHPad;
+		}
 	}
 
 	if (fOverrideHeight != -1.0f)
 		*height = fOverrideHeight;
 	else {
-		if (fVertical) {
+		if (fBarView->Vertical()) {
 			*height = iconBounds.Height() + kVPad * 4;
-			if (fDrawLabel && iconBounds.Width() > 32)
+			if (!static_cast<TBarApp*>(be_app)->Settings()->hideLabels
+				&& iconBounds.Width() > 32) {
 				*height += fLabelAscent + fLabelDescent;
+			}
 		} else {
 			*height = iconBounds.Height() + kVPad * 4;
 		}
@@ -204,7 +207,7 @@ TTeamMenuItem::Draw()
 		flags |= BControlLook::B_ACTIVATED;
 
 	uint32 borders = BControlLook::B_TOP_BORDER;
-	if (fVertical) {
+	if (fBarView->Vertical()) {
 		menu->SetHighColor(tint_color(menuColor, B_DARKEN_1_TINT));
 		borders |= BControlLook::B_LEFT_BORDER
 			| BControlLook::B_RIGHT_BORDER;
@@ -247,11 +250,12 @@ TTeamMenuItem::DrawContent()
 		BRect frame(Frame());
 		BRect iconBounds(fIcon->Bounds());
 		BRect dstRect(iconBounds);
-		float extra = fVertical ? 0.0f : -1.0f;
+		float extra = fBarView->Vertical() ? 0.0f : -1.0f;
 		BPoint contLoc = ContentLocation();
 		BPoint drawLoc = contLoc + BPoint(kHPad, kVPad);
 
-		if (!fDrawLabel || (fVertical && iconBounds.Width() > 32)) {
+		if (static_cast<TBarApp*>(be_app)->Settings()->hideLabels
+			|| (fBarView->Vertical() && iconBounds.Width() > 32)) {
 			float offsetx = contLoc.x
 				+ ((frame.Width() - iconBounds.Width()) / 2) + extra;
 			float offsety = contLoc.y + 3.0f + extra;
@@ -271,13 +275,14 @@ TTeamMenuItem::DrawContent()
 
 			float labelHeight = fLabelAscent + fLabelDescent;
 			drawLoc.x += iconBounds.Width() + kLabelOffset;
-			drawLoc.y = frame.top + ((frame.Height() - labelHeight) / 2) + extra;
+			drawLoc.y = frame.top + ((frame.Height() - labelHeight) / 2)
+				+ extra;
 		}
 
 		menu->MovePenTo(drawLoc);
 	}
 
-	if (fDrawLabel) {
+	if (!static_cast<TBarApp*>(be_app)->Settings()->hideLabels) {
 		menu->SetDrawingMode(B_OP_OVER);
 		menu->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 
@@ -287,7 +292,8 @@ TTeamMenuItem::DrawContent()
 		DrawContentLabel();
 	}
 
-	if (fVertical && static_cast<TBarApp*>(be_app)->Settings()->superExpando
+	if (fBarView->Vertical()
+		&& static_cast<TBarApp*>(be_app)->Settings()->superExpando
 		&& fBarView->ExpandoState()) {
 		DrawExpanderArrow();
 	}
@@ -301,16 +307,17 @@ TTeamMenuItem::DrawContentLabel()
 	menu->MovePenBy(0, fLabelAscent);
 
 	float cachedWidth = menu->StringWidth(Label());
-	if (Submenu() && fVertical)
+	if (Submenu() != NULL && fBarView->Vertical())
 		cachedWidth += 18;
 
 	const char* label = Label();
 	char* truncLabel = NULL;
 	float max = 0;
 
-	if (fVertical && static_cast<TBarApp*>(be_app)->Settings()->superExpando)
+	if (fBarView->Vertical()
+		&& static_cast<TBarApp*>(be_app)->Settings()->superExpando) {
 		max = menu->MaxContentWidth() - kSwitchWidth;
-	else
+	} else
 		max = menu->MaxContentWidth() - 4.0f;
 
 	if (max > 0) {
@@ -462,7 +469,7 @@ TTeamMenuItem::ExpanderBounds() const
 
 void
 TTeamMenuItem::_InitData(BList* team, BBitmap* icon, char* name, char* sig,
-	float width, float height, bool drawLabel, bool vertical)
+	float width, float height)
 {
 	fTeam = team;
 	fIcon = icon;
@@ -476,8 +483,6 @@ TTeamMenuItem::_InitData(BList* team, BBitmap* icon, char* name, char* sig,
 	SetLabel(fName);
 	fOverrideWidth = width;
 	fOverrideHeight = height;
-	fDrawLabel = drawLabel;
-	fVertical = vertical;
 
 	fBarView = static_cast<TBarApp*>(be_app)->BarView();
 	BFont font(be_plain_font);

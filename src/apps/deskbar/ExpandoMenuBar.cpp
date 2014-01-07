@@ -382,8 +382,9 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					break;
 				}
 
-				if (item->HasLabel()) {
-					// item has a visible label, remove the tooltip and break out
+				if (!dynamic_cast<TBarApp*>(be_app)->Settings()->hideLabels) {
+					// item has a visible label, remove the tooltip
+					// and break out
 					fLastMousedOverItem = menuItem;
 					SetToolTip((const char*)NULL);
 					break;
@@ -584,7 +585,7 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	float itemHeight = -1.0f;
 
 	TTeamMenuItem* item = new TTeamMenuItem(team, icon, name, signature,
-		itemWidth, itemHeight, fDrawLabel, fVertical);
+		itemWidth, itemHeight);
 
 	if (settings->trackerAlwaysFirst
 		&& strcasecmp(signature, kTrackerSignature) == 0) {
