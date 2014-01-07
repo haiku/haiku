@@ -586,17 +586,17 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	TTeamMenuItem* item = new TTeamMenuItem(team, icon, name, signature,
 		itemWidth, itemHeight, fDrawLabel, fVertical);
 
-	if (settings->trackerAlwaysFirst && !strcmp(signature, kTrackerSignature))
+	if (settings->trackerAlwaysFirst
+		&& strcasecmp(signature, kTrackerSignature) == 0) {
 		AddItem(item, 0);
-	else if (settings->sortRunningApps) {
-		TTeamMenuItem* teamItem
-			= dynamic_cast<TTeamMenuItem*>(ItemAt(0));
+	} else if (settings->sortRunningApps) {
+		TTeamMenuItem* teamItem = dynamic_cast<TTeamMenuItem*>(ItemAt(0));
 		int32 firstApp = 0;
 
 		// if Tracker should always be the first item, we need to skip it
 		// when sorting in the current item
 		if (settings->trackerAlwaysFirst && teamItem != NULL
-			&& !strcmp(teamItem->Signature(), kTrackerSignature)) {
+			&& !strcasecmp(teamItem->Signature(), kTrackerSignature)) {
 			firstApp++;
 		}
 
