@@ -51,12 +51,9 @@ public:
 			bool		ChooseCoreAndCPU(CoreEntry*& targetCore,
 							CPUEntry*& targetCPU);
 
-	inline	bigtime_t	LastInterruptTime() const
-							{ return fLastInterruptTime; }
 	inline	void		SetLastInterruptTime(bigtime_t interruptTime)
 							{ fLastInterruptTime = interruptTime; }
-
-	inline	void		IncreaseStolenTime(bigtime_t stolenTime);
+	inline	void		SetStolenInterruptTime(bigtime_t interruptTime);
 
 	inline	void		GoesAway();
 	inline	bigtime_t	WentSleep() const	{ return fWentSleep; }
@@ -226,10 +223,13 @@ ThreadData::ShouldCancelPenalty() const
 
 
 inline void
-ThreadData::IncreaseStolenTime(bigtime_t stolenTime)
+ThreadData::SetStolenInterruptTime(bigtime_t interruptTime)
 {
 	SCHEDULER_ENTER_FUNCTION();
-	fStolenTime += stolenTime;
+
+	interruptTime -= fLastInterruptTime;
+	fStolenTime += interruptTime;
+	fMeasureActiveTime -= interruptTime;
 }
 
 

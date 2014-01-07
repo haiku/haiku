@@ -359,14 +359,16 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	if (!sVectors[vector].no_lock_vector)
 		release_spinlock(&sVectors[vector].vector_lock);
 
-	SpinLocker locker(sVectors[vector].load_lock);
+	SpinLocker vectorLocker(sVectors[vector].load_lock);
 	bigtime_t deltaTime = system_time() - start;
 	sVectors[vector].last_measure_active += deltaTime;
-	locker.Unlock();
+	vectorLocker.Unlock();
 
-	atomic_add64(&get_cpu_struct()->interrupt_time, deltaTime);
+	cpu_ent* cpu = get_cpu_struct();
+	cpu->interrupt_time += deltaTime;
 	if (sVectors[vector].type == INTERRUPT_TYPE_IRQ)
-		atomic_add64(&get_cpu_struct()->irq_time, deltaTime);
+		cpu->irq_time += deltaTime;
+
 	update_int_load(vector);
 
 	if (levelTriggered)

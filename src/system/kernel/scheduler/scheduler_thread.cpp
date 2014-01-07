@@ -166,13 +166,6 @@ ThreadData::ComputeLoad()
 	SCHEDULER_ENTER_FUNCTION();
 
 	ASSERT(gTrackLoad);
-
-	if (fLastInterruptTime > 0) {
-		bigtime_t interruptTime = gCPU[smp_get_current_cpu()].interrupt_time;
-		interruptTime -= fLastInterruptTime;
-		fMeasureActiveTime -= interruptTime;
-	}
-
 	compute_load(fMeasureTime, fMeasureActiveTime, fLoad);
 }
 

@@ -393,8 +393,7 @@ reschedule(int32 nextState)
 	ThreadData* oldThreadData = oldThread->scheduler_data;
 
 	// return time spent in interrupts
-	oldThreadData->IncreaseStolenTime(
-		gCPU[thisCPU].interrupt_time - oldThreadData->LastInterruptTime());
+	oldThreadData->SetStolenInterruptTime(gCPU[thisCPU].interrupt_time);
 
 	bool enqueueOldThread = false;
 	bool putOldThreadAtBack = false;
