@@ -125,6 +125,9 @@ BarViewMessageFilter::Filter(BMessage* message, BHandler** target)
 }
 
 
+//	#pragma mark - TBarView
+
+
 TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	int32 state, float)
 	:
@@ -865,7 +868,7 @@ TBarView::DragStart()
 	uint32 buttons;
 	GetMouse(&loc, &buttons);
 
-	if (fExpandoMenuBar && fExpandoMenuBar->Frame().Contains(loc)) {
+	if (fExpandoMenuBar != NULL && fExpandoMenuBar->Frame().Contains(loc)) {
 		ConvertToScreen(&loc);
 		BPoint expandoLocation = fExpandoMenuBar->ConvertFromScreen(loc);
 		TTeamMenuItem* item = fExpandoMenuBar->TeamItemAtPoint(expandoLocation);

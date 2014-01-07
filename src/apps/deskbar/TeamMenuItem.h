@@ -32,8 +32,8 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
-#ifndef TEAMMENUITEM_H
-#define TEAMMENUITEM_H
+#ifndef TEAM_MENU_ITEM_H
+#define TEAM_MENU_ITEM_H
 
 
 //	Individual team/application listing
@@ -122,4 +122,4 @@ private:
 };
 
 
-#endif	// TEAMMENUITEM_H
+#endif	// TEAM_MENU_ITEM_H

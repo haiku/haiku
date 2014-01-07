@@ -77,7 +77,8 @@ TWindowMenu::WindowShouldBeListed(client_window_info* info)
 
 
 TWindowMenu::TWindowMenu(const BList* team, const char* signature)
-	: BMenu("Deskbar Team Menu"),
+	:
+	BMenu("Deskbar Team Menu"),
 	fTeam(team),
 	fApplicationSignature(signature),
 	fExpanded(false),
@@ -96,7 +97,7 @@ TWindowMenu::AttachedToWindow()
 
 	bool dragging = false;
 	TBarView* barview =(static_cast<TBarApp*>(be_app))->BarView();
-	if (barview && barview->LockLooper()) {
+	if (barview != NULL && barview->LockLooper()) {
 		// 'dragging' mode set in BarView::CacheDragData
 		// invoke in MouseEnter in ExpandoMenuBar
 		dragging = barview->Dragging();

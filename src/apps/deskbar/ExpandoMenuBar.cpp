@@ -515,7 +515,7 @@ bool
 TExpandoMenuBar::InDeskbarMenu(BPoint loc) const
 {
 	TBarWindow* window = dynamic_cast<TBarWindow*>(Window());
-	if (window) {
+	if (window != NULL) {
 		if (TDeskbarMenu* bemenu = window->DeskbarMenu()) {
 			bool inDeskbarMenu = false;
 			if (bemenu->LockLooper()) {
@@ -629,15 +629,14 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 void
 TExpandoMenuBar::AddTeam(team_id team, const char* signature)
 {
-	int32 count = CountItems();
-	for (int32 i = 0; i < count; i++) {
+	int32 itemCount = CountItems();
+	for (int32 i = 0; i < itemCount; i++) {
 		// Only add to team menu items
-		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
-			if (strcasecmp(item->Signature(), signature) == 0) {
-				if (!(item->Teams()->HasItem((void*)(addr_t)team)))
-					item->Teams()->AddItem((void*)(addr_t)team);
-				break;
-			}
+		TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i));
+		if (item != NULL && strcasecmp(item->Signature(), signature) == 0
+			&& !(item->Teams()->HasItem((void*)(addr_t)team))) {
+			item->Teams()->AddItem((void*)(addr_t)team);
+			break;
 		}
 	}
 }
@@ -649,36 +648,35 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 	TWindowMenuItem* windowItem = NULL;
 
 	for (int32 i = CountItems() - 1; i >= 0; i--) {
-		if (TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i))) {
-			if (item->Teams()->HasItem((void*)(addr_t)team)) {
-				item->Teams()->RemoveItem(team);
-				if (partial)
-					return;
-
-				BAutolock locker(sMonLocker);
-					// make the update thread wait
-				RemoveItem(i);
-				if (item == fPreviousDragTargetItem)
-					fPreviousDragTargetItem = NULL;
-				if (item == fLastMousedOverItem)
-					fLastMousedOverItem = NULL;
-				if (item == fLastClickedItem)
-					fLastClickedItem = NULL;
-				delete item;
-				while ((windowItem = dynamic_cast<TWindowMenuItem*>(
-						ItemAt(i))) != NULL) {
-					// Also remove window items (if there are any)
-					RemoveItem(i);
-					if (windowItem == fLastMousedOverItem)
-						fLastMousedOverItem = NULL;
-					if (windowItem == fLastClickedItem)
-						fLastClickedItem = NULL;
-					delete windowItem;
-				}
-				SizeWindow(-1);
-				Window()->UpdateIfNeeded();
+		TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(ItemAt(i));
+		if (item != NULL && item->Teams()->HasItem((void*)(addr_t)team)) {
+			item->Teams()->RemoveItem(team);
+			if (partial)
 				return;
+
+			BAutolock locker(sMonLocker);
+				// make the update thread wait
+			RemoveItem(i);
+			if (item == fPreviousDragTargetItem)
+				fPreviousDragTargetItem = NULL;
+			if (item == fLastMousedOverItem)
+				fLastMousedOverItem = NULL;
+			if (item == fLastClickedItem)
+				fLastClickedItem = NULL;
+			delete item;
+			while ((windowItem = dynamic_cast<TWindowMenuItem*>(
+					ItemAt(i))) != NULL) {
+				// Also remove window items (if there are any)
+				RemoveItem(i);
+				if (windowItem == fLastMousedOverItem)
+					fLastMousedOverItem = NULL;
+				if (windowItem == fLastClickedItem)
+					fLastClickedItem = NULL;
+				delete windowItem;
 			}
+			SizeWindow(-1);
+			Window()->UpdateIfNeeded();
+			return;
 		}
 	}
 }
@@ -882,7 +880,8 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 
 			// Perform SetTo() on all the items that still exist as well as add
 			// new items.
-			bool itemModified = false, resize = false;
+			bool itemModified = false;
+			bool resize = false;
 			TTeamMenuItem* teamItem = NULL;
 
 			for (int32 i = 0; i < totalItems; i++) {
@@ -895,7 +894,7 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 					for (int32 j = 0; j < teamCount; j++) {
 						// The following code is almost a copy/paste from
 						// WindowMenu.cpp
-						team_id	theTeam = (addr_t)teamItem->Teams()->ItemAt(j);
+						team_id theTeam = (addr_t)teamItem->Teams()->ItemAt(j);
 						int32 count = 0;
 						int32* tokens = get_token_list(theTeam, &count);
 
@@ -909,14 +908,13 @@ TExpandoMenuBar::monitor_team_windows(void* arg)
 								// Check if we have a matching window item...
 								item = teamItem->ExpandedWindowItem(
 									wInfo->server_token);
-								if (item) {
+								if (item != NULL) {
 									item->SetTo(wInfo->name,
 										wInfo->server_token, wInfo->is_mini,
 										((1 << current_workspace())
 											& wInfo->workspaces) != 0);
 
-									if (strcmp(wInfo->name,
-										item->Label()) != 0)
+									if (strcmp(wInfo->name, item->Label()) != 0)
 										item->SetLabel(wInfo->name);
 
 									if (item->ChangedState())
