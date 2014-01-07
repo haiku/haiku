@@ -117,20 +117,6 @@ TTeamMenuItem::Invoke(BMessage* message)
 
 
 void
-TTeamMenuItem::SetOverrideWidth(float width)
-{
-	fOverrideWidth = width;
-}
-
-
-void
-TTeamMenuItem::SetOverrideHeight(float height)
-{
-	fOverrideHeight = height;
-}
-
-
-void
 TTeamMenuItem::SetOverrideSelected(bool selected)
 {
 	fOverriddenSelected = selected;
@@ -139,16 +125,9 @@ TTeamMenuItem::SetOverrideSelected(bool selected)
 
 
 void
-TTeamMenuItem::SetArrowDirection(int32 direction)
-{
-	fArrowDirection = direction;
-}
-
-
-void
-TTeamMenuItem::SetHasLabel(bool drawLabel)
-{
-	fDrawLabel = drawLabel;
+TTeamMenuItem::SetIcon(BBitmap* icon) {
+	delete fIcon;
+	fIcon = icon;
 }
 
 

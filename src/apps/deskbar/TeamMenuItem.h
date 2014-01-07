@@ -60,15 +60,19 @@ public:
 
 			status_t			Invoke(BMessage* msg = NULL);
 
-			void				SetOverrideWidth(float width);
-			void				SetOverrideHeight(float height);
+			void				SetOverrideWidth(float width)
+									{ fOverrideWidth = width; };
+			void				SetOverrideHeight(float height)
+									{ fOverrideHeight = height; };
 			void				SetOverrideSelected(bool selected);
 
-			int32				ArrowDirection() const { return fArrowDirection; };
-			void				SetArrowDirection(int32 direction);
+			int32				ArrowDirection() const
+									{ return fArrowDirection; };
+			void				SetArrowDirection(int32 direction)
+									{ fArrowDirection = direction; };
 
-			bool				HasLabel() const { return fDrawLabel; };
-			void				SetHasLabel(bool drawLabel);
+			BBitmap*			Icon() const { return fIcon; };
+			void				SetIcon(BBitmap* icon);
 
 			bool				IsExpanded() const { return fExpanded; };
 			void				ToggleExpandState(bool resizeWindow);
