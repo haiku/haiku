@@ -52,10 +52,7 @@ choose_small_task_core()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	ReadSpinLocker locker(gCoreHeapsLock);
 	CoreEntry* core = gCoreLoadHeap.PeekMaximum();
-	locker.Unlock();
-
 	if (core == NULL)
 		return sSmallTaskCore;
 
@@ -126,25 +123,28 @@ should_rebalance(const ThreadData* threadData)
 	CoreEntry* core = threadData->Core();
 
 	int32 coreLoad = core->GetLoad();
+	int32 threadLoad = threadData->GetLoad();
 	if (coreLoad > kHighLoad) {
-		ReadSpinLocker coreLocker(gCoreHeapsLock);
 		if (sSmallTaskCore == core) {
 			sSmallTaskCore = NULL;
 			choose_small_task_core();
 
-			if (threadData->GetLoad() > coreLoad / 3)
+			if (threadLoad > coreLoad / 3)
 				return false;
 			return coreLoad > kVeryHighLoad;
 		}
 
-		if (threadData->GetLoad() >= coreLoad / 2)
+		if (threadLoad >= coreLoad / 2)
 			return false;
 
 		CoreEntry* other = gCoreLoadHeap.PeekMaximum();
 		if (other == NULL)
 			other = gCoreHighLoadHeap.PeekMinimum();
 		ASSERT(other != NULL);
-		return coreLoad - other->GetLoad() >= kLoadDifference / 2;
+
+		int32 coreNewLoad = coreLoad - threadLoad;
+		int32 otherNewLoad = other->GetLoad() + threadLoad;
+		return coreNewLoad - otherNewLoad >= kLoadDifference / 2;
 	}
 
 	if (coreLoad >= kMediumLoad)
@@ -154,7 +154,7 @@ should_rebalance(const ThreadData* threadData)
 	if (smallTaskCore == NULL)
 		return false;
 	return smallTaskCore != core
-		&& smallTaskCore->GetLoad() +threadData->GetLoad() < kHighLoad;
+		&& smallTaskCore->GetLoad() + threadLoad < kHighLoad;
 }
 
 
