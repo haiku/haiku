@@ -188,10 +188,10 @@ main(int argc, char** argv)
 			mode.timing.h_sync_start = strtol(argv[optind + 2], NULL, 0);
 			mode.timing.h_sync_end = strtol(argv[optind + 3], NULL, 0);
 			mode.timing.h_total = strtol(argv[optind + 4], NULL, 0);
-			mode.timing.h_display = strtol(argv[optind + 5], NULL, 0);
-			mode.timing.h_sync_start = strtol(argv[optind + 6], NULL, 0);
-			mode.timing.h_sync_end = strtol(argv[optind + 7], NULL, 0);
-			mode.timing.h_total = strtol(argv[optind + 8], NULL, 0);
+			mode.timing.v_display = strtol(argv[optind + 5], NULL, 0);
+			mode.timing.v_sync_start = strtol(argv[optind + 6], NULL, 0);
+			mode.timing.v_sync_end = strtol(argv[optind + 7], NULL, 0);
+			mode.timing.v_total = strtol(argv[optind + 8], NULL, 0);
 			mode.timing.flags = 0;
 			mode.space = B_RGB32;
 
