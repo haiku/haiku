@@ -20,7 +20,7 @@ class ScrollArrow;
 
 class TInlineScrollView : public BView {
 public:
-								TInlineScrollView(BRect frame, BView* target,
+								TInlineScrollView(BView* target,
 									enum orientation orientation = B_VERTICAL);
 	virtual						~TInlineScrollView();
 
@@ -37,6 +37,10 @@ public:
 				void			GetSteps(float* _smallStep,
 										 float* _largeStep) const;
 				void			ScrollBy(const float& step);
+
+				bool			Orientation() const { return fOrientation; };
+				void			SetOrientation(int32 orienation)
+									{ fOrientation = orienation; };
 
 private:
 				BView*			fTarget;

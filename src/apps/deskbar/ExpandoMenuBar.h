@@ -61,7 +61,7 @@ class TTeamMenuItem;
 
 class TExpandoMenuBar : public BMenuBar {
 public:
-							TExpandoMenuBar(BRect frame, const char* name,
+							TExpandoMenuBar(const char* name,
 								TBarView* barView, bool vertical);
 
 	virtual	void			AttachedToWindow();
@@ -86,11 +86,15 @@ public:
 			void			CheckItemSizes(int32 delta);
 
 			menu_layout		MenuLayout() const;
+			void			SetMenuLayout(menu_layout layout);
 
 			void			SetMaxItemWidth();
 
 			void			SizeWindow(int32 delta);
 			bool			CheckForSizeOverrun();
+
+			void			StartMonitoringWindows();
+			void			StopMonitoringWindows();
 
 private:
 	static	int				CompareByName(const void* first,

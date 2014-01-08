@@ -158,7 +158,6 @@ public:
 								float* width, float* height);
 			void			SizeWindow(BRect screenFrame);
 			void			PositionWindow(BRect screenFrame);
-			void			AddExpandedItem(const char* signature);
 
 			void			CheckForScrolling();
 
@@ -178,10 +177,6 @@ private:
 			void			PlaceDeskbarMenu();
 			void			PlaceTray(bool vertSwap, bool leftSwap);
 			void			PlaceApplicationBar();
-
-			void			SaveExpandedItems();
-			void			RemoveExpandedItems();
-			void			ExpandItems();
 
 			void			_ChangeState(BMessage* message);
 
@@ -209,7 +204,6 @@ private:
 			uint32			fMaxRecentApps;
 
 			TTeamMenuItem*	fLastDragItem;
-			BList			fExpandedItems;
 			BMessageFilter*	fMouseFilter;
 };
 

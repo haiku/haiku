@@ -38,6 +38,8 @@ All rights reserved.
 
 #include <strings.h>
 
+#include <map>
+
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <ControlLook.h>
@@ -77,11 +79,16 @@ bool TExpandoMenuBar::sDoMonitor = false;
 thread_id TExpandoMenuBar::sMonThread = B_ERROR;
 BLocker TExpandoMenuBar::sMonLocker("expando monitor");
 
+typedef std::map<BString, TTeamMenuItem*> TeamMenuItemMap;
 
-TExpandoMenuBar::TExpandoMenuBar(BRect frame, const char* name,
-	TBarView* barView, bool vertical)
+
+//	#pragma mark - TExpandoMenuBar
+
+
+TExpandoMenuBar::TExpandoMenuBar(const char* name, TBarView* barView,
+	bool vertical)
 	:
-	BMenuBar(frame, name, B_FOLLOW_NONE,
+	BMenuBar(BRect(0, 0, 0, 0), name, B_FOLLOW_NONE,
 		vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW),
 	fBarView(barView),
 	fVertical(vertical),
@@ -122,12 +129,8 @@ TExpandoMenuBar::AttachedToWindow()
 
 	fTeamList.MakeEmpty();
 
-	if (fVertical) {
-		sDoMonitor = true;
-		sMonThread = spawn_thread(monitor_team_windows,
-			"Expando Window Watcher", B_LOW_PRIORITY, this);
-		resume_thread(sMonThread);
-	}
+	if (fVertical)
+		StartMonitoringWindows();
 }
 
 
@@ -136,14 +139,7 @@ TExpandoMenuBar::DetachedFromWindow()
 {
 	BMenuBar::DetachedFromWindow();
 
-	if (sMonThread != B_ERROR) {
-		sDoMonitor = false;
-
-		status_t returnCode;
-		wait_for_thread(sMonThread, &returnCode);
-
-		sMonThread = B_ERROR;
-	}
+	StopMonitoringWindows();
 
 	BMessenger self(this);
 	BMessage message(kUnsubscribe);
@@ -471,37 +467,79 @@ TExpandoMenuBar::BuildItems()
 	fShowTeamExpander = settings->superExpando;
 	fExpandNewTeams = settings->expandNewTeams;
 
-	float itemWidth = -0.1f;
-	if (fVertical)
-		itemWidth = Frame().Width();
-	else {
-		itemWidth = iconSize;
-		if (fDrawLabel)
-			itemWidth += sMinimumWindowWidth - kMinimumIconSize;
-		else
-			itemWidth += kIconPadding * 2;
-	}
+	float itemWidth = fVertical ? Frame().Width()
+		: iconSize + (fDrawLabel ? sMinimumWindowWidth - kMinimumIconSize
+			: kIconPadding * 2);
 	float itemHeight = -1.0f;
 
-	RemoveItems(0, CountItems(), true);
-		// remove all items
+	TeamMenuItemMap items;
+	int32 itemCount = CountItems();
+	BList itemList(itemCount);
+	for (int32 i = 0; i < itemCount; i++) {
+		BMenuItem* menuItem = RemoveItem((int32)0);
+		itemList.AddItem(menuItem);
+		TTeamMenuItem* item = dynamic_cast<TTeamMenuItem*>(menuItem);
+		if (item != NULL)
+			items[BString(item->Signature()).ToLower()] = item;
+	}
 
 	if (settings->sortRunningApps)
 		fTeamList.SortItems(CompareByName);
 
-	int32 count = fTeamList.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		// add items back
+	int32 teamCount = fTeamList.CountItems();
+	for (int32 i = 0; i < teamCount; i++) {
 		BarTeamInfo* barInfo = (BarTeamInfo*)fTeamList.ItemAt(i);
-		TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
-			barInfo->icon, barInfo->name, barInfo->sig, itemWidth,
-			itemHeight, fDrawLabel, fVertical);
+		TeamMenuItemMap::const_iterator iter
+			= items.find(BString(barInfo->sig).ToLower());
+		if (iter == items.end()) {
+			// new team
+			TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
+				barInfo->icon, barInfo->name, barInfo->sig, itemWidth,
+				itemHeight);
 
-		if (settings->trackerAlwaysFirst
-			&& strcmp(barInfo->sig, kTrackerSignature) == 0) {
-			AddItem(item, 0);
-		} else
-			AddItem(item);
+			if (settings->trackerAlwaysFirst
+				&& strcasecmp(barInfo->sig, kTrackerSignature) == 0) {
+				AddItem(item, 0);
+			} else
+				AddItem(item);
+		} else {
+			// existing team, update info and add it
+			TTeamMenuItem* item = iter->second;
+			item->SetIcon(barInfo->icon);
+			item->SetOverrideWidth(itemWidth);
+			item->SetOverrideHeight(itemHeight);
+
+			if (settings->trackerAlwaysFirst
+				&& strcasecmp(barInfo->sig, kTrackerSignature) == 0) {
+				AddItem(item, 0);
+			} else
+				AddItem(item);
+
+			// add window items back
+			int32 index = itemList.IndexOf(item);
+			TWindowMenuItem* windowItem;
+			TWindowMenu* submenu = dynamic_cast<TWindowMenu*>(item->Submenu());
+			bool hasWindowItems = false;
+			while ((windowItem = dynamic_cast<TWindowMenuItem*>(
+					(BMenuItem*)(itemList.ItemAt(++index)))) != NULL) {
+				if (fVertical)
+					AddItem(windowItem);
+				else {
+					delete windowItem;
+					hasWindowItems = submenu != NULL;
+				}
+			}
+
+			// unexpand if turn off show team expander
+			if (fVertical && !fShowTeamExpander && item->IsExpanded())
+				item->ToggleExpandState(false);
+
+			if (hasWindowItems) {
+				// add (new) window items in submenu
+				submenu->SetExpanded(false, 0);
+				submenu->AttachedToWindow();
+			}
+		}
 	}
 
 	if (CountItems() == 0) {
@@ -572,16 +610,9 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 
-	float itemWidth = -1.0f;
-	if (fVertical)
-		itemWidth = fBarView->Bounds().Width();
-	else {
-		itemWidth = iconSize;
-		if (fDrawLabel)
-			itemWidth += sMinimumWindowWidth - kMinimumIconSize;
-		else
-			itemWidth += kIconPadding * 2;
-	}
+	float itemWidth = fVertical ? Frame().Width()
+		: iconSize + (fDrawLabel ? sMinimumWindowWidth - kMinimumIconSize
+			: kIconPadding * 2);
 	float itemHeight = -1.0f;
 
 	TTeamMenuItem* item = new TTeamMenuItem(team, icon, name, signature,
@@ -597,7 +628,7 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 		// if Tracker should always be the first item, we need to skip it
 		// when sorting in the current item
 		if (settings->trackerAlwaysFirst && teamItem != NULL
-			&& !strcasecmp(teamItem->Signature(), kTrackerSignature)) {
+			&& strcasecmp(teamItem->Signature(), kTrackerSignature) == 0) {
 			firstApp++;
 		}
 
@@ -617,10 +648,8 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	} else
 		AddItem(item);
 
-	if (fVertical) {
-		if (item && fShowTeamExpander && fExpandNewTeams)
-			item->ToggleExpandState(false);
-	}
+	if (fShowTeamExpander && fExpandNewTeams)
+		item->ToggleExpandState(false);
 
 	SizeWindow(1);
 	Window()->UpdateIfNeeded();
@@ -660,10 +689,13 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 			RemoveItem(i);
 			if (item == fPreviousDragTargetItem)
 				fPreviousDragTargetItem = NULL;
+
 			if (item == fLastMousedOverItem)
 				fLastMousedOverItem = NULL;
+
 			if (item == fLastClickedItem)
 				fLastClickedItem = NULL;
+
 			delete item;
 			while ((windowItem = dynamic_cast<TWindowMenuItem*>(
 					ItemAt(i))) != NULL) {
@@ -671,8 +703,10 @@ TExpandoMenuBar::RemoveTeam(team_id team, bool partial)
 				RemoveItem(i);
 				if (windowItem == fLastMousedOverItem)
 					fLastMousedOverItem = NULL;
+
 				if (windowItem == fLastClickedItem)
 					fLastClickedItem = NULL;
+
 				delete windowItem;
 			}
 			SizeWindow(-1);
@@ -748,6 +782,16 @@ menu_layout
 TExpandoMenuBar::MenuLayout() const
 {
 	return Layout();
+}
+
+
+void
+TExpandoMenuBar::SetMenuLayout(menu_layout layout)
+{
+	fVertical = layout == B_ITEMS_IN_COLUMN;
+	BMenu::_SetMenuLayout(layout);
+	SetMaxItemWidth();
+		// when the menu layout changes, make sure to set the max width
 }
 
 
@@ -856,6 +900,33 @@ TExpandoMenuBar::SizeWindow(int32 delta)
 		fBarView->CheckForScrolling();
 	} else
 		CheckItemSizes(delta);
+}
+
+
+void
+TExpandoMenuBar::StartMonitoringWindows()
+{
+	if (sMonThread != B_ERROR)
+		return;
+
+	sDoMonitor = true;
+	sMonThread = spawn_thread(monitor_team_windows,
+		"Expando Window Watcher", B_LOW_PRIORITY, this);
+	resume_thread(sMonThread);
+}
+
+
+void
+TExpandoMenuBar::StopMonitoringWindows()
+{
+	if (sMonThread == B_ERROR)
+		return;
+
+	sDoMonitor = false;
+	status_t returnCode;
+	wait_for_thread(sMonThread, &returnCode);
+
+	sMonThread = B_ERROR;
 }
 
 

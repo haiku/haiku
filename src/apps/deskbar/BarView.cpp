@@ -168,10 +168,9 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		AddChild(fDragRegion);
 
 	// create and add the application menubar
-	fExpandoMenuBar = new TExpandoMenuBar(BRect(0, 0, 0, 0),
-		"ExpandoMenuBar", this, fVertical);
-	fInlineScrollView = new TInlineScrollView(BRect(0, 0, 0, 0),
-		fExpandoMenuBar, fVertical ? B_VERTICAL : B_HORIZONTAL);
+	fExpandoMenuBar = new TExpandoMenuBar("ExpandoMenuBar", this, fVertical);
+	fInlineScrollView = new TInlineScrollView(fExpandoMenuBar,
+		fVertical ? B_VERTICAL : B_HORIZONTAL);
 	AddChild(fInlineScrollView);
 
 	// If mini mode, hide the application menubar
@@ -185,8 +184,6 @@ TBarView::~TBarView()
 	delete fDragMessage;
 	delete fCachedTypesList;
 	delete fBarMenuBar;
-
-	RemoveExpandedItems();
 }
 
 
@@ -473,19 +470,12 @@ TBarView::PlaceApplicationBar()
 	BRect expandoFrame(0, 0, 0, 0);
 	if (fVertical) {
 		// left or right
-		if (fTrayLocation != 0) {
-			expandoFrame.top = fDragRegion->Frame().bottom + 1;
-			expandoFrame.left = fDragRegion->Frame().left;
-		} else {
-			expandoFrame.top = fBarMenuBar->Frame().bottom + 1;
-			expandoFrame.left = fDragRegion->Frame().left;
-		}
-
+		expandoFrame.top = fTrayLocation != 0 ? fDragRegion->Frame().bottom + 1
+			: fBarMenuBar->Frame().bottom + 1;
+		expandoFrame.left = fDragRegion->Frame().left;
 		expandoFrame.right = expandoFrame.left + sMinimumWindowWidth;
-		if (fState == kFullState)
-			expandoFrame.bottom = screenFrame.bottom;
-		else
-			expandoFrame.bottom = expandoFrame.top + 1;
+		expandoFrame.bottom = fState == kFullState ? screenFrame.bottom
+			: expandoFrame.top + 1;
 	} else {
 		// top or bottom
 		expandoFrame.top = 0;
@@ -514,9 +504,8 @@ TBarView::PlaceApplicationBar()
 		fExpandoMenuBar->SetMaxItemWidth();
 	}
 
-	fExpandoMenuBar->BuildItems();
-	if (fVertical)
-		ExpandItems();
+	if (fState == kExpandoState)
+		fExpandoMenuBar->BuildItems();
 
 	SizeWindow(screenFrame);
 	PositionWindow(screenFrame);
@@ -581,7 +570,8 @@ TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 void
 TBarView::SizeWindow(BRect screenFrame)
 {
-	float windowWidth, windowHeight;
+	float windowWidth;
+	float windowHeight;
 	GetPreferredWindowSize(screenFrame, &windowWidth, &windowHeight);
 	Window()->ResizeTo(windowWidth, windowHeight);
 }
@@ -590,7 +580,8 @@ TBarView::SizeWindow(BRect screenFrame)
 void
 TBarView::PositionWindow(BRect screenFrame)
 {
-	float windowWidth, windowHeight;
+	float windowWidth;
+	float windowHeight;
 	GetPreferredWindowSize(screenFrame, &windowWidth, &windowHeight);
 
 	BPoint moveLoc(0, 0);
@@ -662,73 +653,6 @@ TBarView::ChangeState(int32 state, bool vertical, bool left, bool top,
 
 
 void
-TBarView::SaveExpandedItems()
-{
-	if (fExpandoMenuBar == NULL)
-		return;
-
-	// Get a list of the signatures of expanded apps. Can't use
-	// team_id because there can be more than one team per application
-	int32 count = fExpandoMenuBar->CountItems();
-	for (int32 i = 0; i < count; i++) {
-		TTeamMenuItem* teamItem
-			= dynamic_cast<TTeamMenuItem*>(fExpandoMenuBar->ItemAt(i));
-
-		if (teamItem != NULL && teamItem->IsExpanded())
-			AddExpandedItem(teamItem->Signature());
-	}
-}
-
-
-void
-TBarView::RemoveExpandedItems()
-{
-	while (!fExpandedItems.IsEmpty())
-		delete static_cast<BString*>(fExpandedItems.RemoveItem((int32)0));
-	fExpandedItems.MakeEmpty();
-}
-
-
-void
-TBarView::ExpandItems()
-{
-	if (fExpandoMenuBar == NULL || !fVertical || fState != kExpandoState
-		|| !fBarApp->Settings()->superExpando
-		|| fExpandedItems.CountItems() <= 0) {
-		return;
-	}
-
-	// Start at the 'bottom' of the list working up.
-	// Prevents being thrown off by expanding items.
-	for (int32 i = fExpandoMenuBar->CountItems() - 1; i >= 0; i--) {
-		TTeamMenuItem* teamItem
-			= dynamic_cast<TTeamMenuItem*>(fExpandoMenuBar->ItemAt(i));
-
-		if (teamItem != NULL) {
-			// Start at the 'bottom' of the fExpandedItems list working up
-			// matching the order of the fExpandoMenuBar list in the outer loop.
-			for (int32 j = fExpandedItems.CountItems() - 1; j >= 0; j--) {
-				BString* itemSig =
-					static_cast<BString*>(fExpandedItems.ItemAt(j));
-
-				if (itemSig->Compare(teamItem->Signature()) == 0) {
-					// Found it, expand the item and delete signature from
-					// the list so that we don't consider it for later items.
-					teamItem->ToggleExpandState(false);
-					fExpandedItems.RemoveItem(j);
-					delete itemSig;
-					break;
-				}
-			}
-		}
-	}
-
-	// Clean up the expanded items list
-	RemoveExpandedItems();
-}
-
-
-void
 TBarView::_ChangeState(BMessage* message)
 {
 	int32 state = message->FindInt32("state");
@@ -745,56 +669,27 @@ TBarView::_ChangeState(BMessage* message)
 	fLeft = left;
 	fTop = top;
 
-	SaveExpandedItems();
-
 	if (stateChanged || vertSwap) {
 		be_app->PostMessage(kStateChanged);
 			// Send a message to the preferences window to let it know to
 			// enable or disable preference items.
 
-		// If switching to expando state, rebuild expando menu bar.
-		if (fState == kExpandoState) {
-			if (fInlineScrollView != NULL) {
-				fInlineScrollView->DetachScrollers();
-				fInlineScrollView->RemoveSelf();
-				delete fInlineScrollView;
-				fInlineScrollView = NULL;
+		if (vertSwap && fExpandoMenuBar != NULL) {
+			if (fVertical) {
+				fInlineScrollView->SetOrientation(B_VERTICAL);
+				fExpandoMenuBar->SetMenuLayout(B_ITEMS_IN_COLUMN);
+				fExpandoMenuBar->StartMonitoringWindows();
+			} else {
+				fInlineScrollView->SetOrientation(B_HORIZONTAL);
+				fExpandoMenuBar->SetMenuLayout(B_ITEMS_IN_ROW);
+				fExpandoMenuBar->StopMonitoringWindows();
 			}
-			if (fExpandoMenuBar != NULL) {
-				delete fExpandoMenuBar;
-				fExpandoMenuBar = NULL;
-			}
-
-			fExpandoMenuBar = new TExpandoMenuBar(BRect(0, 0, 0, 0),
-				"ExpandoMenuBar", this, fVertical);
-			fInlineScrollView = new TInlineScrollView(BRect(0, 0, 0, 0),
-				fExpandoMenuBar, fVertical ? B_VERTICAL : B_HORIZONTAL);
-			AddChild(fInlineScrollView);
 		}
 	}
 
 	PlaceDeskbarMenu();
 	PlaceTray(vertSwap, leftSwap);
 	PlaceApplicationBar();
-}
-
-
-void
-TBarView::AddExpandedItem(const char* signature)
-{
-	bool shouldAdd = true;
-
-	for (int32 i = 0; i < fExpandedItems.CountItems(); i++) {
-		BString *itemSig = static_cast<BString*>(fExpandedItems.ItemAt(i));
-		if (itemSig->Compare(signature) == 0) {
-			// already in the list, don't add the signature
-			shouldAdd = false;
-			break;
-		}
-	}
-
-	if (shouldAdd)
-		fExpandedItems.AddItem(static_cast<void*>(new BString(signature)));
 }
 
 
@@ -1040,7 +935,7 @@ status_t
 TBarView::SendDragMessage(const char* signature, entry_ref* ref)
 {
 	status_t err = B_ERROR;
-	if (fDragMessage) {
+	if (fDragMessage != NULL) {
 		if (fRefsRcvdOnly) {
 			// current message sent to apps is only B_REFS_RECEIVED
 			fDragMessage->what = B_REFS_RECEIVED;
@@ -1059,6 +954,7 @@ TBarView::SendDragMessage(const char* signature, entry_ref* ref)
 		} else if (signature != NULL && *signature != '\0')
 			roster.Launch(signature, fDragMessage);
 	}
+
 	return err;
 }
 

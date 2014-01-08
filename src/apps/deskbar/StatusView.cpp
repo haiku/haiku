@@ -142,7 +142,7 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
 		R_LeafLogoBitmap);
 	if (logoBitmap != NULL) {
-		sMinimumWindowWidth = max_c(sMinimumWindowWidth,
+		sMinimumWindowWidth = std::max(sMinimumWindowWidth,
 			2 * (logoBitmap->Bounds().Width() + 8));
 		fMinimumTrayWidth = sMinimumWindowWidth - kGutter - kDragRegionWidth;
 	}

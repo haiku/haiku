@@ -173,6 +173,7 @@ public:
 private:
 	friend class BMenuBar;
 	friend class BPrivate::MenuPrivate;
+	friend class TExpandoMenuBar;
 	friend status_t _init_interface_kit_();
 	friend status_t	set_menu_info(menu_info* info);
 	friend status_t	get_menu_info(menu_info* info);
@@ -269,6 +270,7 @@ private:
 			int					_State(BMenuItem** _item = NULL) const;
 			void				_InvokeItem(BMenuItem* item, bool now = false);
 			void				_QuitTracking(bool onlyThis = true);
+			void				_SetMenuLayout(menu_layout layout) { fLayout = layout; };
 
 	static	menu_info			sMenuInfo;
 

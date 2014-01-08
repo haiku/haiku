@@ -129,8 +129,6 @@ TBarApp::TBarApp()
 	fSwitcherMessenger = BMessenger(new TSwitchManager(fSettings.switcherLoc));
 	fBarWindow->Show();
 
-	// Call UpdatePlacement() after the window is shown because expanded
-	// apps need to resize the window.
 	fBarWindow->Lock();
 	fBarView->UpdatePlacement();
 	fBarWindow->Unlock();
@@ -505,7 +503,6 @@ TBarApp::MessageReceived(BMessage* message)
 				break;
 
 			fBarWindow->Lock();
-			fBarView->SaveExpandedItems();
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
@@ -521,7 +518,6 @@ TBarApp::MessageReceived(BMessage* message)
 				break;
 
 			fBarWindow->Lock();
-			fBarView->SaveExpandedItems();
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
@@ -545,7 +541,6 @@ TBarApp::MessageReceived(BMessage* message)
 				break;
 
 			fBarWindow->Lock();
-			fBarView->SaveExpandedItems();
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
@@ -561,7 +556,6 @@ TBarApp::MessageReceived(BMessage* message)
 				break;
 
 			fBarWindow->Lock();
-			fBarView->SaveExpandedItems();
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
@@ -577,7 +571,6 @@ TBarApp::MessageReceived(BMessage* message)
 				break;
 
 			fBarWindow->Lock();
-			fBarView->SaveExpandedItems();
 			fBarView->PlaceApplicationBar();
 			fBarWindow->Unlock();
 			break;
@@ -611,7 +604,6 @@ TBarApp::MessageReceived(BMessage* message)
 				break;
 
 			fBarWindow->Lock();
-			fBarView->SaveExpandedItems();
 			if (!fBarView->Vertical()) {
 				// Must also resize the Deskbar menu and replicant tray in
 				// horizontal mode
@@ -804,9 +796,6 @@ TBarApp::AddTeam(team_id team, uint32 flags, const char* sig, entry_ref* ref)
 	FetchAppIcon(barInfo);
 	barInfo->teams->AddItem((void*)(addr_t)team);
 	sBarTeamInfoList.AddItem(barInfo);
-
-	if (fSettings.expandNewTeams)
-		fBarView->AddExpandedItem(sig);
 
 	int32 subsCount = sSubscribers.CountItems();
 	if (subsCount > 0) {
