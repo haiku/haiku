@@ -13,8 +13,6 @@
 struct scheduler_mode_operations {
 	const char*				name;
 
-	bool					avoid_boost;
-
 	bigtime_t				base_quantum;
 	bigtime_t				minimal_quantum;
 	bigtime_t				quantum_multipliers[2];

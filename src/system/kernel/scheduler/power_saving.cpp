@@ -236,8 +236,6 @@ rebalance_irqs(bool idle)
 scheduler_mode_operations gSchedulerPowerSavingMode = {
 	"power saving",
 
-	false,
-
 	3000,
 	1000,
 	{ 3, 60 },

@@ -404,8 +404,6 @@ reschedule(int32 nextState)
 
 			if (oldThreadData->HasQuantumEnded(oldThread->cpu->preempted,
 					oldThread->has_yielded)) {
-				oldThreadData->IncreasePenalty();
-
 				TRACE("enqueueing thread %ld into run queue priority = %ld\n",
 					oldThread->id, oldThreadData->GetEffectivePriority());
 				putOldThreadAtBack = true;
@@ -419,7 +417,6 @@ reschedule(int32 nextState)
 		case THREAD_STATE_FREE_ON_RESCHED:
 			break;
 		default:
-			oldThreadData->IncreasePenalty();
 			oldThreadData->GoesAway();
 			TRACE("not enqueueing thread %ld into run queue next_state = %ld\n",
 				oldThread->id, nextState);

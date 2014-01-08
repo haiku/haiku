@@ -19,6 +19,9 @@ ThreadData::_InitBase()
 	fAdditionalPenalty = 0;
 	fEffectivePriority = fThread->priority;
 
+	fReceivedPenalty = false;
+	fHasSlept = false;
+
 	fTimeLeft = 0;
 	fStolenTime = 0;
 
@@ -28,7 +31,8 @@ ThreadData::_InitBase()
 
 	fWentSleep = 0;
 	fWentSleepActive = 0;
-	fWentSleepCount = -1;
+	fWentSleepCount = 0;
+	fWentSleepCountIdle = 0;
 
 	fEnqueued = false;
 }
@@ -124,7 +128,25 @@ ThreadData::Dump() const
 		additionalPenalty = fAdditionalPenalty % kMinimalPriority;
 	kprintf("\tadditional_penalty:\t%" B_PRId32 " (%" B_PRId32 ")\n",
 		additionalPenalty, fAdditionalPenalty);
-	kprintf("\tstolen_time:\t\t%" B_PRId64 "\n", fStolenTime);
+	kprintf("\teffective_priority:\t%" B_PRId32 "\n", GetEffectivePriority());
+
+	kprintf("\treceived_penalty:\t%s\n", fReceivedPenalty ? "true" : "false");
+	kprintf("\thas_slept:\t\t%s\n", fHasSlept ? "true" : "false");
+
+	bigtime_t quantum = _GetBaseQuantum();
+	if (fThread->priority < B_FIRST_REAL_TIME_PRIORITY) {
+		int32 threadCount = (fCore->ThreadCount() + 1) / fCore->CPUCount();
+		threadCount = max_c(threadCount, 1);
+
+		quantum
+			= std::min(gCurrentMode->maximum_latency / threadCount, quantum);
+		quantum = std::max(quantum,	gCurrentMode->minimal_quantum);
+	}
+	kprintf("\ttime_left:\t\t%" B_PRId64 " us (quantum: %" B_PRId64 " us)\n",
+		fTimeLeft, quantum);
+
+	kprintf("\tstolen_time:\t\t%" B_PRId64 " us\n", fStolenTime);
+	kprintf("\tquantum_start:\t\t%" B_PRId64 " us\n", fQuantumStart);
 	kprintf("\tload:\t\t\t%" B_PRId32 "%%\n", fLoad / 10);
 	kprintf("\twent_sleep:\t\t%" B_PRId64 "\n", fWentSleep);
 	kprintf("\twent_sleep_active:\t%" B_PRId64 "\n", fWentSleepActive);

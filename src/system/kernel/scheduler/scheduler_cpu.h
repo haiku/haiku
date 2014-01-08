@@ -150,6 +150,7 @@ public:
 						void			UpdateLoad(int32 delta);
 
 	inline				int32			StarvationCounter() const;
+	inline				int32			StarvationCounterIdle() const;
 
 	inline				void			CPUGoesIdle(CPUEntry* cpu);
 	inline				void			CPUWakesUp(CPUEntry* cpu);
@@ -174,7 +175,7 @@ private:
 						spinlock		fCPULock;
 
 						int32			fStarvationCounter;
-						DoublyLinkedList<ThreadData>	fThreadList;
+						int32			fStarvationCounterIdle;
 
 						int32			fThreadCount;
 						ThreadRunQueue	fRunQueue;
@@ -387,6 +388,14 @@ CoreEntry::StarvationCounter() const
 }
 
 
+inline int32
+CoreEntry::StarvationCounterIdle() const
+{
+	SCHEDULER_ENTER_FUNCTION();
+	return fStarvationCounterIdle;
+}
+
+
 /* PackageEntry::CoreGoesIdle and PackageEntry::CoreWakesUp have to be defined
    before CoreEntry::CPUGoesIdle and CoreEntry::CPUWakesUp. If they weren't
    GCC2 wouldn't inline them as, apparently, it doesn't do enough optimization
@@ -437,8 +446,13 @@ PackageEntry::CoreWakesUp(CoreEntry* core)
 inline void
 CoreEntry::CPUGoesIdle(CPUEntry* /* cpu */)
 {
-	ASSERT(fCPUIdleCount < fCPUCount);
+	atomic_add(&fStarvationCounter, 1);
+	atomic_add(&fStarvationCounterIdle, 1);
 
+	if (gSingleCore)
+		return;
+
+	ASSERT(fCPUIdleCount < fCPUCount);
 	if (++fCPUIdleCount == fCPUCount)
 		fPackage->CoreGoesIdle(this);
 }
@@ -447,8 +461,10 @@ CoreEntry::CPUGoesIdle(CPUEntry* /* cpu */)
 inline void
 CoreEntry::CPUWakesUp(CPUEntry* /* cpu */)
 {
-	ASSERT(fCPUIdleCount > 0);
+	if (gSingleCore)
+		return;
 
+	ASSERT(fCPUIdleCount > 0);
 	if (fCPUIdleCount-- == fCPUCount)
 		fPackage->CoreWakesUp(this);
 }

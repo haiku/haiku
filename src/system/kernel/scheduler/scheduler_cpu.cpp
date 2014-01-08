@@ -21,7 +21,6 @@ public:
 	static	void		DumpCPURunQueue(CPUEntry* cpu);
 	static	void		DumpCoreRunQueue(CoreEntry* core);
 	static	void		DumpIdleCoresInPackage(PackageEntry* package);
-
 };
 
 
@@ -43,7 +42,8 @@ ThreadRunQueue::Dump() const
 
 			kprintf("%p  %-7" B_PRId32 " %-8" B_PRId32 " %-8" B_PRId32 " %s\n",
 				thread, thread->id, thread->priority,
-				threadData->GetEffectivePriority(), thread->name);
+				thread->priority - threadData->GetEffectivePriority(),
+				thread->name);
 		}
 	}
 }
@@ -158,9 +158,6 @@ CPUEntry::UpdatePriority(int32 priority)
 	if (oldPriority == priority)
 		return;
 	fCore->CPUHeap()->ModifyKey(this, priority);
-
-	if (gSingleCore)
-		return;
 
 	if (oldPriority == B_IDLE_PRIORITY)
 		fCore->CPUWakesUp(this);
@@ -345,6 +342,7 @@ CoreEntry::CoreEntry()
 	fCPUCount(0),
 	fCPUIdleCount(0),
 	fStarvationCounter(0),
+	fStarvationCounterIdle(0),
 	fThreadCount(0),
 	fActiveTime(0),
 	fLoad(0),
@@ -380,8 +378,6 @@ CoreEntry::PushBack(ThreadData* thread, int32 priority)
 	SCHEDULER_ENTER_FUNCTION();
 
 	fRunQueue.PushBack(thread, priority);
-	fThreadList.Insert(thread);
-
 	atomic_add(&fThreadCount, 1);
 }
 
@@ -393,12 +389,13 @@ CoreEntry::Remove(ThreadData* thread)
 
 	ASSERT(thread->IsEnqueued());
 	thread->SetDequeued();
-	if (thread_is_idle_thread(thread->GetThread())
-		|| fThreadList.Head() == thread) {
+
+	ASSERT(!thread_is_idle_thread(thread->GetThread()));
+	if (thread->GetEffectivePriority() == B_LOWEST_ACTIVE_PRIORITY
+		|| thread->IsCPUBound()) {
 		atomic_add(&fStarvationCounter, 1);
 	}
-	if (thread->WentSleepCount() == 0)
-		fThreadList.Remove(thread);
+
 	fRunQueue.Remove(thread);
 	atomic_add(&fThreadCount, -1);
 }
@@ -548,8 +545,8 @@ CoreLoadHeap::Dump()
 	CoreEntry* entry = PeekMinimum();
 	while (entry) {
 		int32 key = GetKey(entry);
-		kprintf("%4" B_PRId32 " %3" B_PRId32 "%%\n", entry->ID(),
-			entry->GetLoad() / 10);
+		kprintf("%4" B_PRId32 " %3" B_PRId32 "%% %7" B_PRId32 "\n", entry->ID(),
+			entry->GetLoad() / 10, entry->ThreadCount());
 
 		RemoveMinimum();
 		sDebugCoreHeap.Insert(entry, key);
@@ -647,7 +644,7 @@ DebugDumper::DumpIdleCoresInPackage(PackageEntry* package)
 
 
 static int
-dump_run_queue(int argc, char **argv)
+dump_run_queue(int /* argc */, char** /* argv */)
 {
 	int32 cpuCount = smp_get_num_cpus();
 	int32 coreCount = gCoreCount;
@@ -665,9 +662,9 @@ dump_run_queue(int argc, char **argv)
 
 
 static int
-dump_cpu_heap(int argc, char** argv)
+dump_cpu_heap(int /* argc */, char** /* argv */)
 {
-	kprintf("core load\n");
+	kprintf("core load threads\n");
 	gCoreLoadHeap.Dump();
 	kprintf("\n");
 	gCoreHighLoadHeap.Dump();
@@ -685,7 +682,7 @@ dump_cpu_heap(int argc, char** argv)
 
 
 static int
-dump_idle_cores(int argc, char** argv)
+dump_idle_cores(int /* argc */, char** /* argv */)
 {
 	kprintf("Idle packages:\n");
 	IdlePackageList::ReverseIterator idleIterator
