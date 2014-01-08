@@ -217,14 +217,14 @@ ThreadData::ComputeQuantum()
 	quantum += fStolenTime;
 	fStolenTime = 0;
 
-	int32 threadCount = (fCore->ThreadCount() + 1) / fCore->CPUCount();
-	threadCount = max_c(threadCount, 1);
-
-	quantum = std::min(gCurrentMode->maximum_latency / threadCount, quantum);
-	quantum = std::max(quantum,	gCurrentMode->minimal_quantum);
+	int32 threadCount = fCore->ThreadCount() / fCore->CPUCount();
+	if (threadCount >= 1) {
+		quantum
+			= std::min(gCurrentMode->maximum_latency / threadCount, quantum);
+		quantum = std::max(quantum,	gCurrentMode->minimal_quantum);
+	}
 
 	fTimeLeft = quantum;
-
 	return quantum;
 }
 

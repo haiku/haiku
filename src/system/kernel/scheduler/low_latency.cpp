@@ -164,7 +164,7 @@ scheduler_mode_operations gSchedulerLowLatencyMode = {
 	100,
 	{ 2, 25 },
 
-	50000,
+	10000,
 
 	switch_to_mode,
 	set_cpu_enabled,

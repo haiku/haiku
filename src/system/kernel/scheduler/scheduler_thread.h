@@ -44,10 +44,10 @@ public:
 
 	inline	int32		GetEffectivePriority() const;
 
+	inline	bool		IsCPUBound() const;
+
 	inline	void		CancelPenalty();
 	inline	bool		ShouldCancelPenalty() const;
-
-	inline	bool		IsCPUBound() const	{ return fAdditionalPenalty != 0; }
 
 			bool		ChooseCoreAndCPU(CoreEntry*& targetCore,
 							CPUEntry*& targetCPU);
@@ -85,7 +85,7 @@ public:
 	static	void		ComputeQuantumLengths();
 
 private:
-	inline	void		_IncreasePenalty();
+	inline	void		_IncreasePenalty(bool strong);
 	inline	int32		_GetPenalty() const;
 
 			void		_ComputeEffectivePriority() const;
@@ -175,7 +175,7 @@ ThreadData::GetEffectivePriority() const
 
 
 inline void
-ThreadData::_IncreasePenalty()
+ThreadData::_IncreasePenalty(bool strong)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
@@ -187,17 +187,27 @@ ThreadData::_IncreasePenalty()
 	TRACE("increasing thread %ld penalty\n", fThread->id);
 
 	fReceivedPenalty = true;
-	int32 oldPenalty = fPriorityPenalty++;
+	int32 oldPenalty = fPriorityPenalty;
+	if (strong)
+		fPriorityPenalty++;
 
 	ASSERT(fThread->priority - oldPenalty >= B_LOWEST_ACTIVE_PRIORITY);
 
 	const int kMinimalPriority = _GetMinimalPriority();
-	if (fThread->priority - oldPenalty <= kMinimalPriority) {
+	if (!strong || fThread->priority - oldPenalty <= kMinimalPriority) {
 		fPriorityPenalty = oldPenalty;
 		fAdditionalPenalty++;
 	}
 
 	_ComputeEffectivePriority();
+}
+
+
+inline bool
+ThreadData::IsCPUBound() const
+{
+	SCHEDULER_ENTER_FUNCTION();
+	return fAdditionalPenalty != 0 && fPriorityPenalty != 0;
 }
 
 
@@ -255,7 +265,7 @@ ThreadData::GoesAway()
 	SCHEDULER_ENTER_FUNCTION();
 
 	if (!fReceivedPenalty)
-		_IncreasePenalty();
+		_IncreasePenalty(false);
 	fHasSlept = true;
 
 	fLastInterruptTime = 0;
@@ -400,7 +410,7 @@ ThreadData::HasQuantumEnded(bool wasPreempted, bool hasYielded)
 
 	if (fTimeLeft == 0) {
 		if (!fReceivedPenalty && !fHasSlept)
-			_IncreasePenalty();
+			_IncreasePenalty(true);
 		fReceivedPenalty = false;
 		fHasSlept = false;
 	}
