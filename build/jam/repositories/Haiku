@@ -20,9 +20,7 @@ local packages =
 	haiku_$(secondaryArchs)_devel
 	;
 
-# TODO : the following should be used once WebPositive builds on x86_64
-# if $(TARGET_PACKAGING_ARCH) != x86_gcc2 || $(secondaryArchs) {
-if x86 in $(HAIKU_PACKAGING_ARCHS) {
+if $(TARGET_PACKAGING_ARCH) != x86_gcc2 || $(secondaryArchs) {
 	packages += webpositive ;
 }
 
