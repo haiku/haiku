@@ -190,18 +190,14 @@ CPUEntry::ComputeLoad()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	ASSERT(gTrackLoad);
+	ASSERT(gTrackCPULoad);
 	ASSERT(!gCPU[fCPUNumber].disabled);
 	ASSERT(fCPUNumber == smp_get_current_cpu());
 
-	int oldLoad = compute_load(fMeasureTime, fMeasureActiveTime, fLoad);
+	int oldLoad = compute_load(fMeasureTime, fMeasureActiveTime, fLoad,
+			system_time());
 	if (oldLoad < 0)
 		return;
-
-	if (oldLoad != fLoad) {
-		int32 delta = fLoad - oldLoad;
-		fCore->UpdateLoad(delta);
-	}
 
 	if (fLoad > kVeryHighLoad)
 		gCurrentMode->rebalance_irqs(false);
@@ -272,11 +268,10 @@ CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 		oldThreadData->UpdateActivity(active);
 	}
 
-	if (gTrackLoad) {
-		oldThreadData->ComputeLoad();
-		nextThreadData->ComputeLoad();
+	if (gTrackCPULoad) {
 		if (!cpuEntry->disabled)
 			ComputeLoad();
+		_RequestPerformanceLevel(nextThreadData);
 	}
 
 	Thread* nextThread = nextThreadData->GetThread();
@@ -285,9 +280,6 @@ CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 		cpuEntry->last_user_time = nextThread->user_time;
 
 		nextThreadData->SetLastInterruptTime(cpuEntry->interrupt_time);
-
-		if (gCPUFrequencyManagement)
-		_RequestPerformanceLevel(nextThreadData);
 	}
 }
 
@@ -365,7 +357,8 @@ CoreEntry::CoreEntry()
 	fThreadCount(0),
 	fActiveTime(0),
 	fLoad(0),
-	fHighLoad(false)
+	fHighLoad(false),
+	fLastLoadUpdate(0)
 {
 	B_INITIALIZE_SPINLOCK(&fCPULock);
 	B_INITIALIZE_SPINLOCK(&fQueueLock);
@@ -425,20 +418,24 @@ CoreEntry::UpdateLoad(int32 delta)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	if (fCPUCount == 0) {
-		fLoad = 0;
-		return;
-	}
+	ASSERT(gTrackCoreLoad);
 
 	atomic_add(&fLoad, delta);
 
-	WriteSpinLocker coreLocker(gCoreHeapsLock);
+	bigtime_t now = system_time();
+	if (now < kLoadMeasureInterval + fLastLoadUpdate)
+		return;
+	if (!try_acquire_write_spinlock(&gCoreHeapsLock))
+		return;
+	WriteSpinLocker coreLocker(gCoreHeapsLock, true);
+
+	fLastLoadUpdate = now;
 
 	int32 newKey = GetLoad();
 	int32 oldKey = CoreLoadHeap::GetKey(this);
 
-	ASSERT(oldKey >= 0 && oldKey <= kMaxLoad);
-	ASSERT(newKey >= 0 && newKey <= kMaxLoad);
+	ASSERT(oldKey >= 0);
+	ASSERT(newKey >= 0);
 
 	if (oldKey == newKey)
 		return;
@@ -502,6 +499,9 @@ CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 
 	fIdleCPUCount--;
 	if (--fCPUCount == 0) {
+		// unassign threads
+		thread_map(CoreEntry::_UnassignThread, this);
+
 		// core has been disabled
 		if (fHighLoad) {
 			gCoreHighLoadHeap.ModifyKey(this, -1);
@@ -516,8 +516,6 @@ CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 		fPackage->RemoveIdleCore(this);
 
 		// get rid of threads
-		thread_map(CoreEntry::_UnassignThread, this);
-
 		while (fRunQueue.PeekMaximum() != NULL) {
 			ThreadData* threadData = fRunQueue.PeekMaximum();
 
@@ -535,7 +533,6 @@ CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 	fCPUHeap.RemoveRoot();
 
 	ASSERT(cpu->GetLoad() >= 0 && cpu->GetLoad() <= kMaxLoad);
-	fLoad -= cpu->GetLoad();
 	ASSERT(fLoad >= 0);
 }
 
@@ -565,9 +562,8 @@ CoreLoadHeap::Dump()
 	while (entry) {
 		int32 key = GetKey(entry);
 
-		int32 activeCPUs = entry->CPUCount() - entry->IdleCPUCount();
 		kprintf("%4" B_PRId32 " %3" B_PRId32 "%% %7" B_PRId32 "\n", entry->ID(),
-			entry->GetLoad() / 10, entry->ThreadCount() + activeCPUs);
+			entry->GetLoad() / 10, entry->ThreadCount());
 
 		RemoveMinimum();
 		sDebugCoreHeap.Insert(entry, key);
@@ -685,8 +681,6 @@ dump_run_queue(int /* argc */, char** /* argv */)
 static int
 dump_cpu_heap(int /* argc */, char** /* argv */)
 {
-	kprintf("Total ready threads: %" B_PRId32 "\n\n", gReadyThreadCount);
-
 	kprintf("core load threads\n");
 	gCoreLoadHeap.Dump();
 	kprintf("\n");

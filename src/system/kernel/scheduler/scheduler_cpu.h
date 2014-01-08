@@ -123,16 +123,13 @@ public:
 	inline				PackageEntry*	Package() const	{ return fPackage; }
 	inline				int32			CPUCount() const
 											{ return fCPUCount; }
-	inline				int32			IdleCPUCount() const
-											{ return fIdleCPUCount; }
 
 	inline				void			LockCPUHeap();
 	inline				void			UnlockCPUHeap();
 
 	inline				CPUPriorityHeap*	CPUHeap();
 
-	inline				int32			ThreadCount() const
-											{ return fThreadCount; }
+	inline				int32			ThreadCount() const;
 
 	inline				void			LockRunQueue();
 	inline				void			UnlockRunQueue();
@@ -188,6 +185,7 @@ private:
 
 						int32			fLoad;
 						bool			fHighLoad;
+						bigtime_t		fLastLoadUpdate;
 
 						friend class DebugDumper;
 } CACHE_LINE_ALIGN;
@@ -329,6 +327,14 @@ CoreEntry::CPUHeap()
 {
 	SCHEDULER_ENTER_FUNCTION();
 	return &fCPUHeap;
+}
+
+
+inline int32
+CoreEntry::ThreadCount() const
+{
+	SCHEDULER_ENTER_FUNCTION();
+	return fThreadCount + fCPUCount - fIdleCPUCount;
 }
 
 

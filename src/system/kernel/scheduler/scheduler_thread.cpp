@@ -6,14 +6,6 @@
 #include "scheduler_thread.h"
 
 
-namespace Scheduler {
-
-
-int32 gReadyThreadCount;
-
-
-}	// namespace Scheduler
-
 using namespace Scheduler;
 
 
@@ -33,9 +25,11 @@ ThreadData::_InitBase()
 	fTimeLeft = 0;
 	fStolenTime = 0;
 
-	fMeasureActiveTime = 0;
-	fMeasureTime = 0;
-	fLoad = 0;
+	fMeasureAvailableActiveTime = 0;
+	fLastMeasureAvailableTime = 0;
+	fMeasureAvailableTime = 0;
+
+	fNeededLoad = 0;
 
 	fWentSleep = 0;
 	fWentSleepActive = 0;
@@ -43,6 +37,7 @@ ThreadData::_InitBase()
 	fWentSleepCountIdle = 0;
 
 	fEnqueued = false;
+	fReady = false;
 }
 
 
@@ -113,6 +108,14 @@ ThreadData::Init()
 
 	ThreadData* currentThreadData = thread_get_current_thread()->scheduler_data;
 	fCore = currentThreadData->fCore;
+
+	if (fThread->priority < B_FIRST_REAL_TIME_PRIORITY) {
+		fPriorityPenalty = std::min(currentThreadData->fPriorityPenalty,
+				std::max(fThread->priority - _GetMinimalPriority(), int32(0)));
+		fAdditionalPenalty = currentThreadData->fAdditionalPenalty;
+
+		_ComputeEffectivePriority();
+	}
 }
 
 
@@ -122,6 +125,7 @@ ThreadData::Init(CoreEntry* core)
 	_InitBase();
 
 	fCore = core;
+	fReady = true;
 }
 
 
@@ -155,7 +159,7 @@ ThreadData::Dump() const
 
 	kprintf("\tstolen_time:\t\t%" B_PRId64 " us\n", fStolenTime);
 	kprintf("\tquantum_start:\t\t%" B_PRId64 " us\n", fQuantumStart);
-	kprintf("\tload:\t\t\t%" B_PRId32 "%%\n", fLoad / 10);
+	kprintf("\tneeded_load:\t\t%" B_PRId32 "%%\n", fNeededLoad / 10);
 	kprintf("\twent_sleep:\t\t%" B_PRId64 "\n", fWentSleep);
 	kprintf("\twent_sleep_active:\t%" B_PRId64 "\n", fWentSleepActive);
 	kprintf("\twent_sleep_count:\t%" B_PRId32 "\n", fWentSleepCount);
@@ -185,18 +189,13 @@ ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 	ASSERT(targetCore != NULL);
 	ASSERT(targetCPU != NULL);
 
+	if (fReady && fCore != targetCore && fCore != NULL) {
+		fCore->UpdateLoad(-fNeededLoad);
+		targetCore->UpdateLoad(fNeededLoad);
+	}
+
 	fCore = targetCore;
 	return rescheduleNeeded;
-}
-
-
-void
-ThreadData::ComputeLoad()
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	ASSERT(gTrackLoad);
-	compute_load(fMeasureTime, fMeasureActiveTime, fLoad);
 }
 
 
@@ -269,6 +268,21 @@ ThreadData::_GetPenalty() const
 		penalty += fAdditionalPenalty % kMinimalPriority;
 
 	return penalty;
+}
+
+
+void
+ThreadData::_ComputeNeededLoad()
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	int32 oldLoad = compute_load(fLastMeasureAvailableTime,
+		fMeasureAvailableActiveTime, fNeededLoad, fMeasureAvailableTime);
+	if (oldLoad < 0 || oldLoad == fNeededLoad)
+		return;
+
+	int32 delta = fNeededLoad - oldLoad;
+	fCore->UpdateLoad(delta);
 }
 
 

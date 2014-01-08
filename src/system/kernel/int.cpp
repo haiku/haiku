@@ -256,7 +256,7 @@ update_int_load(int i)
 
 	int32 oldLoad = sVectors[i].load;
 	compute_load(sVectors[i].last_measure_time, sVectors[i].last_measure_active,
-		sVectors[i].load);
+		sVectors[i].load, system_time());
 
 	if (oldLoad != sVectors[i].load)
 		atomic_add(&sVectors[i].assigned_cpu->load, sVectors[i].load - oldLoad);
@@ -365,9 +365,13 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	vectorLocker.Unlock();
 
 	cpu_ent* cpu = get_cpu_struct();
-	cpu->interrupt_time += deltaTime;
-	if (sVectors[vector].type == INTERRUPT_TYPE_IRQ)
-		cpu->irq_time += deltaTime;
+	if (sVectors[vector].type == INTERRUPT_TYPE_IRQ
+		|| sVectors[vector].type == INTERRUPT_TYPE_ICI
+		|| sVectors[vector].type == INTERRUPT_TYPE_LOCAL_IRQ) {
+		cpu->interrupt_time += deltaTime;
+		if (sVectors[vector].type == INTERRUPT_TYPE_IRQ)
+			cpu->irq_time += deltaTime;
+	}
 
 	update_int_load(vector);
 

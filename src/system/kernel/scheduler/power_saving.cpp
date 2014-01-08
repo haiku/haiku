@@ -123,7 +123,7 @@ should_rebalance(const ThreadData* threadData)
 	CoreEntry* core = threadData->Core();
 
 	int32 coreLoad = core->GetLoad();
-	int32 threadLoad = threadData->GetLoad();
+	int32 threadLoad = threadData->GetLoad() / core->CPUCount();
 	if (coreLoad > kHighLoad) {
 		if (sSmallTaskCore == core) {
 			sSmallTaskCore = NULL;

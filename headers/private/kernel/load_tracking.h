@@ -15,10 +15,9 @@ const bigtime_t kIntervalInaccuracy = kLoadMeasureInterval / 4;
 
 
 static inline int32
-compute_load(bigtime_t& measureTime, bigtime_t& measureActiveTime, int32& load)
+compute_load(bigtime_t& measureTime, bigtime_t& measureActiveTime, int32& load,
+	bigtime_t now)
 {
-	bigtime_t now = system_time();
-
 	if (measureTime == 0) {
 		measureTime = now;
 		return -1;

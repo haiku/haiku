@@ -56,6 +56,7 @@ public:
 							{ fLastInterruptTime = interruptTime; }
 	inline	void		SetStolenInterruptTime(bigtime_t interruptTime);
 
+	inline	void		Continues();
 	inline	void		GoesAway();
 	inline	void		Dies();
 
@@ -67,7 +68,6 @@ public:
 	inline	bool		Dequeue();
 
 	inline	void		UpdateActivity(bigtime_t active);
-			void		ComputeLoad();
 
 	inline	bool		HasQuantumEnded(bool wasPreempted, bool hasYielded);
 			bigtime_t	ComputeQuantum();
@@ -77,16 +77,18 @@ public:
 	inline	void		SetDequeued()	{ fEnqueued = false; }
 
 	inline	Thread*		GetThread() const	{ return fThread; }
-	inline	int32		GetLoad() const	{ return fLoad; }
+	inline	int32		GetLoad() const	{ return fNeededLoad; }
 
 	inline	CoreEntry*	Core() const	{ return fCore; }
-	inline	void		UnassignCore() { fCore = NULL; }
+	inline	void		UnassignCore(bool running = false);
 
 	static	void		ComputeQuantumLengths();
 
 private:
 	inline	void		_IncreasePenalty(bool strong);
 	inline	int32		_GetPenalty() const;
+
+			void		_ComputeNeededLoad();
 
 			void		_ComputeEffectivePriority() const;
 
@@ -104,6 +106,7 @@ private:
 			int32		fWentSleepCountIdle;
 
 			bool		fEnqueued;
+			bool		fReady;
 
 			Thread*		fThread;
 
@@ -116,9 +119,11 @@ private:
 
 			bigtime_t	fTimeLeft;
 
-			bigtime_t	fMeasureActiveTime;
-			bigtime_t	fMeasureTime;
-			int32		fLoad;
+			bigtime_t	fMeasureAvailableActiveTime;
+			bigtime_t	fMeasureAvailableTime;
+			bigtime_t	fLastMeasureAvailableTime;
+
+			int32		fNeededLoad;
 
 			CoreEntry*	fCore;
 };
@@ -129,8 +134,6 @@ public:
 
 	virtual	void		operator()(ThreadData* thread) = 0;
 };
-
-extern int32 gReadyThreadCount;
 
 
 inline int32
@@ -235,8 +238,6 @@ ThreadData::ShouldCancelPenalty() const
 
 	if (fCore == NULL)
 		return false;
-	if (system_time() - fWentSleep > gCurrentMode->minimal_quantum * 2)
-		return false;
 
 	if (GetEffectivePriority() != B_LOWEST_ACTIVE_PRIORITY
 		&& !IsCPUBound()) {
@@ -255,7 +256,17 @@ ThreadData::SetStolenInterruptTime(bigtime_t interruptTime)
 
 	interruptTime -= fLastInterruptTime;
 	fStolenTime += interruptTime;
-	fMeasureActiveTime -= interruptTime;
+}
+
+
+inline void
+ThreadData::Continues()
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	ASSERT(fReady);
+	if (gTrackCoreLoad)
+		_ComputeNeededLoad();
 }
 
 
@@ -263,6 +274,8 @@ inline void
 ThreadData::GoesAway()
 {
 	SCHEDULER_ENTER_FUNCTION();
+
+	ASSERT(fReady);
 
 	if (!fReceivedPenalty)
 		_IncreasePenalty(false);
@@ -275,7 +288,9 @@ ThreadData::GoesAway()
 	fWentSleepCountIdle = fCore->StarvationCounterIdle();
 	fWentSleepActive = fCore->GetActiveTime();
 
-	atomic_add(&gReadyThreadCount, -1);
+	if (gTrackCoreLoad)
+		fCore->UpdateLoad(-fNeededLoad);
+	fReady = false;
 }
 
 
@@ -283,7 +298,11 @@ inline void
 ThreadData::Dies()
 {
 	SCHEDULER_ENTER_FUNCTION();
-	atomic_add(&gReadyThreadCount, -1);
+
+	ASSERT(fReady);
+	if (gTrackCoreLoad)
+		fCore->UpdateLoad(-fNeededLoad);
+	fReady = false;
 }
 
 
@@ -291,9 +310,6 @@ inline void
 ThreadData::PutBack()
 {
 	SCHEDULER_ENTER_FUNCTION();
-
-	if (gTrackLoad)
-		ComputeLoad();
 
 	int32 priority = GetEffectivePriority();
 
@@ -321,13 +337,18 @@ ThreadData::Enqueue()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	if (fThread->state != B_THREAD_READY && fThread->state != B_THREAD_RUNNING)
-		atomic_add(&gReadyThreadCount, 1);
+	if (!fReady) {
+		ASSERT(system_time() - fWentSleep > 0);
+		if (gTrackCoreLoad) {
+			fMeasureAvailableTime += system_time() - fWentSleep;
+
+			fCore->UpdateLoad(fNeededLoad);
+			_ComputeNeededLoad();
+		}
+		fReady = true;
+	}
 
 	fThread->state = B_THREAD_READY;
-
-	if (gTrackLoad)
-		ComputeLoad();
 
 	int32 priority = GetEffectivePriority();
 
@@ -381,7 +402,12 @@ inline void
 ThreadData::UpdateActivity(bigtime_t active)
 {
 	SCHEDULER_ENTER_FUNCTION();
-	fMeasureActiveTime += active;
+
+	if (!gTrackCoreLoad)
+		return;
+
+	fMeasureAvailableTime += active;
+	fMeasureAvailableActiveTime += active;
 }
 
 
@@ -396,9 +422,8 @@ ThreadData::HasQuantumEnded(bool wasPreempted, bool hasYielded)
 	}
 
 	bigtime_t timeUsed = system_time() - fQuantumStart;
-	if (timeUsed > 0);
-		fTimeLeft -= timeUsed;
-	fTimeLeft = std::max(fTimeLeft, bigtime_t(0));
+	ASSERT(timeUsed >= 0);
+	fTimeLeft -= timeUsed;
 
 	// too little time left, it's better make the next quantum a bit longer
 	int32 skipTime = gCurrentMode->minimal_quantum;
@@ -424,6 +449,25 @@ ThreadData::StartQuantum()
 {
 	SCHEDULER_ENTER_FUNCTION();
 	fQuantumStart = system_time();
+}
+
+
+inline void
+ThreadData::UnassignCore(bool running)
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	ASSERT(fCore != NULL);
+	if (!fReady)
+		fCore = NULL;
+
+	if (running || fThread->state == B_THREAD_READY) {
+		if (gTrackCoreLoad)
+			fCore->UpdateLoad(-fNeededLoad);
+		fReady = false;
+		fThread->state = B_THREAD_SUSPENDED;
+		fCore = NULL;
+	}
 }
 
 

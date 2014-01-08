@@ -78,13 +78,13 @@ should_rebalance(const ThreadData* threadData)
 	SCHEDULER_ENTER_FUNCTION();
 
 	int32 coreLoad = threadData->Core()->GetLoad();
+	int32 threadLoad = threadData->GetLoad() / threadData->Core()->CPUCount();
 
 	// If the thread produces more than 50% of the load, leave it here. In
 	// such situation it is better to move other threads away.
-	if (threadData->GetLoad() >= coreLoad / 2)
+	if (threadLoad >= coreLoad / 2)
 		return false;
 
-	int32 threadLoad = threadData->GetLoad();
 	int32 coreNewLoad = coreLoad - threadLoad;
 
 	// If there is high load on this core but this thread does not contribute
@@ -160,11 +160,11 @@ rebalance_irqs(bool idle)
 scheduler_mode_operations gSchedulerLowLatencyMode = {
 	"low latency",
 
-	2000,
-	100,
-	{ 2, 25 },
+	1000,
+	50,
+	{ 2, 50 },
 
-	10000,
+	50000,
 
 	switch_to_mode,
 	set_cpu_enabled,

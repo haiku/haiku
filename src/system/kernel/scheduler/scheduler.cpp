@@ -50,8 +50,8 @@ scheduler_mode gCurrentModeID;
 scheduler_mode_operations* gCurrentMode;
 
 bool gSingleCore;
-bool gCPUFrequencyManagement;
-bool gTrackLoad;
+bool gTrackCoreLoad;
+bool gTrackCPULoad;
 
 }	// namespace Scheduler
 
@@ -388,23 +388,33 @@ reschedule(int32 nextState)
 		case B_THREAD_READY:
 			enqueueOldThread = true;
 
-			if (oldThreadData->HasQuantumEnded(oldThread->cpu->preempted,
-					oldThread->has_yielded)) {
-				TRACE("enqueueing thread %ld into run queue priority = %ld\n",
-					oldThread->id, oldThreadData->GetEffectivePriority());
-				putOldThreadAtBack = true;
-			} else {
-				TRACE("putting thread %ld back in run queue priority = %ld\n",
-					oldThread->id, oldThreadData->GetEffectivePriority());
-				putOldThreadAtBack = false;
+			if (!thread_is_idle_thread(oldThread)) {
+				oldThreadData->Continues();
+				if (oldThreadData->HasQuantumEnded(oldThread->cpu->preempted,
+						oldThread->has_yielded)) {
+					TRACE("enqueueing thread %ld into run queue priority ="
+						" %ld\n", oldThread->id,
+						oldThreadData->GetEffectivePriority());
+					putOldThreadAtBack = true;
+				} else {
+					TRACE("putting thread %ld back in run queue priority ="
+						" %ld\n", oldThread->id,
+						oldThreadData->GetEffectivePriority());
+					putOldThreadAtBack = false;
+				}
 			}
 
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
 			oldThreadData->Dies();
+			if (gCPU[thisCPU].disabled)
+				oldThreadData->UnassignCore(true);
 			break;
 		default:
 			oldThreadData->GoesAway();
+			if (gCPU[thisCPU].disabled)
+				oldThreadData->UnassignCore(true);
+
 			TRACE("not enqueueing thread %ld into run queue next_state = %ld\n",
 				oldThread->id, nextState);
 			break;
@@ -422,6 +432,7 @@ reschedule(int32 nextState)
 			cpu->Remove(nextThreadData);
 
 			putOldThreadAtBack = oldThread->pinned_to_cpu == 0;
+			oldThreadData->UnassignCore(true);
 		} else
 			nextThreadData = oldThreadData;
 	} else {
@@ -476,6 +487,8 @@ reschedule(int32 nextState)
 			bigtime_t quantum = nextThreadData->ComputeQuantum();
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER);
+
+			nextThreadData->Continues();
 		} else
 			gCurrentMode->rebalance_irqs(true);
 		nextThreadData->StartQuantum();
@@ -696,12 +709,12 @@ init()
 
 	// disable parts of the scheduler logic that are not needed
 	gSingleCore = coreCount == 1;
-	gCPUFrequencyManagement = increase_cpu_performance(0) == B_OK;
-	gTrackLoad = !gSingleCore || gCPUFrequencyManagement;
-	dprintf("scheduler switches: single core: %s, cpufreq: %s, load tracking:"
-		" %s\n", gSingleCore ? "true" : "false",
-		gCPUFrequencyManagement ? "true" : "false",
-		gTrackLoad ? "true" : "false");
+	gTrackCPULoad = increase_cpu_performance(0) == B_OK;
+	gTrackCoreLoad = !gSingleCore || gTrackCPULoad;
+	dprintf("scheduler switches: single core: %s, cpu load tracking: %s,"
+		" core load tracking: %s\n", gSingleCore ? "true" : "false",
+		gTrackCPULoad ? "true" : "false",
+		gTrackCoreLoad ? "true" : "false");
 
 	gCoreCount = coreCount;
 	gPackageCount = packageCount;
