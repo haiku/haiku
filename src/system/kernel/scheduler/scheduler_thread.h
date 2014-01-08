@@ -57,6 +57,8 @@ public:
 	inline	void		SetStolenInterruptTime(bigtime_t interruptTime);
 
 	inline	void		GoesAway();
+	inline	void		Dies();
+
 	inline	bigtime_t	WentSleep() const	{ return fWentSleep; }
 	inline	bigtime_t	WentSleepActive() const	{ return fWentSleepActive; }
 
@@ -127,6 +129,8 @@ public:
 
 	virtual	void		operator()(ThreadData* thread) = 0;
 };
+
+extern int32 gReadyThreadCount;
 
 
 inline int32
@@ -260,6 +264,16 @@ ThreadData::GoesAway()
 	fWentSleepCount = fCore->StarvationCounter();
 	fWentSleepCountIdle = fCore->StarvationCounterIdle();
 	fWentSleepActive = fCore->GetActiveTime();
+
+	atomic_add(&gReadyThreadCount, -1);
+}
+
+
+inline void
+ThreadData::Dies()
+{
+	SCHEDULER_ENTER_FUNCTION();
+	atomic_add(&gReadyThreadCount, -1);
 }
 
 
@@ -296,6 +310,9 @@ inline void
 ThreadData::Enqueue()
 {
 	SCHEDULER_ENTER_FUNCTION();
+
+	if (fThread->state != B_THREAD_READY && fThread->state != B_THREAD_RUNNING)
+		atomic_add(&gReadyThreadCount, 1);
 
 	fThread->state = B_THREAD_READY;
 

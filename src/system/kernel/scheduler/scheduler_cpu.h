@@ -123,6 +123,8 @@ public:
 	inline				PackageEntry*	Package() const	{ return fPackage; }
 	inline				int32			CPUCount() const
 											{ return fCPUCount; }
+	inline				int32			IdleCPUCount() const
+											{ return fIdleCPUCount; }
 
 	inline				void			LockCPUHeap();
 	inline				void			UnlockCPUHeap();
@@ -170,7 +172,7 @@ private:
 						PackageEntry*	fPackage;
 
 						int32			fCPUCount;
-						int32			fCPUIdleCount;
+						int32			fIdleCPUCount;
 						CPUPriorityHeap	fCPUHeap;
 						spinlock		fCPULock;
 
@@ -452,8 +454,8 @@ CoreEntry::CPUGoesIdle(CPUEntry* /* cpu */)
 	if (gSingleCore)
 		return;
 
-	ASSERT(fCPUIdleCount < fCPUCount);
-	if (++fCPUIdleCount == fCPUCount)
+	ASSERT(fIdleCPUCount < fCPUCount);
+	if (++fIdleCPUCount == fCPUCount)
 		fPackage->CoreGoesIdle(this);
 }
 
@@ -464,8 +466,8 @@ CoreEntry::CPUWakesUp(CPUEntry* /* cpu */)
 	if (gSingleCore)
 		return;
 
-	ASSERT(fCPUIdleCount > 0);
-	if (fCPUIdleCount-- == fCPUCount)
+	ASSERT(fIdleCPUCount > 0);
+	if (fIdleCPUCount-- == fCPUCount)
 		fPackage->CoreWakesUp(this);
 }
 

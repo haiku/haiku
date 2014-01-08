@@ -53,20 +53,6 @@ bool gSingleCore;
 bool gCPUFrequencyManagement;
 bool gTrackLoad;
 
-CPUEntry* gCPUEntries;
-
-CoreEntry* gCoreEntries;
-CoreLoadHeap gCoreLoadHeap;
-CoreLoadHeap gCoreHighLoadHeap;
-rw_spinlock gCoreHeapsLock = B_RW_SPINLOCK_INITIALIZER;
-int32 gCoreCount;
-
-PackageEntry* gPackageEntries;
-IdlePackageList gIdlePackageList;
-rw_spinlock gIdlePackageLock = B_RW_SPINLOCK_INITIALIZER;
-int32 gPackageCount;
-
-
 }	// namespace Scheduler
 
 using namespace Scheduler;
@@ -415,6 +401,7 @@ reschedule(int32 nextState)
 
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
+			oldThreadData->Dies();
 			break;
 		default:
 			oldThreadData->GoesAway();

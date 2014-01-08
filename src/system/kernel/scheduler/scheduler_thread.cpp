@@ -6,6 +6,14 @@
 #include "scheduler_thread.h"
 
 
+namespace Scheduler {
+
+
+int32 gReadyThreadCount;
+
+
+}	// namespace Scheduler
+
 using namespace Scheduler;
 
 

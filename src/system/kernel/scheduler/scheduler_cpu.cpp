@@ -13,6 +13,25 @@
 #include "scheduler_thread.h"
 
 
+namespace Scheduler {
+
+
+CPUEntry* gCPUEntries;
+
+CoreEntry* gCoreEntries;
+CoreLoadHeap gCoreLoadHeap;
+CoreLoadHeap gCoreHighLoadHeap;
+rw_spinlock gCoreHeapsLock = B_RW_SPINLOCK_INITIALIZER;
+int32 gCoreCount;
+
+PackageEntry* gPackageEntries;
+IdlePackageList gIdlePackageList;
+rw_spinlock gIdlePackageLock = B_RW_SPINLOCK_INITIALIZER;
+int32 gPackageCount;
+
+
+}	// namespace Scheduler
+
 using namespace Scheduler;
 
 
@@ -340,7 +359,7 @@ CPUPriorityHeap::Dump()
 CoreEntry::CoreEntry()
 	:
 	fCPUCount(0),
-	fCPUIdleCount(0),
+	fIdleCPUCount(0),
 	fStarvationCounter(0),
 	fStarvationCounterIdle(0),
 	fThreadCount(0),
@@ -459,9 +478,9 @@ void
 CoreEntry::AddCPU(CPUEntry* cpu)
 {
 	ASSERT(fCPUCount >= 0);
-	ASSERT(fCPUIdleCount >= 0);
+	ASSERT(fIdleCPUCount >= 0);
 
-	fCPUIdleCount++;
+	fIdleCPUCount++;
 	if (fCPUCount++ == 0) {
 		// core has been reenabled
 		fLoad = 0;
@@ -479,9 +498,9 @@ void
 CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 {
 	ASSERT(fCPUCount > 0);
-	ASSERT(fCPUIdleCount > 0);
+	ASSERT(fIdleCPUCount > 0);
 
-	fCPUIdleCount--;
+	fIdleCPUCount--;
 	if (--fCPUCount == 0) {
 		// core has been disabled
 		if (fHighLoad) {
@@ -545,8 +564,10 @@ CoreLoadHeap::Dump()
 	CoreEntry* entry = PeekMinimum();
 	while (entry) {
 		int32 key = GetKey(entry);
+
+		int32 activeCPUs = entry->CPUCount() - entry->IdleCPUCount();
 		kprintf("%4" B_PRId32 " %3" B_PRId32 "%% %7" B_PRId32 "\n", entry->ID(),
-			entry->GetLoad() / 10, entry->ThreadCount());
+			entry->GetLoad() / 10, entry->ThreadCount() + activeCPUs);
 
 		RemoveMinimum();
 		sDebugCoreHeap.Insert(entry, key);
@@ -664,6 +685,8 @@ dump_run_queue(int /* argc */, char** /* argv */)
 static int
 dump_cpu_heap(int /* argc */, char** /* argv */)
 {
+	kprintf("Total ready threads: %" B_PRId32 "\n\n", gReadyThreadCount);
+
 	kprintf("core load threads\n");
 	gCoreLoadHeap.Dump();
 	kprintf("\n");
