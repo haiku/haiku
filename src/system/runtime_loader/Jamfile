@@ -76,6 +76,7 @@ local sources =
 	elf_load_image.cpp
 	elf_symbol_lookup.cpp
 	elf_versioning.cpp
+	pe.cpp
 	errors.cpp
 	export.cpp
 	heap.cpp

@@ -3514,8 +3514,19 @@ _TrackerLaunchDocuments(const entry_ref* /*doNotUse*/, const BMessage* refs,
 			openWithOK = false;
 			openedDocuments = false;
 		}
-
-		if (error == B_LAUNCH_FAILED_EXECUTABLE && !refsToPass) {
+		if (error == B_UNKNOWN_EXECUTABLE && !refsToPass) {
+			// We know it's an executable, but something unsupported
+			alertString.SetTo(B_TRANSLATE("\"%name\" is an unsupported "
+				"executable."));
+			alertString.ReplaceFirst("%name", app.name);
+		} else if (error == B_LEGACY_EXECUTABLE && !refsToPass) {
+			// For the moment, this marks an old R3 binary, we may want to
+			// extend it to gcc2 binaries someday post R1
+			alertString.SetTo(B_TRANSLATE("\"%name\" is a legacy executable. "
+				"Please obtain an updated version or recompile "
+				"the application."));
+			alertString.ReplaceFirst("%name", app.name);
+		} else if (error == B_LAUNCH_FAILED_EXECUTABLE && !refsToPass) {
 			alertString.SetTo(B_TRANSLATE("Could not open \"%name\". "
 				"The file is mistakenly marked as executable. "));
 			alertString.ReplaceFirst("%name", app.name);

@@ -24,6 +24,7 @@
 #include <vm_defs.h>
 
 #include "elf_symbol_lookup.h"
+#include "pe.h"
 
 
 struct user_space_program_args *gProgramArgs;
@@ -396,8 +397,8 @@ test_executable(const char *name, char *invoker)
 
 	status = elf_verify_header(buffer, length);
 	if (status == B_NOT_AN_EXECUTABLE) {
-		// test for shell scripts
 		if (!strncmp(buffer, "#!", 2)) {
+			// test for shell scripts
 			char *end;
 			buffer[min_c((size_t)length, sizeof(buffer) - 1)] = '\0';
 
@@ -414,6 +415,14 @@ test_executable(const char *name, char *invoker)
 			}
 
 			status = B_OK;
+		} else {
+			// Something odd like a PE?
+			status = pe_verify_header(buffer, length);
+
+			// It is a PE, throw B_UNKNOWN_EXECUTABLE
+			// likely win32 at this point
+			if (status == B_OK)
+				status = B_UNKNOWN_EXECUTABLE;
 		}
 	} else if (status == B_OK) {
 		elf_ehdr *elfHeader = (elf_ehdr *)buffer;
