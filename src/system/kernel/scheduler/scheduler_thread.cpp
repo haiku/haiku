@@ -106,10 +106,16 @@ ThreadData::Init()
 {
 	_InitBase();
 
-	ThreadData* currentThreadData = thread_get_current_thread()->scheduler_data;
+	Thread* currentThread = thread_get_current_thread();
+	ThreadData* currentThreadData = currentThread->scheduler_data;
 	fCore = currentThreadData->fCore;
 
 	if (fThread->priority < B_FIRST_REAL_TIME_PRIORITY) {
+		if (!thread_is_idle_thread(currentThread)
+			&& currentThread->priority < B_FIRST_REAL_TIME_PRIORITY) {
+			currentThreadData->_IncreasePenalty(false);
+		}
+
 		fPriorityPenalty = std::min(currentThreadData->fPriorityPenalty,
 				std::max(fThread->priority - _GetMinimalPriority(), int32(0)));
 		fAdditionalPenalty = currentThreadData->fAdditionalPenalty;

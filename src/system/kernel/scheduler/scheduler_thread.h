@@ -426,8 +426,7 @@ ThreadData::HasQuantumEnded(bool wasPreempted, bool hasYielded)
 	fTimeLeft -= timeUsed;
 
 	// too little time left, it's better make the next quantum a bit longer
-	int32 skipTime = gCurrentMode->minimal_quantum;
-	skipTime -= skipTime / 10;
+	int32 skipTime = gCurrentMode->minimal_quantum / 2;
 	if (wasPreempted || fTimeLeft <= skipTime) {
 		fStolenTime += fTimeLeft;
 		fTimeLeft = 0;
