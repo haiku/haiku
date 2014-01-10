@@ -25,8 +25,6 @@ namespace BPrivate {
 
 BLooperList gLooperList;
 
-typedef vector<BLooperList::LooperData>::iterator LooperDataIterator;
-
 
 BLooperList::BLooperList()
 	:
