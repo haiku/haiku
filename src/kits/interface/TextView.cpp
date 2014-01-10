@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Stefano Ceccherini, stefano.ceccherini@gmail.com
  *		Marc Flerackers, mflerackers@androme.be
  *		Hiroshi Lockheimer (BTextView is based on his STEEngine)
+ *		John Scipione, jscipione@gmail.com
  *		Oliver Tappe, zooey@hirschkaefer.de
  */
 
@@ -191,13 +192,8 @@ static const rgb_color kRedInputColor = { 255, 152, 152, 255 };
 static const float kHorizontalScrollBarStep = 10.0;
 static const float kVerticalScrollBarStep = 12.0;
 
-
-enum {
-	NAVIGATE_TO_PREVIOUS_WORD	= '_NVP',
-	NAVIGATE_TO_NEXT_WORD		= '_NVN',
-	NAVIGATE_TO_TOP				= '_NVT',
-	NAVIGATE_TO_BOTTOM			= '_NVB',
-};
+static const int32 kMsgNavigateArrow = '_NvA';
+static const int32 kMsgNavigatePage  = '_NvP';
 
 
 static property_info sPropertyList[] = {
@@ -958,19 +954,21 @@ BTextView::MessageReceived(BMessage* message)
 				_TrackDrag(fWhere);
 			break;
 
-		case NAVIGATE_TO_PREVIOUS_WORD:
-			_HandleArrowKey(B_LEFT_ARROW, true);
+		case kMsgNavigateArrow:
+		{
+			int32 key = message->GetInt32("key", 0);
+			int32 modifiers = message->GetInt32("modifiers", 0);
+			_HandleArrowKey(key, modifiers);
 			break;
-		case NAVIGATE_TO_NEXT_WORD:
-			_HandleArrowKey(B_RIGHT_ARROW, true);
-			break;
+		}
 
-		case NAVIGATE_TO_TOP:
-			_HandlePageKey(B_HOME, true);
+		case kMsgNavigatePage:
+		{
+			int32 key = message->GetInt32("key", 0);
+			int32 modifiers = message->GetInt32("modifiers", 0);
+			_HandlePageKey(key, modifiers);
 			break;
-		case NAVIGATE_TO_BOTTOM:
-			_HandlePageKey(B_END, true);
-			break;
+		}
 
 		default:
 			BView::MessageReceived(message);
@@ -3110,9 +3108,14 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 	fLines = new LineBuffer;
 	fStyles = new StyleBuffer(&font, initialColor);
 
+	fInstalledNavigateLinewiseShortcuts = false;
 	fInstalledNavigateWordwiseShortcuts = false;
+	fInstalledNavigateDocwiseShortcuts = false;
 	fInstalledNavigateToTopOrBottomShortcuts = false;
+
+	fInstalledSelectLinewiseShortcuts = false;
 	fInstalledSelectWordwiseShortcuts = false;
+	fInstalledSelectDocwiseShortcuts = false;
 	fInstalledSelectToTopOrBottomShortcuts = false;
 
 	// We put these here instead of in the constructor initializer list
@@ -3195,7 +3198,7 @@ BTextView::_HandleBackspace()
 
 // Handles when any arrow key is pressed.
 void
-BTextView::_HandleArrowKey(uint32 arrowKey, bool commandKeyDown)
+BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 {
 	// return if there's nowhere to go
 	if (fText->Length() == 0)
@@ -3204,26 +3207,36 @@ BTextView::_HandleArrowKey(uint32 arrowKey, bool commandKeyDown)
 	int32 selStart = fSelStart;
 	int32 selEnd = fSelEnd;
 
-	int32 modifiers = 0;
-	BMessage* message = Window()->CurrentMessage();
-	if (message != NULL)
-		message->FindInt32("modifiers", &modifiers);
+	if (modifiers < 0) {
+		BMessage* currentMessage = Window()->CurrentMessage();
+		if (currentMessage == NULL
+			|| currentMessage->FindInt32("modifiers", &modifiers) != B_OK) {
+			modifiers = 0;
+		}
+	}
 
-	bool shiftDown = modifiers & B_SHIFT_KEY;
+	bool shiftKeyDown   = (modifiers & B_SHIFT_KEY)   != 0;
+	bool controlKeyDown = (modifiers & B_CONTROL_KEY) != 0;
+	bool optionKeyDown  = (modifiers & B_OPTION_KEY)  != 0;
+	bool commandKeyDown = (modifiers & B_COMMAND_KEY) != 0;
 
 	int32 lastClickOffset = fCaretOffset;
+
 	switch (arrowKey) {
 		case B_LEFT_ARROW:
 			if (!fEditable)
 				_ScrollBy(-1 * kHorizontalScrollBarStep, 0);
-			else if (fSelStart != fSelEnd && !shiftDown)
+			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelStart;
 			else {
-				fCaretOffset
-					= commandKeyDown
-						? _PreviousWordStart(fCaretOffset - 1)
-						: _PreviousInitialByte(fCaretOffset);
-				if (shiftDown && fCaretOffset != lastClickOffset) {
+				if (commandKeyDown && !optionKeyDown && !controlKeyDown)
+					fCaretOffset = _PreviousLineStart(fCaretOffset);
+				else if (optionKeyDown && !commandKeyDown && !controlKeyDown)
+					fCaretOffset = _PreviousWordStart(fCaretOffset - 1);
+				else
+					fCaretOffset = _PreviousInitialByte(fCaretOffset);
+
+				if (shiftKeyDown && fCaretOffset != lastClickOffset) {
 					if (fCaretOffset < fSelStart) {
 						// extend selection to the left
 						selStart = fCaretOffset;
@@ -3242,14 +3255,17 @@ BTextView::_HandleArrowKey(uint32 arrowKey, bool commandKeyDown)
 		case B_RIGHT_ARROW:
 			if (!fEditable)
 				_ScrollBy(kHorizontalScrollBarStep, 0);
-			else if (fSelStart != fSelEnd && !shiftDown)
+			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelEnd;
 			else {
-				fCaretOffset
-					= commandKeyDown
-						? _NextWordEnd(fCaretOffset)
-						: _NextInitialByte(fCaretOffset);
-				if (shiftDown && fCaretOffset != lastClickOffset) {
+				if (commandKeyDown && !controlKeyDown && !optionKeyDown)
+					fCaretOffset = _NextLineEnd(fCaretOffset);
+				else if (optionKeyDown && !controlKeyDown && !commandKeyDown)
+					fCaretOffset = _NextWordEnd(fCaretOffset);
+				else
+					fCaretOffset = _NextInitialByte(fCaretOffset);
+
+				if (shiftKeyDown && fCaretOffset != lastClickOffset) {
 					if (fCaretOffset > fSelEnd) {
 						// extend selection to the right
 						selEnd = fCaretOffset;
@@ -3269,23 +3285,28 @@ BTextView::_HandleArrowKey(uint32 arrowKey, bool commandKeyDown)
 		{
 			if (!fEditable)
 				_ScrollBy(0, -1 * kVerticalScrollBarStep);
-			else if (fSelStart != fSelEnd && !shiftDown)
+			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelStart;
 			else {
-				float height;
-				BPoint point = PointAt(fCaretOffset, &height);
-				// find the caret position on the previous
-				// line by gently stepping onto this line
-				for (int i = 1; i <= height; i++) {
-					point.y--;
-					int32 offset = OffsetAt(point);
-					if (offset < fCaretOffset || i == height) {
-						fCaretOffset = offset;
-						break;
+				if (commandKeyDown && !controlKeyDown && !optionKeyDown) {
+					_ScrollTo(0, 0);
+					fCaretOffset = 0;
+				} else {
+					float height;
+					BPoint point = PointAt(fCaretOffset, &height);
+					// find the caret position on the previous
+					// line by gently stepping onto this line
+					for (int i = 1; i <= height; i++) {
+						point.y--;
+						int32 offset = OffsetAt(point);
+						if (offset < fCaretOffset || i == height) {
+							fCaretOffset = offset;
+							break;
+						}
 					}
 				}
 
-				if (shiftDown && fCaretOffset != lastClickOffset) {
+				if (shiftKeyDown && fCaretOffset != lastClickOffset) {
 					if (fCaretOffset < fSelStart) {
 						// extend selection to the top
 						selStart = fCaretOffset;
@@ -3306,14 +3327,20 @@ BTextView::_HandleArrowKey(uint32 arrowKey, bool commandKeyDown)
 		{
 			if (!fEditable)
 				_ScrollBy(0, kVerticalScrollBarStep);
-			else if (fSelStart != fSelEnd && !shiftDown)
+			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelEnd;
 			else {
-				float height;
-				BPoint point = PointAt(fCaretOffset, &height);
-				point.y += height;
-				fCaretOffset = OffsetAt(point);
-				if (shiftDown && fCaretOffset != lastClickOffset) {
+				if (commandKeyDown && !optionKeyDown && !controlKeyDown) {
+					_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
+					fCaretOffset = fText->Length();
+				} else {
+					float height;
+					BPoint point = PointAt(fCaretOffset, &height);
+					point.y += height;
+					fCaretOffset = OffsetAt(point);
+				}
+
+				if (shiftKeyDown && fCaretOffset != lastClickOffset) {
 					if (fCaretOffset > fSelEnd) {
 						// extend selection to the bottom
 						selEnd = fCaretOffset;
@@ -3335,7 +3362,7 @@ BTextView::_HandleArrowKey(uint32 arrowKey, bool commandKeyDown)
 	fStyles->InvalidateNullStyle();
 
 	if (fEditable) {
-		if (shiftDown)
+		if (shiftKeyDown)
 			Select(selStart, selEnd);
 		else
 			Select(fCaretOffset, fCaretOffset);
@@ -3377,15 +3404,21 @@ BTextView::_HandleDelete()
 
 // Handles when the Page Up or Page Down key is pressed.
 void
-BTextView::_HandlePageKey(uint32 pageKey, bool commandKeyDown)
+BTextView::_HandlePageKey(uint32 pageKey, int32 modifiers)
 {
-	int32 mods = 0;
-	BMessage* currentMessage = Window()->CurrentMessage();
-	if (currentMessage)
-		currentMessage->FindInt32("modifiers", &mods);
+	if (modifiers < 0) {
+		BMessage* currentMessage = Window()->CurrentMessage();
+		if (currentMessage == NULL
+			|| currentMessage->FindInt32("modifiers", &modifiers) != B_OK) {
+			modifiers = 0;
+		}
+	}
 
-	bool shiftDown = mods & B_SHIFT_KEY;
-	bool controlDown = mods & B_CONTROL_KEY;
+	bool shiftKeyDown   = (modifiers & B_SHIFT_KEY)   != 0;
+	bool controlKeyDown = (modifiers & B_CONTROL_KEY) != 0;
+	bool optionKeyDown  = (modifiers & B_OPTION_KEY)  != 0;
+	bool commandKeyDown = (modifiers & B_COMMAND_KEY) != 0;
+
 	STELine* line = NULL;
 	int32 selStart = fSelStart;
 	int32 selEnd = fSelEnd;
@@ -3397,33 +3430,34 @@ BTextView::_HandlePageKey(uint32 pageKey, bool commandKeyDown)
 				fCaretOffset = 0;
 				_ScrollTo(0, 0);
 				break;
-			}
-
-			if (commandKeyDown || controlDown) {
-				_ScrollTo(0, 0);
-				fCaretOffset = 0;
-			} else {
-				// get the start of the last line if caret is on it
-				line = (*fLines)[_LineAt(lastClickOffset)];
-				fCaretOffset = line->offset;
-			}
-
-			if (!shiftDown)
-				selStart = selEnd = fCaretOffset;
-			else if (fCaretOffset != lastClickOffset) {
-				if (fCaretOffset < fSelStart) {
-					// extend selection to the left
-					selStart = fCaretOffset;
-					if (lastClickOffset > fSelStart) {
-						// caret has jumped across "anchor"
-						selEnd = fSelStart;
-					}
+			} else if (fSelStart != fSelEnd && !shiftKeyDown)
+				fCaretOffset = fSelEnd;
+			else {
+				if (commandKeyDown && !optionKeyDown && !controlKeyDown) {
+					_ScrollTo(0, 0);
+					fCaretOffset = 0;
 				} else {
-					// shrink selection from the right
-					selEnd = fCaretOffset;
+					// get the start of the last line if caret is on it
+					line = (*fLines)[_LineAt(lastClickOffset)];
+					fCaretOffset = line->offset;
+				}
+
+				if (!shiftKeyDown)
+					selStart = selEnd = fCaretOffset;
+				else if (fCaretOffset != lastClickOffset) {
+					if (fCaretOffset < fSelStart) {
+						// extend selection to the left
+						selStart = fCaretOffset;
+						if (lastClickOffset > fSelStart) {
+							// caret has jumped across "anchor"
+							selEnd = fSelStart;
+						}
+					} else {
+						// shrink selection from the right
+						selEnd = fCaretOffset;
+					}
 				}
 			}
-
 			break;
 
 		case B_END:
@@ -3431,47 +3465,48 @@ BTextView::_HandlePageKey(uint32 pageKey, bool commandKeyDown)
 				fCaretOffset = fText->Length();
 				_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
 				break;
-			}
-
-			if (commandKeyDown || controlDown) {
-				_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
-				fCaretOffset = fText->Length();
-			} else {
-				// If we are on the last line, just go to the last
-				// character in the buffer, otherwise get the starting
-				// offset of the next line, and go to the previous character
-				int32 currentLine = _LineAt(lastClickOffset);
-				if (currentLine + 1 < fLines->NumLines()) {
-					line = (*fLines)[currentLine + 1];
-					fCaretOffset = _PreviousInitialByte(line->offset);
+			} else if (fSelStart != fSelEnd && !shiftKeyDown)
+				fCaretOffset = fSelEnd;
+			else {
+				if (commandKeyDown && !optionKeyDown && !controlKeyDown) {
+					_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
+					fCaretOffset = fText->Length();
 				} else {
-					// This check is needed to avoid moving the cursor
-					// when the cursor is on the last line, and that line
-					// is empty
-					if (fCaretOffset != fText->Length()) {
-						fCaretOffset = fText->Length();
-						if (ByteAt(fCaretOffset - 1) == B_ENTER)
-							fCaretOffset--;
+					// If we are on the last line, just go to the last
+					// character in the buffer, otherwise get the starting
+					// offset of the next line, and go to the previous character
+					int32 currentLine = _LineAt(lastClickOffset);
+					if (currentLine + 1 < fLines->NumLines()) {
+						line = (*fLines)[currentLine + 1];
+						fCaretOffset = _PreviousInitialByte(line->offset);
+					} else {
+						// This check is needed to avoid moving the cursor
+						// when the cursor is on the last line, and that line
+						// is empty
+						if (fCaretOffset != fText->Length()) {
+							fCaretOffset = fText->Length();
+							if (ByteAt(fCaretOffset - 1) == B_ENTER)
+								fCaretOffset--;
+						}
+					}
+				}
+
+				if (!shiftKeyDown)
+					selStart = selEnd = fCaretOffset;
+				else if (fCaretOffset != lastClickOffset) {
+					if (fCaretOffset > fSelEnd) {
+						// extend selection to the right
+						selEnd = fCaretOffset;
+						if (lastClickOffset < fSelEnd) {
+							// caret has jumped across "anchor"
+							selStart = fSelEnd;
+						}
+					} else {
+						// shrink selection from the left
+						selStart = fCaretOffset;
 					}
 				}
 			}
-
-			if (!shiftDown)
-				selStart = selEnd = fCaretOffset;
-			else if (fCaretOffset != lastClickOffset) {
-				if (fCaretOffset > fSelEnd) {
-					// extend selection to the right
-					selEnd = fCaretOffset;
-					if (lastClickOffset < fSelEnd) {
-						// caret has jumped across "anchor"
-						selStart = fSelEnd;
-					}
-				} else {
-					// shrink selection from the left
-					selStart = fCaretOffset;
-				}
-			}
-
 			break;
 
 		case B_PAGE_UP:
@@ -3487,7 +3522,7 @@ BTextView::_HandlePageKey(uint32 pageKey, bool commandKeyDown)
 			if (!fEditable)
 				break;
 
-			if (!shiftDown)
+			if (!shiftKeyDown)
 				selStart = selEnd = fCaretOffset;
 			else if (fCaretOffset != lastClickOffset) {
 				if (fCaretOffset < fSelStart) {
@@ -3517,7 +3552,7 @@ BTextView::_HandlePageKey(uint32 pageKey, bool commandKeyDown)
 			if (!fEditable)
 				break;
 
-			if (!shiftDown)
+			if (!shiftKeyDown)
 				selStart = selEnd = fCaretOffset;
 			else if (fCaretOffset != lastClickOffset) {
 				if (fCaretOffset > fSelEnd) {
@@ -3538,7 +3573,7 @@ BTextView::_HandlePageKey(uint32 pageKey, bool commandKeyDown)
 	}
 
 	if (fEditable) {
-		if (shiftDown)
+		if (shiftKeyDown)
 			Select(selStart, selEnd);
 		else
 			Select(fCaretOffset, fCaretOffset);
@@ -3904,6 +3939,43 @@ BTextView::_FindLineBreak(int32 fromOffset, float* _ascent, float* _descent,
 
 
 int32
+BTextView::_PreviousLineStart(int32 offset)
+{
+	if (offset <= 0)
+		return 0;
+
+	while (offset > 0) {
+		offset = _PreviousInitialByte(offset);
+		if (_CharClassification(offset) == CHAR_CLASS_WHITESPACE
+			&& ByteAt(offset) == B_ENTER) {
+			return offset + 1;
+		}
+	}
+
+	return offset;
+}
+
+
+int32
+BTextView::_NextLineEnd(int32 offset)
+{
+	int32 textLen = fText->Length();
+	if (offset >= textLen)
+		return textLen;
+
+	while (offset < textLen) {
+		if (_CharClassification(offset) == CHAR_CLASS_WHITESPACE
+			&& ByteAt(offset) == B_ENTER) {
+			break;
+		}
+		offset = _NextInitialByte(offset);
+	}
+
+	return offset;
+}
+
+
+int32
 BTextView::_PreviousWordBoundary(int32 offset)
 {
 	uint32 charType = _CharClassification(offset);
@@ -3940,7 +4012,8 @@ BTextView::_PreviousWordStart(int32 offset)
 	if (offset <= 1)
 		return 0;
 
-	--offset;	// need to look at previous char
+	--offset;
+		// need to look at previous char
 	if (_CharClassification(offset) != CHAR_CLASS_DEFAULT) {
 		// skip non-word characters
 		while (offset > 0) {
@@ -4909,44 +4982,132 @@ BTextView::_Activate()
 		_TrackMouse(where, NULL);
 
 	if (Window() != NULL) {
+		BMessage* message;
+
 		if (!Window()->HasShortcut(B_LEFT_ARROW, B_COMMAND_KEY)
-		&& !Window()->HasShortcut(B_RIGHT_ARROW, B_COMMAND_KEY)) {
-			Window()->AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY,
-				new BMessage(NAVIGATE_TO_PREVIOUS_WORD), this);
-			Window()->AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY,
-				new BMessage(NAVIGATE_TO_NEXT_WORD), this);
-			fInstalledNavigateWordwiseShortcuts = true;
+			&& !Window()->HasShortcut(B_RIGHT_ARROW, B_COMMAND_KEY)) {
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_LEFT_ARROW);
+			message->AddInt32("modifiers", B_COMMAND_KEY);
+			Window()->AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY, message, this);
+
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_RIGHT_ARROW);
+			message->AddInt32("modifiers", B_COMMAND_KEY);
+			Window()->AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY, message, this);
+
+			fInstalledNavigateLinewiseShortcuts = true;
 		}
 		if (!Window()->HasShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY)
-		&& !Window()->HasShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY)) {
-			BMessage* message = new BMessage(NAVIGATE_TO_PREVIOUS_WORD);
-			message->AddInt32("modifiers", B_SHIFT_KEY);
+			&& !Window()->HasShortcut(B_RIGHT_ARROW,
+				B_COMMAND_KEY | B_SHIFT_KEY)) {
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_LEFT_ARROW);
+			message->AddInt32("modifiers", B_COMMAND_KEY | B_SHIFT_KEY);
 			Window()->AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY,
 				message, this);
-			message = new BMessage(NAVIGATE_TO_NEXT_WORD);
-			message->AddInt32("modifiers", B_SHIFT_KEY);
+
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_RIGHT_ARROW);
+			message->AddInt32("modifiers", B_COMMAND_KEY | B_SHIFT_KEY);
 			Window()->AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY,
 				message, this);
+
+			fInstalledSelectLinewiseShortcuts = true;
+		}
+
+		if (!Window()->HasShortcut(B_LEFT_ARROW, B_OPTION_KEY)
+			&& !Window()->HasShortcut(B_RIGHT_ARROW, B_OPTION_KEY)) {
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_LEFT_ARROW);
+			message->AddInt32("modifiers", B_OPTION_KEY);
+			Window()->AddShortcut(B_LEFT_ARROW, B_OPTION_KEY, message, this);
+
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_RIGHT_ARROW);
+			message->AddInt32("modifiers", B_OPTION_KEY);
+			Window()->AddShortcut(B_RIGHT_ARROW, B_OPTION_KEY, message, this);
+
+			fInstalledNavigateWordwiseShortcuts = true;
+		}
+		if (!Window()->HasShortcut(B_LEFT_ARROW, B_OPTION_KEY | B_SHIFT_KEY)
+			&& !Window()->HasShortcut(B_RIGHT_ARROW,
+				B_OPTION_KEY | B_SHIFT_KEY)) {
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_LEFT_ARROW);
+			message->AddInt32("modifiers", B_OPTION_KEY | B_SHIFT_KEY);
+			Window()->AddShortcut(B_LEFT_ARROW, B_OPTION_KEY | B_SHIFT_KEY,
+				message, this);
+
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_RIGHT_ARROW);
+			message->AddInt32("modifiers", B_OPTION_KEY | B_SHIFT_KEY);
+			Window()->AddShortcut(B_RIGHT_ARROW, B_OPTION_KEY | B_SHIFT_KEY,
+				message, this);
+
 			fInstalledSelectWordwiseShortcuts = true;
 		}
+
+		if (!Window()->HasShortcut(B_UP_ARROW, B_COMMAND_KEY)
+			&& !Window()->HasShortcut(B_DOWN_ARROW, B_COMMAND_KEY)) {
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_UP_ARROW);
+			message->AddInt32("modifiers", B_COMMAND_KEY);
+			Window()->AddShortcut(B_UP_ARROW, B_COMMAND_KEY, message, this);
+
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_DOWN_ARROW);
+			message->AddInt32("modifiers", B_COMMAND_KEY);
+			Window()->AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY, message, this);
+
+			fInstalledNavigateDocwiseShortcuts = true;
+		}
+		if (!Window()->HasShortcut(B_UP_ARROW, B_COMMAND_KEY | B_SHIFT_KEY)
+			&& !Window()->HasShortcut(B_DOWN_ARROW,
+				B_COMMAND_KEY | B_SHIFT_KEY)) {
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_UP_ARROW);
+			message->AddInt32("modifiers", B_COMMAND_KEY | B_SHIFT_KEY);
+			Window()->AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_SHIFT_KEY,
+				message, this);
+
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_DOWN_ARROW);
+			message->AddInt32("modifiers", B_COMMAND_KEY | B_SHIFT_KEY);
+			Window()->AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_SHIFT_KEY,
+				message, this);
+
+			fInstalledSelectDocwiseShortcuts = true;
+		}
+
 		if (!Window()->HasShortcut(B_HOME, B_COMMAND_KEY)
-		&& !Window()->HasShortcut(B_END, B_COMMAND_KEY)) {
-			Window()->AddShortcut(B_HOME, B_COMMAND_KEY,
-				new BMessage(NAVIGATE_TO_TOP), this);
-			Window()->AddShortcut(B_END, B_COMMAND_KEY,
-				new BMessage(NAVIGATE_TO_BOTTOM), this);
+			&& !Window()->HasShortcut(B_END, B_COMMAND_KEY)) {
+			message = new BMessage(kMsgNavigatePage);
+			message->AddInt32("key", B_HOME);
+			message->AddInt32("modifiers", B_COMMAND_KEY);
+			Window()->AddShortcut(B_HOME, B_COMMAND_KEY, message, this);
+
+			message = new BMessage(kMsgNavigatePage);
+			message->AddInt32("key", B_END);
+			message->AddInt32("modifiers", B_COMMAND_KEY);
+			Window()->AddShortcut(B_END, B_COMMAND_KEY, message, this);
+
 			fInstalledNavigateToTopOrBottomShortcuts = true;
 		}
 		if (!Window()->HasShortcut(B_HOME, B_COMMAND_KEY | B_SHIFT_KEY)
-		&& !Window()->HasShortcut(B_END, B_COMMAND_KEY | B_SHIFT_KEY)) {
-			BMessage* message = new BMessage(NAVIGATE_TO_TOP);
-			message->AddInt32("modifiers", B_SHIFT_KEY);
+			&& !Window()->HasShortcut(B_END, B_COMMAND_KEY | B_SHIFT_KEY)) {
+			message = new BMessage(kMsgNavigatePage);
+			message->AddInt32("key", B_HOME);
+			message->AddInt32("modifiers", B_COMMAND_KEY | B_SHIFT_KEY);
 			Window()->AddShortcut(B_HOME, B_COMMAND_KEY | B_SHIFT_KEY,
 				message, this);
-			message = new BMessage(NAVIGATE_TO_BOTTOM);
-			message->AddInt32("modifiers", B_SHIFT_KEY);
+
+			message = new BMessage(kMsgNavigatePage);
+			message->AddInt32("key", B_END);
+			message->AddInt32("modifiers", B_COMMAND_KEY | B_SHIFT_KEY);
 			Window()->AddShortcut(B_END, B_COMMAND_KEY | B_SHIFT_KEY,
 				message, this);
+
 			fInstalledSelectToTopOrBottomShortcuts = true;
 		}
 	}
@@ -4969,16 +5130,41 @@ BTextView::_Deactivate()
 		_HideCaret();
 
 	if (Window() != NULL) {
-		if (fInstalledNavigateWordwiseShortcuts) {
+		if (fInstalledNavigateLinewiseShortcuts) {
 			Window()->RemoveShortcut(B_LEFT_ARROW, B_COMMAND_KEY);
 			Window()->RemoveShortcut(B_RIGHT_ARROW, B_COMMAND_KEY);
+			fInstalledNavigateLinewiseShortcuts = false;
+		}
+		if (fInstalledSelectLinewiseShortcuts) {
+			Window()->RemoveShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY);
+			Window()->RemoveShortcut(B_RIGHT_ARROW,
+				B_COMMAND_KEY | B_SHIFT_KEY);
+			fInstalledSelectLinewiseShortcuts = false;
+		}
+
+		if (fInstalledNavigateWordwiseShortcuts) {
+			Window()->RemoveShortcut(B_LEFT_ARROW, B_OPTION_KEY);
+			Window()->RemoveShortcut(B_RIGHT_ARROW, B_OPTION_KEY);
 			fInstalledNavigateWordwiseShortcuts = false;
 		}
 		if (fInstalledSelectWordwiseShortcuts) {
-			Window()->RemoveShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY);
-			Window()->RemoveShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY);
+			Window()->RemoveShortcut(B_LEFT_ARROW, B_OPTION_KEY | B_SHIFT_KEY);
+			Window()->RemoveShortcut(B_RIGHT_ARROW, B_OPTION_KEY | B_SHIFT_KEY);
 			fInstalledSelectWordwiseShortcuts = false;
 		}
+
+		if (fInstalledNavigateDocwiseShortcuts) {
+			Window()->RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY);
+			Window()->RemoveShortcut(B_DOWN_ARROW, B_COMMAND_KEY);
+			fInstalledNavigateDocwiseShortcuts = false;
+		}
+		if (fInstalledSelectDocwiseShortcuts) {
+			Window()->RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY | B_SHIFT_KEY);
+			Window()->RemoveShortcut(B_DOWN_ARROW,
+				B_COMMAND_KEY | B_SHIFT_KEY);
+			fInstalledSelectDocwiseShortcuts = false;
+		}
+
 		if (fInstalledNavigateToTopOrBottomShortcuts) {
 			Window()->RemoveShortcut(B_HOME, B_COMMAND_KEY);
 			Window()->RemoveShortcut(B_END, B_COMMAND_KEY);
@@ -5033,8 +5219,7 @@ BTextView::_SetRunArray(int32 startOffset, int32 endOffset,
 }
 
 
-// Returns a value which tells if the given character is a separator
-// character or not.
+// Returns the character class of the character at the given offset.
 // offset The offset where the wanted character can be found.
 // return A value which represents the character's classification.
 uint32
@@ -5306,7 +5491,8 @@ BTextView::_HandleInputMethodChanged(BMessage* message)
 				while ((*currPos & 0xC0) == 0x80)
 					++currPos;
 			} else if ((*currPos & 0xC0) == 0x80) {
-				// illegal: character starts with utf-8 intermediate byte, skip it
+				// illegal: character starts with utf-8 intermediate byte,
+				// skip it
 				prevPos = ++currPos;
 			} else {
 				// single byte character/code, just feed that

@@ -292,10 +292,10 @@ private:
 
 			void				_HandleBackspace();
 			void				_HandleArrowKey(uint32 arrowKey,
-									bool commandKeyDown = false);
+									int32 modifiers = -1);
 			void				_HandleDelete();
 			void				_HandlePageKey(uint32 pageKey,
-									bool commandKeyDown = false);
+									int32 modifiers = -1);
 			void				_HandleAlphaKey(const char* bytes,
 									int32 numBytes);
 
@@ -382,6 +382,9 @@ private:
 			int32				_NextInitialByte(int32 offset) const;
 			int32				_PreviousInitialByte(int32 offset) const;
 
+			int32				_PreviousLineStart(int32 offset);
+			int32				_NextLineEnd(int32 offset);
+
 			int32				_PreviousWordBoundary(int32 offset);
 			int32				_NextWordBoundary(int32 offset);
 
@@ -449,9 +452,15 @@ private:
 			float				fMinTextRectWidth;
 			LayoutData*			fLayoutData;
 			int32				fLastClickOffset;
+
+			bool				fInstalledNavigateLinewiseShortcuts;
 			bool				fInstalledNavigateWordwiseShortcuts;
+			bool				fInstalledNavigateDocwiseShortcuts;
 			bool				fInstalledNavigateToTopOrBottomShortcuts;
+
+			bool				fInstalledSelectLinewiseShortcuts;
 			bool				fInstalledSelectWordwiseShortcuts;
+			bool				fInstalledSelectDocwiseShortcuts;
 			bool				fInstalledSelectToTopOrBottomShortcuts;
 
 			uint32				_reserved[6];
