@@ -175,6 +175,11 @@ USHORT o_zero = 0;
 /* support routines -- the bulk of this thing.  Placed in such an order that
    we don't have to forward-declare anything: */
 
+#ifdef HAVE_HELP
+void helpme();
+#endif
+
+
 /* holler :
    fake varargs -- need to do this way because we wind up calling through
    more levels of indirection than vanilla varargs can handle, and not all
@@ -1311,6 +1316,7 @@ Debug (("wrote %d to net, errno %d", rr, errno))
   close (fd);
   return (0);
 } /* readwrite */
+
 
 /* main :
    now we pull it all together... */
