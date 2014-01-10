@@ -16,7 +16,11 @@
 
 class BView;
 class BLayoutItem;
-class Constraint;
+
+
+namespace LinearProgramming {
+	class Constraint;
+};
 
 
 namespace BPrivate {
