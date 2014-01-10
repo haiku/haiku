@@ -119,7 +119,7 @@ BColumn::BColumn(BMallocIO* stream, int32 version, bool endianSwap)
 		PRINT(("endian swapping column\n"));
 		fOffset = B_SWAP_FLOAT(fOffset);
 		fWidth = B_SWAP_FLOAT(fWidth);
-		STATIC_ASSERT(sizeof(BColumn::fAlignment) == sizeof(int32));
+		STATIC_ASSERT(sizeof(alignment) == sizeof(int32));
 		fAlignment = (alignment)B_SWAP_INT32(fAlignment);
 		fAttrHash = B_SWAP_INT32(fAttrHash);
 		fAttrType = B_SWAP_INT32(fAttrType);
