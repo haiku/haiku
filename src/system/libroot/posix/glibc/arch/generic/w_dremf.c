@@ -9,9 +9,9 @@
 #include "math_private.h"
 
 float
-__dremf(x, y)
-	float x, y;
+__dremf(float x, float y)
 {
 	return __remainderf(x, y);
 }
-weak_alias (__dremf, dremf)
+
+float dremf(float, float) __attribute__((weak, alias("__dremf")));

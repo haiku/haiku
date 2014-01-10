@@ -207,5 +207,5 @@ __fedisableexcept(int mask)
 	return (~omask);
 }
 
-__weak_reference(__feenableexcept, feenableexcept);
-__weak_reference(__fedisableexcept, fedisableexcept);
+int feenableexcept(int) __attribute__((weak, alias("__feenableexcept")));
+int fedisableexcept(int) __attribute__((weak, alias("__fedisableexcept")));
