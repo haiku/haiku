@@ -200,12 +200,14 @@ __printf_fp (FILE *fp,
   /* Nonzero if this is output on a wide character stream.  */
   int wide = info->wide;
 
-  auto wchar_t hack_digit (void);
+  wchar_t hack_digit_ret;
+  int hack_digit_callee;
 
-  wchar_t hack_digit (void)
+  while (0)
     {
       mp_limb_t hi;
 
+hack_digit:
       if (expsign != 0 && type == 'f' && exponent-- > 0)
 	hi = 0;
       else if (scalesize == 0)
@@ -232,7 +234,8 @@ __printf_fp (FILE *fp,
 		  /* We're not prepared for an mpn variable with zero
 		     limbs.  */
 		  fracsize = 1;
-		  return L'0' + hi;
+		  hack_digit_ret = L'0' + hi;
+		  goto hack_digit_end;
 		}
 	    }
 
@@ -241,7 +244,15 @@ __printf_fp (FILE *fp,
 	    frac[fracsize++] = cy;
 	}
 
-      return L'0' + hi;
+      hack_digit_ret = L'0' + hi;
+hack_digit_end:
+      switch (hack_digit_callee)
+        {
+	  case 1: goto hack_digit_callee1;
+	  case 2: goto hack_digit_callee2;
+	  case 3: goto hack_digit_callee3;
+	  default: abort();
+	}
     }
 
 
@@ -885,7 +896,10 @@ __printf_fp (FILE *fp,
 	while (intdig_no < intdig_max)
 	  {
 	    ++intdig_no;
-	    *wcp++ = hack_digit ();
+	    hack_digit_callee = 1;
+	    goto hack_digit;
+hack_digit_callee1:
+	    *wcp++ = hack_digit_ret;
 	  }
 	significant = 1;
 	if (info->alt
@@ -907,7 +921,10 @@ __printf_fp (FILE *fp,
 	   || (fracdig_no < fracdig_max && (fracsize > 1 || frac[0] != 0)))
       {
 	++fracdig_no;
-	*wcp = hack_digit ();
+	hack_digit_callee = 2;
+	goto hack_digit;
+hack_digit_callee2:
+	*wcp++ = hack_digit_ret;
 	if (*wcp != L'0')
 	  significant = 1;
 	else if (significant == 0)
@@ -920,7 +937,10 @@ __printf_fp (FILE *fp,
       }
 
     /* Do rounding.  */
-    digit = hack_digit ();
+    hack_digit_callee = 3;
+    goto hack_digit;
+hack_digit_callee3:
+    digit = hack_digit_ret;
     if (digit > L'4')
       {
 	wchar_t *wtp = wcp;
