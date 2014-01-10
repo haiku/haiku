@@ -34,6 +34,7 @@
 #include <ScrollBar.h>
 #include <Shape.h>
 #include <String.h>
+#include <StackOrHeapArray.h>
 
 #include <FontPrivate.h>
 #include <MessengerPrivate.h>
@@ -1856,10 +1857,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				size = 0.0f;
 			}
 
-			// TODO: don't use the stack for this - numStrings could be large
-			float widthArray[numStrings];
-			int32 lengthArray[numStrings];
-			char *stringArray[numStrings];
+			BStackOrHeapArray<float, 64> widthArray(numStrings);
+			BStackOrHeapArray<int32, 64> lengthArray(numStrings);
+			BStackOrHeapArray<char*, 64> stringArray(numStrings);
 			for (int32 i = 0; i < numStrings; i++) {
 				// This version of ReadString allocates the strings, we free
 				// them below
@@ -1882,7 +1882,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				}
 
 				fLink.StartMessage(B_OK);
-				fLink.Attach(widthArray, sizeof(widthArray));
+				fLink.Attach(widthArray, numStrings * sizeof(float));
 			} else
 				fLink.StartMessage(B_BAD_VALUE);
 
@@ -2497,8 +2497,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				link.Read<escapement_delta>(&deltaArray[i]);
 			}
 
-			// TODO: don't do this on the heap! (at least check the size before)
-			BRect rectArray[numStrings];
+			BStackOrHeapArray<BRect, 64> rectArray(numStrings);
 
 			ServerFont font;
 			bool success = false;
@@ -2513,7 +2512,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				if (font.GetBoundingBoxesForStrings(stringArray, lengthArray,
 					numStrings, rectArray, mode, deltaArray) == B_OK) {
 					fLink.StartMessage(B_OK);
-					fLink.Attach(rectArray, sizeof(rectArray));
+					fLink.Attach(rectArray, numStrings * sizeof(BRect));
 					success = true;
 				}
 			}

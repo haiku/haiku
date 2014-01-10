@@ -25,6 +25,7 @@
 #include <GradientConic.h>
 #include <Region.h>
 #include <Shape.h>
+#include <StackOrHeapArray.h>
 
 #include <ServerProtocol.h>
 
@@ -96,11 +97,11 @@ ServerLink::ReadShape(BShape* shape)
 	fReceiver->Read(&opCount, sizeof(int32));
 	fReceiver->Read(&ptCount, sizeof(int32));
 
-	uint32 opList[opCount];
+	BStackOrHeapArray<uint32, 64> opList(opCount);
 	if (opCount > 0)
 		fReceiver->Read(opList, opCount * sizeof(uint32));
 
-	BPoint ptList[ptCount];
+	BStackOrHeapArray<BPoint, 64> ptList(ptCount);
 	if (ptCount > 0)
 		fReceiver->Read(ptList, ptCount * sizeof(BPoint));
 

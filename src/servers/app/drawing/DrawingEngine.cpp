@@ -10,7 +10,10 @@
 #include "DrawingEngine.h"
 
 #include <Bitmap.h>
+#include <StackOrHeapArray.h>
+
 #include <stdio.h>
+
 #include <algorithm>
 #include <stack>
 
@@ -469,7 +472,7 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region, int32 xOffset,
 
 	// TODO: make this step unnecessary
 	// (by using different stack impl inside node)
-	node nodes[count];
+	BStackOrHeapArray<node, 64> nodes(count);
 	for (int32 i= 0; i < count; i++) {
 		nodes[i].init(region->RectAt(i), count);
 	}

@@ -11,6 +11,7 @@
 
 #include <MediaDefs.h>
 #include <Screen.h>
+#include <StackOrHeapArray.h>
 #include <Window.h>
 
 #include "DrawingTidbits.h"
@@ -108,7 +109,7 @@ VUView::_RenderLaunch(void *data)
 void
 VUView::_RenderLoop()
 {
-	rgb_color levels[fLevelCount][2];
+	BStackOrHeapArray<rgb_color[2], 64> levels(fLevelCount);
 	
 	for (int32 i = 0; i < fLevelCount; i++) {
 		levels[i][0] = levels[i][1] = back_color;	

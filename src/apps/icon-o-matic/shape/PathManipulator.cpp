@@ -14,6 +14,7 @@
 #include <Message.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <StackOrHeapArray.h>
 #include <Window.h>
 
 #include "cursors.h"
@@ -1703,7 +1704,7 @@ PathManipulator::_Nudge(BPoint direction)
 		int32 count = fromSelection ? fSelection->CountItems()
 									: fPath->CountPoints();
 		int32 indices[count];
-		control_point points[count];
+		BStackOrHeapArray<control_point, 64> points(count);
 
 		// init indices and points
 		for (int32 i = 0; i < count; i++) {

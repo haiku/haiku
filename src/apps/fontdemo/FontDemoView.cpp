@@ -20,6 +20,7 @@
 #include <Message.h>
 #include <Shape.h>
 #include <String.h>
+#include <StackOrHeapArray.h>
 
 #include "messages.h"
 
@@ -99,7 +100,7 @@ FontDemoView::_DrawView(BView* view)
 	view->SetFont(&fFont, B_FONT_ALL);
 
 	const size_t size = fString.CountChars();
-	BRect boundBoxes[size];
+	BStackOrHeapArray<BRect, 64> boundBoxes(size);
 
 	if (OutLineLevel())
 		fFont.GetGlyphShapes(fString, size, fShapes);
