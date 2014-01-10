@@ -151,7 +151,7 @@ BTab::Select(BView *owner)
 
 	// NOTE: Views are not added/removed, if there is layout,
 	// they are made visible/invisible in that case.
-	if (!owner->GetLayout())
+	if (!owner->GetLayout() && View()->Parent() == NULL)
 		owner->AddChild(fView);
 
 	fSelected = true;
