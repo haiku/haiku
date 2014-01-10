@@ -494,6 +494,10 @@ void (*bgnd_flag)();
 
 int do_decomp = 0;
 
+void compress(void);
+void decompress(void);
+void copystat(char *ifname, char *ofname);
+
 /*****************************************************************
  * TAG( main )
  *
@@ -947,6 +951,7 @@ long int out_count = 0;			/* # of codes output (for debugging) */
  * questions about this implementation to ames!jaw.
  */
 
+void
 compress() {
     register long fcode;
     register code_int i = 0;
@@ -1215,6 +1220,7 @@ code_int  code;
  * with those of the compress() routine.  See the definitions above.
  */
 
+void
 decompress() {
 
 #ifdef BIG
@@ -1515,8 +1521,8 @@ writeerr()
     exit ( 1 );
 }
 
-copystat(ifname, ofname)
-char *ifname, *ofname;
+void
+copystat(char *ifname, char *ofname)
 {
     struct stat statbuf;
     int mode;
