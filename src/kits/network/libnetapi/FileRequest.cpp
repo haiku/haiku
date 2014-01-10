@@ -7,7 +7,6 @@
  */
 
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <Directory.h>
@@ -84,20 +83,19 @@ BFileRequest::_ProtocolLoop()
 		int size = 0;
 		char name[B_FILE_NAME_LENGTH];
 		BEntry entry;
-		while(directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND)
-		{
+		while (directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
 			// We read directories using the EPFL (Easily Parsed List Format)
 			// This happens to be one of the formats that WebKit can understand,
 			// and it is not too hard to parse or generate.
 			// http://tools.ietf.org/html/draft-bernstein-eplf-02
 			BString epfl("+");
-			if(entry.IsFile() || entry.IsSymLink()) {
+			if (entry.IsFile() || entry.IsSymLink()) {
 				epfl += "r,";
 				off_t fileSize;
 				if (entry.GetSize(&fileSize) == B_OK)
 					epfl << "s" << fileSize << ",";
 
-			} else if(entry.IsDirectory())
+			} else if (entry.IsDirectory())
 				epfl += "/,";
 
 			time_t modification;
@@ -106,11 +104,13 @@ BFileRequest::_ProtocolLoop()
 
 			entry.GetName(name);
 			epfl << "\t" << name << "\r\n";
-			fListener->DataReceived(this, epfl.String(), epfl.Length());
+			if (fListener != NULL)
+				fListener->DataReceived(this, epfl.String(), epfl.Length());
 			size += epfl.Length();
 		}
 
-		fListener->DownloadProgress(this, size, size);
+		if (fListener != NULL)
+			fListener->DownloadProgress(this, size, size);
 		fResult.SetLength(size);
 
 		return B_PROT_SUCCESS;
