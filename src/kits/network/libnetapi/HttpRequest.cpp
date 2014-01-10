@@ -24,12 +24,6 @@
 
 
 static const int32 kHttpBufferSize = 4096;
-static const char* kHttpProtocolThreadStrStatus[
-		B_PROT_HTTP_THREAD_STATUS__END - B_PROT_THREAD_STATUS__END]
-	=  {
-		"The remote server did not found the requested resource"
-	};
-
 
 BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
 	BUrlProtocolListener* listener, BUrlContext* context)
@@ -237,19 +231,6 @@ BHttpRequest::StatusCodeClass(int16 code)
 }
 
 
-const char*
-BHttpRequest::StatusString(status_t threadStatus) const
-{
-	if (threadStatus < B_PROT_THREAD_STATUS__END)
-		return BUrlRequest::StatusString(threadStatus);
-	else if (threadStatus >= B_PROT_HTTP_THREAD_STATUS__END)
-		return BUrlRequest::StatusString(-1);
-	else
-		return kHttpProtocolThreadStrStatus[threadStatus
-			- B_PROT_THREAD_STATUS__END];
-}
-
-
 const BUrlResult&
 BHttpRequest::Result() const
 {
@@ -308,11 +289,11 @@ BHttpRequest::_ProtocolLoop()
 			_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR,
 				"Unable to resolve hostname (%s), aborting.",
 					fUrl.Host().String());
-			return B_PROT_CANT_RESOLVE_HOSTNAME;
+			return B_SERVER_NOT_FOUND;
 		}
 
 		status_t requestStatus = _MakeRequest();
-		if (requestStatus != B_PROT_SUCCESS)
+		if (requestStatus != B_OK)
 			return requestStatus;
 
 		// Prepare the referer for the next request if needed
@@ -396,9 +377,9 @@ BHttpRequest::_ProtocolLoop()
 		fHeaders.CountHeaders(), fInputBuffer.Size());
 
 	if (fResult.StatusCode() == 404)
-		return B_PROT_HTTP_NOT_FOUND;
+		return B_RESOURCE_NOT_FOUND;
 
-	return B_PROT_SUCCESS;
+	return B_OK;
 }
 
 
@@ -440,7 +421,7 @@ BHttpRequest::_MakeRequest()
 	if (connectError != B_OK) {
 		_EmitDebug(B_URL_PROTOCOL_DEBUG_ERROR, "Socket connection error %s",
 			strerror(connectError));
-		return B_PROT_CONNECTION_FAILED;
+		return connectError;
 	}
 
 	//! ProtocolHook:ConnectionOpened
@@ -506,8 +487,8 @@ BHttpRequest::_MakeRequest()
 				fSocket->Write("\r\n", 2);
 			}
 
-			fSocket->Write(fOptPostFields->GetMultipartFooter().String(),
-				fOptPostFields->GetMultipartFooter().Length());
+			BString footer = fOptPostFields->GetMultipartFooter();
+			fSocket->Write(footer.String(), footer.Length());
 		}
 	} else if ((fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT)
 		&& fOptInputData != NULL) {
@@ -546,7 +527,7 @@ BHttpRequest::_MakeRequest()
 	bool receiveEnd = false;
 	bool parseEnd = false;
 	bool readByChunks = false;
-	bool readError = false;
+	status_t readError = B_OK;
 	ssize_t bytesRead = 0;
 	ssize_t bytesReceived = 0;
 	ssize_t bytesTotal = 0;
@@ -561,7 +542,7 @@ BHttpRequest::_MakeRequest()
 			bytesRead = fSocket->Read(chunk.Data(), kHttpBufferSize);
 
 			if (bytesRead < 0) {
-				readError = true;
+				readError = bytesRead;
 				break;
 			} else if (bytesRead == 0)
 				receiveEnd = true;
@@ -692,10 +673,10 @@ BHttpRequest::_MakeRequest()
 	fSocket->Disconnect();
 	delete[] inputTempBuffer;
 
-	if (readError)
-		return B_PROT_READ_FAILED;
+	if (readError != B_OK)
+		return readError;
 
-	return fQuit ? B_PROT_ABORTED : B_PROT_SUCCESS;
+	return fQuit ? B_INTERRUPTED : B_OK;
 }
 
 

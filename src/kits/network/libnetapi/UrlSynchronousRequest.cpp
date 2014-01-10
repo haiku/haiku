@@ -107,6 +107,6 @@ void
 BUrlSynchronousRequest::RequestCompleted(BUrlRequest* caller, bool success)
 {
 	PRINT(("SynchronousRequest::RequestCompleted(%s) : %s\n", (success?"true":"false"),
-		caller->StatusString(caller->Status())));
+		strerror(caller->Status())));
 	fRequestComplete = true;
 }

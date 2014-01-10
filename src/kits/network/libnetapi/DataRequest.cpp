@@ -36,7 +36,7 @@ BDataRequest::_ProtocolLoop()
 	BString mimeType;
 	BString charset;
 	const char* payload;
-	size_t length;
+	ssize_t length;
 	bool isBase64 = false;
 
 	fUrl.UrlDecode(true);
@@ -86,6 +86,12 @@ BDataRequest::_ProtocolLoop()
 			// payload must be a const char* so we can assign data.String() to
 			// it below, but decode_64 modifies buffer.
 		length = decode_base64(buffer, data.String(), data.Length());
+
+		// There may be some padding at the end of the base64 stream. This
+		// prevents us from computing the exact length we should get, so allow
+		// for some error margin.
+		if(length > data.Length() * 4 / 3 || length < data.Length() * 4 / 3 - 3)
+			return B_BAD_DATA;
 	} else {
 		payload = data.String();
 		length = data.Length();
@@ -102,5 +108,5 @@ BDataRequest::_ProtocolLoop()
 	if (isBase64)
 		delete[] payload;
 
-	return B_PROT_SUCCESS;
+	return B_OK;
 }

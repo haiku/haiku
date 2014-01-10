@@ -42,8 +42,6 @@ public:
 	// URL protocol informations
 			bool					IsRunning() const;
 			status_t				Status() const;
-	virtual const char*				StatusString(status_t threadStatus)
-										const;
 	virtual const BUrlResult&		Result() const = 0;
 
 
@@ -65,24 +63,5 @@ protected:
 			BString					fProtocol;
 };
 
-
-// TODO: Rename, this is in the global namespace.
-enum {
-	B_PROT_THREAD_STATUS__BASE	= 0,
-	B_PROT_SUCCESS = B_PROT_THREAD_STATUS__BASE,
-	B_PROT_RUNNING,
-	B_PROT_PAUSED,
-	B_PROT_ABORTED,
-	B_PROT_SOCKET_ERROR,
-	B_PROT_CONNECTION_FAILED,
-	B_PROT_CANT_RESOLVE_HOSTNAME,
-	B_PROT_WRITE_FAILED,
-	B_PROT_READ_FAILED,
-	B_PROT_NO_MEMORY,
-	B_PROT_PROTOCOL_ERROR,
-		//  Thread status over this one are guaranteed to be
-		// errors
-	B_PROT_THREAD_STATUS__END
-};
 
 #endif // _B_URL_REQUEST_H_

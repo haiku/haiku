@@ -49,7 +49,6 @@ public:
 
 			status_t			Stop();
 			const BUrlResult&	Result() const;
-			const char*			StatusString(status_t threadStatus) const;
 
 	static	bool				IsInformationalStatusCode(int16 code);
 	static	bool				IsSuccessStatusCode(int16 code);
@@ -122,13 +121,6 @@ private:
 			bool				fOptDisableListener : 1;
 			bool				fOptAutoReferer : 1;
 };
-
-// ProtocolLoop return status
-enum {
-	B_PROT_HTTP_NOT_FOUND = B_PROT_THREAD_STATUS__END,
-	B_PROT_HTTP_THREAD_STATUS__END
-};
-
 
 // Request method
 const char* const B_HTTP_GET = "GET";

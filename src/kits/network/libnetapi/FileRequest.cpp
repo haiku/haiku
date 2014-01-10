@@ -7,6 +7,7 @@
  */
 
 
+#include <assert.h>
 #include <stdlib.h>
 
 #include <Directory.h>
@@ -42,26 +43,35 @@ BFileRequest::_ProtocolLoop()
 {
 	BNode node(fUrl.Path().String());
 	node_ref ref;
-	if (node.GetNodeRef(&ref) != B_OK)
-		return B_PROT_CONNECTION_FAILED;
+	status_t error = node.GetNodeRef(&ref);
+	if (error != B_OK)
+		return error;
 
+	ssize_t transferredSize = 0;
 	if (node.IsFile()) {
 		BFile file(fUrl.Path().String(), B_READ_ONLY);
-		if (file.InitCheck() != B_OK)
-			return B_PROT_CONNECTION_FAILED;
+		error = file.InitCheck();
+		if (error != B_OK)
+			return error;
 
 		// Send all notifications to listener, if any
 		if (fListener != NULL) {
 			fListener->ConnectionOpened(this);
 			off_t size = 0;
 			file.GetSize(&size);
-			fListener->DownloadProgress(this, size, size);
 			fResult.SetLength(size);
 
 			ssize_t chunkSize;
 			char chunk[4096];
-			while ((chunkSize = file.Read(chunk, sizeof(chunk))) > 0)
+			while ((chunkSize = file.Read(chunk, sizeof(chunk))) > 0) {
 				fListener->DataReceived(this, chunk, chunkSize);
+
+				if (chunkSize > 0)
+					transferredSize += chunkSize;
+				else if (transferredSize != size)
+					return chunkSize;
+			}
+			fListener->DownloadProgress(this, size, size);
 		}
 
 		BNodeInfo info(&file);
@@ -69,52 +79,51 @@ BFileRequest::_ProtocolLoop()
 		if (info.GetType(mimeType) == B_OK)
 			fResult.SetContentType(mimeType);
 
-		return B_PROT_SUCCESS;
-	} else if (node.IsDirectory()) {
-		BDirectory directory(&ref);
-
-		fResult.SetContentType("application/x-ftp-directory");
-			// This tells WebKit to use its FTP directory rendering code.
-
-		// Send all notifications to listener, if any
-		if (fListener != NULL)
-			fListener->ConnectionOpened(this);
-
-		int size = 0;
-		char name[B_FILE_NAME_LENGTH];
-		BEntry entry;
-		while (directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
-			// We read directories using the EPFL (Easily Parsed List Format)
-			// This happens to be one of the formats that WebKit can understand,
-			// and it is not too hard to parse or generate.
-			// http://tools.ietf.org/html/draft-bernstein-eplf-02
-			BString epfl("+");
-			if (entry.IsFile() || entry.IsSymLink()) {
-				epfl += "r,";
-				off_t fileSize;
-				if (entry.GetSize(&fileSize) == B_OK)
-					epfl << "s" << fileSize << ",";
-
-			} else if (entry.IsDirectory())
-				epfl += "/,";
-
-			time_t modification;
-			if (entry.GetModificationTime(&modification) == B_OK)
-				epfl << "m" << modification << ",";
-
-			entry.GetName(name);
-			epfl << "\t" << name << "\r\n";
-			if (fListener != NULL)
-				fListener->DataReceived(this, epfl.String(), epfl.Length());
-			size += epfl.Length();
-		}
-
-		if (fListener != NULL)
-			fListener->DownloadProgress(this, size, size);
-		fResult.SetLength(size);
-
-		return B_PROT_SUCCESS;
+		return B_OK;
 	}
 
-	return B_PROT_CONNECTION_FAILED;
+	assert(node.IsDirectory());
+	BDirectory directory(&ref);
+
+	fResult.SetContentType("application/x-ftp-directory");
+		// This tells WebKit to use its FTP directory rendering code.
+
+	// Send all notifications to listener, if any
+	if (fListener != NULL)
+		fListener->ConnectionOpened(this);
+
+	int size = 0;
+	char name[B_FILE_NAME_LENGTH];
+	BEntry entry;
+	while (directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
+		// We read directories using the EPFL (Easily Parsed List Format)
+		// This happens to be one of the formats that WebKit can understand,
+		// and it is not too hard to parse or generate.
+		// http://tools.ietf.org/html/draft-bernstein-eplf-02
+		BString epfl("+");
+		if (entry.IsFile() || entry.IsSymLink()) {
+			epfl += "r,";
+			off_t fileSize;
+			if (entry.GetSize(&fileSize) == B_OK)
+				epfl << "s" << fileSize << ",";
+
+		} else if (entry.IsDirectory())
+			epfl += "/,";
+
+		time_t modification;
+		if (entry.GetModificationTime(&modification) == B_OK)
+			epfl << "m" << modification << ",";
+
+		entry.GetName(name);
+		epfl << "\t" << name << "\r\n";
+		if (fListener != NULL)
+			fListener->DataReceived(this, epfl.String(), epfl.Length());
+		size += epfl.Length();
+	}
+
+	if (fListener != NULL)
+		fListener->DownloadProgress(this, size, size);
+	fResult.SetLength(size);
+
+	return B_OK;
 }

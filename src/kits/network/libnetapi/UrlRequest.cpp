@@ -12,21 +12,6 @@
 #include <stdio.h>
 
 
-static const char* kProtocolThreadStrStatus[B_PROT_THREAD_STATUS__END + 1]
-	=  {
-		"Request successfully completed",
-		"Request running",
-		"Socket error",
-		"Connection failed",
-		"Hostname resolution failed",
-		"Network write failed",
-		"Network read failed",
-		"Out of memory",
-		"Protocol-specific error",
-		"Unknown error"
-		};
-
-
 BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener,
 	BUrlContext* context, const char* threadName, const char* protocolName)
 	:
@@ -35,7 +20,7 @@ BUrlRequest::BUrlRequest(const BUrl& url, BUrlProtocolListener* listener,
 	fListener(listener),
 	fQuit(false),
 	fRunning(false),
-	fThreadStatus(B_PROT_PAUSED),
+	fThreadStatus(B_NO_INIT),
 	fThreadId(0),
 	fThreadName(threadName),
 	fProtocol(protocolName)
@@ -195,18 +180,6 @@ BUrlRequest::Status() const
 }
 
 
-const char*
-BUrlRequest::StatusString(status_t threadStatus) const
-{
-	if (threadStatus < B_PROT_THREAD_STATUS__BASE)
-		threadStatus = B_PROT_THREAD_STATUS__END;
-	else if (threadStatus >= B_PROT_PROTOCOL_ERROR)
-		threadStatus = B_PROT_PROTOCOL_ERROR;
-
-	return kProtocolThreadStrStatus[threadStatus];
-}
-
-
 // #pragma mark Thread management
 
 
@@ -214,7 +187,7 @@ BUrlRequest::StatusString(status_t threadStatus) const
 BUrlRequest::_ThreadEntry(void* arg)
 {
 	BUrlRequest* urlProtocol = reinterpret_cast<BUrlRequest*>(arg);
-	urlProtocol->fThreadStatus = B_PROT_RUNNING;
+	urlProtocol->fThreadStatus = B_BUSY;
 
 	status_t protocolLoopExitStatus = urlProtocol->_ProtocolLoop();
 
@@ -223,7 +196,7 @@ BUrlRequest::_ThreadEntry(void* arg)
 
 	if (urlProtocol->fListener != NULL) {
 		urlProtocol->fListener->RequestCompleted(urlProtocol,
-			protocolLoopExitStatus == B_PROT_SUCCESS);
+			protocolLoopExitStatus == B_OK);
 	}
 
 	return B_OK;
@@ -240,8 +213,8 @@ BUrlRequest::_EmitDebug(BUrlProtocolDebugMessage type,
 	va_list arguments;
 	va_start(arguments, format);
 
-	char debugMsg[256];
-	vsnprintf(debugMsg, 256, format, arguments);
+	char debugMsg[1024];
+	vsnprintf(debugMsg, sizeof(debugMsg), format, arguments);
 	fListener->DebugMessage(this, type, debugMsg);
 	va_end(arguments);
 }
