@@ -1172,7 +1172,7 @@ ScreenWindow::_CreateColumnRowButton(bool columns, bool plus)
 	message->AddInt32("delta_x", columns ? (plus ? 1 : -1) : 0);
 	message->AddInt32("delta_y", !columns ? (plus ? 1 : -1) : 0);
 
-	BButton* button = new BButton(plus ? "+" : "-", message);
+	BButton* button = new BButton(plus ? "+" : "\xe2\x88\x92", message);
 	button->SetFontSize(be_plain_font->Size() * 0.9);
 
 	BSize size = button->MinSize();
