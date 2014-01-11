@@ -120,6 +120,7 @@ arch_system_info_init(struct kernel_args *args)
 			base = B_CPU_x86;
 	}
 
+	// Any changes to this logic should be replicated to sysinfo.cpp
 	if (base != B_CPU_x86) {
 		if (base == B_CPU_INTEL_x86
 			|| (base == B_CPU_AMD_x86 && cpu->arch.family == 0xF)) {

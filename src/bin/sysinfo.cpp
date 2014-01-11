@@ -583,6 +583,30 @@ dump_cpu(system_info *info, int32 cpu)
 	}
 
 	get_cpuid(&cpuInfo, 1, cpu);
+	// Dump Raw CPUID, and internal CPUID we use...
+	printf("\tRaw CPUID: 0x%1" B_PRIx32 "%1" B_PRIx32 "0%1" B_PRIx32
+		"%1" B_PRIx32 "%1" B_PRIx32 ", ", cpuInfo.eax_1.extended_family,
+		cpuInfo.eax_1.extended_model, cpuInfo.eax_1.family,
+		cpuInfo.eax_1.model, cpuInfo.eax_1.stepping);
+
+	// This logic should be kept in-sync with x86/arch_system_info.cpp
+	// There is also src/tools/cpuidtool.cpp to do command line conversions
+	// of CPUID's to OS.h CPUID's
+	uint32 internalCPUID = 0;
+	if (((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86	
+			&& cpuInfo.eax_1.family == 0xF)
+		|| (info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
+		internalCPUID = (cpuInfo.eax_1.extended_family << 20)
+			+ (cpuInfo.eax_1.extended_model << 16) 
+			+ (cpuInfo.eax_1.family << 4) + cpuInfo.eax_1.model;
+	} else
+		internalCPUID = (cpuInfo.eax_1.family << 4) + cpuInfo.eax_1.model;
+
+	internalCPUID += info->cpu_type & B_CPU_x86_VENDOR_MASK;
+
+	// Matches OS.h define
+	printf("Haiku Internal ID (OS.h): 0x%" B_PRIx32 "\n", internalCPUID);
+
 	print_processor_signature(info, &cpuInfo, NULL);
 	print_features(cpuInfo.eax_1.features);
 
