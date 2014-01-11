@@ -935,7 +935,7 @@ private:
 /*! \brief Maximum number of partition descriptors to be found in volume
 	descriptor sequence, per UDF-2.50
 */
-extern const uint8 kMaxPartitionDescriptors;
+const uint8 kMaxPartitionDescriptors = 2;
 #define UDF_MAX_PARTITION_MAPS 2
 #define UDF_MAX_PARTITION_MAP_SIZE 64
 

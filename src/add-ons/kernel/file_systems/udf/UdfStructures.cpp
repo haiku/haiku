@@ -685,8 +685,6 @@ implementation_use_descriptor::dump() const
 // partition_descriptor
 //----------------------------------------------------------------------
 
-const uint8 kMaxPartitionDescriptors = 2;
-
 void
 partition_descriptor::dump() const
 {
