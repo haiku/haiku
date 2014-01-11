@@ -351,7 +351,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			new BMessage(M_CHECK_SPELLING), ';');
 		menu->AddItem(fSpelling);
 		if (fApp->StartWithSpellCheckOn())
-			PostMessage (M_CHECK_SPELLING);
+			PostMessage(M_CHECK_SPELLING);
 	}
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
