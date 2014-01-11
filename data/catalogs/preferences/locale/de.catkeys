@@ -20,7 +20,7 @@ Restart	Locale Preflet Window		Neustart
 Full format:	TimeFormatSettings		Volles Format:
 Defaults	Locale Preflet Window		Standardwerte
 Cancel	Locale Preflet Window		Abbrechen
-Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Übersetzte Programm- und Ordnernamen in Deskbar und Tracker verwenden.
+Translate application and folder names in Deskbar and Tracker.	Locale Preflet Window		Übersetzte Programmnamen in Deskbar und Tracker
 Revert	Locale Preflet Window		Anfangswerte
 Medium format:	TimeFormatSettings		Mittleres Format:
 12 hour	TimeFormatSettings		12 Stunden

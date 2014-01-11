@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-screenshot	913664967
+1	russian	x-vnd.haiku-screenshot	1483476245
 seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Рабочий стол
 Include window border	ScreenshotWindow		Включая заголовок окна
@@ -7,6 +7,7 @@ Select	ScreenshotWindow		Выбрать
 Capture active window	ScreenshotWindow		Захватить активное окно
 Cancel	ScreenshotWindow		Отмена
 Name:	ScreenshotWindow		Имя:
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Этот файл уже существует.\nВы уверены, что хотите перезаписать его?
 Choose folder	ScreenshotWindow		Выбрать папку
 Save	ScreenshotWindow		Сохранить
 Overwrite	ScreenshotWindow		Перезаписать

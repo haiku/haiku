@@ -1,15 +1,19 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3005327638
+1	finnish	x-vnd.Haiku-HaikuDepot	4291855824
 Name	PackageListView		Nimi
 Installed packages	Model		Asennetut paketit
 User modified packages	Model		Käyttäjän muokkaamat paketit
 Update available	Model		Päivitys saatavilla
 Changelog	PackageInfoView		Muutosloki
+Click a package to view information	PackageInfoView		Napsauta pakkausta tietojen katsomiseksi
 for %Version%	PackageInfoView		%Version%
+No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
 Depot:	FilterView		Varasto:
 Description	PackageListView		Kuvaus
 Install	PackageManager		Asenna
+Tools	MainWindow		Työkalut
 HaikuDepot	System name		HaikuDepot
 Uninstall	PackageManager		Poista asennus
+<no info>	PackageInfoView		<ei tietoja>
 An error occurred while initializing the package manager: %message%	MainWindow		Pakkaushallintaa alustettaessa tapahtui virhe: %message%
 Close	PackageManager		Sulje
 Status	PackageListView		Tila
@@ -25,10 +29,13 @@ Command line	Model		Komentorivi
 Downloading:	PackageInfoView		Ladataan:
 Search terms:	FilterView		Hakusanat:
 %Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error% (%details%)
+Show source packages	MainWindow		Näytä lähdekoodipakkaukset
 Productivity	Model		Tuottavuus
 Show:	FilterView		Näytä:
 Size	PackageListView		Koko
+Options	MainWindow		Valitsimet
 Games	Model		Pelit
 Rating	PackageListView		Arvosana
 Downloading	Model		Ladataan
@@ -45,6 +52,7 @@ Unknown	PackageListView		Tuntematon
 All depots	FilterView		Kaikki varastot
 Available	PackageListView		Käytettävissä
 n/a	PackageInfoView		–
+Show develop packages	MainWindow		Näytä kehityspakkaukset
 Show	FilterView		Näytä
 Uninstalled packages	Model		Pakkaukset, joiden asennus on poistettu
 Audio	Model		Ääni

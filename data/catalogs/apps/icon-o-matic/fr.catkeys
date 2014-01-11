@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	2077263617
+1	french	x-vnd.haiku-icon_o_matic	1906965105
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -50,6 +50,7 @@ bad news	Icon-O-Matic-Exporter		mauvaises nouvelles
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<rien à annuler>
 Off	Icon-O-Matic-Menu-Settings		Éteint
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Figer la forme
+Joins	Icon-O-Matic-PropertyNames		Jointures
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Enlever le style
 Scale X	Icon-O-Matic-PropertyNames		Échelle en X
 Cancel	Icon-O-Matic-SVGExport		Annuler

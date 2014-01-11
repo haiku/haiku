@@ -1,6 +1,7 @@
-1	finnish	x-vnd.Haiku-desklink	2797960853
+1	finnish	x-vnd.Haiku-desklink	3451447865
 Control physical output	MediaReplicant		Ohjaa fyysistä tulostetta
 Couldn't launch 	MediaReplicant		Käynnistäminen epäonnistui 
+Muted	MediaReplicant		Vaimennettu
 OK	MediaReplicant		Valmis
 Sound preferences…	MediaReplicant		Ääniasetukset...
 %g dB	MediaReplicant		%g dB

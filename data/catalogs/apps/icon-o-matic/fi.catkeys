@@ -1,4 +1,4 @@
-1	finnish	x-vnd.haiku-icon_o_matic	1336797042
+1	finnish	x-vnd.haiku-icon_o_matic	28048799
 Select All	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add Style	Icon-O-Matic-AddStylesCmd		Lisää tyyli
 Color (#%02x%02x%02x)	Style name after dropping a color		Väri (#%02x%02x%02x)
@@ -78,6 +78,7 @@ Perspective	Transformation		Perspektiivi
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Siirrä muunnin
 Opacity	Icon-O-Matic-PropertyNames		Läpinäkymättömyys
 Add with path	Icon-O-Matic-ShapesList		Lisää polulla
+Export icon	Dialog title		Vie kuvake
 Gradient type	Icon-O-Matic-StyleTypes		Kaltevuustyyppi
 Icon-O-Matic	System name		Kuvakemaatti
 Cancel	Icon-O-Matic-Menu-Settings		Peru
@@ -190,6 +191,7 @@ Overwrite	Icon-O-Matic-SVGExport		Korvaa
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Jähmetä hahmot
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Halkaise ohjauspiste
 Open…	Icon-O-Matic-Menu-File		Avaa...
+Save icon	Dialog title		Tallenna kuvake
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Väri (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Muokkaa kaltevuutta
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Nollaa polku

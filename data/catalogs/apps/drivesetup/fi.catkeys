@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	3775412465
+1	finnish	x-vnd.Haiku-DriveSetup	758245016
 DriveSetup	System name		Levyasema-asetukset
 Cancel	AbstractParametersPanel		Peru
 Delete	MainWindow		Poista
@@ -7,6 +7,7 @@ Rescan	MainWindow		Etsi uudelleen
 OK	MainWindow		Valmis
 Could not aquire partitioning information.	MainWindow		Ei voitu hakea osiointitietoja.
 There's no space on the partition where a child partition could be created.	MainWindow		Osiolla ei ole mitään tilaa, johon olisi voitu luoda tytärosio.
+Could not unmount partition	MainWindow		Osion irrottaminen epäonnistui
 Initialize	InitializeParametersPanel		Alusta
 OK	AbstractParametersPanel		Valmis
 <empty>	PartitionList		<tyhjä>
@@ -16,6 +17,7 @@ No disk devices have been recognized.	DiskView		Levyasemia ei tunnistettu.
 Failed to initialize the disk %s!\n	MainWindow		Levyn %s alustus epäonnistui!\n
 The selected disk is read-only.	MainWindow		Valittu levy on kirjoitussuojattu.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion \"%s\"? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Pitäisikö irrottaminen pakottaa?\n\nHuomaa: Jos sovellus parhaillaan kirjoittaa taltiolle, irrottaminen saattaa aiheutta datan katoamista.\n
 Could not mount partition %s.	MainWindow		Osion %s liittäminen epäonnistui.
 The partition %s has been successfully formatted.\n	MainWindow		Osion %s alustus onnistui.\n
 Change parameters	MainWindow		Vaihda parametreja
@@ -70,6 +72,7 @@ Are you sure you want to change parameters of the selected partition?\n\nThe par
 Eject	MainWindow		Poista asemasta
 Partition	MainWindow		Osio
 Validation of the given parameters failed.	MainWindow		Annettujen parametrien todentaminen epäonnistui.
+Force unmount	MainWindow		Pakota irrottaminen
 Create	CreateParametersPanel		Luo
 File system	PartitionList		Tiedostojärjestelmä
 Validation of the given creation parameters failed.	MainWindow		Annettujen luontiparametrien todentaminen epäonnistui.
