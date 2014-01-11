@@ -924,7 +924,7 @@ hack_digit_callee1:
 	hack_digit_callee = 2;
 	goto hack_digit;
 hack_digit_callee2:
-	*wcp++ = hack_digit_ret;
+	*wcp = hack_digit_ret;
 	if (*wcp != L'0')
 	  significant = 1;
 	else if (significant == 0)
