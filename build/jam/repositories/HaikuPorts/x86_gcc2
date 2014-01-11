@@ -118,7 +118,7 @@ RemotePackageRepository HaikuPorts
 	libxml2_python-2.8.0-6
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
-	lua-5.2.1-3
+	lua-5.2.1-6
 	m4-1.4.16-5
 	make-3.82-5
 	man-1.6g-3
