@@ -378,7 +378,7 @@ extern void			set_real_time_clock(uint32 secsSinceJan1st1970);
 extern bigtime_t	real_time_clock_usecs(void);
 extern bigtime_t	system_time(void);
 						/* time since booting in microseconds */
-extern nanotime_t	system_time_nsecs();
+extern nanotime_t	system_time_nsecs(void);
 						/* time since booting in nanoseconds */
 
 					// deprecated (is no-op)
