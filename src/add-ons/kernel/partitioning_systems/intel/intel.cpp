@@ -53,20 +53,6 @@
 
 using std::nothrow;
 
-// TODO: This doesn't belong here!
-// no atomic_add() in the boot loader
-#ifdef _BOOT_MODE
-
-inline int32
-atomic_add(int32* a, int32 num)
-{
-	int32 oldA = *a;
-	*a += num;
-	return oldA;
-}
-
-#endif
-
 
 #ifndef _BOOT_MODE
 
