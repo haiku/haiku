@@ -5,6 +5,7 @@
 #ifndef	_SUPPORT_STACKORHEAPARRAY_H
 #define	_SUPPORT_STACKORHEAPARRAY_H
 
+#include <cstddef>
 #include <new>
 
 template <typename Type, int StackSize>
