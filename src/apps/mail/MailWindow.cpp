@@ -342,10 +342,16 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		new BMessage(M_FIND_AGAIN), 'G'));
 	if (!fIncoming) {
 		menu->AddSeparatorItem();
-		menu->AddItem(fQuote = new BMenuItem(B_TRANSLATE("Quote"),
-			new BMessage(M_QUOTE), ']'));
-		menu->AddItem(fRemoveQuote = new BMenuItem(B_TRANSLATE("Remove quote"),
-			new BMessage(M_REMOVE_QUOTE), '['));
+		fQuote = new BMenuItem(B_TRANSLATE("Quote"),
+			new BMessage(M_QUOTE), ']');
+		menu->AddItem(fQuote);
+		AddShortcut(']', B_OPTION_KEY, new BMessage(M_QUOTE));
+
+		fRemoveQuote = new BMenuItem(B_TRANSLATE("Remove quote"),
+			new BMessage(M_REMOVE_QUOTE), '[');
+		menu->AddItem(fRemoveQuote);
+		AddShortcut('[', B_OPTION_KEY, new BMessage(M_REMOVE_QUOTE));
+
 		menu->AddSeparatorItem();
 		fSpelling = new BMenuItem(B_TRANSLATE("Check spelling"),
 			new BMessage(M_CHECK_SPELLING), ';');
