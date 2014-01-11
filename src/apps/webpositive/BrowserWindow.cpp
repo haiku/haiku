@@ -701,6 +701,7 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 			return;
 		}
 	}
+
 	if (message->what == B_MOUSE_MOVED || message->what == B_MOUSE_DOWN
 		|| message->what == B_MOUSE_UP) {
 		message->FindPoint("where", &fLastMousePos);
@@ -708,6 +709,7 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 			fLastMouseMovedTime = system_time();
 		_CheckAutoHideInterface();
 	}
+
 	if (message->what == B_MOUSE_WHEEL_CHANGED) {
 		BPoint where;
 		uint32 buttons;
@@ -729,9 +731,13 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 					return;
 				}
 			}
-		} else // Also don't scroll up and down if the mouse is not over the web view
+		} else {
+			// Also don't scroll up and down if the mouse is not over the
+			// web view
 			return;
+		}
 	}
+
 	BWebWindow::DispatchMessage(message, target);
 }
 
@@ -747,9 +753,11 @@ BrowserWindow::MessageReceived(BMessage* message)
 			else
 				fURLInputGroup->MakeFocus(true);
 			break;
+
 		case RELOAD:
 			CurrentWebView()->Reload();
 			break;
+
 		case GOTO_URL:
 		{
 			BString url;
@@ -761,15 +769,19 @@ BrowserWindow::MessageReceived(BMessage* message)
 
 			break;
 		}
+
 		case GO_BACK:
 			CurrentWebView()->GoBack();
 			break;
+
 		case GO_FORWARD:
 			CurrentWebView()->GoForward();
 			break;
+
 		case STOP:
 			CurrentWebView()->StopLoading();
 			break;
+
 		case HOME:
 			CurrentWebView()->LoadURL(fStartPageURL);
 			break;
@@ -792,13 +804,15 @@ BrowserWindow::MessageReceived(BMessage* message)
 		case CREATE_BOOKMARK:
 			_CreateBookmark();
 			break;
+
 		case SHOW_BOOKMARKS:
 			_ShowBookmarks();
 			break;
 
 		case B_REFS_RECEIVED:
 		{
-			// Currently the only source of these messages is the bookmarks menu.
+			// Currently the only source of these messages is the bookmarks
+			// menu.
 			// Filter refs into URLs, this also gets rid of refs for folders.
 			// For clicks on sub-folders in the bookmarks menu, we have Tracker
 			// open the corresponding folder.
@@ -830,12 +844,15 @@ BrowserWindow::MessageReceived(BMessage* message)
 			}
 			message->RemoveName("refs");
 			if (addedCount > 10) {
-				BString string(B_TRANSLATE_COMMENT("Do you want to open %addedCount "
-					"bookmarks all at once?", "Don't translate variable %addedCount."));
+				BString string(B_TRANSLATE_COMMENT("Do you want to open "
+					"%addedCount bookmarks all at once?", "Don't translate "
+					"variable %addedCount."));
 				string.ReplaceFirst("%addedCount", BString() << addedCount);
 
-				BAlert* alert = new BAlert(B_TRANSLATE("Open bookmarks confirmation"),
-					string.String(), B_TRANSLATE("Cancel"), B_TRANSLATE("Open all"));
+				BAlert* alert = new BAlert(
+					B_TRANSLATE("Open bookmarks confirmation"),
+					string.String(), B_TRANSLATE("Cancel"),
+					B_TRANSLATE("Open all"));
 				alert->SetShortcut(0, B_ESCAPE);
 				if (alert->Go() == 0)
 					break;
@@ -844,6 +861,7 @@ BrowserWindow::MessageReceived(BMessage* message)
 			be_app->PostMessage(message);
 			break;
 		}
+
 		case B_SIMPLE_DATA:
 		{
 			// User possibly dropped files on this window.

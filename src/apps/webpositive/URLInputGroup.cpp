@@ -202,6 +202,7 @@ URLInputGroup::URLTextView::MessageReceived(BMessage* message)
 		case MSG_CLEAR:
 			SetText("");
 			break;
+
 		default:
 			BTextView::MessageReceived(message);
 			break;
