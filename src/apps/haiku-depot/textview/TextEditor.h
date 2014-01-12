@@ -6,6 +6,8 @@
 #define TEXT_EDITOR_H
 
 
+#include <Referenceable.h>
+
 #include "CharacterStyle.h"
 #include "TextDocument.h"
 #include "TextDocumentLayout.h"
@@ -21,7 +23,7 @@ public:
 };
 
 
-class TextEditor {
+class TextEditor : public BReferenceable {
 public:
 								TextEditor();
 								TextEditor(const TextEditor& other);
@@ -80,6 +82,9 @@ private:
 			float				fCaretAnchorX;
 			::CharacterStyle	fStyleAtCaret;
 };
+
+
+typedef BReference<TextEditor> TextEditorRef;
 
 
 #endif // TEXT_EDITOR_H
