@@ -92,7 +92,7 @@ struct router_advertisement_header {
 	uint16		router_lifetime;
 	uint32		reachable_time;
 	uint32		retransmit_timer;
-	uint8		options[];
+	uint8		options[0];
 } _PACKED;
 
 
