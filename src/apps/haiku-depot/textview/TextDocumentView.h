@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef TEXT_DOCUMENT_VIEW_H
@@ -10,6 +10,7 @@
 
 #include "TextDocument.h"
 #include "TextDocumentLayout.h"
+#include "TextEditor.h"
 
 
 class BClipboard;
@@ -20,9 +21,11 @@ public:
 								TextDocumentView(const char* name = NULL);
 	virtual						~TextDocumentView();
 
+	// BView implementation
 	virtual	void				MessageReceived(BMessage* message);
 
 	virtual void				Draw(BRect updateRect);
+	virtual	void				Pulse();
 
 	virtual	void				AttachedToWindow();
 	virtual void				FrameResized(float width, float height);
@@ -34,6 +37,9 @@ public:
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
 
+	virtual	void				KeyDown(const char* bytes, int32 numBytes);
+	virtual	void				KeyUp(const char* bytes, int32 numBytes);
+
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 	virtual	BSize				PreferredSize();
@@ -42,8 +48,12 @@ public:
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
+	// TextDocumentView interface
 			void				SetTextDocument(
 									const TextDocumentRef& document);
+
+			void				SetTextEditor(
+									const TextEditorRef& editor);
 
 			void				SetInsets(float inset);
 			void				SetInsets(float horizontal, float vertical);
@@ -72,6 +82,7 @@ private:
 private:
 			TextDocumentRef		fTextDocument;
 			TextDocumentLayout	fTextDocumentLayout;
+			TextEditorRef		fTextEditor;
 
 			float				fInsetLeft;
 			float				fInsetTop;

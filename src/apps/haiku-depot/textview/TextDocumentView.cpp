@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -17,7 +17,8 @@
 
 TextDocumentView::TextDocumentView(const char* name)
 	:
-	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS
+		| B_PULSE_NEEDED),
 	fInsetLeft(0.0f),
 	fInsetTop(0.0f),
 	fInsetRight(0.0f),
@@ -39,6 +40,8 @@ TextDocumentView::TextDocumentView(const char* name)
 
 TextDocumentView::~TextDocumentView()
 {
+	// Don't forget to remove listeners
+	SetTextEditor(TextEditorRef());
 }
 
 
@@ -85,6 +88,13 @@ TextDocumentView::Draw(BRect updateRect)
 
 	SetHighColor(40, 40, 40);
 	StrokeShape(&shape);
+}
+
+
+void
+TextDocumentView::Pulse()
+{
+	// TODO: Blink cursor
 }
 
 
@@ -155,6 +165,34 @@ TextDocumentView::MouseMoved(BPoint where, uint32 transit,
 }
 
 
+void
+TextDocumentView::KeyDown(const char* bytes, int32 numBytes)
+{
+	if (fTextEditor.Get() == NULL)
+		return;
+
+	KeyEvent event;
+	event.bytes = bytes;
+	event.length = numBytes;
+	event.key = 0;
+	event.modifiers = modifiers();
+	
+	if (Window() != NULL && Window()->CurrentMessage() != NULL) {
+		BMessage* message = Window()->CurrentMessage();
+		message->FindInt32("key", &event.key);
+		message->FindInt32("modifiers", &event.modifiers);
+	}
+
+	fTextEditor->KeyDown(event);
+}
+
+
+void
+TextDocumentView::KeyUp(const char* bytes, int32 numBytes)
+{
+}
+
+
 BSize
 TextDocumentView::MinSize()
 {
@@ -201,11 +239,16 @@ TextDocumentView::GetHeightForWidth(float width, float* min, float* max,
 }
 
 
+// #pragma mark -
+
+
 void
 TextDocumentView::SetTextDocument(const TextDocumentRef& document)
 {
 	fTextDocument = document;
 	fTextDocumentLayout.SetTextDocument(fTextDocument);
+	if (fTextEditor.Get() != NULL)
+		fTextEditor->SetDocument(document);
 
 	fSelectionAnchorOffset = 0;
 	fCaretOffset = 0;
@@ -214,6 +257,25 @@ TextDocumentView::SetTextDocument(const TextDocumentRef& document)
 	InvalidateLayout();
 	Invalidate();
 	_UpdateScrollBars();
+}
+
+
+void
+TextDocumentView::SetTextEditor(const TextEditorRef& editor)
+{
+	if (fTextEditor == editor)
+		return;
+
+	if (fTextEditor.Get() != NULL) {
+		// TODO: Probably has to remove listeners
+	}
+
+	fTextEditor = editor;
+
+	if (fTextEditor.Get() != NULL) {
+		fTextEditor->SetDocument(fTextDocument);
+		// TODO: Probably has to add listeners
+	}
 }
 
 
