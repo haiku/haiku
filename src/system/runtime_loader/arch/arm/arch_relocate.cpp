@@ -21,8 +21,6 @@
 #	define TRACE(x) ;
 #endif
 
-void *__dso_handle;
-
 status_t
 arch_relocate_image(image_t *rootImage, image_t *image,
 	SymbolLookupCache* cache)

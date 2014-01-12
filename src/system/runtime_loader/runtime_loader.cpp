@@ -29,6 +29,7 @@
 
 struct user_space_program_args *gProgramArgs;
 void *__gCommPageAddress;
+void *__dso_handle;
 
 
 static const char *
