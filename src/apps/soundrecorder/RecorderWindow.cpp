@@ -1335,16 +1335,22 @@ RecorderWindow::RefsReceived(BMessage *msg)
 		countBad++;
 	}
 
-	if (countBad > 0 && countGood == 0) {
+	if (countBad == 1 && countGood == 0) {
 		BAlert* alert = new BAlert(B_TRANSLATE("Nothing to play"),
-			B_TRANSLATE("None of the files appear to be audio files"),
+			B_TRANSLATE("The file doesn't appear to be an audio file."),
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
+	} else if (countBad > 0 && countGood == 0) {
+		BAlert* alert = new BAlert(B_TRANSLATE("Nothing to play"),
+			B_TRANSLATE("None of the files appear to be audio files."),
 			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	} else if (countGood > 0) {
 		if (countBad > 0) {
 			BAlert* alert = new BAlert(B_TRANSLATE("Invalid audio files"),
-			B_TRANSLATE("Some of the files don't appear to be audio files"),
+			B_TRANSLATE("Some of the files don't appear to be audio files."),
 				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 				B_WARNING_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
