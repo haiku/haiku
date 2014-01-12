@@ -149,14 +149,13 @@ scale_down(const uint8* srcBits, uint8* dstBits, int32 srcWidth, int32 srcHeight
 			p4 = *((uint32*)srcBits + ((l + 1)* srcWidth) + c);
 
 			// color components
-			blue = (uint8)p1 * d1 + (uint8)p2 * d2 + (uint8)p3 * d3
-				+ (uint8)p4 * d4;
-			green = (uint8)(p1 >> 8) * d1 + (uint8)(p2 >> 8) * d2
-				+ (uint8)(p3 >> 8) * d3 + (uint8)(p4 >> 8) * d4;
-			red = (uint8)(p1 >> 16) * d1 + (uint8)(p2 >> 16) * d2
-				+ (uint8)(p3 >> 16) * d3 + (uint8)(p4 >> 16) * d4;
-			alpha = (uint8)(p1 >> 24) * d1 + (uint8)(p2 >> 24) * d2
-				+ (uint8)(p3 >> 24) * d3 + (uint8)(p4 >> 24) * d4;
+			blue = (uint8)(p1 * d1 + p2 * d2 + p3 * d3 + p4 * d4);
+			green = (uint8)((p1 >> 8) * d1 + (p2 >> 8) * d2
+				+ (p3 >> 8) * d3 + (p4 >> 8) * d4);
+			red = (uint8)((p1 >> 16) * d1 + (p2 >> 16) * d2
+				+ (p3 >> 16) * d3 + (p4 >> 16) * d4);
+			alpha = (uint8)((p1 >> 24) * d1 + (p2 >> 24) * d2
+				+ (p3 >> 24) * d3 + (p4 >> 24) * d4);
 
 			// destination RGBA pixel
 			*((uint32*)dstBits + (i * dstWidth) + j)
