@@ -646,17 +646,23 @@ void
 BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 {
 	const char* bytes;
-	uint32 modifierKeys;
+	int32 modifierKeys;
 	if ((message->what == B_KEY_DOWN || message->what == B_UNMAPPED_KEY_DOWN)
 		&& message->FindString("bytes", &bytes) == B_OK
-		&& message->FindInt32("modifiers", (int32*)&modifierKeys) == B_OK) {
-
-		modifierKeys = modifierKeys & 0x000000ff;
+		&& message->FindInt32("modifiers", &modifierKeys) == B_OK) {
+		modifierKeys = (int32)((uint32)modifierKeys & 0x000000ff);
+		BTextView* textView = dynamic_cast<BTextView*>(CurrentFocus());
 		if (bytes[0] == B_LEFT_ARROW && modifierKeys == B_COMMAND_KEY) {
-			PostMessage(GO_BACK);
+			if (textView != NULL)
+				textView->KeyDown(bytes, modifierKeys);
+			else
+				PostMessage(GO_BACK);
 			return;
 		} else if (bytes[0] == B_RIGHT_ARROW && modifierKeys == B_COMMAND_KEY) {
-			PostMessage(GO_FORWARD);
+			if (textView != NULL)
+				textView->KeyDown(bytes, modifierKeys);
+			else
+				PostMessage(GO_FORWARD);
 			return;
 		} else if (bytes[0] == B_FUNCTION_KEY) {
 			// Some function key Firefox compatibility
