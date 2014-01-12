@@ -49,6 +49,7 @@ Application HaikuDepot :
 	PackageInfoView.cpp
 	PackageListView.cpp
 	PackageManager.cpp
+	RatePackageWindow.cpp
 	support.cpp
 
 	# package_daemon
@@ -73,6 +74,7 @@ DoCatalogs HaikuDepot :
 	PackageInfoView.cpp
 	PackageListView.cpp
 	PackageManager.cpp
+	UserRatingWindow.cpp
 ;
 
 Application TextDocumentTest :

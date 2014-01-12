@@ -21,6 +21,7 @@ class PagesView;
 enum {
 	MSG_VOTE_UP			= 'vtup',
 	MSG_VOTE_DOWN		= 'vtdn',
+	MSG_RATE_PACKAGE	= 'rate',
 };
 
 

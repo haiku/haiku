@@ -390,6 +390,73 @@ private:
 
 enum {
 	MSG_PACKAGE_ACTION			= 'pkga',
+	MSG_MOUSE_ENTERED_RATING	= 'menr',
+	MSG_MOUSE_EXITED_RATING		= 'mexr',
+};
+
+
+class TransitReportingButton : public BButton {
+public:
+	TransitReportingButton(const char* name, const char* label,
+			BMessage* message)
+		:
+		BButton(name, label, message),
+		fTransitMessage(NULL)
+	{
+	}
+
+	virtual ~TransitReportingButton()
+	{
+		SetTransitMessage(NULL);
+	}
+
+	virtual void MouseMoved(BPoint point, uint32 transit,
+		const BMessage* dragMessage)
+	{
+		BButton::MouseMoved(point, transit, dragMessage);
+		
+		if (fTransitMessage != NULL && transit == B_EXITED_VIEW)
+			Invoke(fTransitMessage);
+	}
+
+	void SetTransitMessage(BMessage* message)
+	{
+		if (fTransitMessage != message) {
+			delete fTransitMessage;
+			fTransitMessage = message;
+		}
+	}
+
+private:
+	BMessage*	fTransitMessage;
+};
+
+
+class TransitReportingRatingView : public RatingView, public BInvoker {
+public:
+	TransitReportingRatingView(BMessage* transitMessage)
+		:
+		RatingView(),
+		fTransitMessage(transitMessage)
+	{
+	}
+
+	virtual ~TransitReportingRatingView()
+	{
+		delete fTransitMessage;
+	}
+
+	virtual void MouseMoved(BPoint point, uint32 transit,
+		const BMessage* dragMessage)
+	{
+		RatingView::MouseMoved(point, transit, dragMessage);
+		
+		if (fTransitMessage != NULL && transit == B_ENTERED_VIEW)
+			Invoke(fTransitMessage);
+	}
+
+private:
+	BMessage*	fTransitMessage;
 };
 
 
@@ -432,7 +499,8 @@ public:
 		fVersionInfo->SetHighColor(kLightBlack);
 
 		// Rating view
-		fRatingView = new RatingView();
+		fRatingView = new TransitReportingRatingView(
+			new BMessage(MSG_MOUSE_ENTERED_RATING));
 
 		fAvgRating = new BStringView("package average rating", "");
 		fAvgRating->SetFont(&font);
@@ -445,6 +513,33 @@ public:
 		fVoteInfo->SetFont(&font);
 		fVoteInfo->SetHighColor(kLightBlack);
 
+		// Rate button
+		fRateButton = new TransitReportingButton("rate",
+			B_TRANSLATE("Rate package" B_UTF8_ELLIPSIS),
+			new BMessage(MSG_RATE_PACKAGE));
+		fRateButton->SetTransitMessage(new BMessage(MSG_MOUSE_EXITED_RATING));
+		fRateButton->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+			B_ALIGN_VERTICAL_CENTER));
+
+		// Rating group
+		BView* ratingStack = new BView("rating stack", 0);
+		fRatingLayout = new BCardLayout();
+		ratingStack->SetLayout(fRatingLayout);
+		ratingStack->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+		ratingStack->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+		BGroupView* ratingGroup = new BGroupView(B_HORIZONTAL,
+			B_USE_SMALL_SPACING);
+		BLayoutBuilder::Group<>(ratingGroup)
+			.Add(fRatingView)
+			.Add(fAvgRating)
+			.Add(fVoteInfo)
+		;
+
+		ratingStack->AddChild(ratingGroup);
+		ratingStack->AddChild(fRateButton);
+		fRatingLayout->SetVisibleItem((int32)0);
+
 		BLayoutBuilder::Group<>(this)
 			.Add(fIconView)
 			.AddGroup(B_VERTICAL, 1.0f, 2.2f)
@@ -453,12 +548,7 @@ public:
 				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 			.End()
 			.AddGlue(0.1f)
-			.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING, 0.8f)
-				.Add(fRatingView)
-				.Add(fAvgRating)
-				.Add(fVoteInfo)
-				.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
-			.End()
+			.Add(ratingStack, 0.8f)
 			.AddGlue(0.2f)
 			.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING, 2.0f)
 				.Add(fVersionInfo)
@@ -472,6 +562,31 @@ public:
 
 	virtual ~TitleView()
 	{
+	}
+
+	virtual void AttachedToWindow()
+	{
+		fRateButton->SetTarget(this);
+		fRatingView->SetTarget(this);
+	}
+
+	virtual void MessageReceived(BMessage* message)
+	{
+		switch (message->what) {
+			case MSG_RATE_PACKAGE:
+				// Forward to window (The button has us as target so
+				// we receive the message below.)
+				Window()->PostMessage(MSG_RATE_PACKAGE);
+				break;
+
+			case MSG_MOUSE_ENTERED_RATING:
+				fRatingLayout->SetVisibleItem(1);
+				break;
+
+			case MSG_MOUSE_EXITED_RATING:
+				fRatingLayout->SetVisibleItem((int32)0);
+				break;
+		}
 	}
 
 	void SetPackage(const PackageInfo& package)
@@ -527,16 +642,20 @@ public:
 	}
 
 private:
-	BitmapView*		fIconView;
+	BitmapView*						fIconView;
 
-	BStringView*	fTitleView;
-	BStringView*	fPublisherView;
+	BStringView*					fTitleView;
+	BStringView*					fPublisherView;
 
-	BStringView*	fVersionInfo;
+	BStringView*					fVersionInfo;
 
-	RatingView*		fRatingView;
-	BStringView*	fAvgRating;
-	BStringView*	fVoteInfo;
+	BCardLayout*					fRatingLayout;
+
+	TransitReportingRatingView*		fRatingView;
+	BStringView*					fAvgRating;
+	BStringView*					fVoteInfo;
+
+	TransitReportingButton*			fRateButton;
 };
 
 

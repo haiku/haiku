@@ -44,6 +44,7 @@
 #include "PackageInfoView.h"
 #include "PackageListView.h"
 #include "PackageManager.h"
+#include "RatePackageWindow.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -259,6 +260,17 @@ MainWindow::MessageReceived(BMessage* message)
 				PackageInfoRef ref(info, true);
 				fModel.SetPackageState(ref, ref->State());
 			}
+			break;
+		}
+
+		case MSG_RATE_PACKAGE:
+		{
+			// TODO: Allow only one RatingWindow
+			// TODO: Mechanism for remembering the window frame
+			RatePackageWindow* window = new RatePackageWindow(this,
+				BRect(0, 0, 500, 400));
+			window->Show();
+			break;
 		}
 
 		default:
