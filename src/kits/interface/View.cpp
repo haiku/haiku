@@ -3935,6 +3935,11 @@ BView::_AddChild(BView* child, BView* before)
 		return false;
 	}
 
+	if (child == this) {
+		debugger("AddChild failed - cannot add a view to itself.");
+		return false;
+	}
+
 	bool lockedOwner = false;
 	if (fOwner && !fOwner->IsLocked()) {
 		fOwner->Lock();
