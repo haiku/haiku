@@ -1485,6 +1485,7 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				B_PRIx32 ") %s (%#" B_PRIx32 ")\n",
 				get_attribute_name_name(attributeName), attributeName,
 				get_attribute_form_name(attributeForm), attributeForm);
+			continue;
 		}
 
 		// set the attribute value according to the attribute's class
