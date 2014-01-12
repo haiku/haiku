@@ -17,12 +17,12 @@ TextDocument::TextDocument()
 }
 
 
-TextDocument::TextDocument(const CharacterStyle& CharacterStyle,
+TextDocument::TextDocument(const CharacterStyle& characterStyle,
 	const ParagraphStyle& paragraphStyle)
 	:
 	fParagraphs(),
 	fEmptyLastParagraph(paragraphStyle),
-	fDefaultCharacterStyle(CharacterStyle)
+	fDefaultCharacterStyle(characterStyle)
 {
 }
 
