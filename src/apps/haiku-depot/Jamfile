@@ -26,6 +26,8 @@ local textDocumentSources =
 	TextDocument.cpp
 	TextDocumentLayout.cpp
 	TextDocumentView.cpp
+	TextEditor.cpp
+	TextSelection.cpp
 	TextSpan.cpp
 	TextView.cpp
 ;
