@@ -39,11 +39,11 @@ BNetworkCookie::BNetworkCookie(const char* name, const char* value,
 
 	SetDomain(url.Host());
 
-    if(url.Protocol() == "file" && url.Host().Length() == 0)
-    {
-        SetDomain("localhost");
-            // make sure cookies set from a file:// URL are stored somewhere.
-    }
+	if (url.Protocol() == "file" && url.Host().Length() == 0)
+	{
+		SetDomain("localhost");
+			// make sure cookies set from a file:// URL are stored somewhere.
+	}
 
 	SetPath(_DefaultPathForUrl(url));
 }
@@ -100,13 +100,13 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 	SetPath(_DefaultPathForUrl(url));
 	SetDomain(url.Host());
 	fHostOnly = true;
-    if(url.Protocol() == "file" && url.Host().Length() == 0)
-    {
-        fDomain = "localhost";
-            // make sure cookies set from a file:// URL are stored somewhere.
-            // not going through SetDomain as it requires at least one '.'
-            // in the domain (to avoid setting cookies on TLDs).
-    }
+	if (url.Protocol() == "file" && url.Host().Length() == 0)
+	{
+		fDomain = "localhost";
+			// make sure cookies set from a file:// URL are stored somewhere.
+			// not going through SetDomain as it requires at least one '.'
+			// in the domain (to avoid setting cookies on TLDs).
+	}
 
 	BString name;
 	BString value;
@@ -378,11 +378,19 @@ BNetworkCookie::HttpOnly() const
 const BString&
 BNetworkCookie::RawCookie(bool full) const
 {
-	if (full && !fRawFullCookieValid) {
-		fRawFullCookie.Truncate(0);
-		fRawFullCookieValid = true;
+	if (!fRawCookieValid) {
+		fRawCookie.Truncate(0);
+		fRawCookieValid = true;
 
-		fRawFullCookie << fName << "=" << fValue;
+		fRawCookie << fName << "=" << fValue;
+	}
+
+	if (!full)
+		return fRawCookie;
+
+	if (!fRawFullCookieValid) {
+		fRawFullCookie = fRawCookie;
+		fRawFullCookieValid = true;
 
 		if (HasDomain())
 			fRawFullCookie << "; Domain=" << fDomain;
@@ -395,14 +403,9 @@ BNetworkCookie::RawCookie(bool full) const
 		if (HttpOnly())
 			fRawFullCookie << "; HttpOnly";
 
-	} else if (!full && !fRawCookieValid) {
-		fRawCookie.Truncate(0);
-		fRawCookieValid = true;
-
-		fRawCookie << fName << "=" << fValue;
 	}
 
-	return full ? fRawFullCookie : fRawCookie;
+	return fRawFullCookie;
 }
 
 
@@ -436,8 +439,8 @@ BNetworkCookie::IsValidForUrl(const BUrl& url) const
 	if (Secure() && url.Protocol() != "https")
 		return false;
 
-    if (url.Protocol() == "file")
-        return Domain() == "localhost" && IsValidForPath(url.Path());
+	if (url.Protocol() == "file")
+		return Domain() == "localhost" && IsValidForPath(url.Path());
 
 	return IsValidForDomain(url.Host()) && IsValidForPath(url.Path());
 }
