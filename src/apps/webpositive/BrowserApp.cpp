@@ -120,9 +120,7 @@ BrowserApp::AboutRequested()
 
 	BString aboutText("");
 	aboutText << "HaikuWebKit " << WebKitInfo::HaikuWebKitVersion();
-	aboutText << " (" << WebKitInfo::HaikuWebKitRevision() << ")";
 	aboutText << "\nWebKit " << WebKitInfo::WebKitVersion();
-	aboutText << " (" << WebKitInfo::WebKitRevision() << ")";
 
 	window->AddCopyright(2007, "Haiku, Inc.");
 	window->AddAuthors(authors);
