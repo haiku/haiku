@@ -398,7 +398,7 @@ BNavMenu::StartBuildingItemList()
 {
 	BEntry entry;
 
-	if (fNavDir.device < 0 || entry.SetTo(&fNavDir) != B_OK
+	if (fNavDir.device < 0 || entry.SetTo(&fNavDir, true) != B_OK
 		|| !entry.Exists())
 		return false;
 
