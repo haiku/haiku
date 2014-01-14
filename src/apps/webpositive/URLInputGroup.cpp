@@ -572,7 +572,7 @@ URLInputGroup::URLInputGroup(BMessage* goMessage)
 
 	SetFlags(Flags() | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
 	SetLowColor(ViewColor());
-	SetViewColor(B_TRANSPARENT_COLOR);
+	SetViewColor(fTextView->ViewColor());
 
 	SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_CENTER));
