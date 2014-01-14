@@ -59,6 +59,7 @@ private:
 									int32* pagesCreated = NULL,
 									bool* fullscreen = NULL);
 			void				_CreateNewPage(const BString& url,
+									BrowserWindow* window = NULL,
 									bool fullscreen = false);
 			void				_CreateNewWindow(const BString& url,
 									bool fullscreen = false);

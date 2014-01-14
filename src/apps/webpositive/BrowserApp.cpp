@@ -356,6 +356,10 @@ BrowserApp::_RefsReceived(BMessage* message, int32* _pagesCreated,
 {
 	int32 pagesCreated = 0;
 
+	BrowserWindow* window = NULL;
+	if (message->FindPointer("window", (void**)&window) != B_OK)
+		window = NULL;
+
 	bool fullscreen;
 	if (message->FindBool("fullscreen", &fullscreen) != B_OK)
 		fullscreen = false;
@@ -370,13 +374,13 @@ BrowserApp::_RefsReceived(BMessage* message, int32* _pagesCreated,
 			continue;
 		BString url;
 		url << path.Path();
-		_CreateNewPage(url, fullscreen);
+		_CreateNewPage(url, window, fullscreen);
 		pagesCreated++;
 	}
 
 	BString url;
 	for (int32 i = 0; message->FindString("url", i, &url) == B_OK; i++) {
-		_CreateNewPage(url, fullscreen);
+		_CreateNewPage(url, window, fullscreen);
 		pagesCreated++;
 	}
 
@@ -388,13 +392,28 @@ BrowserApp::_RefsReceived(BMessage* message, int32* _pagesCreated,
 
 
 void
-BrowserApp::_CreateNewPage(const BString& url, bool fullscreen)
+BrowserApp::_CreateNewPage(const BString& url, BrowserWindow* webWindow,
+	bool fullscreen)
 {
+	// Let's first see if we must target a specific window
+	if (webWindow && webWindow->Lock()) {
+		if (webWindow->IsBlankTab()) {
+			if (url.Length() != 0)
+				webWindow->CurrentWebView()->LoadURL(url);
+		} else
+			webWindow->CreateNewTab(url, true);
+		webWindow->Activate();
+		webWindow->CurrentWebView()->MakeFocus(true);
+		webWindow->Unlock();
+		return;
+	}
+
+	// In other cases, try to find a suitable one
 	uint32 workspace = 1 << current_workspace();
 
 	bool loadedInWindowOnCurrentWorkspace = false;
 	for (int i = 0; BWindow* window = WindowAt(i); i++) {
-		BrowserWindow* webWindow = dynamic_cast<BrowserWindow*>(window);
+		webWindow = dynamic_cast<BrowserWindow*>(window);
 		if (!webWindow)
 			continue;
 		if (webWindow->Lock()) {

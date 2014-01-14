@@ -841,6 +841,7 @@ BrowserWindow::MessageReceived(BMessage* message)
 				if (alert->Go() == 0)
 					break;
 			}
+			message->AddPointer("window", this);
 			be_app->PostMessage(message);
 			break;
 		}
