@@ -58,10 +58,11 @@ private:
 			void				_RefsReceived(BMessage* message,
 									int32* pagesCreated = NULL,
 									bool* fullscreen = NULL);
-			void				_CreateNewPage(const BString& url,
+			BrowserWindow*		_CreateNewPage(const BString& url,
 									BrowserWindow* window = NULL,
-									bool fullscreen = false);
-			void				_CreateNewWindow(const BString& url,
+									bool fullscreen = false,
+									bool useBlankTab = true);
+			BrowserWindow*		_CreateNewWindow(const BString& url,
 									bool fullscreen = false);
 			void				_CreateNewTab(BrowserWindow* window,
 									const BString& url, bool select);

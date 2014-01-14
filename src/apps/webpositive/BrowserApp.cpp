@@ -374,13 +374,13 @@ BrowserApp::_RefsReceived(BMessage* message, int32* _pagesCreated,
 			continue;
 		BString url;
 		url << path.Path();
-		_CreateNewPage(url, window, fullscreen);
+		window = _CreateNewPage(url, window, fullscreen, pagesCreated == 0);
 		pagesCreated++;
 	}
 
 	BString url;
 	for (int32 i = 0; message->FindString("url", i, &url) == B_OK; i++) {
-		_CreateNewPage(url, window, fullscreen);
+		window = _CreateNewPage(url, window, fullscreen, pagesCreated == 0);
 		pagesCreated++;
 	}
 
@@ -391,13 +391,13 @@ BrowserApp::_RefsReceived(BMessage* message, int32* _pagesCreated,
 }
 
 
-void
+BrowserWindow*
 BrowserApp::_CreateNewPage(const BString& url, BrowserWindow* webWindow,
-	bool fullscreen)
+	bool fullscreen, bool useBlankTab)
 {
-	// Let's first see if we must target a specific window
+	// Let's first see if we must target a specific window...
 	if (webWindow && webWindow->Lock()) {
-		if (webWindow->IsBlankTab()) {
+		if (useBlankTab && webWindow->IsBlankTab()) {
 			if (url.Length() != 0)
 				webWindow->CurrentWebView()->LoadURL(url);
 		} else
@@ -405,10 +405,10 @@ BrowserApp::_CreateNewPage(const BString& url, BrowserWindow* webWindow,
 		webWindow->Activate();
 		webWindow->CurrentWebView()->MakeFocus(true);
 		webWindow->Unlock();
-		return;
+		return webWindow;
 	}
 
-	// In other cases, try to find a suitable one
+	// Otherwise, try to find one in the current workspace
 	uint32 workspace = 1 << current_workspace();
 
 	bool loadedInWindowOnCurrentWorkspace = false;
@@ -416,9 +416,10 @@ BrowserApp::_CreateNewPage(const BString& url, BrowserWindow* webWindow,
 		webWindow = dynamic_cast<BrowserWindow*>(window);
 		if (!webWindow)
 			continue;
+
 		if (webWindow->Lock()) {
 			if (webWindow->Workspaces() & workspace) {
-				if (webWindow->IsBlankTab()) {
+				if (useBlankTab && webWindow->IsBlankTab()) {
 					if (url.Length() != 0)
 						webWindow->CurrentWebView()->LoadURL(url);
 				} else
@@ -430,13 +431,15 @@ BrowserApp::_CreateNewPage(const BString& url, BrowserWindow* webWindow,
 			webWindow->Unlock();
 		}
 		if (loadedInWindowOnCurrentWorkspace)
-			return;
+			return webWindow;
 	}
-	_CreateNewWindow(url, fullscreen);
+
+	// Finally, if no window is available, let's create one.
+	return _CreateNewWindow(url, fullscreen);
 }
 
 
-void
+BrowserWindow*
 BrowserApp::_CreateNewWindow(const BString& url, bool fullscreen)
 {
 	// Offset the window frame unless this is the first window created in the
@@ -451,6 +454,7 @@ BrowserApp::_CreateNewWindow(const BString& url, bool fullscreen)
 	if (fullscreen)
 		window->ToggleFullscreen();
 	window->Show();
+	return window;
 }
 
 
