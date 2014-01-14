@@ -113,9 +113,9 @@ scale_down(const uint8* srcBits, uint8* dstBits, int32 srcWidth, int32 srcHeight
 	float tmp;
 	float d1, d2, d3, d4;
 		// coefficients
-	uint32 p1, p2, p3, p4;
+	rgb_color p1, p2, p3, p4;
 		// nearby pixels
-	uint8 red, green, blue, alpha;
+	rgb_color out;
 		// color components
 
 	for (int32 i = 0; i < dstHeight; i++) {
@@ -143,23 +143,23 @@ scale_down(const uint8* srcBits, uint8* dstBits, int32 srcWidth, int32 srcHeight
 			d4 = (1 - t) * u;
 
 			// nearby pixels
-			p1 = *((uint32*)srcBits + (l * srcWidth) + c);
-			p2 = *((uint32*)srcBits + (l * srcWidth) + c + 1);
-			p3 = *((uint32*)srcBits + ((l + 1)* srcWidth) + c + 1);
-			p4 = *((uint32*)srcBits + ((l + 1)* srcWidth) + c);
+			p1 = *((rgb_color*)srcBits + (l * srcWidth) + c);
+			p2 = *((rgb_color*)srcBits + (l * srcWidth) + c + 1);
+			p3 = *((rgb_color*)srcBits + ((l + 1)* srcWidth) + c + 1);
+			p4 = *((rgb_color*)srcBits + ((l + 1)* srcWidth) + c);
 
 			// color components
-			blue = (uint8)(p1 * d1 + p2 * d2 + p3 * d3 + p4 * d4);
-			green = (uint8)((p1 >> 8) * d1 + (p2 >> 8) * d2
-				+ (p3 >> 8) * d3 + (p4 >> 8) * d4);
-			red = (uint8)((p1 >> 16) * d1 + (p2 >> 16) * d2
-				+ (p3 >> 16) * d3 + (p4 >> 16) * d4);
-			alpha = (uint8)((p1 >> 24) * d1 + (p2 >> 24) * d2
-				+ (p3 >> 24) * d3 + (p4 >> 24) * d4);
+			out.blue = (uint8)(p1.blue * d1 + p2.blue * d2 + p3.blue * d3 
+				+ p4.blue * d4);
+			out.green = (uint8)(p1.green * d1 + p2.green * d2 + p3.green * d3 
+				+ p4.green * d4);
+			out.red = (uint8)(p1.red * d1 + p2.red * d2 + p3.red * d3 
+				+ p4.red * d4);
+			out.alpha = (uint8)(p1.alpha * d1 + p2.alpha * d2 + p3.alpha * d3
+				+ p4.alpha * d4);
 
 			// destination RGBA pixel
-			*((uint32*)dstBits + (i * dstWidth) + j)
-				= (alpha << 24) | (red << 16) | (green << 8) | (blue);
+			*((rgb_color*)dstBits + (i * dstWidth) + j) = out;
 		}
 	}
 }
