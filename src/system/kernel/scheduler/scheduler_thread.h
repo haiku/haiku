@@ -277,6 +277,10 @@ ThreadData::GoesAway()
 
 	ASSERT(fReady);
 
+	bigtime_t timeUsed = system_time() - fQuantumStart;
+	ASSERT(timeUsed >= 0);
+	fTimeLeft -= timeUsed;
+
 	if (!fReceivedPenalty)
 		_IncreasePenalty(false);
 	fHasSlept = true;
@@ -416,14 +420,14 @@ ThreadData::HasQuantumEnded(bool wasPreempted, bool hasYielded)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
+	bigtime_t timeUsed = system_time() - fQuantumStart;
+	ASSERT(timeUsed >= 0);
+	fTimeLeft -= timeUsed;
+
 	if (hasYielded) {
 		fTimeLeft = 0;
 		return true;
 	}
-
-	bigtime_t timeUsed = system_time() - fQuantumStart;
-	ASSERT(timeUsed >= 0);
-	fTimeLeft -= timeUsed;
 
 	// too little time left, it's better make the next quantum a bit longer
 	int32 skipTime = gCurrentMode->minimal_quantum / 2;
