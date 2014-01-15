@@ -47,7 +47,7 @@ private:
 
 /* static */ SSL_CTX* BSecureSocket::Private::sContext = NULL;
 /* static */ int BSecureSocket::Private::sDataIndex;
-/* static */ vint32 sInitOnce = false;
+/* static */ vint32 BSecureSocket::Private::sInitOnce = false;
 
 
 /* static */ SSL_CTX*
