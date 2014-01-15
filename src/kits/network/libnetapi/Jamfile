@@ -14,7 +14,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		if [ FIsBuildFeatureEnabled openssl ] {
 			SubDirC++Flags -DOPENSSL_ENABLED ;
 			UseBuildFeatureHeaders openssl ;
-			sslSources = SSL.cpp ;
+			sslSources = SSL.cpp Certificate.cpp ;
 			md5Sources = ;
 			Includes [ FGristFiles $(sslSources) SecureSocket.cpp
 					HttpAuthentication.cpp ]
