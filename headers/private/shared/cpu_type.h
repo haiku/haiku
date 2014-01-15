@@ -385,6 +385,10 @@ get_cpu_model_string(const system_info *info)
 			return "Athlon XP";
 		case B_CPU_AMD_DURON:
 			return "Duron";
+		case B_CPU_AMD_SEMPRON_64_MODEL_28:
+		case B_CPU_AMD_SEMPRON_64_MODEL_44:
+		case B_CPU_AMD_SEMPRON_64_MODEL_127:
+			return "Sempron 64";
 		case B_CPU_AMD_ATHLON_64_MODEL_3:
 		case B_CPU_AMD_ATHLON_64_MODEL_4:
 		case B_CPU_AMD_ATHLON_64_MODEL_7:
@@ -397,16 +401,13 @@ get_cpu_model_string(const system_info *info)
 		case B_CPU_AMD_ATHLON_64_MODEL_23:
 		case B_CPU_AMD_ATHLON_64_MODEL_24:
 		case B_CPU_AMD_ATHLON_64_MODEL_27:
-		case B_CPU_AMD_ATHLON_64_MODEL_28:
 		case B_CPU_AMD_ATHLON_64_MODEL_31:
 		case B_CPU_AMD_ATHLON_64_MODEL_35:
 		case B_CPU_AMD_ATHLON_64_MODEL_43:
-		case B_CPU_AMD_ATHLON_64_MODEL_44:
 		case B_CPU_AMD_ATHLON_64_MODEL_47:
 		case B_CPU_AMD_ATHLON_64_MODEL_63:
 		case B_CPU_AMD_ATHLON_64_MODEL_79:
 		case B_CPU_AMD_ATHLON_64_MODEL_95:
-		case B_CPU_AMD_ATHLON_64_MODEL_127:
 			return "Athlon 64";
 		case B_CPU_AMD_OPTERON_MODEL_5:
 		case B_CPU_AMD_OPTERON_MODEL_21:
@@ -428,7 +429,9 @@ get_cpu_model_string(const system_info *info)
 			if (strcasestr(cpuidName, "Athlon") != NULL)
 				return "Athlon II";
 			return "Phenom II";
-		case B_CPU_AMD_A_SERIES:
+		case B_CPU_AMD_A_SERIES_MODEL_1:
+		case B_CPU_AMD_A_SERIES_MODEL_16:
+		case B_CPU_AMD_A_SERIES_MODEL_19:
 			return "A-Series";
 		case B_CPU_AMD_C_SERIES:
 			return "C-Series";
