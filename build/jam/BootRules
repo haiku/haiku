@@ -15,6 +15,11 @@ rule SetupBoot
 		SourceSysHdrs $(sources) : $(TARGET_PRIVATE_KERNEL_HEADERS) ;
 	}
 
+	if $(HAIKU_BOOT_C++_HEADERS_DIR_$(TARGET_PACKAGING_ARCH)) {
+		SourceSysHdrs $(sources) :
+			$(HAIKU_BOOT_C++_HEADERS_DIR_$(TARGET_PACKAGING_ARCH)) ;
+	}
+
 	local object ;
 	for object in $(objects) {
 		# add boot flags for the object

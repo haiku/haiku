@@ -315,11 +315,19 @@ standard_gcc_settings()
 
 	local bootLibgcc
 	local bootLibSupCxx
+	local bootCxxHeaders
 	case $gccMachine in
 		x86_64-*)
-			# Boot loader is 32-bit, need the 32-bit libs.
+			# Boot loader is 32-bit, need the 32-bit libs and c++ config
 			bootLibgcc=`$gcc -m32 -print-libgcc-file-name`
 			bootLibSupCxx=`$gcc -m32 -print-file-name=libsupc++.a`
+
+			local headersBase=$gccdir/../../../..
+			local headers=$headersBase/$gccMachine/include/c++/$gccRawVersion
+			if [ ! -d $headers ]; then
+				headers=$headersBase/include/c++/$gccRawVersion
+			fi
+			bootCxxHeaders="$headers/$gccMachine/32"
 			;;
 		*)
 			bootLibgcc=$libgcc
@@ -360,6 +368,7 @@ standard_gcc_settings()
 	set_variable HAIKU_KERNEL_LIBGCC_$targetArch $kernelLibgcc
 	set_variable HAIKU_CXX_HEADERS_DIR_$targetArch "$cxxHeaders"
 	set_variable HAIKU_BOOT_LIBGCC_$targetArch $bootLibgcc
+	set_variable HAIKU_BOOT_CXX_HEADERS_DIR_$targetArch "$bootCxxHeaders"
 	set_variable HAIKU_USE_GCC_GRAPHITE_$targetArch $useGraphite
 
 	standard_gcc_settings_targetArch=$targetArch
@@ -922,6 +931,7 @@ for targetArch in $HAIKU_PACKAGING_ARCHS; do
 	variables="
 		HAIKU_GCC_HEADERS_DIR		HAIKU_GCC_HEADERS_DIR
 		HAIKU_C++_HEADERS_DIR		HAIKU_CXX_HEADERS_DIR
+		HAIKU_BOOT_C++_HEADERS_DIR	HAIKU_BOOT_CXX_HEADERS_DIR
 		HAIKU_GCC_LIBGCC_OBJECTS	HAIKU_GCC_LIBGCC_OBJECTS
 		"
 	set -- $variables
