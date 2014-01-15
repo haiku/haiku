@@ -43,8 +43,7 @@ status_t
 BFileRequest::_ProtocolLoop()
 {
 	BNode node(fUrl.Path().String());
-	if (node.IsSymLink())
-	{
+	if (node.IsSymLink()) {
 		// Traverse the symlink and start over
 		BEntry entry(fUrl.Path().String(), true);
 		node = BNode(&entry);

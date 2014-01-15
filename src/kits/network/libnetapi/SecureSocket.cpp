@@ -174,8 +174,7 @@ BSecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 		TRACE("SSLConnection can't connect\n");
 		BSocket::Disconnect();
 
-		switch(SSL_get_error(fPrivate->fSSL, sslStatus))
-		{
+		switch (SSL_get_error(fPrivate->fSSL, sslStatus)) {
 			case SSL_ERROR_NONE:
 				// Shouldn't happen...
 				return B_NO_ERROR;

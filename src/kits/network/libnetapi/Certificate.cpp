@@ -11,6 +11,9 @@
 #include "CertificatePrivate.h"
 
 
+#ifdef OPENSSL_ENABLED
+
+
 static time_t parse_ASN1(ASN1_GENERALIZEDTIME *asn1)
 {
 	// Get the raw string data out of the ASN1 container. It looks like this:
@@ -103,3 +106,52 @@ BCertificate::Private::Private(X509* data)
 	: fX509(data)
 {
 }
+
+#else
+
+
+BCertificate::BCertificate(Private* data)
+{
+}
+
+
+BCertificate::~BCertificate()
+{
+}
+
+
+BString
+BCertificate::String()
+{
+	return BString();
+}
+
+
+bigtime_t
+BCertificate::StartDate()
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+bigtime_t
+BCertificate::ExpirationDate()
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+BString
+BCertificate::Issuer()
+{
+	return BString();
+}
+
+
+BString
+BCertificate::Subject()
+{
+}
+
+
+#endif

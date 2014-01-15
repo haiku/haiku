@@ -14,10 +14,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		if [ FIsBuildFeatureEnabled openssl ] {
 			SubDirC++Flags -DOPENSSL_ENABLED ;
 			UseBuildFeatureHeaders openssl ;
-			sslSources = SSL.cpp Certificate.cpp ;
+			sslSources = SSL.cpp ;
 			md5Sources = ;
 			Includes [ FGristFiles $(sslSources) SecureSocket.cpp
-					HttpAuthentication.cpp ]
+					HttpAuthentication.cpp Certificate.cpp ]
 				: [ BuildFeatureAttribute openssl : headers ] ;
 				# Dependency needed to trigger downloading/unzipping the package before
 				# compiling the files.
@@ -37,6 +37,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			NetDebug.cpp
 
 			$(sslSources)
+			Certificate.cpp
 
 			NetworkAddress.cpp
 			NetworkAddressResolver.cpp
