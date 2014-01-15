@@ -43,15 +43,17 @@ status_t
 BFileRequest::_ProtocolLoop()
 {
 	BNode node(fUrl.Path().String());
-	node_ref ref;
-	status_t error = node.GetNodeRef(&ref);
-	if (error != B_OK)
-		return error;
+	if (node.IsSymLink())
+	{
+		// Traverse the symlink and start over
+		BEntry entry(fUrl.Path().String(), true);
+		node = BNode(&entry);
+	}
 
 	ssize_t transferredSize = 0;
 	if (node.IsFile()) {
 		BFile file(fUrl.Path().String(), B_READ_ONLY);
-		error = file.InitCheck();
+		status_t error = file.InitCheck();
 		if (error != B_OK)
 			return error;
 
@@ -84,14 +86,22 @@ BFileRequest::_ProtocolLoop()
 	}
 
 	assert(node.IsDirectory());
+	node_ref ref;
+	status_t error = node.GetNodeRef(&ref);
+	if (error != B_OK)
+		return error;
+
 	BDirectory directory(&ref);
 
-	fResult.SetContentType("application/x-ftp-directory");
+	fResult.SetContentType("application/x-ftp-directory; charset=utf-8");
 		// This tells WebKit to use its FTP directory rendering code.
 
-	// Send all notifications to listener, if any
-	if (fListener != NULL)
+	if (fListener != NULL) {
 		fListener->ConnectionOpened(this);
+
+		// Add a parent directory entry.
+		fListener->DataReceived(this, "+/,\t..\r\n",8);
+	}
 
 	int size = 0;
 	char name[B_FILE_NAME_LENGTH];
