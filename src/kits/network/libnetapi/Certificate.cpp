@@ -14,7 +14,8 @@
 #ifdef OPENSSL_ENABLED
 
 
-static time_t parse_ASN1(ASN1_GENERALIZEDTIME *asn1)
+static time_t
+parse_ASN1(ASN1_GENERALIZEDTIME *asn1)
 {
 	// Get the raw string data out of the ASN1 container. It looks like this:
 	// "YYMMDDHHMMSSZ"
@@ -29,7 +30,8 @@ static time_t parse_ASN1(ASN1_GENERALIZEDTIME *asn1)
 }
 
 
-static BString decode_X509_NAME(X509_NAME* name)
+static BString
+decode_X509_NAME(X509_NAME* name)
 {
 	int len = X509_NAME_get_text_by_NID(name, 0, NULL, 0);
 	char buffer[len];
