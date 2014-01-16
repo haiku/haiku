@@ -23,7 +23,7 @@
 		movl	$n, %eax;									\
 		movl	__gCommPageAddress, %edx;					\
 		addl	4 * COMMPAGE_ENTRY_X86_SYSCALL(%edx), %edx;	\
-		jmp 	%edx;										\
+		jmp 	*%edx;										\
 	FUNCTION_END(name)
 
 #define SYSCALL0(name, n) _SYSCALL(name, n)
