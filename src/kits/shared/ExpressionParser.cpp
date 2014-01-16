@@ -709,7 +709,16 @@ ExpressionParser::_ParseFactorial(MAPM value)
 	if (fTokenizer->NextToken().type == TOKEN_FACTORIAL) {
 		fTokenizer->RewindToken();
 		_EatToken(TOKEN_FACTORIAL);
-		return value.factorial();
+		if (value < 1000)
+			return value.factorial();
+		else {
+			// Use Stirling's approximation (with extra term)
+			// http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
+			// n! ≈ (n/e)^n * sqrt(2πn) * (1 + (1/12n))
+			return value.pow(value) / value.exp()
+				* (MAPM(2) * MAPM(MM_PI) * value).sqrt()
+				* (MAPM(1) + (MAPM(1) / (MAPM(12) * value)));
+		}
 	}
 
 	fTokenizer->RewindToken();
