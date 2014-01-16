@@ -43,9 +43,9 @@ BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
 {
 	_ResetOptions();
 	if (ssl)
-		fSocket = new BSecureSocket();
+		fSocket = new(std::nothrow) BSecureSocket();
 	else
-		fSocket = new BSocket();
+		fSocket = new(std::nothrow) BSocket();
 }
 
 
@@ -120,7 +120,7 @@ BHttpRequest::SetAutoReferrer(bool enable)
 void
 BHttpRequest::SetHeaders(const BHttpHeaders& headers)
 {
-	AdoptHeaders(new BHttpHeaders(headers));
+	AdoptHeaders(new(std::nothrow) BHttpHeaders(headers));
 }
 
 
@@ -135,7 +135,7 @@ BHttpRequest::AdoptHeaders(BHttpHeaders* const headers)
 void
 BHttpRequest::SetPostFields(const BHttpForm& fields)
 {
-	AdoptPostFields(new BHttpForm(fields));
+	AdoptPostFields(new(std::nothrow) BHttpForm(fields));
 }
 
 
@@ -241,8 +241,10 @@ BHttpRequest::Result() const
 status_t
 BHttpRequest::Stop()
 {
-	fSocket->Disconnect();
-		// Unlock any pending connect, read or write operation.
+	if (fSocket) {
+		fSocket->Disconnect();
+			// Unlock any pending connect, read or write operation.
+	}
 	return BUrlRequest::Stop();
 }
 
@@ -340,10 +342,14 @@ BHttpRequest::_ProtocolLoop()
 					if (authentication->Method() == B_HTTP_AUTHENTICATION_NONE) {
 						// There is no authentication context for this
 						// url yet, so let's create one.
-						authentication = new BHttpAuthentication();
-						status = authentication->Initialize(
-							fHeaders["WWW-Authenticate"]);
-						fContext->AddAuthentication(fUrl, authentication);
+						authentication = new(std::nothrow) BHttpAuthentication();
+						if (authentication == NULL)
+							status = B_NO_MEMORY;
+						else {
+							status = authentication->Initialize(
+								fHeaders["WWW-Authenticate"]);
+							fContext->AddAuthentication(fUrl, authentication);
+						}
 					}
 
 					newRequest = false;
@@ -414,6 +420,9 @@ BHttpRequest::_ResolveHostName()
 status_t
 BHttpRequest::_MakeRequest()
 {
+	if (fSocket == NULL)
+		return B_NO_MEMORY;
+
 	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Connection to %s on port %d.",
 		fUrl.Authority().String(), fRemoteAddr.Port());
 	status_t connectError = fSocket->Connect(fRemoteAddr);
@@ -531,7 +540,7 @@ BHttpRequest::_MakeRequest()
 	ssize_t bytesRead = 0;
 	ssize_t bytesReceived = 0;
 	ssize_t bytesTotal = 0;
-	char* inputTempBuffer = new char[kHttpBufferSize];
+	char* inputTempBuffer = new(std::nothrow) char[kHttpBufferSize];
 	ssize_t inputTempSize = kHttpBufferSize;
 	ssize_t chunkSize = -1;
 
@@ -601,7 +610,7 @@ BHttpRequest::_MakeRequest()
 						if (inputTempSize < chunkSize + 2) {
 							delete[] inputTempBuffer;
 							inputTempSize = chunkSize + 2;
-							inputTempBuffer = new char[inputTempSize];
+							inputTempBuffer = new(std::nothrow) char[inputTempSize];
 						}
 						fInputBuffer.RemoveData(inputTempBuffer,
 							chunkSize + 2);
@@ -647,7 +656,7 @@ BHttpRequest::_MakeRequest()
 					if (inputTempSize < bytesRead) {
 						inputTempSize = bytesRead;
 						delete[] inputTempBuffer;
-						inputTempBuffer = new char[bytesRead];
+						inputTempBuffer = new(std::nothrow) char[bytesRead];
 					}
 					fInputBuffer.RemoveData(inputTempBuffer, bytesRead);
 				}
@@ -694,6 +703,9 @@ BHttpRequest::_GetLine(BString& destString)
 		return B_ERROR;
 
 	char* temporaryBuffer = new(std::nothrow) char[characterIndex + 1];
+	if (temporaryBuffer == NULL)
+		return B_NO_MEMORY;
+
 	fInputBuffer.RemoveData(temporaryBuffer, characterIndex + 1);
 
 	// Strip end-of-line character(s)

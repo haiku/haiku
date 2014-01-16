@@ -203,7 +203,7 @@ BHttpFormData::CopyBuffer()
 	if (fDataType != B_HTTPFORM_BUFFER)
 		return B_ERROR;
 
-	char* copiedBuffer = new char[fBufferSize];
+	char* copiedBuffer = new(std::nothrow) char[fBufferSize];
 	if (copiedBuffer == NULL)
 		return B_NO_MEMORY;
 

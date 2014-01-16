@@ -73,6 +73,11 @@ BSecureSocket::Private::~Private()
 	// SSL_free also frees the underlying BIO.
 	if (fSSL != NULL)
 		SSL_free(fSSL);
+	else {
+		// The SSL session was never created (Connect() was not called or
+		// failed). We must free the BIO we created in the constructor.
+		BIO_free(fBIO);
+	}
 }
 
 
@@ -141,11 +146,15 @@ BSecureSocket::Private::VerifyCallback(int ok, X509_STORE_CTX* ctx)
 	// Get the certificate that we could not validate (this may not be the one
 	// we got from the server, but something higher up in the certificate
 	// chain)
-	X509* certificate = X509_STORE_CTX_get_current_cert(ctx);
+	X509* x509 = X509_STORE_CTX_get_current_cert(ctx);
+	BCertificate::Private* certificate =
+		new(std::nothrow) BCertificate::Private(x509);
+
+	if (certificate == NULL)
+		return 0;
 
 	// Let the BSecureSocket (or subclass) decide if we should continue anyway.
-	return socket->CertificateVerificationFailed(BCertificate(
-		new BCertificate::Private(certificate)));
+	return socket->CertificateVerificationFailed(BCertificate(certificate));
 }
 
 
@@ -154,7 +163,7 @@ BSecureSocket::Private::VerifyCallback(int ok, X509_STORE_CTX* ctx)
 
 BSecureSocket::BSecureSocket()
 	:
-	fPrivate(new BSecureSocket::Private())
+	fPrivate(new(std::nothrow) BSecureSocket::Private())
 {
 	fInitStatus = fPrivate != NULL ? fPrivate->InitCheck() : B_NO_MEMORY;
 }
@@ -162,7 +171,7 @@ BSecureSocket::BSecureSocket()
 
 BSecureSocket::BSecureSocket(const BNetworkAddress& peer, bigtime_t timeout)
 	:
-	fPrivate(new BSecureSocket::Private())
+	fPrivate(new(std::nothrow) BSecureSocket::Private())
 {
 	fInitStatus = fPrivate != NULL ? fPrivate->InitCheck() : B_NO_MEMORY;
 	Connect(peer, timeout);
@@ -173,7 +182,7 @@ BSecureSocket::BSecureSocket(const BSecureSocket& other)
 	:
 	BSocket(other)
 {
-	fPrivate = new BSecureSocket::Private(*other.fPrivate);
+	fPrivate = new(std::nothrow) BSecureSocket::Private(*other.fPrivate);
 		// TODO: this won't work this way! - write working copy constructor for
 		// Private.
 
