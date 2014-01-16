@@ -194,7 +194,9 @@ ThreadData::ComputeQuantum() const
 	if (IsRealTime())
 		return quantum;
 
-	int32 threadCount = fCore->ThreadCount() / fCore->CPUCount();
+	int32 threadCount = fCore->ThreadCount();
+	if (fCore->CPUCount() > 0)
+		threadCount /= fCore->CPUCount();
 	if (threadCount >= 1) {
 		quantum
 			= std::min(gCurrentMode->maximum_latency / threadCount, quantum);
