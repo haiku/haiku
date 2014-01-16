@@ -101,10 +101,14 @@ should_rebalance(const ThreadData* threadData)
 	// No cpu bound threads - the situation is quite good. Make sure it
 	// won't get much worse...
 	ReadSpinLocker coreLocker(gCoreHeapsLock);
-
 	CoreEntry* other = gCoreLoadHeap.PeekMinimum();
 	if (other == NULL)
 		other = gCoreHighLoadHeap.PeekMinimum();
+	coreLocker.Unlock();
+
+	if (other->GetLoad() == 0 && coreNewLoad != 0)
+		return true;
+
 	int32 otherNewLoad = other->GetLoad() + threadLoad;
 	return coreNewLoad - otherNewLoad >= kLoadDifference * 2;
 }
