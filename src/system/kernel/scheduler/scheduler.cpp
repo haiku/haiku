@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
+ * Copyright 2013-2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2009, Rene Gollent, rene@gollent.com.
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
@@ -484,7 +484,7 @@ reschedule(int32 nextState)
 
 		oldThread->cpu->preempted = false;
 		if (!thread_is_idle_thread(nextThread)) {
-			bigtime_t quantum = nextThreadData->ComputeQuantum();
+			bigtime_t quantum = nextThreadData->GetQuantumLeft();
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER);
 

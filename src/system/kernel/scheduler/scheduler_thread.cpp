@@ -19,10 +19,7 @@ ThreadData::_InitBase()
 	fAdditionalPenalty = 0;
 	fEffectivePriority = fThread->priority;
 
-	fReceivedPenalty = false;
-	fHasSlept = false;
-
-	fTimeLeft = 0;
+	fTimeUsed = 0;
 	fStolenTime = 0;
 
 	fMeasureAvailableActiveTime = 0;
@@ -111,11 +108,6 @@ ThreadData::Init()
 	fCore = currentThreadData->fCore;
 
 	if (fThread->priority < B_FIRST_REAL_TIME_PRIORITY) {
-		if (!thread_is_idle_thread(currentThread)
-			&& currentThread->priority < B_FIRST_REAL_TIME_PRIORITY) {
-			currentThreadData->_IncreasePenalty(false);
-		}
-
 		fPriorityPenalty = std::min(currentThreadData->fPriorityPenalty,
 				std::max(fThread->priority - _GetMinimalPriority(), int32(0)));
 		fAdditionalPenalty = currentThreadData->fAdditionalPenalty;
@@ -148,21 +140,8 @@ ThreadData::Dump() const
 		additionalPenalty, fAdditionalPenalty);
 	kprintf("\teffective_priority:\t%" B_PRId32 "\n", GetEffectivePriority());
 
-	kprintf("\treceived_penalty:\t%s\n", fReceivedPenalty ? "true" : "false");
-	kprintf("\thas_slept:\t\t%s\n", fHasSlept ? "true" : "false");
-
-	bigtime_t quantum = _GetBaseQuantum();
-	if (fThread->priority < B_FIRST_REAL_TIME_PRIORITY) {
-		int32 threadCount = (fCore->ThreadCount() + 1) / fCore->CPUCount();
-		threadCount = max_c(threadCount, 1);
-
-		quantum
-			= std::min(gCurrentMode->maximum_latency / threadCount, quantum);
-		quantum = std::max(quantum,	gCurrentMode->minimal_quantum);
-	}
-	kprintf("\ttime_left:\t\t%" B_PRId64 " us (quantum: %" B_PRId64 " us)\n",
-		fTimeLeft, quantum);
-
+	kprintf("\ttime_used:\t\t%" B_PRId64 " us (quantum: %" B_PRId64 " us)\n",
+		fTimeUsed, ComputeQuantum());
 	kprintf("\tstolen_time:\t\t%" B_PRId64 " us\n", fStolenTime);
 	kprintf("\tquantum_start:\t\t%" B_PRId64 " us\n", fQuantumStart);
 	kprintf("\tneeded_load:\t\t%" B_PRId32 "%%\n", fNeededLoad / 10);
@@ -206,21 +185,13 @@ ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 
 
 bigtime_t
-ThreadData::ComputeQuantum()
+ThreadData::ComputeQuantum() const
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	bigtime_t quantum;
-	if (fTimeLeft != 0)
-		quantum = fTimeLeft;
-	else
-		quantum = _GetBaseQuantum();
-
+	bigtime_t quantum = _GetBaseQuantum();
 	if (fThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
 		return quantum;
-
-	quantum += fStolenTime;
-	fStolenTime = 0;
 
 	int32 threadCount = fCore->ThreadCount() / fCore->CPUCount();
 	if (threadCount >= 1) {
@@ -229,7 +200,6 @@ ThreadData::ComputeQuantum()
 		quantum = std::max(quantum,	gCurrentMode->minimal_quantum);
 	}
 
-	fTimeLeft = quantum;
 	return quantum;
 }
 
@@ -266,14 +236,7 @@ inline int32
 ThreadData::_GetPenalty() const
 {
 	SCHEDULER_ENTER_FUNCTION();
-
-	int32 penalty = fPriorityPenalty;
-
-	const int kMinimalPriority = _GetMinimalPriority();
-	if (kMinimalPriority > 0)
-		penalty += fAdditionalPenalty % kMinimalPriority;
-
-	return penalty;
+	return fPriorityPenalty;
 }
 
 
@@ -304,6 +267,8 @@ ThreadData::_ComputeEffectivePriority() const
 	else {
 		fEffectivePriority = fThread->priority;
 		fEffectivePriority -= _GetPenalty();
+		if (fEffectivePriority > 0)
+			fEffectivePriority -= fAdditionalPenalty % fEffectivePriority;
 
 		ASSERT(fEffectivePriority < B_FIRST_REAL_TIME_PRIORITY);
 		ASSERT(fEffectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
