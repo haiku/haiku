@@ -16,8 +16,8 @@ public:
 
 	BString		String();
 
-	bigtime_t	StartDate();
-	bigtime_t	ExpirationDate();
+	time_t		StartDate();
+	time_t		ExpirationDate();
 	BString		Issuer();
 	BString		Subject();
 

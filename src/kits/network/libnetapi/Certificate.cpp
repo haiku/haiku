@@ -71,14 +71,14 @@ BCertificate::String()
 }
 
 
-bigtime_t
+time_t
 BCertificate::StartDate()
 {
 	return parse_ASN1(X509_get_notBefore(fPrivate->fX509));
 }
 
 
-bigtime_t
+time_t
 BCertificate::ExpirationDate()
 {
 	return parse_ASN1(X509_get_notAfter(fPrivate->fX509));
@@ -129,14 +129,14 @@ BCertificate::String()
 }
 
 
-bigtime_t
+time_t
 BCertificate::StartDate()
 {
 	return B_NOT_SUPPORTED;
 }
 
 
-bigtime_t
+time_t
 BCertificate::ExpirationDate()
 {
 	return B_NOT_SUPPORTED;
