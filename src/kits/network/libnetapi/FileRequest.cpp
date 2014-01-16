@@ -43,6 +43,7 @@ status_t
 BFileRequest::_ProtocolLoop()
 {
 	BNode node(fUrl.Path().String());
+
 	if (node.IsSymLink()) {
 		// Traverse the symlink and start over
 		BEntry entry(fUrl.Path().String(), true);
@@ -84,12 +85,14 @@ BFileRequest::_ProtocolLoop()
 		return B_OK;
 	}
 
-	assert(node.IsDirectory());
 	node_ref ref;
 	status_t error = node.GetNodeRef(&ref);
+
+	// Stop here, and don't hit the assert below, if the file doesn't exist.
 	if (error != B_OK)
 		return error;
 
+	assert(node.IsDirectory());
 	BDirectory directory(&ref);
 
 	fResult.SetContentType("application/x-ftp-directory; charset=utf-8");
