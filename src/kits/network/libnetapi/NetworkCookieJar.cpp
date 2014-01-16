@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 Haiku Inc. All rights reserved.
+ * Copyright 2010-2014 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,15 +8,23 @@
  */
 
 
-#include <Debug.h>
+#include <new>
+#include <stdio.h>
+
 #include <HashMap.h>
 #include <HashString.h>
 #include <Message.h>
 #include <NetworkCookieJar.h>
 
-#include <new>
-
 #include "NetworkCookieJarPrivate.h"
+
+
+// #define TRACE_COOKIE
+#ifdef TRACE_COOKIE
+#	define TRACE(x...) printf(x)
+#else
+#	define TRACE(x...) ;
+#endif
 
 
 const char* kArchivedCookieMessageName = "be:cookie";
@@ -24,14 +32,14 @@ const char* kArchivedCookieMessageName = "be:cookie";
 
 BNetworkCookieJar::BNetworkCookieJar()
 	:
-	fCookieHashMap(new PrivateHashMap())
+	fCookieHashMap(new(std::nothrow) PrivateHashMap())
 {
 }
 
 
 BNetworkCookieJar::BNetworkCookieJar(const BNetworkCookieJar& other)
 	:
-	fCookieHashMap(new PrivateHashMap())
+	fCookieHashMap(new(std::nothrow) PrivateHashMap())
 {
 	*this = other;
 }
@@ -39,7 +47,7 @@ BNetworkCookieJar::BNetworkCookieJar(const BNetworkCookieJar& other)
 
 BNetworkCookieJar::BNetworkCookieJar(const BNetworkCookieList& otherList)
 	:
-	fCookieHashMap(new PrivateHashMap())
+	fCookieHashMap(new(std::nothrow) PrivateHashMap())
 {
 	AddCookies(otherList);
 }
@@ -47,7 +55,7 @@ BNetworkCookieJar::BNetworkCookieJar(const BNetworkCookieList& otherList)
 
 BNetworkCookieJar::BNetworkCookieJar(BMessage* archive)
 	:
-	fCookieHashMap(new PrivateHashMap())
+	fCookieHashMap(new(std::nothrow) PrivateHashMap())
 {
 	BMessage extractedCookie;
 
@@ -117,11 +125,16 @@ BNetworkCookieJar::AddCookie(const BString& cookie, const BUrl& referrer)
 status_t
 BNetworkCookieJar::AddCookie(BNetworkCookie* cookie)
 {
+	if (fCookieHashMap == NULL)
+		return B_NO_MEMORY;
+
 	if (cookie == NULL || !cookie->IsValid())
 		return B_BAD_VALUE;
 
 	HashString key(cookie->Domain());
 
+	// Get the cookies for the requested domain, or create a new list if there
+	// isn't one yet.
 	BNetworkCookieList* list = fCookieHashMap->fHashMap.Get(key);
 	if (list == NULL) {
 		list = new(std::nothrow) BNetworkCookieList();
@@ -129,6 +142,8 @@ BNetworkCookieJar::AddCookie(BNetworkCookie* cookie)
 			return B_NO_MEMORY;
 	}
 
+	// Remove any cookie with the same key as the one we're trying to add (it
+	// replaces/updates them)
 	for (int32 i = 0; i < list->CountItems(); i++) {
 		BNetworkCookie* c = list->ItemAt(i);
 
@@ -138,9 +153,13 @@ BNetworkCookieJar::AddCookie(BNetworkCookie* cookie)
 		}
 	}
 
-	if (cookie->ShouldDeleteNow())
+	// If the cookie has an expiration date in the past, stop here: we
+	// effectively deleted a cookie.
+	if (cookie->ShouldDeleteNow()) {
+		TRACE("Remove cookie: %s\n", cookie->RawCookie(true).String());
 		delete cookie;
-	else {
+	} else {
+		TRACE("Add cookie: %s\n", cookie->RawCookie(true).String());
 		list->AddItem(cookie);
 	}
 
@@ -370,7 +389,7 @@ BNetworkCookieJar::operator=(const BNetworkCookieJar& other)
 	fFlattened = other.fFlattened;
 
 	delete fCookieHashMap;
-	fCookieHashMap = new PrivateHashMap();
+	fCookieHashMap = new(std::nothrow) PrivateHashMap();
 
 	for (Iterator it = other.GetIterator(); it.HasNext();) {
 		BNetworkCookie* cookie = it.Next();
@@ -555,7 +574,7 @@ BNetworkCookieJar::Iterator::_FindNext()
 		return;
 	}
 
-	if (!fIterator->fCookieMapIterator.HasNext()) {
+	if (fIterator == NULL || !fIterator->fCookieMapIterator.HasNext()) {
 		fElement = NULL;
 		return;
 	}
@@ -592,11 +611,11 @@ BNetworkCookieJar::UrlIterator::UrlIterator(const BNetworkCookieJar* cookieJar,
 	BString domain = url.Host();
 
 	if (!domain.Length()) {
-        if (url.Protocol() == "file")
-            domain = "localhost";
-        else
-		    return;
-    }
+		if (url.Protocol() == "file")
+			domain = "localhost";
+		else
+			return;
+	}
 
 	fIterator = new(std::nothrow) PrivateIterator(
 		fCookieJar->fCookieHashMap->fHashMap.GetIterator());
@@ -683,11 +702,15 @@ BNetworkCookieJar::UrlIterator::operator=(
 bool
 BNetworkCookieJar::UrlIterator::_SuperDomain()
 {
-	const char* domain = fIterator->fKey.GetString();
-	const char* nextDot = strchr(domain, '.');
-
-	if (nextDot == NULL)
+	BString domain(fIterator->fKey.GetString());
+		// Makes a copy of the characters from the key. This is important,
+		// because HashString doesn't like SetTo to be called with a substring
+		// of its original string (use-after-free + memcpy overwrite).
+	int32 firstDot = domain.FindFirst('.');
+	if (firstDot < 0)
 		return false;
+
+	const char* nextDot = domain.String() + firstDot;
 
 	fIterator->fKey.SetTo(nextDot + 1);
 	return true;
