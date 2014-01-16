@@ -12,6 +12,8 @@
 #	include <openssl/ssl.h>
 #endif
 
+#include <pthread.h>
+
 #include <Certificate.h>
 #include <FindDirectory.h>
 #include <Path.h>
@@ -32,8 +34,15 @@
 
 class BSecureSocket::Private {
 public:
+								Private();
+								~Private();
+
+			status_t			InitCheck();
+
 	static	SSL_CTX*			Context();
 	static	int					VerifyCallback(int ok, X509_STORE_CTX* ctx);
+private:
+	static	void				CreateContext();
 public:
 			SSL*				fSSL;
 			BIO*				fBIO;
@@ -41,13 +50,60 @@ public:
 private:
 	static	SSL_CTX*			sContext;
 		// FIXME When do we SSL_CTX_free it?
-	static	vint32				sInitOnce;
+	static	pthread_once_t		sInitOnce;
 };
 
 
 /* static */ SSL_CTX* BSecureSocket::Private::sContext = NULL;
 /* static */ int BSecureSocket::Private::sDataIndex;
-/* static */ vint32 BSecureSocket::Private::sInitOnce = false;
+/* static */ pthread_once_t BSecureSocket::Private::sInitOnce
+	= PTHREAD_ONCE_INIT;
+
+
+BSecureSocket::Private::Private()
+	:
+	fSSL(NULL),
+	fBIO(BIO_new(BIO_s_socket()))
+{
+}
+
+
+BSecureSocket::Private::~Private()
+{
+	// SSL_free also frees the underlying BIO.
+	if (fSSL != NULL)
+		SSL_free(fSSL);
+}
+
+
+status_t
+BSecureSocket::Private::InitCheck()
+{
+	if (fBIO == NULL)
+		return B_NO_MEMORY;
+	return B_OK;
+}
+
+
+/* static */ void
+BSecureSocket::Private::CreateContext()
+{
+	sContext = SSL_CTX_new(SSLv23_method());
+
+	// Setup certificate verification
+	BPath certificateStore;
+	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
+	certificateStore.Append("ssl/CARootCertificates.pem");
+	// TODO we may want to add a non-packaged certificate directory?
+	// (would make it possible to store user-added certificate exceptions
+	// there)
+	SSL_CTX_load_verify_locations(sContext, certificateStore.Path(), NULL);
+	SSL_CTX_set_verify(sContext, SSL_VERIFY_PEER, VerifyCallback);
+
+	// Get an unique index number for storing application data in SSL
+	// structs. We will store a pointer to the BSecureSocket class there.
+	sDataIndex = SSL_get_ex_new_index(0, NULL, NULL, NULL, NULL);
+}
 
 
 /* static */ SSL_CTX*
@@ -56,24 +112,7 @@ BSecureSocket::Private::Context()
 	// We use lazy initialisation here, because reading certificates from disk
 	// and parsing them is a relatively long operation and uses some memory.
 	// We don't want programs that don't use SSL to waste resources with that.
-	if (!sInitOnce) {
-		sInitOnce = true;
-		sContext = SSL_CTX_new(SSLv23_method());
-
-		// Setup certificate verification
-		BPath certificateStore;
-		find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
-		certificateStore.Append("ssl/CARootCertificates.pem");
-		// TODO we may want to add a non-packaged certificate directory?
-		// (would make it possible to store user-added certificate exceptions
-		// there)
-		SSL_CTX_load_verify_locations(sContext, certificateStore.Path(), NULL);
-		SSL_CTX_set_verify(sContext, SSL_VERIFY_PEER, VerifyCallback);
-
-		// Get an unique index number for storing application data in SSL
-		// structs. We will store a pointer to the BSecureSocket class there.
-		sDataIndex = SSL_get_ex_new_index(0, NULL, NULL, NULL, NULL);
-	}
+	pthread_once(&sInitOnce, CreateContext);
 
 	return sContext;
 }
@@ -86,13 +125,13 @@ BSecureSocket::Private::VerifyCallback(int ok, X509_STORE_CTX* ctx)
 {
 	// OpenSSL already checked the certificate again the certificate store for
 	// us, and tells the result of that in the ok parameter.
-	
+
 	// If the verification succeeded, no need for any further checks. Let's
 	// proceed with the connection.
 	if (ok)
 		return ok;
 
-	// The certificate verification failed. Signal this to the caller, and fail.
+	// The certificate verification failed. Signal this to the BSecureSocket.
 
 	// First of all, get the affected BSecureSocket
 	SSL* ssl = (SSL*)X509_STORE_CTX_get_ex_data(ctx,
@@ -104,6 +143,7 @@ BSecureSocket::Private::VerifyCallback(int ok, X509_STORE_CTX* ctx)
 	// chain)
 	X509* certificate = X509_STORE_CTX_get_current_cert(ctx);
 
+	// Let the BSecureSocket (or subclass) decide if we should continue anyway.
 	return socket->CertificateVerificationFailed(BCertificate(
 		new BCertificate::Private(certificate)));
 }
@@ -114,15 +154,17 @@ BSecureSocket::Private::VerifyCallback(int ok, X509_STORE_CTX* ctx)
 
 BSecureSocket::BSecureSocket()
 	:
-	fPrivate(NULL)
+	fPrivate(new BSecureSocket::Private())
 {
+	fInitStatus = fPrivate != NULL ? fPrivate->InitCheck() : B_NO_MEMORY;
 }
 
 
 BSecureSocket::BSecureSocket(const BNetworkAddress& peer, bigtime_t timeout)
 	:
-	fPrivate(NULL)
+	fPrivate(new BSecureSocket::Private())
 {
+	fInitStatus = fPrivate != NULL ? fPrivate->InitCheck() : B_NO_MEMORY;
 	Connect(peer, timeout);
 }
 
@@ -131,12 +173,13 @@ BSecureSocket::BSecureSocket(const BSecureSocket& other)
 	:
 	BSocket(other)
 {
-	fPrivate = (BSecureSocket::Private*)malloc(sizeof(BSecureSocket::Private));
-	if (fPrivate != NULL) {
-		memcpy(fPrivate, other.fPrivate, sizeof(BSecureSocket::Private));
-			// TODO: this won't work this way!
+	fPrivate = new BSecureSocket::Private(*other.fPrivate);
+		// TODO: this won't work this way! - write working copy constructor for
+		// Private.
+
+	if (fPrivate != NULL)
 		SSL_set_ex_data(fPrivate->fSSL, Private::sDataIndex, this);
-	} else
+	else
 		fInitStatus = B_NO_MEMORY;
 
 }
@@ -144,32 +187,43 @@ BSecureSocket::BSecureSocket(const BSecureSocket& other)
 
 BSecureSocket::~BSecureSocket()
 {
-	free(fPrivate);
+	delete fPrivate;
 }
 
 
 status_t
 BSecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 {
-	if (fPrivate == NULL) {
-		fPrivate = (BSecureSocket::Private*)calloc(1,
-			sizeof(BSecureSocket::Private));
-		if (fPrivate == NULL)
-			return B_NO_MEMORY;
-	}
+	if (fPrivate == NULL)
+		return B_NO_MEMORY;
+
+	status_t state = fPrivate->InitCheck();
+	if (state != B_OK)
+		return state;
 
 	status_t status = BSocket::Connect(peer, timeout);
 	if (status != B_OK)
 		return status;
 
+	// Do this only after BSocket::Connect has checked wether we're already
+	// connected. We don't want to kill an existing SSL session, as that would
+	// likely crash the protocol loop for it.
+	if (fPrivate->fSSL != NULL) {
+		SSL_free(fPrivate->fSSL);
+	}
+
 	fPrivate->fSSL = SSL_new(BSecureSocket::Private::Context());
-	fPrivate->fBIO = BIO_new_socket(fSocket, BIO_NOCLOSE);
+	if (fPrivate->fSSL == NULL) {
+		BSocket::Disconnect();
+		return B_NO_MEMORY;
+	}
+
+	BIO_set_fd(fPrivate->fBIO, fSocket, BIO_NOCLOSE);
 	SSL_set_bio(fPrivate->fSSL, fPrivate->fBIO, fPrivate->fBIO);
 	SSL_set_ex_data(fPrivate->fSSL, Private::sDataIndex, this);
 
-	printf("Connecting %p\n", fPrivate->fSSL);
 	int sslStatus = SSL_connect(fPrivate->fSSL);
-   
+
 	if (sslStatus <= 0)	{
 		TRACE("SSLConnection can't connect\n");
 		BSocket::Disconnect();
@@ -199,16 +253,9 @@ BSecureSocket::Disconnect()
 	if (IsConnected()) {
 		if (fPrivate->fSSL != NULL) {
 			SSL_shutdown(fPrivate->fSSL);
-			fPrivate->fSSL = NULL;
 		}
 
 		BSocket::Disconnect();
-			// Must do this before freeing the BIO, to make sure any pending
-			// read or write gets unlocked properly.
-		if (fPrivate->fBIO != NULL) {
-			BIO_free(fPrivate->fBIO);
-			fPrivate->fBIO = NULL;
-		}
 	}
 }
 
