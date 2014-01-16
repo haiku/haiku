@@ -388,7 +388,7 @@ reschedule(int32 nextState)
 		case B_THREAD_READY:
 			enqueueOldThread = true;
 
-			if (!thread_is_idle_thread(oldThread)) {
+			if (!oldThreadData->IsIdle()) {
 				oldThreadData->Continues();
 				if (oldThreadData->HasQuantumEnded(oldThread->cpu->preempted,
 						oldThread->has_yielded)) {
@@ -425,7 +425,7 @@ reschedule(int32 nextState)
 	// select thread with the biggest priority and enqueue back the old thread
 	ThreadData* nextThreadData;
 	if (gCPU[thisCPU].disabled) {
-		if (!thread_is_idle_thread(oldThread)) {
+		if (!oldThreadData->IsIdle()) {
 			CPURunQueueLocker _(cpu);
 
 			nextThreadData = cpu->PeekIdleThread();
@@ -446,7 +446,7 @@ reschedule(int32 nextState)
 	}
 
 	Thread* nextThread = nextThreadData->GetThread();
-	ASSERT(!gCPU[thisCPU].disabled || thread_is_idle_thread(nextThread));
+	ASSERT(!gCPU[thisCPU].disabled || nextThreadData->IsIdle());
 
 	if (nextThread != oldThread) {
 		if (enqueueOldThread) {
@@ -483,7 +483,7 @@ reschedule(int32 nextState)
 			cancel_timer(quantumTimer);
 
 		oldThread->cpu->preempted = false;
-		if (!thread_is_idle_thread(nextThread)) {
+		if (!nextThreadData->IsIdle()) {
 			bigtime_t quantum = nextThreadData->GetQuantumLeft();
 			add_timer(quantumTimer, &reschedule_event, quantum,
 				B_ONE_SHOT_RELATIVE_TIMER);

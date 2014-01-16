@@ -39,6 +39,12 @@ public:
 
 			void		Dump() const;
 
+	inline	int32		GetPriority() const	{ return fThread->priority; }
+	inline	Thread*		GetThread() const	{ return fThread; }
+
+	inline	bool		IsRealTime() const;
+	inline	bool		IsIdle() const;
+
 	inline	bool		HasCacheExpired() const;
 	inline	bool		ShouldRebalance() const;
 
@@ -77,7 +83,6 @@ public:
 	inline	bool		IsEnqueued() const	{ return fEnqueued; }
 	inline	void		SetDequeued()	{ fEnqueued = false; }
 
-	inline	Thread*		GetThread() const	{ return fThread; }
 	inline	int32		GetLoad() const	{ return fNeededLoad; }
 
 	inline	CoreEntry*	Core() const	{ return fCore; }
@@ -145,8 +150,22 @@ ThreadData::_GetMinimalPriority() const
 	const int32 kMaximalPriority = 25;
 	const int32 kMinimalPriority = B_LOWEST_ACTIVE_PRIORITY;
 
-	int32 priority = fThread->priority / kDivisor;
+	int32 priority = GetPriority() / kDivisor;
 	return std::max(std::min(priority, kMaximalPriority), kMinimalPriority);
+}
+
+
+inline bool
+ThreadData::IsRealTime() const
+{
+	return GetPriority() >= B_FIRST_REAL_TIME_PRIORITY;
+}
+
+
+inline bool
+ThreadData::IsIdle() const
+{
+	return GetPriority() == B_IDLE_PRIORITY;
 }
 
 
@@ -181,16 +200,14 @@ ThreadData::_IncreasePenalty()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	if (fThread->priority < B_LOWEST_ACTIVE_PRIORITY)
-		return;
-	if (fThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+	if (IsIdle() || IsRealTime())
 		return;
 
 	TRACE("increasing thread %ld penalty\n", fThread->id);
 
 	int32 oldPenalty = fPriorityPenalty++;
 	const int kMinimalPriority = _GetMinimalPriority();
-	if (fThread->priority - oldPenalty <= kMinimalPriority)
+	if (GetPriority() - oldPenalty <= kMinimalPriority)
 		fPriorityPenalty = oldPenalty;
 
 	_ComputeEffectivePriority();
@@ -201,7 +218,7 @@ inline bool
 ThreadData::IsCPUBound() const
 {
 	SCHEDULER_ENTER_FUNCTION();
-	return GetThread()->priority - fPriorityPenalty == _GetMinimalPriority();
+	return GetPriority() - fPriorityPenalty == _GetMinimalPriority();
 }
 
 

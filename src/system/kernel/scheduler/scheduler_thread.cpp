@@ -17,7 +17,7 @@ ThreadData::_InitBase()
 {
 	fPriorityPenalty = 0;
 	fAdditionalPenalty = 0;
-	fEffectivePriority = fThread->priority;
+	fEffectivePriority = GetPriority();
 
 	fTimeUsed = 0;
 	fStolenTime = 0;
@@ -107,9 +107,9 @@ ThreadData::Init()
 	ThreadData* currentThreadData = currentThread->scheduler_data;
 	fCore = currentThreadData->fCore;
 
-	if (fThread->priority < B_FIRST_REAL_TIME_PRIORITY) {
+	if (!IsRealTime()) {
 		fPriorityPenalty = std::min(currentThreadData->fPriorityPenalty,
-				std::max(fThread->priority - _GetMinimalPriority(), int32(0)));
+				std::max(GetPriority() - _GetMinimalPriority(), int32(0)));
 		fAdditionalPenalty = currentThreadData->fAdditionalPenalty;
 
 		_ComputeEffectivePriority();
@@ -190,7 +190,7 @@ ThreadData::ComputeQuantum() const
 	SCHEDULER_ENTER_FUNCTION();
 
 	bigtime_t quantum = _GetBaseQuantum();
-	if (fThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+	if (IsRealTime())
 		return quantum;
 
 	int32 threadCount = fCore->ThreadCount() / fCore->CPUCount();
@@ -260,12 +260,12 @@ ThreadData::_ComputeEffectivePriority() const
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	if (thread_is_idle_thread(fThread))
+	if (IsIdle())
 		fEffectivePriority = B_IDLE_PRIORITY;
-	else if (fThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
-		fEffectivePriority = fThread->priority;
+	else if (IsRealTime())
+		fEffectivePriority = GetPriority();
 	else {
-		fEffectivePriority = fThread->priority;
+		fEffectivePriority = GetPriority();
 		fEffectivePriority -= _GetPenalty();
 		if (fEffectivePriority > 0)
 			fEffectivePriority -= fAdditionalPenalty % fEffectivePriority;
