@@ -50,7 +50,7 @@ public:
 
 	inline	int32		GetEffectivePriority() const;
 
-	inline	bool		IsCPUBound() const;
+	inline	bool		IsCPUBound() const	{ return fCPUBound; }
 
 	inline	void		CancelPenalty();
 	inline	bool		ShouldCancelPenalty() const;
@@ -116,6 +116,7 @@ private:
 
 			Thread*		fThread;
 
+			bool		fCPUBound;
 			int32		fPriorityPenalty;
 			int32		fAdditionalPenalty;
 
@@ -207,18 +208,12 @@ ThreadData::_IncreasePenalty()
 
 	int32 oldPenalty = fPriorityPenalty++;
 	const int kMinimalPriority = _GetMinimalPriority();
-	if (GetPriority() - oldPenalty <= kMinimalPriority)
+	if (GetPriority() - oldPenalty <= kMinimalPriority) {
 		fPriorityPenalty = oldPenalty;
+		fCPUBound = true;
+	}
 
 	_ComputeEffectivePriority();
-}
-
-
-inline bool
-ThreadData::IsCPUBound() const
-{
-	SCHEDULER_ENTER_FUNCTION();
-	return GetPriority() - fPriorityPenalty == _GetMinimalPriority();
 }
 
 
@@ -229,6 +224,7 @@ ThreadData::CancelPenalty()
 
 	int32 oldPenalty = fPriorityPenalty;
 	fPriorityPenalty = 0;
+	fCPUBound = false;
 
 	if (oldPenalty != 0) {
 		TRACE("cancelling thread %ld penalty\n", fThread->id);

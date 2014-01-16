@@ -18,6 +18,7 @@ ThreadData::_InitBase()
 	fPriorityPenalty = 0;
 	fAdditionalPenalty = 0;
 	fEffectivePriority = GetPriority();
+	fCPUBound = false;
 
 	fTimeUsed = 0;
 	fStolenTime = 0;
