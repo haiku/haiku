@@ -408,13 +408,15 @@ public:
   basic_string substr (size_type pos = 0, size_type n = npos) const
     { return basic_string (*this, pos, n); }
 
+
+  // BeOS bogus versions
+  int compare (const charT* s, size_type pos, size_type n) const;
   int compare (const basic_string& str, size_type pos = 0, size_type n = npos) const;
   // There is no 'strncmp' equivalent for charT pointers.
 
-  // BeOS bogus version
-  int compare (const charT* s, size_type pos, size_type n) const;
-
-  // Correct std C++ prototype
+  // Correct std C++ prototypes
+  int compare (size_type pos, size_type n, const basic_string& str) const
+	{ return compare(str, pos, n); }
   int compare (size_type pos, size_type n, const charT* s) const
     { return compare(s, pos, n); }
   int compare (const charT* s, size_type pos = 0) const
