@@ -789,12 +789,9 @@ intel_set_display_mode(display_mode* mode)
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
 
-	// avoid screen being off when switching workspaces when they have the same
-	// resolution.
-	if (target.virtual_width == display_mode_hook.mode.width
-		&& target.virtual_height == display_mode_hook.mode.height
-		&& target.space == display_mode_hook.mode.space)
-		return B_OK;
+	// TODO stop here, when the requested mode is the same as the current one.
+	// This would avoid screen flickering when setting a mode that's already in
+	// place.
 
 #if 0
 static bool first = tru;
