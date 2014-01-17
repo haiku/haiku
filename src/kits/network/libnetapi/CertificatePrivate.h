@@ -8,7 +8,6 @@
 
 #ifdef OPENSSL_ENABLED
 #	include <openssl/ssl.h>
-#endif
 
 
 class BCertificate::Private {
@@ -18,6 +17,7 @@ public:
 public:
 	X509* fX509;
 };
+#endif
 
 
 #endif

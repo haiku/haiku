@@ -153,6 +153,7 @@ BCertificate::Issuer()
 BString
 BCertificate::Subject()
 {
+	return BString();
 }
 
 
