@@ -76,6 +76,8 @@ private:
 			void				_SetCaretOffset(int32 offset, bool updateAnchor,
 									bool lockSelectionAnchor);
 
+			void				_DrawCaret(int32 textOffset);
+			void				_DrawSelection();
 			void				_GetSelectionShape(BShape& shape,
 									int32 start, int32 end);
 
@@ -93,6 +95,7 @@ private:
 			int32				fCaretOffset;
 			float				fCaretAnchorX;
 			bool				fShowCaret;
+			BRect				fCaretBounds;
 
 			bool				fMouseDown;
 };

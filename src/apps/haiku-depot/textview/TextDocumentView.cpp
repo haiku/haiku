@@ -67,34 +67,29 @@ TextDocumentView::Draw(BRect updateRect)
 	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
 	fTextDocumentLayout.Draw(this, BPoint(fInsetLeft, fInsetTop), updateRect);
 
-	if (fSelectionAnchorOffset == fCaretOffset)
-		return;
+	bool isCaret = fSelectionAnchorOffset == fCaretOffset;
 
-	int32 start;
-	int32 end;
-	GetSelection(start, end);
-
-	BShape shape;
-	_GetSelectionShape(shape, start, end);
-
-	SetDrawingMode(B_OP_SUBTRACT);
-	SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
-	MovePenTo(fInsetLeft - 0.5f, fInsetTop - 0.5f);
-
-	if (IsFocus() && Window() != NULL && Window()->IsActive()) {
-		SetHighColor(30, 30, 30);
-		FillShape(&shape);
+	if (isCaret) {
+		if (fShowCaret && fTextEditor.Get() != NULL)
+			_DrawCaret(fCaretOffset);
+	} else {
+		_DrawSelection();
 	}
-
-	SetHighColor(40, 40, 40);
-	StrokeShape(&shape);
 }
 
 
 void
 TextDocumentView::Pulse()
 {
-	// TODO: Blink cursor
+	if (fTextEditor.Get() == NULL)
+		return;
+
+	// Blink cursor
+	fShowCaret = !fShowCaret;
+	if (fCaretBounds.IsValid())
+		Invalidate(fCaretBounds);
+	else
+		Invalidate();
 }
 
 
@@ -465,7 +460,50 @@ TextDocumentView::_SetCaretOffset(int32 offset, bool updateAnchor,
 }
 
 
-// _GetSelectionShape
+void
+TextDocumentView::_DrawCaret(int32 textOffset)
+{
+	float x1;
+	float y1;
+	float x2;
+	float y2;
+
+	fTextDocumentLayout.GetTextBounds(textOffset, x1, y1, x2, y2);
+	x2 = x1 + 1;
+
+	fCaretBounds = BRect(x1, y1, x2, y2);
+	fCaretBounds.OffsetBy(fInsetLeft, fInsetTop);
+
+	SetDrawingMode(B_OP_INVERT);
+	FillRect(fCaretBounds);
+}
+
+
+void
+TextDocumentView::_DrawSelection()
+{
+	int32 start;
+	int32 end;
+	GetSelection(start, end);
+
+	BShape shape;
+	_GetSelectionShape(shape, start, end);
+
+	SetDrawingMode(B_OP_SUBTRACT);
+
+	SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
+	MovePenTo(fInsetLeft - 0.5f, fInsetTop - 0.5f);
+
+	if (IsFocus() && Window() != NULL && Window()->IsActive()) {
+		SetHighColor(30, 30, 30);
+		FillShape(&shape);
+	}
+
+	SetHighColor(40, 40, 40);
+	StrokeShape(&shape);
+}
+
+
 void
 TextDocumentView::_GetSelectionShape(BShape& shape, int32 start, int32 end)
 {
@@ -551,3 +589,5 @@ TextDocumentView::_GetSelectionShape(BShape& shape, int32 start, int32 end)
 		shape.Close();
 	}
 }
+
+
