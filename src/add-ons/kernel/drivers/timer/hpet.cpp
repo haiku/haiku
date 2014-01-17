@@ -71,7 +71,7 @@ device_hooks hpet_hooks = {
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 static acpi_module_info* sAcpi;
-static vint32 sOpenCount;
+static int32 sOpenCount;
 
 
 static inline bigtime_t
