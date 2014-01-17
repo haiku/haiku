@@ -356,6 +356,13 @@ BSecureSocket::~BSecureSocket()
 }
 
 
+bool
+BSecureSocket::CertificateVerificationFailed(BCertificate)
+{
+	return false;
+}
+
+
 status_t
 BSecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 {
