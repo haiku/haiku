@@ -26,6 +26,59 @@ enum {
 	MSG_SEND			= 'send'
 };
 
+//! Layouts the scrollbar so it looks nice with no border and the document
+// window look.
+class ScrollView : public BScrollView {
+public:
+	ScrollView(const char* name, BView* target)
+		:
+		BScrollView(name, target, 0, false, true, B_FANCY_BORDER)
+	{
+	}
+
+	virtual void DoLayout()
+	{
+		BRect innerFrame = Bounds();
+		innerFrame.InsetBy(2, 2);
+
+		BScrollBar* vScrollBar = ScrollBar(B_VERTICAL);
+		BScrollBar* hScrollBar = ScrollBar(B_HORIZONTAL);
+
+		if (vScrollBar != NULL)
+			innerFrame.right -= vScrollBar->Bounds().Width() - 1;
+		if (hScrollBar != NULL)
+			innerFrame.bottom -= hScrollBar->Bounds().Height() - 1;
+
+		BView* target = Target();
+		if (target != NULL) {
+			Target()->MoveTo(innerFrame.left, innerFrame.top);
+			Target()->ResizeTo(innerFrame.Width(), innerFrame.Height());
+		}
+
+		if (vScrollBar != NULL) {
+			BRect rect = innerFrame;
+			rect.left = rect.right + 1;
+			rect.right = rect.left + vScrollBar->Bounds().Width();
+			rect.top -= 1;
+			rect.bottom += 1;
+
+			vScrollBar->MoveTo(rect.left, rect.top);
+			vScrollBar->ResizeTo(rect.Width(), rect.Height());
+		}
+
+		if (hScrollBar != NULL) {
+			BRect rect = innerFrame;
+			rect.top = rect.bottom + 1;
+			rect.bottom = rect.top + hScrollBar->Bounds().Height();
+			rect.left -= 1;
+			rect.right += 1;
+
+			hScrollBar->MoveTo(rect.left, rect.top);
+			hScrollBar->ResizeTo(rect.Width(), rect.Height());
+		}
+	}
+};
+
 
 RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 	:
@@ -38,8 +91,8 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame)
 	CenterIn(parent->Frame());
 
 	TextDocumentView* textView = new TextDocumentView();
-	BScrollView* textScrollView = new BScrollView("rating scroll view",
-		textView);
+	ScrollView* textScrollView = new ScrollView(
+		"rating scroll view", textView);
 
 	MarkupParser parser;
 	fRatingText = parser.CreateDocumentFromMarkup(
