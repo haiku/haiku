@@ -712,12 +712,14 @@ ExpressionParser::_ParseFactorial(MAPM value)
 		if (value < 1000)
 			return value.factorial();
 		else {
-			// Use Stirling's approximation (with extra term)
-			// http://hyperphysics.phy-astr.gsu.edu/hbase/math/stirling.html
-			// n! ≈ (n/e)^n * sqrt(2πn) * (1 + (1/12n))
+			// Use Stirling's approximation (5 term expansion)
+			// http://en.wikipedia.org/wiki/Stirling%27s_approximation
 			return value.pow(value) / value.exp()
 				* (MAPM(2) * MAPM(MM_PI) * value).sqrt()
-				* (MAPM(1) + (MAPM(1) / (MAPM(12) * value)));
+				* (MAPM(1) + (MAPM(1) / (MAPM(12) * value))
+					+ (MAPM(1) / (MAPM(288) * value.pow(2)))
+					- (MAPM(139) / (MAPM(51840) * value.pow(3)))
+					- (MAPM(571) / (MAPM(2488320) * value.pow(4))));
 		}
 	}
 
