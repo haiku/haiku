@@ -173,6 +173,9 @@ struct intel_shared_info {
 	addr_t			frame_buffer;
 	uint32			frame_buffer_offset;
 
+	bool			got_vbt;
+	bool			single_head_locked;
+
 	struct lock		accelerant_lock;
 	struct lock		engine_lock;
 

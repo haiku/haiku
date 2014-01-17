@@ -8,6 +8,7 @@ UsePrivateHeaders graphics kernel ;
 UsePrivateHeaders shared ;
 
 KernelAddon intel_extreme :
+	bios.cpp
 	driver.cpp
 	device.cpp
 	intel_extreme.cpp
