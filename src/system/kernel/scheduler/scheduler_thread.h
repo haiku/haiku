@@ -394,7 +394,7 @@ ThreadData::Enqueue()
 	SCHEDULER_ENTER_FUNCTION();
 
 	if (!fReady) {
-		ASSERT(system_time() - fWentSleep > 0);
+		ASSERT(system_time() - fWentSleep >= 0);
 		if (gTrackCoreLoad) {
 			fMeasureAvailableTime += system_time() - fWentSleep;
 
