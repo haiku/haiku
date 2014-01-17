@@ -508,8 +508,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 
 	// Find group
 	fFindCloseButton = new CloseButton(new BMessage(EDIT_HIDE_FIND_GROUP));
-	fFindTextControl = new BTextControl("find", B_TRANSLATE("Find:"), "",
-		new BMessage(EDIT_FIND_NEXT));
+	fFindTextControl = new BTextControl("find", B_TRANSLATE("Find:"), "", NULL);
 	fFindTextControl->SetModificationMessage(new BMessage(FIND_TEXT_CHANGED));
 	fFindPreviousButton = new BButton(B_TRANSLATE("Previous"),
 		new BMessage(EDIT_FIND_PREVIOUS));
