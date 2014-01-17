@@ -11,12 +11,14 @@
 
 .text
 
-/* void get_current_cpuid(cpuid_info *info, uint32 eaxRegister) */
+/* void get_current_cpuid(cpuid_info *info, uint32 eaxRegister,
+	uint32 ecxRegister) */
 FUNCTION(get_current_cpuid):
  	pushl	%ebx
  	pushl	%edi
  	movl	12(%esp),%edi	/* first arg points to the cpuid_info structure */
  	movl	16(%esp),%eax	/* second arg sets up eax */
+	movl	20(%esp),%ecx  /* third arg sets up ecx */
  	cpuid
  	movl	%eax,0(%edi)	/* copy the regs into the cpuid_info structure */
  	movl	%ebx,4(%edi)

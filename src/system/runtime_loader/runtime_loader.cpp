@@ -31,6 +31,8 @@ struct user_space_program_args *gProgramArgs;
 void *__gCommPageAddress;
 void *__dso_handle;
 
+int32 __gCPUCount = 1;
+
 
 static const char *
 search_path_for_type(image_type type)

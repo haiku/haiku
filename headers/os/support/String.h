@@ -396,8 +396,8 @@ private:
 								int32 withLength);
 
 private:
-			vint32& 		_ReferenceCount();
-			const vint32& 	_ReferenceCount() const;
+			int32& 			_ReferenceCount();
+			const int32& 	_ReferenceCount() const;
 			bool			_IsShareable() const;
 			void			_FreePrivateData();
 

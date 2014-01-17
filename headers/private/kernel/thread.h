@@ -11,12 +11,13 @@
 
 
 #include <OS.h>
-#include <thread_types.h>
-#include <arch/thread.h>
 
+#include <arch/atomic.h>
+#include <arch/thread.h>
 // For the thread blocking inline functions only.
 #include <kscheduler.h>
 #include <ksignal.h>
+#include <thread_types.h>
 
 
 struct arch_fork_arg;
@@ -69,14 +70,12 @@ public:
 using BKernel::ThreadCreationAttributes;
 
 
+extern spinlock gThreadCreationLock;
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-void thread_enqueue(Thread *t, struct thread_queue *q);
-Thread *thread_lookat_queue(struct thread_queue *q);
-Thread *thread_dequeue(struct thread_queue *q);
-Thread *thread_dequeue_id(struct thread_queue *q, thread_id id);
 
 void thread_at_kernel_entry(bigtime_t now);
 	// called when the thread enters the kernel on behalf of the thread
@@ -86,8 +85,10 @@ void thread_reset_for_exec(void);
 
 status_t thread_init(struct kernel_args *args);
 status_t thread_preboot_init_percpu(struct kernel_args *args, int32 cpuNum);
-void thread_yield(bool force);
+void thread_yield(void);
 void thread_exit(void);
+
+void thread_map(void (*function)(Thread* thread, void* data), void* data);
 
 int32 thread_max_threads(void);
 int32 thread_used_threads(void);
@@ -135,8 +136,7 @@ status_t deselect_thread(int32 object, struct select_info *info, bool kernel);
 
 status_t thread_block();
 status_t thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout);
-status_t thread_block_with_timeout_locked(uint32 timeoutFlags,
-			bigtime_t timeout);
+void thread_unblock(Thread* thread, status_t status);
 
 // used in syscalls.c
 status_t _user_set_thread_priority(thread_id thread, int32 newPriority);
@@ -212,7 +212,7 @@ thread_is_interrupted(Thread* thread, uint32 flags)
 static inline bool
 thread_is_blocked(Thread* thread)
 {
-	return thread->wait.status == 1;
+	return atomic_get(&thread->wait.status) == 1;
 }
 
 
@@ -234,22 +234,22 @@ thread_is_blocked(Thread* thread)
 	If a client lock other than the scheduler lock is used, this function must
 	be called with that lock being held. Afterwards that lock should be dropped
 	and the function that actually blocks the thread shall be invoked
-	(thread_block[_locked]() or thread_block_with_timeout[_locked]()). In
-	between these two steps no functionality that uses the thread blocking API
-	for this thread shall be used.
+	(thread_block[_locked]() or thread_block_with_timeout()). In between these
+	two steps no functionality that uses the thread blocking API for this thread
+	shall be used.
 
 	When the caller determines that the condition for unblocking the thread
 	occurred, it calls thread_unblock_locked() to unblock the thread. At that
 	time one of locks that are held when calling thread_prepare_to_block() must
 	be held. Usually that would be the client lock. In two cases it generally
 	isn't, however, since the unblocking code doesn't know about the client
-	lock: 1. When thread_block_with_timeout[_locked]() had been used and the
-	timeout occurs. 2. When thread_prepare_to_block() had been called with one
-	or both of the \c B_CAN_INTERRUPT or \c B_KILL_CAN_INTERRUPT flags specified
-	and someone calls thread_interrupt() that is supposed to wake up the thread.
+	lock: 1. When thread_block_with_timeout() had been used and the timeout
+	occurs. 2. When thread_prepare_to_block() had been called with one or both
+	of the \c B_CAN_INTERRUPT or \c B_KILL_CAN_INTERRUPT flags specified and
+	someone calls thread_interrupt() that is supposed to wake up the thread.
 	In either of these two cases only the scheduler lock is held by the
 	unblocking code. A timeout can only happen after
-	thread_block_with_timeout_locked() has been called, but an interruption is
+	thread_block_with_timeout() has been called, but an interruption is
 	possible at any time. The client code must deal with those situations.
 
 	Generally blocking and unblocking threads proceed in the following manner:
@@ -333,39 +333,6 @@ thread_prepare_to_block(Thread* thread, uint32 flags, uint32 type,
 }
 
 
-/*!	Blocks the current thread.
-
-	The thread is blocked until someone else unblock it. Must be called after a
-	call to thread_prepare_to_block(). If the thread has already been unblocked
-	after the previous call to thread_prepare_to_block(), this function will
-	return immediately. Cf. the documentation of thread_prepare_to_block() for
-	more details.
-
-	The caller must hold the scheduler lock.
-
-	\param thread The current thread.
-	\return The error code passed to the unblocking function. thread_interrupt()
-		uses \c B_INTERRUPTED. By convention \c B_OK means that the wait was
-		successful while another error code indicates a failure (what that means
-		depends on the client code).
-*/
-static inline status_t
-thread_block_locked(Thread* thread)
-{
-	if (thread->wait.status == 1) {
-		// check for signals, if interruptible
-		if (thread_is_interrupted(thread, thread->wait.flags)) {
-			thread->wait.status = B_INTERRUPTED;
-		} else {
-			thread->next_state = B_THREAD_WAITING;
-			scheduler_reschedule();
-		}
-	}
-
-	return thread->wait.status;
-}
-
-
 /*!	Unblocks the specified blocked thread.
 
 	If the thread is no longer waiting (e.g. because thread_unblock_locked() has
@@ -417,10 +384,12 @@ thread_unblock_locked(Thread* thread, status_t status)
 static inline status_t
 thread_interrupt(Thread* thread, bool kill)
 {
-	if ((thread->wait.flags & B_CAN_INTERRUPT) != 0
-		|| (kill && (thread->wait.flags & B_KILL_CAN_INTERRUPT) != 0)) {
-		thread_unblock_locked(thread, B_INTERRUPTED);
-		return B_OK;
+	if (thread_is_blocked(thread)) {
+		if ((thread->wait.flags & B_CAN_INTERRUPT) != 0
+			|| (kill && (thread->wait.flags & B_KILL_CAN_INTERRUPT) != 0)) {
+			thread_unblock_locked(thread, B_INTERRUPTED);
+			return B_OK;
+		}
 	}
 
 	return B_NOT_ALLOWED;

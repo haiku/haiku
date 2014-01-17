@@ -118,7 +118,7 @@ struct Port : public KernelReferenceable {
 	size_t				name_hash;
 	int32		 		capacity;
 	mutex				lock;
-	vint32              state;
+	int32				state;
 	uint32				read_count;
 	int32				write_count;
 	ConditionVariable	read_condition;
@@ -417,13 +417,13 @@ static const size_t kBufferGrowRate = kInitialPortBufferSize;
 #define PORT_MAX_MESSAGE_SIZE (256 * 1024)
 
 static int32 sMaxPorts = 4096;
-static vint32 sUsedPorts;
+static int32 sUsedPorts;
 
 static PortHashTable sPorts;
 static PortNameHashTable sPortsByName;
 static ConditionVariable sNoSpaceCondition;
-static vint32 sTotalSpaceCommited;
-static vint32 sWaitingForSpace;
+static int32 sTotalSpaceCommited;
+static int32 sWaitingForSpace;
 static port_id sNextPortID = 1;
 static bool sPortsActive = false;
 static rw_lock sPortsLock = RW_LOCK_INITIALIZER("ports list");
@@ -772,8 +772,8 @@ uninit_port(Port* port)
 
 	// Release the threads that were blocking on this port.
 	// read_port() will see the B_BAD_PORT_ID return value, and act accordingly
-	port->read_condition.NotifyAll(false, B_BAD_PORT_ID);
-	port->write_condition.NotifyAll(false, B_BAD_PORT_ID);
+	port->read_condition.NotifyAll(B_BAD_PORT_ID);
+	port->write_condition.NotifyAll(B_BAD_PORT_ID);
 	sNotificationService.Notify(PORT_REMOVED, port->id);
 }
 
@@ -1055,8 +1055,8 @@ close_port(port_id id)
 	notify_port_select_events(portRef, B_EVENT_INVALID);
 	portRef->select_infos = NULL;
 
-	portRef->read_condition.NotifyAll(false, B_BAD_PORT_ID);
-	portRef->write_condition.NotifyAll(false, B_BAD_PORT_ID);
+	portRef->read_condition.NotifyAll(B_BAD_PORT_ID);
+	portRef->write_condition.NotifyAll(B_BAD_PORT_ID);
 
 	return B_OK;
 }

@@ -18,6 +18,7 @@
 
 #include <arch/x86/apic.h>
 #include <arch/x86/arch_int.h>
+#include <arch/x86/arch_smp.h>
 #include <arch/x86/pic.h>
 
 // to gain access to the ACPICA types
@@ -26,9 +27,9 @@
 
 //#define TRACE_IOAPIC
 #ifdef TRACE_IOAPIC
-#	define TRACE(x) dprintf x
+#	define TRACE(...) dprintf(__VA_ARGS__)
 #else
-#	define TRACE(x) ;
+#	define TRACE(...) (void)0
 #endif
 
 
@@ -243,6 +244,30 @@ ioapic_end_of_interrupt(int32 num)
 
 
 static void
+ioapic_assign_interrupt_to_cpu(int32 gsi, int32 cpu)
+{
+	if (gsi < ISA_INTERRUPT_COUNT && sSourceOverrides[gsi] != 0)
+		gsi = sSourceOverrides[gsi];
+
+	struct ioapic* ioapic = find_ioapic(gsi);
+	if (ioapic == NULL)
+		return;
+
+	uint32 apicid = x86_get_cpu_apic_id(cpu);
+
+	uint8 pin = gsi - ioapic->global_interrupt_base;
+	TRACE("ioapic_assign_interrupt_to_cpu: gsi %ld (io-apic %u pin %u) to"
+		" cpu %ld (apic_id %lu)\n", gsi, ioapic->number, pin, cpu, apicid);
+
+	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
+	entry &= ~(uint64(IO_APIC_DESTINATION_FIELD_MASK)
+			<< IO_APIC_DESTINATION_FIELD_SHIFT);
+	entry |= uint64(apicid) << IO_APIC_DESTINATION_FIELD_SHIFT;
+	ioapic_write_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2, entry, false);
+}
+
+
+static void
 ioapic_enable_io_interrupt(int32 gsi)
 {
 	// If enabling an overriden source is attempted, enable the override entry
@@ -255,9 +280,11 @@ ioapic_enable_io_interrupt(int32 gsi)
 	if (ioapic == NULL)
 		return;
 
+	x86_set_irq_source(gsi, IRQ_SOURCE_IOAPIC);
+
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	TRACE(("ioapic_enable_io_interrupt: gsi %ld -> io-apic %u pin %u\n",
-		gsi, ioapic->number, pin));
+	TRACE("ioapic_enable_io_interrupt: gsi %ld -> io-apic %u pin %u\n",
+		gsi, ioapic->number, pin);
 
 	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~IO_APIC_INTERRUPT_MASKED;
@@ -273,8 +300,8 @@ ioapic_disable_io_interrupt(int32 gsi)
 		return;
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	TRACE(("ioapic_disable_io_interrupt: gsi %ld -> io-apic %u pin %u\n",
-		gsi, ioapic->number, pin));
+	TRACE("ioapic_disable_io_interrupt: gsi %ld -> io-apic %u pin %u\n",
+		gsi, ioapic->number, pin);
 
 	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry |= IO_APIC_INTERRUPT_MASKED;
@@ -290,8 +317,8 @@ ioapic_configure_io_interrupt(int32 gsi, uint32 config)
 		return;
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	TRACE(("ioapic_configure_io_interrupt: gsi %ld -> io-apic %u pin %u; "
-		"config 0x%08lx\n", gsi, ioapic->number, pin, config));
+	TRACE("ioapic_configure_io_interrupt: gsi %ld -> io-apic %u pin %u; "
+		"config 0x%08lx\n", gsi, ioapic->number, pin, config);
 
 	ioapic_configure_pin(*ioapic, pin, gsi, config,
 		IO_APIC_DELIVERY_MODE_FIXED);
@@ -310,7 +337,7 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 		return ioapic.register_area;
 	}
 
-	TRACE(("mapped io-apic %u to %p\n", ioapic.number, ioapic.registers));
+	TRACE("mapped io-apic %u to %p\n", ioapic.number, ioapic.registers);
 
 	ioapic.version = ioapic_read_32(ioapic, IO_APIC_VERSION);
 	if (ioapic.version == 0xffffffff) {
@@ -650,7 +677,8 @@ ioapic_init(kernel_args* args)
 		&ioapic_configure_io_interrupt,
 		&ioapic_is_spurious_interrupt,
 		&ioapic_is_level_triggered_interrupt,
-		&ioapic_end_of_interrupt
+		&ioapic_end_of_interrupt,
+		&ioapic_assign_interrupt_to_cpu,
 	};
 
 	if (args->arch_args.apic == NULL)
@@ -774,7 +802,13 @@ ioapic_init(kernel_args* args)
 	current = sIOAPICs;
 	while (current != NULL) {
 		reserve_io_interrupt_vectors(current->max_redirection_entry + 1,
-			current->global_interrupt_base);
+			current->global_interrupt_base, INTERRUPT_TYPE_IRQ);
+
+		for (int32 i = 0; i < current->max_redirection_entry + 1; i++) {
+			x86_set_irq_source(current->global_interrupt_base + i,
+				IRQ_SOURCE_IOAPIC);
+		}
+
 		current = current->next;
 	}
 

@@ -42,6 +42,7 @@
 #include <Screen.h>
 #include <TextView.h>
 
+#include <scheduler.h>
 #include <syscalls.h>
 
 #include "AutoIcon.h"
@@ -76,7 +77,7 @@ const rgb_color kKernelBlue = {20, 20, 231,	255};
 const rgb_color kIdleGreen = {110, 190,110,	255};
 
 ProcessController* gPCView;
-int32 gCPUcount;
+uint32 gCPUcount;
 rgb_color gUserColor;
 rgb_color gUserColorSelected;
 rgb_color gIdleColor;
@@ -157,7 +158,11 @@ ProcessController::ProcessController(BRect frame, bool temp)
 	fTrackerIcon(kTrackerSig),
 	fDeskbarIcon(kDeskbarSig),
 	fTerminalIcon(kTerminalSig),
-	fTemp(temp)
+	kCPUCount(sysconf(_SC_NPROCESSORS_CONF)),
+	fTemp(temp),
+	fLastBarHeight(new float[kCPUCount]),
+	fCPUTimes(new double[kCPUCount]),
+	fPrevActive(new bigtime_t[kCPUCount])
 {
 	if (!temp) {
 		Init();
@@ -177,7 +182,11 @@ ProcessController::ProcessController(BMessage *data)
 	fTrackerIcon(kTrackerSig),
 	fDeskbarIcon(kDeskbarSig),
 	fTerminalIcon(kTerminalSig),
-	fTemp(false)
+	kCPUCount(sysconf(_SC_NPROCESSORS_CONF)),
+	fTemp(false),
+	fLastBarHeight(new float[kCPUCount]),
+	fCPUTimes(new double[kCPUCount]),
+	fPrevActive(new bigtime_t[kCPUCount])
 {
 	Init();
 }
@@ -190,7 +199,11 @@ ProcessController::ProcessController()
 	fTrackerIcon(kTrackerSig),
 	fDeskbarIcon(kDeskbarSig),
 	fTerminalIcon(kTerminalSig),
-	fTemp(false)
+	kCPUCount(sysconf(_SC_NPROCESSORS_CONF)),
+	fTemp(false),
+	fLastBarHeight(new float[kCPUCount]),
+	fCPUTimes(new double[kCPUCount]),
+	fPrevActive(new bigtime_t[kCPUCount])
 {
 	Init();
 }
@@ -207,12 +220,20 @@ ProcessController::~ProcessController()
 
 	delete fMessageRunner;
 	gPCView = NULL;
+
+	delete[] fPrevActive;
+	delete[] fCPUTimes;
+	delete[] fLastBarHeight;
 }
 
 
 void
 ProcessController::Init()
 {
+	memset(fLastBarHeight, 0, sizeof(float) * kCPUCount);
+	memset(fCPUTimes, 0, sizeof(double) * kCPUCount);
+	memset(fPrevActive, 0, sizeof(bigtime_t) * kCPUCount);
+
 	gPCView = this;
 	fMessageRunner = NULL;
 	memset(fLastBarHeight, 0, sizeof(fLastBarHeight));
@@ -418,10 +439,10 @@ ProcessController::MessageReceived(BMessage *message)
 
 		case 'CPU ':
 		{
-			int32 cpu;
-			if (message->FindInt32 ("cpu", &cpu) == B_OK) {
+			uint32 cpu;
+			if (message->FindInt32("cpu", (int32*)&cpu) == B_OK) {
 				bool last = true;
-				for (int p = 0; p < gCPUcount; p++) {
+				for (unsigned int p = 0; p < gCPUcount; p++) {
 					if (p != cpu && _kern_cpu_enabled(p)) {
 						last = false;
 						break;
@@ -438,6 +459,14 @@ ProcessController::MessageReceived(BMessage *message)
 				} else
 					_kern_set_cpu_enabled(cpu, !_kern_cpu_enabled(cpu));
 			}
+			break;
+		}
+
+		case 'Schd':
+		{
+			int32 mode;
+			if (message->FindInt32 ("mode", &mode) == B_OK)
+				set_scheduler_mode(mode);
 			break;
 		}
 
@@ -584,7 +613,7 @@ ProcessController::DoDraw(bool force)
 		SetHighColor(frame_color);
 		StrokeRect(BRect(left - 1, top - 1, right, bottom + 1));
 		if (gCPUcount > 1 && layout[gCPUcount].cpu_inter == 1) {
-			for (int x = 1; x < gCPUcount; x++)
+			for (unsigned int x = 1; x < gCPUcount; x++)
 				StrokeLine(BPoint(left + x * barWidth + x - 1, top),
 					BPoint(left + x * barWidth + x - 1, bottom));
 		}
@@ -594,7 +623,7 @@ ProcessController::DoDraw(bool force)
 		StrokeRect(BRect(leftMem - 1, top - 1,
 			leftMem + layout[gCPUcount].mem_width, bottom + 1));
 
-	for (int x = 0; x < gCPUcount; x++) {
+	for (unsigned int x = 0; x < gCPUcount; x++) {
 		right = left + barWidth - 1;
 		float rem = fCPUTimes[x] * (h + 1);
 		float barHeight = floorf (rem);
@@ -672,14 +701,17 @@ ProcessController::Update()
 	get_system_info(&info);
 	bigtime_t now = system_time();
 
+	cpu_info* cpuInfos = new cpu_info[gCPUcount];
+	get_cpu_info(0, gCPUcount, cpuInfos);
+
 	fMemoryUsage = float(info.used_pages) / float(info.max_pages);
 	// Calculate work done since last call to Update() for each CPU
-	for (int x = 0; x < gCPUcount; x++) {
-		bigtime_t load = info.cpu_infos[x].active_time - fPrevActive[x];
+	for (unsigned int x = 0; x < gCPUcount; x++) {
+		bigtime_t load = cpuInfos[x].active_time - fPrevActive[x];
 		bigtime_t passed = now - fPrevTime;
 		float cpuTime = float(load) / float(passed);
 
-		fPrevActive[x] = info.cpu_infos[x].active_time;
+		fPrevActive[x] = cpuInfos[x].active_time;
 		if (load > passed)
 			fPrevActive[x] -= load - passed; // save overload for next period...
 		if (cpuTime < 0)
@@ -689,6 +721,8 @@ ProcessController::Update()
 		fCPUTimes[x] = cpuTime;
 	}
 	fPrevTime = now;
+
+	delete[] cpuInfos;
 }
 
 
@@ -700,7 +734,8 @@ thread_popup(void *arg)
 {
 	Tpopup_param* param = (Tpopup_param*) arg;
 	int32 mcookie, hcookie;
-	long m, h;
+	unsigned long m;
+	long h;
 	BMenuItem* item;
 	bool top = param->top;
 
@@ -772,7 +807,7 @@ thread_popup(void *arg)
 
 	// CPU on/off section
 	if (gCPUcount > 1) {
-		for (int i = 0; i < gCPUcount; i++) {
+		for (unsigned int i = 0; i < gCPUcount; i++) {
 			char item_name[32];
 			sprintf (item_name, B_TRANSLATE("Processor %d"), i + 1);
 			BMessage* m = new BMessage ('CPU ');
@@ -785,6 +820,21 @@ thread_popup(void *arg)
 		}
 		addtopbottom (new BSeparatorItem ());
 	}
+
+	// Scheduler modes
+	static const char* schedulerModes[] = { "Low Latency", "Power Saving" };
+	unsigned int modesCount = sizeof(schedulerModes) / sizeof(const char*);
+	int32 currentMode = get_scheduler_mode();
+	for (unsigned int i = 0; i < modesCount; i++) {
+		BMessage* m = new BMessage('Schd');
+		m->AddInt32("mode", i);
+		item = new BMenuItem(B_TRANSLATE(schedulerModes[i]), m);
+		if ((uint32)currentMode == i)
+			item->SetMarked(true);
+		item->SetTarget(gPCView);
+		addtopbottom(item);
+	}
+	addtopbottom(new BSeparatorItem());
 
 	if (!be_roster->IsRunning(kTrackerSig)) {
 		item = new IconMenuItem(gPCView->fTrackerIcon,

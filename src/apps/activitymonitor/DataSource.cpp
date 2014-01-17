@@ -497,13 +497,7 @@ BlockCacheDataSource::Copy() const
 int64
 BlockCacheDataSource::NextValue(SystemInfo& info)
 {
-	system_memory_info memoryInfo;
-	status_t status = __get_system_info_etc(B_MEMORY_INFO, &memoryInfo,
-		sizeof(system_memory_info));
-	if (status != B_OK)
-		return 0;
-
-	return memoryInfo.block_cache_memory;
+	return info.BlockCacheMemory();
 }
 
 
@@ -873,7 +867,7 @@ CPUUsageDataSource::Print(BString& text, int64 value) const
 int64
 CPUUsageDataSource::NextValue(SystemInfo& info)
 {
-	bigtime_t active = info.Info().cpu_infos[fCPU].active_time;
+	bigtime_t active = info.CPUActiveTime(fCPU);
 
 	int64 percent = int64(1000.0 * (active - fPreviousActive)
 		/ (info.Time() - fPreviousTime));
@@ -1018,8 +1012,8 @@ CPUCombinedUsageDataSource::NextValue(SystemInfo& info)
 	int32 running = 0;
 	bigtime_t active = 0;
 
-	for (int32 cpu = 0; cpu < info.Info().cpu_count; cpu++) {
-		active += info.Info().cpu_infos[cpu].active_time;
+	for (uint32 cpu = 0; cpu < info.CPUCount(); cpu++) {
+		active += info.CPUActiveTime(cpu);
 		running++;
 			// TODO: take disabled CPUs into account
 	}

@@ -99,6 +99,7 @@ size_t hoardHeap::_threshold[hoardHeap::SIZE_CLASSES] = {
 #endif
 
 
+int hoardHeap::fMaxThreadHeaps = 1;
 int hoardHeap::_numProcessors;
 int hoardHeap::_numProcessorsMask;
 
@@ -454,7 +455,7 @@ hoardHeap::initNumProcs(void)
 	else
 		hoardHeap::_numProcessors = info.cpu_count;
 
-	hoardHeap::_numProcessorsMask =
-		(1 << (lg(hoardHeap::_numProcessors) + 1)) - 1;
+	fMaxThreadHeaps = 1 << (lg(_numProcessors) + 1);
+	_numProcessorsMask = fMaxThreadHeaps - 1;
 }
 

@@ -29,7 +29,7 @@ struct battery_driver_cookie {
 
 struct battery_device_cookie {
 	battery_driver_cookie*		driver_cookie;
-	vint32						stop_watching;
+	int32						stop_watching;
 };
 
 

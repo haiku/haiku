@@ -57,15 +57,6 @@ class hoardHeap {
 		// empty.
 		enum { MAX_EMPTY_SUPERBLOCKS = EMPTY_FRACTION };
 
-		// The maximum number of thread heaps we allow.  (NOT the maximum
-		// number of threads -- Hoard imposes no such limit.)  This must be
-		// a power of two! NB: This number is twice the maximum number of
-		// PROCESSORS supported by Hoard.
-		enum { MAX_HEAPS = B_MAX_CPU_COUNT * 2 };
-
-		// ANDing with this rounds to MAX_HEAPS.
-		enum { MAX_HEAPS_MASK = MAX_HEAPS - 1 };
-
 		//
 		// The number of size classes.  This combined with the
 		// SIZE_CLASS_BASE determine the maximum size of an object.
@@ -214,6 +205,12 @@ class hoardHeap {
 		static void initNumProcs(void);
 
 	protected:
+		// The maximum number of thread heaps we allow.  (NOT the maximum
+		// number of threads -- Hoard imposes no such limit.)  This must be
+		// a power of two! NB: This number is twice the maximum number of
+		// PROCESSORS supported by Hoard.
+		static int fMaxThreadHeaps;
+
 		// number of CPUs, cached
 		static int _numProcessors;
 		static int _numProcessorsMask;

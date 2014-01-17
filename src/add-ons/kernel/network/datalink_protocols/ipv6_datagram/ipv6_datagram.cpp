@@ -251,7 +251,7 @@ put_request_buffer(ndp_entry* entry, net_buffer* buffer)
 static void
 delete_request_buffer(ndp_entry* entry)
 {
-	net_buffer* buffer = atomic_pointer_set(&entry->request_buffer,
+	net_buffer* buffer = atomic_pointer_get_and_set(&entry->request_buffer,
 		kDeletedBuffer);
 	if (buffer != NULL && buffer != kDeletedBuffer)
 		gBufferModule->free(buffer);

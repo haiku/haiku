@@ -53,7 +53,7 @@ status_t TestForAddonExistence(const char* name, directory_which which,
 // Reference counted object
 class Object {
 private:
-	volatile int32 fRefCount;
+	int32 fRefCount;
 
 public:
 	// After construction reference count is 1

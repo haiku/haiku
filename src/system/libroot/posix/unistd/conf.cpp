@@ -99,8 +99,6 @@ __sysconf(int name)
 			return _POSIX_THREADS;
 		case _SC_IOV_MAX:
 			return IOV_MAX;
-		case _SC_NPROCESSORS_MAX:
-			return B_MAX_CPU_COUNT;
 		case _SC_NPROCESSORS_CONF:
 		{
 			system_info info;
@@ -126,8 +124,6 @@ __sysconf(int name)
 					count++;
 			return count;
 		}
-		case _SC_CPUID_MAX:
-			return B_MAX_CPU_COUNT - 1;
 		case _SC_ATEXIT_MAX:
 			return ATEXIT_MAX;
 		case _SC_PASS_MAX:

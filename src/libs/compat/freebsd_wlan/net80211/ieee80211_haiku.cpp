@@ -463,7 +463,7 @@ int
 ieee80211_node_dectestref(struct ieee80211_node* ni)
 {
 	// atomic_add returns old value
-	return atomic_add((vint32*)&ni->ni_refcnt, -1) == 1;
+	return atomic_add((int32*)&ni->ni_refcnt, -1) == 1;
 }
 
 

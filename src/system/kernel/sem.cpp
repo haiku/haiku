@@ -330,12 +330,10 @@ uninit_sem_locked(struct sem_entry& sem, char** _name)
 	sem.u.used.select_infos = NULL;
 
 	// free any threads waiting for this semaphore
-	SpinLocker schedulerLocker(gSchedulerLock);
 	while (queued_thread* entry = sem.queue.RemoveHead()) {
 		entry->queued = false;
-		thread_unblock_locked(entry->thread, B_BAD_SEM_ID);
+		thread_unblock(entry->thread, B_BAD_SEM_ID);
 	}
-	schedulerLocker.Unlock();
 
 	int32 id = sem.id;
 	sem.id = -1;
@@ -395,7 +393,7 @@ delete_sem_internal(sem_id id, bool checkPermission)
 	char* name;
 	uninit_sem_locked(sSems[slot], &name);
 
-	SpinLocker schedulerLocker(gSchedulerLock);
+	SpinLocker schedulerLocker(thread_get_current_thread()->scheduler_lock);
 	scheduler_reschedule_if_necessary_locked();
 	schedulerLocker.Unlock();
 
@@ -646,9 +644,8 @@ remove_thread_from_sem(queued_thread *entry, struct sem_entry *sem)
 	// for that time, so the blocking state of threads won't change (due to
 	// interruption or timeout). We need that lock anyway when unblocking a
 	// thread.
-	SpinLocker schedulerLocker(gSchedulerLock);
-
 	while ((entry = sem->queue.Head()) != NULL) {
+		SpinLocker schedulerLocker(entry->thread->scheduler_lock);
 		if (thread_is_blocked(entry->thread)) {
 			// The thread is still waiting. If its count is satisfied, unblock
 			// it. Otherwise we can't unblock any other thread.
@@ -666,8 +663,6 @@ remove_thread_from_sem(queued_thread *entry, struct sem_entry *sem)
 		sem->queue.Remove(entry);
 		entry->queued = false;
 	}
-
-	schedulerLocker.Unlock();
 
 	// select notification, if the semaphore is now acquirable
 	if (sem->u.used.count > 0)
@@ -825,7 +820,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 
 		// do a quick check to see if the thread has any pending signals
 		// this should catch most of the cases where the thread had a signal
-		SpinLocker schedulerLocker(gSchedulerLock);
+		SpinLocker schedulerLocker(thread->scheduler_lock);
 		if (thread_is_interrupted(thread, flags)) {
 			schedulerLocker.Unlock();
 			sSems[slot].u.used.count += count;
@@ -833,6 +828,8 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 				// the other semaphore will be released later
 			goto err;
 		}
+
+		schedulerLocker.Unlock();
 
 		if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) == 0)
 			timeout = B_INFINITE_TIMEOUT;
@@ -845,7 +842,6 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 		thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_SEMAPHORE,
 			(void*)(addr_t)id);
 
-		schedulerLocker.Unlock();
 		RELEASE_SEM_LOCK(sSems[slot]);
 
 		// release the other semaphore, if any
@@ -854,13 +850,9 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 			semToBeReleased = -1;
 		}
 
-		schedulerLocker.Lock();
-
 		status_t acquireStatus = timeout == B_INFINITE_TIMEOUT
-			? thread_block_locked(thread)
-			: thread_block_with_timeout_locked(flags, timeout);
+			? thread_block() : thread_block_with_timeout(flags, timeout);
 
-		schedulerLocker.Unlock();
 		GRAB_SEM_LOCK(sSems[slot]);
 
 		// If we're still queued, this means the acquiration failed, and we
@@ -974,8 +966,6 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 
 	// Grab the scheduler lock, so thread_is_blocked() is reliable (due to
 	// possible interruptions or timeouts, it wouldn't be otherwise).
-	SpinLocker schedulerLocker(gSchedulerLock);
-
 	while (count > 0) {
 		queued_thread* entry = sSems[slot].queue.Head();
 		if (entry == NULL) {
@@ -986,6 +976,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 			break;
 		}
 
+		SpinLocker schedulerLock(entry->thread->scheduler_lock);
 		if (thread_is_blocked(entry->thread)) {
 			// The thread is still waiting. If its count is satisfied,
 			// unblock it. Otherwise we can't unblock any other thread.
@@ -1011,8 +1002,6 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		entry->queued = false;
 	}
 
-	schedulerLocker.Unlock();
-
 	if (sSems[slot].u.used.count > 0)
 		notify_sem_select_events(&sSems[slot], B_EVENT_ACQUIRE_SEMAPHORE);
 
@@ -1020,7 +1009,8 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	// been told not to.
 	if ((flags & B_DO_NOT_RESCHEDULE) == 0) {
 		semLocker.Unlock();
-		schedulerLocker.Lock();
+
+		SpinLocker _(thread_get_current_thread()->scheduler_lock);
 		scheduler_reschedule_if_necessary_locked();
 	}
 

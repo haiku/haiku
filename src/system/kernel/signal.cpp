@@ -315,7 +315,6 @@ Signal::SetTo(uint32 number)
 	fErrorCode = 0;
 	fSendingProcess = team->id;
 	fSendingUser = team->effective_uid;
-		// assuming scheduler lock is being held
 	fStatus = 0;
 	fPollBand = 0;
 	fAddress = NULL;
@@ -748,7 +747,7 @@ class SigSuspendDone : public AbstractTraceEntry {
 
 /*!	Updates the given thread's Thread::flags field according to what signals are
 	pending.
-	The caller must hold the scheduler lock.
+	The caller must hold \c team->signal_lock.
 */
 static void
 update_thread_signals_flag(Thread* thread)
@@ -763,7 +762,7 @@ update_thread_signals_flag(Thread* thread)
 
 /*!	Updates the current thread's Thread::flags field according to what signals
 	are pending.
-	The caller must hold the scheduler lock.
+	The caller must hold \c team->signal_lock.
 */
 static void
 update_current_thread_signals_flag()
@@ -774,7 +773,7 @@ update_current_thread_signals_flag()
 
 /*!	Updates all of the given team's threads' Thread::flags fields according to
 	what signals are pending.
-	The caller must hold the scheduler lock.
+	The caller must hold \c signal_lock.
 */
 static void
 update_team_threads_signal_flag(Team* team)
@@ -826,7 +825,7 @@ notify_debugger(Thread* thread, Signal* signal, struct sigaction& handler,
 	After dequeuing the signal the Thread::flags field of the affected threads
 	are updated.
 	The caller gets a reference to the returned signal, if any.
-	The caller must hold the scheduler lock.
+	The caller must hold \c team->signal_lock.
 	\param thread The thread.
 	\param nonBlocked The mask of non-blocked signals.
 	\param buffer If the signal is not queued this buffer is returned. In this
@@ -918,7 +917,7 @@ handle_signals(Thread* thread)
 	Team* team = thread->team;
 
 	TeamLocker teamLocker(team);
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker locker(thread->team->signal_lock);
 
 	// If userland requested to defer signals, we check now, if this is
 	// possible.
@@ -949,7 +948,7 @@ handle_signals(Thread* thread)
 			initialIteration = false;
 		} else {
 			teamLocker.Lock();
-			schedulerLocker.Lock();
+			locker.Lock();
 
 			signalMask = thread->AllPendingSignals() & nonBlockedMask;
 		}
@@ -959,7 +958,7 @@ handle_signals(Thread* thread)
 		if ((signalMask & KILL_SIGNALS) == 0
 			&& (atomic_get(&thread->debug_info.flags) & B_THREAD_DEBUG_STOP)
 				!= 0) {
-			schedulerLocker.Unlock();
+			locker.Unlock();
 			teamLocker.Unlock();
 
 			user_debug_stop_thread();
@@ -978,7 +977,7 @@ handle_signals(Thread* thread)
 		ASSERT(signal != NULL);
 		SignalHandledCaller signalHandledCaller(signal);
 
-		schedulerLocker.Unlock();
+		locker.Unlock();
 
 		// get the action for the signal
 		struct sigaction handler;
@@ -1066,7 +1065,7 @@ handle_signals(Thread* thread)
 						team->LockTeamAndParent(false);
 
 						team_set_job_control_state(team,
-							JOB_CONTROL_STATE_CONTINUED, signal, false);
+							JOB_CONTROL_STATE_CONTINUED, signal);
 
 						team->UnlockTeamAndParent();
 
@@ -1101,7 +1100,7 @@ handle_signals(Thread* thread)
 						team->LockTeamAndParent(false);
 
 						team_set_job_control_state(team,
-							JOB_CONTROL_STATE_STOPPED, signal, false);
+							JOB_CONTROL_STATE_STOPPED, signal);
 
 						// send a SIGCHLD to the parent (if it does have
 						// SA_NOCLDSTOP defined)
@@ -1124,13 +1123,15 @@ handle_signals(Thread* thread)
 
 					// Suspend the thread, unless there's already a signal to
 					// continue or kill pending.
-					InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-					if ((thread->AllPendingSignals()
-							& (CONTINUE_SIGNALS | KILL_SIGNALS)) == 0) {
-						thread->next_state = B_THREAD_SUSPENDED;
-						scheduler_reschedule();
+					locker.Lock();
+					bool resume = (thread->AllPendingSignals()
+								& (CONTINUE_SIGNALS | KILL_SIGNALS)) != 0;
+					locker.Unlock();
+
+					if (!resume) {
+						InterruptsSpinLocker _(thread->scheduler_lock);
+						scheduler_reschedule(B_THREAD_SUSPENDED);
 					}
-					schedulerLocker.Unlock();
 
 					continue;
 				}
@@ -1217,7 +1218,7 @@ handle_signals(Thread* thread)
 		TRACE(("### Setting up custom signal handler frame...\n"));
 
 		// save the old block mask -- we may need to adjust it for the handler
-		schedulerLocker.Lock();
+		locker.Lock();
 
 		sigset_t oldBlockMask = thread->sigsuspend_original_unblocked_mask != 0
 			? ~thread->sigsuspend_original_unblocked_mask
@@ -1234,7 +1235,7 @@ handle_signals(Thread* thread)
 
 		update_current_thread_signals_flag();
 
-		schedulerLocker.Unlock();
+		locker.Unlock();
 
 		setup_signal_frame(thread, &handler, signal, oldBlockMask);
 
@@ -1265,7 +1266,7 @@ handle_signals(Thread* thread)
 
 /*!	Checks whether the given signal is blocked for the given team (i.e. all of
 	its threads).
-	The caller must hold the team's lock and the scheduler lock.
+	The caller must hold the team's lock and \c signal_lock.
 */
 bool
 is_team_signal_blocked(Team* team, int signal)
@@ -1310,7 +1311,7 @@ signal_get_user_stack(addr_t address, stack_t* stack)
 
 
 /*!	Checks whether any non-blocked signal is pending for the current thread.
-	The caller must hold the scheduler lock.
+	The caller must hold \c team->signal_lock.
 	\param thread The current thread.
 */
 static bool
@@ -1323,19 +1324,13 @@ has_signals_pending(Thread* thread)
 /*!	Checks whether the current user has permission to send a signal to the given
 	target team.
 
-	The caller must hold the scheduler lock or \a team's lock.
-
 	\param team The target team.
-	\param schedulerLocked \c true, if the caller holds the scheduler lock,
-		\c false otherwise.
 */
 static bool
-has_permission_to_signal(Team* team, bool schedulerLocked)
+has_permission_to_signal(Signal* signal, Team* team)
 {
 	// get the current user
-	uid_t currentUser = schedulerLocked
-		? thread_get_current_thread()->team->effective_uid
-		: geteuid();
+	uid_t currentUser = signal->SendingUser();
 
 	// root is omnipotent -- in the other cases the current user must match the
 	// target team's
@@ -1346,7 +1341,7 @@ has_permission_to_signal(Team* team, bool schedulerLocked)
 /*!	Delivers a signal to the \a thread, but doesn't handle the signal -- it just
 	makes sure the thread gets the signal, i.e. unblocks it if needed.
 
-	The caller must hold the scheduler lock.
+	The caller must hold \c team->signal_lock.
 
 	\param thread The thread the signal shall be delivered to.
 	\param signalNumber The number of the signal to be delivered. If \c 0, no
@@ -1373,7 +1368,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 	BReference<Signal> signalReference(signal, true);
 
 	if ((flags & B_CHECK_PERMISSION) != 0) {
-		if (!has_permission_to_signal(thread->team, true))
+		if (!has_permission_to_signal(signal, thread->team))
 			return EPERM;
 	}
 
@@ -1382,6 +1377,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 
 	if (thread->team == team_get_kernel_team()) {
 		// Signals to kernel threads will only wake them up
+		SpinLocker _(thread->scheduler_lock);
 		if (thread->state == B_THREAD_SUSPENDED)
 			scheduler_enqueue_in_run_queue(thread);
 		return B_OK;
@@ -1405,10 +1401,12 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 				mainThread->AddPendingSignal(SIGKILLTHR);
 
 				// wake up main thread
+				SpinLocker locker(mainThread->scheduler_lock);
 				if (mainThread->state == B_THREAD_SUSPENDED)
 					scheduler_enqueue_in_run_queue(mainThread);
 				else
 					thread_interrupt(mainThread, true);
+				locker.Unlock();
 
 				update_thread_signals_flag(mainThread);
 			}
@@ -1416,24 +1414,31 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 			// supposed to fall through
 		}
 		case SIGKILLTHR:
+		{
 			// Wake up suspended threads and interrupt waiting ones
+			SpinLocker locker(thread->scheduler_lock);
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
 			else
 				thread_interrupt(thread, true);
-			break;
 
+			break;
+		}
 		case SIGNAL_CONTINUE_THREAD:
+		{
 			// wake up thread, and interrupt its current syscall
+			SpinLocker locker(thread->scheduler_lock);
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
 
 			atomic_or(&thread->flags, THREAD_FLAGS_DONT_RESTART_SYSCALL);
 			break;
-
+		}
 		case SIGCONT:
+		{
 			// Wake up thread if it was suspended, otherwise interrupt it, if
 			// the signal isn't blocked.
+			SpinLocker locker(thread->scheduler_lock);
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
 			else if ((SIGNAL_TO_MASK(SIGCONT) & ~thread->sig_block_mask) != 0)
@@ -1442,7 +1447,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 			// remove any pending stop signals
 			thread->RemovePendingSignals(STOP_SIGNALS);
 			break;
-
+		}
 		default:
 			// If the signal is not masked, interrupt the thread, if it is
 			// currently waiting (interruptibly).
@@ -1450,6 +1455,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 						& (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD)))
 					!= 0) {
 				// Interrupt thread if it was waiting
+				SpinLocker locker(thread->scheduler_lock);
 				thread_interrupt(thread, false);
 			}
 			break;
@@ -1462,8 +1468,6 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 
 
 /*!	Sends the given signal to the given thread.
-
-	The caller must not hold the scheduler lock.
 
 	\param thread The thread the signal shall be sent to.
 	\param signal The signal to be delivered. If the signal's number is \c 0, no
@@ -1490,23 +1494,25 @@ send_signal_to_thread(Thread* thread, const Signal& signal, uint32 flags)
 	if (error != B_OK)
 		return error;
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsReadSpinLocker teamLocker(thread->team_lock);
+	SpinLocker locker(thread->team->signal_lock);
 
 	error = send_signal_to_thread_locked(thread, signal.Number(), signalToQueue,
 		flags);
 	if (error != B_OK)
 		return error;
 
+	locker.Unlock();
+	teamLocker.Unlock();
+
 	if ((flags & B_DO_NOT_RESCHEDULE) == 0)
-		scheduler_reschedule_if_necessary_locked();
+		scheduler_reschedule_if_necessary();
 
 	return B_OK;
 }
 
 
 /*!	Sends the given signal to the thread with the given ID.
-
-	The caller must not hold the scheduler lock.
 
 	\param threadID The ID of the thread the signal shall be sent to.
 	\param signal The signal to be delivered. If the signal's number is \c 0, no
@@ -1536,7 +1542,7 @@ send_signal_to_thread_id(thread_id threadID, const Signal& signal, uint32 flags)
 
 /*!	Sends the given signal to the given team.
 
-	The caller must hold the scheduler lock.
+	The caller must hold \c signal_lock.
 
 	\param team The team the signal shall be sent to.
 	\param signalNumber The number of the signal to be delivered. If \c 0, no
@@ -1567,7 +1573,7 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 	BReference<Signal> signalReference(signal, true);
 
 	if ((flags & B_CHECK_PERMISSION) != 0) {
-		if (!has_permission_to_signal(team, true))
+		if (!has_permission_to_signal(signal, team))
 			return EPERM;
 	}
 
@@ -1599,6 +1605,7 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 				mainThread->AddPendingSignal(SIGKILLTHR);
 
 				// wake up main thread
+				SpinLocker _(mainThread->scheduler_lock);
 				if (mainThread->state == B_THREAD_SUSPENDED)
 					scheduler_enqueue_in_run_queue(mainThread);
 				else
@@ -1612,6 +1619,7 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 			// don't block the signal.
 			for (Thread* thread = team->thread_list; thread != NULL;
 					thread = thread->team_next) {
+				SpinLocker _(thread->scheduler_lock);
 				if (thread->state == B_THREAD_SUSPENDED) {
 					scheduler_enqueue_in_run_queue(thread);
 				} else if ((SIGNAL_TO_MASK(SIGCONT) & ~thread->sig_block_mask)
@@ -1653,16 +1661,15 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 					thread = thread->team_next) {
 				sigset_t nonBlocked = ~thread->sig_block_mask
 					| SIGNAL_TO_MASK(SIGCHLD);
-				if ((thread->AllPendingSignals() & nonBlocked) != 0)
+				if ((thread->AllPendingSignals() & nonBlocked) != 0) {
+					SpinLocker _(thread->scheduler_lock);
 					thread_interrupt(thread, false);
+				}
 			}
 			break;
 	}
 
 	update_team_threads_signal_flag(team);
-
-	if ((flags & B_DO_NOT_RESCHEDULE) == 0)
-		scheduler_reschedule_if_necessary_locked();
 
 	return B_OK;
 }
@@ -1695,10 +1702,17 @@ send_signal_to_team(Team* team, const Signal& signal, uint32 flags)
 	if (error != B_OK)
 		return error;
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker locker(team->signal_lock);
 
-	return send_signal_to_team_locked(team, signal.Number(), signalToQueue,
-		flags);
+	error = send_signal_to_team_locked(team, signal.Number(), signalToQueue,
+			flags);
+
+	locker.Unlock();
+
+	if ((flags & B_DO_NOT_RESCHEDULE) == 0)
+		scheduler_reschedule_if_necessary();
+
+	return error;
 }
 
 
@@ -1884,7 +1898,7 @@ sigprocmask_internal(int how, const sigset_t* set, sigset_t* oldSet)
 {
 	Thread* thread = thread_get_current_thread();
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker _(thread->team->signal_lock);
 
 	sigset_t oldMask = thread->sig_block_mask;
 
@@ -1955,7 +1969,7 @@ sigaction_internal(int signal, const struct sigaction* act,
 	if ((act && act->sa_handler == SIG_IGN)
 		|| (act && act->sa_handler == SIG_DFL
 			&& (SIGNAL_TO_MASK(signal) & DEFAULT_IGNORE_SIGNALS) != 0)) {
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+		InterruptsSpinLocker locker(team->signal_lock);
 
 		team->RemovePendingSignal(signal);
 
@@ -1997,7 +2011,7 @@ sigwait_internal(const sigset_t* set, siginfo_t* info, uint32 flags,
 
 	Thread* thread = thread_get_current_thread();
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker locker(thread->team->signal_lock);
 
 	bool timedOut = false;
 	status_t error = B_OK;
@@ -2017,7 +2031,7 @@ sigwait_internal(const sigset_t* set, siginfo_t* info, uint32 flags,
 			ASSERT(signal != NULL);
 
 			SignalHandledCaller signalHandledCaller(signal);
-			schedulerLocker.Unlock();
+			locker.Unlock();
 
 			info->si_signo = signal->Number();
 			info->si_code = signal->SignalCode();
@@ -2049,16 +2063,22 @@ sigwait_internal(const sigset_t* set, siginfo_t* info, uint32 flags,
 			thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_SIGNAL,
 				NULL);
 
+			locker.Unlock();
+
 			if ((flags & B_ABSOLUTE_TIMEOUT) != 0) {
-				error = thread_block_with_timeout_locked(flags, timeout);
+				error = thread_block_with_timeout(flags, timeout);
 				if (error == B_WOULD_BLOCK || error == B_TIMED_OUT) {
 					error = B_WOULD_BLOCK;
 						// POSIX requires EAGAIN (B_WOULD_BLOCK) on timeout
 					timedOut = true;
+
+					locker.Lock();
 					break;
 				}
 			} else
-				thread_block_locked(thread);
+				thread_block();
+
+			locker.Lock();
 		}
 
 		// restore the original block mask
@@ -2084,7 +2104,7 @@ sigsuspend_internal(const sigset_t* _mask)
 
 	Thread* thread = thread_get_current_thread();
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker locker(thread->team->signal_lock);
 
 	// Set the new block mask and block until interrupted. We might be here
 	// after a syscall restart, in which case sigsuspend_original_unblocked_mask
@@ -2098,7 +2118,10 @@ sigsuspend_internal(const sigset_t* _mask)
 	while (!has_signals_pending(thread)) {
 		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
 			THREAD_BLOCK_TYPE_SIGNAL, NULL);
-		thread_block_locked(thread);
+
+		locker.Unlock();
+		thread_block();
+		locker.Lock();
 	}
 
 	// Set sigsuspend_original_unblocked_mask (guaranteed to be non-0 due to
@@ -2123,7 +2146,7 @@ sigpending_internal(sigset_t* set)
 	if (set == NULL)
 		return B_BAD_VALUE;
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker locker(thread->team->signal_lock);
 
 	*set = thread->AllPendingSignals() & thread->sig_block_mask;
 
@@ -2414,13 +2437,13 @@ _user_restore_signal_frame(struct signal_frame_data* userSignalFrameData)
 	}
 
 	// restore the signal block mask
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	InterruptsSpinLocker locker(thread->team->signal_lock);
 
 	thread->sig_block_mask
 		= signalFrameData.context.uc_sigmask & BLOCKABLE_SIGNALS;
 	update_current_thread_signals_flag();
 
-	schedulerLocker.Unlock();
+	locker.Unlock();
 
 	// restore the syscall restart related thread flags and the syscall restart
 	// parameters

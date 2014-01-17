@@ -10,7 +10,7 @@
 #include "via.h"
 #include "generic_x86.h"
 
-#include <OS.h>
+#include <cpu.h>
 
 
 static uint32
@@ -41,11 +41,7 @@ via_set_mtrrs(uint8 defaultType, const x86_mtrr_info* infos, uint32 count)
 static status_t
 via_init(void)
 {
-	system_info info;
-	if (get_system_info(&info) != B_OK)
-		return B_ERROR;
-
-	if ((info.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_VIA_IDT_x86)
+	if (gCPU[0].arch.vendor != VENDOR_CENTAUR)
 		return B_ERROR;
 
 	// current VIA CPUs have always 36 bit (or less?)

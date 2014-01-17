@@ -39,7 +39,7 @@ private:
 	std::list<RegistrarThread*>::iterator& RemoveThread(std::list<RegistrarThread*>::iterator &i);
 	
 	std::list<RegistrarThread*> fThreads;
-	vint32 fThreadCount;
+	int32 fThreadCount;
 };
 
 #endif	// THREAD_MANAGER_H

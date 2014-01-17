@@ -55,7 +55,7 @@ set_intel_syscall_stack(addr_t stackTop)
 static void
 init_intel_syscall_registers(void* dummy, int cpuNum)
 {
-	x86_write_msr(IA32_MSR_SYSENTER_CS, KERNEL_CODE_SEG);
+	x86_write_msr(IA32_MSR_SYSENTER_CS, KERNEL_CODE_SELECTOR);
 	x86_write_msr(IA32_MSR_SYSENTER_ESP, 0);
 	x86_write_msr(IA32_MSR_SYSENTER_EIP, (addr_t)x86_sysenter);
 

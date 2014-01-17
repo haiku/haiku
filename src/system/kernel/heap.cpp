@@ -187,9 +187,9 @@ static const heap_class sHeapClasses[HEAP_CLASS_COUNT] = {
 
 
 static uint32 sHeapCount;
-static heap_allocator *sHeaps[HEAP_CLASS_COUNT * B_MAX_CPU_COUNT];
-static uint32 *sLastGrowRequest[HEAP_CLASS_COUNT * B_MAX_CPU_COUNT];
-static uint32 *sLastHandledGrowRequest[HEAP_CLASS_COUNT * B_MAX_CPU_COUNT];
+static heap_allocator *sHeaps[HEAP_CLASS_COUNT * SMP_MAX_CPUS];
+static uint32 *sLastGrowRequest[HEAP_CLASS_COUNT * SMP_MAX_CPUS];
+static uint32 *sLastHandledGrowRequest[HEAP_CLASS_COUNT * SMP_MAX_CPUS];
 
 static heap_allocator *sVIPHeap;
 static heap_allocator *sGrowHeap = NULL;

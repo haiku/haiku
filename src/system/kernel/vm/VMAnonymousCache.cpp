@@ -1667,11 +1667,11 @@ swap_total_swap_pages()
 
 
 void
-swap_get_info(struct system_memory_info* info)
+swap_get_info(system_info* info)
 {
 #if ENABLE_SWAP_SUPPORT
-	info->max_swap_space = (uint64)swap_total_swap_pages() * B_PAGE_SIZE;
-	info->free_swap_space = (uint64)swap_available_pages() * B_PAGE_SIZE;
+	info->max_swap_pages = swap_total_swap_pages();
+	info->free_swap_pages = swap_available_pages();
 #else
 	info->max_swap_space = 0;
 	info->free_swap_space = 0;

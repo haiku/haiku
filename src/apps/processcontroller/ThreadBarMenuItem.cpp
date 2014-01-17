@@ -104,10 +104,16 @@ ThreadBarMenuItem::DrawBar(bool force)
 			r.right = fGrenze1;
 	}
 	if (r.left < r.right) {
-		if (selected)
-			menu->SetHighColor(fThreadID <= gCPUcount ? gIdleColorSelected : gUserColorSelected);
-		else
-			menu->SetHighColor(fThreadID <= gCPUcount ? gIdleColor : gUserColor);
+		thread_info threadInfo;
+		bool idleThread = false;
+		if (get_thread_info(fThreadID, &threadInfo) == B_OK)
+			idleThread = threadInfo.priority == B_IDLE_PRIORITY;
+
+		if (selected) {
+			menu->SetHighColor(
+				idleThread ? gIdleColorSelected : gUserColorSelected);
+		} else
+			menu->SetHighColor(idleThread ? gIdleColor : gUserColor);
 		menu->FillRect(r);
 	}
 	r.left = grenze2;
@@ -157,7 +163,7 @@ ThreadBarMenuItem::BarUpdate()
 		bigtime_t now = system_time();
 		fKernel = double(info.kernel_time - fThreadInfo.kernel_time) / double(now - fLastTime);
 		fUser = double(info.user_time - fThreadInfo.user_time) / double(now - fLastTime);
-		if (fThreadID <= gCPUcount) {
+		if (info.priority == B_IDLE_PRIORITY) {
 			fUser += fKernel;
 			fKernel = 0;
 		}

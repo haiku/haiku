@@ -12,11 +12,35 @@
 #include <KernelExport.h>
 #include <arch/int.h>
 
+#include <util/list.h>
+
 // private install_io_interrupt_handler() flags
 #define B_NO_LOCK_VECTOR	0x100
 #define B_NO_HANDLED_INFO	0x200
 
 struct kernel_args;
+
+
+enum interrupt_type {
+	INTERRUPT_TYPE_EXCEPTION,
+	INTERRUPT_TYPE_IRQ,
+	INTERRUPT_TYPE_LOCAL_IRQ,
+	INTERRUPT_TYPE_SYSCALL,
+	INTERRUPT_TYPE_ICI,
+	INTERRUPT_TYPE_UNKNOWN
+};
+
+struct irq_assignment {
+	list_link	link;
+
+	uint32		irq;
+	uint32		count;
+
+	int32		handlers_count;
+
+	int32		load;
+	int32		cpu;
+};
 
 
 #ifdef __cplusplus
@@ -53,8 +77,12 @@ are_interrupts_enabled(void)
 #define restore_interrupts(status)	arch_int_restore_interrupts(status)
 
 
-status_t reserve_io_interrupt_vectors(long count, long startVector);
-status_t allocate_io_interrupt_vectors(long count, long *startVector);
+status_t reserve_io_interrupt_vectors(long count, long startVector,
+	enum interrupt_type type);
+status_t allocate_io_interrupt_vectors(long count, long *startVector,
+	enum interrupt_type type);
 void free_io_interrupt_vectors(long count, long startVector);
+
+void assign_io_interrupt_to_cpu(long vector, int32 cpu);
 
 #endif /* _KERNEL_INT_H */

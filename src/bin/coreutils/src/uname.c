@@ -346,16 +346,20 @@ main (int argc, char **argv)
 
 #ifdef __HAIKU__
 	  {
-		system_info sysinfo;
-		get_system_info(&sysinfo);
-
-		switch (sysinfo.platform_type) {
-			case B_AT_CLONE_PLATFORM:
-				element = "x86";
-				break;
-			case B_64_BIT_PC_PLATFORM:
-				element = "x86_64";
-				break;
+		cpu_topology_node_info root;
+		uint32_t count = 1;
+		status_t error = get_cpu_topology_info(&root, &count);
+		if (error != B_OK || count < 1)
+			element = "unknown";
+		else {
+			switch (root.data.root.platform) {
+				case B_CPU_x86:
+					element = "x86";
+					break;
+				case B_CPU_x86_64:
+					element = "x86_64";
+					break;
+			}
 		}
 	  }
 #endif

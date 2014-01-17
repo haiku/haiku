@@ -24,8 +24,8 @@ SystemInfo::SystemInfo(SystemInfoHandler* handler)
 	fMediaBuffers(0)
 {
 	get_system_info(&fSystemInfo);
-	__get_system_info_etc(B_MEMORY_INFO, &fMemoryInfo,
-		sizeof(system_memory_info));
+	fCPUInfos = new cpu_info[fSystemInfo.cpu_count];
+	get_cpu_info(0, fSystemInfo.cpu_count, fCPUInfos);
 
 	if (handler != NULL) {
 		fRunningApps = handler->RunningApps();
@@ -40,6 +40,7 @@ SystemInfo::SystemInfo(SystemInfoHandler* handler)
 
 SystemInfo::~SystemInfo()
 {
+	delete[] fCPUInfos;
 }
 
 
@@ -47,7 +48,7 @@ uint64
 SystemInfo::CachedMemory() const
 {
 #ifdef __HAIKU__
-	return (uint64)fSystemInfo.cached_pages * B_PAGE_SIZE;
+	return fSystemInfo.cached_pages * B_PAGE_SIZE;
 #else
 	return 0LL;
 #endif
@@ -55,37 +56,45 @@ SystemInfo::CachedMemory() const
 
 
 uint64
+SystemInfo::BlockCacheMemory() const
+{
+	return fSystemInfo.block_cache_pages * B_PAGE_SIZE;
+}
+
+
+uint64
 SystemInfo::UsedMemory() const
 {
-	return (uint64)fSystemInfo.used_pages * B_PAGE_SIZE;
+	return fSystemInfo.used_pages * B_PAGE_SIZE;
 }
 
 
 uint64
 SystemInfo::MaxMemory() const
 {
-	return (uint64)fSystemInfo.max_pages * B_PAGE_SIZE;
+	return fSystemInfo.max_pages * B_PAGE_SIZE;
 }
 
 
 uint32
 SystemInfo::PageFaults() const
 {
-	return fMemoryInfo.page_faults;
+	return fSystemInfo.page_faults;
 }
 
 
 uint64
 SystemInfo::UsedSwapSpace() const
 {
-	return fMemoryInfo.max_swap_space - fMemoryInfo.free_swap_space;
+	return (fSystemInfo.max_swap_pages - fSystemInfo.free_swap_pages)
+		* B_PAGE_SIZE;
 }
 
 
 uint64
 SystemInfo::MaxSwapSpace() const
 {
-	return fMemoryInfo.max_swap_space;
+	return fSystemInfo.max_swap_pages * B_PAGE_SIZE;
 }
 
 

@@ -92,7 +92,7 @@ private:
 private:
 			ThreadCreationAttributes fCreationAttributes;
 			char				fThreadName[B_OS_NAME_LENGTH];
-			bool				fPendingDPC;
+			int32				fPendingDPC;
 };
 
 

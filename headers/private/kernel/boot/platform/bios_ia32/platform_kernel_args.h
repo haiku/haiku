@@ -15,8 +15,8 @@
 #include <util/FixedWidthPointer.h>
 
 
-// must match SMP_MAX_CPUS in arch_smp.h
-#define MAX_BOOT_CPUS 8
+#define SMP_MAX_CPUS 64
+
 #define MAX_PHYSICAL_MEMORY_RANGE 32
 #define MAX_PHYSICAL_ALLOCATED_RANGE 32
 #define MAX_VIRTUAL_ALLOCATED_RANGE 32

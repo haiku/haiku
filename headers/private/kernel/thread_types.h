@@ -57,11 +57,14 @@ struct cpu_ent;
 struct image;					// defined in image.c
 struct io_context;
 struct realtime_sem_context;	// defined in realtime_sem.cpp
-struct scheduler_thread_data;
 struct select_info;
 struct user_thread;				// defined in libroot/user_thread.h
 struct VMAddressSpace;
 struct xsi_sem_context;			// defined in xsi_semaphore.cpp
+
+namespace Scheduler {
+	struct ThreadData;
+}
 
 namespace BKernel {
 	struct Team;
@@ -242,10 +245,10 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	struct job_control_entry* job_control_entry;
 
 	VMAddressSpace	*address_space;
-	Thread			*main_thread;	// protected by fLock and the scheduler
-									// lock (and the thread's lock), immutable
+	Thread			*main_thread;	// protected by fLock, immutable
 									// after first set
-	Thread			*thread_list;	// protected by fLock and the scheduler lock
+	Thread			*thread_list;	// protected by fLock, signal_lock and
+									// gThreadCreationLock
 	struct team_loading_info *loading_info;	// protected by fLock
 	struct list		image_list;		// protected by sImageMutex
 	struct list		watcher_list;
@@ -263,13 +266,13 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 
 	struct team_debug_info debug_info;
 
-	// protected by scheduler lock
+	// protected by time_lock
 	bigtime_t		dead_threads_kernel_time;
 	bigtime_t		dead_threads_user_time;
 	bigtime_t		cpu_clock_offset;
+	spinlock		time_lock;
 
-	// user group information; protected by fLock, the *_uid/*_gid fields also
-	// by the scheduler lock
+	// user group information; protected by fLock
 	uid_t			saved_set_uid;
 	uid_t			real_uid;
 	uid_t			effective_uid;
@@ -289,6 +292,8 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 		status_t	status;			// exit status, if normal team exit
 		bool		initialized;	// true when the state has been initialized
 	} exit;
+
+	spinlock		signal_lock;
 
 public:
 								~Team();
@@ -397,7 +402,7 @@ private:
 
 			BKernel::QueuedSignalsCounter* fQueuedSignalsCounter;
 			BKernel::PendingSignals	fPendingSignals;
-									// protected by scheduler lock
+									// protected by signal_lock
 			struct sigaction 	fSignalActions[MAX_SIGNAL_NUMBER];
 									// indexed signal - 1, protected by fLock
 
@@ -405,7 +410,7 @@ private:
 			TeamTimeUserTimerList fCPUTimeUserTimers;
 									// protected by scheduler lock
 			TeamUserTimeUserTimerList fUserTimeUserTimers;
-			vint32				fUserDefinedTimerCount;	// accessed atomically
+			int32				fUserDefinedTimerCount;	// accessed atomically
 };
 
 
@@ -416,20 +421,17 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 	int64			serial_number;	// immutable after adding thread to hash
 	Thread			*hash_next;		// protected by thread hash lock
 	Thread			*team_next;		// protected by team lock and fLock
-	Thread			*queue_next;	// protected by scheduler lock
-	timer			alarm;			// protected by scheduler lock
 	char			name[B_OS_NAME_LENGTH];	// protected by fLock
 	int32			priority;		// protected by scheduler lock
-	int32			next_priority;	// protected by scheduler lock
 	int32			io_priority;	// protected by fLock
 	int32			state;			// protected by scheduler lock
-	int32			next_state;		// protected by scheduler lock
 	struct cpu_ent	*cpu;			// protected by scheduler lock
 	struct cpu_ent	*previous_cpu;	// protected by scheduler lock
 	int32			pinned_to_cpu;	// only accessed by this thread or in the
 									// scheduler, when thread is not running
+	spinlock		scheduler_lock;
 
-	sigset_t		sig_block_mask;	// protected by scheduler lock,
+	sigset_t		sig_block_mask;	// protected by team->signal_lock,
 									// only modified by the thread itself
 	sigset_t		sigsuspend_original_unblocked_mask;
 		// non-0 after a return from _user_sigsuspend(), containing the inverted
@@ -442,8 +444,8 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 
 	bool			in_kernel;		// protected by time_lock, only written by
 									// this thread
-	bool			was_yielded;	// protected by scheduler lock
-	struct scheduler_thread_data* scheduler_data; // protected by scheduler lock
+	bool			has_yielded;	// protected by scheduler lock
+	Scheduler::ThreadData*	scheduler_data; // protected by scheduler lock
 
 	struct user_thread*	user_thread;	// write-protected by fLock, only
 										// modified by the thread itself and
@@ -481,7 +483,8 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 		/* this field may only stay in debug builds in the future */
 
 	BKernel::Team	*team;	// protected by team lock, thread lock, scheduler
-							// lock
+							// lock, team_lock
+	rw_spinlock		team_lock;
 
 	struct {
 		sem_id		sem;		// immutable after thread creation
@@ -514,7 +517,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 	bigtime_t		user_time;			// protected by time_lock
 	bigtime_t		kernel_time;		// protected by time_lock
 	bigtime_t		last_time;			// protected by time_lock
-	bigtime_t		cpu_clock_offset;	// protected by scheduler lock
+	bigtime_t		cpu_clock_offset;	// protected by time_lock
 
 	void			(*post_interrupt_callback)(void*);
 	void*			post_interrupt_data;
@@ -604,11 +607,11 @@ private:
 			mutex				fLock;
 
 			BKernel::PendingSignals	fPendingSignals;
-									// protected by scheduler lock
+									// protected by team->signal_lock
 
 			UserTimerList		fUserTimers;			// protected by fLock
 			ThreadTimeUserTimerList fCPUTimeUserTimers;
-									// protected by scheduler lock
+									// protected by time_lock
 };
 
 
@@ -747,7 +750,7 @@ Thread::DequeuePendingSignal(sigset_t nonBlocked, Signal& buffer)
 
 /*!	Returns the thread's current total CPU time (kernel + user + offset).
 
-	The caller must hold the scheduler lock.
+	The caller must hold \c time_lock.
 
 	\param ignoreCurrentRun If \c true and the thread is currently running,
 		don't add the time since the last time \c last_time was updated. Should
@@ -762,7 +765,7 @@ Thread::CPUTime(bool ignoreCurrentRun) const
 
 	// If currently running, also add the time since the last check, unless
 	// requested otherwise.
-	if (!ignoreCurrentRun && cpu != NULL)
+	if (!ignoreCurrentRun && last_time != 0)
 		time += system_time() - last_time;
 
 	return time;
@@ -778,12 +781,6 @@ using BKernel::ThreadListIterator;
 using BKernel::ProcessSession;
 using BKernel::ProcessGroup;
 using BKernel::ProcessGroupList;
-
-
-struct thread_queue {
-	Thread*	head;
-	Thread*	tail;
-};
 
 
 #endif	// !_ASSEMBLER

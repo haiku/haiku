@@ -58,12 +58,12 @@ FUNCTION(long_enter_kernel):
 	movl	%ecx, %cr0
 
 	// Jump into the 64-bit code segment.
-	ljmp	$KERNEL_CODE_SEG, $.Llmode
+	ljmp	$KERNEL_CODE_SELECTOR, $.Llmode
 .align 8
 .code64
 .Llmode:
 	// Set data segments.
-	mov		$KERNEL_DATA_SEG, %ax
+	mov		$KERNEL_DATA_SELECTOR, %ax
 	mov		%ax, %ss
 	xor		%ax, %ax
 	mov		%ax, %ds

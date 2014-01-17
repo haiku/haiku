@@ -126,12 +126,11 @@ public:
 		// Unlock the queue before blocking
 		queueLocker->Unlock();
 
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 // TODO: We've got a serious race condition: If BlockAndUnlock() returned due to
 // interruption, we will still be queued. A WakeUpThread() at this point will
 // call thread_unblock() and might thus screw with our trying to re-lock the
 // mutex.
-		return thread_block_locked(thread);
+		return thread_block();
 	}
 
 	void DoIpcSet(struct msqid_ds *result)
@@ -246,8 +245,6 @@ public:
 
 	void WakeUpThread(bool waitForMessage)
 	{
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 		if (waitForMessage) {
 			// Wake up all waiting thread for a message
 			// TODO: this can cause starvation for any
@@ -255,14 +252,14 @@ public:
 			while (queued_thread *entry = fWaitingToReceive.RemoveHead()) {
 				entry->queued = false;
 				fThreadsWaitingToReceive--;
-				thread_unblock_locked(entry->thread, 0);
+				thread_unblock(entry->thread, 0);
 			}
 		} else {
 			// Wake up only one thread waiting to send
 			if (queued_thread *entry = fWaitingToSend.RemoveHead()) {
 				entry->queued = false;
 				fThreadsWaitingToSend--;
-				thread_unblock_locked(entry->thread, 0);
+				thread_unblock(entry->thread, 0);
 			}
 		}
 	}
@@ -387,8 +384,8 @@ static mutex sIpcLock;
 static mutex sXsiMessageQueueLock;
 
 static uint32 sGlobalSequenceNumber = 1;
-static vint32 sXsiMessageCount = 0;
-static vint32 sXsiMessageQueueCount = 0;
+static int32 sXsiMessageCount = 0;
+static int32 sXsiMessageQueueCount = 0;
 
 
 //	#pragma mark -
@@ -400,15 +397,13 @@ XsiMessageQueue::~XsiMessageQueue()
 
 	// Wake up any threads still waiting
 	if (fThreadsWaitingToSend || fThreadsWaitingToReceive) {
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 		while (queued_thread *entry = fWaitingToReceive.RemoveHead()) {
 			entry->queued = false;
-			thread_unblock_locked(entry->thread, EIDRM);
+			thread_unblock(entry->thread, EIDRM);
 		}
 		while (queued_thread *entry = fWaitingToSend.RemoveHead()) {
 			entry->queued = false;
-			thread_unblock_locked(entry->thread, EIDRM);
+			thread_unblock(entry->thread, EIDRM);
 		}
 	}
 
@@ -694,7 +689,7 @@ _user_xsi_msgget(key_t key, int flags)
 
 	if (create) {
 		// Create a new message queue for this key
-		if (sXsiMessageQueueCount >= MAX_XSI_MESSAGE_QUEUE) {
+		if (atomic_get(&sXsiMessageQueueCount) >= MAX_XSI_MESSAGE_QUEUE) {
 			TRACE_ERROR(("xsi_msgget: reached limit of maximun number of "
 				"message queues\n"));
 			return ENOSPC;

@@ -29,11 +29,11 @@ struct per_cpu_timer_data {
 	spinlock		lock;
 	timer* volatile	events;
 	timer* volatile	current_event;
-	vint32			current_event_in_progress;
+	int32			current_event_in_progress;
 	bigtime_t		real_time_offset;
 };
 
-static per_cpu_timer_data sPerCPU[B_MAX_CPU_COUNT];
+static per_cpu_timer_data sPerCPU[SMP_MAX_CPUS];
 
 
 //#define TRACE_TIMER
@@ -264,7 +264,7 @@ timer_interrupt()
 
 		cpuData.events = (timer*)event->next;
 		cpuData.current_event = event;
-		cpuData.current_event_in_progress = 1;
+		atomic_set(&cpuData.current_event_in_progress, 1);
 
 		release_spinlock(spinlock);
 
@@ -274,27 +274,10 @@ timer_interrupt()
 		// call the callback
 		// note: if the event is not periodic, it is ok
 		// to delete the event structure inside the callback
-		if (event->hook) {
-			bool callHook = true;
+		if (event->hook)
+			rc = event->hook(event);
 
-			// we may need to acquire the scheduler lock
-			if ((mode & B_TIMER_ACQUIRE_SCHEDULER_LOCK) != 0) {
-				acquire_spinlock(&gSchedulerLock);
-
-				// If the event has been cancelled in the meantime, we don't
-				// call the hook anymore.
-				if (cpuData.current_event == NULL)
-					callHook = false;
-			}
-
-			if (callHook)
-				rc = event->hook(event);
-
-			if ((mode & B_TIMER_ACQUIRE_SCHEDULER_LOCK) != 0)
-				release_spinlock(&gSchedulerLock);
-		}
-
-		cpuData.current_event_in_progress = 0;
+		atomic_set(&cpuData.current_event_in_progress, 0);
 
 		acquire_spinlock(spinlock);
 
@@ -400,7 +383,7 @@ cancel_timer(timer* event)
 	int cpu = event->cpu;
 	SpinLocker spinLocker;
 	while (true) {
-		if (cpu >= B_MAX_CPU_COUNT)
+		if (cpu >= SMP_MAX_CPUS)
 			return false;
 
 		spinLocker.SetTo(sPerCPU[cpu].lock, false);
@@ -461,13 +444,11 @@ cancel_timer(timer* event)
 	// lock to be held while calling the event hook, we'll have to wait
 	// for the hook to complete. When called from the timer hook we don't
 	// wait either, of course.
-	if ((event->flags & B_TIMER_ACQUIRE_SCHEDULER_LOCK) == 0
-		&& cpu != smp_get_current_cpu()) {
+	if (cpu != smp_get_current_cpu()) {
 		spinLocker.Unlock();
 
-		while (cpuData.current_event_in_progress == 1) {
-			PAUSE();
-		}
+		while (atomic_get(&cpuData.current_event_in_progress) == 1)
+			cpu_wait(&cpuData.current_event_in_progress, 0);
 	}
 
 	return true;
@@ -479,7 +460,6 @@ spin(bigtime_t microseconds)
 {
 	bigtime_t time = system_time();
 
-	while ((system_time() - time) < microseconds) {
-		PAUSE();
-	}
+	while ((system_time() - time) < microseconds)
+		cpu_pause();
 }

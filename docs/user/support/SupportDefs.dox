@@ -627,15 +627,13 @@
 //! @{
 
 
-/*!	\fn int32 atomic_set(vint32 *value, int32 newValue)
+/*!	\fn void atomic_set(int32* value, int32 newValue)
 	\brief Atomically set the variable \a value to \a newvalue.
 
 	This is a thread-safe way of performing the \c *value \c = \c newValue
 	operation. You should use these function when two or more threads might
 	access the variable simultaneously. You don't have to use a semaphore or a
-	mutex in this case. 
-
-	\return The original value of \c value.
+	mutex in this case. The variable must be naturally aligned.
 
 	\sa atomic_set64() for a version that works on \c long \c long.
 	\sa atomic_test_and_set()
@@ -646,7 +644,28 @@
 */
 
 
-/*!	\fn int32 atomic_test_and_set(vint32 *value, int32 newValue,
+/*!	\fn int32 atomic_get_and_set(int32* value, int32 newValue)
+	\brief Atomically set the variable \a value to \a newvalue and return the
+		old value.
+
+	This is a thread-safe way of performing the \c *value \c = \c newValue
+	operation. You should use these function when two or more threads might
+	access the variable simultaneously. You don't have to use a semaphore or a
+	mutex in this case. 
+
+	\return The original value of \c value.
+
+	\sa atomic_get_and_set64() for a version that works on \c long \c long.
+	\sa atomic_set()
+	\sa atomic_test_and_set()
+	\sa atomic_add()
+	\sa atomic_and()
+	\sa atomic_or(),
+	\sa atomic_get()
+*/
+
+
+/*!	\fn int32 atomic_test_and_set(int32* value, int32 newValue,
 		int32 testAgainst)
 	\brief Atomically set the variable \a value to \a newValue if the current
 		   value is \a testAgainst.
@@ -659,6 +678,7 @@
 	\return The original value of \c value.
 
 	\sa atomic_test_and_set64() for a version that works on \c long \c long.
+	\sa atomic_get_and_set()
 	\sa atomic_set()
 	\sa atomic_add()
 	\sa atomic_and()
@@ -668,7 +688,7 @@
 
 
 /*!
-	\fn int32 atomic_add(vint32 *value, int32 addValue)
+	\fn int32 atomic_add(int32* value, int32 addValue)
 	\brief Atomically add the value of \a addValue to \a value.
 
 	This is a thread-safe way of performing the \c *value \c += \c addValue
@@ -679,6 +699,7 @@
 	\return The original value of \c value.
 
 	\sa atomic_add64() for a version that works on \c long \c long.
+	\sa atomic_get_and_set()
 	\sa atomic_set()
 	\sa atomic_test_and_set()
 	\sa atomic_and()
@@ -687,7 +708,7 @@
 */
 
 
-/*!	\fn int32 atomic_and(vint32 *value, int32 andValue)
+/*!	\fn int32 atomic_and(int32* value, int32 andValue)
 	\brief Atomically perform a bitwise AND operation of \a andValue to the 
          variable \a andValue.
 
@@ -699,6 +720,7 @@
 	\return The original value of \c value.
 
 	\sa atomic_and64() for a version that works on \c long \c long.
+	\sa atomic_get_and_set()
 	\sa atomic_set()
 	\sa atomic_test_and_set()
 	\sa atomic_add()
@@ -709,7 +731,7 @@
 
 
 /*!
-	\fn int32 atomic_or(vint32 *value, int32 orValue)
+	\fn int32 atomic_or(int32* value, int32 orValue)
 	\brief Atomically perform a bitwise OR operation of \a orValue to the 
 		   variable \a andValue.
 
@@ -721,6 +743,7 @@
 	\return The original value of \c value.
 
 	\sa atomic_or64() for a version that works on \c long \c long.
+	\sa atomic_get_and_set()
 	\sa atomic_set()
 	\sa atomic_test_and_set()
 	\sa atomic_add()
@@ -730,17 +753,18 @@
 
 
 /*!
-	\fn int32 atomic_get(vint32 *value)
+	\fn int32 atomic_get(int32* value)
 	\brief Atomically return the value of \c value.
 
 	This is a thread-safe way of reading the contents of the \c value
 	operation. You should use these function when two or more threads might
 	access the variable simultaneously. You don't have to use a semaphore or a
-	mutex in this case. 
+	mutex in this case. The variable must be naturally aligned.
 
 	\return The original value of \c value.
 
 	\sa atomic_get64() for a version that works on \c long \c long.
+	\sa atomic_get_and_set()
 	\sa atomic_set()
 	\sa atomic_test_and_set()
 	\sa atomic_add()
@@ -750,17 +774,16 @@
 
 
 /*!
-	\fn int64 atomic_set64(vint64 *value, int64 newValue)
+	\fn void atomic_set64(int64* value, int64 newValue)
 	\brief Atomically set the variable \a value to \a newvalue.
 
 	This is a thread-safe way of performing the \c *value \c = \c newValue
 	operation. You should use these function when two or more threads might
 	access the variable simultaneously. You don't have to use a semaphore or a
-	mutex in this case. 
-
-	\return The original value of \c value.
+	mutex in this case. The variable must be naturally aligned.
 
 	\sa atomic_set() for a version that works on an \c int32.
+	\sa atomic_get_and_set64()
 	\sa atomic_test_and_set64()
 	\sa atomic_add64()
 	\sa atomic_and64()
@@ -770,7 +793,29 @@
 
 
 /*!
-	\fn int64 atomic_test_and_set64(vint64 *value, int64 newValue,
+	\fn int64 atomic_get_and_set64(int64* value, int64 newValue)
+	\brief Atomically set the variable \a value to \a newvalue and return
+		the old value.
+
+	This is a thread-safe way of performing the \c *value \c = \c newValue
+	operation. You should use these function when two or more threads might
+	access the variable simultaneously. You don't have to use a semaphore or a
+	mutex in this case. 
+
+	\return The original value of \c value.
+
+	\sa atomic_get_and_set() for a version that works on an \c int32.
+	\sa atomic_set64()
+	\sa atomic_test_and_set64()
+	\sa atomic_add64()
+	\sa atomic_and64()
+	\sa atomic_or64()
+	\sa atomic_get64()
+*/
+
+
+/*!
+	\fn int64 atomic_test_and_set64(int64* value, int64 newValue,
 		int64 testAgainst)
 	\brief Atomically set the variable \a value to \a newValue if the current
          value is \a testAgainst.
@@ -783,6 +828,7 @@
 	\return The original value of \c value.
 
 	\sa atomic_test_and_set() for a version that works on an \c int32.
+	\sa atomic_get_and_set64()
 	\sa atomic_set64()
 	\sa atomic_add64()
 	\sa atomic_and64()
@@ -792,7 +838,7 @@
 
 
 /*!
-	\fn int64 atomic_add64(vint64 *value, int64 addValue)
+	\fn int64 atomic_add64(int64* value, int64 addValue)
 	\brief Atomically add the value of \a addValue to \a value.
 
 	This is a thread-safe way of performing the \c *value \c += \c addValue
@@ -803,6 +849,7 @@
 	\return The original value of \c value.
 
 	\sa atomic_add() for a version that works on an \c int32.
+	\sa atomic_get_and_set64()
 	\sa atomic_set64()
 	\sa atomic_test_and_set64()
 	\sa atomic_and64()
@@ -812,7 +859,7 @@
 
 
 /*!
-	\fn int64 atomic_and64(vint64 *value, int64 andValue)
+	\fn int64 atomic_and64(int64* value, int64 andValue)
 	\brief Atomically perform a bitwise AND operation of \a andValue to the
 		   variable \a andValue.
 
@@ -824,6 +871,7 @@
 	\return The original value of \c value.
 
 	\sa atomic_and() for a version that works on an \c int32.
+	\sa atomic_get_and_set64()
 	\sa atomic_set64()
 	\sa atomic_test_and_set64()
 	\sa atomic_add64()
@@ -832,7 +880,7 @@
 */
 
 
-/*!	\fn int64 atomic_or64(vint64 *value, int64 orValue)
+/*!	\fn int64 atomic_or64(int64* value, int64 orValue)
 	\brief Atomically perform a bitwise OR operation of \a orValue to the
 		   variable \a andValue.
 
@@ -844,6 +892,7 @@
 	\return The original value of \c value.
 
 	\sa atomic_or() for a version that works on an \c int32.
+	\sa atomic_get_and_set64()
 	\sa atomic_set64()
 	\sa atomic_test_and_set64()
 	\sa atomic_add64()
@@ -853,17 +902,18 @@
 
 
 /*!
-	\fn int64 atomic_get64(vint64 *value)
+	\fn int64 atomic_get64(int64* value)
 	\brief Atomically return the value of \c value.
 
 	This is a thread-safe way of reading the contents of the \c value
 	operation. You should use these function when two or more threads might
 	access the variable simultaneously. You don't have to use a semaphore or a
-	mutex in this case. 
+	mutex in this case. The variable must be naturally aligned.
 
 	\return The original value of \c value.
 
 	\sa atomic_get() for a version that works on an \c int32.
+	\sa atomic_get_and_set64()
 	\sa atomic_set64()
 	\sa atomic_test_and_set64()
 	\sa atomic_add64()

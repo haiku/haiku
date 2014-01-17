@@ -10,86 +10,100 @@
 #include "fssh_atomic.h"
 
 
-int32_t
-fssh_atomic_set(vint32_t *value, int32_t newValue)
+void
+fssh_atomic_set(int32_t* value, int32_t newValue)
 {
-	return atomic_set((vint32*)value, newValue);
+	atomic_set((int32*)value, newValue);
 }
 
 
 int32_t
-fssh_atomic_test_and_set(vint32_t *value, int32_t newValue, int32_t testAgainst)
+fssh_atomic_get_and_set(int32_t* value, int32_t newValue)
 {
-	return atomic_test_and_set((vint32*)value, newValue, testAgainst);
+	return atomic_get_and_set((int32*)value, newValue);
 }
 
 
 int32_t
-fssh_atomic_add(vint32_t *value, int32_t addValue)
+fssh_atomic_test_and_set(int32_t *value, int32_t newValue, int32_t testAgainst)
 {
-	return atomic_add((vint32*)value, addValue);
+	return atomic_test_and_set((int32*)value, newValue, testAgainst);
 }
 
 
 int32_t
-fssh_atomic_and(vint32_t *value, int32_t andValue)
+fssh_atomic_add(int32_t *value, int32_t addValue)
 {
-	return atomic_and((vint32*)value, andValue);
+	return atomic_add((int32*)value, addValue);
 }
 
 
 int32_t
-fssh_atomic_or(vint32_t *value, int32_t orValue)	
+fssh_atomic_and(int32_t *value, int32_t andValue)
 {
-	return atomic_or((vint32*)value, orValue);
+	return atomic_and((int32*)value, andValue);
 }
 
 
 int32_t
-fssh_atomic_get(vint32_t *value)
+fssh_atomic_or(int32_t *value, int32_t orValue)	
 {
-	return atomic_get((vint32*)value);
+	return atomic_or((int32*)value, orValue);
+}
+
+
+int32_t
+fssh_atomic_get(int32_t *value)
+{
+	return atomic_get((int32*)value);
+}
+
+
+void
+fssh_atomic_set64(int64_t *value, int64_t newValue)
+{
+	atomic_set64((int64*)value, newValue);
 }
 
 
 int64_t
-fssh_atomic_set64(vint64_t *value, int64_t newValue)
+fssh_atomic_get_and_set64(int64_t* value, int64_t newValue)
 {
-	return atomic_set64((vint64*)value, newValue);
+	return atomic_get_and_set64((int64*)value, newValue);
 }
 
 
 int64_t
-fssh_atomic_test_and_set64(vint64_t *value, int64_t newValue, int64_t testAgainst)
+fssh_atomic_test_and_set64(int64_t *value, int64_t newValue, int64_t testAgainst)
 {
-	return atomic_test_and_set64((vint64 *)value, newValue, testAgainst);
+	return atomic_test_and_set64((int64 *)value, newValue, testAgainst);
 }
 
 
 int64_t
-fssh_atomic_add64(vint64_t *value, int64_t addValue)
+fssh_atomic_add64(int64_t *value, int64_t addValue)
 {
-	return atomic_add64((vint64*)value, addValue);
+	return atomic_add64((int64*)value, addValue);
 }
 
 
 int64_t
-fssh_atomic_and64(vint64_t *value, int64_t andValue)
+fssh_atomic_and64(int64_t *value, int64_t andValue)
 {
-	return atomic_and64((vint64*)value, andValue);
+	return atomic_and64((int64*)value, andValue);
 }
 
 
 int64_t
-fssh_atomic_or64(vint64_t *value, int64_t orValue)	
+fssh_atomic_or64(int64_t *value, int64_t orValue)	
 {
-	return atomic_or64((vint64*)value, orValue);
+	return atomic_or64((int64*)value, orValue);
 }
 
 
 int64_t
-fssh_atomic_get64(vint64_t *value)
+fssh_atomic_get64(int64_t *value)
 {
-	return atomic_get64((vint64*)value);
+	return atomic_get64((int64*)value);
 }
 

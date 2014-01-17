@@ -32,7 +32,7 @@ private:
 			void		BuildPulse();
 };
 
-extern bool LastEnabledCPU(int cpu);
+extern bool LastEnabledCPU(unsigned int cpu);
 extern int GetMinimumViewWidth();
 extern bool LoadInDeskbar();
 extern void Usage();

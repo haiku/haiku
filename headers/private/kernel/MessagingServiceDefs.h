@@ -17,7 +17,7 @@ enum {
 };
 
 struct messaging_area_header {
-	vint32	lock_counter;
+	int32	lock_counter;
 	int32	size;				// set to 0, when area is discarded
 	area_id	kernel_area;
 	area_id	next_kernel_area;

@@ -30,7 +30,7 @@ public:
 			void				GetUnchecked();
 
 private:
-			vint32				fUseCount;
+			int32				fUseCount;
 			BWeakReferenceable*	fObject;
 };
 

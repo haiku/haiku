@@ -205,10 +205,10 @@ IOCache::OperationCompleted(IOOperation* operation, status_t status,
 {
 	if (status == B_OK) {
 		// always fail in case of partial transfers
-		((Operation*)operation)->finishedCondition.NotifyAll(false,
+		((Operation*)operation)->finishedCondition.NotifyAll(
 			transferredBytes == operation->Length() ? B_OK : B_ERROR);
 	} else
-		((Operation*)operation)->finishedCondition.NotifyAll(false, status);
+		((Operation*)operation)->finishedCondition.NotifyAll(status);
 }
 
 
@@ -498,7 +498,7 @@ IOCache::_DoOperation(Operation& operation)
 
 		status_t error = fIOCallback(fIOCallbackData, &operation);
 		if (error != B_OK) {
-			operation.finishedCondition.NotifyAll(false, error);
+			operation.finishedCondition.NotifyAll(error);
 				// removes the entry from the variable
 			return error;
 		}

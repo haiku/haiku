@@ -20,9 +20,12 @@
 int
 uname(struct utsname *info)
 {
+	cpu_topology_node_info root;
 	system_info systemInfo;
 	const char *platform;
 	const char *haikuRevision;
+	uint32_t count = 1;
+	status_t error;
 
 	if (!info) {
 		__set_errno(B_BAD_VALUE);
@@ -44,24 +47,20 @@ uname(struct utsname *info)
 	snprintf(info->release, sizeof(info->release), "%" B_PRId64,
 		systemInfo.kernel_version);
 
-	// TODO: make this better
-	switch (systemInfo.platform_type) {
-		case B_BEBOX_PLATFORM:
-			platform = "BeBox";
-			break;
-		case B_MAC_PLATFORM:
-			platform = "BeMac";
-			break;
-		case B_AT_CLONE_PLATFORM:
-			platform = "BePC";
-			break;
-		case B_64_BIT_PC_PLATFORM:
-			platform = "x86_64";
-			break;
-		default:
-			platform = "unknown";
-			break;
+	error = get_cpu_topology_info(&root, &count);
+	if (error != B_OK || count < 1)
+		platform = "unknown";
+	else {
+		switch (root.data.root.platform) {
+			case B_CPU_x86:
+				platform = "BePC";
+				break;
+			case B_CPU_x86_64:
+				platform = "x86_64";
+				break;
+		}
 	}
+
 	strlcpy(info->machine, platform, sizeof(info->machine));
 
 	if (gethostname(info->nodename, sizeof(info->nodename)) != 0)

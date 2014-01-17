@@ -20,6 +20,7 @@ public:
 						~SystemInfo();
 
 			uint64		CachedMemory() const;
+			uint64		BlockCacheMemory() const;
 			uint64		UsedMemory() const;
 			uint64		MaxMemory() const;
 
@@ -42,6 +43,8 @@ public:
 
 			bigtime_t	Time() const { return fTime; }
 			uint32		CPUCount() const { return fSystemInfo.cpu_count; }
+			bigtime_t	CPUActiveTime(uint32 cpu) const
+							{ return fCPUInfos[cpu].active_time; }
 			const system_info& Info() const { return fSystemInfo; }
 
 			uint64		NetworkReceived();
@@ -61,7 +64,7 @@ private:
 			void		_RetrieveNetwork();
 
 	system_info			fSystemInfo;
-	system_memory_info	fMemoryInfo;
+	cpu_info*			fCPUInfos;
 	bigtime_t			fTime;
 	bool				fRetrievedNetwork;
 	uint64				fBytesReceived;

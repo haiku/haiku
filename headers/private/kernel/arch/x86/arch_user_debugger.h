@@ -9,12 +9,7 @@
 #define ARCH_INIT_USER_DEBUG x86_init_user_debug
 
 // number of breakpoints the CPU supports
-// On 32-bit, DR3 is used to hold the Thread*.
-#ifdef __x86_64__
-#	define X86_BREAKPOINT_COUNT		4
-#else
-#	define X86_BREAKPOINT_COUNT		3
-#endif
+#define X86_BREAKPOINT_COUNT		4
 
 // debug status register DR6
 enum {

@@ -14,11 +14,13 @@
 
 #include <heap.h>
 
+#include <smp.h>
+
 
 struct X86PagingStructures : DeferredDeletable {
 	phys_addr_t					pgdir_phys;
-	vint32						ref_count;
-	vint32						active_on_cpus;
+	int32						ref_count;
+	CPUSet						active_on_cpus;
 		// mask indicating on which CPUs the map is currently used
 
 								X86PagingStructures();

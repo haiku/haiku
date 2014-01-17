@@ -264,7 +264,7 @@ HIDDevice::MaybeScheduleTransfer()
 	if (fRemoved)
 		return B_ERROR;
 
-	if (atomic_set(&fTransferScheduled, 1) != 0) {
+	if (atomic_get_and_set(&fTransferScheduled, 1) != 0) {
 		// someone else already caused a transfer to be scheduled
 		return B_OK;
 	}

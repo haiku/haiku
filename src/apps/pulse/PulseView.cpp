@@ -26,8 +26,14 @@
 #define B_TRANSLATION_CONTEXT "PulseView"
 
 
-PulseView::PulseView(BRect rect, const char *name) :
-	BView(rect, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS) {
+PulseView::PulseView(BRect rect, const char *name)
+	:
+	BView(rect, name, B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS),
+	kCPUCount(sysconf(_SC_NPROCESSORS_CONF)),
+	cpu_times(new double[kCPUCount]),
+	prev_active(new bigtime_t[kCPUCount])
+{
 
 	popupmenu = NULL;
 	cpu_menu_items = NULL;
@@ -40,7 +46,13 @@ PulseView::PulseView(BRect rect, const char *name) :
 }
 
 // This version will be used by the instantiated replicant
-PulseView::PulseView(BMessage *message) : BView(message) {
+PulseView::PulseView(BMessage *message)
+	:
+	BView(message),
+	kCPUCount(sysconf(_SC_NPROCESSORS_CONF)),
+	cpu_times(new double[kCPUCount]),
+	prev_active(new bigtime_t[kCPUCount])
+{
 	SetResizingMode(B_FOLLOW_ALL_SIDES);
 	SetFlags(B_WILL_DRAW | B_PULSE_NEEDED);
 
@@ -50,6 +62,9 @@ PulseView::PulseView(BMessage *message) : BView(message) {
 }
 
 void PulseView::Init() {
+	memset(cpu_times, 0, sizeof(double) * kCPUCount);
+	memset(prev_active, 0, sizeof(double) * kCPUCount);
+
 	popupmenu = new BPopUpMenu("PopUpMenu", false, false, B_ITEMS_IN_COLUMN);
 	popupmenu->SetFont(be_plain_font);
 	mode1 = new BMenuItem("", NULL, 0, 0);
@@ -70,7 +85,7 @@ void PulseView::Init() {
 	if (sys_info.cpu_count >= 2) {
 		cpu_menu_items = new BMenuItem *[sys_info.cpu_count];
 		char temp[20];
-		for (int x = 0; x < sys_info.cpu_count; x++) {
+		for (unsigned int x = 0; x < sys_info.cpu_count; x++) {
 			sprintf(temp, "CPU %d", x + 1);
 			BMessage *message = new BMessage(PV_CPU_MENU_ITEM);
 			message->AddInt32("which", x);
@@ -103,10 +118,14 @@ void PulseView::Update() {
 	get_system_info(&sys_info);
 	bigtime_t now = system_time();
 
+	cpu_info* cpuInfos = new cpu_info[sys_info.cpu_count];
+	get_cpu_info(0, sys_info.cpu_count, cpuInfos);
+
 	// Calculate work done since last call to Update() for each CPU
-	for (int x = 0; x < sys_info.cpu_count; x++) {
-		double cpu_time = (double)(sys_info.cpu_infos[x].active_time - prev_active[x]) / (now - prev_time);
-		prev_active[x] = sys_info.cpu_infos[x].active_time;
+	for (unsigned int x = 0; x < sys_info.cpu_count; x++) {
+		double cpu_time = (double)(cpuInfos[x].active_time - prev_active[x])
+				/ (now - prev_time);
+		prev_active[x] = cpuInfos[x].active_time;
 		if (cpu_time < 0) cpu_time = 0;
 		if (cpu_time > 1) cpu_time = 1;
 		cpu_times[x] = cpu_time;
@@ -119,6 +138,8 @@ void PulseView::Update() {
 		}
 	}
 	prev_time = now;
+
+	delete[] cpuInfos;
 }
 
 void PulseView::ChangeCPUState(BMessage *message) {
@@ -138,5 +159,8 @@ void PulseView::ChangeCPUState(BMessage *message) {
 PulseView::~PulseView() {
 	if (popupmenu != NULL) delete popupmenu;
 	if (cpu_menu_items != NULL) delete cpu_menu_items;
+
+	delete[] prev_active;
+	delete[] cpu_times;
 }
 

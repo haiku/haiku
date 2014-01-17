@@ -75,9 +75,8 @@ void DeskbarPulseView::AttachedToWindow() {
 	system_info sys_info;
 	get_system_info(&sys_info);
 	if (sys_info.cpu_count >= 2) {
-		for (int x = 0; x < sys_info.cpu_count; x++) {
+		for (unsigned int x = 0; x < sys_info.cpu_count; x++)
 			cpu_menu_items[x]->SetTarget(messenger);
-		}
 	}
 
 	// Use a BMessageRunner to deliver periodic messsages instead

@@ -196,7 +196,8 @@ pic_init()
 		&pic_configure_io_interrupt,
 		&pic_is_spurious_interrupt,
 		&pic_is_level_triggered_interrupt,
-		&pic_end_of_interrupt
+		&pic_end_of_interrupt,
+		NULL
 	};
 
 	// Start initialization sequence for the master and slave PICs
@@ -231,7 +232,7 @@ pic_init()
 
 	TRACE(("PIC level trigger mode: 0x%08lx\n", sLevelTriggeredInterrupts));
 
-	reserve_io_interrupt_vectors(16, 0);
+	reserve_io_interrupt_vectors(16, 0, INTERRUPT_TYPE_EXCEPTION);
 
 	// make the pic controller the current one
 	arch_int_set_interrupt_controller(picController);

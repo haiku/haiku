@@ -65,7 +65,7 @@ struct hda_multi;
 */
 struct hda_controller {
 	struct pci_info	pci_info;
-	vint32			opened;
+	int32			opened;
 	const char*		devfs_path;
 
 	area_id			regs_area;

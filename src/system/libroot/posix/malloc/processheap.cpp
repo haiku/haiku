@@ -35,25 +35,44 @@
 using namespace BPrivate;
 
 
-processHeap::processHeap(void)
-	: _buffer(NULL), _bufferCount(0)
+processHeap::processHeap()
+	:
+	theap((HEAPTYPE*)hoardSbrk(sizeof(HEAPTYPE) * fMaxThreadHeaps)),
 #if HEAP_FRAG_STATS
-	, _currentAllocated(0),
+	_currentAllocated(0),
 	_currentRequested(0),
-	_maxAllocated(0), _inUseAtMaxAllocated(0), _maxRequested(0)
+	_maxAllocated(0),
+	_inUseAtMaxAllocated(0),
+	_maxRequested(0),
 #endif
+#if HEAP_LOG
+	_log((Log<MemoryRequest>*)
+		hoardSbrk(sizeof(Log<MemoryRequest>) * (fMaxThreadHeaps + 1))),
+#endif
+	_buffer(NULL),
+	_bufferCount(0)
 {
+	if (theap == NULL)
+		return;
+	new(theap) HEAPTYPE[fMaxThreadHeaps];
+
+#if HEAP_LOG
+	if (_log == NULL)
+		return;
+	new(_log) Log<MemoryRequest>[fMaxThreadHeaps + 1];
+#endif
+
 	int i;
 	// The process heap is heap 0.
 	setIndex(0);
-	for (i = 0; i < MAX_HEAPS; i++) {
+	for (i = 0; i < fMaxThreadHeaps; i++) {
 		// Set every thread's process heap to this one.
 		theap[i].setpHeap(this);
 		// Set every thread heap's index.
 		theap[i].setIndex(i + 1);
 	}
 #if HEAP_LOG
-	for (i = 0; i < MAX_HEAPS + 1; i++) {
+	for (i = 0; i < fMaxThreadHeaps + 1; i++) {
 		char fname[255];
 		sprintf(fname, "log%d", i);
 		unlink(fname);
@@ -74,7 +93,7 @@ processHeap::stats(void)
 #if HEAP_STATS
 	int umax = 0;
 	int amax = 0;
-	for (int j = 0; j < MAX_HEAPS; j++) {
+	for (int j = 0; j < fMaxThreadHeaps; j++) {
 		for (int i = 0; i < SIZE_CLASSES; i++) {
 			amax += theap[j].maxAllocated(i) * sizeFromClass(i);
 			umax += theap[j].maxInUse(i) * sizeFromClass(i);
@@ -98,7 +117,7 @@ processHeap::stats(void)
 #if HEAP_LOG
 	printf("closing logs.\n");
 	fflush(stdout);
-	for (int i = 0; i < MAX_HEAPS + 1; i++) {
+	for (int i = 0; i < fMaxThreadHeaps + 1; i++) {
 		_log[i].close();
 	}
 #endif

@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2004-2010, Haiku, Inc.
+ * Copyright (c) 2004-2013, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Stefano Ceccherini
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Paweł Dziepak, pdziepak@quarnos.org
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 
@@ -15,6 +16,8 @@
 #include <arch/system_info.h>
 
 #include <string.h>
+
+#include <algorithm>
 
 #include <OS.h>
 #include <KernelExport.h>
@@ -50,10 +53,12 @@ dump_info(int argc, char **argv)
 		__VERSION__);
 	kprintf("revision: %s\n\n", get_haiku_revision());
 
-	kprintf("cpu count: %" B_PRId32 ", active times:\n", smp_get_num_cpus());
+	kprintf("cpu count: %" B_PRId32 "\n", smp_get_num_cpus());
 
 	for (int32 i = 0; i < smp_get_num_cpus(); i++)
-		kprintf("  [%" B_PRId32 "] %" B_PRId64 "\n", i + 1, gCPU[i].active_time);
+		kprintf("  [%" B_PRId32 "] active time: %10" B_PRId64 ", interrupt"
+			" time: %10" B_PRId64 ", irq time: %10" B_PRId64 "\n", i + 1,
+			gCPU[i].active_time, gCPU[i].interrupt_time, gCPU[i].irq_time);
 
 	// ToDo: Add page_faults
 	kprintf("pages:\t\t%" B_PRIuPHYSADDR " (%" B_PRIuPHYSADDR " max)\n",
@@ -405,21 +410,15 @@ SystemNotificationService::Listener::OwnerDeleted(AssociatedDataOwner* owner)
 
 
 status_t
-_get_system_info(system_info *info, size_t size)
+get_system_info(system_info* info)
 {
-	if (size != sizeof(system_info))
-		return B_BAD_VALUE;
-
 	memset(info, 0, sizeof(system_info));
 
 	info->boot_time = rtc_boot_time();
 	info->cpu_count = smp_get_num_cpus();
 
-	for (int32 i = 0; i < info->cpu_count; i++)
-		info->cpu_infos[i].active_time = cpu_get_active_time(i);
-
 	vm_page_get_stats(info);
-	// TODO: Add page_faults
+	vm_get_info(info);
 
 	info->used_threads = thread_used_threads();
 	info->max_threads = thread_max_threads();
@@ -436,9 +435,29 @@ _get_system_info(system_info *info, size_t size)
 	strlcpy(info->kernel_build_time, __TIME__, B_OS_NAME_LENGTH);
 	info->abi = B_HAIKU_ABI;
 
-	// all other stuff is architecture specific
-	return arch_get_system_info(info, size);
+	return B_OK;
 }
+
+
+status_t
+get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* info)
+{
+	if (firstCPU >= (uint32)smp_get_num_cpus())
+		return B_BAD_VALUE;
+	if (cpuCount == 0)
+		return B_OK;
+
+	uint32 count = std::min(cpuCount, smp_get_num_cpus() - firstCPU);
+
+	memset(info, 0, sizeof(cpu_info) * count);
+	for (uint32 i = 0; i < count; i++) {
+		info[i].active_time = cpu_get_active_time(firstCPU + i);
+		info[i].enabled = !gCPU[firstCPU + i].disabled;
+	}
+
+	return B_OK;
+}
+
 
 
 status_t
@@ -469,15 +488,13 @@ system_notifications_init()
 
 
 status_t
-_user_get_system_info(system_info *userInfo, size_t size)
+_user_get_system_info(system_info* userInfo)
 {
-	// The BeBook says get_system_info() always returns B_OK,
-	// but that ain't true with invalid addresses
 	if (userInfo == NULL || !IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
 
 	system_info info;
-	status_t status = _get_system_info(&info, size);
+	status_t status = get_system_info(&info);
 	if (status == B_OK) {
 		if (user_memcpy(userInfo, &info, sizeof(system_info)) < B_OK)
 			return B_BAD_ADDRESS;
@@ -490,28 +507,119 @@ _user_get_system_info(system_info *userInfo, size_t size)
 
 
 status_t
-_user_get_system_info_etc(int32 id, void* userInfo, size_t size)
+_user_get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* userInfo)
 {
 	if (userInfo == NULL || !IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
+	if (firstCPU >= (uint32)smp_get_num_cpus())
+		return B_BAD_VALUE;
+	if (cpuCount == 0)
+		return B_OK;
 
-	switch (id) {
-		case B_MEMORY_INFO:
-		{
-			if (size < sizeof(system_memory_info))
-				return B_BAD_VALUE;
+	uint32 count = std::min(cpuCount, smp_get_num_cpus() - firstCPU);
 
-			system_memory_info info;
-			vm_get_info(&info);
+	cpu_info* cpuInfos = new(std::nothrow) cpu_info[count];
+	if (cpuInfos == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<cpu_info> _(cpuInfos);
 
-			info.block_cache_memory = block_cache_used_memory();
+	status_t error = get_cpu_info(firstCPU, count, cpuInfos);
+	if (error != B_OK)
+		return error;
 
-			return user_memcpy(userInfo, &info, sizeof(system_memory_info));
-		}
+	return user_memcpy(userInfo, cpuInfos, sizeof(cpu_info) * count);
+}
 
-		default:
-			return B_BAD_VALUE;
+
+static void
+count_topology_nodes(const cpu_topology_node* node, uint32& count)
+{
+	count++;
+	for (int32 i = 0; i < node->children_count; i++)
+		count_topology_nodes(node->children[i], count);
+}
+
+
+static int32
+get_logical_processor(const cpu_topology_node* node)
+{
+	while (node->level != CPU_TOPOLOGY_SMT) {
+		ASSERT(node->children_count > 0);
+		node = node->children[0];
 	}
+
+	return node->id;
+}
+
+
+static cpu_topology_node_info*
+generate_topology_array(cpu_topology_node_info* topology,
+	const cpu_topology_node* node, uint32& count)
+{
+	if (count == 0)
+		return topology;
+
+	static const topology_level_type mapTopologyLevels[] = { B_TOPOLOGY_SMT,
+		B_TOPOLOGY_CORE, B_TOPOLOGY_PACKAGE, B_TOPOLOGY_ROOT };
+
+	STATIC_ASSERT(sizeof(mapTopologyLevels) / sizeof(topology_level_type)
+		== CPU_TOPOLOGY_LEVELS + 1);
+
+	topology->id = node->id;
+	topology->level = node->level;
+	topology->type = mapTopologyLevels[node->level];
+
+	arch_fill_topology_node(topology, get_logical_processor(node));
+
+	count--;
+	topology++;
+	for (int32 i = 0; i < node->children_count && count > 0; i++)
+		topology = generate_topology_array(topology, node->children[i], count);
+	return topology;
+}
+
+
+status_t
+_user_get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
+	uint32* topologyInfoCount)
+{
+	if (topologyInfoCount == NULL || !IS_USER_ADDRESS(topologyInfoCount))
+		return B_BAD_ADDRESS;
+	
+	const cpu_topology_node* node = get_cpu_topology();
+
+	uint32 count = 0;
+	count_topology_nodes(node, count);
+
+	if (topologyInfos == NULL)
+		return user_memcpy(topologyInfoCount, &count, sizeof(uint32));
+	else if (!IS_USER_ADDRESS(topologyInfoCount))
+		return B_BAD_ADDRESS;
+
+	uint32 userCount;
+	status_t error = user_memcpy(&userCount, topologyInfoCount, sizeof(uint32));
+	if (error != B_OK)
+		return error;
+	if (userCount == 0)
+		return B_OK;
+	count = std::min(count, userCount);
+
+	cpu_topology_node_info* topology
+		= new(std::nothrow) cpu_topology_node_info[count];
+	if (topology == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<cpu_topology_node_info> _(topology);
+	memset(topology, 0, sizeof(cpu_topology_node_info) * count);
+
+	uint32 nodesLeft = count;
+	generate_topology_array(topology, node, nodesLeft);
+	ASSERT(nodesLeft == 0);
+
+	error = user_memcpy(topologyInfos, topology,
+		sizeof(cpu_topology_node_info) * count);
+	if (error != B_OK)
+		return error;
+	return user_memcpy(topologyInfoCount, &count, sizeof(uint32));
 }
 
 

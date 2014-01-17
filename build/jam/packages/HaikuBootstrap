@@ -51,6 +51,8 @@ AddFilesToPackage add-ons kernel generic
 AddFilesToPackage add-ons kernel partitioning_systems
 	: amiga_rdb apple efi_gpt intel session ;
 AddFilesToPackage add-ons kernel interrupt_controllers : openpic@ppc ;
+AddFilesToPackage add-ons kernel power cpufreq : intel_pstates@x86,x86_64 ;
+AddFilesToPackage add-ons kernel power cpuidle : intel_cstates@x86,x86_64 ;
 
 if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 	AddFilesToPackage add-ons kernel cpu : generic_x86 ;
@@ -59,7 +61,6 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 # drivers
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ;
-AddNewDriversToPackage power		: enhanced_speedstep@x86 ;
 AddNewDriversToPackage power		: acpi_battery@x86 ;
 #AddNewDriversToPackage display		: display_controls@x86 ;
 

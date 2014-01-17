@@ -158,7 +158,7 @@ DPCQueue::Close(bool cancelPending)
 
 
 status_t
-DPCQueue::Add(DPCCallback* callback, bool schedulerLocked)
+DPCQueue::Add(DPCCallback* callback)
 {
 	// queue the callback, if the queue isn't closed already
 	InterruptsSpinLocker locker(fLock);
@@ -174,14 +174,14 @@ DPCQueue::Add(DPCCallback* callback, bool schedulerLocked)
 
 	// notify the condition variable, if necessary
 	if (wasEmpty)
-		fPendingCallbacksCondition.NotifyAll(schedulerLocked);
+		fPendingCallbacksCondition.NotifyAll();
 
 	return B_OK;
 }
 
 
 status_t
-DPCQueue::Add(void (*function)(void*), void* argument, bool schedulerLocked)
+DPCQueue::Add(void (*function)(void*), void* argument)
 {
 	if (function == NULL)
 		return B_BAD_VALUE;
@@ -201,7 +201,7 @@ DPCQueue::Add(void (*function)(void*), void* argument, bool schedulerLocked)
 	functionCallback->SetTo(function, argument);
 
 	// add it
-	status_t error = Add(functionCallback, schedulerLocked);
+	status_t error = Add(functionCallback);
 	if (error != B_OK)
 		Recycle(functionCallback);
 

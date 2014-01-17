@@ -66,40 +66,44 @@ main(int argc, char** argv)
 				break;
 		}
 	}
-	system_memory_info info;
-	status_t status = __get_system_info_etc(B_MEMORY_INFO, &info,
-		sizeof(system_memory_info));
+	system_info info;
+	status_t status = get_system_info(&info);
 	if (status != B_OK) {
 		fprintf(stderr, "%s: cannot get system info: %s\n", kProgramName,
 			strerror(status));
 		return 1;
 	}
 
-	printf("max memory:\t\t%Lu\n", info.max_memory);
+	printf("max memory:\t\t%Lu\n", info.max_pages * B_PAGE_SIZE);
 	printf("free memory:\t\t%Lu\n", info.free_memory);
 	printf("needed memory:\t\t%Lu\n", info.needed_memory);
-	printf("block cache memory:\t%Lu\n", info.block_cache_memory);
-	printf("max swap space:\t\t%Lu\n", info.max_swap_space);
-	printf("free swap space:\t%Lu\n", info.free_swap_space);
+	printf("block cache memory:\t%Lu\n", info.block_cache_pages * B_PAGE_SIZE);
+	printf("max swap space:\t\t%Lu\n", info.max_swap_pages * B_PAGE_SIZE);
+	printf("free swap space:\t%Lu\n", info.free_swap_pages * B_PAGE_SIZE);
 	printf("page faults:\t\t%lu\n", info.page_faults);
 
 	if (periodically) {
 		puts("\npage faults  used memory    used swap  block cache");
-		system_memory_info lastInfo = info;
+		system_info lastInfo = info;
 
 		while (true) {
 			snooze(rate);
 
-			__get_system_info_etc(B_MEMORY_INFO, &info,
-				sizeof(system_memory_info));
+			get_system_info(&info);
 
-			printf("%11ld  %11Ld  %11Ld  %11Ld\n",
-				(int32)info.page_faults - lastInfo.page_faults,
-				(info.max_memory - info.free_memory)
-					- (lastInfo.max_memory - lastInfo.free_memory),
-				(info.max_swap_space - info.free_swap_space)
-					- (lastInfo.max_swap_space - lastInfo.free_swap_space),
-				info.block_cache_memory - lastInfo.block_cache_memory);
+			int32 pageFaults = info.page_faults - lastInfo.page_faults;
+			int64 usedMemory
+				= (info.max_pages * B_PAGE_SIZE - info.free_memory)
+					- (lastInfo.max_pages * B_PAGE_SIZE - lastInfo.free_memory);
+			int64 usedSwap
+				= ((info.max_swap_pages - info.free_swap_pages)
+						- (lastInfo.max_swap_pages - lastInfo.free_swap_pages))
+					* B_PAGE_SIZE;
+			int64 blockCache
+				= (info.block_cache_pages - lastInfo.block_cache_pages)
+					* B_PAGE_SIZE;
+			printf("%11" B_PRId32 "  %11" B_PRId64 "  %11" B_PRId64 "  %11"
+				B_PRId64 "\n", pageFaults, usedMemory, usedSwap, blockCache);
 
 			lastInfo = info;
 		}

@@ -100,6 +100,8 @@ private:
 			friend struct PhysicalPageSlotPool;
 
 private:
+	inline	int32				_GetInitialPoolCount();
+
 			bool				_EarlyQuery(addr_t virtualAddress,
 									phys_addr_t* _physicalAddress);
 			pae_page_table_entry* _EarlyGetPageTable(phys_addr_t address);
@@ -158,7 +160,7 @@ X86PagingMethodPAE::PageDirEntryForAddress(
 X86PagingMethodPAE::SetPageTableEntry(pae_page_table_entry* entry,
 	pae_page_table_entry newEntry)
 {
-	return atomic_set64((int64*)entry, newEntry);
+	return atomic_get_and_set64((int64*)entry, newEntry);
 }
 
 

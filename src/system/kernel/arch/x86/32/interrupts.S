@@ -159,7 +159,7 @@
 																		\
 	/* restore pointers and clear fault handler */						\
 	movl	%edx, %esi;				/* syscall info pointer */			\
-	movl	%dr3, %edi;				/* thread pointer */				\
+	movl	%gs:0, %edi;			/* thread pointer */				\
 	movl	$0, THREAD_fault_handler(%edi)
 
 #if SYSCALL_TRACING
@@ -223,7 +223,7 @@ FUNCTION(double_fault):
 	pushl	$-1;	// user-ss
 	pushl	$-1;	// user-esp
 	pushl	$-1;	// flags
-	pushl	$KERNEL_CODE_SEG;	// cs
+	pushl	$KERNEL_CODE_SELECTOR	// cs
 	pushl	$-1;	// eip
 	pushl	$0;		// error-code
 	pushl	$8;
@@ -509,6 +509,9 @@ FUNCTION_END(trap14_double_fault)
 STATIC_FUNCTION(int_bottom):
 	PUSH_IFRAME_BOTTOM(IFRAME_TYPE_OTHER)
 
+	movl	$KERNEL_TLS_SELECTOR, %edx
+	movw	%dx, %gs
+
 	movl	%esp, %ebp		// frame pointer is the iframe
 
 	// Set the RF (resume flag) in EFLAGS. This prevents an instruction
@@ -516,7 +519,7 @@ STATIC_FUNCTION(int_bottom):
 	// exception.
 	orl		$0x10000, IFRAME_flags(%ebp);
 
-	cmp		$USER_CODE_SEG, IFRAME_cs(%ebp)	// user mode
+	cmpw	$USER_CODE_SELECTOR, IFRAME_cs(%ebp)	// user mode
 	je		int_bottom_user
 
 	// We need to recheck user mode using the thread's in_kernel flag, since
@@ -524,7 +527,7 @@ STATIC_FUNCTION(int_bottom):
 	// so that we have to do it in the instruction before, thus opening a
 	// window for an interrupt while still being in the kernel, but having set
 	// up everything for userland already.
-	movl	%dr3, %edi						// thread pointer
+	movl	%gs:0, %edi						// thread pointer
 	cmpb	$0, THREAD_in_kernel(%edi)
 	je		int_bottom_user
 
@@ -540,13 +543,13 @@ FUNCTION_END(int_bottom)
 
 
 STATIC_FUNCTION(int_bottom_user):
-	movl	$KERNEL_DATA_SEG,%eax
+	movl	$KERNEL_DATA_SELECTOR, %eax
 	cld
 	movl	%eax,%ds
 	movl	%eax,%es
 
 	// disable breakpoints, if installed
-	movl	%dr3, %edi				// thread pointer
+	movl	%gs:0, %edi				// thread pointer
 	cli								// disable interrupts
 	STOP_USER_DEBUGGING()
 
@@ -564,7 +567,7 @@ STATIC_FUNCTION(int_bottom_user):
 	// were already/still prepared for userland), since the iframe in this case
 	// will be a kernel iframe and e.g. trying to set up a signal stack will not
 	// be a very healthy endeavor.
-	cmp		$USER_CODE_SEG, IFRAME_cs(%ebp)
+	cmpw	$USER_CODE_SELECTOR, IFRAME_cs(%ebp)
 	jne		1f
 
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
@@ -600,17 +603,20 @@ FUNCTION_END(trap99)
 
 
 STATIC_FUNCTION(handle_syscall):
+	movl	$KERNEL_TLS_SELECTOR, %edx
+	movw	%dx, %gs
+
 	// save %eax, the number of the syscall
 	movl	%eax, %esi
 
-	movl	$KERNEL_DATA_SEG,%eax
+	movl	$KERNEL_DATA_SELECTOR, %eax
 	cld
 	movl	%eax,%ds
 	movl	%eax,%es
 
 	lea		4(%esp), %ebp			// skipping the return address, the stack
 									// frame pointer is the iframe
-	movl	%dr3, %edi				// thread pointer
+	movl	%gs:0, %edi				// thread pointer
 
 	// disable breakpoints, if installed
 	cli								// disable interrupts
@@ -745,7 +751,7 @@ FUNCTION_END(handle_syscall)
 
   STATIC_FUNCTION(bad_syscall_params):
 	// clear the fault handler and exit normally
-	movl	%dr3, %edi
+	movl	%gs:0, %edi
 	movl	$0, THREAD_fault_handler(%edi)
 	jmp		kernel_exit_work
   FUNCTION_END(bad_syscall_params)
@@ -756,14 +762,18 @@ FUNCTION_END(handle_syscall)
 */
 FUNCTION(x86_sysenter):
 	// get the thread
-	movl	%dr3, %edx
+	push	%gs
+	movl	$KERNEL_TLS_SELECTOR, %edx
+	movw	%dx, %gs
+	movl	%gs:0, %edx
+	pop		%gs
 
 	// push the iframe
-	pushl	$USER_DATA_SEG			// user_ss
+	pushl	$USER_DATA_SELECTOR		// user_ss
 	pushl	%ecx					// user_esp
 	pushfl							// eflags
 	orl		$(1 << 9), (%esp)		// set the IF (interrupts) bit
-	pushl	$USER_CODE_SEG			// user cs
+	pushl	$USER_CODE_SELECTOR		// user cs
 
 	// user_eip
 	movl	THREAD_team(%edx), %edx
@@ -816,7 +826,7 @@ FUNCTION(x86_return_to_userland):
 	movl	%ebp, %esp
 
 	// check, if any kernel exit work has to be done
-	movl	%dr3, %edi
+	movl	%gs:0, %edi
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
 			, THREAD_flags(%edi)

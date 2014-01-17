@@ -60,19 +60,20 @@ class ProcessController : public BView {
 		void			Init();
 		void			_HandleDebugRequest(team_id team, thread_id thread);
 
+		const int32		kCPUCount;
 		bool			fTemp;
 		float			fMemoryUsage;
-		float			fLastBarHeight[B_MAX_CPU_COUNT];
+		float*			fLastBarHeight;
 		float			fLastMemoryHeight;
-		double			fCPUTimes[B_MAX_CPU_COUNT];
-		bigtime_t		fPrevActive[B_MAX_CPU_COUNT];
+		double*			fCPUTimes;
+		bigtime_t*		fPrevActive;
 		bigtime_t		fPrevTime;
 		BMessageRunner*	fMessageRunner;
 		rgb_color		frame_color, active_color, idle_color, memory_color, swap_color;
 };
 
 extern	ProcessController*	gPCView;
-extern	int32				gCPUcount;
+extern	uint32				gCPUcount;
 extern	rgb_color			gIdleColor;
 extern	rgb_color			gIdleColorSelected;
 extern	rgb_color			gKernelColor;

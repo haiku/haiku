@@ -44,7 +44,7 @@ class MemoryBarMenu : public BMenu {
 
 	private:
 		team_id*		fTeamList;
-		int				fTeamCount;
+		unsigned int	fTeamCount;
 		MRecycleItem*	fRecycleList;
 		int				fRecycleCount;
 		bigtime_t		fLastTotalTime;

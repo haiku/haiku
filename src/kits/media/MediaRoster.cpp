@@ -3126,25 +3126,10 @@ BMediaRoster::AudioBufferSizeFor(int32 channelCount, uint32 sampleFormat,
 	bigtime_t bufferDuration;
 	ssize_t bufferSize;
 
-	system_info info;
-	get_system_info(&info);
-
-	if (info.cpu_clock_speed > 2000000000)	// 2 GHz
-		bufferDuration = 2500;
-	else if (info.cpu_clock_speed > 1000000000)
-		bufferDuration = 5000;
-	else if (info.cpu_clock_speed > 600000000)
-		bufferDuration = 10000;
-	else if (info.cpu_clock_speed > 200000000)
-		bufferDuration = 20000;
-	else if (info.cpu_clock_speed > 100000000)
-		bufferDuration = 30000;
-	else
-		bufferDuration = 50000;
-
-	if ((busKind == B_ISA_BUS || busKind == B_PCMCIA_BUS)
-		&& bufferDuration < 25000)
+	if (busKind == B_ISA_BUS || busKind == B_PCMCIA_BUS)
 		bufferDuration = 25000;
+	else
+		bufferDuration = 10000;
 
 	bufferSize = (sampleFormat & 0xf) * channelCount
 		* (ssize_t)((frameRate * bufferDuration) / 1000000.0);

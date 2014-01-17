@@ -40,8 +40,8 @@ typedef struct {
 	uint32	apic_phys;
 	FixedWidthPointer<void> apic;
 	uint32	ioapic_phys;
-	uint32	cpu_apic_id[MAX_BOOT_CPUS];
-	uint32	cpu_apic_version[MAX_BOOT_CPUS];
+	uint32	cpu_apic_id[SMP_MAX_CPUS];
+	uint32	cpu_apic_version[SMP_MAX_CPUS];
 	// hpet stuff
 	uint32	hpet_phys;
 	FixedWidthPointer<void> hpet;

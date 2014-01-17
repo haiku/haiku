@@ -208,9 +208,9 @@ generic_mtrr_compute_physical_mask(void)
 	uint32 bits = 36;
 
 	cpuid_info cpuInfo;
-	if (get_current_cpuid(&cpuInfo, 0x80000000) == B_OK
+	if (get_current_cpuid(&cpuInfo, 0x80000000, 0) == B_OK
 		&& (cpuInfo.eax_0.max_eax & 0xff) >= 8) {
-		get_current_cpuid(&cpuInfo, 0x80000008);
+		get_current_cpuid(&cpuInfo, 0x80000008, 0);
 		bits = cpuInfo.regs.eax & 0xff;
 
 		// Obviously, the bits are not always reported correctly

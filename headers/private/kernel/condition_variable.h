@@ -56,19 +56,13 @@ public:
 
 			void				Publish(const void* object,
 									const char* objectType);
-			void				Unpublish(bool schedulerLocked = false);
+			void				Unpublish();
 
-	inline	void				NotifyOne(bool schedulerLocked = false,
-									status_t result = B_OK);
-	inline	void				NotifyAll(bool schedulerLocked = false,
-									status_t result = B_OK);
+	inline	void				NotifyOne(status_t result = B_OK);
+	inline	void				NotifyAll(status_t result = B_OK);
 
-	static	void				NotifyOne(const void* object,
-									bool schedulerLocked = false,
-									status_t result = B_OK);
-	static	void				NotifyAll(const void* object,
-									bool schedulerLocked = false,
-									status_t result = B_OK);
+	static	void				NotifyOne(const void* object, status_t result);
+	static	void				NotifyAll(const void* object, status_t result);
 									// (both methods) caller must ensure that
 									// the variable is not unpublished
 									// concurrently
@@ -86,8 +80,7 @@ public:
 			void				Dump() const;
 
 private:
-			void				_Notify(bool all, bool schedulerLocked,
-									status_t result);
+			void				_Notify(bool all, status_t result);
 			void				_NotifyLocked(bool all, status_t result);
 
 protected:
@@ -124,16 +117,16 @@ ConditionVariableEntry::~ConditionVariableEntry()
 
 
 inline void
-ConditionVariable::NotifyOne(bool schedulerLocked, status_t result)
+ConditionVariable::NotifyOne(status_t result)
 {
-	_Notify(false, schedulerLocked, result);
+	_Notify(false, result);
 }
 
 
 inline void
-ConditionVariable::NotifyAll(bool schedulerLocked, status_t result)
+ConditionVariable::NotifyAll(status_t result)
 {
-	_Notify(true, schedulerLocked, result);
+	_Notify(true, result);
 }
 
 

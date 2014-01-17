@@ -64,7 +64,7 @@ MiniPulseView::MiniPulseView(BMessage *message)
 void MiniPulseView::Draw(BRect rect) {
 	system_info sys_info;
 	get_system_info(&sys_info);
-	if (sys_info.cpu_count > B_MAX_CPU_COUNT || sys_info.cpu_count <= 0)
+	if (sys_info.cpu_count <= 0)
 		return;
 	
 	BRect bounds(Bounds());
@@ -76,7 +76,7 @@ void MiniPulseView::Draw(BRect rect) {
 	float bar_width = (bounds.Width()) / sys_info.cpu_count - 2;
 	float right = bar_width + left;
 	
-	for (int x = 0; x < sys_info.cpu_count; x++) {
+	for (unsigned int x = 0; x < sys_info.cpu_count; x++) {
 		int bar_height = (int)(cpu_times[x] * (h + 1));
 		if (bar_height > h) bar_height = h;
 		double rem = cpu_times[x] * (h + 1) - bar_height;
@@ -131,9 +131,8 @@ void MiniPulseView::AttachedToWindow() {
 	system_info sys_info;
 	get_system_info(&sys_info);
 	if (sys_info.cpu_count >= 2) {
-		for (int x = 0; x < sys_info.cpu_count; x++) {
+		for (unsigned int x = 0; x < sys_info.cpu_count; x++)
 			cpu_menu_items[x]->SetTarget(messenger);
-		}
 	}
 }
 

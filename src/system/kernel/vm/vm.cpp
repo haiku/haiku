@@ -4782,16 +4782,13 @@ vm_put_physical_page_debug(addr_t vaddr, void* handle)
 
 
 void
-vm_get_info(system_memory_info* info)
+vm_get_info(system_info* info)
 {
 	swap_get_info(info);
 
-	info->max_memory = vm_page_num_pages() * B_PAGE_SIZE;
-	info->page_faults = sPageFaults;
-
 	MutexLocker locker(sAvailableMemoryLock);
-	info->free_memory = sAvailableMemory;
 	info->needed_memory = sNeededMemory;
+	info->free_memory = sAvailableMemory;
 }
 
 

@@ -5,11 +5,19 @@
 
 #include <arch/x86/apic.h>
 #include <arch/x86/msi.h>
+#include <arch/x86/arch_smp.h>
 
 #include <debug.h>
 #include <int.h>
 #include <lock.h>
 
+
+struct MSIConfiguration {
+	uint64*	fAddress;
+	uint16* fData;
+};
+
+static MSIConfiguration sMSIConfigurations[NUM_IO_VECTORS];
 
 static bool sMSISupported = false;
 static uint32 sBootCPUAPICId = 0;
@@ -44,7 +52,8 @@ msi_allocate_vectors(uint8 count, uint8 *startVector, uint64 *address,
 		return B_UNSUPPORTED;
 
 	long vector;
-	status_t result = allocate_io_interrupt_vectors(count, &vector);
+	status_t result = allocate_io_interrupt_vectors(count, &vector,
+		INTERRUPT_TYPE_IRQ);
 	if (result != B_OK)
 		return result;
 
@@ -52,6 +61,10 @@ msi_allocate_vectors(uint8 count, uint8 *startVector, uint64 *address,
 		free_io_interrupt_vectors(count, vector);
 		return B_NO_MEMORY;
 	}
+
+	sMSIConfigurations[vector].fAddress = address;
+	sMSIConfigurations[vector].fData = data;
+	x86_set_irq_source(vector, IRQ_SOURCE_MSI);
 
 	*startVector = (uint8)vector;
 	*address = MSI_ADDRESS_BASE | (sBootCPUAPICId << MSI_DESTINATION_ID_SHIFT)
@@ -78,3 +91,15 @@ msi_free_vectors(uint8 count, uint8 startVector)
 
 	free_io_interrupt_vectors(count, startVector);
 }
+
+
+void
+msi_assign_interrupt_to_cpu(uint8 irq, int32 cpu)
+{
+	uint32 apic_id = x86_get_cpu_apic_id(cpu);
+
+	uint64* address = sMSIConfigurations[irq].fAddress;
+	*address = MSI_ADDRESS_BASE | (apic_id << MSI_DESTINATION_ID_SHIFT)
+		| MSI_NO_REDIRECTION | MSI_DESTINATION_MODE_PHYSICAL;
+}
+

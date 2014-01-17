@@ -18,6 +18,12 @@
 #include <user_mutex_defs.h>
 
 
+#define MAX_UNSUCCESSFUL_SPINS	100
+
+
+extern int32 __gCPUCount;
+
+
 // #pragma mark - mutex
 
 
@@ -36,6 +42,9 @@ mutex_init_etc(mutex *lock, const char *name, uint32 flags)
 	lock->name = (flags & MUTEX_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
 	lock->lock = 0;
 	lock->flags = flags;
+
+	if (__gCPUCount < 2)
+		lock->flags &= ~uint32(MUTEX_FLAG_ADAPTIVE);
 }
 
 
@@ -50,15 +59,22 @@ mutex_destroy(mutex *lock)
 status_t
 mutex_lock(mutex *lock)
 {
-	// set the locked flag
-	int32 oldValue = atomic_or(&lock->lock, B_USER_MUTEX_LOCKED);
+	uint32 count = 0;
+	const uint32 kMaxCount
+		= (lock->flags & MUTEX_FLAG_ADAPTIVE) != 0 ? MAX_UNSUCCESSFUL_SPINS : 1;
 
-	if ((oldValue & (B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING)) == 0
-			|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
-		// No one has the lock or is waiting for it, or the mutex has been
-		// disabled.
-		return B_OK;
-	}
+	int32 oldValue;
+	do {
+		// set the locked flag
+		oldValue = atomic_or(&lock->lock, B_USER_MUTEX_LOCKED);
+
+		if ((oldValue & (B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING)) == 0
+				|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
+			// No one has the lock or is waiting for it, or the mutex has been
+			// disabled.
+			return B_OK;
+		}
+	} while (count++ < kMaxCount && (oldValue & B_USER_MUTEX_WAITING) != 0);
 
 	// we have to call the kernel
 	status_t error;

@@ -106,7 +106,7 @@ pthread_key_delete(pthread_key_t key)
 	if (key < 0 || key >= PTHREAD_KEYS_MAX)
 		return EINVAL;
 
-	int32 sequence = atomic_set(&sKeyTable[key].sequence,
+	int32 sequence = atomic_get_and_set(&sKeyTable[key].sequence,
 		PTHREAD_UNUSED_SEQUENCE);
 	if (sequence == PTHREAD_UNUSED_SEQUENCE)
 		return EINVAL;

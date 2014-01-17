@@ -9,7 +9,10 @@
 #ifndef _KERNEL_LOCK_H
 #define _KERNEL_LOCK_H
 
+
 #include <OS.h>
+
+#include <arch/atomic.h>
 #include <debug.h>
 
 
@@ -18,6 +21,7 @@ struct mutex_waiter;
 typedef struct mutex {
 	const char*				name;
 	struct mutex_waiter*	waiters;
+	spinlock				lock;
 #if KDEBUG
 	thread_id				holder;
 #else
@@ -44,8 +48,9 @@ struct rw_lock_waiter;
 typedef struct rw_lock {
 	const char*				name;
 	struct rw_lock_waiter*	waiters;
+	spinlock				lock;
 	thread_id				holder;
-	vint32					count;
+	int32					count;
 	int32					owner_count;
 	int16					active_readers;
 								// Only > 0 while a writer is waiting: number
@@ -88,14 +93,17 @@ typedef struct rw_lock {
 
 // static initializers
 #if KDEBUG
-#	define MUTEX_INITIALIZER(name)			{ name, NULL, -1, 0 }
+#	define MUTEX_INITIALIZER(name) \
+	{ name, NULL, B_SPINLOCK_INITIALIZER, -1, 0 }
 #	define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), 0 }
 #else
-#	define MUTEX_INITIALIZER(name)			{ name, NULL, 0, 0, 0 }
+#	define MUTEX_INITIALIZER(name) \
+	{ name, NULL, B_SPINLOCK_INITIALIZER, 0, 0, 0 }
 #	define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), -1, 0 }
 #endif
 
-#define RW_LOCK_INITIALIZER(name)			{ name, NULL, -1, 0, 0, 0 }
+#define RW_LOCK_INITIALIZER(name) \
+	{ name, NULL, B_SPINLOCK_INITIALIZER, -1, 0, 0, 0 }
 
 
 #if KDEBUG
@@ -144,11 +152,11 @@ extern status_t mutex_switch_from_read_lock(rw_lock* from, mutex* to);
 extern status_t _rw_lock_read_lock(rw_lock* lock);
 extern status_t _rw_lock_read_lock_with_timeout(rw_lock* lock,
 	uint32 timeoutFlags, bigtime_t timeout);
-extern void _rw_lock_read_unlock(rw_lock* lock, bool schedulerLocked);
-extern void _rw_lock_write_unlock(rw_lock* lock, bool schedulerLocked);
+extern void _rw_lock_read_unlock(rw_lock* lock);
+extern void _rw_lock_write_unlock(rw_lock* lock);
 
-extern status_t _mutex_lock(mutex* lock, bool schedulerLocked);
-extern void _mutex_unlock(mutex* lock, bool schedulerLocked);
+extern status_t _mutex_lock(mutex* lock, void* locker);
+extern void _mutex_unlock(mutex* lock);
 extern status_t _mutex_trylock(mutex* lock);
 extern status_t _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags,
 	bigtime_t timeout);
@@ -191,7 +199,7 @@ rw_lock_read_unlock(rw_lock* lock)
 #else
 	int32 oldCount = atomic_add(&lock->count, -1);
 	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
-		_rw_lock_read_unlock(lock, false);
+		_rw_lock_read_unlock(lock);
 #endif
 }
 
@@ -199,7 +207,7 @@ rw_lock_read_unlock(rw_lock* lock)
 static inline void
 rw_lock_write_unlock(rw_lock* lock)
 {
-	_rw_lock_write_unlock(lock, false);
+	_rw_lock_write_unlock(lock);
 }
 
 
@@ -207,23 +215,10 @@ static inline status_t
 mutex_lock(mutex* lock)
 {
 #if KDEBUG
-	return _mutex_lock(lock, false);
+	return _mutex_lock(lock, NULL);
 #else
 	if (atomic_add(&lock->count, -1) < 0)
-		return _mutex_lock(lock, false);
-	return B_OK;
-#endif
-}
-
-
-static inline status_t
-mutex_lock_threads_locked(mutex* lock)
-{
-#if KDEBUG
-	return _mutex_lock(lock, true);
-#else
-	if (atomic_add(&lock->count, -1) < 0)
-		return _mutex_lock(lock, true);
+		return _mutex_lock(lock, NULL);
 	return B_OK;
 #endif
 }
@@ -261,7 +256,7 @@ mutex_unlock(mutex* lock)
 #if !KDEBUG
 	if (atomic_add(&lock->count, 1) < -1)
 #endif
-		_mutex_unlock(lock, false);
+		_mutex_unlock(lock);
 }
 
 

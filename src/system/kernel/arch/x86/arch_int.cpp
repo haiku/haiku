@@ -24,6 +24,7 @@
 
 #include <arch/x86/apic.h>
 #include <arch/x86/descriptors.h>
+#include <arch/x86/msi.h>
 #include <arch/x86/msi_priv.h>
 
 #include <stdio.h>
@@ -40,6 +41,8 @@
 #	define TRACE(x) ;
 #endif
 
+
+static irq_source sVectorSources[NUM_IO_VECTORS];
 
 static const char *kInterruptNames[] = {
 	/*  0 */ "Divide Error Exception",
@@ -231,8 +234,8 @@ x86_hardware_interrupt(struct iframe* frame)
 
 	cpu_status state = disable_interrupts();
 	if (thread->cpu->invoke_scheduler) {
-		SpinLocker schedulerLocker(gSchedulerLock);
-		scheduler_reschedule();
+		SpinLocker schedulerLocker(thread->scheduler_lock);
+		scheduler_reschedule(B_THREAD_READY);
 		schedulerLocker.Unlock();
 		restore_interrupts(state);
 	} else if (thread->post_interrupt_callback != NULL) {
@@ -331,6 +334,13 @@ x86_page_fault_exception(struct iframe* frame)
 }
 
 
+void
+x86_set_irq_source(int irq, irq_source source)
+{
+	sVectorSources[irq] = source;
+}
+
+
 // #pragma mark -
 
 
@@ -386,6 +396,25 @@ bool
 arch_int_are_interrupts_enabled(void)
 {
 	return arch_int_are_interrupts_enabled_inline();
+}
+
+
+void
+arch_int_assign_to_cpu(int32 irq, int32 cpu)
+{
+	switch (sVectorSources[irq]) {
+		case IRQ_SOURCE_IOAPIC:
+			if (sCurrentPIC->assign_interrupt_to_cpu != NULL)
+				sCurrentPIC->assign_interrupt_to_cpu(irq, cpu);
+			break;
+
+		case IRQ_SOURCE_MSI:
+			msi_assign_interrupt_to_cpu(irq, cpu);
+			break;
+
+		default:
+			break;
+	}
 }
 
 

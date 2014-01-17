@@ -476,11 +476,12 @@ SettingsWindow::_Update()
 void
 SettingsWindow::_UpdateSwapInfo()
 {
-	system_memory_info memInfo = {};
-	__get_system_info_etc(B_MEMORY_INFO, &memInfo, sizeof(memInfo));
+	system_info info;
+	get_system_info(&info);
 
-	off_t currentSwapSize = memInfo.max_swap_space;
-	off_t currentSwapUsed = (memInfo.max_swap_space - memInfo.free_swap_space);
+	off_t currentSwapSize = info.max_swap_pages * B_PAGE_SIZE;
+	off_t currentSwapUsed
+		= (info.max_swap_pages - info.free_swap_pages) * B_PAGE_SIZE;
 
 	char sizeStr[16];
 	BString swapSizeStr = string_for_size(currentSwapSize, sizeStr,

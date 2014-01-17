@@ -615,9 +615,40 @@ AboutView::AboutView()
 		strlcpy(processorLabel, B_TRANSLATE("Processor:"),
 			sizeof(processorLabel));
 
+	uint32 topologyNodeCount = 0;
+	cpu_topology_node_info* topology = NULL;
+	get_cpu_topology_info(NULL, &topologyNodeCount);
+	if (topologyNodeCount != 0)
+		topology = new cpu_topology_node_info[topologyNodeCount];
+	get_cpu_topology_info(topology, &topologyNodeCount);
+
+	enum cpu_platform platform = B_CPU_UNKNOWN;
+	enum cpu_vendor cpuVendor = B_CPU_VENDOR_UNKNOWN;
+	uint32 cpuModel = 0;
+	for (uint32 i = 0; i < topologyNodeCount; i++) {
+		switch (topology[i].type) {
+			case B_TOPOLOGY_ROOT:
+				platform = topology[i].data.root.platform;
+				break;
+
+			case B_TOPOLOGY_PACKAGE:
+				cpuVendor = topology[i].data.package.vendor;
+				break;
+
+			case B_TOPOLOGY_CORE:
+				cpuModel = topology[i].data.core.model;
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	delete[] topology;
+
 	BString cpuType;
-	cpuType << get_cpu_vendor_string(systemInfo.cpu_type)
-		<< " " << get_cpu_model_string(&systemInfo);
+	cpuType << get_cpu_vendor_string(cpuVendor)
+		<< " " << get_cpu_model_string(platform, cpuVendor, cpuModel);
 
 	BStringView* cpuView = new BStringView("cputext", cpuType.String());
 	cpuView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,

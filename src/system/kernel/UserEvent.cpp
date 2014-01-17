@@ -27,32 +27,30 @@ struct SignalEvent::EventSignal : Signal {
 		pid_t sendingProcess)
 		:
 		Signal(number, signalCode, errorCode, sendingProcess),
-		fInUse(false)
+		fInUse(0)
 	{
 	}
 
-	bool IsInUse() const
+	bool MarkUsed()
 	{
-		return fInUse;
+		return atomic_get_and_set(&fInUse, 1) != 0;
 	}
 
-	void SetInUse(bool inUse)
+	void SetUnused()
 	{
-		fInUse = inUse;
+		// mark not-in-use
+		atomic_set(&fInUse, 0);
 	}
 
 	virtual void Handled()
 	{
-		// mark not-in-use
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-		fInUse = false;
-		schedulerLocker.Unlock();
+		SetUnused();
 
 		Signal::Handled();
 	}
 
 private:
-	bool				fInUse;
+	int32				fInUse;
 };
 
 
@@ -111,20 +109,21 @@ TeamSignalEvent::Create(Team* team, uint32 signalNumber, int32 signalCode,
 status_t
 TeamSignalEvent::Fire()
 {
-	// called with the scheduler lock held
-	if (fSignal->IsInUse())
+	if (fSignal->MarkUsed())
 		return B_BUSY;
 
 	fSignal->AcquireReference();
 		// one reference is transferred to send_signal_to_team_locked
+
+	InterruptsSpinLocker locker(fTeam->signal_lock);
 	status_t error = send_signal_to_team_locked(fTeam, fSignal->Number(),
 		fSignal, B_DO_NOT_RESCHEDULE);
-	if (error == B_OK) {
-		// Mark the signal in-use. There are situations (for certain signals),
-		// in which send_signal_to_team_locked() succeeds without queuing the
-		// signal.
-		fSignal->SetInUse(fSignal->IsPending());
-	}
+	locker.Unlock();
+
+	// There are situations (for certain signals), in which
+	// send_signal_to_team_locked() succeeds without queuing the signal.
+	if (error != B_OK || !fSignal->IsPending())
+		fSignal->SetUnused();
 
 	return error;
 }
@@ -165,20 +164,22 @@ ThreadSignalEvent::Create(Thread* thread, uint32 signalNumber, int32 signalCode,
 status_t
 ThreadSignalEvent::Fire()
 {
-	// called with the scheduler lock held
-	if (fSignal->IsInUse())
+	if (fSignal->MarkUsed())
 		return B_BUSY;
 
 	fSignal->AcquireReference();
 		// one reference is transferred to send_signal_to_team_locked
+	InterruptsReadSpinLocker teamLocker(fThread->team_lock);
+	SpinLocker locker(fThread->team->signal_lock);
 	status_t error = send_signal_to_thread_locked(fThread, fSignal->Number(),
 		fSignal, B_DO_NOT_RESCHEDULE);
-	if (error == B_OK) {
-		// Mark the signal in-use. There are situations (for certain signals),
-		// in which send_signal_to_team_locked() succeeds without queuing the
-		// signal.
-		fSignal->SetInUse(fSignal->IsPending());
-	}
+	locker.Unlock();
+	teamLocker.Unlock();
+
+	// There are situations (for certain signals), in which
+	// send_signal_to_team_locked() succeeds without queuing the signal.
+	if (error != B_OK || !fSignal->IsPending())
+		fSignal->SetUnused();
 
 	return error;
 }
@@ -190,7 +191,7 @@ ThreadSignalEvent::Fire()
 CreateThreadEvent::CreateThreadEvent(const ThreadCreationAttributes& attributes)
 	:
 	fCreationAttributes(attributes),
-	fPendingDPC(false)
+	fPendingDPC(0)
 {
 	// attributes.name is a pointer to a temporary buffer. Copy the name into
 	// our own buffer and replace the name pointer.
@@ -216,12 +217,11 @@ CreateThreadEvent::Create(const ThreadCreationAttributes& attributes)
 status_t
 CreateThreadEvent::Fire()
 {
-	if (fPendingDPC)
+	bool wasPending = atomic_get_and_set(&fPendingDPC, 1) != 0;
+	if (wasPending)
 		return B_BUSY;
 
-	fPendingDPC = true;
-
-	DPCQueue::DefaultQueue(B_NORMAL_PRIORITY)->Add(this, true);
+	DPCQueue::DefaultQueue(B_NORMAL_PRIORITY)->Add(this);
 
 	return B_OK;
 }
@@ -231,10 +231,7 @@ void
 CreateThreadEvent::DoDPC(DPCQueue* queue)
 {
 	// We're no longer queued in the DPC queue, so we can be reused.
-	{
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-		fPendingDPC = false;
-	}
+	atomic_set(&fPendingDPC, 0);
 
 	// create the thread
 	thread_id threadID = thread_create_thread(fCreationAttributes, false);

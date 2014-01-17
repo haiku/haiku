@@ -1383,8 +1383,7 @@ VMCache::_NotifyPageEvents(vm_page* page, uint32 events)
 		if (waiter->page == page && (waiter->events & events) != 0) {
 			// remove from list and unblock
 			*it = waiter->next;
-			InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-			thread_unblock_locked(waiter->thread, B_OK);
+			thread_unblock(waiter->thread, B_OK);
 		} else
 			it = &waiter->next;
 	}

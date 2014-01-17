@@ -89,7 +89,7 @@ class PrintServerApp : public BApplication, public FolderListener {
 		BBitmap *fSelectedIconMini;
 		BBitmap *fSelectedIconLarge;
 #endif
-		vint32 fReferences;
+		int32 fReferences;
 		sem_id fHasReferences;
 		Settings *fSettings;
 		bool fUseConfigWindow;

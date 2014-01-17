@@ -113,7 +113,7 @@ private:
 private:
 			bool				fStarted;
 			area_id				fArea;
-	volatile BPrivate::media::TimeSourceTransmit* fBuf;
+			BPrivate::media::TimeSourceTransmit* fBuf;
 			BPrivate::media::SlaveNodes* fSlaveNodes;
 
 			area_id				_reserved_area;

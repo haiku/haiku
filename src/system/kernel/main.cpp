@@ -76,6 +76,15 @@ static uint32 sCpuRendezvous3;
 static int32 main2(void *);
 
 
+static void
+non_boot_cpu_init(void* args, int currentCPU)
+{
+	kernel_args* kernelArgs = (kernel_args*)args;
+	if (currentCPU != 0)
+		cpu_init_percpu(kernelArgs, currentCPU);
+}
+
+
 extern "C" int
 _start(kernel_args *bootKernelArgs, int currentCPU)
 {
@@ -92,13 +101,13 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 	smp_set_num_cpus(bootKernelArgs->num_cpus);
 
 	// wait for all the cpus to get here
-	smp_cpu_rendezvous(&sCpuRendezvous, currentCPU);
+	smp_cpu_rendezvous(&sCpuRendezvous);
 
 	// the passed in kernel args are in a non-allocated range of memory
 	if (currentCPU == 0)
 		memcpy(&sKernelArgs, bootKernelArgs, sizeof(kernel_args));
 
-	smp_cpu_rendezvous(&sCpuRendezvous2, currentCPU);
+	smp_cpu_rendezvous(&sCpuRendezvous2);
 
 	// do any pre-booting cpu config
 	cpu_preboot_init_percpu(&sKernelArgs, currentCPU);
@@ -150,11 +159,14 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		int_init_post_vm(&sKernelArgs);
 		cpu_init_post_vm(&sKernelArgs);
 		commpage_init();
+		call_all_cpus_sync(non_boot_cpu_init, &sKernelArgs);
+
 		TRACE("init system info\n");
 		system_info_init(&sKernelArgs);
 
 		TRACE("init SMP\n");
 		smp_init(&sKernelArgs);
+		cpu_build_topology_tree();
 		TRACE("init timer\n");
 		timer_init(&sKernelArgs);
 		TRACE("init real time clock\n");
@@ -210,13 +222,13 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("waking up AP cpus\n");
 		sCpuRendezvous = sCpuRendezvous2 = 0;
 		smp_wake_up_non_boot_cpus();
-		smp_cpu_rendezvous(&sCpuRendezvous, 0); // wait until they're booted
+		smp_cpu_rendezvous(&sCpuRendezvous); // wait until they're booted
 
 		// exit the kernel startup phase (mutexes, etc work from now on out)
 		TRACE("exiting kernel startup\n");
 		gKernelStartup = false;
 
-		smp_cpu_rendezvous(&sCpuRendezvous2, 0);
+		smp_cpu_rendezvous(&sCpuRendezvous2);
 			// release the AP cpus to go enter the scheduler
 
 		TRACE("starting scheduler on cpu 0 and enabling interrupts\n");
@@ -230,12 +242,11 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		arch_cpu_global_TLB_invalidate();
 
 		// this is run for each non boot processor after they've been set loose
-		cpu_init_percpu(&sKernelArgs, currentCPU);
 		smp_per_cpu_init(&sKernelArgs, currentCPU);
 
 		// wait for all other AP cpus to get to this point
-		smp_cpu_rendezvous(&sCpuRendezvous, currentCPU);
-		smp_cpu_rendezvous(&sCpuRendezvous2, currentCPU);
+		smp_cpu_rendezvous(&sCpuRendezvous);
+		smp_cpu_rendezvous(&sCpuRendezvous2);
 
 		// welcome to the machine
 		scheduler_start();
@@ -252,7 +263,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 #endif
 
 	for (;;)
-		arch_cpu_idle();
+		cpu_idle();
 
 	return 0;
 }

@@ -48,12 +48,6 @@
 // a little longer, thus avoiding re-mapping.
 #define SLOTS_PER_TRANSLATION_MAP		4
 
-#define USER_SLOTS_PER_CPU				16
-#define KERNEL_SLOTS_PER_CPU			16
-#define TOTAL_SLOTS_PER_CPU				(USER_SLOTS_PER_CPU \
-											+ KERNEL_SLOTS_PER_CPU + 1)
-	// one slot is for use in interrupts
-
 
 using X86LargePhysicalPageMapper::PhysicalPageSlot;
 using X86LargePhysicalPageMapper::PhysicalPageSlotPool;
@@ -111,7 +105,7 @@ private:
 			struct page_slot {
 				PhysicalPageSlot*	slot;
 				phys_addr_t			physicalAddress;
-				cpu_mask_t			valid;
+				CPUSet				valid;
 			};
 
 			page_slot			fSlots[SLOTS_PER_TRANSLATION_MAP];
@@ -125,9 +119,10 @@ public:
 								LargeMemoryPhysicalPageMapper();
 
 			status_t			Init(kernel_args* args,
-									 PhysicalPageSlotPool* initialPool,
-									 TranslationMapPhysicalPageMapper*&
-									 	_kernelPageMapper);
+									PhysicalPageSlotPool* initialPools,
+									int32 initalPoolCount, size_t poolSize,
+									TranslationMapPhysicalPageMapper*&
+										_kernelPageMapper);
 
 	virtual	status_t			CreateTranslationMapPhysicalPageMapper(
 									TranslationMapPhysicalPageMapper** _mapper);
@@ -173,7 +168,7 @@ private:
 			PhysicalPageSlot* fDebugSlot;
 			PhysicalPageSlotPool* fInitialPool;
 			LargeMemoryTranslationMapPhysicalPageMapper	fKernelMapper;
-			PhysicalPageOpsCPUData fPerCPUData[B_MAX_CPU_COUNT];
+			PhysicalPageOpsCPUData fPerCPUData[SMP_MAX_CPUS];
 };
 
 static LargeMemoryPhysicalPageMapper sPhysicalPageMapper;
@@ -394,10 +389,10 @@ LargeMemoryTranslationMapPhysicalPageMapper::GetPageTableAt(
 		page_slot& slot = fSlots[i];
 		if (slot.physicalAddress == physicalAddress) {
 			fNextSlot = (i + 1) & (fSlotCount - 1);
-			if ((slot.valid & (1 << currentCPU)) == 0) {
+			if (!slot.valid.GetBit(currentCPU)) {
 				// not valid on this CPU -- invalidate the TLB entry
 				invalidate_TLB(slot.slot->address);
-				slot.valid |= 1 << currentCPU;
+				slot.valid.SetBit(currentCPU);
 			}
 			return (void*)slot.slot->address;
 		}
@@ -409,7 +404,8 @@ LargeMemoryTranslationMapPhysicalPageMapper::GetPageTableAt(
 
 	slot.physicalAddress = physicalAddress;
 	slot.slot->Map(physicalAddress);
-	slot.valid = 1 << currentCPU;
+	slot.valid.ClearAll();
+	slot.valid.SetBit(currentCPU);
 
 	return (void*)slot.slot->address;
 }
@@ -428,11 +424,16 @@ LargeMemoryPhysicalPageMapper::LargeMemoryPhysicalPageMapper()
 
 status_t
 LargeMemoryPhysicalPageMapper::Init(kernel_args* args,
-	PhysicalPageSlotPool* initialPool,
+	PhysicalPageSlotPool* initialPools, int32 initialPoolCount, size_t poolSize,
 	TranslationMapPhysicalPageMapper*& _kernelPageMapper)
 {
-	fInitialPool = initialPool;
-	fNonEmptyPools.Add(fInitialPool);
+	ASSERT(initialPoolCount >= 1);
+
+	fInitialPool = initialPools;
+	for (int32 i = 0; i < initialPoolCount; i++) {
+		uint8* pointer = (uint8*)initialPools + i * poolSize;
+		fNonEmptyPools.Add((PhysicalPageSlotPool*)pointer);
+	}
 
 	// get the debug slot
 	GetSlot(true, fDebugSlot);
@@ -755,12 +756,14 @@ LargeMemoryPhysicalPageMapper::GetSlotQueue(int32 cpu, bool user)
 
 status_t
 large_memory_physical_page_ops_init(kernel_args* args,
-	X86LargePhysicalPageMapper::PhysicalPageSlotPool* initialPool,
+	X86LargePhysicalPageMapper::PhysicalPageSlotPool* initialPools,
+	int32 initialPoolCount, size_t poolSize,
 	X86PhysicalPageMapper*& _pageMapper,
 	TranslationMapPhysicalPageMapper*& _kernelPageMapper)
 {
 	new(&sPhysicalPageMapper) LargeMemoryPhysicalPageMapper;
-	sPhysicalPageMapper.Init(args, initialPool, _kernelPageMapper);
+	sPhysicalPageMapper.Init(args, initialPools, initialPoolCount, poolSize,
+		_kernelPageMapper);
 
 	_pageMapper = &sPhysicalPageMapper;
 	return B_OK;

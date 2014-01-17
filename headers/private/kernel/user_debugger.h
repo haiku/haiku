@@ -68,7 +68,7 @@ struct team_debug_info {
 	thread_id	causing_thread;
 		// thread that caused the debugger to be attached; -1 for manual
 		// debugger attachment (or no debugger installed)
-	vint32		image_event;
+	int32		image_event;
 		// counter incremented whenever an image is created/deleted
 
 	struct ConditionVariable* debugger_changed_condition;

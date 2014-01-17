@@ -199,8 +199,8 @@ private:
 			bool				fWaitObjectNotificationsRequested;
 			Thread* volatile	fWaitingProfilerThread;
 			bool				fProfilingActive;
-			bool				fReentered[B_MAX_CPU_COUNT];
-			CPUProfileData		fCPUData[B_MAX_CPU_COUNT];
+			bool				fReentered[SMP_MAX_CPUS];
+			CPUProfileData		fCPUData[SMP_MAX_CPUS];
 			WaitObject*			fWaitObjectBuffer;
 			int32				fWaitObjectCount;
 			WaitObjectList		fUsedWaitObjects;
@@ -220,6 +220,7 @@ SystemProfiler::_MaybeNotifyProfilerThreadLocked()
 		int cpu = smp_get_current_cpu();
 		fReentered[cpu] = true;
 
+		InterruptsSpinLocker _(fWaitingProfilerThread->scheduler_lock);
 		thread_unblock_locked(fWaitingProfilerThread, B_OK);
 
 		fWaitingProfilerThread = NULL;
@@ -234,7 +235,6 @@ SystemProfiler::_MaybeNotifyProfilerThread()
 	if (fWaitingProfilerThread == NULL)
 		return;
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 	SpinLocker locker(fLock);
 
 	_MaybeNotifyProfilerThreadLocked();
@@ -298,18 +298,15 @@ SystemProfiler::~SystemProfiler()
 	// inactive.
 	InterruptsSpinLocker locker(fLock);
 	if (fWaitingProfilerThread != NULL) {
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-		thread_unblock_locked(fWaitingProfilerThread, B_OK);
+		thread_unblock(fWaitingProfilerThread, B_OK);
 		fWaitingProfilerThread = NULL;
 	}
 	fProfilingActive = false;
 	locker.Unlock();
 
 	// stop scheduler listening
-	if (fSchedulerNotificationsRequested) {
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
+	if (fSchedulerNotificationsRequested)
 		scheduler_remove_listener(this);
-	}
 
 	// stop wait object listening
 	if (fWaitObjectNotificationsRequested) {
@@ -499,8 +496,6 @@ SystemProfiler::Init()
 		fThreadNotificationsEnabled = true;
 	}
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 	fProfilingActive = true;
 
 	// start scheduler and wait object listening
@@ -521,8 +516,6 @@ SystemProfiler::Init()
 				ThreadScheduled(thread, thread);
 		}
 	}
-
-	schedulerLocker.Unlock();
 
 	// I/O scheduling
 	if ((fFlags & B_SYSTEM_PROFILER_IO_SCHEDULING_EVENTS) != 0) {
@@ -572,12 +565,9 @@ SystemProfiler::NextBuffer(size_t bytesRead, uint64* _droppedEvents)
 		Thread* thread = thread_get_current_thread();
 		fWaitingProfilerThread = thread;
 
-		InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
 			THREAD_BLOCK_TYPE_OTHER, "system profiler buffer");
 
-		schedulerLocker.Unlock();
 		locker.Unlock();
 
 		status_t error = thread_block_with_timeout(B_RELATIVE_TIMEOUT, 1000000);

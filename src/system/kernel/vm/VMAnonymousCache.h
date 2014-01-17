@@ -99,7 +99,7 @@ private:
 #endif	// ENABLE_SWAP_SUPPORT
 
 
-extern "C" void swap_get_info(struct system_memory_info* info);
+extern "C" void swap_get_info(system_info* info);
 
 
 #endif	/* _KERNEL_VM_STORE_ANONYMOUS_H */

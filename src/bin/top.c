@@ -179,8 +179,6 @@ static void
 compare(
 		thread_time_list_t *old,
 		thread_time_list_t *new,
-		bigtime_t old_busy,
-		bigtime_t new_busy,
 		bigtime_t uinterval,
 		int refresh
 		)
@@ -263,7 +261,7 @@ compare(
 	printf("%6s %7s %7s %7s %4s %16s %-16s \n", "THID", "TOTAL", "USER", "KERNEL",
 		"%CPU", "TEAM NAME", "THREAD NAME");
 	linecount = 1;
-	idletime = new_busy - old_busy;
+	idletime = 0;
 	gtotal = 0;
 	ktotal = 0;
 	utotal = 0;
@@ -354,7 +352,6 @@ adjust_term(bool onlyRows)
 static thread_time_list_t
 gather(
 	   thread_time_list_t *old,
-	   bigtime_t *busy_wait_time,
 	   int refresh
 	   )
 {
@@ -363,7 +360,6 @@ gather(
 	thread_info	t;
 	team_info	tm;
 	thread_time_list_t times;
-	bigtime_t old_busy;
 	int i;
 	system_info info;
 	bigtime_t	oldLastMeasure;
@@ -373,10 +369,6 @@ gather(
 	tmcookie = 0;
 	oldLastMeasure = lastMeasure;
 	lastMeasure = system_time();
-
-	get_system_info(&info);
-	old_busy = *busy_wait_time;
-	*busy_wait_time = info._busy_wait_time;
 
 	while (get_next_team_info(&tmcookie, &tm) == B_NO_ERROR) {
 		thcookie = 0;
@@ -393,8 +385,7 @@ gather(
 			adjust_term(true);
 			screen_size_changed = 0;
 		}
-		compare(old, &times, old_busy, *busy_wait_time,
-			system_time() - oldLastMeasure, refresh);
+		compare(old, &times, system_time() - oldLastMeasure, refresh);
 		free_times(old);
 	}
 	return (times);
@@ -432,7 +423,6 @@ main(int argc, char **argv)
 	//bigtime_t then;
 	bigtime_t uinterval;
 	bigtime_t elapsed;
-	bigtime_t busy;
 	char *myname;
 
 	get_system_info (&sysinfo);
@@ -482,22 +472,22 @@ main(int argc, char **argv)
 	if (iters < 0) {
 		// You will only have to wait half a second for the first iteration.
 		uinterval = 1 * 1000000 / 2;
-		baseline = gather(NULL, &busy, refresh);
+		baseline = gather(NULL, refresh);
 		elapsed = system_time() - lastMeasure;
 		if (elapsed < uinterval)
 			snooze(uinterval - elapsed);
 		// then = system_time();
-		baseline = gather(&baseline, &busy, refresh);
+		baseline = gather(&baseline, refresh);
 
 	} else
-		baseline = gather(NULL, &busy, refresh);
+		baseline = gather(NULL, refresh);
 
 	uinterval = interval * 1000000;
 	for (i = 0; iters < 0 || i < iters; i++) {
 		elapsed = system_time() - lastMeasure;
 		if (elapsed < uinterval)
 			snooze(uinterval - elapsed);
-		baseline = gather(&baseline, &busy, refresh);
+		baseline = gather(&baseline, refresh);
 	}
 
 	printf(exit_ca_mode);

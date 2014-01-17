@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -16,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <arch/atomic.h>
 #include <arch/cpu.h>
 #include <arch/debug.h>
 #include <arch/int.h>
@@ -26,6 +28,7 @@
 #include <int.h>
 #include <spinlock_contention.h>
 #include <thread.h>
+#include <util/atomic.h>
 #if DEBUG_SPINLOCK_LATENCIES
 #	include <safemode.h>
 #endif
@@ -35,15 +38,28 @@
 
 //#define TRACE_SMP
 #ifdef TRACE_SMP
-#	define TRACE(x) dprintf x
+#	define TRACE(...) dprintf_no_syslog(__VA_ARGS__)
 #else
-#	define TRACE(x) ;
+#	define TRACE(...) (void)0
 #endif
 
 
 #undef try_acquire_spinlock
 #undef acquire_spinlock
 #undef release_spinlock
+
+#undef try_acquire_read_spinlock
+#undef acquire_read_spinlock
+#undef release_read_spinlock
+#undef try_acquire_write_spinlock
+#undef acquire_write_spinlock
+#undef release_write_spinlock
+
+#undef try_acquire_write_seqlock
+#undef acquire_write_seqlock
+#undef release_write_seqlock
+#undef acquire_read_seqlock
+#undef release_read_seqlock
 
 
 #define MSG_POOL_SIZE (SMP_MAX_CPUS * 4)
@@ -64,8 +80,8 @@ struct smp_msg {
 	void			*data_ptr;
 	uint32			flags;
 	int32			ref_count;
-	volatile bool	done;
-	uint32			proc_bitmap;
+	int32			done;
+	CPUSet			proc_bitmap;
 };
 
 enum mailbox_source {
@@ -73,21 +89,22 @@ enum mailbox_source {
 	MAILBOX_BCAST,
 };
 
-static vint32 sBootCPUSpin = 0;
+static int32 sBootCPUSpin = 0;
 
-static vint32 sEarlyCPUCall = 0;
+static int32 sEarlyCPUCallCount;
+static CPUSet sEarlyCPUCallSet;
 static void (*sEarlyCPUCallFunction)(void*, int);
 void* sEarlyCPUCallCookie;
 
 static struct smp_msg* sFreeMessages = NULL;
-static volatile int sFreeMessageCount = 0;
+static int32 sFreeMessageCount = 0;
 static spinlock sFreeMessageSpinlock = B_SPINLOCK_INITIALIZER;
 
 static struct smp_msg* sCPUMessages[SMP_MAX_CPUS] = { NULL, };
-static spinlock sCPUMessageSpinlock[SMP_MAX_CPUS];
 
 static struct smp_msg* sBroadcastMessages = NULL;
 static spinlock sBroadcastMessageSpinlock = B_SPINLOCK_INITIALIZER;
+static int32 sBroadcastMessageCounter;
 
 static bool sICIEnabled = false;
 static int32 sNumCPUs = 1;
@@ -103,7 +120,7 @@ static struct {
 	spinlock	*lock;
 } sLastCaller[NUM_LAST_CALLERS];
 
-static vint32 sLastIndex = 0;
+static int32 sLastIndex = 0;
 	// Is incremented atomically. Must be % NUM_LAST_CALLERS before being used
 	// as index into sLastCaller. Note, that it has to be casted to uint32
 	// before applying the modulo operation, since otherwise after overflowing
@@ -123,7 +140,7 @@ push_lock_caller(void* caller, spinlock* lock)
 static void*
 find_lock_caller(spinlock* lock)
 {
-	int32 lastIndex = (uint32)sLastIndex % NUM_LAST_CALLERS;
+	int32 lastIndex = (uint32)atomic_get(&sLastIndex) % NUM_LAST_CALLERS;
 
 	for (int32 i = 0; i < NUM_LAST_CALLERS; i++) {
 		int32 index = (NUM_LAST_CALLERS + lastIndex - 1 - i) % NUM_LAST_CALLERS;
@@ -172,9 +189,9 @@ dump_spinlock(int argc, char** argv)
 static struct {
 	spinlock	*lock;
 	bigtime_t	timestamp;
-} sLatency[B_MAX_CPU_COUNT][NUM_LATENCY_LOCKS];
+} sLatency[SMP_MAX_CPUS][NUM_LATENCY_LOCKS];
 
-static int32 sLatencyIndex[B_MAX_CPU_COUNT];
+static int32 sLatencyIndex[SMP_MAX_CPUS];
 static bool sEnableLatencyCheck;
 
 
@@ -227,7 +244,7 @@ dump_ici_messages(int argc, char** argv)
 	smp_msg* message = sBroadcastMessages;
 	while (message != NULL) {
 		count++;
-		if (message->done)
+		if (message->done == 1)
 			doneCount++;
 		if (message->ref_count <= 0)
 			unreferencedCount++;
@@ -278,8 +295,14 @@ dump_ici_message(int argc, char** argv)
 	kprintf("  data_ptr:    %p\n", message->data_ptr);
 	kprintf("  flags:       %" B_PRIx32 "\n", message->flags);
 	kprintf("  ref_count:   %" B_PRIx32 "\n", message->ref_count);
-	kprintf("  done:        %s\n", message->done ? "true" : "false");
-	kprintf("  proc_bitmap: %" B_PRIx32 "\n", message->proc_bitmap);
+	kprintf("  done:        %s\n", message->done == 1 ? "true" : "false");
+
+	kprintf("  proc_bitmap: ");
+	for (int32 i = 0; i < sNumCPUs; i++) {
+		if (message->proc_bitmap.GetBit(i))
+			kprintf("%s%" B_PRId32, i != 0 ? ", " : "", i);
+	}
+	kprintf("\n");
 
 	return 0;
 }
@@ -307,7 +330,7 @@ try_acquire_spinlock(spinlock* lock)
 	if (atomic_add(&lock->lock, 1) != 0)
 		return false;
 #else
-	if (atomic_or((int32*)lock, 1) != 0)
+	if (atomic_get_and_set((int32*)lock, 1) != 0)
 		return false;
 
 #	if DEBUG_SPINLOCKS
@@ -337,7 +360,7 @@ acquire_spinlock(spinlock* lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (*lock != 0) {
+			while (atomic_get(&lock->lock) != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
 						"for a long time!", lock);
@@ -345,9 +368,9 @@ acquire_spinlock(spinlock* lock)
 				}
 
 				process_all_pending_ici(currentCPU);
-				PAUSE();
+				cpu_wait(&lock->lock, 0);
 			}
-			if (atomic_or((int32*)lock, 1) == 0)
+			if (atomic_get_and_set(&lock->lock, 1) == 0)
 				break;
 		}
 
@@ -358,7 +381,7 @@ acquire_spinlock(spinlock* lock)
 	} else {
 #if DEBUG_SPINLOCKS
 		int32 oldValue;
-		oldValue = atomic_or((int32*)lock, 1);
+		oldValue = atomic_get_and_set(&lock->lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock: attempt to acquire lock %p twice on "
 				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
@@ -391,23 +414,23 @@ acquire_spinlock_nocheck(spinlock *lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (*lock != 0) {
+			while (atomic_get(&lock->lock) != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT_NO_CHECK) {
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
 						"for a long time!", lock);
 					count = 0;
 				}
 
-				PAUSE();
+				cpu_wait(&lock->lock, 0);
 			}
 
-			if (atomic_or((int32*)lock, 1) == 0)
+			if (atomic_get_and_set(&lock->lock, 1) == 0)
 				break;
 		}
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
-		if (atomic_or((int32*)lock, 1) != 0) {
+		if (atomic_get_and_set(&lock->lock, 1) != 0) {
 			panic("acquire_spinlock_nocheck: attempt to acquire lock %p twice "
 				"on non-SMP system\n", lock);
 		}
@@ -434,7 +457,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (*lock != 0) {
+			while (atomic_get(&lock->lock) != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
 					panic("acquire_spinlock_cpu(): Failed to acquire spinlock "
 						"%p for a long time!", lock);
@@ -442,9 +465,9 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 				}
 
 				process_all_pending_ici(currentCPU);
-				PAUSE();
+				cpu_wait(&lock->lock, 0);
 			}
-			if (atomic_or((int32*)lock, 1) == 0)
+			if (atomic_get_and_set(&lock->lock, 1) == 0)
 				break;
 		}
 
@@ -455,7 +478,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 	} else {
 #if DEBUG_SPINLOCKS
 		int32 oldValue;
-		oldValue = atomic_or((int32*)lock, 1);
+		oldValue = atomic_get_and_set(&lock->lock, 1);
 		if (oldValue != 0) {
 			panic("acquire_spinlock_cpu(): attempt to acquire lock %p twice on "
 				"non-SMP system (last caller: %p, value %" B_PRId32 ")", lock,
@@ -492,9 +515,11 @@ release_spinlock(spinlock *lock)
 				}
 			}
 		}
-#else
-		if (atomic_and((int32*)lock, 0) != 1)
+#elif DEBUG_SPINLOCKS
+		if (atomic_get_and_set(&lock->lock, 0) != 1)
 			panic("release_spinlock: lock %p was already released\n", lock);
+#else
+		atomic_set(&lock->lock, 0);
 #endif
 	} else {
 #if DEBUG_SPINLOCKS
@@ -502,13 +527,187 @@ release_spinlock(spinlock *lock)
 			panic("release_spinlock: attempt to release lock %p with "
 				"interrupts enabled\n", lock);
 		}
-		if (atomic_and((int32*)lock, 0) != 1)
+		if (atomic_get_and_set(&lock->lock, 0) != 1)
 			panic("release_spinlock: lock %p was already released\n", lock);
 #endif
 #if DEBUG_SPINLOCK_LATENCIES
 		test_latency(lock);
 #endif
 	}
+}
+
+
+bool
+try_acquire_write_spinlock(rw_spinlock* lock)
+{
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("try_acquire_write_spinlock: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
+	}
+
+	if (sNumCPUs < 2 && lock->lock != 0) {
+		panic("try_acquire_write_spinlock(): attempt to acquire lock %p twice "
+			"on non-SMP system", lock);
+	}
+#endif
+
+	return atomic_test_and_set(&lock->lock, 1u << 31, 0) == 0;
+}
+
+
+void
+acquire_write_spinlock(rw_spinlock* lock)
+{
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("acquire_write_spinlock: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
+	}
+#endif
+
+	uint32 count = 0;
+	int currentCPU = smp_get_current_cpu();
+	while (true) {
+		if (try_acquire_write_spinlock(lock))
+			break;
+
+		while (atomic_get(&lock->lock) != 0) {
+			if (++count == SPINLOCK_DEADLOCK_COUNT) {
+				panic("acquire_write_spinlock(): Failed to acquire spinlock %p "
+					"for a long time!", lock);
+				count = 0;
+			}
+
+			process_all_pending_ici(currentCPU);
+			cpu_wait(&lock->lock, 0);
+		}
+	}
+}
+
+
+void
+release_write_spinlock(rw_spinlock* lock)
+{
+#if DEBUG_SPINLOCKS
+	uint32 previous = atomic_get_and_set(&lock->lock, 0);
+	if ((previous & 1u << 31) == 0) {
+		panic("release_write_spinlock: lock %p was already released (value: "
+			"%#" B_PRIx32 ")\n", lock, previous);
+	}
+#else
+	atomic_set(&lock->lock, 0);
+#endif
+}
+
+
+bool
+try_acquire_read_spinlock(rw_spinlock* lock)
+{
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("try_acquire_read_spinlock: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
+	}
+
+	if (sNumCPUs < 2 && lock->lock != 0) {
+		panic("try_acquire_read_spinlock(): attempt to acquire lock %p twice "
+			"on non-SMP system", lock);
+	}
+#endif
+
+	uint32 previous = atomic_add(&lock->lock, 1);
+	return (previous & (1u << 31)) == 0;
+}
+
+
+void
+acquire_read_spinlock(rw_spinlock* lock)
+{
+#if DEBUG_SPINLOCKS
+	if (are_interrupts_enabled()) {
+		panic("acquire_read_spinlock: attempt to acquire lock %p with "
+			"interrupts enabled", lock);
+	}
+#endif
+
+	uint32 count = 0;
+	int currentCPU = smp_get_current_cpu();
+	while (1) {
+		if (try_acquire_read_spinlock(lock))
+			break;
+
+		while (atomic_get(&lock->lock) != 0) {
+			if (++count == SPINLOCK_DEADLOCK_COUNT) {
+				panic("acquire_read_spinlock(): Failed to acquire spinlock %p "
+					"for a long time!", lock);
+				count = 0;
+			}
+
+			process_all_pending_ici(currentCPU);
+			cpu_wait(&lock->lock, 0);
+		}
+	}
+}
+
+
+void
+release_read_spinlock(rw_spinlock* lock)
+{
+#if DEBUG_SPINLOCKS
+	uint32 previous = atomic_add(&lock->lock, -1);
+	if ((previous & 1u << 31) != 0) {
+		panic("release_read_spinlock: lock %p was already released (value:"
+			" %#" B_PRIx32 ")\n", lock, previous);
+	}
+#else
+	atomic_add(&lock->lock, -1);
+#endif
+
+}
+
+
+bool
+try_acquire_write_seqlock(seqlock* lock) {
+	bool succeed = try_acquire_spinlock(&lock->lock);
+	if (succeed)
+		atomic_add((int32*)&lock->count, 1);
+	return succeed;
+}
+
+
+void
+acquire_write_seqlock(seqlock* lock) {
+	acquire_spinlock(&lock->lock);
+	atomic_add((int32*)&lock->count, 1);
+}
+
+
+void
+release_write_seqlock(seqlock* lock) {
+	atomic_add((int32*)&lock->count, 1);
+	release_spinlock(&lock->lock);
+}
+
+
+uint32
+acquire_read_seqlock(seqlock* lock) {
+	return atomic_get((int32*)&lock->count);
+}
+
+
+bool
+release_read_seqlock(seqlock* lock, uint32 count) {
+	memory_read_barrier();
+
+	uint32 current = atomic_get((int32*)&lock->count);
+
+	if (count % 2 == 1 || current != count) {
+		cpu_pause();
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -521,15 +720,12 @@ find_free_message(struct smp_msg** msg)
 {
 	cpu_status state;
 
-	TRACE(("find_free_message: entry\n"));
+	TRACE("find_free_message: entry\n");
 
 retry:
-	while (sFreeMessageCount <= 0) {
-		state = disable_interrupts();
-		process_all_pending_ici(smp_get_current_cpu());
-		restore_interrupts(state);
-		PAUSE();
-	}
+	while (atomic_get(&sFreeMessageCount) <= 0)
+		cpu_pause();
+
 	state = disable_interrupts();
 	acquire_spinlock(&sFreeMessageSpinlock);
 
@@ -547,7 +743,7 @@ retry:
 
 	release_spinlock(&sFreeMessageSpinlock);
 
-	TRACE(("find_free_message: returning msg %p\n", *msg));
+	TRACE("find_free_message: returning msg %p\n", *msg);
 
 	return state;
 }
@@ -560,13 +756,13 @@ static void
 find_free_message_interrupts_disabled(int32 currentCPU,
 	struct smp_msg** _message)
 {
-	TRACE(("find_free_message_interrupts_disabled: entry\n"));
+	TRACE("find_free_message_interrupts_disabled: entry\n");
 
 	acquire_spinlock_cpu(currentCPU, &sFreeMessageSpinlock);
-	while (sFreeMessageCount <= 0) {
+	while (atomic_get(&sFreeMessageCount) <= 0) {
 		release_spinlock(&sFreeMessageSpinlock);
 		process_all_pending_ici(currentCPU);
-		PAUSE();
+		cpu_pause();
 		acquire_spinlock_cpu(currentCPU, &sFreeMessageSpinlock);
 	}
 
@@ -576,15 +772,15 @@ find_free_message_interrupts_disabled(int32 currentCPU,
 
 	release_spinlock(&sFreeMessageSpinlock);
 
-	TRACE(("find_free_message_interrupts_disabled: returning msg %p\n",
-		*_message));
+	TRACE("find_free_message_interrupts_disabled: returning msg %p\n",
+		*_message);
 }
 
 
 static void
 return_free_message(struct smp_msg* msg)
 {
-	TRACE(("return_free_message: returning msg %p\n", msg));
+	TRACE("return_free_message: returning msg %p\n", msg);
 
 	acquire_spinlock_nocheck(&sFreeMessageSpinlock);
 	msg->next = sFreeMessages;
@@ -600,37 +796,44 @@ check_for_message(int currentCPU, mailbox_source& sourceMailbox)
 	if (!sICIEnabled)
 		return NULL;
 
-	acquire_spinlock_nocheck(&sCPUMessageSpinlock[currentCPU]);
-
-	struct smp_msg* msg = sCPUMessages[currentCPU];
+	struct smp_msg* msg = atomic_pointer_get(&sCPUMessages[currentCPU]);
 	if (msg != NULL) {
-		sCPUMessages[currentCPU] = msg->next;
-		release_spinlock(&sCPUMessageSpinlock[currentCPU]);
-		TRACE((" cpu %d: found msg %p in cpu mailbox\n", currentCPU, msg));
-		sourceMailbox = MAILBOX_LOCAL;
-	} else {
-		// try getting one from the broadcast mailbox
+		do {
+			cpu_pause();
+			msg = atomic_pointer_get(&sCPUMessages[currentCPU]);
+			ASSERT(msg != NULL);
+		} while (atomic_pointer_test_and_set(&sCPUMessages[currentCPU],
+				msg->next, msg) != msg);
 
-		release_spinlock(&sCPUMessageSpinlock[currentCPU]);
+		TRACE(" cpu %d: found msg %p in cpu mailbox\n", currentCPU, msg);
+		sourceMailbox = MAILBOX_LOCAL;
+	} else if (atomic_get(&get_cpu_struct()->ici_counter)
+		!= atomic_get(&sBroadcastMessageCounter)) {
+
+		// try getting one from the broadcast mailbox
 		acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
 
 		msg = sBroadcastMessages;
 		while (msg != NULL) {
-			if (CHECK_BIT(msg->proc_bitmap, currentCPU) != 0) {
+			if (!msg->proc_bitmap.GetBit(currentCPU)) {
 				// we have handled this one already
 				msg = msg->next;
 				continue;
 			}
 
 			// mark it so we wont try to process this one again
-			msg->proc_bitmap = SET_BIT(msg->proc_bitmap, currentCPU);
+			msg->proc_bitmap.ClearBit(currentCPU);
+			atomic_add(&gCPU[currentCPU].ici_counter, 1);
+
 			sourceMailbox = MAILBOX_BCAST;
 			break;
 		}
 		release_spinlock(&sBroadcastMessageSpinlock);
 
-		TRACE((" cpu %d: found msg %p in broadcast mailbox\n", currentCPU,
-			msg));
+		if (msg != NULL) {
+			TRACE(" cpu %d: found msg %p in broadcast mailbox\n", currentCPU,
+				msg);
+		}
 	}
 	return msg;
 }
@@ -645,27 +848,18 @@ finish_message_processing(int currentCPU, struct smp_msg* msg,
 
 	// we were the last one to decrement the ref_count
 	// it's our job to remove it from the list & possibly clean it up
-	struct smp_msg** mbox;
-	spinlock* spinlock;
 
-	// clean up the message from one of the mailboxes
-	if (sourceMailbox == MAILBOX_BCAST) {
-		mbox = &sBroadcastMessages;
-		spinlock = &sBroadcastMessageSpinlock;
-	} else {
-		mbox = &sCPUMessages[currentCPU];
-		spinlock = &sCPUMessageSpinlock[currentCPU];
-	}
+	// clean up the message
+	if (sourceMailbox == MAILBOX_BCAST)
+		acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
 
-	acquire_spinlock_nocheck(spinlock);
-
-	TRACE(("cleaning up message %p\n", msg));
+	TRACE("cleaning up message %p\n", msg);
 
 	if (sourceMailbox != MAILBOX_BCAST) {
 		// local mailbox -- the message has already been removed in
 		// check_for_message()
-	} else if (msg == *mbox) {
-		*mbox = msg->next;
+	} else if (msg == sBroadcastMessages) {
+		sBroadcastMessages = msg->next;
 	} else {
 		// we need to walk to find the message in the list.
 		// we can't use any data found when previously walking through
@@ -674,7 +868,7 @@ finish_message_processing(int currentCPU, struct smp_msg* msg,
 		struct smp_msg* last = NULL;
 		struct smp_msg* msg1;
 
-		msg1 = *mbox;
+		msg1 = sBroadcastMessages;
 		while (msg1 != NULL && msg1 != msg) {
 			last = msg1;
 			msg1 = msg1->next;
@@ -687,13 +881,14 @@ finish_message_processing(int currentCPU, struct smp_msg* msg,
 			panic("last == NULL or msg != msg1");
 	}
 
-	release_spinlock(spinlock);
+	if (sourceMailbox == MAILBOX_BCAST)
+		release_spinlock(&sBroadcastMessageSpinlock);
 
 	if ((msg->flags & SMP_MSG_FLAG_FREE_ARG) != 0 && msg->data_ptr != NULL)
 		free(msg->data_ptr);
 
 	if ((msg->flags & SMP_MSG_FLAG_SYNC) != 0) {
-		msg->done = true;
+		atomic_set(&msg->done, 1);
 		// the caller cpu should now free the message
 	} else {
 		// in the !SYNC case, we get to free the message
@@ -710,7 +905,7 @@ process_pending_ici(int32 currentCPU)
 	if (msg == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	TRACE(("  cpu %ld message = %ld\n", currentCPU, msg->message));
+	TRACE("  cpu %ld message = %ld\n", currentCPU, msg->message);
 
 	bool haltCPU = false;
 
@@ -737,21 +932,8 @@ process_pending_ici(int32 currentCPU)
 			break;
 		}
 		case SMP_MSG_RESCHEDULE:
-		{
-			cpu_ent* cpu = thread_get_current_thread()->cpu;
-			cpu->invoke_scheduler = true;
-			cpu->invoke_scheduler_if_idle = false;
+			scheduler_reschedule_ici();
 			break;
-		}
-		case SMP_MSG_RESCHEDULE_IF_IDLE:
-		{
-			cpu_ent* cpu = thread_get_current_thread()->cpu;
-			if (!cpu->invoke_scheduler) {
-				cpu->invoke_scheduler = true;
-				cpu->invoke_scheduler_if_idle = true;
-			}
-			break;
-		}
 
 		default:
 			dprintf("smp_intercpu_int_handler: got unknown message %" B_PRId32 "\n",
@@ -818,7 +1000,8 @@ static void
 process_early_cpu_call(int32 cpu)
 {
 	sEarlyCPUCallFunction(sEarlyCPUCallCookie, cpu);
-	atomic_and(&sEarlyCPUCall, ~(uint32)(1 << cpu));
+	sEarlyCPUCallSet.ClearBit(cpu);
+	atomic_add(&sEarlyCPUCallCount, 1);
 }
 
 
@@ -829,14 +1012,13 @@ call_all_cpus_early(void (*function)(void*, int), void* cookie)
 		sEarlyCPUCallFunction = function;
 		sEarlyCPUCallCookie = cookie;
 
-		uint32 cpuMask = (1 << sNumCPUs) - 2;
-			// all CPUs but the boot cpu
-
-		sEarlyCPUCall = cpuMask;
+		atomic_set(&sEarlyCPUCallCount, 1);
+		sEarlyCPUCallSet.SetAll();
+		sEarlyCPUCallSet.ClearBit(0);
 
 		// wait for all CPUs to finish
-		while ((sEarlyCPUCall & cpuMask) != 0)
-			PAUSE();
+		while (atomic_get(&sEarlyCPUCallCount) < sNumCPUs)
+			cpu_wait(&sEarlyCPUCallCount, sNumCPUs);
 	}
 
 	function(cookie, 0);
@@ -849,11 +1031,11 @@ call_all_cpus_early(void (*function)(void*, int), void* cookie)
 int
 smp_intercpu_int_handler(int32 cpu)
 {
-	TRACE(("smp_intercpu_int_handler: entry on cpu %ld\n", cpu));
+	TRACE("smp_intercpu_int_handler: entry on cpu %ld\n", cpu);
 
 	process_all_pending_ici(cpu);
 
-	TRACE(("smp_intercpu_int_handler: done\n"));
+	TRACE("smp_intercpu_int_handler: done on cpu %ld\n", cpu);
 
 	return B_HANDLED_INTERRUPT;
 }
@@ -865,9 +1047,9 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 {
 	struct smp_msg *msg;
 
-	TRACE(("smp_send_ici: target 0x%lx, mess 0x%lx, data 0x%lx, data2 0x%lx, "
+	TRACE("smp_send_ici: target 0x%lx, mess 0x%lx, data 0x%lx, data2 0x%lx, "
 		"data3 0x%lx, ptr %p, flags 0x%lx\n", targetCPU, message, data, data2,
-		data3, dataPointer, flags));
+		data3, dataPointer, flags);
 
 	if (sICIEnabled) {
 		int state;
@@ -891,13 +1073,16 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 		msg->data_ptr = dataPointer;
 		msg->ref_count = 1;
 		msg->flags = flags;
-		msg->done = false;
+		msg->done = 0;
 
 		// stick it in the appropriate cpu's mailbox
-		acquire_spinlock_nocheck(&sCPUMessageSpinlock[targetCPU]);
-		msg->next = sCPUMessages[targetCPU];
-		sCPUMessages[targetCPU] = msg;
-		release_spinlock(&sCPUMessageSpinlock[targetCPU]);
+		struct smp_msg* next;
+		do {
+			cpu_pause();
+			next = atomic_pointer_get(&sCPUMessages[targetCPU]);
+			msg->next = next;
+		} while (atomic_pointer_test_and_set(&sCPUMessages[targetCPU], msg,
+				next) != next);
 
 		arch_smp_send_ici(targetCPU);
 
@@ -905,9 +1090,9 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 			// wait for the other cpu to finish processing it
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
-			while (msg->done == false) {
+			while (atomic_get(&msg->done) == 0) {
 				process_all_pending_ici(currentCPU);
-				PAUSE();
+				cpu_wait(&msg->done, 1);
 			}
 			// for SYNC messages, it's our responsibility to put it
 			// back into the free list
@@ -920,25 +1105,22 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 
 
 void
-smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, addr_t data,
+smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 	addr_t data2, addr_t data3, void *dataPointer, uint32 flags)
 {
 	if (!sICIEnabled)
 		return;
 
 	int currentCPU = smp_get_current_cpu();
-	cpuMask &= ~((cpu_mask_t)1 << currentCPU)
-		& (((cpu_mask_t)1 << sNumCPUs) - 1);
-	if (cpuMask == 0) {
-		panic("smp_send_multicast_ici(): 0 CPU mask");
-		return;
-	}
+	bool broadcast = true;
 
 	// count target CPUs
 	int32 targetCPUs = 0;
 	for (int32 i = 0; i < sNumCPUs; i++) {
-		if ((cpuMask & (cpu_mask_t)1 << i) != 0)
+		if (cpuMask.GetBit(i))
 			targetCPUs++;
+		else if (i != currentCPU)
+			broadcast = false;
 	}
 
 	// find_free_message leaves interrupts disabled
@@ -952,8 +1134,15 @@ smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, addr_t data,
 	msg->data_ptr = dataPointer;
 	msg->ref_count = targetCPUs;
 	msg->flags = flags;
-	msg->proc_bitmap = ~cpuMask;
-	msg->done = false;
+	msg->done = 0;
+
+	msg->proc_bitmap = cpuMask;
+	msg->proc_bitmap.ClearBit(currentCPU);
+	if (msg->proc_bitmap.IsEmpty()) {
+		panic("smp_send_multicast_ici(): 0 CPU mask");
+		return;
+	}
+
 
 	// stick it in the broadcast mailbox
 	acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
@@ -961,16 +1150,24 @@ smp_send_multicast_ici(cpu_mask_t cpuMask, int32 message, addr_t data,
 	sBroadcastMessages = msg;
 	release_spinlock(&sBroadcastMessageSpinlock);
 
-	arch_smp_send_broadcast_ici();
-		// TODO: Introduce a call that only bothers the target CPUs!
+	atomic_add(&sBroadcastMessageCounter, 1);
+	for (int32 i = 0; i < sNumCPUs; i++) {
+		if (!cpuMask.GetBit(i))
+			atomic_add(&gCPU[i].ici_counter, 1);
+	}
+
+	if (broadcast)
+		arch_smp_send_broadcast_ici();
+	else
+		arch_smp_send_multicast_ici(cpuMask);
 
 	if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
 		// wait for the other cpus to finish processing it
 		// the interrupt handler will ref count it to <0
 		// if the message is sync after it has removed it from the mailbox
-		while (msg->done == false) {
+		while (atomic_get(&msg->done) == 0) {
 			process_all_pending_ici(currentCPU);
-			PAUSE();
+			cpu_wait(&msg->done, 1);
 		}
 
 		// for SYNC messages, it's our responsibility to put it
@@ -988,9 +1185,9 @@ smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 {
 	struct smp_msg *msg;
 
-	TRACE(("smp_send_broadcast_ici: cpu %ld mess 0x%lx, data 0x%lx, data2 "
+	TRACE("smp_send_broadcast_ici: cpu %ld mess 0x%lx, data 0x%lx, data2 "
 		"0x%lx, data3 0x%lx, ptr %p, flags 0x%lx\n", smp_get_current_cpu(),
-		message, data, data2, data3, dataPointer, flags));
+		message, data, data2, data3, dataPointer, flags);
 
 	if (sICIEnabled) {
 		int state;
@@ -1008,11 +1205,12 @@ smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 		msg->data_ptr = dataPointer;
 		msg->ref_count = sNumCPUs - 1;
 		msg->flags = flags;
-		msg->proc_bitmap = SET_BIT(0, currentCPU);
-		msg->done = false;
+		msg->proc_bitmap.SetAll();
+		msg->proc_bitmap.ClearBit(currentCPU);
+		msg->done = 0;
 
-		TRACE(("smp_send_broadcast_ici%d: inserting msg %p into broadcast "
-			"mbox\n", currentCPU, msg));
+		TRACE("smp_send_broadcast_ici%d: inserting msg %p into broadcast "
+			"mbox\n", currentCPU, msg);
 
 		// stick it in the appropriate cpu's mailbox
 		acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
@@ -1020,22 +1218,25 @@ smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 		sBroadcastMessages = msg;
 		release_spinlock(&sBroadcastMessageSpinlock);
 
+		atomic_add(&sBroadcastMessageCounter, 1);
+		atomic_add(&gCPU[currentCPU].ici_counter, 1);
+
 		arch_smp_send_broadcast_ici();
 
-		TRACE(("smp_send_broadcast_ici: sent interrupt\n"));
+		TRACE("smp_send_broadcast_ici: sent interrupt\n");
 
 		if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
 			// wait for the other cpus to finish processing it
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
-			TRACE(("smp_send_broadcast_ici: waiting for ack\n"));
+			TRACE("smp_send_broadcast_ici: waiting for ack\n");
 
-			while (msg->done == false) {
+			while (atomic_get(&msg->done) == 0) {
 				process_all_pending_ici(currentCPU);
-				PAUSE();
+				cpu_wait(&msg->done, 1);
 			}
 
-			TRACE(("smp_send_broadcast_ici: returning message to free list\n"));
+			TRACE("smp_send_broadcast_ici: returning message to free list\n");
 
 			// for SYNC messages, it's our responsibility to put it
 			// back into the free list
@@ -1045,7 +1246,7 @@ smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 		restore_interrupts(state);
 	}
 
-	TRACE(("smp_send_broadcast_ici: done\n"));
+	TRACE("smp_send_broadcast_ici: done\n");
 }
 
 
@@ -1056,9 +1257,9 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 	if (!sICIEnabled)
 		return;
 
-	TRACE(("smp_send_broadcast_ici_interrupts_disabled: cpu %ld mess 0x%lx, "
+	TRACE("smp_send_broadcast_ici_interrupts_disabled: cpu %ld mess 0x%lx, "
 		"data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%lx\n",
-		currentCPU, message, data, data2, data3, dataPointer, flags));
+		currentCPU, message, data, data2, data3, dataPointer, flags);
 
 	struct smp_msg *msg;
 	find_free_message_interrupts_disabled(currentCPU, &msg);
@@ -1070,11 +1271,12 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 	msg->data_ptr = dataPointer;
 	msg->ref_count = sNumCPUs - 1;
 	msg->flags = flags;
-	msg->proc_bitmap = SET_BIT(0, currentCPU);
-	msg->done = false;
+	msg->proc_bitmap.SetAll();
+	msg->proc_bitmap.ClearBit(currentCPU);
+	msg->done = 0;
 
-	TRACE(("smp_send_broadcast_ici_interrupts_disabled %ld: inserting msg %p "
-		"into broadcast mbox\n", currentCPU, msg));
+	TRACE("smp_send_broadcast_ici_interrupts_disabled %ld: inserting msg %p "
+		"into broadcast mbox\n", currentCPU, msg);
 
 	// stick it in the appropriate cpu's mailbox
 	acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);
@@ -1082,32 +1284,35 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 	sBroadcastMessages = msg;
 	release_spinlock(&sBroadcastMessageSpinlock);
 
+	atomic_add(&sBroadcastMessageCounter, 1);
+	atomic_add(&gCPU[currentCPU].ici_counter, 1);
+
 	arch_smp_send_broadcast_ici();
 
-	TRACE(("smp_send_broadcast_ici_interrupts_disabled %ld: sent interrupt\n",
-		currentCPU));
+	TRACE("smp_send_broadcast_ici_interrupts_disabled %ld: sent interrupt\n",
+		currentCPU);
 
 	if ((flags & SMP_MSG_FLAG_SYNC) != 0) {
 		// wait for the other cpus to finish processing it
 		// the interrupt handler will ref count it to <0
 		// if the message is sync after it has removed it from the mailbox
-		TRACE(("smp_send_broadcast_ici_interrupts_disabled %ld: waiting for "
-			"ack\n", currentCPU));
+		TRACE("smp_send_broadcast_ici_interrupts_disabled %ld: waiting for "
+			"ack\n", currentCPU);
 
-		while (msg->done == false) {
+		while (atomic_get(&msg->done) == 0) {
 			process_all_pending_ici(currentCPU);
-			PAUSE();
+			cpu_wait(&msg->done, 1);
 		}
 
-		TRACE(("smp_send_broadcast_ici_interrupts_disabled %ld: returning "
-			"message to free list\n", currentCPU));
+		TRACE("smp_send_broadcast_ici_interrupts_disabled %ld: returning "
+			"message to free list\n", currentCPU);
 
 		// for SYNC messages, it's our responsibility to put it
 		// back into the free list
 		return_free_message(msg);
 	}
 
-	TRACE(("smp_send_broadcast_ici_interrupts_disabled: done\n"));
+	TRACE("smp_send_broadcast_ici_interrupts_disabled: done\n");
 }
 
 
@@ -1122,17 +1327,17 @@ bool
 smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 {
 	if (cpu == 0) {
-		smp_cpu_rendezvous(rendezVous, cpu);
+		smp_cpu_rendezvous(rendezVous);
 		return true;
 	}
 
-	smp_cpu_rendezvous(rendezVous, cpu);
+	smp_cpu_rendezvous(rendezVous);
 
-	while (sBootCPUSpin == 0) {
-		if ((sEarlyCPUCall & (1 << cpu)) != 0)
+	while (atomic_get(&sBootCPUSpin) == 0) {
+		if (sEarlyCPUCallSet.GetBit(cpu))
 			process_early_cpu_call(cpu);
 
-		PAUSE();
+		cpu_pause();
 	}
 
 	return false;
@@ -1147,7 +1352,7 @@ smp_wake_up_non_boot_cpus()
 		sICIEnabled = true;
 
 	// resume non boot CPUs
-	sBootCPUSpin = 1;
+	atomic_set(&sBootCPUSpin, 1);
 }
 
 
@@ -1162,19 +1367,19 @@ smp_wake_up_non_boot_cpus()
 	ensured via another rendez-vous) the variable can be reset.
 */
 void
-smp_cpu_rendezvous(volatile uint32* var, int current_cpu)
+smp_cpu_rendezvous(uint32* var)
 {
-	atomic_or((vint32*)var, 1 << current_cpu);
+	atomic_add((int32*)var, 1);
 
-	while (*var != (((uint32)1 << sNumCPUs) - 1))
-		PAUSE();
+	while (atomic_get((int32*)var) < sNumCPUs)
+		cpu_wait((int32*)var, sNumCPUs);
 }
 
 
 status_t
 smp_init(kernel_args* args)
 {
-	TRACE(("smp_init: entry\n"));
+	TRACE("smp_init: entry\n");
 
 #if DEBUG_SPINLOCK_LATENCIES
 	sEnableLatencyCheck
@@ -1213,7 +1418,7 @@ smp_init(kernel_args* args)
 		}
 		sNumCPUs = args->num_cpus;
 	}
-	TRACE(("smp_init: calling arch_smp_init\n"));
+	TRACE("smp_init: calling arch_smp_init\n");
 
 	return arch_smp_init(args);
 }
@@ -1310,15 +1515,20 @@ call_all_cpus_sync(void (*func)(void*, int), void* cookie)
 }
 
 
+#undef memory_read_barrier
+#undef memory_write_barrier
+
+
 void
-memory_read_barrier(void)
+memory_read_barrier()
 {
-	arch_cpu_memory_read_barrier();
+	memory_read_barrier_inline();
 }
 
 
 void
-memory_write_barrier(void)
+memory_write_barrier()
 {
-	arch_cpu_memory_write_barrier();
+	memory_write_barrier_inline();
 }
+

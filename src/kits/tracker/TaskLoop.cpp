@@ -172,8 +172,14 @@ ActivityLevel()
 	bigtime_t time = 0;
 	system_info	sinfo;
 	get_system_info(&sinfo);
-	for (int32 index = 0; index < sinfo.cpu_count; index++)
-		time += sinfo.cpu_infos[index].active_time;
+
+	cpu_info* cpuInfos = new cpu_info[sinfo.cpu_count];
+	get_cpu_info(0, sinfo.cpu_count, cpuInfos);
+
+	for (uint32 index = 0; index < sinfo.cpu_count; index++)
+		time += cpuInfos[index].active_time;
+
+	delete[] cpuInfos;
 	return time / ((bigtime_t) sinfo.cpu_count);
 }
 

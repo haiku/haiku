@@ -158,9 +158,9 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 					= (struct mp_base_processor *)pointer;
 				pointer += sizeof(struct mp_base_processor);
 
-				if (gKernelArgs.num_cpus == MAX_BOOT_CPUS) {
-					TRACE(("smp: already reached maximum boot CPUs (%d)\n",
-						MAX_BOOT_CPUS));
+				if (gKernelArgs.num_cpus == SMP_MAX_CPUS) {
+					TRACE(("smp: already reached maximum CPUs (%d)\n",
+						SMP_MAX_CPUS));
 					continue;
 				}
 
@@ -277,9 +277,9 @@ smp_do_acpi_config(void)
 		switch (apic->type) {
 			case ACPI_MADT_LOCAL_APIC:
 			{
-				if (gKernelArgs.num_cpus == MAX_BOOT_CPUS) {
-					TRACE(("smp: already reached maximum boot CPUs (%d)\n",
-						MAX_BOOT_CPUS));
+				if (gKernelArgs.num_cpus == SMP_MAX_CPUS) {
+					TRACE(("smp: already reached maximum CPUs (%d)\n",
+						SMP_MAX_CPUS));
 					break;
 				}
 
@@ -581,7 +581,7 @@ smp_add_safemode_menus(Menu *menu)
 		item->SetHelpText("Disables using the local APIC, also disables SMP.");
 
 		cpuid_info info;
-		if (get_current_cpuid(&info, 1) == B_OK
+		if (get_current_cpuid(&info, 1, 0) == B_OK
 				&& (info.regs.ecx & IA32_FEATURE_EXT_X2APIC) != 0) {
 #if 0
 			menu->AddItem(item = new(nothrow) MenuItem("Disable X2APIC"));
@@ -617,7 +617,7 @@ smp_init(void)
 #endif
 
 	cpuid_info info;
-	if (get_current_cpuid(&info, 1) != B_OK)
+	if (get_current_cpuid(&info, 1, 0) != B_OK)
 		return;
 
 	if ((info.eax_1.features & IA32_FEATURE_APIC) == 0) {

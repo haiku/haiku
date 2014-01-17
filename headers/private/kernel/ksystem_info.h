@@ -21,7 +21,11 @@ status_t system_info_init(struct kernel_args *args);
 status_t system_notifications_init();
 const char* get_haiku_revision(void);
 
-status_t _user_get_system_info(system_info *userInfo, size_t size);
+status_t _user_get_system_info(system_info *userInfo);
+status_t _user_get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* info);
+status_t _user_get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
+				uint32* topologyInfoCount);
+
 status_t _user_get_system_info_etc(int32 id, void *buffer,
 			size_t bufferSize);
 

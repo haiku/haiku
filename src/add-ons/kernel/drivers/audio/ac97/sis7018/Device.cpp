@@ -22,13 +22,14 @@ Device::Device(Device::Info &DeviceInfo, pci_info &PCIInfo)
 		fPCIInfo(PCIInfo),
 		fInfo(DeviceInfo),
 		fIOBase(0),
-		fHWSpinlock(0),
 		fInterruptsNest(0),
 		fBuffersReadySem(-1),
 		fMixer(this),
 		fPlaybackStream(this, false),
 		fRecordStream(this, true)
 {
+	B_INITIALIZE_SPINLOCK(&fHWSpinlock);
+
 	fStatus = _ReserveDeviceOnBus(true);
 	if (fStatus != B_OK)
 		return; // InitCheck will handle the rest

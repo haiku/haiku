@@ -86,7 +86,7 @@ private:
 			CacheList			fCacheEntriesByAge;
 			QueueMap			fQueueMap;
 			QueueDeque			fQueue;
-			vint32				fThreadCount;
+			int32				fThreadCount;
 			int32				fMaxThreadCount;
 			uint64				fBytes;
 			uint64				fMaxBytes;

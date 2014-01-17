@@ -32,6 +32,9 @@ static struct {
 	{(uint32)-1, -1}
 };
 
+status_t __set_scheduler_mode(int32 mode);
+int32 __get_scheduler_mode(void);
+
 
 int32
 suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter,
@@ -59,4 +62,22 @@ estimate_max_scheduling_latency(thread_id thread)
 {
 	return _kern_estimate_max_scheduling_latency(thread);
 }
+
+
+status_t
+__set_scheduler_mode(int32 mode)
+{
+	return _kern_set_scheduler_mode(mode);
+}
+
+
+int32
+__get_scheduler_mode(void)
+{
+	return _kern_get_scheduler_mode();
+}
+
+
+B_DEFINE_WEAK_ALIAS(__set_scheduler_mode, set_scheduler_mode);
+B_DEFINE_WEAK_ALIAS(__get_scheduler_mode, get_scheduler_mode);
 

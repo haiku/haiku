@@ -18,6 +18,7 @@ typedef struct mutex {
 } mutex;
 
 #define MUTEX_FLAG_CLONE_NAME		0x1
+#define MUTEX_FLAG_ADAPTIVE			0x2
 #define MUTEX_INITIALIZER(name)		{ name, 0, 0 }
 
 void		mutex_init(mutex *lock, const char *name);
@@ -71,7 +72,7 @@ int32		recursive_lock_get_recursion(recursive_lock *lock);
 #define		INIT_ONCE_UNINITIALIZED	-1
 #define		INIT_ONCE_INITIALIZED	-4
 
-status_t	__init_once(vint32* control, status_t (*initRoutine)(void*),
+status_t	__init_once(int32* control, status_t (*initRoutine)(void*),
 				void* data);
 
 #ifdef __cplusplus

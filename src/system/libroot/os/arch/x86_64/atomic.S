@@ -1,4 +1,5 @@
 /*
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  */
@@ -9,15 +10,24 @@
 
 .text
 
-/* int32 atomic_set(vint32 *value, int32 newValue) */
+
+/* int32 atomic_set(int32* value, int32 newValue) */
 FUNCTION(atomic_set):
-	movl		%esi, %eax
-	lock
-	xchgl		%eax, (%rdi)
+	sfence
+	movl		%esi, (%rdi)
 	ret
 FUNCTION_END(atomic_set)
 
-/* int32 atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst) */
+
+/* int32 atomic_get_and_set(int32* value, int32 newValue) */
+FUNCTION(atomic_get_and_set):
+	movl		%esi, %eax
+	xchgl		%eax, (%rdi)
+	ret
+FUNCTION_END(atomic_get_and_set)
+
+
+/* int32 atomic_test_and_set(int32* value, int32 newValue, int32 testAgainst) */
 FUNCTION(atomic_test_and_set):
 	movl		%edx, %eax
 	lock
@@ -25,7 +35,8 @@ FUNCTION(atomic_test_and_set):
 	ret
 FUNCTION_END(atomic_test_and_set)
 
-/* int32 atomic_add(vint32 *value, int32 addValue) */
+
+/* int32 atomic_add(int32* value, int32 addValue) */
 FUNCTION(atomic_add):
 	movl		%esi, %eax
 	lock
@@ -33,7 +44,8 @@ FUNCTION(atomic_add):
 	ret
 FUNCTION_END(atomic_add)
 
-/* int32 atomic_and(vint32 *value, int32 andValue) */
+
+/* int32 atomic_and(int32* value, int32 andValue) */
 FUNCTION(atomic_and):
 	movl		(%rdi), %eax
 1:	movl		%eax, %edx
@@ -46,7 +58,8 @@ FUNCTION(atomic_and):
 	ret
 FUNCTION_END(atomic_and)
 
-/* int32 atomic_or(vint32 *value, int32 orValue) */
+
+/* int32 atomic_or(int32* value, int32 orValue) */
 FUNCTION(atomic_or):
 	movl		(%rdi), %eax
 1:	movl		%eax, %edx
@@ -59,24 +72,33 @@ FUNCTION(atomic_or):
 	ret
 FUNCTION_END(atomic_or)
 
-/* int32 atomic_get(vint32 *value) */
+
+/* int32 atomic_get(int32* value) */
 FUNCTION(atomic_get):
 	movl		(%rdi), %eax
-1:	lock
-	cmpxchgl	%eax, (%rdi)
-	jnz			1b
+	lfence
 	ret
 FUNCTION_END(atomic_get)
 
-/* int64 atomic_set64(vint64 *value, int64 newValue) */
+
+/* int64 atomic_set64(int64* value, int64 newValue) */
 FUNCTION(atomic_set64):
-	movq		%rsi, %rax
-	lock
-	xchgq		%rax, (%rdi)
+	sfence
+	movq		%rsi, (%rdi)
 	ret
 FUNCTION_END(atomic_set64)
 
-/* int64 atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst) */
+
+/* int64 atomic_get_and_set64(int64* value, int64 newValue) */
+FUNCTION(atomic_get_and_set64):
+	movq		%rsi, %rax
+	xchgq		%rax, (%rdi)
+	ret
+FUNCTION_END(atomic_get_and_set64)
+
+
+/* int64 atomic_test_and_set64(int64* value, int64 newValue,
+	int64 testAgainst) */
 FUNCTION(atomic_test_and_set64):
 	movq		%rdx, %rax
 	lock
@@ -84,7 +106,8 @@ FUNCTION(atomic_test_and_set64):
 	ret
 FUNCTION_END(atomic_test_and_set64)
 
-/* int64 atomic_add64(vint64 *value, int64 addValue) */
+
+/* int64 atomic_add64(int64* value, int64 addValue) */
 FUNCTION(atomic_add64):
 	movq		%rsi, %rax
 	lock
@@ -92,7 +115,8 @@ FUNCTION(atomic_add64):
 	ret
 FUNCTION_END(atomic_add64)
 
-/* int64 atomic_and64(vint64 *value, int64 andValue) */
+
+/* int64 atomic_and64(int64* value, int64 andValue) */
 FUNCTION(atomic_and64):
 	movq		(%rdi), %rax
 1:	movq		%rax, %rdx
@@ -105,7 +129,8 @@ FUNCTION(atomic_and64):
 	ret
 FUNCTION_END(atomic_and64)
 
-/* int64 atomic_or64(vint64 *value, int64 orValue) */
+
+/* int64 atomic_or64(int64* value, int64 orValue) */
 FUNCTION(atomic_or64):
 	movq		(%rdi), %rax
 1:	movq		%rax, %rdx
@@ -118,11 +143,11 @@ FUNCTION(atomic_or64):
 	ret
 FUNCTION_END(atomic_or64)
 
-/* int64 atomic_get64(vint64 *value) */
+
+/* int64 atomic_get64(int64* value) */
 FUNCTION(atomic_get64):
 	movq		(%rdi), %rax
-1:	lock
-	cmpxchgq	%rax, (%rdi)
-	jnz			1b
+	lfence
 	ret
 FUNCTION_END(atomic_get64)
+

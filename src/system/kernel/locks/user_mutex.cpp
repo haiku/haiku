@@ -99,7 +99,7 @@ remove_user_mutex_entry(UserMutexEntry* entry)
 
 
 static status_t
-user_mutex_lock_locked(vint32* mutex, addr_t physicalAddress, const char* name,
+user_mutex_lock_locked(int32* mutex, addr_t physicalAddress, const char* name,
 	uint32 flags, bigtime_t timeout, MutexLocker& locker)
 {
 	// mark the mutex locked + waiting
@@ -148,7 +148,7 @@ user_mutex_lock_locked(vint32* mutex, addr_t physicalAddress, const char* name,
 
 
 static void
-user_mutex_unlock_locked(vint32* mutex, addr_t physicalAddress, uint32 flags)
+user_mutex_unlock_locked(int32* mutex, addr_t physicalAddress, uint32 flags)
 {
 	if (UserMutexEntry* entry = sUserMutexTable.Lookup(physicalAddress)) {
 		// Someone is waiting -- set the locked flag. It might still be set,

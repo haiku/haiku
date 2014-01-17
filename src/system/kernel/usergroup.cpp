@@ -54,7 +54,6 @@ common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
 			// setgid() semantics: If privileged set both, real, effective and
 			// saved set-gid, otherwise set the effective gid.
 			if (privileged) {
-				InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 				team->saved_set_gid = rgid;
 				team->real_gid = rgid;
 				team->effective_gid = rgid;
@@ -91,7 +90,6 @@ common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
 	}
 
 	// Getting here means all checks were successful -- set the gids.
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 	team->real_gid = rgid;
 	team->effective_gid = egid;
 	team->saved_set_gid = ssgid;
@@ -119,7 +117,6 @@ common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 			// setuid() semantics: If privileged set both, real, effective and
 			// saved set-uid, otherwise set the effective uid.
 			if (privileged) {
-				InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 				team->saved_set_uid = ruid;
 				team->real_uid = ruid;
 				team->effective_uid = ruid;
@@ -156,7 +153,6 @@ common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 	}
 
 	// Getting here means all checks were successful -- set the uids.
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 	team->real_uid = ruid;
 	team->effective_uid = euid;
 	team->saved_set_uid = ssuid;
@@ -253,16 +249,12 @@ common_setgroups(int groupCount, const gid_t* groupList, bool kernel)
 void
 inherit_parent_user_and_group(Team* team, Team* parent)
 {
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 	team->saved_set_uid = parent->saved_set_uid;
 	team->real_uid = parent->real_uid;
 	team->effective_uid = parent->effective_uid;
 	team->saved_set_gid = parent->saved_set_gid;
 	team->real_gid = parent->real_gid;
 	team->effective_gid = parent->effective_gid;
-
-	schedulerLocker.Unlock();
 
 	malloc_referenced_acquire(parent->supplementary_groups);
 	team->supplementary_groups = parent->supplementary_groups;
@@ -279,7 +271,6 @@ update_set_id_user_and_group(Team* team, const char* file)
 		return status;
 
 	TeamLocker teamLocker(team);
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
 	if ((st.st_mode & S_ISUID) != 0) {
 		team->saved_set_uid = st.st_uid;
@@ -300,8 +291,6 @@ _kern_getgid(bool effective)
 {
 	Team* team = thread_get_current_thread()->team;
 
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
-
 	return effective ? team->effective_gid : team->real_gid;
 }
 
@@ -310,8 +299,6 @@ uid_t
 _kern_getuid(bool effective)
 {
 	Team* team = thread_get_current_thread()->team;
-
-	InterruptsSpinLocker schedulerLocker(gSchedulerLock);
 
 	return effective ? team->effective_uid : team->real_uid;
 }
@@ -353,8 +340,6 @@ _user_getgid(bool effective)
 {
 	Team* team = thread_get_current_thread()->team;
 
-	TeamLocker teamLocker(team);
-
 	return effective ? team->effective_gid : team->real_gid;
 }
 
@@ -363,8 +348,6 @@ uid_t
 _user_getuid(bool effective)
 {
 	Team* team = thread_get_current_thread()->team;
-
-	TeamLocker teamLocker(team);
 
 	return effective ? team->effective_uid : team->real_uid;
 }
@@ -395,12 +378,9 @@ ssize_t
 _user_setgroups(int groupCount, const gid_t* groupList)
 {
 	// check privilege
-	{
-		Team* team = thread_get_current_thread()->team;
-		TeamLocker teamLocker(team);
-		if (!is_privileged(team))
-			return EPERM;
-	}
+	Team* team = thread_get_current_thread()->team;
+	if (!is_privileged(team))
+		return EPERM;
 
 	return common_setgroups(groupCount, groupList, false);
 }

@@ -41,12 +41,6 @@ void *(*sbrk_hook)(long) = &BPrivate::hoardSbrk;
 
 using namespace BPrivate;
 
-// How many iterations we spin waiting for a lock.
-enum { SPIN_LIMIT = 50 };
-
-// The values of a user-level lock.
-enum { UNLOCKED = 0, LOCKED = 1 };
-
 struct free_chunk {
 	free_chunk	*next;
 	size_t		size;
@@ -368,35 +362,21 @@ hoardUnsbrk(void *ptr, long size)
 void
 hoardLockInit(hoardLockType &lock, const char *name)
 {
-	lock = UNLOCKED;
+	mutex_init_etc(&lock, name, MUTEX_FLAG_ADAPTIVE);
 }
 
 
 void
 hoardLock(hoardLockType &lock)
 {
-	// A yielding lock (with an initial spin).
-	while (true) {
-		int32 i = 0;
-		while (i < SPIN_LIMIT) {
-			if (atomic_test_and_set(&lock, LOCKED, UNLOCKED) == UNLOCKED) {
-				// We got the lock.
-				return;
-			}
-			i++;
-		}
-
-		// The lock is still being held by someone else.
-		// Give up our quantum.
-		hoardYield();
-	}
+	mutex_lock(&lock);
 }
 
 
 void
 hoardUnlock(hoardLockType &lock)
 {
-	atomic_set(&lock, UNLOCKED);
+	mutex_unlock(&lock);
 }
 
 

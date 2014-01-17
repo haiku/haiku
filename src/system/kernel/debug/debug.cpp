@@ -81,7 +81,7 @@ void call_modules_hook(bool enter);
 
 static void syslog_write(const char* text, int32 length, bool notify);
 
-static arch_debug_registers sDebugRegisters[B_MAX_CPU_COUNT];
+static arch_debug_registers sDebugRegisters[SMP_MAX_CPUS];
 
 static debug_page_fault_info sPageFaultInfo;
 
@@ -139,11 +139,11 @@ static int32 sCurrentLine = 0;
 static debugger_demangle_module_info* sDemangleModule;
 
 static Thread* sDebuggedThread;
-static vint32 sInDebugger = 0;
+static int32 sInDebugger = 0;
 static bool sPreviousDprintfState;
 static volatile bool sHandOverKDL = false;
-static vint32 sHandOverKDLToCPU = -1;
-static bool sCPUTrapped[B_MAX_CPU_COUNT];
+static int32 sHandOverKDLToCPU = -1;
+static bool sCPUTrapped[SMP_MAX_CPUS];
 
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
@@ -703,7 +703,7 @@ kgetc(void)
 			}
 		}
 
-		PAUSE();
+		cpu_pause();
 	}
 }
 
@@ -1007,8 +1007,8 @@ hand_over_kernel_debugger()
 	// hand over to another CPU without us noticing. Since this is only
 	// initiated by the user, it is harmless, though.
 	sHandOverKDL = true;
-	while (sHandOverKDLToCPU >= 0)
-		PAUSE();
+	while (atomic_get(&sHandOverKDLToCPU) >= 0)
+		cpu_wait(&sHandOverKDLToCPU, -1);
 }
 
 

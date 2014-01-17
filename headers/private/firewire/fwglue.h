@@ -30,7 +30,7 @@
 typedef uint32_t bus_addr_t;
 typedef uint32_t bus_size_t;
 
-#define atomic_readandclear_int(ptr) atomic_set((int32 *)(ptr), 0)
+#define atomic_readandclear_int(ptr) atomic_get_and_set((int32*)(ptr), 0)
 #define atomic_set_int(ptr, value) atomic_or((int32 *)(ptr), value)
 
 #define mtx_lock mutex_lock

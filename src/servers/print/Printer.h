@@ -110,7 +110,7 @@ private:
 			// the next job to process
 			Job*				fJob;
 			// the current nmber of processing threads
-			vint32				fProcessing;
+			int32				fProcessing;
 			// stop processing
 			bool				fAbort;
 	static	BObjectList<Printer> sPrinters;

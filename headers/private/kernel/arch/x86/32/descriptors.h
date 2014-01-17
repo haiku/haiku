@@ -9,29 +9,41 @@
 #define _KERNEL_ARCH_X86_32_DESCRIPTORS_H
 
 
-#define KERNEL_CODE_SEG	0x8
-#define KERNEL_DATA_SEG	0x10
+// Segments common for all CPUs.
+#define KERNEL_CODE_SEGMENT			1
+#define KERNEL_DATA_SEGMENT			2
 
-#define USER_CODE_SEG	0x1b
-#define USER_DATA_SEG	0x23
+#define USER_CODE_SEGMENT			3
+#define USER_DATA_SEGMENT			4
 
-#define APM_CODE32_SEGMENT	0x28
-#define APM_CODE16_SEGMENT	0x30
-#define APM_DATA_SEGMENT	0x38
+#define APM_CODE32_SEGMENT			5
+#define APM_CODE16_SEGMENT			6
+#define APM_DATA_SEGMENT			7
 
-#define BIOS_DATA_SEGMENT	0x40
+#define BIOS_DATA_SEGMENT			8
+
+// Per-CPU segments.
+#define TSS_SEGMENT					9
+#define DOUBLE_FAULT_TSS_SEGMENT	10
+#define KERNEL_TLS_SEGMENT			11
+#define USER_TLS_SEGMENT			12
+#define APM_SEGMENT					13
+
+#define GDT_SEGMENT_COUNT			14
+
+
+#define KERNEL_CODE_SELECTOR	((KERNEL_CODE_SEGMENT << 3) | DPL_KERNEL)
+#define KERNEL_DATA_SELECTOR	((KERNEL_DATA_SEGMENT << 3) | DPL_KERNEL)
+
+#define USER_CODE_SELECTOR	((USER_CODE_SEGMENT << 3) | DPL_USER)
+#define USER_DATA_SELECTOR	((USER_DATA_SEGMENT << 3) | DPL_USER)
+
+#define KERNEL_TLS_SELECTOR	((KERNEL_TLS_SEGMENT << 3) | DPL_KERNEL)
 
 
 #ifndef _ASSEMBLER
 	// this file can also be included from assembler as well
 	// (and is in arch_interrupts.S)
-
-#define DOUBLE_FAULT_TSS_BASE_SEGMENT 9
-#define TSS_BASE_SEGMENT	(DOUBLE_FAULT_TSS_BASE_SEGMENT + smp_get_num_cpus())
-#define TLS_BASE_SEGMENT	(TSS_BASE_SEGMENT + smp_get_num_cpus())
-#define APM_BASE_SEGMENT	(TLS_BASE_SEGMENT + smp_get_num_cpus())
-
-#define TSS_SEGMENT(cpu)	(TSS_BASE_SEGMENT + cpu)
 
 // defines entries in the GDT/LDT
 
@@ -72,6 +84,9 @@ struct tss {
 	uint16 unused1;
 	uint16 io_map_base;
 };
+
+typedef segment_descriptor global_descriptor_table[GDT_SEGMENT_COUNT];
+extern global_descriptor_table gGDTs[];
 
 
 static inline void
@@ -138,6 +153,13 @@ set_tss_descriptor(segment_descriptor* desc, addr_t base, uint32 limit)
 	desc->d_b = 0;
 
 	desc->zero = 0;
+}
+
+
+static inline segment_descriptor*
+get_gdt(int32 cpu)
+{
+	return gGDTs[cpu];
 }
 
 

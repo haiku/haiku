@@ -43,7 +43,7 @@ private:
 			bool		fIsTx;
 			status_t	fStatus;
 			area_id		fArea;
-			int32		fSpinlock;
+			spinlock	fSpinlock;
 			sem_id		fSemaphore;
 			uint32		fHead;
 			uint32		fTail;
@@ -61,12 +61,12 @@ DataRing<__type, __count>::DataRing(Device* device, bool isTx)
 							fIsTx(isTx),
 							fStatus(B_NO_INIT),
 							fArea(-1),
-							fSpinlock(0),
 							fSemaphore(0),
 							fHead(0),
 							fTail(0),
 							fDescriptors(NULL)
 {
+	B_INITIALIZE_SPINLOCK(&fSpinlock);
 	memset(fBuffers, 0, sizeof(fBuffers));
 }
 

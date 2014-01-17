@@ -88,6 +88,5 @@ vnode::_WakeUpLocker()
 		atomic_and(&fFlags, ~kFlagsWaitingLocker);
 
 	// and wake it up
-	InterruptsSpinLocker threadLocker(gSchedulerLock);
-	thread_unblock_locked(waiter->thread, B_OK);
+	thread_unblock(waiter->thread, B_OK);
 }

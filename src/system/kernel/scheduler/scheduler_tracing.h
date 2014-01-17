@@ -36,17 +36,12 @@ protected:
 
 class EnqueueThread : public SchedulerTraceEntry {
 public:
-	EnqueueThread(Thread* thread, Thread* previous, Thread* next)
+	EnqueueThread(Thread* thread, int32 effectivePriority)
 		:
 		SchedulerTraceEntry(thread),
-		fPreviousID(-1),
-		fNextID(-1),
-		fPriority(thread->priority)
+		fPriority(thread->priority),
+		fEffectivePriority(effectivePriority)
 	{
-		if (previous != NULL)
-			fPreviousID = previous->id;
-		if (next != NULL)
-			fNextID = next->id;
 		fName = alloc_tracing_buffer_strcpy(thread->name, B_OS_NAME_LENGTH,
 			false);
 		Initialized();
@@ -57,10 +52,9 @@ public:
 	virtual const char* Name() const;
 
 private:
-	thread_id			fPreviousID;
-	thread_id			fNextID;
 	char*				fName;
-	uint8				fPriority;
+	int32				fPriority;
+	int32				fEffectivePriority;
 };
 
 

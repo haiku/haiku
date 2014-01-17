@@ -88,7 +88,7 @@ private:
 		pci_info			fPCIInfo;
 		Info&				fInfo;
 		int					fIOBase;
-		int32				fHWSpinlock;
+		spinlock			fHWSpinlock;
 		int32				fInterruptsNest;
 		sem_id				fBuffersReadySem;
 

@@ -41,12 +41,7 @@ ssize_t arch_cpu_user_strlcpy(char *to, const char *from, size_t size,
 status_t arch_cpu_user_memset(void *s, char c, size_t count,
 			addr_t *faultHandler);
 
-void arch_cpu_idle(void);
 void arch_cpu_sync_icache(void *address, size_t length);
-
-void arch_cpu_memory_read_barrier(void);
-void arch_cpu_memory_write_barrier(void);
-void arch_cpu_memory_read_write_barrier(void);
 
 
 #ifdef __cplusplus
@@ -54,5 +49,7 @@ void arch_cpu_memory_read_write_barrier(void);
 #endif
 
 #include <arch_cpu.h>
+
+#define CACHE_LINE_ALIGN	 __attribute__((aligned(CACHE_LINE_SIZE)))
 
 #endif /* _KERNEL_ARCH_CPU_H */

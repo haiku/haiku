@@ -158,7 +158,7 @@ reseed(ch_randgen *prandgen, const uint32 initTimes)
 			// random seed on startup by reading from /dev/urandom, perl
 			// programs are all but unusable when at least one other thread
 			// hogs the CPU.
-			thread_yield(false);
+			thread_yield();
 
 			// TODO: Introduce a clock_counter() function that directly returns
 			// the value of the hardware clock counter. This will be cheaper

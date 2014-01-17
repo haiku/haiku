@@ -136,7 +136,7 @@ public:
 #endif
 
 #if DEBUG_PAGE_ACCESS
-	vint32					accessing_thread;
+	int32					accessing_thread;
 #endif
 
 #if VM_PAGE_ALLOCATION_TRACKING_AVAILABLE

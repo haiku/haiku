@@ -30,9 +30,6 @@ void x86_restart_syscall(struct iframe* frame);
 void x86_set_tls_context(Thread* thread);
 
 
-#ifdef __x86_64__
-
-
 static inline Thread*
 arch_thread_get_current_thread(void)
 {
@@ -40,6 +37,9 @@ arch_thread_get_current_thread(void)
 	__asm__("mov %%gs:0, %0" : "=r"(addr));
 	return (Thread*)addr;
 }
+
+
+#ifdef __x86_64__
 
 
 static inline void
@@ -59,18 +59,10 @@ arch_thread_set_current_thread(Thread* t)
 void arch_syscall_64_bit_return_value(void);
 
 
-static inline Thread*
-arch_thread_get_current_thread(void)
-{
-	Thread* t = (Thread*)x86_read_dr3();
-	return t;
-}
-
-
 static inline void
 arch_thread_set_current_thread(Thread* t)
 {
-	x86_write_dr3(t);
+	asm volatile("mov %0, %%gs:0" : : "r" (t) : "memory");
 }
 
 
@@ -82,3 +74,4 @@ arch_thread_set_current_thread(Thread* t)
 #endif
 
 #endif /* _KERNEL_ARCH_x86_THREAD_H */
+

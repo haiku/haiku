@@ -46,7 +46,7 @@ thread_id load_image_etc(int32 argCount, const char* const* args,
 	const char* const* env, int32 priority, team_id parentID, uint32 flags);
 
 void team_set_job_control_state(Team* team, job_control_state newState,
-			Signal* signal, bool threadsLocked);
+			Signal* signal);
 void team_set_controlling_tty(int32 index);
 int32 team_get_controlling_tty();
 status_t team_set_foreground_process_group(int32 ttyIndex, pid_t processGroup);

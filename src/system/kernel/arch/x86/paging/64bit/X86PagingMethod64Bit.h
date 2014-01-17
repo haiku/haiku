@@ -116,7 +116,7 @@ X86PagingMethod64Bit::Method()
 /*static*/ inline uint64
 X86PagingMethod64Bit::SetTableEntry(uint64* entry, uint64 newEntry)
 {
-	return atomic_set64((int64*)entry, newEntry);
+	return atomic_get_and_set64((int64*)entry, newEntry);
 }
 
 

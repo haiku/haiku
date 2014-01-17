@@ -1,5 +1,6 @@
 /*
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  *
@@ -14,6 +15,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <algorithm>
+
 #include <ACPI.h>
 
 #include <boot_device.h>
@@ -21,6 +24,7 @@
 #include <debug.h>
 #include <elf.h>
 #include <smp.h>
+#include <util/BitUtils.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
@@ -34,6 +38,7 @@
 
 
 #define DUMP_FEATURE_STRING 1
+#define DUMP_CPU_TOPOLOGY	1
 
 
 /* cpu vendor info */
@@ -66,16 +71,6 @@ static const struct cpu_vendor_info vendor_info[VENDOR_NUM] = {
 #define K8_C1EONCMPHALT			(1ULL << 28)
 
 #define K8_CMPHALT				(K8_SMIONCMPHALT | K8_C1EONCMPHALT)
-
-/*
- * 0 favors highest performance while 15 corresponds to the maximum energy
- * savings. 7 means balance between performance and energy savings.
- * Refer to Section 14.3.4 in <Intel 64 and IA-32 Architectures Software
- * Developer's Manual Volume 3>  for details
- */
-#define ENERGY_PERF_BIAS_PERFORMANCE	0
-#define ENERGY_PERF_BIAS_BALANCE		7
-#define ENERGY_PERF_BIAS_POWERSAVE		15
 
 struct set_mtrr_parameter {
 	int32	index;
@@ -122,6 +117,14 @@ x86_optimized_functions gOptimizedFunctions = {
 	&memset_generic_end
 };
 
+/* CPU topology information */
+static uint32 (*sGetCPUTopologyID)(int currentCPU);
+static uint32 sHierarchyMask[CPU_TOPOLOGY_LEVELS];
+static uint32 sHierarchyShift[CPU_TOPOLOGY_LEVELS];
+
+/* Cache topology information */
+static uint32 sCacheSharingMask[CPU_MAX_CACHE_LEVEL];
+
 
 static status_t
 acpi_shutdown(bool rebootSystem)
@@ -144,7 +147,7 @@ acpi_shutdown(bool rebootSystem)
 			_user_set_cpu_enabled(cpu, false);
 		}
 		// TODO: must not be called from the idle thread!
-		thread_yield(true);
+		thread_yield();
 
 		status = acpi->prepare_sleep_state(ACPI_POWER_STATE_OFF, NULL, 0);
 		if (status == B_OK) {
@@ -188,14 +191,14 @@ set_mtrr(void* _parameter, int cpu)
 		= (struct set_mtrr_parameter*)_parameter;
 
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous);
 
 	// One CPU has to reset sCpuRendezvous3 -- it is needed to prevent the CPU
 	// that initiated the call_all_cpus() from doing that again and clearing
 	// sCpuRendezvous2 before the last CPU has actually left the loop in
 	// smp_cpu_rendezvous();
 	if (cpu == 0)
-		atomic_set((vint32*)&sCpuRendezvous3, 0);
+		atomic_set((int32*)&sCpuRendezvous3, 0);
 
 	disable_caches();
 
@@ -205,8 +208,8 @@ set_mtrr(void* _parameter, int cpu)
 	enable_caches();
 
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
-	smp_cpu_rendezvous(&sCpuRendezvous3, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous2);
+	smp_cpu_rendezvous(&sCpuRendezvous3);
 }
 
 
@@ -216,14 +219,14 @@ set_mtrrs(void* _parameter, int cpu)
 	set_mtrrs_parameter* parameter = (set_mtrrs_parameter*)_parameter;
 
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous);
 
 	// One CPU has to reset sCpuRendezvous3 -- it is needed to prevent the CPU
 	// that initiated the call_all_cpus() from doing that again and clearing
 	// sCpuRendezvous2 before the last CPU has actually left the loop in
 	// smp_cpu_rendezvous();
 	if (cpu == 0)
-		atomic_set((vint32*)&sCpuRendezvous3, 0);
+		atomic_set((int32*)&sCpuRendezvous3, 0);
 
 	disable_caches();
 
@@ -233,8 +236,8 @@ set_mtrrs(void* _parameter, int cpu)
 	enable_caches();
 
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
-	smp_cpu_rendezvous(&sCpuRendezvous3, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous2);
+	smp_cpu_rendezvous(&sCpuRendezvous3);
 }
 
 
@@ -242,14 +245,14 @@ static void
 init_mtrrs(void* _unused, int cpu)
 {
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous);
 
 	// One CPU has to reset sCpuRendezvous3 -- it is needed to prevent the CPU
 	// that initiated the call_all_cpus() from doing that again and clearing
 	// sCpuRendezvous2 before the last CPU has actually left the loop in
 	// smp_cpu_rendezvous();
 	if (cpu == 0)
-		atomic_set((vint32*)&sCpuRendezvous3, 0);
+		atomic_set((int32*)&sCpuRendezvous3, 0);
 
 	disable_caches();
 
@@ -258,8 +261,8 @@ init_mtrrs(void* _unused, int cpu)
 	enable_caches();
 
 	// wait until all CPUs have arrived here
-	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
-	smp_cpu_rendezvous(&sCpuRendezvous3, cpu);
+	smp_cpu_rendezvous(&sCpuRendezvous2);
+	smp_cpu_rendezvous(&sCpuRendezvous3);
 }
 
 
@@ -507,6 +510,308 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 
 
 static void
+compute_cpu_hierarchy_masks(int maxLogicalID, int maxCoreID)
+{
+	ASSERT(maxLogicalID >= maxCoreID);
+	const int kMaxSMTID = maxLogicalID / maxCoreID;
+
+	sHierarchyMask[CPU_TOPOLOGY_SMT] = kMaxSMTID - 1;
+	sHierarchyShift[CPU_TOPOLOGY_SMT] = 0;
+
+	sHierarchyMask[CPU_TOPOLOGY_CORE] = (maxCoreID - 1) * kMaxSMTID;
+	sHierarchyShift[CPU_TOPOLOGY_CORE]
+		= count_set_bits(sHierarchyMask[CPU_TOPOLOGY_SMT]);
+
+	const uint32 kSinglePackageMask = sHierarchyMask[CPU_TOPOLOGY_SMT]
+		| sHierarchyMask[CPU_TOPOLOGY_CORE];
+	sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~kSinglePackageMask;
+	sHierarchyShift[CPU_TOPOLOGY_PACKAGE] = count_set_bits(kSinglePackageMask);
+}
+
+
+static uint32
+get_cpu_legacy_initial_apic_id(int /* currentCPU */)
+{
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 1, 0);
+	return cpuid.regs.ebx >> 24;
+}
+
+
+static inline status_t
+detect_amd_cpu_topology(uint32 maxBasicLeaf, uint32 maxExtendedLeaf)
+{
+	sGetCPUTopologyID = get_cpu_legacy_initial_apic_id;
+
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 1, 0);
+	int maxLogicalID = next_power_of_2((cpuid.regs.ebx >> 16) & 0xff);
+
+	int maxCoreID = 1;
+	if (maxExtendedLeaf >= 0x80000008) {
+		get_current_cpuid(&cpuid, 0x80000008, 0);
+		maxCoreID = (cpuid.regs.ecx >> 12) & 0xf;
+		if (maxCoreID != 0)
+			maxCoreID = 1 << maxCoreID;
+		else
+			maxCoreID = next_power_of_2((cpuid.regs.edx & 0xf) + 1);
+	}
+
+	if (maxExtendedLeaf >= 0x80000001) {
+		get_current_cpuid(&cpuid, 0x80000001, 0);
+		if (x86_check_feature(IA32_FEATURE_AMD_EXT_CMPLEGACY,
+				FEATURE_EXT_AMD_ECX))
+			maxCoreID = maxLogicalID;
+	}
+
+	compute_cpu_hierarchy_masks(maxLogicalID, maxCoreID);
+
+	return B_OK;
+}
+
+
+static void
+detect_amd_cache_topology(uint32 maxExtendedLeaf)
+{
+	if (!x86_check_feature(IA32_FEATURE_AMD_EXT_TOPOLOGY, FEATURE_EXT_AMD_ECX))
+		return;
+
+	if (maxExtendedLeaf < 0x8000001d)
+		return;
+	
+	uint8 hierarchyLevels[CPU_MAX_CACHE_LEVEL];
+	int maxCacheLevel = 0;
+
+	int currentLevel = 0;
+	int cacheType;
+	do {
+		cpuid_info cpuid;
+		get_current_cpuid(&cpuid, 0x8000001d, currentLevel);
+
+		cacheType = cpuid.regs.eax & 0x1f;
+		if (cacheType == 0)
+			break;
+
+		int cacheLevel = (cpuid.regs.eax >> 5) & 0x7;
+		int coresCount = next_power_of_2(((cpuid.regs.eax >> 14) & 0x3f) + 1);
+		hierarchyLevels[cacheLevel - 1]
+			= coresCount * (sHierarchyMask[CPU_TOPOLOGY_SMT] + 1);
+		maxCacheLevel = std::max(maxCacheLevel, cacheLevel);
+
+		currentLevel++;
+	} while (true);
+
+	for (int i = 0; i < maxCacheLevel; i++)
+		sCacheSharingMask[i] = ~uint32(hierarchyLevels[i] - 1);
+	gCPUCacheLevelCount = maxCacheLevel;
+}
+
+
+static uint32
+get_intel_cpu_initial_x2apic_id(int /* currentCPU */)
+{
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 11, 0);
+	return cpuid.regs.edx;
+}
+
+
+static inline status_t
+detect_intel_cpu_topology_x2apic(uint32 maxBasicLeaf)
+{
+	if (maxBasicLeaf < 11)
+		return B_UNSUPPORTED;
+
+	uint8 hierarchyLevels[CPU_TOPOLOGY_LEVELS];
+
+	int currentLevel = 0;
+	int levelType;
+	int levelsSet = 0;
+
+	do {
+		cpuid_info cpuid;
+		get_current_cpuid(&cpuid, 11, currentLevel);
+		if (currentLevel == 0 && cpuid.regs.ebx == 0)
+			return B_UNSUPPORTED;
+
+		levelType = (cpuid.regs.ecx >> 8) & 0xff;
+		switch (levelType) {
+			case 1:	// SMT
+				hierarchyLevels[CPU_TOPOLOGY_SMT] = cpuid.regs.eax & 0x1f;
+				levelsSet |= 1;
+				break;
+			case 2:	// core
+				hierarchyLevels[CPU_TOPOLOGY_CORE] = cpuid.regs.eax & 0x1f;
+				levelsSet |= 2;
+				break;
+		}
+
+		currentLevel++;
+	} while (levelType != 0 && levelsSet != 3);
+
+	sGetCPUTopologyID = get_intel_cpu_initial_x2apic_id;
+
+	for (int i = 0; i < CPU_TOPOLOGY_LEVELS; i++) {
+		uint32 mask = ~uint32(0);
+		if (i < CPU_TOPOLOGY_LEVELS - 1)
+			mask = (1 << hierarchyLevels[i]) - 1;
+		if (i > 0)
+			mask &= ~sHierarchyMask[i - 1];
+		sHierarchyMask[i] = mask;
+		sHierarchyShift[i] = i > 0 ? hierarchyLevels[i - 1] : 0;
+	}
+
+	return B_OK;
+}
+
+
+static inline status_t
+detect_intel_cpu_topology_legacy(uint32 maxBasicLeaf)
+{
+	sGetCPUTopologyID = get_cpu_legacy_initial_apic_id;
+
+	cpuid_info cpuid;
+
+	get_current_cpuid(&cpuid, 1, 0);
+	int maxLogicalID = next_power_of_2((cpuid.regs.ebx >> 16) & 0xff);
+
+	int maxCoreID = 1;
+	if (maxBasicLeaf >= 4) {
+		get_current_cpuid(&cpuid, 4, 0);
+		maxCoreID = next_power_of_2((cpuid.regs.eax >> 26) + 1);
+	}
+
+	compute_cpu_hierarchy_masks(maxLogicalID, maxCoreID);
+
+	return B_OK;
+}
+
+
+static void
+detect_intel_cache_topology(uint32 maxBasicLeaf)
+{
+	if (maxBasicLeaf < 4)
+		return;
+
+	uint8 hierarchyLevels[CPU_MAX_CACHE_LEVEL];
+	int maxCacheLevel = 0;
+
+	int currentLevel = 0;
+	int cacheType;
+	do {
+		cpuid_info cpuid;
+		get_current_cpuid(&cpuid, 4, currentLevel);
+
+		cacheType = cpuid.regs.eax & 0x1f;
+		if (cacheType == 0)
+			break;
+
+		int cacheLevel = (cpuid.regs.eax >> 5) & 0x7;
+		hierarchyLevels[cacheLevel - 1]
+			= next_power_of_2(((cpuid.regs.eax >> 14) & 0x3f) + 1);
+		maxCacheLevel = std::max(maxCacheLevel, cacheLevel);
+
+		currentLevel++;
+	} while (true);
+
+	for (int i = 0; i < maxCacheLevel; i++)
+		sCacheSharingMask[i] = ~uint32(hierarchyLevels[i] - 1);
+
+	gCPUCacheLevelCount = maxCacheLevel;
+}
+
+
+static uint32
+get_simple_cpu_topology_id(int currentCPU)
+{
+	return currentCPU;
+}
+
+
+static inline int
+get_topology_level_id(uint32 id, cpu_topology_level level)
+{
+	ASSERT(level < CPU_TOPOLOGY_LEVELS);
+	return (id & sHierarchyMask[level]) >> sHierarchyShift[level];
+}
+
+
+static void
+detect_cpu_topology(int currentCPU, cpu_ent* cpu, uint32 maxBasicLeaf,
+	uint32 maxExtendedLeaf)
+{
+	if (currentCPU == 0) {
+		memset(sCacheSharingMask, 0xff, sizeof(sCacheSharingMask));
+
+		status_t result = B_UNSUPPORTED;
+		if (x86_check_feature(IA32_FEATURE_HTT, FEATURE_COMMON)) {
+			if (cpu->arch.vendor == VENDOR_AMD) {
+				result = detect_amd_cpu_topology(maxBasicLeaf, maxExtendedLeaf);
+
+				if (result == B_OK)
+					detect_amd_cache_topology(maxExtendedLeaf);
+			}
+
+			if (cpu->arch.vendor == VENDOR_INTEL) {
+				result = detect_intel_cpu_topology_x2apic(maxBasicLeaf);
+				if (result != B_OK)
+					result = detect_intel_cpu_topology_legacy(maxBasicLeaf);
+
+				if (result == B_OK)
+					detect_intel_cache_topology(maxBasicLeaf);
+			}
+		}
+
+		if (result != B_OK) {
+			dprintf("No CPU topology information available.\n");
+
+			sGetCPUTopologyID = get_simple_cpu_topology_id;
+
+			sHierarchyMask[CPU_TOPOLOGY_PACKAGE] = ~uint32(0);
+		}
+	}
+
+	ASSERT(sGetCPUTopologyID != NULL);
+	int topologyID = sGetCPUTopologyID(currentCPU);
+	cpu->topology_id[CPU_TOPOLOGY_SMT]
+		= get_topology_level_id(topologyID, CPU_TOPOLOGY_SMT);
+	cpu->topology_id[CPU_TOPOLOGY_CORE]
+		= get_topology_level_id(topologyID, CPU_TOPOLOGY_CORE);
+	cpu->topology_id[CPU_TOPOLOGY_PACKAGE]
+		= get_topology_level_id(topologyID, CPU_TOPOLOGY_PACKAGE);
+
+	unsigned int i;
+	for (i = 0; i < gCPUCacheLevelCount; i++)
+		cpu->cache_id[i] = topologyID & sCacheSharingMask[i];
+	for (; i < CPU_MAX_CACHE_LEVEL; i++)
+		cpu->cache_id[i] = -1;
+
+#if DUMP_CPU_TOPOLOGY
+	dprintf("CPU %d: apic id %d, package %d, core %d, smt %d\n", currentCPU,
+		topologyID, cpu->topology_id[CPU_TOPOLOGY_PACKAGE],
+		cpu->topology_id[CPU_TOPOLOGY_CORE],
+		cpu->topology_id[CPU_TOPOLOGY_SMT]);
+
+	if (gCPUCacheLevelCount > 0) {
+		char cacheLevels[256];
+		unsigned int offset = 0;
+		for (i = 0; i < gCPUCacheLevelCount; i++) {
+			offset += snprintf(cacheLevels + offset,
+					sizeof(cacheLevels) - offset,
+					" L%d id %d%s", i + 1, cpu->cache_id[i],
+					i < gCPUCacheLevelCount - 1 ? "," : "");
+
+			if (offset >= sizeof(cacheLevels))
+				break;
+		}
+
+		dprintf("CPU %d: cache sharing:%s\n", currentCPU, cacheLevels);
+	}
+#endif
+}
+
+
+static void
 detect_cpu(int currentCPU)
 {
 	cpu_ent* cpu = get_cpu_struct();
@@ -522,7 +827,7 @@ detect_cpu(int currentCPU)
 	cpu->arch.model_name[0] = 0;
 
 	// print some fun data
-	get_current_cpuid(&cpuid, 0);
+	get_current_cpuid(&cpuid, 0, 0);
 	uint32 maxBasicLeaf = cpuid.eax_0.max_eax;
 
 	// build the vendor string
@@ -530,7 +835,7 @@ detect_cpu(int currentCPU)
 	memcpy(vendorString, cpuid.eax_0.vendor_id, sizeof(cpuid.eax_0.vendor_id));
 
 	// get the family, model, stepping
-	get_current_cpuid(&cpuid, 1);
+	get_current_cpuid(&cpuid, 1, 0);
 	cpu->arch.type = cpuid.eax_1.type;
 	cpu->arch.family = cpuid.eax_1.family;
 	cpu->arch.extended_family = cpuid.eax_1.extended_family;
@@ -561,27 +866,27 @@ detect_cpu(int currentCPU)
 	}
 
 	// see if we can get the model name
-	get_current_cpuid(&cpuid, 0x80000000);
+	get_current_cpuid(&cpuid, 0x80000000, 0);
 	uint32 maxExtendedLeaf = cpuid.eax_0.max_eax;
 	if (maxExtendedLeaf >= 0x80000004) {
 		// build the model string (need to swap ecx/edx data before copying)
 		unsigned int temp;
 		memset(cpu->arch.model_name, 0, sizeof(cpu->arch.model_name));
 
-		get_current_cpuid(&cpuid, 0x80000002);
+		get_current_cpuid(&cpuid, 0x80000002, 0);
 		temp = cpuid.regs.edx;
 		cpuid.regs.edx = cpuid.regs.ecx;
 		cpuid.regs.ecx = temp;
 		memcpy(cpu->arch.model_name, cpuid.as_chars, sizeof(cpuid.as_chars));
 
-		get_current_cpuid(&cpuid, 0x80000003);
+		get_current_cpuid(&cpuid, 0x80000003, 0);
 		temp = cpuid.regs.edx;
 		cpuid.regs.edx = cpuid.regs.ecx;
 		cpuid.regs.ecx = temp;
 		memcpy(cpu->arch.model_name + 16, cpuid.as_chars,
 			sizeof(cpuid.as_chars));
 
-		get_current_cpuid(&cpuid, 0x80000004);
+		get_current_cpuid(&cpuid, 0x80000004, 0);
 		temp = cpuid.regs.edx;
 		cpuid.regs.edx = cpuid.regs.ecx;
 		cpuid.regs.ecx = temp;
@@ -604,22 +909,36 @@ detect_cpu(int currentCPU)
 	}
 
 	// load feature bits
-	get_current_cpuid(&cpuid, 1);
+	get_current_cpuid(&cpuid, 1, 0);
 	cpu->arch.feature[FEATURE_COMMON] = cpuid.eax_1.features; // edx
 	cpu->arch.feature[FEATURE_EXT] = cpuid.eax_1.extended_features; // ecx
 
 	if (maxExtendedLeaf >= 0x80000001) {
-		get_current_cpuid(&cpuid, 0x80000001);
+		get_current_cpuid(&cpuid, 0x80000001, 0);
+		if (cpu->arch.vendor == VENDOR_AMD)
+			cpu->arch.feature[FEATURE_EXT_AMD_ECX] = cpuid.regs.ecx; // ecx
 		cpu->arch.feature[FEATURE_EXT_AMD] = cpuid.regs.edx; // edx
 		if (cpu->arch.vendor != VENDOR_AMD)
 			cpu->arch.feature[FEATURE_EXT_AMD] &= IA32_FEATURES_INTEL_EXT;
 	}
 
+	if (maxBasicLeaf >= 5) {
+		get_current_cpuid(&cpuid, 5, 0);
+		cpu->arch.feature[FEATURE_5_ECX] = cpuid.regs.ecx;
+	}
+
 	if (maxBasicLeaf >= 6) {
-		get_current_cpuid(&cpuid, 6);
+		get_current_cpuid(&cpuid, 6, 0);
 		cpu->arch.feature[FEATURE_6_EAX] = cpuid.regs.eax;
 		cpu->arch.feature[FEATURE_6_ECX] = cpuid.regs.ecx;
 	}
+
+	if (maxExtendedLeaf >= 0x80000007) {
+		get_current_cpuid(&cpuid, 0x80000007, 0);
+		cpu->arch.feature[FEATURE_EXT_7_EDX] = cpuid.regs.edx;
+	}
+
+	detect_cpu_topology(currentCPU, cpu, maxBasicLeaf, maxExtendedLeaf);
 
 #if DUMP_FEATURE_STRING
 	dump_feature_string(currentCPU, cpu);
@@ -691,6 +1010,8 @@ arch_cpu_preboot_init_percpu(kernel_args* args, int cpu)
 		x86_write_msr(IA32_MSR_TSC, 0);
 	}
 
+	x86_descriptors_preboot_init_percpu(args, cpu);
+
 	return B_OK;
 }
 
@@ -732,7 +1053,6 @@ detect_amdc1e_noarat()
 status_t
 arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
-	// Load descriptor tables for this CPU.
 	x86_descriptors_init_percpu(args, cpu);
 
 	detect_cpu(cpu);
@@ -742,15 +1062,6 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 			gCpuIdleFunc = amdc1e_noarat_idle;
 		else
 			gCpuIdleFunc = halt_idle;
-	}
-
-	if (x86_check_feature(IA32_FEATURE_EPB, FEATURE_6_ECX)) {
-		uint64 msr = x86_read_msr(IA32_MSR_ENERGY_PERF_BIAS);
-		if ((msr & 0xf) == ENERGY_PERF_BIAS_PERFORMANCE) {
-			msr &= ~0xf;
-			msr |= ENERGY_PERF_BIAS_BALANCE;
-			x86_write_msr(IA32_MSR_ENERGY_PERF_BIAS, msr);
-		}
 	}
 
 	return B_OK;
@@ -972,50 +1283,8 @@ arch_cpu_shutdown(bool rebootSystem)
 
 
 void
-arch_cpu_idle(void)
-{
-	gCpuIdleFunc();
-}
-
-
-void
 arch_cpu_sync_icache(void* address, size_t length)
 {
 	// instruction cache is always consistent on x86
 }
 
-
-void
-arch_cpu_memory_read_barrier(void)
-{
-#ifdef __x86_64__
-	asm volatile("lfence" : : : "memory");
-#else
-	asm volatile ("lock;" : : : "memory");
-	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
-#endif
-}
-
-
-void
-arch_cpu_memory_write_barrier(void)
-{
-#ifdef __x86_64__
-	asm volatile("sfence" : : : "memory");
-#else
-	asm volatile ("lock;" : : : "memory");
-	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
-#endif
-}
-
-
-void
-arch_cpu_memory_read_write_barrier(void)
-{
-#ifdef __x86_64__
-	asm volatile("mfence" : : : "memory");
-#else
-	asm volatile ("lock;" : : : "memory");
-	asm volatile ("addl $0, 0(%%esp);" : : : "memory");
-#endif
-}

@@ -1,5 +1,6 @@
 /*
  * Copyright 2004-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,8 +19,9 @@
 extern "C" {
 #endif
 
-const char *get_cpu_vendor_string(enum cpu_types type);
-const char *get_cpu_model_string(const system_info *info);
+static const char* get_cpu_vendor_string(enum cpu_vendor cpuVendor);
+static const char* get_cpu_model_string(enum cpu_platform platform,
+	enum cpu_vendor cpuVendor, uint32 cpuModel);
 void get_cpu_type(char *vendorBuffer, size_t vendorSize,
 		char *modelBuffer, size_t modelSize);
 int32 get_rounded_cpu_speed(void);
@@ -165,36 +167,16 @@ parse_amd(const char* name)
 #endif
 
 
-const char *
-get_cpu_vendor_string(enum cpu_types type)
+static const char*
+get_cpu_vendor_string(enum cpu_vendor cpuVendor)
 {
-#if __POWERPC__
-	/* We're not that nice here. */
-	return "IBM/Motorola";
-#endif
-#if defined(__INTEL__) || defined(__x86_64__)
-	/* Determine x86 vendor name */
-	switch (type & B_CPU_x86_VENDOR_MASK) {
-		case B_CPU_INTEL_x86:
-			return "Intel";
-		case B_CPU_AMD_x86:
-			return "AMD";
-		case B_CPU_CYRIX_x86:
-			return "Cyrix";
-		case B_CPU_IDT_x86:
-			/* IDT was bought by VIA */
-			if (((type >> 8) & 0xf) >= 6)
-				return "VIA";
-			return "IDT";
-		case B_CPU_RISE_x86:
-				return "Rise";
-		case B_CPU_TRANSMETA_x86:
-			return "Transmeta";
+	static const char* vendorStrings[] = {
+		NULL, "AMD", "Cyrix", "IDT", "Intel", "Rise", "Transmeta", "VIA",
+	};
 
-		default:
-			return NULL;
-	}
-#endif
+	if ((size_t)cpuVendor >= sizeof(vendorStrings) / sizeof(const char*))
+		return NULL;
+	return vendorStrings[cpuVendor];
 }
 
 
@@ -256,251 +238,222 @@ get_cpuid_model_string(char *name)
 #endif	/* __INTEL__ || __x86_64__ */
 
 
-const char *
-get_cpu_model_string(const system_info *info)
+static const char*
+get_cpu_model_string(enum cpu_platform platform, enum cpu_vendor cpuVendor,
+	uint32 cpuModel)
 {
 #if defined(__INTEL__) || defined(__x86_64__)
 	char cpuidName[49];
-		/* for use with get_cpuid_model_string() */
-#endif	/* __INTEL__ || __x86_64__ */
+#endif
 
-	/* Determine CPU type */
-	switch (info->cpu_type) {
-#if __POWERPC__
-		case B_CPU_PPC_603:
-			return "603";
-		case B_CPU_PPC_603e:
-			return "603e";
-		case B_CPU_PPC_750:
-			return "750";
-		case B_CPU_PPC_604:
-			return "604";
-		case B_CPU_PPC_604e:
-			return "604e";
-		default:
-			return NULL;
-#endif	/* __POWERPC__ */
+	(void)cpuVendor;
+	(void)cpuModel;
+
 #if defined(__INTEL__) || defined(__x86_64__)
-		case B_CPU_x86:
-			return "Unknown x86";
+	if (platform != B_CPU_x86 && platform != B_CPU_x86_64)
+		return NULL;
 
-		/* Intel */
-		case B_CPU_INTEL_PENTIUM:
-		case B_CPU_INTEL_PENTIUM75:
-			return "Pentium";
-		case B_CPU_INTEL_PENTIUM_486_OVERDRIVE:
-		case B_CPU_INTEL_PENTIUM75_486_OVERDRIVE:
-			return "Pentium OD";
-		case B_CPU_INTEL_PENTIUM_MMX:
-		case B_CPU_INTEL_PENTIUM_MMX_MODEL_8:
-			return "Pentium MMX";
-		case B_CPU_INTEL_PENTIUM_PRO:
-			return "Pentium Pro";
-		case B_CPU_INTEL_PENTIUM_II_MODEL_3:
-		case B_CPU_INTEL_PENTIUM_II_MODEL_5:
-			return "Pentium II";
-		case B_CPU_INTEL_CELERON:
-		case B_CPU_INTEL_CELERON_MODEL_22:
-			return "Celeron";
-		case B_CPU_INTEL_PENTIUM_III:
-		case B_CPU_INTEL_PENTIUM_III_MODEL_8:
-		case B_CPU_INTEL_PENTIUM_III_MODEL_11:
-		case B_CPU_INTEL_PENTIUM_III_XEON:
-			return "Pentium III";
-		case B_CPU_INTEL_PENTIUM_M:
-		case B_CPU_INTEL_PENTIUM_M_MODEL_13:
-			get_cpuid_model_string(cpuidName);
-			if (strcasestr(cpuidName, "Celeron") != NULL)
-				return "Pentium M Celeron";
-			return "Pentium M";
-		case B_CPU_INTEL_ATOM:
-			return "Atom";
-		case B_CPU_INTEL_PENTIUM_CORE:
-			get_cpuid_model_string(cpuidName);
-			if (strcasestr(cpuidName, "Celeron") != NULL)
-				return "Core Celeron";
-			return "Core";
-		case B_CPU_INTEL_PENTIUM_CORE_2:
-			get_cpuid_model_string(cpuidName);
-			if (strcasestr(cpuidName, "Celeron") != NULL)
-				return "Core 2 Celeron";
-			if (strcasestr(cpuidName, "Xeon") != NULL)
-				return "Core 2 Xeon";
-			return "Core 2";
-		case B_CPU_INTEL_PENTIUM_CORE_2_45_NM:
-			get_cpuid_model_string(cpuidName);
-			if (strcasestr(cpuidName, "Celeron") != NULL)
-				return "Core 2 Celeron";
-			if (strcasestr(cpuidName, "Xeon") != NULL)
-				return "Core 2 Xeon";
-			if (strcasestr(cpuidName, "Pentium") != NULL)
-				return "Pentium";
-			if (strcasestr(cpuidName, "Extreme") != NULL)
-				return "Core 2 Extreme";
-			return	"Core 2";
-		case B_CPU_INTEL_PENTIUM_CORE_I5_M430:
-			return "Core i5";
-		case B_CPU_INTEL_PENTIUM_CORE_I7:
-		case B_CPU_INTEL_PENTIUM_CORE_I7_Q720:
-			get_cpuid_model_string(cpuidName);
-			if (strcasestr(cpuidName, "Xeon") != NULL)
-				return "Core i7 Xeon";
-			return "Core i7";
-		case B_CPU_INTEL_PENTIUM_IV:
-		case B_CPU_INTEL_PENTIUM_IV_MODEL_1:
-		case B_CPU_INTEL_PENTIUM_IV_MODEL_2:
-		case B_CPU_INTEL_PENTIUM_IV_MODEL_3:
-		case B_CPU_INTEL_PENTIUM_IV_MODEL_4:
-			get_cpuid_model_string(cpuidName);
-			if (strcasestr(cpuidName, "Celeron") != NULL)
-				return "Pentium 4 Celeron";
-			if (strcasestr(cpuidName, "Xeon") != NULL)
-				return "Pentium 4 Xeon";
-			return "Pentium 4";
+	uint16 family = ((cpuModel >> 8) & 0xf) | ((cpuModel >> 16) & 0xff0);
+	uint16 model = ((cpuModel >> 4) & 0xf) | ((cpuModel >> 12) & 0xf0);
+	uint8 stepping = cpuModel & 0xf;
 
-		/* AMD */
-		case B_CPU_AMD_K5_MODEL_0:
-		case B_CPU_AMD_K5_MODEL_1:
-		case B_CPU_AMD_K5_MODEL_2:
-		case B_CPU_AMD_K5_MODEL_3:
-			return "K5";
-		case B_CPU_AMD_K6_MODEL_6:
-		case B_CPU_AMD_K6_MODEL_7:
-			return "K6";
-		case B_CPU_AMD_K6_2:
-			return "K6-2";
-		case B_CPU_AMD_K6_III:
-		case B_CPU_AMD_K6_III_MODEL_13:
-			return "K6-III";
-		case B_CPU_AMD_GEODE_LX:
-			return "Geode LX";
-		case B_CPU_AMD_ATHLON_MODEL_1:
-		case B_CPU_AMD_ATHLON_MODEL_2:
-		case B_CPU_AMD_ATHLON_THUNDERBIRD:
-			return "Athlon";
-		case B_CPU_AMD_ATHLON_XP_MODEL_6:
-		case B_CPU_AMD_ATHLON_XP_MODEL_7:
-		case B_CPU_AMD_ATHLON_XP_MODEL_8:
-		case B_CPU_AMD_ATHLON_XP_MODEL_10:
-			return "Athlon XP";
-		case B_CPU_AMD_DURON:
-			return "Duron";
-		case B_CPU_AMD_SEMPRON_64_MODEL_28:
-		case B_CPU_AMD_SEMPRON_64_MODEL_44:
-		case B_CPU_AMD_SEMPRON_64_MODEL_127:
-			return "Sempron 64";
-		case B_CPU_AMD_ATHLON_64_MODEL_3:
-		case B_CPU_AMD_ATHLON_64_MODEL_4:
-		case B_CPU_AMD_ATHLON_64_MODEL_7:
-		case B_CPU_AMD_ATHLON_64_MODEL_8:
-		case B_CPU_AMD_ATHLON_64_MODEL_11:
-		case B_CPU_AMD_ATHLON_64_MODEL_12:
-		case B_CPU_AMD_ATHLON_64_MODEL_14:
-		case B_CPU_AMD_ATHLON_64_MODEL_15:
-		case B_CPU_AMD_ATHLON_64_MODEL_20:
-		case B_CPU_AMD_ATHLON_64_MODEL_23:
-		case B_CPU_AMD_ATHLON_64_MODEL_24:
-		case B_CPU_AMD_ATHLON_64_MODEL_27:
-		case B_CPU_AMD_ATHLON_64_MODEL_31:
-		case B_CPU_AMD_ATHLON_64_MODEL_35:
-		case B_CPU_AMD_ATHLON_64_MODEL_43:
-		case B_CPU_AMD_ATHLON_64_MODEL_47:
-		case B_CPU_AMD_ATHLON_64_MODEL_63:
-		case B_CPU_AMD_ATHLON_64_MODEL_79:
-		case B_CPU_AMD_ATHLON_64_MODEL_95:
-			return "Athlon 64";
-		case B_CPU_AMD_OPTERON_MODEL_5:
-		case B_CPU_AMD_OPTERON_MODEL_21:
-		case B_CPU_AMD_OPTERON_MODEL_33:
-		case B_CPU_AMD_OPTERON_MODEL_37:
-		case B_CPU_AMD_OPTERON_MODEL_39:
-			return "Opteron";
-		case B_CPU_AMD_TURION_64_MODEL_36:
-		case B_CPU_AMD_TURION_64_MODEL_76:
-		case B_CPU_AMD_TURION_64_MODEL_104:
-			return "Turion 64";
-		case B_CPU_AMD_PHENOM_MODEL_2:
-			return "Phenom";
-		case B_CPU_AMD_PHENOM_II_MODEL_4:
-		case B_CPU_AMD_PHENOM_II_MODEL_5:
-		case B_CPU_AMD_PHENOM_II_MODEL_6:
-		case B_CPU_AMD_PHENOM_II_MODEL_10:
-			get_cpuid_model_string(cpuidName);
-			if (strcasestr(cpuidName, "Athlon") != NULL)
-				return "Athlon II";
-			return "Phenom II";
-		case B_CPU_AMD_A_SERIES_MODEL_1:
-		case B_CPU_AMD_A_SERIES_MODEL_16:
-		case B_CPU_AMD_A_SERIES_MODEL_19:
+	if (cpuVendor == B_CPU_VENDOR_AMD) {
+		if (family == 5) {
+			if (model <= 3)
+				return "K5";
+			if (model <= 7)
+				return "K6";
+			if (model == 8)
+				return "K6-2";
+			if (model == 9 || model == 0xd)
+				return "K6-III";
+			if (model == 0xa)
+				return "Geode LX";
+		} else if (family == 6) {
+			if (model <= 2 || model == 4)
+				return "Athlon";
+			if (model == 3)
+				return "Duron";
+			if (model <= 8 || model == 0xa)
+				return "Athlon XP";
+		} else if (family == 0xf) {
+			if (model <= 4 || model == 7 || model == 8
+				|| (model >= 0xb && model <= 0xf) || model == 0x14
+				|| model == 0x18 || model == 0x1b || model == 0x1f
+				|| model == 0x23 || model == 0x2b
+				|| ((model & 0xf) == 0xf && model >= 0x2f && model <= 0x7e)) {
+				return "Athlon 64";
+			}
+			if (model == 5 || model == 0x15 || model == 0x21 || model == 0x25
+				|| model == 0x27) {
+				return "Opteron";
+			}
+			if (model == 0x1c || model == 0x2c || model == 0x7f)
+				return "Sempron 64";
+			if (model == 0x24 || model == 0x4c || model == 0x68)
+				return "Turion 64";
+		} else if (family == 0x1f) {
+			if (model == 2)
+				return "Phenom";
+			if ((model >= 4 && model <= 6) || model == 0xa) {
+				get_cpuid_model_string(cpuidName);
+				if (strcasestr(cpuidName, "Athlon") != NULL)
+					return "Athlon II";
+				return "Phenom II";
+			}
+		} else if (family == 0x3f)
 			return "A-Series";
-		case B_CPU_AMD_C_SERIES:
-			return "C-Series";
-		case B_CPU_AMD_E_SERIES:
-			return "E-Series";
-		case B_CPU_AMD_FX_SERIES_MODEL_1:
-		case B_CPU_AMD_FX_SERIES_MODEL_2:
-			return "FX-Series";
+		else if (family == 0x5f) {
+			if (model == 1)
+				return "C-Series";
+			if (model == 2)
+				return "E-Series";
+		} else if (family == 0x6f) {
+			if (model == 1 || model == 2)
+				return "FX-Series";
+			if (model == 0x10 || model == 0x13)
+				return "A-Series";
+		}
 
-		/* Transmeta */
-		case B_CPU_TRANSMETA_CRUSOE:
-			return "Crusoe";
-		case B_CPU_TRANSMETA_EFFICEON:
-		case B_CPU_TRANSMETA_EFFICEON_2:
-			return "Efficeon";
-
-		/* IDT/VIA */
-		case B_CPU_IDT_WINCHIP_C6:
-			return "WinChip C6";
-		case B_CPU_IDT_WINCHIP_2:
-			return "WinChip 2";
-		case B_CPU_VIA_C3_SAMUEL:
-			return "C3 Samuel";
-		case B_CPU_VIA_C3_SAMUEL_2:
-			/* stepping identified the model */
-			if ((info->cpu_revision & 0xf) < 8)
-				return "C3 Eden/Samuel 2";
-			return "C3 Ezra";
-		case B_CPU_VIA_C3_EZRA_T:
-			return "C3 Ezra-T";
-		case B_CPU_VIA_C3_NEHEMIAH:
-			/* stepping identified the model */
-			if ((info->cpu_revision & 0xf) < 8)
-				return "C3 Nehemiah";
-			return "C3 Eden-N";
-		case B_CPU_VIA_C7_ESTHER:
-		case B_CPU_VIA_C7_ESTHER_2:
-			return "C7";
-		case B_CPU_VIA_NANO_ISAIAH:
-			return "Nano";
-
-		/* Cyrix/VIA */
-		case B_CPU_CYRIX_GXm:
-			return "GXm";
-		case B_CPU_CYRIX_6x86MX:
-			return "6x86MX";
-
-		/* Rise */
-		case B_CPU_RISE_mP6:
-			return "mP6";
-
-		/* National Semiconductor */
-		case B_CPU_NATIONAL_GEODE_GX1:
-			return "Geode GX1";
-
-		default:
-			if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
-				// Fallback to manual parsing of the model string
-				get_cpuid_model_string(cpuidName);
-				return parse_intel(cpuidName);
-			}
-			if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
-				// Fallback to manual parsing of the model string
-				get_cpuid_model_string(cpuidName);
-				return parse_amd(cpuidName);
-			}
-			return NULL;
-#endif	/* __INTEL__ || __x86_64__ */
+		// Fallback to manual parsing of the model string
+		get_cpuid_model_string(cpuidName);
+		return parse_amd(cpuidName);
 	}
+
+	if (cpuVendor == B_CPU_VENDOR_CYRIX) {
+		if (family == 5 && model == 4)
+			return "GXm";
+		if (family == 6)
+			return "6x86MX";
+		return NULL;
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_INTEL) {
+		if (family == 5) {
+			if (model == 1 || model == 2)
+				return "Pentium";
+			if (model == 3 || model == 9)
+				return "Pentium OD";
+			if (model == 4 || model == 8)
+				return "Pentium MMX";
+		} else if (family == 6) {
+			if (model == 1)
+				return "Pentium Pro";
+			if (model == 3 || model == 5)
+				return "Pentium II";
+			if (model == 6)
+				return "Celeron";
+			if (model == 7 || model == 8 || model == 0xa || model == 0xb)
+				return "Pentium III";
+			if (model == 9 || model == 0xd) {
+				get_cpuid_model_string(cpuidName);
+				if (strcasestr(cpuidName, "Celeron") != NULL)
+					return "Pentium M Celeron";
+				return "Pentium M";
+			}
+			if (model == 0x1c || model == 0x26 || model == 0x36)
+				return "Atom";
+			if (model == 0xe) {
+				get_cpuid_model_string(cpuidName);
+				if (strcasestr(cpuidName, "Celeron") != NULL)
+					return "Core Celeron";
+				return "Core";
+			}
+			if (model == 0xf || model == 0x17) {
+                get_cpuid_model_string(cpuidName);
+				if (strcasestr(cpuidName, "Celeron") != NULL)
+					return "Core 2 Celeron";
+				if (strcasestr(cpuidName, "Xeon") != NULL)
+					return "Core 2 Xeon";
+				if (strcasestr(cpuidName, "Pentium") != NULL)
+					return "Pentium";
+				if (strcasestr(cpuidName, "Extreme") != NULL)
+					return "Core 2 Extreme";
+				return "Core 2";
+			}
+			if (model == 0x25)
+				return "Core i5";
+			if (model == 0x1a || model == 0x1e) {
+				get_cpuid_model_string(cpuidName);
+				if (strcasestr(cpuidName, "Xeon") != NULL)
+					return "Core i7 Xeon";
+				return "Core i7";
+			}
+		} else if (family == 0xf) {
+			if (model <= 4) {
+				get_cpuid_model_string(cpuidName);
+				if (strcasestr(cpuidName, "Celeron") != NULL)
+					return "Pentium 4 Celeron";
+				if (strcasestr(cpuidName, "Xeon") != NULL)
+					return "Pentium 4 Xeon";
+				return "Pentium 4";
+			}
+		}
+
+		// Fallback to manual parsing of the model string
+		get_cpuid_model_string(cpuidName);
+		return parse_intel(cpuidName);
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_NATIONAL_SEMICONDUCTOR) {
+		if (family == 5) {
+			if (model == 4)
+				return "Geode GX1";
+			if (model == 5)
+				return "Geode GX2";
+			return NULL;
+		}
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_RISE) {
+		if (family == 5)
+			return "mP6";
+		return NULL;
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_TRANSMETA) {
+		if (family == 5 && model == 4)
+			return "Crusoe";
+		if (family == 0xf && (model == 2 || model == 3))
+			return "Efficeon";
+		return NULL;
+	}
+
+	if (cpuVendor == B_CPU_VENDOR_VIA) {
+		if (family == 5) {
+			if (model == 4)
+				return "WinChip C6";
+			if (model == 8)
+				return "WinChip 2";
+			if (model == 9)
+				return "WinChip 3";
+			return NULL;
+		} else if (family == 6) {
+			if (model == 6)
+				return "C3 Samuel";
+			if (model == 7) {
+				if (stepping < 8)
+					return "C3 Eden/Samuel 2";
+				return "C3 Ezra";
+			}
+			if (model == 8)
+				return "C3 Ezra-T";
+			if (model == 9) {
+				if (stepping < 8)
+					return "C3 Nehemiah";
+				return "C3 Ezra-N";
+			}
+			if (model == 0xa || model == 0xd)
+				return "C7";
+			if (model == 0xf)
+				return "Nano";
+			return NULL;
+		}
+	}
+
+#endif
+
+	return NULL;
 }
 
 
@@ -509,15 +462,42 @@ get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer,
 	size_t modelSize)
 {
 	const char *vendor, *model;
-	system_info info;
 
-	get_system_info(&info);
+	uint32 topologyNodeCount = 0;
+	cpu_topology_node_info* topology = NULL;
+	get_cpu_topology_info(NULL, &topologyNodeCount);
+	if (topologyNodeCount != 0)
+		topology = new cpu_topology_node_info[topologyNodeCount];
+	get_cpu_topology_info(topology, &topologyNodeCount);
 
-	vendor = get_cpu_vendor_string(info.cpu_type);
+	enum cpu_platform platform = B_CPU_UNKNOWN;
+	enum cpu_vendor cpuVendor = B_CPU_VENDOR_UNKNOWN;
+	uint32 cpuModel = 0;
+	for (uint32 i = 0; i < topologyNodeCount; i++) {
+		switch (topology[i].type) {
+			case B_TOPOLOGY_ROOT:
+				platform = topology[i].data.root.platform;
+				break;
+
+			case B_TOPOLOGY_PACKAGE:
+				cpuVendor = topology[i].data.package.vendor;
+				break;
+
+			case B_TOPOLOGY_CORE:
+				cpuModel = topology[i].data.core.model;
+				break;
+
+			default:
+				break;
+		}
+	}
+	delete[] topology;
+
+	vendor = get_cpu_vendor_string(cpuVendor);
 	if (vendor == NULL)
 		vendor = "Unknown";
 
-	model = get_cpu_model_string(&info);
+	model = get_cpu_model_string(platform, cpuVendor, cpuModel);
 	if (model == NULL)
 		model = "Unknown";
 
@@ -536,14 +516,27 @@ get_cpu_type(char *vendorBuffer, size_t vendorSize, char *modelBuffer,
 int32
 get_rounded_cpu_speed(void)
 {
-	system_info info;
+	uint32 topologyNodeCount = 0;
+	cpu_topology_node_info* topology = NULL;
+	get_cpu_topology_info(NULL, &topologyNodeCount);
+	if (topologyNodeCount != 0)
+		topology = new cpu_topology_node_info[topologyNodeCount];
+	get_cpu_topology_info(topology, &topologyNodeCount);
+
+	uint64 cpuFrequency = 0;
+	for (uint32 i = 0; i < topologyNodeCount; i++) {
+		if (topology[i].type == B_TOPOLOGY_CORE) {
+				cpuFrequency = topology[i].data.core.default_frequency;
+				break;
+		}
+	}
+	delete[] topology;
 
 	int target, frac, delta;
 	int freqs[] = { 100, 50, 25, 75, 33, 67, 20, 40, 60, 80, 10, 30, 70, 90 };
 	uint x;
 
-	get_system_info(&info);
-	target = info.cpu_clock_speed / 1000000;
+	target = cpuFrequency / 1000000;
 	frac = target % 100;
 	delta = -frac;
 

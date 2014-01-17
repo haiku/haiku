@@ -53,7 +53,7 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 	SoundRecorder StyledEdit Terminal TextSearch TV WebWatch Workspaces
 ] ;
 SYSTEM_PREFERENCES = [ FFilterByBuildFeatures
-	Appearance Backgrounds CPUFrequency DataTranslations
+	Appearance Backgrounds DataTranslations
 	<preference>Deskbar E-mail FileTypes Keyboard Keymap Locale Media
 	Mouse Network Notifications Printers Screen ScreenSaver
 	Shortcuts Sounds Time Touchpad <preference>Tracker VirtualMemory

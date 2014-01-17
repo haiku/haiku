@@ -74,13 +74,13 @@ long_gdt_init()
 	clear_segment_descriptor(&gdt[0]);
 
 	// Set up code/data segments (TSS segments set up later in the kernel).
-	set_segment_descriptor(&gdt[KERNEL_CODE_SEG / 8], DT_CODE_EXECUTE_ONLY,
+	set_segment_descriptor(&gdt[KERNEL_CODE_SEGMENT], DT_CODE_EXECUTE_ONLY,
 		DPL_KERNEL);
-	set_segment_descriptor(&gdt[KERNEL_DATA_SEG / 8], DT_DATA_WRITEABLE,
+	set_segment_descriptor(&gdt[KERNEL_DATA_SEGMENT], DT_DATA_WRITEABLE,
 		DPL_KERNEL);
-	set_segment_descriptor(&gdt[USER_CODE_SEG / 8], DT_CODE_EXECUTE_ONLY,
+	set_segment_descriptor(&gdt[USER_CODE_SEGMENT], DT_CODE_EXECUTE_ONLY,
 		DPL_USER);
-	set_segment_descriptor(&gdt[USER_DATA_SEG / 8], DT_DATA_WRITEABLE,
+	set_segment_descriptor(&gdt[USER_DATA_SEGMENT], DT_DATA_WRITEABLE,
 		DPL_USER);
 
 	// Used by long_enter_kernel().
@@ -330,7 +330,7 @@ long_start_kernel()
 {
 	// Check whether long mode is supported.
 	cpuid_info info;
-	get_current_cpuid(&info, 0x80000001);
+	get_current_cpuid(&info, 0x80000001, 0);
 	if ((info.regs.edx & (1 << 29)) == 0)
 		panic("64-bit kernel requires a 64-bit CPU");
 

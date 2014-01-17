@@ -420,244 +420,108 @@ extern void			ktrace_vprintf(const char *format, va_list args);
 
 /* System information */
 
-#if __INTEL__
-#	define B_MAX_CPU_COUNT	8
-#elif __x86_64__
-#	define B_MAX_CPU_COUNT	8
-#elif __POWERPC__
-#	define B_MAX_CPU_COUNT	8
-#elif __M68K__
-#	define B_MAX_CPU_COUNT	1
-#elif __ARM__ || __ARMEL__ || __ARMEB__
-#	define B_MAX_CPU_COUNT	1
-#elif __MIPSEL__
-#	define B_MAX_CPU_COUNT	1
-#else
-#	warning Unknown cpu
-#	define B_MAX_CPU_COUNT	1
-#endif
+typedef struct {
+	bigtime_t	active_time;	/* usec of doing useful work since boot */
+	bool		enabled;
+} cpu_info;
 
-typedef enum cpu_types {
-	/* TODO: add latest models */
+typedef struct {
+	bigtime_t		boot_time;			/* time of boot (usecs since 1/1/1970) */
 
-	/* Motorola/IBM */
-	B_CPU_PPC_UNKNOWN					= 0,
-	B_CPU_PPC_601						= 1,
-	B_CPU_PPC_602						= 7,
-	B_CPU_PPC_603						= 2,
-	B_CPU_PPC_603e						= 3,
-	B_CPU_PPC_603ev						= 8,
-	B_CPU_PPC_604						= 4,
-	B_CPU_PPC_604e						= 5,
-	B_CPU_PPC_604ev						= 9,
-	B_CPU_PPC_620						= 10,
-	B_CPU_PPC_750   					= 6,
-	B_CPU_PPC_686						= 13,
-	B_CPU_PPC_860						= 25,
-	B_CPU_PPC_7400						= 26,
-	B_CPU_PPC_7410						= 27,
-	B_CPU_PPC_7447A						= 28,
-	B_CPU_PPC_7448						= 29,
-	B_CPU_PPC_7450						= 30,
-	B_CPU_PPC_7455						= 31,
-	B_CPU_PPC_7457						= 32,
-	B_CPU_PPC_8240						= 33,
-	B_CPU_PPC_8245						= 34,
+	uint32			cpu_count;			/* number of cpus */
 
-	B_CPU_PPC_IBM_401A1					= 35,
-	B_CPU_PPC_IBM_401B2					= 36,
-	B_CPU_PPC_IBM_401C2					= 37,
-	B_CPU_PPC_IBM_401D2					= 38,
-	B_CPU_PPC_IBM_401E2					= 39,
-	B_CPU_PPC_IBM_401F2					= 40,
-	B_CPU_PPC_IBM_401G2					= 41,
-	B_CPU_PPC_IBM_403					= 42,
-	B_CPU_PPC_IBM_405GP					= 43,
-	B_CPU_PPC_IBM_405L					= 44,
-	B_CPU_PPC_IBM_750FX					= 45,
-	B_CPU_PPC_IBM_POWER3				= 46,
+	uint64			max_pages;			/* total # of accessible pages */
+	uint64			used_pages;			/* # of accessible pages in use */
+	uint64			cached_pages;
+	uint64			block_cache_pages;
+	uint64			ignored_pages;		/* # of ignored/inaccessible pages */
 
-	/* Intel */
+	uint64			needed_memory;
+	uint64			free_memory;
 
-	/* Updated according to Intel(R) Processor Identification and
-	 * the  CPUID instruction (Table 4)
-	 * AP-485 Intel - 24161832.pdf
-	 */
-	B_CPU_INTEL_x86						= 0x1000,
-	B_CPU_INTEL_PENTIUM					= 0x1051,
-	B_CPU_INTEL_PENTIUM75,
-	B_CPU_INTEL_PENTIUM_486_OVERDRIVE,
-	B_CPU_INTEL_PENTIUM_MMX,
-	B_CPU_INTEL_PENTIUM_MMX_MODEL_4		= B_CPU_INTEL_PENTIUM_MMX,
-	B_CPU_INTEL_PENTIUM_MMX_MODEL_8		= 0x1058,
-	B_CPU_INTEL_PENTIUM75_486_OVERDRIVE,
-	B_CPU_INTEL_PENTIUM_PRO				= 0x1061,
-	B_CPU_INTEL_PENTIUM_II				= 0x1063,
-	B_CPU_INTEL_PENTIUM_II_MODEL_3		= 0x1063,
-	B_CPU_INTEL_PENTIUM_II_MODEL_5		= 0x1065,
-	B_CPU_INTEL_CELERON					= 0x1066,
-	B_CPU_INTEL_CELERON_MODEL_22		= 0x11066,
-	B_CPU_INTEL_PENTIUM_III				= 0x1067,
-	B_CPU_INTEL_PENTIUM_III_MODEL_8		= 0x1068,
-	B_CPU_INTEL_PENTIUM_M				= 0x1069,
-	B_CPU_INTEL_PENTIUM_III_XEON		= 0x106a,
-	B_CPU_INTEL_PENTIUM_III_MODEL_11 	= 0x106b,
-	B_CPU_INTEL_ATOM					= 0x1106c,
-	B_CPU_INTEL_PENTIUM_M_MODEL_13		= 0x106d, /* Dothan */
-	B_CPU_INTEL_PENTIUM_CORE,
-	B_CPU_INTEL_PENTIUM_CORE_2,
-	B_CPU_INTEL_PENTIUM_CORE_2_45_NM	= 0x11067, /* Core 2 on 45 nm
-	                                                   (Core 2 Extreme,
-	                                                   Xeon model 23 or
-	                                                   Core 2 Duo/Quad) */
-	B_CPU_INTEL_PENTIUM_CORE_I5_M430	= 0x21065, /* Core i5 M 430 @ 2.27 */
-	B_CPU_INTEL_PENTIUM_CORE_I7			= 0x1106a, /* Core i7 920 @ 2.6(6) */
-	B_CPU_INTEL_PENTIUM_CORE_I7_Q720	= 0x1106e, /* Core i7 Q720 @ 1.6 */
-	B_CPU_INTEL_PENTIUM_IV				= 0x10f0,
-	B_CPU_INTEL_PENTIUM_IV_MODEL_1,
-	B_CPU_INTEL_PENTIUM_IV_MODEL_2,
-	B_CPU_INTEL_PENTIUM_IV_MODEL_3,
-	B_CPU_INTEL_PENTIUM_IV_MODEL_4,
+	uint64			max_swap_pages;
+	uint64			free_swap_pages;
 
-	/* AMD */
+	uint32			page_faults;		/* # of page faults */
 
-	// AMD Processor Recognition Application Note
-	B_CPU_AMD_x86						= 0x1100,
+	uint32			max_sems;
+	uint32			used_sems;
 
-	// Family 5h
-	B_CPU_AMD_K5_MODEL_0				= 0x1150,
-	B_CPU_AMD_K5_MODEL_1				= 0x1151,
-	B_CPU_AMD_K5_MODEL_2				= 0x1152,
-	B_CPU_AMD_K5_MODEL_3				= 0x1153,
-	B_CPU_AMD_K6_MODEL_6				= 0x1156,
-	B_CPU_AMD_K6_MODEL_7				= 0x1157,
-	B_CPU_AMD_K6_MODEL_8				= 0x1158,
-	B_CPU_AMD_K6_2						= 0x1158,
-	B_CPU_AMD_K6_MODEL_9				= 0x1159,
-	B_CPU_AMD_K6_III					= 0x1159,
-	B_CPU_AMD_K6_III_MODEL_13			= 0x115d,
+	uint32			max_ports;
+	uint32			used_ports;
 
-	B_CPU_AMD_GEODE_LX					= 0x115a,
+	uint32			max_threads;
+	uint32			used_threads;
 
-	// Family 6h
-	B_CPU_AMD_ATHLON_MODEL_1			= 0x1161,
-	B_CPU_AMD_ATHLON_MODEL_2			= 0x1162,
+	uint32			max_teams;
+	uint32			used_teams;
 
-	B_CPU_AMD_DURON 					= 0x1163,
+	char			kernel_name[B_FILE_NAME_LENGTH];
+	char			kernel_build_date[B_OS_NAME_LENGTH];
+	char			kernel_build_time[B_OS_NAME_LENGTH];
 
-	B_CPU_AMD_ATHLON_THUNDERBIRD		= 0x1164,
-	B_CPU_AMD_ATHLON_XP_MODEL_6			= 0x1166,
-	B_CPU_AMD_ATHLON_XP_MODEL_7			= 0x1167,
-	B_CPU_AMD_ATHLON_XP_MODEL_8			= 0x1168,
-	B_CPU_AMD_ATHLON_XP_MODEL_10		= 0x116a, /* Barton */
+	int64			kernel_version;
+	uint32			abi;				/* the system API */
+} system_info;
 
-	// Family fh
-	B_CPU_AMD_ATHLON_64_MODEL_3			= 0x11f3,
-	B_CPU_AMD_ATHLON_64_MODEL_4			= 0x11f4,
-	B_CPU_AMD_ATHLON_64_MODEL_7			= 0x11f7,
-	B_CPU_AMD_ATHLON_64_MODEL_8			= 0x11f8,
-	B_CPU_AMD_ATHLON_64_MODEL_11		= 0x11fb,
-	B_CPU_AMD_ATHLON_64_MODEL_12		= 0x11fc,
-	B_CPU_AMD_ATHLON_64_MODEL_14		= 0x11fe,
-	B_CPU_AMD_ATHLON_64_MODEL_15		= 0x11ff,
-	B_CPU_AMD_ATHLON_64_MODEL_20		= 0x111f4,
-	B_CPU_AMD_ATHLON_64_MODEL_23		= 0x111f7,
-	B_CPU_AMD_ATHLON_64_MODEL_24		= 0x111f8,
-	B_CPU_AMD_ATHLON_64_MODEL_27		= 0x111fb,
+enum topology_level_type {
+	B_TOPOLOGY_UNKNOWN,
+	B_TOPOLOGY_ROOT,
+	B_TOPOLOGY_SMT,
+	B_TOPOLOGY_CORE,
+	B_TOPOLOGY_PACKAGE
+};
 
-	// Athlon 64's below here could be really
-	// Sempron 64's... however i've yet to find
-	// proof online
-	B_CPU_AMD_ATHLON_64_MODEL_31		= 0x111ff,
-	B_CPU_AMD_ATHLON_64_MODEL_35		= 0x211f3,
-	B_CPU_AMD_ATHLON_64_MODEL_43		= 0x211fb,
-	B_CPU_AMD_ATHLON_64_MODEL_47		= 0x211ff,
-	B_CPU_AMD_ATHLON_64_MODEL_63		= 0x311ff,
-	B_CPU_AMD_ATHLON_64_MODEL_79		= 0x411ff,
-	B_CPU_AMD_ATHLON_64_MODEL_95		= 0x511ff,
-
-	B_CPU_AMD_SEMPRON_64_MODEL_28		= 0x111fc,
-	B_CPU_AMD_SEMPRON_64_MODEL_44		= 0x211fc,
-	B_CPU_AMD_SEMPRON_64_MODEL_127		= 0x711ff,
-
-	B_CPU_AMD_OPTERON_MODEL_5			= 0x11f5,
-	B_CPU_AMD_OPTERON_MODEL_21			= 0x111f5,
-	B_CPU_AMD_OPTERON_MODEL_33			= 0x211f1,
-	B_CPU_AMD_OPTERON_MODEL_37			= 0x211f5,
-	B_CPU_AMD_OPTERON_MODEL_39			= 0x211f7,
-
-	B_CPU_AMD_TURION_64_MODEL_36		= 0x211f4,
-	B_CPU_AMD_TURION_64_MODEL_76		= 0x411fc,
-	B_CPU_AMD_TURION_64_MODEL_104		= 0x611f8,
-
-	// Family 10h
-	B_CPU_AMD_PHENOM_MODEL_2			= 0x1011f2,
-	B_CPU_AMD_PHENOM_II_MODEL_4			= 0x1011f4,
-	B_CPU_AMD_PHENOM_II_MODEL_5			= 0x1011f5,
-	B_CPU_AMD_PHENOM_II_MODEL_6			= 0x1011f6,
-	B_CPU_AMD_PHENOM_II_MODEL_10		= 0x1011fa,
-
-	// Family 12h
-	B_CPU_AMD_A_SERIES_MODEL_1			= 0x3011f1,
-	B_CPU_AMD_A_SERIES_MODEL_16			= 0x6111f0,
-	B_CPU_AMD_A_SERIES_MODEL_19			= 0x6111f3,
-
-	// Family 14h
-	B_CPU_AMD_C_SERIES					= 0x5011f1,
-	B_CPU_AMD_E_SERIES					= 0x5011f2,
-
-	// Family 15h
-	B_CPU_AMD_FX_SERIES_MODEL_1			= 0x6011f1, /* Bulldozer */
-	B_CPU_AMD_FX_SERIES_MODEL_2			= 0x6011f2,
-
-	/* VIA/Cyrix */
-	B_CPU_CYRIX_x86						= 0x1200,
-	B_CPU_VIA_CYRIX_x86					= 0x1200,
-	B_CPU_CYRIX_GXm						= 0x1254,
-	B_CPU_CYRIX_6x86MX					= 0x1260,
-
-	/* VIA/IDT */
-	B_CPU_IDT_x86						= 0x1300,
-	B_CPU_VIA_IDT_x86					= 0x1300,
-	B_CPU_IDT_WINCHIP_C6				= 0x1354,
-	B_CPU_IDT_WINCHIP_2					= 0x1358,
-	B_CPU_IDT_WINCHIP_3,
-	B_CPU_VIA_C3_SAMUEL					= 0x1366,
-	B_CPU_VIA_C3_SAMUEL_2				= 0x1367,
-	B_CPU_VIA_C3_EZRA_T					= 0x1368,
-	B_CPU_VIA_C3_NEHEMIAH				= 0x1369,
-	B_CPU_VIA_C7_ESTHER					= 0x136a,
-	B_CPU_VIA_C7_ESTHER_2				= 0x136d,
-	B_CPU_VIA_NANO_ISAIAH				= 0x136f,
-
-	/* Transmeta */
-	B_CPU_TRANSMETA_x86					= 0x1600,
-	B_CPU_TRANSMETA_CRUSOE				= 0x1654,
-	B_CPU_TRANSMETA_EFFICEON			= 0x16f2,
-	B_CPU_TRANSMETA_EFFICEON_2			= 0x16f3,
-
-	/* Rise */
-	B_CPU_RISE_x86						= 0x1400,
-	B_CPU_RISE_mP6						= 0x1450,
-
-	/* National Semiconductor */
-	B_CPU_NATIONAL_x86					= 0x1500,
-	B_CPU_NATIONAL_GEODE_GX1			= 0x1554,
-	B_CPU_NATIONAL_GEODE_GX2,
-
-	/* For compatibility */
-	B_CPU_AMD_29K						= 14,
+enum cpu_platform {
+	B_CPU_UNKNOWN,
 	B_CPU_x86,
-	B_CPU_MC6502,
-	B_CPU_Z80,
-	B_CPU_ALPHA,
-	B_CPU_MIPS,
-	B_CPU_HPPA,
-	B_CPU_M68K,
-	B_CPU_ARM,
-	B_CPU_SH,
-	B_CPU_SPARC
-} cpu_type;
+	B_CPU_x86_64
+};
+
+enum cpu_vendor {
+	B_CPU_VENDOR_UNKNOWN,
+	B_CPU_VENDOR_AMD,
+	B_CPU_VENDOR_CYRIX,
+	B_CPU_VENDOR_IDT,
+	B_CPU_VENDOR_INTEL,
+	B_CPU_VENDOR_NATIONAL_SEMICONDUCTOR,
+	B_CPU_VENDOR_RISE,
+	B_CPU_VENDOR_TRANSMETA,
+	B_CPU_VENDOR_VIA
+};
+
+typedef struct {
+	enum cpu_platform		platform;
+} cpu_topology_root_info;
+
+typedef struct {
+	enum cpu_vendor			vendor;
+	uint32					cache_line_size;
+} cpu_topology_package_info;
+
+typedef struct {
+	uint32					model;
+	uint64					default_frequency;
+} cpu_topology_core_info;
+
+typedef struct {
+	uint32							id;
+	enum topology_level_type		type;
+	uint32							level;
+
+	union {
+		cpu_topology_root_info		root;
+		cpu_topology_package_info	package;
+		cpu_topology_core_info		core;
+	} data;
+} cpu_topology_node_info;
+
+
+extern status_t		get_system_info(system_info* info);
+extern status_t		get_cpu_info(uint32 firstCPU, uint32 cpuCount,
+						cpu_info* info);
+extern status_t		get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
+						uint32* topologyInfoCount);
 
 #define B_CPU_x86_VENDOR_MASK	0xff00
 
@@ -712,76 +576,6 @@ extern status_t		get_cpuid(cpuid_info *info, uint32 eaxRegister,
 						uint32 cpuNum);
 #endif
 
-
-typedef enum platform_types {
-	B_BEBOX_PLATFORM = 0,
-	B_MAC_PLATFORM,
-	B_AT_CLONE_PLATFORM,
-	B_ENIAC_PLATFORM,
-	B_APPLE_II_PLATFORM,
-	B_CRAY_PLATFORM,
-	B_LISA_PLATFORM,
-	B_TI_994A_PLATFORM,
-	B_TIMEX_SINCLAIR_PLATFORM,
-	B_ORAC_1_PLATFORM,
-	B_HAL_PLATFORM,
-	B_BESM_6_PLATFORM,
-	B_MK_61_PLATFORM,
-	B_NINTENDO_64_PLATFORM,
-	B_AMIGA_PLATFORM,
-	B_ATARI_PLATFORM,
-	B_64_BIT_PC_PLATFORM
-} platform_type;
-
-typedef struct {
-	bigtime_t	active_time;	/* usec of doing useful work since boot */
-} cpu_info;
-
-
-typedef int32 machine_id[2];	/* unique machine ID */
-
-typedef struct {
-	machine_id		id;					/* unique machine ID */
-	bigtime_t		boot_time;			/* time of boot (usecs since 1/1/1970) */
-
-	int32			cpu_count;			/* number of cpus */
-	enum cpu_types	cpu_type;			/* type of cpu */
-	int32			cpu_revision;		/* revision # of cpu */
-	cpu_info		cpu_infos[B_MAX_CPU_COUNT];	/* info about individual cpus */
-	int64			cpu_clock_speed;	/* processor clock speed (Hz) */
-	int64			bus_clock_speed;	/* bus clock speed (Hz) */
-	enum platform_types platform_type;	/* type of machine we're on */
-
-	int32			max_pages;			/* total # of accessible pages */
-	int32			used_pages;			/* # of accessible pages in use */
-	int32			page_faults;		/* # of page faults */
-	int32			max_sems;
-	int32			used_sems;
-	int32			max_ports;
-	int32			used_ports;
-	int32			max_threads;
-	int32			used_threads;
-	int32			max_teams;
-	int32			used_teams;
-
-	char			kernel_name[B_FILE_NAME_LENGTH];
-	char			kernel_build_date[B_OS_NAME_LENGTH];
-	char			kernel_build_time[B_OS_NAME_LENGTH];
-	int64			kernel_version;
-
-	bigtime_t		_busy_wait_time;	/* reserved for whatever */
-
-	int32			cached_pages;
-	uint32			abi;				/* the system API */
-	int32			ignored_pages;		/* # of ignored/inaccessible pages */
-	int32			pad;
-} system_info;
-
-/* system private, use macro instead */
-extern status_t		_get_system_info(system_info *info, size_t size);
-
-#define get_system_info(info) \
-	_get_system_info((info), sizeof(*(info)))
 
 extern int32		is_computer_on(void);
 extern double		is_computer_on_fire(void);

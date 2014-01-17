@@ -109,7 +109,7 @@ random_value()
 unsigned int
 secure_random_value()
 {
-	static vint32 count = 0;
+	static int32 count = 0;
 
 	uint32 data[8];
 	data[0] = atomic_add(&count, 1);

@@ -97,7 +97,7 @@ virtual	status_t			ReadMACAddress(ether_address_t *address);
 		bool				fRemoved;
 		bool				fHasConnection;
 		bool				fNonBlocking;
-		vint32				fInsideNotify;
+		int32				fInsideNotify;
 
 		// interface and device infos
 		uint16				fFrameSize;

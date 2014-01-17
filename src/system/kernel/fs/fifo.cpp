@@ -99,8 +99,7 @@ public:
 		TRACE("ReadRequest %p::Notify(), fNotified %d\n", this, fNotified);
 
 		if (!fNotified) {
-			SpinLocker schedulerLocker(gSchedulerLock);
-			thread_unblock_locked(fThread, status);
+			thread_unblock(fThread, status);
 			fNotified = true;
 		}
 	}

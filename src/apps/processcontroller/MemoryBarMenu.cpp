@@ -45,7 +45,7 @@ MemoryBarMenu::MemoryBarMenu(const char* name, info_pack* infos, system_info& sy
 
 	fTeamList = (team_id*)malloc(sizeof (team_id) * fTeamCount);
 
-	int	k;
+	unsigned int k;
 	for (k = 0; k < systemInfo.used_teams; k++) {
 		fTeamList[k] = infos[k].team_info.team;
 	}
@@ -124,7 +124,7 @@ MemoryBarMenu::Pulse()
 	info_pack infos;
 	item = NULL;
 	while (get_next_team_info(&cookie, &infos.team_info) == B_OK) {
-		int	j = 0;
+		unsigned int j = 0;
 		while (j < fTeamCount && infos.team_info.team != fTeamList[j]) {
 			j++;
 		}

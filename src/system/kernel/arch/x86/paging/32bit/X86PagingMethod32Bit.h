@@ -80,6 +80,8 @@ private:
 			friend struct PhysicalPageSlotPool;
 
 private:
+	inline	int32				_GetInitialPoolCount();
+
 	static	void				_EarlyPreparePageTables(
 									page_table_entry* pageTables,
 									addr_t address, size_t size);
@@ -108,7 +110,7 @@ X86PagingMethod32Bit::Method()
 X86PagingMethod32Bit::SetPageTableEntry(page_table_entry* entry,
 	page_table_entry newEntry)
 {
-	return atomic_set((int32*)entry, newEntry);
+	return atomic_get_and_set((int32*)entry, newEntry);
 }
 
 

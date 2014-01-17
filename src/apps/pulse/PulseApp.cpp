@@ -207,14 +207,14 @@ PulseApp::ShowAbout(bool asApplication)
  */
 
 bool
-LastEnabledCPU(int my_cpu)
+LastEnabledCPU(unsigned int my_cpu)
 {
 	system_info sys_info;
 	get_system_info(&sys_info);
 	if (sys_info.cpu_count == 1)
 		return true;
 
-	for (int x = 0; x < sys_info.cpu_count; x++) {
+	for (unsigned int x = 0; x < sys_info.cpu_count; x++) {
 		if (x == my_cpu)
 			continue;
 		if (_kern_cpu_enabled(x) == 1)

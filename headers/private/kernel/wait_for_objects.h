@@ -17,12 +17,12 @@ struct select_sync;
 typedef struct select_info {
 	struct select_info*	next;				// next in the object's list
 	struct select_sync*	sync;
-	vint32				events;
+	int32				events;
 	uint16				selected_events;
 } select_info;
 
 typedef struct select_sync {
-	vint32				ref_count;
+	int32				ref_count;
 	sem_id				sem;
 	uint32				count;
 	struct select_info*	set;

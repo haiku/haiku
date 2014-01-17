@@ -10,10 +10,12 @@
 .text
 
 
-/* status_t get_current_cpuid(cpuid_info* info, uint32 eaxRegister) */
+/* status_t get_current_cpuid(cpuid_info* info, uint32 eaxRegister,
+	uint32 ecxRegister) */
 FUNCTION(get_current_cpuid):
  	push	%rbx
 	movl	%esi, %eax
+	movl	%edx, %ecx
  	cpuid
  	movl	%eax, 0(%rdi)
  	movl	%ebx, 4(%rdi)

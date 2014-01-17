@@ -196,19 +196,21 @@ extern "C" {
 #endif
 
 /* Atomic functions; previous value is returned */
-extern int32	atomic_set(vint32 *value, int32 newValue);
-extern int32	atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst);
-extern int32	atomic_add(vint32 *value, int32 addValue);
-extern int32	atomic_and(vint32 *value, int32 andValue);
-extern int32	atomic_or(vint32 *value, int32 orValue);
-extern int32	atomic_get(vint32 *value);
+extern void		atomic_set(int32* value, int32 newValue);
+extern int32	atomic_get_and_set(int32* value, int32 newValue);
+extern int32	atomic_test_and_set(int32 *value, int32 newValue, int32 testAgainst);
+extern int32	atomic_add(int32 *value, int32 addValue);
+extern int32	atomic_and(int32 *value, int32 andValue);
+extern int32	atomic_or(int32 *value, int32 orValue);
+extern int32	atomic_get(int32 *value);
 
-extern int64	atomic_set64(vint64 *value, int64 newValue);
-extern int64	atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst);
-extern int64	atomic_add64(vint64 *value, int64 addValue);
-extern int64	atomic_and64(vint64 *value, int64 andValue);
-extern int64	atomic_or64(vint64 *value, int64 orValue);
-extern int64	atomic_get64(vint64 *value);
+extern void		atomic_set64(int64* value, int64 newValue);
+extern int64	atomic_get_and_set64(int64* value, int64 newValue);
+extern int64	atomic_test_and_set64(int64 *value, int64 newValue, int64 testAgainst);
+extern int64	atomic_add64(int64 *value, int64 addValue);
+extern int64	atomic_and64(int64 *value, int64 andValue);
+extern int64	atomic_or64(int64 *value, int64 orValue);
+extern int64	atomic_get64(int64 *value);
 
 /* Other stuff */
 extern void*	get_stack_frame(void);
@@ -240,15 +242,6 @@ extern void*	get_stack_frame(void);
 	__sync_fetch_and_and(valuePointer, andValue)
 #define atomic_or(valuePointer, orValue)	\
 	__sync_fetch_and_or(valuePointer, orValue)
-#define atomic_get(valuePointer)	\
-	__sync_fetch_and_or(valuePointer, 0)
-	// No equivalent to atomic_get(). We simulate it via atomic or. On most
-	// (all?) 32+ bit architectures aligned 32 bit reads will be atomic anyway,
-	// though.
-
-// Note: No equivalent for atomic_set(). It could be simulated by a
-// get + atomic test and set loop, but calling the atomic_set() implementation
-// might be faster.
 
 #endif	// B_USE_BUILTIN_ATOMIC_FUNCTIONS && __GNUC__ >= 4
 

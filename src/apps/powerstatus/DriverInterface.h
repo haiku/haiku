@@ -67,7 +67,7 @@ public:
 protected:
 	virtual void		_WatchPowerStatus() = 0;
 
-	vint32				fIsWatching;
+	int32				fIsWatching;
 	sem_id				fWaitSem;
 
 private:

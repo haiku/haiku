@@ -10,7 +10,7 @@
 #include "intel.h"
 #include "generic_x86.h"
 
-#include <OS.h>
+#include <cpu.h>
 
 
 static void
@@ -23,11 +23,7 @@ intel_init_mtrrs(void)
 static status_t
 intel_init(void)
 {
-	system_info info;
-	if (get_system_info(&info) != B_OK)
-		return B_ERROR;
-
-	if ((info.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_INTEL_x86)
+	if (gCPU[0].arch.vendor != VENDOR_INTEL)
 		return B_ERROR;
 
 	generic_mtrr_compute_physical_mask();

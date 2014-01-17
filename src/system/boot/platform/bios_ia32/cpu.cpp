@@ -327,7 +327,7 @@ check_cpu_features()
 	}
 
 	cpuid_info info;
-	if (get_current_cpuid(&info, 1) != B_OK)
+	if (get_current_cpuid(&info, 1, 0) != B_OK)
 		return B_ERROR;
 
 	if ((info.eax_1.features & RDTSC_FEATURE) == 0) {

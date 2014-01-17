@@ -32,6 +32,7 @@ int __libc_argc;
 char **__libc_argv;
 
 int __gABIVersion;
+int32 __gCPUCount;
 
 char _single_threaded = true;
 	// determines if I/O locking needed; needed for BeOS compatibility
@@ -48,6 +49,7 @@ int _data_offset_main_;
 void
 initialize_before(image_id imageID)
 {
+	system_info info;
 	char *programPath = __gRuntimeLoader->program_args->args[0];
 	__gCommPageAddress = __gRuntimeLoader->commpage_address;
 	__gABIVersion = __gRuntimeLoader->abi_version;
@@ -69,6 +71,9 @@ initialize_before(image_id imageID)
 		umask(__gRuntimeLoader->program_args->umask);
 
 	pthread_self()->id = find_thread(NULL);
+
+	get_system_info(&info);
+	__gCPUCount = info.cpu_count;
 
 	__init_time((addr_t)__gCommPageAddress);
 	__init_heap();

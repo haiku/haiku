@@ -9,8 +9,7 @@
 
 X86PagingStructures::X86PagingStructures()
 	:
-	ref_count(1),
-	active_on_cpus(0)
+	ref_count(1)
 {
 }
 

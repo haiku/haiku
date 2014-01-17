@@ -8,50 +8,22 @@
 
 #include <module.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define CPUIDLE_CSTATE_MAX	8
-#define CSTATE_NAME_LENGTH	32
-#define B_CPUIDLE_MODULE_NAME "generic/cpuidle/v1"
+#include <scheduler.h>
 
 
-struct CpuidleStat {
-	uint64		usageCount;
-	bigtime_t	usageTime;
-};
+#define CPUIDLE_MODULES_PREFIX	"power/cpuidle"
 
 
-struct CpuidleInfo {
-	int32		cstateSleep;
-	CpuidleStat	stats[CPUIDLE_CSTATE_MAX];
-};
+typedef struct cpuidle_module_info {
+	module_info		info;
 
-struct CpuidleDevice;
+	float			rank;
 
-struct CpuidleCstate {
-	char	name[CSTATE_NAME_LENGTH];
-	int32	latency;
-	int32	(*EnterIdle)(int32 state, CpuidleDevice *device);
-	void	*pData;
-};
+	void			(*cpuidle_set_scheduler_mode)(enum scheduler_mode mode);
 
+	void			(*cpuidle_idle)(void);
+	void			(*cpuidle_wait)(int32* variable, int32 test);
+} cpuidle_module_info;
 
-struct CpuidleDevice {
-	CpuidleCstate	cStates[CPUIDLE_CSTATE_MAX];
-	int32			cStateCount;
-};
-
-
-struct CpuidleModuleInfo {
-	module_info	info;
-	status_t	(*AddDevice)(CpuidleDevice *device);
-};
-
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif		// _CPUIDLE_MODULE_H

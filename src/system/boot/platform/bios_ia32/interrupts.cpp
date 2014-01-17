@@ -96,7 +96,8 @@ set_interrupt_gate(int n, void (*function)())
 	if (n >= DEBUG_IDT_SLOT_COUNT)
 		return;
 
-	sDebugIDT[n].a = (KERNEL_CODE_SEG << 16) | (0x0000ffff & (addr_t)function);
+	sDebugIDT[n].a
+		= (KERNEL_CODE_SELECTOR << 16) | (0x0000ffff & (addr_t)function);
 	sDebugIDT[n].b = (0xffff0000 & (addr_t)function) | 0x8e00;
 }
 

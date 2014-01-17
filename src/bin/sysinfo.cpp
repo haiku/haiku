@@ -141,7 +141,8 @@ struct cache_description {
 
 
 static void
-print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
+print_intel_cache_descriptors(enum cpu_vendor vendor, uint32 model,
+	cpuid_info *info)
 {
 	uint8 cacheDescriptors[15];	// Max
 
@@ -195,9 +196,8 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 			if (cacheDescriptors[i] == sIntelCacheDescriptions[j].code) {
 				if (cacheDescriptors[i] == 0x40) {
 					printf("\tNo integrated L%u cache\n",
-						type >= B_CPU_INTEL_PENTIUM_IV
-						&& (type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86
-							? 3 : 2);
+						((model >> 8) & 0xf) == 0xf
+						&& vendor == B_CPU_VENDOR_INTEL ? 3 : 2);
 				} else
 					printf("\t%s\n", sIntelCacheDescriptions[j].description);
 				break;
@@ -209,6 +209,7 @@ print_intel_cache_descriptors(enum cpu_types type, cpuid_info *info)
 			printf("\tUnknown cache descriptor 0x%02x\n", cacheDescriptors[i]);
 	}
 }
+
 
 #endif	// __INTEL__ || __x86_64__
 
@@ -466,12 +467,11 @@ print_features(uint32 features)
 #if defined(__INTEL__) || defined(__x86_64__)
 
 static void
-print_processor_signature(system_info *sys_info, cpuid_info *info,
+print_processor_signature(enum cpu_vendor vendor, cpuid_info *info,
 	const char *prefix)
 {
 
-	if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
-
+	if (vendor == B_CPU_VENDOR_AMD) {
 		printf("\t%s%sype %" B_PRIu32 ", family %" B_PRIu32 ", model %" B_PRIu32
 			", stepping %" B_PRIu32 ", features 0x%08" B_PRIx32 "\n",
 			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
@@ -482,8 +482,7 @@ print_processor_signature(system_info *sys_info, cpuid_info *info,
 				? info->eax_1.extended_model << 4 : 0),
 			info->eax_1.stepping,
 			info->eax_1.features);
-	} else if ((sys_info->cpu_type & B_CPU_x86_VENDOR_MASK)
-			== B_CPU_INTEL_x86) {
+	} else if (vendor == B_CPU_VENDOR_INTEL) {
 		// model calculation is different for INTEL
 		printf("\t%s%sype %" B_PRIu32 ", family %" B_PRIu32 ", model %" B_PRIu32
 			", stepping %" B_PRIu32 ", features 0x%08" B_PRIx32 "\n",
@@ -505,17 +504,33 @@ print_processor_signature(system_info *sys_info, cpuid_info *info,
 static void
 dump_platform(system_info *info)
 {
-	printf("%s\n",
-		info->platform_type == B_AT_CLONE_PLATFORM ? "IntelArchitecture" :
-		info->platform_type == B_MAC_PLATFORM      ? "Macintosh" :
-		info->platform_type == B_BEBOX_PLATFORM    ? "BeBox" : "unknown");
+	cpu_topology_node_info root;
+	uint32 count = 1;
+	get_cpu_topology_info(&root, &count);
+
+	const char* platform;
+	switch (root.data.root.platform) {
+		case B_CPU_x86:
+			platform = "IntelArchitecture";
+			break;
+
+		case B_CPU_x86_64:
+			platform = "IntelArchitecture (64 bit)";
+			break;
+
+		default:
+			platform = "unknown";
+			break;
+	}
+
+	printf("%s\n", platform);
 }
 
 
 #if defined(__INTEL__) || defined(__x86_64__)
 
 static void
-dump_cpu(system_info *info, int32 cpu)
+dump_cpu(enum cpu_vendor vendor, uint32 model, int32 cpu)
 {
 	// References:
 	// http://grafi.ii.pw.edu.pl/gbm/x86/cpuid.html
@@ -573,7 +588,7 @@ dump_cpu(system_info *info, int32 cpu)
 		else {
 			// Intel CPUs don't seem to have the genuine vendor field
 			printf("CPU #%" B_PRId32 ": %.12s\n", cpu,
-				(info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86 ?
+				vendor == B_CPU_VENDOR_INTEL ?
 					baseInfo.eax_0.vendor_id : cpuInfo.eax_0.vendor_id);
 		}
 	} else {
@@ -583,31 +598,13 @@ dump_cpu(system_info *info, int32 cpu)
 	}
 
 	get_cpuid(&cpuInfo, 1, cpu);
-	// Dump Raw CPUID, and internal CPUID we use...
+	// Dump Raw CPUID
 	printf("\tRaw CPUID: 0x%1" B_PRIx32 "%1" B_PRIx32 "0%1" B_PRIx32
 		"%1" B_PRIx32 "%1" B_PRIx32 ", ", cpuInfo.eax_1.extended_family,
 		cpuInfo.eax_1.extended_model, cpuInfo.eax_1.family,
 		cpuInfo.eax_1.model, cpuInfo.eax_1.stepping);
 
-	// This logic should be kept in-sync with x86/arch_system_info.cpp
-	// There is also src/tools/cpuidtool.cpp to do command line conversions
-	// of CPUID's to OS.h CPUID's
-	uint32 internalCPUID = 0;
-	if (((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86	
-			&& cpuInfo.eax_1.family == 0xF)
-		|| (info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
-		internalCPUID = (cpuInfo.eax_1.extended_family << 20)
-			+ (cpuInfo.eax_1.extended_model << 16) 
-			+ (cpuInfo.eax_1.family << 4) + cpuInfo.eax_1.model;
-	} else
-		internalCPUID = (cpuInfo.eax_1.family << 4) + cpuInfo.eax_1.model;
-
-	internalCPUID += info->cpu_type & B_CPU_x86_VENDOR_MASK;
-
-	// Matches OS.h define
-	printf("Haiku Internal ID (OS.h): 0x%" B_PRIx32 "\n", internalCPUID);
-
-	print_processor_signature(info, &cpuInfo, NULL);
+	print_processor_signature(vendor, &cpuInfo, NULL);
 	print_features(cpuInfo.eax_1.features);
 
 	if (maxStandardFunction >= 1) {
@@ -619,17 +616,15 @@ dump_cpu(system_info *info, int32 cpu)
 	/* Extended CPUID */
 	if (maxExtendedFunction >= 1) {
 		get_cpuid(&cpuInfo, 0x80000001, cpu);
-		print_processor_signature(info, &cpuInfo, "Extended AMD: ");
+		print_processor_signature(vendor, &cpuInfo, "Extended AMD: ");
 
-		if ((info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86
-			|| (info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
+		if (vendor == B_CPU_VENDOR_AMD || vendor == B_CPU_VENDOR_INTEL) {
 			print_amd_features(cpuInfo.regs.edx);
 			if (maxExtendedFunction >= 7) {
 				get_cpuid(&cpuInfo, 0x80000007, cpu);
 				print_amd_power_management_features(cpuInfo.regs.edx);
 			}
-		} else if ((info->cpu_type & B_CPU_x86_VENDOR_MASK)
-				== B_CPU_TRANSMETA_x86)
+		} else if (vendor == B_CPU_VENDOR_TRANSMETA)
 			print_transmeta_features(cpuInfo.regs.edx);
 	}
 
@@ -637,9 +632,8 @@ dump_cpu(system_info *info, int32 cpu)
 	if (maxExtendedFunction >= 5) {
 		if (!strncmp(baseInfo.eax_0.vendor_id, "CyrixInstead", 12)) {
 			get_cpuid(&cpuInfo, 0x00000002, cpu);
-			print_intel_cache_descriptors(info->cpu_type, &cpuInfo);
-		} else if ((info->cpu_type & B_CPU_x86_VENDOR_MASK)
-				== B_CPU_INTEL_x86) {
+			print_intel_cache_descriptors(vendor, model, &cpuInfo);
+		} else if (vendor == B_CPU_VENDOR_INTEL) {
 			// Intel does not support extended function 5 (but it does 6 hmm)
 			print_intel_cache_desc(cpu);
 		} else {
@@ -652,7 +646,7 @@ dump_cpu(system_info *info, int32 cpu)
 			get_cpuid(&cpuInfo, 2, cpu);
 
 			if (cpuInfo.eax_2.call_num > 0)
-				print_intel_cache_descriptors(info->cpu_type, &cpuInfo);
+				print_intel_cache_descriptors(vendor, model, &cpuInfo);
 		} while (cpuInfo.eax_2.call_num > 1);
 	}
 
@@ -681,28 +675,59 @@ dump_cpu(system_info *info, int32 cpu)
 static void
 dump_cpus(system_info *info)
 {
-	const char *vendor = get_cpu_vendor_string(info->cpu_type);
-	const char *model = get_cpu_model_string(info);
+	uint32 topologyNodeCount = 0;
+	cpu_topology_node_info* topology = NULL;
+	get_cpu_topology_info(NULL, &topologyNodeCount);
+	if (topologyNodeCount != 0)
+		topology = new cpu_topology_node_info[topologyNodeCount];
+	get_cpu_topology_info(topology, &topologyNodeCount);
+
+	enum cpu_platform platform = B_CPU_UNKNOWN;
+	enum cpu_vendor cpuVendor = B_CPU_VENDOR_UNKNOWN;
+	uint32 cpuModel = 0;
+	uint64 frequency = 0;
+	for (uint32 i = 0; i < topologyNodeCount; i++) {
+		switch (topology[i].type) {
+			case B_TOPOLOGY_ROOT:
+				platform = topology[i].data.root.platform;
+				break;
+
+			case B_TOPOLOGY_PACKAGE:
+				cpuVendor = topology[i].data.package.vendor;
+				break;
+
+			case B_TOPOLOGY_CORE:
+				cpuModel = topology[i].data.core.model;
+				frequency = topology[i].data.core.default_frequency;
+				break;
+
+			default:
+				break;
+		}
+	}
+	delete[] topology;
+
+	const char *vendor = get_cpu_vendor_string(cpuVendor);
+	const char *model = get_cpu_model_string(platform, cpuVendor, cpuModel);
 	char modelString[32];
 
 	if (model == NULL && vendor == NULL)
 		model = "(Unknown)";
 	else if (model == NULL) {
 		model = modelString;
-		snprintf(modelString, 32, "(Unknown %x)", info->cpu_type);
+		snprintf(modelString, 32, "(Unknown %" B_PRIx32 ")", cpuModel);
 	}
 
 	printf("%" B_PRId32 " %s%s%s, revision %04" B_PRIx32 " running at %"
-		B_PRId64 "MHz (ID: 0x%08" B_PRIx32 " 0x%08" B_PRIx32 ")\n\n",
+		B_PRIu64 "MHz\n\n",
 		info->cpu_count,
 		vendor ? vendor : "", vendor ? " " : "", model,
-		info->cpu_revision,
-		info->cpu_clock_speed / 1000000,
-		info->id[0], info->id[1]);
+		cpuModel,
+		frequency / 1000000);
 
 #if defined(__INTEL__) || defined(__x86_64__)
-	for (int32 cpu = 0; cpu < info->cpu_count; cpu++)
-		dump_cpu(info, cpu);
+	for (uint32 cpu = 0; cpu < info->cpu_count; cpu++)
+		dump_cpu(cpuVendor, cpuModel, cpu);
 #endif	// __INTEL__ || __x86_64__
 }
 
@@ -804,8 +829,7 @@ main(int argc, char *argv[])
 			const char *opt = argv[i];
 			if (strncmp(opt, "-id", strlen(opt)) == 0) {
 				/* note: the original also assumes this option on "sysinfo -" */
-				printf("0x%.8" B_PRIx32 " 0x%.8" B_PRIx32 "\n", info.id[0],
-					info.id[1]);
+				printf("%#.8x %#.8x\n", 0,0);
 			} else if (strncmp(opt, "-cpu", strlen(opt)) == 0) {
 				dump_cpus(&info);
 			} else if (strncmp(opt, "-mem", strlen(opt)) == 0) {

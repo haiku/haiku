@@ -43,7 +43,7 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 isa_module_info* isa;
 pci_module_info* pci;
 
-static vint32 open_count;
+static int32 open_count;
 
 ////////////////////////////////////////////////////////////////////////////////
 

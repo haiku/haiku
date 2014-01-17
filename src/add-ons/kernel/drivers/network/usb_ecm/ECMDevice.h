@@ -45,7 +45,7 @@ static	void				_NotifyCallback(void *cookie, int32 status,
 		status_t			fStatus;
 		bool				fOpen;
 		bool				fRemoved;
-		vint32				fInsideNotify;
+		int32				fInsideNotify;
 		usb_device			fDevice;
 		uint16				fVendorID;
 		uint16				fProductID;

@@ -141,7 +141,7 @@ public:
 
 private:
 	char*		fName;
-	vint32		fRefCount;
+	int32		fRefCount;
 	uid_t		fUID;
 	gid_t		fGID;
 	mode_t		fPermissions;
