@@ -147,8 +147,8 @@ BSecureSocket::Private::VerifyCallback(int ok, X509_STORE_CTX* ctx)
 	// we got from the server, but something higher up in the certificate
 	// chain)
 	X509* x509 = X509_STORE_CTX_get_current_cert(ctx);
-	BCertificate::Private* certificate =
-		new(std::nothrow) BCertificate::Private(x509);
+	BCertificate::Private* certificate
+		= new(std::nothrow) BCertificate::Private(x509);
 
 	if (certificate == NULL)
 		return 0;

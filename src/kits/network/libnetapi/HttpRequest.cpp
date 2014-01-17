@@ -241,7 +241,7 @@ BHttpRequest::Result() const
 status_t
 BHttpRequest::Stop()
 {
-	if (fSocket) {
+	if (fSocket != NULL) {
 		fSocket->Disconnect();
 			// Unlock any pending connect, read or write operation.
 	}
@@ -342,7 +342,8 @@ BHttpRequest::_ProtocolLoop()
 					if (authentication->Method() == B_HTTP_AUTHENTICATION_NONE) {
 						// There is no authentication context for this
 						// url yet, so let's create one.
-						authentication = new(std::nothrow) BHttpAuthentication();
+						authentication
+							= new(std::nothrow) BHttpAuthentication();
 						if (authentication == NULL)
 							status = B_NO_MEMORY;
 						else {
@@ -437,7 +438,8 @@ BHttpRequest::_MakeRequest()
 	if (fListener != NULL)
 		fListener->ConnectionOpened(this);
 
-	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT, "Connection opened, sending request.");
+	_EmitDebug(B_URL_PROTOCOL_DEBUG_TEXT,
+		"Connection opened, sending request.");
 
 	_SendRequest();
 	_SendHeaders();
@@ -610,8 +612,15 @@ BHttpRequest::_MakeRequest()
 						if (inputTempSize < chunkSize + 2) {
 							delete[] inputTempBuffer;
 							inputTempSize = chunkSize + 2;
-							inputTempBuffer = new(std::nothrow) char[inputTempSize];
+							inputTempBuffer
+								= new(std::nothrow) char[inputTempSize];
 						}
+
+						if (inputTempBuffer == NULL) {
+							readError = B_NO_MEMORY;
+							break;
+						}
+
 						fInputBuffer.RemoveData(inputTempBuffer,
 							chunkSize + 2);
 						chunkSize = -1;
@@ -657,6 +666,11 @@ BHttpRequest::_MakeRequest()
 						inputTempSize = bytesRead;
 						delete[] inputTempBuffer;
 						inputTempBuffer = new(std::nothrow) char[bytesRead];
+					}
+
+					if (inputTempBuffer == NULL) {
+						readError = B_NO_MEMORY;
+						break;
 					}
 					fInputBuffer.RemoveData(inputTempBuffer, bytesRead);
 				}
@@ -851,7 +865,8 @@ BHttpRequest::_SendHeaders()
 		fOutputHeaders.AddHeader("Content-Length",
 			fOptPostFields->ContentLength());
 	} else if (fOptInputData != NULL
-			&& (fRequestMethod == B_HTTP_POST || fRequestMethod == B_HTTP_PUT)) {
+			&& (fRequestMethod == B_HTTP_POST
+			|| fRequestMethod == B_HTTP_PUT)) {
 		if (fOptInputDataSize >= 0)
 			fOutputHeaders.AddHeader("Content-Length", fOptInputDataSize);
 		else
