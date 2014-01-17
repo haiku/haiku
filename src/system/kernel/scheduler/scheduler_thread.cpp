@@ -11,6 +11,9 @@ using namespace Scheduler;
 
 static bigtime_t sQuantumLengths[THREAD_MAX_SET_PRIORITY + 1];
 
+const int32 kMaximumQuantumLengthsCount	= 20;
+static bigtime_t sMaximumQuantumLengths[kMaximumQuantumLengthsCount];
+
 
 void
 ThreadData::_InitBase()
@@ -18,6 +21,7 @@ ThreadData::_InitBase()
 	fPriorityPenalty = 0;
 	fAdditionalPenalty = 0;
 	fEffectivePriority = GetPriority();
+	fBaseQuantum = sQuantumLengths[GetEffectivePriority()];
 	fCPUBound = false;
 
 	fTimeUsed = 0;
@@ -80,15 +84,6 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 		rescheduleNeeded = false;
 
 	return cpu;
-}
-
-
-inline bigtime_t
-ThreadData::_GetBaseQuantum() const
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	return sQuantumLengths[GetEffectivePriority()];
 }
 
 
@@ -190,19 +185,16 @@ ThreadData::ComputeQuantum() const
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	bigtime_t quantum = _GetBaseQuantum();
 	if (IsRealTime())
-		return quantum;
+		return fBaseQuantum;
 
 	int32 threadCount = fCore->ThreadCount();
 	if (fCore->CPUCount() > 0)
 		threadCount /= fCore->CPUCount();
-	if (threadCount >= 1) {
-		quantum
-			= std::min(gCurrentMode->maximum_latency / threadCount, quantum);
-		quantum = std::max(quantum,	gCurrentMode->minimal_quantum);
-	}
 
+	bigtime_t quantum = fBaseQuantum;
+	if (threadCount < kMaximumQuantumLengthsCount)
+		quantum = std::min(sMaximumQuantumLengths[threadCount], quantum);
 	return quantum;
 }
 
@@ -231,6 +223,16 @@ ThreadData::ComputeQuantumLengths()
 			= kQuantum0 * gCurrentMode->quantum_multipliers[1];
 		sQuantumLengths[priority] = _ScaleQuantum(kQuantum2, kQuantum1,
 			B_NORMAL_PRIORITY, B_IDLE_PRIORITY, priority);
+	}
+
+	for (int32 threadCount = 0; threadCount < kMaximumQuantumLengthsCount;
+		threadCount++) {
+
+		bigtime_t quantum = gCurrentMode->maximum_latency;
+		if (threadCount != 0)
+			quantum /= threadCount;
+		quantum = std::max(quantum, gCurrentMode->minimal_quantum);
+		sMaximumQuantumLengths[threadCount] = quantum;
 	}
 }
 
@@ -276,6 +278,8 @@ ThreadData::_ComputeEffectivePriority() const
 		ASSERT(fEffectivePriority < B_FIRST_REAL_TIME_PRIORITY);
 		ASSERT(fEffectivePriority >= B_LOWEST_ACTIVE_PRIORITY);
 	}
+
+	fBaseQuantum = sQuantumLengths[GetEffectivePriority()];
 }
 
 

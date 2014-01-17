@@ -29,8 +29,6 @@ private:
 	inline	CPUEntry*	_ChooseCPU(CoreEntry* core,
 							bool& rescheduleNeeded) const;
 
-	inline	bigtime_t	_GetBaseQuantum() const;
-
 public:
 						ThreadData(Thread* thread);
 
@@ -121,6 +119,7 @@ private:
 			int32		fAdditionalPenalty;
 
 	mutable	int32		fEffectivePriority;
+	mutable	bigtime_t	fBaseQuantum;
 
 			bigtime_t	fTimeUsed;
 
