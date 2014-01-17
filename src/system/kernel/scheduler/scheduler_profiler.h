@@ -16,6 +16,9 @@
 #define SCHEDULER_ENTER_FUNCTION()	\
 	Scheduler::Profiling::Function schedulerProfiler(__PRETTY_FUNCTION__)
 
+#define SCHEDULER_EXIT_FUNCTION()	\
+	schedulerProfiler.Exit()
+
 
 namespace Scheduler {
 
@@ -124,6 +127,7 @@ Function::Exit()
 #else	// SCHEDULER_PROFILING
 
 #define SCHEDULER_ENTER_FUNCTION()	(void)0
+#define SCHEDULER_EXIT_FUNCTION()	(void)0
 
 #endif	// !SCHEDULER_PROFILING
 
