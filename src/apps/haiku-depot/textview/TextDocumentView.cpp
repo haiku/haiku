@@ -24,14 +24,14 @@ TextDocumentView::TextDocumentView(const char* name)
 	fInsetRight(0.0f),
 	fInsetBottom(0.0f),
 
-	fSelectionAnchorOffset(0),
-	fCaretOffset(0),
-	fCaretAnchorX(0.0f),
+	fCaretBounds(),
 	fShowCaret(false),
-
 	fMouseDown(false)
 {
 	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
+	
+	// Set default TextEditor
+	SetTextEditor(TextEditorRef(new(std::nothrow) TextEditor(), true));
 
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(255, 255, 255, 255);
@@ -67,11 +67,14 @@ TextDocumentView::Draw(BRect updateRect)
 	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
 	fTextDocumentLayout.Draw(this, BPoint(fInsetLeft, fInsetTop), updateRect);
 
-	bool isCaret = fSelectionAnchorOffset == fCaretOffset;
+	if (fTextEditor.Get() == NULL)
+		return;
+
+	bool isCaret = fTextEditor->SelectionLength() == 0;
 
 	if (isCaret) {
-		if (fShowCaret && fTextEditor.Get() != NULL)
-			_DrawCaret(fCaretOffset);
+		if (fShowCaret && fTextEditor->IsEditingEnabled())
+			_DrawCaret(fTextEditor->CaretOffset());
 	} else {
 		_DrawSelection();
 	}
@@ -174,11 +177,13 @@ TextDocumentView::KeyDown(const char* bytes, int32 numBytes)
 	
 	if (Window() != NULL && Window()->CurrentMessage() != NULL) {
 		BMessage* message = Window()->CurrentMessage();
-		message->FindInt32("key", &event.key);
+		message->FindInt32("raw_char", &event.key);
 		message->FindInt32("modifiers", &event.modifiers);
 	}
 
 	fTextEditor->KeyDown(event);
+	fShowCaret = true;
+	Invalidate();
 }
 
 
@@ -245,13 +250,17 @@ TextDocumentView::SetTextDocument(const TextDocumentRef& document)
 	if (fTextEditor.Get() != NULL)
 		fTextEditor->SetDocument(document);
 
-	fSelectionAnchorOffset = 0;
-	fCaretOffset = 0;
-	fCaretAnchorX = 0.0f;
-
 	InvalidateLayout();
 	Invalidate();
 	_UpdateScrollBars();
+}
+
+
+void
+TextDocumentView::SetEditingEnabled(bool enabled)
+{
+	if (fTextEditor.Get() != NULL)
+		fTextEditor->SetEditingEnabled(enabled);
 }
 
 
@@ -262,6 +271,8 @@ TextDocumentView::SetTextEditor(const TextEditorRef& editor)
 		return;
 
 	if (fTextEditor.Get() != NULL) {
+		fTextEditor->SetDocument(TextDocumentRef());
+		fTextEditor->SetLayout(TextDocumentLayoutRef());
 		// TODO: Probably has to remove listeners
 	}
 
@@ -269,6 +280,8 @@ TextDocumentView::SetTextEditor(const TextEditorRef& editor)
 
 	if (fTextEditor.Get() != NULL) {
 		fTextEditor->SetDocument(fTextDocument);
+		fTextEditor->SetLayout(TextDocumentLayoutRef(
+			&fTextDocumentLayout));
 		// TODO: Probably has to add listeners
 	}
 }
@@ -307,38 +320,33 @@ TextDocumentView::SetInsets(float left, float top, float right, float bottom)
 
 
 void
-TextDocumentView::SetCaret(const BPoint& location, bool extendSelection)
+TextDocumentView::SetCaret(BPoint location, bool extendSelection)
 {
-	if (fTextDocument.Get() == NULL)
+	if (fTextEditor.Get() == NULL)
 		return;
 
-	bool rightOfChar = false;
-	int32 caretOffset = fTextDocumentLayout.TextOffsetAt(
-		location.x - fInsetLeft, location.y - fInsetTop, rightOfChar);
+	location.x -= fInsetLeft;
+	location.y -= fInsetTop;
 
-	if (rightOfChar)
-		caretOffset++;
-
-	_SetCaretOffset(caretOffset, true, extendSelection);
+	fTextEditor->SetCaret(location, extendSelection);
+	fShowCaret = !extendSelection;
+	Invalidate();
 }
 
 
 bool
 TextDocumentView::HasSelection() const
 {
-	return fSelectionAnchorOffset != fCaretOffset;
+	return fTextEditor.Get() != NULL && fTextEditor->HasSelection();
 }
 
 
 void
 TextDocumentView::GetSelection(int32& start, int32& end) const
 {
-	if (fSelectionAnchorOffset <= fCaretOffset) {
-		start = fSelectionAnchorOffset;
-		end = fCaretOffset;
-	} else {
-		start = fCaretOffset;
-		end = fSelectionAnchorOffset;
+	if (fTextEditor.Get()) {
+		start = fTextEditor->SelectionStart();
+		end = fTextEditor->SelectionEnd();
 	}
 }
 
@@ -346,8 +354,7 @@ TextDocumentView::GetSelection(int32& start, int32& end) const
 void
 TextDocumentView::Copy(BClipboard* clipboard)
 {
-	if (fSelectionAnchorOffset == fCaretOffset
-		|| fTextDocument.Get() == NULL) {
+	if (!HasSelection() || fTextDocument.Get() == NULL) {
 		// Nothing to copy, don't clear clipboard contents for now reason.
 		return;
 	}
@@ -422,41 +429,6 @@ TextDocumentView::_UpdateScrollBars()
 		verticalScrollBar->SetProportion((float)viewHeight / dataHeight);
 		verticalScrollBar->SetSteps(kVerticalScrollBarStep, viewHeight);
 	}
-}
-
-
-void
-TextDocumentView::_SetCaretOffset(int32 offset, bool updateAnchor,
-	bool lockSelectionAnchor)
-{
-	if (offset < 0)
-		offset = 0;
-	int32 length = fTextDocument->Length();
-	if (offset > length)
-		offset = length;
-
-	if (offset == fCaretOffset && (lockSelectionAnchor
-			|| offset == fSelectionAnchorOffset)) {
-		return;
-	}
-
-	if (!lockSelectionAnchor)
-		fSelectionAnchorOffset = offset;
-
-	fCaretOffset = offset;
-	fShowCaret = true;
-
-	if (updateAnchor) {
-		float x1;
-		float y1;
-		float x2;
-		float y2;
-
-		fTextDocumentLayout.GetTextBounds(fCaretOffset, x1, y1, x2, y2);
-		fCaretAnchorX = x1;
-	}
-
-	Invalidate();
 }
 
 

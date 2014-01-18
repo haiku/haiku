@@ -6,6 +6,7 @@
 #define TEXT_EDITOR_H
 
 
+#include <Point.h>
 #include <Referenceable.h>
 
 #include "CharacterStyle.h"
@@ -27,6 +28,7 @@ class TextEditor : public BReferenceable {
 public:
 								TextEditor();
 								TextEditor(const TextEditor& other);
+	virtual						~TextEditor();
 
 			TextEditor&			operator=(const TextEditor& other);
 			bool				operator==(const TextEditor& other) const;
@@ -41,6 +43,11 @@ public:
 			TextDocumentLayoutRef Layout() const
 									{ return fLayout; }
 
+			void				SetEditingEnabled(bool enabled);
+	inline	bool				IsEditingEnabled() const
+									{ return fEditingEnabled; }
+
+			void				SetCaret(BPoint location, bool extendSelection);
 			void				SetSelection(TextSelection selection);
 	inline	TextSelection		Selection() const
 									{ return fSelection; }
@@ -49,12 +56,25 @@ public:
 			::CharacterStyle	CharacterStyle() const
 									{ return fStyleAtCaret; }
 
-			void				KeyDown(KeyEvent event);
+	virtual	void				KeyDown(KeyEvent event);
 
-			void				Insert(int32 offset, const BString& string);
-			void				Remove(int32 offset, int32 length);
+	virtual	void				Insert(int32 offset, const BString& string);
+	virtual	void				Remove(int32 offset, int32 length);
+
+			void				LineUp(bool select);
+			void				LineDown(bool select);
+			void				LineStart(bool select);
+			void				LineEnd(bool select);
+
+			bool				HasSelection() const;
+			int32				SelectionStart() const;
+			int32				SelectionEnd() const;
+			int32				SelectionLength() const;
+	inline	int32				CaretOffset() const
+									{ return fSelection.Caret(); }
 
 private:
+			void				_MoveToLine(int32 lineIndex, bool select);
 			void				_SetCaretOffset(int32 offset,
 									bool updateAnchor,
 									bool lockSelectionAnchor,
@@ -64,23 +84,13 @@ private:
 									bool updateSelectionStyle);
 
 			void				_UpdateStyleAtCaret();
-
-			void				_LineUp(bool select);
-			void				_LineDown(bool select);
-			void				_LineStart(bool select);
-			void				_LineEnd(bool select);
-
-			bool				_HasSelection() const;
-			int32				_SelectionStart() const;
-			int32				_SelectionEnd() const;
-			int32				_SelectionLength() const;
-
 private:
 			TextDocumentRef		fDocument;
 			TextDocumentLayoutRef fLayout;
 			TextSelection		fSelection;
 			float				fCaretAnchorX;
 			::CharacterStyle	fStyleAtCaret;
+			bool				fEditingEnabled;
 };
 
 

@@ -52,6 +52,7 @@ public:
 			void				SetTextDocument(
 									const TextDocumentRef& document);
 
+			void				SetEditingEnabled(bool enabled);
 			void				SetTextEditor(
 									const TextEditorRef& editor);
 
@@ -60,8 +61,7 @@ public:
 			void				SetInsets(float left, float top, float right,
 									float bottom);
 
-			void				SetCaret(const BPoint& where,
-									bool extendSelection);
+			void				SetCaret(BPoint where, bool extendSelection);
 
 			bool				HasSelection() const;
 			void				GetSelection(int32& start, int32& end) const;
@@ -72,9 +72,6 @@ private:
 			float				_TextLayoutWidth(float viewWidth) const;
 
 			void				_UpdateScrollBars();
-
-			void				_SetCaretOffset(int32 offset, bool updateAnchor,
-									bool lockSelectionAnchor);
 
 			void				_DrawCaret(int32 textOffset);
 			void				_DrawSelection();
@@ -91,12 +88,8 @@ private:
 			float				fInsetRight;
 			float				fInsetBottom;
 
-			int32				fSelectionAnchorOffset;
-			int32				fCaretOffset;
-			float				fCaretAnchorX;
-			bool				fShowCaret;
 			BRect				fCaretBounds;
-
+			bool				fShowCaret;
 			bool				fMouseDown;
 };
 

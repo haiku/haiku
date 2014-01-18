@@ -14,7 +14,8 @@ TextEditor::TextEditor()
 	fLayout(),
 	fSelection(),
 	fCaretAnchorX(0.0f),
-	fStyleAtCaret()
+	fStyleAtCaret(),
+	fEditingEnabled(true)
 {
 }
 
@@ -25,7 +26,13 @@ TextEditor::TextEditor(const TextEditor& other)
 	fLayout(other.fLayout),
 	fSelection(other.fSelection),
 	fCaretAnchorX(other.fCaretAnchorX),
-	fStyleAtCaret(other.fStyleAtCaret)
+	fStyleAtCaret(other.fStyleAtCaret),
+	fEditingEnabled(other.fEditingEnabled)
+{
+}
+
+
+TextEditor::~TextEditor()
 {
 }
 
@@ -41,6 +48,7 @@ TextEditor::operator=(const TextEditor& other)
 	fSelection = other.fSelection;
 	fCaretAnchorX = other.fCaretAnchorX;
 	fStyleAtCaret = other.fStyleAtCaret;
+	fEditingEnabled = other.fEditingEnabled;
 	return *this;
 }
 
@@ -55,7 +63,8 @@ TextEditor::operator==(const TextEditor& other) const
 		&& fLayout == other.fLayout
 		&& fSelection == other.fSelection
 		&& fCaretAnchorX == other.fCaretAnchorX
-		&& fStyleAtCaret == other.fStyleAtCaret;
+		&& fStyleAtCaret == other.fStyleAtCaret
+		&& fEditingEnabled == other.fEditingEnabled;
 }
 
 
@@ -82,6 +91,30 @@ TextEditor::SetLayout(const TextDocumentLayoutRef& ref)
 {
 	fLayout = ref;
 	SetSelection(TextSelection());
+}
+
+
+void
+TextEditor::SetEditingEnabled(bool enabled)
+{
+	fEditingEnabled = enabled;
+}
+
+
+void
+TextEditor::SetCaret(BPoint location, bool extendSelection)
+{
+	if (fDocument.Get() == NULL || fLayout.Get() == NULL)
+		return;
+
+	bool rightOfChar = false;
+	int32 caretOffset = fLayout->TextOffsetAt(location.x, location.y,
+		rightOfChar);
+
+	if (rightOfChar)
+		caretOffset++;
+
+	_SetCaretOffset(caretOffset, true, extendSelection, true);
 }
 
 
@@ -116,15 +149,15 @@ TextEditor::KeyDown(KeyEvent event)
 
 	switch (event.key) {
 		case B_UP_ARROW:
-			_LineUp(select);
+			LineUp(select);
 			break;
 
 		case B_DOWN_ARROW:
-			_LineDown(select);
+			LineDown(select);
 			break;
 
 		case B_LEFT_ARROW:
-			if (_HasSelection() && !select) {
+			if (HasSelection() && !select) {
 				_SetCaretOffset(
 					std::min(fSelection.Caret(), fSelection.Anchor()),
 					true, false, true
@@ -134,7 +167,7 @@ TextEditor::KeyDown(KeyEvent event)
 			break;
 
 		case B_RIGHT_ARROW:
-			if (_HasSelection() && !select) {
+			if (HasSelection() && !select) {
 				_SetCaretOffset(
 					std::max(fSelection.Caret(), fSelection.Anchor()),
 					true, false, true
@@ -144,11 +177,11 @@ TextEditor::KeyDown(KeyEvent event)
 			break;
 
 		case B_HOME:
-			_LineStart(select);
+			LineStart(select);
 			break;
 
 		case B_END:
-			_LineEnd(select);
+			LineEnd(select);
 			break;
 
 		case B_ENTER:
@@ -164,8 +197,8 @@ TextEditor::KeyDown(KeyEvent event)
 			break;
 
 		case B_BACKSPACE:
-			if (_HasSelection()) {
-				Remove(_SelectionStart(), _SelectionLength());
+			if (HasSelection()) {
+				Remove(SelectionStart(), SelectionLength());
 			} else {
 				if (fSelection.Caret() > 0)
 					Remove(fSelection.Caret() - 1, 1);
@@ -173,8 +206,8 @@ TextEditor::KeyDown(KeyEvent event)
 			break;
 
 		case B_DELETE:
-			if (_HasSelection()) {
-				Remove(_SelectionStart(), _SelectionLength());
+			if (HasSelection()) {
+				Remove(SelectionStart(), SelectionLength());
 			} else {
 				if (fSelection.Caret() < fDocument->Length())
 					Remove(fSelection.Caret(), 1);
@@ -207,6 +240,9 @@ TextEditor::KeyDown(KeyEvent event)
 void
 TextEditor::Insert(int32 offset, const BString& string)
 {
+	if (!fEditingEnabled)
+		return;
+
 	// TODO: ...
 }
 
@@ -214,14 +250,119 @@ TextEditor::Insert(int32 offset, const BString& string)
 void
 TextEditor::Remove(int32 offset, int32 length)
 {
+	if (!fEditingEnabled)
+		return;
+
 	// TODO: ...
+}
+
+
+// #pragma mark -
+
+
+void
+TextEditor::LineUp(bool select)
+{
+	if (fLayout.Get() == NULL)
+		return;
+
+	int32 lineIndex = fLayout->LineIndexForOffset(fSelection.Caret());
+	_MoveToLine(lineIndex - 1, select);
+}
+
+
+void
+TextEditor::LineDown(bool select)
+{
+	if (fLayout.Get() == NULL)
+		return;
+
+	int32 lineIndex = fLayout->LineIndexForOffset(fSelection.Caret());
+	_MoveToLine(lineIndex + 1, select);
+}
+
+
+void
+TextEditor::LineStart(bool select)
+{
+	if (fLayout.Get() == NULL)
+		return;
+
+	int32 lineIndex = fLayout->LineIndexForOffset(fSelection.Caret());
+	_SetCaretOffset(fLayout->FirstOffsetOnLine(lineIndex), true, select,
+		true);
+}
+
+
+void
+TextEditor::LineEnd(bool select)
+{
+	if (fLayout.Get() == NULL)
+		return;
+
+	int32 lineIndex = fLayout->LineIndexForOffset(fSelection.Caret());
+	_SetCaretOffset(fLayout->LastOffsetOnLine(lineIndex), true, select,
+		true);
+}
+
+
+// #pragma mark -
+
+
+bool
+TextEditor::HasSelection() const
+{
+	return SelectionLength() > 0;
+}
+
+
+int32
+TextEditor::SelectionStart() const
+{
+	return std::min(fSelection.Caret(), fSelection.Anchor());
+}
+
+
+int32
+TextEditor::SelectionEnd() const
+{
+	return std::max(fSelection.Caret(), fSelection.Anchor());
+}
+
+
+int32
+TextEditor::SelectionLength() const
+{
+	return SelectionEnd() - SelectionStart();
 }
 
 
 // #pragma mark - private
 
 
-// _SetCaretOffset
+// _MoveToLine
+void
+TextEditor::_MoveToLine(int32 lineIndex, bool select)
+{
+	if (lineIndex < 0 || lineIndex >= fLayout->CountLines())
+		return;
+
+	float x1;
+	float y1;
+	float x2;
+	float y2;
+	fLayout->GetLineBounds(lineIndex , x1, y1, x2, y2);
+
+	bool rightOfCenter;
+	int32 textOffset = fLayout->TextOffsetAt(fCaretAnchorX, (y1 + y2) / 2,
+		rightOfCenter);
+
+	if (rightOfCenter)
+		textOffset++;
+
+	_SetCaretOffset(textOffset, false, select, true);
+}
+
 void
 TextEditor::_SetCaretOffset(int32 offset, bool updateAnchor,
 	bool lockSelectionAnchor, bool updateSelectionStyle)
@@ -241,7 +382,6 @@ TextEditor::_SetCaretOffset(int32 offset, bool updateAnchor,
 }
 
 
-// _SetSelection
 void
 TextEditor::_SetSelection(int32 caret, int32 anchor, bool updateAnchor,
 	bool updateSelectionStyle)
@@ -249,11 +389,11 @@ TextEditor::_SetSelection(int32 caret, int32 anchor, bool updateAnchor,
 	if (fLayout.Get() == NULL)
 		return;
 	
-	if (caret == fSelection.Caret() && caret == fSelection.Anchor())
+	if (caret == fSelection.Caret() && anchor == fSelection.Anchor())
 		return;
 
-	fSelection.SetAnchor(anchor);
 	fSelection.SetCaret(caret);
+	fSelection.SetAnchor(anchor);
 
 	if (updateAnchor) {
 		float x1;
@@ -283,63 +423,3 @@ TextEditor::_UpdateStyleAtCaret()
 }
 
 
-// #pragma mark -
-
-
-void
-TextEditor::_LineUp(bool select)
-{
-	// TODO
-}
-
-
-void
-TextEditor::_LineDown(bool select)
-{
-	// TODO
-}
-
-
-void
-TextEditor::_LineStart(bool select)
-{
-	// TODO
-}
-
-
-void
-TextEditor::_LineEnd(bool select)
-{
-	// TODO
-}
-
-
-// #pragma mark -
-
-
-bool
-TextEditor::_HasSelection() const
-{
-	return _SelectionLength() > 0;
-}
-
-
-int32
-TextEditor::_SelectionStart() const
-{
-	return std::min(fSelection.Caret(), fSelection.Anchor());
-}
-
-
-int32
-TextEditor::_SelectionEnd() const
-{
-	return std::max(fSelection.Caret(), fSelection.Anchor());
-}
-
-
-int32
-TextEditor::_SelectionLength() const
-{
-	return _SelectionEnd() - _SelectionStart();
-}
