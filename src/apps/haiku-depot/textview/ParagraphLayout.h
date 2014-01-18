@@ -193,6 +193,12 @@ public:
 			int32				CountLines();
 
 			int32				LineIndexForOffset(int32 textOffset);
+			int32				FirstOffsetOnLine(int32 lineIndex);
+			int32				LastOffsetOnLine(int32 lineIndex);
+
+			void				GetLineBounds(int32 lineIndex,
+									float& x1, float& y1,
+									float& x2, float& y2);
 
 			void				GetTextBounds(int32 textOffset,
 									float& x1, float& y1,

@@ -307,6 +307,73 @@ ParagraphLayout::LineIndexForOffset(int32 textOffset)
 }
 
 
+int32
+ParagraphLayout::FirstOffsetOnLine(int32 lineIndex)
+{
+	_ValidateLayout();
+
+	if (lineIndex < 0)
+		lineIndex = 0;
+	if (lineIndex > fLineInfos.CountItems())
+		lineIndex = fLineInfos.CountItems() - 1;
+
+	return fLineInfos.ItemAt(lineIndex).textOffset;
+}
+
+
+int32
+ParagraphLayout::LastOffsetOnLine(int32 lineIndex)
+{
+	_ValidateLayout();
+
+	if (lineIndex < 0)
+		lineIndex = 0;
+	if (lineIndex >= fLineInfos.CountItems() - 1)
+		return CountGlyphs();
+
+	return fLineInfos.ItemAt(lineIndex + 1).textOffset - 1;
+}
+
+
+void
+ParagraphLayout::GetLineBounds(int32 lineIndex, float& x1, float& y1,
+	float& x2, float& y2)
+{
+	_ValidateLayout();
+
+	if (fGlyphInfos.CountItems() == 0) {
+		x1 = 0.0f;
+		y1 = 0.0f;
+		x2 = 0.0f;
+		y2 = 0.0f;
+
+		return;
+	}
+
+	if (lineIndex < 0)
+		lineIndex = 0;
+	if (lineIndex > fLineInfos.CountItems())
+		lineIndex = fLineInfos.CountItems() - 1;
+
+	const LineInfo& lineInfo = fLineInfos.ItemAt(lineIndex);
+	int32 firstGlyphIndex = lineInfo.textOffset;
+
+	int32 lastGlyphIndex;
+	if (lineIndex < fLineInfos.CountItems() - 1)
+		lastGlyphIndex = fLineInfos.ItemAt(lineIndex + 1).textOffset - 1;
+	else
+		lastGlyphIndex = fGlyphInfos.CountItems() - 1;
+
+	const GlyphInfo& firstInfo = fGlyphInfos.ItemAtFast(firstGlyphIndex);
+	const GlyphInfo& lastInfo = fGlyphInfos.ItemAtFast(lastGlyphIndex);
+
+	x1 = firstInfo.x;
+	y1 = lineInfo.y;
+	x2 = lastInfo.x + lastInfo.width;
+	y1 = lineInfo.y + lineInfo.height;
+}
+
+
 void
 ParagraphLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 	float& x2, float& y2)
