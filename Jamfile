@@ -62,6 +62,9 @@ SubDir HAIKU_TOP ;
 # Execute post-build-target user config rules.
 UserBuildConfigRulePostBuildTargets	;
 
+# specify the Haiku repository contents
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) repositories Haiku ] ;
+
 # specify the Haiku image and network boot archive contents
 if $(HAIKU_BOOTSTRAP_BUILD) {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImageBootstrap ] ;
@@ -74,7 +77,6 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) images CDBootImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images CDBootPPCImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuCD ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images AnybootImage ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) repositories Haiku ] ;
 
 # Check whether all requested optional packages do actually exist.
 local package ;

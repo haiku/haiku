@@ -314,7 +314,7 @@ CopyDirectoryToHaikuImage home config settings Media
 
 # repository config and cache files
 local repository ;
-for repository in $(HAIKU_REPOSITORIES) {
+for repository in $(HAIKU_REPOSITORIES) <repository>haiku {
 	local config = [ on $(repository) return $(HAIKU_REPOSITORY_CONFIG_FILE) ] ;
 	local cache = [ on $(repository) return $(HAIKU_REPOSITORY_CACHE_FILE) ] ;
 	if $(HAIKU_UPDATE_ALL_PACKAGES) {

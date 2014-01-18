@@ -678,11 +678,23 @@ actions BuildRemoteHaikuPortsRepository1
 }
 
 
-rule HaikuRepository repository : repoInfoTemplate : packages
+rule HaikuRepository repository : repoInfoTemplate : packages : url
+	: versionFile
 {
-	# HaikuRepository <repository> : <repoInfoTemplate> : <packages> ;
+	# HaikuRepository <repository> : <repoInfoTemplate> : <packages>
+	#	[ : <url> [ : <versionFile> ] ] ;
 	# Builds the Haiku repository from the given packages and repository info
 	# template. <repository> must already be located.
+	#
+	# <repository> - The repository target. Resolves to a directory that will be
+	#	(removed,) created and populated with the package files and repository
+	#	meta data files.
+	# <repoInfoTemplate> - The repository info template file to be used.
+	# <packages> - The packages to be added to the repository.
+	# <url> - Optional repository URL for the repository config file to be
+	#	created. If not specified the one from the repository info is used.
+	# <versionFile> - Optional file containing the version string that shall
+	#	replace the "$version" placeholder in <url> (if any).
 
 	local architecture = $(HAIKU_PACKAGING_ARCH) ;
 	local secondaryArchitecture ;
@@ -697,6 +709,13 @@ rule HaikuRepository repository : repoInfoTemplate : packages
 	MakeLocate $(repoInfo) : $(repositoriesDir) ;
 	PreprocessPackageOrRepositoryInfo $(repoInfo) : $(repoInfoTemplate)
 		: $(architecture) : $(secondaryArchitecture) ;
+
+	# build the respository config
+	local repositoryConfig = $(repository:G=repository-config)-config ;
+	MakeLocate $(repositoryConfig) : $(repositoriesDir) ;
+	RepositoryConfig $(repositoryConfig) : $(repoInfo) : $(url)
+		: $(versionFile) ;
+	HAIKU_REPOSITORY_CONFIG_FILE on $(repository) = $(repositoryConfig) ;
 
 	# prepare the script that initializes the shell variables
 	local initVariablesScript = $(repository)-repository-init-vars ;
