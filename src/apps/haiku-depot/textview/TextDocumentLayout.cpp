@@ -123,6 +123,69 @@ TextDocumentLayout::LineIndexForOffset(int32 textOffset)
 }
 
 
+int32
+TextDocumentLayout::FirstOffsetOnLine(int32 lineIndex)
+{
+	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex);
+	if (index >= 0) {
+		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
+		return info.layout->FirstOffsetOnLine(lineIndex);
+	}
+
+	return 0;
+}
+
+
+int32
+TextDocumentLayout::LastOffsetOnLine(int32 lineIndex)
+{
+	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex);
+	if (index >= 0) {
+		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
+		return info.layout->LastOffsetOnLine(lineIndex);
+	}
+
+	return 0;
+}
+
+
+int32
+TextDocumentLayout::CountLines()
+{
+	_ValidateLayout();
+
+	int32 lineCount = 0;
+
+	int32 count = fParagraphLayouts.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
+		lineCount += info.layout->CountLines();
+	}
+
+	return lineCount;
+}
+
+
+void
+TextDocumentLayout::GetLineBounds(int32 lineIndex, float& x1, float& y1,
+	float& x2, float& y2)
+{
+	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex);
+	if (index >= 0) {
+		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
+		info.layout->GetLineBounds(lineIndex, x1, y1, x2, y2);
+		y1 += info.y;
+		y2 += info.y;
+		return;
+	}
+
+	x1 = 0.0f;
+	y1 = 0.0f;
+	x2 = 0.0f;
+	y2 = 0.0f;
+}
+
+
 void
 TextDocumentLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 	float& x2, float& y2)
@@ -242,3 +305,23 @@ TextDocumentLayout::_ParagraphLayoutIndexForOffset(int32& textOffset)
 	return -1;
 }
 
+int32
+TextDocumentLayout::_ParagraphLayoutIndexForLineIndex(int32& lineIndex)
+{
+	_ValidateLayout();
+
+	int32 paragraphs = fParagraphLayouts.CountItems();
+	for (int32 i = 0; i < paragraphs; i++) {
+		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
+
+		int32 lineCount = info.layout->CountLines();
+		if (lineIndex > lineCount) {
+			lineIndex -= lineCount;
+			continue;
+		}
+		
+		return i;
+	}
+
+	return -1;
+}

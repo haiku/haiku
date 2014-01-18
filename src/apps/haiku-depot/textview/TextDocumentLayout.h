@@ -87,6 +87,13 @@ public:
 									const BRect& updateRect);
 
 			int32				LineIndexForOffset(int32 textOffset);
+			int32				FirstOffsetOnLine(int32 lineIndex);
+			int32				LastOffsetOnLine(int32 lineIndex);
+			int32				CountLines();
+
+			void				GetLineBounds(int32 lineIndex,
+									float& x1, float& y1,
+									float& x2, float& y2);
 
 			void				GetTextBounds(int32 textOffset,
 									float& x1, float& y1,
@@ -105,6 +112,8 @@ private:
 
 			int32				_ParagraphLayoutIndexForOffset(
 									int32& textOffset);
+			int32				_ParagraphLayoutIndexForLineIndex(
+									int32& lineIndex);
 
 private:
 			float				fWidth;
