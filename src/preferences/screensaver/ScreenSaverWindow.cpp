@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2003-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,7 +25,6 @@
 #include <DurationFormat.h>
 #include <Entry.h>
 #include <File.h>
-#include <FilePanel.h>
 #include <FindDirectory.h>
 #include <Font.h>
 #include <Layout.h>
@@ -64,7 +63,6 @@ const uint32 kMinSettingsHeight = 120;
 
 const int32 kMsgSaverSelected = 'SSEL';
 const int32 kMsgTestSaver = 'TEST';
-const int32 kMsgAddSaver = 'ADD ';
 const int32 kMsgPasswordCheckBox = 'PWCB';
 const int32 kMsgRunSliderChanged = 'RSch';
 const int32 kMsgRunSliderUpdate = 'RSup';
@@ -134,7 +132,6 @@ class ModulesView : public BView {
 public:
 								ModulesView(const char* name,
 									ScreenSaverSettings& settings);
-	virtual						~ModulesView();
 
 	virtual	void				DetachedFromWindow();
 	virtual	void				AttachedToWindow();
@@ -155,10 +152,8 @@ private:
 			void				_OpenSaver();
 
 private:
-			BFilePanel*			fFilePanel;
 			BListView*			fScreenSaversListView;
 			BButton*			fTestButton;
-			BButton*			fAddButton;
 
 			ScreenSaverSettings&	fSettings;
 			ScreenSaverRunner*	fSaverRunner;
@@ -535,9 +530,6 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 	fTestButton = new BButton("TestButton", B_TRANSLATE("Test"),
 		new BMessage(kMsgTestSaver));
 
-	fAddButton = new BButton("AddButton",
-		B_TRANSLATE("Add" B_UTF8_ELLIPSIS), new BMessage(kMsgAddSaver));
-
 	fPreviewView = new PreviewView("preview");
 
 	fScreenSaversListView = new BListView("SaversListView",
@@ -550,8 +542,6 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 	fSettingsBox = new BBox("SettingsBox");
 	fSettingsBox->SetLabel(B_TRANSLATE("Screensaver settings"));
 
-	fFilePanel = new BFilePanel();
-
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.AddGroup(B_VERTICAL)
@@ -559,17 +549,11 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 			.Add(saversListScrollView)
 			.AddGroup(B_HORIZONTAL)
 				.Add(fTestButton)
-				.Add(fAddButton)
+				.AddGlue()
 				.End()
 			.End()
 		.Add(fSettingsBox)
 		.End();
-}
-
-
-ModulesView::~ModulesView()
-{
-	delete fFilePanel;
 }
 
 
@@ -588,7 +572,6 @@ ModulesView::AttachedToWindow()
 {
 	fScreenSaversListView->SetTarget(this);
 	fTestButton->SetTarget(this);
-	fAddButton->SetTarget(this);
 }
 
 
@@ -658,10 +641,6 @@ ModulesView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-
-		case kMsgAddSaver:
-			fFilePanel->Show();
-			break;
 
 		case B_SOME_APP_QUIT:
 		{
