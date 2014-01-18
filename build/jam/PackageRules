@@ -26,6 +26,16 @@ rule HaikuPackage package
 	}
 
 	HAIKU_CONTAINER_ALWAYS_CREATE_DIRECTORIES on $(package) = 1 ;
+
+	# If HAIKU_DONT_REBUILD_PACKAGES is defined, don't rebuild an existing
+	# package.
+	if $(HAIKU_DONT_REBUILD_PACKAGES) {
+		local file = [ Glob $(HAIKU_PACKAGES_DIR_$(HAIKU_PACKAGING_ARCH))
+			: $(package:BS) ] ;
+		if $(file) {
+			HAIKU_DONT_REBUILD_PACKAGE on $(package) = 1 ;
+		}
+	}
 }
 
 
@@ -102,6 +112,15 @@ rule BuildHaikuPackage package : packageInfo
 		secondaryArchitecture = $(TARGET_PACKAGING_ARCH) ;
 	}
 
+	MakeLocate $(package) : $(HAIKU_PACKAGES_DIR_$(architecture)) ;
+
+	# Don't rebuild an existing package, if requested.
+	if [ on $(package) return $(HAIKU_DONT_REBUILD_PACKAGE) ] {
+		NoUpdate $(package) ;
+		BuildHaikuPackageDummy $(package) ;
+		return ;
+	}
+
 	local grist = [ FHaikuPackageGrist $(package) ] ;
 
 	local tempDir
@@ -111,7 +130,6 @@ rule BuildHaikuPackage package : packageInfo
 	#  build the package info and locate the package
 	packageInfo = [ PreprocessPackageInfo $(packageInfo) : $(tempDir)
 		: $(architecture) : $(secondaryArchitecture) ] ;
-	MakeLocate $(package) : $(HAIKU_PACKAGES_DIR_$(architecture)) ;
 	Depends $(package) : $(packageInfo) ;
 
 	# prepare the script that initializes the shell variables
@@ -175,85 +193,120 @@ actions BuildHaikuPackage1
 }
 
 
+actions BuildHaikuPackageDummy
+{
+	# do nothing
+}
+
+
+rule FDontRebuildCurrentPackage
+{
+	on $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+		return $(HAIKU_DONT_REBUILD_PACKAGE) ;
+}
+
+
 rule AddDirectoryToPackage directoryTokens : attributeFiles
 {
-	return [ AddDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(directoryTokens) : $(attributeFiles) ] ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		return [ AddDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(directoryTokens) : $(attributeFiles) ] ;
+	}
 }
 
 
 rule AddFilesToPackage directory : targets : destName
 {
-	AddFilesToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE) : $(directory)
-		: $(targets) : $(destName) ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		AddFilesToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(directory) : $(targets) : $(destName) ;
+	}
 }
 
 
 rule AddSymlinkToPackage directoryTokens : linkTarget : linkName
 {
-	linkTarget = $(linkTarget:J=/) ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		linkTarget = $(linkTarget:J=/) ;
 
-	AddSymlinkToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(directoryTokens) : $(linkTarget) : $(linkName) ;
+		AddSymlinkToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(directoryTokens) : $(linkTarget) : $(linkName) ;
+	}
 }
 
 
 rule CopyDirectoryToPackage directoryTokens : sourceDirectory
 	: targetDirectoryName : excludePatterns : flags
 {
-	CopyDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(directoryTokens) : $(sourceDirectory) : $(targetDirectoryName)
-		: $(excludePatterns) : $(flags) ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		CopyDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(directoryTokens) : $(sourceDirectory) : $(targetDirectoryName)
+			: $(excludePatterns) : $(flags) ;
+	}
 }
 
 
 rule AddHeaderDirectoryToPackage dirTokens : dirName : flags
 {
-	AddHeaderDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(dirTokens) : $(dirName) : $(flags) ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		AddHeaderDirectoryToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(dirTokens) : $(dirName) : $(flags) ;
+	}
 }
 
 
 rule AddWifiFirmwareToPackage driver : subDirToExtract : archive
 	: extract
 {
-	AddWifiFirmwareToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(driver) : $(subDirToExtract) : $(archive) : $(extract) ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		AddWifiFirmwareToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(driver) : $(subDirToExtract) : $(archive) : $(extract) ;
+	}
 }
 
 
 rule ExtractArchiveToPackage dirTokens : archiveFile : flags : extractedSubDir
 {
-	ExtractArchiveToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(dirTokens) : $(archiveFile) : $(flags) : $(extractedSubDir) ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		ExtractArchiveToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(dirTokens) : $(archiveFile) : $(flags) : $(extractedSubDir) ;
+	}
 }
 
 
 rule AddDriversToPackage relativeDirectoryTokens : targets
 {
-	AddDriversToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(relativeDirectoryTokens) : $(targets) ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		AddDriversToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(relativeDirectoryTokens) : $(targets) ;
+	}
 }
 
 
 rule AddNewDriversToPackage relativeDirectoryTokens : targets
 {
-	AddNewDriversToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(relativeDirectoryTokens) : $(targets) ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		AddNewDriversToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(relativeDirectoryTokens) : $(targets) ;
+	}
 }
 
 
 rule AddBootModuleSymlinksToPackage targets
 {
-	AddBootModuleSymlinksToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(targets) ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		AddBootModuleSymlinksToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(targets) ;
+	}
 }
 
 
 rule AddLibrariesToPackage directory : libs
 {
-	AddLibrariesToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
-		: $(directory) : $(libs) ;
+	if ! [ FDontRebuildCurrentPackage ] {
+		AddLibrariesToContainer $(HAIKU_CURRENTLY_BUILT_HAIKU_PACKAGE)
+			: $(directory) : $(libs) ;
+	}
 }
 
 
