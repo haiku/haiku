@@ -1,8 +1,8 @@
 1	greek, modern (1453-)	x-vnd.Haiku-Installer	2099988747
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Οπως στις άλλες καταχωρήσεις του μενού, στην κάτω μεριά του αρχείου προσθέστε κάτι ανάλογο των παρακάτω γραμμών:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Είστε σίγουρος πως θέλετε να ακυρώσετε την εγκατάσταση και να επανεκκινήσετε το σύστημα;
-\t}\n\n	InstallerApp		\t}\n\n
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Το Πρόγραμμα Εγκατάστασης\n\γράφτηκε από τους Jérôme Duval και Stephan Aßmus\n\tΠνευματικά δικαιώματα 2005-2010, Haiku.\n\n
+\t}\n\n	InstallerApp		\t}\n\n
 Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Οι νεότερες εκδόσεις του GRUB κάνουν χρήση ενός αρχείου ρυθμίσεων για επιπρόσθετες καταχωρίσεις στο boot μενού. Για την καταχώρισει τους στην αρχή, πρέπει να δημιουργήσετε/επεξεργαστείτε το αρχείο χρησιμοποιόντας τον αγαπημένο σας συντάκτης αρχείων από ένα Terminal σαν αυτον:\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Εδώ έχετε να σχολιάσετε τη γραμμή \"GRUB_HIDDEN_TIMEOUT = 0\" με την τοποθέτηση ενός \"#\" μπροστά του, ώστε να εμφανιστεί ουσιαστικά το μενού εκκίνησης.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Η εγκατάσταση ολοκληρώθηκε. Ο τομέας εκκίνησης γράφτηκε στο '% s'. Πατήστε Έξοδος για να εγκαταλείψετε την εγκατάσταση ή επιλέξετε μία νέα μονάδα για να εκτελέσετε μια άλλη εγκατάσταση.

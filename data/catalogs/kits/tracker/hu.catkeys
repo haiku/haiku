@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2187262474
+1	hungarian	x-vnd.Haiku-libtracker	2212190051
 OK	WidgetAttributeText		Rendben
 Icon view	VolumeWindow		Ikon nézet
 Add-ons	FilePanelPriv		Kiegészítők
@@ -100,6 +100,7 @@ New folder	FilePanelPriv		Új mappa
 %name info	InfoWindow	InfoWindow Title	%name
 Favorites	FavoritesMenu		Kedvencek
 Add-ons	VolumeWindow		Kiegészítők
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" egy nem támogatott futtatható fájl.
 Sorry, you can't copy items to the Trash.	PoseView		Sajnáljuk, de nem lehet a Szemetesbe másolni.
 List view	VolumeWindow		Lista nézet
 matches wildcard expression	SelectionWindow		megfelel a helyettesítő kifejezésnek
@@ -408,6 +409,7 @@ Paste layout	ContainerWindow		Elrendezés beillesztése
 Select	InfoWindow		Kijelölés
 Could not update permissions of file \"%name\". %error	FSUtils		Nem sikerült módosítani a fájl (%name) jogosultságait.\n\t%error
 Select…	FilePanelPriv		Kijelölés…
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" egy régebbi futtatható fájl. Frissítés vagy újra felépítés szükséges.
 There was an error resolving the link.	Tracker		Hiba történt a hivatkozás feloldása során.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/mp
 You can't move or copy the trash.	FSUtils		A Szemetest nem lehet mozgatni vagy másolni.
@@ -427,6 +429,7 @@ New	ContainerWindow		Új
 Name matches wildcard expression:###	SelectionWindow		A név illeszkedik ezekre a helyettesítőkarakterekre:###
 less than	FindPanel		kisebb, mint
 64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		Fejlesztés
 Modified	ContainerWindow		Módosítva
 Edit Query template	FindPanel		Keresési sablon szerkesztése
 Prompt	FSUtils		Kérdés

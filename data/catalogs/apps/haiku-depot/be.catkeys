@@ -1,18 +1,24 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	361026504
+1	belarusian	x-vnd.Haiku-HaikuDepot	4291855824
 Name	PackageListView		Імя
 Installed packages	Model		Усталяваныя пакункі
 User modified packages	Model		Пакункі мадыфікаваныя карыстальнікам
 Update available	Model		Ёсьць абноўленыя пакункі
 Changelog	PackageInfoView		Гісторыя зменаў
+Click a package to view information	PackageInfoView		Клікніце пакет каб пабачыць інфарамацыю пра яго
 for %Version%	PackageInfoView		для %Version%
+No changelog available.	PackageInfoView		Спіс змен не існуе
 Depot:	FilterView		Сховішча:
 Description	PackageListView		Апісанне
 Install	PackageManager		Усталяваць
+Tools	MainWindow		Прылады
 HaikuDepot	System name		HaikuDepot
 Uninstall	PackageManager		Выдаліць
+<no info>	PackageInfoView		<няма інфармацыі>
 An error occurred while initializing the package manager: %message%	MainWindow		Падчас ініцыялізацыі пакункавага мэнэджэра здарылася памылка: %message%
+Close	PackageManager		Закрыць
 Status	PackageListView		Стан
 Development	Model		Распрацоўка
+Fatal error	PackageManager		Фатальная памылка
 Ratings	PackageInfoView		Рэйтынг
 1 item	PackageListView		1 элемент
 Inactive	PackageListView		Неактыўны
@@ -20,12 +26,16 @@ Refresh depots	MainWindow		Перачытаць сховішчы
 Main Menu	MainWindow		Галоўнае меню
 Command line	Model		Загадны радок
 (%Votes%)	PackageInfoView		(%Votes%)
+Downloading:	PackageInfoView		Спампоўваецца:
 Search terms:	FilterView		Умовы пошуку:
 %Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Рэйтынг карыстальнікаў не існуе
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Падчас аднаўлення інфармацыі сховішчаў адбылася памылка: %error% (%details%)
+Show source packages	MainWindow		Паказваць пакеты з зыходным кодам
 Productivity	Model		Прадукцыйнасць
 Show:	FilterView		Паказаць:
 Size	PackageListView		Памер
+Options	MainWindow		Параметры
 Games	Model		Гульні
 Rating	PackageListView		Рэйтынг
 Downloading	Model		Спампоўваецца
@@ -42,6 +52,7 @@ Unknown	PackageListView		Невядомы
 All depots	FilterView		Усе сховішчы
 Available	PackageListView		Даступна
 n/a	PackageInfoView		н/н
+Show develop packages	MainWindow		Паказаць пакункі для распрацоўшчыкаў
 Show	FilterView		Паказаць
 Uninstalled packages	Model		Выдаленыя пакункі
 Audio	Model		Аўдыё

@@ -1,8 +1,8 @@
 1	romanian	x-vnd.Haiku-Installer	2099988747
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		În spatele celorlalte intrări din meniu spre baza fișierului, adăugați ceva asemănător cu aceste linii:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Sigur doriți să anulați instalarea și să reporniți sistemul?
-\t}\n\n	InstallerApp		\t}\n\n
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Program de instalare\n\tscris de Jérôme Duval și Stephan Aßmus\n\tDrepturi de autor 2005-2010, Haiku.\n\n
+\t}\n\n	InstallerApp		\t}\n\n
 Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Versiunile de GRUB mai noi utilizează un fișier de configurare pentru a adăuga intrări personalizate la meniul de boot. Pentru a le adăuga la vârf, trebuie să creați/editați un fișier prin pornirea editorului de text favorit dintr-un Terminal astfel:\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Aici trebuie să transformați linia „GRUB_HIDDEN_TIMEOUT=0” într-un comentariu punând un „#” în fața acesteia pentru a afișa meniul de pornire a sistemului.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalarea s-a terminat. Sectorul de boot a fost scris pe „%s”. Clic pe Părăsește pentru a ieși din programul de instalare sau alege un volum de destinație nou pentru a executa altă instalare.

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2187262474
+1	swedish	x-vnd.Haiku-libtracker	2212190051
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Ikonvy
 Add-ons	FilePanelPriv		Tillägg
@@ -100,6 +100,7 @@ New folder	FilePanelPriv		Ny mapp
 %name info	InfoWindow	InfoWindow Title	%name information
 Favorites	FavoritesMenu		Favoriter
 Add-ons	VolumeWindow		Tillägg
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" är en osupporterad körbarfil
 Sorry, you can't copy items to the Trash.	PoseView		Du kan inte kopiera filer till Papperskorgen.
 List view	VolumeWindow		Listvy
 matches wildcard expression	SelectionWindow		matchar jokeruttryck
@@ -408,6 +409,7 @@ Paste layout	ContainerWindow		Klistra in layout
 Select	InfoWindow		Markera
 Could not update permissions of file \"%name\". %error	FSUtils		Kunde inte uppdatera rättigheterna i filen "%name". %error
 Select…	FilePanelPriv		Markera...
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" Den körbara filen är från ett gammalt system. Var vänlig uppdatera din fil eller bygg om programmet.
 There was an error resolving the link.	Tracker		Det uppstod ett fel vid uppslag av länk.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Du kan inte flytta eller kopiera Papperskorgen.
@@ -427,6 +429,7 @@ New	ContainerWindow		Ny
 Name matches wildcard expression:###	SelectionWindow		Namn matchar jokertuttryck:###
 less than	FindPanel		mindre än
 64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		utvecklare
 Modified	ContainerWindow		Ändrad
 Edit Query template	FindPanel		Redigera sökmall
 Prompt	FSUtils		Prompt

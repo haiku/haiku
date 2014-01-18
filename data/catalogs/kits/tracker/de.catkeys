@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2187262474
+1	german	x-vnd.Haiku-libtracker	2212190051
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
 Add-ons	FilePanelPriv		Add-ons
@@ -100,6 +100,7 @@ New folder	FilePanelPriv		Neuer Ordner
 %name info	InfoWindow	InfoWindow Title	%name Info
 Favorites	FavoritesMenu		Favoriten
 Add-ons	VolumeWindow		Add-ons
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" hat ein nicht-unterstütztes Programmformat.
 Sorry, you can't copy items to the Trash.	PoseView		Objekte können leider nicht in den Papierkorb kopiert werden.
 List view	VolumeWindow		Listenansicht
 matches wildcard expression	SelectionWindow		entspricht Platzhalter-Ausdruck
@@ -408,6 +409,7 @@ Paste layout	ContainerWindow		Anordnung einfügen
 Select	InfoWindow		Auswählen
 Could not update permissions of file \"%name\". %error	FSUtils		Konnte die Berechtigungen der Datei \"%name\" nicht aktualisieren. %error
 Select…	FilePanelPriv		Auswählen…
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" hat ein veraltetest Programmformat. Die Anwendung muss neu kompiliert, bzw. eine aktualisierte Version installiert werden.
 There was an error resolving the link.	Tracker		Fehler beim Auflösen der Verknüpfung.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Der Papierkorb kann nicht verschoben oder kopiert werden.
@@ -427,6 +429,7 @@ New	ContainerWindow		Neu
 Name matches wildcard expression:###	SelectionWindow		Name trifft auf Platzhalter-Ausdruck zu:###
 less than	FindPanel		kleiner als
 64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		Programmierung
 Modified	ContainerWindow		Geändert
 Edit Query template	FindPanel		Query-Vorlage bearbeiten
 Prompt	FSUtils		Nachfragen

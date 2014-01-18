@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	296461196
+1	japanese	x-vnd.Haiku-libtracker	1108469663
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		アイコン表示
 Add-ons	FilePanelPriv		アドオン
@@ -99,6 +99,7 @@ New folder	FilePanelPriv		新規フォルダー
 %name info	InfoWindow	InfoWindow Title	%name の情報
 Favorites	FavoritesMenu		お気に入り
 Add-ons	VolumeWindow		アドオン
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" はサポートされていない実行形式です。
 Sorry, you can't copy items to the Trash.	PoseView		ごみ箱にコピーすることはできません。
 List view	VolumeWindow		一覧表示
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
@@ -406,7 +407,8 @@ OK	FSUtils		OK
 Paste layout	ContainerWindow		レイアウトを貼り付ける
 Select	InfoWindow		選択
 Could not update permissions of file \"%name\". %error	FSUtils		\"%name\"の権限を更新できませんでした。%error
-Select…	FilePanelPriv		選択…
+Select…	FilePanelPriv		\"%name\" は古い実行形式です。最新版を入手するか、アプリケーションをリコンパイルしてください。
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" は古い実行形式です。最新版を入手するか、アプリケーションを再コンパイルしてください。
 There was an error resolving the link.	Tracker		リンクの解釈に失敗しました。
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/秒
 You can't move or copy the trash.	FSUtils		ごみ箱の移動やコピーはできません。

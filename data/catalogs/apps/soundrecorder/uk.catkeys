@@ -1,9 +1,8 @@
-1	ukrainian	x-vnd.Haiku-SoundRecorder	4189888707
+1	ukrainian	x-vnd.Haiku-SoundRecorder	1728054007
 Loop	RecorderWindow		Петля
 Cannot find default audio hardware	RecorderWindow		Неможливо знайти звуковий пристрій за замовчуванням
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Неможливо знайти тимчасовий файл створений для збереження нового запису
 Nothing to play	RecorderWindow		Нічого для відтворення
-Some of the files don't appear to be audio files	RecorderWindow		Деякі з файлів виявилися не звуковими
 File info	RecorderWindow		Інфо про файл
 Drop files here	SoundListView		Киньте файли сюди
 Input	RecorderWindow		Вхід
@@ -13,7 +12,6 @@ Rewind	RecorderWindow		Перемотка
 Invalid audio files	RecorderWindow		Неправильні аудіо файли
 OK	RecorderWindow		Гаразд
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Неможливо відкрити тимчасовий файл створений для збереження нового запису
-None of the files appear to be audio files	RecorderWindow		Жодних файлів, які могли би бути аудіо
 Input:	RecorderWindow		Вхід:
 Forward	RecorderWindow		Вперед
 Play	RecorderWindow		Відтворити

@@ -1,9 +1,8 @@
-1	romanian	x-vnd.Haiku-SoundRecorder	4189888707
+1	romanian	x-vnd.Haiku-SoundRecorder	1728054007
 Loop	RecorderWindow		Buclă
 Cannot find default audio hardware	RecorderWindow		Nu se poate găsi harware-ul audio implicit
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nu se poate găsi fișierul temporar creat pentru a păstra înregistrarea nouă
 Nothing to play	RecorderWindow		Nimic de redat
-Some of the files don't appear to be audio files	RecorderWindow		Unele fișiere nu par a fi niște fișiere audio
 File info	RecorderWindow		Info fișier
 Drop files here	SoundListView		Plasați fișiere aici
 Input	RecorderWindow		Intrare
@@ -13,7 +12,6 @@ Rewind	RecorderWindow		Derulează înapoi
 Invalid audio files	RecorderWindow		Fișiere audio nevalide
 OK	RecorderWindow		Bine
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Nu se poate deschide fișierul temporar creat pentru a păstra înregistrarea nouă
-None of the files appear to be audio files	RecorderWindow		Niciunul dintre fișiere nu pare a fi din fișierele audio 
 Input:	RecorderWindow		Intrare:
 Forward	RecorderWindow		Înainte
 Play	RecorderWindow		Redă

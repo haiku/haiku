@@ -1,10 +1,9 @@
-1	hindi	x-vnd.Haiku-SoundRecorder	3223747972
+1	hindi	x-vnd.Haiku-SoundRecorder	761913272
 Loop	RecorderWindow		लूप
 Cannot find default audio hardware	RecorderWindow		डिफ़ॉल्ट ऑडियो हार्डवेयर नहीं मिल सका
 Cannot find the temporary file created to hold the new recording	RecorderWindow		नई रिकॉर्डिंग पकड़ने के लिए बनायी गई अस्थायी फ़ाइल को नहीं खोज सका
 Nothing to play	RecorderWindow		खेलने के लिए कुछ भी नहीं
 Duration: 	RecorderWindow		अवधि: 
-Some of the files don't appear to be audio files	RecorderWindow		कुछ फ़ाइलें ऑडियो फ़ाइल प्रतीत नहीं होती हैं
 File info	RecorderWindow		फ़ाइल की जानकारी
 Drop files here	SoundListView		फ़ाइलें यहाँ ड्रॉप करे
 Input	RecorderWindow		इनपुट
@@ -17,7 +16,6 @@ Invalid audio files	RecorderWindow		अवैध ऑडियो फाइले
  seconds	RecorderWindow		सेकंड
 OK	RecorderWindow		ठीक है
 Cannot open the temporary file created to hold the new recording	RecorderWindow		नई रिकॉर्डिंग पकड़ने के लिए बनायी गई अस्थायी फ़ाइल को नहीं खोल सकता
-None of the files appear to be audio files	RecorderWindow		फ़ाइलों में से कोई भी फ़ाइल ऑडियो नही दिखाई देते हैं
 Input:	RecorderWindow		आगत:
 Forward	RecorderWindow		आगे करें
 Play	RecorderWindow		चलाएं

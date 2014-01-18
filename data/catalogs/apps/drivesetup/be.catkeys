@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DriveSetup	3775412465
+1	belarusian	x-vnd.Haiku-DriveSetup	758245016
 DriveSetup	System name		Рэдыктар дыскаў
 Cancel	AbstractParametersPanel		Адмяніць
 Delete	MainWindow		Выдаліць
@@ -7,6 +7,7 @@ Rescan	MainWindow		Перасканіраваць
 OK	MainWindow		ОК
 Could not aquire partitioning information.	MainWindow		Не ўдалося атрымаць інфармацыю аб падзелах.
 There's no space on the partition where a child partition could be created.	MainWindow		Няма мечца на падзеле для стварэння даччынага падзела.
+Could not unmount partition	MainWindow		Немагчыма размантаваць дыск
 Initialize	InitializeParametersPanel		Ініцыялізіраваць
 OK	AbstractParametersPanel		Добра
 <empty>	PartitionList		<пуста>
@@ -16,6 +17,7 @@ No disk devices have been recognized.	DiskView		Не знойдзена ніяк
 Failed to initialize the disk %s!\n	MainWindow		Не ўдалося ініцыялізіраваць падзел %s!\n
 The selected disk is read-only.	MainWindow		Абраны дыск толькі для чытання.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Вы упэўнены, што жадаеце фарматаваць падзел \"%s\"? Дадатковае пацвержанне спатрэбіцца і непасрэдна перад запісам на дыск.
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Размантаваць усё роўна?\n\nКалі том зараз ужываецца нейкай праграмай, вы можаце згубіць даныя пры размантаванні.\n
 Could not mount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
 The partition %s has been successfully formatted.\n	MainWindow		Падзел %s паспяхова фарматаваны.\n
 Change parameters	MainWindow		Змяніць параметры
@@ -70,6 +72,7 @@ Are you sure you want to change parameters of the selected partition?\n\nThe par
 Eject	MainWindow		Выцягнуць
 Partition	MainWindow		Падзел
 Validation of the given parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў стварэння падзелу.
+Force unmount	MainWindow		Размантаваць усё роўна
 Create	CreateParametersPanel		Стварыць
 File system	PartitionList		Файлавая сістэма
 Validation of the given creation parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў стварэння падзелу.

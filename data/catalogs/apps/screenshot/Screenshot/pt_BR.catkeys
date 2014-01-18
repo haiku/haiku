@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.haiku-screenshot	913664967
+1	portuguese (brazil)	x-vnd.haiku-screenshot	1483476245
 seconds	ScreenshotWindow		segundos
 Desktop	ScreenshotWindow		Desktop
 Include window border	ScreenshotWindow		Incluir borda da janela
@@ -7,6 +7,7 @@ Select	ScreenshotWindow		Escolher
 Capture active window	ScreenshotWindow		Capturar janela ativa
 Cancel	ScreenshotWindow		Cancelar
 Name:	ScreenshotWindow		Nome:
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Este arquivo já existe.\n Deseja realmente sobrescrevê-lo?
 Choose folder	ScreenshotWindow		Escolher pasta
 Save	ScreenshotWindow		Salvar
 Overwrite	ScreenshotWindow		Sobrescrever

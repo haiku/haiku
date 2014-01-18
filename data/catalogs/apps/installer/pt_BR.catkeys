@@ -1,8 +1,8 @@
 1	portuguese (brazil)	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Assim, por trás das outras entradas do menu em direção à parte inferior do arquivo, adicione algo semelhante a estas linhas:\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Você tem certeza que deseja abortar a instalação e reiniciar o sistema?
-\t}\n\n	InstallerApp		\t }\n\n
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Instalador\n\desenvolvido por Jérôme Duval e Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
+\t}\n\n	InstallerApp		\t }\n\n
 Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Novas versões do GRUB usam um arquivo de configuração extra para adicionar entradas no menu de inicialização. Para adicioná-las no topo, é preciso criar/editar um arquivo através de seu editor favorito, de um Terminal como este:\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Aqui é necessário comentar a linha \"GRUB_HIDDEN_TIMEOUT=0\" colocando um \"#\" na frente dela a fim de realmente mostrar o menu de inicialização.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		A instalação está completa. O setor de inicialização foi escrito em '%s'. Pressione Sair para deixar o Instalador ou escolha uma nova partição para realizar outra instalação.

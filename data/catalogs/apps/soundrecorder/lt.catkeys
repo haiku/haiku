@@ -1,11 +1,10 @@
-1	lithuanian	x-vnd.Haiku-SoundRecorder	2149017672
+1	lithuanian	x-vnd.Haiku-SoundRecorder	3982150268
 Loop	RecorderWindow		Kartoti
 Cannot find default audio hardware	RecorderWindow		Nepavyko rasti numatytosios garso techninės įrangos
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nepavyko rasti laikinojo failo, sukurto naujam įrašui talpinti
 Sample size:	RecorderWindow		Garso elemento dydis:
 Nothing to play	RecorderWindow		Nėra ką groti
 Duration: 	RecorderWindow		Trukmė: 
-Some of the files don't appear to be audio files	RecorderWindow		Panašu, jog kai kurie failai nėra garso įrašai
 File info	RecorderWindow		Failo savybės
 Drop files here	SoundListView		Meskite failus čia
 Input	RecorderWindow		Įvestis
@@ -19,7 +18,6 @@ Invalid audio files	RecorderWindow		Netinkami garso įrašai
  seconds	RecorderWindow		sek.
 OK	RecorderWindow		Gerai
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Nepavyko atverti laikinojo failo, sukurto naujam įrašui talpinti
-None of the files appear to be audio files	RecorderWindow		Panašu, jog nė vienas failas nėra garso įrašas
 Input:	RecorderWindow		Įvestis:
 Forward	RecorderWindow		Pervynioti pirmyn
 Play	RecorderWindow		Groti

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	2187262474
+1	belarusian	x-vnd.Haiku-libtracker	2212190051
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Від іконак
 Add-ons	FilePanelPriv		Дапаўненні
@@ -100,6 +100,7 @@ New folder	FilePanelPriv		Новы каталог
 %name info	InfoWindow	InfoWindow Title	%name інфа
 Favorites	FavoritesMenu		Выбранае
 Add-ons	VolumeWindow		Дапаўненні
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" непадтрымліваемы тып праграмы.
 Sorry, you can't copy items to the Trash.	PoseView		Прабачце, вы не можаце капіяваць элементы ў Сметніцу.
 List view	VolumeWindow		Від спісу
 matches wildcard expression	SelectionWindow		супадае з падстановачнымі выразамі
@@ -408,6 +409,7 @@ Paste layout	ContainerWindow		Уставіць макет
 Select	InfoWindow		Выбраць
 Could not update permissions of file \"%name\". %error	FSUtils		Не ўдалося абнавіць правы файла \"%name\". %error
 Select…	FilePanelPriv		Выбраць…
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" есць праграмай старога тыпу. Калі ласка набудзце ці збярыце яе новую версію.
 There was an error resolving the link.	Tracker		Адбылася памылка пры разборы спасылкі.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Вы не можаце перамяшчаць ці капіяваць у Сметніцу.
@@ -427,6 +429,7 @@ New	ContainerWindow		Новы
 Name matches wildcard expression:###	SelectionWindow		Імя супадае з падстановачным выразам
 less than	FindPanel		менш за
 64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		распрацоўка
 Modified	ContainerWindow		Зменены
 Edit Query template	FindPanel		Правіць шаблон Запыту
 Prompt	FSUtils		Падказка

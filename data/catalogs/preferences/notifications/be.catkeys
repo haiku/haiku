@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Notifications	1398224574
+1	belarusian	x-vnd.Haiku-Notifications	3366464357
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Адбылася памылка пры захаванні наладак.\nМагчыма, не хапае месца на дыску.
 Notifications	GeneralView		Паведамленні
 seconds of inactivity	GeneralView		секунд прастою
@@ -45,5 +45,6 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 Enable notifications at startup	GeneralView		Уключыць паведамленні пры запуску
 Notifications	PrefletView		Абвесткі
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Сервер паведамленняў не знойдзены, гэта сведчыць аб няўдалай усталёўцы InfoPopper.
+Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Не ўдалося захаваць наладкі, верагодна вы не маеце права пісаць у папку наладак.
 Applications	NotificationView		Праграмы
 Events are notified	GeneralView		Пра падзеі паведамляецца

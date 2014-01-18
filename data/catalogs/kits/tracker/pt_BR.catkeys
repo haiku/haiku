@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	2187262474
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	2212190051
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Em ícones
 Add-ons	FilePanelPriv		Adicionais
@@ -100,6 +100,7 @@ New folder	FilePanelPriv		Nova pasta
 %name info	InfoWindow	InfoWindow Title	Informações de %name
 Favorites	FavoritesMenu		Favoritos
 Add-ons	VolumeWindow		Adicionais
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" é um executável não suportado.
 Sorry, you can't copy items to the Trash.	PoseView		Desculpe, você não pode copiar itens para a Lixeira.
 List view	VolumeWindow		Em lista
 matches wildcard expression	SelectionWindow		encaixa na expressão coringa
@@ -408,6 +409,7 @@ Paste layout	ContainerWindow		Colar disposição
 Select	InfoWindow		Selecionar
 Could not update permissions of file \"%name\". %error	FSUtils		Não foi possível atualizar permissões do arquivo \"%name\". %error
 Select…	FilePanelPriv		Selecionar…
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" é um executável legado. Por favor obtenha uma versão atualizada ou recompile o aplicativo.
 There was an error resolving the link.	Tracker		Ocorreu um erro resolvendo um vínculo.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Não é possível mover ou copiar a lixeira.
@@ -427,6 +429,7 @@ New	ContainerWindow		Novo
 Name matches wildcard expression:###	SelectionWindow		Nome corresponde à expressão especial:###
 less than	FindPanel		menor que
 64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		desenvolvimento
 Modified	ContainerWindow		Modificado
 Edit Query template	FindPanel		Editar modelo de Consulta
 Prompt	FSUtils		Prompt

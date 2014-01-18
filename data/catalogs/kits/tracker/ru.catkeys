@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1400181584
+1	russian	x-vnd.Haiku-libtracker	2212190051
 OK	WidgetAttributeText		ОК
 Icon view	VolumeWindow		Большие значки
 Add-ons	FilePanelPriv		Дополнения
@@ -100,6 +100,7 @@ New folder	FilePanelPriv		Новая папка
 %name info	InfoWindow	InfoWindow Title	Информация о %name
 Favorites	FavoritesMenu		Закладки
 Add-ons	VolumeWindow		Дополнения
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" неподдерживаемый исполняемый файл.
 Sorry, you can't copy items to the Trash.	PoseView		Извините, но вы не можете копировать объекты в корзину.
 List view	VolumeWindow		Список
 matches wildcard expression	SelectionWindow		совпадает с шаблонным выражением
@@ -408,6 +409,7 @@ Paste layout	ContainerWindow		Вставить вид папки
 Select	InfoWindow		Выделить
 Could not update permissions of file \"%name\". %error	FSUtils		Невозможно обновить права файла \"%name\". %error
 Select…	FilePanelPriv		Выделить…
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" программа устаревшего типа. Пожалуйста получите обновленную версию.
 There was an error resolving the link.	Tracker		Возникла ошибка при открытии ссылки.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/с
 You can't move or copy the trash.	FSUtils		Вы не можете перемещать или копировать корзину.

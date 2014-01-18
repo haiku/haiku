@@ -1,9 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-SoundRecorder	3266675535
+1	greek, modern (1453-)	x-vnd.Haiku-SoundRecorder	804840835
 Loop	RecorderWindow		Βρόχος
 Cannot find default audio hardware	RecorderWindow		Αδυναμία εύρεσης προεπιλεγμένου υλικού ήχου
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Αδυναμία εύρεσης του προσωρινού αρχείου που δημιουργήθηκε για να κρατήσει τη νέα ηχογράφηση
 Nothing to play	RecorderWindow		Δεν υπάρχει τίποτα για αναπαραγωγή
-Some of the files don't appear to be audio files	RecorderWindow		Ορισμένα από τα αρχεία δεν φαίνεται να είναι αρχεία ήχου
 File info	RecorderWindow		Πληροφορίες αρχείου
 Drop files here	SoundListView		Σύρετε τα αρχεία εδώ
 Input	RecorderWindow		Είσοδος
@@ -14,7 +13,6 @@ Sample rate:	RecorderWindow		Ρυθμός δειγματοληψίας:
 Invalid audio files	RecorderWindow		Άκυρα αρχεία ήχου
 OK	RecorderWindow		Εντάξει
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Αδυναμία ανοίγματος του προσωρινού αρχείου που δημιουργήθηκε για να κρατήσει τη νέα ηχογράφηση
-None of the files appear to be audio files	RecorderWindow		Κανένα από τα αρχεία δεν φαίνεται να είναι αρχεία ήχου
 Input:	RecorderWindow		Είσοδος:
 Forward	RecorderWindow		Προς τα εμπρός
 Play	RecorderWindow		Αναπαραγωγή

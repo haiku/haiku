@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	2967760334
+1	belarusian	x-vnd.Haiku-Terminal	1655135592
 Not found.	Terminal TermWindow		Не знойдзена.
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Change directory	Terminal TermView		Змяніць дырэкторыю
@@ -55,6 +55,7 @@ Blinking cursor	Terminal AppearancePrefView		Мільгаючы курсор
 Don't save	Terminal PrefWindow		Не захоўваць
 Set window title	Terminal TermWindow		Прызначыць імя вакна
 Terminal	System name		Тэрмінал
+Copy path	Terminal TermView		Капіяваць шлях
 Close other tabs	Terminal TermWindow		Закрыць астатнія ўкладкі
 Match word	Terminal FindWindow		Усё слова
 Nothing is selected.	Terminal TermWindow		Нічога не выбрана.
@@ -80,10 +81,12 @@ Text encoding	Terminal TermWindow		Кадоўка тэксту
 size	Terminal TermView		памер
 Close window	Terminal TermWindow		Закрыць вакно
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tРабочы каталог актыўнага працэсу\n\t\t\tў цякучай укладцы.Дадаткова можна ўказаць макісмальную колькасць кампанентаў пуці.\n\t\t\t Напрыклад, '%2d' - не больша за два кампаненты.\n\t%T\t-\tІмя праграмы Тэрмінала ў актуальнай лакалі.\n\t%e\t-\tКадоўка актыўнай укладкі. Калі UTF-8 то не паказваецца.\n\t%i\t-\tІндэкс вакна.\n\t%p\t-\tІмя актыўнага працэсу ў цякучай укладцы.\n\t%t\t-\tІмя цякучай укладкі.\n\t%%\t-\tСімвал '%'.
+Copy absolute path	Terminal TermView		Капіяваць абсалютны шлях
 Save as default	Terminal TermWindow		Захаваць як прадвызначаныя
 Set tab title	Terminal TermWindow		Прызначыць імя ўкладкі
 Settings…	Terminal TermWindow		Наладкі…
 Abort	Terminal Shell		Спыніць
+Open link	Terminal TermView		Адкрыць спасылку
 Edit	Terminal TermWindow		Правіць
 Color:	Terminal AppearancePrefView		Колер:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для імёнаў вакон. Можна ўжываць наступныя\n запаўняльнікі:\n
@@ -94,7 +97,9 @@ OK	Terminal TermApp		ОК
 Find failed	Terminal TermWindow		Не ўдалося знайсці
 Search forward	Terminal FindWindow		Шукаць далей
 Edit tab title…	Terminal TermWindow		Правіць імя ўкладкі…
+Open path	Terminal TermView		Адкрыць шлях 
 Find previous	Terminal TermWindow		Знайсці ранейшае
+Copy link location	Terminal TermView		Капіяваць спасылку
 Tab title:	Terminal TermWindow		Імя ўкладкі:
 Find next	Terminal TermWindow		Знайсці далейшае
 Close active tab	Terminal TermWindow		Закрыць актыўную ўкладку

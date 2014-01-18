@@ -1,8 +1,8 @@
 1	french	x-vnd.Haiku-Installer	3488795908
 So behind the other menu entries towards the bottom of the file, add something similar to these lines:\n\n	InstallerApp		Ainsi, après les autres entrées du menu vers la fin du fichier, ajouter quelque chose semblable à ces lignes :\n\n
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Êtes-vous sûr de vouloir abandonner l'installation et redémarrer le système ?
-\t}\n\n	InstallerApp		\t}\n\n
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installeur\n\técrit par Jérôme Duval et Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
+\t}\n\n	InstallerApp		\t}\n\n
 Newer versions of GRUB use an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Les nouvelles versions de GRUB utilisent un fichier de configuration supplémentaire pour ajouter des entrées au menu de lancement. Pour en ajouter en haut, vous devez créer ou éditer un fichier à l'aide de votre éditeur de texte favori depuis un terminal comme ceci :\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Vous devez commenter la ligne « GRUB_HIDDEN_TIMEOUT=0 » en y ajoutant un « # » au début pour afficher le menu de démarrage.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		L'installation est terminée. Le secteur d'amorce a été écrit sur « %s ». Cliquer sur Quitter pour sortir de l'Installeur ou choisir un nouveau volume cible pour faire une autre installation.

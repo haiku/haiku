@@ -1,11 +1,10 @@
-1	french	x-vnd.Haiku-SoundRecorder	2149017672
+1	french	x-vnd.Haiku-SoundRecorder	3982150268
 Loop	RecorderWindow		Boucler
 Cannot find default audio hardware	RecorderWindow		Impossible de trouver le périphérique audio par défaut
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Impossible de trouver le fichier temporaire créé pour contenir le nouvel enregistrement.
 Sample size:	RecorderWindow		Taille de l'échantillon :
 Nothing to play	RecorderWindow		Rien à jouer
 Duration: 	RecorderWindow		Durée : 
-Some of the files don't appear to be audio files	RecorderWindow		Certains fichiers semblent ne pas être des fichiers audio
 File info	RecorderWindow		Informations du fichier
 Drop files here	SoundListView		Déposez les fichiers ici
 Input	RecorderWindow		Source
@@ -19,7 +18,6 @@ Invalid audio files	RecorderWindow		Fichiers audio non valides
  seconds	RecorderWindow		 secondes
 OK	RecorderWindow		OK
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Impossible d'ouvrir le fichier temporaire créé pour recevoir le nouvel enregistrement
-None of the files appear to be audio files	RecorderWindow		Aucun des fichiers ne semble-t-être un fichier audio
 Input:	RecorderWindow		Source :
 Forward	RecorderWindow		Avancer
 Play	RecorderWindow		Lecture

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	2969013755
+1	belarusian	x-vnd.Haiku-MediaPlayer	1727923642
 raw audio	MediaPlayer-InfoWin		нефарматаване аўдыё
 Location	MediaPlayer-InfoWin		Месцазнаходжанне
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амерыка)
@@ -21,10 +21,12 @@ Close	MediaPlayer-Main		Закрыць
 Display Mode	MediaPlayer-InfoWin		Рэжым паказу
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Нельга адправіць некаторыя файлы ў Сметніцу.
 <unknown>	MediaPlayer-InfoWin		<невядома>
+Seek	MediaPlayer-Main		Пракруціць
 Open	MediaPlayer-Main		Адкрыць
 Next	MediaPlayer-Main		Наступны
 OK	MediaPlayer-SettingsWindow		ОК
 Track %d	MediaPlayer-Main		Дарожка %d
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Бярэ/ставіць наяўную пазіцыю ў мілісекундах
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Кінатэатр)
 Display mode	MediaPlayer-InfoWin		Рэжым паказу
 Medium	MediaPlayer-SettingsWindow		Сярэдняе
@@ -69,6 +71,7 @@ Select all	MediaPlayer-PlaylistWindow		Пазначыць усе
 Move Entry	MediaPlayer-MovePLItemsCmd		Перамясціць элемент
 Open	MediaPlayer-PlaylistWindow		Адкрыць
 Stop playing.	MediaPlayer-Main		Спыніць прайгранне.
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		Пракруціць на дадзеную колькасць мікрасекундаў
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' немагчыма адкрыць.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Памылка: 
 Audio	MediaPlayer-InfoWin		Аўдыё
@@ -100,6 +103,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Нель�
 <untitled>	PlaylistItem-title		<неназваны>
 Track	Audio Track Menu		Дарожка
 unknown format	MediaPlayer-InfoWin		невядомы фармат
+Position	MediaPlayer-Main		Пазіцыя
 <nothing to redo>	MediaPlayer-PlaylistWindow		<няма чаго перарабляць>
 Skip to the next track.	MediaPlayer-Main		Пераскочыць да наступнай дарожкі.
 Play	MediaPlayer-Main		Прайграць
@@ -135,12 +139,14 @@ Edit	MediaPlayer-PlaylistWindow		Правіць
 Start media server	MediaPlayer-Main		Запусціць медыясервер
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Пераключыць поўны экран.
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Узяць працягласьць бягучага элемента ў мікрасекундах.
 ToggleFullscreen	MediaPlayer-Main		ПераключыцьПоўныЭкран
 <unnamed>	PlaylistItem-name		<неназваны>
 Open Clips	MediaPlayer-Main		Адкрыць Кліпы
 OK	MediaPlayer-PlaylistWindow		ОК
 none	Audio track menu		няма
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Вызначае/прызначае гучнасць (0.0-2.0).
+Duration	MediaPlayer-Main		Працягласць
 Playlist…	MediaPlayer-Main		Плэйліст…
 <unknown>	PlaylistItem-author		<невядомы>
 Save as…	MediaPlayer-PlaylistWindow		Захаваць як…

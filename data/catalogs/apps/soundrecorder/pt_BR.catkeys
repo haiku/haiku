@@ -1,11 +1,10 @@
-1	portuguese (brazil)	x-vnd.Haiku-SoundRecorder	2149017672
+1	portuguese (brazil)	x-vnd.Haiku-SoundRecorder	3982150268
 Loop	RecorderWindow		Repetição
 Cannot find default audio hardware	RecorderWindow		Não é possível encontrar hardware padrão de áudio
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Não é possível encontrar o arquivo temporário criado para conter a nova gravação
 Sample size:	RecorderWindow		Tamanho da amostragem:
 Nothing to play	RecorderWindow		Nada para tocar
 Duration: 	RecorderWindow		Duração: 
-Some of the files don't appear to be audio files	RecorderWindow		Alguns dos arquivos não parecem ser arquivos de áudio
 File info	RecorderWindow		Informações do arquivo
 Drop files here	SoundListView		Soltar arquivos aqui
 Input	RecorderWindow		Entrada
@@ -19,7 +18,6 @@ Invalid audio files	RecorderWindow		Arquivos de áudio inválidos
  seconds	RecorderWindow		 segundos
 OK	RecorderWindow		OK
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Não é possível abir o arquivo temporário criado para abrigar a nova gravação
-None of the files appear to be audio files	RecorderWindow		Nenhum dos arquivos parecem ser arquivos de áudio
 Input:	RecorderWindow		Entrada:
 Forward	RecorderWindow		Avançar
 Play	RecorderWindow		Reproduzir
