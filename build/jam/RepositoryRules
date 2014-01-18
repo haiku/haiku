@@ -172,7 +172,7 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 	local repositoryConfig = $(repository:G=repository-config)-config ;
 	MakeLocate $(repositoryConfig) : $(repositoriesDir) ;
 	RepositoryConfig $(repositoryConfig) : $(repositoryInfo)
-		: $(packagesChecksumFile) : $(repository) ;
+		: $(repositoryUrl)/$version : $(packagesChecksumFile) ;
 
 	HAIKU_REPOSITORY_CACHE_FILE on $(repository) = $(repositoryFile) ;
 	HAIKU_REPOSITORY_CONFIG_FILE on $(repository) = $(repositoryConfig) ;
@@ -209,23 +209,24 @@ actions GeneratedRepositoryPackageList1
 }
 
 
-rule RepositoryConfig repoConfig : repoInfo : packagesChecksumFile : repository
+rule RepositoryConfig repoConfig : repoInfo : url : versionFile
 {
-	repository = $(repository:G=repository) ;
-
-	HAIKU_REPOSITORY_URL on $(repoConfig)
-		= [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
+	HAIKU_REPOSITORY_URL on $(repoConfig) = $(url) ;
 	Depends $(repoConfig)
-		: <build>create_repository_config $(repoInfo) $(packagesChecksumFile) ;
+		: <build>create_repository_config $(repoInfo) $(versionFile) ;
 	RepositoryConfig1 $(repoConfig)
-		: <build>create_repository_config $(repoInfo) $(packagesChecksumFile) ;
+		: <build>create_repository_config $(repoInfo) $(versionFile) ;
 }
 
 
 actions RepositoryConfig1
 {
+	version=
+	if [ -n "$(2[3]:E)" ]; then
+		version=`cat "$(2[3]:E)"`
+	fi
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(2[1]) $(HAIKU_REPOSITORY_URL)/`cat $(2[3])` $(2[2]) $(1)
+	$(2[1]) $(HAIKU_REPOSITORY_URL) $(2[2]) $(1)
 }
 
 
