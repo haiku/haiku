@@ -480,6 +480,94 @@ actions ChecksumFileSHA256
 }
 
 
+rule Sed target : source : substitutions : targetMap
+{
+	# Sed <target> : [ <source> ] : <substitutions> [ : <targetMap> ] ;
+	#
+	# Performs substitutions in a text file. If <source> is given, that is the
+	# input, otherwise the substitutions are performed in place on <target>. The
+	# caller is responsible for locating <target>, <source>, and any other used
+	# target.
+	#
+	# <target> - The target file.
+	# <source> - The source file. If not given, the substitutions are performed
+	#	in place on <target>. If given, a dependency of <target> to <source>
+	#	will be established.
+	# <substitutions> - List of substitutions to be performed. Each element
+	#	specifies a substitution. It's a partial sed "s" command of the form
+	#	"<pattern>,<replacement>".
+	# <targetMap> - A list of elements of the form "<variable>=<mappedTarget>".
+	#	<variable> specifies a name of a shell variable, <mappedTarget> a jam
+	#	target whose bound name will be assigned to the shell variable. The
+	#	variable can be used in <substitutions>. A dependency of <target> to
+	#	<mappedTarget> will be established.
+
+	# We need a temporary (shell) file to which we write the target variable
+	# mappings and the sed invocations. This is necessary, since multiple rule
+	# invocations are allowed for a target, so that we cannot use on-target
+	# variables.
+	local script = [ NextID ] ;
+	script = temp-sed-script-$(target:BS)-$(script) ;
+
+	# process the target variable mappings
+	local mappedTargets ;
+	local targetMapElement ;
+	for targetMapElement in $(targetMap) {
+		local split = [ Match ([^=]+)=(.*) : $(targetMapElement) ] ;
+		HAIKU_SED_SCRIPT_VARIABLE on $(script) += $(split[1]) ;
+		local mappedTarget = $(split[2]) ;
+		mappedTargets += $(mappedTarget) ;
+	}
+
+	HAIKU_SED_SCRIPT_SUBSTITUTIONS on $(script)
+		= "-e \"s,$(substitutions),g\"" ;
+	HAIKU_SED_SCRIPT_SOURCE on $(script) = $(source) ;
+	if $(source) {
+		HAIKU_SED_SCRIPT_SOURCE_ARGUMENTS on $(script) = ">" ;
+	} else {
+		HAIKU_SED_SCRIPT_SOURCE_ARGUMENTS on $(script) = -i ;
+	}
+
+	# build the script
+	MakeLocate $(script) : $(HAIKU_TMP_DIR) ;
+	Depends $(script) : $(mappedTargets) $(source) ;
+	SedCreateScript $(script) : $(mappedTargets) ;
+
+	# build the target
+	Depends $(target) : $(script) ;
+	Sed1 $(target) : $(script) ;
+	RmTemps $(target) : $(script) ;
+}
+
+
+actions SedCreateScript bind HAIKU_SED_SCRIPT_SOURCE
+{
+	set -o errexit
+
+	$(RM) "$(1)"
+	touch "$(1)"
+
+	set -- $(2)
+	for variable in "$(HAIKU_SED_SCRIPT_VARIABLE)" ; do
+		echo "$variable=\"$1\"" >> "$(1)"
+		shift
+	done
+
+	echo sed '$(HAIKU_SED_SCRIPT_SUBSTITUTIONS)' \
+		'"$(HAIKU_SED_SCRIPT_SOURCE)"' "$(HAIKU_SED_SCRIPT_SOURCE_ARGUMENTS)" \
+		'"$target"' >> "$(1)"
+}
+
+
+actions Sed1
+{
+	set -o errexit
+
+	target="$(1)"
+	. "$(2)"
+}
+
+
 rule StripFile target : source
 {
 	# Note: The caller is reponsible for matching TARGET_PACKAGING_ARCH with
