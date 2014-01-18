@@ -50,11 +50,57 @@ rule PreprocessPackageInfo source : directory : architecture
 	;
 
 	local target = $(source:BSG=package-info)-package-info ;
+	if $(HAIKU_BOOTSTRAP_BUILD) {
+		target = $(target)-bootstrap ;
+	}
+	MakeLocate $(target) : $(directory) ;
+
+	PreprocessPackageOrRepositoryInfo $(target) : $(source) : $(architecture)
+		: $(secondaryArchitecture) : useCPP ;
+
+	# Update requires in the package info.
+	if ! $(HAIKU_BOOTSTRAP_BUILD) {
+		local updateRequiresFiles =
+			<build>update_package_requires
+			[ on <repository>HaikuPorts return $(HAIKU_REPOSITORY_CACHE_FILE) ]
+			;
+		Depends $(target) : $(updateRequiresFiles) ;
+		UpdatePackageInfoRequires $(target) : $(updateRequiresFiles) ;
+	}
+
+	return $(target) ;
+}
+
+
+actions UpdatePackageInfoRequires
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	"$(2[1])" "$(1)" "$(2[2])"
+}
+
+
+rule PreprocessPackageOrRepositoryInfo target : source : architecture
+	: secondaryArchitecture : flags
+{
+	# PreprocessPackageOrRepositoryInfo <target> : <source> : <architecture>
+	#	: [ <secondaryArchitecture> ] [ : <flags> ] ;
+	# Preprocesses the package or repository info template file <source> by
+	# performing several placeholder substitutions and optionally filtering it
+	# through the C preprocessor.
+	#
+	# <target> - The generated preprocessed file.
+	# <source> - The package or repository info template file.
+	# <architecture> - The primary packaging architecture.
+	# <secondaryArchitecture> - If given, the secondary packaging architecture
+	#	the package targets. Otherwise the primary architecture is targeted.
+	# <flags>:
+	#	useCPP - Filter the source file through the C preprocessor after the
+	#		placeholder substitutions have been performed.
+
 	local defines = HAIKU_PACKAGING_ARCH=$(architecture) ;
 	local sedReplacements = %HAIKU_PACKAGING_ARCH%,$(architecture) ;
 	if $(HAIKU_BOOTSTRAP_BUILD) {
 		defines += HAIKU_BOOTSTRAP_BUILD ;
-		target = $(target)-bootstrap ;
 	}
 	if $(secondaryArchitecture) {
 		defines += HAIKU_SECONDARY_PACKAGING_ARCH=$(secondaryArchitecture) ;
@@ -68,39 +114,29 @@ rule PreprocessPackageInfo source : directory : architecture
 	}
 
 	local revisionFile = [ DetermineEffectiveHaikuRevision ] ;
-	local updateRequiresFiles ;
-	local haikuPortsRepositoryFile ;
-	if ! $(HAIKU_BOOTSTRAP_BUILD) {
-		updateRequiresFiles =
-			<build>update_package_requires
-			[ on <repository>HaikuPorts return $(HAIKU_REPOSITORY_CACHE_FILE) ]
-			;
+	Depends $(target) : $(source) $(revisionFile) ;
+
+	if useCPP in $(flags) {
+		PREPROCESSOR on $(target)
+			= "|" $(HOST_CC) -E -w [ FDefines $(defines) ] - ;
+	} else {
+		PREPROCESSOR on $(target) = ;
 	}
 
-	MakeLocate $(target) : $(directory) ;
-	Depends $(target) : $(source) $(revisionFile) $(updateRequiresFiles) ;
-
-	CCDEFS on $(target) = [ FDefines $(defines) ] ;
 	HAIKU_SED_REPLACEMENTS on $(target) = "-e s,$(sedReplacements),g" ;
 
-	PreprocessPackageInfo1 $(target) : $(source) $(revisionFile)
-		$(updateRequiresFiles) ;
-
-	return $(target) ;
+	PreprocessPackageOrRepositoryInfo1 $(target) : $(source) $(revisionFile) ;
 }
 
 
-actions PreprocessPackageInfo1
+actions PreprocessPackageOrRepositoryInfo1
 {
 	revision=`cat $(2[2])`
+	version=$(HAIKU_VERSION)_${revision}
 	sed $(HAIKU_SED_REPLACEMENTS) \
-			-e s,%HAIKU_VERSION%,$(HAIKU_VERSION)_${revision}-1, < $(2[1]) \
-		| $(HOST_CC) -E -w $(CCDEFS) - -o $(1)
-
-	if [ -n "$(2[4]:E)" ]; then
-		$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-		"$(2[3])" "$(1)" "$(2[4])" || exit 1
-	fi
+			-e s,%HAIKU_VERSION%,${version}-1, \
+			-e s,%HAIKU_VERSION_NO_REVISION%,${version}, $(2[1]) \
+		$(PREPROCESSOR) > $(1)
 }
 
 

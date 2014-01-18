@@ -35,17 +35,8 @@ for packageFile in "$@"; do
 	cp "$packageFile" "$packageDir/$fileName"
 done
 
-# prepare the repo info file
-fileName=`basename "$packageDir"/haiku-*.hpkg .hpkg`
-version=${fileName#*-}
-version=${version%%-*}
-arch=${fileName##*-}
-
-sed -e "s/%HAIKU_ARCHITECTURE%/$arch/g" \
-	-e "s/%HAIKU_VERSION%/$version/g" \
-	"$repoInfo" > "$repositoryDir/repo.info"
-
 # build the repository file
+cp "$repoInfo" "$repositoryDir/repo.info"
 "$packageRepo" create -C "$repositoryDir" "$repositoryDir/repo.info" \
 	"$packageDir"/*.hpkg
 

@@ -1,6 +1,6 @@
 name Haiku
 vendor "Haiku Project"
-summary "The Haiku repository (for Haiku %HAIKU_VERSION%)"
+summary "The Haiku repository (for Haiku %HAIKU_VERSION_NO_REVISION%)"
 priority 1
-url http://packages.haiku-os.org/haiku/master/repo/%HAIKU_ARCHITECTURE%/%HAIKU_VERSION%
-architecture %HAIKU_ARCHITECTURE%
+url http://packages.haiku-os.org/haiku/master/repo/%HAIKU_PACKAGING_ARCH%/%HAIKU_VERSION_NO_REVISION%
+architecture %HAIKU_PACKAGING_ARCH%

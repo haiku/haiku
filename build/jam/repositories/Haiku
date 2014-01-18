@@ -4,7 +4,7 @@ local haikuRepository = <repository>haiku ;
 MakeLocate $(haikuRepository)
 	: $(HAIKU_PACKAGE_REPOSITORIES_DIR_$(HAIKU_PACKAGING_ARCH)) ;
 
-local repoInfo = <repository-info>haiku ;
+local repoInfo = <repository-info-template>haiku ;
 SEARCH on $(repoInfo) = $(HAIKU_TOP)/src/data/repository_infos ;
 
 local secondaryArchs = $(TARGET_PACKAGING_ARCHS[2-]) ;

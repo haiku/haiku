@@ -677,12 +677,30 @@ actions BuildRemoteHaikuPortsRepository1
 }
 
 
-rule HaikuRepository repository : repoInfo : packages
+rule HaikuRepository repository : repoInfoTemplate : packages
 {
+	# HaikuRepository <repository> : <repoInfoTemplate> : <packages> ;
+	# Builds the Haiku repository from the given packages and repository info
+	# template. <repository> must already be located.
+
+	local architecture = $(HAIKU_PACKAGING_ARCH) ;
+	local secondaryArchitecture ;
+	if $(TARGET_PACKAGING_ARCH) != $(architecture) {
+		secondaryArchitecture = $(TARGET_PACKAGING_ARCH) ;
+	}
+
+	local repositoriesDir = $(HAIKU_PACKAGE_REPOSITORIES_DIR_$(architecture)) ;
+
+	# build the repository info
+	local repoInfo = $(repository:G=repository-info)-info ;
+	MakeLocate $(repoInfo) : $(repositoriesDir) ;
+	PreprocessPackageOrRepositoryInfo $(repoInfo) : $(repoInfoTemplate)
+		: $(architecture) : $(secondaryArchitecture) ;
+
 	# prepare the script that initializes the shell variables
 	local initVariablesScript = $(repository)-repository-init-vars ;
 	MakeLocate $(initVariablesScript)
-		: $(HAIKU_PACKAGE_REPOSITORIES_DIR_$(HAIKU_PACKAGING_ARCH)) ;
+		: $(HAIKU_PACKAGE_REPOSITORIES_DIR_$(architecture)) ;
 	Always $(initVariablesScript) ;
 
 	local script = $(initVariablesScript) ;
