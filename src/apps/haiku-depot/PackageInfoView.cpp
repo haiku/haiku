@@ -111,6 +111,7 @@ public:
 		:
 		TextDocumentView(name)
 	{
+		SetEditingEnabled(false);
 		CharacterStyle regularStyle;
 
 		float fontSize = regularStyle.Font().Size();
