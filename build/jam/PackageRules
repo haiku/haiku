@@ -67,7 +67,7 @@ rule PreprocessPackageInfo source : directory : architecture
 			+= %HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%, ;
 	}
 
-	local revisionFile = [ DetermineHaikuRevision ] ;
+	local revisionFile = [ DetermineEffectiveHaikuRevision ] ;
 	local updateRequiresFiles ;
 	local haikuPortsRepositoryFile ;
 	if ! $(HAIKU_BOOTSTRAP_BUILD) {
@@ -92,9 +92,9 @@ rule PreprocessPackageInfo source : directory : architecture
 
 actions PreprocessPackageInfo1
 {
-	revision=`sed -n 's,^\(hrev[0-9]*\).*,\1,p' $(2[2])`
+	revision=`cat $(2[2])`
 	sed $(HAIKU_SED_REPLACEMENTS) \
-			-e s,%HAIKU_VERSION%,$(HAIKU_VERSION)_${revision:-0}-1, < $(2[1]) \
+			-e s,%HAIKU_VERSION%,$(HAIKU_VERSION)_${revision}-1, < $(2[1]) \
 		| $(HOST_CC) -E -w $(CCDEFS) - -o $(1)
 
 	if [ -n "$(2[4]:E)" ]; then
