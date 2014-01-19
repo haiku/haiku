@@ -243,6 +243,9 @@ TextEditor::Insert(int32 offset, const BString& string)
 	if (!fEditingEnabled || fDocument.Get() == NULL)
 		return B_ERROR;
 
+	// TODO: Via listener, and only affected paragraphs
+	fLayout->Invalidate();
+
 	return fDocument->Insert(offset, string, fStyleAtCaret);
 }
 
@@ -252,6 +255,9 @@ TextEditor::Remove(int32 offset, int32 length)
 {
 	if (!fEditingEnabled || fDocument.Get() == NULL)
 		return B_ERROR;
+
+	// TODO: Via listener, and only affected paragraphs
+	fLayout->Invalidate();
 
 	return fDocument->Remove(offset, length);
 }

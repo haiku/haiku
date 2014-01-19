@@ -125,7 +125,7 @@ TextDocument::Remove(int32 textOffset, int32 length)
 
 	textOffset = 0;
 	
-	while (length > 0) {
+	while (length > 0 && index + 1 < fParagraphs.CountItems()) {
 		const Paragraph& paragraph = ParagraphAt(index + 1);
 		paragraphLength = paragraph.Length();
 		// Remove paragraph in any case. If some of it remains, the last
@@ -238,10 +238,10 @@ TextDocument::ParagraphIndexFor(int32 textOffset, int32& paragraphOffset) const
 	int32 count = fParagraphs.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
-		paragraphOffset = textOffset - textLength;
 		int32 paragraphLength = paragraph.Length();
 		if (textLength + paragraphLength > textOffset)
 			return i;
+		paragraphOffset += paragraphLength;
 		textLength += paragraphLength;
 	}
 	return -1;

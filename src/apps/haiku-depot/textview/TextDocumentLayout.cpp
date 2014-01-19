@@ -62,6 +62,34 @@ TextDocumentLayout::SetTextDocument(const TextDocumentRef& document)
 
 
 void
+TextDocumentLayout::Invalidate()
+{
+	InvalidateParagraphs(0, fParagraphLayouts.CountItems());
+}
+
+
+void
+TextDocumentLayout::InvalidateParagraphs(int32 start, int32 count)
+{
+	if (start < 0 || fDocument.Get() == NULL)
+		return;
+
+	const ParagraphList& paragraphs = fDocument->Paragraphs();
+
+	while (count > 0) {
+		if (start >= fParagraphLayouts.CountItems())
+			break;
+		
+		const Paragraph& paragraph = paragraphs.ItemAtFast(start);
+		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(start);
+		info.layout->SetParagraph(paragraph);
+		
+		start++;
+	}
+}
+
+
+void
 TextDocumentLayout::SetWidth(float width)
 {
 	if (fWidth != width) {

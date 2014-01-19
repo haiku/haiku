@@ -78,6 +78,9 @@ public:
 			void				SetTextDocument(
 									const TextDocumentRef& document);
 
+			void				Invalidate();
+			void				InvalidateParagraphs(int32 start, int32 count);
+
 			void				SetWidth(float width);
 			float				Width() const
 									{ return fWidth; }
