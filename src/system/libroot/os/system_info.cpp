@@ -31,12 +31,12 @@ typedef struct {
 	bigtime_t		boot_time;			/* time of boot (usecs since 1/1/1970) */
 
 	int32			cpu_count;			/* number of cpus */
-	enum cpu_type	cpu_type;			/* type of cpu */
+	int32			cpu_type;			/* type of cpu */
 	int32			cpu_revision;		/* revision # of cpu */
 	legacy_cpu_info	cpu_infos[8];		/* info about individual cpus */
 	int64			cpu_clock_speed;	/* processor clock speed (Hz) */
 	int64			bus_clock_speed;	/* bus clock speed (Hz) */
-	enum platform_type	platform_type;	/* type of machine we're on */
+	int32			platform_type;	/* type of machine we're on */
 
 	int32			max_pages;			/* total # of accessible pages */
 	int32			used_pages;			/* # of accessible pages in use */
