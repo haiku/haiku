@@ -149,15 +149,13 @@ TextDocument::Insert(int32 textOffset, const BString& text,
 			} else {
 				if (!paragraph2.Prepend(span))
 					return B_NO_MEMORY;
-				if (paragraph2.Length() > 0) {
-					if (!fParagraphs.Add(paragraph2, index))
-						return B_NO_MEMORY;
-					index++;
-				}
 			}
 
 			chunkStart = chunkEnd + 1;
 		}
+
+		if (!fParagraphs.Add(paragraph2, index))
+			return B_NO_MEMORY;
 	} else {
 		Paragraph paragraph(ParagraphAt(index));
 		paragraph.Insert(textOffset, TextSpan(text, characterStyle));
