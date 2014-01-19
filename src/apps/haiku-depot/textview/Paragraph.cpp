@@ -67,6 +67,22 @@ Paragraph::SetStyle(const ParagraphStyle& style)
 
 
 bool
+Paragraph::Prepend(const TextSpan& span)
+{
+	// Try to merge with first span if the TextStyles are equal
+	if (fTextSpans.CountItems() > 0) {
+		const TextSpan& firstSpan = fTextSpans.ItemAtFast(0);
+		if (firstSpan.Style() == span.Style()) {
+			BString text(span.Text());
+			text.Append(firstSpan.Text());
+			return fTextSpans.Replace(0, TextSpan(text, span.Style()));
+		}
+	}
+	return fTextSpans.Add(span, 0);
+}
+
+
+bool
 Paragraph::Append(const TextSpan& span)
 {
 	// Try to merge with last span if the TextStyles are equal

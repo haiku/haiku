@@ -30,6 +30,7 @@ public:
 	inline	const TextSpanList&	TextSpans() const
 									{ return fTextSpans; }
 
+			bool				Prepend(const TextSpan& span);
 			bool				Append(const TextSpan& span);
 			bool				Insert(int32 offset, const TextSpan& span);
 			bool				Remove(int32 offset, int32 length);
