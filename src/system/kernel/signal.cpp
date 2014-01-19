@@ -1327,10 +1327,10 @@ has_signals_pending(Thread* thread)
 	\param team The target team.
 */
 static bool
-has_permission_to_signal(Signal* signal, Team* team)
+has_permission_to_signal(Team* team)
 {
 	// get the current user
-	uid_t currentUser = signal->SendingUser();
+	uid_t currentUser = thread_get_current_thread()->team->effective_uid;
 
 	// root is omnipotent -- in the other cases the current user must match the
 	// target team's
@@ -1368,7 +1368,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 	BReference<Signal> signalReference(signal, true);
 
 	if ((flags & B_CHECK_PERMISSION) != 0) {
-		if (!has_permission_to_signal(signal, thread->team))
+		if (!has_permission_to_signal(thread->team))
 			return EPERM;
 	}
 
@@ -1573,7 +1573,7 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 	BReference<Signal> signalReference(signal, true);
 
 	if ((flags & B_CHECK_PERMISSION) != 0) {
-		if (!has_permission_to_signal(signal, team))
+		if (!has_permission_to_signal(team))
 			return EPERM;
 	}
 
