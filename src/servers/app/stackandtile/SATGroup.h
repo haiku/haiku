@@ -258,6 +258,9 @@ public:
 			int32				CountItems();
 			SATWindow*			WindowAt(int32 index);
 
+			SATWindow*			ActiveWindow() const;
+			void				SetActiveWindow(SATWindow* window);
+
 			const WindowAreaList&	GetAreaList() { return fWindowAreaList; }
 
 			/*! \return a sorted tab list. */
@@ -324,6 +327,8 @@ private:
 			bool				fHorizontalTabsSorted;
 			TabList				fVerticalTabs;
 			bool				fVerticalTabsSorted;
+
+			SATWindow*			fActiveWindow;
 };
 
 

@@ -787,9 +787,9 @@ Tab::CompareFunction(const Tab* tab1, const Tab* tab2)
 SATGroup::SATGroup()
 	:
 	fHorizontalTabsSorted(false),
-	fVerticalTabsSorted(false)
+	fVerticalTabsSorted(false),
+	fActiveWindow(NULL)
 {
-	
 }
 
 
@@ -929,6 +929,20 @@ SATWindow*
 SATGroup::WindowAt(int32 index)
 {
 	return fSATWindowList.ItemAt(index);
+}
+
+
+SATWindow*
+SATGroup::ActiveWindow() const
+{
+	return fActiveWindow;
+}
+
+
+void
+SATGroup::SetActiveWindow(SATWindow* window)
+{
+	fActiveWindow = window;
 }
 
 

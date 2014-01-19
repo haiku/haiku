@@ -102,6 +102,7 @@ private:
 			void				_ActivateWindow(SATWindow* window);
 			bool				_HandleMessage(BPrivate::LinkReceiver& link,
 									BPrivate::LinkSender& reply);
+			SATGroup*			_GetSATGroup(SATWindow* window);
 
 			Desktop*			fDesktop;
 
@@ -118,6 +119,11 @@ class GroupIterator {
 public:
 								GroupIterator(StackAndTile* sat,
 									Desktop* desktop);
+
+			SATGroup*			CurrentGroup(void) const
+									{ return fCurrentGroup; };
+			void				SetCurrentGroup(SATGroup* group)
+									{ fCurrentGroup = group; };
 
 			void				RewindToFront();
 			SATGroup*			NextGroup();
