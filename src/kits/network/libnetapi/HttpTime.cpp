@@ -107,7 +107,11 @@ BHttpTime::Parse()
 // TODO: The above was used initially. See http://en.wikipedia.org/wiki/Time.h
 // stippi: I don't know how Christophe had this code compiling initially,
 // since Haiku does not appear to implement timegm().
-return mktime(&expireTime);
+// Using mktime() doesn't cut it, as cookies set with a date shortly in the
+// future (eg. 1 hour) would expire immediately.
+	time_t t = mktime(&expireTime);
+	t -= mktime(gmtime(&t)) - (int)mktime(localtime(&t));
+	return t;
 }
 
 
