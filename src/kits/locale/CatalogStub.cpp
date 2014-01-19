@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Adrien Destugues <pulkomandy@pulkomandy.ath.cx>.
+ * Copyright 2010-2014, Adrien Destugues <pulkomandy@pulkomandy.tk>.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,9 +7,11 @@
 #include <Catalog.h>
 #include <LocaleRoster.h>
 
+#include <locks.h>
+
 
 static BCatalog sCatalog;
-static vint32 sCatalogInitOnce = false;
+static int32 sCatalogInitOnce = INIT_ONCE_UNINITIALIZED;
 
 
 BCatalog*
@@ -28,7 +30,7 @@ BLocaleRoster::GetCatalog()
 namespace BPrivate{
 	void ForceUnloadCatalog()
 	{
-		sCatalogInitOnce = false;
+		sCatalogInitOnce = INIT_ONCE_UNINITIALIZED;
 	}
 }
 

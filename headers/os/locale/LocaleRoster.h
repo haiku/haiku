@@ -6,6 +6,8 @@
 #define _LOCALE_ROSTER_H_
 
 
+#include <pthread.h>
+
 #include <Entry.h>
 #include <String.h>
 
@@ -98,7 +100,7 @@ protected:
 
 private:
 	static	BCatalog*			_GetCatalog(BCatalog* catalog,
-									vint32* catalogInitStatus);
+									int32* catalogInitStatus);
 
 			status_t			_PrepareCatalogEntry(const entry_ref& ref,
 									BString& signature, BString& context,

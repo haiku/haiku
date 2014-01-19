@@ -32,6 +32,7 @@
 #include <TimeZone.h>
 
 #include <ICUWrapper.h>
+#include <locks.h>
 
 // ICU includes
 #include <unicode/locdspnm.h>
@@ -515,16 +516,10 @@ BLocaleRoster::GetLocalizedFileName(BString& localizedFileName,
 }
 
 
-BCatalog*
-BLocaleRoster::_GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
+static status_t
+_InitializeCatalog(void* param)
 {
-	// This function is used in the translation macros, so it can't return a
-	// status_t. Maybe it could throw exceptions ?
-
-	if (*catalogInitStatus == true) {
-		// Catalog already loaded - nothing else to do
-		return catalog;
-	}
+	BCatalog* catalog = (BCatalog*)param;
 
 	// figure out image (shared object) from catalog address
 	image_info info;
@@ -540,13 +535,24 @@ BLocaleRoster::_GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 	}
 
 	if (!found)
-		return catalog;
+		return B_NAME_NOT_FOUND;
 
-	// load the catalog for this mimetype and return it to the app
+	// load the catalog for this mimetype
 	entry_ref ref;
-	if (BEntry(info.name).GetRef(&ref) == B_OK && catalog->SetTo(ref) == B_OK)
-		*catalogInitStatus = true;
+	if (BEntry(info.name).GetRef(&ref) == B_OK && catalog->SetTo(ref) == B_OK);
+		return B_OK;
+	
+	return B_ERROR;
+}
 
+
+BCatalog*
+BLocaleRoster::_GetCatalog(BCatalog* catalog, int32* catalogInitStatus)
+{
+	// This function is used in the translation macros, so it can't return a
+	// status_t. Maybe it could throw exceptions ?
+
+	__init_once(catalogInitStatus, _InitializeCatalog, catalog);
 	return catalog;
 }
 
