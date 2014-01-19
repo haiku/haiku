@@ -88,7 +88,6 @@ typedef struct cpu_ent {
 } cpu_ent CACHE_LINE_ALIGN;
 
 
-//extern cpu_ent gCPU[MAX_BOOT_CPUS];
 extern cpu_ent gCPU[];
 extern uint32 gCPUCacheLevelCount;
 
