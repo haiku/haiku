@@ -5,10 +5,17 @@
 #ifndef _KERNEL_ARCH_ARM_CPU_H
 #define _KERNEL_ARCH_ARM_CPU_H
 
+
+#define CPU_MAX_CACHE_LEVEL 8
+#define CACHE_LINE_SIZE 64
+	// TODO: Could be 32-bits sometimes?
+
+
 #ifndef _ASSEMBLER
 
 #include <arch/arm/arch_thread_types.h>
 #include <kernel.h>
+
 
 /* raw exception frames */
 struct iframe {

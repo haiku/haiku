@@ -10,6 +10,11 @@
 #include <kernel.h>
 
 
+#define CPU_MAX_CACHE_LEVEL	8
+#define CACHE_LINE_SIZE		128
+	// 128 Byte lines on PPC970
+
+
 struct iframe {
 	uint32 vector;
 	uint32 srr0;
