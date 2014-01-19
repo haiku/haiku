@@ -82,6 +82,13 @@ CharacterStyle::SetFontSize(float size)
 }
 
 
+float
+CharacterStyle::FontSize() const
+{
+	return Font().Size();
+}
+
+
 bool
 CharacterStyle::SetBold(bool bold)
 {
@@ -109,6 +116,13 @@ CharacterStyle::SetBold(bool bold)
 
 
 bool
+CharacterStyle::IsBold() const
+{
+	return (Font().Face() & B_BOLD_FACE) != 0;
+}
+
+
+bool
 CharacterStyle::SetItalic(bool italic)
 {
 	uint16 face = Font().Face();
@@ -131,6 +145,13 @@ CharacterStyle::SetItalic(bool italic)
 	}
 
 	return SetFont(_FindFontForFace(neededFace));
+}
+
+
+bool
+CharacterStyle::IsItalic() const
+{
+	return (Font().Face() & B_ITALIC_FACE) != 0;
 }
 
 

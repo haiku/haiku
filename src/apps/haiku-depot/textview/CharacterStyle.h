@@ -21,8 +21,13 @@ public:
 			const BFont&		Font() const;
 
 			bool				SetFontSize(float size);
+			float				FontSize() const;
+
 			bool				SetBold(bool bold);
+			bool				IsBold() const;
+
 			bool				SetItalic(bool italic);
+			bool				IsItalic() const;
 
 			bool				SetAscent(float ascent);
 			float				Ascent() const;
