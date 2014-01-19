@@ -18,39 +18,9 @@
 #if _BEOS_R5_COMPATIBLE_
 
 
-enum cpu_type {
-    B_CPU_PPC_601 = 1,
-    B_CPU_PPC_603 = 2,
-    B_CPU_PPC_603e = 3,
-    B_CPU_PPC_604 = 4,
-    B_CPU_PPC_604e = 5,
-    B_CPU_PPC_686 = 13,
-    B_CPU_AMD_29K,
-    B_CPU_X86,
-    B_CPU_MC6502,
-    B_CPU_Z80,
-    B_CPU_ALPHA,
-    B_CPU_MIPS,
-    B_CPU_HPPA,
-    B_CPU_M68K,
-    B_CPU_ARM,
-    B_CPU_SH,
-    B_CPU_SPARC
-};
+#define LEGACY_B_CPU_X86			15
 
-enum platform_type {
-    B_BEBOX_PLATFORM = 0,
-    B_MAC_PLATFORM,
-    B_AT_CLONE_PLATFORM,
-    B_ENIAC_PLATFORM,
-    B_APPLE_II_PLATFORM,
-    B_CRAY_PLATFORM,
-    B_LISA_PLATFORM,
-    B_TI_994A_PLATFORM,
-    B_TIMEX_SINCLAIR_PLATFORM,
-    B_ORAC_1_PLATFORM,
-    B_HAL_PLATFORM
-};
+#define LEGACY_B_AT_CLONE_PLATFORM	2
 
 typedef struct {
 	bigtime_t	active_time;	/* usec of doing useful work since boot */
@@ -117,8 +87,8 @@ _get_system_info(legacy_system_info* info, size_t size)
 	for (int32 i = 0; i < info->cpu_count; i++)
 		info->cpu_infos[i].active_time = cpuInfos[i].active_time;
 
-	info->platform_type = B_AT_CLONE_PLATFORM;
-	info->cpu_type = B_CPU_X86;
+	info->platform_type = LEGACY_B_AT_CLONE_PLATFORM;
+	info->cpu_type = LEGACY_B_CPU_X86;
 
 	uint32 topologyNodeCount = 0;
 	cpu_topology_node_info* topology = NULL;
@@ -173,7 +143,7 @@ _get_system_info(legacy_system_info* info, size_t size)
 }
 
 
-#endif
+#endif	// _BEOS_R5_COMPATIBLE_
 
 
 status_t
