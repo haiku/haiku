@@ -55,6 +55,9 @@ public:
 			const ParagraphList& Paragraphs() const
 									{ return fParagraphs; }
 
+			int32				ParagraphIndexFor(int32 textOffset,
+									int32& paragraphOffset) const;
+
 			const Paragraph&	ParagraphAt(int32 textOffset,
 									int32& paragraphOffset) const;
 

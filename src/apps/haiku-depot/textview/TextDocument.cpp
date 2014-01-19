@@ -95,10 +95,69 @@ TextDocument::Insert(int32 offset, const BString& text,
 
 
 status_t
-TextDocument::Remove(int32 offset, int32 length)
+TextDocument::Remove(int32 textOffset, int32 length)
 {
-	// TODO: Implement
-	return B_ERROR;
+	if (length == 0)
+		return B_OK;
+
+	int32 paragraphOffset;
+	int32 index = ParagraphIndexFor(textOffset, paragraphOffset);
+	if (index < 0)
+		return B_BAD_VALUE;
+
+	textOffset -= paragraphOffset;
+
+	// The paragraph at the text offset remains, even if the offset is at
+	// the beginning of that paragraph. The idea is that the selection start
+	// stays visually in the same place. Therefore, the paragraph at that
+	// offset has to keep the paragraph style from that paragraph.
+
+	Paragraph resultParagraph(ParagraphAt(index));
+	int32 paragraphLength = resultParagraph.Length();
+	if (textOffset == 0 && length > paragraphLength) {
+		length -= paragraphLength;
+		resultParagraph.Clear();
+	} else {
+		int32 removeLength = std::min(length, paragraphLength - textOffset);
+		resultParagraph.Remove(textOffset, removeLength);
+		length -= removeLength;
+	}
+
+	textOffset = 0;
+	
+	while (length > 0) {
+		const Paragraph& paragraph = ParagraphAt(index + 1);
+		paragraphLength = paragraph.Length();
+		// Remove paragraph in any case. If some of it remains, the last
+		// paragraph to remove is reached, and the remaining spans are
+		// transfered to the result parahraph.
+		if (length >= paragraphLength) {
+			length -= paragraphLength;
+			fParagraphs.Remove(index);
+		} else {
+			// Last paragraph reached
+			int32 removedLength = std::min(length, paragraphLength);
+			Paragraph newParagraph(paragraph);
+			fParagraphs.Remove(index);
+
+			if (!newParagraph.Remove(0, removedLength))
+				return B_NO_MEMORY;
+
+			// Transfer remaining spans to resultParagraph
+			const TextSpanList&	textSpans = newParagraph.TextSpans();
+			int32 spanCount = textSpans.CountItems();
+			for (int32 i = 0; i < spanCount; i++) {
+				const TextSpan& span = textSpans.ItemAtFast(i);
+				resultParagraph.Append(span);
+			}
+			
+			break;
+		}
+	}
+
+	fParagraphs.Replace(index, resultParagraph);
+
+	return B_OK;
 }
 
 
@@ -124,7 +183,12 @@ status_t
 TextDocument::Replace(int32 offset, int32 length, const BString& text,
 	const CharacterStyle& CharacterStyle, const ParagraphStyle& paragraphStyle)
 {
-	// TODO: Implement
+	status_t ret = Remove(offset, length);
+	if (ret != B_OK)
+		return ret;
+	
+	// TODO: ...
+	
 	return B_ERROR;
 }
 
@@ -164,8 +228,8 @@ TextDocument::ParagraphStyleAt(int32 textOffset) const
 // #pragma mark -
 
 
-const Paragraph&
-TextDocument::ParagraphAt(int32 textOffset, int32& paragraphOffset) const
+int32
+TextDocument::ParagraphIndexFor(int32 textOffset, int32& paragraphOffset) const
 {
 	// TODO: Could binary search the Paragraphs if they were wrapped in classes
 	// that knew there text offset in the document.
@@ -177,9 +241,20 @@ TextDocument::ParagraphAt(int32 textOffset, int32& paragraphOffset) const
 		paragraphOffset = textOffset - textLength;
 		int32 paragraphLength = paragraph.Length();
 		if (textLength + paragraphLength > textOffset)
-			return paragraph;
+			return i;
 		textLength += paragraphLength;
 	}
+	return -1;
+}
+
+
+const Paragraph&
+TextDocument::ParagraphAt(int32 textOffset, int32& paragraphOffset) const
+{
+	int32 index = ParagraphIndexFor(textOffset, paragraphOffset);
+	if (index >= 0)
+		return fParagraphs.ItemAtFast(index);
+
 	return fEmptyLastParagraph;
 }
 
