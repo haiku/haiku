@@ -105,9 +105,9 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 	int32 index = 0;
 	while (index < fTextSpans.CountItems()) {
 		const TextSpan& span = fTextSpans.ItemAtFast(index);
-		if (offset - span.CharCount() < 0)
+		if (offset - span.CountChars() < 0)
 			break;
-		offset -= span.CharCount();
+		offset -= span.CountChars();
 		index++;
 	}
 
@@ -126,7 +126,7 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 			// Try to merge with TextSpan before if offset == 0 && index > 0
 			TextSpan span = fTextSpans.ItemAtFast(index - 1);
 			if (span.Style() == newSpan.Style()) {
-				span.Insert(span.CharCount(), newSpan.Text());
+				span.Insert(span.CountChars(), newSpan.Text());
 				return fTextSpans.Replace(index - 1, span);
 			}
 		}
@@ -136,7 +136,7 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 
 	// Split the span,
 	TextSpan spanBefore = span.SubSpan(0, offset);
-	TextSpan spanAfter = span.SubSpan(offset, span.CharCount() - offset);
+	TextSpan spanAfter = span.SubSpan(offset, span.CountChars() - offset);
 
 	return fTextSpans.Replace(index, spanBefore)
 		&& fTextSpans.Add(newSpan, index + 1)
@@ -153,9 +153,9 @@ Paragraph::Remove(int32 offset, int32 length)
 	int32 index = 0;
 	while (index < fTextSpans.CountItems()) {
 		const TextSpan& span = fTextSpans.ItemAtFast(index);
-		if (offset - span.CharCount() < 0)
+		if (offset - span.CountChars() < 0)
 			break;
-		offset -= span.CharCount();
+		offset -= span.CountChars();
 		index++;
 	}
 
@@ -163,7 +163,7 @@ Paragraph::Remove(int32 offset, int32 length)
 		return false;
 
 	TextSpan span(fTextSpans.ItemAtFast(index));
-	int32 removeLength = std::min(span.CharCount() - offset, length);
+	int32 removeLength = std::min(span.CountChars() - offset, length);
 	span.Remove(offset, removeLength);
 	fTextSpans.Replace(index, span);
 	length -= removeLength;
@@ -171,7 +171,7 @@ Paragraph::Remove(int32 offset, int32 length)
 
 	// Remove more spans if necessary
 	while (length > 0 && index < fTextSpans.CountItems()) {
-		int32 spanLength = fTextSpans.ItemAtFast(index).CharCount();
+		int32 spanLength = fTextSpans.ItemAtFast(index).CountChars();
 		if (spanLength <= length) {
 			fTextSpans.Remove(index);
 			length -= spanLength;
@@ -182,7 +182,7 @@ Paragraph::Remove(int32 offset, int32 length)
 				removeLength, spanLength - removeLength);
 			// Try to merge with first span, otherwise replace span at index
 			if (lastSpan.Style() == span.Style()) {
-				span.Insert(span.CharCount(), lastSpan.Text());
+				span.Insert(span.CountChars(), lastSpan.Text());
 				fTextSpans.Replace(index - 1, span);
 			} else {
 				fTextSpans.Replace(index, lastSpan);
@@ -193,7 +193,7 @@ Paragraph::Remove(int32 offset, int32 length)
 	}
 
 	// See if anything from the TextSpan at offset remained
-	if (span.CharCount() == 0)
+	if (span.CountChars() == 0)
 		fTextSpans.Remove(index - 1);
 
 	return true;
@@ -213,7 +213,7 @@ Paragraph::Length() const
 	int32 length = 0;
 	for (int32 i = fTextSpans.CountItems() - 1; i >= 0; i--) {
 		const TextSpan& span = fTextSpans.ItemAtFast(i);
-		length += span.CharCount();
+		length += span.CountChars();
 	}
 	return length;
 }
@@ -237,7 +237,7 @@ Paragraph::GetText(int32 start, int32 length) const
 	int32 count = fTextSpans.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		const TextSpan& span = fTextSpans.ItemAtFast(i);
-		int32 spanLength = span.CharCount();
+		int32 spanLength = span.CountChars();
 		if (spanLength == 0)
 			continue;
 		if (start > spanLength) {

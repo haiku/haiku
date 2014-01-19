@@ -70,24 +70,102 @@ TextDocument::operator!=(const TextDocument& other) const
 
 
 status_t
-TextDocument::Insert(int32 offset, const BString& text)
+TextDocument::Insert(int32 textOffset, const BString& text)
 {
-	return Insert(offset, text, CharacterStyleAt(offset));
+	return Insert(textOffset, text, CharacterStyleAt(textOffset));
 }
 
 
 status_t
-TextDocument::Insert(int32 offset, const BString& text, const CharacterStyle& style)
+TextDocument::Insert(int32 textOffset, const BString& text,
+	const CharacterStyle& style)
 {
-	return Insert(offset, text, style, ParagraphStyleAt(offset));
+	return Insert(textOffset, text, style, ParagraphStyleAt(textOffset));
 }
 
 
 status_t
-TextDocument::Insert(int32 offset, const BString& text,
-	const CharacterStyle& CharacterStyle, const ParagraphStyle& paragraphStyle)
+TextDocument::Insert(int32 textOffset, const BString& text,
+	const CharacterStyle& characterStyle, const ParagraphStyle& paragraphStyle)
 {
-	return Replace(offset, 0, text, CharacterStyle, paragraphStyle);
+	int32 paragraphOffset;
+	int32 index = ParagraphIndexFor(textOffset, paragraphOffset);
+	if (index < 0)
+		return B_BAD_VALUE;
+
+	textOffset -= paragraphOffset;
+
+	bool hasLineBreaks = text.FindFirst('\n', 0) >= 0;
+
+	if (hasLineBreaks) {
+		// Split paragraph at textOffset
+		Paragraph paragraph1(ParagraphAt(index).Style());
+		Paragraph paragraph2(paragraphStyle);
+		const TextSpanList& textSpans = ParagraphAt(index).TextSpans();
+		int32 spanCount = textSpans.CountItems();
+		for (int32 i = 0; i < spanCount; i++) {
+			const TextSpan& span = textSpans.ItemAtFast(i);
+			int32 spanLength = span.CountChars();
+			if (textOffset >= spanLength) {
+				paragraph1.Append(span);
+				textOffset -= spanLength;
+			} else if (textOffset > 0) {
+				paragraph1.Append(
+					span.SubSpan(0, textOffset));
+				paragraph2.Append(
+					span.SubSpan(textOffset, spanLength - textOffset));
+				textOffset = 0;
+			} else {
+				paragraph2.Append(span);
+			}
+		}
+
+		fParagraphs.Remove(index);
+
+		// Insert TextSpans, splitting 'text' into Paragraphs at line breaks.
+		int32 length = text.CountChars();
+		int32 chunkStart = 0;
+		while (chunkStart < length) {
+			int32 chunkEnd = text.FindFirst('\n', chunkStart);
+			bool foundLineBreak = chunkEnd > chunkStart;
+			if (foundLineBreak)
+				chunkEnd++;
+			else
+				chunkEnd = length;
+			
+			BString chunk;
+			text.CopyCharsInto(chunk, chunkStart, chunkEnd - chunkStart);
+			TextSpan span(chunk, characterStyle);
+
+			if (foundLineBreak) {
+				if (!paragraph1.Append(span))
+					return B_NO_MEMORY;
+				if (paragraph1.Length() > 0) {
+					if (!fParagraphs.Add(paragraph1, index))
+						return B_NO_MEMORY;
+					index++;
+				}
+				paragraph1 = Paragraph(paragraphStyle);
+			} else {
+				if (!paragraph2.Prepend(span))
+					return B_NO_MEMORY;
+				if (paragraph2.Length() > 0) {
+					if (!fParagraphs.Add(paragraph2, index))
+						return B_NO_MEMORY;
+					index++;
+				}
+			}
+
+			chunkStart = chunkEnd + 1;
+		}
+	} else {
+		Paragraph paragraph(ParagraphAt(index));
+		paragraph.Insert(textOffset, TextSpan(text, characterStyle));
+		if (!fParagraphs.Replace(index, paragraph))
+			return B_NO_MEMORY;
+	}
+	
+	return B_OK;
 }
 
 
@@ -165,31 +243,30 @@ TextDocument::Remove(int32 textOffset, int32 length)
 
 
 status_t
-TextDocument::Replace(int32 offset, int32 length, const BString& text)
+TextDocument::Replace(int32 textOffset, int32 length, const BString& text)
 {
-	return Replace(offset, length, text, CharacterStyleAt(offset));
+	return Replace(textOffset, length, text, CharacterStyleAt(textOffset));
 }
 
 
 status_t
-TextDocument::Replace(int32 offset, int32 length, const BString& text,
+TextDocument::Replace(int32 textOffset, int32 length, const BString& text,
 	const CharacterStyle& style)
 {
-	return Replace(offset, length, text, style, ParagraphStyleAt(offset));
+	return Replace(textOffset, length, text, style,
+		ParagraphStyleAt(textOffset));
 }
 
 
 status_t
-TextDocument::Replace(int32 offset, int32 length, const BString& text,
-	const CharacterStyle& CharacterStyle, const ParagraphStyle& paragraphStyle)
+TextDocument::Replace(int32 textOffset, int32 length, const BString& text,
+	const CharacterStyle& characterStyle, const ParagraphStyle& paragraphStyle)
 {
-	status_t ret = Remove(offset, length);
+	status_t ret = Remove(textOffset, length);
 	if (ret != B_OK)
 		return ret;
 	
-	// TODO: ...
-	
-	return B_ERROR;
+	return Insert(textOffset, text, characterStyle, paragraphStyle);
 }
 
 
@@ -208,9 +285,10 @@ TextDocument::CharacterStyleAt(int32 textOffset) const
 	int32 index = 0;
 	while (index < spans.CountItems()) {
 		const TextSpan& span = spans.ItemAtFast(index);
-		if (textOffset - span.CharCount() < 0)
+		if (textOffset - span.CountChars() < 0)
 			return span.Style();
-		textOffset -= span.CharCount();
+		textOffset -= span.CountChars();
+		index++;
 	}
 
 	return fDefaultCharacterStyle;

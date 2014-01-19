@@ -792,7 +792,7 @@ ParagraphLayout::_ApplyAlignment()
 bool
 ParagraphLayout::_AppendGlyphInfos(const TextSpan& span)
 {
-	int charCount = span.CharCount();
+	int charCount = span.CountChars();
 	if (charCount == 0)
 		return true;
 
@@ -861,7 +861,7 @@ ParagraphLayout::_FinalizeLine(int lineStart, int lineEnd, int lineIndex,
 			spanIndex++;
 			const TextSpan& span = fTextSpans.ItemAt(spanIndex);
 			spanStart = spanEnd;
-			spanEnd += span.CharCount();
+			spanEnd += span.CountChars();
 			addSpan = true;
 		}
 
@@ -910,7 +910,7 @@ ParagraphLayout::_DrawLine(BView* view, const BPoint& offset,
 	for (int i = 0; i < spanCount; i++) {
 		const TextSpan& span = line.layoutedSpans.ItemAtFast(i);
 		_DrawSpan(view, offset, span, textOffset);
-		textOffset += span.CharCount();
+		textOffset += span.CountChars();
 	}
 }
 

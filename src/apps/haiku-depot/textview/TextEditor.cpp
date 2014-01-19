@@ -6,6 +6,7 @@
 #include "TextEditor.h"
 
 #include <algorithm>
+#include <stdio.h>
 
 
 TextEditor::TextEditor()
@@ -230,6 +231,11 @@ TextEditor::KeyDown(KeyEvent event)
 			if (event.bytes != NULL && event.length > 0) {
 				// Handle null-termintating the string
 				BString text(event.bytes, event.length);
+				
+				// Remove selection, if any
+				if (HasSelection())
+					Remove(SelectionStart(), SelectionLength());
+				
 				Insert(fSelection.Caret(), text);
 			}
 			break;

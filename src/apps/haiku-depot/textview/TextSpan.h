@@ -30,7 +30,7 @@ public:
 	inline	const CharacterStyle& Style() const
 									{ return fStyle; }
 
-	inline	int32				CharCount() const
+	inline	int32				CountChars() const
 									{ return fCharCount; }
 
 			bool				Insert(int32 offset, const BString& text);

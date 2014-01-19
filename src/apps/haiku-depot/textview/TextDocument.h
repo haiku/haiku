@@ -28,21 +28,21 @@ public:
 			bool				operator!=(const TextDocument& other) const;
 
 			// Text insertion and removing
-			status_t			Insert(int32 offset, const BString& text);
-			status_t			Insert(int32 offset, const BString& text,
+			status_t			Insert(int32 textOffset, const BString& text);
+			status_t			Insert(int32 textOffset, const BString& text,
 									const CharacterStyle& style);
-			status_t			Insert(int32 offset, const BString& text,
+			status_t			Insert(int32 textOffset, const BString& text,
 									const CharacterStyle& characterStyle,
 									const ParagraphStyle& paragraphStyle);
 
-			status_t			Remove(int32 offset, int32 length);
+			status_t			Remove(int32 textOffset, int32 length);
 
-			status_t			Replace(int32 offset, int32 length,
+			status_t			Replace(int32 textOffset, int32 length,
 									const BString& text);
-			status_t			Replace(int32 offset, int32 length,
+			status_t			Replace(int32 textOffset, int32 length,
 									const BString& text,
 									const CharacterStyle& style);
-			status_t			Replace(int32 offset, int32 length,
+			status_t			Replace(int32 textOffset, int32 length,
 									const BString& text,
 									const CharacterStyle& characterStyle,
 									const ParagraphStyle& paragraphStyle);
@@ -68,7 +68,7 @@ public:
 			// Query information
 			int32				Length() const;
 
-			BString				GetText(int32 start, int32 length) const;
+			BString				GetText(int32 textOffset, int32 length) const;
 
 private:
 			ParagraphList		fParagraphs;
