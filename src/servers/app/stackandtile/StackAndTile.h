@@ -93,8 +93,8 @@ public:
 			bool				SATKeyPressed()
 									{ return fSATKeyPressed; }
 
-		SATWindow*				GetSATWindow(Window* window);
-		SATWindow*				FindSATWindow(uint64 id);
+			SATWindow*			GetSATWindow(Window* window);
+			SATWindow*			FindSATWindow(uint64 id);
 
 private:
 			void				_StartSAT();
@@ -141,7 +141,6 @@ public:
 			position. If reverseLayerOrder is false the bottommost window comes
 			first. */
 			SATWindow*			NextWindow();
-		
 
 private:
 			SATWindow*			_ReverseNextWindow();

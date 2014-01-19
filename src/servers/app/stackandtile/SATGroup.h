@@ -246,8 +246,8 @@ public:
 			LinearSpec*			GetLinearSpec() { return &fLinearSpec; }
 
 			/*! Create a new WindowArea from the crossing and add the window. */
-			bool				AddWindow(SATWindow* window, Tab* left, Tab* top,
-									Tab* right, Tab* bottom);
+			bool				AddWindow(SATWindow* window, Tab* left,
+									Tab* top, Tab* right, Tab* bottom);
 			/*! Add a window to an existing window area. */
 			bool				AddWindow(SATWindow* window, WindowArea* area,
 									SATWindow* after = NULL);
@@ -259,7 +259,7 @@ public:
 			SATWindow*			WindowAt(int32 index);
 
 			const WindowAreaList&	GetAreaList() { return fWindowAreaList; }
-			
+
 			/*! \return a sorted tab list. */
 			const TabList*		HorizontalTabs();
 			const TabList*		VerticalTabs();

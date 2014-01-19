@@ -22,6 +22,9 @@
 using namespace std;
 
 
+//	#pragma mark - StackAndTile
+
+
 StackAndTile::StackAndTile()
 	:
 	fDesktop(NULL),
@@ -329,6 +332,7 @@ StackAndTile::WindowActivated(Window* window)
 	SATWindow* satWindow = GetSATWindow(window);
 	if (satWindow == NULL)
 		return;
+
 	_ActivateWindow(satWindow);
 }
 
@@ -339,9 +343,11 @@ StackAndTile::WindowSentBehind(Window* window, Window* behindOf)
 	SATWindow* satWindow = GetSATWindow(window);
 	if (satWindow == NULL)
 		return;
+
 	SATGroup* group = satWindow->GetGroup();
 	if (group == NULL)
 		return;
+
 	Desktop* desktop = satWindow->GetWindow()->Desktop();
 	if (desktop == NULL)
 		return;
@@ -363,9 +369,11 @@ StackAndTile::WindowWorkspacesChanged(Window* window, uint32 workspaces)
 	SATWindow* satWindow = GetSATWindow(window);
 	if (satWindow == NULL)
 		return;
+
 	SATGroup* group = satWindow->GetGroup();
 	if (group == NULL)
 		return;
+
 	Desktop* desktop = satWindow->GetWindow()->Desktop();
 	if (desktop == NULL)
 		return;
@@ -387,9 +395,11 @@ StackAndTile::WindowHidden(Window* window, bool fromMinimize)
 	SATWindow* satWindow = GetSATWindow(window);
 	if (satWindow == NULL)
 		return;
+
 	SATGroup* group = satWindow->GetGroup();
 	if (group == NULL)
 		return;
+
 	if (fromMinimize == false && group->CountItems() > 1)
 		group->RemoveWindow(satWindow, false);
 }
@@ -401,9 +411,11 @@ StackAndTile::WindowMinimized(Window* window, bool minimize)
 	SATWindow* satWindow = GetSATWindow(window);
 	if (satWindow == NULL)
 		return;
+
 	SATGroup* group = satWindow->GetGroup();
 	if (group == NULL)
 		return;
+
 	Desktop* desktop = satWindow->GetWindow()->Desktop();
 	if (desktop == NULL)
 		return;
@@ -455,11 +467,13 @@ StackAndTile::WindowFeelChanged(Window* window, window_feel feel)
 	if (feel == B_NORMAL_WINDOW_FEEL)
 		return;
 	SATWindow* satWindow = GetSATWindow(window);
-	if (!satWindow)
+	if (satWindow == NULL)
 		return;
+
 	SATGroup* group = satWindow->GetGroup();
-	if (!group)
+	if (group == NULL)
 		return;
+
 	if (group->CountItems() > 1)
 		group->RemoveWindow(satWindow, false);
 }
@@ -521,8 +535,12 @@ StackAndTile::FindSATWindow(uint64 id)
 		if (window->Id() == id)
 			return window;
 	}
+
 	return NULL;
 }
+
+
+//	#pragma mark - StackAndTile private methods
 
 
 void
@@ -534,7 +552,7 @@ StackAndTile::_StartSAT()
 
 	// Remove window from the group.
 	SATGroup* group = fCurrentSATWindow->GetGroup();
-	if (!group)
+	if (group == NULL)
 		return;
 
 	group->RemoveWindow(fCurrentSATWindow, false);
@@ -560,15 +578,21 @@ StackAndTile::_StopSAT()
 void
 StackAndTile::_ActivateWindow(SATWindow* satWindow)
 {
+	if (satWindow == NULL)
+		return;
+
 	SATGroup* group = satWindow->GetGroup();
-	if (!group)
+	if (group == NULL)
 		return;
+
 	Desktop* desktop = satWindow->GetWindow()->Desktop();
-	if (!desktop)
+	if (desktop == NULL)
 		return;
+
 	WindowArea* area = satWindow->GetWindowArea();
-	if (!area)
+	if (area == NULL)
 		return;
+
 	area->MoveToTopLayer(satWindow);
 
 	const WindowAreaList& areas = group->GetAreaList() ;
@@ -576,6 +600,7 @@ StackAndTile::_ActivateWindow(SATWindow* satWindow)
 		WindowArea* currentArea = areas.ItemAt(i);
 		if (currentArea == area)
 			continue;
+
 		desktop->ActivateWindow(currentArea->TopWindow()->GetWindow());
 	}
 
@@ -670,11 +695,12 @@ GroupIterator::NextGroup()
 			break;
 		}
 		fCurrentWindow = fCurrentWindow->PreviousWindow(
-				fCurrentWindow->CurrentWorkspace());
+			fCurrentWindow->CurrentWorkspace());
 		if (window->IsHidden()
 			|| strcmp(window->Title(), "Deskbar") == 0
-			|| strcmp(window->Title(), "Desktop") == 0)
+			|| strcmp(window->Title(), "Desktop") == 0) {
 			continue;
+		}
 
 		SATWindow* satWindow = fStackAndTile->GetSATWindow(window);
 		group = satWindow->GetGroup();
@@ -683,6 +709,9 @@ GroupIterator::NextGroup()
 	fCurrentGroup = group;
 	return fCurrentGroup;
 }
+
+
+//	#pragma mark - WindowIterator
 
 
 WindowIterator::WindowIterator(SATGroup* group, bool reverseLayerOrder)
@@ -723,6 +752,9 @@ WindowIterator::NextWindow()
 	fWindowIndex++;
 	return window;
 }
+
+
+//	#pragma mark - WindowIterator private methods
 
 
 SATWindow*
