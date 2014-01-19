@@ -127,7 +127,7 @@ TextDocument::Insert(int32 textOffset, const BString& text,
 		int32 chunkStart = 0;
 		while (chunkStart < length) {
 			int32 chunkEnd = text.FindFirst('\n', chunkStart);
-			bool foundLineBreak = chunkEnd > chunkStart;
+			bool foundLineBreak = chunkEnd >= chunkStart;
 			if (foundLineBreak)
 				chunkEnd++;
 			else
@@ -317,10 +317,12 @@ TextDocument::ParagraphIndexFor(int32 textOffset, int32& paragraphOffset) const
 	for (int32 i = 0; i < count; i++) {
 		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
 		int32 paragraphLength = paragraph.Length();
-		if (textLength + paragraphLength > textOffset)
-			return i;
-		paragraphOffset += paragraphLength;
 		textLength += paragraphLength;
+		if (textLength > textOffset
+			|| (i == count - 1 && textLength == textOffset)) {
+			return i;
+		}
+		paragraphOffset += paragraphLength;
 	}
 	return -1;
 }
