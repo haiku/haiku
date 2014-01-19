@@ -121,7 +121,7 @@ public:
 
 	inline bool Add(const ItemType& copyFrom, int32 index)
 	{
-		if (index < 0 || index >= (int32)fCount)
+		if (index < 0 || index > (int32)fCount)
 			return false;
 
 		if (!_Resize(fCount + 1))
