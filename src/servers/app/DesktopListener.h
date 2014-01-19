@@ -50,7 +50,7 @@ public:
 
 	virtual void				WindowMoved(Window* window) = 0;
 	virtual void				WindowResized(Window* window) = 0;
-	virtual void				WindowActitvated(Window* window) = 0;
+	virtual void				WindowActivated(Window* window) = 0;
 	virtual void				WindowSentBehind(Window* window,
 									Window* behindOf) = 0;
 	virtual void				WindowWorkspacesChanged(Window* window,

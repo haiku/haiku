@@ -324,7 +324,7 @@ StackAndTile::WindowResized(Window* window)
 
 
 void
-StackAndTile::WindowActitvated(Window* window)
+StackAndTile::WindowActivated(Window* window)
 {
 	SATWindow* satWindow = GetSATWindow(window);
 	if (satWindow == NULL)

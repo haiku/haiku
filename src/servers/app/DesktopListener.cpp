@@ -198,7 +198,7 @@ DesktopObservable::NotifyWindowActivated(Window* window)
 
 	for (DesktopListener* listener = fDesktopListenerList.First();
 		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
-		listener->WindowActitvated(window);
+		listener->WindowActivated(window);
 }
 
 

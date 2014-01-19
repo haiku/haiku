@@ -67,7 +67,7 @@ public:
 
 	virtual void				WindowMoved(Window* window);
 	virtual void				WindowResized(Window* window);
-	virtual void				WindowActitvated(Window* window);
+	virtual void				WindowActivated(Window* window);
 	virtual void				WindowSentBehind(Window* window,
 									Window* behindOf);
 	virtual void				WindowWorkspacesChanged(Window* window,
