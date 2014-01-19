@@ -270,12 +270,6 @@ arch_cpu_shutdown(bool reboot)
 }
 
 
-void
-arch_cpu_idle(void)
-{
-}
-
-
 // The purpose of this function is to trick the compiler. When setting the
 // page_handler to a label that is obviously (to the compiler) never used,
 // it may reorganize the control flow, so that the labeled part is optimized

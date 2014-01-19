@@ -245,8 +245,8 @@ dprintf("handling I/O interrupts done\n");
 
 	cpu_status state = disable_interrupts();
 	if (thread->cpu->invoke_scheduler) {
-		SpinLocker schedulerLocker(gSchedulerLock);
-		scheduler_reschedule();
+		SpinLocker schedulerLocker(thread->scheduler_lock);
+		scheduler_reschedule(B_THREAD_READY);
 		schedulerLocker.Unlock();
 		restore_interrupts(state);
 	} else if (thread->post_interrupt_callback != NULL) {

@@ -32,7 +32,7 @@ arch_rtc_init(kernel_args *args, struct real_time_data *data)
 	data->arch_data.version = 0;
 
 	// init spinlock
-	sSetArchDataLock = 0;
+	B_INITIALIZE_SPINLOCK(&sSetArchDataLock);
 
 	// init system_time() conversion factor
 	__ppc_setup_system_time(&data->arch_data.system_time_conversion_factor);
