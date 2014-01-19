@@ -3458,7 +3458,7 @@ team_allocate_user_thread(Team* team)
 
 	while (true) {
 		// enough space left?
-		size_t needed = ROUNDUP(sizeof(user_thread), 128);
+		size_t needed = ROUNDUP(sizeof(user_thread), CACHE_LINE_SIZE);
 		if (team->user_data_size - team->used_user_data < needed) {
 			// try to resize the area
 			if (resize_area(team->user_data_area,
