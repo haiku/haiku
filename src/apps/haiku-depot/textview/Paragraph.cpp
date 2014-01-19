@@ -127,6 +127,55 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 }
 
 
+bool
+Paragraph::Remove(int32 offset, int32 length)
+{
+	if (length == 0)
+		return true;
+
+	int32 index = 0;
+	while (index < fTextSpans.CountItems()) {
+		const TextSpan& span = fTextSpans.ItemAtFast(index);
+		if (offset - span.CharCount() < 0)
+			break;
+		offset -= span.CharCount();
+	}
+
+	if (index >= fTextSpans.CountItems())
+		return false;
+	
+	TextSpan span = fTextSpans.ItemAtFast(index).SubSpan(0, offset);
+	fTextSpans.Replace(index, span);
+	index += 1;
+	if (index >= fTextSpans.CountItems())
+		return true;
+	
+	while (length > 0) {
+		int32 spanLength = fTextSpans.ItemAtFast(index).CharCount();
+		if (spanLength <= length) {
+			fTextSpans.Remove(index);
+			length -= spanLength;
+		} else {
+			// Reached last span
+			int32 removeLength = std::min(length, spanLength);
+			TextSpan lastSpan = fTextSpans.ItemAtFast(index).SubSpan(
+				removeLength, spanLength - removeLength);
+			// Try to merge with first span, otherwise replace span at index
+			if (lastSpan.Style() == span.Style()) {
+				span.Insert(span.CharCount(), lastSpan.Text());
+				fTextSpans.Replace(index - 1, span);
+			} else {
+				fTextSpans.Replace(index, lastSpan);
+			}
+
+			break;
+		}
+	}
+
+	return true;
+}
+
+
 void
 Paragraph::Clear()
 {

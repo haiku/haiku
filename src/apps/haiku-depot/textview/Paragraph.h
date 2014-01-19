@@ -32,6 +32,7 @@ public:
 
 			bool				Append(const TextSpan& span);
 			bool				Insert(int32 offset, const TextSpan& span);
+			bool				Remove(int32 offset, int32 length);
 			void				Clear();
 
 			int32				Length() const;
