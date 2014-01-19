@@ -134,7 +134,7 @@ TextEditor::SetCharacterStyle(::CharacterStyle style)
 
 	fStyleAtCaret = style;
 
-	if (fSelection.Caret() != fSelection.Anchor()) {
+	if (HasSelection()) {
 		// TODO: Apply style to selection range
 	}
 }
@@ -368,8 +368,14 @@ TextEditor::SelectionLength() const
 void
 TextEditor::_MoveToLine(int32 lineIndex, bool select)
 {
-	if (lineIndex < 0 || lineIndex >= fLayout->CountLines())
+	if (lineIndex < 0) {
+		_SetCaretOffset(0, false, select, true);
 		return;
+	}
+	if (lineIndex >= fLayout->CountLines()) {
+		_SetCaretOffset(fDocument->Length(), false, select, true);
+		return;
+	}
 
 	float x1;
 	float y1;
