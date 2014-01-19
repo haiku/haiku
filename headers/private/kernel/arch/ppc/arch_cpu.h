@@ -109,6 +109,22 @@ typedef struct arch_cpu_info {
 } arch_cpu_info;
 
 
+#define eieio()	asm volatile("eieio")
+#define isync() asm volatile("isync")
+#define tlbsync() asm volatile("tlbsync")
+#define ppc_sync() asm volatile("sync")
+#define tlbia() asm volatile("tlbia")
+#define tlbie(addr) asm volatile("tlbie %0" :: "r" (addr))
+
+// adjust thread priority on PowerPC (Shared resource hints)
+#define SRH_very_low() asm volatile("or 31,31,31")
+#define SRH_low() asm volatile("or 1,1,1")
+#define SRH_medium_low() asm volatile("or 6,6,6")
+#define SRH_medium() asm volatile("or 2,2,2")
+#define SRH_medium_high() asm volatile("or 5,5,5")
+#define SRH_high() asm volatile("or 3,3,3")
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -157,17 +173,25 @@ extern void ppc_context_switch(void **_oldStackPointer, void *newStackPointer);
 extern bool ppc_set_fault_handler(addr_t *handlerLocation, addr_t handler)
 	__attribute__((noinline));
 
+
+static inline void
+arch_cpu_pause(void)
+{
+	// TODO: PowerPC review logic of setting very low for pause
+	SRH_very_low();
+}
+
+
+static inline void
+arch_cpu_idle(void)
+{
+	// TODO: PowerPC CPU idle call
+}
+
+
 #ifdef __cplusplus
 }
 #endif
-
-#define eieio()	asm volatile("eieio")
-#define isync() asm volatile("isync")
-#define tlbsync() asm volatile("tlbsync")
-#define ppc_sync() asm volatile("sync")
-#define tlbia() asm volatile("tlbia")
-#define tlbie(addr) asm volatile("tlbie %0" :: "r" (addr))
-
 
 // PowerPC processor version (the upper 16 bits of the PVR).
 enum ppc_processor_version {
