@@ -58,8 +58,8 @@ public:
 
 	virtual	void				KeyDown(KeyEvent event);
 
-	virtual	void				Insert(int32 offset, const BString& string);
-	virtual	void				Remove(int32 offset, int32 length);
+	virtual	status_t			Insert(int32 offset, const BString& string);
+	virtual	status_t			Remove(int32 offset, int32 length);
 
 			void				LineUp(bool select);
 			void				LineDown(bool select);
@@ -84,6 +84,7 @@ private:
 									bool updateSelectionStyle);
 
 			void				_UpdateStyleAtCaret();
+
 private:
 			TextDocumentRef		fDocument;
 			TextDocumentLayoutRef fLayout;

@@ -237,23 +237,23 @@ TextEditor::KeyDown(KeyEvent event)
 }
 
 
-void
+status_t
 TextEditor::Insert(int32 offset, const BString& string)
 {
-	if (!fEditingEnabled)
-		return;
+	if (!fEditingEnabled || fDocument.Get() == NULL)
+		return B_ERROR;
 
-	// TODO: ...
+	return fDocument->Insert(offset, string, fStyleAtCaret);
 }
 
 
-void
+status_t
 TextEditor::Remove(int32 offset, int32 length)
 {
-	if (!fEditingEnabled)
-		return;
+	if (!fEditingEnabled || fDocument.Get() == NULL)
+		return B_ERROR;
 
-	// TODO: ...
+	return fDocument->Remove(offset, length);
 }
 
 
