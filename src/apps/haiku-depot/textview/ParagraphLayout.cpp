@@ -314,7 +314,7 @@ ParagraphLayout::FirstOffsetOnLine(int32 lineIndex)
 
 	if (lineIndex < 0)
 		lineIndex = 0;
-	if (lineIndex > fLineInfos.CountItems())
+	if (lineIndex >= fLineInfos.CountItems())
 		lineIndex = fLineInfos.CountItems() - 1;
 
 	return fLineInfos.ItemAt(lineIndex).textOffset;
@@ -352,7 +352,7 @@ ParagraphLayout::GetLineBounds(int32 lineIndex, float& x1, float& y1,
 
 	if (lineIndex < 0)
 		lineIndex = 0;
-	if (lineIndex > fLineInfos.CountItems())
+	if (lineIndex >= fLineInfos.CountItems())
 		lineIndex = fLineInfos.CountItems() - 1;
 
 	const LineInfo& lineInfo = fLineInfos.ItemAt(lineIndex);
@@ -370,7 +370,7 @@ ParagraphLayout::GetLineBounds(int32 lineIndex, float& x1, float& y1,
 	x1 = firstInfo.x;
 	y1 = lineInfo.y;
 	x2 = lastInfo.x + lastInfo.width;
-	y1 = lineInfo.y + lineInfo.height;
+	y2 = lineInfo.y + lineInfo.height;
 }
 
 
