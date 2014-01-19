@@ -15,6 +15,7 @@ ParagraphStyleData::ParagraphStyleData()
 
 	fFirstLineInset(0.0f),
 	fLineInset(0.0f),
+	fLineSpacing(0.0f),
 
 	fSpacingTop(0.0f),
 	fSpacingBottom(0.0f),
@@ -31,6 +32,7 @@ ParagraphStyleData::ParagraphStyleData(const ParagraphStyleData& other)
 
 	fFirstLineInset(other.fFirstLineInset),
 	fLineInset(other.fLineInset),
+	fLineSpacing(other.fLineSpacing),
 
 	fSpacingTop(other.fSpacingTop),
 	fSpacingBottom(other.fSpacingBottom),
@@ -50,6 +52,7 @@ ParagraphStyleData::operator==(const ParagraphStyleData& other) const
 		&& fJustify == other.fJustify
 		&& fFirstLineInset == other.fFirstLineInset
 		&& fLineInset == other.fLineInset
+		&& fLineSpacing == other.fLineSpacing
 		&& fSpacingTop == other.fSpacingTop
 		&& fSpacingBottom == other.fSpacingBottom
 		&& fBullet == other.fBullet;
