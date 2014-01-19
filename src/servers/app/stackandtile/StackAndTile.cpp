@@ -780,9 +780,3 @@ WindowIterator::_ReverseRewind()
 	if (fCurrentArea)
 		fWindowIndex = fCurrentArea->LayerOrder().CountItems() - 1;
 }
-
-
-SATSnappingBehaviour::~SATSnappingBehaviour()
-{
-
-}

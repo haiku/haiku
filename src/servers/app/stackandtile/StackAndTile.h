@@ -157,7 +157,7 @@ private:
 
 class SATSnappingBehaviour {
 public:
-	virtual						~SATSnappingBehaviour();
+	virtual						~SATSnappingBehaviour() {};
 
 	/*! Find all window candidates which possibly can join the group. Found
 	candidates are marked here visual. */
