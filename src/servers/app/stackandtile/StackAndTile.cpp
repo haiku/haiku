@@ -125,7 +125,7 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 		// switch to and from stacking and snapping mode
 		bool wasPressed = fSATKeyPressed;
 		fSATKeyPressed = (what == B_MODIFIERS_CHANGED
-			&& modifiers & B_OPTION_KEY)
+			&& (modifiers & B_OPTION_KEY) != 0)
 			|| (what == B_UNMAPPED_KEY_DOWN && key == kRightOptionKey);
 		if (wasPressed && !fSATKeyPressed)
 			_StopSAT();
@@ -151,6 +151,7 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 				currentGroup = frontWindow->GetGroup();
 			if (currentGroup == NULL)
 				return false;
+
 			int32 groupSize = currentGroup->CountItems();
 			if (groupSize <= 1)
 				return false;
@@ -665,6 +666,9 @@ StackAndTile::_HandleMessage(BPrivate::LinkReceiver& link,
 
 	return true;
 }
+
+
+//	#pragma mark - GroupIterator
 
 
 GroupIterator::GroupIterator(StackAndTile* sat, Desktop* desktop)
