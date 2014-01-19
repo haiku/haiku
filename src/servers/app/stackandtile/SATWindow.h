@@ -1,9 +1,10 @@
 /*
- * Copyright 2010, Haiku.
+ * Copyright 2010-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		John Scipione, jscipione@gmail.com
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 #ifndef SAT_WINDOW_H
 #define SAT_WINDOW_H
