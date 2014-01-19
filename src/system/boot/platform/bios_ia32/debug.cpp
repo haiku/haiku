@@ -172,6 +172,23 @@ void
 debug_cleanup(void)
 {
 	if (sDebugSyslogBuffer != NULL) {
+		// If desired, store the debug syslog data from the previous session for
+		// the kernel.
+		size_t bytesReadable = 0;
+		if (gKernelArgs.previous_debug_size != 0) {
+			bytesReadable = ring_buffer_readable(sDebugSyslogBuffer);
+			gKernelArgs.previous_debug_size = bytesReadable;
+		}
+
+		if (bytesReadable != 0) {
+			if (uint8* buffer = (uint8*)kernel_args_malloc(bytesReadable)) {
+				ring_buffer_read(sDebugSyslogBuffer, buffer, bytesReadable);
+				gKernelArgs.previous_debug_output = buffer;
+			} else
+				gKernelArgs.previous_debug_size = 0;
+		}
+
+		// Prepare the debug syslog buffer for this session.
 		size_t signatureLength = strlen(kDebugSyslogSignature);
 		void* buffer
 			= (void*)ROUNDDOWN((addr_t)sDebugSyslogBuffer, B_PAGE_SIZE);

@@ -39,6 +39,8 @@ main(stage2_args *args)
 	// set debug syslog default
 #if KDEBUG_ENABLE_DEBUG_SYSLOG
 	gKernelArgs.keep_debug_output_buffer = true;
+	gKernelArgs.previous_debug_size = true;
+		// used as a boolean indicator until initialized for the kernel
 #endif
 
 	add_stage2_driver_settings(args);

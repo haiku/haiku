@@ -1027,6 +1027,14 @@ debug_menu_toggle_debug_syslog(Menu* menu, MenuItem* item)
 
 
 static bool
+debug_menu_toggle_previous_debug_syslog(Menu* menu, MenuItem* item)
+{
+	gKernelArgs.previous_debug_size = item->IsMarked();
+	return true;
+}
+
+
+static bool
 debug_menu_save_previous_syslog(Menu* menu, MenuItem* item)
 {
 	Directory* volume = (Directory*)item->Data();
@@ -1280,6 +1288,20 @@ add_debug_menu()
     item->SetHelpText("Enables a special in-memory syslog buffer for this "
     	"session that the boot loader will be able to access after rebooting.");
 
+	ring_buffer* syslogBuffer
+		= (ring_buffer*)gKernelArgs.debug_output.Pointer();
+	bool hasPreviousSyslog
+		= syslogBuffer != NULL && ring_buffer_readable(syslogBuffer) > 0;
+	if (hasPreviousSyslog) {
+		menu->AddItem(item = new(nothrow) MenuItem(
+			"Save syslog from previous session during boot"));
+		item->SetType(MENU_ITEM_MARKABLE);
+		item->SetMarked(gKernelArgs.previous_debug_size);
+		item->SetTarget(&debug_menu_toggle_previous_debug_syslog);
+		item->SetHelpText("Saves the syslog from the previous Haiku session to "
+			"/var/log/previous_syslog when booting.");
+	}
+
 	bool currentLogItemVisible = platform_debug_get_log_buffer(NULL) != NULL;
 	if (currentLogItemVisible) {
 		menu->AddSeparatorItem();
@@ -1291,9 +1313,7 @@ add_debug_menu()
 			"Displays the debug info the boot loader has logged.");
 	}
 
-	ring_buffer* syslogBuffer
-		= (ring_buffer*)gKernelArgs.debug_output.Pointer();
-	if (syslogBuffer != NULL && ring_buffer_readable(syslogBuffer) > 0) {
+	if (hasPreviousSyslog) {
 		if (!currentLogItemVisible)
 			menu->AddSeparatorItem();
 

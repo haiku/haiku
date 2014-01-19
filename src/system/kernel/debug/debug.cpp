@@ -13,8 +13,17 @@
 
 #include "blue_screen.h"
 
+#include <ctype.h>
+#include <errno.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <syslog.h>
+
 #include <algorithm>
 
+#include <AutoDeleter.h>
 #include <boot/kernel_args.h>
 #include <cpu.h>
 #include <debug.h>
@@ -38,13 +47,6 @@
 #include <util/ring_buffer.h>
 
 #include <syslog_daemon.h>
-
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <syslog.h>
 
 #include "debug_builtin_commands.h"
 #include "debug_commands.h"
@@ -105,6 +107,9 @@ static bool sDebugSyslog = false;
 static size_t sSyslogDebuggerOffset = 0;
 	// (relative) buffer offset of the kernel debugger messages of the current
 	// KDL session
+
+static void* sPreviousSessionSyslogBuffer = NULL;
+static size_t sPreviousSessionSyslogBufferSize = 0;
 
 static const char* sCurrentKernelDebuggerMessagePrefix;
 static const char* sCurrentKernelDebuggerMessage;
@@ -1406,6 +1411,17 @@ syslog_init_post_vm(struct kernel_args* args)
 			args->debug_size, false);
 	}
 
+	// Allocate memory for the previous session's debug syslog output. In
+	// syslog_init_post_modules() we'll write it back to disk and free it.
+	if (args->previous_debug_output != NULL) {
+		sPreviousSessionSyslogBuffer = malloc(args->previous_debug_size);
+		if (sPreviousSessionSyslogBuffer != NULL) {
+			sPreviousSessionSyslogBufferSize = args->previous_debug_size;
+			memcpy(sPreviousSessionSyslogBuffer, args->previous_debug_output,
+				sPreviousSessionSyslogBufferSize);
+		}
+	}
+
 	char revisionBuffer[64];
 	length = snprintf(revisionBuffer, sizeof(revisionBuffer),
 		"Welcome to syslog debug output!\nHaiku revision: %s\n",
@@ -1429,6 +1445,28 @@ err1:
 	return status;
 }
 
+static void
+syslog_init_post_modules()
+{
+	if (sPreviousSessionSyslogBuffer == NULL)
+		return;
+
+	void* buffer = sPreviousSessionSyslogBuffer;
+	size_t bufferSize = sPreviousSessionSyslogBufferSize;
+	sPreviousSessionSyslogBuffer = NULL;
+	sPreviousSessionSyslogBufferSize = 0;
+	MemoryDeleter bufferDeleter(buffer);
+
+	int fd = open("/var/log/previous_syslog", O_WRONLY | O_CREAT | O_TRUNC,
+		S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	if (fd < 0) {
+		dprintf("Failed to open previous syslog file: %s\n", strerror(errno));
+		return;
+	}
+
+	write(fd, buffer, bufferSize);
+	close(fd);
+}
 
 static status_t
 syslog_init(struct kernel_args* args)
@@ -1713,7 +1751,7 @@ debug_init_post_settings(struct kernel_args* args)
 void
 debug_init_post_modules(struct kernel_args* args)
 {
-	void* cookie;
+	syslog_init_post_modules();
 
 	// check for dupped lines every 10/10 second
 	register_kernel_daemon(check_pending_repeats, NULL, 10);
@@ -1724,7 +1762,7 @@ debug_init_post_modules(struct kernel_args* args)
 
 	static const char* kDemanglePrefix = "debugger/demangle/";
 
-	cookie = open_module_list("debugger");
+	void* cookie = open_module_list("debugger");
 	uint32 count = 0;
 	while (count < kMaxDebuggerModules) {
 		char name[B_FILE_NAME_LENGTH];
