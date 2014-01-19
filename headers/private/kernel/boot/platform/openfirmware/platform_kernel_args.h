@@ -10,7 +10,8 @@
 #	error This file is included from <boot/kernel_args.h> only
 #endif
 
-#define SMP_MAX_CPUS 16
+#define SMP_MAX_CPUS 1
+	// TODO: Until inline kernel atomic code for ppc is fixed
 
 #define MAX_PHYSICAL_MEMORY_RANGE 4
 #define MAX_PHYSICAL_ALLOCATED_RANGE 8

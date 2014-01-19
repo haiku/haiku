@@ -15,6 +15,8 @@
 #	include <arch/x86/64/atomic.h>
 #elif __INTEL__
 #	include <arch/x86/32/atomic.h>
+#elif __POWERPC__
+#	include <arch/ppc/arch_atomic.h>
 #endif
 
 
