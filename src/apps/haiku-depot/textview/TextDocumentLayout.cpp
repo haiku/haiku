@@ -64,27 +64,42 @@ TextDocumentLayout::SetTextDocument(const TextDocumentRef& document)
 void
 TextDocumentLayout::Invalidate()
 {
-	InvalidateParagraphs(0, fParagraphLayouts.CountItems());
+	if (fDocument.Get() != NULL)
+		InvalidateParagraphs(0, fDocument->Paragraphs().CountItems());
 }
 
 
 void
 TextDocumentLayout::InvalidateParagraphs(int32 start, int32 count)
 {
-	if (start < 0 || fDocument.Get() == NULL)
+	if (start < 0 || count == 0 || fDocument.Get() == NULL)
 		return;
+
+	fLayoutValid = false;
 
 	const ParagraphList& paragraphs = fDocument->Paragraphs();
 
 	while (count > 0) {
-		if (start >= fParagraphLayouts.CountItems())
+		if (start >= paragraphs.CountItems())
 			break;
-		
 		const Paragraph& paragraph = paragraphs.ItemAtFast(start);
-		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(start);
-		info.layout->SetParagraph(paragraph);
+		if (start >= fParagraphLayouts.CountItems()) {
+			ParagraphLayoutRef layout(new(std::nothrow) ParagraphLayout(
+				paragraph), true);
+			if (layout.Get() == NULL
+				|| !fParagraphLayouts.Add(ParagraphLayoutInfo(0.0f, layout))) {
+				fprintf(stderr, "TextDocumentLayout::InvalidateParagraphs() - "
+					"out of memory\n");
+				return;
+			}
+		} else {
+			const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(
+				start);
+			info.layout->SetParagraph(paragraph);
+		}
 		
 		start++;
+		count--;
 	}
 }
 
