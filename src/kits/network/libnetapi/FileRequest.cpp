@@ -57,6 +57,11 @@ BFileRequest::_ProtocolLoop()
 		if (error != B_OK)
 			return error;
 
+		BNodeInfo info(&file);
+		char mimeType[B_MIME_TYPE_LENGTH + 1];
+		if (info.GetType(mimeType) == B_OK)
+			fResult.SetContentType(mimeType);
+
 		// Send all notifications to listener, if any
 		if (fListener != NULL) {
 			fListener->ConnectionOpened(this);
@@ -76,11 +81,6 @@ BFileRequest::_ProtocolLoop()
 			}
 			fListener->DownloadProgress(this, size, size);
 		}
-
-		BNodeInfo info(&file);
-		char mimeType[B_MIME_TYPE_LENGTH + 1];
-		if (info.GetType(mimeType) == B_OK)
-			fResult.SetContentType(mimeType);
 
 		return B_OK;
 	}
