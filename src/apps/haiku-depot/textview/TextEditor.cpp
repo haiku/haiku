@@ -243,10 +243,16 @@ TextEditor::Insert(int32 offset, const BString& string)
 	if (!fEditingEnabled || fDocument.Get() == NULL)
 		return B_ERROR;
 
-	// TODO: Via listener, and only affected paragraphs
-	fLayout->Invalidate();
+	status_t ret = fDocument->Insert(offset, string, fStyleAtCaret);
 
-	return fDocument->Insert(offset, string, fStyleAtCaret);
+	if (ret == B_OK) {
+		// TODO: Via listener, and only affected paragraphs
+		fLayout->Invalidate();
+	
+		_SetCaretOffset(offset + string.CountChars(), true, false, true);
+	}
+
+	return ret;
 }
 
 
@@ -256,10 +262,16 @@ TextEditor::Remove(int32 offset, int32 length)
 	if (!fEditingEnabled || fDocument.Get() == NULL)
 		return B_ERROR;
 
-	// TODO: Via listener, and only affected paragraphs
-	fLayout->Invalidate();
+	status_t ret = fDocument->Remove(offset, length);
 
-	return fDocument->Remove(offset, length);
+	if (ret == B_OK) {
+		// TODO: Via listener, and only affected paragraphs
+		fLayout->Invalidate();
+	
+		_SetCaretOffset(offset, true, false, true);
+	}
+
+	return ret;
 }
 
 
