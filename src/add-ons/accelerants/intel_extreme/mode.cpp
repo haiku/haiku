@@ -74,17 +74,6 @@ struct pll_limits {
 };
 
 
-static struct display_mode_hook {
-	bool active;
-	display_mode *dm;
-	struct {
-		uint16 width;
-		uint16 height;
-		uint16 space;
-	} mode;
-} display_mode_hook;
-
-
 static void mode_fill_missing_bits(display_mode *, uint32);
 
 
@@ -650,11 +639,6 @@ create_mode_list(void)
 						TRACE("intel_extreme: ignoring VBT mode.");
 				}
 
-				// We can also make this the default resolution, if the user
-				// didn't pick one yet.
-				display_mode_hook.active = true;
-				display_mode_hook.dm = list;
-
 				gInfo->mode_list_area = area;
 				gInfo->mode_list = list;
 				gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
@@ -765,11 +749,6 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 status_t
 intel_set_display_mode(display_mode* mode)
 {
-	if (display_mode_hook.active) {
-		mode = display_mode_hook.dm;
-		display_mode_hook.active = false;
-	}
-
 	if (mode == NULL)
 		return B_BAD_VALUE;
 
@@ -794,7 +773,7 @@ intel_set_display_mode(display_mode* mode)
 	// place.
 
 #if 0
-static bool first = tru;
+static bool first = true;
 if (first) {
 	int fd = open("/boot/home/ie_.regs", O_CREAT | O_WRONLY, 0644);
 	if (fd >= 0) {
@@ -1226,10 +1205,6 @@ if (first) {
 	sharedInfo.bytes_per_row = bytesPerRow;
 	sharedInfo.current_mode = target;
 	sharedInfo.bits_per_pixel = bitsPerPixel;
-
-	display_mode_hook.mode.width = target.virtual_width;
-	display_mode_hook.mode.height = target.virtual_height;
-	display_mode_hook.mode.space = target.space;
 
 	return B_OK;
 }
