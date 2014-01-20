@@ -54,6 +54,7 @@ static const uint32 kMsgToggleBorder = 'tgBd';
 static const uint32 kMsgToggleAutoRaise = 'tgAR';
 static const uint32 kMsgToggleAlwaysOnTop = 'tgAT';
 static const uint32 kMsgToggleLiveInDeskbar = 'tgDb';
+static const uint32 kMsgToggleSwitchOnWheel = 'tgWh';
 
 static const float kScreenBorderOffset = 10.0;
 
@@ -71,6 +72,7 @@ class WorkspacesSettings {
 		bool AlwaysOnTop() const { return fAlwaysOnTop; }
 		bool HasTitle() const { return fHasTitle; }
 		bool HasBorder() const { return fHasBorder; }
+		bool SwitchOnWheel() const { return fSwitchOnWheel; }
 
 		void UpdateFramesForScreen(BRect screenFrame);
 		void UpdateScreenFrame();
@@ -80,6 +82,7 @@ class WorkspacesSettings {
 		void SetAlwaysOnTop(bool enable) { fAlwaysOnTop = enable; }
 		void SetHasTitle(bool enable) { fHasTitle = enable; }
 		void SetHasBorder(bool enable) { fHasBorder = enable; }
+		void SetSwitchOnWheel(bool enable) { fSwitchOnWheel = enable; }
 
 	private:
 		status_t _Open(BFile& file, int mode);
@@ -90,6 +93,7 @@ class WorkspacesSettings {
 		bool	fAlwaysOnTop;
 		bool	fHasTitle;
 		bool	fHasBorder;
+		bool	fSwitchOnWheel;
 };
 
 class WorkspacesView : public BView {
@@ -136,10 +140,13 @@ class WorkspacesWindow : public BWindow {
 
 		void SetAutoRaise(bool enable);
 		bool IsAutoRaising() const { return fAutoRaising; }
+		void SetSwitchOnWheel(bool enable);
+		bool SwitchOnWheel() const { return fSwitchOnWheel; }
 
 	private:
 		WorkspacesSettings *fSettings;
 		bool	fAutoRaising;
+		bool	fSwitchOnWheel;
 };
 
 class WorkspacesApp : public BApplication {
@@ -163,7 +170,8 @@ WorkspacesSettings::WorkspacesSettings()
 	fAutoRaising(false),
 	fAlwaysOnTop(false),
 	fHasTitle(true),
-	fHasBorder(true)
+	fHasBorder(true),
+	fSwitchOnWheel(false)
 {
 	UpdateScreenFrame();
 
@@ -185,6 +193,8 @@ WorkspacesSettings::WorkspacesSettings()
 				fHasTitle = true;
 			if (settings.FindBool("has border", &fHasBorder) != B_OK)
 				fHasBorder = true;
+			if (settings.FindBool("switch on wheel", &fSwitchOnWheel) != B_OK)
+				fSwitchOnWheel = false;
 		}
 	} else {
 		// try reading BeOS compatible settings
@@ -266,7 +276,8 @@ WorkspacesSettings::~WorkspacesSettings()
 		&& settings.AddBool("auto-raise", fAutoRaising) == B_OK
 		&& settings.AddBool("always on top", fAlwaysOnTop) == B_OK
 		&& settings.AddBool("has title", fHasTitle) == B_OK
-		&& settings.AddBool("has border", fHasBorder) == B_OK)
+		&& settings.AddBool("has border", fHasBorder) == B_OK
+		&& settings.AddBool("switch on wheel", fSwitchOnWheel) == B_OK)
 		settings.Flatten(&file);
 }
 
@@ -507,6 +518,11 @@ WorkspacesView::MessageReceived(BMessage* message)
 
 		case B_MOUSE_WHEEL_CHANGED:
 		{
+			WorkspacesWindow *window;
+			window = dynamic_cast<WorkspacesWindow *>(Window());
+			if (window && !window->SwitchOnWheel())
+				break;
+
 			float dy = message->FindFloat("be:wheel_delta_y");
 			if (dy > 0.1)
 				activate_workspace(current_workspace() + 1);
@@ -589,6 +605,11 @@ WorkspacesView::MouseDown(BPoint where)
 		BMenuItem* item;
 
 		menu->AddSeparatorItem();
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Switch on mouse wheel"),
+			new BMessage(kMsgToggleSwitchOnWheel)));
+		item->SetMarked(window->SwitchOnWheel());
+
+		menu->AddSeparatorItem();
 		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show window tab"),
 			new BMessage(kMsgToggleTitle)));
 		if (window->Look() == B_TITLED_WINDOW_LOOK)
@@ -655,8 +676,9 @@ WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
 	BWindow(settings->WindowFrame(), B_TRANSLATE_SYSTEM_NAME("Workspaces"), 
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK, B_ALL_WORKSPACES),
- 	fSettings(settings),
- 	fAutoRaising(false)
+	fSettings(settings),
+	fAutoRaising(false),
+	fSwitchOnWheel(false)
 {
 	AddChild(new WorkspacesView(Bounds()));
 
@@ -669,6 +691,8 @@ WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
 		SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 	else
 		SetAutoRaise(fSettings->AutoRaising());
+
+	SetSwitchOnWheel(fSettings->SwitchOnWheel());
 }
 
 
@@ -836,6 +860,10 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kMsgToggleSwitchOnWheel:
+			SetSwitchOnWheel(!SwitchOnWheel());
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -864,6 +892,17 @@ WorkspacesWindow::SetAutoRaise(bool enable)
 		ChildAt(0)->SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	else
 		ChildAt(0)->SetEventMask(0);
+}
+
+
+void
+WorkspacesWindow::SetSwitchOnWheel(bool enable)
+{
+	if (enable == fSwitchOnWheel)
+		return;
+
+	fSwitchOnWheel = enable;
+	fSettings->SetSwitchOnWheel(enable);
 }
 
 
