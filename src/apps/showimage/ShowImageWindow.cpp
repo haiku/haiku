@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2014, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -357,7 +357,7 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 
 	if (!popupMenu) {
 		_AddItemMenu(menu, B_TRANSLATE("Show tool bar"), kMsgToggleToolBar,
-			'T', 0, this);
+			'B', 0, this);
 		_MarkMenuItem(menu, kMsgToggleToolBar,
 			!fToolBarView->IsHidden(fToolBarView));
 	}
@@ -408,6 +408,7 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 		// to from the Be bitmap image format
 	menu->AddItem(menuSaveAs);
 	_AddItemMenu(menu, B_TRANSLATE("Close"), B_QUIT_REQUESTED, 'W', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Move to Trash"), kMsgDeleteCurrentFile, 'T', 0, this);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
 		MSG_PAGE_SETUP, 0, 0, this);
