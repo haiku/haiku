@@ -316,7 +316,7 @@ PPCVMTranslationMap::~PPCVMTranslationMap()
 
 	// mark the vsid base not in use
 	int baseBit = fVSIDBase >> VSID_BASE_SHIFT;
-	atomic_and((vint32 *)&sVSIDBaseBitmap[baseBit / 32],
+	atomic_and((int32 *)&sVSIDBaseBitmap[baseBit / 32],
 			~(1 << (baseBit % 32)));
 }
 
