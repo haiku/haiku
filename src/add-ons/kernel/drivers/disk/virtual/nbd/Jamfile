@@ -9,7 +9,7 @@ if $(TARGET_PLATFORM) = haiku {
 	# lock.h wants debug.h and others.
 	#UsePrivateHeaders kernel ;
 	#UsePublicHeaders kernel ;
-	UsePrivateHeaders [ FDirName kernel ] ;
+	UsePrivateKernelHeaders ;
 }
 
 KernelAddon nbd :

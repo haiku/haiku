@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel generic locked_pool ;
 
-UsePrivateHeaders kernel ;
+UsePrivateKernelHeaders ;
 
 # enable debug output, if debugging is enabled
 if $(DEBUG) != 0 {

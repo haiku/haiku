@@ -1,7 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel drivers disk usb usb_disk ;
 
 SubDirSysHdrs $(HAIKU_TOP) src add-ons kernel bus_managers usb ;
-UsePrivateHeaders drivers kernel ;
+UsePrivateHeaders drivers ;
+UsePrivateKernelHeaders ;
 
 KernelAddon usb_disk :
 	usb_disk.cpp

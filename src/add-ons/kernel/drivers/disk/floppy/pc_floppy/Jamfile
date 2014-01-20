@@ -2,7 +2,8 @@ SubDir HAIKU_TOP src add-ons kernel drivers disk floppy pc_floppy ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders drivers kernel ;
+UsePrivateHeaders drivers ;
+UsePrivateKernelHeaders ;
 
 KernelAddon pc_floppy :
 	floppy.c

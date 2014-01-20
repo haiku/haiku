@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems fat ;
 
-UsePrivateHeaders kernel ;
+UsePrivateKernelHeaders ;
 
 SubDirCcFlags -DTRACK_FILENAME ;
 

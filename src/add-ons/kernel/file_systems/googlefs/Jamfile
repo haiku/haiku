@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel file_systems googlefs ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders kernel ;
+UsePrivateKernelHeaders ;
 
 #SubDirCcFlags -DTRACK_FILENAME ;
 #SubDirCcFlags -DDEBUG_GOOGLEFS=1 ;

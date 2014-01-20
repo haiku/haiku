@@ -6,7 +6,7 @@ SubDirHdrs [ FDirName $(SUBDIR) utils ] ;
 SubDirCcFlags -DHAVE_CONFIG_H=1 ;
 SubDirC++Flags -DHAVE_CONFIG_H=1 ;
 
-UsePrivateHeaders kernel ;
+UsePrivateKernelHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) utils ] ;
 

@@ -1,7 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 sis7018 ;
 
 
-UsePrivateHeaders kernel media ;
+UsePrivateKernelHeaders ;
+UsePrivateHeaders media ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;
 

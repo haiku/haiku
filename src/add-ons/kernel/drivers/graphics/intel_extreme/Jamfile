@@ -4,8 +4,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
-UsePrivateHeaders graphics kernel ;
-UsePrivateHeaders shared ;
+UsePrivateHeaders graphics ;
+UsePrivateKernelHeaders ;
 
 KernelAddon intel_extreme :
 	bios.cpp
