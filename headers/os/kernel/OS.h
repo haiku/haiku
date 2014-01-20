@@ -475,7 +475,15 @@ enum topology_level_type {
 enum cpu_platform {
 	B_CPU_UNKNOWN,
 	B_CPU_x86,
-	B_CPU_x86_64
+	B_CPU_x86_64,
+	B_CPU_PPC,
+	B_CPU_PPC_64,
+	B_CPU_M68K,
+	B_CPU_ARM,
+	B_CPU_ARM_64,
+	B_CPU_ALPHA,
+	B_CPU_MIPS,
+	B_CPU_SH
 };
 
 enum cpu_vendor {
@@ -487,7 +495,10 @@ enum cpu_vendor {
 	B_CPU_VENDOR_NATIONAL_SEMICONDUCTOR,
 	B_CPU_VENDOR_RISE,
 	B_CPU_VENDOR_TRANSMETA,
-	B_CPU_VENDOR_VIA
+	B_CPU_VENDOR_VIA,
+	B_CPU_VENDOR_IBM,
+	B_CPU_VENDOR_MOTOROLA,
+	B_CPU_VENDOR_NEC
 };
 
 typedef struct {

@@ -10,65 +10,79 @@
 #include <boot/kernel_args.h>
 
 
+enum cpu_vendor sCPUVendor;
+uint32 sPVR;
+
 static uint64 sCPUClockFrequency;
 static uint64 sBusClockFrequency;
-static enum cpu_types sCPUType;
-static uint16 sCPURevision;
 
 struct cpu_model {
 	uint16			version;
-	enum cpu_types	beos_type;
+	enum cpu_vendor	vendor;
 };
 
-// mapping of CPU versions to BeOS enum cpu_types
+// mapping of CPU versions to vendors
 struct cpu_model kCPUModels[] = {
-	{ MPC601,		B_CPU_PPC_601 },
-	{ MPC603,		B_CPU_PPC_603 },
-	{ MPC604,		B_CPU_PPC_604 },
-	{ MPC602,		B_CPU_PPC_603ev },
-	{ MPC603e,		B_CPU_PPC_603e },
-	{ MPC603ev,		B_CPU_PPC_603ev },
-	{ MPC750,		B_CPU_PPC_750 },
-	{ MPC604ev,		B_CPU_PPC_604ev },
-	{ MPC7400,		B_CPU_PPC_7400 },
-	{ MPC620,		B_CPU_PPC_620 },
-	{ IBM403,		B_CPU_PPC_IBM_403 },
-	{ IBM401A1,		B_CPU_PPC_IBM_401A1 },
-	{ IBM401B2,		B_CPU_PPC_IBM_401B2 },
-	{ IBM401C2,		B_CPU_PPC_IBM_401C2 },
-	{ IBM401D2,		B_CPU_PPC_IBM_401D2 },
-	{ IBM401E2,		B_CPU_PPC_IBM_401E2 },
-	{ IBM401F2,		B_CPU_PPC_IBM_401F2 },
-	{ IBM401G2,		B_CPU_PPC_IBM_401G2 },
-	{ IBMPOWER3,	B_CPU_PPC_IBM_POWER3 },
-	{ MPC860,		B_CPU_PPC_860 },
-	{ MPC8240,		B_CPU_PPC_8240 },
-	{ IBM405GP,		B_CPU_PPC_IBM_405GP },
-	{ IBM405L,		B_CPU_PPC_IBM_405L },
-	{ IBM750FX,		B_CPU_PPC_IBM_750FX },
-	{ MPC7450,		B_CPU_PPC_7450 },
-	{ MPC7455,		B_CPU_PPC_7455 },
-	{ MPC7457,		B_CPU_PPC_7457 },
-	{ MPC7447A,		B_CPU_PPC_7447A },
-	{ MPC7448,		B_CPU_PPC_7448 },
-	{ MPC7410,		B_CPU_PPC_7410 },
-	{ MPC8245,		B_CPU_PPC_8245 },
-	{ 0,			B_CPU_PPC_UNKNOWN }
+	{ MPC601,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC603,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC604,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC602,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC603e,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC603ev,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC750,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC604ev,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC7400,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC620,		B_CPU_VENDOR_MOTOROLA },
+	{ IBM403,		B_CPU_VENDOR_IBM },
+	{ IBM401A1,		B_CPU_VENDOR_IBM },
+	{ IBM401B2,		B_CPU_VENDOR_IBM },
+	{ IBM401C2,		B_CPU_VENDOR_IBM },
+	{ IBM401D2,		B_CPU_VENDOR_IBM },
+	{ IBM401E2,		B_CPU_VENDOR_IBM },
+	{ IBM401F2,		B_CPU_VENDOR_IBM },
+	{ IBM401G2,		B_CPU_VENDOR_IBM },
+	{ IBMPOWER3,	B_CPU_VENDOR_IBM },
+	{ MPC860,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC8240,		B_CPU_VENDOR_MOTOROLA },
+	{ IBM405GP,		B_CPU_VENDOR_IBM },
+	{ IBM405L,		B_CPU_VENDOR_IBM },
+	{ IBM750FX,		B_CPU_VENDOR_IBM },
+	{ MPC7450,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC7455,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC7457,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC7447A,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC7448,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC7410,		B_CPU_VENDOR_MOTOROLA },
+	{ MPC8245,		B_CPU_VENDOR_MOTOROLA },
+	{ 0,			B_CPU_VENDOR_UNKNOWN }
 };
 
 
-status_t
-arch_get_system_info(system_info *info, size_t size)
+void
+arch_fill_topology_node(cpu_topology_node_info* node, int32 cpu)
 {
-	info->cpu_type = sCPUType;
-	info->cpu_revision = sCPURevision;
+	switch (node->type) {
+		case B_TOPOLOGY_ROOT:
+#if  __powerpc64__
+			node->data.root.platform = B_CPU_PPC_64;
+#else
+			node->data.root.platform = B_CPU_PPC;
+#endif
+			break;
 
-	info->cpu_clock_speed = sCPUClockFrequency;
-	info->bus_clock_speed = sBusClockFrequency;
+		case B_TOPOLOGY_PACKAGE:
+			node->data.package.vendor = sCPUVendor;
+			node->data.package.cache_line_size = CACHE_LINE_SIZE;
+			break;
 
-	info->platform_type = B_MAC_PLATFORM;
+		case B_TOPOLOGY_CORE:
+			node->data.core.model = sPVR;
+			node->data.core.default_frequency = sCPUClockFrequency;
+			break;
 
-	return B_OK;
+		default:
+			break;
+	}
 }
 
 
@@ -82,18 +96,17 @@ arch_system_info_init(struct kernel_args *args)
 
 	// The PVR (processor version register) contains processor version and
 	// revision.
-	uint32 pvr = get_pvr();
-	uint16 version = (uint16)(pvr >> 16);
-	sCPURevision = (uint16)(pvr & 0xffff);
+	sPVR = get_pvr();
+	uint16 model = (uint16)(sPVR >> 16);
+	//sCPURevision = (uint16)(pvr & 0xffff);
 
-	// translate the version to a BeOS cpu_types constant
-	sCPUType = B_CPU_PPC_UNKNOWN;
-	for (i = 0; kCPUModels[i].beos_type != B_CPU_PPC_UNKNOWN; i++) {
-		if (version == kCPUModels[i].version) {
-			sCPUType = kCPUModels[i].beos_type;
+	// Populate vendor
+	for (i = 0; kCPUModels[i].vendor != B_CPU_VENDOR_UNKNOWN; i++) {
+		if (model == kCPUModels[i].version) {
+			sCPUVendor = kCPUModels[i].vendor;
 			break;
 		}
 	}
-	
+
 	return B_OK;
 }
