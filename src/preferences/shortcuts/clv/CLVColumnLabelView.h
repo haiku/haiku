@@ -1,76 +1,97 @@
-#ifndef CLVColumnLabelView_h
-#define CLVColumnLabelView_h
+/*
+ * Copyright 1999-2009 Jeremy Friesner
+ * Copyright 2009-2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jeremy Friesner
+ *		John Scipione, jscipione@gmail.com
+ */
+#ifndef CLV_COLUMN_LABEL_VIEW_H
+#define CLV_COLUMN_LABEL_VIEW_H
+
 
 #include <support/SupportDefs.h>
 #include <InterfaceKit.h>
 
-//******************************************************************************************************
-//**** PROJECT HEADER FILES AND CLASS NAME DECLARATIONS
-//******************************************************************************************************
+
 class ColumnListView;
 class CLVColumn;
 
 
-//******************************************************************************************************
-//**** CLASS AND STRUCTURE DECLARATIONS, ASSOCIATED CONSTANTS AND STATIC FUNCTIONS
-//******************************************************************************************************
 struct CLVDragGroup
 {
-	int32 GroupStartDispListIndex;		//Indices in the column display list where this group starts
-	int32 GroupStopDispListIndex;		//and finishes
-	float GroupBegin,GroupEnd;			//-1.0 if whole group is hidden
-	CLVColumn* LastColumnShown;
-	bool AllLockBeginning;
-	bool AllLockEnd;
-	bool Shown;							//False if none of the columns in this group are shown
-	uint32 Flags;						//Uses CLV_NOT_MOVABLE, CLV_LOCK_AT_BEGINNING, CLV_LOCK_AT_END
+	int32 groupStartDisplayListIndex;
+		// indices in the column display list where this group starts
+	int32 groupStopDisplayListIndex;
+		// and finishes
+	float groupBeginIndex;
+		// -1.0 if whole group is hidden
+	float groupEndIndex;
+		// -1.0 if whole group is hidden
+	CLVColumn* lastColumnShown;
+	bool isAllLockBeginning;
+	bool isAllLockEnd;
+	bool isShown;
+		// false if none of the columns in this group are shown
+	uint32 flags;
+		// Uses CLV_NOT_MOVABLE, CLV_LOCK_AT_BEGINNING, CLV_LOCK_AT_END
 };
 
 
 class CLVColumnLabelView : public BView
 {
-	public:
-		//Constructor and destructor
-		CLVColumnLabelView(BRect Bounds,ColumnListView* Parent,const BFont* Font);
-		~CLVColumnLabelView();
+public:
+							CLVColumnLabelView(BRect frame,
+								ColumnListView* parent,
+								const BFont* font);
+							~CLVColumnLabelView();
 
-		//BView overrides
-		void Draw(BRect UpdateRect);
-		void MouseDown(BPoint Point);
-		void MessageReceived(BMessage *message);
+		// BView overrides
+			void			Draw(BRect UpdateRect);
+			void			MouseDown(BPoint Point);
+			void			MessageReceived(BMessage* message);
 
-	private:
+private:
 		friend class ColumnListView;
 		friend class CLVColumn;
 
-		float fFontAscent;
-		BList* fDisplayList;
+			void			ShiftDragGroup(int32 newPosition);
+			void			UpdateDragGroups();
+			void			SetSnapMinMax();
 
-		//Column select and drag stuff
-		CLVColumn* fColumnClicked;
-		BPoint fPreviousMousePos;
-		BPoint fMouseClickedPos;
-		bool fColumnDragging;
-		bool fColumnResizing;
-		BList fDragGroups;					//Groups of CLVColumns that must drag together
-		int32 fDragGroup;					//Index into DragGroups of the group being dragged by user
-		CLVDragGroup* fTheDragGroup;
-		CLVDragGroup* fTheShownGroupBefore;
-		CLVDragGroup* fTheShownGroupAfter;
-		int32 fSnapGroupBefore,				//Index into DragGroups of TheShownGroupBefore and
-			fSnapGroupAfter;				//TheShownGroupAfter, if the group the user is dragging is
-											//allowed to snap there, otherwise -1
-		float fDragBoxMouseHoldOffset,fResizeMouseHoldOffset;
-		float fDragBoxWidth;				//Can include multiple columns; depends on CLV_LOCK_WITH_RIGHT
-		float fPrevDragOutlineLeft,fPrevDragOutlineRight;
-		float fSnapMin,fSnapMax;			//-1.0 indicates the column can't snap in the given direction
-		ColumnListView* fParent;
+			float			fFontAscent;
+			BList*			fDisplayList;
 
-		//Private functions
-		void ShiftDragGroup(int32 NewPos);
-		void UpdateDragGroups();
-		void SetSnapMinMax();
+		// column select and drag stuff
+			CLVColumn*		fColumnClicked;
+			BPoint			fPreviousMousePosition;
+			BPoint			fMouseClickedPosition;
+			bool			fColumnDragging;
+			bool			fColumnResizing;
+			BList			fDragGroupsList;
+		// groups of CLVColumns that must drag together
+			int32			fDragGroupIndex;
+		// index into DragGroups of the group being dragged by user
+			CLVDragGroup*	fDragGroup;
+			CLVDragGroup*	fShownGroupBefore;
+			CLVDragGroup*	fShownGroupAfter;
+			int32			fSnapGroupBeforeIndex;
+			int32			fSnapGroupAfterIndex;
+		// index into DragGroups of fShownGroupBefore and
+		// fShownGroupAfter, if the group the user is dragging is
+		// allowed to snap there, otherwise -1
+			float			fDragBoxMouseHoldOffset;
+			float			fResizeMouseHoldOffset;
+			float			fDragBoxWidth;
+		// can include multiple columns; depends on CLV_LOCK_WITH_RIGHT
+			float			fPreviousDragOutlineLeft;
+			float			fPreviousDragOutlineRight;
+			float			fSnapMin;
+			float			fSnapMax;
+		// -1.0 indicates the column can't snap in the given direction
+			ColumnListView*	fParent;
 };
 
-#endif
 
+#endif	// CLV_COLUMN_LABEL_VIEW_H

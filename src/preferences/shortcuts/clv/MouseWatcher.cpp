@@ -1,72 +1,91 @@
+/*
+ * Copyright 1999-2009 Jeremy Friesner
+ * Copyright 2009-2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jeremy Friesner
+ *		John Scipione, jscipione@gmail.com
+ */
+
+
 #include "MouseWatcher.h"
 
 #include <Messenger.h>
 #include <InterfaceKit.h>
 
+
 int32 MouseWatcher(void* data);
 
 
-thread_id StartMouseWatcher(BView* TargetView)
+thread_id
+StartMouseWatcher(BView* target)
 {
-	thread_id MouseWatcherThread = spawn_thread(MouseWatcher,"MouseWatcher",B_NORMAL_PRIORITY,
-		new BMessenger(TargetView));
-	if(MouseWatcherThread != B_NO_MORE_THREADS && MouseWatcherThread != B_NO_MEMORY)
+	thread_id MouseWatcherThread = spawn_thread(MouseWatcher,
+		"MouseWatcher", B_NORMAL_PRIORITY, new BMessenger(target));
+	if (MouseWatcherThread != B_NO_MORE_THREADS
+		&& MouseWatcherThread != B_NO_MEMORY) {
 		resume_thread(MouseWatcherThread);
+	}
+
 	return MouseWatcherThread;
 }
 
 
-int32 MouseWatcher(void* data)
+int32
+MouseWatcher(void* data)
 {
-	BMessenger* TheMessenger = (BMessenger*)data;
-	BPoint PreviousPos;
-	uint32 PreviousButtons = 0xFFFFFFFF;
-	bool FirstCheck = true;
-	BMessage MessageToSend;
-	MessageToSend.AddPoint("where",BPoint(0,0));
-	MessageToSend.AddInt32("buttons",0);
-	MessageToSend.AddInt32("modifiers",0);
-	while(true)
-	{
-		if (!TheMessenger->LockTarget())
-		{
-			delete TheMessenger;
-			return 0;			// window is dead so exit
-		}
-		BLooper *TheLooper;
-		BView* TheView = (BView*)TheMessenger->Target(&TheLooper);
-		BPoint Where;
-		uint32 Buttons;
-		TheView->GetMouse(&Where,&Buttons,false);
-		if(FirstCheck)
-		{
-			PreviousPos = Where;
-			PreviousButtons = Buttons;
-			FirstCheck = false;
-		}
-		bool Send = false;
-		if(Buttons != PreviousButtons || Buttons == 0 || Where != PreviousPos)
-		{
-			if(Buttons == 0)
-				MessageToSend.what = MW_MOUSE_UP;
-			else if(Buttons != PreviousButtons)
-				MessageToSend.what = MW_MOUSE_DOWN;
-			else
-				MessageToSend.what = MW_MOUSE_MOVED;
-			MessageToSend.ReplacePoint("where",Where);
-			MessageToSend.ReplaceInt32("buttons",Buttons);
-			MessageToSend.ReplaceInt32("modifiers",modifiers());
-			Send = true;
-		}
-		TheLooper->Unlock();
-		if(Send)
-			TheMessenger->SendMessage(&MessageToSend);
-		if(Buttons == 0)
-		{
-			//Button was released
-			delete TheMessenger;
+	BMessenger* messenger = (BMessenger*)data;
+	BPoint previousPosition;
+	uint32 previousbuttons = 0xFFFFFFFF;
+	bool isFirstCheck = true;
+	BMessage messageToSend;
+	messageToSend.AddPoint("where", BPoint(0, 0));
+	messageToSend.AddInt32("buttons", 0);
+	messageToSend.AddInt32("modifiers", 0);
+
+	while(true) {
+		if (!messenger->LockTarget()) {
+			// window is dead so exit
+			delete messenger;
 			return 0;
 		}
+		BLooper* looper;
+		BView* view = (BView*)messenger->Target(&looper);
+		BPoint where;
+		uint32 buttons;
+		view->GetMouse(&where, &buttons, false);
+		if (isFirstCheck) {
+			previousPosition = where;
+			previousbuttons = buttons;
+			isFirstCheck = false;
+		}
+		bool shouldSend = false;
+		if (buttons != previousbuttons || buttons == 0
+			|| where != previousPosition) {
+			if (buttons == 0)
+				messageToSend.what = MW_MOUSE_UP;
+			else if (buttons != previousbuttons)
+				messageToSend.what = MW_MOUSE_DOWN;
+			else
+				messageToSend.what = MW_MOUSE_MOVED;
+
+			messageToSend.ReplacePoint("where", where);
+			messageToSend.ReplaceInt32("buttons", buttons);
+			messageToSend.ReplaceInt32("modifiers", modifiers());
+			shouldSend = true;
+		}
+
+		looper->Unlock();
+		if (shouldSend)
+			messenger->SendMessage(&messageToSend);
+
+		if (buttons == 0) {
+			// mouse button was released
+			delete messenger;
+			return 0;
+		}
+
 		snooze(50000);
 	}
 }

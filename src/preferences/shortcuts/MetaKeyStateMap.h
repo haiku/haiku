@@ -1,12 +1,13 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Jeremy Friesner
+ * Copyright 2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
  */
-#ifndef MetaKeyStateMap_h
-#define MetaKeyStateMap_h
+#ifndef META_KEY_STATE_MAP_H
+#define META_KEY_STATE_MAP_H
 
 
 #include <List.h>
@@ -21,7 +22,6 @@ class BitFieldTester;
 // description strings and qualifier bit-chords that go with them.
 class MetaKeyStateMap {
 public:
-	
 			// Note: You MUST call SetInfo() directly after using this ctor!
 							MetaKeyStateMap();
 
@@ -65,5 +65,4 @@ private:
 };
 
 
-#endif
-
+#endif	// META_KEY_STATE_MAP_H

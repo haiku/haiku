@@ -16,7 +16,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Shortcuts",
-	long_info  = "Shortcuts ©1999-2009 Jeremy Friesner ©2009 Haiku Inc."
+	long_info  = "Shortcuts ©1999-2009 Jeremy Friesner ©2009-2014 Haiku, Inc."
 };
 
 resource vector_icon {

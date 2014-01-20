@@ -1,12 +1,13 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Jeremy Friesner
+ * Copyright 2009-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
  */
-#ifndef ShortcutsSpec_h
-#define ShortcutsSpec_h
+#ifndef SHORTCUTS_SPEC_H
+#define SHORTCUTS_SPEC_H
 
 
 #include <Bitmap.h>
@@ -19,11 +20,12 @@ class CommandActuator;
 class MetaKeyStateMap;
 
 
-MetaKeyStateMap & GetNthKeyMap(int which);
+MetaKeyStateMap& GetNthKeyMap(int which);
 
-/* Objects of this class represent one hotkey "entry" in the preferences 
- * ListView. Each ShortcutsSpec contains the info necessary to generate both 
- * the proper GUI display, and the proper BitFieldTester and CommandActuator 
+/*
+ * Objects of this class represent one hotkey "entry" in the preferences
+ * ListView. Each ShortcutsSpec contains the info necessary to generate both
+ * the proper GUI display, and the proper BitFieldTester and CommandActuator
  * object for the ShortcutsCatcher add-on to use.
  */
 class ShortcutsSpec : public CLVListItem {
@@ -36,36 +38,36 @@ public:
 							~ShortcutsSpec();
 
 	virtual	status_t		Archive(BMessage* into, bool deep = true) const;
-	virtual void 			Pulse(BView* owner);
-	static 	BArchivable*	Instantiate(BMessage* from);										
-			void			Update(BView* owner, const BFont* font);	
-	const 	char* 			GetCellText(int whichColumn) const;
+	virtual	void 			Pulse(BView* owner);
+	static	BArchivable*	Instantiate(BMessage* from);
+			void			Update(BView* owner, const BFont* font);
+	const	char* 			GetCellText(int whichColumn) const;
 			void			SetCommand(const char* commandStr);
-			
+
 	virtual	void			DrawItemColumn(BView* owner, BRect item_column_rect,
 								int32 column_index, bool columnSelected,
 								bool complete);
 	
-	static	int				MyCompare(const CLVListItem* a_Item1, 
-								const CLVListItem* a_Item2, int32 KeyColumn);
+	static	int				CLVListItemCompare(const CLVListItem* firstItem,
+								const CLVListItem* secondItem, int32 keyColumn);
 
 	// Returns the name of the Nth Column.
 	static	const char*		GetColumnName(int index);
 
 			// Update this spec's state in response to a keystroke to the given
 			// column. Returns true iff a change occurred.
-			bool 			ProcessColumnKeyStroke(int whichColumn, 
+			bool 			ProcessColumnKeyStroke(int whichColumn,
 								const char* bytes, int32 key);
 
 			// Same as ProcessColumnKeyStroke, but for a mouse click instead.
 			bool			ProcessColumnMouseClick(int whichColumn);
 	
 			// Same as ProcessColumnKeyStroke, but for a text string instead.
-			bool			ProcessColumnTextString(int whichColumn, 
+			bool			ProcessColumnTextString(int whichColumn,
 								const char* string);
 
-			int32 			GetSelectedColumn() const {return fSelectedColumn;}
-			void 			SetSelectedColumn(int32 i) {fSelectedColumn = i;}
+			int32 			GetSelectedColumn() const { return fSelectedColumn; }
+			void 			SetSelectedColumn(int32 i) { fSelectedColumn = i; }
 
 	// default layout of columns is set in here.
 	enum {
@@ -81,20 +83,20 @@ public:
 private:
 			void 			_CacheViewFont(BView* owner);
 			bool 			_AttemptTabCompletion();
-			
+
 			// call this to ensure the icon is up-to-date
 			void 			_UpdateIconBitmap();
 
 			char*			fCommand;
-			uint32			fCommandLen; // number of bytes in fCommand buffer
-			uint32			fCommandNul; // index of the NUL byte in fCommand
-			float			fTextOffset;		
-			
+			uint32			fCommandLen;	// number of bytes in fCommand buffer
+			uint32			fCommandNul;	// index of the NUL byte in fCommand
+			float			fTextOffset;
+
 			// icon for associated program. Invalid if none available.
-			BBitmap			fBitmap; 
-			
+			BBitmap			fBitmap;
+
 			char*			fLastBitmapName;
-			bool			fBitmapValid;		
+			bool			fBitmapValid;
 			uint32			fKey;
 			int32			fMetaCellStateIndex[NUM_META_COLUMNS];
 			BPoint			fCursorPt1;
@@ -112,5 +114,5 @@ private:
 	static	const char*		sCommandName;
 };
 
-#endif
 
+#endif	// SHORTCUTS_SPEC_H

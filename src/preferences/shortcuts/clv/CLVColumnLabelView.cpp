@@ -1,24 +1,30 @@
-//ColumnLabelView class source file
+/*
+ * Copyright 1999-2009 Jeremy Friesner
+ * Copyright 2009-2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jeremy Friesner
+ *		John Scipione, jscipione@gmail.com
+ */
 
 
-//******************************************************************************************************
-//**** PROJECT HEADER FILES
-//******************************************************************************************************
 #define CLVColumnLabelView_CPP
+
 #include "CLVColumnLabelView.h"
 #include "ColumnListView.h"
 #include "CLVColumn.h"
 #include "MouseWatcher.h"
 
 
-//******************************************************************************************************
-//**** FUNCTION DEFINITIONS
-//******************************************************************************************************
-CLVColumnLabelView::CLVColumnLabelView(BRect Bounds,ColumnListView* parent,const BFont* Font)
-: BView(Bounds,NULL,B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP,B_WILL_DRAW|B_FRAME_EVENTS),
-fDragGroups(10)
+CLVColumnLabelView::CLVColumnLabelView(BRect frame, ColumnListView* parent,
+	const BFont* font)
+	:
+	BView(frame, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		B_WILL_DRAW | B_FRAME_EVENTS),
+	fDragGroupsList(10)
 {
-	SetFont(Font);
+	SetFont(font);
 	SetViewColor(BeBackgroundGrey);
 	SetLowColor(BeBackgroundGrey);
 	SetHighColor(Black);
@@ -27,726 +33,778 @@ fDragGroups(10)
 	fColumnClicked = NULL;
 	fColumnDragging = false;
 	fColumnResizing = false;
-	font_height FontAttributes;
-	Font->GetHeight(&FontAttributes);
-	fFontAscent = ceil(FontAttributes.ascent);
+	font_height fontAttributes;
+	font->GetHeight(&fontAttributes);
+	fFontAscent = ceil(fontAttributes.ascent);
 }
 
 
 CLVColumnLabelView::~CLVColumnLabelView()
 {
-	int32 NumberOfGroups = fDragGroups.CountItems();
-	for(int32 Counter = 0; Counter < NumberOfGroups; Counter++)
-		fDragGroups.RemoveItem(int32(0));
+	int32 groupCount = fDragGroupsList.CountItems();
+	for (int32 i = 0; i < groupCount; i++)
+		fDragGroupsList.RemoveItem(int32(0));
 }
 
 
-void CLVColumnLabelView::Draw(BRect UpdateRect)
+void
+CLVColumnLabelView::Draw(BRect updateRect)
 {
-	BRegion ClippingRegion;
-	GetClippingRegion(&ClippingRegion);
-	BRect ViewBounds = Bounds();
+	BRegion clippingRegion;
+	GetClippingRegion(&clippingRegion);
+	BRect bounds = Bounds();
 
-	//Draw each column label in turn
-	float ColumnBegin = 0.0;
-	float ColumnEnd = -1.0;
-	bool MergeWithLeft = false;
-	int32 NumberOfColumns = fDisplayList->CountItems();
-	BPoint Start,Stop;
-	for(int32 ColumnDraw = 0; ColumnDraw < NumberOfColumns; ColumnDraw++)
-	{
-		CLVColumn* ThisColumn = (CLVColumn*)fDisplayList->ItemAt(ColumnDraw);
-		if(ThisColumn->IsShown())
-		{
-			//Figure out where this column is
-			ColumnBegin = ThisColumn->fColumnBegin;
-			ColumnEnd = ThisColumn->fColumnEnd;
-			//Start by figuring out if this column will merge with a shown column to the right
-			bool MergeWithRight = false;
-			if(ThisColumn->fFlags & CLV_MERGE_WITH_RIGHT)
-			{
-				for(int32 ColumnCounter = ColumnDraw+1; ColumnCounter < NumberOfColumns;
-					ColumnCounter++)
-				{
-					CLVColumn* NextColumn = (CLVColumn*)fDisplayList->ItemAt(ColumnCounter);
-					if(NextColumn->IsShown())
-					{
-						//The next column is shown
-						MergeWithRight = true;
+	// draw each column label in turn
+	float columnBegin = 0.0;
+	float columnEnd = -1.0;
+	bool shouldMergeWithLeft = false;
+	int32 columnCount = fDisplayList->CountItems();
+	BPoint startingPoint;
+	BPoint stoppingPoint;
+	for (int32 i = 0; i < columnCount; i++) {
+		CLVColumn* column = (CLVColumn*)fDisplayList->ItemAt(i);
+		if (column->IsShown()) {
+			// figure out where this column is
+			columnBegin = column->fColumnBegin;
+			columnEnd = column->fColumnEnd;
+			// start by figuring out if this column will merge
+			// with a shown column to the right
+			bool shouldMergeWithRight = false;
+			if ((column->fFlags & CLV_MERGE_WITH_RIGHT) != 0) {
+				for (int32 j = i + 1; j < columnCount; j++) {
+					CLVColumn* nextColumn = (CLVColumn*)fDisplayList->ItemAt(j);
+					if (nextColumn->IsShown()) {
+						// next column is shown
+						shouldMergeWithRight = true;
+						break;
+					} else if ((nextColumn->fFlags & CLV_MERGE_WITH_RIGHT)
+							== 0) {
+						// next column is not shown and doesn't
+						// pass on the merge
 						break;
 					}
-					else if(!(NextColumn->fFlags & CLV_MERGE_WITH_RIGHT))
-						//The next column is not shown and doesn't pass on the merge
-						break;
 				}
 			}
-			if(ClippingRegion.Intersects(BRect(ColumnBegin,ViewBounds.top,ColumnEnd,
-				ViewBounds.bottom)))
-			{
-				//Need to draw this column
+
+			if (clippingRegion.Intersects(BRect(columnBegin,
+					bounds.top, columnEnd, bounds.bottom))) {
+				// need to draw this column
 				BeginLineArray(4);
-				//Top line
-				Start.Set(ColumnBegin,ViewBounds.top);
-				Stop.Set(ColumnEnd-1.0,ViewBounds.top);
-				if(MergeWithRight && !(ThisColumn == fColumnClicked && fColumnResizing))
-					Stop.x = ColumnEnd;
-				AddLine(Start,Stop,BeHighlight);
-				//Left line
-				if(!MergeWithLeft)
-					AddLine(BPoint(ColumnBegin,ViewBounds.top+1.0),
-						BPoint(ColumnBegin,ViewBounds.bottom),BeHighlight);
-				//Bottom line
-				Start.Set(ColumnBegin+1.0,ViewBounds.bottom);
-				if(MergeWithLeft)
-					Start.x = ColumnBegin;
-				Stop.Set(ColumnEnd-1.0,ViewBounds.bottom);
-				if(MergeWithRight && !(ThisColumn == fColumnClicked && fColumnResizing))
-					Stop.x = ColumnEnd;
-				AddLine(Start,Stop,BeShadow);
-				//Right line
-				if(ThisColumn == fColumnClicked && fColumnResizing)
-					AddLine(BPoint(ColumnEnd,ViewBounds.top),BPoint(ColumnEnd,ViewBounds.bottom),
-						BeFocusBlue);
-				else if(!MergeWithRight)
-					AddLine(BPoint(ColumnEnd,ViewBounds.top),BPoint(ColumnEnd,ViewBounds.bottom),
-						BeShadow);
+
+				// top line
+				startingPoint.Set(columnBegin, bounds.top);
+				stoppingPoint.Set(columnEnd - 1.0, bounds.top);
+				if (shouldMergeWithRight && !(column == fColumnClicked
+					&& fColumnResizing)) {
+					stoppingPoint.x = columnEnd;
+				}
+				AddLine(startingPoint, stoppingPoint, BeHighlight);
+
+				// left line
+				if (!shouldMergeWithLeft) {
+					AddLine(BPoint(columnBegin, bounds.top + 1.0),
+						BPoint(columnBegin, bounds.bottom), BeHighlight);
+				}
+
+				// bottom line
+				startingPoint.Set(columnBegin + 1.0, bounds.bottom);
+				if (shouldMergeWithLeft)
+					startingPoint.x = columnBegin;
+
+				stoppingPoint.Set(columnEnd - 1.0, bounds.bottom);
+				if (shouldMergeWithRight && !(column == fColumnClicked
+					&& fColumnResizing)) {
+					stoppingPoint.x = columnEnd;
+				}
+				AddLine(startingPoint, stoppingPoint, BeShadow);
+
+				// right line
+				if (column == fColumnClicked && fColumnResizing) {
+					AddLine(BPoint(columnEnd, bounds.top),
+					BPoint(columnEnd, bounds.bottom), BeFocusBlue);
+				} else if (!shouldMergeWithRight) {
+					AddLine(BPoint(columnEnd, bounds.top),
+						BPoint(columnEnd, bounds.bottom), BeShadow);
+				}
 				EndLineArray();
 
-				//Add the label
-				if(ThisColumn->fLabel)
-				{
-					//Limit the clipping region to the interior of the box
-					BRegion TextRegion;
-					TextRegion.Include(BRect(ColumnBegin+1.0,ViewBounds.top+1.0,ColumnEnd-1.0,
-						ViewBounds.bottom-1.0));
-					ConstrainClippingRegion(&TextRegion);
+				// add the label
+				if (column->fLabel != NULL) {
+					// limit the clipping region to the interior of the box
+					BRegion textRegion;
+					textRegion.Include(BRect(columnBegin + 1.0,
+						bounds.top + 1.0, columnEnd - 1.0,
+						bounds.bottom - 1.0));
+					ConstrainClippingRegion(&textRegion);
 
-					//Draw the label
-					if(ThisColumn == fColumnClicked && !fColumnResizing)
+					// draw the label
+					if (column == fColumnClicked && !fColumnResizing)
 						SetHighColor(BeFocusBlue);
+
 					SetDrawingMode(B_OP_OVER);
-					DrawString(ThisColumn->fLabel,BPoint(ColumnBegin+9.0,ViewBounds.top+2.0+fFontAscent));
+					DrawString(column->fLabel,
+						BPoint(columnBegin + 9.0,
+							bounds.top + 2.0 + fFontAscent));
 					SetDrawingMode(B_OP_COPY);
 
-					//Underline if this is a selected sort column
-					if(fParent->fSortKeyList.HasItem(ThisColumn) && ThisColumn->fSortMode != NoSort)
-					{
-						float Width = StringWidth(ThisColumn->fLabel);
-						StrokeLine(BPoint(ColumnBegin+8.0,ViewBounds.top+2.0+fFontAscent+2.0),
-							BPoint(ColumnBegin+8.0+Width,ViewBounds.top+2.0+fFontAscent+2.0));
+					// underline if this is a selected sort column
+					if (fParent->fSortKeyList.HasItem(column)
+						&& column->fSortMode != SORT_MODE_NONE) {
+						float Width = StringWidth(column->fLabel);
+						StrokeLine(BPoint(columnBegin + 8.0,
+							bounds.top + 2.0 + fFontAscent + 2.0),
+							BPoint(columnBegin + 8.0 + Width,
+								bounds.top + 2.0 + fFontAscent + 2.0));
 					}
-					if(ThisColumn == fColumnClicked && !fColumnResizing)
+					if (column == fColumnClicked && !fColumnResizing)
 						SetHighColor(Black);
 
-					//Restore the clipping region
+					// restore the clipping region
 					ConstrainClippingRegion(NULL);
 				}
 			}
-			//Set MergeWithLeft flag for the next column to the appropriate state
-			MergeWithLeft = MergeWithRight;
+
+			// set shouldMergeWithLeft flag for the next column to
+			// the appropriate state
+			shouldMergeWithLeft = shouldMergeWithRight;
 		}
 	}
 
-	//Add highlight and shadow to the region after the columns if necessary
-	if(ColumnEnd < ViewBounds.right)
-	{
-		ColumnBegin = ColumnEnd+1.0;
-		if(ClippingRegion.Intersects(BRect(ColumnEnd+1.0,ViewBounds.top,ViewBounds.right,
-			ViewBounds.bottom)))
-		{
+	// add highlight and shadow to the region after the columns if necessary
+	if (columnEnd < bounds.right) {
+		columnBegin = columnEnd + 1.0;
+
+		if (clippingRegion.Intersects(BRect(columnEnd + 1.0,
+				bounds.top, bounds.right, bounds.bottom))) {
 			BeginLineArray(3);
-			//Top line
-			AddLine(BPoint(ColumnBegin,ViewBounds.top),BPoint(ViewBounds.right,ViewBounds.top),
-				BeHighlight);
-			//Left line
-			AddLine(BPoint(ColumnBegin,ViewBounds.top+1.0),BPoint(ColumnBegin,ViewBounds.bottom),
-				BeHighlight);
-			//Bottom line
-			Start.Set(ColumnBegin+1.0,ViewBounds.bottom);
-			if(MergeWithLeft)
-				Start.x = ColumnBegin;
-			Stop.Set(ViewBounds.right,ViewBounds.bottom);
-			AddLine(Start,Stop,BeShadow);
+
+			// top line
+			AddLine(BPoint(columnBegin, bounds.top),
+				BPoint(bounds.right, bounds.top), BeHighlight);
+
+			// left line
+			AddLine(BPoint(columnBegin, bounds.top + 1.0),
+				BPoint(columnBegin, bounds.bottom), BeHighlight);
+
+			// bottom line
+			startingPoint.Set(columnBegin + 1.0, bounds.bottom);
+			if (shouldMergeWithLeft)
+				startingPoint.x = columnBegin;
+
+			stoppingPoint.Set(bounds.right, bounds.bottom);
+			AddLine(startingPoint, stoppingPoint, BeShadow);
 			EndLineArray();
 		}
 	}
 
-	//Draw the dragging box if necessary
-	if(fColumnClicked && fColumnDragging)
-	{
-		float DragOutlineLeft = fPreviousMousePos.x-fDragBoxMouseHoldOffset;
-		float GroupBegin = ((CLVDragGroup*)fDragGroups.ItemAt(fDragGroup))->GroupBegin;
-		if(DragOutlineLeft < GroupBegin && fSnapGroupBefore == -1)
-			DragOutlineLeft = GroupBegin;
-		if(DragOutlineLeft > GroupBegin && fSnapGroupAfter == -1)
-			DragOutlineLeft = GroupBegin;
-		float DragOutlineRight = DragOutlineLeft + fDragBoxWidth;
+	// draw the dragging box if necessary
+	if (fColumnClicked && fColumnDragging) {
+		float dragOutlineLeft = fPreviousMousePosition.x
+			- fDragBoxMouseHoldOffset;
+		float groupBegin = ((CLVDragGroup*)fDragGroupsList.ItemAt(
+			fDragGroupIndex))->groupBeginIndex;
+		if (dragOutlineLeft < groupBegin && fSnapGroupBeforeIndex == -1)
+			dragOutlineLeft = groupBegin;
+
+		if (dragOutlineLeft > groupBegin && fSnapGroupAfterIndex == -1)
+			dragOutlineLeft = groupBegin;
+
+		float DragOutlineRight = dragOutlineLeft + fDragBoxWidth;
+
 		BeginLineArray(4);
-		AddLine(BPoint(DragOutlineLeft,ViewBounds.top),BPoint(DragOutlineRight,
-			ViewBounds.top),BeFocusBlue);
-		AddLine(BPoint(DragOutlineLeft,ViewBounds.bottom),BPoint(DragOutlineRight,
-			ViewBounds.bottom),BeFocusBlue);
-		AddLine(BPoint(DragOutlineLeft,ViewBounds.top+1.0),BPoint(DragOutlineLeft,
-			ViewBounds.bottom-1.0),BeFocusBlue);
-		AddLine(BPoint(DragOutlineRight,ViewBounds.top+1.0),BPoint(DragOutlineRight,
-			ViewBounds.bottom-1.0),BeFocusBlue);
+		AddLine(BPoint(dragOutlineLeft, bounds.top),
+			BPoint(DragOutlineRight, bounds.top), BeFocusBlue);
+		AddLine(BPoint(dragOutlineLeft, bounds.bottom),
+			BPoint(DragOutlineRight, bounds.bottom), BeFocusBlue);
+		AddLine(BPoint(dragOutlineLeft, bounds.top + 1.0),
+			BPoint(dragOutlineLeft, bounds.bottom - 1.0), BeFocusBlue);
+		AddLine(BPoint(DragOutlineRight, bounds.top + 1.0),
+			BPoint(DragOutlineRight, bounds.bottom - 1.0), BeFocusBlue);
 		EndLineArray();
-		fPrevDragOutlineLeft = DragOutlineLeft;
-		fPrevDragOutlineRight = DragOutlineRight;
+
+		fPreviousDragOutlineLeft = dragOutlineLeft;
+		fPreviousDragOutlineRight = DragOutlineRight;
 	}
 }
 
 
-void CLVColumnLabelView::MouseDown(BPoint Point)
+void
+CLVColumnLabelView::MouseDown(BPoint where)
 {
-	//Only pay attention to primary mouse button
-	bool WatchMouse = false;
-	BPoint MousePos;
-	uint32 Buttons;
-	GetMouse(&MousePos,&Buttons);
-	if(Buttons == B_PRIMARY_MOUSE_BUTTON)
-	{
-		BRect ViewBounds = Bounds();
+	// pay attention only to primary mouse button
+	bool shouldWatchMouse = false;
+	BPoint mousePosition;
+	uint32 buttons;
+	GetMouse(&mousePosition, &buttons);
+	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
+		BRect bounds = Bounds();
 
-		//Make sure no other column was already clicked.  If so, just discard the old one and redraw the
-		//view
-		if(fColumnClicked != NULL)
-		{
+		// Make sure no other column was already clicked.
+		// If so, just discard the old one and redraw the view.
+		if (fColumnClicked != NULL) {
 			Invalidate();
 			fColumnClicked = NULL;
 		}
 
-		//Find the column that the user clicked, if any
-		bool GrabbedResizeTab = false;
-		int32 NumberOfColumns = fDisplayList->CountItems();
-		int32 ColumnFind;
-		CLVColumn* ThisColumn = NULL;
-		for(ColumnFind = 0; ColumnFind < NumberOfColumns; ColumnFind++)
-		{
-			ThisColumn = (CLVColumn*)fDisplayList->ItemAt(ColumnFind);
-			if(ThisColumn->IsShown())
-			{
-				float ColumnBegin = ThisColumn->fColumnBegin;
-				float ColumnEnd = ThisColumn->fColumnEnd;
-				if ((Point.x >= ColumnBegin && Point.x <= ColumnEnd) ||
-				    ((ColumnFind == NumberOfColumns-1)&&(Point.x >= ColumnBegin)))  // anything after the rightmost column can drag... jaf
-				{
-				    const float resizeTolerance = 5.0f;  // jaf is too clumsy to click on a 2 pixel space.  :)
+		// find the column that the user clicked, if any
+		bool didGrabResizeTab = false;
+		int32 columnCount = fDisplayList->CountItems();
+		int32 i;
+		CLVColumn* column = NULL;
+		for (i = 0; i < columnCount; i++) {
+			column = (CLVColumn*)fDisplayList->ItemAt(i);
+			if (column->IsShown()) {
+				float columnBegin = column->fColumnBegin;
+				float columnEnd = column->fColumnEnd;
+				if ((where.x >= columnBegin && where.x <= columnEnd)
+					|| ((i == columnCount - 1) && (where.x >= columnBegin))) {
+					// anything after the rightmost column can drag... jaf
+				    const float resizeTolerance = 5.0f;
+					// jaf is too clumsy to click on a 2 pixel space.  :)
 
-					//User clicked in this column
-					if(Point.x <= ColumnBegin+resizeTolerance)
-					{
-						//User clicked the resize tab preceding this column
-						for(ColumnFind--; ColumnFind >= 0; ColumnFind--)
-						{
-							ThisColumn = (CLVColumn*)fDisplayList->ItemAt(ColumnFind);
-							if(ThisColumn->IsShown())
-							{
-								GrabbedResizeTab = true;
+					// user clicked in this column
+					if (where.x <= columnBegin + resizeTolerance) {
+						// user clicked the resize tab preceding this column
+						for (i--; i >= 0; i--) {
+							column = (CLVColumn*)fDisplayList->ItemAt(i);
+							if (column->IsShown()) {
+								didGrabResizeTab = true;
 								break;
 							}
 						}
-					}
-					else if(Point.x >= ColumnEnd-resizeTolerance)
-					{
-						//User clicked the resize tab for (after) this column
-						GrabbedResizeTab = true;
-					}
-					else
-					{
-						//The user clicked in this column
-						fColumnClicked = (CLVColumn*)fDisplayList->ItemAt(ColumnFind);
+					} else if (where.x >= columnEnd-resizeTolerance) {
+						// user clicked the resize tab for (after) this column
+						didGrabResizeTab = true;
+					} else {
+						// user clicked in this column
+						fColumnClicked = (CLVColumn*)fDisplayList->ItemAt(i);
 						fColumnResizing = false;
-						fPreviousMousePos = Point;
-						fMouseClickedPos = Point;
+						fPreviousMousePosition = where;
+						fMouseClickedPosition = where;
 						fColumnDragging = false;
 						SetSnapMinMax();
-						fDragBoxMouseHoldOffset = Point.x-
-							((CLVDragGroup*)fDragGroups.ItemAt(fDragGroup))->GroupBegin;
-						Invalidate(BRect(ColumnBegin+1.0,ViewBounds.top+1.0,ColumnEnd-1.0,
-							ViewBounds.bottom-1.0));
+						fDragBoxMouseHoldOffset = where.x
+							- ((CLVDragGroup*)fDragGroupsList.ItemAt(
+								fDragGroupIndex))->groupBeginIndex;
 
-						//Start watching the mouse
-						WatchMouse = true;
+							Invalidate(BRect(columnBegin + 1.0,
+								bounds.top + 1.0, columnEnd - 1.0,
+								bounds.bottom - 1.0));
+
+						// start watching the mouse
+						shouldWatchMouse = true;
 					}
 					break;
 				}
 			}
 		}
-		if(GrabbedResizeTab)
-		{
-			//The user grabbed a resize tab.  See if resizing of this column is allowed
-			if(!(ThisColumn->fFlags & CLV_NOT_RESIZABLE))
-			{
-				fColumnClicked = (CLVColumn*)fDisplayList->ItemAt(ColumnFind);
-				fColumnResizing = true;
-				fPreviousMousePos = Point;
-				fMouseClickedPos = Point;
-				fColumnDragging = false;
-				fResizeMouseHoldOffset = Point.x-fColumnClicked->fColumnEnd;
-				Invalidate(BRect(fColumnClicked->fColumnEnd,ViewBounds.top,ThisColumn->fColumnEnd,
-					ViewBounds.bottom));
 
-				//Start watching the mouse
-				WatchMouse = true;
+		if (didGrabResizeTab) {
+			// user grabbed a resize tab, check to see if
+			// resizing this column is allowed
+			if ((column->fFlags & CLV_NOT_RESIZABLE) == 0) {
+				fColumnClicked = (CLVColumn*)fDisplayList->ItemAt(i);
+				fColumnResizing = true;
+				fPreviousMousePosition = where;
+				fMouseClickedPosition = where;
+				fColumnDragging = false;
+				fResizeMouseHoldOffset = where.x - fColumnClicked->fColumnEnd;
+				Invalidate(BRect(fColumnClicked->fColumnEnd, bounds.top,
+					column->fColumnEnd, bounds.bottom));
+
+				// start watching the mouse
+				shouldWatchMouse = true;
 			}
 		}
 	}
-	if(WatchMouse)
-	{
+
+	if (shouldWatchMouse) {
 		thread_id MouseWatcherThread = StartMouseWatcher(this);
-		if(MouseWatcherThread == B_NO_MORE_THREADS || MouseWatcherThread == B_NO_MEMORY)
+		if (MouseWatcherThread == B_NO_MORE_THREADS
+			|| MouseWatcherThread == B_NO_MEMORY) {
 			fColumnClicked = NULL;
+		}
 	}
 }
 
 
-void CLVColumnLabelView::MessageReceived(BMessage *message)
+void
+CLVColumnLabelView::MessageReceived(BMessage* message)
 {
-	if(message->what != MW_MOUSE_MOVED && message->what != MW_MOUSE_DOWN && message->what != MW_MOUSE_UP)
+	if (message->what != MW_MOUSE_MOVED && message->what != MW_MOUSE_DOWN
+		&& message->what != MW_MOUSE_UP) {
 		BView::MessageReceived(message);
-	else if(fColumnClicked != NULL)
-	{
-		BPoint MousePos;
-		message->FindPoint("where",&MousePos);
-		uint32 Buttons;
-		message->FindInt32("buttons",(int32*)&Buttons);
-		uint32 Modifiers;
-		message->FindInt32("modifiers",(int32*)&Modifiers);
-		BRect ViewBounds;
-		ViewBounds = Bounds();
-		uint32 ColumnFlags = fColumnClicked->Flags();
-		if(Buttons == B_PRIMARY_MOUSE_BUTTON)
-		{
-			//Mouse is still held down
-			if(!fColumnResizing)
-			{
-				//User is clicking or dragging
-				if((MousePos.x<fMouseClickedPos.x-2.0 || MousePos.x>fMouseClickedPos.x+2.0) &&
-					!fColumnDragging)
-				{
-					//User is initiating a drag
-					if(fTheDragGroup->Flags & CLV_NOT_MOVABLE)
-					{
-						//Not allowed to drag this column - terminate the click
-						Invalidate(BRect(fColumnClicked->fColumnBegin,ViewBounds.top,
-							fColumnClicked->fColumnEnd,ViewBounds.bottom));
+	} else if (fColumnClicked != NULL) {
+		BPoint mousePosition;
+		message->FindPoint("where", &mousePosition);
+		uint32 buttons;
+		message->FindInt32("buttons", (int32*)&buttons);
+		uint32 modifiers;
+		message->FindInt32("modifiers", (int32*)&modifiers);
+		BRect bounds;
+		bounds = Bounds();
+		uint32 columnFlags = fColumnClicked->Flags();
+		if (buttons == B_PRIMARY_MOUSE_BUTTON) {
+			// mouse is still held down
+			if (!fColumnResizing) {
+				// user is clicking or dragging
+				if ((mousePosition.x < fMouseClickedPosition.x - 2.0
+						|| mousePosition.x > fMouseClickedPosition.x + 2.0)
+					&& !fColumnDragging) {
+					// user is initiating a drag
+					if ((fDragGroup->flags & CLV_NOT_MOVABLE) != 0) {
+						// not allowed to drag this column - terminate the click
+						Invalidate(BRect(fColumnClicked->fColumnBegin,
+							bounds.top, fColumnClicked->fColumnEnd,
+							bounds.bottom));
 						fColumnClicked = NULL;
-					}
-					else
-					{
-						//Actually initiate a drag
+					} else {
+						// actually initiate a drag
 						fColumnDragging = true;
-						fPrevDragOutlineLeft = -1.0;
-						fPrevDragOutlineRight = -1.0;
+						fPreviousDragOutlineLeft = -1.0;
+						fPreviousDragOutlineRight = -1.0;
 					}
 				}
 
-				//Now deal with dragging
-				if(fColumnDragging)
-				{
-					//User is dragging
-					if(MousePos.x<fPreviousMousePos.x || MousePos.x>fPreviousMousePos.x)
-					{
-						//Mouse moved since I last checked
-						ViewBounds = Bounds();
+				// now deal with dragging
+				if (fColumnDragging) {
+					// user is dragging
+					if (mousePosition.x < fPreviousMousePosition.x
+						|| mousePosition.x > fPreviousMousePosition.x) {
+						// mouse moved since I last checked
+						bounds = Bounds();
 
-						bool ColumnSnapped;
-						do
-						{
-							//Live dragging of columns
-							ColumnSnapped = false;
-							float ColumnsUpdateLeft = 0;
-							float ColumnsUpdateRight = 0;
+						bool hasColumnSnapped;
+						do {
+							// live dragging of columns
+							hasColumnSnapped = false;
+							float columnsUpdateLeft = 0;
+							float columnsUpdateRight = 0;
 							float MainViewUpdateLeft = 0;
 							float MainViewUpdateRight = 0;
-							CLVColumn* LastSwapColumn = NULL;
-							if(fSnapMin != -1.0 && MousePos.x < fSnapMin)
-							{
-								//Shift the group left
-								ColumnsUpdateLeft = fTheShownGroupBefore->GroupBegin;
-								ColumnsUpdateRight = fTheDragGroup->GroupEnd;
-								MainViewUpdateLeft = ColumnsUpdateLeft;
-								MainViewUpdateRight = ColumnsUpdateRight;
-								LastSwapColumn = fTheShownGroupBefore->LastColumnShown;
-								if(fTheDragGroup->LastColumnShown->fFlags & CLV_MERGE_WITH_RIGHT)
-									ColumnsUpdateRight += 1.0;
-								else if(fTheShownGroupBefore->LastColumnShown->fFlags & CLV_MERGE_WITH_RIGHT)
-									ColumnsUpdateRight += 1.0;
-								ShiftDragGroup(fSnapGroupBefore);
-								ColumnSnapped = true;
+							CLVColumn* lastSwapColumn = NULL;
+							if (fSnapMin != -1.0
+								&& mousePosition.x < fSnapMin) {
+								// shift the group left
+								columnsUpdateLeft
+									= fShownGroupBefore->groupBeginIndex;
+								columnsUpdateRight = fDragGroup->groupEndIndex;
+								MainViewUpdateLeft = columnsUpdateLeft;
+								MainViewUpdateRight = columnsUpdateRight;
+								lastSwapColumn
+									= fShownGroupBefore->lastColumnShown;
+								if ((fDragGroup->lastColumnShown->fFlags
+										& CLV_MERGE_WITH_RIGHT) != 0) {
+									columnsUpdateRight += 1.0;
+								} else if ((fShownGroupBefore->
+									lastColumnShown->fFlags
+										& CLV_MERGE_WITH_RIGHT) != 0) {
+									columnsUpdateRight += 1.0;
+								}
+
+								ShiftDragGroup(fSnapGroupBeforeIndex);
+								hasColumnSnapped = true;
 							}
-							if(fSnapMax != -1.0 && MousePos.x > fSnapMax)
-							{
-								//Shift the group right
-								ColumnsUpdateLeft = fTheDragGroup->GroupBegin;
-								ColumnsUpdateRight = fTheShownGroupAfter->GroupEnd;
-								MainViewUpdateLeft = ColumnsUpdateLeft;
-								MainViewUpdateRight = ColumnsUpdateRight;
-								LastSwapColumn = fTheDragGroup->LastColumnShown;
-								if(fTheDragGroup->LastColumnShown->fFlags & CLV_MERGE_WITH_RIGHT)
-									ColumnsUpdateRight += 1.0;
-								else if(fTheShownGroupAfter->LastColumnShown->fFlags & CLV_MERGE_WITH_RIGHT)
-									ColumnsUpdateRight += 1.0;
-								ShiftDragGroup(fSnapGroupAfter+1);
-								ColumnSnapped = true;
+
+							if (fSnapMax != -1.0
+								&& mousePosition.x > fSnapMax) {
+								// shift the group right
+								columnsUpdateLeft = fDragGroup->groupBeginIndex;
+								columnsUpdateRight
+									= fShownGroupAfter->groupEndIndex;
+								MainViewUpdateLeft = columnsUpdateLeft;
+								MainViewUpdateRight = columnsUpdateRight;
+								lastSwapColumn = fDragGroup->lastColumnShown;
+								if ((fDragGroup->lastColumnShown->fFlags
+										& CLV_MERGE_WITH_RIGHT) != 0) {
+									columnsUpdateRight += 1.0;
+								} else if ((fShownGroupAfter
+									->lastColumnShown->fFlags
+										& CLV_MERGE_WITH_RIGHT) != 0) {
+									columnsUpdateRight += 1.0;
+								}
+								ShiftDragGroup(fSnapGroupAfterIndex + 1);
+								hasColumnSnapped = true;
 							}
-							if(ColumnSnapped)
-							{
-								//Redraw the snapped column labels
-								Invalidate(BRect(ColumnsUpdateLeft,ViewBounds.top,ColumnsUpdateRight,
-									ViewBounds.bottom));
-								BRect MainViewBounds = fParent->Bounds();
-								//Modify MainViewUpdateRight if more columns are pushed by expanders
-								if(LastSwapColumn->fFlags & CLV_EXPANDER ||
-									(LastSwapColumn->fPushedByExpander && (LastSwapColumn->fFlags &
-									CLV_PUSH_PASS)))
-								{
-									int32 NumberOfColumns = fDisplayList->CountItems();
-									for(int32 ColumnCounter = fDisplayList->IndexOf(LastSwapColumn)+1;
-										ColumnCounter < NumberOfColumns; ColumnCounter++)
-									{
-										CLVColumn* ThisColumn =
-											(CLVColumn*)fDisplayList->ItemAt(ColumnCounter);
-										if(ThisColumn->IsShown())
-										{
-											if(ThisColumn->fPushedByExpander)
-												MainViewUpdateRight = ThisColumn->fColumnEnd;
+
+							if (hasColumnSnapped) {
+								// redraw the snapped column labels
+								Invalidate(BRect(columnsUpdateLeft,
+									bounds.top, columnsUpdateRight,
+									bounds.bottom));
+								BRect mainBounds = fParent->Bounds();
+								// modify MainViewUpdateRight if more
+								// columns are pushed by expanders
+								if ((lastSwapColumn->fFlags & CLV_EXPANDER) != 0
+										|| (lastSwapColumn->fPushedByExpander
+									&& ((lastSwapColumn->fFlags & CLV_PUSH_PASS)
+										!= 0))) {
+									int32 columnCount
+										= fDisplayList->CountItems();
+									for (int32 j = fDisplayList->IndexOf(
+											lastSwapColumn) + 1;
+										j < columnCount; j++) {
+										CLVColumn* column =
+											(CLVColumn*)fDisplayList->ItemAt(j);
+										if (column->IsShown()) {
+											if (column->fPushedByExpander)
+												MainViewUpdateRight
+													= column->fColumnEnd;
 											else
 												break;
 										}
 									}
 								}
-								fParent->Invalidate(BRect(MainViewUpdateLeft,MainViewBounds.top,
-									MainViewUpdateRight,MainViewBounds.bottom));
+								fParent->Invalidate(BRect(MainViewUpdateLeft,
+									mainBounds.top, MainViewUpdateRight,
+									mainBounds.bottom));
 							}
-						}while(ColumnSnapped);
-						//Erase and redraw the drag rectangle but not the interior to avoid label flicker
-						float Min = fPrevDragOutlineLeft;
-						float Max = fPrevDragOutlineRight;
-						float Min2 = MousePos.x-fDragBoxMouseHoldOffset;
-						float GroupBegin = ((CLVDragGroup*)fDragGroups.ItemAt(fDragGroup))->GroupBegin;
-						if(Min2 < GroupBegin && fSnapGroupBefore == -1)
-							Min2 = GroupBegin;
-						if(Min2 > GroupBegin && fSnapGroupAfter == -1)
-							Min2 = GroupBegin;
-						float Max2 = Min2 + fDragBoxWidth;
+						} while (hasColumnSnapped);
+						// erase and redraw the drag rectangle but not the
+						// interior to avoid label flicker
+						float min = fPreviousDragOutlineLeft;
+						float max = fPreviousDragOutlineRight;
+						float min2 = mousePosition.x - fDragBoxMouseHoldOffset;
+						float groupBegin = ((CLVDragGroup*)fDragGroupsList.ItemAt(
+							fDragGroupIndex))->groupBeginIndex;
+						if (min2 < groupBegin && fSnapGroupBeforeIndex == -1)
+							min2 = groupBegin;
+
+						if (min2 > groupBegin && fSnapGroupAfterIndex == -1)
+							min2 = groupBegin;
+
+						float max2 = min2 + fDragBoxWidth;
 						float Temp;
-						if(Min2 < Min || Min == -1.0)
-							{Temp = Min2;Min2 = Min;Min = Temp;}
-						if(Max2 > Max || Max == -1.0)
-							{Temp = Max2;Max2 = Max;Max = Temp;}
-						Invalidate(BRect(Min,ViewBounds.top+1.0,Min,ViewBounds.bottom-1.0));
-						if(Min2 != -1.0)
-							Invalidate(BRect(Min2,ViewBounds.top+1.0,Min2,ViewBounds.bottom-1.0));
-						Invalidate(BRect(Max,ViewBounds.top+1.0,Max,ViewBounds.bottom-1.0));
-						if(Max2 != -1.0)
-							Invalidate(BRect(Max2,ViewBounds.top+1.0,Max2,ViewBounds.bottom-1.0));
-						Invalidate(BRect(Min,ViewBounds.top,Max,ViewBounds.top));
-						Invalidate(BRect(Min,ViewBounds.bottom,Max,ViewBounds.bottom));
+						if (min2 < min || min == -1.0) {
+							Temp = min2;
+							min2 = min;
+							min = Temp;
+						}
+
+						if (max2 > max || max == -1.0) {
+							Temp = max2;
+							max2 = max;
+							max = Temp;
+						}
+						Invalidate(BRect(min, bounds.top + 1.0, min,
+							bounds.bottom - 1.0));
+						if (min2 != -1.0) {
+							Invalidate(BRect(min2, bounds.top + 1.0, min2,
+								bounds.bottom - 1.0));
+						}
+						Invalidate(BRect(max, bounds.top + 1.0, max,
+							bounds.bottom - 1.0));
+						if (max2 != -1.0) {
+							Invalidate(BRect(max2, bounds.top + 1.0, max2,
+								bounds.bottom - 1.0));
+						}
+						Invalidate(BRect(min, bounds.top, max, bounds.top));
+						Invalidate(BRect(min, bounds.bottom, max,
+							bounds.bottom));
+					}
+				}
+			} else {
+				// user is resizing the column
+				if (mousePosition.x < fPreviousMousePosition.x
+					|| mousePosition.x > fPreviousMousePosition.x) {
+					float newWidth = mousePosition.x - fResizeMouseHoldOffset
+						- fColumnClicked->fColumnBegin;
+					if (newWidth < fColumnClicked->fMinWidth)
+						newWidth = fColumnClicked->fMinWidth;
+
+					if (newWidth != fColumnClicked->fWidth) {
+						fColumnClicked->SetWidth(newWidth);
+						fParent->ColumnWidthChanged(fParent->IndexOfColumn(
+							fColumnClicked), newWidth);
 					}
 				}
 			}
-			else
-			{
-				//User is resizing the column
-				if(MousePos.x<fPreviousMousePos.x || MousePos.x>fPreviousMousePos.x)
-				{
-					float NewWidth = MousePos.x - fResizeMouseHoldOffset - fColumnClicked->fColumnBegin;
-					if(NewWidth < fColumnClicked->fMinWidth)
-						NewWidth = fColumnClicked->fMinWidth;
-					if(NewWidth != fColumnClicked->fWidth)
-					{
-						fColumnClicked->SetWidth(NewWidth);
-						fParent->ColumnWidthChanged(fParent->IndexOfColumn(fColumnClicked),NewWidth);
-					}
-				}
-			}
-		}
-		else if(Buttons == 0)
-		{
-			//Mouse button was released
-			if(!fColumnDragging && !fColumnResizing)
-			{
-				//Column was clicked
-				if(ColumnFlags&CLV_SORT_KEYABLE)
-				{
-					//The column is a "sortable" column
-					if(!(Modifiers&B_SHIFT_KEY))
-					{
-						//The user wants to select it as the main sorting column
-						if(fParent->fSortKeyList.ItemAt(0) == fColumnClicked)
-							//The column was already selected; switch sort modes
-							fParent->ReverseSortMode(fParent->fColumnList.IndexOf(fColumnClicked));
-						else
+		} else if (buttons == 0) {
+			// mouse button was released
+			if (!fColumnDragging && !fColumnResizing) {
+				// column was clicked
+				if ((columnFlags & CLV_SORT_KEYABLE) != 0) {
+					// column is a "sortable" column
+					if ((modifiers & B_SHIFT_KEY) == 0) {
+						// user wants to select it as the main sorting column
+						if (fParent->fSortKeyList.ItemAt(0) == fColumnClicked) {
+							// column was already selected; switch sort modes
+							fParent->ReverseSortMode(
+								fParent->fColumnList.IndexOf(fColumnClicked));
+						} else {
 							//The user selected this column for sorting
-							fParent->SetSortKey(fParent->fColumnList.IndexOf(fColumnClicked));
-					}
-					else
-					{
-						//The user wants to add it as a secondary sorting column
-						if(fParent->fSortKeyList.HasItem(fColumnClicked))
-							//The column was already selected; switch sort modes
-							fParent->ReverseSortMode(fParent->fColumnList.IndexOf(fColumnClicked));
-						else
-							//The user selected this column for sorting
-							fParent->AddSortKey(fParent->fColumnList.IndexOf(fColumnClicked));
+							fParent->SetSortKey(
+								fParent->fColumnList.IndexOf(fColumnClicked));
+						}
+					} else {
+						// user wants to add it as a secondary sorting column
+						if (fParent->fSortKeyList.HasItem(fColumnClicked)) {
+							// column was already selected; switch sort modes
+							fParent->ReverseSortMode(
+								fParent->fColumnList.IndexOf(fColumnClicked));
+						} else {
+							// user selected this column for sorting
+							fParent->AddSortKey(
+								fParent->fColumnList.IndexOf(fColumnClicked));
+						}
 					}
 				}
+			} else if (fColumnDragging) {
+				// column was dragging; erase the drag box but not
+				// the interior to avoid label flicker
+				Invalidate(BRect(fPreviousDragOutlineLeft, bounds.top + 1.0,
+					fPreviousDragOutlineLeft, bounds.bottom - 1.0));
+				Invalidate(BRect(fPreviousDragOutlineRight, bounds.top + 1.0,
+					fPreviousDragOutlineRight, bounds.bottom - 1.0));
+				Invalidate(BRect(fPreviousDragOutlineLeft, bounds.top,
+					fPreviousDragOutlineRight, bounds.top));
+				Invalidate(BRect(fPreviousDragOutlineLeft, bounds.bottom,
+					fPreviousDragOutlineRight, bounds.bottom));
+			} else {
+				// column was resizing; erase the drag tab
+				Invalidate(BRect(fColumnClicked->fColumnEnd,
+					bounds.top, fColumnClicked->fColumnEnd,
+					bounds.bottom));
 			}
-			else if(fColumnDragging)
-			{
-				//Column was dragging; erase the drag box but not the interior to avoid label flicker
-				Invalidate(BRect(fPrevDragOutlineLeft,ViewBounds.top+1.0,
-					fPrevDragOutlineLeft,ViewBounds.bottom-1.0));
-				Invalidate(BRect(fPrevDragOutlineRight,ViewBounds.top+1.0,
-					fPrevDragOutlineRight,ViewBounds.bottom-1.0));
-				Invalidate(BRect(fPrevDragOutlineLeft,ViewBounds.top,
-					fPrevDragOutlineRight,ViewBounds.top));
-				Invalidate(BRect(fPrevDragOutlineLeft,ViewBounds.bottom,
-					fPrevDragOutlineRight,ViewBounds.bottom));
-			}
-			else
-				//Column was resizing; erase the drag tab
-				Invalidate(BRect(fColumnClicked->fColumnEnd,ViewBounds.top,fColumnClicked->fColumnEnd,
-					ViewBounds.bottom));
-			//Unhighlight the label and forget the column
-			Invalidate(BRect(fColumnClicked->fColumnBegin+1.0,ViewBounds.top+1.0,
-				fColumnClicked->fColumnEnd-1.0,ViewBounds.bottom-1.0));
+
+			// unhighlight the label and forget the column
+			Invalidate(BRect(fColumnClicked->fColumnBegin + 1.0,
+				bounds.top + 1.0, fColumnClicked->fColumnEnd - 1.0,
+				bounds.bottom - 1.0));
+			fColumnClicked = NULL;
+			fColumnDragging = false;
+			fColumnResizing = false;
+		} else {
+			// unused button combination, unhighlight the label and
+			// forget the column
+			Invalidate(BRect(fColumnClicked->fColumnBegin + 1.0,
+				bounds.top + 1.0, fColumnClicked->fColumnEnd - 1.0,
+				bounds.bottom - 1.0));
 			fColumnClicked = NULL;
 			fColumnDragging = false;
 			fColumnResizing = false;
 		}
-		else
-		{
-			//Unused button combination
-			//Unhighlight the label and forget the column
-			Invalidate(BRect(fColumnClicked->fColumnBegin+1.0,ViewBounds.top+1.0,
-				fColumnClicked->fColumnEnd-1.0,ViewBounds.bottom-1.0));
-			fColumnClicked = NULL;
-			fColumnDragging = false;
-			fColumnResizing = false;
-		}
-		fPreviousMousePos = MousePos;
+
+		fPreviousMousePosition = mousePosition;
 	}
 }
 
 
-void CLVColumnLabelView::ShiftDragGroup(int32 NewPos)
-//Shift the drag group into a new position
+// Shift the drag group into a new position
+void
+CLVColumnLabelView::ShiftDragGroup(int32 newPosition)
 {
-	int32 NumberOfGroups = fDragGroups.CountItems();
-	int32 GroupCounter;
-	CLVDragGroup* ThisGroup;
-	int32 ColumnCounter;
-	BList NewDisplayList;
+	int32 groupCount = fDragGroupsList.CountItems();
+	CLVDragGroup* group;
+	BList newDisplayList;
 
 	//Copy the groups up to the new position
-	for(GroupCounter = 0; GroupCounter < NewPos; GroupCounter++)
-	{
-		if(GroupCounter != fDragGroup)
-		{
-			ThisGroup = (CLVDragGroup*)fDragGroups.ItemAt(GroupCounter);
-			for(ColumnCounter = ThisGroup->GroupStartDispListIndex; ColumnCounter <=
-				ThisGroup->GroupStopDispListIndex; ColumnCounter++)
-			NewDisplayList.AddItem(fDisplayList->ItemAt(ColumnCounter));
-		}
-	}
-	//Copy the group into the new position
-	ThisGroup = (CLVDragGroup*)fDragGroups.ItemAt(fDragGroup);
-	for(ColumnCounter = ThisGroup->GroupStartDispListIndex; ColumnCounter <=
-		ThisGroup->GroupStopDispListIndex; ColumnCounter++)
-	NewDisplayList.AddItem(fDisplayList->ItemAt(ColumnCounter));
-	//Copy the rest of the groups, but skip the dragging group
-	for(GroupCounter = NewPos; GroupCounter < NumberOfGroups; GroupCounter++)
-	{
-		if(GroupCounter != fDragGroup)
-		{
-			ThisGroup = (CLVDragGroup*)fDragGroups.ItemAt(GroupCounter);
-			for(ColumnCounter = ThisGroup->GroupStartDispListIndex; ColumnCounter <=
-				ThisGroup->GroupStopDispListIndex; ColumnCounter++)
-			NewDisplayList.AddItem(fDisplayList->ItemAt(ColumnCounter));
+	for (int32 i = 0; i < newPosition; i++) {
+		if (i != fDragGroupIndex) {
+			group = (CLVDragGroup*)fDragGroupsList.ItemAt(i);
+			for (int32 j = group->groupStartDisplayListIndex;
+					j <= group->groupStopDisplayListIndex; j++) {
+				newDisplayList.AddItem(fDisplayList->ItemAt(j));
+			}
 		}
 	}
 
-	//Set the new order
-	*fDisplayList = NewDisplayList;
+	// copy the group into the new position
+	group = (CLVDragGroup*)fDragGroupsList.ItemAt(fDragGroupIndex);
+	for (int32 j = group->groupStartDisplayListIndex;
+			j <= group->groupStopDisplayListIndex; j++) {
+		newDisplayList.AddItem(fDisplayList->ItemAt(j));
+	}
 
-	//Update columns and drag groups
-	fParent->UpdateColumnSizesDataRectSizeScrollBars();
+	// copy the rest of the groups, but skip the dragging group
+	for (int32 i = newPosition; i < groupCount; i++) {
+		if (i != fDragGroupIndex) {
+			group = (CLVDragGroup*)fDragGroupsList.ItemAt(i);
+			for (int32 j = group->groupStartDisplayListIndex;
+					j <= group->groupStopDisplayListIndex; j++) {
+				newDisplayList.AddItem(fDisplayList->ItemAt(j));
+			}
+		}
+	}
+
+	// set the new order
+	*fDisplayList = newDisplayList;
+
+	// update columns and drag groups
+	fParent->ShiftDragGroup();
 	UpdateDragGroups();
 	SetSnapMinMax();
 
-	//Inform the program that the display order changed
-	int32* NewOrder = fParent->DisplayOrder();
-	fParent->DisplayOrderChanged(NewOrder);
-	delete[] NewOrder;
+	// inform the program that the display order changed
+	int32* newOrder = fParent->DisplayOrder();
+	fParent->DisplayOrderChanged(newOrder);
+	delete[] newOrder;
 }
 
 
-void CLVColumnLabelView::UpdateDragGroups()
+// Make a copy of the DragGroups list, use it to store
+// the CLVDragGroup's for recycling.
+void
+CLVColumnLabelView::UpdateDragGroups()
 {
-	//Make a copy of the DragGroups list.  Use it to store the CLVDragGroup's for recycling
-	BList TempList(fDragGroups);
-	fDragGroups.MakeEmpty();
-	int32 NumberOfColumns = fDisplayList->CountItems();
-	bool ContinueGroup = false;
+	BList tempList(fDragGroupsList);
+	fDragGroupsList.MakeEmpty();
+	int32 columnCount = fDisplayList->CountItems();
+	bool shouldContinueGroup = false;
 	CLVDragGroup* CurrentGroup = NULL;
-	for(int32 Counter = 0; Counter < NumberOfColumns; Counter++)
-	{
-		CLVColumn* CurrentColumn = (CLVColumn*)fDisplayList->ItemAt(Counter);
-		if(!ContinueGroup)
-		{
-			//Recycle or obtain a new CLVDragGroup
-			CurrentGroup = (CLVDragGroup*)TempList.RemoveItem(int32(0));
-			if(CurrentGroup == NULL)
+
+	for (int32 i = 0; i < columnCount; i++) {
+		CLVColumn* CurrentColumn = (CLVColumn*)fDisplayList->ItemAt(i);
+		if (!shouldContinueGroup) {
+			// recycle or obtain a new CLVDragGroup
+			CurrentGroup = (CLVDragGroup*)tempList.RemoveItem(int32(0));
+			if (CurrentGroup == NULL)
 				CurrentGroup = new CLVDragGroup;
-			//Add the CLVDragGroup to the DragGroups list
-			fDragGroups.AddItem(CurrentGroup);
-			//Set up the new DragGroup
-			CurrentGroup->GroupStartDispListIndex = Counter;
-			CurrentGroup->GroupStopDispListIndex = Counter;
-			CurrentGroup->Flags = 0;
-			if(CurrentColumn->IsShown())
-			{
-				CurrentGroup->GroupBegin = CurrentColumn->fColumnBegin;
-				CurrentGroup->GroupEnd = CurrentColumn->fColumnEnd;
-				CurrentGroup->LastColumnShown = CurrentColumn;
-				CurrentGroup->Shown = true;
-				if(CurrentColumn->fFlags & CLV_LOCK_AT_BEGINNING)
-					CurrentGroup->AllLockBeginning = true;
+
+			// add the CLVDragGroup to the DragGroups list
+			fDragGroupsList.AddItem(CurrentGroup);
+			// set up the new DragGroup
+			CurrentGroup->groupStartDisplayListIndex = i;
+			CurrentGroup->groupStopDisplayListIndex = i;
+			CurrentGroup->flags = 0;
+
+			if (CurrentColumn->IsShown()) {
+				CurrentGroup->groupBeginIndex = CurrentColumn->fColumnBegin;
+				CurrentGroup->groupEndIndex = CurrentColumn->fColumnEnd;
+				CurrentGroup->lastColumnShown = CurrentColumn;
+				CurrentGroup->isShown = true;
+				if (CurrentColumn->fFlags & CLV_LOCK_AT_BEGINNING)
+					CurrentGroup->isAllLockBeginning = true;
 				else
-					CurrentGroup->AllLockBeginning = false;
-				if(CurrentColumn->fFlags & CLV_LOCK_AT_END)
-					CurrentGroup->AllLockEnd = true;
+					CurrentGroup->isAllLockBeginning = false;
+
+				if (CurrentColumn->fFlags & CLV_LOCK_AT_END)
+					CurrentGroup->isAllLockEnd = true;
 				else
-					CurrentGroup->AllLockEnd = false;
+					CurrentGroup->isAllLockEnd = false;
+			} else {
+				CurrentGroup->groupBeginIndex = -1.0;
+				CurrentGroup->groupEndIndex = -1.0;
+				CurrentGroup->lastColumnShown = NULL;
+				CurrentGroup->isShown = false;
+				if (CurrentColumn->fFlags & CLV_LOCK_AT_BEGINNING)
+					CurrentGroup->isAllLockBeginning = true;
+				else
+					CurrentGroup->isAllLockBeginning = false;
+				if (CurrentColumn->fFlags & CLV_LOCK_AT_END)
+					CurrentGroup->isAllLockEnd = true;
+				else
+					CurrentGroup->isAllLockEnd = false;
 			}
-			else
-			{
-				CurrentGroup->GroupBegin = -1.0;
-				CurrentGroup->GroupEnd = -1.0;
-				CurrentGroup->LastColumnShown = NULL;
-				CurrentGroup->Shown = false;
-				if(CurrentColumn->fFlags & CLV_LOCK_AT_BEGINNING)
-					CurrentGroup->AllLockBeginning = true;
-				else
-					CurrentGroup->AllLockBeginning = false;
-				if(CurrentColumn->fFlags & CLV_LOCK_AT_END)
-					CurrentGroup->AllLockEnd = true;
-				else
-					CurrentGroup->AllLockEnd = false;
+		} else {
+			// add this column to the current DragGroup
+			CurrentGroup->groupStopDisplayListIndex = i;
+			if (CurrentColumn->IsShown()) {
+				if (CurrentGroup->groupBeginIndex == -1.0)
+					CurrentGroup->groupBeginIndex = CurrentColumn->fColumnBegin;
+				CurrentGroup->groupEndIndex = CurrentColumn->fColumnEnd;
+				CurrentGroup->lastColumnShown = CurrentColumn;
+				CurrentGroup->isShown = true;
 			}
+			if ((CurrentColumn->fFlags & CLV_LOCK_AT_BEGINNING) == 0)
+				CurrentGroup->isAllLockBeginning = false;
+			if ((CurrentColumn->fFlags & CLV_LOCK_AT_END) == 0)
+				CurrentGroup->isAllLockEnd = false;
 		}
+
+		CurrentGroup->flags = CurrentColumn->fFlags
+			& (CLV_NOT_MOVABLE | CLV_LOCK_AT_BEGINNING
+				| CLV_LOCK_AT_END);
+		// see if I should add more columns to this group
+		if (CurrentColumn->fFlags & CLV_LOCK_WITH_RIGHT)
+			shouldContinueGroup = true;
 		else
-		{
-			//Add this column to the current DragGroup
-			CurrentGroup->GroupStopDispListIndex = Counter;
-			if(CurrentColumn->IsShown())
-			{
-				if(CurrentGroup->GroupBegin == -1.0)
-					CurrentGroup->GroupBegin = CurrentColumn->fColumnBegin;
-				CurrentGroup->GroupEnd = CurrentColumn->fColumnEnd;
-				CurrentGroup->LastColumnShown = CurrentColumn;
-				CurrentGroup->Shown = true;
-			}
-			if(!(CurrentColumn->fFlags & CLV_LOCK_AT_BEGINNING))
-				CurrentGroup->AllLockBeginning = false;
-			if(!(CurrentColumn->fFlags & CLV_LOCK_AT_END))
-				CurrentGroup->AllLockEnd = false;
-		}
-		CurrentGroup->Flags |= CurrentColumn->fFlags & (CLV_NOT_MOVABLE|CLV_LOCK_AT_BEGINNING|
-			CLV_LOCK_AT_END);
-		//See if I should add more columns to this group
-		if(CurrentColumn->fFlags & CLV_LOCK_WITH_RIGHT)
-			ContinueGroup = true;
-		else
-			ContinueGroup = false;
+			shouldContinueGroup = false;
 	}
-	//If any unused groups remain in TempList, delete them
-	while((CurrentGroup = (CLVDragGroup*)TempList.RemoveItem(int32(0))) != NULL)
+	// if any unused groups remain in tempList, delete them
+	while ((CurrentGroup = (CLVDragGroup*)tempList.RemoveItem(int32(0)))
+			!= NULL) {
 		delete CurrentGroup;
+	}
 }
 
 
-void CLVColumnLabelView::SetSnapMinMax()
+// find the column group that the user is dragging and the shown
+// group before it
+void
+CLVColumnLabelView::SetSnapMinMax()
 {
-	//Find the column group that the user is dragging and the shown group before it
-	int32 NumberOfGroups = fDragGroups.CountItems();
-	int32 ColumnCount;
-	fDragGroup = -1;
-	fTheShownGroupBefore = NULL;
-	fSnapGroupBefore = -1;
-	CLVDragGroup* ThisGroup;
-	int32 GroupCounter;
-	for(GroupCounter = 0; GroupCounter < NumberOfGroups; GroupCounter++)
-	{
-		ThisGroup = (CLVDragGroup*)fDragGroups.ItemAt(GroupCounter);
-		for(ColumnCount = ThisGroup->GroupStartDispListIndex; ColumnCount <=
-			ThisGroup->GroupStopDispListIndex; ColumnCount++)
-			if(fDisplayList->ItemAt(ColumnCount) == fColumnClicked)
-			{
-				fDragGroup = GroupCounter;
-				fTheDragGroup = ThisGroup;
+	int32 groupCount = fDragGroupsList.CountItems();
+	int32 columnCount;
+	fDragGroupIndex = -1;
+	fShownGroupBefore = NULL;
+	fSnapGroupBeforeIndex = -1;
+	CLVDragGroup* group;
+	for (int32 i = 0; i < groupCount; i++) {
+		group = (CLVDragGroup*)fDragGroupsList.ItemAt(i);
+		for (columnCount = group->groupStartDisplayListIndex;
+			columnCount <= group->groupStopDisplayListIndex; columnCount++) {
+			if (fDisplayList->ItemAt(columnCount) == fColumnClicked) {
+				fDragGroupIndex = i;
+				fDragGroup = group;
 				break;
 			}
-		if(fDragGroup != -1)
+		}
+
+		if (fDragGroupIndex != -1)
 			break;
-		else if(ThisGroup->Shown)
-		{
-			fTheShownGroupBefore = ThisGroup;
-			fSnapGroupBefore = GroupCounter;
+		else if (group->isShown) {
+			fShownGroupBefore = group;
+			fSnapGroupBeforeIndex = i;
 		}
 	}
 
-	//Find the position of shown group after the one that the user is dragging
-	fTheShownGroupAfter = NULL;
-	fSnapGroupAfter = -1;
-	for(GroupCounter = fDragGroup+1; GroupCounter < NumberOfGroups; GroupCounter++)
-	{
-		ThisGroup = (CLVDragGroup*)fDragGroups.ItemAt(GroupCounter);
-		if(ThisGroup->Shown)
-		{
-			fTheShownGroupAfter = ThisGroup;
-			fSnapGroupAfter = GroupCounter;
+	// find the position of shown group after the one that the user is dragging
+	fShownGroupAfter = NULL;
+	fSnapGroupAfterIndex = -1;
+	for (int32 i = fDragGroupIndex + 1; i < groupCount; i++) {
+		group = (CLVDragGroup*)fDragGroupsList.ItemAt(i);
+		if (group->isShown) {
+			fShownGroupAfter = group;
+			fSnapGroupAfterIndex = i;
 			break;
 		}
 	}
 
-	//See if it can actually snap in the given direction
-	if(fSnapGroupBefore != -1)
-	{
-		if(fTheShownGroupBefore->Flags & CLV_LOCK_AT_BEGINNING)
-			if(!fTheDragGroup->AllLockBeginning)
-				fSnapGroupBefore = -1;
-		if(fTheDragGroup->Flags & CLV_LOCK_AT_END)
-			if(!fTheShownGroupBefore->AllLockEnd)
-				fSnapGroupBefore = -1;
+	// see if it can actually snap in the given direction
+	if (fSnapGroupBeforeIndex != -1) {
+		if ((fShownGroupBefore->flags & CLV_LOCK_AT_BEGINNING) != 0
+			&& !fDragGroup->isAllLockBeginning) {
+			fSnapGroupBeforeIndex = -1;
+		}
+		if ((fDragGroup->flags & CLV_LOCK_AT_END) != 0
+			&& !fShownGroupBefore->isAllLockEnd) {
+			fSnapGroupBeforeIndex = -1;
+		}
 	}
-	if(fSnapGroupAfter != -1)
-	{
-		if(fTheShownGroupAfter->Flags & CLV_LOCK_AT_END)
-			if(!fTheDragGroup->AllLockEnd)
-				fSnapGroupAfter = -1;
-		if(fTheDragGroup->Flags & CLV_LOCK_AT_BEGINNING)
-			if(!fTheShownGroupAfter->AllLockBeginning)
-				fSnapGroupAfter = -1;
+	if (fSnapGroupAfterIndex != -1) {
+		if (fShownGroupAfter->flags & CLV_LOCK_AT_END
+			&& !fDragGroup->isAllLockEnd) {
+				fSnapGroupAfterIndex = -1;
+		}
+		if (fDragGroup->flags & CLV_LOCK_AT_BEGINNING
+			&& !fShownGroupAfter->isAllLockBeginning) {
+				fSnapGroupAfterIndex = -1;
+		}
 	}
 
-	//Find the minumum and maximum positions for the group to snap
+	// find the minumum and maximum positions for the group to snap
 	fSnapMin = -1.0;
 	fSnapMax = -1.0;
-	fDragBoxWidth = fTheDragGroup->GroupEnd-fTheDragGroup->GroupBegin;
-	if(fSnapGroupBefore != -1)
-	{
-		fSnapMin = fTheShownGroupBefore->GroupBegin + fDragBoxWidth;
-		if(fSnapMin > fTheShownGroupBefore->GroupEnd)
-			fSnapMin = fTheShownGroupBefore->GroupEnd;
+	fDragBoxWidth = fDragGroup->groupEndIndex - fDragGroup->groupBeginIndex;
+	if (fSnapGroupBeforeIndex != -1) {
+		fSnapMin = fShownGroupBefore->groupBeginIndex + fDragBoxWidth;
+		if (fSnapMin > fShownGroupBefore->groupEndIndex)
+			fSnapMin = fShownGroupBefore->groupEndIndex;
 	}
-	if(fSnapGroupAfter != -1)
-	{
-		fSnapMax = fTheShownGroupAfter->GroupEnd - fDragBoxWidth;
-		if(fSnapMax < fTheShownGroupAfter->GroupBegin)
-			fSnapMax = fTheShownGroupAfter->GroupBegin;
+	if (fSnapGroupAfterIndex != -1){
+		fSnapMax = fShownGroupAfter->groupEndIndex - fDragBoxWidth;
+		if (fSnapMax < fShownGroupAfter->groupBeginIndex)
+			fSnapMax = fShownGroupAfter->groupBeginIndex;
 	}
 }

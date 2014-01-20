@@ -1,11 +1,18 @@
-//CLVListItem source file
+/*
+ * Copyright 1999-2009 Jeremy Friesner
+ * Copyright 2009-2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jeremy Friesner
+ *		John Scipione, jscipione@gmail.com
+ */
 
 
-//******************************************************************************************************
-//**** PROJECT HEADER FILES
-//******************************************************************************************************
 #define CLVListItem_CPP
+
 #include <stdio.h>
+
 #include "CLVListItem.h"
 #include "ColumnListView.h"
 #include "CLVColumn.h"
@@ -13,162 +20,185 @@
 
 #include "InterfaceKit.h"
 
-//******************************************************************************************************
-//**** CLVItem CLASS DEFINITION
-//******************************************************************************************************
-CLVListItem::CLVListItem(uint32 level, bool superitem, bool expanded, float minheight)
-: BListItem(level, expanded),
-fExpanderButtonRect(-1.0,-1.0,-1.0,-1.0),
-fExpanderColumnRect(-1.0,-1.0,-1.0,-1.0),
-_selectedColumn(-1)
+
+CLVListItem::CLVListItem(uint32 level, bool superitem, bool expanded,
+	float minheight)
+	:
+	BListItem(level, expanded),
+	fExpanderButtonRect(-1.0, -1.0, -1.0, -1.0),
+	fExpanderColumnRect(-1.0, -1.0, -1.0, -1.0),
+	fSelectedColumn(-1)
 {
-	fSuperItem = superitem;
+	fIsSuperItem = superitem;
 	fOutlineLevel = level;
 	fMinHeight = minheight;
 }
 
 
 CLVListItem::~CLVListItem()
-{ }
-
-
-bool CLVListItem::IsSuperItem() const
 {
-	return fSuperItem;
 }
 
 
-void CLVListItem::SetSuperItem(bool superitem)
+bool
+CLVListItem::IsSuperItem() const
 {
-	fSuperItem = superitem;
+	return fIsSuperItem;
 }
 
 
-uint32 CLVListItem::OutlineLevel() const
+void
+CLVListItem::SetSuperItem(bool superitem)
+{
+	fIsSuperItem = superitem;
+}
+
+
+uint32
+CLVListItem::OutlineLevel() const
 {
 	return fOutlineLevel;
 }
 
-void CLVListItem::SetOutlineLevel(uint32 level)
+
+void
+CLVListItem::SetOutlineLevel(uint32 level)
 {
 	fOutlineLevel = level;
 }
 
-void CLVListItem::Pulse(BView * owner)
+
+void
+CLVListItem::Pulse(BView* owner)
 {
-    // empty
 }
 
-void CLVListItem::DrawItem(BView* owner, BRect itemRect, bool complete)
+void
+CLVListItem::DrawItem(BView* owner, BRect itemRect, bool complete)
 {
-	BList* DisplayList = &((ColumnListView*)owner)->fColumnDisplayList;
-	int32 NumberOfColumns = DisplayList->CountItems();
+	BList* displayList = &((ColumnListView*)owner)->fColumnDisplayList;
+	int32 columnCount = displayList->CountItems();
 	float PushMax = itemRect.right;
-	CLVColumn* ThisColumn;
-	BRect ThisColumnRect = itemRect;
-	float ExpanderDelta = OutlineLevel() * 20.0;
-	//Figure out what the limit is for expanders pushing other columns
-	for(int32 Counter = 0; Counter < NumberOfColumns; Counter++)
-	{
-		ThisColumn = (CLVColumn*)DisplayList->ItemAt(Counter);
-		if((ThisColumn->fFlags & CLV_EXPANDER) || ThisColumn->fPushedByExpander)
-			PushMax = ThisColumn->fColumnEnd;
+	CLVColumn* column;
+	BRect columnRect = itemRect;
+	float expanderDelta = OutlineLevel() * 20.0;
+	// figure out what the limit is for expanders pushing other columns
+	for (int32 i = 0; i < columnCount; i++) {
+		column = (CLVColumn*)displayList->ItemAt(i);
+		if((column->fFlags & CLV_EXPANDER) || column->fPushedByExpander)
+			PushMax = column->fColumnEnd;
 	}
+
 	BRegion ClippingRegion;
-	if(!complete)
+	if (!complete)
 		owner->GetClippingRegion(&ClippingRegion);
 	else
 		ClippingRegion.Set(itemRect);
+
 	float LastColumnEnd = -1.0;
 
-	//Draw the columns
-	for(int32 Counter = 0; Counter < NumberOfColumns; Counter++)
-	{
-		ThisColumn = (CLVColumn*)DisplayList->ItemAt(Counter);
-		if(!ThisColumn->IsShown())
+	// draw the columns
+	for (int32 Counter = 0; Counter < columnCount; Counter++) {
+		column = (CLVColumn*)displayList->ItemAt(Counter);
+		if(!column->IsShown())
 			continue;
-		ThisColumnRect.left = ThisColumn->fColumnBegin;
-		ThisColumnRect.right = LastColumnEnd = ThisColumn->fColumnEnd;
-		float Shift = 0.0;
-		if((ThisColumn->fFlags & CLV_EXPANDER) || ThisColumn->fPushedByExpander)
-			Shift = ExpanderDelta;
-		if(ThisColumn->fFlags & CLV_EXPANDER)
-		{
-			ThisColumnRect.right += Shift;
-			if(ThisColumnRect.right > PushMax)
-				ThisColumnRect.right = PushMax;
-			fExpanderColumnRect = ThisColumnRect;
-			if(ClippingRegion.Intersects(ThisColumnRect))
-			{
-				//Give the programmer a chance to do his kind of highlighting if the item is selected
-				int32 actualIndex = ((ColumnListView*)owner)->fColumnList.IndexOf(ThisColumn);
-				DrawItemColumn(owner, ThisColumnRect, actualIndex, (_selectedColumn == actualIndex), complete);
-				if(fSuperItem)
-				{
-					//Draw the expander, clip manually
-					float TopOffset = ceil((ThisColumnRect.bottom-ThisColumnRect.top-10.0)/2.0);
-					float LeftOffset = ThisColumn->fColumnEnd + Shift - 3.0 - 10.0;
-					float RightClip = LeftOffset + 10.0 - ThisColumnRect.right;
-					if(RightClip < 0.0)
-						RightClip = 0.0;
-					BBitmap* Arrow;
-					if(IsExpanded())
-						Arrow = &((ColumnListView*)owner)->fDownArrow;
+
+		columnRect.left = column->fColumnBegin;
+		columnRect.right = LastColumnEnd = column->fColumnEnd;
+		float shift = 0.0;
+		if ((column->fFlags & CLV_EXPANDER) || column->fPushedByExpander)
+			shift = expanderDelta;
+
+		if (column->fFlags & CLV_EXPANDER) {
+			columnRect.right += shift;
+			if(columnRect.right > PushMax)
+				columnRect.right = PushMax;
+
+			fExpanderColumnRect = columnRect;
+			if (ClippingRegion.Intersects(columnRect)) {
+				// give the programmer a chance to do his kind of
+				// highlighting if the item is selected
+				int32 actualIndex
+					= ((ColumnListView*)owner)->fColumnList.IndexOf(column);
+				DrawItemColumn(owner, columnRect, actualIndex,
+					(fSelectedColumn == actualIndex), complete);
+				if (fIsSuperItem) {
+					// draw the expander, clip manually
+					float top
+						= ceilf((columnRect.bottom-columnRect.top - 10.0)
+							/ 2.0);
+					float left = column->fColumnEnd + shift - 3.0 - 10.0;
+					float rightClip = left + 10.0 - columnRect.right;
+					if (rightClip < 0.0)
+						rightClip = 0.0;
+
+					BBitmap* arrow;
+					if (IsExpanded())
+						arrow = &((ColumnListView*)owner)->fDownArrow;
 					else
-						Arrow = &((ColumnListView*)owner)->fRightArrow;
-					if(LeftOffset <= ThisColumnRect.right)
-					{
-						fExpanderButtonRect.Set(LeftOffset,ThisColumnRect.top+TopOffset,
-							LeftOffset+10.0-RightClip,ThisColumnRect.top+TopOffset+10.0);
+						arrow = &((ColumnListView*)owner)->fRightArrow;
+
+					if (left <= columnRect.right) {
+						fExpanderButtonRect.Set(left, columnRect.top + top,
+							left + 10.0 - rightClip, columnRect.top + top + 10.0);
 						owner->SetDrawingMode(B_OP_OVER);
-						owner->DrawBitmap(Arrow, BRect(0.0,0.0,10.0-RightClip,10.0),fExpanderButtonRect);
+						owner->DrawBitmap(arrow,
+							BRect(0.0, 0.0, 10.0 - rightClip, 10.0),
+							fExpanderButtonRect);
 						owner->SetDrawingMode(B_OP_COPY);
-					}
-					else
-						fExpanderButtonRect.Set(-1.0,-1.0,-1.0,-1.0);
+					} else
+						fExpanderButtonRect.Set(-1.0, -1.0, -1.0, -1.0);
 				}
 			}
-		}
-		else
-		{
-			ThisColumnRect.left += Shift;
-			ThisColumnRect.right += Shift;
-			if(Shift > 0.0 && ThisColumnRect.right > PushMax)
-				ThisColumnRect.right = PushMax;
-			if(ThisColumnRect.right >= ThisColumnRect.left && ClippingRegion.Intersects(ThisColumnRect)) 
+		} else {
+			columnRect.left += shift;
+			columnRect.right += shift;
+			if (shift > 0.0 && columnRect.right > PushMax)
+				columnRect.right = PushMax;
+
+			if (columnRect.right >= columnRect.left
+				&& ClippingRegion.Intersects(columnRect))
 			{
-			    int32 actualIndex = ((ColumnListView*)owner)->fColumnList.IndexOf(ThisColumn);
-				DrawItemColumn(owner, ThisColumnRect, actualIndex, (_selectedColumn == actualIndex), complete);
+			    int32 actualIndex
+					= ((ColumnListView*)owner)->fColumnList.IndexOf(column);
+				DrawItemColumn(owner, columnRect, actualIndex,
+					(fSelectedColumn == actualIndex), complete);
 	        }
 		}
 	}
-	//Fill the area after all the columns (so the select highlight goes all the way across)
-	ThisColumnRect.left = LastColumnEnd + 1.0;
-	ThisColumnRect.right = owner->Bounds().right;
-	if(ThisColumnRect.left <= ThisColumnRect.right && ClippingRegion.Intersects(ThisColumnRect))
-    {
-		DrawItemColumn(owner, ThisColumnRect,-1, false, complete); 
+
+	// fill the area after all the columns (so the select highlight goes
+	// all the way across)
+	columnRect.left = LastColumnEnd + 1.0;
+	columnRect.right = owner->Bounds().right;
+	if (columnRect.left <= columnRect.right
+		&& ClippingRegion.Intersects(columnRect)) {
+		DrawItemColumn(owner, columnRect, -1, false, complete);
 	}
 }
 
 
-float CLVListItem::ExpanderShift(int32 column_index, BView* owner)
+float
+CLVListItem::ExpanderShift(int32 columnIndex, BView* owner)
 {
-	BList* DisplayList = &((ColumnListView*)owner)->fColumnDisplayList;
-	CLVColumn* ThisColumn = (CLVColumn*)DisplayList->ItemAt(column_index);
-	float ExpanderDelta = OutlineLevel() * 20.0;
-	if(!ThisColumn->fPushedByExpander)
-		ExpanderDelta = 0.0;
-	return ExpanderDelta;
+	BList* displayList = &((ColumnListView*)owner)->fColumnDisplayList;
+	CLVColumn* column = (CLVColumn*)displayList->ItemAt(columnIndex);
+	float expanderDelta = OutlineLevel() * 20.0f;
+	if (!column->fPushedByExpander)
+		expanderDelta = 0.0;
+
+	return expanderDelta;
 }
 
 
-void CLVListItem::Update(BView* owner, const BFont* font)
+void
+CLVListItem::Update(BView* owner, const BFont* font)
 {
-	BListItem::Update(owner,font);
-	float ItemHeight = Height();
-	if(ItemHeight < fMinHeight)
-		ItemHeight = fMinHeight;
+	BListItem::Update(owner, font);
+	float itemHeight = Height();
+	if (itemHeight < fMinHeight)
+		itemHeight = fMinHeight;
+
 	SetWidth(((ColumnListView*)owner)->fPageWidth);
-	SetHeight(ItemHeight);
+	SetHeight(itemHeight);
 }

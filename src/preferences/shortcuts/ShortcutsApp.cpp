@@ -1,12 +1,13 @@
 /*
- * Copyright 1999-2010 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Jeremy Friesner
+ * Copyright 2009-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
  *		Fredrik Modéen
  */
- 
+
 
 #include "ShortcutsApp.h"
 
@@ -35,5 +36,5 @@ ShortcutsApp::ReadyToRun()
 
 
 ShortcutsApp::~ShortcutsApp()
-{ 
+{
 }

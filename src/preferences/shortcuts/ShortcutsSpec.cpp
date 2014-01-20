@@ -1,11 +1,11 @@
 /*
- * Copyright 1999-2010 Haiku Inc. All rights reserved.
+ * Copyright 1999-2009 Jeremy Friesner
+ * Copyright 2009-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jeremy Friesner
  */
-
 
 #include "ShortcutsSpec.h"
 
@@ -227,7 +227,8 @@ ShortcutsSpec::ShortcutsSpec(BMessage* from)
 void
 ShortcutsSpec::SetCommand(const char* command)
 {
-	delete[] fCommand;	// out with the old (if any)...
+	delete[] fCommand;
+		// out with the old (if any)...
 	fCommandLen = strlen(command) + 1;
 	fCommandNul = fCommandLen - 1;
 	fCommand = new char[fCommandLen];
@@ -342,7 +343,8 @@ void
 ShortcutsSpec::DrawItemColumn(BView* owner, BRect item_column_rect,
 	int32 column_index, bool columnSelected, bool complete)
 {
-	const float STRING_COLUMN_LEFT_MARGIN = 25.0f; // 16 for the icon,+9 empty
+	const float STRING_COLUMN_LEFT_MARGIN = 25.0f;
+		// 16 for the icon, +9 empty
 
 	rgb_color color;
 	bool selected = IsSelected();
@@ -406,8 +408,8 @@ ShortcutsSpec::DrawItemColumn(BView* owner, BRect item_column_rect,
 		_CacheViewFont(owner);
 
 		// How about I draw a nice "key" background for this one?
-		BRect textRect(point.x - KEY_MARGIN, (point.y-sFontHeight) - KEY_MARGIN
-			, point.x + textWidth + KEY_MARGIN - 2.0f, point.y + KEY_MARGIN);
+		BRect textRect(point.x - KEY_MARGIN, (point.y - sFontHeight) - KEY_MARGIN,
+			point.x + textWidth + KEY_MARGIN - 2.0f, point.y + KEY_MARGIN);
 
 		if (column_index == KEY_COLUMN_INDEX)
 			lowColor = ReallyLightPurple;
@@ -547,7 +549,7 @@ ShortcutsSpec::ProcessColumnTextString(int whichColumn, const char* string)
 bool
 ShortcutsSpec::_AttemptTabCompletion()
 {
-	bool ret = false;
+	bool result = false;
 
 	int32 argc;
 	char** argv = ParseArgvFromString(fCommand, argc);
@@ -555,11 +557,11 @@ ShortcutsSpec::_AttemptTabCompletion()
 		// Try to complete the path partially expressed in the last argument!
 		char* arg = argv[argc - 1];
 		char* fileFragment = strrchr(arg, '/');
-		if (fileFragment) {
+		if (fileFragment != NULL) {
 			const char* directoryName = (fileFragment == arg) ? "/" : arg;
 			*fileFragment = '\0';
 			fileFragment++;
-			int fragLen = strlen(fileFragment);
+			int fragmentLength = strlen(fileFragment);
 
 			BDirectory dir(directoryName);
 			if (dir.InitCheck() == B_NO_ERROR) {
@@ -573,7 +575,7 @@ ShortcutsSpec::_AttemptTabCompletion()
 				while (dir.GetNextEntry(&nextEnt) == B_NO_ERROR) {
 					if (nextEnt.GetPath(&nextPath) == B_NO_ERROR) {
 						char* filePath = strrchr(nextPath.Path(), '/') + 1;
-						if (strncmp(filePath, fileFragment, fragLen) == 0) {
+						if (strncmp(filePath, fileFragment, fragmentLength) == 0) {
 							int len = strlen(filePath);
 							if (len > maxEntryLen)
 								maxEntryLen = len;
@@ -586,13 +588,13 @@ ShortcutsSpec::_AttemptTabCompletion()
 
 				// Now slowly extend our keyword to its full length, counting
 				// numbers of matches at each step. If the match list length
-				// is 1, we can use that whole entry. If it's greater than one
-				// , we can use just the match length.
+				// is 1, we can use that whole entry. If it's greater than one,
+				// we can use just the match length.
 				int matchLen = matchList.CountItems();
 				if (matchLen > 0) {
 					int i;
 					BString result(fileFragment);
-					for (i = fragLen; i < maxEntryLen; i++) {
+					for (i = fragmentLength; i < maxEntryLen; i++) {
 						// See if all the matching entries have the same letter
 						// in the next position... if so, we can go farther.
 						char commonLetter = '\0';
@@ -615,7 +617,7 @@ ShortcutsSpec::_AttemptTabCompletion()
 							result.Append(commonLetter, 1);
 					}
 
-					// Free all the strings we allocated
+					// free all the strings we allocated
 					for (int k = 0; k < matchLen; k++)
 						delete [] ((char*)matchList.ItemAt(k));
 
@@ -637,10 +639,10 @@ ShortcutsSpec::_AttemptTabCompletion()
 
 					// Remove any trailing slash...
 					const char* fileStr = file.String();
-					if (fileStr[strlen(fileStr)-1] == '/')
+					if (fileStr[strlen(fileStr) - 1] == '/')
 						file.RemoveLast("/");
 
-					// And re-append it iff the file is a dir.
+					// and re-append it iff the file is a dir.
 					BDirectory testFileAsDir(file.String());
 					if ((strcmp(file.String(), "/") != 0)
 						&& (testFileAsDir.InitCheck() == B_NO_ERROR))
@@ -649,14 +651,15 @@ ShortcutsSpec::_AttemptTabCompletion()
 					wholeLine += file;
 
 					SetCommand(wholeLine.String());
-					ret = true;
+					result = true;
 				}
 			}
 			*(fileFragment - 1) = '/';
 		}
 	}
 	FreeArgv(argv);
-	return ret;
+
+	return result;
 }
 
 
@@ -664,13 +667,14 @@ bool
 ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 	int32 key)
 {
-	bool ret = false;
+	bool result = false;
+
 	switch(whichColumn) {
 		case KEY_COLUMN_INDEX:
 			if (key > -1) {
 				if ((int32)fKey != key) {
 					fKey = key;
-					ret = true;
+					result = true;
 				}
 			}
 			break;
@@ -684,18 +688,18 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 						// trim a char off the string
 						fCommand[fCommandNul - 1] = '\0';
 						fCommandNul--;	// note new nul position
-						ret = true;
+						result = true;
 						_UpdateIconBitmap();
 					}
-				break;
+					break;
 
 				case B_TAB:
 					if (_AttemptTabCompletion()) {
 						_UpdateIconBitmap();
-						ret = true;
+						result = true;
 					} else
 						beep();
-				break;
+					break;
 
 				default:
 				{
@@ -722,7 +726,7 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 						// Here we should be guaranteed enough room.
 						strncat(fCommand, bytes, fCommandLen);
 						fCommandNul += newCharLen;
-						ret = true;
+						result = true;
 						_UpdateIconBitmap();
 					}
 				}
@@ -731,72 +735,73 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 		}
 
 		default:
-			if ((whichColumn >= 0) && (whichColumn < NUM_META_COLUMNS)) {
-				MetaKeyStateMap * map = &sMetaMaps[whichColumn];
-				int curState = fMetaCellStateIndex[whichColumn];
-				int origState = curState;
-				int numStates = map->GetNumStates();
+			if (whichColumn < 0 || whichColumn >= NUM_META_COLUMNS)
+				break;
 
-				switch(bytes[0])
+			MetaKeyStateMap * map = &sMetaMaps[whichColumn];
+			int curState = fMetaCellStateIndex[whichColumn];
+			int origState = curState;
+			int numStates = map->GetNumStates();
+
+			switch(bytes[0]) {
+				case B_RETURN:
+					// cycle to the previous state
+					curState = (curState + numStates - 1) % numStates;
+					break;
+
+				case B_SPACE:
+					// cycle to the next state
+					curState = (curState + 1) % numStates;
+					break;
+
+				default:
 				{
-					case B_RETURN:
-						// cycle to the previous state
-						curState = (curState + numStates - 1) % numStates;
-						break;
+					// Go to the state starting with the given letter, if
+					// any
+					char letter = bytes[0];
+					if (islower(letter))
+						letter = toupper(letter); // convert to upper case
 
-					case B_SPACE:
-						// cycle to the next state
-						curState = (curState + 1) % numStates;
-						break;
+					if ((letter == B_BACKSPACE) || (letter == B_DELETE))
+						letter = '(';
+							// so space bar will blank out an entry
 
-					default:
-					{
-						// Go to the state starting with the given letter, if
-						// any
-						char letter = bytes[0];
-						if (islower(letter))
-							letter = toupper(letter); // convert to upper case
+					for (int i = 0; i < numStates; i++) {
+						const char* desc = map->GetNthStateDesc(i);
 
-						if ((letter == B_BACKSPACE) || (letter == B_DELETE))
-							letter = '(';
-								// so space bar will blank out an entry
-
-						for (int i = 0; i < numStates; i++) {
-							const char* desc = map->GetNthStateDesc(i);
-
-							if (desc) {
-								if (desc[0] == letter) {
-									curState = i;
-									break;
-								}
-							} else
-								printf(B_TRANSLATE("Error, NULL state description?\n"));
+						if (desc) {
+							if (desc[0] == letter) {
+								curState = i;
+								break;
+							}
+						} else {
+							puts(B_TRANSLATE(
+								"Error, NULL state description?"));
 						}
-						break;
 					}
 				}
-				fMetaCellStateIndex[whichColumn] = curState;
-
-				if (curState != origState)
-					ret = true;
 			}
-			break;
+			fMetaCellStateIndex[whichColumn] = curState;
+
+			if (curState != origState)
+				result = true;
 	}
 
-	return ret;
+	return result;
 }
 
 
 int
-ShortcutsSpec::MyCompare(const CLVListItem* a_Item1, const CLVListItem* a_Item2,
-	int32 KeyColumn)
+ShortcutsSpec::CLVListItemCompare(const CLVListItem* firstItem,
+	const CLVListItem* secondItem, int32 keyColumn)
 {
-	ShortcutsSpec* left = (ShortcutsSpec*) a_Item1;
-	ShortcutsSpec* right = (ShortcutsSpec*) a_Item2;
+	ShortcutsSpec* left = (ShortcutsSpec*) firstItem;
+	ShortcutsSpec* right = (ShortcutsSpec*) secondItem;
 
-	int ret = strcmp(left->GetCellText(KeyColumn),
-		right->GetCellText(KeyColumn));
-	return (ret > 0) ? 1 : ((ret == 0) ? 0 : -1);
+	int result = strcmp(left->GetCellText(keyColumn),
+		right->GetCellText(keyColumn));
+
+	return result > 0 ? 1 : (result == 0 ? 0 : -1);
 }
 
 
@@ -821,13 +826,14 @@ ShortcutsSpec::_UpdateIconBitmap()
 {
 	BString firstWord = ParseArgvZeroFromString(fCommand);
 
-	// Only need to change if the first word has changed...
+	// we only need to change if the first word has changed...
 	if (fLastBitmapName == NULL || firstWord.Length() == 0
 		|| firstWord.Compare(fLastBitmapName)) {
 		if (firstWord.ByteAt(0) == '*')
 			fBitmapValid = IsValidActuatorName(&firstWord.String()[1]);
 		else {
-			fBitmapValid = false; // default till we prove otherwise!
+			fBitmapValid = false;
+			// default until we prove otherwise
 
 			if (firstWord.Length() > 0) {
 				delete [] fLastBitmapName;
@@ -873,4 +879,3 @@ ShortcutsSpec::_InitModifierNames()
 		"Name for modifier on keyboard");
 #endif
 }
-

@@ -1,211 +1,228 @@
-//Column list header source file
+/*
+ * Copyright 1999-2009 Jeremy Friesner
+ * Copyright 2009-2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jeremy Friesner
+ *		John Scipione, jscipione@gmail.com
+ */
 
 
-//******************************************************************************************************
-//**** PROJECT HEADER FILES
-//******************************************************************************************************
 #define CLVColumn_CPP
+
 #include <string.h>
+
 #include "CLVColumn.h"
 #include "ColumnListView.h"
 #include "CLVColumnLabelView.h"
 
 
-//******************************************************************************************************
-//**** CLVColumn CLASS DEFINITION
-//******************************************************************************************************
-CLVColumn::CLVColumn(const char* label,BPopUpMenu * popup,float width,uint32 flags,float min_width)
+CLVColumn::CLVColumn(const char* label, BPopUpMenu* popup, float width,
+	uint32 flags, float minWidth)
 {
-    fPopup = popup;
+	fPopup = popup;
 
-	if(flags & CLV_EXPANDER)
-	{
+	if (flags & CLV_EXPANDER) {
 		label = NULL;
 		width = 20.0;
-		min_width = 20.0;
-		flags &= CLV_NOT_MOVABLE | CLV_LOCK_AT_BEGINNING | CLV_HIDDEN | CLV_LOCK_WITH_RIGHT;
+		minWidth = 20.0;
+		flags &= CLV_NOT_MOVABLE | CLV_LOCK_AT_BEGINNING | CLV_HIDDEN
+			| CLV_LOCK_WITH_RIGHT;
 		flags |= CLV_EXPANDER | CLV_NOT_RESIZABLE | CLV_MERGE_WITH_RIGHT;
 	}
-	if(min_width < 4.0)
-		min_width = 4.0;
-	if(width < min_width)
-		width = min_width;
-	if(label)
-	{
-		fLabel = new char[strlen(label)+1];
-		strcpy((char*)fLabel,label);
-	}
-	else
+
+	if (minWidth < 4.0)
+		minWidth = 4.0;
+
+	if (width < minWidth)
+		width = minWidth;
+
+	if (label != NULL) {
+		fLabel = new char[strlen(label) + 1];
+		strcpy((char*)fLabel, label);
+	} else
 		fLabel = NULL;
+
 	fWidth = width;
-	fMinWidth = min_width;
+	fMinWidth = minWidth;
 	fFlags = flags;
 	fPushedByExpander = false;
 	fParent = NULL;
-	fSortMode = NoSort;
+	fSortMode = SORT_MODE_NONE;
 }
 
 
 CLVColumn::~CLVColumn()
 {
-	delete [] fLabel;
-	if(fParent) fParent->RemoveColumn(this);
-    delete fPopup;
+	delete[] fLabel;
+	if (fParent != NULL)
+		fParent->RemoveColumn(this);
+
+	delete fPopup;
 }
 
 
-float CLVColumn::Width() const
+float
+CLVColumn::Width() const
 {
 	return fWidth;
 }
 
 
-void CLVColumn::SetWidth(float width)
+void
+CLVColumn::SetWidth(float width)
 {
 	if(width < fMinWidth)
 		width = fMinWidth;
-	if(width != fWidth)
-	{
-		float OldWidth = fWidth;
+
+	if(width != fWidth) {
+		float oldWidth = fWidth;
 		fWidth = width;
-		if(IsShown() && fParent)
-		{
-			BWindow* ParentWindow = fParent->Window();
-			if(ParentWindow)
-				ParentWindow->Lock();
-			//Figure out the area after this column to scroll
+		if (IsShown() && fParent != NULL) {
+			BWindow* parentWindow = fParent->Window();
+			if (parentWindow != NULL)
+				parentWindow->Lock();
+
+			// figure out the area after this column to scroll
 			BRect ColumnViewBounds = fParent->fColumnLabelView->Bounds();
 			BRect MainViewBounds = fParent->Bounds();
-			BRect SourceArea = ColumnViewBounds;
-			SourceArea.left = fColumnEnd+1.0;
-			BRect DestArea = SourceArea;
-			float Delta = width-OldWidth;
-			DestArea.left += Delta;
-			DestArea.right += Delta;
+			BRect sourceArea = ColumnViewBounds;
+			sourceArea.left = fColumnEnd + 1.0;
+			BRect destArea = sourceArea;
+			float delta = width-oldWidth;
+			destArea.left += delta;
+			destArea.right += delta;
 			float LimitShift;
-			if(DestArea.right > ColumnViewBounds.right)
-			{
-				LimitShift = DestArea.right-ColumnViewBounds.right;
-				DestArea.right -= LimitShift;
-				SourceArea.right -= LimitShift;
+			if (destArea.right > ColumnViewBounds.right) {
+				LimitShift = destArea.right-ColumnViewBounds.right;
+				destArea.right -= LimitShift;
+				sourceArea.right -= LimitShift;
 			}
-			if(DestArea.left < ColumnViewBounds.left)
-			{
-				LimitShift = ColumnViewBounds.left - DestArea.left;
-				DestArea.left += LimitShift;
-				SourceArea.left += LimitShift;
+			if (destArea.left < ColumnViewBounds.left) {
+				LimitShift = ColumnViewBounds.left - destArea.left;
+				destArea.left += LimitShift;
+				sourceArea.left += LimitShift;
 			}
-			//Scroll the area that is being shifted
-			if(ParentWindow)
-				ParentWindow->UpdateIfNeeded();
-			fParent->fColumnLabelView->CopyBits(SourceArea,DestArea);
-			SourceArea.top = MainViewBounds.top;
-			SourceArea.bottom = MainViewBounds.bottom;
-			DestArea.top = MainViewBounds.top;
-			DestArea.bottom = MainViewBounds.bottom;
-			fParent->CopyBits(SourceArea,DestArea);
 
-			//Invalidate the region that got revealed
-			DestArea = ColumnViewBounds;
-			if(width > OldWidth)
-			{
-				DestArea.left = fColumnEnd+1.0;
-				DestArea.right = fColumnEnd+Delta;
+			// scroll the area that is being shifted
+			if(parentWindow)
+				parentWindow->UpdateIfNeeded();
+
+			fParent->fColumnLabelView->CopyBits(sourceArea, destArea);
+			sourceArea.top = MainViewBounds.top;
+			sourceArea.bottom = MainViewBounds.bottom;
+			destArea.top = MainViewBounds.top;
+			destArea.bottom = MainViewBounds.bottom;
+			fParent->CopyBits(sourceArea, destArea);
+
+			// invalidate the region that got revealed
+			destArea = ColumnViewBounds;
+			if (width > oldWidth) {
+				destArea.left = fColumnEnd + 1.0;
+				destArea.right = fColumnEnd + delta;
+			} else {
+				destArea.left = ColumnViewBounds.right + delta + 1.0;
+				destArea.right = ColumnViewBounds.right;
 			}
+			fParent->fColumnLabelView->Invalidate(destArea);
+			destArea.top = MainViewBounds.top;
+			destArea.bottom = MainViewBounds.bottom;
+			fParent->Invalidate(destArea);
+
+			// invalidate the old or new resize handle as necessary
+			destArea = ColumnViewBounds;
+			if (width > oldWidth)
+				destArea.left = fColumnEnd;
 			else
-			{
-				DestArea.left = ColumnViewBounds.right+Delta+1.0;
-				DestArea.right = ColumnViewBounds.right;
-			}
-			fParent->fColumnLabelView->Invalidate(DestArea);
-			DestArea.top = MainViewBounds.top;
-			DestArea.bottom = MainViewBounds.bottom;
-			fParent->Invalidate(DestArea);
+				destArea.left = fColumnEnd + delta;
 
-			//Invalidate the old or new resize handle as necessary
-			DestArea = ColumnViewBounds;
-			if(width > OldWidth)
-				DestArea.left = fColumnEnd;
-			else
-				DestArea.left = fColumnEnd + Delta;
-			DestArea.right = DestArea.left;
-			fParent->fColumnLabelView->Invalidate(DestArea);
+			destArea.right = destArea.left;
+			fParent->fColumnLabelView->Invalidate(destArea);
 
-			//Update the column sizes, positions and group positions
-			fParent->UpdateColumnSizesDataRectSizeScrollBars();
+			// update the column sizes, positions and group positions
+			fParent->ShiftDragGroup();
 			fParent->fColumnLabelView->UpdateDragGroups();
-			if(ParentWindow)
-				ParentWindow->Unlock();
+			if(parentWindow)
+				parentWindow->Unlock();
 		}
-		if(fParent)
-			fParent->ColumnWidthChanged(fParent->fColumnList.IndexOf(this),fWidth);
+		if (fParent != NULL) {
+			fParent->ColumnWidthChanged(fParent->fColumnList.IndexOf(this),
+				fWidth);
+		}
 	}
 }
 
 
-uint32 CLVColumn::Flags() const
+uint32
+CLVColumn::Flags() const
 {
 	return fFlags;
 }
 
 
-bool CLVColumn::IsShown() const
+bool
+CLVColumn::IsShown() const
 {
-	if(fFlags & CLV_HIDDEN)
+	if ((fFlags & CLV_HIDDEN) != 0)
 		return false;
 	else
 		return true;
 }
 
 
-void CLVColumn::SetShown(bool Shown)
+void
+CLVColumn::SetShown(bool show)
 {
 	bool shown = IsShown();
-	if(shown != Shown)
-	{
-		if(Shown)
+	if (shown != show) {
+		if (show)
 			fFlags &= 0xFFFFFFFF^CLV_HIDDEN;
 		else
 			fFlags |= CLV_HIDDEN;
-		if(fParent)
-		{
-			float UpdateLeft = fColumnBegin;
-			BWindow* ParentWindow = fParent->Window();
-			if(ParentWindow)
-				ParentWindow->Lock();
-			fParent->UpdateColumnSizesDataRectSizeScrollBars();
+
+		if (fParent != NULL) {
+			float updateLeft = fColumnBegin;
+			BWindow* parentWindow = fParent->Window();
+			if (parentWindow != NULL)
+				parentWindow->Lock();
+
+			fParent->ShiftDragGroup();
 			fParent->fColumnLabelView->UpdateDragGroups();
-			if(Shown)
-				UpdateLeft = fColumnBegin;
-			BRect Area = fParent->fColumnLabelView->Bounds();
-			Area.left = UpdateLeft;
-			fParent->fColumnLabelView->Invalidate(Area);
-			Area = fParent->Bounds();
-			Area.left = UpdateLeft;
-			fParent->Invalidate(Area);
-			if(fFlags & CLV_EXPANDER)
-			{
-				if(!Shown)
+			if (show)
+				updateLeft = fColumnBegin;
+
+			BRect area = fParent->fColumnLabelView->Bounds();
+			area.left = updateLeft;
+			fParent->fColumnLabelView->Invalidate(area);
+			area = fParent->Bounds();
+			area.left = updateLeft;
+			fParent->Invalidate(area);
+			if ((fFlags & CLV_EXPANDER) != 0) {
+				if (!show)
 					fParent->fExpanderColumn = -1;
 				else
 					fParent->fExpanderColumn = fParent->IndexOfColumn(this);
 			}
-			if(ParentWindow)
-				ParentWindow->Unlock();
+			if (parentWindow != NULL)
+				parentWindow->Unlock();
 		}
 	}
 }
 
 
-CLVSortMode CLVColumn::SortMode() const
+CLVSortMode
+CLVColumn::SortMode() const
 {
 	return fSortMode;
 }
 
-void CLVColumn::SetSortMode(CLVSortMode mode)
+
+void
+CLVColumn::SetSortMode(CLVSortMode mode)
 {
-	if(fParent)
-		fParent->SetSortMode(fParent->IndexOfColumn(this),mode);
+	if (fParent != NULL)
+		fParent->SetSortMode(fParent->IndexOfColumn(this), mode);
 	else
 		fSortMode = mode;
 }
