@@ -2322,7 +2322,8 @@ BrowserWindow::_SmartURLHandler(const BString& url)
 		BString proto;
 		url.CopyInto(proto, 0, at);
 
-		if (proto == "http" || 	proto == "https" ||	proto == "file")
+		if (proto == "http" || 	proto == "https" ||	proto == "file"
+				|| proto == "about")
 			_VisitURL(url);
 		else {
 			temp = "application/x-vnd.Be.URL.";
