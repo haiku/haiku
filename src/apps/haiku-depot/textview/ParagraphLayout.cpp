@@ -342,11 +342,7 @@ ParagraphLayout::GetLineBounds(int32 lineIndex, float& x1, float& y1,
 	_ValidateLayout();
 
 	if (fGlyphInfos.CountItems() == 0) {
-		x1 = 0.0f;
-		y1 = 0.0f;
-		x2 = 0.0f;
-		y2 = 0.0f;
-
+		_GetEmptyLayoutBounds(x1, y1, x2, y2);
 		return;
 	}
 
@@ -381,11 +377,7 @@ ParagraphLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 	_ValidateLayout();
 
 	if (fGlyphInfos.CountItems() == 0) {
-		x1 = 0.0f;
-		y1 = 0.0f;
-		x2 = 0.0f;
-		y2 = 0.0f;
-
+		_GetEmptyLayoutBounds(x1, y1, x2, y2);
 		return;
 	}
 
@@ -947,4 +939,29 @@ ParagraphLayout::_DrawSpan(BView* view, BPoint offset,
 		offset.x -= delta.nonspace;
 
 	view->DrawString(span.Text(), offset, &delta);
+}
+
+
+void
+ParagraphLayout::_GetEmptyLayoutBounds(float& x1, float& y1, float& x2,
+	float& y2) const
+{
+	if (fLineInfos.CountItems() == 0) {
+		x1 = 0.0f;
+		y1 = 0.0f;
+		x2 = 0.0f;
+		y2 = 0.0f;
+
+		return;
+	}
+
+	// If the paragraph had at least a single empty TextSpan, the layout
+	// can compute some meaningful bounds.
+	const Bullet& bullet = fParagraphStyle.Bullet();
+	x1 = fParagraphStyle.LineInset() + fParagraphStyle.FirstLineInset()
+		+ bullet.Spacing();
+	x2 = x1;
+	const LineInfo& lineInfo = fLineInfos.ItemAt(0);
+	y1 = lineInfo.y;
+	y2 = lineInfo.y + lineInfo.height;
 }

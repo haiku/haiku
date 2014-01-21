@@ -231,6 +231,9 @@ private:
 									const TextSpan& span,
 									int32 textOffset) const;
 
+			void				_GetEmptyLayoutBounds(float& x1, float& y1,
+									float& x2, float& y2) const;
+
 private:
 			TextSpanList		fTextSpans;
 			ParagraphStyle		fParagraphStyle;
