@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -337,7 +337,7 @@ TextDocumentLayout::_ParagraphLayoutIndexForOffset(int32& textOffset)
 		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
 		
 		int32 length = info.layout->CountGlyphs();
-		if (textOffset > length) {
+		if (textOffset >= length) {
 			textOffset -= length;
 			continue;
 		}
