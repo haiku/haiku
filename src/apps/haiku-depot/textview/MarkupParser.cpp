@@ -265,8 +265,7 @@ MarkupParser::_CopySpan(const BString& text, int32& start, int32 end)
 
 	BString subString;
 	text.CopyCharsInto(subString, start, end - start);
-	fCurrentParagraph.Append(TextSpan(subString,
-		*fCurrentCharacterStyle));
+	fCurrentParagraph.Append(TextSpan(subString, *fCurrentCharacterStyle));
 
 	start = end;
 }
@@ -285,6 +284,7 @@ MarkupParser::_ToggleStyle(const CharacterStyle& style)
 void
 MarkupParser::_FinishParagraph()
 {
+	fCurrentParagraph.Append(TextSpan("\n", *fCurrentCharacterStyle));
 	fTextDocument->Append(fCurrentParagraph);
 	fCurrentParagraph.Clear();
 	fCurrentParagraph.SetStyle(fParagraphStyle);
