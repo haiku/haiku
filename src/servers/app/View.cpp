@@ -150,16 +150,6 @@ View::~View()
 }
 
 
-status_t
-View::InitCheck() const
-{
-	if (fDrawState == NULL)
-		return B_NO_MEMORY;
-
-	return B_OK;
-}
-
-
 IntRect
 View::Bounds() const
 {

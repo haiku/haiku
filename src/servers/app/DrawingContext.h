@@ -10,8 +10,8 @@
  *		Marcus Overhagen <marcus@overhagen.de>
  *		Adrien Destugues <pulkomandy@pulkomandy.tk>
  */
-#ifndef DRAWINGCONTEXT_H
-#define DRAWINGCONTEXT_H
+#ifndef DRAWING_CONTEXT_H
+#define DRAWING_CONTEXT_H
 
 
 #include <Point.h>
@@ -29,6 +29,7 @@ class ServerPicture;
 class DrawingContext {
 	public:
 							DrawingContext();
+			status_t		InitCheck() const;
 
 	virtual	void			PushState();
 	virtual	void			PopState();
