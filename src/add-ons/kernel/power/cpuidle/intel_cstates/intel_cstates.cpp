@@ -83,7 +83,8 @@ cstates_idle(void)
 	ASSERT(state >= 0 && state < sCStateCount);
 
 	int subState = idleTime % timeStep;
-	subState /= timeStep / sCStates[state].fSubStatesCount;
+	subState *= sCStates[state].fSubStatesCount;
+	subState /= timeStep;
 
 	ASSERT(subState >= 0 && subState < sCStates[state].fSubStatesCount);
 
