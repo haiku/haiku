@@ -435,6 +435,9 @@ TextDocumentView::_UpdateScrollBars()
 void
 TextDocumentView::_DrawCaret(int32 textOffset)
 {
+	if (!IsFocus() || Window() == NULL || !Window()->IsActive())
+		return;
+
 	float x1;
 	float y1;
 	float x2;
