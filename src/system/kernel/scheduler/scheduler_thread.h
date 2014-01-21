@@ -394,12 +394,15 @@ ThreadData::Enqueue()
 	SCHEDULER_ENTER_FUNCTION();
 
 	if (!fReady) {
-		if (gTrackCoreLoad && system_time() - fWentSleep > 0) {
-			fMeasureAvailableTime += system_time() - fWentSleep;
-
+		if (gTrackCoreLoad) {
+			bigtime_t timeSlept = system_time() - fWentSleep;
 			fCore->UpdateLoad(fNeededLoad);
-			_ComputeNeededLoad();
+			if (timeSlept > 0) {
+				fMeasureAvailableTime += timeSlept;
+				_ComputeNeededLoad();
+			}
 		}
+
 		fReady = true;
 	}
 
