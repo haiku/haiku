@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons input_server filters shortcut_catcher ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 UsePrivateHeaders storage ;
 
 local architectureObject ;

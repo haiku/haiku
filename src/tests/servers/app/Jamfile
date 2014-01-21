@@ -25,6 +25,8 @@ local appServerDir = [ FDirName $(HAIKU_TOP) src servers app ] ;
 
 UseHeaders [ FDirName $(appServerDir) decorator ] ;
 UseHeaders [ FDirName $(appServerDir) drawing ] ;
+UseHeaders [ FDirName $(appServerDir) drawing interface html5 ] ;
+UseHeaders [ FDirName $(appServerDir) drawing interface remote ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter drawing_modes ] ;
 UseHeaders [ FDirName $(appServerDir) drawing Painter font_support ] ;
@@ -108,7 +110,8 @@ SharedLibrary libtestappserver.so :
 #	trace.c
 
 	# libraries
-	: be libpainter.a libagg.a libtextencoding.so libfreetype.so libshared.a
+	: be libpainter.a libagg.a libtextencoding.so libshared.a
+	[ BuildFeatureAttribute freetype : library ]
 ;
 
 AddResources test_app_server : app_server.rdef ;
@@ -173,16 +176,15 @@ Server test_app_server :
 	# libraries
 	:
 	[ BuildFeatureAttribute zlib : library ] libtestappserver.so be
-	libhwinterface.so libhwinterfaceimpl.so liblinprog.a
-	libfreetype.so libtextencoding.so
+	libhwinterface.so libhwinterfaceimpl.so liblinprog.a libtextencoding.so
+	[ BuildFeatureAttribute freetype : library ]
 	$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 ;
 
 # install in the test dir
 HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR)
 	: libtestappserver.so libbe_test.so
-	  libhwinterface.so libhwinterfaceimpl.so libfreetype.so
-	  libtextencoding.so
+	  libhwinterface.so libhwinterfaceimpl.so libtextencoding.so
 	: tests!apps ;
 
 HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : test_app_server

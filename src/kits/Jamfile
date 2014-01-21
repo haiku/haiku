@@ -57,12 +57,12 @@ SetSupportedPlatformsForTarget libbe_test.so : libbe_test ;
 SetVersionScript libbe_test.so : libbe_test_versions ;
 
 SharedLibrary libbe_test.so :
-	LocaleBackend.cpp
 	:
-	<libbe>app_kit.o
-	<libbe>interface_kit.o
-	<libbe>storage_kit.o
-	<libbe>support_kit.o
+	<libbe!$(HAIKU_ARCH)>app_kit.o
+	<libbe!$(HAIKU_ARCH)>interface_kit.o
+	<libbe!$(HAIKU_ARCH)>locale_kit.o
+	<libbe!$(HAIKU_ARCH)>storage_kit.o
+	<libbe!$(HAIKU_ARCH)>support_kit.o
 
 	libicon.a
 	libagg.a
