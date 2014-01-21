@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef TEXT_DOCUMENT_H
@@ -69,6 +69,8 @@ public:
 			int32				Length() const;
 
 			BString				GetText(int32 textOffset, int32 length) const;
+
+			void				PrintToStream() const;
 
 private:
 			ParagraphList		fParagraphs;

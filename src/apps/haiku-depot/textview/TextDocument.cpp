@@ -1,11 +1,12 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "TextDocument.h"
 
 #include <algorithm>
+#include <stdio.h>
 
 
 TextDocument::TextDocument()
@@ -192,11 +193,27 @@ TextDocument::Remove(int32 textOffset, int32 length)
 	int32 paragraphLength = resultParagraph.Length();
 	if (textOffset == 0 && length > paragraphLength) {
 		length -= paragraphLength;
+		paragraphLength = 0;
 		resultParagraph.Clear();
 	} else {
 		int32 removeLength = std::min(length, paragraphLength - textOffset);
 		resultParagraph.Remove(textOffset, removeLength);
+		paragraphLength -= removeLength;
 		length -= removeLength;
+	}
+
+	if (textOffset == paragraphLength && length == 0
+		&& index + 1 < fParagraphs.CountItems()) {
+		// Line break between paragraphs got removed. Shift the next
+		// paragraph's text spans into the resulting one.
+		
+		const TextSpanList&	textSpans = ParagraphAt(index + 1).TextSpans();
+		int32 spanCount = textSpans.CountItems();
+		for (int32 i = 0; i < spanCount; i++) {
+			const TextSpan& span = textSpans.ItemAtFast(i);
+			resultParagraph.Append(span);
+		}
+		fParagraphs.Remove(index + 1);
 	}
 
 	textOffset = 0;
@@ -214,7 +231,7 @@ TextDocument::Remove(int32 textOffset, int32 length)
 			// Last paragraph reached
 			int32 removedLength = std::min(length, paragraphLength);
 			Paragraph newParagraph(paragraph);
-			fParagraphs.Remove(index);
+			fParagraphs.Remove(index + 1);
 
 			if (!newParagraph.Remove(0, removedLength))
 				return B_NO_MEMORY;
@@ -405,4 +422,23 @@ TextDocument::GetText(int32 start, int32 length) const
 	}
 
 	return text;
+}
+
+
+// #pragma mark -
+
+
+void
+TextDocument::PrintToStream() const
+{
+	int32 paragraphCount = fParagraphs.CountItems();
+	if (paragraphCount == 0) {
+		printf("<document/>\n");
+		return;
+	}
+	printf("<document>\n");
+	for (int32 i = 0; i < paragraphCount; i++) {
+		fParagraphs.ItemAtFast(i).PrintToStream();
+	}
+	printf("</document>\n");
 }
