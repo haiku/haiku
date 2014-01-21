@@ -28,7 +28,7 @@
 
 DrawingContext::DrawingContext()
 	:
-	fDrawState(new (nothrow) DrawState)
+	fDrawState(new (std::nothrow) DrawState)
 {
 }
 	
