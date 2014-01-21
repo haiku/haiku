@@ -1,11 +1,12 @@
 /*
- * Copyright 2002-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Tyler Dauwalder
- *		Jonas Sundström, jonas@kirilla.com
+ *		Rene Gollent, rene@gollent.com.
  *		Michael Lotz, mmlr@mlotz.ch
+ *		Jonas Sundström, jonas@kirilla.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 
@@ -131,9 +132,9 @@ MimeInfoUpdater::Do(const entry_ref& entry, bool* _entryIsDir)
 	BAppFileInfo appFileInfoWrite;
 	if (!err && updateAppInfo && node.IsFile()
 		&& is_shared_object_mime_type(type)
-		&& file.SetTo(&entry, B_READ_WRITE) == B_OK
-		&& appFileInfoRead.SetTo(&file) == B_OK
-		&& appFileInfoWrite.SetTo(&file) == B_OK) {
+		&& (err = file.SetTo(&entry, B_READ_WRITE)) == B_OK
+		&& (err = appFileInfoRead.SetTo(&file)) == B_OK
+		&& (err = appFileInfoWrite.SetTo(&file)) == B_OK) {
 
 		// we read from resources and write to attributes
 		appFileInfoRead.SetInfoLocation(B_USE_RESOURCES);

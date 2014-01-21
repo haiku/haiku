@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Tyler Dauwalder
+ *		Rene Gollent, rene@gollent.com.
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 
@@ -69,16 +70,16 @@ DatabaseLocation::OpenType(const char* type, BNode& _node) const
 
 
 /*! \brief Opens a BNode on the given type, creating a node of the
-		appropriate flavor if necessary.
+		appropriate flavor if requested (and necessary).
 	All MIME types are converted to lowercase for use in the filesystem.
 	\param type The MIME type to open.
 	\param _node Node opened on the given MIME type.
 	\param _didCreate If not \c NULL, the variable the pointer refers to is
-		set to \c true, if the node has been newly create, to \c false
+		set to \c true, if the node has been newly created, to \c false
 		otherwise.
 */
 status_t
-DatabaseLocation::OpenOrCreateType(const char* type, BNode& _node,
+DatabaseLocation::OpenWritableType(const char* type, BNode& _node, bool create,
 	bool* _didCreate) const
 {
 	if (_didCreate)
@@ -90,6 +91,8 @@ DatabaseLocation::OpenOrCreateType(const char* type, BNode& _node,
 	if (error == B_OK) {
 		if (index == 0)
 			return B_OK;
+		else if (!create)
+			return B_ENTRY_NOT_FOUND;
 
 		// The caller wants a editable node, but the node found is not in the
 		// user's settings directory. Copy the node.
@@ -106,7 +109,8 @@ DatabaseLocation::OpenOrCreateType(const char* type, BNode& _node,
 		if (_didCreate != NULL)
 			*_didCreate = true;
 		return error;
-	}
+	} else if (!create)
+		return B_ENTRY_NOT_FOUND;
 
 	// type doesn't exist yet -- create the respective node
 	error = _CreateTypeNode(type, _node);
@@ -256,7 +260,7 @@ DatabaseLocation::WriteAttribute(const char* type, const char* attribute,
 		return B_BAD_VALUE;
 
 	BNode node;
-	status_t error = OpenOrCreateType(type, node, _didCreate);
+	status_t error = OpenWritableType(type, node, true, _didCreate);
 	if (error != B_OK)
 		return error;
 
@@ -312,13 +316,9 @@ DatabaseLocation::DeleteAttribute(const char* type, const char* attribute) const
 		return B_BAD_VALUE;
 
 	BNode node;
-	int32 index;
-	status_t error = _OpenType(type, node, index);
+	status_t error = OpenWritableType(type, node, false);
 	if (error != B_OK)
 		return error;
-
-	if (index != 0)
-		return B_NOT_ALLOWED;
 
 	return node.RemoveAttr(attribute);
 }
@@ -327,7 +327,7 @@ DatabaseLocation::DeleteAttribute(const char* type, const char* attribute) const
 /*! \brief Fetches the application hint for the given MIME type.
 
 	The entry_ref pointed to by \c ref must be pre-allocated.
-	
+
 	\param type The MIME type of interest
 	\param _ref Reference to a pre-allocated \c entry_ref struct into
 	           which the location of the hint application is copied.
@@ -418,7 +418,7 @@ DatabaseLocation::GetShortDescription(const char* type, char* description)
 /*!	The string pointed to by \c description must be long enough to
 	hold the long description; a length of \c B_MIME_TYPE_LENGTH is
 	recommended.
-	
+
 	\param type The MIME type of interest
 	\param description Pointer to a pre-allocated string into which the long
 		description is copied. If the function fails, the contents of the string
@@ -465,7 +465,7 @@ DatabaseLocation::GetFileExtensions(const char* type, BMessage& _extensions)
 		_extensions.what = 234;	// Don't know why, but that's what R5 does.
 		err = _extensions.AddString("type", type);
 	}
-	return err;	
+	return err;
 }
 
 
@@ -524,7 +524,7 @@ DatabaseLocation::GetIcon(const char* type, uint8*& _data, size_t& _size)
 	\return
 	- \c B_OK: Success
 	- \c B_ENTRY_NOT_FOUND: No icon of the given size exists for the given type
-	- "error code": Failure	
+	- "error code": Failure
 
 */
 status_t
@@ -562,7 +562,7 @@ DatabaseLocation::GetIconForType(const char* type, const char* fileType,
 		largeIconAttrName, which, &_icon);
 
 //	ssize_t err = type && icon ? B_OK : B_BAD_VALUE;
-//	
+//
 //	// Figure out what kind of data we *should* find
 //	uint32 attrType = 0;
 //	ssize_t attrSize = 0;
@@ -586,7 +586,7 @@ DatabaseLocation::GetIconForType(const char* type, const char* fileType,
 //		}
 //	}
 //	// Construct our attribute name
-//	std::string attr;		
+//	std::string attr;
 //	if (fileType) {
 //		attr = (which == B_MINI_ICON
 //	              ? kMiniIconAttrPrefix
@@ -602,11 +602,11 @@ DatabaseLocation::GetIconForType(const char* type, const char* fileType,
 //	}
 //
 //	BNode node;
-//	if (!err) 
+//	if (!err)
 //		err = open_type(type, &node);
 //
 //	attr_info info;
-//	if (!err) 
+//	if (!err)
 //		err = node.GetAttrInfo(attr.c_str(), &info);
 //
 //	if (!err)
@@ -620,8 +620,8 @@ DatabaseLocation::GetIconForType(const char* type, const char* fileType,
 //			buffer = new(std::nothrow) char[attrSize];
 //			if (!buffer)
 //				err = B_NO_MEMORY;
-//			if (!err) 
-//				err = node.ReadAttr(attr.c_str(), attrType, 0, buffer, attrSize);			
+//			if (!err)
+//				err = node.ReadAttr(attr.c_str(), attrType, 0, buffer, attrSize);
 //		} else {
 //			// same color space, just read direct
 //			err = node.ReadAttr(attr.c_str(), attrType, 0, icon->Bits(), attrSize);
@@ -775,7 +775,7 @@ DatabaseLocation::GetSupportedTypes(const char* type, BMessage& _types)
 		err = B_OK;
 	}
 	if (err == B_OK) {
-		_types.what = 0;	
+		_types.what = 0;
 		err = _types.AddString("type", type);
 	}
 	return err;

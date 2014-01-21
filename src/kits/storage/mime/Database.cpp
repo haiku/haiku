@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2006, Haiku.
+ * Copyright 2002-2014, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Tyler Dauwalder
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Rene Gollent, rene@gollent.com.
  */
 
 
@@ -126,7 +127,7 @@ Database::Install(const char *type)
 		else {
 			bool didCreate = false;
 			BNode node;
-			err = fLocation->OpenOrCreateType(type, node, &didCreate);
+			err = fLocation->OpenWritableType(type, node, true, &didCreate);
 			if (!err && didCreate) {
 				fInstalledTypes.AddType(type);
 				_SendInstallNotification(type);
@@ -443,7 +444,7 @@ Database::SetIconForType(const char *type, const char *fileType,
 	BNode node;
 	bool didCreate = false;
 
-	status_t err = fLocation->OpenOrCreateType(type, node, &didCreate);
+	status_t err = fLocation->OpenWritableType(type, node, true, &didCreate);
 	if (err != B_OK)
 		return err;
 
@@ -504,7 +505,7 @@ Database::SetIconForType(const char *type, const char *fileType,
 	BNode node;
 	bool didCreate = false;
 
-	status_t err = fLocation->OpenOrCreateType(type, node, &didCreate);
+	status_t err = fLocation->OpenWritableType(type, node, true, &didCreate);
 	if (err != B_OK)
 		return err;
 

@@ -38,9 +38,9 @@ public:
 			// opening type nodes
 
 			status_t			OpenType(const char* type, BNode& _node) const;
-			status_t			OpenOrCreateType(const char* type,
-									BNode& _node, bool* _didCreate = NULL)
-									const;
+			status_t			OpenWritableType(const char* type,
+									BNode& _node, bool create,
+									bool* _didCreate = NULL) const;
 
 			// generic type attributes access
 
