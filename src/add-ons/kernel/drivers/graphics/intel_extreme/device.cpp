@@ -124,7 +124,7 @@ device_open(const char* name, uint32 /*flags*/, void** _cookie)
 
 	mutex_lock(&gLock);
 
-	if (info->open_count == 0) {
+	if (info->open_count++ == 0) {
 		// this device has been opened for the first time, so
 		// we allocate needed resources and initialize the structure
 		info->init_status = intel_extreme_init(*info);
@@ -133,8 +133,6 @@ device_open(const char* name, uint32 /*flags*/, void** _cookie)
 			add_debugger_command("ie_reg", getset_register,
 				"dumps or sets the specified intel_extreme register");
 #endif
-
-			info->open_count++;
 		}
 	}
 
