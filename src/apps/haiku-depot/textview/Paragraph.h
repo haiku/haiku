@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PARAGRAPH_H
@@ -40,6 +40,8 @@ public:
 			bool				IsEmpty() const;
 
 			BString				GetText(int32 start, int32 length) const;
+
+			void				PrintToStream() const;
 
 private:
 			ParagraphStyle		fStyle;

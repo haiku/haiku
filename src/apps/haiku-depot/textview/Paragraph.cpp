@@ -1,11 +1,12 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "Paragraph.h"
 
 #include <algorithm>
+#include <stdio.h>
 
 
 Paragraph::Paragraph()
@@ -267,4 +268,27 @@ Paragraph::GetText(int32 start, int32 length) const
 	}
 
 	return text;
+}
+
+
+void
+Paragraph::PrintToStream() const
+{
+	int32 spanCount = fTextSpans.CountItems();
+	if (spanCount == 0) {
+		printf("  <p/>\n");
+		return;
+	}
+	printf("  <p>\n");
+	for (int32 i = 0; i < spanCount; i++) {
+		const TextSpan& span = fTextSpans.ItemAtFast(i);
+		if (span.CountChars() == 0)
+			printf("    <span/>\n");
+		else {
+			BString text = span.Text();
+			text.ReplaceAll("\n", "\\n");
+			printf("    <span>%s<span/>\n", text.String());
+		}
+	}
+	printf("  </p>\n");
 }
