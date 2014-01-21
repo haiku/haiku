@@ -116,6 +116,7 @@ TextDocumentTest::ReadyToRun()
 	);
 
 	documentView->SetTextDocument(document);
+	documentView->MakeFocus();
 
 	window->Show();
 }
