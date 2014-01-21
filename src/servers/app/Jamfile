@@ -32,9 +32,9 @@ local font_src =
 
 UseBuildFeatureHeaders freetype ;
 Includes [ FGristFiles AppServer.cpp BitmapManager.cpp
-	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp DrawState.cpp 
-	ServerApp.cpp ServerBitmap.cpp ServerFont.cpp ServerPicture.cpp
-	ServerWindow.cpp View.cpp Window.cpp WorkspacesView.cpp
+	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp
+	DrawState.cpp ServerApp.cpp ServerBitmap.cpp ServerFont.cpp
+	ServerPicture.cpp ServerWindow.cpp View.cpp Window.cpp WorkspacesView.cpp
 	$(decorator_src) $(font_src) ]
 	: [ BuildFeatureAttribute freetype : headers ] ;
 
@@ -58,6 +58,7 @@ Server app_server :
 	DesktopListener.cpp
 	DesktopSettings.cpp
 	DirectWindowInfo.cpp
+	DrawingContext.cpp
 	DrawState.cpp
 	EventDispatcher.cpp
 	EventStream.cpp

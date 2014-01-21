@@ -17,9 +17,10 @@
 #include <Referenceable.h>
 
 
+class BFile;
+class DrawingContext;
 class ServerApp;
 class View;
-class BFile;
 
 namespace BPrivate {
 	class LinkReceiver;
@@ -48,7 +49,7 @@ public:
 			void				SyncState(View* view);
 			void				SetFontFromLink(BPrivate::LinkReceiver& link);
 
-			void				Play(View* view);
+			void				Play(DrawingContext* target);
 
 			void 				PushPicture(ServerPicture* picture);
 			ServerPicture*		PopPicture();

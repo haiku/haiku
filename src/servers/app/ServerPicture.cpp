@@ -44,7 +44,7 @@ using std::stack;
 
 class ShapePainter : public BShapeIterator {
 public:
-	ShapePainter(View* view);
+	ShapePainter(DrawingContext* view);
 	virtual ~ShapePainter();
 
 	status_t Iterate(const BShape* shape);
@@ -59,13 +59,13 @@ public:
 	void Draw(BRect frame, bool filled);
 
 private:
-	View*			fView;
+	DrawingContext*	fView;
 	stack<uint32>	fOpStack;
 	stack<BPoint>	fPtStack;
 };
 
 
-ShapePainter::ShapePainter(View* view)
+ShapePainter::ShapePainter(DrawingContext* view)
 	:
 	fView(view)
 {
@@ -205,8 +205,8 @@ ShapePainter::Draw(BRect frame, bool filled)
 
 		BPoint offset(fView->CurrentState()->PenLocation());
 		fView->ConvertToScreenForDrawing(&offset);
-		fView->Window()->GetDrawingEngine()->DrawShape(frame, opCount,
-			opList, ptCount, ptList, filled, offset, fView->Scale());
+		fView->GetDrawingEngine()->DrawShape(frame, opCount, opList, ptCount,
+			ptList, filled, offset, fView->Scale());
 
 		delete[] opList;
 		delete[] ptList;
@@ -253,7 +253,7 @@ nop()
 
 
 static void
-move_pen_by(View* view, BPoint delta)
+move_pen_by(DrawingContext* view, BPoint delta)
 {
 	view->CurrentState()->SetPenLocation(
 		view->CurrentState()->PenLocation() + delta);
@@ -261,13 +261,13 @@ move_pen_by(View* view, BPoint delta)
 
 
 static void
-stroke_line(View* view, BPoint start, BPoint end)
+stroke_line(DrawingContext* view, BPoint start, BPoint end)
 {
 	BPoint penPos = end;
 
 	view->ConvertToScreenForDrawing(&start);
 	view->ConvertToScreenForDrawing(&end);
-	view->Window()->GetDrawingEngine()->StrokeLine(start, end);
+	view->GetDrawingEngine()->StrokeLine(start, end);
 
 	view->CurrentState()->SetPenLocation(penPos);
 	// the DrawingEngine/Painter does not need to be updated, since this
@@ -277,105 +277,103 @@ stroke_line(View* view, BPoint start, BPoint end)
 
 
 static void
-stroke_rect(View* view, BRect rect)
+stroke_rect(DrawingContext* view, BRect rect)
 {
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->StrokeRect(rect);
+	view->GetDrawingEngine()->StrokeRect(rect);
 }
 
 
 static void
-fill_rect(View* view, BRect rect)
+fill_rect(DrawingContext* view, BRect rect)
 {
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->FillRect(rect);
+	view->GetDrawingEngine()->FillRect(rect);
 }
 
 
 static void
-stroke_round_rect(View* view, BRect rect, BPoint radii)
+stroke_round_rect(DrawingContext* view, BRect rect, BPoint radii)
 {
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x,
+	view->GetDrawingEngine()->DrawRoundRect(rect, radii.x,
 		radii.y, false);
 }
 
 
 static void
-fill_round_rect(View* view, BRect rect, BPoint radii)
+fill_round_rect(DrawingContext* view, BRect rect, BPoint radii)
 {
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x,
-		radii.y, true);
+	view->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y, true);
 }
 
 
 static void
-stroke_bezier(View* view, const BPoint* viewPoints)
+stroke_bezier(DrawingContext* view, const BPoint* viewPoints)
 {
 	BPoint points[4];
 	view->ConvertToScreenForDrawing(points, viewPoints, 4);
 
-	view->Window()->GetDrawingEngine()->DrawBezier(points, false);
+	view->GetDrawingEngine()->DrawBezier(points, false);
 }
 
 
 static void
-fill_bezier(View* view, const BPoint* viewPoints)
+fill_bezier(DrawingContext* view, const BPoint* viewPoints)
 {
 	BPoint points[4];
 	view->ConvertToScreenForDrawing(points, viewPoints, 4);
 
-	view->Window()->GetDrawingEngine()->DrawBezier(points, true);
+	view->GetDrawingEngine()->DrawBezier(points, true);
 }
 
 
 static void
-stroke_arc(View* view, BPoint center, BPoint radii, float startTheta,
+stroke_arc(DrawingContext* view, BPoint center, BPoint radii, float startTheta,
 	float arcTheta)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta,
-		arcTheta, false);
+	view->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, false);
 }
 
 
 static void
-fill_arc(View* view, BPoint center, BPoint radii, float startTheta,
+fill_arc(DrawingContext* view, BPoint center, BPoint radii, float startTheta,
 	float arcTheta)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta,
+	view->GetDrawingEngine()->DrawArc(rect, startTheta,
 		arcTheta, true);
 }
 
 
 static void
-stroke_ellipse(View* view, BPoint center, BPoint radii)
+stroke_ellipse(DrawingContext* view, BPoint center, BPoint radii)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawEllipse(rect, false);
+	view->GetDrawingEngine()->DrawEllipse(rect, false);
 }
 
 
 static void
-fill_ellipse(View* view, BPoint center, BPoint radii)
+fill_ellipse(DrawingContext* view, BPoint center, BPoint radii)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawEllipse(rect, true);
+	view->GetDrawingEngine()->DrawEllipse(rect, true);
 }
 
 
 static void
-stroke_polygon(View* view, int32 numPoints, const BPoint* viewPoints,
+stroke_polygon(DrawingContext* view, int32 numPoints, const BPoint* viewPoints,
 	bool isClosed)
 {
 	if (numPoints <= 0)
@@ -392,8 +390,8 @@ stroke_polygon(View* view, int32 numPoints, const BPoint* viewPoints,
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points,
-			numPoints, polyFrame, false, isClosed && numPoints > 2);
+		view->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
+			false, isClosed && numPoints > 2);
 	} else {
 		 // avoid constructor/destructor calls by
 		 // using malloc instead of new []
@@ -406,15 +404,15 @@ stroke_polygon(View* view, int32 numPoints, const BPoint* viewPoints,
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points,
-			numPoints, polyFrame, false, isClosed && numPoints > 2);
+		view->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
+			false, isClosed && numPoints > 2);
 		free(points);
 	}
 }
 
 
 static void
-fill_polygon(View* view, int32 numPoints, const BPoint* viewPoints)
+fill_polygon(DrawingContext* view, int32 numPoints, const BPoint* viewPoints)
 {
 	if (numPoints <= 0)
 		return;
@@ -430,8 +428,8 @@ fill_polygon(View* view, int32 numPoints, const BPoint* viewPoints)
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points,
-			numPoints, polyFrame, true, true);
+		view->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
+			true, true);
 	} else {
 		 // avoid constructor/destructor calls by
 		 // using malloc instead of new []
@@ -444,15 +442,15 @@ fill_polygon(View* view, int32 numPoints, const BPoint* viewPoints)
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points,
-			numPoints, polyFrame, true, true);
+		view->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
+			true, true);
 		free(points);
 	}
 }
 
 
 static void
-stroke_shape(View* view, const BShape* shape)
+stroke_shape(DrawingContext* view, const BShape* shape)
 {
 	ShapePainter drawShape(view);
 
@@ -462,7 +460,7 @@ stroke_shape(View* view, const BShape* shape)
 
 
 static void
-fill_shape(View* view, const BShape* shape)
+fill_shape(DrawingContext* view, const BShape* shape)
 {
 	ShapePainter drawShape(view);
 
@@ -472,7 +470,7 @@ fill_shape(View* view, const BShape* shape)
 
 
 static void
-draw_string(View* view, const char* string, float deltaSpace,
+draw_string(DrawingContext* view, const char* string, float deltaSpace,
 	float deltaNonSpace)
 {
 	// NOTE: the picture data was recorded with a "set pen location"
@@ -482,8 +480,8 @@ draw_string(View* view, const char* string, float deltaSpace,
 
 	escapement_delta delta = {deltaSpace, deltaNonSpace };
 	view->ConvertToScreenForDrawing(&location);
-	view->Window()->GetDrawingEngine()->DrawString(string,
-		strlen(string), location, &delta);
+	view->GetDrawingEngine()->DrawString(string, strlen(string), location,
+		&delta);
 
 	view->ConvertFromScreenForDrawing(&location);
 	view->CurrentState()->SetPenLocation(location);
@@ -494,7 +492,7 @@ draw_string(View* view, const char* string, float deltaSpace,
 
 
 static void
-draw_pixels(View* view, BRect src, BRect dest, int32 width,
+draw_pixels(DrawingContext* view, BRect src, BRect dest, int32 width,
 	int32 height, int32 bytesPerRow, int32 pixelFormat, int32 options,
 	const void* data)
 {
@@ -507,15 +505,14 @@ draw_pixels(View* view, BRect src, BRect dest, int32 width,
 	memcpy(bitmap.Bits(), data, height * bytesPerRow);
 
 	view->ConvertToScreenForDrawing(&dest);
-	view->Window()->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest, options);
+	view->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest, options);
 }
 
 
 static void
-draw_picture(View* view, BPoint where, int32 token)
+draw_picture(DrawingContext* view, BPoint where, int32 token)
 {
-	ServerPicture* picture
-		= view->Window()->ServerWindow()->App()->GetPicture(token);
+	ServerPicture* picture = view->GetPicture(token);
 	if (picture != NULL) {
 		view->PushState();
 		view->SetDrawingOrigin(where);
@@ -531,7 +528,7 @@ draw_picture(View* view, BPoint where, int32 token)
 
 
 static void
-set_clipping_rects(View* view, const BRect* rects, uint32 numRects)
+set_clipping_rects(DrawingContext* view, const BRect* rects, uint32 numRects)
 {
 	// TODO: This might be too slow, we should copy the rects
 	// directly to BRegion's internal data
@@ -539,12 +536,13 @@ set_clipping_rects(View* view, const BRect* rects, uint32 numRects)
 	for (uint32 c = 0; c < numRects; c++)
 		region.Include(rects[c]);
 	view->SetUserClipping(&region);
-	view->Window()->ServerWindow()->UpdateCurrentDrawingRegion();
+	view->UpdateCurrentDrawingRegion();
 }
 
 
 static void
-clip_to_picture(View* view, BPicture* picture, BPoint pt, bool clipToInverse)
+clip_to_picture(DrawingContext* view, BPicture* picture, BPoint pt,
+	bool clipToInverse)
 {
 	printf("ClipToPicture(picture, BPoint(%.2f, %.2f), %s)\n",
 		pt.x, pt.y, clipToInverse ? "inverse" : "");
@@ -552,62 +550,61 @@ clip_to_picture(View* view, BPicture* picture, BPoint pt, bool clipToInverse)
 
 
 static void
-push_state(View* view)
+push_state(DrawingContext* view)
 {
 	view->PushState();
 }
 
 
 static void
-pop_state(View* view)
+pop_state(DrawingContext* view)
 {
 	view->PopState();
 
 	BPoint p(0, 0);
 	view->ConvertToScreenForDrawing(&p);
-	view->Window()->GetDrawingEngine()->SetDrawState(
-		view->CurrentState(), (int32)p.x, (int32)p.y);
+	view->GetDrawingEngine()->SetDrawState(view->CurrentState(), (int32)p.x,
+		(int32)p.y);
 }
 
 
 // TODO: Be smart and actually take advantage of these methods:
 // only apply state changes when they are called
 static void
-enter_state_change(View* view)
+enter_state_change(DrawingContext* view)
 {
 }
 
 
 static void
-exit_state_change(View* view)
+exit_state_change(DrawingContext* view)
 {
-	view->Window()->ServerWindow()->ResyncDrawState();
+	view->ResyncDrawState();
 }
 
 
 static void
-enter_font_state(View* view)
+enter_font_state(DrawingContext* view)
 {
 }
 
 
 static void
-exit_font_state(View* view)
+exit_font_state(DrawingContext* view)
 {
-	view->Window()->GetDrawingEngine()->SetFont(
-		view->CurrentState()->Font());
+	view->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
 static void
-set_origin(View* view, BPoint pt)
+set_origin(DrawingContext* view, BPoint pt)
 {
 	view->CurrentState()->SetOrigin(pt);
 }
 
 
 static void
-set_pen_location(View* view, BPoint pt)
+set_pen_location(DrawingContext* view, BPoint pt)
 {
 	view->CurrentState()->SetPenLocation(pt);
 	// the DrawingEngine/Painter does not need to be updated, since this
@@ -617,66 +614,64 @@ set_pen_location(View* view, BPoint pt)
 
 
 static void
-set_drawing_mode(View* view, drawing_mode mode)
+set_drawing_mode(DrawingContext* view, drawing_mode mode)
 {
 	view->CurrentState()->SetDrawingMode(mode);
-	view->Window()->GetDrawingEngine()->SetDrawingMode(mode);
+	view->GetDrawingEngine()->SetDrawingMode(mode);
 }
 
 
 static void
-set_line_mode(View* view, cap_mode capMode, join_mode joinMode,
+set_line_mode(DrawingContext* view, cap_mode capMode, join_mode joinMode,
 	float miterLimit)
 {
 	DrawState* state = view->CurrentState();
 	state->SetLineCapMode(capMode);
 	state->SetLineJoinMode(joinMode);
 	state->SetMiterLimit(miterLimit);
-	view->Window()->GetDrawingEngine()->SetStrokeMode(capMode, joinMode,
-		miterLimit);
+	view->GetDrawingEngine()->SetStrokeMode(capMode, joinMode, miterLimit);
 }
 
 
 static void
-set_pen_size(View* view, float size)
+set_pen_size(DrawingContext* view, float size)
 {
 	view->CurrentState()->SetPenSize(size);
-	view->Window()->GetDrawingEngine()->SetPenSize(
-		view->CurrentState()->PenSize());
+	view->GetDrawingEngine()->SetPenSize(view->CurrentState()->PenSize());
 		// DrawState::PenSize() returns the scaled pen size, so we
 		// need to use that value to set the drawing engine pen size.
 }
 
 
 static void
-set_fore_color(View* view, rgb_color color)
+set_fore_color(DrawingContext* view, rgb_color color)
 {
 	view->CurrentState()->SetHighColor(color);
-	view->Window()->GetDrawingEngine()->SetHighColor(color);
+	view->GetDrawingEngine()->SetHighColor(color);
 }
 
 
 static void
-set_back_color(View* view, rgb_color color)
+set_back_color(DrawingContext* view, rgb_color color)
 {
 	view->CurrentState()->SetLowColor(color);
-	view->Window()->GetDrawingEngine()->SetLowColor(color);
+	view->GetDrawingEngine()->SetLowColor(color);
 }
 
 
 static void
-set_stipple_pattern(View* view, pattern p)
+set_stipple_pattern(DrawingContext* view, pattern p)
 {
 	view->CurrentState()->SetPattern(Pattern(p));
-	view->Window()->GetDrawingEngine()->SetPattern(p);
+	view->GetDrawingEngine()->SetPattern(p);
 }
 
 
 static void
-set_scale(View* view, float scale)
+set_scale(DrawingContext* view, float scale)
 {
 	view->CurrentState()->SetScale(scale);
-	view->Window()->ServerWindow()->ResyncDrawState();
+	view->ResyncDrawState();
 
 	// Update the drawing engine draw state, since some stuff
 	// (for example the pen size) needs to be recalculated.
@@ -684,7 +679,7 @@ set_scale(View* view, float scale)
 
 
 static void
-set_font_family(View* view, const char* family)
+set_font_family(DrawingContext* view, const char* family)
 {
 	FontStyle* fontStyle = gFontManager->GetStyleByIndex(family, 0);
 	ServerFont font;
@@ -694,7 +689,7 @@ set_font_family(View* view, const char* family)
 
 
 static void
-set_font_style(View* view, const char* style)
+set_font_style(DrawingContext* view, const char* style)
 {
 	ServerFont font(view->CurrentState()->Font());
 
@@ -706,7 +701,7 @@ set_font_style(View* view, const char* style)
 
 
 static void
-set_font_spacing(View* view, int32 spacing)
+set_font_spacing(DrawingContext* view, int32 spacing)
 {
 	ServerFont font;
 	font.SetSpacing(spacing);
@@ -715,7 +710,7 @@ set_font_spacing(View* view, int32 spacing)
 
 
 static void
-set_font_size(View* view, float size)
+set_font_size(DrawingContext* view, float size)
 {
 	ServerFont font;
 	font.SetSize(size);
@@ -724,7 +719,7 @@ set_font_size(View* view, float size)
 
 
 static void
-set_font_rotate(View* view, float rotation)
+set_font_rotate(DrawingContext* view, float rotation)
 {
 	ServerFont font;
 	font.SetRotation(rotation);
@@ -733,7 +728,7 @@ set_font_rotate(View* view, float rotation)
 
 
 static void
-set_font_encoding(View* view, int32 encoding)
+set_font_encoding(DrawingContext* view, int32 encoding)
 {
 	ServerFont font;
 	font.SetEncoding(encoding);
@@ -742,7 +737,7 @@ set_font_encoding(View* view, int32 encoding)
 
 
 static void
-set_font_flags(View* view, int32 flags)
+set_font_flags(DrawingContext* view, int32 flags)
 {
 	ServerFont font;
 	font.SetFlags(flags);
@@ -751,7 +746,7 @@ set_font_flags(View* view, int32 flags)
 
 
 static void
-set_font_shear(View* view, float shear)
+set_font_shear(DrawingContext* view, float shear)
 {
 	ServerFont font;
 	font.SetShear(shear);
@@ -760,7 +755,7 @@ set_font_shear(View* view, float shear)
 
 
 static void
-set_font_face(View* view, int32 face)
+set_font_face(DrawingContext* view, int32 face)
 {
 	ServerFont font;
 	font.SetFace(face);
@@ -769,7 +764,7 @@ set_font_face(View* view, int32 face)
 
 
 static void
-set_blending_mode(View* view, int16 alphaSrcMode, int16 alphaFncMode)
+set_blending_mode(DrawingContext* view, int16 alphaSrcMode, int16 alphaFncMode)
 {
 	view->CurrentState()->SetBlendingMode((source_alpha)alphaSrcMode,
 		(alpha_function)alphaFncMode);
@@ -1064,7 +1059,7 @@ ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 
 
 void
-ServerPicture::Play(View* view)
+ServerPicture::Play(DrawingContext* target)
 {
 	// TODO: for now: then change PicturePlayer
 	// to accept a BPositionIO object
@@ -1075,7 +1070,7 @@ ServerPicture::Play(View* view)
 	BPrivate::PicturePlayer player(mallocIO->Buffer(),
 		mallocIO->BufferLength(), PictureList::Private(fPictures).AsBList());
 	player.Play(const_cast<void**>(kTableEntries),
-		sizeof(kTableEntries) / sizeof(void*), view);
+		sizeof(kTableEntries) / sizeof(void*), target);
 }
 
 

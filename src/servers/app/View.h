@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2008, Haiku, Inc.
+ * Copyright (c) 2001-2014, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -8,11 +8,13 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Marcus Overhagen <marcus@overhagen.de>
+ *		Adrien Destugues <pulkomandy@pulkomandy.tk>
  */
 #ifndef	VIEW_H
 #define VIEW_H
 
 
+#include "DrawingContext.h"
 #include "IntRect.h"
 
 #include <GraphicsDefs.h>
@@ -27,7 +29,6 @@ namespace BPrivate {
 	class PortLink;
 };
 
-class DrawState;
 class DrawingEngine;
 class Overlay;
 class Window;
@@ -36,8 +37,8 @@ class ServerCursor;
 class ServerPicture;
 class BGradient;
 
-class View {
- public:
+class View: public DrawingContext {
+	public:
 							View(IntRect frame, IntPoint scrollingOffset,
 								const char* name, int32 token,
 								uint32 resizeMode, uint32 flags);
@@ -65,15 +66,6 @@ class View {
 	inline	IntPoint		ScrollingOffset() const
 								{ return fScrollingOffset; }
 
-			void			SetDrawingOrigin(BPoint origin);
-			BPoint			DrawingOrigin() const;
-
-			void			SetScale(float scale);
-			float			Scale() const;
-
-			void			SetUserClipping(const BRegion* region);
-				// region is expected in view coordinates
-
 			// converts the given frame up the view hierarchy and
 			// clips to each views bounds
 			void			ConvertToVisibleInTopView(IntRect* bounds) const;
@@ -81,6 +73,12 @@ class View {
 	virtual	void			AttachedToWindow(::Window* window);
 	virtual void			DetachedFromWindow();
 			::Window*		Window() const { return fWindow; }
+
+			// Shorthands for opaque Window access
+			DrawingEngine*	GetDrawingEngine() const;
+			ServerPicture*	GetPicture(int32 token) const;
+			void			ResyncDrawState();
+			void			UpdateCurrentDrawingRegion();
 
 			// tree stuff
 			void			AddChild(View* view);
@@ -112,13 +110,13 @@ class View {
 			void			ConvertToParent(IntPoint* point) const;
 			void			ConvertToParent(BRect* rect) const;
 			void			ConvertToParent(IntRect* rect) const;
-			void			ConvertToParent(BRegion* region) const; 
+			void			ConvertToParent(BRegion* region) const;
 
 			void			ConvertFromParent(BPoint* point) const;
 			void			ConvertFromParent(IntPoint* point) const;
 			void			ConvertFromParent(BRect* rect) const;
 			void			ConvertFromParent(IntRect* rect) const;
-			void			ConvertFromParent(BRegion* region) const; 
+			void			ConvertFromParent(BRegion* region) const;
 
 			void			ConvertToScreen(BPoint* point) const;
 			void			ConvertToScreen(IntPoint* point) const;
@@ -131,18 +129,6 @@ class View {
 			void			ConvertFromScreen(BRect* rect) const;
 			void			ConvertFromScreen(IntRect* rect) const;
 			void			ConvertFromScreen(BRegion* region) const;
-
-			void			ConvertToScreenForDrawing(BPoint* point) const;
-			void			ConvertToScreenForDrawing(BRect* rect) const;
-			void			ConvertToScreenForDrawing(BRegion* region) const;
-			void			ConvertToScreenForDrawing(BGradient* gradient) const;
-
-			void			ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const;
-			void			ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const;
-			void			ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const;
-
-			void			ConvertFromScreenForDrawing(BPoint* point) const;
-				// used when updating the pen position
 
 			void			MoveBy(int32 dx, int32 dy,
 								BRegion* dirtyRegion);
@@ -174,7 +160,6 @@ class View {
 
 			void			PushState();
 			void			PopState();
-			DrawState*		CurrentState() const { return fDrawState; }
 
 			void			SetEventMask(uint32 eventMask, uint32 options);
 			uint32			EventMask() const
@@ -259,7 +244,6 @@ class View {
 			IntPoint		fScrollingOffset;
 
 			rgb_color		fViewColor;
-			DrawState*		fDrawState;
 			ServerBitmap*	fViewBitmap;
 			IntRect			fBitmapSource;
 			IntRect			fBitmapDestination;

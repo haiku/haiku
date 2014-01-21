@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2008, Haiku, Inc.
+ * Copyright (c) 2001-2014, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Marcus Overhagen <marcus@overhagen.de>
+ *		Adrien Destugues <pulkomandy@pulkomandy.tk
  */
 #include "View.h"
 
@@ -86,7 +87,6 @@ View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 	fScrollingOffset(scrollingOffset),
 
 	fViewColor((rgb_color){ 255, 255, 255, 255 }),
-	fDrawState(new (nothrow) DrawState),
 	fViewBitmap(NULL),
 	fBitmapResizingMode(0),
 	fBitmapOptions(0),
@@ -218,6 +218,34 @@ View::DetachedFromWindow()
 
 
 // #pragma mark -
+
+
+DrawingEngine*
+View::GetDrawingEngine() const
+{
+	return Window()->GetDrawingEngine();
+}
+
+
+ServerPicture*
+View::GetPicture(int32 token) const
+{
+	return Window()->ServerWindow()->App()->GetPicture(token);
+}
+
+
+void
+View::ResyncDrawState()
+{
+	return Window()->ServerWindow()->ResyncDrawState();
+}
+
+
+void
+View::UpdateCurrentDrawingRegion()
+{
+	return Window()->ServerWindow()->UpdateCurrentDrawingRegion();
+}
 
 
 void
@@ -452,58 +480,6 @@ View::SetFlags(uint32 flags)
 {
 	fFlags = flags;
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
-}
-
-
-void
-View::SetDrawingOrigin(BPoint origin)
-{
-	fDrawState->SetOrigin(origin);
-
-	// rebuild clipping
-	if (fDrawState->HasClipping())
-		RebuildClipping(false);
-}
-
-
-BPoint
-View::DrawingOrigin() const
-{
-	BPoint origin(fDrawState->Origin());
-	float scale = Scale();
-
-	origin.x *= scale;
-	origin.y *= scale;
-
-	return origin;
-}
-
-
-void
-View::SetScale(float scale)
-{
-	fDrawState->SetScale(scale);
-
-	// rebuild clipping
-	if (fDrawState->HasClipping())
-		RebuildClipping(false);
-}
-
-
-float
-View::Scale() const
-{
-	return CurrentState()->Scale();
-}
-
-
-void
-View::SetUserClipping(const BRegion* region)
-{
-	fDrawState->SetClippingRegion(region);
-
-	// rebuild clipping (for just this view)
-	RebuildClipping(false);
 }
 
 
@@ -785,164 +761,6 @@ View::ConvertFromScreen(BRegion* region) const
 	ConvertFromScreen(&offset);
 
 	region->OffsetBy((int)offset.x, (int)offset.y);
-}
-
-
-//! converts a point from local *drawing* to screen coordinate system
-void
-View::ConvertToScreenForDrawing(BPoint* point) const
-{
-	fDrawState->Transform(point);
-	// NOTE: from here on, don't use the
-	// "*ForDrawing()" versions of the parent!
-	ConvertToScreen(point);
-}
-
-
-//! converts a rect from local *drawing* to screen coordinate system
-void
-View::ConvertToScreenForDrawing(BRect* rect) const
-{
-	fDrawState->Transform(rect);
-	// NOTE: from here on, don't use the
-	// "*ForDrawing()" versions of the parent!
-	ConvertToScreen(rect);
-}
-
-
-//! converts a region from local *drawing* to screen coordinate system
-void
-View::ConvertToScreenForDrawing(BRegion* region) const
-{
-	fDrawState->Transform(region);
-	// NOTE: from here on, don't use the
-	// "*ForDrawing()" versions of the parent!
-	ConvertToScreen(region);
-}
-
-
-//! converts a gradient from local *drawing* to screen coordinate system
-void
-View::ConvertToScreenForDrawing(BGradient* gradient) const
-{
-	switch(gradient->GetType()) {
-		case BGradient::TYPE_LINEAR: {
-			BGradientLinear* linear = (BGradientLinear*) gradient;
-			BPoint start = linear->Start();
-			BPoint end = linear->End();
-			fDrawState->Transform(&start);
-			ConvertToScreen(&start);
-			fDrawState->Transform(&end);
-			ConvertToScreen(&end);
-			linear->SetStart(start);
-			linear->SetEnd(end);
-			linear->SortColorStopsByOffset();
-			break;
-		}
-		case BGradient::TYPE_RADIAL: {
-			BGradientRadial* radial = (BGradientRadial*) gradient;
-			BPoint center = radial->Center();
-			fDrawState->Transform(&center);
-			ConvertToScreen(&center);
-			radial->SetCenter(center);
-			radial->SortColorStopsByOffset();
-			break;
-		}
-		case BGradient::TYPE_RADIAL_FOCUS: {
-			BGradientRadialFocus* radialFocus = (BGradientRadialFocus*) gradient;
-			BPoint center = radialFocus->Center();
-			BPoint focal = radialFocus->Focal();
-			fDrawState->Transform(&center);
-			ConvertToScreen(&center);
-			fDrawState->Transform(&focal);
-			ConvertToScreen(&focal);
-			radialFocus->SetCenter(center);
-			radialFocus->SetFocal(focal);
-			radialFocus->SortColorStopsByOffset();
-			break;
-		}
-		case BGradient::TYPE_DIAMOND: {
-			BGradientDiamond* diamond = (BGradientDiamond*) gradient;
-			BPoint center = diamond->Center();
-			fDrawState->Transform(&center);
-			ConvertToScreen(&center);
-			diamond->SetCenter(center);
-			diamond->SortColorStopsByOffset();
-			break;
-		}
-		case BGradient::TYPE_CONIC: {
-			BGradientConic* conic = (BGradientConic*) gradient;
-			BPoint center = conic->Center();
-			fDrawState->Transform(&center);
-			ConvertToScreen(&center);
-			conic->SetCenter(center);
-			conic->SortColorStopsByOffset();
-			break;
-		}
-		case BGradient::TYPE_NONE: {
-			break;
-		}
-	}
-}
-
-
-//! converts points from local *drawing* to screen coordinate system
-void
-View::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const
-{
-	// TODO: optimize this, it should be smarter
-	while (num--) {
-		*dst = *src;
-		fDrawState->Transform(dst);
-		// NOTE: from here on, don't use the
-		// "*ForDrawing()" versions of the parent!
-		ConvertToScreen(dst);
-		src++;
-		dst++;
-	}
-}
-
-
-//! converts rects from local *drawing* to screen coordinate system
-void
-View::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const
-{
-	// TODO: optimize this, it should be smarter
-	while (num--) {
-		*dst = *src;
-		fDrawState->Transform(dst);
-		// NOTE: from here on, don't use the
-		// "*ForDrawing()" versions of the parent!
-		ConvertToScreen(dst);
-		src++;
-		dst++;
-	}
-}
-
-
-//! converts regions from local *drawing* to screen coordinate system
-void
-View::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const
-{
-	// TODO: optimize this, it should be smarter
-	while (num--) {
-		*dst = *src;
-		fDrawState->Transform(dst);
-		// NOTE: from here on, don't use the
-		// "*ForDrawing()" versions of the parent!
-		ConvertToScreen(dst);
-		src++;
-		dst++;
-	}
-}
-
-
-//! converts a point from screen to local coordinate system
-void
-View::ConvertFromScreenForDrawing(BPoint* point) const
-{
-	ConvertFromScreen(point);
-	fDrawState->InverseTransform(point);
 }
 
 
@@ -1257,6 +1075,10 @@ View::PushState()
 	DrawState* newState = fDrawState->PushState();
 	if (newState) {
 		fDrawState = newState;
+		// In BeAPI, B_SUBPIXEL_PRECISE is a view flag, and not affected by the
+		// view state. Our implementation moves it to the draw state, but let's
+		// be compatible with the API here and make it survive accross state
+		// changes.
 		fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
 	}
 }
@@ -1281,6 +1103,9 @@ View::PopState()
 	if (rebuildClipping)
 		RebuildClipping(false);
 }
+
+
+// #pragma mark -
 
 
 void
