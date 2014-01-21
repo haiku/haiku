@@ -369,10 +369,17 @@ void
 TextEditor::_MoveToLine(int32 lineIndex, bool select)
 {
 	if (lineIndex < 0) {
+		// Move to beginning of line instead. Most editors do. Some only when
+		// selecting. Note that we are not updating the horizontal anchor here,
+		// even though the horizontal caret position changes. Most editors
+		// return to the previous horizonal offset when moving back down from
+		// the beginning of the line.
 		_SetCaretOffset(0, false, select, true);
 		return;
 	}
 	if (lineIndex >= fLayout->CountLines()) {
+		// Move to end of line instead, see above for why we do not update the
+		// horizontal anchor.
 		_SetCaretOffset(fDocument->Length(), false, select, true);
 		return;
 	}
