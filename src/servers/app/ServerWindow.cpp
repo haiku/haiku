@@ -3768,47 +3768,56 @@ ServerWindow::PictureToRegion(ServerPicture* picture, BRegion& region,
 			* 32 - 1;
 	}
 
-	// TODO: I used a RGBA32 bitmap because drawing on a GRAY8 doesn't work.
+	region.MakeEmpty();
+
+	// TODO: Only the alpha channel is relevant, but there is no B_ALPHA8
+	// color space, so we use 75% more memory.
 	UtilityBitmap* bitmap = new UtilityBitmap(bounds, B_RGBA32, 0);
-	if (bitmap != NULL) {
+	if (bitmap == NULL)
+		return B_NO_MEMORY;
+
 #if 0
-		/*
-		 * TODO stippi says we could use OffscreenWindow to do this, but there
-		 * doesn't seem to be a way to create a View without a BView on
-		 * application side (the constructor wants a token).
-		 * This would be better, as it would avoid the DrawingContext mess.
-		 */
-		OffscreenWindow window(bitmap, "ClipToPicture", fCurrentView->Window());
-		View view(bounds, IntPoint(0, 0), "ClipToPicture");
-		window->SetTopView(view);
+	/*
+	 * TODO stippi says we could use OffscreenWindow to do this, but there
+	 * doesn't seem to be a way to create a View without a BView on
+	 * application side (the constructor wants a token).
+	 * This would be better, as it would avoid the DrawingContext mess.
+	 */
+	OffscreenWindow window(bitmap, "ClipToPicture", fCurrentView->Window());
+	View view(bounds, IntPoint(0, 0), "ClipToPicture");
+	window->SetTopView(view);
 #endif
 
-		// Clear the bitmap with the transparent color
-		memset(bitmap->Bits(), 0, bitmap->BitsLength());
+	// Clear the bitmap with the transparent color
+	memset(bitmap->Bits(), 0, bitmap->BitsLength());
 
-		// Render the picture to the bitmap
-		BitmapHWInterface interface(bitmap);
-		DrawingEngine* engine = interface.CreateDrawingEngine();
-		// Copy the current state of the client view, so we draw with the right
-		// font, color and everything
-		engine->SetDrawState(fCurrentView->CurrentState());
-		OffscreenContext context(engine);
-		if (engine->LockParallelAccess())
-		{
-			// FIXME ConstrainClippingRegion docs says passing NULL disables
-			// all clipping. This doesn't work and will crash in Painter.
-			BRegion clipping;
-			clipping.Include(bounds);
-			engine->ConstrainClippingRegion(&clipping);
-			picture->Play(&context);
-			engine->UnlockParallelAccess();
-		}
+	// Render the picture to the bitmap
+	BitmapHWInterface interface(bitmap);
+	DrawingEngine* engine = interface.CreateDrawingEngine();
+	if (engine == NULL) {
+		delete bitmap;
+		return B_NO_MEMORY;
 	}
+
+	// Copy the current state of the client view, so we draw with the right
+	// font, color and everything
+	engine->SetDrawState(fCurrentView->CurrentState());
+	OffscreenContext context(engine);
+	if (engine->LockParallelAccess())
+	{
+		// FIXME ConstrainClippingRegion docs says passing NULL disables
+		// all clipping. This doesn't work and will crash in Painter.
+		BRegion clipping;
+		clipping.Include(bounds);
+		engine->ConstrainClippingRegion(&clipping);
+		picture->Play(&context);
+		engine->UnlockParallelAccess();
+	}
+	delete engine;
 
 	// TODO stop here: we want agg to clip using the bitmap (with alpha), not
 	// the region.
 
-	region.MakeEmpty();
 	int32 width = bounds.IntegerWidth() + 1;
 	int32 height = bounds.IntegerHeight() + 1;
 	if (bitmap != NULL) {
