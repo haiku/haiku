@@ -358,7 +358,7 @@ TextDocumentLayout::_ParagraphLayoutIndexForLineIndex(int32& lineIndex)
 		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
 
 		int32 lineCount = info.layout->CountLines();
-		if (lineIndex > lineCount) {
+		if (lineIndex >= lineCount) {
 			lineIndex -= lineCount;
 			continue;
 		}
