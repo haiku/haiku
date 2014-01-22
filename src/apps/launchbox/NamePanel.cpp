@@ -32,7 +32,8 @@ NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 	fWindow(window),
 	fTarget(target),
-	fMessage(message)
+	fMessage(message),
+	fSavedTargetWindowFeel(B_NORMAL_WINDOW_FEEL)
 {
 	BButton* defaultButton = new BButton(B_TRANSLATE("OK"),
 		new BMessage(MSG_PANEL_OK));
@@ -72,7 +73,7 @@ NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
 	SetDefaultButton(defaultButton);
 	fNameTC->MakeFocus(true);
 
-	if (fWindow && fWindow->Lock()) {
+	if (fWindow != NULL && fWindow->Lock()) {
 		fSavedTargetWindowFeel = fWindow->Feel();
 		if (fSavedTargetWindowFeel != B_NORMAL_WINDOW_FEEL)
 			fWindow->SetFeel(B_NORMAL_WINDOW_FEEL);
@@ -85,7 +86,8 @@ NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
 
 NamePanel::~NamePanel()
 {
-	if (fWindow && fWindow->Lock()) {
+	if (fSavedTargetWindowFeel != B_NORMAL_WINDOW_FEEL
+		&& fWindow != NULL && fWindow->Lock()) {
 		fWindow->SetFeel(fSavedTargetWindowFeel);
 		fWindow->Unlock();
 	}	
