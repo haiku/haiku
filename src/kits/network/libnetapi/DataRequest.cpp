@@ -90,8 +90,11 @@ BDataRequest::_ProtocolLoop()
 		// There may be some padding at the end of the base64 stream. This
 		// prevents us from computing the exact length we should get, so allow
 		// for some error margin.
-		if(length > data.Length() * 4 / 3 || length < data.Length() * 4 / 3 - 3)
+		if(length > data.Length() * 4 / 3
+			|| length < data.Length() * 4 / 3 - 3) {
+			delete[] buffer;
 			return B_BAD_DATA;
+		}
 	} else {
 		payload = data.String();
 		length = data.Length();
