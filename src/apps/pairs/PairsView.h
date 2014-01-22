@@ -1,7 +1,12 @@
 /*
  * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com.
  * Copyright 2010 Adam Smith <adamd.smith@utoronto.ca>
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef PAIRS_VIEW_H
 #define PAIRS_VIEW_H

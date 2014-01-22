@@ -1,17 +1,28 @@
 /*
  * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
  */
+
+
+#include "Pairs.h"
 
 #include <stdlib.h>
 
 #include <Application.h>
 #include <Catalog.h>
 
-#include "Pairs.h"
 #include "PairsWindow.h"
 
+
 const char* kSignature = "application/x-vnd.Haiku-Pairs";
+
+
+//	#pragma mark - Pairs
 
 
 Pairs::Pairs()
@@ -47,6 +58,9 @@ Pairs::MessageReceived(BMessage* message)
 {
 	BApplication::MessageReceived(message);
 }
+
+
+//	#pragma mark - main
 
 
 int

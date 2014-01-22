@@ -1,8 +1,14 @@
 /*
  * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com.
  * Copyright 2010 Adam Smith <adamd.smith@utoronto.ca>
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
  */
+
 
 #include "PairsWindow.h"
 
@@ -25,15 +31,16 @@
 #include "PairsTopButton.h"
 
 
-// #pragma mark - PairsWindow
-
-
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PairsWindow"
+
 
 const uint32 MENU_NEW					= 'MGnw';
 const uint32 MENU_SIZE					= 'MGsz';
 const uint32 MENU_QUIT					= 'MGqu';
+
+
+//	#pragma mark - PairsWindow
 
 
 PairsWindow::PairsWindow()
@@ -152,6 +159,7 @@ PairsWindow::MessageReceived(BMessage* message)
 		case MENU_NEW:
 			NewGame();
 			break;
+
 		case MENU_SIZE:
 		{
 			int32 width;
@@ -162,9 +170,11 @@ PairsWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+
 		case MENU_QUIT:
 			be_app->PostMessage(B_QUIT_REQUESTED);
 			break;
+
 		case kMsgCardButton:
 			if (fIsPairsActive) {
 				fButtonClicks++;
@@ -225,7 +235,7 @@ PairsWindow::MessageReceived(BMessage* message)
 						"\tCopyright 2008-2010, Haiku Inc.\n"
 						"\n"
 						"You completed the game in %num% clicks.\n");
-					
+
 					strAbout.ReplaceFirst("%app%",
 						B_TRANSLATE_SYSTEM_NAME("Pairs"));
 					strAbout.ReplaceFirst("%num%", score);
@@ -248,18 +258,14 @@ PairsWindow::MessageReceived(BMessage* message)
 					view->ResizeToPreferred();
 					alert->SetShortcut(0, B_ESCAPE);
 
-					if (alert->Go() == 0) {
-						// New game
+					if (alert->Go() == 0)
 						NewGame();
-					} else {
-						// Quit game
+					else
 						be_app->PostMessage(B_QUIT_REQUESTED);
-					}
 				}
 				break;
 
 		default:
 			BWindow::MessageReceived(message);
-			break;
 	}
 }

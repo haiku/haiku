@@ -18,7 +18,7 @@ resource app_version {
 	internal = 1,
 
 	short_info = "Pairs",
-	long_info = "Pairs, ©2008-2009 Haiku Inc."
+	long_info = "Pairs, ©2008 Ralf Schülke, ©2010 Adam Smith, ©2014 Haiku, Inc."
 };
 
 
@@ -41,4 +41,3 @@ resource vector_icon {
 	$"070108000A060107000A0001041815FF01178400040A00010418001501178600"
 	$"040A040104000A0301090815FF"
 };
-

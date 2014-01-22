@@ -1,10 +1,15 @@
 /*
  * Copyright 2008 Ralf Schülke, ralf.schuelke@googlemail.com.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
  */
-
 #ifndef PAIRS_GLOBAL_H
 #define PAIRS_GLOBAL_H
+
 
 #include <SupportDefs.h>
 
