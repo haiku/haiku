@@ -640,6 +640,11 @@ rule UploadPackages target : packages
 actions UploadPackages1
 {
 	remote=git.haiku-os.org
+	remoteUser=$(HAIKU_REMOTE_USER)
+	if [ -n "$remoteUser" ]; then
+		remote="$remoteUser@$remote"
+	fi
+	echo $remote
 
 	if [ -n "$(HAIKU_REMOTE_REPOSITORY_PACKAGES:E=:J)" ]; then
 		for package in $(HAIKU_REMOTE_REPOSITORY_PACKAGES) ; do
@@ -667,6 +672,10 @@ rule BuildRemoteHaikuPortsRepository target : packages
 actions BuildRemoteHaikuPortsRepository1
 {
 	remote=git.haiku-os.org
+	remoteUser=$(HAIKU_REMOTE_USER)
+	if [ -n "$remoteUser" ]; then
+		remote="$remoteUser@$remote"
+	fi
 
 	repoArch=$(TARGET_PACKAGING_ARCH)
 	scp $(2) $remote:hpkg-upload/$repoArch

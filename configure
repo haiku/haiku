@@ -72,6 +72,8 @@ options:
   -j<n>                       Only relevant for --build-cross-tools and
                               --build-cross-tools-gcc4. Is passed on to the
                               make building the build tools.
+  --remote-user <username>    Use given username when logging into 
+                              git.haiku-os.org (via ssh).
   --target=TARGET             Select build target platform.
                               [default=${TARGET_PLATFORM}]
                               valid targets=r5,bone,dano,haiku
@@ -483,6 +485,7 @@ HOST_SHA256=
 HOST_HAIKU_PORTER=
 HAIKU_PORTS=
 HAIKU_PORTS_CROSS=
+HAIKU_REMOTE_USER=
 
 HAIKU_PACKAGING_ARCHS=
 
@@ -610,6 +613,11 @@ while [ $# -gt 0 ] ; do
 		--include-sources)	HAIKU_INCLUDE_SOURCES=1; shift 1;;
 		--include-3rdparty)	HAIKU_INCLUDE_3RDPARTY=1; shift 1;;
         -j*)				buildCrossToolsJobs="$1"; shift 1;;
+		--remote-user)
+			assertparam "$1" $#
+			HAIKU_REMOTE_USER=$2
+			shift 2
+			;;
 		--target=*)     TARGET_PLATFORM=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--target-arch)
 			assertparam "$1" $#
@@ -886,6 +894,8 @@ HOST_SHA256					?= ${HOST_SHA256} ;
 HOST_HAIKU_PORTER			?= ${HOST_HAIKU_PORTER} ;
 HAIKU_PORTS					?= ${HAIKU_PORTS} ;
 HAIKU_PORTS_CROSS			?= ${HAIKU_PORTS_CROSS} ;
+
+HAIKU_REMOTE_USER			?= "${HAIKU_REMOTE_USER}" ;
 
 EOF
 
