@@ -43,6 +43,10 @@ get_trim_data_from_user(void* buffer, size_t size, MemoryDeleter& deleter,
 		return B_BAD_ADDRESS;
 	}
 
+	// The passed in MemoryDeleter needs to take care of freeing the buffer
+	// later, since we had to allocate it.
+	deleter.SetTo(trimBuffer);
+
 	_trimData = (fs_trim_data*)trimBuffer;
 	return B_OK;
 }
