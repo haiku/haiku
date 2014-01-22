@@ -420,6 +420,9 @@ CoreEntry::UpdateLoad(int32 delta)
 
 	ASSERT(gTrackCoreLoad);
 
+	if (fCPUCount <= 0)
+		return;
+
 	atomic_add(&fLoad, delta);
 
 	bigtime_t now = system_time();
