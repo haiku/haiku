@@ -23,7 +23,8 @@
 
 App::App()
 	:
-	BApplication("application/x-vnd.Haiku-HaikuDepot")
+	BApplication("application/x-vnd.Haiku-HaikuDepot"),
+	fMainWindow(NULL)
 {
 }
 
