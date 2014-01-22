@@ -14,6 +14,9 @@
 #include "MidiRosterLooper.h"
 #include "protocol.h"
 
+#include <pthread.h>
+
+
 using namespace BPrivate;
 
 // The midi_debug_level and midi_dispatcher_priority symbols 
@@ -33,7 +36,10 @@ int32 midi_dispatcher_priority = B_REAL_TIME_PRIORITY;
 // The one and only BMidiRoster instance, which is created
 // the first time the client app calls MidiRoster(). It is
 // destroyed by the BMidiRosterKiller when the app quits.
-static BMidiRoster* roster = NULL;
+static BMidiRoster* sRoster = NULL;
+
+static pthread_once_t sInitOnce = PTHREAD_ONCE_INIT;
+
 
 // Destroys the BMidiRoster instance when the app quits.
 namespace BPrivate
@@ -42,7 +48,11 @@ namespace BPrivate
 	{
 		~BMidiRosterKiller()
 		{
-			delete roster;
+			delete sRoster;
+		}
+
+		static void CreateRoster() {
+			sRoster = new BMidiRoster();
 		}
 	} 
 	midi_roster_killer;
@@ -206,24 +216,15 @@ BMidiRoster::Unregister(BMidiEndpoint* endp)
 BMidiRoster* 
 BMidiRoster::MidiRoster()
 {
-	if (roster == NULL) {
-		new BMidiRoster();
-	}
+	pthread_once(&sInitOnce, BPrivate::BMidiRosterKiller::CreateRoster);
 
-	return roster;
+	return sRoster;
 }
 
 
 BMidiRoster::BMidiRoster()
 {
 	TRACE(("BMidiRoster::BMidiRoster"))
-
-	// While our constructor is executing, some function may 
-	// call MidiRoster() again, which causes an endless loop. 
-	// To prevent this, we immediately fill in "roster"; now
-	// subsequent calls to MidiRoster() won't mess up things.
-
-	roster = this;
 
 	fLooper = new BMidiRosterLooper();
 
