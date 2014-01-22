@@ -644,7 +644,6 @@ actions UploadPackages1
 	if [ -n "$remoteUser" ]; then
 		remote="$remoteUser@$remote"
 	fi
-	echo $remote
 
 	if [ -n "$(HAIKU_REMOTE_REPOSITORY_PACKAGES:E=:J)" ]; then
 		for package in $(HAIKU_REMOTE_REPOSITORY_PACKAGES) ; do
