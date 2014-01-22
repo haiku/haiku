@@ -328,8 +328,9 @@ ParagraphLayout::LastOffsetOnLine(int32 lineIndex)
 
 	if (lineIndex < 0)
 		lineIndex = 0;
+
 	if (lineIndex >= fLineInfos.CountItems() - 1)
-		return CountGlyphs();
+		return CountGlyphs() - 1;
 
 	return fLineInfos.ItemAt(lineIndex + 1).textOffset - 1;
 }
