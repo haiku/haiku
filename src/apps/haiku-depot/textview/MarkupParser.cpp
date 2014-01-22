@@ -25,7 +25,8 @@ MarkupParser::MarkupParser()
 	fBulletStyle(),
 
 	fCurrentCharacterStyle(&fNormalStyle),
-	fCurrentParagraphStyle(&fParagraphStyle)
+	fCurrentParagraphStyle(&fParagraphStyle),
+	fSpanStartOffset(0)
 {
 	_InitStyles();
 }
@@ -45,7 +46,8 @@ MarkupParser::MarkupParser(const CharacterStyle& characterStyle,
 	fBulletStyle(),
 
 	fCurrentCharacterStyle(&fNormalStyle),
-	fCurrentParagraphStyle(&fParagraphStyle)
+	fCurrentParagraphStyle(&fParagraphStyle),
+	fSpanStartOffset(0)
 {
 	_InitStyles();
 }
