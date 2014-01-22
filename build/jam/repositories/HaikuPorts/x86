@@ -92,10 +92,10 @@ RemotePackageRepository HaikuPorts
 	make-3.82-5
 	man-1.6g-3
 	mercurial-2.2.2-5
-	mesa-10.0.2-1
-	mesa_devel-10.0.2-1
-	mesa_swrast-10.0.2-1
-	mesa_swpipe-10.0.2-1
+	mesa-10.0.2-2
+	mesa_devel-10.0.2-2
+	mesa_swrast-10.0.2-2
+	mesa_swpipe-10.0.2-2
 	mkdepend-1.7-3
 	nano-2.2.6-3
 	ncurses-5.9-10
