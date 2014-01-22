@@ -454,6 +454,7 @@ BNetEndpoint::Accept(int32 timeout)
 	socklen_t localAddressSize = sizeof(localAddress);
 	if (getsockname(socket, (struct sockaddr *)&localAddress,
 			&localAddressSize) < 0) {
+		close(socket);
 		fStatus = errno;
 		return NULL;
 	}
