@@ -76,6 +76,13 @@ TextSpan::SetStyle(const CharacterStyle& style)
 
 
 bool
+TextSpan::Append(const BString& text)
+{
+	return Insert(fCharCount, text);
+}
+
+
+bool
 TextSpan::Insert(int32 offset, const BString& text)
 {
 	_TruncateInsert(offset);

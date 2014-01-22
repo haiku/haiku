@@ -33,6 +33,7 @@ public:
 	inline	int32				CountChars() const
 									{ return fCharCount; }
 
+			bool				Append(const BString& text);
 			bool				Insert(int32 offset, const BString& text);
 			bool				Remove(int32 start, int32 count);
 
