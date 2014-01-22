@@ -1496,7 +1496,7 @@ PathHandler::_EntryCreated(const NotOwningEntryRef& entryRef,
 	// Check, if there's a colliding entry.
 	if (Entry* nodeEntry = directory->FindEntry(entryRef.name)) {
 		Node* entryNode = nodeEntry->Node();
-		if (entryNode->NodeRef() == nodeRef)
+		if (entryNode != NULL && entryNode->NodeRef() == nodeRef)
 			return true;
 
 		// We're out of sync with reality -- the new entry refers to a different
