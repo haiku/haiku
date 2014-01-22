@@ -27,7 +27,8 @@ public:
 					:
 					fParent(parent),
 					fName(NULL),
-					fIsBlackListed(false)
+					fIsBlackListed(false),
+					fHashNext(NULL)
 				{
 				}
 

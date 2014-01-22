@@ -21,7 +21,8 @@ namespace PackageFS {
 
 PackageSettingsItem::PackageSettingsItem()
 	:
-	fEntries()
+	fEntries(),
+	fHashNext(NULL)
 {
 }
 
