@@ -4,6 +4,9 @@ SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UsePrivateHeaders app shared storage ;
 
+# for libbe_test
+UsePublicHeaders [ FDirName add-ons registrar ] ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {

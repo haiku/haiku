@@ -75,6 +75,8 @@ SharedLibrary libhwinterfaceimpl.so :
 	: libhwinterface.so
 ;
 
+# These files are shared between the test_app_server and the libhwintreface, so
+# they can talk together.
 SharedLibrary libtestappserver.so :
 	Angle.cpp
 	ClientMemoryAllocator.cpp
@@ -98,6 +100,7 @@ SharedLibrary libtestappserver.so :
 	MultiLocker.cpp
 	Overlay.cpp
 	RGBColor.cpp
+	ServerAppStub.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
 	ServerFont.cpp
@@ -114,7 +117,7 @@ SharedLibrary libtestappserver.so :
 	[ BuildFeatureAttribute freetype : library ]
 ;
 
-AddResources test_app_server : app_server.rdef ;
+AddResources test_app_server : test_app_server.rdef ;
 
 Server test_app_server :
 	# Misc. Sources
@@ -138,7 +141,6 @@ Server test_app_server :
 
 	AppServer.cpp
 	Desktop.cpp
-
 	ServerApp.cpp
 	ServerWindow.cpp
 
@@ -150,9 +152,9 @@ Server test_app_server :
 	drawing_support.cpp
 	MallocBuffer.cpp
 
-	DesktopSettings.cpp
-	VirtualScreen.cpp
 	BitmapHWInterface.cpp
+	DesktopSettings.cpp
+	DrawingContext.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindow.cpp
 	RegionPool.cpp
@@ -160,6 +162,7 @@ Server test_app_server :
 	ScreenConfigurations.cpp
 	ServerPicture.cpp
 	View.cpp
+	VirtualScreen.cpp
 	Window.cpp
 	WindowList.cpp
 	Workspace.cpp

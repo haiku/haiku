@@ -89,8 +89,6 @@ Server test_registrar
 	RecentApps.cpp
 	RecentEntries.cpp
 	Registrar.cpp
-	RegistrarThread.cpp
-	RegistrarThreadManager.cpp
 	RosterAppInfo.cpp
 	RosterSettingsCharStream.cpp
 	ShutdownProcess.cpp
@@ -100,20 +98,15 @@ Server test_registrar
 	WatchingService.cpp
 
 	# mime
-	AssociatedTypes.cpp
 	CreateAppMetaMimeThread.cpp
-	Database.cpp
-	InstalledTypes.cpp
-	MimeSnifferAddon.cpp
-	MimeSnifferAddonManager.cpp
 	MimeUpdateThread.cpp
-	SnifferRules.cpp
-	Supertype.cpp
-	SupportingApps.cpp
+	RegistrarThread.cpp
+	RegistrarThreadManager.cpp
 	UpdateMimeInfoThread.cpp
 
 	R5Compatibility.cpp
 	:
+	libstorage_kit_mime.a
 	be localestub $(TARGET_LIBSTDC++)
 	:
 	registrar.rdef

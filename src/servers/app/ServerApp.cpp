@@ -284,21 +284,6 @@ ServerApp::Activate(bool value)
 }
 
 
-/*!	\brief Send a message to the ServerApp's BApplication
-	\param message The message to send
-*/
-void
-ServerApp::SendMessageToClient(BMessage* message) const
-{
-	status_t status = fHandlerMessenger.SendMessage(message, (BHandler*)NULL,
-		100000);
-	if (status != B_OK) {
-		syslog(LOG_ERR, "app %s send to client failed: %s\n", Signature(),
-			strerror(status));
-	}
-}
-
-
 void
 ServerApp::SetCurrentCursor(ServerCursor* cursor)
 {
@@ -484,21 +469,6 @@ ServerApp::RemovePicture(ServerPicture* picture)
 
 	fPictureMap.erase(picture->Token());
 	picture->ReleaseReference();
-}
-
-
-/*!	Called from the ClientMemoryAllocator whenever a server area could be
-	deleted.
-	A message is then sent to the client telling it that it can delete its
-	client area, too.
-*/
-void
-ServerApp::NotifyDeleteClientArea(area_id serverArea)
-{
-	BMessage notify(kMsgDeleteServerMemoryArea);
-	notify.AddInt32("server area", serverArea);
-
-	SendMessageToClient(&notify);
 }
 
 

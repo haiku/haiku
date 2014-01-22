@@ -56,18 +56,22 @@ SetSupportedPlatformsForTarget libbe_test.so : libbe_test ;
 
 SetVersionScript libbe_test.so : libbe_test_versions ;
 
+UsePrivateHeaders storage mime ;
+
 SharedLibrary libbe_test.so :
 	:
-	<libbe!$(HAIKU_ARCH)>app_kit.o
-	<libbe!$(HAIKU_ARCH)>interface_kit.o
-	<libbe!$(HAIKU_ARCH)>locale_kit.o
-	<libbe!$(HAIKU_ARCH)>storage_kit.o
-	<libbe!$(HAIKU_ARCH)>support_kit.o
+	<libbe!$(HAIKU_PACKAGING_ARCH)>app_kit.o
+	<libbe!$(HAIKU_PACKAGING_ARCH)>interface_kit.o
+	<libbe!$(HAIKU_PACKAGING_ARCH)>locale_kit.o
+	<libbe!$(HAIKU_PACKAGING_ARCH)>storage_kit.o
+	<libbe!$(HAIKU_PACKAGING_ARCH)>support_kit.o
 
-	libicon.a
-	libagg.a
+	[ MultiArchDefaultGristFiles libstorage_kit_mime.a ]
 
-	$(TARGET_LIBSTDC++)
+	[ MultiArchDefaultGristFiles libicon.a ]
+	[ MultiArchDefaultGristFiles libagg.a ]
+
+	$(TARGET_LIBSTDC++) [ BuildFeatureAttribute icu : libraries ]
 ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) interface ] ;
