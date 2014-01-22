@@ -84,7 +84,9 @@ void SerialApp::MessageReceived(BMessage* message)
 			const char* bytes;
 			ssize_t size;
 
-			message->FindData("data", B_RAW_TYPE, (const void**)&bytes, &size);
+			if (message->FindData("data", B_RAW_TYPE, (const void**)&bytes,
+					&size) != B_OK)
+				break;
 
 			if (bytes[0] == '\n') {
 				size = 2;
@@ -113,6 +115,7 @@ void SerialApp::MessageReceived(BMessage* message)
 			} else {
 				debugger("Invalid BMessage received");
 			}
+			break;
 		}
 		case kMsgSettings:
 		{

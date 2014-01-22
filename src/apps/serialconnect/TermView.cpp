@@ -86,9 +86,11 @@ void TermView::Draw(BRect updateRect)
 			foreground.red = cell.fg.red;
 			foreground.green = cell.fg.green;
 			foreground.blue = cell.fg.blue;
+			foreground.alpha = 255;
 			background.red = cell.bg.red;
 			background.green = cell.bg.green;
 			background.blue = cell.bg.blue;
+			background.alpha = 255;
 
 			if(cell.attrs.reverse) {
 				SetLowColor(foreground);
