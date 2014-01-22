@@ -5092,69 +5092,6 @@ BView::_ClipToPicture(BPicture* picture, BPoint where, bool invert, bool sync)
 	if (!picture)
 		return;
 
-#if 1
-	// TODO: Move the implementation to the server!!!
-	// This implementation is pretty slow, since just creating an offscreen
-	// bitmap takes a lot of time. That's the main reason why it should be moved
-	// to the server.
-
-	// Here the idea is to get rid of the padding bytes in the bitmap,
-	// as padding complicates and slows down the iteration.
-	// TODO: Maybe it's not so nice as it assumes BBitmaps to be aligned
-	// to a 4 byte boundary.
-	BRect bounds(Bounds());
-	if ((bounds.IntegerWidth() + 1) % 32) {
-		bounds.right = bounds.left + ((bounds.IntegerWidth() + 1) / 32 + 1)
-			* 32 - 1;
-	}
-
-	// TODO: I used a RGBA32 bitmap because drawing on a GRAY8 doesn't work.
-	BBitmap* bitmap = new(std::nothrow) BBitmap(bounds, B_RGBA32, true);
-	if (bitmap != NULL && bitmap->InitCheck() == B_OK && bitmap->Lock()) {
-		BView* view = new(std::nothrow) BView(bounds, "drawing view",
-			B_FOLLOW_NONE, 0);
-		if (view != NULL) {
-			bitmap->AddChild(view);
-			view->DrawPicture(picture, where);
-			view->Sync();
-		}
-		bitmap->Unlock();
-	}
-
-	BRegion region;
-	int32 width = bounds.IntegerWidth() + 1;
-	int32 height = bounds.IntegerHeight() + 1;
-	if (bitmap != NULL && bitmap->LockBits() == B_OK) {
-		uint32 bit = 0;
-		uint32* bits = (uint32*)bitmap->Bits();
-		clipping_rect rect;
-
-		// TODO: A possible optimization would be adding "spans" instead
-		// of 1x1 rects. That would probably help with very complex
-		// BPictures
-		for (int32 y = 0; y < height; y++) {
-			for (int32 x = 0; x < width; x++) {
-				bit = *bits++;
-				if (bit != 0xFFFFFFFF) {
-					rect.left = x;
-					rect.right = rect.left;
-					rect.top = rect.bottom = y;
-					region.Include(rect);
-				}
-			}
-		}
-		bitmap->UnlockBits();
-	}
-	delete bitmap;
-
-	if (invert) {
-		BRegion inverseRegion;
-		inverseRegion.Include(Bounds());
-		inverseRegion.Exclude(&region);
-		ConstrainClippingRegion(&inverseRegion);
-	} else
-		ConstrainClippingRegion(&region);
-#else
 	if (_CheckOwnerLockAndSwitchCurrent()) {
 		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_PICTURE);
 		fOwner->fLink->Attach<int32>(picture->Token());
@@ -5170,7 +5107,6 @@ BView::_ClipToPicture(BPicture* picture, BPoint where, bool invert, bool sync)
 	}
 
 	fState->archiving_flags |= B_VIEW_CLIP_REGION_BIT;
-#endif
 }
 
 

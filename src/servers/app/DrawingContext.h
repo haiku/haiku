@@ -75,4 +75,30 @@ class DrawingContext {
 };
 
 
+class OffscreenContext: public DrawingContext {
+	public:
+							OffscreenContext(DrawingEngine* engine)
+								: fDrawingEngine(engine)
+							{};
+
+							// Screen and View coordinates are the same for us.
+							// DrawState already takes care of World<>View
+							// conversions.
+			void			ConvertToScreen(BPoint*) const {}
+			void			ConvertToScreen(IntPoint*) const {}
+			void			ConvertToScreen(BRect*) const {}
+			void			ConvertToScreen(IntRect*) const {}
+			void			ConvertToScreen(BRegion*) const {}
+			void			ConvertFromScreen(BPoint*) const {}
+
+			DrawingEngine*	GetDrawingEngine() const { return fDrawingEngine; }
+
+			void			RebuildClipping(bool deep) { /* TODO */ }
+			ServerPicture*	GetPicture(int32 token) const
+								{ /* TODO */ return NULL; }
+	private:
+			DrawingEngine*	fDrawingEngine;
+};
+
+
 #endif

@@ -53,6 +53,9 @@
 
 #include "AppServer.h"
 #include "AutoDeleter.h"
+#include "BBitmapBuffer.h"
+#include "BitmapHWInterface.h"
+#include "BitmapManager.h"
 #include "Desktop.h"
 #include "DirectWindowInfo.h"
 #include "DrawingEngine.h"
@@ -3755,7 +3758,87 @@ status_t
 ServerWindow::PictureToRegion(ServerPicture* picture, BRegion& region,
 	bool inverse, BPoint where)
 {
-	fprintf(stderr, "ServerWindow::PictureToRegion() not implemented\n");
+	// Here the idea is to get rid of the padding bytes in the bitmap,
+	// as padding complicates and slows down the iteration.
+	// TODO: Maybe it's not so nice as it assumes BBitmaps to be aligned
+	// to a 4 byte boundary.
+	BRect bounds(fCurrentView->Bounds());
+	if ((bounds.IntegerWidth() + 1) % 32) {
+		bounds.right = bounds.left + ((bounds.IntegerWidth() + 1) / 32 + 1)
+			* 32 - 1;
+	}
+
+	// TODO: I used a RGBA32 bitmap because drawing on a GRAY8 doesn't work.
+	UtilityBitmap* bitmap = new UtilityBitmap(bounds, B_RGBA32, 0);
+	if (bitmap != NULL) {
+#if 0
+		/*
+		 * TODO stippi says we could use OffscreenWindow to do this, but there
+		 * doesn't seem to be a way to create a View without a BView on
+		 * application side (the constructor wants a token).
+		 * This would be better, as it would avoid the DrawingContext mess.
+		 */
+		OffscreenWindow window(bitmap, "ClipToPicture", fCurrentView->Window());
+		View view(bounds, IntPoint(0, 0), "ClipToPicture");
+		window->SetTopView(view);
+#endif
+
+		// Clear the bitmap with the transparent color
+		memset(bitmap->Bits(), 0, bitmap->BitsLength());
+
+		// Render the picture to the bitmap
+		BitmapHWInterface interface(bitmap);
+		DrawingEngine* engine = interface.CreateDrawingEngine();
+		// Copy the current state of the client view, so we draw with the right
+		// font, color and everything
+		engine->SetDrawState(fCurrentView->CurrentState());
+		OffscreenContext context(engine);
+		if (engine->LockParallelAccess())
+		{
+			// FIXME ConstrainClippingRegion docs says passing NULL disables
+			// all clipping. This doesn't work and will crash in Painter.
+			BRegion clipping;
+			clipping.Include(bounds);
+			engine->ConstrainClippingRegion(&clipping);
+			picture->Play(&context);
+			engine->UnlockParallelAccess();
+		}
+	}
+
+	// TODO stop here: we want agg to clip using the bitmap (with alpha), not
+	// the region.
+
 	region.MakeEmpty();
-	return B_ERROR;
+	int32 width = bounds.IntegerWidth() + 1;
+	int32 height = bounds.IntegerHeight() + 1;
+	if (bitmap != NULL) {
+		uint32 bit = 0;
+		uint32* bits = (uint32*)bitmap->Bits();
+		clipping_rect rect;
+
+		// TODO: A possible optimization would be adding "spans" instead
+		// of 1x1 rects. That would probably help with very complex
+		// BPictures
+		for (int32 y = 0; y < height; y++) {
+			for (int32 x = 0; x < width; x++) {
+				bit = *bits++;
+				if (bit != 0) {
+					rect.left = x;
+					rect.right = rect.left;
+					rect.top = rect.bottom = y;
+					region.Include(rect);
+				}
+			}
+		}
+	}
+	delete bitmap;
+
+	if (inverse) {
+		BRegion inverseRegion;
+		inverseRegion.Include(BRect(fCurrentView->Bounds()));
+		inverseRegion.Exclude(&region);
+		region = inverseRegion;
+	}
+
+	return B_OK;
 }
