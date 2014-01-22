@@ -757,8 +757,8 @@ DumpAudioStreamCSEndpointDescriptor(
 		"Unknown (%u)"
 	};
 
-	const char* units = descriptor->lock_delay_units > 4
-		? aUnits[4] : aUnits[descriptor->lock_delay_units];
+	const char* units = descriptor->lock_delay_units >= 4
+		? aUnits[3] : aUnits[descriptor->lock_delay_units];
 
 	printf("                    Lock Delay Units .. %u (%s)\n",
 		descriptor->lock_delay_units, units);
