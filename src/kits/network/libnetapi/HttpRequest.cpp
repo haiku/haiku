@@ -834,16 +834,18 @@ BHttpRequest::_SendHeaders()
 		fOutputHeaders.AddHeader("Referer", fOptReferer.String());
 
 	// Authentication
-	BHttpAuthentication& authentication = fContext->GetAuthentication(fUrl);
-	if (authentication.Method() != B_HTTP_AUTHENTICATION_NONE) {
-		if (fOptUsername.Length() > 0) {
-			authentication.SetUserName(fOptUsername);
-			authentication.SetPassword(fOptPassword);
-		}
+	if (fContext != NULL) {
+		BHttpAuthentication& authentication = fContext->GetAuthentication(fUrl);
+		if (authentication.Method() != B_HTTP_AUTHENTICATION_NONE) {
+			if (fOptUsername.Length() > 0) {
+				authentication.SetUserName(fOptUsername);
+				authentication.SetPassword(fOptPassword);
+			}
 
-		BString request(fRequestMethod);
-		fOutputHeaders.AddHeader("Authorization",
-			authentication.Authorization(fUrl, request));
+			BString request(fRequestMethod);
+			fOutputHeaders.AddHeader("Authorization",
+				authentication.Authorization(fUrl, request));
+		}
 	}
 
 	// Required headers for POST data
@@ -890,7 +892,7 @@ BHttpRequest::_SendHeaders()
 	}
 
 	// Context cookies
-	if (fOptSetCookies && (fContext != NULL)) {
+	if (fOptSetCookies && fContext != NULL) {
 		BNetworkCookie* cookie;
 		BString cookieString;
 
