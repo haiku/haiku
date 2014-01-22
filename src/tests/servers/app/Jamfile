@@ -202,6 +202,7 @@ SubInclude HAIKU_TOP src tests servers app benchmark ;
 SubInclude HAIKU_TOP src tests servers app bitmap_bounds ;
 SubInclude HAIKU_TOP src tests servers app bitmap_drawing ;
 SubInclude HAIKU_TOP src tests servers app code_to_name ;
+SubInclude HAIKU_TOP src tests servers app clip_to_picture ;
 SubInclude HAIKU_TOP src tests servers app constrain_clipping_region ;
 SubInclude HAIKU_TOP src tests servers app copy_bits ;
 SubInclude HAIKU_TOP src tests servers app cursor_test ;
