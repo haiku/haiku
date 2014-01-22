@@ -73,12 +73,11 @@ BFileRequest::_ProtocolLoop()
 			char chunk[4096];
 			while ((chunkSize = file.Read(chunk, sizeof(chunk))) > 0) {
 				fListener->DataReceived(this, chunk, chunkSize);
-
-				if (chunkSize > 0)
-					transferredSize += chunkSize;
-				else if (transferredSize != size)
-					return chunkSize;
+				transferredSize += chunkSize;
 			}
+			// Return last error if we didn't transfer everything
+			if (transferredSize != size)
+				return chunkSize;
 			fListener->DownloadProgress(this, size, size);
 		}
 
