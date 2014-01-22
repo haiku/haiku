@@ -169,10 +169,11 @@ TextDocumentLayout::LineIndexForOffset(int32 textOffset)
 int32
 TextDocumentLayout::FirstOffsetOnLine(int32 lineIndex)
 {
-	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex);
+	int32 paragraphOffset;
+	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex, paragraphOffset);
 	if (index >= 0) {
 		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
-		return info.layout->FirstOffsetOnLine(lineIndex);
+		return info.layout->FirstOffsetOnLine(lineIndex) + paragraphOffset;
 	}
 
 	return 0;
@@ -182,10 +183,11 @@ TextDocumentLayout::FirstOffsetOnLine(int32 lineIndex)
 int32
 TextDocumentLayout::LastOffsetOnLine(int32 lineIndex)
 {
-	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex);
+	int32 paragraphOffset;
+	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex, paragraphOffset);
 	if (index >= 0) {
 		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
-		return info.layout->LastOffsetOnLine(lineIndex);
+		return info.layout->LastOffsetOnLine(lineIndex) + paragraphOffset;
 	}
 
 	return 0;
@@ -213,7 +215,8 @@ void
 TextDocumentLayout::GetLineBounds(int32 lineIndex, float& x1, float& y1,
 	float& x2, float& y2)
 {
-	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex);
+	int32 paragraphOffset;
+	int32 index = _ParagraphLayoutIndexForLineIndex(lineIndex, paragraphOffset);
 	if (index >= 0) {
 		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(index);
 		info.layout->GetLineBounds(lineIndex, x1, y1, x2, y2);
@@ -349,10 +352,12 @@ TextDocumentLayout::_ParagraphLayoutIndexForOffset(int32& textOffset)
 }
 
 int32
-TextDocumentLayout::_ParagraphLayoutIndexForLineIndex(int32& lineIndex)
+TextDocumentLayout::_ParagraphLayoutIndexForLineIndex(int32& lineIndex,
+	int32& paragraphOffset)
 {
 	_ValidateLayout();
 
+	paragraphOffset = 0;
 	int32 paragraphs = fParagraphLayouts.CountItems();
 	for (int32 i = 0; i < paragraphs; i++) {
 		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
@@ -360,6 +365,7 @@ TextDocumentLayout::_ParagraphLayoutIndexForLineIndex(int32& lineIndex)
 		int32 lineCount = info.layout->CountLines();
 		if (lineIndex >= lineCount) {
 			lineIndex -= lineCount;
+			paragraphOffset += info.layout->CountGlyphs();
 			continue;
 		}
 		

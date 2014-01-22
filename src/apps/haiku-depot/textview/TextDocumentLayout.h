@@ -116,7 +116,8 @@ private:
 			int32				_ParagraphLayoutIndexForOffset(
 									int32& textOffset);
 			int32				_ParagraphLayoutIndexForLineIndex(
-									int32& lineIndex);
+									int32& lineIndex,
+									int32& paragraphOffset);
 
 private:
 			float				fWidth;
