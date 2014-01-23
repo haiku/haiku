@@ -90,6 +90,7 @@ BUrlRequest::Stop()
 	status_t threadStatus = B_OK;
 	fQuit = true;
 
+	send_signal(fThreadId, SIGUSR1); // unblock blocking syscalls.
 	wait_for_thread(fThreadId, &threadStatus);
 	return threadStatus;
 }
@@ -183,19 +184,33 @@ BUrlRequest::Status() const
 // #pragma mark Thread management
 
 
+void
+empty(int)
+{
+}
+
+
 /*static*/ int32
 BUrlRequest::_ThreadEntry(void* arg)
 {
-	BUrlRequest* urlProtocol = reinterpret_cast<BUrlRequest*>(arg);
-	urlProtocol->fThreadStatus = B_BUSY;
+	// Setup an (empty) signal handler so we can be stopped by a signal,
+	// witohut the whole process being killed.
+	struct sigaction action;
+	action.sa_handler = empty;
+	action.sa_mask = 0;
+	action.sa_flags = 0;
+	sigaction(SIGUSR1, &action, NULL);
 
-	status_t protocolLoopExitStatus = urlProtocol->_ProtocolLoop();
+	BUrlRequest* request = reinterpret_cast<BUrlRequest*>(arg);
+	request->fThreadStatus = B_BUSY;
 
-	urlProtocol->fRunning = false;
-	urlProtocol->fThreadStatus = protocolLoopExitStatus;
+	status_t protocolLoopExitStatus = request->_ProtocolLoop();
 
-	if (urlProtocol->fListener != NULL) {
-		urlProtocol->fListener->RequestCompleted(urlProtocol,
+	request->fRunning = false;
+	request->fThreadStatus = protocolLoopExitStatus;
+
+	if (request->fListener != NULL) {
+		request->fListener->RequestCompleted(request,
 			protocolLoopExitStatus == B_OK);
 	}
 
