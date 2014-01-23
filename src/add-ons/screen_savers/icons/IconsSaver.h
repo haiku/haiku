@@ -10,6 +10,7 @@
 #ifndef ICONS_SAVER_H
 #define ICONS_SAVER_H
 
+
 #include <List.h>
 #include <ScreenSaver.h>
 
@@ -37,7 +38,10 @@ private:
 	BBitmap*					fBackBitmap;
 	BView*						fBackView;
 
-	uint16						fMinSize, fMaxSize;
+
+			uint16				fMinSize;
+			uint16				fMaxSize;
 };
 
-#endif
+
+#endif	// ICONS_SAVER_H

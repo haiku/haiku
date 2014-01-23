@@ -10,6 +10,7 @@
 #ifndef ICON_DISPLAY_H
 #define ICON_DISPLAY_H
 
+
 #include <Rect.h>
 #include <View.h>
 
@@ -35,14 +36,15 @@ public:
 			void				DrawOn(BView* view, uint32 delta);
 
 private:
-	bool						fIsRunning;
-	uint8						fState;
-	
-	int32						fTicks;
-	int32						fDelay;
+			bool				fIsRunning;
+			uint8				fState;
 
-	BBitmap*					fBitmap;
-	BRect						fFrame;
+			int32				fTicks;
+			int32				fDelay;
+
+			BBitmap*			fBitmap;
+			BRect				fFrame;
 };
 
-#endif
+
+#endif	// ICON_DISPLAY_H

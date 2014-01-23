@@ -23,6 +23,7 @@
 
 #include "IconDisplay.h"
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Screensaver Icons"
 
@@ -36,16 +37,19 @@
 const rgb_color kBackgroundColor = ui_color(B_DESKTOP_COLOR);
 
 
+
 BScreenSaver* instantiate_screen_saver(BMessage* msg, image_id image)
 {
 	return new IconsSaver(msg, image);
 }
 
 
-IconsSaver::IconsSaver(BMessage* msg, image_id image)
+//	#pragma mark - IconsSaver
+
+
+IconsSaver::IconsSaver(BMessage* archive, image_id image)
 	:
-	BScreenSaver(msg, image),
-	fVectorIconsCount(0),
+	BScreenSaver(archive, image),
 	fIcons(NULL),
 	fBackBitmap(NULL),
 	fBackView(NULL),
@@ -61,7 +65,7 @@ IconsSaver::~IconsSaver()
 
 
 status_t
-IconsSaver::StartSaver(BView *view, bool /*preview*/)
+IconsSaver::StartSaver(BView* view, bool /*preview*/)
 {
 	if (fVectorIconsCount <= 0) {
 		// Load the vector icons from the MIME types
@@ -138,11 +142,11 @@ IconsSaver::StopSaver()
 
 
 void
-IconsSaver::Draw(BView *view, int32 frame)
+IconsSaver::Draw(BView* view, int32 frame)
 {
 	static int32 previousFrame = 0;
 
-	// Update drawing
+	// update drawing
 	if (fBackBitmap->Lock()) {
 		for (uint8 i = 0 ; i < MAX_ICONS ; i++) {
 			fIcons[i].ClearOn(fBackView);
@@ -157,7 +161,7 @@ IconsSaver::Draw(BView *view, int32 frame)
 		fBackBitmap->Unlock();
 	}
 
-	// Sync the view with the back buffer
+	// sync the view with the back buffer
 	view->DrawBitmap(fBackBitmap);
 	previousFrame = frame;
 
