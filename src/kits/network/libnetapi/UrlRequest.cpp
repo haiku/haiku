@@ -184,7 +184,7 @@ BUrlRequest::Status() const
 // #pragma mark Thread management
 
 
-void
+static void
 empty(int)
 {
 }
@@ -194,7 +194,9 @@ empty(int)
 BUrlRequest::_ThreadEntry(void* arg)
 {
 	// Setup an (empty) signal handler so we can be stopped by a signal,
-	// witohut the whole process being killed.
+	// without the whole process being killed.
+	// TODO make connect() properly unlock when close() is called on the
+	// socket, and remove this.
 	struct sigaction action;
 	action.sa_handler = empty;
 	action.sa_mask = 0;
