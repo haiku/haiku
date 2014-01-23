@@ -69,8 +69,15 @@ BNetworkCookie::BNetworkCookie(BMessage* archive)
 	archive->FindBool(kArchivedCookieHttpOnly, &fHttpOnly);
 	archive->FindBool(kArchivedCookieHostOnly, &fHostOnly);
 
+	// We store the expiration date as a string, which should not overflow.
+	// But we still parse the old archive format, where an int32 was used.
+	BString expirationString;
 	int32 expiration;
-	if (archive->FindInt32(kArchivedCookieExpirationDate, &expiration)
+	if (archive->FindString(kArchivedCookieExpirationDate, &expirationString)
+			== B_OK) {
+		BDateTime time = BHttpTime(expirationString).Parse();
+		SetExpirationDate(time);
+	} else if (archive->FindInt32(kArchivedCookieExpirationDate, &expiration)
 			== B_OK) {
 		SetExpirationDate((time_t)expiration);
 	}
@@ -581,8 +588,8 @@ BNetworkCookie::Archive(BMessage* into, bool deep) const
 	}
 
 	if (HasExpirationDate()) {
-		error = into->AddInt32(kArchivedCookieExpirationDate,
-			fExpiration.Time_t());
+		error = into->AddString(kArchivedCookieExpirationDate,
+			BHttpTime(fExpiration).ToString());
 		if (error != B_OK)
 			return error;
 	}

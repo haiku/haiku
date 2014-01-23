@@ -100,14 +100,9 @@ BHttpTime::Parse()
 		fDateFormat = B_HTTP_TIME_FORMAT_ASCTIME;
 	}
 
-//	return timegm(&expireTime);
-// TODO: The above was used initially. See http://en.wikipedia.org/wiki/Time.h
-// stippi: I don't know how Christophe had this code compiling initially,
-// since Haiku does not appear to implement timegm().
-// Using mktime() doesn't cut it, as cookies set with a date shortly in the
-// future (eg. 1 hour) would expire immediately.
 	BTime time(expireTime.tm_hour, expireTime.tm_min, expireTime.tm_sec);
-	BDate date(expireTime.tm_year, expireTime.tm_mon, expireTime.tm_mday);
+	BDate date(expireTime.tm_year + 1900, expireTime.tm_mon + 1,
+		expireTime.tm_mday);
 	BDateTime dateTime(date, time);
 	return dateTime;
 }
@@ -122,8 +117,8 @@ BHttpTime::ToString(int8 format)
 	expirationTm.tm_min = fDate.Time().Minute();
 	expirationTm.tm_hour = fDate.Time().Hour();
 	expirationTm.tm_mday = fDate.Date().Day();
-	expirationTm.tm_mon = fDate.Date().Month();
-	expirationTm.tm_year = fDate.Date().Day();
+	expirationTm.tm_mon = fDate.Date().Month() - 1;
+	expirationTm.tm_year = fDate.Date().Year() - 1900;
 	expirationTm.tm_wday = 0;
 	expirationTm.tm_yday = 0;
 	expirationTm.tm_isdst = 0;
