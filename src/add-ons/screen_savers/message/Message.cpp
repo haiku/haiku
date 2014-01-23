@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,6 +19,7 @@
 #include <Screen.h>
 #include <ScreenSaver.h>
 #include <String.h>
+#include <StringList.h>
 #include <TextView.h>
 #include <View.h>
 
@@ -55,36 +56,25 @@ BString *get_message()
 }
 
 
-int get_lines(BString *message, BString*** result, int *longestLine)
+int
+get_lines(BString *message, BStringList& list, int *longestLine)
 {
-	// First count how many newlines there are
-	int count = 0;
-	int start = 0;
-	while ((start = message->FindFirst('\n', start)) != B_ERROR) {
-		start++; // To move past the new line
-		count++;
-	}
-
-	// Now break the string up and put in result
-	BString **lines = new BString*[count];
-	start = 0;
-	int end = 0;
-	int maxLength = 0;
-	for (int i = 0; ((end = message->FindFirst('\n', start)) != B_ERROR) && i < count; i++) {
-		lines[i] = new BString();
-		message->CopyInto(*lines[i], start, end - start);
-		// Convert tabs to 4 spaces
-		lines[i]->ReplaceAll("\t", "    ");
-		// Look for longest line
-		if (lines[i]->Length() > maxLength) {
-			maxLength = lines[i]->Length();
-			*longestLine = i;
+	BString copy(*message);
+	// Convert tabs to 4 spaces
+	copy.ReplaceAll("\t", "    ");
+	if (copy.Split("\n", false, list)) {
+		int maxLength = 0;
+		int32 count = list.CountStrings();
+		for (int32 i = 0; i < count; i++) {
+			int32 length = list.StringAt(i).Length();
+			if (length  > maxLength) {
+				maxLength = length;
+				*longestLine = i;
+			}
 		}
-		start = end + 1;
+		return count;
 	}
-	*result = lines;
-
-	return count;
+	return 0;
 }
 
 
@@ -266,13 +256,14 @@ Message::Draw(BView *view, int32 frame)
 		offscreen.SetFont(&font);
 		font_height fontHeight;
 		font.GetHeight(&fontHeight);
-		float lineHeight = fontHeight.ascent + fontHeight.descent + fontHeight.leading;
+		float lineHeight = fontHeight.ascent + fontHeight.descent
+			+ fontHeight.leading;
 		
-		BString **lines = NULL;
+		BStringList lines;
 		int longestLine = 0;
-		int count = get_lines(origMessage, &lines, &longestLine);
+		int32 count = get_lines(origMessage, lines, &longestLine);
 
-		float stringWidth = font.StringWidth(lines[longestLine]->String());
+		float stringWidth = font.StringWidth(lines.StringAt(longestLine).String());
 		BRect box(0, 0, stringWidth + 20, (lineHeight * count) + 20);
 		box.OffsetTo((width - box.Width()) / 2, height - box.Height() - 40);
 
@@ -285,11 +276,9 @@ Message::Draw(BView *view, int32 frame)
 		start.x += 10;
 		start.y += 10 + fontHeight.ascent + fontHeight.leading;
 		for (int i = 0; i < count; i++) {
-			offscreen.DrawString(lines[i]->String(), start);
+			offscreen.DrawString(lines.StringAt(i).String(), start);
 			start.y += lineHeight;
-			delete lines[i];
 		}
-		delete[] lines;
 	}
 
 	delete origMessage;
