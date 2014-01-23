@@ -157,8 +157,8 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 				result = B_BAD_VALUE;
 				continue;
 			}
-			BHttpTime date(value);
-			SetExpirationDate(date.Parse());
+			BDateTime parsed = BHttpTime(value).Parse();
+			SetExpirationDate(parsed);
 		} else if (name.ICompare("domain") == 0) {
 			if (value.IsEmpty()) {
 				result = B_BAD_VALUE;
@@ -350,7 +350,7 @@ BNetworkCookie::ExpirationDate() const
 const BString&
 BNetworkCookie::ExpirationString() const
 {
-	BHttpTime date(ExpirationDate());
+	BHttpTime date(fExpiration);
 
 	if (!fExpirationStringValid) {
 		fExpirationString = date.ToString(BPrivate::B_HTTP_TIME_FORMAT_COOKIE);

@@ -7,6 +7,7 @@
 
 #include <ctime>
 
+#include <DateTime.h>
 #include <String.h>
 
 namespace BPrivate {
@@ -24,21 +25,21 @@ enum {
 class BHttpTime {
 public:
 						BHttpTime();
-						BHttpTime(time_t date);
+						BHttpTime(BDateTime date);
 						BHttpTime(const BString& dateString);
 	
 	// Date modification
 			void		SetString(const BString& string);
-			void		SetDate(time_t date);
+			void		SetDate(BDateTime date);
 	
 		
 	// Date conversion
-			time_t		Parse();
+			BDateTime	Parse();
 			BString		ToString(int8 format = B_HTTP_TIME_FORMAT_PARSED);
 			
 private:
 			BString		fDateString;
-			time_t 		fDate;
+			BDateTime	fDate;
 			int8		fDateFormat;
 };
 

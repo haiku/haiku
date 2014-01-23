@@ -13,9 +13,6 @@
 #include <cstdio>
 
 
-#define PRINT(x) printf x
-
-
 static const char* 	kRfc1123Format			= "%a, %d %b %Y %H:%M:%S GMT";
 static const char* 	kCookieFormat			= "%a, %d-%b-%Y %H:%M:%S GMT";
 static const char* 	kRfc1036Format			= "%A, %d-%b-%y %H:%M:%S GMT";
@@ -33,7 +30,7 @@ BHttpTime::BHttpTime()
 }
 
 
-BHttpTime::BHttpTime(time_t date)
+BHttpTime::BHttpTime(BDateTime date)
 	:
 	fDate(date),
 	fDateFormat(B_HTTP_TIME_FORMAT_PREFERRED)
@@ -61,7 +58,7 @@ BHttpTime::SetString(const BString& string)
 
 
 void
-BHttpTime::SetDate(time_t date)
+BHttpTime::SetDate(BDateTime date)
 {
 	fDate = date;
 }
@@ -70,7 +67,7 @@ BHttpTime::SetDate(time_t date)
 // #pragma mark Date conversion
 
 
-time_t
+BDateTime
 BHttpTime::Parse()
 {
 	struct tm expireTime;
@@ -109,9 +106,10 @@ BHttpTime::Parse()
 // since Haiku does not appear to implement timegm().
 // Using mktime() doesn't cut it, as cookies set with a date shortly in the
 // future (eg. 1 hour) would expire immediately.
-	time_t t = mktime(&expireTime);
-	t -= mktime(gmtime(&t)) - (int)mktime(localtime(&t));
-	return t;
+	BTime time(expireTime.tm_hour, expireTime.tm_min, expireTime.tm_sec);
+	BDate date(expireTime.tm_year, expireTime.tm_mon, expireTime.tm_mday);
+	BDateTime dateTime(date, time);
+	return dateTime;
 }
 
 
@@ -119,7 +117,17 @@ BString
 BHttpTime::ToString(int8 format)
 {
 	BString expirationFinal;
-	struct tm* expirationTm = localtime(&fDate);
+	struct tm expirationTm;
+	expirationTm.tm_sec = fDate.Time().Second();
+	expirationTm.tm_min = fDate.Time().Minute();
+	expirationTm.tm_hour = fDate.Time().Hour();
+	expirationTm.tm_mday = fDate.Date().Day();
+	expirationTm.tm_mon = fDate.Date().Month();
+	expirationTm.tm_year = fDate.Date().Day();
+	expirationTm.tm_wday = 0;
+	expirationTm.tm_yday = 0;
+	expirationTm.tm_isdst = 0;
+
 	char expirationString[kTimetToStringMaxLength + 1];
 	size_t strLength;
 	
@@ -127,17 +135,17 @@ BHttpTime::ToString(int8 format)
 		default:
 		case B_HTTP_TIME_FORMAT_RFC1123:
 			strLength = strftime(expirationString, kTimetToStringMaxLength,
-				kRfc1123Format, expirationTm);
+				kRfc1123Format, &expirationTm);
 			break;
 			
 		case B_HTTP_TIME_FORMAT_RFC1036:
 			strLength = strftime(expirationString, kTimetToStringMaxLength,
-				kRfc1036Format, expirationTm);
+				kRfc1036Format, &expirationTm);
 			break;
 		
 		case B_HTTP_TIME_FORMAT_ASCTIME:
 			strLength = strftime(expirationString, kTimetToStringMaxLength,
-				kAscTimeFormat, expirationTm);
+				kAscTimeFormat, &expirationTm);
 			break;		
 	}
 	
