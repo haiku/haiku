@@ -65,8 +65,11 @@ BFileRequest::_ProtocolLoop()
 		// Send all notifications to listener, if any
 		if (fListener != NULL) {
 			fListener->ConnectionOpened(this);
+
 			off_t size = 0;
-			file.GetSize(&size);
+			error = file.GetSize(&size);
+			if (error != B_OK)
+				return error;
 			fResult.SetLength(size);
 
 			ssize_t chunkSize;
@@ -75,9 +78,13 @@ BFileRequest::_ProtocolLoop()
 				fListener->DataReceived(this, chunk, chunkSize);
 				transferredSize += chunkSize;
 			}
-			// Return last error if we didn't transfer everything
-			if (transferredSize != size)
-				return chunkSize;
+			// Return error if we didn't transfer everything
+			if (transferredSize != size) {
+				if (chunkSize < 0)
+					return (status_t)chunkSize;
+				else
+					return B_IO_ERROR;
+			}
 			fListener->DownloadProgress(this, size, size);
 		}
 
