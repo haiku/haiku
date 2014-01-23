@@ -6,9 +6,9 @@ resource app_name_catalog_entry "x-vnd.Haiku-IconsScreensaver:System name:Icons"
 resource app_version {
 	major  = 1,
 	middle = 0,
-	minor  = 0,
-	variety = 0,
+	minor  = 1,
+	variety = 5,
 	internal = 0,
-	short_info = "1.0.0",
-	long_info = "Screensaver Icons"
+	short_info = "Icons Screensaver",
+	long_info = "Icons Screensaver ©2009 Vincent Duvert, ©2014 Haiku, Inc."
 };
