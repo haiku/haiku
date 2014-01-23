@@ -1126,7 +1126,9 @@ if (first) {
 				pll |= DISPLAY_PLL_POST1_DIVIDE_2;
 		}
 
-		write32(INTEL_DISPLAY_A_PLL, pll);
+		// Programmer's Ref says we must allow the DPLL to "warm up" before starting the plane
+		// so mask its bit, wait, enable its bit
+		write32(INTEL_DISPLAY_A_PLL, pll & ~DISPLAY_PLL_NO_VGA_CONTROL);
 		read32(INTEL_DISPLAY_A_PLL);
 		spin(150);
 		write32(INTEL_DISPLAY_A_PLL, pll);
