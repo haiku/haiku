@@ -56,7 +56,8 @@ private:
 
 SignalEvent::SignalEvent(EventSignal* signal)
 	:
-	fSignal(signal)
+	fSignal(signal),
+	fPendingDPC(0)
 {
 }
 
@@ -71,6 +72,24 @@ void
 SignalEvent::SetUserValue(union sigval userValue)
 {
 	fSignal->SetUserValue(userValue);
+}
+
+
+status_t
+SignalEvent::Fire()
+{
+	bool wasPending = atomic_get_and_set(&fPendingDPC, 1) != 0;
+	if (wasPending)
+		return B_BUSY;
+
+	if (fSignal->MarkUsed()) {
+		atomic_set(&fPendingDPC, 0);
+		return B_BUSY;
+	}
+
+	DPCQueue::DefaultQueue(B_NORMAL_PRIORITY)->Add(this);
+
+	return B_OK;
 }
 
 
@@ -106,12 +125,9 @@ TeamSignalEvent::Create(Team* team, uint32 signalNumber, int32 signalCode,
 }
 
 
-status_t
-TeamSignalEvent::Fire()
+void
+TeamSignalEvent::DoDPC(DPCQueue* queue)
 {
-	if (fSignal->MarkUsed())
-		return B_BUSY;
-
 	fSignal->AcquireReference();
 		// one reference is transferred to send_signal_to_team_locked
 
@@ -125,7 +141,8 @@ TeamSignalEvent::Fire()
 	if (error != B_OK || !fSignal->IsPending())
 		fSignal->SetUnused();
 
-	return error;
+	// We're no longer queued in the DPC queue, so we can be reused.
+	atomic_set(&fPendingDPC, 0);
 }
 
 
@@ -161,12 +178,9 @@ ThreadSignalEvent::Create(Thread* thread, uint32 signalNumber, int32 signalCode,
 }
 
 
-status_t
-ThreadSignalEvent::Fire()
+void
+ThreadSignalEvent::DoDPC(DPCQueue* queue)
 {
-	if (fSignal->MarkUsed())
-		return B_BUSY;
-
 	fSignal->AcquireReference();
 		// one reference is transferred to send_signal_to_team_locked
 	InterruptsReadSpinLocker teamLocker(fThread->team_lock);
@@ -181,7 +195,8 @@ ThreadSignalEvent::Fire()
 	if (error != B_OK || !fSignal->IsPending())
 		fSignal->SetUnused();
 
-	return error;
+	// We're no longer queued in the DPC queue, so we can be reused.
+	atomic_set(&fPendingDPC, 0);
 }
 
 

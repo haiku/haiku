@@ -28,10 +28,12 @@ struct UserEvent {
 };
 
 
-struct SignalEvent : UserEvent {
+struct SignalEvent : UserEvent, private DPCCallback {
 	virtual						~SignalEvent();
 
 			void				SetUserValue(union sigval userValue);
+
+	virtual	status_t			Fire();
 
 protected:
 			struct EventSignal;
@@ -41,6 +43,7 @@ protected:
 
 protected:
 			EventSignal*		fSignal;
+			int32				fPendingDPC;
 };
 
 
@@ -48,7 +51,8 @@ struct TeamSignalEvent : SignalEvent {
 	static	TeamSignalEvent*	Create(Team* team, uint32 signalNumber,
 									int32 signalCode, int32 errorCode);
 
-	virtual	status_t			Fire();
+protected:
+	virtual	void				DoDPC(DPCQueue* queue);
 
 private:
 								TeamSignalEvent(Team* team,
@@ -64,7 +68,8 @@ struct ThreadSignalEvent : SignalEvent {
 									int32 signalCode, int32 errorCode,
 									pid_t sendingTeam);
 
-	virtual	status_t			Fire();
+protected:
+	virtual	void				DoDPC(DPCQueue* queue);
 
 private:
 								ThreadSignalEvent(Thread* thread,
