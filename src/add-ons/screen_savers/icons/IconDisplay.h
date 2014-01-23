@@ -12,11 +12,14 @@
 
 
 #include <Rect.h>
+#include <SupportDefs.h>
 #include <View.h>
 
-struct VectorIcon {
-        uint8* data;
-        size_t size;
+
+struct vector_icon {
+	uint8* data;
+	size_t size;
+	type_code type;
 };
 
 
@@ -27,10 +30,10 @@ class IconDisplay {
 public:
 								IconDisplay();
 								~IconDisplay();
-	
-			void				Run(VectorIcon* icon, BRect frame);
-	inline	bool				IsRunning() { return fIsRunning; };
-	inline	BRect				GetFrame() { return fFrame; };
+
+			void				Run(vector_icon* icon, BRect frame);
+	inline	bool				IsRunning() const { return fIsRunning; };
+	inline	BRect				GetFrame() const { return fFrame; };
 
 			void				ClearOn(BView* view);
 			void				DrawOn(BView* view, uint32 delta);

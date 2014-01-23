@@ -31,13 +31,13 @@ public:
 	virtual	void				StartConfig(BView* view);
 
 private:
-	BList						fVectorIcons;
-	int32						fVectorIconsCount;
-	IconDisplay*				fIcons;
+			void				_GetVectorIcons();
 
-	BBitmap*					fBackBitmap;
-	BView*						fBackView;
+			BList				fVectorIcons;
+			IconDisplay*		fIcons;
 
+			BBitmap*			fBackBitmap;
+			BView*				fBackView;
 
 			uint16				fMinSize;
 			uint16				fMaxSize;

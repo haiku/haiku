@@ -42,7 +42,7 @@ IconDisplay::~IconDisplay()
 
 
 void
-IconDisplay::Run(VectorIcon* icon, BRect frame)
+IconDisplay::Run(vector_icon* icon, BRect frame)
 {
 	delete fBitmap;
 
