@@ -5,6 +5,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Vincent Duvert, vincent.duvert@free.fr
  *		John Scipione, jscipione@gmail.com
  */
 #ifndef ICON_DISPLAY_H
@@ -12,18 +13,13 @@
 
 
 #include <Rect.h>
-#include <SupportDefs.h>
-#include <View.h>
 
 
-struct vector_icon {
-	uint8* data;
-	size_t size;
-	type_code type;
-};
+struct vector_icon;
 
 
 class BBitmap;
+class BView;
 
 
 class IconDisplay {

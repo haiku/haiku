@@ -5,14 +5,18 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Vincent Duvert, vincent.duvert@free.fr
  *		John Scipione, jscipione@gmail.com
  */
 #ifndef ICONS_SAVER_H
 #define ICONS_SAVER_H
 
 
-#include <List.h>
+#include <ObjectList.h>
 #include <ScreenSaver.h>
+
+
+struct vector_icon;
 
 
 class IconDisplay;
@@ -33,7 +37,7 @@ public:
 private:
 			void				_GetVectorIcons();
 
-			BList				fVectorIcons;
+	BObjectList<vector_icon>	fVectorIcons;
 			IconDisplay*		fIcons;
 
 			BBitmap*			fBackBitmap;

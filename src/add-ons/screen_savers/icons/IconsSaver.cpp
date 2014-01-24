@@ -5,29 +5,24 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Vincent Duvert, vincent.duvert@free.fr
  *		John Scipione, jscipione@gmail.com
  */
 
 
 #include "IconsSaver.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <Bitmap.h>
 #include <Catalog.h>
-#include <Entry.h>
 #include <MimeType.h>
-#include <Node.h>
-#include <NodeInfo.h>
-#include <StringView.h>
-#include <Query.h>
-#include <Volume.h>
-#include <VolumeRoster.h>
+
 
 #include <BuildScreenSaverDefaultSettingsView.h>
 
 #include "IconDisplay.h"
+#include "VectorIcon.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -43,11 +38,10 @@ static const int32 kMinIconWidthPercentage = 5;
 static const int32 kMaxIconWidthPercentage = 20;
 	// same here
 static const int32 kMinIconCount = 20;
-static const int32 kMaxIconCount = 128;
+static const int32 kMaxIconCount = 300;
 
 
 const rgb_color kBackgroundColor = ui_color(B_DESKTOP_COLOR);
-
 
 
 BScreenSaver* instantiate_screen_saver(BMessage* msg, image_id image)
@@ -172,7 +166,7 @@ IconsSaver::Draw(BView* view, int32 frame)
 			}
 
 			int32 index = RAND_BETWEEN(0, fVectorIcons.CountItems() - 1);
-			fIcons[i].Run((vector_icon*)fVectorIcons.ItemAt(index), iconFrame);
+			fIcons[i].Run(fVectorIcons.ItemAt(index), iconFrame);
 			return;
 		}
 	}
@@ -193,49 +187,32 @@ IconsSaver::StartConfig(BView* view)
 void
 IconsSaver::_GetVectorIcons()
 {
-	BVolumeRoster volumeRoster;
-	BVolume volume;
-	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
-		if (!volume.KnowsAttr() || !volume.KnowsMime() || !volume.KnowsQuery())
+	// Load vector icons from the MIME type database
+	BMessage types;
+	if (BMimeType::GetInstalledTypes(&types) != B_OK)
+		return;
+
+	const char* type;
+	for (int32 i = 0; types.FindString("types", i, &type) == B_OK; i++) {
+		BMimeType mimeType(type);
+		if (mimeType.InitCheck() != B_OK)
 			continue;
 
-		BQuery query;
-		query.SetVolume(&volume);
-		query.SetPredicate("BEOS:APP_SIG=*");
-		query.Fetch();
+		vector_icon* icon = (vector_icon*)malloc(sizeof(vector_icon));
+		if (icon == NULL)
+			continue;
 
-		entry_ref ref;
-		while (query.GetNextRef(&ref) == B_OK) {
-			BFile file(&ref, B_READ_ONLY);
-			if (file.InitCheck() != B_OK)
-				continue;
+		if (mimeType.GetIcon(&icon->data, &icon->size) != B_OK) {
+			// didn't find an icon, delete the icon container
+			delete icon;
+			continue;
+		}
 
-			struct vector_icon* icon
-				= (struct vector_icon*)malloc(sizeof(struct vector_icon));
-			if (icon == NULL)
-				continue;
-
-			BNode node(&ref);
-			BNodeInfo nodeInfo(&node);
-			if (nodeInfo.InitCheck() != B_OK
-				|| nodeInfo.GetIcon(&icon->data, &icon->size, &icon->type)
-					!= B_OK) {
-				// didn't find an icon
-				continue;
-			}
-
-			if (icon->type != B_VECTOR_ICON_TYPE) {
-				// found an icon, but it's not a vector icon
-				delete icon;
-				continue;
-			}
-
-			// found a vector icon, add it to the list
-			fVectorIcons.AddItem(icon);
-			if (fVectorIcons.CountItems() >= kMaxIconCount) {
-				// this is enough to choose from, stop eating memory...
-				return;
-			}
+		// found a vector icon, add it to the list
+		fVectorIcons.AddItem(icon);
+		if (fVectorIcons.CountItems() >= kMaxIconCount) {
+			// this is enough to choose from, stop eating memory...
+			return;
 		}
 	}
 }

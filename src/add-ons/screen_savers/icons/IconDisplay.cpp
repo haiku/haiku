@@ -5,17 +5,20 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Vincent Duvert, vincent.duvert@free.fr
  *		John Scipione, jscipione@gmail.com
  */
 
 
 #include "IconDisplay.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <Bitmap.h>
 #include <IconUtils.h>
+#include <View.h>
+
+#include "VectorIcon.h"
 
 
 #define RAND_BETWEEN(a, b) ((rand() % ((b) - (a) + 1) + (a)))
@@ -48,7 +51,8 @@ IconDisplay::Run(vector_icon* icon, BRect frame)
 
 	fBitmap = new BBitmap(BRect(0, 0, frame.Width(), frame.Height()), 0,
 		B_RGBA32);
-	BIconUtils::GetVectorIcon(icon->data, icon->size, fBitmap);
+	if (BIconUtils::GetVectorIcon(icon->data, icon->size, fBitmap) != B_OK)
+		return;
 
 	fState = 0;
 	fTicks = 0;
@@ -80,26 +84,28 @@ IconDisplay::DrawOn(BView* view, uint32 delta)
 	rgb_color backColor = view->HighColor();
 
 	switch (fState) {
-		case 0: 
-			// Progressive showing
+		case 0:
+			// progressive showing
 			if (fTicks < fDelay)
 				backColor.alpha = (fTicks * 255) / fDelay;
 			else
 				fState++;
+
 			break;
 
-		case 1: 
-			// Completed showing
+		case 1:
+			// completed showing
 			backColor.alpha = 255;
 			fTicks = 0;
 			fDelay = RAND_BETWEEN(STAY_TICKS_MIN, STAY_TICKS_MAX);
 			fState++;
 			break;
 
-		case 2: 
-			// Waiting
+		case 2:
+			// waiting
 			if (fTicks < fDelay)
 				return;
+
 			fTicks = 0;
 			backColor.alpha = 255;
 			fDelay = RAND_BETWEEN(HIDE_TICKS_MIN, HIDE_TICKS_MAX);
@@ -107,8 +113,8 @@ IconDisplay::DrawOn(BView* view, uint32 delta)
 			return;
 			break;
 
-		case 3: 
-			// Progressive hiding
+		case 3:
+			// progressive hiding
 			if (fTicks < fDelay) {
 				backColor.alpha = 255 - (fTicks * 255) / fDelay;
 			} else {
@@ -117,8 +123,8 @@ IconDisplay::DrawOn(BView* view, uint32 delta)
 			}
 			break;
 
-		default: 
-			// Finished
+		default:
+			// finished
 			fIsRunning = false;
 			return;
 			break;

@@ -4,9 +4,11 @@
  */
 
 
-#include "FileTypes.h"
 #include "IconView.h"
-#include "MimeTypeListView.h"
+
+#include <new>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Application.h>
 #include <AppFileInfo.h>
@@ -24,9 +26,8 @@
 #include <Roster.h>
 #include <Size.h>
 
-#include <new>
-#include <stdlib.h>
-#include <string.h>
+#include "FileTypes.h"
+#include "MimeTypeListView.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -182,6 +183,7 @@ Icon::SetTo(const BAppFileInfo& info, const char* type)
 
 	uint8* data;
 	size_t size;
+
 	if (info.GetIconForType(type, &data, &size) == B_OK) {
 		// we have the vector icon, no need to get the rest
 		AdoptData(data, size);
@@ -253,6 +255,7 @@ Icon::CopyTo(BAppFileInfo& info, const char* type, bool force) const
 		status = info.SetIconForType(type, fMini, B_MINI_ICON);
 	if (fData != NULL || force)
 		status = info.SetIconForType(type, fData, fSize);
+
 	return status;
 }
 
@@ -285,6 +288,7 @@ Icon::CopyTo(BMimeType& type, bool force) const
 		status = type.SetIcon(fMini, B_MINI_ICON);
 	if (fData != NULL || force)
 		status = type.SetIcon(fData, fSize);
+
 	return status;
 }
 
@@ -1264,6 +1268,7 @@ IconView::_SetIcon(BBitmap* large, BBitmap* mini, const uint8* data,
 			fType.SetIcon(mini, B_MINI_ICON);
 		if (data != NULL || force)
 			fType.SetIcon(data, size);
+
 		// the icon shown will be updated automatically - we're watching
 		// any changes to the MIME database
 	} else if (fIconData != NULL) {
