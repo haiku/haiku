@@ -250,13 +250,13 @@ PSDLoader::Decode(BPositionIO *target)
 			break;
 		}
 		default:
-			delete fStreamBuffer;
+			delete[] fStreamBuffer;
 			for (int i = 0; i < fChannels; i++)
-				delete imageData[i];
+				delete[] imageData[i];
 			return 	B_NO_TRANSLATOR;
 	}
 
-	delete fStreamBuffer;
+	delete[] fStreamBuffer;
 
 	TranslatorBitmap bitsHeader;
 	bitsHeader.magic = B_TRANSLATOR_BITMAP;
@@ -324,7 +324,7 @@ PSDLoader::Decode(BPositionIO *target)
 				}
 				target->Write(lineData, fWidth * sizeof(uint32));
 			}
-			delete colorData;
+			delete[] colorData;
 			break;
 		}
 		case PSD_COLOR_FORMAT_DUOTONE:
@@ -452,9 +452,9 @@ PSDLoader::Decode(BPositionIO *target)
 			break;
 	};
 
-	delete lineData;
+	delete[] lineData;
 	for (int i = 0; i < fChannels; i++)
-		delete imageData[i];
+		delete[] imageData[i];
 
 	return B_OK;
 }
