@@ -822,7 +822,7 @@ check_for_message(int currentCPU, mailbox_source& sourceMailbox)
 			}
 
 			// mark it so we wont try to process this one again
-			msg->proc_bitmap.ClearBit(currentCPU);
+			msg->proc_bitmap.ClearBitAtomic(currentCPU);
 			atomic_add(&gCPU[currentCPU].ici_counter, 1);
 
 			sourceMailbox = MAILBOX_BCAST;
@@ -1000,7 +1000,7 @@ static void
 process_early_cpu_call(int32 cpu)
 {
 	sEarlyCPUCallFunction(sEarlyCPUCallCookie, cpu);
-	sEarlyCPUCallSet.ClearBit(cpu);
+	sEarlyCPUCallSet.ClearBitAtomic(cpu);
 	atomic_add(&sEarlyCPUCallCount, 1);
 }
 
@@ -1112,20 +1112,24 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 		return;
 
 	int currentCPU = smp_get_current_cpu();
-	bool broadcast = true;
-
-	// count target CPUs
-	int32 targetCPUs = 0;
-	for (int32 i = 0; i < sNumCPUs; i++) {
-		if (cpuMask.GetBit(i))
-			targetCPUs++;
-		else if (i != currentCPU)
-			broadcast = false;
-	}
 
 	// find_free_message leaves interrupts disabled
 	struct smp_msg *msg;
 	int state = find_free_message(&msg);
+
+	msg->proc_bitmap = cpuMask;
+	msg->proc_bitmap.ClearBit(currentCPU);
+
+	int32 targetCPUs = 0;
+	for (int32 i = 0; i < sNumCPUs; i++) {
+		if (msg->proc_bitmap.GetBit(i))
+			targetCPUs++;
+	}
+
+	if (targetCPUs == 0) {
+		panic("smp_send_multicast_ici(): 0 CPU mask");
+		return;
+	}
 
 	msg->message = message;
 	msg->data = data;
@@ -1136,13 +1140,7 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 	msg->flags = flags;
 	msg->done = 0;
 
-	msg->proc_bitmap = cpuMask;
-	msg->proc_bitmap.ClearBit(currentCPU);
-	if (msg->proc_bitmap.IsEmpty()) {
-		panic("smp_send_multicast_ici(): 0 CPU mask");
-		return;
-	}
-
+	bool broadcast = targetCPUs == sNumCPUs - 1;
 
 	// stick it in the broadcast mailbox
 	acquire_spinlock_nocheck(&sBroadcastMessageSpinlock);

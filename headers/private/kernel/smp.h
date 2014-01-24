@@ -50,6 +50,9 @@ public:
 	inline	void		SetBit(int32 cpu);
 	inline	void		ClearBit(int32 cpu);
 
+	inline	void		SetBitAtomic(int32 cpu);
+	inline	void		ClearBitAtomic(int32 cpu);
+
 	inline	bool		GetBit(int32 cpu) const;
 
 	inline	bool		IsEmpty() const;
@@ -118,12 +121,28 @@ inline void
 CPUSet::SetBit(int32 cpu)
 {
 	int32* element = (int32*)&fBitmap[cpu % kArraySize];
-	atomic_or(element, 1u << (cpu / kArraySize));
+	*element |= 1u << (cpu / kArraySize);
 }
 
 
 inline void
 CPUSet::ClearBit(int32 cpu)
+{
+	int32* element = (int32*)&fBitmap[cpu % kArraySize];
+	*element &= ~uint32(1u << (cpu / kArraySize));
+}
+
+
+inline void
+CPUSet::SetBitAtomic(int32 cpu)
+{
+	int32* element = (int32*)&fBitmap[cpu % kArraySize];
+	atomic_or(element, 1u << (cpu / kArraySize));
+}
+
+
+inline void
+CPUSet::ClearBitAtomic(int32 cpu)
 {
 	int32* element = (int32*)&fBitmap[cpu % kArraySize];
 	atomic_and(element, ~uint32(1u << (cpu / kArraySize)));
