@@ -289,6 +289,26 @@ BPackageManager::Update(const BSolverPackageSpecifierList& packages)
 
 
 void
+BPackageManager::FullSync()
+{
+	Init(B_ADD_INSTALLED_REPOSITORIES | B_ADD_REMOTE_REPOSITORIES
+		| B_REFRESH_REPOSITORIES);
+
+	// solve
+	status_t error = fSolver->FullSync();
+	if (error != B_OK)
+		DIE(error, "failed to compute packages to synchronize");
+
+	_HandleProblems();
+
+	// install/uninstall packages
+	_AnalyzeResult();
+	_ConfirmChanges();
+	_ApplyPackageChanges();
+}
+
+
+void
 BPackageManager::VerifyInstallation()
 {
 	Init(B_ADD_INSTALLED_REPOSITORIES | B_ADD_REMOTE_REPOSITORIES

@@ -72,6 +72,7 @@ public:
 									bool installNotYetInstalled,
 									const BSolverPackageSpecifier** _unmatched
 										= NULL) = 0;
+	virtual	status_t			FullSync() = 0;
 	virtual	status_t			VerifyInstallation(uint32 flags = 0) = 0;
 
 			bool				HasProblems() const

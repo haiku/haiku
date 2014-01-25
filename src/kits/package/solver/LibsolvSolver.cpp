@@ -427,6 +427,29 @@ LibsolvSolver::Update(const BSolverPackageSpecifierList& packages,
 
 
 status_t
+LibsolvSolver::FullSync()
+{
+	// add repositories to pool
+	status_t error = _AddRepositories();
+	if (error != B_OK)
+		return error;
+
+	// Init the job queue and specify that all packages shall be updated.
+	error = _InitJobQueue();
+	if (error != B_OK)
+		return error;
+
+	queue_push2(fJobs, SOLVER_SOLVABLE_ALL, 0);
+
+	// set jobs' solver mode and solve
+	_SetJobsSolverMode(SOLVER_DISTUPGRADE);
+
+	_InitSolver();
+	return _Solve();
+}
+
+
+status_t
 LibsolvSolver::VerifyInstallation(uint32 flags)
 {
 	if (_InstalledRepository() == NULL)

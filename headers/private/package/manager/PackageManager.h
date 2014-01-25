@@ -90,6 +90,7 @@ public:
 									int packageCount);
 			void				Update(const BSolverPackageSpecifierList&
 									packages);
+			void				FullSync();
 
 			void				VerifyInstallation();
 
