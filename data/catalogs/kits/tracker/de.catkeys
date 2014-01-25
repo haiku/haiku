@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2212190051
+1	german	x-vnd.Haiku-libtracker	3776246526
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
 Add-ons	FilePanelPriv		Add-ons
@@ -58,12 +58,9 @@ Select all	FilePanelPriv		Alles auswählen
 Link to:	InfoWindow		Verknüpfung zu:
 Location	ContainerWindow		Ort
 Location	QueryPoseView		Ort
-config	B_USER_CONFIG_DIRECTORY		Konfiguration
-apps	B_APPS_DIRECTORY		Anwendungen
 Icon view	ContainerWindow		Icon-Ansicht
 Size	QueryPoseView		Größe
 Emptying Trash… 	StatusWindow		Papierkorb wird geleert...
-Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Neu-Vorlagen
 Close all in workspace	ContainerWindow		Alle auf dieser Arbeitsfläche schließen
 Empty Trash	ContainerWindow		Papierkorb leeren
 Name = %name	FindPanel	FindResultTitle	Name = %name
@@ -116,7 +113,6 @@ Open	VolumeWindow		Öffnen
 New folder	ContainerWindow		Neuer Ordner
 Kind	ContainerWindow		Art
 rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	umzubenennen
-home	B_USER_DIRECTORY		Benutzer
 Select…	ContainerWindow		Auswählen…
 Copy to	ContainerWindow		Kopieren nach
 Move to Trash	ContainerWindow		In Papierkorb verschieben
@@ -125,7 +121,6 @@ Create %s clipping	PoseView		Erzeuge %s Ausschnitt
 Set new link target	InfoWindow		Neues Verknüpfungsziel setzen
 If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Wird der System-Ordner oder seine Inhalte %ifYouDoAction, kann %osName nicht mehr gestartet werden!\n\nUm ihn oder seine Inhalte dennoch %toDoAction, Shift-Taste gedrückt halten und \"%toConfirmAction\" klicken.
 Save as Query template:	FindPanel		Query als Vorlage speichern:
-preferences	B_PREFERENCES_DIRECTORY		Einstellungen
 Cancel	FSUtils		Abbrechen
 move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	zu verschieben
 Edit name	ContainerWindow		Umbenennen
@@ -365,7 +360,6 @@ Open selection with:	OpenWithWindow		Auswahl öffnen mit:
 (%bytes bytes)	InfoWindow		(%bytes Bytes)
 Preparing to create links…	StatusWindow		Erstellen von Verknüpfungen wird vorbereitet…
 Show navigator	SettingsView		Navigator zeigen
-Desktop	B_DESKTOP_DIRECTORY		Desktop
 List folders first	SettingsView		Ordner zuerst listen
 Get info	VolumeWindow		Infos
 Name	SelectionWindow		Name:
@@ -395,7 +389,6 @@ Owner	FilePermissionsView		Besitzer
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Es ist ein Problem beim Speichern in den angegebenen Ordner aufgetreten. Bitte einen anderen wählen.
 Restore	ContainerWindow		Wiederherstellen
 Restoring: 	StatusWindow		Wiederherstellen von:
-system	B_SYSTEM_DIRECTORY		System
 Skip	FSUtils		Überspringen
 Settings…	MountMenu		Einstellungen…
 Recent folders	FavoritesMenu		Letzte Ordner
@@ -429,7 +422,6 @@ New	ContainerWindow		Neu
 Name matches wildcard expression:###	SelectionWindow		Name trifft auf Platzhalter-Ausdruck zu:###
 less than	FindPanel		kleiner als
 64 x 64	DeskWindow		64 x 64
-develop	B_SYSTEM_DEVELOP_DIRECTORY		Programmierung
 Modified	ContainerWindow		Geändert
 Edit Query template	FindPanel		Query-Vorlage bearbeiten
 Prompt	FSUtils		Nachfragen

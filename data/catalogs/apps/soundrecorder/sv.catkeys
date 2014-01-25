@@ -1,13 +1,15 @@
-1	swedish	x-vnd.Haiku-SoundRecorder	3982150268
+1	swedish	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Loop
 Cannot find default audio hardware	RecorderWindow		Kan inte hitta den förvalda ljudhårdvaran
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Kan inte hitta den temporära filen skapad för att lagra den nya inspelningen
 Sample size:	RecorderWindow		Samplingsstorlek:
 Nothing to play	RecorderWindow		Inget att spela
+None of the files appear to be audio files.	RecorderWindow		Ingen av filerna verkar vara ljudfiler.
 Duration: 	RecorderWindow		Längd: 
 File info	RecorderWindow		Filinformation
 Drop files here	SoundListView		Släpp filer här
 Input	RecorderWindow		Inmatning
+Some of the files don't appear to be audio files.	RecorderWindow		Några av filerna verkar inte vara ljudfiler.
 Stop	RecorderWindow		Stopp
 Format:	RecorderWindow		Format:
 Sound List	RecorderWindow		Ljudlista
@@ -40,4 +42,5 @@ Channels: 	RecorderWindow		Kanaler:
 Save	RecorderWindow		Spara
 Sample rate: 	RecorderWindow		Samplingsfrekvens: 
 Cannot connect to media server	RecorderWindow		Kan inte ansluta till mediaservern
+The file doesn't appear to be an audio file.	RecorderWindow		Filen verkar inte vara en ljudfil.
 File name:	RecorderWindow		Filnamn:

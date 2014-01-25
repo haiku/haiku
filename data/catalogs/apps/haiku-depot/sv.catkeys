@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	4291855824
+1	swedish	x-vnd.Haiku-HaikuDepot	3598332680
 Name	PackageListView		Namn
 Installed packages	Model		Installerade paket
 User modified packages	Model		Användarmodifierade paket
@@ -12,11 +12,13 @@ Description	PackageListView		Beskrivning
 Install	PackageManager		Installera
 Tools	MainWindow		Verktyg
 HaikuDepot	System name		HaikuDepot
+Rate package…	PackageInfoView		Hastighet paket...
 Uninstall	PackageManager		Avinstallera
 <no info>	PackageInfoView		<Ingen information>
 An error occurred while initializing the package manager: %message%	MainWindow		Ett fel inträffade när packet manager startade: %message%
 Close	PackageManager		Stäng
 Status	PackageListView		Status
+Your rating	System name		Dina användarbetyg
 Development	Model		Utveckling
 Fatal error	PackageManager		Allvarligt fel
 Ratings	PackageInfoView		Betyg
@@ -52,6 +54,7 @@ Unknown	PackageListView		Okänd
 All depots	FilterView		All depots
 Available	PackageListView		Tillgänglig
 n/a	PackageInfoView		oviktigt
+Send	RatePackageWindow		Skicka
 Show develop packages	MainWindow		Visa utvecklingspaket
 Show	FilterView		Visa
 Uninstalled packages	Model		Avinstallera paket

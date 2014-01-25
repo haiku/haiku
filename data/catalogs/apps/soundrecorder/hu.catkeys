@@ -1,13 +1,15 @@
-1	hungarian	x-vnd.Haiku-SoundRecorder	3982150268
+1	hungarian	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Ismétlés
 Cannot find default audio hardware	RecorderWindow		Nem található az alapértelmezett hangeszköz
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nem található az új felvételt tároló ideiglenes fájl
 Sample size:	RecorderWindow		Méret:
 Nothing to play	RecorderWindow		Nincs mit lejátszani
+None of the files appear to be audio files.	RecorderWindow		A fájlok egyike sem tűnik hangfájlnak.
 Duration: 	RecorderWindow		Hossz:
 File info	RecorderWindow		Fájlinformációk
 Drop files here	SoundListView		Húzza ide a fájlokat
 Input	RecorderWindow		Bemenet
+Some of the files don't appear to be audio files.	RecorderWindow		A fájlok között van olyan, ami nem hangfájl.
 Stop	RecorderWindow		Leállítás
 Format:	RecorderWindow		Formátum:
 Sound List	RecorderWindow		Hanglista
@@ -40,4 +42,5 @@ Channels: 	RecorderWindow		Csatornák:
 Save	RecorderWindow		Mentés
 Sample rate: 	RecorderWindow		Mintavételi frekvencia:
 Cannot connect to media server	RecorderWindow		Nem lehet kapcsolódni a kiszolgálóhoz
+The file doesn't appear to be an audio file.	RecorderWindow		Ez a fájl nem tűnik hangfájlnak.
 File name:	RecorderWindow		Fájlnév:

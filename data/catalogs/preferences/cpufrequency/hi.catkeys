@@ -1,0 +1,20 @@
+1	hindi	x-vnd.Haiku-CPUFrequencyPref	3079996868
+Ok	Status view		ठीक है
+CPU frequency status view	CPU Frequency View		सीपियु आवृत्ति स्थिति देखने के लिए
+Set state	Status view		सेट स्टेट
+Defaults	Pref Window		डिफ़ॉल्ट्स
+Install replicant into Deskbar	CPU Frequency View		डेस्कबार में स्थापित रेप्लिका
+Quit	Status view		छोड़ना
+High performance	Status view		उच्च निष्पादन
+Stepping policy	CPU Frequency View		कदम नीति
+Dynamic performance	Status view		गतिशील प्रदर्शन
+Step up by CPU usage	Color Step View		धीरे-धीरे सीपियु का उपयोग द्वारा चरण होना
+Dynamic stepping	CPU Frequency View		गतिशील कदम
+Stepping policy: 	CPU Frequency View		कदम नीति: 
+Integration time [ms]: 	CPU Frequency View		एकीकरण समय [एमएस]: 
+Open Speedstep preferences…	Status view		खुला स्पीद्स्तेप वरीयता ...
+Revert	Pref Window		पलटें
+Low energy	Status view		कम इनरजी
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		 लौन्चिंग सीपियु आवृत्ति शुभारंभ विफल.\n\nत्रुटि:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		सीपियु रेक़ुएन्क्य\n\t क्लेमेंस ज़िल्डर  द्वारा त्व्रित्तें\n\t कोप्य्रिघ्त 2009, हाइकू, Inc.\n
+CPUFrequency	System name		सीपियु की  आवृत्ति

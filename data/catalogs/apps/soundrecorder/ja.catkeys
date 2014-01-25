@@ -1,13 +1,15 @@
-1	japanese	x-vnd.Haiku-SoundRecorder	3982150268
+1	japanese	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		繰り返し
 Cannot find default audio hardware	RecorderWindow		デフォルトのオーディオハードウェアが見つかりません
 Cannot find the temporary file created to hold the new recording	RecorderWindow		新規レコーディングを保存する一時ファイルが見つかりません
 Sample size:	RecorderWindow		ビット深度:
 Nothing to play	RecorderWindow		再生するものがない
+None of the files appear to be audio files.	RecorderWindow		ファイルはすべてオーディオファイルでは無いようです。
 Duration: 	RecorderWindow		再生時間:
 File info	RecorderWindow		ファイル情報
 Drop files here	SoundListView		ここにファイルをドロップしてください
 Input	RecorderWindow		入力
+Some of the files don't appear to be audio files.	RecorderWindow		ファイルのいくつかはオーディオファイルでは無いようです。
 Stop	RecorderWindow		停止
 Format:	RecorderWindow		フォーマット:
 Sound List	RecorderWindow		サウンドリスト
@@ -40,4 +42,5 @@ Channels: 	RecorderWindow		チャンネル:
 Save	RecorderWindow		保存
 Sample rate: 	RecorderWindow		サンプリングレート: 
 Cannot connect to media server	RecorderWindow		メディアサーバーに接続できません
+The file doesn't appear to be an audio file.	RecorderWindow		ファイルはオーディオファイルでは無いようです。
 File name:	RecorderWindow		ファイル名:

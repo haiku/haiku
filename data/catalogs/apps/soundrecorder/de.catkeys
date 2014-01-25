@@ -1,13 +1,15 @@
-1	german	x-vnd.Haiku-SoundRecorder	3982150268
+1	german	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Schleife
 Cannot find default audio hardware	RecorderWindow		Standard-Audiohardware wurde nicht gefunden.
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Die temporäre Datei, in der die neue Aufnahme gespeichert wurde, kann nicht gefunden werden.
 Sample size:	RecorderWindow		Samplegröße:
 Nothing to play	RecorderWindow		Nichts abzuspielen
+None of the files appear to be audio files.	RecorderWindow		Keine der Dateien scheinen Audiodateien zu sein.
 Duration: 	RecorderWindow		Dauer:
 File info	RecorderWindow		Datei Info
 Drop files here	SoundListView		Dateien hier fallen lassen
 Input	RecorderWindow		Eingang
+Some of the files don't appear to be audio files.	RecorderWindow		Einige der Dateien scheinen keine Audiodateien zu sein.
 Stop	RecorderWindow		Stopp
 Format:	RecorderWindow		Format:
 Sound List	RecorderWindow		Dateiliste
@@ -40,4 +42,5 @@ Channels: 	RecorderWindow		Kanäle:
 Save	RecorderWindow		Speichern
 Sample rate: 	RecorderWindow		Samplerate:
 Cannot connect to media server	RecorderWindow		Es konnte keine Verbindung zum Mediaserver aufgebaut werden.
+The file doesn't appear to be an audio file.	RecorderWindow		Die Datei scheint keine Audiodatei zu sein.
 File name:	RecorderWindow		Dateiname:

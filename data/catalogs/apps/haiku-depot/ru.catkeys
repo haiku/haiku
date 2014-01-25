@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	4291855824
+1	russian	x-vnd.Haiku-HaikuDepot	3598332680
 Name	PackageListView		Имя
 Installed packages	Model		Установленные пакеты
 User modified packages	Model		Пакеты измененные пользователем
@@ -12,11 +12,13 @@ Description	PackageListView		Описание
 Install	PackageManager		Установить
 Tools	MainWindow		Инструменты
 HaikuDepot	System name		Склад
+Rate package…	PackageInfoView		Оценить пакет…
 Uninstall	PackageManager		Удалить
 <no info>	PackageInfoView		<нет информации>
 An error occurred while initializing the package manager: %message%	MainWindow		Возникла ошибка при инициализации менеджера пакетов: %message%
 Close	PackageManager		Закрыть
 Status	PackageListView		Статус
+Your rating	System name		Ваш рейтинг
 Development	Model		Разработка
 Fatal error	PackageManager		Неисправимая ошибка
 Ratings	PackageInfoView		Оценки
@@ -52,6 +54,7 @@ Unknown	PackageListView		Неизвестно
 All depots	FilterView		Все склады
 Available	PackageListView		Доступен
 n/a	PackageInfoView		н/д
+Send	RatePackageWindow		Отправить
 Show develop packages	MainWindow		Отображать пакеты для разработчиков
 Show	FilterView		Все пакеты
 Uninstalled packages	Model		Удаленные пакеты

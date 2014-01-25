@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	4291855824
+1	german	x-vnd.Haiku-HaikuDepot	3598332680
 Name	PackageListView		Name
 Installed packages	Model		Installierte Pakete
 User modified packages	Model		Veränderte Pakete
@@ -12,11 +12,13 @@ Description	PackageListView		Beschreibung
 Install	PackageManager		Installieren
 Tools	MainWindow		Werkzeuge
 HaikuDepot	System name		HaikuDepot
+Rate package…	PackageInfoView		Paket bewerten…
 Uninstall	PackageManager		Deinstallieren
 <no info>	PackageInfoView		<keine Info>
 An error occurred while initializing the package manager: %message%	MainWindow		Bei der Initialisierung des Paketmanagers trat ein Fehler auf: %message%
 Close	PackageManager		Schließen
 Status	PackageListView		Status
+Your rating	System name		Eigene Bewertung
 Development	Model		Programmierung
 Fatal error	PackageManager		Schwerwiegender Fehler
 Ratings	PackageInfoView		Bewertungen
@@ -52,6 +54,7 @@ Unknown	PackageListView		Unbekannt
 All depots	FilterView		Alle Depots
 Available	PackageListView		Verfügbar
 n/a	PackageInfoView		n.v.
+Send	RatePackageWindow		Senden
 Show develop packages	MainWindow		Entwicklungs-Pakete anzeigen
 Show	FilterView		Zeige
 Uninstalled packages	Model		Deinstallierte Pakete

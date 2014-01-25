@@ -1,0 +1,20 @@
+1	romanian	x-vnd.Haiku-CPUFrequencyPref	3079996868
+Ok	Status view		Ok
+CPU frequency status view	CPU Frequency View		Vizualizare a stării frecvenței CPU
+Set state	Status view		Stabilește stare
+Defaults	Pref Window		Implicite
+Install replicant into Deskbar	CPU Frequency View		Instalează copie pe Deskbar
+Quit	Status view		Părăsește
+High performance	Status view		Performanță înaltă
+Stepping policy	CPU Frequency View		Regulă de accelerare
+Dynamic performance	Status view		Performanță dinamică
+Step up by CPU usage	Color Step View		Accelerare după utilizarea CPU
+Dynamic stepping	CPU Frequency View		Accelerare dinamică
+Stepping policy: 	CPU Frequency View		Regulă de accelerare:
+Integration time [ms]: 	CPU Frequency View		Timp de integrare [ms]: 
+Open Speedstep preferences…	Status view		Deschide preferințe viteză…
+Revert	Pref Window		Revenire
+Low energy	Status view		Energie scăzută
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Pornirea prefletului frecvență CPU a eșuat.\n\nEroare:
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		FrecvențăCPU\n\tscris de Clemens Zeidler\n\tDrept de autor 2009, Haiku, Inc.\n
+CPUFrequency	System name		FrecvențăCPU
