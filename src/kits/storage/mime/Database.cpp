@@ -356,16 +356,19 @@ Database::SetFileExtensions(const char *type, const BMessage *extensions)
 
 
 /*!
-	\brief Sets the icon for the given mime type
+	\brief Sets a bitmap icon for the given mime type
+*/
+status_t
+Database::SetIcon(const char* type, const BBitmap* icon, icon_size which)
+{
+	if (icon != NULL)
+		return SetIcon(type, icon->Bits(), icon->BitsLength(), which);
+	return SetIcon(type, NULL, 0, which);
+}
 
-	This is the version I would have used if I could have gotten a BBitmap
-	to the registrar somehow. Since R5::BBitmap::Instantiate is causing a
-	violent crash, I've copied most of the icon	color conversion code into
-	Mime::get_icon_data() so BMimeType::SetIcon() can get at it.
 
-	Once we have a sufficiently complete OBOS::BBitmap implementation, we
-	ought to be able to use this version of SetIcon() again. At that point,
-	I'll add some real documentation.
+/*!
+	\brief Sets a bitmap icon for the given mime type
 */
 status_t
 Database::SetIcon(const char *type, const void *data, size_t dataSize,
@@ -374,11 +377,28 @@ Database::SetIcon(const char *type, const void *data, size_t dataSize,
 	return SetIconForType(type, NULL, data, dataSize, which);
 }
 
+
+/*!
+	\brief Sets the vector icon for the given mime type
+*/
 status_t
 Database::SetIcon(const char *type, const void *data, size_t dataSize)
 {
 	return SetIconForType(type, NULL, data, dataSize);
 }
+
+
+status_t
+Database::SetIconForType(const char* type, const char* fileType,
+	const BBitmap* icon, icon_size which)
+{
+	if (icon != NULL) {
+		return SetIconForType(type, fileType, icon->Bits(),
+			(size_t)icon->BitsLength(), which);
+	}
+	return SetIconForType(type, fileType, NULL, 0, which);
+}
+
 
 // SetIconForType
 /*! \brief Sets the large or mini icon used by an application of this type for

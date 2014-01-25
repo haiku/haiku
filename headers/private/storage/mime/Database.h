@@ -69,9 +69,13 @@ class Database {
 		status_t SetShortDescription(const char *type, const char *description);	
 		status_t SetLongDescription(const char *type, const char *description);
 		status_t SetFileExtensions(const char *type, const BMessage *extensions);
+		status_t SetIcon(const char* type, const BBitmap* icon,
+					icon_size which);
 		status_t SetIcon(const char *type, const void *data, size_t dataSize,
 					icon_size which);
 		status_t SetIcon(const char *type, const void *data, size_t dataSize);
+		status_t SetIconForType(const char* type, const char* fileType,
+					const BBitmap* icon, icon_size which);
 		status_t SetIconForType(const char *type, const char *fileType,
 					const void *data, size_t dataSize, icon_size which);
 		status_t SetIconForType(const char *type, const char *fileType,
