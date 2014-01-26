@@ -199,6 +199,19 @@ ThreadData::ComputeQuantum() const
 }
 
 
+void
+ThreadData::UnassignCore(bool running)
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	ASSERT(fCore != NULL);
+	if (running || fThread->state == B_THREAD_READY)
+		fReady = false;
+	if (!fReady)
+		fCore = NULL;
+}
+
+
 /* static */ void
 ThreadData::ComputeQuantumLengths()
 {

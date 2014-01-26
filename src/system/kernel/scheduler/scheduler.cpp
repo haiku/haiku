@@ -106,6 +106,7 @@ enqueue(Thread* thread, bool newOne)
 	CoreEntry* targetCore = NULL;
 	if (thread->pinned_to_cpu > 0) {
 		ASSERT(thread->previous_cpu != NULL);
+		ASSERT(threadData->Core() != NULL);
 		targetCPU = &gCPUEntries[thread->previous_cpu->cpu_num];
 	} else if (gSingleCore)
 		targetCore = &gCoreEntries[0];
@@ -380,14 +381,9 @@ reschedule(int32 nextState)
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
 			oldThreadData->Dies();
-			if (gCPU[thisCPU].disabled)
-				oldThreadData->UnassignCore(true);
 			break;
 		default:
 			oldThreadData->GoesAway();
-			if (gCPU[thisCPU].disabled)
-				oldThreadData->UnassignCore(true);
-
 			TRACE("not enqueueing thread %ld into run queue next_state = %ld\n",
 				oldThread->id, nextState);
 			break;
@@ -399,13 +395,12 @@ reschedule(int32 nextState)
 	ThreadData* nextThreadData;
 	if (gCPU[thisCPU].disabled) {
 		if (!oldThreadData->IsIdle()) {
-			CPURunQueueLocker _(cpu);
-
-			nextThreadData = cpu->PeekIdleThread();
-			cpu->Remove(nextThreadData);
-
 			putOldThreadAtBack = oldThread->pinned_to_cpu == 0;
 			oldThreadData->UnassignCore(true);
+
+			CPURunQueueLocker cpuLocker(cpu);
+			nextThreadData = cpu->PeekIdleThread();
+			cpu->Remove(nextThreadData);
 		} else
 			nextThreadData = oldThreadData;
 	} else {

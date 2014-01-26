@@ -87,7 +87,7 @@ public:
 	inline	int32		GetLoad() const	{ return fNeededLoad; }
 
 	inline	CoreEntry*	Core() const	{ return fCore; }
-	inline	void		UnassignCore(bool running = false);
+			void		UnassignCore(bool running = false);
 
 	static	void		ComputeQuantumLengths();
 
@@ -498,25 +498,6 @@ ThreadData::UpdateActivity(bigtime_t active)
 
 	fMeasureAvailableTime += active;
 	fMeasureAvailableActiveTime += active;
-}
-
-
-inline void
-ThreadData::UnassignCore(bool running)
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	ASSERT(fCore != NULL);
-	if (!fReady)
-		fCore = NULL;
-
-	if (running || fThread->state == B_THREAD_READY) {
-		if (gTrackCoreLoad)
-			fCore->UpdateLoad(-fNeededLoad);
-		fReady = false;
-		fThread->state = B_THREAD_SUSPENDED;
-		fCore = NULL;
-	}
 }
 
 
