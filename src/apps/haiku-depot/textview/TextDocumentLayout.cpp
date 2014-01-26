@@ -336,7 +336,7 @@ TextDocumentLayout::_ParagraphLayoutIndexForOffset(int32& textOffset)
 	_ValidateLayout();
 
 	int32 paragraphs = fParagraphLayouts.CountItems();
-	for (int32 i = 0; i < paragraphs; i++) {
+	for (int32 i = 0; i < paragraphs - 1; i++) {
 		const ParagraphLayoutInfo& info = fParagraphLayouts.ItemAtFast(i);
 		
 		int32 length = info.layout->CountGlyphs();
@@ -346,6 +346,16 @@ TextDocumentLayout::_ParagraphLayoutIndexForOffset(int32& textOffset)
 		}
 		
 		return i;
+	}
+	
+	if (paragraphs > 0) {
+		const ParagraphLayoutInfo& info = fParagraphLayouts.LastItem();
+
+		// Return last paragraph if the textOffset is still within or
+		// exactly behind the last valid offset in that paragraph.
+		int32 length = info.layout->CountGlyphs();
+		if (textOffset <= length)
+			return paragraphs - 1;
 	}
 	
 	return -1;
