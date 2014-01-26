@@ -5,6 +5,8 @@ BootstrapPackageRepository HaikuPortsCross
 	haikuporter-0-1
 	:
 	# repository architecture packages (stage 1)
+	icu_bootstrap-4.8.1.1-1
+	icu_bootstrap_devel-4.8.1.1-1
 	zlib_bootstrap-1.2.8-2
 	zlib_bootstrap_devel-1.2.8-2
 	:
@@ -14,6 +16,7 @@ BootstrapPackageRepository HaikuPortsCross
 
 	:
 	# source packages
+	icu_bootstrap
 	libsolv_bootstrap
 	zlib_bootstrap
 	:
