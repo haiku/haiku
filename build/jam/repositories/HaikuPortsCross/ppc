@@ -5,8 +5,26 @@ BootstrapPackageRepository HaikuPortsCross
 	haikuporter-0-1
 	:
 	# repository architecture packages (stage 1)
+	autoconf_bootstrap-2.69-1
+	automake_bootstrap-1.13.1-1
+	binutils_bootstrap-2.23.2_2013_04_09-3
+	bison_bootstrap-2.4.3-1
+	flex_bootstrap-2.5.35-1
 	icu_bootstrap-4.8.1.1-1
 	icu_bootstrap_devel-4.8.1.1-1
+	gcc_bootstrap-4.7.3_2013_08_12-1
+	grep_bootstrap-2.14-1
+	freetype_bootstrap-2.4.9-1
+	freetype_bootstrap_devel-2.4.9-1
+	libtool_bootstrap-2.4-8
+	libtool_bootstrap_libltdl-2.4-8
+	m4_bootstrap-1.4.16-1
+	make_bootstrap-3.82-1
+	ncurses_bootstrap-5.9-1
+	ncurses_bootstrap_devel-5.9-1
+	python_bootstrap-2.6.8-1
+	sed_bootstrap-4.2.1-1
+	texinfo_bootstrap-4.13a-1
 	zlib_bootstrap-1.2.8-2
 	zlib_bootstrap_devel-1.2.8-2
 	:
@@ -16,9 +34,24 @@ BootstrapPackageRepository HaikuPortsCross
 
 	:
 	# source packages
+	autoconf_bootstrap
+	automake_bootstrap
+	binutils_bootstrap
+	bison_bootstrap
+	flex_bootstrap
 	icu_bootstrap
-	libsolv_bootstrap
+	gcc_bootstrap
+	grep_bootstrap
+	freetype_bootstrap
+	libtool_bootstrap
+	m4_bootstrap
+	make_bootstrap
+	ncurses_bootstrap
+	python_bootstrap
+	sed_bootstrap
+	texinfo_bootstrap
 	zlib_bootstrap
+	libsolv_bootstrap
 	:
 	# debuginfo packages
 	;
