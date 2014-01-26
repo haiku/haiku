@@ -44,8 +44,12 @@ public:
 			void				PrintToStream() const;
 
 private:
+			void				_InvalidateCachedLength();
+
+private:
 			ParagraphStyle		fStyle;
 			TextSpanList		fTextSpans;
+	mutable	int32				fCachedLength;
 };
 
 

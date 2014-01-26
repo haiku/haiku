@@ -19,7 +19,8 @@ Paragraph::Paragraph()
 Paragraph::Paragraph(const ParagraphStyle& style)
 	:
 	fStyle(style),
-	fTextSpans()
+	fTextSpans(),
+	fCachedLength(-1)
 {
 }
 
@@ -27,7 +28,8 @@ Paragraph::Paragraph(const ParagraphStyle& style)
 Paragraph::Paragraph(const Paragraph& other)
 	:
 	fStyle(other.fStyle),
-	fTextSpans(other.fTextSpans)
+	fTextSpans(other.fTextSpans),
+	fCachedLength(other.fCachedLength)
 {
 }
 
@@ -37,6 +39,7 @@ Paragraph::operator=(const Paragraph& other)
 {
 	fStyle = other.fStyle;
 	fTextSpans = other.fTextSpans;
+	fCachedLength = other.fCachedLength;
 
 	return *this;
 }
@@ -70,6 +73,8 @@ Paragraph::SetStyle(const ParagraphStyle& style)
 bool
 Paragraph::Prepend(const TextSpan& span)
 {
+	_InvalidateCachedLength();
+
 	// Try to merge with first span if the TextStyles are equal
 	if (fTextSpans.CountItems() > 0) {
 		const TextSpan& firstSpan = fTextSpans.ItemAtFast(0);
@@ -86,6 +91,8 @@ Paragraph::Prepend(const TextSpan& span)
 bool
 Paragraph::Append(const TextSpan& span)
 {
+	_InvalidateCachedLength();
+
 	// Try to merge with last span if the TextStyles are equal
 	if (fTextSpans.CountItems() > 0) {
 		const TextSpan& lastSpan = fTextSpans.LastItem();
@@ -103,6 +110,8 @@ Paragraph::Append(const TextSpan& span)
 bool
 Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 {
+	_InvalidateCachedLength();
+
 	int32 index = 0;
 	while (index < fTextSpans.CountItems()) {
 		const TextSpan& span = fTextSpans.ItemAtFast(index);
@@ -150,6 +159,8 @@ Paragraph::Remove(int32 offset, int32 length)
 {
 	if (length == 0)
 		return true;
+
+	_InvalidateCachedLength();
 
 	int32 index = 0;
 	while (index < fTextSpans.CountItems()) {
@@ -227,11 +238,16 @@ Paragraph::Clear()
 int32
 Paragraph::Length() const
 {
+	if (fCachedLength >= 0)
+		return fCachedLength;
+
 	int32 length = 0;
 	for (int32 i = fTextSpans.CountItems() - 1; i >= 0; i--) {
 		const TextSpan& span = fTextSpans.ItemAtFast(i);
 		length += span.CountChars();
 	}
+
+	fCachedLength = length;
 	return length;
 }
 
@@ -307,4 +323,14 @@ Paragraph::PrintToStream() const
 		}
 	}
 	printf("  </p>\n");
+}
+
+
+// #pragma mark -
+
+
+void
+Paragraph::_InvalidateCachedLength()
+{
+	fCachedLength = -1;
 }
