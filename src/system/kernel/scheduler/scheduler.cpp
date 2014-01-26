@@ -328,55 +328,28 @@ switch_thread(Thread* fromThread, Thread* toThread)
 }
 
 
-static inline void
-update_thread_times(Thread* oldThread, Thread* nextThread)
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	bigtime_t now = system_time();
-	if (oldThread == nextThread) {
-		SpinLocker _(oldThread->time_lock);
-		oldThread->kernel_time += now - oldThread->last_time;
-		oldThread->last_time = now;
-	} else {
-		SpinLocker locker(oldThread->time_lock);
-		oldThread->kernel_time += now - oldThread->last_time;
-		oldThread->last_time = 0;
-		locker.Unlock();
-
-		locker.SetTo(nextThread->time_lock, false);
-		nextThread->last_time = now;
-	}
-
-	// If the old thread's team has user time timers, check them now.
-	Team* team = oldThread->team;
-
-	SpinLocker _(team->time_lock);
-	if (team->HasActiveUserTimeUserTimers())
-		user_timer_check_team_user_timers(team);
-}
-
-
 static void
 reschedule(int32 nextState)
 {
 	ASSERT(!are_interrupts_enabled());
 	SCHEDULER_ENTER_FUNCTION();
 
-	SchedulerModeLocker modeLocker;
-
-	Thread* oldThread = thread_get_current_thread();
-
 	int32 thisCPU = smp_get_current_cpu();
 
 	CPUEntry* cpu = CPUEntry::GetCPU(thisCPU);
 	CoreEntry* core = CoreEntry::GetCore(thisCPU);
 
+	Thread* oldThread = thread_get_current_thread();
+	ThreadData* oldThreadData = oldThread->scheduler_data;
+
+	oldThreadData->StopCPUTime();
+
+	SchedulerModeLocker modeLocker;
+
 	TRACE("reschedule(): cpu %ld, current thread = %ld\n", thisCPU,
 		oldThread->id);
 
 	oldThread->state = nextState;
-	ThreadData* oldThreadData = oldThread->scheduler_data;
 
 	// return time spent in interrupts
 	oldThreadData->SetStolenInterruptTime(gCPU[thisCPU].interrupt_time);
@@ -470,9 +443,7 @@ reschedule(int32 nextState)
 
 	ASSERT(nextThreadData->Core() == core);
 	nextThread->state = B_THREAD_RUNNING;
-
-	// track kernel time (user time is tracked in thread_at_kernel_entry())
-	update_thread_times(oldThread, nextThread);
+	nextThreadData->StartCPUTime();
 
 	// track CPU activity
 	cpu->TrackActivity(oldThreadData, nextThreadData);

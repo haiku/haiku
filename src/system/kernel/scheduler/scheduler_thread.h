@@ -50,6 +50,9 @@ public:
 
 	inline	bool		IsCPUBound() const	{ return fCPUBound; }
 
+	inline	void		StartCPUTime();
+	inline	void		StopCPUTime();
+
 	inline	void		CancelPenalty();
 	inline	bool		ShouldCancelPenalty() const;
 
@@ -213,6 +216,35 @@ ThreadData::_IncreasePenalty()
 	}
 
 	_ComputeEffectivePriority();
+}
+
+
+inline void
+ThreadData::StartCPUTime()
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	SpinLocker threadTimeLocker(fThread->time_lock);
+	fThread->last_time = system_time();
+}
+
+
+inline void
+ThreadData::StopCPUTime()
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	// User time is tracked in thread_at_kernel_entry()
+	SpinLocker threadTimeLocker(fThread->time_lock);
+	fThread->kernel_time += system_time() - fThread->last_time;
+	fThread->last_time = 0;
+	threadTimeLocker.Unlock();
+
+	// If the old thread's team has user time timers, check them now.
+	Team* team = fThread->team;
+	SpinLocker teamTimeLocker(team->time_lock);
+	if (team->HasActiveUserTimeUserTimers())
+		user_timer_check_team_user_timers(team);
 }
 
 
