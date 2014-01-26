@@ -36,9 +36,9 @@ update_icon(BAppFileInfo &appFileInfoRead, BAppFileInfo &appFileInfoWrite,
 {
 	status_t err = appFileInfoRead.GetIconForType(type, &icon, iconSize);
 	if (err == B_OK)
-		err = appFileInfoWrite.SetIconForType(type, &icon, iconSize);
+		err = appFileInfoWrite.SetIconForType(type, &icon, iconSize, false);
 	else if (err == B_ENTRY_NOT_FOUND)
-		err = appFileInfoWrite.SetIconForType(type, NULL, iconSize);
+		err = appFileInfoWrite.SetIconForType(type, NULL, iconSize, false);
 	return err;
 }
 
@@ -52,9 +52,9 @@ update_icon(BAppFileInfo &appFileInfoRead, BAppFileInfo &appFileInfoWrite,
 
 	status_t err = appFileInfoRead.GetIconForType(type, &data, &size);
 	if (err == B_OK)
-		err = appFileInfoWrite.SetIconForType(type, data, size);
+		err = appFileInfoWrite.SetIconForType(type, data, size, false);
 	else if (err == B_ENTRY_NOT_FOUND)
-		err = appFileInfoWrite.SetIconForType(type, NULL, size);
+		err = appFileInfoWrite.SetIconForType(type, NULL, size, false);
 
 	free(data);
 
@@ -177,10 +177,11 @@ MimeInfoUpdater::Do(const entry_ref& entry, bool* _entryIsDir)
 		bool hasSupportedTypes = false;
 		err = appFileInfoRead.GetSupportedTypes(&supportedTypes);
 		if (err == B_OK) {
-			err = appFileInfoWrite.SetSupportedTypes(&supportedTypes);
+			err = appFileInfoWrite.SetSupportedTypes(&supportedTypes, false,
+				false);
 			hasSupportedTypes = true;
 		} else if (err == B_ENTRY_NOT_FOUND)
-			err = appFileInfoWrite.SetSupportedTypes(NULL);
+			err = appFileInfoWrite.SetSupportedTypes(NULL, false, false);
 		if (err != B_OK)
 			return err;
 
