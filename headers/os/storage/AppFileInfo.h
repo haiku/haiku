@@ -69,15 +69,21 @@ public:
 
 			status_t			GetSupportedTypes(BMessage* types) const;
 			status_t			SetSupportedTypes(const BMessage* types,
+									bool updateMimeDB, bool syncAll);
+			status_t			SetSupportedTypes(const BMessage* types,
 									bool syncAll);
 			status_t			SetSupportedTypes(const BMessage* types);
 			bool				IsSupportedType(const char* type) const;
 			bool				Supports(BMimeType* type) const;
 
 	virtual	status_t			GetIcon(BBitmap* icon, icon_size which) const;
+			status_t			SetIcon(const BBitmap* icon, icon_size which,
+									bool updateMimeDB);
 	virtual	status_t			SetIcon(const BBitmap* icon, icon_size which);
 
 			status_t			GetIcon(uint8** data, size_t* size) const;
+			status_t			SetIcon(const uint8* data, size_t size,
+									bool updateMimeDB);
 			status_t			SetIcon(const uint8* data, size_t size);
 
 			status_t			GetVersionInfo(version_info* info,
@@ -90,7 +96,13 @@ public:
 			status_t			GetIconForType(const char* type, uint8** data,
 									size_t* size) const;
 			status_t			SetIconForType(const char* type,
+									const BBitmap* icon, icon_size which,
+									bool updateMimeDB);
+			status_t			SetIconForType(const char* type,
 									const BBitmap* icon, icon_size which);
+			status_t			SetIconForType(const char* type,
+									const uint8* data, size_t size,
+									bool updateMimeDB);
 			status_t			SetIconForType(const char* type,
 									const uint8* data, size_t size);
 

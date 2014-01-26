@@ -317,6 +317,41 @@
 
 /*!
 	\fn status_t BAppFileInfo::SetSupportedTypes(const BMessage* types,
+		bool updateMimeDB, bool syncAll)
+	\brief Sets the MIME types that are supported by the application and allows
+		you to specify whether or not the supported types in the MIME DB shall
+		be updated as well.
+
+	If \a types is \c NULL then the application's supported types are unset.
+
+	The supported MIME types must be stored in a field "types" of type
+	\c B_STRING_TYPE in \a types.
+
+	If \a updateMimeDB is \c true, the method will inform the registrar about
+	this news. In this case for each supported type the result of
+	BMimeType::GetSupportingApps() will afterward include the signature of this
+	application. That is, the application file needs to have a signature set.
+
+	\a syncAll specifies whether the no longer supported types shall be
+	updated as well, i.e. whether or not this application shall be removed
+	from the list of supporting applications. Only relevant when \a updateMimeDB
+	is \c true.
+
+	\param types The supported types to be assigned to the file.
+		May be \c NULL.
+	\param updateMimeDB \c true to update the supported types in the MIME DB,
+		\c false otherwise.
+	\param syncAll \c true to also synchronize the no-longer supported
+		types, \c false otherwise.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object is not properly initialized.
+*/
+
+
+/*!
+	\fn status_t BAppFileInfo::SetSupportedTypes(const BMessage* types,
 		bool syncAll)
 	\brief Sets the MIME types that are supported by the application and allows
 		you to specify whether or not the no longer supported types shall be
@@ -439,10 +474,35 @@
 
 
 /*!
+	\fn status_t BAppFileInfo::SetIcon(const BBitmap* icon, icon_size which,
+		bool updateMimeDB)
+	\brief Sets the icon of the associated file from a BBitmap.
+
+	If \a icon is \c NULL then the icon of the file is unset.
+
+	\param icon A pointer to the BBitmap containing the icon to be set.
+		May be \c NULL to specify no icon.
+	\param which Specifies the size of the icon to be set: \c B_MINI_ICON for
+		16x16 mini icon and \c B_LARGE_ICON for the 32x32 large icon.
+		For HVIF icons this parameter has no effect.
+	\param updateMimeDB \c true to also set the icon for the application in the
+		MIME DB. \c false otherwise.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object is not properly initialized.
+	\retval B_BAD_VALUE Unknown icon size \a which or bitmap dimensions
+		(\a icon) and icon size (\a which) do not match.
+*/
+
+/*!
 	\fn status_t BAppFileInfo::SetIcon(const BBitmap* icon, icon_size which)
 	\brief Sets the icon of the associated file from a BBitmap.
 
 	If \a icon is \c NULL then the icon of the file is unset.
+
+	Also sets the application's icon in the MIME DB, if the file has a valid
+	application signature.
 
 	\param icon A pointer to the BBitmap containing the icon to be set.
 		May be \c NULL to specify no icon.
@@ -459,10 +519,33 @@
 
 
 /*!
+	\fn status_t BAppFileInfo::SetIcon(const uint8* data, size_t size,
+		bool updateMimeDB)
+	\brief Sets the icon of the associated file from a buffer.
+
+	If \a data is \c NULL then the icon of the file is unset.
+
+	\param data A pointer to the data buffer containing the vector icon
+		   to be set. May be \c NULL.
+	\param size Specifies the size of buffer pointed to by \a data.
+	\param updateMimeDB \c true to also set the icon for the application in the
+		MIME DB. \c false otherwise.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object is not properly initialized.
+	\retval B_BAD_VALUE \c NULL data.
+*/
+
+
+/*!
 	\fn status_t BAppFileInfo::SetIcon(const uint8* data, size_t size)
 	\brief Sets the icon of the associated file from a buffer.
 
 	If \a data is \c NULL then the icon of the file is unset.
+
+	Also sets the application's icon in the MIME DB, if the file has a valid
+	application signature.
 
 	\param data A pointer to the data buffer containing the vector icon
 		   to be set. May be \c NULL.
@@ -522,6 +605,36 @@
 
 /*!
 	\fn status_t BAppFileInfo::SetIconForType(const char* type,
+		const BBitmap* icon, icon_size which, bool updateMimeDB)
+	\brief Sets the icon the application provides for a given MIME type from a
+		BBitmap.
+
+	\note If \a type is \c NULL then the icon is set.
+	\note If \a icon is \c NULL then the icon is unset.
+
+	If \a updateMimeDB is \c true and if the file has a signature, then the icon
+	is also set on the MIME type. If the type for the signature has not been
+	installed yet, it is installed before.
+
+	\param type The MIME type in question. May be \c NULL.
+	\param icon A pointer to the BBitmap containing the icon to be set.
+		May be \c NULL.
+	\param which Specifies the size of the icon to be set: \c B_MINI_ICON
+		for the mini and \c B_LARGE_ICON for the large icon.
+	\param updateMimeDB \c true to also set the icon for the type in the MIME
+		DB. \c false otherwise.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object is not properly initialized.
+	\retval B_BAD_VALUE Either the icon size \a which is unknown,
+		the bitmap dimensions (\a icon) and icon size (\a which) do not
+		match, or the provided \a type is not a valid MIME type. 
+*/
+
+
+/*!
+	\fn status_t BAppFileInfo::SetIconForType(const char* type,
 		const BBitmap* icon, icon_size which)
 	\brief Sets the icon the application provides for a given MIME type from a
 		BBitmap.
@@ -544,7 +657,34 @@
 	\retval B_NO_INIT The object is not properly initialized.
 	\retval B_BAD_VALUE Either the icon size \a which is unknown,
 		the bitmap dimensions (\a icon) and icon size (\a which) do not
-		match, or the provided \a type is not a valid MIME type. 
+		match, or the provided \a type is not a valid MIME type.
+*/
+
+
+/*!
+	\fn status_t BAppFileInfo::SetIconForType(const char* type,
+		const uint8* data, size_t size, bool updateMimeDB)
+	\brief Sets the icon the application provides for a given MIME type from a
+		buffer.
+
+	\note If \a type is \c NULL then the icon is set.
+	\note If \a data is \c NULL then the icon is unset.
+
+	If \a updateMimeDB is \c true and if the file has a signature, then the icon
+	is also set on the MIME type. If the type for the signature has not been
+	installed yet, it is installed before.
+
+	\param type The MIME type in question. May be \c NULL.
+	\param data A pointer to the data containing the icon to be set.
+		   May be \c NULL.
+	\param size Specifies the size of buffer provided in \a data.
+	\param updateMimeDB \c true to also set the icon for the type in the MIME
+		DB. \c false otherwise.
+
+	\returns A status code.
+	\retval B_OK Everything went fine.
+	\retval B_NO_INIT The object is not properly initialized.
+	\retval B_BAD_VALUE The provided \a type is not a valid MIME type.
 */
 
 
