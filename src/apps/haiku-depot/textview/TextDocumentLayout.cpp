@@ -101,6 +101,10 @@ TextDocumentLayout::InvalidateParagraphs(int32 start, int32 count)
 		start++;
 		count--;
 	}
+
+	// Remove any extra paragraph layouts
+	while (paragraphs.CountItems() < fParagraphLayouts.CountItems())
+		fParagraphLayouts.Remove(fParagraphLayouts.CountItems() - 1);
 }
 
 
