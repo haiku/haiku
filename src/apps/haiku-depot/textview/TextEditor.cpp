@@ -161,8 +161,7 @@ TextEditor::KeyDown(KeyEvent event)
 			if (HasSelection() && !select) {
 				_SetCaretOffset(
 					std::min(fSelection.Caret(), fSelection.Anchor()),
-					true, false, true
-				);
+					true, false, true);
 			} else
 				_SetCaretOffset(fSelection.Caret() - 1, true, select, true);
 			break;
@@ -171,8 +170,7 @@ TextEditor::KeyDown(KeyEvent event)
 			if (HasSelection() && !select) {
 				_SetCaretOffset(
 					std::max(fSelection.Caret(), fSelection.Anchor()),
-					true, false, true
-				);
+					true, false, true);
 			} else
 				_SetCaretOffset(fSelection.Caret() + 1, true, select, true);
 			break;
