@@ -313,8 +313,12 @@ CopyDirectoryToHaikuImage home config settings Media
 	: dvb : -x Jamfile ;
 
 # repository config and cache files
+local repositories = $(HAIKU_REPOSITORIES) ;
+if $(HAIKU_ADD_HAIKU_REPOSITORY_CONFIG) {
+	repositories += <repository>haiku ;
+}
 local repository ;
-for repository in $(HAIKU_REPOSITORIES) <repository>haiku {
+for repository in $(repositories) {
 	local config = [ on $(repository) return $(HAIKU_REPOSITORY_CONFIG_FILE) ] ;
 	local cache = [ on $(repository) return $(HAIKU_REPOSITORY_CACHE_FILE) ] ;
 	if $(HAIKU_UPDATE_ALL_PACKAGES) {
