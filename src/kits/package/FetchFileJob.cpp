@@ -11,7 +11,9 @@
 #include <package/FetchFileJob.h>
 
 #include <stdio.h>
+#ifndef HAIKU_BOOTSTRAP_BUILD
 #include <curl/curl.h>
+#endif
 #include <sys/wait.h>
 
 #include <Path.h>
@@ -67,6 +69,7 @@ FetchFileJob::Execute()
 	if (result != B_OK)
 		return result;
 
+	#ifndef HAIKU_BOOTSTRAP_BUILD
 	CURL* handle = curl_easy_init();
 
 	if (handle == NULL)
@@ -108,6 +111,7 @@ FetchFileJob::Execute()
 		// precise error reporting
 		return B_ERROR;
 	}
+	#endif /* !HAIKU_BOOTSTRAP_BUILD */
 
 	return B_OK;
 }
