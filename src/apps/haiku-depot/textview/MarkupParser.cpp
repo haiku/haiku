@@ -157,7 +157,7 @@ MarkupParser::_ParseText(const BString& text)
 			case '\n':
 				_CopySpan(text, start, offset);
 				if (offset > 0 && c[-1] != ' ')
-					_FinishParagraph(offset >= charCount - 1);
+					_FinishParagraph(offset >= charCount);
 				start = offset + 1;
 				break;
 
@@ -212,7 +212,7 @@ MarkupParser::_ParseText(const BString& text)
 					offset += 2;
 					c += 2;
 
-					_FinishParagraph(offset >= charCount - 1);
+					_FinishParagraph(offset >= charCount);
 
 					start = offset + 1;
 				}
