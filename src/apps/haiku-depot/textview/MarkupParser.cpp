@@ -290,6 +290,11 @@ MarkupParser::_FinishParagraph(bool isLast)
 	if (!isLast)
 		fCurrentParagraph.Append(TextSpan("\n", *fCurrentCharacterStyle));
 
+	if (fCurrentParagraph.IsEmpty()) {
+		// Append empty span
+		fCurrentParagraph.Append(TextSpan("", fNormalStyle));
+	}
+
 	fTextDocument->Append(fCurrentParagraph);
 	fCurrentParagraph.Clear();
 	fCurrentParagraph.SetStyle(fParagraphStyle);
