@@ -157,13 +157,13 @@ MarkupParser::_ParseText(const BString& text)
 			case '\n':
 				_CopySpan(text, start, offset);
 				if (offset > 0 && c[-1] != ' ')
-					_FinishParagraph();
+					_FinishParagraph(offset >= charCount - 1);
 				start = offset + 1;
 				break;
 
 			case '\0':
 				_CopySpan(text, start, offset);
-				_FinishParagraph();
+				_FinishParagraph(true);
 				start = offset + 1;
 				break;
 
@@ -208,10 +208,11 @@ MarkupParser::_ParseText(const BString& text)
 					&& c[0] == '=' && c[1] == '\n') {
 
 					_CopySpan(text, start, offset - 1);
-					_FinishParagraph();
 
 					offset += 2;
 					c += 2;
+
+					_FinishParagraph(offset >= charCount - 1);
 
 					start = offset + 1;
 				}
@@ -284,9 +285,11 @@ MarkupParser::_ToggleStyle(const CharacterStyle& style)
 
 
 void
-MarkupParser::_FinishParagraph()
+MarkupParser::_FinishParagraph(bool isLast)
 {
-	fCurrentParagraph.Append(TextSpan("\n", *fCurrentCharacterStyle));
+	if (!isLast)
+		fCurrentParagraph.Append(TextSpan("\n", *fCurrentCharacterStyle));
+
 	fTextDocument->Append(fCurrentParagraph);
 	fCurrentParagraph.Clear();
 	fCurrentParagraph.SetStyle(fParagraphStyle);

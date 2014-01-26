@@ -40,7 +40,7 @@ private:
 			void				_CopySpan(const BString& text,
 									int32& start, int32 end);
 			void				_ToggleStyle(const CharacterStyle& style);
-			void				_FinishParagraph();
+			void				_FinishParagraph(bool isLast);
 
 private:
 			CharacterStyle		fNormalStyle;
