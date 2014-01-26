@@ -155,6 +155,14 @@ TextDocument::Insert(int32 textOffset, const BString& text,
 			chunkStart = chunkEnd + 1;
 		}
 
+		if (paragraph2.IsEmpty()) {
+			// Make sure Paragraph has at least one TextSpan, even
+			// if its empty.
+			const TextSpanList& spans = paragraph1.TextSpans();
+			const TextSpan& span = spans.LastItem();
+			paragraph2.Append(TextSpan("", span.Style()));
+		}
+
 		if (!fParagraphs.Add(paragraph2, index))
 			return B_NO_MEMORY;
 	} else {
