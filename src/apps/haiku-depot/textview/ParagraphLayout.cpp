@@ -628,7 +628,7 @@ ParagraphLayout::_Layout()
 	}
 
 	// The last line may not have been appended and initialized yet.
-	if (lineStart <= glyphCount - 1) {
+	if (lineStart <= glyphCount - 1 || glyphCount == 0) {
 		float lineHeight;
 		_FinalizeLine(lineStart, glyphCount - 1, lineIndex, y, lineHeight);
 	}
@@ -865,6 +865,15 @@ ParagraphLayout::_FinalizeLine(int lineStart, int lineEnd, int lineIndex,
 			line.layoutedSpans.Add(subSpan);
 			_IncludeStyleInLine(line, span.Style());
 		}
+	}
+
+	if (fGlyphInfos.CountItems() == 0 && fTextSpans.CountItems() > 0) {
+		// When the layout contains no glyphs, but there is at least one
+		// TextSpan in the paragraph, use the font info from that span
+		// to calculate the height of the first LineInfo.
+		const TextSpan& span = fTextSpans.ItemAtFast(0);
+		line.layoutedSpans.Add(span);
+		_IncludeStyleInLine(line, span.Style());
 	}
 
 	lineHeight = line.height;
