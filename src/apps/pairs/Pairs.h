@@ -5,6 +5,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Ralf Schülke, ralf.schuelke@googlemail.com
  *		John Scipione, jscipione@gmail.com
  */
 #ifndef PAIRS_H

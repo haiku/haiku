@@ -6,7 +6,9 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Ralf Schülke, ralf.schuelke@googlemail.com
  *		John Scipione, jscipione@gmail.com
+ *		Adam Smith, adamd.smith@utoronto.ca
  */
 #ifndef PAIRS_VIEW_H
 #define PAIRS_VIEW_H
