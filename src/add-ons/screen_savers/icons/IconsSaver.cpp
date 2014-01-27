@@ -197,15 +197,23 @@ IconsSaver::_GetVectorIcons()
 		if (mimeType.InitCheck() != B_OK)
 			continue;
 
-		vector_icon* icon = (vector_icon*)malloc(sizeof(vector_icon));
-		if (icon == NULL)
-			continue;
+		uint8* data;
+		size_t size;
 
-		if (mimeType.GetIcon(&icon->data, &icon->size) != B_OK) {
-			// didn't find an icon, delete the icon container
-			delete icon;
+		if (mimeType.GetIcon(&data, &size) != B_OK) {
+			// didn't find an icon
 			continue;
 		}
+
+		vector_icon* icon = (vector_icon*)malloc(sizeof(vector_icon));
+		if (icon == NULL) {
+			// ran out of memory, delete the icon data
+			delete[] data;
+			continue;
+		}
+
+		icon->data = data;
+		icon->size = size;
 
 		// found a vector icon, add it to the list
 		fVectorIcons.AddItem(icon);
