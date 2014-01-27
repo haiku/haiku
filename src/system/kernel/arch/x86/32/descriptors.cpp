@@ -99,11 +99,41 @@ set_task_gate(int32 cpu, int32 n, int32 segment)
 }
 
 
-static void
+static inline void
 load_tss()
 {
-	short seg = (TSS_SEGMENT << 3) | DPL_KERNEL;
-	asm("ltr %%ax" : : "a" (seg));
+	uint16 segment = (TSS_SEGMENT << 3) | DPL_KERNEL;
+	asm("ltr %w0" : : "r" (segment));
+}
+
+
+static inline void
+load_gdt(int cpu)
+{
+	struct {
+		uint16	limit;
+		void*	address;
+	} _PACKED gdtDescriptor = {
+		GDT_SEGMENT_COUNT * sizeof(segment_descriptor) - 1,
+		gGDTs[cpu]
+	};
+
+	asm volatile("lgdt %0" : : "m" (gdtDescriptor));
+}
+
+
+static inline void
+load_idt(int cpu)
+{
+	struct {
+		uint16	limit;
+		void*	address;
+	} _PACKED idtDescriptor = {
+		IDT_GATES_COUNT * sizeof(interrupt_descriptor) - 1,
+		&sIDTs[cpu]
+	};
+
+	asm volatile("lidt %0" : : "m" (idtDescriptor));
 }
 
 
@@ -181,8 +211,8 @@ init_double_fault(int cpuNum)
 	struct tss* tss = &gCPU[cpuNum].arch.double_fault_tss;
 
 	memset(tss, 0, sizeof(struct tss));
-	size_t stackSize;
-	tss->sp0 = (addr_t)x86_get_double_fault_stack(cpuNum, &stackSize);
+	size_t stackSize = 0;
+	//tss->sp0 = (addr_t)x86_get_double_fault_stack(cpuNum, &stackSize);
 	tss->sp0 += stackSize;
 	tss->ss0 = KERNEL_DATA_SELECTOR;
 	tss->cr3 = x86_read_cr3();
@@ -203,21 +233,6 @@ init_double_fault(int cpuNum)
 		sizeof(struct tss));
 
 	set_task_gate(cpuNum, 8, DOUBLE_FAULT_TSS_SEGMENT << 3);
-}
-
-
-static void
-load_gdt(int cpu)
-{
-	struct {
-		uint16	limit;
-		void*	address;
-	} _PACKED gdt_descriptor = {
-		GDT_SEGMENT_COUNT * sizeof(segment_descriptor) - 1,
-		gGDTs[cpu]
-	};
-
-	asm volatile("lgdt	%0" : : "m" (gdt_descriptor));
 }
 
 
@@ -264,22 +279,7 @@ init_gdt_percpu(kernel_args* args, int cpu)
 	load_tss();
 
 	// set kernel TLS segment
-	asm volatile("movw %0, %%gs" : : "r" (KERNEL_TLS_SEGMENT << 3));
-}
-
-
-static void
-load_idt(int cpu)
-{
-	struct {
-		uint16	limit;
-		void*	address;
-	} _PACKED idt_descriptor = {
-		IDT_GATES_COUNT * sizeof(interrupt_descriptor) - 1,
-		&sIDTs[cpu]
-	};
-
-	asm volatile("lidt	%0" : : "m" (idt_descriptor));
+	asm volatile("movw %w0, %%gs" : : "r" (KERNEL_TLS_SEGMENT << 3));
 }
 
 
@@ -591,18 +591,5 @@ x86_descriptors_init(kernel_args* args)
 	table[17] = x86_unexpected_exception;	// Alignment Check Exception (#AC)
 	table[18] = x86_fatal_exception;		// Machine-Check Exception (#MC)
 	table[19] = x86_unexpected_exception;	// SIMD Floating-Point Exception (#XF)
-}
-
-
-void
-x86_descriptors_init_percpu(kernel_args* /* args */, int /* cpu */)
-{
-}
-
-
-status_t
-x86_descriptors_init_post_vm(kernel_args* /* args */)
-{
-	return B_OK;
 }
 

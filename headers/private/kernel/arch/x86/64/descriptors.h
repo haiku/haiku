@@ -78,11 +78,6 @@ struct interrupt_descriptor {
 	uint32 reserved : 32;
 } _PACKED;
 
-struct gdt_idt_descr {
-	uint16 limit;
-	addr_t base;
-} _PACKED;
-
 struct tss {
 	uint32 _reserved1;
 	uint64 sp0;

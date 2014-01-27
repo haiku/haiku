@@ -8,6 +8,8 @@
 
 #define __x86_64__
 #include <arch/x86/descriptors.h>
+
+#include "mmu.h"
 #undef __x86_64__
 
 
@@ -24,10 +26,6 @@ FUNCTION(long_enter_kernel):
 	movl	4(%esp), %ebx
 	movl	8(%esp), %edi
 	movl	12(%esp), %esi
-
-	// We're about to disable paging, so we need to load the the physical
-	// address of our GDT.
-	lgdtl	long_phys_gdtr
 
 	// Currently running with 32-bit paging tables at an identity mapped
 	// address. To switch to 64-bit paging we must first disable 32-bit paging,
@@ -57,6 +55,9 @@ FUNCTION(long_enter_kernel):
 	orl		$(1 << 31), %ecx
 	movl	%ecx, %cr0
 
+	// Load 64-bit enabled GDT
+	lgdtl	long_gdtr
+
 	// Jump into the 64-bit code segment.
 	ljmp	$KERNEL_CODE_SELECTOR, $.Llmode
 .align 8
@@ -70,9 +71,6 @@ FUNCTION(long_enter_kernel):
 	mov		%ax, %es
 	mov		%ax, %fs
 	mov		%ax, %gs
-
-	// Load the virtual address of the GDT.
-	lgdtq	long_virt_gdtr(%rip)
 
 	// Set the stack pointer.
 	movl	%edi, %esp
@@ -94,15 +92,10 @@ FUNCTION(long_enter_kernel):
 .data
 
 
-long_phys_gdtr:
-	.word	GDT_LIMIT - 1
-SYMBOL(gLongPhysicalGDT):
+long_gdtr:
+	.word	BOOT_GDT_SEGMENT_COUNT * 8 - 1
+SYMBOL(gLongGDT):
 	.long	0
-
-long_virt_gdtr:
-	.word	GDT_LIMIT - 1
-SYMBOL(gLongVirtualGDT):
-	.quad	0
 
 SYMBOL(gLongPhysicalPML4):
 	.long	0

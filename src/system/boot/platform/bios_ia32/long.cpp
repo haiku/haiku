@@ -23,8 +23,8 @@
 #include <kernel.h>
 
 #include "debug.h"
-#include "smp.h"
 #include "mmu.h"
+#include "smp.h"
 
 
 static const uint64 kTableMappingFlags = 0x7;
@@ -34,8 +34,7 @@ static const uint64 kPageMappingFlags = 0x103;
 
 extern "C" void long_enter_kernel(int currentCPU, uint64 stackTop);
 
-extern uint32 gLongPhysicalGDT;
-extern uint64 gLongVirtualGDT;
+extern uint64 gLongGDT;
 extern uint32 gLongPhysicalPML4;
 extern uint64 gLongKernelEntry;
 
@@ -63,47 +62,21 @@ fix_address(FixedWidthPointer<Type>& p)
 static void
 long_gdt_init()
 {
-	// Allocate memory for the GDT.
-	segment_descriptor* gdt = (segment_descriptor*)
-		mmu_allocate_page(&gKernelArgs.arch_args.phys_gdt);
-	gKernelArgs.arch_args.vir_gdt = fix_address((addr_t)gdt);
-
-	dprintf("GDT at phys 0x%lx, virt 0x%llx\n", gKernelArgs.arch_args.phys_gdt,
-		gKernelArgs.arch_args.vir_gdt);
-
-	clear_segment_descriptor(&gdt[0]);
+	clear_segment_descriptor(&gBootGDT[0]);
 
 	// Set up code/data segments (TSS segments set up later in the kernel).
-	set_segment_descriptor(&gdt[KERNEL_CODE_SEGMENT], DT_CODE_EXECUTE_ONLY,
+	set_segment_descriptor(&gBootGDT[KERNEL_CODE_SEGMENT], DT_CODE_EXECUTE_ONLY,
 		DPL_KERNEL);
-	set_segment_descriptor(&gdt[KERNEL_DATA_SEGMENT], DT_DATA_WRITEABLE,
+	set_segment_descriptor(&gBootGDT[KERNEL_DATA_SEGMENT], DT_DATA_WRITEABLE,
 		DPL_KERNEL);
-	set_segment_descriptor(&gdt[USER_CODE_SEGMENT], DT_CODE_EXECUTE_ONLY,
+	set_segment_descriptor(&gBootGDT[USER_CODE_SEGMENT], DT_CODE_EXECUTE_ONLY,
 		DPL_USER);
-	set_segment_descriptor(&gdt[USER_DATA_SEGMENT], DT_DATA_WRITEABLE,
+	set_segment_descriptor(&gBootGDT[USER_DATA_SEGMENT], DT_DATA_WRITEABLE,
 		DPL_USER);
 
 	// Used by long_enter_kernel().
-	gLongPhysicalGDT = gKernelArgs.arch_args.phys_gdt;
-	gLongVirtualGDT = gKernelArgs.arch_args.vir_gdt;
-}
-
-
-static void
-long_idt_init()
-{
-	interrupt_descriptor* idt = (interrupt_descriptor*)
-		mmu_allocate_page(&gKernelArgs.arch_args.phys_idt);
-	gKernelArgs.arch_args.vir_idt = fix_address((addr_t)idt);
-
-	dprintf("IDT at phys %#lx, virt %#llx\n", gKernelArgs.arch_args.phys_idt,
-		gKernelArgs.arch_args.vir_idt);
-
-	// The 32-bit kernel gets an IDT with the loader's exception handlers until
-	// it can set up its own. Can't do that here because they won't work after
-	// switching to long mode. Therefore, just clear the IDT and leave the
-	// kernel to set it up.
-	memset(idt, 0, B_PAGE_SIZE);
+	gLongGDT = fix_address((addr_t)gBootGDT);
+	dprintf("GDT at 0x%llx\n", gLongGDT);
 }
 
 
@@ -340,7 +313,6 @@ long_start_kernel()
 	smp_init_other_cpus();
 
 	long_gdt_init();
-	long_idt_init();
 	long_mmu_init();
 	debug_cleanup();
 	convert_kernel_args();

@@ -15,23 +15,56 @@
 #include <arch/user_debugger.h>
 
 
+#define IDT_GATES_COUNT	256
+
+
 typedef void interrupt_handler_function(iframe* frame);
 
 
-static segment_descriptor* sGDT;
-static interrupt_descriptor* sIDT;
+static segment_descriptor sGDT[GDT_SEGMENT_COUNT];
+static interrupt_descriptor sIDT[IDT_GATES_COUNT];
 
-static const uint32 kInterruptHandlerTableSize = 256;
+static const uint32 kInterruptHandlerTableSize = IDT_GATES_COUNT;
 interrupt_handler_function* gInterruptHandlerTable[kInterruptHandlerTableSize];
 
 extern uint8 isr_array[kInterruptHandlerTableSize][16];
 
 
-static void
+static inline void
 load_tss(int cpu)
 {
-	uint16 seg = (TSS_SEGMENT(cpu) << 3) | DPL_KERNEL;
-	asm volatile("ltr %%ax" :: "a" (seg));
+	uint16 segment = (TSS_SEGMENT(cpu) << 3) | DPL_KERNEL;
+	asm volatile("ltr %w0" : : "a" (segment));
+}
+
+
+static inline void
+load_gdt()
+{
+	struct {
+		uint16	limit;
+		void*	address;
+	} _PACKED gdtDescriptor = {
+		GDT_SEGMENT_COUNT * sizeof(segment_descriptor) - 1,
+		sGDT
+	};
+
+	asm volatile("lgdt %0" : : "m" (gdtDescriptor));
+}
+
+
+static inline void
+load_idt()
+{
+	struct {
+		uint16	limit;
+		void*	address;
+	} _PACKED idtDescriptor = {
+		IDT_GATES_COUNT * sizeof(interrupt_descriptor) - 1,
+		sIDT
+	};
+
+	asm volatile("lidt %0" : : "m" (idtDescriptor));
 }
 
 
@@ -61,18 +94,43 @@ x86_64_general_protection_fault(iframe* frame)
 
 
 void
-x86_descriptors_preboot_init_percpu(kernel_args* /* args */, int /* cpu */)
+x86_descriptors_preboot_init_percpu(kernel_args* args, int cpu)
 {
+	if (cpu == 0) {
+		STATIC_ASSERT(GDT_SEGMENT_COUNT <= 8192);
+
+		set_segment_descriptor(&sGDT[KERNEL_CODE_SEGMENT], DT_CODE_EXECUTE_ONLY,
+			DPL_KERNEL);
+		set_segment_descriptor(&sGDT[KERNEL_DATA_SEGMENT], DT_DATA_WRITEABLE,
+			DPL_KERNEL);
+		set_segment_descriptor(&sGDT[USER_CODE_SEGMENT], DT_CODE_EXECUTE_ONLY,
+			DPL_USER);
+		set_segment_descriptor(&sGDT[USER_DATA_SEGMENT], DT_DATA_WRITEABLE,
+			DPL_USER);
+	}
+
+	memset(&gCPU[cpu].arch.tss, 0, sizeof(struct tss));
+	gCPU[cpu].arch.tss.io_map_base = sizeof(struct tss);
+
+	// Set up the descriptor for this TSS.
+	set_tss_descriptor(&sGDT[TSS_SEGMENT(cpu)], (addr_t)&gCPU[cpu].arch.tss,
+		sizeof(struct tss));
+
+	// Set up the double fault IST entry (see x86_descriptors_init()).
+	struct tss* tss = &gCPU[cpu].arch.tss;
+	size_t stackSize;
+	tss->ist1 = (addr_t)x86_get_double_fault_stack(cpu, &stackSize);
+	tss->ist1 += stackSize;
+
+	load_idt();
+	load_gdt();
+	load_tss(cpu);
 }
 
 
 void
 x86_descriptors_init(kernel_args* args)
 {
-	// The boot loader sets up a GDT and allocates an empty IDT for us.
-	sGDT = (segment_descriptor*)args->arch_args.vir_gdt;
-	sIDT = (interrupt_descriptor*)args->arch_args.vir_idt;
-
 	// Fill out the IDT, pointing each entry to the corresponding entry in the
 	// ISR array created in arch_interrupts.S (see there to see how this works).
 	for(uint32 i = 0; i < kInterruptHandlerTableSize; i++) {
@@ -120,59 +178,3 @@ x86_descriptors_init(kernel_args* args)
 	table[19] = x86_unexpected_exception;	// SIMD Floating-Point Exception (#XF)
 }
 
-
-void
-x86_descriptors_init_percpu(kernel_args* args, int cpu)
-{
-	// Load the IDT.
-	gdt_idt_descr idtr = {
-		256 * sizeof(interrupt_descriptor) - 1,
-		(addr_t)sIDT
-	};
-	asm volatile("lidt %0" :: "m" (idtr));
-
-	// Load the TSS for non-boot CPUs (boot CPU gets done below).
-	if (cpu != 0) {
-		load_tss(cpu);
-	}
-}
-
-
-status_t
-x86_descriptors_init_post_vm(kernel_args* args)
-{
-	area_id area;
-
-	// Create an area for the GDT.
-	area = create_area("gdt", (void**)&sGDT, B_EXACT_ADDRESS, B_PAGE_SIZE,
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < B_OK)
-		return area;
-
-	// Same for the IDT.
-	area = create_area("idt", (void**)&sIDT, B_EXACT_ADDRESS, B_PAGE_SIZE,
-		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < B_OK)
-		return area;
-
-	for (uint32 i = 0; i < args->num_cpus; i++) {
-		// Set up the task state segment.
-		memset(&gCPU[i].arch.tss, 0, sizeof(struct tss));
-		gCPU[i].arch.tss.io_map_base = sizeof(struct tss);
-
-		// Set up the descriptor for this TSS.
-		set_tss_descriptor(&sGDT[TSS_SEGMENT(i)], (addr_t)&gCPU[i].arch.tss,
-			sizeof(struct tss));
-
-		// Set up the double fault IST entry (see x86_descriptors_init()).
-		struct tss* tss = &gCPU[i].arch.tss;
-		size_t stackSize;
-		tss->ist1 = (addr_t)x86_get_double_fault_stack(i, &stackSize);
-		tss->ist1 += stackSize;
-	}
-
-	// Load the TSS for the boot CPU.
-	load_tss(0);
-
-	return B_OK;
-}

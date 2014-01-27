@@ -49,8 +49,6 @@ enum gate_types {
 
 void x86_descriptors_preboot_init_percpu(kernel_args* args, int cpu);
 void x86_descriptors_init(kernel_args* args);
-void x86_descriptors_init_percpu(kernel_args* args, int cpu);
-status_t x86_descriptors_init_post_vm(kernel_args* args);
 
 
 #endif	// !_ASSEMBLER

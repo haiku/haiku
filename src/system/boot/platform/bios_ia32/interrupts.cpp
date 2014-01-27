@@ -229,17 +229,3 @@ set_debug_idt()
 	set_idt(sDebugIDTDescriptor);
 }
 
-
-void
-interrupts_init_kernel_idt(void* idt, size_t idtSize)
-{
-	// clear it but copy the descriptors we've set up for the exceptions
-	memset(idt, 0, idtSize);
-	memcpy(idt, sDebugIDT, sizeof(sDebugIDT));
-
-	// load the idt
-	gdt_idt_descr idtDescriptor;
-	idtDescriptor.limit = idtSize - 1;
-	idtDescriptor.base = idt;
-	set_idt(idtDescriptor);
-}

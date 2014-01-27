@@ -1053,8 +1053,6 @@ detect_amdc1e_noarat()
 status_t
 arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
-	x86_descriptors_init_percpu(args, cpu);
-
 	detect_cpu(cpu);
 
 	if (!gCpuIdleFunc) {
@@ -1114,9 +1112,6 @@ arch_cpu_init_post_vm(kernel_args* args)
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT, 0,
 		&virtualRestrictions, &physicalRestrictions,
 		(void**)&sDoubleFaultStacks);
-
-	// More descriptor table setup.
-	x86_descriptors_init_post_vm(args);
 
 	X86PagingStructures* kernelPagingStructures
 		= static_cast<X86VMTranslationMap*>(

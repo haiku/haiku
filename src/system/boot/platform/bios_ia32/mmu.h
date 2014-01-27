@@ -6,7 +6,19 @@
 #define MMU_H
 
 
+#include <arch/x86/descriptors.h>
+
+
+#define BOOT_GDT_SEGMENT_COUNT	(USER_DATA_SEGMENT + 1)
+
+
+#ifndef _ASSEMBLER
+
+
 #include <SupportDefs.h>
+
+
+extern segment_descriptor gBootGDT[BOOT_GDT_SEGMENT_COUNT];
 
 
 // For use with mmu_map_physical_memory()
@@ -32,5 +44,7 @@ extern bool mmu_get_virtual_mapping(addr_t virtualAddress,
 #ifdef __cplusplus
 }
 #endif
+
+#endif	// !_ASSEMBLER
 
 #endif	/* MMU_H */

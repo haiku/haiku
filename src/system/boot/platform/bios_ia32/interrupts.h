@@ -26,7 +26,6 @@ __BEGIN_DECLS
 void interrupts_init();
 void set_debug_idt();
 void restore_bios_idt();
-void interrupts_init_kernel_idt(void* idt, size_t idtSize);
 
 
 __END_DECLS

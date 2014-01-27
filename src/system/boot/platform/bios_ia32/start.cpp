@@ -97,16 +97,12 @@ smp_start_kernel(void)
 	asm("cld");
 	asm("fninit");
 
-	// Set up the final idt
-	idt_descr.limit = IDT_LIMIT - 1;
-	idt_descr.base = (uint32 *)(addr_t)gKernelArgs.arch_args.vir_idt;
-
-	asm("lidt	%0;"
-		: : "m" (idt_descr));
+	// Set up idt
+	set_debug_idt();
 
 	// Set up the final gdt
-	gdt_descr.limit = GDT_LIMIT - 1;
-	gdt_descr.base = (uint32 *)gKernelArgs.arch_args.vir_gdt;
+	gdt_descr.limit = sizeof(gBootGDT) - 1;
+	gdt_descr.base = gBootGDT;
 
 	asm("lgdt	%0;"
 		: : "m" (gdt_descr));

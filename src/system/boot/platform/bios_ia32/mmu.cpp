@@ -69,6 +69,8 @@ struct extended_memory {
 };
 
 
+segment_descriptor gBootGDT[BOOT_GDT_SEGMENT_COUNT];
+
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x1000000;		// 16 MB for the kernel
 
@@ -535,76 +537,36 @@ extern "C" void
 mmu_init_for_kernel(void)
 {
 	TRACE("mmu_init_for_kernel\n");
-	// set up a new idt
-	{
-		uint32 *idt;
-
-		// find a new idt
-		idt = (uint32 *)get_next_physical_page();
-		gKernelArgs.arch_args.phys_idt = (uint32)idt;
-
-		TRACE("idt at %p\n", idt);
-
-		// map the idt into virtual space
-		gKernelArgs.arch_args.vir_idt = (uint32)get_next_virtual_page();
-		map_page(gKernelArgs.arch_args.vir_idt, (uint32)idt, kDefaultPageFlags);
-
-		// initialize it
-		interrupts_init_kernel_idt((void*)(addr_t)gKernelArgs.arch_args.vir_idt,
-			IDT_LIMIT);
-
-		TRACE("idt at virtual address 0x%llx\n", gKernelArgs.arch_args.vir_idt);
-	}
 
 	// set up a new gdt
-	{
-		struct gdt_idt_descr gdtDescriptor;
-		segment_descriptor *gdt;
 
-		// find a new gdt
-		gdt = (segment_descriptor *)get_next_physical_page();
-		gKernelArgs.arch_args.phys_gdt = (uint32)gdt;
+	// put standard segment descriptors in GDT
+	clear_segment_descriptor(&gBootGDT[0]);
 
-		TRACE("gdt at %p\n", gdt);
+	// seg 0x08 - kernel 4GB code
+	set_segment_descriptor(&gBootGDT[KERNEL_CODE_SEGMENT], 0, 0xffffffff,
+		DT_CODE_READABLE, DPL_KERNEL);
 
-		// map the gdt into virtual space
-		gKernelArgs.arch_args.vir_gdt = (uint32)get_next_virtual_page();
-		map_page(gKernelArgs.arch_args.vir_gdt, (uint32)gdt, kDefaultPageFlags);
+	// seg 0x10 - kernel 4GB data
+	set_segment_descriptor(&gBootGDT[KERNEL_DATA_SEGMENT], 0, 0xffffffff,
+		DT_DATA_WRITEABLE, DPL_KERNEL);
 
-		// put standard segment descriptors in it
-		segment_descriptor* virtualGDT
-			= (segment_descriptor*)(addr_t)gKernelArgs.arch_args.vir_gdt;
-		clear_segment_descriptor(&virtualGDT[0]);
+	// seg 0x1b - ring 3 user 4GB code
+	set_segment_descriptor(&gBootGDT[USER_CODE_SEGMENT], 0, 0xffffffff,
+		DT_CODE_READABLE, DPL_USER);
 
-		// seg 0x08 - kernel 4GB code
-		set_segment_descriptor(&virtualGDT[KERNEL_CODE_SEGMENT], 0, 0xffffffff,
-			DT_CODE_READABLE, DPL_KERNEL);
+	// seg 0x23 - ring 3 user 4GB data
+	set_segment_descriptor(&gBootGDT[USER_DATA_SEGMENT], 0, 0xffffffff,
+		DT_DATA_WRITEABLE, DPL_USER);
 
-		// seg 0x10 - kernel 4GB data
-		set_segment_descriptor(&virtualGDT[KERNEL_DATA_SEGMENT], 0, 0xffffffff,
-			DT_DATA_WRITEABLE, DPL_KERNEL);
+	// load the GDT
+	struct gdt_idt_descr gdtDescriptor;
+	gdtDescriptor.limit = sizeof(gBootGDT);
+	gdtDescriptor.base = gBootGDT;
 
-		// seg 0x1b - ring 3 user 4GB code
-		set_segment_descriptor(&virtualGDT[USER_CODE_SEGMENT], 0, 0xffffffff,
-			DT_CODE_READABLE, DPL_USER);
+	asm("lgdt %0" : : "m" (gdtDescriptor));
 
-		// seg 0x23 - ring 3 user 4GB data
-		set_segment_descriptor(&virtualGDT[USER_DATA_SEGMENT], 0, 0xffffffff,
-			DT_DATA_WRITEABLE, DPL_USER);
-
-		// virtualGDT[5] and above will be filled later by the kernel
-		// to contain the TSS descriptors, and for TLS (one for every CPU)
-
-		// load the GDT
-		gdtDescriptor.limit = GDT_LIMIT - 1;
-		gdtDescriptor.base = (void*)(addr_t)gKernelArgs.arch_args.vir_gdt;
-
-		asm("lgdt	%0;"
-			: : "m" (gdtDescriptor));
-
-		TRACE("gdt at virtual address %p\n",
-			(void*)gKernelArgs.arch_args.vir_gdt);
-	}
+	TRACE("gdt at virtual address %p\n", gBootGDT);
 
 	// Save the memory we've virtually allocated (for the kernel and other
 	// stuff)
