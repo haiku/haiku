@@ -11,27 +11,45 @@
 #define PAIRS_H
 
 
+#include <map>
+
 #include <Application.h>
-#include <Catalog.h>
 
 
 extern const char* kSignature;
 
 
+struct vector_icon {
+	uint8* data;
+	size_t size;
+};
+
+
+class BBitmap;
 class BMessage;
 class PairsWindow;
 
+
+typedef std::map<size_t, vector_icon*> IconMap;
+
+
 class Pairs : public BApplication {
 public:
-									Pairs();
-	virtual							~Pairs();
+								Pairs();
+	virtual						~Pairs();
 
-	virtual	void					ReadyToRun();
-	virtual	void					RefsReceived(BMessage* message);
-	virtual	void					MessageReceived(BMessage* message);
+	virtual	void				ReadyToRun();
+	virtual	void				RefsReceived(BMessage* message);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
+
+			IconMap				GetIconMap() const { return fIconMap; };
 
 private:
-			PairsWindow*			fWindow;
+			void				_GetVectorIcons();
+
+			PairsWindow*		fWindow;
+			IconMap				fIconMap;
 };
 
 

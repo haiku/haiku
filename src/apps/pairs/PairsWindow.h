@@ -15,8 +15,9 @@
 #include <Window.h>
 
 
-class PairsView;
+class BMenu;
 class BMessageRunner;
+class PairsView;
 
 
 class PairsWindow : public BWindow {
@@ -27,11 +28,12 @@ public:
 		virtual	void			MessageReceived(BMessage* message);
 
 		void					NewGame();
-		void					SetGameSize(int width, int height);
+		void					SetGameSize(uint8 rows, uint8 cols);
 
 private:
-				void			_MakeGameView(int width, int height);
+				void			_MakeGameView(uint8 rows, uint8 cols);
 				void			_MakeMenuBar();
+				void			_ResizeWindow(uint8 rows, uint8 cols);
 
 				BView*			fBackgroundView;
 				PairsView*		fPairsView;
@@ -39,12 +41,13 @@ private:
 				BMessageRunner*	fPairComparing;
 				bool			fIsFirstClick;
 				bool			fIsPairsActive;
-				int				fPairCard;
-				int				fPairCardTmp;
-				int				fButtonTmp;
-				int				fButton;
-				int				fButtonClicks;
-				int				fFinishPairs;
+				int32			fPairCardPosition;
+				int32			fPairCardTmpPosition;
+				int32			fButtonTmpPosition;
+				int32			fButtonPosition;
+				int32			fButtonClicks;
+				int32			fFinishPairs;
+				BMenu*			fIconSizeMenu;
 };
 
 #endif	// PAIRS_WINDOW_H

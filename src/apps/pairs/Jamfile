@@ -2,9 +2,9 @@ SubDir HAIKU_TOP src apps pairs ;
 
 Application Pairs :
 	Pairs.cpp
-	PairsWindow.cpp
+	PairsButton.cpp
 	PairsView.cpp
-	PairsTopButton.cpp
+	PairsWindow.cpp
 
 	: be localestub $(TARGET_LIBSTDC++)
 	: Pairs.rdef
@@ -13,6 +13,7 @@ Application Pairs :
 DoCatalogs Pairs :
 	x-vnd.Haiku-Pairs
 	:
+	Pairs.cpp
 	PairsView.cpp
 	PairsWindow.cpp
 ;

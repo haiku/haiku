@@ -12,40 +12,63 @@
 #define PAIRS_VIEW_H
 
 
+#include <ObjectList.h>
 #include <View.h>
 
 
-class TopButton;
+const uint8 kSmallIconSize = 32;
+const uint8 kMediumIconSize = 64;
+const uint8 kLargeIconSize = 128;
+
+const uint32 kMsgCardButton = 'card';
+
+
+class BBitmap;
+class PairsButton;
+
 
 class PairsView : public BView {
 public:
 								PairsView(BRect frame, const char* name,
-									int width, int height,
-									uint32 resizingMode);
+									uint8 rows, uint8 cols, uint8 iconSize);
 
 	virtual						~PairsView();
 	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
+	virtual	void				FrameResized(float newWidth, float newHeight);
+
 	virtual	void				CreateGameBoard();
 
-			int 				fWidth;
-			int					fHeight;
-			int					fNumOfCards;
+			int32				Rows() const { return fRows; };
+			int32				Cols() const { return fCols; };
+	BObjectList<PairsButton>*	PairsButtonList() const
+									{ return fPairsButtonList; };
 
-			BList				fDeckCard;
-			int					GetIconFromPos(int pos);
+			int32				GetIconPosition(int32 index);
+
+			int32				IconSize() const { return fIconSize; };
+			void				SetIconSize(int32 size) { fIconSize = size; };
+
+			int32				Spacing() const { return fIconSize / 6; };
 
 private:
-			void				_SetPairsBoard();
+			void				_GenerateCardPositions();
 			void				_ReadRandomIcons();
-			void				_GenerateCardPos();
-			bool				_HasBitmap(BList& bitmaps, BBitmap* bitmap);
+			void				_SetPairsBoard();
+			void				_SetPositions();
 
-			BMessage*			fButtonMessage;
-			BList				fCardBitmaps;
-			int*				fRandPos;
-			int*				fPosX;
-			int*				fPosY;
+			uint8				fRows;
+			uint8				fCols;
+			uint8				fIconSize;
+			int32				fButtonsCount;
+			int32				fCardsCount;
+	BObjectList<PairsButton>*	fPairsButtonList;
+	BObjectList<BBitmap>*		fSmallBitmapsList;
+	BObjectList<BBitmap>*		fMediumBitmapsList;
+	BObjectList<BBitmap>*		fLargeBitmapsList;
+			int32*				fRandomPosition;
+			int32*				fPositionX;
+			int32*				fPositionY;
 };
 
 

@@ -7,17 +7,19 @@
  * Authors:
  *		John Scipione, jscipione@gmail.com
  */
-#ifndef PAIRS_TOP_BUTTON_H
-#define PAIRS_TOP_BUTTON_H
+#ifndef PAIRS_BUTTON_H
+#define PAIRS_BUTTON_H
 
-#include <OS.h>
 
-class BButton;
+#include <Button.h>
 
-class TopButton : public BButton {
+
+class PairsButton : public BButton {
 public:
-			TopButton(int x, int y, BMessage* message);
-			virtual ~TopButton();
+								PairsButton(int32 x, int32 y, int32 size,
+									BMessage* message);
+	virtual						~PairsButton();
 };
 
-#endif	// PAIRS_TOP_BUTTON_H
+
+#endif	// PAIRS_BUTTON_H

@@ -12,39 +12,44 @@
 
 #include "PairsView.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <Alert.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <ControlLook.h>
 #include <Catalog.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <FindDirectory.h>
 #include <IconUtils.h>
-#include <List.h>
-#include <Node.h>
-#include <NodeInfo.h>
-#include <Path.h>
+#include <InterfaceDefs.h>
+#include <Window.h>
 
 #include "Pairs.h"
-#include "PairsGlobal.h"
-#include "PairsTopButton.h"
+#include "PairsButton.h"
 
-PairsView::PairsView(BRect frame, const char* name, int width, int height,
-		uint32 resizingMode)
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PairsView"
+
+
+//	#pragma mark - PairsView
+
+
+PairsView::PairsView(BRect frame, const char* name, uint8 rows, uint8 cols,
+	uint8 iconSize)
 	:
-	BView(frame, name, resizingMode, B_WILL_DRAW),
-	fWidth(width),
-	fHeight(height),
-	fNumOfCards(width * height),
-	fRandPos(new int[fNumOfCards]),
-	fPosX(new int[fNumOfCards]),
-	fPosY(new int[fNumOfCards])
+	BView(frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS),
+	fRows(rows),
+	fCols(cols),
+	fIconSize(iconSize),
+	fButtonsCount(rows * cols),
+	fCardsCount(fButtonsCount / 2),
+	fPairsButtonList(new BObjectList<PairsButton>(fButtonsCount)),
+	fSmallBitmapsList(new BObjectList<BBitmap>(fCardsCount)),
+	fMediumBitmapsList(new BObjectList<BBitmap>(fCardsCount)),
+	fLargeBitmapsList(new BObjectList<BBitmap>(fCardsCount)),
+	fRandomPosition(new int32[fButtonsCount]),
+	fPositionX(new int32[fButtonsCount]),
+	fPositionY(new int32[fButtonsCount])
 {
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	CreateGameBoard();
 	_SetPairsBoard();
 }
@@ -54,209 +59,211 @@ void
 PairsView::CreateGameBoard()
 {
 	// Show hidden buttons
-	for (int32 i = 0; i < CountChildren(); i++) {
+	int32 childrenCount = CountChildren();
+	for (int32 i = 0; i < childrenCount; i++) {
 		BView* child = ChildAt(i);
 		if (child->IsHidden())
 			child->Show();
 	}
-	_GenerateCardPos();
+	_GenerateCardPositions();
 }
 
 
 PairsView::~PairsView()
 {
-	for (int i = 0; i < fCardBitmaps.CountItems(); i++)
-		delete ((BBitmap*)fCardBitmaps.ItemAt(i));
-
-	for (int i = 0; i < fDeckCard.CountItems(); i++)
-		delete ((TopButton*)fDeckCard.ItemAt(i));
-
-	delete fRandPos;
-	delete fPosX;
-	delete fPosY;
+	delete fSmallBitmapsList;
+	delete fMediumBitmapsList;
+	delete fLargeBitmapsList;
+	delete fPairsButtonList;
+	delete fRandomPosition;
+	delete fPositionX;
+	delete fPositionY;
 }
 
 
 void
 PairsView::AttachedToWindow()
 {
+	for (int32 i = 0; i < fButtonsCount; i++) {
+		PairsButton* button = fPairsButtonList->ItemAt(i);
+		if (button != NULL)
+			button->SetTarget(Window());
+	}
+
 	MakeFocus(true);
-}
-
-
-bool
-PairsView::_HasBitmap(BList& bitmaps, BBitmap* bitmap)
-{
-	// TODO: if this takes too long, we could build a hash value for each
-	// bitmap in a separate list
-	for (int32 i = bitmaps.CountItems(); i-- > 0;) {
-		BBitmap* item = (BBitmap*)bitmaps.ItemAtFast(i);
-		if (!memcmp(item->Bits(), bitmap->Bits(), item->BitsLength()))
-			return true;
-	}
-
-	return false;
-}
-
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "PairsView"
-
-void
-PairsView::_ReadRandomIcons()
-{
-	// TODO: maybe read the icons only once at startup
-
-	// clean out any previous icons
-	for (int i = 0; i < fCardBitmaps.CountItems(); i++)
-		delete ((BBitmap*)fCardBitmaps.ItemAt(i));
-
-	fCardBitmaps.MakeEmpty();
-
-	BDirectory appsDirectory;
-	BDirectory prefsDirectory;
-
-	BPath path;
-	if (find_directory(B_BEOS_APPS_DIRECTORY, &path) == B_OK)
-		appsDirectory.SetTo(path.Path());
-	if (find_directory(B_BEOS_PREFERENCES_DIRECTORY, &path) == B_OK)
-		prefsDirectory.SetTo(path.Path());
-
-	// read vector icons from apps and prefs folder and put them
-	// into a BList as BBitmaps
-	BList bitmaps;
-
-	BEntry entry;
-	while (appsDirectory.GetNextEntry(&entry) == B_OK
-		|| prefsDirectory.GetNextEntry(&entry) == B_OK) {
-
-		BNode node(&entry);
-		BNodeInfo nodeInfo(&node);
-
-		if (nodeInfo.InitCheck() < B_OK)
-			continue;
-
-		uint8* data;
-		size_t size;
-		type_code type;
-
-		if (nodeInfo.GetIcon(&data, &size, &type) < B_OK)
-			continue;
-
-		if (type != B_VECTOR_ICON_TYPE) {
-			delete[] data;
-			continue;
-		}
-
-		BBitmap* bitmap = new BBitmap(
-			BRect(0, 0, kBitmapSize - 1, kBitmapSize - 1), 0, B_RGBA32);
-		if (BIconUtils::GetVectorIcon(data, size, bitmap) < B_OK) {
-			delete[] data;
-			delete bitmap;
-			continue;
-		}
-
-		delete[] data;
-
-		if (_HasBitmap(bitmaps, bitmap) || !bitmaps.AddItem(bitmap))
-			delete bitmap;
-		else if (bitmaps.CountItems() >= 128) {
-			// this is enough to choose from, stop eating memory...
-			break;
-		}
-	}
-
-	// pick random bitmaps from the ones we got in the list
-	srand((unsigned)time(0));
-
-	for (int i = 0; i < fNumOfCards / 2; i++) {
-		int32 index = rand() % bitmaps.CountItems();
-		BBitmap* bitmap = ((BBitmap*)bitmaps.RemoveItem(index));
-		if (bitmap == NULL) {
-			char buffer[512];
-			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Pairs did not find "
-				"enough vector icons in the system; it needs at least %d."),
-				fNumOfCards / 2);
-			BString msgStr(buffer);
-			msgStr << "\n";
-			BAlert* alert = new BAlert("Fatal", msgStr.String(),
-				B_TRANSLATE("OK"), 	NULL, NULL, B_WIDTH_FROM_WIDEST,
-				B_STOP_ALERT);
-			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-			alert->Go();
-			exit(1);
-		}
-		fCardBitmaps.AddItem(bitmap);
-	}
-
-	// delete the remaining bitmaps from the list
-	while (BBitmap* bitmap = (BBitmap*)bitmaps.RemoveItem((int32)0))
-		delete bitmap;
-}
-
-
-void
-PairsView::_SetPairsBoard()
-{
-	for (int i = 0; i < fNumOfCards; i++) {
-		fButtonMessage = new BMessage(kMsgCardButton);
-		fButtonMessage->AddInt32("ButtonNum", i);
-
-		int x =  i % fWidth * (kBitmapSize + kSpaceSize) + kSpaceSize;
-		int y =  i / fHeight * (kBitmapSize + kSpaceSize) + kSpaceSize;
-
-		TopButton* button = new TopButton(x, y, fButtonMessage);
-		fDeckCard.AddItem(button);
-		AddChild(button);
-	}
-}
-
-
-void
-PairsView::_GenerateCardPos()
-{
-	_ReadRandomIcons();
-
-	srand((unsigned)time(0));
-
-	int* positions = new int[fNumOfCards];
-	for (int i = 0; i < fNumOfCards; i++)
-		positions[i] = i;
-
-	for (int i = fNumOfCards; i >= 1; i--) {
-		int index = rand() % i;
-
-		fRandPos[fNumOfCards - i] = positions[index];
-
-		for (int j = index; j < i - 1; j++)
-			positions[j] = positions[j + 1];
-	}
-
-	for (int i = 0; i < fNumOfCards; i++) {
-		fPosX[i] = (fRandPos[i]) % fWidth * (kBitmapSize + kSpaceSize)
-			+ kSpaceSize;
-		fPosY[i] = (fRandPos[i]) / fHeight * (kBitmapSize + kSpaceSize)
-			+ kSpaceSize;
-	}
-
-	delete [] positions;
+	BView::AttachedToWindow();
 }
 
 
 void
 PairsView::Draw(BRect updateRect)
 {
-	SetDrawingMode(B_OP_ALPHA);
+	BObjectList<BBitmap>* bitmapsList;
+	switch (fIconSize) {
+		case kSmallIconSize:
+			bitmapsList = fSmallBitmapsList;
+			break;
 
-	// draw rand pair 1 & 2
-	for (int i = 0; i < fNumOfCards; i++) {
-		BBitmap* bitmap = ((BBitmap*)fCardBitmaps.ItemAt(i % fNumOfCards / 2));
-		DrawBitmap(bitmap, BPoint(fPosX[i], fPosY[i]));
+		case kLargeIconSize:
+			bitmapsList = fLargeBitmapsList;
+			break;
+
+		case kMediumIconSize:
+		default:
+			bitmapsList = fMediumBitmapsList;
+	}
+
+	for (int32 i = 0; i < fButtonsCount; i++) {
+		SetDrawingMode(B_OP_ALPHA);
+		DrawBitmap(bitmapsList->ItemAt(i % (fButtonsCount / 2)),
+			BPoint(fPositionX[i], fPositionY[i]));
+		SetDrawingMode(B_OP_COPY);
 	}
 }
 
 
-int
-PairsView::GetIconFromPos(int pos)
+void
+PairsView::FrameResized(float newWidth, float newHeight)
 {
-	return fRandPos[pos];
+	int32 spacing = Spacing();
+	for (int32 i = 0; i < fButtonsCount; i++) {
+		PairsButton* button = fPairsButtonList->ItemAt(i);
+		if (button != NULL) {
+			button->ResizeTo(fIconSize, fIconSize);
+			int32 x = i % fRows * (fIconSize + spacing) + spacing;
+			int32 y = i / fCols * (fIconSize + spacing) + spacing;
+			button->MoveTo(x, y);
+			button->SetFontSize(fIconSize - 15);
+		}
+	}
+
+	_SetPositions();
+	Invalidate(BRect(0, 0, newWidth, newHeight));
+	BView::FrameResized(newWidth, newHeight);
+}
+
+
+int32
+PairsView::GetIconPosition(int32 index)
+{
+	return fRandomPosition[index];
+}
+
+
+//	#pragma mark - PairsView private methods
+
+
+void
+PairsView::_GenerateCardPositions()
+{
+	// seed the random number generator based on the current timestamp
+	srand((unsigned)time(0));
+
+	_ReadRandomIcons();
+
+	int32* positions = new int32[fButtonsCount];
+	for (int32 i = 0; i < fButtonsCount; i++)
+		positions[i] = i;
+
+	for (int32 i = fButtonsCount; i > 0; i--) {
+		int32 index = rand() % i;
+		fRandomPosition[fButtonsCount - i] = positions[index];
+		for (int32 j = index; j < i - 1; j++)
+			positions[j] = positions[j + 1];
+	}
+	delete[] positions;
+
+	_SetPositions();
+}
+
+
+void
+PairsView::_ReadRandomIcons()
+{
+	Pairs* app = dynamic_cast<Pairs*>(be_app);
+	if (app == NULL) // check if NULL to make Coverity happy
+		return;
+
+	// Create a copy of the icon map so we can erase elements from it as we
+	// add them to the list eliminating repeated icons without altering the
+	// orginal IconMap.
+	IconMap tmpIconMap(app->GetIconMap());
+	size_t mapSize = tmpIconMap.size();
+	if (mapSize < (size_t)fCardsCount) {
+		// not enough icons, we're screwed
+		return;
+	}
+
+	// clean out any previous icons
+	fSmallBitmapsList->MakeEmpty();
+	fMediumBitmapsList->MakeEmpty();
+	fLargeBitmapsList->MakeEmpty();
+
+	// pick bitmaps at random from the icon map
+	for (int32 i = 0; i < fCardsCount; i++) {
+		IconMap::iterator iter = tmpIconMap.begin();
+		if (mapSize < (size_t)fCardsCount) {
+			// not enough valid icons, we're really screwed
+			return;
+		}
+		std::advance(iter, rand() % mapSize);
+		size_t key = iter->first;
+		vector_icon* icon = iter->second;
+
+		BBitmap* smallBitmap = new BBitmap(
+			BRect(0, 0, kSmallIconSize - 1, kSmallIconSize - 1), B_RGBA32);
+		status_t smallResult = BIconUtils::GetVectorIcon(icon->data,
+			icon->size, smallBitmap);
+		BBitmap* mediumBitmap = new BBitmap(
+			BRect(0, 0, kMediumIconSize - 1, kMediumIconSize - 1), B_RGBA32);
+		status_t mediumResult = BIconUtils::GetVectorIcon(icon->data,
+			icon->size, mediumBitmap);
+		BBitmap* largeBitmap = new BBitmap(
+			BRect(0, 0, kLargeIconSize - 1, kLargeIconSize - 1), B_RGBA32);
+		status_t largeResult = BIconUtils::GetVectorIcon(icon->data,
+			icon->size, largeBitmap);
+
+		if (smallResult + mediumResult + largeResult == B_OK) {
+			fSmallBitmapsList->AddItem(smallBitmap);
+			fMediumBitmapsList->AddItem(mediumBitmap);
+			fLargeBitmapsList->AddItem(largeBitmap);
+		} else {
+			delete smallBitmap;
+			delete mediumBitmap;
+			delete largeBitmap;
+			i--;
+		}
+
+		mapSize -= tmpIconMap.erase(key);
+			// remove the element from the map so we don't read it again
+	}
+}
+
+
+void
+PairsView::_SetPairsBoard()
+{
+	int32 spacing = Spacing();
+	for (int32 i = 0; i < fButtonsCount; i++) {
+		BMessage* buttonMessage = new BMessage(kMsgCardButton);
+		buttonMessage->AddInt32("button number", i);
+
+		int32 x = i % fRows * (fIconSize + spacing) + spacing;
+		int32 y = i / fCols * (fIconSize + spacing) + spacing;
+
+		PairsButton* button = new PairsButton(x, y, fIconSize, buttonMessage);
+		fPairsButtonList->AddItem(button);
+		AddChild(button);
+	}
+}
+
+
+void
+PairsView::_SetPositions()
+{
+	int32 spacing = Spacing();
+	for (int32 i = 0; i < fButtonsCount; i++) {
+		fPositionX[i] = fRandomPosition[i] % fRows * (fIconSize + spacing) + spacing;
+		fPositionY[i] = fRandomPosition[i] / fCols * (fIconSize + spacing) + spacing;
+	}
 }
