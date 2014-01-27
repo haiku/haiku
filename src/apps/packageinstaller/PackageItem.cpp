@@ -15,6 +15,7 @@
 #include <ByteOrder.h>
 #include <Catalog.h>
 #include <Directory.h>
+#include <FindDirectory.h>
 #include <fs_info.h>
 #include <Locale.h>
 #include <NodeInfo.h>
@@ -203,6 +204,25 @@ PackageItem::InitPath(const char *path, BPath *destination)
 		BPath mountPoint(&temp, NULL);
 		ret = destination->SetTo(mountPoint.Path(), fPath.String());
 	}
+
+	BPath systemNonPackagedDir;
+	find_directory(B_SYSTEM_NONPACKAGED_DIRECTORY, &systemNonPackagedDir);
+
+	BPath userNonPackagedDir;
+	find_directory(B_USER_NONPACKAGED_DIRECTORY, &userNonPackagedDir);
+
+	BString pathString(destination->Path());
+
+	// Hardcoded paths, the .pkg files hardcode this to the same
+	if (pathString.FindFirst("/boot/system") == 0 && pathString.FindFirst("non-packaged") == B_ERROR) {
+		pathString.Replace("/boot/system", systemNonPackagedDir.Path(), 1);
+	}
+
+	if (pathString.FindFirst("/boot/home/config") == 0 && pathString.FindFirst("non-packaged") == B_ERROR) {
+		pathString.Replace("/boot/home/config", userNonPackagedDir.Path(), 1);
+	}
+
+	destination->SetTo(pathString.String());
 
 	return ret;
 }
