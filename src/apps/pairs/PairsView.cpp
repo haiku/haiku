@@ -14,6 +14,9 @@
 
 #include "PairsView.h"
 
+#include <stdlib.h>
+	// for srand() and rand()
+
 #include <Application.h>
 #include <Bitmap.h>
 #include <Button.h>
