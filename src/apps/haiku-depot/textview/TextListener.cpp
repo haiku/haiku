@@ -106,6 +106,6 @@ TextListener::TextChanging(TextChangingEvent& event)
 
 
 void
-TextListener::TextChanged(TextChangedEvent& event)
+TextListener::TextChanged(const TextChangedEvent& event)
 {
 }

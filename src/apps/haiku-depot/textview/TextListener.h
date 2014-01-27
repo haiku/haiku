@@ -64,8 +64,11 @@ public:
 
 	virtual	void				TextChanging(TextChangingEvent& event);
 
-	virtual	void				TextChanged(TextChangedEvent& event);
+	virtual	void				TextChanged(const TextChangedEvent& event);
 };
+
+
+typedef BReference<TextListener> TextListenerRef;
 
 
 #endif // TEXT_LISTENER_H
