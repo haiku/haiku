@@ -1422,7 +1422,7 @@ truncate_string(BString& string, uint32 mode, float width,
 {
 	// add a tiny amount to the width to make floating point inaccuracy
 	// not drop chars that would actually fit exactly
-	width += 0.00001;
+	width += 1.f / 128;
 
 	switch (mode) {
 		case B_TRUNCATE_BEGINNING:
