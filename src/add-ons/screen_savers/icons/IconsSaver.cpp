@@ -18,7 +18,6 @@
 #include <Catalog.h>
 #include <MimeType.h>
 
-
 #include <BuildScreenSaverDefaultSettingsView.h>
 
 #include "IconDisplay.h"
