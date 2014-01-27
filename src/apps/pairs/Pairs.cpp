@@ -12,11 +12,15 @@
 
 #include "Pairs.h"
 
+#include <stdio.h>
+	// for snprintf()
 #include <stdlib.h>
 
 #include <Alert.h>
 #include <Catalog.h>
+#include <Message.h>
 #include <MimeType.h>
+#include <String.h>
 
 #include "PairsWindow.h"
 
