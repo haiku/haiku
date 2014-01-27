@@ -261,12 +261,36 @@ Paragraph::IsEmpty() const
 
 
 BString
-Paragraph::GetText(int32 start, int32 length) const
+Paragraph::Text() const
+{
+	BString result;
+
+	int32 count = fTextSpans.CountItems();
+	for (int32 i = 0; i < count; i++)
+		result << fTextSpans.ItemAtFast(i).Text();
+
+	return result;
+}
+
+
+BString
+Paragraph::Text(int32 start, int32 length) const
+{
+	Paragraph subParagraph = SubParagraph(start, length);
+	return subParagraph.Text();
+}
+
+
+Paragraph
+Paragraph::SubParagraph(int32 start, int32 length) const
 {
 	if (start < 0)
 		start = 0;
 	
-	BString text;
+	if (start == 0 && length == Length())
+		return *this;
+	
+	Paragraph result(fStyle);
 	
 	int32 count = fTextSpans.CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -284,13 +308,10 @@ Paragraph::GetText(int32 start, int32 length) const
 		spanLength -= start;
 		int32 copyLength = std::min(spanLength, length);
 
-		if (start == 0 && length == spanLength) {
-			text << span.Text();
-		} else {
-			BString subString;
-			span.Text().CopyCharsInto(subString, start, copyLength);
-			text << subString;
-		}
+		if (start == 0 && length == spanLength)
+			result.Append(span);
+		else
+			result.Append(span.SubSpan(start, copyLength));
 		
 		length -= copyLength;
 		if (length == 0)
@@ -300,7 +321,7 @@ Paragraph::GetText(int32 start, int32 length) const
 		start = 0;
 	}
 
-	return text;
+	return result;
 }
 
 

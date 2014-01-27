@@ -10,9 +10,14 @@
 #include "CharacterStyle.h"
 #include "List.h"
 #include "Paragraph.h"
+#include "TextListener.h"
 
 
-typedef List<Paragraph, false>	ParagraphList;
+typedef List<Paragraph, false>			ParagraphList;
+typedef List<TextListenerRef, false>	TextListenerList;
+
+class TextDocument;
+typedef BReference<TextDocument> TextDocumentRef;
 
 
 class TextDocument : public BReferenceable {
@@ -68,18 +73,30 @@ public:
 			// Query information
 			int32				Length() const;
 
-			BString				GetText(int32 textOffset, int32 length) const;
+			BString				Text() const;
+			BString				Text(int32 textOffset, int32 length) const;
+			TextDocumentRef		SubDocument(int32 textOffset,
+									int32 length) const;
 
 			void				PrintToStream() const;
+
+			// Listener support
+			bool				AddListener(const TextListenerRef& listener);
+			bool				RemoveListener(const TextListenerRef& listener);
+
+private:
+			void				_NotifyTextChanging(
+									TextChangingEvent& event) const;
+			void				_NotifyTextChanged(
+									const TextChangedEvent& event) const;
 
 private:
 			ParagraphList		fParagraphs;
 			Paragraph			fEmptyLastParagraph;
 			CharacterStyle		fDefaultCharacterStyle;
+
+			TextListenerList	fTextListeners;
 };
-
-
-typedef BReference<TextDocument> TextDocumentRef;
 
 
 #endif // TEXT_DOCUMENT_H

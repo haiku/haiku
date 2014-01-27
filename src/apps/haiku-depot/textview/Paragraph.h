@@ -39,7 +39,9 @@ public:
 			int32				Length() const;
 			bool				IsEmpty() const;
 
-			BString				GetText(int32 start, int32 length) const;
+			BString				Text() const;
+			BString				Text(int32 start, int32 length) const;
+			Paragraph			SubParagraph(int32 start, int32 length) const;
 
 			void				PrintToStream() const;
 

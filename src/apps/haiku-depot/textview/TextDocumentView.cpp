@@ -370,7 +370,7 @@ TextDocumentView::Copy(BClipboard* clipboard)
 		int32 end;
 		GetSelection(start, end);
 		
-		BString text = fTextDocument->GetText(start, end - start);
+		BString text = fTextDocument->Text(start, end - start);
 		clip->AddData("text/plain", B_MIME_TYPE, text.String(),
 			text.Length());
 		

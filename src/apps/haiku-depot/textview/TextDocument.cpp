@@ -394,7 +394,14 @@ TextDocument::Length() const
 
 
 BString
-TextDocument::GetText(int32 start, int32 length) const
+TextDocument::Text() const
+{
+	return Text(0, Length());
+}
+
+
+BString
+TextDocument::Text(int32 start, int32 length) const
 {
 	if (start < 0)
 		start = 0;
@@ -417,19 +424,59 @@ TextDocument::GetText(int32 start, int32 length) const
 		paragraphLength -= start;
 		int32 copyLength = std::min(paragraphLength, length);
 		
-		text << paragraph.GetText(start, copyLength);
+		text << paragraph.Text(start, copyLength);
 		
 		length -= copyLength;
 		if (length == 0)
 			break;
-		else if (i < count - 1)
-			text << '\n';
 
 		// Next paragraph is copied from its beginning
 		start = 0;
 	}
 
 	return text;
+}
+
+
+TextDocumentRef
+TextDocument::SubDocument(int32 start, int32 length) const
+{
+	TextDocumentRef result(new(std::nothrow) TextDocument(
+		fDefaultCharacterStyle, fEmptyLastParagraph.Style()), true);
+	
+	if (result.Get() == NULL)
+		return result;
+	
+	if (start < 0)
+		start = 0;
+
+	int32 count = fParagraphs.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
+		int32 paragraphLength = paragraph.Length();
+		if (paragraphLength == 0)
+			continue;
+		if (start > paragraphLength) {
+			// Skip paragraph if its before start
+			start -= paragraphLength;
+			continue;
+		}
+
+		// Remaining paragraph length after start
+		paragraphLength -= start;
+		int32 copyLength = std::min(paragraphLength, length);
+		
+		result->Append(paragraph.SubParagraph(start, copyLength));
+
+		length -= copyLength;
+		if (length == 0)
+			break;
+
+		// Next paragraph is copied from its beginning
+		start = 0;
+	}
+
+	return result;
 }
 
 
@@ -450,3 +497,55 @@ TextDocument::PrintToStream() const
 	}
 	printf("</document>\n");
 }
+
+
+// #pragma mark -
+
+
+bool
+TextDocument::AddListener(const TextListenerRef& listener)
+{
+	return fTextListeners.Add(listener);
+}
+
+
+bool
+TextDocument::RemoveListener(const TextListenerRef& listener)
+{
+	return fTextListeners.Remove(listener);
+}
+
+
+void
+TextDocument::_NotifyTextChanging(TextChangingEvent& event) const
+{
+	// Copy listener list to have a stable list in case listeners
+	// are added/removed from within the notification hook.
+	TextListenerList listeners(fTextListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const TextListenerRef& listener = listeners.ItemAtFast(i);
+		if (listener.Get() == NULL)
+			continue;
+		listener->TextChanging(event);
+		if (event.IsCanceled())
+			break;
+	}
+}
+
+
+void
+TextDocument::_NotifyTextChanged(const TextChangedEvent& event) const
+{
+	// Copy listener list to have a stable list in case listeners
+	// are added/removed from within the notification hook.
+	TextListenerList listeners(fTextListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		const TextListenerRef& listener = listeners.ItemAtFast(i);
+		if (listener.Get() == NULL)
+			continue;
+		listener->TextChanged(event);
+	}
+}
+
