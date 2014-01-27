@@ -32,22 +32,26 @@ TestView::TestView(BRect frame, const char* name, uint32 resizeFlags,
 void
 TestView::AttachedToWindow()
 {
-	BPicture picture;
+	BPicture clipper;
+	BeginPicture(&clipper);
+	PushState();
 
-	BeginPicture(&picture);
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+
 	DrawString("Hello World! - Clipping", BPoint(10, 10));
-
 	FillRect(BRect(0, 20, 400, 40));
+
+	PopState();
 	EndPicture();
 
-	ClipToPicture(&picture);
+	ClipToPicture(&clipper);
 }
 
 
 void
 TestView::Draw(BRect updateRect)
 {
-	SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR)); // opaque black.
 	DrawString("Hello World! - Clipped", BPoint(10, 30));
 	FillRect(BRect(0, 0, 200, 20));
 }
