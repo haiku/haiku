@@ -101,6 +101,11 @@ X86PagingMethod32Bit::PhysicalPageSlotPool::InitInitial(kernel_args* args)
 	size_t areaSize = B_PAGE_SIZE + sizeof(PhysicalPageSlot[1024]);
 	page_table_entry* pageTable = (page_table_entry*)vm_allocate_early(args,
 		areaSize, ~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
+	if (pageTable == 0) {
+		panic("X86PagingMethod32Bit::PhysicalPageSlotPool::InitInitial(): "
+			"Failed to allocate memory for page table!");
+		return B_ERROR;
+	}
 
 	// prepare the page table
 	_EarlyPreparePageTables(pageTable, virtualBase, 1024 * B_PAGE_SIZE);

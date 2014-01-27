@@ -409,6 +409,11 @@ X86PagingMethodPAE::PhysicalPageSlotPool::InitInitial(
 		+ sizeof(PhysicalPageSlot[kPAEPageTableEntryCount]);
 	pae_page_table_entry* pageTable = (pae_page_table_entry*)vm_allocate_early(
 		args, areaSize, ~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
+	if (pageTable == 0) {
+		panic("X86PagingMethodPAE::PhysicalPageSlotPool::InitInitial(): Failed "
+			"to allocate memory for page table!");
+		return B_ERROR;
+	}
 
 	// clear the page table and put it in the page dir
 	memset(pageTable, 0, B_PAGE_SIZE);
