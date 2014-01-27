@@ -367,6 +367,8 @@ periph_io(scsi_periph_device_info *device, io_operation *operation,
 	size_t* _bytesTransferred)
 {
 	const uint32 blockSize = device->block_size;
+	if (blockSize == 0)
+		return B_BAD_VALUE;
 
 	// don't test rw10_enabled restrictions - this flag may get changed
 	scsi_ccb *request = device->scsi->alloc_ccb(device->scsi_device);
