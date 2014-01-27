@@ -141,16 +141,19 @@ public:
 		return true;
 	}
 
-	inline void Remove()
+	inline bool Remove()
 	{
-		if (fCount > 0)
+		if (fCount > 0) {
 			_Resize(fCount - 1);
+			return true;
+		}
+		return false;
 	}
 
-	inline void Remove(int32 index)
+	inline bool Remove(int32 index)
 	{
 		if (index < 0 || index >= (int32)fCount)
-			return;
+			return false;
 
 		if (!PlainOldData) {
 			ItemType* object = fItems + index;
@@ -164,12 +167,12 @@ public:
 		}
 
 		fCount--;
+		return true;
 	}
 
-	inline void Remove(const ItemType& item)
+	inline bool Remove(const ItemType& item)
 	{
-		Remove(IndexOf(item));
-
+		return Remove(IndexOf(item));
 	}
 
 	inline bool Replace(int32 index, const ItemType& copyFrom)
