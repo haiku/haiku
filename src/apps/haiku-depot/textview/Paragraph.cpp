@@ -203,9 +203,10 @@ Paragraph::Remove(int32 offset, int32 length)
 		}
 	}
 
-	// See if anything from the TextSpan at offset remained
+	// See if anything from the TextSpan at offset remained, keep it as empty
+	// span if it is the last remaining span.
 	index--;
-	if (span.CountChars() > 0) {
+	if (span.CountChars() > 0 || fTextSpans.CountItems() == 1) {
 		fTextSpans.Replace(index, span);
 	} else {
 		fTextSpans.Remove(index);
