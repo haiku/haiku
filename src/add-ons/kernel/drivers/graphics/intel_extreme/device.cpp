@@ -142,7 +142,7 @@ device_open(const char* name, uint32 /*flags*/, void** _cookie)
 		info->open_count++;
 		*_cookie = info;
 	} else
-        ERROR("%s: initilization failed!\n", __func__);
+		ERROR("%s: initialization failed!\n", __func__);
 
 	return info->init_status;
 }
