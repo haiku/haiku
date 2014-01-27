@@ -124,9 +124,9 @@ device_open(const char* name, uint32 /*flags*/, void** _cookie)
 
 	mutex_lock(&gLock);
 
-	if (info->open_count++ == 0) {
-		// this device has been opened for the first time, so
-		// we allocate needed resources and initialize the structure
+	if (info->open_count == 0) {
+		// This device hasn't been initialized yet, so we
+		// allocate needed resources and initialize the structure
 		info->init_status = intel_extreme_init(*info);
 		if (info->init_status == B_OK) {
 #ifdef DEBUG_COMMANDS
@@ -138,8 +138,11 @@ device_open(const char* name, uint32 /*flags*/, void** _cookie)
 
 	mutex_unlock(&gLock);
 
-	if (info->init_status == B_OK)
+	if (info->init_status == B_OK) {
+		info->open_count++;
 		*_cookie = info;
+	} else
+        ERROR("%s: initilization failed!\n", __func__);
 
 	return info->init_status;
 }
@@ -171,7 +174,6 @@ device_free(void* data)
 	}
 
 	mutex_unlock(&gLock);
-
 	return B_OK;
 }
 
