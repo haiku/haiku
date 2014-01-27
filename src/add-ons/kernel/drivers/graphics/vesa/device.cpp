@@ -51,19 +51,23 @@ device_open(const char* name, uint32 flags, void** _cookie)
 		return B_BAD_VALUE;
 
 	vesa_info* info = gDeviceInfo[id];
-	*_cookie = info;
 
 	mutex_lock(&gLock);
 
 	status_t status = B_OK;
 
-	if (info->open_count++ == 0) {
+	if (info->open_count == 0) {
 		// this device has been opened for the first time, so
 		// we allocate needed resources and initialize the structure
 		if (status == B_OK)
 			status = vesa_init(*info);
 		if (status == B_OK)
 			info->id = id;
+	}
+
+	if (status == B_OK) {
+		info->open_count++;
+		*_cookie = info;
 	}
 
 	mutex_unlock(&gLock);
