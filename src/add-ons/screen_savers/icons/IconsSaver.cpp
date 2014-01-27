@@ -37,7 +37,7 @@ static const int32 kMinIconWidthPercentage = 5;
 static const int32 kMaxIconWidthPercentage = 20;
 	// same here
 static const int32 kMinIconCount = 20;
-static const int32 kMaxIconCount = 300;
+static const int32 kMaxIconCount = 384;
 
 
 const rgb_color kBackgroundColor = ui_color(B_DESKTOP_COLOR);
