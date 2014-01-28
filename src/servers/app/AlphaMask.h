@@ -17,26 +17,30 @@
 class ServerBitmap;
 
 
-class AlphaMask
-{
-	public:
-										AlphaMask(View& view,
-											ServerPicture& mask, bool inverse,
-											BPoint origin);
-										~AlphaMask();
-		scanline_unpacked_masked_type*	Generate();
+class AlphaMask {
+public:
+								AlphaMask(View* view, ServerPicture* mask,
+									bool inverse, BPoint origin);
+								~AlphaMask();
 
-	private:
-		ServerPicture&					fPicture;
-		const bool						fInverse;
-		const BPoint					fOrigin;
-		View&							fView;
+			scanline_unpacked_masked_type* Generate();
 
-		ServerBitmap*					fCachedBitmap;
-		agg::rendering_buffer			fBuffer;
-		agg::clipped_alpha_mask			fCachedMask;
-		scanline_unpacked_masked_type	fScanline;
+private:
+			ServerBitmap*		_RenderPicture(ServerPicture* picture,
+									bool inverse) const;
+
+
+private:
+			ServerPicture*		fPicture;
+			const bool			fInverse;
+			BPoint				fOrigin;
+			View*				fView;
+
+			ServerBitmap*		fCachedBitmap;
+			agg::rendering_buffer fBuffer;
+			agg::clipped_alpha_mask fCachedMask;
+			scanline_unpacked_masked_type fScanline;
 };
 
 
-#endif
+#endif // ALPHA_MASK_H

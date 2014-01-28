@@ -39,7 +39,7 @@ class ServerPicture;
 class BGradient;
 
 class View: public DrawingContext {
-	public:
+public:
 							View(IntRect frame, IntPoint scrollingOffset,
 								const char* name, int32 token,
 								uint32 resizeMode, uint32 flags);
@@ -232,10 +232,7 @@ class View: public DrawingContext {
 								int32 level = 0);
 #endif
 
-	protected:
-			friend class	AlphaMask;
-			ServerBitmap*	_RenderPicture(ServerPicture* picture,
-								bool inverse);
+protected:
 			BRegion&		_ScreenClipping(BRegion* windowContentClipping,
 								bool force = false) const;
 			void			_MoveScreenClipping(int32 x, int32 y,
