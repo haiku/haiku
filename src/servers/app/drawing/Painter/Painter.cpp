@@ -289,6 +289,11 @@ Painter::SetDrawState(const DrawState* data, int32 xOffset, int32 yOffset)
 
 	fSubpixelPrecise = data->SubPixelPrecise();
 
+	if (data->GetAlphaMask() != NULL)
+		fMaskedUnpackedScanline = data->GetAlphaMask()->Generate();
+	else
+		fMaskedUnpackedScanline = NULL;
+
 	// any of these conditions means we need to use a different drawing
 	// mode instance
 	bool updateDrawingMode
@@ -333,13 +338,6 @@ Painter::ConstrainClipping(const BRegion* region)
 		fRasterizer.clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
 		fSubpixRasterizer.clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
 	}
-}
-
-
-void
-Painter::SetAlphaMask(scanline_unpacked_masked_type* mask)
-{
-	fMaskedUnpackedScanline = mask;
 }
 
 

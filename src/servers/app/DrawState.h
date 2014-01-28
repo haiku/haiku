@@ -20,6 +20,7 @@
 #include "ServerFont.h"
 #include "PatternHandler.h"
 
+class AlphaMask;
 class BRegion;
 
 namespace BPrivate {
@@ -31,8 +32,7 @@ namespace BPrivate {
 class DrawState {
 public:
 							DrawState();
-private:
-							DrawState(DrawState* from);
+							DrawState(const DrawState& other);
 public:
 		virtual				~DrawState();
 
@@ -66,6 +66,9 @@ public:
 		bool				HasClipping() const;
 		bool				HasAdditionalClipping() const;
 		bool				GetCombinedClippingRegion(BRegion* region) const;
+
+			void			SetAlphaMask(AlphaMask* mask);
+			AlphaMask*		GetAlphaMask() const;
 
 							// coordinate transformations
 				void		Transform(float* x, float* y) const;
@@ -148,6 +151,8 @@ protected:
 		float				fCombinedScale;
 
 		BRegion*			fClippingRegion;
+
+		AlphaMask*			fAlphaMask;
 
 		rgb_color			fHighColor;
 		rgb_color			fLowColor;

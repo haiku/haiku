@@ -12,6 +12,7 @@
 #include "BitmapHWInterface.h"
 #include "BitmapManager.h"
 #include "DrawingEngine.h"
+#include "DrawState.h"
 #include "ServerBitmap.h"
 #include "View.h"
 
@@ -101,7 +102,9 @@ AlphaMask::_RenderPicture(ServerPicture* picture, bool inverse) const
 
 	// Copy the current state of the client view, so we draw with the right
 	// font, color and everything
-	engine->SetDrawState(fView->CurrentState());
+	DrawState drawState(*fView->CurrentState());
+	engine->SetDrawState(&drawState);
+
 	OffscreenContext context(engine);
 	if (engine->LockParallelAccess()) {
 		// FIXME ConstrainClippingRegion docs says passing NULL disables

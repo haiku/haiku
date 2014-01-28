@@ -31,7 +31,11 @@ DrawingContext::DrawingContext()
 	fDrawState(new (std::nothrow) DrawState)
 {
 }
-	
+
+
+DrawingContext::~DrawingContext()
+{
+}
 
 
 status_t
@@ -108,7 +112,7 @@ DrawingContext::SetScale(float scale)
 float
 DrawingContext::Scale() const
 {
-	return CurrentState()->Scale();
+	return fDrawState->Scale();
 }
 
 
@@ -117,8 +121,22 @@ DrawingContext::SetUserClipping(const BRegion* region)
 {
 	fDrawState->SetClippingRegion(region);
 
-	// rebuild clipping (for just this view)
+	// rebuild clipping (for just this context)
 	RebuildClipping(false);
+}
+
+
+void
+DrawingContext::SetAlphaMask(AlphaMask* mask)
+{
+	fDrawState->SetAlphaMask(mask);
+}
+
+
+AlphaMask*
+DrawingContext::GetAlphaMask() const
+{
+	return fDrawState->GetAlphaMask();
 }
 
 

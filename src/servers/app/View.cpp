@@ -113,7 +113,6 @@ View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 
 	fCursor(NULL),
 	fPicture(NULL),
-	fAlphaMask(NULL),
 
 	fLocalClipping((BRect)Bounds()),
 	fScreenClipping(),
@@ -134,7 +133,6 @@ View::~View()
 	delete fScreenAndUserClipping;
 	delete fUserClipping;
 	delete fDrawState;
-	delete fAlphaMask;
 
 //	if (fWindow && this == fWindow->TopView())
 //		fWindow->SetTopView(NULL);
@@ -1572,32 +1570,6 @@ View::InvalidateScreenClipping()
 	for (View* child = FirstChild(); child; child = child->NextSibling()) {
 		child->InvalidateScreenClipping();
 	}
-}
-
-
-// TODO we should be storing the ServerPicture here, so we can recompute the
-// bitmap mask when the view is scaled, resized or the origin is changed.
-// This would allow us to keep a bitmap mask matching exactly the view size.
-// Moreover, we should clip that bitmap mask using the region-based clipping,
-// so it can mask out all the clipped regions, and we don't have to worry about
-// them whendoing further drawing. Essentially, switch from region-based to
-// bitmap based clipping for all ourdrawing.
-void
-View::SetAlphaMask(ServerPicture* picture, bool inverse, BPoint origin)
-{
-	// BeOS compatibility: they implemented ClipToPicture by converting the
-	// picture to a complex BRegion and used that as a clipping region. As a
-	// result, youcan't have a picture and a region clipping at the same level
-	// (but you can either using PushState/PopState, or using
-	// ConstrainClippingRegion after ClipToPicture...)
-	// SetUserClipping(NULL);
-
-	delete fAlphaMask;
-	if (picture != NULL) {
-		fAlphaMask = new(std::nothrow) AlphaMask(this, picture, inverse,
-			origin);
-	} else
-		fAlphaMask = NULL;
 }
 
 

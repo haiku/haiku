@@ -19,6 +19,7 @@
 
 #include <Region.h>
 
+#include "AlphaMask.h"
 #include "LinkReceiver.h"
 #include "LinkSender.h"
 #include "ServerProtocolStructs.h"
@@ -28,66 +29,70 @@ using std::nothrow;
 
 
 DrawState::DrawState()
-	: fOrigin(0.0, 0.0),
-	  fCombinedOrigin(0.0, 0.0),
-	  fScale(1.0),
-	  fCombinedScale(1.0),
-	  fClippingRegion(NULL),
+	:
+	fOrigin(0.0, 0.0),
+	fCombinedOrigin(0.0, 0.0),
+	fScale(1.0),
+	fCombinedScale(1.0),
+	fClippingRegion(NULL),
+	fAlphaMask(NULL),
 
-	  fHighColor((rgb_color){ 0, 0, 0, 255 }),
-	  fLowColor((rgb_color){ 255, 255, 255, 255 }),
-	  fPattern(kSolidHigh),
+	fHighColor((rgb_color){ 0, 0, 0, 255 }),
+	fLowColor((rgb_color){ 255, 255, 255, 255 }),
+	fPattern(kSolidHigh),
 
-	  fDrawingMode(B_OP_COPY),
-	  fAlphaSrcMode(B_PIXEL_ALPHA),
-	  fAlphaFncMode(B_ALPHA_OVERLAY),
+	fDrawingMode(B_OP_COPY),
+	fAlphaSrcMode(B_PIXEL_ALPHA),
+	fAlphaFncMode(B_ALPHA_OVERLAY),
 
-	  fPenLocation(0.0, 0.0),
-	  fPenSize(1.0),
+	fPenLocation(0.0, 0.0),
+	fPenSize(1.0),
 
-	  fFontAliasing(false),
-	  fSubPixelPrecise(false),
-	  fLineCapMode(B_BUTT_CAP),
-	  fLineJoinMode(B_MITER_JOIN),
-	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
-	  fPreviousState(NULL)
+	fFontAliasing(false),
+	fSubPixelPrecise(false),
+	fLineCapMode(B_BUTT_CAP),
+	fLineJoinMode(B_MITER_JOIN),
+	fMiterLimit(B_DEFAULT_MITER_LIMIT),
+	fPreviousState(NULL)
 {
 	fUnscaledFontSize = fFont.Size();
 }
 
 
-DrawState::DrawState(DrawState* from)
-	: fOrigin(0.0, 0.0),
-	  fCombinedOrigin(from->fCombinedOrigin),
-	  fScale(1.0),
-	  fCombinedScale(from->fCombinedScale),
-	  fClippingRegion(NULL),
+DrawState::DrawState(const DrawState& other)
+	:
+	fOrigin(other.fOrigin),
+	fCombinedOrigin(other.fCombinedOrigin),
+	fScale(other.fScale),
+	fCombinedScale(other.fCombinedScale),
+	fClippingRegion(NULL),
+	fAlphaMask(NULL),
 
-	  fHighColor(from->fHighColor),
-	  fLowColor(from->fLowColor),
-	  fPattern(from->fPattern),
+	fHighColor(other.fHighColor),
+	fLowColor(other.fLowColor),
+	fPattern(other.fPattern),
 
-	  fDrawingMode(from->fDrawingMode),
-	  fAlphaSrcMode(from->fAlphaSrcMode),
-	  fAlphaFncMode(from->fAlphaFncMode),
+	fDrawingMode(other.fDrawingMode),
+	fAlphaSrcMode(other.fAlphaSrcMode),
+	fAlphaFncMode(other.fAlphaFncMode),
 
-	  fPenLocation(from->fPenLocation),
-	  fPenSize(from->fPenSize),
+	fPenLocation(other.fPenLocation),
+	fPenSize(other.fPenSize),
 
-	  fFont(from->fFont),
-	  fFontAliasing(from->fFontAliasing),
+	fFont(other.fFont),
+	fFontAliasing(other.fFontAliasing),
 
-	  fSubPixelPrecise(from->fSubPixelPrecise),
+	fSubPixelPrecise(other.fSubPixelPrecise),
 
-	  fLineCapMode(from->fLineCapMode),
-	  fLineJoinMode(from->fLineJoinMode),
-	  fMiterLimit(from->fMiterLimit),
+	fLineCapMode(other.fLineCapMode),
+	fLineJoinMode(other.fLineJoinMode),
+	fMiterLimit(other.fMiterLimit),
 
-	  // Since fScale is reset to 1.0, the unscaled
-	  // font size is the current size of the font
-	  // (which is from->fUnscaledFontSize * from->fCombinedScale)
-	  fUnscaledFontSize(from->fUnscaledFontSize),
-	  fPreviousState(from)
+	// Since fScale is reset to 1.0, the unscaled
+	// font size is the current size of the font
+	// (which is from->fUnscaledFontSize * from->fCombinedScale)
+	fUnscaledFontSize(other.fUnscaledFontSize),
+	fPreviousState(NULL)
 {
 }
 
@@ -96,13 +101,22 @@ DrawState::~DrawState()
 {
 	delete fClippingRegion;
 	delete fPreviousState;
+	delete fAlphaMask;
 }
 
 
 DrawState*
 DrawState::PushState()
 {
-	DrawState* next = new (nothrow) DrawState(this);
+	DrawState* next = new (nothrow) DrawState(*this);
+
+	if (next != NULL) {
+		// Prepare state as derived from this state
+		next->fOrigin = BPoint(0.0, 0.0);
+		next->fScale = 1.0;
+		next->fPreviousState = this;
+	}
+
 	return next;
 }
 
@@ -370,6 +384,28 @@ DrawState::GetCombinedClippingRegion(BRegion* region) const
 			return fPreviousState->GetCombinedClippingRegion(region);
 	}
 	return false;
+}
+
+
+void
+DrawState::SetAlphaMask(AlphaMask* mask)
+{
+	// BeOS compatibility: they implemented ClipToPicture by converting the
+	// picture to a complex BRegion and used that as a clipping region. As a
+	// result, youcan't have a picture and a region clipping at the same level
+	// (but you can either using PushState/PopState, or using
+	// ConstrainClippingRegion after ClipToPicture...)
+	// SetClippingRegion(NULL);
+
+	delete fAlphaMask;
+	fAlphaMask = mask;
+}
+
+
+AlphaMask*
+DrawState::GetAlphaMask() const
+{
+	return fAlphaMask;
 }
 
 

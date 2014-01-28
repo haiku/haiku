@@ -51,6 +51,7 @@
 #include "clipping.h"
 #include "utf8_functions.h"
 
+#include "AlphaMask.h"
 #include "AppServer.h"
 #include "AutoDeleter.h"
 #include "BBitmapBuffer.h"
@@ -1869,7 +1870,8 @@ fDesktop->LockSingleWindow();
 
 			link.Read<int32>(&pictureToken);
 			if (pictureToken < 0) {
-				fCurrentView->SetAlphaMask(NULL, false, B_ORIGIN);
+				fCurrentView->SetAlphaMask(NULL);
+				_UpdateDrawState(fCurrentView);
 				break;
 			}
 
@@ -1881,7 +1883,10 @@ fDesktop->LockSingleWindow();
 			if (picture == NULL)
 				break;
 
-			fCurrentView->SetAlphaMask(picture, inverse, where);
+			fCurrentView->SetAlphaMask(new(std::nothrow) AlphaMask(
+				fCurrentView, picture, inverse, where));
+			_UpdateDrawState(fCurrentView);
+
 			picture->ReleaseReference();
 			break;
 		}
@@ -2174,7 +2179,6 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 	// that's why you need to use the clipping only for as long
 	// as you have it locked
 	drawingEngine->ConstrainClippingRegion(&fCurrentDrawingRegion);
-	drawingEngine->SetAlphaMask(fCurrentView->GetAlphaMask());
 
 	switch (code) {
 		case AS_STROKE_LINE:
@@ -2840,7 +2844,6 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			break;
 	}
 
-	drawingEngine->SetAlphaMask(NULL);
 	drawingEngine->UnlockParallelAccess();
 }
 

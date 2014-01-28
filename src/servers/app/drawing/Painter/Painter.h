@@ -54,8 +54,6 @@ public:
 			void				ConstrainClipping(const BRegion* region);
 			const BRegion*		ClippingRegion() const
 									{ return fClippingRegion; }
-			void				SetAlphaMask(
-									scanline_unpacked_masked_type* mask);
 
 			void				SetDrawState(const DrawState* data,
 									int32 xOffset = 0,

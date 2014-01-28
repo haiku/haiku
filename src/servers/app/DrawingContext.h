@@ -17,6 +17,7 @@
 #include <Point.h>
 
 
+class AlphaMask;
 class BGradient;
 class BRegion;
 class DrawingEngine;
@@ -27,8 +28,10 @@ class ServerPicture;
 
 
 class DrawingContext {
-	public:
+public:
 							DrawingContext();
+	virtual					~DrawingContext();
+
 			status_t		InitCheck() const;
 
 	virtual	void			PushState();
@@ -43,7 +46,10 @@ class DrawingContext {
 
 			void			SetUserClipping(const BRegion* region);
 				// region is expected in view coordinates
-			
+	
+			void			SetAlphaMask(AlphaMask* mask);
+			AlphaMask*		GetAlphaMask() const;
+	
 			void			ConvertToScreenForDrawing(BPoint* point) const;
 			void			ConvertToScreenForDrawing(BRect* rect) const;
 			void			ConvertToScreenForDrawing(BRegion* region) const;
@@ -70,13 +76,13 @@ class DrawingContext {
 	virtual void			ResyncDrawState() {};
 	virtual void			UpdateCurrentDrawingRegion() {};
 
-	protected:
+protected:
 			DrawState*		fDrawState;
 };
 
 
 class OffscreenContext: public DrawingContext {
-	public:
+public:
 							OffscreenContext(DrawingEngine* engine)
 								: fDrawingEngine(engine)
 							{};
@@ -96,7 +102,7 @@ class OffscreenContext: public DrawingContext {
 			void			RebuildClipping(bool deep) { /* TODO */ }
 			ServerPicture*	GetPicture(int32 token) const
 								{ /* TODO */ return NULL; }
-	private:
+private:
 			DrawingEngine*	fDrawingEngine;
 };
 
