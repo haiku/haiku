@@ -100,26 +100,16 @@ SharedLibrary libtestappserver.so :
 	MultiLocker.cpp
 	Overlay.cpp
 	RGBColor.cpp
-	ServerAppStub.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
 	ServerFont.cpp
 	SystemPalette.cpp
 
 	# drawing
-	drawing_support.cpp
 	PatternHandler.cpp
 
 #	trace.c
 
-	# libraries
-	: be libpainter.a libagg.a libtextencoding.so libshared.a
-	[ BuildFeatureAttribute freetype : library ]
-;
-
-AddResources test_app_server : test_app_server.rdef ;
-
-Server test_app_server :
 	# Misc. Sources
 	ProfileMessageSupport.cpp
 	EventDispatcher.cpp
@@ -152,6 +142,7 @@ Server test_app_server :
 	drawing_support.cpp
 	MallocBuffer.cpp
 
+	AlphaMask.cpp
 	BitmapHWInterface.cpp
 	DesktopSettings.cpp
 	DrawingContext.cpp
@@ -175,11 +166,22 @@ Server test_app_server :
 	StackAndTile.cpp
 	Stacking.cpp
 	Tiling.cpp
+	# libraries
+	: be libpainter.a libagg.a liblinprog.a libtextencoding.so libshared.a
+	[ BuildFeatureAttribute freetype : library ]
+;
+
+AddResources test_app_server : test_app_server.rdef ;
+
+Server test_app_server :
+
+	# drawing
+	drawing_support.cpp
 
 	# libraries
 	:
 	[ BuildFeatureAttribute zlib : library ] libtestappserver.so be
-	libhwinterface.so libhwinterfaceimpl.so liblinprog.a libtextencoding.so
+	libhwinterface.so libhwinterfaceimpl.so libtextencoding.so
 	[ BuildFeatureAttribute freetype : library ]
 	$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
 ;
