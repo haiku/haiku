@@ -8,35 +8,43 @@
 
 
 #include "agg_clipped_alpha_mask.h"
-#include "ServerBitmap.h"
 #include "ServerPicture.h"
 
+#include "DrawState.h"
 #include "drawing/Painter/defines.h"
 
 
 class ServerBitmap;
+class ServerPicture;
 
 
 class AlphaMask {
 public:
-								AlphaMask(View* view, ServerPicture* mask,
-									bool inverse, BPoint origin);
+								AlphaMask(ServerPicture* mask, bool inverse,
+									BPoint origin, const DrawState& drawState);
 								~AlphaMask();
+
+			void				Update(BRect bounds, BPoint offset);
 
 			scanline_unpacked_masked_type* Generate();
 
 private:
-			ServerBitmap*		_RenderPicture(ServerPicture* picture,
-									bool inverse) const;
+			ServerBitmap*		_RenderPicture() const;
 
 
 private:
 			ServerPicture*		fPicture;
 			const bool			fInverse;
 			BPoint				fOrigin;
-			View*				fView;
+			DrawState			fDrawState;
+
+			BRect				fViewBounds;
+			BPoint				fViewOffset;
 
 			ServerBitmap*		fCachedBitmap;
+			BRect				fCachedBounds;
+			BPoint				fCachedOffset;
+
 			agg::rendering_buffer fBuffer;
 			agg::clipped_alpha_mask fCachedMask;
 			scanline_unpacked_masked_type fScanline;
