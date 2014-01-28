@@ -31,7 +31,7 @@ local font_src =
 	;
 
 UseBuildFeatureHeaders freetype ;
-Includes [ FGristFiles AppServer.cpp BitmapManager.cpp
+Includes [ FGristFiles AlphaMask.cpp AppServer.cpp BitmapManager.cpp
 	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp
 	DrawState.cpp DrawingContext.cpp ServerApp.cpp ServerBitmap.cpp
 	ServerCursor.cpp ServerFont.cpp ServerPicture.cpp ServerWindow.cpp
