@@ -147,11 +147,6 @@ private:
 			bool				_MessageNeedsAllWindowsLocked(
 									uint32 code) const;
 
-			// TODO: Move me elsewhere
-			status_t			PictureToRegion(ServerPicture *picture,
-									BRegion& region, bool inverse,
-									BPoint where);
-
 private:
 			char*				fTitle;
 

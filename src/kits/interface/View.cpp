@@ -5089,24 +5089,23 @@ BView::_SetOwner(BWindow* newOwner)
 void
 BView::_ClipToPicture(BPicture* picture, BPoint where, bool invert, bool sync)
 {
-	if (!picture)
+	if (!_CheckOwnerLockAndSwitchCurrent())
 		return;
 
-	if (_CheckOwnerLockAndSwitchCurrent()) {
+	if (!picture) {
+		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_PICTURE);
+		fOwner->fLink->Attach<int32>(-1);
+	} else {
 		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_PICTURE);
 		fOwner->fLink->Attach<int32>(picture->Token());
 		fOwner->fLink->Attach<BPoint>(where);
 		fOwner->fLink->Attach<bool>(invert);
-
-		// TODO: I think that "sync" means another thing here:
-		// the bebook, at least, says so.
-		if (sync)
-			fOwner->fLink->Flush();
-
-		fState->valid_flags &= ~B_VIEW_CLIP_REGION_BIT;
 	}
 
-	fState->archiving_flags |= B_VIEW_CLIP_REGION_BIT;
+	// TODO: I think that "sync" means another thing here:
+	// the bebook, at least, says so.
+	if (sync)
+		fOwner->fLink->Flush();
 }
 
 

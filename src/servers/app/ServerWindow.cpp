@@ -54,7 +54,6 @@
 #include "AppServer.h"
 #include "AutoDeleter.h"
 #include "BBitmapBuffer.h"
-#include "BitmapHWInterface.h"
 #include "BitmapManager.h"
 #include "Desktop.h"
 #include "DirectWindowInfo.h"
@@ -1864,13 +1863,16 @@ fDesktop->LockSingleWindow();
 			DTRACE(("ServerWindow %s: Message AS_VIEW_CLIP_TO_PICTURE: "
 				"View: %s\n", Title(), fCurrentView->Name()));
 
-			// TODO: you are not allowed to use View regions here!!!
-
 			int32 pictureToken;
 			BPoint where;
 			bool inverse = false;
 
 			link.Read<int32>(&pictureToken);
+			if (pictureToken < 0) {
+				fCurrentView->SetAlphaMask(NULL, false, B_ORIGIN);
+				break;
+			}
+
 			link.Read<BPoint>(&where);
 			if (link.Read<bool>(&inverse) != B_OK)
 				break;
@@ -1879,12 +1881,7 @@ fDesktop->LockSingleWindow();
 			if (picture == NULL)
 				break;
 
-			BRegion region;
-			// TODO: I think we also need the BView's token
-			// I think PictureToRegion would fit better into the View class (?)
-			if (PictureToRegion(picture, region, inverse, where) == B_OK)
-				fCurrentView->SetUserClipping(&region);
-
+			fCurrentView->SetAlphaMask(picture, inverse, where);
 			picture->ReleaseReference();
 			break;
 		}
@@ -2177,6 +2174,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 	// that's why you need to use the clipping only for as long
 	// as you have it locked
 	drawingEngine->ConstrainClippingRegion(&fCurrentDrawingRegion);
+	drawingEngine->SetAlphaMask(fCurrentView->GetAlphaMask());
 
 	switch (code) {
 		case AS_STROKE_LINE:
@@ -2842,6 +2840,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			break;
 	}
 
+	drawingEngine->SetAlphaMask(NULL);
 	drawingEngine->UnlockParallelAccess();
 }
 
@@ -3751,103 +3750,4 @@ ServerWindow::_DirectWindowSetFullScreen(bool enable)
 	}
 
 	fDesktop->SetWindowFeel(fWindow, feel);
-}
-
-
-status_t
-ServerWindow::PictureToRegion(ServerPicture* picture, BRegion& region,
-	bool inverse, BPoint where)
-{
-	// Here the idea is to get rid of the padding bytes in the bitmap,
-	// as padding complicates and slows down the iteration.
-	// TODO: Maybe it's not so nice as it assumes BBitmaps to be aligned
-	// to a 4 byte boundary.
-	BRect bounds(fCurrentView->Bounds());
-	if ((bounds.IntegerWidth() + 1) % 32) {
-		bounds.right = bounds.left + ((bounds.IntegerWidth() + 1) / 32 + 1)
-			* 32 - 1;
-	}
-
-	region.MakeEmpty();
-
-	// TODO: Only the alpha channel is relevant, but there is no B_ALPHA8
-	// color space, so we use 75% more memory.
-	UtilityBitmap* bitmap = new UtilityBitmap(bounds, B_RGBA32, 0);
-	if (bitmap == NULL)
-		return B_NO_MEMORY;
-
-#if 0
-	/*
-	 * TODO stippi says we could use OffscreenWindow to do this, but there
-	 * doesn't seem to be a way to create a View without a BView on
-	 * application side (the constructor wants a token).
-	 * This would be better, as it would avoid the DrawingContext mess.
-	 */
-	OffscreenWindow window(bitmap, "ClipToPicture", fCurrentView->Window());
-	View view(bounds, IntPoint(0, 0), "ClipToPicture");
-	window->SetTopView(view);
-#endif
-
-	// Clear the bitmap with the transparent color
-	memset(bitmap->Bits(), 0, bitmap->BitsLength());
-
-	// Render the picture to the bitmap
-	BitmapHWInterface interface(bitmap);
-	DrawingEngine* engine = interface.CreateDrawingEngine();
-	if (engine == NULL) {
-		delete bitmap;
-		return B_NO_MEMORY;
-	}
-
-	// Copy the current state of the client view, so we draw with the right
-	// font, color and everything
-	engine->SetDrawState(fCurrentView->CurrentState());
-	OffscreenContext context(engine);
-	if (engine->LockParallelAccess())
-	{
-		// FIXME ConstrainClippingRegion docs says passing NULL disables
-		// all clipping. This doesn't work and will crash in Painter.
-		BRegion clipping;
-		clipping.Include(bounds);
-		engine->ConstrainClippingRegion(&clipping);
-		picture->Play(&context);
-		engine->UnlockParallelAccess();
-	}
-	delete engine;
-
-	// TODO stop here: we want agg to clip using the bitmap (with alpha), not
-	// the region.
-
-	int32 width = bounds.IntegerWidth() + 1;
-	int32 height = bounds.IntegerHeight() + 1;
-	if (bitmap != NULL) {
-		uint32 bit = 0;
-		uint32* bits = (uint32*)bitmap->Bits();
-		clipping_rect rect;
-
-		// TODO: A possible optimization would be adding "spans" instead
-		// of 1x1 rects. That would probably help with very complex
-		// BPictures
-		for (int32 y = 0; y < height; y++) {
-			for (int32 x = 0; x < width; x++) {
-				bit = *bits++;
-				if (bit != 0) {
-					rect.left = x;
-					rect.right = rect.left;
-					rect.top = rect.bottom = y;
-					region.Include(rect);
-				}
-			}
-		}
-	}
-	delete bitmap;
-
-	if (inverse) {
-		BRegion inverseRegion;
-		inverseRegion.Include(BRect(fCurrentView->Bounds()));
-		inverseRegion.Exclude(&region);
-		region = inverseRegion;
-	}
-
-	return B_OK;
 }
