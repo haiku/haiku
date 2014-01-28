@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <stack>
 
+#include "AlphaMask.h"
 #include "DrawState.h"
 #include "GlyphLayoutEngine.h"
 #include "Painter.h"
@@ -231,6 +232,16 @@ DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 	ASSERT_PARALLEL_LOCKED();
 
 	fPainter->ConstrainClipping(region);
+}
+
+
+void
+DrawingEngine::SetAlphaMask(AlphaMask* mask)
+{
+	scanline_unpacked_masked_type* scanline = NULL;
+	if (mask != NULL)
+		scanline = mask->Generate();
+	fPainter->SetAlphaMask(scanline);
 }
 
 

@@ -46,6 +46,7 @@ if $(TARGET_ARCH) != x86_64 {
 }
 
 Server app_server :
+	AlphaMask.cpp
 	Angle.cpp
 	AppServer.cpp
 	#BitfieldRegion.cpp

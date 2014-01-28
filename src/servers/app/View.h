@@ -29,6 +29,7 @@ namespace BPrivate {
 	class PortLink;
 };
 
+class AlphaMask;
 class DrawingEngine;
 class Overlay;
 class Window;
@@ -220,6 +221,10 @@ class View: public DrawingContext {
 										&& fScreenAndUserClipping != NULL));
 								}
 
+			void			SetAlphaMask(ServerPicture* picture, bool inverse,
+								BPoint where);
+			AlphaMask*		GetAlphaMask() { return fAlphaMask; }
+
 			// debugging
 			void			PrintToStream() const;
 #if 0
@@ -228,6 +233,9 @@ class View: public DrawingContext {
 #endif
 
 	protected:
+			friend class	AlphaMask;
+			ServerBitmap*	_RenderPicture(ServerPicture* picture,
+								bool inverse);
 			BRegion&		_ScreenClipping(BRegion* windowContentClipping,
 								bool force = false) const;
 			void			_MoveScreenClipping(int32 x, int32 y,
@@ -269,6 +277,7 @@ class View: public DrawingContext {
 
 			ServerCursor*	fCursor;
 			ServerPicture*	fPicture;
+			AlphaMask*		fAlphaMask;
 
 			// clipping
 			BRegion			fLocalClipping;

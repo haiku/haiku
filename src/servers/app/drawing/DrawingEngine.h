@@ -25,6 +25,7 @@ class BPoint;
 class BRect;
 class BRegion;
 
+class AlphaMask;
 class DrawState;
 class Painter;
 class ServerBitmap;
@@ -67,6 +68,7 @@ public:
 	// clipping for all drawing functions, passing a NULL region
 	// will remove any clipping (drawing allowed everywhere)
 	virtual	void			ConstrainClippingRegion(const BRegion* region);
+			void			SetAlphaMask(AlphaMask* mask);
 
 	virtual	void			SetDrawState(const DrawState* state,
 								int32 xOffset = 0, int32 yOffset = 0);

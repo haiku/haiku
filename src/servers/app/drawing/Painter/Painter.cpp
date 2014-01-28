@@ -51,6 +51,7 @@
 #include <AutoDeleter.h>
 #include <View.h>
 
+#include "AlphaMask.h"
 #include "DrawingMode.h"
 #include "GlobalSubpixelSettings.h"
 #include "PatternHandler.h"
@@ -172,13 +173,14 @@ Painter::Painter()
 	fBaseRenderer(fPixelFormat),
 	fUnpackedScanline(),
 	fPackedScanline(),
+	fRasterizer(),
+	fRenderer(fBaseRenderer),
+	fRendererBin(fBaseRenderer),
 	fSubpixPackedScanline(),
 	fSubpixUnpackedScanline(),
 	fSubpixRasterizer(),
-	fRasterizer(),
 	fSubpixRenderer(fBaseRenderer),
-	fRenderer(fBaseRenderer),
-	fRendererBin(fBaseRenderer),
+	fMaskedUnpackedScanline(NULL),
 
 	fPath(),
 	fCurve(fPath),
@@ -334,6 +336,13 @@ Painter::ConstrainClipping(const BRegion* region)
 }
 
 
+void
+Painter::SetAlphaMask(scanline_unpacked_masked_type* mask)
+{
+	fMaskedUnpackedScanline = mask;
+}
+
+
 // SetHighColor
 void
 Painter::SetHighColor(const rgb_color& color)
@@ -454,7 +463,8 @@ Painter::StrokeLine(BPoint a, BPoint b)
 
 	// first, try an optimized version
 	if (fPenSize == 1.0
-		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
+		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)
+		&& fMaskedUnpackedScanline == NULL) {
 		pattern pat = *fPatternHandler.GetR5Pattern();
 		if (pat == B_SOLID_HIGH
 			&& StraightLine(a, b, fPatternHandler.HighColor())) {
@@ -862,8 +872,9 @@ Painter::StrokeRect(const BRect& r) const
 	_Transform(&b, false);
 
 	// first, try an optimized version
-	if (fPenSize == 1.0 &&
-		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
+	if (fPenSize == 1.0
+			&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)
+			&& fMaskedUnpackedScanline == NULL) {
 		pattern p = *fPatternHandler.GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
@@ -924,7 +935,8 @@ Painter::FillRect(const BRect& r) const
 	_Transform(&b, false);
 
 	// first, try an optimized version
-	if (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER) {
+	if ((fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)
+			&& fMaskedUnpackedScanline == NULL) {
 		pattern p = *fPatternHandler.GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
@@ -983,7 +995,8 @@ Painter::FillRect(const BRect& r, const BGradient& gradient) const
 
 	// first, try an optimized version
 	if (gradient.GetType() == BGradient::TYPE_LINEAR
-		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
+		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)
+		&& fMaskedUnpackedScanline == NULL) {
 		const BGradientLinear* linearGradient
 			= dynamic_cast<const BGradientLinear*>(&gradient);
 		if (linearGradient->Start().x == linearGradient->End().x
@@ -1220,7 +1233,10 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 		// make the inner rect work as a hole
 		fRasterizer.filling_rule(agg::fill_even_odd);
 
-		if (fPenSize > 2)
+		if (fMaskedUnpackedScanline != NULL) {
+			agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
+				fRenderer);
+		} else if (fPenSize > 2)
 			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
 		else
 			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
@@ -1362,7 +1378,10 @@ Painter::DrawEllipse(BRect r, bool fill) const
 		// make the inner ellipse work as a hole
 		fRasterizer.filling_rule(agg::fill_even_odd);
 
-		if (fPenSize > 4)
+		if (fMaskedUnpackedScanline != NULL) {
+			agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
+				fRenderer);
+		} else if (fPenSize > 4)
 			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
 		else
 			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
@@ -2750,8 +2769,13 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 		span_gen_type spanGenerator(source, interpolator);
 
 		// render the path with the bitmap as scanline fill
-		agg::render_scanlines_aa(fRasterizer, fUnpackedScanline, fBaseRenderer,
-			spanAllocator, spanGenerator);
+		if (fMaskedUnpackedScanline != NULL) {
+			agg::render_scanlines_aa(fRasterizer, *fMaskedUnpackedScanline,
+				fBaseRenderer, spanAllocator, spanGenerator);
+		} else {
+			agg::render_scanlines_aa(fRasterizer, fUnpackedScanline,
+				fBaseRenderer, spanAllocator, spanGenerator);
+		}
 	} else {
 		// image filter (nearest neighbor)
 		typedef agg::span_image_filter_rgba_nn<
@@ -2759,8 +2783,13 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 		span_gen_type spanGenerator(source, interpolator);
 
 		// render the path with the bitmap as scanline fill
-		agg::render_scanlines_aa(fRasterizer, fUnpackedScanline, fBaseRenderer,
-			spanAllocator, spanGenerator);
+		if (fMaskedUnpackedScanline != NULL) {
+			agg::render_scanlines_aa(fRasterizer, *fMaskedUnpackedScanline,
+				fBaseRenderer, spanAllocator, spanGenerator);
+		} else {
+			agg::render_scanlines_aa(fRasterizer, fUnpackedScanline,
+				fBaseRenderer, spanAllocator, spanGenerator);
+		}
 	}
 }
 
@@ -2887,6 +2916,12 @@ Painter::_StrokePath(VertexSource& path) const
 
 		agg::render_scanlines(fSubpixRasterizer,
 			fSubpixPackedScanline, fSubpixRenderer);
+	} else if(fMaskedUnpackedScanline != NULL) {
+		// TODO: we can't do both alpha-masking and subpixel AA.
+		fRasterizer.reset();
+		fRasterizer.add_path(path);
+		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
+			fRenderer);
 	} else {
 		fRasterizer.reset();
 		fRasterizer.add_path(stroke);
@@ -2912,6 +2947,12 @@ Painter::_FillPath(VertexSource& path) const
 		fSubpixRasterizer.add_path(path);
 		agg::render_scanlines(fSubpixRasterizer,
 			fSubpixPackedScanline, fSubpixRenderer);
+	} else if(fMaskedUnpackedScanline != NULL) {
+		// TODO: we can't do both alpha-masking and subpixel AA.
+		fRasterizer.reset();
+		fRasterizer.add_path(path);
+		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
+			fRenderer);
 	} else {
 		fRasterizer.reset();
 		fRasterizer.add_path(path);
@@ -3133,7 +3174,12 @@ Painter::_FillPathGradientLinear(VertexSource& path,
 
 	fRasterizer.reset();
 	fRasterizer.add_path(path);
-	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+	if (fMaskedUnpackedScanline == NULL)
+		agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+	else {
+		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
+			gradientRenderer);
+	}
 }
 
 
@@ -3180,7 +3226,12 @@ Painter::_FillPathGradientRadial(VertexSource& path,
 
 	fRasterizer.reset();
 	fRasterizer.add_path(path);
-	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+	if (fMaskedUnpackedScanline == NULL)
+		agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+	else {
+		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
+			gradientRenderer);
+	}
 }
 
 
@@ -3228,7 +3279,12 @@ Painter::_FillPathGradientRadialFocus(VertexSource& path,
 
 	fRasterizer.reset();
 	fRasterizer.add_path(path);
-	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+	if (fMaskedUnpackedScanline == NULL)
+		agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+	else {
+		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
+			gradientRenderer);
+	}
 }
 
 
@@ -3274,7 +3330,12 @@ Painter::_FillPathGradientDiamond(VertexSource& path,
 
 	fRasterizer.reset();
 	fRasterizer.add_path(path);
-	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+	if (fMaskedUnpackedScanline == NULL)
+		agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+	else {
+		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
+			gradientRenderer);
+	}
 }
 
 
@@ -3320,5 +3381,10 @@ Painter::_FillPathGradientConic(VertexSource& path,
 
 	fRasterizer.reset();
 	fRasterizer.add_path(path);
-	agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+	if (fMaskedUnpackedScanline == NULL)
+		agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
+	else {
+		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
+			gradientRenderer);
+	}
 }

@@ -54,6 +54,8 @@ public:
 			void				ConstrainClipping(const BRegion* region);
 			const BRegion*		ClippingRegion() const
 									{ return fClippingRegion; }
+			void				SetAlphaMask(
+									scanline_unpacked_masked_type* mask);
 
 			void				SetDrawState(const DrawState* data,
 									int32 xOffset = 0,
@@ -331,15 +333,24 @@ private:
 			pixfmt				fPixelFormat;
 	mutable	renderer_base		fBaseRenderer;
 
+	// Regular drawing mode: pixel-aligned, no alpha masking
 	mutable	scanline_unpacked_type fUnpackedScanline;
 	mutable	scanline_packed_type fPackedScanline;
+	mutable	rasterizer_type		fRasterizer;
+	mutable	renderer_type		fRenderer;
+
+	// Fast mode: no antialiasing needed (horizontal/vertical lines, ...)
+	mutable	renderer_bin_type	fRendererBin;
+
+	// Subpixel mode
 	mutable	scanline_packed_subpix_type fSubpixPackedScanline;
 	mutable	scanline_unpacked_subpix_type fSubpixUnpackedScanline;
 	mutable	rasterizer_subpix_type fSubpixRasterizer;
-	mutable	rasterizer_type		fRasterizer;
 	mutable	renderer_subpix_type fSubpixRenderer;
-	mutable	renderer_type		fRenderer;
-	mutable	renderer_bin_type	fRendererBin;
+
+	// Alpha-Masked mode: for ClipToPicture
+	// (this uses the standard rasterizer and renderer)
+	mutable	scanline_unpacked_masked_type* fMaskedUnpackedScanline;
 
 	mutable	agg::path_storage	fPath;
 	mutable	agg::conv_curve<agg::path_storage> fCurve;

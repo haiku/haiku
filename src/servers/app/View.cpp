@@ -15,6 +15,8 @@
 #include <new>
 #include <stdio.h>
 
+#include "AlphaMask.h"
+#include "BitmapHWInterface.h"
 #include "BitmapManager.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
@@ -113,6 +115,7 @@ View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 
 	fCursor(NULL),
 	fPicture(NULL),
+	fAlphaMask(NULL),
 
 	fLocalClipping((BRect)Bounds()),
 	fScreenClipping(),
@@ -133,6 +136,7 @@ View::~View()
 	delete fScreenAndUserClipping;
 	delete fUserClipping;
 	delete fDrawState;
+	delete fAlphaMask;
 
 //	if (fWindow && this == fWindow->TopView())
 //		fWindow->SetTopView(NULL);
@@ -1570,6 +1574,98 @@ View::InvalidateScreenClipping()
 	for (View* child = FirstChild(); child; child = child->NextSibling()) {
 		child->InvalidateScreenClipping();
 	}
+}
+
+
+// TODO we should be storing the ServerPicture here, so we can recompute the
+// bitmap mask when the view is scaled, resized or the origin is changed.
+// This would allow us to keep a bitmap mask matching exactly the view size.
+// Moreover, we should clip that bitmap mask using the region-based clipping,
+// so it can mask out all the clipped regions, and we don't have to worry about
+// them whendoing further drawing. Essentially, switch from region-based to
+// bitmap based clipping for all ourdrawing.
+void
+View::SetAlphaMask(ServerPicture* picture, bool inverse, BPoint origin)
+{
+	// BeOS compatibility: they implemented ClipToPicture by converting the
+	// picture to a complex BRegion and used that as a clipping region. As a
+	// result, youcan't have a picture and a region clipping at the same level
+	// (but you can either using PushState/PopState, or using
+	// ConstrainClippingRegion after ClipToPicture...)
+	// SetUserClipping(NULL);
+
+	delete fAlphaMask;
+	if (picture != NULL) {
+		fAlphaMask = new(std::nothrow) AlphaMask(*this, *picture, inverse,
+			origin);
+	} else
+		fAlphaMask = NULL;
+}
+
+
+ServerBitmap*
+View::_RenderPicture(ServerPicture* picture, bool inverse)
+{
+	BRect bounds(Bounds());
+
+	// TODO: Only the alpha channel is relevant, but there is no B_ALPHA8
+	// color space, so we use 300% more memory than needed.
+	UtilityBitmap* bitmap = new(std::nothrow) UtilityBitmap(bounds, B_RGBA32,
+		0);
+	if (bitmap == NULL)
+		return NULL;
+
+#if 0
+	/*
+	 * TODO stippi says we could use OffscreenWindow to do this, but there
+	 * doesn't seem to be a way to create a View without a BView on
+	 * application side (the constructor wants a token).
+	 * This would be better, as it would avoid the DrawingContext abstraction
+	 * above View and OffscreenContext and allow for inlining more methods.
+	 */
+	OffscreenWindow window(bitmap, "ClipToPicture", Window());
+	View view(bounds, IntPoint(0, 0), "ClipToPicture");
+	window->SetTopView(view);
+#endif
+
+	// Clear the bitmap with the transparent color
+	memset(bitmap->Bits(), 0, bitmap->BitsLength());
+
+	// Render the picture to the bitmap
+	BitmapHWInterface interface(bitmap);
+	DrawingEngine* engine = interface.CreateDrawingEngine();
+	if (engine == NULL) {
+		delete bitmap;
+		return NULL;
+	}
+
+	// Copy the current state of the client view, so we draw with the right
+	// font, color and everything
+	engine->SetDrawState(CurrentState());
+	OffscreenContext context(engine);
+	if (engine->LockParallelAccess())
+	{
+		// FIXME ConstrainClippingRegion docs says passing NULL disables
+		// all clipping. This doesn't work and will crash in Painter.
+		BRegion clipping;
+		clipping.Include(bounds);
+		engine->ConstrainClippingRegion(&clipping);
+		picture->Play(&context);
+		engine->UnlockParallelAccess();
+	}
+	delete engine;
+
+	if (!inverse)
+		return bitmap;
+
+	// Compute the inverse of our bitmap. There probably is a better way.
+	uint32 size = bitmap->BitsLength();
+	uint8* bits = (uint8*)bitmap->Bits();
+
+	for(uint32 i = 0; i < size; i++)
+		bits[i] = 255 - bits[i];
+
+	return bitmap;
 }
 
 
