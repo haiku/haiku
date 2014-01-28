@@ -84,8 +84,6 @@ static void
 smp_start_kernel(void)
 {
 	uint32 curr_cpu = smp_get_current_cpu();
-	struct gdt_idt_descr idt_descr;
-	struct gdt_idt_descr gdt_descr;
 
 	//TRACE(("smp_cpu_ready: entry cpu %ld\n", curr_cpu));
 
@@ -100,7 +98,8 @@ smp_start_kernel(void)
 	// Set up idt
 	set_debug_idt();
 
-	// Set up the final gdt
+	// Set up gdt
+	struct gdt_idt_descr gdt_descr;
 	gdt_descr.limit = sizeof(gBootGDT) - 1;
 	gdt_descr.base = gBootGDT;
 
