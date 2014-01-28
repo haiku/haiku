@@ -4,6 +4,7 @@
 #include <Application.h>
 #include <Message.h>
 #include <Picture.h>
+#include <ScrollView.h>
 #include <View.h>
 #include <Window.h>
 
@@ -22,6 +23,7 @@ private:
 			void				Test1(BRect updateRect);
 			void				Test2(BRect updateRect);
 			void				Test3(BRect updateRect);
+			void				Test4(BRect updateRect);
 };
 
 
@@ -59,6 +61,8 @@ TestView::Test1(BRect updateRect)
 	FillRect(BRect(0, 0, 200, 20));
 
 	// Paint the whole unclipped region red.
+	// If all went well, this should cover the first line of text and the
+	// 200x20 rectangle below it.
 	PushState();
 	SetDrawingMode(B_OP_ALPHA);
 	rgb_color color;
@@ -84,26 +88,15 @@ TestView::Test2(BRect updateRect)
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
 
-	FillEllipse(BRect(20, 60, 50, 90));
+	FillEllipse(BRect(10, 10, 40, 40));
 
 	PopState();
 	EndPicture();
 
-	ClipToInversePicture(&clipper);
+	ClipToInversePicture(&clipper, BPoint(10, 50));
 
 	FillRect(BRect(10, 50, 60, 100));
 
-	// Paint the whole unclipped region blue.
-	PushState();
-	SetDrawingMode(B_OP_ALPHA);
-	rgb_color color;
-	color.red = 0;
-	color.green = 0;
-	color.blue = 255;
-	color.alpha = 64;
-	SetHighColor(color);
-	FillRect(Bounds());
-	PopState();
 }
 
 
@@ -114,6 +107,7 @@ TestView::Test3(BRect updateRect)
 	ClipToPicture(NULL);
 
 	// Paint the whole unclipped region green.
+	// If all went well, this should cover the whole window.
 	PushState();
 	SetDrawingMode(B_OP_ALPHA);
 	rgb_color color;
@@ -128,11 +122,82 @@ TestView::Test3(BRect updateRect)
 
 
 void
+TestView::Test4(BRect updateRect)
+{
+	// Test multiple clipping pictures with Push/PopState()
+	
+	// First clipping is a circle
+	BPicture clipper;
+	BeginPicture(&clipper);
+	PushState();
+
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+
+	FillEllipse(BRect(70, 50, 120, 100));
+
+	PopState();
+	EndPicture();
+
+	ClipToPicture(&clipper);
+
+	// This should push the first clipping
+	PushState();
+
+	// Second clipping is another circle, offset to the right.
+	BPicture clipper2;
+	BeginPicture(&clipper2);
+	PushState();
+
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+
+	FillEllipse(BRect(100, 50, 150, 100));
+
+	PopState();
+	EndPicture();
+	ClipToPicture(&clipper2);
+
+	// This should only paint the intersection of the two circles.
+	// No other part of the circles should ever be visible.
+	FillRect(BRect(70, 50, 150, 100));
+
+	// ... and back to clipping only the first circle.
+	PopState();
+
+}
+
+
+void
 TestView::Draw(BRect updateRect)
 {
 	Test1(updateRect);
 	Test2(updateRect);
+
+	// Paint the whole unclipped region blue.
+	// If all went well, this should cover the whole window, except the
+	// clipped-out circle
+	PushState();
+	SetDrawingMode(B_OP_ALPHA);
+	rgb_color color;
+	color.red = 0;
+	color.green = 0;
+	color.blue = 255;
+	color.alpha = 64;
+	SetHighColor(color);
+	FillRect(Bounds());
+	PopState();
+
 	Test3(updateRect);
+	Test4(updateRect);
+
+	SetOrigin(5,55);
+	Test2(updateRect);
+
+	SetOrigin(50,55);
+	SetScale(2);
+	Test2(updateRect);
+	SetScale(1);
 }
 
 
@@ -145,12 +210,17 @@ main(int argc, char** argv)
 	BApplication app(kAppSignature);
 
 	BWindow* window = new BWindow(BRect(50.0, 50.0, 300.0, 250.0),
-		"ClipToPicture Test", B_TITLED_WINDOW,
+		"ClipToPicture Test", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE);
 
-	BView* view = new TestView(window->Bounds(), "test", B_FOLLOW_ALL,
+	BRect targetRect = window->Bounds();
+	targetRect.right -= B_V_SCROLL_BAR_WIDTH;
+	targetRect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	BView* view = new TestView(targetRect, "test", B_FOLLOW_ALL,
 		B_WILL_DRAW);
-	window->AddChild(view);
+	BScrollView* scroll = new BScrollView("scroll", view, B_FOLLOW_ALL, 0,
+		true, true);
+	window->AddChild(scroll);
 
 	window->Show();
 
