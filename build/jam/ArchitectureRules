@@ -656,6 +656,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src kits ;
 	EnableWerror src preferences ;
 	EnableWerror src servers ;
+	EnableWerror src system boot ;
 	EnableWerror src system kernel ;
 	EnableWerror src system libroot add-ons ;
 	EnableWerror src system libroot posix locale ;
