@@ -236,10 +236,7 @@ ProcessController::Init()
 
 	gPCView = this;
 	fMessageRunner = NULL;
-	memset(fLastBarHeight, 0, sizeof(fLastBarHeight));
 	fLastMemoryHeight = 0;
-	memset(fCPUTimes, 0, sizeof(fCPUTimes));
-	memset(fPrevActive, 0, sizeof(fPrevActive));
 	fPrevTime = 0;
 }
 
