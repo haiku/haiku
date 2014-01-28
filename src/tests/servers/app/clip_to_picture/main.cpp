@@ -8,16 +8,20 @@
 #include <Window.h>
 
 
-static const char* kAppSignature = "application/x.vnd-Haiku.ShapeTest";
+static const char* kAppSignature = "application/x.vnd-Haiku.ClipToPicture";
 
 
 class TestView : public BView {
 public:
 								TestView(BRect frame, const char* name,
 									uint32 resizeFlags, uint32 flags);
-			void				AttachedToWindow();
 
 	virtual	void				Draw(BRect updateRect);
+
+private:
+			void				Test1(BRect updateRect);
+			void				Test2(BRect updateRect);
+			void				Test3(BRect updateRect);
 };
 
 
@@ -30,9 +34,11 @@ TestView::TestView(BRect frame, const char* name, uint32 resizeFlags,
 
 
 void
-TestView::AttachedToWindow()
+TestView::Test1(BRect updateRect)
 {
 	BPicture clipper;
+
+	// Test antialiased clipping to a text
 	BeginPicture(&clipper);
 	PushState();
 
@@ -40,20 +46,93 @@ TestView::AttachedToWindow()
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
 
 	DrawString("Hello World! - Clipping", BPoint(10, 10));
-	FillRect(BRect(0, 20, 400, 40));
+	FillRect(BRect(0, 20, 200, 40));
 
 	PopState();
 	EndPicture();
 
 	ClipToPicture(&clipper);
+
+	// This string is inside the clipping rectangle. It is completely drawn.
+	DrawString("Hello World! - Clipped", BPoint(10, 30));
+	// This rect is above the clipping string. Only the glyphs are painted.
+	FillRect(BRect(0, 0, 200, 20));
+
+	// Paint the whole unclipped region red.
+	PushState();
+	SetDrawingMode(B_OP_ALPHA);
+	rgb_color color;
+	color.red = 255;
+	color.green = 0;
+	color.blue = 0;
+	color.alpha = 64;
+	SetHighColor(color);
+	FillRect(Bounds());
+	PopState();
+}
+
+
+void
+TestView::Test2(BRect updateRect)
+{
+	BPicture clipper;
+
+	// Test inverse clipping: a round hole in a rect
+	BeginPicture(&clipper);
+	PushState();
+
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+
+	FillEllipse(BRect(20, 60, 50, 90));
+
+	PopState();
+	EndPicture();
+
+	ClipToInversePicture(&clipper);
+
+	FillRect(BRect(10, 50, 60, 100));
+
+	// Paint the whole unclipped region blue.
+	PushState();
+	SetDrawingMode(B_OP_ALPHA);
+	rgb_color color;
+	color.red = 0;
+	color.green = 0;
+	color.blue = 255;
+	color.alpha = 64;
+	SetHighColor(color);
+	FillRect(Bounds());
+	PopState();
+}
+
+
+void
+TestView::Test3(BRect updateRect)
+{
+	// Check that the clipping can be undone.
+	ClipToPicture(NULL);
+
+	// Paint the whole unclipped region green.
+	PushState();
+	SetDrawingMode(B_OP_ALPHA);
+	rgb_color color;
+	color.red = 0;
+	color.green = 255;
+	color.blue = 0;
+	color.alpha = 64;
+	SetHighColor(color);
+	FillRect(Bounds());
+	PopState();
 }
 
 
 void
 TestView::Draw(BRect updateRect)
 {
-	DrawString("Hello World! - Clipped", BPoint(10, 30));
-	FillRect(BRect(0, 0, 200, 20));
+	Test1(updateRect);
+	Test2(updateRect);
+	Test3(updateRect);
 }
 
 
