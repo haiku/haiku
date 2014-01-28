@@ -33,7 +33,8 @@ AGGTextRenderer::AGGTextRenderer(renderer_subpix_type& subpixRenderer,
 		renderer_type& solidRenderer, renderer_bin_type& binRenderer,
 		scanline_unpacked_type& scanline,
 		scanline_unpacked_subpix_type& subpixScanline,
-		rasterizer_subpix_type& subpixRasterizer)
+		rasterizer_subpix_type& subpixRasterizer,
+		scanline_unpacked_masked_type*& maskedScanline)
 	:
 	fPathAdaptor(),
 	fGray8Adaptor(),
@@ -51,6 +52,8 @@ AGGTextRenderer::AGGTextRenderer(renderer_subpix_type& subpixRenderer,
 	fScanline(scanline),
 	fSubpixScanline(subpixScanline),
 	fSubpixRasterizer(subpixRasterizer),
+	fMaskedScanline(maskedScanline),
+
 	fRasterizer(),
 
 	fHinted(true),
@@ -150,7 +153,10 @@ public:
 	void Finish(double x, double y)
 	{
 		if (fVector) {
-			if (fSubpixelAntiAliased) {
+			if (fRenderer.fMaskedScanline != NULL) {
+				agg::render_scanlines(fRenderer.fRasterizer,
+					*fRenderer.fMaskedScanline, fRenderer.fSolidRenderer);
+			} else if (fSubpixelAntiAliased) {
 				agg::render_scanlines(fRenderer.fSubpixRasterizer,
 					fRenderer.fSubpixScanline, fRenderer.fSubpixRenderer);
 			} else {
@@ -234,11 +240,19 @@ public:
 						break;
 
 					case glyph_data_gray8:
-						agg::render_scanlines(fRenderer.fGray8Adaptor,
-							fRenderer.fGray8Scanline, fRenderer.fSolidRenderer);
+						if (fRenderer.fMaskedScanline != NULL) {
+							agg::render_scanlines(fRenderer.fGray8Adaptor,
+								*fRenderer.fMaskedScanline,
+								fRenderer.fSolidRenderer);
+						} else {
+							agg::render_scanlines(fRenderer.fGray8Adaptor,
+								fRenderer.fGray8Scanline,
+								fRenderer.fSolidRenderer);
+						}
 						break;
 
 					case glyph_data_subpix:
+						// TODO: Handle alpha mask (fRenderer.fMaskedScanline)
 						agg::render_scanlines(fRenderer.fGray8Adaptor,
 							fRenderer.fGray8Scanline,
 							fRenderer.fSubpixRenderer);

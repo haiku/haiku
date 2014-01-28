@@ -201,7 +201,7 @@ Painter::Painter()
 
 	fPatternHandler(),
 	fTextRenderer(fSubpixRenderer, fRenderer, fRendererBin, fUnpackedScanline,
-		fSubpixUnpackedScanline, fSubpixRasterizer)
+		fSubpixUnpackedScanline, fSubpixRasterizer, fMaskedUnpackedScanline)
 {
 	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode,
 		false);
@@ -2910,18 +2910,18 @@ Painter::_StrokePath(VertexSource& path) const
 	stroke.line_join(agg_line_join_mode_for(fLineJoinMode));
 	stroke.miter_limit(fMiterLimit);
 
-	if (gSubpixelAntialiasing) {
-		fSubpixRasterizer.reset();
-		fSubpixRasterizer.add_path(stroke);
-
-		agg::render_scanlines(fSubpixRasterizer,
-			fSubpixPackedScanline, fSubpixRenderer);
-	} else if(fMaskedUnpackedScanline != NULL) {
+	if (fMaskedUnpackedScanline != NULL) {
 		// TODO: we can't do both alpha-masking and subpixel AA.
 		fRasterizer.reset();
 		fRasterizer.add_path(path);
 		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
 			fRenderer);
+	} else if (gSubpixelAntialiasing) {
+		fSubpixRasterizer.reset();
+		fSubpixRasterizer.add_path(stroke);
+
+		agg::render_scanlines(fSubpixRasterizer,
+			fSubpixPackedScanline, fSubpixRenderer);
 	} else {
 		fRasterizer.reset();
 		fRasterizer.add_path(stroke);
@@ -2942,17 +2942,17 @@ template<class VertexSource>
 BRect
 Painter::_FillPath(VertexSource& path) const
 {
-	if (gSubpixelAntialiasing) {
-		fSubpixRasterizer.reset();
-		fSubpixRasterizer.add_path(path);
-		agg::render_scanlines(fSubpixRasterizer,
-			fSubpixPackedScanline, fSubpixRenderer);
-	} else if(fMaskedUnpackedScanline != NULL) {
+	if (fMaskedUnpackedScanline != NULL) {
 		// TODO: we can't do both alpha-masking and subpixel AA.
 		fRasterizer.reset();
 		fRasterizer.add_path(path);
 		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
 			fRenderer);
+	} else if (gSubpixelAntialiasing) {
+		fSubpixRasterizer.reset();
+		fSubpixRasterizer.add_path(path);
+		agg::render_scanlines(fSubpixRasterizer,
+			fSubpixPackedScanline, fSubpixRenderer);
 	} else {
 		fRasterizer.reset();
 		fRasterizer.add_path(path);
