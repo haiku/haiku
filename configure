@@ -770,6 +770,8 @@ else
 			if [ $targetArch != x86_gcc2 ]; then
 				script="${script}_gcc4"
 				scriptArgs="$targetMachine"
+				set_default_value HAIKU_USE_GCC_GRAPHITE_$targetArch	\
+					$useGccGraphiteDefault
 			fi
 			secondaryArch=
 			if [ -z "$isPrimaryArch" ]; then

@@ -112,16 +112,16 @@ mkdir -p "$installDir/lib/gcc/$haikuMachine/$gccVersion"
 if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	cloogSourceDir="$buildToolsDir/cloog"
 	gmpSourceDir="$buildToolsDir/gcc/gmp"
-	pplSourceDir="$buildToolsDir/ppl"
+	islSourceDir="$buildToolsDir/isl"
 
-	pplObjDir="$objDir/ppl"
+	islObjDir="$objDir/isl"
 	gmpObjDir="$objDir/gmp"
 	cloogObjDir="$objDir/cloog"
-	mkdir -p "$pplObjDir" "$gmpObjDir" "$cloogObjDir" || exit 1
+	mkdir -p "$islObjDir" "$gmpObjDir" "$cloogObjDir" || exit 1
 
-	gccConfigureArgs="$gccConfigureArgs --with-cloog=\"$installDir\" \
-		--enable-cloog-backend=isl --with-ppl=\"$installDir\" \
-		--disable-cloog-version-check --with-gmp=\"$installDir\" \
+	gccConfigureArgs="$gccConfigureArgs --with-cloog=$installDir \
+		--enable-cloog-backend=isl --with-isl=$installDir \
+		--with-gmp=$installDir \
 		--with-host-libstdcxx=\"-lstdc++\""
 fi
 
@@ -134,7 +134,7 @@ export LC_ALL=POSIX
 
 # build binutils
 cd "$binutilsObjDir"
-CFLAGS="-O2" CXXFLAGS="-O2" "$binutilsSourceDir/configure" \
+CFLAGS="-O2 -pipe" CXXFLAGS="-O2" "$binutilsSourceDir/configure" \
 	--prefix="$installDir" $buildHostSpec --target=$haikuMachine \
 	--enable-targets=$haikuMachine,i386-efi-pe,x86_64-efi-pe \
 	--disable-nls --disable-shared --disable-werror \
@@ -154,21 +154,20 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	$MAKE $additionalMakeArgs || exit 1
 	$MAKE $additionalMakeArgs install || exit 1
 
-	# build ppl
-	cd "$pplObjDir"
-	CFLAGS="-O2" CXXFLAGS="-O2" "$pplSourceDir/configure" --prefix="$installDir" \
-		--disable-nls --disable-shared --disable-watchdog \
-		--disable-maintainer-mode || exit 1
-	$MAKE $additionalMakeArgs AUTOCONF:=true AUTOHEADER:=true ACLOCAL:=true \
-		AUTOMAKE:=true || exit 1
-	$MAKE $additionalMakeArgs install AUTOCONF:=true AUTOHEADER:=true \
-		ACLOCAL:=true AUTOMAKE:=true || exit 1
+	# build isl
+	cd "$islObjDir"
+	CFLAGS="-O2 -pipe" CXXFLAGS="-O2 -pipe" "$islSourceDir/configure" \
+		--prefix="$installDir" --disable-nls --disable-shared \
+		 --with-gmp-prefix="$installDir" || exit 1
+	$MAKE $additionalMakeArgs || exit 1
+	$MAKE $additionalMakeArgs install || exit 1
 
 	# build cloog
 	cd "$cloogObjDir"
-	CFLAGS="-O2" CXXFLAGS="-O2" "$cloogSourceDir/configure" \
+	CFLAGS="-O2 -pipe" CXXFLAGS="-O2" "$cloogSourceDir/configure" \
 		--prefix="$installDir" --disable-nls --disable-shared \
-		--with-gmp-prefix="$installDir" || exit 1
+		--with-gmp-prefix="$installDir" --with-isl-prefix=="$installDir" \
+		|| exit 1
 	$MAKE $additionalMakeArgs || exit 1
 	$MAKE $additionalMakeArgs install || exit 1
 fi
@@ -196,7 +195,7 @@ copy_headers "$haikuSourceDir/headers/posix" "$tmpIncludeDir/posix"
 
 # configure gcc
 cd "$gccObjDir"
-CFLAGS="-O2" CXXFLAGS="-O2" "$gccSourceDir/configure" \
+CFLAGS="-O2 -pipe" CXXFLAGS="-O2" "$gccSourceDir/configure" \
 	--prefix="$installDir" $buildHostSpec --target=$haikuMachine \
 	--disable-nls --disable-shared --with-system-zlib \
 	--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
