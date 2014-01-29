@@ -20,10 +20,14 @@
 #include "Window.h"
 
 
-static const int32 kRightOptionKey = 0x67;
-static const int32 kTabKey = 0x26;
-static const int32 kPageUpKey = 0x21;
-static const int32 kPageDownKey = 0x36;
+static const int32 kRightOptionKey	= 0x67;
+static const int32 kTabKey			= 0x26;
+static const int32 kPageUpKey		= 0x21;
+static const int32 kPageDownKey		= 0x36;
+static const int32 kLeftArrowKey	= 0x61;
+static const int32 kUpArrowKey		= 0x57;
+static const int32 kRightArrowKey	= 0x63;
+static const int32 kDownArrowKey	= 0x62;
 
 
 using namespace std;
@@ -146,6 +150,8 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 	SATGroup* currentGroup = _GetSATGroup(frontWindow);
 
 	switch (key) {
+		case kLeftArrowKey:
+		case kRightArrowKey:
 		case kTabKey:
 		{
 			// go to previous or next window tab in current window group
@@ -159,7 +165,8 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 			for (int32 i = 0; i < groupSize; i++) {
 				SATWindow* targetWindow = currentGroup->WindowAt(i);
 				if (targetWindow == frontWindow) {
-					if ((modifiers & B_SHIFT_KEY) != 0) {
+					if (key == kLeftArrowKey
+						|| (key == kTabKey && (modifiers & B_SHIFT_KEY) != 0)) {
 						// Go to previous window tab (wrap around)
 						int32 previousIndex = i > 0 ? i - 1 : groupSize - 1;
 						targetWindow = currentGroup->WindowAt(previousIndex);
@@ -176,6 +183,7 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 			break;
 		}
 
+		case kUpArrowKey:
 		case kPageUpKey:
 		{
 			// go to previous window group
@@ -214,6 +222,7 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 			break;
 		}
 
+		case kDownArrowKey:
 		case kPageDownKey:
 		{
 			// go to next window group
