@@ -144,6 +144,7 @@ GrepWindow::GrepWindow(BMessage* message)
 	_LoadPrefs();
 	_TileIfMultipleWindows();
 
+	fSearchBoxWidth = fSearchText->Bounds().Width();
 	Show();
 }
 
@@ -157,6 +158,7 @@ GrepWindow::~GrepWindow()
 
 void GrepWindow::FrameResized(float width, float height)
 {
+	fSearchBoxWidth = fSearchText->Bounds().Width();
 	BWindow::FrameResized(width, height);
 	fModel->fFrame = Frame();
 	_SavePrefs();
@@ -1035,8 +1037,13 @@ GrepWindow::_OnNodeMonitorPulse()
 void
 GrepWindow::_OnReportFileName(BMessage* message)
 {
-	if (fModel->fState != STATE_UPDATE)
-		fSearchText->SetText(message->FindString("filename"));
+	if (fModel->fState != STATE_UPDATE) {
+		BString name = message->FindString("filename");
+		fSearchText->TruncateString(&name, B_TRUNCATE_MIDDLE,
+			fSearchBoxWidth - 10);
+
+		fSearchText->SetText(name);		
+	}
 }
 
 

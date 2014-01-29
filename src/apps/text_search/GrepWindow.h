@@ -141,6 +141,8 @@ private:
 			bigtime_t			fLastNodeMonitorEvent;
 			ChangesIterator*	fChangesIterator;
 			BMessageRunner*		fChangesPulse;
+			float				fSearchBoxWidth;
+
 
 			BFilePanel*			fFilePanel;
 };
