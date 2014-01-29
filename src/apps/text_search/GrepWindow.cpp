@@ -85,48 +85,48 @@ static const bigtime_t kChangesPulseInterval = 150000;
 
 GrepWindow::GrepWindow(BMessage* message)
 	: BWindow(BRect(0, 0, 1, 1), NULL, B_DOCUMENT_WINDOW, 0),
-	  fSearchText(NULL),
-	  fSearchResults(NULL),
-	  fMenuBar(NULL),
-	  fFileMenu(NULL),
-	  fNew(NULL),
-	  fOpen(NULL),
-	  fClose(NULL),
-	  fQuit(NULL),
-	  fActionMenu(NULL),
-	  fSelectAll(NULL),
-	  fSearch(NULL),
-	  fTrimSelection(NULL),
-	  fCopyText(NULL),
-	  fSelectInTracker(NULL),
-	  fOpenSelection(NULL),
-	  fPreferencesMenu(NULL),
-	  fRecurseLinks(NULL),
-	  fRecurseDirs(NULL),
-	  fSkipDotDirs(NULL),
-	  fCaseSensitive(NULL),
-	  fEscapeText(NULL),
-	  fTextOnly(NULL),
-	  fInvokePe(NULL),
-	  fShowLinesMenuitem(NULL),
-	  fHistoryMenu(NULL),
-	  fEncodingMenu(NULL),
-	  fUTF8(NULL),
-	  fShiftJIS(NULL),
-	  fEUC(NULL),
-	  fJIS(NULL),
+	fSearchText(NULL),
+	fSearchResults(NULL),
+	fMenuBar(NULL),
+	fFileMenu(NULL),
+	fNew(NULL),
+	fOpen(NULL),
+	fClose(NULL),
+	fQuit(NULL),
+	fActionMenu(NULL),
+	fSelectAll(NULL),
+	fSearch(NULL),
+	fTrimSelection(NULL),
+	fCopyText(NULL),
+	fSelectInTracker(NULL),
+	fOpenSelection(NULL),
+	fPreferencesMenu(NULL),
+	fRecurseLinks(NULL),
+	fRecurseDirs(NULL),
+	fSkipDotDirs(NULL),
+	fCaseSensitive(NULL),
+	fEscapeText(NULL),
+	fTextOnly(NULL),
+	fInvokePe(NULL),
+	fShowLinesMenuitem(NULL),
+	fHistoryMenu(NULL),
+	fEncodingMenu(NULL),
+	fUTF8(NULL),
+	fShiftJIS(NULL),
+	fEUC(NULL),
+	fJIS(NULL),
 
-	  fShowLinesCheckbox(NULL),
-	  fButton(NULL),
+	fShowLinesCheckbox(NULL),
+	fButton(NULL),
 
-	  fGrepper(NULL),
-	  fOldPattern(""),
-	  fModel(new (nothrow) Model()),
-	  fLastNodeMonitorEvent(system_time()),
-	  fChangesIterator(NULL),
-	  fChangesPulse(NULL),
+	fGrepper(NULL),
+	fOldPattern(""),
+	fModel(new (nothrow) Model()),
+	fLastNodeMonitorEvent(system_time()),
+	fChangesIterator(NULL),
+	fChangesPulse(NULL),
 
-	  fFilePanel(NULL)
+	fFilePanel(NULL)
 {
 	if (fModel == NULL)
 		return;
@@ -189,7 +189,7 @@ void GrepWindow::MenusEnded()
 }
 
 
-void GrepWindow::MessageReceived(BMessage *message)
+void GrepWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_NEW_WINDOW:
@@ -421,7 +421,7 @@ GrepWindow::_SetWindowTitle()
 void
 GrepWindow::_CreateMenus()
 {
-	fMenuBar = new BMenuBar(BRect(0,0,1,1), "menubar");
+	fMenuBar = new BMenuBar(BRect(0, 0, 1, 1), "menubar");
 
 	fFileMenu = new BMenu(B_TRANSLATE("File"));
 	fActionMenu = new BMenu(B_TRANSLATE("Actions"));
@@ -454,7 +454,8 @@ GrepWindow::_CreateMenus()
 		B_TRANSLATE("Open selection"), new BMessage(MSG_OPEN_SELECTION), 'O');
 
 	fSelectInTracker = new BMenuItem(
-		B_TRANSLATE("Show files in Tracker"), new BMessage(MSG_SELECT_IN_TRACKER), 'K');
+		B_TRANSLATE("Show files in Tracker"),
+			new BMessage(MSG_SELECT_IN_TRACKER), 'K');
 
 	fCopyText = new BMenuItem(
 		B_TRANSLATE("Copy text to clipboard"), new BMessage(MSG_COPY_TEXT), 'B');
@@ -466,7 +467,8 @@ GrepWindow::_CreateMenus()
 		B_TRANSLATE("Look in sub-folders"), new BMessage(MSG_RECURSE_DIRS));
 
 	fSkipDotDirs = new BMenuItem(
-		B_TRANSLATE("Skip folders starting with a dot"), new BMessage(MSG_SKIP_DOT_DIRS));
+		B_TRANSLATE("Skip folders starting with a dot"),
+			new BMessage(MSG_SKIP_DOT_DIRS));
 
 	fCaseSensitive = new BMenuItem(
 		B_TRANSLATE("Case-sensitive"), new BMessage(MSG_CASE_SENSITIVE));
@@ -584,13 +586,13 @@ GrepWindow::_LayoutViews()
 	float menubarWidth, menubarHeight = 20;
 	fMenuBar->GetPreferredSize(&menubarWidth, &menubarHeight);
 
-	BBox *background = new BBox(
+	BBox* background = new BBox(
 		BRect(0, menubarHeight + 1, 2, menubarHeight + 2), B_EMPTY_STRING,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
 		B_PLAIN_BORDER);
 
-	BScrollView *scroller = new BScrollView(
+	BScrollView* scroller = new BScrollView(
 		"ScrollSearchResults", fSearchResults, B_FOLLOW_ALL_SIDES,
 		B_FULL_UPDATE_ON_RESIZE, true, true, B_NO_BORDER);
 
@@ -647,7 +649,7 @@ GrepWindow::_TileIfMultipleWindows()
 		be_app->Unlock();
 
 		if (windowCount > 1)
-			MoveBy(20,20);
+			MoveBy(20, 20);
 	}
 
 	BScreen screen(this);
@@ -658,7 +660,7 @@ GrepWindow::_TileIfMultipleWindows()
 		|| windowFrame.top > screenFrame.bottom
 		|| windowFrame.right < screenFrame.left
 		|| windowFrame.bottom < screenFrame.top)
-		MoveTo(50,50);
+		MoveTo(50, 50);
 }
 
 
@@ -976,7 +978,7 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 				#endif
 			}
 			TRACE_NM("path: %s\n", path.String());
-//message->PrintToStream();
+// message->PrintToStream();
 			break;
 		}
 
@@ -1102,7 +1104,7 @@ GrepWindow::_OnReportResult(BMessage* message)
 
 
 void
-GrepWindow::_OnReportError(BMessage *message)
+GrepWindow::_OnReportError(BMessage* message)
 {
 	const char* buf;
 	if (message->FindString("error", &buf) == B_OK)
@@ -1250,7 +1252,7 @@ GrepWindow::_OnInvokeItem()
 		// Get the line number.
 		// only this level has line numbers
 		if (level == 1) {
-			BStringItem *str = dynamic_cast<BStringItem*>(item);
+			BStringItem* str = dynamic_cast<BStringItem*>(item);
 			if (str != NULL) {
 				lineNum = atol(str->Text());
 					// fortunately, atol knows when to stop the conversion
@@ -1562,7 +1564,7 @@ GrepWindow::_OnOpenPanelCancel()
 
 
 void
-GrepWindow::_OnSelectAll(BMessage *message)
+GrepWindow::_OnSelectAll(BMessage* message)
 {
 	BMessenger messenger(fSearchResults);
 	messenger.SendMessage(B_SELECT_ALL);
@@ -1594,6 +1596,7 @@ GrepWindow::_ModelChanged()
 	_StopNodeMonitoring();
 	_SavePrefs();
 }
+
 
 bool
 GrepWindow::_OpenInPe(const entry_ref &ref, int32 lineNum)
@@ -1677,7 +1680,7 @@ GrepWindow::_OpenFoldersInTracker(BList* folderList)
 
 
 bool
-GrepWindow::_AreAllFoldersOpenInTracker(BList *folderList)
+GrepWindow::_AreAllFoldersOpenInTracker(BList* folderList)
 {
 	// Compare the folders we want open in Tracker to
 	// the actual Tracker windows currently open.
