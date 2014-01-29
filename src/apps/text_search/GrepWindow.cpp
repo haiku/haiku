@@ -397,8 +397,16 @@ GrepWindow::_SetWindowTitle()
 	BString title;
 	if (entry.InitCheck() == B_OK) {
 		BPath path;
-		if (entry.GetPath(&path) == B_OK)
-			title << B_TRANSLATE(APP_NAME) << ": " << path.Path();
+		if (entry.GetPath(&path) == B_OK) {
+			if (fOldPattern.Length()) {
+				title = B_TRANSLATE("%appname% : %path% : %searchtext%");
+				title.ReplaceAll("%searchtext%", fOldPattern.String()); 
+			} else
+				title = B_TRANSLATE("%appname% : %path%");
+
+			title.ReplaceAll("%appname%", B_TRANSLATE(APP_NAME));
+			title.ReplaceAll("%path%", path.Path());
+		}
 	}
 
 	if (!title.Length())
@@ -801,6 +809,8 @@ GrepWindow::_OnStartCancel()
 		// search pattern.
 
 		fOldPattern = fSearchText->Text();
+
+		_SetWindowTitle();
 
 		FileIterator* iterator = new (nothrow) InitialIterator(fModel);
 		fGrepper = new (nothrow) Grepper(fOldPattern.String(), fModel,
@@ -1491,6 +1501,7 @@ GrepWindow::_OnFileDrop(BMessage* message)
 	fModel->fSelectedFiles = *message;
 
 	fSearchResults->MakeEmpty();
+	fOldPattern = "";
 
 	_SetWindowTitle();
 }
@@ -1500,6 +1511,7 @@ void
 GrepWindow::_OnRefsReceived(BMessage* message)
 {
 	_OnFileDrop(message);
+	fOldPattern = "";
 	// It seems a B_CANCEL always follows a B_REFS_RECEIVED
 	// from a BFilePanel in Open mode.
 	//
