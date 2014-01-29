@@ -136,13 +136,13 @@ device_open(const char* name, uint32 /*flags*/, void** _cookie)
 		}
 	}
 
-	mutex_unlock(&gLock);
-
 	if (info->init_status == B_OK) {
 		info->open_count++;
 		*_cookie = info;
 	} else
 		ERROR("%s: initialization failed!\n", __func__);
+
+	mutex_unlock(&gLock);
 
 	return info->init_status;
 }
