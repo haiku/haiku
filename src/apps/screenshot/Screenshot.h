@@ -26,10 +26,10 @@ private:
 			void		_ShowHelp();
 			void		_New(bigtime_t delay);
 			status_t	_GetActiveWindowFrame();
-			int32		_GetImageType(const char* name) const;
-			
+			int32		_ImageType(const char* name) const;
+
+private:
 			Utility*	fUtility;
-			
 			bool		fLaunchGui;
 };
 

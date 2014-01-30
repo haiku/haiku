@@ -1,9 +1,11 @@
 /*
+ * Copyright 2010-2014, Haiku Inc. All rights reserved.
  * Copyright 2010 Wim van der Meer <WPJvanderMeer@gmail.com>
  * Copyright Karsten Heimrich, host.haiku@gmx.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Axel Dörfler
  *		Karsten Heimrich
  *		Fredrik Modéen
  *		Christophe Huriaux
@@ -31,14 +33,15 @@
 #include <Translator.h>
 #include <View.h>
 
+#include <AutoDeleter.h>
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Screenshot"
 
 
-const char* Utility::sDefaultFileNameBase =
-	B_TRANSLATE_MARK_COMMENT("screenshot",
-	"Base filename of screenshot files");
+const char* Utility::sDefaultFileNameBase = B_TRANSLATE_MARK_COMMENT(
+	"screenshot", "Base filename of screenshot files");
 
 
 Utility::Utility()
@@ -64,7 +67,7 @@ Utility::CopyToClipboard(const BBitmap& screenshot) const
 	if (be_clipboard->Lock()) {
 		be_clipboard->Clear();
 		BMessage* clipboard = be_clipboard->Data();
-		if (clipboard) {
+		if (clipboard != NULL) {
 			BMessage* bitmap = new BMessage();
 			screenshot.Archive(bitmap);
 			clipboard->AddMessage("image/bitmap", bitmap);
@@ -75,13 +78,12 @@ Utility::CopyToClipboard(const BBitmap& screenshot) const
 }
 
 
-/*!
-	Save the screenshot to the file with the specified filename and type.
+/*!	Save the screenshot to the file with the specified filename and type.
 	Note that any existing file with the same filename will be overwritten
 	without warning.
 */
 status_t
-Utility::Save(BBitmap** screenshot, const char* fileName, uint32 imageType)
+Utility::Save(BBitmap* screenshot, const char* fileName, uint32 imageType)
 	const
 {
 	BString fileNameString(fileName);
@@ -94,7 +96,7 @@ Utility::Save(BBitmap** screenshot, const char* fileName, uint32 imageType)
 
 		BEntry entry;
 		int32 index = 1;
-		BString extension = GetFileNameExtension(imageType);
+		BString extension = FileNameExtension(imageType);
 		do {
 			fileNameString.SetTo(homePath.Path());
 			fileNameString << "/" << B_TRANSLATE_NOCOLLECT(sDefaultFileNameBase)
@@ -109,18 +111,22 @@ Utility::Save(BBitmap** screenshot, const char* fileName, uint32 imageType)
 		return B_ERROR;
 
 	// Write the screenshot bitmap to the file
-	BBitmapStream stream(*screenshot);
+	BBitmapStream stream(screenshot);
 	BTranslatorRoster* roster = BTranslatorRoster::Default();
-	roster->Translate(&stream, NULL, NULL, &file, imageType,
+	status_t status = roster->Translate(&stream, NULL, NULL, &file, imageType,
 		B_TRANSLATOR_BITMAP);
-	*screenshot = NULL;
 
-	// Set the file MIME attribute
+	BBitmap* bitmap;
+	stream.DetachBitmap(&bitmap);
+		// The stream takes over ownership of the bitmap
+
+	if (status != B_OK)
+		return status;
+
+	// Set the file MIME attribute (don't mind too much if this fails)
 	BNodeInfo nodeInfo(&file);
-	if (nodeInfo.InitCheck() != B_OK)
-		return B_ERROR;
-
-	nodeInfo.SetType(_GetMimeString(imageType));
+	if (nodeInfo.InitCheck() == B_OK)
+		nodeInfo.SetType(_MimeType(imageType));
 
 	return B_OK;
 }
@@ -160,20 +166,20 @@ Utility::MakeScreenshot(bool includeMouse, bool activeWindow,
 	BBitmap* screenshot = NULL;
 
 	if (activeWindow && activeWindowFrame.IsValid()) {
-
 		BRect frame(activeWindowFrame);
 		if (includeBorder) {
 			frame.InsetBy(-borderSize, -borderSize);
 			frame.top -= tabFrame.bottom - tabFrame.top;
 		}
 
-		screenshot = new BBitmap(frame.OffsetToCopy(B_ORIGIN), B_RGBA32, true);
+		screenshot = new BBitmap(frame.OffsetToCopy(B_ORIGIN),
+			includeBorder ? B_RGBA32 : B_RGB32, true);
 
 		if (screenshot->ImportBits(wholeScreen->Bits(),
-			wholeScreen->BitsLength(), wholeScreen->BytesPerRow(),
-			wholeScreen->ColorSpace(), frame.LeftTop(),
-			BPoint(0, 0), frame.IntegerWidth() + 1,
-			frame.IntegerHeight() + 1) != B_OK) {
+				wholeScreen->BitsLength(), wholeScreen->BytesPerRow(),
+				wholeScreen->ColorSpace(), frame.LeftTop(),
+				BPoint(0, 0), frame.IntegerWidth() + 1,
+				frame.IntegerHeight() + 1) != B_OK) {
 			delete screenshot;
 			return NULL;
 		}
@@ -188,35 +194,36 @@ Utility::MakeScreenshot(bool includeMouse, bool activeWindow,
 
 
 BString
-Utility::GetFileNameExtension(uint32 imageType) const
+Utility::FileNameExtension(uint32 imageType) const
 {
-	BMimeType mimeType(_GetMimeString(imageType));
-	BString extension("");
+	BMimeType mimeType(_MimeType(imageType));
 
 	BMessage message;
 	if (mimeType.GetFileExtensions(&message) == B_OK) {
-		const char* ext;
-		if (message.FindString("extensions", 0, &ext) == B_OK) {
-			extension.SetTo(ext);
+		BString extension;
+		if (message.FindString("extensions", 0, &extension) == B_OK) {
 			extension.Prepend(".");
-		} else
-			extension.SetTo("");
+			return extension;
+		}
 	}
 
-	return extension;
+	return "";
 }
 
 
-BString
-Utility::_GetMimeString(uint32 imageType) const
+status_t
+Utility::FindTranslator(uint32 imageType, translator_id& id,
+	BString* _mimeType) const
 {
-	const char *dummy = "";
 	translator_id* translators = NULL;
 	int32 numTranslators = 0;
+
 	BTranslatorRoster* roster = BTranslatorRoster::Default();
 	status_t status = roster->GetAllTranslators(&translators, &numTranslators);
 	if (status != B_OK)
-		return dummy;
+		return status;
+
+	ArrayDeleter<translator_id> deleter(translators);
 
 	for (int32 x = 0; x < numTranslators; x++) {
 		const translation_format* formats = NULL;
@@ -226,23 +233,46 @@ Utility::_GetMimeString(uint32 imageType) const
 				== B_OK) {
 			for (int32 i = 0; i < numFormats; ++i) {
 				if (formats[i].type == imageType) {
-					delete [] translators;
-					return formats[i].MIME;
+					id = translators[x];
+					if (_mimeType != NULL)
+						*_mimeType = formats[i].MIME;
+					return B_OK;
 				}
 			}
 		}
 	}
-	delete [] translators;
-	return dummy;
+
+	return B_ERROR;
 }
 
 
+BString
+Utility::_MimeType(uint32 imageType) const
+{
+	translator_id id;
+	BString type;
+	FindTranslator(imageType, id, &type);
+	return type;
+}
+
+
+/*!	Makes the space around the tab transparent, and also makes sure that the
+	contents of the window aren't, as the screen does not have an alpha channel.
+*/
 void
 Utility::_MakeTabSpaceTransparent(BBitmap* screenshot, BRect frame) const
 {
 	if (!frame.IsValid() || screenshot->ColorSpace() != B_RGBA32)
 		return;
 
+	// Set the transparency to opaque on the complete bitmap
+	uint8* pixel = (uint8*)screenshot->Bits();
+	uint32 count = screenshot->BitsLength();
+	for (uint32 i = 0; i < count; i += 4) {
+		pixel[i + 3] = 255;
+	}
+
+	// Then make the space around the tab transparent
 	if (!frame.Contains(tabFrame))
 		return;
 

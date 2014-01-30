@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010-2014, Haiku Inc. All rights reserved.
  * Copyright 2010 Wim van der Meer <WPJvanderMeer@gmail.com>
  * Distributed under the terms of the MIT License.
  */
@@ -9,9 +10,7 @@
 #include <Point.h>
 #include <Rect.h>
 #include <String.h>
-
-
-class BBitmap;
+#include <TranslatorRoster.h>
 
 
 // Command constant for sending utility data to the GUI app
@@ -24,11 +23,13 @@ public:
 						~Utility();
 
 			void		CopyToClipboard(const BBitmap& screenshot) const;
-			status_t	Save(BBitmap** screenshot, const char* fileName,
+			status_t	Save(BBitmap* screenshot, const char* fileName,
 							uint32 imageType) const;
 			BBitmap*	MakeScreenshot(bool includeCursor, bool activeWindow,
 							bool includeBorder) const;
-			BString		GetFileNameExtension(uint32 imageType) const;
+			BString		FileNameExtension(uint32 imageType) const;
+			status_t	FindTranslator(uint32 imageType, translator_id& id,
+							BString* _mimeType = NULL) const;
 
 			BBitmap*	wholeScreen;
 			BBitmap*	cursorBitmap;
@@ -43,7 +44,7 @@ public:
 private:
 			void		_MakeTabSpaceTransparent(BBitmap* screenshot,
 							BRect frame) const;
-			BString		_GetMimeString(uint32 imageType) const;
+			BString		_MimeType(uint32 imageType) const;
 };
 
 

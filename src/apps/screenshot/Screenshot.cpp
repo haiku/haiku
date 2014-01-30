@@ -63,22 +63,22 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 	for (int32 i = 0; i < argc; i++) {
 		if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
 			_ShowHelp();
-		else if (strcmp(argv[i], "-b") == 0 
+		else if (strcmp(argv[i], "-b") == 0
 			|| strcmp(argv[i], "--border") == 0)
 			includeBorder = true;
-		else if (strcmp(argv[i], "-m") == 0 
+		else if (strcmp(argv[i], "-m") == 0
 			|| strcmp(argv[i], "--mouse-pointer") == 0)
 			includeCursor = true;
-		else if (strcmp(argv[i], "-w") == 0 
+		else if (strcmp(argv[i], "-w") == 0
 			|| strcmp(argv[i], "--window") == 0)
 			grabActiveWindow = true;
-		else if (strcmp(argv[i], "-s") == 0 
+		else if (strcmp(argv[i], "-s") == 0
 			|| strcmp(argv[i], "--silent") == 0)
 			saveScreenshotSilent = true;
 		else if (strcmp(argv[i], "-f") == 0
 			|| strncmp(argv[i], "--format", 6) == 0
 			|| strncmp(argv[i], "--format=", 7) == 0)
-			imageFileType = _GetImageType(argv[i + 1]);
+			imageFileType = _ImageType(argv[i + 1]);
 		else if (strcmp(argv[i], "-d") == 0
 			|| strncmp(argv[i], "--delay", 7) == 0
 			|| strncmp(argv[i], "--delay=", 8) == 0) {
@@ -94,9 +94,9 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 				fLaunchGui = false;
 				return;
 			}
-		} else if (strcmp(argv[i], "-c") == 0 
+		} else if (strcmp(argv[i], "-c") == 0
 			|| strcmp(argv[i], "--clipboard") == 0)
-			copyToClipboard = true;			
+			copyToClipboard = true;
 		else if (i == argc - 1)
 			outputFilename = argv[i];
 	}
@@ -105,7 +105,7 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 
 	if (copyToClipboard || saveScreenshotSilent) {
 		fLaunchGui = false;
-		
+
 		BBitmap* screenshot = fUtility->MakeScreenshot(includeCursor,
 			grabActiveWindow, includeBorder);
 
@@ -114,9 +114,9 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 
 		if (copyToClipboard)
 			fUtility->CopyToClipboard(*screenshot);
-	
+
 		if (saveScreenshotSilent)
-			fUtility->Save(&screenshot, outputFilename, imageFileType);
+			fUtility->Save(screenshot, outputFilename, imageFileType);
 
 		delete screenshot;
 	}
@@ -219,7 +219,7 @@ Screenshot::_New(bigtime_t delay)
 	BPoint cursorHotSpot;
 	get_mouse(&fUtility->cursorPosition, NULL);
 	get_mouse_bitmap(&fUtility->cursorBitmap, &cursorHotSpot);
-	fUtility->cursorPosition -= cursorHotSpot;	
+	fUtility->cursorPosition -= cursorHotSpot;
 
 	// Put the mouse area in a bitmap
 	BRect bounds = fUtility->cursorBitmap->Bounds();
@@ -284,7 +284,7 @@ Screenshot::_GetActiveWindowFrame()
 		message.AddSpecifier("Active");
 		message.AddSpecifier("Window", index);
 		messenger.SendMessage(&message, &reply, B_INFINITE_TIMEOUT, 50000);
-		
+
 		if (reply.what == B_MESSAGE_NOT_UNDERSTOOD)
 			break;
 
@@ -346,7 +346,7 @@ Screenshot::_GetActiveWindowFrame()
 	fUtility->borderSize = windowInfo->border_size;
 
 	free(windowInfo);
-	
+
 	// Make sure that fActiveWindowFrame doesn't extend beyond the screen frame
 	BRect screenFrame(BScreen().Frame());
 	if (fUtility->activeWindowFrame.left < screenFrame.left)
@@ -363,24 +363,26 @@ Screenshot::_GetActiveWindowFrame()
 
 
 int32
-Screenshot::_GetImageType(const char* name) const
+Screenshot::_ImageType(const char* name) const
 {
-	if (strcmp(name, "bmp") == 0)
+	if (strcasecmp(name, "bmp") == 0)
 		return B_BMP_FORMAT;
-	else if (strcmp(name, "gif") == 0)
+	if (strcasecmp(name, "gif") == 0)
 		return B_GIF_FORMAT;
-	else if (strcmp(name, "jpg") == 0 || strcmp(name, "jpeg") == 0)
+	if (strcasecmp(name, "jpg") == 0 || strcmp(name, "jpeg") == 0)
 		return B_JPEG_FORMAT;
-	else if (strcmp(name, "ppm") == 0)
+	if (strcasecmp(name, "ppm") == 0)
 		return B_PPM_FORMAT;
-	else if (strcmp(name, "tga") == 0 || strcmp(name, "targa") == 0)
+	if (strcasecmp(name, "tga") == 0 || strcmp(name, "targa") == 0)
 		return B_TGA_FORMAT;
-	else if (strcmp(name, "tif") == 0 || strcmp(name, "tiff") == 0)
+	if (strcasecmp(name, "tif") == 0 || strcmp(name, "tiff") == 0)
 		return B_TIFF_FORMAT;
-	else {
-		return B_PNG_FORMAT;
-	}
+
+	return B_PNG_FORMAT;
 }
+
+
+// #pragma mark -
 
 
 int

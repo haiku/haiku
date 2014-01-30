@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010-2014, Haiku Inc. All rights reserved.
  * Copyright 2010 Wim van der Meer <WPJvanderMeer@gmail.com>
  * Copyright Karsten Heimrich, host.haiku@gmx.de.
  * All rights reserved. Distributed under the terms of the MIT License.
@@ -110,8 +111,8 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	:
 	BWindow(BRect(0, 0, 200.0, 100.0), B_TRANSLATE_SYSTEM_NAME("Screenshot"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AVOID_FRONT
-		| B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS
-		| B_CLOSE_ON_ESCAPE),
+			| B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS
+			| B_CLOSE_ON_ESCAPE),
 	fUtility(utility),
 	fDelayControl(NULL),
 	fScreenshot(NULL),
@@ -181,9 +182,10 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 		fTranslatorMenu);
 	menuFormat->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BButton* showSettings =  new BButton("", B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
-			new BMessage(kSettings));
-	showSettings->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
+	BButton* showSettings =  new BButton("",
+		B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), new BMessage(kSettings));
+	showSettings->SetExplicitAlignment(
+		BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
 
 	BBox* divider = new BBox(B_FANCY_BORDER, NULL);
 	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
@@ -195,7 +197,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	const float kLabelSpacing = be_control_look->DefaultLabelSpacing();
 
 	fPreview = new BView("preview", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
-	BBox *previewBox = new BBox(B_FANCY_BORDER, fPreview);
+	BBox* previewBox = new BBox(B_FANCY_BORDER, fPreview);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(kSpacing)
@@ -219,6 +221,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 					.Add(menuFormat->CreateLabelLayoutItem(), 0, 3)
 					.Add(menuFormat->CreateMenuBarLayoutItem(), 1, 3, 3, 1)
 				.End()
+				.AddStrut(kSpacing / 2)
 				.Add(showSettings)
 				.AddGlue()
 			.End()
@@ -337,7 +340,6 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 				BEntry entry(&ref, true);
 				if (entry.InitCheck() == B_OK) {
 					BPath path;
-					// Could return B_BUSY
 					if (entry.GetPath(&path) == B_OK) {
 						BString label(path.Path());
 						_AddItemToPathMenu(path.Path(), label, 3, true);
@@ -438,7 +440,6 @@ void
 ScreenshotWindow::_UpdatePreviewPanel()
 {
 	float height = 150.0f;
-
 	float width = (fScreenshot->Bounds().Width()
 		/ fScreenshot->Bounds().Height()) * height;
 
@@ -481,34 +482,35 @@ ScreenshotWindow::_SetupOutputPathMenu(const BMessage& settings)
 
 	BString label(B_TRANSLATE("Home folder"));
 	_AddItemToPathMenu(path.Path(), label, 0,
-		(path.Path() == lastSelectedPath), 'H');
+		path.Path() == lastSelectedPath, 'H');
 
 	path.Append("Desktop");
 	label.SetTo(B_TRANSLATE("Desktop"));
-	_AddItemToPathMenu(path.Path(), label, 0, (
-		path.Path() == lastSelectedPath), 'D');
+	_AddItemToPathMenu(path.Path(), label, 0,
+		path.Path() == lastSelectedPath, 'D');
 
 	find_directory(B_BEOS_ETC_DIRECTORY, &path);
 	path.Append("artwork");
 
 	label.SetTo(B_TRANSLATE("Artwork folder"));
 	_AddItemToPathMenu(path.Path(), label, 2,
-		(path.Path() == lastSelectedPath), 'A');
+		path.Path() == lastSelectedPath, 'A');
 
 	int32 i = 0;
 	BString userPath;
 	while (settings.FindString("path", ++i, &userPath) == B_OK) {
 		_AddItemToPathMenu(userPath.String(), userPath, 3,
-			(userPath == lastSelectedPath));
+			userPath == lastSelectedPath);
 	}
 
 	if (!fLastSelectedPath) {
 		if (settings.IsEmpty() || lastSelectedPath.Length() == 0) {
 			fOutputPathMenu->ItemAt(1)->SetMarked(true);
 			fLastSelectedPath = fOutputPathMenu->ItemAt(1);
-		} else
+		} else {
 			_AddItemToPathMenu(lastSelectedPath.String(), lastSelectedPath, 3,
 				true);
+		}
 	}
 
 	fOutputPathMenu->AddItem(new BSeparatorItem());
@@ -581,7 +583,7 @@ ScreenshotWindow::_SetupTranslatorMenu()
 	int32 imageFileType;
 	for (int32 i = 0; i < fTranslatorMenu->CountItems(); ++i) {
 		BMenuItem* item = fTranslatorMenu->ItemAt(i);
-		if (item && item->Message()) {
+		if (item != NULL && item->Message()) {
 			item->Message()->FindInt32("be:type", &imageFileType);
 			if (fImageFileType == imageFileType) {
 				item->SetMarked(true);
@@ -618,13 +620,13 @@ ScreenshotWindow::_SaveScreenshot()
 			B_TRANSLATE("Overwrite"),
 			NULL, B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 
-			overwriteAlert->SetShortcut(0, B_ESCAPE);
+		overwriteAlert->SetShortcut(0, B_ESCAPE);
 
-			if (overwriteAlert->Go() == 0)
-				return B_CANCELED;
+		if (overwriteAlert->Go() == 0)
+			return B_CANCELED;
 	}
 
-	return fUtility.Save(&fScreenshot, path.Path(), fImageFileType);
+	return fUtility.Save(fScreenshot, path.Path(), fImageFileType);
 }
 
 
@@ -635,62 +637,38 @@ ScreenshotWindow::_ShowSettings(bool activate)
 		return;
 
 	// Find a translator
-	translator_id translator = 0;
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
-	translator_id* translators = NULL;
-	int32 numTranslators = 0;
-	if (roster->GetAllTranslators(&translators, &numTranslators) != B_OK)
-		return;
-	bool foundTranslator = false;
-	for (int32 x = 0; x < numTranslators; x++) {
-		const translation_format* formats = NULL;
-		int32 numFormats;
-		if (roster->GetOutputFormats(translators[x], &formats,
-			&numFormats) == B_OK) {
-			for (int32 i = 0; i < numFormats; ++i) {
-				if (formats[i].type == static_cast<uint32>(fImageFileType)) {
-					translator = translators[x];
-					foundTranslator = true;
-					break;
-				}
-			}
-		}
-		if (foundTranslator)
-			break;
-	}
-	delete [] translators;
-	if (!foundTranslator)
+	translator_id translator;
+	if (fUtility.FindTranslator(fImageFileType, translator) != B_OK)
 		return;
 
 	// Create a window with a configuration view
-	BView *view;
+	BView* view;
 	BRect rect(0, 0, 239, 239);
 
-	status_t err = roster->MakeConfigurationView(translator, NULL, &view,
-		&rect);
-	if (err < B_OK || view == NULL) {
-		BAlert *alert = new BAlert(NULL, strerror(err), "OK");
+	status_t status = BTranslatorRoster::Default()->MakeConfigurationView(
+		translator, NULL, &view, &rect);
+	if (status != B_OK || view == NULL) {
+		// TODO: proper translation, better error dialog
+		BAlert* alert = new BAlert(NULL, strerror(status), "OK");
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
+	} else if (fSettingsWindow != NULL) {
+		fSettingsWindow->RemoveChild(fSettingsWindow->ChildAt(0));
+		float width, height;
+		view->GetPreferredSize(&width, &height);
+		fSettingsWindow->ResizeTo(width, height);
+		fSettingsWindow->AddChild(view);
+		if (activate)
+			fSettingsWindow->Activate();
 	} else {
-		if (fSettingsWindow) {
-			fSettingsWindow->RemoveChild(fSettingsWindow->ChildAt(0));
-			float width, height;
-			view->GetPreferredSize(&width, &height);
-			fSettingsWindow->ResizeTo(width, height);
-			fSettingsWindow->AddChild(view);
-			if (activate)
-				fSettingsWindow->Activate();
-		} else {
-			fSettingsWindow = new BWindow(rect,
-				B_TRANSLATE("Translator Settings"),
-				B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-				B_NOT_ZOOMABLE | B_NOT_RESIZABLE);
-			fSettingsWindow->AddFilter(new QuitMessageFilter(this));
-			fSettingsWindow->AddChild(view);
-			fSettingsWindow->CenterOnScreen();
-			fSettingsWindow->Show();
-		}
+		fSettingsWindow = new BWindow(rect,
+			B_TRANSLATE("Translator Settings"),
+			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+			B_NOT_ZOOMABLE | B_NOT_RESIZABLE);
+		fSettingsWindow->AddFilter(new QuitMessageFilter(this));
+		fSettingsWindow->AddChild(view);
+		fSettingsWindow->CenterOnScreen();
+		fSettingsWindow->Show();
 	}
 }
 
@@ -700,7 +678,7 @@ ScreenshotWindow::_FindValidFileName(const char* name)
 {
 	BString baseName(name);
 
-	if (fExtension.Compare(""))
+	if (!fExtension.IsEmpty())
 		baseName.RemoveLast(fExtension);
 
 	if (!fLastSelectedPath)
@@ -710,7 +688,7 @@ ScreenshotWindow::_FindValidFileName(const char* name)
 	if (orgPath == NULL)
 		return baseName;
 
-	fExtension = fUtility.GetFileNameExtension(fImageFileType);
+	fExtension = fUtility.FileNameExtension(fImageFileType);
 
 	BPath outputPath = orgPath;
 	BString fileName;
