@@ -276,7 +276,8 @@ MapDevice(DeviceInfo& di)
 			&(si.videoMemAddr));
 	}
 
-	TRACE("Video memory, area: %ld,  addr: 0x%lX\n", si.videoMemArea, (uint32)(si.videoMemAddr));
+	TRACE("Video memory, area: %ld,  addr: 0x%" B_PRIXADDR "\n",
+		si.videoMemArea, (addr_t)(si.videoMemAddr));
 
 	// If there was an error, delete other areas.
 	if (si.videoMemArea < 0) {
@@ -697,7 +698,8 @@ device_open(const char* name, uint32 /*flags*/, void** cookie)
 {
 	status_t status = B_OK;
 
-	TRACE("device_open() - name: %s, cookie: 0x%08lx)\n", name, (uint32)cookie);
+	TRACE("device_open() - name: %s, cookie: 0x%" B_PRIXADDR "\n", name,
+		(addr_t)cookie);
 
 	// Find the device name in the list of devices.
 
