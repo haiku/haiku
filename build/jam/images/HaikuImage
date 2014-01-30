@@ -115,13 +115,13 @@ SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix icmp6 ipv6 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
 	x86,x86_64 @{
-		vesa.accelerant intel_extreme.accelerant
+		intel_810.accelerant intel_extreme.accelerant matrox.accelerant
+		nvidia.accelerant radeon.accelerant
+		radeon_hd.accelerant vesa.accelerant
+		#via.accelerant vmware.accelerant
 	}@ # x86,x86_64
 	x86 @{
-		3dfx.accelerant ati.accelerant matrox.accelerant neomagic.accelerant
-		nvidia.accelerant intel_810.accelerant
-		radeon.accelerant radeon_hd.accelerant s3.accelerant
-		#via.accelerant vmware.accelerant
+		3dfx.accelerant ati.accelerant neomagic.accelerant s3.accelerant
 	}@ # x86
 ] ;
 SYSTEM_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator
@@ -173,11 +173,11 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ice1712 sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
 	x86,x86_64 @{
-		vesa intel_extreme
+		intel_810 intel_extreme matrox nvidia radeon radeon_hd vesa
+		#via vmware
 	}@ # x86,x86_64
 	x86 @{
-		ati 3dfx intel_810 matrox neomagic nvidia radeon radeon_hd
-		s3 #via vmware
+		3dfx ati neomagic s3
 	}@ # x86
 ] ;
 SYSTEM_ADD_ONS_DRIVERS_MIDI = emuxki ice1712 usb_midi ;
