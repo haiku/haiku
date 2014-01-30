@@ -541,7 +541,8 @@ device_open(const char* name, uint32 /*flags*/, void** cookie)
 {
 	status_t status = B_OK;
 
-	TRACE("device_open() - name: %s, cookie: 0x%08lx)\n", name, (uint32)cookie);
+	TRACE("device_open() - name: %s, cookie: 0x%" B_PRIXADDR "\n", name,
+		(addr_t)cookie);
 
 	// Find the device name in the list of devices.
 
@@ -642,8 +643,8 @@ device_ioctl(void* dev, uint32 msg, void* buffer, size_t bufferLength)
 {
 	DeviceInfo& di = *((DeviceInfo*)dev);
 
-	TRACE("device_ioctl(); ioctl: %lu, buffer: 0x%08lx, bufLen: %lu\n", msg,
-		(uint32)buffer, bufferLength);
+	TRACE("device_ioctl(); ioctl: %lu, buffer: 0x%" B_PRIXADDR ", "
+		"bufLen: %lu\n", msg, (addr_t)buffer, bufferLength);
 
 	switch (msg) {
 		case B_GET_ACCELERANT_SIGNATURE:
