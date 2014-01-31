@@ -3108,15 +3108,17 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 	fLines = new LineBuffer;
 	fStyles = new StyleBuffer(&font, initialColor);
 
-	fInstalledNavigateLinewiseShortcuts = false;
-	fInstalledNavigateWordwiseShortcuts = false;
-	fInstalledNavigateDocwiseShortcuts = false;
-	fInstalledNavigateToTopOrBottomShortcuts = false;
+	fInstalledNavigateCommandWordwiseShortcuts = false;
+	fInstalledNavigateOptionWordwiseShortcuts = false;
+	fInstalledNavigateOptionLinewiseShortcuts = false;
+	fInstalledNavigateCommandDocwiseShortcuts = false;
+	fInstalledNavigateHomeEndDocwiseShortcuts = false;
 
-	fInstalledSelectLinewiseShortcuts = false;
-	fInstalledSelectWordwiseShortcuts = false;
-	fInstalledSelectDocwiseShortcuts = false;
-	fInstalledSelectToTopOrBottomShortcuts = false;
+	fInstalledSelectCommandWordwiseShortcuts = false;
+	fInstalledSelectOptionWordwiseShortcuts = false;
+	fInstalledSelectOptionLinewiseShortcuts = false;
+	fInstalledSelectCommandDocwiseShortcuts = false;
+	fInstalledSelectHomeEndDocwiseShortcuts = false;
 
 	// We put these here instead of in the constructor initializer list
 	// to have less code duplication, and a single place where to do changes
@@ -3229,9 +3231,7 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelStart;
 			else {
-				if (commandKeyDown && !optionKeyDown && !controlKeyDown)
-					fCaretOffset = _PreviousLineStart(fCaretOffset);
-				else if (optionKeyDown && !commandKeyDown && !controlKeyDown)
+				if ((commandKeyDown || optionKeyDown) && !controlKeyDown)
 					fCaretOffset = _PreviousWordStart(fCaretOffset - 1);
 				else
 					fCaretOffset = _PreviousInitialByte(fCaretOffset);
@@ -3258,9 +3258,7 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelEnd;
 			else {
-				if (commandKeyDown && !controlKeyDown && !optionKeyDown)
-					fCaretOffset = _NextLineEnd(fCaretOffset);
-				else if (optionKeyDown && !controlKeyDown && !commandKeyDown)
+				if ((commandKeyDown || optionKeyDown) && !controlKeyDown)
 					fCaretOffset = _NextWordEnd(fCaretOffset);
 				else
 					fCaretOffset = _NextInitialByte(fCaretOffset);
@@ -3288,7 +3286,9 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelStart;
 			else {
-				if (commandKeyDown && !controlKeyDown && !optionKeyDown) {
+				if (optionKeyDown && !commandKeyDown && !controlKeyDown)
+					fCaretOffset = _PreviousLineStart(fCaretOffset);
+				else if (commandKeyDown && !optionKeyDown && !controlKeyDown) {
 					_ScrollTo(0, 0);
 					fCaretOffset = 0;
 				} else {
@@ -3330,7 +3330,9 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelEnd;
 			else {
-				if (commandKeyDown && !optionKeyDown && !controlKeyDown) {
+				if (optionKeyDown && !commandKeyDown && !controlKeyDown)
+					fCaretOffset = _NextLineEnd(fCaretOffset);
+				else if (commandKeyDown && !optionKeyDown && !controlKeyDown) {
 					_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
 					fCaretOffset = fText->Length();
 				} else {
@@ -4996,7 +4998,7 @@ BTextView::_Activate()
 			message->AddInt32("modifiers", B_COMMAND_KEY);
 			Window()->AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY, message, this);
 
-			fInstalledNavigateLinewiseShortcuts = true;
+			fInstalledNavigateCommandWordwiseShortcuts = true;
 		}
 		if (!Window()->HasShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY)
 			&& !Window()->HasShortcut(B_RIGHT_ARROW,
@@ -5013,7 +5015,7 @@ BTextView::_Activate()
 			Window()->AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY,
 				message, this);
 
-			fInstalledSelectLinewiseShortcuts = true;
+			fInstalledSelectCommandWordwiseShortcuts = true;
 		}
 
 		if (!Window()->HasShortcut(B_LEFT_ARROW, B_OPTION_KEY)
@@ -5028,7 +5030,7 @@ BTextView::_Activate()
 			message->AddInt32("modifiers", B_OPTION_KEY);
 			Window()->AddShortcut(B_RIGHT_ARROW, B_OPTION_KEY, message, this);
 
-			fInstalledNavigateWordwiseShortcuts = true;
+			fInstalledNavigateOptionWordwiseShortcuts = true;
 		}
 		if (!Window()->HasShortcut(B_LEFT_ARROW, B_OPTION_KEY | B_SHIFT_KEY)
 			&& !Window()->HasShortcut(B_RIGHT_ARROW,
@@ -5045,7 +5047,39 @@ BTextView::_Activate()
 			Window()->AddShortcut(B_RIGHT_ARROW, B_OPTION_KEY | B_SHIFT_KEY,
 				message, this);
 
-			fInstalledSelectWordwiseShortcuts = true;
+			fInstalledSelectOptionWordwiseShortcuts = true;
+		}
+
+		if (!Window()->HasShortcut(B_UP_ARROW, B_OPTION_KEY)
+			&& !Window()->HasShortcut(B_DOWN_ARROW, B_OPTION_KEY)) {
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_UP_ARROW);
+			message->AddInt32("modifiers", B_OPTION_KEY);
+			Window()->AddShortcut(B_UP_ARROW, B_OPTION_KEY, message, this);
+
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_DOWN_ARROW);
+			message->AddInt32("modifiers", B_OPTION_KEY);
+			Window()->AddShortcut(B_DOWN_ARROW, B_OPTION_KEY, message, this);
+
+			fInstalledNavigateOptionLinewiseShortcuts = true;
+		}
+		if (!Window()->HasShortcut(B_UP_ARROW, B_OPTION_KEY | B_SHIFT_KEY)
+			&& !Window()->HasShortcut(B_DOWN_ARROW,
+				B_OPTION_KEY | B_SHIFT_KEY)) {
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_UP_ARROW);
+			message->AddInt32("modifiers", B_OPTION_KEY | B_SHIFT_KEY);
+			Window()->AddShortcut(B_UP_ARROW, B_OPTION_KEY | B_SHIFT_KEY,
+				message, this);
+
+			message = new BMessage(kMsgNavigateArrow);
+			message->AddInt32("key", B_DOWN_ARROW);
+			message->AddInt32("modifiers", B_OPTION_KEY | B_SHIFT_KEY);
+			Window()->AddShortcut(B_DOWN_ARROW, B_OPTION_KEY | B_SHIFT_KEY,
+				message, this);
+
+			fInstalledSelectOptionLinewiseShortcuts = true;
 		}
 
 		if (!Window()->HasShortcut(B_UP_ARROW, B_COMMAND_KEY)
@@ -5060,7 +5094,7 @@ BTextView::_Activate()
 			message->AddInt32("modifiers", B_COMMAND_KEY);
 			Window()->AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY, message, this);
 
-			fInstalledNavigateDocwiseShortcuts = true;
+			fInstalledNavigateCommandDocwiseShortcuts = true;
 		}
 		if (!Window()->HasShortcut(B_UP_ARROW, B_COMMAND_KEY | B_SHIFT_KEY)
 			&& !Window()->HasShortcut(B_DOWN_ARROW,
@@ -5077,7 +5111,7 @@ BTextView::_Activate()
 			Window()->AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_SHIFT_KEY,
 				message, this);
 
-			fInstalledSelectDocwiseShortcuts = true;
+			fInstalledSelectCommandDocwiseShortcuts = true;
 		}
 
 		if (!Window()->HasShortcut(B_HOME, B_COMMAND_KEY)
@@ -5092,7 +5126,7 @@ BTextView::_Activate()
 			message->AddInt32("modifiers", B_COMMAND_KEY);
 			Window()->AddShortcut(B_END, B_COMMAND_KEY, message, this);
 
-			fInstalledNavigateToTopOrBottomShortcuts = true;
+			fInstalledNavigateHomeEndDocwiseShortcuts = true;
 		}
 		if (!Window()->HasShortcut(B_HOME, B_COMMAND_KEY | B_SHIFT_KEY)
 			&& !Window()->HasShortcut(B_END, B_COMMAND_KEY | B_SHIFT_KEY)) {
@@ -5108,7 +5142,7 @@ BTextView::_Activate()
 			Window()->AddShortcut(B_END, B_COMMAND_KEY | B_SHIFT_KEY,
 				message, this);
 
-			fInstalledSelectToTopOrBottomShortcuts = true;
+			fInstalledSelectHomeEndDocwiseShortcuts = true;
 		}
 	}
 }
@@ -5130,50 +5164,61 @@ BTextView::_Deactivate()
 		_HideCaret();
 
 	if (Window() != NULL) {
-		if (fInstalledNavigateLinewiseShortcuts) {
+		if (fInstalledNavigateCommandWordwiseShortcuts) {
 			Window()->RemoveShortcut(B_LEFT_ARROW, B_COMMAND_KEY);
 			Window()->RemoveShortcut(B_RIGHT_ARROW, B_COMMAND_KEY);
-			fInstalledNavigateLinewiseShortcuts = false;
+			fInstalledNavigateCommandWordwiseShortcuts = false;
 		}
-		if (fInstalledSelectLinewiseShortcuts) {
+		if (fInstalledSelectCommandWordwiseShortcuts) {
 			Window()->RemoveShortcut(B_LEFT_ARROW, B_COMMAND_KEY | B_SHIFT_KEY);
 			Window()->RemoveShortcut(B_RIGHT_ARROW,
 				B_COMMAND_KEY | B_SHIFT_KEY);
-			fInstalledSelectLinewiseShortcuts = false;
+			fInstalledSelectCommandWordwiseShortcuts = false;
 		}
 
-		if (fInstalledNavigateWordwiseShortcuts) {
+		if (fInstalledNavigateOptionWordwiseShortcuts) {
 			Window()->RemoveShortcut(B_LEFT_ARROW, B_OPTION_KEY);
 			Window()->RemoveShortcut(B_RIGHT_ARROW, B_OPTION_KEY);
-			fInstalledNavigateWordwiseShortcuts = false;
+			fInstalledNavigateOptionWordwiseShortcuts = false;
 		}
-		if (fInstalledSelectWordwiseShortcuts) {
+		if (fInstalledSelectOptionWordwiseShortcuts) {
 			Window()->RemoveShortcut(B_LEFT_ARROW, B_OPTION_KEY | B_SHIFT_KEY);
 			Window()->RemoveShortcut(B_RIGHT_ARROW, B_OPTION_KEY | B_SHIFT_KEY);
-			fInstalledSelectWordwiseShortcuts = false;
+			fInstalledSelectOptionWordwiseShortcuts = false;
 		}
 
-		if (fInstalledNavigateDocwiseShortcuts) {
+		if (fInstalledNavigateOptionLinewiseShortcuts) {
+			Window()->RemoveShortcut(B_UP_ARROW, B_OPTION_KEY);
+			Window()->RemoveShortcut(B_DOWN_ARROW, B_OPTION_KEY);
+			fInstalledNavigateOptionLinewiseShortcuts = false;
+		}
+		if (fInstalledSelectOptionLinewiseShortcuts) {
+			Window()->RemoveShortcut(B_UP_ARROW, B_OPTION_KEY | B_SHIFT_KEY);
+			Window()->RemoveShortcut(B_DOWN_ARROW, B_OPTION_KEY | B_SHIFT_KEY);
+			fInstalledSelectOptionLinewiseShortcuts = false;
+		}
+
+		if (fInstalledNavigateCommandDocwiseShortcuts) {
 			Window()->RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY);
 			Window()->RemoveShortcut(B_DOWN_ARROW, B_COMMAND_KEY);
-			fInstalledNavigateDocwiseShortcuts = false;
+			fInstalledNavigateCommandDocwiseShortcuts = false;
 		}
-		if (fInstalledSelectDocwiseShortcuts) {
+		if (fInstalledSelectCommandDocwiseShortcuts) {
 			Window()->RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY | B_SHIFT_KEY);
 			Window()->RemoveShortcut(B_DOWN_ARROW,
 				B_COMMAND_KEY | B_SHIFT_KEY);
-			fInstalledSelectDocwiseShortcuts = false;
+			fInstalledSelectCommandDocwiseShortcuts = false;
 		}
 
-		if (fInstalledNavigateToTopOrBottomShortcuts) {
+		if (fInstalledNavigateHomeEndDocwiseShortcuts) {
 			Window()->RemoveShortcut(B_HOME, B_COMMAND_KEY);
 			Window()->RemoveShortcut(B_END, B_COMMAND_KEY);
-			fInstalledNavigateToTopOrBottomShortcuts = false;
+			fInstalledNavigateHomeEndDocwiseShortcuts = false;
 		}
-		if (fInstalledSelectToTopOrBottomShortcuts) {
+		if (fInstalledSelectHomeEndDocwiseShortcuts) {
 			Window()->RemoveShortcut(B_HOME, B_COMMAND_KEY | B_SHIFT_KEY);
 			Window()->RemoveShortcut(B_END, B_COMMAND_KEY | B_SHIFT_KEY);
-			fInstalledSelectToTopOrBottomShortcuts = false;
+			fInstalledSelectHomeEndDocwiseShortcuts = false;
 		}
 	}
 }
