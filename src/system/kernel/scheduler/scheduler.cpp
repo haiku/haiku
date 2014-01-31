@@ -182,11 +182,11 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 	TRACE("changing thread %ld priority to %ld (old: %ld, effective: %ld)\n",
 		thread->id, priority, oldPriority, threadData->GetEffectivePriority());
 
+	thread->priority = priority;
 	threadData->CancelPenalty();
 
 	if (priority == thread->priority)
 		return thread->priority;
-	thread->priority = priority;
 
 	if (thread->state != B_THREAD_READY) {
 		if (thread->state == B_THREAD_RUNNING) {

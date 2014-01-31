@@ -48,8 +48,6 @@ public:
 
 	inline	int32		GetEffectivePriority() const;
 
-	inline	bool		IsCPUBound() const	{ return fCPUBound; }
-
 	inline	void		StartCPUTime();
 	inline	void		StopCPUTime();
 
@@ -109,15 +107,12 @@ private:
 
 			bigtime_t	fWentSleep;
 			bigtime_t	fWentSleepActive;
-			int32		fWentSleepCount;
-			int32		fWentSleepCountIdle;
 
 			bool		fEnqueued;
 			bool		fReady;
 
 			Thread*		fThread;
 
-			bool		fCPUBound;
 			int32		fPriorityPenalty;
 			int32		fAdditionalPenalty;
 
@@ -211,10 +206,8 @@ ThreadData::_IncreasePenalty()
 
 	int32 oldPenalty = fPriorityPenalty++;
 	const int kMinimalPriority = _GetMinimalPriority();
-	if (GetPriority() - oldPenalty <= kMinimalPriority) {
+	if (GetPriority() - oldPenalty <= kMinimalPriority)
 		fPriorityPenalty = oldPenalty;
-		fCPUBound = true;
-	}
 
 	_ComputeEffectivePriority();
 }
@@ -256,7 +249,6 @@ ThreadData::CancelPenalty()
 
 	int32 oldPenalty = fPriorityPenalty;
 	fPriorityPenalty = 0;
-	fCPUBound = false;
 
 	if (oldPenalty != 0) {
 		TRACE("cancelling thread %ld penalty\n", fThread->id);
@@ -272,13 +264,7 @@ ThreadData::ShouldCancelPenalty() const
 
 	if (fCore == NULL)
 		return false;
-
-	if (GetEffectivePriority() != B_LOWEST_ACTIVE_PRIORITY && !IsCPUBound()) {
-		if (fCore->StarvationCounter() != fWentSleepCount)
-			return true;
-	}
-
-	return fCore->StarvationCounterIdle() != fWentSleepCountIdle;
+	return system_time() - fWentSleep > gCurrentMode->base_quantum / 2;
 }
 
 
@@ -374,8 +360,6 @@ ThreadData::GoesAway()
 
 	fWentSleep = system_time();
 	fWentSleepActive = fCore->GetActiveTime();
-	fWentSleepCount = fCore->StarvationCounter();
-	fWentSleepCountIdle = fCore->StarvationCounterIdle();
 
 	if (gTrackCoreLoad)
 		fLoadMeasurementEpoch = fCore->RemoveLoad(fNeededLoad, false);

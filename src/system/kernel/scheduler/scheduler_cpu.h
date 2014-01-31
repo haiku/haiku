@@ -154,9 +154,6 @@ public:
 	inline				uint32			RemoveLoad(int32 load, bool force);
 	inline				void			ChangeLoad(int32 delta);
 
-	inline				int32			StarvationCounter() const;
-	inline				int32			StarvationCounterIdle() const;
-
 	inline				void			CPUGoesIdle(CPUEntry* cpu);
 	inline				void			CPUWakesUp(CPUEntry* cpu);
 
@@ -180,9 +177,6 @@ private:
 						int32			fIdleCPUCount;
 						CPUPriorityHeap	fCPUHeap;
 						spinlock		fCPULock;
-
-						int32			fStarvationCounter;
-						int32			fStarvationCounterIdle;
 
 						int32			fThreadCount;
 						ThreadRunQueue	fRunQueue;
@@ -454,22 +448,6 @@ CoreEntry::ChangeLoad(int32 delta)
 	_UpdateLoad();
 }
 
-	
-inline int32
-CoreEntry::StarvationCounter() const
-{
-	SCHEDULER_ENTER_FUNCTION();
-	return fStarvationCounter;
-}
-
-
-inline int32
-CoreEntry::StarvationCounterIdle() const
-{
-	SCHEDULER_ENTER_FUNCTION();
-	return fStarvationCounterIdle;
-}
-
 
 /* PackageEntry::CoreGoesIdle and PackageEntry::CoreWakesUp have to be defined
    before CoreEntry::CPUGoesIdle and CoreEntry::CPUWakesUp. If they weren't
@@ -521,9 +499,6 @@ PackageEntry::CoreWakesUp(CoreEntry* core)
 inline void
 CoreEntry::CPUGoesIdle(CPUEntry* /* cpu */)
 {
-	atomic_add(&fStarvationCounter, 1);
-	atomic_add(&fStarvationCounterIdle, 1);
-
 	if (gSingleCore)
 		return;
 

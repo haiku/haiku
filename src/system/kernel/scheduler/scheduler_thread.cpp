@@ -22,7 +22,6 @@ ThreadData::_InitBase()
 	fAdditionalPenalty = 0;
 	fEffectivePriority = GetPriority();
 	fBaseQuantum = sQuantumLengths[GetEffectivePriority()];
-	fCPUBound = false;
 
 	fTimeUsed = 0;
 	fStolenTime = 0;
@@ -35,8 +34,6 @@ ThreadData::_InitBase()
 
 	fWentSleep = 0;
 	fWentSleepActive = 0;
-	fWentSleepCount = 0;
-	fWentSleepCountIdle = 0;
 
 	fEnqueued = false;
 	fReady = false;
@@ -144,7 +141,6 @@ ThreadData::Dump() const
 	kprintf("\tneeded_load:\t\t%" B_PRId32 "%%\n", fNeededLoad / 10);
 	kprintf("\twent_sleep:\t\t%" B_PRId64 "\n", fWentSleep);
 	kprintf("\twent_sleep_active:\t%" B_PRId64 "\n", fWentSleepActive);
-	kprintf("\twent_sleep_count:\t%" B_PRId32 "\n", fWentSleepCount);
 	kprintf("\tcore:\t\t\t%" B_PRId32 "\n",
 		fCore != NULL ? fCore->ID() : -1);
 	if (fCore != NULL && HasCacheExpired())

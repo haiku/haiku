@@ -361,8 +361,6 @@ CoreEntry::CoreEntry()
 	:
 	fCPUCount(0),
 	fIdleCPUCount(0),
-	fStarvationCounter(0),
-	fStarvationCounterIdle(0),
 	fThreadCount(0),
 	fActiveTime(0),
 	fLoad(0),
@@ -411,14 +409,10 @@ CoreEntry::Remove(ThreadData* thread)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
+	ASSERT(!thread->IsIdle());
+
 	ASSERT(thread->IsEnqueued());
 	thread->SetDequeued();
-
-	ASSERT(!thread_is_idle_thread(thread->GetThread()));
-	if (thread->GetEffectivePriority() == B_LOWEST_ACTIVE_PRIORITY
-		|| thread->IsCPUBound()) {
-		atomic_add(&fStarvationCounter, 1);
-	}
 
 	fRunQueue.Remove(thread);
 	atomic_add(&fThreadCount, -1);
