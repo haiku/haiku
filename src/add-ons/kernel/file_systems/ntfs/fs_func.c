@@ -1466,11 +1466,11 @@ fs_readlink(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t *bufferSize)
 		goto exit;
 	}
 
-	TRACE("fs_readlink - LINK:[%s]\n", buffer);
-
 	strlcpy(buffer, tempBuffer, *bufferSize);
 
 	*bufferSize = l + 1;
+
+	TRACE("fs_readlink - LINK:[%s]\n", buffer);
 
 	result = B_NO_ERROR;
 
