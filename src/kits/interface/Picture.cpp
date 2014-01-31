@@ -436,6 +436,8 @@ BPicture::_Upload()
 		BPicture *picture = fExtent->PictureAt(i);
 		if (picture)
 			link.Attach<int32>(picture->fToken);
+		else
+			link.Attach<int32>(-1);
 	}
 	link.Attach<int32>(fExtent->Size());
 	link.Attach(fExtent->Data(), fExtent->Size());
