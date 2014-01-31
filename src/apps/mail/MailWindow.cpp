@@ -343,14 +343,11 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	if (!fIncoming) {
 		menu->AddSeparatorItem();
 		fQuote = new BMenuItem(B_TRANSLATE("Quote"),
-			new BMessage(M_QUOTE), ']');
+			new BMessage(M_QUOTE), '\'');
 		menu->AddItem(fQuote);
-		AddShortcut(']', B_OPTION_KEY, new BMessage(M_QUOTE));
-
 		fRemoveQuote = new BMenuItem(B_TRANSLATE("Remove quote"),
-			new BMessage(M_REMOVE_QUOTE), '[');
+			new BMessage(M_REMOVE_QUOTE), '\'', B_SHIFT_KEY);
 		menu->AddItem(fRemoveQuote);
-		AddShortcut('[', B_OPTION_KEY, new BMessage(M_REMOVE_QUOTE));
 
 		menu->AddSeparatorItem();
 		fSpelling = new BMenuItem(B_TRANSLATE("Check spelling"),
