@@ -1469,7 +1469,6 @@ fs_readlink(fs_volume *_vol, fs_vnode *_node, char *buffer, size_t *bufferSize)
 	TRACE("fs_readlink - LINK:[%s]\n", buffer);
 
 	strlcpy(buffer, tempBuffer, *bufferSize);
-	free(tempBuffer);
 
 	*bufferSize = l + 1;
 
@@ -1481,6 +1480,8 @@ exit:
 		ntfs_attr_close(na);
 	if (ni != NULL)
 		ntfs_inode_close(ni);
+	if (tempBuffer != NULL)
+		free(tempBuffer);
 
 	TRACE("fs_readlink - EXIT, result is %s\n", strerror(result));
 
