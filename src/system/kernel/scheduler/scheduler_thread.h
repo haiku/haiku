@@ -131,6 +131,7 @@ private:
 			bigtime_t	fLastMeasureAvailableTime;
 
 			int32		fNeededLoad;
+			uint32		fLoadMeasurementEpoch;
 
 			CoreEntry*	fCore;
 };
@@ -377,7 +378,7 @@ ThreadData::GoesAway()
 	fWentSleepCountIdle = fCore->StarvationCounterIdle();
 
 	if (gTrackCoreLoad)
-		fCore->UpdateLoad(-fNeededLoad);
+		fLoadMeasurementEpoch = fCore->RemoveLoad(fNeededLoad, false);
 	fReady = false;
 }
 
@@ -389,7 +390,7 @@ ThreadData::Dies()
 
 	ASSERT(fReady);
 	if (gTrackCoreLoad)
-		fCore->UpdateLoad(-fNeededLoad);
+		fCore->RemoveLoad(fNeededLoad, true);
 	fReady = false;
 }
 
@@ -428,8 +429,10 @@ ThreadData::Enqueue()
 	if (!fReady) {
 		if (gTrackCoreLoad) {
 			bigtime_t timeSlept = system_time() - fWentSleep;
-			fCore->UpdateLoad(fNeededLoad);
-			if (timeSlept > 0) {
+			bool updateLoad = timeSlept > 0;
+
+			fCore->AddLoad(fNeededLoad, fLoadMeasurementEpoch, !updateLoad);
+			if (updateLoad) {
 				fMeasureAvailableTime += timeSlept;
 				_ComputeNeededLoad();
 			}

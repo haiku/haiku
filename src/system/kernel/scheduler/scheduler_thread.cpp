@@ -102,6 +102,7 @@ ThreadData::Init()
 	Thread* currentThread = thread_get_current_thread();
 	ThreadData* currentThreadData = currentThread->scheduler_data;
 	fCore = currentThreadData->fCore;
+	fLoadMeasurementEpoch = fCore->LoadMeasurementEpoch() - 1;
 
 	if (!IsRealTime()) {
 		fPriorityPenalty = std::min(currentThreadData->fPriorityPenalty,
@@ -170,9 +171,13 @@ ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 	ASSERT(targetCore != NULL);
 	ASSERT(targetCPU != NULL);
 
-	if (fReady && fCore != targetCore && fCore != NULL) {
-		fCore->UpdateLoad(-fNeededLoad);
-		targetCore->UpdateLoad(fNeededLoad);
+	if (fCore != targetCore) {
+		fLoadMeasurementEpoch = targetCore->LoadMeasurementEpoch() - 1;
+		if (fReady) {
+			if (fCore != NULL)
+				fCore->RemoveLoad(fNeededLoad, true);
+			targetCore->AddLoad(fNeededLoad, fLoadMeasurementEpoch, true);
+		}	
 	}
 
 	fCore = targetCore;
@@ -262,14 +267,14 @@ void
 ThreadData::_ComputeNeededLoad()
 {
 	SCHEDULER_ENTER_FUNCTION();
+	ASSERT(!IsIdle());
 
 	int32 oldLoad = compute_load(fLastMeasureAvailableTime,
 		fMeasureAvailableActiveTime, fNeededLoad, fMeasureAvailableTime);
 	if (oldLoad < 0 || oldLoad == fNeededLoad)
 		return;
 
-	int32 delta = fNeededLoad - oldLoad;
-	fCore->UpdateLoad(delta);
+	fCore->ChangeLoad(fNeededLoad - oldLoad);
 }
 
 

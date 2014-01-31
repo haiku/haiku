@@ -39,7 +39,16 @@ class Scheduler::DebugDumper {
 public:
 	static	void		DumpCPURunQueue(CPUEntry* cpu);
 	static	void		DumpCoreRunQueue(CoreEntry* core);
+	static	void		DumpCoreLoadHeapEntry(CoreEntry* core);
 	static	void		DumpIdleCoresInPackage(PackageEntry* package);
+
+private:
+	struct CoreThreadsData {
+			CoreEntry*	fCore;
+			int32		fLoad;
+	};
+
+	static	void		_AnalyzeCoreThreads(Thread* thread, void* data);
 };
 
 
@@ -357,12 +366,15 @@ CoreEntry::CoreEntry()
 	fThreadCount(0),
 	fActiveTime(0),
 	fLoad(0),
+	fCurrentLoad(0),
+	fLoadMeasurementEpoch(0),
 	fHighLoad(false),
 	fLastLoadUpdate(0)
 {
 	B_INITIALIZE_SPINLOCK(&fCPULock);
 	B_INITIALIZE_SPINLOCK(&fQueueLock);
 	B_INITIALIZE_SEQLOCK(&fActiveTimeLock);
+	B_INITIALIZE_RW_SPINLOCK(&fLoadLock);
 }
 
 
@@ -414,67 +426,6 @@ CoreEntry::Remove(ThreadData* thread)
 
 
 void
-CoreEntry::UpdateLoad(int32 delta)
-{
-	SCHEDULER_ENTER_FUNCTION();
-
-	ASSERT(gTrackCoreLoad);
-
-	if (fCPUCount <= 0)
-		return;
-
-	atomic_add(&fLoad, delta);
-
-	bigtime_t now = system_time();
-	if (now < kLoadMeasureInterval + fLastLoadUpdate)
-		return;
-	if (!try_acquire_write_spinlock(&gCoreHeapsLock))
-		return;
-	WriteSpinLocker coreLocker(gCoreHeapsLock, true);
-
-	fLastLoadUpdate = now;
-
-	int32 newKey = GetLoad();
-	int32 oldKey = CoreLoadHeap::GetKey(this);
-
-	ASSERT(oldKey >= 0);
-	ASSERT(newKey >= 0);
-
-	if (oldKey == newKey)
-		return;
-
-	if (newKey > kHighLoad) {
-		if (!fHighLoad) {
-			gCoreLoadHeap.ModifyKey(this, -1);
-			ASSERT(gCoreLoadHeap.PeekMinimum() == this);
-			gCoreLoadHeap.RemoveMinimum();
-
-			gCoreHighLoadHeap.Insert(this, newKey);
-
-			fHighLoad = true;
-		} else
-			gCoreHighLoadHeap.ModifyKey(this, newKey);
-	} else if (newKey < kMediumLoad) {
-		if (fHighLoad) {
-			gCoreHighLoadHeap.ModifyKey(this, -1);
-			ASSERT(gCoreHighLoadHeap.PeekMinimum() == this);
-			gCoreHighLoadHeap.RemoveMinimum();
-
-			gCoreLoadHeap.Insert(this, newKey);
-
-			fHighLoad = false;
-		} else
-			gCoreLoadHeap.ModifyKey(this, newKey);
-	} else {
-		if (fHighLoad)
-			gCoreHighLoadHeap.ModifyKey(this, newKey);
-		else
-			gCoreLoadHeap.ModifyKey(this, newKey);
-	}
-}
-
-
-void
 CoreEntry::AddCPU(CPUEntry* cpu)
 {
 	ASSERT(fCPUCount >= 0);
@@ -484,6 +435,7 @@ CoreEntry::AddCPU(CPUEntry* cpu)
 	if (fCPUCount++ == 0) {
 		// core has been reenabled
 		fLoad = 0;
+		fCurrentLoad = 0;
 		fHighLoad = false;
 		gCoreLoadHeap.Insert(this, 0);
 
@@ -540,6 +492,69 @@ CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 }
 
 
+void
+CoreEntry::_UpdateLoad()
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	if (fCPUCount <= 0)
+		return;
+
+	bigtime_t now = system_time();
+	if (now < kLoadMeasureInterval + fLastLoadUpdate)
+		return;
+	if (!try_acquire_write_spinlock(&gCoreHeapsLock))
+		return;
+	WriteSpinLocker coreLocker(gCoreHeapsLock, true);
+	WriteSpinLocker locker(fLoadLock);
+
+	int32 newKey = GetLoad();
+	int32 oldKey = CoreLoadHeap::GetKey(this);
+
+	ASSERT(oldKey >= 0);
+	ASSERT(newKey >= 0);
+
+	ASSERT(fCurrentLoad >= 0);
+	ASSERT(fLoad >= fCurrentLoad);
+
+	fLoad = fCurrentLoad;
+	fLoadMeasurementEpoch++;
+	fLastLoadUpdate = now;
+
+	if (oldKey == newKey)
+		return;
+
+	if (newKey > kHighLoad) {
+		if (!fHighLoad) {
+			gCoreLoadHeap.ModifyKey(this, -1);
+			ASSERT(gCoreLoadHeap.PeekMinimum() == this);
+			gCoreLoadHeap.RemoveMinimum();
+
+			gCoreHighLoadHeap.Insert(this, newKey);
+
+			fHighLoad = true;
+		} else
+			gCoreHighLoadHeap.ModifyKey(this, newKey);
+	} else if (newKey < kMediumLoad) {
+		if (fHighLoad) {
+			gCoreHighLoadHeap.ModifyKey(this, -1);
+			ASSERT(gCoreHighLoadHeap.PeekMinimum() == this);
+			gCoreHighLoadHeap.RemoveMinimum();
+
+			gCoreLoadHeap.Insert(this, newKey);
+
+			fHighLoad = false;
+		} else
+			gCoreLoadHeap.ModifyKey(this, newKey);
+	} else {
+		if (fHighLoad)
+			gCoreHighLoadHeap.ModifyKey(this, newKey);
+		else
+			gCoreLoadHeap.ModifyKey(this, newKey);
+	}
+}
+
+
 /* static */ void
 CoreEntry::_UnassignThread(Thread* thread, void* data)
 {
@@ -565,8 +580,7 @@ CoreLoadHeap::Dump()
 	while (entry) {
 		int32 key = GetKey(entry);
 
-		kprintf("%4" B_PRId32 " %3" B_PRId32 "%% %7" B_PRId32 "\n", entry->ID(),
-			entry->GetLoad() / 10, entry->ThreadCount());
+		DebugDumper::DumpCoreLoadHeapEntry(entry);
 
 		RemoveMinimum();
 		sDebugCoreHeap.Insert(entry, key);
@@ -645,6 +659,21 @@ DebugDumper::DumpCoreRunQueue(CoreEntry* core)
 
 
 /* static */ void
+DebugDumper::DumpCoreLoadHeapEntry(CoreEntry* entry)
+{
+	CoreThreadsData threadsData;
+	threadsData.fCore = entry;
+	threadsData.fLoad = 0;
+	thread_map(DebugDumper::_AnalyzeCoreThreads, &threadsData);
+
+	kprintf("%4" B_PRId32 " %11" B_PRId32 "%% %11" B_PRId32 "%% %11" B_PRId32
+		"%% %7" B_PRId32 " %5" B_PRIu32 "\n", entry->ID(), entry->fLoad / 10,
+		entry->fCurrentLoad / 10, threadsData.fLoad, entry->ThreadCount(),
+		entry->fLoadMeasurementEpoch);
+}
+
+
+/* static */ void
 DebugDumper::DumpIdleCoresInPackage(PackageEntry* package)
 {
 	kprintf("%-7" B_PRId32 " ", package->fPackageID);
@@ -660,6 +689,15 @@ DebugDumper::DumpIdleCoresInPackage(PackageEntry* package)
 	} else
 		kprintf("-");
 	kprintf("\n");
+}
+
+
+/* static */ void
+DebugDumper::_AnalyzeCoreThreads(Thread* thread, void* data)
+{
+	CoreThreadsData* threadsData = static_cast<CoreThreadsData*>(data);
+	if (thread->scheduler_data->Core() == threadsData->fCore)
+		threadsData->fLoad += thread->scheduler_data->GetLoad();
 }
 
 
@@ -684,7 +722,7 @@ dump_run_queue(int /* argc */, char** /* argv */)
 static int
 dump_cpu_heap(int /* argc */, char** /* argv */)
 {
-	kprintf("core load threads\n");
+	kprintf("core average_load current_load threads_load threads epoch\n");
 	gCoreLoadHeap.Dump();
 	kprintf("\n");
 	gCoreHighLoadHeap.Dump();

@@ -146,7 +146,13 @@ public:
 											bigtime_t activeTime);
 
 	inline				int32			GetLoad() const;
-						void			UpdateLoad(int32 delta);
+	inline				uint32			LoadMeasurementEpoch() const
+											{ return fLoadMeasurementEpoch; }
+
+	inline				void			AddLoad(int32 load, uint32 epoch,
+											bool updateLoad);
+	inline				uint32			RemoveLoad(int32 load, bool force);
+	inline				void			ChangeLoad(int32 delta);
 
 	inline				int32			StarvationCounter() const;
 	inline				int32			StarvationCounterIdle() const;
@@ -162,6 +168,8 @@ public:
 	static inline		CoreEntry*		GetCore(int32 cpu);
 
 private:
+						void			_UpdateLoad();
+
 	static				void			_UnassignThread(Thread* thread,
 											void* core);
 
@@ -184,8 +192,11 @@ private:
 	mutable				seqlock			fActiveTimeLock;
 
 						int32			fLoad;
+						int32			fCurrentLoad;
+						uint32			fLoadMeasurementEpoch;
 						bool			fHighLoad;
 						bigtime_t		fLastLoadUpdate;
+						rw_spinlock		fLoadLock;
 
 						friend class DebugDumper;
 } CACHE_LINE_ALIGN;
@@ -388,6 +399,62 @@ CoreEntry::GetLoad() const
 }
 
 
+inline void
+CoreEntry::AddLoad(int32 load, uint32 epoch, bool updateLoad)
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	ASSERT(gTrackCoreLoad);
+	ASSERT(load >= 0 && load <= kMaxLoad);
+
+	ReadSpinLocker locker(fLoadLock);
+	atomic_add(&fCurrentLoad, load);
+	if (fLoadMeasurementEpoch != epoch)
+		atomic_add(&fLoad, load);
+	locker.Unlock();
+
+	if (updateLoad)
+		_UpdateLoad();
+}
+
+
+inline uint32
+CoreEntry::RemoveLoad(int32 load, bool force)
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	ASSERT(gTrackCoreLoad);
+	ASSERT(load >= 0 && load <= kMaxLoad);
+
+	ReadSpinLocker locker(fLoadLock);
+	atomic_add(&fCurrentLoad, -load);
+	if (force) {
+		atomic_add(&fLoad, -load);
+		locker.Unlock();
+
+		_UpdateLoad();
+	}
+	return fLoadMeasurementEpoch;
+}
+
+
+inline void
+CoreEntry::ChangeLoad(int32 delta)
+{
+	SCHEDULER_ENTER_FUNCTION();
+
+	ASSERT(gTrackCoreLoad);
+	ASSERT(delta >= -kMaxLoad && delta <= kMaxLoad);
+
+	ReadSpinLocker locker(fLoadLock);
+	atomic_add(&fCurrentLoad, delta);
+	atomic_add(&fLoad, delta);
+	locker.Unlock();
+
+	_UpdateLoad();
+}
+
+	
 inline int32
 CoreEntry::StarvationCounter() const
 {
