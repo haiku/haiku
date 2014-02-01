@@ -3111,13 +3111,11 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 	fInstalledNavigateCommandWordwiseShortcuts = false;
 	fInstalledNavigateOptionWordwiseShortcuts = false;
 	fInstalledNavigateOptionLinewiseShortcuts = false;
-	fInstalledNavigateCommandDocwiseShortcuts = false;
 	fInstalledNavigateHomeEndDocwiseShortcuts = false;
 
 	fInstalledSelectCommandWordwiseShortcuts = false;
 	fInstalledSelectOptionWordwiseShortcuts = false;
 	fInstalledSelectOptionLinewiseShortcuts = false;
-	fInstalledSelectCommandDocwiseShortcuts = false;
 	fInstalledSelectHomeEndDocwiseShortcuts = false;
 
 	// We put these here instead of in the constructor initializer list
@@ -5082,38 +5080,6 @@ BTextView::_Activate()
 			fInstalledSelectOptionLinewiseShortcuts = true;
 		}
 
-		if (!Window()->HasShortcut(B_UP_ARROW, B_COMMAND_KEY)
-			&& !Window()->HasShortcut(B_DOWN_ARROW, B_COMMAND_KEY)) {
-			message = new BMessage(kMsgNavigateArrow);
-			message->AddInt32("key", B_UP_ARROW);
-			message->AddInt32("modifiers", B_COMMAND_KEY);
-			Window()->AddShortcut(B_UP_ARROW, B_COMMAND_KEY, message, this);
-
-			message = new BMessage(kMsgNavigateArrow);
-			message->AddInt32("key", B_DOWN_ARROW);
-			message->AddInt32("modifiers", B_COMMAND_KEY);
-			Window()->AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY, message, this);
-
-			fInstalledNavigateCommandDocwiseShortcuts = true;
-		}
-		if (!Window()->HasShortcut(B_UP_ARROW, B_COMMAND_KEY | B_SHIFT_KEY)
-			&& !Window()->HasShortcut(B_DOWN_ARROW,
-				B_COMMAND_KEY | B_SHIFT_KEY)) {
-			message = new BMessage(kMsgNavigateArrow);
-			message->AddInt32("key", B_UP_ARROW);
-			message->AddInt32("modifiers", B_COMMAND_KEY | B_SHIFT_KEY);
-			Window()->AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_SHIFT_KEY,
-				message, this);
-
-			message = new BMessage(kMsgNavigateArrow);
-			message->AddInt32("key", B_DOWN_ARROW);
-			message->AddInt32("modifiers", B_COMMAND_KEY | B_SHIFT_KEY);
-			Window()->AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY | B_SHIFT_KEY,
-				message, this);
-
-			fInstalledSelectCommandDocwiseShortcuts = true;
-		}
-
 		if (!Window()->HasShortcut(B_HOME, B_COMMAND_KEY)
 			&& !Window()->HasShortcut(B_END, B_COMMAND_KEY)) {
 			message = new BMessage(kMsgNavigatePage);
@@ -5196,18 +5162,6 @@ BTextView::_Deactivate()
 			Window()->RemoveShortcut(B_UP_ARROW, B_OPTION_KEY | B_SHIFT_KEY);
 			Window()->RemoveShortcut(B_DOWN_ARROW, B_OPTION_KEY | B_SHIFT_KEY);
 			fInstalledSelectOptionLinewiseShortcuts = false;
-		}
-
-		if (fInstalledNavigateCommandDocwiseShortcuts) {
-			Window()->RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY);
-			Window()->RemoveShortcut(B_DOWN_ARROW, B_COMMAND_KEY);
-			fInstalledNavigateCommandDocwiseShortcuts = false;
-		}
-		if (fInstalledSelectCommandDocwiseShortcuts) {
-			Window()->RemoveShortcut(B_UP_ARROW, B_COMMAND_KEY | B_SHIFT_KEY);
-			Window()->RemoveShortcut(B_DOWN_ARROW,
-				B_COMMAND_KEY | B_SHIFT_KEY);
-			fInstalledSelectCommandDocwiseShortcuts = false;
 		}
 
 		if (fInstalledNavigateHomeEndDocwiseShortcuts) {

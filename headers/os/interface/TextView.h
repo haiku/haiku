@@ -456,13 +456,11 @@ private:
 			bool				fInstalledNavigateCommandWordwiseShortcuts;
 			bool				fInstalledNavigateOptionWordwiseShortcuts;
 			bool				fInstalledNavigateOptionLinewiseShortcuts;
-			bool				fInstalledNavigateCommandDocwiseShortcuts;
 			bool				fInstalledNavigateHomeEndDocwiseShortcuts;
 
 			bool				fInstalledSelectCommandWordwiseShortcuts;
 			bool				fInstalledSelectOptionWordwiseShortcuts;
 			bool				fInstalledSelectOptionLinewiseShortcuts;
-			bool				fInstalledSelectCommandDocwiseShortcuts;
 			bool				fInstalledSelectHomeEndDocwiseShortcuts;
 
 			uint32				_reserved[6];
