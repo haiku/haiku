@@ -62,7 +62,7 @@ _ntfs_dirent_filler(void *_dirent, const ntfschar *name,
 			memcpy(new_entry->ent->d_name,filename, len + 1);
 			new_entry->ent->d_reclen =  sizeof(struct dirent) + len;
 			
-			if(cookie->cache_root == NULL || cookie->entry == NULL) {
+			if (cookie->cache_root == NULL || cookie->entry == NULL) {
 				cookie->cache_root = new_entry;
 				cookie->entry = cookie->cache_root;
 				cookie->entry->next = NULL;
@@ -94,8 +94,7 @@ fs_free_dircookie(fs_volume *_vol, fs_vnode *vnode, void *_cookie)
 		cache_entry *entry = cookie->cache_root;
 		while (entry != NULL) {
 			cache_entry *next = entry->next;
-			if (entry->ent != NULL)
-				free(entry->ent);
+			free(entry->ent);
 			free(entry);
 			entry = next;
 		}
@@ -189,23 +188,23 @@ fs_readdir(fs_volume *_vol, fs_vnode *_node, void *_cookie, struct dirent *buf,
 		goto exit;
 	}
 
-	if(cookie->cache_root == NULL) {
+	if (cookie->cache_root == NULL) {
 		cookie->entry = NULL;
 		result = ntfs_readdir(ni, &cookie->pos, cookie,
 			(ntfs_filldir_t)_ntfs_dirent_filler);
 		cookie->entry = cookie->cache_root;
-		if(result) {
+		if (result) {
 			result = ENOENT;
 			goto exit;			
 		}			
 	}	
 
-	if(cookie->entry == NULL) {
+	if (cookie->entry == NULL) {
 		result = ENOENT;
 		goto exit;
 	}
 	
-	if(cookie->entry->ent == NULL) {
+	if (cookie->entry->ent == NULL) {
 		result = ENOENT;
 		goto exit;
 	}	
@@ -254,8 +253,7 @@ fs_rewinddir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 		cache_entry *entry = cookie->cache_root;
 		while (entry != NULL) {
 			cache_entry *next = entry->next;
-			if (entry->ent != NULL)
-				free(entry->ent);
+			free(entry->ent);
 			free(entry);
 			entry = next;
 		}

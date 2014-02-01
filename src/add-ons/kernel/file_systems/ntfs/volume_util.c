@@ -46,9 +46,9 @@ static uint8 ntfs_count_bits(unsigned char byte, unsigned char shift)
 	int i;
 	unsigned char counter = 0;
 	
-	if(shift < 8) {
-	 	for(i=0; i<shift; i++) {
-			if(!(byte & 0x80))
+	if (shift < 8) {
+	 	for (i=0; i<shift; i++) {
+			if (!(byte & 0x80))
 				counter++;
 			byte = byte << 1;
 		}
@@ -81,21 +81,21 @@ int ntfs_calc_free_space(nspace *_ns)
 		return -1;	
 
 	buf = (unsigned char*)ntfs_malloc(vol->cluster_size);
-	if(!buf)
+	if (buf == NULL)
 		goto exit;
 	
-	while( pos < data->data_size) {
-		if( pos % vol->cluster_size == 0) {
+	while (pos < data->data_size) {
+		if (pos % vol->cluster_size == 0) {
 			readed = ntfs_attr_pread(vol->lcnbmp_na, pos,
 				min(data->data_size - pos, vol->cluster_size), buf);
-			if(readed < B_NO_ERROR)
+			if (readed < B_NO_ERROR)
 				goto error;
-			if(readed != min(data->data_size - pos, vol->cluster_size))
+			if (readed != min(data->data_size - pos, vol->cluster_size))
 				goto error;
 		}
 
 		free_clusters += ntfs_count_bits( buf[pos%vol->cluster_size],
-			min( (vol->nr_clusters) - (pos * 8), 8));
+			min((vol->nr_clusters) - (pos * 8), 8));
 		pos++;
 	}
 error:
