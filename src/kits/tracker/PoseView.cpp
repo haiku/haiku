@@ -7243,7 +7243,8 @@ BPoseView::MouseDown(BPoint where)
 	int32 index;
 	BPose* pose = FindPose(where, &index);
 	if (pose != NULL) {
-		AddRemoveSelectionRange(where, extendSelection, pose);
+		if (!pose->IsSelected() || !secondaryMouseButtonDown)
+			AddRemoveSelectionRange(where, extendSelection, pose);
 
 		if (fTextWidgetToCheck != NULL
 			&& (pose != fLastClickedPose || secondaryMouseButtonDown)) {
