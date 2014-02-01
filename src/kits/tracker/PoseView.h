@@ -609,13 +609,14 @@ class BPoseView : public BView {
 
 		// click handling
 		bool WasDoubleClick(const BPose*, BPoint);
-		bool WasClickInPath(const BPose*, int32 index, BPoint) const;
+		bool WasClickInPath(const BPose*, int32 index,
+			BPoint mouseLocation) const;
 
 		// selection
 		void SelectPosesListMode(BRect, BList**);
 		void SelectPosesIconMode(BRect, BList**);
 		void AddRemoveSelectionRange(BPoint where, bool extendSelection,
-			BPose*);
+			BPose* pose);
 
 		void _BeginSelectionRect(const BPoint& point, bool extendSelection);
 		void _UpdateSelectionRect(const BPoint& point);
@@ -1225,7 +1226,7 @@ EachTextWidget(BPose* pose, BPoseView* poseView,
 {
 	for (int32 index = 0; ;index++) {
 		BColumn* column = poseView->ColumnAt(index);
-		if (!column)
+		if (column == NULL)
 			break;
 
 		BTextWidget* widget = pose->WidgetFor(column->AttrHash());
@@ -1243,7 +1244,7 @@ EachTextWidget(BPose* pose, BPoseView* poseView,
 {
 	for (int32 index = 0; ;index++) {
 		BColumn* column = poseView->ColumnAt(index);
-		if (!column)
+		if (column == NULL)
 			break;
 
 		BTextWidget* widget = pose->WidgetFor(column->AttrHash());
@@ -1261,7 +1262,7 @@ WhileEachTextWidget(BPose* pose, BPoseView* poseView,
 {
 	for (int32 index = 0; ;index++) {
 		BColumn* column = poseView->ColumnAt(index);
-		if (!column)
+		if (column == NULL)
 			break;
 
 		BTextWidget* widget = pose->WidgetFor(column->AttrHash());
