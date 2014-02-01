@@ -3626,9 +3626,12 @@ ServerWindow::_UpdateDrawState(View* view)
 	DrawingEngine* drawingEngine = fWindow->GetDrawingEngine();
 	if (view != NULL && drawingEngine != NULL) {
 		BPoint leftTop(0, 0);
+		if (view->GetAlphaMask() != NULL) {
+			view->ConvertToScreen(&leftTop);
+ 			view->GetAlphaMask()->Update(view->Bounds(), leftTop);
+			leftTop = BPoint(0, 0);
+		}
 		view->ConvertToScreenForDrawing(&leftTop);
-		if (view->GetAlphaMask() != NULL)
-			view->GetAlphaMask()->Update(view->Bounds(), leftTop);
 		drawingEngine->SetDrawState(view->CurrentState(), leftTop.x, leftTop.y);
 	}
 }
