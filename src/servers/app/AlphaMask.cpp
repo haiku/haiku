@@ -116,9 +116,9 @@ AlphaMask::_RenderPicture() const
 		return NULL;
 	}
 
-	engine->SetDrawState(&fDrawState);
+	OffscreenContext context(engine, fDrawState);
+	context.PushState();
 
-	OffscreenContext context(engine);
 	if (engine->LockParallelAccess()) {
 		// FIXME ConstrainClippingRegion docs says passing NULL disables
 		// all clipping. This doesn't work and will crash in Painter.
@@ -128,6 +128,8 @@ AlphaMask::_RenderPicture() const
 		fPicture->Play(&context);
 		engine->UnlockParallelAccess();
 	}
+
+	context.PopState();
 	delete engine;
 
 	if (!fInverse)

@@ -30,6 +30,7 @@ class ServerPicture;
 class DrawingContext {
 public:
 							DrawingContext();
+							DrawingContext(const DrawState& state);
 	virtual					~DrawingContext();
 
 			status_t		InitCheck() const;
@@ -83,9 +84,8 @@ protected:
 
 class OffscreenContext: public DrawingContext {
 public:
-							OffscreenContext(DrawingEngine* engine)
-								: fDrawingEngine(engine)
-							{};
+							OffscreenContext(DrawingEngine* engine,
+								const DrawState& state);
 
 							// Screen and View coordinates are the same for us.
 							// DrawState already takes care of World<>View

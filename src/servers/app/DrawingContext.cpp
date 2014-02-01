@@ -23,12 +23,20 @@
 #include <GradientConic.h>
 #include <Region.h>
 
+#include "DrawingEngine.h"
 #include "DrawState.h"
 
 
 DrawingContext::DrawingContext()
 	:
-	fDrawState(new (std::nothrow) DrawState)
+	fDrawState(new(std::nothrow) DrawState())
+{
+}
+
+
+DrawingContext::DrawingContext(const DrawState& state)
+	:
+	fDrawState(new(std::nothrow) DrawState(state))
 {
 }
 
@@ -304,3 +312,14 @@ DrawingContext::ConvertFromScreenForDrawing(BPoint* point) const
 }
 
 
+// #pragma mark - OffscreenContext
+
+
+OffscreenContext::OffscreenContext(DrawingEngine* engine,
+		const DrawState& state)
+	:
+	DrawingContext(state),
+	fDrawingEngine(engine)
+{
+	fDrawingEngine->SetDrawState(fDrawState);
+}
