@@ -1278,8 +1278,7 @@ AttributeView::MouseDown(BPoint point)
 	} else if (fIconRect.Contains(point)) {
 		uint32 buttons;
 		Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
-		if (((modifiers() & B_CONTROL_KEY) != 0)
-			|| (buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
+		if (SecondaryMouseButtonDown(modifiers(), buttons)) {
 			// Show contextual menu
 			BPopUpMenu* contextMenu
 				= new BPopUpMenu("FileContext", false, false);

@@ -319,7 +319,7 @@ BTitleView::MouseDown(BPoint where)
 	// Check if the user clicked the secondary mouse button.
 	// if so, display the attribute menu:
 
-	if (buttons & B_SECONDARY_MOUSE_BUTTON) {
+	if (SecondaryMouseButtonDown(modifiers(), buttons)) {
 		BContainerWindow* window = dynamic_cast<BContainerWindow*>
 			(Window());
 		BPopUpMenu* menu = new BPopUpMenu("Attributes", false, false);

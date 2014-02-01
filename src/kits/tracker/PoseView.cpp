@@ -4454,8 +4454,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel, BPose* target
 
 				// if control down, run a popup menu
 				if (canCopy
-					&& ((modifiers() & B_CONTROL_KEY) != 0
-						|| (buttons & B_SECONDARY_MOUSE_BUTTON) != 0)) {
+					&& SecondaryMouseButtonDown(modifiers(), buttons)) {
 
 					if (actionSpecifiers.CountItems() > 0) {
 						specificActionIndex = RunMimeTypeDestinationMenu(NULL,
@@ -4539,8 +4538,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel, BPose* target
 
 			bool canRelativeLink = false;
 			if (!canCopy && !canMove && !canLink && containerWindow) {
-				if (((buttons & B_SECONDARY_MOUSE_BUTTON) != 0
-					|| (modifiers() & B_CONTROL_KEY) != 0)) {
+				if (SecondaryMouseButtonDown(modifiers(), buttons)) {
 					switch (containerWindow->ShowDropContextMenu(dropPt)) {
 						case kCreateRelativeLink:
 							canRelativeLink = true;
@@ -4878,8 +4876,7 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 		return;
 
 	bool createRelativeLink = relativeLink;
-	if (((buttons & B_SECONDARY_MOUSE_BUTTON) != 0
-			|| (modifiers() & B_CONTROL_KEY) != 0)
+	if (SecondaryMouseButtonDown(modifiers(), buttons)
 		&& destWindow != NULL) {
 		switch (destWindow->ShowDropContextMenu(loc)) {
 			case kCreateRelativeLink:
@@ -7276,10 +7273,8 @@ BPoseView::MouseDown(BPoint where)
 			ClearSelection();
 
 		// show desktop context menu
-		if (buttons == B_SECONDARY_MOUSE_BUTTON
-			|| (modifierKeys & B_CONTROL_KEY) != 0) {
+		if (SecondaryMouseButtonDown(modifierKeys, buttons))
 			ShowContextMenu(where);
-		}
 	}
 
 	if (fSelectionChangedHook)
@@ -7316,8 +7311,7 @@ BPoseView::MouseUp(BPoint where)
 	// Showing the pose context menu is done on mouse up (or long click)
 	// to make right button dragging possible
 	if (pose != NULL && fTrackRightMouseUp
-		&& (lastButtons == B_SECONDARY_MOUSE_BUTTON
-			|| (modifiers() & B_CONTROL_KEY) != 0)) {
+		&& (SecondaryMouseButtonDown(modifiers(), lastButtons))) {
 		if (!pose->IsSelected()) {
 			ClearSelection();
 			pose->Select(true);
