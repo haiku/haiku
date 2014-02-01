@@ -365,7 +365,7 @@ class Test4Clipping : public TestRenderer {
 		view->ClipToPicture(&picture);
 
 		view->PushState();
-		view->SetScale(3.0);
+		view->SetScale(2.0);
 		view->ClipToPicture(&picture);
 
 		view->FillRect(view->Bounds());
@@ -383,7 +383,7 @@ class Test4Validate : public TestRenderer {
 		view->DrawString("Clipping", BPoint(10, 15));
 		view->SetScale(2.0);
 		view->DrawString("Clipping", BPoint(10, 15));
-		view->SetScale(3.0);
+		view->SetScale(4.0);
 		view->DrawString("Clipping", BPoint(10, 15));
 	}
 };
@@ -411,6 +411,7 @@ main(int argc, char** argv)
 	window->AddTest(new Test("Nested states",
 		new Test4Clipping(), new Test4Validate()));
 
+	window->SetToTest(3);
 	window->Show();
 
 	app.Run();
