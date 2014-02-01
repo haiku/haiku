@@ -511,10 +511,11 @@ DraggableContainerIcon::Draw(BRect updateRect)
 
 
 BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
-		uint32 containerWindowFlags,
-		window_look look, window_feel feel, uint32 flags, uint32 workspace)
-	: BWindow(InitialWindowRect(feel), "TrackerWindow", look, feel, flags,
-			workspace),
+	uint32 containerWindowFlags, window_look look, window_feel feel,
+	uint32 flags, uint32 workspace)
+	:
+	BWindow(InitialWindowRect(feel), "TrackerWindow", look, feel, flags,
+		workspace),
 	fFileContextMenu(NULL),
 	fWindowContextMenu(NULL),
 	fDropContextMenu(NULL),
@@ -1668,30 +1669,30 @@ BContainerWindow::MessageReceived(BMessage* message)
 						break;
 
 					case kDontMoveFilesToTrashChanged:
-						{
-							bool dontMoveToTrash
-								= settings.DontMoveFilesToTrash();
+					{
+						bool dontMoveToTrash
+							= settings.DontMoveFilesToTrash();
 
-							BMenuItem* item
-								= fFileContextMenu->FindItem(kMoveToTrash);
-							if (item != NULL) {
+						BMenuItem* item
+							= fFileContextMenu->FindItem(kMoveToTrash);
+						if (item != NULL) {
+							item->SetLabel(dontMoveToTrash
+								? B_TRANSLATE("Delete")
+								: B_TRANSLATE("Move to Trash"));
+						}
+						// Deskbar doesn't have a menu bar, so check if
+						// there is fMenuBar
+						if (fMenuBar && fFileMenu) {
+							item = fFileMenu->FindItem(kMoveToTrash);
+							if (item) {
 								item->SetLabel(dontMoveToTrash
 									? B_TRANSLATE("Delete")
 									: B_TRANSLATE("Move to Trash"));
 							}
-							// Deskbar doesn't have a menu bar, so check if
-							// there is fMenuBar
-							if (fMenuBar && fFileMenu) {
-								item = fFileMenu->FindItem(kMoveToTrash);
-								if (item) {
-									item->SetLabel(dontMoveToTrash
-										? B_TRANSLATE("Delete")
-										: B_TRANSLATE("Move to Trash"));
-								}
-							}
-							UpdateIfNeeded();
 						}
+						UpdateIfNeeded();
 						break;
+					}
 
 					default:
 						_inherited::MessageReceived(message);
@@ -2681,9 +2682,11 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref* ref, BView*)
 				if (model.InitCheck() == B_OK) { // ??? Do I need this ???
 					if (showAsVolume) {
 						// non-volume enable/disable copy, move, identify
-						EnableNamedMenuItem(fContextMenu, kDuplicateSelection, false);
+						EnableNamedMenuItem(fContextMenu, kDuplicateSelection,
+							false);
 						EnableNamedMenuItem(fContextMenu, kMoveToTrash, false);
-						EnableNamedMenuItem(fContextMenu, kIdentifyEntry, false);
+						EnableNamedMenuItem(fContextMenu, kIdentifyEntry,
+							false);
 
 						// volume model, enable/disable the Unmount item
 						bool ejectableVolumeSelected = false;
