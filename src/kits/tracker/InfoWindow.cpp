@@ -276,7 +276,7 @@ OpenToolTipWindow(BScreen& screen, BRect rect, const char* name,
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BInfoWindow
 
 
 BInfoWindow::BInfoWindow(Model* model, int32 group_index,
