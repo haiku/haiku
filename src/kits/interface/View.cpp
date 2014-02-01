@@ -5092,20 +5092,30 @@ BView::_ClipToPicture(BPicture* picture, BPoint where, bool invert, bool sync)
 	if (!_CheckOwnerLockAndSwitchCurrent())
 		return;
 
-	if (!picture) {
+	if (picture == NULL) {
 		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_PICTURE);
 		fOwner->fLink->Attach<int32>(-1);
+		
+		// NOTE: No need to sync here, since the -1 token cannot
+		// become invalid on the server.
 	} else {
 		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_PICTURE);
 		fOwner->fLink->Attach<int32>(picture->Token());
 		fOwner->fLink->Attach<BPoint>(where);
 		fOwner->fLink->Attach<bool>(invert);
-	}
 
-	// TODO: I think that "sync" means another thing here:
-	// the bebook, at least, says so.
-	if (sync)
-		fOwner->fLink->Flush();
+		// NOTE: "sync" defaults to true in public methods. If you know what
+		// you are doing, i.e. if you know your BPicture stays valid, you
+		// can avoid the performance impact of syncing. In a use-case where
+		// the client creates BPictures on the stack, these BPictures may
+		// have issued a AS_DELETE_PICTURE command to the ServerApp when Draw()
+		// goes out of scope, and the command is processed earlier in the
+		// ServerApp thread than the AS_VIEW_CLIP_TO_PICTURE command in the 
+		// ServerWindow thread, which will then have the result that no
+		// ServerPicture is found of the token.
+		if (sync)
+			Sync();
+	}
 }
 
 
