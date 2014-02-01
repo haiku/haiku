@@ -478,10 +478,10 @@ draw_string(DrawingContext* context, const char* string, float deltaSpace,
 	// use PenLocation()
 	BPoint location = context->CurrentState()->PenLocation();
 
-	escapement_delta delta = {deltaSpace, deltaNonSpace };
+	escapement_delta delta = { deltaSpace, deltaNonSpace };
 	context->ConvertToScreenForDrawing(&location);
-	context->GetDrawingEngine()->DrawString(string, strlen(string), location,
-		&delta);
+	location = context->GetDrawingEngine()->DrawString(string, strlen(string),
+		location, &delta);
 
 	context->ConvertFromScreenForDrawing(&location);
 	context->CurrentState()->SetPenLocation(location);
