@@ -608,7 +608,7 @@ class BPoseView : public BView {
 		virtual void MetaMimeChanged(const char*, const char*);
 
 		// click handling
-		bool WasDoubleClick(const BPose*, BPoint);
+		bool WasDoubleClick(const BPose*, BPoint point, int32 buttons);
 		bool WasClickInPath(const BPose*, int32 index,
 			BPoint mouseLocation) const;
 
@@ -715,7 +715,8 @@ class BPoseView : public BView {
 		BPose* fDropTarget;
 		BPose* fAlreadySelectedDropTarget;
 		BLooper* fSelectionHandler;
-		BPoint fLastClickPt;
+		BPoint fLastClickPoint;
+		int32 fLastClickButtons;
 		const BPose* fLastClickedPose;
 		BPoint fLastLeftTop;
 		BRect fLastExtent;

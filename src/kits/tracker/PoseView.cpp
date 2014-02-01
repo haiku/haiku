@@ -232,7 +232,8 @@ BPoseView::BPoseView(Model* model, BRect bounds, uint32 viewMode,
 	fDropTarget(NULL),
 	fAlreadySelectedDropTarget(NULL),
 	fSelectionHandler(be_app),
-	fLastClickPt(INT32_MAX, INT32_MAX),
+	fLastClickPoint(INT32_MAX, INT32_MAX),
+	fLastClickButtons(0),
 	fLastClickedPose(NULL),
 	fLastExtent(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
 	fTitleView(NULL),
@@ -7253,7 +7254,10 @@ BPoseView::MouseDown(BPoint where)
 		}
 
 		if (!extendSelection && !fTrackRightMouseUp
-			&& WasDoubleClick(pose, where)) {
+			&& WasDoubleClick(pose, where, buttons)
+			&& buttons == B_PRIMARY_MOUSE_BUTTON
+			&& fLastClickButtons == B_PRIMARY_MOUSE_BUTTON
+			&& (modifierKeys & B_CONTROL_KEY) == 0) {
 			// special handling for path field double-clicks
 			if (!WasClickInPath(pose, index, where))
 				OpenSelection(pose, &index);
@@ -7360,26 +7364,28 @@ BPoseView::WasClickInPath(const BPose* pose, int32 index,
 
 
 bool
-BPoseView::WasDoubleClick(const BPose* pose, BPoint point)
+BPoseView::WasDoubleClick(const BPose* pose, BPoint point, int32 buttons)
 {
 	// check proximity
-	BPoint delta = point - fLastClickPt;
+	BPoint delta = point - fLastClickPoint;
 	int32 clicks = Window()->CurrentMessage()->FindInt32("clicks");
 
 	if (clicks == 2
 		&& fabs(delta.x) < kDoubleClickTresh
 		&& fabs(delta.y) < kDoubleClickTresh
 		&& pose == fLastClickedPose) {
-		fLastClickPt.Set(INT32_MAX, INT32_MAX);
+		fLastClickPoint.Set(INT32_MAX, INT32_MAX);
 		fLastClickedPose = NULL;
 		if (fTextWidgetToCheck != NULL)
 			fTextWidgetToCheck->CancelWait();
 
-		return true;
+		return buttons == fLastClickButtons;
 	}
 
-	fLastClickPt = point;
+	fLastClickPoint = point;
 	fLastClickedPose = pose;
+	fLastClickButtons = buttons;
+
 	return false;
 }
 
