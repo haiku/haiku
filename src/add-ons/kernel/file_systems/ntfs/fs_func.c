@@ -147,8 +147,7 @@ ntfs_inode_lookup(fs_volume *_vol, ino_t parent, const char *name)
 		else
 			ino = MREF(inum);
 	}
-	if (uname != NULL)
-		free(uname);
+	free(uname);
 	return (ino);
 }
 
@@ -708,7 +707,7 @@ exit:
 	if (ni != NULL)
 		ntfs_inode_close(ni);
 
-	if (result != B_OK && newNode != NULL)
+	if (result != B_OK)
 		free(newNode);
 
 	TRACE("fs_read_vnode - EXIT, result is %s\n", strerror(result));
@@ -1167,9 +1166,8 @@ exit:
 		
 	if (dir_ni != NULL)
 		ntfs_inode_close(dir_ni);
-		
-	if (uname != NULL)
-		free(uname);
+
+	free(uname);
 
 	TRACE("fs_create - EXIT, result is %s\n", strerror(result));
 
@@ -1480,8 +1478,8 @@ exit:
 		ntfs_attr_close(na);
 	if (ni != NULL)
 		ntfs_inode_close(ni);
-	if (tempBuffer != NULL)
-		free(tempBuffer);
+
+	free(tempBuffer);
 
 	TRACE("fs_readlink - EXIT, result is %s\n", strerror(result));
 
@@ -1573,10 +1571,9 @@ fs_create_symlink(fs_volume *_vol, fs_vnode *_dir, const char *name,
 exit:
 	if (dir_ni != NULL)
 		ntfs_inode_close(dir_ni);
-	if (utarget != NULL)
-		free(utarget);
-	if (uname != NULL)
-		free(uname);
+
+	free(utarget);
+	free(uname);
 
 	TRACE("fs_symlink - EXIT, result is %s\n", strerror(result));
 
@@ -1665,8 +1662,8 @@ fs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name,	int perms)
 exit:
 	if (dir_ni != NULL)
 		ntfs_inode_close(dir_ni);
-	if (uname != NULL)
-		free(uname);
+
+	free(uname);
 
 	TRACE("fs_mkdir - EXIT, result is %s\n", strerror(result));
 
