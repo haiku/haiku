@@ -1,9 +1,10 @@
-1	french	x-vnd.Haiku-DeskCalc	3276968552
+1	french	x-vnd.Haiku-DeskCalc	1694821448
 Compact	CalcView		Compact
 Scientific	CalcView		Scientifique
 DeskCalc	System name		Calculatrice
 Basic	CalcView		Basique
 Radians	CalcView		Radians
 Enable Num Lock on startup	CalcView		Verrouiller le pavé numérique au démarrage
+Calculating	CalcView		Calcul en cours
 Degrees	CalcView		Degrés
 Audio Feedback	CalcView		Échos sonores

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	4011843330
+1	japanese	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		デスクトップの背景にする…
 File	Menus		ファイル
 Slide delay	Menus		スライド間隔
@@ -53,6 +53,7 @@ Select all	Menus		すべて選択
 Zoom factor in %:	PrintOptionsWindow		倍率 (%):
 Width:	PrintOptionsWindow		幅:
 Image	Menus		画像
+Move to Trash	Menus		ごみ箱に移動
 OK	Alerts		OK
 Rotate clockwise	Menus		時計まわりに 90° 回転
 Job setup	PrintOptionsWindow		ジョブ設定

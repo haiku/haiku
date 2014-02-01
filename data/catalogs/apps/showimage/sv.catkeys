@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ShowImage	4011843330
+1	swedish	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Använd som bakgrund…
 File	Menus		Arkiv
 Slide delay	Menus		Bildspelsfördröjning
@@ -53,6 +53,7 @@ Select all	Menus		Markera allt
 Zoom factor in %:	PrintOptionsWindow		Zoomläge i %:
 Width:	PrintOptionsWindow		Bredd:
 Image	Menus		Bild
+Move to Trash	Menus		Flytta till papperskorgen
 OK	Alerts		OK
 Rotate clockwise	Menus		Rotera medurs
 Job setup	PrintOptionsWindow		Utskriftsinställningar

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ShowImage	4011843330
+1	hungarian	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Beállítás háttérnek…
 File	Menus		Fájl
 Slide delay	Menus		Képváltás közti szünet
@@ -53,6 +53,7 @@ Select all	Menus		Összes kiválasztása
 Zoom factor in %:	PrintOptionsWindow		Nagyítás mértéke százalékban:
 Width:	PrintOptionsWindow		Szélesség:
 Image	Menus		Kép
+Move to Trash	Menus		Szemetesbe
 OK	Alerts		Rendben
 Rotate clockwise	Menus		Forgatás az óramutató irányába
 Job setup	PrintOptionsWindow		Feladatbeállítás

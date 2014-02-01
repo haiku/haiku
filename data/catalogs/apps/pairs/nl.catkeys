@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Pairs	1981673050
+1	dutch; flemish	x-vnd.Haiku-Pairs	1649564846
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\t geschreven door Ralf Schülke\n\t Copyright 2008-2010, Haiku Inc.\n\nJe hebt dit spel in %num% klikken beëindigd.\n
 Expert (8x8)	PairsWindow		Expert (8x8)
 Beginner (4x4)	PairsWindow		Beginner (4x4)
@@ -6,9 +6,7 @@ Quit game	PairsWindow		Spel afsluiten
 Game	PairsWindow		Spel
 Size	PairsWindow		Grootte
 New	PairsWindow		Nieuw
-OK	PairsView		Oké
 Intermediate (6x6)	PairsWindow		Gevorderde (6x6)
 Quit	PairsWindow		Afsluiten
 Pairs	System name		Pairs
 New game	PairsWindow		Nieuw spel
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Pairs heeft niet genoeg vector-iconen gevonden op uw systeem; het heeft er minstens %d nodig.

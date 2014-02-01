@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Pairs	1981673050
+1	ukrainian	x-vnd.Haiku-Pairs	1649564846
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tавтор Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nВи завершили гру за %num% кліків.\n
 Expert (8x8)	PairsWindow		Експерт (8x8)
 Beginner (4x4)	PairsWindow		Початківець (4x4)
@@ -6,9 +6,7 @@ Quit game	PairsWindow		Завершити гру
 Game	PairsWindow		Гра
 Size	PairsWindow		Розмір
 New	PairsWindow		Новий
-OK	PairsView		Гаразд
 Intermediate (6x6)	PairsWindow		Середняк (6x6)
 Quit	PairsWindow		Завершити
 Pairs	System name		Пари
 New game	PairsWindow		Нова гра
-Pairs did not find enough vector icons in the system; it needs at least %d.	PairsView		Пари не знайшли жодної векторної іконки в системі; вони повинні бути %d.

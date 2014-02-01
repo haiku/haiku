@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	4011843330
+1	german	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Als Hintergrund verwenden…
 File	Menus		Datei
 Slide delay	Menus		Verzögerung
@@ -53,6 +53,7 @@ Select all	Menus		Alles auswählen
 Zoom factor in %:	PrintOptionsWindow		Vergrößerungsfaktor in %:
 Width:	PrintOptionsWindow		Breite:
 Image	Menus		Bild
+Move to Trash	Menus		In Papierkorb verschieben
 OK	Alerts		OK
 Rotate clockwise	Menus		Im Uhrzeigersinn rotieren
 Job setup	PrintOptionsWindow		Druckauftrag bearbeiten

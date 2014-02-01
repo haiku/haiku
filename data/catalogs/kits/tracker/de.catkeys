@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3776246526
+1	german	x-vnd.Haiku-libtracker	1995236298
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Icon-Ansicht
 Add-ons	FilePanelPriv		Add-ons
@@ -360,6 +360,7 @@ Open selection with:	OpenWithWindow		Auswahl öffnen mit:
 (%bytes bytes)	InfoWindow		(%bytes Bytes)
 Preparing to create links…	StatusWindow		Erstellen von Verknüpfungen wird vorbereitet…
 Show navigator	SettingsView		Navigator zeigen
+Desktop	B_DESKTOP_DIRECTORY		Desktop
 List folders first	SettingsView		Ordner zuerst listen
 Get info	VolumeWindow		Infos
 Name	SelectionWindow		Name:
