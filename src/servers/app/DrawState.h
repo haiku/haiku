@@ -48,10 +48,10 @@ public:
 		void				WriteToLink(BPrivate::LinkSender& link) const;
 
 							// coordinate transformation
-		void				SetOrigin(const BPoint& origin);
-		const BPoint&		Origin() const
+		void				SetOrigin(BPoint origin);
+		BPoint				Origin() const
 								{ return fOrigin; }
-		const BPoint&		CombinedOrigin() const
+		BPoint				CombinedOrigin() const
 								{ return fCombinedOrigin; }
 
 		void				SetScale(float scale);
@@ -81,12 +81,12 @@ public:
 				void		InverseTransform(BPoint* point) const;
 
 							// color
-		void				SetHighColor(const rgb_color& color);
-		const rgb_color&	HighColor() const
+		void				SetHighColor(rgb_color color);
+		rgb_color			HighColor() const
 								{ return fHighColor; }
 
-		void				SetLowColor(const rgb_color& color);
-		const rgb_color&		LowColor() const
+		void				SetLowColor(rgb_color color);
+		rgb_color			LowColor() const
 								{ return fLowColor; }
 
 		void				SetPattern(const Pattern& pattern);
@@ -106,8 +106,8 @@ public:
 								{ return fAlphaFncMode; }
 
 							// pen
-		void				SetPenLocation(const BPoint& location);
-		const BPoint&		PenLocation() const;
+		void				SetPenLocation(BPoint location);
+		BPoint				PenLocation() const;
 
 		void				SetPenSize(float size);
 		float				PenSize() const;
