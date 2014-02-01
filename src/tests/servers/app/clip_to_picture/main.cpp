@@ -1,10 +1,21 @@
+/*
+ * Copyright 2014 Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT license.
+ */
+
+
 #include <stdio.h>
 #include <string.h>
 
 #include <Application.h>
 #include <Message.h>
 #include <Picture.h>
+#include <LayoutBuilder.h>
+#include <List.h>
+#include <PopUpMenu.h>
 #include <ScrollView.h>
+#include <String.h>
+#include <StringView.h>
 #include <View.h>
 #include <Window.h>
 
@@ -12,193 +23,370 @@
 static const char* kAppSignature = "application/x.vnd-Haiku.ClipToPicture";
 
 
-class TestView : public BView {
+class TestRenderer {
 public:
-								TestView(BRect frame, const char* name,
-									uint32 resizeFlags, uint32 flags);
-
-	virtual	void				Draw(BRect updateRect);
-
-private:
-			void				Test1(BRect updateRect);
-			void				Test2(BRect updateRect);
-			void				Test3(BRect updateRect);
-			void				Test4(BRect updateRect);
+	virtual	void				Draw(BView* view, BRect updateRect) = 0;
 };
 
 
-TestView::TestView(BRect frame, const char* name, uint32 resizeFlags,
-		uint32 flags)
+class Test {
+public:
+								Test(const char* name,
+									TestRenderer* clippingTest,
+									TestRenderer* validateTest);
+								~Test();
+
+			const char*			Name() const
+									{ return fName.String(); }
+
+			TestRenderer*		ClippingTest() const
+									{ return fClippingTest; }
+			TestRenderer*		ValidateTest() const
+									{ return fValidateTest; }
+
+private:
+			BString				fName;
+			TestRenderer*		fClippingTest;
+			TestRenderer*		fValidateTest;
+};
+
+
+Test::Test(const char* name, TestRenderer* clippingTest,
+		TestRenderer* validateTest)
 	:
-	BView(frame, name, resizeFlags, flags)
+	fName(name),
+	fClippingTest(clippingTest),
+	fValidateTest(validateTest)
 {
 }
 
 
-void
-TestView::Test1(BRect updateRect)
+Test::~Test()
 {
-	BPicture clipper;
-
-	// Test antialiased clipping to a text
-	BeginPicture(&clipper);
-	PushState();
-
-	SetDrawingMode(B_OP_ALPHA);
-	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
-
-	DrawString("Hello World! - Clipping", BPoint(10, 10));
-	FillRect(BRect(0, 20, 200, 40));
-
-	PopState();
-	EndPicture();
-
-	ClipToPicture(&clipper);
-
-	// This string is inside the clipping rectangle. It is completely drawn.
-	DrawString("Hello World! - Clipped", BPoint(10, 30));
-	// This rect is above the clipping string. Only the glyphs are painted.
-	FillRect(BRect(0, 0, 200, 20));
-
-	// Paint the whole unclipped region red.
-	// If all went well, this should cover the first line of text and the
-	// 200x20 rectangle below it.
-	PushState();
-	SetDrawingMode(B_OP_ALPHA);
-	rgb_color color;
-	color.red = 255;
-	color.green = 0;
-	color.blue = 0;
-	color.alpha = 64;
-	SetHighColor(color);
-	FillRect(Bounds());
-	PopState();
+	delete fClippingTest;
+	delete fValidateTest;
 }
 
 
-void
-TestView::Test2(BRect updateRect)
+// #pragma mark - TestView
+
+
+class TestView : public BView {
+public:
+								TestView();
+	virtual						~TestView();
+
+	virtual	void				Draw(BRect updateRect);
+
+			void				SetTestRenderer(TestRenderer* renderer);
+
+private:
+			TestRenderer*		fTestRenderer;
+};
+
+
+TestView::TestView()
+	:
+	BView(NULL, B_WILL_DRAW),
+	fTestRenderer(NULL)
 {
-	BPicture clipper;
-
-	// Test inverse clipping: a round hole in a rect
-	BeginPicture(&clipper);
-	PushState();
-
-	SetDrawingMode(B_OP_ALPHA);
-	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
-
-	FillEllipse(BRect(10, 10, 40, 40));
-
-	PopState();
-	EndPicture();
-
-	ClipToInversePicture(&clipper, BPoint(10, 50));
-
-	FillRect(BRect(10, 50, 60, 100));
-
 }
 
 
-void
-TestView::Test3(BRect updateRect)
+TestView::~TestView()
 {
-	// Check that the clipping can be undone.
-	ClipToPicture(NULL);
-
-	// Paint the whole unclipped region green.
-	// If all went well, this should cover the whole window.
-	PushState();
-	SetDrawingMode(B_OP_ALPHA);
-	rgb_color color;
-	color.red = 0;
-	color.green = 255;
-	color.blue = 0;
-	color.alpha = 64;
-	SetHighColor(color);
-	FillRect(Bounds());
-	PopState();
-}
-
-
-void
-TestView::Test4(BRect updateRect)
-{
-	// Test multiple clipping pictures with Push/PopState()
-	
-	// First clipping is a circle
-	BPicture clipper;
-	BeginPicture(&clipper);
-	PushState();
-
-	SetDrawingMode(B_OP_ALPHA);
-	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
-
-	FillEllipse(BRect(70, 50, 120, 100));
-
-	PopState();
-	EndPicture();
-
-	ClipToPicture(&clipper);
-
-	// This should push the first clipping
-	PushState();
-
-	// Second clipping is another circle, offset to the right.
-	BPicture clipper2;
-	BeginPicture(&clipper2);
-	PushState();
-
-	SetDrawingMode(B_OP_ALPHA);
-	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
-
-	FillEllipse(BRect(100, 50, 150, 100));
-
-	PopState();
-	EndPicture();
-	ClipToPicture(&clipper2);
-
-	// This should only paint the intersection of the two circles.
-	// No other part of the circles should ever be visible.
-	FillRect(BRect(70, 50, 150, 100));
-
-	// ... and back to clipping only the first circle.
-	PopState();
-
 }
 
 
 void
 TestView::Draw(BRect updateRect)
 {
-	Test1(updateRect);
-	Test2(updateRect);
-
-	// Paint the whole unclipped region blue.
-	// If all went well, this should cover the whole window, except the
-	// clipped-out circle
-	PushState();
-	SetDrawingMode(B_OP_ALPHA);
-	rgb_color color;
-	color.red = 0;
-	color.green = 0;
-	color.blue = 255;
-	color.alpha = 64;
-	SetHighColor(color);
-	FillRect(Bounds());
-	PopState();
-
-	Test3(updateRect);
-	Test4(updateRect);
-
-	SetOrigin(5,55);
-	Test2(updateRect);
-
-	SetOrigin(50,55);
-	SetScale(2);
-	Test2(updateRect);
-	SetScale(1);
+	if (fTestRenderer != NULL)
+		fTestRenderer->Draw(this, updateRect);
 }
+
+
+void
+TestView::SetTestRenderer(TestRenderer* renderer)
+{
+	fTestRenderer = renderer;
+	Invalidate();
+}
+
+
+// #pragma mark - TestWindow
+
+
+enum {
+	MSG_SELECT_TEST	= 'stst'
+};
+
+
+class TestWindow : public BWindow {
+public:
+								TestWindow();
+	virtual						~TestWindow();
+
+	virtual	void				MessageReceived(BMessage* message);
+
+			void				AddTest(Test* test);
+			void				SetToTest(int32 index);
+
+private:
+			TestView*			fClippingTestView;
+			TestView*			fValidateTestView;
+
+			BMenuField*			fTestSelectionField;
+
+			BList				fTests;
+};
+
+
+TestWindow::TestWindow()
+	:
+	BWindow(BRect(50.0, 50.0, 450.0, 250.0), "ClipToPicture Test",
+		B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
+			| B_AUTO_UPDATE_SIZE_LIMITS)
+{
+	fClippingTestView = new TestView();
+	fValidateTestView = new TestView();
+
+	BGroupView* group = new BGroupView(B_HORIZONTAL);
+	BLayoutBuilder::Group<>(group, B_HORIZONTAL, 0.0f)
+		.Add(fClippingTestView)
+		.Add(fValidateTestView)
+	;
+
+	BScrollView* scrollView = new BScrollView("scroll", group, 0, true, true);
+
+	BStringView* leftLabel = new BStringView("left label", 
+		"ClipToPicture:");
+	leftLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+
+	BStringView* rightLabel = new BStringView("right label", 
+		"Validation:");
+	rightLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+
+	fTestSelectionField = new BMenuField("test selection",
+		"Select test:", new BPopUpMenu("select"));
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fTestSelectionField)
+			.AddGlue()
+			.SetInsets(B_USE_DEFAULT_SPACING)
+		.End()
+		.AddGroup(B_HORIZONTAL)
+			.Add(leftLabel)
+			.Add(rightLabel)
+			.SetInsets(B_USE_DEFAULT_SPACING)
+		.End()
+		.Add(scrollView)
+	;
+}
+
+
+TestWindow::~TestWindow()
+{
+	for (int32 i = fTests.CountItems() - 1; i >= 0; i++)
+		delete (Test*)fTests.ItemAt(i);
+}
+
+
+void
+TestWindow::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_SELECT_TEST:
+		{
+			int32 index;
+			if (message->FindInt32("index", &index) == B_OK)
+				SetToTest(index);
+			break;
+		}
+
+		default:
+			BWindow::MessageReceived(message);
+	}
+}
+
+
+void
+TestWindow::AddTest(Test* test)
+{
+	if (test == NULL || fTests.HasItem(test))
+		return;
+
+	if (!fTests.AddItem(test)) {
+		delete test;
+		return;
+	}
+
+	BMessage* message = new BMessage(MSG_SELECT_TEST);
+	message->AddInt32("index", fTests.CountItems() - 1);
+
+	BMenuItem* item = new BMenuItem(test->Name(), message);
+	if (!fTestSelectionField->Menu()->AddItem(item)) {
+		fTests.RemoveItem(fTests.CountItems() - 1);
+		delete test;
+		delete item;
+		return;
+	}
+
+	if (fTests.CountItems() == 1)
+		SetToTest(0);
+}
+
+
+void
+TestWindow::SetToTest(int32 index)
+{
+	Test* test = (Test*)fTests.ItemAt(index);
+	if (test == NULL)
+		return;
+
+	fTestSelectionField->Menu()->ItemAt(index)->SetMarked(true);
+
+	fClippingTestView->SetTestRenderer(test->ClippingTest());
+	fValidateTestView->SetTestRenderer(test->ValidateTest());
+}
+
+
+// #pragma mark - Test1
+
+
+class Test1Clipping : public TestRenderer {
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BPicture picture;
+		view->BeginPicture(&picture);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+		view->DrawString("Clipping to text.", BPoint(20, 30));
+		view->EndPicture();
+
+		view->ClipToPicture(&picture);
+
+		view->FillRect(view->Bounds());
+	}
+};
+
+
+class Test1Validate : public TestRenderer {
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		view->DrawString("Clipping to text.", BPoint(20, 30));
+	}
+};
+
+
+// #pragma mark - Test2
+
+
+class Test2Clipping : public TestRenderer {
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BPicture picture;
+		view->BeginPicture(&picture);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+		view->SetScale(2.0);
+		view->DrawString("Scaled clipping", BPoint(10, 15));
+		view->DrawString("to text.", BPoint(10, 25));
+		view->EndPicture();
+
+		view->ClipToPicture(&picture);
+
+		view->SetScale(1.0);
+		view->FillRect(view->Bounds());
+	}
+};
+
+
+class Test2Validate : public TestRenderer {
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		view->SetScale(2.0);
+		view->DrawString("Scaled clipping", BPoint(10, 15));
+		view->DrawString("to text.", BPoint(10, 25));
+	}
+};
+
+
+// #pragma mark - Test2
+
+
+class Test3Clipping : public TestRenderer {
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		view->SetScale(2.0);
+
+		BPicture picture;
+		view->BeginPicture(&picture);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+		view->DrawString("Scaled picture", BPoint(10, 15));
+		view->EndPicture();
+
+		view->ClipToPicture(&picture);
+
+		view->SetScale(1.0);
+		view->FillRect(view->Bounds());
+	}
+};
+
+
+class Test3Validate : public TestRenderer {
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		view->SetScale(2.0);
+		view->DrawString("Scaled picture", BPoint(10, 15));
+	}
+};
+
+
+// #pragma mark - Test2
+
+
+class Test4Clipping : public TestRenderer {
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BPicture picture;
+		view->BeginPicture(&picture);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+		view->DrawString("Clipping", BPoint(10, 15));
+		view->EndPicture();
+
+		view->ClipToPicture(&picture);
+
+		view->PushState();
+		view->SetScale(2.0);
+		view->ClipToPicture(&picture);
+
+		view->PushState();
+		view->SetScale(3.0);
+		view->ClipToPicture(&picture);
+
+		view->FillRect(view->Bounds());
+
+		view->PopState();
+		view->PopState();
+	}
+};
+
+
+class Test4Validate : public TestRenderer {
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		view->SetDrawingMode(B_OP_OVER);
+		view->DrawString("Clipping", BPoint(10, 15));
+		view->SetScale(2.0);
+		view->DrawString("Clipping", BPoint(10, 15));
+		view->SetScale(3.0);
+		view->DrawString("Clipping", BPoint(10, 15));
+	}
+};
 
 
 // #pragma mark -
@@ -209,18 +397,19 @@ main(int argc, char** argv)
 {
 	BApplication app(kAppSignature);
 
-	BWindow* window = new BWindow(BRect(50.0, 50.0, 300.0, 250.0),
-		"ClipToPicture Test", B_DOCUMENT_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE);
+	TestWindow* window = new TestWindow();
 
-	BRect targetRect = window->Bounds();
-	targetRect.right -= B_V_SCROLL_BAR_WIDTH;
-	targetRect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	BView* view = new TestView(targetRect, "test", B_FOLLOW_ALL,
-		B_WILL_DRAW);
-	BScrollView* scroll = new BScrollView("scroll", view, B_FOLLOW_ALL, 0,
-		true, true);
-	window->AddChild(scroll);
+	window->AddTest(new Test("Simple clipping",
+		new Test1Clipping(), new Test1Validate()));
+
+	window->AddTest(new Test("Scaled clipping 1",
+		new Test2Clipping(), new Test2Validate()));
+
+	window->AddTest(new Test("Scaled clipping 2",
+		new Test3Clipping(), new Test3Validate()));
+
+	window->AddTest(new Test("Nested states",
+		new Test4Clipping(), new Test4Validate()));
 
 	window->Show();
 
