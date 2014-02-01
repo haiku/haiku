@@ -7828,17 +7828,11 @@ BPoseView::AddRemoveSelectionRange(BPoint where, bool extendSelection,
 			BRect selection(where, fSelectionPivotPose->Location(this));
 
 			// Things will get odd if we don't 'fix' the selection rect.
-			if (selection.left > selection.right) {
-				float temp = selection.right;
-				selection.right = selection.left;
-				selection.left = temp;
-			}
+			if (selection.left > selection.right)
+				std::swap(selection.left, selection.right);
 
-			if (selection.top > selection.bottom) {
-				float temp = selection.top;
-				selection.top = selection.bottom;
-				selection.bottom = temp;
-			}
+			if (selection.top > selection.bottom)
+				std::swap(selection.top, selection.bottom);
 
 			// If the selection rect is not at least 1 pixel high/wide, things
 			// are also not going to work out.
