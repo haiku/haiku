@@ -7232,9 +7232,9 @@ BPoseView::MouseDown(BPoint where)
 
 	uint32 buttons = (uint32)window->CurrentMessage()->FindInt32("buttons");
 	uint32 modifierKeys = modifiers();
-
-	fTrackRightMouseUp = (buttons == B_SECONDARY_MOUSE_BUTTON);
-
+	bool secondaryMouseButtonDown
+		= SecondaryMouseButtonDown(modifierKeys, buttons);
+	fTrackRightMouseUp = secondaryMouseButtonDown;
 	bool extendSelection = (modifierKeys & B_COMMAND_KEY) != 0
 		&& fMultipleSelection;
 
@@ -7245,13 +7245,12 @@ BPoseView::MouseDown(BPoint where)
 	if (pose != NULL) {
 		AddRemoveSelectionRange(where, extendSelection, pose);
 
-		if (fTextWidgetToCheck != NULL && (pose != fLastClickedPose
-				|| (buttons & B_SECONDARY_MOUSE_BUTTON) != 0)) {
+		if (fTextWidgetToCheck != NULL
+			&& (pose != fLastClickedPose || secondaryMouseButtonDown)) {
 			fTextWidgetToCheck->CancelWait();
 		}
 
-		if (!extendSelection && !fTrackRightMouseUp
-			&& WasDoubleClick(pose, where, buttons)
+		if (!extendSelection && WasDoubleClick(pose, where, buttons)
 			&& buttons == B_PRIMARY_MOUSE_BUTTON
 			&& fLastClickButtons == B_PRIMARY_MOUSE_BUTTON
 			&& (modifierKeys & B_CONTROL_KEY) == 0) {
