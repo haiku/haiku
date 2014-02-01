@@ -286,6 +286,8 @@ class Test1Validate : public TestRenderer {
 class Test2Clipping : public TestRenderer {
 	virtual void Draw(BView* view, BRect updateRect)
 	{
+		view->PushState();
+		
 		BPicture picture;
 		view->BeginPicture(&picture);
 		view->SetDrawingMode(B_OP_ALPHA);
@@ -295,9 +297,10 @@ class Test2Clipping : public TestRenderer {
 		view->DrawString("to text.", BPoint(10, 25));
 		view->EndPicture();
 
+		view->PopState();
+
 		view->ClipToPicture(&picture);
 
-		view->SetScale(1.0);
 		view->FillRect(view->Bounds());
 	}
 };
@@ -319,8 +322,6 @@ class Test2Validate : public TestRenderer {
 class Test3Clipping : public TestRenderer {
 	virtual void Draw(BView* view, BRect updateRect)
 	{
-		view->SetScale(2.0);
-
 		BPicture picture;
 		view->BeginPicture(&picture);
 		view->SetDrawingMode(B_OP_ALPHA);
@@ -328,6 +329,7 @@ class Test3Clipping : public TestRenderer {
 		view->DrawString("Scaled picture", BPoint(10, 15));
 		view->EndPicture();
 
+		view->SetScale(2.0);
 		view->ClipToPicture(&picture);
 
 		view->SetScale(1.0);
