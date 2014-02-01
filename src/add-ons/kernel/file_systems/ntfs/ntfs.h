@@ -75,8 +75,10 @@ UNLOCK((vol)->vlock); \
 }
 
 typedef enum {
-	NF_FreeClustersOutdate	= (1 << 0),  		// Information about amount of free clusters is outdated.
-	NF_FreeMFTOutdate	= (1 << 1),  			//	Information about amount of	free MFT records is outdated.
+	// Information about amount of free clusters is outdated.
+	NF_FreeClustersOutdate = (1 << 0),
+	// Information about amount of	free MFT records is outdated.
+	NF_FreeMFTOutdate = (1 << 1),
 } ntfs_state_bits;
 
 
@@ -104,8 +106,8 @@ typedef struct attrdircookie {
 	ntfs_attr_search_ctx *ctx;
 } attrdircookie;
 
-#define ntfs_mark_free_space_outdated(ns) (ns->state |= (NF_FreeClustersOutdate | NF_FreeMFTOutdate));
-
+#define ntfs_mark_free_space_outdated(ns) \
+(ns->state |= (NF_FreeClustersOutdate | NF_FreeMFTOutdate));
 
 
 typedef struct nspace {

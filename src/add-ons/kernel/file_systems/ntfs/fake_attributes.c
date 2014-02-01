@@ -57,7 +57,7 @@ status_t set_mime(vnode *node, const char *filename)
 		if (!strcasecmp(filename + namelen - ext_len, p->extension))
 			break;
 	}
-	if(p->mime==NULL)
+	if(p->mime == NULL)
 		node->mime = kFailBackMime;
 	else
 		node->mime = p->mime;

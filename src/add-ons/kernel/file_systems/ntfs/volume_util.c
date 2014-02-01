@@ -38,27 +38,25 @@
 #include "ntfs.h"
 #include "volume_util.h"
 
-static unsigned char ntfs_bits_table[] = { 4, 3, 3, 2, 3, 2, 2, 1,	3, 2, 2, 1, 2, 1, 1, 0 };
+static unsigned char ntfs_bits_table[] = { 4, 3, 3, 2, 3, 2, 2, 1,
+	3, 2, 2, 1, 2, 1, 1, 0 };
 
 static uint8 ntfs_count_bits(unsigned char byte, unsigned char shift)
 {
 	int i;
 	unsigned char counter = 0;
 	
-	if(shift < 8)
-	{
-	 	for(i=0; i<shift; i++)
-		{
-			if(!(byte & 0x80))counter++;
-			byte = byte << 1; 
+	if(shift < 8) {
+	 	for(i=0; i<shift; i++) {
+			if(!(byte & 0x80))
+				counter++;
+			byte = byte << 1;
 		}
-	}
-	else
-	{
+	} else {
 		counter += ntfs_bits_table[byte & 0x0F];
 		counter += ntfs_bits_table[(byte & 0xF0) >> 4];			
-	}	
-		
+	}
+	
 	return counter;
 }
 
@@ -73,34 +71,35 @@ int ntfs_calc_free_space(nspace *_ns)
 	size_t 	 	readed;
 	unsigned 	char *buf = NULL;
 			
-	if(ns== NULL || vol==NULL || data==NULL)
+	if (ns == NULL || vol == NULL || data == NULL)
 		return -1;
 		
-	if(vol->lcnbmp_na==NULL)
+	if (vol->lcnbmp_na == NULL)
 		return -1;
 
 	if (!(ns->state & NF_FreeClustersOutdate))
 		return -1;	
 
 	buf = (unsigned char*)ntfs_malloc(vol->cluster_size);
-	if(!buf)goto exit;
+	if(!buf)
+		goto exit;
 	
-	while( pos < data->data_size)
-	{
-		if( pos % vol->cluster_size == 0) 
-		{			
-			readed = ntfs_attr_pread(vol->lcnbmp_na, pos, min(data->data_size - pos, vol->cluster_size), buf);
-			if(readed < B_NO_ERROR) goto error;
+	while( pos < data->data_size) {
+		if( pos % vol->cluster_size == 0) {
+			readed = ntfs_attr_pread(vol->lcnbmp_na, pos,
+				min(data->data_size - pos, vol->cluster_size), buf);
+			if(readed < B_NO_ERROR)
+				goto error;
 			if(readed != min(data->data_size - pos, vol->cluster_size))
 				goto error;
 		}
-		
-		free_clusters += ntfs_count_bits( buf[pos%vol->cluster_size], min( (vol->nr_clusters) - (pos * 8), 8));		
+
+		free_clusters += ntfs_count_bits( buf[pos%vol->cluster_size],
+			min( (vol->nr_clusters) - (pos * 8), 8));
 		pos++;
 	}
 error:
-	if(buf)
-		free(buf);
+	free(buf);
 exit:	
 	ns->free_clusters = free_clusters;
 	ns->state &= ~(NF_FreeClustersOutdate);
