@@ -321,5 +321,13 @@ OffscreenContext::OffscreenContext(DrawingEngine* engine,
 	DrawingContext(state),
 	fDrawingEngine(engine)
 {
+	ResyncDrawState();
+}
+
+
+void
+OffscreenContext::ResyncDrawState()
+{
 	fDrawingEngine->SetDrawState(fDrawState);
 }
+
