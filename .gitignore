@@ -6,12 +6,3 @@ build/user_config_headers
 *~
 # Vim swp files
 .*.swp
-
-# HFS+ uses NFD and automatically converts NFC to NFD, while the file name in
-# the repository uses NFC. So when git looks for the file, it does find it
-# (because NFC gets converted to NFD), but when it checks for files not in the
-# repository, it finds the file name in NFD and can't match it to the file name
-# in NFC.
-#
-# WARNING: The following line MUST use NFD, DO NOT convert it to NFC!
-src/data/keymaps/French (Bépo).keymap
