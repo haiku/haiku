@@ -622,11 +622,11 @@ detect_intel_cpu_topology_x2apic(uint32 maxBasicLeaf)
 	if (maxBasicLeaf < 11)
 		return B_UNSUPPORTED;
 
-	uint8 hierarchyLevels[CPU_TOPOLOGY_LEVELS];
+	uint8 hierarchyLevels[CPU_TOPOLOGY_LEVELS] = { 0 };
 
 	int currentLevel = 0;
 	int levelType;
-	int levelsSet = 0;
+	unsigned int levelsSet = 0;
 
 	do {
 		cpuid_info cpuid;
@@ -635,13 +635,15 @@ detect_intel_cpu_topology_x2apic(uint32 maxBasicLeaf)
 			return B_UNSUPPORTED;
 
 		levelType = (cpuid.regs.ecx >> 8) & 0xff;
+		int levelValue = cpuid.regs.eax & 0x1f;
+
 		switch (levelType) {
 			case 1:	// SMT
-				hierarchyLevels[CPU_TOPOLOGY_SMT] = cpuid.regs.eax & 0x1f;
+				hierarchyLevels[CPU_TOPOLOGY_SMT] = levelValue;
 				levelsSet |= 1;
 				break;
 			case 2:	// core
-				hierarchyLevels[CPU_TOPOLOGY_CORE] = cpuid.regs.eax & 0x1f;
+				hierarchyLevels[CPU_TOPOLOGY_CORE] = levelValue;
 				levelsSet |= 2;
 				break;
 		}
@@ -651,10 +653,16 @@ detect_intel_cpu_topology_x2apic(uint32 maxBasicLeaf)
 
 	sGetCPUTopologyID = get_intel_cpu_initial_x2apic_id;
 
+	for (int i = 1; i < CPU_TOPOLOGY_LEVELS; i++) {
+		if ((levelsSet & (1u << i)) != 0)
+			continue;
+		hierarchyLevels[i] = hierarchyLevels[i - 1];
+	}
+
 	for (int i = 0; i < CPU_TOPOLOGY_LEVELS; i++) {
 		uint32 mask = ~uint32(0);
 		if (i < CPU_TOPOLOGY_LEVELS - 1)
-			mask = (1 << hierarchyLevels[i]) - 1;
+			mask = (1u << hierarchyLevels[i]) - 1;
 		if (i > 0)
 			mask &= ~sHierarchyMask[i - 1];
 		sHierarchyMask[i] = mask;
