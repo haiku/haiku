@@ -7,3 +7,7 @@ SubInclude HAIKU_TOP src build libpackage ;
 SubInclude HAIKU_TOP src build libroot ;
 SubInclude HAIKU_TOP src build libshared ;
 SubInclude HAIKU_TOP src build libsolv ;
+
+if $(HOST_PLATFORM) = darwin {
+	SubInclude HAIKU_TOP src build libgnuregex ;
+}

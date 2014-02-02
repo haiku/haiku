@@ -495,8 +495,8 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HOST_LIBROOT += /usr/lib/libgnuregex.so ;
 		HOST_STATIC_LIBROOT += /usr/lib/libgnuregex.so ;
 	} else if $(HOST_PLATFORM) = darwin {
-		HOST_LIBROOT += /opt/local/lib/libgnuregex.dylib ;
-		HOST_STATIC_LIBROOT += /opt/local/lib/libgnuregex.dylib ;
+		HOST_LIBROOT += libgnuregex_build.a ;
+		HOST_STATIC_LIBROOT += libgnuregex_build.a ;
 	}
 
 	# The BeOS compilers define __INTEL__ respectively __POWERPC__. On the
@@ -591,6 +591,10 @@ if $(HOST_PLATFORM) = freebsd {
 	# though that's where most things from ports wind up being installed.
 	HOST_HDRS += /usr/local/include ;
 	HOST_LINKFLAGS += -L/usr/local/lib ; 
+}
+
+if $(HOST_PLATFORM) = darwin {
+	HOST_HDRS += [ FDirName $(HAIKU_TOP) src build libgnuregex ] ;
 }
 
 HOST_BE_API_HEADERS =
