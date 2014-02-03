@@ -120,17 +120,17 @@ bool
 connector_read_edid(uint32 connectorIndex, edid1_info* edid)
 {
 	// ensure things are sane
-	uint32 gpioID = gConnector[connectorIndex]->gpioID;
-	if (gGPIOInfo[gpioID]->valid == false) {
+	uint32 i2cPinIndex = gConnector[connectorIndex]->i2cPinIndex;
+	if (gGPIOInfo[i2cPinIndex]->valid == false) {
 		ERROR("%s: invalid gpio %" B_PRIu32 " for connector %" B_PRIu32 "\n",
-			__func__, gpioID, connectorIndex);
+			__func__, i2cPinIndex, connectorIndex);
 		return false;
 	}
 
 	i2c_bus bus;
 
 	ddc2_init_timing(&bus);
-	bus.cookie = (void*)gGPIOInfo[gpioID];
+	bus.cookie = (void*)gGPIOInfo[i2cPinIndex];
 	bus.set_signals = &gpio_set_i2c_bit;
 	bus.get_signals = &gpio_get_i2c_bit;
 
@@ -244,20 +244,99 @@ connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 }
 
 
-status_t
-connector_attach_gpio(uint32 connectorIndex, uint8 hwPin)
+static status_t
+gpio_manual_probe(uint8 hwPin)
 {
-	gConnector[connectorIndex]->gpioID = 0;
+	// manually populate some information on a GPIO pin based on pin id
+
+	int index = GetIndexIntoMasterTable(DATA, GPIO_Pin_LUT);
+	uint16 tableOffset;
+	uint16 tableSize;
+
+	struct _ATOM_GPIO_PIN_LUT* gpioInfo;
+
+	if (atom_parse_data_header(gAtomContext, index, &tableSize, NULL, NULL,
+		&tableOffset)) {
+		ERROR("%s: could't read GPIO_Pin_LUT table from AtomBIOS index %d!\n",
+			__func__, index);
+	}
+	gpioInfo = (struct _ATOM_GPIO_PIN_LUT*)(gAtomContext->bios + tableOffset);
+
+	int numIndices = (tableSize - sizeof(ATOM_COMMON_TABLE_HEADER)) /
+		sizeof(ATOM_GPIO_PIN_ASSIGNMENT);
+	
+	// Find the next available GPIO pin index
+	int gpioIndex;
+	for(gpioIndex = 0; gpioIndex < ATOM_MAX_SUPPORTED_DEVICE; gpioIndex++) {
+		if (!gGPIOInfo[gpioIndex]->valid)
+			break;
+	}
+
+	ATOM_GPIO_PIN_ASSIGNMENT* pin = gpioInfo->asGPIO_Pin;
+	for (int i = 0; i < numIndices; i++) {
+		if (hwPin == pin->ucGPIO_ID) {
+			gGPIOInfo[gpioIndex]->valid = true;
+			gGPIOInfo[gpioIndex]->hwPin = hwPin;
+			#if 0
+			gGPIOInfo[gpioIndex]->hwReg
+				= le16_to_cpu(pin->usGpioPin_AIndex) * 4;
+			gGPIOInfo[gpioIndex]->hwMask
+				= (1 << pin->ucGpioPinBitShift);
+			#endif
+			return B_OK;
+		}
+		pin = (ATOM_GPIO_PIN_ASSIGNMENT*)((uint8*)pin
+			+ sizeof(ATOM_GPIO_PIN_ASSIGNMENT));
+	}
+	return B_ERROR;
+}
+
+
+static status_t
+connector_attach_gpio_i2c(uint32 connectorIndex, uint8 hwPin)
+{
+	gConnector[connectorIndex]->i2cPinIndex = 0;
 	for (uint32 i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
 		if (gGPIOInfo[i]->hwPin != hwPin)
 			continue;
-		gConnector[connectorIndex]->gpioID = i;
+		gConnector[connectorIndex]->i2cPinIndex = i;
 		return B_OK;
 	}
 
-	TRACE("%s: couldn't find GPIO for connector %" B_PRIu32 "\n",
-		__func__, connectorIndex);
+	// We couldnt find the GPIO pin in the known GPIO pins.
+    TRACE("%s: can't find GPIO pin 0x%" B_PRIX8 " for connector %" B_PRIu32 "\n",
+		__func__, hwPin, connectorIndex);
 	return B_ERROR;
+}
+
+
+static status_t
+connector_attach_gpio_hpd(uint32 connectorIndex, uint8 hwPin)
+{
+    gConnector[connectorIndex]->hpdPinIndex = 0;
+
+    for (uint32 i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
+        if (gGPIOInfo[i]->hwPin != hwPin)
+            continue;
+        gConnector[connectorIndex]->hpdPinIndex = i;
+        return B_OK;
+    }
+	// We couldnt find the GPIO pin in the known GPIO pins.
+	// Lets call the GPIO lookup table to add in hpd pins manually
+
+	gpio_manual_probe(hwPin);
+
+	// Try again...
+    for (uint32 i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
+        if (gGPIOInfo[i]->hwPin != hwPin)
+            continue;
+        gConnector[connectorIndex]->hpdPinIndex = i;
+        return B_OK;
+    }
+
+    TRACE("%s: can't find GPIO pin 0x%" B_PRIX8 " for connector %" B_PRIu32 "\n",
+        __func__, hwPin, connectorIndex);
+    return B_ERROR;
 }
 
 
@@ -267,14 +346,11 @@ gpio_probe()
 	radeon_shared_info &info = *gInfo->shared_info;
 
 	int index = GetIndexIntoMasterTable(DATA, GPIO_I2C_Info);
-
-	uint8 tableMajor;
-	uint8 tableMinor;
 	uint16 tableOffset;
 	uint16 tableSize;
 
 	if (atom_parse_data_header(gAtomContext, index, &tableSize,
-		&tableMajor, &tableMinor, &tableOffset) != B_OK) {
+		NULL, NULL, &tableOffset) != B_OK) {
 		ERROR("%s: could't read GPIO_I2C_Info table from AtomBIOS index %d!\n",
 			__func__, index);
 		return B_ERROR;
@@ -452,7 +528,7 @@ connector_probe_legacy()
 		gConnector[connectorIndex]->encoderExternal.valid = false;
 		// encoder_is_external(encoderID);
 
-		connector_attach_gpio(connectorIndex, ci.sucI2cId.ucAccess);
+		connector_attach_gpio_i2c(connectorIndex, ci.sucI2cId.ucAccess);
 
 		pll_limit_probe(&gConnector[connectorIndex]->encoder.pll);
 
@@ -680,7 +756,7 @@ connector_probe()
 								<= ATOM_MAX_OBJECT_RECORD_NUMBER) {
 							ATOM_I2C_RECORD* i2cRecord;
 							ATOM_I2C_ID_CONFIG_ACCESS* i2cConfig;
-							//ATOM_HPD_INT_RECORD* hpd_record;
+							ATOM_HPD_INT_RECORD* hpdRecord;
 
 							switch (record->ucRecordType) {
 								case ATOM_I2C_RECORD_TYPE:
@@ -689,12 +765,13 @@ connector_probe()
 									i2cConfig
 										= (ATOM_I2C_ID_CONFIG_ACCESS*)
 										&i2cRecord->sucI2cId;
-									// attach i2c gpio information for connector
-									connector_attach_gpio(connectorIndex,
+									connector_attach_gpio_i2c(connectorIndex,
 										i2cConfig->ucAccess);
 									break;
 								case ATOM_HPD_INT_RECORD_TYPE:
-									// TODO: HPD (Hot Plug)
+									hpdRecord = (ATOM_HPD_INT_RECORD*)record;
+									connector_attach_gpio_hpd(connectorIndex,
+										hpdRecord->ucHPDIntGPIOID);
 									break;
 							}
 
@@ -749,17 +826,22 @@ debug_connectors()
 	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
 		if (gConnector[id]->valid == true) {
 			uint32 connectorType = gConnector[id]->type;
-			uint16 gpioID = gConnector[id]->gpioID;
+			uint16 i2cPinIndex = gConnector[id]->i2cPinIndex;
+			uint16 hpdPinIndex = gConnector[id]->hpdPinIndex;
 
 			ERROR("Connector #%" B_PRIu32 ")\n", id);
 			ERROR(" + connector:          %s\n",
 				get_connector_name(connectorType));
-			ERROR(" + gpio table id:      %" B_PRIu16 "\n", gpioID);
-			ERROR(" + gpio hw pin:        0x%" B_PRIX32 "\n",
-				gGPIOInfo[gpioID]->hwPin);
-			ERROR(" + gpio valid:         %s\n",
-				gGPIOInfo[gpioID]->valid ? "true" : "false");
-
+			ERROR(" + i2c gpio table id:  %" B_PRIu16 "\n", i2cPinIndex);
+			ERROR("   - gpio hw pin:      0x%" B_PRIX32 "\n",
+				gGPIOInfo[i2cPinIndex]->hwPin);
+			ERROR("   - gpio valid:       %s\n",
+				gGPIOInfo[i2cPinIndex]->valid ? "true" : "false");
+			ERROR(" + hpd gpio table id:  %" B_PRIu16 "\n", hpdPinIndex);
+			ERROR("   - gpio hw pin:      0x%" B_PRIX32 "\n",
+				 gGPIOInfo[hpdPinIndex]->hwPin);
+			ERROR("   - gpio valid:       %s\n",
+				gGPIOInfo[hpdPinIndex]->valid ? "true" : "false");
 			encoder_info* encoder = &gConnector[id]->encoder;
 			ERROR(" + encoder:            %s\n",
 				get_encoder_name(encoder->type));

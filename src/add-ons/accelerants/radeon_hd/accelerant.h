@@ -109,7 +109,7 @@ struct register_info {
 typedef struct {
 	bool	valid;
 
-	uint32	hwPin;		// GPIO hardware pin on GPU
+	uint32	hwPin;	// GPIO hardware pin on GPU
 	bool	hwCapable;	// can do hw assisted i2c
 
 	uint32	sclMaskReg;
@@ -152,7 +152,8 @@ typedef struct {
 	uint32		type;
 	uint32		flags;
 	uint32		lvdsFlags;
-	uint16		gpioID;
+	uint16		i2cPinIndex; // id of gpio pin for i2c communications
+	uint16		hpdPinIndex; // id of gpio pin for hotplug detection
 	struct encoder_info encoder;
 	struct encoder_info encoderExternal;
 	// TODO struct radeon_hpd hpd;

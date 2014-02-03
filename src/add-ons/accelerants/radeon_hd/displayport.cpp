@@ -448,9 +448,9 @@ dp_setup_connectors()
 
 		TRACE("%s: found dp connector on index %" B_PRIu32 "\n",
 			__func__, index);
-		uint32 gpioID = gConnector[index]->gpioID;
+		uint32 i2cPinIndex = gConnector[index]->i2cPinIndex;
 
-		uint32 auxPin = gGPIOInfo[gpioID]->hwPin;
+		uint32 auxPin = gGPIOInfo[i2cPinIndex]->hwPin;
 		dpInfo->auxPin = auxPin;
 
 		uint8 auxMessage[DP_DPCD_SIZE];
@@ -824,8 +824,8 @@ dp_link_train(uint8 crtcID)
 
 	uint32 linkEnumeration
 		= gConnector[connectorIndex]->encoder.linkEnumeration;
-	uint32 gpioID = gConnector[connectorIndex]->gpioID;
-	uint32 hwPin = gGPIOInfo[gpioID]->hwPin;
+	uint32 i2cPinIndex = gConnector[connectorIndex]->i2cPinIndex;
+	uint32 hwPin = gGPIOInfo[i2cPinIndex]->hwPin;
 
 	uint32 dpEncoderID = 0;
 	if (encoder_pick_dig(connectorIndex) > 0)
