@@ -546,63 +546,31 @@ LibsolvSolver::GetResult(BSolverResult& _result)
 	if (transaction->steps.count == 0)
 		return B_OK;
 
-	// Get the packages that end up in the installation. The result queue
-	// contains newPackageCount new packages to install first, followed by the
-	// kept packages.
-	SolvQueue installedPackages;
-	int newPackageCount = transaction_installedresult(transaction,
-		&installedPackages);
-
 	transaction_order(transaction, 0);
 
 	for (int i = 0; i < transaction->steps.count; i++) {
 		Id solvableId = transaction->steps.elements[i];
-		switch (transaction_type(transaction, solvableId,
-				SOLVER_TRANSACTION_RPM_ONLY)) {
-			case SOLVER_TRANSACTION_ERASE:
-			{
-				BSolverPackage* package = _GetPackage(solvableId);
-				if (package == NULL)
-					return B_ERROR;
+		if (fPool->installed
+			&& fPool->solvables[solvableId].repo == fPool->installed) {
+			BSolverPackage* package = _GetPackage(solvableId);
+			if (package == NULL)
+				return B_ERROR;
 
-				if (!_result.AppendElement(
-						BSolverResultElement(
-							BSolverResultElement::B_TYPE_UNINSTALL, package))) {
-					return B_NO_MEMORY;
-				}
-				break;
+			if (!_result.AppendElement(
+					BSolverResultElement(
+						BSolverResultElement::B_TYPE_UNINSTALL, package))) {
+				return B_NO_MEMORY;
 			}
+		} else {
+			BSolverPackage* package = _GetPackage(solvableId);
+			if (package == NULL)
+				return B_ERROR;
 
-			case SOLVER_TRANSACTION_INSTALL:
-			case SOLVER_TRANSACTION_MULTIINSTALL:
-			{
-				// check, if it really is a new package
-// TODO: Is this check really necessary?
-				bool foundPackage = false;
-				for (int j = 0; j < newPackageCount; j++) {
-					if (installedPackages.elements[j] == solvableId) {
-						foundPackage = true;
-						break;
-					}
-				}
-
-				if (!foundPackage)
-					continue;
-
-				BSolverPackage* package = _GetPackage(solvableId);
-				if (package == NULL)
-					return B_ERROR;
-
-				if (!_result.AppendElement(
-						BSolverResultElement(
-							BSolverResultElement::B_TYPE_INSTALL, package))) {
-					return B_NO_MEMORY;
-				}
-				break;
+			if (!_result.AppendElement(
+					BSolverResultElement(
+						BSolverResultElement::B_TYPE_INSTALL, package))) {
+				return B_NO_MEMORY;
 			}
-
-			default:
-				break;
 		}
 	}
 
