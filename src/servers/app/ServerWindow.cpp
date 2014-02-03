@@ -1883,8 +1883,11 @@ fDesktop->LockSingleWindow();
 			if (picture == NULL)
 				break;
 
-			fCurrentView->SetAlphaMask(new(std::nothrow) AlphaMask(
-				picture, inverse, where, *fCurrentView->CurrentState()));
+			AlphaMask* mask = new(std::nothrow) AlphaMask(
+				picture, inverse, where, *fCurrentView->CurrentState());
+			fCurrentView->SetAlphaMask(mask);
+			if (mask != NULL)
+				mask->ReleaseReference();
 			_UpdateDrawState(fCurrentView);
 
 			picture->ReleaseReference();

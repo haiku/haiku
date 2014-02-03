@@ -21,6 +21,8 @@
 AlphaMask::AlphaMask(ServerPicture* picture, bool inverse, BPoint origin,
 		const DrawState& drawState)
 	:
+	fPreviousMask(NULL),
+
 	fPicture(picture),
 	fInverse(inverse),
 	fOrigin(origin),
@@ -44,8 +46,8 @@ AlphaMask::AlphaMask(ServerPicture* picture, bool inverse, BPoint origin,
 AlphaMask::~AlphaMask()
 {
 	fPicture->ReleaseReference();
-	if (fCachedBitmap)
-		fCachedBitmap->ReleaseReference();
+	delete[] fCachedBitmap;
+	SetPrevious(NULL);
 }
 
 
@@ -54,6 +56,25 @@ AlphaMask::Update(BRect bounds, BPoint offset)
 {
 	fViewBounds = bounds;
 	fViewOffset = offset;
+	
+	if (fPreviousMask != NULL)
+		fPreviousMask->Update(bounds, offset);
+}
+
+
+void
+AlphaMask::SetPrevious(AlphaMask* mask)
+{
+	// Since multiple DrawStates can point to the same AlphaMask,
+	// don't accept ourself as the "previous" mask on the state stack.
+	if (mask == this || mask == fPreviousMask)
+		return;
+
+	if (mask != NULL)
+		mask->AcquireReference();
+	if (fPreviousMask != NULL)
+		fPreviousMask->ReleaseReference();
+	fPreviousMask = mask;
 }
 
 
@@ -70,23 +91,77 @@ AlphaMask::Generate()
 		return &fScanline;
 	}
 
-	if (fCachedBitmap != NULL)
-		fCachedBitmap->ReleaseReference();
+	uint32 width = fViewBounds.IntegerWidth() + 1;
+	uint32 height = fViewBounds.IntegerHeight() + 1;
+
+	if (fViewBounds != fCachedBounds || fCachedBitmap == NULL) {
+		delete[] fCachedBitmap;
+		fCachedBitmap = new(std::nothrow) uint8[width * height];
+	}
 	
 	// If rendering the picture fails, we will draw without any clipping.
 	ServerBitmap* bitmap = _RenderPicture();
-	if (bitmap == NULL) {
-		fCachedBitmap = NULL;
+	if (bitmap == NULL || fCachedBitmap == NULL) {
 		fBuffer.attach(NULL, 0, 0, 0);
 		return NULL;
 	}
 
-	fCachedBitmap = bitmap;
+	uint8* bits = bitmap->Bits();
+	uint32 bytesPerRow = bitmap->BytesPerRow();
+	uint8* row = bits;
+	uint8* pixel = fCachedBitmap;
+
+	// Let any previous masks also regenerate themselves. Updating the cached
+	// mask bitmap is only necessary after the view size changed or the
+	// scrolling offset, which definitely affects any masks of lower states
+	// as well, so it works recursively until the bottom mask is regenerated.
+	bool transferBitmap = true;
+	if (fPreviousMask != NULL) {
+		fPreviousMask->Generate();
+		if (fPreviousMask->fCachedBitmap != NULL) {
+			uint8* previousBits = fPreviousMask->fCachedBitmap;
+			for (uint32 y = 0; y < height; y++) {
+				for (uint32 x = 0; x < width; x++) {
+					if (previousBits[0] != 0) {
+						if (fInverse)
+							pixel[0] = 255 - row[3];
+						else
+							pixel[0] = row[3];
+						pixel[0] = pixel[0] * previousBits[0] / 255;
+					} else
+						pixel[0] = 0;
+					previousBits++;
+					pixel++;
+					row += 4;
+				}
+				bits += bytesPerRow;
+				row = bits;
+			}
+			transferBitmap = false;
+		}
+	}
+	
+	if (transferBitmap) {
+		for (uint32 y = 0; y < height; y++) {
+			for (uint32 x = 0; x < width; x++) {
+				if (fInverse)
+					pixel[0] = 255 - row[3];
+				else
+					pixel[0] = row[3];
+				pixel++;
+				row += 4;
+			}
+			bits += bytesPerRow;
+			row = bits;
+		}
+	}
+
+	bitmap->ReleaseReference();
+
 	fCachedBounds = fViewBounds;
 	fCachedOffset = fViewOffset;
 
-	fBuffer.attach(fCachedBitmap->Bits(), fCachedBitmap->Width(),
-		fCachedBitmap->Height(), fCachedBitmap->BytesPerRow());
+	fBuffer.attach(fCachedBitmap, width, height, width);
 
 	fCachedMask.attach(fBuffer, fViewOffset.x + fOrigin.x,
 		fViewOffset.y + fOrigin.y, fInverse ? 255 : 0);
@@ -98,8 +173,6 @@ AlphaMask::Generate()
 ServerBitmap*
 AlphaMask::_RenderPicture() const
 {
-	// TODO: Only the alpha channel is relevant, but there is no B_ALPHA8
-	// color space, so we use 300% more memory than needed.
 	UtilityBitmap* bitmap = new(std::nothrow) UtilityBitmap(fViewBounds,
 		B_RGBA32, 0);
 	if (bitmap == NULL)
@@ -131,16 +204,6 @@ AlphaMask::_RenderPicture() const
 
 	context.PopState();
 	delete engine;
-
-	if (!fInverse)
-		return bitmap;
-
-	// Compute the inverse of our bitmap. There probably is a better way.
-	uint32 size = bitmap->BitsLength();
-	uint8* bits = (uint8*)bitmap->Bits();
-
-	for (uint32 i = 3; i < size; i += 4)
-		bits[i] = 255 - bits[i];
 
 	return bitmap;
 }

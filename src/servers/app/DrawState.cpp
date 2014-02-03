@@ -101,7 +101,8 @@ DrawState::~DrawState()
 {
 	delete fClippingRegion;
 	delete fPreviousState;
-	delete fAlphaMask;
+	if (fAlphaMask != NULL)
+		fAlphaMask->ReleaseReference();
 }
 
 
@@ -115,6 +116,7 @@ DrawState::PushState()
 		next->fOrigin = BPoint(0.0, 0.0);
 		next->fScale = 1.0;
 		next->fPreviousState = this;
+		next->SetAlphaMask(fAlphaMask);
 	}
 
 	return next;
@@ -394,9 +396,17 @@ DrawState::SetAlphaMask(AlphaMask* mask)
 {
 	// NOTE: In BeOS, it wasn't possible to clip to a BPicture and keep
 	// regular custom clipping to a BRegion at the same time.
+	if (fAlphaMask == mask)
+		return;
 
-	delete fAlphaMask;
+	if (mask != NULL)
+		mask->AcquireReference();
+	if (fAlphaMask != NULL)
+		fAlphaMask->ReleaseReference();
 	fAlphaMask = mask;
+	if (fAlphaMask != NULL && fPreviousState != NULL)
+		fAlphaMask->SetPrevious(fPreviousState->fAlphaMask);
+		
 }
 
 

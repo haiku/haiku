@@ -6,6 +6,7 @@
 #ifndef ALPHA_MASK_H
 #define ALPHA_MASK_H
 
+#include <Referenceable.h>
 
 #include "agg_clipped_alpha_mask.h"
 #include "ServerPicture.h"
@@ -18,13 +19,15 @@ class ServerBitmap;
 class ServerPicture;
 
 
-class AlphaMask {
+class AlphaMask : public BReferenceable {
 public:
 								AlphaMask(ServerPicture* mask, bool inverse,
 									BPoint origin, const DrawState& drawState);
 								~AlphaMask();
 
 			void				Update(BRect bounds, BPoint offset);
+
+			void				SetPrevious(AlphaMask* mask);
 
 			scanline_unpacked_masked_type* Generate();
 
@@ -33,6 +36,8 @@ private:
 
 
 private:
+			AlphaMask*			fPreviousMask;
+
 			ServerPicture*		fPicture;
 			const bool			fInverse;
 			BPoint				fOrigin;
@@ -41,7 +46,7 @@ private:
 			BRect				fViewBounds;
 			BPoint				fViewOffset;
 
-			ServerBitmap*		fCachedBitmap;
+			uint8*				fCachedBitmap;
 			BRect				fCachedBounds;
 			BPoint				fCachedOffset;
 

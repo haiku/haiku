@@ -72,27 +72,27 @@ namespace agg
 					x = 0;
 				}
 
+				int rest = 0;
 				if(x + count > xmax)
 				{
-					int rest = x + count - xmax - 1;
+					rest = x + count - xmax - 1;
 					count -= rest;
-					if(count <= 0) 
-					{
-						memset(dst, m_outside, num_pix * sizeof(cover_type));
-						return;
-					}
-					memset(covers + count, m_outside, rest * sizeof(cover_type));
 				}
 
 				const int8u* mask = m_rbuf->row_ptr(y) + x * Step + Offset;
-				do
+				while(count != 0)
 				{
 					*covers = (cover_type)((cover_full + (*covers) * (*mask))
 							>> cover_shift);
 					++covers;
 					mask += Step;
+					--count;
 				}
-				while(--count);
+
+				if(rest > 0) 
+				{
+					memset(covers, m_outside, rest * sizeof(cover_type));
+				}
 			}
 
 		private:
@@ -102,11 +102,8 @@ namespace agg
 			rendering_buffer* m_rbuf;
 			int8u m_outside;
 
-			// TODO this assumes an RGBA bitmap and only uses the alpha channel.
-			// We should keep the masking bitmap as an 8-bit bitmap with only the
-			// alpha channel, to save memory. (this would be Step=1, Offset=0)
-			static const int Step = 4;
-			static const int Offset = 3;
+			static const int Step = 1;
+			static const int Offset = 0;
 	};
 }
 
