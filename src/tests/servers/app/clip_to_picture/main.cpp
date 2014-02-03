@@ -353,26 +353,26 @@ class Test3Validate : public TestRenderer {
 class Test4Clipping : public TestRenderer {
 	virtual void Draw(BView* view, BRect updateRect)
 	{
-		BPicture picture;
-		view->BeginPicture(&picture);
 		view->SetDrawingMode(B_OP_ALPHA);
 		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
-		view->DrawString("Clipping", BPoint(10, 15));
+
+		BPicture rect;
+		view->BeginPicture(&rect);
+		view->FillRect(BRect(20, 20, 50, 50));
 		view->EndPicture();
 
-		view->ClipToPicture(&picture);
+		view->ClipToPicture(&rect);
 
 		view->PushState();
-		view->SetScale(2.0);
-		view->ClipToPicture(&picture);
-
-		view->PushState();
-		view->SetScale(2.0);
-		view->ClipToPicture(&picture);
+		BPicture circle;
+		view->BeginPicture(&circle);
+		view->FillEllipse(BRect(20, 20, 50, 50));
+		view->EndPicture();
+		
+		view->ClipToInversePicture(&circle);
 
 		view->FillRect(view->Bounds());
 
-		view->PopState();
 		view->PopState();
 	}
 };
@@ -381,12 +381,8 @@ class Test4Clipping : public TestRenderer {
 class Test4Validate : public TestRenderer {
 	virtual void Draw(BView* view, BRect updateRect)
 	{
-		view->SetDrawingMode(B_OP_OVER);
-		view->DrawString("Clipping", BPoint(10, 15));
-		view->SetScale(2.0);
-		view->DrawString("Clipping", BPoint(10, 15));
-		view->SetScale(4.0);
-		view->DrawString("Clipping", BPoint(10, 15));
+		view->FillRect(BRect(20, 20, 50, 50));
+		view->FillEllipse(BRect(20, 20, 50, 50), B_SOLID_LOW);
 	}
 };
 
