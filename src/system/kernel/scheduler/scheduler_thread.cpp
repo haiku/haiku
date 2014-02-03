@@ -126,12 +126,10 @@ ThreadData::Dump() const
 {
 	kprintf("\tpriority_penalty:\t%" B_PRId32 "\n", fPriorityPenalty);
 
-	int32 additionalPenalty = 0;
-	const int kMinimalPriority = _GetMinimalPriority();
-	if (kMinimalPriority > 0)
-		additionalPenalty = fAdditionalPenalty % kMinimalPriority;
+	int32 priority = GetPriority() - _GetPenalty();
+	priority = std::max(priority, int32(1));
 	kprintf("\tadditional_penalty:\t%" B_PRId32 " (%" B_PRId32 ")\n",
-		additionalPenalty, fAdditionalPenalty);
+		fAdditionalPenalty % priority, fAdditionalPenalty);
 	kprintf("\teffective_priority:\t%" B_PRId32 "\n", GetEffectivePriority());
 
 	kprintf("\ttime_used:\t\t%" B_PRId64 " us (quantum: %" B_PRId64 " us)\n",
