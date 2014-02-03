@@ -36,6 +36,7 @@
 /* *** DPCD Receiver Compatibility Field (0x0000)     *** */
 /* *** VESA DisplayPort Standard, rev 1.1, p112       *** */
 // DPCD Version (0x0)
+#define DP_DPCD_SIZE						0xf			// Size
 #define DP_DPCD_REV							0x0000		// Reg
 #define DP_DPCD_REV_MINOR_MASK				(15 << 0)	// Int
 #define DP_DPCD_REV_MAJOR_MASK				(15 << 4)	// Int

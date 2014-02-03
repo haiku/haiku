@@ -20,7 +20,7 @@ typedef struct {
 	bool	valid;			// Is valid DP information
 	uint32	auxPin;			// Normally GPIO pin on GPU
 
-	uint8	config[8];		// DP Configuration Data
+	uint8	config[DP_DPCD_SIZE]; // DP Configuration Data
 	int		laneCount;
 
 	uint32	linkRate;		// DP Link Speed 162000, 270000, 540000

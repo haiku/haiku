@@ -100,8 +100,10 @@ dp_aux_write(uint32 hwPin, uint16 address,
 	uint8 auxMessage[20];
 	int auxMessageBytes = sendBytes + 4;
 
-	if (sendBytes > 16)
+	if (sendBytes > 16) {
+		ERROR("%s: Too many bytes! (%" B_PRIu8 ")\n", __func__, sendBytes);
 		return -1;
+	}
 
 	auxMessage[0] = address;
 	auxMessage[1] = address >> 8;
@@ -110,7 +112,7 @@ dp_aux_write(uint32 hwPin, uint16 address,
 	memcpy(&auxMessage[4], send, sendBytes);
 
 	uint8 retry;
-	for (retry = 0; retry < 4; retry++) {
+	for (retry = 0; retry < 7; retry++) {
 		uint8 ack;
 		status_t result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
 			NULL, 0, delay, &ack);
@@ -120,6 +122,7 @@ dp_aux_write(uint32 hwPin, uint16 address,
 		else if (result != B_OK)
 			return result;
 
+		ack >>= 4;
 		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
 			return B_OK;
 		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
@@ -128,6 +131,7 @@ dp_aux_write(uint32 hwPin, uint16 address,
 			return B_IO_ERROR;
 	}
 
+	ERROR("%s: IO Error. %" B_PRIu8 " attempts\n", __func__, retry);
 	return B_IO_ERROR;
 }
 
@@ -145,7 +149,7 @@ dp_aux_read(uint32 hwPin, uint16 address,
 	auxMessage[3] = (auxMessageBytes << 4) | (recvBytes - 1);
 
 	uint8 retry;
-	for (retry = 0; retry < 4; retry++) {
+	for (retry = 0; retry < 7; retry++) {
 		uint8 ack;
 		status_t result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
 			recv, recvBytes, delay, &ack);
@@ -155,6 +159,7 @@ dp_aux_read(uint32 hwPin, uint16 address,
 		else if (result != B_OK)
 			return result;
 
+		ack >>= 4;
 		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
 			return B_OK;
 		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
@@ -163,6 +168,7 @@ dp_aux_read(uint32 hwPin, uint16 address,
 			return B_IO_ERROR;
 	}
 
+	ERROR("%s: IO Error. %" B_PRIu8 " attempts\n", __func__, retry);
 	return B_IO_ERROR;
 }
 
@@ -210,6 +216,7 @@ dp_aux_get_i2c_byte(uint32 hwPin, uint16 address, uint8* data,
 		auxMessage[3] = 3 << 4;
 		auxMessageBytes = 4;
 	}
+
 
 	int retry;
 	for (retry = 0; retry < 4; retry++) {
@@ -433,12 +440,8 @@ dp_setup_connectors()
 	for (uint32 index = 0; index < ATOM_MAX_SUPPORTED_DEVICE; index++) {
 		dp_info* dpInfo = &gConnector[index]->dpInfo;
 		dpInfo->valid = false;
-		if (gConnector[index]->valid == false) {
-			dpInfo->config[0] = 0;
-			continue;
-		}
-
-		if (connector_is_dp(index) == false) {
+		if (gConnector[index]->valid == false
+			|| connector_is_dp(index) == false) {
 			dpInfo->config[0] = 0;
 			continue;
 		}
@@ -450,13 +453,25 @@ dp_setup_connectors()
 		uint32 auxPin = gGPIOInfo[gpioID]->hwPin;
 		dpInfo->auxPin = auxPin;
 
-		uint8 auxMessage[25];
+		uint8 auxMessage[DP_DPCD_SIZE];
 
-		status_t result = dp_aux_read(auxPin, DP_DPCD_REV, auxMessage, 8, 0);
+		status_t result = dp_aux_read(auxPin, DP_DPCD_REV, auxMessage,
+			DP_DPCD_SIZE, 0);
+
 		if (result == B_OK) {
 			dpInfo->valid = true;
-			memcpy(dpInfo->config, auxMessage, 8);
+			memcpy(dpInfo->config, auxMessage, DP_DPCD_SIZE);
+			TRACE("%s: connector(%" B_PRIu32 "): successful read of DPCD\n",
+				__func__, index);
+		} else {
+			TRACE("%s: connector(%" B_PRIu32 "): failed read of DPCD\n",
+				__func__, index);
 		}
+		TRACE("%s: DPCD is ", __func__);
+		uint32 position; 
+		for (position = 0; position < DP_DPCD_SIZE; position++)
+			_sPrintf("%02x ", auxMessage[position]);
+		_sPrintf("\n");
 	}
 }
 
@@ -899,17 +914,20 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 
 	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
 
-	if (!dpInfo->valid)
+	if (!dpInfo->valid) {
+		ERROR("%s: connector(%" B_PRIu32 ") missing valid DisplayPort data!\n",
+			__func__, connectorIndex);
 		return false;
+	}
+
+	edid1_raw raw;
+	uint8* rdata = (uint8*)&raw;
+	uint8 sdata = 0;
 
 	// The following sequence is from a trace of the Linux kernel
 	// radeon code; not sure if the initial writes to address 0 are
 	// requried.
-
 	// TODO: This surely cane be cleaned up
-	edid1_raw raw;
-	uint8* rdata = (uint8*)&raw;
-	uint8 sdata = 0;
 	dp_aux_set_i2c_byte(dpInfo->auxPin, 0x00, &sdata, true, false);
 	dp_aux_set_i2c_byte(dpInfo->auxPin, 0x00, &sdata, false, true);
 
