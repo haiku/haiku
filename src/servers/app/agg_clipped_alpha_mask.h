@@ -72,27 +72,27 @@ namespace agg
 					x = 0;
 				}
 
-				int rest = 0;
 				if(x + count > xmax)
 				{
-					rest = x + count - xmax - 1;
+					int rest = x + count - xmax - 1;
 					count -= rest;
+					if(count <= 0) 
+					{
+						memset(dst, m_outside, num_pix * sizeof(cover_type));
+						return;
+					}
+					memset(covers + count, m_outside, rest * sizeof(cover_type));
 				}
-
+	
 				const int8u* mask = m_rbuf->row_ptr(y) + x * Step + Offset;
-				while(count != 0)
+				do
 				{
 					*covers = (cover_type)((cover_full + (*covers) * (*mask))
-							>> cover_shift);
+						>> cover_shift);
 					++covers;
 					mask += Step;
-					--count;
 				}
-
-				if(rest > 0) 
-				{
-					memset(covers, m_outside, rest * sizeof(cover_type));
-				}
+				while(--count);
 			}
 
 		private:
