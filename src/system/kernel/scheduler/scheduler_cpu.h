@@ -82,11 +82,17 @@ public:
 						void			TrackActivity(ThreadData* oldThreadData,
 											ThreadData* nextThreadData);
 
+						void			StartQuantumTimer(ThreadData* thread,
+											bool wasPreempted);
+
 	static inline		CPUEntry*		GetCPU(int32 cpu);
 
 private:
 						void			_RequestPerformanceLevel(
 											ThreadData* threadData);
+
+	static				int32			_RescheduleEvent(timer* /* unused */);
+	static				int32			_UpdateLoadEvent(timer* /* unused */);
 
 						int32			fCPUNumber;
 						CoreEntry*		fCore;
@@ -100,6 +106,8 @@ private:
 
 						bigtime_t		fMeasureActiveTime;
 						bigtime_t		fMeasureTime;
+
+						bool			fUpdateLoadEvent;
 
 						friend class DebugDumper;
 } CACHE_LINE_ALIGN;
@@ -440,10 +448,11 @@ CoreEntry::ChangeLoad(int32 delta)
 	ASSERT(gTrackCoreLoad);
 	ASSERT(delta >= -kMaxLoad && delta <= kMaxLoad);
 
-	ReadSpinLocker locker(fLoadLock);
-	atomic_add(&fCurrentLoad, delta);
-	atomic_add(&fLoad, delta);
-	locker.Unlock();
+	if (delta != 0) {
+		ReadSpinLocker locker(fLoadLock);
+		atomic_add(&fCurrentLoad, delta);
+		atomic_add(&fLoad, delta);
+	}
 
 	_UpdateLoad();
 }

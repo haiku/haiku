@@ -218,28 +218,12 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 }
 
 
-static inline void
-reschedule_needed()
-{
-	// This function is called as a result of either the timer event set by the
-	// scheduler or an incoming ICI. Make sure the reschedule() is invoked.
-	get_cpu_struct()->invoke_scheduler = true;
-}
-
-
 void
 scheduler_reschedule_ici()
 {
-	reschedule_needed();
-}
-
-
-static int32
-reschedule_event(timer* /* unused */)
-{
-	reschedule_needed();
-	get_cpu_struct()->preempted = true;
-	return B_HANDLED_INTERRUPT;
+	// This function is called as a result of an incoming ICI.
+	// Make sure the reschedule() is invoked.
+	get_cpu_struct()->invoke_scheduler = true;
 }
 
 
@@ -444,18 +428,12 @@ reschedule(int32 nextState)
 	cpu->TrackActivity(oldThreadData, nextThreadData);
 
 	if (nextThread != oldThread || oldThread->cpu->preempted) {
-		timer* quantumTimer = &oldThread->cpu->quantum_timer;
-		if (!oldThread->cpu->preempted)
-			cancel_timer(quantumTimer);
+		cpu->StartQuantumTimer(nextThreadData, oldThread->cpu->preempted);
 
 		oldThread->cpu->preempted = false;
-		if (!nextThreadData->IsIdle()) {
-			bigtime_t quantum = nextThreadData->GetQuantumLeft();
-			add_timer(quantumTimer, &reschedule_event, quantum,
-				B_ONE_SHOT_RELATIVE_TIMER);
-
+		if (!nextThreadData->IsIdle())
 			nextThreadData->Continues();
-		} else
+		else
 			gCurrentMode->rebalance_irqs(true);
 		nextThreadData->StartQuantum();
 

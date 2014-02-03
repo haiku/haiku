@@ -81,7 +81,8 @@ CPUEntry::CPUEntry()
 	:
 	fLoad(0),
 	fMeasureActiveTime(0),
-	fMeasureTime(0)
+	fMeasureTime(0),
+	fUpdateLoadEvent(false)
 {
 	B_INITIALIZE_RW_SPINLOCK(&fSchedulerModeLock);
 	B_INITIALIZE_SPINLOCK(&fQueueLock);
@@ -294,6 +295,27 @@ CPUEntry::TrackActivity(ThreadData* oldThreadData, ThreadData* nextThreadData)
 
 
 void
+CPUEntry::StartQuantumTimer(ThreadData* thread, bool wasPreempted)
+{
+	cpu_ent* cpu = &gCPU[ID()];
+
+	if (!wasPreempted || fUpdateLoadEvent)
+		cancel_timer(&cpu->quantum_timer);
+	fUpdateLoadEvent = false;
+
+	if (!thread->IsIdle()) {
+		bigtime_t quantum = thread->GetQuantumLeft();
+		add_timer(&cpu->quantum_timer, &CPUEntry::_RescheduleEvent, quantum,
+			B_ONE_SHOT_RELATIVE_TIMER);
+	} else if (gTrackCoreLoad) {
+		add_timer(&cpu->quantum_timer, &CPUEntry::_UpdateLoadEvent,
+			kLoadMeasureInterval, B_ONE_SHOT_RELATIVE_TIMER);
+		fUpdateLoadEvent = true;
+	}
+}
+
+
+void
 CPUEntry::_RequestPerformanceLevel(ThreadData* threadData)
 {
 	SCHEDULER_ENTER_FUNCTION();
@@ -320,6 +342,24 @@ CPUEntry::_RequestPerformanceLevel(ThreadData* threadData)
 
 		increase_cpu_performance(delta);
 	}
+}
+
+
+/* static */ int32
+CPUEntry::_RescheduleEvent(timer* /* unused */)
+{
+	get_cpu_struct()->invoke_scheduler = true;
+	get_cpu_struct()->preempted = true;
+	return B_HANDLED_INTERRUPT;
+}
+
+
+/* static */ int32
+CPUEntry::_UpdateLoadEvent(timer* /* unused */)
+{
+	CoreEntry::GetCore(smp_get_current_cpu())->ChangeLoad(0);
+	CPUEntry::GetCPU(smp_get_current_cpu())->fUpdateLoadEvent = false;
+	return B_HANDLED_INTERRUPT;
 }
 
 
@@ -497,10 +537,8 @@ CoreEntry::_UpdateLoad()
 	bigtime_t now = system_time();
 	if (now < kLoadMeasureInterval + fLastLoadUpdate)
 		return;
-	if (!try_acquire_write_spinlock(&gCoreHeapsLock))
-		return;
-	WriteSpinLocker coreLocker(gCoreHeapsLock, true);
 	WriteSpinLocker locker(fLoadLock);
+	WriteSpinLocker coreLocker(gCoreHeapsLock);
 
 	int32 newKey = GetLoad();
 	int32 oldKey = CoreLoadHeap::GetKey(this);
