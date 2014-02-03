@@ -168,6 +168,8 @@ radeon_dpms_set_hook(int mode)
 
 	// As the accelerant hook doesn't pass crtc id
 	for (uint8 id = 0; id < MAX_DISPLAY; id++) {
+		if (gDisplay[id]->attached == false)
+			continue;
 		radeon_dpms_set(id, mode);
 	}
 }
