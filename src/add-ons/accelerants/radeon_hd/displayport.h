@@ -23,18 +23,18 @@
 #define DP_TPS3_SUPPORTED (1 << 6) // Stored within MAX_LANE_COUNT
 
 
-uint8 dpcd_reg_read(uint32 hwPin, uint16 address);
-void dpcd_reg_write(uint32 hwPin, uint16 address, uint8 value);
+uint8 dpcd_reg_read(uint32 connectorIndex, uint16 address);
+void dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value);
 
 // Communication over DisplayPort AUX channel
-status_t dp_aux_write(uint32 hwPin, uint16 address, uint8* send,
+status_t dp_aux_write(uint32 connectorIndex, uint16 address, uint8* send,
 	uint8 sendBytes, uint8 delay);
-status_t dp_aux_read(uint32 hwPin, uint16 address, uint8* recv,
+status_t dp_aux_read(uint32 connectorIndex, uint16 address, uint8* recv,
 	int recvBytes, uint8 delay);
 
-status_t dp_aux_set_i2c_byte(uint32 hwPin, uint16 address,
+status_t dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address,
 	uint8* data, bool start, bool stop);
-status_t dp_aux_get_i2c_byte(uint32 hwPin, uint16 address,
+status_t dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address,
 	uint8* data, bool start, bool stop);
 
 uint32 dp_get_link_rate(uint32 connectorIndex, display_mode* mode);

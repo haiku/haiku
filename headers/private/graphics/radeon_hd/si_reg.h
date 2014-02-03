@@ -304,6 +304,7 @@
 #define 	SI_LB_D6_VBLANK_INTERRUPT			(1 << 3)
 #define 	SI_DC_HPD6_INTERRUPT				(1 << 17)
 #define 	SI_DC_HPD6_RX_INTERRUPT				(1 << 18)
+#define SI_DC_GPIO_HPD_A						0x65b4
 
 /* 0x6858, 0x7458, 0x10058, 0x10c58, 0x11858, 0x12458 */
 #define SI_GRPH_INT_STATUS						0x6858

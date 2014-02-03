@@ -31,10 +31,13 @@
 
 
 static status_t
-dp_aux_speak(uint32 hwPin, uint8* send, int sendBytes,
+dp_aux_speak(uint32 connectorIndex, uint8* send, int sendBytes,
 	uint8* recv, int recvBytes, uint8 delay, uint8* ack)
 {
-	if (hwPin == 0) {
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
+	if (dpInfo->auxPin == 0) {
 		ERROR("%s: cannot speak on invalid GPIO pin!\n", __func__);
 		return B_IO_ERROR;
 	}
@@ -52,11 +55,46 @@ dp_aux_speak(uint32 hwPin, uint8* send, int sendBytes,
 	args.v1.lpAuxRequest = B_HOST_TO_LENDIAN_INT16(0 + 4);
 	args.v1.lpDataOut = B_HOST_TO_LENDIAN_INT16(16 + 4);
 	args.v1.ucDataOutLen = 0;
-	args.v1.ucChannelID = hwPin;
+	args.v1.ucChannelID = dpInfo->auxPin;
 	args.v1.ucDelay = delay / 10;
 
-	//if (ASIC_IS_DCE4(rdev))
-	//	args.v2.ucHPD_ID = chan->rec.hpd;
+	uint16 hpdPinIndex = gConnector[connectorIndex]->hpdPinIndex;
+	if (info.dceMajor >= 4
+		&& gGPIOInfo[hpdPinIndex]->valid) {
+
+		uint32 targetReg = EVERGREEN_DC_GPIO_HPD_A;
+		if (info.dceMajor >= 6)
+			targetReg = SI_DC_GPIO_HPD_A;
+
+		// You're drunk AMD, go home. (this makes no sense)
+		if (gGPIOInfo[hpdPinIndex]->hwReg == targetReg) {
+			switch(gGPIOInfo[hpdPinIndex]->hwMask) {
+				case (1 << 0):
+					args.v2.ucHPD_ID = 0;
+					break;
+				case (1 << 8):
+					args.v2.ucHPD_ID = 1;
+					break;
+				case (1 << 16):
+					args.v2.ucHPD_ID = 2;
+					break;
+				case (1 << 24):
+					args.v2.ucHPD_ID = 3;
+					break;
+				case (1 << 26):
+					args.v2.ucHPD_ID = 4;
+					break;
+				case (1 << 28):
+					args.v2.ucHPD_ID = 5;
+					break;
+				default:
+					args.v2.ucHPD_ID = 0xff;
+					break;
+			}
+		} else {
+			args.v2.ucHPD_ID = 0xff;
+		}
+	}
 
 	unsigned char* base = (unsigned char*)(gAtomContext->scratch + 1);
 
@@ -94,7 +132,7 @@ dp_aux_speak(uint32 hwPin, uint8* send, int sendBytes,
 
 
 status_t
-dp_aux_write(uint32 hwPin, uint16 address,
+dp_aux_write(uint32 connectorIndex, uint16 address,
 	uint8* send, uint8 sendBytes, uint8 delay)
 {
 	uint8 auxMessage[20];
@@ -114,8 +152,8 @@ dp_aux_write(uint32 hwPin, uint16 address,
 	uint8 retry;
 	for (retry = 0; retry < 7; retry++) {
 		uint8 ack;
-		status_t result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
-			NULL, 0, delay, &ack);
+		status_t result = dp_aux_speak(connectorIndex, auxMessage,
+			auxMessageBytes, NULL, 0, delay, &ack);
 
 		if (result == B_BUSY)
 			continue;
@@ -137,7 +175,7 @@ dp_aux_write(uint32 hwPin, uint16 address,
 
 
 status_t
-dp_aux_read(uint32 hwPin, uint16 address,
+dp_aux_read(uint32 connectorIndex, uint16 address,
 	uint8* recv, int recvBytes, uint8 delay)
 {
 	uint8 auxMessage[4];
@@ -151,8 +189,8 @@ dp_aux_read(uint32 hwPin, uint16 address,
 	uint8 retry;
 	for (retry = 0; retry < 7; retry++) {
 		uint8 ack;
-		status_t result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
-			recv, recvBytes, delay, &ack);
+		status_t result = dp_aux_speak(connectorIndex, auxMessage,
+			auxMessageBytes, recv, recvBytes, delay, &ack);
 
 		if (result == B_BUSY)
 			continue;
@@ -174,19 +212,19 @@ dp_aux_read(uint32 hwPin, uint16 address,
 
 
 void
-dpcd_reg_write(uint32 hwPin, uint16 address, uint8 value)
+dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 {
-	status_t result = dp_aux_write(hwPin, address, &value, 1, 0);
+	status_t result = dp_aux_write(connectorIndex, address, &value, 1, 0);
 	if (result != B_OK)
 		ERROR("%s: error on DisplayPort aux write (0x%lX)\n", __func__, result);
 }
 
 
 uint8
-dpcd_reg_read(uint32 hwPin, uint16 address)
+dpcd_reg_read(uint32 connectorIndex, uint16 address)
 {
 	uint8 value = 0;
-	status_t result = dp_aux_read(hwPin, address, &value, 1, 0);
+	status_t result = dp_aux_read(connectorIndex, address, &value, 1, 0);
 	if (result != B_OK)
 		ERROR("%s: error on DisplayPort aux read (0x%lX)\n", __func__, result);
 
@@ -195,7 +233,7 @@ dpcd_reg_read(uint32 hwPin, uint16 address)
 
 
 status_t
-dp_aux_get_i2c_byte(uint32 hwPin, uint16 address, uint8* data,
+dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 	bool start, bool stop)
 {
 	uint8 auxMessage[5];
@@ -217,15 +255,14 @@ dp_aux_get_i2c_byte(uint32 hwPin, uint16 address, uint8* data,
 		auxMessageBytes = 4;
 	}
 
-
 	int retry;
 	for (retry = 0; retry < 4; retry++) {
 		uint8 ack;
 		uint8 reply[2];
 		int replyBytes = 1;
 
-		status_t result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
-			reply, replyBytes, 0, &ack);
+		status_t result = dp_aux_speak(connectorIndex, auxMessage,
+			auxMessageBytes, reply, replyBytes, 0, &ack);
 		if (result == B_BUSY)
 			continue;
 		else if (result != B_OK) {
@@ -274,7 +311,7 @@ dp_aux_get_i2c_byte(uint32 hwPin, uint16 address, uint8* data,
 
 
 status_t
-dp_aux_set_i2c_byte(uint32 hwPin, uint16 address, uint8* data,
+dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 	bool start, bool stop)
 {
 	uint8 auxMessage[5];
@@ -303,8 +340,8 @@ dp_aux_set_i2c_byte(uint32 hwPin, uint16 address, uint8* data,
 		uint8 reply[2];
 		int replyBytes = 1;
 
-		status_t result = dp_aux_speak(hwPin, auxMessage, auxMessageBytes,
-			reply, replyBytes, 0, &ack);
+		status_t result = dp_aux_speak(connectorIndex, auxMessage,
+			auxMessageBytes, reply, replyBytes, 0, &ack);
 		if (result == B_BUSY)
 			continue;
 		else if (result != B_OK) {
@@ -455,7 +492,7 @@ dp_setup_connectors()
 
 		uint8 auxMessage[DP_DPCD_SIZE];
 
-		status_t result = dp_aux_read(auxPin, DP_DPCD_REV, auxMessage,
+		status_t result = dp_aux_read(index, DP_DPCD_REV, auxMessage,
 			DP_DPCD_SIZE, 0);
 
 		if (result == B_OK) {
@@ -476,10 +513,11 @@ dp_setup_connectors()
 }
 
 
-static bool
-dp_get_link_status(dp_info* dp)
+bool
+dp_get_link_status(uint32 connectorIndex)
 {
-	status_t result = dp_aux_read(dp->auxPin, DP_LANE_STATUS_0_1,
+	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
+	status_t result = dp_aux_read(connectorIndex, DP_LANE_STATUS_0_1,
 		dp->linkStatus, DP_LINK_STATUS_SIZE, 100);
 
 	if (result != B_OK) {
@@ -547,7 +585,7 @@ dp_update_vs_emph(uint32 connectorIndex)
 		dp->trainingSet[0], ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH);
 
 	// Set vs and emph on the sink
-	dp_aux_write(dp->auxPin, DP_TRAIN_LANE0,
+	dp_aux_write(connectorIndex, DP_TRAIN_LANE0,
 		dp->trainingSet, dp->laneCount, 0);
 }
 
@@ -664,7 +702,7 @@ dp_set_tp(uint32 connectorIndex, int trainingPattern)
 	}
 
 	// Enable training pattern on the sink
-	dpcd_reg_write(dp->auxPin, DP_TRAIN, trainingPattern);
+	dpcd_reg_write(connectorIndex, DP_TRAIN, trainingPattern);
 }
 
 
@@ -692,7 +730,7 @@ dp_link_train_cr(uint32 connectorIndex)
 		else
 			snooze(1000 * 4 * dp->trainingReadInterval);
 
-		if (!dp_get_link_status(dp))
+		if (!dp_get_link_status(connectorIndex))
 			break;
 
 		if (dp_clock_recovery_ok(dp)) {
@@ -759,7 +797,7 @@ dp_link_train_ce(uint32 connectorIndex)
 		else
 			snooze(1000 * 4 * dp->trainingReadInterval);
 
-		if (!dp_get_link_status(dp))
+		if (!dp_get_link_status(connectorIndex))
 			break;
 
 		if (dp_clock_equalization_ok(dp)) {
@@ -824,8 +862,6 @@ dp_link_train(uint8 crtcID)
 
 	uint32 linkEnumeration
 		= gConnector[connectorIndex]->encoder.linkEnumeration;
-	uint32 i2cPinIndex = gConnector[connectorIndex]->i2cPinIndex;
-	uint32 hwPin = gGPIOInfo[i2cPinIndex]->hwPin;
 
 	uint32 dpEncoderID = 0;
 	if (encoder_pick_dig(connectorIndex) > 0)
@@ -838,9 +874,9 @@ dp_link_train(uint8 crtcID)
 		dpEncoderID |= ATOM_DP_CONFIG_LINK_A;
 
 	dp->trainingReadInterval
-		= dpcd_reg_read(hwPin, DP_TRAINING_AUX_RD_INTERVAL);
+		= dpcd_reg_read(connectorIndex, DP_TRAINING_AUX_RD_INTERVAL);
 
-	uint8 sandbox = dpcd_reg_read(hwPin, DP_MAX_LANE_COUNT);
+	uint8 sandbox = dpcd_reg_read(connectorIndex, DP_MAX_LANE_COUNT);
 
 	radeon_shared_info &info = *gInfo->shared_info;
 	//bool dpTPS3Supported = false;
@@ -851,13 +887,14 @@ dp_link_train(uint8 crtcID)
 
 	// Power up the DP sink
 	if (dp->config[0] >= DP_DPCD_REV_11)
-		dpcd_reg_write(hwPin, DP_SET_POWER, DP_SET_POWER_D0);
+		dpcd_reg_write(connectorIndex, DP_SET_POWER, DP_SET_POWER_D0);
 
 	// Possibly enable downspread on the sink
-	if ((dp->config[3] & 0x1) != 0)
-		dpcd_reg_write(hwPin, DP_DOWNSPREAD_CTRL, DP_DOWNSPREAD_CTRL_AMP_EN);
-	else
-		dpcd_reg_write(hwPin, DP_DOWNSPREAD_CTRL, 0);
+	if ((dp->config[3] & 0x1) != 0) {
+		dpcd_reg_write(connectorIndex, DP_DOWNSPREAD_CTRL,
+			DP_DOWNSPREAD_CTRL_AMP_EN);
+	} else
+		dpcd_reg_write(connectorIndex, DP_DOWNSPREAD_CTRL, 0);
 
 	encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
 		ATOM_ENCODER_CMD_SETUP_PANEL_MODE);
@@ -867,11 +904,11 @@ dp_link_train(uint8 crtcID)
 	if ((dp->config[0] >= DP_DPCD_REV_11)
 		&& (dp->config[2] & DP_ENHANCED_FRAME_CAP_EN))
 		sandbox |= DP_ENHANCED_FRAME_EN;
-	dpcd_reg_write(hwPin, DP_LANE_COUNT, sandbox);
+	dpcd_reg_write(connectorIndex, DP_LANE_COUNT, sandbox);
 
 	// Set the link rate on the DP sink
 	sandbox = dp_encode_link_rate(dp->linkRate);
-	dpcd_reg_write(hwPin, DP_LINK_RATE, sandbox);
+	dpcd_reg_write(connectorIndex, DP_LINK_RATE, sandbox);
 
 	// Start link training on source
 	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
@@ -883,7 +920,7 @@ dp_link_train(uint8 crtcID)
 	}
 
 	// Disable the training pattern on the sink
-	dpcd_reg_write(hwPin, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
+	dpcd_reg_write(connectorIndex, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
 
 	dp_link_train_cr(connectorIndex);
 	dp_link_train_ce(connectorIndex);
@@ -892,7 +929,7 @@ dp_link_train(uint8 crtcID)
 	snooze(400);
 
 	// Disable the training pattern on the sink
-	dpcd_reg_write(hwPin, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
+	dpcd_reg_write(connectorIndex, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
 
 	// Disable the training pattern on the source
 	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
@@ -928,29 +965,29 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 	// radeon code; not sure if the initial writes to address 0 are
 	// requried.
 	// TODO: This surely cane be cleaned up
-	dp_aux_set_i2c_byte(dpInfo->auxPin, 0x00, &sdata, true, false);
-	dp_aux_set_i2c_byte(dpInfo->auxPin, 0x00, &sdata, false, true);
+	dp_aux_set_i2c_byte(connectorIndex, 0x00, &sdata, true, false);
+	dp_aux_set_i2c_byte(connectorIndex, 0x00, &sdata, false, true);
 
-	dp_aux_set_i2c_byte(dpInfo->auxPin, 0x50, &sdata, true, false);
-	dp_aux_set_i2c_byte(dpInfo->auxPin, 0x50, &sdata, false, false);
-	dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, rdata, true, false);
-	dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, rdata, false, false);
-	dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, rdata, false, true);
-	dp_aux_set_i2c_byte(dpInfo->auxPin, 0x50, &sdata, true, false);
-	dp_aux_set_i2c_byte(dpInfo->auxPin, 0x50, &sdata, false, false);
-	dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, rdata, true, false);
+	dp_aux_set_i2c_byte(connectorIndex, 0x50, &sdata, true, false);
+	dp_aux_set_i2c_byte(connectorIndex, 0x50, &sdata, false, false);
+	dp_aux_get_i2c_byte(connectorIndex, 0x50, rdata, true, false);
+	dp_aux_get_i2c_byte(connectorIndex, 0x50, rdata, false, false);
+	dp_aux_get_i2c_byte(connectorIndex, 0x50, rdata, false, true);
+	dp_aux_set_i2c_byte(connectorIndex, 0x50, &sdata, true, false);
+	dp_aux_set_i2c_byte(connectorIndex, 0x50, &sdata, false, false);
+	dp_aux_get_i2c_byte(connectorIndex, 0x50, rdata, true, false);
 
 	for (uint32 i = 0; i < sizeof(raw); i++) {
-		status_t result = dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50,
+		status_t result = dp_aux_get_i2c_byte(connectorIndex, 0x50,
 			rdata++, false, false);
 		if (result != B_OK) {
 			TRACE("%s: error reading EDID data at index %" B_PRIu32 ", "
 				"result = 0x%lX\n", __func__, i, result);
-			dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, &sdata, false, true);
+			dp_aux_get_i2c_byte(connectorIndex, 0x50, &sdata, false, true);
 			return false;
 		}
 	}
-	dp_aux_get_i2c_byte(dpInfo->auxPin, 0x50, &sdata, false, true);
+	dp_aux_get_i2c_byte(connectorIndex, 0x50, &sdata, false, true);
 
 	if (raw.version.version != 1 || raw.version.revision > 4) {
 		ERROR("%s: EDID version or revision out of range\n", __func__);

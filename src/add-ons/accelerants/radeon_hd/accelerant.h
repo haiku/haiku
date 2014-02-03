@@ -161,7 +161,6 @@ typedef struct {
 	uint16		hpdPinIndex; // id of gpio pin for hotplug detection
 	struct encoder_info encoder;
 	struct encoder_info encoderExternal;
-	// TODO struct radeon_hpd hpd;
 	dp_info		dpInfo;
 } connector_info;
 
