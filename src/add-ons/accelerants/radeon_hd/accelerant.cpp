@@ -256,7 +256,7 @@ radeon_init_accelerant(int device)
 	radeon_gpu_probe();
 
 	// find GPIO pins from AtomBIOS
-	gpio_probe();
+	gpio_populate();
 
 	// find physical card connectors from AtomBIOS
 	status = connector_probe();

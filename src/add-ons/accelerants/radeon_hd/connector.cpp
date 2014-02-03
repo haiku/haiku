@@ -40,45 +40,45 @@ gpio_lock_i2c(void* cookie, bool lock)
 
 	if (lock == true) {
 		// hwCapable and > DCE3
-		if (info->hwCapable == true && gInfo->shared_info->dceMajor >= 3) {
+		if (info->i2c.hwCapable == true && gInfo->shared_info->dceMajor >= 3) {
 			// Switch GPIO pads to ddc mode
-			buffer = Read32(OUT, info->sclMaskReg);
+			buffer = Read32(OUT, info->i2c.sclMaskReg);
 			buffer &= ~(1 << 16);
-			Write32(OUT, info->sclMaskReg, buffer);
+			Write32(OUT, info->i2c.sclMaskReg, buffer);
 		}
 
 		// Clear pins
-		buffer = Read32(OUT, info->sclAReg) & ~info->sclAMask;
-		Write32(OUT, info->sclAReg, buffer);
-		buffer = Read32(OUT, info->sdaAReg) & ~info->sdaAMask;
-		Write32(OUT, info->sdaAReg, buffer);
+		buffer = Read32(OUT, info->i2c.sclAReg) & ~info->i2c.sclAMask;
+		Write32(OUT, info->i2c.sclAReg, buffer);
+		buffer = Read32(OUT, info->i2c.sdaAReg) & ~info->i2c.sdaAMask;
+		Write32(OUT, info->i2c.sdaAReg, buffer);
 	}
 
 	// Set pins to input
-	buffer = Read32(OUT, info->sclEnReg) & ~info->sclEnMask;
-	Write32(OUT, info->sclEnReg, buffer);
-	buffer = Read32(OUT, info->sdaEnReg) & ~info->sdaEnMask;
-	Write32(OUT, info->sdaEnReg, buffer);
+	buffer = Read32(OUT, info->i2c.sclEnReg) & ~info->i2c.sclEnMask;
+	Write32(OUT, info->i2c.sclEnReg, buffer);
+	buffer = Read32(OUT, info->i2c.sdaEnReg) & ~info->i2c.sdaEnMask;
+	Write32(OUT, info->i2c.sdaEnReg, buffer);
 
 	// mask clock GPIO pins for software use
-	buffer = Read32(OUT, info->sclMaskReg);
+	buffer = Read32(OUT, info->i2c.sclMaskReg);
 	if (lock == true)
-		buffer |= info->sclMask;
+		buffer |= info->i2c.sclMask;
 	else
-		buffer &= ~info->sclMask;
+		buffer &= ~info->i2c.sclMask;
 
-	Write32(OUT, info->sclMaskReg, buffer);
-	Read32(OUT, info->sclMaskReg);
+	Write32(OUT, info->i2c.sclMaskReg, buffer);
+	Read32(OUT, info->i2c.sclMaskReg);
 
 	// mask data GPIO pins for software use
-	buffer = Read32(OUT, info->sdaMaskReg);
+	buffer = Read32(OUT, info->i2c.sdaMaskReg);
 	if (lock == true)
-		buffer |= info->sdaMask;
+		buffer |= info->i2c.sdaMask;
 	else
-		buffer &= ~info->sdaMask;
+		buffer &= ~info->i2c.sdaMask;
 
-	Write32(OUT, info->sdaMaskReg, buffer);
-	Read32(OUT, info->sdaMaskReg);
+	Write32(OUT, info->i2c.sdaMaskReg, buffer);
+	Read32(OUT, info->i2c.sdaMaskReg);
 }
 
 
@@ -87,8 +87,8 @@ gpio_get_i2c_bit(void* cookie, int* _clock, int* _data)
 {
 	gpio_info* info = (gpio_info*)cookie;
 
-	uint32 scl = Read32(OUT, info->sclYReg) & info->sclYMask;
-	uint32 sda = Read32(OUT, info->sdaYReg) & info->sdaYMask;
+	uint32 scl = Read32(OUT, info->i2c.sclYReg) & info->i2c.sclYMask;
+	uint32 sda = Read32(OUT, info->i2c.sdaYReg) & info->i2c.sdaYMask;
 
 	*_clock = scl != 0;
 	*_data = sda != 0;
@@ -102,15 +102,15 @@ gpio_set_i2c_bit(void* cookie, int clock, int data)
 {
 	gpio_info* info = (gpio_info*)cookie;
 
-	uint32 scl = Read32(OUT, info->sclEnReg) & ~info->sclEnMask;
-	scl |= clock ? 0 : info->sclEnMask;
-	Write32(OUT, info->sclEnReg, scl);
-	Read32(OUT, info->sclEnReg);
+	uint32 scl = Read32(OUT, info->i2c.sclEnReg) & ~info->i2c.sclEnMask;
+	scl |= clock ? 0 : info->i2c.sclEnMask;
+	Write32(OUT, info->i2c.sclEnReg, scl);
+	Read32(OUT, info->i2c.sclEnReg);
 
-	uint32 sda = Read32(OUT, info->sdaEnReg) & ~info->sdaEnMask;
-	sda |= data ? 0 : info->sdaEnMask;
-	Write32(OUT, info->sdaEnReg, sda);
-	Read32(OUT, info->sdaEnReg);
+	uint32 sda = Read32(OUT, info->i2c.sdaEnReg) & ~info->i2c.sdaEnMask;
+	sda |= data ? 0 : info->i2c.sdaEnMask;
+	Write32(OUT, info->i2c.sdaEnReg, sda);
+	Read32(OUT, info->i2c.sdaEnReg);
 
 	return B_OK;
 }
@@ -121,7 +121,8 @@ connector_read_edid(uint32 connectorIndex, edid1_info* edid)
 {
 	// ensure things are sane
 	uint32 i2cPinIndex = gConnector[connectorIndex]->i2cPinIndex;
-	if (gGPIOInfo[i2cPinIndex]->valid == false) {
+	if (gGPIOInfo[i2cPinIndex]->valid == false
+		|| gGPIOInfo[i2cPinIndex]->i2c.valid == false) {
 		ERROR("%s: invalid gpio %" B_PRIu32 " for connector %" B_PRIu32 "\n",
 			__func__, i2cPinIndex, connectorIndex);
 		return false;
@@ -245,54 +246,6 @@ connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode)
 
 
 static status_t
-gpio_manual_probe(uint8 hwPin)
-{
-	// manually populate some information on a GPIO pin based on pin id
-
-	int index = GetIndexIntoMasterTable(DATA, GPIO_Pin_LUT);
-	uint16 tableOffset;
-	uint16 tableSize;
-
-	struct _ATOM_GPIO_PIN_LUT* gpioInfo;
-
-	if (atom_parse_data_header(gAtomContext, index, &tableSize, NULL, NULL,
-		&tableOffset)) {
-		ERROR("%s: could't read GPIO_Pin_LUT table from AtomBIOS index %d!\n",
-			__func__, index);
-	}
-	gpioInfo = (struct _ATOM_GPIO_PIN_LUT*)(gAtomContext->bios + tableOffset);
-
-	int numIndices = (tableSize - sizeof(ATOM_COMMON_TABLE_HEADER)) /
-		sizeof(ATOM_GPIO_PIN_ASSIGNMENT);
-	
-	// Find the next available GPIO pin index
-	int gpioIndex;
-	for(gpioIndex = 0; gpioIndex < ATOM_MAX_SUPPORTED_DEVICE; gpioIndex++) {
-		if (!gGPIOInfo[gpioIndex]->valid)
-			break;
-	}
-
-	ATOM_GPIO_PIN_ASSIGNMENT* pin = gpioInfo->asGPIO_Pin;
-	for (int i = 0; i < numIndices; i++) {
-		if (hwPin == pin->ucGPIO_ID) {
-			gGPIOInfo[gpioIndex]->valid = true;
-			gGPIOInfo[gpioIndex]->hwPin = hwPin;
-			#if 0
-			gGPIOInfo[gpioIndex]->hwReg
-				= le16_to_cpu(pin->usGpioPin_AIndex) * 4;
-			gGPIOInfo[gpioIndex]->hwMask
-				= (1 << pin->ucGpioPinBitShift);
-			#endif
-			return B_OK;
-		}
-		pin = (ATOM_GPIO_PIN_ASSIGNMENT*)((uint8*)pin
-			+ sizeof(ATOM_GPIO_PIN_ASSIGNMENT));
-	}
-	return B_ERROR;
-}
-
-
-static status_t
 connector_attach_gpio_i2c(uint32 connectorIndex, uint8 hwPin)
 {
 	gConnector[connectorIndex]->i2cPinIndex = 0;
@@ -321,27 +274,70 @@ connector_attach_gpio_hpd(uint32 connectorIndex, uint8 hwPin)
         gConnector[connectorIndex]->hpdPinIndex = i;
         return B_OK;
     }
+
 	// We couldnt find the GPIO pin in the known GPIO pins.
-	// Lets call the GPIO lookup table to add in hpd pins manually
-
-	gpio_manual_probe(hwPin);
-
-	// Try again...
-    for (uint32 i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
-        if (gGPIOInfo[i]->hwPin != hwPin)
-            continue;
-        gConnector[connectorIndex]->hpdPinIndex = i;
-        return B_OK;
-    }
-
     TRACE("%s: can't find GPIO pin 0x%" B_PRIX8 " for connector %" B_PRIu32 "\n",
         __func__, hwPin, connectorIndex);
     return B_ERROR;
 }
 
 
-status_t
-gpio_probe()
+static status_t
+gpio_general_populate()
+{
+	int index = GetIndexIntoMasterTable(DATA, GPIO_Pin_LUT);
+	uint16 tableOffset;
+	uint16 tableSize;
+
+	struct _ATOM_GPIO_PIN_LUT* gpioInfo;
+
+	if (atom_parse_data_header(gAtomContext, index, &tableSize, NULL, NULL,
+		&tableOffset)) {
+		ERROR("%s: could't read GPIO_Pin_LUT table from AtomBIOS index %d!\n",
+			__func__, index);
+	}
+	gpioInfo = (struct _ATOM_GPIO_PIN_LUT*)(gAtomContext->bios + tableOffset);
+
+	int numIndices = (tableSize - sizeof(ATOM_COMMON_TABLE_HEADER)) /
+		sizeof(ATOM_GPIO_PIN_ASSIGNMENT);
+	
+	// Find the next available GPIO pin index
+	uint32 gpioIndex;
+	for(gpioIndex = 0; gpioIndex < ATOM_MAX_SUPPORTED_DEVICE; gpioIndex++) {
+		if (!gGPIOInfo[gpioIndex]->valid)
+			break;
+	}
+
+	ATOM_GPIO_PIN_ASSIGNMENT* pin = gpioInfo->asGPIO_Pin;
+	for (int i = 0; i < numIndices; i++) {
+		if (gGPIOInfo[gpioIndex]->valid) {
+			ERROR("%s: BUG: Attempting to fill already populated gpio pin!\n",
+				__func__);
+			return B_ERROR;
+		}
+		gGPIOInfo[gpioIndex]->valid = true;
+		gGPIOInfo[gpioIndex]->i2c.valid = false;
+		gGPIOInfo[gpioIndex]->hwPin = pin->ucGPIO_ID;
+		gGPIOInfo[gpioIndex]->hwReg
+			= B_LENDIAN_TO_HOST_INT16(pin->usGpioPin_AIndex) * 4;
+		gGPIOInfo[gpioIndex]->hwMask
+			= (1 << pin->ucGpioPinBitShift);
+		pin = (ATOM_GPIO_PIN_ASSIGNMENT*)((uint8*)pin
+			+ sizeof(ATOM_GPIO_PIN_ASSIGNMENT));
+
+		TRACE("%s: general GPIO @ %" B_PRIu32 ", valid: %s, "
+			"hwPin: 0x%" B_PRIX32 "\n", __func__, gpioIndex,
+			gGPIOInfo[gpioIndex]->valid ? "true" : "false",
+			gGPIOInfo[gpioIndex]->hwPin);
+
+		gpioIndex++;
+	}
+	return B_OK;
+}
+
+
+static status_t
+gpio_i2c_populate()
 {
 	radeon_shared_info &info = *gInfo->shared_info;
 
@@ -369,7 +365,19 @@ gpio_probe()
 		return B_ERROR;
 	}
 
+	// Find the next available GPIO pin index
+	uint32 gpioIndex;
+	for(gpioIndex = 0; gpioIndex < ATOM_MAX_SUPPORTED_DEVICE; gpioIndex++) {
+		if (!gGPIOInfo[gpioIndex]->valid)
+			break;
+	}
+
 	for (uint32 i = 0; i < numIndices; i++) {
+		if (gGPIOInfo[gpioIndex]->valid) {
+			ERROR("%s: BUG: Attempting to fill already populated gpio pin!\n",
+				__func__);
+			return B_ERROR;
+		}
 		ATOM_GPIO_I2C_ASSIGMENT* gpio = &i2cInfo->asGPIO_Info[i];
 
 		if (info.dceMajor >= 3) {
@@ -393,53 +401,69 @@ gpio_probe()
 		}
 
 		// populate gpio information
-		gGPIOInfo[i]->hwPin = gpio->sucI2cId.ucAccess;
-		gGPIOInfo[i]->hwCapable
+		gGPIOInfo[gpioIndex]->hwPin = gpio->sucI2cId.ucAccess;
+		gGPIOInfo[gpioIndex]->i2c.hwCapable
 			= (gpio->sucI2cId.sbfAccess.bfHW_Capable) ? true : false;
 
 		// GPIO mask (Allows software to control the GPIO pad)
 		// 0 = chip access; 1 = only software;
-		gGPIOInfo[i]->sclMaskReg
+		gGPIOInfo[gpioIndex]->i2c.sclMaskReg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkMaskRegisterIndex) * 4;
-		gGPIOInfo[i]->sdaMaskReg
+		gGPIOInfo[gpioIndex]->i2c.sdaMaskReg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataMaskRegisterIndex) * 4;
-		gGPIOInfo[i]->sclMask = 1 << gpio->ucClkMaskShift;
-		gGPIOInfo[i]->sdaMask = 1 << gpio->ucDataMaskShift;
+		gGPIOInfo[gpioIndex]->i2c.sclMask = 1 << gpio->ucClkMaskShift;
+		gGPIOInfo[gpioIndex]->i2c.sdaMask = 1 << gpio->ucDataMaskShift;
 
 		// GPIO output / write (A) enable
 		// 0 = GPIO input (Y); 1 = GPIO output (A);
-		gGPIOInfo[i]->sclEnReg
+		gGPIOInfo[gpioIndex]->i2c.sclEnReg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkEnRegisterIndex) * 4;
-		gGPIOInfo[i]->sdaEnReg
+		gGPIOInfo[gpioIndex]->i2c.sdaEnReg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataEnRegisterIndex) * 4;
-		gGPIOInfo[i]->sclEnMask = 1 << gpio->ucClkEnShift;
-		gGPIOInfo[i]->sdaEnMask = 1 << gpio->ucDataEnShift;
+		gGPIOInfo[gpioIndex]->i2c.sclEnMask = 1 << gpio->ucClkEnShift;
+		gGPIOInfo[gpioIndex]->i2c.sdaEnMask = 1 << gpio->ucDataEnShift;
 
 		// GPIO output / write (A)
-		gGPIOInfo[i]->sclAReg
+		gGPIOInfo[gpioIndex]->i2c.sclAReg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkA_RegisterIndex) * 4;
-		gGPIOInfo[i]->sdaAReg
+		gGPIOInfo[gpioIndex]->i2c.sdaAReg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataA_RegisterIndex) * 4;
-		gGPIOInfo[i]->sclAMask = 1 << gpio->ucClkA_Shift;
-		gGPIOInfo[i]->sdaAMask = 1 << gpio->ucDataA_Shift;
+		gGPIOInfo[gpioIndex]->i2c.sclAMask = 1 << gpio->ucClkA_Shift;
+		gGPIOInfo[gpioIndex]->i2c.sdaAMask = 1 << gpio->ucDataA_Shift;
 
 		// GPIO input / read (Y)
-		gGPIOInfo[i]->sclYReg
+		gGPIOInfo[gpioIndex]->i2c.sclYReg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usClkY_RegisterIndex) * 4;
-		gGPIOInfo[i]->sdaYReg
+		gGPIOInfo[gpioIndex]->i2c.sdaYReg
 			= B_LENDIAN_TO_HOST_INT16(gpio->usDataY_RegisterIndex) * 4;
-		gGPIOInfo[i]->sclYMask = 1 << gpio->ucClkY_Shift;
-		gGPIOInfo[i]->sdaYMask = 1 << gpio->ucDataY_Shift;
+		gGPIOInfo[gpioIndex]->i2c.sclYMask = 1 << gpio->ucClkY_Shift;
+		gGPIOInfo[gpioIndex]->i2c.sdaYMask = 1 << gpio->ucDataY_Shift;
 
 		// ensure data is valid
-		gGPIOInfo[i]->valid = gGPIOInfo[i]->sclMaskReg ? true : false;
+		gGPIOInfo[gpioIndex]->i2c.valid
+			= gGPIOInfo[gpioIndex]->i2c.sclMaskReg ? true : false;
+		gGPIOInfo[gpioIndex]->valid = gGPIOInfo[gpioIndex]->i2c.valid;
 
-		TRACE("%s: GPIO @ %" B_PRIu32 ", valid: %s, hwPin: 0x%" B_PRIX32 "\n",
-			__func__, i, gGPIOInfo[i]->valid ? "true" : "false",
-			gGPIOInfo[i]->hwPin);
+		TRACE("%s: i2c GPIO @ %" B_PRIu32 ", valid: %s, hwPin: 0x%" B_PRIX32 "\n",
+			__func__, gpioIndex, gGPIOInfo[gpioIndex]->valid ? "true" : "false",
+			gGPIOInfo[gpioIndex]->hwPin);
+
+		gpioIndex++;
 	}
 
 	return B_OK;
+}
+
+
+status_t
+gpio_populate()
+{
+	status_t result = gpio_general_populate();
+	if (result != B_OK)
+		return result;
+
+	result = gpio_i2c_populate();
+	return result;
 }
 
 
@@ -837,6 +861,8 @@ debug_connectors()
 				gGPIOInfo[i2cPinIndex]->hwPin);
 			ERROR("   - gpio valid:       %s\n",
 				gGPIOInfo[i2cPinIndex]->valid ? "true" : "false");
+			ERROR("   - i2c valid:        %s\n",
+				gGPIOInfo[i2cPinIndex]->i2c.valid ? "true" : "false");
 			ERROR(" + hpd gpio table id:  %" B_PRIu16 "\n", hpdPinIndex);
 			ERROR("   - gpio hw pin:      0x%" B_PRIX32 "\n",
 				 gGPIOInfo[hpdPinIndex]->hwPin);

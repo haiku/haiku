@@ -110,27 +110,32 @@ typedef struct {
 	bool	valid;
 
 	uint32	hwPin;	// GPIO hardware pin on GPU
-	bool	hwCapable;	// can do hw assisted i2c
+	uint32	hwReg;	// GPIO register
+	uint32	hwMask;	// GPIO pin mask
 
-	uint32	sclMaskReg;
-	uint32	sdaMaskReg;
-	uint32	sclMask;
-	uint32	sdaMask;
+	struct {
+		bool valid;
+		bool hwCapable;	// can do hw assisted i2c
+		uint32 sclMaskReg;
+		uint32 sdaMaskReg;
+		uint32 sclMask;
+		uint32 sdaMask;
 
-	uint32	sclEnReg;
-	uint32	sdaEnReg;
-	uint32	sclEnMask;
-	uint32	sdaEnMask;
+		uint32 sclEnReg;
+		uint32 sdaEnReg;
+		uint32 sclEnMask;
+		uint32 sdaEnMask;
 
-	uint32	sclYReg;
-	uint32	sdaYReg;
-	uint32	sclYMask;
-	uint32	sdaYMask;
+		uint32 sclYReg;
+		uint32 sdaYReg;
+		uint32 sclYMask;
+		uint32 sdaYMask;
 
-	uint32	sclAReg;
-	uint32	sdaAReg;
-	uint32	sclAMask;
-	uint32	sdaAMask;
+		uint32 sclAReg;
+		uint32 sdaAReg;
+		uint32 sclAMask;
+		uint32 sdaAMask;
+	} i2c;
 } gpio_info;
 
 

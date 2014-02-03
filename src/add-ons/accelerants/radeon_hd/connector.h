@@ -60,7 +60,7 @@ const int kConnectorConvert[] = {
 };
 
 
-status_t gpio_probe();
+status_t gpio_populate();
 bool connector_read_edid(uint32 connector, edid1_info* edid);
 bool connector_read_mode_lvds(uint32 connectorIndex, display_mode* mode);
 
