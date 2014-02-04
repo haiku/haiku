@@ -457,26 +457,12 @@ DrawState::Transform(float* x, float* y) const
 	*y *= fCombinedScale;
 	*x += fCombinedOrigin.x;
 	*y += fCombinedOrigin.y;
-	if (!fCombinedTransform.IsIdentity()) {
-		double _x = *x;
-		double _y = *y;
-		fCombinedTransform.Apply(&_x, &_y);
-		*x = _x;
-		*y = _y;
-	}
 }
 
 
 void
 DrawState::InverseTransform(float* x, float* y) const
 {
-	if (!fCombinedTransform.IsIdentity()) {
-		double _x = *x;
-		double _y = *y;
-		fCombinedTransform.ApplyInverse(&_x, &_y);
-		*x = _x;
-		*y = _y;
-	}
 	*x -= fCombinedOrigin.x;
 	*y -= fCombinedOrigin.y;
 	if (fCombinedScale != 0.0) {
