@@ -25,6 +25,7 @@
 #include <agg_span_gradient.h>
 #include <agg_span_interpolator_linear.h>
 #include <agg_rendering_buffer.h>
+#include <agg_trans_affine.h>
 
 #include "agg_clipped_alpha_mask.h"
 #include "agg_rasterizer_scanline_aa_subpix.h"

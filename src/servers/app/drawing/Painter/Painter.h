@@ -21,6 +21,7 @@
 #include <agg_conv_curve.h>
 #include <agg_path_storage.h>
 
+#include <AffineTransform.h>
 #include <Font.h>
 #include <Rect.h>
 
@@ -51,15 +52,19 @@ public:
 			void				DetachFromBuffer();
 			BRect				Bounds() const;
 
-			void				ConstrainClipping(const BRegion* region);
-			const BRegion*		ClippingRegion() const
-									{ return fClippingRegion; }
-
 			void				SetDrawState(const DrawState* data,
 									int32 xOffset = 0,
 									int32 yOffset = 0);
 
+			void				ConstrainClipping(const BRegion* region);
+			const BRegion*		ClippingRegion() const
+									{ return fClippingRegion; }
+
 								// object settings
+			void				SetTransform(BAffineTransform transform,
+									int32 xOffset = 0,
+									int32 yOffset = 0);
+
 			void				SetHighColor(const rgb_color& color);
 	inline	rgb_color			HighColor() const
 									{ return fPatternHandler.HighColor(); }
@@ -295,6 +300,8 @@ private:
 			BRect				_StrokePath(VertexSource& path) const;
 			template<class VertexSource>
 			BRect				_FillPath(VertexSource& path) const;
+			template<class VertexSource>
+			BRect				_RasterizePath(VertexSource& path) const;
 			void				_CalcLinearGradientTransform(BPoint startPoint,
 									BPoint endPoint, agg::trans_affine& mtx,
 									float gradient_d2 = 100.0f) const;
@@ -358,7 +365,9 @@ private:
 			bool				fValidClipping : 1;
 			bool				fDrawingText : 1;
 			bool				fAttached : 1;
+			bool				fIdentityTransform : 1;
 
+			agg::trans_affine	fTransform;
 			float				fPenSize;
 			const BRegion*		fClippingRegion;
 			drawing_mode		fDrawingMode;

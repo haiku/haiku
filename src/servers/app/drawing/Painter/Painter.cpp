@@ -272,9 +272,9 @@ Painter::Bounds() const
 
 // SetDrawState
 void
-Painter::SetDrawState(const DrawState* data, int32 xOffset, int32 yOffset)
+Painter::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 {
-	// NOTE: The custom clipping in "data" is ignored, because it has already
+	// NOTE: The custom clipping in "state" is ignored, because it has already
 	// been taken into account elsewhere
 
 	// NOTE: Usually this function is only used when the "current view"
@@ -282,40 +282,41 @@ Painter::SetDrawState(const DrawState* data, int32 xOffset, int32 yOffset)
 	// and messed up the state. For other graphics state changes, the
 	// Painter methods are used directly, so this function is much less
 	// speed critical than it used to be.
+	SetTransform(state->CombinedTransform(), xOffset, yOffset);
 
-	SetPenSize(data->PenSize());
+	SetPenSize(state->PenSize());
 
-	SetFont(data);
+	SetFont(state);
 
-	fSubpixelPrecise = data->SubPixelPrecise();
+	fSubpixelPrecise = state->SubPixelPrecise();
 
-	if (data->GetAlphaMask() != NULL)
-		fMaskedUnpackedScanline = data->GetAlphaMask()->Generate();
+	if (state->GetAlphaMask() != NULL)
+		fMaskedUnpackedScanline = state->GetAlphaMask()->Generate();
 	else
 		fMaskedUnpackedScanline = NULL;
 
 	// any of these conditions means we need to use a different drawing
 	// mode instance
 	bool updateDrawingMode
-		= !(data->GetPattern() == fPatternHandler.GetPattern())
-			|| data->GetDrawingMode() != fDrawingMode
-			|| (data->GetDrawingMode() == B_OP_ALPHA
-				&& (data->AlphaSrcMode() != fAlphaSrcMode
-					|| data->AlphaFncMode() != fAlphaFncMode));
+		= !(state->GetPattern() == fPatternHandler.GetPattern())
+			|| state->GetDrawingMode() != fDrawingMode
+			|| (state->GetDrawingMode() == B_OP_ALPHA
+				&& (state->AlphaSrcMode() != fAlphaSrcMode
+					|| state->AlphaFncMode() != fAlphaFncMode));
 
-	fDrawingMode = data->GetDrawingMode();
-	fAlphaSrcMode = data->AlphaSrcMode();
-	fAlphaFncMode = data->AlphaFncMode();
-	fPatternHandler.SetPattern(data->GetPattern());
+	fDrawingMode = state->GetDrawingMode();
+	fAlphaSrcMode = state->AlphaSrcMode();
+	fAlphaFncMode = state->AlphaFncMode();
+	fPatternHandler.SetPattern(state->GetPattern());
 	fPatternHandler.SetOffsets(xOffset, yOffset);
-	fLineCapMode = data->LineCapMode();
-	fLineJoinMode = data->LineJoinMode();
-	fMiterLimit = data->MiterLimit();
+	fLineCapMode = state->LineCapMode();
+	fLineJoinMode = state->LineJoinMode();
+	fMiterLimit = state->MiterLimit();
 
 	// adopt the color *after* the pattern is set
 	// to set the renderers to the correct color
-	SetHighColor(data->HighColor());
-	SetLowColor(data->LowColor());
+	SetHighColor(state->HighColor());
+	SetLowColor(state->LowColor());
 
 	if (updateDrawingMode || fPixelFormat.UsesOpCopyForText())
 		_UpdateDrawingMode();
@@ -337,6 +338,20 @@ Painter::ConstrainClipping(const BRegion* region)
 		clipping_rect cb = fClippingRegion->FrameInt();
 		fRasterizer.clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
 		fSubpixRasterizer.clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
+	}
+}
+
+
+void
+Painter::SetTransform(BAffineTransform transform, int32 xOffset, int32 yOffset)
+{
+	fIdentityTransform = transform.IsIdentity();
+	if (!fIdentityTransform) {
+		fTransform = agg::trans_affine(transform.sx, transform.shy,
+			transform.shx, transform.sy, transform.tx/* + xOffset*/,
+			transform.ty/* + yOffset*/);
+	} else {
+		fTransform.reset();
 	}
 }
 
@@ -460,7 +475,7 @@ Painter::StrokeLine(BPoint a, BPoint b)
 	_Transform(&b, false);
 
 	// first, try an optimized version
-	if (fPenSize == 1.0
+	if (fPenSize == 1.0 && fIdentityTransform
 		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)
 		&& fMaskedUnpackedScanline == NULL) {
 		pattern pat = *fPatternHandler.GetR5Pattern();
@@ -477,7 +492,7 @@ Painter::StrokeLine(BPoint a, BPoint b)
 
 	if (a == b) {
 		// special case dots
-		if (fPenSize == 1.0 && !fSubpixelPrecise) {
+		if (fPenSize == 1.0 && !fSubpixelPrecise && fIdentityTransform) {
 			if (fClippingRegion->Contains(a)) {
 				fPixelFormat.blend_pixel((int)a.x, (int)a.y, fRenderer.color(),
 					255);
@@ -495,7 +510,7 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		// tweak ends to "include" the pixel at the index,
 		// we need to do this in order to produce results like R5,
 		// where coordinates were inclusive
-		if (!fSubpixelPrecise) {
+		if (!fSubpixelPrecise && fIdentityTransform) {
 			bool centerOnLine = fmodf(fPenSize, 2.0) != 0.0;
 			if (a.x == b.x) {
 				// shift to pixel center vertically
@@ -870,7 +885,7 @@ Painter::StrokeRect(const BRect& r) const
 	_Transform(&b, false);
 
 	// first, try an optimized version
-	if (fPenSize == 1.0
+	if (fPenSize == 1.0 && fIdentityTransform
 			&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)
 			&& fMaskedUnpackedScanline == NULL) {
 		pattern p = *fPatternHandler.GetR5Pattern();
@@ -885,7 +900,7 @@ Painter::StrokeRect(const BRect& r) const
 		}
 	}
 
-	if (fmodf(fPenSize, 2.0) != 0.0) {
+	if (fIdentityTransform && fmodf(fPenSize, 2.0) != 0.0) {
 		// shift coords to center of pixels
 		a.x += 0.5;
 		a.y += 0.5;
@@ -934,7 +949,7 @@ Painter::FillRect(const BRect& r) const
 
 	// first, try an optimized version
 	if ((fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)
-			&& fMaskedUnpackedScanline == NULL) {
+		&& fMaskedUnpackedScanline == NULL && fIdentityTransform) {
 		pattern p = *fPatternHandler.GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
@@ -946,7 +961,8 @@ Painter::FillRect(const BRect& r) const
 			return _Clipped(rect);
 		}
 	}
-	if (fDrawingMode == B_OP_ALPHA && fAlphaFncMode == B_ALPHA_OVERLAY) {
+	if (fDrawingMode == B_OP_ALPHA && fAlphaFncMode == B_ALPHA_OVERLAY
+		&& fMaskedUnpackedScanline == NULL && fIdentityTransform) {
 		pattern p = *fPatternHandler.GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
@@ -994,7 +1010,7 @@ Painter::FillRect(const BRect& r, const BGradient& gradient) const
 	// first, try an optimized version
 	if (gradient.GetType() == BGradient::TYPE_LINEAR
 		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)
-		&& fMaskedUnpackedScanline == NULL) {
+		&& fMaskedUnpackedScanline == NULL && fIdentityTransform) {
 		const BGradientLinear* linearGradient
 			= dynamic_cast<const BGradientLinear*>(&gradient);
 		if (linearGradient->Start().x == linearGradient->End().x
@@ -1067,7 +1083,8 @@ Painter::FillRect(const BRect& r, const rgb_color& c) const
 
 // FillRectVerticalGradient
 void
-Painter::FillRectVerticalGradient(BRect r, const BGradientLinear& gradient) const
+Painter::FillRectVerticalGradient(BRect r,
+	const BGradientLinear& gradient) const
 {
 	if (!fValidClipping)
 		return;
@@ -1153,97 +1170,15 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 
 	BPoint lt(r.left, r.top);
 	BPoint rb(r.right, r.bottom);
-	bool centerOffset = fPenSize == 1.0;
-	// TODO: use this when using _StrokePath()
-	// bool centerOffset = fmodf(fPenSize, 2.0) != 0.0;
+	bool centerOffset = fmodf(fPenSize, 2.0) != 0.0;
 	_Transform(&lt, centerOffset);
 	_Transform(&rb, centerOffset);
 
-	if (fPenSize == 1.0) {
-		agg::rounded_rect rect;
-		rect.rect(lt.x, lt.y, rb.x, rb.y);
-		rect.radius(xRadius, yRadius);
+	agg::rounded_rect rect;
+	rect.rect(lt.x, lt.y, rb.x, rb.y);
+	rect.radius(xRadius, yRadius);
 
-		return _StrokePath(rect);
-	}
-
-	// NOTE: This implementation might seem a little strange, but it makes
-	// stroked round rects look like on R5. A more correct way would be to
-	// use _StrokePath() as above (independent from fPenSize).
-	// The fact that the bounding box of the round rect is not enlarged
-	// by fPenSize/2 is actually on purpose, though one could argue it is
-	// unexpected.
-
-	// enclose the right and bottom edge
-	rb.x++;
-	rb.y++;
-
-	agg::rounded_rect outer;
-	outer.rect(lt.x, lt.y, rb.x, rb.y);
-	outer.radius(xRadius, yRadius);
-
-	if (gSubpixelAntialiasing) {
-		fSubpixRasterizer.reset();
-		fSubpixRasterizer.add_path(outer);
-
-		// don't add an inner hole if the "size is negative", this avoids
-		// some defects that can be observed on R5 and could be regarded
-		// as a bug.
-		if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
-			agg::rounded_rect inner;
-			inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize,
-				rb.y - fPenSize);
-			inner.radius(max_c(0.0, xRadius - fPenSize),
-				max_c(0.0, yRadius - fPenSize));
-
-			fSubpixRasterizer.add_path(inner);
-		}
-
-		// make the inner rect work as a hole
-		fSubpixRasterizer.filling_rule(agg::fill_even_odd);
-
-		if (fPenSize > 2) {
-			agg::render_scanlines(fSubpixRasterizer, fSubpixPackedScanline,
-				fSubpixRenderer);
-		} else {
-			agg::render_scanlines(fSubpixRasterizer, fSubpixUnpackedScanline,
-				fSubpixRenderer);
-		}
-
-		fSubpixRasterizer.filling_rule(agg::fill_non_zero);
-	} else {
-		fRasterizer.reset();
-		fRasterizer.add_path(outer);
-
-		// don't add an inner hole if the "size is negative", this avoids
-		// some defects that can be observed on R5 and could be regarded as
-		// a bug.
-		if (2 * fPenSize < rb.x - lt.x && 2 * fPenSize < rb.y - lt.y) {
-			agg::rounded_rect inner;
-			inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize,
-				rb.y - fPenSize);
-			inner.radius(max_c(0.0, xRadius - fPenSize),
-				max_c(0.0, yRadius - fPenSize));
-
-			fRasterizer.add_path(inner);
-		}
-
-		// make the inner rect work as a hole
-		fRasterizer.filling_rule(agg::fill_even_odd);
-
-		if (fMaskedUnpackedScanline != NULL) {
-			agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
-				fRenderer);
-		} else if (fPenSize > 2)
-			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
-		else
-			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
-
-		// reset to default
-		fRasterizer.filling_rule(agg::fill_non_zero);
-	}
-
-	return _Clipped(_BoundingBox(outer));
+	return _StrokePath(rect);
 }
 
 
@@ -1334,61 +1269,12 @@ Painter::DrawEllipse(BRect r, bool fill) const
 	if (divisions > 4096)
 		divisions = 4096;
 
-	if (fill) {
-		agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
+	agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
 
+	if (fill)
 		return _FillPath(path);
-	}
-
-	// NOTE: This implementation might seem a little strange, but it makes
-	// stroked ellipses look like on R5. A more correct way would be to use
-	// _StrokePath(), but it currently has its own set of problems with
-	// narrow ellipses (for small xRadii or yRadii).
-	float inset = fPenSize / 2.0;
-	agg::ellipse inner(center.x, center.y, max_c(0.0, xRadius - inset),
-		max_c(0.0, yRadius - inset), divisions);
-	agg::ellipse outer(center.x, center.y, xRadius + inset, yRadius + inset,
-		divisions);
-
-	if (gSubpixelAntialiasing) {
-		fSubpixRasterizer.reset();
-		fSubpixRasterizer.add_path(outer);
-		fSubpixRasterizer.add_path(inner);
-
-		// make the inner ellipse work as a hole
-		fSubpixRasterizer.filling_rule(agg::fill_even_odd);
-
-		if (fPenSize > 4) {
-			agg::render_scanlines(fSubpixRasterizer, fSubpixPackedScanline,
-				fSubpixRenderer);
-		} else {
-			agg::render_scanlines(fSubpixRasterizer, fSubpixUnpackedScanline,
-				fSubpixRenderer);
-		}
-
-		// reset to default
-		fSubpixRasterizer.filling_rule(agg::fill_non_zero);
-	} else {
-		fRasterizer.reset();
-		fRasterizer.add_path(outer);
-		fRasterizer.add_path(inner);
-
-		// make the inner ellipse work as a hole
-		fRasterizer.filling_rule(agg::fill_even_odd);
-
-		if (fMaskedUnpackedScanline != NULL) {
-			agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
-				fRenderer);
-		} else if (fPenSize > 4)
-			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
-		else
-			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
-
-		// reset to default
-		fRasterizer.filling_rule(agg::fill_non_zero);
-	}
-
-	return _Clipped(_BoundingBox(outer));
+	else
+		return _StrokePath(path);
 }
 
 
@@ -2908,30 +2794,14 @@ Painter::_StrokePath(VertexSource& path) const
 	stroke.line_join(agg_line_join_mode_for(fLineJoinMode));
 	stroke.miter_limit(fMiterLimit);
 
-	if (fMaskedUnpackedScanline != NULL) {
-		// TODO: we can't do both alpha-masking and subpixel AA.
-		fRasterizer.reset();
-		fRasterizer.add_path(path);
-		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
-			fRenderer);
-	} else if (gSubpixelAntialiasing) {
-		fSubpixRasterizer.reset();
-		fSubpixRasterizer.add_path(stroke);
+	if (fIdentityTransform)
+		return _RasterizePath(stroke);
 
-		agg::render_scanlines(fSubpixRasterizer,
-			fSubpixPackedScanline, fSubpixRenderer);
-	} else {
-		fRasterizer.reset();
-		fRasterizer.add_path(stroke);
+	stroke.approximation_scale(fTransform.scale());
 
-		agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
-	}
-
-	BRect touched = _BoundingBox(path);
-	float penSize = ceilf(fPenSize / 2.0);
-	touched.InsetBy(-penSize, -penSize);
-
-	return _Clipped(touched);
+	agg::conv_transform<agg::conv_stroke<VertexSource> > transformedStroke(
+		stroke, fTransform);
+	return _RasterizePath(transformedStroke);
 }
 
 
@@ -2939,6 +2809,19 @@ Painter::_StrokePath(VertexSource& path) const
 template<class VertexSource>
 BRect
 Painter::_FillPath(VertexSource& path) const
+{
+	if (fIdentityTransform)
+		return _RasterizePath(path);
+
+	agg::conv_transform<VertexSource> transformedPath(path, fTransform);
+	return _RasterizePath(transformedPath);
+}
+
+
+// _RasterizePath
+template<class VertexSource>
+BRect
+Painter::_RasterizePath(VertexSource& path) const
 {
 	if (fMaskedUnpackedScanline != NULL) {
 		// TODO: we can't do both alpha-masking and subpixel AA.
