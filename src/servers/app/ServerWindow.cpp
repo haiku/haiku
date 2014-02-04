@@ -1575,6 +1575,36 @@ fDesktop->LockSingleWindow();
 			fLink.Flush();
 			break;
 		}
+		case AS_VIEW_SET_TRANSFORM:
+		{
+			BAffineTransform transform;
+			if (link.Read<BAffineTransform>(&transform) != B_OK)
+				break;
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_TRANSFORM: "
+				"View: %s -> transform: %.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n",
+				Title(), fCurrentView->Name(), transform.sx, transform.shy,
+				transform.shx, transform.sy, transform.tx, transform.ty));
+
+			fCurrentView->CurrentState()->SetTransform(transform);
+			_UpdateDrawState(fCurrentView);
+			break;
+		}
+		case AS_VIEW_GET_TRANSFORM:
+		{
+			BAffineTransform transform
+				= fCurrentView->CurrentState()->Transform();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_TRANSFORM: "
+				"View: %s -> transform: %.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n",
+				Title(), fCurrentView->Name(), transform.sx, transform.shy,
+				transform.shx, transform.sy, transform.tx, transform.ty));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<BAffineTransform>(transform);
+			fLink.Flush();
+			break;
+		}
 		case AS_VIEW_SET_PEN_LOC:
 		{
 			BPoint location;
@@ -2944,10 +2974,24 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_VIEW_SET_SCALE:
 		{
 			float scale;
-			link.Read<float>(&scale);
+			if (link.Read<float>(&scale) != B_OK)
+				break;
+
 			picture->WriteSetScale(scale);
 
 			fCurrentView->SetScale(scale);
+			_UpdateDrawState(fCurrentView);
+			break;
+		}
+		case AS_VIEW_SET_TRANSFORM:
+		{
+			BAffineTransform transform;
+			if (link.Read<BAffineTransform>(&transform) != B_OK)
+				break;
+
+			picture->WriteSetTransform(transform);
+
+			fCurrentView->CurrentState()->SetTransform(transform);
 			_UpdateDrawState(fCurrentView);
 			break;
 		}

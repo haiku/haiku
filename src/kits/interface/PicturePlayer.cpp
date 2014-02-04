@@ -10,15 +10,18 @@
 
 /**	PicturePlayer is used to play picture data. */
 
+#include <PicturePlayer.h>
+
 #include <stdio.h>
 #include <string.h>
 
-#include <PicturePlayer.h>
+#include <AffineTransform.h>
 #include <PictureProtocol.h>
-
 #include <Shape.h>
 
+
 using BPrivate::PicturePlayer;
+
 
 typedef void (*fnc)(void*);
 typedef void (*fnc_BPoint)(void*, BPoint);
@@ -43,6 +46,7 @@ typedef void (*fnc_DrawPixels)(void *, BRect, BRect, int32, int32, int32,
 							   int32, int32, const void *);
 typedef void (*fnc_DrawPicture)(void *, BPoint, int32);
 typedef void (*fnc_BShape)(void*, BShape*);
+typedef void (*fnc_BAffineTransform)(void*, BAffineTransform);
 
 
 static void
@@ -91,6 +95,7 @@ PictureOpToString(int op)
 		RETURN_STRING(B_PIC_SET_LINE_MODE);
 		RETURN_STRING(B_PIC_SET_PEN_SIZE);
 		RETURN_STRING(B_PIC_SET_SCALE);
+		RETURN_STRING(B_PIC_SET_TRANSFORM);
 		RETURN_STRING(B_PIC_SET_FORE_COLOR);
 		RETURN_STRING(B_PIC_SET_BACK_COLOR);
 		RETURN_STRING(B_PIC_SET_STIPLE_PATTERN);
@@ -530,6 +535,13 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				((fnc_ss)functionTable[47])(userData,
 					*reinterpret_cast<const int16 *>(data), /* alphaSrcMode */
 					*reinterpret_cast<const int16 *>(data + sizeof(int16))); /* alphaFncMode */
+				break;
+			}
+
+			case B_PIC_SET_TRANSFORM:
+			{
+				((fnc_BAffineTransform)functionTable[48])(userData,
+					*reinterpret_cast<const BAffineTransform *>(data));
 				break;
 			}
 

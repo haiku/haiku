@@ -30,10 +30,12 @@ using std::nothrow;
 
 DrawState::DrawState()
 	:
-	fOrigin(0.0, 0.0),
-	fCombinedOrigin(0.0, 0.0),
-	fScale(1.0),
-	fCombinedScale(1.0),
+	fOrigin(0.0f, 0.0f),
+	fCombinedOrigin(0.0f, 0.0f),
+	fScale(1.0f),
+	fCombinedScale(1.0f),
+	fTransform(),
+	fCombinedTransform(),
 	fClippingRegion(NULL),
 	fAlphaMask(NULL),
 
@@ -45,8 +47,8 @@ DrawState::DrawState()
 	fAlphaSrcMode(B_PIXEL_ALPHA),
 	fAlphaFncMode(B_ALPHA_OVERLAY),
 
-	fPenLocation(0.0, 0.0),
-	fPenSize(1.0),
+	fPenLocation(0.0f, 0.0f),
+	fPenSize(1.0f),
 
 	fFontAliasing(false),
 	fSubPixelPrecise(false),
@@ -65,6 +67,8 @@ DrawState::DrawState(const DrawState& other)
 	fCombinedOrigin(other.fCombinedOrigin),
 	fScale(other.fScale),
 	fCombinedScale(other.fCombinedScale),
+	fTransform(other.fTransform),
+	fCombinedTransform(other.fCombinedTransform),
 	fClippingRegion(NULL),
 	fAlphaMask(NULL),
 
@@ -115,6 +119,7 @@ DrawState::PushState()
 		// Prepare state as derived from this state
 		next->fOrigin = BPoint(0.0, 0.0);
 		next->fScale = 1.0;
+		next->fTransform.Reset();
 		next->fPreviousState = this;
 		next->SetAlphaMask(fAlphaMask);
 	}
@@ -212,6 +217,7 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 	fDrawingMode = info.drawingMode;
 	fOrigin = info.origin;
 	fScale = info.scale;
+	fTransform = info.transform;
 	fLineJoinMode = info.lineJoin;
 	fLineCapMode = info.lineCap;
 	fMiterLimit = info.miterLimit;
@@ -222,9 +228,11 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 	if (fPreviousState != NULL) {
 		fCombinedOrigin = fPreviousState->fCombinedOrigin + fOrigin;
 		fCombinedScale = fPreviousState->fCombinedScale * fScale;
+		fCombinedTransform = fPreviousState->fCombinedTransform * fTransform;
 	} else {
 		fCombinedOrigin = fOrigin;
 		fCombinedScale = fScale;
+		fCombinedTransform = fTransform;
 	}
 
 
@@ -273,6 +281,7 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 	info.viewStateInfo.drawingMode = fDrawingMode;
 	info.viewStateInfo.origin = fOrigin;
 	info.viewStateInfo.scale = fScale;
+	info.viewStateInfo.transform = fTransform;
 	info.viewStateInfo.lineJoin = fLineJoinMode;
 	info.viewStateInfo.lineCap = fLineCapMode;
 	info.viewStateInfo.miterLimit = fMiterLimit;
@@ -319,21 +328,39 @@ DrawState::SetOrigin(BPoint origin)
 void
 DrawState::SetScale(float scale)
 {
-	if (fScale != scale) {
-		fScale = scale;
+	if (fScale == scale)
+		return;
 
-		// NOTE: the scales of earlier states are never expected to
-		// change, only the topmost state ever changes
-		if (fPreviousState != NULL)
-			fCombinedScale = fPreviousState->fCombinedScale * fScale;
-		else
-			fCombinedScale = fScale;
+	fScale = scale;
 
-		// update font size
-		// NOTE: This is what makes the call potentially expensive,
-		// hence the introductory check
-		fFont.SetSize(fUnscaledFontSize * fCombinedScale);
-	}
+	// NOTE: the scales of earlier states are never expected to
+	// change, only the topmost state ever changes
+	if (fPreviousState != NULL)
+		fCombinedScale = fPreviousState->fCombinedScale * fScale;
+	else
+		fCombinedScale = fScale;
+
+	// update font size
+	// NOTE: This is what makes the call potentially expensive,
+	// hence the introductory check
+	fFont.SetSize(fUnscaledFontSize * fCombinedScale);
+}
+
+
+void
+DrawState::SetTransform(BAffineTransform transform)
+{
+	if (fTransform == transform)
+		return;
+
+	fTransform = transform;
+
+	// NOTE: the transforms of earlier states are never expected to
+	// change, only the topmost state ever changes
+	if (fPreviousState != NULL)
+		fCombinedTransform = fPreviousState->fCombinedTransform * fTransform;
+	else
+		fCombinedTransform = fTransform;
 }
 
 
@@ -430,12 +457,26 @@ DrawState::Transform(float* x, float* y) const
 	*y *= fCombinedScale;
 	*x += fCombinedOrigin.x;
 	*y += fCombinedOrigin.y;
+	if (!fCombinedTransform.IsIdentity()) {
+		double _x = *x;
+		double _y = *y;
+		fCombinedTransform.Apply(&_x, &_y);
+		*x = _x;
+		*y = _y;
+	}
 }
 
 
 void
 DrawState::InverseTransform(float* x, float* y) const
 {
+	if (!fCombinedTransform.IsIdentity()) {
+		double _x = *x;
+		double _y = *y;
+		fCombinedTransform.ApplyInverse(&_x, &_y);
+		*x = _x;
+		*y = _y;
+	}
 	*x -= fCombinedOrigin.x;
 	*y -= fCombinedOrigin.y;
 	if (fCombinedScale != 0.0) {
@@ -667,6 +708,9 @@ DrawState::PrintToStream() const
 {
 	printf("\t Origin: (%.1f, %.1f)\n", fOrigin.x, fOrigin.y);
 	printf("\t Scale: %.2f\n", fScale);
+	printf("\t Transform: %.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n",
+		fTransform.sx, fTransform.shy, fTransform.shx,
+		fTransform.sy, fTransform.tx, fTransform.ty);
 
 	printf("\t Pen Location and Size: (%.1f, %.1f) - %.2f (%.2f)\n",
 		   fPenLocation.x, fPenLocation.y, PenSize(), fPenSize);

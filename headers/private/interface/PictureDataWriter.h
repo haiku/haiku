@@ -9,6 +9,7 @@
 #define _PICTURE_DATA_WRITER_H
 
 
+#include <AffineTransform.h>
 #include <InterfaceDefs.h>
 #include <Font.h>
 #include <OS.h>
@@ -35,6 +36,7 @@ public:
 	status_t WriteSetPenSize(const float &penSize);
 	status_t WriteSetLineMode(const cap_mode &cap, const join_mode &join, const float &miterLimit);	
 	status_t WriteSetScale(const float &scale);
+	status_t WriteSetTransform(BAffineTransform transform);
 	status_t WriteSetPattern(const pattern &pat);
 	status_t WriteSetClipping(const BRegion &region);
 	status_t WriteClearClipping();

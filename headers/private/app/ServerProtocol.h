@@ -341,6 +341,10 @@ enum {
 	AS_DUMP_ALLOCATOR,
 	AS_DUMP_BITMAPS,
 
+	// transformation in addition to origin/scale
+	AS_VIEW_SET_TRANSFORM,
+	AS_VIEW_GET_TRANSFORM,
+
 	AS_LAST_CODE
 };
 

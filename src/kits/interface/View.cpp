@@ -221,6 +221,7 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 	info.drawingMode = drawing_mode;
 	info.origin = origin;
 	info.scale = scale;
+	info.transform = transform;
 	info.lineJoin = line_join;
 	info.lineCap = line_cap;
 	info.miterLimit = miter_limit;
@@ -284,6 +285,7 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 	drawing_mode = info.viewStateInfo.drawingMode;
 	origin = info.viewStateInfo.origin;
 	scale = info.viewStateInfo.scale;
+	transform = info.viewStateInfo.transform;
 	line_join = info.viewStateInfo.lineJoin;
 	line_cap = info.viewStateInfo.lineCap;
 	miter_limit = info.viewStateInfo.miterLimit;
@@ -467,6 +469,14 @@ BView::BView(BMessage* archive)
 	if (archive->FindPoint("_origin", &origin) == B_OK)
 		SetOrigin(origin);
 
+	float scale;
+	if (archive->FindFloat("_scale", &scale) == B_OK)
+		SetScale(scale);
+
+	BAffineTransform transform;
+	if (archive->FindFlat("_transform", &transform) == B_OK)
+		SetTransform(transform);
+
 	float penSize;
 	if (archive->FindFloat("_psize", &penSize) == B_OK)
 		SetPenSize(penSize);
@@ -583,6 +593,14 @@ BView::Archive(BMessage* data, bool deep) const
 
 	if (ret == B_OK && (fState->archiving_flags & B_VIEW_ORIGIN_BIT) != 0)
 		ret = data->AddPoint("_origin", Origin());
+
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_SCALE_BIT) != 0)
+		ret = data->AddFloat("_scale", Scale());
+
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_TRANSFORM_BIT) != 0) {
+		BAffineTransform transform = Transform();
+		ret = data->AddFlat("_transform", &transform);
+	}
 
 	if (ret == B_OK && (fState->archiving_flags & B_VIEW_PEN_SIZE_BIT) != 0)
 		ret = data->AddFloat("_psize", PenSize());
@@ -1743,10 +1761,12 @@ BView::PushState()
 
 	fOwner->fLink->StartMessage(AS_VIEW_PUSH_STATE);
 
-	// initialize origin and scale
-	fState->valid_flags |= B_VIEW_SCALE_BIT | B_VIEW_ORIGIN_BIT;
+	// initialize origin, scale and transform, new states start "clean".
+	fState->valid_flags |= B_VIEW_SCALE_BIT | B_VIEW_ORIGIN_BIT
+		| B_VIEW_TRANSFORM_BIT;
 	fState->scale = 1.0f;
 	fState->origin.Set(0, 0);
+	fState->transform.Reset();
 }
 
 
@@ -1805,12 +1825,10 @@ BView::Origin() const
 		fOwner->fLink->StartMessage(AS_VIEW_GET_ORIGIN);
 
 		int32 code;
-		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == B_OK) {
+		if (fOwner->fLink->FlushWithReply(code) == B_OK && code == B_OK)
 			fOwner->fLink->Read<BPoint>(&fState->origin);
 
-			fState->valid_flags |= B_VIEW_ORIGIN_BIT;
-		}
+		fState->valid_flags |= B_VIEW_ORIGIN_BIT;
 	}
 
 	return fState->origin;
@@ -1846,14 +1864,52 @@ BView::Scale() const
 		fOwner->fLink->StartMessage(AS_VIEW_GET_SCALE);
 
  		int32 code;
-		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == B_OK)
+		if (fOwner->fLink->FlushWithReply(code) == B_OK && code == B_OK)
 			fOwner->fLink->Read<float>(&fState->scale);
 
 		fState->valid_flags |= B_VIEW_SCALE_BIT;
 	}
 
 	return fState->scale;
+}
+
+
+void
+BView::SetTransform(BAffineTransform transform)
+{
+	if (fState->IsValid(B_VIEW_TRANSFORM_BIT) && transform == fState->transform)
+		return;
+
+	if (fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_SET_TRANSFORM);
+		fOwner->fLink->Attach<BAffineTransform>(transform);
+
+		fState->valid_flags |= B_VIEW_TRANSFORM_BIT;
+	}
+
+	fState->transform = transform;
+	fState->archiving_flags |= B_VIEW_TRANSFORM_BIT;
+}
+
+
+BAffineTransform
+BView::Transform() const
+{
+	if (!fState->IsValid(B_VIEW_TRANSFORM_BIT) && fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_GET_TRANSFORM);
+
+ 		int32 code;
+		if (fOwner->fLink->FlushWithReply(code) == B_OK && code == B_OK)
+			fOwner->fLink->Read<BAffineTransform>(&fState->transform);
+
+		fState->valid_flags |= B_VIEW_TRANSFORM_BIT;
+	}
+
+	return fState->transform;
 }
 
 
@@ -1918,8 +1974,7 @@ BView::LineMiterLimit() const
 		fOwner->fLink->StartMessage(AS_VIEW_GET_LINE_MODE);
 
 		int32 code;
-		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == B_OK) {
+		if (fOwner->fLink->FlushWithReply(code) == B_OK && code == B_OK) {
 
 			ViewSetLineModeInfo info;
 			fOwner->fLink->Read<ViewSetLineModeInfo>(&info);

@@ -6,6 +6,7 @@
 #define	_VIEW_H
 
 
+#include <AffineTransform.h>
 #include <Alignment.h>
 #include <Font.h>
 #include <Handler.h>
@@ -284,6 +285,12 @@ public:
 			void				SetOrigin(BPoint pt);
 			void				SetOrigin(float x, float y);
 			BPoint				Origin() const;
+
+								// Works in addition to Origin and Scale.
+								// May be used in parallel or as a much
+								// more powerful alternative.
+			void				SetTransform(BAffineTransform transform);
+			BAffineTransform	Transform() const;
 
 			void				PushState();
 			void				PopState();

@@ -12,10 +12,11 @@
 #define _DRAW_STATE_H_
 
 
+#include <AffineTransform.h>
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
 #include <Point.h>
-#include <View.h> // for B_FONT_ALL
+#include <View.h>
 
 #include "ServerFont.h"
 #include "PatternHandler.h"
@@ -59,6 +60,12 @@ public:
 								{ return fScale; }
 		float				CombinedScale() const
 								{ return fCombinedScale; }
+
+		void				SetTransform(BAffineTransform transform);
+		BAffineTransform	Transform() const
+								{ return fTransform; }
+		BAffineTransform	CombinedTransform() const
+								{ return fCombinedTransform; }
 
 							// additional clipping as requested by client
 		void				SetClippingRegion(const BRegion* region);
@@ -149,6 +156,8 @@ protected:
 		BPoint				fCombinedOrigin;
 		float				fScale;
 		float				fCombinedScale;
+		BAffineTransform	fTransform;
+		BAffineTransform	fCombinedTransform;
 
 		BRegion*			fClippingRegion;
 
