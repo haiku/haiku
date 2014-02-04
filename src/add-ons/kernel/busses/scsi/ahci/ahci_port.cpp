@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2008-2014 Haiku, Inc. All rights reserved.
  * Copyright 2007-2009, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -654,7 +654,6 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 	TRACE("model number: %s\n", modelNumber);
 	TRACE("serial number: %s\n", serialNumber);
 	TRACE("firmware rev.: %s\n", firmwareRev);
-	TRACE("trim support: %s\n", fTrimSupported ? "yes" : "no");
 
 	// There's not enough space to fit all of the data in. ATA has 40 bytes for
 	// the model number, 20 for the serial number and another 8 for the
@@ -813,56 +812,95 @@ AHCIPort::ScsiReadWrite(scsi_ccb* request, uint64 lba, size_t sectorCount,
 void
 AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 {
-	// Determine how many ranges we'll need
-	// We assume that the SCSI unmap ranges cannot be merged together
+	// Determine how many blocks are supposed to be trimmed in total
 	uint32 scsiRangeCount = B_BENDIAN_TO_HOST_INT16(
 		unmapBlocks->block_data_length) / sizeof(scsi_unmap_block_descriptor);
-	uint32 lbaRangeCount = 0;
-	for (uint32 i = 0; i < scsiRangeCount; i++) {
-		lbaRangeCount += ((uint32)B_BENDIAN_TO_HOST_INT32(
-			unmapBlocks->blocks[i].block_count) + 65534) / 65535;
-	}
 
-	uint32 lbaRangesSize = lbaRangeCount * sizeof(uint64);
-	uint64* lbaRanges = (uint64*)malloc(lbaRangesSize);
-	if (lbaRanges == NULL) {
-		TRACE("out of memory when allocating %" B_PRIu32 " unmap ranges\n",
-			lbaRangeCount);
-		request->subsys_status = SCSI_REQ_ABORTED;
-		gSCSI->finished(request, 1);
-		return;
-	}
+	uint32 scsiIndex = 0;
+	uint32 scsiLastBlocks = 0;
+	uint32 maxLBARangeCount = fMaxTrimRangeBlocks * 512 / 8;
+		// 512 bytes per range block, 8 bytes per range
 
-	MemoryDeleter deleter(lbaRanges);
+	// Split the SCSI ranges into ATA ranges as large as allowed.
+	// We assume that the SCSI unmap ranges cannot be merged together
 
-	for (uint32 i = 0, scsiIndex = 0; scsiIndex < scsiRangeCount; scsiIndex++) {
-		uint64 lba = (uint64)B_BENDIAN_TO_HOST_INT64(
-			unmapBlocks->blocks[scsiIndex].lba);
-		uint64 blocksLeft = (uint32)B_BENDIAN_TO_HOST_INT32(
-			unmapBlocks->blocks[scsiIndex].block_count);
-		while (blocksLeft > 0) {
-			uint16 blocks = blocksLeft > 65535 ? 65535 : (uint16)blocksLeft;
-			lbaRanges[i++] = B_HOST_TO_LENDIAN_INT64(
-				((uint64)blocks << 48) | lba);
-			lba += blocks;
-			blocksLeft -= blocks;
+	while (scsiIndex < scsiRangeCount) {
+		// Determine how many LBA ranges we need for the next chunk
+		uint32 lbaRangeCount = 0;
+		for (uint32 i = scsiIndex; i < scsiRangeCount; i++) {
+			uint32 scsiBlocks = B_BENDIAN_TO_HOST_INT32(
+				unmapBlocks->blocks[i].block_count);
+			if (scsiBlocks == 0)
+				break;
+			if (i == scsiIndex)
+				scsiBlocks -= scsiLastBlocks;
+
+			lbaRangeCount += (scsiBlocks + 65534) / 65535;
+			if (lbaRangeCount >= maxLBARangeCount) {
+				lbaRangeCount = maxLBARangeCount;
+				break;
+			}
 		}
+		if (lbaRangeCount == 0)
+			break;
+
+		uint32 lbaRangesSize = lbaRangeCount * sizeof(uint64);
+		uint64* lbaRanges = (uint64*)malloc(lbaRangesSize);
+		if (lbaRanges == NULL) {
+			TRACE("out of memory when allocating %" B_PRIu32 " unmap ranges\n",
+				lbaRangeCount);
+			request->subsys_status = SCSI_REQ_ABORTED;
+			gSCSI->finished(request, 1);
+			return;
+		}
+
+		MemoryDeleter deleter(lbaRanges);
+
+		for (uint32 lbaIndex = 0;
+				scsiIndex < scsiRangeCount && lbaIndex < lbaRangeCount;) {
+			uint64 scsiOffset = B_BENDIAN_TO_HOST_INT64(
+				unmapBlocks->blocks[scsiIndex].lba) + scsiLastBlocks;
+			uint32 scsiBlocksLeft = B_BENDIAN_TO_HOST_INT32(
+				unmapBlocks->blocks[scsiIndex].block_count) - scsiLastBlocks;
+
+			if (scsiBlocksLeft == 0) {
+				// Ignore the rest of the ranges (they are empty)
+				scsiIndex = scsiRangeCount;
+				break;
+			}
+
+			while (scsiBlocksLeft > 0 && lbaIndex < lbaRangeCount) {
+				uint16 blocks = scsiBlocksLeft > 65535
+					? 65535 : (uint16)scsiBlocksLeft;
+				lbaRanges[lbaIndex++] = B_HOST_TO_LENDIAN_INT64(
+					((uint64)blocks << 48) | scsiOffset);
+
+				scsiOffset += blocks;
+				scsiLastBlocks += blocks;
+				scsiBlocksLeft -= blocks;
+			}
+
+			if (scsiBlocksLeft == 0) {
+				scsiLastBlocks = 0;
+				scsiIndex++;
+			}
+		}
+
+		sata_request sreq;
+		sreq.SetATA48Command(ATA_COMMAND_DATA_SET_MANAGEMENT, 0,
+			(lbaRangesSize + 511) / 512);
+		sreq.SetFeature(1);
+		sreq.SetData(lbaRanges, lbaRangesSize);
+
+		ExecuteSataRequest(&sreq);
+		sreq.WaitForCompletion();
+
+		if ((sreq.CompletionStatus() & ATA_ERR) != 0) {
+			TRACE("trim failed (%" B_PRIu32 " ranges)!\n", lbaRangeCount);
+			request->subsys_status = SCSI_REQ_CMP_ERR;
+		} else
+			request->subsys_status = SCSI_REQ_CMP;
 	}
-
-	sata_request sreq;
-	sreq.SetATA48Command(ATA_COMMAND_DATA_SET_MANAGEMENT, 0,
-		(lbaRangesSize + 511) / 512);
-	sreq.SetFeature(1);
-	sreq.SetData(lbaRanges, lbaRangesSize);
-
-	ExecuteSataRequest(&sreq);
-	sreq.WaitForCompletion();
-
-	if ((sreq.CompletionStatus() & ATA_ERR) != 0) {
-		TRACE("trim failed (%" B_PRIu32 " ranges)!\n", lbaRangeCount);
-		request->subsys_status = SCSI_REQ_CMP_ERR;
-	} else
-		request->subsys_status = SCSI_REQ_CMP;
 
 	request->data_resid = 0;
 	request->device_status = SCSI_STATUS_GOOD;
