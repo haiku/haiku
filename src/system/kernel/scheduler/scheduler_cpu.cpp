@@ -527,7 +527,7 @@ CoreEntry::RemoveCPU(CPUEntry* cpu, ThreadProcessing& threadPostProcessing)
 
 
 void
-CoreEntry::_UpdateLoad()
+CoreEntry::_UpdateLoad(bool forceUpdate)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
@@ -535,9 +535,11 @@ CoreEntry::_UpdateLoad()
 		return;
 
 	bigtime_t now = system_time();
-	if (now < kLoadMeasureInterval + fLastLoadUpdate)
+	bool intervalEnded = now >= kLoadMeasureInterval + fLastLoadUpdate;
+
+	if (!intervalEnded && !forceUpdate)
 		return;
-	WriteSpinLocker locker(fLoadLock);
+
 	WriteSpinLocker coreLocker(gCoreHeapsLock);
 
 	int32 newKey = GetLoad();
@@ -546,12 +548,16 @@ CoreEntry::_UpdateLoad()
 	ASSERT(oldKey >= 0);
 	ASSERT(newKey >= 0);
 
-	ASSERT(fCurrentLoad >= 0);
-	ASSERT(fLoad >= fCurrentLoad);
+	if (intervalEnded) {
+		WriteSpinLocker locker(fLoadLock);
 
-	fLoad = fCurrentLoad;
-	fLoadMeasurementEpoch++;
-	fLastLoadUpdate = now;
+		ASSERT(fCurrentLoad >= 0);
+		ASSERT(fLoad >= fCurrentLoad);
+
+		fLoad = fCurrentLoad;
+		fLoadMeasurementEpoch++;
+		fLastLoadUpdate = now;
+	}
 
 	if (oldKey == newKey)
 		return;

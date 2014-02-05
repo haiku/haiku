@@ -173,7 +173,7 @@ public:
 	static inline		CoreEntry*		GetCore(int32 cpu);
 
 private:
-						void			_UpdateLoad();
+						void			_UpdateLoad(bool forceUpdate = false);
 
 	static				void			_UnassignThread(Thread* thread,
 											void* core);
@@ -416,7 +416,7 @@ CoreEntry::AddLoad(int32 load, uint32 epoch, bool updateLoad)
 	locker.Unlock();
 
 	if (updateLoad)
-		_UpdateLoad();
+		_UpdateLoad(true);
 }
 
 
@@ -434,7 +434,7 @@ CoreEntry::RemoveLoad(int32 load, bool force)
 		atomic_add(&fLoad, -load);
 		locker.Unlock();
 
-		_UpdateLoad();
+		_UpdateLoad(true);
 	}
 	return fLoadMeasurementEpoch;
 }
