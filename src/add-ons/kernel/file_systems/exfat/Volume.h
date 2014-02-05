@@ -1,7 +1,14 @@
 /*
- * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
- * This file may be used under the terms of the MIT License.
+ * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Jérôme Duval, korli@users.berlios.de
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef VOLUME_H
 #define VOLUME_H
@@ -144,7 +151,9 @@ private:
 			fs_volume*			fFSVolume;
 			int					fDevice;
 			exfat_super_block	fSuperBlock;
-			char				fName[32];
+			char				fName[34];
+				// Max number of bytes needed is (11 * 3) + 1 for the \0,
+				// that is 11 UCS-2 characters converted to UTF-8.
 
 			uint16				fFlags;
 			uint32				fBlockSize;

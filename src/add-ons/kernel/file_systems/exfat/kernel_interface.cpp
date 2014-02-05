@@ -1,13 +1,23 @@
 /*
+ * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
- * This file may be used under the terms of the MIT License.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Jérôme Duval, korli@users.berlios.de
+ *		John Scipione, jscipione@gmail.com
  */
 
 
 #include <dirent.h>
+#include <unistd.h>
 #include <util/kernel_cpp.h>
 #include <string.h>
+
+#include <new>
 
 #include <AutoDeleter.h>
 #include <fs_cache.h>
@@ -36,6 +46,7 @@
 
 struct identify_cookie {
 	exfat_super_block super_block;
+	char name[34];
 };
 
 
@@ -66,15 +77,45 @@ iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
 
 
 static float
-exfat_identify_partition(int fd, partition_data *partition, void **_cookie)
+exfat_identify_partition(int fd, partition_data* _partition, void** _cookie)
 {
-	exfat_super_block superBlock;
+	struct exfat_super_block superBlock;
 	status_t status = Volume::Identify(fd, &superBlock);
 	if (status != B_OK)
 		return -1;
 
-	identify_cookie *cookie = new identify_cookie;
+	identify_cookie* cookie = new (std::nothrow)identify_cookie;
+	if (cookie == NULL)
+		return -1;
+
 	memcpy(&cookie->super_block, &superBlock, sizeof(exfat_super_block));
+	memset(cookie->name, 0, 34);
+		// zero out volume name
+
+	uint32 rootDirCluster = superBlock.RootDirCluster();
+	uint32 blockSize = 1 << superBlock.BlockShift();
+	uint32 clusterSize = blockSize << superBlock.BlocksPerClusterShift();
+	uint64 rootDirectoryOffset = (uint64)(EXFAT_SUPER_BLOCK_OFFSET
+		+ superBlock.FirstDataBlock() * blockSize
+		+ (rootDirCluster - 2) * clusterSize);
+	struct exfat_entry entry;
+	size_t entrySize = sizeof(struct exfat_entry);
+	for (uint32 i = 0; read_pos(fd, rootDirectoryOffset + i * entrySize,
+			&entry, entrySize) == (ssize_t)entrySize; i++) {
+		if (entry.type == EXFAT_ENTRY_TYPE_NOT_IN_USE
+			|| entry.type == EXFAT_ENTRY_TYPE_LABEL) {
+			if (volume_name(&entry, cookie->name) != B_OK) {
+				delete cookie;
+				return -1;
+			}
+			break;
+		}
+	}
+
+	if (cookie->name[0] == '\0') {
+		delete cookie;
+		return -1;
+	}
 
 	*_cookie = cookie;
 	return 0.8f;
@@ -82,21 +123,18 @@ exfat_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 
 static status_t
-exfat_scan_partition(int fd, partition_data *partition, void *_cookie)
+exfat_scan_partition(int fd, partition_data* _partition, void* _cookie)
 {
-	identify_cookie *cookie = (identify_cookie *)_cookie;
+	identify_cookie* cookie = (identify_cookie*)_cookie;
 
-	partition->status = B_PARTITION_VALID;
-	partition->flags |= B_PARTITION_FILE_SYSTEM;
-	partition->content_size = cookie->super_block.NumBlocks() 
+	_partition->status = B_PARTITION_VALID;
+	_partition->flags |= B_PARTITION_FILE_SYSTEM;
+	_partition->content_size = cookie->super_block.NumBlocks() 
 		<< cookie->super_block.BlockShift();
-	partition->block_size = 1 << cookie->super_block.BlockShift();
-	// TODO volume name isn't in the superblock
-	partition->content_name = strdup(cookie->super_block.filesystem);
-	if (partition->content_name == NULL)
-		return B_NO_MEMORY;
+	_partition->block_size = 1 << cookie->super_block.BlockShift();
+	_partition->content_name = strdup(cookie->name);
 
-	return B_OK;
+	return _partition->content_name != NULL ? B_OK : B_NO_MEMORY;
 }
 
 

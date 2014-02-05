@@ -1,7 +1,14 @@
 /*
- * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
- * This file may be used under the terms of the MIT License.
+ * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Jérôme Duval, korli@users.berlios.de
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -11,6 +18,7 @@
 #include "Volume.h"
 
 #include <errno.h>
+#include <unistd.h>
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,8 +30,8 @@
 #include <util/AutoLock.h>
 
 #include "CachedBlock.h"
-#include "encodings.h"
 #include "Inode.h"
+#include "Utility.h"
 
 
 //#define TRACE_EXFAT
@@ -222,11 +230,12 @@ bool
 LabelVisitor::VisitLabel(struct exfat_entry* entry)
 {
 	TRACE("LabelVisitor::VisitLabel()\n");
-	char utfName[30];
-	size_t utfLength = 30;
-	unicode_to_utf8((const uchar*)entry->name_label.name,
-		entry->name_label.length * 2, (uint8*)utfName, &utfLength);
-	fVolume->SetName(utfName);
+	char name[34];
+	status_t result = volume_name(entry, name);
+	if (result != B_OK)
+		return false;
+
+	fVolume->SetName(name);
 	return true;
 }
 

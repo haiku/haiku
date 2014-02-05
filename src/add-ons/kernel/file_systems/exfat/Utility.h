@@ -1,6 +1,12 @@
 /*
  * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
- * This file may be used under the terms of the MIT License.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef UTILITY_H
 #define UTILITY_H
@@ -37,5 +43,18 @@ open_mode_to_access(int openMode)
 
 	return R_OK | W_OK;
 }
+
+
+/*!	Reads the volume name from an exfat entry and writes it to \a _name
+	as a UTF-8 char array. Writes "Untitled" The volume name is not set.
+	\returns A status code.
+	\retval B_OK Wrote the volume name successfully.
+	\retval B_BAD_VALUE \a entry or \a _name was \c NULL.
+	\retval B_NAME_NOT_FOUND Volume name was not found in this entry.
+	\retval B_NAME_TOO_LONG The passed in _name wasn't long enough to
+			fit the name.
+*/
+status_t volume_name(struct exfat_entry* entry, char* _name);
+
 
 #endif	// UTILITY_H

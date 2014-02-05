@@ -1,6 +1,12 @@
 /*
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
+ * Copyright 2014 Haiku, Inc. All Rights reserved.
+ *
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval, korli@users.berlios.de
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef EXFAT_H
 #define EXFAT_H
@@ -75,10 +81,12 @@ struct exfat_super_block {
 
 #define EXFAT_SUPER_BLOCK_MAGIC			"EXFAT   "
 
+#define EXFAT_ENTRY_TYPE_NOT_IN_USE		0x03
 #define EXFAT_ENTRY_TYPE_BITMAP			0x81
 #define EXFAT_ENTRY_TYPE_UPPERCASE		0x82
 #define EXFAT_ENTRY_TYPE_LABEL			0x83
 #define EXFAT_ENTRY_TYPE_FILE			0x85
+#define EXFAT_ENTRY_TYPE_GUID			0xa0
 #define EXFAT_ENTRY_TYPE_FILEINFO		0xc0
 #define EXFAT_ENTRY_TYPE_FILENAME		0xc1
 #define EXFAT_CLUSTER_END				0xffffffff
@@ -94,8 +102,16 @@ struct exfat_entry {
 	union {
 		struct {
 			uint8 length;
-			char name[30];
-		} _PACKED name_label;
+			uint16 name[11];
+			uint8 reserved[8];
+		} _PACKED label;
+		struct {
+			uint8 chunkCount;
+			uint16 checksum;
+			uint16 flags;
+			uint8 guid[16];
+			uint8 reserved[10];
+		} _PACKED guid;
 		struct {
 			uint8 reserved[3];
 			uint32 checksum;

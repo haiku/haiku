@@ -10,5 +10,6 @@ KernelAddon exfat :
 	encodings.cpp
 	Inode.cpp
 	kernel_interface.cpp
+	Utility.cpp
 	Volume.cpp
 ;
