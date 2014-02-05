@@ -134,7 +134,8 @@ public:
 			Inode *				FindInode(ino_t id);
 			Inode *				FindInode(cluster_t cluster);
 			cluster_t			NextCluster(cluster_t cluster);
-			ino_t				GetIno(cluster_t cluster, uint32 offset, ino_t parent);
+			ino_t				GetIno(cluster_t cluster, uint32 offset,
+									ino_t parent);
 			struct node_key*	GetNode(ino_t ino, ino_t &parent);
 private:
 			ino_t				_NextID() { return fNextId++; }

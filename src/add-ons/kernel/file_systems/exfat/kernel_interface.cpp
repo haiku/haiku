@@ -101,7 +101,7 @@ exfat_scan_partition(int fd, partition_data *partition, void *_cookie)
 
 
 static void
-exfat_free_identify_partition_cookie(partition_data* partition, void* _cookie)
+exfat_free_identify_partition_cookie(partition_data* _partition, void* _cookie)
 {
 	delete (identify_cookie*)_cookie;
 }
@@ -262,7 +262,8 @@ exfat_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 
 static status_t
-exfat_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
+exfat_io(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	io_request* request)
 {
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;

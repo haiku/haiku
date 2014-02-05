@@ -68,6 +68,9 @@ private:
 };
 
 
+//	#pragma mark - DeviceOpener
+
+
 DeviceOpener::DeviceOpener(const char* device, int mode)
 	:
 	fBlockCache(NULL)
@@ -196,7 +199,7 @@ DeviceOpener::GetSize(off_t* _size, uint32* _blockSize)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - LabelVisitor
 
 
 class LabelVisitor : public EntryVisitor {
@@ -228,7 +231,7 @@ LabelVisitor::VisitLabel(struct exfat_entry* entry)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - exfat_super_block::IsValid()
 
 
 bool
@@ -248,7 +251,7 @@ exfat_super_block::IsValid()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - Volume
 
 
 Volume::Volume(fs_volume* volume)
@@ -292,7 +295,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 {
 	flags |= B_MOUNT_READ_ONLY;
 		// we only support read-only for now
-	
+
 	if ((flags & B_MOUNT_READ_ONLY) != 0) {
 		TRACE("Volume::Mount(): Read only\n");
 	} else {
@@ -316,11 +319,11 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		ERROR("Volume::Mount(): Identify() failed\n");
 		return status;
 	}
-	
+
 	fBlockSize = 1 << fSuperBlock.BlockShift();
 	TRACE("block size %" B_PRIu32 "\n", fBlockSize);
 	fEntriesPerBlock = (fBlockSize / sizeof(struct exfat_entry));
-		
+
 	// check if the device size is large enough to hold the file system
 	off_t diskSize;
 	status = opener.GetSize(&diskSize);
@@ -332,7 +335,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fBlockCache = opener.InitCache(fSuperBlock.NumBlocks(), fBlockSize);
 	if (fBlockCache == NULL)
 		return B_ERROR;
-	
+
 	TRACE("Volume::Mount(): Initialized block cache: %p\n", fBlockCache);
 
 	ino_t rootIno;
@@ -348,8 +351,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		return status;
 	}
 
-	TRACE("Volume::Mount(): Found root node: %" B_PRIdINO " (%s)\n", fRootNode->ID(),
-		strerror(fRootNode->InitCheck()));
+	TRACE("Volume::Mount(): Found root node: %" B_PRIdINO " (%s)\n",
+		fRootNode->ID(), strerror(fRootNode->InitCheck()));
 
 	// all went fine
 	opener.Keep();
@@ -512,4 +515,3 @@ Volume::Identify(int fd, exfat_super_block* superBlock)
 
 	return B_OK;
 }
-

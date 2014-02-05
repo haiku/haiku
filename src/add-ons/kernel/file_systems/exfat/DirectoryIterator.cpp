@@ -108,10 +108,12 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 	while (_GetNext((uchar*)currentName, &currentLength, _id) == B_OK) {
 		char utfName[EXFAT_FILENAME_MAX_LENGTH];
 		size_t utfLength = EXFAT_FILENAME_MAX_LENGTH;
-		unicode_to_utf8(currentName, currentLength, (uint8*)utfName, &utfLength);
+		unicode_to_utf8(currentName, currentLength, (uint8*)utfName,
+			&utfLength);
 		if (nameLength == utfLength
 			&& strncmp(utfName, name, nameLength) == 0) {
-			TRACE("DirectoryIterator::Lookup() found ID %" B_PRIdINO "\n", *_id);
+			TRACE("DirectoryIterator::Lookup() found ID %" B_PRIdINO "\n",
+				*_id);
 			return B_OK;
 		}
 		currentLength = EXFAT_FILENAME_MAX_LENGTH;
@@ -263,5 +265,3 @@ DirectoryIterator::_NextEntry()
 
 	return fCurrent->type == 0 ? B_ENTRY_NOT_FOUND : B_OK;
 }
-
-

@@ -18,6 +18,7 @@ typedef uint64 fsblock_t;		// filesystem block number
 
 typedef uint32 cluster_t;
 
+
 #define EXFAT_SUPER_BLOCK_OFFSET	0x0
 
 
@@ -74,18 +75,19 @@ struct exfat_super_block {
 
 #define EXFAT_SUPER_BLOCK_MAGIC			"EXFAT   "
 
-#define EXFAT_ENTRY_TYPE_BITMAP		0x81
-#define EXFAT_ENTRY_TYPE_UPPERCASE	0x82
-#define EXFAT_ENTRY_TYPE_LABEL		0x83
-#define EXFAT_ENTRY_TYPE_FILE		0x85
-#define EXFAT_ENTRY_TYPE_FILEINFO	0xc0
-#define EXFAT_ENTRY_TYPE_FILENAME	0xc1
-#define EXFAT_CLUSTER_END 	0xffffffff
-#define EXFAT_ENTRY_ATTRIB_SUBDIR	0x10
+#define EXFAT_ENTRY_TYPE_BITMAP			0x81
+#define EXFAT_ENTRY_TYPE_UPPERCASE		0x82
+#define EXFAT_ENTRY_TYPE_LABEL			0x83
+#define EXFAT_ENTRY_TYPE_FILE			0x85
+#define EXFAT_ENTRY_TYPE_FILEINFO		0xc0
+#define EXFAT_ENTRY_TYPE_FILENAME		0xc1
+#define EXFAT_CLUSTER_END				0xffffffff
+#define EXFAT_ENTRY_ATTRIB_SUBDIR		0x10
 
 #define EXFAT_ENTRY_FLAG_CONTIGUOUS	0x3
 
 #define EXFAT_FILENAME_MAX_LENGTH	512
+
 
 struct exfat_entry {
 	uint8	type;
