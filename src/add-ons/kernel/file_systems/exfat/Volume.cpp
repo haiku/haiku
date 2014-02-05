@@ -377,8 +377,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 		double size = double((10 * diskSize + divisor - 1) / divisor);
 			// %g in the kernel does not support precision...
 
-		snprintf(fName, sizeof(fName), "%g %cB ExFAT Volume",
-			size / 10, unit);
+		snprintf(fName, 11 + 1, "%g %cB ExFAT", size / 10, unit);
+			// exfat volume names can only contain 11 characters
 	}
 
 	return B_OK;
