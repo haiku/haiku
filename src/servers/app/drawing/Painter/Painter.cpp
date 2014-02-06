@@ -348,9 +348,10 @@ Painter::SetTransform(BAffineTransform transform, int32 xOffset, int32 yOffset)
 {
 	fIdentityTransform = transform.IsIdentity();
 	if (!fIdentityTransform) {
-		fTransform = agg::trans_affine(transform.sx, transform.shy,
-			transform.shx, transform.sy, transform.tx/* + xOffset*/,
-			transform.ty/* + yOffset*/);
+		fTransform = agg::trans_affine_translation(-xOffset, -yOffset);
+		fTransform *= agg::trans_affine(transform.sx, transform.shy,
+			transform.shx, transform.sy, transform.tx, transform.ty);
+		fTransform *= agg::trans_affine_translation(xOffset, yOffset);
 	} else {
 		fTransform.reset();
 	}
