@@ -438,6 +438,7 @@ class HasGlyphsConsumer {
 		: fHasArray(hasArray)
 	{
 	}
+	bool NeedsVector() { return false; }
 	void Start() {}
 	void Finish(double x, double y) {}
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
@@ -481,6 +482,7 @@ class EdgesConsumer {
 		, fSize(size)
 	{
 	}
+	bool NeedsVector() { return false; }
 	void Start() {}
 	void Finish(double x, double y) {}
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
@@ -549,6 +551,7 @@ public:
 	{
 	}
 
+	bool NeedsVector() { return false; }
 	void Start() {}
 	void Finish(double x, double y) {}
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
@@ -619,6 +622,7 @@ public:
 	{
 	}
 
+	bool NeedsVector() { return false; }
 	void Start() {}
 	void Finish(double x, double y) {}
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
@@ -676,6 +680,7 @@ class BoundingBoxConsumer {
 	{
 	}
 
+	bool NeedsVector() { return false; }
 	void Start() {}
 	void Finish(double x, double y) {}
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y) {}
@@ -802,6 +807,7 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 class StringWidthConsumer {
  public:
 	StringWidthConsumer() : width(0.0) {}
+	bool NeedsVector() { return false; }
 	void Start() {}
 	void Finish(double x, double y) { width = x; }
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y) {}

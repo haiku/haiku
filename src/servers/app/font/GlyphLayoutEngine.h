@@ -80,6 +80,7 @@ public:
 	static	bool				IsWhiteSpace(uint32 glyphCode);
 
 	static	FontCacheEntry*		FontCacheEntryFor(const ServerFont& font,
+									bool forceVector,
 									const FontCacheEntry* disallowedEntry,
 									const char* utf8String, int32 length,
 									FontCacheReference& cacheReference,
@@ -100,7 +101,7 @@ private:
 	static	bool				_WriteLockAndAcquireFallbackEntry(
 									FontCacheReference& cacheReference,
 									FontCacheEntry* entry,
-									const ServerFont& font,
+									const ServerFont& font, bool needsVector,
 									const char* utf8String, int32 length,
 									FontCacheReference& fallbackCacheReference,
 									FontCacheEntry*& fallbackEntry);
@@ -131,14 +132,14 @@ GlyphLayoutEngine::IsWhiteSpace(uint32 charCode)
 
 
 inline FontCacheEntry*
-GlyphLayoutEngine::FontCacheEntryFor(const ServerFont& font,
+GlyphLayoutEngine::FontCacheEntryFor(const ServerFont& font, bool forceVector,
 	const FontCacheEntry* disallowedEntry, const char* utf8String, int32 length,
 	FontCacheReference& cacheReference, bool needsWriteLock)
 {
 	ASSERT(cacheReference.Entry() == NULL);
 
 	FontCache* cache = FontCache::Default();
-	FontCacheEntry* entry = cache->FontCacheEntryFor(font);
+	FontCacheEntry* entry = cache->FontCacheEntryFor(font, forceVector);
 	if (entry == NULL)
 		return NULL;
 
@@ -192,8 +193,8 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	}
 
 	if (entry == NULL) {
-		entry = FontCacheEntryFor(font, NULL, utf8String, length,
-			cacheReference, false);
+		entry = FontCacheEntryFor(font, consumer.NeedsVector(), NULL,
+			utf8String, length, cacheReference, false);
 
 		if (entry == NULL)
 			return false;
@@ -211,7 +212,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	double advanceX = 0.0;
 	double advanceY = 0.0;
 
-//	uint32 lastCharCode = 0;
+//	uint32 lastCharCode = 0; // Needed for kerning, see below
 	uint32 charCode;
 	int32 index = 0;
 	bool writeLocked = false;
@@ -244,8 +245,8 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			// we only have to do this switch once for the whole string.
 			if (!writeLocked) {
 				writeLocked = _WriteLockAndAcquireFallbackEntry(cacheReference,
-					entry, font, utf8String, length, fallbackCacheReference,
-					fallbackEntry);
+					entry, font, consumer.NeedsVector(), utf8String, length,
+					fallbackCacheReference, fallbackEntry);
 			}
 
 			if (writeLocked)
@@ -293,8 +294,9 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 inline bool
 GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 	FontCacheReference& cacheReference, FontCacheEntry* entry,
-	const ServerFont& font, const char* utf8String, int32 length,
-	FontCacheReference& fallbackCacheReference, FontCacheEntry*& fallbackEntry)
+	const ServerFont& font, bool forceVector, const char* utf8String,
+	int32 length, FontCacheReference& fallbackCacheReference,
+	FontCacheEntry*& fallbackEntry)
 {
 	// We need the fallback font, since potentially, we have to obtain missing
 	// glyphs from it. We need to obtain the fallback font while we have not
@@ -320,7 +322,7 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 			// to the other, but create new glyphs which are stored in
 			// "entry" in any case, which requires the write cache for
 			// sure (used FontEngine of fallbackEntry).
-			fallbackEntry = FontCacheEntryFor(fallbackFont, entry,
+			fallbackEntry = FontCacheEntryFor(fallbackFont, forceVector, entry,
 				utf8String, length, fallbackCacheReference, true);
 			// NOTE: We don't care if fallbackEntry is NULL, fetching
 			// alternate glyphs will simply not work.

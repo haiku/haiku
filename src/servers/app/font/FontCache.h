@@ -24,7 +24,8 @@ class FontCache : public MultiLocker {
 	// global instance
 	static	FontCache*			Default();
 
-			FontCacheEntry*		FontCacheEntryFor(const ServerFont& font);
+			FontCacheEntry*		FontCacheEntryFor(const ServerFont& font,
+									bool forceVector);
 			void				Recycle(FontCacheEntry* entry);
 
  private:

@@ -146,12 +146,12 @@ FontCacheEntry::~FontCacheEntry()
 
 
 bool
-FontCacheEntry::Init(const ServerFont& font)
+FontCacheEntry::Init(const ServerFont& font, bool forceVector)
 {
 	if (fGlyphCache == NULL)
 		return false;
 
-	glyph_rendering renderingType = _RenderTypeFor(font);
+	glyph_rendering renderingType = _RenderTypeFor(font, forceVector);
 
 	// TODO: encoding from font
 	FT_Encoding charMap = FT_ENCODING_NONE;
@@ -362,9 +362,9 @@ FontCacheEntry::GetKerning(uint32 glyphCode1, uint32 glyphCode2,
 
 /*static*/ void
 FontCacheEntry::GenerateSignature(char* signature, size_t signatureSize,
-	const ServerFont& font)
+	const ServerFont& font, bool forceVector)
 {
-	glyph_rendering renderingType = _RenderTypeFor(font);
+	glyph_rendering renderingType = _RenderTypeFor(font, forceVector);
 
 	// TODO: read more of these from the font
 	FT_Encoding charMap = FT_ENCODING_NONE;
@@ -393,12 +393,12 @@ FontCacheEntry::UpdateUsage()
 
 
 /*static*/ glyph_rendering
-FontCacheEntry::_RenderTypeFor(const ServerFont& font)
+FontCacheEntry::_RenderTypeFor(const ServerFont& font, bool forceVector)
 {
 	glyph_rendering renderingType = gSubpixelAntialiasing ?
 		glyph_ren_subpix : glyph_ren_native_gray8;
 
-	if (font.Rotation() != 0.0 || font.Shear() != 90.0
+	if (forceVector || font.Rotation() != 0.0 || font.Shear() != 90.0
 		|| font.FalseBoldWidth() != 0.0
 		|| (font.Flags() & B_DISABLE_ANTIALIASING) != 0
 		|| font.Size() > 30

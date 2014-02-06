@@ -50,11 +50,12 @@ FontCache::Default()
 
 // FontCacheEntryFor
 FontCacheEntry*
-FontCache::FontCacheEntryFor(const ServerFont& font)
+FontCache::FontCacheEntryFor(const ServerFont& font, bool forceVector)
 {
 	static const size_t signatureSize = 512;
 	char signature[signatureSize];
-	FontCacheEntry::GenerateSignature(signature, signatureSize, font);
+	FontCacheEntry::GenerateSignature(signature, signatureSize, font,
+		forceVector);
 
 	AutoReadLocker readLocker(this);
 
@@ -85,7 +86,7 @@ FontCache::FontCacheEntryFor(const ServerFont& font)
 		// remove old entries, keep entries below certain count
 		_ConstrainEntryCount();
 		entry = new (nothrow) FontCacheEntry();
-		if (!entry || !entry->Init(font)
+		if (!entry || !entry->Init(font, forceVector)
 			|| fFontCacheEntries.Put(signature, entry) < B_OK) {
 			fprintf(stderr, "FontCache::FontCacheEntryFor() - "
 				"out of memory or no font file\n");

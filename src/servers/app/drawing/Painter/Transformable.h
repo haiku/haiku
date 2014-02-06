@@ -53,6 +53,8 @@ class Transformable : public BArchivable,
 								// returns the *bounding box* of that
 			BRect				TransformBounds(const BRect& bounds) const;
 
+			bool				IsTranslationOnly() const;
+
 								// some convenience functions
 	virtual	void				TranslateBy(BPoint offset);
 	virtual	void				RotateBy(BPoint origin, double radians);

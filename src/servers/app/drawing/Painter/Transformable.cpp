@@ -268,6 +268,17 @@ Transformable::TransformBounds(const BRect& bounds) const
 	return bounds;
 }
 
+
+bool
+Transformable::IsTranslationOnly() const
+{
+	double matrix[6];
+	store_to(matrix);
+	return matrix[0] == 1.0 && matrix[1] == 0.0
+		&& matrix[2] == 0.0 && matrix[3] == 1.0;
+}
+
+
 // TranslateBy
 void
 Transformable::TranslateBy(BPoint offset)

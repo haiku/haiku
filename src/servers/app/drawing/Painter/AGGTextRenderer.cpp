@@ -144,6 +144,11 @@ public:
 	{
 	}
 
+	bool NeedsVector()
+	{
+		return !fTransform.IsTranslationOnly();
+	}
+
 	void Start()
 	{
 		fRenderer.fRasterizer.reset();

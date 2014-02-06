@@ -99,7 +99,7 @@ class FontCacheEntry : public MultiLocker, public BReferenceable {
 								FontCacheEntry();
 	virtual						~FontCacheEntry();
 
-			bool				Init(const ServerFont& font);
+			bool				Init(const ServerFont& font, bool forceVector);
 
 			bool				HasGlyphs(const char* utf8String,
 									ssize_t glyphCount) const;
@@ -120,7 +120,7 @@ class FontCacheEntry : public MultiLocker, public BReferenceable {
 
 	static	void				GenerateSignature(char* signature,
 									size_t signatureSize,
-									const ServerFont& font);
+									const ServerFont& font, bool forceVector);
 
 	// private to FontCache class:
 			void				UpdateUsage();
@@ -133,7 +133,8 @@ class FontCacheEntry : public MultiLocker, public BReferenceable {
 								FontCacheEntry(const FontCacheEntry&);
 			const FontCacheEntry& operator=(const FontCacheEntry&);
 
-	static	glyph_rendering		_RenderTypeFor(const ServerFont& font);
+	static	glyph_rendering		_RenderTypeFor(const ServerFont& font,
+									bool forceVector);
 
 			class GlyphCachePool;
 
