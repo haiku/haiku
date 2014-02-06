@@ -230,7 +230,6 @@ public:
 
 		view->SetDrawingMode(B_OP_ALPHA);
 		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-		view->SetHighColor(51, 151, 255, 40);
 
 		BRect rect(view->Bounds());
 		rect.InsetBy(rect.Width() / 3, rect.Height() / 3);
@@ -238,11 +237,16 @@ public:
 			rect.left + rect.Width() / 2,
 			rect.top + rect.Height() / 2);
 
-		for (int32 i = 0; i < 360; i += 20) {
+		for (int32 i = 0; i < 360; i += 40) {
 			BAffineTransform transform;
 			transform.RotateBy(center, i * M_PI / 180.0);
 			view->SetTransform(transform);
+
+			view->SetHighColor(51, 151, 255, 20);
 			view->FillRect(rect);
+
+			view->SetHighColor(51, 255, 151, 180);
+			view->DrawString("Rect", center);
 		}
 	}
 };
