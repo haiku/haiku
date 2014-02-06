@@ -134,7 +134,7 @@ _lendian_unicode_to_utf8(
 	*srcLen = srcCount;
 	*dstLen = dstCount;
 	dst[dstCount] = '\0';
-	
+
 	return status;
 }
 
@@ -174,7 +174,7 @@ _utf8_to_lendian_unicode(
 		dst[dstCount++] = unicode >> 8;
 
 		srcCount += UTF8 - ((uchar *)(src + srcCount));
-		status = B_OK;	
+		status = B_OK;
 	}
 
 	*srcLen = srcCount;
@@ -217,4 +217,3 @@ status_t utf8_to_unicode(const char *utf8, uchar *uni, size_t *unilen)
 
 	return result;
 }
-

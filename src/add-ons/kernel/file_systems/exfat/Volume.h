@@ -17,6 +17,8 @@
 #include <lock.h>
 #include <string.h>
 
+#include <StorageDefs.h>
+
 #include "exfat.h"
 #include "SplayTree.h"
 
@@ -151,9 +153,7 @@ private:
 			fs_volume*			fFSVolume;
 			int					fDevice;
 			exfat_super_block	fSuperBlock;
-			char				fName[34];
-				// Max number of bytes needed is (11 * 3) + 1 for the \0,
-				// that is 11 UCS-2 characters converted to UTF-8.
+			char				fName[B_FILE_NAME_LENGTH];
 
 			uint16				fFlags;
 			uint32				fBlockSize;

@@ -230,8 +230,8 @@ bool
 LabelVisitor::VisitLabel(struct exfat_entry* entry)
 {
 	TRACE("LabelVisitor::VisitLabel()\n");
-	char name[34];
-	status_t result = volume_name(entry, name);
+	char name[B_FILE_NAME_LENGTH];
+	status_t result = get_volume_name(entry, name, sizeof(name));
 	if (result != B_OK)
 		return false;
 
@@ -334,13 +334,6 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fEntriesPerBlock = (fBlockSize / sizeof(struct exfat_entry));
 
 	// check if the device size is large enough to hold the file system
-	off_t diskSize;
-	status = opener.GetSize(&diskSize);
-	if (status != B_OK)
-		return status;
-	if (diskSize < (off_t)fSuperBlock.NumBlocks() << fSuperBlock.BlockShift())
-		return B_BAD_VALUE;
-
 	fBlockCache = opener.InitCache(fSuperBlock.NumBlocks(), fBlockSize);
 	if (fBlockCache == NULL)
 		return B_ERROR;
@@ -371,23 +364,9 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	iterator.Iterate(visitor);
 
 	if (fName[0] == '\0') {
-		// generate a more or less descriptive volume name
-		off_t divisor = 1ULL << 40;
-		char unit = 'T';
-		if (diskSize < divisor) {
-			divisor = 1UL << 30;
-			unit = 'G';
-			if (diskSize < divisor) {
-				divisor = 1UL << 20;
-				unit = 'M';
-			}
-		}
-
-		double size = double((10 * diskSize + divisor - 1) / divisor);
-			// %g in the kernel does not support precision...
-
-		snprintf(fName, sizeof(fName), "%g %cB ExFAT Volume",
-			size / 10, unit);
+		off_t deviceSize = (off_t)fSuperBlock.NumBlocks()
+			<< fSuperBlock.BlockShift();
+		get_default_volume_name(deviceSize, fName, sizeof(fName));
 	}
 
 	return B_OK;

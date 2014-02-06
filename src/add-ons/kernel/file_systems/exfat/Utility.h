@@ -45,16 +45,31 @@ open_mode_to_access(int openMode)
 }
 
 
-/*!	Reads the volume name from an exfat entry and writes it to \a _name
-	as a UTF-8 char array. Writes "Untitled" The volume name is not set.
-	\returns A status code.
-	\retval B_OK Wrote the volume name successfully.
-	\retval B_BAD_VALUE \a entry or \a _name was \c NULL.
-	\retval B_NAME_NOT_FOUND Volume name was not found in this entry.
-	\retval B_NAME_TOO_LONG The passed in _name wasn't long enough to
-			fit the name.
+/*!	Reads the volume name from an exfat entry and writes it to
+	\a _name as a UTF-8 char array.
+
+	Writes a blank string to \a name if the volume name is not set.
+
+	\param entry The \a entry to look for the volume name in.
+	\param name The \a name array to fill out.
+	\param length The \a length of the name array in bytes.
+
+	\returns A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK Wrote the volume name to \a name successfully.
+	\retval B_BAD_VALUE \a entry or \a name was \c NULL.
+	\retval B_NAME_NOT_FOUND Volume name was not found in this \a entry.
+	\retval B_NAME_TOO_LONG \a name wasn't long enough to fit the volume name.
 */
-status_t volume_name(struct exfat_entry* entry, char* _name);
+status_t get_volume_name(struct exfat_entry* entry, char* name, size_t length);
+
+
+/*!	Writes a more or less descriptive volume name to \a name.
+
+	\param diskSize The disk size in bytes
+	\param name The \a name array to fill out.
+	\param length The \a length of the name array in bytes.
+*/
+void get_default_volume_name(off_t diskSize, char* name, size_t length);
 
 
 #endif	// UTILITY_H

@@ -24,6 +24,7 @@
 #include <fs_info.h>
 #include <io_requests.h>
 #include <NodeMonitor.h>
+#include <StorageDefs.h>
 #include <util/AutoLock.h>
 
 #include "DirectoryIterator.h"
@@ -46,7 +47,7 @@
 
 struct identify_cookie {
 	exfat_super_block super_block;
-	char name[34];
+	char name[B_FILE_NAME_LENGTH];
 };
 
 
@@ -77,7 +78,7 @@ iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
 
 
 static float
-exfat_identify_partition(int fd, partition_data* _partition, void** _cookie)
+exfat_identify_partition(int fd, partition_data* partition, void** _cookie)
 {
 	struct exfat_super_block superBlock;
 	status_t status = Volume::Identify(fd, &superBlock);
@@ -89,7 +90,7 @@ exfat_identify_partition(int fd, partition_data* _partition, void** _cookie)
 		return -1;
 
 	memcpy(&cookie->super_block, &superBlock, sizeof(exfat_super_block));
-	memset(cookie->name, 0, 34);
+	memset(cookie->name, 0, sizeof(cookie->name));
 		// zero out volume name
 
 	uint32 rootDirCluster = superBlock.RootDirCluster();
@@ -104,7 +105,8 @@ exfat_identify_partition(int fd, partition_data* _partition, void** _cookie)
 			&entry, entrySize) == (ssize_t)entrySize; i++) {
 		if (entry.type == EXFAT_ENTRY_TYPE_NOT_IN_USE
 			|| entry.type == EXFAT_ENTRY_TYPE_LABEL) {
-			if (volume_name(&entry, cookie->name) != B_OK) {
+			if (get_volume_name(&entry, cookie->name, sizeof(cookie->name))
+					!= B_OK) {
 				delete cookie;
 				return -1;
 			}
@@ -113,8 +115,8 @@ exfat_identify_partition(int fd, partition_data* _partition, void** _cookie)
 	}
 
 	if (cookie->name[0] == '\0') {
-		delete cookie;
-		return -1;
+		off_t deviceSize = (off_t)superBlock.NumBlocks() << superBlock.BlockShift();
+		get_default_volume_name(deviceSize, cookie->name, sizeof(cookie->name));
 	}
 
 	*_cookie = cookie;
@@ -123,23 +125,23 @@ exfat_identify_partition(int fd, partition_data* _partition, void** _cookie)
 
 
 static status_t
-exfat_scan_partition(int fd, partition_data* _partition, void* _cookie)
+exfat_scan_partition(int fd, partition_data* partition, void* _cookie)
 {
 	identify_cookie* cookie = (identify_cookie*)_cookie;
 
-	_partition->status = B_PARTITION_VALID;
-	_partition->flags |= B_PARTITION_FILE_SYSTEM;
-	_partition->content_size = cookie->super_block.NumBlocks() 
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_FILE_SYSTEM;
+	partition->content_size = cookie->super_block.NumBlocks()
 		<< cookie->super_block.BlockShift();
-	_partition->block_size = 1 << cookie->super_block.BlockShift();
-	_partition->content_name = strdup(cookie->name);
+	partition->block_size = 1 << cookie->super_block.BlockShift();
+	partition->content_name = strdup(cookie->name);
 
-	return _partition->content_name != NULL ? B_OK : B_NO_MEMORY;
+	return partition->content_name != NULL ? B_OK : B_NO_MEMORY;
 }
 
 
 static void
-exfat_free_identify_partition_cookie(partition_data* _partition, void* _cookie)
+exfat_free_identify_partition_cookie(partition_data* partition, void* _cookie)
 {
 	delete (identify_cookie*)_cookie;
 }
