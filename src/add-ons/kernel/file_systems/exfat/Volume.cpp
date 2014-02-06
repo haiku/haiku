@@ -333,14 +333,14 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	TRACE("block size %" B_PRIu32 "\n", fBlockSize);
 	fEntriesPerBlock = (fBlockSize / sizeof(struct exfat_entry));
 
-	// check if the device size is large enough to hold the file system
-	off_t fileSystemSize;
-	status = opener.GetSize(&fileSystemSize);
+	// check that the device is large enough to hold the partition
+	off_t deviceSize;
+	status = opener.GetSize(&deviceSize);
 	if (status != B_OK)
 		return status;
 
-	off_t deviceSize = (off_t)fSuperBlock.NumBlocks() << fSuperBlock.BlockShift();
-	if (fileSystemSize < deviceSize)
+	off_t partitionSize = (off_t)fSuperBlock.NumBlocks() << fSuperBlock.BlockShift();
+	if (deviceSize < partitionSize)
 		return B_BAD_VALUE;
 
 	fBlockCache = opener.InitCache(fSuperBlock.NumBlocks(), fBlockSize);
@@ -373,7 +373,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	iterator.Iterate(visitor);
 
 	if (fName[0] == '\0')
-		get_default_volume_name(deviceSize, fName, sizeof(fName));
+		get_default_volume_name(partitionSize, fName, sizeof(fName));
 
 	return B_OK;
 }

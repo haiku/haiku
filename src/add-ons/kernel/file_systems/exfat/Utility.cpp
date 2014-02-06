@@ -48,20 +48,20 @@ get_volume_name(struct exfat_entry* entry, char* name, size_t length)
 
 
 void
-get_default_volume_name(off_t diskSize, char* name, size_t length)
+get_default_volume_name(off_t partitionSize, char* name, size_t length)
 {
 	off_t divisor = 1ULL << 40;
 	char unit = 'T';
-	if (diskSize < divisor) {
+	if (partitionSize < divisor) {
 		divisor = 1UL << 30;
 		unit = 'G';
-		if (diskSize < divisor) {
+		if (partitionSize < divisor) {
 			divisor = 1UL << 20;
 			unit = 'M';
 		}
 	}
 
-	double size = double((10 * diskSize + divisor - 1) / divisor);
+	double size = double((10 * partitionSize + divisor - 1) / divisor);
 		// %g in the kernel does not support precision...
 
 	snprintf(name, length, "%g%ciB ExFAT Volume", size / 10, unit);

@@ -115,8 +115,10 @@ exfat_identify_partition(int fd, partition_data* partition, void** _cookie)
 	}
 
 	if (cookie->name[0] == '\0') {
-		off_t deviceSize = (off_t)superBlock.NumBlocks() << superBlock.BlockShift();
-		get_default_volume_name(deviceSize, cookie->name, sizeof(cookie->name));
+		off_t fileSystemSize = (off_t)superBlock.NumBlocks()
+			<< superBlock.BlockShift();
+		get_default_volume_name(fileSystemSize, cookie->name,
+			sizeof(cookie->name));
 	}
 
 	*_cookie = cookie;

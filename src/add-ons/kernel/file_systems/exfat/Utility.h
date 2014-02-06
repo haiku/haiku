@@ -65,11 +65,11 @@ status_t get_volume_name(struct exfat_entry* entry, char* name, size_t length);
 
 /*!	Writes a more or less descriptive volume name to \a name.
 
-	\param diskSize The disk size in bytes
+	\param partitionSize The partion size in bytes.
 	\param name The \a name array to fill out.
 	\param length The \a length of the name array in bytes.
 */
-void get_default_volume_name(off_t diskSize, char* name, size_t length);
+void get_default_volume_name(off_t partitionSize, char* name, size_t length);
 
 
 #endif	// UTILITY_H
