@@ -135,7 +135,7 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 		// switch to and from stacking and snapping mode
 		bool wasPressed = fSATKeyPressed;
 		fSATKeyPressed = (what == B_MODIFIERS_CHANGED
-			&& (modifiers & B_OPTION_KEY) != 0)
+				&& (modifiers & 0xff) == B_OPTION_KEY)
 			|| (what == B_UNMAPPED_KEY_DOWN && key == kRightOptionKey);
 		if (wasPressed && !fSATKeyPressed)
 			_StopSAT();
