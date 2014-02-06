@@ -1,14 +1,14 @@
-# Doxyfile 1.7.5.1
+# Doxyfile 1.7.6.1
 
 # This file describes the settings to be used by the documentation system
-# doxygen (www.doxygen.org) for a project.
+# doxygen (www.doxygen.org) for a project
 #
-# All text after a hash (#) is considered a comment and will be ignored.
+# All text after a hash (#) is considered a comment and will be ignored
 # The format is:
 #       TAG = value [value, ...]
 # For lists items can also be appended using:
 #       TAG += value [value, ...]
-# Values that contain spaces should be placed between quotes (" ").
+# Values that contain spaces should be placed between quotes (" ")
 
 #---------------------------------------------------------------------------
 # Project related configuration options
@@ -195,6 +195,13 @@ TAB_SIZE               = 4
 
 ALIASES                = "key{1}=<span class=\"keycap\">\1</span>"
 
+# This tag can be used to specify a number of word-keyword mappings (TCL only).
+# A mapping has the form "name=value". For example adding
+# "class=itcl::class" will allow you to use the command class in the
+# itcl::class meaning.
+
+TCL_SUBST              =
+
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C
 # sources only. Doxygen will then generate output that is more tailored for C.
 # For instance, some of the names that are used will be different. The list
@@ -260,7 +267,7 @@ SIP_SUPPORT            = NO
 # setting a simple type. If this is not the case, or you want to show the
 # methods anyway, you should set this option to NO.
 
-IDL_PROPERTY_SUPPORT   = YES
+IDL_PROPERTY_SUPPORT   = NO
 
 # If member grouping is used in the documentation and the DISTRIBUTE_GROUP_DOC
 # tag is set to YES, then doxygen will reuse the documentation of the first
@@ -315,9 +322,20 @@ TYPEDEF_HIDES_STRUCT   = NO
 # a logarithmic scale so increasing the size by one will roughly double the
 # memory usage. The cache size is given by this formula:
 # 2^(16+SYMBOL_CACHE_SIZE). The valid range is 0..9, the default is 0,
-# corresponding to a cache size of 2^16 = 65536 symbols
+# corresponding to a cache size of 2^16 = 65536 symbols.
 
 SYMBOL_CACHE_SIZE      = 0
+
+# Similar to the SYMBOL_CACHE_SIZE the size of the symbol lookup cache can be
+# set using LOOKUP_CACHE_SIZE. This cache is used to resolve symbols given
+# their name and scope. Since this can be an expensive process and often the
+# same symbol appear multiple times in the code, doxygen keeps a cache of
+# pre-resolved symbols. If the cache is too small doxygen will become slower.
+# If the cache is too large, memory is wasted. The cache size is given by this
+# formula: 2^(16+LOOKUP_CACHE_SIZE). The valid range is 0..9, the default is 0,
+# corresponding to a cache size of 2^16 = 65536 symbols.
+
+LOOKUP_CACHE_SIZE      = 0
 
 #---------------------------------------------------------------------------
 # Build related configuration options
@@ -535,8 +553,7 @@ SHOW_DIRECTORIES       = NO
 SHOW_FILES             = YES
 
 # Set the SHOW_NAMESPACES tag to NO to disable the generation of the
-# Namespaces page.
-# This will remove the Namespaces entry from the Quick Index
+# Namespaces page.  This will remove the Namespaces entry from the Quick Index
 # and from the Folder Tree View (if specified). The default is YES.
 
 SHOW_NAMESPACES        = YES
@@ -565,7 +582,8 @@ LAYOUT_FILE            =
 # .bib extension is automatically appended if omitted. Using this command
 # requires the bibtex tool to be installed. See also
 # http://en.wikipedia.org/wiki/BibTeX for more info. For LaTeX the style
-# of the bibliography can be controlled using LATEX_BIB_STYLE.
+# of the bibliography can be controlled using LATEX_BIB_STYLE. To use this
+# feature you need bibtex and perl available in the search path.
 
 CITE_BIB_FILES         =
 
@@ -687,14 +705,15 @@ FILE_PATTERNS          = *.dox \
 
 RECURSIVE              = NO
 
-# The EXCLUDE tag can be used to specify files and/or directories that should
+# The EXCLUDE tag can be used to specify files and/or directories that should be
 # excluded from the INPUT source files. This way you can easily exclude a
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
-# Note that relative paths are relative to directory from which doxygen is run.
+# Note that relative paths are relative to the directory from which doxygen is
+# run.
 
 EXCLUDE                =
 
-# The EXCLUDE_SYMLINKS tag can be used select whether or not files or
+# The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
 # from the input.
 
@@ -751,17 +770,14 @@ IMAGE_PATH             = . \
 # by executing (via popen()) the command <filter> <input-file>, where <filter>
 # is the value of the INPUT_FILTER tag, and <input-file> is the name of an
 # input file. Doxygen will then use the output that the filter program writes
-# to standard output.
-# If FILTER_PATTERNS is specified, this tag will be
+# to standard output.  If FILTER_PATTERNS is specified, this tag will be
 # ignored.
 
 INPUT_FILTER           =
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern
-# basis.
-# Doxygen will compare the file name with each pattern and apply the
-# filter if there is a match.
-# The filters are a list of the form:
+# basis.  Doxygen will compare the file name with each pattern and apply the
+# filter if there is a match.  The filters are a list of the form:
 # pattern=filter (like *.cpp=my_cpp_filter). See INPUT_FILTER for further
 # info on how filters are used. If FILTER_PATTERNS is empty or if
 # non of the patterns match the file name, INPUT_FILTER is applied.
@@ -819,8 +835,7 @@ REFERENCES_RELATION    = YES
 # If the REFERENCES_LINK_SOURCE tag is set to YES (the default)
 # and SOURCE_BROWSER tag is set to YES, then the hyperlinks from
 # functions in REFERENCES_RELATION and REFERENCED_BY_RELATION lists will
-# link to the source code.
-# Otherwise they will link to the documentation.
+# link to the source code.  Otherwise they will link to the documentation.
 
 REFERENCES_LINK_SOURCE = NO
 
@@ -885,9 +900,9 @@ HTML_FILE_EXTENSION    = .html
 # The HTML_HEADER tag can be used to specify a personal HTML header for
 # each generated HTML page. If it is left blank doxygen will generate a
 # standard header. Note that when using a custom header you are responsible
-#  for the proper inclusion of any scripts and style sheets that doxygen
+# for the proper inclusion of any scripts and style sheets that doxygen
 # needs, which is dependent on the configuration options used.
-# It is adviced to generate a default header using "doxygen -w html
+# It is advised to generate a default header using "doxygen -w html
 # header.html footer.html stylesheet.css YourConfigFile" and then modify
 # that header. Note that the header is subject to change so you typically
 # have to redo this when upgrading to a newer version of doxygen or when
@@ -906,7 +921,7 @@ HTML_FOOTER            = footer.html
 # fine-tune the look of the HTML output. If the tag is left blank doxygen
 # will generate a default style sheet. Note that doxygen will try to copy
 # the style sheet file to the HTML output directory, so don't put your own
-# stylesheet in the HTML output directory as well, or it will be erased!
+# style sheet in the HTML output directory as well, or it will be erased!
 
 HTML_STYLESHEET        = book.css
 
@@ -920,7 +935,7 @@ HTML_STYLESHEET        = book.css
 HTML_EXTRA_FILES       =
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output.
-# Doxygen will adjust the colors in the stylesheet and background images
+# Doxygen will adjust the colors in the style sheet and background images
 # according to this color. Hue is specified as an angle on a colorwheel,
 # see http://en.wikipedia.org/wiki/Hue for more information.
 # For instance the value 0 represents red, 60 is yellow, 120 is green,
@@ -1099,7 +1114,7 @@ QHP_SECT_FILTER_ATTRS  =
 QHG_LOCATION           =
 
 # If the GENERATE_ECLIPSEHELP tag is set to YES, additional index files
-#  will be generated, which together with the HTML files, form an Eclipse help
+# will be generated, which together with the HTML files, form an Eclipse help
 # plugin. To install this plugin and make it available under the help contents
 # menu in Eclipse, the contents of the directory containing the HTML and XML
 # files needs to be copied into the plugins directory of eclipse. The name of
@@ -1115,18 +1130,13 @@ GENERATE_ECLIPSEHELP   = NO
 
 ECLIPSE_DOC_ID         = org.doxygen.Project
 
-# The DISABLE_INDEX tag can be used to turn on/off the condensed index at
-# top of each HTML page. The value NO (the default) enables the index and
-# the value YES disables it.
+# The DISABLE_INDEX tag can be used to turn on/off the condensed index (tabs)
+# at top of each HTML page. The value NO (the default) enables the index and
+# the value YES disables it. Since the tabs have the same information as the
+# navigation tree you can set this option to NO if you already set
+# GENERATE_TREEVIEW to YES.
 
 DISABLE_INDEX          = NO
-
-# The ENUM_VALUES_PER_LINE tag can be used to set the number of enum values
-# (range [0,1..20]) that doxygen will group on one line in the generated HTML
-# documentation. Note that a value of 0 will completely suppress the enum
-# values from appearing in the overview section.
-
-ENUM_VALUES_PER_LINE   = 1
 
 # The GENERATE_TREEVIEW tag is used to specify whether a tree-like index
 # structure should be generated to display hierarchical information.
@@ -1135,8 +1145,17 @@ ENUM_VALUES_PER_LINE   = 1
 # is generated for HTML Help). For this to work a browser that supports
 # JavaScript, DHTML, CSS and frames is required (i.e. any modern browser).
 # Windows users are probably better off using the HTML help feature.
+# Since the tree basically has the same information as the tab index you
+# could consider to set DISABLE_INDEX to NO when enabling this option.
 
 GENERATE_TREEVIEW      = NO
+
+# The ENUM_VALUES_PER_LINE tag can be used to set the number of enum values
+# (range [0,1..20]) that doxygen will group on one line in the generated HTML
+# documentation. Note that a value of 0 will completely suppress the enum
+# values from appearing in the overview section.
+
+ENUM_VALUES_PER_LINE   = 1
 
 # By enabling USE_INLINE_TREES, doxygen will generate the Groups, Directories,
 # and Class Hierarchy pages using a tree view instead of an ordered list.
@@ -1345,7 +1364,7 @@ COMPACT_RTF            = NO
 
 RTF_HYPERLINKS         = NO
 
-# Load stylesheet definitions from file. Syntax is similar to doxygen's
+# Load style sheet definitions from file. Syntax is similar to doxygen's
 # config file, i.e. a series of assignments. You only have to provide
 # replacements, missing definitions are set to their default value.
 
@@ -1392,7 +1411,7 @@ MAN_LINKS              = NO
 # generate an XML file that captures the structure of
 # the code including all documentation.
 
-GENERATE_XML           = YES
+GENERATE_XML           = NO
 
 # The XML_OUTPUT tag is used to specify where the XML pages will be put.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
@@ -1450,10 +1469,8 @@ GENERATE_PERLMOD       = NO
 PERLMOD_LATEX          = NO
 
 # If the PERLMOD_PRETTY tag is set to YES the Perl module output will be
-# nicely formatted so it can be parsed by a human reader.
-# This is useful
-# if you want to understand what is going on.
-# On the other hand, if this
+# nicely formatted so it can be parsed by a human reader.  This is useful
+# if you want to understand what is going on.  On the other hand, if this
 # tag is set to NO the size of the Perl module output will be much smaller
 # and Perl will parse it just the same.
 
@@ -1541,11 +1558,9 @@ SKIP_FUNCTION_MACROS   = YES
 # Optionally an initial location of the external documentation
 # can be added for each tagfile. The format of a tag file without
 # this location is as follows:
-#
-# TAGFILES = file1 file2 ...
+#   TAGFILES = file1 file2 ...
 # Adding location for the tag files is done as follows:
-#
-# TAGFILES = file1=loc1 "file2 = loc2" ...
+#   TAGFILES = file1=loc1 "file2 = loc2" ...
 # where "loc1" and "loc2" can be relative or absolute paths or
 # URLs. If a location is present for each tag, the installdox tool
 # does not have to be run to correct the links.
@@ -1588,7 +1603,7 @@ PERL_PATH              = /boot/home/config/bin/perl
 # this option also works with HAVE_DOT disabled, but it is recommended to
 # install and use dot, since it yields more powerful graphs.
 
-CLASS_DIAGRAMS         = YES
+CLASS_DIAGRAMS         = NO
 
 # You can define message sequence charts within doxygen comments using the \msc
 # command. Doxygen will then run the mscgen tool (see
@@ -1643,7 +1658,7 @@ DOT_FONTPATH           =
 # If the CLASS_GRAPH and HAVE_DOT tags are set to YES then doxygen
 # will generate a graph for each documented class showing the direct and
 # indirect inheritance relations. Setting this tag to YES will force the
-# the CLASS_DIAGRAMS tag to NO.
+# CLASS_DIAGRAMS tag to NO.
 
 CLASS_GRAPH            = YES
 

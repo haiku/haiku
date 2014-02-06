@@ -563,10 +563,11 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 ///// Subgroups /////
 
 /*!
-	\defgroup support_globals Global functions in the support kit
+	\defgroup support_globals Global functions
 	\ingroup support
 
-	\defgroup layout Layout classes in the Interface Kit
+	\defgroup layout Layout API
+	\brief Provides classes for automatically laying out UIs.
 	\ingroup interface
 */
 

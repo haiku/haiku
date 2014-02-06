@@ -244,7 +244,7 @@ div.tabs ul.tablist li li.current a, div.tabs2 ul.tablist li li.current a,
 
 /* Contents div */
 
-div.contents {
+div.contents, footer {
 	line-height: 1.5;
 	margin: 10px auto;
 	width: 59em;
