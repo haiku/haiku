@@ -402,6 +402,53 @@ public:
 };
 
 
+// #pragma mark - NestedStates
+
+
+class NestedStatesTest : public Test {
+public:
+	NestedStatesTest()
+		:
+		Test("Nested view states")
+	{
+	}
+	
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BAffineTransform transform;
+		transform.RotateBy(BPoint(100, 100), 30.0 * M_PI / 180.0);
+		view->SetTransform(transform);
+
+		rgb_color top = (rgb_color){ 255, 0, 0, 255 };
+		rgb_color bottom = (rgb_color){ 255, 255, 0, 255 };
+
+		BRect rect(20, 20, 120, 120);
+
+		BGradientLinear gradient;
+		gradient.AddColor(top, 0.0f);
+		gradient.AddColor(bottom, 255.0f);
+		gradient.SetStart(rect.LeftTop());
+		gradient.SetEnd(rect.LeftBottom());
+
+		view->FillRoundRect(rect, 20, 20, gradient);
+
+		view->PushState();
+		// Should be in the same place!
+		view->StrokeRoundRect(rect, 20, 20);
+
+		// Now rotated by another 30 degree
+		view->SetTransform(transform);
+
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+		view->SetHighColor(0, 0, 255, 120);
+		view->FillRoundRect(rect, 20, 20);
+
+		view->PopState();
+	}
+};
+
+
 // #pragma mark -
 
 
@@ -415,8 +462,9 @@ main(int argc, char** argv)
 	window->AddTest(new RectsTest());
 	window->AddTest(new BitmapTest());
 	window->AddTest(new GradientTest());
+	window->AddTest(new NestedStatesTest());
 
-	window->SetToTest(2);
+	window->SetToTest(3);
 	window->Show();
 
 	app.Run();
