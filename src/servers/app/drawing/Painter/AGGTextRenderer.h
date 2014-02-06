@@ -31,7 +31,8 @@ public:
 										subpixScanline,
 									rasterizer_subpix_type& subpixRasterizer,
 									scanline_unpacked_masked_type*&
-										maskedScanline);
+										maskedScanline,
+									agg::trans_affine& viewTransformation);
 	virtual						~AGGTextRenderer();
 
 			void				SetFont(const ServerFont &font);
@@ -99,6 +100,7 @@ private:
 	bool						fKerning;
 	Transformable				fEmbeddedTransformation;
 									// rotated or sheared font?
+	agg::trans_affine&			fViewTransformation;
 };
 
 #endif // AGG_TEXT_RENDERER_H

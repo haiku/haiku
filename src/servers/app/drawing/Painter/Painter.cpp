@@ -201,7 +201,8 @@ Painter::Painter()
 
 	fPatternHandler(),
 	fTextRenderer(fSubpixRenderer, fRenderer, fRendererBin, fUnpackedScanline,
-		fSubpixUnpackedScanline, fSubpixRasterizer, fMaskedUnpackedScanline)
+		fSubpixUnpackedScanline, fSubpixRasterizer, fMaskedUnpackedScanline,
+		fTransform)
 {
 	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode,
 		false);

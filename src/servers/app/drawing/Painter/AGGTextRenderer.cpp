@@ -34,7 +34,8 @@ AGGTextRenderer::AGGTextRenderer(renderer_subpix_type& subpixRenderer,
 		scanline_unpacked_type& scanline,
 		scanline_unpacked_subpix_type& subpixScanline,
 		rasterizer_subpix_type& subpixRasterizer,
-		scanline_unpacked_masked_type*& maskedScanline)
+		scanline_unpacked_masked_type*& maskedScanline,
+		agg::trans_affine& viewTransformation)
 	:
 	fPathAdaptor(),
 	fGray8Adaptor(),
@@ -59,7 +60,8 @@ AGGTextRenderer::AGGTextRenderer(renderer_subpix_type& subpixRenderer,
 	fHinted(true),
 	fAntialias(true),
 	fKerning(true),
-	fEmbeddedTransformation()
+	fEmbeddedTransformation(),
+	fViewTransformation(viewTransformation)
 {
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
@@ -339,6 +341,7 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 
 	Transformable transform(fEmbeddedTransformation);
 	transform.TranslateBy(baseLine);
+	transform *= fViewTransformation;
 
 	fCurves.approximation_scale(transform.scale());
 
@@ -375,6 +378,7 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 //printf("RenderString(\"%s\", length: %ld, dry: %d)\n", string, length, dryRun);
 
 	Transformable transform(fEmbeddedTransformation);
+	transform *= fViewTransformation;
 
 	fCurves.approximation_scale(transform.scale());
 
