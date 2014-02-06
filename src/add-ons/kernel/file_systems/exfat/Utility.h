@@ -46,7 +46,7 @@ open_mode_to_access(int openMode)
 
 
 /*!	Reads the volume name from an exfat entry and writes it to
-	\a _name as a UTF-8 char array.
+	\a name as a UTF-8 char array.
 
 	Writes a blank string to \a name if the volume name is not set.
 
