@@ -9,6 +9,7 @@ UseHeaders [ FDirName os interface ] ;
 SimpleTest Transformation :
 	main.cpp
 	: be $(TARGET_LIBSUPC++)
+	: Transformation.rdef
 	;
 
 if ( $(TARGET_PLATFORM) = libbe_test ) {

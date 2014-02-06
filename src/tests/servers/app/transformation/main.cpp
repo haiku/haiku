@@ -8,11 +8,14 @@
 #include <string.h>
 
 #include <Application.h>
+#include <Bitmap.h>
 #include <Message.h>
 #include <Picture.h>
 #include <LayoutBuilder.h>
 #include <List.h>
 #include <PopUpMenu.h>
+#include <Resources.h>
+#include <Roster.h>
 #include <ScrollView.h>
 #include <String.h>
 #include <StringView.h>
@@ -252,6 +255,114 @@ public:
 };
 
 
+// #pragma mark - BitmapTest
+
+
+class BitmapTest : public Test {
+public:
+	BitmapTest()
+		:
+		Test("Bitmap"),
+		fBitmap(_LoadBitmap(555))
+	{
+	}
+
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BRect rect(view->Bounds());
+
+		if (fBitmap == NULL) {
+			view->SetHighColor(255, 0, 0);
+			view->FillRect(rect);
+			view->SetHighColor(0, 0, 0);
+			view->DrawString("Failed to load the bitmap.", BPoint(20, 20));
+			return;
+		}
+
+		rect.left = (rect.Width() - fBitmap->Bounds().Width()) / 2;
+		rect.top = (rect.Height() - fBitmap->Bounds().Height()) / 2;
+		rect.right = rect.left + fBitmap->Bounds().Width();
+		rect.bottom = rect.top + fBitmap->Bounds().Height();
+
+		BPoint center(
+			rect.left + rect.Width() / 2,
+			rect.top + rect.Height() / 2);
+
+		BPicture picture;
+		view->BeginPicture(&picture);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+		BFont font;
+		view->GetFont(&font);
+		font.SetSize(70);
+		view->SetFont(&font);
+		view->SetHighColor(0, 0, 0, 80);
+		view->FillRect(view->Bounds());
+		view->SetHighColor(0, 0, 0, 255);
+		view->DrawString("CLIPPING", BPoint(0, center.y + 35));
+		view->EndPicture();
+
+		view->ClipToPicture(&picture);
+
+		BAffineTransform transform;
+			transform.RotateBy(center, 30 * M_PI / 180.0);
+			view->SetTransform(transform);
+	
+		view->DrawBitmap(fBitmap, fBitmap->Bounds(), rect);
+	}
+
+private:
+	status_t
+	_GetAppResources(BResources& resources) const
+	{
+		app_info info;
+		status_t status = be_app->GetAppInfo(&info);
+		if (status != B_OK)
+			return status;
+	
+		return resources.SetTo(&info.ref);
+	}
+
+
+	BBitmap* _LoadBitmap(int resourceID) const
+	{
+		BResources resources;
+		status_t status = _GetAppResources(resources);
+		if (status != B_OK)
+			return NULL;
+	
+		size_t dataSize;
+		const void* data = resources.LoadResource(B_MESSAGE_TYPE, resourceID,
+			&dataSize);
+		if (data == NULL)
+			return NULL;
+
+		BMemoryIO stream(data, dataSize);
+
+		// Try to read as an archived bitmap.
+		BMessage archive;
+		status = archive.Unflatten(&stream);
+		if (status != B_OK)
+			return NULL;
+
+		BBitmap* bitmap = new BBitmap(&archive);
+
+		status = bitmap->InitCheck();
+		if (status != B_OK) {
+			delete bitmap;
+			bitmap = NULL;
+		}
+
+		return bitmap;
+	}
+
+private:
+	BBitmap*	fBitmap;
+};
+
+
+
+
 // #pragma mark -
 
 
@@ -263,6 +374,7 @@ main(int argc, char** argv)
 	TestWindow* window = new TestWindow();
 
 	window->AddTest(new RectsTest());
+	window->AddTest(new BitmapTest());
 
 	window->SetToTest(0);
 	window->Show();
