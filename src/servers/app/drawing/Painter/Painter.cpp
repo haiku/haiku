@@ -1869,7 +1869,8 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	double yOffset = viewRect.top - bitmapRect.top;
 
 	// optimized code path for B_CMAP8 and no scale
-	if (xScale == 1.0 && yScale == 1.0) {
+	if (xScale == 1.0 && yScale == 1.0 && fIdentityTransform
+		&& fMaskedUnpackedScanline == NULL) {
 		if (format == B_CMAP8) {
 			if (fDrawingMode == B_OP_COPY) {
 				_DrawBitmapNoScale32(copy_bitmap_row_cmap8_copy, 1,
@@ -1958,7 +1959,8 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 	}
 
 	// maybe we can use an optimized version if there is no scale
-	if (xScale == 1.0 && yScale == 1.0) {
+	if (xScale == 1.0 && yScale == 1.0 && fIdentityTransform
+		&& fMaskedUnpackedScanline == NULL) {
 		if (fDrawingMode == B_OP_COPY) {
 			_DrawBitmapNoScale32(copy_bitmap_row_bgr32_copy, 4, srcBuffer,
 				(int32)xOffset, (int32)yOffset, viewRect);
@@ -1973,7 +1975,8 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 		}
 	}
 
-	if (fDrawingMode == B_OP_COPY) {
+	if (fDrawingMode == B_OP_COPY && fIdentityTransform
+		&& fMaskedUnpackedScanline == NULL) {
 		if ((options & B_FILTER_BITMAP_BILINEAR) != 0) {
 			_DrawBitmapBilinearCopy32(srcBuffer, xOffset, yOffset, xScale,
 				yScale, viewRect);
@@ -2611,12 +2614,14 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	// NOTE: R5 seems to ignore this offset when drawing bitmaps
 	//	srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left,
 	//		-actualBitmapRect.top);
+	srcMatrix *= fTransform;
 
 	agg::trans_affine imgMatrix;
 	imgMatrix *= agg::trans_affine_translation(xOffset - viewRect.left,
 		yOffset - viewRect.top);
 	imgMatrix *= agg::trans_affine_scaling(xScale, yScale);
 	imgMatrix *= agg::trans_affine_translation(viewRect.left, viewRect.top);
+	imgMatrix *= fTransform;
 	imgMatrix.invert();
 
 	// image interpolator
