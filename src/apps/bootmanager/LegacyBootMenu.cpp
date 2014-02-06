@@ -319,8 +319,10 @@ LegacyBootMenu::CanBeInstalled(const BootDrive& drive)
 	device.VisitEachDescendant(&visitor);
 
 	// Enough space to write boot menu to drive?
-	if (!visitor.HasPartitions() || visitor.FirstOffset() < sizeof(kBootLoader))
+	if (!visitor.HasPartitions()
+		|| visitor.FirstOffset() < (int)sizeof(kBootLoader)) {
 		return B_PARTITION_TOO_SMALL;
+	}
 
 	return B_OK;
 }
