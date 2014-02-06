@@ -55,10 +55,13 @@ protected:
 	virtual	void				LastReferenceReleased();
 
 private:
+			struct AbstractVolumeJob;
 			struct VolumeJob;
-			struct RequestJob;
+			struct ProcessNodeMonitorEventsJob;
+			struct CommitTransactionJob;
+			struct VolumeJobFilter;
 
-			friend struct RequestJob;
+			friend struct CommitTransactionJob;
 
 private:
 			Volume**			_GetVolume(PackageFSMountType mountType);
@@ -67,7 +70,8 @@ private:
 			void				_InitPackages(Volume* volume);
 			void				_DeleteVolume(Volume* volume);
 			void				_ProcessNodeMonitorEvents(Volume* volume);
-			void				_HandleRequest(BMessage* message);
+			void				_CommitTransaction(Volume* volume,
+									BMessage* message);
 
 			status_t			_QueueJob(Job* job);
 

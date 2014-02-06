@@ -320,6 +320,9 @@ BDaemonClient::BCommitTransactionResult::FullErrorMessage() const
 	const char* errorString;
 	if (fError > 0) {
 		switch ((BDaemonError)fError) {
+			case B_DAEMON_INSTALLATION_LOCATION_BUSY:
+				errorString = "another package operation already in progress";
+				break;
 			case B_DAEMON_CHANGE_COUNT_MISMATCH:
 				errorString = "transaction out of date";
 				break;
@@ -339,7 +342,7 @@ BDaemonClient::BCommitTransactionResult::FullErrorMessage() const
 		}
 	} else
 		errorString = strerror(fError);
-		
+
 	BString result;
 	if (!fErrorMessage.IsEmpty()) {
 		result = fErrorMessage;

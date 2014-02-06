@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -105,6 +105,146 @@ private:
 };
 
 
+// #pragma mark - State
+
+
+struct Volume::State {
+
+	State()
+		:
+		fLock("volume state"),
+		fPackagesByFileName(),
+		fPackagesByNodeRef(),
+		fChangeCount(0),
+		fPendingPackageJobCount(0)
+	{
+	}
+
+	~State()
+	{
+		fPackagesByFileName.Clear();
+
+		Package* package = fPackagesByNodeRef.Clear(true);
+		while (package != NULL) {
+			Package* next = package->NodeRefHashTableNext();
+			delete package;
+			package = next;
+		}
+	}
+
+	bool Init()
+	{
+		return fLock.InitCheck() == B_OK && fPackagesByFileName.Init() == B_OK
+			&& fPackagesByNodeRef.Init() == B_OK;
+	}
+
+	bool Lock()
+	{
+		return fLock.Lock();
+	}
+
+	void Unlock()
+	{
+		fLock.Unlock();
+	}
+
+	int64 ChangeCount() const
+	{
+		return fChangeCount;
+	}
+
+	Package* FindPackage(const char* name) const
+	{
+		return fPackagesByFileName.Lookup(name);
+	}
+
+	Package* FindPackage(const node_ref& nodeRef) const
+	{
+		return fPackagesByNodeRef.Lookup(nodeRef);
+	}
+
+	PackageFileNameHashTable::Iterator ByFileNameIterator() const
+	{
+		return fPackagesByFileName.GetIterator();
+	}
+
+	PackageNodeRefHashTable::Iterator ByNodeRefIterator() const
+	{
+		return fPackagesByNodeRef.GetIterator();
+	}
+
+	void AddPackage(Package* package)
+	{
+		AutoLocker<BLocker> locker(fLock);
+		fPackagesByFileName.Insert(package);
+		fPackagesByNodeRef.Insert(package);
+	}
+
+	void RemovePackage(Package* package)
+	{
+		AutoLocker<BLocker> locker(fLock);
+		_RemovePackage(package);
+	}
+
+	void SetPackageActive(Package* package, bool active)
+	{
+		AutoLocker<BLocker> locker(fLock);
+		package->SetActive(active);
+	}
+
+	void ActivationChanged(const PackageSet& activatedPackage,
+		const PackageSet& deactivatePackages)
+	{
+		AutoLocker<BLocker> locker(fLock);
+
+		for (PackageSet::iterator it = activatedPackage.begin();
+				it != activatedPackage.end(); ++it) {
+			(*it)->SetActive(true);
+			fChangeCount++;
+		}
+
+		for (PackageSet::iterator it = deactivatePackages.begin();
+				it != deactivatePackages.end(); ++it) {
+			Package* package = *it;
+			_RemovePackage(package);
+			delete package;
+		}
+	}
+
+	void PackageJobPending()
+	{
+		atomic_add(&fPendingPackageJobCount, 1);
+	}
+
+
+	void PackageJobFinished()
+	{
+		atomic_add(&fPendingPackageJobCount, -1);
+	}
+
+
+	bool IsPackageJobPending() const
+	{
+		return fPendingPackageJobCount != 0;
+	}
+
+private:
+	void _RemovePackage(Package* package)
+	{
+		fPackagesByFileName.Remove(package);
+		fPackagesByNodeRef.Remove(package);
+		fChangeCount++;
+	}
+
+private:
+	BLocker						fLock;
+	PackageFileNameHashTable	fPackagesByFileName;
+	PackageNodeRefHashTable		fPackagesByNodeRef;
+	int64						fChangeCount;
+	int32						fPendingPackageJobCount;
+};
+
+
 // #pragma mark - CommitTransactionHandler
 
 
@@ -159,7 +299,7 @@ struct Volume::CommitTransactionHandler {
 		BMessage* reply)
 	{
 		// check the change count
-		if (transaction.ChangeCount() != fVolume->fChangeCount)
+		if (transaction.ChangeCount() != fVolume->fState->ChangeCount())
 			throw Exception(B_DAEMON_CHANGE_COUNT_MISMATCH);
 
 		// collect the packages to deactivate
@@ -230,7 +370,7 @@ private:
 
 		for (int32 i = 0; i < packagesToDeactivateCount; i++) {
 			BString packageName = packagesToDeactivate.StringAt(i);
-			Package* package = fVolume->fPackagesByFileName.Lookup(packageName);
+			Package* package = fVolume->fState->FindPackage(packageName);
 			if (package == NULL) {
 				throw Exception(B_DAEMON_NO_SUCH_PACKAGE, "no such package",
 					packageName);
@@ -285,7 +425,7 @@ private:
 			BString packageName = packagesToActivate.StringAt(i);
 
 			// make sure it doesn't clash with an already existing package
-			Package* package = fVolume->fPackagesByFileName.Lookup(packageName);
+			Package* package = fVolume->fState->FindPackage(packageName);
 			if (package != NULL) {
 				if (fPackagesAlreadyAdded.find(package)
 						!= fPackagesAlreadyAdded.end()) {
@@ -1341,14 +1481,12 @@ Volume::Volume(BLooper* looper)
 	fPackagesDirectoryRef(),
 	fRoot(NULL),
 	fListener(NULL),
-	fPackagesByFileName(),
-	fPackagesByNodeRef(),
+	fState(NULL),
 	fPendingNodeMonitorEventsLock("pending node monitor events"),
 	fPendingNodeMonitorEvents(),
 	fNodeMonitorEventHandleTime(0),
 	fPackagesToBeActivated(),
 	fPackagesToBeDeactivated(),
-	fChangeCount(0),
 	fLocationInfoReply(B_MESSAGE_GET_INSTALLATION_LOCATION_INFO_REPLY)
 {
 	looper->AddHandler(this);
@@ -1360,21 +1498,15 @@ Volume::~Volume()
 	Unmounted();
 		// need for error case in InitPackages()
 
-	fPackagesByFileName.Clear();
-
-	Package* package = fPackagesByNodeRef.Clear(true);
-	while (package != NULL) {
-		Package* next = package->NodeRefHashTableNext();
-		delete package;
-		package = next;
-	}
+	delete fState;
 }
 
 
 status_t
 Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 {
-	if (fPackagesByFileName.Init() != B_OK || fPackagesByNodeRef.Init() != B_OK)
+	fState = new(std::nothrow) State;
+	if (fState == NULL || !fState->Init())
 		RETURN_ERROR(B_NO_MEMORY);
 
 	fRootDirectoryRef = rootDirectoryRef;
@@ -1481,8 +1613,8 @@ Volume::InitPackages(Listener* listener)
 status_t
 Volume::AddPackagesToRepository(BSolverRepository& repository, bool activeOnly)
 {
-	for (PackageFileNameHashTable::Iterator it
-			= fPackagesByFileName.GetIterator(); it.HasNext();) {
+	for (PackageFileNameHashTable::Iterator it = fState->ByFileNameIterator();
+			it.HasNext();) {
 		Package* package = it.Next();
 		if (activeOnly && !package->IsActive())
 			continue;
@@ -1589,10 +1721,13 @@ INFORM("Volume::InitialVerify(%p, %p)\n", nextVolume, nextNextVolume);
 void
 Volume::HandleGetLocationInfoRequest(BMessage* message)
 {
+	AutoLocker<State> stateLocker(fState);
+
 	// If the cached reply message is up-to-date, just send it.
 	int64 changeCount;
 	if (fLocationInfoReply.FindInt64("change count", &changeCount) == B_OK
-		&& changeCount == fChangeCount) {
+		&& changeCount == fState->ChangeCount()) {
+		stateLocker.Unlock();
 		message->SendReply(&fLocationInfoReply, (BHandler*)NULL,
 			kCommunicationTimeout);
 		return;
@@ -1612,8 +1747,8 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 		return;
 	}
 
-	for (PackageFileNameHashTable::Iterator it
-			= fPackagesByFileName.GetIterator(); it.HasNext();) {
+	for (PackageFileNameHashTable::Iterator it = fState->ByFileNameIterator();
+			it.HasNext();) {
 		Package* package = it.Next();
 		const char* fieldName = package->IsActive()
 			? "active packages" : "inactive packages";
@@ -1625,8 +1760,12 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 		}
 	}
 
-	if (fLocationInfoReply.AddInt64("change count", fChangeCount) != B_OK)
+	if (fLocationInfoReply.AddInt64("change count", fState->ChangeCount())
+			!= B_OK) {
 		return;
+	}
+
+	stateLocker.Unlock();
 
 	message->SendReply(&fLocationInfoReply, (BHandler*)NULL,
 		kCommunicationTimeout);
@@ -1667,6 +1806,27 @@ Volume::HandleCommitTransactionRequest(BMessage* message)
 	// send the reply
 	reply.ReplaceInt32("error", error);
 	message->SendReply(&reply, (BHandler*)NULL, kCommunicationTimeout);
+}
+
+
+void
+Volume::PackageJobPending()
+{
+	fState->PackageJobPending();
+}
+
+
+void
+Volume::PackageJobFinished()
+{
+	fState->PackageJobFinished();
+}
+
+
+bool
+Volume::IsPackageJobPending() const
+{
+	return fState->IsPackageJobPending();
 }
 
 
@@ -1735,6 +1895,13 @@ Volume::Location() const
 		default:
 			return B_PACKAGE_INSTALLATION_LOCATION_ENUM_COUNT;
 	}
+}
+
+
+PackageFileNameHashTable::Iterator
+Volume::PackagesByFileNameIterator() const
+{
+	return fState->ByFileNameIterator();
 }
 
 
@@ -1852,7 +2019,7 @@ Volume::CreateTransaction(BPackageInstallationLocation location,
 	}
 
 	// init the transaction
-	error = _transaction.SetTo(location, fChangeCount, directoryName);
+	error = _transaction.SetTo(location, fState->ChangeCount(), directoryName);
 	if (error != B_OK) {
 		BEntry entry;
 		_transactionDirectory.GetEntry(&entry);
@@ -1979,7 +2146,7 @@ Volume::_PackagesEntryCreated(const char* name)
 {
 INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
 	// Ignore the event, if the package is already known.
-	Package* package = fPackagesByFileName.Lookup(name);
+	Package* package = fState->FindPackage(name);
 	if (package != NULL) {
 		if (package->EntryCreatedIgnoreLevel() > 0) {
 			package->DecrementEntryCreatedIgnoreLevel();
@@ -2029,7 +2196,7 @@ void
 Volume::_PackagesEntryRemoved(const char* name)
 {
 INFORM("Volume::_PackagesEntryRemoved(\"%s\")\n", name);
-	Package* package = fPackagesByFileName.Lookup(name);
+	Package* package = fState->FindPackage(name);
 	if (package == NULL)
 		return;
 
@@ -2081,16 +2248,13 @@ Volume::_FillInActivationChangeItem(PackageFSActivationChangeItem* item,
 void
 Volume::_AddPackage(Package* package)
 {
-	fPackagesByFileName.Insert(package);
-	fPackagesByNodeRef.Insert(package);
+	fState->AddPackage(package);
 }
 
 void
 Volume::_RemovePackage(Package* package)
 {
-	fPackagesByFileName.Remove(package);
-	fPackagesByNodeRef.Remove(package);
-	fChangeCount++;
+	fState->RemovePackage(package);
 }
 
 
@@ -2157,7 +2321,7 @@ Volume::_GetActivePackages(int fd)
 
 	// mark the returned packages active
 	for (uint32 i = 0; i < request->packageCount; i++) {
-		Package* package = fPackagesByNodeRef.Lookup(
+		Package* package = fState->FindPackage(
 			node_ref(request->infos[i].packageDeviceID,
 				request->infos[i].packageNodeID));
 		if (package == NULL) {
@@ -2169,18 +2333,17 @@ Volume::_GetActivePackages(int fd)
 			continue;
 		}
 
-		package->SetActive(true);
+		fState->SetPackageActive(package, true);
 INFORM("active package: \"%s\"\n", package->FileName().String());
 	}
 
-for (PackageNodeRefHashTable::Iterator it = fPackagesByNodeRef.GetIterator();
+for (PackageNodeRefHashTable::Iterator it = fState->ByNodeRefIterator();
 	it.HasNext();) {
 	Package* package = it.Next();
 	if (!package->IsActive())
 		INFORM("inactive package: \"%s\"\n", package->FileName().String());
 }
 
-			PackageNodeRefHashTable fPackagesByNodeRef;
 // INFORM("%" B_PRIu32 " active packages:\n", request->packageCount);
 // for (uint32 i = 0; i < request->packageCount; i++) {
 // 	INFORM("  dev: %" B_PRIdDEV ", node: %" B_PRIdINO "\n",
@@ -2280,8 +2443,8 @@ Volume::_CreateActivationFileContent(const PackageSet& toActivate,
 	const PackageSet& toDeactivate, BString& _content)
 {
 	BString activationFileContent;
-	for (PackageFileNameHashTable::Iterator it
-			= fPackagesByFileName.GetIterator(); it.HasNext();) {
+	for (PackageFileNameHashTable::Iterator it = fState->ByFileNameIterator();
+			it.HasNext();) {
 		Package* package = it.Next();
 		if (package->IsActive()
 			&& toDeactivate.find(package) == toDeactivate.end()) {
@@ -2446,16 +2609,5 @@ packagesToActivate.size(), packagesToDeactivate.size());
 
 	// Update our state, i.e. remove deactivated packages and mark activated
 	// packages accordingly.
-	for (PackageSet::iterator it = packagesToActivate.begin();
-		it != packagesToActivate.end(); ++it) {
-		(*it)->SetActive(true);
-		fChangeCount++;
-	}
-
-	for (PackageSet::iterator it = packagesToDeactivate.begin();
-		it != packagesToDeactivate.end(); ++it) {
-		Package* package = *it;
-		_RemovePackage(package);
-		delete package;
-	}
+	fState->ActivationChanged(packagesToActivate, packagesToDeactivate);
 }

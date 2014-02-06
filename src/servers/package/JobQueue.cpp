@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,9 @@
 #include "JobQueue.h"
 
 #include <PthreadMutexLocker.h>
+
+
+// #pragma mark - JobQueue
 
 
 JobQueue::JobQueue()
@@ -96,4 +99,26 @@ JobQueue::DequeueJob()
 	}
 
 	return NULL;
+}
+
+
+void
+JobQueue::DeleteJobs(Filter* filter)
+{
+	PthreadMutexLocker mutexLocker(fMutex);
+
+	for (JobList::Iterator it = fJobs.GetIterator(); Job* job = it.Next();) {
+		if (filter->FilterJob(job)) {
+			it.Remove();
+			delete job;
+		}
+	}
+}
+
+
+// #pragma mark - Filter
+
+
+JobQueue::Filter::~Filter()
+{
 }

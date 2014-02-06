@@ -30,13 +30,36 @@ using namespace BPackageKit::BPrivate;
 using namespace BPackageKit::BManager::BPrivate;
 
 
+static const bigtime_t kCommunicationTimeout = 1000000;
+
+
+// #pragma mark - AbstractVolumeJob
+
+
+struct Root::AbstractVolumeJob : public Job {
+	AbstractVolumeJob(Volume* volume)
+		:
+		fVolume(volume)
+	{
+	}
+
+	Volume* GetVolume() const
+	{
+		return fVolume;
+	}
+
+protected:
+	Volume*	fVolume;
+};
+
+
 // #pragma mark - VolumeJob
 
 
-struct Root::VolumeJob : public Job {
+struct Root::VolumeJob : public AbstractVolumeJob {
 	VolumeJob(Volume* volume, void (Root::*method)(Volume*))
 		:
-		fVolume(volume),
+		AbstractVolumeJob(volume),
 		fMethod(method)
 	{
 	}
@@ -47,30 +70,75 @@ struct Root::VolumeJob : public Job {
 	}
 
 private:
-	Volume*	fVolume;
 	void	(Root::*fMethod)(Volume*);
 };
 
 
-// #pragma mark - RequestJob
+// #pragma mark - ProcessNodeMonitorEventsJob
 
 
-struct Root::RequestJob : public Job {
-	RequestJob(Root* root, BMessage* message)
+struct Root::ProcessNodeMonitorEventsJob : public VolumeJob {
+	ProcessNodeMonitorEventsJob(Volume* volume, void (Root::*method)(Volume*))
 		:
+		VolumeJob(volume, method)
+	{
+		fVolume->PackageJobPending();
+	}
+
+	~ProcessNodeMonitorEventsJob()
+	{
+		fVolume->PackageJobFinished();
+	}
+};
+
+
+// #pragma mark - CommitTransactionJob
+
+
+struct Root::CommitTransactionJob : public AbstractVolumeJob {
+	CommitTransactionJob(Root* root, Volume* volume, BMessage* message)
+		:
+		AbstractVolumeJob(volume),
 		fRoot(root),
 		fMessage(message)
 	{
+		fVolume->PackageJobPending();
+	}
+
+	~CommitTransactionJob()
+	{
+		fVolume->PackageJobFinished();
 	}
 
 	virtual void Do()
 	{
-		fRoot->_HandleRequest(fMessage.Get());
+		fRoot->_CommitTransaction(fVolume, fMessage.Get());
 	}
 
 private:
 	Root*					fRoot;
 	ObjectDeleter<BMessage>	fMessage;
+};
+
+
+// #pragma mark - VolumeJobFilter
+
+
+struct Root::VolumeJobFilter : public ::JobQueue::Filter {
+	VolumeJobFilter(Volume* volume)
+		:
+		fVolume(volume)
+	{
+	}
+
+	virtual bool FilterJob(Job* job)
+	{
+		AbstractVolumeJob* volumeJob = dynamic_cast<AbstractVolumeJob*>(job);
+		return volumeJob != NULL && volumeJob->GetVolume() == fVolume;
+	}
+
+private:
+	Volume*	fVolume;
 };
 
 
@@ -236,21 +304,64 @@ Root::GetVolume(BPackageInstallationLocation location)
 void
 Root::HandleRequest(BMessage* message)
 {
-	RequestJob* job = new(std::nothrow) RequestJob(this, message);
-	if (job == NULL) {
-		delete message;
+	ObjectDeleter<BMessage> messageDeleter(message);
+
+	// get the location and the volume
+	int32 location;
+	if (message->FindInt32("location", &location) != B_OK
+		|| location < 0
+		|| location >= B_PACKAGE_INSTALLATION_LOCATION_ENUM_COUNT) {
 		return;
 	}
 
-	_QueueJob(job);
+	AutoLocker<BLocker> locker(fLock);
+
+	Volume* volume = GetVolume((BPackageInstallationLocation)location);
+	if (volume == NULL)
+		return;
+
+	switch (message->what) {
+		case B_MESSAGE_GET_INSTALLATION_LOCATION_INFO:
+			volume->HandleGetLocationInfoRequest(message);
+			break;
+
+		case B_MESSAGE_COMMIT_TRANSACTION:
+		{
+			// The B_MESSAGE_COMMIT_TRANSACTION request must be handled in the
+			// job thread. But only queue a job, if there aren't package jobs
+			// pending already.
+			if (volume->IsPackageJobPending()) {
+				BMessage reply(B_MESSAGE_COMMIT_TRANSACTION_REPLY);
+				if (reply.AddInt32("error", B_DAEMON_INSTALLATION_LOCATION_BUSY)
+						== B_OK) {
+					message->SendReply(&reply, (BHandler*)NULL,
+						kCommunicationTimeout);
+				}
+				return;
+			}
+
+			CommitTransactionJob* job = new(std::nothrow) CommitTransactionJob(
+				this, volume, message);
+			if (job == NULL)
+				return;
+
+			messageDeleter.Detach();
+
+			_QueueJob(job);
+			break;
+		}
+
+		default:
+			break;
+	}
 }
 
 
 void
 Root::VolumeNodeMonitorEventOccurred(Volume* volume)
 {
-	_QueueJob(
-		new(std::nothrow) VolumeJob(volume, &Root::_ProcessNodeMonitorEvents));
+	_QueueJob(new(std::nothrow) ProcessNodeMonitorEventsJob(volume,
+		&Root::_ProcessNodeMonitorEvents));
 }
 
 
@@ -318,6 +429,10 @@ Root::_InitPackages(Volume* volume)
 void
 Root::_DeleteVolume(Volume* volume)
 {
+	// delete all pending jobs for that volume
+	VolumeJobFilter filter(volume);
+	fJobQueue.DeleteJobs(&filter);
+
 	delete volume;
 }
 
@@ -364,30 +479,9 @@ Root::_ProcessNodeMonitorEvents(Volume* volume)
 
 
 void
-Root::_HandleRequest(BMessage* message)
+Root::_CommitTransaction(Volume* volume, BMessage* message)
 {
-	int32 location;
-	if (message->FindInt32("location", &location) != B_OK
-		|| location < 0
-		|| location >= B_PACKAGE_INSTALLATION_LOCATION_ENUM_COUNT) {
-		return;
-	}
-
-	// get the volume and let it handle the message
-	AutoLocker<BLocker> locker(fLock);
-	Volume* volume = GetVolume((BPackageInstallationLocation)location);
-	locker.Unlock();
-
-	if (volume != NULL) {
-		switch (message->what) {
-			case B_MESSAGE_GET_INSTALLATION_LOCATION_INFO:
-				volume->HandleGetLocationInfoRequest(message);
-				break;
-			case B_MESSAGE_COMMIT_TRANSACTION:
-				volume->HandleCommitTransactionRequest(message);
-				break;
-		}
-	}
+	volume->HandleCommitTransactionRequest(message);
 }
 
 

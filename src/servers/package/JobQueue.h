@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,6 +16,9 @@
 
 class JobQueue {
 public:
+			class Filter;
+
+public:
 								JobQueue();
 								~JobQueue();
 
@@ -27,6 +30,8 @@ public:
 			Job*				DequeueJob();
 									// returns a reference
 
+			void				DeleteJobs(Filter* filter);
+
 private:
 			typedef DoublyLinkedList<Job> JobList;
 
@@ -37,6 +42,14 @@ private:
 			bool				fNewJobConditionInitialized;
 			JobList				fJobs;
 			bool				fClosed;
+};
+
+
+class JobQueue::Filter {
+public:
+	virtual						~Filter();
+
+	virtual	bool				FilterJob(Job* job) = 0;
 };
 
 

@@ -132,7 +132,7 @@ PackageManager::InitInstalledRepository(InstalledRepository& repository)
 
 	if (Volume* volume = fRoot->GetVolume(repository.Location())) {
 		for (PackageFileNameHashTable::Iterator it
-				= volume->PackagesByFileName().GetIterator(); it.HasNext();) {
+				= volume->PackagesByFileNameIterator(); it.HasNext();) {
 			Package* package = it.Next();
 			if (package->IsActive()) {
 				BSolverPackage* solverPackage;

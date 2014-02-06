@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -21,6 +21,21 @@
 
 #include "FSUtils.h"
 #include "Package.h"
+
+
+// Locking Policy
+// ==============
+//
+// A Volume object is accessed by two threads:
+// 1. The application thread: initially (c'tor and Init()) and when handling a
+//    location info request (HandleGetLocationInfoRequest()).
+// 2. The corresponding Root object's job thread (any other operation).
+//
+// The only thread synchronization needed is for the status information accessed
+// by HandleGetLocationInfoRequest() and modified by the job thread. The data
+// are encapsulated in a Volume::State object which contains a lock. The lock
+// must be held by the app thread when accessing the data (it reads only) and
+// by the job thread when modifying the data (not needed when reading).
 
 
 using BPackageKit::BPrivate::BActivationTransaction;
@@ -61,6 +76,10 @@ public:
 			void				HandleCommitTransactionRequest(
 									BMessage* message);
 
+			void				PackageJobPending();
+			void				PackageJobFinished();
+			bool				IsPackageJobPending() const;
+
 			void				Unmounted();
 
 	virtual	void				MessageReceived(BMessage* message);
@@ -90,10 +109,8 @@ public:
 			void				SetRoot(Root* root)
 									{ fRoot = root; }
 
-			const PackageFileNameHashTable& PackagesByFileName() const
-									{ return fPackagesByFileName; }
-			const PackageNodeRefHashTable& PackagesByNodeRef() const
-									{ return fPackagesByNodeRef; }
+			PackageFileNameHashTable::Iterator PackagesByFileNameIterator()
+									const;
 
 			int					OpenRootDirectory() const;
 
@@ -120,6 +137,7 @@ public:
 
 private:
 			struct NodeMonitorEvent;
+			struct State;
 			struct CommitTransactionHandler;
 
 			friend struct CommitTransactionHandler;
@@ -196,15 +214,14 @@ private:
 			node_ref			fPackagesDirectoryRef;
 			Root*				fRoot;
 			Listener*			fListener;
-			PackageFileNameHashTable fPackagesByFileName;
-			PackageNodeRefHashTable fPackagesByNodeRef;
+			State*				fState;
 			BLocker				fPendingNodeMonitorEventsLock;
 			NodeMonitorEventList fPendingNodeMonitorEvents;
 			bigtime_t			fNodeMonitorEventHandleTime;
 			PackageSet			fPackagesToBeActivated;
 			PackageSet			fPackagesToBeDeactivated;
-			int64				fChangeCount;
 			BMessage			fLocationInfoReply;
+									// only accessed in the application thread
 };
 
 
