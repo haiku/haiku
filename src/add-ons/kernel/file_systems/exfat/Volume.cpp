@@ -334,6 +334,15 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fEntriesPerBlock = (fBlockSize / sizeof(struct exfat_entry));
 
 	// check if the device size is large enough to hold the file system
+	off_t fileSystemSize;
+	status = opener.GetSize(&fileSystemSize);
+	if (status != B_OK)
+		return status;
+
+	off_t deviceSize = (off_t)fSuperBlock.NumBlocks() << fSuperBlock.BlockShift();
+	if (fileSystemSize < deviceSize)
+		return B_BAD_VALUE;
+
 	fBlockCache = opener.InitCache(fSuperBlock.NumBlocks(), fBlockSize);
 	if (fBlockCache == NULL)
 		return B_ERROR;
@@ -363,11 +372,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	LabelVisitor visitor(this);
 	iterator.Iterate(visitor);
 
-	if (fName[0] == '\0') {
-		off_t deviceSize = (off_t)fSuperBlock.NumBlocks()
-			<< fSuperBlock.BlockShift();
+	if (fName[0] == '\0')
 		get_default_volume_name(deviceSize, fName, sizeof(fName));
-	}
 
 	return B_OK;
 }
