@@ -2856,49 +2856,117 @@ template<class VertexSource>
 BRect
 Painter::_FillPath(VertexSource& path, const BGradient& gradient) const
 {
-	GTRACE("Painter::_FillPath\n");
+	if (fIdentityTransform)
+		return _RasterizePath(path, gradient);
+
+	agg::conv_transform<VertexSource> transformedPath(path, fTransform);
+	return _RasterizePath(transformedPath, gradient);
+}
+
+
+// _FillPath
+template<class VertexSource>
+BRect
+Painter::_RasterizePath(VertexSource& path, const BGradient& gradient) const
+{
+	GTRACE("Painter::_RasterizePath\n");
+
+	agg::trans_affine gradientTransform;
 
 	switch(gradient.GetType()) {
-		case BGradient::TYPE_LINEAR: {
+		case BGradient::TYPE_LINEAR:
+		{
 			GTRACE(("Painter::_FillPath> type == TYPE_LINEAR\n"));
-			_FillPathGradientLinear(path, *((const BGradientLinear*) &gradient));
+			const BGradientLinear& linearGradient
+				= (const BGradientLinear&) gradient;
+			agg::gradient_x gradientFunction;
+			_CalcLinearGradientTransform(linearGradient.Start(),
+				linearGradient.End(), gradientTransform);
+			_RasterizePath(path, gradient, gradientFunction, gradientTransform);
 			break;
 		}
-		case BGradient::TYPE_RADIAL: {
+		case BGradient::TYPE_RADIAL:
+		{
 			GTRACE(("Painter::_FillPathGradient> type == TYPE_RADIAL\n"));
-			_FillPathGradientRadial(path,
-				*((const BGradientRadial*) &gradient));
+			const BGradientRadial& radialGradient
+				= (const BGradientRadial&) gradient;
+			agg::gradient_radial gradientFunction;
+			_CalcRadialGradientTransform(radialGradient.Center(),
+				gradientTransform);
+			_RasterizePath(path, gradient, gradientFunction, gradientTransform);
 			break;
 		}
-		case BGradient::TYPE_RADIAL_FOCUS: {
+		case BGradient::TYPE_RADIAL_FOCUS:
+		{
 			GTRACE(("Painter::_FillPathGradient> type == TYPE_RADIAL_FOCUS\n"));
-			_FillPathGradientRadialFocus(path,
-				*((const BGradientRadialFocus*) &gradient));
+			const BGradientRadialFocus& radialGradient
+				= (const BGradientRadialFocus&) gradient;
+			agg::gradient_radial_focus gradientFunction;
+			_CalcRadialGradientTransform(radialGradient.Center(),
+				gradientTransform);
+			_RasterizePath(path, gradient, gradientFunction, gradientTransform);
 			break;
 		}
-		case BGradient::TYPE_DIAMOND: {
+		case BGradient::TYPE_DIAMOND:
+		{
 			GTRACE(("Painter::_FillPathGradient> type == TYPE_DIAMOND\n"));
-			_FillPathGradientDiamond(path,
-				*((const BGradientDiamond*) &gradient));
+			const BGradientDiamond& diamontGradient
+				= (const BGradientDiamond&) gradient;
+			agg::gradient_diamond gradientFunction;
+			_CalcRadialGradientTransform(diamontGradient.Center(),
+				gradientTransform);
+			_RasterizePath(path, gradient, gradientFunction, gradientTransform);
 			break;
 		}
-		case BGradient::TYPE_CONIC: {
+		case BGradient::TYPE_CONIC:
+		{
 			GTRACE(("Painter::_FillPathGradient> type == TYPE_CONIC\n"));
-			_FillPathGradientConic(path,
-				*((const BGradientConic*) &gradient));
+			const BGradientConic& conicGradient
+				= (const BGradientConic&) gradient;
+			agg::gradient_conic gradientFunction;
+			_CalcRadialGradientTransform(conicGradient.Center(),
+				gradientTransform);
+			_RasterizePath(path, gradient, gradientFunction, gradientTransform);
 			break;
 		}
-		case BGradient::TYPE_NONE: {
-			GTRACE(("Painter::_FillPathGradient> type == TYPE_NONE\n"));
+		
+		default:
+		case BGradient::TYPE_NONE:
+			GTRACE(("Painter::_FillPathGradient> type == TYPE_NONE/unkown\n"));
 			break;
-		}
 	}
 
 	return _Clipped(_BoundingBox(path));
 }
 
 
-// _MakeGradient
+void
+Painter::_CalcLinearGradientTransform(BPoint startPoint, BPoint endPoint,
+	agg::trans_affine& matrix, float gradient_d2) const
+{
+	float dx = endPoint.x - startPoint.x;
+	float dy = endPoint.y - startPoint.y;
+
+	matrix.reset();
+	matrix *= agg::trans_affine_scaling(sqrt(dx * dx + dy * dy) / gradient_d2);
+	matrix *= agg::trans_affine_rotation(atan2(dy, dx));
+	matrix *= agg::trans_affine_translation(startPoint.x, startPoint.y);
+	matrix *= fTransform;
+	matrix.invert();
+}
+
+
+void
+Painter::_CalcRadialGradientTransform(BPoint center,
+	agg::trans_affine& matrix, float gradient_d2) const
+{
+	matrix.reset();
+	matrix *= agg::trans_affine_translation(center.x, center.y);
+	matrix *= fTransform;
+	matrix.invert();
+}
+
+
 void
 Painter::_MakeGradient(const BGradient& gradient, int32 colorCount,
 	uint32* colors, int32 arrayOffset, int32 arraySize) const
@@ -2978,7 +3046,6 @@ Painter::_MakeGradient(const BGradient& gradient, int32 colorCount,
 }
 
 
-// _MakeGradient
 template<class Array>
 void
 Painter::_MakeGradient(Array& array, const BGradient& gradient) const
@@ -3009,56 +3076,32 @@ Painter::_MakeGradient(Array& array, const BGradient& gradient) const
 }
 
 
-// _CalcLinearGradientTransform
-void Painter::_CalcLinearGradientTransform(BPoint startPoint, BPoint endPoint,
-	agg::trans_affine& matrix, float gradient_d2) const
-{
-	float dx = endPoint.x - startPoint.x;
-	float dy = endPoint.y - startPoint.y;
-
-	matrix.reset();
-	matrix *= agg::trans_affine_scaling(sqrt(dx * dx + dy * dy) / gradient_d2);
-	matrix *= agg::trans_affine_rotation(atan2(dy, dx));
-	matrix *= agg::trans_affine_translation(startPoint.x, startPoint.y);
-	matrix.invert();
-}
-
-
-// _FillPathGradientLinear
-template<class VertexSource>
+template<class VertexSource, typename GradientFunction>
 void
-Painter::_FillPathGradientLinear(VertexSource& path,
-	const BGradientLinear& linear) const
+Painter::_RasterizePath(VertexSource& path, const BGradient& gradient,
+	GradientFunction function, agg::trans_affine& gradientTransform) const
 {
-	GTRACE("Painter::_FillPathGradientLinear\n");
-
-	BPoint start = linear.Start();
-	BPoint end = linear.End();
+	GTRACE("Painter::_RasterizePath\n");
 
 	typedef agg::span_interpolator_linear<> interpolator_type;
 	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
 	typedef agg::span_allocator<agg::rgba8> span_allocator_type;
-	typedef agg::gradient_x	gradient_func_type;
 	typedef agg::span_gradient<agg::rgba8, interpolator_type,
-				gradient_func_type, color_array_type> span_gradient_type;
+				GradientFunction, color_array_type> span_gradient_type;
 	typedef agg::renderer_scanline_aa<renderer_base, span_allocator_type,
 				span_gradient_type> renderer_gradient_type;
 
-	gradient_func_type gradientFunc;
-	agg::trans_affine gradientMatrix;
-	interpolator_type spanInterpolator(gradientMatrix);
+	interpolator_type spanInterpolator(gradientTransform);
 	span_allocator_type spanAllocator;
 	color_array_type colorArray;
 
-	_MakeGradient(colorArray, linear);
+	_MakeGradient(colorArray, gradient);
 
-	span_gradient_type spanGradient(spanInterpolator, gradientFunc, colorArray,
+	span_gradient_type spanGradient(spanInterpolator, function, colorArray,
 		0, 100);
 
 	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
 		spanGradient);
-
-	_CalcLinearGradientTransform(start, end, gradientMatrix);
 
 	fRasterizer.reset();
 	fRasterizer.add_path(path);
@@ -3070,209 +3113,3 @@ Painter::_FillPathGradientLinear(VertexSource& path,
 	}
 }
 
-
-// _FillPathGradientRadial
-template<class VertexSource>
-void
-Painter::_FillPathGradientRadial(VertexSource& path,
-	const BGradientRadial& radial) const
-{
-	GTRACE("Painter::_FillPathGradientRadial\n");
-
-	BPoint center = radial.Center();
-// TODO: finish this
-//	float radius = radial.Radius();
-
-	typedef agg::span_interpolator_linear<> interpolator_type;
-	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
-	typedef agg::span_allocator<agg::rgba8> span_allocator_type;
-	typedef agg::gradient_radial gradient_func_type;
-	typedef agg::span_gradient<agg::rgba8, interpolator_type,
-	gradient_func_type, color_array_type> span_gradient_type;
-	typedef agg::renderer_scanline_aa<renderer_base, span_allocator_type,
-	span_gradient_type> renderer_gradient_type;
-
-	gradient_func_type gradientFunc;
-	agg::trans_affine gradientMatrix;
-	interpolator_type spanInterpolator(gradientMatrix);
-	span_allocator_type spanAllocator;
-	color_array_type colorArray;
-
-	_MakeGradient(colorArray, radial);
-
-	span_gradient_type spanGradient(spanInterpolator, gradientFunc, colorArray,
-		0, 100);
-
-	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
-		spanGradient);
-
-	gradientMatrix.reset();
-	gradientMatrix *= agg::trans_affine_translation(center.x, center.y);
-	gradientMatrix.invert();
-
-//	_CalcLinearGradientTransform(start, end, gradientMtx);
-
-	fRasterizer.reset();
-	fRasterizer.add_path(path);
-	if (fMaskedUnpackedScanline == NULL)
-		agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
-	else {
-		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
-			gradientRenderer);
-	}
-}
-
-
-// _FillPathGradientRadialFocus
-template<class VertexSource>
-void
-Painter::_FillPathGradientRadialFocus(VertexSource& path,
-	const BGradientRadialFocus& focus) const
-{
-	GTRACE("Painter::_FillPathGradientRadialFocus\n");
-
-	BPoint center = focus.Center();
-// TODO: finish this.
-//	BPoint focal = focus.Focal();
-//	float radius = focus.Radius();
-
-	typedef agg::span_interpolator_linear<> interpolator_type;
-	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
-	typedef agg::span_allocator<agg::rgba8> span_allocator_type;
-	typedef agg::gradient_radial_focus gradient_func_type;
-	typedef agg::span_gradient<agg::rgba8, interpolator_type,
-	gradient_func_type, color_array_type> span_gradient_type;
-	typedef agg::renderer_scanline_aa<renderer_base, span_allocator_type,
-	span_gradient_type> renderer_gradient_type;
-
-	gradient_func_type gradientFunc;
-	agg::trans_affine gradientMatrix;
-	interpolator_type spanInterpolator(gradientMatrix);
-	span_allocator_type spanAllocator;
-	color_array_type colorArray;
-
-	_MakeGradient(colorArray, focus);
-
-	span_gradient_type spanGradient(spanInterpolator, gradientFunc, colorArray,
-		0, 100);
-
-	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
-		spanGradient);
-
-	gradientMatrix.reset();
-	gradientMatrix *= agg::trans_affine_translation(center.x, center.y);
-	gradientMatrix.invert();
-
-	//	_CalcLinearGradientTransform(start, end, gradientMatrix);
-
-	fRasterizer.reset();
-	fRasterizer.add_path(path);
-	if (fMaskedUnpackedScanline == NULL)
-		agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
-	else {
-		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
-			gradientRenderer);
-	}
-}
-
-
-// _FillPathGradientDiamond
-template<class VertexSource>
-void
-Painter::_FillPathGradientDiamond(VertexSource& path,
-	const BGradientDiamond& diamond) const
-{
-	GTRACE("Painter::_FillPathGradientDiamond\n");
-
-	BPoint center = diamond.Center();
-//	float radius = diamond.Radius();
-
-	typedef agg::span_interpolator_linear<> interpolator_type;
-	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
-	typedef agg::span_allocator<agg::rgba8> span_allocator_type;
-	typedef agg::gradient_diamond gradient_func_type;
-	typedef agg::span_gradient<agg::rgba8, interpolator_type,
-	gradient_func_type, color_array_type> span_gradient_type;
-	typedef agg::renderer_scanline_aa<renderer_base, span_allocator_type,
-	span_gradient_type> renderer_gradient_type;
-
-	gradient_func_type gradientFunc;
-	agg::trans_affine gradientMatrix;
-	interpolator_type spanInterpolator(gradientMatrix);
-	span_allocator_type spanAllocator;
-	color_array_type colorArray;
-
-	_MakeGradient(colorArray, diamond);
-
-	span_gradient_type spanGradient(spanInterpolator, gradientFunc, colorArray,
-		0, 100);
-
-	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
-		spanGradient);
-
-	gradientMatrix.reset();
-	gradientMatrix *= agg::trans_affine_translation(center.x, center.y);
-	gradientMatrix.invert();
-
-	//	_CalcLinearGradientTransform(start, end, gradientMatrix);
-
-	fRasterizer.reset();
-	fRasterizer.add_path(path);
-	if (fMaskedUnpackedScanline == NULL)
-		agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
-	else {
-		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
-			gradientRenderer);
-	}
-}
-
-
-// _FillPathGradientConic
-template<class VertexSource>
-void
-Painter::_FillPathGradientConic(VertexSource& path,
-	const BGradientConic& conic) const
-{
-	GTRACE("Painter::_FillPathGradientConic\n");
-
-	BPoint center = conic.Center();
-//	float radius = conic.Radius();
-
-	typedef agg::span_interpolator_linear<> interpolator_type;
-	typedef agg::pod_auto_array<agg::rgba8, 256> color_array_type;
-	typedef agg::span_allocator<agg::rgba8> span_allocator_type;
-	typedef agg::gradient_conic gradient_func_type;
-	typedef agg::span_gradient<agg::rgba8, interpolator_type,
-	gradient_func_type, color_array_type> span_gradient_type;
-	typedef agg::renderer_scanline_aa<renderer_base, span_allocator_type,
-	span_gradient_type> renderer_gradient_type;
-
-	gradient_func_type gradientFunc;
-	agg::trans_affine gradientMatrix;
-	interpolator_type spanInterpolator(gradientMatrix);
-	span_allocator_type spanAllocator;
-	color_array_type colorArray;
-
-	_MakeGradient(colorArray, conic);
-
-	span_gradient_type spanGradient(spanInterpolator, gradientFunc, colorArray,
-		0, 100);
-
-	renderer_gradient_type gradientRenderer(fBaseRenderer, spanAllocator,
-		spanGradient);
-
-	gradientMatrix.reset();
-	gradientMatrix *= agg::trans_affine_translation(center.x, center.y);
-	gradientMatrix.invert();
-
-	//	_CalcLinearGradientTransform(start, end, gradientMatrix);
-
-	fRasterizer.reset();
-	fRasterizer.add_path(path);
-	if (fMaskedUnpackedScanline == NULL)
-		agg::render_scanlines(fRasterizer, fPackedScanline, gradientRenderer);
-	else {
-		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
-			gradientRenderer);
-	}
-}

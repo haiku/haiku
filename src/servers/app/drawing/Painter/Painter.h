@@ -302,8 +302,19 @@ private:
 			BRect				_FillPath(VertexSource& path) const;
 			template<class VertexSource>
 			BRect				_RasterizePath(VertexSource& path) const;
+
+			template<class VertexSource>
+			BRect				_FillPath(VertexSource& path,
+									const BGradient& gradient) const;
+			template<class VertexSource>
+			BRect				_RasterizePath(VertexSource& path,
+									const BGradient& gradient) const;
+
 			void				_CalcLinearGradientTransform(BPoint startPoint,
 									BPoint endPoint, agg::trans_affine& mtx,
+									float gradient_d2 = 100.0f) const;
+			void				_CalcRadialGradientTransform(BPoint center,
+									agg::trans_affine& mtx,
 									float gradient_d2 = 100.0f) const;
 
 			void				_MakeGradient(const BGradient& gradient,
@@ -313,25 +324,14 @@ private:
 			template<class Array>
 			void				_MakeGradient(Array& array,
 									const BGradient& gradient) const;
-			template<class VertexSource>
-			BRect				_FillPath(VertexSource& path,
-									const BGradient& gradient) const;
-			template<class VertexSource>
-			void				_FillPathGradientLinear(VertexSource& path,
-									const BGradientLinear& linear) const;
-			template<class VertexSource>
-			void				_FillPathGradientRadial(VertexSource& path,
-									const BGradientRadial& radial) const;
-			template<class VertexSource>
-			void				_FillPathGradientRadialFocus(VertexSource& path,
-									const BGradientRadialFocus& focus) const;
-			template<class VertexSource>
-			void				_FillPathGradientDiamond(VertexSource& path,
-									const BGradientDiamond& diamond) const;
-			template<class VertexSource>
-			void				_FillPathGradientConic(VertexSource& path,
-									const BGradientConic& conic) const;
 
+			template<class VertexSource, typename GradientFunction>
+			void				_RasterizePath(VertexSource& path,
+									const BGradient& gradient,
+									GradientFunction function,
+									agg::trans_affine& gradientTransform) const;
+
+private:
 	mutable	agg::rendering_buffer fBuffer;
 
 	// AGG rendering and rasterization classes
