@@ -30,8 +30,6 @@ ThreadData::_InitBase()
 	fLastMeasureAvailableTime = 0;
 	fMeasureAvailableTime = 0;
 
-	fNeededLoad = 0;
-
 	fWentSleep = 0;
 	fWentSleepActive = 0;
 
@@ -95,11 +93,11 @@ void
 ThreadData::Init()
 {
 	_InitBase();
+	fCore = NULL;
 
 	Thread* currentThread = thread_get_current_thread();
 	ThreadData* currentThreadData = currentThread->scheduler_data;
-	fCore = currentThreadData->fCore;
-	fLoadMeasurementEpoch = fCore->LoadMeasurementEpoch() - 1;
+	fNeededLoad = currentThreadData->fNeededLoad;
 
 	if (!IsRealTime()) {
 		fPriorityPenalty = std::min(currentThreadData->fPriorityPenalty,
@@ -118,6 +116,7 @@ ThreadData::Init(CoreEntry* core)
 
 	fCore = core;
 	fReady = true;
+	fNeededLoad = 0;
 }
 
 
