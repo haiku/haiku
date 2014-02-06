@@ -4,11 +4,13 @@
  */
 
 
+#include <algorithm>
 #include <stdio.h>
 #include <string.h>
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <GradientLinear.h>
 #include <Message.h>
 #include <Picture.h>
 #include <LayoutBuilder.h>
@@ -361,6 +363,43 @@ private:
 };
 
 
+// #pragma mark - Gradient
+
+
+class GradientTest : public Test {
+public:
+	GradientTest()
+		:
+		Test("Gradient")
+	{
+	}
+	
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BRect rect(view->Bounds());
+		rect.InsetBy(rect.Width() / 3, rect.Height() / 3);
+		BPoint center(
+			rect.left + rect.Width() / 2,
+			rect.top + rect.Height() / 2);
+
+		BAffineTransform transform;
+		transform.RotateBy(center, 30.0 * M_PI / 180.0);
+		view->SetTransform(transform);
+
+		rgb_color top = (rgb_color){ 255, 255, 0, 255 };
+		rgb_color bottom = (rgb_color){ 0, 255, 255, 255 };
+
+		BGradientLinear gradient;
+		gradient.AddColor(top, 0.0f);
+		gradient.AddColor(bottom, 255.0f);
+		gradient.SetStart(rect.LeftTop());
+		gradient.SetEnd(rect.LeftBottom());
+
+		float radius = std::min(rect.Width() / 5, rect.Height() / 5);
+
+		view->FillRoundRect(rect, radius, radius, gradient);
+	}
+};
 
 
 // #pragma mark -
@@ -375,8 +414,9 @@ main(int argc, char** argv)
 
 	window->AddTest(new RectsTest());
 	window->AddTest(new BitmapTest());
+	window->AddTest(new GradientTest());
 
-	window->SetToTest(0);
+	window->SetToTest(2);
 	window->Show();
 
 	app.Run();
