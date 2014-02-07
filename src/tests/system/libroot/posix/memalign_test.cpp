@@ -53,7 +53,13 @@ allocate_random_no_alignment(int32 count, size_t maxSize)
 			printf("allocation of %lu bytes failed\n", sizes[i]);
 			exit(1);
 		}
-
+#ifdef __x86_64__
+		if (((addr_t)allocations[i] & 0xf) != 0) {
+			printf("allocation %p not aligned failed\n",
+				allocations[i]);
+			exit(1);
+		}
+#endif
 		write_test_pattern(allocations[i], sizes[i]);
 	}
 

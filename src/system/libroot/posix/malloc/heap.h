@@ -74,8 +74,12 @@ class hoardHeap {
 #	error "Undefined size class base."
 #endif
 
-		// Every object is aligned so that it can always hold a double.
+		// Every object is aligned so that it can always hold any type.
+#ifdef __x86_64__
+		enum { ALIGNMENT = 16 };
+#else		
 		enum { ALIGNMENT = sizeof(double) };
+#endif
 
 		// ANDing with this rounds to ALIGNMENT.
 		enum { ALIGNMENT_MASK = ALIGNMENT - 1 };
