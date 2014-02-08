@@ -15,6 +15,7 @@
 #include "FontManager.h"
 #include "PatternHandler.h"
 #include "ServerFont.h"
+#include "Transformable.h"
 
 #include "defines.h"
 
@@ -39,7 +40,6 @@ class FontCacheReference;
 class RenderingBuffer;
 class ServerBitmap;
 class ServerFont;
-class Transformable;
 
 
 class Painter {
@@ -64,6 +64,9 @@ public:
 			void				SetTransform(BAffineTransform transform,
 									int32 xOffset = 0,
 									int32 yOffset = 0);
+
+	inline	bool				IsIdentityTransform() const
+									{ return fIdentityTransform; }
 
 			void				SetHighColor(const rgb_color& color);
 	inline	rgb_color			HighColor() const
@@ -233,7 +236,9 @@ public:
 
 			BRect				InvertRect(const BRect& r) const;
 
+	inline	BRect				TransformAndClipRect(BRect rect) const;
 	inline	BRect				ClipRect(BRect rect) const;
+	inline	BRect				TransformAlignAndClipRect(BRect rect) const;
 	inline	BRect				AlignAndClipRect(BRect rect) const;
 
 
@@ -367,7 +372,7 @@ private:
 			bool				fAttached : 1;
 			bool				fIdentityTransform : 1;
 
-			agg::trans_affine	fTransform;
+			Transformable		fTransform;
 			float				fPenSize;
 			const BRegion*		fClippingRegion;
 			drawing_mode		fDrawingMode;
@@ -384,6 +389,21 @@ private:
 	// font file which it gets from ServerFont
 	mutable	AGGTextRenderer		fTextRenderer;
 };
+
+
+inline BRect
+Painter::TransformAndClipRect(BRect rect) const
+{
+	rect.left = floorf(rect.left);
+	rect.top = floorf(rect.top);
+	rect.right = ceilf(rect.right);
+	rect.bottom = ceilf(rect.bottom);
+
+	if (!fIdentityTransform)
+		rect = fTransform.TransformBounds(rect);
+
+	return _Clipped(rect);
+}
 
 
 inline BRect
@@ -409,6 +429,24 @@ Painter::AlignAndClipRect(BRect rect) const
 		rect.right = floorf(rect.right);
 		rect.bottom = floorf(rect.bottom);
 	}
+	return _Clipped(rect);
+}
+
+
+inline BRect
+Painter::TransformAlignAndClipRect(BRect rect) const
+{
+	rect.left = floorf(rect.left);
+	rect.top = floorf(rect.top);
+	if (fSubpixelPrecise) {
+		rect.right = ceilf(rect.right);
+		rect.bottom = ceilf(rect.bottom);
+	} else {
+		rect.right = floorf(rect.right);
+		rect.bottom = floorf(rect.bottom);
+	}
+	if (!fIdentityTransform)
+		rect = fTransform.TransformBounds(rect);
 	return _Clipped(rect);
 }
 

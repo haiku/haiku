@@ -583,6 +583,7 @@ DrawingEngine::InvertRect(BRect r)
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
+	// NOTE: Currently ignores view transformation, so no TransformAndClipRect()
 	r = fPainter->ClipRect(r);
 	if (!r.IsValid())
 		return;
@@ -608,7 +609,7 @@ DrawingEngine::DrawBitmap(ServerBitmap* bitmap, const BRect& bitmapRect,
 {
 	ASSERT_PARALLEL_LOCKED();
 
-	BRect clipped = fPainter->ClipRect(viewRect);
+	BRect clipped = fPainter->TransformAndClipRect(viewRect);
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
@@ -632,7 +633,7 @@ DrawingEngine::DrawArc(BRect r, const float& angle, const float& span,
 	if (!filled)
 		extend_by_stroke_width(clipped, fPainter->PenSize());
 
-	clipped = fPainter->ClipRect(r);
+	clipped = fPainter->TransformAndClipRect(r);
 
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
@@ -662,7 +663,7 @@ DrawingEngine::FillArc(BRect r, const float& angle, const float& span,
 	fPainter->AlignEllipseRect(&r, true);
 	BRect clipped(r);
 
-	clipped = fPainter->ClipRect(r);
+	clipped = fPainter->TransformAndClipRect(r);
 
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
@@ -724,7 +725,7 @@ DrawingEngine::DrawEllipse(BRect r, bool filled)
 	clipped.right = ceilf(clipped.right);
 	clipped.bottom = ceilf(clipped.bottom);
 
-	clipped = fPainter->ClipRect(clipped);
+	clipped = fPainter->TransformAndClipRect(clipped);
 
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
@@ -750,7 +751,7 @@ DrawingEngine::FillEllipse(BRect r, const BGradient& gradient)
 	clipped.right = ceilf(clipped.right);
 	clipped.bottom = ceilf(clipped.bottom);
 
-	clipped = fPainter->ClipRect(clipped);
+	clipped = fPainter->TransformAndClipRect(clipped);
 
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
@@ -771,7 +772,7 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 	make_rect_valid(bounds);
 	if (!filled)
 		extend_by_stroke_width(bounds, fPainter->PenSize());
-	bounds = fPainter->ClipRect(bounds);
+	bounds = fPainter->TransformAndClipRect(bounds);
 	if (bounds.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, bounds);
 
@@ -789,7 +790,7 @@ DrawingEngine::FillPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(bounds);
-	bounds = fPainter->ClipRect(bounds);
+	bounds = fPainter->TransformAndClipRect(bounds);
 	if (bounds.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, bounds);
 
@@ -938,7 +939,7 @@ DrawingEngine::StrokeRect(BRect r)
 	make_rect_valid(r);
 	BRect clipped(r);
 	extend_by_stroke_width(clipped, fPainter->PenSize());
-	clipped = fPainter->ClipRect(clipped);
+	clipped = fPainter->TransformAndClipRect(clipped);
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
@@ -955,7 +956,7 @@ DrawingEngine::FillRect(BRect r)
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
-	r = fPainter->AlignAndClipRect(r);
+	r = fPainter->TransformAlignAndClipRect(r);
 	if (!r.IsValid())
 		return;
 
@@ -1007,7 +1008,7 @@ DrawingEngine::FillRect(BRect r, const BGradient& gradient)
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
-	r = fPainter->AlignAndClipRect(r);
+	r = fPainter->TransformAlignAndClipRect(r);
 	if (!r.IsValid())
 		return;
 
@@ -1024,7 +1025,7 @@ DrawingEngine::FillRegion(BRegion& r)
 {
 	ASSERT_PARALLEL_LOCKED();
 
-	BRect clipped = fPainter->ClipRect(r.Frame());
+	BRect clipped = fPainter->TransformAndClipRect(r.Frame());
 	if (!clipped.IsValid())
 		return;
 
@@ -1095,10 +1096,10 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad, bool filled)
 {
 	ASSERT_PARALLEL_LOCKED();
 
-	// NOTE: the stroke does not extend past "r" in R5,
-	// though I consider this unexpected behaviour.
 	make_rect_valid(r);
-	BRect clipped = fPainter->ClipRect(r);
+	if (!filled)
+		extend_by_stroke_width(r, fPainter->PenSize());
+	BRect clipped = fPainter->TransformAndClipRect(r);
 
 	clipped.left = floorf(clipped.left);
 	clipped.top = floorf(clipped.top);
@@ -1122,10 +1123,8 @@ DrawingEngine::FillRoundRect(BRect r, float xrad, float yrad,
 {
 	ASSERT_PARALLEL_LOCKED();
 
-	// NOTE: the stroke does not extend past "r" in R5,
-	// though I consider this unexpected behaviour.
 	make_rect_valid(r);
-	BRect clipped = fPainter->ClipRect(r);
+	BRect clipped = fPainter->TransformAndClipRect(r);
 
 	clipped.left = floorf(clipped.left);
 	clipped.top = floorf(clipped.top);
@@ -1210,7 +1209,7 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds, bool filled)
 	BRect clipped(bounds);
 	if (!filled)
 		extend_by_stroke_width(clipped, fPainter->PenSize());
-	clipped = fPainter->ClipRect(clipped);
+	clipped = fPainter->TransformAndClipRect(clipped);
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
@@ -1231,7 +1230,7 @@ DrawingEngine::FillTriangle(BPoint* pts, const BRect& bounds,
 	ASSERT_PARALLEL_LOCKED();
 
 	BRect clipped(bounds);
-	clipped = fPainter->ClipRect(clipped);
+	clipped = fPainter->TransformAndClipRect(clipped);
 	if (clipped.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
@@ -1250,7 +1249,7 @@ DrawingEngine::StrokeLine(const BPoint& start, const BPoint& end)
 	BRect touched(start, end);
 	make_rect_valid(touched);
 	extend_by_stroke_width(touched, fPainter->PenSize());
-	touched = fPainter->ClipRect(touched);
+	touched = fPainter->TransformAndClipRect(touched);
 	if (touched.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, touched);
 
@@ -1286,7 +1285,7 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 		touched = touched | box;
 	}
 	extend_by_stroke_width(touched, fPainter->PenSize());
-	touched = fPainter->ClipRect(touched);
+	touched = fPainter->TransformAndClipRect(touched);
 	if (touched.IsValid()) {
 		AutoFloatingOverlaysHider _(fGraphicsCard, touched);
 
@@ -1328,7 +1327,8 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	BPoint penLocation = pt;
 
 	// try a fast clipping path
-	if (fPainter->ClippingRegion() && fPainter->Font().Rotation() == 0.0f) {
+	if (fPainter->ClippingRegion() && fPainter->Font().Rotation() == 0.0f
+		&& fPainter->IsIdentityTransform()) {
 		float fontSize = fPainter->Font().Size();
 		BRect clippingFrame = fPainter->ClippingRegion()->Frame();
 		if (pt.x - fontSize > clippingFrame.right
@@ -1354,7 +1354,7 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	BRect b = fPainter->BoundingBox(string, length, pt, &penLocation, delta,
 		&cacheReference);
 	// stop here if we're supposed to render outside of the clipping
-	b = fPainter->ClipRect(b);
+	b = fPainter->TransformAndClipRect(b);
 	if (b.IsValid()) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
 		AutoFloatingOverlaysHider _(fGraphicsCard, b);
@@ -1385,7 +1385,7 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	BRect b = fPainter->BoundingBox(string, length, offsets, &penLocation,
 		&cacheReference);
 	// stop here if we're supposed to render outside of the clipping
-	b = fPainter->ClipRect(b);
+	b = fPainter->TransformAndClipRect(b);
 	if (b.IsValid()) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
 		AutoFloatingOverlaysHider _(fGraphicsCard, b);
