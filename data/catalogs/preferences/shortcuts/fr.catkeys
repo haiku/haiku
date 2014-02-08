@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Shortcuts	2482780610
+1	french	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		BougerSouris
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Raccourcis n'a pas pu enregistrer votre jeu de touches.
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		Ajouter un jeu de touches…
 Control	ShortcutsSpec	Name for modifier on keyboard	Contrôle
 Key	ShortcutsWindow		Touche
 Open KeySet…	ShortcutsWindow		Ouvrir un jeu de touches…
+Error, NULL state description?	ShortcutsSpec		Erreur : description d'état NULL ?
 MouseUp	ShortcutsSpec		SourisEnHaut
 Revert to saved	ShortcutsWindow		Revenir à la version enregistrée
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt

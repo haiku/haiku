@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	1906965105
+1	french	x-vnd.haiku-icon_o_matic	1073858
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -31,6 +31,7 @@ Copy	Icon-O-Matic-Properties		Copier
 Miter Limit	Icon-O-Matic-PropertyNames		Limite de raccord
 OK	Icon-O-Matic-ColorPicker		OK
 Remove Control Point	Icon-O-Matic-RemovePointsCmd		Enlever le point de contrôle
+Bleep!	Exporter - Continue in error dialog		Bip !
 Add circle	Icon-O-Matic-PathsList		Ajouter un cercle
 Shorten	Icon-O-Matic-PropertyNames		Raccourcir
 bad news	Title of error alert		mauvaises nouvelles
@@ -71,6 +72,7 @@ Perspective	Transformation		Perspective
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Déplacer la Transformation
 Opacity	Icon-O-Matic-PropertyNames		Opacité
 Add with path	Icon-O-Matic-ShapesList		Ajouter avec un chemin
+Export icon	Dialog title		Exporter l'icône
 Gradient type	Icon-O-Matic-StyleTypes		Type de dégradé
 Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Annuler
@@ -170,6 +172,7 @@ Overwrite	Icon-O-Matic-SVGExport		Écraser
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Figer les formes
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Diviser le point de contrôle
 Open…	Icon-O-Matic-Menu-File		Ouvrir…
+Save icon	Dialog title		Enregistrer l'icône
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Couleur (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Éditer le dégadé
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Nettoyer le chemin

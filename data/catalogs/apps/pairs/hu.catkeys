@@ -1,12 +1,17 @@
-1	hungarian	x-vnd.Haiku-Pairs	1649564846
+1	hungarian	x-vnd.Haiku-Pairs	1196284538
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Nem találtam elegendő vektoros ikon az induláshoz; legalább %zu szükséges, de csak %zu taláható.\n
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tírta: Ralf Schülke\n\tSzerzői jog 2008-2010, Haiku Inc.\n\n%num% kattintásból nyerte meg a játékot.\n
 Expert (8x8)	PairsWindow		Mester (8x8)
 Beginner (4x4)	PairsWindow		Kezdő (4x4)
 Quit game	PairsWindow		Kilépés a játékból
+Large	PairsWindow		Nagy
+Small	PairsWindow		Kicsi
 Game	PairsWindow		Játék
+OK	Pairs		Rendben
 Size	PairsWindow		Méret
 New	PairsWindow		Új
 Intermediate (6x6)	PairsWindow		Haladó (6x6)
 Quit	PairsWindow		Kilépés
 Pairs	System name		Párok
 New game	PairsWindow		Új játék
+Medium	PairsWindow		Közepes

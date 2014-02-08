@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Shortcuts	2482780610
+1	hungarian	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		EgérMozgatás
 OK	ShortcutsWindow		Rendben
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		A Parancsgombok nem tudta elmenteni a beállításait.
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		Gyorsbillentyű hozzáadása…
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Billentyű
 Open KeySet…	ShortcutsWindow		Gyorsbillentyű megnyitása…
+Error, NULL state description?	ShortcutsSpec		Hiba, NULL állapotleírás?
 MouseUp	ShortcutsSpec		EgérFel
 Revert to saved	ShortcutsWindow		Visszaállítás az elmentettre
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt

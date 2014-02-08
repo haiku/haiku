@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Shortcuts	2482780610
+1	japanese	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できませんでした。
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		キーセットの追加…
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Key
 Open KeySet…	ShortcutsWindow		キーセットを開く…
+Error, NULL state description?	ShortcutsSpec		エラー、記述がありません?\n
 MouseUp	ShortcutsSpec		MouseUp
 Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt

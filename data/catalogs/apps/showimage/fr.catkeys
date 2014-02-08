@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	4011843330
+1	french	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Utiliser comme fond d'écran…
 File	Menus		Fichier
 Slide delay	Menus		Délai de diaporama
@@ -53,6 +53,7 @@ Select all	Menus		Selectionner tout
 Zoom factor in %:	PrintOptionsWindow		Facteur de zoom en % :
 Width:	PrintOptionsWindow		Largeur :
 Image	Menus		Image
+Move to Trash	Menus		Mettre à la corbeille
 OK	Alerts		OK
 Rotate clockwise	Menus		Rotation horaire
 Job setup	PrintOptionsWindow		Définir la tâche
