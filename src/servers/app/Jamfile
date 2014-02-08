@@ -31,7 +31,7 @@ local font_src =
 	;
 
 UseBuildFeatureHeaders freetype ;
-Includes [ FGristFiles AlphaMask.cpp AppServer.cpp BitmapManager.cpp
+Includes [ FGristFiles AppServer.cpp BitmapManager.cpp
 	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp
 	DrawState.cpp DrawingContext.cpp ServerApp.cpp ServerBitmap.cpp
 	ServerCursor.cpp ServerFont.cpp ServerPicture.cpp ServerWindow.cpp
@@ -46,11 +46,9 @@ if $(TARGET_ARCH) != x86_64 {
 }
 
 Server app_server :
-	AlphaMask.cpp
 	Angle.cpp
 	AppServer.cpp
 	#BitfieldRegion.cpp
-	BitmapDrawingEngine.cpp
 	BitmapManager.cpp
 	ClientMemoryAllocator.cpp
 	CursorData.cpp
