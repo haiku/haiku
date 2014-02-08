@@ -13,37 +13,37 @@
 
 #include "Transformable.h"
 
-// min4
+
 inline float
 min4(float a, float b, float c, float d)
 {
 	return min_c(a, min_c(b, min_c(c, d)));
 } 
 
-// max4
+
 inline float
 max4(float a, float b, float c, float d)
 {
 	return max_c(a, max_c(b, max_c(c, d)));
 } 
 
-// constructor
+
 Transformable::Transformable()
 	: agg::trans_affine()
 {
 }
 
-// copy constructor
+
 Transformable::Transformable(const Transformable& other)
 	: agg::trans_affine(other)
 {
 }
 
-// constructor
+
 Transformable::Transformable(const BMessage* archive)
 	: agg::trans_affine()
 {
-	if (archive) {
+	if (archive != NULL) {
 		double storage[6];
 		status_t ret = B_OK;
 		for (int32 i = 0; i < 6; i++) {
@@ -56,17 +56,17 @@ Transformable::Transformable(const BMessage* archive)
 	}
 }
 
-// destructor
+
 Transformable::~Transformable()
 {
 }
 
-// Archive
+
 status_t
 Transformable::Archive(BMessage* into, bool deep) const
 {
 	status_t ret = BArchivable::Archive(into, deep);
-	if (ret >= B_OK) {
+	if (ret == B_OK) {
 		double storage[6];
 		store_to(storage);
 		for (int32 i = 0; i < 6; i++) {
@@ -75,24 +75,24 @@ Transformable::Archive(BMessage* into, bool deep) const
 				break;
 		}
 		// finish off
-		if (ret >= B_OK)
+		if (ret == B_OK)
 			ret = into->AddString("class", "Transformable");
 	}
 	return ret;
 }
 
-// StoreTo
+
 void
 Transformable::StoreTo(double matrix[6]) const
 {
 	store_to(matrix);
 }
 
-// LoadFrom
+
 void
 Transformable::LoadFrom(double matrix[6])
 {
-	// before calling the potentially heavy TransformationChanged()
+	// Before calling the potentially heavy TransformationChanged()
 	// hook function, we make sure that it is actually true
 	Transformable t;
 	t.load_from(matrix);
@@ -102,7 +102,7 @@ Transformable::LoadFrom(double matrix[6])
 	}
 }
 
-// SetTransformable
+
 void
 Transformable::SetTransformable(const Transformable& other)
 {
@@ -112,19 +112,29 @@ Transformable::SetTransformable(const Transformable& other)
 	}
 }
 
-// operator=
+
 Transformable&
 Transformable::operator=(const Transformable& other)
 {
 	if (other != *this) {
-		reset();
-		multiply(other);
+		agg::trans_affine::operator=(other);
 		TransformationChanged();
 	}
 	return *this;
 }
 
-// Multiply
+
+Transformable&
+Transformable::operator=(const agg::trans_affine& other)
+{
+	if (other != *this) {
+		agg::trans_affine::operator=(other);
+		TransformationChanged();
+	}
+	return *this;
+}
+
+
 Transformable&
 Transformable::Multiply(const Transformable& other)
 {
@@ -135,14 +145,14 @@ Transformable::Multiply(const Transformable& other)
 	return *this;
 }
 
-// Reset
+
 void
 Transformable::Reset()
 {
 	reset();
 }
 
-// IsIdentity
+
 bool
 Transformable::IsIdentity() const
 {
@@ -158,39 +168,14 @@ Transformable::IsIdentity() const
 	return false;
 }
 
-// operator==
-bool
-Transformable::operator==(const Transformable& other) const
-{
-	double m1[6];
-	other.store_to(m1);
-	double m2[6];
-	store_to(m2);
-	if (m1[0] == m2[0] &&
-		m1[1] == m2[1] &&
-		m1[2] == m2[2] &&
-		m1[3] == m2[3] &&
-		m1[4] == m2[4] &&
-		m1[5] == m2[5])
-		return true;
-	return false;
-}
 
-// operator!=
-bool
-Transformable::operator!=(const Transformable& other) const
-{
-	return !(*this == other);
-}
-
-// Transform
 void
 Transformable::Transform(double* x, double* y) const
 {
 	transform(x, y);
 }
 
-// Transform
+
 void
 Transformable::Transform(BPoint* point) const
 {
@@ -205,7 +190,7 @@ Transformable::Transform(BPoint* point) const
 	}
 }
 
-// Transform
+
 BPoint
 Transformable::Transform(const BPoint& point) const
 {
@@ -214,14 +199,14 @@ Transformable::Transform(const BPoint& point) const
 	return p;
 }
 
-// InverseTransform
+
 void
 Transformable::InverseTransform(double* x, double* y) const
 {
 	inverse_transform(x, y);
 }
 
-// InverseTransform
+
 void
 Transformable::InverseTransform(BPoint* point) const
 {
@@ -236,7 +221,7 @@ Transformable::InverseTransform(BPoint* point) const
 	}
 }
 
-// InverseTransform
+
 BPoint
 Transformable::InverseTransform(const BPoint& point) const
 {
@@ -245,7 +230,7 @@ Transformable::InverseTransform(const BPoint& point) const
 	return p;
 }
 
-// TransformBounds
+
 BRect
 Transformable::TransformBounds(const BRect& bounds) const
 {
@@ -279,7 +264,7 @@ Transformable::IsTranslationOnly() const
 }
 
 
-// TranslateBy
+
 void
 Transformable::TranslateBy(BPoint offset)
 {
@@ -289,7 +274,7 @@ Transformable::TranslateBy(BPoint offset)
 	}
 }
 
-// RotateBy
+
 void
 Transformable::RotateBy(BPoint origin, double radians)
 {
@@ -301,7 +286,7 @@ Transformable::RotateBy(BPoint origin, double radians)
 	}
 }
 
-// ScaleBy
+
 void
 Transformable::ScaleBy(BPoint origin, double xScale, double yScale)
 {
@@ -313,7 +298,7 @@ Transformable::ScaleBy(BPoint origin, double xScale, double yScale)
 	}
 }
 
-// ShearBy
+
 void
 Transformable::ShearBy(BPoint origin, double xShear, double yShear)
 {

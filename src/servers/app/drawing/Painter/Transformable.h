@@ -32,13 +32,14 @@ class Transformable : public BArchivable,
 
 								// set to or combine with other matrix
 			void				SetTransformable(const Transformable& other);
+			Transformable&		operator=(const agg::trans_affine& other);
 			Transformable&		operator=(const Transformable& other);
 			Transformable&		Multiply(const Transformable& other);
 			void				Reset();
 
 			bool				IsIdentity() const;
-			bool				operator==(const Transformable& other) const;
-			bool				operator!=(const Transformable& other) const;
+//			bool				operator==(const Transformable& other) const;
+//			bool				operator!=(const Transformable& other) const;
 
 								// transforms coordiantes
 			void				Transform(double* x, double* y) const;
