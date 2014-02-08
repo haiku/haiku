@@ -125,6 +125,7 @@ RemotePackageRepository HaikuPorts
 	tar-1.26-6
 	texinfo-4.13a-7
 	vision-0.9.7.r949-1
+	vim-7.4-1
 	which-2.20-1
 	wpa_supplicant-2.0-3
 	xz_utils-5.0.4-1
@@ -254,6 +255,7 @@ RemotePackageRepository HaikuPorts
 	tar
 	texi2html
 	texinfo
+	vim
 	vision
 	which
 	wpa_supplicant
