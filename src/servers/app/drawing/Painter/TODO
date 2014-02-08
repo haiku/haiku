@@ -1,20 +1,2 @@
-Test:
-
-* "composite" alpha blending modes
-
-
-
-Implement:
-
-(* handling of other BBitmap colorspaces)
-
-
-
-Improve:
-
 * make more special verions of DrawingModes for B_SOLID_* patterns
-
-* fast versions of nearest neighbor upscaling / downscaling of BBitmaps
-
-* fast versions of bilinear scaling of BBitmaps
 
