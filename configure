@@ -787,6 +787,7 @@ else
 			SECONDARY_ARCH=$secondaryArch \
 			HAIKU_USE_GCC_GRAPHITE=`get_variable \
 				HAIKU_USE_GCC_GRAPHITE_$targetArch` \
+			HAIKU_USE_GCC_PIPE=$HAIKU_USE_GCC_PIPE \
 			"$script" $scriptArgs "$sourceDir" "$buildCrossTools" \
 				"$crossToolsDir" $buildCrossToolsJobs || exit 1
 			crossToolsPrefix="$crossToolsDir/bin/${targetMachine}-"

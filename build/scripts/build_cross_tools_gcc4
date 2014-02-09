@@ -17,6 +17,8 @@ shift 4
 additionalMakeArgs=$*
 
 kernelCcFlags="-D_KERNEL_MODE"
+ccFlags="-O2"
+cxxFlags="-O2"
 case $haikuMachine in
 x86_64-*)
 	# GCC's default is to enable multilib, but there is a bug when
@@ -124,6 +126,10 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 		--with-gmp=$installDir \
 		--with-host-libstdcxx=\"-lstdc++\""
 fi
+if [ "$HAIKU_USE_GCC_PIPE" = 1 ]; then
+	ccFlags="$ccFlags -pipe"
+	cxxFlags="$cxxFlags -pipe"
+fi
 
 if [ -n "$SECONDARY_ARCH" ]; then
 	gccConfigureArgs="$gccConfigureArgs --with-hybrid-secondary=$SECONDARY_ARCH"
@@ -134,7 +140,7 @@ export LC_ALL=POSIX
 
 # build binutils
 cd "$binutilsObjDir"
-CFLAGS="-O2 -pipe" CXXFLAGS="-O2" "$binutilsSourceDir/configure" \
+CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$binutilsSourceDir/configure" \
 	--prefix="$installDir" $buildHostSpec --target=$haikuMachine \
 	--enable-targets=$haikuMachine,i386-efi-pe,x86_64-efi-pe \
 	--disable-nls --disable-shared --disable-werror \
@@ -149,14 +155,14 @@ export PATH=$PATH:"$installDir/bin"
 if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 	# build gmp
 	cd "$gmpObjDir"
-	"$gmpSourceDir/configure" --prefix="$installDir" \
-		--disable-shared --enable-cxx || exit 1
+	CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$gmpSourceDir/configure" \
+		--prefix="$installDir" --disable-shared --enable-cxx || exit 1
 	$MAKE $additionalMakeArgs || exit 1
 	$MAKE $additionalMakeArgs install || exit 1
 
 	# build isl
 	cd "$islObjDir"
-	CFLAGS="-O2 -pipe" CXXFLAGS="-O2 -pipe" "$islSourceDir/configure" \
+	CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$islSourceDir/configure" \
 		--prefix="$installDir" --disable-nls --disable-shared \
 		 --with-gmp-prefix="$installDir" || exit 1
 	$MAKE $additionalMakeArgs || exit 1
@@ -164,7 +170,7 @@ if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
 
 	# build cloog
 	cd "$cloogObjDir"
-	CFLAGS="-O2 -pipe" CXXFLAGS="-O2" "$cloogSourceDir/configure" \
+	CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$cloogSourceDir/configure" \
 		--prefix="$installDir" --disable-nls --disable-shared \
 		--with-gmp-prefix="$installDir" --with-isl-prefix=="$installDir" \
 		|| exit 1
@@ -195,7 +201,7 @@ copy_headers "$haikuSourceDir/headers/posix" "$tmpIncludeDir/posix"
 
 # configure gcc
 cd "$gccObjDir"
-CFLAGS="-O2 -pipe" CXXFLAGS="-O2" "$gccSourceDir/configure" \
+CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$gccSourceDir/configure" \
 	--prefix="$installDir" $buildHostSpec --target=$haikuMachine \
 	--disable-nls --disable-shared --with-system-zlib \
 	--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
