@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -27,6 +27,7 @@
 
 class Directory;
 class PackageFSRoot;
+class PackagesDirectory;
 class UnpackingNode;
 
 typedef IndexHashTable::Iterator IndexDirIterator;
@@ -106,7 +107,6 @@ private:
 									const OldNodeAttributes& oldAttributes);
 
 private:
-			struct PackagesDirectory;
 			struct ShineThroughDirectory;
 			struct ActivationChangeRequest;
 
