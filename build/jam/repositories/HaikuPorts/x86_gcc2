@@ -41,8 +41,8 @@ RemotePackageRepository HaikuPorts
 	flac-1.3.0-1
 	flac_devel-1.3.0-1
 	flex-2.5.35-6
-	freetype-2.4.9-3
-	freetype_devel-2.4.9-3
+	freetype-2.5.2-1
+	freetype_devel-2.5.2-1
 	fribidi-0.19.5-1
 	fribidi_devel-0.19.5-1	
 	friss-0.8beta-1
