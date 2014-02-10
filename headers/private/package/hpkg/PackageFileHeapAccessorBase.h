@@ -49,7 +49,7 @@ public:
 
 	// BAbstractBufferedDataReader
 	virtual	status_t			ReadDataToOutput(off_t offset, size_t size,
-									BDataOutput* output);
+									BDataIO* output);
 
 public:
 	static	const size_t		kChunkSize = 64 * 1024;

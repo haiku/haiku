@@ -11,6 +11,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
+		UseBuildFeatureHeaders zlib ;
+		
 		UseHeaders [ FDirName
 			$(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCHS[1]))
 			servers input ] ;
@@ -21,6 +23,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		# for RWLockManager only
 		UsePrivateSystemHeaders ;
 		UsePrivateHeaders kernel libroot ;
+		
+		Includes [ FGristFiles $(HPKG_SOURCES) ]
+			: [ BuildFeatureAttribute zlib : headers ] ;
 
 		StaticLibrary [ MultiArchDefaultGristFiles libshared.a ] :
 			AboutMenuItem.cpp
@@ -48,6 +53,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			TextTable.cpp
 			Thread.cpp
 			Variant.cpp
+			
+			# compression
+			ZlibCompressionBase.cpp
+			ZlibDecompressor.cpp
 			;
 
 		Includes [ FGristFiles Keymap.cpp ]

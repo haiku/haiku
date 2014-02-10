@@ -9,12 +9,12 @@
 #include <SupportDefs.h>
 
 
+class BDataIO;
+
+
 namespace BPackageKit {
 
 namespace BHPKG {
-
-
-class BDataOutput;
 
 
 class BDataReader {
@@ -33,7 +33,7 @@ public:
 	virtual	status_t			ReadData(off_t offset, void* buffer,
 									size_t size);
 	virtual	status_t			ReadDataToOutput(off_t offset, size_t size,
-									BDataOutput* output) = 0;
+									BDataIO* output) = 0;
 };
 
 
@@ -73,7 +73,7 @@ public:
 	virtual	status_t			ReadData(off_t offset, void* buffer,
 									size_t size);
 	virtual	status_t			ReadDataToOutput(off_t offset, size_t size,
-									BDataOutput* output);
+									BDataIO* output);
 
 private:
 			const void*			fData;

@@ -6,7 +6,8 @@
 
 #include <package/hpkg/DataReader.h>
 
-#include <package/hpkg/DataOutput.h>
+#include <package/hpkg/BufferDataOutput.h>
+#include <DataIO.h>
 
 #include <string.h>
 
@@ -70,7 +71,7 @@ BBufferDataReader::ReadData(off_t offset, void* buffer, size_t size)
 
 status_t
 BBufferDataReader::ReadDataToOutput(off_t offset, size_t size,
-	BDataOutput* output)
+	BDataIO* output)
 {
 	if (size == 0)
 		return B_OK;
@@ -81,7 +82,7 @@ BBufferDataReader::ReadDataToOutput(off_t offset, size_t size,
 	if (size > fSize || offset > (off_t)fSize - (off_t)size)
 		return B_ERROR;
 
-	return output->WriteData((const uint8*)fData + offset, size);
+	return output->Write((const uint8*)fData + offset, size);
 }
 
 

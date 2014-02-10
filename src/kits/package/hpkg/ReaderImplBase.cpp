@@ -19,9 +19,9 @@
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 
-#include <package/hpkg/DataOutput.h>
+#include <package/hpkg/BufferDataOutput.h>
 #include <package/hpkg/PackageFileHeapReader.h>
-#include <package/hpkg/ZlibDecompressor.h>
+#include <ZlibDecompressor.h>
 
 
 namespace BPackageKit {

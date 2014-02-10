@@ -11,12 +11,12 @@
 #include <algorithm>
 #include <new>
 
+#include <package/hpkg/BufferDataOutput.h>
 #include <package/hpkg/BufferPool.h>
 #include <package/hpkg/PoolBuffer.h>
-#include <package/hpkg/DataOutput.h>
 #include <package/hpkg/v1/HPKGDefsPrivate.h>
 #include <package/hpkg/v1/PackageData.h>
-#include <package/hpkg/ZlibDecompressor.h>
+#include <ZlibDecompressor.h>
 
 
 namespace BPackageKit {
@@ -27,7 +27,7 @@ namespace V1 {
 
 
 using BHPKG::BPrivate::PoolBufferPutter;
-using BHPKG::BPrivate::ZlibDecompressor;
+using ::BPrivate::ZlibDecompressor;
 
 
 // minimum/maximum zlib chunk size we consider sane
@@ -98,7 +98,7 @@ public:
 	}
 
 	virtual status_t ReadDataToOutput(off_t offset, size_t size,
-		BDataOutput* output)
+		BDataIO* output)
 	{
 		if (size == 0)
 			return B_OK;
@@ -125,7 +125,7 @@ public:
 				return error;
 
 			// write to the output
-			error = output->WriteData(buffer->Buffer(), toRead);
+			error = output->Write(buffer->Buffer(), toRead);
 			if (error != B_OK)
 				return error;
 
@@ -205,7 +205,7 @@ public:
 	}
 
 	virtual status_t ReadDataToOutput(off_t offset, size_t size,
-		BDataOutput* output)
+		BDataIO* output)
 	{
 		// check offset and size
 		if (size == 0)
@@ -244,7 +244,7 @@ public:
 
 			// write data to output
 			size_t toCopy = std::min(size, (size_t)fChunkSize - inChunkOffset);
-			error = output->WriteData(
+			error = output->Write(
 				(uint8*)fUncompressBuffer->Buffer() + inChunkOffset, toCopy);
 			if (error != B_OK)
 				return error;

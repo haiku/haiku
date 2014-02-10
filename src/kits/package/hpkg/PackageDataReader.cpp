@@ -13,7 +13,7 @@
 
 #include <package/hpkg/HPKGDefsPrivate.h>
 #include <package/hpkg/PackageData.h>
-#include <package/hpkg/ZlibDecompressor.h>
+#include <ZlibDecompressor.h>
 
 
 namespace BPackageKit {
@@ -53,7 +53,7 @@ public:
 	}
 
 	virtual status_t ReadDataToOutput(off_t offset, size_t size,
-		BDataOutput* output)
+		BDataIO* output)
 	{
 		if (size == 0)
 			return B_OK;

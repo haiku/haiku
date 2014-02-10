@@ -4,16 +4,12 @@
  */
 
 
-#include <package/hpkg/ZlibCompressionBase.h>
+#include <ZlibCompressionBase.h>
 
 #include <errno.h>
 
 #include <zlib.h>
 
-
-namespace BPackageKit {
-
-namespace BHPKG {
 
 namespace BPrivate {
 
@@ -48,7 +44,3 @@ ZlibCompressionBase::TranslateZlibError(int error)
 
 
 }	// namespace BPrivate
-
-}	// namespace BHPKG
-
-}	// namespace BPackageKit

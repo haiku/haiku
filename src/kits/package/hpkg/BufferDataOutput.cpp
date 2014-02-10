@@ -4,7 +4,7 @@
  */
 
 
-#include <package/hpkg/DataOutput.h>
+#include <package/hpkg/BufferDataOutput.h>
 
 #include <string.h>
 
@@ -12,14 +12,6 @@
 namespace BPackageKit {
 
 namespace BHPKG {
-
-
-// #pragma mark - BDataOutput
-
-
-BDataOutput::~BDataOutput()
-{
-}
 
 
 // #pragma mark - BBufferDataOutput
@@ -35,7 +27,7 @@ BBufferDataOutput::BBufferDataOutput(void* buffer, size_t size)
 
 
 status_t
-BBufferDataOutput::WriteData(const void* buffer, size_t size)
+BBufferDataOutput::Write(const void* buffer, size_t size)
 {
 	if (size == 0)
 		return B_OK;

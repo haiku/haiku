@@ -19,9 +19,9 @@
 
 #include <package/hpkg/v1/HPKGDefsPrivate.h>
 
-#include <package/hpkg/DataOutput.h>
+#include <package/hpkg/BufferDataOutput.h>
 #include <package/hpkg/ErrorOutput.h>
-#include <package/hpkg/ZlibDecompressor.h>
+#include <ZlibDecompressor.h>
 
 
 namespace BPackageKit {
@@ -33,7 +33,7 @@ namespace V1 {
 namespace BPrivate {
 
 
-using BHPKG::BPrivate::ZlibDecompressor;
+using ::BPrivate::ZlibDecompressor;
 
 
 static const size_t kScratchBufferSize = 64 * 1024;

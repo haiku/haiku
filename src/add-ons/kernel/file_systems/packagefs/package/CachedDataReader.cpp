@@ -31,7 +31,7 @@ page_physical_number_less(const vm_page* a, const vm_page* b)
 // #pragma mark - PagesDataOutput
 
 
-struct CachedDataReader::PagesDataOutput : public BDataOutput {
+struct CachedDataReader::PagesDataOutput : public BDataIO {
 	PagesDataOutput(vm_page** pages, size_t pageCount)
 		:
 		fPages(pages),
@@ -40,7 +40,7 @@ struct CachedDataReader::PagesDataOutput : public BDataOutput {
 	{
 	}
 
-	virtual status_t WriteData(const void* buffer, size_t size)
+	virtual status_t Write(const void* buffer, size_t size)
 	{
 		while (size > 0) {
 			if (fPageCount == 0)
@@ -65,6 +65,11 @@ struct CachedDataReader::PagesDataOutput : public BDataOutput {
 		}
 
 		return B_OK;
+	}
+
+	virtual ssize_t Read(void* buffer, size_t size)
+	{
+		return B_NOT_SUPPORTED;
 	}
 
 private:
@@ -132,7 +137,7 @@ CachedDataReader::ReadData(off_t offset, void* buffer, size_t size)
 
 status_t
 CachedDataReader::ReadDataToOutput(off_t offset, size_t size,
-	BDataOutput* output)
+	BDataIO* output)
 {
 	if (offset > fCache->virtual_end
 		|| (off_t)size > fCache->virtual_end - offset) {
@@ -168,7 +173,7 @@ CachedDataReader::ReadDataToOutput(off_t offset, size_t size,
 
 status_t
 CachedDataReader::_ReadCacheLine(off_t lineOffset, size_t lineSize,
-	off_t requestOffset, size_t requestLength, BDataOutput* output)
+	off_t requestOffset, size_t requestLength, BDataIO* output)
 {
 	PRINT("CachedDataReader::_ReadCacheLine(%" B_PRIdOFF ", %zu, %" B_PRIdOFF
 		", %zu, %p\n", lineOffset, lineSize, requestOffset, requestLength,
@@ -366,7 +371,7 @@ CachedDataReader::_CachePages(vm_page** pages, size_t firstPage,
 */
 status_t
 CachedDataReader::_WritePages(vm_page** pages, size_t pagesRelativeOffset,
-	size_t requestLength, BDataOutput* output)
+	size_t requestLength, BDataIO* output)
 {
 	PRINT("%p->CachedDataReader::_WritePages(%" B_PRIuSIZE ", %" B_PRIuSIZE
 		", %p)\n", this, pagesRelativeOffset, requestLength, output);
@@ -389,7 +394,7 @@ CachedDataReader::_WritePages(vm_page** pages, size_t pagesRelativeOffset,
 
 		// write the page's data
 		size_t toCopy = std::min(B_PAGE_SIZE - inPageOffset, requestLength);
-		error = output->WriteData((uint8*)(address + inPageOffset), toCopy);
+		error = output->Write((uint8*)(address + inPageOffset), toCopy);
 
 		// unmap the page
 		vm_put_physical_page(address, handle);
