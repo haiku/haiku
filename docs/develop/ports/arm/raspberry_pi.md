@@ -37,7 +37,8 @@ The Raspberry Pi SD card generally uses the MBR file system layout below. Partit
 
 # Compiling
 
-*  Build an ARM toolchain using `./configure --build-cross-tools-gcc4 arm ../buildtools`
+*  Create your work directory `mkdir generated.arm; cd generated.arm`
+*  Build an ARM toolchain using `../configure --build-cross-tools arm ../../buildtools`
 *  Build our loader using `jam -q -sHAIKU_BOOT_BOARD=raspberry_pi -sHAIKU_BOOT_PLATFORM=raspberrypi_arm haiku_loader`
 *  Build our file system using `jam -q -sHAIKU_BOOT_BOARD=raspberry_pi -sHAIKU_BOOT_PLATFORM=raspberrypi_arm haiku-floppyboot.tgz`
 
