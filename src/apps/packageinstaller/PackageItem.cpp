@@ -177,52 +177,65 @@ PackageItem::InitPath(const char *path, BPath *destination)
 	status_t ret = B_OK;
 
 	if (fPathType == P_INSTALL_PATH) {
-		if (!path) {
+//		printf("InitPath - relative: %s + %s\n", path, fPath.String());
+		if (path == NULL) {
 			parser_debug("InitPath path is NULL\n");
 			return B_ERROR;
 		}
 		ret = destination->SetTo(path, fPath.String());
-	}
-	else if (fPathType == P_SYSTEM_PATH)
+	} else if (fPathType == P_SYSTEM_PATH) {
+//		printf("InitPath - absolute: %s\n", fPath.String());
 		ret = destination->SetTo(fPath.String());
-	else {
-		if (!path) {
+	} else {
+//		printf("InitPath - volume: %s + %s\n", path, fPath.String());
+		if (path == NULL) {
 			parser_debug("InitPath path is NULL\n");
 			return B_ERROR;
 		}
 
 		BVolume volume(dev_for_path(path));
 		ret = volume.InitCheck();
-		if (ret != B_OK)
-			return ret;
-
-		BDirectory temp;
-		ret = volume.GetRootDirectory(&temp);
-		if (ret != B_OK)
-			return ret;
-
-		BPath mountPoint(&temp, NULL);
-		ret = destination->SetTo(mountPoint.Path(), fPath.String());
+		if (ret == B_OK) {
+			BDirectory temp;
+			ret = volume.GetRootDirectory(&temp);
+			if (ret == B_OK) {
+				BPath mountPoint(&temp, NULL);
+				ret = destination->SetTo(mountPoint.Path(), fPath.String());
+			}
+		}
 	}
 
-	BPath systemNonPackagedDir;
-	find_directory(B_SYSTEM_NONPACKAGED_DIRECTORY, &systemNonPackagedDir);
-
-	BPath userNonPackagedDir;
-	find_directory(B_USER_NONPACKAGED_DIRECTORY, &userNonPackagedDir);
+	if (ret != B_OK) {
+		fprintf(stderr, "InitPath(%s): %s\n", path, strerror(ret));
+		return ret;
+	}
 
 	BString pathString(destination->Path());
 
 	// Hardcoded paths, the .pkg files hardcode this to the same
-	if (pathString.FindFirst("/boot/system") == 0 && pathString.FindFirst("non-packaged") == B_ERROR) {
-		pathString.Replace("/boot/system", systemNonPackagedDir.Path(), 1);
-	}
+	if (pathString.FindFirst("non-packaged") < 0) {
+		bool wasRewritten = false;
 
-	if (pathString.FindFirst("/boot/home/config") == 0 && pathString.FindFirst("non-packaged") == B_ERROR) {
-		pathString.Replace("/boot/home/config", userNonPackagedDir.Path(), 1);
-	}
+		if (pathString.StartsWith("/boot/system")) {
+			BPath systemNonPackagedDir;
+			find_directory(B_SYSTEM_NONPACKAGED_DIRECTORY,
+				&systemNonPackagedDir);
+			pathString.ReplaceFirst("/boot/system",
+				systemNonPackagedDir.Path());
+			wasRewritten = true;
+		} else if (pathString.StartsWith("/boot/home/config")) {
+			BPath userNonPackagedDir;
+			find_directory(B_USER_NONPACKAGED_DIRECTORY, &userNonPackagedDir);
+			pathString.ReplaceFirst("/boot/home/config",
+				userNonPackagedDir.Path());
+			wasRewritten = true;
+		}
 
-	destination->SetTo(pathString.String());
+		if (wasRewritten) {
+//			printf("rewritten: %s\n", pathString.String());
+			destination->SetTo(pathString.String());
+		}
+	}
 
 	return ret;
 }
