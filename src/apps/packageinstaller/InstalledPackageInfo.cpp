@@ -105,9 +105,10 @@ InstalledPackageInfo::InitCheck()
 
 status_t
 InstalledPackageInfo::SetTo(const char *packageName, const char *version, 
-		bool create)
+	bool create)
 {
 	_ClearItemList();
+
 	fCreate = create;
 	fStatus = B_NO_INIT;
 	fVersion = version;
@@ -179,8 +180,7 @@ InstalledPackageInfo::SetTo(const char *packageName, const char *version,
 			fInstalledItems.AddItem(new BString(itemPath)); // Or maybe BPath better?
 		}
 		fIsUpToDate = true;
-	}
-	else if (fStatus == B_ENTRY_NOT_FOUND) {
+	} else if (fStatus == B_ENTRY_NOT_FOUND) {
 		if (create) {
 			fStatus = B_OK;
 			fIsUpToDate = false;
@@ -315,13 +315,8 @@ InstalledPackageInfo::Save()
 void
 InstalledPackageInfo::_ClearItemList()
 {
-	// Clear the items list
-	BString *iter;
-	uint32 i, count = fInstalledItems.CountItems();
-	for (i = 0; i < count; i++) {
-		iter = static_cast<BString *>(fInstalledItems.ItemAt(0));
-		fInstalledItems.RemoveItem((int32)0);
-		delete iter;
-	}
+	for (int32 i = fInstalledItems.CountItems() - 1; i >= 0; i--)
+		delete static_cast<BString*>(fInstalledItems.ItemAtFast(i));
+	fInstalledItems.MakeEmpty();
 }
 
