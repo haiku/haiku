@@ -10,6 +10,7 @@ Includes [ FGristFiles PackageItem.cpp ]
 
 Application PackageInstaller :
 	main.cpp
+	BlockingWindow.cpp
 	PackageWindow.cpp
 	PackageView.cpp
 	PackageInfo.cpp

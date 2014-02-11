@@ -96,8 +96,7 @@ ImageView::MouseUp(BPoint point)
 
 PackageImageViewer::PackageImageViewer(BPositionIO* imageIO)
 	:
-	BWindow(BRect(100, 100, 100, 100), "", B_MODAL_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_CLOSABLE)
+	BlockingWindow(BRect(100, 100, 100, 100), "")
 {
 	fBackground = new ImageView(imageIO);
 	AddChild(fBackground);
@@ -108,62 +107,5 @@ PackageImageViewer::PackageImageViewer(BPositionIO* imageIO)
 	BRect frame = screen.Frame();
 	MoveTo((frame.Width() - Bounds().Width()) / 2.0f,
 		(frame.Height() - Bounds().Height()) / 2.0f);
-}
-
-
-PackageImageViewer::~PackageImageViewer()
-{
-}
-
-
-bool
-PackageImageViewer::QuitRequested()
-{
-	if (fSemaphore >= B_OK) {
-		delete_sem(fSemaphore);
-		fSemaphore = -1;
-	}
-	return true;
-}
-
-
-void
-PackageImageViewer::Go()
-{
-	// Since this class can be thought of as a modified BAlert window, no use
-	// to reinvent a well fledged wheel. This concept has been borrowed from
-	// the current BAlert implementation
-	fSemaphore = create_sem(0, "ImageViewer");
-	if (fSemaphore < B_OK) {
-		Quit();
-		return;
-	}
-
-	thread_id callingThread = find_thread(NULL);
-	BWindow* window = dynamic_cast<BWindow*>(BLooper::LooperForThread(
-		callingThread));
-	Show();
-
-	if (window != NULL) {
-		// Make sure calling window thread, which is blocked here, is updating
-		// the window from time to time.
-		status_t ret;
-		for (;;) {
-			do {
-				ret = acquire_sem_etc(fSemaphore, 1, B_RELATIVE_TIMEOUT, 50000);
-			} while (ret == B_INTERRUPTED);
-
-			if (ret == B_BAD_SEM_ID)
-				break;
-			window->UpdateIfNeeded();
-		}
-	} else {
-		// Since there are no spinlocks, wait until the semaphore is free
-		while (acquire_sem(fSemaphore) == B_INTERRUPTED) {
-		}
-	}
-
-	if (Lock())
-		Quit();
 }
 

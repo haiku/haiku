@@ -8,11 +8,11 @@
 #ifndef PACKAGE_IMAGE_VIEWER_H
 #define PACKAGE_IMAGE_VIEWER_H
 
-#include <Window.h>
 #include <View.h>
 #include <Bitmap.h>
 #include <DataIO.h>
 
+#include "BlockingWindow.h"
 
 
 class ImageView : public BView {
@@ -29,19 +29,12 @@ private:
 };
 
 
-class PackageImageViewer : public BWindow {
+class PackageImageViewer : public BlockingWindow {
 public:
 								PackageImageViewer(BPositionIO* image);
-	virtual						~PackageImageViewer();
 		
-	virtual	bool				QuitRequested();
-		
-			void				Go();
-
 private:
 			ImageView*			fBackground;
-
-			sem_id				fSemaphore;
 };
 
 

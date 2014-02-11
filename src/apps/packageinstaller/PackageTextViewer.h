@@ -8,28 +8,20 @@
 #ifndef PACKAGETEXTVIEWER_H
 #define PACKAGETEXTVIEWER_H
 
-#include <Window.h>
 #include <View.h>
 #include <TextView.h>
 
+#include "BlockingWindow.h"
 
-class PackageTextViewer : public BWindow {
-	public:
-		PackageTextViewer(const char *text, bool disclaimer = false);
-		~PackageTextViewer();
+class PackageTextViewer : public BlockingWindow {
+public:
+								PackageTextViewer(const char* text,
+									bool disclaimer = false);
 		
-		int32 Go();
-
-		void MessageReceived(BMessage *msg);
+	virtual	void				MessageReceived(BMessage* message);
 		
-	private:
-		void _InitView(const char *text, bool disclaimer);
-
-		BView *fBackground;
-		BTextView *fText;
-
-		sem_id fSemaphore;
-		int32 fValue;
+private:
+			void				_InitView(const char *text, bool disclaimer);
 };
 
 
