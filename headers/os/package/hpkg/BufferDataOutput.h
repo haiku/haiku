@@ -21,7 +21,7 @@ public:
 
 			size_t				BytesWritten() const { return fBytesWritten; }
 
-	virtual	status_t			Write(const void* buffer, size_t size);
+	virtual	ssize_t				Write(const void* buffer, size_t size);
 	virtual ssize_t				Read(void* buffer, size_t size)
 									{ return B_NOT_SUPPORTED; }
 

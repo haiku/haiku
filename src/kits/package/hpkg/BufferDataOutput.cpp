@@ -26,7 +26,7 @@ BBufferDataOutput::BBufferDataOutput(void* buffer, size_t size)
 }
 
 
-status_t
+ssize_t
 BBufferDataOutput::Write(const void* buffer, size_t size)
 {
 	if (size == 0)
@@ -37,7 +37,7 @@ BBufferDataOutput::Write(const void* buffer, size_t size)
 	memcpy((uint8*)fBuffer + fBytesWritten, buffer, size);
 	fBytesWritten += size;
 
-	return B_OK;
+	return size;
 }
 
 

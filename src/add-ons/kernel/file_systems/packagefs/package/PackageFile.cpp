@@ -37,7 +37,7 @@ public:
 	{
 	}
 
-	virtual status_t Write(const void* buffer, size_t size)
+	virtual ssize_t Write(const void* buffer, size_t size)
 	{
 		RETURN_ERROR(write_to_io_request(fRequest, buffer, size));
 	}

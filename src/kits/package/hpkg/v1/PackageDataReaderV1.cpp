@@ -126,7 +126,7 @@ public:
 
 			// write to the output
 			error = output->Write(buffer->Buffer(), toRead);
-			if (error != B_OK)
+			if (error < B_OK)
 				return error;
 
 			offset += toRead;
@@ -246,7 +246,7 @@ public:
 			size_t toCopy = std::min(size, (size_t)fChunkSize - inChunkOffset);
 			error = output->Write(
 				(uint8*)fUncompressBuffer->Buffer() + inChunkOffset, toCopy);
-			if (error != B_OK)
+			if (error < B_OK)
 				return error;
 
 			size -= toCopy;
