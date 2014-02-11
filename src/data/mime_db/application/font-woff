@@ -1,0 +1,12 @@
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/font-woff";
+
+resource(2, "META:SNIFF_RULE") "0.50 (0x774f4646)";
+
+resource(4, "META:S:DESC") #'MSDC' "Web Open Font Format";
+
+resource(5, "META:EXTENS") message(234) {
+"extensions" = "woff",
+"type" = "application/font-woff"
+};
