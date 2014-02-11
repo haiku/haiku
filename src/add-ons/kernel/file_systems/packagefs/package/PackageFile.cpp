@@ -14,7 +14,7 @@
 #include <AutoDeleter.h>
 #include <util/AutoLock.h>
 
-#include <package/hpkg/DataOutput.h>
+#include <package/hpkg/BufferDataOutput.h>
 #include <package/hpkg/DataReader.h>
 #include <package/hpkg/PackageDataReader.h>
 
