@@ -34,7 +34,7 @@ public:
 								PackageImageViewer(BPositionIO* image);
 	virtual						~PackageImageViewer();
 		
-	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
 		
 			void				Go();
 

@@ -20,10 +20,6 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PackageImageViewer"
 
-enum {
-	P_MSG_CLOSE = 'pmic'
-};
-
 
 ImageView::ImageView(BPositionIO* imageIO)
 	:
@@ -89,9 +85,9 @@ ImageView::Draw(BRect updateRect)
 void
 ImageView::MouseUp(BPoint point)
 {
-	BWindow* parent = Window();
-	if (parent)
-		parent->PostMessage(P_MSG_CLOSE);
+	BWindow* window = Window();
+	if (window != NULL)
+		window->PostMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -120,16 +116,14 @@ PackageImageViewer::~PackageImageViewer()
 }
 
 
-void
-PackageImageViewer::MessageReceived(BMessage* message)
+bool
+PackageImageViewer::QuitRequested()
 {
-	if (message->what == P_MSG_CLOSE) {
-		if (fSemaphore >= B_OK) {
-			delete_sem(fSemaphore);
-			fSemaphore = -1;
-		}
-	} else
-		BWindow::MessageReceived(message);
+	if (fSemaphore >= B_OK) {
+		delete_sem(fSemaphore);
+		fSemaphore = -1;
+	}
+	return true;
 }
 
 
