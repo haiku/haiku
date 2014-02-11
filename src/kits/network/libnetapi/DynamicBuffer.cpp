@@ -70,7 +70,7 @@ DynamicBuffer::InitCheck() const
 
 
 status_t
-DynamicBuffer::Insert(const void* data, size_t size)
+DynamicBuffer::Write(const void* data, size_t size)
 {
 	if (fInit != B_OK)
 		return fInit;
@@ -86,14 +86,14 @@ DynamicBuffer::Insert(const void* data, size_t size)
 }
 
 
-status_t
-DynamicBuffer::Remove(void* data, size_t size)
+ssize_t
+DynamicBuffer::Read(void* data, size_t size)
 {
 	if (fInit != B_OK)
 		return fInit;
 
-	if (fDataStart + size > fDataEnd)
-		return B_BUFFER_OVERFLOW;
+	if (size > Size())
+		size = Size();
 
 	memcpy(data, fBuffer + fDataStart, size);
 	fDataStart += size;
@@ -101,7 +101,7 @@ DynamicBuffer::Remove(void* data, size_t size)
 	if (fDataStart == fDataEnd)
 		fDataStart = fDataEnd = 0;
 
-	return B_OK;
+	return size;
 }
 
 

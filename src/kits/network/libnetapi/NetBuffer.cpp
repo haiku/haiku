@@ -54,7 +54,7 @@ BNetBuffer::BNetBuffer(BMessage* archive) :
 		&bufferSize) == B_OK) {
 		fImpl = new (std::nothrow) DynamicBuffer(bufferSize);
 		if (fImpl != NULL) {
-			status_t result = fImpl->Insert(bufferPtr, bufferSize);
+			status_t result = fImpl->Write(bufferPtr, bufferSize);
 			if (result == B_OK)
 				fInit = fImpl->InitCheck();
 			else
@@ -185,7 +185,7 @@ BNetBuffer::AppendString(const char* data)
 status_t
 BNetBuffer::AppendData(const void* data, size_t size)
 {
-	return fImpl->Insert(data, size);
+	return fImpl->Write(data, size);
 }
 
 
@@ -332,7 +332,7 @@ BNetBuffer::RemoveString(char* data, size_t size)
 status_t
 BNetBuffer::RemoveData(void* data, size_t size)
 {
-	return fImpl->Remove(data, size);
+	return fImpl->Read(data, size);
 }
 
 

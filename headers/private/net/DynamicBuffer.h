@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,10 +9,11 @@
 #ifndef _DYNAMIC_BUFFER_H
 #define _DYNAMIC_BUFFER_H
 
+#include <DataIO.h>
 #include <SupportDefs.h>
 
 
-class DynamicBuffer {
+class DynamicBuffer : public BDataIO {
 public:
 	DynamicBuffer(size_t initialSize = 0);
 	~DynamicBuffer();
@@ -25,11 +26,11 @@ public:
 	
 	// Insert data at the end of the buffer. The buffer will be increased to
 	// accomodate the data if needed.
-	status_t Insert(const void* data, size_t size);
+	status_t Write(const void* data, size_t size);
 	
 	// Remove data from the start of the buffer. Move the buffer start
 	// pointer to point to the data following it.
-	status_t Remove(void* data, size_t size);
+	ssize_t Read(void* data, size_t size);
 
 	// Return a pointer to the underlying buffer. Note this will not
 	// necessarily be a pointer to the start of the allocated memory as the
