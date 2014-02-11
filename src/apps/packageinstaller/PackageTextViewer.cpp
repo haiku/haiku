@@ -12,10 +12,9 @@
 
 #include <Button.h>
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <ScrollView.h>
-
-#include <LayoutBuilder.h>
 
 
 enum {
