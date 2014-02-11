@@ -30,14 +30,9 @@ get_volume_name(struct exfat_entry* entry, char* name, size_t length)
 	if (entry->type == EXFAT_ENTRY_TYPE_NOT_IN_USE)
 		name = "";
 	else if (entry->type == EXFAT_ENTRY_TYPE_LABEL) {
-		// UCS-2 can encode codepoints in the range U+0000 to U+FFFF
-		// UTF-8 needs at most 3 bytes to encode values in this range
-		size_t utf8NameLength = entry->label.length * 3;
-		if (length < utf8NameLength)
-			return B_NAME_TOO_LONG;
-
-		status_t result = unicode_to_utf8((const uchar*)entry->label.name,
-			entry->label.length * 2, (uint8*)name, &utf8NameLength);
+		status_t result
+			= unicode_to_utf8((const uchar*)entry->volume_label.name,
+				entry->volume_label.length * 2, (uint8*)name, &length);
 		if (result != B_OK)
 			return result;
 	} else

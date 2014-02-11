@@ -104,14 +104,14 @@ struct exfat_entry {
 			uint8 length;
 			uint16 name[11];
 			uint8 reserved[8];
-		} _PACKED label;
+		} _PACKED volume_label;
 		struct {
 			uint8 chunkCount;
 			uint16 checksum;
 			uint16 flags;
 			uint8 guid[16];
 			uint8 reserved[10];
-		} _PACKED guid;
+		} _PACKED volume_guid;
 		struct {
 			uint8 reserved[3];
 			uint32 checksum;
@@ -171,6 +171,10 @@ struct exfat_entry {
 			uint64 Size() const
 				{ return B_LENDIAN_TO_HOST_INT64(size1); }
 		} _PACKED file_info;
+		struct {
+			uint8 flags;
+			uint16 name[15];
+		} _PACKED file_name;
 	};
 } _PACKED;
 

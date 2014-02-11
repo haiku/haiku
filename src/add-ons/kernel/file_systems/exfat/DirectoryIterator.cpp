@@ -208,9 +208,9 @@ DirectoryIterator::_GetNext(uchar* name, size_t* _nameLength, ino_t* _id,
 				visitor->VisitFileInfo(fCurrent);
 		} else if (fCurrent->type == EXFAT_ENTRY_TYPE_FILENAME) {
 			TRACE("DirectoryIterator::_GetNext() Filename\n");
-			memcpy((uint8*)name + nameIndex, fCurrent->label.name,
-				sizeof(fCurrent->label.name));
-			nameIndex += sizeof(fCurrent->label.name);
+			memcpy((uint8*)name + nameIndex, fCurrent->file_name.name,
+				sizeof(fCurrent->file_name.name));
+			nameIndex += sizeof(fCurrent->file_name.name);
 			name[nameIndex] = '\0';
 			chunkCount--;
 			if (visitor != NULL)
