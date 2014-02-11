@@ -21,32 +21,37 @@
 
 #include <stdio.h>
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Packageinstaller main"
 
+
 class PackageInstaller : public BApplication {
-	public:
-		PackageInstaller();
-		~PackageInstaller();
+public:
+								PackageInstaller();
+	virtual						~PackageInstaller();
 
-		void RefsReceived(BMessage *msg);
-		void ArgvReceived(int32 argc, char **argv);
-		void ReadyToRun();
+	virtual void				RefsReceived(BMessage* message);
+	virtual void				ArgvReceived(int32 argc, char** argv);
+	virtual void				ReadyToRun();
 
-		void MessageReceived(BMessage *msg);
+	virtual void				MessageReceived(BMessage* message);
 
-	private:
-		BFilePanel	*fOpen;
-		uint32		fWindowCount;
+private:
+			void				_NewWindow(const entry_ref* ref);
+
+private:
+			BFilePanel*			fOpenPanel;
+			uint32				fWindowCount;
 };
 
 
 PackageInstaller::PackageInstaller()
-	:	BApplication("application/x-vnd.Haiku-PackageInstaller"),
-	fOpen(NULL),
+	:
+	BApplication("application/x-vnd.Haiku-PackageInstaller"),
+	fOpenPanel(new BFilePanel(B_OPEN_PANEL)),
 	fWindowCount(0)
 {
-	fOpen = new BFilePanel(B_OPEN_PANEL);
 }
 
 
@@ -60,81 +65,69 @@ PackageInstaller::ReadyToRun()
 {
 	// We're ready to run - if no windows are yet visible, this means that
 	// we should show a open panel
-	if (fWindowCount == 0) {
-		fOpen->Show();
-	}
+	if (fWindowCount == 0)
+		fOpenPanel->Show();
 }
 
 
 void
-PackageInstaller::RefsReceived(BMessage *msg)
+PackageInstaller::RefsReceived(BMessage* message)
 {
-	uint32 type;
-	int32 i, count;
-	status_t ret = msg->GetInfo("refs", &type, &count);
-	if (ret != B_OK || type != B_REF_TYPE)
-		return;
-
 	entry_ref ref;
-	PackageWindow *iter;
-	for (i = 0; i < count; i++) {
-		if (msg->FindRef("refs", i, &ref) == B_OK) {
-			iter = new PackageWindow(&ref);
-			fWindowCount++;
-			iter->Show();
-		}
-	}
+	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++)
+		_NewWindow(&ref);
 }
 
 
 void
-PackageInstaller::ArgvReceived(int32 argc, char **argv)
+PackageInstaller::ArgvReceived(int32 argc, char** argv)
 {
-	int i;
-	BPath path;
-	entry_ref ref;
-	status_t ret = B_OK;
-	PackageWindow *iter = 0;
-
-	for (i = 1; i < argc; i++) {
+	for (int i = 1; i < argc; i++) {
+		BPath path;
 		if (path.SetTo(argv[i]) != B_OK) {
-			fprintf(stderr,
-					B_TRANSLATE("Error! \"%s\" is not a valid path.\n"),
-					argv[i]);
+			fprintf(stderr, B_TRANSLATE("Error! \"%s\" is not a valid path.\n"),
+				argv[i]);
 			continue;
 		}
 
-		ret = get_ref_for_path(path.Path(), &ref);
+		entry_ref ref;
+		status_t ret = get_ref_for_path(path.Path(), &ref);
 		if (ret != B_OK) {
-			fprintf(stderr,
-					B_TRANSLATE("Error (%s)! Could not open \"%s\".\n"),
-					strerror(ret), argv[i]);
+			fprintf(stderr, B_TRANSLATE("Error (%s)! Could not open \"%s\".\n"),
+				strerror(ret), argv[i]);
 			continue;
 		}
 
-		iter = new PackageWindow(&ref);
-		fWindowCount++;
-		iter->Show();
+		_NewWindow(&ref);
 	}
 }
 
 
 void
-PackageInstaller::MessageReceived(BMessage *msg)
+PackageInstaller::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case P_WINDOW_QUIT:
 			fWindowCount--;
+			// fall through
 		case B_CANCEL:
-			if (fWindowCount == 0) {
-				BAutolock lock(this);
-				if (lock.IsLocked())
-					Quit();
-			}
+			if (fWindowCount == 0)
+				PostMessage(B_QUIT_REQUESTED);
 			break;
+
 		default:
-			BApplication::MessageReceived(msg);
+			BApplication::MessageReceived(message);
 	}
+}
+
+
+void
+PackageInstaller::_NewWindow(const entry_ref* ref)
+{
+	PackageWindow* window = new PackageWindow(ref);
+	window->Show();
+
+	fWindowCount++;
 }
 
 
