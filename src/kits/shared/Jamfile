@@ -24,7 +24,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UsePrivateSystemHeaders ;
 		UsePrivateHeaders kernel libroot ;
 		
-		Includes [ FGristFiles $(HPKG_SOURCES) ]
+		Includes [ FGristFiles ZlibCompressionBase.cpp ZlibDecompressor.cpp ]
 			: [ BuildFeatureAttribute zlib : headers ] ;
 
 		StaticLibrary [ MultiArchDefaultGristFiles libshared.a ] :
