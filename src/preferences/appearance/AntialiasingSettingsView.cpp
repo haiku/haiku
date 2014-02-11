@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include <ft2build.h>
+#include FT_CONFIG_OPTIONS_H
 	// for detected the availablility of subpixel anti-aliasing
 
 #include <Box.h>
