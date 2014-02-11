@@ -5,8 +5,8 @@
  * Author:
  *		Łukasz 'Sil2100' Zemczak <sil2100@vexillium.org>
  */
-#ifndef PACKAGEIMAGEVIEWER_H
-#define PACKAGEIMAGEVIEWER_H
+#ifndef PACKAGE_IMAGE_VIEWER_H
+#define PACKAGE_IMAGE_VIEWER_H
 
 #include <Window.h>
 #include <View.h>
@@ -16,35 +16,34 @@
 
 
 class ImageView : public BView {
-	public:
-		ImageView(BPositionIO *image);
-		~ImageView();
+public:
+								ImageView(BPositionIO* image);
+	virtual						~ImageView();
 
-		void AttachedToWindow();
-		void Draw(BRect updateRect);
-		void MouseUp(BPoint point);
+	virtual	void				AttachedToWindow();
+	virtual	void				Draw(BRect updateRect);
+	virtual	void				MouseUp(BPoint point);
 
-	private:
-		BBitmap *fImage;
-		bool fSuccess;
+private:
+			BBitmap*			fImage;
 };
 
 
 class PackageImageViewer : public BWindow {
-	public:
-		PackageImageViewer(BPositionIO *image);
-		~PackageImageViewer();
+public:
+								PackageImageViewer(BPositionIO* image);
+	virtual						~PackageImageViewer();
 		
-		void Go();
-
-		void MessageReceived(BMessage *msg);
+	virtual	void				MessageReceived(BMessage* message);
 		
-	private:
-		ImageView *fBackground;
+			void				Go();
 
-		sem_id fSemaphore;
+private:
+			ImageView*			fBackground;
+
+			sem_id				fSemaphore;
 };
 
 
-#endif
+#endif // PACKAGE_IMAGE_VIEWER_H
 
