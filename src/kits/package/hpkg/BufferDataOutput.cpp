@@ -30,7 +30,7 @@ ssize_t
 BBufferDataOutput::Write(const void* buffer, size_t size)
 {
 	if (size == 0)
-		return B_OK;
+		return 0;
 	if (size > fSize - fBytesWritten)
 		return B_BAD_VALUE;
 
