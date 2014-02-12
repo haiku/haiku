@@ -11,34 +11,30 @@
 
 #include <Application.h>
 #include <Catalog.h>
-#include <GroupLayout.h>
-#include <Locale.h>
+
+#include "PackageView.h"
 
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PackageWindow"
 
 
-PackageWindow::PackageWindow(const entry_ref *ref)
+PackageWindow::PackageWindow(const entry_ref* ref)
 	:
 	BWindow(BRect(100, 100, 600, 300),
 		B_TRANSLATE_SYSTEM_NAME("PackageInstaller"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
-	//SetLayout(new BGroupLayout(B_HORIZONTAL));
+	PackageView* view = new PackageView(Bounds(), ref);
+	AddChild(view);
 
-	fBackground = new PackageView(Bounds(), ref);
-	AddChild(fBackground);
-
-	ResizeTo(Bounds().Width(), fBackground->Bounds().Height());
+	ResizeTo(Bounds().Width(), view->Bounds().Height());
+	CenterOnScreen();
 }
 
 
 PackageWindow::~PackageWindow()
 {
-	RemoveChild(fBackground);
-
-	delete fBackground;
 }
 
 

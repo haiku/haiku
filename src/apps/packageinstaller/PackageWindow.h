@@ -5,28 +5,26 @@
  * Author:
  *		Łukasz 'Sil2100' Zemczak <sil2100@vexillium.org>
  */
-#ifndef PACKAGEWINDOW_H
-#define PACKAGEWINDOW_H
+#ifndef PACKAGE_WINDOW_H
+#define PACKAGE_WINDOW_H
 
-#include "PackageView.h"
+
 #include <Window.h>
-#include <Entry.h>
 
+
+struct entry_ref;
 
 const uint32 P_WINDOW_QUIT		=	'PiWq';
 
 
 class PackageWindow : public BWindow {
-	public:
-		PackageWindow(const entry_ref *refs);
-		virtual ~PackageWindow();
+public:
+								PackageWindow(const entry_ref* ref);
+	virtual						~PackageWindow();
 		
-		virtual void Quit();
-		
-	private:
-		PackageView *fBackground;
+	virtual	void				Quit();
 };
 
 
-#endif
+#endif // PACKAGE_WINDOW_H
 

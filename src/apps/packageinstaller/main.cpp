@@ -17,6 +17,7 @@
 #include <FilePanel.h>
 #include <List.h>
 #include <Locale.h>
+#include <Path.h>
 #include <TextView.h>
 
 #include <stdio.h>
