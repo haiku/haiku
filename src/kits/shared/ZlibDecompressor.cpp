@@ -87,7 +87,7 @@ ZlibDecompressor::DecompressNext(const void* input, size_t inputSize)
 		if (fStream.avail_out < sizeof(outputBuffer)) {
 			status_t error = fOutput->Write(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
-			if (error != B_OK)
+			if (error < B_OK)
 				return error;
 		}
 	}
@@ -116,7 +116,7 @@ ZlibDecompressor::Finish()
 		if (fStream.avail_out < sizeof(outputBuffer)) {
 			status_t error = fOutput->Write(outputBuffer,
 				sizeof(outputBuffer) - fStream.avail_out);
-			if (error != B_OK)
+			if (error < B_OK)
 				return error;
 		}
 	}
