@@ -116,8 +116,8 @@ PackageView::AttachedToWindow()
 		title = B_TRANSLATE("Package installer");
 	}
 	else {
-		title = B_TRANSLATE("Install ");
-		title += name;
+		title = B_TRANSLATE("Install %name%");
+		title.ReplaceAll("%name%", name);
 	}
 	parent->SetTitle(title.String());
 	fInstall->SetTarget(this);
