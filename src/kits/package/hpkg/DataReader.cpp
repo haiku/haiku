@@ -83,7 +83,7 @@ BBufferDataReader::ReadDataToOutput(off_t offset, size_t size,
 		return B_ERROR;
 
 	ssize_t result = output->Write((const uint8*)fData + offset, size);
-	if (result > B_OK)
+	if (result >= 0)
 		return B_OK;
 	return result;
 }
