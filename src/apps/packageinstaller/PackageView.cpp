@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Haiku, Inc.
+ * Copyright 2007-2014, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -13,11 +13,14 @@
 #include "PackageView.h"
 
 #include <Alert.h>
+#include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <Directory.h>
+#include <FilePanel.h>
 #include <FindDirectory.h>
 #include <Locale.h>
+#include <MenuField.h>
 #include <MenuItem.h>
 #include <Path.h>
 #include <PopUpMenu.h>

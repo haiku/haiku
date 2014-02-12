@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc.
+ * Copyright 2007-2014, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -13,12 +13,12 @@
 #include "PackageInstall.h"
 #include "PackageStatus.h"
 
-#include <Box.h>
-#include <Button.h>
-#include <FilePanel.h>
-#include <MenuField.h>
 #include <View.h>
 
+class BBox;
+class BButton;
+class BFilePanel;
+class BMenuField;
 class BPopUpMenu;
 class BTextView;
 
@@ -31,39 +31,45 @@ enum {
 };
 
 class PackageView : public BView {
-	public:
-		PackageView(BRect frame, const entry_ref *ref);
-		~PackageView();
+public:
+								PackageView(BRect frame, const entry_ref* ref);
+	virtual						~PackageView();
 
-		void AttachedToWindow();
-		void MessageReceived(BMessage *msg);
+	virtual	void				AttachedToWindow();
+	virtual	void				MessageReceived(BMessage* message);
 
-		int32 ItemExists(PackageItem &item, BPath &path, int32 &policy);
+			int32				ItemExists(PackageItem& item,
+									BPath& path, int32& policy);
 
-		BPath *GetCurrentPath()          { return &fCurrentPath; }
-		PackageInfo *GetPackageInfo()    { return &fInfo; }
-		uint32 GetCurrentType()          { return fCurrentType; }
-		PackageStatus *GetStatusWindow() { return fStatusWindow; }
+			BPath*				CurrentPath()
+									{ return &fCurrentPath; }
+			PackageInfo*		GetPackageInfo()
+									{ return &fInfo; }
+			uint32				CurrentType() const
+									{ return fCurrentType; }
+			PackageStatus*		StatusWindow()
+									{ return fStatusWindow; }
 
-	private:
-		void _InitView();
-		void _InitProfiles();
+private:
+			void				_InitView();
+			void				_InitProfiles();
 
-		status_t _GroupChanged(int32 index);
+			status_t			_GroupChanged(int32 index);
 
-		BPopUpMenu *fInstallTypes;
-		BTextView *fInstallDesc;
-		BPopUpMenu *fDestination;
-		BMenuField *fDestField;
-		BButton *fInstall;
+private:
+			BPopUpMenu*			fInstallTypes;
+			BTextView*			fInstallDesc;
+			BPopUpMenu*			fDestination;
+			BMenuField*			fDestField;
+			BButton*			fInstall;
 
-		BFilePanel *fOpenPanel;
-		BPath fCurrentPath;
-		uint32 fCurrentType;
+			BFilePanel*			fOpenPanel;
+			BPath				fCurrentPath;
+			uint32				fCurrentType;
 
-		PackageInfo fInfo;
-		PackageStatus *fStatusWindow;
-		PackageInstall fInstallProcess;
+			PackageInfo			fInfo;
+			PackageStatus*		fStatusWindow;
+			PackageInstall		fInstallProcess;
 };
 
 #endif	// PACKAGE_VIEW_H

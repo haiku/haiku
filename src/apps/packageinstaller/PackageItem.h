@@ -53,15 +53,15 @@ extern status_t inflate_data(uint8* in, uint32 inSize, uint8* out,
 
 
 struct ItemState {
-	ItemState() : policy(P_EXISTS_NONE), status(B_NO_INIT) {}
-	~ItemState() {}
-
-	inline void Reset(int32 currentPolicy)
+	ItemState(uint8 _policy)
+		:
+		policy(_policy),
+		status(B_NO_INIT)
 	{
-		destination.Unset();
-		parent.Unset();
-		status = B_NO_INIT;
-		policy = currentPolicy;
+	}
+
+	~ItemState()
+	{
 	}
 
 	BPath		destination;
