@@ -18,6 +18,7 @@
 class BBox;
 class BButton;
 class BFilePanel;
+class BMenu;
 class BMenuField;
 class BPopUpMenu;
 class BTextView;
@@ -55,6 +56,15 @@ private:
 			void				_InitProfiles();
 
 			status_t			_GroupChanged(int32 index);
+
+			BString				_NamePlusSizeString(BString name,
+									size_t size, const char* format) const;
+			BMenuItem*			_AddInstallTypeMenuItem(BString baseName,
+									size_t size, int32 index) const;
+			BMenuItem*			_AddDestinationMenuItem(BString baseName,
+									size_t size, const char* path) const;
+			BMenuItem*			_AddMenuItem(const char* name,
+									BMessage* message, BMenu* menu) const;
 
 private:
 			BPopUpMenu*			fInstallTypes;

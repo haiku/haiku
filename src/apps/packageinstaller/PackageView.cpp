@@ -125,45 +125,42 @@ PackageView::AttachedToWindow()
 	fOpenPanel->SetTarget(BMessenger(this));
 	fInstallTypes->SetTargetForItems(this);
 
-	if (fInfo.InitCheck() == B_OK) {
-		// If the package is valid, we can set up the default group and all
-		// other things. If not, then the application will close just after
-		// attaching the view to the window
-		_GroupChanged(0);
+	if (ret != B_OK)
+		return;
 
-		fStatusWindow = new PackageStatus
-			(B_TRANSLATE("Installation progress"),
-			NULL, NULL, this);
+	// If the package is valid, we can set up the default group and all
+	// other things. If not, then the application will close just after
+	// attaching the view to the window
+	_GroupChanged(0);
 
-		// Show the splash screen, if present
-		BMallocIO *image = fInfo.GetSplashScreen();
-		if (image) {
-			PackageImageViewer *imageViewer = new PackageImageViewer(image);
-			imageViewer->Go();
-		}
+	fStatusWindow = new PackageStatus(B_TRANSLATE("Installation progress"),
+		NULL, NULL, this);
 
-		// Show the disclaimer/info text popup, if present
-		BString disclaimer = fInfo.GetDisclaimer();
-		if (disclaimer.Length() != 0) {
-			PackageTextViewer *text = new PackageTextViewer(
-				disclaimer.String());
-			int32 selection = text->Go();
-			// The user didn't accept our disclaimer, this means we cannot
-			// continue.
-			if (selection == 0) {
-				BWindow *parent = Window();
-				if (parent && parent->Lock())
-					parent->Quit();
-  			}
-		}
+	// Show the splash screen, if present
+	BMallocIO* image = fInfo.GetSplashScreen();
+	if (image != NULL) {
+		PackageImageViewer* imageViewer = new PackageImageViewer(image);
+		imageViewer->Go();
+	}
+
+	// Show the disclaimer/info text popup, if present
+	BString disclaimer = fInfo.GetDisclaimer();
+	if (disclaimer.Length() != 0) {
+		PackageTextViewer* text = new PackageTextViewer(
+			disclaimer.String());
+		int32 selection = text->Go();
+		// The user didn't accept our disclaimer, this means we cannot
+		// continue.
+		if (selection == 0)
+			parent->Quit();
 	}
 }
 
 
 void
-PackageView::MessageReceived(BMessage *msg)
+PackageView::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case P_MSG_INSTALL:
 		{
 			fInstall->SetEnabled(false);
@@ -177,7 +174,7 @@ PackageView::MessageReceived(BMessage *msg)
 		case P_MSG_PATH_CHANGED:
 		{
 			BString path;
-			if (msg->FindString("path", &path) == B_OK) {
+			if (message->FindString("path", &path) == B_OK) {
 				fCurrentPath.SetTo(path.String());
 			}
 			break;
@@ -188,7 +185,7 @@ PackageView::MessageReceived(BMessage *msg)
 		case P_MSG_GROUP_CHANGED:
 		{
 			int32 index;
-			if (msg->FindInt32("index", &index) == B_OK) {
+			if (message->FindInt32("index", &index) == B_OK) {
 				_GroupChanged(index);
 			}
 			break;
@@ -265,10 +262,10 @@ PackageView::MessageReceived(BMessage *msg)
 		case B_REFS_RECEIVED:
 		{
 			entry_ref ref;
-			if (msg->FindRef("refs", &ref) == B_OK) {
+			if (message->FindRef("refs", &ref) == B_OK) {
 				BPath path(&ref);
 
-				BMenuItem * item = fDestField->MenuItem();
+				BMenuItem* item = fDestField->MenuItem();
 				dev_t device = dev_for_path(path.Path());
 				BVolume volume(device);
 				if (volume.InitCheck() != B_OK)
@@ -288,27 +285,27 @@ PackageView::MessageReceived(BMessage *msg)
 			break;
 		}
 		case B_SIMPLE_DATA:
-			if (msg->WasDropped()) {
+			if (message->WasDropped()) {
 				uint32 type;
 				int32 count;
-				status_t ret = msg->GetInfo("refs", &type, &count);
+				status_t ret = message->GetInfo("refs", &type, &count);
 				// Check whether the message means someone dropped a file
 				// to our view
 				if (ret == B_OK && type == B_REF_TYPE) {
 					// If it is, send it along with the refs to the application
-					msg->what = B_REFS_RECEIVED;
-					be_app->PostMessage(msg);
+					message->what = B_REFS_RECEIVED;
+					be_app->PostMessage(message);
 				}
 			}
 		default:
-			BView::MessageReceived(msg);
+			BView::MessageReceived(message);
 			break;
 	}
 }
 
 
 int32
-PackageView::ItemExists(PackageItem &item, BPath &path, int32 &policy)
+PackageView::ItemExists(PackageItem& item, BPath& path, int32& policy)
 {
 	int32 choice = P_EXISTS_NONE;
 
@@ -382,10 +379,12 @@ PackageView::ItemExists(PackageItem &item, BPath &path, int32 &policy)
 				
 				BString actionString;
 				if (choice == P_EXISTS_OVERWRITE) {
-					alertString << B_TRANSLATE("All existing files will be replaced?");
+					alertString << B_TRANSLATE(
+						"All existing files will be replaced?");
 					actionString = B_TRANSLATE("Replace all");
 				} else {
-					alertString << B_TRANSLATE("All existing files will be skipped?");
+					alertString << B_TRANSLATE(
+						"All existing files will be skipped?");
 					actionString = B_TRANSLATE("Skip all");
 				}
 				alert = new BAlert("policy_decision", alertString.String(),
@@ -553,45 +552,23 @@ PackageView::_InitView()
 void
 PackageView::_InitProfiles()
 {
-	// Set all profiles
-	int i = 0, num = fInfo.GetProfileCount();
-	pkg_profile *prof;
-	BMenuItem *item = 0;
-	char sizeString[48];
-	BString name = "";
-	BMessage *message;
+	int count = fInfo.GetProfileCount();
 
-	if (num > 0) { // Add the default item
-		prof = fInfo.GetProfile(0);
-		convert_size(prof->space_needed, sizeString, 48);
-		char buffer[512];
-		snprintf(buffer, sizeof(buffer), "(%s)", sizeString);
-		name << prof->name << buffer;
-
-		message = new BMessage(P_MSG_GROUP_CHANGED);
-		message->AddInt32("index", 0);
-		item = new BMenuItem(name.String(), message);
-		fInstallTypes->AddItem(item);
+	if (count > 0) {
+		// Add the default item
+		pkg_profile* profile = fInfo.GetProfile(0);
+		BMenuItem* item = _AddInstallTypeMenuItem(profile->name,
+			profile->space_needed, 0);
 		item->SetMarked(true);
 		fCurrentType = 0;
 	}
 
-	for (i = 1; i < num; i++) {
-		prof = fInfo.GetProfile(i);
+	for (int i = 1; i < count; i++) {
+		pkg_profile* profile = fInfo.GetProfile(i);
 
-		if (prof) {
-			convert_size(prof->space_needed, sizeString, 48);
-			name = prof->name;
-			char buffer[512];
-			snprintf(buffer, sizeof(buffer), "(%s)", sizeString);
-			name << buffer;
-
-			message = new BMessage(P_MSG_GROUP_CHANGED);
-			message->AddInt32("index", i);
-			item = new BMenuItem(name.String(), message);
-			fInstallTypes->AddItem(item);
-		}
-		else
+		if (profile != NULL) {
+			_AddInstallTypeMenuItem(profile->name, profile->space_needed, i);
+		} else
 			fInstallTypes->AddSeparatorItem();
 	}
 }
@@ -603,118 +580,135 @@ PackageView::_GroupChanged(int32 index)
 	if (index < 0)
 		return B_ERROR;
 
-	BMenuItem *iter;
-	int32 i, num = fDestination->CountItems();
-
 	// Clear the choice list
-	for (i = 0;i < num;i++) {
-		iter = fDestination->RemoveItem((int32)0);
-		delete iter;
+	for (int32 i = fDestination->CountItems() - 1; i >= 0; i--) {
+		BMenuItem* item = fDestination->RemoveItem(i);
+		delete item;
 	}
 
 	fCurrentType = index;
-	pkg_profile *prof = fInfo.GetProfile(index);
-	BString test;
+	pkg_profile* profile = fInfo.GetProfile(index);
 	
-	if (prof) {
-		fInstallDesc->SetText(prof->description.String());
-		BMenuItem *item = 0;
-		BPath path;
-		BMessage *temp;
-		BVolume volume;
-		char buffer[512];
-		const char *tmp = B_TRANSLATE("(%s free)");
+	if (profile == NULL)
+		return B_ERROR;
 
-		if (prof->path_type == P_INSTALL_PATH) {
-			dev_t device;
-			BString name;
-			char sizeString[48];
+	fInstallDesc->SetText(profile->description.String());
+	
+	BPath path;
+	BVolume volume;
 
-			if (find_directory(B_BEOS_APPS_DIRECTORY, &path) == B_OK) {
-				device = dev_for_path(path.Path());
-				if (volume.SetTo(device) == B_OK && !volume.IsReadOnly()) {
-					temp = new BMessage(P_MSG_PATH_CHANGED);
-					temp->AddString("path", BString(path.Path()));
-
-					convert_size(volume.FreeBytes(), sizeString, 48);
-					name = path.Path();
-					snprintf(buffer, sizeof(buffer), tmp, sizeString);
-					name << buffer;
-					item = new BMenuItem(name.String(), temp);
-					item->SetTarget(this);
-					fDestination->AddItem(item);
-				}
+	if (profile->path_type == P_INSTALL_PATH) {
+		BMenuItem* item = NULL;
+		if (find_directory(B_BEOS_APPS_DIRECTORY, &path) == B_OK) {
+			dev_t device = dev_for_path(path.Path());
+			if (volume.SetTo(device) == B_OK && !volume.IsReadOnly()) {
+				item = _AddDestinationMenuItem(path.Path(), volume.FreeBytes(),
+					path.Path());
 			}
-			if (find_directory(B_APPS_DIRECTORY, &path) == B_OK) {
-				device = dev_for_path(path.Path());
-				if (volume.SetTo(device) == B_OK && !volume.IsReadOnly()) {
-					temp = new BMessage(P_MSG_PATH_CHANGED);
-					temp->AddString("path", BString(path.Path()));
+		}
+		if (find_directory(B_APPS_DIRECTORY, &path) == B_OK) {
+			dev_t device = dev_for_path(path.Path());
+			if (volume.SetTo(device) == B_OK && !volume.IsReadOnly()) {
+				item = _AddDestinationMenuItem(path.Path(),
+					volume.FreeBytes(), path.Path());
+			}
+		}
 
-					convert_size(volume.FreeBytes(), sizeString, 48);
-					char buffer[512];
-					snprintf(buffer, sizeof(buffer), tmp, sizeString);
-					name = path.Path();
-					name << buffer;
-					item = new BMenuItem(name.String(), temp);
-					item->SetTarget(this);
-					fDestination->AddItem(item);
-				}
+		if (item != NULL) {
+			item->SetMarked(true);
+			fCurrentPath.SetTo(path.Path());
+		}
+		fDestination->AddSeparatorItem();
+
+		_AddMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
+			new BMessage(P_MSG_OPEN_PANEL), fDestination);
+
+		fDestField->SetEnabled(true);
+	} else if (profile->path_type == P_USER_PATH) {
+		bool defaultPathSet = false;
+		BVolumeRoster roster;
+
+		while (roster.GetNextVolume(&volume) != B_BAD_VALUE) {
+			BDirectory mountPoint;
+			if (volume.IsReadOnly() || !volume.IsPersistent()
+				|| volume.GetRootDirectory(&mountPoint) != B_OK) {
+				continue;
 			}
 
-			if (item != NULL) {
+			if (path.SetTo(&mountPoint, NULL) != B_OK)
+				continue;
+
+			char volumeName[B_FILE_NAME_LENGTH];
+			volume.GetName(volumeName);
+	
+			BMenuItem* item = _AddDestinationMenuItem(volumeName,
+				volume.FreeBytes(), path.Path());
+
+			// The first volume becomes the default element
+			if (!defaultPathSet) {
 				item->SetMarked(true);
 				fCurrentPath.SetTo(path.Path());
+				defaultPathSet = true;
 			}
-			fDestination->AddSeparatorItem();
+		}
 
-			item = new BMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
-				new BMessage(P_MSG_OPEN_PANEL));
-			item->SetTarget(this);
-			fDestination->AddItem(item);
-
-			fDestField->SetEnabled(true);
-		} else if (prof->path_type == P_USER_PATH) {
-			BString name;
-			bool defaultPathSet = false;
-			char sizeString[48], volumeName[B_FILE_NAME_LENGTH];
-			BVolumeRoster roster;
-			BDirectory mountPoint;
-
-			while (roster.GetNextVolume(&volume) != B_BAD_VALUE) {
-				if (volume.IsReadOnly() || !volume.IsPersistent()
-					|| volume.GetRootDirectory(&mountPoint) != B_OK) {
-					continue;
-				}
-
-				if (path.SetTo(&mountPoint, NULL) != B_OK)
-					continue;
-
-				temp = new BMessage(P_MSG_PATH_CHANGED);
-				temp->AddString("path", BString(path.Path()));
-
-				convert_size(volume.FreeBytes(), sizeString, 48);
-				volume.GetName(volumeName);
-				name = volumeName;
-				snprintf(buffer, sizeof(buffer), tmp, sizeString);
-				name << buffer;
-				item = new BMenuItem(name.String(), temp);
-				item->SetTarget(this);
-				fDestination->AddItem(item);
-
-				// The first volume becomes the default element
-				if (!defaultPathSet) {
-					item->SetMarked(true);
-					fCurrentPath.SetTo(path.Path());
-					defaultPathSet = true;
-				}
-			}
-
-			fDestField->SetEnabled(true);
-		} else
-			fDestField->SetEnabled(false);
-	}
+		fDestField->SetEnabled(true);
+	} else
+		fDestField->SetEnabled(false);
 
 	return B_OK;
 }
 
+
+BString
+PackageView::_NamePlusSizeString(BString baseName, size_t size,
+	const char* format) const
+{
+	char sizeString[48];
+	convert_size(size, sizeString, sizeof(sizeString));
+
+	BString name(format);
+	name.ReplaceAll("%name%", baseName);
+	name.ReplaceAll("%size%", sizeString);
+
+	return name;
+}
+
+
+BMenuItem*
+PackageView::_AddInstallTypeMenuItem(BString baseName, size_t size,
+	int32 index) const
+{
+	BString name = _NamePlusSizeString(baseName, size,
+		B_TRANSLATE("%name% (%size%)"));
+
+	BMessage* message = new BMessage(P_MSG_GROUP_CHANGED);
+	message->AddInt32("index", index);
+
+	return _AddMenuItem(name, message, fInstallTypes);
+}
+
+
+BMenuItem*
+PackageView::_AddDestinationMenuItem(BString baseName, size_t size,
+	const char* path) const
+{
+	BString name = _NamePlusSizeString(baseName, size,
+		B_TRANSLATE("%name% (%size% free)"));
+
+	BMessage* message = new BMessage(P_MSG_PATH_CHANGED);
+	message->AddString("path", path);
+
+	return _AddMenuItem(name, message, fDestination);
+}
+
+
+BMenuItem*
+PackageView::_AddMenuItem(const char* name, BMessage* message,
+	BMenu* menu) const
+{
+	BMenuItem* item = new BMenuItem(name, message);
+	item->SetTarget(this);
+	menu->AddItem(item);
+	return item;
+}
