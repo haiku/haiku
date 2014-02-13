@@ -12,24 +12,21 @@
 static inline void
 memory_read_barrier_inline(void)
 {
-	// TODO Only ArmV7+?
-	asm volatile("dsb sy" : : : "memory");
+	__sync_synchronize();
 }
 
 
 static inline void
 memory_write_barrier_inline(void)
 {
-	// TODO Only ArmV7+?
-	asm volatile("dsb sy" : : : "memory");
+	__sync_synchronize();
 }
 
 
 static inline void
 memory_full_barrier_inline(void)
 {
-	// TODO Only ArmV7+?
-	asm volatile("dsb sy" : : : "memory");
+	__sync_synchronize();
 }
 
 
