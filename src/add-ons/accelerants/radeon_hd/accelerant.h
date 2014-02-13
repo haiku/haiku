@@ -24,7 +24,8 @@
 
 #define MAX_DISPLAY 2
 	// Maximum displays (more then two requires AtomBIOS)
-
+#define MAX_GPIO_PINS   64
+	// Maximum possible GPIO pins in gGPIOInfo
 
 struct gpu_state {
 	uint32 d1vgaControl;
@@ -193,7 +194,7 @@ extern accelerant_info* gInfo;
 extern atom_context* gAtomContext;
 extern display_info* gDisplay[MAX_DISPLAY];
 extern connector_info* gConnector[ATOM_MAX_SUPPORTED_DEVICE];
-extern gpio_info* gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
+extern gpio_info* gGPIOInfo[MAX_GPIO_PINS];
 
 
 // register access

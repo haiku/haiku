@@ -43,7 +43,7 @@
 struct accelerant_info* gInfo;
 display_info* gDisplay[MAX_DISPLAY];
 connector_info* gConnector[ATOM_MAX_SUPPORTED_DEVICE];
-gpio_info* gGPIOInfo[ATOM_MAX_SUPPORTED_DEVICE];
+gpio_info* gGPIOInfo[MAX_GPIO_PINS];
 
 
 class AreaCloner {

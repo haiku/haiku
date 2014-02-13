@@ -249,7 +249,7 @@ static status_t
 connector_attach_gpio_i2c(uint32 connectorIndex, uint8 hwPin)
 {
 	gConnector[connectorIndex]->i2cPinIndex = 0;
-	for (uint32 i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
+	for (uint32 i = 0; i < MAX_GPIO_PINS; i++) {
 		if (gGPIOInfo[i]->hwPin != hwPin)
 			continue;
 		gConnector[connectorIndex]->i2cPinIndex = i;
@@ -268,7 +268,7 @@ connector_attach_gpio_hpd(uint32 connectorIndex, uint8 hwPin)
 {
     gConnector[connectorIndex]->hpdPinIndex = 0;
 
-    for (uint32 i = 0; i < ATOM_MAX_SUPPORTED_DEVICE; i++) {
+    for (uint32 i = 0; i < MAX_GPIO_PINS; i++) {
         if (gGPIOInfo[i]->hwPin != hwPin)
             continue;
         gConnector[connectorIndex]->hpdPinIndex = i;
@@ -302,11 +302,15 @@ gpio_general_populate()
 		sizeof(ATOM_GPIO_PIN_ASSIGNMENT);
 	
 	// Find the next available GPIO pin index
-	uint32 gpioIndex;
-	for(gpioIndex = 0; gpioIndex < ATOM_MAX_SUPPORTED_DEVICE; gpioIndex++) {
-		if (!gGPIOInfo[gpioIndex]->valid)
+	int32 gpioIndex = -1;
+	for(int32 pin = 0; pin < MAX_GPIO_PINS; pin++) {
+		if (!gGPIOInfo[pin]->valid) {
+			gpioIndex = pin;
 			break;
+		}
 	}
+	if (gpioIndex < 0)
+		ERROR("%s: ERROR: Out of space for additional GPIO pins!\n", __func__);
 
 	ATOM_GPIO_PIN_ASSIGNMENT* pin = gpioInfo->asGPIO_Pin;
 	for (int i = 0; i < numIndices; i++) {
@@ -325,7 +329,7 @@ gpio_general_populate()
 		pin = (ATOM_GPIO_PIN_ASSIGNMENT*)((uint8*)pin
 			+ sizeof(ATOM_GPIO_PIN_ASSIGNMENT));
 
-		TRACE("%s: general GPIO @ %" B_PRIu32 ", valid: %s, "
+		TRACE("%s: general GPIO @ %" B_PRId32 ", valid: %s, "
 			"hwPin: 0x%" B_PRIX32 "\n", __func__, gpioIndex,
 			gGPIOInfo[gpioIndex]->valid ? "true" : "false",
 			gGPIOInfo[gpioIndex]->hwPin);
@@ -366,11 +370,15 @@ gpio_i2c_populate()
 	}
 
 	// Find the next available GPIO pin index
-	uint32 gpioIndex;
-	for(gpioIndex = 0; gpioIndex < ATOM_MAX_SUPPORTED_DEVICE; gpioIndex++) {
-		if (!gGPIOInfo[gpioIndex]->valid)
+	int32 gpioIndex = -1;
+	for(int32 pin = 0; pin < MAX_GPIO_PINS; pin++) {
+		if (!gGPIOInfo[pin]->valid) {
+			gpioIndex = pin;
 			break;
+		}
 	}
+	if (gpioIndex < 0)
+		ERROR("%s: ERROR: Out of space for additional GPIO pins!\n", __func__);
 
 	for (uint32 i = 0; i < numIndices; i++) {
 		if (gGPIOInfo[gpioIndex]->valid) {
