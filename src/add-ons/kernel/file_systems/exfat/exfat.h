@@ -92,9 +92,9 @@ struct exfat_super_block {
 #define EXFAT_CLUSTER_END				0xffffffff
 #define EXFAT_ENTRY_ATTRIB_SUBDIR		0x10
 
-#define EXFAT_ENTRY_FLAG_CONTIGUOUS	0x3
+#define EXFAT_ENTRY_FLAG_CONTIGUOUS		0x3
 
-#define EXFAT_FILENAME_MAX_LENGTH	512
+#define EXFAT_FILENAME_MAX_LENGTH		512
 
 
 struct exfat_entry {

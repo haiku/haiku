@@ -401,7 +401,7 @@ exfat_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	}
 
 	TRACE("exfat_lookup: ID %" B_PRIdINO "\n", *_vnodeID);
-	
+
 	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
 }
 
@@ -570,7 +570,7 @@ exfat_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	TRACE("exfat_read_dir\n");
 	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
 	Volume* volume = (Volume*)_volume->private_volume;
-	
+
 	uint32 maxCount = *_num;
 	uint32 count = 0;
 

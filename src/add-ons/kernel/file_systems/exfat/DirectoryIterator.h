@@ -1,6 +1,12 @@
 /*
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
- * This file may be used under the terms of the MIT License.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval, korli@users.berlios.de
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef DIRECTORYITERATOR_H
 #define DIRECTORYITERATOR_H
@@ -46,8 +52,8 @@ public:
 
 			void				Iterate(EntryVisitor &visitor);
 private:
-			status_t			_GetNext(uchar* unicodename,
-									size_t* _nameLength, ino_t* _id,
+			status_t			_GetNext(uint16* unicodeName,
+									size_t* _codeUnitCount, ino_t* _id,
 									EntryVisitor* visitor = NULL);
 			status_t			_NextEntry();
 

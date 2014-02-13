@@ -18,7 +18,7 @@
 
 #include <Errors.h>
 
-#include "encodings.h"
+#include "convertutf.h"
 
 
 status_t
@@ -30,11 +30,10 @@ get_volume_name(struct exfat_entry* entry, char* name, size_t length)
 	if (entry->type == EXFAT_ENTRY_TYPE_NOT_IN_USE)
 		name = "";
 	else if (entry->type == EXFAT_ENTRY_TYPE_LABEL) {
-		status_t result
-			= unicode_to_utf8((const uchar*)entry->volume_label.name,
-				entry->volume_label.length * 2, (uint8*)name, &length);
-		if (result != B_OK)
-			return result;
+		ssize_t utf8Length = utf16le_to_utf8(entry->volume_label.name,
+			entry->volume_label.length, name, length);
+		if (utf8Length < 0)
+			return (status_t)utf8Length;
 	} else
 		return B_NAME_NOT_FOUND;
 

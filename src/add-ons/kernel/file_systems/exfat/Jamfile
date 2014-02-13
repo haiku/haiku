@@ -7,7 +7,6 @@ UsePrivateKernelHeaders ;
 KernelAddon exfat :
 	DataStream.cpp
 	DirectoryIterator.cpp
-	encodings.cpp
 	Inode.cpp
 	kernel_interface.cpp
 	Utility.cpp

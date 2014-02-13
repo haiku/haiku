@@ -339,7 +339,8 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (status != B_OK)
 		return status;
 
-	off_t partitionSize = (off_t)fSuperBlock.NumBlocks() << fSuperBlock.BlockShift();
+	off_t partitionSize = (off_t)fSuperBlock.NumBlocks()
+		<< fSuperBlock.BlockShift();
 	if (deviceSize < partitionSize)
 		return B_BAD_VALUE;
 

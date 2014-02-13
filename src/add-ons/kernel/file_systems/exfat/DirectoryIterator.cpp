@@ -1,12 +1,21 @@
 /*
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
- * This file may be used under the terms of the MIT License.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval, korli@users.berlios.de
+ *		John Scipione, jscipione@gmail.com
  */
 
 
 #include "DirectoryIterator.h"
 
-#include "encodings.h"
+#include <stdlib.h>
+
+#include "convertutf.h"
+
 #include "Inode.h"
 
 
@@ -16,7 +25,11 @@
 #else
 #	define TRACE(x...) ;
 #endif
-#	define ERROR(x...) dprintf("\33[34mexfat:\33[0m " x)
+
+#define ERROR(x...) dprintf("\33[34mexfat:\33[0m " x)
+
+
+//	#pragma mark - DirectoryIterator
 
 
 DirectoryIterator::DirectoryIterator(Inode* inode)
@@ -49,37 +62,55 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id,
 {
 	if (fCluster == EXFAT_CLUSTER_END)
 		return B_ENTRY_NOT_FOUND;
+
 	if (fOffset == -2) {
 		if (*_nameLength < 3)
 			return B_BUFFER_OVERFLOW;
+
 		*_nameLength = 2;
 		strlcpy(name, "..", *_nameLength + 1);
 		if (fInode->ID() == 1)
 			*_id = fInode->ID();
 		else
 			*_id = fInode->Parent();
+
 		fOffset = -1;
-		TRACE("DirectoryIterator::GetNext() found ..\n");
+		TRACE("DirectoryIterator::GetNext() found \"..\"\n");
+
 		return B_OK;
 	} else if (fOffset == -1) {
 		if (*_nameLength < 2)
 			return B_BUFFER_OVERFLOW;
+
 		*_nameLength = 1;
 		strlcpy(name, ".", *_nameLength + 1);
 		*_id = fInode->ID();
 		fOffset = 0;
-		TRACE("DirectoryIterator::GetNext() found .\n");
+		TRACE("DirectoryIterator::GetNext() found \".\"\n");
+
 		return B_OK;
 	}
 
-	uchar unicodeName[EXFAT_FILENAME_MAX_LENGTH + 1];
-	size_t nameLength = EXFAT_FILENAME_MAX_LENGTH;
-	status_t status = _GetNext(unicodeName, &nameLength, _id, visitor);
-	if (status == B_OK && name != NULL) {
-		status = unicode_to_utf8(unicodeName, nameLength, (uint8 *)name,
-			_nameLength);
-		TRACE("DirectoryIterator::GetNext() %" B_PRIu32 " %s, %" B_PRIdINO "\n", 
-			fInode->Cluster(), name, *_id);
+	size_t utf16CodeUnitCount = EXFAT_FILENAME_MAX_LENGTH / sizeof(uint16);
+	uint16 utf16Name[utf16CodeUnitCount];
+	status_t status = _GetNext(utf16Name, &utf16CodeUnitCount, _id, visitor);
+	if (status == B_OK && utf16CodeUnitCount > 0) {
+		ssize_t lengthOrStatus = utf16le_to_utf8(utf16Name, utf16CodeUnitCount,
+			name, *_nameLength);
+		if (lengthOrStatus < 0) {
+			status = (status_t)lengthOrStatus;
+			if (status == B_NAME_TOO_LONG)
+				*_nameLength = strlen(name);
+		} else
+			*_nameLength = (size_t)lengthOrStatus;
+	}
+
+	if (status == B_OK) {
+		TRACE("DirectoryIterator::GetNext() cluster: %" B_PRIu32 " id: "
+			"%" B_PRIdINO " name: \"%s\", length: %zu\n", fInode->Cluster(),
+			*_id, name, *_nameLength);
+	} else if (status != B_ENTRY_NOT_FOUND) {
+		ERROR("DirectoryIterator::GetNext() (%s)\n", strerror(status));
 	}
 
 	return status;
@@ -97,26 +128,26 @@ DirectoryIterator::Lookup(const char* name, size_t nameLength, ino_t* _id)
 			*_id = fInode->ID();
 		else
 			*_id = fInode->Parent();
+
 		return B_OK;
 	}
 
 	Rewind();
 	fOffset = 0;
 
-	uchar currentName[EXFAT_FILENAME_MAX_LENGTH + 1];
-	size_t currentLength = EXFAT_FILENAME_MAX_LENGTH;
-	while (_GetNext((uchar*)currentName, &currentLength, _id) == B_OK) {
-		char utfName[EXFAT_FILENAME_MAX_LENGTH];
-		size_t utfLength = EXFAT_FILENAME_MAX_LENGTH;
-		unicode_to_utf8(currentName, currentLength, (uint8*)utfName,
-			&utfLength);
-		if (nameLength == utfLength
-			&& strncmp(utfName, name, nameLength) == 0) {
+	size_t utf16CodeUnitCount = EXFAT_FILENAME_MAX_LENGTH / sizeof(uint16);
+	uint16 utf16Name[utf16CodeUnitCount];
+	while (_GetNext(utf16Name, &utf16CodeUnitCount, _id) == B_OK) {
+		char utf8Name[nameLength + 1];
+		ssize_t lengthOrStatus = utf16le_to_utf8(utf16Name, utf16CodeUnitCount,
+			utf8Name, sizeof(utf8Name));
+		if (lengthOrStatus > 0 && (size_t)lengthOrStatus == nameLength
+			&& strncmp(utf8Name, name, nameLength) == 0) {
 			TRACE("DirectoryIterator::Lookup() found ID %" B_PRIdINO "\n",
 				*_id);
 			return B_OK;
 		}
-		currentLength = EXFAT_FILENAME_MAX_LENGTH;
+		utf16CodeUnitCount = EXFAT_FILENAME_MAX_LENGTH / sizeof(uint16);
 	}
 
 	TRACE("DirectoryIterator::Lookup() not found %s\n", name);
@@ -131,9 +162,9 @@ DirectoryIterator::LookupEntry(EntryVisitor* visitor)
 	fCluster = fInode->Cluster();
 	fOffset = fInode->Offset();
 
-	uchar unicodeName[EXFAT_FILENAME_MAX_LENGTH + 1];
-	size_t nameLength = EXFAT_FILENAME_MAX_LENGTH;
-	return _GetNext(unicodeName, &nameLength, NULL, visitor);
+	size_t utf16CodeUnitCount = EXFAT_FILENAME_MAX_LENGTH / sizeof(uint16);
+	uint16 utf16Name[utf16CodeUnitCount];
+	return _GetNext(utf16Name, &utf16CodeUnitCount, NULL, visitor);
 }
 
 
@@ -151,7 +182,7 @@ DirectoryIterator::Iterate(EntryVisitor &visitor)
 {
 	fOffset = 0;
 	fCluster = fInode->StartCluster();
-	
+
 	while (_NextEntry() != B_ENTRY_NOT_FOUND) {
 		switch (fCurrent->type) {
 			case EXFAT_ENTRY_TYPE_BITMAP:
@@ -178,13 +209,14 @@ DirectoryIterator::Iterate(EntryVisitor &visitor)
 
 
 status_t
-DirectoryIterator::_GetNext(uchar* name, size_t* _nameLength, ino_t* _id,
-	EntryVisitor* visitor)
+DirectoryIterator::_GetNext(uint16* utf16Name, size_t* _codeUnitCount,
+	ino_t* _id, EntryVisitor* visitor)
 {
-	size_t nameMax = *_nameLength;
+	size_t nameMax = *_codeUnitCount;
 	size_t nameIndex = 0;
 	status_t status;
 	int32 chunkCount = 1;
+
 	while ((status = _NextEntry()) == B_OK) {
 		TRACE("DirectoryIterator::_GetNext() %" B_PRIu32 "/%p, type 0x%x, "
 			"offset %" B_PRId64 "\n", fInode->Cluster(), fCurrent,
@@ -195,24 +227,24 @@ DirectoryIterator::_GetNext(uchar* name, size_t* _nameLength, ino_t* _id,
 				*_id = fInode->GetVolume()->GetIno(fCluster, fOffset - 1,
 					fInode->ID());
 			}
-			if (visitor != NULL)
-				visitor->VisitFile(fCurrent);
 			TRACE("DirectoryIterator::_GetNext() File chunkCount %" B_PRId32
 				"\n", chunkCount);
+			if (visitor != NULL)
+				visitor->VisitFile(fCurrent);
 		} else if (fCurrent->type == EXFAT_ENTRY_TYPE_FILEINFO) {
 			chunkCount--;
-			TRACE("DirectoryIterator::_GetNext() Filename length %d\n",
-				fCurrent->file_info.name_length);
-			*_nameLength = fCurrent->file_info.name_length * 2;
+			*_codeUnitCount = (size_t)fCurrent->file_info.name_length;
+			TRACE("DirectoryIterator::_GetNext() Filename chunk: %" B_PRId32
+				", code unit count: %" B_PRIu8 "\n", chunkCount, *_codeUnitCount);
 			if (visitor != NULL)
 				visitor->VisitFileInfo(fCurrent);
 		} else if (fCurrent->type == EXFAT_ENTRY_TYPE_FILENAME) {
-			TRACE("DirectoryIterator::_GetNext() Filename\n");
-			memcpy((uint8*)name + nameIndex, fCurrent->file_name.name,
-				sizeof(fCurrent->file_name.name));
-			nameIndex += sizeof(fCurrent->file_name.name);
-			name[nameIndex] = '\0';
 			chunkCount--;
+			size_t utf16Length = sizeof(fCurrent->file_name.name);
+			memcpy(utf16Name + nameIndex, fCurrent->file_name.name, utf16Length);
+			nameIndex += utf16Length / sizeof(uint16);
+			TRACE("DirectoryIterator::_GetNext() Filename index: %zu\n",
+				nameIndex);
 			if (visitor != NULL)
 				visitor->VisitFilename(fCurrent);
 		}
@@ -221,16 +253,18 @@ DirectoryIterator::_GetNext(uchar* name, size_t* _nameLength, ino_t* _id,
 			break;
 	}
 
-	if (status == B_OK) {
-		//*_nameLength = nameIndex;
 #ifdef TRACE_EXFAT
-		char utfName[EXFAT_FILENAME_MAX_LENGTH];
-		size_t utfLen = EXFAT_FILENAME_MAX_LENGTH;
-		unicode_to_utf8(name, nameIndex, (uint8*)utfName, &utfLen);
-		TRACE("DirectoryIterator::_GetNext() Found %s %ld\n", utfName,
-			*_nameLength);
-#endif
+	if (status == B_OK) {
+		size_t utf8Length = B_FILE_NAME_LENGTH * 4;
+		char utf8Name[utf8Length + 1];
+		ssize_t length = utf16le_to_utf8(utf16Name, *_codeUnitCount, utf8Name,
+			utf8Length);
+		if (length > 0) {
+			TRACE("DirectoryIterator::_GetNext() found name: \"%s\", "
+				"length: %d\n", utf8Name, length);
+		}
 	}
+#endif
 
 	return status;
 }
@@ -248,20 +282,22 @@ DirectoryIterator::_NextEntry()
 			block);
 		fCurrent = (struct exfat_entry*)fBlock.SetTo(block)
 			+ fOffset % fInode->GetVolume()->EntriesPerBlock();
-	} else if ((fOffset % fInode->GetVolume()->EntriesPerBlock()) == 0) {	
+	} else if ((fOffset % fInode->GetVolume()->EntriesPerBlock()) == 0) {
 		fsblock_t block;
 		if ((fOffset % fInode->GetVolume()->EntriesPerCluster()) == 0) {
 			fCluster = fInode->NextCluster(fCluster);
 			if (fCluster == EXFAT_CLUSTER_END)
 				return B_ENTRY_NOT_FOUND;
+
 			fInode->GetVolume()->ClusterToBlock(fCluster, block);
 		} else
 			block = fBlock.BlockNumber() + 1;
+
 		TRACE("DirectoryIterator::_NextEntry() block %" B_PRIu64 "\n", block);
 		fCurrent = (struct exfat_entry*)fBlock.SetTo(block);
 	} else
 		fCurrent++;
-	fOffset++;
 
+	fOffset++;
 	return fCurrent->type == 0 ? B_ENTRY_NOT_FOUND : B_OK;
 }
