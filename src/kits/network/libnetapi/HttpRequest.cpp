@@ -652,7 +652,7 @@ BHttpRequest::_MakeRequest()
 					} else {
 						// Format of a chunk header:
 						// <chunk size in hex>[; optional data]
-						int32 semiColonIndex = chunkHeader.FindFirst(";", 0);
+						int32 semiColonIndex = chunkHeader.FindFirst(';', 0);
 
 						// Cut-off optional data if present
 						if (semiColonIndex != -1) {
@@ -670,8 +670,7 @@ BHttpRequest::_MakeRequest()
 					}
 				}
 
-				// A chunk of 0 bytes indicates the end of the chunked
-				// transfer
+				// A chunk of 0 bytes indicates the end of the chunked transfer
 				if (bytesRead == 0)
 					receiveEnd = true;
 			} else {
@@ -719,7 +718,7 @@ BHttpRequest::_MakeRequest()
 					if (decompress) {
 						decompressor.Finish();
 						ssize_t size = decompressorStorage.Size();
-						char buffer[size];
+						BStackOrHeapArray<char, 4096> buffer(size);
 						size = decompressorStorage.Read(buffer, size);
 						if (fListener != NULL && size > 0) {
 							fListener->DataReceived(this, buffer, size);
