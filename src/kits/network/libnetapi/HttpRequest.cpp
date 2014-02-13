@@ -23,6 +23,7 @@
 #include <File.h>
 #include <Socket.h>
 #include <SecureSocket.h>
+#include <StackOrHeapArray.h>
 #include <ZlibDecompressor.h>
 
 
@@ -699,7 +700,7 @@ BHttpRequest::_MakeRequest()
 						decompressor.DecompressNext(inputTempBuffer,
 							bytesRead);
 						ssize_t size = decompressorStorage.Size();
-						char buffer[size];
+						BStackOrHeapArray<char, 4096> buffer(size);
 						size = decompressorStorage.Read(buffer, size);
 						if (size > 0) {
 							fListener->DataReceived(this, buffer, size);
@@ -720,7 +721,7 @@ BHttpRequest::_MakeRequest()
 						ssize_t size = decompressorStorage.Size();
 						char buffer[size];
 						size = decompressorStorage.Read(buffer, size);
-						if (size > 0) {
+						if (fListener != NULL && size > 0) {
 							fListener->DataReceived(this, buffer, size);
 						}
 					}
