@@ -14,11 +14,13 @@
 
 #include <heap.h>
 
+#include <smp.h>
+
 
 struct ARMPagingStructures : DeferredDeletable {
 	uint32						pgdir_phys;
 	int32						ref_count;
-	vint32						active_on_cpus;
+	CPUSet						active_on_cpus;
 		// mask indicating on which CPUs the map is currently used
 
 								ARMPagingStructures();

@@ -112,7 +112,7 @@ private:
 			struct page_slot {
 				PhysicalPageSlot*	slot;
 				phys_addr_t			physicalAddress;
-				cpu_mask_t			valid;
+				CPUSet				valid;
 			};
 
 			page_slot			fSlots[SLOTS_PER_TRANSLATION_MAP];
@@ -174,7 +174,7 @@ private:
 			PhysicalPageSlot* fDebugSlot;
 			PhysicalPageSlotPool* fInitialPool;
 			LargeMemoryTranslationMapPhysicalPageMapper	fKernelMapper;
-			PhysicalPageOpsCPUData fPerCPUData[B_MAX_CPU_COUNT];
+			PhysicalPageOpsCPUData fPerCPUData[SMP_MAX_CPUS];
 };
 
 static LargeMemoryPhysicalPageMapper sPhysicalPageMapper;
@@ -396,11 +396,11 @@ LargeMemoryTranslationMapPhysicalPageMapper::GetPageTableAt(
 		page_slot& slot = fSlots[i];
 		if (slot.physicalAddress == physicalAddress) {
 			fNextSlot = (i + 1) & (fSlotCount - 1);
-			if ((slot.valid & (1 << currentCPU)) == 0) {
+			if (!slot.valid.GetBit(currentCPU)) {
 				// not valid on this CPU -- invalidate the TLB entry
 				arch_cpu_invalidate_TLB_range(slot.slot->address,
 					slot.slot->address + B_PAGE_SIZE);
-				slot.valid |= 1 << currentCPU;
+				slot.valid.SetBit(currentCPU);
 			}
 			return (void*)slot.slot->address + off;
 		}
@@ -412,7 +412,8 @@ LargeMemoryTranslationMapPhysicalPageMapper::GetPageTableAt(
 
 	slot.physicalAddress = physicalAddress;
 	slot.slot->Map(physicalAddress);
-	slot.valid = 1 << currentCPU;
+	slot.valid.ClearAll();
+	slot.valid.SetBit(currentCPU);
 
 	return (void*)slot.slot->address + off;
 }
