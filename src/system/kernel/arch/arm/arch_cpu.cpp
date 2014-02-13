@@ -77,14 +77,6 @@ arch_cpu_init_post_modules(kernel_args *args)
 }
 
 
-void
-arch_cpu_idle(void)
-{
-	uint32 Rd = 0;
-	asm volatile("mcr p15, 0, %[c7format], c7, c0, 4" : : [c7format] "r" (Rd) );
-}
-
-
 status_t
 arch_cpu_shutdown(bool reboot)
 {

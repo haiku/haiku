@@ -75,6 +75,23 @@ extern addr_t arm_get_fp(void);
 extern int mmu_read_c1(void);
 extern int mmu_write_c1(int val);
 
+
+static inline void
+arch_cpu_pause(void)
+{
+	// TODO: ARM Priority pause call
+}
+
+
+static inline void
+arch_cpu_idle(void)
+{
+	uint32 Rd = 0;
+	asm volatile("mcr p15, 0, %[c7format], c7, c0, 4"
+		: : [c7format] "r" (Rd) );
+}
+
+
 #ifdef __cplusplus
 };
 #endif
