@@ -134,6 +134,8 @@ static const char* const PREF_ROWS = "Rows";
 static const char* const PREF_TEXT_ENCODING = "Text encoding";
 
 static const char* const PREF_BLINK_CURSOR = "Blinking cursor";
+static const char* const PREF_BRIGHT_INSTEAD_OF_BOLD =
+	"Bright instead of bold text";
 static const char* const PREF_WARN_ON_EXIT = "Warn on exit";
 static const char* const PREF_CURSOR_STYLE = "Cursor style";
 static const char* const PREF_EMULATE_BOLD = "Emulate bold";

@@ -86,6 +86,10 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		B_TRANSLATE("Blinking cursor"),
 			new BMessage(MSG_BLINK_CURSOR_CHANGED));
 
+	fBrightInsteadOfBold = new BCheckBox(
+		B_TRANSLATE("Use bright instead of bold text"),
+			new BMessage(MSG_BRIGHT_INSTEAD_OF_BOLD_CHANGED));
+
 	fWarnOnExit = new BCheckBox(
 		B_TRANSLATE("Confirm exit if active programs exist"),
 			new BMessage(MSG_WARN_ON_EXIT_CHANGED));
@@ -139,6 +143,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		.Add(fColorControl = new BColorControl(BPoint(10, 10),
 			B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
 		.Add(fBlinkCursor)
+		.Add(fBrightInsteadOfBold)
 		.Add(fWarnOnExit);
 
 	fTabTitle->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
@@ -154,6 +159,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
 
 	fBlinkCursor->SetValue(PrefHandler::Default()->getBool(PREF_BLINK_CURSOR));
+	fBrightInsteadOfBold->SetValue(PrefHandler::Default()->getBool(
+		PREF_BRIGHT_INSTEAD_OF_BOLD));
 	fWarnOnExit->SetValue(PrefHandler::Default()->getBool(PREF_WARN_ON_EXIT));
 
 	BTextControl* redInput = (BTextControl*)fColorControl->ChildAt(0);
@@ -206,6 +213,7 @@ AppearancePrefView::AttachedToWindow()
 	fTabTitle->SetTarget(this);
 	fWindowTitle->SetTarget(this);
 	fBlinkCursor->SetTarget(this);
+	fBrightInsteadOfBold->SetTarget(this);
 	fWarnOnExit->SetTarget(this);
 
 	fFontField->Menu()->SetTargetForItems(this);
@@ -317,6 +325,15 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 				!= fBlinkCursor->Value()) {
 					PrefHandler::Default()->setBool(PREF_BLINK_CURSOR,
 						fBlinkCursor->Value());
+					modified = true;
+			}
+			break;
+
+		case MSG_BRIGHT_INSTEAD_OF_BOLD_CHANGED:
+			if (PrefHandler::Default()->getBool(PREF_BRIGHT_INSTEAD_OF_BOLD)
+				!= fBrightInsteadOfBold->Value()) {
+					PrefHandler::Default()->setBool(PREF_BRIGHT_INSTEAD_OF_BOLD,
+						fBrightInsteadOfBold->Value());
 					modified = true;
 			}
 			break;
