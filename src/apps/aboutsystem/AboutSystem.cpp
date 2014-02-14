@@ -1056,6 +1056,7 @@ AboutView::_CreateCreditsView()
 		"Joseph R. Prostko\n"
 		"François Revol\n"
 		"Philippe Saint-Pierre\n"
+		"Jonathan Schleifer\n"
 		"John Scipione\n"
 		"Alex Smith\n"
 		"Oliver Tappe\n"
