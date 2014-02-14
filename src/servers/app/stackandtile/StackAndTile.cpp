@@ -29,6 +29,9 @@ static const int32 kUpArrowKey		= 0x57;
 static const int32 kRightArrowKey	= 0x63;
 static const int32 kDownArrowKey	= 0x62;
 
+static const int32 kModifiers = B_SHIFT_KEY | B_COMMAND_KEY
+	| B_CONTROL_KEY | B_OPTION_KEY | B_MENU_KEY;
+
 
 using namespace std;
 
@@ -135,7 +138,7 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 		// switch to and from stacking and snapping mode
 		bool wasPressed = fSATKeyPressed;
 		fSATKeyPressed = (what == B_MODIFIERS_CHANGED
-				&& (modifiers & 0xff) == B_OPTION_KEY)
+				&& (modifiers & kModifiers) == B_OPTION_KEY)
 			|| (what == B_UNMAPPED_KEY_DOWN && key == kRightOptionKey);
 		if (wasPressed && !fSATKeyPressed)
 			_StopSAT();
