@@ -19,6 +19,13 @@ atomic_set(int32 *value, int32 newValue)
 
 
 int32
+atomic_get_and_set(int32 *value, int32 newValue)
+{
+	return _kern_atomic_get_and_set(value, newValue);
+}
+
+
+int32
 atomic_test_and_set(int32 *value, int32 newValue, int32 testAgainst)
 {
 	return _kern_atomic_test_and_set(value, newValue, testAgainst);

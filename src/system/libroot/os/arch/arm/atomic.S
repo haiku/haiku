@@ -49,15 +49,22 @@ miss3:	       	ldrex       r12, [r0]
 	        bx	lr
 FUNCTION_END(atomic_or)
 
-/* int atomic_set(int *value, int setTo)
+/* void atomic_set(int *value, int setTo)
  */
 FUNCTION(atomic_set):
+		str	r1, [r0]
+		bx	lr
+FUNCTION_END(atomic_set)
+
+/* int atomic_get_and_set(int *value, int setTo)
+ */
+FUNCTION(atomic_get_and_set):
 miss4:		ldrex   r12, [r0]
        		strex   r3, r1, [r0]
        		teq     r3, #0
        		bne     miss4
 	        bx  lr
-FUNCTION_END(atomic_set)
+FUNCTION_END(atomic_get_and_set)
 
 /* int atomic_test_and_set(int *value, int setTo, int testValue) 
  */

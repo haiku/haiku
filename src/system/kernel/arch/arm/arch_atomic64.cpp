@@ -30,8 +30,17 @@
 static spinlock atomic_lock = B_SPINLOCK_INITIALIZER;
 
 
+void
+atomic_set64(int64 *value, int64 newValue)
+{
+	SpinLocker locker(&atomic_lock);
+
+	*value = newValue;
+}
+
+
 int64
-atomic_set64(vint64 *value, int64 newValue)
+atomic_get_and_set64(int64 *value, int64 newValue)
 {
 	SpinLocker locker(&atomic_lock);
 
@@ -42,7 +51,7 @@ atomic_set64(vint64 *value, int64 newValue)
 
 
 int64
-atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
+atomic_test_and_set64(int64 *value, int64 newValue, int64 testAgainst)
 {
 	SpinLocker locker(&atomic_lock);
 
@@ -54,7 +63,7 @@ atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
 
 
 int64
-atomic_add64(vint64 *value, int64 addValue)
+atomic_add64(int64 *value, int64 addValue)
 {
 	SpinLocker locker(&atomic_lock);
 
@@ -65,7 +74,7 @@ atomic_add64(vint64 *value, int64 addValue)
 
 
 int64
-atomic_and64(vint64 *value, int64 andValue)
+atomic_and64(int64 *value, int64 andValue)
 {
 	SpinLocker locker(&atomic_lock);
 
@@ -76,7 +85,7 @@ atomic_and64(vint64 *value, int64 andValue)
 
 
 int64
-atomic_or64(vint64 *value, int64 orValue)
+atomic_or64(int64 *value, int64 orValue)
 {
 	SpinLocker locker(&atomic_lock);
 
@@ -87,7 +96,7 @@ atomic_or64(vint64 *value, int64 orValue)
 
 
 int64
-atomic_get64(vint64 *value)
+atomic_get64(int64 *value)
 {
 	SpinLocker locker(&atomic_lock);
 	return *value;
@@ -95,11 +104,11 @@ atomic_get64(vint64 *value)
 
 
 int64
-_user_atomic_set64(vint64 *value, int64 newValue)
+_user_atomic_get_and_set64(int64 *value, int64 newValue)
 {
 	if (IS_USER_ADDRESS(value)
 		&& lock_memory((void *)value, sizeof(int64), B_READ_DEVICE) == B_OK) {
-		int64 oldValue = atomic_set64(value, newValue);
+		int64 oldValue = atomic_get_and_set64(value, newValue);
 		unlock_memory((void *)value, sizeof(int64), B_READ_DEVICE);
 		return oldValue;
 	}
@@ -110,8 +119,24 @@ access_violation:
 }
 
 
+void
+_user_atomic_set64(int64 *value, int64 newValue)
+{
+	if (IS_USER_ADDRESS(value)
+		&& lock_memory((void *)value, sizeof(int64), B_READ_DEVICE) == B_OK) {
+		atomic_set64(value, newValue);
+		unlock_memory((void *)value, sizeof(int64), B_READ_DEVICE);
+		return;
+	}
+
+access_violation:
+	// XXX kill application
+	return;
+}
+
+
 int64
-_user_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
+_user_atomic_test_and_set64(int64 *value, int64 newValue, int64 testAgainst)
 {
 	if (IS_USER_ADDRESS(value)
 		&& lock_memory((void *)value, sizeof(int64), B_READ_DEVICE) == B_OK) {
@@ -127,7 +152,7 @@ access_violation:
 
 
 int64
-_user_atomic_add64(vint64 *value, int64 addValue)
+_user_atomic_add64(int64 *value, int64 addValue)
 {
 	if (IS_USER_ADDRESS(value)
 		&& lock_memory((void *)value, sizeof(int64), B_READ_DEVICE) == B_OK) {
@@ -143,7 +168,7 @@ access_violation:
 
 
 int64
-_user_atomic_and64(vint64 *value, int64 andValue)
+_user_atomic_and64(int64 *value, int64 andValue)
 {
 	if (IS_USER_ADDRESS(value)
 		&& lock_memory((void *)value, sizeof(int64), B_READ_DEVICE) == B_OK) {
@@ -159,7 +184,7 @@ access_violation:
 
 
 int64
-_user_atomic_or64(vint64 *value, int64 orValue)
+_user_atomic_or64(int64 *value, int64 orValue)
 {
 	if (IS_USER_ADDRESS(value)
 		&& lock_memory((void *)value, sizeof(int64), B_READ_DEVICE) == B_OK) {
@@ -175,7 +200,7 @@ access_violation:
 
 
 int64
-_user_atomic_get64(vint64 *value)
+_user_atomic_get64(int64 *value)
 {
 	if (IS_USER_ADDRESS(value)
 		&& lock_memory((void *)value, sizeof(int64), B_READ_DEVICE) == B_OK) {

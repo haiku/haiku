@@ -494,23 +494,25 @@ extern status_t		_kern_system_profiler_recorded(
 
 /* atomic_* ops (needed for CPUs that don't support them directly) */
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS
-extern int32		_kern_atomic_set(vint32 *value, int32 newValue);
-extern int32		_kern_atomic_test_and_set(vint32 *value, int32 newValue,
+extern void		_kern_atomic_set(int32 *value, int32 newValue);
+extern int32		_kern_atomic_get_and_set(int32 *value, int32 newValue);
+extern int32		_kern_atomic_test_and_set(int32 *value, int32 newValue,
 						int32 testAgainst);
-extern int32		_kern_atomic_add(vint32 *value, int32 addValue);
-extern int32		_kern_atomic_and(vint32 *value, int32 andValue);
-extern int32		_kern_atomic_or(vint32 *value, int32 orValue);
-extern int32		_kern_atomic_get(vint32 *value);
+extern int32		_kern_atomic_add(int32 *value, int32 addValue);
+extern int32		_kern_atomic_and(int32 *value, int32 andValue);
+extern int32		_kern_atomic_or(int32 *value, int32 orValue);
+extern int32		_kern_atomic_get(int32 *value);
 #endif	// ATOMIC_FUNCS_ARE_SYSCALLS
 
 #ifdef ATOMIC64_FUNCS_ARE_SYSCALLS
-extern int64		_kern_atomic_set64(vint64 *value, int64 newValue);
-extern int64		_kern_atomic_test_and_set64(vint64 *value, int64 newValue,
+extern void		_kern_atomic_set64(int64 *value, int64 newValue);
+extern int64		_kern_atomic_get_and_set64(int64 *value, int64 newValue);
+extern int64		_kern_atomic_test_and_set64(int64 *value, int64 newValue,
 						int64 testAgainst);
-extern int64		_kern_atomic_add64(vint64 *value, int64 addValue);
-extern int64		_kern_atomic_and64(vint64 *value, int64 andValue);
-extern int64		_kern_atomic_or64(vint64 *value, int64 orValue);
-extern int64		_kern_atomic_get64(vint64 *value);
+extern int64		_kern_atomic_add64(int64 *value, int64 addValue);
+extern int64		_kern_atomic_and64(int64 *value, int64 andValue);
+extern int64		_kern_atomic_or64(int64 *value, int64 orValue);
+extern int64		_kern_atomic_get64(int64 *value);
 #endif	// ATOMIC64_FUNCS_ARE_SYSCALLS
 
 /* System informations */
