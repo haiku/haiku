@@ -2213,6 +2213,11 @@ BlockAllocator::_TrimNext(fs_trim_data& trimData, uint32 maxRanges,
 	if (!pushed || force) {
 		// Trim now
 		trimData.trimmed_size = 0;
+dprintf("TRIM FS:\n");
+for (uint32 i = 0; i < trimData.range_count; i++) {
+	dprintf("[3%" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu64 "\n", i,
+		trimData.ranges[i].offset, trimData.ranges[i].size);
+}
 		if (ioctl(fVolume->Device(), B_TRIM_DEVICE, &trimData,
 				sizeof(fs_trim_data)) != 0) {
 			return errno;

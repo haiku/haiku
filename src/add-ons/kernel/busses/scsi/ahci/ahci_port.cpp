@@ -816,6 +816,13 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 	uint32 scsiRangeCount = B_BENDIAN_TO_HOST_INT16(
 		unmapBlocks->block_data_length) / sizeof(scsi_unmap_block_descriptor);
 
+dprintf("TRIM SCSI:\n");
+for (uint32 i = 0; i < scsiRangeCount; i++) {
+	dprintf("[3%" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu32 "\n", i,
+		B_BENDIAN_TO_HOST_INT64(unmapBlocks->blocks[i].lba),
+		B_BENDIAN_TO_HOST_INT32(unmapBlocks->blocks[i].block_count));
+}
+
 	uint32 scsiIndex = 0;
 	uint32 scsiLastBlocks = 0;
 	uint32 maxLBARangeCount = fMaxTrimRangeBlocks * 512 / 8;
@@ -885,6 +892,13 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 				scsiIndex++;
 			}
 		}
+
+dprintf("TRIM AHCI:\n");
+for (uint32 i = 0; i < lbaRangeCount; i++) {
+	uint64 value = B_HOST_TO_LENDIAN_INT64(lbaRanges[i]);
+	dprintf("[3%" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu64 "\n", i,
+		value >> 48, value & ((uint64)1 << 48) - 1);
+}
 
 		sata_request sreq;
 		sreq.SetATA48Command(ATA_COMMAND_DATA_SET_MANAGEMENT, 0,
