@@ -46,8 +46,6 @@ HAIKU_BOARD_SDIMAGE_SIZE = 256 ;
 # gcc flags for the specific cpu
 #
 
-HAIKU_KERNEL_CCFLAGS += -mtune=arm1176jzf-s ;
-HAIKU_KERNEL_C++FLAGS += -mtune=arm1176jzf-s ;
 HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += -mtune=arm1176jzf-s ;
 HAIKU_C++FLAGS_$(HAIKU_PACKAGING_ARCH) += -mtune=arm1176jzf-s ;
 

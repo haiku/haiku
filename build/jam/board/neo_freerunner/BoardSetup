@@ -69,8 +69,6 @@ HAIKU_BOARD_SDIMAGE_FILES =
 # gcc flags for the specific cpu
 #
 
-HAIKU_KERNEL_CCFLAGS += -mcpu=arm920t ;
-HAIKU_KERNEL_C++FLAGS += -mcpu=arm920t ;
 HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += -mcpu=arm920t ;
 HAIKU_C++FLAGS_$(HAIKU_PACKAGING_ARCH) += -mcpu=arm920t ;
 
