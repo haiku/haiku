@@ -132,6 +132,7 @@ RemotePackageRepository HaikuPorts
 	yasm-1.2.0-3
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
+	zsh-5.0.2-1
 
 	# secondary architecture (x86_gcc2)
 	binutils_x86_gcc2-2.17_2013_04_21-2
@@ -262,6 +263,7 @@ RemotePackageRepository HaikuPorts
 	yasm
 	xz_utils
 	zlib
+	zsh
 	:
 	# debuginfo packages
 	grep
