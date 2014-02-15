@@ -15,6 +15,7 @@
 #include <boot/stage2.h>
 #include <arch/smp.h>
 #include <debug.h>
+#include <int.h>
 
 
 status_t
@@ -28,6 +29,16 @@ status_t
 arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
 {
 	return B_OK;
+}
+
+
+void
+arch_smp_send_multicast_ici(CPUSet& cpuSet)
+{
+#if KDEBUG
+	if (are_interrupts_enabled())
+		panic("arch_smp_send_multicast_ici: called with interrupts enabled");
+#endif
 }
 
 

@@ -24,6 +24,30 @@ arch_get_system_info(system_info *info, size_t size)
 }
 
 
+void
+arch_fill_topology_node(cpu_topology_node_info* node, int32 cpu)
+{
+	switch (node->type) {
+		case B_TOPOLOGY_ROOT:
+			node->data.root.platform = B_CPU_PPC_64;
+			break;
+
+		case B_TOPOLOGY_PACKAGE:
+			//TODO node->data.package.vendor = sCPUVendor;
+			node->data.package.cache_line_size = CACHE_LINE_SIZE;
+			break;
+
+		case B_TOPOLOGY_CORE:
+			//TODO node->data.core.model = sPVR;
+			//TODO node->data.core.default_frequency = sCPUClockFrequency;
+			break;
+
+		default:
+			break;
+	}
+}
+
+
 status_t
 arch_system_info_init(struct kernel_args *args)
 {
