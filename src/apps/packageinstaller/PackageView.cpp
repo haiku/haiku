@@ -566,9 +566,9 @@ PackageView::_InitProfiles()
 	for (int i = 1; i < count; i++) {
 		pkg_profile* profile = fInfo.GetProfile(i);
 
-		if (profile != NULL) {
+		if (profile != NULL)
 			_AddInstallTypeMenuItem(profile->name, profile->space_needed, i);
-		} else
+		else
 			fInstallTypes->AddSeparatorItem();
 	}
 }
