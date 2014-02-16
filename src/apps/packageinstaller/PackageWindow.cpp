@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2007-2010, Haiku, Inc. All rights reserved.
+ * Copyright (c) 2007-2014, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Author:
  *		Łukasz 'Sil2100' Zemczak <sil2100@vexillium.org>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -11,6 +12,7 @@
 
 #include <Application.h>
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 
 #include "PackageView.h"
 
@@ -23,12 +25,14 @@ PackageWindow::PackageWindow(const entry_ref* ref)
 	:
 	BWindow(BRect(100, 100, 600, 300),
 		B_TRANSLATE_SYSTEM_NAME("PackageInstaller"),
-		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	PackageView* view = new PackageView(Bounds(), ref);
-	AddChild(view);
+	PackageView* view = new PackageView(ref);
 
-	ResizeTo(Bounds().Width(), view->Bounds().Height());
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
+		.Add(view)
+	;
+
 	CenterOnScreen();
 }
 
