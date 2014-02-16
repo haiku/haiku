@@ -563,26 +563,20 @@ PackageView::_InstallTypeChanged(int32 index)
 
 	if (profile->path_type == P_INSTALL_PATH) {
 		BMenuItem* item = NULL;
-		if (find_directory(B_BEOS_APPS_DIRECTORY, &path) == B_OK) {
+		if (find_directory(B_SYSTEM_NONPACKAGED_DIRECTORY, &path) == B_OK) {
 			dev_t device = dev_for_path(path.Path());
-			if (volume.SetTo(device) == B_OK && !volume.IsReadOnly()) {
+			if (volume.SetTo(device) == B_OK && !volume.IsReadOnly()
+				&& path.Append("apps") == B_OK) {
 				item = _AddDestinationMenuItem(path.Path(), volume.FreeBytes(),
 					path.Path());
-			}
-		}
-		if (find_directory(B_APPS_DIRECTORY, &path) == B_OK) {
-			dev_t device = dev_for_path(path.Path());
-			if (volume.SetTo(device) == B_OK && !volume.IsReadOnly()) {
-				item = _AddDestinationMenuItem(path.Path(),
-					volume.FreeBytes(), path.Path());
 			}
 		}
 
 		if (item != NULL) {
 			item->SetMarked(true);
 			fCurrentPath.SetTo(path.Path());
+			fDestination->AddSeparatorItem();
 		}
-		fDestination->AddSeparatorItem();
 
 		_AddMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
 			new BMessage(P_MSG_OPEN_PANEL), fDestination);
