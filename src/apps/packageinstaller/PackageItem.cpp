@@ -130,10 +130,8 @@ inflate_file_to_file(BFile *in, uint64 in_size, BFile *out, uint64 out_size)
 				(void)inflateEnd(&stream);
 				return B_ERROR;
 			}
-		}
-		while (stream.avail_out == 0);
-	}
-	while (bytes_read != in_size);
+		} while (stream.avail_out == 0);
+	} while (bytes_read != in_size);
 
 	(void)inflateEnd(&stream);
 
@@ -144,7 +142,7 @@ inflate_file_to_file(BFile *in, uint64 in_size, BFile *out, uint64 out_size)
 // #pragma mark - PackageItem
 
 
-PackageItem::PackageItem(BFile *parent, const BString &path, uint8 type,
+PackageItem::PackageItem(BFile* parent, const BString& path, uint8 type,
 	uint32 ctime, uint32 mtime, uint64 offset, uint64 size)
 {
 	SetTo(parent, path, type, ctime, mtime, offset, size);
@@ -157,7 +155,7 @@ PackageItem::~PackageItem()
 
 
 void
-PackageItem::SetTo(BFile *parent, const BString &path, uint8 type, uint32 ctime,
+PackageItem::SetTo(BFile* parent, const BString& path, uint8 type, uint32 ctime,
 	uint32 mtime, uint64 offset, uint64 size)
 {
 	fPackage = parent;
@@ -172,7 +170,7 @@ PackageItem::SetTo(BFile *parent, const BString &path, uint8 type, uint32 ctime,
 
 
 status_t
-PackageItem::InitPath(const char *path, BPath *destination)
+PackageItem::InitPath(const char* path, BPath* destination)
 {
 	status_t ret = B_OK;
 
@@ -300,10 +298,10 @@ PackageItem::HandleAttributes(BPath *destination, BNode *node,
 
 
 status_t
-PackageItem::ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
-	uint32 *nameSize, uint32 *attrType, uint8 **attrData, uint64 *dataSize,
-	uint8 **temp, uint64 *tempSize, uint64 *attrCSize, uint64 *attrOSize,
-	bool *attrStarted, bool *done)
+PackageItem::ParseAttribute(uint8* buffer, BNode* node, char** attrName,
+	uint32* nameSize, uint32* attrType, uint8** attrData, uint64* dataSize,
+	uint8** temp, uint64* tempSize, uint64* attrCSize, uint64* attrOSize,
+	bool* attrStarted, bool* done)
 {
 	status_t ret = B_OK;
 	uint32 length;
@@ -415,7 +413,7 @@ PackageItem::ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 
 
 status_t
-PackageItem::SkipAttribute(uint8 *buffer, bool *attrStarted, bool *done)
+PackageItem::SkipAttribute(uint8* buffer, bool* attrStarted, bool* done)
 {
 	status_t ret = B_OK;
 	uint32 length;
@@ -477,7 +475,7 @@ PackageItem::SkipAttribute(uint8 *buffer, bool *attrStarted, bool *done)
 
 
 status_t
-PackageItem::ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
+PackageItem::ParseData(uint8* buffer, BFile* file, uint64 originalSize,
 	bool *done)
 {
 	status_t ret = B_OK;
@@ -513,12 +511,10 @@ PackageItem::ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
 			return ret;
 		}
 		parser_debug(" File data inflation complete!\n");
-	}
-	else if (!memcmp(buffer, padding, 7)) {
+	} else if (!memcmp(buffer, padding, 7)) {
 		*done = true;
 		return ret;
-	}
-	else {
+	} else {
 		parser_debug("_ParseData unknown tag\n");
 		ret = B_ERROR;
 	}
@@ -530,10 +526,10 @@ PackageItem::ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
 // #pragma mark - PackageScript
 
 
-PackageScript::PackageScript(BFile *parent, uint64 offset, uint64 size,
-		uint64 originalSize)
+PackageScript::PackageScript(BFile* parent, const BString& path, uint64 offset,
+		uint64 size, uint64 originalSize)
 	:
-	PackageItem(parent, NULL, 0, 0, 0, offset, size),
+	PackageItem(parent, path, P_INSTALL_PATH, 0, 0, offset, size),
 	fOriginalSize(originalSize),
 	fThreadId(-1)
 {
@@ -541,7 +537,7 @@ PackageScript::PackageScript(BFile *parent, uint64 offset, uint64 size,
 
 
 status_t
-PackageScript::DoInstall(const char *path, ItemState *state)
+PackageScript::DoInstall(const char* path, ItemState* state)
 {
 	status_t ret = B_OK;
 	parser_debug("Script: DoInstall() called!\n");
@@ -579,8 +575,29 @@ PackageScript::DoInstall(const char *path, ItemState *state)
 					break;
 
 				case P_DATA:
-					ret = _ParseScript(buffer, fOriginalSize, &done);
+				{
+					BString script;
+					ret = _ParseScript(buffer, fOriginalSize, script, &done);
+					if (ret == B_OK) {
+						// Rewrite Deskbar entry targets. NOTE: It would
+						// also work to Replace("/config/be", "/config...")
+						// but it would be less save. For example, an app
+						// could have a folder named "config/be..." inside
+						// its installation folder.
+						script.ReplaceAll(
+							"~/config/be",
+							"~/config/settings/deskbar/menu");
+						script.ReplaceAll(
+							"/boot/home/config/be",
+							"/boot/home/config/settings/deskbar/menu");
+
+						BPath workingDirectory;
+						ret = InitPath(path, &workingDirectory);
+						if (ret == B_OK)
+							ret = _RunScript(workingDirectory.Path(), script);
+					}
 					break;
+				}
 
 				default:
 					return B_ERROR;
@@ -604,7 +621,8 @@ PackageScript::ItemKind()
 
 
 status_t
-PackageScript::_ParseScript(uint8 *buffer, uint64 originalSize, bool *done)
+PackageScript::_ParseScript(uint8 *buffer, uint64 originalSize,
+	BString& _script, bool *done)
 {
 	status_t ret = B_OK;
 
@@ -640,7 +658,7 @@ PackageScript::_ParseScript(uint8 *buffer, uint64 originalSize, bool *done)
 			return B_ERROR;
 		}
 
-		uint8 *script = new uint8[original];
+		uint8* script = new uint8[original];
 		ret = inflate_data(temp, compressed, script, original);
 		if (ret != B_OK) {
 			parser_debug(" inflate_data failed\n");
@@ -649,7 +667,8 @@ PackageScript::_ParseScript(uint8 *buffer, uint64 originalSize, bool *done)
 			return ret;
 		}
 
-		ret = _RunScript(script, originalSize);
+		_script.SetTo((char*)script, originalSize);
+
 		delete[] script;
 		delete[] temp;
 		parser_debug(" Script data inflation complete!\n");
@@ -666,18 +685,23 @@ PackageScript::_ParseScript(uint8 *buffer, uint64 originalSize, bool *done)
 
 
 status_t
-PackageScript::_RunScript(uint8 *script, uint32 len)
+PackageScript::_RunScript(const char* workingDirectory, const BString& script)
 {
 	// This function written by Peter Folk <pfolk@uni.uiuc.edu>
 	// and published in the BeDevTalk FAQ, modified for use in the
 	// PackageInstaller
 	// http://www.abisoft.com/faq/BeDevTalk_FAQ.html#FAQ-209
 
+	// Change current working directory to install path
+	char oldWorkingDirectory[B_PATH_NAME_LENGTH];
+	getcwd(oldWorkingDirectory, sizeof(oldWorkingDirectory));
+	chdir(workingDirectory);
+
 	// Save current FDs
 	int old_in  =  dup(0);
 	int old_out  =  dup(1);
 	int old_err  =  dup(2);
-
+	
 	int filedes[2];
 
 	/* Create new pipe FDs as stdin, stdout, stderr */
@@ -714,11 +738,15 @@ PackageScript::_RunScript(uint8 *script, uint32 len)
 	resume_thread(fThreadId);
 
 	// Write the script
-	if (write(in, script, len) != (int32)len || write(in, "\nexit\n", 6) != 6) {
+	if (write(in, script.String(), script.Length() - 1) != script.Length() - 1
+		|| write(in, "\nexit\n", 6) != 6) {
 		parser_debug("Writing script failed\n");
 		kill_thread(fThreadId);
 		return B_ERROR;
 	}
+
+	// Restore current working directory
+	chdir(oldWorkingDirectory);
 
 	return B_OK;
 }
@@ -727,7 +755,7 @@ PackageScript::_RunScript(uint8 *script, uint32 len)
 // #pragma mark - PackageDirectory
 
 
-PackageDirectory::PackageDirectory(BFile *parent, const BString &path,
+PackageDirectory::PackageDirectory(BFile* parent, const BString& path,
 		uint8 type, uint32 ctime, uint32 mtime, uint64 offset, uint64 size)
 	:
 	PackageItem(parent, path, type, ctime, mtime, offset, size)
@@ -736,7 +764,7 @@ PackageDirectory::PackageDirectory(BFile *parent, const BString &path,
 
 
 status_t
-PackageDirectory::DoInstall(const char *path, ItemState *state)
+PackageDirectory::DoInstall(const char* path, ItemState* state)
 {
 	BPath &destination = state->destination;
 	status_t ret;
@@ -798,12 +826,12 @@ PackageFile::PackageFile(BFile *parent, const BString &path, uint8 type,
 
 
 status_t
-PackageFile::DoInstall(const char *path, ItemState *state)
+PackageFile::DoInstall(const char* path, ItemState* state)
 {
 	if (state == NULL)
 		return B_ERROR;
 
-	BPath &destination = state->destination;
+	BPath& destination = state->destination;
 	status_t ret = B_OK;
 	parser_debug("File: %s DoInstall() called!\n", fPath.String());
 

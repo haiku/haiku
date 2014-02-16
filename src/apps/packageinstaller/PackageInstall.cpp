@@ -202,7 +202,7 @@ PackageInstall::_Install()
 
 	fItemExistsPolicy = P_EXISTS_NONE;
 
-	const char *installPath = fParent->CurrentPath()->Path();
+	const char* installPath = fParent->CurrentPath()->Path();
 	for (uint32 i = 0; i < n; i++) {
 		ItemState state(fItemExistsPolicy);
 		PackageItem* item = static_cast<PackageItem*>(type->items.ItemAt(i));
@@ -245,10 +245,11 @@ PackageInstall::_Install()
 		fCurrentScriptLocker.Lock();
 		fCurrentScript = script;
 
-		status_t status = script->DoInstall();
+		status_t status = script->DoInstall(installPath);
 		if (status != B_OK) {
 			fprintf(stderr, "Error while running script: %s\n",
 				strerror(status));
+			fCurrentScriptLocker.Unlock();
 			return P_MSG_I_ERROR;
 		}
 		fCurrentScriptLocker.Unlock();

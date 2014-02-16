@@ -85,7 +85,7 @@ public:
 								uint64 offset = 0, uint64 size = 0);
 	virtual	const uint32	ItemKind() {return P_NO_KIND;};
 
-	protected:
+protected:
 			status_t		InitPath(const char* path, BPath* destination);
 			status_t		HandleAttributes(BPath* destination, BNode* node,
 								const char* header);
@@ -97,11 +97,12 @@ public:
 								uint64* tempSize, uint64* attrCSize,
 								uint64* attrOSize, bool* attrStarted,
 								bool* done);
-			status_t		SkipAttribute(uint8 *buffer, bool *attrStarted, 
-								bool *done);
+			status_t		SkipAttribute(uint8* buffer, bool* attrStarted, 
+								bool* done);
 			status_t		ParseData(uint8* buffer, BFile* file,
 								uint64 originalSize, bool* done);
 
+protected:
 			BString			fPath;
 			uint64			fOffset;
 			uint64			fSize;
@@ -120,15 +121,16 @@ public:
 								uint64 offset = 0, uint64 size = 0);
 
 	virtual	status_t		DoInstall(const char* path = NULL,
-								ItemState *state = NULL);
+								ItemState* state = NULL);
 	virtual	const uint32	ItemKind();
 };
 
 
 class PackageScript : public PackageItem {
 public:
-							PackageScript(BFile* parent, uint64 offset = 0, 
-								uint64 size = 0, uint64 originalSize = 0);
+							PackageScript(BFile* parent, const BString& path,
+								uint64 offset = 0,  uint64 size = 0,
+								uint64 originalSize = 0);
 
 	virtual	status_t		DoInstall(const char* path = NULL,
 								ItemState *state = NULL);
@@ -138,10 +140,12 @@ public:
 			void			SetThreadId(thread_id id) { fThreadId = id; }
 
 private:
-			status_t		_ParseScript(uint8 *buffer, uint64 originalSize, 
-								bool *done);
-			status_t		_RunScript(uint8 *script, uint32 len);
+			status_t		_ParseScript(uint8* buffer, uint64 originalSize, 
+								BString& script, bool* done);
+			status_t		_RunScript(const char* workingDirectory,
+								const BString& script);
 
+private:
 			uint64			fOriginalSize;
 			thread_id		fThreadId;
 };
@@ -156,7 +160,7 @@ public:
 								const BString& signature, uint32 mode);
 
 	virtual	status_t		DoInstall(const char* path = NULL,
-								ItemState *state = NULL);
+								ItemState* state = NULL);
 	virtual	const uint32	ItemKind();
 
 private:

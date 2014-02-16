@@ -1024,8 +1024,11 @@ PackageInfo::Parse()
 						localType, ctime, mtime, mode, offset, size);
 				}
 			} else if (element == P_SCRIPT) {
-				fScripts.AddItem(new PackageScript(fPackageFile, offset, size,
-					originalSize));
+				parser_debug("Adding the script %s!\n",
+					nameString.String());
+
+				fScripts.AddItem(new PackageScript(fPackageFile,
+					installDirectory, offset, size, originalSize));
 			} else {
 				// If the directory tree count is equal to zero, this means all
 				// directory trees have been closed and a padding sequence means the
