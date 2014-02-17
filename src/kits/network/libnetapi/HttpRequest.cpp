@@ -854,7 +854,7 @@ BHttpRequest::_SendHeaders()
 		fOutputHeaders.AddHeader("Host", Url().Host());
 
 		fOutputHeaders.AddHeader("Accept", "*/*");
-		fOutputHeaders.AddHeader("Accept-Encoding", "gzip, deflate, chunked");
+		fOutputHeaders.AddHeader("Accept-Encoding", "gzip,deflate");
 			// Allow the remote server to send dynamic content by chunks
 			// rather than waiting for the full content to be generated and
 			// sending us data.
