@@ -584,15 +584,39 @@ PackageScript::DoInstall(const char* path, ItemState* state)
 						// but it would be less save. For example, an app
 						// could have a folder named "config/be..." inside
 						// its installation folder.
+						// TODO: Use find_paths() or we are no better than 
+						// these scripts.
 						script.ReplaceAll(
 							"~/config/be",
 							"~/config/settings/deskbar/menu");
 						script.ReplaceAll(
 							"/boot/home/config/be",
 							"/boot/home/config/settings/deskbar/menu");
+						// Rewrite all sorts of other old BeOS paths
+						script.ReplaceAll(
+							"/boot/preferences",
+							"/boot/system/preferences");
+						script.ReplaceAll(
+							"~/config/add-ons/Screen\\ Savers",
+							"~/config/non-packaged/add-ons/Screen\\ Savers");
+						// TODO: More. These should also be put into a
+						// common source location, since it can also be used
+						// for the retargetting of install file locations.
+						// Packages seem to declare which system paths they
+						// use, and then package items can reference one of
+						// those global paths by index. A more elegent solution
+						// compared to what happens now in InitPath() would be
+						// to replace those global package paths. Or maybe
+						// that's more fragile... but a common source for
+						// the rewriting of BeOS paths is needed.
+
+						printf("%s\n", script.String());
 
 						BPath workingDirectory;
-						ret = InitPath(path, &workingDirectory);
+						if (path != NULL)
+							ret = InitPath(path, &workingDirectory);
+						else
+							ret = workingDirectory.SetTo(".");
 						if (ret == B_OK)
 							ret = _RunScript(workingDirectory.Path(), script);
 					}
