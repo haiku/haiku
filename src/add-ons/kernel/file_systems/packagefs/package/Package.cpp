@@ -30,6 +30,7 @@
 #include "GlobalFactory.h"
 #include "PackageDirectory.h"
 #include "PackageFile.h"
+#include "PackagesDirectory.h"
 #include "PackageSettings.h"
 #include "PackageSymlink.h"
 #include "Version.h"
@@ -789,9 +790,11 @@ private:
 // #pragma mark - Package
 
 
-Package::Package(::Volume* volume, dev_t deviceID, ino_t nodeID)
+Package::Package(::Volume* volume, PackagesDirectory* directory, dev_t deviceID,
+	ino_t nodeID)
 	:
 	fVolume(volume),
+	fPackagesDirectory(directory),
 	fFileName(),
 	fName(),
 	fInstallPath(),
@@ -806,6 +809,8 @@ Package::Package(::Volume* volume, dev_t deviceID, ino_t nodeID)
 	fDeviceID(deviceID)
 {
 	mutex_init(&fLock, "packagefs package");
+
+	fPackagesDirectory->AcquireReference();
 }
 
 
@@ -823,6 +828,8 @@ Package::~Package()
 		delete dependency;
 
 	delete fVersion;
+
+	fPackagesDirectory->ReleaseReference();
 
 	mutex_destroy(&fLock);
 }
@@ -920,7 +927,7 @@ Package::Open()
 	}
 
 	// open the file
-	fFD = openat(fVolume->PackagesDirectoryFD(), fFileName, O_RDONLY);
+	fFD = openat(fPackagesDirectory->DirectoryFD(), fFileName, O_RDONLY);
 	if (fFD < 0) {
 		ERROR("Failed to open package file \"%s\"\n", fFileName.Data());
 		return errno;

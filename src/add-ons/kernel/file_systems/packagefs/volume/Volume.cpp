@@ -220,13 +220,6 @@ Volume::~Volume()
 }
 
 
-int
-Volume::PackagesDirectoryFD() const
-{
-	return fPackagesDirectory->DirectoryFD();
-}
-
-
 status_t
 Volume::Mount(const char* parameterString)
 {
@@ -1326,7 +1319,8 @@ Volume::_LoadPackage(const char* name, Package*& _package)
 	}
 
 	// create a package
-	Package* package = new(std::nothrow) Package(this, st.st_dev, st.st_ino);
+	Package* package = new(std::nothrow) Package(this, fPackagesDirectory,
+		st.st_dev, st.st_ino);
 	if (package == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	BReference<Package> packageReference(package, true);

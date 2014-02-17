@@ -53,8 +53,6 @@ public:
 
 			::MountType			MountType() const	{ return fMountType; }
 
-			int					PackagesDirectoryFD() const;
-
 			void				SetPackageFSRoot(::PackageFSRoot* root)
 									{ fPackageFSRoot = root; }
 			::PackageFSRoot*	PackageFSRoot() const

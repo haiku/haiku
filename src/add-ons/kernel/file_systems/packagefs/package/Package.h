@@ -28,6 +28,7 @@ using BPackageKit::BHPKG::BAbstractBufferedDataReader;
 
 
 class PackageLinkDirectory;
+class PackagesDirectory;
 class PackageSettings;
 class Volume;
 class Version;
@@ -36,8 +37,9 @@ class Version;
 class Package : public BReferenceable,
 	public DoublyLinkedListLinkImpl<Package> {
 public:
-								Package(::Volume* volume, dev_t deviceID,
-									ino_t nodeID);
+								Package(::Volume* volume,
+									PackagesDirectory* directory,
+									dev_t deviceID, ino_t nodeID);
 								~Package();
 
 			status_t			Init(const char* fileName);
@@ -113,6 +115,7 @@ private:
 private:
 			mutex				fLock;
 			::Volume*			fVolume;
+			PackagesDirectory*	fPackagesDirectory;
 			String				fFileName;
 			String				fName;
 			String				fInstallPath;
