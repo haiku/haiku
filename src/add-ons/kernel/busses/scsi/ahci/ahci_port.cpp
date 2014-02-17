@@ -897,7 +897,7 @@ dprintf("TRIM AHCI:\n");
 for (uint32 i = 0; i < lbaRangeCount; i++) {
 	uint64 value = B_HOST_TO_LENDIAN_INT64(lbaRanges[i]);
 	dprintf("[3%" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu64 "\n", i,
-		value >> 48, value & ((uint64)1 << 48) - 1);
+		value >> 48, value & (((uint64)1 << 48) - 1));
 }
 
 		sata_request sreq;
