@@ -610,7 +610,7 @@ PackageScript::DoInstall(const char* path, ItemState* state)
 						// that's more fragile... but a common source for
 						// the rewriting of BeOS paths is needed.
 
-						printf("%s\n", script.String());
+//						printf("%s\n", script.String());
 
 						BPath workingDirectory;
 						if (path != NULL)
