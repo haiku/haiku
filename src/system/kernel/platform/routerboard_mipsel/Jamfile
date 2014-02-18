@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src system kernel platform routerboard_mipsel ;
-
-SubDirCcFlags $(TARGET_KERNEL_PIC_CCFLAGS) ;
-SubDirC++Flags $(TARGET_KERNEL_PIC_CCFLAGS) ;
-
-KernelMergeObject kernel_platform_routerboard_mipsel.o :
-	platform.cpp
-;
-

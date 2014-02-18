@@ -194,10 +194,9 @@ switch $(HOST_GCC_MACHINE) {
 
 	# the following are rather unlikely as hosts ...
 	case arm-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case armv7l-*		: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
-	case armv7b-*		: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
+	case armv7l-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
+	case armv7b-*	: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
 	case m68k-*		: HAIKU_HOST_IS_BIG_ENDIAN = 1 ;
-	case mipsel-*	: HAIKU_HOST_IS_BIG_ENDIAN = 0 ;
 	case *			: Exit "Unsupported gcc host machine:" $(HOST_GCC_MACHINE) ;
 }
 
@@ -509,8 +508,6 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HOST_DEFINES += __POWERPC__ ;
 	} else if $(HOST_CPU) = m68k {
 		HOST_DEFINES += __M68K__ ;
-	} else if $(HOST_CPU) = mipsel {
-		HOST_DEFINES += __MIPSEL__ ;
 	}
 
 	# Supposing this is a glibc platform, let's try to get features like large

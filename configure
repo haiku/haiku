@@ -29,8 +29,7 @@ options:
                               directory under "cross-tools". The HAIKU_* tools
                               variables will be set accordingly.
                               <arch> specifies the target architecture, either
-                              "x86_gcc2", "x86", "x86_64", "ppc", "m68k", "arm",
-                              or "mipsel".
+                              "x86_gcc2", "x86", "x86_64", "ppc", "m68k", "arm"
                               This option and --cross-tools-prefix can be
                               specified multiple times. The first cross tools
                               specify the primary tools, the subsequent ones the
@@ -221,7 +220,6 @@ standard_gcc_settings()
 		arm-*)		targetCpu=arm;;
 		i?86-*)		targetCpu=x86;;
 		m68k-*)		targetCpu=m68k;;
-		mipsel-*)	targetCpu=mipsel;;
 		powerpc-*)	targetCpu=ppc;;
 		x86_64-*)	targetCpu=x86_64;;
 		*)
@@ -507,7 +505,6 @@ export haikuRequiredLegacyGCCVersion
 supportedTargetArchs="
 	arm
 	m68k
-	mipsel
 	ppc
 	x86
 	x86_64
@@ -572,7 +569,6 @@ while [ $# -gt 0 ] ; do
 				ppc)		targetMachine=powerpc-apple-haiku;;
 				m68k)		targetMachine=m68k-unknown-haiku;;
 				arm)		targetMachine=arm-unknown-haiku;;
-				mipsel)		targetMachine=mipsel-unknown-haiku;;
 				*)
 					echo "Unsupported target architecture: $2" >&2
 					exit 1

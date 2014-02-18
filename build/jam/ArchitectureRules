@@ -334,12 +334,6 @@ rule KernelArchitectureSetup architecture
 			HAIKU_CONTAINER_STRIP_EXECUTABLES on
 				$(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME) = 1 ;
 
-		case mipsel :
-			# RouterBOARD firmware (ELF image over TFTP)
-			HAIKU_BOOT_PLATFORM = routerboard_mipsel ;
-			# offset in floppy image (>= sizeof(haiku_loader))
-			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB
-
 		case * :
 			Exit "Currently unsupported target CPU:" $(cpu) ;
 	}
@@ -465,9 +459,6 @@ rule ArchitectureSetupWarnings architecture
 			return ;
 				# we use #warning as placeholders for things to write...
 		case m68k :
-			return ;
-				# we use #warning as placeholders for things to write...
-		case mipsel :
 			return ;
 				# we use #warning as placeholders for things to write...
 	}

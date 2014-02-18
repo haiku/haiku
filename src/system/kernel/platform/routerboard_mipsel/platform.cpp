@@ -1,3 +1,0 @@
-/*
-	Just a dummy. No BIOS services are required in the kernel.
-*/
