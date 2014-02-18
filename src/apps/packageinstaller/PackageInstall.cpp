@@ -156,7 +156,7 @@ PackageInstall::_Install()
 			if (err != B_OK) {
 				fprintf(stderr, "Error uninstalling previously installed "
 					"package: %s\n", strerror(err));
-				return P_MSG_I_ERROR;
+				// Ignore error
 			}
 
 			err = packageInfo.SetTo(info->GetName(), info->GetVersion(), true);
