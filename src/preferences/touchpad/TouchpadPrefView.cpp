@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2008-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -451,13 +451,11 @@ TouchpadPrefView::SetupView()
 
 	tapPrefLayout->AddView(fTapSlider);
 
-	BGroupView* buttonView = new BGroupView(B_HORIZONTAL);
+	BGroupView* buttonView = new BGroupView(B_HORIZONTAL, B_USE_SMALL_SPACING);
 	fDefaultButton = new BButton(B_TRANSLATE("Defaults"),
 		new BMessage(DEFAULT_SETTINGS));
 
 	buttonView->AddChild(fDefaultButton);
-	buttonView->GetLayout()->AddItem(
-		BSpaceLayoutItem::CreateHorizontalStrut(B_USE_SMALL_SPACING));
 	fRevertButton = new BButton(B_TRANSLATE("Revert"),
 		new BMessage(REVERT_SETTINGS));
 	fRevertButton->SetEnabled(false);

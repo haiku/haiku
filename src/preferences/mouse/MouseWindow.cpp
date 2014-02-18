@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2014 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -62,7 +62,7 @@ MouseWindow::MouseWindow(BRect _rect)
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
 		.Add(fSettingsBox)
-		.AddGroup(B_HORIZONTAL, 5)
+		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
 			.AddGlue()

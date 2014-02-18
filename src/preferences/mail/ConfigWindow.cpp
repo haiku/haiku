@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2014, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -414,8 +414,8 @@ ConfigWindow::ConfigWindow()
 	BButton *revertButton = new BButton(rect, "revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevertSettings));
 	revertButton->GetPreferredSize(&w, &h);
-	revertButton->ResizeTo(w,h);
-	revertButton->MoveTo(saveButton->Frame().left - 10 - w, rect.top);
+	revertButton->ResizeTo(w, h);
+	revertButton->MoveTo(rect.left, rect.top);
 	top->AddChild(revertButton);
 
 	_LoadSettings();

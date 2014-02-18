@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2014, Haiku, Inc. All Rights Reserved.
  * Copyright 2009, Pier Luigi Fiorini.
  * Distributed under the terms of the MIT License.
  *
@@ -52,8 +52,8 @@ PrefletWin::PrefletWin()
 		.Add(fMainView)
 
 		.AddGroup(B_HORIZONTAL, inset)
-			.AddGlue()
 			.Add(fRevert)
+			.AddGlue()
 			.Add(fApply)
 		.End()
 
