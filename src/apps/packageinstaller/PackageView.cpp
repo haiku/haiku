@@ -477,10 +477,15 @@ PackageView::_InitView()
 		"install type description", fontHeight * 3);
 	fInstallTypeDescriptionView->MakeEditable(false);
 	fInstallTypeDescriptionView->MakeSelectable(false);
+	fInstallTypeDescriptionView->SetInsets(8, 0, 0, 0);
+		// Left inset needs to match BMenuField text offset
 	fInstallTypeDescriptionView->SetText(
 		B_TRANSLATE("No installation type selected"));
 	fInstallTypeDescriptionView->SetViewColor(
 		ui_color(B_PANEL_BACKGROUND_COLOR));
+	BFont font(be_plain_font);
+	font.SetSize(ceilf(font.Size() * 0.85));
+	fInstallTypeDescriptionView->SetFontAndColor(&font);
 
 	BScrollView* installTypeScrollView = new BScrollView(
 		"install type description scroll view", fInstallTypeDescriptionView,
@@ -494,17 +499,27 @@ PackageView::_InitView()
 	fInstall = new BButton("install_button", B_TRANSLATE("Install"),
 		new BMessage(P_MSG_INSTALL));
 
+	BLayoutItem* destFieldLabelItem = fDestField->CreateLabelLayoutItem();
+	BLayoutItem* destFieldMenuItem = fDestField->CreateMenuBarLayoutItem();
+
+	BLayoutItem* typeLabelItem = installType->CreateLabelLayoutItem();
+	BLayoutItem* typeMenuItem = installType->CreateMenuBarLayoutItem();
+
+	float forcedMinWidth = be_plain_font->StringWidth("XXX") * 5;
+	destFieldMenuItem->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
+	typeMenuItem->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
+
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(descriptionScrollView)
 		.AddGrid()
-			.AddMenuField(fDestField, 0, 0, B_ALIGN_RIGHT)
-			.AddMenuField(installType, 0, 1, B_ALIGN_RIGHT)
-			.Add(installTypeScrollView, 0, 2, 2)
-		.End()
-		.AddGroup(B_HORIZONTAL)
-			.AddGlue()
-			.Add(fInstall)
+			.Add(typeLabelItem, 0, 0)
+			.Add(typeMenuItem, 1, 0)
+			.AddGlue(2, 0)
+			.Add(installTypeScrollView, 1, 1, 2)
+			.Add(destFieldLabelItem, 0, 2)
+			.Add(destFieldMenuItem, 1, 2)
+			.Add(fInstall, 2, 2)
 		.End()
 		.SetInsets(B_USE_DEFAULT_SPACING)
 	;
@@ -556,7 +571,11 @@ PackageView::_InstallTypeChanged(int32 index)
 	if (profile == NULL)
 		return B_ERROR;
 
-	fInstallTypeDescriptionView->SetText(profile->description.String());
+	BString typeDescription = profile->description;
+	if (typeDescription.IsEmpty())
+		typeDescription = profile->name;
+	
+	fInstallTypeDescriptionView->SetText(typeDescription.String());
 	
 	BPath path;
 	BVolume volume;
