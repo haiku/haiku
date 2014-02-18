@@ -134,6 +134,8 @@ _BMCMenuBar_::AttachedToWindow()
 		SetLowColor(Parent()->LowColor());
 	else
 		SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
+
+	fPreviousWidth = Bounds().Width();
 }
 
 
@@ -174,8 +176,7 @@ _BMCMenuBar_::Draw(BRect updateRect)
 void
 _BMCMenuBar_::FrameResized(float width, float height)
 {
-	// we need to take care of resizing and cleaning up
-	// the parent menu field
+	// we need to take care of cleaning up the parent menu field
 	float diff = width - fPreviousWidth;
 	fPreviousWidth = width;
 
@@ -185,24 +186,13 @@ _BMCMenuBar_::FrameResized(float width, float height)
 			// clean up the dirty right border of
 			// the menu field when enlarging
 			dirty.right = Frame().right + kVMargin;
-			dirty.left = dirty.left - diff - kVMargin * 2;
+			dirty.left = dirty.right - diff - kVMargin * 2;
 			fMenuField->Invalidate(dirty);
-
-			// clean up the arrow part
-			dirty = Bounds();
-			dirty.left = dirty.right - diff - kPopUpIndicatorWidth;
-			Invalidate(dirty);
 		} else if (diff < 0) {
 			// clean up the dirty right line of
 			// the menu field when shrinking
 			dirty.left = Frame().right - kVMargin;
-			dirty.right = dirty.left - diff + kVMargin * 2;
 			fMenuField->Invalidate(dirty);
-
-			// clean up the arrow part
-			dirty = Bounds();
-			dirty.left = dirty.right - kPopUpIndicatorWidth;
-			Invalidate(dirty);
 		}
 	}
 
@@ -299,7 +289,7 @@ _BMCMenuBar_::MaxSize()
 void
 _BMCMenuBar_::_Init()
 {
-	SetFlags(Flags() | B_FRAME_EVENTS);
+	SetFlags(Flags() | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE);
 	SetBorder(B_BORDER_CONTENTS);
 
 	float left, top, right, bottom;
@@ -326,6 +316,4 @@ _BMCMenuBar_::_Init()
 
 	SetItemMargins(left, top,
 		right + fShowPopUpMarker ? kPopUpIndicatorWidth : 0, bottom);
-
-	fPreviousWidth = Bounds().Width();
 }
