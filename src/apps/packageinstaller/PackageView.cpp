@@ -281,11 +281,18 @@ PackageView::MessageReceived(BMessage* message)
 		}
 		case B_CANCEL:
 		{
-			// File panel aborted, select first item
-			BMenuItem* item = fDestination->ItemAt(0);
-			if (item != NULL && item->Message() != NULL) {
-				item->SetMarked(true);
-				Window()->PostMessage(item->Message(), this);
+			// File panel aborted, select first suitable item
+			for (int32 i = 0; i < fDestination->CountItems(); i++) {
+				BMenuItem* item = fDestination->ItemAt(i);
+				BMessage* message = item->Message();
+				if (message == NULL)
+					continue;
+				BString path;
+				if (message->FindString("path", &path) == B_OK) {
+					fCurrentPath.SetTo(path.String());
+					item->SetMarked(true);
+					break;
+				}
 			}
 			break;
 		}
