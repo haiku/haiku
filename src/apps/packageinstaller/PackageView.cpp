@@ -279,6 +279,17 @@ PackageView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case B_CANCEL:
+		{
+			// File panel aborted, select first item
+			BMenuItem* item = fDestination->ItemAt(0);
+			if (item != NULL && item->Message() != NULL) {
+				item->SetMarked(true);
+				Window()->PostMessage(item->Message(), this);
+			}
+			break;
+		}
+			
 		case B_SIMPLE_DATA:
 			if (message->WasDropped()) {
 				uint32 type;
