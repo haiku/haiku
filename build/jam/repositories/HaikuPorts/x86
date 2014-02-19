@@ -22,6 +22,8 @@ RemotePackageRepository HaikuPorts
 	bison-2.4.3-6
 	bzip2-1.0.6-3
 	cdrtools-3.01~a07-3
+	clang-3.4-3
+	clang_analysis-3.4-3
 	cmake-2.8.11.2-7
 	cpio-2.10-1
 	ctags-5.8-3
@@ -193,6 +195,7 @@ RemotePackageRepository HaikuPorts
 	bison
 	bzip2
 	cdrtools
+	clang
 	cmake
 	cpio
 	ctags
