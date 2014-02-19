@@ -119,7 +119,7 @@ PackageView::AttachedToWindow()
 		title.ReplaceAll("%name%", name);
 	}
 	parent->SetTitle(title.String());
-	fInstall->SetTarget(this);
+	fBeginButton->SetTarget(this);
 
 	fOpenPanel->SetTarget(BMessenger(this));
 	fInstallTypes->SetTargetForItems(this);
@@ -162,7 +162,7 @@ PackageView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case P_MSG_INSTALL:
 		{
-			fInstall->SetEnabled(false);
+			fBeginButton->SetEnabled(false);
 			fInstallTypes->SetEnabled(false);
 			fDestination->SetEnabled(false);
 			fStatusWindow->Show();
@@ -201,7 +201,7 @@ PackageView::MessageReceived(BMessage* message)
 
 			notify->Go();
 			fStatusWindow->Hide();
-			fInstall->SetEnabled(true);
+			fBeginButton->SetEnabled(true);
 			fInstallTypes->SetEnabled(true);
 			fDestination->SetEnabled(true);
 			fInstallProcess.Stop();
@@ -221,7 +221,7 @@ PackageView::MessageReceived(BMessage* message)
 			notify->SetFlags(notify->Flags() | B_CLOSE_ON_ESCAPE);
 			notify->Go();
 			fStatusWindow->Hide();
-			fInstall->SetEnabled(true);
+			fBeginButton->SetEnabled(true);
 			fInstallTypes->SetEnabled(true);
 			fDestination->SetEnabled(true);
 			fInstallProcess.Stop();
@@ -243,7 +243,7 @@ PackageView::MessageReceived(BMessage* message)
 			notify->SetFlags(notify->Flags() | B_CLOSE_ON_ESCAPE);
 			notify->Go();
 			fStatusWindow->Hide();
-			fInstall->SetEnabled(true);
+			fBeginButton->SetEnabled(true);
 			fInstallTypes->SetEnabled(true);
 			fDestination->SetEnabled(true);
 			fInstallProcess.Stop();
@@ -257,7 +257,7 @@ PackageView::MessageReceived(BMessage* message)
 			// We actually use this message only when a post installation script
 			// is running and we want to kill it while it's still running
 			fStatusWindow->Hide();
-			fInstall->SetEnabled(true);
+			fBeginButton->SetEnabled(true);
 			fInstallTypes->SetEnabled(true);
 			fDestination->SetEnabled(true);
 			fInstallProcess.Stop();
@@ -524,35 +524,41 @@ PackageView::_InitView()
 	fDestField = new BMenuField("install_to", B_TRANSLATE("Install to:"),
 		fDestination);
 
-	fInstall = new BButton("install_button", B_TRANSLATE("Install"),
+	fBeginButton = new BButton("begin_button", B_TRANSLATE("Begin"),
 		new BMessage(P_MSG_INSTALL));
-
-	BLayoutItem* destFieldLabelItem = fDestField->CreateLabelLayoutItem();
-	BLayoutItem* destFieldMenuItem = fDestField->CreateMenuBarLayoutItem();
 
 	BLayoutItem* typeLabelItem = installType->CreateLabelLayoutItem();
 	BLayoutItem* typeMenuItem = installType->CreateMenuBarLayoutItem();
+
+	BLayoutItem* destFieldLabelItem = fDestField->CreateLabelLayoutItem();
+	BLayoutItem* destFieldMenuItem = fDestField->CreateMenuBarLayoutItem();
 
 	float forcedMinWidth = be_plain_font->StringWidth("XXX") * 5;
 	destFieldMenuItem->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
 	typeMenuItem->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
 
+	BAlignment labelAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_UNSET);
+	typeLabelItem->SetExplicitAlignment(labelAlignment);
+	destFieldLabelItem->SetExplicitAlignment(labelAlignment);
+
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(descriptionScrollView)
-		.AddGrid()
+		.AddGrid(B_USE_SMALL_SPACING, B_USE_DEFAULT_SPACING)
 			.Add(typeLabelItem, 0, 0)
 			.Add(typeMenuItem, 1, 0)
-			.AddGlue(2, 0)
-			.Add(installTypeScrollView, 1, 1, 2)
+			.Add(installTypeScrollView, 1, 1)
 			.Add(destFieldLabelItem, 0, 2)
 			.Add(destFieldMenuItem, 1, 2)
-			.Add(fInstall, 2, 2)
+		.End()
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fBeginButton)
 		.End()
 		.SetInsets(B_USE_DEFAULT_SPACING)
 	;
 
-	fInstall->MakeDefault(true);
+	fBeginButton->MakeDefault(true);
 }
 
 

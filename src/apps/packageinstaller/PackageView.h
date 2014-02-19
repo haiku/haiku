@@ -71,7 +71,7 @@ private:
 			BTextView*			fInstallTypeDescriptionView;
 			BPopUpMenu*			fDestination;
 			BMenuField*			fDestField;
-			BButton*			fInstall;
+			BButton*			fBeginButton;
 
 			BFilePanel*			fOpenPanel;
 			BPath				fCurrentPath;
