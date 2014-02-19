@@ -129,3 +129,17 @@ decode_base64(char *out, const char *in, off_t length)
 }
 
 
+#if __GNUC__ <= 2
+	// BeOS-ABI compatible wrappers.
+	ssize_t encode_base64(char *out, char *in, off_t length)
+	{
+		return encode_base64(out, in, length, 0);
+	}
+
+	ssize_t	decode_base64(char *out, const char *in, off_t length,
+		bool /*replace_cr*/)
+	{
+		return decode_base64(out, in, length);
+	}
+
+#endif
