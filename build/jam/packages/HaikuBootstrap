@@ -227,8 +227,8 @@ AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 
 AddFilesToPackage add-ons Tracker
-	: FileType-F Mark\ as… Mark\ as\ Read-R Open\ Target\ Folder-O
-		Open\ Terminal-T ZipOMatic-Z ;
+	: FileType Mark\ as… Mark\ as\ Read Open\ Target\ Folder
+		Open\ Terminal ZipOMatic ;
 AddSymlinkToPackage add-ons Tracker
 	: /boot/system/preferences/Backgrounds : Background-B ;
 AddSymlinkToPackage add-ons Tracker
