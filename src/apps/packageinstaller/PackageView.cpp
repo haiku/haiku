@@ -170,6 +170,7 @@ PackageView::MessageReceived(BMessage* message)
 			fInstallProcess.Start();
 			break;
 		}
+
 		case P_MSG_PATH_CHANGED:
 		{
 			BString path;
@@ -177,9 +178,11 @@ PackageView::MessageReceived(BMessage* message)
 				fCurrentPath.SetTo(path.String());
 			break;
 		}
+
 		case P_MSG_OPEN_PANEL:
 			fOpenPanel->Show();
 			break;
+
 		case P_MSG_INSTALL_TYPE_CHANGED:
 		{
 			int32 index;
@@ -187,6 +190,7 @@ PackageView::MessageReceived(BMessage* message)
 				_InstallTypeChanged(index);
 			break;
 		}
+
 		case P_MSG_I_FINISHED:
 		{
 			BAlert* notify = new BAlert("installation_success",
@@ -207,6 +211,7 @@ PackageView::MessageReceived(BMessage* message)
 				parent->Quit();
 			break;
 		}
+
 		case P_MSG_I_ABORT:
 		{
 			BAlert* notify = new BAlert("installation_aborted",
@@ -222,6 +227,7 @@ PackageView::MessageReceived(BMessage* message)
 			fInstallProcess.Stop();
 			break;
 		}
+
 		case P_MSG_I_ERROR:
 		{
 			// TODO: Review this
@@ -243,6 +249,7 @@ PackageView::MessageReceived(BMessage* message)
 			fInstallProcess.Stop();
 			break;
 		}
+
 		case P_MSG_STOP:
 		{
 			// This message is sent to us by the PackageStatus window, informing
@@ -256,6 +263,7 @@ PackageView::MessageReceived(BMessage* message)
 			fInstallProcess.Stop();
 			break;
 		}
+
 		case B_REFS_RECEIVED:
 		{
 			entry_ref ref;
@@ -279,9 +287,10 @@ PackageView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+
 		case B_CANCEL:
 		{
-			// File panel aborted, select first suitable item
+			// file panel aborted, select first suitable item
 			for (int32 i = 0; i < fDestination->CountItems(); i++) {
 				BMenuItem* item = fDestination->ItemAt(i);
 				BMessage* message = item->Message();
@@ -296,20 +305,21 @@ PackageView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-			
+
 		case B_SIMPLE_DATA:
 			if (message->WasDropped()) {
 				uint32 type;
 				int32 count;
 				status_t ret = message->GetInfo("refs", &type, &count);
-				// Check whether the message means someone dropped a file
+				// check whether the message means someone dropped a file
 				// to our view
 				if (ret == B_OK && type == B_REF_TYPE) {
-					// If it is, send it along with the refs to the application
+					// if it is, send it along with the refs to the application
 					message->what = B_REFS_RECEIVED;
 					be_app->PostMessage(message);
 				}
 			}
+			// fall-through
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -585,16 +595,16 @@ PackageView::_InstallTypeChanged(int32 index)
 
 	fCurrentType = index;
 	pkg_profile* profile = fInfo.GetProfile(index);
-	
+
 	if (profile == NULL)
 		return B_ERROR;
 
 	BString typeDescription = profile->description;
 	if (typeDescription.IsEmpty())
 		typeDescription = profile->name;
-	
+
 	fInstallTypeDescriptionView->SetText(typeDescription.String());
-	
+
 	BPath path;
 	BVolume volume;
 
