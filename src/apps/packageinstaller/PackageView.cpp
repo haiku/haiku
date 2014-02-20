@@ -502,7 +502,7 @@ PackageView::_InitView()
 
 	// Install type description text view
 	fInstallTypeDescriptionView = new DescriptionTextView(
-		"install type description", fontHeight * 3);
+		"install type description", fontHeight * 4);
 	fInstallTypeDescriptionView->MakeEditable(false);
 	fInstallTypeDescriptionView->MakeSelectable(false);
 	fInstallTypeDescriptionView->SetInsets(8, 0, 0, 0);
