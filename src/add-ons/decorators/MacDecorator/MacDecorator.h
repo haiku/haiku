@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2009-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		Adrien Destugues, pulkomandy@gmail.com
  *		John Scipione, jscipione@gmail.com
  */
-#ifndef _MAC_DECORATOR_H_
-#define _MAC_DECORATOR_H_
+#ifndef MAC_DECORATOR_H
+#define MAC_DECORATOR_H
 
 
 #include "DecorManager.h"
@@ -93,4 +93,5 @@ private:
 			rgb_color			fNonFocusTextColor;
 };
 
-#endif
+
+#endif	// MAC_DECORATOR_H

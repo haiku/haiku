@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2009-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		Adrien Destugues, pulkomandy@gmail.com
  *		John Scipione, jscipione@gmail.com
  */
-#ifndef _WINDOWS_DECORATOR_H_
-#define _WINDOWS_DECORATOR_H_
+#ifndef WIN_DECORATOR_H
+#define WIN_DECORATOR_H
 
 
 #include "Decorator.h"
@@ -101,4 +101,4 @@ private:
 };
 
 
-#endif	// _WINDOWS_DECORATOR_H_
+#endif	// WIN_DECORATOR_H
