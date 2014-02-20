@@ -232,9 +232,6 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 
 			x += advanceX;
 			y += advanceY;
-
-			if (delta != NULL && index > 0)
-				x += IsWhiteSpace(charCode) ? delta->space : delta->nonspace;
 		}
 
 		const GlyphCache* glyph = entry->CachedGlyph(charCode);
@@ -258,15 +255,22 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			advanceX = 0;
 			advanceY = 0;
 		} else {
-			if (!consumer.ConsumeGlyph(index++, charCode, glyph, entry, x, y)) {
-				advanceX = 0;
-				advanceY = 0;
-				break;
-			}
-
 			// get next increment for pen position
 			advanceX = glyph->advance_x;
 			advanceY = glyph->advance_y;
+
+			// adjust for custom spacing
+			if (delta != NULL) {
+				advanceX += IsWhiteSpace(charCode)
+					? delta->space : delta->nonspace;
+			}
+
+			if (!consumer.ConsumeGlyph(index++, charCode, glyph, entry, x, y,
+					advanceX, advanceY)) {
+				advanceX = 0.0;
+				advanceY = 0.0;
+				break;
+			}
 		}
 
 //		lastCharCode = charCode;

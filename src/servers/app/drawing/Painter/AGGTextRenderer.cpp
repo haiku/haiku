@@ -184,7 +184,8 @@ public:
 	}
 
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
-		FontCacheEntry* entry, double x, double y)
+		FontCacheEntry* entry, double x, double y, double advanceX,
+			double advanceY)
 	{
 		// "glyphBounds" is the bounds of the glyph transformed
 		// by the x y location of the glyph along the base line,

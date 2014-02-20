@@ -446,7 +446,8 @@ class HasGlyphsConsumer {
 		fHasArray[index] = false;
 	}
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
-		FontCacheEntry* entry, double x, double y)
+		FontCacheEntry* entry, double x, double y, double advanceX,
+			double advanceY)
 	{
 		fHasArray[index] = glyph->glyph_index != 0;
 		return true;
@@ -491,7 +492,8 @@ class EdgesConsumer {
 		fEdges[index].right = 0.0;
 	}
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
-		FontCacheEntry* entry, double x, double y)
+		FontCacheEntry* entry, double x, double y, double advanceX,
+			double advanceY)
 	{
 		fEdges[index].left = glyph->inset_left / fSize;
 		fEdges[index].right = glyph->inset_right / fSize;
@@ -560,9 +562,10 @@ public:
 	}
 
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
-		FontCacheEntry* entry, double x, double y)
+		FontCacheEntry* entry, double x, double y, double advanceX,
+			double advanceY)
 	{
-		return _Set(index, glyph->advance_x, glyph->advance_y);
+		return _Set(index, advanceX, advanceY);
 	}
 
 private:
@@ -631,12 +634,13 @@ public:
 	}
 
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
-		FontCacheEntry* entry, double x, double y)
+		FontCacheEntry* entry, double x, double y, double advanceX,
+			double advanceY)
 	{
 		if (index >= fNumChars)
 			return false;
 
-		fWidths[index] = glyph->advance_x / fSize;
+		fWidths[index] = advanceX / fSize;
 		return true;
 	}
 
@@ -685,7 +689,8 @@ class BoundingBoxConsumer {
 	void Finish(double x, double y) {}
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y) {}
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
-		FontCacheEntry* entry, double x, double y)
+		FontCacheEntry* entry, double x, double y, double advanceX,
+			double advanceY)
 	{
 		if (glyph->data_type != glyph_data_outline) {
 			const agg::rect_i& r = glyph->bounds;
@@ -812,7 +817,8 @@ class StringWidthConsumer {
 	void Finish(double x, double y) { width = x; }
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y) {}
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
-		FontCacheEntry* entry, double x, double y)
+		FontCacheEntry* entry, double x, double y, double advanceX,
+			double advanceY)
 	{ return true; }
 
 	float width;
