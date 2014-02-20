@@ -219,7 +219,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	const char* start = utf8String;
 	while ((charCode = UTF8ToCharCode(&utf8String))) {
 
-		if (offsets) {
+		if (offsets != NULL) {
 			// Use direct glyph locations instead of calculating them
 			// from the advance values
 			x = offsets[index].x;
@@ -233,7 +233,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			x += advanceX;
 			y += advanceY;
 
-			if (delta)
+			if (delta != NULL && index > 0)
 				x += IsWhiteSpace(charCode) ? delta->space : delta->nonspace;
 		}
 
