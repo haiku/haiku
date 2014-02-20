@@ -52,9 +52,9 @@ LockInfo::operator==(const struct flock& lock) const
 {
 	bool eof = lock.l_len + lock.l_start == OFF_MAX;
 	uint64 start = static_cast<uint64>(lock.l_start);
-	uint64 len = static_cast<uint64>(lock.l_len);
+	uint64 length = static_cast<uint64>(lock.l_len);
 
-	return fStart == start && (fLength == len
+	return fStart == start && (fLength == length
 		|| (eof && fLength == UINT64_MAX));
 }
 
@@ -86,43 +86,43 @@ Cookie::~Cookie()
 
 
 status_t
-Cookie::RegisterRequest(RPC::Request* req)
+Cookie::RegisterRequest(RPC::Request* request)
 {
-	ASSERT(req != NULL);
+	ASSERT(request != NULL);
 
-	RequestEntry* ent = new RequestEntry;
-	if (ent == NULL)
+	RequestEntry* entry = new RequestEntry;
+	if (entry == NULL)
 		return B_NO_MEMORY;
 
 	MutexLocker _(fRequestLock);
-	ent->fRequest = req;
-	ent->fNext = fRequests;
-	fRequests = ent;
+	entry->fRequest = request;
+	entry->fNext = fRequests;
+	fRequests = entry;
 
 	return B_OK;
 }
 
 
 status_t
-Cookie::UnregisterRequest(RPC::Request* req)
+Cookie::UnregisterRequest(RPC::Request* request)
 {
-	ASSERT(req != NULL);
+	ASSERT(request != NULL);
 
 	MutexLocker _(fRequestLock);
-	RequestEntry* ent = fRequests;
-	RequestEntry* prev = NULL;
-	while (ent != NULL) {
-		if (ent->fRequest == req) {
-			if (prev == NULL)
-				fRequests = ent->fNext;
+	RequestEntry* entry = fRequests;
+	RequestEntry* previous = NULL;
+	while (entry != NULL) {
+		if (entry->fRequest == request) {
+			if (previous == NULL)
+				fRequests = entry->fNext;
 			else
-				prev->fNext = ent->fNext;
-			delete ent;
+				previous->fNext = entry->fNext;
+			delete entry;
 			break;
 		}
 
-		prev = ent;
-		ent = ent->fNext;
+		previous = entry;
+		entry = entry->fNext;
 	}
 
 	return B_OK;
@@ -135,10 +135,10 @@ Cookie::CancelAll()
 	release_sem(fSnoozeCancel);
 
 	MutexLocker _(fRequestLock);
-	RequestEntry* ent = fRequests;
-	while (ent != NULL) {
-		fFileSystem->Server()->WakeCall(ent->fRequest);
-		ent = ent->fNext;
+	RequestEntry* entry = fRequests;
+	while (entry != NULL) {
+		fFileSystem->Server()->WakeCall(entry->fRequest);
+		entry = entry->fNext;
 	}
 
 	return B_OK;
@@ -171,12 +171,12 @@ OpenFileCookie::AddLock(LockInfo* lock)
 
 
 void
-OpenFileCookie::RemoveLock(LockInfo* lock, LockInfo* prev)
+OpenFileCookie::RemoveLock(LockInfo* lock, LockInfo* previous)
 {
-	if (prev != NULL)
-		prev->fCookieNext = lock->fCookieNext;
+	if (previous != NULL)
+		previous->fCookieNext = lock->fCookieNext;
 	else {
-		ASSERT(prev == NULL && fLocks == lock);
+		ASSERT(previous == NULL && fLocks == lock);
 		fLocks = lock->fCookieNext;
 	}
 }
