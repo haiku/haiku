@@ -1,12 +1,13 @@
 /*
- * Copyright 2004-2009 Haiku Inc. All rights reserved.
+ * Copyright 2004-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Sandor Vroemisse
- *		Jérôme Duval
  *		Alexandre Deckner, alex@zappotek.com
- *		Axel Dörfler, axeld@pinc-software.de.
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Jérôme Duval
+ *		John Scipione, jscipione@gmai.com
+ *		Sandor Vroemisse
  */
 #ifndef KEYMAP_WINDOW_H
 #define KEYMAP_WINDOW_H

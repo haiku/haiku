@@ -1,6 +1,11 @@
 /*
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef KEYBOARD_LAYOUT_VIEW_H
 #define KEYBOARD_LAYOUT_VIEW_H
@@ -92,11 +97,6 @@ private:
 			void				_SetFontSize(BView* view, key_kind keyKind);
 			void				_EvaluateDropTarget(BPoint point);
 			void				_SendFakeKeyDown(const Key* key);
-			BMenuItem*			_SwapModifiersMenuItem(uint32 modifier,
-									uint32 oldCode, uint32 newCode);
-			const char*			_NameForModifier(uint32 modifier,
-									bool pretty = false) const;
-			bool				_IsMappableToModifierKey(uint32 keyCode) const;
 
 			BBitmap*			fOffscreenBitmap;
 			BView*				fOffscreenView;

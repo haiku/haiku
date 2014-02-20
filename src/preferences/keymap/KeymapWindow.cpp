@@ -1,12 +1,13 @@
 /*
- * Copyright 2004-2010 Haiku Inc. All rights reserved.
+ * Copyright 2004-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Sandor Vroemisse
- *		Jérôme Duval
  *		Alexandre Deckner, alex@zappotek.com
- *		Axel Dörfler, axeld@pinc-software.de.
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Jérôme Duval
+ *		John Scipione, jscipione@gmai.com
+ *		Sandor Vroemisse
  */
 
 
@@ -325,55 +326,57 @@ KeymapWindow::MessageReceived(BMessage* message)
 			if (message->FindBool("unset", &unset) != B_OK)
 				unset = false;
 
-			if (message->FindUInt32("left_shift_key", &keyCode) == B_OK)
-				fCurrentMap.SetModifier(unset ? 0 : keyCode, B_LEFT_SHIFT_KEY);
+			if (message->FindUInt32("left_shift_key", &keyCode) == B_OK) {
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode,
+					B_LEFT_SHIFT_KEY);
+			}
 
 			if (message->FindUInt32("right_shift_key", &keyCode) == B_OK) {
-				fCurrentMap.SetModifier(unset ? 0 : keyCode,
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode,
 					B_RIGHT_SHIFT_KEY);
 			}
 
 			if (message->FindUInt32("left_control_key", &keyCode) == B_OK) {
-				fCurrentMap.SetModifier(unset ? 0 : keyCode,
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode,
 					B_LEFT_CONTROL_KEY);
 			}
 
 			if (message->FindUInt32("right_control_key", &keyCode) == B_OK) {
-				fCurrentMap.SetModifier(unset ? 0 : keyCode,
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode,
 					B_RIGHT_CONTROL_KEY);
 			}
 
 			if (message->FindUInt32("left_option_key", &keyCode) == B_OK) {
-				fCurrentMap.SetModifier(unset ? 0 : keyCode,
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode,
 					B_LEFT_OPTION_KEY);
 			}
 
 			if (message->FindUInt32("right_option_key", &keyCode) == B_OK) {
-				fCurrentMap.SetModifier(unset ? 0 : keyCode,
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode,
 					B_RIGHT_OPTION_KEY);
 			}
 
 			if (message->FindUInt32("left_command_key", &keyCode) == B_OK) {
-				fCurrentMap.SetModifier(unset ? 0 : keyCode,
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode,
 					B_LEFT_COMMAND_KEY);
 			}
 
 			if (message->FindUInt32("right_command_key", &keyCode) == B_OK) {
-				fCurrentMap.SetModifier(unset ? 0 : keyCode,
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode,
 					B_RIGHT_COMMAND_KEY);
 			}
 
 			if (message->FindUInt32("menu_key", &keyCode) == B_OK)
-				fCurrentMap.SetModifier(unset ? 0 : keyCode, B_MENU_KEY);
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode, B_MENU_KEY);
 
 			if (message->FindUInt32("caps_key", &keyCode) == B_OK)
-				fCurrentMap.SetModifier(unset ? 0 : keyCode, B_CAPS_LOCK);
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode, B_CAPS_LOCK);
 
 			if (message->FindUInt32("num_key", &keyCode) == B_OK)
-				fCurrentMap.SetModifier(unset ? 0 : keyCode, B_NUM_LOCK);
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode, B_NUM_LOCK);
 
 			if (message->FindUInt32("scroll_key", &keyCode) == B_OK)
-				fCurrentMap.SetModifier(unset ? 0 : keyCode, B_SCROLL_LOCK);
+				fCurrentMap.SetModifier(unset ? 0x00 : keyCode, B_SCROLL_LOCK);
 
 			_UpdateButtons();
 			fKeyboardLayoutView->SetKeymap(&fCurrentMap);

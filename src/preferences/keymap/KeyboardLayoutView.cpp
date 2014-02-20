@@ -1,6 +1,11 @@
 /*
  * Copyright 2009-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -31,6 +36,116 @@ static const rgb_color kDarkColor = {200, 200, 200, 255};
 static const rgb_color kSecondDeadKeyColor = {240, 240, 150, 255};
 static const rgb_color kDeadKeyColor = {152, 203, 255, 255};
 static const rgb_color kLitIndicatorColor = {116, 212, 83, 255};
+
+
+static const char*
+name_for_modifier(uint32 modifier, bool pretty)
+{
+	if (modifier == B_CAPS_LOCK)
+		return pretty ? B_TRANSLATE("Caps lock") : "caps_key";
+	else if (modifier == B_NUM_LOCK)
+		return pretty ? B_TRANSLATE("Num lock") : "num_key";
+	else if (modifier == B_SCROLL_LOCK)
+		return pretty ? B_TRANSLATE("Scroll lock") : "scroll_key";
+	else if (modifier == B_SHIFT_KEY) {
+		return pretty ? B_TRANSLATE_COMMENT("Shift", "Shift key")
+			: "shift_key";
+	} else if (modifier == B_LEFT_SHIFT_KEY)
+		return pretty ? B_TRANSLATE("Left shift") : "left_shift_key";
+	else if (modifier == B_RIGHT_SHIFT_KEY)
+		return pretty ? B_TRANSLATE("Right shift") : "right_shift_key";
+	else if (modifier == B_COMMAND_KEY) {
+		return pretty ? B_TRANSLATE_COMMENT("Command", "Command key")
+			: "command_key";
+	} else if (modifier == B_LEFT_COMMAND_KEY)
+		return pretty ? B_TRANSLATE("Left command") : "left_command_key";
+	else if (modifier == B_RIGHT_COMMAND_KEY)
+		return pretty ? B_TRANSLATE("Right command") : "right_command_key";
+	else if (modifier == B_CONTROL_KEY) {
+		return pretty ? B_TRANSLATE_COMMENT("Control", "Control key")
+			: "control_key";
+	} else if (modifier == B_LEFT_CONTROL_KEY)
+		return pretty ? B_TRANSLATE("Left control") : "left_control_key";
+	else if (modifier == B_RIGHT_CONTROL_KEY)
+		return pretty ? B_TRANSLATE("Right control") : "right_control_key";
+	else if (modifier == B_OPTION_KEY) {
+		return pretty ? B_TRANSLATE_COMMENT("Option", "Option key")
+			: "option_key";
+	} else if (modifier == B_LEFT_OPTION_KEY)
+		return pretty ? B_TRANSLATE("Left option") : "left_option_key";
+	else if (modifier == B_RIGHT_OPTION_KEY)
+		return pretty ? B_TRANSLATE("Right option") : "right_option_key";
+	else if (modifier == B_MENU_KEY)
+		return pretty ? B_TRANSLATE_COMMENT("Menu", "Menu key") : "menu_key";
+
+	return NULL;
+}
+
+
+static BMenuItem*
+swap_modifiers_menu_item(Keymap* map, uint32 modifier, uint32 displayModifier,
+	uint32 oldCode, uint32 newCode)
+{
+	int32 mask = B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY;
+	const char* oldName = name_for_modifier(oldCode == 0x00 ? modifier
+		: map->Modifier(oldCode) & ~mask, false);
+	const char* newName = name_for_modifier(newCode == 0x00 ? modifier
+		: map->Modifier(newCode) & ~mask, false);
+
+	BMessage* message = new BMessage(kMsgUpdateModifierKeys);
+	if (newName != NULL)
+		message->AddUInt32(newName, oldCode);
+
+	if (oldName != NULL)
+		message->AddUInt32(oldName, newCode);
+
+	if (oldCode == newCode)
+		message->AddBool("unset", true);
+
+	return new BMenuItem(name_for_modifier(displayModifier, true), message);
+}
+
+
+static bool
+is_left_modifier_key(uint32 keyCode)
+{
+	return keyCode == 0x4b	// left shift
+		|| keyCode == 0x5d	// left command
+		|| keyCode == 0x5c	// left control
+		|| keyCode == 0x66;	// left option
+}
+
+
+static bool
+is_right_modifier_key(uint32 keyCode)
+{
+	return keyCode == 0x56	// right shift
+		|| keyCode == 0x5f	// right command
+		|| keyCode == 0x60	// right control
+		|| keyCode == 0x67	// right option
+		|| keyCode == 0x68;	// menu
+}
+
+
+static bool
+is_lock_key(uint32 keyCode)
+{
+	return keyCode == 0x3b	// caps lock
+		|| keyCode == 0x22	// num lock
+		|| keyCode == 0x0f;	// scroll lock
+}
+
+
+static bool
+is_mappable_to_modifier(uint32 keyCode)
+{
+	return is_left_modifier_key(keyCode)
+		|| is_right_modifier_key(keyCode)
+		|| is_lock_key(keyCode);
+}
+
+
+//	#pragma mark - KeyboardLayoutView
 
 
 KeyboardLayoutView::KeyboardLayoutView(const char* name)
@@ -164,96 +279,119 @@ KeyboardLayoutView::MouseDown(BPoint point)
 	}
 
 	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0
-		|| ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0
-			&& (modifiers() & B_CONTROL_KEY) != 0)) {
-		if (_IsMappableToModifierKey(key->code)) {
-			// pop up the modifier keys menu
-			BPopUpMenu* modifiersPopUp = new BPopUpMenu("Modifiers pop up",
-				true, true, B_ITEMS_IN_COLUMN);
-			const key_map& map = fKeymap->Map();
-			BMenuItem* item = NULL;
+			|| ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0
+		&& (modifiers() & B_CONTROL_KEY) != 0)) {
+		// secondary mouse button, pop up a swap context menu
+		if (!is_mappable_to_modifier(key->code)) {
+			// ToDo: pop up a list of alternative characters
+			fButtons = buttons;
+			return;
+		}
 
-			item = _SwapModifiersMenuItem(B_LEFT_SHIFT_KEY, key->code,
-				map.left_shift_key);
+		// pop up the modifier keys menu
+		BPopUpMenu* modifiersPopUp = new BPopUpMenu("Modifiers pop up",
+			true, true, B_ITEMS_IN_COLUMN);
+		const key_map& map = fKeymap->Map();
+		bool isLockKey = is_lock_key(key->code);
+		BMenuItem* item = NULL;
+
+		if (is_left_modifier_key(key->code) || isLockKey) {
+			item = swap_modifiers_menu_item(fKeymap, B_LEFT_SHIFT_KEY,
+				isLockKey ? B_LEFT_SHIFT_KEY : B_SHIFT_KEY,
+				map.left_shift_key, key->code);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.left_shift_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(B_LEFT_CONTROL_KEY, key->code,
-				map.left_control_key);
+			item = swap_modifiers_menu_item(fKeymap, B_LEFT_CONTROL_KEY,
+				isLockKey ? B_LEFT_CONTROL_KEY : B_CONTROL_KEY,
+				map.left_control_key, key->code);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.left_control_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(B_LEFT_OPTION_KEY, key->code,
-				map.left_option_key);
+			item = swap_modifiers_menu_item(fKeymap, B_LEFT_OPTION_KEY,
+				isLockKey ? B_LEFT_OPTION_KEY : B_OPTION_KEY,
+				map.left_option_key, key->code);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.left_option_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(B_LEFT_COMMAND_KEY, key->code,
-				map.left_command_key);
+			item = swap_modifiers_menu_item(fKeymap, B_LEFT_COMMAND_KEY,
+				isLockKey ? B_LEFT_COMMAND_KEY : B_COMMAND_KEY,
+				map.left_command_key, key->code);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.left_command_key)
 				item->SetMarked(true);
+		}
 
-			modifiersPopUp->AddSeparatorItem();
+		if (is_right_modifier_key(key->code) || isLockKey) {
+			if (isLockKey)
+				modifiersPopUp->AddSeparatorItem();
 
-			item = _SwapModifiersMenuItem(B_RIGHT_SHIFT_KEY,
-				key->code, map.right_shift_key);
+			item = swap_modifiers_menu_item(fKeymap, B_RIGHT_SHIFT_KEY,
+				isLockKey ? B_RIGHT_SHIFT_KEY : B_SHIFT_KEY,
+				map.right_shift_key, key->code);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.right_shift_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(B_RIGHT_CONTROL_KEY,
-				key->code, map.right_control_key);
+			item = swap_modifiers_menu_item(fKeymap, B_RIGHT_CONTROL_KEY,
+				isLockKey ? B_RIGHT_CONTROL_KEY : B_CONTROL_KEY,
+				map.right_control_key, key->code);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.right_control_key)
 				item->SetMarked(true);
+		}
 
-			item = _SwapModifiersMenuItem(B_MENU_KEY, key->code, map.menu_key);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.menu_key)
-				item->SetMarked(true);
+		item = swap_modifiers_menu_item(fKeymap, B_MENU_KEY, B_MENU_KEY,
+			map.menu_key, key->code);
+		modifiersPopUp->AddItem(item);
+		if (key->code == map.menu_key)
+			item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(B_RIGHT_OPTION_KEY, key->code,
-				map.right_option_key);
+		if (is_right_modifier_key(key->code) || isLockKey) {
+			item = swap_modifiers_menu_item(fKeymap, B_RIGHT_OPTION_KEY,
+				isLockKey ? B_RIGHT_OPTION_KEY : B_OPTION_KEY,
+				map.right_option_key, key->code);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.right_option_key)
 				item->SetMarked(true);
 
-			item = _SwapModifiersMenuItem(B_RIGHT_COMMAND_KEY, key->code,
-				map.right_command_key);
+			item = swap_modifiers_menu_item(fKeymap, B_RIGHT_COMMAND_KEY,
+				isLockKey ? B_RIGHT_COMMAND_KEY : B_COMMAND_KEY,
+				map.right_command_key, key->code);
 			modifiersPopUp->AddItem(item);
 			if (key->code == map.right_command_key)
 				item->SetMarked(true);
-
-			modifiersPopUp->AddSeparatorItem();
-
-			item = _SwapModifiersMenuItem(B_CAPS_LOCK, key->code,
-				map.caps_key);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.caps_key)
-				item->SetMarked(true);
-
-			item = _SwapModifiersMenuItem(B_NUM_LOCK, key->code, map.num_key);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.num_key)
-				item->SetMarked(true);
-
-			item = _SwapModifiersMenuItem(B_SCROLL_LOCK, key->code,
-				map.scroll_key);
-			modifiersPopUp->AddItem(item);
-			if (key->code == map.scroll_key)
-				item->SetMarked(true);
-
-			modifiersPopUp->SetAsyncAutoDestruct(true);
-			if (modifiersPopUp->SetTargetForItems(Window()) == B_OK)
-				modifiersPopUp->Go(ConvertToScreen(point), true);
 		}
+
+		modifiersPopUp->AddSeparatorItem();
+
+		item = swap_modifiers_menu_item(fKeymap, B_CAPS_LOCK, B_CAPS_LOCK,
+			map.caps_key, key->code);
+		modifiersPopUp->AddItem(item);
+		if (key->code == map.caps_key)
+			item->SetMarked(true);
+
+		item = swap_modifiers_menu_item(fKeymap, B_NUM_LOCK, B_NUM_LOCK,
+			map.num_key, key->code);
+		modifiersPopUp->AddItem(item);
+		if (key->code == map.num_key)
+			item->SetMarked(true);
+
+		item = swap_modifiers_menu_item(fKeymap, B_SCROLL_LOCK, B_SCROLL_LOCK,
+			map.scroll_key, key->code);
+		modifiersPopUp->AddItem(item);
+		if (key->code == map.scroll_key)
+			item->SetMarked(true);
+
+		modifiersPopUp->SetAsyncAutoDestruct(true);
+		if (modifiersPopUp->SetTargetForItems(Window()) == B_OK)
+			modifiersPopUp->Go(ConvertToScreen(point), true);
 	} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0
 		&& (fButtons & B_TERTIARY_MOUSE_BUTTON) == 0) {
-		// toggle the "deadness" of dead keys via middle mouse button
+		// tertiary mouse button, toggle the "deadness" of dead keys
 		bool isEnabled = false;
 		uint8 deadKey = fKeymap->DeadKey(key->code, fModifiers, &isEnabled);
 		if (deadKey > 0) {
@@ -1275,73 +1413,4 @@ KeyboardLayoutView::_SendFakeKeyDown(const Key* key)
 	}
 
 	fTarget.SendMessage(&message);
-}
-
-
-BMenuItem*
-KeyboardLayoutView::_SwapModifiersMenuItem(uint32 modifier, uint32 oldCode,
-	uint32 newCode)
-{
-	int32 mask = B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY;
-	const char* oldName = _NameForModifier(fKeymap->Modifier(oldCode) & ~mask);
-	const char* newName = _NameForModifier(fKeymap->Modifier(newCode) & ~mask);
-
-	BMessage* message = new BMessage(kMsgUpdateModifierKeys);
-	message->AddUInt32(newName, oldCode);
-	message->AddUInt32(oldName, newCode);
-
-	if (oldCode == newCode)
-		message->AddBool("unset", true);
-
-	return new BMenuItem(_NameForModifier(modifier, true), message);
-}
-
-
-const char*
-KeyboardLayoutView::_NameForModifier(uint32 modifier, bool pretty) const
-{
-	if (modifier == B_CAPS_LOCK)
-		return pretty ? B_TRANSLATE("Caps lock") : "caps_key";
-	else if (modifier == B_NUM_LOCK)
-		return pretty ? B_TRANSLATE("Num lock") : "num_key";
-	else if (modifier == B_SCROLL_LOCK)
-		return pretty ? B_TRANSLATE("Scroll lock") : "scroll_key";
-	else if (modifier == B_LEFT_SHIFT_KEY)
-		return pretty ? B_TRANSLATE("Left shift") : "left_shift_key";
-	else if (modifier == B_RIGHT_SHIFT_KEY)
-		return pretty ? B_TRANSLATE("Right shift") : "right_shift_key";
-	else if (modifier == B_LEFT_COMMAND_KEY)
-		return pretty ? B_TRANSLATE("Left command") : "left_command_key";
-	else if (modifier == B_RIGHT_COMMAND_KEY)
-		return pretty ? B_TRANSLATE("Right command") : "right_command_key";
-	else if (modifier == B_LEFT_CONTROL_KEY)
-		return pretty ? B_TRANSLATE("Left control") : "left_control_key";
-	else if (modifier == B_RIGHT_CONTROL_KEY)
-		return pretty ? B_TRANSLATE("Right control") : "right_control_key";
-	else if (modifier == B_LEFT_OPTION_KEY)
-		return pretty ? B_TRANSLATE("Left option") : "left_option_key";
-	else if (modifier == B_RIGHT_OPTION_KEY)
-		return pretty ? B_TRANSLATE("Right option") : "right_option_key";
-	else if (modifier == B_MENU_KEY)
-		return pretty ? B_TRANSLATE_COMMENT("Menu", "Menu key") : "menu_key";
-
-	return NULL;
-}
-
-
-bool
-KeyboardLayoutView::_IsMappableToModifierKey(uint32 keyCode) const
-{
-	return keyCode == 0x3b	// caps lock
-		|| keyCode == 0x22	// num lock
-		|| keyCode == 0x0f	// scroll lock
-		|| keyCode == 0x4b	// left shift
-		|| keyCode == 0x56	// right shift
-		|| keyCode == 0x5d	// left command
-		|| keyCode == 0x5f	// right command
-		|| keyCode == 0x5c	// left control
-		|| keyCode == 0x60	// right control
-		|| keyCode == 0x66	// left option
-		|| keyCode == 0x67	// right option
-		|| keyCode == 0x68;	// menu
 }
