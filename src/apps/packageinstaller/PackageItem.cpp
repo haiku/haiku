@@ -526,10 +526,10 @@ PackageItem::ParseData(uint8* buffer, BFile* file, uint64 originalSize,
 // #pragma mark - PackageScript
 
 
-PackageScript::PackageScript(BFile* parent, const BString& path, uint64 offset,
-		uint64 size, uint64 originalSize)
+PackageScript::PackageScript(BFile* parent, const BString& path, uint8 type,
+		uint64 offset, uint64 size, uint64 originalSize)
 	:
-	PackageItem(parent, path, P_INSTALL_PATH, 0, 0, offset, size),
+	PackageItem(parent, path, type, 0, 0, offset, size),
 	fOriginalSize(originalSize),
 	fThreadId(-1)
 {

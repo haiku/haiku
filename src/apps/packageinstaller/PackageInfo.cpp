@@ -1027,8 +1027,17 @@ PackageInfo::Parse()
 				parser_debug("Adding the script %s!\n",
 					nameString.String());
 
+				BString workingDirectory;
+				uint8 localType = P_SYSTEM_PATH;
+				if (path == 1)
+					workingDirectory << itemPath;
+				else if (path == 0xffffffff) {
+					workingDirectory << installDirectory;
+					localType = P_INSTALL_PATH;
+				}
+
 				fScripts.AddItem(new PackageScript(fPackageFile,
-					installDirectory, offset, size, originalSize));
+					workingDirectory, localType, offset, size, originalSize));
 			} else {
 				// If the directory tree count is equal to zero, this means all
 				// directory trees have been closed and a padding sequence means the

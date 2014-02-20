@@ -129,7 +129,7 @@ public:
 class PackageScript : public PackageItem {
 public:
 							PackageScript(BFile* parent, const BString& path,
-								uint64 offset = 0,  uint64 size = 0,
+								uint8 type, uint64 offset = 0, uint64 size = 0,
 								uint64 originalSize = 0);
 
 	virtual	status_t		DoInstall(const char* path = NULL,
