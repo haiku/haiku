@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku, Inc.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,7 +10,7 @@
  */
 
 
-//! This one is more like the classic R5 look
+/*! Decorator resembling BeOS R5 */
 
 
 #include "BeDecorator.h"

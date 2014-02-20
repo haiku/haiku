@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013 Haiku, Inc.
+ * Copyright 2009-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,7 +9,7 @@
  */
 
 
-/*! Decorator looking like Windows 95 */
+/*! Decorator resembling Windows 95 */
 
 
 #include "WinDecorator.h"
