@@ -942,12 +942,6 @@ ParagraphLayout::_DrawSpan(BView* view, BPoint offset,
 	delta.nonspace = line.extraGlyphSpacing;
 	delta.space = line.extraWhiteSpacing;
 
-	// TODO: Fix in app_server: First glyph should not be shifted by delta.
-	if (text[0] == ' ')
-		offset.x -= delta.space;
-	else
-		offset.x -= delta.nonspace;
-
 	view->DrawString(span.Text(), offset, &delta);
 }
 
