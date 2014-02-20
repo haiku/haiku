@@ -75,6 +75,24 @@ SharedLibrary libhwinterfaceimpl.so :
 	: libhwinterface.so
 ;
 
+local decorator_src =
+	DecorManager.cpp
+	Decorator.cpp
+	DefaultDecorator.cpp
+	DefaultWindowBehaviour.cpp
+	MagneticBorder.cpp
+	WindowBehaviour.cpp
+	;
+
+local font_src =
+	FontCache.cpp
+	FontCacheEntry.cpp
+	FontEngine.cpp
+	FontFamily.cpp
+	FontManager.cpp
+	FontStyle.cpp
+	;
+
 # These files are shared between the test_app_server and the libhwintreface, so
 # they can talk together.
 SharedLibrary libtestappserver.so :
@@ -87,12 +105,7 @@ SharedLibrary libtestappserver.so :
 	DirectWindowInfo.cpp
 	DrawingEngine.cpp
 	DrawState.cpp
-	FontCache.cpp
-	FontCacheEntry.cpp
-	FontEngine.cpp
-	FontFamily.cpp
-	FontManager.cpp
-	FontStyle.cpp
+	$(font_src)
 	GlobalSubpixelSettings.cpp
 	HashTable.cpp
 	IntPoint.cpp
@@ -117,12 +130,7 @@ SharedLibrary libtestappserver.so :
 	MessageLooper.cpp
 
 	# Decorator
-	Decorator.cpp
-	DecorManager.cpp
-	DefaultDecorator.cpp
-	DefaultWindowBehaviour.cpp
-	MagneticBorder.cpp
-	WindowBehaviour.cpp
+	$(decorator_src)
 
 	# Manager Classes
 	BitmapManager.cpp
@@ -170,6 +178,15 @@ SharedLibrary libtestappserver.so :
 	: be libpainter.a libagg.a liblinprog.a libtextencoding.so libshared.a
 	[ BuildFeatureAttribute freetype : library ]
 ;
+
+Includes [ FGristFiles AppServer.cpp BitmapManager.cpp
+	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp
+	DrawState.cpp DrawingContext.cpp DrawingEngine.cpp ServerApp.cpp 
+	ServerBitmap.cpp ServerCursor.cpp ServerFont.cpp ServerPicture.cpp 
+	ServerWindow.cpp View.cpp Window.cpp WorkspacesView.cpp
+	$(decorator_src) $(font_src) ]
+	: [ BuildFeatureAttribute freetype : headers ] ;
+
 
 AddResources test_app_server : test_app_server.rdef ;
 
