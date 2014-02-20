@@ -8,6 +8,7 @@ RemotePackageRepository HaikuPorts
 	texi2html-1.82-2
 	timgmsoundfont-2004_01_24-3
 	wqy_microhei-0.2.0~beta-3
+	youtube_dl-2014.02.08-1
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
@@ -177,6 +178,7 @@ RemotePackageRepository HaikuPorts
 	sum_it-0.2beta-1
 	tar-1.26-6
 	texinfo-4.13a-7
+	ubertuber-0.9.9-1
 	unrar-4.2.4-1
 	vim-7.3-1
 	vision-0.9.7.r949-2
@@ -399,11 +401,13 @@ RemotePackageRepository HaikuPorts
 	tar
 	texi2html
 	texinfo
+	ubertuber
 	vim
 	vision
 	which
 	wpa_supplicant
 	yasm
+	youtube_dl
 	xz_utils_x86
 	zlib
 	:
