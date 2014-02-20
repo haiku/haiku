@@ -184,7 +184,8 @@ OpenFileCookie::RemoveLock(LockInfo* lock, LockInfo* prev)
 
 OpenDirCookie::OpenDirCookie(FileSystem* fileSystem)
 	:
-	Cookie(fileSystem)
+	Cookie(fileSystem),
+	fSnapshot(NULL)
 {
 }
 
