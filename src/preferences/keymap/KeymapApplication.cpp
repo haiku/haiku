@@ -1,14 +1,18 @@
 /*
- * Copyright 2004-2006 Haiku Inc. All rights reserved.
+ * Copyright 2004-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Sandor Vroemisse
  *		Jérôme Duval
+ *		John Scipione, jscipione@gmail.com
+ *		Sandor Vroemisse
  */
 
 
 #include "KeymapApplication.h"
+
+
+//	#pragma mark - KeymapApplication
 
 
 KeymapApplication::KeymapApplication()
@@ -48,12 +52,13 @@ KeymapApplication::_ShowModifierKeysWindow()
 		fModifierKeysWindow->Activate();
 	else {
 		fModifierKeysWindow = new ModifierKeysWindow();
+		fModifierKeysWindow->CenterIn(fWindow->Frame());
 		fModifierKeysWindow->Show();
 	}
 }
 
 
-//	#pragma mark -
+//	#pragma mark - main method
 
 
 int

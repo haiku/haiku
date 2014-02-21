@@ -1,12 +1,12 @@
 /*
- * Copyright 2004-2006 Haiku Inc. All rights reserved.
+ * Copyright 2004-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Sandor Vroemisse
  *		Jérôme Duval
+ *		John Scipione, jscipione@gmail.com
+ *		Sandor Vroemisse
  */
- 
 #ifndef KEYMAP_APPLICATION_H
 #define KEYMAP_APPLICATION_H
 
@@ -41,4 +41,5 @@ private:
 		ModifierKeysWindow*		fModifierKeysWindow;
 };
 
-#endif // KEYMAP_APPLICATION_H
+
+#endif	// KEYMAP_APPLICATION_H

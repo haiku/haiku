@@ -341,8 +341,6 @@ ModifierKeysWindow::ModifierKeysWindow()
 
 	_MarkMenuItems();
 	_ValidateDuplicateKeys();
-
-	CenterOnScreen();
 }
 
 
