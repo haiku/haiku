@@ -298,6 +298,7 @@ SEARCH on <post-install>fresh_install
 AddFilesToHaikuImage system settings : <post-install>fresh_install ;
 
 # decorators
+AddDirectoryToHaikuImage system non-packaged add-ons decorators ;
 AddDirectoryToHaikuImage home config non-packaged add-ons decorators ;
 #AddFilesToHaikuImage home config add-ons decorators : ;
 

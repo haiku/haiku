@@ -12,7 +12,6 @@
 #include <stdio.h>
 
 #include <Autolock.h>
-#include <Directory.h>
 #include <FindDirectory.h>
 #include <Path.h>
 #include <Resources.h>
@@ -273,7 +272,7 @@ DecorInfo::_Init(bool isUpdate)
 		// and, thusly, the Default decorator...
 		// If you can make it more simple, please do!
 		BPath path;
-		find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
+		find_directory(B_SYSTEM_SERVERS_DIRECTORY, &path);
 		path.Append("app_server");
 		entry.SetTo(path.Path(), true);
 		if (!entry.Exists()) {
@@ -374,58 +373,80 @@ DecorInfoUtility::~DecorInfoUtility()
 status_t
 DecorInfoUtility::ScanDecorators()
 {
-	BPath decorPath;
-	status_t ret = find_directory(B_USER_ADDONS_DIRECTORY, &decorPath);
-	if (ret != B_OK)
-		return ret;
-	ret = decorPath.Append("decorators");
-	if (ret != B_OK)
-		return ret;
+	status_t result;
 
-	BDirectory dir(decorPath.Path());
-	ret = dir.InitCheck();
-	if (ret != B_OK) {
-		fprintf(stderr, "DecorInfoUtility::ScanDecorators:\tERROR: "
-			"DECORATORS_DIR not found!\n");
-		return ret;
-	}
+	BPath systemPath;
+	result = find_directory(B_SYSTEM_ADDONS_DIRECTORY, &systemPath);
+	if (result == B_OK)
+		result = systemPath.Append("decorators");
 
-	BAutolock _(fLock);
-	// First, run through our list and DecorInfos CheckForChanges()
-
-	if (fHasScanned) {
-		for (int i = fList.CountItems() - 1; i > 0; --i) {
-			DecorInfo* decorInfo = fList.ItemAt(i);
-
-			bool deleted = false;
-			decorInfo->CheckForChanges(deleted);
-
-			if (deleted) {
-				fList.RemoveItem(decorInfo);
-				delete decorInfo;
+	if (result == B_OK) {
+		BDirectory systemDirectory(systemPath.Path());
+		result = systemDirectory.InitCheck();
+		if (result == B_OK) {
+			result = _ScanDecorators(systemDirectory);
+			if (result != B_OK) {
+				fprintf(stderr, "DecorInfoUtility::ScanDecorators()\tERROR: %s\n",
+					strerror(result));
+				return result;
 			}
 		}
 	}
 
-	BPath path;
-	entry_ref ref;
-	// Now, look at file system, skip the entries for which we already have
-	// a DecorInfo in the list.
-	while (dir.GetNextRef(&ref) == B_OK) {
-		path.SetTo(decorPath.Path());
-		path.Append(ref.name);
-		if (_FindDecor(path.Path()) != NULL)
-			continue;
+	BPath systemNonPackagedPath;
+	result = find_directory(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
+		&systemNonPackagedPath);
+	if (result == B_OK)
+		result = systemNonPackagedPath.Append("decorators");
 
-		DecorInfo* decorInfo = new(std::nothrow) DecorInfo(ref);
-		if (decorInfo == NULL || decorInfo->InitCheck() != B_OK) {
-			fprintf(stderr, "DecorInfoUtility::ScanDecorators()\tInitCheck() "
-				"failure on decorator, skipping\n");
-			delete decorInfo;
-			continue;
+	if (result == B_OK) {
+		BDirectory systemNonPackagedDirectory(systemNonPackagedPath.Path());
+		result = systemNonPackagedDirectory.InitCheck();
+		if (result == B_OK) {
+			result = _ScanDecorators(systemNonPackagedDirectory);
+			if (result != B_OK) {
+				fprintf(stderr, "DecorInfoUtility::ScanDecorators()\tERROR: %s\n",
+					strerror(result));
+				return result;
+			}
 		}
+	}
 
-		fList.AddItem(decorInfo);
+	BPath userPath;
+	result = find_directory(B_USER_ADDONS_DIRECTORY, &userPath);
+	if (result == B_OK)
+		result = userPath.Append("decorators");
+
+	if (result == B_OK) {
+		BDirectory userDirectory(userPath.Path());
+		result = userDirectory.InitCheck();
+		if (result == B_OK) {
+			result = _ScanDecorators(userDirectory);
+			if (result != B_OK) {
+				fprintf(stderr, "DecorInfoUtility::ScanDecorators()\tERROR: %s\n",
+					strerror(result));
+				return result;
+			}
+		}
+	}
+
+	BPath userNonPackagedPath;
+	result = find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY,
+		&userNonPackagedPath);
+	if (result == B_OK)
+		result = userNonPackagedPath.Append("decorators");
+
+	if (result == B_OK) {
+		BDirectory userNonPackagedDirectory(userNonPackagedPath.Path());
+		result = userNonPackagedDirectory.InitCheck();
+		if (result == B_OK) {
+			result = _ScanDecorators(userNonPackagedDirectory);
+			if (result != B_OK) {
+				fprintf(stderr, "DecorInfoUtility::ScanDecorators()\tERROR: %s\n",
+					strerror(result));
+				return result;
+			}
+		}
 	}
 
 	fHasScanned = true;
@@ -583,6 +604,55 @@ DecorInfoUtility::_FindDecor(const BString& pathString)
 	}
 
 	return NULL;
+}
+
+
+status_t
+DecorInfoUtility::_ScanDecorators(BDirectory decoratorDirectory)
+{
+	BAutolock _(fLock);
+
+	// First, run through our list and DecorInfos CheckForChanges()
+	if (fHasScanned) {
+		for (int i = fList.CountItems() - 1; i > 0; --i) {
+			DecorInfo* decorInfo = fList.ItemAt(i);
+
+			bool deleted = false;
+			decorInfo->CheckForChanges(deleted);
+
+			if (deleted) {
+				fList.RemoveItem(decorInfo);
+				delete decorInfo;
+			}
+		}
+	}
+
+	entry_ref ref;
+	// Now, look at file system, skip the entries for which we already have
+	// a DecorInfo in the list.
+	while (decoratorDirectory.GetNextRef(&ref) == B_OK) {
+		BPath path(&decoratorDirectory);
+		status_t result = path.Append(ref.name);
+		if (result != B_OK) {
+			fprintf(stderr, "DecorInfoUtility::_ScanDecorators()\tFailed to"
+				"append decorator file to path, skipping: %s.\n", strerror(result));
+			continue;
+		}
+		if (_FindDecor(path.Path()) != NULL)
+			continue;
+
+		DecorInfo* decorInfo = new(std::nothrow) DecorInfo(ref);
+		if (decorInfo == NULL || decorInfo->InitCheck() != B_OK) {
+			fprintf(stderr, "DecorInfoUtility::_ScanDecorators()\tInitCheck() "
+				"failure on decorator, skipping.\n");
+			delete decorInfo;
+			continue;
+		}
+
+		fList.AddItem(decorInfo);
+	}
+
+	return B_OK;
 }
 
 
