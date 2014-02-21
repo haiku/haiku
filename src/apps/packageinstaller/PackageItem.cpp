@@ -214,11 +214,11 @@ PackageItem::InitPath(const char* path, BPath* destination)
 	if (pathString.FindFirst("non-packaged") < 0) {
 		bool wasRewritten = false;
 
-		if (pathString.StartsWith("/boot/system")) {
+		if (pathString.StartsWith("/boot/beos/system")) {
 			BPath systemNonPackagedDir;
 			find_directory(B_SYSTEM_NONPACKAGED_DIRECTORY,
 				&systemNonPackagedDir);
-			pathString.ReplaceFirst("/boot/system",
+			pathString.ReplaceFirst("/boot/beos/system",
 				systemNonPackagedDir.Path());
 			wasRewritten = true;
 		} else if (pathString.StartsWith("/boot/home/config")) {
