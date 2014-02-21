@@ -75,7 +75,13 @@ void
 MetadataCache::GrowFile(size_t newSize)
 {
 	MutexLocker _(fLock);
+	off_t oldSize = fStatCache.st_size;
 	fStatCache.st_size = max_c((off_t)newSize, fStatCache.st_size);
+
+	if (oldSize != fStatCache.st_size) {
+		notify_stat_changed(fInode->GetFileSystem()->DevId(), fInode->ID(),
+			B_STAT_SIZE);
+	}
 }
 
 
