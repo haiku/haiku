@@ -238,8 +238,8 @@ ConflictView::_FillIcons()
 ModifierKeysWindow::ModifierKeysWindow()
 	:
 	BWindow(BRect(0, 0, 360, 220), B_TRANSLATE("Modifier keys"),
-		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
-		| B_AUTO_UPDATE_SIZE_LIMITS)
+		B_FLOATING_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	get_key_map(&fCurrentMap, &fCurrentBuffer);
 	get_key_map(&fSavedMap, &fSavedBuffer);
