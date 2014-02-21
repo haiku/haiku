@@ -568,8 +568,8 @@ ModifierKeysWindow::_CreateOptionMenuField()
 	fOptionMenu->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_UNSET));
 
-	return new BMenuField(B_TRANSLATE_COMMENT("Option:", "Option key role name"),
-		fOptionMenu);
+	return new BMenuField(B_TRANSLATE_COMMENT("Option:",
+		"Option key role name"), fOptionMenu);
 }
 
 
