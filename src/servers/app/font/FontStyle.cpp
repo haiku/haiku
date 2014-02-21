@@ -37,7 +37,8 @@ FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
 	fFamily(NULL),
 	fID(0),
 	fBounds(0, 0, 0, 0),
-	fFace(_TranslateStyleToFace(face->style_name))
+	fFace(_TranslateStyleToFace(face->style_name)),
+	fFullAndHalfFixed(false)
 {
 	fName.Truncate(B_FONT_STYLE_LENGTH);
 		// make sure this style can be found using the Be API
@@ -50,6 +51,26 @@ FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
 	// calculate it because height = ascending + descending + leading
 	fHeight.leading = (double)(face->height - face->ascender + face->descender)
 		/ face->units_per_EM;
+
+	if (IsFixedWidth())
+		return;
+
+	// manually check if all applicable chars are the same width
+
+	FT_Int32 loadFlags = FT_LOAD_NO_SCALE | FT_LOAD_TARGET_NORMAL;
+	if (FT_Load_Char(face, (uint32)' ', loadFlags) != 0)
+		return;
+
+	int firstWidth = face->glyph->advance.x;
+	for (uint32 c = ' ' + 1; c <= 0x7e; c++) {
+		if (FT_Load_Char(face, c, loadFlags) != 0)
+			return;
+
+		if (face->glyph->advance.x != firstWidth)
+			return;
+	}
+
+	fFullAndHalfFixed = true;
 }
 
 
