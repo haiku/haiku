@@ -509,17 +509,10 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 	textRect.OffsetBy(offset);
 
 	if (direct) {
-#ifdef __HAIKU__
 		// draw selection box if selected
 		if (selected) {
-#else
-		// erase area we're going to draw in
-		// NOTE: WidgetTextOutline() is reused for
-		// erasing background on R5 here
-		if (view->WidgetTextOutline() || selected) {
-#endif
 			drawView->SetDrawingMode(B_OP_COPY);
-			eraseRect.OffsetBy(offset);
+//			eraseRect.OffsetBy(offset);
 //			drawView->FillRect(eraseRect, B_SOLID_LOW);
 			drawView->FillRect(textRect, B_SOLID_LOW);
 		} else
@@ -547,11 +540,10 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 
 	BPoint loc;
 	loc.y = textRect.bottom - view->FontInfo().descent;
-	loc.x = textRect.left + 1;
+	loc.x = textRect.left;
 
 	const char* fittingText = fText->FittingText(view);
 
-#ifdef __HAIKU__
 	// TODO: Comparing view and drawView here to avoid rendering
 	// the text outline when producing a drag bitmap. The check is
 	// not fully correct, since an offscreen view is also used in some
@@ -611,12 +603,11 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 		drawView->SetDrawingMode(B_OP_OVER);
 		drawView->SetHighColor(textColor);
 	}
-#endif // __HAIKU__
 
 	drawView->DrawString(fittingText, loc);
 
 	if (fSymLink && (fAttrHash == view->FirstColumn()->AttrHash())) {
-		// ToDo:
+		// TODO:
 		// this should be exported to the WidgetAttribute class, probably
 		// by having a per widget kind style
 		if (direct) {
