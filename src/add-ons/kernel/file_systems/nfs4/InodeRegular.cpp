@@ -106,8 +106,6 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 	OpenDelegationData data;
 	data.fType = OPEN_DELEGATE_NONE;
 	if (fOpenState == NULL) {
-		RevalidateFileCache();
-
 		OpenState* state = new(std::nothrow) OpenState;
 		if (state == NULL)
 			return B_NO_MEMORY;
@@ -125,6 +123,8 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 		fOpenState = state;
 		cookie->fOpenState = state;
 		locker.Unlock();
+
+		RevalidateFileCache();
 	} else {
 		fOpenState->AcquireReference();
 		cookie->fOpenState = fOpenState;
@@ -143,6 +143,9 @@ Inode::Open(int mode, OpenFileCookie* cookie)
 				return result;
 			}
 			fOpenState->fMode = O_RDWR;
+
+			if (oldMode == O_RDONLY)
+				RevalidateFileCache();
 		} else {
 			int newMode = mode & O_RWMASK;
 			uint32 allowed = 0;
@@ -190,7 +193,9 @@ Inode::Close(OpenFileCookie* cookie)
 	ASSERT(cookie != NULL);
 	ASSERT(fOpenState == cookie->fOpenState);
 
-	SyncAndCommit();
+	int mode = cookie->fMode & O_RWMASK;
+	if (mode == O_RDWR || mode == O_WRONLY)
+		SyncAndCommit();
 
 	MutexLocker _(fStateLock);
 	ReleaseOpenState();
@@ -437,10 +442,10 @@ Inode::Write(OpenFileCookie* cookie, off_t pos, const void* _buffer,
 status_t
 Inode::Commit()
 {
-	WriteLocker _(fWriteLock);
-
 	if (!fWriteDirty)
 		return B_OK;
+
+	WriteLocker _(fWriteLock);
 	status_t result = CommitWrites();
 	if (result != B_OK)
 		return result;

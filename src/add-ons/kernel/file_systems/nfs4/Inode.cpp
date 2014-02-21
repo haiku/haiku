@@ -170,17 +170,16 @@ Inode::RevalidateFileCache()
 	MutexLocker _(fFileCacheLock);
 	if (change == fChange)
 		return B_OK;
-
 	SyncAndCommit(true);
+
 	file_cache_delete(fFileCache);
 
 	struct stat st;
 	fMetaCache.InvalidateStat();
 	result = Stat(&st);
-	if (result != B_OK)
-		return result;
-
-	fFileCache = file_cache_create(fFileSystem->DevId(), ID(), st.st_size);
+	if (result == B_OK)
+		fMaxFileSize = st.st_size;
+	fFileCache = file_cache_create(fFileSystem->DevId(), ID(), fMaxFileSize);
 
 	change = fChange;
 	return B_OK;
@@ -833,7 +832,8 @@ Inode::ReleaseAllLocks(OpenFileCookie* cookie)
 {
 	ASSERT(cookie != NULL);
 
-	SyncAndCommit();
+	if (cookie->fLocks)
+		SyncAndCommit();
 
 	OpenState* state = cookie->fOpenState;
 	MutexLocker _(state->fLocksLock);
