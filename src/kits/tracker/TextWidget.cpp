@@ -540,7 +540,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 
 	BPoint loc;
 	loc.y = textRect.bottom - view->FontInfo().descent;
-	loc.x = textRect.left;
+	loc.x = textRect.left + 1;
 
 	const char* fittingText = fText->FittingText(view);
 
