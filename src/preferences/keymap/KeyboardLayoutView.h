@@ -98,6 +98,11 @@ private:
 			void				_EvaluateDropTarget(BPoint point);
 			void				_SendFakeKeyDown(const Key* key);
 
+			BMenuItem*			_CreateSwapModifiersMenuItem(uint32 modifier,
+									uint32 displayModifier, uint32 oldCode,
+									uint32 newCode);
+			const char*			_NameForModifier(uint32 modifier, bool pretty);
+
 			BBitmap*			fOffscreenBitmap;
 			BView*				fOffscreenView;
 
