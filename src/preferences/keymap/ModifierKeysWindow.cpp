@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Haiku Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -341,6 +341,8 @@ ModifierKeysWindow::ModifierKeysWindow()
 
 	_MarkMenuItems();
 	_ValidateDuplicateKeys();
+
+	PostMessage(kMsgHideShowIcons);
 }
 
 
@@ -398,6 +400,7 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 
 			_MarkMenuItems();
 			_ValidateDuplicateKeys();
+			_HideShowIcons();
 
 			// enable/disable revert button
 			fRevertButton->SetEnabled(
@@ -470,6 +473,7 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 
 			_MarkMenuItems();
 			_ValidateDuplicateKeys();
+			_HideShowIcons();
 
 			fRevertButton->SetEnabled(false);
 			break;
@@ -838,4 +842,41 @@ ModifierKeysWindow::_DuplicateKeys()
 	}
 
 	return duplicateMask;
+}
+
+
+void
+ModifierKeysWindow::_HideShowIcons()
+{
+	if (fShiftConflictView->Icon() == NULL) {
+		while (!fShiftConflictView->IsHidden())
+			fShiftConflictView->Hide();
+	} else {
+		while (fShiftConflictView->IsHidden())
+			fShiftConflictView->Show();
+	}
+
+	if (fControlConflictView->Icon() == NULL) {
+		while (!fControlConflictView->IsHidden())
+			fControlConflictView->Hide();
+	} else {
+		while (fControlConflictView->IsHidden())
+			fControlConflictView->Show();
+	}
+
+	if (fOptionConflictView->Icon() == NULL) {
+		while (!fOptionConflictView->IsHidden())
+			fOptionConflictView->Hide();
+	} else {
+		while (fOptionConflictView->IsHidden())
+			fOptionConflictView->Show();
+	}
+
+	if (fCommandConflictView->Icon() == NULL) {
+		while (!fCommandConflictView->IsHidden())
+			fCommandConflictView->Hide();
+	} else {
+		while (fCommandConflictView->IsHidden())
+			fCommandConflictView->Show();
+	}
 }

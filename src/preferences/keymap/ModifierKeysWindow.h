@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Haiku Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,6 +57,7 @@ private:
 			int32					_LastKey();
 			void					_ValidateDuplicateKeys();
 			uint32					_DuplicateKeys();
+			void					_HideShowIcons();
 
 			BPopUpMenu*				fShiftMenu;
 			BPopUpMenu*				fControlMenu;
