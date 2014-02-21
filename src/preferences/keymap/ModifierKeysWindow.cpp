@@ -141,7 +141,7 @@ ConflictView::SetWarnIcon(bool show)
 }
 
 
-//	#pragma mark - ConflictView Private Methods
+//	#pragma mark - ConflictView private methods
 
 
 // fill out the icons with the stop and warn symbols from app_server
@@ -480,7 +480,7 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 }
 
 
-//	#pragma mark - ModifierKeysWindow Private Methods
+//	#pragma mark - ModifierKeysWindow private methods
 
 
 BMenuField*
