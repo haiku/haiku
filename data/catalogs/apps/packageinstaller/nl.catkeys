@@ -1,13 +1,11 @@
-1	dutch; flemish	x-vnd.Haiku-PackageInstaller	1396489627
+1	dutch; flemish	x-vnd.Haiku-PackageInstaller	792037176
 Install to:	PackageView		Installeren naar:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akkoord
 Continue	PackageInstall		Doorgaan
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Het gevraagde pakket kon nog worden geïnstalleerd op uw systeem. Dit zou een probleem met het doelpakket kunnen zijn. Gelieve dit probleem te controleren met de distributeur.
 Image not loaded correctly	PackageImageViewer		De afbeelding werd niet correct geladen
-Install 	PackageView		Installeren
 No package selected.	PackageInfo		Geen pakket geselecteerd.
-Install	PackageView		Installeren
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Het gegeven pakket lijkt al geïnstalleerd te zijn op uw systeem. Wil je het aanwezige pakket verwijderen en de installatie voortzetten?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Wil je deze keuze laten onthouden voor de rest van de installatie?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Er lijkt een bestandsgrootte in het pakket niet overeen te komen. Mogelijks is het pakket beschadigd of werd het gewijzigd na het aanmaken. Wil je nog steeds verdergaan?
@@ -48,7 +46,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Alle bestaande bestanden zullen overgeslaan worden?
 Continue	PackageInfo		Doorgaan
 %.1f KiB	PackageView		%.1f KiB
-(%s free)	PackageView		(%s vrij)
 Abort	PackageInfo		Afbreken
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Afbreken

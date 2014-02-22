@@ -1,13 +1,11 @@
-1	japanese	x-vnd.Haiku-PackageInstaller	1396489627
+1	japanese	x-vnd.Haiku-PackageInstaller	792037176
 Install to:	PackageView		インストール先:
 OK	PackageView		OK
 Accept	PackageTextViewer		承認
 Continue	PackageInstall		続ける
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		要求されたパッケージはシステムにインストールできません。パッケージに問題があるかもしれません。 パッケージの配布元に相談してみてください。
 Image not loaded correctly	PackageImageViewer		イメージが正しくロードされていません
-Install 	PackageView		インストール
 No package selected.	PackageInfo		パッケージが選択されていません。
-Install	PackageView		インストール
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		与えられたパッケージはすでにインストールされているようです。既存のものをアンインストールしてインストールを続けますか?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		この決定を残りのインストール作業のために記憶しますか?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		パッケージファイル中にファイルサイズの不一致があるようです。パッケージが壊れているか、作成後変更されたおそれがあります。インストールを本当に続けますか?
@@ -48,7 +46,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		既存のファイルをすべてスキップしますか?
 Continue	PackageInfo		続ける
 %.1f KiB	PackageView		%.1f KiB
-(%s free)	PackageView		(%s 空き)
 Abort	PackageInfo		中断
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		中断

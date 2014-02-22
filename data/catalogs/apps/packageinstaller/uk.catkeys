@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PackageInstaller	2709408798
+1	ukrainian	x-vnd.Haiku-PackageInstaller	792037176
 Install to:	PackageView		Встановити у:
 OK	PackageView		Гаразд
 Accept	PackageTextViewer		Прийняти
@@ -6,7 +6,6 @@ Continue	PackageInstall		Продовжити
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Неможливо встановити даний пакунок у вашій системі. Проблема може бути пов'язана з файлом пакунка. Зверніться до постачальника пакунка.
 Image not loaded correctly	PackageImageViewer		Малюнок завантажився неправильно
 No package selected.	PackageInfo		Не вибрано пакунок.
-Install	PackageView		Встановити
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Схоже, що цей пакунок вже встановлено у вашій системі. Бажаєте вилучити його і продовжити встановлення?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Запам'ятати цю відповідь до кінця встановлення?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Неправильний розмір пакунка. Можливо, пакунок пошкоджено або змінено після створення. Бажаєте продовжити?
@@ -47,7 +46,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Всі наявні файли будуть пропущуны?
 Continue	PackageInfo		Продовжити
 %.1f KiB	PackageView		%.1f КіБ
-(%s free)	PackageView		(%s вільно)
 Abort	PackageInfo		Перервати
 PackageInstaller	System name		Встановлювач пакунків
 Abort	PackageInstall		Перервати

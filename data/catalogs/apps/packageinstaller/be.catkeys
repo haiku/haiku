@@ -1,13 +1,11 @@
-1	belarusian	x-vnd.Haiku-PackageInstaller	1396489627
+1	belarusian	x-vnd.Haiku-PackageInstaller	792037176
 Install to:	PackageView		Усталяваць у:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Прыняць
 Continue	PackageInstall		Працягваць
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Не ўдалося усталяваць абраны пакунак у сістэму. Магчыма праблема з файлам пакунка. Кансультуйцеся, калі ласка, з распрацоўшчыкам пакунка.
 Image not loaded correctly	PackageImageViewer		Вобраз не загружаны
-Install 	PackageView		Усталяваць 
 No package selected.	PackageInfo		Няма абраных пакункаў.
-Install	PackageView		Усталяваць
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Падобна, што абраны пакунак ужо усталёваны на вашай сістэме. Жадаеце выдаліць існуючую версію і працягнуць усталёўку?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Жадаеце абраць такое-ж рашэнне для астатніх этапаў усталёўкі?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Падобна, што памер файлу пакунка не адпавядае. Верагодна, што вы маеце пашкоджаны ці наўмысна мадыфікаваны пакунак. Жадаеце працягнуць усталёўку?
@@ -48,7 +46,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Усе існуючыя файлы будуць абыйдзены?
 Continue	PackageInfo		Працягваць
 %.1f KiB	PackageView		%.1f КіБ
-(%s free)	PackageView		(%s вольна)
 Abort	PackageInfo		Перарваць
 PackageInstaller	System name		Усталёўшчык пакункаў
 Abort	PackageInstall		Перарваць

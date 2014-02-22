@@ -1,13 +1,11 @@
-1	russian	x-vnd.Haiku-PackageInstaller	1396489627
+1	russian	x-vnd.Haiku-PackageInstaller	792037176
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
 Continue	PackageInstall		Продолжить
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Не удалось установить запрошенный пакет. Возможно это случилось из-за проблем файлами данного пакета. Пожалуйста, обратитесь к поставщику пакета.
 Image not loaded correctly	PackageImageViewer		Изображение некорректно загружено
-Install 	PackageView		Установить 
 No package selected.	PackageInfo		Ни один пакет не выбран.
-Install	PackageView		Установить
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Данный пакет уже установлен в вашей системе. Хотите удалить существующий и продолжить установку?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Вы хотите запомнить это решение до конца этой установки?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Обнаружилась несоответствие размера файла в пакете. Этот пакет мог бы быть испорчен или быть измененным после его создания. Вы все еще хотите продолжить?
@@ -48,7 +46,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Все существующие файлы будут заменены?
 Continue	PackageInfo		Продолжить
 %.1f KiB	PackageView		%.1f КБ
-(%s free)	PackageView		(%s свободно)
 Abort	PackageInfo		Прервать
 PackageInstaller	System name		Установщик пакетов
 Abort	PackageInstall		Прервать

@@ -1,13 +1,11 @@
-1	polish	x-vnd.Haiku-PackageInstaller	1396489627
+1	polish	x-vnd.Haiku-PackageInstaller	792037176
 Install to:	PackageView		Zainstaluj w:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akceptuj
 Continue	PackageInstall		Kontynuuj
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Żądany pakiet nie zainstalował się poprawnie w Twoim systemie. To może być problem ze ścieżkami docelowymi plików z pakietu. Proszę skontaktuj się z dystrybutorem paczki.
 Image not loaded correctly	PackageImageViewer		Obraz nie załadował się poprawnie
-Install 	PackageView		Instaluj 
 No package selected.	PackageInfo		Żaden pakiet nie został wybrany.
-Install	PackageView		Instaluj
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Dany pakiet jest już zainstalowany w Twoim systemie. Czy chcesz by odinstalować istniejącą paczkę i kontynuować instalację?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Czy chcesz zapamiętać tę decyzję do końca instalacji?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Prawdopodobnie pliki w pakiecie mają nieprawidłowy rozmiar. Pakiet może być uszkodzony, lub został zmodyfikowany po jego utworzeniu. Czy nadal chcesz kontynuować?
@@ -48,7 +46,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Czy pominąć wszystkie pliki?
 Continue	PackageInfo		Kontynuuj
 %.1f KiB	PackageView		%.1f KiB
-(%s free)	PackageView		(%s wolne)
 Abort	PackageInfo		Przerwij
 PackageInstaller	System name		InstalatorPakietów
 Abort	PackageInstall		Przerwij

@@ -1,13 +1,11 @@
-1	hungarian	x-vnd.Haiku-PackageInstaller	1396489627
+1	hungarian	x-vnd.Haiku-PackageInstaller	792037176
 Install to:	PackageView		Telepítés ide:
 OK	PackageView		Rendben
 Accept	PackageTextViewer		Elfogadás
 Continue	PackageInstall		Folytatás
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		A kért csomag telepítése a rendszerre sikertelen volt. Lehet, hogy ez a cél csomagfájl hibája miatt következett be. Kérjük, vegye fel a kapcsolatot a csomag terjesztőjével.
 Image not loaded correctly	PackageImageViewer		A lemezkép betöltése sikertelen
-Install 	PackageView		Telepítés
 No package selected.	PackageInfo		Nincs csomag kiválasztva.
-Install	PackageView		Telepítés
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		A megadott csomag már fel van telepítve a rendszerre. Eltávolítsuk a már telepítettet, és folytassuk a telepítést?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Megjegyezzük ezt a választást ennek a telepítésnek az idejére?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		A fájlméretek a csomagfájlban nem egyeznek. A csomag korrupt lehet, vagy lehet, hogy az elkészítése után módosították. Biztos folytatni kívánja?
@@ -48,7 +46,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Minden létező fájl átugrása?
 Continue	PackageInfo		Folytatás
 %.1f KiB	PackageView		%.1f KiB
-(%s free)	PackageView		(%s szabad)
 Abort	PackageInfo		Megszakítás
 PackageInstaller	System name		Csomagtelepítő
 Abort	PackageInstall		Megszakítás

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-PackageInstaller	2709408798
+1	greek, modern (1453-)	x-vnd.Haiku-PackageInstaller	792037176
 Install to:	PackageView		Εγκατάσταση στο:
 OK	PackageView		Εντάξει
 Accept	PackageTextViewer		Αποδοχή
@@ -6,7 +6,6 @@ Continue	PackageInstall		Συνέχεια
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Το ζητούμενο πακέτο απέτυχε να εγκατασταθεί στο σύστημσ σας. Αυτο μπορεί να είναι ένα πρόβλημα με το αρχείο πακέτου προορισμού. Παρακαλώ συζητήστε για αυτό το πρόβλημα με το διανομέα του πακέτου.
 Image not loaded correctly	PackageImageViewer		Η εικόνα δε φορτώθηκε σωστά
 No package selected.	PackageInfo		Δεν επιλέχθηκε πακέτο.
-Install	PackageView		Εγκατάσταση
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Το ζητούμενο πακέτο φαίνεται να είναι ήδη εγκατεστημένο στο υστημα σας. Θα θέλατε να απεγκαταστήσετε το υπάρχων πακέτο και να συνεχίσετε την εγκατάσταση;
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Θέλετε να απομνημονευτεί η συγκεκριμένη απόφαση για την υπόλοιπη διαδικασία της εγκατάστασης;\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Φαίνεται  να υπάρχει μια σύγχηση του μεγέθους αρχείου στο αρχείο πακέτου. Το πακέτο μπορεί να είναι καταστραμμένο ή να έχει τροποποιηθεί έπειτα από τη δημιουργία του. Θέλετε οπωσδήποτε να συνεχίσετε;
@@ -47,7 +46,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Όλα τα υπάρχοντα αρχεία θα παραβλεφθούν;
 Continue	PackageInfo		Συνέχεια
 %.1f KiB	PackageView		%.1f KiB
-(%s free)	PackageView		(%s ελεύθερα)
 Abort	PackageInfo		Ματαίωση
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Ματαίωση

@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-PackageInstaller	2709408798
+1	hindi	x-vnd.Haiku-PackageInstaller	792037176
 Install to:	PackageView		इंस्टाल करें:
 OK	PackageView		ठीक है 
 Accept	PackageTextViewer		मंज़ूर है 
@@ -6,7 +6,6 @@ Continue	PackageInstall		जारी रखें
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		आप ने जो पैकेज चाह था वोह आपके सिस्टम में इंस्टाल नहीं हो सका. ये एक समस्या हो सकती है आप के चुने हुए पैकेज फ़ाइल के साथ. कृपया इस चीज़ की सलाह  लें अपने पैकेज बाटने वाले से.
 Image not loaded correctly	PackageImageViewer		चित्र ठीक से लोड नहीं हुआ 
 No package selected.	PackageInfo		कोई पैकेज चुना नहीं गया है.
-Install	PackageView		इंस्टाल 
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		दिया हुआ पैकेज लगता है की पहले से ही आप के सिस्टम में इन्स्तालड है. क्या आप इस को हटान चाटें है और जारी रखना चाहतें है इन्स्तोल्लेषण को? 
 Do you want to remember this decision for the rest of this installation?\n	PackageView		क्या आप इस निर्णय को याद रखना चाहते है आगे बचे हुए इन्स्तोल्लेषण के लिए?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		फ़ाइल के साइज़ का मेल नहीं बेथ रहा है पैकेज फ़ाइल में. पैकेज क्या पता भ्रष्ट हो या फिर मोदिफाय हुआ हो इस के सृजन के बाद. क्या आप जारी रखना चाटें हैं?  
@@ -47,7 +46,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		सारी मोजुदा फ़ाइल को छोड़ दिया जायेगा?
 Continue	PackageInfo		जारी रखें 
 %.1f KiB	PackageView		%.1f KiB
-(%s free)	PackageView		(%s free)
 Abort	PackageInfo		छोड़ें
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		छोड़ें
