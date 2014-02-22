@@ -76,6 +76,7 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher-1.2.7.11-1
 	lcms-2.5-1
 	lcms_devel-2.5-1	
+	less-451-2
 	lha-1.14i-1
 	libao-1.0.0-1
 	libao_devel-1.0.0-1
@@ -135,6 +136,7 @@ RemotePackageRepository HaikuPorts
 	ncurses_devel-5.9-9
 	neon-0.29.6-6
 	neon_devel-0.29.6-6
+	netcat-1.10-1
 	openssh-6.0p1-8
 	openssl-1.0.0j-4
 	openssl_devel-1.0.0j-4
@@ -335,6 +337,7 @@ RemotePackageRepository HaikuPorts
 	jpeg
 	keymapswitcher
 	lcms
+	less
 	lha
 	libao
 	libart_lgpl
@@ -370,6 +373,7 @@ RemotePackageRepository HaikuPorts
 	nano
 	ncurses
 	neon
+	netcat
 	ninja_x86
 	openssh
 	openssl
