@@ -20,7 +20,7 @@ public:
 								BSecureSocket(const BSecureSocket& other);
 	virtual						~BSecureSocket();
 
-	virtual bool				CertificateVerificationFailed(BCertificate);
+	virtual bool				CertificateVerificationFailed(BCertificate&);
 
 	// BSocket implementation
 

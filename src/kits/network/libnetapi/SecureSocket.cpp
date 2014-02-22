@@ -154,7 +154,8 @@ BSecureSocket::Private::VerifyCallback(int ok, X509_STORE_CTX* ctx)
 		return 0;
 
 	// Let the BSecureSocket (or subclass) decide if we should continue anyway.
-	return socket->CertificateVerificationFailed(BCertificate(certificate));
+	BCertificate failedCertificate(certificate);
+	return socket->CertificateVerificationFailed(failedCertificate);
 }
 
 
@@ -285,7 +286,7 @@ BSecureSocket::WaitForReadable(bigtime_t timeout) const
 
 
 bool
-BSecureSocket::CertificateVerificationFailed(BCertificate)
+BSecureSocket::CertificateVerificationFailed(BCertificate&)
 {
 	// Until apps actually make use of the certificate API, let's keep the old
 	// behavior and accept all connections, even if the certificate validation
@@ -357,7 +358,7 @@ BSecureSocket::~BSecureSocket()
 
 
 bool
-BSecureSocket::CertificateVerificationFailed(BCertificate)
+BSecureSocket::CertificateVerificationFailed(BCertificate&)
 {
 	return false;
 }
