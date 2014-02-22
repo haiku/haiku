@@ -31,6 +31,7 @@ RemotePackageRepository HaikuPorts
 	doxygen-1.6.3-4
 	expat-2.0.1-7
 	expat_devel-2.0.1-7
+	findutils-4.4.2-1	
 	ffmpeg-0.10.2-5
 	ffmpeg_devel-0.10.2-5
 	flex-2.5.35-6
@@ -145,6 +146,7 @@ RemotePackageRepository HaikuPorts
 	cvs
 	doxygen
 	expat
+	findutils
 	ffmpeg
 	flex
 	freetype
