@@ -1,0 +1,79 @@
+SubDir HAIKU_TOP src data keyboard_layouts ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+
+rule GenerateKeyboardLayoutLocalizationHeader
+{
+	local header = <keyboard-layout-locale>KeyboardLayoutNames.h ;
+	MakeLocateCommonPlatform $(header) ;
+	local jamfile = [ FGristFiles Jamfile ] ;
+	SEARCH on $(jamfile) = $(SUBDIR) ;
+	Depends $(header) : $(jamfile) ;
+	GenerateKeyboardLayoutLocalizationHeader1 $(header) ;
+	LocalClean clean : $(header) ;
+}
+
+actions GenerateKeyboardLayoutLocalizationHeader1
+{
+	$(RM) $(1)
+	for name in "$(HAIKU_KEYBOARD_LAYOUT_FILES)" ; do
+		echo "B_TRANSLATE_MARK_VOID(\"$name\")" >> $(1)
+	done
+	echo "B_TRANSLATE_MARK_VOID(\"Apple\ Aluminum\")" >> $(1)
+	for name in "$(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES)" ; do
+		echo "B_TRANSLATE_MARK_VOID(\"$name\")" >> $(1)
+	done
+	echo "B_TRANSLATE_MARK_VOID(\"ThinkPad\")" >> $(1)
+	for name in "$(HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES)" ; do
+		echo "B_TRANSLATE_MARK_VOID(\"$name\")" >> $(1)
+	done
+}
+
+
+# Add keyboard layout files to the image.
+local keyboardLayoutsDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
+HAIKU_KEYBOARD_LAYOUT_FILES =
+	"Generic 104-key"
+	"Generic 105-key International"
+	"Kinesis Advantage"
+	"Kinesis Ergo Elan International"
+	"TypeMatrix 2030" ;
+HAIKU_KEYBOARD_LAYOUT_FILES = $(HAIKU_KEYBOARD_LAYOUT_FILES:G=keyboard-layout) ;
+SEARCH on $(HAIKU_KEYBOARD_LAYOUT_FILES) = $(keyboardLayoutsDir) ;
+
+# Add Apple Aluminum keyboard layout files to the image in an Apple Aluminum
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local appleAluminumDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts
+		Apple\ Aluminum ] ;
+HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES =
+	"Apple Aluminium Extended International"
+	"Apple Aluminium International"
+	"Apple Aluminum (US)"
+	"Apple Aluminum Extended (US)" ;
+HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES = 	$(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES:G=keyboard-layout) ;
+SEARCH on $(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES) = $(appleAluminumDir) ;
+
+# Add ThinkPad keyboard layout files to the image in a ThinkPad
+# subdirectory. The subdirectory is turned into a submenu in the Layout menu
+# of the Keymap preference app.
+local thinkpadDir
+	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ThinkPad ] ;
+HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES =
+	"ThinkPad (US)"
+	"ThinkPad International"
+	"ThinkPad T400s (US)"
+	"ThinkPad T400s International"
+	"ThinkPad X1 (US)"
+	"ThinkPad X1 International"
+	"ThinkPad X100e (US)"
+	"ThinkPad X100e International" ;
+HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES
+	= $(HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES:G=keyboard-layout) ;
+SEARCH on $(HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES) = $(thinkpadDir) ;
+
+
+GenerateKeyboardLayoutLocalizationHeader ;

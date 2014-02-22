@@ -191,54 +191,13 @@ for keymapAlias in $(HAIKU_KEYMAP_ALIASES) {
 	AddSymlinkToPackage data Keymaps : $(aliasedTo:BSM) : $(keymapAlias:BSM) ;
 }
 
-# Copy keyboard layout files to the image one-by-one.
-local keyboardLayoutsDir
-	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ] ;
-local keyboardLayoutFiles =
-	"Generic 104-key"
-	"Generic 105-key International"
-	"Kinesis Advantage"
-	"Kinesis Ergo Elan International"
-	"TypeMatrix 2030" ;
-keyboardLayoutFiles = $(keyboardLayoutFiles:G=keyboard-layout) ;
-SEARCH on $(keyboardLayoutFiles) = $(keyboardLayoutsDir) ;
+# keyboard layouts
 AddFilesToPackage data KeyboardLayouts
-	: $(keyboardLayoutFiles) ;
-
-# Add Apple Aluminum keyboard layout files to the image in an Apple Aluminum
-# subdirectory. The subdirectory is turned into a submenu in the Layout menu
-# of the Keymap preference app.
-local appleAluminumDir
-	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts
-		Apple\ Aluminum ] ;
-local appleAluminumFiles =
-	"Apple Aluminium Extended International"
-	"Apple Aluminium International"
-	"Apple Aluminum (US)"
-	"Apple Aluminum Extended (US)" ;
-appleAluminumFiles = $(appleAluminumFiles:G=keyboard-layout) ;
-SEARCH on $(appleAluminumFiles) = $(appleAluminumDir) ;
+	: $(HAIKU_KEYBOARD_LAYOUT_FILES) ;
 AddFilesToPackage data KeyboardLayouts Apple\ Aluminum
-	: $(appleAluminumFiles) ;
-
-# Add ThinkPad keyboard layout files to the image in a ThinkPad
-# subdirectory. The subdirectory is turned into a submenu in the Layout menu
-# of the Keymap preference app.
-local thinkpadDir
-	= [ FDirName $(HAIKU_TOP) data system data KeyboardLayouts ThinkPad ] ;
-local thinkPadFiles =
-	"ThinkPad (US)"
-	"ThinkPad International"
-	"ThinkPad T400s (US)"
-	"ThinkPad T400s International"
-	"ThinkPad X1 (US)"
-	"ThinkPad X1 International"
-	"ThinkPad X100e (US)"
-	"ThinkPad X100e International" ;
-thinkPadFiles = $(thinkPadFiles:G=keyboard-layout) ;
-SEARCH on $(thinkPadFiles) = $(thinkpadDir) ;
+	: $(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES) ;
 AddFilesToPackage data KeyboardLayouts ThinkPad
-	: $(thinkPadFiles) ;
+	: $(HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES) ;
 
 # boot module links
 AddBootModuleSymlinksToPackage

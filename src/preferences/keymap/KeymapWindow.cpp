@@ -616,7 +616,8 @@ KeymapWindow::_AddKeyboardLayouts(BMenu* menu)
 		if (find_directory(dataDirectories[i], &path) != B_OK)
 			continue;
 
-		path.Append("KeyboardLayouts");
+		if (path.Append("KeyboardLayouts") != B_OK)
+			continue;
 
 		BDirectory directory;
 		if (directory.SetTo(path.Path()) == B_OK)
@@ -641,7 +642,7 @@ KeymapWindow::_AddKeyboardLayoutMenu(BMenu* menu, BDirectory directory)
 		BDirectory subdirectory;
 		subdirectory.SetTo(&ref);
 		if (subdirectory.InitCheck() == B_OK) {
-			BMenu* submenu = new BMenu(ref.name);
+			BMenu* submenu = new BMenu(B_TRANSLATE_NOCOLLECT(ref.name));
 
 			_AddKeyboardLayoutMenu(submenu, subdirectory);
 			menu->AddItem(submenu);
@@ -649,7 +650,8 @@ KeymapWindow::_AddKeyboardLayoutMenu(BMenu* menu, BDirectory directory)
 			BMessage* message = new BMessage(kChangeKeyboardLayout);
 
 			message->AddRef("ref", &ref);
-			menu->AddItem(new BMenuItem(ref.name, message));
+			menu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(ref.name),
+				message));
 		}
 	}
 }

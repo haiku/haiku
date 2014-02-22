@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src data ;
 
 HaikuSubInclude deskbar ;
 HaikuSubInclude etc ;
+HaikuSubInclude keyboard_layouts ;
 HaikuSubInclude keymaps ;
 HaikuSubInclude mime_db ;
 HaikuSubInclude settings ;
