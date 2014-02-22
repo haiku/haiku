@@ -37,6 +37,7 @@ RemotePackageRepository HaikuPorts
 	doxygen-1.6.3-3
 	expat-2.0.1-7
 	expat_devel-2.0.1-7
+	findutils-4.4.2-1	
 	ffmpeg-0.10.2-4
 	ffmpeg_devel-0.10.2-4
 	flac-1.3.0-1
@@ -314,6 +315,7 @@ RemotePackageRepository HaikuPorts
 	distcc
 	doxygen
 	expat
+	findutils
 	ffmpeg
 	flac
 	flex
