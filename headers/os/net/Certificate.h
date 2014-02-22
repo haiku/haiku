@@ -26,6 +26,9 @@ private:
 	class Private;
 				BCertificate(Private* data);
 
+				BCertificate(const BCertificate& other);
+					// copy-construction not allowed
+
 	Private*	fPrivate;
 };
 
