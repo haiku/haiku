@@ -286,11 +286,12 @@ BSecureSocket::WaitForReadable(bigtime_t timeout) const
 
 
 bool
-BSecureSocket::CertificateVerificationFailed(BCertificate&)
+BSecureSocket::CertificateVerificationFailed(BCertificate& certificate)
 {
 	// Until apps actually make use of the certificate API, let's keep the old
 	// behavior and accept all connections, even if the certificate validation
 	// didn't work.
+	(void)certificate;
 	return true;
 }
 
@@ -358,8 +359,9 @@ BSecureSocket::~BSecureSocket()
 
 
 bool
-BSecureSocket::CertificateVerificationFailed(BCertificate&)
+BSecureSocket::CertificateVerificationFailed(BCertificate& certificate)
 {
+	(void)certificate;
 	return false;
 }
 
