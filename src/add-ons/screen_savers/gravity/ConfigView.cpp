@@ -87,9 +87,9 @@ ConfigView::AttachedToWindow()
 
 
 void
-ConfigView::MessageReceived(BMessage* msg)
+ConfigView::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case MSG_COUNT:
 			fParent->Config.ParticleCount = fCountSlider->Value();
 			break;
@@ -99,6 +99,6 @@ ConfigView::MessageReceived(BMessage* msg)
 			break;
 
 		default:
-			BView::MessageReceived(msg);
+			BView::MessageReceived(message);
 	}
 }

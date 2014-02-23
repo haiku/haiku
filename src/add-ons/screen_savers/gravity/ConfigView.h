@@ -21,7 +21,7 @@ public:
 					ConfigView(Gravity* parent, BRect rect);
 
 	void 			AttachedToWindow();
-	void 			MessageReceived(BMessage* pbmMessage);
+	void 			MessageReceived(BMessage* message);
 
 private:
 	Gravity*		fParent;
