@@ -35,14 +35,14 @@ kgetc()
 
 
 extern "C" status_t
-_mutex_lock(mutex*, bool)
+_mutex_lock(mutex*, void*)
 {
-	return true;
+	return B_OK;
 }
 
 
 extern "C" void
-_mutex_unlock(mutex*, bool)
+_mutex_unlock(mutex*)
 {
 }
 
