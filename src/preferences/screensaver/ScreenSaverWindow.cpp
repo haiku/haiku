@@ -143,11 +143,12 @@ public:
 
 			void				SaveState();
 
+			BScreenSaver*		ScreenSaver();
+
 private:
 	static	int					_CompareScreenSaverItems(const void* left,
 									const void* right);
 
-			BScreenSaver*		_ScreenSaver();
 			void				_CloseSaver();
 			void				_OpenSaver();
 
@@ -662,7 +663,7 @@ ModulesView::MessageReceived(BMessage* message)
 void
 ModulesView::SaveState()
 {
-	BScreenSaver* saver = _ScreenSaver();
+	BScreenSaver* saver = ScreenSaver();
 	if (saver == NULL)
 		return;
 
@@ -746,7 +747,7 @@ ModulesView::_CompareScreenSaverItems(const void* left, const void* right)
 
 
 BScreenSaver*
-ModulesView::_ScreenSaver()
+ModulesView::ScreenSaver()
 {
 	if (fSaverRunner != NULL)
 		return fSaverRunner->ScreenSaver();
@@ -760,7 +761,7 @@ ModulesView::_CloseSaver()
 {
 	// remove old screen saver preview & config
 
-	BScreenSaver* saver = _ScreenSaver();
+	BScreenSaver* saver = ScreenSaver();
 	BView* view = fPreviewView->RemovePreview();
 	if (fSettingsView != NULL)
 		fSettingsBox->RemoveChild(fSettingsView);
@@ -802,7 +803,7 @@ ModulesView::_OpenSaver()
 	fSettingsView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fSettingsBox->AddChild(fSettingsView);
 
-	BScreenSaver* saver = _ScreenSaver();
+	BScreenSaver* saver = ScreenSaver();
 	if (saver != NULL && fSettingsView != NULL) {
 		saver->StartConfig(fSettingsView);
 		if (saver->StartSaver(view, false) == B_OK)
@@ -827,8 +828,9 @@ ModulesView::_OpenSaver()
 
 ScreenSaverWindow::ScreenSaverWindow()
 	:
-	BWindow(BRect(50, 50, 496, 375), B_TRANSLATE_SYSTEM_NAME("ScreenSaver"),
-		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
+	BDirectWindow(BRect(50, 50, 496, 375),
+		B_TRANSLATE_SYSTEM_NAME("ScreenSaver"), B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	fSettings.Load();
 
@@ -898,6 +900,15 @@ ScreenSaverWindow::~ScreenSaverWindow()
 
 
 void
+ScreenSaverWindow::DirectConnected(direct_buffer_info* info)
+{
+	BScreenSaver* saver = fModulesView->ScreenSaver();
+	if (saver != NULL)
+		saver->DirectConnected(info);
+}
+
+
+void
 ScreenSaverWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -912,7 +923,7 @@ ScreenSaverWindow::MessageReceived(BMessage* message)
 			break;
 
 		default:
-			BWindow::MessageReceived(message);
+			BDirectWindow::MessageReceived(message);
 	}
 }
 

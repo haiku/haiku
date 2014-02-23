@@ -18,8 +18,7 @@ Preference ScreenSaver :
 	ScreenSaver.cpp
 		# needed for some old/broken screen saver add-ons that do not
 		# link against libscreensaver.so
-
-	: tracker libscreensaver.so be $(TARGET_LIBSTDC++) localestub
+	: be game libscreensaver.so localestub tracker $(TARGET_LIBSTDC++)
 	: ScreenSaver.rdef 
 	;
 

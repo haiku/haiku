@@ -12,7 +12,7 @@
 #define SCREEN_SAVER_WINDOW_H
 
 
-#include <Window.h>
+#include <DirectWindow.h>
 
 #include "PasswordWindow.h"
 #include "ScreenSaverSettings.h"
@@ -26,10 +26,12 @@ class FadeView;
 class ModulesView;
 
 
-class ScreenSaverWindow : public BWindow {
+class ScreenSaverWindow : public BDirectWindow {
 public:
 								ScreenSaverWindow();
 	virtual						~ScreenSaverWindow();
+
+	virtual	void				DirectConnected(direct_buffer_info* info);
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				ScreenChanged(BRect frame, color_space space);
