@@ -334,6 +334,9 @@ Flurry::StartSaver(BView* view, bool preview)
 {
 	status_t result = B_ERROR;
 
+	if (preview)
+		return result;
+
 	SetTickSize(50000);
 
 	fFlurryView = new (std::nothrow) FlurryView(view->Bounds());
@@ -371,8 +374,8 @@ Flurry::DirectConnected(direct_buffer_info* info)
 {
 	// Enable or disable direct rendering
 	if (fFlurryView != NULL) {
-		//fFlurryView->DirectConnected(info);
-		//fFlurryView->EnableDirectMode(true);
+		fFlurryView->DirectConnected(info);
+		fFlurryView->EnableDirectMode(true);
 	}
 }
 
