@@ -88,6 +88,13 @@ FUNCTION(atomic_get):
         bx	lr
 FUNCTION_END(atomic_get)
 
+/* void __sync_synchronize(void)
+ */
+FUNCTION(__sync_synchronize):
+	dmb
+	bx lr
+FUNCTION_END(__sync_synchronize)
+
 #endif /* ATOMIC_FUNCS_ARE_SYSCALLS */
 
 #ifndef ATOMIC64_FUNCS_ARE_SYSCALLS
