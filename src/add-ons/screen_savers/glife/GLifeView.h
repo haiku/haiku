@@ -19,9 +19,10 @@
 class GLifeView : public BGLView {
 public:
 	// Constructor & Destructor
-						GLifeView(BRect, const char*, ulong, ulong, GLifeState*);
+						GLifeView(BRect, const char*, ulong,
+							ulong, GLifeState*);
 						~GLifeView(void);
-				
+
 	// Public Methods
 			void		AttachedToWindow(void);
 	virtual	void		Draw(BRect updateRect);

@@ -73,21 +73,15 @@ GLifeSaver::StartConfig(BView* pbvView)
 status_t
 GLifeSaver::StartSaver(BView* pbvView, bool bPreview)
 {
-	if (bPreview) {
-		// We do not use the preview option
-		fGLifeViewport = 0;
-		return B_ERROR;
-	} else {
-		SetTickSize(c_iTickSize);
-		
-		fGLifeViewport = new GLifeView(pbvView->Bounds(),
-			"GLifeView", B_FOLLOW_NONE, BGL_RGB | BGL_DEPTH | BGL_DOUBLE,
-			&fGLifeState);
+	SetTickSize(c_iTickSize);
 
-		pbvView->AddChild(fGLifeViewport);
-		
-		return B_OK;
-	}
+	fGLifeViewport = new GLifeView(pbvView->Bounds(),
+		"GLifeView", B_FOLLOW_NONE, BGL_RGB | BGL_DEPTH | BGL_DOUBLE,
+		&fGLifeState);
+
+	pbvView->AddChild(fGLifeViewport);
+
+	return B_OK;
 }
 
 
@@ -107,12 +101,10 @@ void
 GLifeSaver::DirectConnected(direct_buffer_info* pdbiInfo)
 {
 	// Enable or disable direct rendering
-	#if 1
 	if (fGLifeViewport != NULL) {
 		fGLifeViewport->DirectConnected(pdbiInfo);
 		fGLifeViewport->EnableDirectMode(true);
 	}
-	#endif
 }
 
 
