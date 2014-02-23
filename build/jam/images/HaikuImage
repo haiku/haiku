@@ -170,6 +170,7 @@ SYSTEM_ADD_ONS_SCREENSAVERS = [ FFilterByBuildFeatures
 	GLife@mesa $(HAIKU_INCLUDE_TRADEMARKS)Haiku Icons IFS Leaves
 	Message Spider Gravity@mesa
 ] ;
+
 SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ice1712 sis7018 ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
@@ -299,8 +300,6 @@ SEARCH on <post-install>fresh_install
 AddFilesToHaikuImage system settings : <post-install>fresh_install ;
 
 # decorators
-AddDirectoryToHaikuImage system non-packaged add-ons decorators ;
-AddDirectoryToHaikuImage home config non-packaged add-ons decorators ;
 #AddFilesToHaikuImage system non-packaged add-ons decorators
 #	: BeDecorator MacDecorator WinDecorator ;
 
