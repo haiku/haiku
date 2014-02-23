@@ -63,11 +63,11 @@ PreviewView::~PreviewView()
 
 
 void
-PreviewView::Draw(BRect update)
+PreviewView::Draw(BRect updateRect)
 {
 	SetHighColor(184, 184, 184);
 	FillRoundRect(scale2(0, 9, 0, 3, Bounds()), 4, 4);
-		// Outer shape
+		// outer shape
 	FillRoundRect(scale2(2, 7, 3, 6, Bounds()), 2, 2);
 		// control console outline
 
@@ -75,7 +75,7 @@ PreviewView::Draw(BRect update)
 	StrokeRoundRect(scale2(2, 7, 3, 6, Bounds()), 2, 2);
 		// control console outline
 	StrokeRoundRect(scale2(0, 9, 0, 3, Bounds()), 4, 4);
-		// Outline outer shape
+		// outline outer shape
 
 	SetHighColor(0, 0, 0);
 	FillRect(scale2(1, 8, 1, 2, Bounds()));
@@ -84,7 +84,7 @@ PreviewView::Draw(BRect update)
 	BRect outerShape = scale2(2, 7, 2, 6, Bounds());
 	outerShape.InsetBy(1, 1);
 	FillRoundRect(outerShape, 4, 4);
-		// Outer shape
+		// outer shape
 
 	SetHighColor(0, 255, 0);
 	FillRect(scale2(3, 4, 4, 5, Bounds()));

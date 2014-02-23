@@ -10,17 +10,17 @@
 #define PREVIEW_VIEW_H
 
 
-#include <View.h>
 #include <Box.h>
 #include <ScreenSaverRunner.h>
+#include <View.h>
 
 
-class PreviewView : public BView { 
+class PreviewView : public BView {
 public:
 								PreviewView(const char* name);
 	virtual						~PreviewView();
 
-	virtual	void				Draw(BRect update);
+	virtual	void				Draw(BRect updateRect);
 
 			BView*				AddPreview();
 			BView*				RemovePreview();
