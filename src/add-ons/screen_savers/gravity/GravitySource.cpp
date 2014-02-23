@@ -1,7 +1,14 @@
 /*
  * Copyright 2012-2013 Tri-Edge AI <triedgeai@gmail.com>
- * All rights reserved. Distributed under the terms of the MIT license.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Tri-Edge AI
+ *		John Scipione, jscipione@gmail.com
  */
+
 
 
 #include "GravitySource.h"
@@ -59,7 +66,7 @@ GravitySource::Tick()
 	}
 
 	for (int32 i = 0; i < Particle::list->CountItems(); i++) {
-		Particle* p = (Particle*)Particle::list->ItemAt(i);
+		Particle* p = Particle::list->ItemAt(i);
 		dx = x - p->x;
 		dy = y - p->y;
 		dz = z - p->z;

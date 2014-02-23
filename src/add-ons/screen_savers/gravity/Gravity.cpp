@@ -1,6 +1,12 @@
 /*
  * Copyright 2012-2013 Tri-Edge AI <triedgeai@gmail.com>
- * All rights reserved. Distributed under the terms of the MIT license.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Tri-Edge AI
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -14,9 +20,12 @@
 
 #include <stdlib.h>
 
+
 Gravity::Gravity(BMessage* prefs, image_id imageID)
 	:
-	BScreenSaver(prefs, imageID)
+	BScreenSaver(prefs, imageID),
+	fGravityView(NULL),
+	fConfigView(NULL)
 {
 	srand(time(NULL));
 
@@ -45,7 +54,8 @@ Gravity::SaveState(BMessage* prefs) const
 void
 Gravity::StartConfig(BView* view)
 {
-	view->AddChild(new ConfigView(this, view->Bounds()));
+	fConfigView = new ConfigView(view->Bounds(), this);
+	view->AddChild(fConfigView);
 }
 
 
@@ -54,8 +64,8 @@ Gravity::StartSaver(BView* view, bool preview)
 {
 	SetTickSize((1000 / 20) * 1000);
 		// ~20 FPS
-	fView = new GravityView(this, view->Bounds());
-	view->AddChild(fView);
+	fGravityView = new GravityView(view->Bounds(), this);
+	view->AddChild(fGravityView);
 
 	return B_OK;
 }
@@ -64,17 +74,17 @@ Gravity::StartSaver(BView* view, bool preview)
 void
 Gravity::StopSaver()
 {
-	if (fView != NULL)
-		fView->EnableDirectMode(false);
+	if (fGravityView != NULL)
+		fGravityView->EnableDirectMode(false);
 }
 
 
 void
 Gravity::DirectConnected(direct_buffer_info* info)
 {
-	if (fView != NULL) {
-		fView->DirectConnected(info);
-		fView->EnableDirectMode(true);
+	if (fGravityView != NULL) {
+		fGravityView->DirectConnected(info);
+		fGravityView->EnableDirectMode(true);
 	}
 }
 
@@ -82,5 +92,5 @@ Gravity::DirectConnected(direct_buffer_info* info)
 void
 Gravity::DirectDraw(int32 frame)
 {
-	fView->DirectDraw();
+	fGravityView->DirectDraw();
 }
