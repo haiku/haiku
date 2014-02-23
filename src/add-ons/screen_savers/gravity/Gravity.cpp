@@ -52,16 +52,12 @@ Gravity::StartConfig(BView* view)
 status_t
 Gravity::StartSaver(BView* view, bool preview)
 {
-	if (preview) {
-		fView = NULL;
-		return B_ERROR;
-	} else {
-		SetTickSize((1000 / 20) * 1000);
-			// ~20 FPS
-		fView = new GravityView(this, view->Bounds());
-		view->AddChild(fView);
-		return B_OK;
-	}
+	SetTickSize((1000 / 20) * 1000);
+		// ~20 FPS
+	fView = new GravityView(this, view->Bounds());
+	view->AddChild(fView);
+
+	return B_OK;
 }
 
 
@@ -77,9 +73,8 @@ void
 Gravity::DirectConnected(direct_buffer_info* info)
 {
 	if (fView != NULL) {
-		// TODO: Find out why I had to uncomment this.
-		// view->DirectConnected(pdbiInfo);
-		// view->EnableDirectMode(true);
+		fView->DirectConnected(info);
+		fView->EnableDirectMode(true);
 	}
 }
 
