@@ -619,8 +619,8 @@ rule BuildHaikuPortsRepositoryConfig treePath
 
 actions BuildHaikuPortsRepositoryConfig1
 {
-cat > $(1) << EOF
-#PACKAGER="Joe Hacker <user@host.com>"
+	echo '#PACKAGER="Joe Hacker <user@host.com>"' > $(1)
+	cat >> $(1) << EOF
 TREE_PATH="$(HAIKU_REPOSITORY_TREE_PATH)"
 TARGET_ARCHITECTURE="$(HAIKU_PACKAGING_ARCH)"
 EOF
