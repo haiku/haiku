@@ -197,7 +197,7 @@ rule As
 		systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
 
 	} else {
-		flags = [ on $(1) return $(TARGET_ASFLAGS_$(architecture))
+		flags = [ on $(1) return $(HAIKU_ASFLAGS_$(TARGET_PACKAGING_ARCH))
 			$(ASFLAGS) ] ;
 
 		CC on $(1) = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;

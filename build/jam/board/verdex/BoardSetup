@@ -70,7 +70,7 @@ HAIKU_BOARD_SDIMAGE_FILES =
 
 HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += -mcpu=xscale -D__XSCALE__ ;
 HAIKU_C++FLAGS_$(HAIKU_PACKAGING_ARCH) += -mcpu=xscale -D__XSCALE__ ;
-TARGET_ASFLAGS_$(HAIKU_PACKAGING_ARCH) += -mcpu=xscale -D__XSCALE__ ;
+HAIKU_ASFLAGS_$(HAIKU_PACKAGING_ARCH) += -mcpu=xscale -D__XSCALE__ ;
 
 # Workaround for ld using 32k for alignment despite forcing it in the config...
 # should definitely not be needed!
