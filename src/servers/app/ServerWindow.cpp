@@ -2451,14 +2451,16 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				Title()));
 
 			BRect rect;
-			float xrad,yrad;
+			float xRadius;
+			float yRadius;
 			link.Read<BRect>(&rect);
-			link.Read<float>(&xrad);
-			if (link.Read<float>(&yrad) != B_OK)
+			link.Read<float>(&xRadius);
+			if (link.Read<float>(&yRadius) != B_OK)
 				break;
 
 			fCurrentView->ConvertToScreenForDrawing(&rect);
-			drawingEngine->DrawRoundRect(rect, xrad, yrad,
+			float scale = fCurrentView->CurrentState()->CombinedScale();
+			drawingEngine->DrawRoundRect(rect, xRadius * scale, yRadius * scale,
 				code == AS_FILL_ROUNDRECT);
 			break;
 		}

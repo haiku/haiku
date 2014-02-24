@@ -293,19 +293,26 @@ fill_rect(DrawingContext* context, BRect rect)
 
 
 static void
-stroke_round_rect(DrawingContext* context, BRect rect, BPoint radii)
+draw_round_rect(DrawingContext* context, BRect rect, BPoint radii, bool fill)
 {
 	context->ConvertToScreenForDrawing(&rect);
-	context->GetDrawingEngine()->DrawRoundRect(rect, radii.x,
-		radii.y, false);
+	float scale = context->CurrentState()->CombinedScale();
+	context->GetDrawingEngine()->DrawRoundRect(rect, radii.x * scale,
+		radii.y * scale, fill);
+}
+
+
+static void
+stroke_round_rect(DrawingContext* context, BRect rect, BPoint radii)
+{
+	draw_round_rect(context, rect, radii, false);
 }
 
 
 static void
 fill_round_rect(DrawingContext* context, BRect rect, BPoint radii)
 {
-	context->ConvertToScreenForDrawing(&rect);
-	context->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y, true);
+	draw_round_rect(context, rect, radii, true);
 }
 
 
