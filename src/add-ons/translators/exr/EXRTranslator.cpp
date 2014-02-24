@@ -101,7 +101,7 @@ EXRTranslator::DerivedIdentify(BPositionIO *stream,
 			strlcpy(outInfo->name, B_TRANSLATE("EXR image"),
 				sizeof(outInfo->name));
 		}
-	} catch (const std::exception &e) {
+	} catch (...) {
 		return B_NO_TRANSLATOR;
 	}
 
@@ -226,8 +226,9 @@ EXRTranslator::DerivedTranslate(BPositionIO* source,
 		}
 
 		err = B_OK;
-	} catch (const std::exception &e) {
-		std::cerr << e.what() << std::endl;
+//	} catch (const std::exception &e) {
+//		std::cerr << e.what() << std::endl;
+	} catch (...) {
 	}
 	return err;
 }
