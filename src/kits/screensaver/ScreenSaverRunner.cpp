@@ -96,7 +96,7 @@ ScreenSaverRunner::_LoadAddOn()
 	_CleanUp();
 
 	const char* moduleName = fSettings.ModuleName();
-	if (*moduleName == '\0') {
+	if (moduleName == NULL || *moduleName == '\0') {
 		Resume();
 		return;
 	}
@@ -134,7 +134,7 @@ ScreenSaverRunner::_LoadAddOn()
 			fprintf(stderr, "Unable to find the instantiation function.\n");
 		} else {
 			BMessage state;
-			fSettings.GetModuleState(fSettings.ModuleName(), &state);
+			fSettings.GetModuleState(moduleName, &state);
 			fSaver = instantiate(&state, fAddonImage);
 		}
 
