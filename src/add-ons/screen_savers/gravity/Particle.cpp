@@ -176,6 +176,7 @@ Particle::_ColorParticle(Particle* p, int32 size, int32 shade)
 		case 5:
 			// White
 			p->red = p->green = p->blue = 0.1f + frand() * 0.2f;
+			break;
 
 		case 6:
 			// Rainbow
