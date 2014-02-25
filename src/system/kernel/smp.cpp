@@ -637,7 +637,7 @@ acquire_read_spinlock(rw_spinlock* lock)
 		if (try_acquire_read_spinlock(lock))
 			break;
 
-		while (atomic_get(&lock->lock) != 0) {
+		while ((atomic_get(&lock->lock) & (1u << 31)) != 0) {
 			if (++count == SPINLOCK_DEADLOCK_COUNT) {
 				panic("acquire_read_spinlock(): Failed to acquire spinlock %p "
 					"for a long time!", lock);
