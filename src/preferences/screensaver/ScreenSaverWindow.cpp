@@ -702,8 +702,10 @@ ModulesView::PopulateScreenSaverList()
 
 	for (uint32 i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
 		BPath basePath;
-		find_directory(which[i], &basePath);
-		basePath.Append("Screen Savers", true);
+		if (find_directory(which[i], &basePath) != B_OK)
+			continue;
+		else if (basePath.Append("Screen Savers", true) != B_OK)
+			continue;
 
 		BDirectory dir(basePath.Path());
 		BEntry entry;
@@ -712,8 +714,9 @@ ModulesView::PopulateScreenSaverList()
 			if (entry.GetName(name) != B_OK)
 				continue;
 
-			BPath path = basePath;
-			path.Append(name);
+			BPath path(basePath);
+			if (path.Append(name) != B_OK)
+				continue;
 
 			ScreenSaverItem* item = new ScreenSaverItem(name, path.Path());
 			fScreenSaversListView->AddItem(item);
