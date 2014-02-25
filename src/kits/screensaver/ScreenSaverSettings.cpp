@@ -27,10 +27,10 @@
 ScreenSaverSettings::ScreenSaverSettings()
 {
 	BPath path;
-  	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-
-	fSettingsPath = path;
-	fSettingsPath.Append("ScreenSaver_settings", true);
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		fSettingsPath = path;
+		fSettingsPath.Append("ScreenSaver_settings", true);
+	}
 
 	Defaults();
 }
