@@ -50,8 +50,8 @@ public:
 			bigtime_t		SuspendTime() const { return fSuspendTime; }
 			bigtime_t		OffTime() const { return fOffTime; }
 
-			screen_corner		BlankCorner() const { return fBlankCorner; }
-			screen_corner		NeverBlankCorner() const { return fNeverBlankCorner; }
+			screen_corner	BlankCorner() const { return fBlankCorner; }
+			screen_corner	NeverBlankCorner() const { return fNeverBlankCorner; }
 			bool			LockEnable() const { return fLockEnabled; }
 			bigtime_t		PasswordTime() const { return fPasswordTime; }
 			const char*		Password() { return fPassword.String(); }
