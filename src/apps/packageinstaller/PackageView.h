@@ -66,6 +66,8 @@ private:
 			BMenuItem*			_AddMenuItem(const char* name,
 									BMessage* message, BMenu* menu) const;
 
+			bool				_ValidateFilePanelMessage(BMessage* message);
+
 private:
 			BPopUpMenu*			fInstallTypes;
 			BTextView*			fInstallTypeDescriptionView;
@@ -74,6 +76,8 @@ private:
 			BButton*			fBeginButton;
 
 			BFilePanel*			fOpenPanel;
+			bool				fExpectingOpenPanelResult;
+
 			BPath				fCurrentPath;
 			uint32				fCurrentType;
 

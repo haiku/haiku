@@ -73,6 +73,7 @@ PackageView::PackageView(const entry_ref* ref)
 	BView("package_view", 0),
 	fOpenPanel(new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_DIRECTORY_NODE,
 		false)),
+	fExpectingOpenPanelResult(false),
 	fInfo(ref),
 	fInstallProcess(this)
 {
@@ -180,6 +181,7 @@ PackageView::MessageReceived(BMessage* message)
 		}
 
 		case P_MSG_OPEN_PANEL:
+			fExpectingOpenPanelResult = true;
 			fOpenPanel->Show();
 			break;
 
@@ -266,6 +268,9 @@ PackageView::MessageReceived(BMessage* message)
 
 		case B_REFS_RECEIVED:
 		{
+			if (!_ValidateFilePanelMessage(message))
+				break;
+
 			entry_ref ref;
 			if (message->FindRef("refs", &ref) == B_OK) {
 				BPath path(&ref);
@@ -290,6 +295,9 @@ PackageView::MessageReceived(BMessage* message)
 
 		case B_CANCEL:
 		{
+			if (!_ValidateFilePanelMessage(message))
+				break;
+
 			// file panel aborted, select first suitable item
 			for (int32 i = 0; i < fDestination->CountItems(); i++) {
 				BMenuItem* item = fDestination->ItemAt(i);
@@ -722,4 +730,15 @@ PackageView::_AddMenuItem(const char* name, BMessage* message,
 	item->SetTarget(this);
 	menu->AddItem(item);
 	return item;
+}
+
+
+bool
+PackageView::_ValidateFilePanelMessage(BMessage* message)
+{
+	if (!fExpectingOpenPanelResult)
+		return false;
+
+	fExpectingOpenPanelResult = false;
+	return true;
 }
