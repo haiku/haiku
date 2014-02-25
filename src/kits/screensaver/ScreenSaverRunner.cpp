@@ -103,7 +103,7 @@ ScreenSaverRunner::_LoadAddOn()
 
 	BScreenSaver* (*instantiate)(BMessage*, image_id);
 
-	// try all directories until the first one succeeds
+	// try each directory until one succeeds
 
 	directory_which which[] = {
 		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
@@ -129,7 +129,8 @@ ScreenSaverRunner::_LoadAddOn()
 		printf("Unable to open add-on: %s: %s\n", path.Path(),
 			strerror(fAddonImage));
 	} else {
-		// Look for the one C function that should exist.
+		// look for the one C function that should exist,
+		// instantiate_screen_saver()
 		if (get_image_symbol(fAddonImage, "instantiate_screen_saver",
 				B_SYMBOL_TYPE_TEXT, (void **)&instantiate) != B_OK) {
 			printf("Unable to find the instantiator\n");
