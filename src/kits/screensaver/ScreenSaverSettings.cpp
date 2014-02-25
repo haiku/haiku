@@ -172,21 +172,27 @@ ScreenSaverSettings::Message()
 
 
 status_t
-ScreenSaverSettings::GetModuleState(const char* name, BMessage* stateMsg)
+ScreenSaverSettings::GetModuleState(const char* name, BMessage* stateMessage)
 {
+	if (name == NULL || *name == '\0')
+		return B_BAD_VALUE;
+
 	BString stateName("modulesettings_");
-	stateName += name;
-	return fSettings.FindMessage(stateName.String(), stateMsg);
+	stateName << name;
+	return fSettings.FindMessage(stateName, stateMessage);
 }
 
 
 void
-ScreenSaverSettings::SetModuleState(const char* name, BMessage* stateMsg)
+ScreenSaverSettings::SetModuleState(const char* name, BMessage* stateMessage)
 {
+	if (name == NULL || *name == '\0')
+		return;
+
 	BString stateName("modulesettings_");
-	stateName += name;
+	stateName << name;
 	fSettings.RemoveName(stateName.String());
-	fSettings.AddMessage(stateName.String(), stateMsg);
+	fSettings.AddMessage(stateName.String(), stateMessage);
 }
 
 
