@@ -14,7 +14,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	echo eject env error expand expr
 	factor false fdinfo ffm filepanel finddir findpaths FirstBootPrompt fmt
 	fold fortune fstrim ftp ftpd funzip fwcontrol@x86
-	gawk gdb@x86 getarch getlimits groupadd groupdel groupmod groups gzip gzexe
+	gdb@x86 getarch getlimits groupadd groupdel groupmod groups gzip gzexe
 	hd head hey hostname
 	id ident ifconfig <bin>install installsound iroster isvolume
 	ideinfo@ide idestatus@ide

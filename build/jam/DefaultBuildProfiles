@@ -129,6 +129,7 @@ rule DefineDefaultBuildProfiles
 				flex
 				freetype
 				freetype_devel
+				gawk
 				gcc
 				grep
 				haikuporter
