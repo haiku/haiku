@@ -261,7 +261,6 @@ SubInclude HAIKU_TOP src bin consoled ;
 SubInclude HAIKU_TOP src bin coreutils ;
 SubInclude HAIKU_TOP src bin desklink ;
 SubInclude HAIKU_TOP src bin diffutils ;
-SubInclude HAIKU_TOP src bin findutils ;
 SubInclude HAIKU_TOP src bin fwcontrol ;
 SubInclude HAIKU_TOP src bin gawk ;
 SubInclude HAIKU_TOP src bin gdb ;

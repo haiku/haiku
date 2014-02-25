@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src bin findutils ;
-
-SubInclude HAIKU_TOP src bin findutils gnulib ;
-SubInclude HAIKU_TOP src bin findutils lib ;
-SubInclude HAIKU_TOP src bin findutils find ;
-SubInclude HAIKU_TOP src bin findutils locate ;
-SubInclude HAIKU_TOP src bin findutils xargs ;

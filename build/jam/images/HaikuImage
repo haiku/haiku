@@ -12,15 +12,15 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	csplit cut date dc dd desklink df diff diff3 dircolors dirname
 	diskimage draggers driveinfo dstcheck du dumpcatalog
 	echo eject env error expand expr
-	factor false fdinfo ffm filepanel find finddir findpaths FirstBootPrompt fmt
-	fold fortune frcode fstrim ftp ftpd funzip fwcontrol@x86
+	factor false fdinfo ffm filepanel finddir findpaths FirstBootPrompt fmt
+	fold fortune fstrim ftp ftpd funzip fwcontrol@x86
 	gawk gdb@x86 getarch getlimits groupadd groupdel groupmod groups gzip gzexe
 	hd head hey hostname
 	id ident ifconfig <bin>install installsound iroster isvolume
 	ideinfo@ide idestatus@ide
 	join kernel_debugger keymap keystore kill
 	less lessecho lesskey link linkcatkeys listarea listattr listimage listdev
-	listport listres listsem listusb ln locale locate logger login logname ls
+	listport listres listsem listusb ln locale logger login logname ls
 	lsindex
 	mail2mbox makebootable mbox2mail md5sum merge message mimeset mkdos mkdir
 	mkfifo mkfs mkindex mktemp modifiers mount mount_nfs mountvolume mv
@@ -37,9 +37,9 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
 	tr traceroute translate trash true truncate tsort tty
 	uname unchop unexpand unmount uniq unlink unshar unzip unzipsfx
-	<bin>updatedb uptime urlwrapper useradd userdel uudecode uuencode
+	uptime urlwrapper useradd userdel uudecode uuencode
 	vdir version vmstat
-	waitfor watch wc wget whoami writembr@x86,x86_64 xargs xres
+	waitfor watch wc wget whoami writembr@x86,x86_64 xres
 	yes
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ] ;

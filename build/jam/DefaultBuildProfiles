@@ -125,6 +125,7 @@ rule DefineDefaultBuildProfiles
 				bison
 				curl
 				curl_devel
+				findutils
 				flex
 				freetype
 				freetype_devel

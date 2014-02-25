@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src bin findutils gnulib ;
-
-SubInclude HAIKU_TOP src bin findutils gnulib lib ;
