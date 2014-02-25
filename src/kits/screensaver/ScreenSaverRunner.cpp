@@ -116,9 +116,10 @@ ScreenSaverRunner::_LoadAddOn()
 	for (uint32 i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
 		if (find_directory(which[i], &path, false) != B_OK)
 			continue;
-
-		path.Append("Screen Savers");
-		path.Append(fSettings.ModuleName());
+		else if (path.Append("Screen Savers") != B_OK)
+			continue;
+		else if (path.Append(fSettings.ModuleName()) != B_OK)
+			continue;
 
 		fAddonImage = load_add_on(path.Path());
 		if (fAddonImage >= B_OK)
