@@ -809,7 +809,7 @@ ModulesView::_OpenSaver()
 	BScreenSaver* saver = ScreenSaver();
 	if (saver != NULL && fSettingsView != NULL) {
 		saver->StartConfig(fSettingsView);
-		if (saver->StartSaver(view, false) == B_OK)
+		if (saver->StartSaver(view, true) == B_OK)
 			fSaverRunner->Run();
 	}
 
