@@ -122,14 +122,11 @@ ScreenSaverRunner::_LoadAddOn()
 			continue;
 
 		fAddonImage = load_add_on(path.Path());
-		if (fAddonImage >= B_OK)
+		if (fAddonImage > 0)
 			break;
 	}
 
-	if (fAddonImage < B_OK) {
-		printf("Unable to open add-on: %s: %s\n", path.Path(),
-			strerror(fAddonImage));
-	} else {
+	if (fAddonImage > 0) {
 		// look for the one C function that should exist,
 		// instantiate_screen_saver()
 		if (get_image_symbol(fAddonImage, "instantiate_screen_saver",
@@ -146,7 +143,8 @@ ScreenSaverRunner::_LoadAddOn()
 				strerror(fSaver->InitCheck()));
 			_CleanUp();
 		}
-	}
+	} else
+		printf("Unable to open add-on %s.\n", path.Path());
 
 	Resume();
 }
