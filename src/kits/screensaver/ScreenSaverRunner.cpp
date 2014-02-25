@@ -131,20 +131,23 @@ ScreenSaverRunner::_LoadAddOn()
 		// instantiate_screen_saver()
 		if (get_image_symbol(fAddonImage, "instantiate_screen_saver",
 				B_SYMBOL_TYPE_TEXT, (void **)&instantiate) != B_OK) {
-			printf("Unable to find the instantiator\n");
+			fprintf(stderr, "Unable to find the instantiation function.\n");
 		} else {
 			BMessage state;
 			fSettings.GetModuleState(fSettings.ModuleName(), &state);
 			fSaver = instantiate(&state, fAddonImage);
 		}
 
-		if (fSaver->InitCheck() != B_OK) {
-			printf("ScreenSaver initialization failed: %s!\n",
+		if (fSaver == NULL) {
+			fprintf(stderr, "Screen saver initialization failed.\n");
+			_CleanUp();
+		} else if (fSaver->InitCheck() != B_OK) {
+			fprintf(stderr, "Screen saver initialization failed: %s.\n",
 				strerror(fSaver->InitCheck()));
 			_CleanUp();
 		}
 	} else
-		printf("Unable to open add-on %s.\n", path.Path());
+		fprintf(stderr, "Unable to open add-on %s.\n", path.Path());
 
 	Resume();
 }
@@ -157,7 +160,11 @@ ScreenSaverRunner::_CleanUp()
 	fSaver = NULL;
 
 	if (fAddonImage >= 0) {
-		unload_add_on(fAddonImage);
+		status_t result = unload_add_on(fAddonImage);
+		if (result != B_OK) {
+			fprintf(stderr, "Unable to unload screen saver add-on: %s.\n",
+				strerror(result));
+		}
 		fAddonImage = -1;
 	}
 }
