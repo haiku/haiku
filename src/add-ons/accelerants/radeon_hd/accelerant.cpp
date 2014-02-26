@@ -134,7 +134,7 @@ init_common(int device, bool isClone)
 	}
 
 	// malloc for card gpio pin information
-	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+	for (uint32 id = 0; id < MAX_GPIO_PINS; id++) {
 		gGPIOInfo[id] = (gpio_info*)malloc(sizeof(gpio_info));
 
 		if (gGPIOInfo[id] == NULL)
@@ -225,10 +225,11 @@ uninit_common(void)
 		}
 	}
 
-	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++)
 		free(gConnector[id]);
+
+	for (uint32 id = 0; id < MAX_GPIO_PINS; id++)
 		free(gGPIOInfo[id]);
-	}
 }
 
 
