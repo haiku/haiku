@@ -250,7 +250,7 @@ BUSBInterface::_UpdateDescriptorAndEndpoints()
 		// Delete old endpoints
 		for (int32 i = 0; i < fDescriptor.num_endpoints; i++)
 			delete fEndpoints[i];
-		delete fEndpoints;
+		delete[] fEndpoints;
 	}
 
 	fEndpoints = new(std::nothrow) BUSBEndpoint *[fDescriptor.num_endpoints];
