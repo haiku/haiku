@@ -580,6 +580,7 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 				break;
 			case 5:
 				cookie->version = 3;
+				break;
 			case 6:
 			case 7:
 				cookie->version = 4;
