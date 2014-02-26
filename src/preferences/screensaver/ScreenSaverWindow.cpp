@@ -132,6 +132,7 @@ class ModulesView : public BView {
 public:
 								ModulesView(const char* name,
 									ScreenSaverSettings& settings);
+	virtual						~ModulesView();
 
 	virtual	void				DetachedFromWindow();
 	virtual	void				AttachedToWindow();
@@ -153,10 +154,11 @@ private:
 			void				_OpenSaver();
 
 private:
+		ScreenSaverSettings&	fSettings;
+
 			BListView*			fScreenSaversListView;
 			BButton*			fTestButton;
 
-			ScreenSaverSettings&	fSettings;
 			ScreenSaverRunner*	fSaverRunner;
 			BString				fCurrentName;
 
@@ -522,25 +524,22 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 	:
 	BView(name, B_WILL_DRAW),
 	fSettings(settings),
+	fScreenSaversListView(new BListView("SaversListView")),
+	fTestButton(new BButton("TestButton", B_TRANSLATE("Test"),
+		new BMessage(kMsgTestSaver))),
 	fSaverRunner(NULL),
+	fSettingsBox(new BBox("SettingsBox")),
 	fSettingsView(NULL),
+	fPreviewView(new PreviewView("preview")),
 	fScreenSaverTestTeam(-1)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fTestButton = new BButton("TestButton", B_TRANSLATE("Test"),
-		new BMessage(kMsgTestSaver));
-
-	fPreviewView = new PreviewView("preview");
-
-	fScreenSaversListView = new BListView("SaversListView",
-		B_SINGLE_SELECTION_LIST);
 	fScreenSaversListView->SetSelectionMessage(
 		new BMessage(kMsgSaverSelected));
 	BScrollView* saversListScrollView = new BScrollView("scroll_list",
 		fScreenSaversListView, 0, false, true);
 
-	fSettingsBox = new BBox("SettingsBox");
 	fSettingsBox->SetLabel(B_TRANSLATE("Screensaver settings"));
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
@@ -555,6 +554,14 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 			.End()
 		.Add(fSettingsBox)
 		.End();
+}
+
+
+ModulesView::~ModulesView()
+{
+	delete fTestButton;
+	delete fSettingsBox;
+	delete fPreviewView;
 }
 
 
