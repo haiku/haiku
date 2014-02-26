@@ -602,7 +602,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 showLevel;
 			if (link.Read<int32>(&showLevel) == B_OK) {
 				DTRACE(("ServerWindow %s: Message AS_SHOW_OR_HIDE_WINDOW, "
-					"show level: %d\n", Title(), showLevel));
+					"show level: %ld\n", Title(), showLevel));
 
 				fWindow->SetShowLevel(showLevel);
 				if (showLevel <= 0)
