@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
+ * Copyright 2007-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -92,7 +92,6 @@ public:
 									const char* utf8String,
 									int32 length,
 									const escapement_delta* delta = NULL,
-									bool kerning = true,
 									uint8 spacing = B_BITMAP_SPACING,
 									const BPoint* offsets = NULL,
 									FontCacheReference* cacheReference = NULL);
@@ -173,7 +172,7 @@ inline bool
 GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	const ServerFont& font,
 	const char* utf8String, int32 length,
-	const escapement_delta* delta, bool kerning, uint8 spacing,
+	const escapement_delta* delta, uint8 spacing,
 	const BPoint* offsets, FontCacheReference* _cacheReference)
 {
 	// TODO: implement spacing modes
@@ -212,7 +211,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	double advanceX = 0.0;
 	double advanceY = 0.0;
 
-//	uint32 lastCharCode = 0; // Needed for kerning, see below
+	uint32 lastCharCode = 0; // Needed for kerning in B_STRING_SPACING mode
 	uint32 charCode;
 	int32 index = 0;
 	bool writeLocked = false;
@@ -225,10 +224,8 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			x = offsets[index].x;
 			y = offsets[index].y;
 		} else {
-// TODO: Currently disabled, because it works much too slow (doesn't seem
-// to be properly cached in FreeType.)
-//			if (kerning)
-//				entry->GetKerning(lastCharCode, charCode, &advanceX, &advanceY);
+			if (spacing == B_STRING_SPACING)
+				entry->GetKerning(lastCharCode, charCode, &advanceX, &advanceY);
 
 			x += advanceX;
 			y += advanceY;
@@ -273,7 +270,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			}
 		}
 
-//		lastCharCode = charCode;
+		lastCharCode = charCode;
 		if (utf8String - start + 1 > length)
 			break;
 	}

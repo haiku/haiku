@@ -59,7 +59,6 @@ AGGTextRenderer::AGGTextRenderer(renderer_subpix_type& subpixRenderer,
 
 	fHinted(true),
 	fAntialias(true),
-	fKerning(true),
 	fEmbeddedTransformation(),
 	fViewTransformation(viewTransformation)
 {
@@ -365,7 +364,7 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 		transform, transformOffset, nextCharPos, *this);
 
 	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, delta,
-		fKerning, B_BITMAP_SPACING, NULL, cacheReference);
+		fFont.Spacing(), NULL, cacheReference);
 
 	return transform.TransformBounds(renderer.Bounds());
 }
@@ -402,7 +401,7 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 		transform, transformOffset, nextCharPos, *this);
 
 	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, NULL,
-		fKerning, B_BITMAP_SPACING, offsets, cacheReference);
+		fFont.Spacing(), offsets, cacheReference);
 
 	return transform.TransformBounds(renderer.Bounds());
 }

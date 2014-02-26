@@ -503,7 +503,7 @@ BFont::BFont()
 	fShear(90.0),
 	fRotation(0.0),
 	fFalseBoldWidth(0.0),
-	fSpacing(B_CHAR_SPACING),
+	fSpacing(B_BITMAP_SPACING),
 	fEncoding(B_UNICODE_UTF8),
 	fFace(0),
 	fFlags(0),

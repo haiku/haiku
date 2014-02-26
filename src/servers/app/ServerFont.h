@@ -32,7 +32,7 @@ class ServerFont {
 										   float shear = 90.0,
 										   float falseBoldWidth = 0.0,
 										   uint16 flags = 0,
-										   uint8 spacing = B_CHAR_SPACING);
+										   uint8 spacing = B_BITMAP_SPACING);
 								ServerFont(const ServerFont& font);
 	virtual						~ServerFont();
 

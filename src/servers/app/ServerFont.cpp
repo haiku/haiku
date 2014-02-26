@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2014, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -118,20 +118,20 @@ is_white_space(uint32 charCode)
 	\param flags Style flags as defined in <Font.h>
 	\param spacing String spacing flag as defined in <Font.h>
 */
-ServerFont::ServerFont(FontStyle& style, float size,
-					   float rotation, float shear, float falseBoldWidth,
-					   uint16 flags, uint8 spacing)
-	: fStyle(&style),
-	  fSize(size),
-	  fRotation(rotation),
-	  fShear(shear),
-	  fFalseBoldWidth(falseBoldWidth),
-	  fBounds(0, 0, 0, 0),
-	  fFlags(flags),
-	  fSpacing(spacing),
-	  fDirection(style.Direction()),
-	  fFace(style.Face()),
-	  fEncoding(B_UNICODE_UTF8)
+ServerFont::ServerFont(FontStyle& style, float size, float rotation,
+		float shear, float falseBoldWidth, uint16 flags, uint8 spacing)
+	:
+	fStyle(&style),
+	fSize(size),
+	fRotation(rotation),
+	fShear(shear),
+	fFalseBoldWidth(falseBoldWidth),
+	fBounds(0, 0, 0, 0),
+	fFlags(flags),
+	fSpacing(spacing),
+	fDirection(style.Direction()),
+	fFace(style.Face()),
+	fEncoding(B_UNICODE_UTF8)
 {
 	fStyle->Acquire();
 }
@@ -465,11 +465,9 @@ ServerFont::GetHasGlyphs(const char* string, int32 numBytes,
 	if (!string || numBytes <= 0 || !hasArray)
 		return B_BAD_DATA;
 
-	bool kerning = true; // TODO make this a property?
-
 	HasGlyphsConsumer consumer(hasArray);
 	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
-		NULL, kerning, fSpacing))
+		NULL, fSpacing))
 		return B_OK;
 
 	return B_ERROR;
@@ -513,12 +511,11 @@ ServerFont::GetEdges(const char* string, int32 numBytes,
 	if (!string || numBytes <= 0 || !edges)
 		return B_BAD_DATA;
 
-	bool kerning = true; // TODO make this a property?
-
 	EdgesConsumer consumer(edges, fSize);
 	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
-		NULL, kerning, fSpacing))
+		NULL, fSpacing)) {
 		return B_OK;
+	}
 
 	return B_ERROR;
 
@@ -603,13 +600,12 @@ ServerFont::GetEscapements(const char* string, int32 numBytes, int32 numChars,
 	if (!string || numBytes <= 0 || !escapementArray)
 		return B_BAD_DATA;
 
-	bool kerning = true; // TODO make this a property?
-
 	BPointEscapementConsumer consumer(escapementArray, offsetArray, numChars,
 		fSize);
 	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
-		&delta, kerning, fSpacing))
+		&delta, fSpacing)) {
 		return B_OK;
+	}
 
 	return B_ERROR;
 }
@@ -659,12 +655,11 @@ ServerFont::GetEscapements(const char* string, int32 numBytes, int32 numChars,
 	if (!string || numBytes <= 0 || !widthArray)
 		return B_BAD_DATA;
 
-	bool kerning = true; // TODO make this a property?
-
 	WidthEscapementConsumer consumer(widthArray, numChars, fSize);
 	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
-		&delta, kerning, fSpacing))
+		&delta, fSpacing)) {
 		return B_OK;
+	}
 	return B_ERROR;
 }
 
@@ -767,14 +762,13 @@ ServerFont::GetBoundingBoxes(const char* string, int32 numBytes,
 	if (!string || numBytes <= 0 || !rectArray)
 		return B_BAD_DATA;
 
-	bool kerning = true; // TODO make this a property?
-
 	Transformable transform(EmbeddedTransformation());
 
 	BoundingBoxConsumer consumer(transform, rectArray, asString);
 	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
-		stringEscapement ? &delta : NULL, kerning, fSpacing))
+		stringEscapement ? &delta : NULL, fSpacing)) {
 		return B_OK;
+	}
 	return B_ERROR;
 }
 
@@ -788,8 +782,6 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 	if (!charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
 		return B_BAD_DATA;
 
-	bool kerning = true; // TODO make this a property?
-
 	Transformable transform(EmbeddedTransformation());
 
 	for (int32 i = 0; i < numStrings; i++) {
@@ -799,8 +791,9 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 
 		BoundingBoxConsumer consumer(transform, NULL, true);
 		if (!GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
-			&delta, kerning, fSpacing))
+			&delta, fSpacing)) {
 			return B_ERROR;
+		}
 
 		rectArray[i] = consumer.stringBoundingBox;
 	}
@@ -832,12 +825,11 @@ ServerFont::StringWidth(const char *string, int32 numBytes,
 	if (!string || numBytes <= 0)
 		return 0.0;
 
-	bool kerning = true; // TODO make this a property?
-
 	StringWidthConsumer consumer;
 	if (!GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
-			deltaArray, kerning, fSpacing))
+			deltaArray, fSpacing)) {
 		return 0.0;
+	}
 
 	return consumer.width;
 }

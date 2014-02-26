@@ -47,10 +47,6 @@ public:
 			bool				Antialiasing() const
 									{ return fAntialias; }
 
-			void				SetKerning(bool kerning);
-			bool				Kerning() const
-									{ return fKerning; }
-
 			BRect				RenderString(const char* utf8String,
 									uint32 length, const BPoint& baseLine,
 									const BRect& clippingFrame, bool dryRun,
@@ -97,7 +93,6 @@ private:
 	bool						fHinted;
 									// is glyph hinting active?
 	bool						fAntialias;
-	bool						fKerning;
 	Transformable				fEmbeddedTransformation;
 									// rotated or sheared font?
 	agg::trans_affine&			fViewTransformation;
