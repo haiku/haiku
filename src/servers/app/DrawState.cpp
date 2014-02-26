@@ -155,7 +155,8 @@ DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link)
 	if ((mask & B_FONT_SIZE) != 0) {
 		float size;
 		link.Read<float>(&size);
-		fFont.SetSize(size);
+		fUnscaledFontSize = size;
+		fFont.SetSize(fUnscaledFontSize * fCombinedScale);
 	}
 
 	if ((mask & B_FONT_SHEAR) != 0) {
@@ -184,7 +185,7 @@ DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link)
 
 	if ((mask & B_FONT_ENCODING) != 0) {
 		uint8 encoding;
-		link.Read<uint8>((uint8*)&encoding);
+		link.Read<uint8>(&encoding);
 		fFont.SetEncoding(encoding);
 	}
 
