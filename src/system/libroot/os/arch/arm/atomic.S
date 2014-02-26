@@ -6,6 +6,7 @@
 #include <asm_defs.h>
 #include <arch_config.h>
 
+
 .text
 
 #ifndef ATOMIC_FUNCS_ARE_SYSCALLS
@@ -21,9 +22,6 @@ miss1:	       	ldrex       r12, [r0]
         	mov         r0,  r12
 	        bx          lr
 FUNCTION_END(atomic_add)
-
-
-
 
 /* int atomic_and(int *value, int andValue)
  */
@@ -87,13 +85,6 @@ FUNCTION(atomic_get):
 	ldr	r0, [r0]
         bx	lr
 FUNCTION_END(atomic_get)
-
-/* void __sync_synchronize(void)
- */
-FUNCTION(__sync_synchronize):
-	dmb
-	bx lr
-FUNCTION_END(__sync_synchronize)
 
 #endif /* ATOMIC_FUNCS_ARE_SYSCALLS */
 
