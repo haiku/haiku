@@ -43,6 +43,7 @@
 struct GlyphCache {
 	GlyphCache(uint32 glyphIndex, uint32 dataSize, glyph_data_type dataType,
 			const agg::rect_i& bounds, float advanceX, float advanceY,
+			float preciseAdvanceX, float preciseAdvanceY,
 			float insetLeft, float insetRight)
 		:
 		glyph_index(glyphIndex),
@@ -52,6 +53,8 @@ struct GlyphCache {
 		bounds(bounds),
 		advance_x(advanceX),
 		advance_y(advanceY),
+		precise_advance_x(preciseAdvanceX),
+		precise_advance_y(preciseAdvanceY),
 		inset_left(insetLeft),
 		inset_right(insetRight),
 		hash_link(NULL)
@@ -70,6 +73,8 @@ struct GlyphCache {
 	agg::rect_i		bounds;
 	float			advance_x;
 	float			advance_y;
+	float			precise_advance_x;
+	float			precise_advance_y;
 	float			inset_left;
 	float			inset_right;
 

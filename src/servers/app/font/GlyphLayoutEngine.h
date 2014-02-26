@@ -253,8 +253,13 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			advanceY = 0;
 		} else {
 			// get next increment for pen position
-			advanceX = glyph->advance_x;
-			advanceY = glyph->advance_y;
+			if (spacing == B_CHAR_SPACING) {
+				advanceX = glyph->precise_advance_x;
+				advanceY = glyph->precise_advance_y;
+			} else {
+				advanceX = glyph->advance_x;
+				advanceY = glyph->advance_y;
+			}
 
 			// adjust for custom spacing
 			if (delta != NULL) {

@@ -624,7 +624,22 @@ FontEngine::PrepareGlyph(uint32 glyphIndex)
 	loadFlags |= fGlyphRendering == glyph_ren_subpix ?
 		FT_LOAD_TARGET_LCD : FT_LOAD_TARGET_NORMAL;
 
-	fLastError = FT_Load_Glyph(fFace, glyphIndex, loadFlags);
+	if (fHinting) {
+		// Load without hinting to get precise advance values
+		// for B_CHAR_SPACING
+		fLastError = FT_Load_Glyph(fFace, glyphIndex, loadFlags
+			| FT_LOAD_NO_HINTING);
+	} else {
+		fLastError = FT_Load_Glyph(fFace, glyphIndex, loadFlags);
+	}
+
+	fPreciseAdvanceX = int26p6_to_dbl(fFace->glyph->advance.x);
+	fPreciseAdvanceY = int26p6_to_dbl(fFace->glyph->advance.y);
+
+	if (fHinting) {
+		// Need to load again with hinting.
+		fLastError = FT_Load_Glyph(fFace, glyphIndex, loadFlags);
+	}
 
 	if (fLastError != 0)
 		return false;

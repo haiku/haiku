@@ -105,6 +105,10 @@ class FontEngine {
 									{ return fAdvanceX; }
 			double				AdvanceY() const
 									{ return fAdvanceY; }
+			double				PreciseAdvanceX() const
+									{ return fPreciseAdvanceX; }
+			double				PreciseAdvanceY() const
+									{ return fPreciseAdvanceY; }
 			double				InsetLeft() const
 									{ return fInsetLeft; }
 			double				InsetRight() const
@@ -136,6 +140,8 @@ class FontEngine {
 			agg::rect_i			fBounds;
 			double				fAdvanceX;
 			double				fAdvanceY;
+			double				fPreciseAdvanceX;
+			double				fPreciseAdvanceY;
 			double				fInsetLeft;
 			double				fInsetRight;
 
