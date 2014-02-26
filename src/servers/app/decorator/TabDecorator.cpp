@@ -113,8 +113,9 @@ TabDecorator::~TabDecorator()
 void
 TabDecorator::Draw(BRect updateRect)
 {
-	STRACE(("TabDecorator::Draw(BRect updateRect): "));
-	updateRect.PrintToStream();
+	STRACE(("TabDecorator::Draw(BRect "
+		"updateRect(l:%.1f, t:%.1f, r:%.1f, b:%.1f))\n",
+		updateRect.left, updateRect.top, updateRect.right, updateRect.bottom));
 
 	fDrawingEngine->SetDrawState(&fDrawState);
 
