@@ -30,5 +30,6 @@ DoCatalogs ScreenSaver :
 	x-vnd.Haiku-ScreenSaver
 	:
 	PasswordWindow.cpp
+	PreviewView.cpp
 	ScreenSaverWindow.cpp
 	;

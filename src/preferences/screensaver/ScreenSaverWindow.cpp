@@ -36,6 +36,7 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <ScreenSaver.h>
+#include <ScreenSaverRunner.h>
 #include <ScrollView.h>
 #include <Size.h>
 #include <Slider.h>
@@ -818,6 +819,8 @@ ModulesView::_OpenSaver()
 		saver->StartConfig(fSettingsView);
 		if (saver->StartSaver(view, true) == B_OK)
 			fSaverRunner->Run();
+		else
+			fPreviewView->ShowNoPreview();
 	}
 
 	if (fSettingsView->ChildAt(0) == NULL) {

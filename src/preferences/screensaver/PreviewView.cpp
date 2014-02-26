@@ -9,16 +9,20 @@
 
 
 #include "PreviewView.h"
-#include "Utility.h"
-
-#include <Point.h>
-#include <Rect.h>
-#include <Screen.h>
-#include <ScreenSaver.h>
-#include <Shape.h>
-#include <String.h>
 
 #include <iostream>
+
+#include <Catalog.h>
+#include <Point.h>
+#include <Rect.h>
+#include <Size.h>
+#include <TextView.h>
+
+#include "Utility.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PreviewView"
 
 
 static float sampleX[]
@@ -41,10 +45,14 @@ scale2(int x1, int x2, int y1, int y2, BRect area)
 }
 
 
+//	#pragma mark - PreviewView
+
+
 PreviewView::PreviewView(const char* name)
 	:
 	BView(name, B_WILL_DRAW),
-	fSaverView(NULL)
+	fSaverView(NULL),
+	fNoPreview(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -96,12 +104,29 @@ PreviewView::Draw(BRect updateRect)
 BView*
 PreviewView::AddPreview()
 {
-	BRect rect = scale2(1, 8, 1, 2, Bounds());
-	fSaverView = new BView(rect.InsetBySelf(1, 1), "preview", B_FOLLOW_NONE,
-		B_WILL_DRAW);
+	BRect rect(scale2(1, 8, 1, 2, Bounds()).InsetBySelf(1.0f, 1.0f));
+	fSaverView = new BView(rect, "preview", B_FOLLOW_NONE, B_WILL_DRAW);
 	fSaverView->SetViewColor(0, 0, 0);
 	fSaverView->SetLowColor(0, 0, 0);
 	AddChild(fSaverView);
+
+	BRect textRect(rect);
+	textRect.OffsetTo(-7.0f, 0.0f);
+	textRect.InsetBy(15.0f, 20.0f);
+	fNoPreview = new BTextView(rect, "no preview", textRect, B_FOLLOW_NONE,
+		B_WILL_DRAW);
+	fNoPreview->SetViewColor(0, 0, 0);
+	fNoPreview->SetLowColor(0, 0, 0);
+	fNoPreview->SetFontAndColor(be_plain_font, B_FONT_ALL,
+		&(rgb_color){ 255, 255, 255 });
+	fNoPreview->SetText(B_TRANSLATE("No preview available"));
+	fNoPreview->SetAlignment(B_ALIGN_CENTER);
+	fNoPreview->MakeEditable(false);
+	fNoPreview->MakeResizable(false);
+	fNoPreview->MakeSelectable(false);
+
+	fNoPreview->Hide();
+	fSaverView->AddChild(fNoPreview);
 
 	return fSaverView;
 }
@@ -123,4 +148,18 @@ BView*
 PreviewView::SaverView()
 {
 	return fSaverView;
+}
+
+
+void
+PreviewView::ShowNoPreview() const
+{
+	fNoPreview->Show();
+}
+
+
+void
+PreviewView::HideNoPreview() const
+{
+	fNoPreview->Hide();
 }

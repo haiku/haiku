@@ -10,10 +10,10 @@
 #define PREVIEW_VIEW_H
 
 
-#include <Box.h>
-#include <ScreenSaverRunner.h>
 #include <View.h>
 
+
+class BTextView;
 
 class PreviewView : public BView {
 public:
@@ -26,8 +26,12 @@ public:
 			BView*				RemovePreview();
 			BView*				SaverView();
 
+			void				ShowNoPreview() const;
+			void				HideNoPreview() const;
+
 private:
 			BView*				fSaverView;
+			BTextView*			fNoPreview;
 };
 
 
