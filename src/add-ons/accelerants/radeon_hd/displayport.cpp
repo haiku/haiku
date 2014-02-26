@@ -665,6 +665,7 @@ dp_set_tp(uint32 connectorIndex, int trainingPattern)
 
 	radeon_shared_info &info = *gInfo->shared_info;
 	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
+	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	int rawTrainingPattern = 0;
 
@@ -681,8 +682,7 @@ dp_set_tp(uint32 connectorIndex, int trainingPattern)
 				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN3;
 				break;
 		}
-		// TODO: PixelClock 0 ok?
-		encoder_dig_setup(connectorIndex, 0, rawTrainingPattern);
+		encoder_dig_setup(connectorIndex, pll->pixelClock, rawTrainingPattern);
 	} else {
 		ERROR("%s: TODO: dp_encoder_service\n", __func__);
 		return;
@@ -779,26 +779,30 @@ dp_link_train_cr(uint32 connectorIndex)
 
 
 status_t
-dp_link_train_ce(uint32 connectorIndex)
+dp_link_train_ce(uint32 connectorIndex, bool tp3Support)
 {
 	TRACE("%s\n", __func__);
 
 	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
 
-	// TODO: DisplayPort: Supports TP3?
-	dp_set_tp(connectorIndex, DP_TRAIN_PATTERN_2);
+	if (tp3Support)
+		dp_set_tp(connectorIndex, DP_TRAIN_PATTERN_3);
+	else
+		dp_set_tp(connectorIndex, DP_TRAIN_PATTERN_2);
 
 	dp->trainingAttempts = 0;
 	bool channelEqual = false;
 
 	while (1) {
 		if (dp->trainingReadInterval == 0)
-			snooze(100);
+			snooze(400);
 		else
 			snooze(1000 * 4 * dp->trainingReadInterval);
 
-		if (!dp_get_link_status(connectorIndex))
+		if (!dp_get_link_status(connectorIndex)) {
+			ERROR("%s: ERROR: Unable to get link status!\n", __func__);
 			break;
+		}
 
 		if (dp_clock_equalization_ok(dp)) {
 			channelEqual = true;
@@ -879,9 +883,9 @@ dp_link_train(uint8 crtcID)
 	uint8 sandbox = dpcd_reg_read(connectorIndex, DP_MAX_LANE_COUNT);
 
 	radeon_shared_info &info = *gInfo->shared_info;
-	//bool dpTPS3Supported = false;
-	//if (info.dceMajor >= 5 && (sandbox & DP_TPS3_SUPPORTED) != 0)
-	//	dpTPS3Supported = true;
+	bool dpTPS3Supported = false;
+	if (info.dceMajor >= 5 && (sandbox & DP_TPS3_SUPPORTED) != 0)
+		dpTPS3Supported = true;
 
 	// *** DisplayPort link training initialization
 
@@ -923,7 +927,7 @@ dp_link_train(uint8 crtcID)
 	dpcd_reg_write(connectorIndex, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
 
 	dp_link_train_cr(connectorIndex);
-	dp_link_train_ce(connectorIndex);
+	dp_link_train_ce(connectorIndex, dpTPS3Supported);
 
 	// *** DisplayPort link training finish
 	snooze(400);

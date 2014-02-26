@@ -44,7 +44,7 @@ void dp_setup_connectors();
 
 status_t dp_link_train(uint8 crtcID);
 status_t dp_link_train_cr(uint32 connectorIndex);
-status_t dp_link_train_ce(uint32 connectorIndex);
+status_t dp_link_train_ce(uint32 connectorIndex, bool tp3Support);
 
 bool dp_is_dp12_capable(uint32 connectorIndex);
 
