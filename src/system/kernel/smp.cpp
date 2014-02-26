@@ -360,7 +360,7 @@ acquire_spinlock(spinlock* lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (atomic_get(&lock->lock) != 0) {
+			while (lock->lock != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
 						"for a long time!", lock);
@@ -414,7 +414,7 @@ acquire_spinlock_nocheck(spinlock *lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (atomic_get(&lock->lock) != 0) {
+			while (lock->lock != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT_NO_CHECK) {
 					panic("acquire_spinlock(): Failed to acquire spinlock %p "
 						"for a long time!", lock);
@@ -457,7 +457,7 @@ acquire_spinlock_cpu(int32 currentCPU, spinlock *lock)
 #else
 		while (1) {
 			uint32 count = 0;
-			while (atomic_get(&lock->lock) != 0) {
+			while (lock->lock != 0) {
 				if (++count == SPINLOCK_DEADLOCK_COUNT) {
 					panic("acquire_spinlock_cpu(): Failed to acquire spinlock "
 						"%p for a long time!", lock);
@@ -572,7 +572,7 @@ acquire_write_spinlock(rw_spinlock* lock)
 		if (try_acquire_write_spinlock(lock))
 			break;
 
-		while (atomic_get(&lock->lock) != 0) {
+		while (lock->lock != 0) {
 			if (++count == SPINLOCK_DEADLOCK_COUNT) {
 				panic("acquire_write_spinlock(): Failed to acquire spinlock %p "
 					"for a long time!", lock);
@@ -637,7 +637,7 @@ acquire_read_spinlock(rw_spinlock* lock)
 		if (try_acquire_read_spinlock(lock))
 			break;
 
-		while ((atomic_get(&lock->lock) & (1u << 31)) != 0) {
+		while ((lock->lock & (1u << 31)) != 0) {
 			if (++count == SPINLOCK_DEADLOCK_COUNT) {
 				panic("acquire_read_spinlock(): Failed to acquire spinlock %p "
 					"for a long time!", lock);
@@ -700,7 +700,7 @@ bool
 release_read_seqlock(seqlock* lock, uint32 count) {
 	memory_read_barrier();
 
-	uint32 current = atomic_get((int32*)&lock->count);
+	uint32 current = *(volatile int32*)&lock->count;
 
 	if (count % 2 == 1 || current != count) {
 		cpu_pause();
@@ -723,7 +723,7 @@ find_free_message(struct smp_msg** msg)
 	TRACE("find_free_message: entry\n");
 
 retry:
-	while (atomic_get(&sFreeMessageCount) <= 0)
+	while (sFreeMessageCount <= 0)
 		cpu_pause();
 
 	state = disable_interrupts();
@@ -759,7 +759,7 @@ find_free_message_interrupts_disabled(int32 currentCPU,
 	TRACE("find_free_message_interrupts_disabled: entry\n");
 
 	acquire_spinlock_cpu(currentCPU, &sFreeMessageSpinlock);
-	while (atomic_get(&sFreeMessageCount) <= 0) {
+	while (sFreeMessageCount <= 0) {
 		release_spinlock(&sFreeMessageSpinlock);
 		process_all_pending_ici(currentCPU);
 		cpu_pause();
@@ -1017,7 +1017,7 @@ call_all_cpus_early(void (*function)(void*, int), void* cookie)
 		sEarlyCPUCallSet.ClearBit(0);
 
 		// wait for all CPUs to finish
-		while (atomic_get(&sEarlyCPUCallCount) < sNumCPUs)
+		while (sEarlyCPUCallCount < sNumCPUs)
 			cpu_wait(&sEarlyCPUCallCount, sNumCPUs);
 	}
 
@@ -1090,7 +1090,7 @@ smp_send_ici(int32 targetCPU, int32 message, addr_t data, addr_t data2,
 			// wait for the other cpu to finish processing it
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
-			while (atomic_get(&msg->done) == 0) {
+			while (msg->done == 0) {
 				process_all_pending_ici(currentCPU);
 				cpu_wait(&msg->done, 1);
 			}
@@ -1163,7 +1163,7 @@ smp_send_multicast_ici(CPUSet& cpuMask, int32 message, addr_t data,
 		// wait for the other cpus to finish processing it
 		// the interrupt handler will ref count it to <0
 		// if the message is sync after it has removed it from the mailbox
-		while (atomic_get(&msg->done) == 0) {
+		while (msg->done == 0) {
 			process_all_pending_ici(currentCPU);
 			cpu_wait(&msg->done, 1);
 		}
@@ -1229,7 +1229,7 @@ smp_send_broadcast_ici(int32 message, addr_t data, addr_t data2, addr_t data3,
 			// if the message is sync after it has removed it from the mailbox
 			TRACE("smp_send_broadcast_ici: waiting for ack\n");
 
-			while (atomic_get(&msg->done) == 0) {
+			while (msg->done == 0) {
 				process_all_pending_ici(currentCPU);
 				cpu_wait(&msg->done, 1);
 			}
@@ -1297,7 +1297,7 @@ smp_send_broadcast_ici_interrupts_disabled(int32 currentCPU, int32 message,
 		TRACE("smp_send_broadcast_ici_interrupts_disabled %ld: waiting for "
 			"ack\n", currentCPU);
 
-		while (atomic_get(&msg->done) == 0) {
+		while (msg->done == 0) {
 			process_all_pending_ici(currentCPU);
 			cpu_wait(&msg->done, 1);
 		}
@@ -1331,7 +1331,7 @@ smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 
 	smp_cpu_rendezvous(rendezVous);
 
-	while (atomic_get(&sBootCPUSpin) == 0) {
+	while (sBootCPUSpin == 0) {
 		if (sEarlyCPUCallSet.GetBit(cpu))
 			process_early_cpu_call(cpu);
 
@@ -1369,7 +1369,7 @@ smp_cpu_rendezvous(uint32* var)
 {
 	atomic_add((int32*)var, 1);
 
-	while (atomic_get((int32*)var) < sNumCPUs)
+	while (*var < (uint32)sNumCPUs)
 		cpu_wait((int32*)var, sNumCPUs);
 }
 
