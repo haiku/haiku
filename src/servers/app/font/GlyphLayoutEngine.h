@@ -210,6 +210,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 
 	double advanceX = 0.0;
 	double advanceY = 0.0;
+	double size = font.Size();
 
 	uint32 lastCharCode = 0; // Needed for kerning in B_STRING_SPACING mode
 	uint32 charCode;
@@ -254,8 +255,8 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 		} else {
 			// get next increment for pen position
 			if (spacing == B_CHAR_SPACING) {
-				advanceX = glyph->precise_advance_x;
-				advanceY = glyph->precise_advance_y;
+				advanceX = glyph->precise_advance_x * size;
+				advanceY = glyph->precise_advance_y * size;
 			} else {
 				advanceX = glyph->advance_x;
 				advanceY = glyph->advance_y;
