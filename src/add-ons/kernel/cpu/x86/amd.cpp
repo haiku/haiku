@@ -28,7 +28,8 @@ amd_init(void)
 
 	// The K6-2 doesn't seem to support write-combining (before model 9),
 	// so we ignore anything before that one.
-	if (gCPU[0].arch.family <= 5 || gCPU[0].arch.model < 9)
+	if (gCPU[0].arch.family < 5
+		|| (gCPU[0].arch.family == 5 && gCPU[0].arch.model < 9))
 		return B_ERROR;
 
 	generic_mtrr_compute_physical_mask();
