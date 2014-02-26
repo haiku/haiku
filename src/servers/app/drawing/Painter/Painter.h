@@ -243,9 +243,13 @@ public:
 
 
 private:
-			void				_Transform(BPoint* point,
+			float				_Align(float coord, bool round,
+									bool centerOffset) const;
+			void				_Align(BPoint* point, bool round,
+									bool centerOffset) const;
+			void				_Align(BPoint* point,
 									bool centerOffset = true) const;
-			BPoint				_Transform(const BPoint& point,
+			BPoint				_Align(const BPoint& point,
 									bool centerOffset = true) const;
 			BRect				_Clipped(const BRect& rect) const;
 
@@ -257,6 +261,12 @@ private:
 								// drawing functions stroke/fill
 			BRect				_DrawTriangle(BPoint pt1, BPoint pt2,
 									BPoint pt3, bool fill) const;
+
+			void				_IterateShapeData(const int32& opCount,
+									const uint32* opList, const int32& ptCount,
+									const BPoint* points,
+									const BPoint& viewToScreenOffset,
+									float viewScale) const;
 
 			template<typename sourcePixel>
 			void				_TransparentMagicToAlpha(sourcePixel *buffer,
@@ -303,6 +313,9 @@ private:
 
 			template<class VertexSource>
 			BRect				_StrokePath(VertexSource& path) const;
+			template<class VertexSource>
+			BRect				_StrokePath(VertexSource& path,
+									cap_mode capMode) const;
 			template<class VertexSource>
 			BRect				_FillPath(VertexSource& path) const;
 			template<class VertexSource>

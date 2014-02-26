@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
 #include <Bitmap.h>
 #include <GraphicsDefs.h>
@@ -473,8 +474,8 @@ Painter::StrokeLine(BPoint a, BPoint b)
 
 	// "false" means not to do the pixel center offset,
 	// because it would mess up our optimized versions
-	_Transform(&a, false);
-	_Transform(&b, false);
+	_Align(&a, false);
+	_Align(&b, false);
 
 	// first, try an optimized version
 	if (fPenSize == 1.0 && fIdentityTransform
@@ -508,51 +509,22 @@ Painter::StrokeLine(BPoint a, BPoint b)
 			_FillPath(fPath);
 		}
 	} else {
-		// do the pixel center offset here
-		// tweak ends to "include" the pixel at the index,
-		// we need to do this in order to produce results like R5,
-		// where coordinates were inclusive
-		if (!fSubpixelPrecise && fIdentityTransform) {
-			bool centerOnLine = fmodf(fPenSize, 2.0) != 0.0;
-			if (a.x == b.x) {
-				// shift to pixel center vertically
-				if (centerOnLine) {
-					a.x += 0.5;
-					b.x += 0.5;
-				}
-				// extend on bottom end
-				if (a.y < b.y)
-					b.y++;
-				else
-					a.y++;
-			} else if (a.y == b.y) {
-				if (centerOnLine) {
-					// shift to pixel center horizontally
-					a.y += 0.5;
-					b.y += 0.5;
-				}
-				// extend on right end
-				if (a.x < b.x)
-					b.x++;
-				else
-					a.x++;
-			} else {
-				// do this regardless of pensize
-				if (a.x < b.x)
-					b.x++;
-				else
-					a.x++;
-				if (a.y < b.y)
-					b.y++;
-				else
-					a.y++;
-			}
+		// Do the pixel center offset here
+		if (fmodf(fPenSize, 2.0) != 0.0) {
+			_Align(&a, true);
+			_Align(&b, true);
 		}
 
 		fPath.move_to(a.x, a.y);
 		fPath.line_to(b.x, b.y);
 
-		_StrokePath(fPath);
+		if (fPenSize == 1.0f) {
+			// Tweak ends to "include" the pixel at the index,
+			// we need to do this in order to produce results like R5,
+			// where coordinates were inclusive
+			_StrokePath(fPath, B_SQUARE_CAP);
+		} else
+			_StrokePath(fPath);
 	}
 }
 
@@ -655,9 +627,9 @@ Painter::FillTriangle(BPoint pt1, BPoint pt2, BPoint pt3,
 {
 	CHECK_CLIPPING
 
-	_Transform(&pt1);
-	_Transform(&pt2);
-	_Transform(&pt3);
+	_Align(&pt1);
+	_Align(&pt2);
+	_Align(&pt3);
 
 	fPath.remove_all();
 
@@ -677,27 +649,30 @@ Painter::DrawPolygon(BPoint* p, int32 numPts, bool filled, bool closed) const
 {
 	CHECK_CLIPPING
 
-	if (numPts > 0) {
-		fPath.remove_all();
+	if (numPts == 0)
+		return BRect(0.0, 0.0, -1.0, -1.0);
 
-		_Transform(p);
-		fPath.move_to(p->x, p->y);
+	bool centerOffset = !filled && fIdentityTransform
+		&& fmodf(fPenSize, 2.0) != 0.0;
+	
+	fPath.remove_all();
 
-		for (int32 i = 1; i < numPts; i++) {
-			p++;
-			_Transform(p);
-			fPath.line_to(p->x, p->y);
-		}
+	_Align(p, centerOffset);
+	fPath.move_to(p->x, p->y);
 
-		if (closed)
-			fPath.close_polygon();
-
-		if (filled)
-			return _FillPath(fPath);
-
-		return _StrokePath(fPath);
+	for (int32 i = 1; i < numPts; i++) {
+		p++;
+		_Align(p, centerOffset);
+		fPath.line_to(p->x, p->y);
 	}
-	return BRect(0.0, 0.0, -1.0, -1.0);
+
+	if (closed)
+		fPath.close_polygon();
+
+	if (filled)
+		return _FillPath(fPath);
+
+	return _StrokePath(fPath);
 }
 
 
@@ -711,12 +686,12 @@ Painter::FillPolygon(BPoint* p, int32 numPts, const BGradient& gradient,
 	if (numPts > 0) {
 		fPath.remove_all();
 
-		_Transform(p);
+		_Align(p);
 		fPath.move_to(p->x, p->y);
 
 		for (int32 i = 1; i < numPts; i++) {
 			p++;
-			_Transform(p);
+			_Align(p);
 			fPath.line_to(p->x, p->y);
 		}
 
@@ -737,10 +712,10 @@ Painter::DrawBezier(BPoint* p, bool filled) const
 
 	fPath.remove_all();
 
-	_Transform(&(p[0]));
-	_Transform(&(p[1]));
-	_Transform(&(p[2]));
-	_Transform(&(p[3]));
+	_Align(&(p[0]));
+	_Align(&(p[1]));
+	_Align(&(p[2]));
+	_Align(&(p[3]));
 
 	fPath.move_to(p[0].x, p[0].y);
 	fPath.curve4(p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
@@ -762,83 +737,16 @@ Painter::FillBezier(BPoint* p, const BGradient& gradient) const
 
 	fPath.remove_all();
 
-	_Transform(&(p[0]));
-	_Transform(&(p[1]));
-	_Transform(&(p[2]));
-	_Transform(&(p[3]));
+	_Align(&(p[0]));
+	_Align(&(p[1]));
+	_Align(&(p[2]));
+	_Align(&(p[3]));
 
 	fPath.move_to(p[0].x, p[0].y);
 	fPath.curve4(p[1].x, p[1].y, p[2].x, p[2].y, p[3].x, p[3].y);
 
 	fPath.close_polygon();
 	return _FillPath(fCurve, gradient);
-}
-
-
-static void
-iterate_shape_data(agg::path_storage& path,
-	const int32& opCount, const uint32* opList,
-	const int32& ptCount, const BPoint* points,
-	const BPoint& viewToScreenOffset, float viewScale)
-{
-	// TODO: if shapes are ever used more heavily in Haiku,
-	// it would be nice to use BShape data directly (write
-	// an AGG "VertexSource" adaptor)
-	path.remove_all();
-	for (int32 i = 0; i < opCount; i++) {
-		uint32 op = opList[i] & 0xFF000000;
-		if (op & OP_MOVETO) {
-			path.move_to(
-				points->x * viewScale + viewToScreenOffset.x,
-				points->y * viewScale + viewToScreenOffset.y);
-			points++;
-		}
-
-		if (op & OP_LINETO) {
-			int32 count = opList[i] & 0x00FFFFFF;
-			while (count--) {
-				path.line_to(
-					points->x * viewScale + viewToScreenOffset.x,
-					points->y * viewScale + viewToScreenOffset.y);
-				points++;
-			}
-		}
-
-		if (op & OP_BEZIERTO) {
-			int32 count = opList[i] & 0x00FFFFFF;
-			while (count) {
-				path.curve4(
-					points[0].x * viewScale + viewToScreenOffset.x,
-					points[0].y * viewScale + viewToScreenOffset.y,
-					points[1].x * viewScale + viewToScreenOffset.x,
-					points[1].y * viewScale + viewToScreenOffset.y,
-					points[2].x * viewScale + viewToScreenOffset.x,
-					points[2].y * viewScale + viewToScreenOffset.y);
-				points += 3;
-				count -= 3;
-			}
-		}
-
-		if ((op & OP_LARGE_ARC_TO_CW) || (op & OP_LARGE_ARC_TO_CCW)
-			|| (op & OP_SMALL_ARC_TO_CW) || (op & OP_SMALL_ARC_TO_CCW)) {
-			int32 count = opList[i] & 0x00FFFFFF;
-			while (count) {
-				path.arc_to(
-					points[0].x * viewScale,
-					points[0].y * viewScale,
-					points[1].x,
-					op & (OP_LARGE_ARC_TO_CW | OP_LARGE_ARC_TO_CCW),
-					op & (OP_SMALL_ARC_TO_CW | OP_LARGE_ARC_TO_CW),
-					points[2].x * viewScale + viewToScreenOffset.x,
-					points[2].y * viewScale + viewToScreenOffset.y);
-				points += 3;
-				count -= 3;
-			}
-		}
-
-		if (op & OP_CLOSE)
-			path.close_polygon();
-	}
 }
 
 
@@ -850,8 +758,8 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 {
 	CHECK_CLIPPING
 
-	iterate_shape_data(fPath, opCount, opList, ptCount, points,
-		viewToScreenOffset, viewScale);
+	_IterateShapeData(opCount, opList, ptCount, points, viewToScreenOffset,
+		viewScale);
 
 	if (filled)
 		return _FillPath(fCurve);
@@ -868,8 +776,8 @@ Painter::FillShape(const int32& opCount, const uint32* opList,
 {
 	CHECK_CLIPPING
 
-	iterate_shape_data(fPath, opCount, opList, ptCount, points,
-		viewToScreenOffset, viewScale);
+	_IterateShapeData(opCount, opList, ptCount, points, viewToScreenOffset,
+		viewScale);
 
 	return _FillPath(fCurve, gradient);
 }
@@ -883,8 +791,8 @@ Painter::StrokeRect(const BRect& r) const
 
 	BPoint a(r.left, r.top);
 	BPoint b(r.right, r.bottom);
-	_Transform(&a, false);
-	_Transform(&b, false);
+	_Align(&a, false);
+	_Align(&b, false);
 
 	// first, try an optimized version
 	if (fPenSize == 1.0 && fIdentityTransform
@@ -946,8 +854,8 @@ Painter::FillRect(const BRect& r) const
 	// support invalid rects
 	BPoint a(min_c(r.left, r.right), min_c(r.top, r.bottom));
 	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
-	_Transform(&a, false);
-	_Transform(&b, false);
+	_Align(&a, true, false);
+	_Align(&b, true, false);
 
 	// first, try an optimized version
 	if ((fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)
@@ -1006,8 +914,8 @@ Painter::FillRect(const BRect& r, const BGradient& gradient) const
 	// support invalid rects
 	BPoint a(min_c(r.left, r.right), min_c(r.top, r.bottom));
 	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
-	_Transform(&a, false);
-	_Transform(&b, false);
+	_Align(&a, true, false);
+	_Align(&b, true, false);
 
 	// first, try an optimized version
 	if (gradient.GetType() == BGradient::TYPE_LINEAR
@@ -1173,8 +1081,8 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 	BPoint lt(r.left, r.top);
 	BPoint rb(r.right, r.bottom);
 	bool centerOffset = fmodf(fPenSize, 2.0) != 0.0;
-	_Transform(&lt, centerOffset);
-	_Transform(&rb, centerOffset);
+	_Align(&lt, centerOffset);
+	_Align(&rb, centerOffset);
 
 	agg::rounded_rect rect;
 	rect.rect(lt.x, lt.y, rb.x, rb.y);
@@ -1192,8 +1100,8 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius) const
 
 	BPoint lt(r.left, r.top);
 	BPoint rb(r.right, r.bottom);
-	_Transform(&lt, false);
-	_Transform(&rb, false);
+	_Align(&lt, false);
+	_Align(&rb, false);
 
 	// account for stricter interpretation of coordinates in AGG
 	// the rectangle ranges from the top-left (.0, .0)
@@ -1218,8 +1126,8 @@ Painter::FillRoundRect(const BRect& r, float xRadius, float yRadius,
 
 	BPoint lt(r.left, r.top);
 	BPoint rb(r.right, r.bottom);
-	_Transform(&lt, false);
-	_Transform(&rb, false);
+	_Align(&lt, false);
+	_Align(&rb, false);
 
 	// account for stricter interpretation of coordinates in AGG
 	// the rectangle ranges from the top-left (.0, .0)
@@ -1311,7 +1219,7 @@ Painter::StrokeArc(BPoint center, float xRadius, float yRadius, float angle,
 {
 	CHECK_CLIPPING
 
-	_Transform(&center);
+	_Align(&center);
 
 	double angleRad = (angle * M_PI) / 180.0;
 	double spanRad = (span * M_PI) / 180.0;
@@ -1332,7 +1240,7 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
 {
 	CHECK_CLIPPING
 
-	_Transform(&center);
+	_Align(&center);
 
 	double angleRad = (angle * M_PI) / 180.0;
 	double spanRad = (span * M_PI) / 180.0;
@@ -1369,7 +1277,7 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius, float angle,
 {
 	CHECK_CLIPPING
 
-	_Transform(&center);
+	_Align(&center);
 
 	double angleRad = (angle * M_PI) / 180.0;
 	double spanRad = (span * M_PI) / 180.0;
@@ -1590,32 +1498,43 @@ Painter::InvertRect(const BRect& r) const
 // #pragma mark - private
 
 
-// _Transform
-inline void
-Painter::_Transform(BPoint* point, bool centerOffset) const
+inline float
+Painter::_Align(float coord, bool round, bool centerOffset) const
 {
 	// rounding
-	if (!fSubpixelPrecise) {
-		// TODO: validate usage of floor() for values < 0
-		point->x = (int32)point->x;
-		point->y = (int32)point->y;
-	}
-	// this code is supposed to move coordinates to the center of pixels,
+	if (round)
+		coord = roundf(coord);
+
+	// This code is supposed to move coordinates to the center of pixels,
 	// as AGG considers (0,0) to be the "upper left corner" of a pixel,
 	// but BViews are less strict on those details
-	if (centerOffset) {
-		point->x += 0.5;
-		point->y += 0.5;
-	}
+	if (centerOffset)
+		coord += 0.5;
+
+	return coord;
 }
 
 
-// _Transform
-inline BPoint
-Painter::_Transform(const BPoint& point, bool centerOffset) const
+inline void
+Painter::_Align(BPoint* point, bool centerOffset) const
 {
-	BPoint ret = point;
-	_Transform(&ret, centerOffset);
+	_Align(point, !fSubpixelPrecise, centerOffset);
+}
+
+
+inline void
+Painter::_Align(BPoint* point, bool round, bool centerOffset) const
+{
+	point->x = _Align(point->x, round, centerOffset);
+	point->y = _Align(point->y, round, centerOffset);
+}
+
+
+inline BPoint
+Painter::_Align(const BPoint& point, bool centerOffset) const
+{
+	BPoint ret(point);
+	_Align(&ret, centerOffset);
 	return ret;
 }
 
@@ -1683,9 +1602,9 @@ Painter::_DrawTriangle(BPoint pt1, BPoint pt2, BPoint pt3, bool fill) const
 {
 	CHECK_CLIPPING
 
-	_Transform(&pt1);
-	_Transform(&pt2);
-	_Transform(&pt3);
+	_Align(&pt1);
+	_Align(&pt2);
+	_Align(&pt3);
 
 	fPath.remove_all();
 
@@ -1753,6 +1672,73 @@ copy_bitmap_row_bgr32_over(uint8* dst, const uint8* src, int32 numPixels,
 			*(uint32*)d = *(uint32*)s;
 		d++;
 		s++;
+	}
+}
+
+
+void
+Painter::_IterateShapeData(const int32& opCount, const uint32* opList,
+	const int32& ptCount, const BPoint* points,
+	const BPoint& viewToScreenOffset, float viewScale) const
+{
+	// TODO: if shapes are ever used more heavily in Haiku,
+	// it would be nice to use BShape data directly (write
+	// an AGG "VertexSource" adaptor)
+	fPath.remove_all();
+	for (int32 i = 0; i < opCount; i++) {
+		uint32 op = opList[i] & 0xFF000000;
+		if ((op & OP_MOVETO) != 0) {
+			fPath.move_to(
+				points->x * viewScale + viewToScreenOffset.x,
+				points->y * viewScale + viewToScreenOffset.y);
+			points++;
+		}
+
+		if ((op & OP_LINETO) != 0) {
+			int32 count = opList[i] & 0x00FFFFFF;
+			while (count--) {
+				fPath.line_to(
+					points->x * viewScale + viewToScreenOffset.x,
+					points->y * viewScale + viewToScreenOffset.y);
+				points++;
+			}
+		}
+
+		if ((op & OP_BEZIERTO) != 0) {
+			int32 count = opList[i] & 0x00FFFFFF;
+			while (count) {
+				fPath.curve4(
+					points[0].x * viewScale + viewToScreenOffset.x,
+					points[0].y * viewScale + viewToScreenOffset.y,
+					points[1].x * viewScale + viewToScreenOffset.x,
+					points[1].y * viewScale + viewToScreenOffset.y,
+					points[2].x * viewScale + viewToScreenOffset.x,
+					points[2].y * viewScale + viewToScreenOffset.y);
+				points += 3;
+				count -= 3;
+			}
+		}
+
+		if ((op & OP_LARGE_ARC_TO_CW) != 0 || (op & OP_LARGE_ARC_TO_CCW) != 0
+			|| (op & OP_SMALL_ARC_TO_CW) != 0
+			|| (op & OP_SMALL_ARC_TO_CCW) != 0) {
+			int32 count = opList[i] & 0x00FFFFFF;
+			while (count > 0) {
+				fPath.arc_to(
+					points[0].x * viewScale,
+					points[0].y * viewScale,
+					points[1].x,
+					op & (OP_LARGE_ARC_TO_CW | OP_LARGE_ARC_TO_CCW),
+					op & (OP_SMALL_ARC_TO_CW | OP_LARGE_ARC_TO_CW),
+					points[2].x * viewScale + viewToScreenOffset.x,
+					points[2].y * viewScale + viewToScreenOffset.y);
+				points += 3;
+				count -= 3;
+			}
+		}
+
+		if ((op & OP_CLOSE) != 0)
+			fPath.close_polygon();
 	}
 }
 
@@ -2789,15 +2775,23 @@ agg_line_join_mode_for(join_mode mode)
 	return agg::miter_join;
 }
 
-// _StrokePath
+
 template<class VertexSource>
 BRect
 Painter::_StrokePath(VertexSource& path) const
 {
+	return _StrokePath(path, fLineCapMode);
+}
+
+
+template<class VertexSource>
+BRect
+Painter::_StrokePath(VertexSource& path, cap_mode capMode) const
+{
 	agg::conv_stroke<VertexSource> stroke(path);
 	stroke.width(fPenSize);
 
-	stroke.line_cap(agg_line_cap_mode_for(fLineCapMode));
+	stroke.line_cap(agg_line_cap_mode_for(capMode));
 	stroke.line_join(agg_line_join_mode_for(fLineJoinMode));
 	stroke.miter_limit(fMiterLimit);
 
