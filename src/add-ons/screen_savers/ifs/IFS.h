@@ -1,7 +1,17 @@
-// Polygon.h
-
+/*
+ * Copyright (c) 1997 by Massimino Pascal <Pascal.Massimon@ens.fr>
+ * Copyright 2006-2014, Haiku, Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Massimino Pascal, Pascal.Massimon@ens.fr
+ *		John Scipione, jscipione@gmail.com
+ */
 #ifndef IFS_H
 #define IFS_H
+
 
 #include <Screen.h>
 #include <Point.h>
@@ -9,18 +19,17 @@
 #include <Region.h>
 #include <View.h>
 
-typedef struct Similitude_Struct	SIMI;
-typedef struct Fractal_Struct		FRACTAL;
 
 #define FIX 12
 #define UNIT   ( 1<<FIX )
-#define MAX_SIMI  6
+#define MAX_SIMILITUDE  6
 
 // settings for a PC 120Mhz...
 #define MAX_DEPTH_2  10
 #define MAX_DEPTH_3  6
 #define MAX_DEPTH_4  4
 #define MAX_DEPTH_5  3
+
 
 struct buffer_info {
 	void*			bits;
@@ -35,32 +44,48 @@ struct Point {
 	int32		y;
 };
 
-struct Similitude_Struct {
+typedef struct Similitude {
+	float		c_x;
+	float		c_y;
+	float		r;
+	float		r2;
+	float		A;
+	float		A2;
+	int32		Ct;
+	int32		St;
+	int32		Ct2;
+	int32		St2;
+	int32		Cx;
+	int32		Cy;
+	int32		R;
+	int32		R2;
+} SIMILITUDE;
 
-	float		c_x, c_y;
-	float		r, r2, A, A2;
-	int32		Ct, St, Ct2, St2;
-	int32		Cx, Cy;
-	int32		R, R2;
-};
-
-struct Fractal_Struct {
-
-	int			Nb_Simi;
-	SIMI		Components[5 * MAX_SIMI];
-	int			Depth, Col;
-	int			Count, Speed;
-	int			Width, Height, Lx, Ly;
-	float		r_mean, dr_mean, dr2_mean;
-	int			Cur_Pt, Max_Pt;
+typedef struct Fractal {
+	int			SimilitudeCount;
+	SIMILITUDE	Components[5 * MAX_SIMILITUDE];
+	int			Depth;
+	int			Col;
+	int			Count;
+	int			Speed;
+	int			Width;
+	int			Height;
+	int			Lx;
+	int			Ly;
+	float		r_mean;
+	float		dr_mean;
+	float		dr2_mean;
+	int			CurrentPoint;
+	int			MaxPoint;
 	Point*		buffer1;
 	Point*		buffer2;
 	BBitmap*	bitmap;
 	BBitmap*	markBitmap;
-};
+} FRACTAL;
+
 
 class IFS {
- public:
+public:
 								IFS(BRect bounds);
 	virtual						~IFS();
 
@@ -70,17 +95,14 @@ class IFS {
 			void				SetAdditive(bool additive);
 			void				SetSpeed(int32 speed);
 
- private:
+private:
 			void				_DrawFractal(BView* view,
-											 const buffer_info* info);
-			void				_Trace(FRACTAL* F,
-									   int32 xo, int32 yo);
-			void				_RandomSimis(FRACTAL* f,
-											 SIMI* cur,
-											 int i) const;
+									const buffer_info* info);
+			void				_Trace(FRACTAL* F, int32 xo, int32 yo);
+			void				_RandomSimilitudes(FRACTAL* f, SIMILITUDE* cur,
+									int i) const;
 			void				_FreeBuffers(FRACTAL* f);
 			void				_FreeIFS(FRACTAL* f);
-
 
 			FRACTAL*			fRoot;
 			FRACTAL*			fCurrentFractal;
@@ -91,4 +113,5 @@ class IFS {
 			uint8				fCurrentMarkValue;
 };
 
-#endif // ABOUT_VPOLYGON_HIEW_H
+
+#endif	// IFS_H
