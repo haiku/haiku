@@ -21,6 +21,9 @@
 #include "Utility.h"
 
 
+static const rgb_color kWhite = (rgb_color){ 255, 255, 255 };
+
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PreviewView"
 
@@ -117,8 +120,7 @@ PreviewView::AddPreview()
 		B_WILL_DRAW);
 	fNoPreview->SetViewColor(0, 0, 0);
 	fNoPreview->SetLowColor(0, 0, 0);
-	fNoPreview->SetFontAndColor(be_plain_font, B_FONT_ALL,
-		&(rgb_color){ 255, 255, 255 });
+	fNoPreview->SetFontAndColor(be_plain_font, B_FONT_ALL, &kWhite);
 	fNoPreview->SetText(B_TRANSLATE("No preview available"));
 	fNoPreview->SetAlignment(B_ALIGN_CENTER);
 	fNoPreview->MakeEditable(false);
