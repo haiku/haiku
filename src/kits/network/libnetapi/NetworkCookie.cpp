@@ -264,8 +264,9 @@ BNetworkCookie::SetDomain(const BString& domain)
 BNetworkCookie&
 BNetworkCookie::SetMaxAge(int32 maxAge)
 {
-	BDateTime expiration = BDateTime::CurrentDateTime(B_GMT_TIME);
+	BDateTime expiration = BDateTime::CurrentDateTime(B_LOCAL_TIME);
 	expiration.SetTime_t(expiration.Time_t() + maxAge);
+
 	return SetExpirationDate(expiration);
 }
 
