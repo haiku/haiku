@@ -272,7 +272,7 @@ TabletProtocolHandler::_ReadReport(void *buffer)
 		xTilt = fXTilt->ScaledFloatData();
 
 	float yTilt = 0.0f;
-	if (fXTilt != NULL && fYTilt->Extract() == B_OK && fYTilt->Valid())
+	if (fYTilt != NULL && fYTilt->Extract() == B_OK && fYTilt->Valid())
 		yTilt = fYTilt->ScaledFloatData();
 
 	bool inRange = true;
