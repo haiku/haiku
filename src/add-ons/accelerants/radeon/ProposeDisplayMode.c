@@ -330,7 +330,7 @@ Radeon_ProposeDisplayMode(shared_info *si, crtc_info *crtc,
 	if(	target->timing.v_display < low->timing.v_display ||
 		target->timing.v_display > high->timing.v_display ||
 		target->timing.v_sync_start < low->timing.v_sync_start ||
-		target->timing.v_sync_start > high->timing.h_sync_start ||
+		target->timing.v_sync_start > high->timing.v_sync_start ||
 		target->timing.v_sync_end < low->timing.v_sync_end ||
 		target->timing.v_sync_end > high->timing.v_sync_end ||
 		target->timing.v_total < low->timing.v_total ||
