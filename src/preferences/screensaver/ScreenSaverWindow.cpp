@@ -873,7 +873,8 @@ TabView::MouseDown(BPoint where)
 	} else if (modulesTab != NULL && Selection() != 1
 		&& modulesTabFrame.Contains(where) && modulesView != NULL) {
 		// clicked on the modules tab
-		modulesView->MessageReceived(new BMessage(kMsgSaverSelected));
+		BMessage message(kMsgSaverSelected);
+		modulesView->MessageReceived(&message);
 	}
 
 	BTabView::MouseDown(where);
