@@ -20,10 +20,10 @@
 
 class BMessage;
 class BRect;
-class BTabView;
 
 class FadeView;
 class ModulesView;
+class TabView;
 
 
 class ScreenSaverWindow : public BDirectWindow {
@@ -47,7 +47,7 @@ private:
 
 			FadeView*			fFadeView;
 			ModulesView*		fModulesView;
-			BTabView*			fTabView;
+			TabView*			fTabView;
 };
 
 

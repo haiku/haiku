@@ -98,6 +98,14 @@ private:
 };
 
 
+class TabView : public BTabView {
+public:
+								TabView();
+
+	virtual	void				MouseDown(BPoint where);
+};
+
+
 class FadeView : public BView {
 public:
 								FadeView(const char* name,
@@ -148,6 +156,8 @@ public:
 			BScreenSaver*		ScreenSaver();
 
 private:
+	friend class TabView;
+
 	static	int					_CompareScreenSaverItems(const void* left,
 									const void* right);
 
@@ -836,6 +846,40 @@ ModulesView::_OpenSaver()
 }
 
 
+//	#pragma mark - TabView
+
+
+TabView::TabView()
+	:
+	BTabView("tab_view", B_WIDTH_FROM_LABEL)
+{
+}
+
+
+void
+TabView::MouseDown(BPoint where)
+{
+	BTab* fadeTab = TabAt(0);
+	BRect fadeTabFrame(TabFrame(0));
+	BTab* modulesTab = TabAt(1);
+	BRect modulesTabFrame(TabFrame(1));
+	ModulesView* modulesView = dynamic_cast<ModulesView*>(modulesTab->View());
+
+	if (fadeTab != NULL && Selection() != 0 && fadeTabFrame.Contains(where)
+		&& modulesView != NULL) {
+		// clicked on the fade tab
+		modulesView->SaveState();
+		modulesView->_CloseSaver();
+	} else if (modulesTab != NULL && Selection() != 1
+		&& modulesTabFrame.Contains(where) && modulesView != NULL) {
+		// clicked on the modules tab
+		modulesView->MessageReceived(new BMessage(kMsgSaverSelected));
+	}
+
+	BTabView::MouseDown(where);
+}
+
+
 //	#pragma mark - ScreenSaverWindow
 
 
@@ -861,7 +905,7 @@ ScreenSaverWindow::ScreenSaverWindow()
 	fPasswordWindow->Run();
 
 	// Create the tab view
-	fTabView = new BTabView("tab_view", B_WIDTH_FROM_LABEL);
+	fTabView = new TabView();
 	fTabView->SetBorder(B_NO_BORDER);
 
 	// Create the controls inside the tabs
