@@ -570,7 +570,8 @@ GIFLoad::MemblockAllocate(int size)
 		unsigned char* value = block->data;
 		block->offset = size;
 		block->next = NULL;
-		last->next = block;
+		if (last != NULL)
+			last->next = block;
 
 		return value;
 	}
