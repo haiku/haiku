@@ -166,7 +166,7 @@ GetBitmap(BPositionIO* in, BBitmap** out)
 	header.dataSize = B_BENDIAN_TO_HOST_INT32(header.dataSize);
 
 	// dump data from stream into a BBitmap
-	BBitmap* bitmap = new(std::nothrow) BBitmap(header.bounds, header.colors);
+	BBitmap* bitmap = new BBitmap(header.bounds, header.colors);
 	*out = bitmap;
 	if (bitmap == NULL)
 		return B_NO_MEMORY;
@@ -260,7 +260,7 @@ GIFTranslator::DerivedTranslate(BPositionIO* inSource,
 
 	if (!isGif) {
 		// BBitmap to GIF
-		BBitmap* bitmap = NULL;
+		BBitmap* bitmap;
 		err = GetBitmap(inSource, &bitmap);
 		if (err != B_OK)
 			return err;
