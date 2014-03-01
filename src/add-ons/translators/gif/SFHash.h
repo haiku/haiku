@@ -14,35 +14,41 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+//						John Scipione, <jscipione@gmail.com>
 
 #ifndef SFHASH_H
 #define SFHASH_H
 
+
 class HashItem {
 	friend class SFHash;
-	public:
-		unsigned int key;
-	private:
-		HashItem *next;
+public:
+	unsigned int key;
+private:
+	HashItem* next;
 };
+
 
 class SFHash {
-    public:
-						SFHash(int size = 4096);
-						~SFHash();
+public:
+								SFHash(int size = 4096);
+	virtual						~SFHash();
 
-		void			AddItem(HashItem *item);
-		HashItem*		GetItem(unsigned int key);
-		unsigned int	CountItems();
-		HashItem*		NextItem();
-		void			Rewind();
+			void				AddItem(HashItem* item);
+			HashItem*			GetItem(unsigned int key);
+			unsigned int		CountItems();
+			HashItem*			NextItem();
+			void				Rewind();
 
-        bool fatalerror;
+			bool				fatalerror;
 
-    private:
-        int size, iterate_pos, iterate_depth;
-        HashItem **main_array;
+private:
+			int					size;
+			int					iterate_pos;
+			int					iterate_depth;
+
+			HashItem**			main_array;
 };
 
-#endif
 
+#endif	// SFHASH_H

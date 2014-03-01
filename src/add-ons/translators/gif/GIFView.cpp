@@ -14,11 +14,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
-//                      Maxime Simon, <maxime.simon@gmail.com>
-//			Philippe Saint-Pierre, <stpere@gmail.com>
+//						Philippe Saint-Pierre, <stpere@gmail.com>
+//						Maxime Simon, <maxime.simon@gmail.com>
+//						John Scipione, <jscipione@gmail.com>
 
 #include "GIFView.h"
-#include "GIFTranslator.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,13 +28,14 @@
 #include <LayoutBuilder.h>
 #include <String.h>
 
+#include "GIFTranslator.h"
 #include "SavePalette.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "GIFView"
 
 
-// constructor
 GIFView::GIFView(TranslatorSettings* settings)
 	: 
 	BView("GIFView", B_WILL_DRAW),
@@ -42,20 +43,23 @@ GIFView::GIFView(TranslatorSettings* settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView *title = new BStringView("Title", B_TRANSLATE("GIF image translator"));
+	BStringView* title = new BStringView("Title",
+		B_TRANSLATE("GIF image translator"));
 	title->SetFont(be_bold_font);
 
-        char version_string[100];
-        snprintf(version_string, sizeof(version_string), B_TRANSLATE("v%d.%d.%d %s"),
-                int(B_TRANSLATION_MAJOR_VERSION(GIF_TRANSLATOR_VERSION)),
-                int(B_TRANSLATION_MINOR_VERSION(GIF_TRANSLATOR_VERSION)),
-                int(B_TRANSLATION_REVISION_VERSION(GIF_TRANSLATOR_VERSION)),
-                __DATE__);
+	char version_string[100];
+	snprintf(version_string, sizeof(version_string),
+		B_TRANSLATE("v%d.%d.%d %s"),
+		int(B_TRANSLATION_MAJOR_VERSION(GIF_TRANSLATOR_VERSION)),
+		int(B_TRANSLATION_MINOR_VERSION(GIF_TRANSLATOR_VERSION)),
+		int(B_TRANSLATION_REVISION_VERSION(GIF_TRANSLATOR_VERSION)),
+		__DATE__);
 
-	BStringView *version = new BStringView("Version", version_string);
+	BStringView* version = new BStringView("Version", version_string);
 
-	const char *copyrightString = "©2003 Daniel Switkin, software@switkin.com";
-	BStringView *copyright = new BStringView("Copyright", copyrightString);
+	const char* copyrightString
+		= "©2003 Daniel Switkin, software@switkin.com";
+	BStringView* copyright = new BStringView("Copyright", copyrightString);
 
 	// menu fields (Palette & Colors)
 	fWebSafeMI = new BMenuItem(B_TRANSLATE("Websafe"),
@@ -66,7 +70,8 @@ GIFView::GIFView(TranslatorSettings* settings)
 		new BMessage(GV_GREYSCALE), 0, 0);
 	fOptimalMI = new BMenuItem(B_TRANSLATE("Optimal"),
 		new BMessage(GV_OPTIMAL), 0, 0);
-	fPaletteM = new BPopUpMenu("PalettePopUpMenu", true, true, B_ITEMS_IN_COLUMN);
+	fPaletteM = new BPopUpMenu("PalettePopUpMenu", true, true,
+		B_ITEMS_IN_COLUMN);
 	fPaletteM->AddItem(fWebSafeMI);
 	fPaletteM->AddItem(fBeOSSystemMI);
 	fPaletteM->AddItem(fGreyScaleMI);
@@ -86,34 +91,37 @@ GIFView::GIFView(TranslatorSettings* settings)
 	}
 	fColorCount256MI = fColorCountMI[7];
 
- 	fPaletteMF = new BMenuField(B_TRANSLATE("Palette"), fPaletteM);
- 	fColorCountMF = new BMenuField(B_TRANSLATE("Colors"), fColorCountM);
+	fPaletteMF = new BMenuField(B_TRANSLATE("Palette"), fPaletteM);
+	fColorCountMF = new BMenuField(B_TRANSLATE("Colors"), fColorCountM);
 
- 	// check boxes
- 	fUseDitheringCB = new BCheckBox(B_TRANSLATE("Use dithering"),
- 		new BMessage(GV_USE_DITHERING));
+	// check boxes
+	fUseDitheringCB = new BCheckBox(B_TRANSLATE("Use dithering"),
+		new BMessage(GV_USE_DITHERING));
 
- 	fInterlacedCB = new BCheckBox(B_TRANSLATE("Write interlaced images"),
- 		new BMessage(GV_INTERLACED));
+	fInterlacedCB = new BCheckBox(B_TRANSLATE("Write interlaced images"),
+		new BMessage(GV_INTERLACED));
 
- 	fUseTransparentCB = new BCheckBox(B_TRANSLATE("Write transparent images"),
- 		new BMessage(GV_USE_TRANSPARENT));
+	fUseTransparentCB = new BCheckBox(B_TRANSLATE("Write transparent images"),
+		new BMessage(GV_USE_TRANSPARENT));
 
- 	// radio buttons
- 	fUseTransparentAutoRB = new BRadioButton(
- 		B_TRANSLATE("Automatic (from alpha channel)"),
- 		new BMessage(GV_USE_TRANSPARENT_AUTO));
+	// radio buttons
+	fUseTransparentAutoRB = new BRadioButton(
+		B_TRANSLATE("Automatic (from alpha channel)"),
+		new BMessage(GV_USE_TRANSPARENT_AUTO));
 
- 	fUseTransparentColorRB = new BRadioButton(B_TRANSLATE("Use RGB color"),
- 		new BMessage(GV_USE_TRANSPARENT_COLOR));
+	fUseTransparentColorRB = new BRadioButton(B_TRANSLATE("Use RGB color"),
+		new BMessage(GV_USE_TRANSPARENT_COLOR));
 
- 	fTransparentRedTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_RED));
- 	fTransparentGreenTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_GREEN));
- 	fTransparentBlueTC = new BTextControl("", "0", new BMessage(GV_TRANSPARENT_BLUE));
+	fTransparentRedTC = new BTextControl("", "0",
+		new BMessage(GV_TRANSPARENT_RED));
+	fTransparentGreenTC = new BTextControl("", "0",
+		new BMessage(GV_TRANSPARENT_GREEN));
+	fTransparentBlueTC = new BTextControl("", "0",
+		new BMessage(GV_TRANSPARENT_BLUE));
 
-	BTextView *tr = fTransparentRedTC->TextView();
-	BTextView *tg = fTransparentGreenTC->TextView();
-	BTextView *tb = fTransparentBlueTC->TextView();
+	BTextView* tr = fTransparentRedTC->TextView();
+	BTextView* tg = fTransparentGreenTC->TextView();
+	BTextView* tb = fTransparentBlueTC->TextView();
 
 	for (uint32 x = 0; x < 256; x++) {
 		if (x < '0' || x > '9') {
@@ -134,10 +142,10 @@ GIFView::GIFView(TranslatorSettings* settings)
 
 		.AddGrid(10, 10)
 			.Add(fPaletteMF->CreateLabelLayoutItem(), 0, 0)
-        	.Add(fPaletteMF->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(fPaletteMF->CreateMenuBarLayoutItem(), 1, 0)
 
 			.Add(fColorCountMF->CreateLabelLayoutItem(), 0, 1)
-        	.Add(fColorCountMF->CreateMenuBarLayoutItem(), 1, 1)
+			.Add(fColorCountMF->CreateMenuBarLayoutItem(), 1, 1)
 		.End()
 		.AddGlue()
 
@@ -156,7 +164,8 @@ GIFView::GIFView(TranslatorSettings* settings)
 
 	BFont font;
 	GetFont(&font);
-	SetExplicitPreferredSize(BSize((font.Size() * 400)/12, (font.Size() * 300)/12));
+	SetExplicitPreferredSize(BSize((font.Size() * 400) / 12,
+		(font.Size() * 300) / 12));
 
 	RestorePrefs();
 }
@@ -178,23 +187,26 @@ GIFView::RestorePrefs()
 		case WEB_SAFE_PALETTE:
 			fWebSafeMI->SetMarked(true);
 			break;
+
 		case BEOS_SYSTEM_PALETTE:
 			fBeOSSystemMI->SetMarked(true);
 			break;
+
 		case GREYSCALE_PALETTE:
 			fGreyScaleMI->SetMarked(true);
 			fUseDitheringCB->SetEnabled(false);
 			break;
+
 		case OPTIMAL_PALETTE:
 			fOptimalMI->SetMarked(true);
 			fColorCountMF->SetEnabled(true);
 			break;
+
 		default:
 			int32 value = WEB_SAFE_PALETTE;
 			fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE, &value);
 			fSettings->SaveSettings();
 			fWebSafeMI->SetMarked(true);
-			break;
 	}
 
 	if (fColorCountMF->IsEnabled()
@@ -215,9 +227,10 @@ GIFView::RestorePrefs()
 
 	if (fGreyScaleMI->IsMarked()) 
 		fUseDitheringCB->SetValue(false);
-	else 
+	else {
 		fUseDitheringCB->SetValue(
 			fSettings->SetGetBool(GIF_SETTING_USE_DITHERING));
+	}
 	fUseTransparentCB->SetValue(
 		fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT));
 	fUseTransparentAutoRB->SetValue(
@@ -254,7 +267,6 @@ GIFView::RestorePrefs()
 }
 
 
-// AllAttached
 void
 GIFView::AllAttached()
 {
@@ -273,9 +285,8 @@ GIFView::AllAttached()
 }
 
 
-// MessageReceived
 void
-GIFView::MessageReceived(BMessage *message)
+GIFView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case GV_WEB_SAFE:
@@ -287,6 +298,7 @@ GIFView::MessageReceived(BMessage *message)
 			fColorCount256MI->SetMarked(true);
 			break;
 		}
+
 		case GV_BEOS_SYSTEM:
 		{
 			int32 value = BEOS_SYSTEM_PALETTE;
@@ -296,6 +308,7 @@ GIFView::MessageReceived(BMessage *message)
 			fColorCount256MI->SetMarked(true);
 			break;
 		}
+
 		case GV_GREYSCALE:
 		{
 			int32 value = GREYSCALE_PALETTE;
@@ -308,6 +321,7 @@ GIFView::MessageReceived(BMessage *message)
 			fColorCount256MI->SetMarked(true);
 			break;
 		}
+
 		case GV_OPTIMAL:
 		{
 			int32 value = OPTIMAL_PALETTE;
@@ -318,6 +332,7 @@ GIFView::MessageReceived(BMessage *message)
 				->SetMarked(true);
 			break;
 		}
+
 		case GV_SET_COLOR_COUNT:
 			if (fColorCountMF->IsEnabled()) {
 				int32 sizeInBits;
@@ -329,18 +344,21 @@ GIFView::MessageReceived(BMessage *message)
 				}
 			}
 			break;
+
 		case GV_INTERLACED:
 		{
 			bool value = fInterlacedCB->Value();
 			fSettings->SetGetBool(GIF_SETTING_INTERLACED, &value);
 			break;
 		}
+
 		case GV_USE_DITHERING:
 		{
 			bool value = fUseDitheringCB->Value();
 			fSettings->SetGetBool(GIF_SETTING_USE_DITHERING, &value);
 			break;
 		}
+
 		case GV_USE_TRANSPARENT:
 		{
 			bool value = fUseTransparentCB->Value();
@@ -360,6 +378,7 @@ GIFView::MessageReceived(BMessage *message)
 			}
 			break;
 		}
+
 		case GV_USE_TRANSPARENT_AUTO:
 		{
 			bool value = true;
@@ -369,6 +388,7 @@ GIFView::MessageReceived(BMessage *message)
 			fTransparentBlueTC->SetEnabled(false);
 			break;
 		}
+
 		case GV_USE_TRANSPARENT_COLOR:
 		{
 			bool value = false;
@@ -378,33 +398,37 @@ GIFView::MessageReceived(BMessage *message)
 			fTransparentBlueTC->SetEnabled(true);
 			break;
 		}
+
 		case GV_TRANSPARENT_RED:
 		{	
 			int32 value = CheckInput(fTransparentRedTC);
 			fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED, &value);
 			break;
 		}
+
 		case GV_TRANSPARENT_GREEN:
 		{
 			int32 value = CheckInput(fTransparentGreenTC);
 			fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN, &value);
 			break;
 		}
+
 		case GV_TRANSPARENT_BLUE:
 		{
 			int32 value = CheckInput(fTransparentBlueTC);
 			fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE, &value);
 			break;
 		}
+
 		default:
 			BView::MessageReceived(message);
-			break;
 	}
+
 	fSettings->SaveSettings();
 }
 
 
-int GIFView::CheckInput(BTextControl *control) {
+int GIFView::CheckInput(BTextControl* control) {
 	int value = atoi(control->Text());
 	if (value < 0 || value > 255) {
 		value = (value < 0) ? 0 : 255;
@@ -412,6 +436,6 @@ int GIFView::CheckInput(BTextControl *control) {
 		sprintf(temp, "%d", value);
 		control->SetText(temp);
 	}
+
 	return value;
 }
-

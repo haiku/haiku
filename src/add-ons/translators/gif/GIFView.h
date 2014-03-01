@@ -14,20 +14,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
-//			Philippe Saint-Pierre, 2013, <stpere@gmail.com>
+//						Philippe Saint-Pierre, <stpere@gmail.com>
+//						John Scipione, <jscipione@gmail.com>
 
-#ifndef GIFVIEW_H
-#define GIFVIEW_H
+#ifndef GIF_VIEW_H
+#define GIF_VIEW_H
+
 
 #include <View.h>
 #include "TranslatorSettings.h"
 
-class BMenuField;
-class BPopUpMenu;
-class BMenuItem;
-class BCheckBox;
-class BRadioButton;
-class BTextControl;
 
 #define GV_WEB_SAFE					'gvws'
 #define GV_BEOS_SYSTEM				'gvbe'
@@ -46,43 +42,51 @@ class BTextControl;
 
 const BRect kRectView(110, 110, 339, 339);
 
+
+class BMenuField;
+class BPopUpMenu;
+class BMenuItem;
+class BCheckBox;
+class BRadioButton;
+class BTextControl;
+
 class GIFView : public BView {
- public:
-							GIFView(TranslatorSettings* settings);
-	virtual					~GIFView();
+public:
+								GIFView(TranslatorSettings* settings);
+	virtual						~GIFView();
 
-	virtual	void			MessageReceived(BMessage* message);
-	virtual	void			AllAttached();
-		
- private:
-			void			RestorePrefs();
-			int				CheckInput(BTextControl* control);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				AllAttached();
 
-		TranslatorSettings*		fSettings;
+private:
+			void				RestorePrefs();
+			int					CheckInput(BTextControl* control);
 
-		BMenuField*			fPaletteMF;
-		BPopUpMenu*			fPaletteM;
-		BMenuItem*			fWebSafeMI;
-		BMenuItem*			fBeOSSystemMI;
-		BMenuItem*			fGreyScaleMI;
-		BMenuItem*			fOptimalMI;
+			TranslatorSettings*	fSettings;
 
-		BMenuField*			fColorCountMF;
-		BPopUpMenu*			fColorCountM;
-		BMenuItem*			fColorCountMI[8];
-		BMenuItem*			fColorCount256MI;
+			BMenuField*			fPaletteMF;
+			BPopUpMenu*			fPaletteM;
+			BMenuItem*			fWebSafeMI;
+			BMenuItem*			fBeOSSystemMI;
+			BMenuItem*			fGreyScaleMI;
+			BMenuItem*			fOptimalMI;
 
-		BCheckBox*			fInterlacedCB;
-		BCheckBox*			fUseTransparentCB;
-		BCheckBox*			fUseDitheringCB;
+			BMenuField*			fColorCountMF;
+			BPopUpMenu*			fColorCountM;
+			BMenuItem*			fColorCountMI[8];
+			BMenuItem*			fColorCount256MI;
 
-		BRadioButton*		fUseTransparentAutoRB;
-		BRadioButton*		fUseTransparentColorRB;
+			BCheckBox*			fInterlacedCB;
+			BCheckBox*			fUseTransparentCB;
+			BCheckBox*			fUseDitheringCB;
 
-		BTextControl*		fTransparentRedTC;
-		BTextControl*		fTransparentGreenTC;
-		BTextControl*		fTransparentBlueTC;
+			BRadioButton*		fUseTransparentAutoRB;
+			BRadioButton*		fUseTransparentColorRB;
+
+			BTextControl*		fTransparentRedTC;
+			BTextControl*		fTransparentGreenTC;
+			BTextControl*		fTransparentBlueTC;
 };
 
-#endif
 
+#endif	// GIF_VIEW_H

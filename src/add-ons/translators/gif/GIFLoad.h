@@ -13,96 +13,93 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef GIFLOAD_H
-#define GIFLOAD_H
+// Additional authors:	John Scipione, <jscipione@gmail.com>
+
+#ifndef GIF_LOAD_H
+#define GIF_LOAD_H
+
 
 #include <DataIO.h>
 #include "LoadPalette.h"
+
 
 #define GIF_INTERLACED		0x40
 #define GIF_LOCALCOLORMAP	0x80
 
 
-class Memblock {
-	public:
-		uchar data[4096];
-		int offset;
-		Memblock *next;
+struct Memblock {
+	uchar		data[4096];
+	int			offset;
+	Memblock*	next;
 };
 
 
-const int gl_pass_starts_at[] = {0, 4, 2, 1, 0};
-const int gl_increment_pass_by[] = {8, 8, 4, 2, 0};
+const int gl_pass_starts_at[]		= { 0, 4, 2, 1, 0 };
+const int gl_increment_pass_by[]	= { 8, 8, 4, 2, 0 };
 
 
 class GIFLoad {
-	public:
-		GIFLoad(BPositionIO *input, BPositionIO *output);
-		~GIFLoad();
-		bool fatalerror;
-		
-	private:
-		bool ReadGIFHeader();
-		bool ReadGIFLoopBlock();
-		bool ReadGIFControlBlock();
-		bool ReadGIFImageHeader();
-		bool ReadGIFImageData();
-		bool ReadGIFCommentBlock();
-		bool ReadGIFUnknownBlock(unsigned char c);
-		
-		bool InitFrame(int size);
-		short NextCode();
-		void ResetTable();
-		
-		uchar *MemblockAllocate(int size);
-		void MemblockDeleteAll();
+public:
+								GIFLoad(BPositionIO* input,
+									BPositionIO* output);
+	virtual						~GIFLoad();
 
-		inline bool OutputColor(unsigned char *string, int size) {
-			int bpr = fWidth << 2;
-			
-			for (int x = 0; x < size; x++) {
-				fScanLine[fScanlinePosition] = fPalette->ColorForIndex(string[x]);
-				fScanlinePosition++;
-				
-				if (fScanlinePosition >= fWidth) {
-					if (fOutput->WriteAt(32 + (fRow * bpr), fScanLine, bpr) < bpr) return false;
-					fScanlinePosition = 0;
-					if (fInterlaced) {
-						fRow += gl_increment_pass_by[fPass];
-						while (fRow >= fHeight) {
-							fPass++;
-							if (fPass > 3) return true;
-							fRow = gl_pass_starts_at[fPass];
-						}
-					} else fRow++;
-				}
-			}
-			return true;
-		}
-		
-		BPositionIO *fInput, *fOutput;
-		LoadPalette *fPalette;
-		bool fInterlaced;
-		int fPass, fRow, fWidth, fHeight;
-		
-		unsigned char fOldCode[4096];
-		unsigned int fOldCodeLength;
-		short fNewCode;
-		int fBits, fMaxCode, fCodeSize;
-		short fClearCode, fEndCode, fNextCode;
-		
-		unsigned char *fTable[4096];
-		short fEntrySize[4096];
-		Memblock *fHeadMemblock;
-		
-		int fBitCount;
-		unsigned int fBitBuffer;
-		unsigned char fByteCount;
-		unsigned char fByteBuffer[255];
+			bool				fatalerror;
 
-		uint32 *fScanLine;
-		int fScanlinePosition;
+private:
+			bool				ReadGIFHeader();
+			bool				ReadGIFLoopBlock();
+			bool				ReadGIFControlBlock();
+			bool				ReadGIFImageHeader();
+			bool				ReadGIFImageData();
+			bool				ReadGIFCommentBlock();
+			bool				ReadGIFUnknownBlock(unsigned char c);
+
+			bool				InitFrame(int size);
+			short				NextCode();
+			void				ResetTable();
+
+			uchar*				MemblockAllocate(int size);
+			void				MemblockDeleteAll();
+
+			inline	bool		OutputColor(unsigned char* string, int size);
+
+			BPositionIO*		fInput;
+			BPositionIO*		fOutput;
+			LoadPalette*		fPalette;
+
+			bool				fInterlaced;
+
+			int					fPass;
+			int					fRow;
+
+			int					fWidth;
+			int					fHeight;
+
+			unsigned char		fOldCode[4096];
+			unsigned int		fOldCodeLength;
+
+			short				fNewCode;
+			int					fBits;
+			int					fMaxCode;
+			int					fCodeSize;
+
+			short				fClearCode;
+			short				fEndCode;
+			short				fNextCode;
+
+			unsigned char*		fTable[4096];
+			short				fEntrySize[4096];
+			Memblock*			fHeadMemblock;
+
+			int					fBitCount;
+			unsigned int		fBitBuffer;
+			unsigned char		fByteCount;
+			unsigned char		fByteBuffer[255];
+
+			uint32*				fScanLine;
+			int					fScanlinePosition;
 };
 
-#endif
 
+#endif	// GIF_LOAD_H

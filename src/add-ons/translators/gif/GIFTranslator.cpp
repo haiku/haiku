@@ -12,12 +12,16 @@
 //	original author in any about box using this software.
 //
 ////////////////////////////////////////////////////////////////////////////////
-// Additional authors:  Stephan Aßmus, <superstippi@gmx.de>
+
+// Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+//						John Scipione, <jscipione@gmail.com>
 
 #include "GIFTranslator.h"
-#include "GIFView.h"
-#include "GIFSave.h"
-#include "GIFLoad.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <syslog.h>
 
 #include <Application.h>
 #include <ByteOrder.h>
@@ -28,12 +32,11 @@
 #include <TranslatorAddOn.h>
 #include <TranslatorFormats.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <syslog.h>
-
+#include "GIFView.h"
+#include "GIFSave.h"
+#include "GIFLoad.h"
 #include "TranslatorWindow.h"
+
 
 #ifndef GIF_TYPE
 #define GIF_TYPE 'GIF '
@@ -43,40 +46,64 @@
 #define B_TRANSLATION_CONTEXT "GIFTranslator"
 
 
-// This global will be externed in other files - set once here
-// for the entire translator
 bool debug = false;
+	// this global will be externed in other files - set once here
+	// for the entire translator
 
-bool DetermineType(BPositionIO *source, bool *is_gif);
-status_t GetBitmap(BPositionIO *in, BBitmap **out);
+bool DetermineType(BPositionIO* source, bool* isGif);
+status_t GetBitmap(BPositionIO* in, BBitmap** out);
 
 static const translation_format sInputFormats[] = {
-	{ GIF_TYPE, B_TRANSLATOR_BITMAP, GIF_IN_QUALITY, GIF_IN_CAPABILITY,
-		"image/gif", "GIF image" },
-	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, BBM_IN_QUALITY, BBM_IN_CAPABILITY,
-		"image/x-be-bitmap", "Be Bitmap Format (GIFTranslator)" }
+	{
+		GIF_TYPE,
+		B_TRANSLATOR_BITMAP,
+		GIF_IN_QUALITY,
+		GIF_IN_CAPABILITY,
+		"image/gif",
+		"GIF image"
+	},
+	{
+		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_BITMAP,
+		BBM_IN_QUALITY,
+		BBM_IN_CAPABILITY,
+		"image/x-be-bitmap",
+		"Be Bitmap Format (GIFTranslator)"
+	}
 };
 
 static const translation_format sOutputFormats[] = {
-	{ GIF_TYPE, B_TRANSLATOR_BITMAP, GIF_OUT_QUALITY, GIF_OUT_CAPABILITY, "image/gif", 
-		"GIF image" },
-	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, BBM_OUT_QUALITY, BBM_OUT_CAPABILITY,
-		"image/x-be-bitmap", "Be Bitmap Format (GIFTranslator)" }
+	{
+		GIF_TYPE,
+		B_TRANSLATOR_BITMAP,
+		GIF_OUT_QUALITY,
+		GIF_OUT_CAPABILITY,
+		"image/gif",
+		"GIF image"
+	},
+	{
+		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_BITMAP,
+		BBM_OUT_QUALITY,
+		BBM_OUT_CAPABILITY,
+		"image/x-be-bitmap",
+		"Be Bitmap Format (GIFTranslator)"
+	}
 };
 
 // Default settings for the Translator
 static const TranSetting sDefaultSettings[] = {
-        {B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
-        {B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false},
-	{GIF_SETTING_INTERLACED, TRAN_SETTING_BOOL, false},
-	{GIF_SETTING_USE_TRANSPARENT, TRAN_SETTING_BOOL, false},
-	{GIF_SETTING_USE_TRANSPARENT_AUTO, TRAN_SETTING_BOOL, false},
-	{GIF_SETTING_USE_DITHERING, TRAN_SETTING_BOOL, false},
-	{GIF_SETTING_PALETTE_MODE, TRAN_SETTING_INT32, 0},
-	{GIF_SETTING_PALETTE_SIZE, TRAN_SETTING_INT32, 8},
-	{GIF_SETTING_TRANSPARENT_RED, TRAN_SETTING_INT32, 0},
-	{GIF_SETTING_TRANSPARENT_GREEN, TRAN_SETTING_INT32, 0},
-	{GIF_SETTING_TRANSPARENT_BLUE, TRAN_SETTING_INT32, 0}
+	{ B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false },
+	{ B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false },
+	{ GIF_SETTING_INTERLACED, TRAN_SETTING_BOOL, false },
+	{ GIF_SETTING_USE_TRANSPARENT, TRAN_SETTING_BOOL, false },
+	{ GIF_SETTING_USE_TRANSPARENT_AUTO, TRAN_SETTING_BOOL, false },
+	{ GIF_SETTING_USE_DITHERING, TRAN_SETTING_BOOL, false },
+	{ GIF_SETTING_PALETTE_MODE, TRAN_SETTING_INT32, 0 },
+	{ GIF_SETTING_PALETTE_SIZE, TRAN_SETTING_INT32, 8 },
+	{ GIF_SETTING_TRANSPARENT_RED, TRAN_SETTING_INT32, 0 },
+	{ GIF_SETTING_TRANSPARENT_GREEN, TRAN_SETTING_INT32, 0 },
+	{ GIF_SETTING_TRANSPARENT_BLUE, TRAN_SETTING_INT32, 0 }
 };
 
 const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
@@ -85,31 +112,35 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting
 
 
 /* Look at first few bytes in stream to determine type - throw it back
-   if it is not a GIF or a BBitmap that we understand */
+ * if it is not a GIF or a BBitmap that we understand.
+ */
 bool
-DetermineType(BPositionIO *source, bool *is_gif)
+DetermineType(BPositionIO* source, bool* isGif)
 {
 	unsigned char header[7];
-	*is_gif = true;
+	*isGif = true;
 	if (source->Read(header, 6) != 6)
 		return false;
 	header[6] = 0x00;
 
-	if (strcmp((char *)header, "GIF87a") != 0 && strcmp((char *)header, 
-		"GIF89a") != 0) {
-		*is_gif = false;
-		int32 magic = (header[0] << 24) + (header[1] << 16) + (header[2] << 8) 
+	if (strcmp((char*)header, "GIF87a") != 0
+		&& strcmp((char*)header, "GIF89a") != 0) {
+		*isGif = false;
+		int32 magic = (header[0] << 24) + (header[1] << 16) + (header[2] << 8)
 			+ header[3];
 		if (magic != B_TRANSLATOR_BITMAP)
 			return false;
+
 		source->Seek(5 * 4 - 2, SEEK_CUR);
 		color_space cs;
 		if (source->Read(&cs, 4) != 4)
 			return false;
+
 		cs = (color_space)B_BENDIAN_TO_HOST_INT32(cs);
 		if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG
-			&& cs != B_RGBA32_BIG)
+			&& cs != B_RGBA32_BIG) {
 			return false;
+		}
 	}
 
 	source->Seek(0, SEEK_SET);
@@ -117,12 +148,10 @@ DetermineType(BPositionIO *source, bool *is_gif)
 }
 
 
-/* Dump data from stream into a BBitmap */
 status_t
-GetBitmap(BPositionIO *in, BBitmap **out)
+GetBitmap(BPositionIO* in, BBitmap** out)
 {
 	TranslatorBitmap header;
-
 	status_t err = in->Read(&header, sizeof(header));
 	if (err != sizeof(header))
 		return B_IO_ERROR;
@@ -136,15 +165,18 @@ GetBitmap(BPositionIO *in, BBitmap **out)
 	header.colors = (color_space)B_BENDIAN_TO_HOST_INT32(header.colors);
 	header.dataSize = B_BENDIAN_TO_HOST_INT32(header.dataSize);
 
+	// dump data from stream into a BBitmap
 	BBitmap* bitmap = new(std::nothrow) BBitmap(header.bounds, header.colors);
 	*out = bitmap;
 	if (bitmap == NULL)
 		return B_NO_MEMORY;
-	unsigned char *bits = (unsigned char *)bitmap->Bits();
+
+	unsigned char* bits = (unsigned char*)bitmap->Bits();
 	if (bits == NULL) {
 		delete bitmap;
 		return B_NO_MEMORY;
 	}
+
 	err = in->Read(bits, header.dataSize);
 	if (err == (status_t)header.dataSize)
 		return B_OK;
@@ -155,29 +187,31 @@ GetBitmap(BPositionIO *in, BBitmap **out)
 }
 
 
-/* Required Identify function - may need to read entire header, not sure */
 status_t
 GIFTranslator::DerivedIdentify(BPositionIO* inSource,
 	const translation_format* inFormat, BMessage* ioExtension,
 	translator_info* outInfo, uint32 outType)
 {
-	const char *debug_text = getenv("GIF_TRANSLATOR_DEBUG");
+	// Required identify function - may need to read entire header, not sure
+	const char* debug_text = getenv("GIF_TRANSLATOR_DEBUG");
 	if (debug_text != NULL && atoi(debug_text) != 0)
 		debug = true;
 
 	if (outType == 0)
 		outType = B_TRANSLATOR_BITMAP;
+
 	if (outType != GIF_TYPE && outType != B_TRANSLATOR_BITMAP) 
 		return B_NO_TRANSLATOR;
 
-	bool is_gif;
-	if (!DetermineType(inSource, &is_gif))
+	bool isGif;
+	if (!DetermineType(inSource, &isGif))
 		return B_NO_TRANSLATOR;
-	if (!is_gif && inFormat != NULL && inFormat->type != B_TRANSLATOR_BITMAP)
+
+	if (!isGif && inFormat != NULL && inFormat->type != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
 
 	outInfo->group = B_TRANSLATOR_BITMAP;
-	if (is_gif) {
+	if (isGif) {
 		outInfo->type = GIF_TYPE;
 		outInfo->quality = GIF_IN_QUALITY;
 		outInfo->capability = GIF_IN_CAPABILITY;
@@ -191,57 +225,68 @@ GIFTranslator::DerivedIdentify(BPositionIO* inSource,
 			sizeof(outInfo->name));
 		strcpy(outInfo->MIME, "image/x-be-bitmap");
 	}
+
 	return B_OK;
 }
 
 
 /* Main required function - assumes that an incoming GIF must be translated
-   to a BBitmap, and vice versa - this could be improved */
+ * to a BBitmap, and vice versa - this could be improved
+ */
 status_t
 GIFTranslator::DerivedTranslate(BPositionIO* inSource,
 	const translator_info* inInfo, BMessage* ioExtension, uint32 outType,
 	BPositionIO* outDestination, int32 baseType)
 {
 	const char* debug_text = getenv("GIF_TRANSLATOR_DEBUG");
-	if ((debug_text != NULL) && (atoi(debug_text) != 0)) debug = true;
+	if (debug_text != NULL && atoi(debug_text) != 0)
+		debug = true;
 
-	if (outType == 0) outType = B_TRANSLATOR_BITMAP;
-	if (outType != GIF_TYPE && outType != B_TRANSLATOR_BITMAP) {
+	if (outType == 0)
+		outType = B_TRANSLATOR_BITMAP;
+
+	if (outType != GIF_TYPE && outType != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
-	}
 
-	bool is_gif;
-	if (!DetermineType(inSource, &is_gif)) return B_NO_TRANSLATOR;
-	if (!is_gif && inInfo->type != B_TRANSLATOR_BITMAP) return B_NO_TRANSLATOR;
+	bool isGif;
+	if (!DetermineType(inSource, &isGif))
+		return B_NO_TRANSLATOR;
+
+	if (!isGif && inInfo->type != B_TRANSLATOR_BITMAP)
+		return B_NO_TRANSLATOR;
 
 	status_t err = B_OK;
 	bigtime_t now = system_time();
-	// Going from BBitmap to GIF
-	if (!is_gif) {
-		BBitmap *bitmap = NULL;
+
+	if (!isGif) {
+		// BBitmap to GIF
+		BBitmap* bitmap = NULL;
 		err = GetBitmap(inSource, &bitmap);
 		if (err != B_OK)
 			return err;
-		GIFSave* gs = new GIFSave(bitmap, outDestination, fSettings);
-		if (gs->fatalerror) {
-			delete gs;
+
+		GIFSave* gitSave = new GIFSave(bitmap, outDestination, fSettings);
+		if (gitSave->fatalerror) {
+			delete gitSave;
 			delete bitmap;
 			return B_NO_MEMORY;
 		}
-		delete gs;
+		delete gitSave;
 		delete bitmap;
-	} else { // GIF to BBitmap
-		GIFLoad *gl = new GIFLoad(inSource, outDestination);
-		if (gl->fatalerror) {
-			delete gl;
+	} else {
+		// GIF to BBitmap
+		GIFLoad* gifLoad = new GIFLoad(inSource, outDestination);
+		if (gifLoad->fatalerror) {
+			delete gifLoad;
 			return B_NO_MEMORY;
 		}
-		delete gl;
+		delete gifLoad;
 	}
 
 	if (debug) {
 		now = system_time() - now;
-		syslog(LOG_ERR, "Translate() - Translation took %Ld microseconds\n", now);
+		syslog(LOG_ERR, "Translate() - Translation took %Ld microseconds\n",
+			now);
 	}
 	return B_OK;
 }
@@ -250,22 +295,23 @@ GIFTranslator::DerivedTranslate(BPositionIO* inSource,
 BTranslator*
 make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 {
-        if (n == 0)
-                return new GIFTranslator();
+	if (n == 0)
+		return new GIFTranslator();
 
-        return NULL;
+	return NULL;
 }
 
 
 GIFTranslator::GIFTranslator()
-	: BaseTranslator(B_TRANSLATE("GIF images"),
-		B_TRANSLATE("GIF image translator"),
-		GIF_TRANSLATOR_VERSION,
-		sInputFormats, kNumInputFormats,
-		sOutputFormats, kNumOutputFormats,
-		"GIFTranslator_Settings",
-		sDefaultSettings, kNumDefaultSettings,
-		B_TRANSLATOR_BITMAP, B_GIF_FORMAT)
+	:
+	BaseTranslator(B_TRANSLATE("GIF images"),
+	B_TRANSLATE("GIF image translator"),
+	GIF_TRANSLATOR_VERSION,
+	sInputFormats, kNumInputFormats,
+	sOutputFormats, kNumOutputFormats,
+	"GIFTranslator_Settings",
+	sDefaultSettings, kNumDefaultSettings,
+	B_TRANSLATOR_BITMAP, B_GIF_FORMAT)
 {
 }
 
@@ -276,7 +322,7 @@ GIFTranslator::~GIFTranslator()
 
 
 BView*
-GIFTranslator::NewConfigView(TranslatorSettings *settings)
+GIFTranslator::NewConfigView(TranslatorSettings* settings)
 {
 	return new GIFView(settings);
 }
@@ -285,13 +331,13 @@ GIFTranslator::NewConfigView(TranslatorSettings *settings)
 int
 main()
 {
-        BApplication app("application/x-vnd.Haiku-GIFTranslator");
-        status_t result;
-        result = LaunchTranslatorWindow(new GIFTranslator,
-                B_TRANSLATE("GIF Settings"), kRectView);
-        if (result == B_OK) {
-                app.Run();
-                return 0;
-        } else
-                return 1;
+	BApplication app("application/x-vnd.Haiku-GIFTranslator");
+	status_t result = LaunchTranslatorWindow(new GIFTranslator,
+		B_TRANSLATE("GIF Settings"), kRectView);
+	if (result == B_OK) {
+		app.Run();
+		return 0;
+	}
+
+	return 1;
 }

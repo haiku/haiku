@@ -14,18 +14,24 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Additional authors:	Stephan Aßmus, <superstippi@gmx.de>
+//						John Scipione, <jscipione@gmail.com>
+
+
+#include "SavePalette.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <new>
 
-#include "SavePalette.h"
 #include <Bitmap.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+
 
 using std::nothrow;
 
 extern bool debug;
+
 
 // "web safe palette"
 const rgb_color wsp[256] = {
@@ -159,40 +165,43 @@ const rgb_color wsp[256] = {
 	{0x00, 0x00, 0x00, 0xff}, {0x00, 0x00, 0x00, 0xff}
 };
 
-class ColorItem : public HashItem {
-	public:
-		ColorItem(unsigned int k, unsigned int c,
-				  uint8 r, uint8 g, uint8 b)
-			: count(c),
-			  red(r),
-			  green(g),
-			  blue(b)
-		{
-			key = k;
-		}
-        unsigned int count;
-        uint8 red;
-        uint8 green;
-        uint8 blue;
+
+struct ColorItem : public HashItem {
+	ColorItem(unsigned int k, unsigned int c,
+		uint8 r, uint8 g, uint8 b)
+		:
+		count(c),
+		red(r),
+		green(g),
+		blue(b)
+	{
+		key = k;
+	}
+
+	unsigned int count;
+	uint8 red;
+	uint8 green;
+	uint8 blue;
 };
 
-// constructor
+
 SavePalette::SavePalette(int mode)
-	: pal(new(nothrow) rgb_color[256]),
-	  fSize(0),
-	  fSizeInBits(8),
-	  fMode(mode),
-	  fTransparentMode(NO_TRANSPARENCY),
-	  fTransparentIndex(-1),
-	  fBackgroundIndex(0),
-	  fFatalError(pal == NULL)
+	:
+	pal(new(nothrow) rgb_color[256]),
+	fSize(0),
+	fSizeInBits(8),
+	fMode(mode),
+	fTransparentMode(NO_TRANSPARENCY),
+	fTransparentIndex(-1),
+	fBackgroundIndex(0),
+	fFatalError(pal == NULL)
 {
 	if (IsValid()) {
 		if (fMode == WEB_SAFE_PALETTE) {
 			memcpy(pal, wsp, sizeof(rgb_color) * 256);
 			fSize = 216;
 		} else if (fMode == BEOS_SYSTEM_PALETTE) {
-			color_map *map = (color_map *)system_colors();
+			color_map* map = (color_map*)system_colors();
 			memcpy(pal, map->color_list, sizeof(rgb_color) * 256);
 			fSize = 256;
 		} else if (fMode == GREYSCALE_PALETTE) {
@@ -205,17 +214,18 @@ SavePalette::SavePalette(int mode)
 	}
 }
 
-// make_key
+
 static int
 make_key(uint8 r, uint8 g, uint8 b, uint8 bits)
 {
 	r = r >> (8 - bits);
 	g = g >> (8 - bits);
 	b = b >> (8 - bits);
+
 	return (r << (bits * 2)) | (g << bits) | b;
 }
 
-// touch_color_item
+
 static bool
 touch_color_item(SFHash& hash, unsigned int key, uint8 r, uint8 g, uint8 b)
 {
@@ -227,27 +237,30 @@ touch_color_item(SFHash& hash, unsigned int key, uint8 r, uint8 g, uint8 b)
 				printf("Out of memory in touch_color_item()\n");
 			return false;
 		}
-		hash.AddItem((HashItem *)ci);
+		hash.AddItem((HashItem*)ci);
 	} else {
 		ci->count++;
+#if 0
 		// use brightest color
-/*		ci->red = max_c(ci->red, r);
+		ci->red = max_c(ci->red, r);
 		ci->green = max_c(ci->green, g);
-		ci->blue = max_c(ci->blue, b);*/
+		ci->blue = max_c(ci->blue, b);
+#endif
 	}
 	return true;
 }
 
-// constructor
-SavePalette::SavePalette(BBitmap *bitmap, int32 maxSizeInBits)
-	: pal(new(nothrow) rgb_color[256]),
-	  fSize(0),
-	  fSizeInBits(0),
-	  fMode(OPTIMAL_PALETTE),
-	  fTransparentMode(NO_TRANSPARENCY),
-	  fTransparentIndex(-1),
-	  fBackgroundIndex(0),
-	  fFatalError(pal == NULL)
+
+SavePalette::SavePalette(BBitmap* bitmap, int32 maxSizeInBits)
+	:
+	pal(new(nothrow) rgb_color[256]),
+	fSize(0),
+	fSizeInBits(0),
+	fMode(OPTIMAL_PALETTE),
+	fTransparentMode(NO_TRANSPARENCY),
+	fTransparentIndex(-1),
+	fBackgroundIndex(0),
+	fFatalError(pal == NULL)
 {
 	if (!IsValid())
 		return;
@@ -255,31 +268,35 @@ SavePalette::SavePalette(BBitmap *bitmap, int32 maxSizeInBits)
 	SFHash hash(1 << 16);
 	if (hash.fatalerror) {
 		if (debug)
-			printf("Out of memory in SavePalette(BBitmap *)\n");
+			printf("Out of memory in SavePalette(BBitmap*)\n");
 		fFatalError = true;
 		return;
 	}
 
 	// reject unsupported color spaces
 	// TODO: B_CMAP8 and B_GRAY8 should be really easy to support as well!!
-    color_space cs = bitmap->ColorSpace();
-    if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG && cs != B_RGBA32_BIG) {
-    	if (debug) {
-    		printf("Wrong color space given in SavePalette(BBitmap):\n");
-    		printf("%d %d %d %d or 0x%x\n", (cs & 0xff000000) >> 24, (cs & 0xff0000) >> 16,
-    			(cs & 0xff00) >> 8, cs & 0xff, cs);
-    	}
-    	fFatalError = true;
-    	return;
-   	}
-   	
+	color_space cs = bitmap->ColorSpace();
+	if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG
+		&& cs != B_RGBA32_BIG) {
+		if (debug) {
+			printf("Wrong color space given in SavePalette(BBitmap):\n");
+			printf("%d %d %d %d or 0x%x\n",
+				(cs & 0xff000000) >> 24, (cs & 0xff0000) >> 16,
+				(cs & 0xff00) >> 8, cs & 0xff, cs);
+		}
+		fFatalError = true;
+		return;
+	}
+
 	BRect rect = bitmap->Bounds();
 	uint32 height = rect.IntegerHeight() + 1;
 	uint32 width = rect.IntegerWidth() + 1;
 	uint8* bits = (uint8*)bitmap->Bits();
 	uint32 bpr = bitmap->BytesPerRow();
 
-	uint8 r, g, b;
+	uint8 r;
+	uint8 g;
+	uint8 b;
 	uint8 useBits = 3 + maxSizeInBits / 2;
 	if (cs == B_RGB32 || cs == B_RGBA32) {
 		for (uint32 y = 0; y < height; y++) {
@@ -292,13 +309,15 @@ SavePalette::SavePalette(BBitmap *bitmap, int32 maxSizeInBits)
 
 				uint32 key = make_key(r, g, b, useBits);
 				if (!touch_color_item(hash, key, r, g, b)) {
-					if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
+					if (debug)
+						printf("Out of memory in SavePalette(BBitmap*)\n");
+
 					fFatalError = true;
-			        return;
-	            }
-	        }
-	        bits += bpr;
-	    }
+					return;
+				}
+			}
+			bits += bpr;
+		}
 	} else if ((cs == B_RGB32_BIG || cs == B_RGBA32_BIG)) {
 		for (uint32 y = 0; y < height; y++) {
 			uint8* handle = bits;
@@ -310,66 +329,68 @@ SavePalette::SavePalette(BBitmap *bitmap, int32 maxSizeInBits)
 
 				uint32 key = make_key(r, g, b, useBits);
 				if (!touch_color_item(hash, key, r, g, b)) {
-					if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
+					if (debug)
+						printf("Out of memory in SavePalette(BBitmap*)\n");
 					fFatalError = true;
-			        return;
-	            }
-	        }
-	        bits += bpr;
-	    }
+					return;
+				}
+			}
+			bits += bpr;
+		}
 	}
-    
+
 	int unique_colors = hash.CountItems();
-	while (((1 << fSizeInBits) < unique_colors) && (fSizeInBits < maxSizeInBits))
+	while (((1 << fSizeInBits) < unique_colors)
+		&& (fSizeInBits < maxSizeInBits)) {
 		fSizeInBits++;
+	}
 	fSize = 1 << fSizeInBits;
 
-    ColorItem **topcolors = (ColorItem **)malloc(fSize * sizeof(ColorItem *));
-    if (topcolors == NULL) {
-        if (debug) printf("Out of memory in SavePalette(BBitmap *)\n");
-        fFatalError = true;
-        return;
-    }
-    ColorItem *dummy = new ColorItem(0, 0, 0, 0, 0);
-    for (int i = 0; i < fSize; i++)
-    	topcolors[i] = dummy;
+	ColorItem** topcolors = (ColorItem**)malloc(fSize * sizeof(ColorItem*));
+	if (topcolors == NULL) {
+		if (debug) printf("Out of memory in SavePalette(BBitmap*)\n");
+		fFatalError = true;
+		return;
+	}
+	ColorItem* dummy = new ColorItem(0, 0, 0, 0, 0);
+	for (int i = 0; i < fSize; i++)
+		topcolors[i] = dummy;
 
-    for (int i = 0; i < unique_colors; i++) {
-        ColorItem *ci = (ColorItem *)hash.NextItem();
-        for (int j = 0; j < fSize; j++) {
-            if (ci->count > topcolors[j]->count) {
-                for (int k = fSize - 1; k > j; k--) {
-                    topcolors[k] = topcolors[k - 1];
-                }
-                topcolors[j] = ci;
-                break;
-            }
-        }
-    }
-    
-    for (int i = 0; i < fSize; i++) {
-    	pal[i].red = topcolors[i]->red;
-    	pal[i].green = topcolors[i]->green;
-        pal[i].blue = topcolors[i]->blue;
-        pal[i].alpha = 0xff;
-    }
-    
-    delete dummy;
-    free(topcolors);
+	for (int i = 0; i < unique_colors; i++) {
+		ColorItem* ci = (ColorItem*)hash.NextItem();
+		for (int j = 0; j < fSize; j++) {
+			if (ci->count > topcolors[j]->count) {
+				for (int k = fSize - 1; k > j; k--) {
+					topcolors[k] = topcolors[k - 1];
+				}
+				topcolors[j] = ci;
+				break;
+			}
+		}
+	}
+
+	for (int i = 0; i < fSize; i++) {
+		pal[i].red = topcolors[i]->red;
+		pal[i].green = topcolors[i]->green;
+		pal[i].blue = topcolors[i]->blue;
+		pal[i].alpha = 0xff;
+	}
+
+	delete dummy;
+	free(topcolors);
 }
 
-// destructor
+
 SavePalette::~SavePalette()
 {
 	delete[] pal;
 }
 
-// IndexForColor
-//
-// standard mapping services once a palette is loaded
+
 uint8
 SavePalette::IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha)
 {
+	// standard mapping services once a palette is loaded
 	if (fTransparentMode > NO_TRANSPARENCY && alpha < 128)
 		return fTransparentIndex;
 
@@ -378,13 +399,16 @@ SavePalette::IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha)
 	if (fMode == GREYSCALE_PALETTE) {
 		index = (308 * red + 600 * green + 116 * blue) / 1024;
 		// avoid transparent index
-		if (fTransparentMode == AUTO_TRANSPARENCY && index == 1 && fTransparentIndex == 1)
+		if (fTransparentMode == AUTO_TRANSPARENCY && index == 1
+			&& fTransparentIndex == 1) {
 			index = 0;
+		}
 	} else {
 		int closestDistance = 255 * 255 * 3;
 	
 		if (fTransparentMode == AUTO_TRANSPARENCY) {
-			for (int i = 0; i < fTransparentIndex && closestDistance != 0; i++) {
+			for (int i = 0; i < fTransparentIndex && closestDistance != 0;
+					i++) {
 				int rd = (int)red - (int)pal[i].red;
 				int gd = (int)green - (int)pal[i].green;
 				int bd = (int)blue - (int)pal[i].blue;
@@ -394,7 +418,8 @@ SavePalette::IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha)
 					index = i;
 				}
 			}
-			for (int i = fTransparentIndex + 1; i < fSize && closestDistance != 0; i++) {
+			for (int i = fTransparentIndex + 1;
+					i < fSize && closestDistance != 0; i++) {
 				int rd = (int)red - (int)pal[i].red;
 				int gd = (int)green - (int)pal[i].green;
 				int bd = (int)blue - (int)pal[i].blue;
@@ -417,10 +442,11 @@ SavePalette::IndexForColor(uint8 red, uint8 green, uint8 blue, uint8 alpha)
 			}
 		}
 	}
+
 	return index;
 }
 
-// SetTransparentIndex
+
 void
 SavePalette::PrepareForAutoTransparency()
 {
@@ -448,7 +474,7 @@ SavePalette::PrepareForAutoTransparency()
 	}
 }
 
-// SetTransparentColor
+
 void
 SavePalette::SetTransparentColor(uint8 red, uint8 green, uint8 blue)
 {
@@ -460,7 +486,7 @@ SavePalette::SetTransparentColor(uint8 red, uint8 green, uint8 blue)
 		if (pal[i].red == red &&
 			pal[i].green == green &&
 			pal[i].blue == blue) {
-			
+
 			fTransparentIndex = i;
 			found = true;
 
@@ -489,7 +515,7 @@ SavePalette::SetTransparentColor(uint8 red, uint8 green, uint8 blue)
 	}
 }
 
-// GetColors
+
 void
 SavePalette::GetColors(uint8* buffer, int size) const
 {

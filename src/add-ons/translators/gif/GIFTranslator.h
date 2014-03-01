@@ -13,10 +13,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef GIFTRANSLATOR_H
-#define GIFTRANSLATOR_H
+// Additional authors:	John Scipione, <jscipione@gmail.com>
+
+#ifndef GIF_TRANSLATOR_H
+#define GIF_TRANSLATOR_H
+
 
 #include "BaseTranslator.h"
+
 
 #define GIF_IN_QUALITY		0.8
 #define GIF_IN_CAPABILITY	0.8
@@ -27,6 +31,8 @@
 #define GIF_OUT_CAPABILITY	0.8
 #define BBM_OUT_QUALITY		0.3
 #define BBM_OUT_CAPABILITY	0.3
+
+#define GIF_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1, 5, 0)
 
 // settings
 
@@ -41,24 +47,25 @@
 #define GIF_SETTING_TRANSPARENT_BLUE		"transparent blue"
 
 
-#define GIF_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VERSION(1,5,0)
-
 class GIFTranslator : public BaseTranslator {
-	public:
-		GIFTranslator();
-		virtual status_t DerivedIdentify(BPositionIO* inSource,
-			const translation_format* inFormat, BMessage* ioExtension,
-			translator_info* outInfo, uint32 outType);
+public:
+								GIFTranslator();
+	virtual	status_t			DerivedIdentify(BPositionIO* inSource,
+									const translation_format* inFormat,
+									BMessage* ioExtension,
+									translator_info* outInfo, uint32 outType);
 
-		virtual status_t DerivedTranslate(BPositionIO* inSource,
-			const translator_info* inInfo, BMessage* ioExtension,
-			uint32 outType, BPositionIO* outDestination, int32 baseType);
-		
-		virtual BView* NewConfigView(TranslatorSettings* settings);
-		
-	protected:
-		virtual ~GIFTranslator();
+	virtual	status_t			DerivedTranslate(BPositionIO* inSource,
+									const translator_info* inInfo,
+									BMessage* ioExtension,
+									uint32 outType, BPositionIO* outDestination,
+									int32 baseType);
+
+	virtual	BView*				NewConfigView(TranslatorSettings* settings);
+
+protected:
+	virtual						~GIFTranslator();
 };
 
-#endif
 
+#endif	// GIF_TRANSLATOR_H

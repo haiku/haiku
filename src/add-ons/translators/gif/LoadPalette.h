@@ -13,24 +13,31 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Additional authors:	John Scipione, <jscipione@gmail.com>
+
 #ifndef LOAD_PALETTE_H
 #define LOAD_PALETTE_H
 
+
 #include <SupportDefs.h>
 
+
 class LoadPalette {
-	public:
-		LoadPalette();
-		uint32 ColorForIndex(int index);
-		void SetColor(int index, uint8 red, uint8 green, uint8 blue);
-		
-		int size, size_in_bits;
-		int backgroundindex, transparentindex;
-		bool usetransparent;
-		
-	private:
+public:
+								LoadPalette();
+
+		uint32					ColorForIndex(int index);
+		void					SetColor(int index, uint8 red, uint8 green, uint8 blue);
+
+		int						size;
+		int						size_in_bits;
+		int						backgroundindex;
+		int						transparentindex;
+		bool					usetransparent;
+
+private:
 		uint32 data[256];
 };
 
-#endif
 
+#endif	// LOAD_PALETTE_H

@@ -13,12 +13,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Additional authors:	John Scipione, <jscipione@gmail.com>
+
 #ifndef SAVE_PALETTE_H
 #define SAVE_PALETTE_H
 
+
 #include "SFHash.h"
 #include <GraphicsDefs.h>
-class BBitmap;
 
 enum {
 	WEB_SAFE_PALETTE = 0,
@@ -33,51 +35,52 @@ enum {
 	COLOR_KEY_TRANSPARENCY
 };
 
+
+class BBitmap;
+
 class SavePalette {
-	public:
-							SavePalette(int mode);
-							SavePalette(BBitmap *bitmap,
-										int32 maxSizeInBits = 8);
-	virtual					~SavePalette();
+public:
+								SavePalette(int mode);
+								SavePalette(BBitmap* bitmap,
+									int32 maxSizeInBits = 8);
+	virtual						~SavePalette();
 		
-	inline	bool			IsValid() const
-								{ return !fFatalError; }
+	inline	bool				IsValid() const
+									{ return !fFatalError; }
 
-			uint8			IndexForColor(uint8 red, uint8 green,
-										  uint8 blue, uint8 alpha = 255);
-	inline	uint8			IndexForColor(const rgb_color& color);
+			uint8				IndexForColor(uint8 red, uint8 green,
+									uint8 blue, uint8 alpha = 255);
+	inline	uint8				IndexForColor(const rgb_color& color);
 
-	inline	bool			UseTransparent() const
-								{ return fTransparentMode > NO_TRANSPARENCY; }
+	inline	bool				UseTransparent() const
+									{ return fTransparentMode > NO_TRANSPARENCY; }
 
-			void			PrepareForAutoTransparency();
-	inline	int				TransparentIndex() const
-								{ return fTransparentIndex; }
-			void			SetTransparentColor(uint8 red,
-												uint8 green,
-												uint8 blue);
+			void				PrepareForAutoTransparency();
+	inline	int					TransparentIndex() const
+									{ return fTransparentIndex; }
+			void				SetTransparentColor(uint8 red,
+									uint8 green, uint8 blue);
 
-	inline	int				SizeInBits() const
-								{ return fSizeInBits; }
+	inline	int					SizeInBits() const { return fSizeInBits; }
 
-	inline	int				BackgroundIndex() const
-								{ return fBackgroundIndex; }
+	inline	int					BackgroundIndex() const
+									{ return fBackgroundIndex; }
 
-			void			GetColors(uint8* buffer, int size) const;
+			void				GetColors(uint8* buffer, int size) const;
 
-			rgb_color*		pal;
+			rgb_color*			pal;
 
-	private:
-			int				fSize;
-			int				fSizeInBits;
-			int				fMode;
-			uint32			fTransparentMode;
-			int				fTransparentIndex;
-			int				fBackgroundIndex;
-			bool			fFatalError;
+private:
+			int					fSize;
+			int					fSizeInBits;
+			int					fMode;
+			uint32				fTransparentMode;
+			int					fTransparentIndex;
+			int					fBackgroundIndex;
+			bool				fFatalError;
 };
 
-// IndexForColor
+
 inline uint8
 SavePalette::IndexForColor(const rgb_color& color)
 {
@@ -85,6 +88,4 @@ SavePalette::IndexForColor(const rgb_color& color)
 }
 
 
-#endif
-
-
+#endif	// SAVE_PALETTE_H
