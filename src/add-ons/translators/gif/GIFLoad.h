@@ -59,7 +59,7 @@ private:
 			short				NextCode();
 			void				ResetTable();
 
-			uchar*				MemblockAllocate(int size);
+			unsigned char*		MemblockAllocate(int size);
 			void				MemblockDeleteAll();
 
 			inline	bool		OutputColor(unsigned char* string, int size);

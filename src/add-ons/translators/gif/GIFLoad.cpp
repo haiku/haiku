@@ -533,7 +533,7 @@ GIFLoad::InitFrame(int size)
 }
 
 
-uchar*
+unsigned char*
 GIFLoad::MemblockAllocate(int size)
 {
 	// Do 4k mallocs, keep them in a linked list, do a first fit across
@@ -544,7 +544,7 @@ GIFLoad::MemblockAllocate(int size)
 		if (fHeadMemblock == NULL)
 			return NULL;
 
-		uchar* value = fHeadMemblock->data;
+		unsigned char* value = fHeadMemblock->data;
 		fHeadMemblock->offset = size;
 		fHeadMemblock->next = NULL;
 
@@ -567,7 +567,7 @@ GIFLoad::MemblockAllocate(int size)
 		if (block == NULL)
 			return NULL;
 
-		uchar* value = block->data;
+		unsigned char* value = block->data;
 		block->offset = size;
 		block->next = NULL;
 		last->next = block;
