@@ -397,7 +397,7 @@ GIFLoad::ReadGIFImageData()
 				newEntry[x] = fOldCode[x];
 
 			//memcpy(newEntry + fOldCodeLength, fTable[fNewCode], 1);
-			newEntry[fOldCodeLength] = *fTable[fNewCode];
+			newEntry[fOldCodeLength] = fTable[fNewCode][0];
 		} else {
 			// does not exist in table
 
@@ -406,7 +406,7 @@ GIFLoad::ReadGIFImageData()
 				newEntry[x] = fOldCode[x];
 
 			//memcpy(newEntry + fOldCodeLength, fOldCode, 1);
-			newEntry[fOldCodeLength] = *fOldCode;
+			newEntry[fOldCodeLength] = fOldCode[0];
 
 			if (!OutputColor(newEntry, fOldCodeLength + 1))
 				goto bad_end;
