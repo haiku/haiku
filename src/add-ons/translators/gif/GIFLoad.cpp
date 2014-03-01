@@ -331,7 +331,7 @@ GIFLoad::ReadGIFImageHeader()
 bool
 GIFLoad::ReadGIFImageData()
 {
-	unsigned char newEntry[4096];
+	unsigned char newEntry[ENTRY_COUNT];
 
 	unsigned char cs;
 	fInput->Read(&cs, 1);
@@ -489,7 +489,7 @@ GIFLoad::ResetTable()
 	fMaxCode = (1 << fBits) - 1;
 
 	MemblockDeleteAll();
-	for (int x = 0; x < 4096; x++) {
+	for (int x = 0; x < ENTRY_COUNT; x++) {
 		fTable[x] = NULL;
 		if (x < (1 << fCodeSize)) {
 			fTable[x] = MemblockAllocate(1);
@@ -553,8 +553,8 @@ GIFLoad::MemblockAllocate(int size)
 		Memblock* block = fHeadMemblock;
 		Memblock* last = NULL;
 		while (block != NULL) {
-			if (4096 - block->offset > size) {
-				uchar* value = block->data + block->offset;
+			if (ENTRY_COUNT - block->offset > size) {
+				unsigned char* value = block->data + block->offset;
 				block->offset += size;
 
 				return value;

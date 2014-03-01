@@ -26,9 +26,11 @@
 #define GIF_INTERLACED		0x40
 #define GIF_LOCALCOLORMAP	0x80
 
+#define ENTRY_COUNT			4096
+
 
 typedef struct Memblock {
-	unsigned char	data[4096];
+	unsigned char	data[ENTRY_COUNT];
 	int				offset;
 	Memblock*		next;
 } Memblock;
@@ -76,7 +78,7 @@ private:
 			int					fWidth;
 			int					fHeight;
 
-			unsigned char		fOldCode[4096];
+			unsigned char		fOldCode[ENTRY_COUNT];
 			unsigned int		fOldCodeLength;
 
 			short				fNewCode;
@@ -88,8 +90,8 @@ private:
 			short				fEndCode;
 			short				fNextCode;
 
-			unsigned char*		fTable[4096];
-			short				fEntrySize[4096];
+			unsigned char*		fTable[ENTRY_COUNT];
+			short				fEntrySize[ENTRY_COUNT];
 			Memblock*			fHeadMemblock;
 
 			int					fBitCount;
