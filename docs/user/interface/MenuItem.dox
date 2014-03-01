@@ -1,0 +1,388 @@
+/*
+ * Copyright 2014 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/MenuItem.h	 hrev46953
+ *		src/kits/interface/MenuItem.cpp	 hrev46953
+ */
+
+
+/*!
+	\file MenuItem.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BMenuItem class definition.
+*/
+
+
+/*!
+	\class BMenuItem
+	\ingroup interface
+	\ingroup libbe
+	\brief Display item for the BMenu class.
+
+	A BMenuItem either consists of a label or a submenu and message that
+	is sent to the attached menu's target when the item is selected. BMenu
+	and BMenuItem work in concert with each other in order to create a
+	menu tree hierarchy. BMenuItem's serve as nodes in the tree while
+	BMenu's serve as branches.
+
+	\sa SetLabel()
+
+	A menu item, unless it represents a submenu, can have a keyboard
+	shortcut which is a printable character used in combination with
+	the \key{Command} key and possibly other modifiers to invoke the item.
+	The shortcut is displayed right of the item's label.
+
+	\sa SetShortcut()
+
+	A menu item may also have a trigger character assigned to it that
+	invokes the item without using the \key{Command} key. The trigger
+	characters is drawn underlined in the menu item's label. Unlike
+	shortcuts, triggers are automatically assigned to a menu item. You
+	can set the trigger character explicitly by calling SetTrigger().
+
+	\sa SetTrigger()
+
+	\attention Triggers are currently disabled.
+
+	Both the shortcut character and trigger character are case-insensitive.
+
+	A menu item may be marked, which draws a checkmark on the left side
+	of the item. only one menu items may
+	be marked at a time if attached to a menu in radio mode.
+
+	\sa SetMarked()
+	\sa BMenu::SetRadioMode()
+
+	Menu items can also be enabled or disabled. A disabled item's label is drawn
+	in a lighter color to indicate that it may not be used. A disabled menu
+	item may not be selected or invoked. If the menu item controls a submenu the
+	submenu may still be opened but each of the items will be disabled.
+
+	\sa SetEnabled()
+*/
+
+
+/*!
+	\fn BMenuItem::BMenuItem(const char* label, BMessage* message,
+		char shortcut, uint32 modifiers)
+	\brief Creates a new BMenuItem object with the specified \a label
+	       and \a message.
+
+	\param label The text \a label that is displayed.
+	\param message The BMessage that is sent when the item is selected.
+	\param shortcut The \a shortcut characters to activate the menu item.
+	\param modifiers The modifier keys to active the menu item,
+	       \c B_COMMAND_KEY is assumed.
+*/
+
+
+/*!
+	\fn BMenuItem::BMenuItem(BMenu* menu, BMessage* message)
+	\brief Creates a new BMenuItem object with the specified \a menu
+	       and \a message.
+
+	The menu item's label is derived from the \a menu name. This method
+	makes the menu item a submenu.
+
+	\param menu The \a menu to assign to the item.
+	\param message The BMessage that is sent when the item is selected.
+*/
+
+
+/*!
+	\fn BMenuItem::BMenuItem(BMessage* data)
+	\brief Archive constructor.
+
+	\param data The message \a data to construct the menu item from.
+*/
+
+
+/*!
+	\fn BArchivable* BMenuItem::Instantiate(BMessage* data)
+	\brief Creates a new BMenuItem object from an \a data message.
+
+	\return A newly created BMenuItem object or \c NULL if the message
+	        doesn't contain an archived BMenuItem.
+*/
+
+
+/*!
+	\fn status_t BMenuItem::Archive(BMessage* data, bool deep) const
+	\brief Archives the the BMenuItem object into the \a data message.
+
+	Adds the label and current state of the BMenuItem to the archive.
+
+	\param data A pointer to the BMessage to archive the object into.
+	\param deep Whether or not to archive attached menus as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived successfully.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+*/
+
+
+/*!
+	\fn BMenuItem::~BMenuItem()
+	\brief Destructor.
+
+	Also frees the memory used by the label or submenu.
+*/
+
+
+/*!
+	\fn void BMenuItem::SetLabel(const char* string)
+	\brief Sets the menu item label to \a string.
+
+	The memory used by the label is copied so you may free the original.
+	Setting the label invalidates the attached menu.
+
+	\param string The \a string to set the label to.
+*/
+
+
+/*!
+	\fn void BMenuItem::SetEnabled(bool enable)
+	\brief Enables or disables the menu item.
+
+	Enabling or disabling the menu item invalidates the attached menu.
+
+	\param enable \c true to enable the menu item, \c false to disable it.
+*/
+
+
+/*!
+	\fn void BMenuItem::SetMarked(bool mark)
+	\brief Marks or unmarks the menu item.
+
+	Marking or unmarking the menu item invalidates the attached menu.
+
+	Marking a menu item attached to a menu in radio mode causes the currently
+	marked item to be unmarked.
+
+	\param mark \c true to mark the menu item, \c false to unmark it.
+
+	\sa BMenu::SetRadioMode()
+*/
+
+
+/*!
+	\fn void BMenuItem::SetTrigger(char trigger)
+	\brief Set the character that activates this menu item. The triggered
+	       character is drawn underlined in the menu.
+
+	\attention Triggers are currently disabled.
+
+	\param trigger The trigger character to set on this menu item.
+*/
+
+
+/*!
+	\fn void BMenuItem::SetShortcut(char shortcut, uint32 modifiers)
+	\brief Set the keyboard shortcut of the menu item.
+
+	Setting a shortcut invalidates the attached menu.
+
+	This method will override the existing shortcut set to the window.
+
+	\param shortcut The ASCII shortcut character to set.
+	\param modifiers A bitmap mask of modifier keys used to activate
+	       the shortcut.
+*/
+
+
+/*!
+	\fn const char* BMenuItem::Label() const
+	\brief Returns the item's label.
+
+	\return The item's label as a const char array.
+*/
+
+
+/*!
+	\fn bool BMenuItem::IsEnabled() const
+	\brief Returns whether or not the item is enabled.
+
+	\return \c true if the item is enabled, \c false if disabled.
+*/
+
+
+/*!
+	\fn bool BMenuItem::IsMarked() const
+	\brief Returns whether or not the item is marked.
+
+	\return \c true if the item is marked, \c false if unmarked.
+*/
+
+
+/*!
+	\fn char BMenuItem::Trigger() const
+	\brief Returns the item's trigger character.
+
+	\return The current trigger character as a char or 0 if unset.
+*/
+
+
+/*!
+	\fn char BMenuItem::Shortcut(uint32* modifiers) const
+	\brief Returns the currently set shortcut and fills out \a modifiers
+	       with a bitmap of the modifier keys required to invoke the item.
+
+	\param modifiers A pointer to a uint32 to fill out.
+
+	\return The shortcut character assigned to the menu item as a char.
+*/
+
+
+/*!
+	\fn BMenu* BMenuItem::Submenu() const
+	\brief Returns a pointer to the attached menu.
+
+	\return A pointer to the attached menu.
+*/
+
+
+/*!
+	\fn BMenu* BMenuItem::Menu() const
+	\brief Returns a pointer to the menu that the item is attached to.
+
+	\return A pointer to the menu that the item is attached to.
+*/
+
+
+/*!
+	\fn BRect BMenuItem::Frame() const
+	\brief Returns the bounds rectangle of the menu item.
+
+	\return The bounds rectangle of the menu item in the coordinate system
+	        of the menu that the item is attached to.
+*/
+
+
+/*!
+	\fn void BMenuItem::GetContentSize(float* width, float* height)
+	\brief Fills out \a width and \a height with the content rectangle
+	       dimensions.
+
+	You only need to call this method if you're implementing your own
+	DrawContent() method to override how the contents of the menu item
+	are drawn.
+
+	The content rectangle excludes the item margins and the area that
+	contains the checkmark, shortcut, and submenu arrow.
+
+	The content rectangle can be calculated using this method as well as
+	ContentLocation() to get location of the top left corner.
+
+	\param width Filled out with the \a width of the content rectangle.
+	\param height Filled out with the \a height of the content rectangle.
+
+	\sa ContentLocation()
+	\sa DrawContent()
+*/
+
+
+/*!
+	\fn void BMenuItem::TruncateLabel(float maxWidth, char* newLabel)
+	\brief Truncates the label and stashes it into \a newLabel.
+
+	You are responsible for allocating \a newLabel with enough space to fit
+	the label including the trailing \c NUL. The method will \c NUL terminate
+	the string for you.
+
+	\param maxWidth The maximum number of bytes to truncate the label to.
+	\param newLabel The buffer to store the truncated label in.
+*/
+
+
+/*!
+	\fn void BMenuItem::DrawContent()
+	\brief Hook method used to draw the menu items contents.
+
+	This method is called automatically by BMenu::Draw(), you need not call it
+	yourself. You may want to override this method in derived classes to do
+	something different than drawing a text label.
+*/
+
+
+/*!
+	\fn void BMenuItem::Draw()
+	\brief Hook method used to draw the menu items.
+
+	This method is called by automatically by BMenu::Draw(). You should not need to
+	call this method yourself but you may want to override it in a derived class
+	to do something other than the default. The default draws the mark, shortcut
+	and possibly a right arrow to indicate there is submenu and then calls
+	DrawContent() to fill in the label. Lastly Highlight() is called if the item
+	is selected.
+*/
+
+
+/*!
+	\fn void BMenuItem::Highlight(bool highlight)
+	\brief Highlights or unhighlights the menu item.
+
+	This method is called by Draw() when the item is selected or unselected.
+
+	You shouldn't need to call this method unless you override the Draw()
+	method in a derived class and you want to highlight differently.
+
+	\param highlight Highlights if \a highlight is \c true,
+	       unhighlights if \c false.
+*/
+
+
+/*!
+	\fn bool BMenuItem::IsSelected() const
+	\brief Returns whether or not the item is selected.
+
+	\return \c true if selected, \c false if not selected.
+*/
+
+
+/*!
+	\fn BPoint BMenuItem::ContentLocation() const
+	\brief Returns the top-left point of the content rectangle.
+
+	You only need to call this method if you're implementing your own
+	DrawContent() method to override how the contents of the menu item
+	are drawn.
+
+	The content rectangle can be calculated using this method as well as
+	GetContentSize() to get the width and height.
+
+	\return The top-left point of the content rectangle as a BPoint in the
+	         coordinate system of the attached BMenu.
+
+	\sa GetContentSize()
+	\sa DrawContent()
+*/
+
+
+/*!
+	\fn status_t BMenuItem::Invoke(BMessage* message)
+	\brief Sends a copy of the model \a message to the target.
+
+	This method extends BInvoker::Invoke() to guarantee that only enabled items
+	attached to the menu can be invoked and automatically marks the item.
+
+	The following fields added to the \a message:
+		- "when"	\c B_INT64_TYPE		system_time()
+		- "source"	\c B_POINTER_TYPE	A pointer to the menu item object.
+		- "index"	\c B_INT32_TYPE		The index of the menu item.
+
+	\param message The message to send or \c NULL to send the message set in
+	       the constructor.
+
+	\return \c B_OK on success or an error code on error.
+	\retval B_OK The message was sent successfully.
+	\retval B_BAD_VALUE The message was \c NULL.
+
+	\sa BInvoker::Invoke()
+*/
