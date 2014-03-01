@@ -47,7 +47,7 @@ GIFLoad::GIFLoad(BPositionIO* input, BPositionIO* output)
 	}
 
 	if (debug) {
-		syslog(LOG_ERR, "GIFLoad::GIFLoad() - Image dimensions are %d x %d\n",
+		syslog(LOG_INFO, "GIFLoad::GIFLoad() - Image dimensions are %d x %d\n",
 			fWidth, fHeight);
 	}
 
@@ -68,7 +68,7 @@ GIFLoad::GIFLoad(BPositionIO* input, BPositionIO* output)
 				fatalerror = true;
 			} else {
 				if (debug) {
-					syslog(LOG_ERR, "GIFLoad::GIFLoad() - "
+					syslog(LOG_INFO, "GIFLoad::GIFLoad() - "
 						"Found a single image and leaving\n");
 				}
 			}
@@ -116,7 +116,7 @@ GIFLoad::GIFLoad(BPositionIO* input, BPositionIO* output)
 	}
 
 	if (debug)
-		syslog(LOG_ERR, "GIFLoad::GIFLoad() - Done\n");
+		syslog(LOG_INFO, "GIFLoad::GIFLoad() - Done\n");
 }
 
 
@@ -142,7 +142,7 @@ GIFLoad::ReadGIFHeader()
 	if (header[10] & GIF_LOCALCOLORMAP) {
 		fPalette->size_in_bits = (header[10] & 0x07) + 1;
 		if (debug) {
-			syslog(LOG_ERR, "GIFLoad::ReadGIFHeader() - "
+			syslog(LOG_INFO, "GIFLoad::ReadGIFHeader() - "
 				"Found %d bit global palette\n",
 				fPalette->size_in_bits);
 		}
@@ -200,7 +200,7 @@ GIFLoad::ReadGIFControlBlock()
 		fPalette->usetransparent = true;
 		fPalette->transparentindex = data[4];
 		if (debug) {
-			syslog(LOG_ERR, "GIFLoad::ReadGIFControlBlock() - "
+			syslog(LOG_INFO, "GIFLoad::ReadGIFControlBlock() - "
 				"Transparency active, using palette index %d\n", data[4]);
 		}
 	}
@@ -213,7 +213,7 @@ bool
 GIFLoad::ReadGIFCommentBlock()
 {
 	if (debug)
-		syslog(LOG_ERR, "GIFLoad::ReadGIFCommentBlock() - Found:\n");
+		syslog(LOG_INFO, "GIFLoad::ReadGIFCommentBlock() - Found:\n");
 
 	unsigned char length;
 	char comment_data[256];
@@ -226,11 +226,11 @@ GIFLoad::ReadGIFCommentBlock()
 
 		comment_data[length] = 0x00;
 		if (debug)
-			syslog(LOG_ERR, "%s", comment_data);
+			syslog(LOG_INFO, "%s", comment_data);
 	} while (length != 0x00);
 
 	if (debug)
-		syslog(LOG_ERR, "\n");
+		syslog(LOG_INFO, "\n");
 
 	return true;
 }
@@ -240,7 +240,7 @@ bool
 GIFLoad::ReadGIFUnknownBlock(unsigned char c)
 {
 	if (debug)
-		syslog(LOG_ERR, "GIFLoad::ReadGIFUnknownBlock() - Found: %d\n", c);
+		syslog(LOG_INFO, "GIFLoad::ReadGIFUnknownBlock() - Found: %d\n", c);
 
 	unsigned char length;
 	do {
@@ -301,7 +301,7 @@ GIFLoad::ReadGIFImageHeader()
 		int s = 1 << fPalette->size_in_bits;
 		fPalette->size = s;
 		if (debug) {
-			syslog(LOG_ERR, "GIFLoad::ReadGIFImageHeader() - "
+			syslog(LOG_INFO, "GIFLoad::ReadGIFImageHeader() - "
 				"Found %d bit local palette\n", fPalette->size_in_bits);
 		}
 
@@ -316,10 +316,10 @@ GIFLoad::ReadGIFImageHeader()
 	fInterlaced = data[8] & GIF_INTERLACED;
 	if (debug) {
 		if (fInterlaced) {
-			syslog(LOG_ERR, "GIFLoad::ReadGIFImageHeader() - "
+			syslog(LOG_INFO, "GIFLoad::ReadGIFImageHeader() - "
 				"Image is interlaced\n");
 		} else {
-			syslog(LOG_ERR, "GIFLoad::ReadGIFImageHeader() - "
+			syslog(LOG_INFO, "GIFLoad::ReadGIFImageHeader() - "
 				"Image is not interlaced\n");
 		}
 	}
@@ -355,7 +355,7 @@ GIFLoad::ReadGIFImageData()
 	}
 
 	if (debug)
-		syslog(LOG_ERR, "GIFLoad::ReadGIFImageData() - Starting LZW\n");
+		syslog(LOG_INFO, "GIFLoad::ReadGIFImageData() - Starting LZW\n");
 
 	while ((fNewCode = NextCode()) != -1 && fNewCode != fEndCode) {
 		if (fNewCode == fClearCode) {
@@ -439,7 +439,7 @@ GIFLoad::ReadGIFImageData()
 		return false;
 
 	if (debug)
-		syslog(LOG_ERR, "GIFLoad::ReadGIFImageData() - Done\n");
+		syslog(LOG_INFO, "GIFLoad::ReadGIFImageData() - Done\n");
 
 	return true;
 
