@@ -29,8 +29,8 @@ public:
 									bool deep = true) const;
 
 	virtual	void				SetLabel(const char* name);
-	virtual	void				SetEnabled(bool enabled);
-	virtual	void				SetMarked(bool marked);
+	virtual	void				SetEnabled(bool enable);
+	virtual	void				SetMarked(bool mark);
 	virtual	void				SetTrigger(char trigger);
 	virtual	void				SetShortcut(char shortcut, uint32 modifiers);
 
@@ -49,7 +49,7 @@ protected:
 	virtual	void				TruncateLabel(float maxWidth, char* newLabel);
 	virtual	void				DrawContent();
 	virtual	void				Draw();
-	virtual	void				Highlight(bool enabled);
+	virtual	void				Highlight(bool highlight);
 			bool				IsSelected() const;
 			BPoint				ContentLocation() const;
 
