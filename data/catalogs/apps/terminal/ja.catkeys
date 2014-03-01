@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	1655135592
+1	japanese	x-vnd.Haiku-Terminal	3250775475
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -70,6 +70,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:\
 Selected background	Terminal AppearancePrefView		選択されたテキストの背景
 Slate	Terminal colors scheme		スレート
 Text under cursor	Terminal AppearancePrefView		カーソル位置の文字
+Use bright instead of bold text	Terminal AppearancePrefView		太字の代わりに高輝度テキストを使う
 Midnight	Terminal colors scheme		ミッドナイト
 Decrease	Terminal TermWindow		小さく
 Default	Terminal colors scheme		デフォルト

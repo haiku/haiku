@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	1655135592
+1	german	x-vnd.Haiku-Terminal	3250775475
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -70,6 +70,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:\
 Selected background	Terminal AppearancePrefView		Auswahl-Hintergrund
 Slate	Terminal colors scheme		Schiefer
 Text under cursor	Terminal AppearancePrefView		Text unter Cursor
+Use bright instead of bold text	Terminal AppearancePrefView		Text heller statt fett gedruckt
 Midnight	Terminal colors scheme		Mitternacht
 Decrease	Terminal TermWindow		Verkleinern
 Default	Terminal colors scheme		Standard

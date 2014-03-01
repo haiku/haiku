@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	4236806696
+1	polish	x-vnd.Haiku-libtracker	3449725806
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
 Add-ons	FilePanelPriv		Wtyczki
@@ -426,6 +426,7 @@ New	ContainerWindow		Nowy
 Name matches wildcard expression:###	SelectionWindow		Nazwa odpowiada wieloznacznikowemu wyrażeniu: ###
 less than	FindPanel		mniej niż
 64 x 64	DeskWindow		64 x 64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		develop
 Modified	ContainerWindow		Zmodyfikowane
 Edit Query template	FindPanel		Edytuj szablon Zapytania
 Prompt	FSUtils		Ostrzegaj

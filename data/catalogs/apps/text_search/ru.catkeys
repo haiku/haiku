@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku.TextSearch	1180598828
+1	russian	x-vnd.Haiku.TextSearch	2496563907
 %s: Not enough room to escape the filename.	Grepper		%s: Недостаточно места для экранирования имени файла.
 Trim to selection	GrepWindow		Искать в выделенных
 Follow symbolic links	GrepWindow		Переходить по ссылкам
@@ -8,6 +8,7 @@ The unselected files will be removed from the list.	GrepWindow		Невыделе
 Set target…	GrepWindow		Выбрать цель…
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Пожалуйста, выберите файлы, которые вы хотите увидеть выделенными в Tracker.
 Open files in Pe	GrepWindow		Открывать файлы в Pe
+%appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		Скопировать текст в буфер
 Settings	GrepWindow		Настройки
 Select all	GrepWindow		Выделить все
@@ -31,3 +32,4 @@ Show files in Tracker	GrepWindow		Показать файлы в Tracker
 Case-sensitive	GrepWindow		Учитывать регистр
 Text files only	GrepWindow		Только текстовые файлы
 Show lines	GrepWindow		Показывать строки
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

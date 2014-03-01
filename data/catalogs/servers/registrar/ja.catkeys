@@ -5,7 +5,7 @@ OK	ShutdownProcess		OK
 System is shut down	ShutdownProcess		システムがシャットダウンされました
 It's now safe to turn off the computer.	ShutdownProcess		コンピューターの電源を切断しても安全です。 
 Cancel	ShutdownProcess		中止
-Do you really want to shut down the system?	ShutdownProcess		本当にシステムをシャットダウンしてよいですか?
+Do you really want to shut down the system?	ShutdownProcess		本当にシステムをシャットダウンしますか?
 Asking other processes to quit.	ShutdownProcess		ほかのプロセスに終了を要求しています。
 Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\"に終了を要求しています。
 %action%?	ShutdownProcess		%action%?
@@ -14,7 +14,7 @@ Restarting…	ShutdownProcess		再起動中…
 Asking background applications to quit.	ShutdownProcess		バックグランドアプリケーションに終了を要求しています。
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		\"%appName%\" がシャットダウンプロセスを中断しました。
 Tidying things up a bit.	ShutdownProcess		少し片付け中です。
-Do you really want to restart the system?	ShutdownProcess		本当にシステムを再起動してよいですか?
+Do you really want to restart the system?	ShutdownProcess		本当にシステムを再起動しますか?
 Shutdown status	ShutdownProcess		シャットダウンの状態
 Cancel shutdown	ShutdownProcess		シャットダウンを中止
 Kill application	ShutdownProcess		強制終了

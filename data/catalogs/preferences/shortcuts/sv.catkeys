@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Shortcuts	2482780610
+1	swedish	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		FlyttaMus
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Genvägar kunde inte spara din genvägsuppsättning.
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		Lägg till…
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Tangent
 Open KeySet…	ShortcutsWindow		Öppna…
+Error, NULL state description?	ShortcutsSpec		Fel: NULL i tillståndsbeskrivning?
 MouseUp	ShortcutsSpec		MusknappUpp
 Revert to saved	ShortcutsWindow		Återgå till sparade
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt

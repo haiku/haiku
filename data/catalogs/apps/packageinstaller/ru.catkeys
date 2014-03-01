@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PackageInstaller	792037176
+1	russian	x-vnd.Haiku-PackageInstaller	2033288398
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
@@ -12,12 +12,14 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		Ошибка во время установки пакета\n
 Disclaimer	PackageTextViewer		Заявление об отказе от ответственности
 %.1f GiB	PackageView		%.1f ГБ
+%name% (%size% free)	PackageView		%name% (%size% свободно)
 The installation of the package has been aborted.	PackageView		Установка пакета была прервана.
 Done	PackageInstall		Готово
 All existing files will be replaced?	PackageView		Все существующие файлы будут заменены?
 Preparing package	PackageInstall		Подготовка пакета
 No package available.	PackageInfo		Нет доступных пакетов.
 none	PackageView		нет
+Install %name%	PackageView		Установить %name%
 Stop	PackageStatus		Остановить
 Other…	PackageView		Другой…
 No installation type selected	PackageView		Не выбран тип установки
@@ -45,11 +47,14 @@ Decline	PackageTextViewer		Отклонить
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл с именем '%s' уже существует по этому пути.\n Заменить этот файл тем, что находится внутри пакета или пропустить его?
 All existing files will be skipped?	PackageView		Все существующие файлы будут заменены?
 Continue	PackageInfo		Продолжить
+%index% of %total%	PackageInstall		%index% из %total%
 %.1f KiB	PackageView		%.1f КБ
 Abort	PackageInfo		Прервать
 PackageInstaller	System name		Установщик пакетов
 Abort	PackageInstall		Прервать
+%name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Продолжить
+Begin	PackageView		Установить
 Replace	PackageView		Заменить
 Installation progress	PackageView		Прогресс установки
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакета не может быть прочитан.\nОдна из возможных причин этого может бы быть то, что требуемый файл не является корректным BeOS .pkg файлом.

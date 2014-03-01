@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PackageInstaller	792037176
+1	japanese	x-vnd.Haiku-PackageInstaller	2033288398
 Install to:	PackageView		インストール先:
 OK	PackageView		OK
 Accept	PackageTextViewer		承認
@@ -12,12 +12,14 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		パッケージをインストール中にエラーが発生しました\n
 Disclaimer	PackageTextViewer		免責条項
 %.1f GiB	PackageView		%.1f GiB
+%name% (%size% free)	PackageView		%name% (%size% 空き)
 The installation of the package has been aborted.	PackageView		パッケージのインストールは中止されました。
 Done	PackageInstall		完了
 All existing files will be replaced?	PackageView		既存のファイルをすべて置き換えますか?
 Preparing package	PackageInstall		パッケージを準備しています
 No package available.	PackageInfo		利用できるパッケージがありません。
 none	PackageView		無し
+Install %name%	PackageView		%name% をインストール
 Stop	PackageStatus		中止
 Other…	PackageView		他の場所…
 No installation type selected	PackageView		インストールタイプが選択されていません
@@ -45,11 +47,14 @@ Decline	PackageTextViewer		断る
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		ファイル '%s' がすでにパスに存在します。\nファイルをパッケージの物と置き換えますか、またはスキップしますか?
 All existing files will be skipped?	PackageView		既存のファイルをすべてスキップしますか?
 Continue	PackageInfo		続ける
+%index% of %total%	PackageInstall		%index%  / %total%
 %.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		中断
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		中断
+%name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		続ける
+Begin	PackageView		開始
 Replace	PackageView		置き換える
 Installation progress	PackageView		インストール状況
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		パッケージファイルを読めません。\n考えられる原因のひとつとして、要求されたファイルが正しい BeOS .pkg パッケージで無いことが考えられます。

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku.TextSearch	1180598828
+1	japanese	x-vnd.Haiku.TextSearch	2496563907
 %s: Not enough room to escape the filename.	Grepper		%s: ファイル名をエスケープする余裕がありません。
 Trim to selection	GrepWindow		選択部のみ残す
 Follow symbolic links	GrepWindow		シンボリックリンクに従う
@@ -8,6 +8,7 @@ The unselected files will be removed from the list.	GrepWindow		選択されな�
 Set target…	GrepWindow		ターゲットの指定
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Tracker で選択するファイルを選んでください。
 Open files in Pe	GrepWindow		Pe で開く
+%appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		テキストをクリップボードにコピー
 Settings	GrepWindow		設定
 Select all	GrepWindow		すべて選択
@@ -31,3 +32,4 @@ Show files in Tracker	GrepWindow		Tracker でファイルを選択
 Case-sensitive	GrepWindow		大文字と小文字を区別する
 Text files only	GrepWindow		テキストファイルのみ
 Show lines	GrepWindow		行を表示
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

@@ -13,7 +13,7 @@ Horizontal scrolling	TouchpadPrefView		水平スクロール
 Fast	TouchpadPrefView		速い
 OK	TouchpadPrefView		OK
 Acceleration	TouchpadPrefView		加速度
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新しいスクロール範囲はとても広いので、通常のマウス操作を妨害するかもしれません。本当に変更してよいですか?
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新しいスクロール範囲はとても広いので、通常のマウス操作を妨害するかもしれません。本当に変更しますか?
 Horizontal	TouchpadPrefView		水平方向
 Off	TouchpadPrefView		無効
 Sensitivity	TouchpadPrefView		感度

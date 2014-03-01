@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	4011843330
+1	russian	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Сделать фоном рабочего стола…
 File	Menus		Файл
 Slide delay	Menus		Задержка слайд шоу
@@ -53,6 +53,7 @@ Select all	Menus		Выделить всё
 Zoom factor in %:	PrintOptionsWindow		Масштаб в %:
 Width:	PrintOptionsWindow		Ширина:
 Image	Menus		Изображение
+Move to Trash	Menus		Переместить в корзину
 OK	Alerts		ОК
 Rotate clockwise	Menus		Повернуть по часовой стрелке
 Job setup	PrintOptionsWindow		Печать

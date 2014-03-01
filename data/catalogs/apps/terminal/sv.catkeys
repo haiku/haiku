@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	1655135592
+1	swedish	x-vnd.Haiku-Terminal	3250775475
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -70,6 +70,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:\
 Selected background	Terminal AppearancePrefView		Vald bakgrund
 Slate	Terminal colors scheme		Slate
 Text under cursor	Terminal AppearancePrefView		Text under markören
+Use bright instead of bold text	Terminal AppearancePrefView		Använd ljus istället för fet text
 Midnight	Terminal colors scheme		Midnatt
 Decrease	Terminal TermWindow		Minska
 Default	Terminal colors scheme		Standard

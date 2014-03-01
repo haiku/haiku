@@ -15,7 +15,7 @@ Install progress:  	InstallerWindow		進行状況:
 2.2) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Starting Installation.	InstallProgress		準備をしています…
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		品質のソフトウェアです。高い確率で重要なデータを失う恐れがあります。こまめにバックアップをとってください! さらに、次の点に留意してください。\n\n\n
-Are you sure you want to abort the installation?	InstallerWindow		インストールを中断してよろしいですか ?
+Are you sure you want to abort the installation?	InstallerWindow		インストールを中断しますか ?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		使用中の起動ディスクにインストールしますか？この場合、システムを再起動する必要があります。
 Quit Boot Manager	InstallerWindow		ブートマネージャーを終了
 Stop	InstallerWindow		中断
@@ -110,7 +110,7 @@ Cancel	InstallProgress		中止
 Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		ブートマネージャーと DriveSetup が実行中…\n\nインストールを続けるには、両アプリケーションを閉じてください。
 Try installing anyway	InstallProgress		それでもインストールを試みる
 So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		そのため、以下の見出しは編集する必要はありません。何か似たものをこれらの行に追加してください。\n\n
-Are you sure you want to to stop the installation?	InstallerWindow		インストールを中断してよろしいですか ?
+Are you sure you want to to stop the installation?	InstallerWindow		インストールを中断しますか ?
 Onto:	InstallerWindow		インストール先:
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		ブートマネージャーウィンドウを閉じてから、インストーラーウィンドウを閉じてください。
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   はじめて Haiku のブートに成功したら、 \"Welcome\" と \"Userguide\" を必ず読んでください。これらは、デスクトップ上のリンクおよび、WebPositive のブックマーク中にあります。\n\n

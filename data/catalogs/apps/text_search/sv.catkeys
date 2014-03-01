@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku.TextSearch	1180598828
+1	swedish	x-vnd.Haiku.TextSearch	2496563907
 %s: Not enough room to escape the filename.	Grepper		%s: Saknar utrymme för att koda om filnamnet.
 Trim to selection	GrepWindow		Avgränsa sökning till markerade filer
 Follow symbolic links	GrepWindow		Följ symboliska länkar
@@ -8,6 +8,7 @@ The unselected files will be removed from the list.	GrepWindow		De omarkerade fi
 Set target…	GrepWindow		Ange mål...
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Markera de filer du vill ska markeras i Tracker.
 Open files in Pe	GrepWindow		Öppna filerna i Pe
+%appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		Kopiera text till urklipp
 Settings	GrepWindow		Inställningar
 Select all	GrepWindow		Markera allt
@@ -31,3 +32,4 @@ Show files in Tracker	GrepWindow		Visa filer i Tracker
 Case-sensitive	GrepWindow		Skilj på små/stora bokstäver
 Text files only	GrepWindow		Endast textfiler
 Show lines	GrepWindow		Visa rader
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

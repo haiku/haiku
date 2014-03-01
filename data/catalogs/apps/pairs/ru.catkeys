@@ -1,12 +1,16 @@
-1	russian	x-vnd.Haiku-Pairs	1649564846
+1	russian	x-vnd.Haiku-Pairs	3437954381
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tразработал Ralf Schülke\n\tВсе права защищены © 2008-2010 Haiku, Inc.\n\nВы прошли игру за %num% кликов.\n
 Expert (8x8)	PairsWindow		Эксперт (8x8)
 Beginner (4x4)	PairsWindow		Новичок (4x4)
 Quit game	PairsWindow		Выход
+Large	PairsWindow		Большая
+Small	PairsWindow		Маленькая
 Game	PairsWindow		Игра
+OK	Pairs		ОК
 Size	PairsWindow		Размер
 New	PairsWindow		Новая
 Intermediate (6x6)	PairsWindow		Средний (6x6)
 Quit	PairsWindow		Выход
 Pairs	System name		Пары
 New game	PairsWindow		Новая игра
+Medium	PairsWindow		Средняя

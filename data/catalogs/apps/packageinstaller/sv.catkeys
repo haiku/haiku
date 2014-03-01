@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PackageInstaller	792037176
+1	swedish	x-vnd.Haiku-PackageInstaller	2033288398
 Install to:	PackageView		Installera till:
 OK	PackageView		OK
 Accept	PackageTextViewer		Acceptera
@@ -12,12 +12,14 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		Ett fel uppstod under paketinstallationen\n
 Disclaimer	PackageTextViewer		Ansvarsfriskrivning
 %.1f GiB	PackageView		%.1f GiB
+%name% (%size% free)	PackageView		%name% (%size% ledigt)
 The installation of the package has been aborted.	PackageView		Installationen av paketet har avbrutits.
 Done	PackageInstall		Färdig
 All existing files will be replaced?	PackageView		Skall alla befintliga filer skrivas över?
 Preparing package	PackageInstall		Förbereder paket
 No package available.	PackageInfo		Inga paket tillgängliga.
 none	PackageView		ingen
+Install %name%	PackageView		Installera %name%
 Stop	PackageStatus		Stoppa
 Other…	PackageView		Annan...
 No installation type selected	PackageView		Ingen installationstyp vald
@@ -45,11 +47,14 @@ Decline	PackageTextViewer		Acceptera inte
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Filen '%s' finns redan i den angivna sökvägen.\nSkall filen skrivas över av filer i detta paket, eller skall den lämnas kvar?
 All existing files will be skipped?	PackageView		Hoppa över alla befintliga filer?
 Continue	PackageInfo		Fortsätt
+%index% of %total%	PackageInstall		%index% av %total%
 %.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		Avbryt
 PackageInstaller	System name		PaketInstallerare
 Abort	PackageInstall		Avbryt
+%name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Fortsätt
+Begin	PackageView		Börja
 Replace	PackageView		Ersätt
 Installation progress	PackageView		Installationsförlopp
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paketfilen är inte läsbar.\nEn möjlig anledning är att den begärda filen inte är ett giltigt BeOS paket.

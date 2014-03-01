@@ -1,11 +1,16 @@
-1	hungarian	x-vnd.Haiku-Keymap	761976561
+1	hungarian	x-vnd.Haiku-Keymap	363163193
 Shift:	Modifier keys window	Shift key role name	Váltógomb:
 Revert	Modifier keys window		Visszaállít
+Scroll lock	Keyboard Layout View		Scroll lock
+Menu	Keyboard Layout View	Menu key	Menü
+Left control	Keyboard Layout View		Bal Ctrl
 Tilde trigger	Keymap window		Hullámvonal kapcsoló
 Grave trigger	Keymap window		Fordított ékezet kapcsoló
 Role	Modifier keys window	As in the role of a modifier key	Szerep
+Caps lock	Keyboard Layout View		Caps lock
 Select dead keys	Keymap window		„Beragadó” gombok kiválasztása
 Cancel	Modifier keys window		Mégse
+Command	Keyboard Layout View	Command key	Parancsbillentyű
 Defaults	Keymap window		Eredeti
 Quit	Keymap window		Kilépés
 Switch shortcut keys to Haiku mode	Keymap window		Billentyűzetkombináció-váltás Haiku-módra
@@ -14,26 +19,37 @@ Diaeresis trigger	Keymap window		Tréma kapcsoló
 Disabled	Modifier keys window	Do nothing	Letiltva
 Open…	Keymap window		Megnyitás…
 System:	Keymap window		Nyelv:
+Left command	Keyboard Layout View		Bal parancs billentyű
 Set modifier keys…	Keymap window		Módosító billentyű megadása…
 Option:	Modifier keys window	Option key role name	Opció billentyű:
+Control	Keyboard Layout View	Control key	Vezérlőbillentyű
+Left option	Keyboard Layout View		Bal opció billentyű
+Right control	Keyboard Layout View		Jobb Ctrl
 Switch shortcut keys	Keymap window		Billentyűzetkombináció-váltás
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift billentyű
 User:	Keymap window		Felhasználó:
+Right option	Keyboard Layout View		Jobb opció billentyű
+Right shift	Keyboard Layout View		Jobb Shift
 Key	Modifier keys window	As in a computer keyboard key	Billentyű
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl billentyű
 Control:	Modifier keys window	Control key role name	Vezérlőbillentyű:
+Option	Keyboard Layout View	Option key	Opció billentyű
 Sample and clipboard:	Keymap window		Próba és vágólap:
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opc billentyű
 Layout	Keymap window		Elrendezés
 Switch shortcut keys to Windows/Linux mode	Keymap window		Billentyűkombináció váltása Windows/Linux módra
+Right command	Keyboard Layout View		Jobb parancs billentyű
 Revert	Keymap window		Visszaállít
 Command:	Modifier keys window	Command key role name	Parancsbillentyű:
 Save as…	Keymap window		Mentés másként…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd billentyű
 File	Keymap window		Fájl
+Num lock	Keyboard Layout View		Num lock
 (Current)	Keymap window		(jelenlegi)
 Font	Keymap window		Betűtípus
 Keymap	System name		Billentyűzetkiosztás
+Left shift	Keyboard Layout View		Bal Shift
+Shift	Keyboard Layout View	Shift key	Váltógomb
 Set modifier keys	Modifier keys window		Módosító billentyű megadása
 Modifier keys	Modifier keys window		Módosító billentyű
 Acute trigger	Keymap window		Ékezet kapcsoló

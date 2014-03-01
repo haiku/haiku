@@ -21,7 +21,7 @@ Recent documents	FavoritesMenu		最近開いたドキュメント
 Modified	QueryPoseView		更新日時
 Created	ContainerWindow		作成日時
 Error %error loading add-On %name.	ContainerWindow		%nameアドオンの読み込み中に%errorエラーが発生
-If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		settings  フォルダーを%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります。\n\n続けてもよろしいですか?
+If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		settings  フォルダーを%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります。\n\n続けますか?
 contains	SelectionWindow		含む
 Sorry, you can't save things at the root of your system.	FilePanelPriv		システムのルートフォルダーに保存は許可されていません。
 Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示する
@@ -66,7 +66,7 @@ Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		�
 Close all in workspace	ContainerWindow		ワークスペース内のすべてを閉じる
 Empty Trash	ContainerWindow		ごみ箱を空にする
 Name = %name	FindPanel	FindResultTitle	名前 = %name
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		選択された項目をこのフォルダーに移動またはコピーしてよろしいですか？
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		選択された項目をこのフォルダーに移動またはコピーしますか？
 Does not handle file	OpenWithWindow		このファイルに対応してない
 Arrange by	ContainerWindow		並べ換え
 Mount server error	AutoMounterSettings		マウントサーバーエラー
@@ -91,7 +91,7 @@ Cut	FilePanelPriv		切り取り
 Replace	FilePanelPriv		置換
 Select all	VolumeWindow		すべて選択
 Opens with:	InfoWindow		アプリケーション:
-If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		MIME 設定を%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります。\n\n続けてもよろしいですか?
+If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		MIME 設定を%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります。\n\n続けますか?
 Open	ContainerWindow		開く
 96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		フォルダーサイズの計算中にエラー発生。
@@ -122,7 +122,7 @@ Move to Trash	ContainerWindow		ごみ箱に移動
 Move to	ContainerWindow		指定先に移動
 Create %s clipping	PoseView		%s クリップを作成
 Set new link target	InfoWindow		リンク先を変更
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		システムフォルダーおよびその中身を%ifYouDoActionした場合、%osName が起動しなくなります。\n\n続けてもよろしいですか?\n\nそれでもシステムフォルダーまたはその中身の%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		システムフォルダーおよびその中身を%ifYouDoActionした場合、%osName が起動しなくなります。\n\n続けますか?\n\nそれでもシステムフォルダーまたはその中身の%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
 Save as Query template:	FindPanel		クエリ雛型として保存する:
 preferences	B_PREFERENCES_DIRECTORY		設定
 Cancel	FSUtils		中止
@@ -254,7 +254,7 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定のフォルダーに\"%name\"というファイルがすでに存在します。置き換えますか?
 Cancel	ContainerWindow		中止
 Only the boot disk	AutoMounterSettings		起動ディスクのみ
-If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		config フォルダーを%ifYouDoAction した場合、%osName が正常に動作しなくなる可能性があります!\n\n続けてもよろしいですか?
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		config フォルダーを%ifYouDoAction した場合、%osName が正常に動作しなくなる可能性があります!\n\n続けますか?
 Unmount	ContainerWindow		マウント解除
 Copy layout	ContainerWindow		レイアウトをコピー
 label too long	PoseView		ラベルが長すぎます
@@ -342,7 +342,7 @@ Handles any file	OpenWithWindow		すべてのファイルに対応
 Get info	FilePanelPriv		詳細情報…
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		中止
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\"  は開こうとしているドキュメントタイプをサポートしていません。\n進めてもよろしいですか?\n\n アプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\"  は開こうとしているドキュメントタイプをサポートしていません。\n進めますか?\n\n アプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
 Disks	DirMenu		ディスク
 New folder %ld	FSUtils		新規フォルダー %ld 
 All BeOS disks	AutoMounterSettings		全 BFS パーティション
@@ -379,8 +379,8 @@ You can't replace a folder with one of its sub-folders.	FSUtils		サブフォル
 Preferences…	ContainerWindow		設定…
 Move	PoseView		移動
 Open and make preferred	OpenWithWindow		関連付けて開く
-Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除してもよろしいですか? 削除した項目は復元できませんので、ご注意ください。
-If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		ホームフォルダーを%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります。\n\n続けてもよろしいですか?\n\nそれでもホームフォルダーの%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		選択した項目を削除しますか? 削除した項目は復元できませんので、ご注意ください。
+If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		ホームフォルダーを%ifYouDoActionした場合、%osName が正常に動作しなくなる可能性があります。\n\n続けますか?\n\nそれでもホームフォルダーの%toDoActionを実行するなら、Shift キーを押しながら \"%toConfirmAction\" をクリックしてください。
 Add-ons	DeskWindow		アドオン
 Name	FindPanel		名前
 And	FindPanel		かつ

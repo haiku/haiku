@@ -1,11 +1,17 @@
-1	japanese	x-vnd.Haiku-Keymap	4022885915
+1	japanese	x-vnd.Haiku-Keymap	363163193
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		元に戻す
+Scroll lock	Keyboard Layout View		Scroll lock
+Menu	Keyboard Layout View	Menu key	メニューキー
+Left control	Keyboard Layout View		左 Control キー
 Tilde trigger	Keymap window		チルダのトリガー
 Grave trigger	Keymap window		グレイヴアクセントのトリガー
 Role	Modifier keys window	As in the role of a modifier key	役割
+Caps lock	Keyboard Layout View		Caps lock
 Select dead keys	Keymap window		デッドキーの選択
 Cancel	Modifier keys window		中止
+Command	Keyboard Layout View	Command key	Command
+Defaults	Keymap window		デフォルト
 Quit	Keymap window		終了
 Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
 Circumflex trigger	Keymap window		サーカムフレックスのトリガー
@@ -13,26 +19,37 @@ Diaeresis trigger	Keymap window		ウムラウトのトリガー
 Disabled	Modifier keys window	Do nothing	無効
 Open…	Keymap window		開く…
 System:	Keymap window		システム:
+Left command	Keyboard Layout View		左 Command キー
 Set modifier keys…	Keymap window		修飾キーを設定…
 Option:	Modifier keys window	Option key role name	Option:
+Control	Keyboard Layout View	Control key	Control:
+Left option	Keyboard Layout View		左 Option キー
+Right control	Keyboard Layout View		右 Control キー
 Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift キー
 User:	Keymap window		ユーザー:
+Right option	Keyboard Layout View		右 Option キー
+Right shift	Keyboard Layout View		右 Shift キー
 Key	Modifier keys window	As in a computer keyboard key	キー
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl キー
 Control:	Modifier keys window	Control key role name	Control:
+Option	Keyboard Layout View	Option key	Option:
 Sample and clipboard:	Keymap window		サンプル＆クリップボード
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt キー
 Layout	Keymap window		レイアウト
 Switch shortcut keys to Windows/Linux mode	Keymap window		ショートカットキースイッチを Windows/Linux モードにする
+Right command	Keyboard Layout View		右 Command キー
 Revert	Keymap window		元に戻す
 Command:	Modifier keys window	Command key role name	Command:
 Save as…	Keymap window		名前を付けて保存…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd キー
 File	Keymap window		ファイル
+Num lock	Keyboard Layout View		Num lock
 (Current)	Keymap window		(使用中キーマップ)
 Font	Keymap window		フォント
 Keymap	System name		キーマップ
+Left shift	Keyboard Layout View		左 Shift キー
+Shift	Keyboard Layout View	Shift key	Shift:
 Set modifier keys	Modifier keys window		修飾キーを設定
 Modifier keys	Modifier keys window		修飾キー
 Acute trigger	Keymap window		アキュートアクセントのトリガー

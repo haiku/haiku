@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	2546851103
+1	polish	x-vnd.Haiku-HaikuDepot	3242437255
 Name	PackageListView		Nazwa
 Installed packages	Model		Zainstalowane pakiety
 User modified packages	Model		Pakiety zmodyfikowane przez użytkownika
@@ -10,6 +10,7 @@ Install	PackageManager		Zainstaluj
 HaikuDepot	System name		HaikuDepot
 Uninstall	PackageManager		Odinstaluj
 An error occurred while initializing the package manager: %message%	MainWindow		Wystąpił błąd podczas inicjalizacji menedżera pakietów: %message%
+Close	PackageManager		Zamknij
 Status	PackageListView		Status
 Ratings	PackageInfoView		Oceny
 1 item	PackageListView		1 element

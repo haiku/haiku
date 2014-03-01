@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku.TextSearch	1180598828
+1	hungarian	x-vnd.Haiku.TextSearch	2496563907
 %s: Not enough room to escape the filename.	Grepper		%s: Nincs elég hely kihagyni a fájlnevet.
 Trim to selection	GrepWindow		Kijelölés kivágása
 Follow symbolic links	GrepWindow		Szimbolikus linkek követése
@@ -8,6 +8,7 @@ The unselected files will be removed from the list.	GrepWindow		A ki nem válasz
 Set target…	GrepWindow		Cél megadása…
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Válassza ki azokat a fájlokat a Nyomkövetőben, melyek kijelölésre kerüljenek.
 Open files in Pe	GrepWindow		Fájlok megnyitása Pe-ben
+%appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		Szöveg másolása a vágólapra
 Settings	GrepWindow		Beállítások
 Select all	GrepWindow		Összes kijelölése
@@ -31,3 +32,4 @@ Show files in Tracker	GrepWindow		Fájlok megjelenítése a Nyomkövetőben
 Case-sensitive	GrepWindow		Betűérzékeny
 Text files only	GrepWindow		Csak szövegfájlokban
 Show lines	GrepWindow		Sorok megjelenítése
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

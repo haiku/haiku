@@ -1,9 +1,10 @@
-1	portuguese (brazil)	x-vnd.Haiku-Pairs	1649564846
+1	portuguese (brazil)	x-vnd.Haiku-Pairs	1834872602
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\t escrito por Ralf Schülke\n\t Direitos reservados 2008-2010, Haiku Inc.\n\nVocê completou o jogo em %num% cliques.\n
 Expert (8x8)	PairsWindow		Expert (8x8)
 Beginner (4x4)	PairsWindow		Iniciante (4x4)
 Quit game	PairsWindow		Sair do jogo
 Game	PairsWindow		Jogo
+OK	Pairs		OK
 Size	PairsWindow		Tamanho
 New	PairsWindow		Novo
 Intermediate (6x6)	PairsWindow		Intermediário (6x6)

@@ -1,11 +1,16 @@
-1	german	x-vnd.Haiku-Keymap	761976561
+1	german	x-vnd.Haiku-Keymap	363163193
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Anfangswerte
+Scroll lock	Keyboard Layout View		Rollen-Feststelltaste
+Menu	Keyboard Layout View	Menu key	Menü
+Left control	Keyboard Layout View		Steuerung links
 Tilde trigger	Keymap window		~ Tilde
 Grave trigger	Keymap window		` Gravis
 Role	Modifier keys window	As in the role of a modifier key	Funktion
+Caps lock	Keyboard Layout View		Hochstelltaste
 Select dead keys	Keymap window		Auslösetasten definieren
 Cancel	Modifier keys window		Abbrechen
+Command	Keyboard Layout View	Command key	Befehl
 Defaults	Keymap window		Standardwerte
 Quit	Keymap window		Beenden
 Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten tauschen: Haiku-Modus
@@ -14,26 +19,37 @@ Diaeresis trigger	Keymap window		¨ Trema/Diärese
 Disabled	Modifier keys window	Do nothing	Deaktiviert
 Open…	Keymap window		Öffnen…
 System:	Keymap window		System:
+Left command	Keyboard Layout View		Befehl links
 Set modifier keys…	Keymap window		Hilfstasten zuordnen…
 Option:	Modifier keys window	Option key role name	Option:
+Control	Keyboard Layout View	Control key	Steuerung
+Left option	Keyboard Layout View		Option links
+Right control	Keyboard Layout View		Steuerung rechts
 Switch shortcut keys	Keymap window		Befehlstasten tauschen
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift-Taste
 User:	Keymap window		Benutzer:
+Right option	Keyboard Layout View		Option rechts
+Right shift	Keyboard Layout View		Shift rechts
 Key	Modifier keys window	As in a computer keyboard key	Taste
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Strg-Taste
 Control:	Modifier keys window	Control key role name	Steuerung:
+Option	Keyboard Layout View	Option key	Option
 Sample and clipboard:	Keymap window		Tastenausgabe:
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-Taste
 Layout	Keymap window		Tastatur
 Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus
+Right command	Keyboard Layout View		Befehl rechts
 Revert	Keymap window		Anfangswerte
 Command:	Modifier keys window	Command key role name	Befehl:
 Save as…	Keymap window		Speichern unter…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-Taste
 File	Keymap window		Datei
+Num lock	Keyboard Layout View		Num-Feststelltaste
 (Current)	Keymap window		(Aktiv)
 Font	Keymap window		Schriftart
 Keymap	System name		Tastaturlayout
+Left shift	Keyboard Layout View		Shift left
+Shift	Keyboard Layout View	Shift key	Shift
 Set modifier keys	Modifier keys window		Hilfstasten zuordnen
 Modifier keys	Modifier keys window		Hilfstasten
 Acute trigger	Keymap window		´ Akut

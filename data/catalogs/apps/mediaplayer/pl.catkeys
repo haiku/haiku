@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	2969013755
+1	polish	x-vnd.Haiku-MediaPlayer	1276112823
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -141,6 +141,7 @@ Open Clips	MediaPlayer-Main		Otwórz pliki
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		brak
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Pobiera/ustawia głośność (0.0-2.0).
+Duration	MediaPlayer-Main		Czas trwania
 Playlist…	MediaPlayer-Main		Lista odtwarzania…
 <unknown>	PlaylistItem-author		<nieznany>
 Save as…	MediaPlayer-PlaylistWindow		Zapisz jako…

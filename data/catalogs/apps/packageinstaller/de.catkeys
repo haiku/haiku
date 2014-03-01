@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PackageInstaller	792037176
+1	german	x-vnd.Haiku-PackageInstaller	2033288398
 Install to:	PackageView		Installieren nach:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akzeptieren
@@ -12,12 +12,14 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		Fehler beim Installieren des Pakets\n
 Disclaimer	PackageTextViewer		Haftungsausschluss
 %.1f GiB	PackageView		%.1f GiB
+%name% (%size% free)	PackageView		%name% (%size% frei)
 The installation of the package has been aborted.	PackageView		Die Installation des Pakets wurde abgebrochen.
 Done	PackageInstall		Fertig
 All existing files will be replaced?	PackageView		Alle vorhandenen Dateien werden ersetzt?
 Preparing package	PackageInstall		Paket wird vorbereitet
 No package available.	PackageInfo		Kein Paket verfügbar.
 none	PackageView		entfällt
+Install %name%	PackageView		Installiere %name%
 Stop	PackageStatus		Stopp
 Other…	PackageView		Andere…
 No installation type selected	PackageView		Es wurde kein Installationstyp gewählt
@@ -45,11 +47,14 @@ Decline	PackageTextViewer		Ablehnen
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Die Datei '%s' existiert bereits im Zielort.\nSoll sie mit der aus dem Paket ersetzt, oder übersprungen werden?
 All existing files will be skipped?	PackageView		Alle existierenden Dateien werden übersprungen?
 Continue	PackageInfo		Weiter
+%index% of %total%	PackageInstall		%index% von %total%
 %.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		Abbrechen
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Abbrechen
+%name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Weiter
+Begin	PackageView		Start
 Replace	PackageView		Ersetzen
 Installation progress	PackageView		Installationsverlauf
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Das Paket ist nicht lesbar.\nDas ausgewählte Paket ist möglicherweise keine gültige BeOS .pkg Datei.

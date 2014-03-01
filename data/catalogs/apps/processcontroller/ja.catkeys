@@ -8,7 +8,7 @@ This team is already gone…	ProcessController		Team はすでに終了してい
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Real-time priority	ProcessController		リアルタイム優先度
 Your setting file could not be saved!\n(%s)	ProcessController		設定ファイルは保存できませんでした。\n(%s)
-What do you want to do with the team \"%s\"?	ProcessController		スレッド \"%s\" に対してなにをしたいですか?
+What do you want to do with the team \"%s\"?	ProcessController		スレッド \"%s\" に対してなにをしますか?
 This thread is already gone…	ProcessController		スレッドはすでに終了しています…
 Cancel	ProcessController		取り消し
 Display priority	ProcessController		表示優先度
