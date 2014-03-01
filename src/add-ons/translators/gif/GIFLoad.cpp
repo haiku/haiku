@@ -412,6 +412,8 @@ GIFLoad::ReadGIFImageData()
 				goto bad_end;
 		}
 		fTable[fNextCode] = MemblockAllocate(fOldCodeLength + 1);
+		if (fTable[fNextCode] == NULL)
+			goto bad_end;
 
 		//memcpy(fTable[fNextCode], newEntry, fOldCodeLength + 1);
 		for (unsigned int x = 0; x < fOldCodeLength + 1; x++)
@@ -491,8 +493,10 @@ GIFLoad::ResetTable()
 		fTable[x] = NULL;
 		if (x < (1 << fCodeSize)) {
 			fTable[x] = MemblockAllocate(1);
-			fTable[x][0] = x;
-			fEntrySize[x] = 1;
+			if (fTable[x] != NULL) {
+				fTable[x][0] = x;
+				fEntrySize[x] = 1;
+			}
 		}
 	}
 }
@@ -536,7 +540,10 @@ GIFLoad::MemblockAllocate(int size)
 	// them when a new request comes along.
 
 	if (fHeadMemblock == NULL) {
-		fHeadMemblock = new Memblock();
+		fHeadMemblock = (Memblock*)malloc(sizeof(Memblock));
+		if (fHeadMemblock == NULL)
+			return NULL;
+
 		uchar* value = fHeadMemblock->data;
 		fHeadMemblock->offset = size;
 		fHeadMemblock->next = NULL;
@@ -556,7 +563,10 @@ GIFLoad::MemblockAllocate(int size)
 			block = block->next;
 		}
 
-		block = new Memblock();
+		block = (Memblock*)malloc(sizeof(Memblock));
+		if (block == NULL)
+			return NULL;
+
 		uchar* value = block->data;
 		block->offset = size;
 		block->next = NULL;

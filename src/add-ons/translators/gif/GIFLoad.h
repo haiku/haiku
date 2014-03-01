@@ -27,11 +27,11 @@
 #define GIF_LOCALCOLORMAP	0x80
 
 
-struct Memblock {
-	uchar		data[4096];
-	int			offset;
-	Memblock*	next;
-};
+typedef struct Memblock {
+	unsigned char	data[4096];
+	int				offset;
+	Memblock*		next;
+} Memblock;
 
 
 const int gl_pass_starts_at[]		= { 0, 4, 2, 1, 0 };
