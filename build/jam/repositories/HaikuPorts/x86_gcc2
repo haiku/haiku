@@ -216,8 +216,8 @@ RemotePackageRepository HaikuPorts
 	glu_x86_devel-9.0.0-2
 	guilib_x86-1.2.1-1
 	guilib_x86_devel-1.2.1-1
-	haikuwebkit_x86-1.2.3-1
-	haikuwebkit_x86_devel-1.2.3-1
+	haikuwebkit_x86-1.2.4-1
+	haikuwebkit_x86_devel-1.2.4-1
 	icu_x86-4.8.1.1-4
 	icu_x86_devel-4.8.1.1-4
 	jpeg_x86-9-3
@@ -334,7 +334,7 @@ RemotePackageRepository HaikuPorts
 	grep
 	groff
 	guilib
-	haikuwebkit_x86
+#	haikuwebkit_x86
 	htmldoc
 	icu
 	jam
