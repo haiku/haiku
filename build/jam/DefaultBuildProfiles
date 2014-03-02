@@ -143,6 +143,7 @@ rule DefineDefaultBuildProfiles
 				ncurses_devel
 				python
 				sed
+				texinfo
 				zlib
 				zlib_devel
 				;
