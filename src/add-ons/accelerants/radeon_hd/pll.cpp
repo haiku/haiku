@@ -45,6 +45,28 @@ extern "C" void _sPrintf(const char* format, ...);
 //	AtomBIOS:	16200  * 10 Khz	0.162 * 10 Ghz
 
 
+/* The PLL allows to synthesize a clock signal with a range of frequencies
+ * based on a single input reference clock signal. It uses several dividers
+ * to create a rational factor multiple of the input frequency.
+ *
+ * The reference clock signal frequency is pll_info::referenceFreq (in kHz ? TODO).
+ * It is then, one after another...
+ *   (1) divided by the (integer) reference divider (pll_info::referenceDiv).
+ *   (2) multiplied by the fractional feedback divider, which sits in the
+ *       PLL's feedback loop and thus multiplies the frequency. It allows
+ *       using a rational number factor of the form "x.y", with
+ *       x = pll_info::feedbackDiv and y = pll_info::feedbackDivFrac.
+ *   (3) divided by the (integer) post divider (pll_info::postDiv).
+ *   Allowed ranges are given in the pll_info min/max values.
+ *
+ *   The resulting output pixel clock frequency is then:
+ * 
+ *                            feedbackDiv + (feedbackDivFrac/10)
+ *   f_out = referenceFreq * ------------------------------------
+ *                                  referenceDiv * postDiv
+ */
+
+
 status_t
 pll_limit_probe(pll_info* pll)
 {
@@ -342,16 +364,20 @@ pll_compute_post_divider(pll_info* pll)
 }
 
 
+/*! Compute values for the fractional feedback divider to match the desired
+ *  pixel clock frequency as closely as possible. Reference and post divider
+ *  values are already filled in (if used).
+ */
 status_t
 pll_compute(pll_info* pll)
 {
 	pll_compute_post_divider(pll);
 
-	uint32 targetClock = pll->adjustedClock;
+	const uint32 targetClock = pll->adjustedClock;
 
 	pll->feedbackDiv = 0;
 	pll->feedbackDivFrac = 0;
-	uint32 referenceFrequency = pll->referenceFreq;
+	const uint32 referenceFrequency = pll->referenceFreq;
 
 	if ((pll->flags & PLL_USE_REF_DIV) != 0) {
 		TRACE("%s: using AtomBIOS reference divider\n", __func__);
@@ -363,19 +389,21 @@ pll_compute(pll_info* pll)
 	if ((pll->flags & PLL_USE_FRAC_FB_DIV) != 0) {
 		TRACE("%s: using AtomBIOS fractional feedback divider\n", __func__);
 
-		uint32 tmp = pll->postDiv * pll->referenceDiv;
-		tmp *= targetClock;
-		pll->feedbackDiv = tmp / pll->referenceFreq;
-		pll->feedbackDivFrac = tmp % pll->referenceFreq;
+		const uint32 numerator = pll->postDiv * pll->referenceDiv
+			* targetClock;
+		pll->feedbackDiv = numerator / referenceFrequency;
+		pll->feedbackDivFrac = numerator % referenceFrequency;
 
 		if (pll->feedbackDiv > pll->maxFeedbackDiv)
 			pll->feedbackDiv = pll->maxFeedbackDiv;
 		else if (pll->feedbackDiv < pll->minFeedbackDiv)
 			pll->feedbackDiv = pll->minFeedbackDiv;
 
+		// Put first 2 digits after the decimal point into feedbackDivFrac
 		pll->feedbackDivFrac
-			= (100 * pll->feedbackDivFrac) / pll->referenceFreq;
-
+			= (100 * pll->feedbackDivFrac) / referenceFrequency;
+		
+		// Now round it to one digit
 		if (pll->feedbackDivFrac >= 5) {
 			pll->feedbackDivFrac -= 5;
 			pll->feedbackDivFrac /= 10;
