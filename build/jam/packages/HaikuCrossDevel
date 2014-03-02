@@ -47,6 +47,7 @@ for stage in _stage1 "" {
 	AddLibrariesToPackage $(developCrossLibDirTokens) :
 		[ MultiArchDefaultGristFiles libbsd.so ]
 		[ MultiArchDefaultGristFiles libroot.so : revisioned ]
+		[ MultiArchDefaultGristFiles libnetwork.so ]
 		$(HAIKU_SHARED_LIBSTDC++_$(architecture))
 		$(HAIKU_SHARED_LIBSUPC++_$(architecture))
 		$(additionalLibraries$(stage))
