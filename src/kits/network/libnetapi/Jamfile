@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src kits network libnetapi ;
 
-UsePrivateHeaders net shared ;
+UsePrivateHeaders app net shared ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
@@ -16,6 +16,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		Includes [ FGristFiles $(HPKG_SOURCES) ]
 			: [ BuildFeatureAttribute zlib : headers ] ;
+
+		UsePrivateSystemHeaders ;
 
 		if [ FIsBuildFeatureEnabled openssl ] {
 			SubDirC++Flags -DOPENSSL_ENABLED ;
@@ -72,6 +74,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			# TODO: another add-on for file:// (a much simpler one)
 			FileRequest.cpp
+
+			notifications.cpp
 
 			$(md5Sources)
 

@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src kits network ;
 
-UsePrivateHeaders app libroot net shared ;
+UsePrivateHeaders libroot net shared ;
 
 local services = [ FGristFiles services ] ;
 SEARCH on $(services) = [ FDirName $(SUBDIR) libbind defaults ] ;
@@ -16,11 +16,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SharedLibrary $(libnetwork) :
 			init.cpp
 			interfaces.cpp
-			notifications.cpp
 			socket.cpp
 			r5_compatibility.cpp
 			:
-			be
 			<libbind!$(architecture)>libbind.o
 			$(TARGET_LIBSUPC++)
 			;
