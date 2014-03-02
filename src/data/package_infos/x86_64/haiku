@@ -19,9 +19,7 @@ provides {
 	haiku=%HAIKU_VERSION% compat>=R1~alpha1
 	coreutils = 8.4 compat >= 0
 	diffutils = 2.8.1 compat >= 0
-	findutils = 4.2.33 compat >= 0
 	cmd:arp
-	cmd:awk
 	cmd:base64
 	cmd:basename
 	cmd:bash
@@ -54,14 +52,12 @@ provides {
 	cmd:expr
 	cmd:factor
 	cmd:false
-	cmd:find = 4.2.33
 	cmd:fmt
 	cmd:fold
 	cmd:frcode
 	cmd:ftp
 	cmd:ftpd
 	cmd:funzip
-	cmd:gawk
 	cmd:gdb
 	cmd:getlimits
 	cmd:groups
@@ -80,7 +76,6 @@ provides {
 	cmd:lesskey
 	cmd:link
 	cmd:ln = 8.4
-	cmd:locate
 	cmd:login
 	cmd:logname
 	cmd:ls
@@ -156,7 +151,6 @@ provides {
 	cmd:unshar
 	cmd:unzip = 5.50
 	cmd:unzipsfx
-	cmd:updatedb
 	cmd:useradd
 	cmd:uudecode
 	cmd:uuencode
@@ -165,7 +159,6 @@ provides {
 	cmd:wc
 	cmd:wget = 1.12
 	cmd:whoami
-	cmd:xargs
 	cmd:xres
 	cmd:yes
 	cmd:zcat
