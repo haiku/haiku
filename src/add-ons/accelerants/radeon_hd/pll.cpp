@@ -374,7 +374,7 @@ pll_compute(pll_info* pll)
 			pll->feedbackDiv = pll->minFeedbackDiv;
 
 		pll->feedbackDivFrac
-			= (1000 * pll->feedbackDivFrac) / pll->referenceFreq;
+			= (100 * pll->feedbackDivFrac) / pll->referenceFreq;
 
 		if (pll->feedbackDivFrac >= 5) {
 			pll->feedbackDivFrac -= 5;
