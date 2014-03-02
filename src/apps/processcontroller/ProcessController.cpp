@@ -819,7 +819,8 @@ thread_popup(void *arg)
 	}
 
 	// Scheduler modes
-	static const char* schedulerModes[] = { "Low Latency", "Power Saving" };
+	static const char* schedulerModes[] = { B_TRANSLATE_MARK("Low Latency"),
+		B_TRANSLATE_MARK("Power Saving") };
 	unsigned int modesCount = sizeof(schedulerModes) / sizeof(const char*);
 	int32 currentMode = get_scheduler_mode();
 	for (unsigned int i = 0; i < modesCount; i++) {
