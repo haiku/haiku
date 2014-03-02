@@ -10,7 +10,7 @@ RemotePackageRepository HaikuPorts
 	wqy_microhei-0.2.0~beta-3
 	:
 	# repository architecture packages
-	# primary architecture (x86_64)
+	# primary architecture (ppc)
 
 	:
 
