@@ -49,7 +49,7 @@ extern "C" void _sPrintf(const char* format, ...);
  * based on a single input reference clock signal. It uses several dividers
  * to create a rational factor multiple of the input frequency.
  *
- * The reference clock signal frequency is pll_info::referenceFreq (in kHz ? TODO).
+ * The reference clock signal frequency is pll_info::referenceFreq (in kHz).
  * It is then, one after another...
  *   (1) divided by the (integer) reference divider (pll_info::referenceDiv).
  *   (2) multiplied by the fractional feedback divider, which sits in the
