@@ -12,15 +12,15 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	csplit cut date dc dd desklink df diff diff3 dircolors dirname
 	diskimage draggers driveinfo dstcheck du dumpcatalog
 	echo eject env error expand expr
-	factor false fdinfo ffm filepanel find finddir findpaths fmt fold
-	fortune frcode ftp ftpd funzip
+	factor false fdinfo ffm filepanel finddir findpaths fmt fold
+	fortune ftp ftpd funzip
 	gdb@x86 getarch getlimits groupadd groupdel groupmod groups gzip gzexe
 	hd head hey hostname
 	id ident ifconfig <bin>install isvolume
 	ideinfo@ide idestatus@ide
 	join kernel_debugger keymap keystore kill
 	less lessecho lesskey link linkcatkeys listarea listattr listimage listdev
-	listport listres listsem listusb ln locale locate logger login logname ls
+	listport listres listsem listusb ln locale logger login logname ls
 	lsindex
 	makebootable md5sum merge message mimeset mkdir
 	mkfifo mkfs mkindex mktemp modifiers mount mountvolume mv
@@ -37,9 +37,9 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
 	tr traceroute trash true truncate tsort tty
 	uname unchop unexpand unmount uniq unlink unshar unzip unzipsfx
-	<bin>updatedb uptime urlwrapper useradd userdel uudecode uuencode
+	uptime urlwrapper useradd userdel uudecode uuencode
 	vdir version vmstat
-	waitfor watch wc wget whoami writembr@x86 xargs xres
+	waitfor watch wc wget whoami writembr@x86 xres
 	yes
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ] ;
