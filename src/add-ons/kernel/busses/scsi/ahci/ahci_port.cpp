@@ -818,7 +818,7 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 
 dprintf("TRIM SCSI:\n");
 for (uint32 i = 0; i < scsiRangeCount; i++) {
-	dprintf("[3%" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu32 "\n", i,
+	dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu32 "\n", i,
 		B_BENDIAN_TO_HOST_INT64(unmapBlocks->blocks[i].lba),
 		B_BENDIAN_TO_HOST_INT32(unmapBlocks->blocks[i].block_count));
 }
@@ -896,8 +896,8 @@ for (uint32 i = 0; i < scsiRangeCount; i++) {
 dprintf("TRIM AHCI:\n");
 for (uint32 i = 0; i < lbaRangeCount; i++) {
 	uint64 value = B_HOST_TO_LENDIAN_INT64(lbaRanges[i]);
-	dprintf("[3%" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu64 "\n", i,
-		value >> 48, value & (((uint64)1 << 48) - 1));
+	dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu64 "\n", i,
+		value & (((uint64)1 << 48) - 1), value >> 48);
 }
 
 		sata_request sreq;
