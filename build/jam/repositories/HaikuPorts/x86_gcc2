@@ -48,7 +48,7 @@ RemotePackageRepository HaikuPorts
 	fribidi-0.19.5-1
 	fribidi_devel-0.19.5-1	
 	friss-0.8beta-1
-	gawk-4.1.0-1
+	gawk-4.1.0-2
 	gcc-2.95.3_2013_08_15-4
 	gettext-0.18.1.1-5
 	gettext_libintl-0.18.1.1-5
