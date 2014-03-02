@@ -454,10 +454,11 @@ MainWindow::LoadSettings(const BMessage* message)
 
 	// store workspace setting
 	bool showOnAllWorkspaces;
-	if (message->FindBool("all workspaces", &showOnAllWorkspaces) == B_OK)
+	if (message->FindBool("all workspaces", &showOnAllWorkspaces) == B_OK) {
 		fShowOnAllWorkspaces = showOnAllWorkspaces;
 		SetWorkspaces(showOnAllWorkspaces
 			? B_ALL_WORKSPACES : 1L << current_workspace());
+	}
 	if (!fShowOnAllWorkspaces) {
 		uint32 workspaces;
 		if (message->FindInt32("workspaces", (int32*)&workspaces) == B_OK)
