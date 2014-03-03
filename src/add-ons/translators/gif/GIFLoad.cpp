@@ -26,6 +26,8 @@
 #include <TranslatorFormats.h>
 #include <InterfaceDefs.h>
 
+#include "GIFPrivate.h"
+
 
 extern bool debug;
 
@@ -57,8 +59,8 @@ GIFLoad::GIFLoad(BPositionIO* input, BPositionIO* output)
 		return;
 	}
 
-	while (c != 0x3b) {
-		if (c == 0x2c) {
+	while (c != TERMINATOR_INTRODUCER) {
+		if (c == DESCRIPTOR_INTRODUCER) {
 			if ((!ReadGIFImageHeader()) || (!ReadGIFImageData())) {
 				if (debug) {
 					syslog(LOG_ERR, "GIFLoad::GIFLoad() - "
@@ -75,23 +77,23 @@ GIFLoad::GIFLoad(BPositionIO* input, BPositionIO* output)
 			free(fScanLine);
 			fScanLine = NULL;
 			return;
-		} else if (c == 0x21) {
+		} else if (c == EXTENSION_INTRODUCER) {
 			unsigned char d;
 			if (fInput->Read(&d, 1) < 1) {
 				fatalerror = true;
 				return;
 			}
-			if (d == 0xff) {
+			if (d == LOOP_BLOCK_LABEL) {
 				if (!ReadGIFLoopBlock()) {
 					fatalerror = true;
 					return;
 				}
-			} else if (d == 0xf9) {
+			} else if (d == GRAPHIC_CONTROL_LABEL) {
 				if (!ReadGIFControlBlock()) {
 					fatalerror = true;
 					return;
 				}
-			} else if (d == 0xfe) {
+			} else if (d == COMMENT_EXTENSION_LABEL) {
 				if (!ReadGIFCommentBlock()) {
 					fatalerror = true;
 					return;
@@ -102,7 +104,7 @@ GIFLoad::GIFLoad(BPositionIO* input, BPositionIO* output)
 					return;
 				}
 			}
-		} else if (c != 0x00) {
+		} else if (c != BLOCK_TERMINATOR) {
 			if (!ReadGIFUnknownBlock(c)) {
 				fatalerror = true;
 				return;
@@ -224,10 +226,10 @@ GIFLoad::ReadGIFCommentBlock()
 		if (fInput->Read(comment_data, length) < length)
 			return false;
 
-		comment_data[length] = 0x00;
+		comment_data[length] = BLOCK_TERMINATOR;
 		if (debug)
 			syslog(LOG_INFO, "%s", comment_data);
-	} while (length != 0x00);
+	} while (length != BLOCK_TERMINATOR);
 
 	if (debug)
 		syslog(LOG_INFO, "\n");
@@ -248,7 +250,7 @@ GIFLoad::ReadGIFUnknownBlock(unsigned char c)
 			return false;
 
 		fInput->Seek(length, SEEK_CUR);
-	} while (length != 0x00);
+	} while (length != BLOCK_TERMINATOR);
 
 	return true;
 }
@@ -428,7 +430,7 @@ GIFLoad::ReadGIFImageData()
 		fOldCodeLength = fEntrySize[fNewCode];
 		fNextCode++;
 
-		if (fNextCode > fMaxCode && fBits != 12) {
+		if (fNextCode > fMaxCode && fBits < LZ_MAX_BITS) {
 			fBits++;
 			fMaxCode = (1 << fBits) - 1;
 		}
@@ -514,6 +516,7 @@ GIFLoad::InitFrame(int size)
 	fEndCode = fClearCode + 1;
 	fNextCode = fClearCode + 2;
 	fMaxCode = (1 << fBits) - 1;
+
 	fPass = 0;
 
 	if (fInterlaced)

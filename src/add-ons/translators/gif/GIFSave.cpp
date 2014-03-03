@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <syslog.h>
 
+#include "GIFPrivate.h"
+
 
 const int gs_pass_starts_at[] = {0, 4, 2, 1, 0};
 const int gs_increment_pass_by[] = {8, 8, 4, 2, 0};
@@ -173,7 +175,7 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 	delete hash;
 
 	// Terminating character
-	char t = 0x3b;
+	char t = TERMINATOR_INTRODUCER;
 	output->Write(&t, 1);
 }
 
@@ -212,7 +214,10 @@ GIFSave::WriteGIFHeader()
 void
 GIFSave::WriteGIFControlBlock()
 {
-	unsigned char b[8] = { 0x21, 0xf9, 0x04, 0, 0, 0, 0, 0x00 };
+	unsigned char b[8] = { 
+		EXTENSION_INTRODUCER, GRAPHIC_CONTROL_LABEL, 0x04, 0x00, 0x00, 0x00,
+		0x00, BLOCK_TERMINATOR
+	};
 	if (palette->UseTransparent()) {
 		b[3] = b[3] | 1;
 		b[6] = palette->TransparentIndex();
@@ -225,7 +230,7 @@ void
 GIFSave::WriteGIFImageHeader()
 {
 	unsigned char header[10];
-	header[0] = 0x2c;
+	header[0] = DESCRIPTOR_INTRODUCER;
 	header[1] = header[2] = 0;
 	header[3] = header[4] = 0;
 
@@ -237,7 +242,7 @@ GIFSave::WriteGIFImageHeader()
 	if (fSettings->SetGetBool(GIF_SETTING_INTERLACED))
 		header[9] = 0x40;
 	else
-		header[9] = 0x00;
+		header[9] = BLOCK_TERMINATOR;
 
 	output->Write(header, 10);
 }
@@ -268,8 +273,8 @@ GIFSave::WriteGIFImageData()
 
 			if (next_code > max_code) {
 				BITS++;
-				if (BITS > 12) {
-					OutputCode(clear_code, 12);
+				if (BITS > LZ_MAX_BITS) {
+					OutputCode(clear_code, LZ_MAX_BITS);
 					BITS = code_size + 1;
 					ResetHashtable();
 					next_code = clear_code + 1;
@@ -285,7 +290,7 @@ GIFSave::WriteGIFImageData()
 	OutputCode(string_code, BITS);
 	OutputCode(end_code, BITS);
 	OutputCode(0, BITS, true);
-	char t = 0x00;
+	char t = BLOCK_TERMINATOR;
 	output->Write(&t, 1);
 	free(code_value);
 	free(prefix_code);
@@ -531,7 +536,7 @@ GIFSave::InitFrame()
 	max_code = (1 << BITS) - 1;
 	string_code = 0;
 	character = 0;
-	table_size = 1 << 12;
+	table_size = 1 << LZ_MAX_BITS;
 
 	bit_count = 0;
 	bit_buffer = 0;
