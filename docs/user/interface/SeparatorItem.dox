@@ -111,5 +111,5 @@
 	call this method yourself but you may want to override it in a derived class
 	to do something other than the default.
 
-	The default draws a light grey vertical line through the middle of the item.
+	The default draws a light grey horizontal line through the middle of the item.
 */
