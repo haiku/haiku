@@ -64,7 +64,7 @@ DebugNow::StartSaver(BView* view, bool preview)
 
 	BFont font;
 	view->GetFont(&font);
-	font.SetSize(viewHeight / 2.5);
+	font.SetSize(viewHeight / 3);
 	view->SetFont(&font);
 
 	fDelta.nonspace = 0;
