@@ -14,7 +14,7 @@ class BMessage;
 class BSeparatorItem : public BMenuItem {
 public:
 								BSeparatorItem();
-								BSeparatorItem(BMessage* archive);
+								BSeparatorItem(BMessage* data);
 	virtual						~BSeparatorItem();
 
 	static	BArchivable*		Instantiate(BMessage* data);

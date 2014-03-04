@@ -43,10 +43,10 @@ BSeparatorItem::Archive(BMessage* data, bool deep) const
 
 
 BArchivable*
-BSeparatorItem::Instantiate(BMessage* archive)
+BSeparatorItem::Instantiate(BMessage* data)
 {
-	if (validate_instantiation(archive, "BSeparatorItem"))
-		return new BSeparatorItem(archive);
+	if (validate_instantiation(data, "BSeparatorItem"))
+		return new BSeparatorItem(data);
 
 	return NULL;
 }
