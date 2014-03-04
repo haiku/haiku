@@ -388,6 +388,10 @@ GIFLoad::ReadGIFImageData()
 			continue;
 		}
 
+		// error out if we're trying to access an out-of-bounds index
+		if (fNextCode >= ENTRY_COUNT)
+			goto bad_end;
+
 		if (fTable[fNewCode] != NULL) {
 			// exists in table
 
