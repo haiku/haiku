@@ -187,12 +187,13 @@ GetBitmap(BPositionIO* in, BBitmap** out)
 }
 
 
+/*	Required identify function - may need to read entire header, not sure
+ */
 status_t
 GIFTranslator::DerivedIdentify(BPositionIO* inSource,
 	const translation_format* inFormat, BMessage* ioExtension,
 	translator_info* outInfo, uint32 outType)
 {
-	// Required identify function - may need to read entire header, not sure
 	const char* debug_text = getenv("GIF_TRANSLATOR_DEBUG");
 	if (debug_text != NULL && atoi(debug_text) != 0)
 		debug = true;
@@ -265,13 +266,13 @@ GIFTranslator::DerivedTranslate(BPositionIO* inSource,
 		if (err != B_OK)
 			return err;
 
-		GIFSave* gitSave = new GIFSave(bitmap, outDestination, fSettings);
-		if (gitSave->fatalerror) {
-			delete gitSave;
+		GIFSave* gifSave = new GIFSave(bitmap, outDestination, fSettings);
+		if (gifSave->fatalerror) {
+			delete gifSave;
 			delete bitmap;
 			return B_NO_MEMORY;
 		}
-		delete gitSave;
+		delete gifSave;
 		delete bitmap;
 	} else {
 		// GIF to BBitmap
