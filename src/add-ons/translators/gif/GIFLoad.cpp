@@ -336,27 +336,25 @@ bool
 GIFLoad::ReadGIFImageData()
 {
 	unsigned char newEntry[ENTRY_COUNT];
+	unsigned char codeSize;
+	fInput->Read(&codeSize, 1);
 
-	unsigned char cs;
-	fInput->Read(&cs, 1);
-	if (cs == fPalette->size_in_bits) {
-		if (!InitFrame(fPalette->size_in_bits))
-			return false;
-	} else if (cs > fPalette->size_in_bits) {
+	if (codeSize > fPalette->size_in_bits) {
 		if (debug) {
 			syslog(LOG_ERR, "GIFLoad::ReadGIFImageData() - "
 				"Code_size should be %d, not %d, allowing it\n",
-				fCodeSize, cs);
+				fCodeSize, codeSize);
 		}
-		if (!InitFrame(cs))
+		if (!InitFrame(codeSize))
 			return false;
-	} else if (cs < fPalette->size_in_bits) {
+	} else if (codeSize < fPalette->size_in_bits) {
 		if (debug) {
 			syslog(LOG_ERR, "GIFLoad::ReadGIFImageData() - "
-				"Code_size should be %d, not %d\n", fCodeSize, cs);
+				"Code_size should be %d, not %d\n", fCodeSize, codeSize);
 		}
 		return false;
-	}
+	} else if (!InitFrame(fPalette->size_in_bits))
+		return false;
 
 	if (debug)
 		syslog(LOG_INFO, "GIFLoad::ReadGIFImageData() - Starting LZW\n");
@@ -507,9 +505,9 @@ GIFLoad::ResetTable()
 
 
 bool
-GIFLoad::InitFrame(int size)
+GIFLoad::InitFrame(int codeSize)
 {
-	fCodeSize = size;
+	fCodeSize = codeSize;
 	if (fCodeSize == 1)
 		fCodeSize++;
 

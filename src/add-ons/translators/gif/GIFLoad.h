@@ -57,7 +57,7 @@ private:
 			bool				ReadGIFCommentBlock();
 			bool				ReadGIFUnknownBlock(unsigned char c);
 
-			bool				InitFrame(int size);
+			bool				InitFrame(int codeSize);
 			short				NextCode();
 			void				ResetTable();
 
