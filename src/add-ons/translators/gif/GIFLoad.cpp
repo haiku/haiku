@@ -263,6 +263,8 @@ GIFLoad::ReadGIFImageHeader()
 	if (fInput->Read(data, 9) < 9)
 		return false;
 
+	int left = data[0] + (data[1] << 8);
+	int top = data[2] + (data[3] << 8);
 	int localWidth = data[4] + (data[5] << 8);
 	int localHeight = data[6] + (data[7] << 8);
 	if (fWidth != localWidth || fHeight != localHeight) {
@@ -284,7 +286,7 @@ GIFLoad::ReadGIFImageHeader()
 		return false;
 	}
 
-	BRect rect(0, 0, fWidth - 1, fHeight - 1);
+	BRect rect(left, top, left + fWidth - 1, top + fHeight - 1);
 	TranslatorBitmap header;
 	header.magic = B_HOST_TO_BENDIAN_INT32(B_TRANSLATOR_BITMAP);
 	header.bounds.left = B_HOST_TO_BENDIAN_FLOAT(rect.left);
