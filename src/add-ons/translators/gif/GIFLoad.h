@@ -26,7 +26,10 @@
 #define GIF_INTERLACED		0x40
 #define GIF_LOCALCOLORMAP	0x80
 
-#define ENTRY_COUNT			4096
+#define ENTRY_COUNT			4354
+	// 4354 = 4096 + 256 + 1 + 1
+	// 4096 for the image data, 256 for the color codes,
+	// 1 for the clear code, 1 for the end code
 
 
 typedef struct Memblock {
