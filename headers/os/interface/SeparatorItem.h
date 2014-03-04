@@ -1,10 +1,10 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SEPARATOR_ITEM_H
 #define _SEPARATOR_ITEM_H
- 
+
 
 #include <MenuItem.h>
 
@@ -17,11 +17,11 @@ public:
 								BSeparatorItem(BMessage* archive);
 	virtual						~BSeparatorItem();
 
-	static	BArchivable*		Instantiate(BMessage* archive);
-	virtual	status_t			Archive(BMessage* archive,
+	static	BArchivable*		Instantiate(BMessage* data);
+	virtual	status_t			Archive(BMessage* data,
 									bool deep = true) const;
 
-	virtual	void				SetEnabled(bool state);
+	virtual	void				SetEnabled(bool enable);
 
 protected:
 	virtual	void				GetContentSize(float* _width, float* _height);

@@ -1,29 +1,30 @@
 /*
- * Copyright (c) 2001-2010, Haiku, Inc.
+ * Copyright (c) 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Marc Flerackers (mflerackers@androme.be)
- *		Bill Hayden (haydentech@users.sourceforge.net)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini, burton666@libero.it
+ *		Marc Flerackers, mflerackers@androme.be
+ *		Bill Hayden, haydentech@users.sourceforge.net
  */
-
-/*!	Display separator item for BMenu class */
 
 
 #include <SeparatorItem.h>
+
 #include <Font.h>
 
 
 BSeparatorItem::BSeparatorItem()
-	: BMenuItem("", NULL)
+	:
+	BMenuItem("", NULL)
 {
 	BMenuItem::SetEnabled(false);
 }
 
 
-BSeparatorItem::BSeparatorItem(BMessage* archive)
-	: BMenuItem(archive)
+BSeparatorItem::BSeparatorItem(BMessage* data)
+	:
+	BMenuItem(data)
 {
 	BMenuItem::SetEnabled(false);
 }
@@ -35,13 +36,13 @@ BSeparatorItem::~BSeparatorItem()
 
 
 status_t
-BSeparatorItem::Archive(BMessage* archive, bool deep) const
+BSeparatorItem::Archive(BMessage* data, bool deep) const
 {
-	return BMenuItem::Archive(archive, deep);
+	return BMenuItem::Archive(data, deep);
 }
 
 
-BArchivable *
+BArchivable*
 BSeparatorItem::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BSeparatorItem"))
@@ -52,7 +53,7 @@ BSeparatorItem::Instantiate(BMessage* archive)
 
 
 void
-BSeparatorItem::SetEnabled(bool state)
+BSeparatorItem::SetEnabled(bool enable)
 {
 	// Don't do anything - we don't want to get enabled ever
 }
@@ -66,8 +67,9 @@ BSeparatorItem::GetContentSize(float* _width, float* _height)
 
 	if (_height != NULL) {
 		BFont font(be_plain_font);
-		if (Menu())
+		if (Menu() != NULL)
 			Menu()->GetFont(&font);
+
 		const float height = floorf((font.Size() * 0.8) / 2) * 2;
 		*_height = max_c(4, height);
 	}
