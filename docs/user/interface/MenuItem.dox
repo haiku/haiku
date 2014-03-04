@@ -1,13 +1,13 @@
 /*
- * Copyright 2014 Haiku Inc. All rights reserved.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/MenuItem.h	 hrev46953
- *		src/kits/interface/MenuItem.cpp	 hrev46953
+ *		headers/os/interface/MenuItem.h	 hrev46969
+ *		src/kits/interface/MenuItem.cpp	 hrev46969
  */
 
 
@@ -266,8 +266,8 @@
 
 
 /*!
-	\fn void BMenuItem::GetContentSize(float* width, float* height)
-	\brief Fills out \a width and \a height with the content rectangle
+	\fn void BMenuItem::GetContentSize(float* _width, float* _height)
+	\brief Fills out \a _width and \a _height with the content rectangle
 	       dimensions.
 
 	You only need to call this method if you're implementing your own
@@ -280,8 +280,8 @@
 	The content rectangle can be calculated using this method as well as
 	ContentLocation() to get location of the top left corner.
 
-	\param width Filled out with the \a width of the content rectangle.
-	\param height Filled out with the \a height of the content rectangle.
+	\param _width Filled out with the width of the content rectangle.
+	\param _height Filled out with the height of the content rectangle.
 
 	\sa ContentLocation()
 	\sa DrawContent()

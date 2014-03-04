@@ -360,7 +360,7 @@ BMenuItem::Frame() const
 
 
 void
-BMenuItem::GetContentSize(float* width, float* height)
+BMenuItem::GetContentSize(float* _width, float* _height)
 {
 	// TODO: Get rid of this. BMenu should handle this
 	// automatically. Maybe it's not even needed, since our
@@ -369,10 +369,10 @@ BMenuItem::GetContentSize(float* width, float* height)
 
 	fCachedWidth = fSuper->StringWidth(fLabel);
 
-	if (width)
-		*width = (float)ceil(fCachedWidth);
-	if (height)
-		*height = MenuPrivate(fSuper).FontHeight();
+	if (_width)
+		*_width = (float)ceil(fCachedWidth);
+	if (_height)
+		*_height = MenuPrivate(fSuper).FontHeight();
 }
 
 
