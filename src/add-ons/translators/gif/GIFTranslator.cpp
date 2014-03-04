@@ -111,9 +111,9 @@ const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_for
 const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
 
 
-/* Look at first few bytes in stream to determine type - throw it back
- * if it is not a GIF or a BBitmap that we understand.
- */
+/*!	Look at first few bytes in stream to determine type - throw it back
+	if it is not a GIF or a BBitmap that we understand.
+*/
 bool
 DetermineType(BPositionIO* source, bool* isGif)
 {
@@ -187,8 +187,8 @@ GetBitmap(BPositionIO* in, BBitmap** out)
 }
 
 
-/*	Required identify function - may need to read entire header, not sure
- */
+/*!	Required identify function - may need to read entire header, not sure
+*/
 status_t
 GIFTranslator::DerivedIdentify(BPositionIO* inSource,
 	const translation_format* inFormat, BMessage* ioExtension,
@@ -231,9 +231,9 @@ GIFTranslator::DerivedIdentify(BPositionIO* inSource,
 }
 
 
-/* Main required function - assumes that an incoming GIF must be translated
- * to a BBitmap, and vice versa - this could be improved
- */
+/*!	Main required function - assumes that an incoming GIF must be translated
+	to a BBitmap, and vice versa - this could be improved
+*/
 status_t
 GIFTranslator::DerivedTranslate(BPositionIO* inSource,
 	const translator_info* inInfo, BMessage* ioExtension, uint32 outType,
