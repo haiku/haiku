@@ -40,8 +40,10 @@ BScreenSaver* instantiate_screen_saver(BMessage* message, image_id image)
 DebugNow::DebugNow(BMessage* archive, image_id id)
 	:
 	BScreenSaver(archive, id),
-	fLine1("DEBUG"),
-	fLine2("NOW")
+	fLine1(B_TRANSLATE_COMMENT("DEBUG",
+		"keep it short and all uppercase, 5 characters or less")),
+	fLine2(B_TRANSLATE_COMMENT("NOW",
+		"keep it short and all uppercase, 5 characters or less"))
 {
 }
 
