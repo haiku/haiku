@@ -1465,7 +1465,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	newSize -= sizeof(addr_t) + sizeof(heap_leak_check_info);
 
 	// if not, allocate a new chunk of memory
-	*newAddress = memalign(0, newSize);
+	*newAddress = memalign(newSize >= 8 ? 8 : 0, newSize);
 	if (*newAddress == NULL) {
 		// we tried but it didn't work out, but still the operation is done
 		return B_OK;
@@ -1937,7 +1937,7 @@ malloc(size_t size)
 	if (sUseGuardPage)
 		return heap_debug_malloc_with_guard_page(size);
 
-	return memalign(0, size);
+	return memalign(size >= 8 ? 8 : 0, size);
 }
 
 
@@ -1978,7 +1978,7 @@ void *
 realloc(void *address, size_t newSize)
 {
 	if (address == NULL)
-		return memalign(0, newSize);
+		return memalign(newSize >= 8 ? 8 : 0, newSize);
 
 	if (newSize == 0) {
 		free(address);

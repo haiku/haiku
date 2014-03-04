@@ -966,7 +966,7 @@ memalign(size_t alignment, size_t size)
 extern "C" void*
 malloc(size_t size)
 {
-	return memalign(0, size);
+	return memalign(size >= 8 ? 8 : 0, size);
 }
 
 
@@ -987,7 +987,7 @@ realloc(void* address, size_t newSize)
 	}
 
 	if (address == NULL)
-		return memalign(0, newSize);
+		return memalign(size >= 8 ? 8 : 0, newSize);
 
 	return guarded_heap_realloc(address, newSize);
 }
