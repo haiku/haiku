@@ -1,0 +1,115 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/SeparatorItem.h	 hrev46969
+ *		src/kits/interface/SeparatorItem.cpp	 hrev46969
+ */
+
+
+/*!
+	\file SeparatorItem.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BSeparatorItem class definition.
+*/
+
+
+/*!
+	\class BSeparatorItem
+	\ingroup interface
+	\ingroup libbe
+	\brief Display separator item for BMenu class.
+
+	A BSeparatorItem is used to separate groups of menu items in a BMenu.
+	It is drawn as a horizontal line and cannot be selected or highlighted.
+
+	\warning BSeparatorItems are only meant to be used with menus whose
+	         items are arranged in a \c B_ITEMS_IN_COLUMN layout.
+*/
+
+
+/*!
+	\fn BSeparatorItem::BSeparatorItem()
+	\brief Creates a new BSeparatorItem object.
+
+	The creates a new BSeparatorItem from BMenuItem with a blank label and
+	\c NULL message, then disables it.
+*/
+
+
+/*!
+	\fn BSeparatorItem::BSeparatorItem(BMessage* data)
+	\brief Archive constructor.
+
+	\param data The message \a data to construct the separator item from.
+*/
+
+
+/*!
+	\fn BSeparatorItem::~BSeparatorItem()
+	\brief Destructor, does nothing.
+*/
+
+
+/*!
+	\fn status_t BSeparatorItem::Archive(BMessage* data, bool deep) const
+	\brief Archives the the BSeparatorItem object into the \a data message.
+
+	\param data A pointer to the BMessage to archive the object into.
+	\param deep This parameter has no effect for this class.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived successfully.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+*/
+
+
+/*!
+	\fn BArchivable* BSeparatorItem::Instantiate(BMessage* data)
+	\brief Creates a new BSeparatorItem object from an \a data message.
+
+	\return A newly created BSeparatorItem object or \c NULL if the message
+	        doesn't contain an archived BSeparatorItem.
+*/
+
+
+/*!
+	\fn void BSeparatorItem::SetEnabled(bool enable)
+	\brief Does nothing, this method is defined to override the default
+	       BMenuItem behavior.
+*/
+
+
+/*!
+	\fn void BSeparatorItem::GetContentSize(float* _width, float* _height)
+	\brief Fills out \a _width and \a _height with the content rectangle
+	       dimensions.
+
+	You only need to call this method if you're implementing your own
+	DrawContent() method to override how the contents of the separator
+	are drawn.
+
+	\param _width Filled out with the width of the content rectangle.
+	\param _height Filled out with the height of the content rectangle.
+
+	\sa ContentLocation()
+	\sa DrawContent()
+*/
+
+
+/*!
+	\fn void BSeparatorItem::Draw()
+	\brief Hook method used to draw the menu items.
+
+	This method is called by automatically by BMenu::Draw(). You should not need to
+	call this method yourself but you may want to override it in a derived class
+	to do something other than the default.
+
+	The default draws a light grey vertical line through the middle of the item.
+*/
