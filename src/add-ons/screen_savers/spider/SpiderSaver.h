@@ -1,16 +1,37 @@
 /*
- * Copyright 2007, Haiku Inc. All rights reserved.
+ * Copyright 2007-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
  */
 #ifndef SPIDER_SAVER_H
 #define SPIDER_SAVER_H
 
+
 #include <Locker.h>
 #include <ScreenSaver.h>
 #include <View.h>
+
+
+enum {
+	RED							= 1,
+	GREEN						= 2,
+	BLUE						= 3,
+	YELLOW						= 4,
+	PURPLE						= 5,
+	CYAN						= 6,
+	GRAY						= 7,
+};
+
+
+#define MIN_POLY_POINTS 3
+#define MAX_POLY_POINTS 10
+#define MIN_QUEUE_DEPTH 40
+#define MAX_QUEUE_DEPTH 160
+#define MAX_QUEUE_NUMBER 40
+
+
 
 class BSlider;
 class BMenuField;
@@ -18,8 +39,9 @@ class Polygon;
 class PolygonQueue;
 class SpiderView;
 
+
 class SpiderSaver : public BScreenSaver {
- public:
+public:
 								SpiderSaver(BMessage *message,
 											image_id image);
 	virtual						~SpiderSaver();
@@ -37,7 +59,7 @@ class SpiderSaver : public BScreenSaver {
 			void				SetPolyPoints(uint32 maxPoints);
 			void				SetColor(uint32 color);
 
- private:
+private:
 			void				_Init(BRect bounds);
 			void				_Cleanup();
 			void				_AllocBackBitmap(float width, float height);
@@ -45,42 +67,20 @@ class SpiderSaver : public BScreenSaver {
 			void				_DrawInto(BView *view);
 			void				_DrawPolygon(Polygon* polygon, BView *view);
 
-	BBitmap*					fBackBitmap;
-	BView*						fBackView;
+			BBitmap*			fBackBitmap;
+			BView*				fBackView;
 
-	PolygonQueue**				fQueues;
-	uint32						fQueueNumber;
-	uint32						fMaxPolyPoints;
-	uint32						fMaxQueueDepth;
-	uint32						fColor;
+			PolygonQueue**		fQueues;
+			uint32				fQueueNumber;
+			uint32				fMaxPolyPoints;
+			uint32				fMaxQueueDepth;
+			uint32				fColor;
 
-	bool						fPreview;
-	BRect						fBounds;
+			bool				fPreview;
+			BRect				fBounds;
 
-	BLocker						fLocker;
+			BLocker				fLocker;
 };
 
-class SpiderView : public BView {
- public:
-								SpiderView(BRect frame,
-										   SpiderSaver* saver,
-										   uint32 queueNumber,
-										   uint32 maxPolyPoints,
-										   uint32 maxQueueDepth,
-										   uint32 color);
-	virtual						~SpiderView();
-
-								// BView
-	virtual	void				AttachedToWindow();
-	virtual	void				MessageReceived(BMessage* message);
-
- private:
-			SpiderSaver*		fSaver;
-
-			BSlider*			fQueueNumberS;
-			BSlider*			fPolyNumberS;
-			BSlider*			fQueueDepthS;
-			BMenuField*			fColorMF;
-};
 
 #endif	//	SPIDER_SAVER_H
