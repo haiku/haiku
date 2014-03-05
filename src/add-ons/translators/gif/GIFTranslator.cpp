@@ -121,6 +121,7 @@ DetermineType(BPositionIO* source, bool* isGif)
 	*isGif = true;
 	if (source->Read(header, 6) != 6)
 		return false;
+
 	header[6] = 0x00;
 
 	if (strcmp((char*)header, "GIF87a") != 0
@@ -152,8 +153,8 @@ status_t
 GetBitmap(BPositionIO* in, BBitmap** out)
 {
 	TranslatorBitmap header;
-	status_t err = in->Read(&header, sizeof(header));
-	if (err != sizeof(header))
+	status_t result = in->Read(&header, sizeof(header));
+	if (result != sizeof(header))
 		return B_IO_ERROR;
 
 	header.magic = B_BENDIAN_TO_HOST_INT32(header.magic);
@@ -166,24 +167,19 @@ GetBitmap(BPositionIO* in, BBitmap** out)
 	header.dataSize = B_BENDIAN_TO_HOST_INT32(header.dataSize);
 
 	// dump data from stream into a BBitmap
-	BBitmap* bitmap = new BBitmap(header.bounds, header.colors);
-	*out = bitmap;
-	if (bitmap == NULL)
-		return B_NO_MEMORY;
-
-	unsigned char* bits = (unsigned char*)bitmap->Bits();
-	if (bits == NULL) {
-		delete bitmap;
+	*out = new BBitmap(header.bounds, header.colors);
+	if (!(*out)->IsValid()) {
+		delete *out;
 		return B_NO_MEMORY;
 	}
 
-	err = in->Read(bits, header.dataSize);
-	if (err == (status_t)header.dataSize)
-		return B_OK;
-	else {
-		delete bitmap;
+	result = in->Read((*out)->Bits(), header.dataSize);
+	if (result != (status_t)header.dataSize) {
+		delete *out;
 		return B_IO_ERROR;
 	}
+
+	return B_OK;
 }
 
 
@@ -256,15 +252,15 @@ GIFTranslator::DerivedTranslate(BPositionIO* inSource,
 	if (!isGif && inInfo->type != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
 
-	status_t err = B_OK;
+	status_t result = B_OK;
 	bigtime_t now = system_time();
 
 	if (!isGif) {
 		// BBitmap to GIF
 		BBitmap* bitmap;
-		err = GetBitmap(inSource, &bitmap);
-		if (err != B_OK)
-			return err;
+		result = GetBitmap(inSource, &bitmap);
+		if (result != B_OK)
+			return result;
 
 		GIFSave* gifSave = new GIFSave(bitmap, outDestination, fSettings);
 		if (gifSave->fatalerror) {
