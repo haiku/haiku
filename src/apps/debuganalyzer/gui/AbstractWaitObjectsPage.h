@@ -13,6 +13,7 @@
 #include <CheckBox.h>
 #include <GroupView.h>
 
+#include "model/Model.h"
 #include "table/TableColumns.h"
 #include "table/TreeTable.h"
 
