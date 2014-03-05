@@ -167,7 +167,10 @@ GetBitmap(BPositionIO* in, BBitmap** out)
 	header.dataSize = B_BENDIAN_TO_HOST_INT32(header.dataSize);
 
 	// dump data from stream into a BBitmap
-	*out = new BBitmap(header.bounds, header.colors);
+	*out = new(std::nothrow) BBitmap(header.bounds, header.colors);
+	if (*out == NULL)
+		return B_NO_MEMORY;
+
 	if (!(*out)->IsValid()) {
 		delete *out;
 		return B_NO_MEMORY;
