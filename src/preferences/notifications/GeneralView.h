@@ -9,7 +9,6 @@
 #include "SettingsPane.h"
 
 class BCheckBox;
-class BButton;
 class BStringView;
 class BTextControl;
 
@@ -26,8 +25,7 @@ public:
 			status_t		Revert();
 
 private:
-		BButton*			fServerButton;
-		BStringView*		fStatusLabel;
+		BCheckBox*			fNotificationBox;
 		BCheckBox*			fAutoStart;
 		BTextControl*		fTimeout;
 		BCheckBox*			fHideAll;

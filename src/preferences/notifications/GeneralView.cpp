@@ -39,36 +39,16 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "GeneralView"
-const int32 kServer = '_TSR';
-
-const char* kStartServer = B_TRANSLATE("Enable notifications");
-const char* kStopServer = B_TRANSLATE("Disable notifications");
-const char* kStarted = B_TRANSLATE("Events are notified");
-const char* kStopped = B_TRANSLATE("Events are not notified");
-
+const int32 kToggleNotifications = '_TSR';
 
 GeneralView::GeneralView(SettingsHost* host)
 	:
 	SettingsPane("general", host)
 {
-	BFont statusFont;
-
-	// Set a smaller font for the status label
-	statusFont.SetSize(be_plain_font->Size() * 0.8);
-
-	// Status button and label
-	fServerButton = new BButton("server", kStartServer, new BMessage(kServer));
-	fStatusLabel = new BStringView("status", kStopped);
-	fStatusLabel->SetFont(&statusFont);
-
-	// Update status label and server button
-	if (_IsServerRunning()) {
-		fServerButton->SetLabel(kStopServer);
-		fStatusLabel->SetText(kStarted);
-	} else {
-		fServerButton->SetLabel(kStartServer);
-		fStatusLabel->SetText(kStopped);
-	}
+	// Notifications
+	fNotificationBox = new BCheckBox("server",
+		B_TRANSLATE("Enable notifications"),
+		new BMessage(kToggleNotifications));
 
 	// Autostart
 	fAutoStart = new BCheckBox("autostart",
@@ -93,8 +73,7 @@ GeneralView::GeneralView(SettingsHost* host)
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, inset)
 		.AddGroup(B_HORIZONTAL, inset)
-			.Add(fServerButton)
-			.Add(fStatusLabel)
+			.Add(fNotificationBox)
 			.AddGlue()
 		.End()
 
@@ -116,7 +95,7 @@ GeneralView::GeneralView(SettingsHost* host)
 void
 GeneralView::AttachedToWindow()
 {
-	fServerButton->SetTarget(this);
+	fNotificationBox->SetTarget(this);
 	fAutoStart->SetTarget(this);
 	fTimeout->SetTarget(this);
 }
@@ -126,7 +105,7 @@ void
 GeneralView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-		case kServer: {
+		case kToggleNotifications: {
 				entry_ref ref;
 
 				// Check if server is available
@@ -141,7 +120,7 @@ GeneralView::MessageReceived(BMessage* msg)
 					return;
 				}
 
-				if (_IsServerRunning()) {
+				if (fNotificationBox->Value() == B_CONTROL_OFF) {
 					// Server team
 					team_id team = be_roster->TeamFor(kNotificationServerSignature);
 
@@ -170,10 +149,7 @@ GeneralView::MessageReceived(BMessage* msg)
 						(void)alert->Go();
 						return;
 					}
-
-					fServerButton->SetLabel(kStartServer);
-					fStatusLabel->SetText(kStopped);
-				} else {
+				} else if(!_IsServerRunning()){
 					// Start server
 					status_t err = be_roster->Launch(kNotificationServerSignature);
 					if (err != B_OK) {
@@ -188,9 +164,6 @@ GeneralView::MessageReceived(BMessage* msg)
 						(void)alert->Go();
 						return;
 					}
-
-					fServerButton->SetLabel(kStopServer);
-					fStatusLabel->SetText(kStarted);
 				}
 			} break;
 		case kSettingChanged:
@@ -230,6 +203,8 @@ GeneralView::Load()
 	settings.Unflatten(&file);
 
 	char buffer[255];
+
+	fNotificationBox->SetValue(_IsServerRunning() ? B_CONTROL_ON : B_CONTROL_OFF);
 
 	bool autoStart;
 	if (settings.FindBool(kAutoStartName, &autoStart) != B_OK)
