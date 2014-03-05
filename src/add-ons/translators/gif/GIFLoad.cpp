@@ -18,13 +18,13 @@
 
 #include "GIFLoad.h"
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <syslog.h>
 
 #include <ByteOrder.h>
-#include <TranslatorFormats.h>
 #include <InterfaceDefs.h>
+#include <TranslatorFormats.h>
 
 #include "GIFPrivate.h"
 

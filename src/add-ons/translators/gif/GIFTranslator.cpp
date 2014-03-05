@@ -28,13 +28,13 @@
 #include <Catalog.h>
 #include <DataIO.h>
 #include <InterfaceDefs.h>
-#include <TypeConstants.h>
 #include <TranslatorAddOn.h>
 #include <TranslatorFormats.h>
+#include <TypeConstants.h>
 
-#include "GIFView.h"
-#include "GIFSave.h"
 #include "GIFLoad.h"
+#include "GIFSave.h"
+#include "GIFView.h"
 #include "TranslatorWindow.h"
 
 
