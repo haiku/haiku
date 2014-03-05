@@ -76,8 +76,8 @@ struct RefreshWorkerParameters {
 		:
 		window(window),
 		forceRefresh(forceRefresh)
-		{
-		}
+	{
+	}
 };
 
 
@@ -141,14 +141,11 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 MainWindow::~MainWindow()
 {
 	fTerminating = true;
-	if (fModelWorker > 0) {
-		status_t result;
-		wait_for_thread(fModelWorker, &result);
-	}
+	if (fModelWorker > 0)
+		wait_for_thread(fModelWorker, NULL);
 
 	delete_sem(fPendingActionsSem);
-	status_t result;
-	wait_for_thread(fPendingActionsWorker, &result);
+	wait_for_thread(fPendingActionsWorker, NULL);
 }
 
 
@@ -189,7 +186,7 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_SHOW_SOURCE_PACKAGES:
 			{
-				BAutolock _(fModel.Lock());
+				BAutolock locker(fModel.Lock());
 				fModel.SetShowSourcePackages(!fModel.ShowSourcePackages());
 			}
 			_AdoptModel();
@@ -197,7 +194,7 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_SHOW_DEVELOP_PACKAGES:
 			{
-				BAutolock _(fModel.Lock());
+				BAutolock locker(fModel.Lock());
 				fModel.SetShowDevelopPackages(!fModel.ShowDevelopPackages());
 			}
 			_AdoptModel();
@@ -256,7 +253,7 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_PACKAGE_STATE_CHANGED:
 		{
 			PackageInfo* info;
-			if (message->FindPointer("package", (void **)&info) == B_OK) {
+			if (message->FindPointer("package", (void**)&info) == B_OK) {
 				PackageInfoRef ref(info, true);
 				fModel.SetPackageState(ref, ref->State());
 			}
@@ -314,9 +311,8 @@ MainWindow::SchedulePackageActions(PackageActionList& list)
 {
 	AutoLocker<BLocker> lock(&fPendingActionsLock);
 	for (int32 i = 0; i < list.CountItems(); i++) {
-		if (!fPendingActions.Add(list.ItemAtFast(i))) {
+		if (!fPendingActions.Add(list.ItemAtFast(i)))
 			return B_NO_MEMORY;
-		}
 	}
 
 	return release_sem_etc(fPendingActionsSem, list.CountItems(), 0);
@@ -339,14 +335,13 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 	menuBar->AddItem(menu);
 
 	menu = new BMenu(B_TRANSLATE("Options"));
-	
+
 	fShowDevelopPackagesItem = new BMenuItem(
 		B_TRANSLATE("Show develop packages"),
 		new BMessage(MSG_SHOW_DEVELOP_PACKAGES));
 	menu->AddItem(fShowDevelopPackagesItem);
 
-	fShowSourcePackagesItem = new BMenuItem(
-		B_TRANSLATE("Show source packages"),
+	fShowSourcePackagesItem = new BMenuItem(B_TRANSLATE("Show source packages"),
 		new BMessage(MSG_SHOW_SOURCE_PACKAGES));
 	menu->AddItem(fShowSourcePackagesItem);
 
@@ -361,11 +356,11 @@ MainWindow::_AdoptModel()
 
 	fPackageListView->Clear();
 	for (int32 i = 0; i < fVisiblePackages.CountItems(); i++) {
-		BAutolock _(fModel.Lock());
+		BAutolock locker(fModel.Lock());
 		fPackageListView->AddPackage(fVisiblePackages.ItemAtFast(i));
 	}
 
-	BAutolock _(fModel.Lock());
+	BAutolock locker(fModel.Lock());
 	fShowSourcePackagesItem->SetMarked(fModel.ShowSourcePackages());
 	fShowDevelopPackagesItem->SetMarked(fModel.ShowDevelopPackages());
 }
@@ -377,7 +372,7 @@ MainWindow::_AdoptPackage(const PackageInfoRef& package)
 	fPackageInfoView->SetPackage(package);
 	fModel.PopulatePackage(package,
 		Model::POPULATE_USER_RATINGS | Model::POPULATE_SCREEN_SHOTS
-		| Model::POPULATE_CHANGELOG | Model::POPULATE_CATEGORIES);
+			| Model::POPULATE_CHANGELOG | Model::POPULATE_CATEGORIES);
 }
 
 
@@ -412,8 +407,7 @@ MainWindow::_RefreshRepositories(bool force)
 			continue;
 		}
 
-		if (roster.GetRepositoryCache(repoName, &cache) != B_OK
-			|| force) {
+		if (roster.GetRepositoryCache(repoName, &cache) != B_OK || force) {
 			try {
 				BRefreshRepositoryRequest refreshRequest(context, repoConfig);
 
@@ -508,13 +502,16 @@ MainWindow::_RefreshPackageList()
 		if (it != foundPackages.end())
 			modelInfo.SetTo(it->second);
 		else {
+			// Add new package info
 			BString publisherURL;
 			if (repoPackageInfo.URLList().CountStrings() > 0)
 				publisherURL = repoPackageInfo.URLList().StringAt(0);
-			const BStringList& rightsList = repoPackageInfo.CopyrightList();
+
 			BString publisherName = repoPackageInfo.Vendor();
+			const BStringList& rightsList = repoPackageInfo.CopyrightList();
 			if (rightsList.CountStrings() > 0)
 				publisherName = rightsList.StringAt(0);
+
 			modelInfo.SetTo(new(std::nothrow) PackageInfo(
 					repoPackageInfo.Name(),
 					repoPackageInfo.Version().ToString(),
@@ -565,7 +562,7 @@ MainWindow::_RefreshPackageList()
 	// any packages remaining will be locally installed packages
 	// that weren't acquired from a repository
 	for (PackageInfoMap::iterator it = remotePackages.begin();
-		it != remotePackages.end(); ++it) {
+			it != remotePackages.end(); it++) {
 		foundPackages.erase(it->first);
 	}
 
@@ -574,13 +571,12 @@ MainWindow::_RefreshPackageList()
 		depots[repoName] = DepotInfo(repoName);
 		DepotInfoMap::iterator depot = depots.find(repoName);
 		for (PackageInfoMap::iterator it = foundPackages.begin();
-			it != foundPackages.end(); ++it) {
+				it != foundPackages.end(); ++it) {
 			depot->second.AddPackage(it->second);
 		}
 	}
 
-	for (DepotInfoMap::iterator it = depots.begin(); it != depots.end();
-		++it) {
+	for (DepotInfoMap::iterator it = depots.begin(); it != depots.end(); it++) {
 		fModel.AddDepot(it->second);
 	}
 
@@ -596,8 +592,8 @@ MainWindow::_RefreshPackageList()
 		BPath systemPath;
 		error = find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &systemPath);
 		if (error != B_OK) {
-			throw BFatalErrorException(error, "Unable to retrieve system "
-				"packages directory.");
+			throw BFatalErrorException(error,
+				"Unable to retrieve system packages directory.");
 		}
 
 		// add the "installed" repository with the given packages
@@ -619,7 +615,7 @@ MainWindow::_RefreshPackageList()
 			BRepositoryBuilder systemRepositoryBuilder(systemRepository,
 				"system");
 			for (PackageInfoMap::iterator it = systemInstalledPackages.begin();
-				it != systemInstalledPackages.end(); ++it) {
+					it != systemInstalledPackages.end(); it++) {
 				BPath packagePath(systemPath);
 				packagePath.Append(it->first);
 				systemRepositoryBuilder.AddPackage(packagePath.Path());
@@ -742,4 +738,3 @@ MainWindow::_NotifyUser(const char* title, const char* message)
 	if (alert != NULL)
 		alert->Go();
 }
-
