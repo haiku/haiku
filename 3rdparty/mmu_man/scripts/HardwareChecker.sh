@@ -1,7 +1,7 @@
 #!/bin/sh
 #	HardwareChecker.sh for Haiku
 #
-#	Copyright 2011, François Revol <revol@free.fr>.
+#	Copyright 2011-2014, François Revol <revol@free.fr>.
 #
 #	Distributed under the MIT License
 #
@@ -12,6 +12,7 @@
 netcat=netcat
 report_site=fake.haikuware.com
 report_cgi=http://haikuware.com/hwreport.php
+packages="dmidecode"
 
 do_notify ()
 {
@@ -22,10 +23,19 @@ do_notify ()
 	notify --type progress \
 		--messageID hwck_$$ \
 		--icon /system/apps/Devices \
-		--app HardwareChecker \
+		--group HardwareChecker \
 		--title "progress:" --progress "$p" "$m" "$@"
 	
 	
+}
+
+try_install_packages ()
+{
+	which pkgman >/dev/null 2>&1 || return
+
+	for p in $packages; do
+		pkgman install "$p" || alert "Unable to install package '$p'" "Ok"
+	done
 }
 
 start_fake_httpd ()
@@ -35,7 +45,7 @@ start_fake_httpd ()
 	report_ack="<html><head></head><body><h1>Done! You can close this window now.</h1></body></html>"
 	report_cgi=http://127.0.0.1:$report_port/hwreport
 	(
-		# force a previous isntance to close
+		# force a previous instance to close
 		$netcat 127.0.0.1 8989 < /dev/null > /dev/null
 		echo "listening on port $report_port"
 		#
@@ -273,10 +283,16 @@ check_utils ()
 	ifconfig
 	echo "</textarea>"
 
-	echo "<h3><tt>installoptionalpackage -l</tt></h3>"
+	echo "<h3><tt>pkgman list-repos</tt></h3>"
+	echo "<i>(list of configured package repositories)</i><br />"
+	echo "<textarea style='font-family: monospace' rows='10' cols='80' name='pkgman_list_repos_output' id='pkgman_list_repos_output' readonly='readonly'>"
+	pkgman list-repos
+	echo "</textarea>"
+
+	echo "<h3><tt>pkgman search -a</tt></h3>"
 	echo "<i>(list of installed packaged)</i><br />"
-	echo "<textarea style='font-family: monospace' rows='10' cols='80' name='installoptpkg_l_output' id='installoptpkg_l_output' readonly='readonly'>"
-	installoptionalpackage -l
+	echo "<textarea style='font-family: monospace' rows='10' cols='80' name='pkgman_search_a_output' id='pkgman_search_a_output' readonly='readonly'>"
+	pkgman search -a
 	echo "</textarea>"
 
 	echo "<br />"
@@ -359,6 +375,9 @@ tf=/tmp/hw_checker_$$.html
 
 do_notify 0.0 "Checking for network..."
 detect_network
+
+do_notify 0.0 "Checking for needed packages..."
+try_install_packages
 
 check_all > "$tf"
 
