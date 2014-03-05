@@ -706,9 +706,13 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 				return;
 			}
 		} else if (bytes[0] == B_ESCAPE) {
-			// Default escape key behavior:
-			PostMessage(STOP);
-			return;
+			if (modifierKeys == B_COMMAND_KEY)
+				_ShowInterface(true);
+			else {
+				// Default escape key behavior:
+				PostMessage(STOP);
+				return;
+			}
 		}
 	}
 
@@ -1113,7 +1117,6 @@ BrowserWindow::MenusBeginning()
 {
 	_UpdateHistoryMenu();
 	_UpdateClipboardItems();
-	_ShowInterface(true);
 }
 
 
