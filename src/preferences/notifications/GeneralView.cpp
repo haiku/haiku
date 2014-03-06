@@ -62,7 +62,8 @@ GeneralView::GeneralView(SettingsHost* host)
 		B_TRANSLATE("seconds of inactivity"));
 
 	// Default position
-	// TODO: Here will come a screen representation with the four corners clickable
+	// TODO: Here will come a screen representation with the four corners 
+	// clickable
 
 	// Load settings
 	Load();
@@ -105,67 +106,69 @@ void
 GeneralView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-		case kToggleNotifications: {
-				entry_ref ref;
+		case kToggleNotifications:
+		{
+			entry_ref ref;
 
-				// Check if server is available
-				if (!_CanFindServer(&ref)) {
-					BAlert* alert = new BAlert(B_TRANSLATE("Notifications"),
-						B_TRANSLATE("The notifications server cannot be"
-						" found, this means your InfoPopper installation was"
-						" not successfully completed."), B_TRANSLATE("OK"),
-						NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			// Check if server is available
+			if (!_CanFindServer(&ref)) {
+				BAlert* alert = new BAlert(B_TRANSLATE("Notifications"),
+					B_TRANSLATE("The notifications server cannot be"
+					" found, this means your InfoPopper installation was"
+					" not successfully completed."), B_TRANSLATE("OK"),
+					NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+				(void)alert->Go();
+				return;
+			}
+
+			if (fNotificationBox->Value() == B_CONTROL_OFF) {
+				// Server team
+				team_id team = be_roster->TeamFor(kNotificationServerSignature);
+
+				// Establish a connection to infopopper_server
+				status_t ret = B_ERROR;
+				BMessenger messenger(kNotificationServerSignature, team, &ret);
+				if (ret != B_OK) {
+					BAlert* alert = new BAlert(B_TRANSLATE(
+						"Notifications"), B_TRANSLATE("Notifications "
+						"cannot be stopped, because the server can't be"
+						" reached."), B_TRANSLATE("OK"), NULL, NULL,
+						B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					(void)alert->Go();
 					return;
 				}
 
-				if (fNotificationBox->Value() == B_CONTROL_OFF) {
-					// Server team
-					team_id team = be_roster->TeamFor(kNotificationServerSignature);
-
-					// Establish a connection to infopopper_server
-					status_t ret = B_ERROR;
-					BMessenger messenger(kNotificationServerSignature, team, &ret);
-					if (ret != B_OK) {
-						BAlert* alert = new BAlert(B_TRANSLATE(
-							"Notifications"), B_TRANSLATE("Notifications "
-							"cannot be stopped, because the server can't be"
-							" reached."), B_TRANSLATE("OK"), NULL, NULL,
-							B_WIDTH_AS_USUAL, B_STOP_ALERT);
-						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-						(void)alert->Go();
-						return;
-					}
-
-					// Send quit message
-					if (messenger.SendMessage(new BMessage(B_QUIT_REQUESTED)) != B_OK) {
-						BAlert* alert = new BAlert(B_TRANSLATE(
-							"Notifications"), B_TRANSLATE("Cannot disable"
-							" notifications because the server can't be "
-							"reached."), B_TRANSLATE("OK"),
-							NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-						(void)alert->Go();
-						return;
-					}
-				} else if(!_IsServerRunning()){
-					// Start server
-					status_t err = be_roster->Launch(kNotificationServerSignature);
-					if (err != B_OK) {
-						BAlert* alert = new BAlert(B_TRANSLATE(
-							"Notifications"), B_TRANSLATE("Cannot enable"
-							" notifications because the server cannot be "
-							"found.\nThis means your InfoPopper installation"
-							" was not successfully completed."),
-							B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-							B_STOP_ALERT);
-						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-						(void)alert->Go();
-						return;
-					}
+				// Send quit message
+				if (messenger.SendMessage(B_QUIT_REQUESTED) != B_OK) {
+					BAlert* alert = new BAlert(B_TRANSLATE(
+						"Notifications"), B_TRANSLATE("Cannot disable"
+						" notifications because the server can't be "
+						"reached."), B_TRANSLATE("OK"),
+						NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					(void)alert->Go();
+					return;
 				}
-			} break;
+			} else if (!_IsServerRunning()) {
+				// Start server
+				status_t err = be_roster->Launch(kNotificationServerSignature);
+				if (err != B_OK) {
+					BAlert* alert = new BAlert(B_TRANSLATE(
+						"Notifications"), B_TRANSLATE("Cannot enable"
+						" notifications because the server cannot be "
+						"found.\nThis means your InfoPopper installation"
+						" was not successfully completed."),
+						B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
+						B_STOP_ALERT);
+					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+					(void)alert->Go();
+					return;
+				}
+			}
+			break;
+		} 
 		case kSettingChanged:
 			SettingsPane::MessageReceived(msg);
 			break;
