@@ -344,7 +344,8 @@ GIFLoad::ReadGIFImageData()
 {
 	unsigned char newEntry[ENTRY_COUNT];
 	unsigned char codeSize;
-	fInput->Read(&codeSize, 1);
+	if (fInput->Read(&codeSize, 1) < 1)
+		return false;
 
 	if (codeSize > fPalette->size_in_bits) {
 		if (debug) {
