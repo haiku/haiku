@@ -250,7 +250,7 @@ GIFSave::WriteGIFHeader()
 	header[9] = (height & 0xff00) >> 8;
 	header[10] = 0xf0 | (palette->SizeInBits() - 1);
 	header[11] = palette->BackgroundIndex();
-	if (output->Write(header, 13) < 0)
+	if (output->Write(header, 13) < 13)
 		return B_IO_ERROR;
 
 	// global palette
@@ -261,7 +261,7 @@ GIFSave::WriteGIFHeader()
 		return B_NO_MEMORY;
 
 	palette->GetColors(buffer, size);
-	if (output->Write(buffer, size) < 0) {
+	if (output->Write(buffer, size) < size) {
 		delete[] buffer;
 		return B_IO_ERROR;
 	}
@@ -282,7 +282,7 @@ GIFSave::WriteGIFControlBlock()
 		b[3] = b[3] | 1;
 		b[6] = palette->TransparentIndex();
 	}
-	return output->Write(b, 8) < 0 ? B_IO_ERROR : B_OK;
+	return output->Write(b, 8) < 8 ? B_IO_ERROR : B_OK;
 }
 
 
@@ -304,7 +304,7 @@ GIFSave::WriteGIFImageHeader()
 	else
 		header[9] = BLOCK_TERMINATOR;
 
-	return output->Write(header, 10) < 0 ? B_IO_ERROR : B_OK;
+	return output->Write(header, 10) < 10 ? B_IO_ERROR : B_OK;
 }
 
 
@@ -336,7 +336,7 @@ GIFSave::WriteGIFImageData()
 
 	ResetHashtable();
 
-	if (output->Write(&code_size, 1) < 0) {
+	if (output->Write(&code_size, 1) < 1) {
 		free(code_value);
 		free(prefix_code);
 		free(append_char);
@@ -424,7 +424,7 @@ GIFSave::WriteGIFImageData()
 	}
 
 	char t = BLOCK_TERMINATOR;
-	if (output->Write(&t, 1) < 0) {
+	if (output->Write(&t, 1) < 1) {
 		free(code_value);
 		free(prefix_code);
 		free(append_char);
@@ -454,7 +454,7 @@ GIFSave::OutputCode(short code, int BITS, bool flush)
 		}
 		if (byte_count >= 255) {
 			byte_buffer[0] = 255;
-			if (output->Write(byte_buffer, 256) < 0)
+			if (output->Write(byte_buffer, 256) < 256)
 				return B_IO_ERROR;
 
 			if (byte_count == 256) {
@@ -474,7 +474,7 @@ GIFSave::OutputCode(short code, int BITS, bool flush)
 		}
 		if (byte_count > 0) {
 			byte_buffer[0] = (unsigned char)byte_count;
-			if (output->Write(byte_buffer, byte_count + 1) < 0)
+			if (output->Write(byte_buffer, byte_count + 1) < byte_count + 1)
 				return B_IO_ERROR;
 		}
 	}
