@@ -193,13 +193,13 @@ GIFView::GIFView(TranslatorSettings* settings)
 GIFView::~GIFView()
 {
 	fSettings->Release();
+
 	delete fTitle;
 	delete fVersion;
 	delete fCopyright;
 	delete fPaletteMF;
 	delete fColorCountMF;
 	delete fDitheringBox;
-	delete fInterlacedBox;
 	delete fInterlacedBox;
 	delete fTransparentBox;
 }
