@@ -43,12 +43,16 @@
 const BRect kRectView(110, 110, 339, 339);
 
 
-class BMenuField;
-class BPopUpMenu;
-class BMenuItem;
+class BBox;
 class BCheckBox;
+class BPopUpMenu;
+class BMenuField;
+class BMenuItem;
 class BRadioButton;
+class BStringView;
 class BTextControl;
+
+
 
 class GIFView : public BView {
 public:
@@ -63,6 +67,10 @@ private:
 			int					CheckInput(BTextControl* control);
 
 			TranslatorSettings*	fSettings;
+
+			BStringView*		fTitle;
+			BStringView*		fVersion;
+			BStringView*		fCopyright;
 
 			BMenuField*			fPaletteMF;
 			BPopUpMenu*			fPaletteM;
@@ -83,9 +91,13 @@ private:
 			BRadioButton*		fUseTransparentAutoRB;
 			BRadioButton*		fUseTransparentColorRB;
 
-			BTextControl*		fTransparentRedTC;
-			BTextControl*		fTransparentGreenTC;
-			BTextControl*		fTransparentBlueTC;
+			BBox*				fDitheringBox;
+			BBox*				fInterlacedBox;
+			BBox*				fTransparentBox;
+
+			BTextControl*		fRedTextControl;
+			BTextControl*		fGreenTextControl;
+			BTextControl*		fBlueTextControl;
 };
 
 

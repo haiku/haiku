@@ -23,10 +23,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Box.h>
 #include <Catalog.h>
-#include <InterfaceKit.h>
+#include <CheckBox.h>
 #include <LayoutBuilder.h>
+#include <MenuField.h>
+#include <MenuItem.h>
+#include <PopUpMenu.h>
+#include <RadioButton.h>
+#include <SpaceLayoutItem.h>
+#include <StringView.h>
 #include <String.h>
+#include <TextControl.h>
 
 #include "GIFTranslator.h"
 #include "SavePalette.h"
@@ -37,15 +45,14 @@
 
 
 GIFView::GIFView(TranslatorSettings* settings)
-	: 
+	:
 	BView("GIFView", B_WILL_DRAW),
 	fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BStringView* title = new BStringView("Title",
-		B_TRANSLATE("GIF image translator"));
-	title->SetFont(be_bold_font);
+	fTitle = new BStringView("Title", B_TRANSLATE("GIF image translator"));
+	fTitle->SetFont(be_bold_font);
 
 	char version_string[100];
 	snprintf(version_string, sizeof(version_string),
@@ -54,12 +61,11 @@ GIFView::GIFView(TranslatorSettings* settings)
 		int(B_TRANSLATION_MINOR_VERSION(GIF_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(GIF_TRANSLATOR_VERSION)),
 		__DATE__);
-
-	BStringView* version = new BStringView("Version", version_string);
+	fVersion = new BStringView("Version", version_string);
 
 	const char* copyrightString
 		= "©2003 Daniel Switkin, software@switkin.com";
-	BStringView* copyright = new BStringView("Copyright", copyrightString);
+	fCopyright = new BStringView("Copyright", copyrightString);
 
 	// menu fields (Palette & Colors)
 	fWebSafeMI = new BMenuItem(B_TRANSLATE("Websafe"),
@@ -91,15 +97,21 @@ GIFView::GIFView(TranslatorSettings* settings)
 	}
 	fColorCount256MI = fColorCountMI[7];
 
-	fPaletteMF = new BMenuField(B_TRANSLATE("Palette"), fPaletteM);
-	fColorCountMF = new BMenuField(B_TRANSLATE("Colors"), fColorCountM);
+	fPaletteMF = new BMenuField(B_TRANSLATE("Palette:"), fPaletteM);
+	fPaletteMF->SetAlignment(B_ALIGN_RIGHT);
+	fColorCountMF = new BMenuField(B_TRANSLATE("Colors:"), fColorCountM);
+	fColorCountMF->SetAlignment(B_ALIGN_RIGHT);
 
 	// check boxes
 	fUseDitheringCB = new BCheckBox(B_TRANSLATE("Use dithering"),
 		new BMessage(GV_USE_DITHERING));
+	fDitheringBox = new BBox("dithering", B_WILL_DRAW, B_NO_BORDER);
+	fDitheringBox->SetLabel(fUseDitheringCB);
 
 	fInterlacedCB = new BCheckBox(B_TRANSLATE("Write interlaced images"),
 		new BMessage(GV_INTERLACED));
+	fInterlacedBox = new BBox("interlaced", B_WILL_DRAW, B_NO_BORDER);
+	fInterlacedBox->SetLabel(fInterlacedCB);
 
 	fUseTransparentCB = new BCheckBox(B_TRANSLATE("Write transparent images"),
 		new BMessage(GV_USE_TRANSPARENT));
@@ -112,55 +124,62 @@ GIFView::GIFView(TranslatorSettings* settings)
 	fUseTransparentColorRB = new BRadioButton(B_TRANSLATE("Use RGB color"),
 		new BMessage(GV_USE_TRANSPARENT_COLOR));
 
-	fTransparentRedTC = new BTextControl("", "0",
+	// text controls
+	fRedTextControl = new BTextControl("", "0",
 		new BMessage(GV_TRANSPARENT_RED));
-	fTransparentGreenTC = new BTextControl("", "0",
+	fGreenTextControl = new BTextControl("", "0",
 		new BMessage(GV_TRANSPARENT_GREEN));
-	fTransparentBlueTC = new BTextControl("", "0",
+	fBlueTextControl = new BTextControl("", "0",
 		new BMessage(GV_TRANSPARENT_BLUE));
 
-	BTextView* tr = fTransparentRedTC->TextView();
-	BTextView* tg = fTransparentGreenTC->TextView();
-	BTextView* tb = fTransparentBlueTC->TextView();
+	fTransparentBox = new BBox(B_FANCY_BORDER,
+		BLayoutBuilder::Grid<>(3.0f, 5.0f)
+			.Add(fUseTransparentAutoRB, 0, 0, 4, 1)
+			.Add(fUseTransparentColorRB, 0, 1)
+			.Add(fRedTextControl, 1, 1)
+			.Add(fGreenTextControl, 2, 1)
+			.Add(fBlueTextControl, 3, 1)
+			.SetInsets(10.0f, 6.0f, 10.0f, 10.0f)
+			.View());
+	fTransparentBox->SetLabel(fUseTransparentCB);
+
+	BTextView* redTextView = fRedTextControl->TextView();
+	BTextView* greenTextView = fGreenTextControl->TextView();
+	BTextView* bluetextView = fBlueTextControl->TextView();
 
 	for (uint32 x = 0; x < 256; x++) {
 		if (x < '0' || x > '9') {
-			tr->DisallowChar(x);
-			tg->DisallowChar(x);
-			tb->DisallowChar(x);
+			redTextView->DisallowChar(x);
+			greenTextView->DisallowChar(x);
+			bluetextView->DisallowChar(x);
 		}
 	}
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
-		.SetInsets(5)
-		.AddGrid(10, 10)
-			.Add(title, 0, 0)
-			.Add(version, 1, 0)
-		.End()
-		.Add(copyright)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 10.0f)
+		.SetInsets(10.0f)
+		.AddGrid(10.0f, 5.0f)
+			.Add(fTitle, 0, 0)
+			.Add(fVersion, 1, 0)
+			.Add(fCopyright, 0, 1, 2, 1)
+			.End()
 		.AddGlue()
 
-		.AddGrid(10, 10)
+		.AddGrid(10.0f, 5.0f)
 			.Add(fPaletteMF->CreateLabelLayoutItem(), 0, 0)
 			.Add(fPaletteMF->CreateMenuBarLayoutItem(), 1, 0)
 
 			.Add(fColorCountMF->CreateLabelLayoutItem(), 0, 1)
 			.Add(fColorCountMF->CreateMenuBarLayoutItem(), 1, 1)
-		.End()
+
+			.Add(BSpaceLayoutItem::CreateHorizontalStrut(10.0f), 1, 2)
+
+			.Add(fDitheringBox, 1, 3)
+			.Add(fInterlacedBox, 1, 4)
+			.Add(fTransparentBox, 1, 5)
+
+			.End()
 		.AddGlue()
-
-		.Add(fUseDitheringCB)
-		.Add(fInterlacedCB)
-		.Add(fUseTransparentCB)
-
-		.Add(fUseTransparentAutoRB)
-		.AddGrid(10, 10)
-			.Add(fUseTransparentColorRB, 0, 0)
-			.Add(fTransparentRedTC, 1, 0)
-			.Add(fTransparentGreenTC, 2, 0)
-			.Add(fTransparentBlueTC, 3, 0)
-		.End()
-		.AddGlue();
+		.End();
 
 	BFont font;
 	GetFont(&font);
@@ -174,6 +193,15 @@ GIFView::GIFView(TranslatorSettings* settings)
 GIFView::~GIFView()
 {
 	fSettings->Release();
+	delete fTitle;
+	delete fVersion;
+	delete fCopyright;
+	delete fPaletteMF;
+	delete fColorCountMF;
+	delete fDitheringBox;
+	delete fInterlacedBox;
+	delete fInterlacedBox;
+	delete fTransparentBox;
 }
 
 
@@ -225,7 +253,7 @@ GIFView::RestorePrefs()
 
 	fInterlacedCB->SetValue(fSettings->SetGetBool(GIF_SETTING_INTERLACED));
 
-	if (fGreyScaleMI->IsMarked()) 
+	if (fGreyScaleMI->IsMarked())
 		fUseDitheringCB->SetValue(false);
 	else {
 		fUseDitheringCB->SetValue(
@@ -240,30 +268,30 @@ GIFView::RestorePrefs()
 	if (fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT)) {
 		fUseTransparentAutoRB->SetEnabled(true);
 		fUseTransparentColorRB->SetEnabled(true);
-		fTransparentRedTC->SetEnabled(
+		fRedTextControl->SetEnabled(
 			!fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO));
-		fTransparentGreenTC->SetEnabled(
+		fGreenTextControl->SetEnabled(
 			!fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO));
-		fTransparentBlueTC->SetEnabled(
+		fBlueTextControl->SetEnabled(
 			!fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO));
 	} else {
 		fUseTransparentAutoRB->SetEnabled(false);
 		fUseTransparentColorRB->SetEnabled(false);
-		fTransparentRedTC->SetEnabled(false);
-		fTransparentGreenTC->SetEnabled(false);
-		fTransparentBlueTC->SetEnabled(false);
+		fRedTextControl->SetEnabled(false);
+		fGreenTextControl->SetEnabled(false);
+		fBlueTextControl->SetEnabled(false);
 	}
 
 	char temp[4];
 	sprintf(temp, "%d",
 		(int)fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED));
-	fTransparentRedTC->SetText(temp);
+	fRedTextControl->SetText(temp);
 	sprintf(temp, "%d",
 		(int)fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN));
-	fTransparentGreenTC->SetText(temp);
+	fGreenTextControl->SetText(temp);
 	sprintf(temp, "%d",
 		(int)fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE));
-	fTransparentBlueTC->SetText(temp);
+	fBlueTextControl->SetText(temp);
 }
 
 
@@ -277,9 +305,9 @@ GIFView::AllAttached()
 	fUseTransparentCB->SetTarget(msgr);
 	fUseTransparentAutoRB->SetTarget(msgr);
 	fUseTransparentColorRB->SetTarget(msgr);
-	fTransparentRedTC->SetTarget(msgr);
-	fTransparentGreenTC->SetTarget(msgr);
-	fTransparentBlueTC->SetTarget(msgr);
+	fRedTextControl->SetTarget(msgr);
+	fGreenTextControl->SetTarget(msgr);
+	fBlueTextControl->SetTarget(msgr);
 	fPaletteM->SetTargetForItems(msgr);
 	fColorCountM->SetTargetForItems(msgr);
 }
@@ -365,15 +393,15 @@ GIFView::MessageReceived(BMessage* message)
 			if (value) {
 				fUseTransparentAutoRB->SetEnabled(true);
 				fUseTransparentColorRB->SetEnabled(true);
-				fTransparentRedTC->SetEnabled(fUseTransparentColorRB->Value());
-				fTransparentGreenTC->SetEnabled(fUseTransparentColorRB->Value());
-				fTransparentBlueTC->SetEnabled(fUseTransparentColorRB->Value());
+				fRedTextControl->SetEnabled(fUseTransparentColorRB->Value());
+				fGreenTextControl->SetEnabled(fUseTransparentColorRB->Value());
+				fBlueTextControl->SetEnabled(fUseTransparentColorRB->Value());
 			} else {
 				fUseTransparentAutoRB->SetEnabled(false);
 				fUseTransparentColorRB->SetEnabled(false);
-				fTransparentRedTC->SetEnabled(false);
-				fTransparentGreenTC->SetEnabled(false);
-				fTransparentBlueTC->SetEnabled(false);
+				fRedTextControl->SetEnabled(false);
+				fGreenTextControl->SetEnabled(false);
+				fBlueTextControl->SetEnabled(false);
 			}
 			break;
 		}
@@ -382,9 +410,9 @@ GIFView::MessageReceived(BMessage* message)
 		{
 			bool value = true;
 			fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO, &value);
-			fTransparentRedTC->SetEnabled(false);
-			fTransparentGreenTC->SetEnabled(false);
-			fTransparentBlueTC->SetEnabled(false);
+			fRedTextControl->SetEnabled(false);
+			fGreenTextControl->SetEnabled(false);
+			fBlueTextControl->SetEnabled(false);
 			break;
 		}
 
@@ -392,29 +420,29 @@ GIFView::MessageReceived(BMessage* message)
 		{
 			bool value = false;
 			fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO, &value);
-			fTransparentRedTC->SetEnabled(true);
-			fTransparentGreenTC->SetEnabled(true);
-			fTransparentBlueTC->SetEnabled(true);
+			fRedTextControl->SetEnabled(true);
+			fGreenTextControl->SetEnabled(true);
+			fBlueTextControl->SetEnabled(true);
 			break;
 		}
 
 		case GV_TRANSPARENT_RED:
 		{
-			int32 value = CheckInput(fTransparentRedTC);
+			int32 value = CheckInput(fRedTextControl);
 			fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED, &value);
 			break;
 		}
 
 		case GV_TRANSPARENT_GREEN:
 		{
-			int32 value = CheckInput(fTransparentGreenTC);
+			int32 value = CheckInput(fGreenTextControl);
 			fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN, &value);
 			break;
 		}
 
 		case GV_TRANSPARENT_BLUE:
 		{
-			int32 value = CheckInput(fTransparentBlueTC);
+			int32 value = CheckInput(fBlueTextControl);
 			fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE, &value);
 			break;
 		}
