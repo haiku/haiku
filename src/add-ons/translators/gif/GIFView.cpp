@@ -400,7 +400,7 @@ GIFView::MessageReceived(BMessage* message)
 		}
 
 		case GV_TRANSPARENT_RED:
-		{	
+		{
 			int32 value = CheckInput(fTransparentRedTC);
 			fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED, &value);
 			break;
@@ -428,7 +428,9 @@ GIFView::MessageReceived(BMessage* message)
 }
 
 
-int GIFView::CheckInput(BTextControl* control) {
+int
+GIFView::CheckInput(BTextControl* control)
+{
 	int value = atoi(control->Text());
 	if (value < 0 || value > 255) {
 		value = (value < 0) ? 0 : 255;

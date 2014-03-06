@@ -351,12 +351,15 @@ GIFSave::ResetHashtable()
 int
 GIFSave::CheckHashtable(int s, unsigned char c)
 {
-	if (s == -1) return c;
+	if (s == -1)
+		return c;
+
 	int hashindex = HASH(s, c);
 	int nextindex;
 	while ((nextindex = code_value[hashindex]) != -1) {
 		if (prefix_code[nextindex] == s && append_char[nextindex] == c)
 			return nextindex;
+
 		hashindex = (hashindex + HASHSTEP) % HASHSIZE;
 	}
 
