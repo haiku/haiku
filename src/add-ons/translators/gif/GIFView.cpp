@@ -298,18 +298,19 @@ GIFView::RestorePrefs()
 void
 GIFView::AllAttached()
 {
+	BMessenger messenger(this);
+	fInterlacedCB->SetTarget(messenger);
+	fUseDitheringCB->SetTarget(messenger);
+	fUseTransparentCB->SetTarget(messenger);
+	fUseTransparentAutoRB->SetTarget(messenger);
+	fUseTransparentColorRB->SetTarget(messenger);
+	fRedTextControl->SetTarget(messenger);
+	fGreenTextControl->SetTarget(messenger);
+	fBlueTextControl->SetTarget(messenger);
+	fPaletteM->SetTargetForItems(messenger);
+	fColorCountM->SetTargetForItems(messenger);
+
 	BView::AllAttached();
-	BMessenger msgr(this);
-	fInterlacedCB->SetTarget(msgr);
-	fUseDitheringCB->SetTarget(msgr);
-	fUseTransparentCB->SetTarget(msgr);
-	fUseTransparentAutoRB->SetTarget(msgr);
-	fUseTransparentColorRB->SetTarget(msgr);
-	fRedTextControl->SetTarget(msgr);
-	fGreenTextControl->SetTarget(msgr);
-	fBlueTextControl->SetTarget(msgr);
-	fPaletteM->SetTargetForItems(msgr);
-	fColorCountM->SetTargetForItems(msgr);
 }
 
 
