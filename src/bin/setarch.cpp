@@ -23,7 +23,8 @@ const char* kCommandName = __progname;
 
 
 static const char* kUsage =
-	"Usage: %s [ <options> ] <architecture> [ <command> ... ]\n"
+	"Usage: %s [-hl]\n"
+	"       %s [-p] <architecture> [ <command> ... ]\n"
 	"Executes the given command or, by default, a shell with a PATH\n"
 	"environment variable modified such that commands for the given\n"
 	"architecture will be preferred, respectively used exclusively in case of\n"
@@ -32,6 +33,8 @@ static const char* kUsage =
 	"Options:\n"
 	"  -h, --help\n"
 	"    Print this usage info.\n"
+	"  -l, --list-architectures\n"
+	"    List all architectures.\n"
 	"  -p, --print-path\n"
 	"    Only print the modified PATH variable value; don't execute any\n"
 	"    command.\n"
@@ -41,8 +44,8 @@ static const char* kUsage =
 static void
 print_usage_and_exit(bool error)
 {
-    fprintf(error ? stderr : stdout, kUsage, kCommandName);
-    exit(error ? 1 : 0);
+	fprintf(error ? stderr : stdout, kUsage, kCommandName, kCommandName);
+	exit(error ? 1 : 0);
 }
 
 
@@ -136,16 +139,18 @@ int
 main(int argc, const char* const* argv)
 {
 	bool printPath = false;
+	bool listArchitectures = false;
 
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "help", no_argument, 0, 'h' },
+			{ "list-architectures", no_argument, 0, 'l' },
 			{ "print-path", no_argument, 0, 'p' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+hp",
+		int c = getopt_long(argc, (char**)argv, "+hlp",
 			sLongOptions, NULL);
 		if (c == -1)
 			break;
@@ -153,6 +158,10 @@ main(int argc, const char* const* argv)
 		switch (c) {
 			case 'h':
 				print_usage_and_exit(false);
+				break;
+
+			case 'l':
+				listArchitectures = true;
 				break;
 
 			case 'p':
@@ -163,6 +172,30 @@ main(int argc, const char* const* argv)
 				print_usage_and_exit(true);
 				break;
 		}
+	}
+
+	// only one of listArchitectures, printPath may be specified
+	if (listArchitectures && printPath)
+		print_usage_and_exit(true);
+
+	// get architectures
+	BStringList architectures;
+	status_t error = get_architectures(architectures);
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Failed to get architectures: %s\n",
+			strerror(error));
+		exit(1);
+	}
+
+	// list architectures
+	if (listArchitectures) {
+		if (optind != argc)
+			print_usage_and_exit(true);
+
+		int32 count = architectures.CountStrings();
+		for (int32 i = 0; i < count; i++)
+			printf("%s\n", architectures.StringAt(i).String());
+		return 0;
 	}
 
 	// The remaining arguments are the architecture and optionally the command
@@ -178,14 +211,6 @@ main(int argc, const char* const* argv)
 		print_usage_and_exit(true);
 
 	// check the architecture
-	BStringList architectures;
-	status_t error = get_architectures(architectures);
-	if (error != B_OK) {
-		fprintf(stderr, "Error: Failed to get architectures: %s\n",
-			strerror(error));
-		exit(1);
-	}
-
 	if (!architectures.HasString(architecture)) {
 		fprintf(stderr, "Error: Unsupported architecture \"%s\"\n",
 			architecture);
