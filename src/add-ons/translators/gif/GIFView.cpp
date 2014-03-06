@@ -337,10 +337,9 @@ GIFView::MessageReceived(BMessage* message)
 			if (fColorCountMF->IsEnabled()) {
 				int32 sizeInBits;
 				if (message->FindInt32(GIF_SETTING_PALETTE_SIZE, &sizeInBits)
-					>= B_OK) {
-					if (sizeInBits > 0 && sizeInBits <= 8)
-						fSettings->SetGetInt32(GIF_SETTING_PALETTE_SIZE,
-							&sizeInBits);
+						>= B_OK && sizeInBits > 0 && sizeInBits <= 8) {
+					fSettings->SetGetInt32(GIF_SETTING_PALETTE_SIZE,
+						&sizeInBits);
 				}
 			}
 			break;
