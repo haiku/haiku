@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <syslog.h>
 
+#include <new>
+
 #include "GIFPrivate.h"
 
 
@@ -58,13 +60,21 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 	}
 
 	fatalerror = false;
-	if (fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE) == OPTIMAL_PALETTE)
-		palette = new SavePalette(bitmap,
+	if (fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE) == OPTIMAL_PALETTE) {
+		palette = new(std::nothrow) SavePalette(bitmap,
 			fSettings->SetGetInt32(GIF_SETTING_PALETTE_SIZE));
-	else
-		palette = new SavePalette(
+	} else {
+		palette = new(std::nothrow) SavePalette(
 			fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE));
+	}
+
+	if (palette == NULL) {
+		fatalerror = true;
+		return;
+	}
+
 	if (!palette->IsValid()) {
+		delete palette;
 		fatalerror = true;
 		return;
 	}
@@ -80,13 +90,33 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 		if (debug)
 			syslog(LOG_INFO, "GIFSave::GIFSave() - Using dithering\n");
 
-		red_error = new int32[width + 2];
+		red_error = new(std::nothrow) int32[width + 2];
+		if (red_error == NULL) {
+			delete palette;
+			fatalerror = true;
+			return;
+		}
 		red_error = &red_error[1];
 			// Allow index of -1 too
-		green_error = new int32[width + 2];
+
+		green_error = new(std::nothrow) int32[width + 2];
+		if (green_error == NULL) {
+			delete palette;
+			delete[] red_error;
+			fatalerror = true;
+			return;
+		}
 		green_error = &green_error[1];
 			// Allow index of -1 too
-		blue_error = new int32[width + 2];
+
+		blue_error = new(std::nothrow) int32[width + 2];
+		if (blue_error == NULL) {
+			delete palette;
+			delete[] red_error;
+			delete[] green_error;
+			fatalerror = true;
+			return;
+		}
 		blue_error = &blue_error[1];
 			// Allow index of -1 too
 
@@ -151,11 +181,29 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 
 	this->output = output;
 	this->bitmap = bitmap;
-	WriteGIFHeader();
+
+	if (WriteGIFHeader() != B_OK) {
+		delete palette;
+		delete[] red_error;
+		delete[] green_error;
+		delete[] blue_error;
+		fatalerror = true;
+		return;
+	}
+
 	if (debug)
 		syslog(LOG_INFO, "GIFSave::GIFSave() - Wrote gif header\n");
 
-	hash = new SFHash(1 << 16);
+	hash = new(std::nothrow) SFHash(1 << 16);
+	if (hash == NULL) {
+		delete palette;
+		delete[] red_error;
+		delete[] green_error;
+		delete[] blue_error;
+		fatalerror = true;
+		return;
+	}
+
 	WriteGIFControlBlock();
 	if (debug)
 		syslog(LOG_INFO, "GIFSave::GIFSave() - Wrote gif control block\n");
@@ -188,7 +236,7 @@ GIFSave::~GIFSave()
 }
 
 
-void
+status_t
 GIFSave::WriteGIFHeader()
 {
 	// Standard header
@@ -200,19 +248,28 @@ GIFSave::WriteGIFHeader()
 	header[9] = (height & 0xff00) >> 8;
 	header[10] = 0xf0 | (palette->SizeInBits() - 1);
 	header[11] = palette->BackgroundIndex();
-	output->Write(header, 13);
+	if (output->Write(header, 13) < 0)
+		return B_IO_ERROR;
 
 	// global palette
 	int size = (1 << palette->SizeInBits()) * 3;
-	uint8* buffer = new uint8[size];
 		// can't be bigger than this
+	uint8* buffer = new(std::nothrow) uint8[size];
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
 	palette->GetColors(buffer, size);
-	output->Write(buffer, size);
+	if (output->Write(buffer, size) < 0) {
+		delete[] buffer;
+		return B_IO_ERROR;
+	}
 	delete[] buffer;
+
+	return B_OK;
 }
 
 
-void
+status_t
 GIFSave::WriteGIFControlBlock()
 {
 	unsigned char b[8] = { 
@@ -223,11 +280,11 @@ GIFSave::WriteGIFControlBlock()
 		b[3] = b[3] | 1;
 		b[6] = palette->TransparentIndex();
 	}
-	output->Write(b, 8);
+	return output->Write(b, 8) < 0 ? B_IO_ERROR : B_OK;
 }
 
 
-void
+status_t
 GIFSave::WriteGIFImageHeader()
 {
 	unsigned char header[10];
@@ -245,21 +302,55 @@ GIFSave::WriteGIFImageHeader()
 	else
 		header[9] = BLOCK_TERMINATOR;
 
-	output->Write(header, 10);
+	return output->Write(header, 10) < 0 ? B_IO_ERROR : B_OK;
 }
 
 
-void
+status_t
 GIFSave::WriteGIFImageData()
 {
 	InitFrame();
+
+	status_t result = B_OK;
+
 	code_value = (short*)malloc(HASHSIZE * 2);
+	if (code_value == NULL)
+		return B_NO_MEMORY;
+
 	prefix_code = (short*)malloc(HASHSIZE * 2);
+	if (prefix_code == NULL) {
+		free(code_value);
+
+		return B_NO_MEMORY;
+	}
+
 	append_char = (unsigned char*)malloc(HASHSIZE);
+	if (append_char == NULL) {
+		free(code_value);
+		free(prefix_code);
+
+		return B_NO_MEMORY;
+	}
+
 	ResetHashtable();
 
-	output->Write(&code_size, 1);
-	OutputCode(clear_code, BITS);
+	if (output->Write(&code_size, 1) < 0) {
+		free(code_value);
+		free(prefix_code);
+		free(append_char);
+
+		return B_IO_ERROR;
+	}
+
+	result = OutputCode(clear_code, BITS);
+	if (result != B_OK) {
+		free(code_value);
+		free(prefix_code);
+		free(append_char);
+
+		return B_IO_ERROR;
+	}
+
 	string_code = NextPixel(0);
 	int area = height * width;
 
@@ -270,12 +361,27 @@ GIFSave::WriteGIFImageData()
 			string_code = y;
 		else {
 			AddToHashtable(string_code, character);
-			OutputCode(string_code, BITS);
+			result = OutputCode(string_code, BITS);
+			if (result != B_OK) {
+				free(code_value);
+				free(prefix_code);
+				free(append_char);
+
+				return B_IO_ERROR;
+			}
 
 			if (next_code > max_code) {
 				BITS++;
 				if (BITS > LZ_MAX_BITS) {
-					OutputCode(clear_code, LZ_MAX_BITS);
+					result = OutputCode(clear_code, LZ_MAX_BITS);
+					if (result != B_OK) {
+						free(code_value);
+						free(prefix_code);
+						free(append_char);
+
+						return B_IO_ERROR;
+					}
+
 					BITS = code_size + 1;
 					ResetHashtable();
 					next_code = clear_code + 1;
@@ -288,22 +394,55 @@ GIFSave::WriteGIFImageData()
 		}
 	}
 
-	OutputCode(string_code, BITS);
-	OutputCode(end_code, BITS);
-	OutputCode(0, BITS, true);
+	result = OutputCode(string_code, BITS);
+	if (result != B_OK) {
+		free(code_value);
+		free(prefix_code);
+		free(append_char);
+
+		return B_IO_ERROR;
+	}
+
+	result = OutputCode(end_code, BITS);
+	if (result != B_OK) {
+		free(code_value);
+		free(prefix_code);
+		free(append_char);
+
+		return B_IO_ERROR;
+	}
+
+	result = OutputCode(0, BITS, true);
+	if (result != B_OK) {
+		free(code_value);
+		free(prefix_code);
+		free(append_char);
+
+		return B_IO_ERROR;
+	}
+
 	char t = BLOCK_TERMINATOR;
-	output->Write(&t, 1);
+	if (output->Write(&t, 1) < 0) {
+		free(code_value);
+		free(prefix_code);
+		free(append_char);
+
+		return B_IO_ERROR;
+	}
+
 	free(code_value);
 	free(prefix_code);
 	free(append_char);
+
+	return result;
 }
 
 
-void
+status_t
 GIFSave::OutputCode(short code, int BITS, bool flush)
 {
 	if (!flush) {
-		bit_buffer |= (unsigned int) code << bit_count;
+		bit_buffer |= (unsigned int)code << bit_count;
 		bit_count += BITS;
 		while (bit_count >= 8) {
 			byte_buffer[byte_count + 1] = (unsigned char)(bit_buffer & 0xff);
@@ -313,7 +452,9 @@ GIFSave::OutputCode(short code, int BITS, bool flush)
 		}
 		if (byte_count >= 255) {
 			byte_buffer[0] = 255;
-			output->Write(byte_buffer, 256);
+			if (output->Write(byte_buffer, 256) < 0)
+				return B_IO_ERROR;
+
 			if (byte_count == 256) {
 				byte_buffer[1] = byte_buffer[256];
 				byte_count = 1;
@@ -331,9 +472,12 @@ GIFSave::OutputCode(short code, int BITS, bool flush)
 		}
 		if (byte_count > 0) {
 			byte_buffer[0] = (unsigned char)byte_count;
-			output->Write(byte_buffer, byte_count + 1);
+			if (output->Write(byte_buffer, byte_count + 1) < 0)
+				return B_IO_ERROR;
 		}
 	}
+
+	return B_OK;
 }
 
 

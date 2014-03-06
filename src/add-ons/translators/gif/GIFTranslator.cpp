@@ -265,7 +265,13 @@ GIFTranslator::DerivedTranslate(BPositionIO* inSource,
 		if (result != B_OK)
 			return result;
 
-		GIFSave* gifSave = new GIFSave(bitmap, outDestination, fSettings);
+		GIFSave* gifSave = new(std::nothrow) GIFSave(bitmap, outDestination,
+			fSettings);
+		if (gifSave == NULL) {
+			delete bitmap;
+			return B_NO_MEMORY;
+		}
+
 		if (gifSave->fatalerror) {
 			delete gifSave;
 			delete bitmap;
@@ -275,7 +281,10 @@ GIFTranslator::DerivedTranslate(BPositionIO* inSource,
 		delete bitmap;
 	} else {
 		// GIF to BBitmap
-		GIFLoad* gifLoad = new GIFLoad(inSource, outDestination);
+		GIFLoad* gifLoad = new(std::nothrow) GIFLoad(inSource, outDestination);
+		if (gifLoad == NULL)
+			return B_NO_MEMORY;
+
 		if (gifLoad->fatalerror) {
 			delete gifLoad;
 			return B_NO_MEMORY;
@@ -296,7 +305,7 @@ BTranslator*
 make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 {
 	if (n == 0)
-		return new GIFTranslator();
+		return new(std::nothrow) GIFTranslator();
 
 	return NULL;
 }
@@ -324,7 +333,7 @@ GIFTranslator::~GIFTranslator()
 BView*
 GIFTranslator::NewConfigView(TranslatorSettings* settings)
 {
-	return new GIFView(settings);
+	return new(std::nothrow) GIFView(settings);
 }
 
 
@@ -332,7 +341,7 @@ int
 main()
 {
 	BApplication app("application/x-vnd.Haiku-GIFTranslator");
-	status_t result = LaunchTranslatorWindow(new GIFTranslator,
+	status_t result = LaunchTranslatorWindow(new(std::nothrow) GIFTranslator,
 		B_TRANSLATE("GIF Settings"), kRectView);
 	if (result == B_OK) {
 		app.Run();

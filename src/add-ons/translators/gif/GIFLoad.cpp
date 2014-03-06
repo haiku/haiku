@@ -22,6 +22,8 @@
 #include <stdlib.h>
 #include <syslog.h>
 
+#include <new>
+
 #include <ByteOrder.h>
 #include <InterfaceDefs.h>
 #include <TranslatorFormats.h>
@@ -139,7 +141,10 @@ GIFLoad::ReadGIFHeader()
 	fWidth = header[6] + (header[7] << 8);
 	fHeight = header[8] + (header[9] << 8);
 
-	fPalette = new LoadPalette();
+	fPalette = new(std::nothrow) LoadPalette();
+	if (fPalette == NULL)
+		return false;
+
 	// Global palette
 	if (header[10] & GIF_LOCALCOLORMAP) {
 		fPalette->size_in_bits = (header[10] & 0x07) + 1;

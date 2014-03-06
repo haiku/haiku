@@ -44,11 +44,11 @@ public:
 			bool				fatalerror;
 
 private:
-			void				WriteGIFHeader();
-			void				WriteGIFControlBlock();
-			void				WriteGIFImageHeader();
-			void				WriteGIFImageData();
-			void				OutputCode(short code, int BITS,
+			status_t			WriteGIFHeader();
+			status_t			WriteGIFControlBlock();
+			status_t			WriteGIFImageHeader();
+			status_t			WriteGIFImageData();
+			status_t			OutputCode(short code, int BITS,
 									bool flush = false);
 
 			unsigned char		NextPixel(int pixel);
