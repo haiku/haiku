@@ -52,6 +52,7 @@ choose_small_task_core()
 {
 	SCHEDULER_ENTER_FUNCTION();
 
+	ReadSpinLocker coreLocker(gCoreHeapsLock);
 	CoreEntry* core = gCoreLoadHeap.PeekMaximum();
 	if (core == NULL)
 		return sSmallTaskCore;
@@ -137,9 +138,11 @@ should_rebalance(const ThreadData* threadData)
 		if (threadLoad >= coreLoad / 2)
 			return false;
 
+		ReadSpinLocker coreLocker(gCoreHeapsLock);
 		CoreEntry* other = gCoreLoadHeap.PeekMaximum();
 		if (other == NULL)
 			other = gCoreHighLoadHeap.PeekMinimum();
+		coreLocker.Unlock();
 		ASSERT(other != NULL);
 
 		int32 coreNewLoad = coreLoad - threadLoad;
