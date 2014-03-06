@@ -36,13 +36,13 @@
 
 // settings
 
-#define GIF_SETTING_INTERLACED			"interlaced"
-#define GIF_SETTING_USE_TRANSPARENT		"use transparent"
+#define GIF_SETTING_INTERLACED				"interlaced"
+#define GIF_SETTING_USE_TRANSPARENT			"use transparent"
 #define GIF_SETTING_USE_TRANSPARENT_AUTO	"use transparent auto"
-#define GIF_SETTING_USE_DITHERING		"use dithering"
-#define GIF_SETTING_PALETTE_MODE		"palette mode"
-#define GIF_SETTING_PALETTE_SIZE		"palette size"
-#define GIF_SETTING_TRANSPARENT_RED		"transparent red"
+#define GIF_SETTING_USE_DITHERING			"use dithering"
+#define GIF_SETTING_PALETTE_MODE			"palette mode"
+#define GIF_SETTING_PALETTE_SIZE			"palette size"
+#define GIF_SETTING_TRANSPARENT_RED			"transparent red"
 #define GIF_SETTING_TRANSPARENT_GREEN		"transparent green"
 #define GIF_SETTING_TRANSPARENT_BLUE		"transparent blue"
 
