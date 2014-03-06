@@ -47,11 +47,12 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 	TranslatorSettings* settings)
 {
 	fSettings = settings;
-	color_space cs = bitmap->ColorSpace();
-	if (cs != B_RGB32 && cs != B_RGBA32 && cs != B_RGB32_BIG
-		&& cs != B_RGBA32_BIG) {
+	color_space colorSpace = bitmap->ColorSpace();
+	if (colorSpace != B_RGB32 && colorSpace != B_RGBA32
+		&& colorSpace != B_RGB32_BIG && colorSpace != B_RGBA32_BIG) {
 		if (debug)
 			syslog(LOG_ERR, "GIFSave::GIFSave() - Unknown color space\n");
+
 		fatalerror = true;
 		return;
 	}
@@ -380,16 +381,16 @@ unsigned char
 GIFSave::NextPixel(int pixel)
 {
 	int bpr = bitmap->BytesPerRow();
-	color_space cs = bitmap->ColorSpace();
-	bool useAlphaForTransparency = 
-		(fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO)
-			&& cs == B_RGBA32) || cs == B_RGBA32_BIG;
+	color_space colorSpace = bitmap->ColorSpace();
+	bool useAlphaForTransparency = colorSpace == B_RGBA32_BIG
+		|| (fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO)
+			&& colorSpace == B_RGBA32);
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
 	unsigned char a;
 
-	if (cs == B_RGB32 || cs == B_RGBA32) {
+	if (colorSpace == B_RGB32 || colorSpace == B_RGBA32) {
 		b = gifbits[0];
 		g = gifbits[1];
 		r = gifbits[2];
