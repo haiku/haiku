@@ -106,9 +106,12 @@ static const TranSetting sDefaultSettings[] = {
 	{ GIF_SETTING_TRANSPARENT_BLUE, TRAN_SETTING_INT32, 0 }
 };
 
-const uint32 kNumInputFormats = sizeof(sInputFormats) / sizeof(translation_format);
-const uint32 kNumOutputFormats = sizeof(sOutputFormats) / sizeof(translation_format);
-const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) / sizeof(TranSetting);
+const uint32 kNumInputFormats = sizeof(sInputFormats)
+	/ sizeof(translation_format);
+const uint32 kNumOutputFormats = sizeof(sOutputFormats)
+	/ sizeof(translation_format);
+const uint32 kNumDefaultSettings = sizeof(sDefaultSettings)
+	/ sizeof(TranSetting);
 
 
 /*!	Look at first few bytes in stream to determine type - throw it back
@@ -200,7 +203,7 @@ GIFTranslator::DerivedIdentify(BPositionIO* inSource,
 	if (outType == 0)
 		outType = B_TRANSLATOR_BITMAP;
 
-	if (outType != GIF_TYPE && outType != B_TRANSLATOR_BITMAP) 
+	if (outType != GIF_TYPE && outType != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
 
 	bool isGif;

@@ -159,9 +159,10 @@ GIFLoad::ReadGIFHeader()
 		unsigned char gp[256 * 3];
 		if (fInput->Read(gp, s * 3) < s * 3)
 			return false;
-		for (int x = 0; x < s; x++) {
+
+		for (int x = 0; x < s; x++)
 			fPalette->SetColor(x, gp[x * 3], gp[x * 3 + 1], gp[x * 3 + 2]);
-		}
+
 		fPalette->backgroundindex = header[11];
 	} else {
 		// install BeOS system palette in case local palette isn't present
@@ -182,9 +183,10 @@ bool
 GIFLoad::ReadGIFLoopBlock()
 {
 	unsigned char length;
-	if (fInput->Read(&length, 1) < 1) return false;
-	fInput->Seek(length, SEEK_CUR);
+	if (fInput->Read(&length, 1) < 1)
+		return false;
 
+	fInput->Seek(length, SEEK_CUR);
 	do {
 		if (fInput->Read(&length, 1) < 1)
 			return false;

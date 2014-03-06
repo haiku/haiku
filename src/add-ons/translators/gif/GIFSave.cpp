@@ -139,16 +139,18 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 			case WEB_SAFE_PALETTE:
 				syslog(LOG_INFO, "web safe palette\n");
 				break;
+
 			case BEOS_SYSTEM_PALETTE:
 				syslog(LOG_INFO, "BeOS system palette\n");
 				break;
+
 			case GREYSCALE_PALETTE:
 				syslog(LOG_INFO, "greyscale palette\n");
 				break;
+
 			case OPTIMAL_PALETTE:
 			default:
 				syslog(LOG_INFO, "optimal palette\n");
-				break;
 		}
 	}
 
@@ -167,7 +169,7 @@ GIFSave::GIFSave(BBitmap* bitmap, BPositionIO* output,
 				(uint8)fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE));
 			if (debug) {
 				syslog(LOG_INFO, "GIFSave::GIFSave() - "
-					"Found transparent color %d,%d,%d at index %d\n", 
+					"Found transparent color %d,%d,%d at index %d\n",
 					fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED),
 					fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN),
 					fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE),
@@ -272,7 +274,7 @@ GIFSave::WriteGIFHeader()
 status_t
 GIFSave::WriteGIFControlBlock()
 {
-	unsigned char b[8] = { 
+	unsigned char b[8] = {
 		EXTENSION_INTRODUCER, GRAPHIC_CONTROL_LABEL, 0x04, 0x00, 0x00, 0x00,
 		0x00, BLOCK_TERMINATOR
 	};
@@ -551,10 +553,10 @@ GIFSave::NextPixel(int pixel)
 	gifbits += 4;
 	pos += 4;
 
-	if (!fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT) 
+	if (!fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT)
 		|| fSettings->SetGetBool(GIF_SETTING_USE_TRANSPARENT_AUTO)
 		|| r != fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_RED)
-		|| g != fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN) 
+		|| g != fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_GREEN)
 		|| b != fSettings->SetGetInt32(GIF_SETTING_TRANSPARENT_BLUE)) {
 		if (fSettings->SetGetBool(GIF_SETTING_USE_DITHERING)) {
 			if (pixel % width == 0)
