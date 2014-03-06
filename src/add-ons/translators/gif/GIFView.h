@@ -59,8 +59,8 @@ public:
 								GIFView(TranslatorSettings* settings);
 	virtual						~GIFView();
 
-	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AllAttached();
+	virtual	void				MessageReceived(BMessage* message);
 
 private:
 			void				RestorePrefs();
