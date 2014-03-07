@@ -1,0 +1,148 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/StringItem.h	 hrev46985
+ *		src/kits/interface/StringItem.cpp	 hrev46985
+ */
+
+
+/*!
+	\file StringItem.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BStringItem class definition.
+*/
+
+
+/*!
+	\class BStringItem
+	\ingroup interface
+	\ingroup libbe
+	\brief A list item of a text string used as a member of a BListView
+	       or BOutlineListView.
+*/
+
+
+/*!
+	\fn BStringItem::BStringItem(const char* text, uint32 level, bool expanded)
+	\brief Creates a new BStringItem object which displays the \a text string.
+
+	The \a level and \a expanded parameters only apply to string items attached
+	to a BOutlineListView and are passed unchanged to the BListItem constructor.
+
+	\param text The \a text to display.
+	\param level The \a level of the item in a BOutlineListView.
+	\param expanded Whether or not the item is \a expanded in a BOutlineListView.
+*/
+
+
+/*!
+	\fn BStringItem::BStringItem(BMessage* archive)
+	\brief Archive constructor.
+
+	\param archive The message \a archive to construct the string item from.
+*/
+
+
+/*!
+	\fn BStringItem::~BStringItem()
+	\brief Destructor, frees the memory used by the string.
+*/
+
+
+/*!
+	\fn BArchivable* BStringItem::Instantiate(BMessage* archive)
+	\brief Creates a new BStringItem object from an \a archive message.
+
+	\return A newly created BStringItem object or \c NULL if the message
+	        doesn't contain an archived BStringItem.
+*/
+
+
+/*!
+	\fn status_t BStringItem::Archive(BMessage* archive, bool deep) const
+	\brief Archives the the BStringItem object into the \a archive message.
+
+	\param archive A pointer to the BMessage to archive the object into.
+	\param deep This parameter has no effect for this class.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived successfully.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+*/
+
+
+/*!
+	\fn void BStringItem::DrawItem(BView* owner, BRect frame, bool complete)
+	\brief Hook method called when the string item is drawn.
+
+	The background is drawn either \c B_LIST_BACKGROUND_COLOR or
+	\c B_LIST_SELECTED_BACKGROUND_COLOR depending on whether the item is
+	selected or not.
+
+	Similarly, the text is drawn either \c B_LIST_ITEM_TEXT_COLOR or
+	\c B_LIST_SELECTED_ITEM_TEXT_COLOR.
+
+	The text is drawn in a lighter color if the item is disabled to indicate
+	that it may not be selected. A darker color is used instead if
+	\c B_LIST_BACKGROUND_COLOR is set to a dark color.
+
+	\param owner The string item's parent.
+	\param frame The frame to draw in.
+	\param complete Whether or not to draw the background in addition to the
+	       item's contents.
+
+	\sa IsSelected()
+	\sa IsEnabled()
+*/
+
+
+/*!
+	\fn void BStringItem::SetText(const char* text)
+	\brief Sets the \a text string displayed by the item. The memory used by the
+	       old string is freed.
+
+	\param text The \a text string to set in a C-string.
+*/
+
+
+/*!
+	\fn const char* BStringItem::Text() const
+	\returns The text set to the item.
+
+	\returns the text set to the item as a C-string.
+*/
+
+
+/*
+	\fn void BStringItem::Update(BView* owner, const BFont* font)
+	\brief Hook method that's called when the \a owner changes.
+
+	This method gets called when the string item is added to a list view.
+
+	The default implementation sets the width of the list item to the width of
+	\a owner and sets the height to fit \a font.
+
+	\param owner The list item's new \a owner.
+	\param font The font set to the list item's current \a owner.
+*/
+
+
+/*!
+	\fn float BStringItem::BaselineOffset() const
+	\brief Returns the offset from the top of the frame to the base line of
+	      the text.
+
+	The baseline is the line upon which the letters "sit" and below which
+	descenders extend. This value is set in the Update() method.
+
+	This may be overridden by derived classes to set the base line offset.
+
+	\returns The offset to the baseline of the text as a float.
+*/
