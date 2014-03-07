@@ -4405,22 +4405,24 @@ BView::MessageReceived(BMessage* message)
 					break;
 				}
 
-				float deltaX = 0.0f, deltaY = 0.0f;
+				float deltaX = 0.0f;
+				float deltaY = 0.0f;
+
 				if (horizontal != NULL)
 					message->FindFloat("be:wheel_delta_x", &deltaX);
+
 				if (vertical != NULL)
 					message->FindFloat("be:wheel_delta_y", &deltaY);
 
 				if (deltaX == 0.0f && deltaY == 0.0f)
 					break;
 
-				if (horizontal != NULL) {
+				if (horizontal != NULL)
 					ScrollWithMouseWheelDelta(horizontal, deltaX);
-				}
 
-				if (vertical != NULL) {
+				if (vertical != NULL)
 					ScrollWithMouseWheelDelta(vertical, deltaY);
-				}
+
 				break;
 			}
 
@@ -5721,7 +5723,8 @@ BView::ScrollWithMouseWheelDelta(BScrollBar* scrollBar, float delta)
 	if (scrollBar == NULL || delta == 0.0f)
 		return;
 
-	float smallStep, largeStep;
+	float smallStep;
+	float largeStep;
 	scrollBar->GetSteps(&smallStep, &largeStep);
 
 	// pressing the shift key scrolls faster (following the pseudo-standard set
