@@ -231,10 +231,12 @@ GIFView::RestorePrefs()
 			break;
 
 		default:
+		{
 			int32 value = WEB_SAFE_PALETTE;
 			fSettings->SetGetInt32(GIF_SETTING_PALETTE_MODE, &value);
 			fSettings->SaveSettings();
 			fWebSafeMI->SetMarked(true);
+		}
 	}
 
 	if (fColorCountMF->IsEnabled()
