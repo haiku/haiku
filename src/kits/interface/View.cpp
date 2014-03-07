@@ -4417,10 +4417,10 @@ BView::MessageReceived(BMessage* message)
 				if (deltaX == 0.0f && deltaY == 0.0f)
 					break;
 
-				if (horizontal != NULL)
+				if (horizontal != NULL && deltaX != 0.0f)
 					ScrollWithMouseWheelDelta(horizontal, deltaX);
 
-				if (vertical != NULL)
+				if (vertical != NULL && deltaY != 0.0f)
 					ScrollWithMouseWheelDelta(vertical, deltaY);
 
 				break;
