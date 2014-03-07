@@ -186,6 +186,8 @@ GIFView::GIFView(TranslatorSettings* settings)
 	SetExplicitPreferredSize(BSize((font.Size() * 400) / 12,
 		(font.Size() * 300) / 12));
 
+	fSettings->Acquire();
+
 	RestorePrefs();
 }
 
