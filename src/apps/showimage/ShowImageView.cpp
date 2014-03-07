@@ -1362,7 +1362,7 @@ ShowImageView::_MouseWheelChanged(BMessage* message)
 	if ((modifiers() & B_SHIFT_KEY) != 0) {
 		// scroll up and down
 		_ScrollRestrictedBy(x, y);
-	} else if ((modifiers() & B_COMMAND_KEY) != 0) {
+	} else if ((modifiers() & B_CONTROL_KEY) != 0) {
 		// scroll left and right
 		_ScrollRestrictedBy(y, x);
 	} else {
