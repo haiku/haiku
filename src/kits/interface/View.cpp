@@ -12,6 +12,7 @@
 
 #include <View.h>
 
+#include <algorithm>
 #include <new>
 
 #include <math.h>
@@ -4416,6 +4417,9 @@ BView::MessageReceived(BMessage* message)
 
 				if (deltaX == 0.0f && deltaY == 0.0f)
 					break;
+
+				if ((modifiers() & B_CONTROL_KEY) != 0)
+					std::swap(horizontal, vertical);
 
 				if (horizontal != NULL && deltaX != 0.0f)
 					ScrollWithMouseWheelDelta(horizontal, deltaX);
