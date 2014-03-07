@@ -1340,36 +1340,41 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 
 
 void
-ShowImageView::_MouseWheelChanged(BMessage* msg)
+ShowImageView::_MouseWheelChanged(BMessage* message)
 {
 	// The BeOS driver does not currently support
-	// X wheel scrolling, therefore, dx is zero.
-	// |dy| is the number of notches scrolled up or down.
-	// When the wheel is scrolled down (towards the user) dy > 0
-	// When the wheel is scrolled up (away from the user) dy < 0
+	// X wheel scrolling, therefore, deltaX is zero.
+	// |deltaY| is the number of notches scrolled up or down.
+	// When the wheel is scrolled down (towards the user) deltaY > 0
+	// When the wheel is scrolled up (away from the user) deltaY < 0
 	const float kscrollBy = 40;
-	float dy, dx;
-	float x, y;
-	x = 0; y = 0;
-	if (msg->FindFloat("be:wheel_delta_x", &dx) == B_OK)
-		x = dx * kscrollBy;
-	if (msg->FindFloat("be:wheel_delta_y", &dy) == B_OK)
-		y = dy * kscrollBy;
+	float deltaY;
+	float deltaX;
+	float x = 0;
+	float y = 0;
 
-	if ((modifiers() & B_SHIFT_KEY) != 0)
+	if (message->FindFloat("be:wheel_delta_x", &deltaX) == B_OK)
+		x = deltaX * kscrollBy;
+
+	if (message->FindFloat("be:wheel_delta_y", &deltaY) == B_OK)
+		y = deltaY * kscrollBy;
+
+	if ((modifiers() & B_SHIFT_KEY) != 0) {
+		// scroll up and down
 		_ScrollRestrictedBy(x, y);
-	else if ((modifiers() & B_COMMAND_KEY) != 0)
+	} else if ((modifiers() & B_COMMAND_KEY) != 0) {
+		// scroll left and right
 		_ScrollRestrictedBy(y, x);
-	else {
-		// Zoom in spot
+	} else {
+		// zoom at location
 		BPoint where;
 		uint32 buttons;
 		GetMouse(&where, &buttons);
 
 		if (fStickyZoomCountDown <= 0) {
-			if (dy < 0)
+			if (deltaY < 0)
 				ZoomIn(where);
-			else if (dy > 0)
+			else if (deltaY > 0)
 				ZoomOut(where);
 
 			if (fZoom == 1.0)
@@ -1415,6 +1420,7 @@ ShowImageView::MessageReceived(BMessage* message)
 		case B_COPY_TARGET:
 			_HandleDrop(message);
 			break;
+
 		case B_MOUSE_WHEEL_CHANGED:
 			_MouseWheelChanged(message);
 			break;
@@ -1782,13 +1788,13 @@ ShowImageView::_SetIcon(bool clear, icon_size which)
 	uchar* dest = (uchar*)icon.Bits();
 	const int32 srcBPR = thumbnail->BytesPerRow();
 	const int32 destBPR = icon.BytesPerRow();
-	const int32 dx = (int32)rect.left;
-	const int32 dy = (int32)rect.top;
+	const int32 deltaX = (int32)rect.left;
+	const int32 deltaY = (int32)rect.top;
 
 	for (int32 y = 0; y <= rect.IntegerHeight(); y++) {
 		for (int32 x = 0; x <= rect.IntegerWidth(); x++) {
 			const uchar* s = src + y * srcBPR + x;
-			uchar* d = dest + (y + dy) * destBPR + (x + dx);
+			uchar* d = dest + (y + deltaY) * destBPR + (x + deltaX);
 			*d = *s;
 		}
 	}
