@@ -736,12 +736,13 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 			// know the setting of the fZoomTextOnly member here. Plus other
 			// clients of the API may not want this feature.
 			if ((modifiers() & B_COMMAND_KEY) != 0) {
-				float dy;
-				if (message->FindFloat("be:wheel_delta_y", &dy) == B_OK) {
-					if (dy < 0)
+				float deltaY;
+				if (message->FindFloat("be:wheel_delta_y", &deltaY) == B_OK) {
+					if (deltaY < 0)
 						CurrentWebView()->IncreaseZoomFactor(fZoomTextOnly);
 					else
 						CurrentWebView()->DecreaseZoomFactor(fZoomTextOnly);
+
 					return;
 				}
 			}
