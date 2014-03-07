@@ -1,0 +1,28 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/PictureButton.h	 hrev46970
+ *		src/kits/interface/PictureButton.cpp	 hrev46970
+ */
+
+
+/*!
+	\file PictureButton.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BPictureButton class definition.
+*/
+
+
+/*!
+	\class BPictureButton
+	\ingroup interface
+	\ingroup libbe
+	\brief Displays a button with a BPicture image instead of a text
+	       label like a BButton.
+*/

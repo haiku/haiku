@@ -1,0 +1,28 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Picture.h	 hrev46970
+ *		src/kits/interface/Picture.cpp	 hrev46970
+ */
+
+
+/*!
+	\file Picture.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BPicture class definition.
+*/
+
+
+/*!
+	\class BPicture
+	\ingroup interface
+	\ingroup libbe
+	\brief Records a series of drawing instructions that can be "replayed"
+	       later.
+*/
