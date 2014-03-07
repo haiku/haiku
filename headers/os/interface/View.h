@@ -607,7 +607,7 @@ protected:
 
 	virtual	void				LayoutChanged();
 
-			void				ScrollWithMouseWheelDelta(BScrollBar*, float);
+			status_t			ScrollWithMouseWheelDelta(BScrollBar*, float);
 
 private:
 			void				_Layout(bool force, BLayoutContext* context);

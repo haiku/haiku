@@ -5717,11 +5717,11 @@ BView::_SwitchServerCurrentView() const
 }
 
 
-void
+status_t
 BView::ScrollWithMouseWheelDelta(BScrollBar* scrollBar, float delta)
 {
 	if (scrollBar == NULL || delta == 0.0f)
-		return;
+		return B_BAD_VALUE;
 
 	float smallStep;
 	float largeStep;
@@ -5731,6 +5731,8 @@ BView::ScrollWithMouseWheelDelta(BScrollBar* scrollBar, float delta)
 	// by other desktop environments).
 	delta *= (modifiers() & B_SHIFT_KEY) != 0 ? largeStep : smallStep;
 	scrollBar->SetValue(scrollBar->Value() + delta);
+
+	return B_OK;
 }
 
 
