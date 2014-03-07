@@ -34,7 +34,7 @@ static inline void
 load_tss(int cpu)
 {
 	uint16 segment = (TSS_SEGMENT(cpu) << 3) | DPL_KERNEL;
-	asm volatile("ltr %w0" : : "a" (segment));
+	asm volatile("ltr %w0" : : "r" (segment));
 }
 
 
