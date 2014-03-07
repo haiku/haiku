@@ -147,7 +147,7 @@
 
 /*!
 	\fn void BListItem::Update(BView* owner, const BFont* font)
-	\brief Hook method that's called with the list item's \a owner changes.
+	\brief Hook method that's called when the \a owner changes.
 
 	This method gets called when the list item is added to the list view.
 
