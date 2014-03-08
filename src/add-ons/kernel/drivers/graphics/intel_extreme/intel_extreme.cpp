@@ -78,35 +78,40 @@ static int32
 intel_interrupt_handler(void* data)
 {
 	intel_info &info = *(intel_info*)data;
-
-	uint16 identity = read16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY));
+	uint32 reg = find_reg(info, INTEL_INTERRUPT_IDENTITY);
+	uint16 identity = read16(info, reg);
 	if (identity == 0)
 		return B_UNHANDLED_INTERRUPT;
 
 	int32 handled = B_HANDLED_INTERRUPT;
 
-	// TODO: verify that these aren't actually the same
-	bool hasPCH = info.device_type.HasPlatformControlHub();
-	uint16 mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA : INTERRUPT_VBLANK_PIPEA;
-	if ((identity & mask) != 0) {
-		handled = release_vblank_sem(info);
+	while (identity != 0) {
 
-		// make sure we'll get another one of those
-		write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
-			DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+		// TODO: verify that these aren't actually the same
+		bool hasPCH = info.device_type.HasPlatformControlHub();
+		uint16 mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA
+			: INTERRUPT_VBLANK_PIPEA;
+		if ((identity & mask) != 0) {
+			handled = release_vblank_sem(info);
+
+			// make sure we'll get another one of those
+			write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
+				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+		}
+
+		mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEB : INTERRUPT_VBLANK_PIPEB;
+		if ((identity & mask) != 0) {
+			handled = release_vblank_sem(info);
+
+			// make sure we'll get another one of those
+			write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
+				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+		}
+
+		// setting the bit clears it!
+		write16(info, reg, identity);
+		identity = read16(info, reg);
 	}
-
-	mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEB : INTERRUPT_VBLANK_PIPEB;
-	if ((identity & mask) != 0) {
-		handled = release_vblank_sem(info);
-
-		// make sure we'll get another one of those
-		write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
-			DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-	}
-
-	// setting the bit clears it!
-	write16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), identity);
 
 	return handled;
 }
