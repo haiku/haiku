@@ -34,7 +34,8 @@ namespace {
 class PackageInfoErrorListener : public BPackageInfo::ParseErrorListener {
 public:
 	PackageInfoErrorListener(const char* context)
-		: fContext(context)
+		:
+		fContext(context)
 	{
 	}
 
