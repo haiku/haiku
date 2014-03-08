@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUG_INFO_ENTRIES_H
@@ -1628,6 +1628,14 @@ private:
 class DIETypeUnit : public DIECompileUnitBase {
 public:
 								DIETypeUnit();
+
+	virtual	uint16				Tag() const;
+};
+
+
+class DIERValueReferenceType : public DIEReferenceType {
+public:
+								DIERValueReferenceType();
 
 	virtual	uint16				Tag() const;
 };

@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -2573,6 +2573,21 @@ DIETypeUnit::Tag() const
 }
 
 
+// #pragma mark - DIERValueReferenceType
+
+
+DIERValueReferenceType::DIERValueReferenceType()
+{
+}
+
+
+uint16
+DIERValueReferenceType::Tag() const
+{
+	return DW_TAG_rvalue_reference_type;
+}
+
+
 // #pragma mark - DIETemplateTemplateParameter
 
 
@@ -2968,6 +2983,9 @@ DebugInfoEntryFactory::CreateDebugInfoEntry(uint16 tag, DebugInfoEntry*& _entry)
 			break;
 		case DW_TAG_type_unit:
 			entry = new(std::nothrow) DIETypeUnit;
+			break;
+		case DW_TAG_rvalue_reference_type:
+			entry = new(std::nothrow) DIERValueReferenceType;
 			break;
 		case DW_TAG_GNU_template_template_param:
 			entry = new(std::nothrow) DIETemplateTemplateParameter;
