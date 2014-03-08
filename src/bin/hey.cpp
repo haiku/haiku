@@ -928,7 +928,7 @@ print_message(BMessage *message)
 
 	char *whatString = get_datatype_string(message->what);
 	printf("BMessage(%s):\n", whatString);
-	free(whatString);
+	delete[] whatString;
 	for (int32 i = 0; i < textlist.CountItems(); i++) {
 		printf("   %s\n", (char*)textlist.ItemAt(i));
 		free(textlist.ItemAt(i));
@@ -1260,7 +1260,7 @@ format_data(int32 type, char *ptr, long size)
 			if (anothermsg.Unflatten((const char *)ptr) == B_OK) {
 				char *whatString = get_datatype_string(anothermsg.what);
 				sprintf(str, "what=%s", whatString);
-				free(whatString);
+				delete[] whatString;
 			} else
 				strcpy(str, "error when unflattening");
 			break;
