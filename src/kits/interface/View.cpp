@@ -5733,7 +5733,11 @@ BView::ScrollWithMouseWheelDelta(BScrollBar* scrollBar, float delta)
 
 	// pressing the shift key scrolls faster (following the pseudo-standard set
 	// by other desktop environments).
-	delta *= (modifiers() & B_SHIFT_KEY) != 0 ? largeStep : smallStep;
+	if ((modifiers() & B_SHIFT_KEY) != 0)
+		delta *= largeStep;
+	else
+		delta *= smallStep * 3;
+
 	scrollBar->SetValue(scrollBar->Value() + delta);
 
 	return B_OK;

@@ -202,7 +202,7 @@ BScrollBar::BScrollBar(BRect frame, const char* name, BView* target,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 	fMin(min),
 	fMax(max),
-	fSmallStep(3.0f),
+	fSmallStep(1.0f),
 	fLargeStep(10.0f),
 	fValue(0),
 	fProportion(0.0f),
@@ -232,7 +232,7 @@ BScrollBar::BScrollBar(const char* name, BView* target,
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
 	fMin(min),
 	fMax(max),
-	fSmallStep(3.0f),
+	fSmallStep(1.0f),
 	fLargeStep(10.0f),
 	fValue(0),
 	fProportion(0.0f),
@@ -269,7 +269,7 @@ BScrollBar::BScrollBar(BMessage* data)
 		fMax = 0.0f;
 
 	if (data->FindFloat("_steps", 0, &fSmallStep) < B_OK)
-		fSmallStep = 3.0f;
+		fSmallStep = 1.0f;
 
 	if (data->FindFloat("_steps", 1, &fLargeStep) < B_OK)
 		fLargeStep = 10.0f;
