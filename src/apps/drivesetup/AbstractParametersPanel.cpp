@@ -97,7 +97,7 @@ AbstractParametersPanel::~AbstractParametersPanel()
 
 	delete_sem(fExitSemaphore);
 
-	if (fEditor == NULL)
+	if (fOkButton->Window() == NULL)
 		delete fOkButton;
 }
 
@@ -171,14 +171,15 @@ AbstractParametersPanel::Init(B_PARAMETER_EDITOR_TYPE type,
 	if (status != B_OK && status != B_NOT_SUPPORTED)
 		fReturnStatus = status;
 
-	if (fEditor == NULL)
-		return;
-
 	// Create controls
 
 	BLayoutBuilder::Group<> builder = BLayoutBuilder::Group<>(this,
 		B_VERTICAL);
-	AddControls(builder, fEditor->View());
+
+	if (fEditor == NULL)
+		AddControls(builder, NULL);
+	else
+		AddControls(builder, fEditor->View());
 
 	builder.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.AddGlue()
@@ -189,8 +190,10 @@ AbstractParametersPanel::Init(B_PARAMETER_EDITOR_TYPE type,
 
 	SetDefaultButton(fOkButton);
 
-	fEditor->SetTo(partition);
-	fEditor->SetModificationMessage(new BMessage(kParameterChanged));
+	if (fEditor != NULL) {
+		fEditor->SetTo(partition);
+		fEditor->SetModificationMessage(new BMessage(kParameterChanged));
+	}
 }
 
 
