@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ShowImage	4011843330
+1	portuguese (brazil)	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Utilizar como plano de fundo…
 File	Menus		Arquivo
 Slide delay	Menus		Atraso de deslizamento
@@ -53,6 +53,7 @@ Select all	Menus		Selecionar tudo
 Zoom factor in %:	PrintOptionsWindow		Fator de zoom em %:
 Width:	PrintOptionsWindow		Largura:
 Image	Menus		Imagem
+Move to Trash	Menus		Mover para a Lixeira
 OK	Alerts		OK
 Rotate clockwise	Menus		Girar em sentido horário
 Job setup	PrintOptionsWindow		Configurar trabalho

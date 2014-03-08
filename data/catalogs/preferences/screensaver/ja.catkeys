@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ScreenSaver	1801423325
+1	japanese	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		スクリーンセーバーを実行できませんでした
 30 seconds	ScreenSaver		30 秒
 Start screensaver	ScreenSaver		スクリーンセーバーを開始
@@ -24,4 +24,5 @@ Blackness	ScreenSaver		Blackness
 Use custom password	ScreenSaver		独自のパスワードを使う
 Done	ScreenSaver		完了
 Confirm password:	ScreenSaver		パスワード(再度):
+No preview available	PreviewView		プレビューはありません
 Use network password	ScreenSaver		ネットワークパスワードを使用

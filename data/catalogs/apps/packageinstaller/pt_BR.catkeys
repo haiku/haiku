@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PackageInstaller	792037176
+1	portuguese (brazil)	x-vnd.Haiku-PackageInstaller	1300087557
 Install to:	PackageView		Instalar em:
 OK	PackageView		OK
 Accept	PackageTextViewer		Aceitar
@@ -18,6 +18,7 @@ All existing files will be replaced?	PackageView		Todos os arquivos existentes s
 Preparing package	PackageInstall		Preparando pacote
 No package available.	PackageInfo		Nenhum pacote disponível.
 none	PackageView		nenhum
+Install %name%	PackageView		Instalar %name%
 Stop	PackageStatus		Parar
 Other…	PackageView		Outro…
 No installation type selected	PackageView		Nenhum tipo de instalação selecionado
@@ -45,11 +46,14 @@ Decline	PackageTextViewer		Desistir
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		O arquivo de nome '%s' já existe no caminho especificado.\nSubstituir o arquivo existente pelo deste pacote ou pular esta etapa? 
 All existing files will be skipped?	PackageView		Todos os arquivos existentes serão pulados?
 Continue	PackageInfo		Continuar
+%index% of %total%	PackageInstall		%index% de %total%
 %.1f KiB	PackageView		%.1f kB
 Abort	PackageInfo		Cancelar
 PackageInstaller	System name		Instalador de pacotes
 Abort	PackageInstall		Cancelar
+%name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Continuar
+Begin	PackageView		Início
 Replace	PackageView		Substituir
 Installation progress	PackageView		Progresso da instalação
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		O arquivo do pacote é ilegível.\nUma das possíveis razões é que este não é um arquivo .pkg do BeOS válido.

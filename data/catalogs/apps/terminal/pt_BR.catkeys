@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	1655135592
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	3250775475
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
@@ -70,6 +70,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:\
 Selected background	Terminal AppearancePrefView		Plano de fundo selecionado
 Slate	Terminal colors scheme		Ardósia
 Text under cursor	Terminal AppearancePrefView		Texto sob cursor
+Use bright instead of bold text	Terminal AppearancePrefView		Usar texto claro ao invés de negrito
 Midnight	Terminal colors scheme		Meia-noite
 Decrease	Terminal TermWindow		Diminuir
 Default	Terminal colors scheme		Padrão

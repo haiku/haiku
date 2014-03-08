@@ -1,39 +1,119 @@
-1	french	x-vnd.Haiku-Keymap	761976561
+1	french	x-vnd.Haiku-Keymap	3330955176
+Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Majuscule :
 Revert	Modifier keys window		Défaire
+Slovak	Keyboard Layout View		Slovaque
+Hungarian	Keyboard Layout View		Hongrois
+German	Keyboard Layout View		Allemand
+Swiss-French	Keyboard Layout View		Suisse-Français
+Warning: left and right key roles do not match	Modifier keys window		Attention : les rôles des touches gauche et droite ne correspondent pas
+Scroll lock	Keyboard Layout View		Arrêt défilement
+Belarusian (Mac)	Keyboard Layout View		Biélorusse (Mac)
+Greek	Keyboard Layout View		Grec
+Menu	Keyboard Layout View	Menu key	Menu
+US	Keyboard Layout View		US
+Left control	Keyboard Layout View		Contrôle gauche
+Spanish	Keyboard Layout View		Espagnol
+Ukrainian (Mac)	Keyboard Layout View		Ukrainien (Mac)
+Belarusian	Keyboard Layout View		Biélorusse
+Italian	Keyboard Layout View		Italien
+Polish (Typewriter)	Keyboard Layout View		Polonais (machine à écrire)
 Tilde trigger	Keymap window		Tilde
 Grave trigger	Keymap window		Accent grave
 Role	Modifier keys window	As in the role of a modifier key	Rôle
+Caps lock	Keyboard Layout View		Verr. maj.
 Select dead keys	Keymap window		Sélection des touches mortes
+Bulgarian (Cyrillic)	Keyboard Layout View		Bulgare (Cyrillique)
 Cancel	Modifier keys window		Annuler
+Russian	Keyboard Layout View		Russe
+Icelandic	Keyboard Layout View		Islandais
+Command	Keyboard Layout View	Command key	Commande
+Polish	Keyboard Layout View		Polonais
+Serbian (Cyrillic)	Keyboard Layout View		Serbe (Cyrillique)
+French	Keyboard Layout View		Français
+Faeroese	Keyboard Layout View		Féroéen
+Japanese	Keyboard Layout View		Japonais
+Bulgarian (Phonetic)	Keyboard Layout View		Bulgare (Phonétique)
+Dvorak (programmer's)	Keyboard Layout View		Dvorak (programmeur)
+Estonian	Keyboard Layout View		Estonien
+Russian (Mac)	Keyboard Layout View		Russe (MAC)
 Defaults	Keymap window		Valeurs par défaut
 Quit	Keymap window		Quitter
+Dutch	Keyboard Layout View		Néerlandais
 Switch shortcut keys to Haiku mode	Keymap window		Basculer les touches de raccourcis en mode Haiku
 Circumflex trigger	Keymap window		Accent circonflexe
+ISO-9995	Keyboard Layout View		ISO-9995
+Hebrew	Keyboard Layout View		Hébreu
 Diaeresis trigger	Keymap window		Tréma
 Disabled	Modifier keys window	Do nothing	Désactivé
+Belarusian (Latin)	Keyboard Layout View		Biélorusse (Latin)
+Danish	Keyboard Layout View		Danois
 Open…	Keymap window		Ouvrir…
+Russian (Typewriter)	Keyboard Layout View		Russe (Machine à écrire)
+Error: duplicate keys	Modifier keys window		Erreur : touches dupliquées
 System:	Keymap window		Système :
+Lithuanian	Keyboard Layout View		Lituanien
+Finnish	Keyboard Layout View		Finnois
+Left command	Keyboard Layout View		Commande gauche
+Romanian	Keyboard Layout View		Roumain
 Set modifier keys…	Keymap window		Régler les touches modificatrices…
 Option:	Modifier keys window	Option key role name	Option :
+Czech (Mac)	Keyboard Layout View		Tchèque (Mac)
+Control	Keyboard Layout View	Control key	Contrôle
+Left option	Keyboard Layout View		Option gauche
+Portuguese	Keyboard Layout View		Portugais
+Right control	Keyboard Layout View		Contrôle droit
 Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
+Norwegian	Keyboard Layout View		Norvégien
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Touche majuscule
 User:	Keymap window		Utilisateur :
+Esperanto	Keyboard Layout View		Espéranto
+Arabic (102)	Keyboard Layout View		Arabe (102)
+United-Kingdom	Keyboard Layout View		Royaume-Uni
+German (Mac)	Keyboard Layout View		Allemand (Mac)
+Right option	Keyboard Layout View		Option droite
+Right shift	Keyboard Layout View		Majuscule droite
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Touche contrôle
 Control:	Modifier keys window	Control key role name	Contrôle :
+Brazilian	Keyboard Layout View		Brésilien
+Brazilian (ABNT2)	Keyboard Layout View		Brésilien (ABNT-2)
+French (Bépo)	Keyboard Layout View		Français (Bépo)
+Option	Keyboard Layout View	Option key	Option
+US-International	Keyboard Layout View		US International
 Sample and clipboard:	Keymap window		Exemple et presse-papier :
+Swiss-German	Keyboard Layout View		Suisse-Allemand
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Touche Alt/Option
 Layout	Keymap window		Disposition
 Switch shortcut keys to Windows/Linux mode	Keymap window		Basculer les touches de raccourcis en mode Linux/Windows
+Albanian	Keyboard Layout View		Albanais
+Right command	Keyboard Layout View		Commande droite
 Revert	Keymap window		Défaire
 Command:	Modifier keys window	Command key role name	Commande :
+Spanish (Dvorak)	Keyboard Layout View		Espagnol (Dvorak)
+Lithuanian (Standard)	Keyboard Layout View		Lituanien (standard)
+Canadian-French	Keyboard Layout View		Canadien-Français
+Irish	Keyboard Layout View		Irlandais
+Turkish (Type-F)	Keyboard Layout View		Turc (Type-F)
+Slovene	Keyboard Layout View		Slovène
+Turkish (Type-Q)	Keyboard Layout View		Turc (Type-Q)
 Save as…	Keymap window		Enregistrer sous…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Touche Win/Cmd
+Serbian (Latin)	Keyboard Layout View		Serbe (Latin)
 File	Keymap window		Fichier
+Num lock	Keyboard Layout View		Verr. Num.
+Swedish	Keyboard Layout View		Suédois
+Macedonian	Keyboard Layout View		Macédonien
 (Current)	Keymap window		(Actif)
 Font	Keymap window		Police
 Keymap	System name		Disposition du clavier
+French (Mac)	Keyboard Layout View		Français (MAC)
+Left shift	Keyboard Layout View		Majuscule gauche
+Shift	Keyboard Layout View	Shift key	Majuscule
+Ukrainian	Keyboard Layout View		Ukrainien
+Croatian	Keyboard Layout View		Croate
+Kazakh	Keyboard Layout View		Kazakh
+Czech	Keyboard Layout View		Tchèque
 Set modifier keys	Modifier keys window		Régler les touches modificatrices
 Modifier keys	Modifier keys window		Touches modificatrices
 Acute trigger	Keymap window		Accent aigu

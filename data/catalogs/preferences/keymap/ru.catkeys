@@ -1,39 +1,86 @@
-1	russian	x-vnd.Haiku-Keymap	761976561
+1	russian	x-vnd.Haiku-Keymap	2510000186
+Dvorak	Keyboard Layout View		Дворак
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Вернуть
+Slovak	Keyboard Layout View		Словацкая
+Hungarian	Keyboard Layout View		Венгерская
+German	Keyboard Layout View		Немецкая
+Swiss-French	Keyboard Layout View		Франко-швейцарский
+Warning: left and right key roles do not match	Modifier keys window		Внимание: роль левой и правой клавиши не совпадают
+Greek	Keyboard Layout View		Греческая
+Left control	Keyboard Layout View		Левый control
+Spanish	Keyboard Layout View		Испанская
+Ukrainian (Mac)	Keyboard Layout View		Украинская (Mac)
+Belarusian	Keyboard Layout View		Белорусская
+Italian	Keyboard Layout View		Итальянская
 Tilde trigger	Keymap window		Тильда
 Grave trigger	Keymap window		Апостроф
 Role	Modifier keys window	As in the role of a modifier key	Роль
+Caps lock	Keyboard Layout View		Caps lock
 Select dead keys	Keymap window		Выбор мертвых клавиш
+Bulgarian (Cyrillic)	Keyboard Layout View		Болгарская (кириллическая)
 Cancel	Modifier keys window		Отмена
+Russian	Keyboard Layout View		Русская
+Icelandic	Keyboard Layout View		Исландская
+Command	Keyboard Layout View	Command key	Command
+Polish	Keyboard Layout View		Польская
+Serbian (Cyrillic)	Keyboard Layout View		Сербская (кириллическая)
+French	Keyboard Layout View		Французская
+Faeroese	Keyboard Layout View		Фарерская
+Japanese	Keyboard Layout View		Японская
+Bulgarian (Phonetic)	Keyboard Layout View		Болгарская (фонетическая)
+Estonian	Keyboard Layout View		Эстонская
 Defaults	Keymap window		По умолчанию
 Quit	Keymap window		Выйти
 Switch shortcut keys to Haiku mode	Keymap window		Переключить раскладку в режим Haiku
 Circumflex trigger	Keymap window		Циркумфлекс
 Diaeresis trigger	Keymap window		Диерезис
 Disabled	Modifier keys window	Do nothing	Отключено
+Belarusian (Latin)	Keyboard Layout View		Белорусская (латиница)
+Danish	Keyboard Layout View		Датская
 Open…	Keymap window		Открыть…
+Error: duplicate keys	Modifier keys window		Ошибка: дублирующиеся клавиши
 System:	Keymap window		Системные:
+Lithuanian	Keyboard Layout View		Литовская
+Finnish	Keyboard Layout View		Финская
 Set modifier keys…	Keymap window		Назначить клавиши-модификаторы…
 Option:	Modifier keys window	Option key role name	Option:
+Control	Keyboard Layout View	Control key	Control
 Switch shortcut keys	Keymap window		Переключение горячих клавиш
+Norwegian	Keyboard Layout View		Норвежская
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавиша Shift
 User:	Keymap window		Пользовательские:
+Esperanto	Keyboard Layout View		Эсперанто
+Right option	Keyboard Layout View		Правый option
 Key	Modifier keys window	As in a computer keyboard key	Клавиша
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавиша Ctrl
 Control:	Modifier keys window	Control key role name	Control:
+Brazilian	Keyboard Layout View		Бразильская
+Option	Keyboard Layout View	Option key	Option
 Sample and clipboard:	Keymap window		Пример и буфер обмена:
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Клавиша Alt/Opt
 Layout	Keymap window		Макет
 Switch shortcut keys to Windows/Linux mode	Keymap window		Переключить раскладку в режим Windows/Linux
+Albanian	Keyboard Layout View		Албанская
+Right command	Keyboard Layout View		Правый command
 Revert	Keymap window		Вернуть
 Command:	Modifier keys window	Command key role name	Command:
+Latin-American	Keyboard Layout View		Латиноамериканская
+Spanish (Dvorak)	Keyboard Layout View		Испанская (Дворак)
+Irish	Keyboard Layout View		Ирландская
 Save as…	Keymap window		Сохранить как…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Клавиша Win/Cmd
 File	Keymap window		Файл
+Swedish	Keyboard Layout View		Шведская
+Macedonian	Keyboard Layout View		Македонская
 (Current)	Keymap window		(Текущая)
 Font	Keymap window		Шрифт
 Keymap	System name		Раскладка
+Shift	Keyboard Layout View	Shift key	Shift
+Ukrainian	Keyboard Layout View		Украинская
+Croatian	Keyboard Layout View		Хорватская
+Kazakh	Keyboard Layout View		Казахская
+Czech	Keyboard Layout View		Чешская
 Set modifier keys	Modifier keys window		Назначить клавиши-модификаторы
 Modifier keys	Modifier keys window		Клавиши-модификаторы
 Acute trigger	Keymap window		Аксант эгю

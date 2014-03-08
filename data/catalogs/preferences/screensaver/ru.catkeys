@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ScreenSaver	1801423325
+1	russian	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Не удалось загрузить заставку
 30 seconds	ScreenSaver		30 секунд
 Start screensaver	ScreenSaver		Запускать заставку через
@@ -24,4 +24,5 @@ Blackness	ScreenSaver		Пустой экран
 Use custom password	ScreenSaver		Использовать выбранный пароль
 Done	ScreenSaver		Готово
 Confirm password:	ScreenSaver		Подтверждение пароля:
+No preview available	PreviewView		Предварительный просмотр недоступен
 Use network password	ScreenSaver		Использовать сетевой пароль

@@ -1,55 +1,124 @@
-1	hungarian	x-vnd.Haiku-Keymap	363163193
+1	hungarian	x-vnd.Haiku-Keymap	439384761
+Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Váltógomb:
 Revert	Modifier keys window		Visszaállít
+Slovak	Keyboard Layout View		Szlovák
+Hungarian	Keyboard Layout View		Magyar
+German	Keyboard Layout View		Német
+Swiss-French	Keyboard Layout View		Svájci francia
+Warning: left and right key roles do not match	Modifier keys window		Figyelem: a bal és a jobb szabály nem egyezik
+Belgian (comma)	Keyboard Layout View		Belga
 Scroll lock	Keyboard Layout View		Scroll lock
+Belarusian (Mac)	Keyboard Layout View		Belorusz (Mac)
+Greek	Keyboard Layout View		Görög
 Menu	Keyboard Layout View	Menu key	Menü
+US	Keyboard Layout View		Egyesült Államok
 Left control	Keyboard Layout View		Bal Ctrl
+Spanish	Keyboard Layout View		Spanyol
+Ukrainian (Mac)	Keyboard Layout View		Ukrán (Mac)
+Belarusian	Keyboard Layout View		Belorusz
+Italian	Keyboard Layout View		Olasz
+Polish (Typewriter)	Keyboard Layout View		Lengyel (írógép)
 Tilde trigger	Keymap window		Hullámvonal kapcsoló
 Grave trigger	Keymap window		Fordított ékezet kapcsoló
 Role	Modifier keys window	As in the role of a modifier key	Szerep
 Caps lock	Keyboard Layout View		Caps lock
 Select dead keys	Keymap window		„Beragadó” gombok kiválasztása
+Bulgarian (Cyrillic)	Keyboard Layout View		Bolgár (cirill)
 Cancel	Modifier keys window		Mégse
+Russian	Keyboard Layout View		Orosz
+Icelandic	Keyboard Layout View		Izlandi
 Command	Keyboard Layout View	Command key	Parancsbillentyű
+Polish	Keyboard Layout View		Lengyel
+Serbian (Cyrillic)	Keyboard Layout View		Szerb (cirill)
+French	Keyboard Layout View		Francia
+Faeroese	Keyboard Layout View		Feröeri
+Japanese	Keyboard Layout View		Japán
+Bulgarian (Phonetic)	Keyboard Layout View		Bolgár (fonetikus)
+Dvorak (programmer's)	Keyboard Layout View		Dvorak (programozó)
+Estonian	Keyboard Layout View		Észt
+Russian (Mac)	Keyboard Layout View		Orosz (Mac)
 Defaults	Keymap window		Eredeti
 Quit	Keymap window		Kilépés
+Dutch	Keyboard Layout View		Holland
 Switch shortcut keys to Haiku mode	Keymap window		Billentyűzetkombináció-váltás Haiku-módra
 Circumflex trigger	Keymap window		Kalap kapcsoló
+ISO-9995	Keyboard Layout View		ISO-9995
+Hebrew	Keyboard Layout View		Héber
 Diaeresis trigger	Keymap window		Tréma kapcsoló
 Disabled	Modifier keys window	Do nothing	Letiltva
+Belarusian (Latin)	Keyboard Layout View		Belorusz (latin)
+Danish	Keyboard Layout View		Dán
 Open…	Keymap window		Megnyitás…
+Russian (Typewriter)	Keyboard Layout View		Orosz (írógép)
+Error: duplicate keys	Modifier keys window		Hiba: dupla billentyű
 System:	Keymap window		Nyelv:
+Lithuanian	Keyboard Layout View		Litván
+Finnish	Keyboard Layout View		Finn
+Svorak	Keyboard Layout View		Svorak
 Left command	Keyboard Layout View		Bal parancs billentyű
+Romanian	Keyboard Layout View		Román
 Set modifier keys…	Keymap window		Módosító billentyű megadása…
 Option:	Modifier keys window	Option key role name	Opció billentyű:
+Czech (Mac)	Keyboard Layout View		Cseh (Mac)
 Control	Keyboard Layout View	Control key	Vezérlőbillentyű
 Left option	Keyboard Layout View		Bal opció billentyű
+Portuguese	Keyboard Layout View		Portugál
 Right control	Keyboard Layout View		Jobb Ctrl
+Belgian (point)	Keyboard Layout View		Belga (pont)
 Switch shortcut keys	Keymap window		Billentyűzetkombináció-váltás
+Norwegian	Keyboard Layout View		Norvég
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift billentyű
 User:	Keymap window		Felhasználó:
+Esperanto	Keyboard Layout View		Eszperantó
+Arabic (102)	Keyboard Layout View		Arab (102)
+United-Kingdom	Keyboard Layout View		Egyesült Királyság
+German (Mac)	Keyboard Layout View		Német (Mac)
 Right option	Keyboard Layout View		Jobb opció billentyű
 Right shift	Keyboard Layout View		Jobb Shift
 Key	Modifier keys window	As in a computer keyboard key	Billentyű
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl billentyű
 Control:	Modifier keys window	Control key role name	Vezérlőbillentyű:
+Brazilian	Keyboard Layout View		Brazil
+Brazilian (ABNT2)	Keyboard Layout View		Brazil (ABNT-2)
+French (Bépo)	Keyboard Layout View		Francia (Bépo)
 Option	Keyboard Layout View	Option key	Opció billentyű
+US-International	Keyboard Layout View		Egyesült Államok nemzetközi
 Sample and clipboard:	Keymap window		Próba és vágólap:
+Swiss-German	Keyboard Layout View		Svájci német
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opc billentyű
 Layout	Keymap window		Elrendezés
 Switch shortcut keys to Windows/Linux mode	Keymap window		Billentyűkombináció váltása Windows/Linux módra
+Albanian	Keyboard Layout View		Albán
 Right command	Keyboard Layout View		Jobb parancs billentyű
 Revert	Keymap window		Visszaállít
 Command:	Modifier keys window	Command key role name	Parancsbillentyű:
+Latin-American	Keyboard Layout View		Latin-amerikai
+Spanish (Dvorak)	Keyboard Layout View		Spanyol (Dvorak)
+Lithuanian (Standard)	Keyboard Layout View		Litván (szabványos)
+Canadian-French	Keyboard Layout View		Kanadai francia
+Irish	Keyboard Layout View		Ír
+Turkish (Type-F)	Keyboard Layout View		Török (F-típusú)
+Slovene	Keyboard Layout View		Szlovén
+Turkish (Type-Q)	Keyboard Layout View		Török (Q-típusú)
 Save as…	Keymap window		Mentés másként…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd billentyű
+Serbian (Latin)	Keyboard Layout View		Szerb (latin)
 File	Keymap window		Fájl
 Num lock	Keyboard Layout View		Num lock
+Swedish	Keyboard Layout View		Svéd
+Macedonian	Keyboard Layout View		macedón
 (Current)	Keymap window		(jelenlegi)
 Font	Keymap window		Betűtípus
 Keymap	System name		Billentyűzetkiosztás
+French (Mac)	Keyboard Layout View		Francia (Mac)
 Left shift	Keyboard Layout View		Bal Shift
 Shift	Keyboard Layout View	Shift key	Váltógomb
+Ukrainian	Keyboard Layout View		Ukrán
+Croatian	Keyboard Layout View		Horvát
+Kazakh	Keyboard Layout View		Kazak
+Czech	Keyboard Layout View		Cseh
 Set modifier keys	Modifier keys window		Módosító billentyű megadása
+Colemak	Keyboard Layout View		Colemak
 Modifier keys	Modifier keys window		Módosító billentyű
 Acute trigger	Keymap window		Ékezet kapcsoló

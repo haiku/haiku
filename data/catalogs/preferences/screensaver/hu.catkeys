@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ScreenSaver	1801423325
+1	hungarian	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		A képernyővédő betöltése sikertelen
 30 seconds	ScreenSaver		30 másodperc
 Start screensaver	ScreenSaver		Képernyővédő indítása
@@ -24,4 +24,5 @@ Blackness	ScreenSaver		Sötétség
 Use custom password	ScreenSaver		Egyéni jelszó használata
 Done	ScreenSaver		Kész
 Confirm password:	ScreenSaver		Jelszó megerősítése:
+No preview available	PreviewView		Nem áll rendelkezésre előnézet
 Use network password	ScreenSaver		Hálózati jelszó használata

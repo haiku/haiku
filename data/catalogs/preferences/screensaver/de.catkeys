@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ScreenSaver	1801423325
+1	german	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Bildschirmschoner konnte nicht geladen werden.
 30 seconds	ScreenSaver		30 Sekunden
 Start screensaver	ScreenSaver		Bildschirmschoner starten
@@ -24,4 +24,5 @@ Blackness	ScreenSaver		Schwarzer Bildschirm
 Use custom password	ScreenSaver		Benutzerdefiniertes Passwort
 Done	ScreenSaver		Fertig
 Confirm password:	ScreenSaver		Passwort bestätigen:
+No preview available	PreviewView		Keine Vorschau verfügbar
 Use network password	ScreenSaver		Netzwerkpasswort

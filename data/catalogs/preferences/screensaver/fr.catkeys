@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ScreenSaver	1801423325
+1	french	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Impossible de charger l'économiseur d'écran
 30 seconds	ScreenSaver		30 secondes
 Start screensaver	ScreenSaver		Démarrer l'économiseur
@@ -24,4 +24,5 @@ Blackness	ScreenSaver		Ténèbres
 Use custom password	ScreenSaver		Utiliser un mot de passe personnalisé
 Done	ScreenSaver		Terminé
 Confirm password:	ScreenSaver		Confirmer le mot de passe :
+No preview available	PreviewView		Pas d'aperçu disponible
 Use network password	ScreenSaver		Utiliser un mot de passe réseau
