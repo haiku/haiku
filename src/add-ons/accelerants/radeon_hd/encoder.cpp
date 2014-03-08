@@ -1226,7 +1226,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	bool isDP = connector_is_dp(connectorIndex);
-	bool linkB = gConnector[connectorIndex]->encoderExternal.linkEnumeration
+	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
 	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
