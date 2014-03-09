@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -351,8 +351,10 @@ DwarfImageDebugInfo::GetFunctions(const BObjectList<SymbolInfo>& symbols,
 			if (rangeList == NULL) {
 				target_addr_t lowPC = subprogramEntry->LowPC();
 				target_addr_t highPC = subprogramEntry->HighPC();
-				if (lowPC >= highPC)
+				if (lowPC == highPC)
 					continue;
+				else if (highPC < lowPC)
+					highPC += lowPC;
 
 				rangeList = new(std::nothrow) TargetAddressRangeList(
 					TargetAddressRange(lowPC, highPC - lowPC));

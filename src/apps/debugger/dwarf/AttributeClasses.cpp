@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -49,8 +49,8 @@ static const attribute_name_info_entry kAttributeNameInfos[] = {
 	{ ENTRY(bit_offset),			AC_BLOCK | AC_CONSTANT | AC_REFERENCE },
 	{ ENTRY(bit_size),				AC_BLOCK | AC_CONSTANT | AC_REFERENCE },
 	{ ENTRY(stmt_list),				AC_LINEPTR },
-	{ ENTRY(low_pc),				AC_ADDRESS },
-	{ ENTRY(high_pc),				AC_ADDRESS },
+	{ ENTRY(low_pc),				AC_ADDRESS | AC_CONSTANT | AC_REFERENCE },
+	{ ENTRY(high_pc),				AC_ADDRESS | AC_CONSTANT | AC_REFERENCE },
 	{ ENTRY(language),				AC_CONSTANT },
 	{ ENTRY(discr),					AC_REFERENCE },
 	{ ENTRY(discr_value),			AC_CONSTANT },
