@@ -309,7 +309,7 @@ CPUEntry::StartQuantumTimer(ThreadData* thread, bool wasPreempted)
 			B_ONE_SHOT_RELATIVE_TIMER);
 	} else if (gTrackCoreLoad) {
 		add_timer(&cpu->quantum_timer, &CPUEntry::_UpdateLoadEvent,
-			kLoadMeasureInterval, B_ONE_SHOT_RELATIVE_TIMER);
+			kLoadMeasureInterval * 2, B_ONE_SHOT_RELATIVE_TIMER);
 		fUpdateLoadEvent = true;
 	}
 }
@@ -536,20 +536,18 @@ CoreEntry::_UpdateLoad(bool forceUpdate)
 
 	bigtime_t now = system_time();
 	bool intervalEnded = now >= kLoadMeasureInterval + fLastLoadUpdate;
+	bool intervalSkipped = now >= kLoadMeasureInterval * 2 + fLastLoadUpdate;
 
 	if (!intervalEnded && !forceUpdate)
 		return;
 
 	WriteSpinLocker coreLocker(gCoreHeapsLock);
 
-	int32 newKey = GetLoad();
-	int32 oldKey = CoreLoadHeap::GetKey(this);
-
-	ASSERT(oldKey >= 0);
-	ASSERT(newKey >= 0);
-
+	int32 newKey;
 	if (intervalEnded) {
 		WriteSpinLocker locker(fLoadLock);
+
+		newKey = intervalSkipped ? fCurrentLoad : GetLoad();
 
 		ASSERT(fCurrentLoad >= 0);
 		ASSERT(fLoad >= fCurrentLoad);
@@ -557,7 +555,13 @@ CoreEntry::_UpdateLoad(bool forceUpdate)
 		fLoad = fCurrentLoad;
 		fLoadMeasurementEpoch++;
 		fLastLoadUpdate = now;
-	}
+	} else
+		newKey = GetLoad();
+
+	int32 oldKey = CoreLoadHeap::GetKey(this);
+
+	ASSERT(oldKey >= 0);
+	ASSERT(newKey >= 0);
 
 	if (oldKey == newKey)
 		return;
