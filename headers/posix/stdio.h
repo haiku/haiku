@@ -121,7 +121,9 @@ extern int		setbuffer(FILE *stream, char *buf, size_t size);
 extern int 	    	setlinebuf(FILE *stream);
 
 extern size_t	fwrite(const void *buffer, size_t size, size_t numItems, FILE *stream);
+extern size_t	fwrite_unlocked(const void *buffer, size_t size, size_t numItems, FILE *stream);
 extern size_t	fread(void *buffer, size_t size, size_t numItems, FILE *stream);
+extern size_t	fread_unlocked(void *buffer, size_t size, size_t numItems, FILE *stream);
 
 extern int		putc(int c, FILE *stream);
 extern int		putchar(int c);
@@ -131,6 +133,7 @@ extern int		fputc(int c, FILE *stream);
 extern int		fputc_unlocked(int c, FILE *stream);
 extern int		puts(const char *string);
 extern int		fputs(const char *string, FILE *stream);
+extern int		fputs_unlocked(const char *string, FILE *stream);
 
 extern int		getc(FILE *stream);
 extern int		getc_unlocked(FILE *stream);
@@ -138,8 +141,10 @@ extern int		ungetc(int c, FILE *stream);
 extern int		getchar(void);
 extern int		getchar_unlocked(void);
 extern int		fgetc(FILE *stream);
+extern int		fgetc_unlocked(FILE *stream);
 extern char		*gets(char *buffer);
 extern char		*fgets(char *string, int stringLength, FILE *stream);
+extern char		*fgets_unlocked(char *string, int stringLength, FILE *stream);
 
 extern ssize_t	getdelim(char **_line, size_t *_length, int delimiter,
 					FILE *stream);
