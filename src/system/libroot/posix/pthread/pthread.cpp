@@ -181,7 +181,7 @@ pthread_self(void)
 int
 pthread_equal(pthread_t t1, pthread_t t2)
 {
-	return t1 != NULL && t2 != NULL && t1 == t2;
+	return t1 == t2;
 }
 
 
