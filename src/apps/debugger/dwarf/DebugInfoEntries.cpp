@@ -115,6 +115,9 @@ DIECompileUnitBase::AddAttribute_high_pc(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fHighPC = value.address;
+	if (fLowPC != 0 && fHighPC < fLowPC)
+		fHighPC += fLowPC;
+
 	return B_OK;
 }
 
@@ -999,6 +1002,9 @@ DIELexicalBlock::AddAttribute_high_pc(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fHighPC = value.address;
+	if (fLowPC != 0 && fHighPC < fLowPC)
+		fHighPC += fLowPC;
+
 	return B_OK;
 }
 
@@ -1948,6 +1954,9 @@ DIESubprogram::AddAttribute_high_pc(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fHighPC = value.address;
+	if (fLowPC != 0 && fHighPC < fLowPC)
+		fHighPC += fLowPC;
+
 	return B_OK;
 }
 
