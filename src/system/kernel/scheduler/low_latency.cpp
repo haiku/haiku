@@ -85,29 +85,26 @@ should_rebalance(const ThreadData* threadData)
 	if (threadLoad >= coreLoad / 2)
 		return false;
 
-	int32 coreNewLoad = coreLoad - threadLoad;
-
+	// Get the least loaded core.
 	ReadSpinLocker coreLocker(gCoreHeapsLock);
 	CoreEntry* other = gCoreLoadHeap.PeekMinimum();
 	if (other == NULL)
 		other = gCoreHighLoadHeap.PeekMinimum();
 	coreLocker.Unlock();
-
 	ASSERT(other != NULL);
-	int32 otherNewLoad = other->GetLoad() + threadLoad;
 
-	// If there is high load on this core but this thread does not contribute
-	// significantly consider giving it to someone less busy.
-	if (coreLoad > kHighLoad) {
-		if (coreNewLoad - otherNewLoad >= kLoadDifference)
-			return true;
-	}
+	if (other == threadData->Core())
+		return false;
 
-	// No cpu bound threads - the situation is quite good. Make sure it
-	// won't get much worse...
+	// If there are idle cores give them some work unless that will cause
+	// the current core to become idle.
+	int32 coreNewLoad = coreLoad - threadLoad;
 	if (other->GetLoad() == 0 && coreNewLoad != 0)
 		return true;
-	return coreNewLoad - otherNewLoad >= kLoadDifference * 2;
+
+	// Attempt to keep load balanced.
+	int32 otherNewLoad = other->GetLoad() + threadLoad;
+	return coreNewLoad - otherNewLoad >= kLoadDifference;
 }
 
 
