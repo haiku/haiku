@@ -314,6 +314,7 @@ DIEDeclaredType::DIEDeclaredType()
 	:
 	fDescription(NULL),
 	fAbstractOrigin(NULL),
+	fSignatureType(NULL),
 	fAccessibility(0),
 	fDeclaration(false)
 {
@@ -331,6 +332,13 @@ DebugInfoEntry*
 DIEDeclaredType::AbstractOrigin() const
 {
 	return fAbstractOrigin;
+}
+
+
+DebugInfoEntry*
+DIEDeclaredType::SignatureType() const
+{
+	return fSignatureType;
 }
 
 
@@ -373,6 +381,15 @@ DIEDeclaredType::AddAttribute_abstract_origin(uint16 attributeName,
 	const AttributeValue& value)
 {
 	fAbstractOrigin = value.reference;
+	return B_OK;
+}
+
+
+status_t
+DIEDeclaredType::AddAttribute_signature(uint16 attributeName,
+	const AttributeValue& value)
+{
+	fSignatureType = value.reference;
 	return B_OK;
 }
 

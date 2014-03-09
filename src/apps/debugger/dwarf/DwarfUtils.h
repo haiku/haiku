@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_UTILS_H
@@ -57,6 +57,14 @@ DwarfUtils::GetDIEByPredicate(EntryType* entry, const Predicate& predicate)
 	if (EntryType* specification = dynamic_cast<EntryType*>(
 			entry->Specification())) {
 		entry = specification;
+		if (predicate(entry))
+			return entry;
+	}
+
+	// try the type unit signature
+	if (EntryType* signature = dynamic_cast<EntryType*>(
+			entry->SignatureType())) {
+		entry = signature;
 		if (predicate(entry))
 			return entry;
 	}

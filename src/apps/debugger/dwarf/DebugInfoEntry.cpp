@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -90,6 +90,13 @@ DebugInfoEntry::Specification() const
 
 DebugInfoEntry*
 DebugInfoEntry::AbstractOrigin() const
+{
+	return NULL;
+}
+
+
+DebugInfoEntry*
+DebugInfoEntry::SignatureType() const
 {
 	return NULL;
 }

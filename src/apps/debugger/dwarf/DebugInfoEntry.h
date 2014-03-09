@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUG_INFO_ENTRY_H
@@ -61,6 +61,7 @@ public:
 	virtual	const char*			Description() const;
 	virtual	DebugInfoEntry*		Specification() const;
 	virtual	DebugInfoEntry*		AbstractOrigin() const;
+	virtual	DebugInfoEntry*		SignatureType() const;
 	virtual	LocationDescription* GetLocationDescription();
 
 			bool				GetDeclarationFile(uint32& _file) const;
