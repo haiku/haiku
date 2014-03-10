@@ -5,7 +5,7 @@ BootstrapPackageRepository HaikuPortsCross
 	haikuporter-0-1
 	:
 	# repository architecture packages (stage 1)
-	autoconf_bootstrap-2.69-1
+	autoconf_bootstrap-2.69-2
 	automake_bootstrap-1.13.1-1
 	binutils_bootstrap-2.17_2013_04_21-3
 	bison_bootstrap-2.4.3-1
