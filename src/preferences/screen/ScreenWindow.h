@@ -1,12 +1,13 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Rafael Romo
- *		Stefano Ceccherini (burton666@libero.it)
- *		Thomas Kurschel
+ *		Stefano Ceccherini, burton666@libero.it
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Thomas Kurschel
+ *		Rafael Romo
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef SCREEN_WINDOW_H
 #define SCREEN_WINDOW_H
@@ -20,8 +21,8 @@
 class BBox;
 class BPopUpMenu;
 class BMenuField;
+class BSpinner;
 class BStringView;
-class BTextControl;
 
 class RefreshWindow;
 class MonitorView;
@@ -39,9 +40,6 @@ public:
 	virtual	void			ScreenChanged(BRect frame, color_space mode);
 
 private:
-			BButton*		_CreateColumnRowButton(bool columns, bool plus);
-			BButton*		_GetColumnRowButton(bool columns, bool plus);
-
 			void			_BuildSupportedColorSpaces();
 
 			void			_CheckApplyEnabled();
@@ -74,9 +72,8 @@ private:
 			MonitorView*	fMonitorView;
 			BMenuItem*		fAllWorkspacesItem;
 
-			BTextControl*	fColumnsControl;
-			BTextControl*	fRowsControl;
-			BButton*		fWorkspacesButtons[4];
+			BSpinner*		fColumnsControl;
+			BSpinner*		fRowsControl;
 
 			uint32			fSupportedColorSpaces;
 			BMenuItem*		fUserSelectedColorSpace;
