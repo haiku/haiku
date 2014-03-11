@@ -433,7 +433,6 @@ Painter::SetFillRule(int32 fillRule)
 
 	fRasterizer.filling_rule(aggFillRule);
 	fSubpixRasterizer.filling_rule(aggFillRule);
-	fRasterizer.filling_rule(aggFillRule);
 }
 
 
