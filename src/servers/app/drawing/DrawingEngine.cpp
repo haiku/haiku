@@ -272,6 +272,13 @@ DrawingEngine::SetStrokeMode(cap_mode lineCap, join_mode joinMode,
 
 
 void
+DrawingEngine::SetFillRule(int32 fillRule)
+{
+	fPainter->SetFillRule(fillRule);
+}
+
+
+void
 DrawingEngine::SetBlendingMode(source_alpha srcAlpha, alpha_function alphaFunc)
 {
 	fPainter->SetBlendingMode(srcAlpha, alphaFunc);

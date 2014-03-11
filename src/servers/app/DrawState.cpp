@@ -55,6 +55,7 @@ DrawState::DrawState()
 	fLineCapMode(B_BUTT_CAP),
 	fLineJoinMode(B_MITER_JOIN),
 	fMiterLimit(B_DEFAULT_MITER_LIMIT),
+	fFillRule(B_NONZERO),
 	fPreviousState(NULL)
 {
 	fUnscaledFontSize = fFont.Size();
@@ -687,6 +688,13 @@ void
 DrawState::SetMiterLimit(float limit)
 {
 	fMiterLimit = limit;
+}
+
+
+void
+DrawState::SetFillRule(int32 fillRule)
+{
+	fFillRule = fillRule;
 }
 
 

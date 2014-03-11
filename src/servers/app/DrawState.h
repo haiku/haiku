@@ -144,6 +144,10 @@ public:
 		float				MiterLimit() const
 								{ return fMiterLimit; }
 
+		void				SetFillRule(int32 fillRule);
+		int32				FillRule() const
+								{ return fFillRule; }
+
 							// convenience functions
 		void				PrintToStream() const;
 
@@ -192,6 +196,7 @@ protected:
 		cap_mode			fLineCapMode;
 		join_mode			fLineJoinMode;
 		float				fMiterLimit;
+		int32				fFillRule;
 		// "internal", used to calculate the size
 		// of the font (again) when the scale changes
 		float				fUnscaledFontSize;

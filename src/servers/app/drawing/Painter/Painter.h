@@ -81,6 +81,7 @@ public:
 									{ return fPenSize; }
 			void				SetStrokeMode(cap_mode lineCap,
 									join_mode joinMode, float miterLimit);
+			void				SetFillRule(int32 fillRule);
 			void				SetPattern(const pattern& p,
 									bool drawingText = false);
 	inline	pattern				Pattern() const
@@ -394,6 +395,7 @@ private:
 			cap_mode			fLineCapMode;
 			join_mode			fLineJoinMode;
 			float				fMiterLimit;
+			int32				fFillRule;
 
 			PatternHandler		fPatternHandler;
 

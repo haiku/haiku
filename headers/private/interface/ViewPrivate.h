@@ -40,8 +40,9 @@ enum {
 	B_VIEW_VIEW_COLOR_BIT		= 0x00010000,
 	B_VIEW_PATTERN_BIT			= 0x00020000,
 	B_VIEW_TRANSFORM_BIT		= 0x00040000,
+	B_VIEW_FILL_RULE_BIT		= 0x00080000,
 
-	B_VIEW_ALL_BITS				= 0x0007ffff,
+	B_VIEW_ALL_BITS				= 0x000fffff,
 
 	// these used for archiving only
 	B_VIEW_RESIZE_BIT			= 0x00001000,
@@ -122,6 +123,9 @@ class ViewState {
 		join_mode			line_join;
 		cap_mode			line_cap;
 		float				miter_limit;
+
+		// fill rule
+		int32				fill_rule;
 
 		// alpha blending
 		source_alpha		alpha_source_mode;

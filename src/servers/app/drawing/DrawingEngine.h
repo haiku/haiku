@@ -76,6 +76,7 @@ public:
 	virtual	void			SetPenSize(float size);
 	virtual	void			SetStrokeMode(cap_mode lineCap, join_mode joinMode,
 								float miterLimit);
+	virtual void			SetFillRule(int32 fillRule);
 	virtual	void			SetPattern(const struct pattern& pattern);
 	virtual	void			SetDrawingMode(drawing_mode mode);
 	virtual	void			SetDrawingMode(drawing_mode mode,

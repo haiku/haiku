@@ -282,6 +282,9 @@ public:
 			cap_mode			LineCapMode() const;
 			float				LineMiterLimit() const;
 
+			void				SetFillRule(int32 rule);
+			int32				FillRule() const;
+
 			void				SetOrigin(BPoint pt);
 			void				SetOrigin(float x, float y);
 			BPoint				Origin() const;

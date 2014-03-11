@@ -261,6 +261,14 @@ enum cap_mode {
 const float B_DEFAULT_MITER_LIMIT = 10.0F;
 
 
+// Polygon filling rules
+
+enum {
+	B_EVEN_ODD = 0,
+	B_NONZERO
+};
+
+
 // Bitmap and overlay constants
 
 enum bitmap_tiling {

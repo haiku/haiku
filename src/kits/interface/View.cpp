@@ -149,6 +149,7 @@ ViewState::ViewState()
 	line_join = B_MITER_JOIN;
 	line_cap = B_BUTT_CAP;
 	miter_limit = B_DEFAULT_MITER_LIMIT;
+	fill_rule = B_NONZERO;
 
 	alpha_source_mode = B_PIXEL_ALPHA;
 	alpha_function_mode = B_ALPHA_OVERLAY;
@@ -494,6 +495,10 @@ BView::BView(BMessage* archive)
 		&& archive->FindFloat("_lmmiter", &lineMiter) == B_OK)
 		SetLineMode((cap_mode)lineCap, (join_mode)lineJoin, lineMiter);
 
+	int16 fillRule;
+	if (archive->FindInt16("_fillrule", &fillRule) == B_OK)
+		SetFillRule(fillRule);
+
 	int16 alphaBlend;
 	int16 modeBlend;
 	if (archive->FindInt16("_blend", 0, &alphaBlend) == B_OK
@@ -616,6 +621,9 @@ BView::Archive(BMessage* data, bool deep) const
 		if (ret == B_OK)
 			ret = data->AddFloat("_lmmiter", LineMiterLimit());
 	}
+
+	if (ret == B_OK && (fState->archiving_flags & B_VIEW_FILL_RULE_BIT) != 0)
+		ret = data->AddInt16("_fillrule", (int16)FillRule());
 
 	if (ret == B_OK && (fState->archiving_flags & B_VIEW_BLENDING_BIT) != 0) {
 		source_alpha alphaSourceMode;
@@ -1989,6 +1997,51 @@ BView::LineMiterLimit() const
 	}
 
 	return fState->miter_limit;
+}
+
+
+void
+BView::SetFillRule(int32 fillRule)
+{
+	if (fState->IsValid(B_VIEW_FILL_RULE_BIT) && fillRule == fState->fill_rule)
+		return;
+
+	if (fOwner) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_SET_FILL_RULE);
+		fOwner->fLink->Attach<int32>(fillRule);
+
+		fState->valid_flags |= B_VIEW_FILL_RULE_BIT;
+	}
+
+	fState->fill_rule = fillRule;
+
+	fState->archiving_flags |= B_VIEW_FILL_RULE_BIT;
+}
+
+
+int32
+BView::FillRule() const
+{
+	if (!fState->IsValid(B_VIEW_FILL_RULE_BIT) && fOwner) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_GET_FILL_RULE);
+
+		int32 code;
+		if (fOwner->fLink->FlushWithReply(code) == B_OK && code == B_OK) {
+
+			int32 fillRule;
+			fOwner->fLink->Read<int32>(&fillRule);
+
+			fState->fill_rule = fillRule;
+		}
+
+		fState->valid_flags |= B_VIEW_FILL_RULE_BIT;
+	}
+
+	return fState->fill_rule;
 }
 
 

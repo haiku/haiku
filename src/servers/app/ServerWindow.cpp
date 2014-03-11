@@ -1529,6 +1529,31 @@ fDesktop->LockSingleWindow();
 
 			break;
 		}
+		case AS_VIEW_SET_FILL_RULE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_FILL_RULE: "
+				"View: %s\n", Title(), fCurrentView->Name()));
+			int32 fillRule;
+			if (link.Read<int32>(&fillRule) != B_OK)
+				break;
+
+			fCurrentView->CurrentState()->SetFillRule(fillRule);
+			fWindow->GetDrawingEngine()->SetFillRule(fillRule);
+
+			break;
+		}
+		case AS_VIEW_GET_FILL_RULE:
+		{
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_FILL_RULE: "
+				"View: %s\n", Title(), fCurrentView->Name()));
+			int32 fillRule = fCurrentView->CurrentState()->FillRule();
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<int32>(fillRule);
+			fLink.Flush();
+
+			break;
+		}
 		case AS_VIEW_PUSH_STATE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_VIEW_PUSH_STATE: View: "
