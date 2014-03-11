@@ -116,6 +116,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Size.cpp
 			Slider.cpp
 			SpaceLayoutItem.cpp
+			Spinner.cpp
 			SplitLayout.cpp
 			SplitLayoutBuilder.cpp
 			SplitView.cpp
