@@ -158,8 +158,10 @@ parse(BMessenger& the_application, int argc, char *argv[], int32 argapp)
 	status_t err = Hey(&the_application, argv, &argx, argc, &the_reply);
 
 	if (err != B_OK) {
-		if (!silent)
-			fprintf(stderr, "Error when sending message to %s!\n", argv[argapp]);
+		if (!silent) {
+			fprintf(stderr, "Error when sending message to %s!\n",
+				argv[argapp]);
+		}
 		return B_ERROR;
 	} else {
 		if (the_reply.what == (uint32)B_MESSAGE_NOT_UNDERSTOOD
@@ -172,7 +174,7 @@ parse(BMessenger& the_application, int argc, char *argv[], int32 argapp)
 				}
 			} else {
 				if (!silent) {
-					printf("error 0x%8" B_PRIx32 "\n",
+					printf("error 0x%8" B_PRIx32 "\n", 
 						the_reply.FindInt32("error"));
 				}			
 			}
@@ -182,15 +184,15 @@ parse(BMessenger& the_application, int argc, char *argv[], int32 argapp)
 				if (output) {
 					type_code tc;
 					if (the_reply.GetInfo("result", &tc) == B_OK) {
-						if(tc == B_INT8_TYPE) {
+						if (tc == B_INT8_TYPE) {
 							int8 v;
 							the_reply.FindInt8("result", &v);
 							printf("%d\n", v);
-						} else if(tc == B_INT16_TYPE) {
+						} else if (tc == B_INT16_TYPE) {
 							int16 v;
 							the_reply.FindInt16("result", &v);
 							printf("%d\n", v);
-						} else if(tc == B_INT32_TYPE) {
+						} else if (tc == B_INT32_TYPE) {
 							int32 v;
 							the_reply.FindInt32("result", &v);
 							printf("%" B_PRId32 "\n", v);
@@ -409,16 +411,17 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 {
 	bool direct_what = false;
 	BMessage the_message;
-	if (strcasecmp(argv[*argx], "let") == 0) {			// added "let" -- sander@adamation.com 31may2000
+	if (strcasecmp(argv[*argx], "let") == 0) {
+			// added "let" -- sander@adamation.com 31may2000
 		BMessage get_target (B_GET_PROPERTY);
 		get_target.AddSpecifier ("Messenger");
-		// parse the specifiers
+			// parse the specifiers
 		(*argx)++;
 		status_t result = B_OK;
 		while ((result = add_specifier(&get_target, argv, argx, argc)) == B_OK)
 			;
 
-		if (result != B_ERROR) {	// bad syntax
+		if (result != B_ERROR) {
 			if (!silent)
 				fprintf(stderr, "Bad specifier syntax!\n");
 			return result;
@@ -441,9 +444,10 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 			return B_ERROR;
 		}
 	}
-	if (strcasecmp(argv[*argx], "do") == 0)			// added "do"  -- pfolk@uni.uiuc.edu  1999-11-03
+	if (strcasecmp(argv[*argx], "do") == 0) {
+			// added "do"  -- pfolk@uni.uiuc.edu  1999-11-03
 		the_message.what = B_EXECUTE_PROPERTY;
-	else if (strcasecmp(argv[*argx], "get") == 0)
+	} else if (strcasecmp(argv[*argx], "get") == 0)
 		the_message.what = B_GET_PROPERTY;
 	else if (strcasecmp(argv[*argx], "set") == 0)
 		the_message.what = B_SET_PROPERTY;
@@ -457,31 +461,40 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 		the_message.what = B_SAVE_REQUESTED;
 	else if (strcasecmp(argv[*argx], "load") == 0)
 		the_message.what = B_REFS_RECEIVED;
-	else if(strcasecmp(argv[*argx], "count") == 0)
+	else if (strcasecmp(argv[*argx], "count") == 0)
 		the_message.what = B_COUNT_PROPERTIES;
-	else if(strcasecmp(argv[*argx], "getsuites") == 0)
+	else if (strcasecmp(argv[*argx], "getsuites") == 0)
 		the_message.what = B_GET_SUPPORTED_SUITES;
 	else {
-		switch(strlen(argv[*argx])) {	// can be a message constant if 1,2,3 or 4 chars
+		switch(strlen(argv[*argx])) {
+				// can be a message constant if 1,2,3 or 4 chars
 			case 1:
 				the_message.what = (int32)argv[*argx][0];
 				break;
 			case 2:
-				the_message.what = (((int32)argv[*argx][0])<<8)|(((int32)argv[*argx][1]));
+				the_message.what = (((int32)argv[*argx][0]) << 8)
+					| (((int32)argv[*argx][1]));
 				break;
 			case 3:
-				the_message.what = (((int32)argv[*argx][0])<<16)|(((int32)argv[*argx][1])<<8)|(((int32)argv[*argx][2]));
+				the_message.what = (((int32)argv[*argx][0]) << 16)
+					| (((int32)argv[*argx][1]) << 8)
+					| (((int32)argv[*argx][2]));
 				break;
 			case 4:
-				the_message.what = (((int32)argv[*argx][0])<<24)|(((int32)argv[*argx][1])<<16)|(((int32)argv[*argx][2])<<8)|(((int32)argv[*argx][3]));
+				the_message.what = (((int32)argv[*argx][0]) << 24)
+					| (((int32)argv[*argx][1]) << 16)
+					| (((int32)argv[*argx][2]) << 8)
+					| (((int32)argv[*argx][3]));
 				break;
 			default:
 				// maybe this is a user defined command, ask for the supported suites
 				bool found = false;
 				if (target && target->IsValid()) {
-					BMessage rply;
-					if(target->SendMessage(B_GET_SUPPORTED_SUITES, &rply) == B_OK) {
-						// if all goes well, rply contains all kinds of property infos
+					BMessage reply;
+					if (target->SendMessage(B_GET_SUPPORTED_SUITES, &reply)
+						== B_OK) {
+						// if all goes well, reply contains all kinds of
+						// property infos
 						int32 j = 0;
 						void *voidptr;
 						ssize_t sizefound;
@@ -494,36 +507,46 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 //							printf ("Suite %ld: %s\n", j, str);
 //
 //						j = 0;
-						while(rply.FindData("messages", B_PROPERTY_INFO_TYPE, j++, (const void **)&voidptr, &sizefound) == B_OK && !found) {
-							if (propinfo.Unflatten(B_PROPERTY_INFO_TYPE, (const void *)voidptr, sizefound) == B_OK) {
-								vinfo=propinfo.Values();
-								vinfo_index=0;
-								vinfo_count=propinfo.CountValues();
+						while (reply.FindData("messages", B_PROPERTY_INFO_TYPE,
+								j++, (const void **)&voidptr, &sizefound)
+							== B_OK && !found) {
+							if (propinfo.Unflatten(B_PROPERTY_INFO_TYPE,
+									(const void *)voidptr, sizefound) == B_OK) {
+								vinfo = propinfo.Values();
+								vinfo_index = 0;
+								vinfo_count = propinfo.CountValues();
 #if TEST_VALUEINFO>0
-								value_info vinfo[10]={	{"Backup", 'back', B_COMMAND_KIND, "This command backs up your hard drive."},
-											{"Abort", 'abor', B_COMMAND_KIND, "Stops the current operation..."},
-											{"Type Code", 'type', B_TYPE_CODE_KIND, "Type code info..."}
-										};
-								vinfo_count=3;
+								value_info vinfo[10] = {
+									{"Backup", 'back', B_COMMAND_KIND,
+										"This command backs up your hard"
+										" drive."},
+									{"Abort", 'abor', B_COMMAND_KIND,
+										"Stops the current operation..."},
+									{"Type Code", 'type', B_TYPE_CODE_KIND,
+										"Type code info..."}
+								};
+								vinfo_count = 3;
 #endif
 
 								while (vinfo_index < vinfo_count) {
-									if (strcmp(vinfo[vinfo_index].name, argv[*argx]) == 0) {
+									if (strcmp(vinfo[vinfo_index].name,
+											argv[*argx]) == 0) {
 										found = true;
-										the_message.what = vinfo[vinfo_index].value;
+										the_message.what = 
+											vinfo[vinfo_index].value;
 #if TEST_VALUEINFO>0
-										printf("FOUND COMMAND \"%s\" = %lX\n", vinfo[vinfo_index].name, the_message.what);
+										printf("FOUND COMMAND \"%s\" = %lX\n",
+											vinfo[vinfo_index].name,
+											the_message.what);
 #endif
 										break;
 									}
 									vinfo_index++;
 								}
-
 							}
 						}
 					}
 				}
-
 
 				if (!found) {
 					if (!silent)
@@ -538,15 +561,17 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 	(*argx)++;
 
 	// One exception: Single data item at end of line.
-	if (direct_what && *argx == argc - 1 && argv[*argx] != NULL) {
+	if (direct_what && *argx == argc - 1 && argv[*argx] != NULL)
 		add_data(&the_message, argv, argx);
-	} else {
+	else {
 		// parse the specifiers
-		if (the_message.what != B_REFS_RECEIVED) {	// LOAD has no specifier
-			while ((result = add_specifier(&the_message, argv, argx, argc)) == B_OK)
+		if (the_message.what != B_REFS_RECEIVED) {
+				// LOAD has no specifier
+			while ((result = add_specifier(&the_message, argv, argx, argc))
+				== B_OK)
 				;
 
-			if (result != B_ERROR) {	// bad syntax
+			if (result != B_ERROR) {
 				if (!silent)
 					fprintf(stderr, "Bad specifier syntax!\n");
 				return result;
@@ -556,18 +581,15 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 
 	// if verb is SET or LOAD, there should be a to <value>
 	if ((the_message.what == B_SET_PROPERTY || the_message.what == B_REFS_RECEIVED) && argv[*argx] != NULL) {
-		if (strcasecmp(argv[*argx], "to") == 0) {
+		if (strcasecmp(argv[*argx], "to") == 0)
 			(*argx)++;
-		}
 		result = add_data(&the_message, argv, argx);
 		if (result != B_OK) {
 			if (result == B_FILE_NOT_FOUND) {
 				if (!silent)
 					fprintf(stderr, "File not found!\n");
-			} else {
-				if (!silent)
-					fprintf(stderr, "Invalid 'to...' value format!\n");
-			}
+			} else if (!silent)
+				fprintf(stderr, "Invalid 'to...' value format!\n");
 			return result;
 		}
 	}
@@ -581,11 +603,10 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 #endif
 
 	if (target && target->IsValid()) {
-		if (reply) {
+		if (reply)
 			result = target->SendMessage(&the_message, reply);
-		} else {
+		else
 			result = target->SendMessage(&the_message);
-		}
 	}
 	return result;
 }
@@ -603,9 +624,9 @@ add_with(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 			(*argx)++;
 			bool done = false;
 			do {
-				result=add_data(to_message, argv, argx);
-				if (result!=B_OK) {
-					if (result==B_FILE_NOT_FOUND) {
+				result = add_data(to_message, argv, argx);
+				if (result != B_OK) {
+					if (result == B_FILE_NOT_FOUND) {
 						if (!silent)
 							fprintf(stderr, "File not found!\n");
 					} else {
@@ -616,9 +637,9 @@ add_with(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 				}
 				(*argx)++;
 				// printf ("argc = %d, argv[%d] = %s\n", argc, *argx, argv[*argx]);
-				if (*argx < argc - 1 && strcasecmp(argv[*argx], "and")==0) {
+				if (*argx < argc - 1 && strcasecmp(argv[*argx], "and") == 0)
 					(*argx)++;
-				} else
+				else
 					done = true;
 			} while (!done);
 		}
@@ -639,75 +660,93 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 
 	(*argx)++;
 
-	if (strcasecmp(property, "do") == 0)	// Part of the "hey App let Specifier do Verb".
-		return B_ERROR;	// no more specifiers
-
-	if (strcasecmp(property, "to") == 0)	// it is the 'to' string!!!
-		return B_ERROR;	// no more specifiers
-
-	if (strcasecmp(property, "with") == 0) {	// it is the 'with' string!!!
-		*argx -= 2;
-		add_with(to_message, argv, argx, argc);
+	if (strcasecmp(property, "do") == 0) {
+			// Part of the "hey App let Specifier do Verb".
 		return B_ERROR;	// no more specifiers
 	}
 
-	if (strcasecmp(property, "of") == 0) {		// skip "of", read real property
+	if (strcasecmp(property, "to") == 0) {
+		return B_ERROR;
+			// no more specifiers
+	}
+
+	if (strcasecmp(property, "with") == 0) {
+		*argx -= 2;
+		add_with(to_message, argv, argx, argc);
+		return B_ERROR;
+			// no more specifiers
+	}
+
+	if (strcasecmp(property, "of") == 0) {
+			// skip "of", read real property
 		property = argv[*argx];
 		if (property == NULL)
-			return B_BAD_SCRIPT_SYNTAX;		// bad syntax
+			return B_BAD_SCRIPT_SYNTAX;
 		(*argx)++;
 	}
 
-	if (strcasecmp(property, "the") == 0) {		// skip "the", read real property  -- pfolk@uni.uiuc.edu 1999-11-03
+	if (strcasecmp(property, "the") == 0) {
+			// skip "the", read real property  -- pfolk@uni.uiuc.edu 1999-11-03
 		property = argv[*argx];
 		if (property == NULL)
-			return B_BAD_SCRIPT_SYNTAX;		// bad syntax
+			return B_BAD_SCRIPT_SYNTAX;
 		(*argx)++;
 	}
 
 	// decide the specifier
 
 	char *specifier = NULL;
-	if (to_message->what == B_CREATE_PROPERTY) // create is always direct. without this, a "with" would be taken as a specifier
+	if (to_message->what == B_CREATE_PROPERTY) {
+			// create is always direct. without this, a "with" would be
+			// taken as a specifier
 		(*argx)--;
-	else
+	} else
 		specifier = argv[*argx];
-	if (specifier == NULL) {	// direct specifier
+	if (specifier == NULL) {
+			// direct specifier
 		to_message->AddSpecifier(property);
-		return B_ERROR;		// no more specifiers
+		return B_ERROR;
+			// no more specifiers
 	}
 
 	(*argx)++;
 
-	if (strcasecmp(specifier, "of") == 0) {	// direct specifier
+	if (strcasecmp(specifier, "of") == 0) {
+			// direct specifier
 		to_message->AddSpecifier(property);
 		return B_OK;
 	}
 
-	if (strcasecmp(specifier, "to") == 0) {	// direct specifier
+	if (strcasecmp(specifier, "to") == 0) {
+			// direct specifier
 		to_message->AddSpecifier(property);
-		return B_ERROR;		// no more specifiers
+		return B_ERROR;
+			// no more specifiers
 	}
 
 
-	if (specifier[0] == '[') {	// index, reverse index or range
+	if (specifier[0] == '[') {
+			// index, reverse index or range
 		char *end;
 		int32 ix1, ix2;
-		if (specifier[1] == '-') {	// reverse index
+		if (specifier[1] == '-') {
+				// reverse index
 			ix1 = strtoul(specifier + 2, &end, 10);
 			BMessage revspec(B_REVERSE_INDEX_SPECIFIER);
 			revspec.AddString("property", property);
 			revspec.AddInt32("index", ix1);
 			to_message->AddSpecifier(&revspec);
-		} else {	// index or range
+		} else {
+				// index or range
 			ix1 = strtoul(specifier + 1, &end, 10);
-			if (end[0] == ']') {	// it was an index
+			if (end[0] == ']') {
+					// it was an index
 				to_message->AddSpecifier(property, ix1);
 				return B_OK;
 			} else {
 				specifier = argv[*argx];
 				if (specifier == NULL) {
-					// I was wrong, it was just an index
+						// I was wrong, it was just an index
 					to_message->AddSpecifier(property, ix1);
 					return B_OK;
 				}
@@ -715,16 +754,18 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 				if (strcasecmp(specifier, "to") == 0) {
 					specifier = argv[*argx];
 					if (specifier == NULL)
-						return B_BAD_SCRIPT_SYNTAX;		// wrong syntax
+						return B_BAD_SCRIPT_SYNTAX;
 					(*argx)++;
 					ix2 = strtoul(specifier, &end, 10);
-					to_message->AddSpecifier(property, ix1, ix2 - ix1 > 0 ? ix2 - ix1 : 1);
+					to_message->AddSpecifier(property, ix1, ix2 - ix1 > 0
+							? ix2 - ix1 : 1);
 					return B_OK;
 				} else
-					return B_BAD_SCRIPT_SYNTAX;		// wrong syntax
+					return B_BAD_SCRIPT_SYNTAX;
 			}
 		}
-	} else {	// name specifier
+	} else {
+		// name specifier
 		// if it contains only digits, it will be an index...
 		bool index_spec = true;
 		bool reverse = specifier[0] == '-';
@@ -766,7 +807,7 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 status_t
 add_data(BMessage *to_message, char *argv[], int32 *argx)
 {
-	char *valuestring=argv[*argx];
+	char *valuestring = argv[*argx];
 
 	if (valuestring == NULL)
 		return B_ERROR;
@@ -840,9 +881,9 @@ add_data(BMessage *to_message, char *argv[], int32 *argx)
 		else
 			to_message->AddBool(curname, atol(valuestring + strlen("bool(")) == 0 ? false : true);
 	} else if (strncasecmp(valuestring, "float", strlen("float")) == 0)
-		to_message->AddFloat(curname, atof(valuestring+strlen("float(")));
+		to_message->AddFloat(curname, atof(valuestring + strlen("float(")));
 	else if (strncasecmp(valuestring, "double", strlen("double")) == 0)
-		to_message->AddDouble(curname, atof(valuestring+strlen("double(")));
+		to_message->AddDouble(curname, atof(valuestring + strlen("double(")));
 	else if (strncasecmp(valuestring, "BPoint", strlen("BPoint")) == 0) {
 		float x, y;
 		x = atof(valuestring + strlen("BPoint("));
@@ -891,8 +932,9 @@ add_data(BMessage *to_message, char *argv[], int32 *argx)
 		entry_ref file_ref;
 
 		// remove the last ] or )
-		if (valuestring[strlen(valuestring) - 1] == ')' || valuestring[strlen(valuestring) - 1] == ']')
-			valuestring[strlen(valuestring)-1] = 0;
+		if (valuestring[strlen(valuestring) - 1] == ')'
+			|| valuestring[strlen(valuestring) - 1] == ']')
+			valuestring[strlen(valuestring) - 1] = 0;
 
 		if (get_ref_for_path(valuestring + 5, &file_ref) != B_OK)
 			return B_FILE_NOT_FOUND;
@@ -906,7 +948,8 @@ add_data(BMessage *to_message, char *argv[], int32 *argx)
 		// add both ways, refsreceived needs it as "refs" while scripting needs "data"
 		to_message->AddRef("refs", &file_ref);
 		to_message->AddRef(curname, &file_ref);
-	} else {	// it is string
+	} else {
+		// it is string
 		// does it begin with a quote?
 		if (valuestring[0] == '\"') {
 			if (valuestring[strlen(valuestring) - 1] == '\"')
@@ -958,23 +1001,26 @@ add_message_contents(BList *textlist, BMessage *msg, int32 level)
 		msg->GetInfo(B_ANY_TYPE, i, &namefound, &typefound);
 		j = 0;
 
-		while (msg->FindData(namefound, typefound, j++, (const void **)&voidptr, &sizefound) == B_OK) {
+		while (msg->FindData(namefound, typefound, j++, (const void **)&voidptr,
+				&sizefound) == B_OK) {
 			datatype = get_datatype_string(typefound);
 			content = format_data(typefound, (char*)voidptr, sizefound);
-			textline = (char*)malloc(20 + level * 4 + strlen(namefound) + strlen(datatype) + strlen(content));
+			textline = (char*)malloc(20 + level * 4 + strlen(namefound)
+					+ strlen(datatype) + strlen(content));
 			memset(textline, 32, 20 + level * 4);
-			sprintf(textline + level * 4, "\"%s\" (%s) : %s", namefound, datatype, content);
+			sprintf(textline + level * 4, "\"%s\" (%s) : %s", namefound,
+				datatype, content);
 			textlist->AddItem(textline);
-			delete [] datatype;
-			delete [] content;
+			delete[] datatype;
+			delete[] content;
 
 			if (typefound == B_MESSAGE_TYPE) {
 				msg->FindMessage(namefound, j - 1, &a_message);
 				add_message_contents(textlist, &a_message, level + 1);
-			} else if (typefound == B_RAW_TYPE && strcmp(namefound, "_previous_") == 0) {
-				if (a_message.Unflatten((const char *)voidptr) == B_OK) {
+			} else if (typefound == B_RAW_TYPE && strcmp(namefound,
+					"_previous_") == 0) {
+				if (a_message.Unflatten((const char *)voidptr) == B_OK)
 					add_message_contents(textlist, &a_message, level + 1);
-				}
 			}
 		}
 	}
@@ -1092,12 +1138,10 @@ get_datatype_string(int32 type)
 		case B_ERROR:	strcpy(str, "B_ERROR"); break;
 
 		default:	// unknown
-					id_to_string(type, str);
-					break;
+			id_to_string(type, str);
+			break;
 	}
-
 	return str;
-
 }
 
 
@@ -1108,7 +1152,6 @@ format_data(int32 type, char *ptr, long size)
 	char *str;
 	float *fptr;
 	double *dptr;
-//	BRect *brptr;
 	entry_ref aref;
 	BEntry entry;
 	BPath path;
@@ -1231,7 +1274,8 @@ format_data(int32 type, char *ptr, long size)
 		case B_RECT_TYPE:
 			str = new char[200];
 			fptr = (float*)ptr;
-			sprintf(str, "BRect(%.1f, %.1f, %.1f, %.1f)", fptr[0], fptr[1], fptr[2], fptr[3]);
+			sprintf(str, "BRect(%.1f, %.1f, %.1f, %.1f)", fptr[0], fptr[1],
+				fptr[2], fptr[3]);
 			break;
 
 		case B_POINT_TYPE:
@@ -1242,7 +1286,9 @@ format_data(int32 type, char *ptr, long size)
 
 		case B_RGB_COLOR_TYPE:
 			str = new char[64];
-			sprintf(str, "Red=%u  Green=%u  Blue=%u  Alpha=%u", ((uint8*)ptr)[0], ((uint8*)ptr)[1], ((uint8*)ptr)[2], ((uint8*)ptr)[3] );
+			sprintf(str, "Red=%u  Green=%u  Blue=%u  Alpha=%u",
+				((uint8*)ptr)[0], ((uint8*)ptr)[1], ((uint8*)ptr)[2],
+				((uint8*)ptr)[3]);
 			break;
 
 		case B_COLOR_8_BIT_TYPE:
@@ -1268,8 +1314,8 @@ format_data(int32 type, char *ptr, long size)
 		case B_PROPERTY_INFO_TYPE:
 		{
 			BPropertyInfo propinfo;
-			if (propinfo.Unflatten(B_PROPERTY_INFO_TYPE, (const void *)ptr, size)
-				== B_OK) {
+			if (propinfo.Unflatten(B_PROPERTY_INFO_TYPE, (const void *)ptr,
+					size) == B_OK) {
 				str = new char[size * 32];	// an approximation
 
 				const property_info *pinfo = propinfo.Properties();
@@ -1278,22 +1324,27 @@ format_data(int32 type, char *ptr, long size)
 					"specifiers              types\n-----------------------------------"
 					"----------------------------------------------------------------\n");
 				for (int32 pinfo_index = 0; pinfo_index < propinfo.CountProperties(); pinfo_index++) {
-					strcat(str,  "                " + (strlen(pinfo[pinfo_index].name) < 16 ? strlen(pinfo[pinfo_index].name) : 16));
+					strcat(str,  "                "
+						+ (strlen(pinfo[pinfo_index].name) < 16 ?
+							strlen(pinfo[pinfo_index].name) : 16));
 					strcat(str, pinfo[pinfo_index].name);
 					strcat(str, "   ");
 					char *start = str + strlen(str);
 
-					for (int32 i = 0; i < 10 && pinfo[pinfo_index].commands[i]; i++) {
-						tempstr = get_datatype_string(pinfo[pinfo_index].commands[i]);
+					for (int32 i = 0; i < 10 && pinfo[pinfo_index].commands[i];
+							i++) {
+						tempstr = get_datatype_string(
+							pinfo[pinfo_index].commands[i]);
 						strcat(str, tempstr);
 						strcat(str, " ");
-						delete [] tempstr;
+						delete[] tempstr;
 					}
 
 					// pad the rest with spaces
-					if (strlen(start) < 36)
-						strcat(str, "                                    " + strlen(start));
-					else
+					if (strlen(start) < 36) {
+						strcat(str, "                                    "
+							+ strlen(start));
+					} else
 						strcat(str, "  " );
 
 					for (int32 i = 0; i < 10 && pinfo[pinfo_index].specifiers[i]; i++) {
@@ -1329,11 +1380,13 @@ format_data(int32 type, char *ptr, long size)
 						}
 
 						// pad the rest with spaces
-						if (strlen(start) < 60)
-							strcat(str, "                                                            " + strlen(start));
-						else
+						if (strlen(start) < 60) {
+							strcat(str, "                                      "
+								"                      " + strlen(start));
+						} else
 							strcat(str, "  ");
-						for (int32 i = 0; i < 10 && pinfo[pinfo_index].types[i] != 0; i++) {
+						for (int32 i = 0; i < 10
+								&& pinfo[pinfo_index].types[i] != 0; i++) {
 							uint32 type = pinfo[pinfo_index].types[i];
 							char str2[6];
 							snprintf(str2, sizeof(str2), "%c%c%c%c ",
@@ -1345,7 +1398,9 @@ format_data(int32 type, char *ptr, long size)
 						}
 
 						for (int32 i = 0; i < 3; i++) {
-							for (int32 j = 0; j < 5 && pinfo[pinfo_index].ctypes[i].pairs[j].type != 0; j++) {
+							for (int32 j = 0; j < 5
+									&& pinfo[pinfo_index].ctypes[i].pairs[j].type
+										!= 0; j++) {
 								uint32 type = pinfo[pinfo_index].ctypes[i].pairs[j].type;
 								char str2[strlen(pinfo[pinfo_index].ctypes[i].pairs[j].name) + 8];
 								snprintf(str2, sizeof(str2),
@@ -1373,17 +1428,25 @@ format_data(int32 type, char *ptr, long size)
 				const value_info *vinfo = propinfo.Values();
 				int32 vinfo_count = propinfo.CountValues();
 #if TEST_VALUEINFO>0
-				value_info vinfo[10] = {	{"Backup", 'back', B_COMMAND_KIND, "This command backs up your hard drive."},
-					{"Abort", 'abor', B_COMMAND_KIND, "Stops the current operation..."},
-					{"Type Code", 'type', B_TYPE_CODE_KIND, "Type code info..."} };
+				value_info vinfo[10] = {
+					{"Backup", 'back', B_COMMAND_KIND,
+						"This command backs up your hard drive."},
+					{"Abort", 'abor', B_COMMAND_KIND,
+						"Stops the current operation..."},
+					{"Type Code", 'type', B_TYPE_CODE_KIND,
+						"Type code info..."}
+				};
 				vinfo_count = 3;
 #endif
 
 				if (vinfo && vinfo_count > 0) {
-					sprintf(str + strlen(str), "\n            name   value                               kind\n"
-								"--------------------------------------------------------------------------------\n");
+					sprintf(str + strlen(str),
+						"\n            name   value                            "
+						"   kind\n---------------------------------------------"
+						"-----------------------------------\n");
 
-					for (int32 vinfo_index = 0; vinfo_index < vinfo_count; vinfo_index++) {
+					for (int32 vinfo_index = 0; vinfo_index < vinfo_count;
+						vinfo_index++) {
 						char *start = str + strlen(str);
 						strcat(str, "                " + (strlen(vinfo[vinfo_index].name) < 16 ? strlen(vinfo[vinfo_index].name) : 16));
 						strcat(str, vinfo[vinfo_index].name);
@@ -1395,9 +1458,10 @@ format_data(int32 type, char *ptr, long size)
 						strcat(str, ")");
 
 							// pad the rest with spaces
-						if (strlen(start) < 36 + 19)
-							strcat(str, "                                                       " + strlen(start));
-						else
+						if (strlen(start) < 36 + 19) {
+							strcat(str, "                                      "
+								"                 " + strlen(start));
+						} else
 							strcat(str, "  ");
 
 						switch (vinfo[vinfo_index].kind) {
