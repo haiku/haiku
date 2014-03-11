@@ -184,7 +184,7 @@ AddPackageFilesToHaikuImage system :
 # build and add the source package directory and a haikuports.config file
 CopyDirectoryToHaikuImage home haikuports
 	: [ BuildHaikuPortsSourcePackageDirectory ]
-	: input-source-packages : : isTarget ;
+	: input-source-packages : -x  *_source-*.hpkg : isTarget ;
 AddFilesToHaikuImage home haikuports
 	: [ BuildHaikuPortsRepositoryConfig /boot/home/haikuports ] ;
 
