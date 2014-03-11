@@ -1,7 +1,7 @@
 /*
  * Copyright 2009, Christian Packmann.
  * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
- * Copyright 2005-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2005-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -199,7 +199,6 @@ Painter::Painter()
 	fLineCapMode(B_BUTT_CAP),
 	fLineJoinMode(B_MITER_JOIN),
 	fMiterLimit(B_DEFAULT_MITER_LIMIT),
-	fFillRule(B_NONZERO),
 
 	fPatternHandler(),
 	fTextRenderer(fSubpixRenderer, fRenderer, fRendererBin, fUnpackedScanline,
@@ -316,6 +315,8 @@ Painter::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 	fLineJoinMode = state->LineJoinMode();
 	fMiterLimit = state->MiterLimit();
 
+	SetFillRule(state->FillRule());
+
 	// adopt the color *after* the pattern is set
 	// to set the renderers to the correct color
 	SetHighColor(state->HighColor());
@@ -427,7 +428,12 @@ Painter::SetStrokeMode(cap_mode lineCap, join_mode joinMode, float miterLimit)
 void
 Painter::SetFillRule(int32 fillRule)
 {
-	fFillRule = fillRule;
+	agg::filling_rule_e aggFillRule = fillRule == B_EVEN_ODD
+		? agg::fill_even_odd : agg::fill_non_zero;
+
+	fRasterizer.filling_rule(aggFillRule);
+	fSubpixRasterizer.filling_rule(aggFillRule);
+	fRasterizer.filling_rule(aggFillRule);
 }
 
 
@@ -2835,22 +2841,16 @@ Painter::_RasterizePath(VertexSource& path) const
 	if (fMaskedUnpackedScanline != NULL) {
 		// TODO: we can't do both alpha-masking and subpixel AA.
 		fRasterizer.reset();
-		fRasterizer.filling_rule(
-			fFillRule == B_EVEN_ODD ? agg::fill_even_odd : agg::fill_non_zero);
 		fRasterizer.add_path(path);
 		agg::render_scanlines(fRasterizer, *fMaskedUnpackedScanline,
 			fRenderer);
 	} else if (gSubpixelAntialiasing) {
 		fSubpixRasterizer.reset();
-		fSubpixRasterizer.filling_rule(
-			fFillRule == B_EVEN_ODD ? agg::fill_even_odd : agg::fill_non_zero);
 		fSubpixRasterizer.add_path(path);
 		agg::render_scanlines(fSubpixRasterizer,
 			fSubpixPackedScanline, fSubpixRenderer);
 	} else {
 		fRasterizer.reset();
-		fRasterizer.filling_rule(
-			fFillRule == B_EVEN_ODD ? agg::fill_even_odd : agg::fill_non_zero);
 		fRasterizer.add_path(path);
 		agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
 	}

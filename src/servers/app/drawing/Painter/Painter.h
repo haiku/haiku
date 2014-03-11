@@ -395,7 +395,6 @@ private:
 			cap_mode			fLineCapMode;
 			join_mode			fLineJoinMode;
 			float				fMiterLimit;
-			int32				fFillRule;
 
 			PatternHandler		fPatternHandler;
 
