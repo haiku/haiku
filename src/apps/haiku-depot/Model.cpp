@@ -1,10 +1,12 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "Model.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 
 #include <Autolock.h>
@@ -48,12 +50,7 @@ public:
 		// Also the PackageList could actually contain references to packages
 		// instead of the packages as objects. The equal operator is quite
 		// expensive as is.
-		const PackageList& packages = fDepot.Packages();
-		for (int i = packages.CountItems() - 1; i >= 0; i--) {
-			if (packages.ItemAtFast(i) == package)
-				return true;
-		}
-		return false;
+		return fDepot.Packages().Contains(package);
 	}
 
 private:
@@ -73,6 +70,7 @@ public:
 	{
 		if (package.Get() == NULL)
 			return false;
+
 		const CategoryList& categories = package->Categories();
 		for (int i = categories.CountItems() - 1; i >= 0; i--) {
 			const CategoryRef& category = categories.ItemAtFast(i);
@@ -126,6 +124,58 @@ public:
 private:
 	const PackageList&	fPackageListA;
 	const PackageList&	fPackageListB;
+};
+
+
+class NotContainedInFilter : public PackageFilter {
+public:
+	NotContainedInFilter(const PackageList* packageList, ...)
+	{
+		va_list args;
+		va_start(args, packageList);
+		while (true) {
+			const PackageList* packageList = va_arg(args, const PackageList*);
+			if (packageList == NULL)
+				break;
+			fPackageLists.Add(packageList);
+		}
+		va_end(args);
+	}
+
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
+	{
+		if (package.Get()==NULL)
+			return false;
+printf("TEST %s\n", package->Title().String());
+		for (int32 i = 0; i < fPackageLists.CountItems(); i++) {
+			if (fPackageLists.ItemAtFast(i)->Contains(package)) {
+printf("  contained in %ld\n", i);
+				return false;
+			}
+		}
+		return true;
+	}
+
+private:
+	List<const PackageList*, true>	fPackageLists;
+};
+
+
+class StateFilter : public PackageFilter {
+public:
+	StateFilter(PackageState state)
+		:
+		fState(state)
+	{
+	}
+
+	virtual bool AcceptsPackage(const PackageInfoRef& package) const
+	{
+		return package->State() == NONE;
+	}
+
+private:
+	PackageState	fState;
 };
 
 
@@ -227,7 +277,7 @@ Model::Model()
 	fCategoryFilter(PackageFilterRef(new AnyFilter(), true)),
 	fDepotFilter(""),
 	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
-	
+
 	fShowSourcePackages(false),
 	fShowDevelopPackages(false)
 {
@@ -244,6 +294,11 @@ Model::Model()
 	fUserCategories.Add(CategoryRef(new PackageCategory(
 		BitmapRef(),
 		B_TRANSLATE("Installed packages"), "installed"), true));
+
+	// A category for packages that not yet installed.
+	fUserCategories.Add(CategoryRef(new PackageCategory(
+		BitmapRef(),
+		B_TRANSLATE("Available packages"), "available"), true));
 
 	// A category for packages that the user specifically uninstalled.
 	// For example, a user may have removed packages from a default
@@ -363,7 +418,12 @@ Model::SetCategory(const BString& category)
 		filter = new ContainedInFilter(fInstalledPackages);
 	else if (category == "uninstalled")
 		filter = new ContainedInFilter(fUninstalledPackages);
-	else if (category == "modified") {
+	else if (category == "available") {
+		filter = new StateFilter(NONE);
+//		filter = new NotContainedInFilter(&fInstalledPackages,
+//			&fUninstalledPackages, &fDownloadingPackages, &fUpdateablePackages,
+//			NULL);
+	} else if (category == "modified") {
 		filter = new ContainedInEitherFilter(fInstalledPackages,
 			fUninstalledPackages);
 	} else if (category == "downloading")
@@ -410,7 +470,6 @@ Model::SetShowDevelopPackages(bool show)
 {
 	fShowDevelopPackages = show;
 }
-
 
 
 // #pragma mark - information retrival
