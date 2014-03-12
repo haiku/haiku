@@ -19,7 +19,7 @@ RemotePackageRepository HaikuPorts
 	automake-1.13.1-4
 #	bepdf-1.1.1~beta5_2013_04_28-1
 	binutils-2.23.2_2013_04_09-2
-	bison-2.4.3-6
+	bison-2.5-1
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
 	cdrtools-3.01~a07-3
@@ -76,8 +76,8 @@ RemotePackageRepository HaikuPorts
 	libsolv_devel-0.3.0_haiku_2013_10_01-1
 	libtheora-1.1.1-2
 	libtheora_devel-1.1.1-2
-	libtool-2.4-8
-	libtool_libltdl-2.4-8
+	libtool-2.4.2-1
+	libtool_libltdl-2.4.2-1
 	libvorbis-1.3.2-2
 	libvorbis_devel-1.3.2-2
 	libvpx-1.0.0-2
@@ -108,8 +108,9 @@ RemotePackageRepository HaikuPorts
 	pe-2.4.3_hg611-1
 	perl-5.18.1-1
 	pkgconfig-0.27.1-2
-	python-2.6.8-6
-	readline-6.2-3
+	python-2.6.9-1
+	readline-6.2-4
+	readline_devel-6.2-4
 	ruby-1.9.1-2
 	ruby_devel-1.9.1-2
 	scons-2.2.0-2
