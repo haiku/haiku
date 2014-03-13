@@ -42,7 +42,7 @@ rule ProcessCommandLineArguments
 				Echo ;
 				Echo "Nightly build profiles (small set of packages used in"
                 	"nightly builds and default configuration):" ;
-				Echo "  nightly-raw        - A raw disk image." ;
+				Echo "  nightly-raw      - A raw disk image." ;
 				Echo "  nightly-anyboot  - A custom image for either CD or"
 					"disk." ;
 				Echo "  nightly-cd       - An ISO9660 CD image." ;
