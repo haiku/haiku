@@ -163,7 +163,7 @@ SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures acpi_button@x86 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	ata@ata pci ps2@x86,x86_64 isa@x86,x86_64
 	ide@ide scsi config_manager agp_gart@x86 usb firewire@x86 acpi@x86,x86_64
-	virtio
+	virtio random
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs bindfs btrfs exfat ext2 fat iso9660
 	attribute_overlay write_overlay ntfs packagefs reiserfs@x86 udf ;
