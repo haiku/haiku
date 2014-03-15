@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Notifications	35333153
+1	slovak	x-vnd.Haiku-Notifications	1032629100
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Vyskytla sa chyba pri ukladaní nastavení.\nJe možné, že vám dochádza miesto na disku.
 Notifications	GeneralView		Oznamy
 seconds of inactivity	GeneralView		sekundách nečinnosti
@@ -7,7 +7,6 @@ Mini icon	DisplayView		Mini ikona
 Enable notifications	GeneralView		Zapnúť upozornenia
 Error	NotificationView		Chyba
 OK	GeneralView		OK
-Events are not notified	GeneralView		Udalosti sa neoznamujú
 Type	NotificationView		Typ
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Oznámenia nemožno zastaviť, pretože server nebolo možné kontaktovať.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Oznámenia nemožno zapnúť, pretože server nebol nájdený.\nTo znamená, že vaša inštalácia InfoPopper nebola úspešne dokončená.
@@ -28,7 +27,6 @@ Yes	NotificationView		Áno
 Large icon	DisplayView		Veľká ikona
 Icon size:	DisplayView		Veľkosť ikony:
 Hide notifications from screen after	GeneralView		Skryť oznamy z obrazovky po
-Disable notifications	GeneralView		Vypnúť oznamy
 Notifications	System name		Oznamy
 Notifications	NotificationView		Oznamy
 No	NotificationView		Nie
@@ -45,4 +43,3 @@ Enable notifications at startup	GeneralView		Zapnúť oznamy pri štarte
 Notifications	PrefletView		Oznámenia
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Server oznámení nemožno nájsť. To znamená, že vaša inštalácia InfoPopper nebola úspešne dokončená.
 Applications	NotificationView		Aplikácie
-Events are notified	GeneralView		Udalosti sa oznamujú

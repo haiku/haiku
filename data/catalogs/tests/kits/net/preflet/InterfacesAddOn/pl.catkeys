@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-InterfacesAddOn	367402138
+1	polish	x-vnd.Haiku-InterfacesAddOn	160108912
 Interface	InterfaceWindow		Interfejs
 Configure…	InterfacesListView		Konfiguruj…
 Static	IntefaceAddressView		Statyczny
@@ -25,6 +25,9 @@ DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Tryb:
 Your netmask	IntefaceAddressView		Maska twojej sieci
 IP Address:	IntefaceAddressView		Adres IP:
+Off	IntefaceAddressView		Wyłączone
+MAC address:	IntefaceHardwareView		Adres MAC:
+Netmask:	IntefaceAddressView		Maska sieci:
 Your IP address	IntefaceAddressView		Twój adres IP
 %llu KBytes	IntefaceHardwareView		%llu kilobajtów
 disconnected	IntefaceHardwareView		odłączone

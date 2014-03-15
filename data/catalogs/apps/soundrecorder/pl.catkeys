@@ -1,13 +1,15 @@
-1	polish	x-vnd.Haiku-SoundRecorder	3982150268
+1	polish	x-vnd.Haiku-SoundRecorder	1849114076
 Loop	RecorderWindow		Pętla
 Cannot find default audio hardware	RecorderWindow		Nie można odnaleść domyślnego urządzenia audio
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nie można zlokalizować pliku tymczasowego przechowującego nowe nagrania
 Sample size:	RecorderWindow		Rozmiar próbki:
 Nothing to play	RecorderWindow		Nic do otworzenia
+None of the files appear to be audio files.	RecorderWindow		Żaden z tych plików nie jest rozpoznawany jako plik audio.
 Duration: 	RecorderWindow		Czas trwania: 
 File info	RecorderWindow		Informacje o pliku
 Drop files here	SoundListView		Upuść pliki tutaj
 Input	RecorderWindow		Wejście
+Some of the files don't appear to be audio files.	RecorderWindow		Część plików nie jest rozpoznawana jako pliki audio.
 Stop	RecorderWindow		Zatrzymaj
 Format:	RecorderWindow		Format:
 Sound List	RecorderWindow		Lista dzwięków

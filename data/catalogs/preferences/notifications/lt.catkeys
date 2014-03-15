@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Notifications	35333153
+1	lithuanian	x-vnd.Haiku-Notifications	1032629100
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Įrašant nuostatas, įvyko klaida.\nGali būti, jog diske nepakanka laisvos vietos.
 Notifications	GeneralView		Pranešimai
 seconds of inactivity	GeneralView		sek. pasyvumo
@@ -7,7 +7,6 @@ Mini icon	DisplayView		mažos piktogramos
 Enable notifications	GeneralView		Įjungti pranešimus
 Error	NotificationView		Klaida
 OK	GeneralView		Gerai
-Events are not notified	GeneralView		Apie įvykius nepranešama
 Type	NotificationView		Tipas
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Pranešimų tarnybos sustabdyti nepavyko, nes ji nepasiekiama.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nepavyko įgalinti pranešimų, nes pranešimų tarnyba nerasta.\nTai reiškia, jog pranešimų tarnyba nebuvo sėkmingai įdiegta.
@@ -28,7 +27,6 @@ Yes	NotificationView		Taip
 Large icon	DisplayView		didelės piktogramos
 Icon size:	DisplayView		Piktogramų dydis:
 Hide notifications from screen after	GeneralView		Pašalinti pranešimus iš ekrano po
-Disable notifications	GeneralView		Išjungti pranešimus
 Notifications	System name		Pranešimai
 Notifications	NotificationView		Pranešimai
 No	NotificationView		Ne
@@ -45,4 +43,3 @@ Enable notifications at startup	GeneralView		Įjungti pranešimus sistemos palei
 Notifications	PrefletView		Pranešimai
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Pranešimų tarnyba nerasta. Tai reiškia, jog ji nebuvo sėkmingai įdiegta.
 Applications	NotificationView		Programos
-Events are notified	GeneralView		Apie įvykius pranešama

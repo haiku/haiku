@@ -47,7 +47,7 @@ greater than	FindPanel		większy niż
 Delete	PoseView		Skasuj
 Select all	ContainerWindow		Zaznacz wszystko
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Przepraszamy, atrybut 'Character' nie może przechowywać wielobajtowych znaków.
-Clean up	DeskWindow		Wyczyść
+Clean up	DeskWindow		Uprzątnij
 You cannot copy or move the root directory.	FSUtils		Nie możesz kopiować ani przenosić katalogu głównego.
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed z %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Odwróć zaznaczenie
@@ -91,7 +91,7 @@ Cut	FilePanelPriv		Wytnij
 Replace	FilePanelPriv		Zastąp
 Select all	VolumeWindow		Zaznacz wszystko
 Opens with:	InfoWindow		Otwórz za pomocą:
-If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeśli wykonasz '%ifYouDoAction' wobec ustawień MIME, %osName może się nie zachowywać właściwie!\n\nCzy jesteś pewien, że chcesz wykonać operację %ifYouDoAction?
+If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeśli wykonasz '%ifYouDoAction' wobec ustawień MIME, %osName może się nie zachowywać właściwie!\n\nCzy jesteś pewien, że chcesz wykonać tę operację?
 Open	ContainerWindow		Otwórz
 96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Błąd przy obliczaniu rozmiaru folderu.
@@ -253,7 +253,7 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Plik o nazwie \"%name\" już istnieje w tej lokalizacji. Czy chcesz go zamienić?
 Cancel	ContainerWindow		Anuluj
 Only the boot disk	AutoMounterSettings		Tylko dysk bootujący
-If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeśli wykonasz '%ifYouDoAction' wobec katalogu konfiguracji, %osName może się nie zachowywać właściwie!\n\nCzy jesteś pewien, że chcesz wykonać operację '%ifYouDoAction'?
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeśli wykonasz '%ifYouDoAction' wobec katalogu konfiguracji, %osName może się nie zachowywać właściwie!\n\nCzy jesteś pewien, że chcesz wykonać tę operację?
 Unmount	ContainerWindow		Odmontuj
 Copy layout	ContainerWindow		Kopiuj motyw
 label too long	PoseView		opis zbyt długi

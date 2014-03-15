@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Notifications	35333153
+1	dutch; flemish	x-vnd.Haiku-Notifications	1032629100
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Er ontstond een fout tijdens het opslaan van de voorkeuren.\nHet is mogelijk dat uw schijfruimte opraakt.
 Notifications	GeneralView		Aankondigingen
 seconds of inactivity	GeneralView		seconden inactief
@@ -7,7 +7,6 @@ Mini icon	DisplayView		Mini-icoon
 Enable notifications	GeneralView		Aankondigingen aanzetten
 Error	NotificationView		Fout
 OK	GeneralView		Oké
-Events are not notified	GeneralView		Gebeurtenissen worden niet aangekondigd
 Type	NotificationView		Soort
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Aankondigingen kan niet worden gestopt, omdat de server niet bereikt kan worden.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Kan aankondigingen niet aanzetten omdat de server niet gevonden kan worden.\nDit betekent dat uw InfoPopper-installatie niet succesvol werd afgerond.
@@ -28,7 +27,6 @@ Yes	NotificationView		Ja
 Large icon	DisplayView		Groot icoon
 Icon size:	DisplayView		Icoongrootte:
 Hide notifications from screen after	GeneralView		Aankondigingen uit beeld halen na
-Disable notifications	GeneralView		Aankondigingen uitzetten
 Notifications	System name		Aankondigingen
 Notifications	NotificationView		Aankondigingen
 No	NotificationView		Nee
@@ -45,4 +43,3 @@ Enable notifications at startup	GeneralView		Aankondigingen aanzetten bij opstar
 Notifications	PrefletView		Aankondigingen
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		De aankondigingen-server kon niet gevonden worden, dit betekent dat uw InfoPopper-installatie niet succesvol werd afgerond.
 Applications	NotificationView		Toepassingen
-Events are notified	GeneralView		Gebeutenissen worden aangekondigd

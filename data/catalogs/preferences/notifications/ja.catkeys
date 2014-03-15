@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Notifications	3366464357
+1	japanese	x-vnd.Haiku-Notifications	68793008
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		設定ファイルの保存中にエラーが発生しました。\nディスク容量が不足している可能性があります。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		秒後に画面から隠されます。
@@ -7,7 +7,6 @@ Mini icon	DisplayView		小さいアイコン
 Enable notifications	GeneralView		通知を有効にする
 Error	NotificationView		エラー
 OK	GeneralView		OK
-Events are not notified	GeneralView		イベントは通知されません
 Type	NotificationView		タイプ
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		サーバーと通信できないので通知を止めることができません。
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		サーバーが見つからないので通知を有効にできません。\nこれは、InfoPopper のインストールがうまく完了していないことを示しています。
@@ -29,7 +28,6 @@ Yes	NotificationView		はい
 Large icon	DisplayView		大きいアイコン
 Icon size:	DisplayView		アイコンのサイズ:
 Hide notifications from screen after	GeneralView		通知はなにもしないと
-Disable notifications	GeneralView		通知を無効にする
 Notifications	System name		通知
 Notifications	NotificationView		通知
 No	NotificationView		いいえ
@@ -47,4 +45,3 @@ Notifications	PrefletView		通知
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		通知サーバーが見つかりません。これは、InfoPopper のインストールがうまく完了していないことを示しています。
 Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		設定を保存できません。おそらく settings ディレクトリに書き込み権限がありません。
 Applications	NotificationView		アプリケーション
-Events are notified	GeneralView		イベントは通知されます

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Notifications	1398224574
+1	polish	x-vnd.Haiku-Notifications	2395520521
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Wystąpił błąd przy zapisie ustawień.\nByć może zabrakło miejsca na dysku.
 Notifications	GeneralView		Powiadomienia
 seconds of inactivity	GeneralView		sekund nieaktywności
@@ -7,7 +7,6 @@ Mini icon	DisplayView		Mini ikona
 Enable notifications	GeneralView		Włącz powiadomienia
 Error	NotificationView		Błąd
 OK	GeneralView		OK
-Events are not notified	GeneralView		Zdarzenie nie są powiadamiane
 Type	NotificationView		Typ
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Powiadomienie nie mogą być zatrzymane, bo nie można skontaktować się z serwerem.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Nie można włączyć powiadomień bo nie można odnaleźć serwera.\nTo oznacza, że instalacja InfoPopper nie została pomyślnie ukończona.
@@ -29,7 +28,6 @@ Yes	NotificationView		Tak
 Large icon	DisplayView		Duża ikona
 Icon size:	DisplayView		Rozmiar ikon:
 Hide notifications from screen after	GeneralView		Ukryj powiadomienia z ekranu po
-Disable notifications	GeneralView		Wyłącz powiadomienia
 Notifications	System name		Powiadomienia
 Notifications	NotificationView		Powiadomienia
 No	NotificationView		Nie
@@ -46,4 +44,3 @@ Enable notifications at startup	GeneralView		Włącz powiadomienia podczas uruch
 Notifications	PrefletView		Powiadomienia
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Serwer powiadomień nie został odnaleziony, to oznacza, że instalacja InfoPopper  nie została ukończona pomyślnie.
 Applications	NotificationView		Aplikacje
-Events are notified	GeneralView		Zdarzenia są powiadomywane

@@ -1,30 +1,41 @@
-1	polish	x-vnd.Haiku-HaikuDepot	3242437255
+1	polish	x-vnd.Haiku-HaikuDepot	1804299307
 Name	PackageListView		Nazwa
 Installed packages	Model		Zainstalowane pakiety
 User modified packages	Model		Pakiety zmodyfikowane przez użytkownika
 Update available	Model		Dostępna aktualizacja
 Changelog	PackageInfoView		Dziennik zmian
+Click a package to view information	PackageInfoView		Kliknij na paczkę, aby zobaczyć informacje
 for %Version%	PackageInfoView		dla %Version%
+No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
+Depot:	FilterView		Magazyn:
 Description	PackageListView		Opis
 Install	PackageManager		Zainstaluj
+Tools	MainWindow		Narzędzia
 HaikuDepot	System name		HaikuDepot
+Rate package…	PackageInfoView		Oceń paczkę…
 Uninstall	PackageManager		Odinstaluj
 An error occurred while initializing the package manager: %message%	MainWindow		Wystąpił błąd podczas inicjalizacji menedżera pakietów: %message%
 Close	PackageManager		Zamknij
 Status	PackageListView		Status
+Your rating	System name		Twoja ocena
+Development	Model		Narzędzia programistów
+Fatal error	PackageManager		Błąd krytyczny
 Ratings	PackageInfoView		Oceny
 1 item	PackageListView		1 element
 Inactive	PackageListView		Nieaktywny
 Refresh depots	MainWindow		Odśwież listy pakietów
 Main Menu	MainWindow		Menu główne
 Command line	Model		Wiersz poleceń
-(%Votes%)	PackageInfoView		(%Oceny%)
+(%Votes%)	PackageInfoView		(%Votes%)
+Downloading:	PackageInfoView		Pobieranie:
 Search terms:	FilterView		Szukana fraza:
-%Version%	PackageInfoView		%Wersja%
+%Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Brak ocen użytkowników.
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error% (%details%)
 Productivity	Model		Programy użytkowe
 Show:	FilterView		Pokaż:
 Size	PackageListView		Rozmiar
+Options	MainWindow		Opcje
 Games	Model		Gry
 Rating	PackageListView		Ocena
 Downloading	Model		Pobieranie
@@ -35,9 +46,15 @@ Close	MainWindow		Zamknij
 Video	Model		Wideo
 An error occurred while refreshing the repository: %error%	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error%
 All packages	FilterView		Wszystkie pakiety
+Depot	FilterView		Magazyn
 Uninstalled	PackageListView		Niezainstalowany
 Unknown	PackageListView		Nieznany
+All depots	FilterView		Wszystkie magazyny
 Available	PackageListView		Dostępny
 n/a	PackageInfoView		Nie dotyczy
+Send	RatePackageWindow		Wyślij
+Show	FilterView		Pokaż
 Uninstalled packages	Model		Niezainstalowane pakiety
+Audio	Model		Dźwięk
+About	PackageInfoView		O paczce
 Active	PackageListView		Aktywny

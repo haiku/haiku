@@ -1,5 +1,6 @@
-1	polish	x-vnd.Haiku-ProcessController	2886374724
+1	polish	x-vnd.Haiku-ProcessController	1848752768
 Memory usage	ProcessController		Użycie pamięci
+Kill this team!	ProcessController		Zakończ ten wątek!
 Idle priority	ProcessController		Priorytet bezczynności
 Restart Deskbar	ProcessController		Zrestartuj Deskbar
 Custom priority	ProcessController		Własny priorytet
@@ -7,6 +8,7 @@ This team is already gone…	ProcessController		Ten zespół nie jest już obecn
 Error saving file	ProcessController		Błąd przy zapisywaniu pliku
 Real-time priority	ProcessController		Priorytet czasu rzeczywistego
 Your setting file could not be saved!\n(%s)	ProcessController		Twój plik ustawień nie może być zapisany!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Co chcesz zrobić z  tym wątkiem \"%s\"?
 This thread is already gone…	ProcessController		Ten wątek nie jest już obecny…
 Cancel	ProcessController		Anuluj
 Display priority	ProcessController		Priorytet wyświetlania
@@ -36,6 +38,7 @@ Threads and CPU usage	ProcessController		Wątki oraz użycie CPU
 Urgent display priority	ProcessController		Pilny priorytet wyświetlania
 OK	ProcessController		OK
 Damned!	ProcessController		Cholera!
+Debug this team!	ProcessController		Debuguj ten wątek!
 Usage: %s [-deskbar]\n	ProcessController		Użycie: %s [-deskbar]\n
 ProcessController	System name		ProcessController
 Real-time display priority	ProcessController		Czasu rzeczywistego priorytet wyświetlania

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Notifications	3366464357
+1	german	x-vnd.Haiku-Notifications	68793008
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Beim Speichern der Einstellungen ist ein Fehler aufgetreten.\nVermutlich ist nicht mehr genügend Speicher auf dem Datenträger verfügbar.
 Notifications	GeneralView		Notifications - Benachrichtigungen
 seconds of inactivity	GeneralView		Sekunden Leerlauf.
@@ -7,7 +7,6 @@ Mini icon	DisplayView		Kleines Icon
 Enable notifications	GeneralView		Benachrichtigungen aktivieren
 Error	NotificationView		Fehler
 OK	GeneralView		OK
-Events are not notified	GeneralView		Ereignisse werden nicht gemeldet
 Type	NotificationView		Typ
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Benachrichtigungen können nicht angehalten werden, weil der Server nicht erreicht werden kann.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Benachrichtigungen können nicht aktiviert werden, weil der Server nicht gefunden wurde.\nDas bedeutet, dass die InfoPopper Installation nicht erfolgreich war.
@@ -29,7 +28,6 @@ Yes	NotificationView		Ja
 Large icon	DisplayView		Großes Icon
 Icon size:	DisplayView		Icon Größe:
 Hide notifications from screen after	GeneralView		Benachrichtigungen ausblenden nach 
-Disable notifications	GeneralView		Benachrichtigungen deaktivieren
 Notifications	System name		Benachrichtigungen
 Notifications	NotificationView		Notifications
 No	NotificationView		Nein
@@ -47,4 +45,3 @@ Notifications	PrefletView		Benachrichtigungen
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Der Benachrichtiguns-Server wurde nicht gefunden.\nWahrscheinlich war die Installation nicht erfolgreich.
 Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Die Einstellungen konnten nicht gespeichert werden. Wahrscheinlich ist der entsprechende Ordner schreibgeschützt.
 Applications	NotificationView		Anwendungen
-Events are notified	GeneralView		Ereignisse werden gemeldet

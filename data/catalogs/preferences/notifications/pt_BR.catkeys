@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Notifications	3366464357
+1	portuguese (brazil)	x-vnd.Haiku-Notifications	68793008
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Um erro ocorreu salvando as preferências.\nÉ possível que esteja executando fora do espaço de disco.
 Notifications	GeneralView		Notificações
 seconds of inactivity	GeneralView		segundos de inatividade
@@ -7,7 +7,6 @@ Mini icon	DisplayView		Mini ícone
 Enable notifications	GeneralView		Habilitar notificações
 Error	NotificationView		Erro
 OK	GeneralView		OK
-Events are not notified	GeneralView		Eventos não são notificados
 Type	NotificationView		Tipo
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Notificações não podem ser paradas porque o servidor não pode ser alcançado.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Não é possível habilitar as notificações porque o servidor não pôde ser encontrado.\nIsto significa que a instalação do InfoPopper não foi completada com sucesso.
@@ -29,7 +28,6 @@ Yes	NotificationView		Sim
 Large icon	DisplayView		Ícone grande
 Icon size:	DisplayView		Tamanho do ícone:
 Hide notifications from screen after	GeneralView		Ocultar notificações da tela após
-Disable notifications	GeneralView		Desabilitar notificações
 Notifications	System name		Notificações
 Notifications	NotificationView		Notificações
 No	NotificationView		Não
@@ -47,4 +45,3 @@ Notifications	PrefletView		Notificações
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		O servidor de notificações não pode ser encontrado, isto significa que a instalação do InfoPopper não foi completada com sucesso.
 Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Não é possível salvar as preferências, você provavelmente não possui acesso a gravação no diretório de configuração.
 Applications	NotificationView		Aplicativos
-Events are notified	GeneralView		Eventos são notificados

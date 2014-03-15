@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Shortcuts	2482780610
+1	polish	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Skróty nie mogły zapisać ustawienia klawiszy.
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		Dodaj KeySet…
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Przycisk
 Open KeySet…	ShortcutsWindow		Otwórz KeySet…
+Error, NULL state description?	ShortcutsSpec		Błąd, brak opisu stanu?
 MouseUp	ShortcutsSpec		MouseUp
 Revert to saved	ShortcutsWindow		Cofnięto do zapisu
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt

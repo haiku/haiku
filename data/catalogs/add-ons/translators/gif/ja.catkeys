@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-GIFTranslator	3139538777
+1	japanese	x-vnd.Haiku-GIFTranslator	2681465564
 Websafe	GIFView		Webセーフカラー
 Write interlaced images	GIFView		インターレースイメージを書き出す
 Optimal	GIFView		最適化
@@ -9,11 +9,9 @@ GIF image translator	GIFView		GIF イメージトランスレーター
 GIF image	GIFTranslator		GIF イメージ
 Write transparent images	GIFView		透過イメージを書き出す
 GIF images	GIFTranslator		GIF イメージ
-Palette	GIFView		パレット
 Use RGB color	GIFView		RGBで指定
 Use dithering	GIFView		ディザリングする
 GIF Settings	GIFTranslator		GIF設定
 BeOS system	GIFView		BeOSシステムカラー
 v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		アルファチャンネルより自動設定
-Colors	GIFView		色数

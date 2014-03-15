@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-PackageInstaller	792037176
+1	polish	x-vnd.Haiku-PackageInstaller	2511221884
 Install to:	PackageView		Zainstaluj w:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akceptuj
@@ -18,6 +18,7 @@ All existing files will be replaced?	PackageView		Czy zastąpić wszystkie pliki
 Preparing package	PackageInstall		Przygotowywanie pakietu
 No package available.	PackageInfo		Brak dostępnych pakietów.
 none	PackageView		brak
+Install %name%	PackageView		Zainstaluj %name%
 Stop	PackageStatus		Stop
 Other…	PackageView		Inne…
 No installation type selected	PackageView		Sposób instalacji nie został wybrany

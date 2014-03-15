@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	1276112823
+1	polish	x-vnd.Haiku-MediaPlayer	1345097290
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -100,6 +100,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Wszystkie
 <untitled>	PlaylistItem-title		<bez tytułu>
 Track	Audio Track Menu		Ścieżka
 unknown format	MediaPlayer-InfoWin		nieznany format
+Position	MediaPlayer-Main		Pozycja
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nie ma czego powtórzyć>
 Skip to the next track.	MediaPlayer-Main		Przeskocz do następnego utworu.
 Play	MediaPlayer-Main		Odtwórz

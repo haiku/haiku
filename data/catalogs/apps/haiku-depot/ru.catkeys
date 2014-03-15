@@ -28,7 +28,7 @@ Refresh depots	MainWindow		Обновить склады
 Main Menu	MainWindow		Главное меню
 Command line	Model		Командная строка
 (%Votes%)	PackageInfoView		(%Votes%)
-Downloading:	PackageInfoView		Загружаемые:
+Downloading:	PackageInfoView		Загружается:
 Search terms:	FilterView		Условия поиска:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.

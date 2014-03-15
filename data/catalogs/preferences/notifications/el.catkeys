@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Notifications	35333153
+1	greek, modern (1453-)	x-vnd.Haiku-Notifications	1032629100
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Ένα σφάλμα παρουσιάστικε κατά την διαδικάσια αποθήκευσεις των προτιμήσεων.\nΠιθανα να μην υπάρχει αρκετός αποθηκευτικός χώρος στο δίσκο. 
 Notifications	GeneralView		Κοινοποιήσεις
 seconds of inactivity	GeneralView		δευτερόλεπτα αδράνειας
@@ -7,7 +7,6 @@ Mini icon	DisplayView		Μίνι εικονίδιο
 Enable notifications	GeneralView		Ενεργοποίηση κοινοποιήσεων
 Error	NotificationView		Λάθος
 OK	GeneralView		Εντάξει
-Events are not notified	GeneralView		Τα γεγονότα δεν ειδοποιούνται
 Type	NotificationView		Τύπος
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Αδύνατη η επικοινωνία με το σέρβερ. Οι ειδοποιήσεις δεν μπορούν να σταματήσουν.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.
@@ -28,7 +27,6 @@ Yes	NotificationView		Ναί
 Large icon	DisplayView		Μεγάλο εικονίδιο
 Icon size:	DisplayView		Μέγεθος εικονίδιου
 Hide notifications from screen after	GeneralView		Απόκρυψη κοινοποίησεων
-Disable notifications	GeneralView		Απενεργοποίση κοινοποίησεων
 Notifications	System name		Notifications
 Notifications	NotificationView		Κοινοποιήσεις
 No	NotificationView		Όχι
@@ -45,4 +43,3 @@ Enable notifications at startup	GeneralView		Ενεργοποίηση ειδοπ
 Notifications	PrefletView		Ειδοποιήσεις
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Ο εξυπηρετητής ειδοποιήσεων δε μπόρεσε να βρεθεί, αυτο σημαίνει οτι η εγκατάσταση του InfoPopper δεν ολοκληρώθηκε με επιτυχία.
 Applications	NotificationView		Εφαρμογές
-Events are notified	GeneralView		Τα γεγονότα ειδοποιούνται

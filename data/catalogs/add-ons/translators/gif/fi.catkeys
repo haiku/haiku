@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-GIFTranslator	3139538777
+1	finnish	x-vnd.Haiku-GIFTranslator	2681465564
 Websafe	GIFView		Websafe
 Write interlaced images	GIFView		Kirjoita lomitettuja kuvia
 Optimal	GIFView		Optimaalinen
@@ -9,11 +9,9 @@ GIF image translator	GIFView		GIF-kuvamuunnin
 GIF image	GIFTranslator		GIF-kuva
 Write transparent images	GIFView		Kirjoita läpinäkyviä kuvia
 GIF images	GIFTranslator		GIF-kuvat
-Palette	GIFView		Paletti
 Use RGB color	GIFView		Käytä RGB-väriä
 Use dithering	GIFView		Käytä sekoitussävytystä
 GIF Settings	GIFTranslator		GIF-asetukset
 BeOS system	GIFView		BeOS-järjestelmä
 v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		Automaattinen (alfa-kanavalta)
-Colors	GIFView		Värit

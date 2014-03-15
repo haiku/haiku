@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Notifications	3366464357
+1	finnish	x-vnd.Haiku-Notifications	68793008
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Tapahtui virhe tallennettaessa asetuksia.\nOn mahdollista, että levytila on loppunut.
 Notifications	GeneralView		Ilmoitukset
 seconds of inactivity	GeneralView		joutilaisuussekunnit
@@ -7,7 +7,6 @@ Mini icon	DisplayView		Minikuvake
 Enable notifications	GeneralView		Ota käyttöön ilmoitukset
 Error	NotificationView		Virhe
 OK	GeneralView		Valmis
-Events are not notified	GeneralView		Tapahtumia ei ole ilmoitettu
 Type	NotificationView		Tyyppi
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Ilmoitusten pysäyttäminen epäonnistui, koska palvelinta ei tavoiteta.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Ilmoitusten käyttöönotto epäonnistui, koska palvelinta ei löydy.\nTämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
@@ -29,7 +28,6 @@ Yes	NotificationView		Kyllä
 Large icon	DisplayView		Suuri kuvake
 Icon size:	DisplayView		Kuvakekoko:
 Hide notifications from screen after	GeneralView		Piilota ilmoitukset näytöltä ajassa
-Disable notifications	GeneralView		Ota ilmoitukset pois käytöstä
 Notifications	System name		Ilmoitusasetukset
 Notifications	NotificationView		Ilmoitusasetukset
 No	NotificationView		Ei
@@ -47,4 +45,3 @@ Notifications	PrefletView		Ilmoitusasetukset
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Ilmoituspalvelinta ei löytynyt. Tämä tarkoittaa, että InfoPopper-asennus ei ole onnistunut.
 Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Asetusten tallentaminen epäonnistui, sinulla ei luultavasti ole kirjoitusoikeuksia asetuskansioon.
 Applications	NotificationView		Sovellukset
-Events are notified	GeneralView		Tapahtumista on ilmoitettu

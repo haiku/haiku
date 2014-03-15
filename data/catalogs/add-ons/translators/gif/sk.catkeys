@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-GIFTranslator	2708495435
+1	slovak	x-vnd.Haiku-GIFTranslator	2250422222
 Websafe	GIFView		Farby pre web
 Write interlaced images	GIFView		Zapisovať obrázky s prekladanými riadkami
 Optimal	GIFView		Optimálne
@@ -7,10 +7,8 @@ Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Format (GIFTranslator)
 GIF image translator	GIFView		Prekladač obrázkov GIF
 GIF image	GIFTranslator		Obrázok GIF
 Write transparent images	GIFView		Zapisovať priesvitné obrázky
-Palette	GIFView		Paleta
 Use RGB color	GIFView		Použiť farby RGB
 Use dithering	GIFView		Použiť dithering
 GIF Settings	GIFTranslator		Nastavenia GIF
 BeOS system	GIFView		Systém BeOS
 Automatic (from alpha channel)	GIFView		Automaticky (podľa kanála alfa)
-Colors	GIFView		Farby

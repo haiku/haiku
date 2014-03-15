@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	3102001288
+1	polish	x-vnd.Haiku-DriveSetup	960703572
 DriveSetup	System name		DriveSetup
 Cancel	AbstractParametersPanel		Anuluj
 Delete	MainWindow		Usuń
@@ -7,6 +7,7 @@ Rescan	MainWindow		Przeskanuj
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Nie można uzyskać informacji na temat partycji.
 There's no space on the partition where a child partition could be created.	MainWindow		Brak miejsca na partycji, gdzie można by utworzyć zagnieżdzoną partycje.
+Could not unmount partition	MainWindow		Nie można odmontować partycji
 Initialize	InitializeParametersPanel		Inicjalizacja
 OK	AbstractParametersPanel		OK
 <empty>	PartitionList		<pusty>
@@ -15,7 +16,8 @@ Select a partition from the list below.	DiskView		Proszę wybrać partycje z lis
 No disk devices have been recognized.	DiskView		Nie rozpoznano żadnych dysków twardych.
 Failed to initialize the disk %s!\n	MainWindow		Błąd podczas inicjalizacji partycji %s!\n
 The selected disk is read-only.	MainWindow		Wybrany dysk jest w trybie tylko do odczytu.
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Czy jesteś pewien, że chcesz sformatować tę partycję \\"%s\"? Zostaniesz zapytany o to ponownie, zanim zmiany zostaną zapisane na dysku.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Czy jesteś pewien, że chcesz sformatować tę partycję \"%s\"? Zostaniesz zapytany o to ponownie, zanim zmiany zostaną zapisane na dysku.
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Wymusić odmontowanie?\n\nUwaga: Jeśli aplikacja aktualnie zapisuje dane na partycji, jej odmontowanie może skutkować utratą danych.\n
 Could not mount partition %s.	MainWindow		Nie można zamontować partycji %s.
 The partition %s has been successfully formatted.\n	MainWindow		Partycja %s została poprawnie sformatowana.\n
 Change parameters	MainWindow		Zmień parametry
@@ -68,6 +70,8 @@ Delete partition	MainWindow		Usuń partycję
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Czy jesteś pewna/pewny, że chcesz zmienić parametry wybranej partycji?\n\nPartycja może już nie być rozpoznawalna przez inne systemy operacyjne!
 Eject	MainWindow		Wysuń
 Partition	MainWindow		Partycja
+Validation of the given parameters failed.	MainWindow		Sprawdzenie poprawności parametrów nie powiodło się.
+Force unmount	MainWindow		Wymuś odmontowanie
 Create	CreateParametersPanel		Utwórz
 File system	PartitionList		System plików
 Validation of the given creation parameters failed.	MainWindow		Sprawdzenie poprawności parametrów tworzenia partycji nie powiodło się.

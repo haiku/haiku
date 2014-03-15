@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	3366464357
+1	french	x-vnd.Haiku-Notifications	68793008
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Une erreur est survenue lors de la sauvegarde des préférences.\nVous n'avez peut-être plus suffisamment d'espace libre sur votre disque.
 Notifications	GeneralView		Notifications
 seconds of inactivity	GeneralView		secondes d'inactivités
@@ -7,7 +7,6 @@ Mini icon	DisplayView		Petite icône
 Enable notifications	GeneralView		Activer les notifications
 Error	NotificationView		Erreur
 OK	GeneralView		OK
-Events are not notified	GeneralView		Les événements ne sont pas notifiés
 Type	NotificationView		Type
 Notifications cannot be stopped, because the server can't be reached.	GeneralView		Les notifications ne peuvent pas être arrêtées, parce qu'il est impossible d'atteindre le serveur.
 Cannot enable notifications because the server cannot be found.\nThis means your InfoPopper installation was not successfully completed.	GeneralView		Impossible d'activer les notifications, car le serveur est introuvable.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.
@@ -29,7 +28,6 @@ Yes	NotificationView		Oui
 Large icon	DisplayView		Grande icône
 Icon size:	DisplayView		Taille de l'icône :
 Hide notifications from screen after	GeneralView		Faire disparaître les notifications de l'écran après
-Disable notifications	GeneralView		Désactiver les notifications
 Notifications	System name		Notifications
 Notifications	NotificationView		Notifications
 No	NotificationView		Non
@@ -47,4 +45,3 @@ Notifications	PrefletView		Notifications
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Impossible de trouver le serveur de notifications.\nCela signifie que votre installation d'InfoPopper ne s'est par terminée correctement.
 Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Impossible d'enregistrer les préférences, vous n'avez probablement pas accès en écriture au répertoire des réglages.
 Applications	NotificationView		Applications
-Events are notified	GeneralView		Les événements sont notifiés
