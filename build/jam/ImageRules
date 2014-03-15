@@ -1153,7 +1153,7 @@ rule BuildHaikuImagePackageList target
 	}
 
 	# extract the versioned package names (without revision)
-	packageFiles = [ Match "(.*)-[^-]*-[^-]*" : $(packageFiles:B) ] ;
+	packageFiles = [ Match "^([^-]*)" : $(packageFiles:B) ] ;
 
 	HAIKU_IMAGE_PACKAGES on $(target) = $(packageFiles) ;
 }
