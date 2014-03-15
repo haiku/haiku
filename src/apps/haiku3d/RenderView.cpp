@@ -257,7 +257,7 @@ RenderView::FrameResized(float width, float height)
 
 
 void
-RenderView::ErrorCallback(uint32 error)
+RenderView::ErrorCallback(unsigned long error)
 {
-	fprintf(stderr, "OpenGL error (%li): %s\n", error, gluErrorString(error));
+	fprintf(stderr, "OpenGL error (%lu): %s\n", error, gluErrorString(error));
 }

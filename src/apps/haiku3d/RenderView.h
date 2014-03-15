@@ -24,7 +24,7 @@ public:
 
 	virtual void	AttachedToWindow();
 	virtual void	FrameResized(float width, float height);
-	virtual	void	ErrorCallback(uint32 error);
+	virtual	void	ErrorCallback(unsigned long error);
 
 protected:
 	void			_InitGL();
