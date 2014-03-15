@@ -3,8 +3,10 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * 		Alexandre Deckner <alex@zappotek.com>
+ *		Alexandre Deckner <alex@zappotek.com>
  */
+
+#define __STDC_FORMAT_MACROS
 
 #include "BitmapTexture.h"
 
@@ -12,6 +14,7 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <inttypes.h>
 #include <stdio.h>
 
 
@@ -43,8 +46,8 @@ BitmapTexture::_Load(BBitmap* bitmap) {
 		0, GL_BGRA, GL_UNSIGNED_BYTE,
 		bitmap->Bits());
 
-	printf("BitmapTexture::_Load, loaded texture %u (%li, %li, %libits)\n",
-		fId, (int32) bitmap->Bounds().Width(),
+	printf("BitmapTexture::_Load, loaded texture %u (%" PRIi32 ", %" PRIi32 ", "
+		"%" PRIi32 "bits)\n", fId, (int32) bitmap->Bounds().Width(),
 		(int32) bitmap->Bounds().Height(),
 		8 * bitmap->BytesPerRow() / (int)bitmap->Bounds().Width());
 

@@ -4,8 +4,11 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+#define __STDC_FORMAT_MACROS
+
 #include "Model.h"
 
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -146,10 +149,12 @@ public:
 	{
 		if (package.Get()==NULL)
 			return false;
-printf("TEST %s\n", package->Title().String());
+
+		printf("TEST %s\n", package->Title().String());
+
 		for (int32 i = 0; i < fPackageLists.CountItems(); i++) {
 			if (fPackageLists.ItemAtFast(i)->Contains(package)) {
-printf("  contained in %ld\n", i);
+				printf("  contained in %" PRId32 "\n", i);
 				return false;
 			}
 		}
