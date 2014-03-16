@@ -1,0 +1,287 @@
+# This file defines the content of the regular Haiku image.
+
+# import everything from the minimum image
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
+
+SYSTEM_BIN += [ FFilterByBuildFeatures
+	CortexAddOnHost
+	FirstBootPrompt	fwcontrol@x86
+	gdb@x86
+	installsound
+	mail2mbox mbox2mail mkdos mount_nfs
+	play playfile playsound playwav
+	screenshot setdecor spamdbm 
+	translate
+] ;
+
+SYSTEM_APPS += [ FFilterByBuildFeatures
+	CDPlayer CodyCam 
+	GLInfo@mesa 
+	HaikuDepot 
+	Icon-O-Matic Installer LaunchBox 
+	Magnify Mail MediaConverter MediaPlayer MidiPlayer
+	PackageInstaller People	PoorMan PowerStatus
+	Screenshot SerialConnect SoundRecorder 
+	TV 
+	WebWatch 
+] ;
+
+DESKBAR_APPLICATIONS += 
+	CodyCam CDPlayer 
+	HaikuDepot 
+	Icon-O-Matic Installer 
+	Magnify Mail MediaConverter MediaPlayer MidiPlayer 
+	People PoorMan
+	TV
+;
+
+DESKBAR_DESKTOP_APPLETS += 
+	LaunchBox 
+	PowerStatus
+;
+
+SYSTEM_PREFERENCES += [ FFilterByBuildFeatures
+	DataTranslations
+	E-mail 
+	Media 
+	Printers 
+	ScreenSaver Sounds 
+] ;
+
+SYSTEM_DEMOS += [ FFilterByBuildFeatures
+	BSnow Chart Clock Cortex FontDemo GLTeapot@mesa
+	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d@mesa Mandelbrot OverlayImage Pairs
+	PatchBay Playground Pulse Sudoku
+] ;
+
+
+rule HaikuImageGetSystemLibs
+{
+	return
+		# libs with special grist
+		[ MultiArchDefaultGristFiles libroot.so : revisioned ]
+		$(HAIKU_SHARED_LIBSTDC++_$(TARGET_PACKAGING_ARCH))
+		$(HAIKU_SHARED_LIBSUPC++_$(TARGET_PACKAGING_ARCH))
+		# libs with standard grist
+		[ MultiArchDefaultGristFiles [ FFilterByBuildFeatures
+			libbe.so libbsd.so libbnetapi.so
+			libdebug.so libdevice.so
+			libgame.so libglut.so@mesa libgnu.so
+			libmail.so libmedia.so libmidi.so libmidi2.so
+			libnetwork.so
+			libpackage.so
+			libscreensaver.so
+			libtextencoding.so libtracker.so libtranslation.so
+			libtiff.so 
+		] ]
+		;
+}
+
+
+rule HaikuImageGetPrivateSystemLibs
+{
+	return [ MultiArchDefaultGristFiles [ FFilterByBuildFeatures
+		libalm.so
+		libfluidsynth.so
+		libilmimf.so
+		libpackage-add-on-libsolv.so
+		libroot-addon-icu.so
+	] ] ;
+}
+
+
+SYSTEM_SERVERS += [ FFilterByBuildFeatures
+	cddb_daemon 
+	mail_daemon media_addon_server media_server midi_server
+	nfs4_idmapper_server 
+	print_server print_addon_server
+] ;
+
+SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
+	x86,x86_64 @{
+		intel_810.accelerant intel_extreme.accelerant 
+		matrox.accelerant
+		nvidia.accelerant 
+		radeon.accelerant radeon_hd.accelerant 
+		#via.accelerant 
+	}@ # x86,x86_64
+	x86 @{
+		3dfx.accelerant ati.accelerant neomagic.accelerant s3.accelerant
+	}@ # x86
+] ;
+
+SYSTEM_ADD_ONS_TRANSLATORS += 
+	BMPTranslator 
+	EXRTranslator 
+	GIFTranslator 
+	HVIFTranslator 
+	ICOTranslator ICNSTranslator 
+	JPEGTranslator	JPEG2000Translator 
+	PCXTranslator PNGTranslator PPMTranslator PSDTranslator
+	RAWTranslator RTFTranslator 
+	SGITranslator
+	TGATranslator TIFFTranslator 
+	WebPTranslator WonderBrushTranslator
+;
+
+SYSTEM_ADD_ONS_MEDIA += [ FFilterByBuildFeatures
+	cortex_audioadapter.media_addon	cortex_flanger.media_addon
+	dvb.media_addon@x86
+	equalizer.media_addon
+	firewire_dv.media_addon@x86
+	hmulti_audio.media_addon
+	#legacy.media_addon
+	mixer.media_addon
+	opensound.media_addon
+	tone_producer_demo.media_addon
+	usb_webcam.media_addon
+	video_producer_demo.media_addon	video_window_demo.media_addon
+	vst_host.media_addon
+] ;
+
+SYSTEM_ADD_ONS_MEDIA_PLUGINS += [ FFilterByBuildFeatures
+	ffmpeg@ffmpeg 
+	raw_decoder
+] ;
+
+SYSTEM_ADD_ONS_PRINT +=
+	Canon\ LIPS3\ Compatible
+	Canon\ LIPS4\ Compatible
+	Gutenprint
+	PCL5\ Compatible
+	PCL6\ Compatible
+	PDF\ Writer
+	PS\ Compatible
+	Preview
+;
+
+SYSTEM_ADD_ONS_PRINT_TRANSPORT += 
+	HP\ JetDirect 
+	IPP 
+	LPR
+	# Parallel\ Port
+	Print\ To\ File 
+	Serial\ Port 
+	USB\ Port
+;
+
+SYSTEM_ADD_ONS_SCREENSAVERS += [ FFilterByBuildFeatures
+	Butterfly 
+	DebugNow 
+	Flurry@mesa
+	GLife@mesa Gravity@mesa
+	$(HAIKU_INCLUDE_TRADEMARKS)Haiku 
+	Icons IFS 
+	Leaves
+	Message 
+	Spider
+] ;
+
+SYSTEM_ADD_ONS_DRIVERS_AUDIO += 
+	auich auvia 
+	echo3g emuxki 
+	hda 
+	ice1712 
+	sis7018 
+;
+
+SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD += 
+	#cmedia usb_audio 
+;
+
+SYSTEM_ADD_ONS_DRIVERS_GRAPHICS += [ FFilterByBuildFeatures
+	x86,x86_64 @{
+		intel_810 intel_extreme 
+		matrox 
+		nvidia 
+		radeon radeon_hd 
+		#via 
+	}@ # x86,x86_64
+	x86 @{
+		3dfx 
+		ati 
+		neomagic 
+		s3
+	}@ # x86
+] ;
+
+SYSTEM_ADD_ONS_DRIVERS_MIDI += 
+	emuxki 
+	ice1712 
+	usb_midi 
+;
+
+SYSTEM_ADD_ONS_DRIVERS_POWER += [ FFilterByBuildFeatures
+	acpi_battery@x86,x86_64
+] ;
+
+SYSTEM_ADD_ONS_FILE_SYSTEMS += 
+	cdda 
+	googlefs 
+	nfs nfs4 
+;
+
+# Mailbox folders and symlink
+AddDirectoryToHaikuImage home mail draft ;
+AddDirectoryToHaikuImage home mail in ;
+AddDirectoryToHaikuImage home mail out ;
+
+# Add boot launch directory
+AddDirectoryToHaikuImage home config settings boot launch ;
+
+# Add mail provider infos.
+AddFilesToHaikuImage home config settings Mail ProviderInfo :
+	$(HAIKU_PROVIDER_INFOS) ;
+
+# Add Tracker New Templates
+AddFilesToHaikuImage home config settings Tracker "Tracker New Templates"
+	:
+	"<tracker-new-templates>C++ header"
+	"<tracker-new-templates>C++ source"
+	"<tracker-new-templates>makefile"
+	"<tracker-new-templates>text file"
+;
+
+#local bashCompletionFiles = [ Glob $(etcDir)/bash_completion.d : * ] ;
+#local bashCompletionHelperFiles
+#    = [ Glob $(etcDir)/bash_completion.d/helpers : * ] ;
+#bashCompletionFiles = $(bashCompletionFiles:G=bash-completion) ;
+#bashCompletionHelperFiles = $(bashCompletionHelperFiles:G=bash-completion-hlp) ;
+#AddDirectoryToHaikuImage system etc bash_completion.d ;
+#AddDirectoryToHaikuImage system etc bash_completion.d helpers ;
+#AddFilesToHaikuImage system etc bash_completion.d : $(bashCompletionFiles) ;
+#AddFilesToHaikuImage system etc bash_completion.d helpers
+#    : $(bashCompletionHelperFiles) ;
+
+# decorators
+#AddFilesToHaikuImage system non-packaged add-ons decorators
+#	: BeDecorator MacDecorator WinDecorator ;
+
+# printers
+AddDirectoryToHaikuImage home config settings printers Preview
+	: home-config-settings-printers-preview.rdef ;
+AddDirectoryToHaikuImage home config settings printers "Save as PDF"
+	: home-config-settings-printers-save-as-pdf.rdef ;
+
+# dvb channel settings
+CopyDirectoryToHaikuImage home config settings Media
+	: [ FDirName $(HAIKU_TOP) data settings media dvb ]
+	: dvb : -x Jamfile ;
+
+# repository config and cache files
+local repositories = $(HAIKU_REPOSITORIES) ;
+if $(HAIKU_ADD_HAIKU_REPOSITORY_CONFIG) {
+	repositories += <repository>haiku ;
+}
+local repository ;
+for repository in $(repositories) {
+	local config = [ on $(repository) return $(HAIKU_REPOSITORY_CONFIG_FILE) ] ;
+	local cache = [ on $(repository) return $(HAIKU_REPOSITORY_CACHE_FILE) ] ;
+	if $(HAIKU_UPDATE_ALL_PACKAGES) {
+		HAIKU_INCLUDE_IN_IMAGE on $(config) $(cache) = 1 ;
+	}
+	AddFilesToHaikuImage system settings package-repositories
+		: $(config) : $(repository:G=) ;
+	AddFilesToHaikuImage system cache package-repositories
+		: $(cache) : $(repository:G=) ;
+}

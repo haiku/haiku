@@ -1,0 +1,200 @@
+# This file adds content common to all images, it needs to be included after
+# all the other definitions.
+
+# create directories that may remain empty
+AddDirectoryToHaikuImage home Desktop ;
+AddDirectoryToHaikuImage home mail ;
+AddDirectoryToHaikuImage home config cache ;
+AddDirectoryToHaikuImage home config packages ;
+AddDirectoryToHaikuImage home config settings ;
+AddDirectoryToHaikuImage home config var ;
+AddDirectoryToHaikuImage home config non-packaged bin ;
+AddDirectoryToHaikuImage home config non-packaged data fonts ;
+AddDirectoryToHaikuImage home config non-packaged lib ;
+AddDirectoryToHaikuImage home config non-packaged add-ons decorators ;
+AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers bin ;
+AddDirectoryToHaikuImage home config non-packaged add-ons kernel drivers dev ;
+AddDirectoryToHaikuImage home config non-packaged add-ons input_server devices ;
+AddDirectoryToHaikuImage home config non-packaged add-ons input_server filters ;
+AddDirectoryToHaikuImage home config non-packaged add-ons input_server methods ;
+AddDirectoryToHaikuImage home config non-packaged add-ons media plugins ;
+AddDirectoryToHaikuImage home config non-packaged add-ons Tracker ;
+AddDirectoryToHaikuImage home config non-packaged add-ons Print ;
+AddDirectoryToHaikuImage home config non-packaged add-ons Screen\ Savers ;
+AddDirectoryToHaikuImage home config non-packaged add-ons Translators ;
+AddDirectoryToHaikuImage system cache tmp ;
+AddDirectoryToHaikuImage system non-packaged bin ;
+AddDirectoryToHaikuImage system non-packaged data fonts ;
+AddDirectoryToHaikuImage system non-packaged lib ;
+AddDirectoryToHaikuImage system non-packaged add-ons decorators ;
+AddDirectoryToHaikuImage system non-packaged add-ons kernel drivers bin ;
+AddDirectoryToHaikuImage system non-packaged add-ons kernel drivers dev ;
+AddDirectoryToHaikuImage system non-packaged add-ons input_server devices ;
+AddDirectoryToHaikuImage system non-packaged add-ons input_server filters ;
+AddDirectoryToHaikuImage system non-packaged add-ons input_server methods ;
+AddDirectoryToHaikuImage system non-packaged add-ons media plugins ;
+AddDirectoryToHaikuImage system non-packaged add-ons Tracker ;
+AddDirectoryToHaikuImage system non-packaged add-ons Print ;
+AddDirectoryToHaikuImage system non-packaged add-ons Screen\ Savers ;
+AddDirectoryToHaikuImage system non-packaged add-ons Translators ;
+AddDirectoryToHaikuImage system var empty ;
+AddDirectoryToHaikuImage system var log ;
+
+
+#pragma mark - Optional Packages
+
+
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackages ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalTestPackages ] ;
+
+
+#pragma mark - User/Group Setup
+
+
+# add the root user and the root and users groups
+AddUserToHaikuImage $(HAIKU_ROOT_USER_NAME:E=baron) : 0 : 0 : /boot/home
+	: /bin/bash : $(HAIKU_ROOT_USER_REAL_NAME:E="Root User") ;
+AddGroupToHaikuImage root : 0 : ;
+AddGroupToHaikuImage users : 100 : ;
+
+
+#pragma mark - Host Name
+
+
+if $(HAIKU_IMAGE_HOST_NAME) {
+	actions BuildHaikuImageHostnameFile
+	{
+		echo "$(HAIKU_IMAGE_HOST_NAME)" > $(1)
+	}
+
+	local file = <haiku-image>hostname ;
+	Always $(file) ;
+	MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
+	BuildHaikuImageHostnameFile $(file) ;
+	AddFilesToHaikuImage system settings network : $(file) ;
+}
+
+
+#pragma mark - Build The Image
+
+
+# Execute pre-image user config rules.
+UserBuildConfigRulePreImage	;
+
+# Set image name and directory defaults and locate the image.
+HAIKU_IMAGE_NAME ?= $(HAIKU_DEFAULT_IMAGE_NAME) ;
+HAIKU_IMAGE_DIR ?= $(HAIKU_DEFAULT_IMAGE_DIR) ;
+HAIKU_IMAGE = $(HAIKU_IMAGE_NAME) ;
+HAIKU_IMAGE_SIZE ?= $(HAIKU_DEFAULT_IMAGE_SIZE) ; # 300 MB
+HAIKU_IMAGE_LABEL ?= $(HAIKU_DEFAULT_IMAGE_LABEL) ;
+MakeLocate $(HAIKU_IMAGE) : $(HAIKU_IMAGE_DIR) ;
+
+# Set the default installation directory.
+HAIKU_INSTALL_DIR ?= $(HAIKU_DEFAULT_INSTALL_DIR) ;
+
+# the pseudo target all image contents is attached to
+NotFile $(HAIKU_IMAGE_CONTAINER_NAME) ;
+
+# prepare the script that initializes the shell variables
+HAIKU_IMAGE_INIT_VARIABLES_SCRIPT = <HaikuImage>haiku.image-init-vars ;
+local script = $(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT) ;
+MakeLocate $(script) : $(HAIKU_OUTPUT_DIR) ;
+Always $(script) ;
+
+AddVariableToScript $(script) : sourceDir : $(HAIKU_TOP) ;
+AddVariableToScript $(script) : outputDir : $(HAIKU_OUTPUT_DIR) ;
+AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
+AddVariableToScript $(script) : installDir : $(HAIKU_INSTALL_DIR) ;
+#AddVariableToScript $(script) : isImage : 1 ;
+AddVariableToScript $(script) : imageSize : $(HAIKU_IMAGE_SIZE) ;
+AddVariableToScript $(script) : imageLabel : $(HAIKU_IMAGE_LABEL) ;
+AddVariableToScript $(script) : addBuildCompatibilityLibDir
+	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+AddVariableToScript $(script) : dontClearImage : $(HAIKU_DONT_CLEAR_IMAGE) ;
+AddVariableToScript $(script) : updateOnly : [ IsUpdateHaikuImageOnly ] ;
+AddTargetVariableToScript $(script) : <build>addattr ;
+AddTargetVariableToScript $(script) : <build>bfs_shell : bfsShell ;
+AddTargetVariableToScript $(script) : <build>fs_shell_command : fsShellCommand ;
+AddTargetVariableToScript $(script) : <build>copyattr ;
+AddTargetVariableToScript $(script) : <build>create_image : createImage ;
+AddTargetVariableToScript $(script) : <build>makebootable ;
+AddTargetVariableToScript $(script) : <build>rc ;
+AddTargetVariableToScript $(script) : <build>resattr ;
+AddTargetVariableToScript $(script) : <build>unzip ;
+AddTargetVariableToScript $(script) : <build>vmdkimage ;
+if $(HOST_RM_ATTRS_TARGET) {
+	AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET) : rmAttrs ;
+} else {
+	AddVariableToScript $(script) : rmAttrs : rm ;
+}
+
+AddPackagesAndRepositoryVariablesToContainerScript $(script)
+	: $(HAIKU_IMAGE_CONTAINER_NAME) ;
+
+# create the other scripts
+HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;
+HAIKU_IMAGE_COPY_FILES_SCRIPT = <HaikuImage>haiku.image-copy-files ;
+HAIKU_IMAGE_EXTRACT_FILES_SCRIPT = <HaikuImage>haiku.image-extract-files ;
+MakeLocate $(HAIKU_IMAGE_MAKE_DIRS_SCRIPT) $(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+	$(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT) : $(HAIKU_OUTPUT_DIR) ;
+
+CreateHaikuImageMakeDirectoriesScript $(HAIKU_IMAGE_MAKE_DIRS_SCRIPT) ;
+CreateHaikuImageCopyFilesScript $(HAIKU_IMAGE_COPY_FILES_SCRIPT) ;
+CreateHaikuImageExtractFilesScript $(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT) ;
+
+# Convenience wrapper rule around BuildHaikuImage.
+rule _BuildHaikuImage image : isImage : isVMwareImage
+{
+	# _BuildHaikuImage <image target> : <isImage> : <isVMwareImage> ;
+	#
+
+	# build the image
+	# HAIKU_IMAGE_EARLY_USER_SCRIPTS, HAIKU_IMAGE_LATE_USER_SCRIPTS can be
+	# specified by the user.
+	BuildHaikuImage $(image) :
+		$(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT)
+		$(HAIKU_IMAGE_EARLY_USER_SCRIPTS)
+		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
+		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+		$(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT)
+		$(HAIKU_IMAGE_LATE_USER_SCRIPTS)
+		: $(isImage)
+		: $(isVMwareImage)
+	;
+
+	# remove the scripts we have generated
+	RmTemps $(image) :
+		$(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT)
+		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
+		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+		$(HAIKU_IMAGE_EXTRACT_FILES_SCRIPT)
+	;
+}
+
+# build the image
+_BuildHaikuImage $(HAIKU_IMAGE) : true ;
+NotFile haiku-image ;
+Depends haiku-image : $(HAIKU_IMAGE) ;
+
+
+# install Haiku into a directory
+NotFile install-haiku ;
+_BuildHaikuImage install-haiku : 0 ;
+
+
+# build the VMware image
+HAIKU_VMWARE_IMAGE_NAME ?= $(HAIKU_DEFAULT_VMWARE_IMAGE_NAME) ;
+HAIKU_VMWARE_IMAGE = $(HAIKU_VMWARE_IMAGE_NAME) ;
+MakeLocate $(HAIKU_VMWARE_IMAGE) : $(HAIKU_IMAGE_DIR) ;
+
+_BuildHaikuImage $(HAIKU_VMWARE_IMAGE) : true : true ;
+NotFile haiku-vmware-image ;
+Depends haiku-vmware-image : $(HAIKU_VMWARE_IMAGE) ;
+
+
+# create a package list
+BuildHaikuImagePackageList $(HAIKU_IMAGE_LIST_PACKAGES_TARGET) ;
+
+
+# Execute post-image user config rules.
+UserBuildConfigRulePostImage ;
