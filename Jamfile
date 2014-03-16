@@ -80,14 +80,10 @@ UserBuildConfigRulePostBuildTargets	;
 # specify the Haiku repository contents
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) repositories Haiku ] ;
 
-# specify the Haiku image and network boot archive contents
-if $(HAIKU_BOOTSTRAP_BUILD) {
-	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImageBootstrap ] ;
-} else if $(HAIKU_MINIMUM_BUILD) {
-	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImageMinimum ] ;
-} else {
-	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImage ] ;
-}
+# specify the actual Haiku image contents
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImage ] ;
+
+# specify the additional image contents one for each boot type
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images NetBootArchive ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images FloppyBootImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images CDBootImage ] ;

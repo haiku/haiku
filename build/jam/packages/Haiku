@@ -200,18 +200,19 @@ AddFilesToPackage data KeyboardLayouts ThinkPad
 
 # boot module links
 AddBootModuleSymlinksToPackage
-	acpi@x86,x86_64 ata@ata pci isa@x86,x86_64 config_manager dpc
-	ide@ide scsi usb
-	openpic@ppc
-	ata_adapter@ata ide_adapter@ide locked_pool scsi_periph
-	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112
-	ide_isa@x86
-	<usb>uhci <usb>ohci <usb>ehci
-	scsi_cd scsi_disk usb_disk
-	virtio virtio_pci virtio_block virtio_scsi
+	acpi@x86,x86_64 ahci ata@ata ata_adapter@ata 
+	bfs 
+	config_manager 
+	dpc
 	efi_gpt
-	intel
-	bfs packagefs
+	generic_ide_pci 
+	ide@ide ide_adapter@ide ide_isa@x86 isa@x86,x86_64 intel it8211 
+	legacy_sata locked_pool 
+	openpic@ppc
+	packagefs pci 
+	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112
+	usb usb_disk <usb>ehci <usb>ohci <usb>uhci
+	virtio virtio_block virtio_pci virtio_scsi
 ;
 
 # add-ons
@@ -268,11 +269,6 @@ CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;
 # Deskbar menu symlinks
 
 # "Applications" links
-DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap CodyCam CDPlayer DeskCalc
-	Devices DiskProbe DriveSetup DiskUsage Expander HaikuDepot Icon-O-Matic
-	Installer Magnify Mail MediaConverter MediaPlayer MidiPlayer People PoorMan
-	Screenshot SerialConnect SoundRecorder StyledEdit Terminal TV
-;
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
 	AddSymlinkToPackage data deskbar menu Applications
@@ -280,9 +276,6 @@ for linkTarget in $(DESKBAR_APPLICATIONS) {
 }
 
 # "Desktop applets" links
-DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
-	Workspaces
-;
 for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
 	AddSymlinkToPackage data deskbar menu Desktop\ applets
 		: ../../../../apps/$(linkTarget) : $(linkTarget) ;
