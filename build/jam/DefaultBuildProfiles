@@ -1,9 +1,14 @@
 # set HAIKU_BOOTSTRAP_BUILD early, if building a bootstrap Haiku image
 switch $(HAIKU_BUILD_PROFILE) {
-	case "bootstrap-*" :
+	case "bootstrap-*" : {
 		HAIKU_BOOTSTRAP_BUILD = 1 ;
 		HAIKU_DEFINES += HAIKU_BOOTSTRAP_BUILD ;
 		TARGET_DEFINES += HAIKU_BOOTSTRAP_BUILD ;
+	}
+	
+	case "minimum-*" : {
+		HAIKU_MINIMUM_BUILD = 1 ;
+	}
 }
 
 
@@ -28,6 +33,13 @@ rule DefineDefaultBuildProfiles
 	DefineBuildProfile bootstrap-vmware : vmware-image
 		: "haiku-bootstrap.vmdk" ;
 
+	# minimum profiles
+	DefineBuildProfile minimum-raw : image : "haiku-minimum.image" ;
+	DefineBuildProfile minimum-vmware : vmware-image : "haiku-minimum.vmdk" ;
+	DefineBuildProfile minimum-anyboot : anyboot-image 
+		: "haiku-minimum-anyboot.image" ;
+
+
 	switch $(HAIKU_BUILD_PROFILE) {
 		case "release-*" : {
 			Echo Building Haiku R1/development preview ;
@@ -41,6 +53,7 @@ rule DefineDefaultBuildProfiles
 				bepdf
 				cvs
 				keymapswitcher
+				llvm
 				man
 				mercurial
 				nano
@@ -123,18 +136,14 @@ rule DefineDefaultBuildProfiles
 				automake
 				binutils
 				bison
-				curl
 				curl_devel
 				findutils
 				flex
-				freetype
 				freetype_devel
 				gawk
 				gcc
 				grep
 				haikuporter
-				icu
-				libsolv
 				libtool
 				libtool_libltdl
 				m4
@@ -144,7 +153,6 @@ rule DefineDefaultBuildProfiles
 				python
 				sed
 				texinfo
-				zlib
 				zlib_devel
 				;
 
@@ -171,6 +179,14 @@ rule DefineDefaultBuildProfiles
 			}
 
 			AddOptionalHaikuImagePackages DevelopmentMin ;
+		}
+
+		case "minimum-*" : {
+			Echo Building Haiku Minimum Target ;
+			HAIKU_IMAGE_HOST_NAME ?= shredder ;
+
+			AddHaikuImagePackages
+				;
 		}
 	}
 

@@ -1,5 +1,8 @@
 #pragma mark - Private
 
+# default value for the build profile that defines the set of source packages 
+# that will be put onto the bootstrap image
+HAIKU_BOOTSTRAP_SOURCES_PROFILE ?= @minimum-raw ;
 
 rule PackageFamily packageBaseName
 {
@@ -555,8 +558,8 @@ rule BuildHaikuPortsSourcePackageDirectory
 
 actions BuildHaikuPortsPackageList
 {
-	HAIKU_BOOTSTRAP_BUILD= $(JAM:E=jam) @release-raw build-package-list $(1) \
-		$(HAIKU_REPOSITORY_BUILD_ADDITIONAL_PACKAGES)
+	HAIKU_BOOTSTRAP_BUILD= $(JAM:E=jam) $(HAIKU_BOOTSTRAP_SOURCES_PROFILE) \
+		build-package-list $(1) $(HAIKU_REPOSITORY_BUILD_ADDITIONAL_PACKAGES)
 }
 
 

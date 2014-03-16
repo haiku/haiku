@@ -11,13 +11,28 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	}
 }
 
-# Include packages that are required by all images.
-if ! $(HAIKU_BOOTSTRAP_BUILD) {
+# Include packages that are required by all images:
+# primary architecture
+AddHaikuImagePackages
+	curl freetype icu libsolv zlib
+	;
+# secondary architectures
+local architectureObject ;
+for architectureObject
+		in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
+	on $(architectureObject) {
+		AddHaikuImagePackages
+			curl freetype icu libsolv zlib
+			;
+	}
+}
+	
+# Include packages that are required by non-basic images:
+if ! ( $(HAIKU_BOOTSTRAP_BUILD) || $(HAIKU_MINIMUM_BUILD) ) {
 	# primary architecture
 	AddHaikuImagePackages
-		bzip2 ctags curl findutils gawk grep sed tar which zlib
-		ffmpeg freetype icu jpeg libpng libsolv
-		mesa mesa_devel mesa_swrast glu
+		bzip2 ctags ffmpeg findutils gawk glu grep jpeg libpng 
+		mesa mesa_devel mesa_swrast sed tar which
 		;
 
 	# secondary architectures
@@ -26,7 +41,7 @@ if ! $(HAIKU_BOOTSTRAP_BUILD) {
 			in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
 		on $(architectureObject) {
 			AddHaikuImagePackages
-				curl ffmpeg freetype glu icu jpeg libpng libsolv mesa zlib
+				ffmpeg glu jpeg libpng mesa
 				;
 		}
 	}
@@ -68,6 +83,8 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) repositories Haiku ] ;
 # specify the Haiku image and network boot archive contents
 if $(HAIKU_BOOTSTRAP_BUILD) {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImageBootstrap ] ;
+} else if $(HAIKU_MINIMUM_BUILD) {
+	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImageMinimum ] ;
 } else {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images HaikuImage ] ;
 }
