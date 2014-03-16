@@ -519,13 +519,6 @@ rule BuildHaikuPortsSourcePackageDirectory
 	Depends $(packageList) :
 		[ FDirName $(HAIKU_BUILD_RULES_DIR) repositories HaikuPorts
 			$(architecture) ] ;
-	# Note: Those are packages we need for building on the bootstrap Haiku. They
-	# are build-pre-requires and as such won't be detected by haikuporter as
-	# required dependencies when building the source packages.
-	HAIKU_REPOSITORY_BUILD_ADDITIONAL_PACKAGES on $(packageList) =
-		htmldoc
-		texi2html
-		;
 	BuildHaikuPortsPackageList $(packageList) ;
 
 	# prepare the config file for the HaikuPorts build
