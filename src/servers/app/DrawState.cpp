@@ -92,6 +92,7 @@ DrawState::DrawState(const DrawState& other)
 	fLineCapMode(other.fLineCapMode),
 	fLineJoinMode(other.fLineJoinMode),
 	fMiterLimit(other.fMiterLimit),
+	fFillRule(other.fFillRule),
 
 	// Since fScale is reset to 1.0, the unscaled
 	// font size is the current size of the font
@@ -223,6 +224,7 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 	fLineJoinMode = info.lineJoin;
 	fLineCapMode = info.lineCap;
 	fMiterLimit = info.miterLimit;
+	fFillRule = info.fillRule;
 	fAlphaSrcMode = info.alphaSourceMode;
 	fAlphaFncMode = info.alphaFunctionMode;
 	fFontAliasing = info.fontAntialiasing;
@@ -287,6 +289,7 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 	info.viewStateInfo.lineJoin = fLineJoinMode;
 	info.viewStateInfo.lineCap = fLineCapMode;
 	info.viewStateInfo.miterLimit = fMiterLimit;
+	info.viewStateInfo.fillRule = fFillRule;
 	info.viewStateInfo.alphaSourceMode = fAlphaSrcMode;
 	info.viewStateInfo.alphaFunctionMode = fAlphaFncMode;
 	info.viewStateInfo.fontAntialiasing = fFontAliasing;

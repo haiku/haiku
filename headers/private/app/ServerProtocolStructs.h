@@ -26,6 +26,7 @@ struct ViewSetStateInfo {
 	join_mode					lineJoin;
 	cap_mode					lineCap;
 	float						miterLimit;
+	int32						fillRule;
 	source_alpha				alphaSourceMode;
 	alpha_function				alphaFunctionMode;
 	bool						fontAntialiasing;

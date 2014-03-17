@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -227,6 +227,7 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 	info.lineJoin = line_join;
 	info.lineCap = line_cap;
 	info.miterLimit = miter_limit;
+	info.fillRule = fill_rule;
 	info.alphaSourceMode = alpha_source_mode;
 	info.alphaFunctionMode = alpha_function_mode;
 	info.fontAntialiasing = font_aliasing;
@@ -291,6 +292,7 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 	line_join = info.viewStateInfo.lineJoin;
 	line_cap = info.viewStateInfo.lineCap;
 	miter_limit = info.viewStateInfo.miterLimit;
+	fill_rule = info.viewStateInfo.fillRule;
 	alpha_source_mode = info.viewStateInfo.alphaSourceMode;
 	alpha_function_mode = info.viewStateInfo.alphaFunctionMode;
 	font_aliasing = info.viewStateInfo.fontAntialiasing;
