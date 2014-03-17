@@ -248,6 +248,9 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS =
 	write_overlay
 ;
 
+# symlink to home on desktop
+AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
+
 # global settings when a package is installed in ~/config
 AddDirectoryToHaikuImage home config settings global ;
 
