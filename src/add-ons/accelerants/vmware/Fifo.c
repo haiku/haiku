@@ -81,7 +81,7 @@ FifoInit(void)
 		B_REAL_TIME_DISPLAY_PRIORITY, NULL);
 	resume_thread(gUpdateThread);
 
-	TRACE("init fifo: %ld -> %ld\n",
+	TRACE("init fifo: %" B_PRId32 " -> %" B_PRId32 "\n",
 		fifo[SVGA_FIFO_MIN], fifo[SVGA_FIFO_MAX]);
 }
 
