@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -1811,11 +1812,8 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	// wait for the loader of the new team to finish its work
 	if ((flags & B_WAIT_TILL_LOADED) != 0) {
 		if (mainThread != NULL) {
-			InterruptsSpinLocker schedulerLocker(mainThread->scheduler_lock);
-
 			// resume the team's main thread
-	 		if (mainThread->state == B_THREAD_SUSPENDED)
-				scheduler_enqueue_in_run_queue(mainThread);
+			thread_continue(mainThread);
 		}
 
 		// Now suspend ourselves until loading is finished. We will be woken
@@ -1823,12 +1821,8 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		// the team is going to die (e.g. is killed). In either case the one
 		// setting `loadingInfo.done' is responsible for removing the info from
 		// the team structure.
-		while (!loadingInfo.done) {
-			Thread* thread = thread_get_current_thread();
-
-			InterruptsSpinLocker schedulerLocker(thread->scheduler_lock);
-			scheduler_reschedule(B_THREAD_SUSPENDED);
-		}
+		while (!loadingInfo.done)
+			thread_suspend();
 
 		if (loadingInfo.result < B_OK)
 			return loadingInfo.result;
@@ -3193,11 +3187,8 @@ team_delete_team(Team* team, port_id debuggerPort)
 		loadingInfo->result = B_ERROR;
 		loadingInfo->done = true;
 
-		InterruptsSpinLocker _(loadingInfo->thread->scheduler_lock);
-
 		// wake up the waiting thread
-		if (loadingInfo->thread->state == B_THREAD_SUSPENDED)
-			scheduler_enqueue_in_run_queue(loadingInfo->thread);
+		thread_continue(loadingInfo->thread);
 	}
 
 	// notify team watchers

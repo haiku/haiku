@@ -422,6 +422,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 	Thread			*hash_next;		// protected by thread hash lock
 	Thread			*team_next;		// protected by team lock and fLock
 	char			name[B_OS_NAME_LENGTH];	// protected by fLock
+	bool			going_to_suspend;	// protected by scheduler lock
 	int32			priority;		// protected by scheduler lock
 	int32			io_priority;	// protected by fLock
 	int32			state;			// protected by scheduler lock

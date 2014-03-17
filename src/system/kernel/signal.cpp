@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
@@ -1128,10 +1129,8 @@ handle_signals(Thread* thread)
 								& (CONTINUE_SIGNALS | KILL_SIGNALS)) != 0;
 					locker.Unlock();
 
-					if (!resume) {
-						InterruptsSpinLocker _(thread->scheduler_lock);
-						scheduler_reschedule(B_THREAD_SUSPENDED);
-					}
+					if (!resume)
+						thread_suspend();
 
 					continue;
 				}
@@ -1377,9 +1376,7 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 
 	if (thread->team == team_get_kernel_team()) {
 		// Signals to kernel threads will only wake them up
-		SpinLocker _(thread->scheduler_lock);
-		if (thread->state == B_THREAD_SUSPENDED)
-			scheduler_enqueue_in_run_queue(thread);
+		thread_continue(thread);
 		return B_OK;
 	}
 
@@ -1401,6 +1398,8 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 				mainThread->AddPendingSignal(SIGKILLTHR);
 
 				// wake up main thread
+				thread->going_to_suspend = false;
+
 				SpinLocker locker(mainThread->scheduler_lock);
 				if (mainThread->state == B_THREAD_SUSPENDED)
 					scheduler_enqueue_in_run_queue(mainThread);
@@ -1416,6 +1415,8 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 		case SIGKILLTHR:
 		{
 			// Wake up suspended threads and interrupt waiting ones
+			thread->going_to_suspend = false;
+
 			SpinLocker locker(thread->scheduler_lock);
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
@@ -1427,6 +1428,8 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 		case SIGNAL_CONTINUE_THREAD:
 		{
 			// wake up thread, and interrupt its current syscall
+			thread->going_to_suspend = false;
+
 			SpinLocker locker(thread->scheduler_lock);
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
@@ -1438,6 +1441,8 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 		{
 			// Wake up thread if it was suspended, otherwise interrupt it, if
 			// the signal isn't blocked.
+			thread->going_to_suspend = false;
+
 			SpinLocker locker(thread->scheduler_lock);
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
@@ -1605,6 +1610,8 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 				mainThread->AddPendingSignal(SIGKILLTHR);
 
 				// wake up main thread
+				mainThread->going_to_suspend = false;
+
 				SpinLocker _(mainThread->scheduler_lock);
 				if (mainThread->state == B_THREAD_SUSPENDED)
 					scheduler_enqueue_in_run_queue(mainThread);
@@ -1619,6 +1626,8 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 			// don't block the signal.
 			for (Thread* thread = team->thread_list; thread != NULL;
 					thread = thread->team_next) {
+				thread->going_to_suspend = false;
+
 				SpinLocker _(thread->scheduler_lock);
 				if (thread->state == B_THREAD_SUSPENDED) {
 					scheduler_enqueue_in_run_queue(thread);

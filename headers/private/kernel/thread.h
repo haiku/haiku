@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
@@ -407,6 +408,48 @@ static inline void
 thread_unpin_from_current_cpu(Thread* thread)
 {
 	thread->pinned_to_cpu--;
+}
+
+
+static inline void
+thread_prepare_suspend()
+{
+	Thread* thread = thread_get_current_thread();
+	thread->going_to_suspend = true;
+}
+
+
+static inline void
+thread_suspend(bool alreadyPrepared = false)
+{
+	Thread* thread = thread_get_current_thread();
+	if (!alreadyPrepared)
+		thread_prepare_suspend();
+
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&thread->scheduler_lock);
+
+	if (thread->going_to_suspend)
+		scheduler_reschedule(B_THREAD_SUSPENDED);
+
+	release_spinlock(&thread->scheduler_lock);
+	restore_interrupts(state);
+}
+
+
+static inline void
+thread_continue(Thread* thread)
+{
+	thread->going_to_suspend = false;
+
+	cpu_status state = disable_interrupts();
+	acquire_spinlock(&thread->scheduler_lock);
+
+	if (thread->state == B_THREAD_SUSPENDED)
+		scheduler_enqueue_in_run_queue(thread);
+
+	release_spinlock(&thread->scheduler_lock);
+	restore_interrupts(state);
 }
 
 

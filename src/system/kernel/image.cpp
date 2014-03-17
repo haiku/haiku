@@ -371,20 +371,14 @@ notify_loading_app(status_t result, bool suspend)
 		// we're done with the team stuff, get the scheduler lock instead
 		teamLocker.Unlock();
 
-		Thread* thread = loadingInfo->thread;
-		InterruptsSpinLocker schedulerLocker(thread->scheduler_lock);
+		thread_prepare_suspend();
+
 		// wake up the waiting thread
-		if (thread->state == B_THREAD_SUSPENDED)
-			scheduler_enqueue_in_run_queue(thread);
-		schedulerLocker.Unlock();
+		thread_continue(loadingInfo->thread);
 
 		// suspend ourselves, if desired
-		if (suspend) {
-			Thread* thread = thread_get_current_thread();
-			InterruptsSpinLocker schedulerLocker(thread->scheduler_lock);
-
-			scheduler_reschedule(B_THREAD_SUSPENDED);
-		}
+		if (suspend)
+			thread_suspend(true);
 	}
 }
 
