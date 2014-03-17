@@ -80,7 +80,8 @@ enum {
 	WINDOW_OPENED					= 'wndo',
 	WINDOW_CLOSED					= 'wndc',
 	SHOW_DOWNLOAD_WINDOW			= 'sdwd',
-	SHOW_SETTINGS_WINDOW			= 'sswd'
+	SHOW_SETTINGS_WINDOW			= 'sswd',
+	SHOW_CONSOLE_WINDOW				= 'scwd'
 };
 
 #define INTEGRATE_MENU_INTO_TAB_BAR 0

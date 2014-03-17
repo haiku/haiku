@@ -37,6 +37,7 @@ local sources =
 	SettingsKeys.cpp
 	SettingsWindow.cpp
 	URLInputGroup.cpp
+	ConsoleWindow.cpp
 ;
 
 # We build WebPositive only for one architecture -- the first architecture for

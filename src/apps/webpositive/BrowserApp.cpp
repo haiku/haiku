@@ -48,11 +48,13 @@
 #include "DownloadWindow.h"
 #include "SettingsMessage.h"
 #include "SettingsWindow.h"
+#include "ConsoleWindow.h"
 #include "NetworkCookieJar.h"
 #include "WebKitInfo.h"
 #include "WebPage.h"
 #include "WebSettings.h"
 #include "WebView.h"
+#include "WebViewConstants.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -76,7 +78,8 @@ BrowserApp::BrowserApp()
 	fCookies(NULL),
 	fContext(NULL),
 	fDownloadWindow(NULL),
-	fSettingsWindow(NULL)
+	fSettingsWindow(NULL),
+	fConsoleWindow(NULL)
 {
 #if ENABLE_NATIVE_COOKIES
 	BString cookieStorePath = kApplicationName;
@@ -181,6 +184,8 @@ BrowserApp::ReadyToRun()
 		defaultDownloadWindowFrame);
 	BRect settingsWindowFrame = fSettings->GetValue("settings window frame",
 		BRect());
+	BRect consoleWindowFrame = fSettings->GetValue("console window frame",
+		BRect(50, 50, 400, 300));
 	bool showDownloads = fSettings->GetValue("show downloads", false);
 
 	fDownloadWindow = new DownloadWindow(downloadWindowFrame, showDownloads,
@@ -201,6 +206,8 @@ BrowserApp::ReadyToRun()
 	fSettingsWindow = new SettingsWindow(settingsWindowFrame, fSettings);
 
 	BWebPage::SetDownloadListener(BMessenger(fDownloadWindow));
+	
+	fConsoleWindow = new ConsoleWindow(consoleWindowFrame);
 
 	fInitialized = true;
 
@@ -264,6 +271,12 @@ BrowserApp::MessageReceived(BMessage* message)
 		break;
 	case SHOW_SETTINGS_WINDOW:
 		_ShowWindow(message, fSettingsWindow);
+		break;
+	case SHOW_CONSOLE_WINDOW:
+		_ShowWindow(message, fConsoleWindow);
+		break;
+	case ADD_CONSOLE_MESSAGE:
+		fConsoleWindow->PostMessage(message);
 		break;
 
 	default:
@@ -339,6 +352,11 @@ BrowserApp::QuitRequested()
 	if (fSettingsWindow->Lock()) {
 		fSettings->SetValue("settings window frame", fSettingsWindow->Frame());
 		fSettingsWindow->Unlock();
+	}
+	
+	if (fConsoleWindow->Lock()) {
+		fSettings->SetValue("console window frame", fConsoleWindow->Frame());
+		fConsoleWindow->Unlock();
 	}
 
 	BMessage cookieArchive;

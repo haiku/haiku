@@ -397,6 +397,8 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		new BMessage(SHOW_DOWNLOAD_WINDOW), 'D'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings"),
 		new BMessage(SHOW_SETTINGS_WINDOW)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Script console"),
+		new BMessage(SHOW_CONSOLE_WINDOW)));	
 	BMenuItem* aboutItem = new BMenuItem(B_TRANSLATE("About"),
 		new BMessage(B_ABOUT_REQUESTED));
 	menu->AddItem(aboutItem);
@@ -1006,6 +1008,7 @@ BrowserWindow::MessageReceived(BMessage* message)
 
 		case SHOW_DOWNLOAD_WINDOW:
 		case SHOW_SETTINGS_WINDOW:
+		case SHOW_CONSOLE_WINDOW:
 			message->AddUInt32("workspaces", Workspaces());
 			be_app->PostMessage(message);
 			break;
@@ -1087,6 +1090,10 @@ BrowserWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case ADD_CONSOLE_MESSAGE:
+			be_app->PostMessage(message);
+			BWebWindow::MessageReceived(message);
+			break;
 
 		default:
 			BWebWindow::MessageReceived(message);

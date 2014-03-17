@@ -40,6 +40,7 @@ class DownloadWindow;
 class BrowserWindow;
 class SettingsMessage;
 class SettingsWindow;
+class ConsoleWindow;
 
 
 class BrowserApp : public BApplication {
@@ -81,6 +82,7 @@ private:
 
 			DownloadWindow*		fDownloadWindow;
 			SettingsWindow*		fSettingsWindow;
+			ConsoleWindow*		fConsoleWindow;
 };
 
 
