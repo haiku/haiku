@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -21,7 +22,7 @@ struct Team;
 struct Thread;
 
 
-struct UserEvent {
+struct UserEvent : public BReferenceable {
 	virtual						~UserEvent();
 
 	virtual	status_t			Fire() = 0;

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -128,7 +129,8 @@ UserTimer::UserTimer()
 
 UserTimer::~UserTimer()
 {
-	delete fEvent;
+	if (fEvent != NULL)
+		fEvent->ReleaseReference();
 }
 
 

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -87,6 +88,7 @@ SignalEvent::Fire()
 		return B_BUSY;
 	}
 
+	AcquireReference();
 	DPCQueue::DefaultQueue(B_NORMAL_PRIORITY)->Add(this);
 
 	return B_OK;
@@ -143,6 +145,8 @@ TeamSignalEvent::DoDPC(DPCQueue* queue)
 
 	// We're no longer queued in the DPC queue, so we can be reused.
 	atomic_set(&fPendingDPC, 0);
+
+	ReleaseReference();
 }
 
 
@@ -197,6 +201,8 @@ ThreadSignalEvent::DoDPC(DPCQueue* queue)
 
 	// We're no longer queued in the DPC queue, so we can be reused.
 	atomic_set(&fPendingDPC, 0);
+
+	ReleaseReference();
 }
 
 
@@ -236,6 +242,7 @@ CreateThreadEvent::Fire()
 	if (wasPending)
 		return B_BUSY;
 
+	AcquireReference();
 	DPCQueue::DefaultQueue(B_NORMAL_PRIORITY)->Add(this);
 
 	return B_OK;
