@@ -278,5 +278,6 @@ void
 AbstractParametersPanel::AddControls(BLayoutBuilder::Group<>& builder,
 	BView* editorView)
 {
-	builder.Add(editorView);
+	if (editorView != NULL)
+		builder.Add(editorView);
 }
