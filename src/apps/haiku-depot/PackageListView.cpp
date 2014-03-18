@@ -23,6 +23,8 @@ static const char* skPackageStateAvailable = B_TRANSLATE_MARK("Available");
 static const char* skPackageStateUninstalled = B_TRANSLATE_MARK("Uninstalled");
 static const char* skPackageStateActive = B_TRANSLATE_MARK("Active");
 static const char* skPackageStateInactive = B_TRANSLATE_MARK("Inactive");
+static const char* skPackageStatePending = B_TRANSLATE_MARK(
+	"Pending" B_UTF8_ELLIPSIS);
 
 
 inline BString
@@ -43,6 +45,8 @@ package_state_to_string(PackageInfoRef ref)
 			data.SetToFormat("%3.2f%%", ref->DownloadProgress() * 100.0);
 			return data;
 		}
+		case PENDING:
+			return B_TRANSLATE(skPackageStatePending);
 	}
 
 	return B_TRANSLATE("Unknown");

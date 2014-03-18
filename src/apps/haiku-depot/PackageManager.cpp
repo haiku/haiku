@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -108,6 +108,7 @@ public:
 			| BPackageManager::B_ADD_REMOTE_REPOSITORIES
 			| BPackageManager::B_REFRESH_REPOSITORIES);
 		PackageInfoRef ref(Package());
+		ref->SetState(PENDING);
 		fPackageManager->SetCurrentActionPackage(ref, true);
 		fPackageManager->AddProgressListener(this);
 		const char* packageName = ref->Title().String();
@@ -310,7 +311,7 @@ PackageManager::GetPackageActions(PackageInfoRef package, Model* model)
 	if (state == ACTIVATED || state == INSTALLED) {
 		actionList.Add(PackageActionRef(new UninstallPackageAction(
 			package, model), true));
-	} else {
+	} else if (state == NONE || state == UNINSTALLED) {
 		actionList.Add(PackageActionRef(new InstallPackageAction(package,
 				model),	true));
 	}

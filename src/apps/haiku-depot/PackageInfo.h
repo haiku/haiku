@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_H
@@ -193,6 +193,7 @@ enum PackageState {
 	DOWNLOADING	= 2,
 	ACTIVATED	= 3,
 	UNINSTALLED	= 4,
+	PENDING		= 5,
 };
 
 
