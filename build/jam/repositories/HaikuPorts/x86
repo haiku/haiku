@@ -18,7 +18,7 @@ RemotePackageRepository HaikuPorts
 	autoconf-2.69-5
 	automake-1.13.1-4
 	bepdf-1.1.1~beta5_2013_04_28-2
-	binutils-2.23.2_2013_04_09-2
+	binutils-2.24_2014_03_19-1
 	bison-2.4.3-6
 	bzip2-1.0.6-3
 	cdrtools-3.01~a07-3
