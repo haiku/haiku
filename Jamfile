@@ -11,39 +11,36 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	}
 }
 
-# Include packages that are required by all images:
+if $(HAIKU_BOOTSTRAP_BUILD) {
+	EnableBuildFeatures bootstrap_image ;
+} else if $(HAIKU_MINIMUM_BUILD) {
+	EnableBuildFeatures minimum_image ;
+} else {
+	EnableBuildFeatures regular_image ;
+}
+
+# Include required packages:
 # primary architecture
-AddHaikuImagePackages
+AddHaikuImagePackages [ FFilterByBuildFeatures 
 	curl freetype icu libsolv zlib
-	;
+
+	regular_image @{
+		bzip2 ctags ffmpeg findutils gawk glu grep jpeg libpng 
+		mesa mesa_devel mesa_swrast sed tar which
+	}@
+] ;
 # secondary architectures
 local architectureObject ;
 for architectureObject
 		in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
 	on $(architectureObject) {
-		AddHaikuImagePackages
+		AddHaikuImagePackages [ FFilterByBuildFeatures 
 			curl freetype icu libsolv zlib
-			;
-	}
-}
-	
-# Include packages that are required by non-basic images:
-if ! ( $(HAIKU_BOOTSTRAP_BUILD) || $(HAIKU_MINIMUM_BUILD) ) {
-	# primary architecture
-	AddHaikuImagePackages
-		bzip2 ctags ffmpeg findutils gawk glu grep jpeg libpng 
-		mesa mesa_devel mesa_swrast sed tar which
-		;
 
-	# secondary architectures
-	local architectureObject ;
-	for architectureObject
-			in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
-		on $(architectureObject) {
-			AddHaikuImagePackages
+			regular_image @{
 				ffmpeg glu jpeg libpng mesa
-				;
-		}
+			}@
+		] ;
 	}
 }
 
