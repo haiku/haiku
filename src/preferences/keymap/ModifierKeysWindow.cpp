@@ -292,7 +292,27 @@ ModifierKeysWindow::ModifierKeysWindow()
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	float forcedMinWidth = be_plain_font->StringWidth("XXX") * 4;
+	// find the minimum width to fit the labels
+	float shiftLabelWidth
+		= shiftMenuField->StringWidth(shiftMenuField->Label());
+	float controlLabelWidth
+		= controlMenuField->StringWidth(controlMenuField->Label());
+	float optionLabelWidth
+		= optionMenuField->StringWidth(optionMenuField->Label());
+	float commandLabelWidth
+		= commandMenuField->StringWidth(commandMenuField->Label());
+
+	float forcedMinWidth = shiftLabelWidth;
+	if (controlLabelWidth > forcedMinWidth)
+		forcedMinWidth = controlLabelWidth;
+
+	if (optionLabelWidth > forcedMinWidth)
+		forcedMinWidth = optionLabelWidth;
+
+	if (commandLabelWidth > forcedMinWidth)
+		forcedMinWidth = commandLabelWidth;
+
+	forcedMinWidth += be_plain_font->StringWidth("XXX");
 	keyRole->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
 
 	BLayoutItem* shiftLabel = shiftMenuField->CreateLabelLayoutItem();
