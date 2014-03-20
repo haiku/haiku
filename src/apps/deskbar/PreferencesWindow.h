@@ -34,7 +34,7 @@ class BFile;
 class BMessage;
 class BRadioButton;
 class BSlider;
-class BTextControl;
+class BSpinner;
 
 class PreferencesWindow : public BWindow
 {
@@ -67,9 +67,9 @@ private:
 			BCheckBox*		fMenuRecentApplications;
 			BCheckBox*		fMenuRecentFolders;
 
-			BTextControl*	fMenuRecentDocumentCount;
-			BTextControl*	fMenuRecentApplicationCount;
-			BTextControl*	fMenuRecentFolderCount;
+			BSpinner*		fMenuRecentDocumentCount;
+			BSpinner*		fMenuRecentApplicationCount;
+			BSpinner*		fMenuRecentFolderCount;
 
 			BCheckBox*		fAppsSort;
 			BCheckBox*		fAppsSortTrackerFirst;
