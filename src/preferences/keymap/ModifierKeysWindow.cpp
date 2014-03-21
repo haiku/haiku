@@ -289,65 +289,34 @@ ModifierKeysWindow::ModifierKeysWindow()
 		new BMessage(kMsgApplyModifiers));
 	fOkButton->MakeDefault(true);
 
-	// Build the layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_SMALL_SPACING)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+			.Add(keyRole, 0, 0)
+			.Add(keyLabel, 1, 0)
 
-	// find the minimum width to fit the labels
-	float shiftLabelWidth
-		= shiftMenuField->StringWidth(shiftMenuField->Label());
-	float controlLabelWidth
-		= controlMenuField->StringWidth(controlMenuField->Label());
-	float optionLabelWidth
-		= optionMenuField->StringWidth(optionMenuField->Label());
-	float commandLabelWidth
-		= commandMenuField->StringWidth(commandMenuField->Label());
+			.Add(shiftMenuField->CreateLabelLayoutItem(), 0, 1)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1, 1)
+				.Add(shiftMenuField->CreateMenuBarLayoutItem())
+				.Add(fShiftConflictView)
+				.End()
 
-	float forcedMinWidth = shiftLabelWidth;
-	if (controlLabelWidth > forcedMinWidth)
-		forcedMinWidth = controlLabelWidth;
+			.Add(controlMenuField->CreateLabelLayoutItem(), 0, 2)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1, 2)
+				.Add(controlMenuField->CreateMenuBarLayoutItem())
+				.Add(fControlConflictView)
+				.End()
 
-	if (optionLabelWidth > forcedMinWidth)
-		forcedMinWidth = optionLabelWidth;
+			.Add(optionMenuField->CreateLabelLayoutItem(), 0, 3)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1, 3)
+				.Add(optionMenuField->CreateMenuBarLayoutItem())
+				.Add(fOptionConflictView)
+				.End()
 
-	if (commandLabelWidth > forcedMinWidth)
-		forcedMinWidth = commandLabelWidth;
-
-	forcedMinWidth += be_plain_font->StringWidth("XXX");
-	keyRole->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
-
-	BLayoutItem* shiftLabel = shiftMenuField->CreateLabelLayoutItem();
-	shiftLabel->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
-	BLayoutItem* controlLabel = controlMenuField->CreateLabelLayoutItem();
-	controlLabel->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
-	BLayoutItem* optionLabel = optionMenuField->CreateLabelLayoutItem();
-	optionLabel->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
-	BLayoutItem* commandLabel = commandMenuField->CreateLabelLayoutItem();
-	commandLabel->SetExplicitMinSize(BSize(forcedMinWidth, B_SIZE_UNSET));
-
-	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_SMALL_SPACING)
-		.AddGroup(B_HORIZONTAL)
-			.Add(keyRole)
-			.Add(keyLabel)
-			.End()
-		.AddGroup(B_HORIZONTAL)
-			.Add(shiftLabel)
-			.Add(shiftMenuField->CreateMenuBarLayoutItem())
-			.Add(fShiftConflictView)
-			.End()
-		.AddGroup(B_HORIZONTAL)
-			.Add(controlLabel)
-			.Add(controlMenuField->CreateMenuBarLayoutItem())
-			.Add(fControlConflictView)
-			.End()
-		.AddGroup(B_HORIZONTAL)
-			.Add(optionLabel)
-			.Add(optionMenuField->CreateMenuBarLayoutItem())
-			.Add(fOptionConflictView)
-			.End()
-		.AddGroup(B_HORIZONTAL)
-			.Add(commandLabel)
-			.Add(commandMenuField->CreateMenuBarLayoutItem())
-			.Add(fCommandConflictView)
+			.Add(commandMenuField->CreateLabelLayoutItem(), 0, 4)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING, 1, 4)
+				.Add(commandMenuField->CreateMenuBarLayoutItem())
+				.Add(fCommandConflictView)
+				.End()
 			.End()
 		.AddGlue()
 		.AddGroup(B_HORIZONTAL)
@@ -357,7 +326,7 @@ ModifierKeysWindow::ModifierKeysWindow()
 			.Add(fOkButton)
 			.End()
 		.SetInsets(B_USE_DEFAULT_SPACING)
-	);
+		.End();
 
 	_MarkMenuItems();
 	_ValidateDuplicateKeys();
