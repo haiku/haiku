@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	984880419
+1	ukrainian	x-vnd.haiku-icon_o_matic	28048799
 Select All	Icon-O-Matic-PathManipulator		Вибрати все
 Add Style	Icon-O-Matic-AddStylesCmd		Додати cтиль
 Color (#%02x%02x%02x)	Style name after dropping a color		Колір (#%02x%02x%02x)
@@ -42,6 +42,7 @@ Untitled	Icon-O-Matic-Main		Неназваний
 Multi Set 	Multi Set (property name)		Встановити кілька 
 any of the other lists to	Empty property list - 2nd line		будь-який з інших списків до
 Save as…	Icon-O-Matic-Menu-File		Зберегти як…
+Don't save	Icon-O-Matic-Menu-Settings		Не зберігати
 Change Color	Icon-O-Matic-SetColorCmd		Змінити Колір
 Style	Icon-O-Matic-Menus		Стиль
 <modify path>	Icon-O-Matic-PathCmd		<змінити шлях>
@@ -64,17 +65,20 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		Видалити Фігуру
 Reverse	Icon-O-Matic-PathsList		Повернути
 HVIF Source Code	Icon-O-Matic-SavePanel		Код джерела HVIF
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Скинути Перетворення
+Settings	Icon-O-Matic-Menus		Налаштування
 All	Icon-O-Matic-Properties		Всі
 Multi Paste Properties	Icon-O-Matic-Properties		Вставити кілька властивостей
 Undo	Icon-O-Matic-Main		Скасувати
 Click on a shape above	Empty transformers list - 1st line		Натиснути на фігуру нижче
 Add Shape	Icon-O-Matic-AddShapesCmd		Додати фігуру
 Contour	Transformation		Контур
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Зберегти зміни поточного значка перед закриттям
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<нічого не переробляти>
 Perspective	Transformation		Перспектива
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Перемістити перетворювач
 Opacity	Icon-O-Matic-PropertyNames		Прозорість
 Add with path	Icon-O-Matic-ShapesList		Додати зі шляхом
+Export icon	Dialog title		Експортувати значок
 Gradient type	Icon-O-Matic-StyleTypes		Тип градієнту
 Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Відміна
@@ -114,6 +118,7 @@ Gradient	Icon-O-Matic-StyleTypes		Градієнт
 Min LOD	Icon-O-Matic-PropertyNames		Min LOD
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Атрибут BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Обернути виділення
+Drop shapes	Icon-O-Matic-ShapesList		Видалити форми
 Export as…	Icon-O-Matic-Menu-File		Експортувати як…
 Transformation	Transformation		Перетворення
 Click on an object in	Empty property list - 1st line		Натисніть на об'єкт в
@@ -186,6 +191,7 @@ Overwrite	Icon-O-Matic-SVGExport		Перезаписати
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Заморозити фігури
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Розділити контрольну точку
 Open…	Icon-O-Matic-Menu-File		Відкрити…
+Save icon	Dialog title		Зберегти значок
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Колір (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Редагувати градієнт
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Очистити шлях

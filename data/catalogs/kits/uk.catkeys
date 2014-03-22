@@ -1,22 +1,30 @@
-1	ukrainian	x-vnd.Haiku-libbe	270491052
+1	ukrainian	x-vnd.Haiku-libbe	3504008668
+gamma	AboutWindow		гамма
+beta	AboutWindow		бета
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Автор:
 About %app%	AboutMenuItem		Про %app%
 Cut	TextView		Вирізати
+Version	AboutWindow		Версія
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Неможливо створити реплікант для \"%опису\".\n%помилки
 Copy	TextView		Копіювати
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d байт
+alpha	AboutWindow		альфа
 Error	PrintJob		Помилка
 No Pages to print!	PrintJob		Жодної сторінки для друку!
+All Rights Reserved.	AboutWindow		Усі права застережено.
 About %app%	AboutWindow		Про %app%
 OK	Dragger		Гаразд
 OK	PrintJob		Гаразд
 Green:	ColorControl		Зелений:
+Ok	AboutWindow		Гаразд
+Version history:	AboutWindow		Історія версій:
 Remove replicant	Dragger		Видалити реплікант
 OK	ZombieReplicantView		Гаразд
 Print Server is not responding.	PrintJob		Принт сервер недоступний.
 Paste	TextView		Вставити
+Special Thanks:	AboutWindow		Особлива подяка
 %.2f TiB	StringForSize		%.2f TiB
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити додаток для репліканту. Незнайдено сигнатуру додатку.\n%помилка
 Redo	TextView		Відмінити відміну
@@ -27,6 +35,8 @@ Undo	TextView		Відмінити
 Red:	ColorControl		Червоний:
 %3.2f MiB	StringForSize		%3.2f MiB
 About %app…	Dragger		Про %app…
+development	AboutWindow		розробка
 Error	ZombieReplicantView		Помилка
 Blue:	ColorControl		Синій:
+gold master	AboutWindow		золота
 Can't delete this replicant from its original application. Life goes on.	Dragger		Неможливо видалити реплікант з рідного додатку. Життя продовжується.

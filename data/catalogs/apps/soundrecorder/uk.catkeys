@@ -1,26 +1,37 @@
-1	ukrainian	x-vnd.Haiku-SoundRecorder	1728054007
+1	ukrainian	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Петля
 Cannot find default audio hardware	RecorderWindow		Неможливо знайти звуковий пристрій за замовчуванням
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Неможливо знайти тимчасовий файл створений для збереження нового запису
+Sample size:	RecorderWindow		Розмір зразка:
 Nothing to play	RecorderWindow		Нічого для відтворення
+None of the files appear to be audio files.	RecorderWindow		Жоден з цих файлів не є звуковим
+Duration: 	RecorderWindow		Тривалість:
 File info	RecorderWindow		Інфо про файл
 Drop files here	SoundListView		Киньте файли сюди
 Input	RecorderWindow		Вхід
+Some of the files don't appear to be audio files.	RecorderWindow		Деякі з файлів виявилися не звуковими
 Stop	RecorderWindow		Зупинити
+Format:	RecorderWindow		Формат:
 Sound List	RecorderWindow		Список звуку
+Compression: 	RecorderWindow		Компресія:
 Rewind	RecorderWindow		Перемотка
+Sample rate:	RecorderWindow		Частота дискретизації:
 Invalid audio files	RecorderWindow		Неправильні аудіо файли
+ seconds	RecorderWindow		секунд
 OK	RecorderWindow		Гаразд
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Неможливо відкрити тимчасовий файл створений для збереження нового запису
 Input:	RecorderWindow		Вхід:
 Forward	RecorderWindow		Вперед
 Play	RecorderWindow		Відтворити
 SoundRecorder	System name		Запис звуку
+Channels:	RecorderWindow		Канали:
+ bits	RecorderWindow		біт
 None	RecorderWindow		Жоден
 Record	RecorderWindow		Записати
 Sample size: 	RecorderWindow		Розмір зразка:
 Cannot recognize this file as a media file	RecorderWindow		Неможливо розпізнати файл як медіа
 Format: 	RecorderWindow		Формат:
+File name: 	RecorderWindow		І'мя файла:
 Cannot connect to the selected sound input	RecorderWindow		Неможливо під'єднати вибраний аудіо вхід
 Cannot get the file to play	RecorderWindow		Неможливо отримати файл для відтворення
 Cannot record a sound that long	RecorderWindow		Неможливо записати довший звук
@@ -31,4 +42,5 @@ Channels: 	RecorderWindow		Канали:
 Save	RecorderWindow		Зберегти
 Sample rate: 	RecorderWindow		Частота дискретизації:
 Cannot connect to media server	RecorderWindow		Неможливо під'єднати медіа сервер
+The file doesn't appear to be an audio file.	RecorderWindow		Цей файл не є звуковим
 File name:	RecorderWindow		І'мя файла:

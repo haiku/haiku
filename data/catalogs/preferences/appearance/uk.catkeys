@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-Appearance	727801787
-Plain font:	Font view		Простий шрифт:
+Plain font:	Font view		Простий текст
 Control highlight	Colors tab		Простий шрифт:
 Control border	Colors tab		Межа елемента
 Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
@@ -16,7 +16,7 @@ Success	Colors tab		Успіх
 Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
 Failure	Colors tab		Невдача
 Hinting menu	AntialiasingSettingsView		Меню коректування
-Scroll bar:	DecorSettingsView		Смуга прокрутки:
+Scroll bar:	DecorSettingsView		Смуга прокрутки
 Document background	Colors tab		Тло документа
 Revert	APRWindow		Повернути
 Window tab	Colors tab		Заголовок вікна
@@ -26,7 +26,7 @@ Antialiasing	APRWindow		Зглажування
 Navigation base	Colors tab		Основа навігації
 Selected list item text	Colors tab		Текст виділеного пункту меню
 Window border	Colors tab		Межа вікна
-Double:	DecorSettingsView		Подвійний:
+Double:	DecorSettingsView		Подвійний
 Window tab text	Colors tab		Текст заголовку вікна
 Document text	Colors tab		Текст документа
 Navigation pulse	Colors tab		Навігаційна пульсація

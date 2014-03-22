@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ScreenSaver	904083067
+1	ukrainian	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Не вдалося загрузити зберігач
 30 seconds	ScreenSaver		30 секунд
 Start screensaver	ScreenSaver		Запустити зберігач
@@ -10,7 +10,9 @@ Display Power Management Signaling not available	ScreenSaver		Display Power Mana
 ScreenSaver	System name		Зберігач екрану
 Test	ScreenSaver		Тест
 General	ScreenSaver		Основний
+Fade now when mouse is here	ScreenSaver		Увімкнути заставку коли курсор знаходиться тут
 Enable screensaver	ScreenSaver		Використати зберігач
+Don't fade when mouse is here	ScreenSaver		Не вмикати заставку коли курсор знаходиться тут
 Cancel	ScreenSaver		Відмінити
 Turn off screen	ScreenSaver		Вимкнути екран
 No options available	ScreenSaver		Опції недоступні
@@ -22,4 +24,5 @@ Blackness	ScreenSaver		Чорнота
 Use custom password	ScreenSaver		Використовувати пароль користувача
 Done	ScreenSaver		Готово
 Confirm password:	ScreenSaver		Підтвердіть пароль:
+No preview available	PreviewView		Попередній перегляд неможливий.
 Use network password	ScreenSaver		Використовувати мережевий пароль

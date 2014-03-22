@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-screenshot	889794495
+1	ukrainian	x-vnd.haiku-screenshot	1483476245
 seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Робочий стіл
 Include window border	ScreenshotWindow		Включаючи межу вікна
@@ -7,8 +7,10 @@ Select	ScreenshotWindow		Вибрати
 Capture active window	ScreenshotWindow		Захопити активне вікно
 Cancel	ScreenshotWindow		Відмінити
 Name:	ScreenshotWindow		Ім'я:
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Цей файл вже існує.\nВи впевнені, що бажаєте перезаписати його?
 Choose folder	ScreenshotWindow		Виберіть папку
 Save	ScreenshotWindow		Зберегти
+Overwrite	ScreenshotWindow		переписати
 Choose folder...	ScreenshotWindow		Виберіть папку...
 Please select	ScreenshotWindow		Будь-ласка виберіть
 Save as:	ScreenshotWindow		Зберегти як:

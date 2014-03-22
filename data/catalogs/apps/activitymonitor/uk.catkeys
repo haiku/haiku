@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	2372331429
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	1211510241
 P-faults	DataSource		Р-помилки
 Media nodes	DataSource		Мультимедійні вузли
 Threads	DataSource		Потоки
@@ -34,6 +34,7 @@ Remove graph	ActivityView		Видалити графік
 CPU usage	DataSource		Використання CPU
 Raw clipboard	DataSource		Буфер обміну
 Sems	DataSource		Сімс
+%.1f MiB	DataSource		%.1f МіБ
 ActivityMonitor	System name		Монітор активності
 Running applications	DataSource		Запущені додатки
 Semaphores	DataSource		Семафори

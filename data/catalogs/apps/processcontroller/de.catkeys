@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ProcessController	1848752768
+1	german	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		Speicherverbrauch
 Kill this team!	ProcessController		Dieses Team beenden!
 Idle priority	ProcessController		Leerlauf-Priorität
@@ -7,6 +7,7 @@ Custom priority	ProcessController		Anwendungsspezifische Priorität
 This team is already gone…	ProcessController		Dieses Team existiert nicht mehr…
 Error saving file	ProcessController		Fehler beim Speichern der Datei
 Real-time priority	ProcessController		Echtzeit-Priorität
+Power saving	ProcessController		Energiespar-Modus
 Your setting file could not be saved!\n(%s)	ProcessController		Die Einstellungsdatei konnte nicht gespeichert werden.\n(%s)
 What do you want to do with the team \"%s\"?	ProcessController		Was soll mit dem Team \"%s\" geschehen?
 This thread is already gone…	ProcessController		Dieser Thread existiert nicht mehr…
@@ -36,6 +37,7 @@ Quit an application	ProcessController		Anwendung beenden
 Install in Deskbar	ProcessController		In Deskbar installieren
 Threads and CPU usage	ProcessController		Threads und CPU-Last
 Urgent display priority	ProcessController		Hohe Anzeigen-Priorität
+Low latency	ProcessController		Performance-Modus
 OK	ProcessController		OK
 Damned!	ProcessController		Herrje!
 Debug this team!	ProcessController		Dieses Team debuggen!

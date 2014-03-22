@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-PEPL	3273435274
+1	ukrainian	x-vnd.Be-PEPL	2332202134
 Edit	People		Редагувати
 Error	People		Помилка
 City	People		Місто
@@ -21,6 +21,7 @@ Nickname	People		Нік
 Quit	People		Вийти
 Name	People		Ім'я
 Revert	People		Повернути
+Don't save	People		Не зберігати
 Undo	People		Cкасувати
 E-mail	People		E-mail
 Load image…	People		Завантажити зображення…
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Домашній телефон
 Save as…	People		Зберегти як…
 Redo	People		Переробити
+Save changes before closing?	People		Зберегти зміни перед закриттям?
 Paste	People		Вставити
 Drop an image here,\nor use the contextual menu.	People		Перемістіть зображення сюди,\nабо використайте контекстне меню.
 Save	People		Зберегти

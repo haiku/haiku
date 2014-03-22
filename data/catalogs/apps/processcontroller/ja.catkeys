@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ProcessController	1848752768
+1	japanese	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		メモリ使用量
 Kill this team!	ProcessController		スレッドを強制終了
 Idle priority	ProcessController		アイドル優先度
@@ -7,6 +7,7 @@ Custom priority	ProcessController		カスタム優先度
 This team is already gone…	ProcessController		Team はすでに終了しています…
 Error saving file	ProcessController		ファイル保存中にエラーが発生しました
 Real-time priority	ProcessController		リアルタイム優先度
+Power saving	ProcessController		省電力モード
 Your setting file could not be saved!\n(%s)	ProcessController		設定ファイルは保存できませんでした。\n(%s)
 What do you want to do with the team \"%s\"?	ProcessController		スレッド \"%s\" に対してなにをしますか?
 This thread is already gone…	ProcessController		スレッドはすでに終了しています…
@@ -36,6 +37,7 @@ Quit an application	ProcessController		アプリケーションを終了
 Install in Deskbar	ProcessController		Deskbar にインストール
 Threads and CPU usage	ProcessController		スレッドと CPU の使用量
 Urgent display priority	ProcessController		緊急表示優先度
+Low latency	ProcessController		低遅延モード
 OK	ProcessController		OK
 Damned!	ProcessController		とんでもない!
 Debug this team!	ProcessController		スレッドをデバッグ

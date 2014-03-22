@@ -1,11 +1,13 @@
-1	polish	x-vnd.Haiku-GIFTranslator	3793186771
+1	polish	x-vnd.Haiku-GIFTranslator	2626723192
 Websafe	GIFView		Websafe
 Write interlaced images	GIFView		Zapisuj obrazy z przeplotem
 Optimal	GIFView		Optymalna
 Greyscale	GIFView		Odcienie szarości
+Colors:	GIFView		Kolory:
 GIF image translator	GIFTranslator		Translator obrazów GIF
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Format Be Bitmap (GIFTranslator)
 GIF image translator	GIFView		Translator obrazów GIF
+Palette:	GIFView		Paleta:
 GIF image	GIFTranslator		Obraz GIF
 Write transparent images	GIFView		Zapisuj informacje o przezroczystości
 GIF images	GIFTranslator		Obrazy GIF

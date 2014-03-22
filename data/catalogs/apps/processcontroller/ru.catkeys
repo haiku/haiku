@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ProcessController	1848752768
+1	russian	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		Использование памяти
 Kill this team!	ProcessController		Убить этот поток!
 Idle priority	ProcessController		Приоритет бездействия
@@ -7,6 +7,7 @@ Custom priority	ProcessController		Заданный приоритет
 This team is already gone…	ProcessController		Этого приложения уже не существует…
 Error saving file	ProcessController		Ошибка при сохранении файла
 Real-time priority	ProcessController		Приоритет реального времени
+Power saving	ProcessController		Режим энергосбережения
 Your setting file could not be saved!\n(%s)	ProcessController		Невозможно сохранить настройки!\n(%s)
 What do you want to do with the team \"%s\"?	ProcessController		Что вы хотите сделать с потоком \"%s\"?
 This thread is already gone…	ProcessController		Этого потока уже не существует…
@@ -36,6 +37,7 @@ Quit an application	ProcessController		Завершить приложение
 Install in Deskbar	ProcessController		Установить в Deskbar
 Threads and CPU usage	ProcessController		Потоки и загрузка ЦПУ
 Urgent display priority	ProcessController		Срочный приоритет отображения
+Low latency	ProcessController		Режим наименьших задержек
 OK	ProcessController		ОК
 Damned!	ProcessController		Проклятье!
 Debug this team!	ProcessController		Отладить этот поток!

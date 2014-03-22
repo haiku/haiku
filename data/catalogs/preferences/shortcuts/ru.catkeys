@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Shortcuts	2482780610
+1	russian	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		MoveMouse
 OK	ShortcutsWindow		ОК
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Не удалось сохранить список горячих клавиш.
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		Добавить список горячих �
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Клавиша
 Open KeySet…	ShortcutsWindow		Открыть список горячих клавиш…
+Error, NULL state description?	ShortcutsSpec		Ошибка, состояние описания NULL?\n
 MouseUp	ShortcutsSpec		MouseUp
 Revert to saved	ShortcutsWindow		Вернуться к сохраненной версии
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt

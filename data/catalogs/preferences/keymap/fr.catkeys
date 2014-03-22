@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	3330955176
+1	french	x-vnd.Haiku-Keymap	439384761
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Majuscule :
 Revert	Modifier keys window		Défaire
@@ -7,6 +7,7 @@ Hungarian	Keyboard Layout View		Hongrois
 German	Keyboard Layout View		Allemand
 Swiss-French	Keyboard Layout View		Suisse-Français
 Warning: left and right key roles do not match	Modifier keys window		Attention : les rôles des touches gauche et droite ne correspondent pas
+Belgian (comma)	Keyboard Layout View		Belge (virgule)
 Scroll lock	Keyboard Layout View		Arrêt défilement
 Belarusian (Mac)	Keyboard Layout View		Biélorusse (Mac)
 Greek	Keyboard Layout View		Grec
@@ -54,6 +55,7 @@ Error: duplicate keys	Modifier keys window		Erreur : touches dupliquées
 System:	Keymap window		Système :
 Lithuanian	Keyboard Layout View		Lituanien
 Finnish	Keyboard Layout View		Finnois
+Svorak	Keyboard Layout View		Svorak
 Left command	Keyboard Layout View		Commande gauche
 Romanian	Keyboard Layout View		Roumain
 Set modifier keys…	Keymap window		Régler les touches modificatrices…
@@ -63,6 +65,7 @@ Control	Keyboard Layout View	Control key	Contrôle
 Left option	Keyboard Layout View		Option gauche
 Portuguese	Keyboard Layout View		Portugais
 Right control	Keyboard Layout View		Contrôle droit
+Belgian (point)	Keyboard Layout View		Belge (point)
 Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
 Norwegian	Keyboard Layout View		Norvégien
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Touche majuscule
@@ -90,6 +93,7 @@ Albanian	Keyboard Layout View		Albanais
 Right command	Keyboard Layout View		Commande droite
 Revert	Keymap window		Défaire
 Command:	Modifier keys window	Command key role name	Commande :
+Latin-American	Keyboard Layout View		Latino-américain
 Spanish (Dvorak)	Keyboard Layout View		Espagnol (Dvorak)
 Lithuanian (Standard)	Keyboard Layout View		Lituanien (standard)
 Canadian-French	Keyboard Layout View		Canadien-Français
@@ -115,5 +119,6 @@ Croatian	Keyboard Layout View		Croate
 Kazakh	Keyboard Layout View		Kazakh
 Czech	Keyboard Layout View		Tchèque
 Set modifier keys	Modifier keys window		Régler les touches modificatrices
+Colemak	Keyboard Layout View		Colemak
 Modifier keys	Modifier keys window		Touches modificatrices
 Acute trigger	Keymap window		Accent aigu

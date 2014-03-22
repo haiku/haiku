@@ -1,11 +1,19 @@
-1	ukrainian	x-vnd.Be-TSKB	1259752388
+1	ukrainian	x-vnd.Be-TSKB	2335730970
 Power off	DeskbarMenu		Вимкнути
+Sort applications by name	PreferencesWindow		Сортувати програми за назвою
+Suspend	DeskbarMenu		Призупинити
+Hide clock	TimeView		Приховати годинник
 Applications	PreferencesWindow		Додатки
+Time preferences…	TimeView		Налаштувати годинник
+About Haiku	DeskbarMenu		Про Haiku
+Edit in Tracker…	PreferencesWindow		Змінити меню 
 Recent documents:	PreferencesWindow		Недавні документи:
 Recent applications	DeskbarMenu		Останні програми
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Додатки
 Find…	DeskbarMenu		Пошук...
+Show clock	Tray		Показати годинник
 Window	PreferencesWindow		Вікно
+Defaults	PreferencesWindow		Типове
 Menu	PreferencesWindow		Меню
 Recent documents	DeskbarMenu		Останні документи
 Auto-hide	PreferencesWindow		Автозникнення
@@ -15,6 +23,7 @@ Show all	WindowMenu		Показати все
 No windows	WindowMenu		Немає вікон
 Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Перезавантажити систему
+Large	PreferencesWindow		Великі
 Auto-raise	PreferencesWindow		Автоспливання
 Recent folders:	PreferencesWindow		Недавні папки:
 Show application expander	PreferencesWindow		Показувати додаток expander
@@ -22,6 +31,8 @@ Restart Tracker	DeskbarMenu		Перезавантажити Tracker
 Close all	WindowMenu		Закрити все
 Deskbar preferences	PreferencesWindow		Налаштування Deskbar
 Mount	DeskbarMenu		Приєднати
+Revert	PreferencesWindow		Повернути
+Small	PreferencesWindow		Маленькі
 Recent applications:	PreferencesWindow		Недавні додатки:
 Shutdown…	DeskbarMenu		Вимкнути...
 Tracker always first	PreferencesWindow		Tracker завжди перший
@@ -32,7 +43,9 @@ Show calendar…	TimeView		Показати календар…
 Deskbar preferences…	DeskbarMenu		Налаштування Deskbar...
 Expand new applications	PreferencesWindow		Розпакувати нові додатки
 Show replicants	DeskbarMenu		Показати репліканти
+Hide application names	PreferencesWindow		Сховати назви програм
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
+Icon size	PreferencesWindow		Розмір значків
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Аплети екрану
 Hide all	WindowMenu		Сховати все
 Quit application	WindowMenu		Вийти з додатку

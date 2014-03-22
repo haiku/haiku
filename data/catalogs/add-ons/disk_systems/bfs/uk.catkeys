@@ -5,4 +5,4 @@ Enable query support	BFS_Initialize_Parameter		Дозвіл підтримку �
 Disabling query support may speed up certain file system operations, but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Заборона підтримки , but should only be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.
 1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Найменші файли)
 Blocksize:	BFS_Initialize_Parameter		Розмір блоків:
-Name:	BFS_Initialize_Parameter		 Ім'я:
+Name:	BFS_Initialize_Parameter		Ім'я:

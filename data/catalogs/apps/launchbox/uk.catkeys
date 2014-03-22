@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-LaunchBox	3016105370
+1	ukrainian	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Новий
 Set description…	LaunchBox		Встановити Опис…
 Vertical layout	LaunchBox		Вертикальне розташування
@@ -6,6 +6,7 @@ OK	LaunchBox		Гаразд
 Pad 1	LaunchBox		Панель 1
 last chance	LaunchBox		остання спроба
 Quit	LaunchBox		Вийти
+Open containing folder	LaunchBox		Відкрити теку, яка містить дані
 Clear button	LaunchBox		Очистити кнопку
 LaunchBox	System name		LaunchBox
 Ignore double-click	LaunchBox		Ігнорувати подвійне натискання

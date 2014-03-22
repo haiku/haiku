@@ -1,7 +1,7 @@
 1	russian	x-vnd.Haiku-HaikuDepot	3598332680
 Name	PackageListView		Имя
 Installed packages	Model		Установленные пакеты
-User modified packages	Model		Пакеты измененные пользователем
+User modified packages	Model		Измененные пользователем
 Update available	Model		Доступны обновления
 Changelog	PackageInfoView		История изменений
 Click a package to view information	PackageInfoView		Нажмите на пакет, чтобы увидеть информацию о нем

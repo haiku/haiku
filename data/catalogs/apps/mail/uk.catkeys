@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	3841022894
+1	ukrainian	x-vnd.Be-MAIL	233997769
 View	Mail		Вигляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Додати атрибути:
@@ -10,6 +10,7 @@ Edit	Mail		Редагувати
 Print	Mail		Друкувати
 <none>	Mail		<жодного>
 New mail message	Mail		Новий лист
+Untitled	Mail		Без назви
 Automatic	Mail		Автоматично
 Automatically mark mail as read:	Mail		Автоматично помітити як прочитане:
 helpful message	Mail		щасливе повідомлення
@@ -26,6 +27,7 @@ Don't save	Mail		Не зберігати
 Expert	Mail		Експерт
 Reply account:	Mail		Аккаунт для відповіді:
 Message	Mail		Повідомлення
+Settings…	Mail		Налаштування
 Reply to sender	Mail		Відповісти відправникові
 There is no installed handler for URL links.	Mail		Не встановлено обробник посилань URL
 Signature	Mail		Підпис
@@ -61,21 +63,26 @@ Print…	Mail		Друкувати…
 Warn unencodable:	Mail		Увага нерозкодоване:
 Quit	Mail		Завершити
 %n - Full name	Mail		%n - Повне ім'я
+ Read 	Mail		Прочитаним
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Кошик
 Default account:	Mail		Аккаунт по замовчуванню:
 Size:	Mail		Розмір:
 Account from mail	Mail		Аккаунт для пошти
 Edit signatures…	Mail		Редагувати підписи…
 New	Mail		Новий
+Attachments: 	Mail		Вкладення:
 On	Mail		Включити
 Set to %s	Mail		Встановити в %s
 Forward	Mail		Переслати
 E-mail draft could not be saved!	Mail		Чорновик листа не збережено!
+%e wrote:\\n	Mail		%e написав:\\n
 To:	Mail		До:
 Only files can be added as attachments.	Mail		Тільки файли можуть бути додані як вкладення.
 Previous message	Mail		Попередній лист
 Attachments:	Mail		Вкладення:
 Title:	Mail		Назва:
+<no account found>	Mail		<аккаунт не знайдено>
 Find…	Mail		Знайти…
 Accounts…	Mail		Аккаунти…
 Mail preferences	Mail		Настройки пошти
@@ -100,6 +107,7 @@ Close	Mail		Закрити
 No matches	Mail		Не відповідати
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon не запущено. Лист стоїть в черзі і буде відправлений після запуску демона.
 Really delete this signature? This cannot be undone.	Mail		Дійсно видалити цей підпис? Це буде незворотним.
+Save this message as a draft before closing?	Mail		Зберегти це повідомлення як чернетку перед закриттям?
 Open	Mail		Відкрити
 draft	B_USER_DIRECTORY/mail/draft		чорновик
 Quote	Mail		Цитата
@@ -113,6 +121,7 @@ Account:	Mail		Аккаунт:
 Decoding:	Mail		Розкодування:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Вибачте не знайдено жодного додатка що підтримує дані типу 'Person'.
 Delete	Mail		Видалити
+Don't send	Mail		Не надсилати
 Leave as '%s'	Mail		Зберегти як '%s'
 Copy	Mail		Копіювати
 Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
@@ -127,6 +136,7 @@ Font:	Mail		Шрифт:
 (Address unavailable)	Mail		(Адреса недоступна)
 Save address	Mail		Зберегти адресу
 Queries	Mail		Запити
+Send this message before closing?	Mail		Відіслати це повідомлення перед закриттям? 
 Save	Mail		Зберегти
 Random	Mail		Випадковий
 Close and 	Mail		Закрити і

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	4011843330
+1	ukrainian	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Використати як тло…
 File	Menus		Файл
 Slide delay	Menus		Затримка слайда
@@ -53,6 +53,7 @@ Select all	Menus		Вибрати все
 Zoom factor in %:	PrintOptionsWindow		Масштаб зображення %:
 Width:	PrintOptionsWindow		Ширина:
 Image	Menus		Зображення
+Move to Trash	Menus		Перемістити в кошик
 OK	Alerts		Гаразд
 Rotate clockwise	Menus		Поворот за годинниковою стрілкою
 Job setup	PrintOptionsWindow		Настройка завдання

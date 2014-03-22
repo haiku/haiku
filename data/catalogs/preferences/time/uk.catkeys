@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Time	1859841283
+1	ukrainian	x-vnd.Haiku-Time	3259467657
 GMT (UNIX compatible)	Time		GMT (сумісний з UNIX)
 OK	Time		Гаразд
 Asia	Time		Азія
@@ -11,6 +11,7 @@ Preview time:	Time		Попередній час:
 Synchronize	Time		Синхронізувати
 Revert	Time		Повернути
 Pacific	Time		Тихий океан
+Show day of week	Time		Показувати день тижня
 Add	Time		Додати
 Date and time	Time		Дата і час
 about	Time		про
@@ -26,12 +27,16 @@ Time	Time		Час
 Indian	Time		Індія
 Sending request failed	Time		Не вдалося надіслати запит
 Arctic	Time		Арктика
+Display time with seconds	Time		Показувати секунди
 Time	System name		Час
 America	Time		Америка
 Reset	Time		Скинути
 Synchronize at boot	Time		Синхронізувати завантаження
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата & Час, розробка:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсі права застережені 2004-2012, Haiku.
 Received invalid time	Time		Отримано неправильний час
 Antarctica	Time		Антарктика
+Show time zone	Time		Встановити часову зону
+Show clock in Deskbar	Time		Показувати час в Deskbar
 The following error occured while synchronizing:r\n%s: %s	Time		При синхронізації трапилась така помилка:r\n%s: %s
 <Other>	Time		<Інше>
 Current time:	Time		Поточний час:
@@ -39,5 +44,6 @@ Try all servers	Time		Випробувати всі сервери
 Time zone	Time		Часова зона
 Could not create socket	Time		Неможливо створити комірку
 Synchronize again	Time		Синхронізувати знову
+Clock	Time		Годинник
 Network time	Time		Мережевий час
 Atlantic	Time		Атлантичний океан

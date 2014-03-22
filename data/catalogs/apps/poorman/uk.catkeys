@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PoorMan	1108606987
+1	ukrainian	x-vnd.Haiku-PoorMan	1267330937
 Website location	PoorMan		Розташування сайту
 Error Server	PoorMan		Помилка сервера
 Settings…	PoorMan		Налаштування…
@@ -24,13 +24,17 @@ Advanced	PoorMan		Розширені
 OK	PoorMan		Гаразд
 Status: Stopped	PoorMan		Статус: Зупинено
 Dir Created	PoorMan		Створити директорію
+Log to file	PoorMan		Зберегти лог в файл
 Quit	PoorMan		Вийти
 Hits: 0	PoorMan		Підказка: 0
 Save log console	PoorMan		Зберегти лог консолі
 Edit	PoorMan		Редагувати
+Create Log File	PoorMan		Створити лог файл 
+Log to console	PoorMan		Виводити лог в консоль
 Directory: (none)	PoorMan		Директорія: (жодна)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть директорію щоб опублікувати в інтернеті.\n\nPoorMan може створити директорію по замовчуванню \"public_html\" у вашій домашній директорії.\nАбо ви вибере одну з своїх власних директорій.
 Log To Console	PoorMan		Лог в консоль
+Connections	PoorMan		Підє'днання
 Status: Running	PoorMan		Стан: Запущений
 connections	PoorMan		підє'днання
 Controls	PoorMan		Органи управління
@@ -38,6 +42,7 @@ Send file listing if there's no start page	PoorMan		Відправити спи�
 Error Dir	PoorMan		Помилка директорії
 Select all	PoorMan		Вибрати все
 File	PoorMan		Файл
+File Logging	PoorMan		Логування в файл
 Save console selections as…	PoorMan		Зберегти вибране консолі як…
 File logging	PoorMan		Файл реєстрації
 Select web folder	PoorMan		Зберегти веб каталог
@@ -53,7 +58,9 @@ Create log file	PoorMan		Очистити логфайл
 Starting up... 	PoorMan		Запускаєтся…
 Site	PoorMan		Сайт
 Cancel	PoorMan		Відмінити
+Console logging	PoorMan		Логування в консоль
 Cannot start the server	PoorMan		Не вдалося запустити сервер
 Select	PoorMan		Вибрати
 Save console as…	PoorMan		Зберегти консоль як…
+PoorMan	System name		PoorMan
 Console Logging	PoorMan		Консоль реєстрації

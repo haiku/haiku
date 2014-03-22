@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CodyCam	3353004969
+1	ukrainian	x-vnd.Haiku-CodyCam	2416864674
 Capturing Image…	VideoConsumer.cpp		Захоплення зображення…
 Every 30 seconds	CodyCam		Кожні 30 секунд
 File name:	CodyCam		Ім’я файлу:
@@ -38,6 +38,7 @@ Every 8 hours	CodyCam		Кожні 8 годин
 Rename failed	VideoConsumer.cpp		Переіменування не вдалося
 Cannot start time source!	CodyCam		Неможливо почати відлік часу!
 Cannot register the video window	CodyCam		Неможливо зареєструвати вікно відео
+CodyCam	System name		Вебкамера
 Every 24 hours	CodyCam		Кожні 24 години
 unknown command	SettingsHandler		невідома команда
 Video settings	CodyCam		Налаштування відео

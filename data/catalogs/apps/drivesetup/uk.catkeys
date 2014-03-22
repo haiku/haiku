@@ -1,19 +1,26 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	2061656786
+1	ukrainian	x-vnd.Haiku-DriveSetup	758245016
 DriveSetup	System name		DriveSetup
+Cancel	AbstractParametersPanel		Відмінити
 Delete	MainWindow		Видалити
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному розділі будуть безповоротно втрачені!
 Rescan	MainWindow		Пересканувати
 OK	MainWindow		Гаразд
 Could not aquire partitioning information.	MainWindow		Неможливо відобразити інформацію про розмітку.
 There's no space on the partition where a child partition could be created.	MainWindow		Відсутнє місце в розділі , де ви бажаєте створити дочірній розділ.
+Could not unmount partition	MainWindow		Неможливо відмонтувати розділ
 Initialize	InitializeParametersPanel		Ініціалізація
 OK	AbstractParametersPanel		Гаразд
 <empty>	PartitionList		<пусто>
 Unable to find the selected partition by ID.	MainWindow		Неможливо знайти розділ за ID.
 Select a partition from the list below.	DiskView		Виберіть розділ зі списку нижче.
 No disk devices have been recognized.	DiskView		Не розпізнано жодного дискового пристрою.
+Failed to initialize the disk %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
 The selected disk is read-only.	MainWindow		Вибраний диск тільки для читання.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ \"%s\"?\nПовторний запит буде выдано безпосередньо перед записом измін на диск.
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Відключити цей розділ примусово?\n\nУвага: якщо якась програма в даний момент записує дані на цей розділ, то його відключення може призвести до їх втрати.\n
 Could not mount partition %s.	MainWindow		Неможливо підмонтувати розділ %s.
+The partition %s has been successfully formatted.\n	MainWindow		Розділ %s був успішно ініціалізований.\n
+Change parameters	MainWindow		Змінити параметри
 The partition %s is already unmounted.	MainWindow		Розділ %s повністю відмонтований.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Видалення розділу призупинене. Жодні зміни не були записані на диск.
 Could not delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
@@ -27,3 +34,61 @@ Mounted at	PartitionList		Змонтувати на
 There was an error acquiring the partition row.	MainWindow		Сталася помилка при одержанні параметрів розділу.
 You need to select a partition entry from the list.	MainWindow		Ви повинні вибрати розділ зі списку.
 The currently selected partition does not have a parent partition.	MainWindow		Поточний розділ не має батіківського розділу.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск просто зараз?\n\nВсі дані на вибранному диску будуть безповоротно втрачені, якщо ви продовжите!
+Write changes	MainWindow		Записати зміни
+There was an error preparing the disk for modifications.	MainWindow		Сталася помилка при збереженні змін на диск
+The partition %s is already mounted.	MainWindow		Розділ %s вже підмонтовано.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ?\nПовторний запит буде видано безпосередньо перед записом змін на диск.
+Partition name:	ChangeParametersPanel		Назва розділу:
+Change	ChangeParametersPanel		Змінити
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск просто зараз?\n\nВсі дані на диску %s будуть безпозворотно втрачені, якщо ви продовжите!
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте видалити вибраний розділ?\n\nВсі дані на цьому розділі будуть безпозворотно втрачені, якщо ви продовжите!
+Create…	MainWindow		Створити…
+Disk system \"%s\"\" not found!	MainWindow		Дискова система \"%s\"\" не знайдена!
+The disk has been successfully initialized.\n	MainWindow		Диск був успішно ініціалізований.\n
+Could not unmount partition %s.	MainWindow		Неможливо підмонтувати розділ %s.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Не вдалося змінити параметри розділу. Зміни не були записані на диск.
+Failed to format the partition %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
+Mount	MainWindow		Підмонтувати
+Partition type	PartitionList		Тип розділу
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати цілий диск? (переважно на диску створюють систему розділів)\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
+The panel experienced a problem!	MainWindow		З панеллю сталася проблема!
+Change parameters…	MainWindow		Змінити параметри…
+Device	PartitionList		Пристрій
+Disk	MainWindow		Диск
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ви впевнені, що бажаєте ініціалізувати вибраний диск? Всі дані на цьому диску будуть втрачені.\nПовторний запит буде видано безпосередньо перед записом змін на диск.\n
+Partition size	CreateParametersPanel		Розмір розділу
+Device	DiskView		Пристрій
+Active	PartitionList		Загрузочний
+Volume name	PartitionList		Ім'я розділу
+Continue	MainWindow		Продовжити
+Cannot delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
+Mount all	MainWindow		Підмонтувати все
+End: %s	Support		Кінець: %s
+The panel could not return successfully.	MainWindow		Панель не вдалося коректно повернути.
+Cancel	MainWindow		Відміна
+Delete partition	MainWindow		Видалити розділ
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Ви впевнені, що бажаєте змінити параметри вибраного розділу?\n\nРозділ може більше не распізнаватись іншими операційними системами!
+Eject	MainWindow		Витягнути
+Partition	MainWindow		Розділ
+Validation of the given parameters failed.	MainWindow		Перевірка введених параметрів не вдалася
+Force unmount	MainWindow		Примусово відімкнути
+Create	CreateParametersPanel		Створити
+File system	PartitionList		Файлова система
+Validation of the given creation parameters failed.	MainWindow		Не вдалося застосувати введені при створенні параметри.
+Partition type:	ChangeParametersPanel		Тип розділу:
+Size	PartitionList		Розмір
+Wipe (not implemented)	MainWindow		Очистити ( не зреалізовано)
+Validation of the given initialization parameters failed.	MainWindow		Не вдалося застосувати параметри, введені при ініціалізації.
+The selected partition does not contain a partitioning system.	MainWindow		Вибраний розділ не містить таблиці розділів.
+Offset: %s	Support		Зміщення: %s
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск просто зараз?\n\nЯкщо ви продовжите, то всі дані на розділі %s будуть безповоротно втрачені!
+The partition %s is currently mounted.	MainWindow		Розділ %s повністю підмонтований.
+Surface test (not implemented)	MainWindow		Тест поверхні (ще не зреалізовано)
+Format	MainWindow		Форматувати
+Could not change the parameters of the selected partition.	MainWindow		Неможливо змінити параметри вибраного розділу.
+Parameters	PartitionList		Параметри
+Creation of the partition has failed.	MainWindow		Не вдалося створити розділ
+The currently selected partition is not empty.	MainWindow		Поточний вибраний розділ не є порожній.
+Failed to format the partition. No changes have been written to disk.	MainWindow		Не вдалось ініціалізувати розділ. Жодні зміни не були записані на диск.
+Unmount	MainWindow		Відмонтувати

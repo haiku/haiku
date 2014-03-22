@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Haiku-CPUFrequencyPref	3079996868
+1	ukrainian	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		Гаразд
 CPU frequency status view	CPU Frequency View		Статистика частоти ЦП
+OK	Status view		Гаразд
 Set state	Status view		Встановити стан
 Defaults	Pref Window		По замовчуванню
 Install replicant into Deskbar	CPU Frequency View		Встановити реплікант в Deskbar

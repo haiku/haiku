@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	1073858
+1	french	x-vnd.haiku-icon_o_matic	1273975508
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -94,6 +94,7 @@ Pick a color	Icon-O-Matic-ColorPicker		Choisissez une couleur
 Quit	Icon-O-Matic-Menu-File		Quitter
 Export	Icon-O-Matic-Menu-File		Exporter
 No	Icon-O-Matic-StyledTextImport		Non
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Révoquer le chemin
 load error	Icon-O-Matic-SVGImport		erreur de chargement
 Move Shapes	Icon-O-Matic-MoveShapesCommand		Déplacer les formes
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Enlever les styles

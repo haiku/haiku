@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku.TextSearch	1180598828
+1	ukrainian	x-vnd.Haiku.TextSearch	2496563907
 %s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця для відміни імені файлу.
 Trim to selection	GrepWindow		Обрізати для вибору
 Follow symbolic links	GrepWindow		Дотримуйтесь символічних посилань
@@ -8,6 +8,7 @@ The unselected files will be removed from the list.	GrepWindow		Не вибра�
 Set target…	GrepWindow		Встановити ціль…
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker.
 Open files in Pe	GrepWindow		Відкрити файл у Pe
+%appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		Копіювати текст до буферу обміну
 Settings	GrepWindow		Налаштування
 Select all	GrepWindow		Вибрати все
@@ -31,3 +32,4 @@ Show files in Tracker	GrepWindow		Показати файл у Tracker
 Case-sensitive	GrepWindow		З урахуванням регістру
 Text files only	GrepWindow		Тільки текстові файли
 Show lines	GrepWindow		Показати лінії
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Haiku-desklink	2797960853
+1	ukrainian	x-vnd.Haiku-desklink	3451447865
 Control physical output	MediaReplicant		Керувати фізичним виходом 
 Couldn't launch 	MediaReplicant		Не вдалось відкрити 
+Muted	MediaReplicant		Приглушено
 OK	MediaReplicant		Гаразд
 Sound preferences…	MediaReplicant		Настройки звуку…
 %g dB	MediaReplicant		%g dB

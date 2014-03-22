@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Mail	3957822883
+1	ukrainian	x-vnd.Haiku-Mail	2592587573
 Mail checking	Config Window		Перевірка пошти
 Settings	Config Window		Налаштування
 Never	Config Window	show status window	Ніколи
@@ -6,6 +6,7 @@ Only when dial-up is connected	Config Window		Тільки при включен
 While sending and receiving	Config Window		При відправці і отриманні
 days	Config Window		днів
 Incoming	Config Window		Вхідні
+Server name:	E-Mail		Ім'я серверу:
 OK	Config Window		Гаразд
 Start mail services on startup	Config Window		Запускати сервіс при старті
 E-mail address:	E-Mail		Адреса E-mail :

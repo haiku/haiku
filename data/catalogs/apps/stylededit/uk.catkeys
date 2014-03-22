@@ -1,13 +1,16 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	3019034824
+1	ukrainian	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		Редактор тексту StyledEdit
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Цей файл помічений тільки для читання. Зберегти зміни в документі \"%s\"? 
 Paste	Menus		Вставити
 OK	LoadAlert		Гаразд
 File	Menus		Файл
 ???	LoadAlert		???
+Modified	StatusView		Змінений
 Lines:	Statistics		Стрічка:
 Italic	Menus		Italic
 Left	Menus		Вліво
 Search backwards	FindandReplaceWindow		Повторний пошук
+Unlock file	StatusView		Розблокувати
 Size	Menus		Розмір
 Save	QuitAlert		Зберегти
 Page setup…	Menus		Настройка друку…
@@ -19,21 +22,27 @@ Cancel	SaveAlert		Відмінити
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо повернути, файл не знайдено: \"%s\".
 Case-sensitive	FindandReplaceWindow		Чутливий до регістра
 Green	Menus		Зелений
+Reload	NodeMonitorAlerts		Перезавантажити
 Yellow	Menus		Жовтий
 Replace in all windows	FindandReplaceWindow		Замінити  у всіх вікнах
 Wrap lines	Menus		Перенос по словах
 Quit	Menus		Вийти
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" був видалений іншою програмою, відновити його?
 Document statistics	Statistics		Статистика документу
 Cancel	RevertToSavedAlert		Відмінити
+Autodetect	Menus		Автовизначення
 Document	Menus		Документ
 Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ?
 Edit	Menus		Редагувати
+Revert	RevertToSavedAlert		Повернути
 Font	Menus		Шрифт
 Replace all	FindandReplaceWindow		Замінити все
 Statistics…	Menus		Статистика…
 Default	Open_and_SaveAsPanel		По замовчуванню
 Replace next	Menus		Замінити наступний
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" має незбережені зміни.\nПовернути його до останньої збереженої версії?
 Cancel	FindandReplaceWindow		Відмінити
+Text encoding	Menus		Кодування
 Close	Menus		Закрити
 Save	SaveAlert		Зберегти
 Words:	Statistics		Слова:
@@ -47,7 +56,9 @@ OK	QuitAlert		Гаразд
 Open…	Menus		Відкрити…
 Center	Menus		Центр
 Blue	Menus		Синій
+Unable to unlock file\n\t%s	QuitAlert		Неможливо розблокувати файл\n\t%s
 Cyan	Menus		Голубий
+line %d, column %d	StatusView		лінія %d, позиція %d
 OK	Statistics		Гаразд
 Magenta	Menus		Фіолетовий
 New	Menus		Новий
@@ -58,13 +69,17 @@ Find:	FindandReplaceWindow		Знайти:
 Error saving \"%s\":\n%s	SaveAlert		Помилка збереження "%s":\n%s
 Copy	Menus		Копіювати
 Cut	Menus		Вирізати
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" був змінений іншою програмою, перезавантажити його?
 Replace	FindandReplaceWindow		Перемістити
 Find again	Menus		Повторний пошук
 Cancel	QuitAlert		Відмінити
 Find…	Menus		Знайти…
 Select all	Menus		Вибрати все
 Don't save	SaveAlert		Не зберігати
+Recover	NodeMonitorAlerts		Відновити
 Error loading \"%s\":\n\t%s	LoadAlert		Помилка загрузки "%s":\n\t%s
+Ignore	NodeMonitorAlerts		Ігнорувати
+Read-only	StatusView		Тільки читання
 Undo typing	QuitAlert		Відміна друку
 Black	Menus		Чорний
 Untitled 	StyledEditWindow		Неназваний 
@@ -74,5 +89,6 @@ Encoding	Open_and_SaveAsPanel		Кодування
 Characters:	Statistics		Символи:
 Save as…	Menus		Зберегти як…
 Redo typing	QuitAlert		Поновлення друку
+Reload…	Menus		Перезавантажити
 Replace…	Menus		Перемістити…
 Right	Menus		Вправо

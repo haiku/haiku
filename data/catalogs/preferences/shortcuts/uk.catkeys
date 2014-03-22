@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Shortcuts	3618270780
+1	ukrainian	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		Переміщення мишки
 OK	ShortcutsWindow		Гаразд
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		не вдалося створити список горячих клавіш.
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		Додати список горячих кл�
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Клавіша
 Open KeySet…	ShortcutsWindow		Відкрити список горячих клавіш…
+Error, NULL state description?	ShortcutsSpec		Помилка, NULL опису стану?\n
 MouseUp	ShortcutsSpec		Мишку вгору
 Revert to saved	ShortcutsWindow		Повернутися до збереження
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
@@ -19,10 +20,12 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не вдалос
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Багато \"*Перемістити мишку до 100% 0\" \"*Кнопка мишки1\"
 SendMessage	ShortcutsSpec		Відправити повідомлення
 MoveMouseTo	ShortcutsSpec		Перемістити мишку до
+Option	ShortcutsSpec	Name for modifier on keyboard	Параметр
 Save	ShortcutsWindow		Зберегти
 *MouseButton 1	ShortcutsWindow		*Кнопка мишки 1
 *MoveMouse +20 +0	ShortcutsWindow		*Переміщення мишки +20 +0
 MouseDown	ShortcutsSpec		Мишку вниз
+Save changes before closing?	ShortcutsWindow		Зберегти зміни перед закриттям?
 Remove selected shortcut	ShortcutsWindow		Видалити вибрану горячу клавішу
 MouseButton	ShortcutsSpec		Кнопка мишки
 Add new shortcut	ShortcutsWindow		Додати нову горячу клавішу

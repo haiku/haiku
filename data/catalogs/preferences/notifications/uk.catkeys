@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Notifications	1032629100
+1	ukrainian	x-vnd.Haiku-Notifications	68793008
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Виникла помилка збереження настройок.\nМожливо, що закінчилось місце на диску.
 Notifications	GeneralView		Повідомлення
 seconds of inactivity	GeneralView		секунд бездіяльності
@@ -16,6 +16,7 @@ Cannot disable notifications because the server can't be reached.	GeneralView		�
 Progress	NotificationView		Хід
 Last Received	NotificationView		Останє повідомлення  отримано
 General	PrefletView		Основні
+Apply	PrefletWin		Застосувати
 Display	PrefletView		Дисплей
 Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Невдалося включити повідомлення під час старту, можливо у вас немає доступу до директорії завантаження.
 Search:	NotificationView		Пошук:
@@ -42,4 +43,5 @@ There was a problem saving the preferences.\nIt's possible you don't have write 
 Enable notifications at startup	GeneralView		Включити повідомлення при старті
 Notifications	PrefletView		Повідомлення
 The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Невдалося знайти сервер повідомлень, Це означає, що установка  InfoPopper Вами була завершена невдало.
+Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Не вдалося зберегти налаштування, можливо ви не прав на запис до ціеї папки.
 Applications	NotificationView		Додатки

@@ -1,7 +1,10 @@
-1	ukrainian	x-vnd.Haiku-DeskCalc	1916192649
+1	ukrainian	x-vnd.Haiku-DeskCalc	1694821448
 Compact	CalcView		Компактний
 Scientific	CalcView		Науковий
 DeskCalc	System name		Калькулятор
 Basic	CalcView		Основний
+Radians	CalcView		Радіани
 Enable Num Lock on startup	CalcView		Включати Num Lock при запуску
+Calculating	CalcView		Обчислення
+Degrees	CalcView		Градуси
 Audio Feedback	CalcView		Озвучка віддачі
