@@ -8,7 +8,7 @@ local packages =
 	MakefileEngine
 	;
 
-if $(HAIKU_BOOTSTRAP_BUILD) {
+if $(HAIKU_BUILD_TYPE) = bootstrap {
 	packages += HaikuBootstrap ;
 } else {
 	packages += Haiku ;
@@ -22,7 +22,7 @@ local archDependentPackages =
 local secondaryArchPackages =
 	HaikuDevelSecondary
 	;
-if $(HAIKU_BOOTSTRAP_BUILD) {
+if $(HAIKU_BUILD_TYPE) = bootstrap {
 	secondaryArchPackages += HaikuSecondaryBootstrap ;
 } else {
 	secondaryArchPackages += HaikuSecondary ;

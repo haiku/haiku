@@ -874,7 +874,7 @@ rule AddPackagesAndRepositoryVariablesToContainerScript script : container
 		= [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] ;
 	local resolvePackageDependencies ;
 	if ( ! $(updateOnly) || $(HAIKU_UPDATE_ALL_PACKAGES) )
-		&& ! $(HAIKU_BOOTSTRAP_BUILD) {
+		&& $(HAIKU_BUILD_TYPE) != bootstrap {
 		resolvePackageDependencies = 1 ;
 	}
 	AddVariableToScript $(script) : resolvePackageDependencies

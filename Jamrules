@@ -65,7 +65,7 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) DefaultBuildProfiles ] ;
 local repositoriesDirectory
 	= [ FDirName $(HAIKU_BUILD_RULES_DIR) repositories ] ;
 local repositories = HaikuPorts ;
-if $(HAIKU_BOOTSTRAP_BUILD) {
+if $(HAIKU_BUILD_TYPE) = bootstrap {
 	repositories = HaikuPortsCross ;
 }
 

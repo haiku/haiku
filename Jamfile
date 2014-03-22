@@ -11,14 +11,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	}
 }
 
-if $(HAIKU_BOOTSTRAP_BUILD) {
-	EnableBuildFeatures bootstrap_image ;
-} else if $(HAIKU_MINIMUM_BUILD) {
-	EnableBuildFeatures minimum_image ;
-} else {
-	EnableBuildFeatures regular_image ;
-}
-
 # Include required packages:
 # primary architecture
 AddHaikuImagePackages [ FFilterByBuildFeatures 

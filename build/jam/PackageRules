@@ -50,7 +50,7 @@ rule PreprocessPackageInfo source : directory : architecture
 	;
 
 	local target = $(source:BSG=package-info)-package-info ;
-	if $(HAIKU_BOOTSTRAP_BUILD) {
+	if $(HAIKU_BUILD_TYPE) = bootstrap {
 		target = $(target)-bootstrap ;
 	}
 	MakeLocate $(target) : $(directory) ;
@@ -59,7 +59,7 @@ rule PreprocessPackageInfo source : directory : architecture
 		: $(secondaryArchitecture) : useCPP ;
 
 	# Update requires in the package info.
-	if ! $(HAIKU_BOOTSTRAP_BUILD) {
+	if $(HAIKU_BUILD_TYPE) != bootstrap {
 		local updateRequiresFiles =
 			<build>update_package_requires
 			[ on <repository>HaikuPorts return $(HAIKU_REPOSITORY_CACHE_FILE) ]
@@ -99,7 +99,7 @@ rule PreprocessPackageOrRepositoryInfo target : source : architecture
 
 	local defines = HAIKU_PACKAGING_ARCH=$(architecture) ;
 	local sedReplacements = %HAIKU_PACKAGING_ARCH%,$(architecture) ;
-	if $(HAIKU_BOOTSTRAP_BUILD) {
+	if $(HAIKU_BUILD_TYPE) = bootstrap {
 		defines += HAIKU_BOOTSTRAP_BUILD ;
 	}
 	if $(secondaryArchitecture) {

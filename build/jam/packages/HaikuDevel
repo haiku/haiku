@@ -65,7 +65,7 @@ AddHeaderDirectoryToPackage compatibility bsd : bsd ;
 AddHeaderDirectoryToPackage compatibility gnu : gnu ;
 
 # third party libs headers
-if ! $(HAIKU_BOOTSTRAP_BUILD) {
+if $(HAIKU_BUILD_TYPE) != "bootstrap" {
 	AddHeaderDirectoryToPackage libs tiff : 3rdparty ;
 }
 

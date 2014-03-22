@@ -551,8 +551,8 @@ rule BuildHaikuPortsSourcePackageDirectory
 
 actions BuildHaikuPortsPackageList
 {
-	HAIKU_BOOTSTRAP_BUILD= $(JAM:E=jam) $(HAIKU_BOOTSTRAP_SOURCES_PROFILE) \
-		build-package-list $(1) $(HAIKU_REPOSITORY_BUILD_ADDITIONAL_PACKAGES)
+	$(JAM:E=jam) $(HAIKU_BOOTSTRAP_SOURCES_PROFILE) build-package-list $(1) \
+		$(HAIKU_REPOSITORY_BUILD_ADDITIONAL_PACKAGES)
 }
 
 

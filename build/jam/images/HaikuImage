@@ -3,9 +3,9 @@
 # (respectively installing the files in the installation directory).
 
 # import the defintions of the image content
-if $(HAIKU_BOOTSTRAP_BUILD) {
+if $(HAIKU_BUILD_TYPE) = bootstrap {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions bootstrap ] ;
-} else if $(HAIKU_MINIMUM_BUILD) {
+} else if $(HAIKU_BUILD_TYPE) = minimum {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
 } else {
 	include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions regular ] ;

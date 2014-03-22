@@ -1,15 +1,24 @@
-# set HAIKU_BOOTSTRAP_BUILD early, if building a bootstrap Haiku image
+# set HAIKU_BUILD_TYPE early
 switch $(HAIKU_BUILD_PROFILE) {
 	case "bootstrap-*" : {
-		HAIKU_BOOTSTRAP_BUILD = 1 ;
+		HAIKU_BUILD_TYPE = bootstrap ;
+		EnableBuildFeatures bootstrap_image ;
+		
 		HAIKU_DEFINES += HAIKU_BOOTSTRAP_BUILD ;
 		TARGET_DEFINES += HAIKU_BOOTSTRAP_BUILD ;
+	} 
+
+	case "minimum-*" : {
+		HAIKU_BUILD_TYPE = minimum ;
+		EnableBuildFeatures minimum_image ;
 	}
 	
-	case "minimum-*" : {
-		HAIKU_MINIMUM_BUILD = 1 ;
+	case "*" : {
+		HAIKU_BUILD_TYPE = regular ;
+		EnableBuildFeatures regular_image ;
 	}
 }
+Echo "Starting build of type $(HAIKU_BUILD_TYPE) ..." ;
 
 
 rule DefineDefaultBuildProfiles
@@ -137,7 +146,6 @@ rule DefineDefaultBuildProfiles
 				binutils
 				bison
 				curl_devel
-				findutils
 				flex
 				freetype_devel
 				gawk
