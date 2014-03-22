@@ -673,6 +673,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src bin package ;
 	EnableWerror src bin package_repo ;
 	EnableWerror src bin pkgman ;
+	EnableWerror src libs bsd ;
 	EnableWerror src apps ;
 	EnableWerror src kits ;
 	EnableWerror src preferences ;
