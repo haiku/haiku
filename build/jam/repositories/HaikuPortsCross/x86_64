@@ -11,6 +11,7 @@ BootstrapPackageRepository HaikuPortsCross
 	bison_bootstrap-2.4.3-1
 	curl_bootstrap-7.26.0-1
 	curl_bootstrap_devel-7.26.0-1
+	findutils_bootstrap-4.4.2-1
 	flex_bootstrap-2.5.35-1
 	freetype_bootstrap-2.4.9-1
 	freetype_bootstrap_devel-2.4.9-1
@@ -42,6 +43,7 @@ BootstrapPackageRepository HaikuPortsCross
 	binutils_bootstrap
 	bison_bootstrap
 	curl_bootstrap
+	findutils_bootstrap
 	flex_bootstrap
 	freetype_bootstrap
 	gawk_bootstrap

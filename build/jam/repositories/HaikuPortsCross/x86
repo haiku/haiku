@@ -9,6 +9,7 @@ BootstrapPackageRepository HaikuPortsCross
 	automake_bootstrap-1.13.1-1
 	binutils_bootstrap-2.24_2014_03_19-1
 	bison_bootstrap-2.4.3-1
+	findutils_bootstrap-4.4.2-1
 	flex_bootstrap-2.5.35-1
 	freetype_bootstrap-2.4.9-1
 	freetype_bootstrap_devel-2.4.9-1
@@ -56,6 +57,7 @@ BootstrapPackageRepository HaikuPortsCross
 	automake_bootstrap
 	binutils_bootstrap
 	bison_bootstrap
+	findutils_bootstrap
 	flex_bootstrap
 	freetype_bootstrap
 	gawk_bootstrap
