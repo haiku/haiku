@@ -71,8 +71,8 @@ ConsoleWindow::MessageReceived(BMessage* message)
 			int32 columnNumber = message->FindInt32("column");
 			BString text = message->FindString("string");
 			BString finalText;
-			finalText.SetToFormat("%s:%li:%li: %s\n", source.String(), lineNumber,
-				columnNumber, text.String());
+			finalText.SetToFormat("%s:%" B_PRIi32 ":%" B_PRIi32 ": %s\n",
+				source.String(), lineNumber, columnNumber, text.String());
 			fMessagesListView->AddItem(new BStringItem(finalText.String()));
 			break;
 		}
