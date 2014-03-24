@@ -7,5 +7,9 @@ resource(3, "META:S:DESC") #'MSDC' "MPEG-2 transport stream";
 
 resource(4, "META:EXTENS") message(234) {
 	"extensions" = "ts",
+	"extensions" = "TS",
+	"extensions" = "mts",
+	"extensions" = "MTS",
+	"extensions" = "m2ts",
 	"type" = "video/mp2t"
 };
