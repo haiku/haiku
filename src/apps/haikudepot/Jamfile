@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src apps haiku-depot ;
+SubDir HAIKU_TOP src apps haikudepot ;
 
 UsePrivateHeaders interface shared package ;
 
@@ -9,10 +9,11 @@ local sourceDirs =
 
 local sourceDir ;
 for sourceDir in $(sourceDirs) {
-	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haiku-depot $(sourceDir) ] ;
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haikudepot $(sourceDir) ] ;
 }
 
-	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
+
 local textDocumentSources =
 	Bullet.cpp
 	BulletData.cpp
