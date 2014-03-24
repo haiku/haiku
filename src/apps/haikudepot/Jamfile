@@ -85,3 +85,9 @@ Application TextDocumentTest :
 
 	: be translation libshared.a $(TARGET_LIBSUPC++)
 ;
+
+Application ConnectionTest :
+	ConnectionTest.cpp
+
+	: be netapi translation libshared.a $(TARGET_LIBSUPC++)
+;
