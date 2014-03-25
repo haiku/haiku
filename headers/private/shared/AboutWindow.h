@@ -41,13 +41,13 @@ public:
 								const char** contents = NULL);
 
 			BBitmap*		Icon();
-			void			SetIcon(BBitmap* icon);
+	virtual	void			SetIcon(BBitmap* icon);
 
 			const char*		Name();
-			void			SetName(const char* name);
+	virtual	void			SetName(const char* name);
 
 			const char*		Version();
-			void			SetVersion(const char* version);
+	virtual	void			SetVersion(const char* version);
 
 private:
 	virtual	void			_ReservedAboutWindow20();
