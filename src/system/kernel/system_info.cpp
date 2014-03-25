@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2013, Haiku, Inc.
+ * Copyright (c) 2004-2014, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -406,6 +406,57 @@ SystemNotificationService::Listener::OwnerDeleted(AssociatedDataOwner* owner)
 }
 
 
+//	#pragma mark - private functions
+
+
+static void
+count_topology_nodes(const cpu_topology_node* node, uint32& count)
+{
+	count++;
+	for (int32 i = 0; i < node->children_count; i++)
+		count_topology_nodes(node->children[i], count);
+}
+
+
+static int32
+get_logical_processor(const cpu_topology_node* node)
+{
+	while (node->level != CPU_TOPOLOGY_SMT) {
+		ASSERT(node->children_count > 0);
+		node = node->children[0];
+	}
+
+	return node->id;
+}
+
+
+static cpu_topology_node_info*
+generate_topology_array(cpu_topology_node_info* topology,
+	const cpu_topology_node* node, uint32& count)
+{
+	if (count == 0)
+		return topology;
+
+	static const topology_level_type mapTopologyLevels[] = { B_TOPOLOGY_SMT,
+		B_TOPOLOGY_CORE, B_TOPOLOGY_PACKAGE, B_TOPOLOGY_ROOT };
+
+	STATIC_ASSERT(sizeof(mapTopologyLevels) / sizeof(topology_level_type)
+		== CPU_TOPOLOGY_LEVELS + 1);
+
+	topology->id = node->id;
+	topology->level = node->level;
+	topology->type = mapTopologyLevels[node->level];
+
+	arch_fill_topology_node(topology, get_logical_processor(node));
+
+	count--;
+	topology++;
+	for (int32 i = 0; i < node->children_count && count > 0; i++)
+		topology = generate_topology_array(topology, node->children[i], count);
+	return topology;
+}
+
+
 //	#pragma mark -
 
 
@@ -457,7 +508,6 @@ get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* info)
 
 	return B_OK;
 }
-
 
 
 status_t
@@ -531,61 +581,13 @@ _user_get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* userInfo)
 }
 
 
-static void
-count_topology_nodes(const cpu_topology_node* node, uint32& count)
-{
-	count++;
-	for (int32 i = 0; i < node->children_count; i++)
-		count_topology_nodes(node->children[i], count);
-}
-
-
-static int32
-get_logical_processor(const cpu_topology_node* node)
-{
-	while (node->level != CPU_TOPOLOGY_SMT) {
-		ASSERT(node->children_count > 0);
-		node = node->children[0];
-	}
-
-	return node->id;
-}
-
-
-static cpu_topology_node_info*
-generate_topology_array(cpu_topology_node_info* topology,
-	const cpu_topology_node* node, uint32& count)
-{
-	if (count == 0)
-		return topology;
-
-	static const topology_level_type mapTopologyLevels[] = { B_TOPOLOGY_SMT,
-		B_TOPOLOGY_CORE, B_TOPOLOGY_PACKAGE, B_TOPOLOGY_ROOT };
-
-	STATIC_ASSERT(sizeof(mapTopologyLevels) / sizeof(topology_level_type)
-		== CPU_TOPOLOGY_LEVELS + 1);
-
-	topology->id = node->id;
-	topology->level = node->level;
-	topology->type = mapTopologyLevels[node->level];
-
-	arch_fill_topology_node(topology, get_logical_processor(node));
-
-	count--;
-	topology++;
-	for (int32 i = 0; i < node->children_count && count > 0; i++)
-		topology = generate_topology_array(topology, node->children[i], count);
-	return topology;
-}
-
-
 status_t
 _user_get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
 	uint32* topologyInfoCount)
 {
 	if (topologyInfoCount == NULL || !IS_USER_ADDRESS(topologyInfoCount))
 		return B_BAD_ADDRESS;
-	
+
 	const cpu_topology_node* node = get_cpu_topology();
 
 	uint32 count = 0;
