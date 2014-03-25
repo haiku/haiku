@@ -20,7 +20,7 @@ class BBitmap;
 class BPoint;
 
 class BAboutWindow : public BWindow {
- public:
+public:
 							BAboutWindow(const char* appName,
 								const char* signature);
 	virtual					~BAboutWindow();
@@ -48,8 +48,10 @@ class BAboutWindow : public BWindow {
 
 			const char*		Version();
 			void			SetVersion(const char* version);
- private:
+
+private:
 			AboutView*		fAboutView;
 };
+
 
 #endif	// B_ABOUT_WINDOW_H

@@ -42,12 +42,13 @@ static const float kStripeWidth = 30.0;
 
 using BPrivate::gSystemCatalog;
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "AboutWindow"
 
 
 class StripeView : public BView {
- public:
+public:
 							StripeView(BBitmap* icon);
 	virtual					~StripeView();
 
@@ -56,13 +57,13 @@ class StripeView : public BView {
 			BBitmap*		Icon() const { return fIcon; };
 			void			SetIcon(BBitmap* icon);
 
- private:
+private:
 			BBitmap*		fIcon;
 };
 
 
 class AboutView : public BGroupView {
- public:
+public:
 							AboutView(const char* name,
 								const char* signature);
 	virtual					~AboutView();
@@ -78,11 +79,11 @@ class AboutView : public BGroupView {
 			const char*		Version();
 			status_t		SetVersion(const char* version);
 
- private:
+private:
 			const char*		_GetVersionFromSignature(const char* signature);
 			BBitmap*		_GetIconFromSignature(const char* signature);
 
- private:
+private:
 			BStringView*	fNameView;
 			BStringView*	fVersionView;
 			BTextView*		fInfoView;
@@ -90,7 +91,7 @@ class AboutView : public BGroupView {
 };
 
 
-//	#pragma mark -
+//	#pragma mark - StripeView
 
 
 StripeView::StripeView(BBitmap* icon)
@@ -304,6 +305,28 @@ AboutView::_GetIconFromSignature(const char* signature)
 //	#pragma mark - AboutView public methods
 
 
+BBitmap*
+AboutView::Icon()
+{
+	if (fStripeView == NULL)
+		return NULL;
+
+	return fStripeView->Icon();
+}
+
+
+status_t
+AboutView::SetIcon(BBitmap* icon)
+{
+	if (fStripeView == NULL)
+		return B_NO_INIT;
+
+	fStripeView->SetIcon(icon);
+
+	return B_OK;
+}
+
+
 const char*
 AboutView::Name()
 {
@@ -336,35 +359,14 @@ AboutView::SetVersion(const char* version)
 }
 
 
-BBitmap*
-AboutView::Icon()
-{
-	if (fStripeView == NULL)
-		return NULL;
-
-	return fStripeView->Icon();
-}
-
-
-status_t
-AboutView::SetIcon(BBitmap* icon)
-{
-	if (fStripeView == NULL)
-		return B_NO_INIT;
-
-	fStripeView->SetIcon(icon);
-
-	return B_OK;
-}
-
-
 //	#pragma mark - BAboutWindow
 
 
 BAboutWindow::BAboutWindow(const char* appName, const char* signature)
-	:	BWindow(BRect(0.0, 0.0, 200.0, 200.0), appName, B_MODAL_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE 
-		| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
+	:
+	BWindow(BRect(0.0, 0.0, 200.0, 200.0), appName, B_MODAL_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
@@ -417,9 +419,9 @@ BAboutWindow::AboutPosition(float width, float height)
 		dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
 
 	BScreen screen(window);
- 	BRect screenFrame(0, 0, 640, 480);
- 	if (screen.IsValid())
- 		screenFrame = screen.Frame();
+	BRect screenFrame(0, 0, 640, 480);
+	if (screen.IsValid())
+		screenFrame = screen.Frame();
 
 	// Horizontally, we're smack in the middle
 	result.x = screenFrame.left + (screenFrame.Width() / 2.0) - (width / 2.0);
@@ -577,6 +579,20 @@ BAboutWindow::AddText(const char* header, const char** contents)
 }
 
 
+BBitmap*
+BAboutWindow::Icon()
+{
+	return fAboutView->Icon();
+}
+
+
+void
+BAboutWindow::SetIcon(BBitmap* icon)
+{
+	fAboutView->SetIcon(icon);
+}
+
+
 const char*
 BAboutWindow::Name()
 {
@@ -603,18 +619,3 @@ BAboutWindow::SetVersion(const char* version)
 {
 	fAboutView->SetVersion(version);
 }
-
-
-BBitmap*
-BAboutWindow::Icon()
-{
-	return fAboutView->Icon();
-}
-
-
-void
-BAboutWindow::SetIcon(BBitmap* icon)
-{
-	fAboutView->SetIcon(icon);
-}
-
