@@ -39,6 +39,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
 
 		MergeObject <libbe!$(architecture)>interface_kit.o :
+			AboutWindow.cpp
 			AbstractLayout.cpp
 			AbstractLayoutItem.cpp
 			AffineTransform.cpp
