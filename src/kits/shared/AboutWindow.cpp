@@ -78,7 +78,7 @@ class AboutView : public BGroupView {
 			const char*		Version();
 			status_t		SetVersion(const char* version);
 
- protected:
+ private:
 			const char*		_GetVersionFromSignature(const char* signature);
 			BBitmap*		_GetIconFromSignature(const char* signature);
 
@@ -211,7 +211,7 @@ AboutView::~AboutView()
 }
 
 
-//	#pragma mark - AboutView protected methods
+//	#pragma mark - AboutView private methods
 
 
 const char*
