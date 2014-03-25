@@ -190,19 +190,18 @@ AboutView::AboutView(const char* appName, const char* signature)
 		new BMessage(B_QUIT_REQUESTED));
 
 	GroupLayout()->SetSpacing(0);
-	BLayoutBuilder::Group<>(this)
-		.AddGroup(B_HORIZONTAL, 0)
-			.Add(fStripeView)
-			.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
-				.SetInsets(0, B_USE_DEFAULT_SPACING,
-					B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-				.Add(fNameView)
-				.Add(fVersionView)
-				.Add(infoViewScroller)
-				.Add(closeButton)
-				.End()
-			.AddGlue()
-			.End();
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
+		.Add(fStripeView)
+		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
+			.SetInsets(0, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.Add(fNameView)
+			.Add(fVersionView)
+			.Add(infoViewScroller)
+			.Add(closeButton)
+			.End()
+		.AddGlue()
+		.End();
 }
 
 
