@@ -2,7 +2,7 @@
 ##	Does all the hard work for the Generic Makefile
 ##	which simply defines the project parameters
 
-##	Supports Generic Makefile v2.0, 2.01, 2.1, 2.2, 2.3, 2.4, 2.5 
+##	Supports Generic Makefile v2.0, 2.01, 2.1, 2.2, 2.3, 2.4, 2.5
 
 #	determine wheather running on x86 or ppc
 MACHINE=$(shell uname -m)
@@ -96,8 +96,8 @@ endif
 		LDFLAGS += -shared -Xlinker -soname=$(NAME)
 	else
 	ifeq ($(strip $(TYPE)), DRIVER)
-		LDFLAGS += -nostdlib /boot/develop/lib/x86/_KERNEL_ \
-					/boot/develop/lib/x86/haiku_version_glue.o
+		LDFLAGS += -nostdlib /boot/system/develop/lib/_KERNEL_ \
+					/boot/system/develop/lib/haiku_version_glue.o
 	endif
 	endif
 	endif
@@ -117,7 +117,7 @@ endif
 #       quotation marks
 ifeq ($(strip $(TYPE)), STATIC)
 	TARGET		:= $(TARGET_DIR)/$(NAME).a
-else	
+else
 	TARGET		:= $(TARGET_DIR)/$(NAME)
 endif
 
@@ -154,13 +154,13 @@ ifneq (,$(filter $(CPU),x86 x86_64))
 	INCLUDES = $(LOC_INCLUDES)
 	INCLUDES += -I-
 	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -I, $(path)))
-	
+
 	STDCPPLIBS = stdc++.r4
  else
 	INCLUDES = -iquote./
 	INCLUDES += $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -iquote, $(path)))
 	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -isystem, $(path)))
-	
+
 	STDCPPLIBS = stdc++ supc++
  endif
 else
@@ -317,7 +317,7 @@ $(OBJ_DIR)/%.rsrc : %.RDEF
 $(CATALOGS_DIR)/%.catalog : $(CATKEYS_DIR)/%.catkeys
 	linkcatkeys -o "$@" -s $(APP_MIME_SIG) -l $(notdir $(basename $@)) $<
 
-# rule to preprocess program sources into file ready for collecting catkeys 
+# rule to preprocess program sources into file ready for collecting catkeys
 $(OBJ_DIR)/$(NAME).pre : $(SRCS)
 	-cat $(SRCS) | $(CC) -E -x c++ $(INCLUDES) $(CFLAGS) -DB_COLLECTING_CATKEYS - > $(OBJ_DIR)/$(NAME).pre
 
