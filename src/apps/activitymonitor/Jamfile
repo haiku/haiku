@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps activitymonitor ;
 
-UsePrivateHeaders shared system ;
+UsePrivateHeaders interface system ;
 
 Application ActivityMonitor :
 	ActivityMonitor.cpp

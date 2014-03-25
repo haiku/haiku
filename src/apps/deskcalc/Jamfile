@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src apps deskcalc ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders interface shared ;
 
 Application DeskCalc :
 	CalcApplication.cpp

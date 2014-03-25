@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src preferences locale ;
 
-UsePrivateHeaders locale ;
-UsePrivateHeaders shared ;
+UsePrivateHeaders interface locale ;
 
 local sources =
 	LanguageListView.cpp

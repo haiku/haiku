@@ -64,7 +64,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		# private OS headers
 		UseLibraryHeaders icon ;
-		UsePrivateHeaders shared tracker ;
+		UsePrivateHeaders interface shared tracker ;
 		SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 		Application WebPositive :
