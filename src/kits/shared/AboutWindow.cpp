@@ -619,3 +619,27 @@ BAboutWindow::SetVersion(const char* version)
 {
 	fAboutView->SetVersion(version);
 }
+
+
+// FBC padding
+
+void BAboutWindow::_ReservedAboutWindow20() {}
+void BAboutWindow::_ReservedAboutWindow19() {}
+void BAboutWindow::_ReservedAboutWindow18() {}
+void BAboutWindow::_ReservedAboutWindow17() {}
+void BAboutWindow::_ReservedAboutWindow16() {}
+void BAboutWindow::_ReservedAboutWindow15() {}
+void BAboutWindow::_ReservedAboutWindow14() {}
+void BAboutWindow::_ReservedAboutWindow13() {}
+void BAboutWindow::_ReservedAboutWindow12() {}
+void BAboutWindow::_ReservedAboutWindow11() {}
+void BAboutWindow::_ReservedAboutWindow10() {}
+void BAboutWindow::_ReservedAboutWindow9() {}
+void BAboutWindow::_ReservedAboutWindow8() {}
+void BAboutWindow::_ReservedAboutWindow7() {}
+void BAboutWindow::_ReservedAboutWindow6() {}
+void BAboutWindow::_ReservedAboutWindow5() {}
+void BAboutWindow::_ReservedAboutWindow4() {}
+void BAboutWindow::_ReservedAboutWindow3() {}
+void BAboutWindow::_ReservedAboutWindow2() {}
+void BAboutWindow::_ReservedAboutWindow1() {}

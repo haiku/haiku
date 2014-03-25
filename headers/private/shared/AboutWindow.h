@@ -50,7 +50,32 @@ public:
 			void			SetVersion(const char* version);
 
 private:
+	virtual	void			_ReservedAboutWindow20();
+	virtual	void			_ReservedAboutWindow19();
+	virtual	void			_ReservedAboutWindow18();
+	virtual	void			_ReservedAboutWindow17();
+	virtual	void			_ReservedAboutWindow16();
+	virtual	void			_ReservedAboutWindow15();
+	virtual	void			_ReservedAboutWindow14();
+	virtual	void			_ReservedAboutWindow13();
+	virtual	void			_ReservedAboutWindow12();
+	virtual	void			_ReservedAboutWindow11();
+	virtual	void			_ReservedAboutWindow10();
+	virtual	void			_ReservedAboutWindow9();
+	virtual	void			_ReservedAboutWindow8();
+	virtual	void			_ReservedAboutWindow7();
+	virtual	void			_ReservedAboutWindow6();
+	virtual	void			_ReservedAboutWindow5();
+	virtual	void			_ReservedAboutWindow4();
+	virtual	void			_ReservedAboutWindow3();
+	virtual	void			_ReservedAboutWindow2();
+	virtual	void			_ReservedAboutWindow1();
+
+private:
 			AboutView*		fAboutView;
+
+			// FBC Padding
+			uint32			_reserved[20];
 };
 
 
