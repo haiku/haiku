@@ -283,7 +283,7 @@ RemotePackageRepository HaikuPorts
 	openssl_x86_devel-1.0.0j-4
 	physfs_x86-2.0.3-1
 	physfs_x86_devel-2.0.3-1
-	protrekkr_x86-2.5.4-1
+	protrekkr_x86-2.5.4-2
 	qtcore_x86-4.8.5.git-4
 	qtcore_x86_devel-4.8.5.git-4
 	quicklaunch-0.9.6-1
