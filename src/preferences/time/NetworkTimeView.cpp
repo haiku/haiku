@@ -499,8 +499,6 @@ NetworkTimeView::_UpdateServerList()
 	while ((item = fServerListView->RemoveItem((int32)0)) != NULL)
 		delete item;
 
-	fServerListView->MakeEmpty();
-
 	const char* server;
 	int32 index = 0;
 	while ((server = fSettings.GetServer(index++)) != NULL)
