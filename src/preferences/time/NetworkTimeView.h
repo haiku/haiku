@@ -83,16 +83,16 @@ private:
 
 class NetworkTimeView : public BGroupView {
 public:
- 							NetworkTimeView(const char* name);
- 		
+							NetworkTimeView(const char* name);
+
 	virtual	void			MessageReceived(BMessage* message);
 	virtual	void			AttachedToWindow();
-	
+
 			bool			CheckCanRevert();
 private:
- 			void	 		_InitView();
- 			void 			_UpdateServerList();
- 			void			_DoneSynchronizing();
+			void			_InitView();
+			void			_UpdateServerList();
+			void			_DoneSynchronizing();
 			bool			_IsValidServerName(const char * serverName);
 
 			Settings		fSettings;
@@ -102,13 +102,13 @@ private:
 			BButton*		fRemoveButton;
 			BButton*		fResetButton;
 
- 			BListView*		fServerListView;
- 			BCheckBox* 		fTryAllServersCheckBox;
- 			BCheckBox* 		fSynchronizeAtBootCheckBox;
- 			BButton* 		fSynchronizeButton;
+			BListView*		fServerListView;
+			BCheckBox*		fTryAllServersCheckBox;
+			BCheckBox*		fSynchronizeAtBootCheckBox;
+			BButton*		fSynchronizeButton;
 
-	 		thread_id		fUpdateThread;
+			thread_id		fUpdateThread;
 };
-	
-#endif
 
+
+#endif	// NETWORK_TIME_VIEW_H
