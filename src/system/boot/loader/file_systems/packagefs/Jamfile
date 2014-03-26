@@ -51,12 +51,8 @@ BootStaticLibrary boot_packagefs :
 	: -fno-pic
 ;
 
-Includes [ FGristFiles 
-		PackageDataReader.cpp
-		PackageFileHeapAccessorBase.cpp
-		PackageReaderImpl.cpp
-		ReaderImplBase.cpp
-		ZlibCompressionBase.cpp	
-		ZlibDecompressor.cpp	
-	] : [ BuildFeatureAttribute zlib : headers ] ;
-
+Includes [
+	FGristFiles ZlibCompressionBase.cpp package/hpkg/ZlibCompressor.h
+		shared/ZlibDecompressor.h
+	]
+	: [ BuildFeatureAttribute zlib : headers ] ;
