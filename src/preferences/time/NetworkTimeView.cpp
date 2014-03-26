@@ -308,13 +308,17 @@ NetworkTimeView::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgRemoveServer:
+		{
+			int32 currentSelection = fServerListView->CurrentSelection();
+			if (currentSelection < 0)
+				break;
+
 			fSettings.RemoveServer(((BStringItem*)
-				fServerListView->ItemAt(
-					fServerListView->
-					CurrentSelection()))->Text());
+				fServerListView->ItemAt(currentSelection))->Text());
 			_UpdateServerList();
 			Looper()->PostMessage(new BMessage(kMsgChange));
 			break;
+		}
 
 		case kMsgResetServerList:
 			fSettings.ResetServersToDefaults();
