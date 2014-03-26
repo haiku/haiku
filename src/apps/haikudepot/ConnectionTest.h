@@ -7,14 +7,23 @@
 
 
 #include <Application.h>
+#include <String.h>
 
 
 class ConnectionTest : public BApplication {
 public:
-								ConnectionTest();
+								ConnectionTest(const char* username,
+									const char* password);
 	virtual						~ConnectionTest();
 
 	virtual	void				ReadyToRun();
+
+private:
+			void				_TestGetPackage();
+			void				_TestDownloadIcon();
+private:
+			BString				fUsername;
+			BString				fPassword;
 };
 
 
