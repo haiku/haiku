@@ -21,6 +21,7 @@
 #include <ControlLook.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <ListItem.h>
 #include <ListView.h>
 #include <Path.h>
 #include <ScrollView.h>
@@ -494,12 +495,14 @@ NetworkTimeView::_InitView()
 void
 NetworkTimeView::_UpdateServerList()
 {
-	while (fServerListView->RemoveItem((int32)0) != NULL)
-		;
+	BListItem* item;
+	while ((item = fServerListView->RemoveItem((int32)0)) != NULL)
+		delete item;
+
+	fServerListView->MakeEmpty();
 
 	const char* server;
 	int32 index = 0;
-
 	while ((server = fSettings.GetServer(index++)) != NULL)
 		fServerListView->AddItem(new BStringItem(server));
 
