@@ -1,9 +1,10 @@
 /*
- * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Copyright 2013-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *		Axel Dörfler, axeld@pinc-software.de
  *
  * Corresponds to:
  *		headers/os/net/DatagramSocket.h rev 43302
@@ -13,39 +14,40 @@
 /*!
 	\file DatagramSocket.h
 	\ingroup network
-	\brief BAbstractSocket implementation for UDP datagram connections.
+	\brief BAbstractSocket implementation for datagram connections.
 */
 
 /*!
 	\class BDatagramSocket
 	\ingroup network
-	\brief BAbstractSocket implementation for UDP datagram connections.
+	\brief BAbstractSocket implementation for datagram connections.
 
 	Datagrams are atomic messages. There is no notion of sequence and the data
-	sent in a sequence of Write calls may not get to the other end of the
+	sent in a sequence of write calls may not get to the other end of the
 	connections in the same order. There is no flow control, so some of them
-	may not even make it to the peer.
+	may not even make it to the peer. The most well known datagram protocol
+	is UDP, which also happens to be the only one that Haiku currently supports.
 
 	The main uses for datagram sockets are when performance is more important
 	than safety (the lack of acknowledge mechanism allows to send a lot of
 	datagram packets at once, whereas TCP is limited by its sliding window
 	mechanism), when the application wants to manage flow control and
-	acknowledges itself, and when lost packets don't matter (for example, in
+	acknowledges itself (ie. when you want to implement your own protocol on
+	top of UDP), and when lost packets don't matter (for example, in
 	a video stream, there is no use for receiving late video frames if they
 	were already skipped to play the following ones).
 
-	To better match the atomic behavior of datagrams, this class provides
-	SendTo and ReceiveFrom methods. These allow to send datagrams to different
-	peers, and receive datagrams only from a single one at a time. This allows
-	the use of a single datagram connection to communicate with multiple peers
-	at the same time.
+	Since UDP is a connectionless protocol, in order to specify the target,
+	or to be able to know from where you got a packet, this class provides
+	you with the extra methods SendTo() and ReceiveFrom().
 */
 
 /*!
 	\fn BDatagramSocket::BDatagramSocket()
 	\brief Default constructor.
 
-	Does nothing. Call Bind or Connect to actually start network communications.
+	Does nothing. Call Bind() or Connect() to actually start network
+	communications.
 	
 	\see BAbstractSocket::BAbstractSocket().
 */
@@ -55,7 +57,7 @@
 		bigtime_t timeout)
 	\brief Create and connect a datagram socket.
 
-	The socket is immediately connected to the given peer. Use InitCheck to
+	The socket is immediately connected to the given peer. Use InitCheck() to
 	make sure the connection was successful.
 
 	\param peer host to connect to
@@ -80,14 +82,14 @@
 
 	In broadcast mode, datagrams can be sent to multiple peers at once.
 	Calling this method is not enough, you must also set your peer address to
-	be INADDR_BROADCAST to effectively send a broadcast message.
+	be \c INADDR_BROADCAST to effectively send a broadcast message.
 
 	Note that broadcast messages usually don't propagate on Internet as they
 	would generate too much traffic. Their use is thus restricted to local
 	networks.
 
 	\param broadcast the requested state for broadcast permissions.
-	\return B_OK on success, or other error codes on failure.
+	\return \c B_OK on success, or other error codes on failure.
 */
 
 /*!
@@ -116,7 +118,7 @@
 		const void* buffer, size_t size)
 	\brief Send a single datagram to the given address
 
-	Unlike the Write method, which always sends to the same peer, this method
+	Unlike the Write() method, which always sends to the same peer, this method
 	can be used to send messages to different destinations.
 
 	\param address the host to send the datagram to
@@ -131,22 +133,21 @@
 		BNetworkAddress& from)
 	\brief receive a single datagram from a given host
 
-	Wait for a message to come from the given host and fill the buffer with it.
+	Receives a datagram, and fills the \a from address with the host that
+	sent it.
 	If the buffer is too small, extra bytes from the datagram will be lost.
 
 	\param buffer the buffer to store the datagram in
 	\param bufferSize size of the buffer
-	\param from the datagram sneder address
+	\param from the datagram sender address
 */
 
 /*!
 	\fn ssize_t BDatagramSocket::Read(void* buffer, size_t size)
 	\brief Receive a datagram from any sender
 
-	This is similar to ReceiveFrom, but does not allow filtering which host the
-	datagram comes from. The first message that comes in will be accepted.
-
-	There is no way to know who sent the message.
+	This is similar to ReceiveFrom(), but there is no way to know who sent
+	the message.
 
 	If the buffer is too small, the remaining part of the datagram is lost.
 
@@ -160,7 +161,7 @@
 	\brief Send a datagram to the default target
 
 	If the socket is connected, send a datagram to the connected host.
-	If it's not, send to the peer givento the SetPeer function.
+	If it's not, send to the peer given to the SetPeer() function.
 
 	\param buffer the datagram to send
 	\param size the size of the message
