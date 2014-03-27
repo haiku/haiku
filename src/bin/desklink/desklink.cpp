@@ -55,7 +55,7 @@ main(int, char **argv)
 			while (found < count) {
 				const char *name = NULL;
 				if (deskbar.GetItemInfo(j, &name) == B_OK) {
-					printf("Item %ld: '%s'\n", j, name);
+					printf("Item %" B_PRId32 ": '%s'\n", j, name);
 					free((void *)name);
 					found++;
 				}
@@ -95,13 +95,13 @@ main(int, char **argv)
 			while (deskbar.GetItemInfo(replicant.String(), &found_id) == B_OK) {
 				err = deskbar.RemoveItem(found_id);
 				if (err != B_OK) {
-					printf("desklink: Error removing replicant id %ld: %s\n",
-						found_id, strerror(err));
+					printf("desklink: Error removing replicant id "
+						"%" B_PRId32 ": %s\n", found_id, strerror(err));
 					break;
 				}
 				found++;
 			}
-			printf("Removed %ld items.\n", found);
+			printf("Removed %" B_PRId32 " items.\n", found);
 			return err;
 		}
 

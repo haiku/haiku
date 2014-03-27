@@ -395,7 +395,7 @@ VolumeControl::UpdateText() const
 	if (!IsEnabled())
 		return NULL;
 
-	fText.SetToFormat(B_TRANSLATE("%ld dB"), Value());
+	fText.SetToFormat(B_TRANSLATE("%" B_PRId32 " dB"), Value());
 	return fText.String();
 }
 
