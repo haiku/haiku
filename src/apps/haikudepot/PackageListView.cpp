@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, <rene@gollent.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -123,6 +123,7 @@ public:
 			const PackageInfoRef& Package() const
 									{ return fPackage; }
 
+			void				UpdateTitle();
 			void				UpdateState();
 			void				UpdateRating();
 
@@ -466,10 +467,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 
 	// Package icon and title
 	// NOTE: The icon BBitmap is referenced by the fPackage member.
-	const BBitmap* icon = NULL;
-	if (package.Icon().Get() != NULL)
-		icon = package.Icon()->Bitmap(SharedBitmap::SIZE_16);
-	SetField(new BBitmapStringField(icon, package.Title()), kTitleColumn);
+	UpdateTitle();
 
 	// Rating
 	UpdateRating();
@@ -482,7 +480,6 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	SetField(new BStringField("0 KiB"), kSizeColumn);
 
 	// Status
-	// TODO: Fetch info about installed/deactivated/uninstalled/...
 	SetField(new BStringField(package_state_to_string(fPackage)),
 		kStatusColumn);
 
@@ -494,6 +491,19 @@ PackageRow::~PackageRow()
 {
 	if (fPackage.Get() != NULL)
 		fPackage->RemoveListener(fPackageListener);
+}
+
+
+void
+PackageRow::UpdateTitle()
+{
+	if (fPackage.Get() == NULL)
+		return;
+
+	const BBitmap* icon = NULL;
+	if (fPackage->Icon().Get() != NULL)
+		icon = fPackage->Icon()->Bitmap(SharedBitmap::SIZE_16);
+	SetField(new BBitmapStringField(icon, fPackage->Title()), kTitleColumn);
 }
 
 
@@ -670,6 +680,8 @@ PackageListView::MessageReceived(BMessage* message)
 					row->UpdateRating();
 				if ((changes & PKG_CHANGED_STATE) != 0)
 					row->UpdateState();
+				if ((changes & PKG_CHANGED_ICON) != 0)
+					row->UpdateTitle();
 			}
 			break;
 		}
