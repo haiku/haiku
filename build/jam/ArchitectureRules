@@ -325,9 +325,9 @@ rule KernelArchitectureSetup architecture
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
 
-			# yasm is required for target arch x86
-			if ! $(HAIKU_YASM) {
-				Exit "HAIKU_YASM not set. Please re-run configure." ;
+			# nasm is required for target arch x86
+			if ! $(HAIKU_NASM) {
+				Exit "HAIKU_NASM not set. Please re-run configure." ;
 			}
 
 		case x86_64 :
@@ -340,9 +340,9 @@ rule KernelArchitectureSetup architecture
 			# x86_64 kernel source is under arch/x86.
 			HAIKU_KERNEL_ARCH = x86 ;
 
-			# yasm is required for target arch x86_64
-			if ! $(HAIKU_YASM) {
-				Exit "HAIKU_YASM not set. Please re-run configure." ;
+			# nasm is required for target arch x86_64
+			if ! $(HAIKU_NASM) {
+				Exit "HAIKU_NASM not set. Please re-run configure." ;
 			}
 
 		case m68k :

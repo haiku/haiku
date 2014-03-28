@@ -5,11 +5,11 @@
 ; MBR Boot code
 ;
 ; assemble the Master boot record with:
-;	yasm -f bin -O5 -o mbr.bin mbr.S
+;	nasm -f bin -O5 -o mbr.bin mbr.S
 ;
 ; assemble the MBR's code (does not contain the partiton table
 ; nor the MAGIC code) with:
-;	yasm -f bin -O5 -o mbrcode.bin mbr.S -dMBR_CODE_ONLY=1
+;	nasm -f bin -O5 -o mbrcode.bin mbr.S -dMBR_CODE_ONLY=1
 
 
 ;%define	DEBUG			1
@@ -373,27 +373,23 @@ data:
 
 ; check whether the code is small enough to fit in the boot code area
 end:
-		;use nasm instead of yasm to check  the code size
-		;%if end - start > DISKSIG
-		;	%error "Code exceeds master boot code area!"
-		;%endif
+		%if end - start > DISKSIG
+			%error "Code exceeds master boot code area!"
+		%endif
 
 %ifdef MBR_CODE_ONLY
 	;just build the code.
 	;Do not generate the datas
 %else
-		;use nasm instead of yasm => use %rep instead of times
-		;%rep start + DISKSIG - end
-		;	db	0					;fill the rest of the code area
-		;%endrep
-		times start + DISKSIG - end db 0
+		%rep start + DISKSIG - end
+			db	0					;fill the rest of the code area
+		%endrep
 		kMbrDiskID	dd	0			;Disk signature
 		dw 0						;reserved
 		PartitionTable times PartitionEntry_size * 4 db 0
 DiskSignature:
-		;use nasm instead of yasm to check  the MAGIC offset
-		;%if DiskSignature - start <> MAGIC_OFF
-		;	%error "incorrect Disk Signature offset"
-		;%endif
+		%if DiskSignature - start <> MAGIC_OFF
+			%error "incorrect Disk Signature offset"
+		%endif
 		kMbrSignature	db	0x55, 0xAA
 %endif

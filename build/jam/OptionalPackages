@@ -120,7 +120,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 	}
 
 	# other commonly used tools
-	AddHaikuImagePackages bison cdrtools flex jam m4 make mkdepend yasm ;
+	AddHaikuImagePackages bison cdrtools flex jam m4 make mkdepend nasm ;
 }
 
 

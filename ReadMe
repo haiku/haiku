@@ -42,7 +42,7 @@ development tools are included in official releases (e.g. R1 alpha 1) and in the
  * autoheader (part of autoconf, needed for building gcc)
  * automake
  * gawk
- * yasm (http://www.tortall.net/projects/yasm/wiki/Download)
+ * nasm
  * wget
  * (un)zip
  * cdrtools (not genisoimage!)
@@ -76,7 +76,7 @@ The following darwin ports need to be installed:
  * gnuregex
  * gsed
  * cdrtools
- * yasm
+ * nasm
  * wget
  * less
  * mpfr

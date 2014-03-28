@@ -111,7 +111,7 @@ environment variables:
   HAIKU_RANLIB_x86_gcc2       The static library indexer for x86_gcc2. Defaults
                               to "ranlib".
   HAIKU_STRIP_x86_gcc2        The x86_gcc2 strip command. Defaults to "strip".
-  HAIKU_YASM                  The yasm assembler (x86 only).
+  HAIKU_NASM                  The nasm assembler (x86 and x86_64 only).
   HAIKU_CPPFLAGS_<arch>       The preprocessor flags for target architecture
                               <arch>. Defaults to "".
   HAIKU_CCFLAGS_<arch>        The C flags for target architecture <arch>.
@@ -486,7 +486,7 @@ HAIKU_PORTS_CROSS=
 
 HAIKU_PACKAGING_ARCHS=
 
-set_default_value HAIKU_YASM		yasm
+set_default_value HAIKU_NASM		nasm
 
 if sha256sum < /dev/null > /dev/null 2>&1; then
 	HOST_SHA256=sha256sum
