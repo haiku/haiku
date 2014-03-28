@@ -9,7 +9,37 @@
 
 const media_file_format gMuxerTable[] = {
 	{
-		media_file_format::B_WRITABLE
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_WAV_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"audio/ac3",
+		"AC3",
+		"ac3",
+		"ac3",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_VIDEO
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_AVI_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/x-asf",
+		"ASF Movie",
+		"asf",
+		"asf",
+		{ 0 }
+	},
+	{
+		media_file_format::B_WRITABLE | media_file_format::B_READABLE
 			| media_file_format::B_KNOWS_RAW_VIDEO
 			| media_file_format::B_KNOWS_RAW_AUDIO
 			| media_file_format::B_KNOWS_ENCODED_VIDEO
@@ -25,39 +55,113 @@ const media_file_format gMuxerTable[] = {
 		{ 0 }
 	},
 	{
-		media_file_format::B_WRITABLE
+		media_file_format::B_WRITABLE | media_file_format::B_READABLE
 			| media_file_format::B_KNOWS_RAW_VIDEO
 			| media_file_format::B_KNOWS_RAW_AUDIO
 			| media_file_format::B_KNOWS_ENCODED_VIDEO
 			| media_file_format::B_KNOWS_ENCODED_AUDIO,
 		{ 0 },
-		B_MISC_FORMAT_FAMILY,
+		B_QUICKTIME_FORMAT_FAMILY,
 		100,
 		{ 0 },
-		"video/x-msvideo",
-		"DV video format",
+		"video/dv",
+		"DV Movie",
 		"dv",
 		"dv",
 		{ 0 }
 	},
 	{
-		media_file_format::B_WRITABLE
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_WAV_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"audio/x-flac",
+		"Free Lossless Audio",
+		"flac",
+		"flac",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
 			| media_file_format::B_KNOWS_RAW_VIDEO
 			| media_file_format::B_KNOWS_RAW_AUDIO
 			| media_file_format::B_KNOWS_ENCODED_VIDEO
 			| media_file_format::B_KNOWS_ENCODED_AUDIO,
 		{ 0 },
-		B_AVI_FORMAT_FAMILY,
+		B_QUICKTIME_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/x-flv",
+		"Flash video",
+		"flv",
+		"flv",
+		{ 0 }
+	},
+	{
+		media_file_format::B_WRITABLE | media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_VIDEO
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_QUICKTIME_FORMAT_FAMILY,
 		100,
 		{ 0 },
 		"video/x-matroska",
-		"Matroska file format",
+		"Matroska movie",
 		"mkv",
 		"mkv",
 		{ 0 }
 	},
 	{
-		media_file_format::B_WRITABLE
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_VIDEO
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_QUICKTIME_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/x-mov",
+		"Quicktime movie",
+		"mov",
+		"mov",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MPEG_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"audio/mpeg",
+		"MPEG Layer 3",
+		"mp3",
+		"mp3",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_QUICKTIME_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/mp4",
+		"MPEG (Motion Picture Experts Group) format 4",
+		"mp4",
+		"mp4",
+		{ 0 }
+	},
+	{
+		media_file_format::B_WRITABLE | media_file_format::B_READABLE
 			| media_file_format::B_KNOWS_ENCODED_VIDEO
 			| media_file_format::B_KNOWS_ENCODED_AUDIO,
 		{ 0 },
@@ -70,21 +174,107 @@ const media_file_format gMuxerTable[] = {
 		"mpg",
 		{ 0 }
 	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_AVI_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/mpeg",
+		"MPEG TS",
+		"mpegts",
+		"mpegts",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MPEG_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/mpeg",
+		"MPEG",
+		"mpeg",
+		"mpeg",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_QUICKTIME_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/nsv",
+		"NSV (NullSoft Video file)",
+		"nsv",
+		"nsv",
+		{ 0 }
+	},
 // TODO: This one rejects unknown codecs. We probably need to define
 // a media_format_family for it so that Encoders can announce their support
 // for it specifically.
 	{
-		media_file_format::B_WRITABLE
+		media_file_format::B_WRITABLE | media_file_format::B_READABLE
 			| media_file_format::B_KNOWS_ENCODED_VIDEO
 			| media_file_format::B_KNOWS_ENCODED_AUDIO,
 		{ 0 },
 		B_MISC_FORMAT_FAMILY,
 		100,
 		{ 0 },
-		"application/ogg",
+		"audio/ogg",
 		"Ogg (Xiph.Org Foundation)",
 		"ogg",
 		"ogg",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_AVI_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/vnd.rn-realvideo",
+		"RM (RealVideo clip)",
+		"rm",
+		"rm",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_VIDEO
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_QUICKTIME_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"application/x-shockwave-flash",
+		"Shockwave video",
+		"swf",
+		"swf",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MPEG_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/x-vob",
+		"VOB movie",
+		"vob",
+		"vob",
 		{ 0 }
 	},
 	{
@@ -94,7 +284,7 @@ const media_file_format gMuxerTable[] = {
 		B_WAV_FORMAT_FAMILY,
 		100,
 		{ 0 },
-		"audio/x-wav",
+		"audio/wav",
 		"WAV Format",
 		"wav",
 		"wav",

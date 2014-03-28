@@ -1567,7 +1567,7 @@ AVFormatReader::GetFileFormatInfo(media_file_format* mff)
 		return;
 	}
 
-	const DemuxerFormat* format = demuxer_format_for(context->iformat);
+	const media_file_format* format = demuxer_format_for(context->iformat);
 
 	mff->capabilities = media_file_format::B_READABLE
 		| media_file_format::B_KNOWS_ENCODED_VIDEO
@@ -1575,9 +1575,7 @@ AVFormatReader::GetFileFormatInfo(media_file_format* mff)
 		| media_file_format::B_IMPERFECTLY_SEEKABLE;
 
 	if (format != NULL) {
-		// TODO: Check if AVInputFormat has audio only and then use
-		// format->audio_family!
-		mff->family = format->video_family;
+		mff->family = format->family;
 	} else {
 		TRACE("  no DemuxerFormat for AVInputFormat!\n");
 		mff->family = B_MISC_FORMAT_FAMILY;

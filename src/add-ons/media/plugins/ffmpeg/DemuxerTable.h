@@ -9,18 +9,9 @@
 #include <MediaDefs.h>
 
 
-struct DemuxerFormat {
-	const char*				demuxer_name;
-	const char*				pretty_name;
-	const char*				mime_type;
-	media_format_family		audio_family;
-	media_format_family		video_family;
-};
-
-
 struct AVInputFormat;
 
-const DemuxerFormat* demuxer_format_for(AVInputFormat* format);
+const media_file_format* demuxer_format_for(AVInputFormat* format);
 
 
 #endif // DEMUXER_TABLE_H
