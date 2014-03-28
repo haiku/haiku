@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -11,6 +11,8 @@
 
 #include <Autolock.h>
 #include <Catalog.h>
+
+#include "WebAppInterface.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -281,7 +283,10 @@ Model::Model()
 	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
 
 	fShowSourcePackages(false),
-	fShowDevelopPackages(false)
+	fShowDevelopPackages(false),
+
+	fPopulateAllPackagesThread(-1),
+	fStopPopulatingAllPackages(false)
 {
 	// Don't forget to add new categories to this list:
 	fCategories.Add(fCategoryAudio);
@@ -327,6 +332,12 @@ Model::Model()
 }
 
 
+Model::~Model()
+{
+	StopPopulatingAllPackages();
+}
+
+
 PackageList
 Model::CreatePackageList() const
 {
@@ -368,6 +379,7 @@ Model::AddDepot(const DepotInfo& depot)
 void
 Model::Clear()
 {
+	StopPopulatingAllPackages();
 	fDepots.Clear();
 }
 
@@ -518,5 +530,93 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 			);
 		}
 
+	}
+}
+
+
+void
+Model::PopulateAllPackages()
+{
+	StopPopulatingAllPackages();
+
+	fStopPopulatingAllPackages = false;
+
+	fPopulateAllPackagesThread = spawn_thread(&_PopulateAllPackagesEntry,
+		"Package populator", B_NORMAL_PRIORITY, this);
+	if (fPopulateAllPackagesThread >= 0)
+		resume_thread(fPopulateAllPackagesThread);
+}
+
+
+void
+Model::StopPopulatingAllPackages()
+{
+	if (fPopulateAllPackagesThread < 0)
+		return;
+
+	fStopPopulatingAllPackages = true;
+	wait_for_thread(fPopulateAllPackagesThread, NULL);
+	fPopulateAllPackagesThread = -1;
+}
+
+
+int32
+Model::_PopulateAllPackagesEntry(void* cookie)
+{
+	Model* model = static_cast<Model*>(cookie);
+	model->_PopulateAllPackagesThread();
+	return 0;
+}
+
+
+void
+Model::_PopulateAllPackagesThread()
+{
+	int32 depotIndex = 0;
+	int32 packageIndex = 0;
+
+	while (!fStopPopulatingAllPackages) {
+		// Obtain PackageInfoRef while keeping the depot and package lists
+		// locked.
+		PackageInfoRef package;
+		{
+			BAutolock locker(&fLock);
+			
+			if (depotIndex >= fDepots.CountItems())
+				break;
+			const DepotInfo& depot = fDepots.ItemAt(depotIndex);
+
+			const PackageList& packages = depot.Packages();
+			if (packageIndex >= packages.CountItems()) {
+				// Need the next depot
+				packageIndex = 0;
+				depotIndex++;
+				continue;
+			}
+			
+			package = packages.ItemAt(packageIndex);
+			packageIndex++;
+		}
+		
+		if (package.Get() == NULL)
+			continue;
+	
+		_PopulatePackageIcon(package);
+		// TODO: Average user rating. It needs to be shown in the
+		// list view, so without the user clicking the package.
+	}
+}
+
+
+void
+Model::_PopulatePackageIcon(const PackageInfoRef& package)
+{
+	WebAppInterface interface;
+	BMallocIO buffer;
+
+	status_t status = interface.RetrievePackageIcon(package->Title(), &buffer);
+	if (status == B_OK) {
+		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
+		package->SetIcon(bitmapRef);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
@@ -24,6 +24,7 @@ typedef BReference<PackageFilter> PackageFilterRef;
 class Model {
 public:
 								Model();
+	virtual						~Model();
 
 			BLocker*			Lock()
 									{ return &fLock; }
@@ -85,6 +86,15 @@ public:
 
 			void				PopulatePackage(const PackageInfoRef& package,
 									uint32 flags);
+			void				PopulateAllPackages();
+			void				StopPopulatingAllPackages();
+
+private:
+	static	int32				_PopulateAllPackagesEntry(void* cookie);
+			void				_PopulateAllPackagesThread();
+
+			void				_PopulatePackageIcon(
+									const PackageInfoRef& package);
 
 private:
 			BLocker				fLock;
@@ -117,6 +127,9 @@ private:
 
 			bool				fShowSourcePackages;
 			bool				fShowDevelopPackages;
+
+			thread_id			fPopulateAllPackagesThread;
+	volatile bool				fStopPopulatingAllPackages;
 };
 
 

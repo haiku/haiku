@@ -53,6 +53,7 @@ Application HaikuDepot :
 	PackageManager.cpp
 	RatePackageWindow.cpp
 	support.cpp
+	WebAppInterface.cpp
 
 	# package_daemon
 	ProblemWindow.cpp
@@ -61,7 +62,7 @@ Application HaikuDepot :
 	# text view stuff
 	$(textDocumentSources)
 
-	: be package translation libcolumnlistview.a libshared.a
+	: be package netapi translation libcolumnlistview.a libshared.a
 		$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) localestub
 	: HaikuDepot.rdef
 ;
@@ -84,10 +85,4 @@ Application TextDocumentTest :
 	$(textDocumentSources)
 
 	: be translation libshared.a $(TARGET_LIBSUPC++)
-;
-
-Application ConnectionTest :
-	ConnectionTest.cpp
-
-	: be netapi translation libshared.a $(TARGET_LIBSUPC++)
 ;

@@ -580,6 +580,9 @@ MainWindow::_RefreshPackageList()
 		fModel.AddDepot(it->second);
 	}
 
+	// start retrieving package icons and average ratings
+	fModel.PopulateAllPackages();
+
 	// compute the OS package dependencies
 	try {
 		// create the solver
