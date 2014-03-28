@@ -287,7 +287,7 @@ RemotePackageRepository HaikuPorts
 	qtcore_x86-4.8.5.git-4
 	qtcore_x86_devel-4.8.5.git-4
 	quicklaunch-0.9.6-1
-	qupzilla_x86-1.4.x-2
+	qupzilla_x86-1.7.x-1
 	sdl_gfx_x86-2.0.24-1
 	sdl_gfx_x86_devel-2.0.24-1
 	sdl_image_x86-1.2.12-1
