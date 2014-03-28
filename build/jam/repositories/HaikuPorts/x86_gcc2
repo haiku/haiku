@@ -134,6 +134,7 @@ RemotePackageRepository HaikuPorts
 	milkytracker-0.90.86-1
 	mkdepend-1.7-3
 	nano-2.2.6-3
+	nasm-2.11.02-1
 	ncurses-5.9-9
 	ncurses_devel-5.9-9
 	neon-0.29.6-6
@@ -395,6 +396,7 @@ RemotePackageRepository HaikuPorts
 	mkdepend
 	mpg123_x86
 	nano
+	nasm
 	ncurses
 	neon
 	netcat
