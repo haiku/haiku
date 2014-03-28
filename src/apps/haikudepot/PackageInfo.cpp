@@ -26,6 +26,8 @@ SharedBitmap::SharedBitmap(BBitmap* bitmap)
 	:
 	BReferenceable(),
 	fResourceID(-1),
+	fBuffer(NULL),
+	fSize(0),
 	fMimeType()
 {
 	fBitmap[0] = bitmap;
@@ -38,6 +40,8 @@ SharedBitmap::SharedBitmap(int32 resourceID)
 	:
 	BReferenceable(),
 	fResourceID(resourceID),
+	fBuffer(NULL),
+	fSize(0),
 	fMimeType()
 {
 	fBitmap[0] = NULL;
@@ -50,8 +54,27 @@ SharedBitmap::SharedBitmap(const char* mimeType)
 	:
 	BReferenceable(),
 	fResourceID(-1),
+	fBuffer(NULL),
+	fSize(0),
 	fMimeType(mimeType)
 {
+	fBitmap[0] = NULL;
+	fBitmap[1] = NULL;
+	fBitmap[2] = NULL;
+}
+
+
+SharedBitmap::SharedBitmap(const BMallocIO& data)
+	:
+	BReferenceable(),
+	fResourceID(-1),
+	fBuffer(new(std::nothrow) uint8[data.BufferLength()]),
+	fSize(data.BufferLength()),
+	fMimeType()
+{
+	if (fBuffer != NULL)
+		memcpy(fBuffer, data.Buffer(), fSize);
+
 	fBitmap[0] = NULL;
 	fBitmap[1] = NULL;
 	fBitmap[2] = NULL;
@@ -63,13 +86,14 @@ SharedBitmap::~SharedBitmap()
 	delete fBitmap[0];
 	delete fBitmap[1];
 	delete fBitmap[2];
+	delete[] fBuffer;
 }
 
 
 const BBitmap*
 SharedBitmap::Bitmap(Size which)
 {
-	if (fResourceID == -1 && fMimeType.Length() == 0)
+	if (fResourceID == -1 && fMimeType.Length() == 0 && fBuffer == NULL)
 		return fBitmap[0];
 
 	int32 index = 0;
@@ -93,6 +117,8 @@ SharedBitmap::Bitmap(Size which)
 	if (fBitmap[index] == NULL) {
 		if (fResourceID >= 0)
 			fBitmap[index] = _CreateBitmapFromResource(size);
+		else if (fBuffer != NULL)
+			fBitmap[index] = _CreateBitmapFromBuffer(size);
 		else if (fMimeType.Length() > 0)
 			fBitmap[index] = _CreateBitmapFromMimeType(size);
 	}
@@ -112,45 +138,26 @@ SharedBitmap::_CreateBitmapFromResource(int32 size) const
 	size_t dataSize;
 	const void* data = resources.LoadResource(B_VECTOR_ICON_TYPE, fResourceID,
 		&dataSize);
-	if (data != NULL) {
-		BBitmap* bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0,
-			B_RGBA32);
-		status = bitmap->InitCheck();
-		if (status == B_OK) {
-			status = BIconUtils::GetVectorIcon(
-				reinterpret_cast<const uint8*>(data), dataSize, bitmap);
-		};
-
-		if (status != B_OK) {
-			delete bitmap;
-			bitmap = NULL;
-		}
-
-		return bitmap;
-	}
+	if (data != NULL)
+		return _LoadIconFromBuffer(data, dataSize, size);
 
 	data = resources.LoadResource(B_MESSAGE_TYPE, fResourceID, &dataSize);
-	if (data != NULL) {
-		BMemoryIO stream(data, dataSize);
-
-		// Try to read as an archived bitmap.
-		BMessage archive;
-		status = archive.Unflatten(&stream);
-		if (status != B_OK)
-			return NULL;
-
-		BBitmap* bitmap = new BBitmap(&archive);
-
-		status = bitmap->InitCheck();
-		if (status != B_OK) {
-			delete bitmap;
-			bitmap = NULL;
-		}
-
-		return bitmap;
-	}
+	if (data != NULL)
+		return _LoadBitmapFromBuffer(data, dataSize);
 
 	return NULL;
+}
+
+
+BBitmap*
+SharedBitmap::_CreateBitmapFromBuffer(int32 size) const
+{
+	BBitmap* bitmap = _LoadIconFromBuffer(fBuffer, fSize, size);
+	
+	if (bitmap == NULL)
+		bitmap = _LoadBitmapFromBuffer(fBuffer, fSize);
+
+	return bitmap;
 }
 
 
@@ -166,6 +173,50 @@ SharedBitmap::_CreateBitmapFromMimeType(int32 size) const
 	status = bitmap->InitCheck();
 	if (status == B_OK)
 		status = mimeType.GetIcon(bitmap, B_MINI_ICON);
+
+	if (status != B_OK) {
+		delete bitmap;
+		bitmap = NULL;
+	}
+
+	return bitmap;
+}
+
+
+BBitmap*
+SharedBitmap::_LoadBitmapFromBuffer(const void* buffer, size_t size) const
+{
+	BMemoryIO stream(buffer, size);
+
+	// Try to read as an archived bitmap.
+	BMessage archive;
+	status_t status = archive.Unflatten(&stream);
+	if (status != B_OK)
+		return NULL;
+
+	BBitmap* bitmap = new BBitmap(&archive);
+
+	status = bitmap->InitCheck();
+	if (status != B_OK) {
+		delete bitmap;
+		bitmap = NULL;
+	}
+
+	return bitmap;
+}
+
+
+BBitmap*
+SharedBitmap::_LoadIconFromBuffer(const void* data, size_t dataSize,
+	int32 size) const
+{
+	BBitmap* bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0,
+		B_RGBA32);
+	status_t status = bitmap->InitCheck();
+	if (status == B_OK) {
+		status = BIconUtils::GetVectorIcon(
+			reinterpret_cast<const uint8*>(data), dataSize, bitmap);
+	};
 
 	if (status != B_OK) {
 		delete bitmap;
