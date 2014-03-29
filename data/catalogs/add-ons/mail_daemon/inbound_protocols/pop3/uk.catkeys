@@ -6,9 +6,9 @@ Sending username…	pop3		Відправка імені користувача�
 Getting mailbox size…	pop3		Отримання розміру скриньки…
 Connecting to POP3 server…	pop3		Підключення до POP3 сервера…
 Getting UniqueIDs…	pop3		Отримання особистого ID…
-: No reply.\n	pop3		Без відповіді.\n
-: Connection refused or host not found	pop3		Під'єднання невдале або сервер не знайдено
-Error while connecting to server %serv	pop3		Помилка при під'єднанні до сервера  %serv
+: No reply.\n	pop3		: Без відповіді.\n
+: Connection refused or host not found	pop3		: Під'єднання невдале або сервер не знайдено
+Error while connecting to server %serv	pop3		Помилка при під'єднанні до сервера %serv
 Error while authenticating user %user	pop3		Помилка ідентифікації користувача %user
 Destination:	ConfigView		Ціль:
 APOP	ConfigView		APOP

@@ -1,11 +1,11 @@
 1	ukrainian	x-vnd.Haiku-JPEGTranslator	965709535
 Output quality	JPEGTranslator		Вихідна якість
 JPEG images	JPEGTranslator		Зображення JPEG
-Prevent colors 'washing out'	JPEGTranslator		попереджати втрату 'насичення' кольорів
+Prevent colors 'washing out'	JPEGTranslator		Попереджати втрату 'насичення' кольорів
 JPEG Library Error: %s\n	be_jerror		Помилка бібліотеки JPEG: %s\n
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Використовувати код CMYK 0 для 100% охоплення чорнила
 About	JPEGTranslator		Про
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\n На основі бібліотеки IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nз заплаткою для \"lossless\" кодування Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nЗ деякою зміною передачі кольору від Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\n На основі бібліотеки IJG ©   1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nз заплаткою для \"lossless\" кодування Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nЗ деякою зміною передачі кольору від Magnus Hellman\n\thttp://www.bebits.com/app/802\n
 Low	JPEGTranslator		Низьке
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Зробити файл меньшим (можлива втрата якості)
 None	JPEGTranslator		Жоден

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3598332680
+1	hungarian	x-vnd.Haiku-HaikuDepot	3398060443
 Name	PackageListView		Név
 Installed packages	Model		Telepített csomagok
 User modified packages	Model		Módosított csomagok
@@ -18,6 +18,7 @@ Uninstall	PackageManager		Eltávolítás
 An error occurred while initializing the package manager: %message%	MainWindow		Hiba történt a csomagkezelő indításakor: %message%
 Close	PackageManager		Bezárás
 Status	PackageListView		Állapot
+Available packages	Model		Elérhető csomagok
 Your rating	System name		Saját értékelés
 Development	Model		Fejlesztés
 Fatal error	PackageManager		Végzetes hiba
@@ -48,6 +49,7 @@ Close	MainWindow		Bezárás
 Video	Model		Videó
 An error occurred while refreshing the repository: %error%	MainWindow		Hiba történt a raktár frissítése közben: %error%
 All packages	FilterView		Összes csomag
+Pending…	PackageListView		Folyamatban…
 Depot	FilterView		Raktár
 Uninstalled	PackageListView		Eltávolítva
 Unknown	PackageListView		Ismeretlen

@@ -31,5 +31,5 @@ Close	LaunchBox		Закрити
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Призупинено команду 'відкрити папку' для Tracker.\n\nПомилка:
 You can drag an icon here.	LaunchBox		Ви можете перемістити іконки сюди.
 Clone	LaunchBox		Клонувати
-launch popup	LaunchBox		Увімкнути спливаючі повідомлення
+launch popup	LaunchBox		увімкнути спливаючі повідомлення
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсно закрити цю панель?\n(Вона не збережеться.)

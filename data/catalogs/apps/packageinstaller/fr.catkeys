@@ -12,7 +12,7 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		Erreur lors de l'installation du paquet\n
 Disclaimer	PackageTextViewer		Mise en garde
 %.1f GiB	PackageView		%.1f Gio
-%name% (%size% free)	PackageView		%name% (%size% libre)
+%name% (%size% free)	PackageView		%name% (%size% libres)
 The installation of the package has been aborted.	PackageView		L'installation du paquet a été abandonnée.
 Done	PackageInstall		Terminé
 All existing files will be replaced?	PackageView		Voulez-vous remplacer tous les fichiers existants ?

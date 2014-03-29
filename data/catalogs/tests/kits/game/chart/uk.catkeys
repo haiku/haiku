@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ChartDemo	557376150
+1	ukrainian	x-vnd.Haiku-ChartDemo	986636897
 Slow rotation	ChartWindow		Повільне обертання
 Pink	ChartWindow		Рожевий
 Comet	ChartWindow		Комета
@@ -9,6 +9,7 @@ Blue	ChartWindow		Блакитний
 Colors	ChartWindow		Кольори
 Novas	ChartWindow		Нові зорі
 LineArray	ChartWindow		Масив ліній
+ 0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s (логарифмічна шкала)
 Free motion	ChartWindow		Вільний рух
 (high) 100% 	ChartWindow		(високий) 100%
 Green	ChartWindow		Зелений
@@ -20,6 +21,7 @@ Chaos	ChartWindow		Хаос
 Full screen	ChartWindow		На весь екран
 Spiral	ChartWindow		Спіраль
 Slow motion	ChartWindow		Повільний рух
+ 5% (low)	ChartWindow		 5% (низька)
 Fast motion	ChartWindow		Швидкий рух
 Special	ChartWindow		Особливий
 Status	ChartWindow		Стан

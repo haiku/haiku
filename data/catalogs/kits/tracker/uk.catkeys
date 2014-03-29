@@ -44,7 +44,7 @@ before	FindPanel		до
 Error emptying Trash	FSUtils		Помилка спустошення кошика!
 On	FindPanel		На
 MiB	WidgetAttributeText		MiB
-greater than	FindPanel		Більше ніж
+greater than	FindPanel		більше ніж
 Delete	PoseView		Видалити
 Select all	ContainerWindow		Вибрати все
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Прикро, атрибут 'Символ' не може містити багатобайтовий знак.
@@ -59,7 +59,7 @@ Link to:	InfoWindow		Посилання на:
 Location	ContainerWindow		Розташування
 Location	QueryPoseView		Розташування
 config	B_USER_CONFIG_DIRECTORY		config
-apps	B_APPS_DIRECTORY		Програми
+apps	B_APPS_DIRECTORY		програми
 Icon view	ContainerWindow		У вигляді іконок
 Size	QueryPoseView		Розмір
 Emptying Trash… 	StatusWindow		Зпорожнення Кошика…
@@ -134,7 +134,7 @@ KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Помилка %error при завантаженні додатку %name.
 Defaults	TrackerSettingsWindow		По замовчуванню
 %num items	CountView		%num елементів
-Mini icon view	ContainerWindow		у вигляді міні іконок
+Mini icon view	ContainerWindow		У вигляді міні іконок
 Clean up	VolumeWindow		Очистити
 OK	TrackerInitialState		Гаразд
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Не вдалося відкрити \"%name\". Файл помилково позначений як виконуваний.
@@ -258,7 +258,7 @@ Only the boot disk	AutoMounterSettings		Тільки загрузочний ди
 If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Якщо ви %ifYouDoAction папку config, %osName може почати працювати некоректно!\n\nВи впевнені, що бажаєте зробити це?
 Unmount	ContainerWindow		Відмонтувати
 Copy layout	ContainerWindow		Копіювати макет
-label too long	PoseView		Мітка занадто довга
+label too long	PoseView		мітка занадто довга
 Finish: %time	StatusWindow		Залишилось: %time
 Cancel	Tracker		Відмінити
 Sorry, you cannot edit that attribute.	WidgetAttributeText		Вибачти, ви не можете змінювати ці атрибути.
@@ -318,7 +318,7 @@ Query name:	FindPanel		Ім'я запиту:
 Permissions	ContainerWindow		Дозволи
 96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		переміщення
-Identify	InfoWindow		визначити
+Identify	InfoWindow		Визначити
 Recent folders	ContainerWindow		Недавні папки
 rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	перейменувати
 Close all	ContainerWindow		Закрити все
@@ -334,7 +334,7 @@ Clean up	ContainerWindow		Очистити
 after	FindPanel		після
 Select…	QueryContainerWindow		Вибрати…
 More options	FindPanel		Більше опцій
-link	FSUtils	filename link	Посилання
+link	FSUtils	filename link	посилання
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		В %func \nfind_directory() призупинено. \nПричина: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Зазначене імя є недопустимим. Будь ласка виберіть інше імя.
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Ви не можете перемістити папку в себе або в будь яку з її вкладених папок.
@@ -349,7 +349,7 @@ New folder %ld	FSUtils		Нова папка %ld
 All BeOS disks	AutoMounterSettings		Всі диски BeOS
 Used space color	SettingsView		Колір області використання
 Sorry, could not create a new folder.	FSUtils		Вибачте, не вдалося створити нову папку
-multiple disks	FindPanel		Помножити диски
+multiple disks	FindPanel		помножити диски
 Done	AutoMounterSettings		Готово
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ви повинні кинути елемент на будь-яку з іконок диску ву вікні\"Disks\".
 Untitled clipping	PoseView		Неназвана вирізка
@@ -419,7 +419,7 @@ That name is already taken. Please type another one.	WidgetAttributeText		Ім'�
 Close	QueryContainerWindow		Закрити
 Formula %formula	FindPanel	FindResultTitle	Формула %formula
 Kind:	InfoWindow		Вид:
-starts with	FindPanel		Почати з
+starts with	FindPanel		почати з
 Increase size	ContainerWindow		Збільшити розмір
 is	FindPanel		є
 Attributes	ContainerWindow		Атрибути

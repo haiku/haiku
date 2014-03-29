@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	259771815
+1	japanese	x-vnd.Haiku-HaikuDepot	59499578
 Name	PackageListView		名前
 Installed packages	Model		インストール済パッケージ
 User modified packages	Model		ユーザーが変更したパッケージ
@@ -17,6 +17,7 @@ Uninstall	PackageManager		アンインストール
 An error occurred while initializing the package manager: %message%	MainWindow		パッケージマネジャーの初期化中にエラーが発生しました: %message%
 Close	PackageManager		閉じる
 Status	PackageListView		状態
+Available packages	Model		使用可能なパッケージ
 Your rating	System name		あなたの評価
 Development	Model		開発
 Fatal error	PackageManager		致命的なエラー
@@ -47,6 +48,7 @@ Close	MainWindow		閉じる
 Video	Model		ビデオ
 An error occurred while refreshing the repository: %error%	MainWindow		リポジトリの更新中にエラーが発生しました: %error%
 All packages	FilterView		すべてのパッケージ
+Pending…	PackageListView		保留中…
 Depot	FilterView		Depot
 Uninstalled	PackageListView		アンインストール済み
 Unknown	PackageListView		不明

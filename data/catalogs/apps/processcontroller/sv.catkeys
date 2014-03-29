@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ProcessController	1848752768
+1	swedish	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		Minnesanvändning
 Kill this team!	ProcessController		Avsluta tråden!
 Idle priority	ProcessController		Overksam prioritet
@@ -7,6 +7,7 @@ Custom priority	ProcessController		Annan prioritet
 This team is already gone…	ProcessController		Processen är redan avslutad...
 Error saving file	ProcessController		Fel vid sparning av fil
 Real-time priority	ProcessController		Realtidsprioritet
+Power saving	ProcessController		Strömbesparing
 Your setting file could not be saved!\n(%s)	ProcessController		Inställningsfilen kunde inte sparas!\n(%s)
 What do you want to do with the team \"%s\"?	ProcessController		Vad vill du göra med tråden \"%s\"?
 This thread is already gone…	ProcessController		Tråden är redan avslutad
@@ -36,6 +37,7 @@ Quit an application	ProcessController		Avsluta ett program
 Install in Deskbar	ProcessController		Installera i Deskbar
 Threads and CPU usage	ProcessController		Tråd och CPU användning
 Urgent display priority	ProcessController		Brådskande visningsprioritet
+Low latency	ProcessController		Låg latens
 OK	ProcessController		OK
 Damned!	ProcessController		Attans!
 Debug this team!	ProcessController		Felsök tråden!

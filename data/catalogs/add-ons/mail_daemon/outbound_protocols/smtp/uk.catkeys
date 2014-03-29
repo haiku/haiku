@@ -3,9 +3,9 @@ SMTP server:	ConfigView		SMTP-сервер:
 STARTTLS	ConfigView		STARTTLS
 Error while logging in to %serv	smtp		Помилка при вході на %serv
 Unencrypted	ConfigView		Без шифрування
-. The server says:\n	smtp		Сервер відповідає:\n
+. The server says:\n	smtp		. Сервер відповідає:\n
 ESMTP	ConfigView		ESMTP
-Connecting to server…	smtp		З'єднання з сервером...
+Connecting to server…	smtp		З'єднання з сервером…
 Error while opening connection to %serv	smtp		Помилка відкриття з'єднання з %serv
 POP3 authentication failed. The server said:\n	smtp		Аутентифікація POP3 не вдалась. Сервер повідомив:\n
 Destination:	ConfigView		Призначення:

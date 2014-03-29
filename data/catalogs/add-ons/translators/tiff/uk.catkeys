@@ -11,6 +11,6 @@ TIFF image translator	TIFFTranslator		Перетворювач зображен�
 RLE (Packbits)	TIFFView		RLE (Packbits)
 TIFF Settings	TIFFMain		Настройки TIFF
 Use compression:	TIFFView		Використати зтиск:
-identify_tiff_header: invalid document index\n	TIFFTranslator		Визначення заголовка tiff: неправильний показник документу\n
+identify_tiff_header: invalid document index\n	TIFFTranslator		визначення заголовка tiff: неправильний показник документу\n
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
 Version %d.%d.%d %s	TIFFView		Версія %d.%d.%d %s

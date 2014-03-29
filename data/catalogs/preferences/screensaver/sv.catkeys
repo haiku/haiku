@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ScreenSaver	1801423325
+1	swedish	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Kunde inte läsa in skärmsläckaren
 30 seconds	ScreenSaver		30 sekunder
 Start screensaver	ScreenSaver		Starta skärmsläckare
@@ -24,4 +24,5 @@ Blackness	ScreenSaver		Svärta
 Use custom password	ScreenSaver		Använd anpassat lösenord
 Done	ScreenSaver		Klar
 Confirm password:	ScreenSaver		Bekräfta lösenord:
+No preview available	PreviewView		Ingen förhandsvisning tillgänglig
 Use network password	ScreenSaver		Använd nätverkslösenordet

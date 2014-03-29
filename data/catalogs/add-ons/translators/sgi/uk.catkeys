@@ -8,6 +8,6 @@ SGI image translator	SGITranslator		Перетворювач зображень 
 SGI image	SGITranslator		Зображення SGI
 RLE	SGIView		RLE
 SGI Settings	SGIMain		Настройки SGI
-\n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nНа основі плагіна GIMP SGI v1.5:\n
+\n\nbased on GIMP SGI plugin v1.5:\n	SGIView		\n\nна основі плагіна GIMP SGI v1.5:\n
 written by:\n	SGIView		автор:\n
 SGI image translator	SGIView		Перетворювач зображень SGI

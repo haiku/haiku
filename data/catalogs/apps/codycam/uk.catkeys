@@ -79,7 +79,7 @@ Cannot create a video window	CodyCam		Неможливо створити вік
 Every 10 minutes	CodyCam		Кожні 10 хвилин
 Cannot start the video source	CodyCam		Неможливо запустити джерело відео
 Cannot start the video window	CodyCam		Неможливо запустити вікно відео
-password expected	CodyCam		Очікується пароль
+password expected	CodyCam		очікується пароль
 reply: %d, %d\n	FtpClient		відповідь: %d, %d\n
 Cannot find the media roster	CodyCam		Неможливо знайти медіа ростер
 Every 4 hours	CodyCam		Кожні 4 години
