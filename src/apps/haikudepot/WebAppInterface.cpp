@@ -20,7 +20,7 @@
 
 class ProtocolListener : public BUrlProtocolListener {
 public:
-	ProtocolListener::ProtocolListener()
+	ProtocolListener()
 		:
 		fDownloadIO(NULL)
 	{

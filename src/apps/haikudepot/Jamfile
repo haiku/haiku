@@ -62,7 +62,7 @@ Application HaikuDepot :
 	# text view stuff
 	$(textDocumentSources)
 
-	: be package netapi translation libcolumnlistview.a libshared.a
+	: be package bnetapi translation libcolumnlistview.a libshared.a
 		$(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) localestub
 	: HaikuDepot.rdef
 ;
