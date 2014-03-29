@@ -10,19 +10,19 @@ Application writembr :
 
 # Assemble the MBR code, and convert it into a header file
 
-rule AssembleYasmBin object : source
+rule AssembleNasmBin object : source
 {
 	SEARCH on $(source) = $(SUBDIR) ;
 	MakeLocateDebug $(object) ;
 	Depends $(object) : $(source) ;
 }
 
-actions AssembleYasmBin
+actions AssembleNasmBin
 {
-	$(HAIKU_YASM) -f bin -O5 -o $(1) $(2)
+	$(HAIKU_NASM) -f bin -O5 -o $(1) $(2)
 }
 
-AssembleYasmBin [ FGristFiles mbr.bin ] : mbr.S ;
+AssembleNasmBin [ FGristFiles mbr.bin ] : mbr.S ;
 
 DataFileToSourceFile [ FGristFiles MBR.h ] : [ FGristFiles mbr.bin ]
 	: kMBR : kMBRSize ;

@@ -14,7 +14,7 @@ rule BuildAnybootMBR binary : source {
 
 actions BuildAnybootMBR1 {
 	$(RM) $(1)
-	$(HAIKU_YASM) -f bin $(MBR_SOURCE) -O5 -o $(1)
+	$(HAIKU_NASM) -f bin $(MBR_SOURCE) -O5 -o $(1)
 }
 
 rule BuildAnybootImage anybootImage : mbrPart : isoPart : imageFile {

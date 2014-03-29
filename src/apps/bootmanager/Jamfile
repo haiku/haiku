@@ -31,19 +31,19 @@ DoCatalogs BootManager : x-vnd.Haiku-BootManager : $(cataloguedSources) ;
 # Assemble the boot loader, and convert it into a header file
 
 # TODO: should be merged with the AssembleNasm rule
-rule AssembleYasmBin object : source
+rule AssembleNasmBin object : source
 {
 	SEARCH on $(source) = $(SUBDIR) ;
 	MakeLocateDebug $(object) ;
 	Depends $(object) : $(source) ;
 }
 
-actions AssembleYasmBin
+actions AssembleNasmBin
 {
-	$(HAIKU_YASM) -f bin -o $(1) $(2)
+	$(HAIKU_NASM) -f bin -o $(1) $(2)
 }
 
-AssembleYasmBin [ FGristFiles bootman.bin ] : bootman.S ;
+AssembleNasmBin [ FGristFiles bootman.bin ] : bootman.S ;
 
 DataFileToSourceFile [ FGristFiles BootLoader.h ] : [ FGristFiles bootman.bin ]
 	: kBootLoader : kBootLoaderSize ;
