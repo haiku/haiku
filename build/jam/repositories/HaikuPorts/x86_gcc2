@@ -30,8 +30,8 @@ RemotePackageRepository HaikuPorts
 	cdrtools_devel-3.01~a18-1
 	cmake-2.8.11.2-7
 	ctags-5.8-3
-	curl-7.26.0-5
-	curl_devel-7.26.0-5
+	curl-7.35.0-1
+	curl_devel-7.35.0-1
 	cvs-1.12.13.1-6
 	distcc-3.1-2
 	doxygen-1.6.3-3
@@ -150,7 +150,8 @@ RemotePackageRepository HaikuPorts
 	physfs_devel-2.0.3-1
 	pkgconfig-0.27.1-1
 	python-2.6.8-6
-	readline-6.2-3
+	readline-6.3-1
+	readline_devel-6.3-1
 	rsync-3.1.0-1
 	ruby-1.9.1-2
 	ruby_devel-1.9.1-2
@@ -176,11 +177,13 @@ RemotePackageRepository HaikuPorts
 	smpeg_devel-0.4.5-1
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.0.2-1
-	sqlite_devel-3.8.0.2-1
+	sqlite-3.8.4.1-1
+	sqlite_devel-3.8.4.1-1
 	subversion-1.6.18-6
 	subversion_devel-1.6.18-6
 	sum_it-0.2beta-1
+	taglib-1.7.2-1
+	taglib_devel-1.7.2-1
 	tar-1.26-6
 	texinfo-4.13a-7
 	ubertuber-0.9.10-1
@@ -196,6 +199,30 @@ RemotePackageRepository HaikuPorts
 
 	# secondary architecture (x86)
 	binutils_x86-2.23.2_2013_04_09-1
+	boost_x86-1.55.0-3
+	boost_x86_atomic-1.55.0-3
+	boost_x86_chrono-1.55.0-3
+	boost_x86_context-1.55.0-3
+	boost_x86_coroutine-1.55.0-3
+	boost_x86_date_time-1.55.0-3
+	boost_x86_devel-1.55.0-3
+	boost_x86_filesystem-1.55.0-3
+	boost_x86_graph-1.55.0-3
+	boost_x86_iostreams-1.55.0-3
+	boost_x86_locale-1.55.0-3
+	boost_x86_log-1.55.0-3
+	boost_x86_math-1.55.0-3
+	boost_x86_program_options-1.55.0-3
+	boost_x86_random-1.55.0-3
+	boost_x86_regex-1.55.0-3
+	boost_x86_serialization-1.55.0-3
+	boost_x86_signals-1.55.0-3
+	boost_x86_system-1.55.0-3
+	boost_x86_test-1.55.0-3
+	boost_x86_thread-1.55.0-3
+	boost_x86_timer-1.55.0-3
+	boost_x86_unit_test_framework-1.55.0-3
+	boost_x86_wave-1.55.0-3
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
 	curl_x86-7.26.0-5
@@ -323,6 +350,7 @@ RemotePackageRepository HaikuPorts
 	binutils
 	binutils_x86
 	bison
+	boost_x86
 	bzip2
 	caya
 	cdrtools
@@ -432,6 +460,7 @@ RemotePackageRepository HaikuPorts
 	sqlite_x86
 	subversion
 	sum_it
+	taglib
 	tar
 	texi2html
 	texinfo
