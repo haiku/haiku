@@ -15,7 +15,7 @@ RemotePackageRepository HaikuPorts
 	apr_devel-1.4.6-7
 	apr_util-1.4.1-4
 	apr_util_devel-1.4.1-4
-	autoconf-2.69-5
+	autoconf-2.69-6
 	automake-1.13.1-4
 	bepdf-1.1.1~beta5_2013_04_28-2
 	binutils-2.23.2_2013_04_09-2
@@ -27,8 +27,8 @@ RemotePackageRepository HaikuPorts
 	cmake-2.8.11.2-7
 	cpio-2.10-1
 	ctags-5.8-3
-	curl-7.26.0-5
-	curl_devel-7.26.0-5
+	curl-7.35.0-1
+	curl_devel-7.35.0-1
 	cvs-1.12.13.1-6
 	doxygen-1.6.3-4
 	expat-2.0.1-7
@@ -102,14 +102,15 @@ RemotePackageRepository HaikuPorts
 	mesa_swpipe-10.0.2-3
 	mkdepend-1.7-3
 	nano-2.2.6-3
+	nasm-2.11.02-1
 	ncurses-5.9-10
 	ncurses_devel-5.9-10
 	neon-0.29.6-7
 	neon_devel-0.29.6-7
 	openjdk-1.7_2013_11_08-2
 	openssh-6.0p1-8
-	openssl-1.0.0j-4
-	openssl_devel-1.0.0j-4
+	openssl-1.0.0j-5
+	openssl_devel-1.0.0j-5
 	p7zip-9.20.1-4
 	pe-2.4.3_hg615-2
 	perl-5.18.1-1
@@ -243,6 +244,7 @@ RemotePackageRepository HaikuPorts
 	mesa_x86_gcc2
 	mkdepend
 	nano
+	nasm
 	ncurses
 	neon
 	openssh
