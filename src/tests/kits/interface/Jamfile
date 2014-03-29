@@ -68,6 +68,11 @@ SimpleTest ScrollViewTest :
 	: be $(TARGET_LIBSUPC++)
 	;
 
+SimpleTest AlertTest :
+	AlertTest.cpp
+	: be $(TARGET_LIBSUPC++)
+;
+
 SimpleTest ChannelSliderTest :
 	ChannelSliderTest.cpp
 	ChannelSlider.cpp
