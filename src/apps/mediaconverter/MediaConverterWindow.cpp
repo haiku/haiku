@@ -701,6 +701,8 @@ MediaConverterWindow::BuildFormatMenu()
 	int32 cookie = 0;
 	FileFormatMenuItem* ff_item;
 	while (get_next_file_format(&cookie, &mfi) == B_OK) {
+		if ((mfi.capabilities & media_file_format::B_WRITABLE) == 0)
+			continue;
 		ff_item = new FileFormatMenuItem(&mfi);
 		menu->AddItem(ff_item);
 	}
