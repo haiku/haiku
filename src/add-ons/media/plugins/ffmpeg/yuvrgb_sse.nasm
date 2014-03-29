@@ -134,17 +134,17 @@ Const128	dw	128
 
 ; Packed Convert
 ; void Convert_YUV422_RGBA32_SSE(void *fromPtr, void *toPtr, int width)
-width    equ	ebp+16
-toPtr    equ	ebp+12
-fromPtr  equ	ebp+8
+%define width   ebp+16
+%define toPtr   ebp+12
+%define fromPtr ebp+8
 
 ; Planar Convert
 ; void Convert_YUV420P_RGBA32_SSE(void *fromYPtr, void *fromUPtr, void *fromVPtr, void *toPtr, int width)
-width1    equ	ebp+24
-toPtr1    equ	ebp+20
-fromVPtr  equ	ebp+16
-fromUPtr  equ	ebp+12
-fromYPtr  equ	ebp+8
+%define width1   ebp+24
+%define toPtr1   ebp+20
+%define fromVPtr ebp+16
+%define fromUPtr ebp+12
+%define fromYPtr ebp+8
 
 SECTION .text align=16
 
