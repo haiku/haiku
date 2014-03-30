@@ -523,7 +523,7 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		}
 	} else {
 		// Do the pixel center offset here
-		if (fmodf(fPenSize, 2.0) != 0.0) {
+		if (!fSubpixelPrecise && fmodf(fPenSize, 2.0) != 0.0) {
 			_Align(&a, true);
 			_Align(&b, true);
 		}
@@ -531,7 +531,7 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		fPath.move_to(a.x, a.y);
 		fPath.line_to(b.x, b.y);
 
-		if (fPenSize == 1.0f) {
+		if (!fSubpixelPrecise && fPenSize == 1.0f) {
 			// Tweak ends to "include" the pixel at the index,
 			// we need to do this in order to produce results like R5,
 			// where coordinates were inclusive
@@ -1516,7 +1516,7 @@ Painter::_Align(float coord, bool round, bool centerOffset) const
 {
 	// rounding
 	if (round)
-		coord = roundf(coord);
+		coord = (int32)coord;
 
 	// This code is supposed to move coordinates to the center of pixels,
 	// as AGG considers (0,0) to be the "upper left corner" of a pixel,
