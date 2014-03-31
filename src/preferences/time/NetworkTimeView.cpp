@@ -506,6 +506,8 @@ NetworkTimeView::_UpdateServerList()
 
 	fServerListView->Select(fSettings.GetDefaultServer());
 	fServerListView->ScrollToSelection();
+
+	fRemoveButton->SetEnabled(fServerListView->CountItems() > 0);
 }
 
 
