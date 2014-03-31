@@ -296,6 +296,8 @@ RemotePackageRepository HaikuPorts
 	libxslt_x86_devel-1.1.28-2
 	luajit_x86-2.0.2-2
 	luajit_x86_devel-2.0.2-2
+	lzo_x86-2.06-1
+	lzo_x86_devel-2.06-1
 	mesa_x86-10.0.2-2
 	mesa_x86_devel-10.0.2-2
 	mesa_x86_swrast-10.0.2-2
@@ -414,6 +416,7 @@ RemotePackageRepository HaikuPorts
 	libxslt_x86
 	luajit_x86
 	lua
+	lzo_x86
 	m4
 	make
 	man
