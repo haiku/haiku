@@ -4,9 +4,14 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders media ;
 
-Addon raw_decoder :
-	AudioConversion.cpp
-	RawDecoderPlugin.cpp
-	: be libmedia.so $(TARGET_LIBSUPC++)
-;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		Addon [ MultiArchDefaultGristFiles raw_decoder ] :
+			AudioConversion.cpp
+			RawDecoderPlugin.cpp
+			: be media $(TARGET_LIBSUPC++)
+		;
+	}
+}
 

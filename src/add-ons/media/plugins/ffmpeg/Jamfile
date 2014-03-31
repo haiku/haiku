@@ -32,29 +32,34 @@ if $(TARGET_ARCH) != x86_64 {
 	;
 }
 
-UseBuildFeatureHeaders ffmpeg ;
-Includes [ FGristFiles $(sources) ]
-	: [ BuildFeatureAttribute ffmpeg : headers ] ;
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		UseBuildFeatureHeaders ffmpeg ;
+		Includes [ FGristFiles $(sources) ]
+			: [ BuildFeatureAttribute ffmpeg : headers ] ;
 
-local ffmpegHeaders = [ BuildFeatureAttribute ffmpeg : headers : path ] ;
-UseHeaders $(ffmpegHeaders) ;
-UseHeaders [ FDirName $(ffmpegHeaders) libavcodec ] ;
-UseHeaders [ FDirName $(ffmpegHeaders) libavdevice ] ;
-UseHeaders [ FDirName $(ffmpegHeaders) libavfilter ] ;
-UseHeaders [ FDirName $(ffmpegHeaders) libavformat ] ;
-UseHeaders [ FDirName $(ffmpegHeaders) libavutil ] ;
-UseHeaders [ FDirName $(ffmpegHeaders) libswscale ] ;
+		local ffmpegHeaders = [ BuildFeatureAttribute ffmpeg : headers : path ] ;
+		UseHeaders $(ffmpegHeaders) ;
+		UseHeaders [ FDirName $(ffmpegHeaders) libavcodec ] ;
+		UseHeaders [ FDirName $(ffmpegHeaders) libavdevice ] ;
+		UseHeaders [ FDirName $(ffmpegHeaders) libavfilter ] ;
+		UseHeaders [ FDirName $(ffmpegHeaders) libavformat ] ;
+		UseHeaders [ FDirName $(ffmpegHeaders) libavutil ] ;
+		UseHeaders [ FDirName $(ffmpegHeaders) libswscale ] ;
 
-Addon ffmpeg :
-	$(sources)
-	:
+		Addon [ MultiArchDefaultGristFiles ffmpeg ] :
+			$(sources)
+			:
 
-	# FFmpeg libraries (from FFmpeg optional package):
-	[ BuildFeatureAttribute ffmpeg : libraries ]
+			# FFmpeg libraries (from FFmpeg optional package):
+			[ BuildFeatureAttribute ffmpeg : libraries ]
 
-	be
-	media
-	$(TARGET_LIBSUPC++)
-;
+			be
+			media
+			$(TARGET_LIBSUPC++)
+		;
+	}
+}
 
 
