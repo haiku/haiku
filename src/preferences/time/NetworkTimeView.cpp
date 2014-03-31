@@ -295,21 +295,18 @@ NetworkTimeView::MessageReceived(BMessage* message)
 		case kMsgServerEdited:
 		{
 			rgb_color defaultColor = ui_color(B_CONTROL_TEXT_COLOR);
-			rgb_color red = {255, 0, 0};
-			int32 length = fServerTextControl->TextView()->TextLength();
-
-			if (_IsValidServerName(fServerTextControl->TextView()->Text())) {
-				fServerTextControl->TextView()->SetFontAndColor(0, length, NULL,
-					0, &defaultColor);
-			} else {
-				fServerTextControl->TextView()->SetFontAndColor(0, length, NULL,
-					0, &red);
-			}
+			rgb_color invalid = ui_color(B_FAILURE_COLOR);
+			bool isValidServerName
+				= _IsValidServerName(fServerTextControl->Text());
+			fServerTextControl->TextView()->SetFontAndColor(0,
+				fServerTextControl->TextView()->TextLength(), NULL, 0,
+				isValidServerName ? &defaultColor : &invalid);
+			fAddButton->SetEnabled(isValidServerName);
 			break;
 		}
 
 		case kMsgAddServer:
-			if (!_IsValidServerName(fServerTextControl->TextView()->Text()))
+			if (!_IsValidServerName(fServerTextControl->Text()))
 				break;
 
 			fSettings.AddServer(fServerTextControl->Text());
@@ -418,6 +415,7 @@ NetworkTimeView::AttachedToWindow()
 	fServerTextControl->SetTarget(this);
 	fServerListView->SetTarget(this);
 	fAddButton->SetTarget(this);
+	fAddButton->SetEnabled(false);
 	fRemoveButton->SetTarget(this);
 	fResetButton->SetTarget(this);
 	fTryAllServersCheckBox->SetTarget(this);
@@ -521,9 +519,9 @@ NetworkTimeView::_DoneSynchronizing()
 
 
 bool
-NetworkTimeView::_IsValidServerName(const char * serverName)
+NetworkTimeView::_IsValidServerName(const char* serverName)
 {
-	if (serverName[0] == '\0')
+	if (serverName == NULL || *serverName == '\0')
 		return false;
 
 	for (int32 i = 0; serverName[i] != '\0'; i++) {

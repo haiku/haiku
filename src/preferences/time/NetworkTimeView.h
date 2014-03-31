@@ -93,7 +93,7 @@ private:
 			void			_InitView();
 			void			_UpdateServerList();
 			void			_DoneSynchronizing();
-			bool			_IsValidServerName(const char * serverName);
+			bool			_IsValidServerName(const char* serverName);
 
 			Settings		fSettings;
 
