@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Architecture.h>
 #include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -54,14 +55,6 @@ public:
 
 private:
 	image_id	fImage;
-};
-
-
-static const directory_which sDirectories[] = {
-	B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-	B_USER_ADDONS_DIRECTORY,
-	B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-	B_SYSTEM_ADDONS_DIRECTORY
 };
 
 
@@ -125,14 +118,19 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
 	// of system add-ons by user add-ons, in case they offer decoders
 	// for the same format.
 
+	char** directories = NULL;
+	size_t directoryCount = 0;
+
+	if (find_paths_etc(get_architecture(), B_FIND_PATH_ADD_ONS_DIRECTORY,
+			"media/plugins", B_FIND_PATH_EXISTING_ONLY, &directories,
+			&directoryCount) != B_OK) {
+		printf("AddOnManager::GetDecoderForFormat: failed to locate plugins\n");
+		return B_ENTRY_NOT_FOUND;
+	}
+
 	BPath path;
-	for (uint i = 0; i < sizeof(sDirectories) / sizeof(directory_which); i++) {
-		if (find_directory(sDirectories[i], &path) != B_OK
-			|| path.Append("media/plugins") != B_OK) {
-			printf("AddOnManager::GetDecoderForFormat: failed to construct "
-				"path for directory %u\n", i);
-			continue;
-		}
+	for (uint i = 0; i < directoryCount; i++) {
+		path.SetTo(directories[i]);
 		if (_FindDecoder(format, path, _decoderRef))
 			return B_OK;
 	}
@@ -151,14 +149,19 @@ AddOnManager::GetReaders(xfer_entry_ref* outRefs, int32* outCount,
 
 	// See GetDecoderForFormat() for why we need to scan the list by path.
 
+	char** directories = NULL;
+	size_t directoryCount = 0;
+
+	if (find_paths_etc(get_architecture(), B_FIND_PATH_ADD_ONS_DIRECTORY,
+			"media/plugins", B_FIND_PATH_EXISTING_ONLY, &directories,
+			&directoryCount) != B_OK) {
+		printf("AddOnManager::GetReaders: failed to locate plugins\n");
+		return B_ENTRY_NOT_FOUND;
+	}
+
 	BPath path;
-	for (uint i = 0; i < sizeof(sDirectories) / sizeof(directory_which); i++) {
-		if (find_directory(sDirectories[i], &path) != B_OK
-			|| path.Append("media/plugins") != B_OK) {
-			printf("AddOnManager::GetReaders: failed to construct "
-				"path for directory %u\n", i);
-			continue;
-		}
+	for (uint i = 0; i < directoryCount; i++) {
+		path.SetTo(directories[i]);
 		_GetReaders(path, outRefs, outCount, maxCount);
 	}
 	
@@ -302,16 +305,24 @@ AddOnManager::_RegisterAddOns()
 			|| !strcasecmp(buffer, "enabled")
 			|| !strcmp(buffer, "1"));
 
+	char** directories = NULL;
+	size_t directoryCount = 0;
+
+	if (find_paths_etc(get_architecture(), B_FIND_PATH_ADD_ONS_DIRECTORY,
+			"media/plugins", B_FIND_PATH_EXISTING_ONLY, &directories,
+			&directoryCount) != B_OK) {
+		printf("AddOnManager::RegisterAddOns: failed to locate plugins\n");
+		return;
+	}
+
 	node_ref nref;
 	BDirectory directory;
 	BPath path;
-	for (uint i = 0; i < sizeof(sDirectories) / sizeof(directory_which); i++) {
+	for (uint i = 0; i < directoryCount; i++) {
 		if (disableUserAddOns && i <= 1)
 			continue;
 
-		if (find_directory(sDirectories[i], &path) == B_OK
-			&& path.Append("media/plugins") == B_OK
-			&& directory.SetTo(path.Path()) == B_OK
+		if (directory.SetTo(directories[i]) == B_OK
 			&& directory.GetNodeRef(&nref) == B_OK) {
 			fAddOnMonitorHandler->AddDirectory(&nref);
 				// NOTE: This may already start registering add-ons in the
