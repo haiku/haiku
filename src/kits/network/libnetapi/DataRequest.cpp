@@ -81,7 +81,7 @@ BDataRequest::_ProtocolLoop()
 	}
 
 	if (isBase64) {
-		char* buffer = new char[data.Length() * 4 / 3];
+		char* buffer = new char[data.Length() * 3 / 4];
 		payload = buffer;
 			// payload must be a const char* so we can assign data.String() to
 			// it below, but decode_64 modifies buffer.
@@ -90,8 +90,8 @@ BDataRequest::_ProtocolLoop()
 		// There may be some padding at the end of the base64 stream. This
 		// prevents us from computing the exact length we should get, so allow
 		// for some error margin.
-		if(length > data.Length() * 4 / 3
-			|| length < data.Length() * 4 / 3 - 3) {
+		if(length > data.Length() * 3 / 4
+			|| length < data.Length() * 3 / 4 - 3) {
 			delete[] buffer;
 			return B_BAD_DATA;
 		}
