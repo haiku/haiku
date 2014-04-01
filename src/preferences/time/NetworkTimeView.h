@@ -108,6 +108,9 @@ private:
 			BCheckBox*		fSynchronizeAtBootCheckBox;
 			BButton*		fSynchronizeButton;
 
+			rgb_color		fTextColor;
+			rgb_color		fInvalidColor;
+
 			thread_id		fUpdateThread;
 };
 

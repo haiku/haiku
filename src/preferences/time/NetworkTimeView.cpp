@@ -277,6 +277,8 @@ NetworkTimeView::NetworkTimeView(const char* name)
 	fTryAllServersCheckBox(NULL),
 	fSynchronizeAtBootCheckBox(NULL),
 	fSynchronizeButton(NULL),
+	fTextColor(ui_color(B_CONTROL_TEXT_COLOR)),
+	fInvalidColor(ui_color(B_FAILURE_COLOR)),
 	fUpdateThread(-1)
 {
 	fSettings.Load();
@@ -315,13 +317,11 @@ NetworkTimeView::MessageReceived(BMessage* message)
 
 		case kMsgServerEdited:
 		{
-			rgb_color defaultColor = ui_color(B_CONTROL_TEXT_COLOR);
-			rgb_color invalid = ui_color(B_FAILURE_COLOR);
 			bool isValidServerName
 				= _IsValidServerName(fServerTextControl->Text());
 			fServerTextControl->TextView()->SetFontAndColor(0,
 				fServerTextControl->TextView()->TextLength(), NULL, 0,
-				isValidServerName ? &defaultColor : &invalid);
+				isValidServerName ? &fTextColor : &fInvalidColor);
 			fAddButton->SetEnabled(isValidServerName);
 			break;
 		}
