@@ -84,6 +84,7 @@ private:
 class NetworkTimeView : public BGroupView {
 public:
 							NetworkTimeView(const char* name);
+	virtual					~NetworkTimeView();
 
 	virtual	void			MessageReceived(BMessage* message);
 	virtual	void			AttachedToWindow();

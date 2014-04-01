@@ -269,10 +269,31 @@ NetworkTimeView::NetworkTimeView(const char* name)
 	:
 	BGroupView(name, B_VERTICAL, B_USE_DEFAULT_SPACING),
 	fSettings(),
+	fServerTextControl(NULL),
+	fAddButton(NULL),
+	fRemoveButton(NULL),
+	fResetButton(NULL),
+	fServerListView(NULL),
+	fTryAllServersCheckBox(NULL),
+	fSynchronizeAtBootCheckBox(NULL),
+	fSynchronizeButton(NULL),
 	fUpdateThread(-1)
 {
 	fSettings.Load();
 	_InitView();
+}
+
+
+NetworkTimeView::~NetworkTimeView()
+{
+	delete fServerTextControl;
+	delete fAddButton;
+	delete fRemoveButton;
+	delete fResetButton;
+	delete fServerListView;
+	delete fTryAllServersCheckBox;
+	delete fSynchronizeAtBootCheckBox;
+	delete fSynchronizeButton;
 }
 
 
