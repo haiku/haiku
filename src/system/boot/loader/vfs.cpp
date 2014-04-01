@@ -1,5 +1,6 @@
 /*
  * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -34,6 +35,14 @@ using namespace boot;
 #else
 #	define TRACE(x) ;
 #endif
+
+
+struct __DIR {
+	Directory*	directory;
+	void*		cookie;
+	dirent		entry;
+	char		nameBuffer[B_FILE_NAME_LENGTH - 1];
+};
 
 
 class Descriptor {
@@ -734,6 +743,19 @@ get_node_for_path(Directory *directory, char *path, Node **_node)
 }
 
 
+/*!	Version of get_node_for_path() not modifying \a path.
+ */
+static status_t
+get_node_for_path(Directory* directory, const char* path, Node** _node)
+{
+	char* mutablePath = strdup(path);
+	if (mutablePath == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter mutablePathDeleter(mutablePath);
+
+	return get_node_for_path(directory, mutablePath, _node);
+}
+
 //	#pragma mark -
 
 
@@ -1008,4 +1030,115 @@ fstat(int fd, struct stat *stat)
 		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
 	RETURN_AND_SET_ERRNO(descriptor->Stat(*stat));
+}
+
+
+DIR*
+open_directory(Directory* baseDirectory, const char* path)
+{
+	DIR* dir = new(std::nothrow) DIR;
+	if (dir == NULL) {
+		errno = B_NO_MEMORY;
+		return NULL;
+	}
+	ObjectDeleter<DIR> dirDeleter(dir);
+
+	Node* node;
+	status_t error = get_node_for_path(baseDirectory, path, &node);
+	if (error != B_OK) {
+		errno = error;
+		return NULL;
+	}
+	MethodDeleter<Node, status_t> nodeReleaser(node, &Node::Release);
+
+	if (!S_ISDIR(node->Type())) {
+		errno = error;
+		return NULL;
+	}
+
+	dir->directory = static_cast<Directory*>(node);
+
+	error = dir->directory->Open(&dir->cookie, O_RDONLY);
+	if (error != B_OK) {
+		errno = error;
+		return NULL;
+	}
+
+	nodeReleaser.Detach();
+	return dirDeleter.Detach();
+}
+
+
+DIR*
+opendir(const char* dirName)
+{
+	return open_directory(gRoot, dirName);
+}
+
+
+int
+closedir(DIR* dir)
+{
+	if (dir != NULL) {
+		dir->directory->Close(dir->cookie);
+		dir->directory->Release();
+		delete dir;
+	}
+
+	return 0;
+}
+
+
+struct dirent*
+readdir(DIR* dir)
+{
+	if (dir == NULL) {
+		errno = B_BAD_VALUE;
+		return NULL;
+	}
+
+	for (;;) {
+		status_t error = dir->directory->GetNextEntry(dir->cookie,
+			dir->entry.d_name, B_FILE_NAME_LENGTH);
+		if (error != B_OK) {
+			errno = error;
+			return NULL;
+		}
+
+		dir->entry.d_pdev = 0;
+			// not supported
+		dir->entry.d_pino = dir->directory->Inode();
+		dir->entry.d_dev = dir->entry.d_pdev;
+			// not supported
+
+		if (strcmp(dir->entry.d_name, ".") == 0
+				|| strcmp(dir->entry.d_name, "..") == 0) {
+			// Note: That's obviously not correct for "..", but we can't
+			// retrieve that information.
+			dir->entry.d_ino = dir->entry.d_pino;
+		} else {
+			Node* node = dir->directory->Lookup(dir->entry.d_name, false);
+			if (node == NULL)
+				continue;
+
+			dir->entry.d_ino = node->Inode();
+			node->Release();
+		}
+
+		return &dir->entry;
+	}
+}
+
+
+void
+rewinddir(DIR* dir)
+{
+	if (dir == NULL) {
+		errno = B_BAD_VALUE;
+		return;
+	}
+
+	status_t error = dir->directory->Rewind(dir->cookie);
+	if (error != B_OK)
+		errno = error;
 }

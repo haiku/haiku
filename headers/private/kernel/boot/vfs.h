@@ -6,6 +6,8 @@
 #define KERNEL_BOOT_VFS_H
 
 
+#include <dirent.h>
+
 #include <SupportDefs.h>
 
 #include <util/DoublyLinkedList.h>
@@ -146,6 +148,7 @@ extern status_t mount_file_systems(stage2_args *args);
 extern int open_node(Node *node, int mode);
 extern int open_from(Directory *directory, const char *path, int mode,
 			mode_t permissions = 0);
+extern DIR* open_directory(Directory* baseDirectory, const char* path);
 
 extern Node *get_node_from(int fd);
 
