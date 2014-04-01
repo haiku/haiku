@@ -1,10 +1,11 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Hamish Morrison <hamish@lavabit.com>
- *		Axel Dörfler <axeld@pinc-software.de>
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Hamish Morrison, hamish@lavabit.com
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef NETWORK_TIME_VIEW_H
 #define NETWORK_TIME_VIEW_H
@@ -16,11 +17,10 @@
 class BButton;
 class BCheckBox;
 class BListView;
-class BTextControl;
 class BMessage;
 class BMessenger;
 class BPath;
-class Settings;
+class BTextControl;
 
 
 static const uint32 kMsgNetworkTimeSettings = 'ntst';
@@ -35,16 +35,6 @@ static const uint32 kMsgSynchronize = 'sync';
 static const uint32 kMsgStopSynchronization = 'stps';
 static const uint32 kMsgSynchronizationResult = 'syrs';
 static const uint32 kMsgNetworkTimeChange = 'ntch';
-
-
-status_t
-update_time(const Settings& settings, BMessenger* messenger,
-	thread_id* thread);
-
-
-status_t
-update_time(const Settings& settings, const char** errorString,
-	int32* errorCode);
 
 
 class Settings {
@@ -113,6 +103,18 @@ private:
 
 			thread_id		fUpdateThread;
 };
+
+
+int32
+update_thread(void* params);
+
+status_t
+update_time(const Settings& settings, BMessenger* messenger,
+	thread_id* thread);
+
+status_t
+update_time(const Settings& settings, const char** errorString,
+	int32* errorCode);
 
 
 #endif	// NETWORK_TIME_VIEW_H
