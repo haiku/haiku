@@ -10,6 +10,8 @@
 
 #include <Referenceable.h>
 
+#include "NodeRef.h"
+
 
 class PackagesDirectory : public BReferenceable {
 public:
@@ -20,10 +22,12 @@ public:
 									{ return fPath; }
 			int					DirectoryFD() const
 									{ return fDirFD; }
+			const node_ref&		NodeRef() const
+									{ return fNodeRef; }
 			dev_t				DeviceID() const
-									{ return fDeviceID; }
+									{ return fNodeRef.device; }
 			ino_t				NodeID() const
-									{ return fNodeID; }
+									{ return fNodeRef.node; }
 
 			status_t			Init(const char* path, dev_t mountPointDeviceID,
 									ino_t mountPointNodeID, struct stat& _st);
@@ -31,8 +35,7 @@ public:
 private:
 			char*				fPath;
 			int					fDirFD;
-			dev_t				fDeviceID;
-			ino_t				fNodeID;
+			node_ref			fNodeRef;
 };
 
 

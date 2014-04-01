@@ -18,7 +18,9 @@
 PackagesDirectory::PackagesDirectory()
 	:
 	fPath(NULL),
-	fDirFD(-1)
+	fDirFD(-1),
+	fNodeRef(),
+	fHashNext(NULL)
 {
 }
 
@@ -72,8 +74,8 @@ status_t PackagesDirectory::Init(const char* path, dev_t mountPointDeviceID,
 	if (fstat(fDirFD, &st) < 0)
 		RETURN_ERROR(errno);
 
-	fDeviceID = st.st_dev;
-	fNodeID = st.st_ino;
+	fNodeRef.device = st.st_dev;
+	fNodeRef.node = st.st_ino;
 
 	// get a normalized path
 	KPath normalizedPath;
@@ -81,7 +83,7 @@ status_t PackagesDirectory::Init(const char* path, dev_t mountPointDeviceID,
 		RETURN_ERROR(normalizedPath.InitCheck());
 
 	char* normalizedPathBuffer = normalizedPath.LockBuffer();
-	error = vfs_entry_ref_to_path(fDeviceID, fNodeID, NULL, true,
+	error = vfs_entry_ref_to_path(fNodeRef.device, fNodeRef.node, NULL, true,
 		normalizedPathBuffer, normalizedPath.BufferSize());
 	if (error != B_OK)
 		RETURN_ERROR(error);
