@@ -5,6 +5,9 @@ RemotePackageRepository HaikuPorts
 	# architecture "any" packages
 	be_book-2008_10_26-1
 	ca_root_certificates-2012_12_29-1
+	openttd_gfx-0.4.7-1
+	openttd_msx-0.3.1-1
+	openttd_sfx-0.2.3-1
 	texi2html-1.82-2
 	timgmsoundfont-2004_01_24-3
 	wqy_microhei-0.2.0~beta-3
@@ -312,6 +315,7 @@ RemotePackageRepository HaikuPorts
 	openal_x86_devel-1.13.0-2
 	openssl_x86-1.0.0j-4
 	openssl_x86_devel-1.0.0j-4
+	openttd_x86-1.3.3-1
 	physfs_x86-2.0.3-1
 	physfs_x86_devel-2.0.3-1
 	pkgconfig_x86-0.27.1-2
@@ -438,6 +442,7 @@ RemotePackageRepository HaikuPorts
 	openal_x86
 	openssh
 	openssl
+	openttd_x86
 	p7zip
 	pe
 	perl
