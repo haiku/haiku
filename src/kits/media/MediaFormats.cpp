@@ -42,32 +42,33 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 		return B_BAD_VALUE;
 
 	while (true) {
-		media_codec_info codec_info;
-		media_format_family format_family;
-		media_format input_format;
-		media_format output_format;
+		media_codec_info candidateCodecInfo;
+		media_format_family candidateFormatFamily;
+		media_format candidateInputFormat;
+		media_format candidateOutputFormat;
 
-		status_t ret = AddOnManager::GetInstance()->GetCodecInfo(&codec_info,
-			&format_family, &input_format, &output_format, *cookie);
+		status_t ret = AddOnManager::GetInstance()->GetCodecInfo(
+			&candidateCodecInfo, &candidateFormatFamily,
+			&candidateInputFormat, &candidateOutputFormat, *cookie);
 
 		if (ret != B_OK)
 			return ret;
 
 		*cookie = *cookie + 1;
 
-		if (fileFormat != NULL && format_family != B_ANY_FORMAT_FAMILY
+		if (fileFormat != NULL && candidateFormatFamily != B_ANY_FORMAT_FAMILY
 			&& fileFormat->family != B_ANY_FORMAT_FAMILY
-			&& fileFormat->family != format_family) {
+			&& fileFormat->family != candidateFormatFamily) {
 			continue;
 		}
 
-		if (!input_format.Matches(inputFormat))
+		if (!candidateInputFormat.Matches(inputFormat))
 			continue;
 
 		if (_outputFormat != NULL)
-			*_outputFormat = output_format;
+			*_outputFormat = candidateOutputFormat;
 
-		*_codecInfo = codec_info;
+		*_codecInfo = candidateCodecInfo;
 		break;
 	}
 
@@ -91,27 +92,28 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 	}
 
 	while (true) {
-		media_codec_info codec_info;
-		media_format_family format_family;
-		media_format input_format;
-		media_format output_format;
+		media_codec_info candidateCodecInfo;
+		media_format_family candidateFormatFamily;
+		media_format candidateInputFormat;
+		media_format candidateOutputFormat;
 
-		status_t ret = AddOnManager::GetInstance()->GetCodecInfo(&codec_info,
-			&format_family, &input_format, &output_format, *cookie);
+		status_t ret = AddOnManager::GetInstance()->GetCodecInfo(
+			&candidateCodecInfo, &candidateFormatFamily, &candidateInputFormat,
+			&candidateOutputFormat, *cookie);
 				
 		if (ret != B_OK)
 			return ret;
 
 		*cookie = *cookie + 1;
 
-		if (fileFormat != NULL && format_family != B_ANY_FORMAT_FAMILY
+		if (fileFormat != NULL && candidateFormatFamily != B_ANY_FORMAT_FAMILY
 			&& fileFormat->family != B_ANY_FORMAT_FAMILY
-			&& fileFormat->family != format_family) {
+			&& fileFormat->family != candidateFormatFamily) {
 			continue;
 		}
 
-		if (!input_format.Matches(inputFormat)
-			|| !output_format.Matches(outputFormat)) {
+		if (!candidateInputFormat.Matches(inputFormat)
+			|| !candidateOutputFormat.Matches(outputFormat)) {
 			continue;
 		}
 
@@ -121,11 +123,11 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 		// possible, we actually have to instantiate an Encoder here and
 		// ask it to specifiy the format.
 		if (_acceptedInputFormat != NULL)
-			*_acceptedInputFormat = input_format;
+			*_acceptedInputFormat = candidateInputFormat;
 		if (_acceptedOutputFormat != NULL)
-			*_acceptedOutputFormat = output_format;
+			*_acceptedOutputFormat = candidateOutputFormat;
 
-		*_codecInfo = codec_info;
+		*_codecInfo = candidateCodecInfo;
 		break;
 	}
 
@@ -139,18 +141,16 @@ get_next_encoder(int32* cookie, media_codec_info* _codecInfo)
 	if (cookie == NULL || _codecInfo == NULL)
 		return B_BAD_VALUE;
 
-	media_codec_info codec_info;
-	media_format_family format_family;
-	media_format input_format;
-	media_format output_format;
+	media_format_family formatFamily;
+	media_format inputFormat;
+	media_format outputFormat;
 
-	status_t ret = AddOnManager::GetInstance()->GetCodecInfo(&codec_info,
-		&format_family, &input_format, &output_format, *cookie);
+	status_t ret = AddOnManager::GetInstance()->GetCodecInfo(_codecInfo,
+		&formatFamily, &inputFormat, &outputFormat, *cookie);
 	if (ret != B_OK)
 		return ret;
 
 	*cookie = *cookie + 1;
-	*_codecInfo = codec_info;
 
 	return B_OK;
 }
@@ -354,14 +354,10 @@ meta_format::Compare(const meta_format* a, const meta_format* b)
 
 
 /** We share one global list for all BMediaFormats in the team - since the
- *	format data can change at any time, we have to ask the server to update
- *	the list to ensure that we are working on the latest data set.
- *	The list we get from the server is always sorted by description.
- *	The formats lock has to be hold when you call this function.
+ *	format data can change at any time, we have to update the list to ensure
+ *	that we are working on the latest data set. The list is always sorted by
+ *	description. The formats lock has to be held when you call this function.
  */
-
-FormatManager* gFormatManager = NULL;
-
 static status_t
 update_media_formats()
 {
@@ -369,9 +365,7 @@ update_media_formats()
 		return B_NOT_ALLOWED;
 
 	BMessage reply;
-	if (gFormatManager == NULL)
-		gFormatManager = new FormatManager;
-	gFormatManager->GetFormats(sLastFormatsUpdate, reply);
+	FormatManager::GetInstance()->GetFormats(sLastFormatsUpdate, reply);
 
 	// do we need an update at all?
 	bool needUpdate;
@@ -622,10 +616,7 @@ BMediaFormats::MakeFormatFor(const media_format_description* descriptions,
 	int32 descriptionCount, media_format* format, uint32 flags,
 	void* _reserved)
 {
-	if (gFormatManager == NULL)
-		gFormatManager = new FormatManager;
-	
-	status_t status = gFormatManager->MakeFormatFor(descriptions,
+	status_t status = FormatManager::GetInstance()->MakeFormatFor(descriptions,
 		descriptionCount, *format, flags, _reserved);
 
 	return status;

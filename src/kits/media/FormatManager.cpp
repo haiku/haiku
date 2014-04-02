@@ -129,6 +129,30 @@ FormatManager::FormatManager()
 }
 
 
+pthread_once_t FormatManager::sInitOnce;
+FormatManager* FormatManager::sInstance = NULL;
+
+
+/* static */ void
+FormatManager::CreateInstance()
+{
+	sInstance = new FormatManager();
+}
+
+
+/* static */ FormatManager*
+FormatManager::GetInstance()
+{
+	static FormatManager* sFormatManager = NULL;
+	if (sFormatManager == NULL)
+		pthread_once(&sInitOnce, &CreateInstance);
+
+	return sFormatManager;
+}
+
+
+
+
 FormatManager::~FormatManager()
 {
 }
@@ -220,8 +244,7 @@ FormatManager::MakeFormatFor(const media_format_description* descriptions,
 
 	status_t result = B_OK;
 	// TODO: Support "flags" (B_SET_DEFAULT, B_EXCLUSIVE, B_NO_MERGE)!
-	int32 i = 0;
-	for(i = 0; i < descriptionCount; i++) {
+	for (int32 i = 0; i < descriptionCount; i++) {
 		meta_format* metaFormat = new(std::nothrow) meta_format(
 			descriptions[i], format, codec);
 		if (metaFormat == NULL

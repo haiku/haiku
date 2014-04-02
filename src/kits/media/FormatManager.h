@@ -12,13 +12,13 @@
 
 #include <Locker.h>
 #include <ObjectList.h>
+#include <pthread.h>
 
 #include "MetaFormat.h"
 
 
 class FormatManager {
 public:
-								FormatManager();
 								~FormatManager();
 
 			void				GetFormats(bigtime_t lastUpdate, BMessage& reply);
@@ -29,6 +29,11 @@ public:
 									void* _reserved);
 			void				RemoveFormat(const media_format& format);
 
+			static FormatManager* GetInstance();
+
+private:
+								FormatManager();
+			static void			CreateInstance();
 private:
 	typedef BPrivate::media::meta_format meta_format;
 
@@ -36,6 +41,9 @@ private:
 			BLocker				fLock;
 			bigtime_t			fLastUpdate;
 			int32				fNextCodecID;
+
+			static FormatManager* sInstance;
+			static pthread_once_t	sInitOnce;
 };
 
 #endif // _FORMAT_MANAGER_H

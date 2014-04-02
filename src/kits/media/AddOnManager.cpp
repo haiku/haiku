@@ -24,6 +24,7 @@
 
 #include "debug.h"
 
+#include "FormatManager.h"
 #include "MetaFormat.h"
 
 
@@ -246,9 +247,10 @@ void
 AddOnManager::_RegisterAddOns()
 {
 	// Check if add-ons are already registered.
-	if(!fReaderList.IsEmpty() || !fWriterList.IsEmpty()
-			|| !fDecoderList.IsEmpty() || !fEncoderList.IsEmpty())
+	if (!fReaderList.IsEmpty() || !fWriterList.IsEmpty()
+		|| !fDecoderList.IsEmpty() || !fEncoderList.IsEmpty()) {
 		return;
+	}
 
 	char** directories = NULL;
 	size_t directoryCount = 0;
@@ -348,7 +350,8 @@ printf("removing reader '%s'\n", readerInfo->ref.name);
 printf("removing decoder '%s'\n", decoderInfo->ref.name);
 			media_format* format;
 			for (decoderInfo->formats.Rewind();
-				decoderInfo->formats.GetNext(&format);) {
+					decoderInfo->formats.GetNext(&format);) {
+				FormatManager::GetInstance()->RemoveFormat(*format);
 			}
 			fDecoderList.RemoveCurrent();
 			break;
