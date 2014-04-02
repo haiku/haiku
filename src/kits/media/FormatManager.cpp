@@ -134,41 +134,24 @@ FormatManager::~FormatManager()
 }
 
 
-void
-FormatManager::LoadState()
-{
-}
-
-
-void
-FormatManager::SaveState()
-{
-}
-
-
 /*! This method is called when BMediaFormats asks for any updates
  	made to our format list.
 	If there were any changes since the last time, the whole
 	list will be sent back.
 */
 void 
-FormatManager::GetFormats(BMessage& message)
+FormatManager::GetFormats(bigtime_t lastUpdate, BMessage& reply)
 {
 	BAutolock locker(fLock);
 
-	bigtime_t lastUpdate;
-	if (message.FindInt64("last_timestamp", &lastUpdate) == B_OK
-		&& lastUpdate >= fLastUpdate) {
+	if (lastUpdate >= fLastUpdate) {
 		// There weren't any changes since last time.
-		BMessage reply;
 		reply.AddBool("need_update", false);
 
-		message.SendReply(&reply, (BHandler*)NULL, TIMEOUT);
 		return;
 	}
 
 	// Add all meta formats to the list
-	BMessage reply;
 	reply.AddBool("need_update", true);
 	reply.AddInt64("timestamp", system_time());
 
@@ -180,29 +163,14 @@ FormatManager::GetFormats(BMessage& message)
 		reply.AddData("formats", MEDIA_META_FORMAT_TYPE, format,
 			sizeof(meta_format));
 	}
-
-	message.SendReply(&reply, (BHandler*)NULL, TIMEOUT);
 }
 
 
-void
-FormatManager::MakeFormatFor(BMessage& message)
+status_t
+FormatManager::MakeFormatFor(const media_format_description* descriptions,
+	int32 descriptionCount, media_format& format, uint32 flags, void* _reserved)
 {
 	BAutolock locker(fLock);
-
-	media_format format;
-	const void* data;
-	ssize_t size;
-	if (message.FindData("format", B_RAW_TYPE, 0, &data, &size) != B_OK
-		|| size != sizeof(format)) {
-		// Couldn't get the format
-		BMessage reply;
-		reply.AddInt32("result", B_ERROR);
-		message.SendReply(&reply, (BHandler*)NULL, TIMEOUT);
-		return;
-	}
-	// Copy the BMessage's data into our format
-	format = *(media_format*)data;
 
 	int codec = fNextCodecID;
 	switch (format.type) {
@@ -246,22 +214,16 @@ FormatManager::MakeFormatFor(BMessage& message)
 			break;
 		default:
 			// nothing to do
-			BMessage reply;
-			reply.AddInt32("result", B_OK);
-			reply.AddData("format", B_RAW_TYPE, &format, sizeof(format));
-			message.SendReply(&reply, (BHandler*)NULL, TIMEOUT);
-			return;
+			return B_OK;
 	}
 	fLastUpdate = system_time();
 
 	status_t result = B_OK;
 	// TODO: Support "flags" (B_SET_DEFAULT, B_EXCLUSIVE, B_NO_MERGE)!
 	int32 i = 0;
-	while (message.FindData("description", B_RAW_TYPE, i++, &data, &size)
-			== B_OK && size == sizeof(media_format_description)) {
-		meta_format* metaFormat
-			= new(std::nothrow) meta_format(*(media_format_description*)data,
-				format, codec);
+	for(i = 0; i < descriptionCount; i++) {
+		meta_format* metaFormat = new(std::nothrow) meta_format(
+			descriptions[i], format, codec);
 		if (metaFormat == NULL
 			|| !fList.BinaryInsert(metaFormat, meta_format::Compare)) {
 			delete metaFormat;
@@ -270,11 +232,7 @@ FormatManager::MakeFormatFor(BMessage& message)
 		}
 	}
 
-	BMessage reply;
-	reply.AddInt32("result", result);
-	if (result == B_OK)
-		reply.AddData("format", B_RAW_TYPE, &format, sizeof(format));
-	message.SendReply(&reply, (BHandler*)NULL, TIMEOUT);
+	return B_OK;
 }
 
 

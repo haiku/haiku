@@ -22,13 +22,8 @@
 #include <image.h>
 #include <Path.h>
 
-#include <safemode_defs.h>
-#include <syscalls.h>
-
 #include "debug.h"
-#include "media_server.h"
 
-#include "FormatManager.h"
 #include "MetaFormat.h"
 
 
@@ -65,38 +60,28 @@ AddOnManager::AddOnManager()
 	:
  	fLock("add-on manager"),
  	fNextWriterFormatFamilyID(0),
- 	fNextEncoderCodecInfoID(0),
- 	fAddOnMonitorHandler(NULL),
- 	fAddOnMonitor(NULL)
+	fNextEncoderCodecInfoID(0)
 {
 }
 
 
 AddOnManager::~AddOnManager()
 {
-	if (fAddOnMonitor != NULL && fAddOnMonitor->Lock()) {
-		fAddOnMonitor->RemoveHandler(fAddOnMonitorHandler);
-		delete fAddOnMonitorHandler;
-		fAddOnMonitor->Quit();
-	}
 }
 
 
-void
-AddOnManager::LoadState()
-{
-	_RegisterAddOns();
-}
+AddOnManager AddOnManager::sInstance;
 
 
-void
-AddOnManager::SaveState()
+/* static */ AddOnManager*
+AddOnManager::GetInstance()
 {
+	return &sInstance;
 }
 
 
 status_t
-AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
+AddOnManager::GetDecoderForFormat(entry_ref* _decoderRef,
 	const media_format& format)
 {
 	if ((format.type == B_MEDIA_ENCODED_VIDEO
@@ -109,6 +94,7 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
 		return B_MEDIA_BAD_FORMAT;
 
 	BAutolock locker(fLock);
+	_RegisterAddOns();
 
 	printf("AddOnManager::GetDecoderForFormat: searching decoder for encoding "
 		"%" B_PRIu32 "\n", format.Encoding());
@@ -140,10 +126,11 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
 
 
 status_t
-AddOnManager::GetReaders(xfer_entry_ref* outRefs, int32* outCount,
+AddOnManager::GetReaders(entry_ref* outRefs, int32* outCount,
 	int32 maxCount)
 {
 	BAutolock locker(fLock);
+	_RegisterAddOns();
 
 	*outCount = 0;
 
@@ -170,9 +157,10 @@ AddOnManager::GetReaders(xfer_entry_ref* outRefs, int32* outCount,
 
 
 status_t
-AddOnManager::GetEncoder(xfer_entry_ref* _encoderRef, int32 id)
+AddOnManager::GetEncoder(entry_ref* _encoderRef, int32 id)
 {
 	BAutolock locker(fLock);
+	_RegisterAddOns();
 
 	encoder_info* info;
 	for (fEncoderList.Rewind(); fEncoderList.GetNext(&info);) {
@@ -194,9 +182,10 @@ AddOnManager::GetEncoder(xfer_entry_ref* _encoderRef, int32 id)
 
 
 status_t
-AddOnManager::GetWriter(xfer_entry_ref* _ref, uint32 internalID)
+AddOnManager::GetWriter(entry_ref* _ref, uint32 internalID)
 {
 	BAutolock locker(fLock);
+	_RegisterAddOns();
 
 	writer_info* info;
 	for (fWriterList.Rewind(); fWriterList.GetNext(&info);) {
@@ -217,6 +206,7 @@ status_t
 AddOnManager::GetFileFormat(media_file_format* _fileFormat, int32 cookie)
 {
 	BAutolock locker(fLock);
+	_RegisterAddOns();
 
 	media_file_format* fileFormat;
 	if (fWriterFileFormats.Get(cookie, &fileFormat)) {
@@ -234,6 +224,7 @@ AddOnManager::GetCodecInfo(media_codec_info* _codecInfo,
 	media_format* _inputFormat, media_format* _outputFormat, int32 cookie)
 {
 	BAutolock locker(fLock);
+	_RegisterAddOns();
 
 	encoder_info* info;
 	if (fEncoderList.Get(cookie, &info)) {
@@ -254,56 +245,10 @@ AddOnManager::GetCodecInfo(media_codec_info* _codecInfo,
 void
 AddOnManager::_RegisterAddOns()
 {
-	class CodecHandler : public AddOnMonitorHandler {
-	private:
-		AddOnManager* fManager;
-
-	public:
-		CodecHandler(AddOnManager* manager)
-		{
-			fManager = manager;
-		}
-
-		virtual void AddOnCreated(const add_on_entry_info* entryInfo)
-		{
-		}
-
-		virtual void AddOnEnabled(const add_on_entry_info* entryInfo)
-		{
-			entry_ref ref;
-			make_entry_ref(entryInfo->dir_nref.device,
-				entryInfo->dir_nref.node, entryInfo->name, &ref);
-			fManager->_RegisterAddOn(ref);
-		}
-
-		virtual void AddOnDisabled(const add_on_entry_info* entryInfo)
-		{
-			entry_ref ref;
-			make_entry_ref(entryInfo->dir_nref.device,
-				entryInfo->dir_nref.node, entryInfo->name, &ref);
-			fManager->_UnregisterAddOn(ref);
-		}
-
-		virtual void AddOnRemoved(const add_on_entry_info* entryInfo)
-		{
-		}
-	};
-
-	fAddOnMonitorHandler = new CodecHandler(this);
-	fAddOnMonitor = new AddOnMonitor(fAddOnMonitorHandler);
-
-	// get safemode option for disabling user add-ons
-
-	char buffer[16];
-	size_t size = sizeof(buffer);
-
-	bool disableUserAddOns = _kern_get_safemode_option(
-			B_SAFEMODE_DISABLE_USER_ADD_ONS, buffer, &size) == B_OK
-		&& (!strcasecmp(buffer, "true")
-			|| !strcasecmp(buffer, "yes")
-			|| !strcasecmp(buffer, "on")
-			|| !strcasecmp(buffer, "enabled")
-			|| !strcmp(buffer, "1"));
+	// Check if add-ons are already registered.
+	if(!fReaderList.IsEmpty() || !fWriterList.IsEmpty()
+			|| !fDecoderList.IsEmpty() || !fEncoderList.IsEmpty())
+		return;
 
 	char** directories = NULL;
 	size_t directoryCount = 0;
@@ -311,22 +256,16 @@ AddOnManager::_RegisterAddOns()
 	if (find_paths_etc(get_architecture(), B_FIND_PATH_ADD_ONS_DIRECTORY,
 			"media/plugins", B_FIND_PATH_EXISTING_ONLY, &directories,
 			&directoryCount) != B_OK) {
-		printf("AddOnManager::RegisterAddOns: failed to locate plugins\n");
 		return;
 	}
 
-	node_ref nref;
-	BDirectory directory;
 	BPath path;
 	for (uint i = 0; i < directoryCount; i++) {
-		if (disableUserAddOns && i <= 1)
-			continue;
-
-		if (directory.SetTo(directories[i]) == B_OK
-			&& directory.GetNodeRef(&nref) == B_OK) {
-			fAddOnMonitorHandler->AddDirectory(&nref);
-				// NOTE: This may already start registering add-ons in the
-				// AddOnMonitor looper thread after the call returns!
+		BDirectory directory;
+		if (directory.SetTo(directories[i]) == B_OK) {
+			entry_ref ref;
+			while(directory.GetNextRef(&ref) == B_OK)
+				_RegisterAddOn(ref);
 		}
 	}
 }
@@ -410,7 +349,6 @@ printf("removing decoder '%s'\n", decoderInfo->ref.name);
 			media_format* format;
 			for (decoderInfo->formats.Rewind();
 				decoderInfo->formats.GetNext(&format);) {
-				gFormatManager->RemoveFormat(*format);
 			}
 			fDecoderList.RemoveCurrent();
 			break;
@@ -591,7 +529,7 @@ AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
 
 bool
 AddOnManager::_FindDecoder(const media_format& format, const BPath& path,
-	xfer_entry_ref* _decoderRef)
+	entry_ref* _decoderRef)
 {
 	node_ref nref;
 	BDirectory directory;
@@ -624,7 +562,7 @@ AddOnManager::_FindDecoder(const media_format& format, const BPath& path,
 
 
 void
-AddOnManager::_GetReaders(const BPath& path, xfer_entry_ref* outRefs,
+AddOnManager::_GetReaders(const BPath& path, entry_ref* outRefs,
 	int32* outCount, int32 maxCount)
 {
 	node_ref nref;

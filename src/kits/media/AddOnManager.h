@@ -19,8 +19,6 @@
 #include "DataExchange.h"
 #include "TList.h"
 
-#include "AddOnMonitor.h"
-#include "AddOnMonitorHandler.h"
 #include "DecoderPlugin.h"
 #include "EncoderPlugin.h"
 #include "ReaderPlugin.h"
@@ -32,18 +30,17 @@ public:
 								AddOnManager();
 								~AddOnManager();
 
-			void				LoadState();
-			void				SaveState();
+			static AddOnManager* GetInstance();
 
-			status_t			GetDecoderForFormat(xfer_entry_ref* _ref,
+			status_t			GetDecoderForFormat(entry_ref* _ref,
 									const media_format& format);
 
-			status_t			GetReaders(xfer_entry_ref* _ref,
+			status_t			GetReaders(entry_ref* _ref,
 									int32* _count, int32 maxCount);
 
-			status_t			GetEncoder(xfer_entry_ref* _ref, int32 id);
+			status_t			GetEncoder(entry_ref* _ref, int32 id);
 
-			status_t			GetWriter(xfer_entry_ref* _ref,
+			status_t			GetWriter(entry_ref* _ref,
 									uint32 internalID);
 
 			status_t			GetFileFormat(media_file_format* _fileFormat,
@@ -71,9 +68,9 @@ private:
 
 			bool				_FindDecoder(const media_format& format,
 									const BPath& path,
-									xfer_entry_ref* _decoderRef);
+									entry_ref* _decoderRef);
 			void				_GetReaders(const BPath& path,
-									xfer_entry_ref* outRefs, int32* outCount,
+									entry_ref* outRefs, int32* outCount,
 									int32 maxCount);
 
 private:
@@ -108,8 +105,7 @@ private:
 			uint32				fNextWriterFormatFamilyID;
 			uint32				fNextEncoderCodecInfoID;
 
-			AddOnMonitorHandler* fAddOnMonitorHandler;
-			AddOnMonitor*		fAddOnMonitor;
+			static AddOnManager	sInstance;
 };
 
 #endif // _ADD_ON_MANAGER_H

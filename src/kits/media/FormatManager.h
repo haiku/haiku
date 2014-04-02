@@ -21,11 +21,12 @@ public:
 								FormatManager();
 								~FormatManager();
 
-			void				LoadState();
-			void				SaveState();
-
-			void				GetFormats(BMessage& message);
-			void				MakeFormatFor(BMessage& message);
+			void				GetFormats(bigtime_t lastUpdate, BMessage& reply);
+			status_t			MakeFormatFor(
+									const media_format_description* descriptions,
+									int32 descriptionCount,
+									media_format& format, uint32 flags,
+									void* _reserved);
 			void				RemoveFormat(const media_format& format);
 
 private:

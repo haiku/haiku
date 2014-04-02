@@ -8,7 +8,9 @@
  */
 
 
+#include "AddOnManager.h"
 #include "DataExchange.h"
+#include "FormatManager.h"
 #include "MetaFormat.h"
 #include "debug.h"
 
@@ -40,29 +42,32 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 		return B_BAD_VALUE;
 
 	while (true) {
-		server_get_codec_info_request request;
-		request.cookie = *cookie;
-		server_get_codec_info_reply reply;
-		status_t ret = QueryServer(SERVER_GET_CODEC_INFO_FOR_COOKIE, &request,
-			sizeof(request), &reply, sizeof(reply));
+		media_codec_info codec_info;
+		media_format_family format_family;
+		media_format input_format;
+		media_format output_format;
+
+		status_t ret = AddOnManager::GetInstance()->GetCodecInfo(&codec_info,
+			&format_family, &input_format, &output_format, *cookie);
+
 		if (ret != B_OK)
 			return ret;
 
 		*cookie = *cookie + 1;
 
-		if (fileFormat != NULL && reply.format_family != B_ANY_FORMAT_FAMILY
+		if (fileFormat != NULL && format_family != B_ANY_FORMAT_FAMILY
 			&& fileFormat->family != B_ANY_FORMAT_FAMILY
-			&& fileFormat->family != reply.format_family) {
+			&& fileFormat->family != format_family) {
 			continue;
 		}
 
-		if (!reply.input_format.Matches(inputFormat))
+		if (!input_format.Matches(inputFormat))
 			continue;
 
 		if (_outputFormat != NULL)
-			*_outputFormat = reply.output_format;
+			*_outputFormat = output_format;
 
-		*_codecInfo = reply.codec_info;
+		*_codecInfo = codec_info;
 		break;
 	}
 
@@ -86,24 +91,27 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 	}
 
 	while (true) {
-		server_get_codec_info_request request;
-		request.cookie = *cookie;
-		server_get_codec_info_reply reply;
-		status_t ret = QueryServer(SERVER_GET_CODEC_INFO_FOR_COOKIE, &request,
-			sizeof(request), &reply, sizeof(reply));
+		media_codec_info codec_info;
+		media_format_family format_family;
+		media_format input_format;
+		media_format output_format;
+
+		status_t ret = AddOnManager::GetInstance()->GetCodecInfo(&codec_info,
+			&format_family, &input_format, &output_format, *cookie);
+				
 		if (ret != B_OK)
 			return ret;
 
 		*cookie = *cookie + 1;
 
-		if (fileFormat != NULL && reply.format_family != B_ANY_FORMAT_FAMILY
+		if (fileFormat != NULL && format_family != B_ANY_FORMAT_FAMILY
 			&& fileFormat->family != B_ANY_FORMAT_FAMILY
-			&& fileFormat->family != reply.format_family) {
+			&& fileFormat->family != format_family) {
 			continue;
 		}
 
-		if (!reply.input_format.Matches(inputFormat)
-			|| !reply.output_format.Matches(outputFormat)) {
+		if (!input_format.Matches(inputFormat)
+			|| !output_format.Matches(outputFormat)) {
 			continue;
 		}
 
@@ -113,11 +121,11 @@ get_next_encoder(int32* cookie, const media_file_format* fileFormat,
 		// possible, we actually have to instantiate an Encoder here and
 		// ask it to specifiy the format.
 		if (_acceptedInputFormat != NULL)
-			*_acceptedInputFormat = reply.input_format;
+			*_acceptedInputFormat = input_format;
 		if (_acceptedOutputFormat != NULL)
-			*_acceptedOutputFormat = reply.output_format;
+			*_acceptedOutputFormat = output_format;
 
-		*_codecInfo = reply.codec_info;
+		*_codecInfo = codec_info;
 		break;
 	}
 
@@ -131,16 +139,18 @@ get_next_encoder(int32* cookie, media_codec_info* _codecInfo)
 	if (cookie == NULL || _codecInfo == NULL)
 		return B_BAD_VALUE;
 
-	server_get_codec_info_request request;
-	request.cookie = *cookie;
-	server_get_codec_info_reply reply;
-	status_t ret = QueryServer(SERVER_GET_CODEC_INFO_FOR_COOKIE, &request,
-		sizeof(request), &reply, sizeof(reply));
+	media_codec_info codec_info;
+	media_format_family format_family;
+	media_format input_format;
+	media_format output_format;
+
+	status_t ret = AddOnManager::GetInstance()->GetCodecInfo(&codec_info,
+		&format_family, &input_format, &output_format, *cookie);
 	if (ret != B_OK)
 		return ret;
 
 	*cookie = *cookie + 1;
-	*_codecInfo = reply.codec_info;
+	*_codecInfo = codec_info;
 
 	return B_OK;
 }
@@ -350,22 +360,18 @@ meta_format::Compare(const meta_format* a, const meta_format* b)
  *	The formats lock has to be hold when you call this function.
  */
 
+FormatManager* gFormatManager = NULL;
+
 static status_t
 update_media_formats()
 {
 	if (!sLock.IsLocked())
 		return B_NOT_ALLOWED;
 
-	BMessage request(MEDIA_SERVER_GET_FORMATS);
-	request.AddInt64("last_timestamp", sLastFormatsUpdate);
-	
 	BMessage reply;
-	status_t status = QueryServer(request, reply);
-	if (status < B_OK) {
-		ERROR("BMediaFormats: Could not update formats: %s\n",
-			strerror(status));
-		return status;
-	}
+	if (gFormatManager == NULL)
+		gFormatManager = new FormatManager;
+	gFormatManager->GetFormats(sLastFormatsUpdate, reply);
 
 	// do we need an update at all?
 	bool needUpdate;
@@ -616,40 +622,13 @@ BMediaFormats::MakeFormatFor(const media_format_description* descriptions,
 	int32 descriptionCount, media_format* format, uint32 flags,
 	void* _reserved)
 {
-	BMessage request(MEDIA_SERVER_MAKE_FORMAT_FOR);
-	for (int32 i = 0 ; i < descriptionCount ; i++) {
-		request.AddData("description", B_RAW_TYPE, &descriptions[i],
-			sizeof(descriptions[i]));
-	}
-	request.AddData("format", B_RAW_TYPE, format, sizeof(*format));
-	request.AddData("flags", B_UINT32_TYPE, &flags, sizeof(flags));
-	request.AddPointer("_reserved", _reserved);
+	if (gFormatManager == NULL)
+		gFormatManager = new FormatManager;
 	
-	BMessage reply;
-	status_t status = QueryServer(request, reply);
-	if (status != B_OK) {
-		ERROR("BMediaFormats: Could not make a format: %s\n", strerror(status));
-		return status;
-	}
+	status_t status = gFormatManager->MakeFormatFor(descriptions,
+		descriptionCount, *format, flags, _reserved);
 
-	// check the status
-	if (reply.FindInt32("result", &status) < B_OK)
-		return B_ERROR;
-	if (status != B_OK)
-		return status;
-
-	// get the format
-	const void* data;
-	ssize_t size;
-	if (reply.FindData("format", B_RAW_TYPE, 0, &data, &size) != B_OK)
-		return B_ERROR;
-	if (size != sizeof(*format))
-		return B_ERROR;
-
-	// copy the BMessage's data into our format
-	*format = *(media_format*)data;
-
-	return B_OK;
+	return status;
 }
 
 
