@@ -253,8 +253,9 @@ static property_info sPropertyList[] = {
 
 
 BTextView::BTextView(BRect frame, const char* name, BRect textRect,
-		uint32 resizeMask, uint32 flags)
-	: BView(frame, name, resizeMask,
+	uint32 resizeMask, uint32 flags)
+	:
+	BView(frame, name, resizeMask,
 		flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	_InitObject(textRect, NULL, NULL);
@@ -262,9 +263,10 @@ BTextView::BTextView(BRect frame, const char* name, BRect textRect,
 
 
 BTextView::BTextView(BRect frame, const char* name, BRect textRect,
-		const BFont* initialFont, const rgb_color* initialColor,
-		uint32 resizeMask, uint32 flags)
-	: BView(frame, name, resizeMask,
+	const BFont* initialFont, const rgb_color* initialColor,
+	uint32 resizeMask, uint32 flags)
+	:
+	BView(frame, name, resizeMask,
 		flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	_InitObject(textRect, initialFont, initialColor);
@@ -272,8 +274,9 @@ BTextView::BTextView(BRect frame, const char* name, BRect textRect,
 
 
 BTextView::BTextView(const char* name, uint32 flags)
-	: BView(name, flags | B_FRAME_EVENTS | B_PULSE_NEEDED
-		| B_INPUT_METHOD_AWARE)
+	:
+	BView(name,
+		flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	_InitObject(Bounds(), NULL, NULL);
 }
@@ -281,15 +284,17 @@ BTextView::BTextView(const char* name, uint32 flags)
 
 BTextView::BTextView(const char* name, const BFont* initialFont,
 	const rgb_color* initialColor, uint32 flags)
-	: BView(name, flags | B_FRAME_EVENTS | B_PULSE_NEEDED
-		| B_INPUT_METHOD_AWARE)
+	:
+	BView(name,
+		flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	_InitObject(Bounds(), initialFont, initialColor);
 }
 
 
 BTextView::BTextView(BMessage* archive)
-	: BView(archive)
+	:
+	BView(archive)
 {
 	CALLED();
 	BRect rect;
