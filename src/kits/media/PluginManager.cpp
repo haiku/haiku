@@ -7,6 +7,7 @@
 #include <image.h>
 #include <string.h>
 
+#include "AddOnManager.h"
 #include "PluginManager.h"
 #include "DataExchange.h"
 #include "debug.h"
@@ -32,10 +33,11 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 	}
 
 	// get list of available readers from the server
-	server_get_readers_request request;
-	server_get_readers_reply reply;
-	status_t ret = QueryServer(SERVER_GET_READERS, &request, sizeof(request),
-		&reply, sizeof(reply));
+	entry_ref refs[MAX_READERS];
+	int32 count;
+
+	status_t ret = AddOnManager::GetInstance()->GetReaders(refs, &count,
+		MAX_READERS);
 	if (ret != B_OK) {
 		printf("PluginManager::CreateReader: can't get list of readers: %s\n",
 			strerror(ret));
@@ -43,8 +45,8 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 	}
 
 	// try each reader by calling it's Sniff function...
-	for (int32 i = 0; i < reply.count; i++) {
-		entry_ref ref = reply.ref[i];
+	for (int32 i = 0; i < count; i++) {
+		entry_ref ref = refs[i];
 		MediaPlugin* plugin = GetPlugin(ref);
 		if (plugin == NULL) {
 			printf("PluginManager::CreateReader: GetPlugin failed\n");
@@ -106,19 +108,17 @@ PluginManager::CreateDecoder(Decoder** _decoder, const media_format& format)
 {
 	TRACE("PluginManager::CreateDecoder enter\n");
 
-	// get decoder for this format from the server
-	server_get_decoder_for_format_request request;
-	server_get_decoder_for_format_reply reply;
-	request.format = format;
-	status_t ret = QueryServer(SERVER_GET_DECODER_FOR_FORMAT, &request,
-		sizeof(request), &reply, sizeof(reply));
+	// get decoder for this format
+	entry_ref ref;
+	status_t ret = AddOnManager::GetInstance()->GetDecoderForFormat(
+		&ref, format);
 	if (ret != B_OK) {
 		printf("PluginManager::CreateDecoder: can't get decoder for format: "
 			"%s\n", strerror(ret));
 		return ret;
 	}
 
-	MediaPlugin* plugin = GetPlugin(reply.ref);
+	MediaPlugin* plugin = GetPlugin(ref);
 	if (plugin == NULL) {
 		printf("PluginManager::CreateDecoder: GetPlugin failed\n");
 		return B_ERROR;
@@ -197,18 +197,16 @@ PluginManager::CreateWriter(Writer** writer, const media_file_format& mff,
 	TRACE("PluginManager::CreateWriter enter\n");
 
 	// Get the Writer responsible for this media_file_format from the server.
-	server_get_writer_request request;
-	request.internal_id = mff.id.internal_id;
-	server_get_writer_reply reply;
-	status_t ret = QueryServer(SERVER_GET_WRITER_FOR_FORMAT_FAMILY, &request,
-		sizeof(request), &reply, sizeof(reply));
+	entry_ref ref;
+	status_t ret = AddOnManager::GetInstance()->GetWriter(&ref,
+		mff.id.internal_id);
 	if (ret != B_OK) {
 		printf("PluginManager::CreateWriter: can't get writer for file "
 			"family: %s\n", strerror(ret));
 		return ret;
 	}
 
-	MediaPlugin* plugin = GetPlugin(reply.ref);
+	MediaPlugin* plugin = GetPlugin(ref);
 	if (plugin == NULL) {
 		printf("PluginManager::CreateWriter: GetPlugin failed\n");
 		return B_ERROR;
@@ -259,18 +257,16 @@ PluginManager::CreateEncoder(Encoder** _encoder,
 	TRACE("PluginManager::CreateEncoder enter\n");
 
 	// Get encoder for this codec info from the server
-	server_get_encoder_for_codec_info_request request;
-	server_get_encoder_for_codec_info_reply reply;
-	request.id = codecInfo->id;
-	status_t ret = QueryServer(SERVER_GET_ENCODER_FOR_CODEC_INFO, &request,
-		sizeof(request), &reply, sizeof(reply));
+	entry_ref ref;
+	status_t ret = AddOnManager::GetInstance()->GetEncoder(&ref,
+		codecInfo->id);
 	if (ret != B_OK) {
 		printf("PluginManager::CreateEncoder: can't get encoder for codec %s: "
 			"%s\n", codecInfo->pretty_name, strerror(ret));
 		return ret;
 	}
 
-	MediaPlugin* plugin = GetPlugin(reply.ref);
+	MediaPlugin* plugin = GetPlugin(ref);
 	if (!plugin) {
 		printf("PluginManager::CreateEncoder: GetPlugin failed\n");
 		return B_ERROR;

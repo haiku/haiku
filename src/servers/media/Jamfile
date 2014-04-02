@@ -9,11 +9,9 @@ AddResources media_server : media_server.rdef ;
 
 Server media_server :
 	media_server.cpp
-	AddOnManager.cpp
 	AppManager.cpp
 	BufferManager.cpp
 	DefaultManager.cpp
-	FormatManager.cpp
 	MediaFilesManager.cpp
 	NodeManager.cpp
 	NotificationManager.cpp

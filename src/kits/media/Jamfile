@@ -51,10 +51,12 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			TimeSource.cpp
 
 			# Internal Functionality
+			AddOnManager.cpp
 			BufferCache.cpp
 			DataExchange.cpp
 			DefaultMediaTheme.cpp
 			DormantNodeManager.cpp
+			FormatManager.cpp
 			Notifications.cpp
 			request_data.cpp
 			SharedBufferList.cpp

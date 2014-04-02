@@ -25,9 +25,6 @@ enum {
 	MEDIA_SERVER_CANCEL_NOTIFICATIONS,
 	MEDIA_SERVER_SEND_NOTIFICATIONS,
 
-	MEDIA_SERVER_GET_FORMATS,
-	MEDIA_SERVER_MAKE_FORMAT_FOR,
-
 	// add_system_beep_event()
 	MEDIA_SERVER_ADD_SYSTEM_BEEP_EVENT,
 
@@ -76,12 +73,6 @@ enum {
 	SERVER_SET_ITEM_AUDIO_GAIN,
 	SERVER_GET_FORMAT_FOR_DESCRIPTION,
 	SERVER_GET_DESCRIPTION_FOR_FORMAT,
-	SERVER_GET_READERS,
-	SERVER_GET_DECODER_FOR_FORMAT,
-	SERVER_GET_WRITER_FOR_FORMAT_FAMILY,
-	SERVER_GET_FILE_FORMAT_FOR_COOKIE,
-	SERVER_GET_CODEC_INFO_FOR_COOKIE,
-	SERVER_GET_ENCODER_FOR_CODEC_INFO,
 	SERVER_REGISTER_ADD_ON,
 	SERVER_UNREGISTER_ADD_ON,
 	SERVER_GET_ADD_ON_REF,
@@ -601,62 +592,6 @@ struct server_set_item_audio_gain_request : request_data {
 struct server_set_item_audio_gain_reply : reply_data {
 };
 
-struct server_get_decoder_for_format_request : request_data {
-	media_format			format;
-};
-
-struct server_get_decoder_for_format_reply : reply_data {
-	xfer_entry_ref			ref;
-		// a ref to the decoder
-};
-
-struct server_get_encoder_for_codec_info_request : request_data {
-	int32					id;
-};
-
-struct server_get_encoder_for_codec_info_reply : reply_data {
-	xfer_entry_ref			ref;
-		// a ref to the encoder
-};
-
-struct server_get_readers_request : request_data {
-};
-
-struct server_get_readers_reply : reply_data {
-	xfer_entry_ref			ref[MAX_READERS];
-		// a list of refs to the reader
-	int32					count;
-};
-
-struct server_get_writer_request : request_data {
-	uint32					internal_id;
-};
-
-struct server_get_writer_reply : reply_data {
-	xfer_entry_ref			ref;
-		// a ref to the writer
-};
-
-struct server_get_file_format_request : request_data {
-	int32					cookie;
-};
-
-struct server_get_file_format_reply : reply_data {
-	media_file_format		file_format;
-		// the file format matching the cookie
-};
-
-struct server_get_codec_info_request : request_data {
-	int32					cookie;
-};
-
-struct server_get_codec_info_reply : reply_data {
-	media_codec_info		codec_info;
-	media_format_family		format_family;
-	media_format			input_format;
-	media_format			output_format;
-		// the codec info matching the cookie
-};
 
 struct server_get_dormant_flavor_info_request : request_data {
 	media_addon_id	add_on_id;

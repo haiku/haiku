@@ -47,11 +47,9 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 
 #include <syscalls.h>
 
-#include "AddOnManager.h"
 #include "AppManager.h"
 #include "BufferManager.h"
 #include "DataExchange.h"
-#include "FormatManager.h"
 #include "MediaMisc.h"
 #include "MediaFilesManager.h"
 #include "NodeManager.h"
@@ -61,10 +59,8 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 #include "media_server.h"
 
 
-AddOnManager* gAddOnManager;
 AppManager* gAppManager;
 BufferManager* gBufferManager;
-FormatManager* gFormatManager;
 MediaFilesManager* gMediaFilesManager;
 NodeManager* gNodeManager;
 NotificationManager* gNotificationManager;
@@ -111,8 +107,6 @@ ServerApp::ServerApp()
 	gAppManager = new AppManager;
 	gNodeManager = new NodeManager;
 	gMediaFilesManager = new MediaFilesManager;
-	gFormatManager = new FormatManager;
-	gAddOnManager = new AddOnManager;
 
 	fControlPort = create_port(64, MEDIA_SERVER_PORT_NAME);
 	fControlThread = spawn_thread(_ControlThread, "media_server control", 105,
@@ -128,13 +122,11 @@ ServerApp::~ServerApp()
 	delete_port(fControlPort);
 	wait_for_thread(fControlThread, NULL);
 
-	delete gAddOnManager;
 	delete gNotificationManager;
 	delete gBufferManager;
 	delete gAppManager;
 	delete gNodeManager;
 	delete gMediaFilesManager;
-	delete gFormatManager;
 }
 
 
@@ -142,14 +134,12 @@ void
 ServerApp::ReadyToRun()
 {
 	gNodeManager->LoadState();
-	gFormatManager->LoadState();
 
 	// make sure any previous media_addon_server is gone
 	_QuitAddOnServer();
 	// and start a new one
 	_LaunchAddOnServer();
 
-	gAddOnManager->LoadState();
 }
 
 
@@ -159,8 +149,6 @@ ServerApp::QuitRequested()
 	TRACE("ServerApp::QuitRequested()\n");
 	gMediaFilesManager->SaveState();
 	gNodeManager->SaveState();
-	gFormatManager->SaveState();
-	gAddOnManager->SaveState();
 
 	_QuitAddOnServer();
 
@@ -887,79 +875,6 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 			break;
 		}
 
-		case SERVER_GET_READERS:
-		{
-			const server_get_readers_request& request
-				= *static_cast<const server_get_readers_request*>(data);
-			server_get_readers_reply reply;
-
-			status_t status = gAddOnManager->GetReaders(reply.ref, &reply.count,
-				MAX_READERS);
-			request.SendReply(status, &reply, sizeof(reply));
-			break;
-		}
-
-		case SERVER_GET_DECODER_FOR_FORMAT:
-		{
-			const server_get_decoder_for_format_request& request
-				= *static_cast<
-					const server_get_decoder_for_format_request*>(data);
-			server_get_decoder_for_format_reply reply;
-
-			status_t status = gAddOnManager->GetDecoderForFormat(&reply.ref,
-				request.format);
-			request.SendReply(status, &reply, sizeof(reply));
-			break;
-		}
-
-		case SERVER_GET_WRITER_FOR_FORMAT_FAMILY:
-		{
-			const server_get_writer_request& request
-				= *static_cast<const server_get_writer_request*>(data);
-			server_get_writer_reply reply;
-
-			status_t status = gAddOnManager->GetWriter(&reply.ref,
-				request.internal_id);
-			request.SendReply(status, &reply, sizeof(reply));
-			break;
-		}
-
-		case SERVER_GET_FILE_FORMAT_FOR_COOKIE:
-		{
-			const server_get_file_format_request& request
-				= *static_cast<const server_get_file_format_request*>(data);
-			server_get_file_format_reply reply;
-
-			status_t status = gAddOnManager->GetFileFormat(&reply.file_format,
-				request.cookie);
-			request.SendReply(status, &reply, sizeof(reply));
-			break;
-		}
-
-		case SERVER_GET_CODEC_INFO_FOR_COOKIE:
-		{
-			const server_get_codec_info_request& request
-				= *static_cast<const server_get_codec_info_request*>(data);
-			server_get_codec_info_reply reply;
-
-			status_t status = gAddOnManager->GetCodecInfo(&reply.codec_info,
-				&reply.format_family, &reply.input_format,
-				&reply.output_format, request.cookie);
-			request.SendReply(status, &reply, sizeof(reply));
-			break;
-		}
-
-		case SERVER_GET_ENCODER_FOR_CODEC_INFO:
-		{
-			const server_get_encoder_for_codec_info_request& request
-				= *static_cast<
-					const server_get_encoder_for_codec_info_request*>(data);
-			server_get_encoder_for_codec_info_reply reply;
-			status_t status = gAddOnManager->GetEncoder(&reply.ref, request.id);
-			request.SendReply(status, &reply, sizeof(reply));
-			break;
-		}
-
 		default:
 			printf("media_server: received unknown message code %#08" B_PRIx32
 				"\n", code);
@@ -998,14 +913,6 @@ ServerApp::MessageReceived(BMessage* msg)
 
 		case MEDIA_FILES_MANAGER_SAVE_TIMER:
 			gMediaFilesManager->TimerMessage();
-			break;
-
-		case MEDIA_SERVER_GET_FORMATS:
-			gFormatManager->GetFormats(*msg);
-			break;
-
-		case MEDIA_SERVER_MAKE_FORMAT_FOR:
-			gFormatManager->MakeFormatFor(*msg);
 			break;
 
 		case MEDIA_SERVER_ADD_SYSTEM_BEEP_EVENT:
