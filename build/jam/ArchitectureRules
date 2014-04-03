@@ -29,7 +29,7 @@ rule ArchitectureSetup architecture
 	# http://www.freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
 	if $(gccVersion[1]) >= 3 {
 		gccBaseFlags += -fno-strict-aliasing ;
-		if ! $(HAIKU_CC_IS_CLANG_$(architecture)) {
+		if $(HAIKU_CC_IS_CLANG_$(architecture)) = 0 {
 			gccBaseFlags += -fno-tree-vrp ;
 		}
 	}
@@ -393,7 +393,7 @@ rule KernelArchitectureSetup architecture
 
 	local g++BaseFlags = $(gccBaseFlags) -fno-exceptions ;
 
-	if $(gccVersion[1]) >= 3 && ! $(HAIKU_CC_IS_CLANG_$(architecture)) {
+	if $(gccVersion[1]) >= 3 && $(HAIKU_CC_IS_CLANG_$(architecture)) = 0 {
 		g++BaseFlags += -fno-use-cxa-atexit ;
 	}
 
@@ -498,7 +498,7 @@ rule ArchitectureSetupWarnings architecture
 	rule EnableWerror dirTokens : scope {
 		# Clang gives way more warnings than GCC, so that code won't compile
 		# -Werror when using Clang.
-		if ! $(HAIKU_CC_IS_CLANG_$(architecture)) {
+		if $(HAIKU_CC_IS_CLANG_$(architecture)) = 0 {
 			SetConfigVar WARNINGS : HAIKU_TOP $(dirTokens) : treatAsErrors
 				: $(scope) ;
 		}
@@ -513,7 +513,7 @@ rule ArchitectureSetupWarnings architecture
 		WARNINGS on $(file) = $(WARNINGS) ;
 	}
 
-	if $(HAIKU_CC_IS_CLANG_$(architecture)) {
+	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
 		# We need -integrated-as, as otherwise Clang uses GCC as assembler and
 		# passes -fheinous-gnu-extensions to GCC, which GCC does not understand
 		# then errors out.
