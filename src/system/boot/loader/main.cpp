@@ -26,6 +26,9 @@
 #endif
 
 
+void *__dso_handle;
+
+
 extern "C" int
 main(stage2_args *args)
 {

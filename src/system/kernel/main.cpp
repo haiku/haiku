@@ -65,6 +65,9 @@
 #	define TRACE(x...) ;
 #endif
 
+
+void *__dso_handle;
+
 bool gKernelStartup = true;
 bool gKernelShutdown = false;
 
