@@ -86,6 +86,8 @@ options:
                               ones the secondary architectures.
   --update                    re-runs last configure invocation [must be given
                               as first option!]
+  --use-clang                 Build with host Clang instead of GCC cross
+                              compiler
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
                               process, but uses more memory.
   --use-gcc-graphite          Build with GCC Graphite engine for loop
@@ -352,6 +354,16 @@ standard_gcc_settings()
 	set_variable HAIKU_CPU_$targetArch $targetCpu
 
 	get_build_tool_path CC_$targetArch "$gcc"
+	if [ $useClang = 1 ]; then
+		# The get_build_tool_path above is needed to get the path to the rest
+		# of the build tools
+		local path=`dirname $(get_variable HAIKU_CC_$targetArch)`
+		set_variable HAIKU_CC_$targetArch \
+			"PATH=\\\"$path:\\\$PATH\\\" clang -target $gccMachine"
+		set_variable HAIKU_CC_IS_CLANG_$targetArch 1
+	else
+		set_variable HAIKU_CC_IS_CLANG_$targetArch 0
+	fi
 	set_variable HAIKU_GCC_RAW_VERSION_$targetArch $gccRawVersion
 	set_variable HAIKU_GCC_MACHINE_$targetArch $gccMachine
 	set_variable HAIKU_GCC_LIB_DIR_$targetArch $gccdir
@@ -454,6 +466,7 @@ targetArchs=
 buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
 buildCrossToolsJobs=
+useClang=0
 useGccGraphiteDefault=0
 unknownArchIndex=1
 haikuTargetArchs=
@@ -623,6 +636,7 @@ while [ $# -gt 0 ] ; do
 			)
 			haikuTargetArchs="$haikuTargetArchs $targetArch"
 			;;
+		--use-clang) useClang=1; shift 1;;
 		--use-gcc-pipe)	HAIKU_USE_GCC_PIPE=1; shift 1;;
 		--use-gcc-graphite)	useGccGraphiteDefault=1; shift 1;;
 		--use-32bit)	HAIKU_HOST_USE_32BIT=1; shift 1;;
@@ -907,6 +921,7 @@ for targetArch in $HAIKU_PACKAGING_ARCHS; do
 		HAIKU_BOOT_LIBSUPC++		HAIKU_BOOT_LIBSUPCXX
 		HAIKU_AR					HAIKU_AR
 		HAIKU_CC					HAIKU_CC
+		HAIKU_CC_IS_CLANG			HAIKU_CC_IS_CLANG
 		HAIKU_LD					HAIKU_LD
 		HAIKU_OBJCOPY				HAIKU_OBJCOPY
 		HAIKU_RANLIB				HAIKU_RANLIB
