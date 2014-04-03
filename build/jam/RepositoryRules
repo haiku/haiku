@@ -483,7 +483,7 @@ rule FetchPackage packageName : flags
 {
 	local foundPackageName = [ IsPackageAvailable $(packageName) : $(flags) ] ;
 	if ! $(foundPackageName) {
-		Exit "DownloadPackage: package" $(packageName) "not available!" ;
+		Exit "FetchPackage: package" $(packageName) "not available!" ;
 		return ;
 	}
 	packageName = $(foundPackageName) ;
@@ -496,6 +496,12 @@ rule FetchPackage packageName : flags
 		= [ on $(packageFamily) return $(HAIKU_PACKAGE_VERSIONS[1]) ] ;
 	local fileName = [ on $(package) return $(HAIKU_PACKAGE_FILE_NAME) ] ;
 	local repository = [ on $(package) return $(HAIKU_PACKAGE_REPOSITORY) ] ;
+
+	if $(HAIKU_DONT_FETCH_PACKAGES) {
+		Exit "FetchPackage: file" $(fileName) "not found and fetching"
+			"disabled!" ;
+		return ;
+	}
 
 	return [ InvokeRepositoryMethod $(repository) : FetchPackage : $(package)
 		: $(fileName) ] ;
