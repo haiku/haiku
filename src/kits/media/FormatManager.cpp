@@ -143,11 +143,10 @@ FormatManager::CreateInstance()
 /* static */ FormatManager*
 FormatManager::GetInstance()
 {
-	static FormatManager* sFormatManager = NULL;
-	if (sFormatManager == NULL)
+	if (sInstance == NULL)
 		pthread_once(&sInitOnce, &CreateInstance);
 
-	return sFormatManager;
+	return sInstance;
 }
 
 
