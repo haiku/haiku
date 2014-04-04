@@ -5,6 +5,7 @@
 
 #include <LayoutUtils.h>
 
+#include <algorithm>
 #include <typeinfo>
 
 #include <Layout.h>
@@ -191,7 +192,7 @@ BLayoutUtils::AlignInFrame(BView* view, BRect frame)
 		float preferredHeight;
 		view->GetHeightForWidth(frame.Width(), &minHeight, &maxHeight,
 			&preferredHeight);
-		frame.bottom = frame.top + max_c(frame.Height(), minHeight);
+		frame.bottom = frame.top + std::max(frame.Height(), minHeight);
 		maxSize.height = minHeight;
 	}
 	frame = AlignInFrame(frame, maxSize, alignment);
