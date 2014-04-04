@@ -174,34 +174,29 @@ BLayoutUtils::AlignInFrame(BRect frame, BSize maxSize, BAlignment alignment)
 void
 BLayoutUtils::AlignInFrame(BView* view, BRect frame)
 {
- 	BSize maxSize = view->MaxSize();
- 	BAlignment alignment = view->LayoutAlignment();
-
- 	if (view->HasHeightForWidth()) {
- 		// The view has height for width, so we do the horizontal alignment
- 		// ourselves and restrict the height max constraint respectively.
-
- 		if (maxSize.width < frame.Width()
- 			&& alignment.horizontal != B_ALIGN_USE_FULL_WIDTH) {
- 			frame.OffsetBy(floor((frame.Width() - maxSize.width)
- 				* alignment.RelativeHorizontal()), 0);
- 			frame.right = frame.left + maxSize.width;
- 		}
- 		alignment.horizontal = B_ALIGN_USE_FULL_WIDTH;
-
- 		float minHeight;
- 		float maxHeight;
- 		float preferredHeight;
- 		view->GetHeightForWidth(frame.Width(), &minHeight, &maxHeight,
- 			&preferredHeight);
-
- 		frame.bottom = frame.top + max_c(frame.Height(), minHeight);
- 		maxSize.height = minHeight;
- 	}
-
- 	frame = AlignInFrame(frame, maxSize, alignment);
- 	view->MoveTo(frame.LeftTop());
- 	view->ResizeTo(frame.Size());
+	BSize maxSize = view->MaxSize();
+	BAlignment alignment = view->LayoutAlignment();
+	if (view->HasHeightForWidth()) {
+		// The view has height for width, so we do the horizontal alignment
+		// ourselves and restrict the height max constraint respectively.
+		if (maxSize.width < frame.Width()
+			&& alignment.horizontal != B_ALIGN_USE_FULL_WIDTH) {
+			frame.OffsetBy(floor((frame.Width() - maxSize.width)
+				* alignment.RelativeHorizontal()), 0);
+			frame.right = frame.left + maxSize.width;
+		}
+		alignment.horizontal = B_ALIGN_USE_FULL_WIDTH;
+		float minHeight;
+		float maxHeight;
+		float preferredHeight;
+		view->GetHeightForWidth(frame.Width(), &minHeight, &maxHeight,
+			&preferredHeight);
+		frame.bottom = frame.top + max_c(frame.Height(), minHeight);
+		maxSize.height = minHeight;
+	}
+	frame = AlignInFrame(frame, maxSize, alignment);
+	view->MoveTo(frame.LeftTop());
+	view->ResizeTo(frame.Size());
 }
 
 
