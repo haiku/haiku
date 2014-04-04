@@ -1914,17 +1914,15 @@ BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
-	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
+	float textHeight = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
 	height = std::max(height, textHeight);
 
 	// handle alignment
-	BPoint location;
+	BRect alignedRect = BLayoutUtils::AlignInFrame(rect,
+		BSize(width - 1, height - 1), alignment);
 
 	if (icon != NULL) {
-		// draw the icon
-		BRect alignedRect = BLayoutUtils::AlignInFrame(rect,
-			BSize(width - 1, height - 1), alignment);
-		location = alignedRect.LeftTop();
+		BPoint location = alignedRect.LeftTop();
 		if (icon->Bounds().Height() + 1 < height)
 			location.y += ceilf((height - icon->Bounds().Height() - 1) / 2);
 
@@ -1932,45 +1930,12 @@ BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 		view->SetDrawingMode(B_OP_OVER);
 		view->DrawBitmap(icon, location);
 		view->SetDrawingMode(oldMode);
-
-		// set the location to draw the label
-		location = BPoint(alignedRect.left + textOffset,
-			alignedRect.top + ceilf(fontHeight.ascent));
-		if (textHeight < height)
-			location.y += ceilf((height - textHeight) / 2);
-	} else {
-		switch (alignment.horizontal) {
-			case B_ALIGN_LEFT:
-			default:
-				location.x = rect.left;
-				break;
-
-			case B_ALIGN_RIGHT:
-				location.x = rect.right - width;
-				break;
-
-			case B_ALIGN_CENTER:
-				location.x = (rect.left + rect.right - width) / 2.0f;
-				break;
-		}
-
-		switch (alignment.vertical) {
-			case B_ALIGN_TOP:
-				location.y = rect.top + ceilf(fontHeight.ascent);
-				break;
-
-			case B_ALIGN_MIDDLE:
-			default:
-				location.y = floorf((rect.top + rect.bottom - height)
-					/ 2.0f + 0.5f) + ceilf(fontHeight.ascent);
-				break;
-
-			case B_ALIGN_BOTTOM:
-				location.y = rect.bottom - ceilf(fontHeight.descent);
-				break;
-		}
 	}
 
+	BPoint location(alignedRect.left + textOffset,
+		alignedRect.top + ceilf(fontHeight.ascent));
+	if (textHeight < height)
+		location.y += ceilf((height - textHeight) / 2);
 	DrawLabel(view, truncatedLabel.String(), base, flags, location);
 }
 
