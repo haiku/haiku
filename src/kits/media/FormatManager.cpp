@@ -129,7 +129,7 @@ FormatManager::FormatManager()
 }
 
 
-pthread_once_t FormatManager::sInitOnce;
+pthread_once_t FormatManager::sInitOnce = PTHREAD_ONCE_INIT;
 FormatManager* FormatManager::sInstance = NULL;
 
 
@@ -143,8 +143,7 @@ FormatManager::CreateInstance()
 /* static */ FormatManager*
 FormatManager::GetInstance()
 {
-	if (sInstance == NULL)
-		pthread_once(&sInitOnce, &CreateInstance);
+	pthread_once(&sInitOnce, &CreateInstance);
 
 	return sInstance;
 }
