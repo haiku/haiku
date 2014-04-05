@@ -91,10 +91,11 @@ public:
 
 private:
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
-			void				_PopulateAllPackagesThread();
+			void				_PopulateAllPackagesThread(bool fromCacheOnly);
 
 			void				_PopulatePackageIcon(
-									const PackageInfoRef& package);
+									const PackageInfoRef& package,
+									bool fromCacheOnly);
 
 private:
 			BLocker				fLock;

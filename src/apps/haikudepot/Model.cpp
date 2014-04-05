@@ -6,11 +6,18 @@
 
 #include "Model.h"
 
+#include <ctime>
 #include <stdarg.h>
 #include <stdio.h>
+#include <time.h>
 
 #include <Autolock.h>
 #include <Catalog.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <File.h>
+#include <Path.h>
 
 #include "WebAppInterface.h"
 
@@ -564,13 +571,14 @@ int32
 Model::_PopulateAllPackagesEntry(void* cookie)
 {
 	Model* model = static_cast<Model*>(cookie);
-	model->_PopulateAllPackagesThread();
+	model->_PopulateAllPackagesThread(true);
+	model->_PopulateAllPackagesThread(false);
 	return 0;
 }
 
 
 void
-Model::_PopulateAllPackagesThread()
+Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 {
 	int32 depotIndex = 0;
 	int32 packageIndex = 0;
@@ -601,7 +609,7 @@ Model::_PopulateAllPackagesThread()
 		if (package.Get() == NULL)
 			continue;
 	
-		_PopulatePackageIcon(package);
+		_PopulatePackageIcon(package, fromCacheOnly);
 		// TODO: Average user rating. It needs to be shown in the
 		// list view, so without the user clicking the package.
 	}
@@ -609,8 +617,41 @@ Model::_PopulateAllPackagesThread()
 
 
 void
-Model::_PopulatePackageIcon(const PackageInfoRef& package)
+Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 {
+	// See if there is a cached icon file
+	BFile iconFile;
+	BPath iconCachePath;
+	bool fileExists = false;
+	BString iconName(package->Title());
+	iconName << ".hvif";
+	time_t modifiedTime;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &iconCachePath) == B_OK
+		&& iconCachePath.Append("HaikuDepot/IconCache") == B_OK
+		&& create_directory(iconCachePath.Path(), 0777) == B_OK
+		&& iconCachePath.Append(iconName) == B_OK) {
+		// Try opening the file in read-only mode, which will fail if its
+		// not a file or does not exist.
+		fileExists = iconFile.SetTo(iconCachePath.Path(), B_READ_ONLY) == B_OK;
+		if (fileExists)
+			iconFile.GetModificationTime(&modifiedTime);
+	}
+
+	if (fileExists) {
+		time_t now;
+		time(&now);
+		if (fromCacheOnly || now - modifiedTime < 60 * 60) {
+			// Cache file is recent enough, just use it and return.
+			BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(iconFile), true);
+			package->SetIcon(bitmapRef);
+			return;
+		}
+	}
+
+	if (fromCacheOnly)
+		return;
+
+	// Retrieve icon from web-app
 	WebAppInterface interface;
 	BMallocIO buffer;
 
@@ -618,5 +659,9 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package)
 	if (status == B_OK) {
 		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
 		package->SetIcon(bitmapRef);
+		if (iconFile.SetTo(iconCachePath.Path(),
+				B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) == B_OK) {
+			iconFile.Write(buffer.Buffer(), buffer.BufferLength());
+		}
 	}
 }
