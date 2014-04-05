@@ -15,7 +15,7 @@ RemotePackageRepository HaikuPorts
 	apr_devel-1.4.6-7
 	apr_util-1.4.1-4
 	apr_util_devel-1.4.1-4
-	autoconf-2.69-5
+	autoconf-2.69-6
 	automake-1.13.1-4
 #	bepdf-1.1.1~beta5_2013_04_28-1
 	binutils-2.23.2_2013_04_09-2
@@ -25,8 +25,8 @@ RemotePackageRepository HaikuPorts
 	cdrtools-3.01~a07-3
 	cmake-2.8.11.2-7
 	ctags-5.8-3
-	curl-7.26.0-5
-	curl_devel-7.26.0-5
+	curl-7.36.0-1
+	curl_devel-7.36.0-1
 	cvs-1.12.13.1-6
 	doxygen-1.6.3-4
 	expat-2.0.1-7
@@ -41,13 +41,13 @@ RemotePackageRepository HaikuPorts
 	gcc-4.8.2_2014_01_28-2
 	gettext-0.18.1.1-5
 	gettext_libintl-0.18.1.1-5
-	git-1.8.3.4-2
-	git_arch-1.8.3.4-2
-	git_cvs-1.8.3.4-2
-	git_daemon-1.8.3.4-2
-	git_email-1.8.3.4-2
-	git_remote_helpers-1.8.3.4-2
-	git_svn-1.8.3.4-2
+	git-1.8.3.4-3
+	git_arch-1.8.3.4-3
+	git_cvs-1.8.3.4-3
+	git_daemon-1.8.3.4-3
+	git_email-1.8.3.4-3
+	git_remote_helpers-1.8.3.4-3
+	git_svn-1.8.3.4-3
 	glu-9.0.0-2
 	glu_devel-9.0.0-2
 	gperf-3.0.4-1
@@ -97,6 +97,7 @@ RemotePackageRepository HaikuPorts
 	mesa_swpipe-10.0.2-3
 	mkdepend-1.7-3
 	nano-2.2.6-3
+	nasm-2.11.02-1
 	ncurses-5.9-10
 	ncurses_devel-5.9-10
 	neon-0.29.6-7
@@ -108,12 +109,12 @@ RemotePackageRepository HaikuPorts
 	pe-2.4.3_hg611-1
 	perl-5.18.1-1
 	pkgconfig-0.27.1-2
-	python-2.6.9-1
-	readline-6.2-4
-	readline_devel-6.2-4
+	python-2.7.6-1
+	readline-6.3-1
+	readline_devel-6.3-1
 	ruby-1.9.1-2
 	ruby_devel-1.9.1-2
-	scons-2.2.0-2
+	scons-2.2.0-3
 	sed-4.2.1-6
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
@@ -121,7 +122,7 @@ RemotePackageRepository HaikuPorts
 	sqlite_devel-3.7.13-4
 	subversion-1.6.18-6
 	subversion_devel-1.6.18-6
-	tar-1.26-6
+	tar-1.27.1-2
 	texinfo-4.13a-7
 	vision-0.9.7.r949-2
 	which-2.20-2
@@ -185,6 +186,7 @@ RemotePackageRepository HaikuPorts
 	mesa
 	mkdepend
 	nano
+	nasm
 	ncurses
 	neon
 	openssh
