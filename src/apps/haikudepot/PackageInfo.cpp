@@ -64,16 +64,26 @@ SharedBitmap::SharedBitmap(const char* mimeType)
 }
 
 
-SharedBitmap::SharedBitmap(const BMallocIO& data)
+SharedBitmap::SharedBitmap(BPositionIO& data)
 	:
 	BReferenceable(),
 	fResourceID(-1),
-	fBuffer(new(std::nothrow) uint8[data.BufferLength()]),
-	fSize(data.BufferLength()),
+	fBuffer(NULL),
+	fSize(0),
 	fMimeType()
 {
-	if (fBuffer != NULL)
-		memcpy(fBuffer, data.Buffer(), fSize);
+	status_t status = data.GetSize(&fSize);
+	if (status == B_OK && fSize > 0 && fSize <= 64 * 1024) {
+		fBuffer = new(std::nothrow) uint8[fSize];
+
+		data.Seek(0, SEEK_SET);
+		ssize_t read = data.Read(fBuffer, fSize);
+		if (read != fSize) {
+			delete[] fBuffer;
+			fBuffer = NULL;
+			fSize = 0;
+		}
+	}
 
 	fBitmap[0] = NULL;
 	fBitmap[1] = NULL;

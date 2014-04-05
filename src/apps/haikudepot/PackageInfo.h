@@ -16,7 +16,7 @@
 
 
 class BBitmap;
-class BMallocIO;
+class BPositionIO;
 
 
 class SharedBitmap : public BReferenceable {
@@ -31,7 +31,7 @@ public:
 								SharedBitmap(BBitmap* bitmap);
 								SharedBitmap(int32 resourceID);
 								SharedBitmap(const char* mimeType);
-								SharedBitmap(const BMallocIO& data);
+								SharedBitmap(BPositionIO& data);
 								~SharedBitmap();
 
 			const BBitmap*		Bitmap(Size which);
@@ -49,7 +49,7 @@ private:
 private:
 			int32				fResourceID;
 			uint8*				fBuffer;
-			size_t				fSize;
+			off_t				fSize;
 			BString				fMimeType;
 			BBitmap*			fBitmap[3];
 };
