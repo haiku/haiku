@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-20014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,7 +58,7 @@
 
 <h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" /><acronym title="Keymap">Tastaturlayout</acronym></h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Preferences">Einstellungen</acronym></span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Einstellungen</span></td></tr>
 <tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/Keymap</span></td></tr>
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/Keymap/*</span> - Ort für vom Benutzer geänderte Tastaturlayouts.<br />
 <span class="path">~/config/settings/Key_map</span></td></tr>
@@ -74,8 +74,12 @@ Neben der Konfiguration eines eigenen Tastaturlayouts, kann das <acronym title="
 <tr><td><span class="menu">Auslösetasten definieren</span></td><td> </td><td>Setzt die oben erwähnten blauen Tasten.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Befehlstasten tauschen...</span></td><td> </td><td>Setzt die Befehlskürzeltaste in Windows/Linux Mode, d.h. <span class="key">CONTROL</span> (= <span class="key">STRG</span>) oder Haiku Mode, d.h. <span class="key">COMMAND</span> (= <span class="key">ALT</span>).</td></tr>
 </table>
-<p>Die Liste zur Linken enthält die voreingestellten Tastaturlayouts des Systems, und darunter ggf. benutzerdefinierte Layouts. Layouts lassen sich via Drag &amp; Drop in der Tastaturdarstellung verändern: mit der linken Maustaste ausgeführt, wird eine Taste kopiert, mit der rechten die beiden Tasten ausgetauscht.<br />
-Abschließend lässt sich das Ergebnis mittels <span class="menu">Datei | Speichern unter...</span> speichern. So veränderte Layouts erscheinen nur in der benutzerdefinierten Liste wenn sie unter <span class="path">~/config/settings/Keymap/</span> abgelegt werden. Ansonsten muss man sie per <span class="menu">Datei | Öffnen...</span> laden.</p>
+<p>Die Liste zur Linken enthält die voreingestellten Tastaturlayouts des Systems, und darunter ggf. benutzerdefinierte Layouts. Layouts lassen sich via Drag &amp; Drop in der Tastaturdarstellung verändern: mit der linken Maustaste ausgeführt, wird eine Taste kopiert, mit der rechten werden die beiden Tasten ausgetauscht.</p>
+<p>Als Alternative zum Drag &amp; Drop von Tasten, öffnet der Menüpunkt <span class="menu">Datei | Hilfstasten zuordnen...</span> dieses Fenster:</p>
+<img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
+<p>Hier verschiedenen Funktionen die entsprechenden Tasten zugeordnet werden, oder auch Funktionen komplett deaktiviert werden. Man kann sogar unterschiedlichen Funktionen die gleiche Taste zuordnen. Das ist allerdings in den meisten Fällen keine gute Idee und man wird deshalb durch ein kleines Ausrufezeichen neben dem Auswahlmenu davor gewarnt.<br />
+Klickt man <span class="button">Hilfstasten zuordnen</span> werden die Änderungen übernommen und das Fenster geschlossen.</p>
+<p>Abschließend lässt sich das Ergebnis mittels <span class="menu">Datei | Speichern unter...</span> speichern. So veränderte Layouts erscheinen nur in der benutzerdefinierten Liste wenn sie unter <span class="path">~/config/settings/Keymap/</span> abgelegt werden. Ansonsten muss man sie per <span class="menu">Datei | Öffnen...</span> laden.</p>
 <p>Um die Tastaturdarstellung besser an die reale Tastatur anzupassen, stehen diverse Einstellungen im Menü <span class="menu">Tastatur</span> zur Verfügung.</p>
 <p>Die Schriftart der Tastenbeschriftungen kann im Menü <span class="menu">Schriftart</span> gesetzt werden. Achtung, nicht alle Schriften enthalten unbedingt alle für ein bestimmtes Layout benötigte Zeichen.</p>
 <p>Schließlich bringt der <span class="button">Anfangswerte</span> Knopf die Einstellungen wieder zurück, die beim Start des Keymap Panels aktiv waren.</p>
@@ -87,7 +91,7 @@ Abschließend lässt sich das Ergebnis mittels <span class="menu">Datei | Speich
 <p>Das aktuelle Layout lässt sich mit einem Befehl im Terminal ausgeben:</p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
 <p>Die so generierte Textdatei lässt sich anschließend in einem Texteditor öffnen. Hier sollte man auf alle Fälle eine Schrift mit fester Breite verwenden, sonst findet man sich hier bestimmt nicht zurecht...<br />
-Am Anfang der Datei befindet sich die Legende für eine stilisierte Tastatur mit den entsprechenden HEX-Werten für jede Taste. Darunter folgen die eigentlichen Zuweisungen der einzelnen Werte. Hiermit lässt sich all das ändern, was auch mit den <acronym title="Keymap">Tastaturlayout</acronym> Einstellungen möglich ist, und dann noch einiges mehr. Besitzt die eigene Tastatur spezielle Tasten, lassen sie sich hier u.U. aktivieren. Zumindest als normale Tasten oder weitere Option- oder Control-Taste. Dadurch kann man immer noch nicht z.B. Multimediatasten zum lauter/leiser machen benutzen oder um bestimmte Anwendungen zu starten. Dazu existiert z.B. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
+Am Anfang der Datei befindet sich die Legende für eine stilisierte Tastatur mit den entsprechenden HEX-Werten für jede Taste. Darunter folgen die eigentlichen Zuweisungen der einzelnen Werte. Hiermit lässt sich all das ändern, was auch mit den <acronym title="Keymap">Tastaturlayout</acronym> Einstellungen möglich ist, und dann noch einiges mehr. Besitzt die eigene Tastatur spezielle Tasten, lassen sie sich hier u.U. aktivieren. Zumindest als normale Tasten oder weitere Option- oder Control-Taste. Dadurch kann man immer noch nicht z.B. Multimediatasten zum lauter/leiser machen benutzen oder um bestimmte Anwendungen zu starten. Dazu existieren die <a href="shortcuts.html">Tastenkürzel</a> Einstellungen.</p>
 <p>Ist man fertig, wird die Datei abgespeichert und das geänderte Layout mit diesem Befehl geladen:</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
 <p>Möchte man dieses Layout in der Keymap Anwendung importieren, muss es erst in ein Binärformat konvertiert werden:</p>

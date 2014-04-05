@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  *		Stephan Aßmus <superstippi@gmx.de> 
  * Translators:
  *		Karvjorm
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -52,6 +53,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -94,17 +96,16 @@
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="software" name="software">Lisäohjelmistojen asentaminen</a></h2>
-<p>Binaari- ja lähdekoodiyhteensopivuuden vuoksi monia BeOS-sovelluksia voidaan suorittaa Haikussa (sinun on ehkä asennettava valinnainen paketti ”beoscompatibility” joitakin ohjelmia varten, katso alla). Yksinkertaisesti pura pakkaus latauksen jälkeen (hiiren kaksoisnapsautus avaa <span class="app">Laajentaja</span>n) kansioon <span class="path">/boot/apps/</span> ja käynnistä sovellus sieltä.</p>
+<p>Most of the available software can be downloaded and installed with the application HaikuDepot that comes with Haiku.<br />
+Because of our binary and source compatibility, most BeOS applications run on Haiku. Many of those have been re-packaged for Haiku or still run unmodified. You'll find more information on installing new programs in the user guide's chapter on <a href="../userguide/fi/applications.html">Applications</a>.</p>
 
-<p>Suosittuja ohjelmistovarastoja ovat:</p>
+<p>Besides using HaikuDepot, popular software repositories are:</p>
 <ul>
 	<li><a href="http://www.haikuware.com" class="printurl">Haikuware</a></li>
 	<li><a href="http://www.bebits.com" class="printurl">BeBits</a></li>
-	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - ylläpitää siirretyn ohjelmiston korjauksia</li>
-	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> - ylläpitää aitoja BeOS- ja Haiku open source -ohjelmistohankkeita</li>
+	<li><a href="http://haikuports.org" class="printurl">HaikuPorts</a> - maintains patches for ported software</li>
+	<li><a href="https://github.com/HaikuArchives" class="printurl">HaikuArchives</a> - hosts native BeOS and Haiku open source software projects in a github</li>
 </ul>
-
-<p>Haikun rakentamisjärjestelmässä käytetään myös niin sanottuja valinnaisia pakkauksia. Ei ole tarkoitus, että loppukäyttäjät manuaalisesti purkavat ja asentavat pakkaukset. Sen sijaan tarkoitusta varten on apuohjelmaskripti <tt>installoptionalpackage</tt>. Tämän skriptin tarkoitus on täyttää aukko, joka johtuu siitä, että Haikun pakettihallinta on vielä suunnitteilla. Skripti sallii sinun asentaa useimmat saatavilla olevat valinnaiset pakkaukset.<br />Sinun on suoritettava komento Pääteikkunassa: <tt>installoptionalpackage -h</tt> selittää sen käytön.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>

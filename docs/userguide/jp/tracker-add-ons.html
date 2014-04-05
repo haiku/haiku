@@ -59,28 +59,28 @@
 
 <h1>Tracker アドオン</h1>
 
-<p>アプリケーションは、Tracker からのファイルの選択で自身を容易に呼び出せるように、アドオンをインストールできます。特定のファイルタイプを扱うことができるアドオンだけが、コンテキストメニューあるいは Tracker ウィンドウのファイル (File) メニューの<span class="menu">アドオン (Add-Ons)</span> 以下に表示されます。いくつかのアドオンは、必ずしも処理するファイルを必要とせず、常にメニュー内に存在しています。</p>
-<p>New Tracker add-ons that don't come as part of a regular .hpkg package, can be installed by copying them into their respective non-packaged folder (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
+<p>アプリケーションは、Tracker からのファイルの選択で自身を容易に呼び出せるように、アドオンをインストールできます。特定のファイルタイプを扱えるアドオンだけが、コンテキストメニューあるいは Tracker ウィンドウのファイル (File) メニューの<span class="menu">アドオン (Add-Ons)</span> 以下に表示されます。いくつかのアドオンは、必ずしも処理するファイルを必要とせず、常にメニュー内に存在しています。</p>
+<p>正規の .hpkg パッケージの一部でない Tracker アドオンをインストールするには、それらを個々の non-packaged フォルダーにコピーします (<a href="filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください)。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>すべてのユーザに利用可能なアドオン用</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>すべてのユーザーに利用可能なアドオン用</td></tr>
 <tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Tracker/</span></td><td>   </td><td>ユーザー専用アドオン用</td></tr>
 </table>
-<p>アドオンのファイル名は、ダッシュと英大文字を後に付けることができ、それはキーボードショートカットから利用可能です。たとえば、<span class="app">Open Target Folder-O</span> は、<span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span> で起動します。<br />
-もちろん、ショートカットを決める場合は、ショートカットの衝突の可能性を管理しなければなりません。異なるアドオンに同じショートカットを持つことはできません。</p>
+<p>アドオンのファイル名にはダッシュと英大文字を後に付けられ、英字はキーボードショートカットから利用できます。たとえば、<span class="app">Open Target Folder-O</span> は、<span class="key">ALT</span> <span class="key">OPT</span> <span class="key">O</span> で起動します。<br />
+もちろん、ショートカットを決める場合は、ショートカットが衝突する可能性を処理しなければなりません。異なるアドオンに同じショートカットを持つことはできません。</p>
 
 <h2><a id="system-add-ons" name="system-add-ons">Haiku の Tracker アドオン</a></h2>
 <p>これらの Tracker アドオンはすべての Haiku インストールに付いてきます。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
 	<tr><td class="onelinetop"><b>Background</b><i>-B</i></td>
-		<td valign="top">デスクトップあるいは任意のフォルダーの色やイメージを変更するため、<a href="preferences/backgrounds.html">背景 (Background)</a> プリファレンスを起動します。イメージファイルから呼び出された場合、背景パネルは、起動時にそのイメージを使われる可能性のある背景としてロードします。</td></tr>
+		<td valign="top">デスクトップあるいは任意のフォルダーの色や画像を変更するため、<a href="preferences/backgrounds.html">背景 (Background)</a> プリファレンスを起動します。画像ファイルから呼び出された場合、背景パネルは、起動時にその画像を使われる可能性のある背景としてロードします。</td></tr>
 	<tr><td class="onelinetop"><b>DiskUsage</b><i>-I</i></td>
 		<td valign="top">一致するフォルダーをベースとして <a href="applications/diskusage.html">DiskUsage</a> アプリケーションを起動します。</td></tr>
 	<tr><td class="onelinetop"><b>FileType</b><i>-F</i></td>
-		<td valign="top">ファイル上で呼び出された場合、そのファイル特有の <a href="filetypes.html">FileType</a> パネルを、そうでなければ FileTypes プリファレンスを起動します。</td></tr>
+		<td valign="top">ファイル上で呼び出された場合、そのファイル特有の <a href="filetypes.html">FileType</a> パネルを起動し、ファイル以外の場合、FileTypes プリファレンスを起動します。</td></tr>
 	<tr><td class="onelinetop"><b>Open Target Folder</b><i>-O</i></td>
-		<td valign="top">リンク上のみで使用でき、リンク元ファイルが存在するフォルダーを開きます。</td></tr>
+		<td valign="top">リンク上だけで使用でき、リンク元ファイルが存在するフォルダーを開きます。</td></tr>
 	<tr><td class="onelinetop"><b>TextSearch</b><i>-G</i></td>
-		<td valign="top"><a href="applications/textsearch.html">TextSearch</a> アプリケーションを起動して、選択されたフォルダー (または、そのサブフォルダー) 中の文字列を捜します。</td></tr>
+		<td valign="top"><a href="applications/textsearch.html">TextSearch</a> アプリケーションを起動して、選択されたフォルダー (またはそのサブフォルダー) 中で文字列を捜します。</td></tr>
 	<tr><td class="onelinetop"><b>ZipOMatic</b><i>-Z</i></td>
 		<td valign="top">選択されたファイルを zip アーカイブへ追加します。ファイルを選択せずに呼び出すと、ドラッグ＆ドロップによって zip アーカイブを作成するパネルを開きます。</td></tr>
 </table>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,10 +48,10 @@
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Innehållsförteckning</a> 
-::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Innehållsförteckning</a> 
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>
 
@@ -64,56 +64,89 @@
 <p>Haiku's starthanterare kan hjälpa när du har hårdvarurelaterade problem eller vill välja vilken Haikuinstallation du vill starta, om du har mer än en (kanske på en installations-CD eller ett USB-minne).<br />
 Det är också användbart efter att man installerat en mjukvarukomponent som krånglar och som hindrar dig från att starta systemet för att ta bort den igen. Valet <i>Disable user add-ons</i> som nämns nedan, startar Haiku utan att ladda komponenter installerade av användaren, t.ex. en drivrutin.</p>
 <p>För att få fram valen i Boot Loader måste du tycka på, och fortsätta hålla ner tangenten <span class="key">SKIFT</span> innan Haikus startprocess. Om du har en boot manager installerad kan du börja hålla ner <span class="key">SKIFT</span> innan du väljer att starta Haiku. Om Haiku är det enda installerade operativsystemet på datorn kan du börja hålla ner tangenten när du fortfarande ser startmeddelanden från BIOS.  </p>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="options" name="options">Boot Loader Options</a></h2>
 <p>När den kommit fram erbjuds du fyra menyer:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b></td><td> </td><td>Välj vilken Haikuinstallation du vill starta.</td></tr>
 <tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
-	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
-	</table>
-</td></tr>
+	<p><span class="menu">Safe mode</span><br />
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+	<p><span class="menu">Disable user add-ons</span><br />
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+	<p><span class="menu">Disable IDE DMA</span><br />
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+</p>
+	<p><span class="menu">Use fail-safe video mode</span><br />
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+	<p><span class="menu">Disable IO-APIC</span><br />
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+	<p><span class="menu">Disable local APIC</span><br />
+		Disables using the local APIC, also disables SMP.</p>
+	<p><span class="menu">Disable SMP</span><br />
+		Disables all but one CPU core.</p>
+	<p><span class="menu">Don't call the BIOS</span><br />
+		Stops the system from calling BIOS functions.</p>
+	<p><span class="menu">Disable APM</span><br />
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+	<p><span class="menu">Disable ACPI</span><br />
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+	<p><span class="menu">Blacklist entries</span><br />
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
-	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
-	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
-<tr><td></td><td></td><td>If "Enable debug syslog" is activated, a warm reboot after a crash shows these additional options:</td></tr>
-<tr><td></td><td></td><td>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
-	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
+	<p><span class="menu">Enable serial debug output</span><br />
+		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
+	<p><span class="menu">Enable on screen debug output</span><br />
+		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
+	<p><span class="menu">Disable on screen paging</span><br />
+		Disables paging when on screen debug output is enabled.</p>
+	<p><span class="menu">Enable debug syslog</span><br />
+		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
+	<p><span class="menu">Display current boot loader log</span><br />
+		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
+	<p><span class="menu">Add advanced debug option</span><br />
+		Allows advanced debugging options to be entered directly.</p></td></tr>
+<tr><td></td><td></td><td>If "<i>Enable debug syslog</i>" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
+		Saves the syslog from the previous Haiku session to /var/log/previous_syslog when booting.</p>
+	<p><span class="menu">Display syslog from previous session</span><br />
+		Displays the syslog from the previous Haiku session</p>
+	<p><span class="menu">Save syslog from previous session</span><br />
+		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
 <tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Om du behövde aktivera valet <i>Use fail-safe video mode</i> kan du ange upplösning och färgdjup.</td></tr>
 </table>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
+<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../welcome/en/bugreports.html">bug report</a> in any case.</p>
+<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again to make things right by uninstalling the offending package again:</p>
+<ul>
+<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootScript from being started.</p></li>
+<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
+</ul>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="booting" name="booting">Booting Haiku</a></h2>
 <p>Efter att du aktiverat ett eller flera val återvänder du till huvudmenyn och fortsätter med startprocessen som visar dig denna skärm:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
 <p>Om allt är OK tänds symbolerna snabbt, en efter en.<br />
 De olika symbolerna motsvarar ungefärligt dessa i steg startsprocessen:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initierar moduler.</td></tr>
-	<tr><td><b>Hårddisk + förstoringsglas</b></td><td> </td><td>Skapar rootfs (<span class="path">/</span>) och monterar devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Kretskort</b></td><td> </td><td>Initierar enhetshanteraren.</td></tr>
-	<tr><td><b>Startdisk</b></td><td> </td><td>Monterar startdisk.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Laddar CPU-specifika moduler.</td></tr>
-	<tr><td><b>Mapp</b></td><td> </td><td>Slutgiltig initiering av delsystem.</td></tr>
-	<tr><td><b>Raket</b></td><td> </td><td>Startskript startar systemet.</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initierar moduler.</td></tr>
+	<tr><td><b>Hårddisk + förstoringsglas</b></td><td> </td><td>Skapar rootfs (<span class="path">/</span>) och monterar devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Kretskort</b></td><td> </td><td>Initierar enhetshanteraren.</td></tr>
+	<tr><td><b>Startdisk</b></td><td> </td><td>Monterar startdisk.</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>Laddar CPU-specifika moduler.</td></tr>
+	<tr><td><b>Mapp</b></td><td> </td><td>Slutgiltig initiering av delsystem.</td></tr>
+	<tr><td><b>Raket</b></td><td> </td><td>Startskript startar systemet.</td></tr>
 </table>
 
 </div>
@@ -121,10 +154,10 @@ De olika symbolerna motsvarar ungefärligt dessa i steg startsprocessen:</p>
 
 <div class="nav">
 <div class="inner"><span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Innehållsförteckning</a> 
-::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Innehållsförteckning</a> 
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>
 

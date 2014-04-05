@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,6 +54,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h1>Pikanäppäimet ja näppäinyhdistelmät</h1>
 
@@ -68,26 +69,45 @@
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>Vaihtaa <a href="workspaces.html">Työtila</a> X:ään (<span class="key">Fx</span> on funktionäppäin, joka vastaa työtilaa). Ota aktiivi ikkuna mukanasi lisäämällä yhdistelmään <span class="key">VAIHTO</span>-näppäimen</td></tr>
 <tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Navigoi avaruudellisesti käytettävissä olevien työtilojen rivejä tai sarakkeita. Lisää yhdistelmään <span class="key">VAIHTO</span> niin saat aktiivin ikkunan mukanasi.</td></tr>
+<tr><td> </td></tr>
 <tr><td><span class="key">Alt Gr/OPT</span></td><td></td><td>Näppäimen <span class="key">Alt Gr</span> pitäminen alhaalla raahattaessa ikkuna lähelle toisen ikkunan välilehteä tai reunaa aiheuttaa niiden pinoamisen tai asettumisen rinnakkaisiksi tiiliksi (katso kappale <a href="gui.html#stack-tile">Haikun graafinen käyttöliittymä</a>).</td></tr>
+<tr><td><span class="key">OPT</span><span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Cycles through the open windows within the current workspace.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + hiiren ykköspainike</td><td></td><td>Napsauttaminen ja raahaaminen hiiren ykköspainikkeella siirtää ikkunan (see chapter <a href="gui.html#move-resize">Haikun graafinen käyttöliittymä</a>).</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + hiiren kakkospainike</td><td></td><td>Napsauttaminen ja raahaaminen hiiren kakkospainikkeella muuttaa ikkunan koon (see chapter <a href="gui.html#move-resize">Haikun graafinen käyttöliittymä</a>).</td></tr>
+<tr><td> </td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Loitontaa tai lähentää ikkunan toisen kokoiseksi (useimmissa sovelluksissa enimmäiskokoon).</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>Minimoi aktiivin ikkunan.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Piilottaa (minimoi) aktiivin sovelluksen kaikki ikkunat.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Vetää aktiivin ikkunan päällimmäiseksi (käytössä vain hiiriasetuksella <a href="preferences/mouse.html">Kohdistus seuraa hiirtä</a>).</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Lähettää aktiivin ikkunan taustalle. </td></tr>
+<tr><td> </td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>Alhaalla pitäminen tuo näkyviin <a href="twitcher.html">Vaihtaja</a>-sovelluksen.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td>Avaa <a href="teammonitor.html">Ryhmävalvonta</a>-sovelluksen.</td></tr>
+<tr><td> </td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>Siirtyy valikkopalkkiin (poistuu <span class="key">ESC</span>-näppäimellä).</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>Kopioi valinnan leikepöydälle.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">X</span></td><td></td><td>Leikkaa valinnan leikepöydälle.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">V</span></td><td></td><td>Liittää leikepöydän sisällön.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>Sulkee aktiivin ikkunan.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">Q</span></td><td></td><td>Sulkee sovelluksen.</td></tr>
+<tr><td> </td></tr>
 <tr><td><span class="key">PrtScr</span></td><td style="width:15px;"></td><td>Ottaa näytönkaappauksen viipeellä nolla ja käynnistää <a href="applications/screenshot.html">Näytönkaappaus</a>-paneelin.</td></tr>
 <tr><td class="onelinetop"><span class="key">VAIHTO</span> <span class="key">PrtScr</span></td><td></td><td>Ottaa näytönkaappauksen hiljaa (avaamatta paneelia) samalla kun sovellus yhä kunnioittaa viimeksi käytettyjä asetuksia.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">PrtScr</span></td><td></td><td>Myös tämä ottaa näytönkaappauksen hiljaa talletuilla asetuksilla, mutta tiedostoon tallentamisen sijasta kopioi sen vain leikepöydälle.</td></tr>
 </table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="textediting" name="textediting">Textediting shortcuts</a></h2>
+<p>Whenever you edit text – be it when renaming a file in Tracker, editing a file in StyledEdit, or chatting in Vision – there are some universal shortcuts:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> or<br /><span class="key">OPT</span> <span class="key">←</span> / <span class="key">→</span></td><td style="width:15px;"></td><td>Jump word-wise through the text. (Note: It may be useful to get used to using the <span class="key">OPT</span> combination. Then you're all set if some app already uses the <span class="key">ALT</span> combination for another command.)</td></tr>
+<tr><td><span class="key">HOME</span></td><td></td><td>Jumps to the beginning of the line.</td></tr>
+<tr><td><span class="key">END</span></td><td></td><td>Jumps to the end of the line.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">HOME</span></td><td></td><td>Jumps to the beginning of the document.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">END</span></td><td></td><td>Jumps to the end of the document.</td></tr>
+</table>
+<p>Holding <span class="key">SHIFT</span> additionally when using the above key combinations will select the text between the cursor jumps.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -100,6 +120,7 @@
 <tr><td><span class="key">MENU</span></td><td></td><td>Avaa Työpöytäpalkin (poistuu <span class="key">ESC</span>-näppäimellä).</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Peru viimeisin toiminto. Perumishistoriaa rajoittaa vain käytettävissä oleva muisti. Huomaa, tämä toimii vain itse tiedostotoiminnoille, muuttuneet attribuutit ja käyttöoikeusasetukset ei voida perua tällä. Myös kun tiedoston on siirretty <i>Roskakori</i>in, niin se on mennyt iäksi.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">VAIHTO</span> <span class="key">Z</span></td><td></td><td>Tee juuri palautettu toiminto uudelleen näppäimillä <span class="key">ALT</span> <span class="key">Z</span>.</td></tr>
+<tr><td><span class="key">SHIFT</span> + Mousewheel</td><td></td><td>When scrolling through a long list of files in a Tracker window or when you're <a href="tracker.html#navigating">drilling down submenus</a>, this will speed things up by doing page-wise scrolling.</td></tr>
 </table>
 
 <h2>

@@ -54,6 +54,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>索引</td></tr>
@@ -114,7 +115,7 @@
 <li><p>系统无法实现正确引导。它可能自动重启，或停止在某个步骤（例如，某个启动图标）。对于后一种情况，可以尝试使用快捷键 <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>。</p></li>
 <li><p>整个系统或者部分硬件无法正确运行。例如，系统运行缓慢，出现错误，或者完全无法运行。如果某个硬件完全无法工作，首要的是检查Haiku目前是否支持该硬件（例如，在邮件列表或论坛中进行询问）。</p></li>
 </ul>
-<p>需要注意的是，只有最后这种情况与硬件相关，而所有其他的问题也可能由硬件驱动中的错误引起。如果您对引起该问题的硬件或相关的驱动有所疑问，您可以检查删除/禁用该硬件或驱动是否会产生影响。例如，如果您怀疑无线网络有问题，您会发现BIOS中有可禁用它的选项。如果其中没有该选项，您可以从安装的Haiku中删除相关的无线网络驱动（位于 <span class="path">/boot/system/add-ons/kernel/drivers/bin</span>）。</p>
+<p>Note that while only the last point seems to indicate hardware relation, all the other symptoms could be caused by a bug in a hardware driver as well. If you have a suspicion what piece of hardware or corresponding driver might have to do with the problem, check whether removing/disabling the hardware or the driver makes a difference. For example, if you suspect Wifi you may find that your BIOS has an option to disable it. Or if not, you could blacklist the responsible Wifi driver from your Haiku installation (see <a href="../../../userguide/en/bootloader.html">Boot Loader</a>).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">内核调试 - KDL</a></h3>
@@ -133,11 +134,11 @@
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">系统日志</a></h3>
-<p><b>这是从无法引导的系统中获取信息的首选方法。</b>
-<br />
-系统日志（syslog，system log的缩写）中包含了关于系统问题的有用信息，包括KDL会话的输出信息 。通常将它附带到有关内核问题的报告中是个不错的主意。系统日志将会写入文件 <span class="path">/boot/common/var/log/syslog</span>。由于写入文件需要系统处于运行状态，因此当内核出现问题时（尤其是，系统自动重启，或者无法持续KDL会话），最新的输出信息可能无法写入日志文件。</p>
-<p>引导程序的<span class="menu">Debug menu</span> 中的<span class="menu">Enable debug syslog</span> 选项可以使系统日志在内存中稍微持久的存在。默认情况下，它是启用的。 “稍微持久” 意味着，它可以在一次机器重置之后仍然存在，在之后直接进入引导程序菜单时仍然可以访问。尽管如此，引导一个操作系统将会（Haiku 肯定会，其他的可能会）损坏该信息。 所以您需要在引导时按下 <span class="key">SHIFT</span> 进入引导程序菜单。<br />
-在引导程序的 <span class="menu">Debug menu</span> 中，您可以找到 <span class="menu">Display syslog from previous session</span> 和 <span class="menu">Save syslog from previous session</span> 两个入口。前者将系统日志显示于屏幕，后者允许您将其保存到硬盘。需要注意的是，目前只有FAT32卷支持保存该文件。如果您使用USB磁盘，但是插入晚了，可能它将不被识别；您可以重置机器，然后再次进入引导程序菜单。但是还要注意：不要无意的启动任何操作系统，否则数据将会丢失。</p>
+<p><b>This is the preferred method for gaining information from a non-booting system.</b><br />
+The syslog (short for system log) contains valuable information about what has happened in your system, including the output of KDL sessions. It's usually a good idea to attach it to the kernel related Trac ticket. The syslog is written to the file <span class="path">/boot/system/var/log/syslog</span>. Since writing to a file requires a working system, the most recent output might not have made it to the syslog when a kernel problem occurs (particularly on spontaneous reboots or uncontinuable KDL sessions).</p>
+<p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog persistent. If the option <span class="menu">Save syslog from previous session during boot</span> is activated in the boot loader options (as it is by default), you'll find the syslog of your last session as <span class="path">/boot/system/var/log/previous_syslog</span>.<br />
+If you're not able to boot to get to the previous_syslog, you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
+In the boot loader's <span class="menu">Debug menu</span> you should find the entries <span class="menu">Display syslog from previous session</span> and <span class="menu">Save syslog from previous session</span>. The former displays the syslog on screen, the latter allows you to save it as a file to disk. Note that at the moment only FAT32 volumes are supported for saving the file. If you want to use a USB stick, but have plugged it in too late so that it isn't recognized yet, you can reset the machine and re-enter the boot loader menu. Note: Don't accidentally boot any operating system or the data will be lost.</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="onscreen" name="onscreen">屏幕调试</a></h3>

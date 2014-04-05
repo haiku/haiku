@@ -13,6 +13,8 @@
  *		Vincent Duvert
  *		Loïc
  *		Humdinger
+ *		Wabouz
+ *		roptat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -55,7 +57,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Appearance (Apparence)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -76,39 +77,39 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">Installer de nouvelles polices</a></h3>
-<p>New fonts that don't come as part of a regular .hpkg package, can be installed by copying them into a subfolder according to the font type (<tt>psfonts</tt> or <tt>ttfonts</tt>) into their respective <tt>non-packaged</tt> folder (see topic <a href="../filesystem-layout.html">Filesystem layout</a>). For TrueType fonts that would be:</p>
+<p>Vous installez de nouvelles polices en les copiant dans leurs dossiers utilisateurs respectifs, i.e. <span class="path">/boot/common/data/fonts/</span> ou <span class="path">/boot/home/config/data/fonts/</span> (Voir le sujet sur la <a href="../filesystem-layout.html">structure du système de fichiers</a>).</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>pour les polices accessibles pour tous les utilisateurs.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>pour les polices uniquement accessibles pour vous</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Couleurs</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>Dans l'onglet, <span class="menu">Couleurs</span>, vous pouvez modifier les couleurs de différents éléments de l'interface utilisateur. La palette de couleurs accepte les glisser-déposer de couleurs depuis d'autres programmes, ce qui vous permettra de glisser des couleurs depuis par exemple <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span>, ou les préférences <span class="app">Backgrounds</span>.</p>
+<p>Dans l'onglet <span class="menu">Couleurs</span>, vous pouvez modifier les couleurs des différents éléments de l'interface utilisateur. La palette de couleurs accepte les glisser-déposer de couleurs depuis d'autres programmes, ce qui vous permettra de glisser des couleurs depuis par exemple <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span>, ou les préférences <span class="app">Backgrounds</span>.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="decorators" name="decorators">Décorateurs de fenêtres</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>les décorateurs déterminent l'apparence et le comportement des fenêtres de tous les éléments d'interface graphique. Actuellement Haiku est livré avec le seul décorateur par défaut. Si vous trouver et installer d'autres décorateurs, vous pouvez en choisir un dans la liste déroulante.</p>
+<p>Les décorateurs déterminent l'apparence et le comportement des fenêtres de tous les éléments d'interface graphique. Actuellement Haiku est livré avec un seul décorateur par défaut. Si vous trouvez et installez d'autres décorateurs, vous pourrez en choisir un dans la liste déroulante.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="antialiasing" name="antialiasing">Lissage</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>L'onglet <span class="menu">Lissage</span>, permet de régler la manière de dessiner les choses à l'écran.</p>
+<p>L'onglet <span class="menu">Lissage</span> permet de régler la manière de dessiner les choses à l'écran.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Hinting de glyphes</h3>
-<p>Si activé, la <span class="menu">Consigne de glyphes</span> (Glyph hinting) aligne les lettres de manière à ce que leurs bords horizontaux soient situés entre deux pixels. Ceci permet un meilleur contraste, en particulier pour le texte en noir sur blanc. Ce dernier apparaît plus net. Le réglage "<span class="menu">Seulement les polices à chasse fixe</span>" est particulièrement utile pour les écrans à base résolution comme ceux des netbooks. Sur ceux-ci la consigne peut donner un mauvais résultats avec des polices de petite taille, mais avec ce réglage vous pourrez conserver les avantages de la  consigne dans les éditeurs de texte et le Terminal.</p>
+Consigne de glyphes</h3>
+<p>Si activée, la <span class="menu">Consigne de glyphes</span> (Glyph hinting) aligne les lettres de manière à ce que leurs bords horizontaux soient situés entre deux pixels. Ceci permet un meilleur contraste, en particulier pour le texte en noir sur blanc. Ce dernier apparaît plus net. Le réglage "<span class="menu">Seulement les polices à chasse fixe</span>" est particulièrement utile pour les écrans à basse résolution comme ceux des netbooks. Sur ceux-ci la consigne peut donner de mauvais résultats avec des polices de petite taille, mais avec ce réglage vous pourrez conserver les avantages de la consigne dans les éditeurs de texte et le Terminal.</p>
 <p>Voyez les différences induites par cette consigne entre ces deux captures d'écrans agrandies :</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting désactivé</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting activé</td></tr>
 </table>
-<p>Notez que ces captures d'écran de l'application  <span class="app">Magnify</span> sont bien sûr réalisées avec des réglages de hinting différents. Vous pouvez donc voir l'effet du réglage sur le texte de l'onglet jaune et celui de la fenêtre ("35 x 15 @ 8 pixels/pixel").</p>
+<p>Notez que ces captures d'écran de l'application  <span class="app">Magnify</span> sont bien sûr réalisées avec différents réglages de consignes. Vous pouvez donc voir l'effet du réglage sur le texte de l'onglet jaune et celui de la fenêtre ("35 x 15 @ 8 pixels/pixel").</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -119,13 +120,13 @@ Il y a deux méthodes:</p>
 <span class="menu">Sous-pixel LCD</span> donnera un meilleur rendu sur les écrans LCD haute résolution. Au lieu de changer l'intensité du pixel, il change sa couleur, ce qui permet de déplacer le bord d'un élément d'une fraction de pixel (car sur les écrans LCD les composantes rouge, vert et bleu sont séparées).</p>
 <p>À nouveau, voici les deux méthodes présentées sur deux captures d'écran :</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Niveaux de gris, hinting désactivé</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, lissage activé</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Niveaux de gris, consigne désactivée</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD subpixel, lissage activé</td></tr>
 </table>
 <p>Le lissage sous-pixel ajoute une bordure colorées aux objets, que vous pourriez ne pas apprécier. Dans Haiku, vous pouvez mélanger les deux méthodes de lissage et trouver le bon réglage pour vous en déplaçant un curseur.</p>
-<div class="box-info">Le lissage sous-pixel combiné au hinting est soumis à un brevet logiciel et n'est donc pas disponible par défaut. Désolé. En fonction de votre lieu de résidence, vous pourrez peut-être vous procurer une version débridée. Parlez-en à vos représentants.</div>
-<p>Si vous activez le hinting et le lissage sous-pixel en modifiant les sources de Haiku et en recompilant l'ensemble, voici ce que vous obtiendrez par rapport au hinting avec niveaux de gris :</p>
+<div class="box-info">Le lissage sous-pixel combiné aux consignes est soumis à un brevet logiciel et n'est donc pas disponible par défaut. Désolé. En fonction de votre lieu de résidence, vous pourrez peut-être vous procurer une version débridée. Parlez-en à vos représentants.</div>
+<p>Si vous activez les consignes et le lissage sous-pixel en modifiant les sources de Haiku et en recompilant l'ensemble, voici ce que vous obtiendrez par rapport a la consigne avec niveaux de gris :</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Niveaux de gris, hinting activé</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD sous-pixel, hinting activé</td></tr>
+<tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Niveaux de gris, consigne activé</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD sous-pixel, consigne activée</td></tr>
 </table>
 <p><br /></p>
 <p>En bas du panneau, vous trouverez deux boutons :</p>

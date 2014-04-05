@@ -56,7 +56,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 
 <table class="index" id="index" summary="index">
@@ -71,8 +70,8 @@
 
 <h1>ワークショップ: ワイヤレスネットワーク</h1>
 
-<p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
-This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">this list online</a> for a list of supported models or check <a href="http://www.freebsd.org/releases/9.2R/hardware.html#wlan">FreeBSD 9.2's release hardware notes</a>.</p>
+<p>ネットワークを動作させるようにすることは、今日のインターネット常時接続への要求において必要不可欠なことです。小さなプロジェクトにとって、すべてのさまざまな、絶え間なく変化するハードウェアとドライバーについていくことはとても困難なことです。Haiku はネットワークドライバーを <a href="http://www.freebsd.org">FreeBSD</a>  互換レイヤーに依存しています。<br />
+これは、大量のハードウェアのサポートを保証します。しかし、それらの 100% がサポートされるわけではありません。サポートされているモデルの<a href="https://www.haiku-os.org/guides/daily-tasks/wireless#hardware-notes">リスト</a>をオンラインで参照するか、<a href="http://www.freebsd.org/releases/9.2R/hardware.html#wlan">FreeBSD 9.2 リリースのハードウェアノート</a>をチェックしてください。</p>
 <div class="box-info">現在のところ、PCI、PCI-X、PCI-Express、Mini PCI、および Mini PCI-Express デバイスのみサポートされているはずです。<br />PCMCIA、CardBus、ExpressCard、USB、および ISA デバイスは動作するようになるのにまだ作業が必要です。</div>
 
 <h2>
@@ -92,16 +91,16 @@ This ensures a massive amount of supported hardware, though probably not 100% of
 <p>Deskbar 内の NetworkStatus アイコンを右クリックして、ネットワークの公開名 (public name) を選択します (それはネットワークが送信する "SSID" です)。
 </p>
 <img src="images/workshop-wlan-images/join-network.png" alt="join-network.png" />
-<p>ウィンドウが開きます。そこに、認証タイプ (たぶん、WPA か WPA2 のどちらか。WEP はもはやセキュアな暗号ではありません ！） とパスワードを入力します。<span class="button">OK</span>  を押して、ログインプロセスを開始します。<br /> ハードウェアとネットワーク構成によっては、これはしばらくかかるかもしれません。通知ウィンドウで情報が提示されるでしょう。</p>
+<p>ウィンドウが開きます。そこに、認証方式 (たぶん、WPA か WPA2 のどちらか。WEP はもはやセキュアな暗号ではありません!) とパスワードを入力します。<span class="button">OK</span>  を押して、ログインプロセスを開始します。<br />ハードウェアとネットワーク構成によっては、これはしばらくかかるかもしれません。通知ウィンドウで情報が提示されるでしょう。</p>
 <img src="images/workshop-wlan-images/join-status.gif" alt="join-network.gif" />
-<p>いったん、それが "Ready" と表示し、Deskbar 中の NetworkStatus のアイコンが緑の丸になったら、接続が確立されています。通知が "No link" で終わり、アイコンが黄色の三角なら、なにか異常が発生しています。おそらくパスワードが間違っています。
+<p>通知ウィンドウが、いったん "Ready" と表示し、Deskbar 中の NetworkStatus のアイコンが緑の丸になったら、接続が確立されています。通知が "No link" で終わり、アイコンが黄色の三角なら、なにか異常が発生しています。おそらくパスワードが間違っています。
 </p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="commandline" name="commandline">コマンドラインから接続する</a></h2>
-<p>If you prefer to use the command line or would like to use scripting or the <span class="path">~/config/settings/boot/UserBootscript</span> to automate things to join a specific network on bootup, there's the command <tt>ifconfig</tt>.</p>
-<p>ターミナルを起動して、最初の行を入力して利用できるワイヤレスネットワークを検索します。</p>
+<p>コマンドラインを使うのを好むか、スクリプトを使いたいか、または <span class="path">~/config/settings/boot/UserBootscriptt</span> で起動時に特定のネットワークへの接続を自動化したいなら、<tt>ifconfig</tt> コマンドがあります。</p>
+<p>ターミナルを起動して、以下の最初の行を入力して利用できるワイヤレスネットワークを検索します。</p>
 <pre class="terminal">ifconfig /dev/net/iprowifi3945/0 scan
 name                             address              signal  auth
 haiku-top                        01:d0:19:a6:88:42        30  WPA
@@ -114,7 +113,7 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">ヒント</a></h2>
-<ul><li><p>ここに、Haiku でインターネット接続が動作しない時にファームウェアをインストールする方法があります。ほかのオペレーティングシステムで以下のファイルをダウンロードしてください。Haiku を起動し、ファイルをそれぞれの場所にコピーし、<span class="cli">install-wifi-firmwares.sh</span> スクリプトを実行します。</p>
+<ul><li><p>以下は、Haiku でインターネット接続が動作しない時にファームウェアをインストールする方法です。ほかのオペレーティングシステムで以下のファイルをダウンロードしてください。Haiku を起動し、ファイルをそれぞれの場所にコピーし、<span class="cli">install-wifi-firmwares.sh</span> スクリプトを実行します。</p>
 
 <ul>
 <li><p>以下のふたつを <span class="path">/boot/system/data/firmware/broadcom43xx/b43-fwcutter/</span> へコピーしてください。<br />
@@ -143,7 +142,7 @@ ArcorInternet123                 00:20:12:a4:29:e1        15  WPA</pre>
 <div class="inner"><span>
  «  <a href="workshop-email.html">ワークショップ: メールの管理</a> 
 ::  <a href="contents.html" class="uplink">目次</a> 
-::  <a href="applications.html">Applications (アプリケーション)</a>  »
+::  <a href="applications.html">アプリケーション</a>  »
 </span></div>
 </div>
 

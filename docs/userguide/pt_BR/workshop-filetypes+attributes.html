@@ -55,7 +55,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -201,23 +200,23 @@ mkindex -t int DVDdb:avaliacao</pre>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filling-data" name="filling-data">Preenchimento dos dados</a></h2>
-<p>Now, everything's set and we can begin putting some data into our base.<br />
-Since our basic file is a cover image, we go to some online resource like IMdB, look for our first movie and save the cover or movie poster in a new folder where we want to keep our DVDdb files.</p>
-<p>Opening that folder we see a typical Tracker window with one JPEG in it. Right-clicking it, we change its filetype to <tt>application/DVDdb</tt> with the <span class="app">Filetype Addon</span>. There's more info on this in the <a href="filetypes.html">Filetypes</a> document.</p>
-<p>Now, we activate all our DVDdb attributes from the <span class="menu">Attributes</span> menu of the Tracker window and rearrange the columns to our taste:</p>
+<p>Agora, tudo está definido e nós podemos começar a colocar alguns dados na nossa base.<br />
+Uma vez que nosso arquivo básico é uma imagem de capa, vamos a alguma fonte online como o IMdB, procurar por nosso primeiro filme e salvar a capa ou poster do filme em uma nova pasta onde queremos manter nossos arquivos DVDdb.</p>
+<p>Abrindo aquela pasta vemos uma janela típica do Rastreador com uma JPEG nela. Clicando com o botão direito nela, alteramos seu tipo de arquivo para <tt>application/DVDdb</tt> com o <span class="app">Adicional de Tipo de Arquivo</span>. Existe mais informação sobre isso no documento <a href="filetypes.html">Tipos de Arquivo</a>.</p>
+<p>Agora, ativamos todos os nossos atributos DVDdb a partir do menu <span class="menu">Atributos</span> da janela do Rastreador menu of the Tracker window e rearranjamos as colunas a nosso gosto:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb-empty.png" alt="filetypes-dvddb-empty.png" />
-<p>By clicking on a yet empty attribute (or pressing <span class="key">ALT</span> <span class="key">E</span>) we enter editing mode and fill each attribute. With <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span> you can navigate between attributes.</p>
-<p>In our example, we usually start with a downloaded JPG cover and change its type to applications/DVDdb. There's another elegant way to produce a file to work with. Just copy an empty file of our filetype to <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> and rename it to DVDdb.</p>
-<p>Right-clicking into a Tracker window, you'll find a new entry under <span class="menu">New...</span> besides the default "New folder".</p>
+<p>Ao clicar num atributo ainda vazio (ou pressionando <span class="key">ALT</span> <span class="key">E</span>) entramos no modo de edição e preenchemos cada atributo. Com <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span> podemos navegar entre os atributos.</p>
+<p>No nosso exemplo, nós começamos com uma capa JPG baixada e mudamos seu tipo para applications/DVDdb. Existe outra forma elegante de produzir um arquivo para trabalhar com ele. Apenas copie um arquivo vazio de seu tipo de arquivo para <span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> e renomeie-o para DVDdb.</p>
+<p>Clicando com o botão direito dentro da janela do Rastreador, encontraremos uma nova entrada sob <span class="menu">Novo...</span> além do padrão "Nova pasta".</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="query-db" name="query-db">Consultando a base de dados</a></h2>
-<p>Several hours of grunt work later, we have a nice little database that you can query to find all your Christina Ricci movies that have a 7+ rating...  :)</p>
-<p>You can assign a sensible attribute layout for query results of a specific filetype.<br />
-Open the folder containing your DVDdb files and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy layout</span>.</p>
-<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder and rename it to <i>group/filetype</i>, replacing slashes with underscores; in our case "applications_DVDdb".</p>
-<p>Open the new folder and paste in the layout with <span class="menu">Attributes | Paste layout</span>. Voilà:</p>
+<p>Muitas horas de trabalho barulhento depois, temos um pequeno e belo banco de dados que pode ser consultado para encontrar todos os seus filmes de Christina Ricci que possuam nota 7+...  :)</p>
+<p>Pode-se atribuir uma disposição de atributo sensível para resultados de consulta de um tipo de arquivo específico.<br />
+Abra a pasta contendo seus arquivos DVDdb e arrume os atributos da forma como gostaria de ter apresentados os resultados de consulta. Copie esta disposição com <span class="menu">Atributos | Copiar disposição</span>.</p>
+<p>Abra <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, crie uma nova pasta e renomeie para  <i>grupo/tipo de arquivo</i>, substituindo barras por sublinhados; no nosso caso, "aplicativos_DVDdb".</p>
+<p>Abra a nova pasta e cole dentro a disposição com <span class="menu">Atributos | Colar disposição</span>. Voilà:</p>
 <img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
 
 </div>

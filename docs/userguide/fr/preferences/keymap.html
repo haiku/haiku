@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-20014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,7 @@
  *		Loïc
  *		Vincent Duvert
  *		Humdinger
+ *		roptat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -75,8 +76,12 @@ Ainsi, les préférences Keymap ne servent pas uniquement à configurer votre di
 <tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>pour la définition des touches modificatrices mentionnées ci-dessus.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td> </td><td>pour utiliser la touche de raccourcis en mode Windows/Linux, c’est à dire <span class="key">CONTROL</span> (normalement <span class="key">CTRL</span>) ou en mode Haiku, soit <span class="key">COMMAND</span> (normalement <span class="key">ALT</span>).</td></tr>
 </table>
-<p>Les listes de gauche permettent d’accéder aux dispositions de clavier pré-configurées du système, ainsi qu’à celle définies par l’utilisateur, si disponibles. Vous pouvez éditer une disposition en effectuant des glisser-déposer de touches sur la représentation du clavier. En les effectuant avec le bouton gauche, la touche sera copiée, avec le bouton droit elle sera échangée.<br />
-Quand vous aurez fini, vous pourrez enregistrer le fichier résultant avec le menu <span class="menu">File | Save...</span>. Votre disposition modifiée apparaîtra dans la liste si elel est enregistrée dans le dossier <span class="path">~/config/settings/Keymap/</span>. Dans le cas contraire, vous devrez la charger avec <span class="menu">File | Open...</span>.</p>
+<p>Les listes de gauche permettent d’accéder aux dispositions de clavier pré-configurées du système, ainsi qu’à celle définies par l’utilisateur, si disponibles. Vous pouvez éditer une disposition en effectuant des glisser-déposer de touches sur la représentation du clavier. En les effectuant avec le bouton gauche, la touche sera copiée, avec le bouton droit elle sera échangée.</p>
+<p>Plutôt que de glisser-déposer des touches, le menu <span class="menu">File | Set modifier keys...</span> ouvre la fenêtre suivante :</p>
+<img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
+<p>Vous pourrez alors modifier le rôle d’une touche, voire même totalement la désactiver. Vous pouvez même donner plusieurs rôles à la même touche bien que ce ne soit pas recommandé. Vous verrez d’ailleurs apparaître un petit point d’exclamation à côté des menus déroulants si vous le faîtes.<br />
+Appuyer sur <span class="button">Set modifier keys</span> applique les changements et ferme la fenêtre.</p>
+<p>Quand vous aurez fini, vous pourrez enregistrer le fichier résultant avec le menu <span class="menu">File | Save...</span>. Votre disposition modifiée apparaîtra dans la liste si elle est enregistrée dans le dossier <span class="path">~/config/settings/Keymap/</span>. Dans le cas contraire, vous devrez la charger avec <span class="menu">File | Open...</span>.</p>
 <p>Afin que le clavier virtuel corresponde le plus possible à votre clavier réel, différents réglages sont disponibles dans le menu <span class="menu">Layout</span>.</p>
 <p>La police utilisée pour la représentation du clavier peut être configurée dans le menu <span class="menu">Font</span>. Notez qu’elle peut ou non contenir tous les symboles d’une disposition de clavier spécifique.</p>
 <p>Enfin, un bouton <span class="button">Revert</span> restaurera les paramètres qui étaient actifs avant que vous ne commenciez à modifier la disposition du clavier.</p>
@@ -87,8 +92,8 @@ Quand vous aurez fini, vous pourrez enregistrer le fichier résultant avec le me
 <p>Il existe une autre méthode pour personnaliser votre disposition de clavier. Vous devez pour cela éditer un fichier contenant un grand nombre de valeurs hexadécimales, ce qui peut apparaître compliqué au premier abord, mais qui n’est pas impossible à réaliser.</p>
 <p>Vous pouvez décompiler la disposition courante de clavier à l’aide ce cette commande de Terminal :</p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
-<p>Le fichier généré peut être ouvert dans un éditeur de texte. Utilisez de préférence une police de pas fixe pour l’affichage…<br />
-Au début de ce fichier, vous trouverez une représentation de clavier avec les valeurs hexadécimales correspondant à chaque touche. À la suite sont indiquées les assignations de touches pour chaque valeur. Vous pouvez donc y effectuer toutes les personnalisations disponibles depuis le panneau de préférences Keymap, et bien plus. Si vous avez des touches spéciales sur votre clavier, vous devriez pouvoir les faire fonctionner en éditant ce fichier. Toutefois, elle fonctionneront comme des touches ordinaires ou comme touches modificatrices. Vous ne pourrez pas, par exemple, utiliser vos touches multimédia pour augmenter/réduire le volume ou lancer des applications. Pour cela, vous aurez besoin de <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
+<p>Le fichier généré peut être ouvert dans un éditeur de texte. Utilisez de préférence une police à chasse fixe pour l’affichage…<br />
+Au début de ce fichier, vous trouverez une représentation de clavier avec les valeurs hexadécimales correspondant à chaque touche. À la suite sont indiquées les assignations de touches pour chaque valeur. Vous pouvez donc y effectuer toutes les personnalisations disponibles depuis le panneau de préférences Keymap, et bien plus. Si vous avez des touches spéciales sur votre clavier, vous devriez pouvoir les faire fonctionner en éditant ce fichier. Toutefois, elle fonctionneront comme des touches ordinaires ou comme touches modificatrices. Vous ne pourrez pas, par exemple, utiliser vos touches multimédia pour augmenter/réduire le volume ou lancer des applications. Pour cela, vous aurez besoin de <a href="shortcuts.html">Shortcuts</a>.</p>
 <p>Lorsque vous avez terminé, vous pouvez enregistrer le fichier, et activer la nouvelle disposition du clavier avec cette commande :</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
 <p>Si vous voulez importer cette disposition de clavier dans le panneau de préférence Keymap, vous devez au préalable le compiler dans un format binaire :</p>

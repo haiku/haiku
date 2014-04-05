@@ -13,6 +13,7 @@
  *		Loïc
  *		Humdinger
  *		Vincent Duvert
+ *		Wabouz
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -56,15 +57,14 @@
 
 <div id="content">
 <div>
-<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - ajoute/surcharge les paramètres par défaut définis dans <span class="path">/boot/system/settings/etc/profile</span>.<br />
+<span class="path">~/.inputrc</span> - ajoute/surcharge les paramètres par défaut définis dans <span class="path">/boot/system/settings/etc/inputrc</span>.</td></tr>
 </table>
 <p><br /></p>
 <p>Le Terminal est l'interface de Haiku à bash, le Bourne Again Shell.</p>
@@ -99,15 +99,15 @@ Pressez <span class="button">OK</span> pour sauvegarder les réglages en cours c
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">Raccourcis claviers</a></h2>
 <p>Vous trouverez une liste des raccourcis utiles dans <a href="../keyboard-shortcuts.html#terminal">Raccourcis clavier</a>.</p>
-<p>Another nice feature that is more a key &amp; mouse combination: When holding <span class="key">ALT</span> a path or URL under the mouse pointer gets highlighted. A left-click opens the file/folder or website. A right-click opens a context menu to either <span class="menu">Copy path</span> or <span class="menu">Copy absolute path</span>. Imagine you're in <span class="path">/MyData/source/haiku/</span> and have the path <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> under the mouse pointer, the latter menu item  will result in the combined, absolute path &lt;<i>deep breath</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
-<p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
-<p>By the way, right-clicking into the Terminal window will insert the clipboard. In combination with copying parts of highlighted paths, this can be used for speedy navigation of deep folder hierarchies.</p>
+<p>Une autre fonction intéressante est une combinaison de touche et du curseur. En maintenant <span class="key">ALT</span>un chemin ou une URL sous le curseur est mis en évidence. Un clique gauche ouvre le fichier/ dossier ou site correspondant. Un clique droit ouvre un menu contextuel pour <span class="menu">Copier le chemin</span> ou bien <span class="menu">Copier le chemin absolu (absolute path)</span>. Par exemple, si vous vous trouvez dans <span class="path">/MyData/source/haiku/</span> et que vous avez le chemin <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> sous le curseur de la souris, vous obtiendrez le chemin absolu &lt;<i>Prenez un grand souffle</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
+<p>Si vous maintenez enfoncé les touches <span class="key">ALT</span> <span class="key">Maj</span>, seul la partie allant du début du chemin jusqu'au pointeur de la souris sera mis en surbrillance.</p>
+<p>De plus, un clique droit dans le Terminal insère le contenu du presse-papier. Combiné avec l'utilisation de la mise en surbrillance des chemins, cela permet une navigation rapide dans une arborescence de dossier.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Personnalisation du Bash</a></h2>
-<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
-Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/settings/etc/</span>.</p>
+<p>Issu du monde Unix, les possibilités de personnalisation du shell bash sont infinies. Deux fichiers sont particulièrement importants pour l'utilisateur : <span class="cli">.profile</span> et <span class="cli">.inputrc</span><br />
+Ces deux fichiers peuvent être créés dans votre dossier <span class="path">home/</span> pour se substituer aux valeurs par défaut du système qui sont configurées dans <span class="path">/boot/system/etc/</span>.</p>
 
 <h3>.profile</h3>
 <p>Le fichier <span class="cli">.profile</span> est chargé chaque fois que 

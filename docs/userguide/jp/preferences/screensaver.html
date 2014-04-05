@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2013, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -49,18 +49,18 @@
 <span>
  «  <a href="screen.html">画面</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
-::  <a href="sounds.html">サウンド</a>  »
+::  <a href="shortcuts">キーボードショートカット
+</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 <h2><img src="../../images/prefs-images/screensaver-icon_64.png" alt="screensaver-icon_64.png" width="64" height="64" />スクリーンセーバー (ScreenSaver)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>位置:</td><td></td><td><span class="path">/boot/system/preferences/Screensaver</span></td></tr>
+<tr><td>設定ファイルの位置:</td><td></td><td><span class="path">~/config/settings/ScreenSaver_settings</span></td></tr>
 </table>
 
 <p>スクリーンセーバー設定のパネルは 2 つのタブに分かれています。</p>
@@ -72,9 +72,9 @@
 <br />
 <p>一番上のチェックボックスでスクリーンセーバーを有効にするかを選択します。<br />
 その下のスライドバーでスクリーンセーバーが起動するまでの時間を変更できます。</p>
-<p>次の2 つのスライダーは、チェック母ックを有効にしたときにのみ未使用できます。<br />
-1 つは、ディスプレイの電源が切れるまでの時間を設定します。<br />
-もう 1 つは、アンロックのためにパスワードが必要となるまでの時間を設定します。
+<p>次の2 つのスライダーは、チェックボックスを有効にしたときにのみ使用できます。<br />
+1 つは、ディスプレイの電源がオフになるまでの時間を設定します。<br />
+もう 1 つは、ロック解除のためにパスワードが必要となるまでの時間を設定します。
 </p>
 <p>下部の画面のイラストをクリックすることで、どの角にマウスをおいたときにスクリーンセーバーを起動するかを設定できます。この機能を無効化したいときは、イラストの真ん中をクリックしてください。</p>
 
@@ -83,11 +83,12 @@
 <a name="screensavers" id="modules">スクリーンセーバー (Screensavers)</a></h2>
 <img src="../images/prefs-images/screensaver-modules.png" alt="screensaver-modules.png" />
 <br />
-<p>2 つめのタブには、インストールされたすべてのスクリーンセーバーのリストとそれぞれの設定が表示されます。リストの下にある<span class="button">テスト (Test)</span> ボタンで選択しているスクリーンセーバーを試すことができます。また、<span class="button">追加… (Add...)</span> ボタンでスクリーンセーバーの追加ができます。別のやり方としては、スクリーンセーバーをリストにドラッグアンドドロップしても追加できます。もちろん、それぞれのユーザーのフォルダー (すなわち<span class="path">/boot/common/add-ons/Screen Savers/</span>、もしくは<span class="path">/boot/home/config/add-ons/Screen Savers/</span>) で、ファイルのコピーや削除ができます (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックをご覧ください)。
+<p>2 つめのタブには、インストールされたすべてのスクリーンセーバーのリストとそれぞれの設定が表示されます。リストの下にある<span class="button">テスト (Test)</span> ボタンで選択しているスクリーンセーバーを試せます。<br />
+正規の .hpkg パッケージの一部でない新しいスクリーンセーバーをインストールするには、それぞれの <tt>non-packaged</tt> フォルダーへコピーします (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください)。
 </p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/add-ons/Screen Savers/</span></td><td>   </td><td> for screen savers available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Screen Savers/</span></td><td>   </td><td> for screen savers only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/add-ons/Screen Savers/</span></td><td>   </td><td>すべてのユーザーが使用できるスクリーンセーバー用</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/add-ons/Screen Savers/</span></td><td>   </td><td>ユーザーだけが使用できるスクリーンセーバー用</td></tr>
 </table>
 
 </div>
@@ -97,7 +98,8 @@
 <div class="inner"><span>
  «  <a href="screen.html">画面</a> 
 ::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a> 
-::  <a href="sounds.html">サウンド</a>  »
+::  <a href="shortcuts">キーボードショートカット
+</a> »
 </span></div>
 </div>
 

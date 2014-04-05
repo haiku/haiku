@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-20014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />Mapa klávesov</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -74,8 +75,12 @@ Tým pádom sú nastavenia Mapy kláves užitočné nielen na konfiguráciu vaš
 <tr><td><span class="menu">Vyberte mŕtve klávesy</span></td><td> </td><td>nastavenie vyššie spomenutých modrých klávesov.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Vymeniť skratkové klávesy...</span></td><td> </td><td>prepnutie skratkových klávesov na režim Windows/Linux, teda <span class="key">CONTROL</span> (bežne <span class="key">CTRL</span>) alebo režim Haiku, teda <span class="key">COMMAND</span> (bežne <span class="key">ALT</span>).</td></tr>
 </table>
-<p>Zoznam vľavo ponúka všetky dostupné prednastavené mapy klávesov a pod tým, ak sú dostupné, používateľom definované mapy. Mapu klávesov môžete meniť ťahaním myšou: kliknutím ľavým tlačidlom a pretiahnutím na iný kláves skopírujete, kliknutím pravým tlačidlom a pretiahnutím na iný klávesy vymeníte.<br />
-Keď skončíte, váš výsledok môžete uložiť v menu <span class="menu">Súbor | Uložiť...</span>. Vaša modifikovaná mapa sa objaví iba v zozname používateľom definovaných máp, ktoré sú umiestnené v <span class="path">~/config/settings/Keymap/</span>. Inak ich budete musieť manuálne načítať cez <span class="menu">Súbor | Otvoriť...</span>.</p>
+<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.</p>
+<p>Alternatively to this drag&amp;dropping of keys, there's the menu <span class="menu">File | Set modifier keys...</span> that opens this window:</p>
+<img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
+<p>Here, you can assign keys to their respective roles or even completely disable the role of a key. You can even assign the same key to different roles, though that's not a good idea most of the time and you'll be warned by a small exclamation mark beside the pop-up menus if you do that.<br />
+Pressing <span class="button">Set modifier keys</span> applies your changes and closes the window.</p>
+<p>When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
 <p>Aby vaša Mapa klávesov lepšie zodpovedala vašej fyzickej klávesnici, môžete si vybrať z viacerých nastavení v menu <span class="menu">Rozloženie</span>.</p>
 <p>Písmo použité v znázornení klávesnice sa nastavuje v menu <span class="menu">Písmo</span>. Pamätajte, že nie všetky písma obsahujú všetky symboly špecifickej mapy kláves.</p>
 <p>Nakoniec je tu ešte kláves <span class="button">Vrátiť</span>, ktorý vráti späť nastavenia, ktoré boli aktívne v momente zapnutia nastavení Mapy klávesov.</p>
@@ -86,8 +91,8 @@ Keď skončíte, váš výsledok môžete uložiť v menu <span class="menu">Sú
 <p>Okrem panelu nastavení existuje aj iná metóda na prispôsobovanie mapy klávesov. Zahŕňa upravovanie textového súboru obsahujúceho hromadu hexadecimálnych hodnôt, čo môže byť zo začiatku odstrašujúce, no nie je to nemožné pochopiť. </p>
 <p>Aktuálnu mapu kláves môžete vypísať príkazom v Termináli:</p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
-<p>Vygenerovaný textový súbor môže byť potom upravovaný v textovom editore. Uistite sa, že v textovom editore používate písmo s pevnou šírkou znaku, ináč bude súbor ešte ťažší na pochopenie...<br />
-Na začiatku súboru nájdete legendu štylizovanej klávesnice obsahujúcu hexadecimálny hodnotu zodpovedajúcu každému klávesu. Pod tým sa nachádzajú priradenia každej hodnoty. Môžete robiť všetky prispôsobenia dostupné z panelu nastavení a ešte niečo navyše. Ak máte na vašej klávesnici nejaké špeciálne klávesy, môže sa vám podariť ich aktivovať, ale iba ako obyčajné klávesy ako <span class="key">ALT</span> a <span class="key">CONTROL</span>. Nebudete môcť napríklad meniť hlasitosť či spúšťať aplikácie vašimi multimediálnymi klávesmi. Na to môžete použiť napr. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
+<p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
+At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use the <a href="shortcuts.html">Shortcuts</a> preferences.</p>
 <p>Keď skončíte, súbor uložíte a modifikovanú mapu klávesov môžete načítať systémom pomocou tohoto príkazu:</p>
 <pre class="terminal">keymap -s &lt; moja_mapa_klavesov</pre>
 <p>Ak chcete túto mapu importovať do panelu Mapy kláves, musíte ju najprv skompilovať do binárneho formátu:</p>

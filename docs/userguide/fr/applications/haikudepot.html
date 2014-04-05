@@ -9,12 +9,15 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
+ *		roptat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>HaikuDepot</title>
+	<title>HaikuDépôt</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -52,16 +55,48 @@
 
 <div id="content">
 <div>
-<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
-<h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuDepot</h2>
+<h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuDépôt</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
+<tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
+<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Documentation is still missing. If you want to work on it, please announce it on the <a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a> to avoid duplication.</p>
+<p>HaikuDepot est l'application principale pour gérer vos paquets logiciels. Elle vous permet de parcourir et rechercher les paquets à travers les référentiels (aussi appelés « dépôts »), de les installer, de les mettre à jour et de les désinstaller.</p>
+<img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
+
+<h3>Le filtre</h3>
+<p>Au dessus de la liste des paquets, on trouve des critères pour filtrer ceux visibles :</p>
+<ul>
+<li><p>Le menu déroulant <span class="menu">Show</span> permet de limiter la liste à une catégorie, comme « <i>Audio</i> » ou « <i>Jeux</i> ». Vous pouvez aussi afficher uniquement les paquets déjà installés ou ceux pouvant être mis à jour.</p></li>
+<li><p>Le menu déroulant <span class="menu">Depot</span> permet de limiter la liste aux paquets provenant d’un dépôt particulier.</p></li>
+<li><p>Le champs de texte <span class="menu">Search terms</span> permet de filtrer la liste en fonction des mots-clefs que vous renseignez.</p></li>
+</ul>
+
+<h3>La liste</h3>
+<p>Comme dans une fenêtre du Tracker, il est possible de choisir quels colonnes afficher avec un clic droit sur l’entête de la colonne. Un clic gauche trie la liste en fonction de la colonne. Bien sûr, il est possible de réorganiser les colonnes en les glissant vers une nouvelle position.</p>
+<p>La colonne de statut d’un paquet peut avoir pour valeur :</p>
+<ul>
+<li><p><span class="menu">Available</span> : le paquet existe dans le dépôt et il peut être téléchargé et installé. Si le paquet a des dépendances, vous en serez informé à l’installation et vous aurez la possibilité de télécharger et installer tout ce qui est nécessaire.</p></li>
+<li><p><span class="menu">Active</span>: le paquet est déjà installé et prêt à être utilisé.</p></li>
+<li><p><span class="menu">Update available</span>: une version plus récente que celle déjà installée est disponible.</p></li>
+</ul>
+<p>Vous pouvez attraper la ligne en pointillé entre la liste des paquets et la zone d’information pour redimensionner verticalement la liste des paquets.</p>
+
+<h3>La zone d'information</h3>
+<p>En bas de la fenêtre se trouve une zone où apparaît des informations sur le paquet sélectionné dans la liste.<br />
+À droite du nom du paquet, de l’auteur, des nates et de la version se trouve un bouton qui, en fonction de l’état actuel du paquet, permet d’installer (<span class="button">Install</span>), de désinstaller (<span class="button">Uninstall</span>) ou de mettre à jour (<span class="button">Update</span>) le paquet.</p>
+<p>Au dessous il y a 3 onglets :</p>
+<ul>
+<li><p><span class="menu">About</span> contient une description plus détaillée du paquet, ainsi que des copies d’écran, une addresse de contact et l’URL de l’équipe maintenant le paquet, si disponibles.</p></li>
+<li><p><span class="menu">Ratings</span> affiche les notes et les commentaires des utilisateurs s’il y en a. Le pouce vers le haut ou vers le bas permettent de montrer votre accord ou votre désaccord avec un commentaire.</p></li>
+<li><p><span class="menu">Changelog</span> affiche un historique détaillé de toutes les versions du paquet qui ont été publiées jusqu’ici.</p></li>
+</ul>
+
+<h3>Outils et Options</h3>
+<p>Dans le menu <span class="menu">Tools</span> en haut de la fenêtre se trouve un l’élément <span class="menu">Refresh depots</span> pour mettre à jour les dépôts. Le programme va alors chercher la liste à jour de tous les paquets disponibles dans le dépôt.</p>
+<p>Dans le menu <span class="menu">Options</span>, vous pourrez choisir de montrer les paquets de développement (<span class="menu">Show develop packages</span>) ou de code source (<span class="menu">Show source packages</span>) dans la liste. Pour l’utilisateur moyen, ces paquets sont sans intérêt et ne feront que rallonger la liste. Ils sont par contre importants pour les personnes qui ont besoin des bibliothèques, des en-têtes, etc… d’un paquet pour développer et compiler des programmes qui en dépendent.</p>
 
 </div>
 </div>

@@ -84,22 +84,16 @@
 <li><p><b>Asztalsáv-beállítások...</b> - Az Asztalsáv beállításai (információk lejjebb).</p></li>
 <li><p><b>Leállítás</b> - A rendszer <span class="menu">Újraindítás</span>a vagy <span class="menu">Kikapcsolás</span>a.</p></li>
 <li><p><b>Legutóbbi dokumentumok, mappák, programok</b> - A legutóbb megnyitott dokumentumok, mappák illetve programok listája (bővebben az <span class="menu">Asztalsáv beállítások</span> részben alább).</p></li>
-<li><p><b>Programok, Bemutatók, Asztali kisalkalmazások, Beállítások</b> - Az elérhető programok, bemutatók és beállítások listája.<br />További bejegyzéseket hozhatsz létre bármilyen elemhez (programhoz, mappához, fájlhoz, kereséshez, stb.), amihez hivatkozást készítesz a <span class="path">~/config/settings/deskbar</span> mappába.</p></li>
+<li><p><b>Programok, Bemutatók, Asztali kisalkalmazások, Beállítások</b> - Az elérhető programok, bemutatók és beállítások listája.<br />További bejegyzéseket hozhatsz létre bármilyen elemhez (programhoz, mappához, fájlhoz, kereséshez, stb.), amihez hivatkozást készítesz a <span class="path">~/config/settings/deskbar/menu</span> mappába.</p></li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Asztalsáv beállításai</h3>
-<h4>Menü</h4>
-<p>Bár az Asztalsáv menüjének felső része állandó, a <span class="menu">Leállítás...</span> alatti menüpontok személyre szabhatóak.</p>
-<img src="images/deskbar-images/prefs-menu.png" alt="prefs-menu.png" />
-<p>Megadható az utoljára használt fájlok, mappák illetve programok száma, amik majd megjelennek a menüben, vagy egyáltalán megjelenjen-e vagy sem.<br />
-A <span class="button">Menü szerkesztése...</span> gomb megnyomásával megnyílik a <span class="path">~/config/settings/deskbar/</span> mappa. Itt megtaláljuk a menüben megjelenő összes mappát és hivatkozást, melyek alap esetben a <span class="menu">Programok</span>, <span class="menu">Bemutatók</span>, <span class="menu">Asztali kisalkalmazások</span>, és a <span class="menu">Beállítások</span>.<br />
-A bejegyzések törölhetőek vagy újak adhatóak hozzá (például programok, dokumentumok vagy akár lekérdezések), amiket egyszerűen csak be kell másolni a mappába, vagy törölni kell onnan.</p>
-<p>A legegyszerűbb az, ha a fájlt, mappát vagy a mentett keresést az Asztalsávra húzzuk, ahová rakni szeretnénk.</p>
+<img src="images/deskbar-images/prefs-deskbar.png" alt="prefs-deskbar.png" />
+<p>Az Asztalsáv beállításai három részből állnak.</p>
 
 <h4>Programok</h4>
 <p>Az alábbi beállítások nincsenek hatással a programokra, csupán a futó programok listájának megjelenését módosíthatjuk vele.</p>
-<img src="images/deskbar-images/prefs-apps.png" alt="prefs-apps.png" />
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Futó programok rendezése</span></td><td> </td><td>A futó programok listájának ABC sorrend szerinti rendezése.</td></tr>
 <tr><td><span class="menu">A Nyomkövető mindig az első</span></td><td> </td><td>A Nyomkövető mindig az első a futó programok listájában a sorbarendezéstől függetlenül.</td></tr>
@@ -109,14 +103,21 @@ A bejegyzések törölhetőek vagy újak adhatóak hozzá (például programok, 
 <tr><td><span class="menu">Ikon mérete</span></td><td> </td><td>A futó programok listájában a programikonok mérete.</td></tr>
 </table>
 
+<h4>Menü</h4>
+<p>Míg az első pár menüelem állandó, a <span class="menu">Leállítás...</span> alattiak már személyre szabhatóak.<br />
+Megadható az utoljára használt fájlok, mappák illetve programok száma, amik majd megjelennek a menüben, vagy egyáltalán megjelenjen-e vagy sem.<br />
+A <span class="button">Menü szerkesztése...</span> gomb megnyomásával megnyílik a <span class="path">~/config/settings/deskbar/</span> mappa. Itt megtaláljuk a menüben megjelenő összes mappát és hivatkozást, melyek alap esetben a <span class="menu">Programok</span>, <span class="menu">Bemutatók</span>, <span class="menu">Asztali kisalkalmazások</span>, és a <span class="menu">Beállítások</span>.<br />
+A bejegyzések törölhetőek vagy újak adhatóak hozzá (például programok, dokumentumok vagy akár lekérdezések), amiket egyszerűen csak be kell másolni a mappába, vagy törölni kell onnan.</p>
+<p>A legegyszerűbb az, ha a fájlt, mappát vagy a mentett keresést az Asztalsávra húzzuk, ahová rakni szeretnénk.</p>
+
 <h4>Ablak</h4>
 <p>Ezek az opciók magára az Asztalsáv-ablakra vonatkoznak.</p>
-<img src="images/deskbar-images/prefs-window.png" alt="prefs-window.png" />
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Mindig felül</span></td><td> </td><td>Az Asztalsáv mindig a többi ablak előtt van.</td></tr>
 <tr><td><span class="menu">Automatikus előrehozás</span></td><td> </td><td>Az Asztalsáv előre hozása ha az egér fölé kerül.</td></tr>
 <tr><td><span class="menu">Automatikus elrejtés</span></td><td> </td><td>Az Asztalsáv mérete lecsökken mindössze néhány képpontra, majd előjön ha az egér fölé kerül.</td></tr>
 </table>
+
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">A Polc</a></h2>

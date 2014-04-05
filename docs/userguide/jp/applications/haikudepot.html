@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mt
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -45,23 +47,55 @@
 </ul>
 <span>
  «  <a href="expander.html">ファイル解凍</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications (アプリケーション)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="icon-o-matic.html">Icon-O-Matic</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuDepot</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
+<tr><td>位置:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
+<tr><td>設定ファイルの位置:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Documentation is still missing. If you want to work on it, please announce it on the <a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a> to avoid duplication.</p>
+<p>HaikuDepot は、ユーザーのソフトウェア管理に関して、中心となるアプリケーションです。HaikuDepot により、パッケージリポジトリ ("depots" とも呼ばれます) を通じて、一覧や検索ができ、パッケージのインストール、更新およびアンインストールができます。</p>
+<img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
+
+<h3>フィルター</h3>
+<p>一番上には、その下の使用可能なパッケージのリストをフィルタリングするいくつかの手段があります。</p>
+<ul>
+<li><p> <span class="menu">表示 (Show)</span> ポップアップメニューは、"<i>Audio</i>" や "<i>Games</i>" のような特定のカテゴリーにリストを制限します。インストール済パッケージだけや、インストール済で更新の利用可能なパッケージだけを表示することもできます。</p></li>
+<li><p><span class="menu">Depot</span> ポップアップメニューは、特定のリポジトリからのパッケージを表示するようにリストを制限します。</p></li>
+<li><p><span class="menu">検索 (Search terms)</span> テキストフィールドは、入力したキーワードでリストをフィルタリングします。</p></li>
+</ul>
+
+<h3>リスト</h3>
+<p>Tracker ウィンドウと同じく、コンテキストメニューから表示する列を選択するには、列見出しで右クリックします。左クリックは、列に応じてリストを並び替えます。もちろん、列を新しい位置にドラッグすることで列を再配置できます。</p>
+<p>パッケージの status 列は、以下のうちの 1 つを取ります。</p>
+<ul>
+<li><p><span class="menu">利用可能 (Available)</span>: パッケージが depot 内に存在し、ダウンロードおよびインストールができます。ほかのパッケージに何らかの依存関係があれば、インストール中にユーザーに知らされ、必要なものをすべてダウンロード / インストールするかを選択させます。</p></li>
+<li><p><span class="menu">有効 (Active)</span>: パッケージはインストール済みで、いつでも利用できます。</p></li>
+<li><p><span class="menu">更新あり (Update available)</span>: ユーザーがインストールしたものより新しいバージョンが利用できます。</p></li>
+</ul>
+<p>パッケージリストと情報エリアの間の点線をつかむと、パッケージリストを縦方向にリサイズできます。</p>
+
+<h3>情報エリア</h3>
+<p>下側は、その上のリストで現在選択されているパッケージの情報を表示するエリアです。<br />
+パッケージ名、作者、評価、およびバージョンの右側にボタンがあります。 – ボタンは、パッケージの現在の状況に応じて、パッケージを <span class="button">インストール (Install)</span>、<span class="button">アンインストール (Uninstall)</span>、または <span class="button">更新 (Update)</span> します。</p>
+<p>その下に 3 つのタブがあります:</p>
+<ul>
+<li><p><span class="menu">パッケージについて (About)</span> パッケージのより詳しい説明と同様に、スクリーンショット、連絡先アドレス、存在するならパッケージされたソフトウェアを保守するチームの URL を表示します。</p></li>
+<li><p><span class="menu">評価 (Ratings)</span> 利用できるなら、ユーザーによる評価とコメントを表示します。左側の小さいアイコンを上下することで、読者の同意非同意をコメントと共に表示できます。</p></li>
+<li><p><span class="menu">変更履歴 (Changelog)</span> ここまでリリースしてきたパッケージのすべてのバージョンの詳細な履歴を表示します。</p></li>
+</ul>
+
+<h3>ツールとオプション</h3>
+<p>ウィンドウの一番上にある <span class="menu">ツール (Tools)</span> メニューの中に、<span class="menu">Depot を更新 (Refresh depots)</span> 項目があります。これは、リポジトリから利用可能なパッケージの最新のリストを要求します。</p>
+<p><span class="menu">オプション (Options)</span> メニューの下にある、パッケージリストの <span class="menu">開発用パッケージを表示する (Show develop packages)</span> および <span class="menu">ソースパッケージを表示する (Show source packages)</span> もまた選択できます。これらは通常のユーザーには興味のあるものではなく、リストをごちゃごちゃさせるだけです。しかし、パッケージのライブラリやヘッダーなどを必要とする人たちにとっては、それらに依存するプログラムの開発やコンパイルのために重要となります。</p>
 
 </div>
 </div>
@@ -70,7 +104,7 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="expander.html">ファイル解凍</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications (アプリケーション)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="icon-o-matic.html">Icon-O-Matic</a>  »
 </span></div>
 </div>

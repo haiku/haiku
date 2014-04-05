@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-20014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -73,8 +73,12 @@ A panel nem csupán a kiosztás beállítására használható, hanem a speciál
 <tr><td><span class="menu">Beragadó gombok kiválasztása</span></td><td> </td><td>A fennt említett kék billentyűk megadása.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Billentyűkombináció váltása...</span></td><td> </td><td>A billentyűzet-kombinációk Windows/Linux szerűen, például <span class="key">CONTROL</span> (általában <span class="key">CTRL</span>) vagy Haiku szerűen, például <span class="key">COMMAND</span> (általában <span class="key">ALT</span>).</td></tr>
 </table>
-<p>A bal oldalon található listában az előre deffiniált, illetve ha már vannak, akkor az egyéni kiosztások találhatóak. A virtuális billentyűzeten a gombokat módosíthatjuk is. Ekkor a bal egérgombbal a billentyű mozgatható, míg a jobb gombbal kicserélhető két billentyű.<br />
-Ha elkészültünk, akkor a <span class="menu">Fájl | Mentés...</span> menüvel el is tárolhatjuk azt. Ezután a kiosztás megjelenik az egyéni listában, és a <span class="path">~/config/settings/Keymap/</span> mappában. Egyéb esetben pedig a <span class="menu">Fájl | Megnyitás...</span> menüvel tölthető be.</p>
+<p>A bal oldalon található listában az előre deffiniált, illetve ha már vannak, akkor az egyéni kiosztások találhatóak. A virtuális billentyűzeten a gombokat módosíthatjuk is. Ekkor a bal egérgombbal a billentyű mozgatható, míg a jobb gombbal kicserélhető két billentyű.</p>
+<p>A billentyűk mozgatása helyett a <span class="menu">Fájl | Módosító billentyű megadása...</span> menü is használható:</p>
+<img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
+<p>Ezen a felületen módosíthatjuk az egyes billentyűk szerepét vagy akár teljesen le is tilthatjuk azt. Ugyanakkor, egy azon billentyűhöz több funkció is társítható. Ez általában nem a legjobb ötlet, kapunk is erre egy figyelmeztetést.<br />
+A <span class="button">Módosító billentyű megadása</span> gombot lenyomva az ablak bezáródik és a módosítások azonnal érvénybe lépnek.</p>
+<p>Ha elkészültünk, akkor a <span class="menu">Fájl | Mentés másként...</span> menü segítségével eltárolhatjuk a módosításokat. Az eltárolt kiosztás csak akkor jelenik meg a felhasználói listában, ha az a <span class="path">~/config/settings/Keymap/</span> mappában található. Egyébként a <span class="menu">Fájl | Megnyitás...</span> menüvel tölthetjük be.</p>
 <p>A pontosabb megjelenítés érdekében, hogy a virtuális billentyűzet jobban hasonlítson a valós billentyűzetre, a <span class="menu">Elrendezés</span> menüből néhány billentyűzett-típus közül választhatunk.</p>
 <p>A virtuális billentyűzeten használt betűtípus módosítható a <span class="menu">Betűtípus</span> menüből.</p>
 <p>Végül pedig a <span class="button">Visszavon</span> gomb az összes beállítást az indításkori állapotra állít vissza.</p>
@@ -86,7 +90,7 @@ Ha elkészültünk, akkor a <span class="menu">Fájl | Mentés...</span> menüve
 <p>A jelenlegi kiosztást elmenthetjük az alábbi parancs segítségével a Teminálban:</p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
 <p>Az elkészült szöveges fájl bármely szövegszerkesztőben megnyitható. Győződjünk meg arról, hogy rögzített betűtípust használunk, így biztosan nem fogjuk eltéveszteni a fájlban tárolt adatokat.<br />
-A fájl elején egy kis magyarázat található a stilizált billentyűzetre a hexadecimális értékekkel együtt. Ez alatt az aktuális társítások találhatóak minden értékhez. Ugyan azokat a módosításokat érhetjük el itt is, mint a beállítások panelen, talán még kicsit többet is. Ha a billentyűzetén néhány speciális szimbólum is található, akkor itt könnyen aktiválhatjuk azokat. Ezek egy külön billentyűként is vagy kombinációként is használhatóak. Arra azonban nincs lehetőség, hogy például a hangerőt növeljük vagy csökkentsük, illetve elindítsunk néhány programot. Erre használható például a <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">Parancsgombok</a> program.</p>
+A fájl elején egy kis magyarázat található a stilizált billentyűzetre a hexadecimális értékekkel együtt. Ez alatt az aktuális társítások találhatóak minden értékhez. Ugyan azokat a módosításokat érhetjük el itt is, mint a beállítások panelen, talán még kicsit többet is. Ha a billentyűzetén néhány speciális szimbólum is található, akkor itt könnyen aktiválhatjuk azokat. Ezek egy külön billentyűként is vagy kombinációként is használhatóak. Arra azonban nincs lehetőség, hogy például a hangerőt növeljük vagy csökkentsük, illetve elindítsunk néhány programot. Erre használható például a <a href="shortcuts.html">Parancsgombok</a> program.</p>
 <p>Miután végeztünk, elmenthetjük és betölthetjük a módosításokat a következő parancs kiadásával:</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
 <p>Ahhoz, hogy ezt a kiosztást betöltsük a Billentyűzetkiosztás panelba, előtte bináris formátumúvá kell azt alakítani:</p>

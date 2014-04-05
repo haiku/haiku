@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2011, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -53,6 +53,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Aplikácie</span></td></tr>
@@ -81,7 +82,7 @@ Na záver sa môžete rozhodnúť či zahrniete tlačidlo "Domov" v navigačnom 
 <ul>
 <li><img src="../images/apps-images/webpositive-tabbar.png" alt="webpositive-tabbar.png" />
 <p>Nové karty sú vytvorené tlačidlom <span class="key">+</span> vpravo v lište alebo v prípade, že je ešte dosť miesta, poklepaním na prázdne miesto na nej. Ak existuje viac otvorených záložiek, než vojde do baru, <span class="key">&lt;</span> <span class="key">&gt;</span> rolovacie tlačidlo stane aktívne, čo vám umožní prechádzať lište vľavo a vpravo. <span class="key">∨</span> tlačidlo úplne vpravo hostí pop-up menu so všetkými otvorenými kartami pre ešte rýchlejšie navigáciu.</p></li>
-<li><p>Kliknutie na odkaz stredným tlačidlom myši otvorí stránku na novej karte v pozadí.</p></li>
+<li><p>Clicking on a link with the middle mouse button opens the page in a new tab in the background. Holding <span class="key">SHIFT</span> while middle-clicking, opens it in the foreground.</p></li>
 <li><p>Z ponuky <span class="menu">Zobraziť</span> môžte <span class="menu">Priblížiť</span> a <span class="menu">Oddialiť</span> stránku. Tiež je tu možnosť <span class="menu">Priblížiť iba text</span>, ponechávajúc obrázky v ich pôvodnej veľkosti.</p></li>
 <li><p>Ak sa prepnete do režimu celej obrazovky a aktivujete nastavenia skryť rozhranie, zmizne po sekunde. Na jeho dočasné zobrazenie, jednoducho presuňte ukazovateľ myši na hornej časti obrazovky.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
@@ -101,7 +102,6 @@ Reťazce nerozpoznané ako URL sa vyhľadajú cez Google, takže pole Locator sl
 <li><p>Kliknutie pravým tlačidlom myši otvorí kontextové menu, ktoré v závislosti na objekte, na ktorý ste klikli, ponúka otvoriť odkaz v novom okne alebo novej záložke, stiahnite si objekt atď.</p></li>
 <li><p><span class="menu">Upraviť | Nájsť</span> zobrazí vyhľadávací panel v spodnej časti okna, pre začiatok vyhľadávania na stránke. Zhody sú na stránke zvýraznené.</p></li>
 </ul>
-<div class="box-info">Po chvíli môže začať načítanie stránok pomalšie a pomalšie. Nie tak celkom chyba v pravom slova zmysle, je to skôr efekt nedostatočného zaobchádzanie s cookies. V každom prípade, pokiaľ to nebude opravené, musíte do toho manuálne zasiahnuť: Pozrite sa na <span class="path">~/config/settings/WebPositive/Cookies.curl</span>. Tento súbor ukladá cookies z webových stránok a pomaly rastie počas surfovania na webe. Akonáhle je pár desiatok kilobajtov veľký, začne spomaľovať prezeranie. Stačí zmazať súbor, v tomto prípade a začať s čistým štítom.</div>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Záložky</h2>
 <p>WebPositive záložky sú riadené ako súbory a priečinky v  <tt>~/config/settings/WebPositive/Bookmarks/</tt>. Pridanie záložky vytvorí nový súbor. Môžete rýchlo otvoriť zložku <span class="menu">Spravovať záložky...</span>.</p>
 <img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
@@ -131,7 +131,7 @@ Všeobecne platí, že WebPositive je veľmi tolerantný, pokiaľ ide o správu 
 <tr><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>Otvorí domovskú stránku</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">D</span></td><td> </td><td>Zobrazí/skryje okno sťahovania.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Zobrazuje vyhľadávacie lištu pre vyhľadávanie na stránke (skryjete s <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Vytvoriť záložku na túto stránku</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Bookmarks the current page.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">M</span></td><td> </td><td>správa záložiek, otvorením priečinka záložiek.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">←</span></td><td> </td><td>Predchádzajúca stránka v histórii </td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">→</span></td><td> </td><td>Ďalšia stránka v histórii</td></tr>

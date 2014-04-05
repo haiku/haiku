@@ -71,28 +71,28 @@
 
 <h1>Tracker</h1>
 
-<p>Tracker はすべてのファイルへのグラフィカルインタフェースです。それは新しいファイルおよびフォルダーの作成や、検索、起動や名前の編集の他に、既存のファイルのコピーや削除も行います。</p>
-<p>ほかのアプリケーションと同様に (アイコンを備えたデスクトップは実際に単にうしろにあるフルスクリーンウィンドウです)、Tracker はそのウィンドウとともに Deskbar 上に現れ、終了および再起動ができます。クラッシュやフリーズした Tracker (あるいは不安定な Deskbar) を終了して再起動するもっとも簡単な方法は、<a href="teammonitor.html">チームモニター</a>を呼び出すことです。</p>
+<p>Tracker はすべてのファイルへのグラフィカルインターフェースです。それは新しいファイルおよびフォルダーの作成や、検索、起動や名前の編集のほかに、既存のファイルのコピーや削除も行います。</p>
+<p>ほかのアプリケーションと同様に (アイコンを備えたデスクトップは実際にはうしろにある単なるフルスクリーンウィンドウです)、Tracker はそのウィンドウとともに Deskbar 上に現れ、終了および再起動ができます。クラッシュやフリーズした Tracker (あるいは不安定な Deskbar) を終了して再起動するもっとも簡単な方法は、<a href="teammonitor.html">チームモニター</a>を呼び出すことです。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mounting-volumes" name="mounting-volumes">ボリュームのマウント</a></h2>
-<p>ハードディスク、CD、USB スティック等にアクセスするためには、まずボリュームをマウントしなければなりません、すなわち、システムにそれがそこにあることを知らせます。ボリュームのマウントはデスクトップあるいはマウント済のボリューム (ブートディスク等) を右クリックして <span class="menu">マウント (Mount)</span> サブメニューからボリュームを選択することで行われます。Deskbar に同様のマウントメニューが見つかります。</p>
+<p>ハードディスク、CD、USB スティック等にアクセスするためには、まずボリュームをマウントしなければなりません、すなわち、システムにそれがそこにあることを知らせます。ボリュームをマウントするには、デスクトップあるいはマウント済のボリューム (ブートディスク等) を右クリックして <span class="menu">マウント (Mount)</span> サブメニューからボリュームを選択します。Deskbar に同様のマウントメニューが見つかります。</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
-<p>また、<span class="menu">設定 (Settings)</span> もあるので、起動ごとにすべてを手動でマウントする必要はありません。上図の設定は、接続や挿入されたあらゆる記憶装置を自動的にマウントし、以前にマウントされたすべてのディスクを起動時にマウントするでしょう。</p>
+<p>また、<span class="menu">設定 (Settings)</span> もあるので、起動のたびにすべてを手動でマウントする必要はありません。上図の設定は、接続や挿入されたあらゆる記憶装置を自動的にマウントし、以前にマウントされたすべてのディスクを起動時にマウントするでしょう。</p>
 <div class="box-warning">ハードドライブや USB スティック等を取り外す前に、ボリュームが正しくアンマウントしたことを確かめてください (これはデータ転送がすべて終了したことを保証します)。そうしないと、データを失うか、あるいはディスクを破損するかもしれません。</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="navigating" name="navigating">ナビゲーション</a></h2>
 <p>デフォルトでは、フォルダーをダブルクリックすると、Tracker は親ウィンドウを開いたままで新しいウィンドウを開きます。これではすぐに散らかったデスクトップになってしまいます。<br />
-<span class="key">OPT</span> キーを押すことでこれを防ぐことができます。つまり、自動的に親ウィンドウを閉じます。<br />
+これを防ぐには、<span class="key">OPT</span> キーを押します。それにより、自動的に親ウィンドウを閉じます。<br />
 これはまた、キーボードナビゲーションでも当てはまります。さらに詳しくは、<a href="keyboard-shortcuts.html">ショートカットやキーの組み合わせ</a>のトピックを見てください。</p>
-<p>Tracker の主な目的の 1 つは、ほかのプラットフォーム上のファイルマネージャと同様にフォルダーを移動することです。Haiku の Tracker には、効率的に移動を支援するいくつかの独自の特徴があります。</p>
+<p>Tracker の主な目的の 1 つは、ほかのプラットフォーム上のファイルマネージャーと同様にフォルダーを移動することです。Haiku の Tracker には、効率的に移動を支援するいくつかの独自の特徴があります。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">サブメニューのドリルダウン</a></h3>
-<p>ダブルクリックで次々とフォルダー階層を降りて行く代わりに、ドリルダウンするもっとよい方法があります。</p>
+<p>ダブルクリックで次々とフォルダー階層を下る代わりに、ドリルダウンのためのもっとよい方法があります。</p>
 <img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
 <!-- screenshot needs updating to show /boot/system/documentation -->
 <p>フォルダー上で右クリックすると、通常のコンテキストメニューの一番上に現在のフォルダーのサブメニューが見つかります。それはフォルダーの 1 階層下へ移動します。捜しているファイルかフォルダーを見つけてそれをクリックで開くまで、階層を下って移動してください。上の図は、フォルダー <span class="path">/boot/home/config/</span> の内容を表示しています。<br />
@@ -100,58 +100,58 @@
 <p>同様の方法は、Tracker の任意のウィンドウから使用できます。</p>
 <img src="images/tracker-images/window-drill-down.png" alt="window-drill-down.png" />
 <p>項目の数を表示している左下のエリアをクリックすると、現在のフォルダーの上の階層にあるフォルダーのサブメニューが見つかるでしょう。そこから、いつも通りフォルダーを経由してドリルダウンできます。</p>
-<p>デスクトップは、常に階層のトップレベルであり、Tracker がマウントされたボリュームを表示する場所であることに注意してください。したがって、別のディスクに移動したければ、まずにトップレベル (デスクトップ) へ移動し、そこからディスクへ移動する必要があります。</p><br />
+<p>デスクトップは、常に階層のトップレベルであり、Tracker がマウントされたボリュームを表示する場所であることに注意してください。したがって、別のディスクに移動したければ、まずトップレベル (デスクトップ) へ移動してからディスクへ移動する必要があります。</p><br />
 <p>ファイルをフォルダーにドラッグした時にも同様のサブメニューナビゲートができるでしょう。フォルダー上でしばらく留まると、サブメニューがポップアップし目的地へドリルダウンできます。もし右マウスボタンを押してドラッグを始めた場合は、ボタンを離した時に、ファイルのコピー、移動、またはリンクから選択できます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="type-ahead" name="type-ahead">先行入力でファイルにジャンプする</a></h3>
-<p>ほかのオペレーティングシステムのファイルマネージャでこのコンセプトは良く知っているかもしれません。ファイル名の最初の数文字をタイプすると、これらの文字に最初に一致するファイルにジャンプします。Haiku はそのアイデアを一歩進めました。これらの文字で始まるファイルが無いときは、ファイル名に文字列を含む最初のファイルにジャンプします。ファイル名中に文字列が無い場合は、次に属性が検索されます。</p>
+<p>ほかのオペレーティングシステムのファイルマネージャーでこのコンセプトは良く知っているかもしれません。ファイル名の最初の数文字をタイプすると、これらの文字に最初に一致するファイルにジャンプします。Haiku はそのアイデアを一歩進めました。これらの文字で始まるファイルが無いときは、ファイル名に文字列を含む最初のファイルにジャンプします。ファイル名中に文字列が無い場合は、次に属性が検索されます。</p>
 <img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
-<p>上の例では、"Haiku logo" で始まるたくさんのファイルがあるので、単純な先行入力は無駄です。しかし、Haiku では、"web" とタイプすることで、最初のファイルである、"Haiku logo - website" に正確にジャンプします。タイプされた文字は左下 (通常、フォルダー中の全ファイルの数が表示される場所) に表示されます。１ 秒後に元の表示に戻り、新しい先行入力検索を開始できます。</p>
+<p>上の例では、"Haiku logo" で始まるたくさんのファイルがあるので、単純な先行入力は無駄です。しかし、Haiku では、"web" とタイプすることで、最初のファイルである、"Haiku logo - website" に正確にジャンプします。タイプされた文字は左下 (通常、フォルダー中の全ファイルの数が表示される場所) に表示されます。1 秒後に元の表示に戻り、新しい先行入力検索を開始できます。</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="type-ahead-filter" name="type-ahead-filter">先行入力フィルター</a></h3>
-<p>入力中にジャンプする代わりに、先行入力文字列に一致しないファイルを取り除くオプションもあリます。特に、ファイルが多すぎるフォルダーの場合、これは透明度を著しく改善します。<span class="key">SHIFT</span> <span class="key">SPACE</span> を区切りとして使うことで、複数の文字列でフィルターすることさえできます。<br />
-先行入力ジャンプと異なり、フィルタリングは<span class="key">ESC</span> を押すか、ウィンドウを閉じる (または、シングルウィンドウナビゲーションモードのときはフォルダーを去る) までは有効です。<br />
+<p>入力中にジャンプする代わりに、先行入力文字列に一致しないファイルを取り除くオプションもあります。特に、ファイルが多すぎるフォルダーの場合、これは明快さを著しく改善します。<span class="key">SHIFT</span> <span class="key">SPACE</span> を区切りとして使うことで、複数の文字列でフィルタリングさえできます。<br />
+先行入力ジャンプと異なり、フィルタリングは <span class="key">ESC</span> を押すか、ウィンドウを閉じる (または、シングルウィンドウナビゲーションモードのときはフォルダーを去る) までは有効です。<br />
 この先行入力フィルタリングは、<a href="#tracker-preferences.html">Tracker preferences</a> 中で設定されます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="appearance" name="appearance">外観</a></h2>
 <img src="images/tracker-images/window-menu.png" alt="window-menu.png" />
-<p>Tracker ウィンドウは <span class="menu">ウィンドウ (Window)</span> メニューから、3 つの表示モードを提供します。</p>
+<p>Tracker ウィンドウは、<span class="menu">ウィンドウ (Window)</span> メニューから 3 つの表示モードを提供します。</p>
 <ul>
-<li><p><span class="menu">アイコン表示 (Icon view)</span> (<span class="key">ALT</span> <span class="key">1</span>) - 大きいアイコン表示です。サブメニューからサイズを変更できます。また、<span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span> で、アイコンのサイズを大きくまたは小さくできます。</p></li>
-<li><p><span class="menu">ミニアイコン表示 (Mini icon view)</span> (<span class="key">ALT</span> <span class="key">2</span>) - 小さいアイコン表示です。</p></li>
-<li><p><span class="menu">一覧表示 (List view)</span> (<span class="key">ALT</span> <span class="key">3</span>) - ファイルを詳細リストで表示します。また、利用可能な<i>属性</i>を表示 / 非表示にできます (<a href="attributes.html">属性</a>のトピックを見てください)。</p></li>
+<li><p><span class="menu">アイコン表示 (Icon view)</span> (<span class="key">ALT</span> <span class="key">1</span>) - 大きいアイコンで表示します。サブメニューからサイズを変更できます。また、<span class="key">ALT</span> <span class="key">+</span>/<span class="key">-</span> で、アイコンを拡大縮小できます。</p></li>
+<li><p><span class="menu">ミニアイコン表示 (Mini icon view)</span> (<span class="key">ALT</span> <span class="key">2</span>) - 小さいアイコンで表示します。</p></li>
+<li><p><span class="menu">一覧表示 (List view)</span> (<span class="key">ALT</span> <span class="key">3</span>) - ファイルを詳細リストで表示します。また、利用可能な<i>属性</i>を表示または非表示にできます (<a href="attributes.html">属性</a>のトピックを見てください)。</p></li>
 </ul>
 <p><span class="menu">ウィンドウ (Window)</span> メニューはほかに多くの機能を提供します。</p>
 <ul>
 <li><p><span class="menu">最適な表示サイズに変更 (Resize to fit)</span> (<span class="key">ALT</span> <span class="key">Y</span>) - ウィンドウを望ましいサイズにリサイズします。</p></li>
-<li><p><span class="menu">並べ換え (Arrange by)</span> - アイコンモード、またはミニアイコンモードでのみ利用できます。サブメニューによりさまざまなプロパティでの並び替えができます。</p>
+<li><p><span class="menu">並べ換え (Arrange by)</span> - アイコンモード、またはミニアイコンモードでのみ使えます。サブメニューによりさまざまなプロパティでの並び替えができます。</p>
 	<ul>
 	<li><p><span class="menu">名前 (Name)</span>、<span class="menu">実名 (Real name)</span>、<span class="menu">サイズ (Size)</span>、<span class="menu">更新日時 (Modified)</span>、<span class="menu">作成日時 (Created)</span>、<span class="menu">種類 (Kind)</span>, <span class="menu">場所 (Location)</span>、<span class="menu">アクセス許可 (Permissions)</span></p></li>
 	<li><p><span class="menu">逆順にする (Reverse order)</span> - 並び替えを逆順にします</p></li>
-	<li _translation_id="4339"><p><span class="menu">アイコンの整列 (Clean up)</span> (<span class="key">ALT</span> <span class="key">K</span>) - すべてのアイコンを見えないグリッドに整列させます。<span class="key">SHIFT</span> を押しながら選択すると、メニューは <span class="menu">すべてを整列 (Clean up all)</span> となり、整列に加えて、すべてのアイコンを上記で選択されたキーで並び替えます。</p></li>
+	<li _translation_id="4339"><p><span class="menu">アイコンの整列 (Clean up)</span> (<span class="key">ALT</span> <span class="key">K</span>) - すべてのアイコンを見えないグリッド上に整列させます。<span class="key">SHIFT</span> を押しながら選択すると、メニューは<span class="menu">すべてを整列 (Clean up all)</span> となり、整列に加えて、すべてのアイコンを上記で選択されたキーで並び替えます。</p></li>
 	</ul></li>
 <li><p><span class="menu">選択… (Select...)</span> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - ファイルを<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expression">正規表現</a>で選択します。</p></li>
-<li><p><span class="menu">閉じる (Close)</span> (<span class="key">ALT</span> <span class="key">W</span>) - ウィンドウを閉じます。<span class="key">SHIFT</span> を押しながら選択すると、メニューは <span class="menu">すべて閉じる (Close all)</span> となり、すべての Tracker ウィンドウを閉じます。</p></li>
+<li><p><span class="menu">閉じる (Close)</span> (<span class="key">ALT</span> <span class="key">W</span>) - ウィンドウを閉じます。<span class="key">SHIFT</span> を押しながら選択すると、メニューは<span class="menu">すべて閉じる (Close all)</span> となり、すべての Tracker ウィンドウを閉じます。</p></li>
 <li><p><span class="menu">ワークスペース内のすべてを閉じる (Close all in workspace)</span> (<span class="key">ALT</span> <span class="key">Q</span>) - 現在のワークスペース中のすべての Tracker ウィンドウを閉じます。フォルダーをクリックする時に <span class="key">OPT</span> キーを押し忘れ、結果として開いた Tracker ウィンドウでワークスペースが散らかった場合に便利です。</p></li>
 </ul>
-<p>しばしば、少しのアイコンを完全な <span class="menu">アイコンの整列 (Clean up)</span> (<span class="key">ALT</span> <span class="key">K</span>) を使わずに再整列したい場合があります。その場合、アイコンを選択して、新しい場所へドラッグします。アイコンをドロップする前に <span class="key">ALT</span> キーを押し続けます。これによりアイコンは見えないグリッドに整列されます。</p>
-<p>その他の機能は、Tracker 設定を除いて説明を要しない物です。</p>
+<p>しばしば、完全な<span class="menu">アイコンの整列 (Clean up)</span> (<span class="key">ALT</span> <span class="key">K</span>) を使わずに少しのアイコンを再整列したい場合があります。その場合、アイコンを選択して、新しい場所へドラッグします。アイコンをドロップする前に <span class="key">ALT</span> キーを押し続けます。これによりアイコンは見えないグリッドに整列されます。</p>
+<p>その他の機能は、Tracker 設定を除いて説明を要しないものです。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tracker-preferences" name="tracker-preferences">Tracker 環境設定</a></h3>
-<p><span class="menu">ウィンドウ (Window) | 設定… (Preferences...)</span> は、多くの設定項目を提供するパネルを開きます。それらは読んでわかる物では有りませんが、一度試せば明らかになるはずです。すべての設定はライブで適用されるので、変更した結果はすぐに見られるでしょう。<br />
+<p><span class="menu">ウィンドウ (Window) | 設定… (Preferences...)</span> は、多くの設定項目を提供するパネルを開きます。それらは読んでわかるものではありませんが、一度試せば明らかになるはずです。すべての設定はライブで適用されるので、変更した結果はすぐに見られるでしょう。<br />
 それでは、わかりにくい設定を手短に。</p>
 <ul>
 <li><p><span class="menu">デスクトップ (Desktop)</span> - マウントされたディスクを、すべてデスクトップに表示するか、またはデスクトップ上の単独のディスク (Disks) アイコンをクリックして表示されるウィンドウ中に表示するかを決めます。</p></li>
 <li><p><span class="menu">ウィンドウ (Windows)</span> - <span class="menu">シングルウィンドウナビゲーション (Single window navigation)</span> を設定できます。つまり、フォルダーをダブルクリックすると、それ自身のウィンドウを開く代わりにすでに開いているウィンドウの中に開きます。これは上記の <span class="key">OPT</span> キーを押しながらクリックするのとは違います。なぜなら、ウィンドウごとに保存された位置やサイズを失うからです。<br /><br /></p>
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
-<p>シングルウィンドウナビゲーションモードへ Tracker を切り替える前に、よりなじんでいるかもしれないので、まずはメニューベースのブラウジングを試して見ることを勧めます。メニューベースに慣れた後では、実際にはるかに速く動作するかもしれません。一方、シングルウィンドウブラウズは<i>ナビゲーター</i>を提供します。そこには、パス名を入力したりコピー＆ペーストできます。また、戻る、進む、および上の階層へ移動のボタンを使用できます。</p> 
+<p>シングルウィンドウナビゲーションモードへ Tracker を切り替える前に、よりなじんでいるかもしれないので、まずはメニューベースのブラウジングを試して見ることを勧めます。メニューベースに慣れた後では、実際にはるかに速く動作するかもしれません。一方、シングルウィンドウブラウズは<i>ナビゲーター</i>を提供します。そこでは、パス名の入力や、コピー＆ペーストができます。また、戻る、進む、および上の階層へ移動のボタンを使用できます。</p> 
 <p> <span class="menu">先行入力フィルターを有効にする (Enable type-ahead filtering)</span>  を有効にすると、入力している間、入力文字列がファイル名または表示されている属性にマッチするファイルだけを表示するように、Tracker ウィンドウの内容をフィルタリングします。<a href="#type-ahead-filter">上記を</a>見てください。</p></li>
 <li><p><span class="menu">ごみ箱 (Trash)</span> - ファイルを削除する時の振る舞いを設定します。</p></li>
 <li><p><span class="menu">ディスクアイコン (Volume icons)</span> - ディスクアイコンの横に表示される空き容量表示の有無や色を設定します。</p></li>
@@ -161,37 +161,35 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="working-with-files" name="working-with-files">ファイル操作</a></h2>
-<p>ファイルを選択したときに呼び出される <span class="menu">ファイル (File)</span> メニューコマンドのほとんどは、そのファイルを右クリックしたときに呼ばれるコンテキストメニュー中にも表示されます。</p>
+<p>ファイルを選択したときに呼び出される<span class="menu">ファイル (File)</span> メニューコマンドのほとんどは、そのファイルを右クリックしたときに呼ばれるコンテキストメニュー中にも表示されます。</p>
 <p>例によって、コマンドの使い方はかなり明白なものです。</p>
 <ul>
 <li><p><span class="menu">検索… (Find...)</span> - ファイルまたはフォルダーを検索します。より多くの情報を得るために<a href="queries.html">クエリ</a>のトピックを見てください。</p></li>
 <li><p><span class="menu">新規作成 (New)</span> - 新しいフォルダー、または<i>テンプレート</i>に基づいたファイルを作成します。<br /><br /></p>
 <img src="images/tracker-images/new-menu.png" alt="new-menu.png" />
 <p><span class="menu">雛形を編集… (Edit templates...)</span> を選択すると、<span class="path">/boot/home/config/settings/Tracker/Tracker New Templates</span> フォルダーを開きます。そのフォルダーにファイルを作成すると、<span class="menu">新規作成 (New)</span> メニューのテンプレートとしてファイルの名前およびほかの属性を持ったファイルタイプを提供するでしょう。ここでは、ファイルタイプが <tt>text/plain</tt> であるファイル "Text" があります。より多くの情報については、<a href="filetypes.html">ファイルタイプ</a>のトピックを見てください。</p></li>
-<li><p><span class="menu">指定アプリケーションで開く… (Open with...)</span> - このサブメニューは、このファイルタイプを扱うことができるアプリケーションをすべて表示します。<br /><br /></p>
-<img src="images/tracker-images/open-with.png" alt="open-with.png" />
-
-<p>ファイルがダブルクリックされた時に、ファイルを開く優先アプリケーションにチェックマークがつきます。このサブメニューは最初に正確なファイルタイプ (この場合、タイプ <tt>text/plain</tt> であるテキストファイル) を扱うことができるアプリケーションをリストします。次に、ここで一般にそのスーパータイプ (ここでは <tt>text/*</tt>) を扱うことができるすべてのアプリケーションが,、最後に、任意のファイルに対処できるものがリストに入ります。サブメニュー中のアプリケーション名ではなく、<span class="menu">指定アプリケーションで開く… (Open with...)</span> をクリックする場合、代わりにパネルが開きます。</p>
+<li><p><span class="menu">指定アプリケーションで開く… (Open with...)</span> - このサブメニューは、このファイルタイプを扱えるアプリケーションをすべて表示します。<br /><br /></p>
+<img src="images/tracker-images/open-with.png" alt="open-with.png" /><p>ファイルがダブルクリックされた時にファイルを開く優先アプリケーションにチェックマークがつきます。このサブメニューは最初に正確なファイルタイプ (この場合、タイプ <tt>text/plain</tt> であるテキストファイル) を扱えるアプリケーションをリストします。次に、一般にそのスーパータイプ (ここでは <tt>text/*</tt>) を扱えるすべてのアプリケーションが、最後に、任意のファイルを処理できるものがリストに入ります。サブメニュー中のアプリケーション名ではなく、<span class="menu">指定アプリケーションで開く… (Open with...)</span> をクリックすると、代わりにパネルが開きます。</p>
 <br /><br />
 <img src="images/tracker-images/open-with-preferred.png" alt="open-with-preferred" />
-<p>ここで、再びサブメニューにプログラムのリストを見つけるでしょう。1　つを選択して、<span class="button">関連づけて開く (Open and make preferred)</span> ボタンをクリックすると、そのファイルタイプ (ここでは <tt>text/plain</tt>) を持つすべてのファイルに対する優先アプリケーションを変更できます。</p></li>
+<p>ここで、再びサブメニューにプログラムのリストを見つけるでしょう。1 つのファイルを選択して、<span class="button">関連づけて開く (Open and make preferred)</span> ボタンをクリックすると、そのファイルタイプ (ここでは <tt>text/plain</tt>) を持つすべてのファイルに対する優先アプリケーションを変更できます。</p></li>
 <li><span class="menu">詳細情報… (Get info)</span>
 <br /><br />
 <img src="images/tracker-images/get-info.png" alt="get-info" />
-<p>パネルは、選択されたファイルの情報の表示、およびデフォルトアプリケーションの設定が行えます。また、パネルの一部を拡げると、ファイルのパーミッションおよび所有者を設定できます。パスをクリックすると、Tracker ウィンドウ中にファイルを開きます。</p></li>
-<li><p><span class="menu">名前の変更 (Edit name)</span>, <span class="menu">複製 (Duplicate)</span>、および <span class="menu">ごみ箱に捨てる (Move to Trash)</span> - ファイル名の編集、ファイルの複製、または選択したファイルをごみ箱へ移動できます。</p></li>
-<li><p><span class="menu">指定先に移動 (Move to)</span>、<span class="menu">指定先にコピー (Copy to)</span>、および <span class="menu">指定先にリンクを作成 (Create link)</span> - サブメニューナビゲーション方法を使用して、選択したファイルの移動、コピー、またはリンクができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けると、相対リンクを作成するオプションを提供します。</p></li>
-<li><p><span class="menu">切り取り (Cut)</span>、<span class="menu">コピー (Copy)</span>、および <span class="menu">貼り付け (Paste)</span> - クリップボードを使ってファイルのカット、コピー、そしてペーストができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けることによって、おそらく別のフォルダーからファイルを <span class="menu">さらにコピー / 切り取り (Copy/Cut more)</span> でき、後でほかのどこかにペーストできます。さらに、<span class="key">SHIFT</span> を押し続ける間、クリップボードにコピーされたファイルをリンクとしてペーストできます。</p></li>
-<li><p><span class="menu">ファイル形式を判別 (Identify)</span> - ファイルタイプを見つけ出して、たとえば、<span class="cli">wget</span> でファイルを転送した場合のように、ファイルがファイルタイプを持っていなければ、セットするでしょう。メニューを起動する間に <span class="key">SHIFT</span> を押していると、メニューは <span class="menu">ファイル形式を判別 (Force identify)</span> に変わります。これは、ファイルタイプを識別し、誤りだった場合は修正します。</p></li>
+<p>このパネルでは、選択されたファイルの情報の表示およびデフォルトアプリケーションの設定が行えます。また、パネルの一部を拡げると、ファイルのパーミッションおよび所有者を設定できます。パスをクリックすると、Tracker ウィンドウ中にファイルを選択します。</p></li>
+<li><p><span class="menu">名前の変更 (Edit name)</span>, <span class="menu">複製 (Duplicate)</span>、<span class="menu">ごみ箱に移動 (Move to Trash)</span> - ファイル名の編集、ファイルの複製、または選択したファイルをごみ箱へ移動できます。</p></li>
+<li><p><span class="menu">指定先に移動 (Move to)</span>、<span class="menu">指定先にコピー (Copy to)</span>、<span class="menu">指定先にリンクを作成 (Create link)</span> - サブメニューナビゲーション方法を使用して、選択したファイルの移動、コピー、またはリンクができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けると、相対リンクを作成するオプションを提供します。</p></li>
+<li><p><span class="menu">切り取り (Cut)</span>、<span class="menu">コピー (Copy)</span>、<span class="menu">貼り付け (Paste)</span> - クリップボードを使ってファイルのカット、コピー、そしてペーストができます。メニューを起動する間に <span class="key">SHIFT</span> を押し続けることによって、おそらく別のフォルダーからファイルを<span class="menu">さらにコピー / 切り取り (Copy/Cut more)</span> でき、後でほかのどこかにペーストできます。さらに、<span class="key">SHIFT</span> を押し続ける間、クリップボードにコピーされたファイルをリンクとしてペーストできます。</p></li>
+<li><p><span class="menu">ファイル形式を判別 (Identify)</span> - ファイルタイプを見つけ出して、たとえば、<span class="cli">wget</span> でファイルを転送した場合のように、ファイルがファイルタイプを持っていなければ、セットするでしょう。メニューを起動する間に <span class="key">SHIFT</span> を押していると、メニューは<span class="menu">ファイル形式を判別 (Force identify)</span> に変わります。これは、ファイルタイプを識別し、誤りだった場合は修正します。</p></li>
 <li><p><span class="menu">アドオン (Add-ons)</span> - すべての一般的な Tracker アドオンと、選択されたファイルを扱えるアドオンを表示します。詳しくは、<a href="tracker-add-ons.html">Tracker アドオン</a>のトピックを見てください。</p></li>
 </ul>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="transaction-status" name="transaction-status">処理状況</a></h2>
-<p>ファイルをコピー、移動、または削除する場合、Tracker は進行状況をステータスウィンドウで表示します。1 つ以上の処理を始めた場合、ジョブ毎に状態が表示されます。</p>
+<p>ファイルをコピー、移動、または削除する場合、Tracker は進行状況をステータスウィンドウで表示します。複数の処理を始めた場合、ジョブごとに状態が表示されます。</p>
 <img src="images/tracker-images/transaction-status.png" alt="transaction-status.png" />
-<p>右側に、処理を休止あるいは完全に止めるための 2 個のボタンがあります。時々、大きな処理を一時的に休止することは有用かもしれません。たとえば、大きなアプリケーションを速く起動する必要があるかもしれません。大量のデータのコピーはあなたのハードディスクの I/O 帯域幅を詰まらせ、したがってワークフローを遅らせます。</p>
+<p>右側に、処理を休止あるいは完全に止めるための 2 個のボタンがあります。大きな処理を一時的に休止することはたまには有用かもしれません。たとえば、大きなアプリケーションを速く起動する必要があるかもしれません。大量のデータコピーはユーザーのハードディスクの I/O 帯域幅を詰まらせるので、ワークフローを遅らせます。</p>
 
 </div>
 </div>

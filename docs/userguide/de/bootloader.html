@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,10 +48,10 @@
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Inhalt</a> 
-::  <a href="filesystem-layout.html">Dateisystem Layout</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Inhalt</a> 
+::  <a href="filesystem-layout.html">Dateisystem Layout</a>  »
 </span></div>
 </div>
 
@@ -62,58 +62,90 @@
 
 <p>Mit dem "Haiku Boot Loader" kann man zum einen unterschiedliche Haiku-Installationen starten, zum anderen hardware-spezifische Probleme umgehen. <br />Ebenso ist es damit möglich, während einer Software-Installation hinzugefügte Systemerweiterungen vorübergehend zu deaktivieren (über den unten bezeichneten Punkt <i>Disable user add-ons</i>), um eventuell aufgetretene Fehler zu beheben.</p>
 <p>Um zum Bildschirm der Boot Loader Optionen zu gelangen, muss man noch vor Beginn des Boot-Prozesses <span class="key">SHIFT</span> gedrückt halten. Ist ein Bootmanager installiert, kann man das bereits tun, bevor man dort den Haiku-Eintrag auswählt. Ist Haiku das einzige Betriebssystem auf dem Rechner, kann die Taste schon gehalten werden, während noch die BIOS Meldungen zu sehen sind.</p>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="options" name="options">Boot Loader Optionen</a></h2>
 <p>Im Boot Loader hat man vier Auswahlmöglichkeiten:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b></td><td> </td><td>Hier wird eine Auswahl an bootfähigen Haiku-Installationen angezeigt.</td></tr>
 <tr><td><b>Select safe mode options</b><br />
 </td><td> </td><td>Es gibt mehrere Möglichkeiten Haiku bei hardware-bezogenen Problemen zum Booten zu bringen, oder falls das System durch ein installiertes Add-On instabil wurde, indem man verschiedene Komponenten deaktiviert. Wird über die Pfeiltasten eine Option auswählt, wird am unteren Bildschirmrand eine kurze Erklärung angezeigt.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Safe mode</i></td><td width="15"></td><td>Abgesicherter Modus</td></tr>
-	<tr><td><i>- Disable user add-ons</i></td><td></td><td>Benutzer Add-Ons deaktivieren</td></tr>
-	<tr><td><i>- Disable IDE DMA</i></td><td></td><td>IDE DMA deaktivieren</td></tr>
-	<tr><td><i>- Use fail-safe video mode</i></td><td></td><td>Gesicherten Videomodus benutzen</td></tr>
-	<tr><td><i>- Don't call the BIOS</i></td><td></td><td>Keine BIOS-Funktionen aufrufen</td></tr>
-	<tr><td><i>- Disable APM</i></td><td></td><td>APM deaktivieren</td></tr>
-	<tr><td><i>- Disable ACPI</i></td><td></td><td>ACPI deaktivieren</td></tr>
-	</table>
-</td></tr>
+	<p><span class="menu">Safe mode</span><br />
+		Versetzt das System in einen abgesicherten Modus. Diese Einstellung kann unabhängig von den anderen Optionen aktiviert werden.</p>
+	<p><span class="menu">Disable user add-ons</span><br />
+		Verhindert das Laden jeglicher vom Benutzer installierten Add-Ons. Siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p>
+	<p><span class="menu">Disable IDE DMA</span><br />
+		Deaktiviert IDE DMA, erhöht die IDE-Kompatibilität auf Kosten der Performance.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
+		Ignoriert den Speicher über dem 4 GiB Adresslimit, setzt die Einstellung in der 'kernel' Datei außer Kraft.</p>
+	<p><span class="menu">Use fail-safe video mode</span><br />
+		Aktiviert den VESA-Mode, es wird nicht versucht einen speziellen Grafiktreiber zu benutzen.</p>
+	<p><span class="menu">Disable IO-APIC</span><br />
+		Deaktiviert den IO APIC für das Interrupt-Routing und erzwingt stattdessen die Benutzung von "Legacy PIC".</p>
+	<p><span class="menu">Disable local APIC</span><br />
+		Deaktiviert den lokalen APIC und auch SMP (Multiprozessor).</p>
+	<p><span class="menu">Disable SMP</span><br />
+		Deaktiviert alle CPU Cores bis auf einen.</p>
+	<p><span class="menu">Don't call the BIOS</span><br />
+		Es werden keine BIOS-Funktionen aufgerufen.</p>
+	<p><span class="menu">Disable APM</span><br />
+		Deaktiviert Advanced Power Management Hardware-Unterstützung, setzt APM-Einstellungen in der 'kernel' Datei außer Kraft.</p>
+	<p><span class="menu">Disable ACPI</span><br />
+		Deaktiviert Advanced Configuration and Power Interface Hardware-Unterstützung, setzt ACPI-Einstellungen in der 'kernel' Datei außer Kraft.</p>
+	<p><span class="menu">Blacklist entries</span><br />
+		Ermöglicht die Auswahl von Systemdateien, die ignoriert werden sollen. Nützlich, um beispielsweise Treiber vorübergehend zu deaktivieren. Siehe <a href="#troubleshooting">Fehlersuche</a> weiter unten.</p></td></tr>
 <tr><td><b>Select debug options</b>
 </td><td> </td><td>Hier befinden sich einige hilfreiche Optionen zum Debuggen bzw. um Details für einen <a href="../welcome/de/bugreports.html">Bugreport</a> zu erhalten. Auch hier wird bei jeder Option unten erklärender Text eingeblendet.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td>Debug-Ausgabe über die serielle Schnittstelle aktivieren</td></tr>
-	<tr><td><i>- Enable on screen debug output</i></td><td></td><td>Debug-Ausgabe auf dem Bildschirm aktivieren</td></tr>
-	<tr><td><i>- Disable on screen paging</i></td><td></td><td>Seitenweise Ausgabe ausschalten</td></tr>
-	<tr><td><i>- Enable debug syslog</i></td><td></td><td>Debug Syslog aktivieren</td></tr>
-	<tr><td><i>- Display current boot loader log</i></td><td></td><td>Aktuelles Boot Loader Log anzeigen (<span class="key">Q</span> kehrt zurück aus dem Log)</td></tr>
-	<tr><td><i>- Add advanced debug option</i></td><td></td><td>Weitere Debug-Optionen eingeben</td></tr>
-</table>
-</td></tr>
-<tr><td></td><td></td><td>Ist "Enable debug syslog" aktiviert, werden beim folgenden Warmstart nach einem Crash noch weitere Optionen angeboten:</td></tr>
-<tr><td></td><td></td><td>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Display syslog from previous session</i></td><td></td><td>Syslog der letzten Sitzung anzeigen</td></tr>
-	<tr><td><i>- Save syslog from previous session</i></td><td></td><td>Syslog der letzten Sitzung speichern (auf FAT32 formatieren USB-Stick)</td></tr>
-</table>
-</td></tr>
+	<p><span class="menu">Enable serial debug output</span><br />
+		Aktiviert die Syslog-Ausgabe über die serielle Schnittstelle (Standard: 115200, 8N1).</p>
+	<p><span class="menu">Enable on screen debug output</span><br />
+		Zeigt statt dem üblichen Boot-Logo die Debug-Ausgaben während dem Hochfahren.</p>
+	<p><span class="menu">Disable on screen paging</span><br />
+		Schaltet die seitenweise Ausgabe aus, wenn "on screen debug" aktiviert ist.</p>
+	<p><span class="menu">Enable debug syslog</span><br />
+		Aktiviert für diese Sitzung einen besonderen Syslog-Buffer im Speicher, auf den der Boot-Loader nach einem Neustart zugreifen kann.</p>
+	<p><span class="menu">Display current boot loader log</span><br />
+		Zeigt die vom Boot-Loader gesammelten Debug-Informationen (<span class="key">Q</span> verlässt das Log)</p>
+	<p><span class="menu">Add advanced debug option</span><br />
+		Erlaubt das direkte Eingeben erweiterter Debug-Optionen.</p></td></tr>
+<tr><td></td><td></td><td>Ist "<i>Enable debug syslog</i>" aktiviert, werden beim folgenden Warmstart nach einem Crash noch weitere Optionen angeboten:</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
+		Speichert beim Hochfahren das Syslog der letzten Haiku Sitzung als /var/log/previous_syslog.</p>
+	<p><span class="menu">Display syslog from previous session</span><br />
+		Zeigt das Syslog der letzten Haiku Sitzung an.</p>
+	<p><span class="menu">Save syslog from previous session</span><br />
+		Speichert das Syslog der letzten Haiku Sitzung auf FAT32 formatiertes Laufwerk, z. B. USB-Stick.</p></td></tr>
 <tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Falls die Option <i>Use fail-safe video mode</i> gewählt werden muss, um Haiku zu starten, kann man hier die Bildschirmauflösung und Farbtiefe auswählen.</td></tr>
 </table>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="troubleshooting" name="troubleshooting">Fehlersuche</a></h2>
+<p>Falls sich Haiku weigert auf einem Rechner überhaupt nur hochzufahren, sollte man mal diverse Optionen unter <span class="menu">Select safe mode options</span> ausprobieren. Auf alle Fälle ist ein <a href="../welcome/de/bugreports.html">Bug Report</a> angeraten.</p>
+<p>Falls Haiku hingegen Ärger macht nachdem bestimmte Software, insbesondere Treiber, installiert wurde, gibt es mehrere Möglichkeiten Haiku wieder bootbar zu machen, um das verantworliche Paket wieder de-installieren zu können:</p>
+<ul>
+<li><p>Aktiviert man <span class="menu">Safe mode</span>, verhindert das den Start der meisten Server, Daemons und dem UserBootScript.</p></li>
+<li><p>Aktiviert man <span class="menu">Disable user add-ons</span>, verhindert das die Nutzung jeglicher Add-Ons (Treiber, Translatoren etc.), die in der Benutzer-Hierarchie unter Home installiert wurden.</p></li>
+<li><p>Befindet sich der problematische Treiber oder Add-On etc. allerdings in der System Hierarchie, wird die Sache etwas komplizierter, da dieser Teil des Dateisystems nicht beschreibbar ist. Hier kommt die Option <span class="menu">Blacklist entries</span> zum Einsatz. Mit ihr lässt sich durch die System-Verzeichnisse navigieren, um die entsprechende Komponente mittels <span class="key">LEERTASTE</span> oder <span class="key">RETURN</span> zu deaktivieren. <span class="key">ESC</span> führt wieder eine Verzeichnisebene zurück nach oben.</p>
+<p>Online zeigt der Artikel "<a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a>" wie man diese Einstellung festlegt, damit sie bei jedem Hochfahren erhalten bleibt.</p></li>
+</ul>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="booting" name="booting">Haiku starten</a></h2>
 <p>Nach der Auswahl einer oder mehrerer Optionen kann man über das Hauptmenü den eigentlichen Boot-Vorgang starten. Es erscheint daraufhin folgender Bildschirm:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
 <p>Wenn Haiku ordnungsgemäß bootet, leuchten nacheinander alle Icons auf, und das System wechselt zum Desktop.<br />
 Die unterschiedlichen Symbole repräsentieren die verschiedenen Phasen des Boot-Vorganges:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Die einzelnen Kernel-Module werden geladen.</td></tr>
-	<tr><td><b>Laufwerk/Lupe</b></td><td> </td><td>Die Boot-Partition wird gesucht und spezielle Dateisysteme angelegt (rootfs: <span class="path">/</span> und <span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Steckkarte</b></td><td> </td><td>Der Geräte-Manager, der sich um die Zuteilung von Systemressourcen an die einzelnen Hardware-Komponenten kümmert, wird geladen.</td></tr>
-	<tr><td><b>Boot-Laufwerk</b></td><td> </td><td>Die vorher gefundene Boot-Partition wird in das Dateisystem eingebunden.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Spezielle Hauptprozessor-Module werden geladen.</td></tr>
-	<tr><td><b>Ordner</b></td><td> </td><td>Alle Subsysteme werden aktiviert.</td></tr>
-	<tr><td><b>Rakete</b></td><td> </td><td>Die Boot-Skripte werden abgearbeitet, anschließend wird der Desktop gestartet.</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Die einzelnen Kernel-Module werden geladen.</td></tr>
+	<tr><td><b>Laufwerk/Lupe</b></td><td> </td><td>Die Boot-Partition wird gesucht und spezielle Dateisysteme angelegt (rootfs: <span class="path">/</span> und <span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Steckkarte</b></td><td> </td><td>Der Geräte-Manager, der sich um die Zuteilung von Systemressourcen an die einzelnen Hardware-Komponenten kümmert, wird geladen.</td></tr>
+	<tr><td><b>Boot-Laufwerk</b></td><td> </td><td>Die vorher gefundene Boot-Partition wird in das Dateisystem eingebunden.</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>Spezielle Hauptprozessor-Module werden geladen.</td></tr>
+	<tr><td><b>Ordner</b></td><td> </td><td>Alle Subsysteme werden aktiviert.</td></tr>
+	<tr><td><b>Rakete</b></td><td> </td><td>Die Boot-Skripte werden abgearbeitet, anschließend wird der Desktop gestartet.</td></tr>
 </table>
 
 </div>
@@ -121,10 +153,10 @@ Die unterschiedlichen Symbole repräsentieren die verschiedenen Phasen des Boot-
 
 <div class="nav">
 <div class="inner"><span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Inhalt</a> 
-::  <a href="filesystem-layout.html">Dateisystem Layout</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Inhalt</a> 
+::  <a href="filesystem-layout.html">Dateisystem Layout</a>  »
 </span></div>
 </div>
 

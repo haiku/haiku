@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-20014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,6 +54,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />键盘映射</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -74,9 +75,12 @@
 <tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>用于设置上述的蓝色按键。</td></tr>
 <tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td> </td><td>用于使用 Windows/Linux 模式的快捷键，例如 <span class="key">CONTROL</span>（通常为 <span class="key">CTRL</span>）或者 Haiku 模式，例如 <span class="key">COMMAND</span>（通常为 <span class="key">ALT</span>）。</td></tr>
 </table>
-<p>左边的列表提供了可用的系统预设值键盘映射，在它的下面还提供了可用的用户定义键盘映射。您可以通过拖拽来改变键盘映射：左键点击拖拽复制一个按键，而右键点击拖拽调换两个按键。
-<br />
-修改完成之后，您可以使用菜单 <span class="menu">File | Save...</span> 来保存结果。如果结果保存在 <span class="path">~/config/settings/Keymap/</span>，那么您修改后的映射将会只出现在用户定义的列表，否则，您需要通过 <span class="menu">File | Open...</span> 对其进行手动的加载。</p>
+<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.</p>
+<p>Alternatively to this drag&amp;dropping of keys, there's the menu <span class="menu">File | Set modifier keys...</span> that opens this window:</p>
+<img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
+<p>Here, you can assign keys to their respective roles or even completely disable the role of a key. You can even assign the same key to different roles, though that's not a good idea most of the time and you'll be warned by a small exclamation mark beside the pop-up menus if you do that.<br />
+Pressing <span class="button">Set modifier keys</span> applies your changes and closes the window.</p>
+<p>When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
 <p>为了使键盘映射面板更好的对应于您实际的键盘，在 <span class="menu">Layout</span> 菜单中有几个不同的设置可供选择。</p>
 <p>在键盘显示面板中的字体可以通过 <span class="menu">Font</span> 菜单进行设置。需要注意的是，它可能不包含某种特别映射的所有符号。</p>
 <p>最后，有一个 <span class="button">Revert</span> 按钮，它用于恢复设置到键盘映射首选项启动之前的状态。</p>
@@ -87,9 +91,8 @@
 <p>除了使用键盘映射首选项面板之外，还有一种方法可以用于定制键盘映射。它涉及到编辑包含十六进制值的文本文件，看起来难度很大，但是它并非无法掌握。</p>
 <p>您可以在终端中使用下述命令卸载当前的键盘映射：</p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
-<p>生成的文本文件可以在文本编辑器中打开。一定要确保使用等宽字体，否则您将无法充分理解该文件...
-<br />
-在文件起始，您会找到格式化键盘的说明，每个按键对应一个十六进制值。在其下，是每个值的实际分配。您可以在键盘映射首选项面板中进行所有的定制或者其他的操作。如果碰巧您的键盘具有几个特殊的按键，您可以将它们激活。其实是，将它们用作普通按键，或者换挡键和控制键。您将无法将其用于其他用途，例如使您的多媒体键用于增/减音量，或者启动某些程序。但是对此，您可以使用 <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>。</p>
+<p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
+At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use the <a href="shortcuts.html">Shortcuts</a> preferences.</p>
 <p>在完成修改之后，为了保存文件，并且使系统启用修改后的键盘映射，您可以使用下述命令：</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
 <p>如果您希望将该键盘映射引入映射面板，您必须首先将它编译为二进制格式：</p>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,6 +54,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />Tietomuuntimet</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -67,20 +68,26 @@ Jokainen muunnin luo omat asetustiedostonsa tänne sen jälkeen kun olet muuttan
 <img src="../images/prefs-images/datatranslations.png" alt="datatranslations.png" />
 <p>Muuntimen kyvyistä riippuen jokainen muunnin tarjoaa eri asetuksia. Saat vähintään <span class="button">Tiedot...</span>-painikkeen, joka avaa ikkunan, jossa ilmoitetaan kehittäjätiedot ja asennuspolku.<br />Seuraava taulukko esittää yhteenvedon oletusmuuntimista ja niiden hyödyllisimmistä valitsimista.</p>
 <table summary="translators" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Apple icons</span></td><td>Valid image sizes are 16, 32, 48, 128, 256, 512, 1024 (RGB32 and RGBA32)</td></tr>
 <tr><td><span class="menu">BMP-kuvat</span></td><td>24-bittinen, tiivistämätön, ei läpinäkyvyytt'ä </td></tr>
 <tr><td><span class="menu">EXR-kuvat</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym>:n jyrrkästi dynaaiisen alueen (HDR) -muoto</td></tr>
 <tr><td><span class="menu">GIF-kuvat</span></td><td>8-bittinen, häviötön tiivistys, läpinäkyvyys<nr></nr>Voit pienentää tiedostokokoa rajoittamalla käytettyjen värien määrää ja palettia.<br />Voit tallentaa kuvat läpinäkyvyydellä joko automaattisesti käyttämällä alfa-kanavaa tai asettamalla manuaalisesti läpinäkyvän RGB-arvon.</td></tr>
+<tr><td><span class="menu">HVIF icons</span></td><td>Translator for Haiku's vector icon format</td></tr>
 <tr><td><span class="menu">JPEG2000-kuvat</span></td><td>24-bittinen, tiivistetty, ei läpinäkyvyyttä<br />Tässä välität normaalisti vain tulostuslaadusta.</td></tr>
 <tr><td><span class="menu">JPEG-kuvat</span></td><td>24-bittinen, tiivistetty, ei läpinäkyvyyttä<br />Tulostuslaadun lisäksi voit asettaa myös pehmennyksen, joka vähentää tiivistysartefakteja, mutta voi sumentaa kuvaa hiukan.</td></tr>
 <tr><td><span class="menu">PCX-kuvat</span></td><td>24-bittinen, tiivistämätön, ei läpinäkyvyyttä, PC Paintbrush -vaihtomuoto</td></tr>
+<tr><td><span class="menu">Photoshop images</span></td><td>32bit, lossless compression, transparency<br />
+The translator reduces all layers to one bitmap layer.</td></tr>
 <tr><td><span class="menu">PNG-kuvat</span></td><td>32-bittinen, häviötön tiivistys, läpinäkyvyys</td></tr>
 <tr><td><span class="menu">PPM-kuvat</span></td><td>24-bittinen, tiivistämätön, ei läpinäkyvyyttä, siirrettävä PixMap -muoto</td></tr>
 <tr><td><span class="menu">RAW-kuvat</span></td><td>aina 48-bittiseen, tiivistämätön, ei läpinäkyvyyttä</td></tr>
 <tr><td><span class="menu">RTF-tekstitiedostot</span></td><td>Muotoiltu teksti</td></tr>
 <tr><td><span class="menu">SGI-kuvat</span></td><td>24-bittinen, valinnainen häviötön tiivistys, läpinäkyvyys</td></tr>
-<tr><td><span class="menu">Tyylitetty editori-tiedostot</span></td><td>Muotoiltu teksti</td></tr>
+<tr><td><span class="menu">Tyylitetty editori-tiedostot</span></td><td>Plain text with formatting stored in attibutes</td></tr>
 <tr><td><span class="menu">TGA-kuvat</span></td><td>32-bittinen, valinnainen häviötön tiivistys, läpinäkyvyys</td></tr>
 <tr><td><span class="menu">TIFF-kuvat</span></td><td>24-bittinen, valinnainen häviötön tiivistys, kerrokset, läpinäkyvyys</td></tr>
+<tr><td><span class="menu">WebP images</span></td><td>8-bit YUV 4:2:0 image format, compressed, no transparency</td></tr>
+<tr><td><span class="menu">Windows icons</span></td><td>Valid image sizes are 16, 32, 48</td></tr>
 <tr><td class="onelinetop"><span class="menu">WonderBrush-kuvat</span></td><td>32-bittinen, kerrokset, läpinäkyvyys, vektori/pikselitiedot</td></tr>
 </table>
 <p><br /></p>

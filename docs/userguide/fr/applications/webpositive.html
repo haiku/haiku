@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2011, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -83,7 +83,7 @@ les polices à utiliser en standard, avec empattements, sans empattements ou à 
 <ul>
 <li><img src="../images/apps-images/webpositive-tabbar.png" alt="webpositive-tabbar.png" />
 <p>Vous pouvez créer de nouvelles pages avec le bouton <span class="key">+</span> à droite des onglets ou, s'il y a encore assez d'espace, en double-cliquant sur la zone vide à coté. S'il y a plus d'onglets ouverts que la zone ne peut en contenir, les boutons <span class="key">&lt;</span> et <span class="key">&gt;</span> deviennent actifs, et vous permettent de faire défiler les onglets vers la gauche ou la droite. Le bouton <span class="key">∨</span> à l'extrême droite héberge un menu déroulant listant tous les onglets ouverts pour une navigation encore plus rapide.</p></li>
-<li><p>Vous pouvez ouvrir un lien dans un nouvel onglet en arrière-plan en cliquant dessus avec le bouton central de la souris.</p></li>
+<li><p>Vous pouvez ouvrir un lien dans un nouvel onglet en arrière-plan en cliquant dessus avec le bouton central de la souris. En maintenant en plus la touche <span class="key">Maj</span> enfoncée, il s'ouvrira au premier plan.</p></li>
 <li><p>Dans le menu <span class="menu">View</span> (Affichage), vous pouvez agrandir (<span class="menu">Zoom in</span>) ou réduire (<span class="menu">Zoom out</span>) une page. Il existe aussi une option pour grossir uniquement le texte <span class="menu">Zoom text only</span>, conservant ainsi la taille d'origine de toutes les images.</p></li>
 <li><p>Si vous passez en mode plein écran et que vous avez réglé l'interface pour qu'elle se masque automatiquement, elle disparaîtra après une seconde. Pour la faire réapparaitre temporairement, déplacez simplement le pointeur de la souris vers le haut de l'écran.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
@@ -92,7 +92,6 @@ Les chaînes non reconnues comme URL seront exploitées à l'aide du moteur de r
 <li><p>Un clic droit ouvre un menu contextuel qui vous propose, selon l'objet sur lequel vous avez cliqué, de télécharger l'objet, ou d'ouvrir le lien dans une nouvelle fenêtre ou un nouvel onglet.</p></li>
 <li><p><span class="menu">Edit | Find</span> (Éditer | Rechercher) affiche une barre de recherche en bas de la fenêtre pour examiner le contenu de la page. Les correspondances trouvées dans la page apparaitront en surbrillance.</p></li>
 </ul>
-<div class="box-info">Après quelques temps, le chargement des pages web peut se révéler être de plus en plus lent. Ce n'est pas vraiment un bug dans le vrai sens du terme, mais plutôt une conséquence d'une gestion inefficace des cookies. Quoi qu'il en soit, vous devrez intervenir manuellement jusqu'à ce que ce problème soit fixé : Jetez un oeil à <span class="path">~/config/settings/WebPositive/Cookies.curl</span>. Ce fichier stocke les cookies des pages Web et grossi lentement au fur et à mesure que vous surfez sur le web. Quand il atteint une taille de quelques dizaine de kilo-octets, il commence à ralentir la navigation. Il suffit de supprimer ce fichier pour retrouver les performance initiales.</div>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Signets</h2>
 <p>Les signets sont gérés sous la forme de fichiers et de dossiers dans <tt>~/config/settings/WebPositive/Bookmarks/</tt>. L'ajout d'un signet créera un nouveau fichier à cet endroit. Vous pouvez ouvrir rapidement le dossier avec <span class="menu">Manage Bookmarks…</span> (Gérer les signets).</p>
 <img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
@@ -121,7 +120,7 @@ En règle générale, WebPositive est très tolérant quand il s'agit de gérer 
 <tr><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>Ouvre la page d'accueil.</td></tr>
 <tr><td><span class="key">Alt</span> <span class="key">D</span></td><td> </td><td>Affiche ou masque la fenêtre des téléchargements.</td></tr>
 <tr><td><span class="key">Alt</span> <span class="key">F</span></td><td> </td><td>Affiche la barre de recherche pour examiner le contenu de la page (Utilisez <span class="key">ESC</span> pour la masquer).</td></tr>
-<tr><td><span class="key">Alt</span> <span class="key">B</span></td><td> </td><td>Place un signet sur cette page.</td></tr>
+<tr><td><span class="key">Alt</span> <span class="key">B</span></td><td> </td><td>Place un signet sur la page.</td></tr>
 <tr><td><span class="key">Alt</span> <span class="key">M</span></td><td> </td><td>Gérer les signets via l'ouverture du dossier des signets.</td></tr>
 <tr><td><span class="key">Alt</span> <span class="key">←</span></td><td> </td><td>Page précédente dans l'historique.</td></tr>
 <tr><td><span class="key">Alt</span> <span class="key">→</span></td><td> </td><td>Page suivante dans l'historique.</td></tr>

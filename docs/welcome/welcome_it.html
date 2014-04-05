@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  *		Stephan Aßmus <superstippi@gmx.de> 
  * Translators:
  *		MichaelPeppers
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -96,18 +97,16 @@
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="indice" /></a>
 <a id="software" name="software">Installare altre applicazioni</a></h2>
-<p>Grazie alla compatibilità, sia a livello di binari, sia a livello di codice, molte applicazioni per BeOS funzionano in Haiku (potresti aver bisogno di installare il pacchetto opzionale "beoscompatibility" per alcuni programmi, vedi sotto). Dopo aver scaricato un pacchetto, basta estrarlo (un doppio click su di esso fa aprire l'<span class="app">Expander</span>) in <span class="path">/boot/apps/</span> e far partire l'applicazione da lì.</p>
+<p>Most of the available software can be downloaded and installed with the application HaikuDepot that comes with Haiku.<br />
+Because of our binary and source compatibility, most BeOS applications run on Haiku. Many of those have been re-packaged for Haiku or still run unmodified. You'll find more information on installing new programs in the user guide's chapter on <a href="../userguide/it/applications.html">Applications</a>.</p>
 
-<p>I siti più utili per cercare applicazioni per Haiku sono:</p>
+<p>Besides using HaikuDepot, popular software repositories are:</p>
 <ul>
 	<li><a href="http://www.haikuware.com" class="printurl">Haikuware</a></li>
 	<li><a href="http://www.bebits.com" class="printurl">BeBits</a></li>
-	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - si occupa delle patch per le applicazioni non-native</li>
-	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> - ospita progetti di applicazioni open source native per BeOS e Haiku</li>
+	<li><a href="http://haikuports.org" class="printurl">HaikuPorts</a> - maintains patches for ported software</li>
+	<li><a href="https://github.com/HaikuArchives" class="printurl">HaikuArchives</a> - hosts native BeOS and Haiku open source software projects in a github</li>
 </ul>
-
-<p>Ci sono anche i cosiddetti Pacchetti Opzionali, che sono usati dal build system di Haiku. Non è nostra intenzione far estrarre e installare questi pacchetti manualmente all'utente finale, perciò, è stato incluso uno script, <tt>installoptionalpackage</tt>. Lo script è pensato per coprire questo gap mentre si sta lavorando su come gestire i pacchetti in Haiku. Questo script ti permetterà di installare la maggior parte dei Pacchetti Opzionali disponibili.<br />
-Dovrai far partire il comando nel terminale; <tt>installoptionalpackage -h</tt> spiega il suo utilizzo.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="indice" /></a>

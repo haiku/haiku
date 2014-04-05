@@ -14,6 +14,7 @@
  * Translators:
  *		Loïc
  *		Vincent Duvert
+ *		roptat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -54,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
@@ -120,7 +122,7 @@ La seconde ligne dit « <i>Welcome to Kernel Debugging Land…</i> ». Celle a
 </ul>
 <p>Notez que si seul le dernier point semble indiquer une relation avec le matériel, tous les autres symptômes pourraient aussi être causés par un bogue dans un pilote.
 Si vous soupçonnez un matériel ou son pilote d'être responsable du problème, vérifiez si la suppression ou la désactivation du matériel ou du pilote change quelque chose.
-Par exemple, si vous soupçonnez le Wifi, votre BIOS a peut-être une option pour le désactiver. Sinon, vous pouvez supprimer le pilote Wifi installé dans Haiku (dans <span class="path">/boot/system/add-ons/kernel/drivers/bin</span>).</p>
+Par exemple, si vous soupçonnez le Wifi, votre BIOS a peut-être une option pour le désactiver. Sinon, vous pouvez supprimer le pilote Wifi installé dans Haiku (voir <a href="../../../userguide/en/bootloader.html">Chargeur de démarrage</a>).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Le mode débogage noyau - KDL</a></h3>
@@ -141,9 +143,10 @@ ne posent pas de problème, les claviers USB connecté à un controleur UHCI ne 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">Le journal système</a></h3>
 <p><b>C'est la méthode privilégiée pour obtenir des informations d'un système qui ne démarre pas.</b><br />Le journal système ( « syslog » en abgégé) contient des informations précieuses sur ce qui s'est passé dans votre système, y compris les productions des sessions KDL. L'attacher au ticket « kernel » dans l'outil de suivi de bogues (Trac) est généralement une bonne pratique.
-Le journal est consigné dans le fichier <span class="path">/boot/common/var/log/syslog</span>.Puisque l'écriture d'un fichier requiert un système qui fonctionne, les écritures les plus récente faites dans le journal ne peuvent pas être présentes quand un problème se produit dans le noyau (en particulier lors d'un redémarrage spontané ou d'une sessions KDL non recouvrable).</p>
-<p>L'option <span class="menu">Enable debug syslog</span> dans le menu <span class="menu">Debug menu</span> du chargeur de démarrage rend le journal légèrement persistant en mémoire. Cette option est activée par défaut. « légèrement persistant » signifie qu'il résistera à une réinitialisation et qu'il sera encore accessible quand vous entrerez dans le menu du chargeur de démarrage juste après. Noter qu'amorcer un système d'exploitation (Haiku sans aucun doute, et probablement les autres) détruit cette information. Alors vous devez rentrer dans le menu du chargeur de démarrage en maintenant la touche <span class="key">MAJ</span> enfoncée pendant le redémarrage.<br />
-Dans le menu du chargeur de démarrage <span class="menu">Debug menu</span>, vous devriez maintenant trouver les entrés <span class="menu">Display syslog from previous session</span> et <span class="menu">Save syslog from previous session</span>. La première, affiche le journal de la session précédente à écran. La dernière vous permet de l'enregistrer dans un fichier sur disque. Notez que pour le moment seuls les volumes FAT32 sont pris en charge pour l'enregistrement du fichier. Si vous souhaitez utiliser une clé USB, mais que vous l'avez branchée trop tard de sorte qu'elle n'a pas été prise en compte, vous pouvez réinitialiser la machine et entrer à nouveau dans le menu du chargeur de démarrage. Mais encore une fois : Ne démarrer aucun système d'exploitation accidentellement ou les données seront perdues.</p>
+Le journal est consigné dans le fichier <span class="path">/boot/system/var/log/syslog</span>.Puisque l'écriture d'un fichier requiert un système qui fonctionne, les entrées les plus récente faites dans le journal peuvent ne pas être présentes quand un problème se produit dans le noyau (en particulier lors d'un redémarrage spontané ou d'une session KDL non recouvrable).</p>
+<p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog persistent. If the option <span class="menu">Save syslog from previous session during boot</span> is activated in the boot loader options (as it is by default), you'll find the syslog of your last session as <span class="path">/boot/system/var/log/previous_syslog</span>.<br />
+If you're not able to boot to get to the previous_syslog, you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
+In the boot loader's <span class="menu">Debug menu</span> you should find the entries <span class="menu">Display syslog from previous session</span> and <span class="menu">Save syslog from previous session</span>. The former displays the syslog on screen, the latter allows you to save it as a file to disk. Note that at the moment only FAT32 volumes are supported for saving the file. If you want to use a USB stick, but have plugged it in too late so that it isn't recognized yet, you can reset the machine and re-enter the boot loader menu. Note: Don't accidentally boot any operating system or the data will be lost.</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="onscreen" name="onscreen">Les sorties écran du débogueur</a></h3>

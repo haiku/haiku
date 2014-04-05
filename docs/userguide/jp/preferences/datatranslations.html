@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,39 +58,45 @@
 
 <h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />DataTranslations</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/*</span> - デフォルトの設定を変更すると、トランスレーターごとに設定ファイルが置かれます。<br />
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>位置:</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
+<tr><td>設定ファイルの位置:</td><td></td><td><span class="path">~/config/settings/*</span> - デフォルトの設定を変更すると、トランスレーターごとに設定ファイルが置かれます。<br />
 <span class="path">~/config/settings/system/DataTranslations settings</span> - パネルのウィンドウ位置を保存します。</td></tr>
 </table>
-<p>すべてのアプリケーションが、トランスレーターのインストールされているファイル形式でファイルを開いたり保存したりできます。DataTranslations プレファレンスでトランスレーターを設定します。</p>
+<p>すべてのアプリケーションが、インストールされたトランスレーターのファイル形式でファイルを開いたり保存したりできます。DataTranslations プレファレンスでトランスレーターを設定します。</p>
 <p><br /></p>
 <img src="../images/prefs-images/datatranslations.png" alt="datatranslations.png" />
 <p>トランスレーターの設定項目は機能に応じそれぞれ異なっていますが、情報 (Info) ボタンを押すとクレジットとインストール先のパスが表示されます。<br />
 次の表はデフォルトのトランスレーターと、特に便利なそれらのオプションの一覧です。</p>
 <table summary="translators" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">BMP Images</span></td><td>24 ビット、非圧縮、非透過</td></tr>
-<tr><td><span class="menu">EXR Images</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym> ハイダイナミックレンジ (HDR) 形式</td></tr>
-<tr><td><span class="menu">GIF Images</span></td><td>8 ビット、ロスレス圧縮、透過<br />
+<tr><td><span class="menu">アップルアイコン</span></td><td>有効なイメージサイズは、16、32、48、128、256、512、1024 (RGB32 および RGBA32) です。</td></tr>
+<tr><td><span class="menu">BMP 画像</span></td><td>24 ビット、非圧縮、非透過</td></tr>
+<tr><td><span class="menu">EXR 画像</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym> ハイダイナミックレンジ (HDR) 形式</td></tr>
+<tr><td><span class="menu">GIF 画像</span></td><td>8 ビット、ロスレス圧縮、透過<br />
 使用する色とパレットを制限することでファイルサイズを小さくできます。<br />
 画像を透過させて書き出すには、アルファチャネルを使い自動的に行うか、手動で RGB 値を設定します。</td></tr>
-<tr><td><span class="menu">JPEG2000 Images</span></td><td>24 ビット、圧縮、非透過<br />
+<tr><td><span class="menu">HVIF アイコン</span></td><td>Haiku のベクターアイコンフォーマット用のトランスレーターです。</td></tr>
+<tr><td><span class="menu">JPEG2000 画像</span></td><td>24 ビット、圧縮、非透過<br />
 ここでは普通、出力品質のみが考慮されます。</td></tr>
-<tr><td><span class="menu">JPEG Images</span></td><td>24 ビット、圧縮、非透過<br />
+<tr><td><span class="menu">JPEG 画像</span></td><td>24 ビット、圧縮、非透過<br />
 画像は少し不明瞭になりますが、出力品質だけでなく、スムージングを設定して圧縮による劣化を抑えることもできます。</td></tr>
-<tr><td><span class="menu">PCX Images</span></td><td>24 ビット、非圧縮、非透過、PC Paintbrush 互換形式</td></tr>
-<tr><td><span class="menu">PNG Images</span></td><td>32 ビット、ロスレス圧縮、透過</td></tr>
-<tr><td><span class="menu">PPM Images</span></td><td>24 ビット、非圧縮、非透過 Portable PixMap フォーマット</td></tr>
-<tr><td><span class="menu">RAW Images</span></td><td>最大 48 ビット、非圧縮、非透過</td></tr>
-<tr><td><span class="menu">RTF Text Files</span></td><td>書式付きテキスト</td></tr>
-<tr><td><span class="menu">SGI Images</span></td><td>24 ビット、ロスレス圧縮オプション、透過</td></tr>
-<tr><td><span class="menu">StyledEdit Files</span></td><td>書式付きテキスト</td></tr>
-<tr><td><span class="menu">TGA Images</span></td><td>32 ビット、ロスレス圧縮オプション、透過</td></tr>
-<tr><td><span class="menu">TIFF Images</span></td><td>24 ビット、ロスレス圧縮オプション、レイヤー、透過</td></tr>
-<tr><td class="onelinetop"><span class="menu">WonderBrush Images</span></td><td>32 ビット、レイヤー、透過、ベクター / ピクセルデータ</td></tr>
+<tr><td><span class="menu">PCX 画像</span></td><td>24 ビット、非圧縮、非透過、PC Paintbrush 互換形式</td></tr>
+<tr><td><span class="menu">Photoshop 画像</span></td><td>32bit、ロスレス圧縮、透明度<br />
+トランスレーターはすべてのレイヤーをひとつのビットマップに減らします。</td></tr>
+<tr><td><span class="menu">PNG 画像</span></td><td>32 ビット、ロスレス圧縮、透過</td></tr>
+<tr><td><span class="menu">PPM 画像</span></td><td>24 ビット、非圧縮、非透過 Portable PixMap フォーマット</td></tr>
+<tr><td><span class="menu">RAW 画像</span></td><td>最大 48 ビット、非圧縮、非透過</td></tr>
+<tr><td><span class="menu">RTF テキストファイル</span></td><td>書式付きテキスト</td></tr>
+<tr><td><span class="menu">SGI 画像</span></td><td>24 ビット、ロスレス圧縮オプション、透過</td></tr>
+<tr><td><span class="menu">StyledEdit ファイル</span></td><td>属性中にフォーマットデータを格納したプレーンテキスト</td></tr>
+<tr><td><span class="menu">TGA 画像</span></td><td>32 ビット、ロスレス圧縮オプション、透過</td></tr>
+<tr><td><span class="menu">TIFF 画像</span></td><td>24 ビット、ロスレス圧縮オプション、レイヤー、透過</td></tr>
+<tr><td><span class="menu">WebP 画像</span></td><td>8 ビット YUV 4:2:0 イメージフォーマット、圧縮、透明度無し</td></tr>
+<tr><td><span class="menu">Windows アイコン</span></td><td>有効なイメージサイズは、16、32、48 です。</td></tr>
+<tr><td class="onelinetop"><span class="menu">WonderBrush 画像</span></td><td>32 ビット、レイヤー、透過、ベクター / ピクセルデータ</td></tr>
 </table>
 <p><br /></p>
-<div class="box-info">スクリーンショット、図表や、白黒など色数の少ない画像、また小さい画像の保存には GIF (最大 256 色) か PNG (数百万色) が最適です。たとえば JPEG では、ファイルサイズの削減が得られずに劣化だけ招くことがあります。</div>
+<div class="box-info">スクリーンショットおよび図表や、白黒など色数の少ない画像、また小さい画像の保存には GIF (最大 256 色) か PNG (数百万色) が最適です。たとえば JPEG では、ファイルサイズの削減が得られずに劣化だけ招くことがあります。</div>
 
 </div>
 </div>

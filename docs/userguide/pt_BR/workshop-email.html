@@ -55,7 +55,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -70,78 +69,78 @@
 
 <h1>Ofinica: Gerenciando o Correio Eletrônico</h1>
 
-<p>This workshop takes a look on how to manage email under Haiku. It assumes that the email services are correctly configured with the <a href="preferences/e-mail.html">E-Mail</a> preferences and you're familiar with the basic features of the <a href="applications/mail.html">Mail</a> application.</p>
+<p>Esta oficina dá uma geral de como gerenciar correo eletrônico no Haiku. Ela assume que os serviços de correio eletrônico estão corretamente configurados com as preferências de <a href="preferences/e-mail.html">Correio Eletrônico</a> que você esteja acostumado com as funcionalidades básicas do aplicativo <a href="applications/mail.html">Correio</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mailsystem" name="mailsystem">Sistema de correio do Haiku</a></h2>
-<p>If you come to Haiku from other operating systems, you're probably used to big applications like MS Outlook or Mozilla's Thunderbird. You have to configure them by entering all the info on mail server addresses etc. and they use their own contacts database. They take care of sending and fetching email and store them in some big special file.<br />
-Changing you email client can be a hassle with quite some ex/importing and converting going on. Using more than one client in parallel to check out what else is available is also not without the occasional kerfuffle.</p>
-<p>Haiku's mail system is different. It breaks down into smaller separate modules.</p>
-<p>There's the <span class="app">mail_daemon</span> that takes care of the communication with your mail servers. The <a href="preferences/e-mail.html">E-Mail</a> preferences is the one central point to configure your email accounts and how often they're checked, for example.</p>
-<p>Every message that is fetched or sent is saved as one single email file, with its header information (like sender, subject, date) and status (like New, Replied, Sent) in BFS attributes. This enables searching/filtering them with Haiku's fast queries.</p>
+<p>Se vem ao Haiku a partir de outros sistemas operacionais, provavelmente está acostumado com aplicativos grandes como MS Outlook ou Mozilla Thunderbird. Você os configura inserindo todas as informações nos endereços de servidor de correio, etc., e eles utilizam seus próprios bancos de dados de contatos. Eles cuidam de enviar e buscar mensagens e guardá-las em algum grande arquivo especial.<br />
+Alterar seu cliente de correio eletrônico pode ser uma chatice com tantos exportar/importar e converter afora. Utilizar mais de um cliente paralelamente para verificar o que está disponível não deixa de ter algum incômodo.</p>
+<p>O sistema de correio do Haiku é diferente. Ele desmembra em módulos menores separados.</p>
+<p>Existe o <span class="app">mail_daemon</span> que cuida da comunicação com seus servidores de correio. As preferências de <a href="preferences/e-mail.html">Correio Eletrônico</a> é o ponto central para configurar suas contas de correio eletrônico e quantas vezes eles são verificados, por exemplo.</p>
+<p>Toda mensagem que é recuperada ou enviada é salva como um arquivo de correio eletrônico único, com seu cabeçalho de informação (como remetente, assunto, data) e estado (como Novo, Respondido, Enviado) em atributos BFS. Isto habilita pesquisar/filtrar com as consultas rápidas do Haiku.</p>
 <img src="images/workshop-email-images/browsing.png" alt="browsing.png" /> 
-<p>With every email being in a separate file, viewing them becomes just as easy as browsing through a folder (or query result) of images with <a href="applications/showimage.html">ShowImage</a>. Leaving the Tracker window open, you'll see the moving selection of the currently viewed file while you use the previous/next button to move through them.<br />
-As they are independent files, using a viewer other than Haiku's <a href="applications/mail.html">Mail</a> causes no problems whatsoever.</p>
-<p>Similarly, creating a new message results in just another file that is handed to the mail_daemon that takes care of sending it off. Contact management is deferred to the <a href="applications/people.html">People</a> application.</p>
-<p>In a nutshell, where other mail clients do everything, from communicating with the mail servers to providing a view with all your mails and tools to search and filter them, Haiku uses a chain of smaller tools and general file management:</p>
+<p>Com cada correio eletrônico estando em um arquivo separado, vê-los torna-se tão fácil quanto navegar através de uma pasta (ou resultado de consulta) de imagens com <a href="applications/showimage.html">Mostrar Imagem</a>. Deixando a janela do Rastreador aberta, ver-se-á a seleção movimentando-se entre os arquivos ao usar o botão anterior/próximo para mover entre eles.<br />
+Como são arquivos independentes, utilizar outro visualizador que não o <a href="applications/mail.html">Correio</a> do Haiku não causa qualquer problema.</p>
+<p>Similarmente, criar uma nova mensagem resulta em apenas outro arquivo que é entregue ao mail_daemon que se encarrega de enviá-lo. O gerenciamento de contatos é cedido para o aplicativo <a href="applications/people.html">Pessoas</a>.</p>
+<p>Em poucas palavras, onde outros clientes de correio fazem tudo, da comunicação com os servidores de correio à oferta de uma visualização de todas as suas mensagens e ferramentas para pesquisá-las e filtrá-las, o Haiku utiliza uma cadeia de ferramentas menores e gerenciamento geral de arquivos:</p>
 <ul>
-<li><p>The <span class="app">mail_daemon</span> to fetch/send mail and save them as normal files.</p></li>
-<li><p>Tracker windows and queries to find and show email files.</p></li>
-<li><p>The <span class="app">Mail</span> application to view email files and create new messages relying on system-wide contact management by the <span class="app">People</span> app.</p></li>
+<li><p>O <span class="app">mail_daemon</span> busca/envia mensagens e os salva como arquivos normais.</p></li>
+<li><p>Janelas do Rastreador e consultas para encontrar e exibir arquivos de correio eletrônico.</p></li>
+<li><p>O aplicativo <span class="app">Correio</span> para visualizar arquivos de correio eletrônico e criar novas mensagens deixando o gerenciamento de contatos no sistema inteiro para o aplicativo <span class="app">Pessoas</span>.</p></li>
 </ul>
-<p>Especially using Tracker and queries to manage emails is a powerful idea. The experience you gain can be transferred to any other problem that is dealing with files. Be it images, music, video, contacts or any other documents, using Tracker is at the core of all file managing.<br />
-Also, improvements in any of these system areas benefit not just emailing, but all applications that make use of them.</p>
+<p>Especialmente usar o Rastreador e consultas para gerenciar mensagens é uma ideia poderosa. A experiência que você ganha pode ser transferida para qualquer outro problema, como lidar com filmes. Sejam imagens, música, vídeo, contatos ou quaisquer outros documentos, utilizar o Rastreador  está no centro de toda a gestão de arquivos.<br />
+Também, melhoramentos em quaisquer dessas áreas do sistema beneficiam não apenas o correio eletrônico, mas todos os aplicativos que fazem uso delas.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="status" name="status">Utilizando estados personalizados</a></h2>
-<p>When you browse through your newly arrived email, you may want to come back to some of them later to think about it in more depth. While you could use Mail's menu <span class="menu">Close and | Leave as New</span> to keep them in your "<i>New messages</i>" query, things tend to pile up that way...</p>
-<p>One solution is of course to just start a reply and save it as draft. But if you don't expect to write a reply and just want to re-read the mail later, that isn't ideal.</p>
+<p>Quando navega através de suas mensagens recém-chegadas, pode-se querer voltar para algumas delas mais tarde para pensar sobre o assunto mais profundamente. Enquanto poderia utilizar o menu do Correio <span class="menu">Fechar e | Deixar como Não Lida</span> para mantê-las na sua consulta "<i>Novas mensagens</i>", as coisas tendem a se acumular desse jeito...</p>
+<p>Uma solução é naturalmente apenas iniciar uma resposta e salvá-la como rascunho. Mas se não pretende escrever uma resposta e apenas quer reler a mensagem mais tarde, isto não é o ideal.</p>
 <img src="images/workshop-email-images/status.png" alt="status.png" /> 
-<p>Better use <span class="menu">Close and | Set to...</span> to create a new status and use that to categorize your mail. For example, you could call the status "<i>Later</i>", and then query for that when you find more time.<br />
-Or you use different statuses for specific projects. For example, I created a status "<i>HUG</i>" (for "Haiku user guide") under which I collect every mail that may influence the contents of the user guide, like commit messages about code changes that alter or introduce some feature or anything else I feel could improve the user guide.<br />
-In any case, try to keep the status name short. That way it always fits in a normally wide "Status" column in Tracker.</p>
-<p>You don't have to open an email with the <span class="app">Mail</span> application to set its status. With the Tracker add-ons <span class="app">Mark as Read </span> and <span class="app">Mark as...</span> you can select some email files and set their status in one go.</p>
+<p>Melhor utilizar <span class="menu">Fechar e | Definir para...</span> para criar um novo estado e utilizá-lo para categorizar sua mensagem. Por exemplo, poder-se-ia chamar o estado "<i>Depois</i>" e então consultá-lo quando encontrar mais tempo.<br />
+Ou utilizar diferentes estados para projetos específicos. Por exemplo, eu criei um estado "<i>HUG</i>" (para "Haiku user guide") sob o qual eu coleto toda mensagem que pode influenciar os conteúdos do guia do usuário, como mensagens de commit sobre mudanças no código que alteram ou introduzem alguma funcionalidade ou algo mais que eu sinto que possa melhorar o guia do usuário.<br />
+Em todo caso, tente manter o estado com o nome curto. Assim ele sempre ficará em uma coluna "Estado" com largura normal no Rastreador.</p>
+<p>Não é preciso abrir uma mensagem com o aplicativo  <span class="app">Correio</span> para definir seu estado. Com os adicionais do Rastreador <span class="app">Marcar como Lida </span> e <span class="app">Marcar como...</span> pode-se selecionar alguns arquivos de correio eletrônico e definir seus estados de uma só vez.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="queries" name="queries">Utilizando consultas</a></h2>
-<p>Sure, you specify a folder to store all your email, you can open it et voilà,  there's all you mail. But over time the folder becomes crowded and showing all will take longer and longer as thousands of files and their attributes have to be parsed and sorted. Also, most of the time you don't really care about two year old emails of Nigerian princes and their inheritory trouble ...</p>
-<div class="box-info">A lot of time when populating a folder is spent on putting files read from disk into the correct sorting order and displaying that in the window. If you do have to open a folder with a huge number of files, you can shorten the wait by making the Tracker window "invisible", i.e. either minimize it or change to another workspace. Watch <a href="applications/processcontroller.html">ProcessController</a> to see how it affects CPU usage.</div>
+<p>Certo, você especifica uma pasta para armazenar todas as suas mensagens, pode abrí-la e voilà,  lá estão todas as suas mensagens. Mas progressivamente a pasta torna-se lotada e mostrar tudo tomará mais e mais tempo com milhares de arquivos e seus atributos sendo analisados e ordenados. Também, na maior parte do tempo você não realmente não liga pra mensagens de dois anos atrás dos príncipes nigerianos e seus problemas com herança...</p>
+<div class="box-info">Muito tempo de preenchimento de uma pasta é gasto em colocar arquivos lidos do disco dentro da ordem correta e exibir na janela. Se precisa abrir uma pasta com um número enorme de arquivos, pode reduzir a espera fazendo a janela do Rastreador "invisível", ou seja, tanto minimizá-la ou mudar para outro espeço de trabalho. Leia <a href="applications/processcontroller.html">Controlador de Processo</a> para ver como ela afeta a utilização da CPU.</div>
 <p><a href="queries.html">Consultas</a>, ao resgate!</p>
-<p>By using queries, you can narrow down the view of your mails. Actually, the mailbox icon in the Deskbar uses queries.</p>
+<p>Ao utilizar consultas, pode-se visualizar suas mensagens usando seta para baixo. Em verdade, o ícone da caixa de correio na Deskbar utiliza consultas.</p>
 <img src="images/workshop-email-images/daemon-in-deskbar.png" alt="daemon-in-deskbar.png" /> 
-<p>The <span class="menu">Open Draft</span> submenu does a query for the status "<i>Draft</i>", which is set by <span class="app">Mail</span> when you save a message.</p>
-<p><span class="menu">Open Inbox Folder</span> and <span class="menu">Open Mail Folder</span> are just links to regular folders (and not very useful in my opinion).</p>
-<p>The <span class="menu"># new messages</span> submenu is populated by a query for email with the status "<i>New</i>" (that same query is used to change the mailbox icon to show some letters in it, by the way).</p>
+<p>O submenu <span class="menu">Abrir Rascunho</span> faz uma pesquisa pelo estado "<i>Rascunho</i>", o qual é definido pelo <span class="app">Correio</span> ao salvar uma mensagem.</p>
+<p><span class="menu">Abrir a Pasta Entrada</span> e <span class="menu">Abrir a Pasta Correio</span> são apenas vínculos para pastas regulares (e não são muito úteis, na minha opinião).</p>
+<p>O submenu <span class="menu"># novas mensagens</span> é preenchido por uma consulta por mensagens com o estado "<i>Novo</i>" (a propósito, a mesma consulta é utilizada para mudar o ícone da caixa de correio para mostrar algumas cartas nela).</p>
 
-<p>You can add your own queries (or folders, applications, scripts etc.) to that context menu too, by putting them or links to them into <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
-<div class="box-info">The query <span class="path">~/config/settings/Mail/mailbox</span> is a special case: It is executed when left-clicking the mailbox icon in the Deskbar. If you want to change that behavior, you can replace it with any other file (or link to a file), just name it "<i>mailbox</i>". It doesn't have to be a query, a link to a folder of queries or a script or application works just as well.</div>
+<p>Pode-se adicionar também suas próprias consultas (ou pastas, aplicativos, scripts, etc.) àquele menu de contexto, colocando-os ou aos seus vínculos dentro de <span class="path">~/config/settings/Mail/Menu Links</span>.</p>
+<div class="box-info">A consulta <span class="path">~/config/settings/Mail/mailbox</span> é um caso especial: Ela é executada ao clicar com o botão esquerdo do mouse no ícone da caixa de correio na Deskbar. Se deseja mudar seu comportamento, pode substituí-lo com qualquer outro arquivo (ou vínculo para um arquivo), apenas nomeando-o "<i>mailbox</i>". Ela não tem que ser uma consulta, um vínculo para uma pasta de consultas ou um script ou aplicativo para funcionar corretamente.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="query-examples" name="query-examples">Exemplos de consultas</a></h3>
-<p>Here are a few examples of useful queries:</p>
+<p>Eis alguns exemplos de consultas úteis:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="10">
 <tr align="center"><td><img src="images/workshop-email-images/query-1.png" alt="query-1.png" /><br />
-This finds all mails with the custom status "<i>Later</i>".</td>
+Isto encontra todos as mensagens com o estado personalizado "<i>Depois</i>".</td>
 <td><img src="images/workshop-email-images/query-2.png" alt="query-2.png" /><br />
-This finds all mails of the past 2 days.</td></tr>
+Isto encontra todas as mensagens dos últimos 2 dias.</td></tr>
 
 <tr align="center"><td><img src="images/workshop-email-images/query-3.png" alt="query-3.png" /><br />
-This finds all mails by Ingo Weinhold of the past 2 weeks.</td>
+Isto encontra todas as mensagens de Ingo Weinhold das últimas 2 semanas.</td>
 <td><img src="images/workshop-email-images/query-4.png" alt="query-4.png" /><br />
-This finds all posts from the Haiku commit list of the past 12 hours.</td></tr>
+Isto encontra todas as postagens da lista de commit do Haiku das últimas 12 horas.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">Mais dicas</a></h2>
 <ul>
-<li><p>If you don't save a query as "<i>Query</i>" but as "<i>Query template</i>", invoking it won't show the result window, but the Find... window instead. That way you can easily exchange the search string for the subject or sender, for example, or change a "<i>2 days</i>" time limit to "<i>3 days</i>".</p></li>
-<li><p>Activating "type-ahead filtering" in <a href="tracker.html#tracker-preferences">Tracker's preferences</a> allows you to very quickly filter a query result even further. Often it's enough to query for all mails of the last 3 days and go with type-ahead filtering from there. The big advantage is, that you don't have to exactly specify which attribute to search for, as all displayed are considered when filtering.</p></li>
-<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">RelatedMail</a> is a nifty little application that will query for all mails with the same subject/sender/time-frame etc. of a dropped email. Kind of what the <span class="menu">Queries</span> menu in the <span class="app">Mail</span> app is supposed to do.</p></li>
+<li><p>Se não salvar uma consulta como "<i>Consulta</i>" mas como "<i>Modelo de consulta</i>", ao chamá-la não abrir-se-á a janela de resultado, mas ao invés disso a janela Encontrar... Desse modo pode-se facilmente alterar a sequência de pesquisa para um assunto ou remetente, por exemplo, ou alterar um limite de tempo de "<i>2 dias</i>" para "<i>3 dias</i>".</p></li>
+<li><p>Ativar "filtragem com auto-completar" nas <a href="tracker.html#tracker-preferences">preferências do Rastreador</a> permite filtrar ainda mais rapidamente um resultado de consulta. Frequentemente, é bastante consultar por todas as mensagens dos últimos 3 dias e usar a filtragem com auto-completar a partir daí. A grande vantagem é não ser preciso especificar exatamente qual atributo procurar, pois todos os exibidos são considerados na filtragem.</p></li>
+<li><p><a href="http://haikuware.com/directory/view-details/utilities/desktop-accessories/relatedmail">Correio Relacionado</a> é uma pequeno e elegante aplicativo que consultará por todas as mensagens com o mesmo assunto/remetente/espaço de tempo, etc., de um correio eletrônico baixado. Uma espécie de menu <span class="menu">Consultas</span> no aplicativo <span class="app">Correio</span> espera-se que faça o mesmo.</p></li>
 </ul>
 
 </div>

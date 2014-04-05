@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,7 @@
  *		iwaim
  *		Shota Fukumori
  *		mt
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -71,7 +72,7 @@
 <h2>
 <a id="welcome" name="welcome">Haiku へようこそ！</a></h2>
 <p>Haiku を選んでくれてとてもうれしいよ！これは私たちの  4 番目の公式リリースです。私たちは新しい開発者をプロジェクトに迎え入れて、将来のユーザーに Haiku を選択してもらう機会を与えたいと考えています。この<i>アルファ版</i>が私たちが設定した目標を完全に満たしているものではなく、すべての機能を提供しているわけではないと理解しています。また、幅広いエンドユーザー・エクスペリエンスによって最終的な R1 バージョンの計画を立てました。しかしながら、あなたがこのリリースで Haiku の素晴らしいポテンシャルに気づき、私たちの興奮を共有してくれることを願っています。</p>
-<p>最新のニュースとお知らせは、私たちのプロジェクトのウエブサイト、<a hrf="http://www.haiku-os.org">Haiku-os.org</a> にアクセスしてください。</p>
+<p>最新のニュースとお知らせは、私たちのプロジェクトのウェブサイト、<a hrf="http://www.haiku-os.org">Haiku-os.org</a> にアクセスしてください。</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -97,28 +98,25 @@
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="software" name="software">ソフトウェアを追加する</a></h2>
-<p>だいたいの BeOS 向けアプリケーションは Haiku でもバイナリとソースコードの互換性から動くと思われます (ただし、オプションの "beoscompatibility" パッケージのインストールが必要です)。パッケージをダウンロードし、<span class="path">/boot/apps/</span> に unzip (ダブルクリックで、<span class="app">ファイル解凍</span>が開きます) することでアプリケーションを起動できます。</p>
+<p>ほとんどの利用可能なソフトウェアは、Haiku に付属のアプリケーション、HaikuDepot でダウンロードおよびインストールできます。<br />ほとんどの BeOS 向けアプリケーションは Haiku でもバイナリとソースコードの互換性から動作すると思われます。その多くは Haiku 用に再パッケージされているか、修正なしに動作します。新しいアプリケーションのインストールに関する追加の情報はユーザーガイドの<a href="../userguide/jp/applications.html">アプリケーション</a>の章に見つかります。</p>
 
-<p>有名なソフトウェアのレポジトリの一覧:</p>
+<p>HaikuDepot の使用以外の、有名なソフトウェアレポジトリの一覧:</p>
 <ul>
 	<li><a href="http://www.haikuware.com" class="printurl">Haikuware</a></li>
 	<li><a href="http://www.bebits.com" class="printurl">BeBits</a></li>
-	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - 移植されたソフトウェアやパッチのメンテナンスを行っています</li>
-	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> - ネイティブ BeOS と Haiku のソフトウェアを提供しています</li>
+	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - Haiku に移植されたソフトウェアのパッチをメンテナンスしています。</li>
+	<li><a href="https://github.com/HaikuArchives" class="printurl">HaikuArchives</a> - ネイティブ BeOS と Haiku のオープンソースソフトウェアプロジェクトを github でホストしています。</li>
 </ul>
-
-<p>Haiku のビルドシステムで使われているオプショナルパッケージというものがあります。これはユーザーが手動で展開・インストールを行うために用意はされていません。そのかわり、<tt>installoptionalpackage</tt> というユーティリティスクリプトが用意されています。このスクリプトは未完成の Haiku のパッケージ管理システムの穴を埋めるためのもので、たくさんのオプショナルパッケージのインストールを容易にするために用意されています。<br />
-以下のコマンドをターミナルで実行することで使い方を知ることができます: <tt>installoptionalpackage -h</tt></p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="software" name="wifi">Haiku での Wifi</a></h2>
-<p>Haiku は、WPA/WPA2 または WEP で暗号化されているか、または暗号化されていないワイヤレスネットワークをサポートしています。異なるハードウェアベンダーの様々なライセンスポリシーのため、ファームウェアインストールプロセスのマニュアルが必要となるでしょう。サポートされたハードウェア、ファームウェアのインストール、そしてワイヤレスネットワークへの接続方法についての詳しい情報は、ユーザーガイドの <a href="../userguide/jp/workshop-wlan.html">ワークショップ: ワイヤレスネットワーク</a>で見つかるでしょう。</p> 
+<p>Haiku は、WPA / WPA2 または WEP で暗号化されているワイヤレスネットワークと、当然、オープンで暗号化されていないワイヤレスネットワークをサポートしています。異なるハードウェアベンダーの様々なライセンスポリシーのため、ファームウェアインストールプロセスのマニュアルが必要となるでしょう。サポートされたハードウェア、ファームウェアのインストール、そしてワイヤレスネットワークへの接続方法についての詳しい情報は、ユーザーガイドの <a href="../userguide/jp/workshop-wlan.html">ワークショップ: ワイヤレスネットワーク</a>で見つかるでしょう。</p> 
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="api" name="api">API を理解する</a></h2>
-<p>Haiku は再実装のため、API は BeOS R5 とまだ同じです (少しの追加があります)。そのため、Be Book にあるドキュメントはまだ有用な情報です。Be Inc. を持つ ACCESS に感謝します。私たちは Be Book のコピーを提供することを許可されました。<br />BeOS API から離れたところ、および Haiku 固有の追加事項は Haiku Book に集められています。</p>
+<p>Haiku は再実装のため、API は BeOS R5 とまだ同じです (少しの追加があります)。そのため、Be Book にあるドキュメントはまだ有用な情報です。かつての Be Inc. の所有物の権利を持つ ACCESS に感謝します。私たちは Be Book のコピーを提供することを許可されました。<br />BeOS API から離れたところ、および Haiku 固有の追加事項は Haiku Book に集められています。</p>
 
 <p>以下は、読者が始めるのに手助けになると思われる追加のドキュメントです。</p>
 <ul>
@@ -132,7 +130,7 @@
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="contact" name="contact">連絡を取り合う</a></h2>
-<p>IRC  (webchat 上の <a href="http://webchat.freenode.net/?channels=haiku">#haiku</a>) や私たちのフォーラム、メーリングリストでほかの開発者やユーザーと連絡や議論ができます。たくさんの人々が一緒に活動をするには、ルールにしっかりと準拠して行動をする必要があります。<a href="http://www.haiku-os.org/community/ml/etiquette">メーリングリストでのルール</a> に準拠して行動をするようにお願いします。</p>
+<p>IRC  (webchat 上の <a href="http://webchat.freenode.net/?channels=haiku">#haiku</a>) や私たちのフォーラム、メーリングリストでほかの開発者やユーザーと連絡や議論ができます。たくさんの人々が一緒に活動をするには、ルールにしっかりと準拠して行動をする必要があります。<a href="http://www.haiku-os.org/community/ml/etiquette">メーリングリストでのルール</a>に準拠して行動をするようにお願いします。</p>
 <ul>
 	<li><a href="http://www.haiku-os.org/community/irc" class="printurl">IRC チャンネル</a></li>
 	<li><a href="http://www.haiku-os.org/forum" class="printurl">フォーラム</a></li>

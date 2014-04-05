@@ -63,24 +63,24 @@
 <h1>Aplicativos
 </h1>
 
-<p>Before diving into all the applications that come with Haiku, let's have a more detailed look at how to install and uninstall programs. The most convenient way to find, install, update and uninstall applications is via Haiku's package management system. However, since Haiku is largely binary and source compatible to its ancestor BeOS, you might find older archives (.zip and .pkg) that can still be installed as well.</p>
-<div class="box-info">Below you'll always find the <tt>~/config/</tt> hierarchy of the Home folder mentioned. If you intend to share packages for all users (once Haiku becomes multi-user aware), you should use the mirrored filesystem hierarchy under <tt>/system/</tt>. See topic <a href="filesystem-layout.html">Filesystem layout</a> for more information.</div>
+<p>Antes de aprofundar em todas os aplicativos que vêm com o Haiku, vamos dar uma olhada mais detalhada em como instalar e desinstalar programas. O modo mais conveniente para encontrar, instalar, atualizar e desinstalar aplicativos é via sistema de gerenciamento de pacotes do Haiku. Contudo, uma vez que o Haiku é amplamente compatível, tanto nos binários como em código-fonte, com seu antecessor BeOS, encontrar-se-á arquivos antigos (.zip e .pkg) que ainda podem ser instalados normalmente.</p>
+<div class="box-info">A seguir, sempre será mencionada a hierarquia <tt>~/config/</tt> da pasta Home. Se pretende compartilhar pacotes para todos os usuários (desde que o Haiku torne-se multi-usuário), deve utilizar a hierarquia de sistema de arquivos espelhada em <tt>/system/</tt>. Veja o tópico <a href="filesystem-layout.html">Disposição do sistema de arquivos</a> para maiores informações.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hpkg" name="hpkg">Pacotes Haiku (.hpkg)</a></h2>
-<p>The simplest way is to use <a href="">HaikuDepot</a> to find, download and automatically install and uninstall a package. If that isn't an option  maybe you downloaded a package somewhere, because it's not (yet) in a public repository  it's just as easy to install it manually: Just move the .hpkg file into <tt>~/config/packages/</tt>. </p>
-<p>You'll find the newly installed application in <tt>~/config/apps/</tt> or, in case of a commandline application, in <tt>~/config/bin/</tt>. All other files the program depends upon (libraries, data, add-ons, etc.) appear automatically in the right locations in the filesystem.</p>
+<p>A maneira mais simples é utilizar o <a href="applications/haikudepot.html">Depósito Haiku</a> para encontrar, baixar, instalar e desinstalar automaticamente um pacote. Se esta não for uma opção — talvez tenha baixado um pacote de algum lugar, porque (ainda) não está em um repositório público — é muito fácil instalá-lo manualmente: apenas mova o arquivo .hpkg para dentro de <tt>~/config/packages/</tt>. </p>
+<p>Encontrar-se-á o aplicativo recém-instalado em <tt>~/config/apps/</tt> ou, no caso de um aplicativo de linha de comando, em <tt>~/config/bin/</tt>. Todos os outros arquivos dos quais o programa depende (bibliotecas, dados, adicionais, etc.) aparecem automaticamente nos locais corretos no sistema de arquivos.</p>
 <p>Os tópicos <a href="deskbar.html">Deskbar</a> ou <a href="desktop-applets/launchbox.html">LaunchBox</a> descrevem como adicionar atalhos para a nova aplicação instalada.</p>
-<p>Uninstalling is just as easy: move the package out of <tt>~/config/packages/</tt>.</p>
-<div class="box-info">By the way, although you can unpack a .hpkg file like any other archive, this is not what the package mangement is doing when you're installing a package. The underlying filesystem only appears to spread files in their respective folders, there's no physical moving around taking place. This is why installing/uninstalling is so very fast and clean.</div>
-<p>If the package depends on some other library or package, a window will pop up, asking if the necessary files shall be downloaded and installed as well.</p>
+<p>Desinstalar é igualmente fácil: remova o pacote de <tt>~/config/packages/</tt>.</p>
+<div class="box-info">A propósito, embora possa desempacotar um arquivo .hpkg como qualquer outro arquivo compactado, não é isto que o gerenciamento de pacotes faz ao instalar um pacote. O sistema de arquivos implícito apenas aparenta espalhar os arquivos em suas respectivas pastas, mas não há movimentação física sendo feita. Eis o porquê do instalar/desinstalar ser tão rápido e limpo.</div>
+<p>Se o pacote depende de alguma outra biblioteca ou pacote, uma janela se abrirá perguntando se os arquivos necessários devem ser baixados e instalados.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">Antigos arquivos BeOS (.zip e .pkg)</a></h2>
-<p>BeOS archives that include all they need in their app's folder can simply be unpacked (double clicking opens <span class="app">Expander</span>) anywhere in <tt>/boot/home/</tt> and run from there. Uninstalling such self-contained applications is easy: just delete the app's folder.</p>
-<p>This is true for the majority of old BeOS applications. If you happen upon one that doesn't work out-of-the-box, because it wants to spread its files to hard-coded locations that are not guaranteed to exist, you can try to fix things manually. The folder <tt>~/config/non-packaged/</tt> allows you to recreate the needed folder hierarchy. As more and more real .hpkg packages become available and old BeOS applications get re-packaged, this will become less needed. Please consult this <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">online article</a> on how to use the <tt>non-packaged</tt> hierarchy.</p>
+<p>BeOS archives that include all they need in their app's folder can simply be unpacked (double clicking opens <span class="app">Expander</span> or the old <span class="app">PackageInstaller</span>) anywhere in <tt>/boot/home/</tt> and run from there. Uninstalling such self-contained applications is easy: just delete the app's folder.</p>
+<p>Isto é verdadeiro para a maioria dos aplicativos antigos do BeOS. Se acontecer de algum não funcionar facilmente, porque ele quer espalhar seus arquivos para locais definidos via código os quais não há garantia de existirem, pode-se tentar corrigir manualmente. A pasta <tt>~/config/non-packaged/</tt> permite recriar a hierarquia de pastas necessária. A medida que mais e mais pacotes .hpkg reais tornam-se disponíveis e antigos aplicativos  BeOS são reempacotados, isso se tornará menos necessário. Favor consultar o <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">artigo online</a> sobre como utilizar a hierarquia <tt>non-packaged</tt>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -108,7 +108,7 @@
 	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Expansor</a></td><td> </td>
 		<td valign="top">Uma ferramenta para descompactar fichários comuns.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/haikudepot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/haikudepot.html">Depósito Haiku</a></td><td> </td>
-		<td valign="top"><span style="color:silver">Uma ferramenta para encontrar, baixar, instalar, atualizar e desinstalar pacotes (de aplicativos) [<i>faltando</i>]</span></td></tr>
+		<td valign="top">A tool to find, download, install, update and uninstall (application) packages</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Mático</a></td><td> </td>
 		<td valign="top">Um aplicativo pra criar ícones vetoriais do Haiku.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Instalador</a></td><td> </td>

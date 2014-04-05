@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2011, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,7 +59,7 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicativos</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/apps/WebPositive</span></td></tr>
-<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/WebPositive/</span> - Arquivos de configuração, cookies, cache e histórico de navegação</td></tr>
+<tr><td>Definições:</td><td></td><td><span class="path">~/config/settings/WebPositive/</span> - Arquivos de configuração, cookies, cache e histórico de navegação</td></tr>
 <tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - Todos os marcadores como arquivos individuais</td></tr>
 </table>
 <p><br /></p>
@@ -83,7 +83,7 @@ Finalmente, pode-se decidir incluir um botão "Página inicial" na barra de nave
 <ul>
 <li><img src="../images/apps-images/webpositive-tabbar.png" alt="webpositive-tabbar.png" />
 <p>Novas abas são criadas com o botão <span class="key">+</span> à direita da barra da guia ou, se ainda existir bastante espaço, com um duplo-clique em uma área vazia da barra. Se existirem mais guias abertas do que cabe na largura da barra, os botões de rolagem <span class="key">&lt;</span> <span class="key">&gt;</span> tornam-se ativos, permitindo rolar a barra da guia para a esquerda e para a direita. O botão <span class="key">∨</span> na extremidade direita abriga um menu pop-up com todas as guias abertas para uma navegação ainda mais rápida.</p></li>
-<li><p>Clicar em um vínculo com o botão do meio do mouse abre a página em uma nova guia, em segundo plano.</p></li>
+<li><p>Clicar em um vínculo com o botão do meio do mouse abre a página em uma nova guia em segundo plano. Segurar <span class="key">SHIFT</span> ao clicar com o botão do meio abre-a no primeiro plano.</p></li>
 <li><p>A partir do menu <span class="menu">Visualizar</span> pode-se <span class="menu">Aumentar o zoom</span> and <span class="menu">Diminuir o Zoom</span> de uma página. Existe também a opção de <span class="menu">Zoom apenas no texto</span>, deixando todas as imagens em seu tamanho original.</p></li>
 <li><p>Se mudar para modo de tela cheia e houver ativado a definição de ocultar a interface, ela irá desaparecer após um segundo. Para trazê-la temporariamente de volta, simplesmente mova o cursor do mouse para o topo da tela.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
@@ -92,7 +92,6 @@ Sequências não reconhecidas como endereços válidos serão pesquisados pelo G
 <li><p>Clicar com o botão direito do mouse abre um menu de contexto o qual, dependendo do objeto clicado, permite abrir o link em uma nova janela ou nova guia, baixar o objetco, etc.</p></li>
 <li><p><span class="menu">Editar | Procurar</span> mostra uma barra de localização na base do navegador para iniciar uma pesquisa na própria página.</p></li>
 </ul>
-<div class="box-info">Depois de algum tempo, pode-se experimentar páginas web sendo carregadas cada vez mais lentamente. Isso não é uma falha no verdadeiro sentido, é mais um efeito do manuseamento deficiente de cookies. De qualquer forma, até que seja corrigido, será necessária uma intervenção manual: Dê uma olhada em <span class="path">~/config/settings/WebPositive/Cookies.curl</span>. Este arquivo armazena cookies de páginas web e cresce lentamente enqaunto surfa na web. Uma vez que possui algumas dezenas de quilobytes de tamanho, começa a desacelerar a navegação. Apenas exclua o arquivo nesse ponto para começar com um novo e limpo.</div>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Favoritos</h2>
 <p>Os marcadores do WebPositive são gerenciados como arquivos e pastas em <tt>~/config/settings/WebPositive/Bookmarks/</tt>. Adicionar um marcador irá criar um novo arquivo lá. Abra rapidamente uma pasta com <span class="menu">Gerenciar Marcadores...</span>.</p>
 <img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
@@ -120,7 +119,7 @@ Geralmente, WebPositive é muito tolerante quando se trata de gerir arquivos com
 <tr><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>Abre a página inicial.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">D</span></td><td> </td><td>Exibe/oculta a janela Downloads.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Exibe a barra de localização para pesquisas na página (ocultar com <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Adiciona esta página aos favoritos.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Adiciona a página atual aos favoritos.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">M</span></td><td> </td><td>Gerenciar os favoritos, abrindo a pasta Favoritos.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">←</span></td><td> </td><td>Página anterior no histórico.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">→</span></td><td> </td><td>Próxima página no histórico.</td></tr>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2011, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -82,7 +82,7 @@ Finally, you can decide to include the "Home" button in the navigation bar and s
 <ul>
 <li><img src="../images/apps-images/webpositive-tabbar.png" alt="webpositive-tabbar.png" />
 <p>New tabs are created with the <span class="key">+</span> button to the right in the tab bar or, if there's still enough space, by double-clicking into an empty area of it. If there are more tabs open than fit into the bar, the <span class="key">&lt;</span> <span class="key">&gt;</span> scroll-buttons become active, allowing you to scroll the tab bar left and right. The <span class="key">∨</span> button to the far right hosts a pop-up menu with all open tabs for even quicker navigation.</p></li>
-<li><p>Clicking on a link with the middle mouse button opens the page in a new tab in the background.</p></li>
+<li><p>Clicking on a link with the middle mouse button opens the page in a new tab in the background. Holding <span class="key">SHIFT</span> while middle-clicking, opens it in the foreground.</p></li>
 <li><p>From the <span class="menu">View</span> menu you can <span class="menu">Zoom in</span> and <span class="menu">Zoom out</span> of a page. There's also an option to <span class="menu">Zoom text only</span>, leaving all images with their original size.</p></li>
 <li><p>If you switch to full screen mode and have activated the setting to hide the interface, it will disappear after a second. To slide it temporarily back in, simply move the mouse pointer to the top of the screen.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
@@ -91,7 +91,6 @@ Strings not recognized as URLs will get looked up with Google, so the locator fi
 <li><p>Right-clicking opens a context menu which, depending on the object you've clicked on, offers to open the link in a new window or a new tab, download the object etc.</p></li>
 <li><p><span class="menu">Edit | Find</span> shows a find bar at the bottom to start an in-page search. Matches are highlighted in the page.</p></li>
 </ul>
-<div class="box-info">After a while you may experience web pages being loaded slower and slower. Not really a bug in the truest sense, it's more an effect of a deficient handling of cookies. Either way, until that is fixed you'll have to manually intervene: Have a look at <span class="path">~/config/settings/WebPositive/Cookies.curl</span>. This file stores cookies from webpages and slowly grows while surfing the web. Once it's a few dozen kilobytes in size, it starts to slow down browsing. Just delete the file at that point to start with a clean slate.</div>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Bookmarks</h2>
 <p>WebPositive's bookmarks are managed as files and folders in <tt>~/config/settings/WebPositive/Bookmarks/</tt>. Adding a bookmark will create a new file there. You can quickly open the folder with <span class="menu">Manage Bookmarks...</span>.</p>
 <img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
@@ -119,7 +118,7 @@ Generally, WebPositive is very tolerant when it comes to managing files with Tra
 <tr><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>Opens the home page.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">D</span></td><td> </td><td>Shows/hides the Downloads window.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Shows the find bar for in-page searching (hide with <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Bookmarks this page.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Bookmarks the current page.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">M</span></td><td> </td><td>Manage bookmarks, opening the Bookmarks folder.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">←</span></td><td> </td><td>Previous page in the history.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">→</span></td><td> </td><td>Next page in the history.</td></tr>

@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -52,16 +54,48 @@
 
 <div id="content">
 <div>
-<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuDepot</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Anwendungen</span></td></tr>
+<tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Documentation is still missing. If you want to work on it, please announce it on the <a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a> to avoid duplication.</p>
+<p>HaikuDepot ist die zentrale Anwendung, um Software-Pakete zu managen. Mir ihr lassen sich Repositories (auch "Depots" genannt) durchstöbern und Pakete installieren, aktualisieren und deinstallieren.</p>
+<img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
+
+<h3>Filter</h3>
+<p>Ganz oben hat man einige Möglichkeiten, die Paketliste darunter zu filtern:</p>
+<ul>
+<li><p>Unter dem <span class="menu">Zeige</span> Menü kann man die Liste auf bestimmte Kategorien begrenzen, wie "<i>Audio</i>" oder "<i>Spiele</i>". Außerdem kann man sich auch nur die bereits installierten Pakete anzeigen lassen, oder nur diejenigen, für die ein Update zur verfügbar ist.</p></li>
+<li><p>Im <span class="menu">Depot</span> Menü bestimmt man welche Repositories überhaupt in der Liste auftauchen sollen.</p></li>
+<li><p>Die im <span class="menu">Suchbegriffe</span> Textfeld eingegebenen Wörter filtern die Liste entsprechend.</p></li>
+</ul>
+
+<h3>Paketliste</h3>
+<p>Wie in jedem Tracker-Fenster, lässt sich aus einem Kontextmenü per Rechtsklick auf einen Spaltentitel auswählen, welche Spalten anzezeigt werden sollen. Ein Linksklick sortiert die Liste nach der entsprechenden Spalte, und natürlich kann man die Anordnung ändern, indem man eine Spalte an eine andere Position zieht.</p>
+<p>In der entsprechenden Spalte eines Pakets können unterschiedliche Status angezeigt werden:</p>
+<ul>
+<li><p><span class="menu">Verfügbar</span>:Das Paket existiert in diesem Depot und es kann heruntergalden und installiert werden. Bestehen Abhängigkeiten zu anderen Paketen, so wird einem dies bei der Installation mitgeteilt und man hat die Wahl alles Nötige ebenfalls herunterzuladen und installieren zu lassen.</p></li>
+<li><p><span class="menu">Aktiviert</span>: Das Paket ist momentan installiert und benutzbar.</p></li>
+<li><p><span class="menu">Update verfügbar</span>: Eine neuere Version als die installierte ist verfügbar.</p></li>
+</ul>
+<p>Mittels der gepunkteten Linie zwischen Paketliste und Infobereich, lässt sich die Höhe der Liste verändern.</p>
+
+<h3>Infobereich</h3>
+<p>Ganz unten befindet sich ein Bereich mit Informationen des momentan in der Liste ausgewählten Pakets.<br />
+Rechts neben Paketname, Autor, Bewertung und Version befindet sich ein Button, mit dem sich ein Paket – je nach aktuellen Status – <span class="button">Installieren</span>, <span class="button">Deinstallieren</span> oder <span class="button">Updaten</span> lässt.</p>
+<p>Darunter befinden sich drei Reiter:</p>
+<ul>
+<li><p>In <span class="menu">Über</span> findet man eine ausführlichere Beschreibung des Pakets, sowie falls vorhanden, Bildschirmfotos, Kontaktadresse und URL des Team, das die Software betreut.</p></li>
+<li><p>Unter <span class="menu">Bewertungen</span> kann man, falls vorhanden, Kommentare und Bewertungen von anderen Benutzern lesen. Mittels der kleinen Daumen-rauf/runter-Icons rechts, kann man die einzelnen Kommentare bewerten.</p></li>
+<li><p>Im <span class="menu">Änderungsprotokoll</span> ist die Historie der veröffentlichten Versionen des Pakets nachzulesen.</p></li>
+</ul>
+
+<h3>Werkzeuge und Einstellungen</h3>
+<p>Im <span class="menu">Werkzeuge</span> Menü ganz oben im HaikuDepot-Fenster findet sich der Menüpunkt <span class="menu">Depots aktualisieren</span>. Er fordert eine aktuelle Liste aller verfügbaren Pakete der Repositories an.</p>
+<p>Im <span class="menu">Einstellungen</span> Menü gibt es die Optionen zum <span class="menu">Entwicklungs-Pakete anzeigen</span> und <span class="menu">Quellcode-Pakete anzeigen</span> in der Paketliste. Für den normalen Benutzer sind sie nicht so interessant und blähen die Paketliste nur unnötig auf. Sie sind sie allerdings wichtig für Leute, die deren Bibliotheken, Header-Dateien etc. brauchen, um darauf aufbauende Programme zu entwickeln und zu kompilieren.</p>
 
 </div>
 </div>

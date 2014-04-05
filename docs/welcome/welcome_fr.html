@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,7 @@
  *		Vincent Duvert
  *		Loïc
  *		Humdinger
+ *		Wabouz
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -77,7 +78,7 @@
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bugreport" name="bugreport">Attention aux bogues</a></h2>
 <p>Nous avons travaillé dur pour résoudre les bogues critiques du système. Néanmoins, Haiku n'étant qu'au stade d'une version alpha, beaucoup n'ont pas encore été découverts.</p>
-<div class="box-warning">Nous déconseillons l'utilisation des versions Alpha sur un système en production. Les données que vous manipulez pourraient être altérées, corrompues ou tout simplement détruites.</div>
+<div class="box-warning">Nous déconseillons l'utilisation des versions Alpha en tant que système pour travailler sur des fichiers/projets/travaux personnels. Les données que vous manipulez pourraient être altérées, corrompues ou tout simplement détruites.</div>
 
 <p>La sortie d'une version alpha a pour objectif de faire découvrir et tester le système par d'avantage de personnes, afin de trouver les bogues présents et d'obtenir des suggestions d'améliorations futures. Veuillez rapporter d'éventuels bogues et suggestions sur notre traqueur de bogues après avoir utilisé sa fonction de recherche pour éviter les doublons.</p>
 <ul>
@@ -97,21 +98,15 @@
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="software" name="software">Installer plus de logiciels</a></h2>
-<p>Grâce à notre compatibilité binaire et source avec BeOS, de nombreuses applications écrites pour ce système fonctionne sous Haiku. Après avoir téléchargé un paquet, décompressez le (un double-clic lancera  <span class="app">Expander</span>) dans  <span class="path">/boot/apps/</span> et démarrez l'application depuis de ce dossier.</p>
+<p>La plupart des logiciels disponible peuvent être téléchargés et installés avec l'application HaikuDepot qui est fournie avec Haiku.<br /> Du fait de sa la compatibilité des binaires et des sources, la plupart des applications BeOS tournent sur Haiku. Beaucoup d'entre elles ont été ré-empaquetées pour Haiku ou tournent parfaitement, même sans modification. Vous trouverez plus d'informations sur l'installation de nouveaux programmes dans le guide de l'utilisateur, au chapitre <a href="../userguide/fr/applications.html">Applications</a>.</p>
 
-<p>Voici quelques sites populaires référençant un certain nombre de logiciels :</p>
+<p>Voici quelques sites populaires référençant un certain nombre de logiciels populaires :</p>
 <ul>
 	<li><a href="http://www.haikuware.com" class="printurl">Haikuware</a></li>
 	<li><a href="http://www.bebits.com" class="printurl">BeBits</a></li>
-	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - maintient les correctifs pour les logiciels portés</li>
-	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> - héberge des projets de logiciels open source natifs pour BeOS et Haiku</li>
+	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - maintient les correctifs pour les logiciels supportés.</li>
+	<li><a href="http://dev.osdrawer.net/" class="printurl">OsDrawer</a> - héberge des projets de logiciels open source natifs pour BeOS et Haiku</li>
 </ul>
-
-<p>Il y a aussi les paquets dits optionnels, qui sont utilisés par le système de compilation d'Haiku. Les utilisateurs finaux ne sont pas sensés les extraire manuellement pour les installer. Toutefois, un script utilitaire est fourni : <tt>installoptionalpackage</tt>.
-Ce script est destiné à combler les lacunes du gestionnaire de paquets en cours de construction.
-Il vous permettra d'installer la plus part des paquets optionnels disponibles.<br />
-Vous devrez saisir une ligne de commande dans le Terminal :
-<tt>installoptionalpackage -h</tt> explique son utilisation.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>

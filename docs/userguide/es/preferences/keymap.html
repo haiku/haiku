@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-20014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">La traducción de esta página no está completa aún. Hasta que esté, las partes sin terminar vienen en su inglés original.</div>
 
 <h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />Keymap</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -74,8 +75,12 @@ Así, las preferencias de distribución de teclado no sólo están para configur
 <tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>(Seleccionar teclas muertas) para seleccionar las teclas azules arriba mencionadas.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td> </td><td>(Cambiar tecla de atajos) para usar la tecla de atajos en modo Windows/Linux, p. ej., <span class="key">Control</span> (normalmente <span class="key">Ctrl</span>) o el modo de Haiku, p. ej., <span class="key">Command</span> (normalmente <span class="key">ALT</span>).</td></tr>
 </table>
-<p>Las listas en la izquierda ofrecen las distribuciones de teclado preconfiguradas disponibles del sistema, y debajo de ellas, si están disponibles, los mapas definidos por el usuario. Puede cambiar una distribución de teclado mediante arrastrar y soltar en la representación del teclado, con dar clic con el botón derecho y arrastrar se intercambian las dos teclas.<br />
-Cuando haya terminado puede guardar el resultado desde el menú <span class="menu">File | Save...</span> (Archivo | Guardar). El mapa modificado aparecerá en la lista definida por el usuario si se almacenó en <span class="path">~/config/settings/Keymap/</span>. De lo contrario, tendrá que cargarla manualmente a través de <span class="menu">File | Open...</span> (Archivo | Abrir).</p>
+<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.</p>
+<p>Alternatively to this drag&amp;dropping of keys, there's the menu <span class="menu">File | Set modifier keys...</span> that opens this window:</p>
+<img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
+<p>Here, you can assign keys to their respective roles or even completely disable the role of a key. You can even assign the same key to different roles, though that's not a good idea most of the time and you'll be warned by a small exclamation mark beside the pop-up menus if you do that.<br />
+Pressing <span class="button">Set modifier keys</span> applies your changes and closes the window.</p>
+<p>When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
 <p>Para equiparar mejor el panel Distribución de teclado a su teclado físico, hay algunas configuraciones diferentes disponibles desde el menú <span class="menu">Layout</span> (Disposición).</p>
 <p>El tipo de letra utilizado en la representación del teclado se selecciona desde el menú <span class="menu">Font</span> (Tipografía). Note que puede o no contener todos los símbolos para una Distribución de teclado específica.</p>
 <p>Finalmente, hay un botón <span class="button">Revert</span> (Revertir) para regresar las configuraciones que estaban activas cuando se inició el panel preferencias de Distribución de teclado.</p>
@@ -85,8 +90,8 @@ Cuando haya terminado puede guardar el resultado desde el menú <span class="men
 <p>Hay otro método para personalizar su distribución de teclado además del panel de preferencias Distribución de teclado. Involucra editar un archivo de texto que contiene cargas de valores hexadecimales, lo cual puede parecer intimidante a primera vista, pero realmente no es tan imposible de entender.</p>
 <p>Se puede tirar copia de la distribución de teclado actual con un comando en la Terminal:</p>
 <pre class="terminal">keymap -d MyKeymap</pre>
-<p>El archivo de texto generado puede usarse luego en un editor de texto. Asegúrese de usar un tipo de letra monoespaciado en ese editor o nunca se comprenderá intuitivamente ese archivo...<br />
-Al inicio del citado archivo, se encontrará una leyenda del teclado estilizado con el valor hexadecimal correspondiente a cada tecla. Debajo de eso están las asignaciones reales de cada valor. Puede hacer toda la personalización que esté también disponible desde el panel de preferencias Distribución de teclado, y algo más. Esto es, usarlos como teclas ordinarias o como una tecla Option o Control. No será capaz de, por ejemplo, hacer que las teclas multimedia incrementen o decrementen el volumen o iniciar alguna aplicación. Para ello se puede usar, p. ej., a <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
+<p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
+At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use the <a href="shortcuts.html">Shortcuts</a> preferences.</p>
 <p>Cuando termine, guardará el archivo y hará que el sistema cargue la distribución de teclado modificada con este comando:</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
 <p>Si quisiera importar esta distribución dentro del panel Distribución de teclado, tiene que compilarla primero en un formato binario:</p>

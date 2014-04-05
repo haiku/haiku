@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -47,10 +47,10 @@
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">目次</a> 
-::  <a href="filesystem-layout.html">ファイルシステムの設計</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">目次</a> 
+::  <a href="filesystem-layout.html">ファイルシステムレイアウト</a>  »
 </span></div>
 </div>
 
@@ -59,61 +59,91 @@
 
 <h1>ブートローダー</h1>
 
-<p>ハードウェア周りに問題が生じた場合や、Haiku を 2 つ以上インストールしていて (おそらくインストール CD 上あるいは USB メモリ上の Haiku)、そのいずれかを選択する場合に、Haiku のブートローダーは役立ちます。<br />
-また、あるソフトウェアコンポーネントをインストールしたもののそれが正しく動作せず、システムの起動を妨げてしまうような状況で、そのコンポーネントを再度削除するのにも Haiku のブートローダーは役立ちます。後で述べるように、<i>Disable user add-ons</i> オプションを有効にすると、ドライバーといったユーザーがインストールしたコンポーネントを読み込まずに Haiku が起動します。</p>
-<p>ブートローダーのオプションに入るには、Haiku の起動プロセスが始まる前に <span class="key">SHIFT</span> キーを押しっぱなしにする必要があります。ブートマネージャーがインストールされている場合は、Haiku のブートエントリーを実行する前に <span class="key">SHIFT</span> を押し続ける動作を始めても構いません。Haiku がそのマシンの唯一のオペレーティングシステムである場合、BIOS からのブートメッセージがまだ表示されている状態から SHIFT キー を押し続ける動作を始めることができます。</p>
-<p><br /></p>
-<p>ブートローダーのオプションに入ると、次の 4 つのメニューが表示されます:</p>
+<p>ハードウェア周りに問題が生じた場合や、Haiku を複数インストールしていて (おそらくインストール CD 上あるいは USB メモリ上の Haiku)、そのいずれかを選択する場合に、Haiku のブートローダーは役立ちます。<br />
+また、あるソフトウェアコンポーネントをインストールしたもののそれが正しく動作せず、システムの起動を妨げてしまうような状況で、そのコンポーネントを再度削除するのにも Haiku のブートローダーは役立ちます。後で述べるように、<i>Disable user add-ons</i> オプションを有効にすると、ユーザーがインストールしたドライバーのようなコンポーネントを読み込まずに Haiku が起動します。</p>
+<p>ブートローダーのオプションに入るには、Haiku の起動プロセスが始まる前に <span class="key">SHIFT</span> キーを押しっぱなしにする必要があります。ブートマネージャーがインストールされている場合は、Haiku のブートエントリーを実行する前に <span class="key">SHIFT</span> を押し続ける動作を始めても構いません。Haiku がそのマシンの唯一のオペレーティングシステムである場合、BIOS からのブートメッセージがまだ表示されている状態から SHIFT キーを押し続ける動作を始められます。</p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="options" name="options">ブートローダーのオプション</a></h2>
+<p>ブートローダーのオプションに入ると、次の 4 つのメニューが表示されます。</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b></td><td> </td><td>インストールされた Haiku のうち、どれを起動するのか選択します。</td></tr>
 <tr><td><b>Select safe mode options</b>
-</td><td> </td><td>ハードウェア周りに問題が生じた場合、または不正なアドオンのためにシステムが不安定あるいは起動しなくなった場合に試してみるべきオプションがいくつかあります。選択バーをあるオプションに移動させると、画面の下部に短い説明が表示されます。</td></tr>
-<tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
-	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
-	</table>
-</td></tr>
+</td><td> </td><td>ハードウェア周りに問題が生じた場合、または不正なアドオンのためにシステムが不安定あるいは起動しなくなった場合に試してみるべきオプションがいくつかあります。オプションに選択バーを移動させると、画面の下部に短い説明が表示されます。</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Safe mode</span><br />
+		システムをセーフモードにします。このオプションは、ほかのオプションと独立して有効にできます。</p>
+	<p><span class="menu">Disable user add-ons</span><br />
+		ユーザーがインストールしたすべてのアドオンを読み込まないようにします。システムディレクトリにあるアドオンだけが読み込まれます。下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p>
+	<p><span class="menu">Disable IDE DMA</span><br />
+		IDE DMA を無効にします。速度を犠牲にして、IDE の互換性を向上します。</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
+		4 GiB アドレス限界を超えるメモリを無視します。カーネル設定ファイル中の設定を上書きします。</p>
+	<p><span class="menu">Use fail-safe video mode</span><br />
+		システムは VESA モードを使用し、ほかのグラフィックドライバーを使用しません。</p>
+	<p><span class="menu">Disable IO-APIC</span><br />
+		割り込みルーティング用の IO APIC の使用を無効にします。代わりに、従来の PIC を使用します。</p>
+	<p><span class="menu">Disable local APIC</span><br />
+		ローカル APIC の使用を無効にします。また、SMP も無効にします。</p>
+	<p><span class="menu">Disable SMP</span><br />
+		1 つを除いてすべての CPU コアを無効にします。</p>
+	<p><span class="menu">Don't call the BIOS</span><br />
+		システムが BIOS 機能を呼び出すことを禁止します。</p>
+	<p><span class="menu">Disable APM</span><br />
+		アドバンストパワーマネージメント (APM) のハードウェアサポートを無効にし、カーネル設定ファイル内の APM 設定を上書きします。</p>
+	<p><span class="menu">Disable ACPI</span><br />
+		アドバンスドコンフィグレーションアンドパワーインターフェイス (ACPI) のハードウェアサポートを無効にし、カーネル設定ファイル内の ACPI 設定を上書きします。</p>
+	<p><span class="menu">Blacklist entries</span><br />
+		無視しなければならないシステムファイルを選択できるようにします。たとえば、ドライバーを一時的に無効にする場合に役立ちます。下の<a href="#troubleshooting">トラブルシューティング</a>を見てください。</p></td></tr>
 <tr><td><b>Select debug options</b>
-</td><td> </td><td>これを選択すると、デバッグに役立ついくつかのオプションや、 <a href="../welcome/en/bugreports.html">バグ報告</a>のために詳細な情報を取得するのに役立つオプションが現れます。ここでも、各オプションに関する短い説明が画面の下部に表示されます。</td></tr>
-<tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
-	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(ログを終了するには <span class="key">Q</span> を押します)</td></tr>
-	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
-<tr><td></td><td></td><td>"Enable debug syslog" を有効にした場合、クラッシュ後にソフトウェアリセット (warm reboot) を行うと、次の追加のオプションが表示されます:</td></tr>
-<tr><td></td><td></td><td>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
-	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
+</td><td> </td><td>これを選択すると、デバッグに役立ついくつかのオプションや、<a href="../welcome/en/bugreports.html">バグ報告</a>のために詳細な情報を取得するのに役立つオプションが現れます。ここでも、各オプションに関する短い説明が画面の下部に表示されます。</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Enable serial debug output</span><br />
+		syslog 出力のシリアルインターフェースへの転送をオンにします (デフォルト値: 115200, 8N1)。</p>
+	<p><span class="menu">Enable on screen debug output</span><br />
+		通常のブートロゴの代わりに、システムがブート中にスクリーン上へデバッグ出力を表示します。</p>
+	<p><span class="menu">Disable on screen paging</span><br />
+		スクリーンへのデバック出力が有効なときに、ページングを無効にします。</p>
+	<p><span class="menu">Enable debug syslog</span><br />
+		このセッションに対して、特別なメモリ内の syslog バッファーを有効にします。ブートローダーは再起動後そのバッファーにアクセスできます。</p>
+	<p><span class="menu">Display current boot loader log</span><br />
+		ブートローダーが記録したデバッグ情報を表示します (<span class="key">Q</span> を押してログを抜けます)</p>
+	<p><span class="menu">Add advanced debug option</span><br />
+		詳細なデバッグオプションを直接入力できるようにします。</p></td></tr>
+<tr><td></td><td></td><td>"<i>Enable debug syslog</i>" を有効にした場合、クラッシュ後にソフトウェアリセット (warm reboot) を行うと、次の追加オプションが表示されます:</td></tr>
+<tr><td></td><td></td><td><p><span class="menu">Save syslog from previous session during boot</span><br />
+		前回の Haiku のセッションを、起動中に /var/log/previous_syslog へ保存します。</p>
+	<p><span class="menu">Display syslog from previous session</span><br />
+		前回の Haiku のセッションの syslog を表示します。</p>
+	<p><span class="menu">Save syslog from previous session</span><br />
+		前回の Haiku のセッションの syslog をディスクに保存します。現在、FAT32 ボリュームのみがサポートされています。</p></td></tr>
 <tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td><i>Use fail-safe video mode</i> を有効にしなければならないときに、解像度と色深度を設定できます。</td></tr>
 </table>
-<p><br /></p>
-<p>1 つ以上のオプションを有効にしてメインメニューに戻り、起動を続行すると、このブートスクリーンが表示されます:</p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="troubleshooting" name="troubleshooting">トラブルシューティング</a></h2>
+<p>Haiku がユーザーのハードウェアで最初から起動しない場合、<span class="menu">Select safe mode options</span> のさまざまなオプションを設定してみてください。ともかく、<a href="../welcome/en/bugreports.html">バグレポート</a>の提出を検討してください。</p>
+<p>一方、Haiku がいくつかのソフトウェア、特にハードウェアドライバーをインストールした後に突然調子が悪くなった場合は、障害を起こすパッケージを再びアンインストールすることで、Haiku を再び起動可能にし、正しく動作させるオプションがいくつかあります。</p>
+<ul>
+<li><p><span class="menu">Safe mode</span> を有効にすると、ほとんどのサーバー、デーモン、そして UserBootScript の起動を禁止します。</p></li>
+<li><p><span class="menu">Disable user add-ons</span> を有効にすると、ユーザーがホームフォルダー以下の階層にインストールしたすべてのアドオン (ドライバー、トランスレーターなど) の使用を禁止します。</p></li>
+<li><p>問題のあるドライバー、アドオンなどが、システム階層にインストールされている場合は、少しばかり複雑になります。なぜなら、その階層は読み取り専用だからです。ここで、<span class="menu">Blacklist entries</span> オプションが出てきます。それにより、システム階層全体を検索して、ユーザーにとってシステムを混乱させるコンポーネントを無効にします。無効にする項目は、<span class="key">SPACE</span> または <span class="key">RETURN</span> キーでチェックします。<span class="key">ESC</span> は親ディレクトリへ一段戻ります。</p>
+<p>オンラインで、<a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> という記事があります。これには、コンポーネントの無効化を定着させる方法が説明されています。</p></li>
+</ul>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="booting" name="booting">Haiku のブート</a></h2>
+<p>1 つまたは複数のオプションを有効にしてメインメニューに戻り、起動を続行すると、このブートスクリーンが表示されます:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
 <p>すべてが順調に進むと、各シンボルが次々に点灯して行きます。<br />
-異なるシンボルは大まかに次のブートステージに対応します:</p>
+それぞれのシンボルは大まかに次のブートステージに対応します:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>原子</b></td><td style="width:10px;"> </td><td>モジュールの初期化。</td></tr>
-	<tr><td><b>ディスク + 虫眼鏡</b></td><td> </td><td>rootfs (<span class="path">/</span>) の作成と devfs (<span class="path">/dev</span>) のマウント。</td></tr>
-	<tr><td><b>プラグインカード</b></td><td> </td><td>デバイスマネージャーの初期化。</td></tr>
-	<tr><td><b>ブートディスク</b></td><td> </td><td>起動ディスクのマウント。</td></tr>
-	<tr><td><b>IC チップ</b></td><td> </td><td>CPU 固有のモジュールの読み込み。</td></tr>
-	<tr><td><b>フォルダー</b></td><td> </td><td>サブシステムの最終初期化。</td></tr>
-	<tr><td><b>ロケット</b></td><td> </td><td>起動スクリプトによるシステムの起動。</td></tr>
+	<tr><td><b>原子</b></td><td style="width:10px;"> </td><td>モジュールの初期化。</td></tr>
+	<tr><td><b>ディスク + 虫眼鏡</b></td><td> </td><td>rootfs (<span class="path">/</span>) の作成と devfs (<span class="path">/dev</span>) のマウント。</td></tr>
+	<tr><td><b>プラグインカード</b></td><td> </td><td>デバイスマネージャーの初期化。</td></tr>
+	<tr><td><b>ブートディスク</b></td><td> </td><td>起動ディスクのマウント。</td></tr>
+	<tr><td><b>IC チップ</b></td><td> </td><td>CPU 固有のモジュールの読み込み。</td></tr>
+	<tr><td><b>フォルダー</b></td><td> </td><td>サブシステムの最終初期化。</td></tr>
+	<tr><td><b>ロケット</b></td><td> </td><td>起動スクリプトによるシステムの起動。</td></tr>
 </table>
 
 </div>
@@ -121,10 +151,10 @@
 
 <div class="nav">
 <div class="inner"><span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">目次</a> 
-::  <a href="filesystem-layout.html">ファイルシステムの設計</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">目次</a> 
+::  <a href="filesystem-layout.html">ファイルシステムレイアウト</a>  »
 </span></div>
 </div>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,69 +46,105 @@
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Sisältö</a> 
-::  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h1>Alkukäynnistyslataaja</h1>
 
 <p>Haikun alkukäynnistyslataaja voi avustaa kun koet laitteistopulmia tai haluat valita, minkä Haiku-asennuksen käynnistät, jos sinulla on useampi kuin yksi. (ehkä asennus-CD:llä tai USB-tikulla)<br />Se on myös kätevä kun olet asentanut ohjelmistokomponentin, joka oireilee ja estää sinua alkukäynnistämästä järjestelmää uudelleen komponentin poistamiseksi. <i>Ota pois käytössä lisäosa</i>-valitsin, joka on mainittu alla, käynnistää Haikun lataamatta käyttäjän asentamia komponentteja, esim.: ajuria.</p>
 <p>Alkulatauslataajan valitsimiin pääsemiseksi sinun on painettava ja pidettävä alhaalla  <span class="key">VAIHTO</span>-näppäintä ennen Haikun alkulatausprosessin käynnistymistä. Jos alkulataushallinta on asennettu, voit aloittaa pitämällä <span class="key">VAIHTO</span>-näppäintä ennen Haikun alkulatausrivin valintaa. Jos Haiku on ainoa koneeseen asennettu käyttöjärjestelmä, voit aloittaa näppäimen pitämisen alhaalla jo silloin, kun näet näytölläsi BIOS-alkulatausviestit.</p>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="options" name="options">Boot Loader Options</a></h2>
 <p>Kun olet päässyt sinne, näkyviin tulee neljä valikkoa:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Valitse alkulatauslevy</b></td><td> </td><td>Valitse, minkä Haiku-asennuksen käynnistät.</td></tr>
 <tr><td><b>Valitse turvatilavalitsimet</b>
 </td><td> </td><td>Laitteistopulmien tapahtuessa voit kokeilla useita valitsimia tai jos järjestelmä tulee epästabiiliksi tai sitä ei pysty alkulataamaan huonosti käyttäytyvän lisäosan vuoksi. Kun valintapalkin siirtää valitsimelle, niin näytön alalaiteen ilmaantuu lyhyt selite.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Turvatila</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Ota käyttäjälisäosat pois käytöstä</i></td><td></td><td></td></tr>
-	<tr><td><i>- Ota pois käytöstä IDE DMA</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Käytä vikaturvallista videotilaa</i></td><td></td><td></td></tr>
-	<tr><td><i>- Älä kutsu BIOS:ia</i></td><td></td><td></td></tr>
-	<tr><td><i>- Ota pois käytöstä APM</i></td><td></td><td></td></tr>
-	<tr><td><i>- Ota pois käytöstä ACPI</i></td><td></td><td></td></tr>
-	</table></td></tr>
+	<p><span class="menu">Safe mode</span><br />
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+	<p><span class="menu">Disable user add-ons</span><br />
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+	<p><span class="menu">Disable IDE DMA</span><br />
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+</p>
+	<p><span class="menu">Use fail-safe video mode</span><br />
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+	<p><span class="menu">Disable IO-APIC</span><br />
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+	<p><span class="menu">Disable local APIC</span><br />
+		Disables using the local APIC, also disables SMP.</p>
+	<p><span class="menu">Disable SMP</span><br />
+		Disables all but one CPU core.</p>
+	<p><span class="menu">Don't call the BIOS</span><br />
+		Stops the system from calling BIOS functions.</p>
+	<p><span class="menu">Disable APM</span><br />
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+	<p><span class="menu">Disable ACPI</span><br />
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+	<p><span class="menu">Blacklist entries</span><br />
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Valitse vianjäljitysvalitsimet</b>
 </td><td> </td><td>Tästä löydät useita valitsimia, jotka opastavat vianjäljityksessä tai yksityiskohtien hakemisessa <a href="../welcome/fi/bugreports.html">vikailmoitukseen</a>. Taas näytön alalaidassa näytetään lyhyt selite.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Ota käyttöön vianjäljitystuloste sarjaväylän kautta</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Ota käyttöön vianjäljitystuloste näytölle</i></td><td></td><td></td></tr>
-	<tr><td><i>- Ota pois käytöstä näytön sivutus</i></td><td></td><td></td></tr>
-	<tr><td><i>- Ota käyttöön vianjäljitys syslog-tiedostoon</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Näytä nykyinen alkulatausloki</i></td><td></td><td>(Paina näppäintä <span class="key">Q</span> lokista poistumiseksi)</td></tr>
-	<tr><td><i>- Lisää lisävikajäljitysvalitsin</i></td><td></td><td></td></tr>
-</table></td></tr>
-<tr><td></td><td></td><td>Jos valitsin "Ota käyttöön vianjäljitys syslog-tiedostoon" on aktivoitu, uudelleenkäynnistyminen kaatumisen jälkeen näyttää nämä lisävalitsimet:</td></tr>
-<tr><td></td><td></td><td>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td class="onelinetop"><i>- Näytä syslog-tiedosto edellisestä istunnosta</i></td><td></td><td></td></tr>
-	<tr><td><i>- Tallenna syslog-tiedosto edellisestä istunnosta</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
+	<p><span class="menu">Enable serial debug output</span><br />
+		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
+	<p><span class="menu">Enable on screen debug output</span><br />
+		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
+	<p><span class="menu">Disable on screen paging</span><br />
+		Disables paging when on screen debug output is enabled.</p>
+	<p><span class="menu">Enable debug syslog</span><br />
+		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
+	<p><span class="menu">Display current boot loader log</span><br />
+		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
+	<p><span class="menu">Add advanced debug option</span><br />
+		Allows advanced debugging options to be entered directly.</p></td></tr>
+<tr><td></td><td></td><td>If "<i>Enable debug syslog</i>" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
+		Saves the syslog from the previous Haiku session to /var/log/previous_syslog when booting.</p>
+	<p><span class="menu">Display syslog from previous session</span><br />
+		Displays the syslog from the previous Haiku session</p>
+	<p><span class="menu">Save syslog from previous session</span><br />
+		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
 <tr><td class="onelinetop"><b>Valitse vikaturvallinen videotila</b></td><td> </td><td>Jos sinun oli aktivoitava valitsin <i>Käytä vikaturvallista videotila</i>a, voit asettaa resoluution ja värisyvyyden.</td></tr>
 </table>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
+<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../welcome/en/bugreports.html">bug report</a> in any case.</p>
+<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again to make things right by uninstalling the offending package again:</p>
+<ul>
+<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootScript from being started.</p></li>
+<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
+</ul>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="booting" name="booting">Booting Haiku</a></h2>
 <p>Yhden tai useamman valitsimen aktivoinnin jälkeen palaat päävalikkoon ja jatkat alkulatausta, mikä esittää sinulle tämän alkulatausnäytön:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
 <p>Jos kaikki toimii normaalisti, symboli toisensa jälkeen syttyy.<br />Erilaiset symbolit vastaavat likimain näitä alkulatausvaiheita:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atomi</b></td><td style="width:10px;"> </td><td>Moduulien alustaminen</td></tr>
-	<tr><td><b>Levy + suurentaja</b></td><td> </td><td>Luodaan rootfs (<span class="path">/</span>) ja liitetään devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Lisäosakortti</b></td><td> </td><td>Alustetaan laitehallintaa</td></tr>
-	<tr><td><b>Alkukäynnistetään levy</b></td><td> </td><td>Liitetään alkulatauslevy</td></tr>
-	<tr><td><b>Mikropiirit</b></td><td> </td><td>Ladataan prosessorikohtaiset moduulit</td></tr>
-	<tr><td><b>Kansio</b></td><td> </td><td>Alijärjestelmien loppualustus.</td></tr>
-	<tr><td><b>Raketti</b></td><td> </td><td>Järjestelmän käynnistävä alkulatausskripti.</td></tr>
+	<tr><td><b>Atomi</b></td><td style="width:10px;"> </td><td>Moduulien alustaminen</td></tr>
+	<tr><td><b>Levy + suurentaja</b></td><td> </td><td>Luodaan rootfs (<span class="path">/</span>) ja liitetään devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Lisäosakortti</b></td><td> </td><td>Alustetaan laitehallintaa</td></tr>
+	<tr><td><b>Alkukäynnistetään levy</b></td><td> </td><td>Liitetään alkulatauslevy</td></tr>
+	<tr><td><b>Mikropiirit</b></td><td> </td><td>Ladataan prosessorikohtaiset moduulit</td></tr>
+	<tr><td><b>Kansio</b></td><td> </td><td>Alijärjestelmien loppualustus.</td></tr>
+	<tr><td><b>Raketti</b></td><td> </td><td>Järjestelmän käynnistävä alkulatausskripti.</td></tr>
 </table>
 
 </div>
@@ -116,10 +152,10 @@
 
 <div class="nav">
 <div class="inner"><span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Sisältö</a> 
-::  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a>  »
 </span></div>
 </div>
 

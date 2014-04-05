@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-20014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,12 +55,13 @@
 
 <div id="content">
 <div>
+<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
 <h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />Mapa de Teclado</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferências</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/preferences/Keymap</span></td></tr>
-<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/Keymap/*</span> - Localização dos mapas de teclado modificados pelo usuário.<br />
+<tr><td>Definições:</td><td></td><td><span class="path">~/config/settings/Keymap/*</span> - Localização dos mapas de teclado modificados pelo usuário.<br />
 <span class="path">~/config/settings/Key_map</span></td></tr>
 </table>
 <p><br /></p>
@@ -74,8 +75,12 @@ Assim, as preferências do Mapa de Teclas além de servirem para configurações
 <tr><td><span class="menu">Selecionar teclas mortas</span></td><td> </td><td>para definir as teclas azuis mencionadas acima.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Alterar tecla de atalho...</span></td><td> </td><td>para utilizar a tecla de atalho em modo  Windows/Linux, ou seja <span class="key">CONTROL</span> (normalmente <span class="key">CTRL</span>) ou modo Haiku, ou seja <span class="key">COMMAND</span> (normalmente <span class="key">ALT</span>).</td></tr>
 </table>
-<p>As listas à esquerda oferecem os mapas de teclado pré-configurados disponíveis do sistema e, abaixo, se disponível, mapas definidos pelo usuário. Pode-se alterar um mapa de teclado através de arrastar e soltar na representação de teclado: arrastar com o botão esquerdo do mouse pressionado copia uma tecla, arrastar como botão direito do mouse pressionado permuta entre duas teclas.<br />
-Ao concluir pode-se salvar o resultado a partir do menu <span class="menu">Arquivo | Salvar...</span>. Seu mapa modificado apenas aparecerá na lista de definidos pelo usuário se armazenado em <span class="path">~/config/settings/Keymap/</span>. Do contrário, deverá ser carregado manualmente via <span class="menu">Arquivo | Abrir...</span>.</p>
+<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.</p>
+<p>Alternatively to this drag&amp;dropping of keys, there's the menu <span class="menu">File | Set modifier keys...</span> that opens this window:</p>
+<img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
+<p>Here, you can assign keys to their respective roles or even completely disable the role of a key. You can even assign the same key to different roles, though that's not a good idea most of the time and you'll be warned by a small exclamation mark beside the pop-up menus if you do that.<br />
+Pressing <span class="button">Set modifier keys</span> applies your changes and closes the window.</p>
+<p>When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
 <p>Para melhor combinar o painel do Mapa de Teclado com seu teclado físico, existem muitas diferentes definições disponíveis a partir do menu <span class="menu">Disposição</span>.</p>
 <p>A fonte utilizada na representação do teclado é definida a partir do menu <span class="menu">Fonte</span>. Observe que ela pode ou não conter todos os símbolos para um teclado específico.</p>
 <p>Finalmente, existe um botão <span class="button">Reverter</span> para trazer de volta as definições que estavam ativas quando iniciou as preferências do Mapa de Teclado.</p>
@@ -86,8 +91,8 @@ Ao concluir pode-se salvar o resultado a partir do menu <span class="menu">Arqui
 <p>existe outro método para personalizar seu mapa de teclado além do painel de preferências do Mapa de Teclado. Ele envolve editar um arquivo de texto contendo valores hexadecimais, os quais podem parecer assustadores à primeira vista, mas não são realmente impossíveis de compreender.</p>
 <p>Pode-se desabilitar o mapa de teclado atual com um comando no Terminal:</p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
-<p>O arquivo de texto gerado pode então ser aberto em um editor de texto. Certifique-se de utilizar uma fonte fixa no editor ou você nunca entenderá o arquivo...<br />
-No início do arquivo, encontrará uma legenda de um teclado estilizado com o valor hexadecimal correspondente para cada tecla. Abaixo estão as atribuições atuais de todos os valores. Pode-se fazer todas as personalizações disponíveis a partir do painel de preferências do Mapa de Teclado, e alguns mais. Se acontecer de ter alguma teclas especiais no seu teclado, será capaz de ativá-las.  Isto é, use-as como teclas ordinárias ou como uma tecla de opção ou controle. Não será capaz, por exemplo, de fazer suas teclas multimídia aumentarem/diminuirem o volume ou iniciar algum aplicativo. Para isto pode-se utilizar por exemplo <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
+<p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
+At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use the <a href="shortcuts.html">Shortcuts</a> preferences.</p>
 <p>Ao terminar, salve o arquivo e faça seu sistema carregar o mapa de teclado modificado com este comando:</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
 <p>Se gostaria de importar este mapa de teclado para o painel do Mapa de Teclado, terá que compilá-lo primeiro para um formato binário:</p>

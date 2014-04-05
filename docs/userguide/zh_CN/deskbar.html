@@ -56,6 +56,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>索引</td></tr>
@@ -86,24 +87,17 @@
 <li><p><b>Deskbar Preferences...</b> - 打开桌面栏的首选项面板（详情见下面的介绍）。</p></li>
 <li><p><b>Shutdown</b> - 提供了<span class="menu">重启</span> 和 <span class="menu">关机</span> 选项。</p></li>
 <li><p><b>Recent Documents, Folders, Applications</b> - 显示最近打开的文档，文件夹和应用程序 (详情见下面的 <span class="menu">桌面栏首选项</span> 介绍)。</p></li>
-<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> - 分别列出了所有安装的应用程序，演示程序，小程序和首选项。
-<br />您也可以把其他的程序（或者任何其他的目录，文档，查询等。） 放置到 <span class="path">~/config/settings/deskbar</span> ，将它们显示到菜单栏。</p></li>
+<li><p><b>Applications, Demos, Deskbar applets, Preferences</b> - List of installed applications, demos, applets and preferences.<br />You can add links to other programs (or any folder, document, query etc.) by putting them into <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>桌面栏首选项</h3>
-<h4>菜单</h4>
-<p>尽管菜单栏顶端的一些菜单项是固定的，但是您可以定制那些位于 <span class="menu">关闭系统...</span> 下的菜单项。</p>
-<img src="images/deskbar-images/prefs-menu.png" alt="prefs-menu.png" />
-<p>在这里您可以设置桌面栏菜单中最新的文档，文件夹和程序的数量，或者您可以选择查看所有的最新信息。<br />
-<span class="button">Edit Menu...</span> 按钮用于打开文件夹 <span class="path">~/config/settings/deskbar</span> 。在该文件夹下，您可以看到桌面栏中出现的所有文件和文件夹。默认设置下，这些包括： <span class="menu">应用程序</span>，<span class="menu">程序演示</span>，<span class="menu">桌面栏小程序</span>，以及 <span class="menu">首选项</span> 。<br />
-您可以通过向这些文件夹复制或者删除程序快捷式，文档，甚至查询来添加或者删除有关的入口。</p>
-<p>甚至，您也可以直接将文件，目录，或者保存的查询拖放到桌面栏。</p>
+<img src="images/deskbar-images/prefs-deskbar.png" alt="prefs-deskbar.png" />
+<p>The Deskbar preference panel is devided into three sections.</p>
 
 <h4>应用程序
 </h4>
 <p>下面的设置并不会对您所安装的程序有任何影响，而将会改变所运行应用程序列表的行为和外观。</p>
-<img src="images/deskbar-images/prefs-apps.png" alt="prefs-apps.png" />
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">排列运行程序</span></td><td> </td><td>按字母顺序排列运行程序列表。</td></tr>
 <tr><td><span class="menu">文件浏览器置首位</span></td><td> </td><td>即使按字母排序，文件浏览器总是位于列表首位。</td></tr>
@@ -113,15 +107,22 @@
 <tr><td><span class="menu">图标大小</span></td><td> </td><td>调整运行程序图标大小。</td></tr>
 </table>
 
+<h4>菜单</h4>
+<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
+Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
+The button <span class="button">Edit menu...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
+You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>甚至，您也可以直接将文件，目录，或者保存的查询拖放到桌面栏。</p>
+
 <h4>窗口
 </h4>
-<p>如下是桌面栏窗口首选项。</p>
-<img src="images/deskbar-images/prefs-window.png" alt="prefs-window.png" />
+<p>Finally, the preferences for the Deskbar window.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">置顶</span></td><td> </td><td>桌面栏位于所有窗口之上。</td></tr>
 <tr><td><span class="menu">自动提升</span></td><td> </td><td>如果桌面栏被鼠标点击，则置顶。</td></tr>
 <tr><td><span class="menu">自动隐藏</span></td><td> </td><td>桌面栏自动隐藏，受到鼠标点击则弹出。</td></tr>
 </table>
+
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">系统托盘</a></h2>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2011, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,7 +57,7 @@
 <div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Applications">Anwendungen</acronym></span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Anwendungen</span></td></tr>
 <tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/WebPositive</span></td></tr>
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/WebPositive/</span> - Konfigurationsdateien, Cookies, Cache und Surf-Historie</td></tr>
 <tr><td></td><td></td><td><span class="path">~/config/settings/WebPositive/Bookmarks</span> - Alle Lesezeichen als einzelne Dateien</td></tr>
@@ -83,7 +83,7 @@ Schließlich lässt sich das Symbol für die Startseite in der Navigationsleiste
 <ul>
 <li><img src="../images/apps-images/webpositive-tabbar.png" alt="webpositive-tabbar.png" />
 <p>Neue Reiter können mit dem <span class="key">+</span> Symbol rechts in der Reiterleiste geöffnet werden oder durch einen Doppelklick auf eine freie Fläche neben den Reitern, falls dafür noch Platz ist. Sind mehr Reiter geöffnet als in die Leiste passen, werden die <span class="key">&lt;</span> <span class="key">&gt;</span> Symbole aktiv, mit denen die Reiterleiste nach rechts und links gescrollt werden kann. Zur noch schnelleren Navigation dient das <span class="key">∨</span> Symbol ganz rechts, das ein Menü mit allen vorhandenen Reitern öffnet.</p></li>
-<li><p>Ein Klick mit der mittleren Maustaste öffnet einen Link in einem neuen Reiter, ohne den aktuellen Reiter zu verlassen.</p></li>
+<li><p>Ein Klick mit der mittleren Maustaste öffnet einen Link im Hintergrund in einem neuen Reiter. Hält man dabei <span class="key">SHIFT</span> gedrückt, öffnet sich der neue Reiter im Vordergrund.</p></li>
 <li><p>Mit <span class="menu">Zoom in</span> und <span class="menu">Zoom out</span> aus dem <span class="menu">View</span> Menü kann der Inhalt einer Seite vergrößert und verkleinert werden.  Bei aktivem <span class="menu">Zoom text only</span> wird nur der Text vergrößert, alle Bilder bleiben in Originalgröße.</p></li>
 <li><p>Ist die Einstellung zum Ausblenden der Oberfläche aktiviert, verschwindet beim Wechsel in den Vollbildmodus nach kurzer Zeit. Um sie kurzzeitig wieder einzublenden, muss man nur mit der Maus zum oberen Bildschirmrand fahren.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
@@ -92,7 +92,6 @@ Eingaben, die nicht als URL erkannt werden, dienen als Suchbegriff für eine Goo
 <li><p>Ein Rechtsklick öffnet ein Kontextmenü, mit dem, abhängig vom angeklickten Objekt, beispielsweise ein Link in einem neuen Fenster oder Reiter geöffnet, oder das Objekt runtergeladen werden kann etc.</p></li>
 <li><p><span class="menu">Edit | Find</span> öffnet eine Suchleiste unten im Fenster, um Begriffe auf der aktuellen Seite zu suchen. Die Fundstellen werden farbig hinterlegt.</p></li>
 </ul>
-<div class="box-info">Nach einer Weile kann es vorkommen, dass Webseiten immer langsamer geladen werden. Das ist nicht wirklich ein Bug, eher liegt das an einer ineffektiven Verwaltung von Cookies. Wie auch immer, bis dieses Problem gelöst ist, muss man selbst Hand anlegen. Und zwar an der Datei <span class="path">~/config/settings/WebPositive/Cookies.curl</span>. Sie speichert die Cookies von Webseiten und wächst beim Surfen langsam an. Erreicht sie eine Größe von ein paar Dutzend Kilobytes, wird das Surfen immer schwerfälliger. An dieser Stelle kann man die Datei einfach löschen, und alles läuft wieder fix, wie gewohnt.</div>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Lesezeichen</h2>
 <p>WebPositives Lesezeichen werden als einzelne Dateien und Ordner in <span class="path">~/config/settings/WebPositive/Bookmarks/</span> verwaltet. Fügt man ein neues Lesezeichen hinzu, wird dort eine neue Datei erstellt. Dieser Ordner lässt sich bequem mit <span class="menu">Manage Bookmarks...</span> öffnen.</p>
 <img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
@@ -120,7 +119,7 @@ Sowieso ist WebPositive sehr tolerant, wenn es um Dateioperationen in Tracker ge
 <tr><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>Öffnet die Startseite.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">D</span></td><td> </td><td>Blendet das Downloads-Fenster ein und aus.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Blendet die Suchleiste ein (Ausblenden mit <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Legt ein Lesezeichen an.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">B</span></td><td> </td><td>Legt ein Lesezeichen für die aktuellen Seite an.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">M</span></td><td> </td><td>Öffnet den Bookmarks-Ordner zum Verwalten von Lesezeichen.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">←</span></td><td> </td><td>Vorherige Seite aus der Historie.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">→</span></td><td> </td><td>Nächste Seite aus der Historie.</td></tr>

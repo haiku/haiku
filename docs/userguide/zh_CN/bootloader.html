@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -47,72 +47,106 @@
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">内容</a> 
-::  <a href="filesystem-layout.html">文件系统布局</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">内容</a> 
+::  <a href="filesystem-layout.html">文件系统布局</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h1>引导程序</h1>
 
 <p>Haiku 的系统引导程序可以用于帮助您解决遇到的硬件相关问题，或者用于选择通过 Haiku 的哪种安装方式来启动（可以是 CD 光驱启动或 USB 盘启动）。<br />此外，如果安装了某个软件组件导致系统无法启动，您也可以通过引导程序方便地将其移除。下面提到的<i>Disable user add-ons （禁用用户安装组件）</i> 选项，它可以启动 Haiku，但是不加载用户安装组件，例如：某个驱动程序。</p>
 <p>为了进入引导程序选项，您需要在 Haiku 的启动进程开始前，持续按住 <span class="key">SHIFT</span> 键。如果已经安装了启动管理软件，您可以在进入 Haiku 启动调用之前开始按下 <span class="key">SHIFT</span> 键。如果Haiku是唯一的操作系统，您可以在 BIOS 中显示启动消息时就开始按下该按键。</p>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="options" name="options">Boot Loader Options</a></h2>
 <p>进入选项之后，出现了下面四个菜单：</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b></td><td> </td><td>选择Haiku的安装介质。</td></tr>
 <tr><td><b>Select safe mode options</b><br />
 </td><td> </td><td>在系统引导中遇到硬件问题时，可以尝试下面的几个选项。当选择条移动到某个选项时，在屏幕底部会显示相应的简短说明。</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
-	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
-	</table>
-</td></tr>
+	<p><span class="menu">Safe mode</span><br />
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+	<p><span class="menu">Disable user add-ons</span><br />
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+	<p><span class="menu">Disable IDE DMA</span><br />
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+</p>
+	<p><span class="menu">Use fail-safe video mode</span><br />
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+	<p><span class="menu">Disable IO-APIC</span><br />
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+	<p><span class="menu">Disable local APIC</span><br />
+		Disables using the local APIC, also disables SMP.</p>
+	<p><span class="menu">Disable SMP</span><br />
+		Disables all but one CPU core.</p>
+	<p><span class="menu">Don't call the BIOS</span><br />
+		Stops the system from calling BIOS functions.</p>
+	<p><span class="menu">Disable APM</span><br />
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+	<p><span class="menu">Disable ACPI</span><br />
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+	<p><span class="menu">Blacklist entries</span><br />
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Select debug options</b><br />
 </td><td> </td><td>在这里，你会发现几个选项，它们用于调试或者获取<a href="../welcome/en/bugreports.html">错误报告</a>的详细情况。同时，对于每个选项，在屏幕底部也都会出现相关的说明。</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
-	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
-	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
-<tr><td></td><td></td><td>如果激活了 "Enable debug syslog" ，那么在系统崩溃，重启后会显示如下选项：</td></tr>
-<tr><td></td><td></td><td>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
-	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
+	<p><span class="menu">Enable serial debug output</span><br />
+		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
+	<p><span class="menu">Enable on screen debug output</span><br />
+		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
+	<p><span class="menu">Disable on screen paging</span><br />
+		Disables paging when on screen debug output is enabled.</p>
+	<p><span class="menu">Enable debug syslog</span><br />
+		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
+	<p><span class="menu">Display current boot loader log</span><br />
+		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
+	<p><span class="menu">Add advanced debug option</span><br />
+		Allows advanced debugging options to be entered directly.</p></td></tr>
+<tr><td></td><td></td><td>If "<i>Enable debug syslog</i>" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
+		Saves the syslog from the previous Haiku session to /var/log/previous_syslog when booting.</p>
+	<p><span class="menu">Display syslog from previous session</span><br />
+		Displays the syslog from the previous Haiku session</p>
+	<p><span class="menu">Save syslog from previous session</span><br />
+		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
 <tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>如果你启动了 <i>Use fail-safe video mode</i> 选项， 您可以设置屏幕的分辨率和颜色深度。</td></tr>
 </table>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
+<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../welcome/en/bugreports.html">bug report</a> in any case.</p>
+<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again to make things right by uninstalling the offending package again:</p>
+<ul>
+<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootScript from being started.</p></li>
+<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
+</ul>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="booting" name="booting">Booting Haiku</a></h2>
 <p>在激活几个选项之后，返回主菜单，继续系统引导。开机界面如下：</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
 <p>如果一切运行正常，那么所有的图标都将依此点亮。<br />
 这些不同的符号大致对应了下面的启动步骤：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>系统组件初始化。</td></tr>
-	<tr><td><b>Disk + magnifier</b></td><td> </td><td>创建文件系统 (<span class="path">/</span>) 和挂载硬件驱动 (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Plug-in card</b></td><td> </td><td>硬件管理初始化。</td></tr>
-	<tr><td><b>Boot disk</b></td><td> </td><td>挂载启动磁盘。</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>CPU特定模块加载</td></tr>
-	<tr><td><b>Folder</b></td><td> </td><td>子系统初始化。</td></tr>
-	<tr><td><b>Rocket</b></td><td> </td><td>加载系统启动脚本。</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>系统组件初始化。</td></tr>
+	<tr><td><b>Disk + magnifier</b></td><td> </td><td>创建文件系统 (<span class="path">/</span>) 和挂载硬件驱动 (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Plug-in card</b></td><td> </td><td>硬件管理初始化。</td></tr>
+	<tr><td><b>Boot disk</b></td><td> </td><td>挂载启动磁盘。</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>CPU特定模块加载</td></tr>
+	<tr><td><b>Folder</b></td><td> </td><td>子系统初始化。</td></tr>
+	<tr><td><b>Rocket</b></td><td> </td><td>加载系统启动脚本。</td></tr>
 </table>
 
 </div>
@@ -120,10 +154,10 @@
 
 <div class="nav">
 <div class="inner"><span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">内容</a> 
-::  <a href="filesystem-layout.html">文件系统布局</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">内容</a> 
+::  <a href="filesystem-layout.html">文件系统布局</a>  »
 </span></div>
 </div>
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,7 +59,7 @@
 
 <h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" /><acronym title="DataTranslations">Datenkonvertierung</acronym></h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu"><acronym title="Preferences">Einstellungen</acronym></span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Einstellungen</span></td></tr>
 <tr><td>Ort:</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/*</span> - Jeder Translator ("Übersetzer") hat hier eine Datei mit spezifischen Einstellungen.<br />
 <span class="path">~/config/settings/system/DataTranslations settings</span> - Speichert die Position des Programmfensters.</td></tr>
@@ -70,24 +70,30 @@
 <p>Abhängig vom einzelnen Translator variiert der Umfang der Einstellungsmöglichkeiten. Es ist aber immer mindestens eine Schaltfläche <span class="button">Info</span> vorhanden, die Auskunft über den Translator und dessen Speicherort angibt.<br />
 Nachfolgend eine Tabelle der standardmäßig installierten Translatoren und ihrer wichtigsten Einstellungen.</p>
 <table summary="translators" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Apple-Icons</span></td><td>Gültige Bildgrößen sind 16, 32, 48, 128, 256, 512, 1024 (RGB32 and RGBA32)</td></tr>
 <tr><td><span class="menu">BMP-Bilder</span></td><td>24 bit Farbtiefe, unkomprimiert, keine Transparenz</td></tr>
 <tr><td><span class="menu">EXR-Bilder</span></td><td><acronym title="Industrial Light &amp; Magic">ILM</acronym>-eigenes Format für HDR Bilder.</td></tr>
-<tr><td><span class="menu">GIF Images</span></td><td>8 bit Farbtiefe, verlustfreie Kompression, Transparenz<br />
+<tr><td><span class="menu">GIF-Bilder</span></td><td>8 bit Farbtiefe, verlustfreie Kompression, Transparenz<br />
 Über die Anzahl der zu verwendenden Farben kann die Dateigröße beeinflusst werden.<br />
 Die Transparenz wird entweder automatisch aus dem Alphakanal genommen, oder händisch über die Definition einer speziellen Farbe, die transparent dargestellt wird. </td></tr>
+<tr><td><span class="menu">HVIF-Icons</span></td><td>Translator für Haikus Vektoricons</td></tr>
 <tr><td><span class="menu">JPEG2000-Bilder</span></td><td>24 bit Farbtiefe, komprimiert, keine Transparenz<br />
 Hier interessiert meist nur die eingestellte Ausgabequalität.</td></tr>
 <tr><td><span class="menu">JPEG-Bilder</span></td><td>24 bit Farbtiefe, komprimiert, keine Transparenz<br />
 Neben der Ausgabequalität kann noch eine Kantenglättung eingestellt werden, die Kompressions-Artefakte mildert, aber gleichzeitig die Bildschärfe verringert.</td></tr>
 <tr><td><span class="menu">PCX-Bilder</span></td><td>24 bit Farbtiefe, unkomprimiert, keine Transparenz; "PC Paintbrush Exchange"-Format</td></tr>
-<tr><td><span class="menu">PNG-Bild</span></td><td>32 bit Farbtiefe, verlustfreie Kompression, Transparenz</td></tr>
-<tr><td><span class="menu">PPM Images</span></td><td>24 bit Farbtiefe, unkomprimiert, keine Transparenz; "Portable PixMap"-Format</td></tr>
+<tr><td><span class="menu">Photoshop-Bilder</span></td><td>32 bit Farbtiefe, verlustfreie Kompression, Transparenz<br />
+Alle Ebenen werden auf eine Bitmap-Ebene reduziert.</td></tr>
+<tr><td><span class="menu">PNG-Bilder</span></td><td>32 bit Farbtiefe, verlustfreie Kompression, Transparenz</td></tr>
+<tr><td><span class="menu">PPM-Bilder</span></td><td>24 bit Farbtiefe, unkomprimiert, keine Transparenz; "Portable PixMap"-Format</td></tr>
 <tr><td><span class="menu">RAW-Bilder</span></td><td>bis zu 48 bit Farbtiefe, unkomprimiert, keine Transparenz</td></tr>
 <tr><td><span class="menu">RTF-Textdateien</span></td><td>formatierter Text</td></tr>
 <tr><td><span class="menu">SGI-Bilder</span></td><td>24 bit Farbtiefe, optional verlustfreie Kompression, Transparenz</td></tr>
-<tr><td><span class="menu">StyledEdit-Dateien</span></td><td>formatierter Text</td></tr>
+<tr><td><span class="menu">StyledEdit-Dateien</span></td><td>Textdatei mit Formatierung in Attributen</td></tr>
 <tr><td><span class="menu">TGA-Bilder</span></td><td>32 bit Farbtiefe, optional verlustfreie Komprimierung, Transparenz</td></tr>
 <tr><td><span class="menu">TIFF-Bilder</span></td><td>24 bit Farbtiefe, optional verlustfreie Komprimierung, Ebenen, Transparenz</td></tr>
+<tr><td><span class="menu">WebP-Bilder</span></td><td>8 bit Farbtiefe YUV 4:2:0 Bildformat, komprimiert, keine Transparenz</td></tr>
+<tr><td><span class="menu">Windows-Icons</span></td><td>Gültige Bildgrößen sind 16, 32, 48</td></tr>
 <tr><td class="onelinetop"><span class="menu">WonderBrush-Bilder</span></td><td>32 bit Farbtiefe, Ebenen, Transparenz; spezielles Dateiformat von WonderBrush</td></tr>
 </table>
 <p><br /></p>

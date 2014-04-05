@@ -55,14 +55,12 @@
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />外観 (Appearance)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
-<tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
-<span class="path">~/config/settings/system/app_server/decorator_settings</span><br />
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>位置:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
+<tr><td>設定ファイルの位置:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
 <span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
 <p>外観 (Appearance) プリファレンスで、Haiku の外見の一部を変更できます。</p>
@@ -76,23 +74,22 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">新しいフォントのインストール</a></h3>
-<p>New fonts that don't come as part of a regular .hpkg package, can be installed by copying them into a subfolder according to the font type (<tt>psfonts</tt> or <tt>ttfonts</tt>) into their respective <tt>non-packaged</tt> folder (see topic <a href="../filesystem-layout.html">Filesystem layout</a>). For TrueType fonts that would be:</p>
+<p>正規の .hpkg パッケージの一部でない新しいフォントをインストールするには、それぞれの<tt>non-packaged</tt> フォルダーの、フォントの種類 (<tt>psfonts</tt> または <tt>ttfonts</tt>) に応じたサブフォルダーへコピーします。 (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>)のトピックを参照ください。TrueType フォントに関しては、コピー先は以下のようになるでしょう。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>すべてのユーザー用フォント</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>ユーザー専用フォント</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">色 (Colors)</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p><span class="menu">色 (Colors)</span> タブで、ユーザーインターフェースの各部位の色を変更できます。ドラッグアンドドロップによって、ほかのアプリケーションから色を持ってこられるようになっているので、たとえば、<span class="app">WonderBrush</span>、<span class="app">Icon-O-Matic</span>、または<span class="app">背景</span> パネルなどから色をドラッグできます。</p>
+<p><span class="menu">色 (Colors)</span> タブで、ユーザーインターフェースの各部位の色を変更できます。カラーウェルは、ほかのアプリケーションからのドラッグ＆ドロップを受け付けるので、たとえば、<span class="app">WonderBrush</span>、<span class="app">Icon-O-Matic</span>、または<span class="app">背景</span> パネルなどから色をドラッグできます。</p>
 
-<h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="decorators" name="decorators">ウインドウデコレーター</a></h2>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="decorators" name="decorators">ウィンドウデコレーター (Window decorators)</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku はただひとつのデフォルトデコレーターだけがついています。ほかのデコレーターを見つけてインストールすることがあれば、ポップアップメニューからべつのデコレーターを選べるでしょう。</p>
+<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku はデフォルトデコレーターただひとつだけが付属しています。ほかのデコレーターを見つけてインストールすることがあれば、ポップアップメニューからべつのデコレーターを選べるでしょう。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -114,21 +111,21 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 アンチエイリアスのタイプ (Antialiasing type)</h3>
-<p>画面描画を改善するもうひとつの方法は <i>Antialiasing</i> (アンチエイリアス) で、テキストだけでなくすべてのベクタグラフィックをサポートします。アンチエイリアスはあるピクセルの色を変更することにより、線をなめらかにします。線をなめらかにする手法には、次の 2 つがあります:</p>
+<p>画面描画を改善するもうひとつの方法は <i>Antialiasing</i> (アンチエイリアス) で、テキストだけでなくすべてのベクターグラフィックをサポートします。アンチエイリアスはあるピクセルの色を変更することにより、線をなめらかにします。線をなめらかにする手法には、次の 2 つがあります:</p>
 <p><span class="menu">グレースケール (Grayscale)</span> は、輪郭のピクセルの明るさを変更します。<br />
 <span class="menu">LCD サブピクセル (LCD subpixel)</span> は、特に (高解像度の) LCD ディスプレイを使用する場合に、グレースケールよりもさらになめらかに描画します。LCD ディスプレイの 1 つのピクセルは、赤、緑、青の要素で構成されているので、この手法では 1 ピクセルの明るさを変更するかわりに、1 ピクセルより小さな分量だけ輪郭を移動させて輪郭の色を変更します。</p>
 <p>先ほどと同様に、次の拡大したスクリーンショットは、この 2 つの方法の違いを示しています:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />グレースケール、ヒンティング無効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-subpixel.png" alt="appearance-subpixel.png" /><br />LCD サブピクセル、ヒンティング無効</td></tr>
 </table>
-<p>サブピクセルベースのアンチエイリアスでは、図形オブジェクトにわずかな色味を帯びた輝きが加わります。この余分な輝きを、だれもが許容するわけではありません。Haiku では、この 2 つのアンチエイリアス手法を混ぜて使用できます。スライダーを使って、最適な混合比を設定できます。</p>
+<p>サブピクセルベースのアンチエイリアスでは、図形オブジェクトにわずかな色味を帯びた輝きが加わります。この余分な輝きを、だれもが許容するわけではありません。Haiku では、この 2 つのアンチエイリアス手法を混ぜて使えます。スライダーを使って、最適な混合比を設定できます。</p>
 <div class="box-info">サブピクセルベースのアンチエイリアスをグリフのヒンティングとあわせて使用することは、ソフトウェア特許の対象となるため、デフォルトでは両者を同時に使用できないようになっています。住んでいる地域次第では、このロックを解除したバージョンを入手することが合法である場合があります。その場合は申し訳ありませんが、その地域の配布担当者と交渉してください。</div>
 <p>仮にソースコードを変更して再コンパイルすることで、ヒンティングと LCD サブピクセルを組み合わせた描画方法を有効にした場合、ヒンティングとグレースケールを組み合わせたものと見た目を比較すると、次のようになります:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />グレースケール、ヒンティング有効</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../images/prefs-images/appearance-glyph-on-subpixel.png" alt="appearance-glyph-on-subpixel.png" /><br />LCD サブピクセル、ヒンティング有効</td></tr>
 </table>
 <p><br /></p>
-<p>設定パネルの下の部分に、次の 2 つのボタンがあります:</p>
+<p>設定パネルの下に、次の 2 つのボタンがあります:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべてをデフォルト値にリセットします。</td></tr>
 <tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>外観プリファレンスを起動したときの設定に戻します。</td></tr>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,10 +46,10 @@
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Obsah</a> 
-::  <a href="filesystem-layout.html">Rozloženie súborového systému Haiku</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Obsah</a> 
+::  <a href="filesystem-layout.html">Rozloženie súborového systému Haiku</a>  »
 </span></div>
 </div>
 
@@ -62,56 +62,89 @@
 <p>Zavádzač systému Haiku vám môže pomôcť, keď narazíte na problémy s hardvérom alebo ak si chcete vybrať, ktorú inštaláciu Haiku chcete spustiť ak máte viac než jednu (možno na inštalačnom CD alebo na kľúči USB).<br />
 Tiež sa hodí potom ako nainštalujete softvérový komponent, ktorý robí problémy a zabraňuje vám naštartovať systém, na jeho odstránenie a opätovné pridanie. Voľba <i>Vypnúť používateľské doplnky</i>, ktorá sa spomína nižšie spustí Haiku bez načítania komponentov, ktoré nainštaloval používateľ, napr. ovládače zariadení.</p>
 <p>Voľby Zavádzača systému môžete zadať po stlačení a podržaní klávesu <span class="key">SHIFT</span> pred začiatkom zavádzania systému Haiku. Ak je nainštalovaný správca zavádzania, môžete kláves <span class="key">SHIFT</span> začať držať už predtým, než vyvoláte položku Haiku. Ak je Haiku na počítači jediný operačný systém, môžete začať držať kláves ešte vtedy, keď vidíte štartovacie správy od BIOSu.</p>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="options" name="options">Boot Loader Options</a></h2>
 <p>Po jeho zobrazení vám ponúkne štyri menu:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Vyberte zavádzací zväzok</b></td><td> </td><td>Vyberte, ktorú inštaláciu Haiku chcete spustiť.</td></tr>
 <tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Safe mode</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Disable user add-ons</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable IDE DMA</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td></td></tr>
-	<tr><td><i>- Don't call the BIOS</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable APM</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable ACPI</i></td><td></td><td></td></tr>
-	</table>
-</td></tr>
+	<p><span class="menu">Safe mode</span><br />
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+	<p><span class="menu">Disable user add-ons</span><br />
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+	<p><span class="menu">Disable IDE DMA</span><br />
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+</p>
+	<p><span class="menu">Use fail-safe video mode</span><br />
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+	<p><span class="menu">Disable IO-APIC</span><br />
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+	<p><span class="menu">Disable local APIC</span><br />
+		Disables using the local APIC, also disables SMP.</p>
+	<p><span class="menu">Disable SMP</span><br />
+		Disables all but one CPU core.</p>
+	<p><span class="menu">Don't call the BIOS</span><br />
+		Stops the system from calling BIOS functions.</p>
+	<p><span class="menu">Disable APM</span><br />
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+	<p><span class="menu">Disable ACPI</span><br />
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+	<p><span class="menu">Blacklist entries</span><br />
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
-	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
-	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
-<tr><td></td><td></td><td>If "Enable debug syslog" is activated, a warm reboot after a crash shows these additional options:</td></tr>
-<tr><td></td><td></td><td>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td></td></tr>
-	<tr><td><i>- Save syslog from previous session</i></td><td></td><td></td></tr>
-</table>
-</td></tr>
+	<p><span class="menu">Enable serial debug output</span><br />
+		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
+	<p><span class="menu">Enable on screen debug output</span><br />
+		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
+	<p><span class="menu">Disable on screen paging</span><br />
+		Disables paging when on screen debug output is enabled.</p>
+	<p><span class="menu">Enable debug syslog</span><br />
+		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
+	<p><span class="menu">Display current boot loader log</span><br />
+		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
+	<p><span class="menu">Add advanced debug option</span><br />
+		Allows advanced debugging options to be entered directly.</p></td></tr>
+<tr><td></td><td></td><td>If "<i>Enable debug syslog</i>" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
+		Saves the syslog from the previous Haiku session to /var/log/previous_syslog when booting.</p>
+	<p><span class="menu">Display syslog from previous session</span><br />
+		Displays the syslog from the previous Haiku session</p>
+	<p><span class="menu">Save syslog from previous session</span><br />
+		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
 <tr><td class="onelinetop"><b>Vyberte bezpečný grafický režim</b></td><td> </td><td>Ak ste museli aktivovať voľbu <i>Použiť bezpečný grafický režim</i>, tu môžete nastaviť rozlíšenie a farebnú hĺbku.</td></tr>
 </table>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
+<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../welcome/en/bugreports.html">bug report</a> in any case.</p>
+<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again to make things right by uninstalling the offending package again:</p>
+<ul>
+<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootScript from being started.</p></li>
+<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
+</ul>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="booting" name="booting">Booting Haiku</a></h2>
 <p>Po aktivovaní jednej alebo viacerých volieb sa vrátite do hlavného menu a môžete pokračovať v zavádzaní systému, ktoré sa nachádza na tejto obrazovke:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
 <p>Ak všetko funguje, postupne sa rozsvecuje jeden symbol za druhým.<br />
 Rozličné symboly zhruba zodpovedajú týmto fázam zavádzania:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atóm</b></td><td style="width:10px;"> </td><td>Inicializácia modulov.</td></tr>
-	<tr><td><b>Disk + lupa</b></td><td> </td><td>Vytvára sa rootfs (<span class="path">/</span>) a pripája sa devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Zásuvná karta</b></td><td> </td><td>Inicializuje sa správca zariadení.</td></tr>
-	<tr><td><b>Zavádzací disk</b></td><td> </td><td>Pripája sa zavádzací disk.</td></tr>
-	<tr><td><b>Čip</b></td><td> </td><td>Načítavajú sa moduly špecifické pre CPU.</td></tr>
-	<tr><td><b>Priečinok</b></td><td> </td><td>Konečná inicializácia subsystémov.</td></tr>
-	<tr><td><b>Raketa</b></td><td> </td><td>Zavádzací skript spúšťa systém.</td></tr>
+	<tr><td><b>Atóm</b></td><td style="width:10px;"> </td><td>Inicializácia modulov.</td></tr>
+	<tr><td><b>Disk + lupa</b></td><td> </td><td>Vytvára sa rootfs (<span class="path">/</span>) a pripája sa devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Zásuvná karta</b></td><td> </td><td>Inicializuje sa správca zariadení.</td></tr>
+	<tr><td><b>Zavádzací disk</b></td><td> </td><td>Pripája sa zavádzací disk.</td></tr>
+	<tr><td><b>Čip</b></td><td> </td><td>Načítavajú sa moduly špecifické pre CPU.</td></tr>
+	<tr><td><b>Priečinok</b></td><td> </td><td>Konečná inicializácia subsystémov.</td></tr>
+	<tr><td><b>Raketa</b></td><td> </td><td>Zavádzací skript spúšťa systém.</td></tr>
 </table>
 
 </div>
@@ -119,10 +152,10 @@ Rozličné symboly zhruba zodpovedajú týmto fázam zavádzania:</p>
 
 <div class="nav">
 <div class="inner"><span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Obsah</a> 
-::  <a href="filesystem-layout.html">Rozloženie súborového systému Haiku</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Obsah</a> 
+::  <a href="filesystem-layout.html">Rozloženie súborového systému Haiku</a>  »
 </span></div>
 </div>
 

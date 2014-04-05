@@ -48,22 +48,21 @@
 </ul>
 <span>
  «  <a href="stylededit.html">StyledEdit</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications (アプリケーション)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />ターミナル (Terminal)</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/ターミナル</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
+<tr><td>位置:</td><td></td><td><span class="path">/boot/system/apps/ターミナル</span></td></tr>
+<tr><td>設定ファイルの位置:</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
+<span class="path">~/.profile</span> -  <span class="path">/boot/system/settings/etc/profile</span> のデフォルトに追加 / 上書き<br />
+<span class="path">~/.inputrc</span> -  <span class="path">/boot/system/settings/etc/inputrc</span> のデフォルトに追加 / 上書き</td></tr>
 </table>
 <p><br /></p>
 <p>ターミナルは、Haiku の Bash (Bourne Again Shell) へのインターフェースです。</p>
@@ -72,13 +71,13 @@
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="windows-tabs" name="windows-tabs">ウィンドウとタブ</a></h2>
-<p>ターミナルは必要ならばいくつでも開くことができます。すでに実行中のターミナルから、<span class="key">ALT</span> <span class="key">N</span> で新しいウィンドウを開くか、<span class="key">ALT</span> <span class="key">T</span> でタブを開けます。</p>
+<p>必要ならばいくつでもターミナルを開けます。すでに実行中のターミナルから、<span class="key">ALT</span> <span class="key">N</span> で新しいウィンドウを開くか、または <span class="key">ALT</span> <span class="key">T</span> で新しいタブを開きます。</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p>タブの空白部分をダブルクリックすると新しいタブが開かれ、タブをダブルクリックするとタイトルを編集するダイアログが開かれます。％ で指定された変数はいくつかあり、テキストフィールドの上にマウスを移動させると説明がツールチップで表示されます。<br />
+<p>タブの空白部分をダブルクリックすると新しいタブが開かれ、タブをダブルクリックするとタイトルを編集するダイアログが開かれます。% で指定された変数はいくつかあり、テキストフィールドの上にマウスを移動させると説明がツールチップで表示されます。<br />
 標準 (<tt>%1d: %p</tt>) では、タブはカレントディレクトリを表示し、<tt>:</tt> で区切った後、現在実行中のプロセス(bash が実行中かアイドル中の場合は <tt>--</tt>) を表示します。上のスクリーンショットでは、<span class="path">Desktop</span> フォルダー内の FTP セッションを最初のタブで実行しており、二つ目のタブは、<span class="path">home</span> でアイドルしています。<br /><span class="menu">設定 | ウィンドウタイトル... (Edit | Window title...)</span> でターミナルのウィンドウタイトルも同様に編集できます。</p>
 <p>タブを右クリックすると <span class="menu">タブを閉じる (Close tab)</span> か、ダブルクリックのように、<span class="menu">タブタイトルの編集... (Edit tab title...)</span> をするコンテキストメニューが表示されます。</p>
-<p>ターミナルのウィンドウはほかのウィンドウのようにサイズを変更するか、<span class="menu">設定 | ウィンドウサイズ (Settings | Window size)</span> メニューでプリセットされたサイズを使うことができます。 <span class="key">ALT</span> <span class="key">ENTER</span> で全画面表示に切り替えます。</p>
+<p>ターミナルのウィンドウはほかのウィンドウのようにサイズを変更するか、<span class="menu">設定 | ウィンドウサイズ (Settings | Window size)</span> メニューでプリセットされたサイズを使えます。 <span class="key">ALT</span> <span class="key">ENTER</span> で全画面表示に切り替えます。</p>
 <p>変更されたウィンドウサイズと文字エンコーディングは、<span class="menu">設定 | デフォルトで保存 (Settings | Save as default)</span> を選択しなければ保存されません。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -86,7 +85,7 @@
 <p><span class="menu">設定 | 設定... (Settings | Settings...)</span> ではターミナルの標準設定を変更できます。</p>
 <img src="../images/apps-images/terminal-settings.png" alt="terminal-settings.png" />
 <br />
-<p>タブやウィンドウのタイトルの名前を付ける ”式” から始まります。ふたたび、ツールチップは利用可能な変数を表示します。その下ではフォントタイプ、フォントサイズやテキストの背景色を設定できます。<span class="menu">白地に黒文字 (Black on white)</span> のようなプリセット配色を選択するか、下にあるカラー選択を使って <span class="menu">カスタム (Custom)</span> 配色を作成できます。<br />
+<p>タブやウィンドウのタイトルの名前を付ける ”式” から始まります。この場合も、ツールチップは利用可能な変数を表示します。その下ではフォントタイプ、フォントサイズやテキストの背景色を設定できます。<span class="menu">白地に黒文字 (Black on white)</span> のようなプリセット配色を選択するか、下にあるカラー選択を使って <span class="menu">カスタム (Custom)</span> 配色を作成できます。<br />
 チェックボックスをオンにすると <span class="menu">実行中のプログラムがある場合、終了時に確認する (Confirm exit if active programs exist)</span> ことができ、プログラムが実行中にターミナルを終了しようとすると警告が出ます。<br />
 設定をファイルに保存でき、ファイルをダブルクリックすると設定されたターミナルが開きます。<br />
 <span class="button">OK</span> をクリックすると現在の設定をデフォルトとして保存します。</p>
@@ -95,15 +94,15 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="shortcuts" name="shortcuts">キーボードショートカット</a></h2>
 <p><a href="../keyboard-shortcuts.html#terminal">ショートカットとキーの組み合わせ</a>に、便利なショートカットの一覧が載っています。</p>
-<p>Another nice feature that is more a key &amp; mouse combination: When holding <span class="key">ALT</span> a path or URL under the mouse pointer gets highlighted. A left-click opens the file/folder or website. A right-click opens a context menu to either <span class="menu">Copy path</span> or <span class="menu">Copy absolute path</span>. Imagine you're in <span class="path">/MyData/source/haiku/</span> and have the path <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> under the mouse pointer, the latter menu item  will result in the combined, absolute path &lt;<i>deep breath</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span>.</p>
-<p>If you hold down <span class="key">ALT</span> <span class="key">SHIFT</span>, only the path from beginning to where your mouse pointer sits will be highlighted.</p>
-<p>By the way, right-clicking into the Terminal window will insert the clipboard. In combination with copying parts of highlighted paths, this can be used for speedy navigation of deep folder hierarchies.</p>
+<p>もうひとつの便利な機能として、キーボードとマウスのさらなる組み合わせがあります。 <span class="key">ALT</span> を押したままだと、マウスポインターの下のパスまたは URL が反転表示されます。左クリックでファイル / フォルダーあるいはウェブサイトが開きます。右クリックで <span class="menu">Copy path</span> (パスをコピー)または <span class="menu">Copy absolute path</span> (絶対パスをコピー) のコンテクストメニューが開きます。ユーザーが <span class="path">/MyData/source/haiku/</span> にいるとして、マウスポインターの下側のパスが <span class="path">generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> であるとすると、後者のメニューは結合された絶対パス&lt;<i>深呼吸</i>&gt;:<br /> <span class="path">/MyData/source/haiku/generated/objects/haiku/x86_gcc2/release/apps/stylededit/StyledEdit</span> となります。</p>
+<p><span class="key">ALT</span> <span class="key">SHIFT</span> を押したままの場合は、マウスポインターがさすところまでのパスが反転表示されます。</p>
+<p>ところで、ターミナルウィンドウ内で右クリックすると、クリップボードの内容を挿入します。これと反転表示されたパスのコピーとを組み合わせると、深いフォルダー階層の素早いナビゲーションに使えます。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Bash カスタマイズ</a></h2>
-<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
-Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/settings/etc/</span>.</p>
+<p>bash は Unix 由来なので、カスタマイズする方法は数え切れないほどあります。ユーザーにとって重要なファイルは、<span class="cli">.profile</span> と <span class="cli">.inputrc</span> の 2 つです。<br />
+ファイルは両方とも <span class="path">home/</span> 内に作成することができ、<span class="path">/boot/system/settings/etc/</span> で設定されたシステムデフォルトを上書きできます。</p>
 
 <h3>.profile</h3>
 <p><span class="cli">.profile</span> は新しいターミナルを開くたびにロードされます。bash の動作に影響するさまざまなエイリアスや変数を設定します。これについてのヘルプはオンラインで見つけられるでしょう。</p>
@@ -114,21 +113,21 @@ Both files can be created in the <span class="path">home/</span> folder and add 
 <li><a href="http://betips.net/1997/09/09/enhancing-bash/">bash の強化</a></li>
 <li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">カスタムキーボードショートカット</a></li>
 </ul>
-<p>より多くのヘルプは、<a href="http://betips.net/index.php?s=.profile">こちらへ</a>。</p>
+<p>追加のヘルプは、<a href="http://betips.net/index.php?s=.profile">こちらへ</a>。</p>
 
 <h3>.inputrc</h3>
-<p><span class="cli">.inputrc</span> はキーバインドに対して働きます。Haiku は便利なデフォルトを提供するので、読者が詳細設定を変更する必要はないでしょう。特別なキーバインドが必要になった場合は、<a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a> などのオンラインリソースを見てください。</p>
+<p><span class="cli">.inputrc</span> はキーバインドに対応します。Haiku は便利なデフォルトを提供するので、読者が詳細設定を変更する必要はないでしょう。特別なキーバインドが必要になった場合は、<a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a> などのオンラインリソースを見てください。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hints" name="hints">ターミナルで作業するためのヒント</a></h2>
 <ul><li><p>
-ファイルやフォルダーを Tracker ウィンドウからターミナルにドラッグすると、カーソルの場所にファイルやフォルダーの場所を挿入します。右クリックでドラッグすると、次のようなアクションがコンテキストメニューに表示されます。</p>
+ファイルやフォルダーを Tracker ウィンドウからターミナルにドラッグすると、カーソル位置にファイルやフォルダーの場所を挿入します。右クリックでドラッグすると、次のようなアクションがコンテキストメニューに表示されます。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">パスを挿入 (Insert path)</span></td><td> </td><td>左クリックと同様、ファイルの場所を挿入します。</td></tr>
 <tr><td><span class="menu">ディレクトリを変更 (Change directory)</span></td><td> </td><td>ドラッグされたファイルのフォルダーへディレクトリを変更します。</td></tr>
 <tr><td><span class="menu">カレントディレクトリにリンク作成 (Create link here)</span></td><td> </td><td>現在ターミナルで作業中のディレクトリにドラッグされたファイルのリンクを作成します。</td></tr>
-<tr><td><span class="menu">カレントディレクトリへ移動 (Move here)</span></td><td> </td><td>ドラッグされたファイルをカレントディレクトリへ移動させます。</td></tr>
+<tr><td><span class="menu">カレントディレクトリへ移動 (Move here)</span></td><td> </td><td>ドラッグされたファイルをカレントディレクトリへ移動します。</td></tr>
 <tr><td><span class="menu">カレントディレクトリへコピー (Copy here)</span></td><td> </td><td>ドラッグされたファイルをカレントディレクトリにコピーします。</td></tr>
 </table></li>
 <li><p><span class="cli">open <i>[filename]</i></span> コマンドでどのファイルも標準アプリケーションで開くことができます。
@@ -144,7 +143,7 @@ Both files can be created in the <span class="path">home/</span> folder and add 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="stylededit.html">StyledEdit</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications (アプリケーション)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="textsearch.html">TextSearch</a>  »
 </span></div>
 </div>

@@ -61,7 +61,40 @@
 <tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Documentation is still missing. If you want to work on it, please announce it on the <a href="http://www.freelists.org/list/haiku-doc">Documentation mailing list</a> to avoid duplication.</p>
+<p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories (also called "depots") and install, update and uninstall packages.</p>
+<img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
+
+<h3>The Filter</h3>
+<p>At the top we find a few means to filter the list of available packages below:</p>
+<ul>
+<li><p>The <span class="menu">Show</span> pop-up menu lets you limit the list to individual categories like "<i>Audio</i>" or "<i>Games</i>". You can also have only your already installed packages displayed or those that have an update available.</p></li>
+<li><p>The <span class="menu">Depot</span> pop-up menu lets you limit the list to only show packages from certain repositories,</p></li>
+<li><p>The <span class="menu">Search terms</span> text field lets you filter the list to the keywords you enter.</p></li>
+</ul>
+
+<h3>The List</h3>
+<p>Like in any Tracker window, you can choose from a context menu which columns to display by right-clicking the column heading. A left-click sorts the list according to that column. Of course, you can rearrange the columns by dragging them to a new position.</p>
+<p>The status column of a package can have one of several states:</p>
+<ul>
+<li><p><span class="menu">Available</span>: The package exists in that depot and can be downloaded and installed. If there are any dependencies on other packages, you'll be informed of that while installing and get the choice of downloading/installing all that's necessary.</p></li>
+<li><p><span class="menu">Active</span>: The package is currently installed and ready to be used.</p></li>
+<li><p><span class="menu">Update available</span>: There's a newer version than your installed one available.</p></li>
+</ul>
+<p>You can grab the dotted line between the packages list and the info area to vertically resize the packages list.</p>
+
+<h3>The Info Area</h3>
+<p>At the bottom is an area that displays information on the package that is currently selected in the list above it.<br />
+To the right of package name, author, rating and version is a button, that – depending on the current state of the package – lets you <span class="button">Install</span>, <span class="button">Uninstall</span> or <span class="button">Update</span> it.</p>
+<p>Below are three tabs:</p>
+<ul>
+<li><p><span class="menu">About</span> has a more detailed description of the package, as well as screenshots and a contact address and URL of the team that maintains the packaged software, if available.</p></li>
+<li><p><span class="menu">Ratings</span> shows ratings and comments of users, if available. With the little thumb up/down icons to the right, you can show your approval or disapproval with a certain comment.</p></li>
+<li><p><span class="menu">Changelog</span> show the detailed history of all the  versions of the package that have been released so far.</p></li>
+</ul>
+
+<h3>Tools and Options</h3>
+<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh depots</span>. This will request an up-to-date list of all available packages from the repositories.</p>
+<p>Under <span class="menu">Options</span> you can choose to also <span class="menu">Show develop packages</span> and <span class="menu">Show source packages</span> in the packages list. For the normal user those are of no interest and would only clutter the list. They are important, however, for people who need the libraries, headers etc. of a package to develop and compile programs depending on them.</p>
 
 </div>
 </div>

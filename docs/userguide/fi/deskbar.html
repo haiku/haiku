@@ -55,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -84,20 +85,16 @@
 <li><p><b>Työpöytäpalkkiasetukset...</b> - Avaa paneelin Työpöytäpalkin asetuksia varten (katso alla).</p></li>
 <li><p><b>Sammuttaminen</b> - Avaa valitsimet joko <span class="menu">Käynnistä järjestelmä uudelleen</span> tai <span class="menu">Sammuta virta</span>.</p></li>
 <li><p><b>Äskettäiset asiakirjat, kansiot ja sovellukset</b> - Viimeiseksi avattujen asiakirjojen, kansioiden ja sovellusten luettelo (katso <span class="menu">Työpöytäpalkkiasetukset</span> alla).</p></li>
-<li><p><b>Sovellukset, Esittelyohjelmat, Työpöytäsovelmat ja Asetusohjelmat</b> - Asennettujen sovellusten, esittelyohjelmien, sovelmien ja asetusohjelmien luettelo.<br />Voit lisätä linkin muihin ohjelmiin (tai mihin tahansa kansioon, asiakirjaan, kyselyyn jne.) laittamalla ne kansioon <span class="path">~/config/settings/deskbar</span>.</p></li>
+<li><p><b>Applications, Demos, Deskbar applets, Preferences</b> - List of installed applications, demos, applets and preferences.<br />You can add links to other programs (or any folder, document, query etc.) by putting them into <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Työpöytäpalkin asetukset</h3>
-<h4>Valikko</h4>
-<p>Samalla kun pari ensimmäistä Työpöytäpalkin valikkoriviä ovat kiinteitä, voit muokata <span class="menu">Sammuttaminen...</span> rivin alapuolella olevia.</p>
-<img src="images/deskbar-images/prefs-menu.png" alt="prefs-menu.png" />
-<p>Tässä voit asettaa Työpöytäpalkin valikossa näkyvien äskettäisten asiakirjojen, kansioiden ja sovellusten lukumäärän, tai haluatko nähdä niitä ollenkaan.<br />Painike <span class="button">Muokkaa valikkoa...</span> avaa kansion <span class="path">~/config/settings/deskbar</span>. Siitä löydät tiedostot ja kansiot, jotka ilmaantuvat Työpöytäpalkkiin. Oletuksena nämä ovat <span class="menu">Asetusohjelmat</span>, <span class="menu">Esittelyohjelmat</span>, <span class="menu">Sovellukset</span>, ja <span class="menu">Työpöytäsovelmat</span>.<br />Voit poistaa ja lisätä kohteita kuten linkkejä sovelluksiin, asiakirjoihin tai jopa kyselyjä yksinkertaisesti kopioimalla/poistamalla niitä tästä kansiosta tai tähän kansioon.</p>
-<p>Vielä yksinkertaisempaa on raahata tiedosto, kansio tai tallennettu kysely ja pudottaa se sinne minne haluat sen Työpöytäpalkissa.</p>
+<img src="images/deskbar-images/prefs-deskbar.png" alt="prefs-deskbar.png" />
+<p>The Deskbar preference panel is devided into three sections.</p>
 
 <h4>Sovellukset</h4>
 <p>Seuraava asetus ei koske asennettuja sovelluksia, mutta suoritettavien sovellusten luettelon käyttäytymistä ja ulkonäköä.</p>
-<img src="images/deskbar-images/prefs-apps.png" alt="prefs-apps.png" />
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Lajittele suoritettavat sovellukset</span></td><td> </td><td>Lajittelee suoritettavat ohjelmat aakkosjärjestykseen.</td></tr>
 <tr><td><span class="menu">Seuraaja aina ensimmäisenä</span></td><td> </td><td>Vieläpä silloin, kun sovellukset on lajiteltu aakkosjärjestykseen, Seuraaja on aina ensimmäisenä luettelossa.</td></tr>
@@ -107,14 +104,21 @@
 <tr><td><span class="menu">Kuvakekoko</span></td><td> </td><td>Säätää suoritettavien sovellusten kuvakekoon.</td></tr>
 </table>
 
+<h4>Valikko</h4>
+<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
+Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
+The button <span class="button">Edit menu...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
+You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>Vielä yksinkertaisempaa on raahata tiedosto, kansio tai tallennettu kysely ja pudottaa se sinne minne haluat sen Työpöytäpalkissa.</p>
+
 <h4>Ikkuna</h4>
-<p>Viimeinen välilehti sisältää Työpöytäpalkki-ikkunan asetukset.</p>
-<img src="images/deskbar-images/prefs-window.png" alt="prefs-window.png" />
+<p>Finally, the preferences for the Deskbar window.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Aina päällimmäisenä</span></td><td> </td><td>Työpöytäpalkki pysyy aina kaikkien muiden ikkunoiden päällä.</td></tr>
 <tr><td><span class="menu">Nosta automaattisesti</span></td><td> </td><td>Työpöytäpalkki ponnahtaa etualalle, jos hiiren kohdistin koskettaa sitä.</td></tr>
 <tr><td><span class="menu">Piilota automaattisesti</span></td><td> </td><td>Työpöytäpalkki on pienennetty vain muutaman pikselin kokoiseksi ja ponnahtaa näkyviin vain, jos hiiren kohdistin koskettaa niitä.</td></tr>
 </table>
+
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">Tarjotin</a></h2>

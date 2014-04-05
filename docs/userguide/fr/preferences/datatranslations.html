@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -69,25 +69,31 @@
 <p>En fonction de ses aptitudes, chaque traducteur vous proposera des réglages différents. Au minimum, vous obtiendrez un bouton <span class="button">Info...</span> qui ouvre une fenêtre avec les crédits et le chemin d'installation.<br />
 Le tableau suivant donne un aperçu des traducteurs par défaut avec leurs options les plus utiles.</p>
 <table summary="translators" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">BMP Images</span></td><td>24 bits, non compressé, sans transparence</td></tr>
-<tr><td><span class="menu">EXR Images</span></td><td>Format d'image à grande gamme dynamique (HDR), conçu par <acronym title="Industrial Light &amp; Magic">ILM</acronym></td></tr>
-<tr><td><span class="menu">GIF Images</span></td><td>8 bits, compression sans pertes, transparence<br />
+<tr><td><span class="menu">Icône Apple</span></td><td>Les tailles d'images valides sont 16, 32, 48, 128, 256, 512 et 1024 (RGB32 and RGBA32)</td></tr>
+<tr><td><span class="menu">Image BMP</span></td><td>24 bits, non compressé, sans transparence</td></tr>
+<tr><td><span class="menu">Image EXR</span></td><td>Format d'image à grande gamme dynamique (HDR), conçu par <acronym title="Industrial Light &amp; Magic">ILM</acronym></td></tr>
+<tr><td><span class="menu">Image GIF</span></td><td>8 bits, compression sans pertes, transparence<br />
 Vous pouvez réduire la taille des fichiers GIF en réduisant le nombre de couleurs et la taille de la palette.<br />
 Vous pouvez enregistrer des images avec transparence, soit en utilisant un canal alpha, soit en choisissant manuellement la valeur RVB qui sera transparente.</td></tr>
-<tr><td><span class="menu">JPEG2000 Images</span></td><td>24 bits, compression avec pertes, pas de transparence<br />
+<tr><td><span class="menu">Icône HVIF</span></td><td>Icône vectorielle au format Haiku</td></tr>
+<tr><td><span class="menu">Image JPEG2000</span></td><td>24 bits, compression avec pertes, pas de transparence<br />
 Le paramètre le plus important est celui réglant la qualité de sortie.</td></tr>
-<tr><td><span class="menu">JPEG Images</span></td><td>24 bits, compression avec pertes, pas de transparence<br />
+<tr><td><span class="menu">Image JPEG</span></td><td>24 bits, compression avec pertes, pas de transparence<br />
 En plus du réglage de qualité de sortie, vous pouvez activer l'adoucissement (smoothing) qui réduira les artefacts mais peut rendre l'image légèrement floue.</td></tr>
-<tr><td><span class="menu">PCX Images</span></td><td>24 bits, non compressé, pas de transparence — Format d'échange Paintbrush</td></tr>
-<tr><td><span class="menu">PNG Images</span></td><td>32 bits, compression sans perte, avec transparence</td></tr>
-<tr><td><span class="menu">PPM Images</span></td><td>24 bit, non compressé, pas de transparence — Format Portable PixMap</td></tr>
-<tr><td><span class="menu">RAW Images</span></td><td>jusqu'à 48 bits, non compressé, pas de transparence</td></tr>
-<tr><td><span class="menu">RTF Text Files</span></td><td>Texte avec mise en forme</td></tr>
-<tr><td><span class="menu">SGI Images</span></td><td>24 bits, compression sans pertes optionnelle, transparence</td></tr>
-<tr><td><span class="menu">StyledEdit Files</span></td><td>Texte avec mise en forme</td></tr>
-<tr><td><span class="menu">TGA Images</span></td><td>32 bits, compression sans pertes optionnelle, transparence</td></tr>
-<tr><td><span class="menu">TIFF Images</span></td><td>24 bits, compression sans pertes optionnelle, transparence</td></tr>
-<tr><td class="onelinetop"><span class="menu">WonderBrush Images</span></td><td>32 bits, calques, transparence, données vectorielles/bitmap</td></tr>
+<tr><td><span class="menu">Image PCX</span></td><td>24 bits, non compressé, pas de transparence — Format d'échange Paintbrush</td></tr>
+<tr><td><span class="menu">Image Photoshop</span></td><td>32bit, compression sans pertes, transparence<br />
+Le traducteur réduit tous les calques à un seul calque bitmap.</td></tr>
+<tr><td><span class="menu">Image PNG</span></td><td>32 bits, compression sans perte, avec transparence</td></tr>
+<tr><td><span class="menu">Image PPM</span></td><td>24 bit, non compressé, pas de transparence — Format Portable PixMap</td></tr>
+<tr><td><span class="menu">Image RAW</span></td><td>jusqu'à 48 bits, non compressé, pas de transparence</td></tr>
+<tr><td><span class="menu">Texte RTF</span></td><td>Texte avec mise en forme</td></tr>
+<tr><td><span class="menu">Image SGI</span></td><td>24 bits, compression sans pertes optionnelle, transparence</td></tr>
+<tr><td><span class="menu">Texte StyledEdit</span></td><td>Texte brut avec un attribut de mise en forme</td></tr>
+<tr><td><span class="menu">Image TGA</span></td><td>32 bits, compression sans pertes optionnelle, transparence</td></tr>
+<tr><td><span class="menu">Image TIFF</span></td><td>24 bits, compression sans pertes optionnelle, transparence</td></tr>
+<tr><td><span class="menu">Image WebP</span></td><td>Format d'image 8-bit YUV 4:2:0, compressé, sans transparence</td></tr>
+<tr><td><span class="menu">Icône Windows</span></td><td>Les tailles d'images valides sont 16, 32 et 48</td></tr>
+<tr><td class="onelinetop"><span class="menu">Image WonderBrush</span></td><td>32 bits, calques, transparence, données vectorielles/bitmap</td></tr>
 </table>
 <p><br /></p>
 <div class="box-info">Les copies d'écran, les graphiques, les dessins en noir et blanc et d'autres image avec peu de couleurs devraient être de préférence enregistrées en GIF (jusqu'à 256 couleurs) ou PNG (milions de couleurs). Si vous choisissez le format JPEG, par exemple, l'image compressée présentera des artéfacts, sans gain réelle sur la taille compressée.</div>

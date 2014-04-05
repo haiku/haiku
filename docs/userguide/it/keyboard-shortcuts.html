@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -71,26 +71,45 @@
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">ALT</span> <span class="key">Fx</span></td><td style="width:15px;"></td><td>Passa allo <a href="workspaces.html">Spazio di lavoro</a> X (<span class="key">Fx</span> è il tasto di funzione corrispondente a tale area di lavoro), è possibile trascinare la finestra attiva usando il tasto <span class="key">SHIFT</span>.</td></tr>
 <tr><td class="onelinetop"><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Permette di navigare spazialmente tra le righe/colonne delle aree di lavoro disponibili, è sufficiente aggiungere <span class="key">SHIFT</span> per trascinare la finestra attiva verso il nuovo workspace.</td></tr>
+<tr><td> </td></tr>
 <tr><td><span class="key">OPT</span></td><td></td><td>Holding <span class="key">OPT</span> while dragging a window near another window's tab or border will stack or tile them (see chapter <a href="gui.html#stack-tile">GUI</a>).</td></tr>
+<tr><td><span class="key">OPT</span><span class="key">↑</span> / <span class="key">↓</span></td><td></td><td>Cycles through the open windows within the current workspace.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + left mouse</td><td></td><td>Click and drag with left mouse button to move a window (see chapter <a href="gui.html#move-resize">GUI</a>).</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> + right mouse</td><td></td><td>Click and drag with right mouse button to resize a window (see chapter <a href="gui.html#move-resize">GUI</a>).</td></tr>
+<tr><td> </td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Esegue lo zoom di una finestra ad un'altra dimensione (usa la dimensione massima per la maggior parte delle applicazioni).</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span></td><td></td><td>Minimizza la finestra attiva.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">H</span></td><td></td><td>Nasconde (minimizza) tutte le finestre dell'applicazione attiva.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Pulls the active window to the front (only applicable with the mouse setting <a href="preferences/mouse.html">Focus Follows Mouse</a>).</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Invia la finestra attiva sotto tutte le altre.</td></tr>
+<tr><td> </td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">TAB</span></td><td></td><td>Quando viene premuta la combinazione appare il <a href="twitcher.html">Twitcher</a>.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span></td><td></td><td>Apre il <a href="teammonitor.html">Team Monitor</a>.</td></tr>
+<tr><td> </td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">ESC</span></td><td></td><td>Entra nella barra dei menu (si chiude con <span class="key">ESC</span>).</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>Copia la selezione negli appunti.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">X</span></td><td></td><td>Taglia la selezione negli appunti.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">V</span></td><td></td><td>Incolla il contenuto degli appunti.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">W</span></td><td></td><td>Chiude la finestra attiva.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">Q</span></td><td></td><td>Esce da un'applicazione.</td></tr>
+<tr><td> </td></tr>
 <tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Cattura subito un'immagine e lancia il pannello <a href="applications/screenshot.html">Screenshot</a>.</td></tr>
 <tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Cattura un'immagine silenziosamente (senza aprire il pannello), pur rispettando le ultime impostazioni utilizzate.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Crea un'istantanea usando le proprie impostazioni, ma invece di salvarlo come file, viene soltanto copiato negli appunti.</td></tr>
 </table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="textediting" name="textediting">Textediting shortcuts</a></h2>
+<p>Whenever you edit text – be it when renaming a file in Tracker, editing a file in StyledEdit, or chatting in Vision – there are some universal shortcuts:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">←</span> / <span class="key">→</span> or<br /><span class="key">OPT</span> <span class="key">←</span> / <span class="key">→</span></td><td style="width:15px;"></td><td>Jump word-wise through the text. (Note: It may be useful to get used to using the <span class="key">OPT</span> combination. Then you're all set if some app already uses the <span class="key">ALT</span> combination for another command.)</td></tr>
+<tr><td><span class="key">HOME</span></td><td></td><td>Jumps to the beginning of the line.</td></tr>
+<tr><td><span class="key">END</span></td><td></td><td>Jumps to the end of the line.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">HOME</span></td><td></td><td>Jumps to the beginning of the document.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">END</span></td><td></td><td>Jumps to the end of the document.</td></tr>
+</table>
+<p>Holding <span class="key">SHIFT</span> additionally when using the above key combinations will select the text between the cursor jumps.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -103,6 +122,7 @@
 <tr><td><span class="key">MENU</span></td><td></td><td>Apre il menu della Deskbar (chiude con <span class="key">ESC</span>).</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Annulla l'ultima azione, la cronologia degli annullamenti è limitata solo dalla memoria disponibile. Nota, l'operazione funziona per azioni effettuate sul file stesso, quindi non sarà possibile usarla per annullare modifiche agli attributi oppure ai permessi. Inoltre, quando un file viene rimosso dal <i>Cestino</i> non potrà essere recuperato.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">Z</span></td><td></td><td>Ripristina l'azione appena annullata con <span class="key">ALT</span> <span class="key">Z</span>.</td></tr>
+<tr><td><span class="key">SHIFT</span> + Mousewheel</td><td></td><td>When scrolling through a long list of files in a Tracker window or when you're <a href="tracker.html#navigating">drilling down submenus</a>, this will speed things up by doing page-wise scrolling.</td></tr>
 </table>
 
 <h2>

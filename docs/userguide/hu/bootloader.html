@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,10 +46,10 @@
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Tartalom</a> 
-::  <a href="filesystem-layout.html">Fájlrendszer felépítése</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="filesystem-layout.html">Fájlrendszer felépítése</a>  »
 </span></div>
 </div>
 
@@ -61,58 +61,91 @@
 <p>A Haiku rendszertöltő segíthet megtalálni a számítógép hibáit, illetve kiválaszthatjuk az indítani kívánt rendszert, ha több Haiku is elérhető (például CD-n vagy USB-n).<br />
 Ez akkor is hasznos lehet, ha valamely telepített összetevő miatt a rendszer nem tud elindulni. A <i>Disable user add-ons (felhasználói kiegészítők tiltása)</i> opció használatával például a rendszer a felhasználó által telepített eszközvezérlők betöltése nélkül indítható.</p>
 <p>A rendszertöltőbe való belépéshez tartsuk lenyomva a <span class="key">SHIFT</span> billentyűt, mielőtt a Haiku betöltési folyamat elindul (mielőtt megjelenik a Haiku logó). Ha rendszerválasztó menü is van telepítve, akkor tartsuk lenyomva a <span class="key">SHIFT</span>-et mielőtt kiválasztjuk az indítandó rendszert. Ha csak Haiku van a gépünkön, akkor ajánlott már akkor lenyomva tartani a billentyűt, amikor még a BIOS üzenetei vannak a képernyőn.</p>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="options" name="options">A rendszer betöltésekor elérhető opciók</a></h2>
 <p>A rendszertöltő elindulása után az alábbi menük/lehetőségek tárulnak elénk:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b><br />Rendszer kiválasztása</td><td> </td><td>Az indítandó Haiku kiválasztása.</td></tr>
 <tr><td><b>Select safe mode options</b><br />Biztonsági opciók
 </td><td> </td><td>A következő opciók hibakereséskor lehetnek hasznunkra. Az opciók kijelölésekor a képernyő alján egy rövid leírást olvashatunk a hatásukról.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Safe mode</i></td><td width="15"></td><td>biztonsági mód</td></tr>
-	<tr><td><i>- Disable user add-ons</i></td><td></td><td>felhasználói kiegészítők tiltása</td></tr>
-	<tr><td><i>- Disable IDE DMA</i></td><td></td><td>DMA tiltása</td></tr>
-	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i></td><td></td><td>biztonsági videó mód</td></tr>
-	<tr><td><i>- Don't call the BIOS</i></td><td></td><td>BIOS hívások tiltása</td></tr>
-	<tr><td><i>- Disable APM</i></td><td></td><td>APM tiltása</td></tr>
-	<tr><td><i>- Disable ACPI</i></td><td></td><td>ACPI tiltása</td></tr>
-	</table>
-</td></tr>
-<tr><td><b>Select debug options</b><br />Hibakereső opciók
+	<p><span class="menu">Safe mode</span> (Biztonsági mód)<br />
+		A rendszert biztonsági módba állítja. Ez a többi opciótól függetlenül engedélyezhető.</p>
+	<p><span class="menu">Disable user add-ons</span> (Felhasználói kiegésztők tiltása)<br />
+		Minden a felhasználó által telepített kiegészítő betöltésének megakadályozása. Csak a rendszer mappában lévő kiegészítők töltődnek be. Bővebben a <a href="#troubleshooting">Hibelhárítás</a> szakaszban.</p>
+	<p><span class="menu">Disable IDE DMA</span> (IDE DMA tiltása)<br />
+		Letiltja az IDE DMA-t, megnöveli az IDE kompatibilitást a teljesítmény rovására.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span> (A 4 GiB feletti memória tiltása)<br />
+		A rendszer kernel beállításait felülbírálva letiltható  4 GiB feletti memória terület.
+</p>
+	<p><span class="menu">Use fail-safe video mode</span> (Biztonsági videó mód)<br />
+		A rendszer csak a VESA módot fogja használni, megakadályozza minden egyéb grafikus vezérlő betöltését.</p>
+	<p><span class="menu">Disable IO-APIC</span> (IO APIC tiltása)<br />
+		Letiltja az IO APIC megszakítás-kiosztását, helyette a hagyományos PIC használatát erőlteti.</p>
+	<p><span class="menu">Disable local APIC</span> (Helyi APIC tiltása)<br />
+		A helyi APIC tiltása az SMP tiltásával együtt.</p>
+	<p><span class="menu">Disable SMP</span> (SMP tiltása)<br />
+		Egy kivételével az összes processzormagot letiltja.</p>
+	<p><span class="menu">Don't call the BIOS</span> (BIOS hívások tiltása)<br />
+		Letiltja a rendszert hívó BIOS funkciókat.</p>
+	<p><span class="menu">Disable APM</span> (APM tiltása)<br />
+		Letiltja a bővített energiagazdálkodást. Ezzel felül bírálja a kernelben megadott APM beállítást is.</p>
+	<p><span class="menu">Disable ACPI</span> (ACPI tiltása)<br />
+		Letiltja a bővített konfigurációs és energia vezérőt. Ezzel felül bírálja a kernelben megadott ACPI beállítást is.</p>
+	<p><span class="menu">Blacklist entries</span> (Feketelista)<br />
+		Lehetőséget nyújt arra, hogy rendszer fájlok betöltését mellőzzük induláskor. Hasznos lehet, ha például egy eszköz vezérlőt ideiglenesen le akarunk tiltani. Bővebben a <a href="#troubleshooting">Hibaelhárítás</a> szakaszban.</p></td></tr>
+<tr><td><b>Debug menu</b><br />Hibakereső menü
 </td><td> </td><td>Az alábbi opciók segítséghetnek a hiba keresésben illetve a hiba <a href="../welcome/hu/bugreports.html">jelentésében</a>. Szintén kapunk egy kis leírást a képernyő alján ha kiválasztunk egy opciót.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td>sorosporti hibakeresés engedélyezése</td></tr>
-	<tr><td><i>- Enable on screen debug output</i></td><td></td><td>képernyőn történő hibakeresés engedélyezése</td></tr>
-	<tr><td><i>- Disable on screen paging</i></td><td></td><td>lapozás tiltása a képernyőn</td></tr>
-	<tr><td><i>- Enable debug syslog</i></td><td></td><td>hibakereső naplózás engedélyezése</td></tr>
-	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>jelenlegi rendszertöltő napló megjelenítése (kilépés a <span class="key">Q</span> lenyomásával)</td></tr>
-	<tr><td><i>- Add advanced debug option</i></td><td></td><td>további hibakereső opciók</td></tr>
-</table>
-</td></tr>
-<tr><td></td><td></td><td>Ha az "Enable debug syslog" engedélyezve van, hiba utáni újraindítás esetén a következő opciók is megjelennek:</td></tr>
-<tr><td></td><td></td><td>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td class="onelinetop"><i>- Display syslog from previous session</i></td><td></td><td>a legutóbbi napló megjelenítése</td></tr>
-	<tr><td><i>- Save syslog from previous session</i></td><td></td><td>a legutóbbi napló mentése</td></tr>
-</table>
-</td></tr>
+	<p><span class="menu">Enable serial debug output</span> (Soros porton történő hibakeresés engedélyezése)<br />
+		A naplózást a soros portra irányítja át (eredeti beállítások: 115200, 8N1).</p>
+	<p><span class="menu">Enable on screen debug output</span> (Képernyőn történő hibakeresés engedélyezése)<br />
+		A szokásos logó helyett a rendszer napló látható betöltéskor a képernyőn.</p>
+	<p><span class="menu">Disable on screen paging</span> (Képernyőn való lapozás tiltása)<br />
+		Ha a képernyőn történő hibakeresés engedélyezve van, akkor letiltja a kézzel történő lapozást.</p>
+	<p><span class="menu">Enable debug syslog</span> (Hibakereső naplózás engedélyezése)<br />
+		Engedélyezi a rendszernapló a memória egy speciális területén való eltárolását, így újraindítás után is elérhető lesz.</p>
+	<p><span class="menu">Display current boot loader log</span> (A jelenlegi rendszertöltő naplójának megtekintése)<br />
+		Megjeleníti a jelenlegi, már összegyűjtött hibakereső információkat (a <span class="key">Q</span> lenyomásával kiléphetünk).</p>
+	<p><span class="menu">Add advanced debug option</span> (További hibakereső opciók)<br />
+		További opciók megadása.</p></td></tr>
+<tr><td></td><td></td><td>Ha az "<i>Enable debug syslog</i>" engedélyezve van, hiba utáni újraindítás esetén a következő opciók is megjelennek:</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span> (Az előző munkamenet naplójának mentése betöltés közben)<br />
+		Az előző Haiku munkamenet naplójának mentése a /var/log/previous_syslog fájlba a rendszer betöltésekor.</p>
+	<p><span class="menu">Display syslog from previous session</span> (Előző munkamenet naplójának megjelenítése)<br />
+		A legutóbbi munkamenetben összegyűjtött hibakeresési információk megjelenítse.</p>
+	<p><span class="menu">Save syslog from previous session</span> (Előző munkamenet naplójának elmentése)<br />
+		A legutóbbi munkamenetben összegyűjtött hibakeresési információk elmentése lemezre. Jelenleg csak FAT32 fájlrendszerű lemezek használhatóak.</p></td></tr>
 <tr><td class="onelinetop"><b>Select fail safe video mode</b><br />Biztonsági videó mód választása</td><td> </td><td>Ha bejelöljük a <i>Use fail-safe video mode</i>-ot (biztonsági videó mód), akkor kiválaszthatjuk a felbontást és a színmélységet.</td></tr>
 </table>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="troubleshooting" name="troubleshooting">Hibaelhárítás</a></h2>
+<p>Ha a Haiku elsőre nem tud elindulni, akkor ajánlott kipróbálni néhány hibakeresési opciót a <span class="menu">Select safe mode options</span> menüben. Továbbá egy <a href="../welcome/en/bugreports.html">hibajelentést</a> is lehet küldeni.</p>
+<p>Az is lehetséges, hogy a Haiku csak egy újonnan feltelepített program, eszközvezérlő miatt nem indul el. Ekkor több lehetőségünk is van hogy újra be tudjuk tölteni a rendszerünket, például a feltelepített csomag eltávolításával:</p>
+<ul>
+<li><p>A <span class="menu">Safe mode</span> engedélyezésével megakadályozhatjuk a legtöbb szerver, démon elindítását illetve a UserBootScript végrehajtását.</p></li>
+<li><p>A <span class="menu">Disable user add-ons</span> aktiválásával elkerülhetjük az általunk feltelepített kiegészítők (vezérlők, értelmezők, stb.) betöltését, használatát.</p></li>
+<li><p>Ha az érintett vezérlő, kiegészítő, stb rendszer szinten van telepítve, akkor a helyzet kicsit nehezebb. Itt kap szerepet a <span class="menu">Blacklist entries</span>. Használatakor az egész fájlrendszeren végig mehetünk és letilthatjuk a szükséges összetevőket. A kiválasztás a <span class="key">SPACE</span> vagy <span class="key">RETURN</span> billentyűvel történik. Az <span class="key">ESC</span> lenyomásával egy szintel feljebb mehetünk.</p>
+<p>Az interneten olvasható egy cikk (<a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a>) arról, hogy hogyan tudjuk véglegesíteni ezeknek az összetevőknek a letiltását.</p></li>
+</ul>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="booting" name="booting">A Haiku indítása</a></h2>
 <p>Ha bejelöltük a megfelelő opciókat, utána térjünk vissza a főmenübe, majd folytassuk a betöltést. Ez a következő képernyőt eredményezi:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
 <p>Ha minden rendben megy, akkor az összes szimbólum gyorsan aktívvá válik.<br />
 A különféle szimbólumok az alábbi betöltési szakaszokat jelölik:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>A modulok betöltése.</td></tr>
-	<tr><td><b>Lemez nagyítóval</b></td><td> </td><td>A gyökér fájlrendszer (<span class="path">/</span>) és az eszközök fájlrendszer (<span class="path">/dev</span>) létrehozása.</td></tr>
-	<tr><td><b>Csatolókártya</b></td><td> </td><td>Eszközkezelő betöltése.</td></tr>
-	<tr><td><b>Rendszerlemez</b></td><td> </td><td>Rendszerlemez csatolása.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Processzor-függő modulok betöltése.</td></tr>
-	<tr><td><b>Mappa</b></td><td> </td><td>Alrendszerek betöltése.</td></tr>
-	<tr><td><b>Rakéta</b></td><td> </td><td>A betöltő-szkript elindítja a rendszert.</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>A modulok betöltése.</td></tr>
+	<tr><td><b>Lemez nagyítóval</b></td><td> </td><td>A gyökér fájlrendszer (<span class="path">/</span>) és az eszközök fájlrendszer (<span class="path">/dev</span>) létrehozása.</td></tr>
+	<tr><td><b>Csatolókártya</b></td><td> </td><td>Eszközkezelő betöltése.</td></tr>
+	<tr><td><b>Rendszerlemez</b></td><td> </td><td>Rendszerlemez csatolása.</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>Processzor-függő modulok betöltése.</td></tr>
+	<tr><td><b>Mappa</b></td><td> </td><td>Alrendszerek betöltése.</td></tr>
+	<tr><td><b>Rakéta</b></td><td> </td><td>A betöltő-szkript elindítja a rendszert.</td></tr>
 </table>
 
 </div>
@@ -120,10 +153,10 @@ A különféle szimbólumok az alábbi betöltési szakaszokat jelölik:</p>
 
 <div class="nav">
 <div class="inner"><span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Tartalom</a> 
-::  <a href="filesystem-layout.html">Fájlrendszer felépítése</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Tartalom</a> 
+::  <a href="filesystem-layout.html">Fájlrendszer felépítése</a>  »
 </span></div>
 </div>
 

@@ -54,7 +54,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
 <h1>Disposição do sistema de arquivos</h1>
 
@@ -62,59 +61,59 @@
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
 <p>O segundo alerta aparece caso tente renomear ou deletar algo na hierarquia do sistema. Aqui, o botão "<span class="button">Rename</span>" somente estará disponível quando o usuário estiver segurando a tecla <span class="key">SHIFT</span>.</p>
-<p>Generally, there are two separate branches springing from the root folder of the boot volume:</p>
+<p>Geralmente, existem dois ramos separados partindo da pasta raiz do volume de inicialização:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Contains system files and applications/packages shared by all users.</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>This is your personal folder where you keep your data and settings and the applications/packages that are <i>not</i> shared by all users.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Contém o sistema de arquivos e aplicativos/pacotes compartilhados por todos os usuários.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>Esta é sua pasta pessoal que contém seus dados e configurações e os aplicativos/pacotes que <i>não</i> são compartilhados por todos os usuários.</td></tr>
 </table>
-<p>As long as Haiku isn't multi-user, this distinction between shared and not-shared applications/packages has no apparent effect, as there's only one user with one home folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
+<p>Enquanto o Haiku não é multiusuário, esta distinção entre arquivos/pacotes compartilhados e não-compartilhados não tem efeito aparente, já que existe apenas um usuário com uma pasta home. Mas, uma vez que haverá suporte para mais usuários eventualmente, faz sentido aprender o caminho correto desde o início.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">A pasta system - <span class="path">/boot/system/</span></a></h2>
-<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
-Most of the folders inside <span class="path">/boot/system/</span> are read-only, which is sensible as they contain the files necessary for Haiku to function correctly and therefore have to be safe from (accidental) alteration. The only user-writable folders are:</p>
+<p>No BeOS, antecessor do Haiku, esta pasta era chamada <span class="path">/boot/beos/</span>. Esta denominação ainda pode ser encontrada em alguns documentos antigos (por exemplo, o BeBook original).<br />
+A maioria das pastas dentro de <span class="path">/boot/system/</span> são somente-leitura, pois contém os arquivos necessários para o Haiku funcionar corretamente e portanto deve estar a salvo de alterações (acidentais). As únicas pastas que podem ser gravadas pelo usuário são:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>Contains cached files and the temporary folder linked to <span class="path">/tmp/</span>.</td></tr>
-<tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives).</td></tr>
-<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Besides holding Haiku's system packages, you can add/remove packages shared by all users.</td></tr>
-<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Contains system-wide settings.</td></tr>
-<tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Contains logs like the syslog (important when troubleshooting) and is the default location for the swap file.</td></tr>
+<tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>Contém arquivos em cache e a pasta temporária vinculada a <span class="path">/tmp/</span>.</td></tr>
+<tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>Contém uma hierarquia para arquivos que não são parte de um .hpkg (provavelmente de antigos pacotes BeOS).</td></tr>
+<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Além de abrigar pacotes de sistema do Haiku, você pode adicionar/remover pacotes compatilhados por todos os usuários.</td></tr>
+<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Contém definições de todo o sistema.</td></tr>
+<tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Contém registros como o syslog (importante quando em problemas) e é a localização padrão para o arquivo swap.</td></tr>
 </table>
-<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
+<p><span class="box-info">Para mais informações sobre as pastas <span class="path">packages</span> e <span class="path">non-packaged</span>, veja o tópico <a href="applications.html">Instalando aplicativos</a>.</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="home" name="home">A pasta home - <span class="path">/boot/home/</span></a></h2>
-<p>This folder belongs to you. Here you can create and delete files and folders as you wish. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)<br />
-Files that you'd like to share with other users in a future multi-user environment have do be put outside <span class="path">/boot/home/</span>. For example, you could create a folder <span class="path">/boot/all-users/</span> and put the stuff there.</p>
+<p>Esta pasta lhe pertence. Aqui pode-se criar e eliminar arquivos e pastas do jeito que quiser. (A propósito, o til ("<tt>~</tt>") é um atalho para sua pasta home, então não deve sempre escrever "<span class="path">/boot/home/</span>" no Terminal.)<br />
+Arquivos que você gostaria de compartilhar com outros usuários num futuro ambiente multiusuário devem ser postos fora de <span class="path">/boot/home/</span>. Por exemplo, pode-se criar uma pasta <span class="path">/boot/all-users/</span> e colocar o material lá.</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/Desktop/</span></td><td style="width:10px;"> </td>
-<td>Holds the files of your desktop. Double-clicking won't open it, as it is already always visible. When your files happen to be obscured by open windows, just switch quickly to another <a href="workspaces.html">Workspace</a>. Of course, <a href="tracker.html#drill-down">drilling</a> down by right-clicking is also possible.</td></tr>
+<td>Abriga os arquivos de seu computador. Clicando duas vezes não irá abri-la, por já ser sempre visível. Quando seus arquivos ficarem cobertos por janelas abertas, apenas alterne rapidamente para outro <a href="workspaces.html">Espaço de Trabalho</a>. Naturalmente, <a href="tracker.html#drill-down">navegar</a> através do clique com o botão direito também é possível.</td></tr>
 <tr><td><span class="path">~/mail/</span></td><td style="width:10px;"> </td>
-<td>This is the default location for your mails.</td></tr>
+<td>Esta é a localização padrão para suas mensagens de correio.</td></tr>
 <tr><td><span class="path">~/people/</span></td><td style="width:10px;"> </td>
-<td>This is the default location for you contact files, see <a href="applications/people.html">People</a>.</td></tr>
+<td>Esta é a localização padrão para seus arquivos de contato, veja <a href="applications/people.html">Pessoas</a>.</td></tr>
 <tr><td><span class="path">~/queries/</span></td><td style="width:10px;"> </td>
-<td><a href="queries.html">Queries</a> are stored here, by default temporarily for 7 days.</td></tr>
+<td><a href="queries.html">Consultas</a> são armazenadas aqui, temporariamente por 7 dias, por padrão.</td></tr>
 </table>
 
-<p>The folder <span class="path">/boot/home/config/</span> is special: just like <span class="path">/boot/system/</span> it's mostly under the control of the package management and therefore read-only. It too contains these similar user-writable folders:</p>
+<p>A pasta <span class="path">/boot/home/config/</span> é especial: assim como <span class="path">/boot/system/</span> está principalmente sob o controle do gerenciamento de pacote e portanto somente-leitura. Ela também contém estas pastas, similarmente graváveis pelo usuário:</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/config/packages/</span></td><td style="width:10px;"> </td>
-<td>Here you can add/remove packages that are <i>not</i> shared by all users.</td></tr>
+<td>Aqui pode-se adicionar/remover pacotes que <i>não</i> são compartilhados por todos os usuários.</td></tr>
 
 <tr><td class="onelinetop"><span class="path">~/config/non-packaged/</span></td><td> </td>
-<td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives) and are <i>not</i> shared by all users.</td></tr>
+<td>Contém uma hierarquia para arquivos que não são parte de um .hpkg (provavelmente de antigos pacotes BeOS) e <i>não</i> são compartilhados por todos os usuários.</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
 <td>Esta pasta contém as definições de todas as aplicações e certas configurações para o sistema. Algumas aplicações gerenciam suas definições em subpastas próprias, outras simplesmente colocam seu arquivo de configuração aqui.</td></tr>
 </table>
 
-<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="">Installing applications</a>.</span></p>
-<p>Here are some of the more interesting subfolders in <span class="path">~/config/settings</span>:</p>
+<p><span class="box-info">Para mais informações sobre as pastas <span class="path">packages</span> e <span class="path">non-packaged</span>, veja o tópico <a href="applications.html">Instalando aplicativos</a>.</span></p>
+<p>Aqui estão algumas das mais interessantes subpastas em <span class="path">~/config/settings/</span>:</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">boot/</span></td><td style="width:10px;"> </td>
@@ -127,7 +126,7 @@ Files that you'd like to share with other users in a future multi-user environme
 <td>Neste banco de dados <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> o Haiku mantém uma lista de todos os diferentes <a href="filetypes.html">tipos de arquivos</a> e suas definições.</td></tr>
 
 <tr><td class="onelinetop"><span class="path">deskbar/menu/</span></td><td> </td>
-<td>Copied or linked to files/folders/queries in this folder appear in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>.</td></tr>
+<td>Copiado ou vinculado a arquivos/pastas/consultas nesta pasta aparece no <a href="deskbar.html#deskbar-menu">menu Deskbar</a>.</td></tr>
 
 <tr><td class="onelinetop"><span class="path">kernel/drivers/</span></td><td> </td>
 <td>Existe um arquivo de definições que pode ser de interesse: <span class="cli">kernel</span> oferece algumas configurações de baixo nível tais como desabilitar <acronym title="Symmetric Multi Processing">SMP</acronym>, ativar depuração serial ou habilitar gerenciamento avançado de energia. Ativa-se a linha de configuração removendo o símbolo de comentário "<tt>#</tt>". Tenha muito cuidado aqui!</td></tr>

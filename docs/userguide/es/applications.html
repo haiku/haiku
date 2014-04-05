@@ -69,7 +69,7 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hpkg" name="hpkg">Haiku packages (.hpkg)</a></h2>
-<p>The simplest way is to use <a href="">HaikuDepot</a> to find, download and automatically install and uninstall a package. If that isn't an option  maybe you downloaded a package somewhere, because it's not (yet) in a public repository  it's just as easy to install it manually: Just move the .hpkg file into <tt>~/config/packages/</tt>. </p>
+<p>The simplest way is to use <a href="applications/haikudepot.html">HaikuDepot</a> to find, download and automatically install and uninstall a package. If that isn't an option — maybe you downloaded a package somewhere, because it's not (yet) in a public repository — it's just as easy to install it manually: Just move the .hpkg file into <tt>~/config/packages/</tt>. </p>
 <p>You'll find the newly installed application in <tt>~/config/apps/</tt> or, in case of a commandline application, in <tt>~/config/bin/</tt>. All other files the program depends upon (libraries, data, add-ons, etc.) appear automatically in the right locations in the filesystem.</p>
 <p>Topics <a href="deskbar.html">Deskbar</a> or <a href="desktop-applets/launchbox.html">LaunchBox</a> describe how to add shortcuts to your newly installed application.</p>
 <p>Uninstalling is just as easy: move the package out of <tt>~/config/packages/</tt>.</p>
@@ -79,7 +79,7 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="beos_apps" name="beos_apps">Old BeOS archives (.zip and .pkg)</a></h2>
-<p>BeOS archives that include all they need in their app's folder can simply be unpacked (double clicking opens <span class="app">Expander</span>) anywhere in <tt>/boot/home/</tt> and run from there. Uninstalling such self-contained applications is easy: just delete the app's folder.</p>
+<p>BeOS archives that include all they need in their app's folder can simply be unpacked (double clicking opens <span class="app">Expander</span> or the old <span class="app">PackageInstaller</span>) anywhere in <tt>/boot/home/</tt> and run from there. Uninstalling such self-contained applications is easy: just delete the app's folder.</p>
 <p>This is true for the majority of old BeOS applications. If you happen upon one that doesn't work out-of-the-box, because it wants to spread its files to hard-coded locations that are not guaranteed to exist, you can try to fix things manually. The folder <tt>~/config/non-packaged/</tt> allows you to recreate the needed folder hierarchy. As more and more real .hpkg packages become available and old BeOS applications get re-packaged, this will become less needed. Please consult this <a href="http://www.haiku-os.org/guides/daily-tasks/install-applications">online article</a> on how to use the <tt>non-packaged</tt> hierarchy.</p>
 
 <h2>
@@ -108,7 +108,7 @@
 	<tr><td style="width:24px;"><img src="../images/apps-images/expander-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/expander.html">Expander</a></td><td> </td>
 		<td valign="top">Herramienta para desempaquetar (descomprimir) ficheros comunes.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/haikudepot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/haikudepot.html">HaikuDepot</a></td><td> </td>
-		<td valign="top"><span style="color:silver">A tool to find, download, install, update and uninstall (application) packages [<i>still missing</i>]</span></td></tr>
+		<td valign="top">A tool to find, download, install, update and uninstall (application) packages</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/icon-o-matic-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/icon-o-matic.html">Icon-O-Matic</a></td><td> </td>
 		<td valign="top">Aplicación para crear iconos vectoriales de Haiku.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Installer</a></td><td> </td>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,12 +55,13 @@
 
 <div id="content">
 <div>
+<div class="box-info">A tradução desta página ainda não está completa. Até lá, partes incompletas mostrarão o original em inglês.</div>
 
 <h2><img src="../../images/prefs-images/datatranslations-icon_64.png" alt="datatranslations-icon_64.png" width="64" height="64" />Traduções de Dados</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferências</span></td></tr>
 <tr><td>Localização:</td><td></td><td><span class="path">/boot/system/preferences/DataTranslations</span></td></tr>
-<tr><td>Configurações:</td><td></td><td><span class="path">~/config/settings/*</span> - Todo Tradutor cria seu próprio arquivo de configuração aqui após a mudança do padrão.<br />
+<tr><td>Definições:</td><td></td><td><span class="path">~/config/settings/*</span> - Todo Tradutor cria seu próprio arquivo de configuração aqui após a mudança do padrão.<br />
 <span class="path">~/config/settings/system/DataTranslations settings</span> - Armazena a posição da caixa de diálogo.</td></tr>
 </table>
 <p>Todo aplicativo tem a habilidade de abrir e salvar todo formato de arquivo para o qual existe um Tradutor instalado. As definições para estes Tradutores são configuradas nas preferências de Traduções de Dados.</p>
@@ -69,24 +70,30 @@
 <p>Dependendo de suas capacidades, cada Tradutor oferece diferentes definições. Pelo menos obter-se-á um botão <span class="button">Informações...</span> que abre uma janela com os créditos e o caminho da instalação.<br />
 A tabela seguinte dá uma visão geral dos Tradutores padrão e suas opções mais úteis.</p>
 <table summary="translators" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Apple icons</span></td><td>Valid image sizes are 16, 32, 48, 128, 256, 512, 1024 (RGB32 and RGBA32)</td></tr>
 <tr><td><span class="menu">imagens BMP</span></td><td>24bit, não comprimida, sem transparência</td></tr>
 <tr><td><span class="menu">imagens EXR</span></td><td>formato da <acronym title="Industrial Light &amp; Magic">ILM</acronym> com high dynamic-range (HDR)</td></tr>
 <tr><td><span class="menu">imagens GIF</span></td><td>8bit, compressão sem perda, transparência<br />
 Pode-se reduzir o tamanho do arquivo limitando o número de cores usadas e a paleta.<br />
 Também pode-se gravar imagens com transparência, pelo uso automático do canal alfa ou definindo o valor de RGB que será transparente, manualmente.</td></tr>
+<tr><td><span class="menu">HVIF icons</span></td><td>Translator for Haiku's vector icon format</td></tr>
 <tr><td><span class="menu">imagens JPEG2000</span></td><td>24bit, comprimida, sem transparência<br />
 Aqui, o cuidado normalmente é apenas com a qualidade da saída.</td></tr>
 <tr><td><span class="menu">imagens JPEG</span></td><td>24bit, comprimida, sem transparência<br />
 Além da qualidade da saída pode-se também definir uma suavização que irá amainar a compressão dos objetos mas pode manchar um pouco a imagem.</td></tr>
 <tr><td><span class="menu">imagens PCX</span></td><td>24bit, não comprimida, sem transparência, formato PC Paintbrush Exchange</td></tr>
+<tr><td><span class="menu">Photoshop images</span></td><td>32bit, lossless compression, transparency<br />
+The translator reduces all layers to one bitmap layer.</td></tr>
 <tr><td><span class="menu">imagens PNG</span></td><td>32bit, compression sem perda, transparência</td></tr>
 <tr><td><span class="menu">imagens PPM</span></td><td>24bit, não comprimida, sem transparência, formato Portable PixMap</td></tr>
 <tr><td><span class="menu">imagens RAW</span></td><td>até 48bit, não comprimida, sem transparência</td></tr>
 <tr><td><span class="menu">arquivos de texto RTF</span></td><td>Texto formatado</td></tr>
 <tr><td><span class="menu">imagens SGI</span></td><td>24bit, compressão sem perda opcional, transparência</td></tr>
-<tr><td><span class="menu">arquivos StyledEdit </span></td><td>Texto formatado</td></tr>
+<tr><td><span class="menu">arquivos StyledEdit </span></td><td>Plain text with formatting stored in attibutes</td></tr>
 <tr><td><span class="menu">imagens TGA</span></td><td>32bit, compressão sem perda opcional, transparência</td></tr>
 <tr><td><span class="menu">imagens TIFF</span></td><td>24bit, compressão sem perda opcional, camadas, transparência</td></tr>
+<tr><td><span class="menu">WebP images</span></td><td>8-bit YUV 4:2:0 image format, compressed, no transparency</td></tr>
+<tr><td><span class="menu">Windows icons</span></td><td>Valid image sizes are 16, 32, 48</td></tr>
 <tr><td class="onelinetop"><span class="menu">imagens WonderBrush</span></td><td>32bit, camadas, transparência, dados vetor/pixel</td></tr>
 </table>
 <p><br /></p>

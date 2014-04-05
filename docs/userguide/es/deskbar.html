@@ -88,22 +88,16 @@
 <li><p><b>Preferencias del Deskbar (Barra de Escritorio)</b> - Abre un panel para configurar el Deskbar (mirar abajo).</p></li>
 <li><p><b>Apagar</b> - Ofrece la opción de  <span class="menu">Reiniciar</span> o <span class="menu">Apagar el Sistema</span>.</p></li>
 <li><p><b>Documentos, Carpetas, Aplicaciones Recientes</b> - Lista de los últimos documentos, carpetas y aplicaciones a las que se ha accedido recientemente (ver <span class="menu">Preferencias del Deskbar</span> abajo).</p></li>
-<li><p><b>Applications, Demos, Deskbar applets, Preferences</b> - List of installed applications, demos, applets and preferences.<br />You can add links to other programs (or any folder, document, query etc.) by putting them into <span class="path">~/config/settings/deskbar</span>.</p></li>
+<li><p><b>Applications, Demos, Deskbar applets, Preferences</b> - List of installed applications, demos, applets and preferences.<br />You can add links to other programs (or any folder, document, query etc.) by putting them into <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Preferencias del Deskbar</h3>
-<h4>Menu</h4>
-<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.</p>
-<img src="images/deskbar-images/prefs-menu.png" alt="prefs-menu.png" />
-<p>Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
-The button <span class="button">Edit menu...</span> opens the folder <span class="path">~/config/settings/deskbar</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
-You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
-<p>Es incluso más fácil arrastrar un archivo, carpeta o consulta guardada y soltarla donde quiera dentro del Deskbar</p>
+<img src="images/deskbar-images/prefs-deskbar.png" alt="prefs-deskbar.png" />
+<p>The Deskbar preference panel is devided into three sections.</p>
 
 <h4>Applications</h4>
 <p>The following settings don't apply to your installed applications, but to the behavior and visuals of the list of running applications.</p>
-<img src="images/deskbar-images/prefs-apps.png" alt="prefs-apps.png" />
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Sort running applications</span></td><td> </td><td>Sorts the list of running programs alphabetically.</td></tr>
 <tr><td><span class="menu">Tracker always first</span></td><td> </td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
@@ -113,14 +107,21 @@ You can delete or add entries like links to applications, documents or even quer
 <tr><td><span class="menu">Icon size</span></td><td> </td><td>Adjusts the icon size of running applications. </td></tr>
 </table>
 
+<h4>Menu</h4>
+<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
+Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
+The button <span class="button">Edit menu...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
+You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>Es incluso más fácil arrastrar un archivo, carpeta o consulta guardada y soltarla donde quiera dentro del Deskbar</p>
+
 <h4>Window</h4>
-<p>The last tab contains the preferences for the Deskbar window.</p>
-<img src="images/deskbar-images/prefs-window.png" alt="prefs-window.png" />
+<p>Finally, the preferences for the Deskbar window.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">Always on top</span></td><td> </td><td>The Deskbar always stays above all other windows.</td></tr>
 <tr><td><span class="menu">Auto-raise</span></td><td> </td><td>The Deskbar pops to the front if the mouse pointer touches it.</td></tr>
 <tr><td><span class="menu">Auto-hide</span></td><td> </td><td>The Deskbar is reduced to only a few pixels and only pops up if the mouse pointer touches them.</td></tr>
 </table>
+
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">La Bandeja del sistema</a></h2>

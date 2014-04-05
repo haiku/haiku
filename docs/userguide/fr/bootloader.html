@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2012, Haiku. All rights reserved.
+ * Copyright 2008-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  * Translators:
  *		Loïc
  *		Vincent Duvert
+ *		roptat
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -47,10 +48,10 @@
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Sommaire</a> 
-::  <a href="filesystem-layout.html">Structure du système de fichiers</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="filesystem-layout.html">Structure du système de fichiers</a>  »
 </span></div>
 </div>
 
@@ -62,61 +63,95 @@
 
 <p>Le chargeur de démarrage de Haiku peut vous aider à résoudre certains problèmes de support matériel, et à choisir quelle installation de Haiku démarrer si vous en avez plusieurs (par exemple sur un CD d'installation ou sur une clef USB).<br />
 Il peut également s'avérer utile si un composant logiciel que vous avez installé empêche le démarrage de votre ordinateur : l'option <i>Disable user add-ons</i> mentionnée ci-dessous démarrera Haiku sans charger les composants (généralement des pilotes) en question.</p>
-<p>Pour accéder aux options du chargeur de démarrage, vous devez garder la touche <span class="key">MAJ</span> appuyé jusqu'à l'amorce du processus de démarrage d'Haiku.
-Si un gestionnaire d'amorce est installé, vous pouvez commencer à presser la touche <span class="key">MAJ</span> avant d'invoquer le démarrage d'Haiku.
+<p>Pour accéder aux options du chargeur de démarrage, vous devez garder la touche <span class="key">Maj</span> appuyé jusqu'à l'amorce du processus de démarrage d'Haiku.
+Si un gestionnaire d'amorce est installé, vous pouvez commencer à presser la touche <span class="key">Maj</span> avant d'invoquer le démarrage d'Haiku.
 Si Haiku est le seul système d'exploitation de votre machine, Vous pouvez commencer à presser la touche même si le BIOS n'a pas fini d'afficher ses messages de démarrage.</p>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="options" name="options">Les options d'amorçage</a></h2>
 <p>Ceci fait, vous aurez accès à quatre menus :</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b></td><td> </td><td>Vous permet de sélectionner l'installation de Haiku à démarrer.</td></tr>
 <tr><td><b>Select safe mode options</b></td><td> </td><td>Il y a plusieurs options à essayer en cas de problème lié au matériel, ou si le système devient instable ou incapable de démarrer à cause d'un mauvais pilote. Lorsque vous déplacez la barre de sélection d'une option, une brève explication s'affiche en bas de l'écran.</td></tr>
-<tr><td></td><td></td><td><table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Safe mode</i> (Mode de démarrage minimal)</td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Disable user add-ons</i> (Désactiver les extensions utilisateur)<br /></td><td></td><td></td></tr>
-	<tr><td><i>- Disable IDE DMA</i> (Désactiver l'optimisation DMA du bus IDE)</td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Use fail-safe video mode</i> (Mode vidéo sans échec)</td><td></td><td></td></tr>
-	<tr><td><i>- Don't call the BIOS</i> (Éviter les appels au BIOS)</td><td></td><td></td></tr>
-	<tr><td><i>- Disable APM</i> (Désactiver la gestion d'énergie APM)</td><td></td><td></td></tr>
-	<tr><td><i>- Disable ACPI</i> (Désactiver la gestion d'énergie avancée ACPI)</td><td></td><td></td></tr>
-	</table>
-</td></tr>
+<tr><td></td><td></td><td>
+	<p><span class="menu">Safe mode</span><br />
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+	<p><span class="menu">Disable user add-ons</span><br />
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+	<p><span class="menu">Disable IDE DMA</span><br />
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
+</p>
+	<p><span class="menu">Use fail-safe video mode</span><br />
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+	<p><span class="menu">Disable IO-APIC</span><br />
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+	<p><span class="menu">Disable local APIC</span><br />
+		Disables using the local APIC, also disables SMP.</p>
+	<p><span class="menu">Disable SMP</span><br />
+		Disables all but one CPU core.</p>
+	<p><span class="menu">Don't call the BIOS</span><br />
+		Stops the system from calling BIOS functions.</p>
+	<p><span class="menu">Disable APM</span><br />
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+	<p><span class="menu">Disable ACPI</span><br />
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+	<p><span class="menu">Blacklist entries</span><br />
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Select debug options</b>
 </td><td> </td><td>Ici, vous trouverez plusieurs options qui vous aideront à déboguer ou à récuperer le détail pour un <a href="../welcome/en/bugreports.html">rapport de bogue</a>.
 Voici, une courte explication pour chaque option affichée ci-dessous.</td></tr>
 <tr><td></td><td></td><td>
-	<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td><i>- Enable serial debug output</i></td><td width="15"></td><td></td></tr>
-	<tr><td><i>- Enable on screen debug output</i></td><td></td><td></td></tr>
-	<tr><td><i>- Disable on screen paging</i></td><td></td><td></td></tr>
-	<tr><td><i>- Enable debug syslog</i></td><td></td><td></td></tr>
-	<tr><td class="onelinetop"><i>- Display current boot loader log</i></td><td></td><td>(Press <span class="key">Q</span> to exit the log)</td></tr>
-	<tr><td><i>- Add advanced debug option</i></td><td></td><td></td></tr>
-</table>
+	<p><span class="menu">Enable serial debug output</span><br />
+		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
+	<p><span class="menu">Enable on screen debug output</span><br />
+		Display debug output on screen while the system is booting, instead of the normal boot logo.</p>
+	<p><span class="menu">Disable on screen paging</span><br />
+		Disables paging when on screen debug output is enabled.</p>
+	<p><span class="menu">Enable debug syslog</span><br />
+		Enables a special in-memory syslog buffer for this session that the boot loader will be able to access after rebooting.</p>
+	<p><span class="menu">Display current boot loader log</span><br />
+		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
+	<p><span class="menu">Add advanced debug option</span><br />
+		Allows advanced debugging options to be entered directly.</p></td></tr>
+<tr><td></td><td></td><td>Si « <i>Enable debug syslog</i> » est activé, un redémarrage à chaud après un plantage montre les options supplémentaires suivantes :
 </td></tr>
-<tr><td></td><td></td><td>Si  "syslog debug" est activé, un redémarrage à chaud après un plantage montre les options supplémentaires suivantes :
-</td></tr>
-<tr><td></td><td></td><td>
-<table summary="layout" border="0" cellspacing="0" cellpadding="2">
-	<tr><td class="onelinetop"><i>- Display syslog from previous session</i> (Afficher les traces de la session précédente)</td><td></td><td></td></tr>
-	<tr><td><i>- Save syslog from previous session</i> (Enregistrer les traces de la session précédente)</td><td></td><td></td></tr>
-</table>
-</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
+		Saves the syslog from the previous Haiku session to /var/log/previous_syslog when booting.</p>
+	<p><span class="menu">Display syslog from previous session</span><br />
+		Displays the syslog from the previous Haiku session</p>
+	<p><span class="menu">Save syslog from previous session</span><br />
+		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
 <tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Si vous avez activé l'option <i>Use fail-safe video mode</i>, vous pouvez utiliser ce menu pour choisir une résolution et une profondeur de couleur.</td></tr>
 </table>
-<p><br /></p>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="troubleshooting" name="troubleshooting">Dépannage</a></h2>
+<p>Si, dès le départ, Haiku refuse de démarrer sur votre matériel, essayez les différentes options de réglage sous <span class="menu">Select safe mode options</span>. Dans tous les cas, Envisagez de sousmettre un <a href="../welcome/en/bugreports.html">rapport de bug</a>.</p>
+<p>Si, au contraire, Haiku cesse de démarrer seulement après avoir installé un logiciel, en particulier un pilote, plusieurs options s’offrent à vous pour permettre à Haiku de démarrer de nouveau et désinstaller le logiciel en cause :</p>
+<ul>
+<li><p>Activer <span class="menu">Safe mode</span> empêchera la plupart des serveurs, des daemons et du UserBootScript de se lancer.</p></li>
+<li><p>Activer <span class="menu">Disable user add-ons</span> empêchera l’utilisation de toute extension (pilote, traducteur, etc…) que vous avez installée dans votre dossier personnel.</p></li>
+<li><p>Si le pilote ou l’extension en cause est installé dans un dossier système, cela devient plus complexe car cette partie est en lecture-seule. C’est à cela que sert <span class="menu">Blacklist entries</span>. Vous pourrez alors naviguer dans les dossiers système et désactiver les composants fautifs en cochant une entrée avec la touche <span class="key">Espace</span> ou <span class="key">Entrée</span>. La touche <span class="key">Esc</span> permet de retourner au dossier parent.</p>
+<p>L’article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> (en anglais) vous montrera comment rendre ce réglage permanent.</p></li>
+</ul>
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="booting" name="booting">Démarrer Haiku</a></h2>
 <p>Après avoir activé une ou plusieurs options, vous pourrez retourner au menu principal et continuer le démarrage. Pendant celui-ci, un écran de démarrage sera affiché :</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
 <p>Si tout fonctionne correctement, chaque symbole devrait s'illuminer, l'un après l'autre.<br />
 Ces symboles correspondent grossièrement aux étapes de démarrage suivantes :</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atome</b></td><td style="width:10px;"> </td><td>Initialisation du noyau et des modules.</td></tr>
-	<tr><td><b>Disque dur avec loupe</b></td><td> </td><td>Création du système de fichier racine (<span class="path">/</span>) et montage du système de fichiers devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Carte d'extension</b></td><td> </td><td>Initialisation du gestionnaire de périphériques.</td></tr>
-	<tr><td><b>Disque de démarrage</b></td><td> </td><td>Montage du disque de démarrage.</td></tr>
-	<tr><td><b>Puce</b></td><td> </td><td>Activation des fonctionnalités spécifiques au processeur.</td></tr>
-	<tr><td><b>Dossier</b></td><td> </td><td>Initialisation des sous-systèmes.</td></tr>
-	<tr><td><b>Fusée</b></td><td> </td><td>Exécution des scripts de démarrage.</td></tr>
+	<tr><td><b>Atome</b></td><td style="width:10px;"> </td><td>Initialisation du noyau et des modules.</td></tr>
+	<tr><td><b>Disque dur avec loupe</b></td><td> </td><td>Création du système de fichier racine (<span class="path">/</span>) et montage du système de fichiers devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Carte d'extension</b></td><td> </td><td>Initialisation du gestionnaire de périphériques.</td></tr>
+	<tr><td><b>Disque de démarrage</b></td><td> </td><td>Montage du disque de démarrage.</td></tr>
+	<tr><td><b>Puce</b></td><td> </td><td>Activation des fonctionnalités spécifiques au processeur.</td></tr>
+	<tr><td><b>Dossier</b></td><td> </td><td>Initialisation des sous-systèmes.</td></tr>
+	<tr><td><b>Fusée</b></td><td> </td><td>Exécution des scripts de démarrage.</td></tr>
 </table>
 
 </div>
@@ -124,10 +159,10 @@ Ces symboles correspondent grossièrement aux étapes de démarrage suivantes :
 
 <div class="nav">
 <div class="inner"><span>
-    <!-- «  <a href="installation.html">Installing Haiku</a> 
-::  -->
-    <a href="contents.html" class="uplink">Sommaire</a> 
-::  <a href="filesystem-layout.html">Structure du système de fichiers</a>  »
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="filesystem-layout.html">Structure du système de fichiers</a>  »
 </span></div>
 </div>
 

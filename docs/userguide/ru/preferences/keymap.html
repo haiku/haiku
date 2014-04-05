@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-20014, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,6 +57,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />Раскладка (Keymap)</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -76,8 +77,12 @@
 <tr><td><span class="menu">Выбор мёртвых клавиш</span></td><td> </td><td>для настройки вышеупомянутых знаковых синих клавиш.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Переключить раскладку в режим...</span></td><td> </td><td>для использования горячих клавиш в Windows/Linux  режиме (клавише <span class="key">CONTROL</span> соответствует <span class="key">CTRL</span>) или в Haiku режиме (клавише <span class="key">COMMAND</span> соответствует <span class="key">ALT</span>).</td></tr>
 </table>
-<p>В списке слева доступны предварительно сконфигурированные системные раскладки, а под ними, если такие имеются, пользовательские. Вы можете изменять раскладку, перетаскивая мышкой клавиши на клавиатуре - левой кнопкой клавиша скопируется, а правой -  поменяется местами.<br />
-Когда все изменения произведены, то результат можно сохранить через меню <span class="menu">Файл | Сохранить... </span>, и ваша пользовательская раскладка появится в соответствующем списке, если сохраненние произведено в папку <span class="path">~/config/settings/Keymap/</span>, иначе нужно вручную открыть её через меню <span class="menu">Файл | Открыть...</span>.</p>
+<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.</p>
+<p>Alternatively to this drag&amp;dropping of keys, there's the menu <span class="menu">File | Set modifier keys...</span> that opens this window:</p>
+<img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
+<p>Here, you can assign keys to their respective roles or even completely disable the role of a key. You can even assign the same key to different roles, though that's not a good idea most of the time and you'll be warned by a small exclamation mark beside the pop-up menus if you do that.<br />
+Pressing <span class="button">Set modifier keys</span> applies your changes and closes the window.</p>
+<p>When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
 <p>Для большей схожести панели клавиатурной раскладки с вашей физической клавиатурой имеется несколько их различных вариантов, доступных через меню <span class="menu">Макет</span>.</p>
 <p>Шрифт, используемый для изображения клавиатуры, устанавливается через меню <span class="menu">Шрифт</span>. Обратим внимание, что не все символы будут отображаться на многих раскладках.</p>
 <p>В самом низу находится кнопка <span class="button">Вернуть</span>, возвращающая установки, которые были активны при открытии окна настроек клавиатурной раскладки.</p>
@@ -88,8 +93,8 @@
 <p>Есть другой способ настройки раскладки, помимо окна настройки, включающий редактирование текстового файла с изменением HEX значений. Это может показаться на первый взгляд сложным, но разобраться будет достаточно легко.</p>
 <p>Вы можете вывести текущую раскладку, набрав в  Terminal команду:</p>
 <pre class="terminal">keymap -d MyKeymap</pre>
-<p>Сгенерированный текстовый файл может быть открыт в любом текстовом редакторе, в котором используется моноширный шрифт, иначе файл будет нечитабельным.<br />
-Вначале этого файла вы увидите приблизительное изображение клавиатуры с HEX значениями для каждой клавиши, а ниже находится их фактическая привязка. Вы можете менять все настройки, которые доступны через панель настроек клавиатурной раскладки, но также и много других. Если у вас на клавиатуре имеются дополнительные клавиши, то вы можете активировать их и использовать в качестве обычных клавиш или как опциональную или контрольную клавишу. Например, можно с помощью мультимедийных клавиш уменьшать/увеличивать громкость или же запускать какое-либо приложение. Для этого рекомендуется использовать программу <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
+<p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
+At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use the <a href="shortcuts.html">Shortcuts</a> preferences.</p>
 <p>После окончания правки и сохранения файла загрузите в систему измененную раскладку следующей командой:</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
 <p>Если вы хотите использовать её в настройках Раскладки, вам сначала следует скомпилировать её в бинарный формат, следующей командой:</p>

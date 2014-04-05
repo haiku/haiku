@@ -48,7 +48,7 @@
 </ul>
 <span>
  «  <a href="terminal.html">ターミナル</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications (アプリケーション)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="tv.html">TV</a>  »
 </span></div>
 </div>
@@ -58,12 +58,12 @@
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />TextSearch</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar メニュー:</td><td style="width:15px;"></td><td><i>エントリー無し、通常は Tracker アドオンから起動</i></td></tr>
-<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
-<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>エントリー無し、通常は Tracker アドオンから起動</i></td></tr>
+<tr><td>位置:</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
+<tr><td>設定ファイルの位置:</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
 </table>
 <p><br /></p>
-<p>TextSearch はテキストファイルの中の文字列を検索します。通常は <a href="../tracker-add-ons.html">Tracker アドオン</a> コンテキストメニューから選択したフォルダーやファイル内を検索するために呼び出されます。</p>
+<p>TextSearch はテキストファイル中の文字列を検索します。通常は <a href="../tracker-add-ons.html">Tracker アドオン</a>コンテキストメニューから選択したフォルダーやファイル内を検索するために呼び出されます。</p>
 
 <img src="../images/apps-images/textsearch.png" alt="textsearch.png" />
 
@@ -80,13 +80,13 @@
 <tr><td><span class="menu">Tracker で開く (Open files in Tracker)</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>現在選択しているファイルの場所を Tracker で開きます。</td></tr>
 <tr><td class="onelinetop"><span class="menu">テキストをクリップボードにコピー (Copy text to clipboard)</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>選択部分をクリップボードにコピーします。</td></tr>
 <tr><td colspan="5"><h3>設定メニュー</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">ドットで始まるフォルダーを無視する (Skip folders starting with a dot)</span></td><td> </td><td>これはアドミンファイルが "<tt>.folders/</tt>" フォルダーの中に隠されている "unixy" な環境で働いている時に便利です。このフォルダーは SVN や CVS などのソースバージョン管理システムに使用されていて、Haiku でも広く使われています。</td></tr>
-<tr><td colspan="3"><span class="menu">検索文字をエスケープする (Escape search text)</span></td><td> </td><td>TextSearch は、<span class="cli">grep</span> と呼ばれるコマンドラインツールを使用します。これには <tt>'"*\$?!</tt> やスペースなどの特別な文字には <tt>\</tt> が付いていなければいけません。この設定をオフにすると、自分で <tt>\</tt> を付けなければいけませんが、<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">正規表現</a> ができるようになります。</td></tr>
-<tr><td colspan="3"><span class="menu">テキストファイルのみ (Text files only)</span></td><td> </td><td>TextSearch は現在テキストファイル内のみの文字列を探すのに便利です。この設定を無効にするとすべてのファイルの中身をチェックします。</td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">ドットで始まるフォルダーを無視する (Skip folders starting with a dot)</span></td><td> </td><td>これは管理用ファイルが "<tt>.folders/</tt>" フォルダーの中に隠されている "unixy" な環境で働いている時に便利です。このフォルダーは SVN や CVS などのソースバージョン管理システムに使用されていて、Haiku でも広く使われています。</td></tr>
+<tr><td colspan="3"><span class="menu">検索文字をエスケープする (Escape search text)</span></td><td> </td><td>TextSearch は、コマンドラインツール <span class="cli">grep</span> を使用します。これは <tt>'"*\$?!</tt> およびスペースなどの特別な文字には <tt>\</tt> を付けなければいけません。この設定をオフにすると、自分で <tt>\</tt> を付けなければいけませんが、それと引き換えに<a href="http://ja.wikipedia.org/wiki/%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE" class="external free" title="Wikipedia: Regular expressions" rel="nofollow">正規表現</a>の力を手に入れられます。</td></tr>
+<tr><td colspan="3"><span class="menu">テキストファイルのみ (Text files only)</span></td><td> </td><td>TextSearch は現在テキストファイル中の文字列を探すのだけに役立ちます。この設定を無効にするとすべてのファイルの内容をチェックします。</td></tr>
 <tr><td colspan="5"><h3>検索履歴 (History) メニュー</h3></td></tr>
 <tr><td colspan="4"></td><td>最近検索した文字列が含まれています。</td></tr>
 <tr><td colspan="5"><h3>文字コード (Encoding) メニュー</h3></td></tr>
-<tr><td colspan="4"></td><td>必要な場合別の文字コードを選択できます。</td></tr>
+<tr><td colspan="4"></td><td>必要なら、別の文字コードを選択できます。</td></tr>
 </table>
 </div>
 </div>
@@ -94,7 +94,7 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="terminal.html">ターミナル</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications (アプリケーション)</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">アプリケーション</a> 
 ::  <a href="tv.html">TV</a>  »
 </span></div>
 </div>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2011, Haiku. All rights reserved.
+ * Copyright 2010-2013, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -81,7 +81,7 @@ Végül pedig eldönthetjük, hogy a "Kezdőlap"-gomb a gombsoron megjelenjen-e,
 <ul>
 <li><img src="../images/apps-images/webpositive-tabbar.png" alt="webpositive-tabbar.png" />
 <p>Új lapokat létrehozhatunk a <span class="key">+</span> gomb segítségével a fül-soron, vagy ha van elég hely, akkor dupla kattintással is az üres területen a fül-soron. Ha több oldal is meg van nyitva, mint amennyi elfér a fül-soron, akkor a <span class="key">&lt;</span> <span class="key">&gt;</span> görgető gombok aktívak lesznek. A jobb oldalon a <span class="key">∨</span> gombot lenyomva egy menü jelenik meg az összes megnyitott lap címével együtt, így gyorsan a szükségesre navigálhatunk közöttük.</p></li>
-<li><p>Egy hivatkozáson a középső gombbal kattintva a hivatkozás megnyílik egy új lapon a háttérben.</p></li>
+<li><p>Egy hivatkozáson a középső gombbal kattintva a hivatkozás megnyílik egy új lapon a háttérben. A <span class="key">SHIFT</span> lenyomvatartásákor pedig előtérben nyílik meg.</p></li>
 <li><p>A <span class="menu">Nézet</span> menüből a <span class="menu">Méret növelése</span> és a <span class="menu">Méret csökkentése</span> érhető el. Egy másik opciói is a rendelkezésünkre áll: <span class="menu">Csak a szöveg nagyítása</span>, mely esetben a képek mérete nem változik, csak a szövegé.</p></li>
 <li><p>Ha teljes képernyős módba váltunk, és a beállítások szerint a vezérlőfelület eltűnik, akkor egy másodperc múlva már nem látjuk azt. Hogy ideiglenesen visszahozzuk, egyszerűen csak mozgassuk az egeret a képernyő felső részére.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
@@ -90,7 +90,6 @@ Ha címként nem értelmezhető a beírt szöveg, akkor a böngésző megkeresi 
 <li><p>Egy objektumon jobb gombbal kattintva egy helyi menü jelenik meg, mely változik a objektumnak megfelelően (például megnyitás új oldalon, vagy letöltés).</p></li>
 <li><p>A <span class="menu">Szerkesztés | Keresés</span> megjelenít egy kereső mezőt az ablak alján, mellyel az oldalon lévő szövegben kereshetünk. A találatokat a böngésző kiemeli az oldalon.</p></li>
 </ul>
-<div class="box-info">Egy idő után az oldal betöltése egyre lassabb és lassabb lehet. Ez nem feltétlenül hiba, ugyanis ezt általában a sütik (cookie) kezelése okozza. Amíg ez nem oldódik meg, addig manuálisan kell eljárni: a <span class="path">~/config/settings/WebPositive/Cookies.curl</span> fájlt meg kell keresni. Ez tartalmazza a sütiket, és folyamatosan növekszik, ahogy böngészünk az interneten. Miután több kilobájt lesz a mérete, a böngészés lelassul. Ekkor csak törölni kell a fájlt, és "tiszta lappal" indulunk.</div>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Könyvjelzők</h2>
 <p>A WebPositive a könyvjelzőket fájlként és mappaként tárolja a <tt>~/config/settings/WebPositive/Bookmarks/</tt> mappában. Új könyvjelző hozzáadásakor egy fájl jön létre. A könyvjelzőket tartalmazó mappát gyorsan megnyithatjuk a <span class="menu">Könyvjelzők kezelése</span> menüvel.</p>
 <img src="../images/apps-images/webpositive-bookmarks.png" alt="webpositive-bookmarks" />
