@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	3519077057
+1	lithuanian	x-vnd.haiku-icon_o_matic	28048799
 Select All	Icon-O-Matic-PathManipulator		Pažymėti viską
 Add Style	Icon-O-Matic-AddStylesCmd		Pridėti stilių
 Color (#%02x%02x%02x)	Style name after dropping a color		Spalva (#%02x%02x%02x)
@@ -42,6 +42,7 @@ Untitled	Icon-O-Matic-Main		Be pavadinimo
 Multi Set 	Multi Set (property name)		Multiaibė 
 any of the other lists to	Empty property list - 2nd line		bet kuriame kitame sąraše
 Save as…	Icon-O-Matic-Menu-File		Įrašyti kaip…
+Don't save	Icon-O-Matic-Menu-Settings		Neįrašyti
 Change Color	Icon-O-Matic-SetColorCmd		Pakeisti spalvą
 Style	Icon-O-Matic-Menus		Stilius
 <modify path>	Icon-O-Matic-PathCmd		<pakeisti kreivę>
@@ -66,15 +67,18 @@ HVIF Source Code	Icon-O-Matic-SavePanel		HVIF pirminis tekstas
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Atšaukti transformacijas
 Settings	Icon-O-Matic-Menus		Nuostatos
 All	Icon-O-Matic-Properties		Viską
+Multi Paste Properties	Icon-O-Matic-Properties		Įklijuoti daug savybių
 Undo	Icon-O-Matic-Main		Atšaukti:
 Click on a shape above	Empty transformers list - 1st line		Spustelėkite figūrą aukščiau
 Add Shape	Icon-O-Matic-AddShapesCmd		Pridėti figūrą
 Contour	Transformation		Kontūras
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Ar įrašyti piktogramos pakeitimus prieš ją užveriant?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nėra ką grąžinti>
 Perspective	Transformation		Perspektyva
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Perkelti transformatorių
 Opacity	Icon-O-Matic-PropertyNames		Neskaidrumas
 Add with path	Icon-O-Matic-ShapesList		Pridėti su kreive
+Export icon	Dialog title		Eksportuoti piktogramą
 Gradient type	Icon-O-Matic-StyleTypes		Gradiento tipas
 Icon-O-Matic	System name		Piktogramų rengyklė
 Cancel	Icon-O-Matic-Menu-Settings		Atsisakyti
@@ -114,6 +118,7 @@ Gradient	Icon-O-Matic-StyleTypes		Gradientas
 Min LOD	Icon-O-Matic-PropertyNames		Maž. det. lyg.
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON požymis
 Invert selection	Icon-O-Matic-Properties		Invertuoti žymėjimą
+Drop shapes	Icon-O-Matic-ShapesList		Pašalinti formas
 Export as…	Icon-O-Matic-Menu-File		Eksportuoti kaip…
 Transformation	Transformation		Transformacija
 Click on an object in	Empty property list - 1st line		Spustelėkite objektą
@@ -173,6 +178,7 @@ Flip Control Point	Icon-O-Matic-FlipPointsCmd		Apversti valdymo tašką
 Redo	Icon-O-Matic-Main		Grąžinti:
 Assign Paths	Icon-O-Matic-AddPathsCmd		Priskirti kreives
 OK	Icon-O-Matic-SVGImport		Gerai
+Multi paste	Icon-O-Matic-Properties		Daugybinis įklijavimas
 to attach transformers.	Empty transformers list - 2nd line		kad galėtumėte priskirti transformatorius.
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Atšaukti transformaciją
 Reverse Path	Icon-O-Matic-ReversePathCmd		Pakeisti kreivės kryptį
@@ -185,6 +191,7 @@ Overwrite	Icon-O-Matic-SVGExport		Perrašyti
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Fiksuoti figūras
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Perkelti valdymo tašką
 Open…	Icon-O-Matic-Menu-File		Atverti…
+Save icon	Dialog title		Įrašyti piktogramą
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Spalva (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Keisti gradientą
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Išvalyti kreivę

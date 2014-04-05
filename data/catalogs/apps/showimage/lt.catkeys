@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-ShowImage	4011843330
+1	lithuanian	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Naudoti kaip darbalaukio foną…
 File	Menus		Failas
 Slide delay	Menus		Skaidrių keitimo dažnis
@@ -53,6 +53,7 @@ Select all	Menus		Pažymėti viską
 Zoom factor in %:	PrintOptionsWindow		Mastelis (procentais):
 Width:	PrintOptionsWindow		Plotis:
 Image	Menus		Paveikslas
+Move to Trash	Menus		Išmesti Šiukšlinėn
 OK	Alerts		Gerai
 Rotate clockwise	Menus		Pasukti pagal laikrodžio rodyklę
 Job setup	PrintOptionsWindow		Užduoties nuostatos

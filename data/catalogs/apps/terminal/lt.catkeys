@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Terminal	3240808153
+1	lithuanian	x-vnd.Haiku-Terminal	611722497
 Not found.	Terminal TermWindow		Nerasta.
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Change directory	Terminal TermView		Keisti aplanką
@@ -55,6 +55,7 @@ Blinking cursor	Terminal AppearancePrefView		Mirksintis žymeklis
 Don't save	Terminal PrefWindow		Neįrašyti
 Set window title	Terminal TermWindow		Keisti lango antraštę
 Terminal	System name		Terminalas
+Copy path	Terminal TermView		Kopijuoti kelią
 Close other tabs	Terminal TermWindow		Užverti kitas korteles
 Match word	Terminal FindWindow		Atitikti visą žodį
 Nothing is selected.	Terminal TermWindow		Nėra pažymėto teksto.
@@ -67,7 +68,9 @@ Error!	Terminal getString		Klaida!
 New tab	Terminal TermWindow		Nauja kortelė
 The pattern specifying the tab titles. The following placeholders\ncan be used:\n	Terminal AppearancePrefView		Kortelių antraščių šablonas. Galite naudoti šiuos vietaženklius:\n
 Selected background	Terminal AppearancePrefView		Pažymėto teksto fono
+Slate	Terminal colors scheme		Skalūnas
 Text under cursor	Terminal AppearancePrefView		Tekstas po žymekliu
+Use bright instead of bold text	Terminal AppearancePrefView		Užuot tekstą storinus, suteikti jam skaistesnę spalvą
 Midnight	Terminal colors scheme		Vidurnaktis
 Decrease	Terminal TermWindow		Pamažinti
 Default	Terminal colors scheme		Numatytoji
@@ -78,10 +81,12 @@ Clear all	Terminal TermWindow		Išvalyti viską
 Text encoding	Terminal TermWindow		Teksto koduotė
 size	Terminal TermView		dydis
 Close window	Terminal TermWindow		Užverti langą
+Copy absolute path	Terminal TermView		Kopijuoti absoliutųjį kelią
 Save as default	Terminal TermWindow		Įrašyti kaip numatytąsias
 Set tab title	Terminal TermWindow		Keisti kortelės antraštę
 Settings…	Terminal TermWindow		Nuostatos…
 Abort	Terminal Shell		Nutraukti
+Open link	Terminal TermView		Atverti saitą
 Edit	Terminal TermWindow		Taisa
 Color:	Terminal AppearancePrefView		Spalva:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lango antraštės šablonas. Galite naudoti šiuos vietaženklius:\n
@@ -92,7 +97,9 @@ OK	Terminal TermApp		Gerai
 Find failed	Terminal TermWindow		Paieška nepavyko
 Search forward	Terminal FindWindow		Ieškoti žemyn
 Edit tab title…	Terminal TermWindow		Keisti kortelės antraštę…
+Open path	Terminal TermView		Atverti kelią
 Find previous	Terminal TermWindow		Ieškoti ankstesnio
+Copy link location	Terminal TermView		Kopijuoti saito adresą
 Tab title:	Terminal TermWindow		Kortelės antraštė:
 Find next	Terminal TermWindow		Ieškoti kito
 Close active tab	Terminal TermWindow		Užverti aktyvią kortelę

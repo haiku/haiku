@@ -1,5 +1,6 @@
-1	lithuanian	x-vnd.Haiku-StyledEdit	1514650816
+1	lithuanian	x-vnd.Haiku-StyledEdit	3208803155
 StyledEdit	System name		Rašyklė
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Šis failas pažymėtas kaip skirtas tik skaitymui. Ar įrašyti dokumento „%s“ pakeitimus? 
 Paste	Menus		Įdėti
 OK	LoadAlert		Gerai
 File	Menus		Failas
@@ -75,6 +76,7 @@ Cancel	QuitAlert		Atsisakyti
 Find…	Menus		Ieškoti…
 Select all	Menus		Pažymėti viską
 Don't save	SaveAlert		Neįrašyti
+Recover	NodeMonitorAlerts		Atkurti
 Error loading \"%s\":\n\t%s	LoadAlert		Klaida įkeliant „%s“:\n\t%s
 Ignore	NodeMonitorAlerts		Nepaisyti
 Read-only	StatusView		Tik skaitymui

@@ -1,14 +1,19 @@
-1	lithuanian	x-vnd.Haiku-GIFTranslator	2250422222
+1	lithuanian	x-vnd.Haiku-GIFTranslator	1515001985
 Websafe	GIFView		saityno spalvos
 Write interlaced images	GIFView		Naudoti progresinį paveikslų kodavimą
 Optimal	GIFView		optimali
 Greyscale	GIFView		pilkumo tonai
+Colors:	GIFView		Spalvos:
+GIF image translator	GIFTranslator		GIF paveikslų keitiklis
 Be Bitmap Format (GIFTranslator)	GIFTranslator		„Be“ paveikslų formatas (GIF keitiklis)
 GIF image translator	GIFView		GIF paveikslų keitiklis
+Palette:	GIFView		Paletė:
 GIF image	GIFTranslator		GIF paveikslas
 Write transparent images	GIFView		Naudoti permatomumą
+GIF images	GIFTranslator		GIF paveikslai
 Use RGB color	GIFView		Naudoti RŽM spalvą
 Use dithering	GIFView		Naudoti elementų smulkinimą
 GIF Settings	GIFTranslator		GIF nuostatos
 BeOS system	GIFView		„BeOS“ sisteminė
+v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		Automatinė spalva (iš alfa kanalo)

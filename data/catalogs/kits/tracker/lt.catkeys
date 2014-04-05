@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	1271663904
+1	lithuanian	x-vnd.Haiku-libtracker	2212190051
 OK	WidgetAttributeText		Gerai
 Icon view	VolumeWindow		Rodyti piktogramas
 Add-ons	FilePanelPriv		Priedai
@@ -73,6 +73,7 @@ Arrange by	ContainerWindow		Rikiuoti pagal
 Mount server error	AutoMounterSettings		Tomų prijungimo tarnybos klaida
 Search	FindPanel		Ieškoti
 Preparing to empty Trash…	StatusWindow		Ruošiamasi tuštinti Šiukšlinę…
+You cannot put the selected item(s) into the trash.	FSUtils		Pažymėtų elementų negalima išmesti Šiukšlinėn.
 Disks	Model		Tomai
 Create link	ContainerWindow		Kurti nuorodą
 Decrease size	DeskWindow		Sumažinti
@@ -99,6 +100,7 @@ New folder	FilePanelPriv		Naujas aplankas
 %name info	InfoWindow	InfoWindow Title	Informacija apie „%name“
 Favorites	FavoritesMenu		Parankiniai
 Add-ons	VolumeWindow		Priedai
+\"%name\" is an unsupported executable.	FSUtils		„%name%“ yra nepalaikomo tipo vykdomasis failas.
 Sorry, you can't copy items to the Trash.	PoseView		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
 List view	VolumeWindow		Rodyti sąrašą
 matches wildcard expression	SelectionWindow		atitinka šabloną
@@ -140,6 +142,7 @@ Add-ons	ContainerWindow		Priedai
 Edit templates…	TemplatesMenu		Tvarkyti šablonus…
 Finish: %time - Over %finishtime left	StatusWindow		Pabaiga: %time – liko dar virš %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Objektas vardu „%name“ jau egzistuoja šiame aplanke. Ar norite jį pakeisti kuriama simboline nuoroda?
+Fewer options	FindPanel		Mažiau parinkčių
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Deja, paskirties tome nepakanka laisvos vietos pažymėtiems objektams nukopijuoti.
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (%error).
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Deja, vienu metu įrašyti daugiau nei vieno failo neleidžiama.
@@ -232,6 +235,7 @@ Temporary	FindPanel		Užklausa laikina
 Version	OpenWithWindow		Versija
 Default application	InfoWindow		numatytąją programą
 Preparing to copy items…	StatusWindow		Rengiamasi kopijuoti objektus…
+Save query as template…	FindPanel		Įrašyti užklausą kaip šabloną…
 Show folder location in title tab	SettingsView		Rodyti pilną aplanko kelią lango antraštėje
 Proceed	FSUtils		Vykdyti
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Šiame aplanke, jau yra objektų, kurių vardai sutampa su objektų, kuriuos %verb, pavadinimais.\n\nAr norite visus konfliktinius objektus pakeisti tais, kuriuos %verb, ar geriau Jūsų atsiklausti dėl kiekvieno atskirai?
@@ -329,6 +333,7 @@ The specified name is already used as the name of a folder. Please choose anothe
 Clean up	ContainerWindow		Sutvarkyti
 after	FindPanel		nuo
 Select…	QueryContainerWindow		Pažymėti…
+More options	FindPanel		Daugiau parinkčių
 link	FSUtils	filename link	nuoroda
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		Ties %func \nnepavyko įvykdyti find_directory(). \nPriežastis: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Įvestas vardas negalimas. Įveskite kitą vardą.
@@ -404,6 +409,7 @@ Paste layout	ContainerWindow		Pritaikyti nukopijuotą išdėstymą
 Select	InfoWindow		Pažymėti
 Could not update permissions of file \"%name\". %error	FSUtils		Nepavyko atnaujinti failo „%name“ leidimų. %error
 Select…	FilePanelPriv		Pažymėti…
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		„%name%“ yra pasenusio tipo vykdomasis failas. Įsigykite naujesnę programos versiją arba ją perkompiliuokite.
 There was an error resolving the link.	Tracker		Nustatant nuorodos tikslą, įvyko klaida.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Šiukšlinės negalima nei perkelti, nei nukopijuoti.
@@ -423,6 +429,7 @@ New	ContainerWindow		Naujas
 Name matches wildcard expression:###	SelectionWindow		Vardas atitinka šabloną:###
 less than	FindPanel		mažesnis nei
 64 x 64	DeskWindow		64×64
+develop	B_SYSTEM_DEVELOP_DIRECTORY		Programavimas
 Modified	ContainerWindow		Modifikavimo data
 Edit Query template	FindPanel		Taisyti užklausos šabloną
 Prompt	FSUtils		Klausti
@@ -440,6 +447,7 @@ contains	FindPanel		savyje turi
 Relation	OpenWithWindow		Santykis
 Open	FilePanelPriv		Atverti
 Mount	DeskWindow		Prijungti
+Recent queries	FindPanel		Paskiausios užklausos
 Mount	ContainerWindow		Prijungti
 %capacity (%used used -- %free free)	InfoWindow		%capacity (užpildyta %used, laisva %free)
 Cancel	FSClipBoard		Atsisakyti

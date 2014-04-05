@@ -1,12 +1,17 @@
-1	lithuanian	x-vnd.Haiku-Pairs	1649564846
+1	lithuanian	x-vnd.Haiku-Pairs	1196284538
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Neaptikta pakankamai vektorinių piktogramų „Poroms“ paleisti. Reikia bent %zu, rasta %zu.\n
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tautorius Ralf Schülke\n\t© 2008-2010, Haiku Inc.\n\nUžbaigti žaidimui jums prireikė %num% spragtelėjimų.\n
 Expert (8x8)	PairsWindow		Žinovas (8×8)
 Beginner (4x4)	PairsWindow		Naujokas (4×4)
 Quit game	PairsWindow		Baigti žaidimą
+Large	PairsWindow		Didelės
+Small	PairsWindow		Mažos
 Game	PairsWindow		Žaidimas
+OK	Pairs		Gerai
 Size	PairsWindow		Dydis
 New	PairsWindow		Naujas
 Intermediate (6x6)	PairsWindow		Pažengęs (6×6)
 Quit	PairsWindow		Baigti žaidimą
 Pairs	System name		Poros
 New game	PairsWindow		Naujas žaidimas
+Medium	PairsWindow		Vidutinės

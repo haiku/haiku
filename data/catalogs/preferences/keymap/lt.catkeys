@@ -1,38 +1,124 @@
-1	lithuanian	x-vnd.Haiku-Keymap	4022885915
+1	lithuanian	x-vnd.Haiku-Keymap	439384761
+Dvorak	Keyboard Layout View		Anglų (Dvorako)
 Shift:	Modifier keys window	Shift key role name	Antrasis lygis:
 Revert	Modifier keys window		Atšaukti pakeitimus
+Slovak	Keyboard Layout View		Slovakų
+Hungarian	Keyboard Layout View		Vengrų
+German	Keyboard Layout View		Vokiečių
+Swiss-French	Keyboard Layout View		Prancūzų (Šveicarija)
+Warning: left and right key roles do not match	Modifier keys window		Dėmesio! Dešinės ir kairės pusės valdymo klavišų funkcijos nesutampa
+Belgian (comma)	Keyboard Layout View		Belgų (kablelis)
+Scroll lock	Keyboard Layout View		Slinkti
+Belarusian (Mac)	Keyboard Layout View		Baltarusių („Mac“)
+Greek	Keyboard Layout View		Graikų
+Menu	Keyboard Layout View	Menu key	Meniu
+US	Keyboard Layout View		Anglų (JAV)
+Left control	Keyboard Layout View		Kairysis Vald
+Spanish	Keyboard Layout View		Ispanų
+Ukrainian (Mac)	Keyboard Layout View		Ukrainiečių („Mac“)
+Belarusian	Keyboard Layout View		Baltarusių
+Italian	Keyboard Layout View		Italų
+Polish (Typewriter)	Keyboard Layout View		Lenkų (raš. mašinėlės)
 Tilde trigger	Keymap window		Riestinis kirtis (tildė)
 Grave trigger	Keymap window		Kairinis kirtis (gravis)
 Role	Modifier keys window	As in the role of a modifier key	Funkcija
+Caps lock	Keyboard Layout View		Didž
 Select dead keys	Keymap window		Kombinaciniai klavišai
+Bulgarian (Cyrillic)	Keyboard Layout View		Bulgarų (kirilica)
 Cancel	Modifier keys window		Atsisakyti
+Russian	Keyboard Layout View		Rusų
+Icelandic	Keyboard Layout View		Islandų
+Command	Keyboard Layout View	Command key	Komanda
+Polish	Keyboard Layout View		Lenkų
+Serbian (Cyrillic)	Keyboard Layout View		Serbų (kirilica)
+French	Keyboard Layout View		Prancūzų
+Faeroese	Keyboard Layout View		Farerų
+Japanese	Keyboard Layout View		Japonų
+Bulgarian (Phonetic)	Keyboard Layout View		Bulgarų (fonetinė)
+Dvorak (programmer's)	Keyboard Layout View		Anglų (Dvorako progr.)
+Estonian	Keyboard Layout View		Estų
+Russian (Mac)	Keyboard Layout View		Rusų („Mac“)
+Defaults	Keymap window		Numatytai
 Quit	Keymap window		Baigti darbą
+Dutch	Keyboard Layout View		Olandų
 Switch shortcut keys to Haiku mode	Keymap window		Naudoti „Haiku“ valdymo klavišus
 Circumflex trigger	Keymap window		Stogelis
+ISO-9995	Keyboard Layout View		ISO-9995
+Hebrew	Keyboard Layout View		Hebrajų
 Diaeresis trigger	Keymap window		Du taškai viršuje (umliautas)
 Disabled	Modifier keys window	Do nothing	Joks
+Belarusian (Latin)	Keyboard Layout View		Baltarusių (lotyniški rašm.)
+Danish	Keyboard Layout View		Danų
 Open…	Keymap window		Atverti…
+Russian (Typewriter)	Keyboard Layout View		Rusų (raš. mašinėlė)
+Error: duplicate keys	Modifier keys window		Klaida: klavišai dubliuojasi
 System:	Keymap window		Sistemos išdėstymai:
+Lithuanian	Keyboard Layout View		Lietuvių
+Finnish	Keyboard Layout View		Suomių
+Svorak	Keyboard Layout View		Švedų („Svorak“)
+Left command	Keyboard Layout View		Kairysis Kom
+Romanian	Keyboard Layout View		Rumunų
 Set modifier keys…	Keymap window		Nustatyti valdymo klavišus…
 Option:	Modifier keys window	Option key role name	Alternatyva:
+Czech (Mac)	Keyboard Layout View		Čekų („Mac“)
+Control	Keyboard Layout View	Control key	Valdymas
+Left option	Keyboard Layout View		Kairysis Alt
+Portuguese	Keyboard Layout View		Portugalų
+Right control	Keyboard Layout View		Dešinysis Vald
+Belgian (point)	Keyboard Layout View		Belgų (taškas)
 Switch shortcut keys	Keymap window		Sukeisti Valdymo ir Komandos klavišus
+Norwegian	Keyboard Layout View		Norvegų
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Lyg2 klavišas
 User:	Keymap window		Naudotojo išdėstymai:
+Esperanto	Keyboard Layout View		Esperanto
+Arabic (102)	Keyboard Layout View		Arabų (102 klavišų)
+United-Kingdom	Keyboard Layout View		Anglų (Jungt. Karalystės)
+German (Mac)	Keyboard Layout View		Vokiečių („Mac“)
+Right option	Keyboard Layout View		Dešinysis Alt
+Right shift	Keyboard Layout View		Dešinysis Lyg2
 Key	Modifier keys window	As in a computer keyboard key	Klavišas
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Vald klavišas
 Control:	Modifier keys window	Control key role name	Valdymas:
+Brazilian	Keyboard Layout View		Brazilų
+Brazilian (ABNT2)	Keyboard Layout View		Brazilų (ABNT2)
+French (Bépo)	Keyboard Layout View		Prancūzų (Bépo)
+Option	Keyboard Layout View	Option key	Alternatyva
+US-International	Keyboard Layout View		Anglų (JAV tarptautinis)
 Sample and clipboard:	Keymap window		Vieta pabandymui:
+Swiss-German	Keyboard Layout View		Vokiečių (Šveicarija)
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt klavišas
 Layout	Keymap window		Klaviatūra
 Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti „Windows“ ir „Linux“ valdymo klavišus
+Albanian	Keyboard Layout View		Albanų
+Right command	Keyboard Layout View		Dešinysis Kom
 Revert	Keymap window		Atšaukti pakeitimus
 Command:	Modifier keys window	Command key role name	Komanda:
+Latin-American	Keyboard Layout View		Lotynų Amerikos
+Spanish (Dvorak)	Keyboard Layout View		Ispanų (Dvorako)
+Lithuanian (Standard)	Keyboard Layout View		Lietuvių (Standartinis)
+Canadian-French	Keyboard Layout View		Prancūzų (Kanada)
+Irish	Keyboard Layout View		Airių
+Turkish (Type-F)	Keyboard Layout View		Turkų („Type-F“)
+Slovene	Keyboard Layout View		Slovėnų
+Turkish (Type-Q)	Keyboard Layout View		Turkų („Type-Q“)
 Save as…	Keymap window		Įrašyti kaip…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd klavišas
+Serbian (Latin)	Keyboard Layout View		Serbų (lotyniški rašm.)
 File	Keymap window		Failas
+Num lock	Keyboard Layout View		Skaitmenys
+Swedish	Keyboard Layout View		Švedų
+Macedonian	Keyboard Layout View		Makedonų
 (Current)	Keymap window		(Esamas)
 Font	Keymap window		Šriftas
 Keymap	System name		Klavišų išdėstymas
+French (Mac)	Keyboard Layout View		Prancūzų („Mac“)
+Left shift	Keyboard Layout View		Kairysis Lyg2
+Shift	Keyboard Layout View	Shift key	Lyg2
+Ukrainian	Keyboard Layout View		Ukrainiečių
+Croatian	Keyboard Layout View		Kroatų
+Kazakh	Keyboard Layout View		Kazachų
+Czech	Keyboard Layout View		Čekų
 Set modifier keys	Modifier keys window		Nustatyti valdymo klavišus
+Colemak	Keyboard Layout View		Anglų („Colemak“)
 Modifier keys	Modifier keys window		Valdymo klavišai
 Acute trigger	Keymap window		Dešininis kirtis (akūtas)

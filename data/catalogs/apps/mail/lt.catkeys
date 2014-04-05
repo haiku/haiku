@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-MAIL	3366038826
+1	lithuanian	x-vnd.Be-MAIL	233997769
 View	Mail		Rodymas
 %d - Date	Mail		%d – data
 Attach attributes:	Mail		Pridedamų failų požymių įtraukimas:
@@ -107,6 +107,7 @@ Close	Mail		Užverti
 No matches	Mail		Atitikmenų nėra
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Pašto tarnyba (mail_daemon) šiuo metu nepaleista. Laiškas įtrauktas į eilę ir bus išsiųstas kai tik pašto tarnyba bus paleista.
 Really delete this signature? This cannot be undone.	Mail		Ar tikrai pašalinti šį prierašą? Šis veiksmas neatšaukiamas.
+Save this message as a draft before closing?	Mail		Ar įrašyti šį laišką kaip juodraštį prieš jį užveriant?
 Open	Mail		Atverti
 draft	B_USER_DIRECTORY/mail/draft		Juodraščiai
 Quote	Mail		Citata
@@ -120,6 +121,7 @@ Account:	Mail		Paskyra:
 Decoding:	Mail		Koduotė:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Apgailestaujame, tačiau nepavyko rasti programos, palaikančios „Person“ tipo failus.
 Delete	Mail		Šalinti
+Don't send	Mail		Nesiųsti
 Leave as '%s'	Mail		Palikti kaip „%s“
 Copy	Mail		Kopijuoti
 Mail couldn't find its dictionary.	Mail		Pašto programai nepavyko rasti žodyno.
@@ -134,6 +136,7 @@ Font:	Mail		Šriftas:
 (Address unavailable)	Mail		(Adresas nenurodytas)
 Save address	Mail		Įrašyti adresą
 Queries	Mail		Užklausos
+Send this message before closing?	Mail		Ar išsiųsti šį laišką prieš jį užveriant?
 Save	Mail		Įrašyti
 Random	Mail		Atsitiktinį
 Close and 	Mail		Užverti ir

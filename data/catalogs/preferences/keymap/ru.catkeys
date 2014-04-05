@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Keymap	2510000186
+1	russian	x-vnd.Haiku-Keymap	3681814702
 Dvorak	Keyboard Layout View		Дворак
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Вернуть
@@ -7,6 +7,7 @@ Hungarian	Keyboard Layout View		Венгерская
 German	Keyboard Layout View		Немецкая
 Swiss-French	Keyboard Layout View		Франко-швейцарский
 Warning: left and right key roles do not match	Modifier keys window		Внимание: роль левой и правой клавиши не совпадают
+Belarusian (Mac)	Keyboard Layout View		Белорусская (латиница)
 Greek	Keyboard Layout View		Греческая
 Left control	Keyboard Layout View		Левый control
 Spanish	Keyboard Layout View		Испанская
@@ -43,6 +44,7 @@ Error: duplicate keys	Modifier keys window		Ошибка: дублирующие
 System:	Keymap window		Системные:
 Lithuanian	Keyboard Layout View		Литовская
 Finnish	Keyboard Layout View		Финская
+Svorak	Keyboard Layout View		Дворак
 Set modifier keys…	Keymap window		Назначить клавиши-модификаторы…
 Option:	Modifier keys window	Option key role name	Option:
 Control	Keyboard Layout View	Control key	Control

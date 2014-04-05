@@ -1,11 +1,13 @@
-1	russian	x-vnd.Haiku-GIFTranslator	2681465564
+1	russian	x-vnd.Haiku-GIFTranslator	1515001985
 Websafe	GIFView		Безопасная
 Write interlaced images	GIFView		Записывать чересстрочные изображения
 Optimal	GIFView		Оптимальная
 Greyscale	GIFView		Оттенки серого
+Colors:	GIFView		Цвета:
 GIF image translator	GIFTranslator		Транслятор GIF изображений
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Растровый формат Be (GIFTranslator)
 GIF image translator	GIFView		Транслятор GIF изображений
+Palette:	GIFView		Палитра:
 GIF image	GIFTranslator		GIF изображение
 Write transparent images	GIFView		Записывать прозрачные изображения
 GIF images	GIFTranslator		GIF изображения

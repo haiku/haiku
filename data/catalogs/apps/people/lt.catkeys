@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-PEPL	3273435274
+1	lithuanian	x-vnd.Be-PEPL	2332202134
 Edit	People		Taisa
 Error	People		Klaida
 City	People		Miestas
@@ -21,6 +21,7 @@ Nickname	People		Slapyvardis
 Quit	People		Baigti darbą
 Name	People		Vardas
 Revert	People		Atšaukti pakeitimus
+Don't save	People		Neįrašyti
 Undo	People		Atšaukti
 E-mail	People		El. paštas
 Load image…	People		Parinkti paveikslą…
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Namų telefonas
 Save as…	People		Įrašyti kaip…
 Redo	People		Grąžinti
+Save changes before closing?	People		Ar įrašyti paketimus prieš užveriant?
 Paste	People		Įdėti
 Drop an image here,\nor use the contextual menu.	People		Numeskite paveikslą čia, arba\npasinaudokite kontekstiniu meniu.
 Save	People		Įrašyti

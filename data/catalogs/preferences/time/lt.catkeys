@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Time	3544635877
+1	lithuanian	x-vnd.Haiku-Time	3259467657
 GMT (UNIX compatible)	Time		Pasaulinis (Grinvičo) laikas (suderinama su UNIX)
 OK	Time		Gerai
 Asia	Time		Azija
@@ -11,12 +11,13 @@ Preview time:	Time		Laikas, kuris bus rodomas:
 Synchronize	Time		Sinchronizuoti
 Revert	Time		Atšaukti pakeitimus
 Pacific	Time		Ramusis vandenynas
+Show day of week	Time		Rodyti savaitės dieną
 Add	Time		Pridėti
 Date and time	Time		Data ir laikas
 about	Time		Apie
 Local time (Windows compatible)	Time		Vietinis laikas (suderinama su „Windows“)
 Message receiving failed	Time		Nepavyko gauti pranešimo
-Set time zone	Time		Pakeisti laiko zoną
+Set time zone	Time		Pakeisti laiko juostą
 Waiting for answer failed	Time		Atsakymas negautas
 Hardware clock set to:	Time		Aparatiniame šio įrenginio laikrodyje nustatytas:
 The following error occured while synchronizing:r\n%s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s
@@ -26,6 +27,7 @@ Time	Time		Laikas
 Indian	Time		Indijos vandenynas
 Sending request failed	Time		Užklausos išsiųsti nepavyko
 Arctic	Time		Arktis
+Display time with seconds	Time		Rodyti sekundes
 Time	System name		Laikas
 America	Time		Amerika
 Reset	Time		Numatytai
@@ -33,11 +35,13 @@ Synchronize at boot	Time		Sinchronizuoti įkeliant sistemą
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Laikas ir data. Programos autoriai:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n© 2004-2012, „Haiku“,
 Received invalid time	Time		Gautas negalimas laikas
 Antarctica	Time		Antarktis
+Show time zone	Time		Rodyti laiko juostą
+Show clock in Deskbar	Time		Rodyti laikrodį pranešimų srityje
 The following error occured while synchronizing:r\n%s: %s	Time		Bandant sinchronizuoti, susidurta su šia klaida:\n%s: %s
 <Other>	Time		<Kita>
 Current time:	Time		Dabartinis laikas:
 Try all servers	Time		Bandyti visus serverius
-Time zone	Time		Laiko zona
+Time zone	Time		Laiko juosta
 Could not create socket	Time		Nepavyko sukurti lizdo
 Synchronize again	Time		Sinchronizuoti vėl
 Clock	Time		Laikrodis

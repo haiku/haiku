@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libbe	3533447595
+1	lithuanian	x-vnd.Haiku-libbe	3504008668
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -14,9 +14,11 @@ alpha	AboutWindow		alfa
 Error	PrintJob		Klaida
 No Pages to print!	PrintJob		Nėra spausdintinų puslapių!
 All Rights Reserved.	AboutWindow		Visos teisės saugomos.
+About %app%	AboutWindow		Apie „%app%“
 OK	Dragger		Gerai
 OK	PrintJob		Gerai
 Green:	ColorControl		Žalia:
+Ok	AboutWindow		Gerai
 Version history:	AboutWindow		Versijų istorija:
 Remove replicant	Dragger		Pašalinti replikantą
 OK	ZombieReplicantView		Gerai
@@ -33,6 +35,8 @@ Undo	TextView		Atšaukti
 Red:	ColorControl		Raudona:
 %3.2f MiB	StringForSize		%3.2f MiB
 About %app…	Dragger		Apie programą „%app“…
+development	AboutWindow		vystoma
 Error	ZombieReplicantView		Klaida
 Blue:	ColorControl		Mėlyna:
+gold master	AboutWindow		galutinė
 Can't delete this replicant from its original application. Life goes on.	Dragger		Šio replikanto pašalinti iš jo pirminės programos nepavyko. Gyvenimas tęsiasi.

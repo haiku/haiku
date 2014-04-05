@@ -1,0 +1,33 @@
+1	lithuanian	x-vnd.Haiku-InterfacesAddOn	160108912
+Interface	InterfaceWindow		Tinklo adapteris
+Configure…	InterfacesListView		Konfigūruoti…
+Static	IntefaceAddressView		Statinis
+None	InterfacesListView		Nėra
+IP:	InterfacesListView	IPv4 address label	IP:
+Status:	IntefaceHardwareView		Būsena:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Save	InterfaceWindow		Įrašyti
+Link speed:	IntefaceHardwareView		Jungties sparta:
+Renegotiate	InterfacesAddOn		Gauti iš naujo
+The method for obtaining an IP address	IntefaceAddressView		IP adreso gavimo būdas
+Your gateway	IntefaceAddressView		Jūsų sietuvas
+Enable	InterfacesListView		Įjungti
+Received:	IntefaceHardwareView		Gauta:
+Revert	InterfaceWindow		Atšaukti pakeitimus
+connected	IntefaceHardwareView		prijungtas
+Gateway:	IntefaceAddressView		Sietuvas:
+Disable	InterfacesListView		Išjungti
+Sent:	IntefaceHardwareView		Išsiųsta:
+Disable	InterfacesAddOn		Išjungti
+Configure…	InterfacesAddOn		Konfigūruoti…
+Renegotiate Address	InterfacesListView		Gauti adresą iš naujo
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Veiksena:
+Your netmask	IntefaceAddressView		Jūsų tinklo kaukė
+IP Address:	IntefaceAddressView		IP adresas:
+Off	IntefaceAddressView		Išjungtas
+MAC address:	IntefaceHardwareView		MAC adresas:
+Netmask:	IntefaceAddressView		Tinklo kaukė:
+Your IP address	IntefaceAddressView		Jūsų IP adresas
+%llu KBytes	IntefaceHardwareView		%llu KB
+disconnected	IntefaceHardwareView		atjungtas

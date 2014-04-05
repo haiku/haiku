@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-WebPositive	233049275
+1	lithuanian	x-vnd.Haiku-WebPositive	2880796666
 Show home button	Settings Window		Rodyti Namų mygtuką
 Username:	Authentication Panel		Naudotojo vardas:
 Copy URL to clipboard	Download Window		Kopijuoti URL adresą į iškarpinę
@@ -16,6 +16,8 @@ Start page:	Settings Window		Pradžios tinklapis:
 History	WebPositive Window		Žurnalas
 Error opening downloads folder	Download Window		Klaida atveriant parsiuntimų aplanką
 Paste	WebPositive Window		Įdėti
+Double-click or middle-click to open new tab.	Tab Manager		Dukart spustelėkite arba spustelėkite vidurinį mygtuką naujai kortelei atverti.
+Proxy username:	Settings Window		Įgaliotojo serverio naudotojo vardas:
 Settings	Settings Window		Nuostatos
 %seconds seconds left	Download Window		Liko %seconds sek.
 Confirmation	WebPositive Window		Patvirtinimas
@@ -41,9 +43,10 @@ Quit	WebPositive Window		Baigti darbą
 Full screen	WebPositive Window		Visas ekranas
 Open download error	Download Window		Klaida atveriant parsiųstą failą
 Standard font:	Settings Window		Numatytasis šriftas:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Rasti ankstesnį ieškomos frazės pasikartojimą
 Restart	Download Window		Paleisti iš naujo
 Proxy server	Settings Window		Įgaliotasis serveris
-Open containing folder	Download Window		Atverti aplanką su šiuo failu
+Open containing folder	Download Window		Atverti gaubiantįjį aplanką
 New window	WebPositive Window		Naujas langas
 Open	Download Window		Atverti
 Reload	WebPositive Window		Atsiųsti iš naujo
@@ -58,6 +61,7 @@ Cut	WebPositive Window		Iškirpti
 Bookmark this page	WebPositive Window		Įtraukti šį tinklapį į adresyną
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Bandant atverti Adresyno aplanką, įvyko klaida.\n\nKlaida: %error
 Open downloads folder	Download Window		Atverti parsiuntimų aplanką
+Proxy password:	Settings Window		Įgaliotojo serverio slaptažodis:
 Number of days to keep links in History menu:	Settings Window		Kiek dienų laikyti saitus žurnalo meniu:
 Hide	Download Window		Nerodyti
 Reset size	WebPositive Window		Atstatyti pradinį dydį
@@ -67,6 +71,7 @@ There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive 
 Over 1 day left	Download Window		Liko daugiau nei 1 diena
 Downloads	WebPositive Window		Parsiuntimai
 Requesting %url	WebPositive Window		Siunčiama užklausa tinklapiui %url
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Rasti tolesnį ieškomos frazės pasikartojimą
 Apply	Settings Window		Taikyti
 Bookmark info	WebPositive Window		Adresyno įrašo savybės
 Size:	Font Selection view		Dydis:
@@ -80,13 +85,16 @@ Open blank page	Settings Window		Atverti tuščią tinklapį
 New tabs:	Settings Window		Naujos kortelės:
 Cancel	WebPositive Window		Atsisakyti
 Open all	WebPositive Window		Atverti viską
+Proxy server requires authentication	Settings Window		Įgaliotasis serveris reikalauja patvirtinti tapatybę
 Clear	URL Bar		Išvalyti
 Cut	URL Bar		Iškirpti
 Clear	WebPositive Window		Išvalyti
+Script console	Console Window		Scenarijų pultas
 Remove	Download Window		Pašalinti
 Find	WebPositive Window		Ieškoti
 Find previous	WebPositive Window		Ieškoti ankstesnio frazės egzemplioriaus
 Settings	WebPositive Window		Nuostatos
+Script console	WebPositive Window		Scenarijų pultas
 Proxy server address:	Settings Window		Įgaliotojo serverio adresas:
 Proxy server port:	Settings Window		Įgaliotojo serverio prievadas:
 Bookmarks	WebPositive Window		Adresynas
@@ -100,6 +108,7 @@ Open start page	Settings Window		Atverti pradžios tinklapį
 Continue downloads	WebPositive		Tęsti parsiuntimus
 Cancel	Download Window		Atsisakyti
 Open search page	Settings Window		Atverti paieškos tinklapį
+Clear	Console Window		Išvalyti
 Password:	Authentication Panel		Slaptažodis:
 Back	WebPositive Window		Atgal
 New browser window	Download Window		Naujas naršyklės langas

@@ -1,0 +1,65 @@
+1	lithuanian	x-vnd.Haiku-HaikuDepot	3398060443
+Name	PackageListView		Pavadinimas
+Installed packages	Model		Įdiegti paketai
+User modified packages	Model		Naudotojo pakeisti paketai
+Update available	Model		Galimi naujinimai
+Changelog	PackageInfoView		Pakeitimų žurnalas
+Click a package to view information	PackageInfoView		Spustelėkite paketą jo informacijai pamatyti
+for %Version%	PackageInfoView		versijai %Version%
+No changelog available.	PackageInfoView		Pakeitimų žurnalas neprieinamas.
+Depot:	FilterView		Saugykla:
+Description	PackageListView		Aprašas
+Install	PackageManager		Įdiegti
+Tools	MainWindow		Priemonės
+HaikuDepot	System name		Paketų tvarkytuvė
+Rate package…	PackageInfoView		Įvertinti paketą…
+Uninstall	PackageManager		Išdiegti
+<no info>	PackageInfoView		<informacijos nėra>
+An error occurred while initializing the package manager: %message%	MainWindow		Inicijuojant paketų tvarkytuvę, įvyko klaida: %message%
+Close	PackageManager		Užverti
+Status	PackageListView		Būsena
+Available packages	Model		Prieinami paketai
+Your rating	System name		Jūsų įvertinimas
+Development	Model		Programuotojams
+Fatal error	PackageManager		Kritinė klaida
+Ratings	PackageInfoView		Įvertinimai
+1 item	PackageListView		1 elementas
+Inactive	PackageListView		Neaktyvus
+Refresh depots	MainWindow		Atnaujinti saugyklas
+Main Menu	MainWindow		Pagrindinis meniu
+Command line	Model		Komandų eilutė
+(%Votes%)	PackageInfoView		(%Votes%)
+Downloading:	PackageInfoView		Parsiunčiamas:
+Search terms:	FilterView		Ieškomi žodžiai:
+%Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Naudotojų įvertinimų nėra.
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Atnaujinant saugyklos turinį, įvyko klaida: %error% (%details%)
+Show source packages	MainWindow		Rodyti pirminių tekstų paketus
+Productivity	Model		Raštinė
+Show:	FilterView		Rodiniai:
+Size	PackageListView		Dydis
+Options	MainWindow		Parinktys
+Games	Model		Žaidimai
+Rating	PackageListView		Įvertinimas
+Downloading	Model		Parsiunčiami
+%ld items	PackageListView		elementų: %ld
+Graphics	Model		Grafika
+Local	MainWindow		Vietinis
+Close	MainWindow		Užverti
+Video	Model		Video
+An error occurred while refreshing the repository: %error%	MainWindow		Atnaujinant saugyklos turinį, įvyko klaida: %error%
+All packages	FilterView		Visi paketai
+Pending…	PackageListView		Laukiama…
+Depot	FilterView		Visos saugyklos
+Uninstalled	PackageListView		Išdiegti
+Unknown	PackageListView		Nežinoma
+All depots	FilterView		Visos saugyklos
+Available	PackageListView		Prieinamas
+n/a	PackageInfoView		n/d
+Send	RatePackageWindow		Siųsti
+Show develop packages	MainWindow		Rodyti programuotojams skirtus paketus
+Show	FilterView		Visi paketai
+Uninstalled packages	Model		Išdiegti paketai
+Audio	Model		Audio
+About	PackageInfoView		Apie
+Active	PackageListView		Aktyvus

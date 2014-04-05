@@ -1,16 +1,19 @@
-1	lithuanian	x-vnd.Be-TSKB	1042823442
+1	lithuanian	x-vnd.Be-TSKB	2335730970
 Power off	DeskbarMenu		Išjungti
+Sort applications by name	PreferencesWindow		Rikiuoti programas pagal pavadinimą
 Suspend	DeskbarMenu		Pristabdyti
 Hide clock	TimeView		Nerodyti laikrodžio
 Applications	PreferencesWindow		Programos
 Time preferences…	TimeView		Laiko nuostatos…
 About Haiku	DeskbarMenu		Apie „Haiku“
+Edit in Tracker…	PreferencesWindow		Tvarkyti Pėdsekyje…
 Recent documents:	PreferencesWindow		Paskiausi dokumentai:
 Recent applications	DeskbarMenu		Paskiausiai leistos programos
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programos
 Find…	DeskbarMenu		Ieškoti…
 Show clock	Tray		Rodyti laikrodį
 Window	PreferencesWindow		Langas
+Defaults	PreferencesWindow		Numatytai
 Menu	PreferencesWindow		Meniu
 Recent documents	DeskbarMenu		Paskiausiai atverti dokumentai
 Auto-hide	PreferencesWindow		Automatiškai slėpti
@@ -28,6 +31,7 @@ Restart Tracker	DeskbarMenu		Perleisti Pėdsekį
 Close all	WindowMenu		Užverti visus
 Deskbar preferences	PreferencesWindow		Užduočių juostos nuostatos
 Mount	DeskbarMenu		Prijungti diską
+Revert	PreferencesWindow		Atšaukti pakeitimus
 Small	PreferencesWindow		Mažos
 Recent applications:	PreferencesWindow		Paskiausios programos:
 Shutdown…	DeskbarMenu		Kompiuterio išjungimas…

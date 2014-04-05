@@ -1,9 +1,11 @@
-1	lithuanian	x-vnd.Haiku-ActivityMonitor	3955848603
+1	lithuanian	x-vnd.Haiku-ActivityMonitor	637395798
 P-faults	DataSource		Psl. klaidos
 Threads	DataSource		Gijos
+Always on top	ActivityWindow		Visada viršuje
 Add graph	ActivityWindow		Pridėti grafiką
 Teams	DataSource		Procesų grupės
 Hide legend	ActivityView		Nerodyti legendos
+MiB	DataSource		MiB
 Network send	DataSource		Išsiunčiami duomenys
 CPU usage (combined)	DataSource		Centrinio procesoriaus apkrova (kompleksinė)
 CPU	DataSource		Centrinis procesorius Nr.
@@ -24,12 +26,14 @@ Update time interval:	SettingsWindow		Atnaujinimo periodas:
 TX	DataSource	Shorter version for Sending	Išs.
 Quit	ActivityWindow		Baigti darbą
 Block cache memory	DataSource		Blokinio podėlio atmintis
+%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		Pašalinti grafiką
 %lld sec.	SettingsWindow		%lld sek.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		Centrinio procesoriaus apkrova
 Raw clipboard	DataSource		Iškarpinės apimtis
 Sems	DataSource		Sem.
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		Aktyvumo monitorius
 Running applications	DataSource		Veikiančios programos
 Semaphores	DataSource		Semaforai

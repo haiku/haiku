@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaPlayer	2969013755
+1	lithuanian	x-vnd.Haiku-MediaPlayer	1727923642
 raw audio	MediaPlayer-InfoWin		neapdorotas garso įrašas
 Location	MediaPlayer-InfoWin		Vieta
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikietiškas)
@@ -21,10 +21,12 @@ Close	MediaPlayer-Main		Užverti
 Display Mode	MediaPlayer-InfoWin		Rodymo būdas
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kai kurių failų išmesti Šiukšlinėn nepavyko.
 <unknown>	MediaPlayer-InfoWin		<nežinomas>
+Seek	MediaPlayer-Main		Pervynioti
 Open	MediaPlayer-Main		Atverti
 Next	MediaPlayer-Main		Kitas
 OK	MediaPlayer-SettingsWindow		Gerai
 Track %d	MediaPlayer-Main		%d-asis takelis
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Gauna/nustato šiuo metu atkuriamą įrašo poziciją (mikrosekundėmis).
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 („Cinemascope“)
 Display mode	MediaPlayer-InfoWin		Rodymo būdas
 Medium	MediaPlayer-SettingsWindow		Vidutinis
@@ -69,6 +71,7 @@ Select all	MediaPlayer-PlaylistWindow		Pažymėti viską
 Move Entry	MediaPlayer-MovePLItemsCmd		Perkelti įrašą
 Open	MediaPlayer-PlaylistWindow		Atverti
 Stop playing.	MediaPlayer-Main		Sustabdyti atkūrimą.
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		Pervynioti įrašą per nurodytą mikrosekundžių kiekį.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Failo „%filename“ nepavyko atverti.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Klaida:
 Audio	MediaPlayer-InfoWin		Garsas
@@ -100,6 +103,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Visų fai
 <untitled>	PlaylistItem-title		<be pavadinimo>
 Track	Audio Track Menu		Takelis
 unknown format	MediaPlayer-InfoWin		formatas nežinomas
+Position	MediaPlayer-Main		Pozicija
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nėra ką grąžinti>
 Skip to the next track.	MediaPlayer-Main		Peršokti į kitą takelį.
 Play	MediaPlayer-Main		Leisti
@@ -135,12 +139,14 @@ Edit	MediaPlayer-PlaylistWindow		Taisa
 Start media server	MediaPlayer-Main		Paleisti įvairialypės terpės tarnybą
 %.3f fps	MediaPlayer-InfoWin		%.3f kadr./sek.
 Toggle fullscreen.	MediaPlayer-Main		Įjungti / išjungti viso ekrano veikseną.
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Gauna šiuo metu atkuriamo įrašo trukmę mikrosekundėmis.
 ToggleFullscreen	MediaPlayer-Main		ToggleFullscreen
 <unnamed>	PlaylistItem-name		<be pavadinimo>
 Open Clips	MediaPlayer-Main		Atverti įrašus
 OK	MediaPlayer-PlaylistWindow		Gerai
 none	Audio track menu		nėra
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Gauna / nustato garsumą (0.0-2.0).
+Duration	MediaPlayer-Main		Trukmė
 Playlist…	MediaPlayer-Main		Grojaraštis…
 <unknown>	PlaylistItem-author		<nežinomas>
 Save as…	MediaPlayer-PlaylistWindow		Įrašyti kaip…

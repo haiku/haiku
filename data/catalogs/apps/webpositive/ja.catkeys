@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	1786411139
+1	japanese	x-vnd.Haiku-WebPositive	2880796666
 Show home button	Settings Window		ホームボタンを表示する
 Username:	Authentication Panel		ユーザー名:
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
@@ -89,10 +89,12 @@ Proxy server requires authentication	Settings Window		プロキシサーバー�
 Clear	URL Bar		クリア
 Cut	URL Bar		切り取り
 Clear	WebPositive Window		クリア
+Script console	Console Window		スクリプトコンソール
 Remove	Download Window		削除
 Find	WebPositive Window		検索
 Find previous	WebPositive Window		前を検索
 Settings	WebPositive Window		設定
+Script console	WebPositive Window		スクリプトコンソール
 Proxy server address:	Settings Window		プロキシサーバーのアドレス:
 Proxy server port:	Settings Window		プロキシサーバーポート:
 Bookmarks	WebPositive Window		ブックマーク
@@ -106,6 +108,7 @@ Open start page	Settings Window		スタートページを開く
 Continue downloads	WebPositive		ダウンロードを続ける
 Cancel	Download Window		中止
 Open search page	Settings Window		検索ページを開く
+Clear	Console Window		クリア
 Password:	Authentication Panel		パスワード:
 Back	WebPositive Window		戻る
 New browser window	Download Window		新規ブラウザウィンドウ

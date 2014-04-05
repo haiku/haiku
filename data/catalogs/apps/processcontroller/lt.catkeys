@@ -1,12 +1,15 @@
-1	lithuanian	x-vnd.Haiku-ProcessController	2886374724
+1	lithuanian	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		Atminties naudojimas
+Kill this team!	ProcessController		Nutraukti šios procesų grupės darbą!
 Idle priority	ProcessController		Nulinis prioritetas
 Restart Deskbar	ProcessController		Perleisti Užduočių juostą
 Custom priority	ProcessController		Parinktinis prioritetas
 This team is already gone…	ProcessController		Šios užduoties jau nebėra…
 Error saving file	ProcessController		Klaida įrašant failą
 Real-time priority	ProcessController		Tikralaikis prioritetas
+Power saving	ProcessController		Energijos taupymas
 Your setting file could not be saved!\n(%s)	ProcessController		Nepavyko įrašyti Jūsų nuostatų failo!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Ką norite daryti su „%s“ procesų grupe?
 This thread is already gone…	ProcessController		Šios gijos jau nebėra…
 Cancel	ProcessController		Atsisakyti
 Display priority	ProcessController		Rodymo prioritetas
@@ -34,8 +37,10 @@ Quit an application	ProcessController		Baigti programos darbą
 Install in Deskbar	ProcessController		Patalpinti pranešimų srityje
 Threads and CPU usage	ProcessController		Gijos ir procesoriaus naudojimas
 Urgent display priority	ProcessController		Skubaus rodymo prioritetas
+Low latency	ProcessController		Minimali delsa
 OK	ProcessController		Gerai
 Damned!	ProcessController		Po velnių!
+Debug this team!	ProcessController		Derinti šią procesų grupę!
 Usage: %s [-deskbar]\n	ProcessController		Naudojimas: %s [-deskbar]\n
 ProcessController	System name		Procesų valdiklis
 Real-time display priority	ProcessController		Tikralaikio rodymo prioritetas

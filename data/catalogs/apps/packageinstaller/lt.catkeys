@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-PackageInstaller	792037176
+1	lithuanian	x-vnd.Haiku-PackageInstaller	2033288398
 Install to:	PackageView		Diegti į:
 OK	PackageView		Gerai
 Accept	PackageTextViewer		Priimti
@@ -12,12 +12,14 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		Klaida diegiant paketą\n
 Disclaimer	PackageTextViewer		Atsakomybės išsižadėjimas
 %.1f GiB	PackageView		%.1f GiB
+%name% (%size% free)	PackageView		%name% (laisva %size%)
 The installation of the package has been aborted.	PackageView		Paketo diegimas nutrauktas.
 Done	PackageInstall		Atlikta
 All existing files will be replaced?	PackageView		Ar tikrai norite perrašyti visus egzistuojančius failus?
 Preparing package	PackageInstall		Paketas ruošiamas
 No package available.	PackageInfo		Nėra paketo.
 none	PackageView		nieko
+Install %name%	PackageView		Įdiegti „%name%“
 Stop	PackageStatus		Stabdyti
 Other…	PackageView		Kitą vietą…
 No installation type selected	PackageView		Diegimo tipas nenurodytas
@@ -45,11 +47,14 @@ Decline	PackageTextViewer		Atmesti
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Failas vardu „%s“ duotąjame kelyje jau yra.\nPakeisti failą esančiu šiame pakete, ar palikti esamą?
 All existing files will be skipped?	PackageView		Ar tikrai norite praleisti visus jau egzistuojančius failus?
 Continue	PackageInfo		Tęsti
+%index% of %total%	PackageInstall		%index% iš %total%
 %.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		Nutraukti
 PackageInstaller	System name		Paketų diegyklė
 Abort	PackageInstall		Nutraukti
+%name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Tęsti
+Begin	PackageView		Pradėti
 Replace	PackageView		Pakeisti
 Installation progress	PackageView		Diegimo eiga
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paketo failo nepavyko perskaityti.\nGali būti, jog nurodytas failas nėra BeOS .pkg paketas arba yra pažeistas.

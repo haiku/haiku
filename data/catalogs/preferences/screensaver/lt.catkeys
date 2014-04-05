@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-ScreenSaver	904083067
+1	lithuanian	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Nepavyko įkelti ekrano užsklandos
 30 seconds	ScreenSaver		30 sekundžių
 Start screensaver	ScreenSaver		Paleisti ekrano užsklandą
@@ -10,7 +10,9 @@ Display Power Management Signaling not available	ScreenSaver		DPMS (ekrano maiti
 ScreenSaver	System name		Ekrano užsklanda
 Test	ScreenSaver		Išbandyti
 General	ScreenSaver		Bendrosios
+Fade now when mouse is here	ScreenSaver		Paleisti užsklandą, kai pelės žymeklis yra čia
 Enable screensaver	ScreenSaver		Įjungti ekrano užsklandą
+Don't fade when mouse is here	ScreenSaver		Neleisti užsklandos, kai pelės žymeklis yra čia
 Cancel	ScreenSaver		Atsisakyti
 Turn off screen	ScreenSaver		Išjungti ekraną
 No options available	ScreenSaver		Ši užsklanda nekonfigūruojama
@@ -22,4 +24,5 @@ Blackness	ScreenSaver		Juodas ekranas
 Use custom password	ScreenSaver		Naudoti kitą slaptažodį
 Done	ScreenSaver		Atlikta
 Confirm password:	ScreenSaver		Patvirtinkite slaptažodį:
+No preview available	PreviewView		Peržiūra negalima
 Use network password	ScreenSaver		Naudoti tinklo slaptažodį

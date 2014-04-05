@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Keymap	2268786606
+1	swedish	x-vnd.Haiku-Keymap	439384761
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Skift:
 Revert	Modifier keys window		Återställ
@@ -6,6 +6,7 @@ Slovak	Keyboard Layout View		Slovakiska
 Hungarian	Keyboard Layout View		Ungerska
 German	Keyboard Layout View		Tyska
 Swiss-French	Keyboard Layout View		Fransk (schweizisk)
+Warning: left and right key roles do not match	Modifier keys window		Warning: Höger och vänster roller matchar inte varandra
 Belgian (comma)	Keyboard Layout View		Belgisk (vanlig)
 Scroll lock	Keyboard Layout View		Scroll lock
 Belarusian (Mac)	Keyboard Layout View		Vitryska (Mac)
@@ -34,6 +35,7 @@ French	Keyboard Layout View		Franska
 Faeroese	Keyboard Layout View		Färöiska
 Japanese	Keyboard Layout View		Japanska
 Bulgarian (Phonetic)	Keyboard Layout View		Bulgariskt (Fonetiskt)
+Dvorak (programmer's)	Keyboard Layout View		Dvorak (Programmerare)
 Estonian	Keyboard Layout View		Estniska
 Russian (Mac)	Keyboard Layout View		Rysk (Mac)
 Defaults	Keymap window		Standardvärde
@@ -48,22 +50,40 @@ Disabled	Modifier keys window	Do nothing	Inaktiverad
 Belarusian (Latin)	Keyboard Layout View		Vitryska (latinsk)
 Danish	Keyboard Layout View		Danska
 Open…	Keymap window		Öppna…
+Russian (Typewriter)	Keyboard Layout View		Rysk (Skrivmaskin)
+Error: duplicate keys	Modifier keys window		Fel: Upprepad tangenter
 System:	Keymap window		System:
+Lithuanian	Keyboard Layout View		Litauiska
+Finnish	Keyboard Layout View		Finska
+Svorak	Keyboard Layout View		Svorak
 Left command	Keyboard Layout View		Vänster kommando
+Romanian	Keyboard Layout View		Rumänska
 Set modifier keys…	Keymap window		Sätt modifierings tangent...
 Option:	Modifier keys window	Option key role name	Alternativ:
+Czech (Mac)	Keyboard Layout View		Tjeckisk (Mac)
 Control	Keyboard Layout View	Control key	Kontroll
 Left option	Keyboard Layout View		Vänster alternativ
+Portuguese	Keyboard Layout View		Portugisiska
 Right control	Keyboard Layout View		Höger kontroll
+Belgian (point)	Keyboard Layout View		Belgisk (point)
 Switch shortcut keys	Keymap window		Switch shortcut keys
+Norwegian	Keyboard Layout View		Norska
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Skifttangent
 User:	Keymap window		Användare:
+Esperanto	Keyboard Layout View		Esperanto
+Arabic (102)	Keyboard Layout View		Arabisk (102)
+United-Kingdom	Keyboard Layout View		Storbritannien
+German (Mac)	Keyboard Layout View		Tyska (Mac)
 Right option	Keyboard Layout View		Höger alternativ
 Right shift	Keyboard Layout View		Höger skift
 Key	Modifier keys window	As in a computer keyboard key	Tangent
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-tangent
 Control:	Modifier keys window	Control key role name	Kontroll:
+Brazilian	Keyboard Layout View		Brazilianskt
+Brazilian (ABNT2)	Keyboard Layout View		Brazilianskt (ABNT2)
+French (Bépo)	Keyboard Layout View		Franska (Bépo)
 Option	Keyboard Layout View	Option key	Alternativ
+US-International	Keyboard Layout View		US-International
 Sample and clipboard:	Keymap window		Exempel:
 Swiss-German	Keyboard Layout View		Schweizisk tysk
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt tangent
@@ -99,5 +119,6 @@ Croatian	Keyboard Layout View		Kroatiska
 Kazakh	Keyboard Layout View		Kazakiska
 Czech	Keyboard Layout View		Tjeckiska
 Set modifier keys	Modifier keys window		Set modifierings tangent
+Colemak	Keyboard Layout View		Colemak
 Modifier keys	Modifier keys window		Modifierings tangenter
 Acute trigger	Keymap window		Acute trigger

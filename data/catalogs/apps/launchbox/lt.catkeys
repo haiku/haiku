@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-LaunchBox	3016105370
+1	lithuanian	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Naujas
 Set description…	LaunchBox		Keisti aprašą…
 Vertical layout	LaunchBox		Išdėstyti stačiai
@@ -6,6 +6,7 @@ OK	LaunchBox		Gerai
 Pad 1	LaunchBox		Skydelis Nr. 1
 last chance	LaunchBox		paskutinė proga
 Quit	LaunchBox		Baigti darbą
+Open containing folder	LaunchBox		Atverti gaubiantįjį aplanką
 Clear button	LaunchBox		Atlaisvinti mygtuką
 LaunchBox	System name		Leidyklė
 Ignore double-click	LaunchBox		Nepaisyti dvigubų spustelėjimų

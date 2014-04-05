@@ -1,9 +1,11 @@
-1	lithuanian	x-vnd.Haiku-MediaConverter	2955071341
+1	lithuanian	x-vnd.Haiku-MediaConverter	2722282283
 Video using parameters form settings	MediaConverter		Vaizdo įrašui naudojami nurodyti parametrai
 Video encoding:	MediaConverter		Vaizdo kodavimas:
+Error read audio frame %lld	MediaConverter		Klaida skaitant audio kadrą %lld
 No audio	Audio codecs list		Be garso takelio
 Error	MediaConverter		Klaida
 Error loading a file	MediaConverter		Klaida įkeliant failą
+Error read video frame %lld	MediaConverter		Klaida skaitant video kadrą %lld
 File Error	MediaConverter-FileInfo		Failo klaida
 Open…	Menu		Atverti…
 Start [ms]: 	MediaConverter		Pradžia [ms]:
@@ -22,6 +24,8 @@ Audio:	MediaConverter-FileInfo		Garso takelis:
 OK	MediaConverter-FileInfo		Gerai
  seconds	MediaFileInfo		 sek.
 Source files	MediaConverter		Pirminiai failai
+Error writing video frame %lld	MediaConverter		Klaida rašant video kadrą %lld
+Error writing audio frame %lld	MediaConverter		Klaida rašant audio kadrą %lld
 Cancelling	MediaConverter		Nutraukiama
 %d byte 	MediaFileInfo		%d baitas
 Error loading files	MediaConverter		Klaida įkeliant failus

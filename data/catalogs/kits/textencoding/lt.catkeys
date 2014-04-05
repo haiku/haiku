@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtextencoding	3062073902
+1	lithuanian	x-vnd.Haiku-libtextencoding	1525027211
 ISO Greek	textencodings		Graikų (ISO)
 ISO South European	textencodings		Pietų Europos (ISO)
 Chinese Big5	textencodings		Kinų (Big5)
@@ -7,6 +7,7 @@ ISO Arabic	textencodings		Arabų (ISO)
 ISO Latin 9	textencodings		Vakarų Europos (ISO 8859-15)
 Japanese Shift JIS	textencodings		Japonų (Shift JIS)
 DOS Cyrillic	textencodings		Kirilica (DOS)
+Windows Central European (CP 1250)	textencodings		„Windows“ Vidurio Europos (CP 1250)
 Windows Cyrillic (CP 1251)	textencodings		Kirilica (Windows-1251)
 Japanese EUC	textencodings		Japonų (EUC)
 Unicode	textencodings		Unikodas

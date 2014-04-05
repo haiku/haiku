@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-BluetoothPrefs	1628593228
+1	lithuanian	x-vnd.Haiku-BluetoothPrefs	3212620536
 About Bluetooth…	Window		Apie…
 Handheld	Settings view		delninukas
 Default inquiry time:	Settings view		Numatytasis žvalgymo laikas:
@@ -55,6 +55,7 @@ Always ask	Settings view		visuomet atsiklausti
 Retrieving name of %1	Inquiry panel		Gaunamas %1 vardas
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Įsitikinkite, kad nuotoliniame įrenginyje įjungtas „Bluetooth“ ir spustelėkite mygtuką „Žvalgyti“. Laikas, reikalingas vardų gavimui, nėra žinomas, nors ir neturėtų viršyti 3 sekundžių vienam įrenginiui. Pridėję įrenginius į pagrindinį sąrašą, galėsite su jais suporuoti šią sistemą.
 Authenticate	Extended local device view		Nustatyti tapatybę
+Pick device...	Settings view		Parinkti įrenginį…
 Retrieving names...	Inquiry panel		Gaunami vardai…
 Help	Window		Pagalba
 Add…	Remote devices		Pridėti…

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	1786411139
+1	swedish	x-vnd.Haiku-WebPositive	2880796666
 Show home button	Settings Window		Visa hem-knappen
 Username:	Authentication Panel		Användarnamn:
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
@@ -89,10 +89,12 @@ Proxy server requires authentication	Settings Window		Proxyservern kräver behö
 Clear	URL Bar		Töm
 Cut	URL Bar		Klipp ut
 Clear	WebPositive Window		Töm
+Script console	Console Window		Skriptkonsol
 Remove	Download Window		Ta bort
 Find	WebPositive Window		Sök
 Find previous	WebPositive Window		Sök föregående
 Settings	WebPositive Window		Inställningar
+Script console	WebPositive Window		Skriptkonsol
 Proxy server address:	Settings Window		Proxyserveradress:
 Proxy server port:	Settings Window		Port för proxyserver
 Bookmarks	WebPositive Window		Bokmärken
@@ -106,6 +108,7 @@ Open start page	Settings Window		Öppna startsida
 Continue downloads	WebPositive		Fortsätt ladda ner
 Cancel	Download Window		Avbryt
 Open search page	Settings Window		Öppna sök sidan
+Clear	Console Window		Töm
 Password:	Authentication Panel		Lösenord:
 Back	WebPositive Window		Tillbaka
 New browser window	Download Window		Nytt fönster
