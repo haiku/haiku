@@ -9,6 +9,7 @@ endif
 
 syn keyword Keyword BUILD_PACKAGE_ACTIVATION_FILE DISABLE_SOURCE_PACKAGE HOMEPAGE
 syn keyword Keyword MESSAGE REVISION CHECKSUM_MD5 PATCHES SOURCE_DIR SRC_FILENAME
+syn keyword Keyword CHECKSUM_SIZE CHECKSUM_RMD160 CHECKSUM_SHA512 SECONDARY_ARCHITECTURES
 syn keyword Keyword SRC_URI ARCHITECTURES BUILD_PREREQUIRES BUILD_REQUIRES CONFLICTS
 syn keyword Keyword COPYRIGHT DESCRIPTION FRESHENS GLOBAL_WRITABLE_FILES LICENSE
 syn keyword Keyword PACKAGE_GROUPS PACKAGE_USERS POST_INSTALL_SCRIPTS PROVIDES REPLACES
@@ -35,7 +36,7 @@ syn keyword Define relativePreferencesDir relativeSbinDir relativeSettingsDir
 syn keyword Define relativeSharedStateDir sbinDir settingsDir sharedStateDir
 syn keyword Define sourceDir targetArchitecture buildMachineTriple
 syn keyword Define buildMachineTripleAsName crossSysrootDir targetMachineTriple
-syn keyword Define targetMachineTripleAsName
+syn keyword Define targetMachineTripleAsName secondaryArchSuffix
 
 syn keyword Function addAppDeskbarSymlink addPreferencesDeskbarSymlink
 syn keyword Function defineDebugInfoPackage extractDebugInfo
