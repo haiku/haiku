@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * All rights reserved. Distributed under the terms of the MIT License.
@@ -493,6 +493,9 @@ MainWindow::_RefreshPackageList()
 		// system packages in order to compute the list of protected
 		// dependencies indicated above.
 
+	BitmapRef defaultIcon(new(std::nothrow) SharedBitmap(
+		"application/x-vnd.haiku-package"), true);
+
 	for (int32 i = 0; i < packages.CountItems(); i++) {
 		BSolverPackage* package = packages.ItemAt(i);
 		const BPackageInfo& repoPackageInfo = package->Info();
@@ -527,6 +530,7 @@ MainWindow::_RefreshPackageList()
 			foundPackages[repoPackageInfo.Name()] = modelInfo;
 		}
 
+		modelInfo->SetIcon(defaultIcon);
 		modelInfo->AddListener(this);
 
 		BSolverRepository* repository = package->Repository();
