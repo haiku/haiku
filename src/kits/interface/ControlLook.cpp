@@ -1922,7 +1922,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 		BSize(width - 1, height - 1), alignment);
 
 	if (icon != NULL) {
-		BPoint location = alignedRect.LeftTop();
+		BPoint location(alignedRect.LeftTop());
 		if (icon->Bounds().Height() + 1 < height)
 			location.y += ceilf((height - icon->Bounds().Height() - 1) / 2);
 
@@ -1936,6 +1936,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 		alignedRect.top + ceilf(fontHeight.ascent));
 	if (textHeight < height)
 		location.y += ceilf((height - textHeight) / 2);
+
 	DrawLabel(view, truncatedLabel.String(), base, flags, location);
 }
 
