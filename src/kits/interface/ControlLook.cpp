@@ -1,10 +1,11 @@
 /*
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
- * Copyright 2012-2013, Haiku Inc. All rights reserved.
+ * Copyright 2012-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		John Scipione <jscipione@gmail.com>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -1918,8 +1919,8 @@ BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 	height = std::max(height, textHeight);
 
 	// handle alignment
-	BRect alignedRect = BLayoutUtils::AlignInFrame(rect,
-		BSize(width - 1, height - 1), alignment);
+	BRect alignedRect(BLayoutUtils::AlignOnRect(rect,
+		BSize(width - 1, height - 1), alignment));
 
 	if (icon != NULL) {
 		BPoint location(alignedRect.LeftTop());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_LAYOUT_UTILS_H
@@ -40,6 +40,7 @@ public:
 	static	BRect				AlignInFrame(BRect frame, BSize maxSize,
 									BAlignment alignment);
 	static	void				AlignInFrame(BView* view, BRect frame);
+	static	BRect				AlignOnRect(BRect rect, BSize size, BAlignment alignment);
 	static	BRect				MoveIntoFrame(BRect rect, BSize frameSize);
 
 	// debugging

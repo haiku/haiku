@@ -1,6 +1,12 @@
 /*
  * Copyright 2006-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 
 #include <LayoutUtils.h>
@@ -150,6 +156,8 @@ BLayoutUtils::ComposeAlignment(BAlignment alignment, BAlignment layoutAlignment)
 
 
 // AlignInFrame
+// This method restricts the dimensions of the resulting rectangle according
+// to the available size specified by maxSize.
 BRect
 BLayoutUtils::AlignInFrame(BRect frame, BSize maxSize, BAlignment alignment)
 {
@@ -198,6 +206,23 @@ BLayoutUtils::AlignInFrame(BView* view, BRect frame)
 	frame = AlignInFrame(frame, maxSize, alignment);
 	view->MoveTo(frame.LeftTop());
 	view->ResizeTo(frame.Size());
+}
+
+
+// AlignOnRect
+// This method, unlike AlignInFrame(), provides the possibility to return
+// a rectangle with dimensions greater than the available size.
+BRect
+BLayoutUtils::AlignOnRect(BRect rect, BSize size, BAlignment alignment)
+{
+	rect.left += (int)((rect.Width() - size.width)
+		* alignment.RelativeHorizontal());
+	rect.top += (int)(((rect.Height() - size.height))
+		* alignment.RelativeVertical());
+	rect.right = rect.left + size.width;
+	rect.bottom = rect.top + size.height;
+
+	return rect;
 }
 
 
