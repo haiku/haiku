@@ -414,6 +414,11 @@ Menu::FindShortcut(char key) const
 		shortcut = shortcut->next;
 	}
 
+	Menu *superMenu = Supermenu();
+
+	if (superMenu != NULL)
+		return superMenu->FindShortcut(key);
+
 	return NULL;
 }
 
@@ -429,6 +434,11 @@ Menu::FindItemByShortcut(char key)
 		if (item->Shortcut() == key)
 			return item;
 	}
+
+	Menu *superMenu = Supermenu();
+
+	if (superMenu != NULL)
+		return superMenu->FindItemByShortcut(key);
 
 	return NULL;
 }
