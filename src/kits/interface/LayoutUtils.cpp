@@ -182,7 +182,7 @@ BLayoutUtils::AlignInFrame(BView* view, BRect frame)
 		// ourselves and restrict the height max constraint respectively.
 		if (maxSize.width < frame.Width()
 			&& alignment.horizontal != B_ALIGN_USE_FULL_WIDTH) {
-			frame.OffsetBy(floor((frame.Width() - maxSize.width)
+			frame.OffsetBy(floorf((frame.Width() - maxSize.width)
 				* alignment.RelativeHorizontal()), 0);
 			frame.right = frame.left + maxSize.width;
 		}
