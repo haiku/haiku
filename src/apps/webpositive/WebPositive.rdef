@@ -19,6 +19,7 @@ resource file_types message {
 	"types" = "image/jpeg",
 	"types" = "image/png",
 	"types" = "image/svg+xml",
+	"types" = "application/xhtml+xml",
 	"types" = "application/x-vnd.Be.URL.file",
 	"types" = "application/x-vnd.Be.URL.ftp",
 	"types" = "application/x-vnd.Be.URL.http",
