@@ -78,13 +78,7 @@ rebalance(const ThreadData* threadData)
 	SCHEDULER_ENTER_FUNCTION();
 
 	CoreEntry* core = threadData->Core();
-	int32 coreLoad = core->GetLoad();
-	int32 threadLoad = threadData->GetLoad() / core->CPUCount();
-
-	// If the thread produces more than 50% of the load, leave it here. In
-	// such situation it is better to move other threads away.
-	if (threadLoad >= coreLoad / 2)
-		return core;
+	ASSERT(core != NULL);
 
 	// Get the least loaded core.
 	ReadSpinLocker coreLocker(gCoreHeapsLock);
@@ -94,18 +88,20 @@ rebalance(const ThreadData* threadData)
 	coreLocker.Unlock();
 	ASSERT(other != NULL);
 
-	if (other == core)
+	// Check if the least loaded core is significantly less loaded than
+	// the current one.
+	int32 coreLoad = core->GetLoad();
+	int32 otherLoad = other->GetLoad();
+	if (other == core || otherLoad + kLoadDifference >= coreLoad)
 		return core;
 
-	// If there are idle cores give them some work unless that will cause
-	// the current core to become idle.
-	int32 coreNewLoad = coreLoad - threadLoad;
-	if (other->GetLoad() == 0 && coreNewLoad != 0)
-		return other;
+	// Check whether migrating the current thread would result in both core
+	// loads become closer to the average.
+	int32 difference = coreLoad - otherLoad - kLoadDifference;
+	ASSERT(difference > 0);
 
-	// Attempt to keep load balanced.
-	int32 otherNewLoad = other->GetLoad() + threadLoad;
-	return coreNewLoad - otherNewLoad >= kLoadDifference ? other : core;
+	int32 threadLoad = threadData->GetLoad() / core->CPUCount();
+	return difference >= threadLoad ? other : core;
 }
 
 
