@@ -111,9 +111,8 @@ enqueue(Thread* thread, bool newOne)
 	} else if (gSingleCore)
 		targetCore = &gCoreEntries[0];
 	else if (threadData->Core() != NULL
-		&& (!newOne || !threadData->HasCacheExpired())
-		&& !threadData->ShouldRebalance()) {
-		targetCore = threadData->Core();
+		&& (!newOne || !threadData->HasCacheExpired())) {
+		targetCore = threadData->Rebalance();
 	}
 
 	bool rescheduleNeeded = threadData->ChooseCoreAndCPU(targetCore, targetCPU);

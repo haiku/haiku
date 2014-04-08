@@ -44,7 +44,7 @@ public:
 	inline	bool		IsIdle() const;
 
 	inline	bool		HasCacheExpired() const;
-	inline	bool		ShouldRebalance() const;
+	inline	CoreEntry*	Rebalance() const;
 
 	inline	int32		GetEffectivePriority() const;
 
@@ -176,13 +176,13 @@ ThreadData::HasCacheExpired() const
 }
 
 
-inline bool
-ThreadData::ShouldRebalance() const
+inline CoreEntry*
+ThreadData::Rebalance() const
 {
 	SCHEDULER_ENTER_FUNCTION();
 
 	ASSERT(!gSingleCore);
-	return gCurrentMode->should_rebalance(this);
+	return gCurrentMode->rebalance(this);
 }
 
 

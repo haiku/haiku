@@ -72,18 +72,19 @@ choose_core(const ThreadData* /* threadData */)
 }
 
 
-static bool
-should_rebalance(const ThreadData* threadData)
+static CoreEntry*
+rebalance(const ThreadData* threadData)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
-	int32 coreLoad = threadData->Core()->GetLoad();
-	int32 threadLoad = threadData->GetLoad() / threadData->Core()->CPUCount();
+	CoreEntry* core = threadData->Core();
+	int32 coreLoad = core->GetLoad();
+	int32 threadLoad = threadData->GetLoad() / core->CPUCount();
 
 	// If the thread produces more than 50% of the load, leave it here. In
 	// such situation it is better to move other threads away.
 	if (threadLoad >= coreLoad / 2)
-		return false;
+		return core;
 
 	// Get the least loaded core.
 	ReadSpinLocker coreLocker(gCoreHeapsLock);
@@ -93,18 +94,18 @@ should_rebalance(const ThreadData* threadData)
 	coreLocker.Unlock();
 	ASSERT(other != NULL);
 
-	if (other == threadData->Core())
-		return false;
+	if (other == core)
+		return core;
 
 	// If there are idle cores give them some work unless that will cause
 	// the current core to become idle.
 	int32 coreNewLoad = coreLoad - threadLoad;
 	if (other->GetLoad() == 0 && coreNewLoad != 0)
-		return true;
+		return other;
 
 	// Attempt to keep load balanced.
 	int32 otherNewLoad = other->GetLoad() + threadLoad;
-	return coreNewLoad - otherNewLoad >= kLoadDifference;
+	return coreNewLoad - otherNewLoad >= kLoadDifference ? other : core;
 }
 
 
@@ -168,7 +169,7 @@ scheduler_mode_operations gSchedulerLowLatencyMode = {
 	set_cpu_enabled,
 	has_cache_expired,
 	choose_core,
-	should_rebalance,
+	rebalance,
 	rebalance_irqs,
 };
 

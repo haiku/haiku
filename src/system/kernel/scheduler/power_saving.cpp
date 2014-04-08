@@ -114,8 +114,8 @@ choose_core(const ThreadData* threadData)
 }
 
 
-static bool
-should_rebalance(const ThreadData* threadData)
+static CoreEntry*
+rebalance(const ThreadData* threadData)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
@@ -128,15 +128,15 @@ should_rebalance(const ThreadData* threadData)
 	if (coreLoad > kHighLoad) {
 		if (sSmallTaskCore == core) {
 			sSmallTaskCore = NULL;
-			choose_small_task_core();
+			CoreEntry* smallTaskCore = choose_small_task_core();
 
 			if (threadLoad > coreLoad / 3)
-				return false;
-			return coreLoad > kVeryHighLoad;
+				return core;
+			return coreLoad > kVeryHighLoad ? smallTaskCore : core;
 		}
 
 		if (threadLoad >= coreLoad / 2)
-			return false;
+			return core;
 
 		ReadSpinLocker coreLocker(gCoreHeapsLock);
 		CoreEntry* other = gCoreLoadHeap.PeekMaximum();
@@ -147,17 +147,17 @@ should_rebalance(const ThreadData* threadData)
 
 		int32 coreNewLoad = coreLoad - threadLoad;
 		int32 otherNewLoad = other->GetLoad() + threadLoad;
-		return coreNewLoad - otherNewLoad >= kLoadDifference / 2;
+		return coreNewLoad - otherNewLoad >= kLoadDifference / 2 ? other : core;
 	}
 
 	if (coreLoad >= kMediumLoad)
-		return false;
+		return core;
 
 	CoreEntry* smallTaskCore = choose_small_task_core();
 	if (smallTaskCore == NULL)
-		return false;
-	return smallTaskCore != core
-		&& smallTaskCore->GetLoad() + threadLoad < kHighLoad;
+		return core;
+	return smallTaskCore->GetLoad() + threadLoad < kHighLoad
+		? smallTaskCore : core;
 }
 
 
@@ -249,7 +249,7 @@ scheduler_mode_operations gSchedulerPowerSavingMode = {
 	set_cpu_enabled,
 	has_cache_expired,
 	choose_core,
-	should_rebalance,
+	rebalance,
 	rebalance_irqs,
 };
 

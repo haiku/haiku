@@ -25,7 +25,7 @@ struct scheduler_mode_operations {
 								const Scheduler::ThreadData* threadData);
 	Scheduler::CoreEntry*	(*choose_core)(
 								const Scheduler::ThreadData* threadData);
-	bool					(*should_rebalance)(
+	Scheduler::CoreEntry*	(*rebalance)(
 								const Scheduler::ThreadData* threadData);
 	void					(*rebalance_irqs)(bool idle);
 };
