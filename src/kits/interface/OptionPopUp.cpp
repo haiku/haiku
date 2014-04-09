@@ -107,7 +107,7 @@ BOptionPopUp::GetOptionAt(int32 index, const char** outName, int32* outValue)
 		if (item != NULL) {
 			if (outName != NULL)
 				*outName = item->Label();
-			if (outValue != NULL)
+			if (outValue != NULL && item->Message() != NULL)
 				item->Message()->FindInt32("be:value", outValue);
 
 			result = true;
