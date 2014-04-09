@@ -309,10 +309,28 @@ enum scsi_device_type {
 };
 
 
+// vital product data: pages
+#define SCSI_PAGE_SUPPORTED_VPD 0x00	/* Supported VPD Pages */
+#define SCSI_PAGE_USN 0x80				/* Unit serial number */
+#define SCSI_PAGE_BLOCK_LIMITS 0xb0		/* Block limits */
+#define SCSI_PAGE_BLOCK_DEVICE_CHARS 0xb1	/* Block device characteristics */
+#define SCSI_PAGE_LB_PROVISIONING 0xb2	/* Logical block provisioning */
+#define SCSI_PAGE_REFERRALS 0xb3		/* Referrals */
+
+// vital product data: supported pages
+typedef struct scsi_page_list {
+	LBITFIELD8_2(
+		device_type : 5,
+		device_qualifier : 3
+	);
+	uint8	page_code;
+	uint8	_res2;
+
+	uint8	page_length;
+	uint8	pages[1]; 			// size according to page_length
+} _PACKED scsi_page_list;
+
 // vital product data: unit serial number page
-
-#define SCSI_PAGE_USN 0x80
-
 typedef struct scsi_page_usn {
 	LBITFIELD8_2(
 		device_type : 5,
@@ -324,6 +342,57 @@ typedef struct scsi_page_usn {
 	uint8	_page_length;		// total size = this + 3
 	char	psn[1];			// size according to page_length
 } _PACKED scsi_page_usn;
+
+typedef struct scsi_page_block_limits {
+	LBITFIELD8_2(
+		device_type : 5,
+		device_qualifier : 3
+	);
+	uint8	page_code;
+
+	uint16	_page_length;
+	LBITFIELD8_2(
+		wsnz : 1,
+		_res4_1 : 7
+	);
+	uint8	max_cmp_write_length;
+	uint16	opt_transfer_length_grain;
+	uint32	max_transfer_length;
+	uint32	opt_transfer_length;
+	uint32	max_prefetch_length;
+	uint32	max_unmap_lba_count;
+	uint32	max_unmap_blk_count;
+	uint32	opt_unmap_grain;
+	uint32	unmap_grain_align;
+	uint64	max_write_same_length;
+	uint8	_res44[20];
+} _PACKED scsi_page_block_limits;
+
+typedef struct scsi_page_lb_provisioning {
+	LBITFIELD8_2(
+		device_type : 5,
+		device_qualifier : 3
+	);
+	uint8	page_code;
+
+	uint16	page_length;
+	uint8	threshold_exponent;
+	LBITFIELD8_7(
+		dp : 1,
+		anc_sup : 1,
+		lbprz : 1,
+		_res5_3 : 2,
+		lbpws10 : 1,
+		lbpws : 1,
+		lbpu : 1
+	);
+	LBITFIELD8_2(
+		provisioning_type : 3,
+		_res6_3 : 5
+	);
+	uint8 _res7;
+} _PACKED scsi_page_lb_provisioning;
+
 
 // READ CAPACITY (10)
 
