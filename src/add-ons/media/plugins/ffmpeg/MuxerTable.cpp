@@ -10,6 +10,20 @@
 const media_file_format gMuxerTable[] = {
 	{
 		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MISC_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/3gpp",
+		"3GPP video",
+		"3gp",
+		"3gp",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
 			| media_file_format::B_KNOWS_RAW_AUDIO
 			| media_file_format::B_KNOWS_ENCODED_AUDIO,
 		{ 0 },
@@ -288,6 +302,20 @@ const media_file_format gMuxerTable[] = {
 		"WAV Format",
 		"wav",
 		"wav",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MISC_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"video/webm",
+		"WebM movie",
+		"webm",
+		"webm",
 		{ 0 }
 	},
 };
