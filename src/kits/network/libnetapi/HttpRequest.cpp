@@ -321,8 +321,11 @@ BHttpRequest::_ProtocolLoop()
 					break;
 
 				//  TODO: Some browsers seems to translate POST requests to
-				// GET when following a 302 redirection
-				if (fResult.StatusCode() == B_HTTP_STATUS_MOVED_PERMANENTLY) {
+				// GET when following a 302 redirection. 303 should do the same,
+				// but NOT 307.
+				if (fResult.StatusCode() == B_HTTP_STATUS_MOVED_PERMANENTLY
+					|| fResult.StatusCode() == B_HTTP_STATUS_TEMPORARY_REDIRECT
+					|| fResult.StatusCode() == B_HTTP_STATUS_FOUND) {
 					BString locationUrl = fHeaders["Location"];
 
 					fUrl = BUrl(fUrl, locationUrl);
