@@ -59,6 +59,8 @@ BFileRequest::_ProtocolLoop()
 
 		BNodeInfo info(&file);
 		char mimeType[B_MIME_TYPE_LENGTH + 1];
+		if (info.GetType(mimeType) != B_OK)
+			update_mime_info(fUrl.Path().String(), false, true, false);
 		if (info.GetType(mimeType) == B_OK)
 			fResult.SetContentType(mimeType);
 
