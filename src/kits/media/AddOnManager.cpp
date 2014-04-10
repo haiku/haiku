@@ -278,9 +278,6 @@ AddOnManager::_RegisterAddOn(const entry_ref& ref)
 {
 	BPath path(&ref);
 
-	printf("AddOnManager::_RegisterAddOn(): trying to load \"%s\"\n",
-		path.Path());
-
 	ImageLoader loader(path);
 	status_t status = loader.InitCheck();
 	if (status != B_OK)
@@ -423,8 +420,6 @@ AddOnManager::_RegisterDecoder(DecoderPlugin* plugin, const entry_ref& ref)
 			return;
 		}
 	}
-
-	printf("AddOnManager::_RegisterDecoder, name %s\n", ref.name);
 
 	decoder_info info;
 	info.ref = ref;
