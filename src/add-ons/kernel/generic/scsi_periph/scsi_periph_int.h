@@ -101,6 +101,8 @@ status_t periph_io(scsi_periph_device_info* device, io_operation* operation,
 status_t periph_ioctl(scsi_periph_handle_info *handle, int op,
 	void *buf, size_t len);
 void periph_sync_queue_daemon(void *arg, int iteration);
+status_t vpd_page_get(scsi_periph_device_info *device, uint8 page, void* data,
+	uint16 length);
 
 
 // scsi_periph.c

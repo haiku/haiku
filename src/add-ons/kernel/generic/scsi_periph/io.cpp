@@ -67,7 +67,7 @@ vpd_page_inquiry(scsi_periph_device_info *device, uint8 page, void* data,
 }
 
 
-static status_t
+status_t
 vpd_page_get(scsi_periph_device_info *device, uint8 page, void* data,
 	uint16 length)
 {
