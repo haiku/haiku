@@ -244,30 +244,10 @@ BTab::DrawFocusMark(BView *owner, BRect frame)
 void
 BTab::DrawLabel(BView *owner, BRect frame)
 {
-	if (Label() == NULL)
-		return;
-
-	BString label = Label();
-	float frameWidth = frame.Width();
-	float width = owner->StringWidth(label.String());
-	font_height fh;
-
-	if (width > frameWidth) {
-		BFont font;
-		owner->GetFont(&font);
-		font.TruncateString(&label, B_TRUNCATE_END, frameWidth);
-		width = frameWidth;
-		font.GetHeight(&fh);
-	} else {
-		owner->GetFontHeight(&fh);
-	}
-
-	owner->SetDrawingMode(B_OP_OVER);
-	owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
-	owner->DrawString(label.String(),
-		BPoint((frame.left + frame.right - width) / 2.0,
- 			(frame.top + frame.bottom - fh.ascent - fh.descent) / 2.0
- 			+ fh.ascent));
+	be_control_look->DrawLabel(owner, Label(), frame, frame,
+		ui_color(B_PANEL_BACKGROUND_COLOR),
+		IsEnabled() ? 0 : BPrivate::BControlLook::B_DISABLED,
+		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
 }
 
 
