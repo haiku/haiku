@@ -43,10 +43,39 @@ BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
 	fOptPostFields(NULL),
 	fOptInputData(NULL),
 	fOptInputDataSize(-1),
+	fOptRangeStart(-1),
+	fOptRangeEnd(-1),
 	fOptFollowLocation(true)
 {
 	_ResetOptions();
-	if (ssl)
+	if (fSSL)
+		fSocket = new(std::nothrow) BSecureSocket();
+	else
+		fSocket = new(std::nothrow) BSocket();
+}
+
+
+BHttpRequest::BHttpRequest(const BHttpRequest& other)
+	:
+	BUrlRequest(other.Url(), other.fListener, other.fContext,
+		"BUrlProtocol.HTTP", other.fSSL ? "HTTPS" : "HTTP"),
+	fSocket(NULL),
+	fSSL(other.fSSL),
+	fRequestMethod(other.fRequestMethod),
+	fHttpVersion(other.fHttpVersion),
+	fResult(other.fUrl),
+	fRequestStatus(kRequestInitialState),
+	fOptHeaders(NULL),
+	fOptPostFields(NULL),
+	fOptInputData(NULL),
+	fOptInputDataSize(NULL),
+	fOptRangeStart(other.fOptRangeStart),
+	fOptRangeEnd(other.fOptRangeEnd),
+	fOptFollowLocation(other.fOptFollowLocation)
+{
+	_ResetOptions();
+		// FIXME some options may be copied from other instead.
+	if (fSSL)
 		fSocket = new(std::nothrow) BSecureSocket();
 	else
 		fSocket = new(std::nothrow) BSocket();
@@ -552,6 +581,7 @@ BHttpRequest::_MakeRequest()
 	ssize_t bytesRead = 0;
 	ssize_t bytesReceived = 0;
 	ssize_t bytesTotal = 0;
+	off_t bytesUnpacked = 0;
 	char* inputTempBuffer = new(std::nothrow) char[kHttpBufferSize];
 	ssize_t inputTempSize = kHttpBufferSize;
 	ssize_t chunkSize = -1;
@@ -705,11 +735,13 @@ BHttpRequest::_MakeRequest()
 						BStackOrHeapArray<char, 4096> buffer(size);
 						size = decompressorStorage.Read(buffer, size);
 						if (size > 0) {
-							fListener->DataReceived(this, buffer, size);
+							fListener->DataReceived(this, buffer, bytesUnpacked,
+								size);
+							bytesUnpacked += size;
 						}
 					} else {
 						fListener->DataReceived(this, inputTempBuffer,
-							bytesRead);
+							bytesReceived - bytesRead, bytesRead);
 					}
 					fListener->DownloadProgress(this, bytesReceived,
 						bytesTotal);
@@ -724,7 +756,9 @@ BHttpRequest::_MakeRequest()
 						BStackOrHeapArray<char, 4096> buffer(size);
 						size = decompressorStorage.Read(buffer, size);
 						if (fListener != NULL && size > 0) {
-							fListener->DataReceived(this, buffer, size);
+							fListener->DataReceived(this, buffer,
+								bytesUnpacked, size);
+							bytesUnpacked += size;
 						}
 					}
 				}

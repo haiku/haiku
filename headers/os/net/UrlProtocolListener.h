@@ -62,15 +62,17 @@ public:
 	virtual void				HeadersReceived(BUrlRequest* caller);
 	
 	/**
-		DataReceived(data, size)
+		DataReceived(data, position, size)
 		Frequency:	Zero or more
 		Parameters:	data	 Pointer to the data block in memory
+					position Offset of the data in the stream
 					size	 Size of the data block 
 		
 		 Called each time a full block of data is received.
 	*/
 	virtual void				DataReceived(BUrlRequest* caller,
-									const char* data, ssize_t size);
+									const char* data, off_t position,
+									ssize_t size);
 									
 	/**
 		DownloadProgress(bytesReceived, bytesTotal)

@@ -47,7 +47,7 @@ public:
 	}
 	
 	virtual void DataReceived(BUrlRequest* caller, const char* data,
-		ssize_t size)
+		off_t position, ssize_t size)
 	{
 //		printf("DataReceived(%p): %ld bytes\n", caller, size);
 

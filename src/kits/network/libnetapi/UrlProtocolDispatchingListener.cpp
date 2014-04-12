@@ -75,11 +75,14 @@ BUrlProtocolDispatchingListener::HeadersReceived(BUrlRequest* caller)
 
 void
 BUrlProtocolDispatchingListener::DataReceived(BUrlRequest* caller,
-	const char* data, ssize_t size)
+	const char* data, off_t position, ssize_t size)
 {
 	BMessage message(B_URL_PROTOCOL_NOTIFICATION);
 	status_t result = message.AddData("url:data", B_STRING_TYPE, data, size,
 		true, 1);
+	assert(result == B_OK);
+
+	result = message.AddInt32("url:position", position);
 	assert(result == B_OK);
 	
 	_SendMessage(&message, B_URL_PROTOCOL_DATA_RECEIVED, caller);

@@ -77,7 +77,7 @@ BFileRequest::_ProtocolLoop()
 			ssize_t chunkSize;
 			char chunk[4096];
 			while ((chunkSize = file.Read(chunk, sizeof(chunk))) > 0) {
-				fListener->DataReceived(this, chunk, chunkSize);
+				fListener->DataReceived(this, chunk, transferredSize, chunkSize);
 				transferredSize += chunkSize;
 			}
 			// Return error if we didn't transfer everything
@@ -110,10 +110,10 @@ BFileRequest::_ProtocolLoop()
 		fListener->ConnectionOpened(this);
 
 		// Add a parent directory entry.
-		fListener->DataReceived(this, "+/,\t..\r\n",8);
+		fListener->DataReceived(this, "+/,\t..\r\n", transferredSize, 8);
+		transferredSize += 8;
 	}
 
-	int size = 0;
 	char name[B_FILE_NAME_LENGTH];
 	BEntry entry;
 	while (directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
@@ -137,14 +137,16 @@ BFileRequest::_ProtocolLoop()
 
 		entry.GetName(name);
 		epfl << "\t" << name << "\r\n";
-		if (fListener != NULL)
-			fListener->DataReceived(this, epfl.String(), epfl.Length());
-		size += epfl.Length();
+		if (fListener != NULL) {
+			fListener->DataReceived(this, epfl.String(), transferredSize,
+				epfl.Length());
+		}
+		transferredSize += epfl.Length();
 	}
 
 	if (fListener != NULL)
-		fListener->DownloadProgress(this, size, size);
-	fResult.SetLength(size);
+		fListener->DownloadProgress(this, transferredSize, transferredSize);
+	fResult.SetLength(transferredSize);
 
 	return B_OK;
 }

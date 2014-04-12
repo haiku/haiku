@@ -105,7 +105,7 @@ BDataRequest::_ProtocolLoop()
 	if (fListener != NULL) {
 		fListener->DownloadProgress(this, length, length);
 		if (length > 0)
-			fListener->DataReceived(this, payload, length);
+			fListener->DataReceived(this, payload, 0, length);
 	}
 
 	if (isBase64)

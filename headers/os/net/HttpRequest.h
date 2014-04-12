@@ -26,6 +26,7 @@ public:
 									const char *protocolName = "HTTP",
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL);
+								BHttpRequest(const BHttpRequest& other);
 	virtual						~BHttpRequest();
 
 			void				SetMethod(const char* const method);
@@ -38,6 +39,8 @@ public:
 			void				SetAutoReferrer(bool enable);
 			void				SetUserName(const BString& name);
 			void				SetPassword(const BString& password);
+			void				SetRangeStart(off_t position);
+			void				SetRangeEnd(off_t position);
 
 			void				SetPostFields(const BHttpForm& fields);
 			void				SetHeaders(const BHttpHeaders& headers);
@@ -115,6 +118,8 @@ private:
 			BHttpForm*			fOptPostFields;
 			BDataIO*			fOptInputData;
 			ssize_t				fOptInputDataSize;
+			off_t				fOptRangeStart;
+			off_t				fOptRangeEnd;
 			bool				fOptSetCookies : 1;
 			bool				fOptFollowLocation : 1;
 			bool				fOptDiscardData : 1;

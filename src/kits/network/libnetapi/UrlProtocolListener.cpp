@@ -40,7 +40,7 @@ BUrlProtocolListener::HeadersReceived(BUrlRequest*)
 
 
 void
-BUrlProtocolListener::DataReceived(BUrlRequest*, const char*, ssize_t)
+BUrlProtocolListener::DataReceived(BUrlRequest*, const char*, off_t, ssize_t)
 {
 }
 

@@ -26,7 +26,8 @@ public:
 	virtual void				ResponseStarted(BUrlRequest* caller);
 	virtual void				HeadersReceived(BUrlRequest* caller);
 	virtual void				DataReceived(BUrlRequest* caller,
-									const char* data, ssize_t size);
+									const char* data, off_t position,
+									ssize_t size);
 	virtual	void				DownloadProgress(BUrlRequest* caller,
 									ssize_t bytesReceived, ssize_t bytesTotal);
 	virtual void				UploadProgress(BUrlRequest* caller,

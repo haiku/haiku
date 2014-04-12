@@ -106,7 +106,9 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 					return;
 				}
 
-				DataReceived(caller, data, size);
+				off_t position = message->FindInt32("url:position");
+
+				DataReceived(caller, data, position, size);
 			}
 			break;
 

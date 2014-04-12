@@ -79,7 +79,7 @@ BUrlSynchronousRequest::HeadersReceived(BUrlRequest*)
 
 void
 BUrlSynchronousRequest::DataReceived(BUrlRequest*, const char*,
-	ssize_t size)
+	off_t, ssize_t size)
 {
 	PRINT(("SynchronousRequest::DataReceived(%zd)\n", size));
 }
