@@ -13,8 +13,8 @@ Rescan	Status View		Пересканувати
 file unavailable	Status View		файл недоступний
 Get info	Pie View		Інформація
 DiskUsage	System name		Використання дисків
- in %d files	Info Window		в %d файлах
-%d files	Status View		в %d файлів
+ in %d files	Info Window		 в %d файлах
+%d files	Status View		%d файлів
 Created	Info Window		Створено
 Modified	Info Window		Змінено
 Abort	Status View		Перервати

@@ -17,5 +17,5 @@ Save image	Magnify-Main		Зберегти зображення
 Increase window size	Magnify-Main		Збільшити розмір вікна
 Decrease window size	Magnify-Main		Зменшити розмір вікна
 Increase pixel size	Magnify-Main		Збільшити розмір пікселя
-  size must be > 4 and a multiple of 4\n	Console		розмір має бути більший 4 і кратний 4\n
+  size must be > 4 and a multiple of 4\n	Console		  розмір має бути більший 4 і кратний 4\n
 Add a crosshair	Magnify-Main		Додати перехрестя

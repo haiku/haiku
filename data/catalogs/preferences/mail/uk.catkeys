@@ -9,17 +9,17 @@ Incoming	Config Window		Вхідні
 Server name:	E-Mail		Ім'я серверу:
 OK	Config Window		Гаразд
 Start mail services on startup	Config Window		Запускати сервіс при старті
-E-mail address:	E-Mail		Адреса E-mail :
-Account name:	E-Mail		Ім'я акаунту:
+E-mail address:	E-Mail		Адреса ел.пошти:
+Account name:	E-Mail		Назва облікового запису:
 Account name:	Config Views		Ім'я аккаунта:
-Create new account	AutoConfigWindow		Створити новий аккаунт
+Create new account	AutoConfigWindow		Створити обліковий запис
 OK	Config Views		Гаразд
 The filter could not be moved. Deleting filter.	Config Views		Фільтр неможливо перемістити. Видалення фільтра.
 Revert	Config Window		Повернути
-Login name:	E-Mail		Логін:
+Login name:	E-Mail		Реєстраційне ім'я:
 Incoming	E-Mail		Вхідні
-Password:	E-Mail		Пароль:
-Accounts	Config Window		Аккаунти
+Password:	E-Mail		Гасло:
+Accounts	Config Window		Облікові записи
 Finish	AutoConfigWindow		Фініш
 Remove	Config Window		Видалити
 Miscellaneous	Config Window		Змішаний
@@ -28,10 +28,10 @@ Server Name:	E-Mail		Ім'я серверу:
 While sending	Config Window		Поки відправляється
 Schedule outgoing mail when dial-up is disconnected	Config Window		Затримувати відправку вихідних при відключеному діалапі
 hours	Config Window		годин
-Enter a valid e-mail address.	AutoConfigWindow		Введіть дійсну поштову адресу.
+Enter a valid e-mail address.	AutoConfigWindow		Введіть чинну адресу ел. пошти.
 Add	Config Window		Додати
-Account settings	AutoConfigWindow		Настройка аакунта
-E-mail	System name		Пошта
+Account settings	AutoConfigWindow		Параметри облікового запису
+E-mail	System name		Ел.пошта
 never	Config Window	mail checking frequency	ніколи
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nОсновні налаштування неможливо повернути.\n\nПомилка при відновленні налаштувань:\n%s\n
 Real name:	Config Views		Справжнє ім'я:
@@ -40,14 +40,14 @@ Choose Protocol	E-Mail		Вибрати протокол
 Return address:	Config Views		Зворотня адреса:
 Edit mailbox menu…	Config Window		Редагувати почтове меню…
 Outgoing	E-Mail		Вихідні
-\t\t· E-mail filters	Config Window		\t\t· поштові фільтри
+\t\t· E-mail filters	Config Window		\t\t· Поштові фільтри
 Remove	Config Views		Видалити
 \t\t· Incoming	Config Window		\t\t· Вхідні
 Next	AutoConfigWindow		Наступне
 Check every	Config Window		Перевіряти кожні
 Back	AutoConfigWindow		Назад
 Incoming mail filters	Config Views		Вхідний поштовий фільтр
-Account settings	Config Views		Настройка аккаунта
+Account settings	Config Views		Параметри облікового запису
 minutes	Config Window		хвилин
 Error retrieving general settings: %s\n	Config Window		Помилка при відновленні основних настройок: %s\n
 Real name:	E-Mail		Справжнє ім'я:
@@ -57,5 +57,5 @@ OK	AutoConfigWindow		Гаразд
 Add filter	Config Views		Додати фільтр
 Outgoing	Config Window		Вихідні
 Outgoing mail filters	Config Views		Фільтри вихідної пошти
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтворіть новий аккаунт натиснувши кнопку Додати .\n\nВидаліть аккаунт при допомозі кнопки Видалити на вибраному пункті\n\nВиберіть пункт зі списку при необхідності змініть його налаштувань.
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nСтворіть новий обліковий запис натиснувши кнопку Додати .\n\nВидаліть обліковий запис при допомозі кнопки Видалити на вибраному елементі\n\nВиберіть елемент зі списку для зміни його налаштувань.
 Error	Config Window		Помилка

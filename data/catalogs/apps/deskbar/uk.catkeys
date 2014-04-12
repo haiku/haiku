@@ -4,13 +4,13 @@ Sort applications by name	PreferencesWindow		Сортувати програми
 Suspend	DeskbarMenu		Призупинити
 Hide clock	TimeView		Приховати годинник
 Applications	PreferencesWindow		Додатки
-Time preferences…	TimeView		Налаштувати годинник
+Time preferences…	TimeView		Налаштування годинника…
 About Haiku	DeskbarMenu		Про Haiku
 Edit in Tracker…	PreferencesWindow		Змінити меню 
 Recent documents:	PreferencesWindow		Недавні документи:
 Recent applications	DeskbarMenu		Останні програми
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Додатки
-Find…	DeskbarMenu		Пошук...
+Find…	DeskbarMenu		Знайти…
 Show clock	Tray		Показати годинник
 Window	PreferencesWindow		Вікно
 Defaults	PreferencesWindow		Типове

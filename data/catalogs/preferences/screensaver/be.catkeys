@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ScreenSaver	1801423325
+1	belarusian	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Не ўдалося загрузіць захавальнік экрана
 30 seconds	ScreenSaver		30 секунд
 Start screensaver	ScreenSaver		Запусціць захавальнік
@@ -24,4 +24,5 @@ Blackness	ScreenSaver		Чарната
 Use custom password	ScreenSaver		Карыстацца асаблівым паролем
 Done	ScreenSaver		Гатова
 Confirm password:	ScreenSaver		Пацвердзіце пароль:
+No preview available	PreviewView		Прагляд недаступны
 Use network password	ScreenSaver		Карыстацца сеткавым паролем

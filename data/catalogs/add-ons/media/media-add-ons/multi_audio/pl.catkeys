@@ -1,23 +1,34 @@
-1	polish	x-vnd.Haiku-hmulti_audio.media_addon	1336654819
-Master	MultiAudio		Master
+1	polish	x-vnd.Haiku-hmulti_audio.media_addon	451057402
+Master	MultiAudio		Główny
 SPDIF	MultiAudio		SPDIF
 Gain	MultiAudio		Wzmocnienie
 Output 3D center	MultiAudio		Wyjście 3D, środek
-Extended Setup	MultiAudio		Zaawansowane Ustawienia
+Extended Setup	MultiAudio		Ustawienia zaawansowane
 CD	MultiAudio		CD
 Tone control	MultiAudio		Kontrola tonów
 Phone	MultiAudio		Telefon
 Aux	MultiAudio		Aux
-Output bass	MultiAudio		Wyjście basu
+Output bass	MultiAudio		Wyjście, tony niskie
 Headphones	MultiAudio		Słuchawki
 Beep	MultiAudio		Brzęczyk
+Output mono mix	MultiAudio		Wyjście mono
+Output stereo mix	MultiAudio		Wyjście stereo
 Input	MultiAudio		Wejście
-Input & Output	MultiAudio		Wejście i Wyjście
+Output treble	MultiAudio		Wyjście, tony wysokie
+Mono mix	MultiAudio		Mono
+General	MultiAudio		Ogólne
+Input & Output	MultiAudio		Ogólne
+Enhanced Setup	MultiAudio		Ustawienia rozszerzone
+Stereo mix	MultiAudio		Stereo
+Output 3D depth	MultiAudio		Wyjście 3D, głębia
 Volume	MultiAudio		Głośność
 Output	MultiAudio		Wyjście
 Video	MultiAudio		Wideo
+Line	MultiAudio		Liniowe
 Mic	MultiAudio		Mikrofon
  frequency:	MultiAudio		 częstotliwość:
+Enable	MultiAudio		Włącz
 Mute	MultiAudio		Wycisz
+Wave	MultiAudio		Fala
 Setup	MultiAudio		Ustawienia
 Level	MultiAudio		Poziom

@@ -9,7 +9,7 @@ No package selected.	PackageInfo		Не вибрано пакунок.
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Схоже, що цей пакунок вже встановлено у вашій системі. Бажаєте вилучити його і продовжити встановлення?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Запам'ятати цю відповідь до кінця встановлення?\n
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Неправильний розмір пакунка. Можливо, пакунок пошкоджено або змінено після створення. Бажаєте продовжити?
-Error while installing the package\n	PackageView		Помилка при встановленні пакунка
+Error while installing the package\n	PackageView		Помилка при встановленні пакунка\n
 Disclaimer	PackageTextViewer		Відмова від гарантій
 %.1f GiB	PackageView		%.1f ГіБ
 %name% (%size% free)	PackageView		%name% (%size% вільно)

@@ -18,7 +18,7 @@ Processing	JobListView		Виконання
 Red	TestPageView		Червоний
 Printer name:	AddPrinterDialog		Ім'я принтера:
 Driver: %driver%	PrinterListView		Драйвер: %driver%
- pending jobs.	PrinterListView		Немає завдань в черзі.
+ pending jobs.	PrinterListView		 Немає завдань в черзі.
 Black	TestPageView		Чорний
 Restart job	PrintersWindow		Перезапустити завдання
 Add	AddPrinterDialog		Додати

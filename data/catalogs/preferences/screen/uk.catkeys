@@ -2,7 +2,7 @@
 yes	Screen		так
 Use laptop panel:	Screen		Використовувати панель ноутбука:
 15 bits/pixel, 32768 colors	Screen		15 біт/пікселів, 32768 кольорів
-/other…	Screen		/інше…
+/other…	Screen		/other…
 16 bits/pixel, 65536 colors	Screen		16 біт/піксель, 65536 кольорів
 Revert	Screen		Повернути
 Swap displays:	Screen		Поміняти дисплеї:
@@ -35,7 +35,7 @@ horizontally	Screen		горизонтально
 Other…	Screen		Інше…
 Cancel	Screen		Відміна
 bits/pixel	Screen		бітів/піксель
-Settings will revert in %seconds seconds.	Screen		Настройки будуть повернуті через %seconds секунд
+Settings will revert in %seconds seconds.	Screen		Налаштування будуть повернуті через %seconds секунд.
 Refresh rate:	Screen		Частота обновлення:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Ви бажаєте зберегти ці налаштування?

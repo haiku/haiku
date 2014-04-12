@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PackageInstaller	1300087557
+1	portuguese (brazil)	x-vnd.Haiku-PackageInstaller	2033288398
 Install to:	PackageView		Instalar em:
 OK	PackageView		OK
 Accept	PackageTextViewer		Aceitar
@@ -12,6 +12,7 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		Erro instalando o pacote\n
 Disclaimer	PackageTextViewer		Aviso
 %.1f GiB	PackageView		%.1f GB
+%name% (%size% free)	PackageView		%name% (%size% livre)
 The installation of the package has been aborted.	PackageView		A instalação do pacote foi cancelada.
 Done	PackageInstall		Feito
 All existing files will be replaced?	PackageView		Todos os arquivos existentes serão substituídos?
@@ -53,7 +54,7 @@ PackageInstaller	System name		Instalador de pacotes
 Abort	PackageInstall		Cancelar
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Continuar
-Begin	PackageView		Início
+Begin	PackageView		Começar
 Replace	PackageView		Substituir
 Installation progress	PackageView		Progresso da instalação
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		O arquivo do pacote é ilegível.\nUma das possíveis razões é que este não é um arquivo .pkg do BeOS válido.

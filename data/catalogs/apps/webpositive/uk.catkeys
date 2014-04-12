@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	1786411139
+1	ukrainian	x-vnd.Haiku-WebPositive	2880796666
 Show home button	Settings Window		Показати кнопку Додому
 Username:	Authentication Panel		Користувач:
 Copy URL to clipboard	Download Window		Копіювати URL до буфера обміну
@@ -12,14 +12,14 @@ Clear history	WebPositive Window		Очистити історію
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Вчора
 Default standard font size:	Settings Window		Розмір стандартного шрифта:
-Start page:	Settings Window		Початкова сторінка
+Start page:	Settings Window		Початкова сторінка:
 History	WebPositive Window		Історія
 Error opening downloads folder	Download Window		Помилка під час відкриття теки завантажень
 Paste	WebPositive Window		Вставити
 Double-click or middle-click to open new tab.	Tab Manager		Нактискання середньой кнопки або подвійний клік відкриє нову вкладку.
 Proxy username:	Settings Window		Користувач проксі:
 Settings	Settings Window		Налаштування
-%seconds seconds left	Download Window		залишилось %seconds секунд
+%seconds seconds left	Download Window		%seconds секунд залишилось
 Confirmation	WebPositive Window		Підтвердження
 Window	WebPositive Window		Вікно
 Decrease size	WebPositive Window		Зменшити розмір
@@ -75,7 +75,7 @@ Find next occurrence of search terms	WebPositive Window	find bar next button too
 Apply	Settings Window		Застосувати
 Bookmark info	WebPositive Window		Інформація про закладку
 Size:	Font Selection view		Розмір:
-Show tabs if only one page is open	Settings Window		Завжди показувати панель вкладок, навіть коли відкрита єдина.
+Show tabs if only one page is open	Settings Window		Показувати панель вкладок, навіть коли відкрита єдина
 About	WebPositive Window		Про додаток
 Finish: 	Download Window	Finishing time	Завершится в:
 Fonts	Settings Window		Шрифти
@@ -89,10 +89,12 @@ Proxy server requires authentication	Settings Window		Проксі потреб�
 Clear	URL Bar		Очистити
 Cut	URL Bar		Вирізати
 Clear	WebPositive Window		Очистити
+Script console	Console Window		Консоль сценаріїв
 Remove	Download Window		Вилучити
 Find	WebPositive Window		Знайти
 Find previous	WebPositive Window		Знайти попереднє
 Settings	WebPositive Window		Налаштування
+Script console	WebPositive Window		Консоль сценаріїв
 Proxy server address:	Settings Window		Адреса проксі-сервера:
 Proxy server port:	Settings Window		Порт проксі-сервера:
 Bookmarks	WebPositive Window		Закладки
@@ -106,6 +108,7 @@ Open start page	Settings Window		Відкрити початкову сторі�
 Continue downloads	WebPositive		Продовжити завантаження
 Cancel	Download Window		Скасувати
 Open search page	Settings Window		Відкрити пошукову сторінку
+Clear	Console Window		Очистити
 Password:	Authentication Panel		Гасло:
 Back	WebPositive Window		Назад
 New browser window	Download Window		Нове вікно браузера
@@ -117,7 +120,7 @@ Authentication required	Authentication Panel		Вимагається автен�
 Use proxy server to connect to the internet	Settings Window		Використовувати проксі для з'єднання з інтернетом
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		WebPositive все ще завантажує файли, ви впевнені, що бажаєте закрити його зараз?
 Auto-hide interface in full screen mode	Settings Window		Автоматично ховати інтерфейс у повноекранному режимі
-%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	не вдалося обробити %url
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url призупинено
 New tab	WebPositive Window		Нова вкладка
 Downloads in progress	WebPositive		Поступ завантаження
 Style:	Font Selection view		Стиль:

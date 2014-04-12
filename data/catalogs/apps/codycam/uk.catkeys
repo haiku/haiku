@@ -26,7 +26,7 @@ Logging in…	VideoConsumer.cpp		Авторизація…
 Server:	CodyCam		Сервер:
 server address expected	CodyCam		вкажіть адресу сервера
 Error creating output file	VideoConsumer.cpp		Помилка при створенні вихідного файла
-unrecognized upload client specified	CodyCam		 нерозпізнаний клієнт вивантаження
+unrecognized upload client specified	CodyCam		нерозпізнаний клієнт вивантаження
 File %s ; Line %ld # unterminated quote\n	SettingsHandler		Файл %s ; Рядок %ld # невизначений запит\n
 Output	CodyCam		Вивід
 Every 15 minutes	CodyCam		Кожні 15 хвилин
@@ -71,7 +71,7 @@ Cannot connect the video source to the video window	CodyCam		Неможливо 
 capture rate expected	CodyCam		вкажіть періодичність захоплення
 Error getting initial latency for the capture node	CodyCam		Помилка при отриманні затримки для вузла захоплення
 Send to…	CodyCam		Відправити до…
-on or off expected	Settings	Do not translate 'on' and 'off'	 очікується включення або виключення
+on or off expected	Settings	Do not translate 'on' and 'off'	очікується включення або виключення
 Quit	CodyCam		Вийти
 cmd: '%s'\n	FtpClient		команда: '%s'\n
 Never	CodyCam		Ніколи

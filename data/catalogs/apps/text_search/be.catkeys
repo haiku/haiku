@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku.TextSearch	1180598828
+1	belarusian	x-vnd.Haiku.TextSearch	2496563907
 %s: Not enough room to escape the filename.	Grepper		%s: Не хапае месца для перадання імя файла.
 Trim to selection	GrepWindow		Накласці на выдзяленне
 Follow symbolic links	GrepWindow		Прытрымлівацца сімвалічных спасылак
@@ -8,6 +8,7 @@ The unselected files will be removed from the list.	GrepWindow		Нявыбран
 Set target…	GrepWindow		Прызначыць цэль…
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Калі ласка, выберыце файлы, якія вы жадалі б мець пазначанымі ў Трэкеры.
 Open files in Pe	GrepWindow		Адкрыць файлы ў Pe
+%appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		Капіяваць у буфер
 Settings	GrepWindow		Наладкі
 Select all	GrepWindow		Выбраць усё
@@ -31,3 +32,4 @@ Show files in Tracker	GrepWindow		Паказаць файлы ў Трэкеры
 Case-sensitive	GrepWindow		З улікам рэгістру
 Text files only	GrepWindow		Толькі тэкставыя файлы
 Show lines	GrepWindow		Паказаць радкі
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

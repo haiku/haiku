@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	3449725806
+1	polish	x-vnd.Haiku-libtracker	2212190051
 OK	WidgetAttributeText		OK
 Icon view	VolumeWindow		Widok ikon
 Add-ons	FilePanelPriv		Wtyczki
@@ -21,6 +21,7 @@ Recent documents	FavoritesMenu		Ostatnio otwierane dokumenty
 Modified	QueryPoseView		Zmodyfikowano
 Created	ContainerWindow		Utworzono
 Error %error loading add-On %name.	ContainerWindow		Błąd %error przy ładowaniu Wtyczki %name.
+If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeśli wykonasz %ifYouDoAction na folderze ustawień, %osName może przestać działać poprawnie!\n\nNa pewno chcesz to zrobić?
 contains	SelectionWindow		zawiera
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Przepraszamy, nie możesz zapisywać w katalogu głównym systemu.
 Show shared volumes on Desktop	SettingsView		Pokaż wspólne woluminy na Pulpicie
@@ -99,6 +100,7 @@ New folder	FilePanelPriv		Nowy folder
 %name info	InfoWindow	InfoWindow Title	%name informacje
 Favorites	FavoritesMenu		Ulubione
 Add-ons	VolumeWindow		Wtyczki
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" jest niewspieranym plikiem wykonywalnym.
 Sorry, you can't copy items to the Trash.	PoseView		Przepraszamy, nie możesz skopiować elementu do kosza.
 List view	VolumeWindow		Widok listy
 matches wildcard expression	SelectionWindow		Odpowiada wieloznacznikowemu wyrażeniu
@@ -407,6 +409,7 @@ Paste layout	ContainerWindow		Wklej motyw
 Select	InfoWindow		Wybierz
 Could not update permissions of file \"%name\". %error	FSUtils		Nie można zauktualizować uprawnień dla pliku \"%name\". %error
 Select…	FilePanelPriv		Wybierz…
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" jest plikiem wykonywalnym w starym formacie. Zdobądź zaktualizowaną wersję lub skompiluj aplikację jeszcze raz.
 There was an error resolving the link.	Tracker		Pojawił się problem przy przetwarzaniu skrótu.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		nie możesz przenieść ani skopiować kosza.

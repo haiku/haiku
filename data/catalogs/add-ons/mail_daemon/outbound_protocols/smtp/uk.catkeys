@@ -9,7 +9,7 @@ Connecting to server…	smtp		З'єднання з сервером…
 Error while opening connection to %serv	smtp		Помилка відкриття з'єднання з %serv
 POP3 authentication failed. The server said:\n	smtp		Аутентифікація POP3 не вдалась. Сервер повідомив:\n
 Destination:	ConfigView		Призначення:
-: Connection refused or host not found.	smtp		: Погане з'єднання або хост не знайдено
+: Connection refused or host not found.	smtp		: Погане з'єднання або хост не знайдено.
 None	ConfigView		Жоден
 POP3 before SMTP	ConfigView		POP3 перед SMTP
 SSL	ConfigView		SSL

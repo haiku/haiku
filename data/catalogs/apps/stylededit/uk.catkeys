@@ -32,7 +32,7 @@ Document statistics	Statistics		Статистика документу
 Cancel	RevertToSavedAlert		Відмінити
 Autodetect	Menus		Автовизначення
 Document	Menus		Документ
-Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ?
+Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ? 
 Edit	Menus		Редагувати
 Revert	RevertToSavedAlert		Повернути
 Font	Menus		Шрифт
@@ -66,7 +66,7 @@ Wrap-around search	FindandReplaceWindow		Шукати по всьому доку
 Bold	Menus		Bold
 Find selection	Menus		Знайти  вибране
 Find:	FindandReplaceWindow		Знайти:
-Error saving \"%s\":\n%s	SaveAlert		Помилка збереження "%s":\n%s
+Error saving \"%s\":\n%s	SaveAlert		Помилка збереження \"%s\":\n%s
 Copy	Menus		Копіювати
 Cut	Menus		Вирізати
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" був змінений іншою програмою, перезавантажити його?
@@ -77,7 +77,7 @@ Find…	Menus		Знайти…
 Select all	Menus		Вибрати все
 Don't save	SaveAlert		Не зберігати
 Recover	NodeMonitorAlerts		Відновити
-Error loading \"%s\":\n\t%s	LoadAlert		Помилка загрузки "%s":\n\t%s
+Error loading \"%s\":\n\t%s	LoadAlert		Помилка загрузки \"%s\":\n\t%s
 Ignore	NodeMonitorAlerts		Ігнорувати
 Read-only	StatusView		Тільки читання
 Undo typing	QuitAlert		Відміна друку
@@ -89,6 +89,6 @@ Encoding	Open_and_SaveAsPanel		Кодування
 Characters:	Statistics		Символи:
 Save as…	Menus		Зберегти як…
 Redo typing	QuitAlert		Поновлення друку
-Reload…	Menus		Перезавантажити
+Reload…	Menus		Перезавантажити…
 Replace…	Menus		Перемістити…
 Right	Menus		Вправо

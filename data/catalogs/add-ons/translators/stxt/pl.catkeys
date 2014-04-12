@@ -2,7 +2,7 @@
 Be styled text file	STXTTranslator		Tekst formatowany Be
 Plain text file	STXTTranslator		Plik czystego tekstu
 STXTTranslator Settings	STXTTranslator		Ustawienia translatora STXT
-StyledEdit file translator	STXTView		Translator plików programu StyledEdit
+StyledEdit file translator	STXTView		Translator plików StyledEdit
 StyledEdit files	STXTTranslator		Pliki StyledEdit
-StyledEdit file translator	STXTTranslator		Translator plików programu StyledEdit
+StyledEdit file translator	STXTTranslator		Translator plików StyledEdit
 STXT Settings	STXTMain		Ustawienia STXT

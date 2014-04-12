@@ -1,29 +1,31 @@
-1	polish	x-vnd.Haiku-HaikuDepot	1804299307
+1	polish	x-vnd.Haiku-HaikuDepot	3398060443
 Name	PackageListView		Nazwa
-Installed packages	Model		Zainstalowane pakiety
-User modified packages	Model		Pakiety zmodyfikowane przez użytkownika
+Installed packages	Model		Zainstalowane bambetle
+User modified packages	Model		Bambetle zmodyfikowane przez użytkownika
 Update available	Model		Dostępna aktualizacja
 Changelog	PackageInfoView		Dziennik zmian
-Click a package to view information	PackageInfoView		Kliknij na paczkę, aby zobaczyć informacje
+Click a package to view information	PackageInfoView		Kliknij na bambetel, aby zobaczyć informacje
 for %Version%	PackageInfoView		dla %Version%
 No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
-Depot:	FilterView		Magazyn:
+Depot:	FilterView		Składzik:
 Description	PackageListView		Opis
 Install	PackageManager		Zainstaluj
 Tools	MainWindow		Narzędzia
-HaikuDepot	System name		HaikuDepot
-Rate package…	PackageInfoView		Oceń paczkę…
+HaikuDepot	System name		SkładzikBambetli
+Rate package…	PackageInfoView		Oceń bambetel…
 Uninstall	PackageManager		Odinstaluj
-An error occurred while initializing the package manager: %message%	MainWindow		Wystąpił błąd podczas inicjalizacji menedżera pakietów: %message%
+<no info>	PackageInfoView		<brak informacji>
+An error occurred while initializing the package manager: %message%	MainWindow		Wystąpił błąd podczas inicjalizacji menedżera bambetli: %message%
 Close	PackageManager		Zamknij
 Status	PackageListView		Status
+Available packages	Model		Dostępne bambetle
 Your rating	System name		Twoja ocena
 Development	Model		Narzędzia programistów
 Fatal error	PackageManager		Błąd krytyczny
 Ratings	PackageInfoView		Oceny
 1 item	PackageListView		1 element
 Inactive	PackageListView		Nieaktywny
-Refresh depots	MainWindow		Odśwież listy pakietów
+Refresh depots	MainWindow		Odśwież listy bambetli
 Main Menu	MainWindow		Menu główne
 Command line	Model		Wiersz poleceń
 (%Votes%)	PackageInfoView		(%Votes%)
@@ -31,7 +33,8 @@ Downloading:	PackageInfoView		Pobieranie:
 Search terms:	FilterView		Szukana fraza:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		Brak ocen użytkowników.
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error% (%details%)
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Wystąpił błąd podczas odświeżania składziku: %error% (%details%)
+Show source packages	MainWindow		Pokaż bambetle źródłowe
 Productivity	Model		Programy użytkowe
 Show:	FilterView		Pokaż:
 Size	PackageListView		Rozmiar
@@ -44,17 +47,19 @@ Graphics	Model		Grafika
 Local	MainWindow		Lokalne
 Close	MainWindow		Zamknij
 Video	Model		Wideo
-An error occurred while refreshing the repository: %error%	MainWindow		Wystąpił błąd podczas odświeżania repozytorium: %error%
-All packages	FilterView		Wszystkie pakiety
+An error occurred while refreshing the repository: %error%	MainWindow		Wystąpił błąd podczas odświeżania składziku: %error%
+All packages	FilterView		Wszystkie bambetle
+Pending…	PackageListView		Oczekiwanie…
 Depot	FilterView		Magazyn
 Uninstalled	PackageListView		Niezainstalowany
 Unknown	PackageListView		Nieznany
-All depots	FilterView		Wszystkie magazyny
+All depots	FilterView		Wszystkie składziki
 Available	PackageListView		Dostępny
 n/a	PackageInfoView		Nie dotyczy
 Send	RatePackageWindow		Wyślij
+Show develop packages	MainWindow		Pokaż bambetle deweloperskie
 Show	FilterView		Pokaż
-Uninstalled packages	Model		Niezainstalowane pakiety
+Uninstalled packages	Model		Niezainstalowane bambetle
 Audio	Model		Dźwięk
-About	PackageInfoView		O paczce
+About	PackageInfoView		O bambetlu
 Active	PackageListView		Aktywny

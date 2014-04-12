@@ -10,7 +10,7 @@ Login:	Login View		Ім'я:
 Error	Login App		Помилка
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Ви можете налаштувати робочий стіл, що демонструється за програмою для входу, помістивши на нього реплікант.\n\nПо завершенні просто вийдіть з програми (Alt-Q).
 Unimplemented	Login App		Не реалізовано
-Welcome to Haiku	Login Window		Ласкаво просимо до Haiku!
+Welcome to Haiku	Login Window		Запрошуємо в Haiku
 Reboot	Login View		Перезавантажити
 Login application for Haiku\nUsage:\n	Login App		Програма для входу до Haiku\nВикористання:\n
 Info	Login App		Інформація

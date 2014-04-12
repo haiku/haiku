@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ProcessController	1848752768
+1	portuguese (brazil)	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		Uso de memória
 Kill this team!	ProcessController		Matar esta equipe!
 Idle priority	ProcessController		Prioridade ociosa
@@ -7,6 +7,7 @@ Custom priority	ProcessController		Prioridade personalizada
 This team is already gone…	ProcessController		Esta equipe já se foi…
 Error saving file	ProcessController		Erro ao gravar o arquivo
 Real-time priority	ProcessController		Prioridade em tempo real
+Power saving	ProcessController		Economia de energia
 Your setting file could not be saved!\n(%s)	ProcessController		Arquivo de definições não pôde ser salvo!\n(%s)
 What do you want to do with the team \"%s\"?	ProcessController		O que deseja fazer com a equipe \"%s\"?
 This thread is already gone…	ProcessController		Este processo já se foi…
@@ -36,6 +37,7 @@ Quit an application	ProcessController		Fechar uma aplicação
 Install in Deskbar	ProcessController		Instalar no Deskbar
 Threads and CPU usage	ProcessController		Processos e utilização de CPU
 Urgent display priority	ProcessController		Exibir prioridade urgente
+Low latency	ProcessController		Baixa latência
 OK	ProcessController		OK
 Damned!	ProcessController		Maldição!
 Debug this team!	ProcessController		Depurar esta equipe!

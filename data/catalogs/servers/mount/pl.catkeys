@@ -13,5 +13,5 @@ OK	AutoMounter		OK
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		System plików na tym woluminie nie jest systemem plików Haiku. Zalecane jest zamontowanie go w trybie tylko do odczytu. Zapobiegnie to przypadkow utracie danych spowodowanej błędami w Haiku.
 Previous volumes mounted.	AutoMounter		Poprzednie woluminy zamontowane.
 Mount error	AutoMounter		Błąd montowania
-It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Zalecne jest zamontowanie wszystkich dodatkowych dysków Haiku w trybie tylko do odczytu. Zapobiegnie to przypadkow utracie danych spowodowanej błędami w Haiku.
+It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Zalecane jest zamontowanie wszystkich dodatkowych dysków Haiku w trybie tylko do odczytu. Zapobiegnie to przypadkowej utracie danych spowodowanej błędami w Haiku.
 Force unmount	AutoMounter		Wymuś odmontowanie

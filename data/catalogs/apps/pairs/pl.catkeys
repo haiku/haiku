@@ -1,12 +1,17 @@
-1	polish	x-vnd.Haiku-Pairs	1649564846
+1	polish	x-vnd.Haiku-Pairs	1196284538
+Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pairs nie znalazł wystarczająco wiele ikon by rozpocząć; potrzeba przynajmniej %zu, znaleziono %zu.\n
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nYou completed the game in %num% clicks.\n	PairsWindow		%app%\n\tnapisał Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\nUkończyłeś grę w %num% kliknięć.\n
 Expert (8x8)	PairsWindow		Ekspert (8x8)
 Beginner (4x4)	PairsWindow		Początkujący (4x4)
 Quit game	PairsWindow		Wyjdź z gry
+Large	PairsWindow		Duże
+Small	PairsWindow		Małe
 Game	PairsWindow		Gra
+OK	Pairs		OK
 Size	PairsWindow		Rozmiar
 New	PairsWindow		Nowy
 Intermediate (6x6)	PairsWindow		Średni (6x6)
 Quit	PairsWindow		Zamknij
 Pairs	System name		Pary
 New game	PairsWindow		Nowa gra
+Medium	PairsWindow		Średnie

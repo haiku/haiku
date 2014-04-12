@@ -11,7 +11,7 @@ Starting media server…	Media Window		Запуск Медіа Сервера…
 Done shutting down.	Media Window		Відбувається закриття.
 Video settings	Media Window		Налаштування відео
 Video output:	Media views		Вивід відео:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа сервер не запущено\n Зробити це?\n
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа сервер не запущено\nЗапустити його?
 Restart media services	Media views		Перезапустити медіа сервіси
 Couldn't remove volume control in Deskbar: %s\n	Media views		Неможливо видалити регулятор гучності з Deskbar: %s\n
 Media	System name		Mедіа

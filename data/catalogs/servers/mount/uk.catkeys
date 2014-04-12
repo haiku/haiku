@@ -11,7 +11,7 @@ Could not unmount disk \"%s\":\n\t%s	AutoMounter		Неможливо відмо�
 Mounting volume <unnamed volume>\n\n	AutoMounter		Монтування тому <безіменний том>\n\n
 OK	AutoMounter		Гаразд
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Файлова система на цьому томі не є файловою системою Haiku. Рекомендуємо підмонтування у режимі тільки для читання, це поможе вберегти дані при виникненні помилок в Haiku.
-Previous volumes mounted.	AutoMounter		Попередні томи підмонтовані
+Previous volumes mounted.	AutoMounter		Попередні томи підмонтовані.
 Mount error	AutoMounter		Помилка підмонтування
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Рекомендується підмонтовувати всі доступні томи Haiku тільки в режимі для читання. Це вбереже від втрати даних при помилках у Haiku.
 Force unmount	AutoMounter		Швидке відмонтування

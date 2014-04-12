@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	2482780610
+1	portuguese (brazil)	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		Mover o Mouse
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		O Atalhos não pode salvar sua combinação de teclas
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		Juntar combinação de teclas...
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Tecla
 Open KeySet…	ShortcutsWindow		Abrir combinação de teclas...
+Error, NULL state description?	ShortcutsSpec		Erro, descrição de estado NULL?
 MouseUp	ShortcutsSpec		Mouse para cima
 Revert to saved	ShortcutsWindow		Reverter para salvo
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt

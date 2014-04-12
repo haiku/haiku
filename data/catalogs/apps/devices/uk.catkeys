@@ -5,7 +5,7 @@ ACPI controller	Device		ACPI контролер
 Memory controller	Device		Контролер пам’яті
 Driver used	DevicePCI		Використовує драйвер
 CD-ROM	DeviceSCSI		CD-ROM
-ISA bus	Device		ISA bus
+ISA bus	Device		шина ISA
 ACPI bus	Device		Шина ACPI
 ISA bus	DevicesView		Шина ISA
 Docking station	Device		Док-станція
@@ -19,7 +19,7 @@ Category	DevicesView		Категорії
 Quit	DevicesView		Вийти
 Device paths	Device		Шляхи пристрою
 Scanner	DeviceSCSI		Сканер
-Printer	DeviceSCSI		Printer
+Printer	DeviceSCSI		Принтер
 Processor	Device		Процесор
 Optical Drive	DeviceSCSI		Оптичний привід
 ACPI Processor Namespace '%2'	DeviceACPI		Місце імені процесора ACPI '%2'
@@ -57,7 +57,7 @@ ACPI bus	DevicesView		ШинаACPI
 Changer	DeviceSCSI		Ченджер
 ACPI System Bus	DeviceACPI		Шина системи ACPI
 Devices	System name		Пристрої
-Worm	DeviceSCSI		Worm
+Worm	DeviceSCSI		Хробак
 Multimedia controller	Device		Мультимедійний контролер
 Unknown	DevicePCI		Невідомий
 Device name:	Device		Назва пристрою:

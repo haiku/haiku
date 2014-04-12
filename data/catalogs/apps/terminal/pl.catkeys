@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	2967760334
+1	polish	x-vnd.Haiku-Terminal	3250775475
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz Terminal
 Change directory	Terminal TermView		Zmień folder
@@ -55,6 +55,7 @@ Blinking cursor	Terminal AppearancePrefView		Migający kursor
 Don't save	Terminal PrefWindow		Nie zapisuj
 Set window title	Terminal TermWindow		Ustaw tytuł okna
 Terminal	System name		Terminal
+Copy path	Terminal TermView		Kopiuj ścieżkę
 Close other tabs	Terminal TermWindow		Zamknij pozostałe karty
 Match word	Terminal FindWindow		Dopasuj słowo
 Nothing is selected.	Terminal TermWindow		Nic nie jest zaznaczone.
@@ -69,6 +70,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:\
 Selected background	Terminal AppearancePrefView		Wybrane tło
 Slate	Terminal colors scheme		Ciemnopopielaty
 Text under cursor	Terminal AppearancePrefView		Tekst pod kursorem
+Use bright instead of bold text	Terminal AppearancePrefView		Użyj jasnego zamiast tłustego tekstu
 Midnight	Terminal colors scheme		O północy
 Decrease	Terminal TermWindow		Zmniejsz
 Default	Terminal colors scheme		Domyślny
@@ -80,10 +82,12 @@ Text encoding	Terminal TermWindow		Kodowanie tekstu
 size	Terminal TermView		rozmiar
 Close window	Terminal TermWindow		Zamknij okno
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tBieżący katalog roboczy dla aktywnego procesu w bieżącej \n\t\t\tzakładce.  Ocjonalnie może być określona maksymalna \n\t\t\tliczba elementów ścieżki, np. '%2d' dla co najmnie dwóch elementów.\n\t%T\t-\tNszwa aplikacji Terminala przy obecnych ustawieniach językowych.\n\t%e\t-\tKodowanie znaków obecnej zakładki. Puste, jeśli kodowaniem \n\t\t\tjest UTF-8.\n\t%i\t-\tnr okna.\n\t%p\t-\tNazwa aktywnego procesu w bieżącej zakładce.\n\t%t\t-\tTytuł obecnej zakładki.\n\t%%\t-\tZnak '%'.
+Copy absolute path	Terminal TermView		Kopiuj ścieżkę absolutną
 Save as default	Terminal TermWindow		Zapisz jako domyślne
 Set tab title	Terminal TermWindow		Ustaw tytuł karty
 Settings…	Terminal TermWindow		Ustawienia…
 Abort	Terminal Shell		Anuluj
+Open link	Terminal TermView		Otwórz odnośnik
 Edit	Terminal TermWindow		Edytuj
 Color:	Terminal AppearancePrefView		Kolor:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Wzór ustalający tytuł okna. Następujące wyznaczniki\nmogą zostać użyte:\n
@@ -94,7 +98,9 @@ OK	Terminal TermApp		OK
 Find failed	Terminal TermWindow		Nie znaleziono
 Search forward	Terminal FindWindow		Szukaj dalej
 Edit tab title…	Terminal TermWindow		Edytuj nazwę karty…
+Open path	Terminal TermView		Otwórz ścieżkę
 Find previous	Terminal TermWindow		Znajdź poprzedni
+Copy link location	Terminal TermView		Kopiuj adres odnośnika
 Tab title:	Terminal TermWindow		Tytuł karty:
 Find next	Terminal TermWindow		Znajdź następny
 Close active tab	Terminal TermWindow		Zamknij aktywną kartę

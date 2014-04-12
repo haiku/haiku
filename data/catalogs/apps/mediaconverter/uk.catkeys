@@ -22,8 +22,8 @@ Low	MediaConverter		Низька
 Conversion completed	MediaConverter		Конвертація завершена
 Audio:	MediaConverter-FileInfo		Аудіо:
 OK	MediaConverter-FileInfo		Гаразд
- seconds	MediaFileInfo		секунд
-Source files	MediaConverter		Файл первинних текстів:
+ seconds	MediaFileInfo		 секунд
+Source files	MediaConverter		Файл первинних текстів
 Error writing video frame %lld	MediaConverter		Помилка запису відеокадру %lld
 Error writing audio frame %lld	MediaConverter		Помилка запису аудіокадру %lld
 Cancelling	MediaConverter		Відміна

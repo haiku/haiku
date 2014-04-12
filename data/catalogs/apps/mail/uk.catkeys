@@ -27,14 +27,14 @@ Don't save	Mail		Не зберігати
 Expert	Mail		Експерт
 Reply account:	Mail		Аккаунт для відповіді:
 Message	Mail		Повідомлення
-Settings…	Mail		Налаштування
+Settings…	Mail		Налаштування…
 Reply to sender	Mail		Відповісти відправникові
-There is no installed handler for URL links.	Mail		Не встановлено обробник посилань URL
+There is no installed handler for URL links.	Mail		Не встановлено обробник посилань URL.
 Signature	Mail		Підпис
 Find again	Mail		Повторний пошук
 Bcc:	Mail		Bcc:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить  %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете  зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб п.овернутися назад і виправити ситуацію.
-Signature:	Mail		Підпис
+Signature:	Mail		Підпис:
 Save changes to this signature?	Mail		Зберегти зміни в цьому підписі?
 Cc:	Mail		Cc:
 Off	Mail		Вимкнути
@@ -63,7 +63,7 @@ Print…	Mail		Друкувати…
 Warn unencodable:	Mail		Увага нерозкодоване:
 Quit	Mail		Завершити
 %n - Full name	Mail		%n - Повне ім'я
- Read 	Mail		Прочитаним
+ Read 	Mail		 Прочитаним 
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Кошик
 Default account:	Mail		Аккаунт по замовчуванню:
@@ -141,7 +141,7 @@ Save	Mail		Зберегти
 Random	Mail		Випадковий
 Close and 	Mail		Закрити і
 Save as draft	Mail		Зберегти як чорновик
-The mail_daemon could not be started:\n\t	Mail		 Mail_daemon не запущено:\n\t
+The mail_daemon could not be started:\n\t	Mail		Mail_daemon не запущено:\n\t
 Open attachment	Mail		Відкрити вкладення
 sent	B_USER_DIRECTORY/mail/sent		відіслати
 (Date unavailable)	Mail		(Дата недоступна)

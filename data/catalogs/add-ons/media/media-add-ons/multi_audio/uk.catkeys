@@ -26,7 +26,7 @@ Output	MultiAudio		Вихід
 Video	MultiAudio		Відео
 Line	MultiAudio		Лінія
 Mic	MultiAudio		Мікрофон
- frequency:	MultiAudio		частота:
+ frequency:	MultiAudio		 частота:
 Enable	MultiAudio		Увімкнути
 Mute	MultiAudio		Приглушити
 Wave	MultiAudio		Хвиля

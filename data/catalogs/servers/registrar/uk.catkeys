@@ -3,14 +3,14 @@ Restart system	ShutdownProcess		Перезапустити систему
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Програма \"%appName%\" може бути заблокована на модальній панелі.
 OK	ShutdownProcess		Гаразд
 System is shut down	ShutdownProcess		Система вимикається
-It's now safe to turn off the computer.	ShutdownProcess		Тепер можна вимкнути комп'ютер
+It's now safe to turn off the computer.	ShutdownProcess		Тепер можна вимкнути комп'ютер.
 Cancel	ShutdownProcess		Скасувати
 Do you really want to shut down the system?	ShutdownProcess		Ви справді хочете вимкнути систему?
 Asking other processes to quit.	ShutdownProcess		Опитування інших процесів про вихід.
 Asking \"%appName%\" to quit.	ShutdownProcess		Опитування \"%appName%\" про вихід.
 %action%?	ShutdownProcess		%action%?
 Shutdown aborted	ShutdownProcess		Вимкнення скасовано
-Restarting…	ShutdownProcess		Перезапуск...
+Restarting…	ShutdownProcess		Перезапуск…
 Asking background applications to quit.	ShutdownProcess		Опитування фонових програм про вихід.
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Програма \"%appName%\" припинила процес вимкнення.
 Tidying things up a bit.	ShutdownProcess		Ще деякі дрібниці.

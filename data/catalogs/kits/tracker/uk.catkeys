@@ -67,13 +67,13 @@ Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		�
 Close all in workspace	ContainerWindow		Закрити всі робочі простори
 Empty Trash	ContainerWindow		Очистити Кошик
 Name = %name	FindPanel	FindResultTitle	Ім'я = %name
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ви впевнені що бажаєте копіювати або перемістити вибрані речі до цієї папки?
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ви впевнені що бажаєте копіювати або перемістити вибрані об'єкт(и) до цієї папки?
 Does not handle file	OpenWithWindow		Не працює з файлом
 Arrange by	ContainerWindow		Сортувати за
 Mount server error	AutoMounterSettings		Помилка сервера монтування
 Search	FindPanel		Пошук
 Preparing to empty Trash…	StatusWindow		Підготовка до очищення Кошика…
-You cannot put the selected item(s) into the trash.	FSUtils		Ви не можете перемістити обрані об'єкти в кошик.
+You cannot put the selected item(s) into the trash.	FSUtils		Ви не можете перемістити обрані об'єкт(и) в кошик.
 Disks	Model		Диски
 Create link	ContainerWindow		Створити посилання
 Decrease size	DeskWindow		Зменшити розмір
@@ -209,7 +209,7 @@ You cannot create a link to the root directory.	FSUtils		Ви не можете 
 48 x 48	ContainerWindow		48 x 48
 Resize to fit	VolumeWindow		Припасувати
 Could not find application \"%appname\"	OpenWithWindow		Невдалось знайти програму \"%appname\"
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Деякі з вибраних елементів не можуть бути переміщені Кошик . Ви хочете видалити їх все одно? ( Операція необоротна.)
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Деякі з вибраних елементів не можуть бути переміщені Кошик . Ви хочете видалити їх все одно? ( Операція незворотна.)
 Invert	SelectionWindow		Інвертувати
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	перейменуєте
 Find	FindPanel		Знайти
@@ -282,7 +282,7 @@ by name	FindPanel		по імені
 Creating links: 	StatusWindow		Створення посилань:
 Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Перейменувати
 Paused: click to resume or stop	StatusWindow		Зупинено: натисніть щоб відновити або зупинити
-Preferred for %type	OpenWithWindow		 Бажаний для %type
+Preferred for %type	OpenWithWindow		Бажаний для %type
 GiB	WidgetAttributeText		GiB
 There was an error deleting \"%name\":\n\t%error	FSUtils		Виникла помилка при видаленні \"%name\":\n\t%error
 Paste	FilePanelPriv		Вставити
@@ -295,7 +295,7 @@ Move here	ContainerWindow		Перемістити сюди
 File	FilePanelPriv		Файл
 Real name	ContainerWindow		Справжнє ім'я
 Error moving \"%name\"	FSUtils		Помилка переміщення \"%name\"
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ви повинні опустити елемент на одну з іконок диску у вікні\"Disks\".
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ви повинні опустити об'єкт на одну з іконок диску у вікні\"Disks\".
 Cancel	WidgetAttributeText		Відмінити
 Could not find an application to open \"%name\" (%error). 	FSUtils		Не вдалося знайти додаток для відкриття \"%name\" (%error).
 Create a Query template	FindPanel		Створення шаблонів запиту
@@ -351,7 +351,7 @@ Used space color	SettingsView		Колір області використанн�
 Sorry, could not create a new folder.	FSUtils		Вибачте, не вдалося створити нову папку
 multiple disks	FindPanel		помножити диски
 Done	AutoMounterSettings		Готово
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ви повинні кинути елемент на будь-яку з іконок диску ву вікні\"Disks\".
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ви повинні кинути об'єкт на будь-яку з іконок диску у вікні\"Disks\".
 Untitled clipping	PoseView		Неназвана вирізка
 Don't automount	AutoMounterSettings		Не автомонтувати
 Save	FilePanelPriv		Зберегти
@@ -380,7 +380,7 @@ You can't replace a folder with one of its sub-folders.	FSUtils		Ви не мо�
 Preferences…	ContainerWindow		Налаштування
 Move	PoseView		Перемістити
 Open and make preferred	OpenWithWindow		Відкрити і зробити бажаним
-Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ви впевнені що хочете видалити вибрані елементи? Ця операція необоротна
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ви впевнені що хочете видалити вибрані об'єкт(и)? Ця операція незворотня.
 If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Якщо ви %ifYouDoAction папку home, %osName може почати працювати некоректно!\n\nВи впевнені, що бажаєте зробити це?\nЩоб %toDoAction папку home, утримуючи клавішу Shift  натисніть \"%toConfirmAction\".
 Add-ons	DeskWindow		Додатки
 Name	FindPanel		Ім'я

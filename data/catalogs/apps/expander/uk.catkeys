@@ -6,7 +6,7 @@ Use:	ExpanderPreferences		Використати:
 File expanded	ExpanderWindow		Розпаковка файлу
 The destination is read only.	ExpanderWindow		Ціль тільки для читання.
 Expander: Open	ExpanderWindow		Expander: Відкрити
- is not supported	ExpanderWindow		не підтримується
+ is not supported	ExpanderWindow		 не підтримується
 Expander settings	ExpanderPreferences		Настройки Розпаковувача
 Select current	DirectoryFilePanel		Вибрати поточний
 Source	ExpanderWindow		Джерело
@@ -33,7 +33,7 @@ Show contents	ExpanderWindow		Показати вміст
 Automatically show contents listing	ExpanderPreferences		Автоматично показувати список вмісту
 OK	ExpanderPreferences		Гаразд
 Leave destination folder path empty	ExpanderPreferences		Зберегти шлях папки призначення пустим
-Failed to create the destination folder.	ExpanderWindow		Не вдалося створити папку призначення
+Failed to create the destination folder.	ExpanderWindow		Не вдалося створити папку призначення.
 Create	ExpanderWindow		Створити
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка була переіменована, видалена або не\nпідтримується.
 The file doesn't exist	ExpanderWindow		Файл відсутній

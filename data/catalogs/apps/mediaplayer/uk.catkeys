@@ -52,7 +52,7 @@ Nothing to Play	MediaPlayer-Main		Нічого для відтворення
 Muted	MediaPlayer-SettingsWindow		Приглушений
 Quit	MediaPlayer-Main		Вийти
 Video	MediaPlayer-Main		Відео
-Start playing.	MediaPlayer-Main		Почати відтворення
+Start playing.	MediaPlayer-Main		Почати відтворення.
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Немає встановленого декодера щоб підтримував файл цього формату, або у декодера є проблема з спеціальною версією формату.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Імпортувати запис
 Gets the URI of the currently playing item.	MediaPlayer-Main		Отримати URI, який відтворюєтся в даний момент.
@@ -70,14 +70,14 @@ h	MediaPlayer-InfoWin	Hours	г
 Select all	MediaPlayer-PlaylistWindow		Вибрати все
 Move Entry	MediaPlayer-MovePLItemsCmd		Перемістити запис
 Open	MediaPlayer-PlaylistWindow		Відкрити
-Stop playing.	MediaPlayer-Main		Зупинити відтворення
+Stop playing.	MediaPlayer-Main		Зупинити відтворення.
 Seek by the specified amounts of microseconds.	MediaPlayer-Main		Пошук за визначеною кількістю мілісекунд.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' не може бути відкритим.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Помилка:
 Audio	MediaPlayer-InfoWin		Аудіо
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Помилка переміщення до кошика
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (неправильне повідомлення). Збереження списку відтворення призупинено.
-Skip to the previous track.	MediaPlayer-Main		Повернутися до попереднього треку
+Skip to the previous track.	MediaPlayer-Main		Повернутися до попереднього треку.
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% викликав внутрішню помилку. Файл неможливо відкрити.
 Close window after playing video	MediaPlayer-SettingsWindow		Закрити вікно після відтворення відео
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Масштаб зображення зглажений (без режиму накладання)
@@ -105,7 +105,7 @@ Track	Audio Track Menu		Трек
 unknown format	MediaPlayer-InfoWin		невідомий формат
 Position	MediaPlayer-Main		Положення
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нічого для відміни>
-Skip to the next track.	MediaPlayer-Main		Пропустити до наступного треку
+Skip to the next track.	MediaPlayer-Main		Пропустити до наступного треку.
 Play	MediaPlayer-Main		Відтворити
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Знищити записи в кошику
 200% scale	MediaPlayer-Main		Масштаб 200% 

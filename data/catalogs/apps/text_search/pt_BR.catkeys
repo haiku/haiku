@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku.TextSearch	1180598828
+1	portuguese (brazil)	x-vnd.Haiku.TextSearch	2496563907
 %s: Not enough room to escape the filename.	Grepper		%s. Não há espaço suficiente para escapar o nome do arquivo.
 Trim to selection	GrepWindow		Reduzir para seleção
 Follow symbolic links	GrepWindow		Seguir atalhos
@@ -8,6 +8,7 @@ The unselected files will be removed from the list.	GrepWindow		Os arquivos não
 Set target…	GrepWindow		Estabelecer objetivo…
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Por favor selecione os arquivos que você deseja ter selecionados por você no Tracker
 Open files in Pe	GrepWindow		Abrir os arquivos no Pe
+%appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		Copiar texto para a Área de Transferência
 Settings	GrepWindow		Configurações
 Select all	GrepWindow		Selecionar tudo
@@ -31,3 +32,4 @@ Show files in Tracker	GrepWindow		Mostrar arquivos no Tracker
 Case-sensitive	GrepWindow		Diferenciar maiúsculas e minúsculas
 Text files only	GrepWindow		Somente arquivos de texto
 Show lines	GrepWindow		Mostrar linhas
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

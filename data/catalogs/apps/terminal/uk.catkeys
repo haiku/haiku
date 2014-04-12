@@ -27,7 +27,7 @@ Window title:	Terminal TermWindow		Ім'я вікна:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Невідома опція \"%s\"\n
 Blue	Terminal colors scheme		Синій
 Custom	Terminal colors scheme		Налаштована вручну
-%app% settings	Terminal PrefWindow	window title	Параметри %app%
+%app% settings	Terminal PrefWindow	window title	%app% налаштування
 Cancel	Terminal SetTitleWindow		Відміна
 Increase	Terminal TermWindow		Збільшити
 Settings	Terminal TermWindow		Настройки

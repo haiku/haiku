@@ -4,12 +4,12 @@ Cannot find default audio hardware	RecorderWindow		Неможливо знайт
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Неможливо знайти тимчасовий файл створений для збереження нового запису
 Sample size:	RecorderWindow		Розмір зразка:
 Nothing to play	RecorderWindow		Нічого для відтворення
-None of the files appear to be audio files.	RecorderWindow		Жоден з цих файлів не є звуковим
+None of the files appear to be audio files.	RecorderWindow		Жоден з цих файлів не є звуковим.
 Duration: 	RecorderWindow		Тривалість:
 File info	RecorderWindow		Інфо про файл
 Drop files here	SoundListView		Киньте файли сюди
 Input	RecorderWindow		Вхід
-Some of the files don't appear to be audio files.	RecorderWindow		Деякі з файлів виявилися не звуковими
+Some of the files don't appear to be audio files.	RecorderWindow		Деякі з файлів виявилися не звуковими.
 Stop	RecorderWindow		Зупинити
 Format:	RecorderWindow		Формат:
 Sound List	RecorderWindow		Список звуку
@@ -17,7 +17,7 @@ Compression: 	RecorderWindow		Компресія:
 Rewind	RecorderWindow		Перемотка
 Sample rate:	RecorderWindow		Частота дискретизації:
 Invalid audio files	RecorderWindow		Неправильні аудіо файли
- seconds	RecorderWindow		секунд
+ seconds	RecorderWindow		 секунд
 OK	RecorderWindow		Гаразд
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Неможливо відкрити тимчасовий файл створений для збереження нового запису
 Input:	RecorderWindow		Вхід:
@@ -25,7 +25,7 @@ Forward	RecorderWindow		Вперед
 Play	RecorderWindow		Відтворити
 SoundRecorder	System name		Запис звуку
 Channels:	RecorderWindow		Канали:
- bits	RecorderWindow		біт
+ bits	RecorderWindow		 біт
 None	RecorderWindow		Жоден
 Record	RecorderWindow		Записати
 Sample size: 	RecorderWindow		Розмір зразка:
@@ -42,5 +42,5 @@ Channels: 	RecorderWindow		Канали:
 Save	RecorderWindow		Зберегти
 Sample rate: 	RecorderWindow		Частота дискретизації:
 Cannot connect to media server	RecorderWindow		Неможливо під'єднати медіа сервер
-The file doesn't appear to be an audio file.	RecorderWindow		Цей файл не є звуковим
+The file doesn't appear to be an audio file.	RecorderWindow		Цей файл не є звуковим.
 File name:	RecorderWindow		І'мя файла:

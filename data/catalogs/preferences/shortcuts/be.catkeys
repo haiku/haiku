@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Shortcuts	2482780610
+1	belarusian	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		РухацьМыш
 OK	ShortcutsWindow		ОК
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Рэдактар Гарачых Клавішаў не змог захаваць вашу канфігурацыю (KeySet).
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		Дадаць KeySet…
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Key	ShortcutsWindow		Клавіша
 Open KeySet…	ShortcutsWindow		Адкрыць KeySet…
+Error, NULL state description?	ShortcutsSpec		Памылка, апісанне стану NULL?
 MouseUp	ShortcutsSpec		МышУверх
 Revert to saved	ShortcutsWindow		Вярнуцца да захаванага
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt

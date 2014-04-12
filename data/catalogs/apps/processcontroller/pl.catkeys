@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ProcessController	1848752768
+1	polish	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		Użycie pamięci
 Kill this team!	ProcessController		Zakończ ten wątek!
 Idle priority	ProcessController		Priorytet bezczynności
@@ -7,6 +7,7 @@ Custom priority	ProcessController		Własny priorytet
 This team is already gone…	ProcessController		Ten zespół nie jest już obecny…
 Error saving file	ProcessController		Błąd przy zapisywaniu pliku
 Real-time priority	ProcessController		Priorytet czasu rzeczywistego
+Power saving	ProcessController		Oszczędzanie energii
 Your setting file could not be saved!\n(%s)	ProcessController		Twój plik ustawień nie może być zapisany!\n(%s)
 What do you want to do with the team \"%s\"?	ProcessController		Co chcesz zrobić z  tym wątkiem \"%s\"?
 This thread is already gone…	ProcessController		Ten wątek nie jest już obecny…
@@ -36,6 +37,7 @@ Quit an application	ProcessController		Wyjdź z aplikacji
 Install in Deskbar	ProcessController		Zainstaluj w Deskbarze
 Threads and CPU usage	ProcessController		Wątki oraz użycie CPU
 Urgent display priority	ProcessController		Pilny priorytet wyświetlania
+Low latency	ProcessController		Niskie opóźnienia
 OK	ProcessController		OK
 Damned!	ProcessController		Cholera!
 Debug this team!	ProcessController		Debuguj ten wątek!

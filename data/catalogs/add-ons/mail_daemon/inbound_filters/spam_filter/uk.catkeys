@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-SpamFilter	1975155212
 or empty e-mail	SpamFilterConfig		або порожній лист
 Spam Filter (AGMS Bayesian)	SpamFilter		Спам-фільтр (AGMS Байєса)
-Genuine below and uncertain above:	SpamFilterConfig		Справжні - внизу, а сумнівні - вгорі
+Genuine below and uncertain above:	SpamFilterConfig		Справжні - внизу, і сумнівні - вгорі:
 Spam above:	SpamFilterConfig		Спам вгорі:
 Add spam rating to start of subject	SpamFilterConfig		Додати позначку про спам на початку теми
 Learn from all incoming e-mail	SpamFilterConfig		Вчитися за всією вхідною поштою

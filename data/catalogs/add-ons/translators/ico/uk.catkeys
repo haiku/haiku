@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-ICOTranslator	3916328565
 Cursor	ICOTranslator		Курсор
-Version %d.%d.%d, %s	ConfigView		 Версія %d.%d.%d, %s
+Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Вікна зображення %s %ld bit
 Valid icon sizes are 16, 32, or 48	ConfigView		Доступні розміри іконок є 16, 32, або 48
 Windows icons	ICOTranslator		Значки Windows

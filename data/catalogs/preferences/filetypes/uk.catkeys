@@ -45,7 +45,7 @@ Could not open file	FileType Window		Неможливо відкрити фай�
 Description:	FileTypes Window		Опис:
 File	FileTypes Window		Файл
 Name:	Application Types Window		Ім'я:
-Group name:	New File Type Window		Ім'я групи
+Group name:	New File Type Window		Ім'я групи:
 Preferred application	FileType Window		Бажаний додаток
 Progress	Application Types Window		Хід
 Set preferred application	Preferred App Menu		Вибрати бажаний додаток

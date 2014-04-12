@@ -44,7 +44,7 @@ Headphones	DeviceClass		Навушники
 Information	DeviceClass		Інформація
 Remote control	DeviceClass		Віддалене управління
 Service classes: 	DeviceClass		Класи служби: 
-Pager	DeviceClass	A small radio device to receive short text messages	Пейджер Примітка: невеликий радіо-пристрій отримує короткі текстові повідомлення
+Pager	DeviceClass	A small radio device to receive short text messages	Пейджер
 Object transfer	DeviceClass		Об'єкт передачі
 Gaming/Toy	DeviceClass		Ігрові/іграшки
 Audio	DeviceClass		Аудіо

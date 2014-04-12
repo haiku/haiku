@@ -12,5 +12,5 @@ Open MediaPlayer	MediaReplicant		Otwórz MediaPlayer
 desklink	MediaReplicant		Skrót pulpitu
 Options	MediaReplicant		Opcje
 %ld dB	VolumeControl		%ld dB
-Beep	MediaReplicant		Dzwonek systemowy
+Beep	MediaReplicant		Brzęczyk
 Volume	VolumeControl		Głośność

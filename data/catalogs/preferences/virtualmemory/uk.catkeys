@@ -2,9 +2,9 @@
 Quit	SettingsWindow		Вийти
 Automatic swap management	SettingsWindow		Визначати автоматично
 Turn off	SettingsWindow		Вимкнути
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Вимкнення віртуальної пам'яті, може мати небажаний вплив на стабільність системи, коли  вся доступна фізична пам'ять буде задіяна.\nВіртуальна пам"ять не впливає на продуктивність системи аж до цього моменту.\n\nДійсно хочете її вимкнути?
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Вимкнення віртуальної пам'яті, може мати небажаний вплив на стабільність системи, коли  вся доступна фізична пам'ять буде задіяна.\nВіртуальна пам'ять не впливає на продуктивність системи аж до цього моменту.\n\nВи дійсно бажаєте її вимкнути?
 Requested swap file size:	SettingsWindow		Розмір свопа, що запрошується:
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Параметри вказані в файлі налаштувань хибні. Завантажити типові чи вийти?
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Параметри вказані в файлі налаштувань хибні. Завантажити типові чи вийти.
 Defaults	SettingsWindow		По замовчуванню
 Current Swap:	SettingsWindow		Поточний файл підкачки:
 Use volume:	SettingsWindow		Використати образ:

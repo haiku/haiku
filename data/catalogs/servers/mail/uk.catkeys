@@ -3,7 +3,7 @@ Fetching mail for %name	Notifier		Отримання пошти для %name
 Check for mails only	DeskbarView		Перевірити тільки пошту
 Send pending mails	DeskbarView		Відправити чергову пошту 
 New Messages	MailDaemon		Нові повідомлення
-<no accounts>	DeskbarView		<акаунти відсутні>
+<no accounts>	DeskbarView		<облікові записи відсутні>
 %num new messages	DeskbarView		%num нових повідомлень
 Mail status	MailDaemon		Стан пошти
 Shutdown mail services	DeskbarView		Закрити поштові сервіси

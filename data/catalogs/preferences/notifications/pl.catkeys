@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Notifications	2395520521
+1	polish	x-vnd.Haiku-Notifications	68793008
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	GeneralView		Wystąpił błąd przy zapisie ustawień.\nByć może zabrakło miejsca na dysku.
 Notifications	GeneralView		Powiadomienia
 seconds of inactivity	GeneralView		sekund nieaktywności
@@ -18,16 +18,16 @@ Last Received	NotificationView		Ostatnio otrzymane
 General	PrefletView		Ogólne
 Apply	PrefletWin		Zastosuj
 Display	PrefletView		Wyświetlanie
-Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nie można włączyć powiadomień przy starcie systemu, prawdopodobnie nie masz uprawnień zapisu do katalogu ustawień systemowych.
+Can't enable notifications at startup time, you probably don't have write permission to the boot settings directory.	GeneralView		Nie można włączyć powiadomień przy starcie systemu, prawdopodobnie nie masz uprawnień do zapisu w katalogu ustawień systemowych.
 Search:	NotificationView		Szukaj:
 The notifications server cannot be found.\nA possible cause is an installation not done correctly	GeneralView		Nie można odnaleźć serwera powiadomień.\nByć może instalacja nie została poprawnie wykonana
 Allowed	NotificationView		Zezwolone
-Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Nie można zapisać ustawień, prawdopodobnie nie masz uprawnień zapisu do katalogu ustawień lub brakuje miejsca na dysku.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Wystąpił problem zapisu ustawień.\nByć może nie masz uprawnień zapisu do katalogu ustawień.
+Can't save preferenes, you probably don't have write access to the settings directory or the disk is full.	DisplayView		Nie można zapisać ustawień, prawdopodobnie nie masz uprawnień do zapisu w katalogu ustawień lub brakuje miejsca na dysku.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	DisplayView		Wystąpił problem zapisu ustawień.\nByć może nie masz uprawnień do zapisu w katalogu ustawień.
 Yes	NotificationView		Tak
 Large icon	DisplayView		Duża ikona
 Icon size:	DisplayView		Rozmiar ikon:
-Hide notifications from screen after	GeneralView		Ukryj powiadomienia z ekranu po
+Hide notifications from screen after	GeneralView		Usuń powiadomienia z ekranu po
 Notifications	System name		Powiadomienia
 Notifications	NotificationView		Powiadomienia
 No	NotificationView		Nie
@@ -38,9 +38,10 @@ Application	NotificationView		Aplikacja
 Enabled	NotificationView		Włączone
 OK	DisplayView		OK
 Unknown	NotificationView		Nieznane
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Wystąpił problem zapisu preferencji. \nMożliwe, że nie masz uprawnień zapisu w katalogu ustawień.
-There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Wystąpił problem zapisu preferencji. \nMożliwe, że nie masz uprawnień zapisu w katalogu ustawień.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	GeneralView		Wystąpił problem zapisu preferencji.\nMożliwe, że nie masz uprawnień do zapisu w katalogu ustawień.
+There was a problem saving the preferences.\nIt's possible you don't have write access to the settings directory.	NotificationView		Wystąpił problem zapisu preferencji.\nMożliwe, że nie masz uprawnień do zapisu w katalogu ustawień.
 Enable notifications at startup	GeneralView		Włącz powiadomienia podczas uruchamiania
 Notifications	PrefletView		Powiadomienia
-The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Serwer powiadomień nie został odnaleziony, to oznacza, że instalacja InfoPopper  nie została ukończona pomyślnie.
+The notifications server cannot be found, this means your InfoPopper installation was not successfully completed.	GeneralView		Serwer powiadomień nie został odnaleziony, to oznacza, że instalacja InfoPopper nie została ukończona pomyślnie.
+Can't save preferences, you probably don't have write access to the settings directory.	GeneralView		Nie można zapisać ustawień, prawdopodobnie nie masz uprawnień do zapisu w katalogu z ustawieniami.
 Applications	NotificationView		Aplikacje

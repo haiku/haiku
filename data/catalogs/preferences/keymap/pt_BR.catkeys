@@ -1,20 +1,33 @@
-1	portuguese (brazil)	x-vnd.Haiku-Keymap	3149356649
+1	portuguese (brazil)	x-vnd.Haiku-Keymap	439384761
+Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Deslocar:
 Revert	Modifier keys window		Reverter
+Slovak	Keyboard Layout View		Eslovaco
+Hungarian	Keyboard Layout View		Húngaro
+German	Keyboard Layout View		Alemão
+Swiss-French	Keyboard Layout View		Francês Suiço
+Warning: left and right key roles do not match	Modifier keys window		Aviso: regras das teclas direita e esquerda não são iguais
 Belgian (comma)	Keyboard Layout View		Belga (vírgula)
-Scroll lock	Keyboard Layout View		Trava de rolagem
+Scroll lock	Keyboard Layout View		Scroll lock
 Belarusian (Mac)	Keyboard Layout View		Bielorrusso (Mac)
 Greek	Keyboard Layout View		Grego
 Menu	Keyboard Layout View	Menu key	Menu
 US	Keyboard Layout View		US
-Left control	Keyboard Layout View		Controle esquerdo
+Left control	Keyboard Layout View		Control esquerdo
 Spanish	Keyboard Layout View		Espanhol
 Ukrainian (Mac)	Keyboard Layout View		Ucraniano (Mac)
+Belarusian	Keyboard Layout View		Bielorrusso
+Italian	Keyboard Layout View		Italiano
+Polish (Typewriter)	Keyboard Layout View		Polonês (Máquina de Escrever)
 Tilde trigger	Keymap window		Acento til
 Grave trigger	Keymap window		Tecla morta
 Role	Modifier keys window	As in the role of a modifier key	Função
+Caps lock	Keyboard Layout View		Caps lock
 Select dead keys	Keymap window		Selecionar teclas de acento
+Bulgarian (Cyrillic)	Keyboard Layout View		Búlgaro (Cirílico)
 Cancel	Modifier keys window		Cancelar
+Russian	Keyboard Layout View		Russo
+Icelandic	Keyboard Layout View		Islandês
 Command	Keyboard Layout View	Command key	Comando
 Polish	Keyboard Layout View		Polonês
 Serbian (Cyrillic)	Keyboard Layout View		Sérvio (Cirílico)
@@ -24,31 +37,51 @@ Japanese	Keyboard Layout View		Japonês
 Bulgarian (Phonetic)	Keyboard Layout View		Búlgaro (Fonético)
 Dvorak (programmer's)	Keyboard Layout View		Dvorak (de programador)
 Estonian	Keyboard Layout View		Estoniano
+Russian (Mac)	Keyboard Layout View		Russo (Mac)
 Defaults	Keymap window		Configurações padrão
 Quit	Keymap window		Sair
+Dutch	Keyboard Layout View		Holandês
 Switch shortcut keys to Haiku mode	Keymap window		Alternar teclas de atalho para o modo Haiku
 Circumflex trigger	Keymap window		Tecla de circunflexo
+ISO-9995	Keyboard Layout View		ISO-9995
+Hebrew	Keyboard Layout View		Hebreu
 Diaeresis trigger	Keymap window		Tecla de trema
 Disabled	Modifier keys window	Do nothing	Desabilitado
+Belarusian (Latin)	Keyboard Layout View		Bielorrusso (Latino)
+Danish	Keyboard Layout View		Dinamarquês
 Open…	Keymap window		Abrir...
+Russian (Typewriter)	Keyboard Layout View		Russo (Máquina de Escrever)
+Error: duplicate keys	Modifier keys window		Erro: chaves duplicadas
 System:	Keymap window		Sistema:
+Lithuanian	Keyboard Layout View		Lituano
+Finnish	Keyboard Layout View		Finlandês
+Svorak	Keyboard Layout View		Svorak
 Left command	Keyboard Layout View		Comando esquerdo
 Romanian	Keyboard Layout View		Romeno
 Set modifier keys…	Keymap window		Definir modificador de teclas…
 Option:	Modifier keys window	Option key role name	Opção:
 Czech (Mac)	Keyboard Layout View		Tcheco (Mac)
-Control	Keyboard Layout View	Control key	Controle
+Control	Keyboard Layout View	Control key	Control
 Left option	Keyboard Layout View		Opção esquerda
 Portuguese	Keyboard Layout View		Português
-Right control	Keyboard Layout View		Controle direito
+Right control	Keyboard Layout View		Control direito
 Belgian (point)	Keyboard Layout View		Belga (ponto)
 Switch shortcut keys	Keymap window		Mudas as teclas de atalho
 Norwegian	Keyboard Layout View		Norueguês
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla shift
 User:	Keymap window		Usuário:
+Esperanto	Keyboard Layout View		Esperanto
+Arabic (102)	Keyboard Layout View		Arábico (102)
+United-Kingdom	Keyboard Layout View		Reino Unido
+German (Mac)	Keyboard Layout View		Alemão (Mac)
+Right option	Keyboard Layout View		Opção da direita
+Right shift	Keyboard Layout View		Shift direito
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Tecla control
 Control:	Modifier keys window	Control key role name	Controle:
+Brazilian	Keyboard Layout View		Brasileiro
+Brazilian (ABNT2)	Keyboard Layout View		Brasileiro (ABNT2)
+French (Bépo)	Keyboard Layout View		Francês (Bépo)
 Option	Keyboard Layout View	Option key	Opção
 US-International	Keyboard Layout View		US-internacional
 Sample and clipboard:	Keymap window		Amostra e área de transferência:
@@ -64,12 +97,28 @@ Latin-American	Keyboard Layout View		Latino-Americano
 Spanish (Dvorak)	Keyboard Layout View		Espanhol (Dvorak)
 Lithuanian (Standard)	Keyboard Layout View		Lituano (Padrão)
 Canadian-French	Keyboard Layout View		Francês-Canadense
+Irish	Keyboard Layout View		Irlandês
+Turkish (Type-F)	Keyboard Layout View		Turco (Tipo-F)
+Slovene	Keyboard Layout View		Esloveno
+Turkish (Type-Q)	Keyboard Layout View		Turco (Tipo-Q)
 Save as…	Keymap window		Salvar como...
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
+Serbian (Latin)	Keyboard Layout View		Sérvio (Latino)
 File	Keymap window		Arquivo
+Num lock	Keyboard Layout View		Num lock
+Swedish	Keyboard Layout View		Sueco
+Macedonian	Keyboard Layout View		Macedônio
 (Current)	Keymap window		(Atual)
 Font	Keymap window		Fonte
 Keymap	System name		Mapa do teclado
+French (Mac)	Keyboard Layout View		Francês (Mac)
+Left shift	Keyboard Layout View		Shift esquerdo
+Shift	Keyboard Layout View	Shift key	Shift
+Ukrainian	Keyboard Layout View		Ucraniano
+Croatian	Keyboard Layout View		Croata
+Kazakh	Keyboard Layout View		Cazaque
+Czech	Keyboard Layout View		Tcheco
 Set modifier keys	Modifier keys window		Definir teclas modificadoras
+Colemak	Keyboard Layout View		Colemak
 Modifier keys	Modifier keys window		Teclas modificadoras
 Acute trigger	Keymap window		Tecla de acento agudo

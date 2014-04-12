@@ -2,19 +2,19 @@
 Input gain controls represent	AudioMixer		Regulacja wzmocnienia wejścia reprezentuje
 Linear interpolation	AudioMixer		Interpolacja liniowa
 Virtual output channels	AudioMixer		Wirtualne kanały wyjściowe
-Refuse output format changes	AudioMixer		Odmowa zmiany formatu wyjściowego
+Refuse output format changes	AudioMixer		Odmów zmiany formatu wyjściowego
 Output mapping	AudioMixer		Mapowanie wyjścia
-Allow input channel remapping	AudioMixer		Pozwól ponowne mapować kanał wejściowy
+Allow input channel remapping	AudioMixer		Pozwól ponownie mapować kanał wejściowy
 Resampling algorithm	AudioMixer		Algorytm konwersji częstotliwości próbkowania
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Tłumienie wyjścia miksera przez 3dB (jak w BeOS R5)
-Display balance control for stereo connections	AudioMixer		Wyświetlanie kontroli balansu dla połączeń stereo
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Tłum wyjście miksera o 3dB (jak w BeOS R5)
+Display balance control for stereo connections	AudioMixer		Wyświetl kontrolę balansu dla połączeń stereo
 To output	AudioMixer		Do wyjścia
 not connected	AudioMixer		nie podłączony
-Refuse input format changes	AudioMixer		Odmowa zmiany formatów wejściowych
+Refuse input format changes	AudioMixer		Odmów zmiany formatów wejściowych
 Drop/repeat samples	AudioMixer		Zostaw/powtórz sample
 Output channel sources	AudioMixer		Źródła kanału wyjściowego
 dB	AudioMixer		dB
-Gain controls	AudioMixer		Sterowanie wzmocnieniem
+Gain controls	AudioMixer		Regulacja wzmocnienia
 Input mapping	AudioMixer		Mapowanie wejścia
 Mute	AudioMixer		Wycisz
 Input channel destinations	AudioMixer		Miejsca kanału wejściowego
@@ -23,5 +23,5 @@ Master output	AudioMixer		Wyjście główne
 Setup	AudioMixer		Ustawienia
 Use non linear gain sliders (like BeOS R5)	AudioMixer		Użyj nieliniowych suwaków wzmocnienia (jak w BeOS R5)
 Gain	AudioMixer		Wzmocnienie
-Allow output channel remapping	AudioMixer		Pozwól ponowne mapować kanał wyjściowy
+Allow output channel remapping	AudioMixer		Pozwól ponownie mapować kanał wyjściowy
 Physical input channels	AudioMixer		Fizyczne kanały wejściowe

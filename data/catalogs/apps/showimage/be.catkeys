@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-ShowImage	4011843330
+1	belarusian	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Ужыць як фон…
 File	Menus		Файл
 Slide delay	Menus		Затрымка слайду
@@ -53,6 +53,7 @@ Select all	Menus		Выбраць усё
 Zoom factor in %:	PrintOptionsWindow		Мера павелічэння, %:
 Width:	PrintOptionsWindow		Шырыня:
 Image	Menus		Выява
+Move to Trash	Menus		Перамясціць у сметніцу
 OK	Alerts		ОК
 Rotate clockwise	Menus		Павярнуць па гадзіннікавай стрэлцы
 Job setup	PrintOptionsWindow		Наладка заданняў

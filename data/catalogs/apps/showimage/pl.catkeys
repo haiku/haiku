@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ShowImage	4011843330
+1	polish	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Użyj jako tapety…
 File	Menus		Plik
 Slide delay	Menus		Opóźnienie
@@ -53,6 +53,7 @@ Select all	Menus		Zaznacz wszystko
 Zoom factor in %:	PrintOptionsWindow		Współczynnik przybliżenia w %:
 Width:	PrintOptionsWindow		Szerokość:
 Image	Menus		Obraz
+Move to Trash	Menus		Przenieś do kosza
 OK	Alerts		OK
 Rotate clockwise	Menus		Obróć zgodnie ze wskazówkami zegara
 Job setup	PrintOptionsWindow		Ustawienia zadania

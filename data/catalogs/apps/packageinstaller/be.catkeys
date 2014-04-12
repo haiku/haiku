@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-PackageInstaller	792037176
+1	belarusian	x-vnd.Haiku-PackageInstaller	2033288398
 Install to:	PackageView		Усталяваць у:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Прыняць
@@ -12,12 +12,14 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		Памылка падчас усталёўкі пакунка\n
 Disclaimer	PackageTextViewer		Адмова
 %.1f GiB	PackageView		%.1f ГіБ
+%name% (%size% free)	PackageView		%name% (%size% вольна)
 The installation of the package has been aborted.	PackageView		Усталёўка пакунка была перарваная.
 Done	PackageInstall		Зроблена
 All existing files will be replaced?	PackageView		Усе існуючыя файлы будуць заменены?
 Preparing package	PackageInstall		Прыгатаванне пакунку
 No package available.	PackageInfo		Няма даступных пакункаў.
 none	PackageView		няма
+Install %name%	PackageView		Усталяваць %name%
 Stop	PackageStatus		Спыніць
 Other…	PackageView		Другі…
 No installation type selected	PackageView		Не абраны тып усталёўкі
@@ -45,11 +47,14 @@ Decline	PackageTextViewer		Знізіць
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл '%s' ужо існуе у вашай сістэме.\nЗамяніць яго тым што зададзены ў пакунку ці абыйсці?
 All existing files will be skipped?	PackageView		Усе існуючыя файлы будуць абыйдзены?
 Continue	PackageInfo		Працягваць
+%index% of %total%	PackageInstall		%index% з %total%
 %.1f KiB	PackageView		%.1f КіБ
 Abort	PackageInfo		Перарваць
 PackageInstaller	System name		Усталёўшчык пакункаў
 Abort	PackageInstall		Перарваць
+%name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Працягваць
+Begin	PackageView		Пачаць
 Replace	PackageView		Замяніць
 Installation progress	PackageView		Прагрэс усталёўкі
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакунку не можа быць прачытаны.\nМагчымая прычына такой памылкі можа быць тое, што ён не з´яўляецца карэктным BeOS .pkg файлам.

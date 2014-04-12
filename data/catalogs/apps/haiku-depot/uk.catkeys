@@ -23,7 +23,7 @@ Your rating	System name		Ваш рейтинг
 Development	Model		Розробка
 Fatal error	PackageManager		Критична помилка
 Ratings	PackageInfoView		Оцінки
-1 item	PackageListView		%1 об’єкт
+1 item	PackageListView		1 об’єкт
 Inactive	PackageListView		Неактивний
 Refresh depots	MainWindow		Оновити сховища
 Main Menu	MainWindow		Головне меню
@@ -42,7 +42,7 @@ Options	MainWindow		Налаштування
 Games	Model		Ігри
 Rating	PackageListView		Оцінка
 Downloading	Model		Завантаження
-%ld items	PackageListView		об'єктів: %ld
+%ld items	PackageListView		%ld об'єктів
 Graphics	Model		Зображення
 Local	MainWindow		Локальний
 Close	MainWindow		Закрити

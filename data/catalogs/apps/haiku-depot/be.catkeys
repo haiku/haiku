@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	4291855824
+1	belarusian	x-vnd.Haiku-HaikuDepot	3398060443
 Name	PackageListView		Імя
 Installed packages	Model		Усталяваныя пакункі
 User modified packages	Model		Пакункі мадыфікаваныя карыстальнікам
@@ -12,11 +12,14 @@ Description	PackageListView		Апісанне
 Install	PackageManager		Усталяваць
 Tools	MainWindow		Прылады
 HaikuDepot	System name		HaikuDepot
+Rate package…	PackageInfoView		Ацаніць пакунак…
 Uninstall	PackageManager		Выдаліць
 <no info>	PackageInfoView		<няма інфармацыі>
 An error occurred while initializing the package manager: %message%	MainWindow		Падчас ініцыялізацыі пакункавага мэнэджэра здарылася памылка: %message%
 Close	PackageManager		Закрыць
 Status	PackageListView		Стан
+Available packages	Model		Наяўныя пакункі
+Your rating	System name		Рэйтынг
 Development	Model		Распрацоўка
 Fatal error	PackageManager		Фатальная памылка
 Ratings	PackageInfoView		Рэйтынг
@@ -46,12 +49,14 @@ Close	MainWindow		Закрыць
 Video	Model		Відэа
 An error occurred while refreshing the repository: %error%	MainWindow		Падчас аднаўлення інфармацыі сховішчаў адбылася памылка: %error%
 All packages	FilterView		Усе пакункі
+Pending…	PackageListView		Чакае…
 Depot	FilterView		Сховішча
 Uninstalled	PackageListView		Выдаленныя
 Unknown	PackageListView		Невядомы
 All depots	FilterView		Усе сховішчы
 Available	PackageListView		Даступна
 n/a	PackageInfoView		н/н
+Send	RatePackageWindow		Даслаць
 Show develop packages	MainWindow		Паказаць пакункі для распрацоўшчыкаў
 Show	FilterView		Паказаць
 Uninstalled packages	Model		Выдаленыя пакункі

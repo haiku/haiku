@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-WebPositive	1786411139
+1	portuguese (brazil)	x-vnd.Haiku-WebPositive	2880796666
 Show home button	Settings Window		Exibir botão home
 Username:	Authentication Panel		Nome de Usuário:
 Copy URL to clipboard	Download Window		Copiar URL para a área de transferência
@@ -89,10 +89,12 @@ Proxy server requires authentication	Settings Window		Servidor proxy requer aute
 Clear	URL Bar		Limpar
 Cut	URL Bar		Cortar
 Clear	WebPositive Window		Limpar
+Script console	Console Window		Console do script
 Remove	Download Window		Remover
 Find	WebPositive Window		Localizar
 Find previous	WebPositive Window		Localizar anterior
 Settings	WebPositive Window		Definições
+Script console	WebPositive Window		Console do script
 Proxy server address:	Settings Window		Endereço do servidor proxy:
 Proxy server port:	Settings Window		Porta do servidor proxy:
 Bookmarks	WebPositive Window		Marcadores
@@ -106,6 +108,7 @@ Open start page	Settings Window		Abrir página inicial
 Continue downloads	WebPositive		Continuar a baixar
 Cancel	Download Window		Cancelar
 Open search page	Settings Window		Abrir página de pesquisa
+Clear	Console Window		Limpar
 Password:	Authentication Panel		Senha:
 Back	WebPositive Window		Voltar
 New browser window	Download Window		Nova janela do navegador

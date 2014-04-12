@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	1345097290
+1	polish	x-vnd.Haiku-MediaPlayer	1727923642
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -21,10 +21,12 @@ Close	MediaPlayer-Main		Zamknij
 Display Mode	MediaPlayer-InfoWin		Tryb wyświetlania
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kilka plików nie mogło być przeniesionych do Kosza.
 <unknown>	MediaPlayer-InfoWin		<nieznany>
+Seek	MediaPlayer-Main		Przewiń
 Open	MediaPlayer-Main		Otwórz
 Next	MediaPlayer-Main		Następny
 OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Utwór %d
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Pobiera/ustawia aktualną pozycję odtwarzania w mikrosekundach.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Tryb wyświetlania
 Medium	MediaPlayer-SettingsWindow		Średnie
@@ -69,6 +71,7 @@ Select all	MediaPlayer-PlaylistWindow		Zaznacz wszystko
 Move Entry	MediaPlayer-MovePLItemsCmd		Przeniesienie wpisu
 Open	MediaPlayer-PlaylistWindow		Otwórz
 Stop playing.	MediaPlayer-Main		Zatrzymaj odtwarzanie.
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		Przewiń o określoną liczbę mikrosekund.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Plik '%filename' nie może być otwarty.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Błąd: 
 Audio	MediaPlayer-InfoWin		Dźwięk
@@ -136,6 +139,7 @@ Edit	MediaPlayer-PlaylistWindow		Edytuj
 Start media server	MediaPlayer-Main		Uruchom serwer mediów
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Przełącz tryb pełnoekranowy.
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Pobiera czas trwania aktualnie odtwarzanego elementu w mikrosekundach.
 ToggleFullscreen	MediaPlayer-Main		PrzałączeniePełnegoEkranu
 <unnamed>	PlaylistItem-name		<bez nazwy>
 Open Clips	MediaPlayer-Main		Otwórz pliki

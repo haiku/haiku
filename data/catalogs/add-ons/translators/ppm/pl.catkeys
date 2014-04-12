@@ -6,10 +6,10 @@ Grayscale 8 bits	PPMTranslator		8-bitowa skala szarości
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bity
 PPM image	PPMTranslator		Obraz PPM
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1, 16 bitów
-Be Bitmap Format (PPMTranslator)	PPMTranslator		Format Be Bitmap (Translator PPM)
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Format Be Bitmap (PPMTranslator)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8, 32 bity
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8, 32 bity
-PPM image translator	PPMTranslator		Konwerter obrazów PPM
+PPM image translator	PPMTranslator		Translator obrazów PPM
 bits/space	PPMTranslator		bity/przestrzeń
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8, 32 bity, Big Endian
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5, 16 bitów, Big Endian
@@ -27,5 +27,5 @@ Input Color Space	PPMTranslator		Wejściowa przestrzeń barw
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8, 32 bity
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Przykładowy kod źródłowy, copyright 1999, Be Incorporated
 PPMTranslator Settings	PPMTranslator		Ustawienia translatora PPM
-Something is wrong with the PPMTranslator!	PPMMain		Coś poszło nie tak w PPM Translatorze!
+Something is wrong with the PPMTranslator!	PPMMain		Coś jest nie tak z PPMTranslatorem!
 System palette 8 bits	PPMTranslator		Paleta systemowa, 8 bitów

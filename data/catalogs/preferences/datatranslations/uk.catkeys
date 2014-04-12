@@ -6,7 +6,7 @@ Name: %s \nVersion: %ld.%ld.%ld\n\nInfo:\n%s\n\nPath:\n%s\n	DataTranslations		І
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Елемент '%name' не є перетворювачем і його не буде встановлено.
 Could not install %s:\n%s	DataTranslations		Неможливо встановити %s:\n%s
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Використовуйте цю панель для встановлення параметрів по замовчуванню для перетворювачів, особливо коли вони не визначені додатком.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		 Елемент з назвою '%name' повністю присутній у папці Перетворювачів! Переписати існуючий Перетворювач?
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Елемент з назвою '%name' повністю присутній у папці Перетворювачів! Переписати існуючий Перетворювач?
 DataTranslations - Note	DataTranslations		Перетворення даних — Заувага
 Overwrite	DataTranslations		Перезаписати
 Info:	DataTranslations		Інформація:

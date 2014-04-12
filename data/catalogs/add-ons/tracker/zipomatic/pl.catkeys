@@ -14,5 +14,5 @@ Stopped	file:ZipOMaticWindow.cpp		Zatrzymane
 Archive	file:ZipperThread.cpp		Archiwum
 Error creating archive	file:ZipOMaticWindow.cpp		Błąd podczas tworzenia archiwum
 You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Masz %ld uruchomionych kopii Zip-O-Matic.\n\n
-Archive created OK	file:ZipOMaticWindow.cpp		Archiwum stworzono pomyślnie
+Archive created OK	file:ZipOMaticWindow.cpp		Archiwum utworzono pomyślnie
 Stop them	file:ZipOMatic.cpp		Zatrzymaj je

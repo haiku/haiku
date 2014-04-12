@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-SoundRecorder	1849114076
+1	polish	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Pętla
 Cannot find default audio hardware	RecorderWindow		Nie można odnaleść domyślnego urządzenia audio
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nie można zlokalizować pliku tymczasowego przechowującego nowe nagrania
@@ -42,4 +42,5 @@ Channels: 	RecorderWindow		Kanały:
 Save	RecorderWindow		Zapisz
 Sample rate: 	RecorderWindow		Próbkowanie: 
 Cannot connect to media server	RecorderWindow		Nie można się połączyć z serwerem mediów
+The file doesn't appear to be an audio file.	RecorderWindow		Ten plik nie wygląda na plik audio.
 File name:	RecorderWindow		Nazwa pliku:

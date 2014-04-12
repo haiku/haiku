@@ -28,6 +28,6 @@ IP Address:	IntefaceAddressView		Адреса IP:
 Off	IntefaceAddressView		Вимкнути
 MAC address:	IntefaceHardwareView		MAC-адреса:
 Netmask:	IntefaceAddressView		Маска мережі:
-Your IP address	IntefaceAddressView		IP-адреса:
+Your IP address	IntefaceAddressView		Ваша IP-адреса
 %llu KBytes	IntefaceHardwareView		%llu КБайт
 disconnected	IntefaceHardwareView		роз'єднано

@@ -16,7 +16,7 @@ Select a partition from the list below.	DiskView		Виберіть розділ 
 No disk devices have been recognized.	DiskView		Не розпізнано жодного дискового пристрою.
 Failed to initialize the disk %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
 The selected disk is read-only.	MainWindow		Вибраний диск тільки для читання.
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ \"%s\"?\nПовторний запит буде выдано безпосередньо перед записом измін на диск.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ \"%s\"? Повторний запит буде видано безпосередньо перед записом змін на диск.
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Відключити цей розділ примусово?\n\nУвага: якщо якась програма в даний момент записує дані на цей розділ, то його відключення може призвести до їх втрати.\n
 Could not mount partition %s.	MainWindow		Неможливо підмонтувати розділ %s.
 The partition %s has been successfully formatted.\n	MainWindow		Розділ %s був успішно ініціалізований.\n
@@ -36,9 +36,9 @@ You need to select a partition entry from the list.	MainWindow		Ви повин�
 The currently selected partition does not have a parent partition.	MainWindow		Поточний розділ не має батіківського розділу.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск просто зараз?\n\nВсі дані на вибранному диску будуть безповоротно втрачені, якщо ви продовжите!
 Write changes	MainWindow		Записати зміни
-There was an error preparing the disk for modifications.	MainWindow		Сталася помилка при збереженні змін на диск
+There was an error preparing the disk for modifications.	MainWindow		Сталася помилка при збереженні змін на диск.
 The partition %s is already mounted.	MainWindow		Розділ %s вже підмонтовано.
-Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ?\nПовторний запит буде видано безпосередньо перед записом змін на диск.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ? Повторний запит буде видано безпосередньо перед записом змін на диск.
 Partition name:	ChangeParametersPanel		Назва розділу:
 Change	ChangeParametersPanel		Змінити
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск просто зараз?\n\nВсі дані на диску %s будуть безпозворотно втрачені, якщо ви продовжите!
@@ -51,12 +51,12 @@ Failed to change the parameters of the partition. No changes have been written t
 Failed to format the partition %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
 Mount	MainWindow		Підмонтувати
 Partition type	PartitionList		Тип розділу
-Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати цілий диск? (переважно на диску створюють систему розділів)\nПовторный запрос будет выдан непосредственно перед записью изменений на диск.
+Are you sure you want to format a raw disk? (most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати цілий диск? (переважно на диску створюють систему розділів)Повторний запит буде видано безпосередньо перед записом змін на диск.
 The panel experienced a problem!	MainWindow		З панеллю сталася проблема!
 Change parameters…	MainWindow		Змінити параметри…
 Device	PartitionList		Пристрій
 Disk	MainWindow		Диск
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ви впевнені, що бажаєте ініціалізувати вибраний диск? Всі дані на цьому диску будуть втрачені.\nПовторний запит буде видано безпосередньо перед записом змін на диск.\n
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ви впевнені, що бажаєте ініціалізувати вибраний диск? Всі дані на цьому диску будуть втрачені.Повторний запит буде видано безпосередньо перед записом змін на диск.\n
 Partition size	CreateParametersPanel		Розмір розділу
 Device	DiskView		Пристрій
 Active	PartitionList		Загрузочний
@@ -71,7 +71,7 @@ Delete partition	MainWindow		Видалити розділ
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Ви впевнені, що бажаєте змінити параметри вибраного розділу?\n\nРозділ може більше не распізнаватись іншими операційними системами!
 Eject	MainWindow		Витягнути
 Partition	MainWindow		Розділ
-Validation of the given parameters failed.	MainWindow		Перевірка введених параметрів не вдалася
+Validation of the given parameters failed.	MainWindow		Перевірка введених параметрів не вдалася.
 Force unmount	MainWindow		Примусово відімкнути
 Create	CreateParametersPanel		Створити
 File system	PartitionList		Файлова система
@@ -88,7 +88,7 @@ Surface test (not implemented)	MainWindow		Тест поверхні (ще не 
 Format	MainWindow		Форматувати
 Could not change the parameters of the selected partition.	MainWindow		Неможливо змінити параметри вибраного розділу.
 Parameters	PartitionList		Параметри
-Creation of the partition has failed.	MainWindow		Не вдалося створити розділ
+Creation of the partition has failed.	MainWindow		Не вдалося створити розділ.
 The currently selected partition is not empty.	MainWindow		Поточний вибраний розділ не є порожній.
 Failed to format the partition. No changes have been written to disk.	MainWindow		Не вдалось ініціалізувати розділ. Жодні зміни не були записані на диск.
 Unmount	MainWindow		Відмонтувати
