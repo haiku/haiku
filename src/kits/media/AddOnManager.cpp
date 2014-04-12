@@ -97,9 +97,6 @@ AddOnManager::GetDecoderForFormat(entry_ref* _decoderRef,
 	BAutolock locker(fLock);
 	_RegisterAddOns();
 
-	printf("AddOnManager::GetDecoderForFormat: searching decoder for encoding "
-		"%" B_PRIu32 "\n", format.Encoding());
-
 	// Since the list of decoders is unsorted, we need to search for
 	// a decoder by add-on directory, in order to maintain the shadowing
 	// of system add-ons by user add-ons, in case they offer decoders
@@ -167,16 +164,10 @@ AddOnManager::GetEncoder(entry_ref* _encoderRef, int32 id)
 	for (fEncoderList.Rewind(); fEncoderList.GetNext(&info);) {
 		// check if the encoder matches the supplied format
 		if (info->internalID == (uint32)id) {
-			printf("AddOnManager::GetEncoderForFormat: found encoder %s for "
-				"id %" B_PRId32 "\n", info->ref.name, id);
-
 			*_encoderRef = info->ref;
 			return B_OK;
 		}
 	}
-
-	printf("AddOnManager::GetEncoderForFormat: failed to find encoder for id "
-		"%" B_PRId32 "\n", id);
 
 	return B_ENTRY_NOT_FOUND;
 }
@@ -191,9 +182,6 @@ AddOnManager::GetWriter(entry_ref* _ref, uint32 internalID)
 	writer_info* info;
 	for (fWriterList.Rewind(); fWriterList.GetNext(&info);) {
 		if (info->internalID == internalID) {
-			printf("AddOnManager::GetWriter: found writer %s for "
-				"internal_id %" B_PRId32 "\n", info->ref.name, internalID);
-
 			*_ref = info->ref;
 			return B_OK;
 		}
@@ -324,17 +312,12 @@ AddOnManager::_RegisterAddOn(const entry_ref& ref)
 status_t
 AddOnManager::_UnregisterAddOn(const entry_ref& ref)
 {
-BPath path(&ref);
-printf("AddOnManager::_UnregisterAddOn(): trying to unload \"%s\"\n",
-	path.Path());
-
 	BAutolock locker(fLock);
 
 	// Remove any Readers exported by this add-on
 	reader_info* readerInfo;
 	for (fReaderList.Rewind(); fReaderList.GetNext(&readerInfo);) {
 		if (readerInfo->ref == ref) {
-printf("removing reader '%s'\n", readerInfo->ref.name);
 			fReaderList.RemoveCurrent();
 			break;
 		}
@@ -344,7 +327,6 @@ printf("removing reader '%s'\n", readerInfo->ref.name);
 	decoder_info* decoderInfo;
 	for (fDecoderList.Rewind(); fDecoderList.GetNext(&decoderInfo);) {
 		if (decoderInfo->ref == ref) {
-printf("removing decoder '%s'\n", decoderInfo->ref.name);
 			media_format* format;
 			for (decoderInfo->formats.Rewind();
 					decoderInfo->formats.GetNext(&format);) {
@@ -366,7 +348,6 @@ printf("removing decoder '%s'\n", decoderInfo->ref.name);
 				if (writerFormat->id.internal_id == writerInfo->internalID)
 					fWriterFileFormats.RemoveCurrent();
 			}
-printf("removing writer '%s'\n", writerInfo->ref.name);
 			fWriterList.RemoveCurrent();
 			break;
 		}
@@ -375,8 +356,6 @@ printf("removing writer '%s'\n", writerInfo->ref.name);
 	encoder_info* encoderInfo;
 	for (fEncoderList.Rewind(); fEncoderList.GetNext(&encoderInfo);) {
 		if (encoderInfo->ref == ref) {
-printf("removing encoder '%s', id %" B_PRIu32 "\n", encoderInfo->ref.name,
-	encoderInfo->internalID);
 			fEncoderList.RemoveCurrent();
 			// Keep going, since we add multiple encoder infos per add-on.
 		}
@@ -398,8 +377,6 @@ AddOnManager::_RegisterReader(ReaderPlugin* reader, const entry_ref& ref)
 			return;
 		}
 	}
-
-	printf("AddOnManager::_RegisterReader, name %s\n", ref.name);
 
 	reader_info info;
 	info.ref = ref;
@@ -451,8 +428,6 @@ AddOnManager::_RegisterWriter(WriterPlugin* writer, const entry_ref& ref)
 		}
 	}
 
-	printf("AddOnManager::_RegisterWriter, name %s\n", ref.name);
-
 	writer_info info;
 	info.ref = ref;
 	info.internalID = fNextWriterFormatFamilyID++;
@@ -494,8 +469,6 @@ AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
 			return;
 		}
 	}
-
-	printf("AddOnManager::_RegisterEncoder, name %s\n", ref.name);
 
 	// Get list of supported encoders...
 
@@ -546,10 +519,6 @@ AddOnManager::_FindDecoder(const media_format& format, const BPath& path,
 			// check if the decoder matches the supplied format
 			if (!decoderFormat->Matches(&format))
 				continue;
-
-			printf("AddOnManager::GetDecoderForFormat: found decoder %s/%s "
-				"for encoding %" B_PRIu32 "\n", path.Path(), info->ref.name,
-				decoderFormat->Encoding());
 
 			*_decoderRef = info->ref;
 			return true;
