@@ -68,7 +68,7 @@ BHttpRequest::BHttpRequest(const BHttpRequest& other)
 	fOptHeaders(NULL),
 	fOptPostFields(NULL),
 	fOptInputData(NULL),
-	fOptInputDataSize(NULL),
+	fOptInputDataSize(0),
 	fOptRangeStart(other.fOptRangeStart),
 	fOptRangeEnd(other.fOptRangeEnd),
 	fOptFollowLocation(other.fOptFollowLocation)
