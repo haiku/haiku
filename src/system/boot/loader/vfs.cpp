@@ -55,7 +55,7 @@ class Descriptor {
 		ssize_t WriteAt(off_t pos, const void *buffer, size_t bufferSize);
 		ssize_t Write(const void *buffer, size_t bufferSize);
 
-		status_t Stat(struct stat &stat);
+		void Stat(struct stat &stat);
 
 		off_t Offset() const { return fOffset; }
 		int32 RefCount() const { return fRefCount; }
@@ -148,6 +148,15 @@ ino_t
 Node::Inode() const
 {
 	return 0;
+}
+
+
+void
+Node::Stat(struct stat& stat)
+{
+	stat.st_mode = Type();
+	stat.st_size = Size();
+	stat.st_ino = Inode();
 }
 
 
@@ -374,14 +383,10 @@ Descriptor::WriteAt(off_t pos, const void *buffer, size_t bufferSize)
 }
 
 
-status_t
+void
 Descriptor::Stat(struct stat &stat)
 {
-	stat.st_mode = fNode->Type();
-	stat.st_size = fNode->Size();
-	stat.st_ino = fNode->Inode();
-
-	return B_OK;
+	fNode->Stat(stat);
 }
 
 
@@ -999,6 +1004,27 @@ get_node_from(int fd)
 }
 
 
+status_t
+get_stat(Directory* directory, const char* path, struct stat& st)
+{
+	Node* node;
+	status_t error = get_node_for_path(directory, path, &node);
+	if (error != B_OK)
+		return error;
+
+	node->Stat(st);
+	node->Release();
+	return B_OK;
+}
+
+
+Directory*
+directory_from(DIR* dir)
+{
+	return dir != NULL ? dir->directory : NULL;
+}
+
+
 int
 close(int fd)
 {
@@ -1029,7 +1055,8 @@ fstat(int fd, struct stat *stat)
 	if (descriptor == NULL)
 		RETURN_AND_SET_ERRNO(B_FILE_ERROR);
 
-	RETURN_AND_SET_ERRNO(descriptor->Stat(*stat));
+	descriptor->Stat(*stat);
+	return 0;
 }
 
 

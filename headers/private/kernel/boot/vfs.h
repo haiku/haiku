@@ -17,6 +17,7 @@
 #ifdef __cplusplus
 
 struct file_map_run;
+struct stat;
 
 /** This is the base class for all VFS nodes */
 
@@ -40,6 +41,8 @@ class Node : public DoublyLinkedListLinkImpl<Node> {
 		virtual int32 Type() const;
 		virtual off_t Size() const;
 		virtual ino_t Inode() const;
+
+		void Stat(struct stat& stat);
 
 		status_t Acquire();
 		status_t Release();
@@ -149,8 +152,13 @@ extern int open_node(Node *node, int mode);
 extern int open_from(Directory *directory, const char *path, int mode,
 			mode_t permissions = 0);
 extern DIR* open_directory(Directory* baseDirectory, const char* path);
+extern status_t get_stat(Directory* directory, const char* path,
+			struct stat& st);
 
-extern Node *get_node_from(int fd);
+extern Node* get_node_from(int fd);
+	// returns a reference
+extern Directory* directory_from(DIR* dir);
+	// does not return a reference
 
 extern status_t add_partitions_for(int fd, bool mountFileSystems, bool isBootDevice = false);
 extern status_t add_partitions_for(Node *device, bool mountFileSystems, bool isBootDevice = false);
