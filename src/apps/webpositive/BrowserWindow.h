@@ -103,6 +103,7 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 	virtual	void				MenusBeginning();
+	virtual	void				MenusEnded();
 
 	virtual void				ScreenChanged(BRect screenSize,
 									color_space format);
@@ -246,6 +247,7 @@ private:
 
 			bool				fIsFullscreen;
 			bool				fInterfaceVisible;
+			bool				fMenusRunning;
 			BRect				fNonFullscreenWindowFrame;
 			BMessageRunner*		fPulseRunner;
 			uint32				fVisibleInterfaceElements;

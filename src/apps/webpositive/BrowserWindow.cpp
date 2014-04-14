@@ -334,6 +334,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS),
 	fIsFullscreen(false),
 	fInterfaceVisible(false),
+	fMenusRunning(false),
 	fPulseRunner(NULL),
 	fVisibleInterfaceElements(interfaceElements),
 	fContext(context),
@@ -707,7 +708,7 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 				_InvokeButtonVisibly(fFindCloseButton);
 				return;
 			}
-		} else if (bytes[0] == B_ESCAPE) {
+		} else if (bytes[0] == B_ESCAPE && !fMenusRunning) {
 			if (modifierKeys == B_COMMAND_KEY)
 				_ShowInterface(true);
 			else {
@@ -1125,6 +1126,14 @@ BrowserWindow::MenusBeginning()
 {
 	_UpdateHistoryMenu();
 	_UpdateClipboardItems();
+	fMenusRunning = true;
+}
+
+
+void
+BrowserWindow::MenusEnded()
+{
+	fMenusRunning = false;
 }
 
 
