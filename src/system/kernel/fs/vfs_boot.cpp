@@ -526,9 +526,17 @@ vfs_mount_boot_file_system(kernel_args* args)
 			&& lstat(kSystemPackagesDirectory, &st) == 0)) {
 		static const char* const kPackageFSName = "packagefs";
 
+		char arguments[256];
+		strlcpy(arguments, "packages /boot/system/packages; type system",
+			sizeof(arguments));
+		if (const char* stateName
+				= bootVolume.GetString(BOOT_VOLUME_PACKAGES_STATE, NULL)) {
+			strlcat(arguments, "; state ", sizeof(arguments));
+			strlcat(arguments, stateName, sizeof(arguments));
+		}
+
 		dev_t packageMount = _kern_mount("/boot/system", NULL, kPackageFSName,
-			0, "packages /boot/system/packages; type system",
-			0 /* unused argument length */);
+			0, arguments, 0 /* unused argument length */);
 		if (packageMount < 0) {
 			panic("Failed to mount system packagefs: %s",
 				strerror(packageMount));
