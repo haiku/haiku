@@ -114,7 +114,6 @@ provides {
 	cmd:sh
 	cmd:sha1sum
 	cmd:sha256sum
-	cmd:shar
 	cmd:shred
 	cmd:shuf
 	cmd:sleep
@@ -148,12 +147,9 @@ provides {
 	cmd:unexpand
 	cmd:uniq
 	cmd:unlink
-	cmd:unshar
 	cmd:unzip = 5.50
 	cmd:unzipsfx
 	cmd:useradd
-	cmd:uudecode
-	cmd:uuencode
 	cmd:vdir
 	cmd:watch
 	cmd:wc
