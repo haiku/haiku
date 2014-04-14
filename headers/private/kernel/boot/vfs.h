@@ -18,6 +18,8 @@
 
 struct file_map_run;
 struct stat;
+class PackageVolumeInfo;
+class PackageVolumeState;
 
 /** This is the base class for all VFS nodes */
 
@@ -114,7 +116,11 @@ public:
 								BootVolume();
 								~BootVolume();
 
-			status_t			SetTo(Directory* rootDirectory);
+			status_t			SetTo(Directory* rootDirectory,
+									PackageVolumeInfo* packageVolumeInfo
+										= NULL,
+									PackageVolumeState* packageVolumeState
+										= NULL);
 			void				Unset();
 
 			bool				IsValid() const
@@ -125,9 +131,16 @@ public:
 			Directory*			SystemDirectory() const
 									{ return fSystemDirectory; }
 			bool				IsPackaged() const
-									{ return fPackaged; }
+									{ return fPackageVolumeInfo != NULL; }
+			PackageVolumeInfo*	GetPackageVolumeInfo() const
+									{ return fPackageVolumeInfo; }
+			PackageVolumeState*	GetPackageVolumeState() const
+									{ return fPackageVolumeState; }
 
 private:
+			status_t			_SetTo(Directory* rootDirectory,
+									PackageVolumeInfo* packageVolumeInfo,
+									PackageVolumeState* packageVolumeState);
 			int					_OpenSystemPackage();
 
 private:
@@ -136,8 +149,8 @@ private:
 			Directory*			fSystemDirectory;
 				// "system" directory of the volume; if packaged the root
 				// directory of the mounted packagefs
-			bool				fPackaged;
-				// indicates whether the boot volume's system is packaged
+			PackageVolumeInfo*	fPackageVolumeInfo;
+			PackageVolumeState*	fPackageVolumeState;
 };
 
 

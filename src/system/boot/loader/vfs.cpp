@@ -23,6 +23,7 @@
 #include <boot/stage2.h>
 #include <syscall_utils.h>
 
+#include "package_support.h"
 #include "RootFileSystem.h"
 #include "file_systems/packagefs/packagefs.h"
 
@@ -418,7 +419,8 @@ BootVolume::BootVolume()
 	:
 	fRootDirectory(NULL),
 	fSystemDirectory(NULL),
-	fPackaged(false)
+	fPackageVolumeInfo(NULL),
+	fPackageVolumeState(NULL)
 {
 }
 
@@ -430,7 +432,46 @@ BootVolume::~BootVolume()
 
 
 status_t
-BootVolume::SetTo(Directory* rootDirectory)
+BootVolume::SetTo(Directory* rootDirectory,
+	PackageVolumeInfo* packageVolumeInfo,
+	PackageVolumeState* packageVolumeState)
+{
+	Unset();
+
+	status_t error = _SetTo(rootDirectory, packageVolumeInfo,
+		packageVolumeState);
+	if (error != B_OK)
+		Unset();
+
+	return error;
+}
+
+
+void
+BootVolume::Unset()
+{
+	if (fRootDirectory != NULL) {
+		fRootDirectory->Release();
+		fRootDirectory = NULL;
+	}
+
+	if (fSystemDirectory != NULL) {
+		fSystemDirectory->Release();
+		fSystemDirectory = NULL;
+	}
+
+	if (fPackageVolumeInfo != NULL) {
+		fPackageVolumeInfo->ReleaseReference();
+		fPackageVolumeInfo = NULL;
+		fPackageVolumeState = NULL;
+	}
+}
+
+
+status_t
+BootVolume::_SetTo(Directory* rootDirectory,
+	PackageVolumeInfo* packageVolumeInfo,
+	PackageVolumeState* packageVolumeState)
 {
 	Unset();
 
@@ -451,13 +492,32 @@ BootVolume::SetTo(Directory* rootDirectory)
 
 	fSystemDirectory = static_cast<Directory*>(systemNode);
 
+	if (packageVolumeInfo == NULL) {
+		// get a package volume info 
+		BReference<PackageVolumeInfo> packageVolumeInfoReference(
+			new(std::nothrow) PackageVolumeInfo);
+		status_t error = packageVolumeInfoReference->SetTo(fSystemDirectory,
+			"packages");
+		if (error != B_OK) {
+			// apparently not packaged
+			return B_OK;
+		}
+
+		fPackageVolumeInfo = packageVolumeInfoReference.Detach();
+	} else {
+		fPackageVolumeInfo = packageVolumeInfo;
+		fPackageVolumeInfo->AcquireReference();
+	}
+
+	fPackageVolumeState = packageVolumeState != NULL
+		? packageVolumeState : fPackageVolumeInfo->States().Head();
+
 	// try opening the system package
 	int packageFD = _OpenSystemPackage();
-	fPackaged = packageFD >= 0;
-	if (!fPackaged)
-		return B_OK;
+	if (packageFD < 0)
+		return packageFD;
 
-	// the system is packaged -- mount the packagefs
+	// mount packagefs
 	Directory* packageRootDirectory;
 	status_t error = packagefs_mount_file(packageFD, fSystemDirectory,
 		packageRootDirectory);
@@ -471,23 +531,6 @@ BootVolume::SetTo(Directory* rootDirectory)
 	fSystemDirectory = packageRootDirectory;
 
 	return B_OK;
-}
-
-
-void
-BootVolume::Unset()
-{
-	if (fRootDirectory != NULL) {
-		fRootDirectory->Release();
-		fRootDirectory = NULL;
-	}
-
-	if (fSystemDirectory != NULL) {
-		fSystemDirectory->Release();
-		fSystemDirectory = NULL;
-	}
-
-	fPackaged = false;
 }
 
 
@@ -505,29 +548,9 @@ BootVolume::_OpenSystemPackage()
 		return -1;
 	Directory* packageDirectory = (Directory*)packagesNode;
 
-	// search for the system package
-	int fd = -1;
-	void* cookie;
-	if (packageDirectory->Open(&cookie, O_RDONLY) == B_OK) {
-		char name[B_FILE_NAME_LENGTH];
-		while (packageDirectory->GetNextEntry(cookie, name, sizeof(name))
-				== B_OK) {
-			// The name must end with ".hpkg".
-			size_t nameLength = strlen(name);
-			if (nameLength < 6 || strcmp(name + nameLength - 5, ".hpkg") != 0)
-				continue;
-
-			// The name must either be "haiku.hpkg" or start with "haiku-".
-			if (strcmp(name, "haiku.hpkg") == 0
-				|| strncmp(name, "haiku-", 6) == 0) {
-				fd = open_from(packageDirectory, name, O_RDONLY);
-				break;
-			}
-		}
-		packageDirectory->Close(cookie);
-	}
-
-	return fd;
+	// open the system package
+	return open_from(packageDirectory, fPackageVolumeState->SystemPackage(),
+		O_RDONLY);
 }
 
 
@@ -561,8 +584,13 @@ register_boot_file_system(BootVolume& bootVolume)
 
 	gBootVolume.SetInt64(BOOT_VOLUME_PARTITION_OFFSET,
 		partition->offset);
-	if (bootVolume.IsPackaged())
+
+	if (bootVolume.IsPackaged()) {
 		gBootVolume.SetBool(BOOT_VOLUME_PACKAGED, true);
+		PackageVolumeState* state = bootVolume.GetPackageVolumeState();
+		if (state->Name() != NULL)
+			gBootVolume.AddString(BOOT_VOLUME_PACKAGES_STATE, state->Name());
+	}
 
 	Node *device = get_node_from(partition->FD());
 	if (device == NULL) {

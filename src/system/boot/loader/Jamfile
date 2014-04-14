@@ -64,6 +64,7 @@ BootStaticLibrary boot_loader :
 	loader.cpp
 	main.cpp
 	menu.cpp
+	package_support.cpp
 	pager.cpp
 	partitions.cpp
 	RootFileSystem.cpp

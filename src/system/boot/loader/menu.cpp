@@ -1,7 +1,7 @@
 /*
  * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2011, Rene Gollent, rene@gollent.com.
- * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2013-2014, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -31,6 +31,7 @@
 
 #include "load_driver_settings.h"
 #include "loader.h"
+#include "package_support.h"
 #include "pager.h"
 #include "RootFileSystem.h"
 
@@ -764,6 +765,77 @@ public:
 };
 
 
+// #pragma mark - boot volume menu
+
+
+class BootVolumeMenuItem : public MenuItem {
+public:
+	BootVolumeMenuItem(const char* volumeName)
+		:
+		MenuItem(volumeName),
+		fStateChoiceText(NULL)
+	{
+	}
+
+	~BootVolumeMenuItem()
+	{
+		UpdateStateName(NULL);
+	}
+
+	void UpdateStateName(PackageVolumeState* volumeState)
+	{
+		free(fStateChoiceText);
+		fStateChoiceText = NULL;
+	
+		if (volumeState != NULL && volumeState->Name() != NULL) {
+			char nameBuffer[128];
+			snprintf(nameBuffer, sizeof(nameBuffer), "%s (%s)", Label(),
+				volumeState->DisplayName());
+			fStateChoiceText = strdup(nameBuffer);
+		}
+
+		Supermenu()->SetChoiceText(
+			fStateChoiceText != NULL ? fStateChoiceText : Label());
+	}
+
+private:
+	char*	fStateChoiceText;
+};
+
+
+class PackageVolumeStateMenuItem : public MenuItem {
+public:
+	PackageVolumeStateMenuItem(const char* label, PackageVolumeInfo* volumeInfo,
+		PackageVolumeState*	volumeState)
+		:
+		MenuItem(label),
+		fVolumeInfo(volumeInfo),
+		fVolumeState(volumeState)
+	{
+		fVolumeInfo->AcquireReference();
+	}
+
+	~PackageVolumeStateMenuItem()
+	{
+		fVolumeInfo->ReleaseReference();
+	}
+
+	PackageVolumeInfo* VolumeInfo() const
+	{
+		return fVolumeInfo;
+	}
+
+	PackageVolumeState* VolumeState() const
+	{
+		return fVolumeState;
+	}
+
+private:
+	PackageVolumeInfo*	fVolumeInfo;
+	PackageVolumeState*	fVolumeState;
+};
+
+
 // #pragma mark -
 
 
@@ -866,6 +938,42 @@ user_menu_boot_volume(Menu* menu, MenuItem* item)
 	sPathBlacklist->MakeEmpty();
 
 	bool valid = sBootVolume->SetTo((Directory*)item->Data()) == B_OK;
+
+	bootItem->SetEnabled(valid);
+	if (valid)
+		bootItem->Select(true);
+
+	gBootVolume.SetBool(BOOT_VOLUME_USER_SELECTED, true);
+	return true;
+}
+
+
+static bool
+user_menu_boot_volume_state(Menu* menu, MenuItem* _item)
+{
+	MenuItem* bootItem = get_continue_booting_menu_item();
+	if (bootItem == NULL) {
+		// huh?
+		return true;
+	}
+
+	PackageVolumeStateMenuItem* item = static_cast<PackageVolumeStateMenuItem*>(
+		_item);
+	if (sBootVolume->IsValid() && sBootVolume->GetPackageVolumeState() != NULL
+			&& sBootVolume->GetPackageVolumeState() == item->VolumeState()) {
+		return true;
+	}
+
+	BootVolumeMenuItem* volumeItem = static_cast<BootVolumeMenuItem*>(
+		item->Supermenu()->Superitem());
+	volumeItem->SetMarked(true);
+	volumeItem->Select(true);
+	volumeItem->UpdateStateName(item->VolumeState());
+
+	sPathBlacklist->MakeEmpty();
+
+	bool valid = sBootVolume->SetTo((Directory*)item->Data(),
+		item->VolumeInfo(), item->VolumeState()) == B_OK;
 
 	bootItem->SetEnabled(valid);
 	if (valid)
@@ -1060,8 +1168,65 @@ debug_menu_save_previous_syslog(Menu* menu, MenuItem* item)
 }
 
 
+static void
+add_boot_volume_item(Menu* menu, Directory* volume, const char* name)
+{
+	BReference<PackageVolumeInfo> volumeInfo;
+	PackageVolumeState* selectedState = NULL;
+	if (volume == sBootVolume->RootDirectory()) {
+		volumeInfo.SetTo(sBootVolume->GetPackageVolumeInfo());
+		selectedState = sBootVolume->GetPackageVolumeState();
+	} else {
+		volumeInfo.SetTo(new(std::nothrow) PackageVolumeInfo);
+		if (volumeInfo->SetTo(volume, "system/packages") == B_OK)
+			selectedState = volumeInfo->States().Head();
+		else
+			volumeInfo.Unset();
+	}
+
+	BootVolumeMenuItem* item = new(nothrow) BootVolumeMenuItem(name);
+	menu->AddItem(item);
+
+	Menu* subMenu = NULL;
+
+	if (volumeInfo != NULL) {
+		subMenu = new(std::nothrow) Menu(CHOICE_MENU, "Select Haiku version");
+
+		for (PackageVolumeStateList::ConstIterator it
+				= volumeInfo->States().GetIterator();
+			PackageVolumeState* state = it.Next();) {
+			PackageVolumeStateMenuItem* stateItem
+				= new(nothrow) PackageVolumeStateMenuItem(state->DisplayName(),
+					volumeInfo, state);
+			subMenu->AddItem(stateItem);
+			stateItem->SetTarget(user_menu_boot_volume_state);
+			stateItem->SetData(volume);
+
+			if (state == selectedState) {
+				stateItem->SetMarked(true);
+				stateItem->Select(true);
+				item->UpdateStateName(stateItem->VolumeState());
+			}
+		}
+	}
+
+	if (subMenu != NULL && subMenu->CountItems() > 1) {
+		item->SetSubmenu(subMenu);
+	} else {
+		delete subMenu;
+		item->SetTarget(user_menu_boot_volume);
+		item->SetData(volume);
+	}
+
+	if (volume == sBootVolume->RootDirectory()) {
+		item->SetMarked(true);
+		item->Select(true);
+	}
+}
+
+
 static Menu*
-add_boot_volume_menu(Directory* bootVolume)
+add_boot_volume_menu()
 {
 	Menu* menu = new(std::nothrow) Menu(CHOICE_MENU, "Select Boot Volume");
 	MenuItem* item;
@@ -1072,19 +1237,12 @@ add_boot_volume_menu(Directory* bootVolume)
 		Directory* volume;
 		while (gRoot->GetNextNode(cookie, (Node**)&volume) == B_OK) {
 			// only list bootable volumes
-			if (volume != bootVolume && !is_bootable(volume))
+			if (volume != sBootVolume->RootDirectory() && !is_bootable(volume))
 				continue;
 
 			char name[B_FILE_NAME_LENGTH];
 			if (volume->GetName(name, sizeof(name)) == B_OK) {
-				menu->AddItem(item = new(nothrow) MenuItem(name));
-				item->SetTarget(user_menu_boot_volume);
-				item->SetData(volume);
-
-				if (volume == bootVolume) {
-					item->SetMarked(true);
-					item->Select(true);
-				}
+				add_boot_volume_item(menu, volume, name);
 
 				count++;
 			}
@@ -1425,7 +1583,7 @@ user_menu(BootVolume& _bootVolume, PathBlacklist& _pathBlacklist)
 
 	// Add boot volume
 	menu->AddItem(item = new(std::nothrow) MenuItem("Select boot volume",
-		add_boot_volume_menu(_bootVolume.RootDirectory())));
+		add_boot_volume_menu()));
 
 	// Add safe mode
 	menu->AddItem(item = new(std::nothrow) MenuItem("Select safe mode options",
