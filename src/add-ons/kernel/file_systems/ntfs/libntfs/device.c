@@ -1,9 +1,10 @@
 /**
  * device.c - Low level device io functions. Originated from the Linux-NTFS project.
  *
- * Copyright (c) 2004-2006 Anton Altaparmakov
+ * Copyright (c) 2004-2013 Anton Altaparmakov
  * Copyright (c) 2004-2006 Szabolcs Szakacsits
  * Copyright (c) 2010      Jean-Pierre Andre
+ * Copyright (c) 2008-2013 Tuxera Inc.
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -66,6 +67,9 @@
 #endif
 #ifdef HAVE_LINUX_HDREG_H
 #include <linux/hdreg.h>
+#endif
+#ifdef ENABLE_HD
+#include <hd.h>
 #endif
 #ifdef __HAIKU__
 #include <Drivers.h>
@@ -131,6 +135,8 @@ struct ntfs_device *ntfs_device_alloc(const char *name, const long state,
 		dev->d_ops = dops;
 		dev->d_state = state;
 		dev->d_private = priv_data;
+		dev->d_heads = -1;
+		dev->d_sectors_per_track = -1;
 	}
 	return dev;
 }
@@ -663,6 +669,132 @@ s64 ntfs_device_partition_start_sector_get(struct ntfs_device *dev)
 	return -1;
 }
 
+static int ntfs_device_get_geo(struct ntfs_device *dev)
+{
+	int err;
+
+	if (!dev) {
+		errno = EINVAL;
+		return -1;
+	}
+	err = EOPNOTSUPP;
+#ifdef ENABLE_HD
+	{
+		hd_data_t *hddata;
+		hd_t *hd, *devlist, *partlist = NULL;
+		str_list_t *names;
+		hd_res_t *res;
+		const int d_name_len = strlen(dev->d_name) + 1;
+		int done = 0;
+
+		hddata = calloc(1, sizeof(*hddata));
+		if (!hddata) {
+			err = ENOMEM;
+			goto skip_hd;
+		}
+		/* List all "disk" class devices on the system. */
+		devlist = hd_list(hddata, hw_disk, 1, NULL);
+		if (!devlist) {
+			free(hddata);
+			err = ENOMEM;
+			goto skip_hd;
+		}
+		/*
+		 * Loop over each disk device looking for the device with the
+		 * same unix name as @dev.
+		 */
+		for (hd = devlist; hd; hd = hd->next) {
+			if (hd->unix_dev_name && !strncmp(dev->d_name,
+					hd->unix_dev_name, d_name_len))
+				goto got_hd;
+			if (hd->unix_dev_name2 && !strncmp(dev->d_name,
+					hd->unix_dev_name2, d_name_len))
+				goto got_hd;
+			for (names = hd->unix_dev_names; names;
+					names = names->next) {
+				if (names->str && !strncmp(dev->d_name,
+						names->str, d_name_len))
+					goto got_hd;
+			}
+		}
+		/*
+		 * Device was not a whole disk device.  Unless it is a file it
+		 * is likely to be a partition device.  List all "partition"
+		 * class devices on the system.
+		 */
+		partlist = hd_list(hddata, hw_partition, 1, NULL);
+		for (hd = partlist; hd; hd = hd->next) {
+			if (hd->unix_dev_name && !strncmp(dev->d_name,
+					hd->unix_dev_name, d_name_len))
+				goto got_part_hd;
+			if (hd->unix_dev_name2 && !strncmp(dev->d_name,
+					hd->unix_dev_name2, d_name_len))
+				goto got_part_hd;
+			for (names = hd->unix_dev_names; names;
+					names = names->next) {
+				if (names->str && !strncmp(dev->d_name,
+						names->str, d_name_len))
+					goto got_part_hd;
+			}
+		}
+		/* Failed to find the device.  Stop trying and clean up. */
+		goto end_hd;
+got_part_hd:
+		/* Get the whole block device the partition device is on. */
+		hd = hd_get_device_by_idx(hddata, hd->attached_to);
+		if (!hd)
+			goto end_hd;
+got_hd:
+		/*
+		 * @hd is now the whole block device either being formatted or
+		 * that the partition being formatted is on.
+		 *
+		 * Loop over each resource of the disk device looking for the
+		 * BIOS legacy geometry obtained from EDD which is what Windows
+		 * needs to boot.
+		 */
+		for (res = hd->res; res; res = res->next) {
+			/* geotype 3 is BIOS legacy. */
+			if (res->any.type != res_disk_geo ||
+					res->disk_geo.geotype != 3)
+				continue;
+			dev->d_heads = res->disk_geo.heads;
+			dev->d_sectors_per_track = res->disk_geo.sectors;
+			done = 1;
+		}
+end_hd:
+		if (partlist)
+			hd_free_hd_list(partlist);
+		hd_free_hd_list(devlist);
+		hd_free_hd_data(hddata);
+		free(hddata);
+		if (done) {
+			ntfs_log_debug("EDD/BIOD legacy heads = %u, sectors "
+					"per track = %u\n", dev->d_heads,
+					dev->d_sectors_per_track);
+			return 0;
+		}
+	}
+skip_hd:
+#endif
+#ifdef HDIO_GETGEO
+	{	struct hd_geometry geo;
+
+		if (!dev->d_ops->ioctl(dev, HDIO_GETGEO, &geo)) {
+			dev->d_heads = geo.heads;
+			dev->d_sectors_per_track = geo.sectors;
+			ntfs_log_debug("HDIO_GETGEO heads = %u, sectors per "
+					"track = %u\n", dev->d_heads,
+					dev->d_sectors_per_track);
+			return 0;
+		}
+		err = errno;
+	}
+#endif
+	errno = err;
+	return -1;
+}
+
 /**
  * ntfs_device_heads_get - get number of heads of device
  * @dev:		open device
@@ -674,6 +806,7 @@ s64 ntfs_device_partition_start_sector_get(struct ntfs_device *dev)
  *	EINVAL		Input parameter error
  *	EOPNOTSUPP	System does not support HDIO_GETGEO ioctl
  *	ENOTTY		@dev is a file or a device not supporting HDIO_GETGEO
+ *	ENOMEM		Not enough memory to complete the request
  */
 int ntfs_device_heads_get(struct ntfs_device *dev)
 {
@@ -681,20 +814,15 @@ int ntfs_device_heads_get(struct ntfs_device *dev)
 		errno = EINVAL;
 		return -1;
 	}
-#ifdef HDIO_GETGEO
-	{	struct hd_geometry geo;
-
-		if (!dev->d_ops->ioctl(dev, HDIO_GETGEO, &geo)) {
-			ntfs_log_debug("HDIO_GETGEO heads = %u (0x%x)\n",
-					(unsigned)geo.heads,
-					(unsigned)geo.heads);
-			return geo.heads;
+	if (dev->d_heads == -1) {
+		if (ntfs_device_get_geo(dev) == -1)
+			return -1;
+		if (dev->d_heads == -1) {
+			errno = EINVAL;
+			return -1;
 		}
 	}
-#else
-	errno = EOPNOTSUPP;
-#endif
-	return -1;
+	return dev->d_heads;
 }
 
 /**
@@ -708,6 +836,7 @@ int ntfs_device_heads_get(struct ntfs_device *dev)
  *	EINVAL		Input parameter error
  *	EOPNOTSUPP	System does not support HDIO_GETGEO ioctl
  *	ENOTTY		@dev is a file or a device not supporting HDIO_GETGEO
+ *	ENOMEM		Not enough memory to complete the request
  */
 int ntfs_device_sectors_per_track_get(struct ntfs_device *dev)
 {
@@ -715,20 +844,15 @@ int ntfs_device_sectors_per_track_get(struct ntfs_device *dev)
 		errno = EINVAL;
 		return -1;
 	}
-#ifdef HDIO_GETGEO
-	{	struct hd_geometry geo;
-
-		if (!dev->d_ops->ioctl(dev, HDIO_GETGEO, &geo)) {
-			ntfs_log_debug("HDIO_GETGEO sectors_per_track = %u (0x%x)\n",
-					(unsigned)geo.sectors,
-					(unsigned)geo.sectors);
-			return geo.sectors;
+	if (dev->d_sectors_per_track == -1) {
+		if (ntfs_device_get_geo(dev) == -1)
+			return -1;
+		if (dev->d_sectors_per_track == -1) {
+			errno = EINVAL;
+			return -1;
 		}
 	}
-#else
-	errno = EOPNOTSUPP;
-#endif
-	return -1;
+	return dev->d_sectors_per_track;
 }
 
 /**

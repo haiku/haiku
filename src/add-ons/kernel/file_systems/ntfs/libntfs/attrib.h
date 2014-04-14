@@ -61,7 +61,8 @@ typedef enum {
 typedef enum {			/* ways of processing holes when expanding */
 	HOLES_NO,
 	HOLES_OK,
-	HOLES_DELAY
+	HOLES_DELAY,
+	HOLES_NONRES
 } hole_type;
 
 /**

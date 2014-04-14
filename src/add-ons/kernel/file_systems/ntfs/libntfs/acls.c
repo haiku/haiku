@@ -644,7 +644,7 @@ BOOL ntfs_valid_descr(const char *securattr, unsigned int attrsz)
 		&& ((offgroup + 2) < attrsz)
 		&& (!offdacl
 			|| ((offdacl >= sizeof(SECURITY_DESCRIPTOR_RELATIVE))
-			    && (offdacl+sizeof(ACL) < attrsz)))
+			    && (offdacl+sizeof(ACL) <= attrsz)))
 		&& (!offsacl
 			|| ((offsacl >= sizeof(SECURITY_DESCRIPTOR_RELATIVE))
 			    && (offsacl+sizeof(ACL) <= attrsz)))

@@ -188,6 +188,7 @@ u32 ntfs_log_clear_flags(u32 flags)
 	return old;
 }
 
+
 /**
  * ntfs_log_get_stream - Default output streams for logging levels
  * @level:	Log level
@@ -276,6 +277,7 @@ static const char * ntfs_log_get_prefix(u32 level)
 
 	return prefix;
 }
+
 
 /**
  * ntfs_log_set_handler - Provide an alternate logging handler

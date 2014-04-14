@@ -1433,7 +1433,8 @@ static int ntfs_mntent_check(const char *file, unsigned long *mnt_flags)
 		err = errno;
 		goto exit;
 	}
-	if (!(f = setmntent(MOUNTED, "r"))) {
+	f = setmntent("/proc/mounts", "r");
+	if (!f && !(f = setmntent(MOUNTED, "r"))) {
 		err = errno;
 		goto exit;
 	}

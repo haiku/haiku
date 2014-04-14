@@ -5,7 +5,7 @@
  * Copyright (c) 2004-2005 Anton Altaparmakov
  * Copyright (c) 2004-2006 Szabolcs Szakacsits
  * Copyright (c)      2005 Yura Pakhuchiy
- * Copyright (c) 2009-2011 Jean-Pierre Andre
+ * Copyright (c) 2009-2013 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -734,6 +734,7 @@ do_next_cb:
 		ofs = 0;
 	} else {
 		s64 tdata_size, tinitialized_size;
+		u32 decompsz;
 
 		/*
 		 * Compressed cb, decompress it into the temporary buffer, then
@@ -791,7 +792,10 @@ do_next_cb:
 		if (cb_pos + 2 <= cb_end)
 			*(u16*)cb_pos = 0;
 		ntfs_log_debug("Successfully read the compression block.\n");
-		if (ntfs_decompress(dest, cb_size, cb, cb_size) < 0) {
+		/* Do not decompress beyond the requested block */
+		to_read = min(count, cb_size - ofs);
+		decompsz = ((ofs + to_read - 1) | (NTFS_SB_SIZE - 1)) + 1;
+		if (ntfs_decompress(dest, decompsz, cb, cb_size) < 0) {
 			err = errno;
 			free(cb);
 			free(dest);
@@ -800,7 +804,6 @@ do_next_cb:
 			errno = err;
 			return -1;
 		}
-		to_read = min(count, cb_size - ofs);
 		memcpy(b, dest + ofs, to_read);
 		total += to_read;
 		count -= to_read;

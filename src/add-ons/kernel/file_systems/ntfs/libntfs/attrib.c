@@ -5,7 +5,7 @@
  * Copyright (c) 2002-2005 Richard Russon
  * Copyright (c) 2002-2008 Szabolcs Szakacsits
  * Copyright (c) 2004-2007 Yura Pakhuchiy
- * Copyright (c) 2007-2011 Jean-Pierre Andre
+ * Copyright (c) 2007-2013 Jean-Pierre Andre
  * Copyright (c) 2010      Erik Larsson
  *
  * This program/include file is free software; you can redistribute it and/or
@@ -454,7 +454,8 @@ ntfs_attr *ntfs_attr_open(ntfs_inode *ni, const ATTR_TYPES type,
 	if (type == AT_ATTRIBUTE_LIST)
 		a->flags = 0;
 
-	if ((type == AT_DATA) && !a->initialized_size) {
+	if ((type == AT_DATA)
+	   && (a->non_resident ? !a->initialized_size : !a->value_length)) {
 		/*
 		 * Define/redefine the compression state if stream is
 		 * empty, based on the compression mark on parent
@@ -4928,7 +4929,7 @@ static int ntfs_resident_attr_resize(ntfs_attr *na, const s64 newsize);
  *	ENOSPC - There is no enough space in base mft to resize $ATTRIBUTE_LIST.
  */
 static int ntfs_resident_attr_resize_i(ntfs_attr *na, const s64 newsize,
-			BOOL force_non_resident)
+			hole_type holes)
 {
 	ntfs_attr_search_ctx *ctx;
 	ntfs_volume *vol;
@@ -4966,7 +4967,7 @@ static int ntfs_resident_attr_resize_i(ntfs_attr *na, const s64 newsize,
 	 * attribute non-resident if the attribute type supports it. If it is
 	 * smaller we can go ahead and attempt the resize.
 	 */
-	if ((newsize < vol->mft_record_size) && !force_non_resident) {
+	if ((newsize < vol->mft_record_size) && (holes != HOLES_NONRES)) {
 		/* Perform the resize of the attribute record. */
 		if (!(ret = ntfs_resident_attr_value_resize(ctx->mrec, ctx->attr,
 				newsize))) {
@@ -5011,7 +5012,7 @@ static int ntfs_resident_attr_resize_i(ntfs_attr *na, const s64 newsize,
 		 * could cause the attribute to be made resident again,
 		 * so size changes are not allowed.
 		 */
-		if (force_non_resident) {
+		if (holes == HOLES_NONRES) {
 			ret = 0;
 			if (newsize != na->data_size) {
 				ntfs_log_error("Cannot change size when"
@@ -5022,7 +5023,7 @@ static int ntfs_resident_attr_resize_i(ntfs_attr *na, const s64 newsize,
 			return (ret);
 		}
 		/* Resize non-resident attribute */
-		return ntfs_attr_truncate_i(na, newsize, HOLES_OK);
+		return ntfs_attr_truncate_i(na, newsize, holes);
 	} else if (errno != ENOSPC && errno != EPERM) {
 		err = errno;
 		ntfs_log_perror("Failed to make attribute non-resident");
@@ -5078,7 +5079,7 @@ static int ntfs_resident_attr_resize_i(ntfs_attr *na, const s64 newsize,
 		ntfs_inode_mark_dirty(tna->ni);
 		ntfs_attr_close(tna);
 		ntfs_attr_put_search_ctx(ctx);
-		return ntfs_resident_attr_resize_i(na, newsize, force_non_resident);
+		return ntfs_resident_attr_resize_i(na, newsize, holes);
 	}
 	/* Check whether error occurred. */
 	if (errno != ENOENT) {
@@ -5098,7 +5099,7 @@ static int ntfs_resident_attr_resize_i(ntfs_attr *na, const s64 newsize,
 			ntfs_log_perror("Could not free space in MFT record");
 			return -1;
 		}
-		return ntfs_resident_attr_resize_i(na, newsize, force_non_resident);
+		return ntfs_resident_attr_resize_i(na, newsize, holes);
 	}
 
 	/*
@@ -5137,7 +5138,7 @@ static int ntfs_resident_attr_resize_i(ntfs_attr *na, const s64 newsize,
 		ntfs_attr_put_search_ctx(ctx);
 		if (ntfs_inode_add_attrlist(ni))
 			return -1;
-		return ntfs_resident_attr_resize_i(na, newsize, force_non_resident);
+		return ntfs_resident_attr_resize_i(na, newsize, holes);
 	}
 	/* Allocate new mft record. */
 	ni = ntfs_mft_record_alloc(vol, ni);
@@ -5158,7 +5159,7 @@ static int ntfs_resident_attr_resize_i(ntfs_attr *na, const s64 newsize,
 
 	ntfs_attr_put_search_ctx(ctx);
 	/* Try to perform resize once again. */
-	return ntfs_resident_attr_resize_i(na, newsize, force_non_resident);
+	return ntfs_resident_attr_resize_i(na, newsize, holes);
 
 resize_done:
 	/*
@@ -5179,7 +5180,7 @@ static int ntfs_resident_attr_resize(ntfs_attr *na, const s64 newsize)
 	int ret; 
 	
 	ntfs_log_enter("Entering\n");
-	ret = ntfs_resident_attr_resize_i(na, newsize, FALSE);
+	ret = ntfs_resident_attr_resize_i(na, newsize, HOLES_OK);
 	ntfs_log_leave("\n");
 	return ret;
 }
@@ -5203,7 +5204,7 @@ int ntfs_attr_force_non_resident(ntfs_attr *na)
 {
 	int res;
 
-	res = ntfs_resident_attr_resize_i(na, na->data_size, TRUE);
+	res = ntfs_resident_attr_resize_i(na, na->data_size, HOLES_NONRES);
 	if (!res && !NAttrNonResident(na)) {
 		res = -1;
 		errno = EIO;
@@ -5566,7 +5567,7 @@ retry:
 		BOOL changed;
 
 		if (!(na->data_flags & ATTR_IS_SPARSE)) {
-			int sparse;
+			int sparse = 0;
 			runlist_element *xrl;
 
 				/*
@@ -5574,10 +5575,18 @@ retry:
 				 * have to check whether there is a hole
 				 * in the updated region.
 				 */
-			xrl = na->rl;
-			if (xrl->lcn == LCN_RL_NOT_MAPPED)
-				xrl++;
-			sparse = ntfs_rl_sparse(xrl);
+			for (xrl = na->rl; xrl->length; xrl++) {
+				if (xrl->lcn < 0) {
+					if (xrl->lcn == LCN_HOLE) {
+						sparse = 1;
+						break;
+					}
+					if (xrl->lcn != LCN_RL_NOT_MAPPED) {
+						sparse = -1;
+						break;
+					}
+				}
+			}
 			if (sparse < 0) {
 				ntfs_log_error("Could not check whether sparse\n");
 				errno = EIO;
@@ -6441,7 +6450,7 @@ static int ntfs_attr_truncate_i(ntfs_attr *na, const s64 newsize,
 		else
 			ret = ntfs_non_resident_attr_shrink(na, fullsize);
 	} else
-		ret = ntfs_resident_attr_resize(na, newsize);
+		ret = ntfs_resident_attr_resize_i(na, newsize, holes);
 out:	
 	ntfs_log_leave("Return status %d\n", ret);
 	return ret;
@@ -6587,7 +6596,8 @@ void *ntfs_attr_readall(ntfs_inode *ni, const ATTR_TYPES type,
 	
 	na = ntfs_attr_open(ni, type, name, name_len);
 	if (!na) {
-		ntfs_log_perror("ntfs_attr_open failed");
+		ntfs_log_perror("ntfs_attr_open failed, inode %lld attr 0x%lx",
+				(long long)ni->mft_no,(long)le32_to_cpu(type));
 		goto err_exit;
 	}
 	data = ntfs_malloc(na->data_size);

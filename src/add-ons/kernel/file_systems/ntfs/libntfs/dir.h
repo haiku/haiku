@@ -88,8 +88,6 @@ extern int ntfs_delete(ntfs_volume *vol, const char *path,
 extern int ntfs_link(ntfs_inode *ni, ntfs_inode *dir_ni, const ntfschar *name,
 		u8 name_len);
 
-extern MFT_REF ntfs_mft_get_parent_ref(ntfs_inode *ni);
-
 /*
  * File types (adapted from include <linux/fs.h>)
  */
@@ -117,6 +115,10 @@ extern int ntfs_readdir(ntfs_inode *dir_ni, s64 *pos,
 		void *dirent, ntfs_filldir_t filldir);
 
 ntfs_inode *ntfs_dir_parent_inode(ntfs_inode *ni);
+
+#ifdef __HAIKU__
+MFT_REF ntfs_mft_get_parent_ref(ntfs_inode *ni);
+#endif
 
 int ntfs_get_ntfs_dos_name(ntfs_inode *ni, ntfs_inode *dir_ni,
 			char *value, size_t size);

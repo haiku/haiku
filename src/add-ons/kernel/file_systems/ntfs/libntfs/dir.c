@@ -1047,6 +1047,9 @@ static int ntfs_filldir(ntfs_inode *dir_ni, s64 *pos, u8 ivcn_bits,
  * Return the mft reference of the parent directory on success or -1 on error
  * with errno set to the error code.
  */
+#ifndef __HAIKU__
+static
+#endif
 MFT_REF ntfs_mft_get_parent_ref(ntfs_inode *ni)
 {
 	MFT_REF mref;
