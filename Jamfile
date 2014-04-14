@@ -18,7 +18,7 @@ AddHaikuImagePackages [ FFilterByBuildFeatures
 
 	regular_image @{
 		bzip2 ctags ffmpeg findutils gawk glu grep jpeg libpng 
-		mesa mesa_devel mesa_swrast sed tar which
+		mesa mesa_devel mesa_swrast sed sharutils tar which
 	}@
 ] ;
 # secondary architectures

@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src bin sharutils ;
-
-SubInclude HAIKU_TOP src bin sharutils lib ;
-SubInclude HAIKU_TOP src bin sharutils src ; 

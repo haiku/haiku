@@ -1,7 +1,0 @@
-	../lib/error.c \
-	../lib/getopt.c \
-	../lib/xmalloc.c \
-	../src/shar.c \
-	../src/unshar.c \
-	../src/uudecode.c \
-	../src/uuencode.c
