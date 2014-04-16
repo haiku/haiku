@@ -268,7 +268,6 @@ SubInclude HAIKU_TOP src bin hid_decode ;
 SubInclude HAIKU_TOP src bin ideinfo ;
 SubInclude HAIKU_TOP src bin keymap ;
 SubInclude HAIKU_TOP src bin keystore ;
-SubInclude HAIKU_TOP src bin less ;
 SubInclude HAIKU_TOP src bin listdev ;
 SubInclude HAIKU_TOP src bin locale ;
 SubInclude HAIKU_TOP src bin makebootable ;

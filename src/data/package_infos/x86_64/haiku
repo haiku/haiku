@@ -71,9 +71,6 @@ provides {
 	cmd:install
 	cmd:join
 	cmd:kill
-	cmd:less
-	cmd:lessecho
-	cmd:lesskey
 	cmd:link
 	cmd:ln = 8.4
 	cmd:login

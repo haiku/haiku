@@ -15,7 +15,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	hd head hey hostname
 	id ideinfo@ide ident idestatus@ide ifconfig <bin>install iroster isvolume
 	join kernel_debugger keymap keystore kill
-	less lessecho lesskey link linkcatkeys listarea listattr listimage listdev
+	link linkcatkeys listarea listattr listimage listdev
 	listport listres listsem listusb ln locale logger login logname ls lsindex
 	makebootable md5sum merge message mimeset mkdir mkfifo mkfs mkindex mktemp 
 	modifiers mount mountvolume mv
