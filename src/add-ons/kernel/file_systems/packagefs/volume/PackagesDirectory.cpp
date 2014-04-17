@@ -17,6 +17,7 @@
 
 PackagesDirectory::PackagesDirectory()
 	:
+	fStateName(),
 	fPath(NULL),
 	fDirFD(-1),
 	fNodeRef(),
@@ -34,7 +35,20 @@ PackagesDirectory::~PackagesDirectory()
 }
 
 
-status_t PackagesDirectory::Init(const char* path, dev_t mountPointDeviceID,
+/*static*/ bool
+PackagesDirectory::IsNewer(const PackagesDirectory* a,
+	const PackagesDirectory* b)
+{
+	if (b->fStateName.IsEmpty())
+		return false;
+	if (a->fStateName.IsEmpty())
+		return true;
+	return strcmp(a->fStateName, b->fStateName) > 0;
+}
+
+
+status_t
+PackagesDirectory::Init(const char* path, dev_t mountPointDeviceID,
 	ino_t mountPointNodeID, struct stat& _st)
 {
 	// Open the directory. We want the path be interpreted depending on from
@@ -56,14 +70,41 @@ status_t PackagesDirectory::Init(const char* path, dev_t mountPointDeviceID,
 			"packages", &vnode);
 	}
 	if (error != B_OK) {
-		ERROR("Failed to open package domain \"%s\"\n", strerror(error));
+		ERROR("Failed to open packages directory \"%s\"\n", strerror(error));
 		RETURN_ERROR(error);
 	}
 
+	return _Init(vnode, _st);
+}
+
+
+status_t
+PackagesDirectory::InitOldState(dev_t adminDirDeviceID, ino_t adminDirNodeID,
+	const char* stateName)
+{
+	if (!fStateName.SetTo(stateName))
+		RETURN_ERROR(B_NO_MEMORY);
+
+	struct vnode* vnode;
+	status_t error = vfs_entry_ref_to_vnode(adminDirDeviceID, adminDirNodeID,
+		stateName, &vnode);
+	if (error != B_OK) {
+		ERROR("Failed to open old state directory \"%s\"\n", strerror(error));
+		RETURN_ERROR(error);
+	}
+
+	struct stat st;
+	return _Init(vnode, st);
+}
+
+
+status_t
+PackagesDirectory::_Init(struct vnode* vnode, struct stat& _st)
+{
 	fDirFD = vfs_open_vnode(vnode, O_RDONLY, true);
 
 	if (fDirFD < 0) {
-		ERROR("Failed to open package domain \"%s\"\n", strerror(fDirFD));
+		ERROR("Failed to open packages directory \"%s\"\n", strerror(fDirFD));
 		vfs_put_vnode(vnode);
 		RETURN_ERROR(fDirFD);
 	}
@@ -83,8 +124,8 @@ status_t PackagesDirectory::Init(const char* path, dev_t mountPointDeviceID,
 		RETURN_ERROR(normalizedPath.InitCheck());
 
 	char* normalizedPathBuffer = normalizedPath.LockBuffer();
-	error = vfs_entry_ref_to_path(fNodeRef.device, fNodeRef.node, NULL, true,
-		normalizedPathBuffer, normalizedPath.BufferSize());
+	status_t error = vfs_entry_ref_to_path(fNodeRef.device, fNodeRef.node, NULL,
+		true, normalizedPathBuffer, normalizedPath.BufferSize());
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

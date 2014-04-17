@@ -35,7 +35,6 @@
 #include "PackageFSRoot.h"
 #include "PackageLinkDirectory.h"
 #include "PackageLinksDirectory.h"
-#include "PackagesDirectory.h"
 #include "Resolvable.h"
 #include "SizeIndex.h"
 #include "UnpackingLeafNode.h"
@@ -62,6 +61,10 @@ const size_t kMaxActivationRequestSize = 10 * 1024 * 1024;
 // sanity limit for activation file size
 const size_t kMaxActivationFileSize = 10 * 1024 * 1024;
 
+static const char* const kAdministrativeDirectoryName
+	= PACKAGES_DIRECTORY_ADMIN_DIRECTORY;
+static const char* const kActivationFileName
+	= PACKAGES_DIRECTORY_ACTIVATION_FILE;
 static const char* const kActivationFilePath
 	= PACKAGES_DIRECTORY_ADMIN_DIRECTORY "/"
 		PACKAGES_DIRECTORY_ACTIVATION_FILE;
@@ -165,6 +168,8 @@ Volume::Volume(fs_volume* fsVolume)
 	fRootDirectory(NULL),
 	fPackageFSRoot(NULL),
 	fPackagesDirectory(NULL),
+	fPackagesDirectories(),
+	fPackagesDirectoriesByNodeRef(),
 	fPackageSettings(),
 	fNextNodeID(kRootDirectoryID + 1)
 {
@@ -213,8 +218,8 @@ Volume::~Volume()
 	if (fRootDirectory != NULL)
 		fRootDirectory->ReleaseReference();
 
-	if (fPackagesDirectory != NULL)
-		fPackagesDirectory->ReleaseReference();
+	while (PackagesDirectory* directory = fPackagesDirectories.RemoveHead())
+		directory->ReleaseReference();
 
 	rw_lock_destroy(&fLock);
 }
@@ -224,7 +229,11 @@ status_t
 Volume::Mount(const char* parameterString)
 {
 	// init the hash tables
-	status_t error = fNodes.Init();
+	status_t error = fPackagesDirectoriesByNodeRef.Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = fNodes.Init();
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -305,6 +314,7 @@ Volume::Mount(const char* parameterString)
 	const char* volumeName = NULL;
 	const char* mountType = NULL;
 	const char* shineThrough = NULL;
+	const char* packagesState = NULL;
 
 	void* parameterHandle = parse_driver_settings_string(parameterString);
 	if (parameterHandle != NULL) {
@@ -315,6 +325,8 @@ Volume::Mount(const char* parameterString)
 		mountType = get_driver_parameter(parameterHandle, "type", NULL, NULL);
 		shineThrough = get_driver_parameter(parameterHandle, "shine-through",
 			NULL, NULL);
+		packagesState = get_driver_parameter(parameterHandle, "state", NULL,
+			NULL);
 	}
 
 	CObjectDeleter<void, status_t> parameterHandleDeleter(parameterHandle,
@@ -348,12 +360,21 @@ Volume::Mount(const char* parameterString)
 	fPackagesDirectory = new(std::nothrow) PackagesDirectory;
 	if (fPackagesDirectory == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
+	fPackagesDirectories.Add(fPackagesDirectory);
+	fPackagesDirectoriesByNodeRef.Insert(fPackagesDirectory);
 
 	struct stat st;
 	error = fPackagesDirectory->Init(packages, fMountPoint.deviceID,
 		fMountPoint.nodeID, st);
 	if (error != B_OK)
 		RETURN_ERROR(error);
+
+	// If a packages state has been specified, load the needed states.
+	if (packagesState != NULL) {
+		error = _LoadOldPackagesStates(packagesState);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+	}
 
 	// If no volume name is given, infer it from the mount type.
 	if (volumeName == NULL) {
@@ -621,13 +642,88 @@ Volume::PackageLinkNodeChanged(Node* node, uint32 statFields,
 
 
 status_t
+Volume::_LoadOldPackagesStates(const char* packagesState)
+{
+	// open and stat the admininistrative dir
+	int fd = openat(fPackagesDirectory->DirectoryFD(),
+		kAdministrativeDirectoryName, O_RDONLY);
+	if (fd < 0) {
+		ERROR("Failed to open administrative directory: %s\n", strerror(errno));
+		RETURN_ERROR(errno);
+	}
+
+	struct stat adminDirStat;
+	if (fstat(fd, &adminDirStat) < 0) {
+		ERROR("Failed to fstat() administrative directory: %s\n",
+			strerror(errno));
+		RETURN_ERROR(errno);
+	}
+
+	// iterate through the "administrative" dir
+	DIR* dir = fdopendir(fd);
+	if (dir == NULL) {
+		ERROR("Failed to open administrative directory: %s\n", strerror(errno));
+		RETURN_ERROR(errno);
+	}
+	CObjectDeleter<DIR, int> dirCloser(dir, closedir);
+
+	while (dirent* entry = readdir(dir)) {
+		if (strncmp(entry->d_name, "state_", 6) != 0
+			|| strcmp(entry->d_name, packagesState) < 0) {
+			continue;
+		}
+
+		PackagesDirectory* packagesDirectory
+			= new(std::nothrow) PackagesDirectory;
+		status_t error = packagesDirectory->InitOldState(adminDirStat.st_dev,
+			adminDirStat.st_ino, entry->d_name);
+		if (error != B_OK) {
+			delete packagesDirectory;
+			continue;
+		}
+
+		fPackagesDirectories.Add(packagesDirectory);
+		fPackagesDirectoriesByNodeRef.Insert(packagesDirectory);
+
+		INFORM("added old packages dir state \"%s\"\n",
+			packagesDirectory->StateName().Data());
+	}
+
+	// sort the packages directories by state age
+	fPackagesDirectories.Sort(&PackagesDirectory::IsNewer);
+
+	return B_OK;
+}
+
+
+status_t
 Volume::_AddInitialPackages()
 {
-	dprintf("packagefs: Adding packages from \"%s\"\n",
-		fPackagesDirectory->Path());
+	PackagesDirectory* packagesDirectory = fPackagesDirectories.Last();
+	INFORM("Adding packages from \"%s\"\n", packagesDirectory->Path());
 
-	// try reading the activation file
-	status_t error = _AddInitialPackagesFromActivationFile();
+	// try reading the activation file of the oldest state
+	status_t error = _AddInitialPackagesFromActivationFile(packagesDirectory);
+	if (error != B_OK && packagesDirectory != fPackagesDirectory) {
+		WARN("Loading packages from old state \"%s\" failed. Loading packages "
+			"from latest state.\n", packagesDirectory->StateName().Data());
+
+		// remove all packages already added
+		{
+			VolumeWriteLocker systemVolumeLocker(_SystemVolumeIfNotSelf());
+			VolumeWriteLocker volumeLocker(this);
+			_RemoveAllPackages();
+		}
+
+		// remove the old states
+		while (fPackagesDirectories.Last() != fPackagesDirectory)
+			fPackagesDirectories.RemoveTail()->ReleaseReference();
+
+		// try reading the activation file of the latest state
+		packagesDirectory = fPackagesDirectory;
+		error = _AddInitialPackagesFromActivationFile(packagesDirectory);
+	}
+
 	if (error != B_OK) {
 		INFORM("Loading packages from activation file failed. Loading all "
 			"packages in packages directory.\n");
@@ -666,11 +762,14 @@ Volume::_AddInitialPackages()
 
 
 status_t
-Volume::_AddInitialPackagesFromActivationFile()
+Volume::_AddInitialPackagesFromActivationFile(
+	PackagesDirectory* packagesDirectory)
 {
 	// try reading the activation file
-	int fd = openat(fPackagesDirectory->DirectoryFD(),
-		kActivationFilePath, O_RDONLY);
+	int fd = openat(packagesDirectory->DirectoryFD(),
+		packagesDirectory == fPackagesDirectory
+			? kActivationFilePath : kActivationFileName,
+		O_RDONLY);
 	if (fd < 0) {
 		INFORM("Failed to open packages activation file: %s\n",
 			strerror(errno));
@@ -730,7 +829,8 @@ Volume::_AddInitialPackagesFromActivationFile()
 			RETURN_ERROR(B_BAD_DATA);
 		}
 
-		status_t error = _LoadAndAddInitialPackage(packageName);
+		status_t error = _LoadAndAddInitialPackage(packagesDirectory,
+			packageName);
 		if (error != B_OK)
 			RETURN_ERROR(error);
 
@@ -771,7 +871,7 @@ Volume::_AddInitialPackagesFromDirectory()
 			continue;
 		}
 
-		_LoadAndAddInitialPackage(entry->d_name);
+		_LoadAndAddInitialPackage(fPackagesDirectory, entry->d_name);
 	}
 
 	return B_OK;
@@ -779,10 +879,11 @@ Volume::_AddInitialPackagesFromDirectory()
 
 
 status_t
-Volume::_LoadAndAddInitialPackage(const char* name)
+Volume::_LoadAndAddInitialPackage(PackagesDirectory* packagesDirectory,
+	const char* name)
 {
 	Package* package;
-	status_t error = _LoadPackage(name, package);
+	status_t error = _LoadPackage(packagesDirectory, name, package);
 	if (error != B_OK) {
 		ERROR("Failed to load package \"%s\": %s\n", name, strerror(error));
 		RETURN_ERROR(error);
@@ -1309,17 +1410,28 @@ Volume::_RemoveNodeAndVNode(Node* node)
 
 
 status_t
-Volume::_LoadPackage(const char* name, Package*& _package)
+Volume::_LoadPackage(PackagesDirectory* packagesDirectory, const char* name,
+	Package*& _package)
 {
-	// check whether the entry is a file
+	// Find the package -- check the specified packages directory and iterate
+	// toward the newer states.
 	struct stat st;
-	if (fstatat(fPackagesDirectory->DirectoryFD(), name, &st, 0) < 0
-		|| !S_ISREG(st.st_mode)) {
-		return B_BAD_VALUE;
+	for (;;) {
+		if (packagesDirectory == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		if (fstatat(packagesDirectory->DirectoryFD(), name, &st, 0) == 0) {
+			// check whether the entry is a file
+			if (!S_ISREG(st.st_mode))
+				return B_BAD_VALUE;
+			break;
+		}
+
+		packagesDirectory = fPackagesDirectories.GetPrevious(packagesDirectory);
 	}
 
 	// create a package
-	Package* package = new(std::nothrow) Package(this, fPackagesDirectory,
+	Package* package = new(std::nothrow) Package(this, packagesDirectory,
 		st.st_dev, st.st_ino);
 	if (package == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
@@ -1417,7 +1529,7 @@ INFORM("Volume::_ChangeActivation(): %" B_PRId32 " new packages, %" B_PRId32 " o
 		}
 
 		Package* package;
-		status_t error = _LoadPackage(item->name, package);
+		status_t error = _LoadPackage(fPackagesDirectory, item->name, package);
 		if (error != B_OK) {
 			ERROR("Volume::_ChangeActivation(): failed to load package "
 				"\"%s\"\n", item->name);

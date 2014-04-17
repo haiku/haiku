@@ -21,6 +21,7 @@
 #include "NodeListener.h"
 #include "Package.h"
 #include "PackageLinksListener.h"
+#include "PackagesDirectory.h"
 #include "PackageSettings.h"
 #include "Query.h"
 
@@ -109,10 +110,16 @@ private:
 			struct ActivationChangeRequest;
 
 private:
+			status_t			_LoadOldPackagesStates(
+									const char* packagesState);
+
 			status_t			_AddInitialPackages();
-			status_t			_AddInitialPackagesFromActivationFile();
+			status_t			_AddInitialPackagesFromActivationFile(
+									PackagesDirectory* packagesDirectory);
 			status_t			_AddInitialPackagesFromDirectory();
-			status_t			_LoadAndAddInitialPackage(const char* name);
+			status_t			_LoadAndAddInitialPackage(
+									PackagesDirectory* packagesDirectory,
+									const char* name);
 
 	inline	void				_AddPackage(Package* package);
 	inline	void				_RemovePackage(Package* package);
@@ -145,8 +152,9 @@ private:
 			void				_RemoveNodeAndVNode(Node* node);
 									// caller must hold a reference
 
-			status_t			_LoadPackage(const char* name,
-									Package*& _package);
+			status_t			_LoadPackage(
+									PackagesDirectory* packagesDirectory,
+									const char* name, Package*& _package);
 
 			status_t			_ChangeActivation(
 									ActivationChangeRequest& request);
@@ -178,6 +186,8 @@ private:
 			::PackageFSRoot*	fPackageFSRoot;
 			::MountType			fMountType;
 			PackagesDirectory*	fPackagesDirectory;
+			PackagesDirectoryList fPackagesDirectories;
+			PackagesDirectoryHashTable fPackagesDirectoriesByNodeRef;
 			PackageSettings		fPackageSettings;
 
 			struct {
