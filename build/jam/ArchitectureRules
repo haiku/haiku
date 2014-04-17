@@ -29,7 +29,7 @@ rule ArchitectureSetup architecture
 	# http://www.freelists.org/post/haiku-development/hrev45320-Yet-another-nonobvious-effect-of-ftreevrp-optimization
 	if $(gccVersion[1]) >= 3 {
 		gccBaseFlags += -fno-strict-aliasing ;
-		if $(HAIKU_CC_IS_CLANG_$(architecture)) = 0 {
+		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
 			gccBaseFlags += -fno-tree-vrp ;
 		}
 	}
@@ -393,7 +393,7 @@ rule KernelArchitectureSetup architecture
 
 	local g++BaseFlags = $(gccBaseFlags) -fno-exceptions ;
 
-	if $(gccVersion[1]) >= 3 && $(HAIKU_CC_IS_CLANG_$(architecture)) = 0 {
+	if $(gccVersion[1]) >= 3 && $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
 		g++BaseFlags += -fno-use-cxa-atexit ;
 	}
 
