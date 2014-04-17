@@ -1,6 +1,0 @@
-#command
-\177	back-screen
-^H		back-screen
-#line-edit
-\177	backspace
-^H		backspace
