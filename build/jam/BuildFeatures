@@ -351,6 +351,24 @@ if [ IsPackageAvailable libsolv_devel ] {
 }
 
 
+# qrencode
+if [ IsPackageAvailable qrencode_devel ] {
+	ExtractBuildFeatureArchives libqrencode :
+		file: base qrencode
+			runtime: lib
+		file: devel qrencode_devel
+			depends: base
+			library: $(developLibDir)/libqrencode.a
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures libqrencode ;
+} else {
+	Echo "qrencode support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
+
 # GPL add-ons
 if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
 	EnableBuildFeatures gpl ;

@@ -43,7 +43,7 @@ AddFilesToPackage add-ons kernel busses virtio : virtio_pci ;
 AddFilesToPackage add-ons kernel console : vga_text ;
 AddFilesToPackage add-ons kernel debugger
 	: <kdebug>demangle <kdebug>disasm@x86 <kdebug>hangman
-	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>qrencode
+	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard <kdebug>qrencode@libqrencode
 	  <kdebug>run_on_exit ;
 AddFilesToPackage add-ons kernel file_systems : $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToPackage add-ons kernel generic
