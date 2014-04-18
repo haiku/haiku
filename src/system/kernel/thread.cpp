@@ -891,6 +891,10 @@ thread_create_thread(const ThreadCreationAttributes& attributes, bool kernel)
 		// available for deinitialization
 	thread->priority = attributes.priority == -1
 		? B_NORMAL_PRIORITY : attributes.priority;
+	thread->priority = std::max(thread->priority,
+			(int32)THREAD_MIN_SET_PRIORITY);
+	thread->priority = std::min(thread->priority,
+			(int32)THREAD_MAX_SET_PRIORITY);
 	thread->state = B_THREAD_SUSPENDED;
 
 	thread->sig_block_mask = attributes.signal_mask;
