@@ -461,16 +461,41 @@ Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
 			if (size != sizeof(PackageFSVolumeInfo))
 				RETURN_ERROR(B_BAD_VALUE);
 
+			PackageFSVolumeInfo* userVolumeInfo
+				= (PackageFSVolumeInfo*)buffer;
+
 			VolumeReadLocker volumeReadLocker(this);
 
-			PackageFSVolumeInfo info;
-			info.mountType = fMountType;
-			info.rootDeviceID = fPackageFSRoot->DeviceID();
-			info.rootDirectoryID = fPackageFSRoot->NodeID();
-			info.packagesDeviceID = fPackagesDirectory->DeviceID();
-			info.packagesDirectoryID = fPackagesDirectory->NodeID();
+			PackageFSVolumeInfo volumeInfo;
+			volumeInfo.mountType = fMountType;
+			volumeInfo.rootDeviceID = fPackageFSRoot->DeviceID();
+			volumeInfo.rootDirectoryID = fPackageFSRoot->NodeID();
+			volumeInfo.packagesDirectoryCount = fPackagesDirectories.Count();
 
-			RETURN_ERROR(user_memcpy(buffer, &info, sizeof(info)));
+			status_t error = user_memcpy(userVolumeInfo, &volumeInfo,
+				sizeof(volumeInfo));
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			uint32 directoryIndex = 0;
+			for (PackagesDirectoryList::Iterator it
+					= fPackagesDirectories.GetIterator();
+				PackagesDirectory* directory = it.Next();
+				directoryIndex++) {
+				PackageFSDirectoryInfo info;
+				info.deviceID = directory->DeviceID();
+				info.nodeID = directory->NodeID();
+
+				PackageFSDirectoryInfo* userInfo
+					= userVolumeInfo->packagesDirectoryInfos + directoryIndex;
+				if (addr_t(userInfo + 1) > (addr_t)buffer + size)
+					break;
+
+				if (user_memcpy(userInfo, &info, sizeof(info)) != B_OK)
+					return B_BAD_ADDRESS;
+			}
+
+			return B_OK;
 		}
 
 		case PACKAGE_FS_OPERATION_GET_PACKAGE_INFOS:
@@ -491,6 +516,10 @@ Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
 				PackageFSPackageInfo info;
 				info.packageDeviceID = package->DeviceID();
 				info.packageNodeID = package->NodeID();
+				PackagesDirectory* directory = package->Directory();
+				info.directoryDeviceID = directory->DeviceID();
+				info.directoryNodeID = directory->NodeID();
+
 				PackageFSPackageInfo* userInfo = request->infos + packageIndex;
 				if (addr_t(userInfo + 1) > (addr_t)buffer + size)
 					break;

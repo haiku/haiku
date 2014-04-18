@@ -1556,8 +1556,9 @@ Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 	}
 
 	fMountType = info.mountType;
-	fPackagesDirectoryRef.device = info.packagesDeviceID;
-	fPackagesDirectoryRef.node = info.packagesDirectoryID;
+	fPackagesDirectoryRef.device = info.packagesDirectoryInfos[0].deviceID;
+	fPackagesDirectoryRef.node = info.packagesDirectoryInfos[0].nodeID;
+// TODO: Adjust for old state support!
 
 	_packageRootRef.device = info.rootDeviceID;
 	_packageRootRef.node = info.rootDirectoryID;
@@ -2293,6 +2294,7 @@ Volume::_ReadPackagesDirectory()
 status_t
 Volume::_GetActivePackages(int fd)
 {
+// TODO: Adjust for old state support!
 	uint32 maxPackageCount = 16 * 1024;
 	PackageFSGetPackageInfosRequest* request = NULL;
 	MemoryDeleter requestDeleter;

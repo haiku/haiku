@@ -30,26 +30,38 @@ enum {
 
 // PACKAGE_FS_OPERATION_GET_VOLUME_INFO
 
+struct PackageFSDirectoryInfo {
+	// node_ref of the directory
+	dev_t					deviceID;
+	ino_t					nodeID;
+};
+
 struct PackageFSVolumeInfo {
 	PackageFSMountType	mountType;
 
 	// device and node id of the respective package FS root scope (e.g. "/boot"
 	// for the three standard volumes)
-	dev_t				rootDeviceID;
-	ino_t				rootDirectoryID;
+	dev_t					rootDeviceID;
+	ino_t					rootDirectoryID;
 
-	// device and node id of the volume's packages directory
-	dev_t				packagesDeviceID;
-	ino_t				packagesDirectoryID;
+	// packageCount is set to the actual packages directory count, even if it is
+	// greater than the array, so the caller can determine whether the array was
+	// large enough.
+	// The directories are ordered from the most recent state (the actual
+	// "packages" directory) to the oldest one, the one that is actually active.
+	uint32					packagesDirectoryCount;
+	PackageFSDirectoryInfo	packagesDirectoryInfos[1];
 };
 
 
 // PACKAGE_FS_OPERATION_GET_PACKAGE_INFOS
 
 struct PackageFSPackageInfo {
-	// node_ref of the package file
+	// node_ref of the package file and the containing directory
 	dev_t							packageDeviceID;
+	dev_t							directoryDeviceID;
 	ino_t							packageNodeID;
+	ino_t							directoryNodeID;
 };
 
 struct PackageFSGetPackageInfosRequest {

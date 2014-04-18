@@ -58,6 +58,8 @@ public:
 									{ return fDeviceID; }
 			ino_t				NodeID() const
 									{ return fNodeID; }
+			PackagesDirectory*	Directory() const
+									{ return fPackagesDirectory; }
 
 			void				SetInstallPath(const String& installPath);
 			const String&		InstallPath() const	{ return fInstallPath; }
