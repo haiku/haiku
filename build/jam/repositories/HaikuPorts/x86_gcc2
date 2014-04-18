@@ -199,6 +199,8 @@ RemotePackageRepository HaikuPorts
 	which-2.20-1
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-3
+	yab-1.7.02-2
+	yab_ide-2.2.1-2
 	yasm-1.2.0-3
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
@@ -486,6 +488,7 @@ RemotePackageRepository HaikuPorts
 	vision
 	which
 	wpa_supplicant
+	yab
 	yasm
 	youtube_dl
 	xz_utils_x86
