@@ -153,6 +153,8 @@ RemotePackageRepository HaikuPorts
 	physfs_devel-2.0.3-1
 	pkgconfig-0.27.1-1
 	python-2.6.8-6
+	qrencode-3.3.0-1
+	qrencode_devel-3.3.0-1
 	readline-6.3-1
 	readline_devel-6.3-1
 	rsync-3.1.0-1
@@ -451,6 +453,7 @@ RemotePackageRepository HaikuPorts
 	pkgconfig
 	protrekkr_x86
 	python
+	qrencode
 	qtcore_x86
 	quicklaunch
 	qupzilla_x86
