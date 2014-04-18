@@ -13,6 +13,7 @@ class BCheckBox;
 class BMenu;
 class BMenuField;
 class BMenuItem;
+class BSpinner;
 class BTextControl;
 class FontSelectionView;
 class SettingsMessage;
@@ -46,7 +47,6 @@ private:
 
 			uint32				_NewWindowPolicy() const;
 			uint32				_NewTabPolicy() const;
-			int32				_MaxHistoryAge() const;
 
 			void				_SetSizesMenuValue(BMenu* menu, int32 value);
 			int32				_SizesMenuValue(BMenu* menu) const;
@@ -73,7 +73,7 @@ private:
 			BMenuItem*			fNewTabBehaviorOpenSearchItem;
 			BMenuItem*			fNewTabBehaviorOpenBlankItem;
 
-			BTextControl*		fDaysInHistoryMenuControl;
+			BSpinner*			fDaysInHistory;
 			BCheckBox*			fShowTabsIfOnlyOnePage;
 			BCheckBox*			fAutoHideInterfaceInFullscreenMode;
 			BCheckBox*			fAutoHidePointer;
