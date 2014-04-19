@@ -110,7 +110,7 @@ main(int argc, const char* const* argv)
 
 	// close the braces and write the size variable
 	sprintf(lineBuffer, "};\nlong long %s = %lldLL;\n", sizeVarName,
-		dataSize);
+		(long long)dataSize);
 	write_string(outFD, lineBuffer);
 
 	close(inFD);
