@@ -36,6 +36,7 @@
 #include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <StringList.h>
 #include <StringView.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
@@ -1756,13 +1757,18 @@ status_t
 AboutView::_GetLicensePath(const char* license, BPath& path)
 {
 	BPathFinder pathFinder;
+	BStringList paths;
 	struct stat st;
 
-	status_t error = pathFinder.FindPath(B_FIND_PATH_DATA_DIRECTORY,
-		"licenses", path);
-	if (error == B_OK && path.Append(license) == B_OK
-		&& lstat(path.Path(), &st) == 0) {
-		return B_OK;
+	status_t error = pathFinder.FindPaths(B_FIND_PATH_DATA_DIRECTORY,
+		"licenses", paths);
+
+	for (int i = 0; i < paths.CountStrings(); ++i) {
+		if (error == B_OK && path.SetTo(paths.StringAt(i)) == B_OK
+			&& path.Append(license) == B_OK
+			&& lstat(path.Path(), &st) == 0) {
+			return B_OK;
+		}
 	}
 
 	path.Unset();
