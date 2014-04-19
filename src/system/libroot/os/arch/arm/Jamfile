@@ -15,6 +15,7 @@ for architectureObject in [ MultiArchSubDirSetup arm ] {
 			byteorder.S
 			system_time.c
 			stack_frame.c
+			stdatomic.c
 			thread.c
 			time.c
 			tls.c
