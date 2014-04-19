@@ -18,6 +18,7 @@ Server package_daemon
 	ResultWindow.cpp
 	Root.cpp
 	Volume.cpp
+	VolumeState.cpp
 	:
 	be package
 	$(TARGET_LIBSTDC++)

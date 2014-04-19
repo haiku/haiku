@@ -45,6 +45,7 @@
 #include "DebugSupport.h"
 #include "Exception.h"
 #include "FSTransaction.h"
+#include "VolumeState.h"
 
 
 using namespace BPackageKit::BPrivate;
@@ -102,146 +103,6 @@ public:
 private:
 	BString	fEntryName;
 	bool	fCreated;
-};
-
-
-// #pragma mark - State
-
-
-struct Volume::State {
-
-	State()
-		:
-		fLock("volume state"),
-		fPackagesByFileName(),
-		fPackagesByNodeRef(),
-		fChangeCount(0),
-		fPendingPackageJobCount(0)
-	{
-	}
-
-	~State()
-	{
-		fPackagesByFileName.Clear();
-
-		Package* package = fPackagesByNodeRef.Clear(true);
-		while (package != NULL) {
-			Package* next = package->NodeRefHashTableNext();
-			delete package;
-			package = next;
-		}
-	}
-
-	bool Init()
-	{
-		return fLock.InitCheck() == B_OK && fPackagesByFileName.Init() == B_OK
-			&& fPackagesByNodeRef.Init() == B_OK;
-	}
-
-	bool Lock()
-	{
-		return fLock.Lock();
-	}
-
-	void Unlock()
-	{
-		fLock.Unlock();
-	}
-
-	int64 ChangeCount() const
-	{
-		return fChangeCount;
-	}
-
-	Package* FindPackage(const char* name) const
-	{
-		return fPackagesByFileName.Lookup(name);
-	}
-
-	Package* FindPackage(const node_ref& nodeRef) const
-	{
-		return fPackagesByNodeRef.Lookup(nodeRef);
-	}
-
-	PackageFileNameHashTable::Iterator ByFileNameIterator() const
-	{
-		return fPackagesByFileName.GetIterator();
-	}
-
-	PackageNodeRefHashTable::Iterator ByNodeRefIterator() const
-	{
-		return fPackagesByNodeRef.GetIterator();
-	}
-
-	void AddPackage(Package* package)
-	{
-		AutoLocker<BLocker> locker(fLock);
-		fPackagesByFileName.Insert(package);
-		fPackagesByNodeRef.Insert(package);
-	}
-
-	void RemovePackage(Package* package)
-	{
-		AutoLocker<BLocker> locker(fLock);
-		_RemovePackage(package);
-	}
-
-	void SetPackageActive(Package* package, bool active)
-	{
-		AutoLocker<BLocker> locker(fLock);
-		package->SetActive(active);
-	}
-
-	void ActivationChanged(const PackageSet& activatedPackage,
-		const PackageSet& deactivatePackages)
-	{
-		AutoLocker<BLocker> locker(fLock);
-
-		for (PackageSet::iterator it = activatedPackage.begin();
-				it != activatedPackage.end(); ++it) {
-			(*it)->SetActive(true);
-			fChangeCount++;
-		}
-
-		for (PackageSet::iterator it = deactivatePackages.begin();
-				it != deactivatePackages.end(); ++it) {
-			Package* package = *it;
-			_RemovePackage(package);
-			delete package;
-		}
-	}
-
-	void PackageJobPending()
-	{
-		atomic_add(&fPendingPackageJobCount, 1);
-	}
-
-
-	void PackageJobFinished()
-	{
-		atomic_add(&fPendingPackageJobCount, -1);
-	}
-
-
-	bool IsPackageJobPending() const
-	{
-		return fPendingPackageJobCount != 0;
-	}
-
-private:
-	void _RemovePackage(Package* package)
-	{
-		fPackagesByFileName.Remove(package);
-		fPackagesByNodeRef.Remove(package);
-		fChangeCount++;
-	}
-
-private:
-	BLocker						fLock;
-	PackageFileNameHashTable	fPackagesByFileName;
-	PackageNodeRefHashTable		fPackagesByNodeRef;
-	int64						fChangeCount;
-	int32						fPendingPackageJobCount;
 };
 
 
@@ -1505,7 +1366,7 @@ Volume::~Volume()
 status_t
 Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 {
-	fState = new(std::nothrow) State;
+	fState = new(std::nothrow) VolumeState;
 	if (fState == NULL || !fState->Init())
 		RETURN_ERROR(B_NO_MEMORY);
 
@@ -1722,7 +1583,7 @@ INFORM("Volume::InitialVerify(%p, %p)\n", nextVolume, nextNextVolume);
 void
 Volume::HandleGetLocationInfoRequest(BMessage* message)
 {
-	AutoLocker<State> stateLocker(fState);
+	AutoLocker<VolumeState> stateLocker(fState);
 
 	// If the cached reply message is up-to-date, just send it.
 	int64 changeCount;

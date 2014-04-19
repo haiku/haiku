@@ -33,7 +33,7 @@
 //
 // The only thread synchronization needed is for the status information accessed
 // by HandleGetLocationInfoRequest() and modified by the job thread. The data
-// are encapsulated in a Volume::State object which contains a lock. The lock
+// are encapsulated in a VolumeState object which contains a lock. The lock
 // must be held by the app thread when accessing the data (it reads only) and
 // by the job thread when modifying the data (not needed when reading).
 
@@ -44,6 +44,7 @@ using BPackageKit::BPrivate::BDaemonClient;
 class BDirectory;
 
 class Root;
+class VolumeState;
 
 namespace BPackageKit {
 	class BSolver;
@@ -137,7 +138,6 @@ public:
 
 private:
 			struct NodeMonitorEvent;
-			struct State;
 			struct CommitTransactionHandler;
 
 			friend struct CommitTransactionHandler;
@@ -214,7 +214,7 @@ private:
 			node_ref			fPackagesDirectoryRef;
 			Root*				fRoot;
 			Listener*			fListener;
-			State*				fState;
+			VolumeState*		fState;
 			BLocker				fPendingNodeMonitorEventsLock;
 			NodeMonitorEventList fPendingNodeMonitorEvents;
 			bigtime_t			fNodeMonitorEventHandleTime;
