@@ -13,6 +13,9 @@
 #ifdef _KERNEL_MODE
 #	include <KernelExport.h>
 #	include <util/kernel_cpp.h>
+#	include <util/TypeOperation.h>
+#else
+#	include <TypeOperation.h>
 #endif
 
 
@@ -136,7 +139,7 @@ public:
 		return fItemCount;
 	}
 
-	ValueType* Lookup(const KeyType& key) const
+	ValueType* Lookup(typename TypeOperation<KeyType>::ConstRefT key) const
 	{
 		if (fTableSize == 0)
 			return NULL;
@@ -364,7 +367,7 @@ public:
 		return Iterator(this);
 	}
 
-	Iterator GetIterator(const KeyType& key) const
+	Iterator GetIterator(typename TypeOperation<KeyType>::ConstRefT key) const
 	{
 		if (fTableSize == 0)
 			return Iterator(this, fTableSize, NULL);
