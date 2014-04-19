@@ -1760,7 +1760,7 @@ AboutView::_GetLicensePath(const char* license, BPath& path)
 		B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
 		B_SYSTEM_DATA_DIRECTORY
 	};
-	static const int dirCount = 3;
+	static const int dirCount = 4;
 
 	for (int i = 0; i < dirCount; i++) {
 		struct stat st;
