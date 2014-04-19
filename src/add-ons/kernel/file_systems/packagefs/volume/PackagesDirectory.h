@@ -61,7 +61,7 @@ private:
 
 
 struct PackagesDirectoryHashDefinition {
-	typedef const node_ref&		KeyType;
+	typedef const node_ref		KeyType;
 	typedef	PackagesDirectory	ValueType;
 
 	size_t HashKey(const node_ref& key) const
