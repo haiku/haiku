@@ -31,6 +31,7 @@
 #include <Messenger.h>
 #include <OS.h>
 #include <Path.h>
+#include <PathFinder.h>
 #include <Resources.h>
 #include <Screen.h>
 #include <ScrollView.h>
@@ -1754,22 +1755,14 @@ AboutView::_CreateCreditsView()
 status_t
 AboutView::_GetLicensePath(const char* license, BPath& path)
 {
-	static const directory_which directoryConstants[] = {
-		B_USER_NONPACKAGED_DATA_DIRECTORY,
-		B_USER_DATA_DIRECTORY,
-		B_SYSTEM_NONPACKAGED_DATA_DIRECTORY,
-		B_SYSTEM_DATA_DIRECTORY
-	};
-	static const int dirCount = 4;
+	BPathFinder pathFinder;
+	struct stat st;
 
-	for (int i = 0; i < dirCount; i++) {
-		struct stat st;
-		status_t error = find_directory(directoryConstants[i], &path);
-		if (error == B_OK && path.Append("licenses") == B_OK
-			&& path.Append(license) == B_OK
-			&& lstat(path.Path(), &st) == 0) {
-			return B_OK;
-		}
+	status_t error = pathFinder.FindPath(B_FIND_PATH_DATA_DIRECTORY,
+		"licenses", path);
+	if (error == B_OK && path.Append(license) == B_OK
+		&& lstat(path.Path(), &st) == 0) {
+		return B_OK;
 	}
 
 	path.Unset();
