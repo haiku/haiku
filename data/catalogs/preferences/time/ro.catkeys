@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Time	1859841283
+1	romanian	x-vnd.Haiku-Time	891089298
 GMT (UNIX compatible)	Time		GMT (compatibil cu UNIX)
 OK	Time		OK
 Asia	Time		Asia
@@ -28,7 +28,6 @@ Sending request failed	Time		Trimiterea cererii a eșuat
 Arctic	Time		Arctic
 Time	System name		Oră
 America	Time		America
-Reset	Time		Resetează
 Synchronize at boot	Time		Sincronizează la pornirea sistemului
 Received invalid time	Time		S-a primit o oră invalidă
 Antarctica	Time		Antarctica

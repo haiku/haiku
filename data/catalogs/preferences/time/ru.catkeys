@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Time	3259467657
+1	russian	x-vnd.Haiku-Time	2290715672
 GMT (UNIX compatible)	Time		По Гринвичу (совместимо с UNIX)
 OK	Time		ОК
 Asia	Time		Азия
@@ -30,7 +30,6 @@ Arctic	Time		Арктика
 Display time with seconds	Time		Показывать секунды
 Time	System name		Время
 America	Time		Америка
-Reset	Time		Сбросить
 Synchronize at boot	Time		Синхронизировать при загрузке
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Дата & Время, разработан:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nВсе права защищены 2004-2012, Haiku.
 Received invalid time	Time		Получено неверное время

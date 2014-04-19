@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Time	1859841283
+1	greek, modern (1453-)	x-vnd.Haiku-Time	891089298
 GMT (UNIX compatible)	Time		GMT (Συμβατό με το UNIX)
 OK	Time		Εντάξει
 Asia	Time		Ασία
@@ -28,7 +28,6 @@ Sending request failed	Time		Η αποστολή αίτησης απέτυχε
 Arctic	Time		Αρκτική
 Time	System name		Time
 America	Time		Αμερική
-Reset	Time		Επαναφορά
 Synchronize at boot	Time		Συγχρονισμός κατά την εκκίνηση
 Received invalid time	Time		Ελήφθη λανθασμένη ώρα
 Antarctica	Time		Ανταρκτική

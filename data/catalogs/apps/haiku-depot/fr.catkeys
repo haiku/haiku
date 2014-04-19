@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	3598332680
+1	french	x-vnd.Haiku-HaikuDepot	3398060443
 Name	PackageListView		Nom
 Installed packages	Model		Paquets installés
 User modified packages	Model		Paquets modifiés par l'utilisateur
@@ -18,6 +18,7 @@ Uninstall	PackageManager		Désinstaller
 An error occurred while initializing the package manager: %message%	MainWindow		Une erreur est survenue à l'initialisation du gestionnaire de paquet : %message%
 Close	PackageManager		Fermer
 Status	PackageListView		État
+Available packages	Model		Paquets disponibles
 Your rating	System name		Votre évaluation
 Development	Model		Développement
 Fatal error	PackageManager		Erreur fatale
@@ -48,6 +49,7 @@ Close	MainWindow		Fermer
 Video	Model		Vidéo
 An error occurred while refreshing the repository: %error%	MainWindow		Une erreur est survenue lors du rafraîchissement du dépôt : %error%
 All packages	FilterView		Tous les paquets
+Pending…	PackageListView		En attente…
 Depot	FilterView		Dépôt
 Uninstalled	PackageListView		Désinstallé
 Unknown	PackageListView		Inconnu

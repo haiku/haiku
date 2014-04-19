@@ -1,32 +1,32 @@
 1	polish	x-vnd.Haiku-About	86924748
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 przez autorów Gutenprint. Wszelkie prawa zastrzeżone.
-Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (i jego kernel NewOS)\n
-BSD (4-clause)	AboutView		BSD (4-klauzulowa licencja BSD)
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travisa Geiselbrechta (i jego jądra NewOS)\n
+BSD (4-clause)	AboutView		BSD (4-klauzulowa)
 %ld Processors:	AboutView		Liczba procesorów %ld:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL oraz Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Wszelkie prawa zastrzeżone.
 %d MiB total	AboutView		%d MiB ogółem
-Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (założyciel projektu)\n\n
-The Haiku-Ports team\n	AboutView		Zespół Haiku-Ports\n
+Michael Phipps (project founder)\n\n	AboutView		Michaela Phippsa (założyciela projektu)\n\n
+The Haiku-Ports team\n	AboutView		Zespołu Haiku-Ports\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. Wszelkie prawa zastrzeżone.
 %d MiB used (%d%%)	AboutView		%d MiB użyte (%d%%)
 Website, marketing & documentation:\n	AboutView		Strona WWW, marketing i dokumentacja:\n
 GNU LGPL v2.1	AboutView		GNU LGPL v2.1
 AboutSystem	System name		OSystemie
-MIT (no promotion)	AboutView		MIT (nie promowany)
+MIT (no promotion)	AboutView		MIT (bez promocji)
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe i inni.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Wszelkie prawa zastrzeżone.
 Revision	AboutView		Rewizja
 Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2005 Industrial Light & Magic, oddział Lucas Digital Ltd. LLC.
-Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. i jego zespół programistów, za stworzenie BeOS!\n\n
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. i jej zespołu programistów, za stworzenie BeOS!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Wszelkie prawa zastrzeżone..
 Source Code: 	AboutView		Kod źródłowy: 
 Processor:	AboutView		Procesor:
-Kernel:	AboutView		Kernel:
-BSD (3-clause)	AboutView		BSD (3-klauzulowa licencja BSD)
+Kernel:	AboutView		Jądro:
+BSD (3-clause)	AboutView		BSD (3-klauzulowa)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman oraz Daniel Veillard. Wszelkie prawa zastrzeżone.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Fragmenty tego oprogramowania są chronione prawem autorskim.\nCopyright © 1996-2006 The FreeType Project. Wszelkie prawa zastrzeżone.
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Prawa autorskie do kodu Haiku są własnością Haiku Inc. lub autorów, gdzie jest to wyraźnie zaznaczone w źródłach. Haiku ® i HAIKU logo ® są zarejestrowanymi znakami towarowymi Haiku Inc.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Prawa autorskie do kodu Haiku są własnością Haiku Inc. lub autorów, gdzie jest to wyraźnie zaznaczone w źródłach. Haiku® i logo HAIKU® są zarejestrowanymi znakami towarowymi Haiku Inc.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nWszelkie prawa zastrzeżone.
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB ogółem, %inaccessible MiB nieosiągalne
 Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard, et al.
@@ -54,8 +54,8 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Time running:	AboutView		Czas działania:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Zawiera oprogramowanie wytworzone przez NetBSD Foundation, Inc. oraz ich współpracowników:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. Wszelkie prawa zastrzeżone.
 Contains software from the FreeBSD Project, released under the BSD license:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Zawiera oprogramowanie z Projektu FreeBSD, wydanego na licencji BSD:\ncal, ftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Wszelkie prawa zastrzeżone.
-Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google i ich programom Google Summer of Code i Google Code In\n
-The Haikuware team and their bounty program\n	AboutView		Zespół Haikuware i ich program nagród\n
+Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google i ich programów Google Summer of Code i Google Code In\n
+The Haikuware team and their bounty program\n	AboutView		Zespołu Haikuware i ich programu nagród\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Wszelkie prawa zastrzeżone.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Wszelkie prawa zastrzeżone.
 About this system	AboutWindow		O systemie
@@ -67,7 +67,7 @@ Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyri
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Wszelkie prawa zastrzeżone.
 The BeGeistert team\n	AboutView		Grupy BeGeistert\n
-The University of Auckland and Christof Lutteroth\n\n	AboutView		Uniwersytet w Auckland oraz Christof Lutteroth\n\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		Uniwersytetu w Auckland oraz Christofa Lutterotha\n\n
 Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratory, Uniwersytet Tokijski.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Wszelkie prawa zastrzeżone.
 Copyright © 2002-2008 Alexander L. Roshal. All rights reserved.	AboutView		Copyright © 2002-2008 Alexander L. Roshal. Wszelkie prawa zastrzeżone.
@@ -76,8 +76,8 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyri
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH i Thomas Merz. Wszelkie prawa zastrzeżone.\nPDFlib i PDFlib logo są zastrzeżonymi znakami towarowymi PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Wszelkie prawa zastrzeżone.
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Zawiera oprogramowanie z GNU Project, wydanego na licencjach GPL i LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
-…and the many people making donations!\n\n	AboutView		...oraz wielu ludziom, którzy wysyłają dotacje!\n\n
-MIT license. All rights reserved.	AboutView		MIT license. Wszelkie prawa zastrzeżone.
+…and the many people making donations!\n\n	AboutView		...oraz wielu ludzi, którzy wysyłają dotacje!\n\n
+MIT license. All rights reserved.	AboutView		Licencja MIT. Wszelkie prawa zastrzeżone.
 [Click a license name to read the respective license.]\n\n	AboutView		[Kliknij na nazwę licencji, aby wyświetlić jej treść.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Wszelkie prawa zastrzeżone.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Wszelkie prawa zastrzeżone.

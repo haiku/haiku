@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Time	3259467657
+1	polish	x-vnd.Haiku-Time	2290715672
 GMT (UNIX compatible)	Time		GMT (kompatybilne z UNIX'em)
 OK	Time		OK
 Asia	Time		Azja
@@ -30,7 +30,6 @@ Arctic	Time		Arktyka
 Display time with seconds	Time		Wyświetl sekundy
 Time	System name		Czas
 America	Time		Ameryka
-Reset	Time		Resetuj
 Synchronize at boot	Time		Synchronizuj przy rozruchu
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, napisany przez:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nPrawa zastrzeżone 2004-2012, Haiku.
 Received invalid time	Time		Odebrano niepoprawny czas

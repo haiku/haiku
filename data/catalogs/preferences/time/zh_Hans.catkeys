@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Time	3544635877
+1	english	x-vnd.Haiku-Time	2575883892
 GMT (UNIX compatible)	Time		GMT（UNIX 兼容）
 OK	Time		确定
 Asia	Time		亚洲
@@ -28,7 +28,6 @@ Sending request failed	Time		发送请求失败
 Arctic	Time		北极
 Time	System name		时间
 America	Time		美洲
-Reset	Time		重置
 Synchronize at boot	Time		启动时同步
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		时间日期，编写者：\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n版权所有 2004-2012, Haiku.
 Received invalid time	Time		接收时间无效

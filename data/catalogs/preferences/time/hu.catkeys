@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Time	3259467657
+1	hungarian	x-vnd.Haiku-Time	2290715672
 GMT (UNIX compatible)	Time		GMT (UNIX kompatibilis)
 OK	Time		Rendben
 Asia	Time		Ázsia
@@ -30,7 +30,6 @@ Arctic	Time		Arktisz
 Display time with seconds	Time		Másodpercek megjelenítése
 Time	System name		Dátum és idő
 America	Time		Amerika
-Reset	Time		Visszaállítás
 Synchronize at boot	Time		Szinkronizálás indításkor
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Dátum és idő, készítette:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\n Copyright 2004-2012, Haiku.
 Received invalid time	Time		Érvénytelen idő érkezett

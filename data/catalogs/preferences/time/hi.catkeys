@@ -1,4 +1,4 @@
-1	hindi	x-vnd.Haiku-Time	1859841283
+1	hindi	x-vnd.Haiku-Time	891089298
 GMT (UNIX compatible)	Time		जीऍमटी (UNIX compatible)
 OK	Time		ठीक है
 Asia	Time		एशिया
@@ -28,7 +28,6 @@ Sending request failed	Time		रेकुएस्ट को भेज रहे
 Arctic	Time		आर्तिक
 Time	System name		समय
 America	Time		अमेरिका
-Reset	Time		रिसेट
 Synchronize at boot	Time		बूट पर तुल्यकालिक करें
 Received invalid time	Time		आमने समय मिला
 Antarctica	Time		अन्टार्टिका

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Time	3259467657
+1	french	x-vnd.Haiku-Time	2290715672
 GMT (UNIX compatible)	Time		GMT (compatible UNIX)
 OK	Time		OK
 Asia	Time		Asie
@@ -30,7 +30,6 @@ Arctic	Time		Arctique
 Display time with seconds	Time		Afficher l'heure avec les secondes
 Time	System name		Heure
 America	Time		Amérique
-Reset	Time		Réinitialiser
 Synchronize at boot	Time		Synchroniser au démarrage
 Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Date & Heure, écrit par :\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Une heure non valide a été reçue
