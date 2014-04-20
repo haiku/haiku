@@ -323,10 +323,10 @@ RemotePackageRepository HaikuPorts
 	luajit_x86_devel-2.0.2-2
 	lzo_x86-2.06-1
 	lzo_x86_devel-2.06-1
-	mesa_x86-10.1.0-1
-	mesa_x86_devel-10.1.0-1
-	mesa_x86_swrast-10.1.0-1
-	mesa_x86_swpipe-10.1.0-1
+	mesa_x86-10.1.0-2
+	mesa_x86_devel-10.1.0-2
+	mesa_x86_swrast-10.1.0-2
+	mesa_x86_swpipe-10.1.0-2
 	mpg123_x86-1.12.1-1
 	mpg123_x86_devel-1.12.1-1
 	ncurses_x86-5.9-9
