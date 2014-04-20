@@ -32,10 +32,11 @@ using namespace BPackageKit::BPrivate;
 
 
 CommitTransactionHandler::CommitTransactionHandler(Volume* volume,
-	const PackageSet& packagesAlreadyAdded,
+	VolumeState* volumeState, const PackageSet& packagesAlreadyAdded,
 	const PackageSet& packagesAlreadyRemoved)
 	:
 	fVolume(volume),
+	fVolumeState(volumeState),
 	fPackagesToActivate(),
 	fPackagesToDeactivate(),
 	fAddedPackages(),
@@ -86,7 +87,7 @@ CommitTransactionHandler::HandleRequest(
 	const BActivationTransaction& transaction, BMessage* reply)
 {
 	// check the change count
-	if (transaction.ChangeCount() != fVolume->State()->ChangeCount())
+	if (transaction.ChangeCount() != fVolumeState->ChangeCount())
 		throw Exception(B_DAEMON_CHANGE_COUNT_MISMATCH);
 
 	// collect the packages to deactivate
@@ -156,7 +157,7 @@ CommitTransactionHandler::_GetPackagesToDeactivate(
 
 	for (int32 i = 0; i < packagesToDeactivateCount; i++) {
 		BString packageName = packagesToDeactivate.StringAt(i);
-		Package* package = fVolume->State()->FindPackage(packageName);
+		Package* package = fVolumeState->FindPackage(packageName);
 		if (package == NULL) {
 			throw Exception(B_DAEMON_NO_SUCH_PACKAGE, "no such package",
 				packageName);
@@ -213,7 +214,7 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 		BString packageName = packagesToActivate.StringAt(i);
 
 		// make sure it doesn't clash with an already existing package
-		Package* package = fVolume->State()->FindPackage(packageName);
+		Package* package = fVolumeState->FindPackage(packageName);
 		if (package != NULL) {
 			if (fPackagesAlreadyAdded.find(package)
 					!= fPackagesAlreadyAdded.end()) {
@@ -419,7 +420,7 @@ CommitTransactionHandler::_AddPackagesToActivate()
 		}
 
 		// also add the package to the volume
-		fVolume->State()->AddPackage(package);
+		fVolumeState->AddPackage(package);
 
 		_PreparePackageToActivate(package);
 	}
@@ -937,7 +938,7 @@ CommitTransactionHandler::_RevertAddPackagesToActivate()
 			continue;
 		}
 
-		fVolume->State()->RemovePackage(package);
+		fVolumeState->RemovePackage(package);
 
 		if (transactionDirectory.InitCheck() != B_OK)
 			continue;
@@ -1294,7 +1295,7 @@ CommitTransactionHandler::_CreateActivationFileContent(
 {
 	BString activationFileContent;
 	for (PackageFileNameHashTable::Iterator it
-			= fVolume->State()->ByFileNameIterator();
+			= fVolumeState->ByFileNameIterator();
 		Package* package = it.Next();) {
 		if (package->IsActive()
 			&& toDeactivate.find(package) == toDeactivate.end()) {
@@ -1435,8 +1436,7 @@ CommitTransactionHandler::_ChangePackageActivation(
 
 	// Update our state, i.e. remove deactivated packages and mark activated
 	// packages accordingly.
-	fVolume->State()->ActivationChanged(packagesToActivate,
-		packagesToDeactivate);
+	fVolumeState->ActivationChanged(packagesToActivate, packagesToDeactivate);
 }
 
 

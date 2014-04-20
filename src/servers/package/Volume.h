@@ -111,9 +111,6 @@ public:
 			void				SetRoot(Root* root)
 									{ fRoot = root; }
 
-			VolumeState*		State() const
-									{ return fState; }
-
 			PackageFileNameHashTable::Iterator PackagesByFileNameIterator()
 									const;
 

@@ -397,7 +397,7 @@ Volume::HandleCommitTransactionRequest(BMessage* message)
 
 	// perform the request
 	PackageSet dummy;
-	CommitTransactionHandler handler(this, dummy, dummy);
+	CommitTransactionHandler handler(this, fState, dummy, dummy);
 	int32 error;
 	try {
 		handler.HandleRequest(message, &reply);
@@ -569,7 +569,7 @@ Volume::ProcessPendingPackageActivationChanges()
 		return;
 
 	// perform the request
-	CommitTransactionHandler handler(this, fPackagesToBeActivated,
+	CommitTransactionHandler handler(this, fState, fPackagesToBeActivated,
 		fPackagesToBeDeactivated);
 	int32 error;
 	try {
@@ -654,7 +654,7 @@ Volume::CommitTransaction(const BActivationTransaction& transaction,
 	BDaemonClient::BCommitTransactionResult& _result)
 {
 	// perform the request
-	CommitTransactionHandler handler(this, packagesAlreadyAdded,
+	CommitTransactionHandler handler(this, fState, packagesAlreadyAdded,
 		packagesAlreadyRemoved);
 	int32 error;
 	try {

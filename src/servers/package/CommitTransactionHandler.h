@@ -25,6 +25,7 @@ typedef std::set<std::string> StringSet;
 class CommitTransactionHandler {
 public:
 								CommitTransactionHandler(Volume* volume,
+									VolumeState* volumeState,
 									const PackageSet& packagesAlreadyAdded,
 									const PackageSet& packagesAlreadyRemoved);
 								~CommitTransactionHandler();
@@ -125,6 +126,7 @@ private:
 
 private:
 			Volume*				fVolume;
+			VolumeState*		fVolumeState;
 			PackageList			fPackagesToActivate;
 			PackageSet			fPackagesToDeactivate;
 			PackageSet			fAddedPackages;
