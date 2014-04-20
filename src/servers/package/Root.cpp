@@ -22,15 +22,13 @@
 #include <package/DaemonDefs.h>
 #include <package/manager/Exceptions.h>
 
+#include "Constants.h"
 #include "DebugSupport.h"
 #include "PackageManager.h"
 
 
 using namespace BPackageKit::BPrivate;
 using namespace BPackageKit::BManager::BPrivate;
-
-
-static const bigtime_t kCommunicationTimeout = 1000000;
 
 
 // #pragma mark - AbstractVolumeJob

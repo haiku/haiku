@@ -43,6 +43,7 @@ using BPackageKit::BPrivate::BDaemonClient;
 
 class BDirectory;
 
+class CommitTransactionHandler;
 class Root;
 class VolumeState;
 
@@ -138,9 +139,8 @@ public:
 
 private:
 			struct NodeMonitorEvent;
-			struct CommitTransactionHandler;
 
-			friend struct CommitTransactionHandler;
+			friend class CommitTransactionHandler;
 
 			typedef FSUtils::RelativePath RelativePath;
 			typedef DoublyLinkedList<NodeMonitorEvent> NodeMonitorEventList;

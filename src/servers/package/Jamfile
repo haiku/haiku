@@ -5,6 +5,8 @@ UsePrivateHeaders app interface kernel shared storage ;
 
 Server package_daemon
 	:
+	CommitTransactionHandler.cpp
+	Constants.cpp
 	DebugSupport.cpp
 	Exception.cpp
 	FSTransaction.cpp
