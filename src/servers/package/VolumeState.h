@@ -44,10 +44,6 @@ public:
 									const PackageSet& activatedPackage,
 									const PackageSet& deactivatePackages);
 
-			void				PackageJobPending();
-			void				PackageJobFinished();
-			bool				IsPackageJobPending() const;
-
 private:
 			void				_RemovePackage(Package* package);
 
@@ -56,7 +52,6 @@ private:
 			PackageFileNameHashTable fPackagesByFileName;
 			PackageNodeRefHashTable fPackagesByNodeRef;
 			int64				fChangeCount;
-			int32				fPendingPackageJobCount;
 };
 
 
@@ -85,27 +80,6 @@ inline PackageNodeRefHashTable::Iterator
 VolumeState::ByNodeRefIterator() const
 {
 	return fPackagesByNodeRef.GetIterator();
-}
-
-
-inline void
-VolumeState::PackageJobPending()
-{
-	atomic_add(&fPendingPackageJobCount, 1);
-}
-
-
-inline void
-VolumeState::PackageJobFinished()
-{
-	atomic_add(&fPendingPackageJobCount, -1);
-}
-
-
-inline bool
-VolumeState::IsPackageJobPending() const
-{
-	return fPendingPackageJobCount != 0;
 }
 
 

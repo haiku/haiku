@@ -17,8 +17,7 @@ VolumeState::VolumeState()
 	fLock("volume state"),
 	fPackagesByFileName(),
 	fPackagesByNodeRef(),
-	fChangeCount(0),
-	fPendingPackageJobCount(0)
+	fChangeCount(0)
 {
 }
 

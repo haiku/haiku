@@ -185,6 +185,7 @@ private:
 			PackageSet			fPackagesToBeDeactivated;
 			BMessage			fLocationInfoReply;
 									// only accessed in the application thread
+			int32				fPendingPackageJobCount;
 };
 
 

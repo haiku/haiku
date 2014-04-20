@@ -99,7 +99,8 @@ Volume::Volume(BLooper* looper)
 	fNodeMonitorEventHandleTime(0),
 	fPackagesToBeActivated(),
 	fPackagesToBeDeactivated(),
-	fLocationInfoReply(B_MESSAGE_GET_INSTALLATION_LOCATION_INFO_REPLY)
+	fLocationInfoReply(B_MESSAGE_GET_INSTALLATION_LOCATION_INFO_REPLY),
+	fPendingPackageJobCount(0)
 {
 	looper->AddHandler(this);
 }
@@ -425,21 +426,21 @@ Volume::HandleCommitTransactionRequest(BMessage* message)
 void
 Volume::PackageJobPending()
 {
-	fState->PackageJobPending();
+	atomic_add(&fPendingPackageJobCount, 1);
 }
 
 
 void
 Volume::PackageJobFinished()
 {
-	fState->PackageJobFinished();
+	atomic_add(&fPendingPackageJobCount, -1);
 }
 
 
 bool
 Volume::IsPackageJobPending() const
 {
-	return fState->IsPackageJobPending();
+	return fPendingPackageJobCount != 0;
 }
 
 
