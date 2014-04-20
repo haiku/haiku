@@ -152,6 +152,7 @@ main(int argc, const char* const* argv)
 			{ "architecture", required_argument, 0, 'a' },
 			{ "dependency", required_argument, 0, 'd' },
 			{ "help", no_argument, 0, 'h' },
+			{ "list", no_argument, 0, 'l' },
 			{ "path", required_argument, 0, 'p' },
 			{ "resolvable", required_argument, 0, 'pr' },
 			{ "reverse", no_argument, 0, 'R' },
