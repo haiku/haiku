@@ -230,19 +230,14 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 		}
 
 		// read the package
-		entry_ref entryRef;
-		entryRef.device = fTransactionDirectoryRef.device;
-		entryRef.directory = fTransactionDirectoryRef.node;
-		if (entryRef.set_name(packageName) != B_OK)
-			throw Exception(B_NO_MEMORY);
-
 		package = new(std::nothrow) Package;
 		if (package == NULL || !fPackagesToActivate.AddItem(package)) {
 			delete package;
 			throw Exception(B_NO_MEMORY);
 		}
 
-		error = package->Init(entryRef);
+		error = package->Init(
+			NotOwningEntryRef(fTransactionDirectoryRef, packageName));
 		if (error != B_OK)
 			throw Exception(error, "failed to read package", packageName);
 
@@ -403,12 +398,8 @@ CommitTransactionHandler::_AddPackagesToActivate()
 		}
 
 		// get a BEntry for the package
-		entry_ref entryRef;
-		entryRef.device = fTransactionDirectoryRef.device;
-		entryRef.directory = fTransactionDirectoryRef.node;
-		if (entryRef.set_name(package->FileName()) != B_OK)
-			throw Exception(B_NO_MEMORY);
-
+		NotOwningEntryRef entryRef(fTransactionDirectoryRef,
+			package->FileName());
 		BEntry entry;
 		error = entry.SetTo(&entryRef);
 		if (error != B_OK) {
