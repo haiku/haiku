@@ -9,11 +9,14 @@
 
 #include "CommitTransactionHandler.h"
 
+#include <errno.h>
 #include <grp.h>
 #include <pwd.h>
 
+#include <File.h>
 #include <Path.h>
 
+#include <AutoDeleter.h>
 #include <CopyEngine.h>
 #include <NotOwningEntryRef.h>
 #include <package/DaemonDefs.h>
@@ -83,7 +86,7 @@ CommitTransactionHandler::HandleRequest(
 	const BActivationTransaction& transaction, BMessage* reply)
 {
 	// check the change count
-	if (transaction.ChangeCount() != fVolume->fState->ChangeCount())
+	if (transaction.ChangeCount() != fVolume->State()->ChangeCount())
 		throw Exception(B_DAEMON_CHANGE_COUNT_MISMATCH);
 
 	// collect the packages to deactivate
@@ -153,7 +156,7 @@ CommitTransactionHandler::_GetPackagesToDeactivate(
 
 	for (int32 i = 0; i < packagesToDeactivateCount; i++) {
 		BString packageName = packagesToDeactivate.StringAt(i);
-		Package* package = fVolume->fState->FindPackage(packageName);
+		Package* package = fVolume->State()->FindPackage(packageName);
 		if (package == NULL) {
 			throw Exception(B_DAEMON_NO_SUCH_PACKAGE, "no such package",
 				packageName);
@@ -195,8 +198,7 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 	RelativePath directoryPath(kAdminDirectoryName,
 		transactionDirectoryName);
 	BDirectory directory;
-	status_t error = fVolume->_OpenPackagesSubDirectory(directoryPath,
-		false, directory);
+	status_t error = _OpenPackagesSubDirectory(directoryPath, false, directory);
 	if (error != B_OK)
 		throw Exception(error, "failed to open transaction directory");
 
@@ -211,7 +213,7 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 		BString packageName = packagesToActivate.StringAt(i);
 
 		// make sure it doesn't clash with an already existing package
-		Package* package = fVolume->fState->FindPackage(packageName);
+		Package* package = fVolume->State()->FindPackage(packageName);
 		if (package != NULL) {
 			if (fPackagesAlreadyAdded.find(package)
 					!= fPackagesAlreadyAdded.end()) {
@@ -262,7 +264,7 @@ CommitTransactionHandler::_ApplyChanges(BMessage* reply)
 	_AddPackagesToActivate();
 
 	// activate/deactivate packages
-	fVolume->_ChangePackageActivation(fAddedPackages, fRemovedPackages);
+	_ChangePackageActivation(fAddedPackages, fRemovedPackages);
 
 	// run post-installation scripts
 	_RunPostInstallScripts();
@@ -294,7 +296,7 @@ CommitTransactionHandler::_CreateOldStateDirectory(BMessage* reply)
 
 	// make sure the directory doesn't exist yet
 	BDirectory adminDirectory;
-	status_t error = fVolume->_OpenPackagesSubDirectory(
+	status_t error = _OpenPackagesSubDirectory(
 		RelativePath(kAdminDirectoryName), true, adminDirectory);
 	if (error != B_OK)
 		throw Exception(error, "failed to open administrative directory");
@@ -322,7 +324,7 @@ CommitTransactionHandler::_CreateOldStateDirectory(BMessage* reply)
 
 	// write the old activation file
 	BEntry activationFile;
-	error = fVolume->_WriteActivationFile(
+	error = _WriteActivationFile(
 		RelativePath(kAdminDirectoryName, directoryName),
 		kActivationFileName, PackageSet(), PackageSet(), activationFile);
 	if (error != B_OK)
@@ -353,7 +355,7 @@ CommitTransactionHandler::_RemovePackagesToDeactivate()
 		}
 
 		// get a BEntry for the package
-		NotOwningEntryRef entryRef(fVolume->fPackagesDirectoryRef,
+		NotOwningEntryRef entryRef(fVolume->PackagesDirectoryRef(),
 			package->FileName());
 
 		BEntry entry;
@@ -386,7 +388,7 @@ CommitTransactionHandler::_AddPackagesToActivate()
 	// open packages directory
 	BDirectory packagesDirectory;
 	status_t error
-		= packagesDirectory.SetTo(&fVolume->fPackagesDirectoryRef);
+		= packagesDirectory.SetTo(&fVolume->PackagesDirectoryRef());
 	if (error != B_OK)
 		throw Exception(error, "failed to open packages directory");
 
@@ -426,7 +428,7 @@ CommitTransactionHandler::_AddPackagesToActivate()
 		}
 
 		// also add the package to the volume
-		fVolume->_AddPackage(package);
+		fVolume->State()->AddPackage(package);
 
 		_PreparePackageToActivate(package);
 	}
@@ -567,7 +569,7 @@ CommitTransactionHandler::_AddGlobalWritableFiles(Package* package)
 	// Open the root directory of the installation location where we will
 	// extract the files -- that's the volume's root directory.
 	BDirectory rootDirectory;
-	status_t error = rootDirectory.SetTo(&fVolume->fRootDirectoryRef);
+	status_t error = rootDirectory.SetTo(&fVolume->RootDirectoryRef());
 	if (error != B_OK) {
 		throw Exception(error,
 			BString().SetToFormat("failed to get the root directory "
@@ -577,7 +579,7 @@ CommitTransactionHandler::_AddGlobalWritableFiles(Package* package)
 
 	// Open writable-files directory in the administrative directory.
 	if (fWritableFilesDirectory.InitCheck() != B_OK) {
-		error = fVolume->_OpenPackagesSubDirectory(
+		error = _OpenPackagesSubDirectory(
 			RelativePath(kAdminDirectoryName, kWritableFilesDirectoryName),
 			true, fWritableFilesDirectory);
 
@@ -612,7 +614,7 @@ CommitTransactionHandler::_AddGlobalWritableFile(Package* package,
 	// Map the path name to the actual target location. Currently this only
 	// concerns "settings/", which is mapped to "settings/global/".
 	BString targetPath(file.Path());
-	if (fVolume->fMountType == PACKAGE_FS_MOUNT_TYPE_HOME) {
+	if (fVolume->MountType() == PACKAGE_FS_MOUNT_TYPE_HOME) {
 		if (targetPath == "settings"
 			|| targetPath.StartsWith("settings/")) {
 			targetPath.Insert("/global", 8);
@@ -944,13 +946,13 @@ CommitTransactionHandler::_RevertAddPackagesToActivate()
 			continue;
 		}
 
-		fVolume->_RemovePackage(package);
+		fVolume->State()->RemovePackage(package);
 
 		if (transactionDirectory.InitCheck() != B_OK)
 			continue;
 
 		// get BEntry for the package
-		NotOwningEntryRef entryRef(fVolume->fPackagesDirectoryRef,
+		NotOwningEntryRef entryRef(fVolume->PackagesDirectoryRef(),
 			package->FileName());
 
 		BEntry entry;
@@ -982,7 +984,7 @@ CommitTransactionHandler::_RevertRemovePackagesToDeactivate()
 	// open packages directory
 	BDirectory packagesDirectory;
 	status_t error
-		= packagesDirectory.SetTo(&fVolume->fPackagesDirectoryRef);
+		= packagesDirectory.SetTo(&fVolume->PackagesDirectoryRef());
 	if (error != B_OK) {
 		throw Exception(error, "failed to open packages directory");
 		ERROR("failed to open packages directory: %s\n",
@@ -1061,7 +1063,7 @@ void
 CommitTransactionHandler::_RunPostInstallScript(Package* package,
 	const BString& script)
 {
-	BDirectory rootDir(&fVolume->fRootDirectoryRef);
+	BDirectory rootDir(&fVolume->RootDirectoryRef());
 	BPath scriptPath(&rootDir, script);
 	status_t error = scriptPath.InitCheck();
 	if (error != B_OK) {
@@ -1080,15 +1082,6 @@ CommitTransactionHandler::_RunPostInstallScript(Package* package,
 			strerror(error));
 // TODO: Notify the user!
 	}
-}
-
-
-/*static*/ BString
-CommitTransactionHandler::_GetPath(const FSUtils::Entry& entry,
-	const BString& fallback)
-{
-	BString path = entry.Path();
-	return path.IsEmpty() ? fallback : path;
 }
 
 
@@ -1175,7 +1168,7 @@ CommitTransactionHandler::_ExtractPackageContent(Package* package,
 	createSubDirectoryOperation.Finished();
 
 	// extract
-	NotOwningEntryRef packageRef(fVolume->fPackagesDirectoryRef,
+	NotOwningEntryRef packageRef(fVolume->PackagesDirectoryRef(),
 		package->FileName());
 
 	int32 contentPathCount = contentPaths.CountStrings();
@@ -1219,6 +1212,266 @@ CommitTransactionHandler::_ExtractPackageContent(Package* package,
 	// keep the directory, regardless of whether the transaction is rolled
 	// back
 	createSubDirectoryOperation.Unregister();
+}
+
+
+status_t
+CommitTransactionHandler::_OpenPackagesSubDirectory(const RelativePath& path,
+	bool create, BDirectory& _directory)
+{
+	// open the packages directory
+	BDirectory directory;
+	status_t error = directory.SetTo(&fVolume->PackagesDirectoryRef());
+	if (error != B_OK) {
+		ERROR("CommitTransactionHandler::_OpenPackagesSubDirectory(): failed "
+			"to open packages directory: %s\n", strerror(error));
+		RETURN_ERROR(error);
+	}
+
+	return FSUtils::OpenSubDirectory(directory, path, create, _directory);
+}
+
+
+status_t
+CommitTransactionHandler::_OpenPackagesFile(
+	const RelativePath& subDirectoryPath, const char* fileName, uint32 openMode,
+	BFile& _file, BEntry* _entry)
+{
+	BDirectory directory;
+	if (!subDirectoryPath.IsEmpty()) {
+		status_t error = _OpenPackagesSubDirectory(subDirectoryPath,
+			(openMode & B_CREATE_FILE) != 0, directory);
+		if (error != B_OK) {
+			ERROR("CommitTransactionHandler::_OpenPackagesFile(): failed to "
+				"open packages subdirectory \"%s\": %s\n",
+				subDirectoryPath.ToString().String(), strerror(error));
+			RETURN_ERROR(error);
+		}
+	} else {
+		status_t error = directory.SetTo(&fVolume->PackagesDirectoryRef());
+		if (error != B_OK) {
+			ERROR("CommitTransactionHandler::_OpenPackagesFile(): failed to "
+				"open packages directory: %s\n", strerror(error));
+			RETURN_ERROR(error);
+		}
+	}
+
+	BEntry stackEntry;
+	BEntry& entry = _entry != NULL ? *_entry : stackEntry;
+	status_t error = entry.SetTo(&directory, fileName);
+	if (error != B_OK) {
+		ERROR("CommitTransactionHandler::_OpenPackagesFile(): failed to get "
+			"entry for file: %s", strerror(error));
+		RETURN_ERROR(error);
+	}
+
+	return _file.SetTo(&entry, openMode);
+}
+
+
+status_t
+CommitTransactionHandler::_WriteActivationFile(
+	const RelativePath& directoryPath, const char* fileName,
+	const PackageSet& toActivate, const PackageSet& toDeactivate,
+	BEntry& _entry)
+{
+	// create the content
+	BString activationFileContent;
+	status_t error = _CreateActivationFileContent(toActivate, toDeactivate,
+		activationFileContent);
+	if (error != B_OK)
+		return error;
+
+	// write the file
+	error = _WriteTextFile(directoryPath, fileName, activationFileContent,
+		_entry);
+	if (error != B_OK) {
+		ERROR("CommitTransactionHandler::_WriteActivationFile(): failed to "
+			"write activation file \"%s/%s\": %s\n",
+			directoryPath.ToString().String(), fileName, strerror(error));
+		return error;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+CommitTransactionHandler::_CreateActivationFileContent(
+	const PackageSet& toActivate, const PackageSet& toDeactivate,
+	BString& _content)
+{
+	BString activationFileContent;
+	for (PackageFileNameHashTable::Iterator it
+			= fVolume->State()->ByFileNameIterator();
+		Package* package = it.Next();) {
+		if (package->IsActive()
+			&& toDeactivate.find(package) == toDeactivate.end()) {
+			int32 length = activationFileContent.Length();
+			activationFileContent << package->FileName() << '\n';
+			if (activationFileContent.Length()
+					< length + package->FileName().Length() + 1) {
+				return B_NO_MEMORY;
+			}
+		}
+	}
+
+	for (PackageSet::const_iterator it = toActivate.begin();
+		it != toActivate.end(); ++it) {
+		Package* package = *it;
+		int32 length = activationFileContent.Length();
+		activationFileContent << package->FileName() << '\n';
+		if (activationFileContent.Length()
+				< length + package->FileName().Length() + 1) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	_content = activationFileContent;
+	return B_OK;
+}
+
+
+status_t
+CommitTransactionHandler::_WriteTextFile(const RelativePath& directoryPath,
+	const char* fileName, const BString& content, BEntry& _entry)
+{
+	BFile file;
+	status_t error = _OpenPackagesFile(directoryPath,
+		fileName, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE, file, &_entry);
+	if (error != B_OK) {
+		ERROR("CommitTransactionHandler::_WriteTextFile(): failed to create "
+			"file \"%s/%s\": %s\n", directoryPath.ToString().String(), fileName,
+			strerror(error));
+		return error;
+	}
+
+	ssize_t bytesWritten = file.Write(content.String(),
+		content.Length());
+	if (bytesWritten < 0) {
+		ERROR("CommitTransactionHandler::_WriteTextFile(): failed to write "
+			"file \"%s/%s\": %s\n", directoryPath.ToString().String(), fileName,
+			strerror(bytesWritten));
+		return bytesWritten;
+	}
+
+	return B_OK;
+}
+
+
+void
+CommitTransactionHandler::_ChangePackageActivation(
+	const PackageSet& packagesToActivate,
+	const PackageSet& packagesToDeactivate)
+{
+	INFORM("CommitTransactionHandler::_ChangePackageActivation(): activating "
+		"%zu, deactivating %zu packages\n", packagesToActivate.size(),
+		packagesToDeactivate.size());
+
+	// write the temporary package activation file
+	BEntry activationFileEntry;
+	status_t error = _WriteActivationFile(RelativePath(kAdminDirectoryName),
+		kTemporaryActivationFileName, packagesToActivate, packagesToDeactivate,
+		activationFileEntry);
+	if (error != B_OK)
+		throw Exception(error, "failed to write activation file");
+
+	// compute the size of the allocation we need for the activation change
+	// request
+	int32 itemCount = packagesToActivate.size() + packagesToDeactivate.size();
+	size_t requestSize = sizeof(PackageFSActivationChangeRequest)
+		+ itemCount * sizeof(PackageFSActivationChangeItem);
+
+	for (PackageSet::iterator it = packagesToActivate.begin();
+		 it != packagesToActivate.end(); ++it) {
+		requestSize += (*it)->FileName().Length() + 1;
+	}
+
+	for (PackageSet::iterator it = packagesToDeactivate.begin();
+		 it != packagesToDeactivate.end(); ++it) {
+		requestSize += (*it)->FileName().Length() + 1;
+	}
+
+	// allocate and prepare the request
+	PackageFSActivationChangeRequest* request
+		= (PackageFSActivationChangeRequest*)malloc(requestSize);
+	if (request == NULL)
+		throw Exception(B_NO_MEMORY);
+	MemoryDeleter requestDeleter(request);
+
+	request->itemCount = itemCount;
+
+	PackageFSActivationChangeItem* item = &request->items[0];
+	char* nameBuffer = (char*)(item + itemCount);
+
+	for (PackageSet::iterator it = packagesToActivate.begin();
+		it != packagesToActivate.end(); ++it, item++) {
+		_FillInActivationChangeItem(item, PACKAGE_FS_ACTIVATE_PACKAGE, *it,
+			nameBuffer);
+	}
+
+	for (PackageSet::iterator it = packagesToDeactivate.begin();
+		it != packagesToDeactivate.end(); ++it, item++) {
+		_FillInActivationChangeItem(item, PACKAGE_FS_DEACTIVATE_PACKAGE, *it,
+			nameBuffer);
+	}
+
+	// issue the request
+	int fd = fVolume->OpenRootDirectory();
+	if (fd < 0)
+		throw Exception(fd, "failed to open root directory");
+	FileDescriptorCloser fdCloser(fd);
+
+	if (ioctl(fd, PACKAGE_FS_OPERATION_CHANGE_ACTIVATION, request, requestSize)
+			!= 0) {
+// TODO: We need more error information and error handling!
+		throw Exception(errno, "ioctl() to de-/activate packages failed");
+	}
+
+	// rename the temporary activation file to the final file
+	error = activationFileEntry.Rename(kActivationFileName, true);
+	if (error != B_OK) {
+		throw Exception(error,
+			"failed to rename temporary activation file to final file");
+// TODO: We should probably try to reverse the activation changes, though that
+// will fail, if this method has been called in response to node monitoring
+// events. Alternatively moving the package activation file could be made part
+// of the ioctl(), since packagefs should be able to undo package changes until
+// the very end, unless running out of memory. In the end the situation would be
+// bad anyway, though, since the activation file may refer to removed packages
+// and things would be in an inconsistent state after rebooting.
+	}
+
+	// Update our state, i.e. remove deactivated packages and mark activated
+	// packages accordingly.
+	fVolume->State()->ActivationChanged(packagesToActivate,
+		packagesToDeactivate);
+}
+
+
+void
+CommitTransactionHandler::_FillInActivationChangeItem(
+	PackageFSActivationChangeItem* item, PackageFSActivationChangeType type,
+	Package* package, char*& nameBuffer)
+{
+	item->type = type;
+	item->packageDeviceID = package->NodeRef().device;
+	item->packageNodeID = package->NodeRef().node;
+	item->nameLength = package->FileName().Length();
+	item->parentDeviceID = fVolume->PackagesDeviceID();
+	item->parentDirectoryID = fVolume->PackagesDirectoryID();
+	item->name = nameBuffer;
+	strcpy(nameBuffer, package->FileName());
+	nameBuffer += package->FileName().Length() + 1;
+}
+
+
+/*static*/ BString
+CommitTransactionHandler::_GetPath(const FSUtils::Entry& entry,
+	const BString& fallback)
+{
+	BString path = entry.Path();
+	return path.IsEmpty() ? fallback : path;
 }
 
 

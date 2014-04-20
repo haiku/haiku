@@ -111,6 +111,9 @@ public:
 			void				SetRoot(Root* root)
 									{ fRoot = root; }
 
+			VolumeState*		State() const
+									{ return fState; }
+
 			PackageFileNameHashTable::Iterator PackagesByFileNameIterator()
 									const;
 
@@ -140,8 +143,6 @@ public:
 private:
 			struct NodeMonitorEvent;
 
-			friend class CommitTransactionHandler;
-
 			typedef FSUtils::RelativePath RelativePath;
 			typedef DoublyLinkedList<NodeMonitorEvent> NodeMonitorEventList;
 
@@ -155,14 +156,6 @@ private:
 			void				_PackagesEntryCreated(const char* name);
 			void				_PackagesEntryRemoved(const char* name);
 
-			void				_FillInActivationChangeItem(
-									PackageFSActivationChangeItem* item,
-									PackageFSActivationChangeType type,
-									Package* package, char*& nameBuffer);
-
-			void				_AddPackage(Package* package);
-			void				_RemovePackage(Package* package);
-
 			status_t			_ReadPackagesDirectory();
 			status_t			_GetActivePackages(int fd);
 
@@ -170,42 +163,12 @@ private:
 									BSolverRepository& repository,
 							 		bool activeOnly, bool installed);
 
-			status_t			_OpenPackagesFile(
-									const RelativePath& subDirectoryPath,
-									const char* fileName, uint32 openMode,
-									BFile& _file, BEntry* _entry = NULL);
 			status_t			_OpenPackagesSubDirectory(
 									const RelativePath& path, bool create,
 									BDirectory& _directory);
 
 			status_t			_OpenSettingsRootDirectory(
 									BDirectory& _directory);
-
-			status_t			_CreateActivationFileContent(
-									const PackageSet& toActivate,
-									const PackageSet& toDeactivate,
-									BString& _content);
-			status_t			_WriteActivationFile(
-									const RelativePath& directoryPath,
-									const char* fileName,
-									const PackageSet& toActivate,
-									const PackageSet& toDeactivate,
-									BEntry& _entry);
-
-			status_t			_WriteTextFile(
-									const RelativePath& directoryPath,
-									const char* fileName,
-									const BString& content, BEntry& _entry);
-
-			void				_ChangePackageActivation(
-									const PackageSet& packagesToActivate,
-									const PackageSet& packagesToDeactivate);
-									// throws Exception
-
-			status_t			_ExtractPackageContent(Package* package,
-									const char* contentPath,
-									BDirectory& targetDirectory,
-									BDirectory& _extractedFilesDirectory);
 
 private:
 			BString				fPath;

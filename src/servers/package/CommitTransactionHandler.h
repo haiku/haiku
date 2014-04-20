@@ -80,13 +80,44 @@ private:
 			void				_RunPostInstallScript(Package* package,
 									const BString& script);
 
-	static	BString				_GetPath(const FSUtils::Entry& entry,
-									const BString& fallback);
-
 			void				_ExtractPackageContent(Package* package,
 									const BStringList& contentPaths,
 									BDirectory& targetDirectory,
 									BDirectory& _extractedFilesDirectory);
+
+			status_t			_OpenPackagesSubDirectory(
+									const RelativePath& path, bool create,
+									BDirectory& _directory);
+			status_t			_OpenPackagesFile(
+									const RelativePath& subDirectoryPath,
+									const char* fileName, uint32 openMode,
+									BFile& _file, BEntry* _entry = NULL);
+
+			status_t			_WriteActivationFile(
+									const RelativePath& directoryPath,
+									const char* fileName,
+									const PackageSet& toActivate,
+									const PackageSet& toDeactivate,
+									BEntry& _entry);
+			status_t			_CreateActivationFileContent(
+									const PackageSet& toActivate,
+									const PackageSet& toDeactivate,
+									BString& _content);
+			status_t			_WriteTextFile(
+									const RelativePath& directoryPath,
+									const char* fileName,
+									const BString& content, BEntry& _entry);
+			void				_ChangePackageActivation(
+									const PackageSet& packagesToActivate,
+									const PackageSet& packagesToDeactivate);
+									// throws Exception
+			void				_FillInActivationChangeItem(
+									PackageFSActivationChangeItem* item,
+									PackageFSActivationChangeType type,
+									Package* package, char*& nameBuffer);
+
+	static	BString				_GetPath(const FSUtils::Entry& entry,
+									const BString& fallback);
 
 	static	status_t			_TagPackageEntriesRecursively(
 									BDirectory& directory, const BString& value,
