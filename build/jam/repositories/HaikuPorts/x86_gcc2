@@ -262,8 +262,8 @@ RemotePackageRepository HaikuPorts
 	giflib_x86_devel-5.0.5-2
 	glib2_x86-2.38.1-1
 	glib2_x86_devel-2.38.1-1
-	glu_x86-9.0.0-3
-	glu_x86_devel-9.0.0-3
+	glu_x86-9.0.0-4
+	glu_x86_devel-9.0.0-4
 	goonies_x86-1.4.1528-1
 	guilib_x86-1.2.1-1
 	guilib_x86_devel-1.2.1-1
