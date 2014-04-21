@@ -33,8 +33,9 @@ m68k-*)
 	gccConfigureArgs="--enable-multilib"
 	;;
 arm-*)
-	binutilsConfigureArgs="--enable-multilib"
-	gccConfigureArgs="--enable-multilib"
+	# Multilib creates a lot of confusion as the wrong libs end up being linked.
+	binutilsConfigureArgs="--disable-multilib --with-float=hard"
+	gccConfigureArgs="--disable-multilib --with-float=hard"
 	;;
 *)
 	binutilsConfigureArgs="--disable-multilib"
