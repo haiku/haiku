@@ -1259,8 +1259,9 @@ BTextControl::_ValidateLayoutData()
 	font_height& fh = fLayoutData->font_info;
 	GetFontHeight(&fh);
 
-	if (Label() != NULL) {
-		fLayoutData->label_width = ceilf(StringWidth(Label()));
+	const char* label = Label();
+	if (label != NULL) {
+		fLayoutData->label_width = ceilf(StringWidth(label));
 		fLayoutData->label_height = ceilf(fh.ascent) + ceilf(fh.descent);
 	} else {
 		fLayoutData->label_width = 0;
