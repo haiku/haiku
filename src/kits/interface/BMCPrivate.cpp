@@ -262,7 +262,6 @@ _BMCMenuBar_::MinSize()
 {
 	BSize size;
 	BMenuBar::GetPreferredSize(&size.width, &size.height);
-
 	if (fShowPopUpMarker) {
 		// account for popup indicator + a few pixels margin
 		size.width += kPopUpIndicatorWidth;
@@ -279,6 +278,7 @@ _BMCMenuBar_::MaxSize()
 	// limited.
 	BSize size;
 	BMenuBar::GetPreferredSize(&size.width, &size.height);
+
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 }
 

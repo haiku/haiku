@@ -845,6 +845,7 @@ BMenuField::CreateMenuBarLayoutItem()
 			B_ALIGN_VERTICAL_UNSET));
 		fLayoutData->menu_bar_layout_item = new MenuBarLayoutItem(this);
 	}
+
 	return fLayoutData->menu_bar_layout_item;
 }
 
@@ -857,22 +858,27 @@ BMenuField::Perform(perform_code code, void* _data)
 			((perform_data_min_size*)_data)->return_value
 				= BMenuField::MinSize();
 			return B_OK;
+
 		case PERFORM_CODE_MAX_SIZE:
 			((perform_data_max_size*)_data)->return_value
 				= BMenuField::MaxSize();
 			return B_OK;
+
 		case PERFORM_CODE_PREFERRED_SIZE:
 			((perform_data_preferred_size*)_data)->return_value
 				= BMenuField::PreferredSize();
 			return B_OK;
+
 		case PERFORM_CODE_LAYOUT_ALIGNMENT:
 			((perform_data_layout_alignment*)_data)->return_value
 				= BMenuField::LayoutAlignment();
 			return B_OK;
+
 		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
 			((perform_data_has_height_for_width*)_data)->return_value
 				= BMenuField::HasHeightForWidth();
 			return B_OK;
+
 		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
 		{
 			perform_data_get_height_for_width* data
@@ -881,12 +887,14 @@ BMenuField::Perform(perform_code code, void* _data)
 				&data->preferred);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
 			BMenuField::SetLayout(data->layout);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
 			perform_data_layout_invalidated* data
@@ -894,24 +902,25 @@ BMenuField::Perform(perform_code code, void* _data)
 			BMenuField::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_DO_LAYOUT:
 		{
 			BMenuField::DoLayout();
 			return B_OK;
 		}
+
 		case PERFORM_CODE_ALL_UNARCHIVED:
 		{
 			perform_data_all_unarchived* data
 				= (perform_data_all_unarchived*)_data;
-
 			data->return_value = BMenuField::AllUnarchived(data->archive);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_ALL_ARCHIVED:
 		{
 			perform_data_all_archived* data
 				= (perform_data_all_archived*)_data;
-
 			data->return_value = BMenuField::AllArchived(data->archive);
 			return B_OK;
 		}
@@ -952,6 +961,7 @@ BMenuField::DoLayout()
 	BSize size(Bounds().Size());
 	if (size.width < fLayoutData->min.width)
 		size.width = fLayoutData->min.width;
+
 	if (size.height < fLayoutData->min.height)
 		size.height = fLayoutData->min.height;
 
@@ -1104,6 +1114,7 @@ BMenuField::_DrawMenuBar(BRect updateRect)
 	uint32 flags = 0;
 	if (!IsEnabled())
 		flags |= BControlLook::B_DISABLED;
+
 	if (IsFocus() && Window()->IsActive())
 		flags |= BControlLook::B_FOCUSED;
 
@@ -1307,6 +1318,7 @@ BMenuField::_ValidateLayoutData()
 
 	if (divider > 0)
 		min.width += divider;
+
 	if (fLayoutData->label_height > min.height)
 		min.height = fLayoutData->label_height;
 
@@ -1415,7 +1427,7 @@ BMenuField::LabelLayoutItem::BaseMinSize()
 {
 	fParent->_ValidateLayoutData();
 
-	if (!fParent->Label())
+	if (fParent->Label() == NULL)
 		return BSize(-1, -1);
 
 	return BSize(fParent->fLayoutData->label_width + 5,
@@ -1462,6 +1474,7 @@ BMenuField::LabelLayoutItem::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "BMenuField::LabelLayoutItem"))
 		return new LabelLayoutItem(from);
+
 	return NULL;
 }
 
@@ -1551,6 +1564,7 @@ BMenuField::MenuBarLayoutItem::BaseMaxSize()
 {
 	BSize size(BaseMinSize());
 	size.width = B_SIZE_UNLIMITED;
+
 	return size;
 }
 
