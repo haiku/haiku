@@ -974,8 +974,10 @@ BMenuField::DoLayout()
 		// We have valid layout items, they define the divider location.
 		divider = fLayoutData->menu_bar_layout_item->Frame().left
 			- fLayoutData->label_layout_item->Frame().left;
-	} else if (fLayoutData->label_width > 0)
-		divider = fLayoutData->label_width + 5;
+	} else if (fLayoutData->label_width > 0) {
+		divider = fLayoutData->label_width
+			+ be_control_look->DefaultLabelSpacing();
+	}
 
 	// menu bar
 	BRect dirty(fMenuBar->Frame());
@@ -1295,8 +1297,10 @@ BMenuField::_ValidateLayoutData()
 
 	// compute the minimal divider
 	float divider = 0;
-	if (fLayoutData->label_width > 0)
-		divider = fLayoutData->label_width + 5;
+	if (fLayoutData->label_width > 0) {
+		divider = fLayoutData->label_width
+			+ be_control_look->DefaultLabelSpacing();
+	}
 
 	// If we shan't do real layout, we let the current divider take influence.
 	if ((Flags() & B_SUPPORTS_LAYOUT) == 0)
@@ -1430,7 +1434,8 @@ BMenuField::LabelLayoutItem::BaseMinSize()
 	if (fParent->Label() == NULL)
 		return BSize(-1, -1);
 
-	return BSize(fParent->fLayoutData->label_width + 5,
+	return BSize(fParent->fLayoutData->label_width
+			+ be_control_look->DefaultLabelSpacing(),
 		fParent->fLayoutData->label_height);
 }
 
