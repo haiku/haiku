@@ -84,6 +84,8 @@ options:
                               first occurrence specifies the primary
                               architecture of the Haiku to build, subsequent
                               ones the secondary architectures.
+  --target-board <board>      ARM only: Specify the board to build for. Must be
+                              one of beagle,pi,verdex.
   --update                    re-runs last configure invocation [must be given
                               as first option!]
   --use-clang                 Build with host Clang instead of GCC cross
@@ -496,6 +498,7 @@ HOST_SHA256=
 HOST_HAIKU_PORTER=
 HAIKU_PORTS=
 HAIKU_PORTS_CROSS=
+HAIKU_BOOT_BOARD=
 
 HAIKU_PACKAGING_ARCHS=
 
@@ -522,6 +525,11 @@ supportedTargetArchs="
 	x86
 	x86_64
 	x86_gcc2
+	"
+supportedTargetBoards="
+	beagle
+	pi
+	verdex
 	"
 
 # determine output directory
@@ -635,6 +643,15 @@ while [ $# -gt 0 ] ; do
 				exit 1
 			)
 			haikuTargetArchs="$haikuTargetArchs $targetArch"
+			;;
+		--target-board)
+			assertparam "$1" $#
+			HAIKU_BOOT_BOARD=$2
+			is_in_list "$HAIKU_BOOT_BOARD" "$supportedTargetBoards" || (
+				echo "Unsupported target board: \"$HAIKU_BOOT_BOARD\"" >&2
+				exit 1
+			)
+			shift 2
 			;;
 		--use-clang) useClang=1; shift 1;;
 		--use-gcc-pipe)	HAIKU_USE_GCC_PIPE=1; shift 1;;
@@ -889,6 +906,7 @@ HAIKU_PACKAGING_ARCHS		?= ${HAIKU_PACKAGING_ARCHS} ;
 HAIKU_BUILD_ATTRIBUTES_DIR	?= ${HAIKU_BUILD_ATTRIBUTES_DIR} ;
 
 HAIKU_NASM					?= ${HAIKU_NASM} ;
+HAIKU_BOOT_BOARD			?= ${HAIKU_BOOT_BOARD} ;
 
 HOST_EXTENDED_REGEX_SED		?= ${HOST_EXTENDED_REGEX_SED} ;
 HOST_GCC_RAW_VERSION		?= ${HOST_GCC_RAW_VERSION} ;
