@@ -207,7 +207,7 @@ struct BMenu::LayoutData {
 };
 
 
-// #pragma mark -
+// #pragma mark - BMenu
 
 
 BMenu::BMenu(const char* name, menu_layout layout)
@@ -326,9 +326,6 @@ BMenu::~BMenu()
 }
 
 
-// #pragma mark -
-
-
 BArchivable*
 BMenu::Instantiate(BMessage* archive)
 {
@@ -377,9 +374,6 @@ BMenu::Archive(BMessage* data, bool deep) const
 }
 
 
-// #pragma mark -
-
-
 void
 BMenu::AttachedToWindow()
 {
@@ -420,9 +414,6 @@ BMenu::AllDetached()
 {
 	BView::AllDetached();
 }
-
-
-// #pragma mark -
 
 
 void
@@ -593,16 +584,14 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 }
 
 
-// #pragma mark -
-
-
 BSize
 BMenu::MinSize()
 {
 	_ValidatePreferredSize();
 
-	BSize size = (GetLayout() ? GetLayout()->MinSize()
+	BSize size = (GetLayout() != NULL ? GetLayout()->MinSize()
 		: fLayoutData->preferred);
+
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
@@ -612,8 +601,9 @@ BMenu::MaxSize()
 {
 	_ValidatePreferredSize();
 
-	BSize size = (GetLayout() ? GetLayout()->MaxSize()
+	BSize size = (GetLayout() != NULL ? GetLayout()->MaxSize()
 		: fLayoutData->preferred);
+
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 }
 
@@ -623,8 +613,9 @@ BMenu::PreferredSize()
 {
 	_ValidatePreferredSize();
 
-	BSize size = (GetLayout() ? GetLayout()->PreferredSize()
+	BSize size = (GetLayout() != NULL ? GetLayout()->PreferredSize()
 		: fLayoutData->preferred);
+
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
 }
 
@@ -636,6 +627,7 @@ BMenu::GetPreferredSize(float* _width, float* _height)
 
 	if (_width)
 		*_width = fLayoutData->preferred.width;
+
 	if (_height)
 		*_height = fLayoutData->preferred.height;
 }
@@ -653,7 +645,7 @@ BMenu::DoLayout()
 {
 	// If the user set a layout, we let the base class version call its
 	// hook.
-	if (GetLayout()) {
+	if (GetLayout() != NULL) {
 		BView::DoLayout();
 		return;
 	}
@@ -686,9 +678,6 @@ BMenu::InvalidateLayout()
 	// BView::InvalidateLayout() for good measure. Don't delete this method!
 	BView::InvalidateLayout(false);
 }
-
-
-// #pragma mark -
 
 
 void
@@ -725,6 +714,7 @@ BMenu::AddItem(BMenuItem* item, int32 index)
 		}
 		UnlockLooper();
 	}
+
 	return true;
 }
 
@@ -1151,9 +1141,6 @@ BMenu::Superitem() const
 }
 
 
-// #pragma mark -
-
-
 BHandler*
 BMenu::ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier,
 	int32 form, const char* property)
@@ -1228,22 +1215,27 @@ BMenu::Perform(perform_code code, void* _data)
 			((perform_data_min_size*)_data)->return_value
 				= BMenu::MinSize();
 			return B_OK;
+
 		case PERFORM_CODE_MAX_SIZE:
 			((perform_data_max_size*)_data)->return_value
 				= BMenu::MaxSize();
 			return B_OK;
+
 		case PERFORM_CODE_PREFERRED_SIZE:
 			((perform_data_preferred_size*)_data)->return_value
 				= BMenu::PreferredSize();
 			return B_OK;
+
 		case PERFORM_CODE_LAYOUT_ALIGNMENT:
 			((perform_data_layout_alignment*)_data)->return_value
 				= BMenu::LayoutAlignment();
 			return B_OK;
+
 		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
 			((perform_data_has_height_for_width*)_data)->return_value
 				= BMenu::HasHeightForWidth();
 			return B_OK;
+
 		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
 		{
 			perform_data_get_height_for_width* data
@@ -1252,12 +1244,14 @@ BMenu::Perform(perform_code code, void* _data)
 				&data->preferred);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
 			BMenu::SetLayout(data->layout);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
 			perform_data_layout_invalidated* data
@@ -1265,6 +1259,7 @@ BMenu::Perform(perform_code code, void* _data)
 			BMenu::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_DO_LAYOUT:
 		{
 			BMenu::DoLayout();
@@ -1276,8 +1271,11 @@ BMenu::Perform(perform_code code, void* _data)
 }
 
 
+// #pragma mark - BMenu protected methods
+
+
 BMenu::BMenu(BRect frame, const char* name, uint32 resizingMode, uint32 flags,
-		menu_layout layout, bool resizeToFit)
+	menu_layout layout, bool resizeToFit)
 	:
 	BView(frame, name, resizingMode, flags),
 	fChosenItem(NULL),
@@ -1324,10 +1322,13 @@ BMenu::GetItemMargins(float* _left, float* _top, float* _right,
 {
 	if (_left != NULL)
 		*_left = fPad.left;
+
 	if (_top != NULL)
 		*_top = fPad.top;
+
 	if (_right != NULL)
 		*_right = fPad.right;
+
 	if (_bottom != NULL)
 		*_bottom = fPad.bottom;
 }
@@ -1389,6 +1390,9 @@ BMenu::Track(bool sticky, BRect* clickToOpenRect)
 }
 
 
+// #pragma mark - BMenu private methods
+
+
 bool
 BMenu::AddDynamicItem(add_state state)
 {
@@ -1405,14 +1409,17 @@ BMenu::DrawBackground(BRect updateRect)
 		uint32 flags = 0;
 		if (!IsEnabled())
 			flags |= BControlLook::B_DISABLED;
+
 		if (IsFocus())
 			flags |= BControlLook::B_FOCUSED;
+
 		BRect rect = Bounds();
 		uint32 borders = BControlLook::B_LEFT_BORDER
 			| BControlLook::B_RIGHT_BORDER;
 		if (Window() != NULL && Parent() != NULL) {
 			if (Parent()->Frame().top == Window()->Bounds().top)
 				borders |= BControlLook::B_TOP_BORDER;
+
 			if (Parent()->Frame().bottom == Window()->Bounds().bottom)
 				borders |= BControlLook::B_BOTTOM_BORDER;
 		} else {
@@ -1980,9 +1987,6 @@ BMenu::_UpdateStateClose(BMenuItem* item, const BPoint& where,
 }
 
 
-// #pragma mark -
-
-
 bool
 BMenu::_AddItem(BMenuItem* item, int32 index)
 {
@@ -2128,7 +2132,6 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	fLayoutData->lastResizingMode = ResizingMode();
 
 	BRect frame;
-
 	switch (fLayout) {
 		case B_ITEMS_IN_COLUMN:
 		{
@@ -2139,9 +2142,11 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 				overrideFrame = &parentFrame;
 			}
 
-			_ComputeColumnLayout(index, bestFit, moveItems, overrideFrame, frame);
+			_ComputeColumnLayout(index, bestFit, moveItems, overrideFrame,
+				frame);
 			break;
 		}
+
 		case B_ITEMS_IN_ROW:
 			_ComputeRowLayout(index, bestFit, moveItems, frame);
 			break;
@@ -2188,34 +2193,40 @@ void
 BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 	BRect* overrideFrame, BRect& frame)
 {
-	BFont font;
-	GetFont(&font);
 	bool command = false;
 	bool control = false;
 	bool shift = false;
 	bool option = false;
+
 	if (index > 0)
 		frame = ItemAt(index - 1)->Frame();
-	else if (overrideFrame != NULL) {
+	else if (overrideFrame != NULL)
 		frame.Set(0, 0, overrideFrame->right, -1);
-	} else
+	else
 		frame.Set(0, 0, 0, -1);
+
+	BFont font;
+	GetFont(&font);
 
 	for (; index < fItems.CountItems(); index++) {
 		BMenuItem* item = ItemAt(index);
 
-		float width, height;
+		float width;
+		float height;
 		item->GetContentSize(&width, &height);
 
 		if (item->fModifiers && item->fShortcutChar) {
 			width += font.Size();
-			if (item->fModifiers & B_COMMAND_KEY)
+			if ((item->fModifiers & B_COMMAND_KEY) != 0)
 				command = true;
-			if (item->fModifiers & B_CONTROL_KEY)
+
+			if ((item->fModifiers & B_CONTROL_KEY) != 0)
 				control = true;
-			if (item->fModifiers & B_SHIFT_KEY)
+
+			if ((item->fModifiers & B_SHIFT_KEY) != 0)
 				shift = true;
-			if (item->fModifiers & B_OPTION_KEY)
+
+			if ((item->fModifiers & B_OPTION_KEY) != 0)
 				option = true;
 		}
 
@@ -2231,14 +2242,22 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 		frame.bottom = item->fBounds.bottom;
 	}
 
-	if (command)
-		frame.right += BPrivate::MenuPrivate::MenuItemCommand()->Bounds().Width() + 1;
-	if (control)
-		frame.right += BPrivate::MenuPrivate::MenuItemControl()->Bounds().Width() + 1;
-	if (option)
-		frame.right += BPrivate::MenuPrivate::MenuItemOption()->Bounds().Width() + 1;
-	if (shift)
-		frame.right += BPrivate::MenuPrivate::MenuItemShift()->Bounds().Width() + 1;
+	if (command) {
+		frame.right
+			+= BPrivate::MenuPrivate::MenuItemCommand()->Bounds().Width() + 1;
+	}
+	if (control) {
+		frame.right
+			+= BPrivate::MenuPrivate::MenuItemControl()->Bounds().Width() + 1;
+	}
+	if (option) {
+		frame.right
+			+= BPrivate::MenuPrivate::MenuItemOption()->Bounds().Width() + 1;
+	}
+	if (shift) {
+		frame.right
+			+= BPrivate::MenuPrivate::MenuItemShift()->Bounds().Width() + 1;
+	}
 
 	if (fMaxContentWidth > 0)
 		frame.right = min_c(frame.right, fMaxContentWidth);
@@ -3005,7 +3024,7 @@ BMenu::_QuitTracking(bool onlyThis)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - menu_info functions
 
 
 // TODO: Maybe the following two methods would fit better into
