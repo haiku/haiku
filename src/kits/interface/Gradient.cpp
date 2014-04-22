@@ -305,6 +305,10 @@ BGradient::SetColorStops(const BGradient& other)
 int32
 BGradient::AddColor(const rgb_color& color, float offset)
 {
+	// Out of bounds stops would crash the app_server
+	if (offset < 0.f || offset > 255.f)
+		return -1;
+
 	// find the correct index (sorted by offset)
 	ColorStop* stop = new ColorStop(color, offset);
 	int32 index = 0;
