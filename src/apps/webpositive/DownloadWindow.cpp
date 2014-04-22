@@ -406,6 +406,8 @@ DownloadWindow::_DownloadStarted(BWebDownload* download)
 	SetWorkspaces(B_CURRENT_WORKSPACE);
 	if (IsHidden())
 		Show();
+
+	Activate(true);
 }
 
 
