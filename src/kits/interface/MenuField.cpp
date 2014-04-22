@@ -1270,7 +1270,8 @@ BMenuField::_InitMenuBar(const BMessage* archive)
 
 	bool dmark = false;
 	archive->FindBool("be:dmark", &dmark);
-	if (_BMCMenuBar_* menuBar = dynamic_cast<_BMCMenuBar_*>(fMenuBar))
+	_BMCMenuBar_* menuBar = dynamic_cast<_BMCMenuBar_*>(fMenuBar);
+	if (menuBar != NULL)
 		menuBar->TogglePopUpMarker(dmark);
 }
 
