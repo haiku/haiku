@@ -148,11 +148,11 @@ struct BTextControl::LayoutData {
 };
 
 
-// #pragma mark -
-
-
 static const int32 kFrameMargin = 2;
 static const int32 kLabelInputSpacing = 3;
+
+
+// #pragma mark - BTextControl
 
 
 BTextControl::BTextControl(BRect frame, const char* name, const char* label,
@@ -347,7 +347,7 @@ BTextControl::Invoke(BMessage *message)
 }
 
 
-BTextView *
+BTextView*
 BTextControl::TextView() const
 {
 	return fText;
@@ -385,9 +385,10 @@ BTextControl::SetAlignment(alignment labelAlignment, alignment textAlignment)
 void
 BTextControl::GetAlignment(alignment* _label, alignment* _text) const
 {
-	if (_label)
+	if (_label != NULL)
 		*_label = fLabelAlign;
-	if (_text)
+
+	if (_text != NULL)
 		*_text = fText->Alignment();
 }
 
@@ -659,7 +660,7 @@ BTextControl::MessageReceived(BMessage *message)
 					reply.AddString("result", fText->Text());
 					handled = true;
 				} else {
-					const char *value = NULL;
+					const char* value = NULL;
 					// B_SET_PROPERTY
 					if (message->FindString("data", &value) == B_OK) {
 						fText->SetText(value);
@@ -680,10 +681,9 @@ BTextControl::MessageReceived(BMessage *message)
 }
 
 
-BHandler *
-BTextControl::ResolveSpecifier(BMessage *message, int32 index,
-										 BMessage *specifier, int32 what,
-										 const char *property)
+BHandler*
+BTextControl::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
 {
 	BPropertyInfo propInfo(sPropertyList);
 
@@ -696,23 +696,24 @@ BTextControl::ResolveSpecifier(BMessage *message, int32 index,
 
 
 status_t
-BTextControl::GetSupportedSuites(BMessage *data)
+BTextControl::GetSupportedSuites(BMessage* data)
 {
 	return BControl::GetSupportedSuites(data);
 }
 
 
 void
-BTextControl::MouseUp(BPoint pt)
+BTextControl::MouseUp(BPoint point)
 {
-	BControl::MouseUp(pt);
+	BControl::MouseUp(point);
 }
 
 
 void
-BTextControl::MouseMoved(BPoint pt, uint32 code, const BMessage *msg)
+BTextControl::MouseMoved(BPoint point, uint32 transit,
+	const BMessage* dragMessage)
 {
-	BControl::MouseMoved(pt, code, msg);
+	BControl::MouseMoved(point, transit, dragMessage);
 }
 
 
@@ -866,6 +867,7 @@ BTextControl::CreateLabelLayoutItem()
 {
 	if (!fLayoutData->label_layout_item)
 		fLayoutData->label_layout_item = new LabelLayoutItem(this);
+
 	return fLayoutData->label_layout_item;
 }
 
@@ -875,6 +877,7 @@ BTextControl::CreateTextViewLayoutItem()
 {
 	if (!fLayoutData->text_view_layout_item)
 		fLayoutData->text_view_layout_item = new TextViewLayoutItem(this);
+
 	return fLayoutData->text_view_layout_item;
 }
 
@@ -910,6 +913,7 @@ BTextControl::DoLayout()
 	BSize size(Bounds().Size());
 	if (size.width < fLayoutData->min.width)
 		size.width = fLayoutData->min.width;
+
 	if (size.height < fLayoutData->min.height)
 		size.height = fLayoutData->min.height;
 
@@ -954,7 +958,7 @@ BTextControl::SetIcon(const BBitmap* icon, uint32 flags)
 }
 
 
-// #pragma mark -
+// #pragma mark - BTextControl private methods
 
 
 status_t
@@ -965,22 +969,27 @@ BTextControl::Perform(perform_code code, void* _data)
 			((perform_data_min_size*)_data)->return_value
 				= BTextControl::MinSize();
 			return B_OK;
+
 		case PERFORM_CODE_MAX_SIZE:
 			((perform_data_max_size*)_data)->return_value
 				= BTextControl::MaxSize();
 			return B_OK;
+
 		case PERFORM_CODE_PREFERRED_SIZE:
 			((perform_data_preferred_size*)_data)->return_value
 				= BTextControl::PreferredSize();
 			return B_OK;
+
 		case PERFORM_CODE_LAYOUT_ALIGNMENT:
 			((perform_data_layout_alignment*)_data)->return_value
 				= BTextControl::LayoutAlignment();
 			return B_OK;
+
 		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
 			((perform_data_has_height_for_width*)_data)->return_value
 				= BTextControl::HasHeightForWidth();
 			return B_OK;
+
 		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
 		{
 			perform_data_get_height_for_width* data
@@ -989,12 +998,14 @@ BTextControl::Perform(perform_code code, void* _data)
 				&data->preferred);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
 			BTextControl::SetLayout(data->layout);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
 			perform_data_layout_invalidated* data
@@ -1002,29 +1013,31 @@ BTextControl::Perform(perform_code code, void* _data)
 			BTextControl::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_DO_LAYOUT:
 		{
 			BTextControl::DoLayout();
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_ICON:
 		{
 			perform_data_set_icon* data = (perform_data_set_icon*)_data;
 			return BTextControl::SetIcon(data->icon, data->flags);
 		}
+
 		case PERFORM_CODE_ALL_UNARCHIVED:
 		{
 			perform_data_all_unarchived* data
 				= (perform_data_all_unarchived*)_data;
-
 			data->return_value = BTextControl::AllUnarchived(data->archive);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_ALL_ARCHIVED:
 		{
 			perform_data_all_archived* data
 				= (perform_data_all_archived*)_data;
-
 			data->return_value = BTextControl::AllArchived(data->archive);
 			return B_OK;
 		}
@@ -1040,7 +1053,7 @@ void BTextControl::_ReservedTextControl3() {}
 void BTextControl::_ReservedTextControl4() {}
 
 
-BTextControl &
+BTextControl&
 BTextControl::operator=(const BTextControl&)
 {
 	return *this;
@@ -1065,9 +1078,9 @@ BTextControl::_UpdateTextViewColors(bool enabled)
 
 	fText->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
-	if (enabled) {
+	if (enabled)
 		color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-	} else {
+	else {
 		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			B_LIGHTEN_2_TINT);
 	}
@@ -1220,10 +1233,11 @@ BTextControl::_UpdateFrame()
 			fDivider = 0;
 		}
 
+		// update our frame
 		MoveTo(frame.left, frame.top);
-		BSize oldSize = Bounds().Size();
+		BSize oldSize(Bounds().Size());
 		ResizeTo(frame.Width(), frame.Height());
-		BSize newSize = Bounds().Size();
+		BSize newSize(Bounds().Size());
 
 		// If the size changes, ResizeTo() will trigger a relayout, otherwise
 		// we need to do that explicitly.
@@ -1276,6 +1290,7 @@ BTextControl::_ValidateLayoutData()
 
 	if (divider > 0)
 		min.width += divider;
+
 	if (fLayoutData->label_height > min.height)
 		min.height = fLayoutData->label_height;
 
@@ -1288,7 +1303,7 @@ BTextControl::_ValidateLayoutData()
 }
 
 
-// #pragma mark -
+// #pragma mark - BTextControl::LabelLayoutItem
 
 
 BTextControl::LabelLayoutItem::LabelLayoutItem(BTextControl* parent)
@@ -1415,7 +1430,7 @@ BTextControl::LabelLayoutItem::Instantiate(BMessage* from)
 }
 
 
-// #pragma mark -
+// #pragma mark - BTextControl::TextViewLayoutItem
 
 
 BTextControl::TextViewLayoutItem::TextViewLayoutItem(BTextControl* parent)
@@ -1500,6 +1515,7 @@ BTextControl::TextViewLayoutItem::BaseMaxSize()
 {
 	BSize size(BaseMinSize());
 	size.width = B_SIZE_UNLIMITED;
+
 	return size;
 }
 
@@ -1510,6 +1526,7 @@ BTextControl::TextViewLayoutItem::BasePreferredSize()
 	BSize size(BaseMinSize());
 	// puh, no idea...
 	size.width = 100;
+
 	return size;
 }
 
@@ -1545,6 +1562,7 @@ BTextControl::TextViewLayoutItem::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "BTextControl::TextViewLayoutItem"))
 		return new TextViewLayoutItem(from);
+
 	return NULL;
 }
 
@@ -1558,4 +1576,3 @@ B_IF_GCC_2(InvalidateLayout__12BTextControlb,
 
 	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
-
