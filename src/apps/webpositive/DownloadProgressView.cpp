@@ -21,6 +21,7 @@
 #include <MenuItem.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
+#include <Notification.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
 #include <SpaceLayoutItem.h>
@@ -139,6 +140,11 @@ public:
 	virtual BSize MaxSize()
 	{
 		return MinSize();
+	}
+
+	BBitmap* Bitmap()
+	{
+		return &fIconBitmap;
 	}
 
 private:
@@ -617,6 +623,18 @@ DownloadProgressView::DownloadFinished()
 	fBottomButton->SetMessage(new BMessage(REMOVE_DOWNLOAD));
 	fBottomButton->SetEnabled(true);
 	fInfoView->SetText("");
+	fStatusBar->SetBarColor(ui_color(B_SUCCESS_COLOR));
+
+	BNotification success(B_INFORMATION_NOTIFICATION);
+	success.SetTitle(B_TRANSLATE("Download finished"));
+	success.SetContent(fPath.Leaf());
+	BEntry entry(fPath.Path());
+	entry_ref ref;
+	entry.GetRef(&ref);
+	success.SetOnClickFile(&ref);
+	success.SetIcon(fIconView->Bitmap());
+	success.Send();
+
 }
 
 
@@ -631,6 +649,15 @@ DownloadProgressView::DownloadCanceled()
 	fBottomButton->SetMessage(new BMessage(REMOVE_DOWNLOAD));
 	fBottomButton->SetEnabled(true);
 	fInfoView->SetText("");
+	fStatusBar->SetBarColor(ui_color(B_FAILURE_COLOR));
+
+	BNotification success(B_ERROR_NOTIFICATION);
+	success.SetTitle(B_TRANSLATE("Download aborted"));
+	success.SetContent(fPath.Leaf());
+	// Don't make a click on the notification open the file: it is not complete
+	success.SetIcon(fIconView->Bitmap());
+	success.Send();
+
 	fPath.Unset();
 }
 
