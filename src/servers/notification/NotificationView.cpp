@@ -72,14 +72,15 @@ NotificationView::NotificationView(NotificationWindow* win,
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
 
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	
 	switch (fNotification->Type()) {
 		case B_IMPORTANT_NOTIFICATION:
-			SetViewColor(255, 255, 255);
-			SetLowColor(255, 255, 255);
+			fStripeColor = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 			break;
 		case B_ERROR_NOTIFICATION:
-			SetViewColor(ui_color(B_FAILURE_COLOR));
-			SetLowColor(ui_color(B_FAILURE_COLOR));
+			fStripeColor = ui_color(B_FAILURE_COLOR);
 			break;
 		case B_PROGRESS_NOTIFICATION:
 		{
@@ -94,10 +95,11 @@ NotificationView::NotificationView(NotificationWindow* win,
 
 			layout->AddView(progress);
 		}
-		// fall through
-		default:
-			SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		// fall through.
+		case B_INFORMATION_NOTIFICATION:
+			fStripeColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+				B_DARKEN_1_TINT);
+			break;
 	}
 
 	SetText();
@@ -239,7 +241,7 @@ NotificationView::Draw(BRect updateRect)
 	
 	BRect stripeRect = Bounds();
 	stripeRect.right = kIconStripeWidth;
-	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+	SetHighColor(fStripeColor);
 	FillRect(stripeRect);
 	
 	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
