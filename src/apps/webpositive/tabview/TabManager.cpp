@@ -160,6 +160,7 @@ class TabMenuTabButton : public TabButton {
 public:
 	TabMenuTabButton(BMessage* message)
 		: TabButton(message)
+		, fCloseTime(0)
 	{
 	}
 
@@ -177,8 +178,13 @@ public:
 
 	virtual void MouseDown(BPoint point)
 	{
-		if (!IsEnabled())
+		// Don't reopen the menu if it's already open or freshly closed.
+		bigtime_t clickSpeed = 2000000;
+		get_click_speed(&clickSpeed);
+		if (!IsEnabled() || (Value() == B_CONTROL_ON) 
+			|| real_time_clock_usecs() < fCloseTime + clickSpeed) {
 			return;
+		}
 
 		// Invoke must be called before setting B_CONTROL_ON
 		// for the button to stay "down"
@@ -193,8 +199,12 @@ public:
 
 	void MenuClosed()
 	{
+		fCloseTime = real_time_clock_usecs();
 		SetValue(B_CONTROL_OFF);
 	}
+
+private:
+	bigtime_t fCloseTime;
 };
 
 
