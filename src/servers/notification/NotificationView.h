@@ -71,6 +71,7 @@ private:
 			BBitmap*			fBitmap;
 			LineInfoList		fLines;
 			float				fHeight;
+			rgb_color			fStripeColor;
 			bool				fCloseClicked;
 };
 
