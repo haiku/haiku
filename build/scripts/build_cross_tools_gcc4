@@ -34,8 +34,11 @@ m68k-*)
 	;;
 arm-*)
 	# Multilib creates a lot of confusion as the wrong libs end up being linked.
-	binutilsConfigureArgs="--disable-multilib --with-float=hard"
-	gccConfigureArgs="--disable-multilib --with-float=hard"
+	# For now, target Cortex-A8 devices.
+	binutilsConfigureArgs="--disable-multilib --with-float=hard
+		--with-cpu=cortex-a8 --with-arch=armv7-a --with-fpu=vfpv3"
+	gccConfigureArgs="--disable-multilib --with-float=hard
+		--with-cpu=cortex-a8 --with-arch=armv7-a --with-fpu=vfpv3"
 	;;
 *)
 	binutilsConfigureArgs="--disable-multilib"
