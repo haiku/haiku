@@ -99,12 +99,11 @@ public:
 			ino_t				RootDirectoryID() const
 									{ return fRootDirectoryRef.node; }
 
-			const node_ref&		PackagesDirectoryRef() const
-									{ return fPackagesDirectoryRef; }
+			const node_ref&		PackagesDirectoryRef() const;
 			dev_t				PackagesDeviceID() const
-									{ return fPackagesDirectoryRef.device; }
+									{ return PackagesDirectoryRef().device; }
 			ino_t				PackagesDirectoryID() const
-									{ return fPackagesDirectoryRef.node; }
+									{ return PackagesDirectoryRef().node; }
 
 			Root*				GetRoot() const
 									{ return fRoot; }
@@ -139,6 +138,7 @@ public:
 
 private:
 			struct NodeMonitorEvent;
+			struct PackagesDirectory;
 
 			typedef FSUtils::RelativePath RelativePath;
 			typedef DoublyLinkedList<NodeMonitorEvent> NodeMonitorEventList;
@@ -171,7 +171,8 @@ private:
 			BString				fPath;
 			PackageFSMountType	fMountType;
 			node_ref			fRootDirectoryRef;
-			node_ref			fPackagesDirectoryRef;
+			PackagesDirectory*	fPackagesDirectories;
+			uint32				fPackagesDirectoryCount;
 			Root*				fRoot;
 			Listener*			fListener;
 			VolumeState*		fState;

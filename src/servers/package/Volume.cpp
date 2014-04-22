@@ -32,6 +32,7 @@
 
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
+#include <NotOwningEntryRef.h>
 #include <package/DaemonDefs.h>
 
 #include "CommitTransactionHandler.h"
@@ -81,6 +82,52 @@ private:
 };
 
 
+// #pragma mark - PackagesDirectory
+
+
+struct Volume::PackagesDirectory {
+public:
+	PackagesDirectory()
+		:
+		fNodeRef(),
+		fName()
+	{
+	}
+
+	void Init(const node_ref& nodeRef, bool isPackagesDir)
+	{
+		fNodeRef = nodeRef;
+
+		if (isPackagesDir)
+			return;
+
+		BDirectory directory;
+		BEntry entry;
+		if (directory.SetTo(&fNodeRef) == B_OK
+			&& directory.GetEntry(&entry) == B_OK) {
+			fName = entry.Name();
+		}
+
+		if (fName.IsEmpty())
+			fName = "unknown state";
+	}
+
+	const node_ref& NodeRef() const
+	{
+		return fNodeRef;
+	}
+
+	const BString& Name() const
+	{
+		return fName;
+	}
+
+private:
+	node_ref	fNodeRef;
+	BString		fName;
+};
+
+
 // #pragma mark - Volume
 
 
@@ -90,7 +137,8 @@ Volume::Volume(BLooper* looper)
 	fPath(),
 	fMountType(PACKAGE_FS_MOUNT_TYPE_CUSTOM),
 	fRootDirectoryRef(),
-	fPackagesDirectoryRef(),
+	fPackagesDirectories(NULL),
+	fPackagesDirectoryCount(0),
 	fRoot(NULL),
 	fListener(NULL),
 	fState(NULL),
@@ -111,6 +159,7 @@ Volume::~Volume()
 	Unmounted();
 		// need for error case in InitPackages()
 
+	delete fPackagesDirectories;
 	delete fState;
 }
 
@@ -160,21 +209,56 @@ Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 	}
 	FileDescriptorCloser fdCloser(fd);
 
-	PackageFSVolumeInfo info;
-	if (ioctl(fd, PACKAGE_FS_OPERATION_GET_VOLUME_INFO, &info, sizeof(info))
-			!= 0) {
-		ERROR("Volume::Init(): failed to get volume info: %s\n",
-			strerror(errno));
-		RETURN_ERROR(errno);
+	// get the volume info from packagefs
+	uint32 maxPackagesDirCount = 16;
+	PackageFSVolumeInfo* info = NULL;
+	MemoryDeleter infoDeleter;
+	size_t bufferSize;
+	for (;;) {
+		bufferSize = sizeof(PackageFSVolumeInfo)
+			+ (maxPackagesDirCount - 1) * sizeof(PackageFSDirectoryInfo);
+		info = (PackageFSVolumeInfo*)malloc(bufferSize);
+		if (info == NULL)
+			RETURN_ERROR(B_NO_MEMORY);
+		infoDeleter.SetTo(info);
+
+		if (ioctl(fd, PACKAGE_FS_OPERATION_GET_VOLUME_INFO, info,
+				bufferSize) != 0) {
+			ERROR("Volume::Init(): failed to get volume info: %s\n",
+				strerror(errno));
+			RETURN_ERROR(errno);
+		}
+
+		if (info->packagesDirectoryCount <= maxPackagesDirCount)
+			break;
+
+		maxPackagesDirCount = info->packagesDirectoryCount;
+		infoDeleter.Unset();
 	}
 
-	fMountType = info.mountType;
-	fPackagesDirectoryRef.device = info.packagesDirectoryInfos[0].deviceID;
-	fPackagesDirectoryRef.node = info.packagesDirectoryInfos[0].nodeID;
-// TODO: Adjust for old state support!
+	if (info->packagesDirectoryCount < 1) {
+		ERROR("Volume::Init(): got invalid volume info from packagefs\n");
+		RETURN_ERROR(B_BAD_VALUE);
+	}
 
-	_packageRootRef.device = info.rootDeviceID;
-	_packageRootRef.node = info.rootDirectoryID;
+	fMountType = info->mountType;
+
+	fPackagesDirectories = new(std::nothrow) PackagesDirectory[
+		info->packagesDirectoryCount];
+	if (fPackagesDirectories == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	fPackagesDirectoryCount = info->packagesDirectoryCount;
+
+	for (uint32 i = 0; i < info->packagesDirectoryCount; i++) {
+		fPackagesDirectories[i].Init(
+			node_ref(info->packagesDirectoryInfos[i].deviceID,
+				info->packagesDirectoryInfos[i].nodeID),
+			i == 0);
+	}
+
+	_packageRootRef.device = info->rootDeviceID;
+	_packageRootRef.node = info->rootDirectoryID;
 
 	return B_OK;
 }
@@ -184,7 +268,7 @@ status_t
 Volume::InitPackages(Listener* listener)
 {
 	// node-monitor the volume's packages directory
-	status_t error = watch_node(&fPackagesDirectoryRef, B_WATCH_DIRECTORY,
+	status_t error = watch_node(&PackagesDirectoryRef(), B_WATCH_DIRECTORY,
 		BMessenger(this));
 	if (error == B_OK) {
 		fListener = listener;
@@ -215,7 +299,7 @@ Volume::InitPackages(Listener* listener)
 
 	// create the admin directory, if it doesn't exist yet
 	BDirectory packagesDirectory;
-	if (packagesDirectory.SetTo(&fPackagesDirectoryRef) == B_OK) {
+	if (packagesDirectory.SetTo(&PackagesDirectoryRef()) == B_OK) {
 		if (!BEntry(&packagesDirectory, kAdminDirectoryName).Exists())
 			packagesDirectory.CreateDirectory(kAdminDirectoryName, NULL);
 	}
@@ -355,9 +439,9 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 		|| fLocationInfoReply.AddInt64("base directory node",
 			fRootDirectoryRef.node) != B_OK
 		|| fLocationInfoReply.AddInt32("packages directory device",
-			fPackagesDirectoryRef.device) != B_OK
+			PackagesDeviceID()) != B_OK
 		|| fLocationInfoReply.AddInt64("packages directory node",
-			fPackagesDirectoryRef.node) != B_OK) {
+			PackagesDirectoryID()) != B_OK) {
 		return;
 	}
 
@@ -509,6 +593,13 @@ Volume::Location() const
 		default:
 			return B_PACKAGE_INSTALLATION_LOCATION_ENUM_COUNT;
 	}
+}
+
+
+const node_ref&
+Volume::PackagesDirectoryRef() const
+{
+	return fPackagesDirectories[0].NodeRef();
 }
 
 
@@ -687,7 +778,7 @@ Volume::_HandleEntryCreatedOrRemoved(const BMessage* message, bool created)
 	if (message->FindInt32("device", &deviceID) != B_OK
 		|| message->FindInt64("directory", &directoryID) != B_OK
 		|| message->FindString("name", &name) != B_OK
-		|| node_ref(deviceID, directoryID) != fPackagesDirectoryRef) {
+		|| node_ref(deviceID, directoryID) != PackagesDirectoryRef()) {
 		return;
 	}
 
@@ -708,18 +799,18 @@ Volume::_HandleEntryMoved(const BMessage* message)
 		|| message->FindInt64("to directory", &toDirectoryID) != B_OK
 		|| message->FindString("from name", &fromName) != B_OK
 		|| message->FindString("name", &toName) != B_OK
-		|| deviceID != fPackagesDirectoryRef.device
-		|| (fromDirectoryID != fPackagesDirectoryRef.node
-			&& toDirectoryID != fPackagesDirectoryRef.node)) {
+		|| deviceID != PackagesDeviceID()
+		|| (fromDirectoryID != PackagesDirectoryID()
+			&& toDirectoryID != PackagesDirectoryID())) {
 		return;
 	}
 
 	AutoLocker<BLocker> eventsLock(fPendingNodeMonitorEventsLock);
 		// make sure for a move the two events cannot get split
 
-	if (fromDirectoryID == fPackagesDirectoryRef.node)
+	if (fromDirectoryID == PackagesDirectoryID())
 		_QueueNodeMonitorEvent(fromName, false);
-	if (toDirectoryID == fPackagesDirectoryRef.node)
+	if (toDirectoryID == PackagesDirectoryID())
 		_QueueNodeMonitorEvent(toName, true);
 }
 
@@ -772,15 +863,6 @@ INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
 		return;
 	}
 
-	entry_ref entry;
-	entry.device = fPackagesDirectoryRef.device;
-	entry.directory = fPackagesDirectoryRef.node;
-	status_t error = entry.set_name(name);
-	if (error != B_OK) {
-		ERROR("out of memory\n");
-		return;
-	}
-
 	package = new(std::nothrow) Package;
 	if (package == NULL) {
 		ERROR("out of memory\n");
@@ -788,7 +870,8 @@ INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
 	}
 	ObjectDeleter<Package> packageDeleter(package);
 
-	error = package->Init(entry);
+	NotOwningEntryRef entry(PackagesDirectoryRef(), name);
+	status_t error = package->Init(entry);
 	if (error != B_OK) {
 		ERROR("failed to init package for file \"%s\"\n", name);
 		return;
@@ -847,7 +930,7 @@ status_t
 Volume::_ReadPackagesDirectory()
 {
 	BDirectory directory;
-	status_t error = directory.SetTo(&fPackagesDirectoryRef);
+	status_t error = directory.SetTo(&PackagesDirectoryRef());
 	if (error != B_OK) {
 		ERROR("Volume::_ReadPackagesDirectory(): failed to open packages "
 			"directory: %s\n", strerror(error));
@@ -977,7 +1060,7 @@ Volume::_OpenPackagesSubDirectory(const RelativePath& path, bool create,
 {
 	// open the packages directory
 	BDirectory directory;
-	status_t error = directory.SetTo(&fPackagesDirectoryRef);
+	status_t error = directory.SetTo(&PackagesDirectoryRef());
 	if (error != B_OK) {
 		ERROR("Volume::_OpenPackagesSubDirectory(): failed to open packages "
 			"directory: %s\n", strerror(error));
