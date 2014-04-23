@@ -11,6 +11,7 @@
 
 
 class BDataIO;
+class BMessage;
 
 
 class WebAppInterface {
@@ -21,6 +22,10 @@ public:
 			void				SetAuthorization(const BString& username,
 									const BString& password);
 
+			status_t			RetrievePackageInfo(
+									const BString& packageName,
+									BMessage& message);
+
 			status_t			RetrievePackageIcon(
 									const BString& packageName,
 									BDataIO* stream);
@@ -28,6 +33,7 @@ public:
 private:
 			BString				fUsername;
 			BString				fPassword;
+	static	int					fRequestIndex;
 };
 
 

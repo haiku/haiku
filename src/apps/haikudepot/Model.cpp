@@ -609,9 +609,28 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 		if (package.Get() == NULL)
 			continue;
 	
+//		_PopulatePackageInfo(package, fromCacheOnly);
 		_PopulatePackageIcon(package, fromCacheOnly);
 		// TODO: Average user rating. It needs to be shown in the
 		// list view, so without the user clicking the package.
+	}
+}
+
+
+void
+Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
+{
+	if (fromCacheOnly)
+		return;
+	
+	// Retrieve info from web-app
+	WebAppInterface interface;
+	BMessage info;
+
+	status_t status = interface.RetrievePackageInfo(package->Title(), info);
+	if (status == B_OK) {
+		// TODO: Parse message...
+		info.PrintToStream();
 	}
 }
 

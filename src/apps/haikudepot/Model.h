@@ -93,6 +93,9 @@ private:
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
 			void				_PopulateAllPackagesThread(bool fromCacheOnly);
 
+			void				_PopulatePackageInfo(
+									const PackageInfoRef& package,
+									bool fromCacheOnly);
 			void				_PopulatePackageIcon(
 									const PackageInfoRef& package,
 									bool fromCacheOnly);
