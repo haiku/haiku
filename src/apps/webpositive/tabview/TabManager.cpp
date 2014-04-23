@@ -181,8 +181,9 @@ public:
 		// Don't reopen the menu if it's already open or freshly closed.
 		bigtime_t clickSpeed = 2000000;
 		get_click_speed(&clickSpeed);
+		bigtime_t clickTime = Window()->CurrentMessage()->FindInt64("when");
 		if (!IsEnabled() || (Value() == B_CONTROL_ON) 
-			|| real_time_clock_usecs() < fCloseTime + clickSpeed) {
+			|| clickTime < fCloseTime + clickSpeed) {
 			return;
 		}
 
@@ -199,7 +200,7 @@ public:
 
 	void MenuClosed()
 	{
-		fCloseTime = real_time_clock_usecs();
+		fCloseTime = system_time();
 		SetValue(B_CONTROL_OFF);
 	}
 
