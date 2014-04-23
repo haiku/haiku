@@ -2154,9 +2154,6 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		case B_ITEMS_IN_MATRIX:
 			_ComputeMatrixLayout(frame);
 			break;
-
-		default:
-			break;
 	}
 
 	// change width depending on resize mode
