@@ -3,6 +3,10 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "text/xml";
 
+resource(2, "META:SNIFF_RULE") #'CSTR' array {
+	"0.2 (\"<?xml\")"
+};
+
 resource(2, "META:S:DESC") #'MSDC' "XML file";
 
 resource(3, "META:EXTENS") message(234) {
