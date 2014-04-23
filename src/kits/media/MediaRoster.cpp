@@ -1037,7 +1037,6 @@ BMediaRoster::Connect(const media_source& from, const media_destination& to,
 	strcpy(out_output->name, reply5.name);
 
 	// the connection is now made
-	printf("BMediaRoster::Connect connection established!\n");
 	PRINT_FORMAT("   format", *io_format);
 	PRINT_INPUT("   input", *out_input);
 	PRINT_OUTPUT("   output", *out_output);
@@ -2266,12 +2265,6 @@ BMediaRoster::GetParameterWebFor(const media_node& node, BParameterWeb** _web)
 			if (web == NULL)
 				rv = B_NO_MEMORY;
 			else {
-				printf("BMediaRoster::GetParameterWebFor Unflattening %"
-					B_PRId32 " bytes, %#" B_PRIx32 ", %#" B_PRIx32 ", %#"
-					B_PRIx32 ", %#" B_PRIx32 "\n", reply.size,
-					((uint32*)data)[0], ((uint32*)data)[1], ((uint32*)data)[2],
-					((uint32*)data)[3]);
-
 				rv = web->Unflatten(reply.code, data, reply.size);
 				if (rv != B_OK) {
 					ERROR("BMediaRoster::GetParameterWebFor Unflatten failed, "

@@ -26,8 +26,6 @@ CPUCapabilities::CPUCapabilities()
 #if defined(__INTEL__) || defined(__x86_64__)
 	_SetIntelCapabilities();
 #endif
-	
-	PrintCapabilities();
 }
 
 

@@ -12,7 +12,7 @@
 // http://www.joemaller.com/fcp/fxscript_yuv_color.shtml
 
 
-#if 1
+#if DEBUG
   #define TRACE(a...) printf(a)
 #else
   #define TRACE(a...)

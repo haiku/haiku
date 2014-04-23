@@ -429,8 +429,6 @@ BMediaEventLooper::Run()
 
 	// get latency information
 	fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
-	printf("BMediaEventLooper: SchedulingLatency is %" B_PRId64 "\n",
-		fSchedulingLatency);
 }
 
 
