@@ -4,7 +4,9 @@ resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 resource(1, "META:TYPE") "application/xhtml+xml";
 
 resource(2, "META:SNIFF_RULE") #'CSTR' array {
-	"0.60  [0](\"<?xml\"|\"\\376\\377\\000<\\000?\\000x\\000m\\000l\") [0:128](\"<!DOCTYPE html\"|\"\\000<\\000!\\000D\\000O\\000C\\000T\\000Y\\000P\\000E\\000 \\000h\\000t\\000m\\000l\")"
+	"0.60 [0:512](\"<html xmlns\" | "
+	"\"<\\000h\\000t\\000m\\000l\\000 \\000x\\000m\\000l\\000n\\000s\" | "
+	"\"-//W3C//DTD XHTML\")"
 };
 
 resource(3, "META:S:DESC") #'MSDC' "XHTML file";
