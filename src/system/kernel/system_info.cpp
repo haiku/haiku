@@ -240,7 +240,7 @@ private:
 		MutexLocker locker(fLock);
 
 		int32 eventCode;
-		int32 teamID;
+		int32 teamID = 0;
 		if (event->FindInt32("event", &eventCode) != B_OK
 			|| event->FindInt32("team", &teamID) != B_OK) {
 			return;

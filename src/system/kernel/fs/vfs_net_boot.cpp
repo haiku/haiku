@@ -319,7 +319,7 @@ NetBootMethod::Init()
 	status_t status;
 
 	uint64 clientMAC;
-	uint32 clientIP;
+	uint32 clientIP = 0;
 	uint32 netMask;
 	if (fBootVolume.FindInt64("client MAC", (int64*)&clientMAC) != B_OK
 		|| fBootVolume.FindInt32("client IP", (int32*)&clientIP) != B_OK) {

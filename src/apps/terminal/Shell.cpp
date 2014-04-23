@@ -276,7 +276,7 @@ Shell::GetActiveProcessInfo(ActiveProcessInfo& _info) const
 	// fetch the name and the current directory from the info
 	const char* name;
 	int32 cwdDevice;
-	int64 cwdDirectory;
+	int64 cwdDirectory = 0;
 	if (info.FindString("name", &name) != B_OK
 		|| info.FindInt32("cwd device", &cwdDevice) != B_OK
 		|| info.FindInt64("cwd directory", &cwdDirectory) != B_OK) {

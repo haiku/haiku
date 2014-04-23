@@ -266,8 +266,8 @@ private:
 			return B_OK;
 
 		// get the chunk offset and size
-		uint64 offset;
-		uint32 compressedSize;
+		uint64 offset = 0;
+		uint32 compressedSize = 0;
 		status_t error = _GetCompressedChunkOffsetAndSize(chunkIndex, offset,
 			compressedSize);
 		if (error != B_OK)
