@@ -15,7 +15,6 @@
 #include <CardLayout.h>
 #include <ControlLook.h>
 #include <GroupView.h>
-#include <MenuBar.h>
 #include <SpaceLayoutItem.h>
 #include <Window.h>
 
