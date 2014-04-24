@@ -13,7 +13,9 @@
 
 #include <Menu.h>
 
+#include <algorithm>
 #include <new>
+
 #include <ctype.h>
 #include <string.h>
 
@@ -2039,11 +2041,11 @@ BMenu::_RemoveItems(int32 index, int32 count, BMenuItem* item,
 		}
 	} else {
 		// We iterate backwards because it's simpler
-		int32 i = min_c(index + count - 1, fItems.CountItems() - 1);
+		int32 i = std::min(index + count - 1, fItems.CountItems() - 1);
 		// NOTE: the range check for "index" is done after
 		// calculating the last index to be removed, so
 		// that the range is not "shifted" unintentionally
-		index = max_c(0, index);
+		index = std::max((int32)0, index);
 		for (; i >= index; i--) {
 			item = static_cast<BMenuItem*>(fItems.ItemAt(i));
 			if (item != NULL) {
@@ -2235,7 +2237,7 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 		if (item->fSubmenu != NULL)
 			width += item->Frame().Height();
 
-		frame.right = max_c(frame.right, width + fPad.left + fPad.right);
+		frame.right = std::max(frame.right, width + fPad.left + fPad.right);
 		frame.bottom = item->fBounds.bottom;
 	}
 
@@ -2257,7 +2259,7 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 	}
 
 	if (fMaxContentWidth > 0)
-		frame.right = min_c(frame.right, fMaxContentWidth);
+		frame.right = std::min(frame.right, fMaxContentWidth);
 
 	if (moveItems) {
 		for (int32 i = 0; i < fItems.CountItems(); i++)
@@ -2290,7 +2292,7 @@ BMenu::_ComputeRowLayout(int32 index, bool bestFit, bool moveItems,
 			+ fPad.right;
 
 		frame.right = item->Frame().right + 1.0f;
-		frame.bottom = max_c(frame.bottom, height + fPad.top + fPad.bottom);
+		frame.bottom = std::max(frame.bottom, height + fPad.top + fPad.bottom);
 	}
 
 	if (moveItems) {
@@ -2312,10 +2314,10 @@ BMenu::_ComputeMatrixLayout(BRect &frame)
 	for (int32 i = 0; i < CountItems(); i++) {
 		BMenuItem* item = ItemAt(i);
 		if (item != NULL) {
-			frame.left = min_c(frame.left, item->Frame().left);
-			frame.right = max_c(frame.right, item->Frame().right);
-			frame.top = min_c(frame.top, item->Frame().top);
-			frame.bottom = max_c(frame.bottom, item->Frame().bottom);
+			frame.left = std::min(frame.left, item->Frame().left);
+			frame.right = std::max(frame.right, item->Frame().right);
+			frame.top = std::min(frame.top, item->Frame().top);
+			frame.bottom = std::max(frame.bottom, item->Frame().bottom);
 		}
 	}
 }
