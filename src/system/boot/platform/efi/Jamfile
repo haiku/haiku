@@ -27,6 +27,7 @@ local platform_src =
 	entry.S
 	mmu.cpp
 	heap.cpp
+	acpi.cpp
 	menu.cpp
 	devices.cpp
 	;
