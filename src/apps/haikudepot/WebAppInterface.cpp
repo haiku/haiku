@@ -39,8 +39,7 @@ public:
 	JsonBuilder& AddObject(const char* name)
 	{
 		_StartName(name);
-
-		fString << "\":{";
+		fString << '{';
 		fInList = false;
 		return *this;
 	}
@@ -55,11 +54,8 @@ public:
 	JsonBuilder& AddArray(const char* name)
 	{
 		_StartName(name);
-
-		fString << "\":[";
-		
+		fString << '[';
 		fInList = false;
-		
 		return *this;
 	}
 
@@ -73,42 +69,30 @@ public:
 	JsonBuilder& AddValue(const char* name, const char* value)
 	{
 		_StartName(name);
-
+		fString << '\"';
 		// TODO: Escape value
-
-		fString << "\":\"";
 		fString << value;
-		fString << "\"";
-		
+		fString << '\"';
 		fInList = true;
-		
 		return *this;
 	}
 
 	JsonBuilder& AddValue(const char* name, int value)
 	{
 		_StartName(name);
-
-		fString << "\":";
 		fString << value;
-		
 		fInList = true;
-		
 		return *this;
 	}
 
 	JsonBuilder& AddValue(const char* name, bool value)
 	{
 		_StartName(name);
-
-		fString << "\":";
 		if (value)
 			fString << "true";
 		else
 			fString << "false";
-		
 		fInList = true;
-		
 		return *this;
 	}
 
@@ -125,8 +109,9 @@ private:
 			fString << ",\"";
 		else
 			fString << '"';
-
+		// TODO: Escape name
 		fString << name;
+		fString << "\":";
 	}
 
 private:
