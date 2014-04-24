@@ -303,7 +303,7 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 	if (statusCode == 200)
 		return B_OK;
 
-	printf("Response code: %ld\n", statusCode);
+       printf("Response code: %" B_PRId32 "\n", statusCode);
 
 	return B_ERROR;
 }
