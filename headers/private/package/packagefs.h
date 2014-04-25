@@ -57,17 +57,18 @@ struct PackageFSVolumeInfo {
 // PACKAGE_FS_OPERATION_GET_PACKAGE_INFOS
 
 struct PackageFSPackageInfo {
-	// node_ref of the package file and the containing directory
+	// node_ref and entry_ref of the package file
 	dev_t							packageDeviceID;
 	dev_t							directoryDeviceID;
 	ino_t							packageNodeID;
 	ino_t							directoryNodeID;
+	const char*						name;
 };
 
 struct PackageFSGetPackageInfosRequest {
-	// Filled in by the FS. packageCount is set to the actual package count,
-	// even if it is greater than the array, so the caller can determine whether
-	// the array was large enough.
+	// Filled in by the FS. bufferSize is set to the required buffer size, even
+	// even if the provided buffer is smaller.
+	uint32							bufferSize;
 	uint32							packageCount;
 	PackageFSPackageInfo			infos[1];
 };

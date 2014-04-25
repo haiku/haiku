@@ -508,6 +508,10 @@ Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
 
 			VolumeReadLocker volumeReadLocker(this);
 
+			addr_t bufferEnd = (addr_t)buffer + size;
+			uint32 packageCount = fPackages.CountElements();
+			char* nameBuffer = (char*)(request->infos + packageCount);
+
 			uint32 packageIndex = 0;
 			for (PackageFileNameHashTable::Iterator it
 					= fPackages.GetIterator(); it.HasNext();
@@ -519,18 +523,29 @@ Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
 				PackagesDirectory* directory = package->Directory();
 				info.directoryDeviceID = directory->DeviceID();
 				info.directoryNodeID = directory->NodeID();
+				info.name = nameBuffer;
 
 				PackageFSPackageInfo* userInfo = request->infos + packageIndex;
-				if (addr_t(userInfo + 1) > (addr_t)buffer + size)
-					break;
+				if (addr_t(userInfo + 1) <= bufferEnd) {
+					if (user_memcpy(userInfo, &info, sizeof(info)) != B_OK)
+						return B_BAD_ADDRESS;
+				}
 
-				if (user_memcpy(userInfo, &info, sizeof(info)) != B_OK)
-					return B_BAD_ADDRESS;
+				const char* name = package->FileName();
+				size_t nameSize = strlen(name) + 1;
+				char* nameEnd = nameBuffer + nameSize;
+				if ((addr_t)nameEnd <= bufferEnd) {
+					if (user_memcpy(nameBuffer, name, nameSize) != B_OK)
+						return B_BAD_ADDRESS;
+				}
+				nameBuffer = nameEnd;
 			}
 
-			uint32 packageCount = fPackages.CountElements();
-			RETURN_ERROR(user_memcpy(&request->packageCount, &packageCount,
-				sizeof(packageCount)));
+			PackageFSGetPackageInfosRequest header;
+			header.bufferSize = nameBuffer - (char*)request;
+			header.packageCount = packageCount;
+			size_t headerSize = (char*)&request->infos - (char*)request;
+			RETURN_ERROR(user_memcpy(request, &header, headerSize));
 		}
 
 		case PACKAGE_FS_OPERATION_CHANGE_ACTIVATION:

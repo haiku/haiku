@@ -962,13 +962,10 @@ status_t
 Volume::_GetActivePackages(int fd)
 {
 // TODO: Adjust for old state support!
-	uint32 maxPackageCount = 16 * 1024;
 	PackageFSGetPackageInfosRequest* request = NULL;
 	MemoryDeleter requestDeleter;
-	size_t bufferSize;
+	size_t bufferSize = 64 * 1024;
 	for (;;) {
-		bufferSize = sizeof(PackageFSGetPackageInfosRequest)
-			+ (maxPackageCount - 1) * sizeof(PackageFSPackageInfo);
 		request = (PackageFSGetPackageInfosRequest*)malloc(bufferSize);
 		if (request == NULL)
 			RETURN_ERROR(B_NO_MEMORY);
@@ -981,10 +978,10 @@ Volume::_GetActivePackages(int fd)
 			RETURN_ERROR(errno);
 		}
 
-		if (request->packageCount <= maxPackageCount)
+		if (request->bufferSize <= bufferSize)
 			break;
 
-		maxPackageCount = request->packageCount;
+		bufferSize = request->bufferSize;
 		requestDeleter.Unset();
 	}
 
