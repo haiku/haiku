@@ -178,8 +178,6 @@ FormatManager::GetFormats(bigtime_t lastUpdate, BMessage& reply)
 	reply.AddInt64("timestamp", system_time());
 
 	int32 count = fList.CountItems();
-	printf("FormatManager::GetFormats(): put %" B_PRId32 " formats into "
-		"message\n", count);
 	for (int32 i = 0; i < count; i++) {
 		meta_format* format = fList.ItemAt(i);
 		reply.AddData("formats", MEDIA_META_FORMAT_TYPE, format,

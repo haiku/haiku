@@ -328,7 +328,7 @@ PluginManager::~PluginManager()
 	for (int i = fPluginList.CountItems() - 1; i >= 0; i--) {
 		plugin_info* info = NULL;
 		fPluginList.Get(i, &info);
-		printf("PluginManager: Error, unloading PlugIn %s with usecount "
+		TRACE("PluginManager: Error, unloading PlugIn %s with usecount "
 			"%d\n", info->name, info->usecount);
 		delete info->plugin;
 		unload_add_on(info->image);

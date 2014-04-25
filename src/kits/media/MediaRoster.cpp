@@ -777,7 +777,7 @@ BMediaRoster::ReleaseNode(const media_node& node)
 		return B_MEDIA_BAD_NODE;
 
 	if (node.kind & NODE_KIND_NO_REFCOUNTING) {
-		printf("BMediaRoster::ReleaseNode, trying to release reference "
+		TRACE("BMediaRoster::ReleaseNode, trying to release reference "
 			"counting disabled timesource, node %" B_PRId32 ", port %" B_PRId32
 			", team %" B_PRId32 "\n", node.node, node.port,
 			BPrivate::current_team());
