@@ -5,7 +5,7 @@
  * Copyright (C) 2010 Stephan Aßmus <superstippi@gmx.de>
  * Copyright (C) 2010 Michael Lotz <mmlr@mlotz.ch>
  * Copyright (C) 2010 Rene Gollent <rene@gollent.com>
- * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Copyright 2013-2014 Haiku, Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -101,6 +101,7 @@ enum {
 	HOME										= 'home',
 	GOTO_URL									= 'goul',
 	RELOAD										= 'reld',
+	SHOW_HIDE_BOOKMARK_BAR						= 'shbb',
 	CLEAR_HISTORY								= 'clhs',
 
 	CREATE_BOOKMARK								= 'crbm',
@@ -572,6 +573,10 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	menu = new BMenu(B_TRANSLATE("View"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Reload"), new BMessage(RELOAD),
 		'R'));
+	// the label will be replaced with the appropriate text later on
+	fBookmarkBarMenuItem = new BMenuItem("Show/Hide bookmark bar",
+		new BMessage(SHOW_HIDE_BOOKMARK_BAR));
+	menu->AddItem(fBookmarkBarMenuItem);
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Increase size"),
 		new BMessage(ZOOM_FACTOR_INCREASE), '+'));
@@ -715,15 +720,23 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		.Add(toggleFullscreenButton, 0.0f)
 	;
 
+	fBookmarkBar = new BookmarkBar("Bookmarks", this, &bookmarkRef);
+	if (fAppSettings->GetValue(kSettingsShowBookmarkBar, true)) {
+		// We need to hide the bookmark bar and then show it again
+		// to save the setting and set the menu item label.
+		fBookmarkBar->Hide();
+		_ShowBookmarkBar(true);
+	} else
+		_ShowBookmarkBar(false);
+
 	// Layout
 	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, 0.0)
 #if !INTEGRATE_MENU_INTO_TAB_BAR
 		.Add(menuBarGroup)
 #endif
-		.Add(new BookmarkBar(B_TRANSLATE("Bookmarks"), this,
-			&bookmarkRef))
 		.Add(fTabManager->TabGroup())
 		.Add(navigationGroup)
+		.Add(fBookmarkBar)
 		.Add(fTabManager->ContainerView())
 		.Add(findGroup)
 		.Add(statusGroup)
@@ -915,6 +928,10 @@ BrowserWindow::MessageReceived(BMessage* message)
 
 		case RELOAD:
 			CurrentWebView()->Reload();
+			break;
+
+		case SHOW_HIDE_BOOKMARK_BAR:
+			_ShowBookmarkBar(fBookmarkBar->IsHidden());
 			break;
 
 		case GOTO_URL:
@@ -1229,6 +1246,9 @@ BrowserWindow::MessageReceived(BMessage* message)
 					fHomeButton->Show();
 				else
 					fHomeButton->Hide();
+			} else if (name == kSettingsShowBookmarkBar
+				&& message->FindBool("value", &flag) == B_OK) {
+				_ShowBookmarkBar(flag);
 			}
 			break;
 		}
@@ -2626,4 +2646,22 @@ BrowserWindow::_HandlePageSourceResult(const BMessage* message)
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 	}
+}
+
+
+void
+BrowserWindow::_ShowBookmarkBar(bool show)
+{
+	if (fBookmarkBar == NULL || fBookmarkBar->IsHidden() != show)
+		return;
+
+	fAppSettings->SetValue(kSettingsShowBookmarkBar, show);
+
+	fBookmarkBarMenuItem->SetLabel(show
+		? B_TRANSLATE("Hide bookmark bar")
+		: B_TRANSLATE("Show bookmark bar"));
+	if (show)
+		fBookmarkBar->Show();
+	else
+		fBookmarkBar->Hide();
 }

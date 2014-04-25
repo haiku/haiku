@@ -1,10 +1,17 @@
 /*
  * Copyright (C) 2010 Stephan Aßmus <superstippi@gmx.de>
+ * Coptright 2014 Haiku, Inc. All rights reserved.
  *
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		John Scipione, jscipione@gmail.com
  */
 
+
 #include "SettingsKeys.h"
+
 
 const char* kSettingsKeyDownloadPath = "download path";
 const char* kSettingsKeyShowTabsIfSinglePageOpen
@@ -31,3 +38,5 @@ const char* kSettingsKeyProxyPort = "http proxy port";
 const char* kSettingsKeyUseProxyAuth = "use http proxy authentication";
 const char* kSettingsKeyProxyUsername = "http proxy username";
 const char* kSettingsKeyProxyPassword = "http proxy password";
+
+const char* kSettingsShowBookmarkBar = "show bookmarks bar";

@@ -1,10 +1,16 @@
 /*
  * Copyright (C) 2010 Stephan Aßmus <superstippi@gmx.de>
+ * Coptright 2014 Haiku, Inc. All rights reserved.
  *
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		John Scipione, jscipione@gmail.com
  */
 #ifndef SETTINGS_KEYS_H
 #define SETTINGS_KEYS_H
+
 
 #include <SupportDefs.h>
 
@@ -30,5 +36,7 @@ extern const char* kSettingsKeyProxyPort;
 extern const char* kSettingsKeyUseProxyAuth;
 extern const char* kSettingsKeyProxyUsername;
 extern const char* kSettingsKeyProxyPassword;
+
+extern const char* kSettingsShowBookmarkBar;
 
 #endif	// SETTINGS_KEYS_H

@@ -2,8 +2,7 @@
  * Copyright (C) 2007 Ryan Leavengood <leavengood@gmail.com>
  * Copyright (C) 2009 Maxime Simon <simon.maxime@gmail.com>
  * Copyright (C) 2010 Stephan Aßmus <superstippi@gmx.de>
- *
- * All rights reserved.
+ * Copyright 2013-2014 Haiku, Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -48,6 +47,8 @@ class BStringView;
 class BTextControl;
 class BUrlContext;
 class BWebView;
+
+class BookmarkBar;
 class SettingsMessage;
 class TabManager;
 class URLInputGroup;
@@ -209,6 +210,8 @@ private:
 			void				_HandlePageSourceResult(
 									const BMessage* message);
 
+			void				_ShowBookmarkBar(bool show);
+
 private:
 			BMenu*				fHistoryMenu;
 			int32				fHistoryMenuFixedItemCount;
@@ -266,6 +269,9 @@ private:
 			uint32				fNewTabPolicy;
 			BString				fStartPageURL;
 			BString				fSearchPageURL;
+
+			BMenuItem*			fBookmarkBarMenuItem;
+			BookmarkBar*		fBookmarkBar;
 };
 
 
