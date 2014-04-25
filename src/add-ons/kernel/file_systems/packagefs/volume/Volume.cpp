@@ -458,7 +458,7 @@ Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
 	switch (operation) {
 		case PACKAGE_FS_OPERATION_GET_VOLUME_INFO:
 		{
-			if (size != sizeof(PackageFSVolumeInfo))
+			if (size < sizeof(PackageFSVolumeInfo))
 				RETURN_ERROR(B_BAD_VALUE);
 
 			PackageFSVolumeInfo* userVolumeInfo
