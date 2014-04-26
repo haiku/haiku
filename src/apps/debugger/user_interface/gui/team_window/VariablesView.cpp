@@ -2042,6 +2042,9 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 	ContextActionList* actions)
 {
 	ValueLocation* location = node->NodeChild()->Location();
+	if (location == NULL)
+		return B_OK;
+
 	status_t result = B_OK;
 	BMessage* message = NULL;
 
