@@ -403,7 +403,7 @@ rule AddHeaderDirectoryToContainer container : dirTokens : dirName
 
 	CopyDirectoryToContainer $(container) : $(systemDirTokens) develop headers
 		: [ FDirName $(HAIKU_TOP) headers $(dirTokens) ]
-		: $(dirName) : -x .svn : $(flags) ;
+		: $(dirName) : -x *~ : $(flags) ;
 }
 
 
