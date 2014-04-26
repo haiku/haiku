@@ -2,6 +2,9 @@
 #
 # configure [ <options> ]
 
+# set flag to exit script when exit command is executed
+set -e
+
 # usage
 #
 # Prints usage.
@@ -180,6 +183,19 @@ absolute_path()
 		echo "$1"
 	else
 		echo "`pwd`/$1"
+	fi
+}
+
+# check_dir_exists
+#
+# check if a directory exists or not
+#
+check_dir_exists()
+{
+	if [ -d "$1" ]; then
+		return 0
+	else
+		return 1
 	fi
 }
 
@@ -570,6 +586,18 @@ while [ $# -gt 0 ] ; do
 			HOST_HAIKU_PORTER="`absolute_path $2`"
 			HAIKU_PORTS_CROSS="`absolute_path $3`"
 			HAIKU_PORTS="`absolute_path $4`"
+			check_dir_exists "$HOST_HAIKU_PORTER" || (
+				echo "Non-existent directory $HOST_HAIKU_PORTER" >&2
+				exit 1
+			)
+			check_dir_exists "$HAIKU_PORTS" || (
+				echo "Non-existent directory $HAIKU_PORTS" >&2
+				exit 1
+			)
+			check_dir_exists "$HAIKU_PORTS_CROSS" || (
+				echo "Non-existent directory $HAIKU_PORTS_CROSS" >&2
+				exit 1
+			)
 			shift 4
 			;;
 		--build-cross-tools)
