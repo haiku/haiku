@@ -153,7 +153,7 @@ static const char *kUserDirectories[] = {
 	HOME,									// B_USER_DIRECTORY
 	HOME CONFIG,							// B_USER_CONFIG_DIRECTORY
 	HOME CONFIG "/add-ons$a",
-	HOME CONFIG "/boot",
+	HOME CONFIG "/settings/boot",
 	HOME CONFIG "/data/fonts",
 	HOME CONFIG "/lib$a",
 	HOME CONFIG "/settings",
