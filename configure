@@ -199,6 +199,19 @@ check_dir_exists()
 	fi
 }
 
+# check_file_exists
+#
+# check if a file exists or not
+#
+check_file_exists()
+{
+	if [ -f "$1" ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
 # real_path
 #
 # returns the realpath of a symbolic link.
@@ -586,8 +599,8 @@ while [ $# -gt 0 ] ; do
 			HOST_HAIKU_PORTER="`absolute_path $2`"
 			HAIKU_PORTS_CROSS="`absolute_path $3`"
 			HAIKU_PORTS="`absolute_path $4`"
-			check_dir_exists "$HOST_HAIKU_PORTER" || (
-				echo "Non-existent directory $HOST_HAIKU_PORTER" >&2
+			check_file_exists "$HOST_HAIKU_PORTER" || (
+				echo "Invalid path to haikuporter: $HOST_HAIKU_PORTER" >&2
 				exit 1
 			)
 			check_dir_exists "$HAIKU_PORTS" || (
