@@ -35,9 +35,8 @@ The BeagleBone Black supports booting from an microSD card while the boot switch
 
 # Compiling
 
-*  Create your work directory `mkdir generated.arm; cd generated.arm`
-*  Build an ARM toolchain using `../configure --build-cross-tools arm ../../buildtools`
-*  Build our loader using `jam -q -sHAIKU_BOOT_BOARD=beagleboneblk haiku_loader`
+*  Create your work directory `mkdir generated.beagle; cd generated.beagle`
+*  Build an ARM toolchain using `../configure --build-cross-tools arm ../../buildtools --target-board beagle`
 *  TODO
 
 # Booting
