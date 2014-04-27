@@ -25,6 +25,7 @@
 #include "Constants.h"
 #include "DebugSupport.h"
 #include "Exception.h"
+#include "PackageFileManager.h"
 #include "VolumeState.h"
 
 
@@ -32,17 +33,25 @@ using namespace BPackageKit::BPrivate;
 
 
 CommitTransactionHandler::CommitTransactionHandler(Volume* volume,
-	VolumeState* volumeState, const PackageSet& packagesAlreadyAdded,
+	PackageFileManager* packageFileManager, VolumeState* volumeState,
+	bool isActiveVolumeState, const PackageSet& packagesAlreadyAdded,
 	const PackageSet& packagesAlreadyRemoved)
 	:
 	fVolume(volume),
-	fVolumeState(volumeState),
+	fPackageFileManager(packageFileManager),
+	fVolumeState(volumeState->Clone()),
+	fVolumeStateIsActive(isActiveVolumeState),
 	fPackagesToActivate(),
 	fPackagesToDeactivate(),
 	fAddedPackages(),
 	fRemovedPackages(),
 	fPackagesAlreadyAdded(packagesAlreadyAdded),
 	fPackagesAlreadyRemoved(packagesAlreadyRemoved),
+	fOldStateDirectory(),
+	fOldStateDirectoryRef(),
+	fOldStateDirectoryName(),
+	fTransactionDirectoryRef(),
+	fWritableFilesDirectory(),
 	fAddedGroups(),
 	fAddedUsers(),
 	fFSTransaction()
@@ -62,6 +71,8 @@ CommitTransactionHandler::~CommitTransactionHandler()
 			delete package;
 		}
 	}
+
+	delete fVolumeState;
 }
 
 
@@ -144,6 +155,15 @@ CommitTransactionHandler::Revert()
 }
 
 
+VolumeState*
+CommitTransactionHandler::DetachVolumeState()
+{
+	VolumeState* result = fVolumeState;
+	fVolumeState = NULL;
+	return result;
+}
+
+
 void
 CommitTransactionHandler::_GetPackagesToDeactivate(
 	const BActivationTransaction& transaction)
@@ -164,11 +184,6 @@ CommitTransactionHandler::_GetPackagesToDeactivate(
 		}
 
 		fPackagesToDeactivate.insert(package);
-
-		if (fPackagesAlreadyRemoved.find(package)
-				== fPackagesAlreadyRemoved.end()) {
-			package->IncrementEntryRemovedIgnoreLevel();
-		}
 	}
 }
 
@@ -231,18 +246,16 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 		}
 
 		// read the package
-		package = new(std::nothrow) Package;
-		if (package == NULL || !fPackagesToActivate.AddItem(package)) {
-			delete package;
-			throw Exception(B_NO_MEMORY);
-		}
-
-		error = package->Init(
-			NotOwningEntryRef(fTransactionDirectoryRef, packageName));
+		error = fPackageFileManager->CreatePackage(
+			NotOwningEntryRef(fTransactionDirectoryRef, packageName),
+			package);
 		if (error != B_OK)
 			throw Exception(error, "failed to read package", packageName);
 
-		package->IncrementEntryCreatedIgnoreLevel();
+		if (!fPackagesToActivate.AddItem(package)) {
+			delete package;
+			throw Exception(B_NO_MEMORY);
+		}
 	}
 }
 
@@ -250,6 +263,9 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 void
 CommitTransactionHandler::_ApplyChanges(BMessage* reply)
 {
+	if (fVolumeState == NULL)
+		throw std::bad_alloc();
+
 	// create an old state directory
 	_CreateOldStateDirectory(reply);
 
@@ -262,8 +278,12 @@ CommitTransactionHandler::_ApplyChanges(BMessage* reply)
 	// activate/deactivate packages
 	_ChangePackageActivation(fAddedPackages, fRemovedPackages);
 
-	// run post-installation scripts
-	_RunPostInstallScripts();
+	if (fVolumeStateIsActive) {
+		// run post-installation scripts
+		_RunPostInstallScripts();
+	} else {
+		// TODO: Make sure the post-install scripts are run on next boot!
+	}
 
 	// removed packages have been deleted, new packages shall not be deleted
 	fAddedPackages.clear();
@@ -318,6 +338,10 @@ CommitTransactionHandler::_CreateOldStateDirectory(BMessage* reply)
 
 	fOldStateDirectoryName = directoryName;
 
+	error = fOldStateDirectory.GetNodeRef(&fOldStateDirectoryRef);
+	if (error != B_OK)
+		throw Exception(error, "failed get old state directory ref");
+
 	// write the old activation file
 	BEntry activationFile;
 	error = _WriteActivationFile(
@@ -351,8 +375,7 @@ CommitTransactionHandler::_RemovePackagesToDeactivate()
 		}
 
 		// get a BEntry for the package
-		NotOwningEntryRef entryRef(fVolume->PackagesDirectoryRef(),
-			package->FileName());
+		NotOwningEntryRef entryRef(package->EntryRef());
 
 		BEntry entry;
 		status_t error = entry.SetTo(&entryRef);
@@ -371,6 +394,10 @@ CommitTransactionHandler::_RemovePackagesToDeactivate()
 				"failed to move old package from packages directory",
 				package->FileName());
 		}
+
+		fPackageFileManager->PackageFileMoved(package->File(),
+			fOldStateDirectoryRef);
+		package->File()->IncrementEntryRemovedIgnoreLevel();
 	}
 }
 
@@ -418,6 +445,10 @@ CommitTransactionHandler::_AddPackagesToActivate()
 				"failed to move new package to packages directory",
 				package->FileName());
 		}
+
+		fPackageFileManager->PackageFileMoved(package->File(),
+			fVolume->PackagesDirectoryRef());
+		package->File()->IncrementEntryCreatedIgnoreLevel();
 
 		// also add the package to the volume
 		fVolumeState->AddPackage(package);
@@ -944,9 +975,7 @@ CommitTransactionHandler::_RevertAddPackagesToActivate()
 			continue;
 
 		// get BEntry for the package
-		NotOwningEntryRef entryRef(fVolume->PackagesDirectoryRef(),
-			package->FileName());
-
+		NotOwningEntryRef entryRef(package->EntryRef());
 		BEntry entry;
 		error = entry.SetTo(&entryRef);
 		if (error != B_OK) {
@@ -963,6 +992,10 @@ CommitTransactionHandler::_RevertAddPackagesToActivate()
 				strerror(error));
 			continue;
 		}
+
+		fPackageFileManager->PackageFileMoved(package->File(),
+			fTransactionDirectoryRef);
+		package->File()->IncrementEntryRemovedIgnoreLevel();
 	}
 }
 
@@ -1010,6 +1043,10 @@ CommitTransactionHandler::_RevertRemovePackagesToDeactivate()
 				strerror(error));
 			continue;
 		}
+
+		fPackageFileManager->PackageFileMoved(package->File(),
+			fVolume->PackagesDirectoryRef());
+		package->File()->IncrementEntryCreatedIgnoreLevel();
 	}
 }
 
@@ -1160,8 +1197,7 @@ CommitTransactionHandler::_ExtractPackageContent(Package* package,
 	createSubDirectoryOperation.Finished();
 
 	// extract
-	NotOwningEntryRef packageRef(fVolume->PackagesDirectoryRef(),
-		package->FileName());
+	NotOwningEntryRef packageRef(package->EntryRef());
 
 	int32 contentPathCount = contentPaths.CountStrings();
 	for (int32 i = 0; i < contentPathCount; i++) {
@@ -1368,6 +1404,39 @@ CommitTransactionHandler::_ChangePackageActivation(
 	if (error != B_OK)
 		throw Exception(error, "failed to write activation file");
 
+	// notify packagefs
+	if (fVolumeStateIsActive) {
+		_ChangePackageActivationIOCtl(packagesToActivate, packagesToDeactivate);
+	} else {
+		// TODO: Notify packagefs that active packages have been moved or do
+		// node monitoring in packagefs!
+	}
+
+	// rename the temporary activation file to the final file
+	error = activationFileEntry.Rename(kActivationFileName, true);
+	if (error != B_OK) {
+		throw Exception(error,
+			"failed to rename temporary activation file to final file");
+// TODO: We should probably try to revert the activation changes, though that
+// will fail, if this method has been called in response to node monitoring
+// events. Alternatively moving the package activation file could be made part
+// of the ioctl(), since packagefs should be able to undo package changes until
+// the very end, unless running out of memory. In the end the situation would be
+// bad anyway, though, since the activation file may refer to removed packages
+// and things would be in an inconsistent state after rebooting.
+	}
+
+	// Update our state, i.e. remove deactivated packages and mark activated
+	// packages accordingly.
+	fVolumeState->ActivationChanged(packagesToActivate, packagesToDeactivate);
+}
+
+
+void
+CommitTransactionHandler::_ChangePackageActivationIOCtl(
+	const PackageSet& packagesToActivate,
+	const PackageSet& packagesToDeactivate)
+{
 	// compute the size of the allocation we need for the activation change
 	// request
 	int32 itemCount = packagesToActivate.size() + packagesToDeactivate.size();
@@ -1419,24 +1488,6 @@ CommitTransactionHandler::_ChangePackageActivation(
 // TODO: We need more error information and error handling!
 		throw Exception(errno, "ioctl() to de-/activate packages failed");
 	}
-
-	// rename the temporary activation file to the final file
-	error = activationFileEntry.Rename(kActivationFileName, true);
-	if (error != B_OK) {
-		throw Exception(error,
-			"failed to rename temporary activation file to final file");
-// TODO: We should probably try to reverse the activation changes, though that
-// will fail, if this method has been called in response to node monitoring
-// events. Alternatively moving the package activation file could be made part
-// of the ioctl(), since packagefs should be able to undo package changes until
-// the very end, unless running out of memory. In the end the situation would be
-// bad anyway, though, since the activation file may refer to removed packages
-// and things would be in an inconsistent state after rebooting.
-	}
-
-	// Update our state, i.e. remove deactivated packages and mark activated
-	// packages accordingly.
-	fVolumeState->ActivationChanged(packagesToActivate, packagesToDeactivate);
 }
 
 

@@ -33,9 +33,9 @@
 //
 // The only thread synchronization needed is for the status information accessed
 // by HandleGetLocationInfoRequest() and modified by the job thread. The data
-// are encapsulated in a VolumeState object which contains a lock. The lock
-// must be held by the app thread when accessing the data (it reads only) and
-// by the job thread when modifying the data (not needed when reading).
+// are encapsulated in a VolumeState, which is protected by Volume::fLock. The
+// lock must be held by the app thread when accessing the data (it reads only)
+// and by the job thread when modifying the data (not needed when reading).
 
 
 using BPackageKit::BPrivate::BActivationTransaction;
@@ -44,6 +44,7 @@ using BPackageKit::BPrivate::BDaemonClient;
 class BDirectory;
 
 class CommitTransactionHandler;
+class PackageFileManager;
 class Root;
 class VolumeState;
 
@@ -154,7 +155,14 @@ private:
 			void				_PackagesEntryRemoved(const char* name);
 
 			status_t			_ReadPackagesDirectory();
+			status_t			_InitLatestState();
+			status_t			_InitLatestStateFromActivatedPackages();
 			status_t			_GetActivePackages(int fd);
+			bool				_CheckActivePackagesMatchLatestState(
+									PackageFSGetPackageInfosRequest* request);
+			void				_SetLatestState(VolumeState* state,
+									bool isActive);
+			void				_DumpState(VolumeState* state);
 
 			status_t			_AddRepository(BSolver* solver,
 									BSolverRepository& repository,
@@ -162,9 +170,6 @@ private:
 
 			status_t			_OpenPackagesSubDirectory(
 									const RelativePath& path, bool create,
-									BDirectory& _directory);
-
-			status_t			_OpenSettingsRootDirectory(
 									BDirectory& _directory);
 
 private:
@@ -175,7 +180,10 @@ private:
 			uint32				fPackagesDirectoryCount;
 			Root*				fRoot;
 			Listener*			fListener;
-			VolumeState*		fState;
+			PackageFileManager*	fPackageFileManager;
+			VolumeState*		fLatestState;
+			VolumeState*		fActiveState;
+			BLocker				fLock;
 			BLocker				fPendingNodeMonitorEventsLock;
 			NodeMonitorEventList fPendingNodeMonitorEvents;
 			bigtime_t			fNodeMonitorEventHandleTime;

@@ -9,8 +9,6 @@
 #define VOLUME_STATE_H
 
 
-#include <Locker.h>
-
 #include "Package.h"
 
 
@@ -20,11 +18,6 @@ public:
 								~VolumeState();
 
 			bool				Init();
-
-			bool				Lock()
-									{ return fLock.Lock(); }
-			void				Unlock()
-									{ fLock.Unlock(); }
 
 			int64				ChangeCount() const
 									{ return fChangeCount; }
@@ -44,11 +37,12 @@ public:
 									const PackageSet& activatedPackage,
 									const PackageSet& deactivatePackages);
 
+			VolumeState*		Clone() const;
+
 private:
 			void				_RemovePackage(Package* package);
 
 private:
-			BLocker				fLock;
 			PackageFileNameHashTable fPackagesByFileName;
 			PackageNodeRefHashTable fPackagesByNodeRef;
 			int64				fChangeCount;

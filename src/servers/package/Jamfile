@@ -15,6 +15,8 @@ Server package_daemon
 	JobQueue.cpp
 	Package.cpp
 	PackageDaemon.cpp
+	PackageFile.cpp
+	PackageFileManager.cpp
 	PackageManager.cpp
 	ProblemWindow.cpp
 	ResultWindow.cpp

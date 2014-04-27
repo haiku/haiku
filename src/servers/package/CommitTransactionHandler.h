@@ -25,7 +25,9 @@ typedef std::set<std::string> StringSet;
 class CommitTransactionHandler {
 public:
 								CommitTransactionHandler(Volume* volume,
+									PackageFileManager* packageFileManager,
 									VolumeState* volumeState,
+									bool isActiveVolumeState,
 									const PackageSet& packagesAlreadyAdded,
 									const PackageSet& packagesAlreadyRemoved);
 								~CommitTransactionHandler();
@@ -42,6 +44,10 @@ public:
 
 			const BString&		OldStateDirectoryName() const
 									{ return fOldStateDirectoryName; }
+
+			VolumeState*		DetachVolumeState();
+			bool				IsActiveVolumeState() const
+									{ return fVolumeStateIsActive; }
 
 private:
 			typedef BObjectList<Package> PackageList;
@@ -112,6 +118,10 @@ private:
 									const PackageSet& packagesToActivate,
 									const PackageSet& packagesToDeactivate);
 									// throws Exception
+			void				_ChangePackageActivationIOCtl(
+									const PackageSet& packagesToActivate,
+									const PackageSet& packagesToDeactivate);
+									// throws Exception
 			void				_FillInActivationChangeItem(
 									PackageFSActivationChangeItem* item,
 									PackageFSActivationChangeType type,
@@ -126,7 +136,9 @@ private:
 
 private:
 			Volume*				fVolume;
+			PackageFileManager*	fPackageFileManager;
 			VolumeState*		fVolumeState;
+			bool				fVolumeStateIsActive;
 			PackageList			fPackagesToActivate;
 			PackageSet			fPackagesToDeactivate;
 			PackageSet			fAddedPackages;
@@ -134,6 +146,7 @@ private:
 			const PackageSet&	fPackagesAlreadyAdded;
 			const PackageSet&	fPackagesAlreadyRemoved;
 			BDirectory			fOldStateDirectory;
+			node_ref			fOldStateDirectoryRef;
 			BString				fOldStateDirectoryName;
 			node_ref			fTransactionDirectoryRef;
 			BDirectory			fWritableFilesDirectory;

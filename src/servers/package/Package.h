@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,11 +11,7 @@
 
 #include <set>
 
-#include <Entry.h>
-#include <Node.h>
-#include <package/PackageInfo.h>
-
-#include <util/OpenHashTable.h>
+#include "PackageFile.h"
 
 
 using namespace BPackageKit;
@@ -23,40 +19,33 @@ using namespace BPackageKit;
 
 class Package {
 public:
-								Package();
+								Package(PackageFile* file);
 								~Package();
 
-			status_t			Init(const entry_ref& entryRef);
+			PackageFile*		File() const
+									{ return fFile; }
 
 			const node_ref&		NodeRef() const
-									{ return fNodeRef; }
+									{ return fFile->NodeRef(); }
 			const BString&		FileName() const
-									{ return fFileName; }
+									{ return fFile->FileName(); }
+			NotOwningEntryRef	EntryRef() const
+									{ return fFile->EntryRef(); }
 
 			const BPackageInfo & Info() const
-									{ return fInfo; }
+									{ return fFile->Info(); }
 
-			BString				RevisionedName() const;
-			BString				RevisionedNameThrows() const;
+			BString				RevisionedName() const
+									{ return fFile->RevisionedName(); }
+			BString				RevisionedNameThrows() const
+									{ return fFile->RevisionedNameThrows(); }
 
 			bool				IsActive() const
 									{ return fActive; }
 			void				SetActive(bool active)
 									{ fActive = active; }
 
-			int32				EntryCreatedIgnoreLevel() const
-									{ return fIgnoreEntryCreated; }
-			void				IncrementEntryCreatedIgnoreLevel()
-									{ fIgnoreEntryCreated++; }
-			void				DecrementEntryCreatedIgnoreLevel()
-									{ fIgnoreEntryCreated--; }
-
-			int32				EntryRemovedIgnoreLevel() const
-									{ return fIgnoreEntryRemoved; }
-			void				IncrementEntryRemovedIgnoreLevel()
-									{ fIgnoreEntryRemoved++; }
-			void				DecrementEntryRemovedIgnoreLevel()
-									{ fIgnoreEntryRemoved--; }
+			Package*			Clone() const;
 
 			Package*&			FileNameHashTableNext()
 									{ return fFileNameHashTableNext; }
@@ -64,14 +53,10 @@ public:
 									{ return fNodeRefHashTableNext; }
 
 private:
-			node_ref			fNodeRef;
-			BString				fFileName;
-			BPackageInfo		fInfo;
+			PackageFile*		fFile;
 			bool				fActive;
 			Package*			fFileNameHashTableNext;
 			Package*			fNodeRefHashTableNext;
-			int32				fIgnoreEntryCreated;
-			int32				fIgnoreEntryRemoved;
 };
 
 

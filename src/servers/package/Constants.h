@@ -21,5 +21,8 @@ static const bigtime_t kHandleNodeMonitorEvents = 'nmon';
 static const bigtime_t kNodeMonitorEventHandlingDelay = 500000;
 static const bigtime_t kCommunicationTimeout = 1000000;
 
+// sanity limit for activation file size
+static const size_t kMaxActivationFileSize = 10 * 1024 * 1024;
+
 
 #endif	// CONSTANTS_H

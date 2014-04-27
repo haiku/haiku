@@ -39,6 +39,7 @@
 #include "Constants.h"
 #include "DebugSupport.h"
 #include "Exception.h"
+#include "PackageFileManager.h"
 #include "VolumeState.h"
 
 
@@ -141,7 +142,10 @@ Volume::Volume(BLooper* looper)
 	fPackagesDirectoryCount(0),
 	fRoot(NULL),
 	fListener(NULL),
-	fState(NULL),
+	fPackageFileManager(NULL),
+	fLatestState(NULL),
+	fActiveState(NULL),
+	fLock("volume"),
 	fPendingNodeMonitorEventsLock("pending node monitor events"),
 	fPendingNodeMonitorEvents(),
 	fNodeMonitorEventHandleTime(0),
@@ -159,23 +163,41 @@ Volume::~Volume()
 	Unmounted();
 		// need for error case in InitPackages()
 
-	delete [] fPackagesDirectories;
-	delete fState;
+	delete[] fPackagesDirectories;
+	delete fPackageFileManager;
+
+	_SetLatestState(NULL, true);
 }
 
 
 status_t
 Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 {
-	fState = new(std::nothrow) VolumeState;
-	if (fState == NULL || !fState->Init())
+	status_t error = fLock.InitCheck();
+	if (error != B_OK)
+		return error;
+
+	error = fPendingNodeMonitorEventsLock.InitCheck();
+	if (error != B_OK)
+		return error;
+
+	fLatestState = new(std::nothrow) VolumeState;
+	if (fLatestState == NULL || !fLatestState->Init())
 		RETURN_ERROR(B_NO_MEMORY);
+
+	fPackageFileManager = new(std::nothrow) PackageFileManager(fLock);
+	if (fPackageFileManager == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	error = fPackageFileManager->Init();
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
 	fRootDirectoryRef = rootDirectoryRef;
 
 	// open the root directory
 	BDirectory directory;
-	status_t error = directory.SetTo(&fRootDirectoryRef);
+	error = directory.SetTo(&fRootDirectoryRef);
 	if (error != B_OK) {
 		ERROR("Volume::Init(): failed to open root directory: %s\n",
 			strerror(error));
@@ -293,6 +315,10 @@ Volume::InitPackages(Listener* listener)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
+	error = _InitLatestState();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
 	error = _GetActivePackages(fd);
 	if (error != B_OK)
 		RETURN_ERROR(error);
@@ -311,8 +337,8 @@ Volume::InitPackages(Listener* listener)
 status_t
 Volume::AddPackagesToRepository(BSolverRepository& repository, bool activeOnly)
 {
-	for (PackageFileNameHashTable::Iterator it = fState->ByFileNameIterator();
-			it.HasNext();) {
+	for (PackageFileNameHashTable::Iterator it
+			= fLatestState->ByFileNameIterator(); it.HasNext();) {
 		Package* package = it.Next();
 		if (activeOnly && !package->IsActive())
 			continue;
@@ -419,13 +445,13 @@ INFORM("Volume::InitialVerify(%p, %p)\n", nextVolume, nextNextVolume);
 void
 Volume::HandleGetLocationInfoRequest(BMessage* message)
 {
-	AutoLocker<VolumeState> stateLocker(fState);
+	AutoLocker<BLocker> locker(fLock);
 
 	// If the cached reply message is up-to-date, just send it.
 	int64 changeCount;
 	if (fLocationInfoReply.FindInt64("change count", &changeCount) == B_OK
-		&& changeCount == fState->ChangeCount()) {
-		stateLocker.Unlock();
+		&& changeCount == fLatestState->ChangeCount()) {
+		locker.Unlock();
 		message->SendReply(&fLocationInfoReply, (BHandler*)NULL,
 			kCommunicationTimeout);
 		return;
@@ -445,8 +471,8 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 		return;
 	}
 
-	for (PackageFileNameHashTable::Iterator it = fState->ByFileNameIterator();
-			it.HasNext();) {
+	for (PackageFileNameHashTable::Iterator it
+			= fLatestState->ByFileNameIterator(); it.HasNext();) {
 		Package* package = it.Next();
 		const char* fieldName = package->IsActive()
 			? "active packages" : "inactive packages";
@@ -458,12 +484,12 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 		}
 	}
 
-	if (fLocationInfoReply.AddInt64("change count", fState->ChangeCount())
+	if (fLocationInfoReply.AddInt64("change count", fLatestState->ChangeCount())
 			!= B_OK) {
 		return;
 	}
 
-	stateLocker.Unlock();
+	locker.Unlock();
 
 	message->SendReply(&fLocationInfoReply, (BHandler*)NULL,
 		kCommunicationTimeout);
@@ -481,10 +507,13 @@ Volume::HandleCommitTransactionRequest(BMessage* message)
 
 	// perform the request
 	PackageSet dummy;
-	CommitTransactionHandler handler(this, fState, dummy, dummy);
+	CommitTransactionHandler handler(this, fPackageFileManager, fLatestState,
+		fLatestState == fActiveState, dummy, dummy);
 	int32 error;
 	try {
 		handler.HandleRequest(message, &reply);
+		_SetLatestState(handler.DetachVolumeState(),
+			handler.IsActiveVolumeState());
 		error = B_DAEMON_OK;
 	} catch (Exception& exception) {
 		error = exception.Error();
@@ -606,7 +635,7 @@ Volume::PackagesDirectoryRef() const
 PackageFileNameHashTable::Iterator
 Volume::PackagesByFileNameIterator() const
 {
-	return fState->ByFileNameIterator();
+	return fLatestState->ByFileNameIterator();
 }
 
 
@@ -660,11 +689,14 @@ Volume::ProcessPendingPackageActivationChanges()
 		return;
 
 	// perform the request
-	CommitTransactionHandler handler(this, fState, fPackagesToBeActivated,
+	CommitTransactionHandler handler(this, fPackageFileManager, fLatestState,
+		fLatestState == fActiveState, fPackagesToBeActivated,
 		fPackagesToBeDeactivated);
 	int32 error;
 	try {
 		handler.HandleRequest(fPackagesToBeActivated, fPackagesToBeDeactivated);
+		_SetLatestState(handler.DetachVolumeState(),
+			handler.IsActiveVolumeState());
 		error = B_DAEMON_OK;
 	} catch (Exception& exception) {
 		error = exception.Error();
@@ -724,7 +756,8 @@ Volume::CreateTransaction(BPackageInstallationLocation location,
 	}
 
 	// init the transaction
-	error = _transaction.SetTo(location, fState->ChangeCount(), directoryName);
+	error = _transaction.SetTo(location, fLatestState->ChangeCount(),
+		directoryName);
 	if (error != B_OK) {
 		BEntry entry;
 		_transactionDirectory.GetEntry(&entry);
@@ -745,11 +778,14 @@ Volume::CommitTransaction(const BActivationTransaction& transaction,
 	BDaemonClient::BCommitTransactionResult& _result)
 {
 	// perform the request
-	CommitTransactionHandler handler(this, fState, packagesAlreadyAdded,
+	CommitTransactionHandler handler(this, fPackageFileManager, fLatestState,
+		fLatestState == fActiveState, packagesAlreadyAdded,
 		packagesAlreadyRemoved);
 	int32 error;
 	try {
 		handler.HandleRequest(transaction, NULL);
+		_SetLatestState(handler.DetachVolumeState(),
+			handler.IsActiveVolumeState());
 		error = B_DAEMON_OK;
 		_result.SetTo(error, BString(), BString(),
 			handler.OldStateDirectoryName());
@@ -851,10 +887,10 @@ Volume::_PackagesEntryCreated(const char* name)
 {
 INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
 	// Ignore the event, if the package is already known.
-	Package* package = fState->FindPackage(name);
+	Package* package = fLatestState->FindPackage(name);
 	if (package != NULL) {
-		if (package->EntryCreatedIgnoreLevel() > 0) {
-			package->DecrementEntryCreatedIgnoreLevel();
+		if (package->File()->EntryCreatedIgnoreLevel() > 0) {
+			package->File()->DecrementEntryCreatedIgnoreLevel();
 		} else {
 			WARN("node monitoring created event for already known entry "
 				"\"%s\"\n", name);
@@ -863,22 +899,17 @@ INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
 		return;
 	}
 
-	package = new(std::nothrow) Package;
-	if (package == NULL) {
-		ERROR("out of memory\n");
-		return;
-	}
-	ObjectDeleter<Package> packageDeleter(package);
-
-	NotOwningEntryRef entry(PackagesDirectoryRef(), name);
-	status_t error = package->Init(entry);
+	status_t error = fPackageFileManager->CreatePackage(
+		NotOwningEntryRef(PackagesDirectoryRef(), name),
+		package);
 	if (error != B_OK) {
 		ERROR("failed to init package for file \"%s\"\n", name);
 		return;
 	}
 
-	fState->AddPackage(package);
-	packageDeleter.Detach();
+	fLock.Lock();
+	fLatestState->AddPackage(package);
+	fLock.Unlock();
 
 	try {
 		fPackagesToBeActivated.insert(package);
@@ -893,13 +924,13 @@ void
 Volume::_PackagesEntryRemoved(const char* name)
 {
 INFORM("Volume::_PackagesEntryRemoved(\"%s\")\n", name);
-	Package* package = fState->FindPackage(name);
+	Package* package = fLatestState->FindPackage(name);
 	if (package == NULL)
 		return;
 
 	// Ignore the event, if we generated it ourselves.
-	if (package->EntryRemovedIgnoreLevel() > 0) {
-		package->DecrementEntryRemovedIgnoreLevel();
+	if (package->File()->EntryRemovedIgnoreLevel() > 0) {
+		package->File()->DecrementEntryRemovedIgnoreLevel();
 		return;
 	}
 
@@ -911,7 +942,8 @@ INFORM("Volume::_PackagesEntryRemoved(\"%s\")\n", name);
 
 	// If the package isn't active, just remove it for good.
 	if (!package->IsActive()) {
-		fState->RemovePackage(package);
+		AutoLocker<BLocker> locker(fLock);
+		fLatestState->RemovePackage(package);
 		delete package;
 		return;
 	}
@@ -942,16 +974,117 @@ Volume::_ReadPackagesDirectory()
 		if (!BString(entry.name).EndsWith(kPackageFileNameExtension))
 			continue;
 
-		Package* package = new(std::nothrow) Package;
-		if (package == NULL)
-			RETURN_ERROR(B_NO_MEMORY);
-		ObjectDeleter<Package> packageDeleter(package);
-
-		status_t error = package->Init(entry);
+		Package* package;
+		status_t error = fPackageFileManager->CreatePackage(entry, package);
 		if (error == B_OK) {
-			fState->AddPackage(package);
-			packageDeleter.Detach();
+			AutoLocker<BLocker> locker(fLock);
+			fLatestState->AddPackage(package);
 		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Volume::_InitLatestState()
+{
+	if (_InitLatestStateFromActivatedPackages() == B_OK)
+		return B_OK;
+
+	INFORM("Failed to get activated packages info from activated packages file."
+		" Assuming all package files in package directory are activated.\n");
+
+	AutoLocker<BLocker> locker(fLock);
+
+	for (PackageFileNameHashTable::Iterator it
+				= fLatestState->ByFileNameIterator();
+			Package* package = it.Next();) {
+		fLatestState->SetPackageActive(package, true);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Volume::_InitLatestStateFromActivatedPackages()
+{
+	// try reading the activation file
+	NotOwningEntryRef entryRef(PackagesDirectoryRef(), kActivationFileName);
+	BFile file;
+	status_t error = file.SetTo(&entryRef, B_READ_ONLY);
+	if (error != B_OK) {
+		INFORM("Failed to open packages activation file: %s\n",
+			strerror(error));
+		RETURN_ERROR(error);
+	}
+
+	// read the whole file into memory to simplify things
+	off_t size;
+	error = file.GetSize(&size);
+	if (error != B_OK) {
+		ERROR("Failed to packages activation file size: %s\n",
+			strerror(error));
+		RETURN_ERROR(error);
+	}
+
+	if (size > (off_t)kMaxActivationFileSize) {
+		ERROR("The packages activation file is too big.\n");
+		RETURN_ERROR(B_BAD_DATA);
+	}
+
+	char* fileContent = (char*)malloc(size + 1);
+	if (fileContent == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	MemoryDeleter fileContentDeleter(fileContent);
+
+	ssize_t bytesRead = file.Read(fileContent, size);
+	if (bytesRead < 0) {
+		ERROR("Failed to read packages activation file: %s\n",
+			strerror(bytesRead));
+		RETURN_ERROR(errno);
+	}
+
+	if (bytesRead != size) {
+		ERROR("Failed to read whole packages activation file.\n");
+		RETURN_ERROR(B_ERROR);
+	}
+
+	// null-terminate to simplify parsing
+	fileContent[size] = '\0';
+
+	AutoLocker<BLocker> locker(fLock);
+
+	// parse the file and mark the respective packages active
+	const char* packageName = fileContent;
+	char* const fileContentEnd = fileContent + size;
+	while (packageName < fileContentEnd) {
+		char* packageNameEnd = strchr(packageName, '\n');
+		if (packageNameEnd == NULL)
+			packageNameEnd = fileContentEnd;
+
+		// skip empty lines
+		if (packageName == packageNameEnd) {
+			packageName++;
+			continue;
+		}
+		*packageNameEnd = '\0';
+
+		if (packageNameEnd - packageName >= B_FILE_NAME_LENGTH) {
+			ERROR("Invalid packages activation file content.\n");
+			RETURN_ERROR(B_BAD_DATA);
+		}
+
+		Package* package = fLatestState->FindPackage(packageName);
+		if (package != NULL) {
+			fLatestState->SetPackageActive(package, true);
+		} else {
+			WARN("Package \"%s\" from activation file not in packages "
+				"directory.\n", packageName);
+		}
+
+		packageName = packageNameEnd + 1;
 	}
 
 	return B_OK;
@@ -961,7 +1094,7 @@ Volume::_ReadPackagesDirectory()
 status_t
 Volume::_GetActivePackages(int fd)
 {
-// TODO: Adjust for old state support!
+	// get the info from packagefs
 	PackageFSGetPackageInfosRequest* request = NULL;
 	MemoryDeleter requestDeleter;
 	size_t bufferSize = 64 * 1024;
@@ -985,38 +1118,139 @@ Volume::_GetActivePackages(int fd)
 		requestDeleter.Unset();
 	}
 
-	// mark the returned packages active
+	INFORM("latest volume state:\n");
+	_DumpState(fLatestState);
+
+	// check whether that matches the expected state
+	if (_CheckActivePackagesMatchLatestState(request)) {
+		INFORM("The latest volume state is also the currently active one\n");
+		fActiveState = fLatestState;
+		return B_OK;
+	}
+
+	// There's a mismatch. We need a new state that reflects the actual
+	// activation situation.
+	VolumeState* state = new(std::nothrow) VolumeState;
+	if (state == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	ObjectDeleter<VolumeState> stateDeleter(state);
+
 	for (uint32 i = 0; i < request->packageCount; i++) {
-		Package* package = fState->FindPackage(
-			node_ref(request->infos[i].packageDeviceID,
-				request->infos[i].packageNodeID));
-		if (package == NULL) {
-			WARN("active package (dev: %" B_PRIdDEV ", node: %" B_PRIdINO ") "
-				"not found in package directory\n",
-				request->infos[i].packageDeviceID,
-				request->infos[i].packageNodeID);
-// TODO: Deactivate the package right away?
+		const PackageFSPackageInfo& info = request->infos[i];
+		NotOwningEntryRef entryRef(info.directoryDeviceID, info.directoryNodeID,
+			info.name);
+		Package* package;
+		status_t error = fPackageFileManager->CreatePackage(entryRef, package);
+		if (error != B_OK) {
+			WARN("Failed to create package (dev: %" B_PRIdDEV ", node: %"
+				B_PRIdINO ", \"%s\"): %s\n", info.directoryDeviceID,
+				info.directoryNodeID, info.name, strerror(error));
 			continue;
 		}
 
-		fState->SetPackageActive(package, true);
-INFORM("active package: \"%s\"\n", package->FileName().String());
+		state->AddPackage(package);
+		state->SetPackageActive(package, true);
 	}
 
-for (PackageNodeRefHashTable::Iterator it = fState->ByNodeRefIterator();
-	it.HasNext();) {
-	Package* package = it.Next();
-	if (!package->IsActive())
-		INFORM("inactive package: \"%s\"\n", package->FileName().String());
+	INFORM("currently active volume state:\n");
+	_DumpState(state);
+
+	fActiveState = stateDeleter.Detach();
+	return B_OK;
 }
 
-// INFORM("%" B_PRIu32 " active packages:\n", request->packageCount);
-// for (uint32 i = 0; i < request->packageCount; i++) {
-// 	INFORM("  dev: %" B_PRIdDEV ", node: %" B_PRIdINO "\n",
-// 		request->infos[i].packageDeviceID, request->infos[i].packageNodeID);
-// }
 
-	return B_OK;
+bool
+Volume::_CheckActivePackagesMatchLatestState(
+	PackageFSGetPackageInfosRequest* request)
+{
+	if (fPackagesDirectoryCount != 1) {
+		INFORM("An old packages state (\"%s\") seems to be active.\n",
+			fPackagesDirectories[fPackagesDirectoryCount - 1].Name().String());
+		return false;
+	}
+
+	const node_ref packagesDirRef(PackagesDirectoryRef());
+
+	// mark the returned packages active
+	for (uint32 i = 0; i < request->packageCount; i++) {
+		const PackageFSPackageInfo& info = request->infos[i];
+		if (node_ref(info.directoryDeviceID, info.directoryNodeID)
+				!= packagesDirRef) {
+			WARN("active package \"%s\" (dev: %" B_PRIdDEV ", node: %" B_PRIdINO
+				") not in packages directory\n", info.name,
+				info.packageDeviceID, info.packageNodeID);
+			return false;
+		}
+
+		Package* package = fLatestState->FindPackage(
+			node_ref(info.packageDeviceID, info.packageNodeID));
+		if (package == NULL || !package->IsActive()) {
+			WARN("active package \"%s\" (dev: %" B_PRIdDEV ", node: %" B_PRIdINO
+				") not %s\n", info.name,
+				info.packageDeviceID, info.packageNodeID,
+				package == NULL
+					? "found in packages directory" : "supposed to be active");
+			return false;
+		}
+	}
+
+	// Check whether there are packages that aren't active but should be.
+	uint32 count = 0;
+	for (PackageNodeRefHashTable::Iterator it
+			= fLatestState->ByNodeRefIterator(); it.HasNext();) {
+		Package* package = it.Next();
+		if (package->IsActive())
+			count++;
+	}
+
+	if (count != request->packageCount) {
+		INFORM("There seem to be packages in the packages directory that "
+			"should be active.\n");
+		return false;
+	}
+
+	return true;
+}
+
+
+void
+Volume::_SetLatestState(VolumeState* state, bool isActive)
+{
+	AutoLocker<BLocker> locker(fLock);
+	if (isActive) {
+		if (fLatestState != fActiveState)
+			delete fActiveState;
+		fActiveState = state;
+	}
+
+	delete fLatestState;
+	fLatestState = state;
+}
+
+
+void
+Volume::_DumpState(VolumeState* state)
+{
+	uint32 inactiveCount = 0;
+	for (PackageNodeRefHashTable::Iterator it = state->ByNodeRefIterator();
+			it.HasNext();) {
+		Package* package = it.Next();
+		if (package->IsActive()) {
+			INFORM("active package: \"%s\"\n", package->FileName().String());
+		} else
+			inactiveCount++;
+	}
+
+	if (inactiveCount == 0)
+		return;
+
+	for (PackageNodeRefHashTable::Iterator it = state->ByNodeRefIterator();
+			it.HasNext();) {
+		Package* package = it.Next();
+		if (!package->IsActive())
+			INFORM("inactive package: \"%s\"\n", package->FileName().String());
+	}
 }
 
 

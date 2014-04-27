@@ -9,12 +9,12 @@
 
 #include "VolumeState.h"
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 
 
 VolumeState::VolumeState()
 	:
-	fLock("volume state"),
 	fPackagesByFileName(),
 	fPackagesByNodeRef(),
 	fChangeCount(0)
@@ -38,7 +38,7 @@ VolumeState::~VolumeState()
 bool
 VolumeState::Init()
 {
-	return fLock.InitCheck() == B_OK && fPackagesByFileName.Init() == B_OK
+	return fPackagesByFileName.Init() == B_OK
 		&& fPackagesByNodeRef.Init() == B_OK;
 }
 
@@ -46,25 +46,26 @@ VolumeState::Init()
 void
 VolumeState::AddPackage(Package* package)
 {
-	AutoLocker<BLocker> locker(fLock);
 	fPackagesByFileName.Insert(package);
 	fPackagesByNodeRef.Insert(package);
+	fChangeCount++;
 }
 
 
 void
 VolumeState::RemovePackage(Package* package)
 {
-	AutoLocker<BLocker> locker(fLock);
-	_RemovePackage(package);
+	fPackagesByFileName.Remove(package);
+	fPackagesByNodeRef.Remove(package);
+	fChangeCount++;
 }
 
 
 void
 VolumeState::SetPackageActive(Package* package, bool active)
 {
-	AutoLocker<BLocker> locker(fLock);
 	package->SetActive(active);
+	fChangeCount++;
 }
 
 
@@ -72,8 +73,6 @@ void
 VolumeState::ActivationChanged(const PackageSet& activatedPackage,
 	const PackageSet& deactivatePackages)
 {
-	AutoLocker<BLocker> locker(fLock);
-
 	for (PackageSet::iterator it = activatedPackage.begin();
 			it != activatedPackage.end(); ++it) {
 		(*it)->SetActive(true);
@@ -83,16 +82,30 @@ VolumeState::ActivationChanged(const PackageSet& activatedPackage,
 	for (PackageSet::iterator it = deactivatePackages.begin();
 			it != deactivatePackages.end(); ++it) {
 		Package* package = *it;
-		_RemovePackage(package);
+		RemovePackage(package);
 		delete package;
 	}
 }
 
 
-void
-VolumeState::_RemovePackage(Package* package)
+VolumeState*
+VolumeState::Clone() const
 {
-	fPackagesByFileName.Remove(package);
-	fPackagesByNodeRef.Remove(package);
-	fChangeCount++;
+	VolumeState* clone = new(std::nothrow) VolumeState;
+	if (clone == NULL)
+		return NULL;
+	ObjectDeleter<VolumeState> cloneDeleter(clone);
+
+	for (PackageFileNameHashTable::Iterator it
+				= fPackagesByFileName.GetIterator();
+			Package* package = it.Next();) {
+		Package* clonedPackage = package->Clone();
+		if (clonedPackage == NULL)
+			return NULL;
+		clone->AddPackage(clonedPackage);
+	}
+
+	clone->fChangeCount = fChangeCount;
+
+	return cloneDeleter.Detach();
 }
