@@ -74,7 +74,7 @@ options:
   -j<n>                       Only relevant for --build-cross-tools and
                               --build-cross-tools-gcc4. Is passed on to the
                               make building the build tools.
-  --remote-user <username>    Use given username when logging into 
+  --remote-user <username>    Use given username when logging into
                               git.haiku-os.org (via ssh).
   --target=TARGET             Select build target platform.
                               [default=${TARGET_PLATFORM}]
