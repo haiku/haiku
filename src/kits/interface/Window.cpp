@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2011, Haiku.
+ * Copyright 2001-2014, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -3287,9 +3287,11 @@ BWindow::_DetermineTarget(BMessage* message, BHandler* target)
 		case B_KEY_UP:
 		{
 			// if we have a default button, it might want to hear
-			// about pressing the <enter> key
+			// about pressing the <enter> key, but it shouldn't
+			// intercept it if another BControl is focused
 			int32 rawChar;
 			if (DefaultButton() != NULL
+				&& dynamic_cast<BControl*>(CurrentFocus()) == NULL
 				&& message->FindInt32("raw_char", &rawChar) == B_OK
 				&& rawChar == B_ENTER)
 				return DefaultButton();
