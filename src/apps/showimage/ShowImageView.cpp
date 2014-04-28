@@ -1630,7 +1630,7 @@ ShowImageView::FitToBounds()
 		return;
 
 	float fitToBoundsZoom = _FitToBoundsZoom();
-	if (!fStretchToBounds || fitToBoundsZoom > 1.0f)
+	if (!fStretchToBounds && fitToBoundsZoom > 1.0f)
 		SetZoom(1.0f);
 	else
 		SetZoom(fitToBoundsZoom);
