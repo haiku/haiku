@@ -4,8 +4,8 @@
  */
 #include "ToolBarView.h"
 
+#include <Button.h>
 #include <ControlLook.h>
-#include <IconButton.h>
 #include <Message.h>
 #include <SeparatorView.h>
 #include <SpaceLayoutItem.h>
@@ -16,8 +16,8 @@ ToolBarView::ToolBarView(BRect frame)
 	BGroupView(B_HORIZONTAL)
 {
 	float inset = ceilf(be_control_look->DefaultItemSpacing() / 2);
-	GroupLayout()->SetInsets(inset, 2, inset, 3);
-	GroupLayout()->SetSpacing(inset);
+	GroupLayout()->SetInsets(inset, 0, inset, 0);
+	GroupLayout()->SetSpacing(1);
 
 	SetFlags(Flags() | B_FRAME_EVENTS | B_PULSE_NEEDED);
 
@@ -37,7 +37,7 @@ ToolBarView::Hide()
 {
 	BView::Hide();
 	// TODO: This could be fixed in BView instead. Looking from the 
-	// BIconButtons, they are not hidden though, only their parent is...
+	// BButtons, they are not hidden though, only their parent is...
 	_HideToolTips();
 }
 
@@ -54,11 +54,13 @@ void
 ToolBarView::AddAction(BMessage* message, BHandler* target,
 	const BBitmap* icon, const char* toolTipText)
 {
-	BIconButton* button = new BIconButton(NULL, NULL, message, target);
+	BButton* button = new BButton(NULL, NULL, message);
 	button->SetIcon(icon);
+	button->SetFlat(true);
 	if (toolTipText != NULL)
 		button->SetToolTip(toolTipText);
 	_AddView(button);
+	button->SetTarget(target);
 }
 
 
@@ -79,7 +81,7 @@ ToolBarView::AddGlue()
 void
 ToolBarView::SetActionEnabled(uint32 command, bool enabled)
 {
-	if (BIconButton* button = _FindIconButton(command))
+	if (BButton* button = _FindButton(command))
 		button->SetEnabled(enabled);
 }
 
@@ -87,15 +89,15 @@ ToolBarView::SetActionEnabled(uint32 command, bool enabled)
 void
 ToolBarView::SetActionPressed(uint32 command, bool pressed)
 {
-	if (BIconButton* button = _FindIconButton(command))
-		button->SetPressed(pressed);
+	if (BButton* button = _FindButton(command))
+		button->SetValue(pressed);
 }
 
 
 void
 ToolBarView::SetActionVisible(uint32 command, bool visible)
 {
-	BIconButton* button = _FindIconButton(command);
+	BButton* button = _FindButton(command);
 	if (button == NULL)
 		return;
 	for (int32 i = 0; BLayoutItem* item = GroupLayout()->ItemAt(i); i++) {
@@ -133,11 +135,11 @@ ToolBarView::_AddView(BView* view)
 }
 
 
-BIconButton*
-ToolBarView::_FindIconButton(uint32 command) const
+BButton*
+ToolBarView::_FindButton(uint32 command) const
 {
 	for (int32 i = 0; BView* view = ChildAt(i); i++) {
-		BIconButton* button = dynamic_cast<BIconButton*>(view);
+		BButton* button = dynamic_cast<BButton*>(view);
 		if (button == NULL)
 			continue;
 		BMessage* message = button->Message();

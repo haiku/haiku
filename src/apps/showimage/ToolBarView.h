@@ -8,11 +8,7 @@
 #include <GroupView.h>
 
 
-namespace BPrivate {
-class BIconButton;
-}
-
-using BPrivate::BIconButton;
+class BButton;
 
 
 class ToolBarView : public BGroupView {
@@ -40,7 +36,7 @@ private:
 	virtual	void				FrameResized(float width, float height);
 
 			void				_AddView(BView* view);
-			BIconButton*		_FindIconButton(uint32 command) const;
+			BButton*			_FindButton(uint32 command) const;
 			void				_HideToolTips() const;
 };
 
