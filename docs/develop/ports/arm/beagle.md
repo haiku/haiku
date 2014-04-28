@@ -46,6 +46,14 @@ The BeagleBone Black supports booting from an microSD card while the boot switch
 2. If the boot switch is depressed:
    SPI0, MMC0, USB0, UART0
 
+# Emulation
+
+The Linaro Fork of QEmu has beagle board (and other OMAP3) support.
+https://launchpad.net/qemu-linaro
+
+It seems you get this as the default QEmu install on some, but not all, Ubuntu
+versions. For other distros (or Haiku), you'll have to compile it yourself.
+
 # Additional information
 
 * [CircutCo WikiPage](http://circuitco.com/support/index.php?title=BeagleBoneBlack)

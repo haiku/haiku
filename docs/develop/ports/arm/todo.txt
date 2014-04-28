@@ -1,7 +1,34 @@
+* Fix pre-ARMv7 support
+  Currently the cross-tools are compiled to default to ARMv7, Cortex-A8, and
+  hardware floating point. This works around the missing atomic support, see
+  below. This should be done by setting the -mcpu,-march and -mfloat-abi
+  switches at build time, however, they aren't passed on to haikuporter
+  during the bootstrap build, leading to the ports failing to find the
+  gcc atomic ops again.
+
 * Determine how to handle atomic functions on ARM.
   GCC inlines are not supported, since the instructionset is ill-equiped for
   this on older (pre-ARMv7) architectures. We possibly have to do something
   similar to the linux kernel helper functions for this....
+  On ARMv7 and later, this is not an issue. Not sure about ARMv6, we may get
+  it going there. ARMv5 definitely needs us to write some code, but is it
+  worth the trouble?
+
+* Fix multilib support
+  ARM-targetting versions of gcc are usually built with multilib support, to
+  allow targetting architectures with or without FPU, and using either ARM
+  or Thumb instructions. This bascally means a different libgcc and libstdc++
+  are built for each combination.
+  The cross-tools can be built with multilib support. However, we do some
+  tricks to get a separate libgcc and libstdc++ for the kernel (without C++11
+  threads support, as that would not build in the kernel). Building this lib
+  is not done in a multilib-aware way, so you get one only for the default
+  arch/cpu/abi the compiler is targetting. This is good enough, as long as that
+  arch is the one we want to use for the kernel...
+  Later on, the bootstrap build of the native gcc compiler will fail, because
+  it tries to build its multilib library set by linking against the different
+  versions of libroot (with and without fpu, etc). We only build one libroot,
+  so this also fails.
 
 * Figure out how to get page flags (modified/accessed) and implement it ;)
 	use unmapped/read-only mappings to trigger soft faults
