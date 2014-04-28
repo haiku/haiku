@@ -87,6 +87,8 @@ public:
 			void				CopySelectionToClipboard();
 
 			void				FitToBounds();
+			void				ForceOriginalSize(bool force)
+									{ fForceOriginalSize = force; }
 			void				SetZoom(float zoom,
 									BPoint where = BPoint(-1, -1));
 			float				Zoom() const
@@ -194,6 +196,7 @@ private:
 			BPoint				fBitmapLocationInView;
 
 			bool				fStretchToBounds;
+			bool				fForceOriginalSize;
 			bool				fHideCursor;
 			bool				fScrollingBitmap;
 			bool				fCreatingSelection;

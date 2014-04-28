@@ -20,10 +20,12 @@ public:
 
 			void				AddAction(uint32 command, BHandler* target,
 									const BBitmap* icon,
-									const char* toolTipText = NULL);
+									const char* toolTipText = NULL,
+									bool lockable = false);
 			void				AddAction(BMessage* message, BHandler* target,
 									const BBitmap* icon,
-									const char* toolTipText = NULL);
+									const char* toolTipText = NULL,
+									bool lockable = false);
 			void				AddSeparator();
 			void				AddGlue();
 

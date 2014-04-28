@@ -25,6 +25,7 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <BitmapStream.h>
+#include <Button.h>
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <Entry.h>
@@ -176,29 +177,31 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 //	fToolBarView->AddAction(MSG_FILE_OPEN, be_app,
 //		tool_bar_icon(kIconDocumentOpen), B_TRANSLATE("Open"B_UTF8_ELLIPSIS));
 	fToolBarView->AddAction(MSG_FILE_PREV, this,
-		tool_bar_icon(kIconGoPrevious), B_TRANSLATE("Previous file"));
+		tool_bar_icon(kIconGoPrevious), B_TRANSLATE("Previous file"), false);
 	fToolBarView->AddAction(MSG_FILE_NEXT, this, tool_bar_icon(kIconGoNext),
-		B_TRANSLATE("Next file"));
+		B_TRANSLATE("Next file"), false);
 	BMessage* fullScreenSlideShow = new BMessage(MSG_SLIDE_SHOW);
 	fullScreenSlideShow->AddBool("full screen", true);
 	fToolBarView->AddAction(fullScreenSlideShow, this,
-		tool_bar_icon(kIconMediaMovieLibrary), B_TRANSLATE("Slide show"));
+		tool_bar_icon(kIconMediaMovieLibrary), B_TRANSLATE("Slide show"),
+		false);
 	fToolBarView->AddSeparator();
 	fToolBarView->AddAction(MSG_SELECTION_MODE, this,
 		tool_bar_icon(kIconDrawRectangularSelection),
-		B_TRANSLATE("Selection mode"));
+		B_TRANSLATE("Selection mode"), false);
 	fToolBarView->AddSeparator();
 	fToolBarView->AddAction(kMsgOriginalSize, this,
-		tool_bar_icon(kIconZoomOriginal), B_TRANSLATE("Original size"));
+		tool_bar_icon(kIconZoomOriginal), B_TRANSLATE("Original size"), true);
 	fToolBarView->AddAction(kMsgFitToWindow, this,
-		tool_bar_icon(kIconZoomFitBest), B_TRANSLATE("Fit to window"));
+		tool_bar_icon(kIconZoomFitBest), B_TRANSLATE("Fit to window"), false);
 	fToolBarView->AddAction(MSG_ZOOM_IN, this, tool_bar_icon(kIconZoomIn),
-		B_TRANSLATE("Zoom in"));
+		B_TRANSLATE("Zoom in"), false);
 	fToolBarView->AddAction(MSG_ZOOM_OUT, this, tool_bar_icon(kIconZoomOut),
-		B_TRANSLATE("Zoom out"));
+		B_TRANSLATE("Zoom out"), false);
 	fToolBarView->AddGlue();
 	fToolBarView->AddAction(MSG_FULL_SCREEN, this,
-		tool_bar_icon(kIconViewWindowed), B_TRANSLATE("Leave full screen"));
+		tool_bar_icon(kIconViewWindowed), B_TRANSLATE("Leave full screen"),
+		false);
 	fToolBarView->SetActionVisible(MSG_FULL_SCREEN, false);
 
 	fToolBarView->ResizeTo(viewFrame.Width(), fToolBarView->MinSize().height);
@@ -966,6 +969,13 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgOriginalSize:
+			if (message->FindInt32("behavior") == BButton::B_TOGGLE_BEHAVIOR)
+			{
+				bool force = message->FindInt32("be:value");
+				fImageView->ForceOriginalSize(force);
+				if (!force)
+					break;
+			}
 			fImageView->SetZoom(1.0);
 			break;
 

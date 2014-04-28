@@ -10,6 +10,34 @@
 #include <SeparatorView.h>
 #include <SpaceLayoutItem.h>
 
+class LockableButton: public BButton
+{
+public:
+	LockableButton(const char* name, const char* label, BMessage* message);
+
+	void MouseDown(BPoint point);
+};
+
+
+LockableButton::LockableButton(const char* name, const char* label,
+	BMessage* message)
+	: BButton(name, label, message)
+{
+}
+
+
+void
+LockableButton::MouseDown(BPoint point)
+{
+	if (modifiers() & B_SHIFT_KEY || Value() == B_CONTROL_ON)
+		SetBehavior(B_TOGGLE_BEHAVIOR);
+	else
+		SetBehavior(B_BUTTON_BEHAVIOR);
+
+	Message()->SetInt32("behavior", Behavior());
+	BButton::MouseDown(point);
+}
+
 
 ToolBarView::ToolBarView(BRect frame)
 	:
@@ -44,17 +72,22 @@ ToolBarView::Hide()
 
 void
 ToolBarView::AddAction(uint32 command, BHandler* target, const BBitmap* icon,
-	const char* toolTipText)
+	const char* toolTipText, bool lockable)
 {
-	AddAction(new BMessage(command), target, icon, toolTipText);
+	AddAction(new BMessage(command), target, icon, toolTipText, lockable);
 }
 
 
 void
 ToolBarView::AddAction(BMessage* message, BHandler* target,
-	const BBitmap* icon, const char* toolTipText)
+	const BBitmap* icon, const char* toolTipText, bool lockable)
 {
-	BButton* button = new BButton(NULL, NULL, message);
+
+	BButton* button;
+	if (lockable)
+		button = new LockableButton(NULL, NULL, message);
+	else
+		button = new BButton(NULL, NULL, message);
 	button->SetIcon(icon);
 	button->SetFlat(true);
 	if (toolTipText != NULL)

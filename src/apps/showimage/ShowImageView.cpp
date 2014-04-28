@@ -186,6 +186,7 @@ ShowImageView::ShowImageView(BRect rect, const char* name, uint32 resizingMode,
 	fBitmapLocationInView(0.0, 0.0),
 
 	fStretchToBounds(false),
+	fForceOriginalSize(false),
 	fHideCursor(false),
 	fScrollingBitmap(false),
 	fCreatingSelection(false),
@@ -1630,7 +1631,7 @@ ShowImageView::FitToBounds()
 		return;
 
 	float fitToBoundsZoom = _FitToBoundsZoom();
-	if (!fStretchToBounds && fitToBoundsZoom > 1.0f)
+	if (!fStretchToBounds && fitToBoundsZoom > 1.0f || fForceOriginalSize)
 		SetZoom(1.0f);
 	else
 		SetZoom(fitToBoundsZoom);
