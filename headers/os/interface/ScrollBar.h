@@ -133,11 +133,10 @@ private:
 			float				fProportion;
 			BView*				fTarget;
 			orientation			fOrientation;
-			char*				fTargetName;
 
 			Private*			fPrivateData;
 
-			uint32				_reserved[3];
+			uint32				_reserved[4];
 };
 
 #endif	// _SCROLL_BAR_H

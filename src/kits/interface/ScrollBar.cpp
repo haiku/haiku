@@ -207,8 +207,7 @@ BScrollBar::BScrollBar(BRect frame, const char* name, BView* target,
 	fValue(0),
 	fProportion(0.0f),
 	fTarget(NULL),
-	fOrientation(direction),
-	fTargetName(NULL)
+	fOrientation(direction)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 
@@ -237,8 +236,7 @@ BScrollBar::BScrollBar(const char* name, BView* target,
 	fValue(0),
 	fProportion(0.0f),
 	fTarget(NULL),
-	fOrientation(direction),
-	fTargetName(NULL)
+	fOrientation(direction)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 
@@ -255,8 +253,7 @@ BScrollBar::BScrollBar(const char* name, BView* target,
 BScrollBar::BScrollBar(BMessage* data)
 	:
 	BView(data),
-	fTarget(NULL),
-	fTargetName(NULL)
+	fTarget(NULL)
 {
 	fPrivateData = new BScrollBar::Private(this);
 
@@ -567,17 +564,12 @@ BScrollBar::SetTarget(BView* target)
 	}
 
 	fTarget = target;
-	free(fTargetName);
-
 	if (fTarget) {
-		fTargetName = strdup(target->Name());
-
 		if (fOrientation == B_VERTICAL)
 			fTarget->fVerScroller = this;
 		else
 			fTarget->fHorScroller = this;
-	} else
-		fTargetName = NULL;
+	}
 }
 
 
