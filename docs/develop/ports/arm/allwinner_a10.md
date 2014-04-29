@@ -74,3 +74,11 @@ FDT. We may use the FDT files from there for the most common boards.
 # Emulation support
 
 qemu 1.0 has a Cubieoard target which emulates this chip.
+
+# Useful links
+
+Arch Linux instructions on creating a bootable SD card (partition layout, etc)
+http://archlinuxarm.org/platforms/armv7/allwinner/cubieboard#qt-platform_tabs-ui-tabs2
+
+Linux SunXi: mainline Linux support for the Allwinner chips. Lots of docs on the hardware.
+http://linux-sunxi.org/
