@@ -969,9 +969,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgOriginalSize:
-			if (message->FindInt32("behavior") == BButton::B_TOGGLE_BEHAVIOR)
-			{
-				bool force = message->FindInt32("be:value");
+			if (message->FindInt32("behavior") == BButton::B_TOGGLE_BEHAVIOR) {
+				bool force = (message->FindInt32("be:value") == B_CONTROL_ON);
 				fImageView->ForceOriginalSize(force);
 				if (!force)
 					break;

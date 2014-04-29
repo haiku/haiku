@@ -10,18 +10,19 @@
 #include <SeparatorView.h>
 #include <SpaceLayoutItem.h>
 
-class LockableButton: public BButton
-{
+class LockableButton: public BButton {
 public:
-	LockableButton(const char* name, const char* label, BMessage* message);
+			LockableButton(const char* name, const char* label,
+				BMessage* message);
 
-	void MouseDown(BPoint point);
+	void	MouseDown(BPoint point);
 };
 
 
 LockableButton::LockableButton(const char* name, const char* label,
 	BMessage* message)
-	: BButton(name, label, message)
+	:
+	BButton(name, label, message)
 {
 }
 
@@ -29,7 +30,7 @@ LockableButton::LockableButton(const char* name, const char* label,
 void
 LockableButton::MouseDown(BPoint point)
 {
-	if (modifiers() & B_SHIFT_KEY || Value() == B_CONTROL_ON)
+	if ((modifiers() & B_SHIFT_KEY) != 0 || Value() == B_CONTROL_ON)
 		SetBehavior(B_TOGGLE_BEHAVIOR);
 	else
 		SetBehavior(B_BUTTON_BEHAVIOR);
