@@ -118,8 +118,8 @@ typedef uint64_t uintmax_t;
 #define UINTMAX_MAX	UINT64_MAX
 
 /* Limits of other integer types */
-#define PTDIFF_MIN __HAIKU_SADDR_MIN
-#define PTDIFF_MAX __HAIKU_SADDR_MAX
+#define PTRDIFF_MIN __HAIKU_SADDR_MIN
+#define PTRDIFF_MAX __HAIKU_SADDR_MAX
 
 #define SIG_ATOMIC_MIN INT32_MIN
 #define SIG_ATOMIC_MAX INT32_MAX
