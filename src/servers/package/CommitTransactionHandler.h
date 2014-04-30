@@ -127,6 +127,8 @@ private:
 									PackageFSActivationChangeType type,
 									Package* package, char*& nameBuffer);
 
+			bool				_IsSystemPackage(Package* package);
+
 	static	BString				_GetPath(const FSUtils::Entry& entry,
 									const BString& fallback);
 

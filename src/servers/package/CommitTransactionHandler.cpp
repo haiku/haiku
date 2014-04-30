@@ -368,6 +368,11 @@ CommitTransactionHandler::_RemovePackagesToDeactivate()
 	for (PackageSet::const_iterator it = fPackagesToDeactivate.begin();
 		it != fPackagesToDeactivate.end(); ++it) {
 		Package* package = *it;
+
+		// When deactivating (or updating) a system package, don't do that live.
+		if (_IsSystemPackage(package))
+			fVolumeStateIsActive = false;
+
 		if (fPackagesAlreadyRemoved.find(package)
 				!= fPackagesAlreadyRemoved.end()) {
 			fRemovedPackages.insert(package);
@@ -1505,6 +1510,24 @@ CommitTransactionHandler::_FillInActivationChangeItem(
 	item->name = nameBuffer;
 	strcpy(nameBuffer, package->FileName());
 	nameBuffer += package->FileName().Length() + 1;
+}
+
+
+bool
+CommitTransactionHandler::_IsSystemPackage(Package* package)
+{
+	// package name should be "haiku[_<arch>]"
+	const BString& name = package->Info().Name();
+	if (!name.StartsWith("haiku"))
+		return false;
+	if (name.Length() == 5)
+		return true;
+	if (name[5] != '_')
+		return false;
+
+	BPackageArchitecture architecture;
+	return BPackageInfo::GetArchitectureByName(name.String() + 6, architecture)
+		== B_OK;
 }
 
 
