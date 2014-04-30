@@ -50,9 +50,6 @@ rule PreprocessPackageInfo source : directory : architecture
 	;
 
 	local target = $(source:BSG=package-info)-package-info ;
-	if $(HAIKU_BUILD_TYPE) = bootstrap {
-		target = $(target)-bootstrap ;
-	}
 	MakeLocate $(target) : $(directory) ;
 
 	PreprocessPackageOrRepositoryInfo $(target) : $(source) : $(architecture)
@@ -97,11 +94,9 @@ rule PreprocessPackageOrRepositoryInfo target : source : architecture
 	#	useCPP - Filter the source file through the C preprocessor after the
 	#		placeholder substitutions have been performed.
 
-	local defines = HAIKU_PACKAGING_ARCH=$(architecture) ;
+	local defines = HAIKU_PACKAGING_ARCH=$(architecture)
+		HAIKU_$(HAIKU_BUILD_TYPE:U)_BUILD ;
 	local sedReplacements = %HAIKU_PACKAGING_ARCH%,$(architecture) ;
-	if $(HAIKU_BUILD_TYPE) = bootstrap {
-		defines += HAIKU_BOOTSTRAP_BUILD ;
-	}
 	if $(secondaryArchitecture) {
 		defines += HAIKU_SECONDARY_PACKAGING_ARCH=$(secondaryArchitecture) ;
 		sedReplacements
@@ -159,8 +154,9 @@ rule BuildHaikuPackage package : packageInfo
 
 	local grist = [ FHaikuPackageGrist $(package) ] ;
 
-	local tempDir
-		= [ FDirName $(HAIKU_PACKAGES_BUILD_DIR_$(architecture)) $(grist) ] ;
+	local tempDir = [ FDirName
+		$(HAIKU_PACKAGES_BUILD_DIR_$(architecture)) $(HAIKU_BUILD_TYPE) $(grist)
+	] ;
 	local scriptDir = [ FDirName $(tempDir) scripts ] ;
 
 	#  build the package info and locate the package

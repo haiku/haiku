@@ -11,11 +11,17 @@ switch $(HAIKU_BUILD_PROFILE) {
 	case "minimum-*" : {
 		HAIKU_BUILD_TYPE = minimum ;
 		EnableBuildFeatures minimum_image ;
+
+		HAIKU_DEFINES += HAIKU_MINIMUM_BUILD ;
+		TARGET_DEFINES += HAIKU_MINIMUM_BUILD ;
 	}
 
 	case "*" : {
 		HAIKU_BUILD_TYPE = regular ;
 		EnableBuildFeatures regular_image ;
+
+		HAIKU_DEFINES += HAIKU_REGULAR_BUILD ;
+		TARGET_DEFINES += HAIKU_REGULAR_BUILD ;
 	}
 }
 Echo "Starting build of type $(HAIKU_BUILD_TYPE) ..." ;

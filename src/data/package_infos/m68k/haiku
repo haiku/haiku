@@ -173,7 +173,7 @@ provides {
 
 requires {
 	lib:libfreetype
-#ifndef HAIKU_BOOTSTRAP_BUILD
+#ifdef HAIKU_REGULAR_BUILD
 	lib:libjpeg
 	lib:libpng
 #endif

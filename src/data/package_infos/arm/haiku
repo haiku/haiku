@@ -181,7 +181,7 @@ requires {
 	lib:libicutest
 	lib:libicutu
 	lib:libicuuc
-#ifndef HAIKU_BOOTSTRAP_BUILD
+#ifdef HAIKU_REGULAR_BUILD
 	lib:libjpeg
 	lib:libpng
 #endif
