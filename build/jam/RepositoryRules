@@ -155,25 +155,50 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 	Depends $(packagesChecksumFile) : $(packageListFile) ;
 	ChecksumFileSHA256 $(packagesChecksumFile) : $(packageListFile) ;
 
-	# download repository info file
 	local repositoryInfo = $(repository:G=repository-info)-info ;
-	MakeLocate $(repositoryInfo) : $(repositoriesDir) ;
-	local repoUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
-	DownloadLocatedFile $(repositoryInfo)
-		: "$(repoUrl)/`cat $source`/repo.info"
-		: $(packagesChecksumFile) ;
-
-	# download repository file
 	local repositoryFile = $(repository:G=repository-cache) ;
-	MakeLocate $(repositoryFile) : $(repositoriesDir) ;
-	local repoUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
-	DownloadLocatedFile $(repositoryFile)
-		: "$(repoUrl)/`cat $source`/repo"
-		: $(packagesChecksumFile) ;
+	local repositoryConfig = $(repository:G=repository-config)-config ;
+	MakeLocate $(repositoryInfo) $(repositoryFile) $(repositoryConfig)
+		: $(repositoriesDir) ;
+	# Use a locally created dummy repository if downloads have been disabled.
+	# This is useful when trying to build everything locally from source.
+	if $(HAIKU_NO_DOWNLOADS) = 1 {
+		# build the dummy repository info file
+		local repositoryInfoTemplate = <repository-info-template>haikuports ;
+		SEARCH on $(repositoryInfoTemplate)
+			= $(HAIKU_TOP)/src/data/repository_infos ;
+		PreprocessPackageOrRepositoryInfo $(repositoryInfo)
+			: $(repositoryInfoTemplate) : $(architecture) ;
+
+		# build repository file, using only packages available in the download
+		# directory
+		local allPackageFiles = [
+			on $(packageListFile) return $(HAIKU_REPOSITORY_PACKAGE_FILE_NAMES)
+		] ;
+		local packageFiles ;
+		for packageFile in $(allPackageFiles) {
+			if [ Glob $(HAIKU_DOWNLOAD_DIR) : $(packageFile) ] {
+				packageFile = $(packageFile:G=package-file) ;
+				MakeLocate $(packageFile) : $(HAIKU_DOWNLOAD_DIR) ;
+				packageFiles += $(packageFile) ;
+			}
+		}
+		RepositoryCache $(repositoryFile) : $(repositoryInfo)
+			: $(packageFiles) ;
+	} else {
+		# download repository info file
+		local repoUrl = [ on $(repository) return $(HAIKU_REPOSITORY_URL) ] ;
+		DownloadLocatedFile $(repositoryInfo)
+			: "$(repoUrl)/`cat $source`/repo.info"
+			: $(packagesChecksumFile) ;
+
+		# download repository file
+		DownloadLocatedFile $(repositoryFile)
+			: "$(repoUrl)/`cat $source`/repo"
+			: $(packagesChecksumFile) ;
+	}
 
 	# build repository config file
-	local repositoryConfig = $(repository:G=repository-config)-config ;
-	MakeLocate $(repositoryConfig) : $(repositoriesDir) ;
 	RepositoryConfig $(repositoryConfig) : $(repositoryInfo)
 		: $(repositoryUrl)/$version : $(packagesChecksumFile) ;
 
@@ -230,6 +255,23 @@ actions RepositoryConfig1
 	fi
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(2[1]) $(HAIKU_REPOSITORY_URL) $(2[2]) $(1)
+}
+
+
+rule RepositoryCache repoCache : repoInfo : packageFiles
+{
+	Depends $(repoCache)
+		: <build>package_repo $(repoInfo) $(packageFiles) ;
+	RepositoryCache1 $(repoCache)
+		: <build>package_repo $(repoInfo) $(packageFiles) ;
+}
+
+
+actions RepositoryCache1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) create -q $(2[2-])
+	mv $(1:B=repo) $(1)
 }
 
 
