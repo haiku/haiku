@@ -159,7 +159,7 @@ Volume::~Volume()
 	Unmounted();
 		// need for error case in InitPackages()
 
-	delete fPackagesDirectories;
+	delete [] fPackagesDirectories;
 	delete fState;
 }
 
