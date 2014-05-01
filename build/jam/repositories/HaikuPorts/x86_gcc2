@@ -282,6 +282,8 @@ RemotePackageRepository HaikuPorts
 	libao_x86_devel-1.0.0-1
 	libart_lgpl_x86-2.3.21-1
 	libart_lgpl_x86_devel-2.3.21-1
+	libexecinfo_x86-1.1-1
+	libexecinfo_x86_devel-1.1-1
 	libffi_x86-3.0.13-1
 	libffi_x86_devel-3.0.13-1
 	libiconv_x86-1.13.1-6
@@ -435,6 +437,7 @@ RemotePackageRepository HaikuPorts
 	libao
 	libart_lgpl
 	libedit
+	libexecinfo_x86
 	libffi_x86
 	libiconv
 	libmad
