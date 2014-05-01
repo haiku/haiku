@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,8 +18,8 @@ BInstallationLocationInfo::BInstallationLocationInfo()
 	fLocation(B_PACKAGE_INSTALLATION_LOCATION_ENUM_COUNT),
 	fBaseDirectoryRef(),
 	fPackageDirectoryRef(),
-	fActivePackageInfos(),
-	fInactivePackageInfos(),
+	fLatestActivePackageInfos(),
+	fLatestInactivePackageInfos(),
 	fChangeCount(0)
 {
 }
@@ -36,8 +36,8 @@ BInstallationLocationInfo::Unset()
 	fLocation = B_PACKAGE_INSTALLATION_LOCATION_ENUM_COUNT;
 	fBaseDirectoryRef = node_ref();
 	fPackageDirectoryRef = node_ref();
-	fActivePackageInfos.MakeEmpty();
-	fInactivePackageInfos.MakeEmpty();
+	fLatestActivePackageInfos.MakeEmpty();
+	fLatestInactivePackageInfos.MakeEmpty();
 	fChangeCount = 0;
 }
 
@@ -87,30 +87,32 @@ BInstallationLocationInfo::SetPackagesDirectoryRef(const node_ref& ref)
 
 
 const BPackageInfoSet&
-BInstallationLocationInfo::ActivePackageInfos() const
+BInstallationLocationInfo::LatestActivePackageInfos() const
 {
-	return fActivePackageInfos;
+	return fLatestActivePackageInfos;
 }
 
 
 void
-BInstallationLocationInfo::SetActivePackageInfos(const BPackageInfoSet& infos)
+BInstallationLocationInfo::SetLatestActivePackageInfos(
+	const BPackageInfoSet& infos)
 {
-	fActivePackageInfos = infos;
+	fLatestActivePackageInfos = infos;
 }
 
 
 const BPackageInfoSet&
-BInstallationLocationInfo::InactivePackageInfos() const
+BInstallationLocationInfo::LatestInactivePackageInfos() const
 {
-	return fInactivePackageInfos;
+	return fLatestInactivePackageInfos;
 }
 
 
 void
-BInstallationLocationInfo::SetInactivePackageInfos(const BPackageInfoSet& infos)
+BInstallationLocationInfo::SetLatestInactivePackageInfos(
+	const BPackageInfoSet& infos)
 {
-	fInactivePackageInfos = infos;
+	fLatestInactivePackageInfos = infos;
 }
 
 

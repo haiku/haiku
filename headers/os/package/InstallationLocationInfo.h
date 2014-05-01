@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__INSTALLATION_LOCATION_INFO_H_
@@ -32,12 +32,13 @@ public:
 			const node_ref&		PackagesDirectoryRef() const;
 			status_t			SetPackagesDirectoryRef(const node_ref& ref);
 
-			const BPackageInfoSet& ActivePackageInfos() const;
-			void				SetActivePackageInfos(
+			const BPackageInfoSet& LatestActivePackageInfos() const;
+			void				SetLatestActivePackageInfos(
 									const BPackageInfoSet& infos);
 
-			const BPackageInfoSet& InactivePackageInfos() const;
-			void				SetInactivePackageInfos(
+			const BPackageInfoSet& LatestInactivePackageInfos() const;
+			void				SetLatestInactivePackageInfos(
+									const BPackageInfoSet& infos);
 									const BPackageInfoSet& infos);
 
 			int64				ChangeCount() const;
@@ -47,8 +48,8 @@ private:
 			BPackageInstallationLocation fLocation;
 			node_ref			fBaseDirectoryRef;
 			node_ref			fPackageDirectoryRef;
-			BPackageInfoSet		fActivePackageInfos;
-			BPackageInfoSet		fInactivePackageInfos;
+			BPackageInfoSet		fLatestActivePackageInfos;
+			BPackageInfoSet		fLatestInactivePackageInfos;
 			int64				fChangeCount;
 };
 

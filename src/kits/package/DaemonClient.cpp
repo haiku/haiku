@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -87,8 +87,8 @@ BDaemonClient::GetInstallationLocationInfo(
 	_info.SetBaseDirectoryRef(node_ref(baseDirectoryDevice, baseDirectoryNode));
 	_info.SetPackagesDirectoryRef(
 		node_ref(packagesDirectoryDevice, packagesDirectoryNode));
-	_info.SetActivePackageInfos(activePackages);
-	_info.SetInactivePackageInfos(inactivePackages);
+	_info.SetLatestActivePackageInfos(activePackages);
+	_info.SetLatestInactivePackageInfos(inactivePackages);
 	_info.SetChangeCount(changeCount);
 
 	return B_OK;
@@ -158,7 +158,7 @@ BDaemonClient::CreateTransaction(BPackageInstallationLocation location,
 	error = entryRef.set_name(PACKAGES_DIRECTORY_ADMIN_DIRECTORY);
 	if (error != B_OK)
 		return error;
-	
+
 	BDirectory adminDirectory;
 	error = adminDirectory.SetTo(&entryRef);
 	if (error != B_OK)

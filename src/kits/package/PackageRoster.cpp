@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -217,7 +217,7 @@ BPackageRoster::GetActivePackages(BPackageInstallationLocation location,
 	if (error != B_OK)
 		return error;
 
-	packageInfos = info.ActivePackageInfos();
+	packageInfos = info.LatestActivePackageInfos();
 	return B_OK;
 #else
 	return B_NOT_SUPPORTED;
