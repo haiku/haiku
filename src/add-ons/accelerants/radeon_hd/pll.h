@@ -84,6 +84,7 @@ struct pll_info {
 	uint32 maxFeedbackDivFrac;
 
 	/* spread spectrum info */
+	bool ssEnabled;
 	uint8 ssType;
 	uint8 ssDelay;
 	uint8 ssRange;
@@ -93,6 +94,7 @@ struct pll_info {
 	/* asic spread spectrum */
 	uint16 ssRate;
 	uint16 ssAmount;
+	uint16 ssPercentageDiv;
 
 	/* pixel clock to be used in pll calculations (kHz) */
 	uint32 adjustedClock;

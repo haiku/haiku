@@ -251,6 +251,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 					= ss_info->info.asSpreadSpectrum[i].ucSpreadSpectrumMode;
 				pll->ssRate = B_LENDIAN_TO_HOST_INT16(
 					ss_info->info.asSpreadSpectrum[i].usSpreadRateInKhz);
+				pll->ssPercentageDiv = 100;
 				return B_OK;
 			}
 			break;
@@ -279,6 +280,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 					= ss_info->info_2.asSpreadSpectrum[i].ucSpreadSpectrumMode;
 				pll->ssRate = B_LENDIAN_TO_HOST_INT16(
 					ss_info->info_2.asSpreadSpectrum[i].usSpreadRateIn10Hz);
+				pll->ssPercentageDiv = 100;
 				return B_OK;
 			}
 			break;
@@ -302,11 +304,21 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 					ss_info
 						->info_3.asSpreadSpectrum[i].usSpreadSpectrumPercentage
 					);
-
 				pll->ssType
 					= ss_info->info_3.asSpreadSpectrum[i].ucSpreadSpectrumMode;
 				pll->ssRate = B_LENDIAN_TO_HOST_INT16(
 					ss_info->info_3.asSpreadSpectrum[i].usSpreadRateIn10Hz);
+
+				if ((ss_info->info_3.asSpreadSpectrum[i].ucSpreadSpectrumMode
+					& SS_MODE_V3_PERCENTAGE_DIV_BY_1000_MASK) != 0)
+					pll->ssPercentageDiv = 1000;
+				else
+					pll->ssPercentageDiv = 100;
+
+				if (ssID == ASIC_INTERNAL_ENGINE_SS
+					|| ssID == ASIC_INTERNAL_MEMORY_SS)
+					pll->ssRate /= 100;
+
 				return B_OK;
 			}
 			break;
@@ -371,6 +383,8 @@ pll_compute_post_divider(pll_info* pll)
 status_t
 pll_compute(pll_info* pll)
 {
+	radeon_shared_info &info = *gInfo->shared_info;
+
 	pll_compute_post_divider(pll);
 
 	const uint32 targetClock = pll->adjustedClock;
@@ -485,6 +499,22 @@ pll_compute(pll_info* pll)
 		TRACE("%s: pixel clock %" B_PRIu32 " was changed to %" B_PRIu32 "\n",
 			__func__, pll->adjustedClock, calculatedClock);
 		pll->pixelClock = calculatedClock;
+	}
+
+	// Calcuate needed SS data on DCE4
+	if (info.dceMajor >= 4) {
+		uint32 amount = ((pll->feedbackDiv * 10) + pll->feedbackDivFrac);
+		amount *= pll->ssPercentage;
+		amount /= pll->ssPercentageDiv * 100;
+		pll->ssAmount = (amount / 10) & ATOM_PPLL_SS_AMOUNT_V2_FBDIV_MASK;
+		pll->ssAmount |= ((amount - (amount / 10))
+			<< ATOM_PPLL_SS_AMOUNT_V2_NFRAC_SHIFT) & ATOM_PPLL_SS_AMOUNT_V2_NFRAC_MASK;
+
+		uint32 centerSpreadMultiplier = 2;
+		if ((pll->ssType & ATOM_PPLL_SS_TYPE_V2_CENTRE_SPREAD) != 0)
+			centerSpreadMultiplier = 4;
+		pll->ssStep = (centerSpreadMultiplier * amount * pll->referenceDiv
+			* (pll->ssRate * 2048)) / (125 * 25 * pll->referenceFreq / 100);
 	}
 
 	return B_OK;
@@ -693,7 +723,7 @@ pll_set(display_mode* mode, uint8 crtcID)
 	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 	uint32 dp_clock = gConnector[connectorIndex]->dpInfo.linkRate;
-	bool ssEnabled = false;
+	pll->ssEnabled = false;
 
 	pll->pixelClock = mode->timing.pixel_clock;
 
@@ -714,32 +744,32 @@ pll_set(display_mode* mode, uint8 crtcID)
 				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_DP);
 			else {
 				if (dp_clock == 162000) {
-					ssEnabled = pll_ppll_ss_probe(pll,
+					pll->ssEnabled = pll_ppll_ss_probe(pll,
 						ATOM_DP_SS_ID2) == B_OK ? true : false;
-					if (!ssEnabled)
-						ssEnabled = pll_ppll_ss_probe(pll,
+					if (!pll->ssEnabled)
+						pll->ssEnabled = pll_ppll_ss_probe(pll,
 							ATOM_DP_SS_ID1) == B_OK ? true : false;
 				} else
-					ssEnabled = pll_ppll_ss_probe(pll,
+					pll->ssEnabled = pll_ppll_ss_probe(pll,
 						ATOM_DP_SS_ID1) == B_OK ? true : false;
 			}
 			break;
 		case ATOM_ENCODER_MODE_LVDS:
 			if (info.dceMajor >= 4)
-				ssEnabled = pll_asic_ss_probe(pll,
+				pll->ssEnabled = pll_asic_ss_probe(pll,
 					gInfo->lvdsSpreadSpectrumID) == B_OK ? true : false;
 			else
-				ssEnabled = pll_ppll_ss_probe(pll,
+				pll->ssEnabled = pll_ppll_ss_probe(pll,
 					gInfo->lvdsSpreadSpectrumID) == B_OK ? true : false;
 			break;
 		case ATOM_ENCODER_MODE_DVI:
 			if (info.dceMajor >= 4)
-				ssEnabled = pll_asic_ss_probe(pll,
+				pll->ssEnabled = pll_asic_ss_probe(pll,
 					ASIC_INTERNAL_SS_ON_TMDS) == B_OK ? true : false;
 			break;
 		case ATOM_ENCODER_MODE_HDMI:
 			if (info.dceMajor >= 4)
-				ssEnabled = pll_asic_ss_probe(pll,
+				pll->ssEnabled = pll_asic_ss_probe(pll,
 					ASIC_INTERNAL_SS_ON_HDMI) == B_OK ? true : false;
 			break;
 	}
@@ -749,10 +779,7 @@ pll_set(display_mode* mode, uint8 crtcID)
 	pll_adjust(pll, mode, crtcID);
 		// get any needed clock adjustments, set reference/post dividers
 	pll_compute(pll);
-		// compute dividers
-
-	display_crtc_ss(pll, ATOM_DISABLE);
-		// disable ss
+		// compute dividers and spread spectrum
 
 	uint8 tableMajor;
 	uint8 tableMinor;
@@ -892,8 +919,12 @@ pll_set(display_mode* mode, uint8 crtcID)
 
 	status_t result = atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-	if (ssEnabled)
+	// TODO: PLL forced off until we can test it
+	pll->ssEnabled = false;
+	if (pll->ssEnabled)
 		display_crtc_ss(pll, ATOM_ENABLE);
+	else
+		display_crtc_ss(pll, ATOM_DISABLE);
 
 	return result;
 }
