@@ -16,8 +16,7 @@
 VolumeState::VolumeState()
 	:
 	fPackagesByFileName(),
-	fPackagesByNodeRef(),
-	fChangeCount(0)
+	fPackagesByNodeRef()
 {
 }
 
@@ -48,7 +47,6 @@ VolumeState::AddPackage(Package* package)
 {
 	fPackagesByFileName.Insert(package);
 	fPackagesByNodeRef.Insert(package);
-	fChangeCount++;
 }
 
 
@@ -57,7 +55,6 @@ VolumeState::RemovePackage(Package* package)
 {
 	fPackagesByFileName.Remove(package);
 	fPackagesByNodeRef.Remove(package);
-	fChangeCount++;
 }
 
 
@@ -65,7 +62,6 @@ void
 VolumeState::SetPackageActive(Package* package, bool active)
 {
 	package->SetActive(active);
-	fChangeCount++;
 }
 
 
@@ -76,7 +72,6 @@ VolumeState::ActivationChanged(const PackageSet& activatedPackage,
 	for (PackageSet::iterator it = activatedPackage.begin();
 			it != activatedPackage.end(); ++it) {
 		(*it)->SetActive(true);
-		fChangeCount++;
 	}
 
 	for (PackageSet::iterator it = deactivatePackages.begin();
@@ -104,8 +99,6 @@ VolumeState::Clone() const
 			return NULL;
 		clone->AddPackage(clonedPackage);
 	}
-
-	clone->fChangeCount = fChangeCount;
 
 	return cloneDeleter.Detach();
 }

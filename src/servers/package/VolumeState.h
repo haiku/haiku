@@ -19,9 +19,6 @@ public:
 
 			bool				Init();
 
-			int64				ChangeCount() const
-									{ return fChangeCount; }
-
 			Package*			FindPackage(const char* name) const;
 			Package*			FindPackage(const node_ref& nodeRef) const;
 
@@ -45,7 +42,6 @@ private:
 private:
 			PackageFileNameHashTable fPackagesByFileName;
 			PackageNodeRefHashTable fPackagesByNodeRef;
-			int64				fChangeCount;
 };
 
 

@@ -145,6 +145,7 @@ Volume::Volume(BLooper* looper)
 	fPackageFileManager(NULL),
 	fLatestState(NULL),
 	fActiveState(NULL),
+	fChangeCount(0),
 	fLock("volume"),
 	fPendingNodeMonitorEventsLock("pending node monitor events"),
 	fPendingNodeMonitorEvents(),
@@ -450,7 +451,7 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 	// If the cached reply message is up-to-date, just send it.
 	int64 changeCount;
 	if (fLocationInfoReply.FindInt64("change count", &changeCount) == B_OK
-		&& changeCount == fLatestState->ChangeCount()) {
+		&& changeCount == fChangeCount) {
 		locker.Unlock();
 		message->SendReply(&fLocationInfoReply, (BHandler*)NULL,
 			kCommunicationTimeout);
@@ -484,10 +485,8 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 		}
 	}
 
-	if (fLocationInfoReply.AddInt64("change count", fLatestState->ChangeCount())
-			!= B_OK) {
+	if (fLocationInfoReply.AddInt64("change count", fChangeCount) != B_OK)
 		return;
-	}
 
 	locker.Unlock();
 
@@ -756,8 +755,7 @@ Volume::CreateTransaction(BPackageInstallationLocation location,
 	}
 
 	// init the transaction
-	error = _transaction.SetTo(location, fLatestState->ChangeCount(),
-		directoryName);
+	error = _transaction.SetTo(location, fChangeCount, directoryName);
 	if (error != B_OK) {
 		BEntry entry;
 		_transactionDirectory.GetEntry(&entry);
@@ -909,6 +907,7 @@ INFORM("Volume::_PackagesEntryCreated(\"%s\")\n", name);
 
 	fLock.Lock();
 	fLatestState->AddPackage(package);
+	fChangeCount++;
 	fLock.Unlock();
 
 	try {
@@ -944,6 +943,7 @@ INFORM("Volume::_PackagesEntryRemoved(\"%s\")\n", name);
 	if (!package->IsActive()) {
 		AutoLocker<BLocker> locker(fLock);
 		fLatestState->RemovePackage(package);
+		fChangeCount++;
 		delete package;
 		return;
 	}
@@ -979,6 +979,7 @@ Volume::_ReadPackagesDirectory()
 		if (error == B_OK) {
 			AutoLocker<BLocker> locker(fLock);
 			fLatestState->AddPackage(package);
+			fChangeCount++;
 		}
 	}
 
@@ -1001,6 +1002,7 @@ Volume::_InitLatestState()
 				= fLatestState->ByFileNameIterator();
 			Package* package = it.Next();) {
 		fLatestState->SetPackageActive(package, true);
+		fChangeCount++;
 	}
 
 	return B_OK;
@@ -1079,6 +1081,7 @@ Volume::_InitLatestStateFromActivatedPackages()
 		Package* package = fLatestState->FindPackage(packageName);
 		if (package != NULL) {
 			fLatestState->SetPackageActive(package, true);
+			fChangeCount++;
 		} else {
 			WARN("Package \"%s\" from activation file not in packages "
 				"directory.\n", packageName);
@@ -1226,6 +1229,7 @@ Volume::_SetLatestState(VolumeState* state, bool isActive)
 
 	delete fLatestState;
 	fLatestState = state;
+	fChangeCount++;
 }
 
 

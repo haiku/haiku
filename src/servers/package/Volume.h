@@ -111,6 +111,9 @@ public:
 			void				SetRoot(Root* root)
 									{ fRoot = root; }
 
+			int64				ChangeCount() const
+									{ return fChangeCount; }
+
 			PackageFileNameHashTable::Iterator PackagesByFileNameIterator()
 									const;
 
@@ -183,6 +186,7 @@ private:
 			PackageFileManager*	fPackageFileManager;
 			VolumeState*		fLatestState;
 			VolumeState*		fActiveState;
+			int64				fChangeCount;
 			BLocker				fLock;
 			BLocker				fPendingNodeMonitorEventsLock;
 			NodeMonitorEventList fPendingNodeMonitorEvents;

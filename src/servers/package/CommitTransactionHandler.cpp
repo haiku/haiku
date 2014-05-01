@@ -98,7 +98,7 @@ CommitTransactionHandler::HandleRequest(
 	const BActivationTransaction& transaction, BMessage* reply)
 {
 	// check the change count
-	if (transaction.ChangeCount() != fVolumeState->ChangeCount())
+	if (transaction.ChangeCount() != fVolume->ChangeCount())
 		throw Exception(B_DAEMON_CHANGE_COUNT_MISMATCH);
 
 	// collect the packages to deactivate
