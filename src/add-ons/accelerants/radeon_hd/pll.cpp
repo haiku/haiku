@@ -714,27 +714,33 @@ pll_set(display_mode* mode, uint8 crtcID)
 				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_DP);
 			else {
 				if (dp_clock == 162000) {
-					ssEnabled = pll_ppll_ss_probe(pll, ATOM_DP_SS_ID2);
+					ssEnabled = pll_ppll_ss_probe(pll,
+						ATOM_DP_SS_ID2) == B_OK ? true : false;
 					if (!ssEnabled)
-						// id2 failed, try id1
-						ssEnabled = pll_ppll_ss_probe(pll, ATOM_DP_SS_ID1);
+						ssEnabled = pll_ppll_ss_probe(pll,
+							ATOM_DP_SS_ID1) == B_OK ? true : false;
 				} else
-					ssEnabled = pll_ppll_ss_probe(pll, ATOM_DP_SS_ID1);
+					ssEnabled = pll_ppll_ss_probe(pll,
+						ATOM_DP_SS_ID1) == B_OK ? true : false;
 			}
 			break;
 		case ATOM_ENCODER_MODE_LVDS:
 			if (info.dceMajor >= 4)
-				ssEnabled = pll_asic_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
+				ssEnabled = pll_asic_ss_probe(pll,
+					gInfo->lvdsSpreadSpectrumID) == B_OK ? true : false;
 			else
-				ssEnabled = pll_ppll_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
+				ssEnabled = pll_ppll_ss_probe(pll,
+					gInfo->lvdsSpreadSpectrumID) == B_OK ? true : false;
 			break;
 		case ATOM_ENCODER_MODE_DVI:
 			if (info.dceMajor >= 4)
-				ssEnabled = pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_TMDS);
+				ssEnabled = pll_asic_ss_probe(pll,
+					ASIC_INTERNAL_SS_ON_TMDS) == B_OK ? true : false;
 			break;
 		case ATOM_ENCODER_MODE_HDMI:
 			if (info.dceMajor >= 4)
-				ssEnabled = pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_HDMI);
+				ssEnabled = pll_asic_ss_probe(pll,
+					ASIC_INTERNAL_SS_ON_HDMI) == B_OK ? true : false;
 			break;
 	}
 
