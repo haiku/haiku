@@ -36,11 +36,20 @@ rule AddRepositoryPackage repository : architecture : baseName : version
 	package = $(package:E=$(baseName):G=package-in-$(repository:G=)) ;
 	HAIKU_PACKAGE_REPOSITORY on $(package) = $(repository) ;
 	HAIKU_PACKAGE_ARCHITECTURE on $(package) = $(architecture) ;
-	HAIKU_PACKAGE_FILE_NAME on $(package) = $(package:G=)-$(architecture).hpkg ;
+	local packageFileName = $(package:G=)-$(architecture).hpkg ;
+	HAIKU_PACKAGE_FILE_NAME on $(package) = $(packageFileName) ;
 
 	local packageFamily = [ InvokeRepositoryMethod $(repository) : PackageFamily
 		: $(baseName) ] ;
 	baseName = $(packageFamily:G=) ;
+
+	if $(HAIKU_NO_DOWNLOADS) = 1 {
+		# Only add packages to repository that already exist in download
+		# directory.
+		if ! [ Glob $(HAIKU_DOWNLOAD_DIR) : $(packageFileName) ] {
+			return ;
+		}
+	}
 
 	if ! $(baseName) in $(HAIKU_AVAILABLE_PACKAGES) {
 		HAIKU_AVAILABLE_PACKAGES += $(baseName) ;
@@ -170,18 +179,14 @@ rule RemotePackageRepository repository : architecture : repositoryUrl
 		PreprocessPackageOrRepositoryInfo $(repositoryInfo)
 			: $(repositoryInfoTemplate) : $(architecture) ;
 
-		# build repository file, using only packages available in the download
-		# directory
-		local allPackageFiles = [
+		# build repository file
+		local packageFileNames = [
 			on $(packageListFile) return $(HAIKU_REPOSITORY_PACKAGE_FILE_NAMES)
 		] ;
 		local packageFiles ;
-		for packageFile in $(allPackageFiles) {
-			if [ Glob $(HAIKU_DOWNLOAD_DIR) : $(packageFile) ] {
-				packageFile = $(packageFile:G=package-file) ;
-				MakeLocate $(packageFile) : $(HAIKU_DOWNLOAD_DIR) ;
-				packageFiles += $(packageFile) ;
-			}
+		for packageFile in $(packageFileNames) {
+			MakeLocate $(packageFile) : $(HAIKU_DOWNLOAD_DIR) ;
+			packageFiles += $(packageFile) ;
 		}
 		RepositoryCache $(repositoryFile) : $(repositoryInfo)
 			: $(packageFiles) ;
