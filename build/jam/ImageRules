@@ -880,6 +880,8 @@ rule AddPackagesAndRepositoryVariablesToContainerScript script : container
 	AddVariableToScript $(script) : resolvePackageDependencies
 		: $(resolvePackageDependencies) ;
 
+	AddVariableToScript $(script) : noDownloads : $(HAIKU_NO_DOWNLOADS) ;
+
 	AddVariableToScript $(script) : updateAllPackages
 		: $(HAIKU_UPDATE_ALL_PACKAGES) ;
 

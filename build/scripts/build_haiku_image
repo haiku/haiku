@@ -16,6 +16,7 @@ set -o errexit
 # imageSize
 # imageLabel
 # resolvePackageDependencies
+# noDownloads
 # updateAllPackages
 # updateOnly
 # dontClearImage
@@ -214,6 +215,11 @@ downloadFile()
 	path=$2
 
 	if [ ! -f "$path" ]; then
+		if [ "$noDownloads" == "1" ]; then
+			echo "ERROR: Would need to download $url, but HAIKU_NO_DOWNLOADS "
+				"is set!"
+			exit 1
+		fi
 		wget -O "$path" "$url"
 	fi
 }
