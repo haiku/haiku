@@ -115,7 +115,7 @@ rule PrepareSubDirConfigVariables
 {
 	local dirTokens = $(1) ;
 	local config = [ ConfigObject $(dirTokens) ] ;
-	
+
 	if ! [ on $(config) return $(__prepared) ] {
 		# prepare config for parent dir
 		local parentDir = [ FReverse $(dirTokens) ] ;
@@ -146,7 +146,7 @@ rule PrepareConfigVariables
 	# objects to the global values
 	local rootConfig = [ ConfigObject ] ; # the root config object
 	local inheritedRootConfig = [ ConfigObject : __inherited_config__ ] ;
-	
+
 	for var in $(AUTO_SET_UP_CONFIG_VARIABLES) {
 		$(var) on $(rootConfig) = $($(var)) ;
 		$(var) on $(inheritedRootConfig) = $($(var)) ;

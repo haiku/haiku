@@ -1,4 +1,3 @@
-
 rule SetupBoot
 {
 	# Usage SetupBoot <sources_or_objects> : <extra_cc_flags> : <include_private_headers> ;

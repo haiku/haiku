@@ -315,7 +315,7 @@ rule KernelArchitectureSetup architecture
 					Exit "Set HAIKU_BOOT_BOARD for your target ARM device!" ;
 				}
 			}
-					
+
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
 

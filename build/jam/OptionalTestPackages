@@ -12,11 +12,11 @@
 # 	# add scripts, tattle executable and README
 # 	SEARCH on <libmicro>bench <libmicro>multiview <libmicro>README
 # 		= [ FDirName $(HAIKU_TOP) src tests system benchmarks libMicro ] ;
-# 
+#
 # 	AddFilesToHaikuImage home benchmarks libmicro
 # 		: <libmicro>bench <libmicro>multiview <libmicro>README ;
 # 	AddFilesToHaikuImage home benchmarks libmicro bin-BePC : tattle ;
-# 
+#
 # 	# add libmicro benchmarks
 # 	AddFilesToHaikuImage home benchmarks libmicro bin-BePC :
 # 		atomic <libmicro>bind cachetocache cascade_cond cascade_fcntl
@@ -30,9 +30,9 @@
 # 		siglongjmp signal sigprocmask <libmicro>socket socketpair <libmicro>stat
 # 		strcasecmp strchr strcmp strcpy strftime strlen strtol system time times
 # 		write writev ;
-# 
+#
 # 	AddSymlinkToHaikuImage home benchmarks libmicro : bin-BePC : bin ;
-# 
+#
 # 	AddOptionalPackageDescriptionToHaikuImage
 # 		<libmicro>.OptionalPackageDescription
 # 		: $(HAIKU_TOP) src tests system benchmarks libMicro ;

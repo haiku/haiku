@@ -1,4 +1,3 @@
-
 # FIncludes <dirs> ;
 #
 # Overridden to support a second argument, the option to be used.
@@ -415,7 +414,7 @@ rule UsePrivateSystemHeaders
 }
 
 
-rule UseBuildFeatureHeaders feature : attribute 
+rule UseBuildFeatureHeaders feature : attribute
 {
 	# UseBuildFeatureHeaders <feature> : [ <attribute> ] ;
 	# A shorthand for

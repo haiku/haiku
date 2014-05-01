@@ -200,16 +200,16 @@ AddFilesToPackage data KeyboardLayouts ThinkPad
 
 # boot module links
 AddBootModuleSymlinksToPackage
-	acpi@x86,x86_64 ahci ata@ata ata_adapter@ata 
-	bfs 
-	config_manager 
+	acpi@x86,x86_64 ahci ata@ata ata_adapter@ata
+	bfs
+	config_manager
 	dpc
 	efi_gpt
-	generic_ide_pci 
-	ide@ide ide_adapter@ide ide_isa@x86 isa@x86,x86_64 intel it8211 
-	legacy_sata locked_pool 
+	generic_ide_pci
+	ide@ide ide_adapter@ide ide_isa@x86 isa@x86,x86_64 intel it8211
+	legacy_sata locked_pool
 	openpic@ppc
-	packagefs pci 
+	packagefs pci
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112
 	usb usb_disk <usb>ehci <usb>ohci <usb>uhci
 	virtio virtio_block virtio_pci virtio_scsi

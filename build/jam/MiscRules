@@ -1,4 +1,3 @@
-
 rule SetupObjectsDir
 {
 	# SetupObjectsDir

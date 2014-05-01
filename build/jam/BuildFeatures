@@ -169,7 +169,7 @@ if [ IsPackageAvailable mesa_devel ] {
 if [ IsPackageAvailable ffmpeg_devel ] {
 	local ffmpegLibs = libavformat.so libavcodec.so libavdevice.so
 		libavfilter.so libswscale.so libavutil.so ;
-	
+
 	ExtractBuildFeatureArchives ffmpeg :
 		file: base ffmpeg
 			runtime: lib
@@ -180,7 +180,7 @@ if [ IsPackageAvailable ffmpeg_devel ] {
 		;
 
 	EnableBuildFeatures ffmpeg ;
-	
+
 } else {
 	Echo "FFMpeg support not available on $(TARGET_PACKAGING_ARCH)" ;
 }

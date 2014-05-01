@@ -1,4 +1,3 @@
-
 # Variable naming conventions:
 # TARGET_*:	A build system variable specifying a property for building for
 #			the target platform (usually Haiku). E.g. TARGET_CC specifies the
@@ -587,7 +586,7 @@ if $(HOST_PLATFORM) = freebsd {
 	# FreeBSD's gcc doesn't include /usr/local/* in its search paths,
 	# though that's where most things from ports wind up being installed.
 	HOST_HDRS += /usr/local/include ;
-	HOST_LINKFLAGS += -L/usr/local/lib ; 
+	HOST_LINKFLAGS += -L/usr/local/lib ;
 }
 
 if $(HOST_PLATFORM) = darwin {

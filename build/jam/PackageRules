@@ -46,7 +46,7 @@ rule PreprocessPackageInfo source : directory : architecture
 	SEARCH on $(source) +=
 		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) $(architecture) ]
 		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) any ]
-		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) generic ] 
+		[ FDirName $(HAIKU_PACKAGE_INFOS_DIR) generic ]
 	;
 
 	local target = $(source:BSG=package-info)-package-info ;

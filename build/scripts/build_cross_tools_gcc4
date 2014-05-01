@@ -95,7 +95,7 @@ if [ -z "$gccVersion" ]; then
 fi
 
 # touch all info files in order to avoid the dependency on makeinfo
-# (which apparently doesn't work reliably on all the different host 
+# (which apparently doesn't work reliably on all the different host
 # configurations and changes files which in turn appear as local changes
 # to the VCS).
 find "$binutilsSourceDir" "$gccSourceDir" -name \*.info -print0 | xargs -0 touch

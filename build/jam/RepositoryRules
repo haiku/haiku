@@ -1,6 +1,6 @@
 #pragma mark - Private
 
-# default value for the build profile that defines the set of source packages 
+# default value for the build profile that defines the set of source packages
 # that will be put onto the bootstrap image
 HAIKU_BOOTSTRAP_SOURCES_PROFILE ?= @minimum-raw ;
 

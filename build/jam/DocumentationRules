@@ -31,7 +31,7 @@ rule Man2Docs
 		Man2Doc $(target) : $(source) ;
 	}
 }
- 
+
 rule Doc2HTML
 {
 	local source = [ FGristFiles $(1) ] ;
@@ -49,7 +49,7 @@ rule Doc2HTML
 
 	MakeLocate $(target) : $(basedir) ;
 	if $(2) {
-		XSLBASEDIR on $(target) = -stringparam base.dir \"$(basedir)/\" ; 
+		XSLBASEDIR on $(target) = -stringparam base.dir \"$(basedir)/\" ;
 	}
 	XSLSHEET on $(target) = $(xslsheet) ;
 	XSLOPTIONS on $(target) = $(options) ;

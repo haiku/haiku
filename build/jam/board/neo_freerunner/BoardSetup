@@ -28,7 +28,7 @@ HAIKU_BOARD_LOADER_STACK_BASE = 0x34000000 ;
 # u-boot binary image filename, to build the flash image
 # XXX: Locate it somehow (for now just put it in generated/)
 #HAIKU_BOARD_UBOOT_IMAGE ?= u-boot-verdex-400-r1604.bin ;
-#HAIKU_BOARD_UBOOT_IMAGE_URL = 
+#HAIKU_BOARD_UBOOT_IMAGE_URL =
 #	http://www.gumstix.net/feeds/u-boot/u-boot-verdex-400-r1604.bin ;
 
 
@@ -57,7 +57,7 @@ if mmcinit; then \
 	bootm $(HAIKU_BOARD_LOADER_UIBASE); \
 fi" ;
 
-HAIKU_BOARD_SDIMAGE_FILES = 
+HAIKU_BOARD_SDIMAGE_FILES =
 	haiku_loader
 	haiku_loader.ub
 	haiku_loader_nbsd.ub

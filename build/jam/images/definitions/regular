@@ -10,42 +10,42 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 	installsound
 	mail2mbox mbox2mail mkdos mount_nfs
 	play playfile playsound playwav
-	screenshot setdecor spamdbm 
+	screenshot setdecor spamdbm
 	translate
 ] ;
 
 SYSTEM_APPS += [ FFilterByBuildFeatures
-	CDPlayer CodyCam 
-	GLInfo@mesa 
-	HaikuDepot 
-	Icon-O-Matic Installer LaunchBox 
+	CDPlayer CodyCam
+	GLInfo@mesa
+	HaikuDepot
+	Icon-O-Matic Installer LaunchBox
 	Magnify Mail MediaConverter MediaPlayer MidiPlayer
 	PackageInstaller People	PoorMan PowerStatus
-	Screenshot SerialConnect SoundRecorder 
-	TV 
-	WebWatch 
+	Screenshot SerialConnect SoundRecorder
+	TV
+	WebWatch
 ] ;
 
-DESKBAR_APPLICATIONS += 
-	CodyCam CDPlayer 
-	HaikuDepot 
-	Icon-O-Matic Installer 
-	Magnify Mail MediaConverter MediaPlayer MidiPlayer 
+DESKBAR_APPLICATIONS +=
+	CodyCam CDPlayer
+	HaikuDepot
+	Icon-O-Matic Installer
+	Magnify Mail MediaConverter MediaPlayer MidiPlayer
 	People PoorMan
 	TV
 ;
 
-DESKBAR_DESKTOP_APPLETS += 
-	LaunchBox 
+DESKBAR_DESKTOP_APPLETS +=
+	LaunchBox
 	PowerStatus
 ;
 
 SYSTEM_PREFERENCES += [ FFilterByBuildFeatures
 	DataTranslations
-	E-mail 
-	Media 
-	Printers 
-	ScreenSaver Sounds 
+	E-mail
+	Media
+	Printers
+	ScreenSaver Sounds
 ] ;
 
 SYSTEM_DEMOS += [ FFilterByBuildFeatures
@@ -72,7 +72,7 @@ rule HaikuImageGetSystemLibs
 			libpackage.so
 			libscreensaver.so
 			libtextencoding.so libtracker.so libtranslation.so
-			libtiff.so 
+			libtiff.so
 		] ]
 		;
 }
@@ -91,36 +91,36 @@ rule HaikuImageGetPrivateSystemLibs
 
 
 SYSTEM_SERVERS += [ FFilterByBuildFeatures
-	cddb_daemon 
+	cddb_daemon
 	mail_daemon media_addon_server media_server midi_server
-	nfs4_idmapper_server 
+	nfs4_idmapper_server
 	print_server print_addon_server
 ] ;
 
 SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
 	x86,x86_64 @{
-		intel_810.accelerant intel_extreme.accelerant 
+		intel_810.accelerant intel_extreme.accelerant
 		matrox.accelerant
-		nvidia.accelerant 
-		radeon.accelerant radeon_hd.accelerant 
-		#via.accelerant 
+		nvidia.accelerant
+		radeon.accelerant radeon_hd.accelerant
+		#via.accelerant
 	}@ # x86,x86_64
 	x86 @{
 		3dfx.accelerant ati.accelerant neomagic.accelerant s3.accelerant
 	}@ # x86
 ] ;
 
-SYSTEM_ADD_ONS_TRANSLATORS += 
-	BMPTranslator 
-	EXRTranslator 
-	GIFTranslator 
-	HVIFTranslator 
-	ICOTranslator ICNSTranslator 
-	JPEGTranslator	JPEG2000Translator 
+SYSTEM_ADD_ONS_TRANSLATORS +=
+	BMPTranslator
+	EXRTranslator
+	GIFTranslator
+	HVIFTranslator
+	ICOTranslator ICNSTranslator
+	JPEGTranslator	JPEG2000Translator
 	PCXTranslator PNGTranslator PPMTranslator PSDTranslator
-	RAWTranslator RTFTranslator 
+	RAWTranslator RTFTranslator
 	SGITranslator
-	TGATranslator TIFFTranslator 
+	TGATranslator TIFFTranslator
 	WebPTranslator WonderBrushTranslator
 ;
 
@@ -140,7 +140,7 @@ SYSTEM_ADD_ONS_MEDIA += [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_ADD_ONS_MEDIA_PLUGINS += [ FFilterByBuildFeatures
-	ffmpeg@ffmpeg 
+	ffmpeg@ffmpeg
 	raw_decoder
 ] ;
 
@@ -155,70 +155,70 @@ SYSTEM_ADD_ONS_PRINT +=
 	Preview
 ;
 
-SYSTEM_ADD_ONS_PRINT_TRANSPORT += 
-	HP\ JetDirect 
-	IPP 
+SYSTEM_ADD_ONS_PRINT_TRANSPORT +=
+	HP\ JetDirect
+	IPP
 	LPR
 	# Parallel\ Port
-	Print\ To\ File 
-	Serial\ Port 
+	Print\ To\ File
+	Serial\ Port
 	USB\ Port
 ;
 
 SYSTEM_ADD_ONS_SCREENSAVERS += [ FFilterByBuildFeatures
-	Butterfly 
-	DebugNow 
+	Butterfly
+	DebugNow
 	Flurry@mesa
 	GLife@mesa Gravity@mesa
-	$(HAIKU_INCLUDE_TRADEMARKS)Haiku 
-	Icons IFS 
+	$(HAIKU_INCLUDE_TRADEMARKS)Haiku
+	Icons IFS
 	Leaves
-	Message 
+	Message
 	Spider
 ] ;
 
-SYSTEM_ADD_ONS_DRIVERS_AUDIO += 
-	auich auvia 
-	echo3g emuxki 
-	hda 
-	ice1712 
-	sis7018 
+SYSTEM_ADD_ONS_DRIVERS_AUDIO +=
+	auich auvia
+	echo3g emuxki
+	hda
+	ice1712
+	sis7018
 ;
 
-SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD += 
-	#cmedia usb_audio 
+SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD +=
+	#cmedia usb_audio
 ;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS += [ FFilterByBuildFeatures
 	x86,x86_64 @{
-		intel_810 intel_extreme 
-		matrox 
-		nvidia 
-		radeon radeon_hd 
-		#via 
+		intel_810 intel_extreme
+		matrox
+		nvidia
+		radeon radeon_hd
+		#via
 	}@ # x86,x86_64
 	x86 @{
-		3dfx 
-		ati 
-		neomagic 
+		3dfx
+		ati
+		neomagic
 		s3
 	}@ # x86
 ] ;
 
-SYSTEM_ADD_ONS_DRIVERS_MIDI += 
-	emuxki 
-	ice1712 
-	usb_midi 
+SYSTEM_ADD_ONS_DRIVERS_MIDI +=
+	emuxki
+	ice1712
+	usb_midi
 ;
 
 SYSTEM_ADD_ONS_DRIVERS_POWER += [ FFilterByBuildFeatures
 	acpi_battery@x86,x86_64
 ] ;
 
-SYSTEM_ADD_ONS_FILE_SYSTEMS += 
-	cdda 
-	googlefs 
-	nfs nfs4 
+SYSTEM_ADD_ONS_FILE_SYSTEMS +=
+	cdda
+	googlefs
+	nfs nfs4
 ;
 
 # Mailbox folders and symlink

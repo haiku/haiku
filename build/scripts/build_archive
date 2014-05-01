@@ -12,9 +12,9 @@ shift
 # The second argument is the shell script that initializes the variables:
 # tmpDir
 # addBuildCompatibilityLibDir
-# 
+#
 # copyattr
-# rmAttrs 
+# rmAttrs
 # zip
 # NOTE: rmAttrs and zip are only passed in when building zip
 #

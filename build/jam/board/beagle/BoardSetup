@@ -28,13 +28,13 @@ HAIKU_BOARD_LOADER_STACK_BASE = 0x84000000 ;
 
 # OMAP x-loader image, must be first file on FAT partition
 HAIKU_BOARD_MLO_IMAGE ?= MLO ;
-HAIKU_BOARD_MLO_IMAGE_URL = 
+HAIKU_BOARD_MLO_IMAGE_URL =
 	http://www.angstrom-distribution.org/demo/beagleboard/MLO ;
 
 # u-boot binary image filename, to build the flash image
 # XXX: Locate it somehow (for now just put it in generated/)
 HAIKU_BOARD_UBOOT_IMAGE ?= u-boot.bin ;
-HAIKU_BOARD_UBOOT_IMAGE_URL = 
+HAIKU_BOARD_UBOOT_IMAGE_URL =
 	http://www.angstrom-distribution.org/demo/beagleboard/u-boot.bin ;
 
 #

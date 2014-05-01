@@ -13,11 +13,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 # Include required packages:
 # primary architecture
-AddHaikuImagePackages [ FFilterByBuildFeatures 
+AddHaikuImagePackages [ FFilterByBuildFeatures
 	curl freetype icu libsolv zlib
 
 	regular_image @{
-		bzip2 ctags ffmpeg findutils gawk glu grep jpeg less libpng 
+		bzip2 ctags ffmpeg findutils gawk glu grep jpeg less libpng
 		mesa mesa_devel mesa_swrast sed sharutils tar which
 	}@
 ] ;
@@ -26,7 +26,7 @@ local architectureObject ;
 for architectureObject
 		in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
 	on $(architectureObject) {
-		AddHaikuImagePackages [ FFilterByBuildFeatures 
+		AddHaikuImagePackages [ FFilterByBuildFeatures
 			curl freetype icu libsolv zlib
 
 			regular_image @{

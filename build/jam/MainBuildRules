@@ -1,4 +1,3 @@
-
 rule AddSharedObjectGlueCode
 {
 	# AddSharedObjectGlueCode <target> : <isExecutable> ;

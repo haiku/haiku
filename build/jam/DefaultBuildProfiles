@@ -3,16 +3,16 @@ switch $(HAIKU_BUILD_PROFILE) {
 	case "bootstrap-*" : {
 		HAIKU_BUILD_TYPE = bootstrap ;
 		EnableBuildFeatures bootstrap_image ;
-		
+
 		HAIKU_DEFINES += HAIKU_BOOTSTRAP_BUILD ;
 		TARGET_DEFINES += HAIKU_BOOTSTRAP_BUILD ;
-	} 
+	}
 
 	case "minimum-*" : {
 		HAIKU_BUILD_TYPE = minimum ;
 		EnableBuildFeatures minimum_image ;
 	}
-	
+
 	case "*" : {
 		HAIKU_BUILD_TYPE = regular ;
 		EnableBuildFeatures regular_image ;
@@ -45,7 +45,7 @@ rule DefineDefaultBuildProfiles
 	# minimum profiles
 	DefineBuildProfile minimum-raw : image : "haiku-minimum.image" ;
 	DefineBuildProfile minimum-vmware : vmware-image : "haiku-minimum.vmdk" ;
-	DefineBuildProfile minimum-anyboot : anyboot-image 
+	DefineBuildProfile minimum-anyboot : anyboot-image
 		: "haiku-minimum-anyboot.image" ;
 
 

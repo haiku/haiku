@@ -7,7 +7,7 @@ destination=CountryFlags.rdef
 nr=0
 
 for file in *
-do 
+do
 	id=`echo "$file" | cut -b -2`
 	name=`echo "${file%%.*}" | cut -b 4-`
 
@@ -15,7 +15,7 @@ do
 	echo "resource($nr,\"$id\") #'VICN' array {" >> $destination
 	tail -n +3 "$file" >> $destination
 	echo >> $destination
-	
-	nr=`expr $nr + 1`	
+
+	nr=`expr $nr + 1`
 	echo \ $nr, $name, $id... OK
 done

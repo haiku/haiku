@@ -5,11 +5,11 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	addattr alert arp
 	base64 basename bash bc beep bfsinfo
 	cal cat catattr checkfs checkitout chgrp chmod chop chown chroot cksum clear
-	clockconfig cmp collectcatkeys comm compress copyattr cp csplit cut 
-	date dc dd desklink df diff diff3 dircolors dirname diskimage draggers 
+	clockconfig cmp collectcatkeys comm compress copyattr cp csplit cut
+	date dc dd desklink df diff diff3 dircolors dirname diskimage draggers
 	driveinfo dstcheck du dumpcatalog
 	echo eject env error expand expr
-	factor false fdinfo ffm filepanel finddir findpaths fmt fold fortune fstrim 
+	factor false fdinfo ffm filepanel finddir findpaths fmt fold fortune fstrim
 	ftp ftpd funzip
 	getarch getlimits groupadd groupdel groupmod groups gzip gzexe
 	hd head hey hostname
@@ -17,7 +17,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	join kernel_debugger keymap keystore kill
 	link linkcatkeys listarea listattr listimage listdev
 	listport listres listsem listusb ln locale logger login logname ls lsindex
-	makebootable md5sum merge message mimeset mkdir mkfifo mkfs mkindex mktemp 
+	makebootable md5sum merge message mimeset mkdir mkfifo mkfs mkindex mktemp
 	modifiers mount mountvolume mv
 	netcat netstat nl nohup notify nproc
 	od open
@@ -40,44 +40,44 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_APPS = [ FFilterByBuildFeatures
-	AboutSystem ActivityMonitor 
-	BootManager@x86,x86_64 
+	AboutSystem ActivityMonitor
+	BootManager@x86,x86_64
 	CharacterMap
 	Debugger DeskCalc Devices DiskProbe DiskUsage DriveSetup
 	Expander
 	NetworkStatus
-	ProcessController 
-	ShowImage StyledEdit 
-	Terminal TextSearch 
+	ProcessController
+	ShowImage StyledEdit
+	Terminal TextSearch
 	Workspaces
 ] ;
 
-DESKBAR_APPLICATIONS = 
-	ActivityMonitor 
-	CharacterMap 
-	DeskCalc Devices DiskProbe DiskUsage DriveSetup 
-	Expander 
-	StyledEdit 
+DESKBAR_APPLICATIONS =
+	ActivityMonitor
+	CharacterMap
+	DeskCalc Devices DiskProbe DiskUsage DriveSetup
+	Expander
+	StyledEdit
 	Terminal
 ;
 
-DESKBAR_DESKTOP_APPLETS = 
-	NetworkStatus 
+DESKBAR_DESKTOP_APPLETS =
+	NetworkStatus
 	ProcessController
 	Workspaces
 ;
 
 SYSTEM_PREFERENCES = [ FFilterByBuildFeatures
-	Appearance 
+	Appearance
 	Backgrounds
-	<preference>Deskbar 
-	FileTypes 
-	Keyboard Keymap 
+	<preference>Deskbar
+	FileTypes
+	Keyboard Keymap
 	Locale
-	Mouse 
-	Network Notifications 
-	Screen Shortcuts 
-	Time Touchpad <preference>Tracker 
+	Mouse
+	Network Notifications
+	Screen Shortcuts
+	Time Touchpad <preference>Tracker
 	VirtualMemory
 ] ;
 
@@ -115,35 +115,35 @@ rule HaikuImageGetPrivateSystemLibs
 
 
 SYSTEM_SERVERS = [ FFilterByBuildFeatures
-	app_server 
-	debug_server dns_resolver_server 
+	app_server
+	debug_server dns_resolver_server
 	input_server
 	keystore_server
-	mount_server 
+	mount_server
 	net_server notification_server
-	package_daemon power_daemon 
+	package_daemon power_daemon
 	registrar
 	syslog_daemon
 ] ;
 
-SYSTEM_NETWORK_DEVICES = 
-	ethernet 
-	loopback 
+SYSTEM_NETWORK_DEVICES =
+	ethernet
+	loopback
 ;
 
-SYSTEM_NETWORK_DATALINK_PROTOCOLS = 
-	<module>arp 
-	ethernet_frame 
-	ipv6_datagram 
+SYSTEM_NETWORK_DATALINK_PROTOCOLS =
+	<module>arp
+	ethernet_frame
+	ipv6_datagram
 	loopback_frame
 ;
 
 #SYSTEM_NETWORK_PPP = ipcp modem pap pppoe ;
 
-SYSTEM_NETWORK_PROTOCOLS = 
-	icmp icmp6 ipv4 ipv6  
-	tcp 
-	udp unix 
+SYSTEM_NETWORK_PROTOCOLS =
+	icmp icmp6 ipv4 ipv6
+	tcp
+	udp unix
 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
@@ -153,12 +153,12 @@ SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
 	}@ # x86,x86_64
 ] ;
 
-SYSTEM_ADD_ONS_TRANSLATORS = 
-	STXTTranslator 
+SYSTEM_ADD_ONS_TRANSLATORS =
+	STXTTranslator
 ;
 
-SYSTEM_ADD_ONS_LOCALE_CATALOGS = 
-	<catalog-addon>plaintext 
+SYSTEM_ADD_ONS_LOCALE_CATALOGS =
+	<catalog-addon>plaintext
 ;
 
 SYSTEM_ADD_ONS_MEDIA = ;
@@ -186,33 +186,33 @@ SYSTEM_ADD_ONS_DRIVERS_MIDI = ;
 
 SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	x86,x86_64 @{
-		3com 
-		atheros813x ar81xx attansic_l1 attansic_l2 
-		broadcom440x broadcom570x 
-		dec21xxx 
-		ipro100 ipro1000 
-		jmicron2x0 
-		marvell_yukon 
+		3com
+		atheros813x ar81xx attansic_l1 attansic_l2
+		broadcom440x broadcom570x
+		dec21xxx
+		ipro100 ipro1000
+		jmicron2x0
+		marvell_yukon
 		nforce
-		pcnet 
-		rtl8139 rtl81xx 
-		sis19x syskonnect 
+		pcnet
+		rtl8139 rtl81xx
+		sis19x syskonnect
 		via_rhine vt612x
 	}@ # x86_64
 
-	etherpci 
-	pegasus 
-	sis900 
-	usb_asix usb_davicom usb_ecm 
+	etherpci
+	pegasus
+	sis900
+	usb_asix usb_davicom usb_ecm
 	wb840
 
 	# WLAN drivers
 	x86 @{
-		aironetwifi atheroswifi 
+		aironetwifi atheroswifi
 		broadcom43xx
-		iprowifi2100 iprowifi2200 iprowifi3945 iprowifi4965 
+		iprowifi2100 iprowifi2200 iprowifi3945 iprowifi4965
 		marvell88w8363 marvell88w8335
-		ralinkwifi 
+		ralinkwifi
 		wavelanwifi
 	}@ # x86
 
@@ -220,18 +220,18 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	#usb_beceemwmx@gpl
 ] ;
 
-SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures 
-	acpi_button@x86 
+SYSTEM_ADD_ONS_DRIVERS_POWER = [ FFilterByBuildFeatures
+	acpi_button@x86
 ] ;
 
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
-	acpi@x86,x86_64	agp_gart@x86,x86_64 ata@ata 
-	config_manager 
+	acpi@x86,x86_64	agp_gart@x86,x86_64 ata@ata
+	config_manager
 	firewire@x86
 	ide@ide scsi isa@x86,x86_64
 	pci ps2@x86,x86_64
 	random
-	usb 
+	usb
 	virtio
 ] ;
 

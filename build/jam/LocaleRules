@@ -23,11 +23,11 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 		if $(PLATFORM) = host {
 			sysHeaders += $(HOST_HDRS) ;
 			defines += $(HOST_DEFINES) ;
-			cc = $(HOST_CC) ;			
+			cc = $(HOST_CC) ;
 			if $(USES_BE_API) {
 				sysHeaders += $(HOST_BE_API_HEADERS) ;
 			}
-			
+
 			includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
@@ -171,12 +171,12 @@ rule AddCatalogEntryAttribute target
 	#
 	# <attribute value> should be of the form
 	#	"x-vnd.Haiku-App:context:string"
-		
+
 	CATALOG_ENTRY on $(target) = "$(2)" ;
 
 	Depends $(target) : <build>addattr ;
-	
-	AddCatalogEntryAttribute1 $(target) 
+
+	AddCatalogEntryAttribute1 $(target)
 		: <build>addattr ;
 }
 
