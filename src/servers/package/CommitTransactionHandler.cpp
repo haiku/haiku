@@ -352,9 +352,8 @@ CommitTransactionHandler::_CreateOldStateDirectory(BMessage* reply)
 
 	// add the old state directory to the reply
 	if (reply != NULL) {
-		error = reply->AddString("old state", fOldStateDirectoryName);
-		if (error != B_OK)
-			throw Exception(error, "failed to add field to reply");
+		if (reply->AddString("old state", fOldStateDirectoryName) != B_OK)
+			throw Exception(B_NO_MEMORY);
 	}
 }
 
@@ -1015,12 +1014,8 @@ CommitTransactionHandler::_RevertRemovePackagesToDeactivate()
 	BDirectory packagesDirectory;
 	status_t error
 		= packagesDirectory.SetTo(&fVolume->PackagesDirectoryRef());
-	if (error != B_OK) {
+	if (error != B_OK)
 		throw Exception(error, "failed to open packages directory");
-		ERROR("failed to open packages directory: %s\n",
-			strerror(error));
-		return;
-	}
 
 	for (PackageSet::iterator it = fRemovedPackages.begin();
 		it != fRemovedPackages.end(); ++it) {
