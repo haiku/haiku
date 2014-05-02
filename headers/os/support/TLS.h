@@ -30,8 +30,8 @@ tls_get(int32 index)
 {
 	void *ret;
 	__asm__ __volatile__ ( 
-		"movl	%%fs:(,%%edx, 4), %%eax \n\t"
-		: "=a"(ret) : "d"(index) );
+		"movl	%%fs:(, %1, 4), %0"
+		: "=r" (ret) : "r" (index));
 	return ret;
 }
 
@@ -40,9 +40,9 @@ tls_address(int32 index)
 {
 	void **ret;
 	__asm__ __volatile__ ( 
-		"movl	%%fs:0, %%eax \n\t"
-		"leal	(%%eax, %%edx, 4), %%eax \n\t"
-		: "=a"(ret) : "d"(index) );
+		"movl	%%fs:0, %0\n\t"
+		"leal	(%0, %1, 4), %0\n\t"
+		: "=&r" (ret) : "r" (index));
 	return ret;
 }
 
@@ -50,8 +50,8 @@ static inline void
 tls_set(int32 index, void *value)
 {
 	__asm__ __volatile__ ( 
-		"movl	%%eax, %%fs:(,%%edx, 4) \n\t"
-		: : "d"(index), "a"(value) );
+		"movl	%1, %%fs:(, %0, 4)"
+		: : "r" (index), "r" (value));
 }
 
 #else
