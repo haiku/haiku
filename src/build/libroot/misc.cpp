@@ -69,3 +69,14 @@ snooze_until(bigtime_t time, int timeBase)
 {
 	return snooze(time - system_time());
 }
+
+
+#ifdef __linux__
+// Linux is the only system out there to not have this...
+int mergesort(void* base, size_t count, size_t size,
+	int (*compare)(const void *, const void *))
+{
+	qsort(base, count, size, compare);
+	return 0;
+}
+#endif
