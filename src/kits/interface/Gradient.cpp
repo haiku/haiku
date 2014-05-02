@@ -9,9 +9,9 @@
 
 #include "Gradient.h"
 
+#include <algorithm>
 #include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include <Message.h>
 
@@ -72,17 +72,11 @@ BGradient::ColorStop::operator!=(const ColorStop& other) const
 }
 
 
-static int
-sort_color_stops_by_offset(const void* _left, const void* _right)
+static bool
+sort_color_stops_by_offset(const BGradient::ColorStop* left,
+	const BGradient::ColorStop* right)
 {
-	const BGradient::ColorStop** left = (const BGradient::ColorStop**)_left;
-	const BGradient::ColorStop** right = (const BGradient::ColorStop**)_right;
-	if ((*left)->offset > (*right)->offset)
-		return 1;
-	else if ((*left)->offset < (*right)->offset)
-		return -1;
-
-	return 0;
+	return left->offset < right->offset;
 }
 
 
@@ -434,13 +428,13 @@ BGradient::ColorStops() const
 void
 BGradient::SortColorStopsByOffset()
 {
-	// Use merge-sort because it's a stable algorithm: stops with the same
-	// offset will retain their original order. This can be used to have sharp
-	// color changes in the gradient.
-	// BList.SortItems uses a qsort, which isn't stable, and sometimes swaps
+	// Use stable sort: stops with the same offset will retain their original
+	// order. This can be used to have sharp color changes in the gradient.
+	// BList.SortItems() uses qsort(), which isn't stable, and sometimes swaps
 	// such stops.
-	mergesort(fColorStops.Items(), fColorStops.CountItems(), sizeof(void*),
-		sort_color_stops_by_offset);
+	const BGradient::ColorStop** first = (const BGradient::ColorStop**)fColorStops.Items();
+	const BGradient::ColorStop** last = first + fColorStops.CountItems();
+	std::stable_sort(first, last, sort_color_stops_by_offset);
 }
 
 
