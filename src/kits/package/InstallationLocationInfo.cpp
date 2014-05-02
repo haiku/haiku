@@ -20,6 +20,8 @@ BInstallationLocationInfo::BInstallationLocationInfo()
 	fPackageDirectoryRef(),
 	fLatestActivePackageInfos(),
 	fLatestInactivePackageInfos(),
+	fCurrentlyActivePackageInfos(),
+	fOldStateName(),
 	fChangeCount(0)
 {
 }
@@ -38,6 +40,8 @@ BInstallationLocationInfo::Unset()
 	fPackageDirectoryRef = node_ref();
 	fLatestActivePackageInfos.MakeEmpty();
 	fLatestInactivePackageInfos.MakeEmpty();
+	fCurrentlyActivePackageInfos.MakeEmpty();
+	fOldStateName.Truncate(0);
 	fChangeCount = 0;
 }
 
@@ -113,6 +117,35 @@ BInstallationLocationInfo::SetLatestInactivePackageInfos(
 	const BPackageInfoSet& infos)
 {
 	fLatestInactivePackageInfos = infos;
+}
+
+
+const BPackageInfoSet&
+BInstallationLocationInfo::CurrentlyActivePackageInfos() const
+{
+	return fCurrentlyActivePackageInfos;
+}
+
+
+void
+BInstallationLocationInfo::SetCurrentlyActivePackageInfos(
+	const BPackageInfoSet& infos)
+{
+	fCurrentlyActivePackageInfos = infos;
+}
+
+
+const BString&
+BInstallationLocationInfo::OldStateName() const
+{
+	return fOldStateName;
+}
+
+
+void
+BInstallationLocationInfo::SetOldStateName(const BString& name)
+{
+	fOldStateName = name;
 }
 
 

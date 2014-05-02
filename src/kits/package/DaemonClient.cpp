@@ -63,9 +63,11 @@ BDaemonClient::GetInstallationLocationInfo(
 	int64 baseDirectoryNode;
 	int32 packagesDirectoryDevice;
 	int64 packagesDirectoryNode;
+	BString oldStateName;
 	int64 changeCount;
-	BPackageInfoSet activePackages;
-	BPackageInfoSet inactivePackages;
+	BPackageInfoSet latestActivePackages;
+	BPackageInfoSet latestInactivePackages;
+	BPackageInfoSet currentlyActivePackages;
 	if ((error = reply.FindInt32("base directory device", &baseDirectoryDevice))
 			!= B_OK
 		|| (error = reply.FindInt64("base directory node", &baseDirectoryNode))
@@ -74,10 +76,13 @@ BDaemonClient::GetInstallationLocationInfo(
 			&packagesDirectoryDevice)) != B_OK
 		|| (error = reply.FindInt64("packages directory node",
 			&packagesDirectoryNode)) != B_OK
-		|| (error = _ExtractPackageInfoSet(reply, "active packages",
-			activePackages)) != B_OK
-		|| (error = _ExtractPackageInfoSet(reply, "inactive packages",
-			inactivePackages)) != B_OK
+		|| (error = _ExtractPackageInfoSet(reply, "latest active packages",
+			latestActivePackages)) != B_OK
+		|| (error = _ExtractPackageInfoSet(reply, "latest inactive packages",
+			latestInactivePackages)) != B_OK
+		|| (error = _ExtractPackageInfoSet(reply, "currently active packages",
+			currentlyActivePackages)) != B_OK
+		|| (error = reply.FindString("old state", &oldStateName)) != B_OK
 		|| (error = reply.FindInt64("change count", &changeCount)) != B_OK) {
 		return error;
 	}
@@ -87,8 +92,10 @@ BDaemonClient::GetInstallationLocationInfo(
 	_info.SetBaseDirectoryRef(node_ref(baseDirectoryDevice, baseDirectoryNode));
 	_info.SetPackagesDirectoryRef(
 		node_ref(packagesDirectoryDevice, packagesDirectoryNode));
-	_info.SetLatestActivePackageInfos(activePackages);
-	_info.SetLatestInactivePackageInfos(inactivePackages);
+	_info.SetLatestActivePackageInfos(latestActivePackages);
+	_info.SetLatestInactivePackageInfos(latestInactivePackages);
+	_info.SetCurrentlyActivePackageInfos(currentlyActivePackages);
+	_info.SetOldStateName(oldStateName);
 	_info.SetChangeCount(changeCount);
 
 	return B_OK;

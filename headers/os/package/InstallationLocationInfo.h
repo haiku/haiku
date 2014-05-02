@@ -7,6 +7,7 @@
 
 
 #include <Node.h>
+#include <String.h>
 
 #include <package/PackageDefs.h>
 #include <package/PackageInfoSet.h>
@@ -39,7 +40,13 @@ public:
 			const BPackageInfoSet& LatestInactivePackageInfos() const;
 			void				SetLatestInactivePackageInfos(
 									const BPackageInfoSet& infos);
+
+			const BPackageInfoSet& CurrentlyActivePackageInfos() const;
+			void				SetCurrentlyActivePackageInfos(
 									const BPackageInfoSet& infos);
+
+			const BString&		OldStateName() const;
+			void				SetOldStateName(const BString& name);
 
 			int64				ChangeCount() const;
 			void				SetChangeCount(int64 changeCount);
@@ -50,6 +57,8 @@ private:
 			node_ref			fPackageDirectoryRef;
 			BPackageInfoSet		fLatestActivePackageInfos;
 			BPackageInfoSet		fLatestInactivePackageInfos;
+			BPackageInfoSet		fCurrentlyActivePackageInfos;
+			BString				fOldStateName;
 			int64				fChangeCount;
 };
 

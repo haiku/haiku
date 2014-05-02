@@ -476,12 +476,33 @@ Volume::HandleGetLocationInfoRequest(BMessage* message)
 			= fLatestState->ByFileNameIterator(); it.HasNext();) {
 		Package* package = it.Next();
 		const char* fieldName = package->IsActive()
-			? "active packages" : "inactive packages";
+			? "latest active packages" : "latest inactive packages";
 		BMessage packageArchive;
 		if (package->Info().Archive(&packageArchive) != B_OK
 			|| fLocationInfoReply.AddMessage(fieldName, &packageArchive)
 				!= B_OK) {
 			return;
+		}
+	}
+
+	if (fActiveState != fLatestState) {
+		if (fPackagesDirectoryCount > 1) {
+			fLocationInfoReply.AddString("old state",
+				fPackagesDirectories[fPackagesDirectoryCount - 1].Name());
+		}
+
+		for (PackageFileNameHashTable::Iterator it
+				= fActiveState->ByFileNameIterator(); it.HasNext();) {
+			Package* package = it.Next();
+			if (!package->IsActive())
+				continue;
+
+			BMessage packageArchive;
+			if (package->Info().Archive(&packageArchive) != B_OK
+				|| fLocationInfoReply.AddMessage("currently active packages",
+					&packageArchive) != B_OK) {
+				return;
+			}
 		}
 	}
 
