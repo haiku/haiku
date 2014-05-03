@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	2880796666
+1	german	x-vnd.Haiku-WebPositive	951661576
 Show home button	Settings Window		Home-Symbol anzeigen
 Username:	Authentication Panel		Benutzername:
 Copy URL to clipboard	Download Window		Adresse kopieren
@@ -25,6 +25,7 @@ Window	WebPositive Window		Fenster
 Decrease size	WebPositive Window		Verkleinern
 Serif font:	Settings Window		Serifenschrift:
 Loading %url	WebPositive Window		%url wird geladen
+Download aborted	Download Window		Download abgebrochen
 Page source	WebPositive Window		Quelltext der Seite
 Next	WebPositive Window		Vorwärts
 Find next	WebPositive Window		Nächster Treffer
@@ -85,6 +86,7 @@ Open blank page	Settings Window		Leere Seite öffnen
 New tabs:	Settings Window		Neue Reiter:
 Cancel	WebPositive Window		Abbrechen
 Open all	WebPositive Window		Alle öffnen
+Hide bookmark bar	WebPositive Window		Lesezeichenleiste ausblenden
 Proxy server requires authentication	Settings Window		Der Proxy-Server verlangt eine Authentifizierung
 Clear	URL Bar		Leeren
 Cut	URL Bar		Ausschneiden
@@ -137,6 +139,8 @@ Clone current page	Settings Window		Aktuelle Seite verwenden
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sollen alle %addedCount Lesezeichen auf einmal geöffnet werden?
 OK	Authentication Panel		OK
 Copy	URL Bar		Kopieren
+Download finished	Download Window		Download abgeschlossen
+Show bookmark bar	WebPositive Window		Lesezeichenleiste einblenden
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Lesezeichen verwalten
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Es existiert bereits ein Lesezeichen für diese Seite (%bookmarkName).

@@ -20,7 +20,7 @@ Invert selection	VolumeWindow		Odwróć zaznaczenie
 Recent documents	FavoritesMenu		Ostatnio otwierane dokumenty
 Modified	QueryPoseView		Zmodyfikowano
 Created	ContainerWindow		Utworzono
-Error %error loading add-On %name.	ContainerWindow		Błąd %error przy ładowaniu Wtyczki %name.
+Error %error loading add-On %name.	ContainerWindow		Błąd %error przy ładowaniu wtyczki %name.
 If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeśli wykonasz %ifYouDoAction na folderze ustawień, %osName może przestać działać poprawnie!\n\nNa pewno chcesz to zrobić?
 contains	SelectionWindow		zawiera
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Przepraszamy, nie możesz zapisywać w katalogu głównym systemu.
@@ -65,7 +65,7 @@ Size	QueryPoseView		Rozmiar
 Emptying Trash… 	StatusWindow		Opróżnianie Kosza… 
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker New Templates
 Close all in workspace	ContainerWindow		Zamknij wszystko w przestrzeni roboczej
-Empty Trash	ContainerWindow		Wyczyść Kosz
+Empty Trash	ContainerWindow		Opróżnij kosz
 Name = %name	FindPanel	FindResultTitle	Nazwa = %name
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Jesteś pewien, że chcesz przenieść lub skopiować pliki do tego folderu?
 Does not handle file	OpenWithWindow		Nie podtrzymuje pliku

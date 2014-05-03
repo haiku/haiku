@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	2880796666
+1	swedish	x-vnd.Haiku-WebPositive	951661576
 Show home button	Settings Window		Visa hem-knappen
 Username:	Authentication Panel		Användarnamn:
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
@@ -25,6 +25,7 @@ Window	WebPositive Window		Fönster
 Decrease size	WebPositive Window		Minska storlek
 Serif font:	Settings Window		Serif-typsnitt:
 Loading %url	WebPositive Window		Läser in %url
+Download aborted	Download Window		Nedladdning avbruten
 Page source	WebPositive Window		Sidkälla
 Next	WebPositive Window		Nästa
 Find next	WebPositive Window		Sök nästa
@@ -85,6 +86,7 @@ Open blank page	Settings Window		Öppna blank sida
 New tabs:	Settings Window		Ny flik
 Cancel	WebPositive Window		Avbryt
 Open all	WebPositive Window		Öppna alla
+Hide bookmark bar	WebPositive Window		Dölj bokmärkes listan
 Proxy server requires authentication	Settings Window		Proxyservern kräver behörighetskontroll
 Clear	URL Bar		Töm
 Cut	URL Bar		Klipp ut
@@ -137,6 +139,8 @@ Clone current page	Settings Window		Kopiera aktuella sida
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vill du öppna %addedCount bokmärken på en gång?
 OK	Authentication Panel		OK
 Copy	URL Bar		Kopiera
+Download finished	Download Window		Nerladdning klar
+Show bookmark bar	WebPositive Window		Visa bokmärkslistan
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Hantera bokmärken
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ett bokmärke (%bookmarkName) för denna sida finns redan.

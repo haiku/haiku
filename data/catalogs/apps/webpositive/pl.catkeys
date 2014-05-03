@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	2880796666
+1	polish	x-vnd.Haiku-WebPositive	951661576
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -25,6 +25,7 @@ Window	WebPositive Window		Okno
 Decrease size	WebPositive Window		Zmniejsz wielkość
 Serif font:	Settings Window		Czcionka szeryfowa:
 Loading %url	WebPositive Window		Ładowanie %url
+Download aborted	Download Window		Pobieranie przerwane
 Page source	WebPositive Window		Źródło strony
 Next	WebPositive Window		Następna
 Find next	WebPositive Window		Znajdź następne
@@ -85,6 +86,7 @@ Open blank page	Settings Window		Otwórz pustą stronę
 New tabs:	Settings Window		Nowa karta:
 Cancel	WebPositive Window		Anuluj
 Open all	WebPositive Window		Otwórz wszystko
+Hide bookmark bar	WebPositive Window		Ukryj pasek zakładek
 Proxy server requires authentication	Settings Window		Serwer proxy wymaga uwierzytelnienia
 Clear	URL Bar		Wyczyść
 Cut	URL Bar		Wytnij
@@ -137,6 +139,8 @@ Clone current page	Settings Window		Sklonuj bieżącą stronę
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Czy naprawdę chcesz otworzyć wszystkie zakładki %addedCount na raz?
 OK	Authentication Panel		OK
 Copy	URL Bar		Kopiuj
+Download finished	Download Window		Pobieranie zakończone
+Show bookmark bar	WebPositive Window		Pokaż pasek zakładek
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Zarządzanie zakładkami
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Zakładka dla tej strony (%bookmarkName) już istnieje.

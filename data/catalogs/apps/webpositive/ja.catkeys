@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	2880796666
+1	japanese	x-vnd.Haiku-WebPositive	951661576
 Show home button	Settings Window		ホームボタンを表示する
 Username:	Authentication Panel		ユーザー名:
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
@@ -25,6 +25,7 @@ Window	WebPositive Window		ウィンドウ
 Decrease size	WebPositive Window		サイズを小さく
 Serif font:	Settings Window		セリフフォント:
 Loading %url	WebPositive Window		読み込み中 %url
+Download aborted	Download Window		ダウンロードを中止しました
 Page source	WebPositive Window		ページのソース
 Next	WebPositive Window		次へ
 Find next	WebPositive Window		次を検索
@@ -85,6 +86,7 @@ Open blank page	Settings Window		空白のページを開く
 New tabs:	Settings Window		新しいタブ:
 Cancel	WebPositive Window		中止
 Open all	WebPositive Window		すべて開く
+Hide bookmark bar	WebPositive Window		ブックマークバーを隠す
 Proxy server requires authentication	Settings Window		プロキシサーバーは認証を必要
 Clear	URL Bar		クリア
 Cut	URL Bar		切り取り
@@ -137,6 +139,8 @@ Clone current page	Settings Window		現在のページを複製
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	一度に %addedCount 個のブックマークを開きますか?
 OK	Authentication Panel		OK
 Copy	URL Bar		コピー
+Download finished	Download Window		ダウンロードが完了しました
+Show bookmark bar	WebPositive Window		ブックマークバーを表示
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		ブックマークを管理
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	このページ (%bookmarkName) のブックマークはすでにあります。

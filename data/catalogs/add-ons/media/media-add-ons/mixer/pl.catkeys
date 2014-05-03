@@ -10,7 +10,7 @@ Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Tłum wyjście miksera 
 Display balance control for stereo connections	AudioMixer		Wyświetl kontrolę balansu dla połączeń stereo
 To output	AudioMixer		Do wyjścia
 not connected	AudioMixer		nie podłączony
-Refuse input format changes	AudioMixer		Odmów zmiany formatów wejściowych
+Refuse input format changes	AudioMixer		Odmów zmiany formatu wejściowego
 Drop/repeat samples	AudioMixer		Zostaw/powtórz sample
 Output channel sources	AudioMixer		Źródła kanału wyjściowego
 dB	AudioMixer		dB

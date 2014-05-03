@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	2880796666
+1	hungarian	x-vnd.Haiku-WebPositive	951661576
 Show home button	Settings Window		Kezdőlap-gomb megjelenítése
 Username:	Authentication Panel		Felhasználónév:
 Copy URL to clipboard	Download Window		Cím másolása a vágólapra
@@ -25,6 +25,7 @@ Window	WebPositive Window		Ablak
 Decrease size	WebPositive Window		Méret csökkentése
 Serif font:	Settings Window		Talpas betűtípus:
 Loading %url	WebPositive Window		%url betöltése
+Download aborted	Download Window		A letöltés megszakadt
 Page source	WebPositive Window		Oldal forrása
 Next	WebPositive Window		Következő
 Find next	WebPositive Window		Következő találat
@@ -85,6 +86,7 @@ Open blank page	Settings Window		Üres oldal megnyitása
 New tabs:	Settings Window		Új fülek:
 Cancel	WebPositive Window		Mégse
 Open all	WebPositive Window		Az összes megnyitása
+Hide bookmark bar	WebPositive Window		Könyvjelzősáv elrejtése
 Proxy server requires authentication	Settings Window		A proxy hitelesítést kér
 Clear	URL Bar		Törlés
 Cut	URL Bar		Kivágás
@@ -137,6 +139,8 @@ Clone current page	Settings Window		Jelenlegi oldal másolása
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Biztosan meg akar nyitni %addedCount könyvjelzőt egyszerre?
 OK	Authentication Panel		Rendben
 Copy	URL Bar		Másolás
+Download finished	Download Window		A letöltés befejeződött
+Show bookmark bar	WebPositive Window		Könyvjelzősáv megjelenítése
 OK	WebPositive Window		Rendben
 Manage bookmarks	WebPositive Window		Könyvjelzők kezelése
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ehhez az oldalhoz (%bookmarkName) már tartozik könyvjelző.

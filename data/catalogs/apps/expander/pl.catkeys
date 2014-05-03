@@ -44,7 +44,7 @@ Expand	ExpanderWindow		Rozpakuj
 Close	ExpanderMenu		Zamknij
 The destination is not a folder.	ExpanderWindow		Cel nie jest katalogiem.
 Open destination folder after extraction	ExpanderPreferences		Otwórz katalog docelowy po rozpakowaniu
-Set source…	ExpanderMenu		Ustaw źródło…
+Set source…	ExpanderMenu		Wybierz źródło…
 Select '%s'	DirectoryFilePanel		Wybierz „%s”
 Show contents	ExpanderMenu		Pokaż zawartość
 Stop	ExpanderWindow		Zatrzymaj

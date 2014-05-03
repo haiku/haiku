@@ -8,9 +8,9 @@ usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]      
 %s not a valid option\n	FilePanelApp		%s nie jest prawidłową opcją\n
 short\tlong\tdescription\n	FilePanelApp		krótki\tdługi\topis\n
 %s: this option requires a parameter\n	FilePanelApp		%s: ta opcja wymaga podania parametru\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tskorzystaj z wczytania FilePanel (domyślne)\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tskorzystaj FilePanelu otwierania (domyślne)\n
 -f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tniezaimplementowane\n
--s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tskorzystaj FilePanelu zapisywania\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tskorzystaj z FilePanelu zapisywania\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tustaw domyślną nazwę dla zapisywania\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tsprawia, że FilePanel staje się modalny\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\twyświetl użycie\n

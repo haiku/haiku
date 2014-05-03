@@ -22,7 +22,7 @@ Always on top	PreferencesWindow		常に手前に
 Show all	WindowMenu		すべて表示
 No windows	WindowMenu		ウィンドウ無し
 Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		システムを再起動
+Restart system	DeskbarMenu		再起動
 Large	PreferencesWindow		大
 Auto-raise	PreferencesWindow		マウスオーバーで手前に
 Recent folders:	PreferencesWindow		最近開いたフォルダー

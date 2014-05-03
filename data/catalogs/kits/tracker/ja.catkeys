@@ -186,7 +186,7 @@ Outline selection rectangle only	SettingsView		マウスドラッグ選択時ア
 Select all	DeskWindow		すべて選択
 OK	InfoWindow		OK
 Replace	FSUtils		置換
-You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		下記の項目:\n\t%name%src\n\nを\n\t%name%dest\n\nと置き換えようとしています。\n\n%movemodeの項目と置き換えますか？
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		下記の項目:\n\t%name%dest\nを\n\t%name%src\nで置き換えようとしています。\n\n%movemodeの項目と置き換えますか?
 Mini icon view	DeskWindow		ミニアイコン表示
 Error in regular expression:\n\n'%errstring'	PoseView		正規表現にエラーがあります:\n\n'%errstring'
 Mount all	MountMenu		すべてマウント

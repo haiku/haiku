@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	2969013755
+1	english	x-vnd.Haiku-MediaPlayer	1276112823
 raw audio	MediaPlayer-InfoWin		原生音频
 Location	MediaPlayer-InfoWin		位置
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
@@ -141,6 +141,7 @@ Open Clips	MediaPlayer-Main		打开片段
 OK	MediaPlayer-PlaylistWindow		确定
 none	Audio track menu		无
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		设置音量为（0.0-2.0）。
+Duration	MediaPlayer-Main		次数
 Playlist…	MediaPlayer-Main		播放列表...
 <unknown>	PlaylistItem-author		<未知>
 Save as…	MediaPlayer-PlaylistWindow		保存为...
