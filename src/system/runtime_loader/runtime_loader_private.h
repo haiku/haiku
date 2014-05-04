@@ -76,7 +76,7 @@ status_t get_library_symbol(void* handle, void* caller, const char* symbolName,
 status_t get_next_image_dependency(image_id id, uint32* cookie,
 	const char** _name);
 int resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
-	SymbolLookupCache* cache, addr_t* sym_addr);
+	SymbolLookupCache* cache, addr_t* sym_addr, image_t** symbolImage = NULL);
 
 
 status_t elf_verify_header(void* header, size_t length);

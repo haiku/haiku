@@ -474,7 +474,7 @@ find_undefined_symbol_add_on(image_t* rootImage, image_t* image,
 
 int
 resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
-	SymbolLookupCache* cache, addr_t* symAddress)
+	SymbolLookupCache* cache, addr_t* symAddress, image_t** symbolImage)
 {
 	uint32 index = sym - image->syms;
 
@@ -581,6 +581,8 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 
 	cache->SetSymbolValueAt(index, (addr_t)location);
 
+	if (symbolImage)
+		*symbolImage = sharedImage;
 	*symAddress = (addr_t)location;
 	return B_OK;
 }

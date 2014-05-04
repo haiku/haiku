@@ -21,13 +21,14 @@ relocate_rela(image_t* rootImage, image_t* image, Elf64_Rela* rel,
 		int type = ELF64_R_TYPE(rel[i].r_info);
 		int symIndex = ELF64_R_SYM(rel[i].r_info);
 		Elf64_Addr symAddr = 0;
+		image_t* symbolImage = NULL;
 
 		// Resolve the symbol, if any.
 		if (symIndex != 0) {
 			Elf64_Sym* sym = SYMBOL(image, symIndex);
 
 			status_t status = resolve_symbol(rootImage, image, sym, cache,
-				&symAddr);
+				&symAddr, &symbolImage);
 			if (status != B_OK) {
 				TRACE(("resolve symbol \"%s\" returned: %" B_PRId32 "\n",
 					SYMNAME(image, sym), status));
@@ -57,7 +58,8 @@ relocate_rela(image_t* rootImage, image_t* image, Elf64_Rela* rel,
 				relocValue = image->regions[0].delta + rel[i].r_addend;
 				break;
 			case R_X86_64_DTPMOD64:
-				relocValue = image->dso_tls_id;
+				relocValue = symbolImage == NULL
+							? image->dso_tls_id : symbolImage->dso_tls_id;
 				break;
 			case R_X86_64_DTPOFF32:
 			case R_X86_64_DTPOFF64:

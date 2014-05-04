@@ -31,29 +31,22 @@ relocate_rel(image_t *rootImage, image_t *image, struct Elf32_Rel *rel,
 
 	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < rel_len; i++) {
 		unsigned type = ELF32_R_TYPE(rel[i].r_info);
+		unsigned symbolIndex = ELF32_R_SYM(rel[i].r_info);
 
-		switch (type) {
-			case R_386_32:
-			case R_386_PC32:
-			case R_386_GLOB_DAT:
-			case R_386_JMP_SLOT:
-			case R_386_GOTOFF:
-			case R_386_TLS_DTPOFF32:
-			{
-				struct Elf32_Sym *sym;
-				status_t status;
-				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
-
-				status = resolve_symbol(rootImage, image, sym, cache, &S);
-				if (status < B_OK) {
-					TRACE(("resolve symbol \"%s\" returned: %ld\n",
-						SYMNAME(image, sym), status));
-					printf("resolve symbol \"%s\" returned: %ld\n",
-						SYMNAME(image, sym), status);
-					return status;
-				}
+		image_t* symbolImage = NULL;
+		if (symbolIndex != 0) {
+			Elf32_Sym* sym = SYMBOL(image, symbolIndex);
+			status_t status = resolve_symbol(rootImage, image, sym, cache, &S,
+					&symbolImage);
+			if (status < B_OK) {
+				TRACE(("resolve symbol \"%s\" returned: %ld\n",
+					SYMNAME(image, sym), status));
+				printf("resolve symbol \"%s\" returned: %ld\n",
+					SYMNAME(image, sym), status);
+				return status;
 			}
 		}
+
 		switch (type) {
 			case R_386_NONE:
 				continue;
@@ -92,7 +85,8 @@ relocate_rel(image_t *rootImage, image_t *image, struct Elf32_Rel *rel,
 				break;
 #endif
 			case R_386_TLS_DTPMOD32:
-				final_val = image->dso_tls_id;
+				final_val = symbolImage == NULL
+							? image->dso_tls_id : symbolImage->dso_tls_id;
 				break;
 			case R_386_TLS_DTPOFF32:
 				final_val = S;
