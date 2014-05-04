@@ -18,6 +18,7 @@
 #include "add_ons.h"
 #include "elf_haiku_version.h"
 #include "elf_symbol_lookup.h"
+#include "elf_tls.h"
 #include "elf_versioning.h"
 #include "images.h"
 #include "runtime_loader_private.h"
@@ -77,6 +78,9 @@ count_regions(const char* imagePath, char const* buff, int phnum, int phentsize)
 			case PT_STACK:
 				// we don't use it
 				break;
+			case PT_TLS:
+				// will be handled at some other place
+				break;
 			default:
 				FATAL("%s: Unhandled pheader type in count 0x%" B_PRIx32 "\n",
 					imagePath, pheaders->p_type);
@@ -94,6 +98,8 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 	elf_phdr* pheader;
 	int regcount;
 	int i;
+
+	image->dso_tls_id = unsigned(-1);
 
 	regcount = 0;
 	for (i = 0; i < phnum; i++) {
@@ -192,6 +198,12 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 				break;
 			case PT_STACK:
 				// we don't use it
+				break;
+			case PT_TLS:
+				image->dso_tls_id
+					= TLSBlockTemplates::Get().Register(
+						TLSBlockTemplate((void*)pheader->p_vaddr,
+							pheader->p_filesz, pheader->p_memsz));
 				break;
 			default:
 				FATAL("%s: Unhandled pheader type in parse 0x%" B_PRIx32 "\n",
@@ -315,6 +327,10 @@ parse_dynamic_segment(image_t* image)
 				uint32 flags = d[i].d_un.d_val;
 				if ((flags & DF_SYMBOLIC) != 0)
 					image->flags |= RFLAG_SYMBOLIC;
+				if ((flags & DF_STATIC_TLS) != 0) {
+					FATAL("Static TLS model is not supported.\n");
+					return false;
+				}
 				break;
 			}
 			default:

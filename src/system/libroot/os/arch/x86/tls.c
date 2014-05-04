@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -9,8 +10,23 @@
 #	define _NO_INLINE_ASM 1
 #endif
 
+#include <runtime_loader/runtime_loader.h>
+
 #include "support/TLS.h"
 #include "tls.h"
+
+
+#if !defined(__GNUC__) || (__GNUC__ > 2)
+
+struct tls_index {
+	unsigned long int	module;
+	unsigned long int	offset;
+};
+
+
+void* ___tls_get_addr(struct tls_index* ti) __attribute__((__regparm__(1)));
+
+#endif	// GCC2
 
 
 static int32 gNextSlot = TLS_FIRST_FREE_SLOT;
@@ -57,4 +73,17 @@ tls_set(int32 index, void *value)
 		"movl	%1, %%fs:(, %0, 4)"
 		: : "r" (index), "r" (value));
 }
+
+
+#if !defined(__GNUC__) || (__GNUC__ > 2)
+
+
+void* __attribute__((__regparm__(1)))
+___tls_get_addr(struct tls_index* ti)
+{
+	return __gRuntimeLoader->get_tls_address(ti->module, ti->offset);
+}
+
+
+#endif	// GCC2
 

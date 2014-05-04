@@ -38,6 +38,7 @@ relocate_rel(image_t *rootImage, image_t *image, struct Elf32_Rel *rel,
 			case R_386_GLOB_DAT:
 			case R_386_JMP_SLOT:
 			case R_386_GOTOFF:
+			case R_386_TLS_DTPOFF32:
 			{
 				struct Elf32_Sym *sym;
 				status_t status;
@@ -90,6 +91,12 @@ relocate_rel(image_t *rootImage, image_t *image, struct Elf32_Rel *rel,
 				final_val = GOT + A - P;
 				break;
 #endif
+			case R_386_TLS_DTPMOD32:
+				final_val = image->dso_tls_id;
+				break;
+			case R_386_TLS_DTPOFF32:
+				final_val = S;
+				break;
 			default:
 				TRACE(("unhandled relocation type %d\n", ELF32_R_TYPE(rel[i].r_info)));
 				return B_NOT_ALLOWED;

@@ -8,10 +8,18 @@
 #	define _NO_INLINE_ASM 1
 #endif
 
+#include <runtime_loader/runtime_loader.h>
+
 #include <support/TLS.h>
 #include <tls.h>
 
 #include <assert.h>
+
+
+struct tls_index {
+	unsigned long int	module;
+	unsigned long int	offset;
+};
 
 
 static int32 gNextSlot = TLS_FIRST_FREE_SLOT;
@@ -63,3 +71,11 @@ tls_set(int32 _index, void* value)
 		"movq	%1, %%fs:(, %0, 8)"
 		: : "r" (index), "r" (value));
 }
+
+
+extern "C" void*
+__tls_get_addr(tls_index* ti)
+{
+	return __gRuntimeLoader->get_tls_address(ti->module, ti->offset);
+}
+

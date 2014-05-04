@@ -45,6 +45,8 @@ struct rld_export {
 		const char** _architecture);
 	status_t (*get_next_image_dependency)(image_id id, uint32 *cookie,
 		const char **_name);
+	void* (*get_tls_address)(unsigned dso, addr_t offset);
+	void (*destroy_thread_tls)();
 
 	status_t (*reinit_after_fork)();
 
@@ -113,6 +115,8 @@ typedef struct image_t {
 	int					rela_len;
 	elf_rel				*pltrel;
 	int					pltrel_len;
+
+	unsigned			dso_tls_id;
 
 	uint32				num_needed;
 	struct image_t		**needed;

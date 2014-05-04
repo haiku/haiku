@@ -19,6 +19,7 @@ enum {
 	TLS_ERRNO_SLOT,
 	TLS_ON_EXIT_THREAD_SLOT,
 	TLS_USER_THREAD_SLOT,
+	TLS_DYNAMIC_THREAD_VECTOR,
 
 	// Note: these entries can safely be changed between
 	// releases; 3rd party code always calls tls_allocate()

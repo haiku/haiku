@@ -20,6 +20,7 @@
 #include <vm_defs.h>
 
 #include "add_ons.h"
+#include "elf_tls.h"
 #include "runtime_loader_private.h"
 
 
@@ -396,6 +397,10 @@ map_image(int fd, char const* path, image_t* image)
 
 		image->regions[i].delta = loadAddress - image->regions[i].vmstart;
 		image->regions[i].vmstart = loadAddress;
+		if (i == 0) {
+			TLSBlockTemplates::Get().SetBaseAddress(image->dso_tls_id,
+				loadAddress);
+		}
 	}
 
 	if (image->dynamic_ptr != 0)

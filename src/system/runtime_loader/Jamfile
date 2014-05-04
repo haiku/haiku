@@ -30,6 +30,7 @@ StaticLibrary libruntime_loader.a :
 	<src!system!libroot!os!$(architecture)>recursive_lock.o
 	<src!system!libroot!os!$(architecture)>syscalls.o
 	<src!system!libroot!os!$(architecture)>sem.o
+	<src!system!libroot!os!arch!$(TARGET_ARCH)!$(architecture)>tls.o
 
 	<src!system!libroot!posix!$(architecture)>errno.o
   	<src!system!libroot!posix!$(architecture)>fcntl.o
@@ -75,6 +76,7 @@ local sources =
 	elf_haiku_version.cpp
 	elf_load_image.cpp
 	elf_symbol_lookup.cpp
+	elf_tls.cpp
 	elf_versioning.cpp
 	pe.cpp
 	errors.cpp

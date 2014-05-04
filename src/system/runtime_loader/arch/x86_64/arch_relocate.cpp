@@ -56,6 +56,13 @@ relocate_rela(image_t* rootImage, image_t* image, Elf64_Rela* rel,
 			case R_X86_64_RELATIVE:
 				relocValue = image->regions[0].delta + rel[i].r_addend;
 				break;
+			case R_X86_64_DTPMOD64:
+				relocValue = image->dso_tls_id;
+				break;
+			case R_X86_64_DTPOFF32:
+			case R_X86_64_DTPOFF64:
+				relocValue = symAddr;
+				break;
 			default:
 				TRACE(("unhandled relocation type %d\n", type));
 				return B_BAD_DATA;

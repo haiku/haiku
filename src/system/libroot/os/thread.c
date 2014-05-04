@@ -11,6 +11,7 @@
 
 #include <libroot_private.h>
 #include <pthread_private.h>
+#include <runtime_loader.h>
 #include <thread_defs.h>
 #include <tls.h>
 #include <syscalls.h>
@@ -69,6 +70,8 @@ _thread_do_exit_work(void)
 	}
 
 	tls_set(TLS_ON_EXIT_THREAD_SLOT, NULL);
+
+	__gRuntimeLoader->destroy_thread_tls();
 
 	__pthread_destroy_thread();
 }

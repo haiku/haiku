@@ -190,7 +190,7 @@ arch_team_init_team_struct(Team* p, bool kernel)
 status_t
 arch_thread_init_tls(Thread* thread)
 {
-	size_t tls[TLS_USER_THREAD_SLOT + 1];
+	addr_t tls[TLS_FIRST_FREE_SLOT];
 
 	thread->user_local_storage = thread->user_stack_base
 		+ thread->user_stack_size;

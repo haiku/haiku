@@ -50,9 +50,7 @@ extern bool gProgramLoaded;
 extern image_t* gProgramImage;
 
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 
 int runtime_loader(void* arg, void* commpage);
 int open_executable(char* name, image_type type, const char* rpath,
@@ -93,8 +91,6 @@ status_t heap_init(void);
 status_t arch_relocate_image(image_t* rootImage, image_t* image,
 	SymbolLookupCache* cache);
 
-#ifdef __cplusplus
 }
-#endif
 
 #endif	/* RUNTIME_LOADER_PRIVATE_H */

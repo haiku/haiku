@@ -26,6 +26,7 @@
 #include "add_ons.h"
 #include "elf_load_image.h"
 #include "elf_symbol_lookup.h"
+#include "elf_tls.h"
 #include "elf_versioning.h"
 #include "errors.h"
 #include "images.h"
@@ -634,6 +635,8 @@ unload_library(void* handle, image_id imageID, bool addOn)
 
 			if (image->term_routine)
 				((init_term_function)image->term_routine)(image->id);
+
+			TLSBlockTemplates::Get().Unregister(image->dso_tls_id);
 
 			dequeue_disposable_image(image);
 			unmap_image(image);

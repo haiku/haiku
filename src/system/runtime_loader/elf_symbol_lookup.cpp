@@ -514,6 +514,7 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 	}
 
 	enum {
+		SUCCESS,
 		ERROR_NO_SYMBOL,
 		ERROR_WRONG_TYPE,
 		ERROR_NOT_EXPORTED,
@@ -521,6 +522,7 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 	};
 	uint32 lookupError = ERROR_UNPATCHED;
 
+	bool tlsSymbol = sym->Type() == STT_TLS;
 	void* location = NULL;
 	if (sharedSym == NULL) {
 		// symbol not found at all
@@ -538,14 +540,20 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 		sharedImage = NULL;
 	} else {
 		// symbol is fine, get its location
-		location = (void*)(sharedSym->st_value
-			+ sharedImage->regions[0].delta);
+		location = (void*)sharedSym->st_value;
+		if (!tlsSymbol) {
+			location
+				= (void*)((addr_t)location + sharedImage->regions[0].delta);
+		} else
+			lookupError = SUCCESS;
 	}
 
-	patch_undefined_symbol(rootImage, image, symName, &sharedImage, &location,
-		&type);
+	if (!tlsSymbol) {
+		patch_undefined_symbol(rootImage, image, symName, &sharedImage,
+			&location, &type);
+	}
 
-	if (location == NULL) {
+	if (location == NULL && lookupError != SUCCESS) {
 		switch (lookupError) {
 			case ERROR_NO_SYMBOL:
 				FATAL("%s: Could not resolve symbol '%s'\n",
