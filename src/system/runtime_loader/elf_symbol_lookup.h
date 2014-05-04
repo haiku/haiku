@@ -64,6 +64,7 @@ struct SymbolLookupCache {
 	{
 		if (fTableSize > 0) {
 			fValues = (addr_t*)malloc(sizeof(addr_t) * fTableSize);
+			fDSOs = (image_t**)malloc(sizeof(image_t*) * fTableSize);
 
 			size_t elementCount = (fTableSize + 31) / 32;
 			fValuesResolved = (uint32*)malloc(4 * elementCount);
@@ -81,6 +82,7 @@ struct SymbolLookupCache {
 	{
 		free(fValuesResolved);
 		free(fValues);
+		free(fDSOs);
 	}
 
 	bool IsSymbolValueCached(size_t index) const
@@ -94,18 +96,27 @@ struct SymbolLookupCache {
 		return fValues[index];
 	}
 
-	void SetSymbolValueAt(size_t index, addr_t value)
+	addr_t SymbolValueAt(size_t index, image_t** image) const
+	{
+		if (image)
+			*image = fDSOs[index];
+		return fValues[index];
+	}
+
+	void SetSymbolValueAt(size_t index, addr_t value, image_t* image)
 	{
 		if (index < fTableSize) {
 			fValues[index] = value;
+			fDSOs[index] = image;
 			fValuesResolved[index / 32] |= 1 << (index % 32);
 		}
 	}
 
 private:
-	size_t	fTableSize;
-	addr_t*	fValues;
-	uint32*	fValuesResolved;
+	size_t		fTableSize;
+	addr_t*		fValues;
+	image_t**	fDSOs;
+	uint32*		fValuesResolved;
 };
 
 

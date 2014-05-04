@@ -480,7 +480,7 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 
 	// check the cache first
 	if (cache->IsSymbolValueCached(index)) {
-		*symAddress = cache->SymbolValueAt(index);
+		*symAddress = cache->SymbolValueAt(index, symbolImage);
 		return B_OK;
 	}
 
@@ -579,7 +579,7 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 		return B_MISSING_SYMBOL;
 	}
 
-	cache->SetSymbolValueAt(index, (addr_t)location);
+	cache->SetSymbolValueAt(index, (addr_t)location, sharedImage);
 
 	if (symbolImage)
 		*symbolImage = sharedImage;
