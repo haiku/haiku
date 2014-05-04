@@ -19,7 +19,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SharedLibrary [ MultiArchDefaultGristFiles libmedia.so ] :
 			# Private Media Kit
 			!missing_symbols.cpp
-			SoundConsumer.cpp
+			MediaRecorder.cpp
+			MediaRecorderNode.cpp
 
 			# Public Media Kit
 			Buffer.cpp

@@ -1,5 +1,6 @@
 /*
  * Copyright 2005, Jérôme Duval. All rights reserved.
+ * Copyright 2014, Dario Casalinuovo. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Inspired by SoundCapture from Be newsletter (Media Kit Basics:
@@ -42,8 +43,8 @@
 #include <TimeSource.h>
 #include <NodeInfo.h>
 
+#include "SoundUtils.h"
 #include "RecorderWindow.h"
-#include "SoundConsumer.h"
 #include "FileUtils.h"
 
 #if ! NDEBUG
@@ -123,7 +124,7 @@ RecorderWindow::RecorderWindow()
 	fSaveButton = NULL;
 	fLoopButton = NULL;
 	fInputField = NULL;
-	fRecordNode = 0;
+	fRecorder = NULL;
 	fRecording = false;
 	fTempCount = -1;
 	fButtonState = btnPaused;
@@ -146,14 +147,15 @@ RecorderWindow::RecorderWindow()
 
 RecorderWindow::~RecorderWindow()
 {
-	//	The sound consumer and producer are Nodes; it has to be released and the Roster
-	//	will reap it when it's done.
-	if (fRecordNode)
-		fRecordNode->Release();
+	//  The MediaRecorder have to be deleted, the dtor
+	//  disconnect it from the media_kit.
+	delete fRecorder;
+
 	delete fPlayer;
 
 	if (fPlayTrack && fPlayFile)
 		fPlayFile->ReleaseTrack(fPlayTrack);
+
 	if (fPlayFile)
 		delete fPlayFile;
 	fPlayTrack = NULL;
@@ -232,17 +234,25 @@ RecorderWindow::InitWindow()
 		if (error < B_OK) //	there's no mixer?
 			goto bad_mojo;
 
-		//	Create our internal Node which records sound, and register it.
-		fRecordNode = new SoundConsumer("Sound Recorder");
-		error = fRoster->RegisterNode(fRecordNode);
-		if (error < B_OK)
+		fRecorder = new BMediaRecorder("Sound Recorder",
+			B_MEDIA_RAW_AUDIO);
+
+		if (fRecorder->InitCheck() < B_OK)
 			goto bad_mojo;
+
+		// Set the node to accept only audio data
+		media_format output_format;
+		output_format.type = B_MEDIA_RAW_AUDIO;
+		output_format.u.raw_audio = media_raw_audio_format::wildcard;
+		fRecorder->SetAcceptedFormat(output_format);
 
 		//	Create the window header with controls
 		BRect r(Bounds());
 		r.bottom = r.top + 175;
-		BBox *background = new BBox(r, "_background", B_FOLLOW_LEFT_RIGHT
-			| B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_NO_BORDER);
+		BBox *background = new BBox(r, "_background",
+			B_FOLLOW_LEFT_RIGHT	| B_FOLLOW_TOP, B_WILL_DRAW
+			| B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_NO_BORDER);
+
 		AddChild(background);
 
 		r = background->Bounds();
@@ -451,9 +461,7 @@ RecorderWindow::InitWindow()
 		dormant_node_info dni[maxInputCount];
 
 		int32 real_count = maxInputCount;
-		media_format output_format;
-		output_format.type = B_MEDIA_RAW_AUDIO;
-		output_format.u.raw_audio = media_raw_audio_format::wildcard;
+
 		error = fRoster->GetDormantNodes(dni, &real_count, 0, &output_format,
 			0, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
 		if (real_count > maxInputCount) {
@@ -514,8 +522,8 @@ RecorderWindow::InitWindow()
 bad_mojo:
 	if (error >= 0)
 		error = B_ERROR;
-	if (fRecordNode)
-		fRecordNode->Release();
+	if (fRecorder)
+		delete fRecorder;
 
 	delete fPlayer;
 	if (!fInputField)
@@ -696,14 +704,7 @@ RecorderWindow::Record(BMessage * message)
 		return;
 	}
 
-	//	And get it going...
-	bigtime_t then = fRecordNode->TimeSource()->Now() + 50000LL;
-	fRoster->StartNode(fRecordNode->Node(), then);
-	if (fAudioInputNode.kind & B_TIME_SOURCE) {
-		fRoster->StartNode(fAudioInputNode,
-			fRecordNode->TimeSource()->RealTimeFor(then, 0));
-	} else
-		fRoster->StartNode(fAudioInputNode, then);
+	fRecorder->Start();
 }
 
 
@@ -871,93 +872,60 @@ RecorderWindow::MakeRecordConnection(const media_node & input)
 {
 	CONNECT((stderr, "RecorderWindow::MakeRecordConnection()\n"));
 
-	//	Find an available output for the given input node.
-	int32 count = 0;
-	status_t err = fRoster->GetFreeOutputsFor(input, &fAudioOutput, 1, &count, B_MEDIA_RAW_AUDIO);
-	if (err < B_OK) {
+	status_t err = B_OK;
+	media_output audioOutput;
+
+	if (!fRecorder->IsConnected()) {
+		//	Find an available output for the given input node.
+		int32 count = 0;
+		err = fRoster->GetFreeOutputsFor(input, &audioOutput, 1,
+			&count, B_MEDIA_RAW_AUDIO);
+
+		if (err < B_OK) {
+			CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
+				" couldn't get free outputs from audio input node\n"));
+			return err;
+		}
+
+		if (count < 1) {
+			CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
+				" no free outputs from audio input node\n"));
+			return B_BUSY;
+		}
+
+	} else {
 		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
-			" couldn't get free outputs from audio input node\n"));
-		return err;
-	}
-	if (count < 1) {
-		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
-			" no free outputs from audio input node\n"));
+			" audio input node already connected\n"));
+
 		return B_BUSY;
-	}
-
-	//	Find an available input for our own Node. Note that we go through the
-	//	MediaRoster; calling Media Kit methods directly on Nodes in our app is
-	//	not OK (because synchronization happens in the service thread, not in
-	//	the calling thread).
-	// TODO: explain this
-	err = fRoster->GetFreeInputsFor(fRecordNode->Node(), &fRecInput, 1, &count, B_MEDIA_RAW_AUDIO);
-	if (err < B_OK) {
-		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
-			" couldn't get free inputs for sound recorder\n"));
-		return err;
-	}
-	if (count < 1) {
-		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
-			" no free inputs for sound recorder\n"));
-		return B_BUSY;
-	}
-
-	//	Find out what the time source of the input is.
-	//	For most nodes, we just use the preferred time source (the DAC) for synchronization.
-	//	However, nodes that record from an input need to synchronize to the audio input node
-	//	instead for best results.
-	//	MakeTimeSourceFor gives us a "clone" of the time source node that we can manipulate
-	//	to our heart's content. When we're done with it, though, we need to call Release()
-	//	on the time source node, so that it keeps an accurate reference count and can delete
-	//	itself when it's no longer needed.
-	// TODO: what about filters connected to audio input?
-	media_node use_time_source;
-	BTimeSource * tsobj = fRoster->MakeTimeSourceFor(input);
-	if (! tsobj) {
-		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
-			" couldn't clone time source from audio input node\n"));
-		return B_MEDIA_BAD_NODE;
-	}
-
-	//	Apply the time source in effect to our own Node.
-	err = fRoster->SetTimeSourceFor(fRecordNode->Node().node, tsobj->Node().node);
-	if (err < B_OK) {
-		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
-			" couldn't set the sound recorder's time source\n"));
-		tsobj->Release();
-		return err;
 	}
 
 	//	Get a format, any format.
-	fRecordFormat.u.raw_audio = fAudioOutput.format.u.raw_audio;
+	fRecordFormat.u.raw_audio = audioOutput.format.u.raw_audio;
 	fRecordFormat.type = B_MEDIA_RAW_AUDIO;
 
 	//	Tell the consumer where we want data to go.
-	err = fRecordNode->SetHooks(RecordFile, NotifyRecordFile, this);
+	err = fRecorder->SetHooks(RecordFile, NotifyRecordFile, this);
+
 	if (err < B_OK) {
 		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
 			" couldn't set the sound recorder's hook functions\n"));
-		tsobj->Release();
 		return err;
 	}
 
-	//	Using the same structs for input and output is OK in
-	//  BMediaRoster::Connect().
-	err = fRoster->Connect(fAudioOutput.source, fRecInput.destination,
-		&fRecordFormat, &fAudioOutput, &fRecInput);
-	if (err < B_OK) {
-		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
-			" failed to connect sound recorder to audio input node.\n"));
-		tsobj->Release();
-		fRecordNode->SetHooks(0, 0, 0);
-		return err;
+	if (!fRecorder->IsConnected()) {
+
+		err = fRecorder->Connect(input, &audioOutput, &fRecordFormat);
+
+		if (err < B_OK) {
+			CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
+				" failed to connect sound recorder to audio input node.\n"));
+
+			fRecorder->SetHooks(NULL, NULL, NULL);
+			return err;
+		}
 	}
 
-	//	Start the time source if it's not running.
-	if ((tsobj->Node() != input) && !tsobj->IsRunning())
-		fRoster->StartNode(tsobj->Node(), BTimeSource::RealTime());
-
-	tsobj->Release();	//	we're done with this time source instance!
 	return B_OK;
 }
 
@@ -965,16 +933,13 @@ RecorderWindow::MakeRecordConnection(const media_node & input)
 status_t
 RecorderWindow::BreakRecordConnection()
 {
-	status_t err;
+	status_t err = B_OK;
 
-	//	If we are the last connection, the Node will stop automatically since it
-	//	has nowhere to send data to.
-	err = fRoster->StopNode(fRecInput.node, 0);
-	err = fRoster->Disconnect(fAudioOutput.node.node, fAudioOutput.source,
-		fRecInput.node.node, fRecInput.destination);
-	fAudioOutput.source = media_source::null;
-	fRecInput.destination = media_destination::null;
-	return err;
+	err = fRecorder->Stop(true);
+	if (err < B_OK)
+		return err;
+
+	return fRecorder->Disconnect();
 }
 
 
@@ -984,8 +949,11 @@ RecorderWindow::StopRecording()
 	if (!fRecording)
 		return B_OK;
 	fRecording = false;
+
 	BreakRecordConnection();
-	fRecordNode->SetHooks(NULL,NULL,NULL);
+
+	fRecorder->SetHooks(NULL, NULL, NULL);
+
 	if (fRecSize > 0) {
 
 		wave_struct header;
@@ -1240,7 +1208,7 @@ RecorderWindow::RemoveCurrentSoundItem() {
 
 void
 RecorderWindow::RecordFile(void* cookie, bigtime_t timestamp,
-	void* data, size_t size, const media_raw_audio_format &format)
+	void* data, size_t size, const media_format &format)
 {
 	//	Callback called from the SoundConsumer when receiving buffers.
 	RecorderWindow * window = (RecorderWindow *)cookie;
@@ -1249,7 +1217,7 @@ RecorderWindow::RecordFile(void* cookie, bigtime_t timestamp,
 		//	Write the data to file (we don't buffer or guard file access
 		//	or anything)
 		window->fRecFile.WriteAt(window->fRecSize, data, size);
-		window->fVUView->ComputeLevels(data, size, format.format);
+		window->fVUView->ComputeLevels(data, size, format.u.raw_audio.format);
 		window->fRecSize += size;
 	}
 }

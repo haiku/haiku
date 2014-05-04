@@ -21,6 +21,7 @@
 #include <Window.h>
 
 #include "DrawButton.h"
+#include "MediaRecorder.h"
 #include "ScopeView.h"
 #include "SoundListView.h"
 #include "TransportButton.h"
@@ -40,12 +41,8 @@ class BScrollView;
 class BSlider;
 class BStringView;
 
-namespace BPrivate {
-class SoundConsumer;
-}
 
-
-using BPrivate::SoundConsumer;
+using BPrivate::media::BMediaRecorder;
 
 
 class RecorderWindow : public BWindow {
@@ -78,6 +75,7 @@ public:
 		};
 
 		void AddSoundItem(const BEntry& entry, bool temp = false);
+
 		void RemoveCurrentSoundItem();
 
 private:
@@ -95,7 +93,7 @@ private:
 		TrackSlider *fTrackSlider;
 		UpDownButton * fUpDownButton;
 		BMenuField * fInputField;
-		SoundConsumer * fRecordNode;
+		BMediaRecorder * fRecorder;
 		BSoundPlayer * fPlayer;
 		bool fRecording;
 		SoundListView * fSoundList;
@@ -128,8 +126,6 @@ private:
 		off_t fRecSize;
 
 		media_node fAudioInputNode;
-		media_output fAudioOutput;
-		media_input fRecInput;
 
 		BMediaFile *fPlayFile;
 		media_format fPlayFormat;
@@ -171,7 +167,7 @@ private:
 		status_t UpdatePlayFile(SoundListItem *item, bool updateDisplay = false);
 		void ErrorAlert(const char * action, status_t err);
 
-static	void RecordFile(void * cookie, bigtime_t timestamp, void * data, size_t size, const media_raw_audio_format & format);
+static	void RecordFile(void * cookie, bigtime_t timestamp, void * data, size_t size, const media_format & format);
 static	void NotifyRecordFile(void * cookie, int32 code, ...);
 
 static	void PlayFile(void * cookie, void * data, size_t size, const media_raw_audio_format & format);
