@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -181,6 +181,11 @@ InspectorWindow::_Init()
 		endianMenu->ItemAt(0)->SetMarked(true);
 
 	fAddressInput->TextView()->MakeFocus(true);
+
+	AddShortcut(B_LEFT_ARROW, B_COMMAND_KEY, new BMessage(
+			MSG_NAVIGATE_PREVIOUS_BLOCK));
+	AddShortcut(B_RIGHT_ARROW, B_COMMAND_KEY, new BMessage(
+			MSG_NAVIGATE_NEXT_BLOCK));
 }
 
 
