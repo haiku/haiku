@@ -111,19 +111,28 @@ typedef enum {
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 extern status_t swap_data(type_code type, void *data, size_t length,
 	swap_action action);
 extern bool is_type_swapped(type_code type);
 
-
 /* Private implementations */
 extern double __swap_double(double arg);
 extern float  __swap_float(float arg);
+#if (defined(__INTEL__) || defined(__x86_64__)) && GCC_VERSION >= 40300
+#define __swap_int64(arg)	__builtin_bswap64(arg)
+#define __swap_int32(arg)	__builtin_bswap32(arg)
+#define __swap_int16(arg)	__builtin_bswap16(arg)
+#elif defined(__ARM__) && GCC_VERSION >= 40800
+#define __swap_int64(arg)	__builtin_bswap64(arg)
+#define __swap_int32(arg)	__builtin_bswap32(arg)
+#define __swap_int16(arg)	__builtin_bswap16(arg)
+#else
 extern uint64 __swap_int64(uint64 arg);
 extern uint32 __swap_int32(uint32 arg);
 extern uint16 __swap_int16(uint16 arg);
+#endif
 
 #ifdef __cplusplus
 }
