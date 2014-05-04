@@ -18,6 +18,8 @@
 #define R_386_RELATIVE	8	/* add load address of shared object */
 #define R_386_GOTOFF	9	/* add GOT relative symbol address */
 #define R_386_GOTPC		10	/* add PC relative GOT table address */
+#define R_386_TLS_DTPMOD32	35
+#define R_386_TLS_DTPOFF32	36
 
 #ifdef _BOOT_MODE
 # include "../x86_64/arch_elf.h"
