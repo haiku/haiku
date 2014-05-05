@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Distributed under the terms of the MIT License.
  */
@@ -7,6 +8,8 @@
 #ifndef _NO_INLINE_ASM
 #	define _NO_INLINE_ASM 1
 #endif
+
+#include <atomic>
 
 #include <runtime_loader/runtime_loader.h>
 
@@ -22,54 +25,49 @@ struct tls_index {
 };
 
 
-static int32 gNextSlot = TLS_FIRST_FREE_SLOT;
+static std::atomic<int> gNextSlot(TLS_FIRST_FREE_SLOT);
+
+
+static inline void**
+get_tls()
+{
+	void** tls;
+	__asm__ __volatile__ ("movq	%%fs:0, %0" : "=r" (tls));
+	return tls;
+}
 
 
 int32
-tls_allocate(void)
+tls_allocate()
 {
-	int32 next = atomic_add(&gNextSlot, 1);
-	if (next >= TLS_MAX_KEYS)
-		return B_NO_MEMORY;
+	if (gNextSlot < TLS_MAX_KEYS) {
+		auto next = gNextSlot++;
+		if (next < TLS_MAX_KEYS)
+			return next;
+	}
 
-	return next;
+	return B_NO_MEMORY;
 }
 
 
 void*
-tls_get(int32 _index)
+tls_get(int32 index)
 {
-	int64 index = _index;
-	void* ret;
-
-	__asm__ __volatile__ (
-		"movq	%%fs:(, %1, 8), %0"
-		: "=r" (ret) : "r" (index));
-	return ret;
+	return get_tls()[index];
 }
 
 
 void**
-tls_address(int32 _index)
+tls_address(int32 index)
 {
-	int64 index = _index;
-	void** ret;
-
-	__asm__ __volatile__ (
-		"movq	%%fs:0, %0\n\t"
-		"leaq	(%0, %1, 8), %0\n\t"
-		: "=&r" (ret) : "r" (index));
-	return ret;
+	return get_tls() + index;
 }
 
 
 void
-tls_set(int32 _index, void* value)
+tls_set(int32 index, void* value)
 {
-	int64 index = _index;
-	__asm__ __volatile__ (
-		"movq	%1, %%fs:(, %0, 8)"
-		: : "r" (index), "r" (value));
+	get_tls()[index] = value;
 }
 
 
