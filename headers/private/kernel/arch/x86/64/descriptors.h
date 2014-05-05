@@ -13,13 +13,6 @@
 #define USER_DATA_SEGMENT		3
 #define USER_CODE_SEGMENT		4
 
-#define TSS_BASE_SEGMENT		5
-
-#define TSS_SEGMENT(cpu)		(TSS_BASE_SEGMENT + cpu * 2)
-
-#define GDT_SEGMENT_COUNT		(TSS_BASE_SEGMENT + SMP_MAX_CPUS * 2)
-
-
 #define KERNEL_CODE_SELECTOR	((KERNEL_CODE_SEGMENT << 3) | DPL_KERNEL)
 #define KERNEL_DATA_SELECTOR	((KERNEL_DATA_SEGMENT << 3) | DPL_KERNEL)
 
@@ -44,23 +37,6 @@ struct segment_descriptor {
 	uint32 d_b : 1;
 	uint32 granularity : 1;
 	uint32 base1 : 8;
-} _PACKED;
-
-// Structure of a TSS segment descriptor.
-struct tss_descriptor {
-	uint32 limit0 : 16;
-	uint32 base0 : 24;
-	uint32 type : 4;
-	uint32 desc_type : 1;
-	uint32 dpl : 2;
-	uint32 present : 1;
-	uint32 limit1 : 4;
-	uint32 available : 1;
-	uint32 unused1 : 2;
-	uint32 granularity : 1;
-	uint32 base1 : 8;
-	uint32 base2 : 32;
-	uint32 unused2 : 32;
 } _PACKED;
 
 // Structure of an interrupt descriptor.
@@ -124,29 +100,6 @@ set_segment_descriptor(segment_descriptor* desc, uint8 type, uint8 dpl)
 
 	desc->long_mode = (type & DT_CODE_EXECUTE_ONLY) ? 1 : 0;
 		// Must be set to 1 for code segments only.
-}
-
-
-static inline void
-set_tss_descriptor(segment_descriptor* _desc, uint64 base, uint32 limit)
-{
-	clear_segment_descriptor(_desc);
-	clear_segment_descriptor(&_desc[1]);
-
-	// The TSS descriptor is a special format in 64-bit mode, it is 16 bytes
-	// instead of 8.
-	tss_descriptor* desc = (tss_descriptor*)_desc;
-
-	desc->base0 = base & 0xffffff;
-	desc->base1 = (base >> 24) & 0xff;
-	desc->base2 = (base >> 32);
-	desc->limit0 = limit & 0xffff;
-	desc->limit1 = (limit >> 16) & 0xf;
-
-	desc->present = 1;
-	desc->type = DT_TSS;
-	desc->desc_type = DT_SYSTEM_SEGMENT;
-	desc->dpl = DPL_KERNEL;
 }
 
 
