@@ -63,11 +63,9 @@ BDaemonClient::GetInstallationLocationInfo(
 	int64 baseDirectoryNode;
 	int32 packagesDirectoryDevice;
 	int64 packagesDirectoryNode;
-	BString oldStateName;
 	int64 changeCount;
 	BPackageInfoSet latestActivePackages;
 	BPackageInfoSet latestInactivePackages;
-	BPackageInfoSet currentlyActivePackages;
 	if ((error = reply.FindInt32("base directory device", &baseDirectoryDevice))
 			!= B_OK
 		|| (error = reply.FindInt64("base directory node", &baseDirectoryNode))
@@ -80,12 +78,20 @@ BDaemonClient::GetInstallationLocationInfo(
 			latestActivePackages)) != B_OK
 		|| (error = _ExtractPackageInfoSet(reply, "latest inactive packages",
 			latestInactivePackages)) != B_OK
-		|| (error = _ExtractPackageInfoSet(reply, "currently active packages",
-			currentlyActivePackages)) != B_OK
-		|| (error = reply.FindString("old state", &oldStateName)) != B_OK
 		|| (error = reply.FindInt64("change count", &changeCount)) != B_OK) {
 		return error;
 	}
+
+	BPackageInfoSet currentlyActivePackages;
+	error = _ExtractPackageInfoSet(reply, "currently active packages",
+		currentlyActivePackages);
+	if (error != B_OK && error != B_NAME_NOT_FOUND)
+		return error;
+
+	BString oldStateName;
+	error = reply.FindString("old state", &oldStateName);
+	if (error != B_OK && error != B_NAME_NOT_FOUND)
+		return error;
 
 	_info.Unset();
 	_info.SetLocation(location);
