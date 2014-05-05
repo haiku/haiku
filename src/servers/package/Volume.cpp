@@ -526,11 +526,11 @@ Volume::HandleCommitTransactionRequest(BMessage* message)
 		return;
 
 	// perform the request
-	PackageSet dummy;
-	CommitTransactionHandler handler(this, fPackageFileManager, fLatestState,
-		fLatestState == fActiveState, dummy, dummy);
+	CommitTransactionHandler handler(this, fPackageFileManager);
 	int32 error;
 	try {
+		PackageSet dummy;
+		handler.Init(fLatestState, fLatestState == fActiveState, dummy, dummy);
 		handler.HandleRequest(message, &reply);
 		_SetLatestState(handler.DetachVolumeState(),
 			handler.IsActiveVolumeState());
@@ -709,12 +709,12 @@ Volume::ProcessPendingPackageActivationChanges()
 		return;
 
 	// perform the request
-	CommitTransactionHandler handler(this, fPackageFileManager, fLatestState,
-		fLatestState == fActiveState, fPackagesToBeActivated,
-		fPackagesToBeDeactivated);
+	CommitTransactionHandler handler(this, fPackageFileManager);
 	int32 error;
 	try {
-		handler.HandleRequest(fPackagesToBeActivated, fPackagesToBeDeactivated);
+		handler.Init(fLatestState, fLatestState == fActiveState,
+			fPackagesToBeActivated, fPackagesToBeDeactivated);
+		handler.HandleRequest();
 		_SetLatestState(handler.DetachVolumeState(),
 			handler.IsActiveVolumeState());
 		error = B_DAEMON_OK;
@@ -797,11 +797,11 @@ Volume::CommitTransaction(const BActivationTransaction& transaction,
 	BDaemonClient::BCommitTransactionResult& _result)
 {
 	// perform the request
-	CommitTransactionHandler handler(this, fPackageFileManager, fLatestState,
-		fLatestState == fActiveState, packagesAlreadyAdded,
-		packagesAlreadyRemoved);
+	CommitTransactionHandler handler(this, fPackageFileManager);
 	int32 error;
 	try {
+		handler.Init(fLatestState, fLatestState == fActiveState,
+			packagesAlreadyAdded, packagesAlreadyRemoved);
 		handler.HandleRequest(transaction, NULL);
 		_SetLatestState(handler.DetachVolumeState(),
 			handler.IsActiveVolumeState());

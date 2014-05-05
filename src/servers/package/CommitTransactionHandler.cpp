@@ -33,20 +33,18 @@ using namespace BPackageKit::BPrivate;
 
 
 CommitTransactionHandler::CommitTransactionHandler(Volume* volume,
-	PackageFileManager* packageFileManager, VolumeState* volumeState,
-	bool isActiveVolumeState, const PackageSet& packagesAlreadyAdded,
-	const PackageSet& packagesAlreadyRemoved)
+	PackageFileManager* packageFileManager)
 	:
 	fVolume(volume),
 	fPackageFileManager(packageFileManager),
-	fVolumeState(volumeState->Clone()),
-	fVolumeStateIsActive(isActiveVolumeState),
+	fVolumeState(NULL),
+	fVolumeStateIsActive(false),
 	fPackagesToActivate(),
 	fPackagesToDeactivate(),
 	fAddedPackages(),
 	fRemovedPackages(),
-	fPackagesAlreadyAdded(packagesAlreadyAdded),
-	fPackagesAlreadyRemoved(packagesAlreadyRemoved),
+	fPackagesAlreadyAdded(),
+	fPackagesAlreadyRemoved(),
 	fOldStateDirectory(),
 	fOldStateDirectoryRef(),
 	fOldStateDirectoryName(),
@@ -73,6 +71,31 @@ CommitTransactionHandler::~CommitTransactionHandler()
 	}
 
 	delete fVolumeState;
+}
+
+
+void
+CommitTransactionHandler::Init(VolumeState* volumeState,
+	bool isActiveVolumeState, const PackageSet& packagesAlreadyAdded,
+	const PackageSet& packagesAlreadyRemoved)
+{
+	fVolumeState = volumeState->Clone();
+	if (fVolumeState == NULL)
+		throw std::bad_alloc();
+
+	fVolumeStateIsActive = isActiveVolumeState;
+
+	for (PackageSet::const_iterator it = packagesAlreadyAdded.begin();
+			it != packagesAlreadyAdded.end(); ++it) {
+		Package* package = fVolumeState->FindPackage((*it)->FileName());
+		fPackagesAlreadyAdded.insert(package);
+	}
+
+	for (PackageSet::const_iterator it = packagesAlreadyRemoved.begin();
+			it != packagesAlreadyRemoved.end(); ++it) {
+		Package* package = fVolumeState->FindPackage((*it)->FileName());
+		fPackagesAlreadyRemoved.insert(package);
+	}
 }
 
 
@@ -118,20 +141,15 @@ CommitTransactionHandler::HandleRequest(
 
 
 void
-CommitTransactionHandler::HandleRequest(const PackageSet& packagesAdded,
-	const PackageSet& packagesRemoved)
+CommitTransactionHandler::HandleRequest()
 {
-	// Copy package sets to fPackagesToActivate/fPackagesToDeactivate. The
-	// given sets are assumed to be identical to the ones specified in the
-	// constructor invocation (fPackagesAlreadyAdded,
-	// fPackagesAlreadyRemoved).
-	for (PackageSet::const_iterator it = packagesAdded.begin();
-		it != packagesAdded.end(); ++it) {
+	for (PackageSet::const_iterator it = fPackagesAlreadyAdded.begin();
+		it != fPackagesAlreadyAdded.end(); ++it) {
 		if (!fPackagesToActivate.AddItem(*it))
 			throw std::bad_alloc();
 	}
 
-	fPackagesToDeactivate = packagesRemoved;
+	fPackagesToDeactivate = fPackagesAlreadyRemoved;
 
 	_ApplyChanges(NULL);
 }
@@ -263,9 +281,6 @@ CommitTransactionHandler::_ReadPackagesToActivate(
 void
 CommitTransactionHandler::_ApplyChanges(BMessage* reply)
 {
-	if (fVolumeState == NULL)
-		throw std::bad_alloc();
-
 	// create an old state directory
 	_CreateOldStateDirectory(reply);
 

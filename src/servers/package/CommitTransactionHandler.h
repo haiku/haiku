@@ -25,20 +25,22 @@ typedef std::set<std::string> StringSet;
 class CommitTransactionHandler {
 public:
 								CommitTransactionHandler(Volume* volume,
-									PackageFileManager* packageFileManager,
-									VolumeState* volumeState,
+									PackageFileManager* packageFileManager);
+								~CommitTransactionHandler();
+
+			void				Init(VolumeState* volumeState,
 									bool isActiveVolumeState,
 									const PackageSet& packagesAlreadyAdded,
 									const PackageSet& packagesAlreadyRemoved);
-								~CommitTransactionHandler();
 
 			void				HandleRequest(BMessage* request,
 									BMessage* reply);
 			void				HandleRequest(
 									const BActivationTransaction& transaction,
 									BMessage* reply);
-			void				HandleRequest(const PackageSet& packagesAdded,
-									const PackageSet& packagesRemoved);
+			void				HandleRequest();
+									// uses packagesAlreadyAdded and
+									// packagesAlreadyRemoved from Init()
 
 			void				Revert();
 
@@ -145,8 +147,8 @@ private:
 			PackageSet			fPackagesToDeactivate;
 			PackageSet			fAddedPackages;
 			PackageSet			fRemovedPackages;
-			const PackageSet&	fPackagesAlreadyAdded;
-			const PackageSet&	fPackagesAlreadyRemoved;
+			PackageSet			fPackagesAlreadyAdded;
+			PackageSet			fPackagesAlreadyRemoved;
 			BDirectory			fOldStateDirectory;
 			node_ref			fOldStateDirectoryRef;
 			BString				fOldStateDirectoryName;
