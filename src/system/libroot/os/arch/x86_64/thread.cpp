@@ -13,7 +13,9 @@ find_thread(const char* name)
 {
 	if (!name) {
 		thread_id thread;
-		__asm__ __volatile__ ("movq %%fs:8, %%rax" : "=a" (thread));
+		static_assert(sizeof(thread_id) <= sizeof(uint32_t),
+			"thread_id is larger than uint32_t");
+		__asm__ __volatile__ ("movl %%fs:8, %0" : "=r" (thread));
 		return thread;
 	}
 
