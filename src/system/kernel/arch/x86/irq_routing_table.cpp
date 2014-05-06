@@ -18,7 +18,7 @@
 
 //#define TRACE_PRT
 #ifdef TRACE_PRT
-#	define TRACE(x...) dprintf("IRQRoutingTable: "x)
+#	define TRACE(x...) dprintf("IRQRoutingTable: " x)
 #else
 #	define TRACE(x...)
 #endif
