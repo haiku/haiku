@@ -461,8 +461,6 @@ void x86_fxrstor(const void* fpuState);
 void x86_noop_swap(void* oldFpuState, const void* newFpuState);
 void x86_fxsave_swap(void* oldFpuState, const void* newFpuState);
 addr_t x86_get_stack_frame();
-uint64 x86_read_msr(uint32 registerNumber);
-void x86_write_msr(uint32 registerNumber, uint64 value);
 uint32 x86_count_mtrrs(void);
 void x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type);
 status_t x86_get_mtrr(uint32 index, uint64* _base, uint64* _length,
@@ -481,6 +479,10 @@ void x86_hardware_interrupt(iframe* frame);
 void x86_page_fault_exception(iframe* iframe);
 
 #ifndef __x86_64__
+
+uint64 x86_read_msr(uint32 registerNumber);
+void x86_write_msr(uint32 registerNumber, uint64 value);
+
 void x86_context_switch(struct arch_thread* oldState,
 	struct arch_thread* newState);
 

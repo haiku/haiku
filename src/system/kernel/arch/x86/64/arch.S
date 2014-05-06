@@ -55,28 +55,6 @@ FUNCTION(x86_get_stack_frame):
 FUNCTION_END(x86_get_stack_frame)
 
 
-/* uint64 x86_read_msr(uint32 register); */
-FUNCTION(x86_read_msr):
-	mov		%edi, %ecx
-	rdmsr
-	shl		$32, %rdx
-	mov		%eax, %eax
-	or		%rdx, %rax
-	ret
-FUNCTION_END(x86_read_msr)
-
-
-/* void x86_write_msr(uint32 register, uint64 value); */
-FUNCTION(x86_write_msr):
-	mov		%rsi, %rdx
-	mov		%esi, %eax
-	mov		%edi, %ecx
-	shr		$32, %rdx
-	wrmsr
-	ret
-FUNCTION_END(x86_write_msr)
-
-
 /* void x86_64_thread_entry(); */
 FUNCTION(x86_64_thread_entry):
 	xorq	%rbp, %rbp
