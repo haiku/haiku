@@ -9,7 +9,13 @@
 #define _KERNEL_ARCH_x86_THREAD_TYPES_H
 
 
-#include <arch_cpu.h>
+#include <SupportDefs.h>
+
+#ifdef __x86_64__
+#	include <arch/x86/64/iframe.h>
+#else
+#	include <arch/x86/32/iframe.h>
+#endif
 
 
 namespace BKernel {
@@ -40,7 +46,8 @@ struct arch_thread {
 	uint64*			syscall_rsp;
 	uint64*			user_rsp;
 
-	uint64*			current_stack;
+	uintptr_t*		current_stack;
+	uintptr_t		instruction_pointer;
 #else
 	struct farcall	current_stack;
 	struct farcall	interrupt_stack;
@@ -72,7 +79,7 @@ struct arch_fork_arg {
 inline addr_t
 arch_thread::GetFramePointer() const
 {
-	return current_stack[1];
+	return current_stack[0];
 }
 
 

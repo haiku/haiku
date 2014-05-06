@@ -165,7 +165,7 @@ void
 arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 	void (*function)(void*), const void* data)
 {
-	addr_t* stackTop = (addr_t*)_stackTop;
+	uintptr_t* stackTop = static_cast<uintptr_t*>(_stackTop);
 
 	TRACE("arch_thread_init_kthread_stack: stack top %p, function %p, data: "
 		"%p\n", _stackTop, function, data);
@@ -173,23 +173,11 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 	// Save the stack top for system call entry.
 	thread->arch_info.syscall_rsp = (uint64*)thread->kernel_stack_top;
 
-	// x86_64 uses registers for argument passing, first argument in RDI,
-	// however we don't save RDI on every context switch (there is no need
-	// for us to: it is not callee-save, and only contains the first argument
-	// to x86_context_switch). However, this presents a problem since we
-	// cannot store the argument for the entry function here. Therefore, we
-	// save the function address in R14 and the argument in R15 (which are
-	// restored), and then set up the stack to initially call a wrapper
-	// function which passes the argument correctly.
+	thread->arch_info.instruction_pointer
+		= reinterpret_cast<uintptr_t>(x86_64_thread_entry);
 
-	*--stackTop = 0;							// Dummy return address.
-	*--stackTop = (addr_t)x86_64_thread_entry;	// Wrapper function.
-	*--stackTop = (addr_t)data;					// R15: argument.
-	*--stackTop = (addr_t)function;				// R14: entry function.
-	*--stackTop = 0;							// R13.
-	*--stackTop = 0;							// R12.
-	*--stackTop = 0;							// RBP.
-	*--stackTop = 0;							// RBX.
+	*--stackTop = uintptr_t(data);
+	*--stackTop = uintptr_t(function);
 
 	// Save the stack position.
 	thread->arch_info.current_stack = stackTop;

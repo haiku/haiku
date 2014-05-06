@@ -13,12 +13,13 @@
 #ifndef _ASSEMBLER
 
 #include <module.h>
+
+#include <arch_thread_types.h>
+
 #include <arch/x86/descriptors.h>
 
 #ifdef __x86_64__
-#	include <arch/x86/64/iframe.h>
-#else
-#	include <arch/x86/32/iframe.h>
+#	include <arch/x86/64/cpu.h>
 #endif
 
 #endif	// !_ASSEMBLER
@@ -452,8 +453,6 @@ void __x86_setup_system_time(uint32 conversionFactor,
 	uint32 conversionFactorNsecs, bool conversionFactorNsecsShift);
 #endif
 
-void x86_context_switch(struct arch_thread* oldState,
-	struct arch_thread* newState);
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
 void x86_swap_pgdir(addr_t newPageDir);
@@ -482,6 +481,8 @@ void x86_hardware_interrupt(iframe* frame);
 void x86_page_fault_exception(iframe* iframe);
 
 #ifndef __x86_64__
+void x86_context_switch(struct arch_thread* oldState,
+	struct arch_thread* newState);
 
 void x86_fnsave(void* fpuState);
 void x86_frstor(const void* fpuState);
