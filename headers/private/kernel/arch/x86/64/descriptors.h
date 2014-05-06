@@ -39,21 +39,6 @@ struct segment_descriptor {
 	uint32 base1 : 8;
 } _PACKED;
 
-// Structure of an interrupt descriptor.
-struct interrupt_descriptor {
-	uint32 base0 : 16;
-	uint32 sel : 16;
-	uint32 ist : 3;
-	uint32 unused1 : 5;
-	uint32 type : 4;
-	uint32 unused2 : 1;
-	uint32 dpl : 2;
-	uint32 present : 1;
-	uint32 base1 : 16;
-	uint32 base2 : 32;
-	uint32 reserved : 32;
-} _PACKED;
-
 struct tss {
 	uint32 _reserved1;
 	uint64 sp0;
@@ -100,24 +85,6 @@ set_segment_descriptor(segment_descriptor* desc, uint8 type, uint8 dpl)
 
 	desc->long_mode = (type & DT_CODE_EXECUTE_ONLY) ? 1 : 0;
 		// Must be set to 1 for code segments only.
-}
-
-
-static inline void
-set_interrupt_descriptor(interrupt_descriptor* desc, uint64 addr, uint32 type,
-	uint16 seg, uint32 dpl, uint32 ist)
-{
-	desc->base0 = addr & 0xffff;
-	desc->base1 = (addr >> 16) & 0xffff;
-	desc->base2 = (addr >> 32) & 0xffffffff;
-	desc->sel = seg;
-	desc->ist = ist;
-	desc->type = type;
-	desc->dpl = dpl;
-	desc->present = 1;
-	desc->unused1 = 0;
-	desc->unused2 = 0;
-	desc->reserved = 0;
 }
 
 

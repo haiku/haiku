@@ -16,8 +16,20 @@
 #include <arch/user_debugger.h>
 
 
-#define IDT_GATES_COUNT	256
+template<typename T, T (*Function)(unsigned), unsigned N, unsigned ...Index>
+struct GenerateTable : GenerateTable<T, Function, N - 1,  N - 1, Index...> {
+};
 
+template<typename T, T (*Function)(unsigned), unsigned ...Index>
+struct GenerateTable<T, Function, 0, Index...> {
+	GenerateTable()
+		:
+		fTable { Function(Index)... }
+	{
+	}
+
+	T	fTable[sizeof...(Index)];
+};
 
 enum class DescriptorType : unsigned {
 	DataWritable		= 0x2,
@@ -78,19 +90,61 @@ private:
 	static constexpr	unsigned	kDescriptorCount
 										= kFirstTSS + SMP_MAX_CPUS * 2;
 
-	alignas(sizeof(Descriptor))	Descriptor	fTable[kDescriptorCount];
+	alignas(uint64_t)	Descriptor	fTable[kDescriptorCount];
 };
 
+enum class InterruptDescriptorType : unsigned {
+	Interrupt		= 14,
+	Trap,
+};
+
+class [[gnu::packed]] InterruptDescriptor {
+public:
+	constexpr						InterruptDescriptor(uintptr_t isr,
+										unsigned ist, bool kernelOnly);
+	constexpr						InterruptDescriptor(uintptr_t isr);
+
+	static constexpr	InterruptDescriptor	Generate(unsigned index);
+
+private:
+						uint16_t	fBase0;
+						uint16_t	fSelector;
+						unsigned	fIST		:3;
+						unsigned	fReserved0	:5;
+						unsigned	fType		:4;
+						unsigned	fReserved1	:1;
+						unsigned	fDPL		:2;
+						unsigned	fPresent	:1;
+						uint16_t	fBase1;
+						uint32_t	fBase2;
+						uint32_t	fReserved2;
+};
+
+class InterruptDescriptorTable {
+public:
+	inline				void		Load() const;
+
+	static constexpr	unsigned	kDescriptorCount = 256;
+
+private:
+	typedef GenerateTable<InterruptDescriptor, InterruptDescriptor::Generate,
+			kDescriptorCount> TableType;
+	alignas(uint64_t)	TableType	fTable;
+};
+
+class InterruptServiceRoutine {
+	alignas(16)	uint8_t	fDummy[16];
+};
+
+extern const InterruptServiceRoutine
+	isr_array[InterruptDescriptorTable::kDescriptorCount];
 
 static GlobalDescriptorTable	sGDT;
-
-static interrupt_descriptor sIDT[IDT_GATES_COUNT];
+static InterruptDescriptorTable	sIDT;
 
 typedef void interrupt_handler_function(iframe* frame);
-static const uint32 kInterruptHandlerTableSize = IDT_GATES_COUNT;
-interrupt_handler_function* gInterruptHandlerTable[kInterruptHandlerTableSize];
-
-extern uint8 isr_array[kInterruptHandlerTableSize][16];
+interrupt_handler_function*
+	gInterruptHandlerTable[InterruptDescriptorTable::kDescriptorCount];
 
 
 constexpr bool
@@ -198,18 +252,58 @@ GlobalDescriptorTable::SetTSS(unsigned cpu, const TSSDescriptor& tss)
 }
 
 
-static inline void
-load_idt()
+constexpr
+InterruptDescriptor::InterruptDescriptor(uintptr_t isr, unsigned ist,
+	bool kernelOnly)
+	:
+	fBase0(isr),
+	fSelector(KERNEL_CODE_SELECTOR),
+	fIST(ist),
+	fReserved0(0),
+	fType(static_cast<unsigned>(InterruptDescriptorType::Interrupt)),
+	fReserved1(0),
+	fDPL(kernelOnly ? 0 : 3),
+	fPresent(1),
+	fBase1(isr >> 16),
+	fBase2(isr >> 32),
+	fReserved2(0)
 {
-	struct {
-		uint16	limit;
-		void*	address;
-	} _PACKED idtDescriptor = {
-		IDT_GATES_COUNT * sizeof(interrupt_descriptor) - 1,
-		sIDT
+	static_assert(sizeof(InterruptDescriptor) == sizeof(uint64_t) * 2,
+		"Invalid InterruptDescriptor size.");
+}
+
+
+constexpr
+InterruptDescriptor::InterruptDescriptor(uintptr_t isr)
+	:
+	InterruptDescriptor(isr, 0, true)
+{
+}
+
+
+void
+InterruptDescriptorTable::Load() const
+{
+	struct [[gnu::packed]] {
+		uint16_t	fLimit;
+		const void*	fAddress;
+	} gdtDescriptor = {
+		sizeof(fTable) - 1,
+		static_cast<const void*>(fTable.fTable),
 	};
 
-	asm volatile("lidt %0" : : "m" (idtDescriptor));
+	asm volatile("lidt	%0" : : "m" (gdtDescriptor));
+}
+
+
+constexpr InterruptDescriptor
+InterruptDescriptor::Generate(unsigned index)
+{
+	return index == 3
+		? InterruptDescriptor(uintptr_t(isr_array + index), 0, false)
+		: (index == 8
+			? InterruptDescriptor(uintptr_t(isr_array + index), 1, true)
+			: InterruptDescriptor(uintptr_t(isr_array + index)));
 }
 
 
@@ -258,38 +352,22 @@ x86_descriptors_preboot_init_percpu(kernel_args* args, int cpu)
 			TSSDescriptor(uintptr_t(&gCPU[cpu].arch.tss), sizeof(struct tss)));
 	TSSDescriptor::LoadTSS(tssIndex);
 
-	load_idt();
+	new(&sIDT) InterruptDescriptorTable;
+	sIDT.Load();
 }
 
 
 void
 x86_descriptors_init(kernel_args* args)
 {
-	// Fill out the IDT, pointing each entry to the corresponding entry in the
-	// ISR array created in arch_interrupts.S (see there to see how this works).
-	for(uint32 i = 0; i < kInterruptHandlerTableSize; i++) {
-		// x86_64 removes task gates, therefore we cannot use a separate TSS
-		// for the double fault exception. However, instead it adds a new stack
-		// switching mechanism, the IST. The IST is a table of stack addresses
-		// in the TSS. If the IST field of an interrupt descriptor is non-zero,
-		// the CPU will switch to the stack specified by that IST entry when
-		// handling that interrupt. So, we use IST entry 1 to store the double
-		// fault stack address (set up in x86_descriptors_init_post_vm()).
-		uint32 ist = (i == 8) ? 1 : 0;
-
-		// Breakpoint exception can be raised from userland.
-		uint32 dpl = (i == 3) ? DPL_USER : DPL_KERNEL;
-
-		set_interrupt_descriptor(&sIDT[i], (addr_t)&isr_array[i],
-			GATE_INTERRUPT, KERNEL_CODE_SELECTOR, dpl, ist);
-	}
-
 	// Initialize the interrupt handler table.
 	interrupt_handler_function** table = gInterruptHandlerTable;
 	for (uint32 i = 0; i < ARCH_INTERRUPT_BASE; i++)
 		table[i] = x86_invalid_exception;
-	for (uint32 i = ARCH_INTERRUPT_BASE; i < kInterruptHandlerTableSize; i++)
+	for (uint32 i = ARCH_INTERRUPT_BASE;
+		i < InterruptDescriptorTable::kDescriptorCount; i++) {
 		table[i] = x86_hardware_interrupt;
+	}
 
 	table[0]  = x86_unexpected_exception;	// Divide Error Exception (#DE)
 	table[1]  = x86_handle_debug_exception; // Debug Exception (#DB)
