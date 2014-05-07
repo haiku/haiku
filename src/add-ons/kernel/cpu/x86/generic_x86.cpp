@@ -21,7 +21,7 @@
 
 //#define TRACE_MTRR
 #ifdef TRACE_MTRR
-#	define TRACE(x...)	dprintf("mtrr: "x)
+#	define TRACE(x...)	dprintf("mtrr: " x)
 #else
 #	define TRACE(x...)	/* nothing */
 #endif

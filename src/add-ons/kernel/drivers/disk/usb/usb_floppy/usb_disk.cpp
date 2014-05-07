@@ -23,11 +23,11 @@
 
 //#define TRACE_USB_DISK
 #ifdef TRACE_USB_DISK
-#define TRACE(x...)			dprintf("\x1B[35m"DRIVER_NAME"\x1B[0m: "x)
-#define TRACE_ALWAYS(x...)	dprintf("\x1B[35m"DRIVER_NAME"\x1B[0m: "x)
+#define TRACE(x...)			dprintf("\x1B[35m" DRIVER_NAME "\x1B[0m: " x)
+#define TRACE_ALWAYS(x...)	dprintf("\x1B[35m" DRIVER_NAME "\x1B[0m: " x)
 #else
 #define TRACE(x...)			/* nothing */
-#define TRACE_ALWAYS(x...)	dprintf("\x1B[35m"DRIVER_NAME"\x1B[0m: "x)
+#define TRACE_ALWAYS(x...)	dprintf("\x1B[35m" DRIVER_NAME "\x1B[0m: " x)
 #endif
 
 

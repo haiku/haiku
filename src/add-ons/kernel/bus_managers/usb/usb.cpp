@@ -312,7 +312,7 @@ status_t
 queue_bulk(usb_pipe pipe, void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
-	TRACE_MODULE("queue_bulk(%"B_PRId32 ", %p, %" B_PRIuSIZE ", %p, %p)\n",
+	TRACE_MODULE("queue_bulk(%" B_PRId32 ", %p, %" B_PRIuSIZE ", %p, %p)\n",
 		pipe, data, dataLength, callback, callbackCookie);
 	Object *object = gUSBStack->GetObject(pipe);
 	if (!object || (object->Type() & USB_OBJECT_BULK_PIPE) == 0)

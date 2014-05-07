@@ -31,11 +31,11 @@
 
 // #define TRACE_USB_PRINTER 1
 #ifdef TRACE_USB_PRINTER
-#define TRACE(x...)			dprintf(DRIVER_NAME": "x)
-#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME": "x)
+#define TRACE(x...)			dprintf(DRIVER_NAME ": " x)
+#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME ": " x)
 #else
 #define TRACE(x...)			/* nothing */
-#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME": "x)
+#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME ": " x)
 #endif
 
 

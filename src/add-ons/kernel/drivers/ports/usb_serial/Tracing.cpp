@@ -81,7 +81,7 @@ usb_serial_trace(bool force, const char *format, ...)
 	static char buffer[1024];
 	char *bufferPointer = buffer;
 	if (!gLogToFile) {
-		const char *prefix = "\33[32m"DRIVER_NAME":\33[0m ";
+		const char *prefix = "\33[32m" DRIVER_NAME ":\33[0m ";
 		strcpy(bufferPointer, prefix);
 		bufferPointer += strlen(prefix);
 	}

@@ -69,7 +69,7 @@ print_descriptor_chain(ehci_qtd *descriptor)
 	while (descriptor) {
 		dprintf(" %08" B_PRIx32 " n%08" B_PRIx32 " a%08" B_PRIx32 " t%08" B_PRIx32
 			" %08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32
-			" %08" B_PRIx32 " s%"B_PRIuSIZE "\n",
+			" %08" B_PRIx32 " s%" B_PRIuSIZE "\n",
 			descriptor->this_phy, descriptor->next_phy,
 			descriptor->alt_next_phy, descriptor->token,
 			descriptor->buffer_phy[0], descriptor->buffer_phy[1],
