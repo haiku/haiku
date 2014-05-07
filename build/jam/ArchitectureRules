@@ -403,6 +403,10 @@ rule KernelArchitectureSetup architecture
 	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(g++BaseFlags) ;
 	HAIKU_BOOT_LINKFLAGS = ;
 
+	if $(gccVersion[1]) >= 4 {
+		HAIKU_KERNEL_C++FLAGS += -std=gnu++11 ;
+	}
+
 	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 	HAIKU_KERNEL_PIC_LINKFLAGS = ;
 	HAIKU_KERNEL_ADDON_LINKFLAGS = ;

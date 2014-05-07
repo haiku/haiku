@@ -17,8 +17,6 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
 
 local archSpecificSources ;
 if $(TARGET_ARCH) = x86_64 {
-	SubDirC++Flags -std=gnu++11 ;
-
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 64 ] ;
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 64bit ] ;
 
