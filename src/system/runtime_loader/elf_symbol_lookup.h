@@ -60,6 +60,7 @@ struct SymbolLookupCache {
 		:
 		fTableSize(image->symhash[1]),
 		fValues(NULL),
+		fDSOs(NULL),
 		fValuesResolved(NULL)
 	{
 		if (fTableSize > 0) {
@@ -70,9 +71,10 @@ struct SymbolLookupCache {
 			fValuesResolved = (uint32*)malloc(4 * elementCount);
 			memset(fValuesResolved, 0, 4 * elementCount);
 
-			if (fValues == NULL || fValuesResolved == NULL) {
+			if (fValues == NULL || fDSOs == NULL || fValuesResolved == NULL) {
 				free(fValuesResolved);
 				free(fValues);
+				free(fDSOs);
 				fTableSize = 0;
 			}
 		}
