@@ -122,8 +122,8 @@ RemotePackageRepository HaikuPorts
 	python-2.6.9-1
 	qrencode-3.3.0-1
 	qrencode_devel-3.3.0-1
-	readline-6.2-4
-	readline_devel-6.2-4
+	readline-6.2-5
+	readline_devel-6.2-5
 	ruby-1.9.1-2
 	ruby_devel-1.9.1-2
 	scons-2.2.0-2
