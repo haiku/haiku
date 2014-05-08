@@ -119,7 +119,7 @@ FSUtils::CompareFileContent(BPositionIO& content1, BPositionIO& content2,
 	uint8* buffer1 = new(std::nothrow) uint8[2 * kCompareDataBufferSize];
 	if (buffer1 == NULL)
 		return B_NO_MEMORY;
-	MemoryDeleter bufferDeleter(buffer1);
+	ArrayDeleter<uint8> bufferDeleter(buffer1);
 	uint8* buffer2 = buffer1 + kCompareDataBufferSize;
 
 	// compare the data
