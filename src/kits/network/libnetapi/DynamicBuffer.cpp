@@ -23,12 +23,10 @@ DynamicBuffer::DynamicBuffer(size_t initialSize) :
 	fDataEnd(0),
 	fInit(B_NO_INIT)
 {
-	if (initialSize >= 0) {
-		fBuffer = new (std::nothrow) unsigned char[initialSize];
-		if (fBuffer != NULL) {
-			fBufferSize = initialSize;
-			fInit = B_OK;
-		}
+	fBuffer = new (std::nothrow) unsigned char[initialSize];
+	if (fBuffer != NULL) {
+		fBufferSize = initialSize;
+		fInit = B_OK;
 	}
 }
 
