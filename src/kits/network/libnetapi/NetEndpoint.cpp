@@ -521,9 +521,10 @@ int32
 BNetEndpoint::Receive(BNetBuffer& buffer, size_t length, int flags)
 {
 	BNetBuffer chunk(length);
-	length = Receive(chunk.Data(), length, flags);
-	buffer.AppendData(chunk.Data(), length);
-	return length;
+	ssize_t bytesReceived = Receive(chunk.Data(), length, flags);
+	if (bytesReceived > 0)
+		buffer.AppendData(chunk.Data(), bytesReceived);
+	return bytesReceived;
 }
 
 
@@ -542,14 +543,14 @@ BNetEndpoint::ReceiveFrom(void* buffer, size_t length,
 	struct sockaddr_in addr;
 	socklen_t addrSize = sizeof(addr);
 
-	length = recvfrom(fSocket, buffer, length, flags,
+	ssize_t bytesReceived = recvfrom(fSocket, buffer, length, flags,
 		(struct sockaddr *)&addr, &addrSize);
-	if (length < 0)
+	if (bytesReceived < 0)
 		fStatus = errno;
 	else
 		address.SetTo(addr);
 
-	return length;
+	return bytesReceived;
 }
 
 
@@ -558,9 +559,10 @@ BNetEndpoint::ReceiveFrom(BNetBuffer& buffer, size_t length,
 	BNetAddress& address, int flags)
 {
 	BNetBuffer chunk(length);
-	length = ReceiveFrom(chunk.Data(), length, address, flags);
-	buffer.AppendData(chunk.Data(), length);
-	return length;
+	ssize_t bytesReceived = ReceiveFrom(chunk.Data(), length, address, flags);
+	if (bytesReceived > 0)
+		buffer.AppendData(chunk.Data(), bytesReceived);
+	return bytesReceived;
 }
 
 
