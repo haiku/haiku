@@ -48,7 +48,7 @@ public:
 			TLSBlock	CreateBlock(unsigned dso);
 
 private:
-						TLSBlockTemplates() { }
+	inline				TLSBlockTemplates();
 
 	static	TLSBlockTemplates*	fInstance;
 

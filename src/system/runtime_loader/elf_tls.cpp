@@ -116,7 +116,7 @@ TLSBlockTemplates::Register(const TLSBlockTemplate& block)
 		fTemplates.push_back(block);
 	}
 
-	fTemplates[dso].SetGeneration(fGeneration++);
+	fTemplates[dso].SetGeneration(fGeneration);
 	return dso;
 }
 
@@ -127,6 +127,7 @@ TLSBlockTemplates::Unregister(unsigned dso)
 	if (dso == unsigned(-1))
 		return;
 
+	fGeneration++;
 	fFreeDSOs.push_back(dso);
 }
 
@@ -152,6 +153,13 @@ TLSBlock
 TLSBlockTemplates::CreateBlock(unsigned dso)
 {
 	return fTemplates[dso].CreateBlock();
+}
+
+
+TLSBlockTemplates::TLSBlockTemplates()
+	:
+	fGeneration(0)
+{
 }
 
 
