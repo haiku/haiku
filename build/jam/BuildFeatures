@@ -203,6 +203,23 @@ if [ IsPackageAvailable freetype_devel ] {
 }
 
 
+# Gutenprint
+if [ IsPackageAvailable gutenprint_devel ] {
+	ExtractBuildFeatureArchives gutenprint :
+		file: base gutenprint
+			runtime: lib
+		file: devel gutenprint_devel
+			depends: base
+			library: $(developLibDir)/libgutenprint.a
+			headers: $(developHeadersDir) $(developHeadersDir)/gutenprint
+		;
+
+	EnableBuildFeatures gutenprint ;
+} else {
+	Echo "Gutenprint support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # TagLib
 
 # TODO: Update to packages!
