@@ -267,8 +267,8 @@ main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	// arbitrary 4 GB limitation
-	if (imageSize > 0x100000000ULL) {
+	// arbitrary 160 GB limitation
+	if (imageSize > 0x2800000000ULL) {
 		fprintf(stderr, "Error: image size too large\n");
 		exit(EXIT_FAILURE);
 	}
