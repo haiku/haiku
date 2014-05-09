@@ -100,7 +100,7 @@ PackageFile::RevisionedNameThrows() const
 void
 PackageFile::LastReferenceReleased()
 {
-	if (fOwner == NULL)
+	if (fOwner != NULL)
 		fOwner->RemovePackageFile(this);
 	delete this;
 }
