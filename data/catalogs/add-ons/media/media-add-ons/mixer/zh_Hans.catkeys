@@ -17,7 +17,7 @@ dB	AudioMixer		分贝
 Gain controls	AudioMixer		增益控制
 Input mapping	AudioMixer		输入映射
 Mute	AudioMixer		静音
-Input channel destinations	AudioMixer		目标输入通道
+Input channel destinations	AudioMixer		输入通道目标
 To master	AudioMixer		到主音量
 Master output	AudioMixer		主音量输出
 Setup	AudioMixer		配置

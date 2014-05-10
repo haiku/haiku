@@ -1,7 +1,6 @@
-1	japanese	x-vnd.Haiku-About	86924748
+1	japanese	x-vnd.Haiku-About	2441795911
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 Gutenprint の著者たち. All rights reserved.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n
-BSD (4-clause)	AboutView		BSD (4条項)
 %ld Processors:	AboutView		%ld プロセッサ:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeLおよびRemi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. All rights reserved.
@@ -11,9 +10,7 @@ The Haiku-Ports team\n	AboutView		Haiku-Ports チーム\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. All rights reserved.
 %d MiB used (%d%%)	AboutView		%d MiB 使用中 (%d%%)
 Website, marketing & documentation:\n	AboutView		ウェブサイト、広報 & ドキュメント:\n
-GNU LGPL v2.1	AboutView		GNU LGPL v2.1
 AboutSystem	System name		このシステムについて
-MIT (no promotion)	AboutView		MIT (非商用利用)
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe他.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. All rights reserved.
 Revision	AboutView		リビジョン
@@ -23,7 +20,6 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 19
 Source Code: 	AboutView		ソースコード:
 Processor:	AboutView		プロセッサ:
 Kernel:	AboutView		カーネル:
-BSD (3-clause)	AboutView		BSD (3条項)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie BozemanおよびDaniel Veillard. All rights reserved.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		このソフトウェアの一部は著作権下にあります。 \nCopyright © 1996-2006 The FreeType Project. All rights reserved.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haikuのコードの著作権はHaiku, Inc.または各ソースコードに明示された個々の著者に帰属します。Haiku®およびHAIKUロゴ・マーク®はHaiku, Inc.の(登録)商標です。\n\n
@@ -59,7 +55,6 @@ The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆�
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. All rights reserved.
 About this system	AboutWindow		このシステムについて
-BSD (2-clause)	AboutView		BSD (2条項)
 Version:	AboutView		バージョン:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. All rights reserved.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center LtdおよびClark Cooper.

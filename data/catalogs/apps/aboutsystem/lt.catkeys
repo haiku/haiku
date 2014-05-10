@@ -1,7 +1,6 @@
-1	lithuanian	x-vnd.Haiku-About	86924748
+1	lithuanian	x-vnd.Haiku-About	2441795911
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		© 1999-2010 „Gutenprint“ autoriai. Visos teisės saugomos.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis'ui Geiselbrecht'ui (už „NewOS“ branduolį)\n
-BSD (4-clause)	AboutView		BSD (4 punktų)
 %ld Processors:	AboutView		%ld procesoriai:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		© 2000 Jean-Pierre ervbefeL ir Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		© 1996-2005 Julian R Seward. Visos teisės saugomos.
@@ -11,9 +10,7 @@ The Haiku-Ports team\n	AboutView		„Haiku-Ports“ komandai\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		© 1998-2003 Daniel Veillard. Visos teisės saugomos.
 %d MiB used (%d%%)	AboutView		%d MiB naudojama (%d%%)
 Website, marketing & documentation:\n	AboutView		Saityno svetainė, rinkodara ir dokumentacija:\n
-GNU LGPL v2.1	AboutView		GNU LGPL 2.1 versija
 AboutSystem	System name		Apie šią sistemą
-MIT (no promotion)	AboutView		MIT (su ribojimu reklamai)
 Copyright © 2003 Peter Hanappe and others.	AboutView		© 2003 Peter Hanappe ir kiti.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		© 1994-1997 Mark Kilgard. Visos teisės saugomos.
 Revision	AboutView		modifikacija
@@ -23,7 +20,6 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		© 1999-2000 Y.
 Source Code: 	AboutView		Pirminiai tekstai: 
 Processor:	AboutView		Procesorius:
 Kernel:	AboutView		Branduolys:
-BSD (3-clause)	AboutView		BSD (3 punktų)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		© 2001-2002 Thomas Broyer, Charlie Bozeman ir Daniel Veillard. Visos teisės saugomos.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Dalies šios progarminės įrangos autorių teisės priklauso © 1996-2006 The FreeType Project. Visos teisės saugomos.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Visos autorių teisės į „Haiku“ pirminius tekstus priklauso „Haiku, Inc.“ arba konkretiems tuose tekstuose paminėtiems autoriams. „Haiku“® ir „HAIKU“® logotipas yra registruoti „Haiku, Inc.“ prekės ženklai.\n\n
@@ -59,7 +55,6 @@ The Haikuware team and their bounty program\n	AboutView		„Haikuware“ komanda
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		© 1995, 1998-2001 Jef Poskanzer. Visos teisės saugomos.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		© 2010-2011 Google Inc. Visos teisės saugomos.
 About this system	AboutWindow		Apie šią sistemą
-BSD (2-clause)	AboutView		BSD (2 punktų)
 Version:	AboutView		Versija:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		© 1994-2008 Xiph.Org. Visos teisės saugomos.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		© 1998-2000 Thai Open Source Software Center Ltd ir Clark Cooper.

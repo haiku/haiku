@@ -1,0 +1,65 @@
+1	english	x-vnd.Haiku-HaikuDepot	3398060443
+Name	PackageListView		名称
+Installed packages	Model		已安装软件包
+User modified packages	Model		用户修改软件包
+Update available	Model		可用更新
+Changelog	PackageInfoView		更新记录
+Click a package to view information	PackageInfoView		点击软件包查看信息
+for %Version%	PackageInfoView		用于 %Version%
+No changelog available.	PackageInfoView		未发现更新记录。
+Depot:	FilterView		软件库：
+Description	PackageListView		描述
+Install	PackageManager		安装
+Tools	MainWindow		工具
+HaikuDepot	System name		Haiku 软件库
+Rate package…	PackageInfoView		软件包评分…
+Uninstall	PackageManager		卸载
+<no info>	PackageInfoView		<无信息>
+An error occurred while initializing the package manager: %message%	MainWindow		软件包管理器初始化出现错误：%message%
+Close	PackageManager		关闭
+Status	PackageListView		状态
+Available packages	Model		可用的软件包
+Your rating	System name		您的评分
+Development	Model		开发
+Fatal error	PackageManager		严重错误
+Ratings	PackageInfoView		评级
+1 item	PackageListView		1 项
+Inactive	PackageListView		未激活
+Refresh depots	MainWindow		刷新软件库
+Main Menu	MainWindow		主菜单
+Command line	Model		命令行
+(%Votes%)	PackageInfoView		（%Votes%）
+Downloading:	PackageInfoView		下载中：
+Search terms:	FilterView		搜索项目：
+%Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		未发现用户评分。
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		刷新软件库出现错误：%error% (%details%)
+Show source packages	MainWindow		显示源码包
+Productivity	Model		生产力
+Show:	FilterView		显示：
+Size	PackageListView		大小
+Options	MainWindow		选项
+Games	Model		游戏
+Rating	PackageListView		评级
+Downloading	Model		正在下载
+%ld items	PackageListView		%ld 项目
+Graphics	Model		图形
+Local	MainWindow		本地
+Close	MainWindow		关闭
+Video	Model		视频
+An error occurred while refreshing the repository: %error%	MainWindow		刷新软件库出现错误：%error%
+All packages	FilterView		所有软件包
+Pending…	PackageListView		挂起…
+Depot	FilterView		软件库
+Uninstalled	PackageListView		已卸载
+Unknown	PackageListView		未知
+All depots	FilterView		所有软件库
+Available	PackageListView		可用
+n/a	PackageInfoView		n/a
+Send	RatePackageWindow		发送
+Show develop packages	MainWindow		显示开发软件包
+Show	FilterView		显示
+Uninstalled packages	Model		已卸载软件包
+Audio	Model		音频
+About	PackageInfoView		关于
+Active	PackageListView		激活

@@ -13,7 +13,7 @@ Rescan	Status View		重新扫描
 file unavailable	Status View		文件不可用
 Get info	Pie View		获取信息
 DiskUsage	System name		磁盘查看器
- in %d files	Info Window		位于 %d 个文件
+ in %d files	Info Window		 在 %d 个文件
 %d files	Status View		%d 文件
 Created	Info Window		已创建
 Modified	Info Window		已修改

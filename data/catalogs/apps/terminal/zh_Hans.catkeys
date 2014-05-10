@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	328707356
+1	english	x-vnd.Haiku-Terminal	3250775475
 Not found.	Terminal TermWindow		未找到。  
 Switch Terminals	Terminal TermWindow		切换终端
 Change directory	Terminal TermView		更改目录
@@ -7,9 +7,9 @@ Professional	Terminal colors scheme		专业主题
 OK	Terminal TermWindow		确定
 New Terminal	Terminal TermWindow		新建窗口
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		终端无法启动shell，非常抱歉。
-Match case	Terminal FindWindow		匹配大小写  
+Match case	Terminal FindWindow		匹配大小写
 Quit	Terminal TermWindow		退出
-Use default shell	Terminal Shell		使用默认shell  
+Use default shell	Terminal Shell		使用默认shell
 Confirm exit if active programs exist	Terminal AppearancePrefView		如果存在活动程序，确定退出。
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了当前标签标题。可以使用下述的\n占位符：\n
 Select all	Terminal TermWindow		全选
@@ -55,6 +55,7 @@ Blinking cursor	Terminal AppearancePrefView		闪烁游标
 Don't save	Terminal PrefWindow		不保存
 Set window title	Terminal TermWindow		设置窗口标题
 Terminal	System name		终端
+Copy path	Terminal TermView		复制路径
 Close other tabs	Terminal TermWindow		关闭其他标签
 Match word	Terminal FindWindow		匹配单词
 Nothing is selected.	Terminal TermWindow		未选中任何文件。
@@ -69,6 +70,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:\
 Selected background	Terminal AppearancePrefView		选中背景
 Slate	Terminal colors scheme		岩石主题
 Text under cursor	Terminal AppearancePrefView		下划线
+Use bright instead of bold text	Terminal AppearancePrefView		使用明亮文本以代替加粗文本
 Midnight	Terminal colors scheme		午夜主题
 Decrease	Terminal TermWindow		缩小
 Default	Terminal colors scheme		默认主题
@@ -79,10 +81,13 @@ Clear all	Terminal TermWindow		清空
 Text encoding	Terminal TermWindow		文字编码
 size	Terminal TermView		大小
 Close window	Terminal TermWindow		关闭窗口
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t当前标签页中活动进程所处路径。\n\t\t\t可以根据需要，指定路径组成部分的最大数量\n\t\t\t例如， '%2d' 指定最多两个组成部分。\n\t%T\t-\t当前语言环境中终端程序名称。\n\t%e\t-\t当前标签页中的编码类型，UTF-8 默认不显示。\n\t%i\t-\t窗口索引编号。\n\t%p\t-\t当前标签页中活动进程名称。\n\t%t\t-\t当前标签页标题\n\t%%\t-\t字符 '%'。
+Copy absolute path	Terminal TermView		复制绝对路径
 Save as default	Terminal TermWindow		保存为默认
 Set tab title	Terminal TermWindow		设置标签标题
 Settings…	Terminal TermWindow		设置…
 Abort	Terminal Shell		放弃
+Open link	Terminal TermView		打开链接
 Edit	Terminal TermWindow		编辑
 Color:	Terminal AppearancePrefView		颜色：
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了窗口标题。可以使用下述的\n占位符：\n
@@ -93,7 +98,9 @@ OK	Terminal TermApp		确定
 Find failed	Terminal TermWindow		查找失败
 Search forward	Terminal FindWindow		搜索前一个
 Edit tab title…	Terminal TermWindow		编辑标签标题...
+Open path	Terminal TermView		打开路径
 Find previous	Terminal TermWindow		查找上一个
+Copy link location	Terminal TermView		复制链接位置
 Tab title:	Terminal TermWindow		标签标题：
 Find next	Terminal TermWindow		查找下一个
 Close active tab	Terminal TermWindow		关闭活动标签

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PackageInstaller	792037176
+1	english	x-vnd.Haiku-PackageInstaller	2033288398
 Install to:	PackageView		安装到：
 OK	PackageView		确认
 Accept	PackageTextViewer		接受
@@ -12,12 +12,14 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		安装软件包时出错\n
 Disclaimer	PackageTextViewer		责任声明
 %.1f GiB	PackageView		%.1f GiB
+%name% (%size% free)	PackageView		%name% (自由空间 %size%)
 The installation of the package has been aborted.	PackageView		该包的安装已经取消。
 Done	PackageInstall		完成
 All existing files will be replaced?	PackageView		替换所有存在文件吗？
 Preparing package	PackageInstall		准备安装包
 No package available.	PackageInfo		无可用包。
 none	PackageView		无
+Install %name%	PackageView		安装 %name%
 Stop	PackageStatus		停止
 Other…	PackageView		其他...
 No installation type selected	PackageView		未选中安装类型
@@ -45,11 +47,14 @@ Decline	PackageTextViewer		递减
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		'%s' 文件已经存在于给定路径。\n是替换为包中的文件，还是跳过？
 All existing files will be skipped?	PackageView		所有已存在的文件将被跳过？
 Continue	PackageInfo		继续
+%index% of %total%	PackageInstall		%index% / %total%
 %.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		终止
 PackageInstaller	System name		包安装器
 Abort	PackageInstall		终止
+%name% (%size%)	PackageView		%name% （%size%）
 Continue	PackageTextViewer		继续
+Begin	PackageView		开始
 Replace	PackageView		替换
 Installation progress	PackageView		安装进度
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		无法读取包文件。\n产生的原因之一可能是所需文件不是有效的 BeOS .pkg 包。

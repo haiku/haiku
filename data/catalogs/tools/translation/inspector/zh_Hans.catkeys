@@ -3,7 +3,7 @@ User Translators	ActiveTranslatorsWindow		用户翻译器
 No image available to save.	ImageWindow		无图像可用于保存。
 Sorry, unable to write the image file.	ImageView		对不起，无法写入图像文件。
 Number of Documents: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		文档数：%1\n\n\已用转换器：\n名称：%2\n信息：%3\n版本：%4\n
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		 \n类型：'%1' (%2)\n组别： '%3' (%4)\n质量：%5\n性能：%6\nMIME 类型：%7\n名称 ：%8\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\n类型：'%1' (%2)\n分组： '%3' (%4)\n质量：%5\n性能：%6\nMIME 类型：%7\n名称 ：%8\n
 Bummer	ImageWindow		Bummer
 Last Page	ImageWindow		上一页
 \nInput Formats:	ImageView		\n输入格式：

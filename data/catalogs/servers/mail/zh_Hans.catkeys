@@ -1,6 +1,6 @@
 1	english	x-vnd.Be-POST	1091177030
 Fetching mail for %name	Notifier		获取 %name 的邮件
-Check for mails only	DeskbarView		仅检查邮件
+Check for mails only	DeskbarView		只检查邮件
 Send pending mails	DeskbarView		发送挂起邮件
 New Messages	MailDaemon		新邮件
 <no accounts>	DeskbarView		<无账户>

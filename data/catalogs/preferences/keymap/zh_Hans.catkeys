@@ -1,11 +1,34 @@
-1	english	x-vnd.Haiku-Keymap	4022885915
+1	english	x-vnd.Haiku-Keymap	2376733585
+Dvorak	Keyboard Layout View		德沃夏克键盘
 Shift:	Modifier keys window	Shift key role name	Shift：
 Revert	Modifier keys window		取消
+Slovak	Keyboard Layout View		斯洛伐克文
+Hungarian	Keyboard Layout View		匈牙利文
+German	Keyboard Layout View		德文
+Swiss-French	Keyboard Layout View		瑞士-法文
+Warning: left and right key roles do not match	Modifier keys window		警告：左右键规则不匹配
+Belgian (comma)	Keyboard Layout View		比利时文 (逗号)
+Scroll lock	Keyboard Layout View		滚动锁定
+Belarusian (Mac)	Keyboard Layout View		白俄罗斯 (Mac)
+Greek	Keyboard Layout View		希腊
+Menu	Keyboard Layout View	Menu key	菜单
+US	Keyboard Layout View		美国
+Left control	Keyboard Layout View		左侧 Ctrl
+Spanish	Keyboard Layout View		西班牙语
+Ukrainian (Mac)	Keyboard Layout View		乌克兰语 (Mac)
+Belarusian	Keyboard Layout View		白俄罗斯语
+Italian	Keyboard Layout View		意大利语
+Polish (Typewriter)	Keyboard Layout View		波兰文 (打字机)
 Tilde trigger	Keymap window		触发颚化字符
 Grave trigger	Keymap window		触发雕刻字符
 Role	Modifier keys window	As in the role of a modifier key	作用
+Caps lock	Keyboard Layout View		大小写锁定
 Select dead keys	Keymap window		选择废键：
 Cancel	Modifier keys window		取消
+Faeroese	Keyboard Layout View		法罗语
+Japanese	Keyboard Layout View		日语
+Bulgarian (Phonetic)	Keyboard Layout View		保加利亚语 (语音)
+Dvorak (programmer's)	Keyboard Layout View		德沃夏克键盘 (程序员专用)
 Quit	Keymap window		退出
 Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为Haiku模式
 Circumflex trigger	Keymap window		触发音调符号

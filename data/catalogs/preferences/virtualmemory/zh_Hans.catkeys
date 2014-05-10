@@ -1,5 +1,6 @@
-1	english	x-vnd.Haiku-VirtualMemory	4238590117
+1	english	x-vnd.Haiku-VirtualMemory	2090796060
 Quit	SettingsWindow		退出
+Automatic swap management	SettingsWindow		自动管理交换分区
 Turn off	SettingsWindow		关闭
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		当物理内存不足时，禁用虚拟内存，会影响系统的稳定性。\n除非物理内存已用完，使用虚拟内存不会对您的系统性能造成任何影响。\n\n您确定禁用虚拟内存吗？
 Requested swap file size:	SettingsWindow		建议交换分区大小：

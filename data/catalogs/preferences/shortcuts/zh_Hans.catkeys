@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Shortcuts	1243549695
+1	english	x-vnd.Haiku-Shortcuts	1965025444
 MoveMouse	ShortcutsSpec		鼠标移动
 OK	ShortcutsWindow		确定
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		无法保存您的按键设置。
@@ -8,6 +8,7 @@ Append KeySet…	ShortcutsWindow		添加按键设置...
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		按键
 Open KeySet…	ShortcutsWindow		打开按键设置...  
+Error, NULL state description?	ShortcutsSpec		错误，无效状态描述？
 MouseUp	ShortcutsSpec		MouseUp
 Revert to saved	ShortcutsWindow		取消保存  
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt 
@@ -19,6 +20,7 @@ Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		无法打开您�
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \'*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 SendMessage	ShortcutsSpec		SendMessage
 MoveMouseTo	ShortcutsSpec		MoveMouseTo
+Option	ShortcutsSpec	Name for modifier on keyboard	选项
 Save	ShortcutsWindow		保存
 *MouseButton 1	ShortcutsWindow		*MouseButton 1
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0

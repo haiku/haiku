@@ -11,7 +11,7 @@ About Sounds	SoundsHApp		关于 声音
 Sound	HEventList		声音
 Event	HEventList		事件
 <none>	HEventList		<无>
-Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		声音 \n  编写者：\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n最初程序由Atsushi Takamatsu编写。\n版权所有 2003-2006 Haiku .Inc\n
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		声音\n  编写者：\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  最初程序由Atsushi Takamatsu编写。\n版权所有 ©2003-2006 Haiku .Inc
 <none>	HWindow		<无>
 Other…	HWindow		其它…
 Play	HWindow		播放

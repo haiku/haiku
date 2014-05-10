@@ -1,9 +1,11 @@
-1	english	x-vnd.Haiku-MediaConverter	2955071341
+1	english	x-vnd.Haiku-MediaConverter	2722282283
 Video using parameters form settings	MediaConverter		视频参数表使用设置
 Video encoding:	MediaConverter		视频编码：
+Error read audio frame %lld	MediaConverter		读取音频帧 %lld 出错
 No audio	Audio codecs list		无音频
 Error	MediaConverter		错误
 Error loading a file	MediaConverter		载入文件错误
+Error read video frame %lld	MediaConverter		读取视频帧 %lld 出错
 File Error	MediaConverter-FileInfo		文件错误
 Open…	Menu		打开...
 Start [ms]: 	MediaConverter		开始 [ms]：
@@ -22,6 +24,8 @@ Audio:	MediaConverter-FileInfo		音频：
 OK	MediaConverter-FileInfo		确定
  seconds	MediaFileInfo		秒
 Source files	MediaConverter		源文件
+Error writing video frame %lld	MediaConverter		写入视频帧 %lld 出错
+Error writing audio frame %lld	MediaConverter		写入音频帧 %lld 出错
 Cancelling	MediaConverter		取消
 %d byte 	MediaFileInfo		%d 字节
 Error loading files	MediaConverter		载入文件错误

@@ -14,7 +14,7 @@ Stop	InstallerWindow	In alert after pressing Stop	暂停
 Install progress:  	InstallerWindow		安装进度：
 2.2) GRUB 1\n	InstallerApp		2.1) GRUB 1\n
 Starting Installation.	InstallProgress		启动安装
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		这是 测试版本 软件！因此会有很高的丢失数据风险。请经常进行数据的备份！这是我们的善意提醒。
+This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		这是 测试版本 软件！因此会有很高的丢失数据风险。请经常进行数据的备份！这是我们的善意提醒。\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		您确定要取消安装吗？
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		您确定安装 Haiku 到当前引导磁盘？如果您继续安装，系统安装器将会重启您的计算机。
 Quit Boot Manager	InstallerWindow		退出引导管理器
@@ -39,9 +39,9 @@ Performing installation.	InstallProgress		执行安装。
 scanning…	InstallerWindow		扫描...
 Set up boot menu	InstallerWindow		设置引导菜单
 2.1) GRUB (since os-prober v1.44)\n	InstallerApp		2.1) GRUB ( os-prober v1.44 以上版本)\n
-The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		首个逻辑分区的编号总是 \"4\"，
+The first logical partition always has the number \"4\", regardless of the number of primary partitions.\n\n	InstallerApp		不管主分区的编号，首个逻辑分区的编号总是 \"4\"。\n\n
 GRUB's naming scheme is still: (hdN,n)\n\n	InstallerApp		GRUB 的命名策略仍然是：(hdN,n)\n\n
-\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <偏好文本编辑器> /boot/grub/menu.lst\n\n 
+\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n	InstallerApp		\tsudo <偏好文本编辑器> /boot/grub/menu.lst\n\n
 Abort	InstallerWindow		取消
 Finishing Installation.	InstallProgress		完成安装。
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <偏好文本编辑器> /etc/default/grub\n\n
@@ -54,7 +54,7 @@ Scanning for disks…	InstallerWindow		扫描磁盘...
 The disk can't be mounted. Please choose a different disk.	InstallProgress		磁盘无法挂载。请选择其他磁盘。
 ?? of ??	InstallerWindow	Unknown progress	??来源于??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		启动磁盘管理器为\n可用硬盘和其他媒介进行分区。\n分区可以初始化为 Be 文件系统以作为 Haiku 引导分区。
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be initialized with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		启动磁盘管理器为和其他媒介进行分区。\n分区可以初始化为 Be 文件系统以作为 \n Haiku 引导分区。
 Show optional packages	InstallerWindow		显示附加软件包
 No partitions have been found that are suitable for installation. Please set up partitions and initialize at least one partition with the Be File System.	InstallerWindow		未发现可用于安装的分区。请设置分区，并至少将一个分区初始化为 Be 文件系统。
 Additionally you have to edit another file to actually display the boot menu:\n\n	InstallerApp		此外，您必须编辑其他文件以显示引导菜单：\n\n
@@ -62,7 +62,7 @@ Choose the disk you want to install onto from the pop-up menu. Then click \"Begi
 Unknown Type	InstallProgress	Partition content type	未知类型
 <none>	InstallerWindow	No partition available	<无>
 \t\tset root=(hd0,7)\n	InstallerApp		\t\t set root=(hd0,7)\n
-You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		您将会注意到，GRUB 使用了不同于 Linux 的硬盘命名方式。
+You'll note that GRUB uses a different naming strategy for hard drives than Linux.\n\n	InstallerApp		您将会注意到，GRUB 使用了不同于 Linux 的硬盘命名方式。\n\n
 \"n\" is the partition number, also starting with \"0\".\n	InstallerApp		\"n\" 是分区编号，也从 \"0\" 开始。\n
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		安装完成.引导扇区已经写入 '%s'.按下重启系统按钮重启计算机或者选择新目标卷执行安装.
 Installation canceled.	InstallProgress		安装已取消。
@@ -89,12 +89,12 @@ Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerAp
 OK	InstallProgress		确定
 Please choose target	InstallerWindow		请选择目标
 ???	InstallerWindow	Unknown partition name	???
-1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1）如果您将安装 Haiku 到真实硬件（而不是虚拟机），强烈建议您预备一个硬盘分区。系统安装器和磁盘管理器将初始化已有分区为 Haiku 原生文件系统，但是修改实际分区布局的选项还未在各种配置的计算机上进行大规模的测试，因此我们建议您不要使用它。
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2）系统安装器能够实现 Haiku 分区的启动，但是并不能够将 Haiku 集成到已有的引导菜单。如果您安装了 GRUB，您可以添加 Haiku 到其引导菜单。对于不同的 GRUB 版本，所要执行的操作将不尽相同。
+1)   If you are installing Haiku onto real hardware (not inside an emulator) it is recommended that you have already prepared a hard disk partition. The Installer and the DriveSetup tool offer to initialize existing partitions with the Haiku native file system, but the options to change the actual partition layout may not have been tested on a sufficiently great variety of computer configurations so we do not recommend using it.\n	InstallerApp		1）  如果您将安装 Haiku 到真实硬件（而不是虚拟机），强烈建议您预备一个硬盘分区。系统安装器和磁盘管理器将初始化已有分区为 Haiku 原生文件系统，但是修改实际分区布局的选项还未在各种配置的计算机上进行大规模的测试，因此我们建议您不要使用它。\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to its boot menu. Depending on what version of GRUB you use, this is done differently.\n\n\n	InstallerApp		2）  系统安装器能够实现 Haiku 分区的启动，但是并不能够将 Haiku 集成到已有的引导菜单。如果您安装了 GRUB，您可以添加 Haiku 到其引导菜单。对于不同的 GRUB 版本，所要执行的操作将不尽相同。\n\n\n
 Begin	InstallerWindow		开始
 Finally, you have to update the boot menu by entering:\n\n	InstallerApp		最后，您需要更新引导菜单，请输入：\n\n
-If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		如果您没有创建分区，仅需要重启，使用您感觉友好的工具创建分区，然后重启进入 Haiku 以继续执行安装。例如，您可以使用 GParted Live-CD，它也可以调整已有分区大小以腾出空间。
-With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		对于 GRUB2 ，首个逻辑分区编号总是 \"5\"，它和其他主分区编号没有任何关系。
+If you have not created a partition yet, simply reboot, create the partition using whatever tool you feel most comfortable with, and reboot into Haiku to continue with the installation. You could for example use the GParted Live-CD, it can also resize existing partitions to make room.\n\n\n	InstallerApp		如果您没有创建分区，仅需要重启，使用您感觉友好的工具创建分区，然后重启进入 Haiku 以继续执行安装。例如，您可以使用 GParted Live-CD，它也可以调整已有分区大小以腾出空间。\n\n\n
+With GRUB 2 the first logical partition always has the number \"5\", regardless of the number of primary partitions.\n\n	InstallerApp		对于 GRUB2 ，首个逻辑分区编号总是 \"5\"，它和其他主分区编号没有任何关系。\n\n
 Write boot sector	InstallerWindow		写入引导扇区
 Cancel	InstallerWindow		取消
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		磁盘管理器可用于配置磁盘分区，当前其无法启动。
@@ -102,18 +102,18 @@ No optional packages available.	PackagesView		无可用附加软件包。
 All hard disks start with \"hd\".\n	InstallerApp		所有硬盘的起始字符为：\"hd\"。\n
 Continue	InstallerApp		继续
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		引导管理器，用于配置 Haiku 引导菜单，无法启动。
-Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		从终端中启动偏好的编辑器，配置您的 /boot/grub/menu.lst，如下：
+Configure your /boot/grub/menu.lst by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		从终端中启动偏好的编辑器，配置您的 /boot/grub/menu.lst，如下：\n\n
 Boot sector not written because of an internal error.	InstallProgress		由于内部错误，引导扇区未写入。
 Additional disk space required: %s	InstallerWindow		需要额外磁盘空间：%s
-NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		备注：由于硬盘的命名策略仍然如 2.1) 所述，因此分区的方案已经发生了改变。
+NOTE: While the naming strategy for hard disks is still as described under 2.1) the naming scheme for partitions has changed.\n\n	InstallerApp		备注：由于硬盘的命名策略仍然如 2.1) 所述，因此分区的方案已经发生了改变。\n\n
 Cancel	InstallProgress		取消
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		引导管理器和磁盘管理器运行中...\n请关闭这两个程序以继续安装。
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		引导管理器和磁盘管理器运行中...\n\n请关闭这两个程序以继续安装。
 Try installing anyway	InstallProgress		尝试继续安装
-So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		所以，在不需要编辑的头部下面，添加类似于以下行的内容：
+So below the heading that must not be edited, add something similar to these lines:\n\n	InstallerApp		所以，在不需要编辑的头部下面，添加类似于以下行的内容：\n\n
 Are you sure you want to to stop the installation?	InstallerWindow		您是否确定终止安装过程？
 Onto:	InstallerWindow		安装到：
 Please close the Boot Manager window before closing the Installer window.	InstallerWindow		在关闭系统安装器之前请关闭引导管理器。
-3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) 在首次成功启动 Haiku 之后，您需要阅读 \"欢迎使用\" 和 \"用户指南\" 等文档。在桌面和 WebPositive 的书签栏内都有它们的链接。\n\n
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"Welcome\" and \"Userguide\" documentation. There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)  在首次成功启动 Haiku 之后，您需要阅读 \"欢迎使用\" 和 \"用户指南\" 等文档。在桌面和 WebPositive 书签栏内都有相应链接。\n\n
 Tools	InstallerWindow		工具
 The mount point could not be retrieved.	InstallProgress		挂载点无法恢复。
 The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		目标卷不为空。您确定必须进行安装吗？\n\n注意：从源卷拷贝的 'system' 文件夹为空，所有其他的文件夹将被合并，反之，源卷和目标卷中的所有文件和链接将会被源卷版本所覆盖。

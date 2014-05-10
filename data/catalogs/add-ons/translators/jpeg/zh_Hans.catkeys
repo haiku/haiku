@@ -1,7 +1,7 @@
 1	english	x-vnd.Haiku-JPEGTranslator	965709535
 Output quality	JPEGTranslator		输出质量
 JPEG images	JPEGTranslator		JPEG 图像
-Prevent colors 'washing out'	JPEGTranslator		阻止颜色 'washing out'
+Prevent colors 'washing out'	JPEGTranslator		防止颜色 '消退'
 JPEG Library Error: %s\n	be_jerror		JPEG 二进制错误：%s\n
 Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		启用 0 CMYK编码用于 100% 墨水覆盖
 About	JPEGTranslator		关于

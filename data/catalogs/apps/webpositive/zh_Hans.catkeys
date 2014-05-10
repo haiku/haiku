@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-WebPositive	2633177086
+1	english	x-vnd.Haiku-WebPositive	951661576
 Show home button	Settings Window		显示 home 按钮
 Username:	Authentication Panel		用户名：
 Copy URL to clipboard	Download Window		复制 URL 到剪贴板
@@ -16,6 +16,7 @@ Start page:	Settings Window		开始页面：
 History	WebPositive Window		历史
 Error opening downloads folder	Download Window		打开下载目录出错
 Paste	WebPositive Window		粘贴
+Double-click or middle-click to open new tab.	Tab Manager		双击或者单击中键以打开新标签。
 Proxy username:	Settings Window		代理服务器 用户名：
 Settings	Settings Window		设置
 %seconds seconds left	Download Window		剩余 %seconds 秒
@@ -24,6 +25,7 @@ Window	WebPositive Window		窗口
 Decrease size	WebPositive Window		缩小
 Serif font:	Settings Window		衬线字体：
 Loading %url	WebPositive Window		载入 %url
+Download aborted	Download Window		下载已取消
 Page source	WebPositive Window		查看网页源码
 Next	WebPositive Window		下一页
 Find next	WebPositive Window		查找下一个
@@ -42,6 +44,7 @@ Quit	WebPositive Window		退出
 Full screen	WebPositive Window		全屏
 Open download error	Download Window		打开下载出错
 Standard font:	Settings Window		标准字体：
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	查找前一个搜索项
 Restart	Download Window		重新下载
 Proxy server	Settings Window		代理服务器
 Open containing folder	Download Window		打开文件目录
@@ -83,14 +86,17 @@ Open blank page	Settings Window		打开空白页
 New tabs:	Settings Window		新建标签页：
 Cancel	WebPositive Window		取消
 Open all	WebPositive Window		打开所有
+Hide bookmark bar	WebPositive Window		隐藏书签栏
 Proxy server requires authentication	Settings Window		代理服务器需要认证
 Clear	URL Bar		清除
 Cut	URL Bar		剪切
 Clear	WebPositive Window		清除
+Script console	Console Window		脚本控制台
 Remove	Download Window		删除
 Find	WebPositive Window		查找
 Find previous	WebPositive Window		查找上一个
 Settings	WebPositive Window		设置
+Script console	WebPositive Window		脚本控制台
 Proxy server address:	Settings Window		代理服务器地址：
 Proxy server port:	Settings Window		代理服务器端口：
 Bookmarks	WebPositive Window		书签
@@ -104,6 +110,7 @@ Open start page	Settings Window		打开开始页面
 Continue downloads	WebPositive		继续下载
 Cancel	Download Window		取消
 Open search page	Settings Window		打开搜索页面
+Clear	Console Window		清除
 Password:	Authentication Panel		密码：
 Back	WebPositive Window		后退
 New browser window	Download Window		新建浏览窗口
@@ -132,6 +139,8 @@ Clone current page	Settings Window		复制当前页面
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	确认全部打开 %addedCount 个书签页 
 OK	Authentication Panel		确定
 Copy	URL Bar		复制
+Download finished	Download Window		下载完成
+Show bookmark bar	WebPositive Window		显示书签栏
 OK	WebPositive Window		确定
 Manage bookmarks	WebPositive Window		管理书签
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	本页面的书签页（%bookmarkName）已经存在。

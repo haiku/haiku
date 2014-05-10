@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-PSRV	1761631281
+1	english	x-vnd.Be-PSRV	123334776
 Undefined	ConfigWindow		未定义
 Return the number of available transports	PrintServerApp Scripting		返回可用的传输协议脚本编号
 Return the number of available printers	PrintServerApp Scripting		返回可用打印机编号
@@ -9,6 +9,7 @@ Retrieve a specific printer	PrintServerApp Scripting		检索特定打印机
 Page %1 to %2	ConfigWindow		页面%1到%2
 Get name of the printer add-on used for this printer	Printer Scripting		获取该打印机的附加名
 Page setup:	ConfigWindow		页面设置:
+B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		确定
 Cancel	ConfigWindow		取消
 Printer server	ConfigWindow		打印机组件
@@ -20,7 +21,7 @@ Would you like to set one up now?	PrintServerApp		是否进行设置?
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		类型
 All pages	ConfigWindow		所有页面
-There is no default printer set up.	PrintServerApp		打印机默认设置不存在.
+There is no default printer set up.	PrintServerApp		未设置默认打印机。
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	信纸

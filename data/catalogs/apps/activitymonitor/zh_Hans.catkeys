@@ -1,15 +1,17 @@
-1	english	x-vnd.Haiku-ActivityMonitor	234995750
+1	english	x-vnd.Haiku-ActivityMonitor	1211510241
 P-faults	DataSource		页面错误
 Media nodes	DataSource		媒介节点
 Threads	DataSource		线程
+Always on top	ActivityWindow		始终置顶
 Add graph	ActivityWindow		添加图示
 Teams	DataSource		团队
 Hide legend	ActivityView		隐藏说明
+MiB	DataSource		MiB
 Network send	DataSource		网络发送
 CPU usage (combined)	DataSource		CPU 使用率（总和）
 CPU	DataSource		CPU
 Used memory	DataSource		已用内存
-Cached memory	DataSource		缓存内存
+Cached memory	DataSource		高速缓存
 Apps	DataSource		应用程序
 Show legend	ActivityView		显示说明
 Text clipboard	DataSource		文本剪贴板
@@ -25,12 +27,14 @@ Update time interval:	SettingsWindow		更新频率：
 TX	DataSource	Shorter version for Sending	TX
 Quit	ActivityWindow		退出
 Block cache memory	DataSource		高速缓存
+%.1f KiB/s	DataSource		%.1f KiB/s
 Remove graph	ActivityView		删除图示
 %lld sec.	SettingsWindow		%lld sec.
 %lld ms	SettingsWindow		%lld ms
 CPU usage	DataSource		CPU使用率
 Raw clipboard	DataSource		原始剪贴板
 Sems	DataSource		Sems
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		系统监视器
 Running applications	DataSource		运行程序
 Semaphores	DataSource		信号量

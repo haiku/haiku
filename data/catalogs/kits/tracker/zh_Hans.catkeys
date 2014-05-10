@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	484583014
+1	english	x-vnd.Haiku-libtracker	2212190051
 OK	WidgetAttributeText		确定
 Icon view	VolumeWindow		图标视图
 Add-ons	FilePanelPriv		附加组件
@@ -73,6 +73,7 @@ Arrange by	ContainerWindow		排序方式
 Mount server error	AutoMounterSettings		挂载服务错误
 Search	FindPanel		搜索
 Preparing to empty Trash…	StatusWindow		准备清空垃圾箱...
+You cannot put the selected item(s) into the trash.	FSUtils		您不能够将所选项放入垃圾箱。
 Disks	Model		磁盘
 Create link	ContainerWindow		创造链接
 Decrease size	DeskWindow		缩小尺寸
@@ -99,6 +100,7 @@ New folder	FilePanelPriv		新建文件夹
 %name info	InfoWindow	InfoWindow Title	%name 信息
 Favorites	FavoritesMenu		选择
 Add-ons	VolumeWindow		附加组件
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" 是不支持的可执行文件。
 Sorry, you can't copy items to the Trash.	PoseView		对不起，您无法复制项目至垃圾箱。
 List view	VolumeWindow		列表视图
 matches wildcard expression	SelectionWindow		匹配通配符表达式
@@ -140,6 +142,7 @@ Add-ons	ContainerWindow		附加组件
 Edit templates…	TemplatesMenu		编辑模版...
 Finish: %time - Over %finishtime left	StatusWindow		完成：%time - 剩余 %finishtime
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		该文件夹中已经存在命名为 \"%name\" 的项目，您希望将其替换为正在创建的符号链接吗？
+Fewer options	FindPanel		简单选项
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		对不起，目标卷中没有足够的空间以复制选取对象。
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		无法使用 \"%app\" 应用程序打开 \"%document\"（%error)）。
 Sorry, saving more than one item is not allowed.	FilePanelPriv		对不起，不允许保存多个项目。
@@ -228,10 +231,11 @@ Capacity:	InfoWindow		容量：
 Delete	FilePanelPriv		删除
 Save	FindPanel		保存
 copy	FSUtils	filename copy	复制
-Temporary	FindPanel		暂时
+Temporary	FindPanel		临时文件
 Version	OpenWithWindow		版本
 Default application	InfoWindow		默认程序
 Preparing to copy items…	StatusWindow		准备复制项目...
+Save query as template…	FindPanel		保存查询为模板…
 Show folder location in title tab	SettingsView		在标签标题显示目录位置
 Proceed	FSUtils		执行
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		目录中已经存在与您将 %verb 的项目同名的内容。\n\n您希望将其替换为您正在 %verb 的项目并将其应用于所有内容吗？
@@ -326,9 +330,10 @@ Copy here	ContainerWindow		复制到此
 Move to Trash	FilePanelPriv		移动到垃圾箱
 Current folder	ContainerWindow		当前目录
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定名称已经作为目录名使用。请选择其他命名。
-Clean up	ContainerWindow		清除
+Clean up	ContainerWindow		刷新
 after	FindPanel		之后
 Select…	QueryContainerWindow		选择...
+More options	FindPanel		更多选项
 link	FSUtils	filename link	链接
 At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		在 %func \nfind_directory()失败。\n原因：%error
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定名称非法。请选择其他命名。
@@ -404,6 +409,7 @@ Paste layout	ContainerWindow		粘贴布局
 Select	InfoWindow		选择
 Could not update permissions of file \"%name\". %error	FSUtils		无法更新 \"%name\" 的文件权限。错误：%error
 Select…	FilePanelPriv		选择...
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" 为遗留可执行文件。请获取更新版本或者重新编译应用。
 There was an error resolving the link.	Tracker		恢复链接出错。
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		您无法移动或复制垃圾箱。
@@ -441,6 +447,7 @@ contains	FindPanel		包含
 Relation	OpenWithWindow		联系
 Open	FilePanelPriv		打开
 Mount	DeskWindow		挂载
+Recent queries	FindPanel		最近查询
 Mount	ContainerWindow		挂载
 %capacity (%used used -- %free free)	InfoWindow		%capacity（已用 %used -- 空闲 %free）
 Cancel	FSClipBoard		取消

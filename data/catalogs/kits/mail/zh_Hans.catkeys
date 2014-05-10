@@ -1,7 +1,8 @@
-1	english	x-vnd.Haiku-libmail	161731481
+1	english	x-vnd.Haiku-libmail	4037525365
 Partially download messages larger than	ProtocolConfigView		下载邮件尺寸大于
 Password:	ProtocolConfigView		密码:
 Remove mail from server when deleted	ProtocolConfigView		删除时从服务器同步移除邮件
+KiB	ProtocolConfigView		KiB
 Mail server:	ProtocolConfigView		邮件服务器:
 Select…	MailKit		选择...
 Connection type:	ProtocolConfigView		连接类型:

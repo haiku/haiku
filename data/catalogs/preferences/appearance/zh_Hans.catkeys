@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	76206318
+1	english	x-vnd.Haiku-Appearance	727801787
 Plain font:	Font view		常规字体
 Control highlight	Colors tab		控件亮度
 Control border	Colors tab		控件边界
@@ -9,12 +9,14 @@ Defaults	APRWindow		默认
 Grayscale	AntialiasingSettingsView		灰度
 Shine	Colors tab		亮度
 About	DecorSettingsView		关于
+About decorator	DecorSettingsView		关于主题
 Off	AntialiasingSettingsView		关闭
 Choose Decorator	DecorSettingsView		选择装饰
 Success	Colors tab		成功
 Inactive window tab text	Colors tab		激活窗口标签
 Failure	Colors tab		失败
 Hinting menu	AntialiasingSettingsView		提示菜单
+Scroll bar:	DecorSettingsView		滚动栏：
 Document background	Colors tab		文档背景
 Revert	APRWindow		取消
 Window tab	Colors tab		窗口选项
@@ -34,6 +36,7 @@ List background	Colors tab		列表背景
 OK	DecorSettingsView		确定
 Control mark	Colors tab		控件标记
 Size:	Font Selection view		大小：
+Decorator:	DecorSettingsView		主题：
 Selected list item background	Colors tab		选中列表项背景
 Panel background	Colors tab		面板背景
 Menu font:	Font view		菜单字体:
@@ -44,8 +47,10 @@ List item text	Colors tab		列表项文本
 Appearance	System name		外观
 Fixed font:	Font view		等宽字体
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	迅捷的棕毛小狐狸越过了懒惰的大黄狗。
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\n作者：\n\t%decorAuthors\n\n网址：%decorURL\n协议：%decorLic\n\n%decorDesc\n
 Reduce colored edges filter strength:	AntialiasingSettingsView		减小彩色边缘滤色强度:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		为了避免可能的版权争端，基于抗锯齿技术的“象形文字亚像素精度”显示在当前编译的 Haiku 中尚不可用。为了使用该特性，你必须自己进行 Haiku 的编译，并且只需在 libfreetype 设置头文件中使用相关的选项即可。
+Scroll bar thumb	Colors tab		滚动条缩略图
 Control text	Colors tab		控件文本
 Single:	DecorSettingsView		单行：
 Tooltip text	Colors tab		提示文本

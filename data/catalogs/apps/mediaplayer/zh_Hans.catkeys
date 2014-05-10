@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	1276112823
+1	english	x-vnd.Haiku-MediaPlayer	1727923642
 raw audio	MediaPlayer-InfoWin		原生音频
 Location	MediaPlayer-InfoWin		位置
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
@@ -21,10 +21,12 @@ Close	MediaPlayer-Main		关闭
 Display Mode	MediaPlayer-InfoWin		显示模式
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		有些文件无法被移动到垃圾箱。
 <unknown>	MediaPlayer-InfoWin		<未知>
+Seek	MediaPlayer-Main		搜索
 Open	MediaPlayer-Main		打开
 Next	MediaPlayer-Main		下一个
 OK	MediaPlayer-SettingsWindow		确定
 Track %d	MediaPlayer-Main		轨道 %d 
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		获取/设置当前播放位置（毫秒）。
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1（宽屏）
 Display mode	MediaPlayer-InfoWin		显示模式
 Medium	MediaPlayer-SettingsWindow		中等
@@ -69,6 +71,7 @@ Select all	MediaPlayer-PlaylistWindow		全选
 Move Entry	MediaPlayer-MovePLItemsCmd		移动条目
 Open	MediaPlayer-PlaylistWindow		打开
 Stop playing.	MediaPlayer-Main		停止播放。
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		根据指定毫秒数搜索
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		无法打开文件 '%filename' 。\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		错误： 
 Audio	MediaPlayer-InfoWin		音频
@@ -100,6 +103,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		无法移
 <untitled>	PlaylistItem-title		<无标题>
 Track	Audio Track Menu		轨道
 unknown format	MediaPlayer-InfoWin		未知格式
+Position	MediaPlayer-Main		位置
 <nothing to redo>	MediaPlayer-PlaylistWindow		<无重复内容>
 Skip to the next track.	MediaPlayer-Main		跳到下一个轨道
 Play	MediaPlayer-Main		播放
@@ -134,7 +138,8 @@ Revert	MediaPlayer-SettingsWindow		恢复
 Edit	MediaPlayer-PlaylistWindow		编辑
 Start media server	MediaPlayer-Main		启动媒体服务器
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
-Toggle fullscreen.	MediaPlayer-Main		全平切换。
+Toggle fullscreen.	MediaPlayer-Main		切换全屏。
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		获取当前播放项目间隔（毫秒单位）。
 ToggleFullscreen	MediaPlayer-Main		全屏切换。
 <unnamed>	PlaylistItem-name		<未命名>
 Open Clips	MediaPlayer-Main		打开片段

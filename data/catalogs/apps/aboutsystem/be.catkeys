@@ -1,7 +1,6 @@
-1	belarusian	x-vnd.Haiku-About	86924748
+1	belarusian	x-vnd.Haiku-About	2441795911
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Аўтарскае права © 1999-2010 by the authors of Gutenprint. Правы захаваныя.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (асабіста за ядро NewOS)\n
-BSD (4-clause)	AboutView		BSD (4 часткі)
 %ld Processors:	AboutView		%ld Працэсараў:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Аўтарскае права © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Аўтарскае права © 1996-2005 Julian R Seward. Правы захаваныя.
@@ -11,9 +10,7 @@ The Haiku-Ports team\n	AboutView		Каманда Haiku-Ports\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Аўтарскае права © 1998-2003 Daniel Veillard. Правы захаваныя.
 %d MiB used (%d%%)	AboutView		%d MiB выкарыстана (%d%%)
 Website, marketing & documentation:\n	AboutView		Web-сайт, маркетынг і дакументацыя:\n
-GNU LGPL v2.1	AboutView		GNU LGPL версія 2.1
 AboutSystem	System name		Пра Сістэму
-MIT (no promotion)	AboutView		MIT (без рэкламы)
 Copyright © 2003 Peter Hanappe and others.	AboutView		Аўтарскае права © 2003 Peter Hanappe і іншыя.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Аўтарскае права © 1994-1997 Mark Kilgard. Правы захаваныя.
 Revision	AboutView		Рэвізія
@@ -23,7 +20,6 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Аўтарск�
 Source Code: 	AboutView		Зыходны код: 
 Processor:	AboutView		Працэсар:
 Kernel:	AboutView		Ядро:
-BSD (3-clause)	AboutView		BSD (3 часткі)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Аўтарскае права © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. Правы захаваныя.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Аўтарскае права на часткі гэтага праграмнага забяспячэння\n© 1996-2006 The FreeType Project. Правы захаваныя.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Аўтарскія правы на зыходны код Haiku належаць Haiku, Inc. ці суадносным аўтарам якія пазначаны ў зыходных тэкстах. Haiku® і HAIKU logo® з´яўляюцца зарэгістраванымі гандлёвымі знакамі Haiku, Inc.\n\n
@@ -59,7 +55,6 @@ The Haikuware team and their bounty program\n	AboutView		Каманда Haikuwar
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Аўтарскае права © 1995, 1998-2001 Jef Poskanzer. Правы захаваныя.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Аўтарскае права © 2010-2011 Google Inc. Правы захаваныя.
 About this system	AboutWindow		Інфармацыя пра сістэму
-BSD (2-clause)	AboutView		BSD (2 часткі)
 Version:	AboutView		Версія:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Аўтарскае права © 1994-2008 Xiph.Org. Правы захаваныя.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Аўтарскае права © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.

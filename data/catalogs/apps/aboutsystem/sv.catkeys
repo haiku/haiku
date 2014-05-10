@@ -1,7 +1,6 @@
-1	swedish	x-vnd.Haiku-About	86924748
+1	swedish	x-vnd.Haiku-About	2441795911
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Upphovsrätt © 1999-2010 skaparna av Gutenprint. Med ensamrätt.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (och hans NewOS-kärna)\n
-BSD (4-clause)	AboutView		BSD (4-klausul)
 %ld Processors:	AboutView		%ld Processorer:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Upphovsrätt © 2000 Jean-Pierre erbefeL och Remi Lefebvre. Med ensamrätt.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Upphovsrätt © 1996-2005 Julian R Seward. Med ensamrätt.
@@ -11,9 +10,7 @@ The Haiku-Ports team\n	AboutView		Haiku Ports-teamet\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Upphovsrätt © 1998-2003 Daniel Veillard. Med ensamrätt.
 %d MiB used (%d%%)	AboutView		%d MiB använt (%d%%)
 Website, marketing & documentation:\n	AboutView		Webbplats, marknadsföring och dokumentation:\n
-GNU LGPL v2.1	AboutView		GNU LGPL v2.1
 AboutSystem	System name		OmHaiku
-MIT (no promotion)	AboutView		MIT (no promotion)
 Copyright © 2003 Peter Hanappe and others.	AboutView		Upphovsrätt © 2003 Peter Hanappe och andra.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Upphovsrätt © 1994-1997 Mark Kilard. Med ensamrätt.
 Revision	AboutView		Utgåva
@@ -23,7 +20,6 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Upphovsrätt ©
 Source Code: 	AboutView		Källkod: 
 Processor:	AboutView		Processor:
 Kernel:	AboutView		Kärna:
-BSD (3-clause)	AboutView		BSD (3-klausul)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Upphovsrätt © 2001-2002 Thomas Broyer, Charlie Bozeman och Daniel Veillard. Med ensamrätt.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		Delar av systemet är under upphovsrätt \nUpphovsrätt © 1996-2006 The FreeType Project. Med ensamrätt.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Upphovsrätten till Haiku's källkod en egendom tillhörande Haiku, Inc. eller respektive upphovsman, där det uttryckligen är angivet i källkoden. Haiku® och Haiku's logo® är registrerade varumärken tillhörande Haiku, Inc.\n\n
@@ -59,7 +55,6 @@ The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och de
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Upphovsrätt © 1995, 1998-2001 Jef Poskanzer. Med ensamrätt.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Upphovsrätt © 2010-2011 Google Inc. Med ensamrätt.
 About this system	AboutWindow		Om Haiku
-BSD (2-clause)	AboutView		BSD (2-klausul)
 Version:	AboutView		Version:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Upphovsrätt © 1994-2008 Xiph.Org. Med ensamrätt.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Upphovsrätt © 1998-2000 Thai Open Source Software Center Ltd och Clark Cooper.

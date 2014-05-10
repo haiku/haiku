@@ -1,7 +1,6 @@
-1	hungarian	x-vnd.Haiku-About	86924748
+1	hungarian	x-vnd.Haiku-About	2441795911
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 a Gutenprint szerzőitől. Minden jog fenntartva.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrechtnek (NewOS kernel)\n
-BSD (4-clause)	AboutView		BSD (4-klauzulás)
 %ld Processors:	AboutView		%ld Processzor:
 Copyright © 2000 Jean-Pierre ervbefeL and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre ervbefeL és Remi Lefebvre.
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Minden jog fenntartva.
@@ -11,9 +10,7 @@ The Haiku-Ports team\n	AboutView		A Haiku-Ports csapatának\n
 Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. Minden jog fenntartva.
 %d MiB used (%d%%)	AboutView		%d MiB használt (%d%%)
 Website, marketing & documentation:\n	AboutView		Weboldal, marketing és dokumentáció:\n
-GNU LGPL v2.1	AboutView		GNU LGPL v2.1
 AboutSystem	System name		Névjegy
-MIT (no promotion)	AboutView		MIT (promóciómentes)
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe és mások.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Minden jog fenntartva.
 Revision	AboutView		Kiadás
@@ -23,7 +20,6 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright© 199
 Source Code: 	AboutView		Forráskód: 
 Processor:	AboutView		Processzor:
 Kernel:	AboutView		Kernel:
-BSD (3-clause)	AboutView		BSD (3-klauzulás)
 Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman és Daniel Veillard. Minden jog fenntartva.
 Portions of this software are under copyright.\nCopyright © 1996-2006 The FreeType Project. All rights reserved.	AboutView		E szoftver része szerzői jog által védettek.\nSzerzői jog © 1996-2006 The FreeType Project. Minden jog fenntartva.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		A Haiku kódjának szerzői jogai a Haiku, Inc.-et vagy, ha nevük a forráskódban külön ki van emelve, a kód egyes íróit illetik. A Haiku® és a HAIKU logo® a Haiku, Inc. bejegyzett védjegye.\n\n
@@ -59,7 +55,6 @@ The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Minden jog fenntartva.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Minden jog fenntartva.
 About this system	AboutWindow		Haiku névjegye
-BSD (2-clause)	AboutView		BSD (2-klauzulás)
 Version:	AboutView		Verzió:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Minden jog fenntartva.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd és Clark Cooper.

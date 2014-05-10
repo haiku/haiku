@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ShowImage	4011843330
+1	english	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		设置为桌面背景…
 File	Menus		文件
 Slide delay	Menus		幻灯片延迟
@@ -53,6 +53,7 @@ Select all	Menus		全选
 Zoom factor in %:	PrintOptionsWindow		缩放比例 %：
 Width:	PrintOptionsWindow		宽度：
 Image	Menus		图像
+Move to Trash	Menus		移动到垃圾箱
 OK	Alerts		确定
 Rotate clockwise	Menus		顺时针旋转
 Job setup	PrintOptionsWindow		安装
