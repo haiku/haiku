@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src libs print libgutenprint ;
-
-SubInclude HAIKU_TOP src libs print libgutenprint src ;

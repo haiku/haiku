@@ -210,7 +210,7 @@ if [ IsPackageAvailable gutenprint_devel ] {
 			runtime: lib
 		file: devel gutenprint_devel
 			depends: base
-			library: $(developLibDir)/libgutenprint.a
+			library: $(developLibDir)/libgutenprint.so
 			headers: $(developHeadersDir) $(developHeadersDir)/gutenprint
 		;
 
