@@ -51,8 +51,8 @@ RemotePackageRepository HaikuPorts
 	git_email-1.8.3.4-2
 	git_remote_helpers-1.8.3.4-2
 	git_svn-1.8.3.4-2
-	glu-9.0.0-2
-	glu_devel-9.0.0-2
+	glu-9.0.0-3
+	glu_devel-9.0.0-3
 	gperf-3.0.4-1
 	grep-2.14-5
 	groff-1.20.1-3
