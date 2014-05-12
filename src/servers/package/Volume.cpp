@@ -162,12 +162,12 @@ Volume::Volume(BLooper* looper)
 Volume::~Volume()
 {
 	Unmounted();
-		// need for error case in InitPackages()
+		// needed for error case in InitPackages()
+
+	_SetLatestState(NULL, true);
 
 	delete[] fPackagesDirectories;
 	delete fPackageFileManager;
-
-	_SetLatestState(NULL, true);
 }
 
 
