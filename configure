@@ -71,9 +71,8 @@ options:
                               patched sources. This is preferable when
                               distributing on physical mediums.
   --include-3rdparty          Include 3rdparty/ in the build system.
-  -j<n>                       Only relevant for --build-cross-tools and
-                              --build-cross-tools-gcc4. Is passed on to the
-                              make building the build tools.
+  -j<n>                       Only relevant for --build-cross-tools. Is passed
+                              on to the make building the build tools.
   --no-downloads              Do not download anything. Useful when trying to
                               bootstrap and build Haiku from source only.
   --remote-user <username>    Use given username when logging into
