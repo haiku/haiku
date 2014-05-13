@@ -155,6 +155,9 @@ IFS::IFS(BRect bounds)
 	fAdditive(false),
 	fCurrentMarkValue(1)
 {
+	if (!bounds.IsValid())
+		return;
+	
 	ya_rand_init(system_time());
 
 	int         i;
