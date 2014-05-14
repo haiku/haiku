@@ -153,9 +153,18 @@ IFSSaver::StartSaver(BView* view, bool preview)
 	SetTickSize((bigtime_t)floor(1000000.0 / fps + 0.5));
 
 	fIsPreview = preview;
+
+	if (view == NULL)
+		return B_BAD_VALUE;
+
 	fBounds = view->Bounds();
+	if (!fBounds.IsValid())
+		return B_BAD_VALUE;
 
 	_Init(fBounds);
+	if (fIFS == NULL)
+		return B_ERROR;
+
 	fIFS->SetAdditive(fIsPreview || fAdditive);
 	fIFS->SetSpeed(fSpeed);
 
