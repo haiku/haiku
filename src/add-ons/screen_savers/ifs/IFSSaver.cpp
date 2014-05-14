@@ -229,11 +229,12 @@ status_t
 IFSSaver::SaveState(BMessage* into) const
 {
 	status_t ret = B_BAD_VALUE;
-	if (into) {
+	if (into != NULL) {
 		ret = into->AddBool("IFS additive", fAdditive);
 		if (ret >= B_OK)
 			ret = into->AddInt32("IFS speed", fSpeed);
 	}
+
 	return ret;
 }
 
