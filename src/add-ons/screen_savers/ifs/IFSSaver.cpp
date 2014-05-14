@@ -150,7 +150,7 @@ IFSSaver::StartSaver(BView* view, bool preview)
 	float totalSize = mode.timing.h_total * mode.timing.v_total;
 	float fps = mode.timing.pixel_clock * 1000.0 / totalSize;
 
-	SetTickSize((int64)floor(1000000.0 / fps + 0.5));
+	SetTickSize((bigtime_t)floor(1000000.0 / fps + 0.5));
 
 	fIsPreview = preview;
 	fBounds = view->Bounds();
