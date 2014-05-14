@@ -67,9 +67,9 @@ IFSSaver::IFSSaver(BMessage* message, image_id id)
 
 IFSSaver::~IFSSaver()
 {
-	if (Looper() != NULL) {
+	if (Looper() != NULL)
 		Looper()->RemoveHandler(this);
-	}
+
 	_Cleanup();
 }
 
@@ -222,7 +222,6 @@ IFSSaver::Draw(BView* view, int32 frame)
 void
 IFSSaver::DirectDraw(int32 frame)
 {
-
 	if (frame == 0)
 		fLastDrawnFrame = -1;
 
