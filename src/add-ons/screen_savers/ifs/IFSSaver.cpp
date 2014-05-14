@@ -47,7 +47,7 @@ IFSSaver::IFSSaver(BMessage* message, image_id id)
 	BHandler("IFS Saver"),
 	fIFS(NULL),
 	fIsPreview(false),
-	fBounds(0.0, 0.0, -1.0, -1.0),
+	fBounds(0.0f, 0.0f, -1.0f, -1.0f),
 	fLastDrawnFrame(0),
 	fAdditive(false),
 	fSpeed(6)
@@ -78,8 +78,8 @@ void
 IFSSaver::StartConfig(BView* view)
 {
 	BRect bounds = view->Bounds();
-	bounds.InsetBy(10.0, 10.0);
-	BRect frame(0.0, 0.0, bounds.Width(), 20.0);
+	bounds.InsetBy(10.0f, 10.0f);
+	BRect frame(0.0f, 0.0f, bounds.Width(), 20.0f);
 
 	// the additive check box
 	fAdditiveCB = new BCheckBox(frame, "additive setting",
@@ -89,7 +89,7 @@ IFSSaver::StartConfig(BView* view)
 	fAdditiveCB->SetValue(fAdditive);
 
 	fAdditiveCB->ResizeToPreferred();
-	bounds.bottom -= fAdditiveCB->Bounds().Height() * 2.0;
+	bounds.bottom -= fAdditiveCB->Bounds().Height() * 2.0f;
 	fAdditiveCB->MoveTo(bounds.LeftBottom());
 
 	view->AddChild(fAdditiveCB);
@@ -104,7 +104,7 @@ IFSSaver::StartConfig(BView* view)
 	fSpeedS->SetHashMarkCount(12);
 
 	fSpeedS->ResizeToPreferred();
-	bounds.bottom -= fSpeedS->Bounds().Height() + 15.0;
+	bounds.bottom -= fSpeedS->Bounds().Height() + 15.0f;
 	fSpeedS->MoveTo(bounds.LeftBottom());
 
 	view->AddChild(fSpeedS);
@@ -148,7 +148,7 @@ IFSSaver::StartSaver(BView* view, bool preview)
 	BScreen screen(B_MAIN_SCREEN_ID);
 	screen.GetMode(&mode);
 	float totalSize = mode.timing.h_total * mode.timing.v_total;
-	float fps = mode.timing.pixel_clock * 1000.0 / totalSize;
+	float fps = mode.timing.pixel_clock * 1000.0f / totalSize;
 
 	SetTickSize((bigtime_t)floor(1000000.0 / fps + 0.5));
 
