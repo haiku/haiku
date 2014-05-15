@@ -96,6 +96,7 @@ BreakpointsView::MessageReceived(BMessage* message)
 			_HandleBreakpointAction(message->what);
 			break;
 
+		default:
 			BGroupView::MessageReceived(message);
 			break;
 	}
