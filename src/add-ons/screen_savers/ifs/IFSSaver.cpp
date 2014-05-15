@@ -226,7 +226,7 @@ IFSSaver::DirectDraw(int32 frame)
 		fLastDrawnFrame = -1;
 
 	int32 frames = frame - fLastDrawnFrame;
-	if (fDirectInfo.bits) {
+	if (fDirectInfo.bits != NULL) {
 		fIFS->Draw(NULL, &fDirectInfo, frames);
 		fLastDrawnFrame = frame;
 	}
@@ -252,7 +252,7 @@ IFSSaver::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgToggleAdditive:
-			if (fLocker.Lock() && fIFS) {
+			if (fLocker.Lock() && fIFS != NULL) {
 				fAdditive = fAdditiveCB->Value() == B_CONTROL_ON;
 				fIFS->SetAdditive(fAdditive || fIsPreview);
 				fLocker.Unlock();
@@ -260,7 +260,7 @@ IFSSaver::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgSetSpeed:
-			if (fLocker.Lock() && fIFS) {
+			if (fLocker.Lock() && fIFS != NULL) {
 				fSpeed = fSpeedS->Value();
 				fIFS->SetSpeed(fSpeed);
 				fLocker.Unlock();
