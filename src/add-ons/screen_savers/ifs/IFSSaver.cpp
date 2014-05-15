@@ -47,7 +47,6 @@ IFSSaver::IFSSaver(BMessage* message, image_id id)
 	BHandler("IFS Saver"),
 	fIFS(NULL),
 	fIsPreview(false),
-	fBounds(0.0f, 0.0f, -1.0f, -1.0f),
 	fLastDrawnFrame(0),
 	fAdditive(false),
 	fSpeed(6)
@@ -157,11 +156,7 @@ IFSSaver::StartSaver(BView* view, bool preview)
 	if (view == NULL)
 		return B_BAD_VALUE;
 
-	fBounds = view->Bounds();
-	if (!fBounds.IsValid())
-		return B_BAD_VALUE;
-
-	_Init(fBounds);
+	_Init(view->Bounds());
 	if (fIFS == NULL)
 		return B_ERROR;
 

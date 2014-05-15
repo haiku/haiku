@@ -38,7 +38,6 @@ private:
 			IFS*				fIFS;
 
 			bool				fIsPreview;
-			BRect				fBounds;
 
 			BLocker				fLocker;
 
