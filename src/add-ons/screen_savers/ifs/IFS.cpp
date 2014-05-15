@@ -429,6 +429,7 @@ IFS::_DrawFractal(BView* view, const buffer_info* info)
 		int32 minY = F->Height;
 		int32 maxX = 0;
 		int32 maxY = 0;
+
 		// Erase previous dots from bitmap,
 		// but only if we're not in BDirectWindow mode,
 		// since the dots will have been erased already
@@ -455,8 +456,9 @@ IFS::_DrawFractal(BView* view, const buffer_info* info)
 				}
 			}
 		}
+
 		// draw the new dots into the bitmap
-		if (fCurrentPoint) {
+		if (fCurrentPoint != 0) {
 			if (info != NULL) {
 				for (int32 i = 0; i <  fCurrentPoint; i++) {
 					Point p = F->buffer2[i];
@@ -475,7 +477,7 @@ IFS::_DrawFractal(BView* view, const buffer_info* info)
 				}
 			} else {
 				// in this version, remember the bounds rectangle
-				for (int32 i = 0; i <  fCurrentPoint; i++) {
+				for (int32 i = 0; i < fCurrentPoint; i++) {
 					Point p = F->buffer2[i];
 					if (p.x >= 0 && p.x < F->Width
 						&& p.y >= 0 && p.y < F->Height) {
@@ -491,10 +493,13 @@ IFS::_DrawFractal(BView* view, const buffer_info* info)
 
 						if (minX > p.x)
 							minX = p.x;
+
 						if (minY > p.y)
 							minY = p.y;
+
 						if (maxX < p.x)
 							maxX = p.x;
+
 						if (maxY < p.y)
 							maxY = p.y;
 					}
