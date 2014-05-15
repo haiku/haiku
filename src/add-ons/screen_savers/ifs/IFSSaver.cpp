@@ -220,9 +220,8 @@ IFSSaver::DirectDraw(int32 frame)
 	if (frame == 0)
 		fLastDrawnFrame = -1;
 
-	int32 frames = frame - fLastDrawnFrame;
-	if (fDirectInfo.bits != NULL) {
-		fIFS->Draw(NULL, &fDirectInfo, frames);
+	if (!fIsPreview && fDirectInfo.bits != NULL) {
+		fIFS->Draw(NULL, &fDirectInfo, frame - fLastDrawnFrame);
 		fLastDrawnFrame = frame;
 	}
 }
