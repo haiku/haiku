@@ -1041,10 +1041,8 @@ DwarfFile::_ParseTypesSection()
 			unitHeaderOffset, unitContentOffset,
 			unitLength + (unitLengthOffset - unitHeaderOffset),
 			abbrevOffset, typeOffset, addressSize, signature, dwarf64);
-		if (unit == NULL) {
-			delete unit;
+		if (unit == NULL)
 			return B_NO_MEMORY;
-		}
 
 		// parse the debug info for the unit
 		status_t error = _ParseTypeUnit(unit);
