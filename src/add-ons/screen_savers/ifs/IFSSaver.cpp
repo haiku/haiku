@@ -160,7 +160,7 @@ IFSSaver::StartSaver(BView* view, bool preview)
 	if (fIFS == NULL)
 		return B_ERROR;
 
-	fIFS->SetAdditive(fIsPreview || fAdditive);
+	fIFS->SetAdditive(fAdditive || fIsPreview);
 	fIFS->SetSpeed(fSpeed);
 
 	return B_OK;
