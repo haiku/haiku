@@ -2601,10 +2601,10 @@ TermView::_AddHighlight(Highlight* highlight)
 void
 TermView::_RemoveHighlight(Highlight* highlight)
 {
-	fHighlights.RemoveItem(highlight);
-
 	if (!highlight->IsEmpty())
 		_InvalidateTextRange(highlight->Start(), highlight->End());
+
+	fHighlights.RemoveItem(highlight);
 }
 
 
