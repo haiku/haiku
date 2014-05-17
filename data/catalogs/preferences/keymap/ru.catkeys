@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Keymap	3681814702
+1	russian	x-vnd.Haiku-Keymap	13775349
 Dvorak	Keyboard Layout View		Дворак
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Вернуть
@@ -7,8 +7,12 @@ Hungarian	Keyboard Layout View		Венгерская
 German	Keyboard Layout View		Немецкая
 Swiss-French	Keyboard Layout View		Франко-швейцарский
 Warning: left and right key roles do not match	Modifier keys window		Внимание: роль левой и правой клавиши не совпадают
+Belgian (comma)	Keyboard Layout View		Бельгийская (comma)
+Scroll lock	Keyboard Layout View		Scroll lock
 Belarusian (Mac)	Keyboard Layout View		Белорусская (латиница)
 Greek	Keyboard Layout View		Греческая
+Menu	Keyboard Layout View	Menu key	Меню
+US	Keyboard Layout View		США
 Left control	Keyboard Layout View		Левый control
 Spanish	Keyboard Layout View		Испанская
 Ukrainian (Mac)	Keyboard Layout View		Украинская (Mac)

@@ -21,7 +21,7 @@ Input channel destinations	AudioMixer		输入通道目标
 To master	AudioMixer		到主音量
 Master output	AudioMixer		主音量输出
 Setup	AudioMixer		配置
-Use non linear gain sliders (like BeOS R5)	AudioMixer		使用非线性增益滚动条( 类似 BeOS R5 )
+Use non linear gain sliders (like BeOS R5)	AudioMixer		使用非线性增益滚动条(类似 BeOS R5)
 Gain	AudioMixer		增益
 Allow output channel remapping	AudioMixer		启用输出频道重映射
 Physical input channels	AudioMixer		物理输入频道

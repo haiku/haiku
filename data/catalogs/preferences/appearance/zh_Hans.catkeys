@@ -1,5 +1,5 @@
 1	english	x-vnd.Haiku-Appearance	727801787
-Plain font:	Font view		常规字体
+Plain font:	Font view		常规字体：
 Control highlight	Colors tab		控件亮度
 Control border	Colors tab		控件边界
 Antialiasing type:	AntialiasingSettingsView		抗锯齿类型:
@@ -36,7 +36,7 @@ List background	Colors tab		列表背景
 OK	DecorSettingsView		确定
 Control mark	Colors tab		控件标记
 Size:	Font Selection view		大小：
-Decorator:	DecorSettingsView		主题：
+Decorator:	DecorSettingsView		主题库：
 Selected list item background	Colors tab		选中列表项背景
 Panel background	Colors tab		面板背景
 Menu font:	Font view		菜单字体:
@@ -45,7 +45,7 @@ Control background	Colors tab		控件背景
 Inactive window tab	Colors tab		活动窗口标签
 List item text	Colors tab		列表项文本
 Appearance	System name		外观
-Fixed font:	Font view		等宽字体
+Fixed font:	Font view		等宽字体：
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	迅捷的棕毛小狐狸越过了懒惰的大黄狗。
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\n作者：\n\t%decorAuthors\n\n网址：%decorURL\n协议：%decorLic\n\n%decorDesc\n
 Reduce colored edges filter strength:	AntialiasingSettingsView		减小彩色边缘滤色强度:
@@ -54,7 +54,7 @@ Scroll bar thumb	Colors tab		滚动条缩略图
 Control text	Colors tab		控件文本
 Single:	DecorSettingsView		单行：
 Tooltip text	Colors tab		提示文本
-Bold font:	Font view		粗体：
+Bold font:	Font view		加粗字体：
 Inactive window border	Colors tab		禁用窗口边框
 Menu item text	Colors tab		菜单项文本
 LCD subpixel	AntialiasingSettingsView		LCD 亚像素精度
@@ -63,7 +63,7 @@ Strong	AntialiasingSettingsView		强
 Panel text	Colors tab		面板文本
 Arrow style	DecorSettingsView		箭头样式
 Monospaced fonts only	AntialiasingSettingsView		仅等宽字体
-Look and feel	APRWindow		外观感觉
+Look and feel	APRWindow		外观
 Antialiasing menu	AntialiasingSettingsView		抗锯齿菜单
 Fonts	APRWindow		字体
 Glyph hinting:	AntialiasingSettingsView		象形文字微调：

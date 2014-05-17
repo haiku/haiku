@@ -1,15 +1,23 @@
-1	english	x-vnd.Haiku-Playground	673906124
+1	english	x-vnd.Haiku-Playground	1375574837
 Line	Playground		直线
 Fill	Playground		填充
 Over	Playground		覆盖
 Quit	Playground		退出
 Rect	Playground		矩形
+Select	Playground		选择
+Click and drag to draw an object	Playground		点击并拖拽绘制对象
+Controls	Playground		控件
+Round rect	Playground		圆角矩形
+Alpha:	Playground		透明度：
+Mode:	Playground		模式：
+Submenu	Playground		子菜单
+Copy	Playground		复制
 Cancel	Playground		取消
 Clear	Playground		清除
 Min	Playground		最小
 Blend	Playground		混合
 Invert	Playground		翻转
-Clear all drawing objects?	Playground		清除所有绘制内容？
+Clear all drawing objects?	Playground		清除所有绘制对象？
 Width:	Playground		宽度：
 Alpha	Playground		透明
 New object	Playground		新建对象

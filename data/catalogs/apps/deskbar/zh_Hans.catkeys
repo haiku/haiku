@@ -26,7 +26,7 @@ Restart system	DeskbarMenu		重启系统
 Large	PreferencesWindow		大
 Auto-raise	PreferencesWindow		自动
 Recent folders:	PreferencesWindow		最近文件夹：
-Show application expander	PreferencesWindow		显示程序扩展箭头
+Show application expander	PreferencesWindow		显示程序扩展
 Restart Tracker	DeskbarMenu		重启文件浏览器
 Close all	WindowMenu		关闭所有
 Deskbar preferences	PreferencesWindow		桌面栏首选项

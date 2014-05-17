@@ -1,9 +1,9 @@
-1	english	x-vnd.Haiku-InterfacesAddOn	2864358523
+1	english	x-vnd.Haiku-InterfacesAddOn	160108912
 Interface	InterfaceWindow		接口
 Configure…	InterfacesListView		配置…
 Static	IntefaceAddressView		静态
 None	InterfacesListView		无
-IP:	InterfacesListView	IPv4 address label	IP地址：
+IP:	InterfacesListView	IPv4 address label	IP 地址：
 Status:	IntefaceHardwareView		状态：
 IPv6:	InterfacesListView	IPv6 address label	IPv6地址：
 Save	InterfaceWindow		保存
@@ -17,6 +17,16 @@ Revert	InterfaceWindow		恢复
 connected	IntefaceHardwareView		已连接
 Gateway:	IntefaceAddressView		网关：
 Disable	InterfacesListView		禁用
+Sent:	IntefaceHardwareView		已发送：
+Disable	InterfacesAddOn		禁用
+Configure…	InterfacesAddOn		配置…
+Renegotiate Address	InterfacesListView		重新协商地址
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		模式：
+Your netmask	IntefaceAddressView		您的子网掩码
+IP Address:	IntefaceAddressView		IP 地址：
+Off	IntefaceAddressView		关闭
+MAC address:	IntefaceHardwareView		MAC 地址：
 Netmask:	IntefaceAddressView		子网掩码：
 Your IP address	IntefaceAddressView		您的 IP 地址
 %llu KBytes	IntefaceHardwareView		%llu K字节

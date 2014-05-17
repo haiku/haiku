@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Keymap	2376733585
+1	english	x-vnd.Haiku-Keymap	2389508189
 Dvorak	Keyboard Layout View		德沃夏克键盘
 Shift:	Modifier keys window	Shift key role name	Shift：
 Revert	Modifier keys window		取消
@@ -24,38 +24,73 @@ Grave trigger	Keymap window		触发雕刻字符
 Role	Modifier keys window	As in the role of a modifier key	作用
 Caps lock	Keyboard Layout View		大小写锁定
 Select dead keys	Keymap window		选择废键：
+Bulgarian (Cyrillic)	Keyboard Layout View		保加利亚文(斯拉夫字母)
 Cancel	Modifier keys window		取消
+Russian	Keyboard Layout View		俄罗斯文
+Icelandic	Keyboard Layout View		冰岛文
+Command	Keyboard Layout View	Command key	命令
+Polish	Keyboard Layout View		波兰文
+Serbian (Cyrillic)	Keyboard Layout View		塞尔维亚文(斯拉夫字母)
+French	Keyboard Layout View		法文
 Faeroese	Keyboard Layout View		法罗语
 Japanese	Keyboard Layout View		日语
 Bulgarian (Phonetic)	Keyboard Layout View		保加利亚语 (语音)
 Dvorak (programmer's)	Keyboard Layout View		德沃夏克键盘 (程序员专用)
+Estonian	Keyboard Layout View		爱沙尼亚文
+Russian (Mac)	Keyboard Layout View		俄罗斯文(Mac)
+Defaults	Keymap window		默认
 Quit	Keymap window		退出
+Dutch	Keyboard Layout View		荷兰文
 Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为Haiku模式
 Circumflex trigger	Keymap window		触发音调符号
+ISO-9995	Keyboard Layout View		ISO-9995
+Hebrew	Keyboard Layout View		希伯来文
 Diaeresis trigger	Keymap window		触发分音符号
 Disabled	Modifier keys window	Do nothing	禁用
+Belarusian (Latin)	Keyboard Layout View		白俄罗斯 (拉丁字母)
+Danish	Keyboard Layout View		丹麦文
 Open…	Keymap window		打开..
+Russian (Typewriter)	Keyboard Layout View		俄罗斯文(打字机)
+Error: duplicate keys	Modifier keys window		错误：重复按键
 System:	Keymap window		系统：
+Lithuanian	Keyboard Layout View		立陶宛文
+Finnish	Keyboard Layout View		芬兰文
 Set modifier keys…	Keymap window		设置修饰键…
 Option:	Modifier keys window	Option key role name	选项：
 Switch shortcut keys	Keymap window		切换快捷键
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift 键
 User:	Keymap window		用户：
+Esperanto	Keyboard Layout View		世界语
+Arabic (102)	Keyboard Layout View		阿拉伯文(102)
+United-Kingdom	Keyboard Layout View		英语
+German (Mac)	Keyboard Layout View		德语(Mac)
+Right option	Keyboard Layout View		右侧选项
+Right shift	Keyboard Layout View		右侧 shift 键
 Key	Modifier keys window	As in a computer keyboard key	按键
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl 键
 Control:	Modifier keys window	Control key role name	控制：
+Brazilian	Keyboard Layout View		巴西
+Brazilian (ABNT2)	Keyboard Layout View		巴西(ABNT2)
+French (Bépo)	Keyboard Layout View		法语(Bépo)
 Sample and clipboard:	Keymap window		示例和剪贴板：
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt 键
 Layout	Keymap window		布局
 Switch shortcut keys to Windows/Linux mode	Keymap window		切换快捷键为 Windows/Linux 模式
 Revert	Keymap window		取消
 Command:	Modifier keys window	Command key role name	命令：
+Irish	Keyboard Layout View		爱尔兰
+Turkish (Type-F)	Keyboard Layout View		土耳其(Type-F)
+Slovene	Keyboard Layout View		斯洛文尼亚
+Turkish (Type-Q)	Keyboard Layout View		土耳其(Type-Q)
 Save as…	Keymap window		保存为...
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd 键
 File	Keymap window		文件
+Num lock	Keyboard Layout View		Mum 锁
 (Current)	Keymap window		（当前）
 Font	Keymap window		字体
 Keymap	System name		键盘映射
+Left shift	Keyboard Layout View		左侧 shift 键
+Shift	Keyboard Layout View	Shift key	Shift
 Set modifier keys	Modifier keys window		设置修饰键
 Modifier keys	Modifier keys window		修饰键
 Acute trigger	Keymap window		触发尖重音符
