@@ -350,7 +350,7 @@ RemotePackageRepository HaikuPorts
 	qemu_x86-1.7.0-1
 	qtcore_x86-4.8.5.git-4
 	qtcore_x86_devel-4.8.5.git-4
-	quicklaunch-0.9.6-1
+	quicklaunch-0.9.7-1
 	qupzilla_x86-1.7.x-1
 	rocksndiamonds_x86-3.3.1.2-1
 	sdl_gfx_x86-2.0.24-1
