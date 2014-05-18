@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -490,10 +490,30 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BString& _output,
 	BString data;
 	for (int32 i = 0; StackFrame* frame = trace->FrameAt(i); i++) {
 		char functionName[512];
-		data.SetToFormat("\t\t%#08" B_PRIx64 "\t%#08" B_PRIx64 "\t%s\n",
-			frame->FrameAddress(), frame->InstructionPointer(),
-			UiUtils::FunctionNameForFrame(frame, functionName,
-				sizeof(functionName)));
+		BString sourcePath;
+
+		target_addr_t ip = frame->InstructionPointer();
+		FunctionInstance* functionInstance;
+		Statement* statement;
+		if (fTeam->GetStatementAtAddress(ip,
+				functionInstance, statement) == B_OK) {
+			BReference<Statement> statementReference(statement, true);
+
+			int32 line = statement->StartSourceLocation().Line();
+			LocatableFile* sourceFile = functionInstance->GetFunction()
+				->SourceFile();
+			if (sourceFile != NULL) {
+				sourceFile->GetPath(sourcePath);
+				sourcePath.SetToFormat("(%s:%" B_PRId32 ")",
+					sourcePath.String(), line);
+			}
+		}
+
+
+		data.SetToFormat("\t\t%#08" B_PRIx64 "\t%#08" B_PRIx64 "\t%s %s\n",
+			frame->FrameAddress(), ip, UiUtils::FunctionNameForFrame(
+				frame, functionName, sizeof(functionName)),
+				sourcePath.String());
 
 		_output << data;
 
