@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -290,12 +290,13 @@ TeamDebugger::~TeamDebugger()
 		fReportGenerator->Quit();
 	}
 
+	delete fWorker;
+
 	delete fImageInfoPendingThreads;
 
 	delete fBreakpointManager;
 	delete fWatchpointManager;
 	delete fMemoryBlockManager;
-	delete fWorker;
 	delete fTeam;
 	delete fFileManager;
 
