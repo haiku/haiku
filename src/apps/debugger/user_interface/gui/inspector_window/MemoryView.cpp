@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -745,7 +745,7 @@ MemoryView::_GetAddressDisplayWidth() const
 void
 MemoryView::_GetSelectionRegion(BRegion& region)
 {
-	if (fHexMode == HexModeNone)
+	if (fHexMode == HexModeNone || fTargetBlock == NULL)
 		return;
 
 	region.MakeEmpty();
