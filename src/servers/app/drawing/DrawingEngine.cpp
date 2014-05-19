@@ -963,16 +963,14 @@ DrawingEngine::FillRect(BRect r)
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
-	r.left = floorf(r.left);
-	r.top = floorf(r.top);
-	r.right = ceilf(r.right);
-	r.bottom = ceilf(r.bottom);
+
+	r = fPainter->AlignRect(r);
 
 	BRect dirty = fPainter->TransformAndClipRect(r);
 	if (!dirty.IsValid())
 		return;
 
-	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, r);
+	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, dirty);
 
 	bool doInSoftware = true;
 
@@ -1028,10 +1026,7 @@ DrawingEngine::FillRect(BRect r, const BGradient& gradient)
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
-	r.left = floorf(r.left);
-	r.top = floorf(r.top);
-	r.right = ceilf(r.right);
-	r.bottom = ceilf(r.bottom);
+	r = fPainter->AlignRect(r);
 
 	BRect dirty = fPainter->TransformAndClipRect(r);
 	if (!dirty.IsValid())

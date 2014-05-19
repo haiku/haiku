@@ -241,6 +241,7 @@ public:
 	inline	BRect				ClipRect(BRect rect) const;
 	inline	BRect				TransformAlignAndClipRect(BRect rect) const;
 	inline	BRect				AlignAndClipRect(BRect rect) const;
+	inline	BRect				AlignRect(BRect rect) const;
 
 
 private:
@@ -434,21 +435,22 @@ Painter::ClipRect(BRect rect) const
 inline BRect
 Painter::AlignAndClipRect(BRect rect) const
 {
-	rect.left = floorf(rect.left);
-	rect.top = floorf(rect.top);
-	if (fSubpixelPrecise) {
-		rect.right = ceilf(rect.right);
-		rect.bottom = ceilf(rect.bottom);
-	} else {
-		rect.right = floorf(rect.right);
-		rect.bottom = floorf(rect.bottom);
-	}
-	return _Clipped(rect);
+	return _Clipped(AlignRect(rect));
 }
 
 
 inline BRect
 Painter::TransformAlignAndClipRect(BRect rect) const
+{
+	rect = AlignRect(rect);
+	if (!fIdentityTransform)
+		rect = fTransform.TransformBounds(rect);
+	return _Clipped(rect);
+}
+
+
+inline BRect
+Painter::AlignRect(BRect rect) const
 {
 	rect.left = floorf(rect.left);
 	rect.top = floorf(rect.top);
@@ -459,9 +461,8 @@ Painter::TransformAlignAndClipRect(BRect rect) const
 		rect.right = floorf(rect.right);
 		rect.bottom = floorf(rect.bottom);
 	}
-	if (!fIdentityTransform)
-		rect = fTransform.TransformBounds(rect);
-	return _Clipped(rect);
+
+	return rect;
 }
 
 
