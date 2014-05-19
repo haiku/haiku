@@ -8,6 +8,7 @@
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/HCI/btHCI_transport.h>
+#include <kernel.h>
 
 #include "h2generic.h"
 #include "h2upper.h"

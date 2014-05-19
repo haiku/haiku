@@ -70,6 +70,9 @@
 #define CHECK_BIT(a, b) ((a) & (1 << (b)))
 #define SET_BIT(a, b) ((a) | (1 << (b)))
 #define CLEAR_BIT(a, b) ((a) & (~(1 << (b))))
+#define GET_BIT(a, b) ((a & b) != 0)
+#define TOOGLE_BIT(a, b) (a ^= b)
+
 
 /* during kernel startup, interrupts are disabled (among other things) */
 extern bool gKernelStartup;

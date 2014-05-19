@@ -15,6 +15,7 @@
 
 #include <ByteOrder.h>
 
+#include <kernel.h>
 #include <string.h>
 
 //#define DUMP_BUFFERS

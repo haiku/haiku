@@ -37,15 +37,6 @@
 #pragma mark - Kernel Auxiliary Stuff -
 #endif
 
-/* tricking bits */
-#define SET_BIT(byte,bit_mask)			{byte|=bit_mask;}
-#define CLEAR_BIT(byte,bit_mask)		{byte&=~bit_mask;}
-#define GET_BIT(byte,bit_mask)			((byte&bit_mask)!=0)
-#define TOOGLE_BIT(byte,bit_mask)		{byte^=bit_mask;}
-
-//#define TEST_AND_SET(byte,bit_mask)     (((byte|=bit_mask)&bit_mask)!=0) 
-//#define TEST_AND_CLEAR(byte,bit_mask)   (((byte&=~bit_mask)&bit_mask)!=0) 
-
 static inline uint32 TEST_AND_SET(uint32 *byte, uint32 bit_mask) {
 
 	uint32 val = (*byte&bit_mask)!=0;
