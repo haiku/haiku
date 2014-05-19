@@ -237,6 +237,8 @@ public:
 		view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 
 		BRect rect(view->Bounds());
+		rect.OffsetTo(B_ORIGIN);
+
 		rect.InsetBy(rect.Width() / 3, rect.Height() / 3);
 		BPoint center(
 			rect.left + rect.Width() / 2,
@@ -449,6 +451,35 @@ public:
 };
 
 
+// #pragma mark - Clipping
+
+
+class ClippingTest : public Test {
+public:
+	ClippingTest()
+		:
+		Test("View bounds clipping")
+	{
+	}
+
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BRect r (20, 20, 50, 50);
+		view->SetHighColor(ui_color(B_FAILURE_COLOR));
+		view->FillRect(r);
+
+		BAffineTransform transform;
+		transform.TranslateBy(400, 400);
+		view->SetTransform(transform);
+
+		// Make sure this rectangle is drawn, even when the original one is out
+		// of the view bounds (for example because of scrolling).
+		view->SetHighColor(ui_color(B_SUCCESS_COLOR));
+		view->FillRect(r);
+	}
+};
+
+
 // #pragma mark -
 
 
@@ -463,6 +494,7 @@ main(int argc, char** argv)
 	window->AddTest(new BitmapTest());
 	window->AddTest(new GradientTest());
 	window->AddTest(new NestedStatesTest());
+	window->AddTest(new ClippingTest());
 
 	window->SetToTest(3);
 	window->Show();
