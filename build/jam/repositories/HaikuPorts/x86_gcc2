@@ -15,6 +15,7 @@ RemotePackageRepository HaikuPorts
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
+	ale-0.9.1-1
 	apr-1.4.6-7
 	apr_devel-1.4.6-7
 	apr_util-1.4.1-3
