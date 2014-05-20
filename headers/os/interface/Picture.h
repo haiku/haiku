@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2014 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_PICTURE_H
@@ -20,13 +20,12 @@ class BPicture : public BArchivable {
 public:
 								BPicture();
 								BPicture(const BPicture& other);
-								BPicture(BMessage* archive);
+								BPicture(BMessage* data);
 	virtual						~BPicture();
 
-	static	BArchivable*		Instantiate(BMessage* archive);
-	virtual	status_t			Archive(BMessage* archive,
-									bool deep = true) const;
-	virtual	status_t			Perform(perform_code d, void* arg);
+	static	BArchivable*		Instantiate(BMessage* data);
+	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
+	virtual	status_t			Perform(perform_code code, void* arg);
 
 			status_t			Play(void** callBackTable,
 									int32 tableEntries,
