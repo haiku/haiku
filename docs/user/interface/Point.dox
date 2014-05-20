@@ -1,0 +1,182 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Point.h	 hrev47234
+ *		src/kits/interface/Point.cpp	 hrev47234
+ */
+
+
+/*!
+	\file Point.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BPoint class definition.
+*/
+
+
+/*!
+	\var B_ORIGIN
+	\brief The origin point, equivalent to BPoint(0, 0).
+*/
+
+
+/*!
+	\class BPoint
+	\ingroup interface
+	\ingroup libbe
+	\brief A point on a two-dimensional Cartesian coordinate system.
+*/
+
+
+/*!
+	\var BPoint::x
+	\brief The horizontal coordinate.
+*/
+
+
+/*!
+	\var BPoint::y
+	\brief The vertical coordinate.
+*/
+
+
+/*!
+	\fn inline BPoint::BPoint()
+	\brief Initializes a BPoint object at the origin, (0, 0).
+
+	\see BPoint::Set()
+*/
+
+
+/*!
+	\fn inline BPoint::BPoint(float x, float y)
+	\brief Initializes a BPoint object at the specified \a x and
+	       \a y coordinates.
+
+	\param x The \a x coordinate.
+	\param y The \a y coordinate.
+*/
+
+
+/*!
+	\fn inline BPoint::BPoint(const BPoint& other)
+	\brief Initializes a BPoint object from another BPoint.
+
+	\param other The BPoint object to copy from.
+*/
+
+
+/*!
+	\fn inline BPoint& BPoint::operator=(const BPoint& other)
+	\brief Initializes a BPoint object from another BPoint by overloading
+	       the = operator.
+
+	\param other The BPoint object to copy from.
+*/
+
+
+/*!
+	\fn inline void BPoint::Set(float x, float y)
+	\brief Sets the \a x and \a y coordinates of a BPoint object.
+
+	\param x The \a x coordinate to set.
+	\param y The \a y coordinate to set.
+*/
+
+
+/*!
+	\fn void BPoint::ConstrainTo(BRect rect)
+	\brief Moves the BPoint so that it is contained within \a rect.
+
+	If the BPoint is already contained within \a rect this method has no
+	effect.
+
+	\param rect The BRect to constrain the BPoint within.
+*/
+
+
+/*!
+	\fn void BPoint::PrintToStream() const
+	\brief Print the x and y coordinates to standard output.
+
+	Prints in the following format:
+
+\verbatim
+BPoint(x:%.0f, y:%.0f)
+\endverbatim
+*/
+
+
+/*!
+	\fn BPoint BPoint::operator-() const
+	\brief Returns a BPoint object with the x and y coordinates negated.
+
+	\return A new BPoint object.
+*/
+
+
+/*!
+	\fn BPoint BPoint::operator+(const BPoint& other) const
+	\brief Returns a BPoint where the x-coordinate is the sum of the x values
+	       and the y-coordinate is the sum of the y values.
+
+	\param other The BPoint object to use in the addition.
+
+	\return A new BPoint object.
+*/
+
+
+/*!
+	\fn BPoint BPoint::operator-(const BPoint& other) const
+	\brief Returns a BPoint where the x-coordinate is the difference of the
+	       x values and the y-coordinate is the difference of the y values.
+
+	\param other The BPoint object to use in the subtraction.
+
+	\return A new BPoint object.
+*/
+
+
+/*!
+	\fn BPoint& BPoint::operator+=(const BPoint& other)
+	\brief Uses the BPoint as an accumulator storing the sum of the x values
+	       and the sum of the y values.
+
+	\param other The BPoint object to use in the addition.
+
+	\return The address of the BPoint object.
+*/
+
+
+/*!
+	\fn BPoint& BPoint::operator-=(const BPoint& other)
+	\brief Uses the BPoint as an accumulator storing the difference of the x
+	       values and the difference of the y values.
+
+	\param other The BPoint object to use in the subtraction.
+
+	\return The address of the BPoint object.
+*/
+
+
+/*!
+	\fn bool BPoint::operator!=(const BPoint& other) const
+	\brief Returns whether or not the x and y coordinates of the BPoint
+	       objects differ.
+
+	\return \c true if the x or y coordinates differ, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BPoint::operator==(const BPoint& other) const
+	\brief Returns whether or not the x and y coordinates of the BPoint
+	       objects are equal.
+
+	\return \c true if the x and y coordinates are equal, \c false otherwise.
+*/
