@@ -6,8 +6,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/Picture.h	 hrev46970
- *		src/kits/interface/Picture.cpp	 hrev46970
+ *		headers/os/interface/Picture.h	 hrev47233
+ *		src/kits/interface/Picture.cpp	 hrev47233
  */
 
 
@@ -25,4 +25,146 @@
 	\ingroup libbe
 	\brief Records a series of drawing instructions that can be "replayed"
 	       later.
+
+	A BPicture, unlike a BBitmap, is independent of the display resolution
+	as it contains drawing instructions rather than image data.
+
+	To begin drawing you first create a new BPicture object and pass it to
+	BView::BeginPicture(). All subsequent drawing instructions are drawn
+	into the BPicture object instead of the BView. When you are done recording
+	call BView::EndPicture() which stops drawing into the BPicture object and
+	passes a pointer to it back to the caller.
+
+	For example:
+\code
+	BPicture* picture;
+	view->BeginPicture(new BPicture);
+	// drawing instructions go here
+	picture = view->EndPicture();
+\endcode
+
+	Only drawing instructions performed directly on the view, not it's child
+	views are send to the BPicture object and BPicture captures only primitive
+	graphics operations. The view must be attached to a window for the drawing
+	instruction to be recorded. Drawing instructions are recorded even if the
+	view is hidden or resides outside the clipping region or the window is
+	off-screen.
+
+	The BPicture object data is erased when passed to BView::BeginPicture().
+	If you'd like to append data to a BPicture object instead use
+	BView::AppendToPicture(). Both BView::BeginPicture() and
+	BView::AppendToPicture() must be followed by a call to BView::EndPicture()
+	to finish recording.
+
+	\sa BView::AppendToPicture()
+	\sa BView::BeginPicture()
+	\sa BView::EndPicture()
+*/
+
+
+/*!
+	\fn BPicture::BPicture()
+	\brief Initializes an empty BPicture object.
+*/
+
+
+/*!
+	\fn BPicture::BPicture(const BPicture& otherPicture)
+	\brief Initializes an BPicture object copying the data from \a otherPicture.
+*/
+
+
+/*!
+	\fn BPicture::BPicture(BMessage* data)
+	\brief Initializes an BPicture object copying the data from from the
+	       passed in \a data archive.
+*/
+
+
+/*!
+	\fn BPicture::~BPicture()
+	\brief Destroys the BPicture object and deletes all associated data.
+*/
+
+
+/*!
+	\fn BArchivable* BPicture::Instantiate(BMessage* data)
+	\brief Returns a pointer to a new BPicture object created from the BPicture
+	       data archived in \a data.
+
+	\returns A newly created BPicture object or \c NULL if the message doesn't
+	         contain an archived BPicture.
+
+	\see BArchivable::Instantiate()
+*/
+
+
+/*!
+	\fn status_t BPicture::Archive(BMessage* data, bool deep) const
+	\brief Archives the BPicture object into the \a data message.
+
+	\param data A pointer to the BMessage object to archive into.
+	\param deep The parameter has no effect to this method.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+	\retval B_OK The object was archived successfully.
+	\retval B_NO_MEMORY Ran out of memory while archiving the object.
+
+	\sa BArchivable::Archive()
+	\sa BPicture::Instantiate()
+*/
+
+
+/*!
+	\fn status_t BPicture::Perform(perform_code code, void* arg)
+	\brief Perform some action (internal method defined for binary
+	       compatibility purposes).
+*/
+
+
+/*!
+	\fn status_t BPicture::Play(void** callBackTable, int32 tableEntries,
+		void* user)
+	\brief Plays back a picture using the passed in call back functions.
+
+	See http://haiku-os.org/legacy-docs/bebook/BPicture.html#BPicture_Play
+	for details.
+
+	\param callBackTable An array of pointers to pointers of call back functions.
+	\param tableEntries Specifies the number of function pointers found in
+	       \a callBackTable.
+	\param user A hook to pass additional data to each call back function.
+
+	\returns A status code.
+	\retval B_OK The BPicture object was played back successfully.
+	\retval B_ERROR BPicture data is \c NULL.
+*/
+
+
+/*!
+	\fn status_t BPicture::Flatten(BDataIO* stream)
+	\brief Flattens the contents of the BPicture object into \a stream.
+
+	\param stream The stream to write to.
+
+	\returns A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK The BPicture object was flattened successfully.
+	\retval B_BAD_VALUE The \a stream pointer was \c NULL or the data was invalid.
+	\retval B_IO_ERROR The number of bytes written does not equal the size
+	        of the contents of the BPicture object.
+*/
+
+
+/*!
+	\fn status_t BPicture::Unflatten(BDataIO* stream)
+	\brief Unflattens the contents from the \a stream into the BPicture object.
+
+	\param stream The stream to read from.
+
+	\returns A status code, \c B_OK on success or an error code otherwise.
+	\retval B_OK The object was unflattened successfully.
+	\retval B_BAD_VALUE The \a stream pointer was \c NULL or the data was invalid.
+	\retval B_IO_ERROR The number of bytes read does not equal the size
+	        of the contents of the BPicture object.
 */
