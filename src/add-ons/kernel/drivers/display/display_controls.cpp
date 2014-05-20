@@ -46,7 +46,7 @@ displaycontrols_init_device(void *_cookie, void **cookie)
 {
 	device_node *node = (device_node *)_cookie;
 	displaycontrols_device_info *device;
-	device_node *parent;
+//	device_node *parent;
 
 	acpi_objects arguments;
 	acpi_object_type argument;
@@ -67,7 +67,7 @@ displaycontrols_init_device(void *_cookie, void **cookie)
 	}
 
 	argument.object_type = ACPI_TYPE_INTEGER;
-	argument.data.integer = BIOS_DISPLAY_SWITCH | BIOS_BRIGHTNESS_CONTROL;
+	argument.integer.integer = BIOS_DISPLAY_SWITCH | BIOS_BRIGHTNESS_CONTROL;
 	arguments.count = 1;
 	arguments.pointer = &argument;
 	if (sAcpi->evaluate_object(&device->acpi_device, "_DOS", &arguments, NULL, 0)
