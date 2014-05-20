@@ -57,7 +57,7 @@ enum {
 
 #define MSG_DELAY_POPUP 'arDP'
 
-#define MSG_TOOGLE_ACTIVE 'arTA'
+#define MSG_TOGGLE_ACTIVE 'arTA'
 #define MSG_SET_ACTIVE 'arSA'
 #define MSG_SET_INACTIVE 'arSI'
 #define MSG_SET_DELAY 'arSD'

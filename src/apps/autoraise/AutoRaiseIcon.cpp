@@ -44,7 +44,7 @@ ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
 	SetFont(be_plain_font);
 
 
-	BMenuItem *active = new BMenuItem("Active", new BMessage(MSG_TOOGLE_ACTIVE));
+	BMenuItem *active = new BMenuItem("Active", new BMessage(MSG_TOGGLE_ACTIVE));
 	active->SetMarked(s->Active());
 	AddItem(active);
 
@@ -499,7 +499,7 @@ void TrayView::MessageReceived(BMessage* message)
 
 	switch(message->what)
 	{
-		case MSG_TOOGLE_ACTIVE:
+		case MSG_TOGGLE_ACTIVE:
 			SetActive(!_settings->Active());
 			break;
 		case MSG_SET_ACTIVE:
