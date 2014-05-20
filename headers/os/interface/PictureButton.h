@@ -22,7 +22,7 @@ public:
 									BPicture* off, BPicture* on,
 									BMessage* message,
 									uint32 behavior = B_ONE_STATE_BUTTON,
-									uint32 resizeMask = B_FOLLOW_LEFT
+									uint32 resizingMode = B_FOLLOW_LEFT
 										| B_FOLLOW_TOP,
 									uint32 flgs = B_WILL_DRAW | B_NAVIGABLE);
 								BPictureButton(BMessage* archive);
@@ -56,10 +56,10 @@ public:
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* message);
 
-	virtual	void				SetEnabledOn(BPicture* on);
-	virtual	void				SetEnabledOff(BPicture* off);
-	virtual	void				SetDisabledOn(BPicture* on);
-	virtual	void				SetDisabledOff(BPicture* off);
+	virtual	void				SetEnabledOn(BPicture* picture);
+	virtual	void				SetEnabledOff(BPicture* picture);
+	virtual	void				SetDisabledOn(BPicture* picture);
+	virtual	void				SetDisabledOff(BPicture* picture);
 
 			BPicture*			EnabledOn() const;
 			BPicture*			EnabledOff() const;
