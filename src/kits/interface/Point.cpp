@@ -4,10 +4,13 @@
  *
  * Authors:
  *		Frans van Nispen
+ *		John Scipione, jscipione@gmail.com
  */
 
 
 #include <Point.h>
+
+#include <algorithm>
 
 #include <stdio.h>
 
@@ -21,8 +24,8 @@ const BPoint B_ORIGIN(0, 0);
 void
 BPoint::ConstrainTo(BRect rect)
 {
-	x = max_c(min_c(x, rect.right), rect.left);
-	y = max_c(min_c(y, rect.bottom), rect.top);
+	x = std::max(std::min(x, rect.right), rect.left);
+	y = std::max(std::min(y, rect.bottom), rect.top);
 }
 
 
