@@ -480,6 +480,96 @@ public:
 };
 
 
+// #pragma mark - BitmapTest
+
+
+class BitmapClipTest : public Test {
+public:
+	BitmapClipTest()
+		:
+		Test("Bitmap clipping"),
+		fBitmap(_LoadBitmap(555))
+	{
+	}
+
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BRect rect(view->Bounds());
+
+		if (fBitmap == NULL) {
+			view->SetHighColor(255, 0, 0);
+			view->FillRect(rect);
+			view->SetHighColor(0, 0, 0);
+			view->DrawString("Failed to load the bitmap.", BPoint(20, 20));
+			return;
+		}
+
+		rect = fBitmap->Bounds();
+
+		view->SetHighColor(ui_color(B_FAILURE_COLOR));
+		view->FillRect(rect);
+
+		// The rect offset should compensate the transform translation, so the
+		// bitmap should be drawn at the view origin.
+		rect.OffsetBy(0, 40);
+
+		BAffineTransform transform;
+			transform.TranslateBy(0, -40);
+		view->SetTransform(transform);
+
+		view->DrawBitmap(fBitmap, fBitmap->Bounds(), rect);
+	}
+
+private:
+	status_t
+	_GetAppResources(BResources& resources) const
+	{
+		app_info info;
+		status_t status = be_app->GetAppInfo(&info);
+		if (status != B_OK)
+			return status;
+
+		return resources.SetTo(&info.ref);
+	}
+
+
+	BBitmap* _LoadBitmap(int resourceID) const
+	{
+		BResources resources;
+		status_t status = _GetAppResources(resources);
+		if (status != B_OK)
+			return NULL;
+
+		size_t dataSize;
+		const void* data = resources.LoadResource(B_MESSAGE_TYPE, resourceID,
+			&dataSize);
+		if (data == NULL)
+			return NULL;
+
+		BMemoryIO stream(data, dataSize);
+
+		// Try to read as an archived bitmap.
+		BMessage archive;
+		status = archive.Unflatten(&stream);
+		if (status != B_OK)
+			return NULL;
+
+		BBitmap* bitmap = new BBitmap(&archive);
+
+		status = bitmap->InitCheck();
+		if (status != B_OK) {
+			delete bitmap;
+			bitmap = NULL;
+		}
+
+		return bitmap;
+	}
+
+private:
+	BBitmap*	fBitmap;
+};
+
+
 // #pragma mark -
 
 
@@ -491,12 +581,13 @@ main(int argc, char** argv)
 	TestWindow* window = new TestWindow();
 
 	window->AddTest(new RectsTest());
+	window->AddTest(new BitmapClipTest());
 	window->AddTest(new BitmapTest());
 	window->AddTest(new GradientTest());
 	window->AddTest(new NestedStatesTest());
 	window->AddTest(new ClippingTest());
 
-	window->SetToTest(3);
+	window->SetToTest(1);
 	window->Show();
 
 	app.Run();
