@@ -9,9 +9,9 @@
 #include <InterfaceDefs.h>
 #include <Rect.h>
 
+
 //namespace BPrivate { class BAffineTransform; }
 //using namespace BPrivate;
-
 
 class BPolygon {
 public:
@@ -26,7 +26,7 @@ public:
 			BRect				Frame() const;
 			void				AddPoints(const BPoint* points, int32 count);
 			int32				CountPoints() const;
-			void				MapTo(BRect srcRect, BRect dstRect);
+			void				MapTo(BRect source, BRect destination);
 			void				PrintToStream() const;
 
 //			void				TransformBy(const BAffineTransform& transform);
@@ -41,11 +41,10 @@ private:
 			bool				_AddPoints(const BPoint* points, int32 count,
 									bool computeBounds);
 			void				_ComputeBounds();
-			void				_MapPoint(BPoint* point, const BRect& srcRect,
-										const BRect& dstRect);
-			void				_MapRectangle(BRect* rect,
-									const BRect& srcRect,
-									const BRect& dstRect);
+			void				_MapPoint(BPoint* point, const BRect& source,
+									const BRect& destination);
+			void				_MapRectangle(BRect* rect, const BRect& source,
+									const BRect& destination);
 
 private:
 			BRect				fBounds;
@@ -53,4 +52,4 @@ private:
 			BPoint*				fPoints;
 };
 
-#endif // _POLYGON_H_
+#endif	// _POLYGON_H

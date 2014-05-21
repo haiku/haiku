@@ -3,15 +3,16 @@
  * Distributed under the terms of the MIT license.
  *
  * Authors:
+ *		Stephan Aßmus, superstippi@gmx.de
  *		Marc Flerackers, mflerackers@androme.be
  *		Marcus Overhagen
- *		Stephan Aßmus <superstippi@gmx.de>
  */
+
 
 #include <Polygon.h>
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <AffineTransform.h>
@@ -107,16 +108,17 @@ BPolygon::CountPoints() const
 
 
 void
-BPolygon::MapTo(BRect srcRect, BRect dstRect)
+BPolygon::MapTo(BRect source, BRect destination)
 {
 	for (uint32 i = 0; i < fCount; i++)
-		_MapPoint(fPoints + i, srcRect, dstRect);
-	_MapRectangle(&fBounds, srcRect, dstRect);
+		_MapPoint(fPoints + i, source, destination);
+
+	_MapRectangle(&fBounds, source, destination);
 }
 
 
 void
-BPolygon::PrintToStream () const
+BPolygon::PrintToStream() const
 {
 	for (uint32 i = 0; i < fCount; i++)
 		fPoints[i].PrintToStream();
@@ -148,7 +150,7 @@ BPolygon::PrintToStream () const
 //}
 
 
-// #pragma mark -
+// #pragma mark - BPolygon private methods
 
 
 bool
@@ -194,10 +196,13 @@ BPolygon::_ComputeBounds()
 	for (uint32 i = 1; i < fCount; i++) {
 		if (fPoints[i].x < fBounds.left)
 			fBounds.left = fPoints[i].x;
+
 		if (fPoints[i].y < fBounds.top)
 			fBounds.top = fPoints[i].y;
+
 		if (fPoints[i].x > fBounds.right)
 			fBounds.right = fPoints[i].x;
+
 		if (fPoints[i].y > fBounds.bottom)
 			fBounds.bottom = fPoints[i].y;
 	}
@@ -205,24 +210,25 @@ BPolygon::_ComputeBounds()
 
 
 void
-BPolygon::_MapPoint(BPoint* point, const BRect& srcRect, const BRect& dstRect)
+BPolygon::_MapPoint(BPoint* point, const BRect& source,
+	const BRect& destination)
 {
-	point->x = (point->x - srcRect.left) * dstRect.Width() / srcRect.Width()
-		+ dstRect.left;
-	point->y = (point->y - srcRect.top) * dstRect.Height() / srcRect.Height()
-		+ dstRect.top;
+	point->x = (point->x - source.left) * destination.Width() / source.Width()
+		+ destination.left;
+	point->y = (point->y - source.top) * destination.Height() / source.Height()
+		+ destination.top;
 }
 
 
 void
-BPolygon::_MapRectangle(BRect* rect, const BRect& srcRect,
-	const BRect& dstRect)
+BPolygon::_MapRectangle(BRect* rect, const BRect& source,
+	const BRect& destination)
 {
 	BPoint leftTop = rect->LeftTop();
 	BPoint bottomRight = rect->RightBottom();
 
-	_MapPoint(&leftTop, srcRect, dstRect);
-	_MapPoint(&bottomRight, srcRect, dstRect);
+	_MapPoint(&leftTop, source, destination);
+	_MapPoint(&bottomRight, source, destination);
 
 	*rect = BRect(leftTop, bottomRight);
 }
