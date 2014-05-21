@@ -1428,7 +1428,7 @@ Painter::DrawBitmap(const ServerBitmap* bitmap, BRect bitmapRect,
 {
 	CHECK_CLIPPING
 
-	BRect touched = _Clipped(viewRect);
+	BRect touched = TransformAlignAndClipRect(viewRect);
 
 	if (bitmap && bitmap->IsValid() && touched.IsValid()) {
 		// the native bitmap coordinate system
