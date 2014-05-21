@@ -1,0 +1,133 @@
+/*
+ * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Polygon.h	 hrev47240
+ *		src/kits/interface/Polygon.cpp	 hrev47240
+ */
+
+
+/*!
+	\file Polygon.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BPolygon class definition.
+*/
+
+
+/*!
+	\class BPolygon
+	\ingroup interface
+	\ingroup libbe
+	\brief A closed, many-sided figure which defines an area in a
+	       two-dimensional Cartesian coordinate system.
+
+	A BPolygon is defined as a set of BPoint objects, each BPoint represents
+	a vertex of the polygon. Unlike a BRect, a BPolygon can can have any number
+	of sides and the sides don't have to be aligned on coordinate axes.
+
+	BPolygon objects are most commonly used for drawing. BView::StrokePolygon()
+	and BView::FillPolygon() allow you to draw a polygon in a BView by taking a
+	BPolygon object as an argument.
+
+	\sa BView::StrokePolygon()
+	\sa BView::FillPolygon()
+*/
+
+
+/*!
+	\fn BPolygon::BPolygon(const BPoint* points, int32 count)
+	\brief Initializes a new BPolygon object from an array of \a points.
+
+	\param points The array of BPoint objects to add.
+	\param count The number of BPoint objects in the array.
+*/
+
+
+/*!
+	\fn BPolygon::BPolygon(const BPolygon& other)
+	\brief Initializes a new BPolygon object from another BPolygon and
+	       copies the list of BPoint objects from \a other.
+
+	\note This method was not available in BeOS R5.
+
+	\param other The BPolygon object to copy from.
+*/
+
+
+/*!
+	\fn BPolygon::BPolygon(const BPolygon* other)
+	\brief Initializes a new BPolygon object from a pointer to another
+	       BPolygon and copies the list of BPoint objects from \a other.
+
+	\param other A pointer to a BPolygon object to copy from.
+*/
+
+
+/*!
+	\fn BPolygon::BPolygon()
+	\brief Initializes an empty polygon without any points.
+
+	\see BPolygon::AddPoints() to add points to the BPolygon.
+*/
+
+
+/*!
+	\fn BPolygon::~BPolygon()
+	\brief Destroys the object and frees the memory used by the associated
+	       BPoint objects.
+*/
+
+
+/*!
+	\fn BPolygon& BPolygon::operator=(const BPolygon& other)
+	\brief Initializes a new BPolygon object and copies the list of BPoint
+	       objects from \a other.
+
+	\param other The BPolygon object to copy from.
+*/
+
+
+/*!
+	\fn BRect BPolygon::Frame() const
+	\brief Returns the frame rectangle that encloses the BPolygon object.
+*/
+
+
+/*!
+	\fn void BPolygon::AddPoints(const BPoint* points, int32 count)
+	\brief Adds an array of BPoint objects.
+
+	\param points The array of BPoint objects to add.
+	\param count The number of BPoint objects in the array.
+*/
+
+
+/*!
+	\fn int32 BPolygon::CountPoints() const
+	\brief Returns the number of points associated with the polygon.
+*/
+
+
+/*!
+	\fn void BPolygon::MapTo(BRect source, BRect destination)
+	\brief Modifies each BPoint in the BPolygon so that the shape fits inside
+	       the \a destination rectangle.
+
+	The \a source rectangle is used so that the points are mapped
+	proportionally. To modify a polygon so that it is inscribed in the
+	\a destination rectangle exactly, pass the frame rectangle as the
+	\a source.
+*/
+
+
+/*!
+	\fn void BPolygon::PrintToStream() const
+	\brief Prints each of the points of the BPolygon to standard output.
+
+	\see BPoint::PrintToStream()
+*/
