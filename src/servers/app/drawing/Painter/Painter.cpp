@@ -2635,7 +2635,8 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	source_type source(pixf_img);
 
 	// clip to the current clipping region's frame
-	viewRect = viewRect & fClippingRegion->Frame();
+	if (fIdentityTransform)
+		viewRect = viewRect & fClippingRegion->Frame();
 	// convert to pixel coords (versus pixel indices)
 	viewRect.right++;
 	viewRect.bottom++;
