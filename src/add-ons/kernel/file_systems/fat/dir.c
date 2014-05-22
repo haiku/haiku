@@ -82,14 +82,17 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 			iter->csi.sector, iter->current_index));
 		if (buffer[0] == 0) { // quit if at end of table
 			if (start_index != 0xffff) {
-				dprintf("lfn entry (%s) with no alias\n", filename);
+				*puni = 0;
+				dprintf("lfn entry (%s) with no alias\n", uni);
 			}
 			return ENOENT;
 		}
 
 		if (buffer[0] == 0xe5) { // skip erased entries
 			if (start_index != 0xffff) {
-				dprintf("lfn entry (%s) with intervening erased entries\n", filename);
+				*puni = 0;
+				dprintf("lfn entry (%s) with intervening erased entries\n",
+					uni);
 				start_index = 0xffff;
 			}
 			DPRINTF(2, ("entry erased, skipping...\n"));
@@ -261,7 +264,8 @@ get_next_dirent(nspace *vol, vnode *dir, struct diri *iter, ino_t *vnid,
 		}
 	}
 
-	DPRINTF(2, ("get_next_dirent: found %s (vnid %Lx)\n", filename, *vnid));
+	DPRINTF(2, ("get_next_dirent: found %s (vnid %Lx)\n", filename,
+		vnid != NULL ? *vnid : NULL));
 
 	return B_NO_ERROR;
 }
