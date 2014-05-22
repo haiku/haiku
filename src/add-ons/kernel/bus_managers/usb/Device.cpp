@@ -465,6 +465,9 @@ Device::InitEndpoints(int32 interfaceIndex)
 
 		usb_interface_info* interfaceInfo
 			= fCurrentConfiguration->interface[j].active;
+		if (interfaceInfo == NULL)
+			continue;
+
 		for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
 			usb_endpoint_info* endpoint = &interfaceInfo->endpoint[i];
 			Pipe* pipe = NULL;
