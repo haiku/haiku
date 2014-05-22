@@ -57,14 +57,15 @@ static status_t
 _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 	int len)
 {
-	uint8 *buffer, hash = 0; /* quiet warning */
+	uint8 *buffer;
+	uint8 hash = 0;
 	uchar uni[1024];
 	uint16 *puni;
 	uint32 i;
 
 	// lfn state
-	uint32 start_index = 0xffff, filename_len = 0; /* quiet warning */
-	uint32 lfn_count = 0 /* quiet warning */;
+	uint32 start_index = 0xffff, filename_len = 0;
+	uint32 lfn_count = 0;
 
 	if (iter->current_block == NULL)
 		return ENOENT;
@@ -74,8 +75,8 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 		return ENOMEM;
 	}
 
-	buffer = iter->current_block
-		+ ((iter->current_index) % (iter->csi.vol->bytes_per_sector / 0x20)) * 0x20;
+	buffer = iter->current_block + ((iter->current_index)
+		% (iter->csi.vol->bytes_per_sector / 0x20)) * 0x20;
 
 	for (; buffer != NULL; buffer = diri_next_entry(iter)) {
 		DPRINTF(2, ("_next_dirent_: %lx/%lx/%lx\n", iter->csi.cluster,
@@ -167,11 +168,12 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 				dprintf("error: long file name too long\n");
 
 				diri_free(iter);
-				diri_init(iter->csi.vol, iter->starting_cluster, start_index, iter);
+				diri_init(iter->csi.vol, iter->starting_cluster, start_index,
+					iter);
 				return ENAMETOOLONG;
 			} else if (hash_msdos_name((const char *)buffer) != hash) {
-				dprintf("error: long file name (%s) hash and short file name don't match\n",
-					filename);
+				dprintf("error: long file name (%s) hash and short file name "
+					"don't match\n", filename);
 				start_index = 0xffff;
 			}
 		}
@@ -245,7 +247,8 @@ get_next_dirent(nspace *vol, vnode *dir, struct diri *iter, ino_t *vnid,
 					*vnid = loc;
 				}
 			} else if (result != B_OK) {
-				dprintf("get_next_dirent: unknown error (%s)\n", strerror(result));
+				dprintf("get_next_dirent: unknown error (%s)\n",
+					strerror(result));
 				return result;
 			}
 
@@ -273,7 +276,7 @@ check_dir_empty(nspace *vol, vnode *dir)
 {
 	uint32 i;
 	struct diri iter;
-	status_t result = B_ERROR; /* quiet warning */
+	status_t result = B_ERROR;
 
 	if (diri_init(vol, dir->cluster, 0, &iter) == NULL) {
 		dprintf("check_dir_empty: error opening directory\n");
