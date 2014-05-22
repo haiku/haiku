@@ -94,7 +94,6 @@ scan_partition(int fd, partition_data *partition, void *cookie)
 		child->block_size = session->BlockSize();
 		child->flags |= session->Flags();
 		child->type = strdup(session->Type());
-		delete session;
 		if (!child->type) {
 			error = B_NO_MEMORY;
 			break;
