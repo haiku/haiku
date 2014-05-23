@@ -1374,7 +1374,7 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	BRect b = fPainter->BoundingBox(string, length, pt, &penLocation, delta,
 		&cacheReference);
 	// stop here if we're supposed to render outside of the clipping
-	b = fPainter->TransformAndClipRect(b);
+	b = fPainter->ClipRect(b);
 	if (b.IsValid()) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
 		AutoFloatingOverlaysHider _(fGraphicsCard, b);
@@ -1405,7 +1405,7 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	BRect b = fPainter->BoundingBox(string, length, offsets, &penLocation,
 		&cacheReference);
 	// stop here if we're supposed to render outside of the clipping
-	b = fPainter->TransformAndClipRect(b);
+	b = fPainter->ClipRect(b);
 	if (b.IsValid()) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
 		AutoFloatingOverlaysHider _(fGraphicsCard, b);
