@@ -11,11 +11,12 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <GradientLinear.h>
-#include <Message.h>
-#include <Picture.h>
 #include <LayoutBuilder.h>
 #include <List.h>
+#include <Message.h>
+#include <Picture.h>
 #include <PopUpMenu.h>
+#include <Region.h>
 #include <Resources.h>
 #include <Roster.h>
 #include <ScrollView.h>
@@ -25,7 +26,7 @@
 #include <Window.h>
 
 
-static const char* kAppSignature = "application/x.vnd-Haiku.Transformation";
+static const char* kAppSignature = "application/x-vnd.Haiku-Transformation";
 
 
 class Test {
@@ -480,6 +481,68 @@ public:
 };
 
 
+// #pragma mark - Clipping
+
+
+class TextClippingTest : public Test {
+public:
+	TextClippingTest()
+		:
+		Test("Text clipping")
+	{
+	}
+
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BFont font;
+		view->GetFont(&font);
+		font.SetSize(70);
+		view->SetFont(&font);
+
+		float width = view->Bounds().Width();
+
+		// The translation make the text, which has negative coordinates, be
+		// visible inside the viewport.
+		BAffineTransform transform;
+		transform.TranslateBy(width, 0);
+		view->SetTransform(transform);
+
+		const char* str = "CLIPPING";
+
+		// Test the standard DrawString method
+
+		// Draw the text bounds
+		float size = view->StringWidth(str);
+		BRect r(-width, 0, size - width, 70);
+		view->SetHighColor(ui_color(B_SUCCESS_COLOR));
+		view->FillRect(r);
+
+		// Draw the text (which should fit inside the bounds rectangle)
+		view->SetHighColor(0, 0, 0, 255);
+		view->DrawString(str, BPoint(-width, 70));
+
+		// Test with offset-based DrawString
+		BPoint offsets[strlen(str)];
+		for(unsigned int i = 0; i < strlen(str); i++)
+		{
+			offsets[i].x = i * 35 - width;
+			offsets[i].y = 145;
+		}
+
+		// Draw the text bounds
+		view->SetHighColor(ui_color(B_SUCCESS_COLOR));
+		r = BRect(offsets[0], offsets[strlen(str) - 1]);
+		r.top = 75;
+		view->FillRect(r);
+
+		// Draw the text (which should fit inside the bounds rectangle)
+		view->SetHighColor(0, 0, 0, 255);
+		view->DrawString(str, offsets, strlen(str));
+
+	}
+};
+
+
 // #pragma mark - BitmapTest
 
 
@@ -510,7 +573,8 @@ public:
 		view->FillRect(rect);
 
 		// The rect offset should compensate the transform translation, so the
-		// bitmap should be drawn at the view origin.
+		// bitmap should be drawn at the view origin. It will then exactly
+		// cover the red rectangle, which should not be visible anymore.
 		rect.OffsetBy(0, 40);
 
 		BAffineTransform transform;
@@ -582,12 +646,13 @@ main(int argc, char** argv)
 
 	window->AddTest(new RectsTest());
 	window->AddTest(new BitmapClipTest());
+	window->AddTest(new TextClippingTest());
 	window->AddTest(new BitmapTest());
 	window->AddTest(new GradientTest());
 	window->AddTest(new NestedStatesTest());
 	window->AddTest(new ClippingTest());
 
-	window->SetToTest(1);
+	window->SetToTest(2);
 	window->Show();
 
 	app.Run();
