@@ -56,6 +56,66 @@ Test::~Test()
 }
 
 
+class BitmapTest : public Test {
+public:
+	BitmapTest(const char* name)
+		:
+		Test(name),
+		fBitmap(_LoadBitmap(555))
+	{
+	}
+
+private:
+	status_t
+	_GetAppResources(BResources& resources) const
+	{
+		app_info info;
+		status_t status = be_app->GetAppInfo(&info);
+		if (status != B_OK)
+			return status;
+	
+		return resources.SetTo(&info.ref);
+	}
+
+
+	BBitmap* _LoadBitmap(int resourceID) const
+	{
+		BResources resources;
+		status_t status = _GetAppResources(resources);
+		if (status != B_OK)
+			return NULL;
+	
+		size_t dataSize;
+		const void* data = resources.LoadResource(B_MESSAGE_TYPE, resourceID,
+			&dataSize);
+		if (data == NULL)
+			return NULL;
+
+		BMemoryIO stream(data, dataSize);
+
+		// Try to read as an archived bitmap.
+		BMessage archive;
+		status = archive.Unflatten(&stream);
+		if (status != B_OK)
+			return NULL;
+
+		BBitmap* bitmap = new BBitmap(&archive);
+
+		status = bitmap->InitCheck();
+		if (status != B_OK) {
+			delete bitmap;
+			bitmap = NULL;
+		}
+
+		return bitmap;
+	}
+
+protected:
+	BBitmap*	fBitmap;
+};
+
+
+
 // #pragma mark - TestView
 
 
@@ -260,15 +320,14 @@ public:
 };
 
 
-// #pragma mark - BitmapTest
+// #pragma mark - AlphaMaskBitmapTest
 
 
-class BitmapTest : public Test {
+class AlphaMaskBitmapTest : public BitmapTest {
 public:
-	BitmapTest()
+	AlphaMaskBitmapTest()
 		:
-		Test("Bitmap"),
-		fBitmap(_LoadBitmap(555))
+		BitmapTest("Alpha Masked Bitmap")
 	{
 	}
 
@@ -315,54 +374,6 @@ public:
 	
 		view->DrawBitmap(fBitmap, fBitmap->Bounds(), rect);
 	}
-
-private:
-	status_t
-	_GetAppResources(BResources& resources) const
-	{
-		app_info info;
-		status_t status = be_app->GetAppInfo(&info);
-		if (status != B_OK)
-			return status;
-	
-		return resources.SetTo(&info.ref);
-	}
-
-
-	BBitmap* _LoadBitmap(int resourceID) const
-	{
-		BResources resources;
-		status_t status = _GetAppResources(resources);
-		if (status != B_OK)
-			return NULL;
-	
-		size_t dataSize;
-		const void* data = resources.LoadResource(B_MESSAGE_TYPE, resourceID,
-			&dataSize);
-		if (data == NULL)
-			return NULL;
-
-		BMemoryIO stream(data, dataSize);
-
-		// Try to read as an archived bitmap.
-		BMessage archive;
-		status = archive.Unflatten(&stream);
-		if (status != B_OK)
-			return NULL;
-
-		BBitmap* bitmap = new BBitmap(&archive);
-
-		status = bitmap->InitCheck();
-		if (status != B_OK) {
-			delete bitmap;
-			bitmap = NULL;
-		}
-
-		return bitmap;
-	}
-
-private:
-	BBitmap*	fBitmap;
 };
 
 
@@ -543,15 +554,14 @@ public:
 };
 
 
-// #pragma mark - BitmapTest
+// #pragma mark - BitmapClipTest
 
 
-class BitmapClipTest : public Test {
+class BitmapClipTest : public BitmapTest {
 public:
 	BitmapClipTest()
 		:
-		Test("Bitmap clipping"),
-		fBitmap(_LoadBitmap(555))
+		BitmapTest("Bitmap clipping")
 	{
 	}
 
@@ -583,54 +593,6 @@ public:
 
 		view->DrawBitmap(fBitmap, fBitmap->Bounds(), rect);
 	}
-
-private:
-	status_t
-	_GetAppResources(BResources& resources) const
-	{
-		app_info info;
-		status_t status = be_app->GetAppInfo(&info);
-		if (status != B_OK)
-			return status;
-
-		return resources.SetTo(&info.ref);
-	}
-
-
-	BBitmap* _LoadBitmap(int resourceID) const
-	{
-		BResources resources;
-		status_t status = _GetAppResources(resources);
-		if (status != B_OK)
-			return NULL;
-
-		size_t dataSize;
-		const void* data = resources.LoadResource(B_MESSAGE_TYPE, resourceID,
-			&dataSize);
-		if (data == NULL)
-			return NULL;
-
-		BMemoryIO stream(data, dataSize);
-
-		// Try to read as an archived bitmap.
-		BMessage archive;
-		status = archive.Unflatten(&stream);
-		if (status != B_OK)
-			return NULL;
-
-		BBitmap* bitmap = new BBitmap(&archive);
-
-		status = bitmap->InitCheck();
-		if (status != B_OK) {
-			delete bitmap;
-			bitmap = NULL;
-		}
-
-		return bitmap;
-	}
-
-private:
-	BBitmap*	fBitmap;
 };
 
 
@@ -647,7 +609,7 @@ main(int argc, char** argv)
 	window->AddTest(new RectsTest());
 	window->AddTest(new BitmapClipTest());
 	window->AddTest(new TextClippingTest());
-	window->AddTest(new BitmapTest());
+	window->AddTest(new AlphaMaskBitmapTest());
 	window->AddTest(new GradientTest());
 	window->AddTest(new NestedStatesTest());
 	window->AddTest(new ClippingTest());
