@@ -107,7 +107,7 @@ KernelMergeObject kernel_lib_posix.o :
 	strcmp.c
 	strcpy.c
 	strcspn.c
-	strdup.c
+	strdup.cpp
 	strerror.c
 	strlcat.c
 	strlcpy.c

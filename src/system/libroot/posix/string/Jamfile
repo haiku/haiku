@@ -5,6 +5,12 @@ UsePrivateHeaders
 	[ FDirName libroot locale ]
 	;
 
+
+# Our versions of strdup and strndup check for NULL parameters (for BeOS
+# compatibility), but GCC optimizes this away as its builtins don't handle
+# it.
+C++FLAGS += -fno-builtin-strdup -fno-builtin-strndup ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
@@ -29,7 +35,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			strcoll.cpp
 			strcpy.c
 			strcspn.c
-			strdup.c
+			strdup.cpp
 			strerror.c
 			strlcat.c
 			strlcpy.c

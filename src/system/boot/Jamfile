@@ -21,7 +21,7 @@ BootMergeObject boot_libroot.o :
 	memchr.c
 	memcmp.c
 	memmove.c
-	strdup.c
+	strdup.cpp
 	strndup.cpp
 	strlen.cpp
 	strnlen.cpp
