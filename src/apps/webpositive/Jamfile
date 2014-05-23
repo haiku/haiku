@@ -19,6 +19,7 @@ local sources =
 	# support
 	BaseURL.cpp
 	BitmapButton.cpp
+	BookmarkBar.cpp
 	FontSelectionView.cpp
 	SettingsMessage.cpp
 
