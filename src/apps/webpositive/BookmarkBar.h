@@ -11,6 +11,7 @@
 #include <MenuBar.h>
 #include <Node.h>
 #include <NodeMonitor.h>
+#include <Size.h>
 
 
 class BEntry;
@@ -30,12 +31,16 @@ public:
 	void							AttachedToWindow();
 	void							MessageReceived(BMessage* message);
 
+	void							FrameResized(float width, float height);
+	BSize							MinSize();
+
 private:
 	void							_AddItem(ino_t inode, BEntry* entry);
 
 private:
 	node_ref						fNodeRef;
 	std::map<ino_t, BPrivate::IconMenuItem*>	fItemsMap;
+	BMenu*							fOverflowMenu;
 };
 
 

@@ -14,12 +14,19 @@
 
 #include "NavMenu.h"
 
+#include <stdio.h>
+
 
 BookmarkBar::BookmarkBar(const char* title, BHandler* target,
 	const entry_ref* navDir)
 	: BMenuBar(title)
 {
+	SetFlags(Flags() | B_FRAME_EVENTS);
 	BEntry(navDir).GetNodeRef(&fNodeRef);
+
+	fOverflowMenu = new BMenu(B_UTF8_ELLIPSIS);
+
+	AddItem(fOverflowMenu);
 }
 
 
@@ -119,6 +126,59 @@ BookmarkBar::MessageReceived(BMessage* message)
 
 
 void
+BookmarkBar::FrameResized(float width, float height)
+{
+	int32 count = CountItems() - 1;
+		// We don't touch the "more" menu
+	int32 i = 0;
+	float rightmost = 0.f;
+	while (i < count) {
+		BMenuItem* item = ItemAt(i);
+		BRect frame = item->Frame();
+		if (frame.right > width - 32)
+			break;
+		rightmost = frame.right;
+		i++;
+	}
+
+	if (i == count) {
+		// See if we can move some items from the "more" menu in the remaining
+		// space.
+		BMenuItem* extraItem = fOverflowMenu->ItemAt(0);
+		while (extraItem) {
+			BRect frame = extraItem->Frame();
+			if (frame.Width() + rightmost > width - 32)
+				break;
+
+			AddItem(fOverflowMenu->RemoveItem((int32)0), i);
+			i++;
+
+			extraItem = fOverflowMenu->ItemAt(0);
+		}
+	} else {
+		// Remove any overflowing item and move them to the "more" menu.
+		for (int j = i; j < count; j++)
+			fOverflowMenu->AddItem(RemoveItem(j), 0);
+	}
+}
+
+
+BSize
+BookmarkBar::MinSize()
+{
+	BSize size = BMenuBar::MinSize();
+
+	// We only need space to show the "more" button.
+	size.width = 32;
+
+	return size;
+}
+
+
+//#pragma mark - private methods
+
+
+void
 BookmarkBar::_AddItem(ino_t inode, BEntry* entry)
 {
 	char name[B_FILE_NAME_LENGTH];
@@ -149,6 +209,10 @@ BookmarkBar::_AddItem(ino_t inode, BEntry* entry)
 			B_MINI_ICON);
 	}
 
-	BMenuBar::AddItem(item);
+	BMenuBar::AddItem(item, CountItems() - 1);
 	fItemsMap[inode] = item;
+
+	// Move the item to the "more" menu if it overflows.
+	BRect r = Bounds();
+	FrameResized(r.width(), r.height());
 }
