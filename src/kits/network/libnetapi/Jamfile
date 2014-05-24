@@ -14,7 +14,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local sslSources ;
 		local md5Sources ;
 
-		Includes [ FGristFiles $(HPKG_SOURCES) ]
+		Includes [ FGristFiles HttpRequest.cpp ]
 			: [ BuildFeatureAttribute zlib : headers ] ;
 
 		UsePrivateSystemHeaders ;
@@ -55,7 +55,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			NetworkInterface.cpp
 			NetworkRoster.cpp
 			RouteSupport.cpp
-			
+
 			AbstractSocket.cpp
 			DatagramSocket.cpp
 			Socket.cpp
