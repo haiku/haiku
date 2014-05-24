@@ -171,6 +171,7 @@ pll_ppll_ss_probe(pll_info* pll, uint32 ssID)
 	if (atom_parse_data_header(gAtomContext, index, &headerSize,
 		&tableMajor, &tableMinor, &headerOffset) != B_OK) {
 		ERROR("%s: Couldn't parse data header\n", __func__);
+		pll->ssEnabled = false;
 		return B_ERROR;
 	}
 
@@ -192,10 +193,12 @@ pll_ppll_ss_probe(pll_info* pll, uint32 ssID)
 			pll->ssRange = ss_info->asSS_Info[i].ucSS_Range;
 			pll->ssReferenceDiv
 				= ss_info->asSS_Info[i].ucRecommendedRef_Div;
+			pll->ssEnabled = true;
 			return B_OK;
 		}
 	}
 
+	pll->ssEnabled = false;
 	return B_ERROR;
 }
 
@@ -212,6 +215,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 	if (atom_parse_data_header(gAtomContext, index, &headerSize,
 		&tableMajor, &tableMinor, &headerOffset) != B_OK) {
 		ERROR("%s: Couldn't parse data header\n", __func__);
+		pll->ssEnabled = false;
 		return B_ERROR;
 	}
 
@@ -252,6 +256,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 				pll->ssRate = B_LENDIAN_TO_HOST_INT16(
 					ss_info->info.asSpreadSpectrum[i].usSpreadRateInKhz);
 				pll->ssPercentageDiv = 100;
+				pll->ssEnabled = true;
 				return B_OK;
 			}
 			break;
@@ -281,6 +286,7 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 				pll->ssRate = B_LENDIAN_TO_HOST_INT16(
 					ss_info->info_2.asSpreadSpectrum[i].usSpreadRateIn10Hz);
 				pll->ssPercentageDiv = 100;
+				pll->ssEnabled = true;
 				return B_OK;
 			}
 			break;
@@ -319,15 +325,18 @@ pll_asic_ss_probe(pll_info* pll, uint32 ssID)
 					|| ssID == ASIC_INTERNAL_MEMORY_SS)
 					pll->ssRate /= 100;
 
+				pll->ssEnabled = true;
 				return B_OK;
 			}
 			break;
 		default:
 			ERROR("%s: Unknown SS table version!\n", __func__);
+			pll->ssEnabled = false;
 			return B_ERROR;
 	}
 
 	ERROR("%s: No potential spread spectrum data found!\n", __func__);
+	pll->ssEnabled = false;
 	return B_ERROR;
 }
 
@@ -391,7 +400,6 @@ pll_compute(pll_info* pll)
 
 	pll->feedbackDiv = 0;
 	pll->feedbackDivFrac = 0;
-	const uint32 referenceFrequency = pll->referenceFreq;
 
 	if ((pll->flags & PLL_USE_REF_DIV) != 0) {
 		TRACE("%s: using AtomBIOS reference divider\n", __func__);
@@ -405,8 +413,8 @@ pll_compute(pll_info* pll)
 
 		const uint32 numerator = pll->postDiv * pll->referenceDiv
 			* targetClock;
-		pll->feedbackDiv = numerator / referenceFrequency;
-		pll->feedbackDivFrac = numerator % referenceFrequency;
+		pll->feedbackDiv = numerator / pll->referenceFreq;
+		pll->feedbackDivFrac = numerator % pll->referenceFreq;
 
 		if (pll->feedbackDiv > pll->maxFeedbackDiv)
 			pll->feedbackDiv = pll->maxFeedbackDiv;
@@ -415,7 +423,7 @@ pll_compute(pll_info* pll)
 
 		// Put first 2 digits after the decimal point into feedbackDivFrac
 		pll->feedbackDivFrac
-			= (100 * pll->feedbackDivFrac) / referenceFrequency;
+			= (100 * pll->feedbackDivFrac) / pll->referenceFreq;
 		
 		// Now round it to one digit
 		if (pll->feedbackDivFrac >= 5) {
@@ -435,16 +443,16 @@ pll_compute(pll_info* pll)
 			uint32 retroEncabulator = pll->postDiv * pll->referenceDiv;
 
 			retroEncabulator *= targetClock;
-			pll->feedbackDiv = retroEncabulator / referenceFrequency;
+			pll->feedbackDiv = retroEncabulator / pll->referenceFreq;
 			pll->feedbackDivFrac
-				= retroEncabulator % referenceFrequency;
+				= retroEncabulator % pll->referenceFreq;
 
 			if (pll->feedbackDiv > pll->maxFeedbackDiv)
 				pll->feedbackDiv = pll->maxFeedbackDiv;
 			else if (pll->feedbackDiv < pll->minFeedbackDiv)
 				pll->feedbackDiv = pll->minFeedbackDiv;
 
-			if (pll->feedbackDivFrac >= (referenceFrequency / 2))
+			if (pll->feedbackDivFrac >= (pll->referenceFreq / 2))
 				pll->feedbackDiv++;
 
 			pll->feedbackDivFrac = 0;
@@ -461,7 +469,7 @@ pll_compute(pll_info* pll)
 					__func__, targetClock);
 				return B_ERROR;
 			}
-			uint32 tmp = (referenceFrequency * pll->feedbackDiv)
+			uint32 tmp = (pll->referenceFreq * pll->feedbackDiv)
 				/ (pll->postDiv * pll->referenceDiv);
 			tmp = (tmp * 1000) / targetClock;
 
@@ -481,14 +489,14 @@ pll_compute(pll_info* pll)
 	}
 
 	uint32 calculatedClock
-		= ((referenceFrequency * pll->feedbackDiv * 10)
-		+ (referenceFrequency * pll->feedbackDivFrac))
+		= ((pll->referenceFreq * pll->feedbackDiv * 10)
+		+ (pll->referenceFreq * pll->feedbackDivFrac))
 		/ (pll->referenceDiv * pll->postDiv * 10);
 
 	TRACE("%s: Calculated pixel clock of %" B_PRIu32 " based on:\n", __func__,
 		calculatedClock);
 	TRACE("%s:   referenceFrequency: %" B_PRIu32 "; "
-		"referenceDivider: %" B_PRIu32 "\n", __func__, referenceFrequency,
+		"referenceDivider: %" B_PRIu32 "\n", __func__, pll->referenceFreq,
 		pll->referenceDiv);
 	TRACE("%s:   feedbackDivider: %" B_PRIu32 "; "
 		"feedbackDividerFrac: %" B_PRIu32 "\n", __func__, pll->feedbackDiv,
@@ -502,7 +510,14 @@ pll_compute(pll_info* pll)
 	}
 
 	// Calcuate needed SS data on DCE4
-	if (info.dceMajor >= 4) {
+	if (info.dceMajor >= 4 && pll->ssEnabled) {
+		if (pll->ssPercentageDiv == 0) {
+			// Avoid div by 0, shouldn't happen but be mindful of it
+			TRACE("%s: ssPercentageDiv is less than 0, aborting SS calcualation",
+				__func__);
+			pll->ssEnabled = false;
+			return B_OK;
+		}
 		uint32 amount = ((pll->feedbackDiv * 10) + pll->feedbackDivFrac);
 		amount *= pll->ssPercentage;
 		amount /= pll->ssPercentageDiv * 100;
@@ -744,33 +759,26 @@ pll_set(display_mode* mode, uint8 crtcID)
 				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_DP);
 			else {
 				if (dp_clock == 162000) {
-					pll->ssEnabled = pll_ppll_ss_probe(pll,
-						ATOM_DP_SS_ID2) == B_OK ? true : false;
+					pll_ppll_ss_probe(pll, ATOM_DP_SS_ID2);
 					if (!pll->ssEnabled)
-						pll->ssEnabled = pll_ppll_ss_probe(pll,
-							ATOM_DP_SS_ID1) == B_OK ? true : false;
+						pll_ppll_ss_probe(pll, ATOM_DP_SS_ID1);
 				} else
-					pll->ssEnabled = pll_ppll_ss_probe(pll,
-						ATOM_DP_SS_ID1) == B_OK ? true : false;
+					pll_ppll_ss_probe(pll, ATOM_DP_SS_ID1);
 			}
 			break;
 		case ATOM_ENCODER_MODE_LVDS:
 			if (info.dceMajor >= 4)
-				pll->ssEnabled = pll_asic_ss_probe(pll,
-					gInfo->lvdsSpreadSpectrumID) == B_OK ? true : false;
+				pll_asic_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
 			else
-				pll->ssEnabled = pll_ppll_ss_probe(pll,
-					gInfo->lvdsSpreadSpectrumID) == B_OK ? true : false;
+				pll_ppll_ss_probe(pll, gInfo->lvdsSpreadSpectrumID);
 			break;
 		case ATOM_ENCODER_MODE_DVI:
 			if (info.dceMajor >= 4)
-				pll->ssEnabled = pll_asic_ss_probe(pll,
-					ASIC_INTERNAL_SS_ON_TMDS) == B_OK ? true : false;
+				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_TMDS);
 			break;
 		case ATOM_ENCODER_MODE_HDMI:
 			if (info.dceMajor >= 4)
-				pll->ssEnabled = pll_asic_ss_probe(pll,
-					ASIC_INTERNAL_SS_ON_HDMI) == B_OK ? true : false;
+				pll_asic_ss_probe(pll, ASIC_INTERNAL_SS_ON_HDMI);
 			break;
 	}
 
@@ -919,8 +927,6 @@ pll_set(display_mode* mode, uint8 crtcID)
 
 	status_t result = atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-	// TODO: PLL forced off until we can test it
-	pll->ssEnabled = false;
 	if (pll->ssEnabled)
 		display_crtc_ss(pll, ATOM_ENABLE);
 	else
