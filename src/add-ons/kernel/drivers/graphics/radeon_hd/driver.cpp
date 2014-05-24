@@ -318,6 +318,10 @@ const struct supported_device {
 	{0x6799, 6, 0, RADEON_TAHITI, CHIP_STD, "Radeon HD 7990"},
 	//  Aruba   DCE 6.1 Trinity / Richland
 	{0x9990, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7920"},
+	{0x9991, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7540"},
+	{0x9992, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7420"},
+	{0x9993, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7480"},
+	{0x9994, 6, 1, RADEON_ARUBA, CHIP_APU, "Radeon HD 7400"},
 	//  Oland   DCE 6,4
 	//  Hainan  NODCE. No display hardware, OpenCL 3D engine.
 
