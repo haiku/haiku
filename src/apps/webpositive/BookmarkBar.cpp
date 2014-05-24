@@ -214,5 +214,5 @@ BookmarkBar::_AddItem(ino_t inode, BEntry* entry)
 
 	// Move the item to the "more" menu if it overflows.
 	BRect r = Bounds();
-	FrameResized(r.width(), r.height());
+	FrameResized(r.Width(), r.Height());
 }
