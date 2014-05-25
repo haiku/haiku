@@ -39,7 +39,7 @@ static const char* kUsage =
 	"Usage: %s [ <options> ] <output file> [ <command line> ]\n"
 	"Records thread scheduling information to a file for later analysis.\n"
 	"If a command line <command line> is given, recording starts right before\n"
-	"executing the command and steps when the respective team quits.\n"
+	"executing the command and stops when the respective team quits.\n"
 	"\n"
 	"Options:\n"
 	"  -l           - When a command line is given: Start recording before\n"
