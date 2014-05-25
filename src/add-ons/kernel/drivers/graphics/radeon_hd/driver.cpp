@@ -106,6 +106,7 @@ const struct supported_device {
 	{0x9615, 2, 0, RADEON_RV610, CHIP_IGP, "Radeon HD 3200"},
 	{0x9614, 2, 0, RADEON_RV610, CHIP_IGP, "Radeon HD 3300"},
 	//  Radeon 3430		- RV620
+	{0x95c2, 3, 0, RADEON_RV620, CHIP_STD, "Radeon HD 3430"},
 	{0x95c5, 3, 0, RADEON_RV620, CHIP_STD, "Radeon HD 3450"},
 	{0x95c6, 3, 0, RADEON_RV620, CHIP_STD, "Radeon HD 3450"},
 	{0x95c7, 3, 0, RADEON_RV620, CHIP_STD, "Radeon HD 3450"},
