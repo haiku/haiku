@@ -104,6 +104,8 @@ enum radeon_chipset {
 	RADEON_KAVERI,		//Sea Islands, DCE 8.1
 	RADEON_BONAIRE,		// DCE 8.2
 	RADEON_KABINI,		// DCE 8.3
+	RADEON_MULLINS,		// DCE 8.3
+	RADEON_HAWAII,		// ??
 };
 
 // !! Must match chipset families above
@@ -155,7 +157,9 @@ static const char radeon_chip_name[][MAX_NAME_LENGTH] = {
 	"Hainan",
 	"Kaveri",
 	"Bonaire",
-	"Kabini"
+	"Kabini",
+	"Mullins",
+	"Hawaii"
 };
 
 
