@@ -29,33 +29,35 @@
 #ifndef _ATOMBIOS_H
 #define _ATOMBIOS_H
 
+// Types for Haiku
+#include "atombios-types.h"
+
 #define ATOM_VERSION_MAJOR                   0x00020000
 #define ATOM_VERSION_MINOR                   0x00000002
 
 #define ATOM_HEADER_VERSION (ATOM_VERSION_MAJOR | ATOM_VERSION_MINOR)
 
-#if defined(__POWERPC__)
-#define ATOM_BIG_ENDIAN 1
-#else
-#define ATOM_BIG_ENDIAN 0
-#endif
-
+/* Endianness should be specified before inclusion,
+ * default to little endian
+ */
 #ifndef ATOM_BIG_ENDIAN
 #error Endian not specified
 #endif
 
-#ifndef ULONG
-typedef unsigned long ULONG;
-#endif
+#ifdef _H2INC
+  #ifndef ULONG 
+    typedef unsigned long ULONG;
+  #endif
 
-#ifndef UCHAR
-typedef unsigned char UCHAR;
-#endif
+  #ifndef UCHAR
+    typedef unsigned char UCHAR;
+  #endif
 
-#ifndef USHORT
-typedef unsigned short USHORT;
+  #ifndef USHORT 
+    typedef unsigned short USHORT;
+  #endif
 #endif
-
+      
 #define ATOM_DAC_A            0 
 #define ATOM_DAC_B            1
 #define ATOM_EXT_DAC          2
