@@ -215,7 +215,7 @@ downloadFile()
 	path=$2
 
 	if [ ! -f "$path" ]; then
-		if [ "$noDownloads" == "1" ]; then
+		if [ "$noDownloads" = "1" ]; then
 			echo "ERROR: Would need to download $url, but HAIKU_NO_DOWNLOADS "
 				"is set!"
 			exit 1
