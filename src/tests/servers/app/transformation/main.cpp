@@ -596,6 +596,35 @@ public:
 };
 
 
+// #pragma mark - PixelAlignTest
+
+
+class PixelAlignTest : public Test {
+public:
+	PixelAlignTest()
+		:
+		Test("Pixel alignment")
+	{
+	}
+
+	virtual void Draw(BView* view, BRect updateRect)
+	{
+		BRect rect(20, 20, 120, 120);
+		view->SetHighColor(ui_color(B_SUCCESS_COLOR));
+		view->StrokeRect(rect);
+
+		BAffineTransform transform;
+			transform.TranslateBy(140, 0);
+		view->SetTransform(transform);
+
+		// Translating a pixel-aligned rectangle by an integer number of
+		// pixels should result in a pixel-aligned rectangle.
+		view->SetHighColor(ui_color(B_FAILURE_COLOR));
+		view->StrokeRect(rect);
+	}
+};
+
+
 // #pragma mark -
 
 
@@ -613,6 +642,7 @@ main(int argc, char** argv)
 	window->AddTest(new GradientTest());
 	window->AddTest(new NestedStatesTest());
 	window->AddTest(new ClippingTest());
+	window->AddTest(new PixelAlignTest());
 
 	window->SetToTest(2);
 	window->Show();
