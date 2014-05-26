@@ -181,6 +181,7 @@ RemotePackageRepository HaikuPorts
 	sdl_sound_devel-1.0.3-2
 	sdl_ttf-2.0.11-1
 	sdl_ttf_devel-2.0.11-1
+	sdllopan-10-2
 	sed-4.2.1-6
 	sge-030809-2
 	sge_devel-030809-2
@@ -367,7 +368,6 @@ RemotePackageRepository HaikuPorts
 	sdl_sound_x86_devel-1.0.3-1
 	sdl_ttf_x86-2.0.11-1
 	sdl_ttf_x86_devel-2.0.11-1
-	sdllopan-10-2
 	sge_x86-030809-1
 	sge_x86_devel-030809-1
 	smjpeg_x86-0.2.1-1
