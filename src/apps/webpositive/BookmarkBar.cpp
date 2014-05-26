@@ -19,13 +19,13 @@
 
 BookmarkBar::BookmarkBar(const char* title, BHandler* target,
 	const entry_ref* navDir)
-	: BMenuBar(title)
+	:
+	BMenuBar(title)
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
 	BEntry(navDir).GetNodeRef(&fNodeRef);
 
 	fOverflowMenu = new BMenu(B_UTF8_ELLIPSIS);
-
 	AddItem(fOverflowMenu);
 }
 
@@ -45,10 +45,10 @@ BookmarkBar::AttachedToWindow()
 	// Enumerate initial directory content
 	BDirectory dir(&fNodeRef);
 	BEntry bookmark;
-	while(dir.GetNextEntry(&bookmark) == B_OK) {
+	while (dir.GetNextEntry(&bookmark) == B_OK) {
 		node_ref ref;
-		bookmark.GetNodeRef(&ref);
-		_AddItem(ref.node, &bookmark);
+		if (bookmark.GetNodeRef(&ref) == B_OK)
+			_AddItem(ref.node, &bookmark);
 	}
 }
 
@@ -56,16 +56,16 @@ BookmarkBar::AttachedToWindow()
 void
 BookmarkBar::MessageReceived(BMessage* message)
 {
-	switch(message->what) {
+	switch (message->what) {
 		case B_NODE_MONITOR:
 		{
 			int32 opcode = message->FindInt32("opcode");
 			ino_t inode = message->FindInt64("node");
-			switch(opcode) {
+			switch (opcode) {
 				case B_ENTRY_CREATED:
 				{
 					entry_ref ref;
-					const char *name;
+					const char* name;
 
 					message->FindInt32("device", &ref.device);
 					message->FindInt64("directory", &ref.directory);
@@ -73,13 +73,13 @@ BookmarkBar::MessageReceived(BMessage* message)
 					ref.set_name(name);
 
 					BEntry entry(&ref);
-					_AddItem(inode, &entry);
+					if (entry.InitCheck() == B_OK)
+						_AddItem(inode, &entry);
 					break;
 				}
 				case B_ENTRY_MOVED:
 				{
-					if (fItemsMap[inode] == NULL)
-					{
+					if (fItemsMap[inode] == NULL) {
 						entry_ref ref;
 						const char *name;
 
@@ -97,11 +97,10 @@ BookmarkBar::MessageReceived(BMessage* message)
 						ino_t from, to;
 						message->FindInt64("to directory", &to);
 						message->FindInt64("from directory", &from);
-						if (from == to)
-						{
+						if (from == to) {
 							const char *name;
-							message->FindString("name", &name);
-							fItemsMap[inode]->SetLabel(name);
+							if (message->FindString("name", &name) == B_OK)
+								fItemsMap[inode]->SetLabel(name);
 							break;
 						}
 					}
@@ -113,6 +112,7 @@ BookmarkBar::MessageReceived(BMessage* message)
 				{
 					IconMenuItem* item = fItemsMap[inode];
 					RemoveItem(item);
+					fOverflowMenu->RemoveItem(item);
 					fItemsMap.erase(inode);
 					delete item;
 				}
@@ -145,7 +145,7 @@ BookmarkBar::FrameResized(float width, float height)
 		// See if we can move some items from the "more" menu in the remaining
 		// space.
 		BMenuItem* extraItem = fOverflowMenu->ItemAt(0);
-		while (extraItem) {
+		while (extraItem != NULL) {
 			BRect frame = extraItem->Frame();
 			if (frame.Width() + rightmost > width - 32)
 				break;
@@ -158,7 +158,7 @@ BookmarkBar::FrameResized(float width, float height)
 	} else {
 		// Remove any overflowing item and move them to the "more" menu.
 		for (int j = i; j < count; j++)
-			fOverflowMenu->AddItem(RemoveItem(j), 0);
+			fOverflowMenu->AddItem(RemoveItem(j));
 	}
 }
 
@@ -175,7 +175,7 @@ BookmarkBar::MinSize()
 }
 
 
-//#pragma mark - private methods
+// #pragma mark - private methods
 
 
 void
@@ -193,7 +193,7 @@ BookmarkBar::_AddItem(ino_t inode, BEntry* entry)
 
 	IconMenuItem* item = NULL;
 
-	if(entry->IsDirectory()) {
+	if (entry->IsDirectory()) {
 		BNavMenu* menu = new BNavMenu(name, B_REFS_RECEIVED, Window());
 		menu->SetNavDir(&ref);
 		item = new IconMenuItem(menu, NULL,
@@ -205,8 +205,7 @@ BookmarkBar::_AddItem(ino_t inode, BEntry* entry)
 
 		BMessage* message = new BMessage(B_REFS_RECEIVED);
 		message->AddRef("refs", &ref);
-		item = new IconMenuItem(name, message, &info,
-			B_MINI_ICON);
+		item = new IconMenuItem(name, message, &info, B_MINI_ICON);
 	}
 
 	BMenuBar::AddItem(item, CountItems() - 1);
