@@ -178,6 +178,11 @@ AlphaMask::_RenderPicture() const
 	if (bitmap == NULL)
 		return NULL;
 
+	if (!bitmap->IsValid()) {
+		delete bitmap;
+		return NULL;
+	}
+
 	// Clear the bitmap with the transparent color
 	memset(bitmap->Bits(), 0, bitmap->BitsLength());
 
