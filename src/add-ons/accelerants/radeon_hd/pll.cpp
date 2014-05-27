@@ -1083,7 +1083,7 @@ pll_shared_dp()
 
 
 /**
- * pll_next_available - Find the next available non-DP PLL
+ * pll_next_available - Find the next available PLL
  *
  * Returns the next available PLL
  */
