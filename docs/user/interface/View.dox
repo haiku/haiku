@@ -2055,6 +2055,12 @@ SetViewColor(Parent()->ViewColor());
 	\brief Fill out \a region with the view's clipping region.
 
 	\param[out] region The BRegion object to fill out.
+
+	Get the current clipping region, which is an intersection of the view
+	visible region on screen (which depends on the view bounds, any child view
+	hiding parts of it, and overlapping windows) and the constrained clipping
+	regions set by calls to ConstrainClippingRegion() in the current stack of
+	drawing states.
 */
 
 
@@ -2065,14 +2071,20 @@ SetViewColor(Parent()->ViewColor());
 
 	The Application Server keeps track of the clipping region for each view
 	attached to a window so that the view can't draw outside of it,
-	consequently this method works only for view that are attached to a window.
+	consequently this method works only for views that are attached to a window.
 
-	The default clipping region contains the visible area of the view. By passing
-	a region to this method the clipping area is further restricted. Passing in
-	\c NULL resets the clipping region back to the default.
+	The default clipping region contains the visible area of the view. By
+	passing a region to this method the clipping area is further restricted.
+	Passing in \c NULL resets the clipping region back to the default.
 
 	Calls to ConstrainClippingRegion() are not cumulative, each time this
-	method is called it replaces the old clipping region.
+	method is called it replaces the old clipping region. However, clipping
+	regions from previous states are intersected to compute the effective
+	clipping.
+
+	Region-based clipping is not affected by the view transform. If you need to
+	constrain drawing to a transformed region, use ClipToPicture() and
+	FillRegion() instead.
 
 	\param region The region to set the clipping region to or \c NULL
 	       to reset to default.
