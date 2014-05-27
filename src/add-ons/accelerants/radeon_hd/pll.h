@@ -104,6 +104,10 @@ struct pll_info {
 void pll_external_init();
 status_t pll_external_set(uint32 clock);
 status_t pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID);
+uint32 pll_usage_mask();
+uint32 pll_usage_count(uint32 pllID);
+uint32 pll_shared_dp();
+uint32 pll_next_available();
 status_t pll_compute(pll_info* pll);
 void pll_setup_flags(pll_info* pll, uint8 crtcID);
 status_t pll_limit_probe(pll_info* pll);

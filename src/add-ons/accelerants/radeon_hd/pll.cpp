@@ -1012,14 +1012,105 @@ pll_external_init()
 	} else if (info.dceMajor >= 4) {
 		// Create our own pseudo pll
 		pll_info pll;
-		bool ssPresent = pll_asic_ss_probe(&pll, ASIC_INTERNAL_SS_ON_DCPLL)
-			== B_OK ? true : false;
-		if (ssPresent)
+		pll_asic_ss_probe(&pll, ASIC_INTERNAL_SS_ON_DCPLL);
+		if (pll.ssEnabled)
 			display_crtc_ss(&pll, ATOM_DISABLE);
 		pll_external_set(gInfo->displayClockFrequency);
-		if (ssPresent)
+		if (pll.ssEnabled)
 			display_crtc_ss(&pll, ATOM_ENABLE);
 	}
+}
+
+/**
+ * pll_usage_mask - Calculate which PLL's are in use
+ *
+ * Returns the mask of which PLL's are in use
+ */
+uint32
+pll_usage_mask()
+{
+	uint32 pllMask = 0;
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		if (gConnector[id]->valid == true) {
+			pll_info* pll = &gConnector[id]->encoder.pll;
+			if (pll->id != ATOM_PPLL_INVALID)
+				pllMask |= (1 << pll->id);
+		}
+	}
+	return pllMask;
+}
+
+
+/**
+ * pll_usage_count - Find number of connectors attached to a PLL
+ *
+ * Returns the count of connectors using specified PLL
+ */
+uint32
+pll_usage_count(uint32 pllID)
+{
+	uint32 pllCount = 0;
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		if (gConnector[id]->valid == true) {
+			pll_info* pll = &gConnector[id]->encoder.pll;
+			if (pll->id == pllID)
+				pllCount++;
+		}
+	}
+
+	return pllCount;
+}
+
+
+/**
+ * pll_shared_dp - Find any existing PLL's used for DP connectors
+ *
+ * Returns the PLL shared by other DP connectors
+ */
+uint32
+pll_shared_dp()
+{
+	for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
+		if (gConnector[id]->valid == true) {
+			if (connector_is_dp(id)) {
+				pll_info* pll = &gConnector[id]->encoder.pll;
+				return pll->id;
+			}
+		}
+	}
+	return ATOM_PPLL_INVALID;
+}
+
+
+/**
+ * pll_next_available - Find the next available non-DP PLL
+ *
+ * Returns the next available PLL
+ */
+uint32
+pll_next_available()
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+	uint32 dceVersion = (info.dceMajor * 100) + info.dceMinor;
+
+	uint32 pllMask = pll_usage_mask();
+
+	if (dceVersion == 802 || dceVersion == 601) {
+		if (!(pllMask & (1 << ATOM_PPLL0)))
+			return ATOM_PPLL0;
+	}
+
+	if (!(pllMask & (1 << ATOM_PPLL1)))
+		return ATOM_PPLL1;
+	if (dceVersion != 601) {
+		if (!(pllMask & (1 << ATOM_PPLL2)))
+			return ATOM_PPLL2;
+	}
+	// TODO: If this starts happening, we likely need to
+	// add the sharing of PLL's with identical clock rates
+	// (see radeon_atom_pick_pll in drm)
+	ERROR("%s: Unable to find a PLL! (0x%" B_PRIX32 ")\n", __func__, pllMask);
+	return ATOM_PPLL_INVALID;
 }
 
 
@@ -1028,34 +1119,45 @@ pll_pick(uint32 connectorIndex)
 {
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 	radeon_shared_info &info = *gInfo->shared_info;
+	uint32 dceVersion = (info.dceMajor * 100) + info.dceMinor;
 
 	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
 
-	if (info.dceMajor == 6 && info.dceMinor == 1) {
-		// DCE 6.1 APU
-		if (gConnector[connectorIndex]->encoder.objectID
-			== ENCODER_OBJECT_ID_INTERNAL_UNIPHY && !linkB) {
-			pll->id = ATOM_PPLL2;
+	pll->id = ATOM_PPLL_INVALID;
+
+	// DCE 6.1 APU, UNIPHYA requires PLL2
+	if (gConnector[connectorIndex]->encoder.objectID
+		== ENCODER_OBJECT_ID_INTERNAL_UNIPHY && !linkB) {
+		pll->id = ATOM_PPLL2;
+		return B_OK;
+	}
+
+	if (connector_is_dp(connectorIndex)) {
+		// If DP external clock, set to invalid except on DCE 6.1
+		if (gInfo->dpExternalClock && !(dceVersion == 601)) {
+			pll->id = ATOM_PPLL_INVALID;
 			return B_OK;
 		}
-		// TODO: check for used PLL1 and use PLL2?
-		pll->id = ATOM_PPLL1;
-		return B_OK;
-	} else if (info.dceMajor >= 4) {
-		if (connector_is_dp(connectorIndex)) {
-			if (gInfo->dpExternalClock) {
-				pll->id = ATOM_PPLL_INVALID;
+
+		// DCE 6.1+, we can share DP PLLs. See if any other DP connectors
+		// have been assigned a PLL yet.
+		if (dceVersion >= 601) {
+			pll->id = pll_shared_dp();
+			if (pll->id != ATOM_PPLL_INVALID)
 				return B_OK;
-			} else if (info.dceMajor >= 6) {
-				pll->id = ATOM_PPLL1;
-				return B_OK;
-			} else if (info.dceMajor >= 5) {
-				pll->id = ATOM_DCPLL;
-				return B_OK;
-			}
+			// Continue through to pll_next_available
+		} else if (dceVersion == 600) {
+			pll->id = ATOM_PPLL0;
+			return B_OK;
+		} else if (info.dceMajor >= 5) {
+			pll->id = ATOM_DCPLL;
+			return B_OK;
 		}
-		pll->id = ATOM_PPLL1;
+	}
+
+	if (info.dceMajor >= 4) {
+		pll->id = pll_next_available();
 		return B_OK;
 	}
 
