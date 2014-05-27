@@ -24,7 +24,7 @@ RemotePackageRepository HaikuPorts
 	automake-1.13.1-4
 	beam-1.2alpha-1
 	bepdf-1.1.1~beta5_2013_04_28-1
-	bescreencapture-1.9.3-1
+	bescreencapture-1.9.4-1
 #	bezillabrowser-2.0.0.22pre_2010_05_02-1
 	binutils-2.17_2013_04_21-2
 	bison-2.4.3-6
