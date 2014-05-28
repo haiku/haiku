@@ -36,6 +36,8 @@ enum {
 static const uint32 kDefaultMode = 0777;
 static const uint8 padding[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
+extern bool gVerbose;
+
 enum {
 	P_DATA = 0,
 	P_ATTRIBUTE
@@ -175,17 +177,20 @@ PackageItem::InitPath(const char* path, BPath* destination)
 	status_t ret = B_OK;
 
 	if (fPathType == P_INSTALL_PATH) {
-//		printf("InitPath - relative: %s + %s\n", path, fPath.String());
+		if (gVerbose)
+			printf("InitPath - relative: %s + %s\n", path, fPath.String());
 		if (path == NULL) {
 			parser_debug("InitPath path is NULL\n");
 			return B_ERROR;
 		}
 		ret = destination->SetTo(path, fPath.String());
 	} else if (fPathType == P_SYSTEM_PATH) {
-//		printf("InitPath - absolute: %s\n", fPath.String());
+		if (gVerbose)
+			printf("InitPath - absolute: %s\n", fPath.String());
 		ret = destination->SetTo(fPath.String());
 	} else {
-//		printf("InitPath - volume: %s + %s\n", path, fPath.String());
+		if (gVerbose)
+			printf("InitPath - volume: %s + %s\n", path, fPath.String());
 		if (path == NULL) {
 			parser_debug("InitPath path is NULL\n");
 			return B_ERROR;
@@ -237,7 +242,8 @@ PackageItem::InitPath(const char* path, BPath* destination)
 		}
 
 		if (wasRewritten) {
-//			printf("rewritten: %s\n", pathString.String());
+			if (gVerbose)
+				printf("rewritten: %s\n", pathString.String());
 			destination->SetTo(pathString.String());
 		}
 	}
@@ -620,7 +626,8 @@ PackageScript::DoInstall(const char* path, ItemState* state)
 						// that's more fragile... but a common source for
 						// the rewriting of BeOS paths is needed.
 
-//						printf("%s\n", script.String());
+						if (gVerbose)
+							printf("%s\n", script.String());
 
 						BPath workingDirectory;
 						if (path != NULL)

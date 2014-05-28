@@ -27,6 +27,9 @@
 #define B_TRANSLATION_CONTEXT "Packageinstaller main"
 
 
+bool gVerbose = false;
+
+
 class PackageInstaller : public BApplication {
 public:
 								PackageInstaller();
@@ -84,6 +87,11 @@ void
 PackageInstaller::ArgvReceived(int32 argc, char** argv)
 {
 	for (int i = 1; i < argc; i++) {
+		if (strcmp("--verbose", argv[i]) == 0 || strcmp("-v", argv[i]) == 0) {
+			gVerbose = true;
+			continue;
+		}
+		
 		BPath path;
 		if (path.SetTo(argv[i]) != B_OK) {
 			fprintf(stderr, B_TRANSLATE("Error! \"%s\" is not a valid path.\n"),
