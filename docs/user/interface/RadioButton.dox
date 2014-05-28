@@ -1,0 +1,447 @@
+/*
+ * Copyright 2014 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/RadioButton.h	 hrev47274
+ *		src/kits/interface/RadioButton.cpp	 hrev47274
+ */
+
+
+/*!
+	\file RadioButton.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BRadioButton class definition.
+*/
+
+
+/*!
+	\class BRadioButton
+	\ingroup interface
+	\ingroup libbe
+	\brief A user interface control used to select between a set of mutually
+	       exclusive options.
+
+	\image html BRadioButton_example.png
+
+	Radio buttons, unlike check boxes, are always used as part of a group.
+	Only one radio button in a group can be on at a time, when one is turned
+	on all sibling radio buttons are turned off. When a radio button is on it
+	has a value of 1 (\c B_CONTROL_ON), when it is off it has a value of 0
+	(\c B_CONTROL_OFF). Since all sibling radio buttons are connected to
+	create separate groups of radio buttons each group must be attached to
+	a different parent, for instance a separate BView.
+
+	Each radio button in a group sends its own BMessage, it's up to you to
+	determine what action takes place when each radio button is selected, if
+	any. The message is sent only when a radio button is turned on, not when
+	it is turned off.
+*/
+
+
+/*!
+	\fn BRadioButton::BRadioButton(BRect frame, const char* name,
+		const char* label, BMessage* message, uint32 resizingMode,
+		uint32 flags)
+	\brief Construct a radio button in the \a frame rectangle with a \a name,
+	       \a label, model \a message, \a resizingMode, and creation \a flags.
+
+	\note This constructor will resize the control to it's minimum height if needed
+	      for compatibility with BeOS R5.
+
+	The initial value of the radio button is 0 (\c B_CONTROL_OFF).
+
+	\param frame The \a frame to draw the radio button in.
+	\param name The \a name of the radio button, can be \c NULL.
+	\param label The \a label displayed along with the radio button control,
+	       can be \c NULL.
+	\param message The \a message to send when the radio button is activated,
+	       can be \c NULL.
+	\param resizingMode Defines the behavior of the radio button as the parent
+		view resizes. See BView for details.
+	\param flags Behavior flags for the radio button. See BView for details.
+*/
+
+
+/*!
+	\fn BRadioButton::BRadioButton(const char* name, const char* label,
+		BMessage* message, uint32 flags)
+	\brief Construct a radio button with a \a name, \a label, model \a message,
+		and creation \a flags suitable for use with the Layout API.
+
+	The initial value of the radio button is 0 (\c B_CONTROL_OFF).
+
+	\param name The \a name of the radio button, can be \c NULL.
+	\param label The \a label displayed along with the radio button control,
+	       can be \c NULL.
+	\param message The \a message to send when the radio button is activated,
+	       can be \c NULL.
+	\param flags Behavior flags for the checkbox. See BView for details.
+*/
+
+
+/*!
+	\fn BRadioButton::BRadioButton(const char* label, BMessage* message)
+	\brief Constructs a BRadioButton object with just a \a label and model
+		\a message.
+
+	The initial value of the radio button is set to 0 (\c B_CONTROL_OFF).
+	The \a label and the \a message parameters can be set to \c NULL.
+
+	\param label The \a label displayed along with the radio button control,
+	       can be \c NULL.
+	\param message The \a message to send when the radio button is activated,
+	       can be \c NULL.
+*/
+
+
+/*!
+	\fn BRadioButton::BRadioButton(BMessage* archive)
+	\brief Constructs a BRadioButton object from an \a archive message.
+
+	This method is usually not called directly, if you want to build a
+	radio button from an archived message you should call Instantiate()
+	instead because it can handle errors properly.
+
+	\param archive The message to construct the BRadioButton object from.
+*/
+
+
+/*!
+	\fn BRadioButton::~BRadioButton()
+	\brief Destructor, does nothing.
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BArchivable* BRadioButton::Instantiate(BMessage* archive)
+	\brief Creates a new BRadioButton object from the \a archive message.
+
+	\return A newly created radio button or \c NULL if the message doesn't
+	        contain an archived BRadioButton.
+*/
+
+
+/*!
+	\fn status_t BRadioButton::Archive(BMessage* archive, bool deep) const
+	\brief Archives the object into the \a data message.
+
+	\param archive A pointer to the BMessage object to archive the object into.
+	\param deep Whether or not to archive child views as well.
+
+	\return A status code, \c B_OK if everything went well or an error code
+	        otherwise.
+
+	\sa BControl::Archive()
+*/
+
+
+//! @}
+
+
+/*!
+	\name Hook Methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BRadioButton::AttachedToWindow()
+	\brief Hook method called when the control is attached to a window.
+
+	The default implementation does nothing.
+
+	\sa BControl::AttachedToWindow()
+*/
+
+
+/*!
+	\fn void BRadioButton::DetachedFromWindow()
+	\brief Hook method called when the control is detached from a window.
+
+	The default implementation does nothing.
+
+	\sa BControl::DetachedFromWindow()
+*/
+
+
+/*!
+	\fn void BRadioButton::AllAttached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+	       all child views have already been attached to a window.
+
+	The default implementation does nothing.
+
+	\sa BView::AllAttached()
+*/
+
+
+/*!
+	\fn void BRadioButton::AllDetached()
+	\brief Similar to AttachedToWindow() but this method is triggered after
+	       all child views have already been detached from a window.
+
+	The default implementation does nothing.
+
+	\sa BView::AllDetached()
+*/
+
+
+/*!
+	\fn void BRadioButton::Draw(BRect updateRect)
+	\brief Draws the area of the radio button that intersects \a updateRect.
+
+	\note This is an hook method called by the Interface Kit, you don't
+	      have to call it yourself. If you need to forcefully redraw a
+	      radio button consider calling Invalidate() instead.
+
+	\param updateRect The rectangular area to be drawn.
+
+	\sa BView::Draw()
+*/
+
+
+/*!
+	\fn void BRadioButton::FrameMoved(BPoint newPosition)
+	\brief Hook method called when the radio button is moved.
+
+	The default implementation does nothing.
+
+	\param newPosition The point that the radio button has been moved to.
+
+	\sa BView::FrameMoved()
+*/
+
+
+/*!
+	\fn void BRadioButton::FrameResized(float width, float height)
+	\brief Hook method called when the radio button is resized.
+
+	The default implementation does nothing.
+
+	\param width The new \a width of the radio button.
+	\param height The new \a height of the radio button.
+
+	\sa BView::FrameResized()
+*/
+
+
+/*!
+	\fn void BRadioButton::KeyDown(const char* bytes, int32 numBytes)
+	\brief Hook method called when a keyboard key is pressed.
+
+	Overrides \c B_RETURN and \c B_SPACE from BControl to toggle the value,
+	but don't allow turning the control off, only on.
+
+	\param bytes The bytes of the key combination pressed.
+	\param numBytes The number of bytes in \a bytes.
+*/
+
+
+/*!
+	\fn void BRadioButton::MessageReceived(BMessage* message)
+	\brief Handle \a message received by the associated looper.
+
+	The default implemenation does nothing.
+
+	\param message The \a message received by the associated looper.
+
+	\see BControl::MessageReceived()
+*/
+
+
+/*!
+	\fn void BRadioButton::MouseDown(BPoint where)
+	\brief Hook method called when a mouse button is pressed.
+
+	Begins tracking the mouse cursor.
+
+	\param where The point on the screen where to mouse pointer is when
+	       the mouse button is pressed.
+*/
+
+
+/*!
+	\fn void BRadioButton::MouseMoved(BPoint where, uint32 code,
+		const BMessage* dragMessage)
+	\brief Hook method called when the mouse is moved.
+
+	Once MouseDown() has been called on a radio button this method updates
+	the outline when the cursor is inside the control redrawing as necessary.
+
+	\param where The new location of the mouse in the control's coordinate system.
+	\param code One of the following:
+	- \c B_ENTERED_VIEW The cursor has just entered the control.
+	- \c B_INSIDE_VIEW The cursor is inside the control.
+	- \c B_EXITED_VIEW The cursor has left the control's bounds. This only gets
+	     sent if the scope of the mouse events that the control can receive has
+	     been expanded by BView::SetEventMask() or BView::SetMouseEventMask().
+	- \c B_OUTSIDE_VIEW The cursor is outside the button. This only gets sent if
+	     the scope of the mouse events that the control can receive has been
+	     expanded by SetEventMask() or SetMouseEventMask().
+	\param dragMessage If a drag-and-drop operation is taking place this is a
+	     pointer to a BMessage that holds the drag information, otherwise the
+	     pointer is \c NULL.
+*/
+
+
+/*!
+	\fn void BRadioButton::MouseUp(BPoint where)
+	\brief Hook method called when a mouse button is released.
+
+	Turns the button on turning off all sibling radio buttons and calls the
+	Invoke() method. Unlike a BCheckBox, a BRadioButton only posts its message when
+	it is turned on, not when it is turned off.
+
+	\param where The point on the screen where the mouse pointer is located when
+	       the mouse button is released in the view's coordinate system.
+
+	\sa BControl::MouseUp()
+*/
+
+
+/*!
+	\fn void BRadioButton::WindowActivated(bool active)
+	\brief Hook method called when the attached window is activated or
+	       deactivated.
+
+	The default implementation does nothing.
+
+	\param active \c true if the window becomes activated, \c false if the
+	       window becomes deactivated.
+
+	\sa BControl::WindowActivated()
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BRadioButton::MakeFocus(bool focused)
+	\brief Makes the radio button the current focus view of the window or
+	       gives up being the window's focus view.
+
+	The default implementation does nothing.
+
+	\param focused \a true to set focus, \a false to remove it.
+
+	\sa BControl::MakeFocus()
+*/
+
+
+/*!
+	\fn BHandler* BRadioButton::ResolveSpecifier(BMessage* message,
+		int32 index, BMessage* specifier, int32 what, const char* property)
+	\brief Determine the proper specifier for scripting messages.
+
+	The default implementation does nothing.
+
+	\sa BControl::ResolveSpecifier()
+*/
+
+
+/*!
+	\fn void BRadioButton::SetValue(int32 value)
+	\brief Turn the radio button on or off.
+
+	Turning a radio button on turns off all sibling radio buttons and calls the
+	Invoke() method.
+
+	\param value The value to set the radio button to, should be
+		either \c B_CONTROL_ON or \c B_CONTROL_OFF.
+
+	\sa BControl::SetValue()
+*/
+
+
+/*!
+	\fn void BRadioButton::GetPreferredSize(float* _width, float* _height)
+	\brief Fill out the preferred width and height of the radio button
+	       into the \a _width and \a _height parameters.
+
+	\remark Either the \a _width or \a _height parameter may be set to \c NULL
+		    if you only want to get the other one.
+
+	\param[out] _width Pointer to a \c float to store the width.
+	\param[out] _height Pointer to a \c float to store the height.
+*/
+
+
+/*!
+	\fn status_t BRadioButton::GetSupportedSuites(BMessage* message)
+	\brief Report the suites of messages this control understands.
+
+	\param message Allows you to add the names of the suites the radio button
+	       implements to the suites array.
+
+	\return \c B_OK if all went well or an error code otherwise.
+
+	\sa BControl::GetSupportedSuites();
+*/
+
+
+/*!
+	\fn status_t BRadioButton::Invoke(BMessage* message)
+	\brief Sends a copy of the model \a message to the designated target.
+
+	The default implementation does nothing.
+
+	\sa BControl::Invoke()
+*/
+
+
+/*!
+	\fn status_t BRadioButton::Perform(perform_code code, void* _data)
+	\brief Perform some action. (Internal Method)
+*/
+
+
+/*!
+	\fn BAlignment BRadioButton::LayoutAlignment()
+	\brief Returns the alignment used by this control in a layout.
+
+	\return The alignment used by this control as a BAlignment.
+*/
+
+
+/*!
+	\fn BSize BRadioButton::MaxSize()
+	\brief Get the maximum size of the radio button.
+
+	\return The maximum size of the radio button as a BSize.
+
+	\sa BAbstractLayout::MaxSize()
+*/
+
+
+/*!
+	\fn void BRadioButton::ResizeToPreferred()
+	\brief Resize the control to its preferred size.
+
+	The default implementation does nothing.
+
+	\sa BControl::ResizeToPreferred()
+*/
+
+
+/*!
+	\fn status_t BRadioButton::SetIcon(const BBitmap* icon, uint32 flags)
+	\brief Set the icon used by the radio button.
+
+	\see BControl::SetIcon()
+*/
