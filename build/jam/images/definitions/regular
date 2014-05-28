@@ -64,6 +64,7 @@ rule HaikuImageGetSystemLibs
 		$(HAIKU_SHARED_LIBSUPC++_$(TARGET_PACKAGING_ARCH))
 		# libs with standard grist
 		[ MultiArchDefaultGristFiles [ FFilterByBuildFeatures
+			libalm.so
 			libbe.so libbsd.so libbnetapi.so
 			libdebug.so libdevice.so
 			libgame.so libglut.so@mesa libgnu.so
