@@ -221,6 +221,13 @@ PackageItem::InitPath(const char* path, BPath* destination)
 			pathString.ReplaceFirst("/boot/beos/system",
 				systemNonPackagedDir.Path());
 			wasRewritten = true;
+		} else if (pathString.StartsWith("/boot/system")) {
+			BPath systemNonPackagedDir;
+			find_directory(B_SYSTEM_NONPACKAGED_DIRECTORY,
+				&systemNonPackagedDir);
+			pathString.ReplaceFirst("/boot/system",
+				systemNonPackagedDir.Path());
+			wasRewritten = true;
 		} else if (pathString.StartsWith("/boot/home/config")) {
 			BPath userNonPackagedDir;
 			find_directory(B_USER_NONPACKAGED_DIRECTORY, &userNonPackagedDir);
@@ -596,6 +603,9 @@ PackageScript::DoInstall(const char* path, ItemState* state)
 						script.ReplaceAll(
 							"/boot/preferences",
 							"/boot/system/preferences");
+						script.ReplaceAll(
+							"/boot/apps",
+							"/boot/system/non-packaged/apps");
 						script.ReplaceAll(
 							"~/config/add-ons/Screen\\ Savers",
 							"~/config/non-packaged/add-ons/Screen\\ Savers");
