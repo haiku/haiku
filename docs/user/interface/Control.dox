@@ -1,13 +1,13 @@
 /*
- * Copyright 2011-2013 Haiku Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/Control.h	 rev 42794
- *		src/kits/interface/Control.cpp	 rev 42794
+ *		headers/os/interface/Control.h	 hrev47274
+ *		src/kits/interface/Control.cpp	 hrev47274
  */
 
 
@@ -177,8 +177,9 @@
 
 /*!
 	\fn void BControl::DetachedFromWindow()
-	\brief Hook method called when the object is detached from a
-		window.
+	\brief Hook method called when the object is detached from a window.
+
+	The default implementation does nothing.
 
 	\sa BView::DetachedFromWindow()
 */
@@ -189,6 +190,8 @@
 	\brief Similar to AttachedToWindow() but this method is triggered after
 	       all child views have already been attached to a window.
 
+	The default implementation does nothing.
+
 	\sa BView::AllAttached()
 */
 
@@ -197,6 +200,8 @@
 	\fn void BControl::AllDetached()
 	\brief Similar to AttachedToWindow() but this method is triggered after
 	       all child views have already been detached from a window.
+
+	The default implementation does nothing.
 
 	\sa BView::AllDetached()
 */
@@ -240,31 +245,55 @@
 
 
 /*!
-	\fn void BControl::MouseDown(BPoint point)
+	\fn void BControl::MessageReceived(BMessage* message)
+	\brief Handle \a message received by the associated looper.
+
+	\param message The \a message received by the associated looper.
+
+	\see BView::MessageReceived()
+*/
+
+
+/*!
+	\fn void BControl::MouseDown(BPoint where)
 	\brief Hook method called when a mouse button is pressed.
 
-	\param point The point on the screen where to mouse pointer is when
-	       the mouse button is pressed.
+	\param where The point on the screen where the mouse pointer is when
+	       the mouse button is pressed in the view's coordinate system.
 
 	\sa BView::MouseDown()
 */
 
 
 /*!
-	\fn void BControl::MouseUp(BPoint point)
+	\fn void BControl::MouseUp(BPoint where)
 	\brief Hook method called when a mouse button is released.
 
-	\param point The point on the screen where to mouse pointer is when
-	       the mouse button is released.
+	\param where The point on the screen where the mouse pointer is located
+	       when the mouse button is released in the view's coordinate system.
 
 	\sa BView::MouseUp()
 */
 
 
 /*!
-	\fn void BControl::MouseMoved(BPoint point, uint32 transit,
-		const BMessage *message)
+	\fn void BControl::MouseMoved(BPoint where, uint32 code,
+		const BMessage* dragMessage)
 	\brief Hook method called when the mouse is moved.
+
+	\param where The new location of the mouse in the control's coordinate system.
+	\param code One of the following:
+	- \c B_ENTERED_VIEW The cursor has just entered the control.
+	- \c B_INSIDE_VIEW The cursor is inside the control.
+	- \c B_EXITED_VIEW The cursor has left the control's bounds. This only gets
+	     sent if the scope of the mouse events that the control can receive has
+	     been expanded by BView::SetEventMask() or BView::SetMouseEventMask().
+	- \c B_OUTSIDE_VIEW The cursor is outside the view. This only gets sent if the
+	     scope of the mouse events that the control can receive has been expanded
+	     by SetEventMask() or SetMouseEventMask().
+	\param dragMessage If a drag-and-drop operation is taking place this is a
+	       pointer to a BMessage that holds the drag information, otherwise the
+	       pointer is \c NULL.
 
 	\sa BView::MouseMoved()
 */
@@ -354,8 +383,8 @@
 	Derived classes can override this method to set the preferred
 	width and height of the control.
 
-	\param _width Pointer to a \c float to hold the width of the control.
-	\param _height Pointer to a \c float to hold the height of the control.
+	\param[out] _width Pointer to a \c float to hold the width of the control.
+	\param[out] _height Pointer to a \c float to hold the height of the control.
 
 	\sa BView::GetPreferredSize()
 */
@@ -384,6 +413,9 @@
 
 	\param message The \a message to send.
 
+	\return \c B_OK if the control was invoked, otherwise an error
+	        code is returned.
+
 	\sa BInvoker::Invoke()
 	\sa IsEnabled()
 */
@@ -400,7 +432,14 @@
 
 /*!
 	\fn status_t BControl::GetSupportedSuites(BMessage* message)
-	\brief Report the suites of understood messages.
+	\brief Report the suites of messages this control understands.
+
+	Adds the string "suite/vnd.Be-control" to the message.
+
+	\param message Allows you to add the names of the suites the control
+	       implements to the suites array.
+
+	\return \c B_OK if all went well or an error code otherwise.
 
 	\sa BHandler::GetSupportedSuites();
 */
@@ -427,4 +466,46 @@
 	\returns A status code.
 
 	\sa BHandler::Perform()
+*/
+
+
+/*!
+	\fn status_t BControl::SetIcon(const BBitmap* icon, uint32 flags)
+	\brief This convenience method is used to set the bitmaps
+	       for the standard states from a single bitmap.
+
+	It also supports cropping the icon to its non-transparent area.
+	The icon is meant as an addition to or replacement of the label.
+
+	\note This method was not available in BeOS R5.
+
+	\param icon The \a icon to set.
+	\param flags Modify how the icon is set.
+	- \c B_TRIM_ICON_BITMAP Crop the bitmap to the not fully transparent
+	     area, may change the icon size.
+	- \c B_TRIM_ICON_BITMAP_KEEP_ASPECT Like \c B_TRIM_BITMAP, but keeps
+	     the aspect ratio.
+	- \c B_CREATE_ACTIVE_ICON_BITMAP
+	- \c B_CREATE_PARTIALLY_ACTIVE_ICON_BITMAP
+	- \c B_CREATE_DISABLED_ICON_BITMAPS
+
+	\return \c B_OK if the icon was set or an error code otherwise.
+*/
+
+
+/*!
+	\fn status_t BControl::SetIconBitmap(const BBitmap* bitmap,
+		uint32 which, uint32 flags)
+	\brief Icon bitmaps for various states of the control (off, on,
+	       partially on, each enabled or disabled, plus up to 125
+	       custom states) can be set individually.
+
+	\note This method was not available in BeOS R5.
+
+	\param bitmap The \a bitmap icon to set.
+	\param which The state to set the icon for.
+	\param flags Modify how the icon is set.
+		- \c B_KEEP_ICON_BITMAP Transfer ownership of the bitmap to the control.
+
+	\return \c B_OK if the icon was set or an error code otherwise.
 */
