@@ -137,7 +137,7 @@ public:
 								BView(const char* name, uint32 flags,
 									BLayout* layout = NULL);
 								BView(BRect frame, const char* name,
-									uint32 resizeMask, uint32 flags);
+									uint32 resizingMode, uint32 flags);
 	virtual						~BView();
 
 								BView(BMessage* archive);
@@ -640,7 +640,7 @@ private:
 	friend class BWindow;
 
 			void				_InitData(BRect frame, const char* name,
-									uint32 resizeMask, uint32 flags);
+									uint32 resizingMode, uint32 flags);
 			status_t			_SetViewBitmap(const BBitmap* bitmap,
 									BRect srcRect, BRect dstRect,
 									uint32 followFlags, uint32 options);

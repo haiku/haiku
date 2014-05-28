@@ -1304,7 +1304,7 @@ BView::MouseUp(BPoint where)
 
 
 void
-BView::MouseMoved(BPoint where, uint32 code, const BMessage* a_message)
+BView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
 	// Hook function
 	STRACE(("\tHOOK: BView(%s)::MouseMoved()\n", Name()));
