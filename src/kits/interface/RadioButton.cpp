@@ -7,19 +7,14 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/*!
-	BRadioButton represents a single on/off button. 
-	All sibling BRadioButton objects comprise a single
-	"multiple choice" control.
-*/
 
 #include <RadioButton.h>
 
 #include <algorithm>
 
+#include <Box.h>
 #include <ControlLook.h>
 #include <Debug.h>
-#include <Box.h>
 #include <LayoutUtils.h>
 #include <Window.h>
 
@@ -27,9 +22,10 @@
 
 
 BRadioButton::BRadioButton(BRect frame, const char* name, const char* label,
-		BMessage* message, uint32 resizMask, uint32 flags)
-	: BControl(frame, name, label, message, resizMask, flags | B_FRAME_EVENTS),
-	  fOutlined(false)
+	BMessage* message, uint32 resizingMode, uint32 flags)
+	:
+	BControl(frame, name, label, message, resizingMode, flags | B_FRAME_EVENTS),
+	fOutlined(false)
 {
 	// Resize to minimum height if needed for BeOS compatibility
 	float minHeight;
@@ -40,24 +36,26 @@ BRadioButton::BRadioButton(BRect frame, const char* name, const char* label,
 
 
 BRadioButton::BRadioButton(const char* name, const char* label,
-		BMessage* message, uint32 flags)
-	: BControl(name, label, message, flags | B_FRAME_EVENTS),
-	  fOutlined(false)
+	BMessage* message, uint32 flags)
+	:
+	BControl(name, label, message, flags | B_FRAME_EVENTS),
+	fOutlined(false)
 {
 }
 
 
 BRadioButton::BRadioButton(const char* label, BMessage* message)
-	: BControl(NULL, label, message,
-		B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS),
-	  fOutlined(false)
+	:
+	BControl(NULL, label, message, B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS),
+	fOutlined(false)
 {
 }
 
 
-BRadioButton::BRadioButton(BMessage* archive)
-	: BControl(archive),
-	  fOutlined(false)
+BRadioButton::BRadioButton(BMessage* data)
+	:
+	BControl(data),
+	fOutlined(false)
 {
 }
 
@@ -68,19 +66,19 @@ BRadioButton::~BRadioButton()
 
 
 BArchivable*
-BRadioButton::Instantiate(BMessage* archive)
+BRadioButton::Instantiate(BMessage* data)
 {
-	if (validate_instantiation(archive, "BRadioButton"))
-		return new BRadioButton(archive);
+	if (validate_instantiation(data, "BRadioButton"))
+		return new BRadioButton(data);
 
 	return NULL;
 }
 
 
 status_t
-BRadioButton::Archive(BMessage* archive, bool deep) const
+BRadioButton::Archive(BMessage* data, bool deep) const
 {
-	return BControl::Archive(archive, deep);
+	return BControl::Archive(data, deep);
 }
 
 
@@ -114,14 +112,14 @@ BRadioButton::Draw(BRect updateRect)
 
 
 void
-BRadioButton::MouseDown(BPoint point)
+BRadioButton::MouseDown(BPoint where)
 {
 	if (!IsEnabled())
 		return;
 
 	fOutlined = true;
 
-	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
+	if ((Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) != 0) {
 		Invalidate();
 		SetTracking(true);
 		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
@@ -133,10 +131,8 @@ BRadioButton::MouseDown(BPoint point)
 
 		do {
 			snooze(40000);
-
-			GetMouse(&point, &buttons, true);
-
-			bool inside = bounds.Contains(point);
+			GetMouse(&where, &buttons, true);
+			bool inside = bounds.Contains(where);
 
 			if (fOutlined != inside) {
 				fOutlined = inside;
@@ -149,9 +145,8 @@ BRadioButton::MouseDown(BPoint point)
 			_Redraw();
 			SetValue(B_CONTROL_ON);
 			Invoke();
-		} else {
+		} else
 			_Redraw();
-		}
 	}
 }
 
@@ -178,9 +173,9 @@ BRadioButton::KeyDown(const char* bytes, int32 numBytes)
 				SetValue(B_CONTROL_ON);
 				Invoke();
 			}
-
 			break;
 		}
+
 		default:
 			BControl::KeyDown(bytes, numBytes);
 	}
@@ -195,45 +190,45 @@ BRadioButton::SetValue(int32 value)
 		Invalidate(_KnobFrame());
 	}
 
-	if (!value)
+	if (value == 0)
 		return;
 
 	BView* parent = Parent();
 	BView* child = NULL;
 
-	if (parent) {
+	if (parent != NULL) {
 		// If the parent is a BBox, the group parent is the parent of the BBox
 		BBox* box = dynamic_cast<BBox*>(parent);
 
-		if (box && box->LabelView() == this)
+		if (box != NULL && box->LabelView() == this)
 			parent = box->Parent();
 
-		if (parent) {
+		if (parent != NULL) {
 			BBox* box = dynamic_cast<BBox*>(parent);
 
 			// If the parent is a BBox, skip the label if there is one
-			if (box && box->LabelView())
+			if (box != NULL && box->LabelView())
 				child = parent->ChildAt(1);
 			else
 				child = parent->ChildAt(0);
 		} else
 			child = Window()->ChildAt(0);
-	} else if (Window())
+	} else if (Window() != NULL)
 		child = Window()->ChildAt(0);
 
-	while (child) {
+	while (child != NULL) {
 		BRadioButton* radio = dynamic_cast<BRadioButton*>(child);
 
-		if (radio && (radio != this))
+		if (radio != NULL && (radio != this))
 			radio->SetValue(B_CONTROL_OFF);
 		else {
 			// If the child is a BBox, check if the label is a radiobutton
 			BBox* box = dynamic_cast<BBox*>(child);
 
-			if (box && box->LabelView()) {
+			if (box != NULL && box->LabelView()) {
 				radio = dynamic_cast<BRadioButton*>(box->LabelView());
 
-				if (radio && (radio != this))
+				if (radio != NULL && (radio != this))
 					radio->SetValue(B_CONTROL_OFF);
 			}
 		}
@@ -306,12 +301,12 @@ BRadioButton::WindowActivated(bool active)
 
 
 void
-BRadioButton::MouseUp(BPoint point)
+BRadioButton::MouseUp(BPoint where)
 {
 	if (!IsTracking())
 		return;
 
-	fOutlined = Bounds().Contains(point);
+	fOutlined = Bounds().Contains(where);
 	if (fOutlined) {
 		fOutlined = false;
 		if (Value() != B_CONTROL_ON) {
@@ -326,12 +321,13 @@ BRadioButton::MouseUp(BPoint point)
 
 
 void
-BRadioButton::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
+BRadioButton::MouseMoved(BPoint where, uint32 code,
+	const BMessage* dragMessage)
 {
 	if (!IsTracking())
 		return;
 
-	bool inside = Bounds().Contains(point);
+	bool inside = Bounds().Contains(where);
 
 	if (fOutlined != inside) {
 		fOutlined = inside;
@@ -348,9 +344,9 @@ BRadioButton::DetachedFromWindow()
 
 
 void
-BRadioButton::FrameMoved(BPoint newLocation)
+BRadioButton::FrameMoved(BPoint newPosition)
 {
-	BControl::FrameMoved(newLocation);
+	BControl::FrameMoved(newPosition);
 }
 
 
@@ -407,22 +403,27 @@ BRadioButton::Perform(perform_code code, void* _data)
 			((perform_data_min_size*)_data)->return_value
 				= BRadioButton::MinSize();
 			return B_OK;
+
 		case PERFORM_CODE_MAX_SIZE:
 			((perform_data_max_size*)_data)->return_value
 				= BRadioButton::MaxSize();
 			return B_OK;
+
 		case PERFORM_CODE_PREFERRED_SIZE:
 			((perform_data_preferred_size*)_data)->return_value
 				= BRadioButton::PreferredSize();
 			return B_OK;
+
 		case PERFORM_CODE_LAYOUT_ALIGNMENT:
 			((perform_data_layout_alignment*)_data)->return_value
 				= BRadioButton::LayoutAlignment();
 			return B_OK;
+
 		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
 			((perform_data_has_height_for_width*)_data)->return_value
 				= BRadioButton::HasHeightForWidth();
 			return B_OK;
+
 		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
 		{
 			perform_data_get_height_for_width* data
@@ -431,12 +432,14 @@ BRadioButton::Perform(perform_code code, void* _data)
 				&data->preferred);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
 			BRadioButton::SetLayout(data->layout);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
 			perform_data_layout_invalidated* data
@@ -444,11 +447,13 @@ BRadioButton::Perform(perform_code code, void* _data)
 			BRadioButton::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_DO_LAYOUT:
 		{
 			BRadioButton::DoLayout();
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_ICON:
 		{
 			perform_data_set_icon* data = (perform_data_set_icon*)_data;
@@ -518,13 +523,15 @@ BRadioButton::_KnobFrame(const font_height& fontHeight) const
 void
 BRadioButton::_Redraw()
 {
-	BRect b(Bounds());
+	BRect bounds(Bounds());
+
 	// fill background with ViewColor()
 	rgb_color highColor = HighColor();
 	SetHighColor(ViewColor());
-	FillRect(b);
+	FillRect(bounds);
+
 	// restore previous HighColor()
 	SetHighColor(highColor);
-	Draw(b);
+	Draw(bounds);
 	Flush();
 }

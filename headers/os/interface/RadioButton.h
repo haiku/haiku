@@ -14,7 +14,7 @@ class BRadioButton : public BControl {
 public:
 								BRadioButton(BRect frame, const char* name,
 									const char* label, BMessage* message,
-									uint32 resizMask
+									uint32 resizingMode
 										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BRadioButton(const char* name,
@@ -23,15 +23,14 @@ public:
 								BRadioButton(const char* label,
 									BMessage* message);
 
-								BRadioButton(BMessage* archive);
+								BRadioButton(BMessage* data);
 	virtual						~BRadioButton();
 
-	static	BArchivable*		Instantiate(BMessage* archive);
-	virtual	status_t			Archive(BMessage* archive,
-									bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* data);
+	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
 
 	virtual	void				Draw(BRect updateRect);
-	virtual	void				MouseDown(BPoint point);
+	virtual	void				MouseDown(BPoint where);
 	virtual	void				AttachedToWindow();
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				SetValue(int32 value);
@@ -42,11 +41,11 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				WindowActivated(bool active);
-	virtual	void				MouseUp(BPoint point);
-	virtual	void				MouseMoved(BPoint point, uint32 transit,
+	virtual	void				MouseUp(BPoint where);
+	virtual	void				MouseMoved(BPoint where, uint32 code,
 									const BMessage* dragMessage);
 	virtual	void				DetachedFromWindow();
-	virtual	void				FrameMoved(BPoint newLocation);
+	virtual	void				FrameMoved(BPoint newPosition);
 	virtual	void				FrameResized(float width, float height);
 
 	virtual	BHandler*			ResolveSpecifier(BMessage* message,
