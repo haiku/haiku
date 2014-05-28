@@ -1,5 +1,5 @@
 /*
- *	Copyright 2001-2013, Haiku Inc. All rights reserved.
+ *	Copyright 2001-2014 Haiku Inc. All rights reserved.
  *  Distributed under the terms of the MIT License.
  *
  *	Authors:
@@ -88,16 +88,16 @@ BButton::~BButton()
 }
 
 
-BButton::BButton(BMessage* archive)
+BButton::BButton(BMessage* data)
 	:
-	BControl(archive),
+	BControl(data),
 	fPreferredSize(-1, -1),
 	fFlags(0),
 	fBehavior(B_BUTTON_BEHAVIOR),
 	fPopUpMessage(NULL)
 {
 	bool isDefault = false;
-	if (archive->FindBool("_default", &isDefault) == B_OK && isDefault)
+	if (data->FindBool("_default", &isDefault) == B_OK && isDefault)
 		_SetFlag(FLAG_DEFAULT, true);
 	// NOTE: Default button state will be synchronized with the window
 	// in AttachedToWindow().
@@ -105,25 +105,25 @@ BButton::BButton(BMessage* archive)
 
 
 BArchivable*
-BButton::Instantiate(BMessage* archive)
+BButton::Instantiate(BMessage* data)
 {
-	if (validate_instantiation(archive, "BButton"))
-		return new(std::nothrow) BButton(archive);
+	if (validate_instantiation(data, "BButton"))
+		return new(std::nothrow) BButton(data);
 
 	return NULL;
 }
 
 
 status_t
-BButton::Archive(BMessage* archive, bool deep) const
+BButton::Archive(BMessage* data, bool deep) const
 {
-	status_t err = BControl::Archive(archive, deep);
+	status_t err = BControl::Archive(data, deep);
 
 	if (err != B_OK)
 		return err;
 
 	if (IsDefault())
-		err = archive->AddBool("_default", true);
+		err = data->AddBool("_default", true);
 
 	return err;
 }
@@ -167,12 +167,12 @@ BButton::Draw(BRect updateRect)
 
 
 void
-BButton::MouseDown(BPoint point)
+BButton::MouseDown(BPoint where)
 {
 	if (!IsEnabled())
 		return;
 
-	if (fBehavior == B_POP_UP_BEHAVIOR && _PopUpRect().Contains(point)) {
+	if (fBehavior == B_POP_UP_BEHAVIOR && _PopUpRect().Contains(where)) {
 		InvokeNotify(fPopUpMessage, B_CONTROL_MODIFIED);
 		return;
 	}
@@ -199,9 +199,8 @@ BButton::MouseDown(BPoint point)
 			Window()->UpdateIfNeeded();
 			snooze(40000);
 
-			GetMouse(&point, &buttons, true);
-
- 			inside = bounds.Contains(point);
+			GetMouse(&where, &buttons, true);
+ 			inside = bounds.Contains(where);
 
 			if (toggleBehavior) {
 				bool pressed = inside ^ _Flag(FLAG_WAS_PRESSED);
@@ -252,7 +251,6 @@ BButton::KeyDown(const char* bytes, int32 numBytes)
 		snooze(25000);
 
 		Invoke();
-
 	} else
 		BControl::KeyDown(bytes, numBytes);
 }
@@ -264,7 +262,7 @@ BButton::MakeDefault(bool flag)
 	BButton* oldDefault = NULL;
 	BWindow* window = Window();
 
-	if (window)
+	if (window != NULL)
 		oldDefault = window->DefaultButton();
 
 	if (flag) {
@@ -300,9 +298,9 @@ BButton::MakeDefault(bool flag)
 
 
 void
-BButton::SetLabel(const char* string)
+BButton::SetLabel(const char* label)
 {
-	BControl::SetLabel(string);
+	BControl::SetLabel(label);
 }
 
 
@@ -376,9 +374,9 @@ BButton::WindowActivated(bool active)
 
 
 void
-BButton::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
+BButton::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
-	bool inside = Bounds().Contains(point);
+	bool inside = Bounds().Contains(where);
 	if (_SetFlag(FLAG_INSIDE, inside))
 		Invalidate();
 
@@ -396,12 +394,12 @@ BButton::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 
 
 void
-BButton::MouseUp(BPoint point)
+BButton::MouseUp(BPoint where)
 {
 	if (!IsTracking())
 		return;
 
-	if (Bounds().Contains(point)) {
+	if (Bounds().Contains(where)) {
 		if (fBehavior == B_TOGGLE_BEHAVIOR)
 			SetValue(_Flag(FLAG_WAS_PRESSED) ? B_CONTROL_OFF : B_CONTROL_ON);
 
@@ -464,9 +462,9 @@ BButton::Invoke(BMessage* message)
 
 
 void
-BButton::FrameMoved(BPoint newLocation)
+BButton::FrameMoved(BPoint newPosition)
 {
-	BControl::FrameMoved(newLocation);
+	BControl::FrameMoved(newPosition);
 }
 
 

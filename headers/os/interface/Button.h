@@ -1,9 +1,10 @@
 /*
- * Copyright 2001-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BUTTON_H
 #define _BUTTON_H
+
 
 #include <Control.h>
 
@@ -24,22 +25,20 @@ public:
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE
 										| B_FULL_UPDATE_ON_RESIZE); 
 								BButton(const char* name, const char* label,
-									BMessage *message,
-									uint32 flags = B_WILL_DRAW | B_NAVIGABLE
-										| B_FULL_UPDATE_ON_RESIZE);
+									BMessage* message,
+										uint32 flags = B_WILL_DRAW | B_NAVIGABLE
+											| B_FULL_UPDATE_ON_RESIZE);
 								BButton(const char* label,
 									BMessage* message = NULL);
-	
-								BButton(BMessage *archive);
+								BButton(BMessage* data);
 
 	virtual						~BButton();
 
-	static	BArchivable*		Instantiate(BMessage* archive);
-	virtual	status_t			Archive(BMessage* archive,
-									bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* data);
+	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
 	
 	virtual	void				Draw(BRect updateRect);
-	virtual	void				MouseDown(BPoint point);
+	virtual	void				MouseDown(BPoint where);
 	virtual	void				AttachedToWindow();
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				MakeDefault(bool flag);
@@ -57,16 +56,16 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				WindowActivated(bool active);
-	virtual	void				MouseMoved(BPoint point, uint32 transit,
-									const BMessage* message);
-	virtual	void				MouseUp(BPoint point);
+	virtual	void				MouseMoved(BPoint where, uint32 code,
+									const BMessage* dragMessage);
+	virtual	void				MouseUp(BPoint where);
 	virtual	void				DetachedFromWindow();
 	virtual	void				SetValue(int32 value);
 	virtual	void				GetPreferredSize (float* _width,
 									float* _height);
 	virtual	void				ResizeToPreferred();
 	virtual	status_t			Invoke(BMessage* message = NULL);
-	virtual	void				FrameMoved(BPoint newLocation);
+	virtual	void				FrameMoved(BPoint newPosition);
 	virtual	void				FrameResized(float width, float height);
 
 	virtual	void				MakeFocus(bool focused = true);
@@ -110,4 +109,5 @@ private:
 			BMessage*			fPopUpMessage;
 };
 
-#endif // _BUTTON_H
+
+#endif	// _BUTTON_H
