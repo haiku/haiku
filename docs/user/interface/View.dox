@@ -1,13 +1,13 @@
 /*
- * Copyright 2011-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/View.h	 hrev46322
- *		src/kits/interface/View.cpp	 hrev46322
+ *		headers/os/interface/View.h	 hrev47274
+ *		src/kits/interface/View.cpp	 hrev47274
  */
 
 
@@ -870,10 +870,27 @@ SetViewColor(Parent()->ViewColor());
 
 /*!
 	\fn void BView::MouseMoved(BPoint where, uint32 code,
-		const BMessage* a_message)
+		const BMessage* dragMessage)
 	\brief Hook method called when the mouse is moved.
 
 	The default implementation does nothing.
+
+	\param where The new location of the mouse in the view's coordinate system.
+	\param code One of the following:
+	- \c B_ENTERED_VIEW The cursor has just entered the view.
+	- \c B_INSIDE_VIEW The cursor is inside the view.
+	- \c B_EXITED_VIEW The cursor has left the view's bounds. This only gets sent
+	     if the scope of the mouse events that the view can receive has been
+	     expanded by SetEventMask() or SetMouseEventMask().
+	- \c B_OUTSIDE_VIEW The cursor is outside the view. This only gets sent if the
+	     scope of the mouse events that the view can receive has been expanded by
+	     SetEventMask() or SetMouseEventMask().
+	\param dragMessage If a drag-and-drop operation is taking place this is a
+	       pointer to a BMessage that holds the drag information, otherwise the
+	       pointer is \c NULL.
+
+	\sa SetEventMask(), SetMouseEventMask()
+	\sa DragMessage()
 */
 
 
