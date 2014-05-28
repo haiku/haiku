@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku Inc.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,7 +7,8 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/*!	BCheckBox displays an on/off control. */
+
+// BCheckBox displays an on/off control.
 
 
 #include <CheckBox.h>
@@ -23,8 +24,8 @@
 #include <binary_compatibility/Interface.h>
 
 
-BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
-		BMessage *message, uint32 resizingMode, uint32 flags)
+BCheckBox::BCheckBox(BRect frame, const char* name, const char* label,
+	BMessage* message, uint32 resizingMode, uint32 flags)
 	:
 	BControl(frame, name, label, message, resizingMode, flags),
 	fPreferredSize(),
@@ -41,7 +42,7 @@ BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 }
 
 
-BCheckBox::BCheckBox(const char *name, const char *label, BMessage *message,
+BCheckBox::BCheckBox(const char* name, const char* label, BMessage* message,
 	uint32 flags)
 	:
 	BControl(name, label, message, flags | B_WILL_DRAW | B_NAVIGABLE),
@@ -52,7 +53,7 @@ BCheckBox::BCheckBox(const char *name, const char *label, BMessage *message,
 }
 
 
-BCheckBox::BCheckBox(const char *label, BMessage *message)
+BCheckBox::BCheckBox(const char* label, BMessage* message)
 	:
 	BControl(NULL, label, message, B_WILL_DRAW | B_NAVIGABLE),
 	fPreferredSize(),
@@ -62,9 +63,9 @@ BCheckBox::BCheckBox(const char *label, BMessage *message)
 }
 
 
-BCheckBox::BCheckBox(BMessage *archive)
+BCheckBox::BCheckBox(BMessage* data)
 	:
-	BControl(archive),
+	BControl(data),
 	fOutlined(false),
 	fPartialToOff(false)
 {
@@ -76,27 +77,27 @@ BCheckBox::~BCheckBox()
 }
 
 
-// #pragma mark -
+// #pragma mark - Archiving methods
 
 
-BArchivable *
-BCheckBox::Instantiate(BMessage *archive)
+BArchivable*
+BCheckBox::Instantiate(BMessage* data)
 {
-	if (validate_instantiation(archive, "BCheckBox"))
-		return new(std::nothrow) BCheckBox(archive);
+	if (validate_instantiation(data, "BCheckBox"))
+		return new(std::nothrow) BCheckBox(data);
 
 	return NULL;
 }
 
 
 status_t
-BCheckBox::Archive(BMessage *archive, bool deep) const
+BCheckBox::Archive(BMessage* data, bool deep) const
 {
-	return BControl::Archive(archive, deep);
+	return BControl::Archive(data, deep);
 }
 
 
-// #pragma mark -
+// #pragma mark - Hook methods
 
 
 void
@@ -153,9 +154,9 @@ BCheckBox::AllDetached()
 
 
 void
-BCheckBox::FrameMoved(BPoint newLocation)
+BCheckBox::FrameMoved(BPoint newPosition)
 {
-	BControl::FrameMoved(newLocation);
+	BControl::FrameMoved(newPosition);
 }
 
 
@@ -173,18 +174,15 @@ BCheckBox::WindowActivated(bool active)
 }
 
 
-// #pragma mark -
-
-
 void
-BCheckBox::MessageReceived(BMessage *message)
+BCheckBox::MessageReceived(BMessage* message)
 {
 	BControl::MessageReceived(message);
 }
 
 
 void
-BCheckBox::KeyDown(const char *bytes, int32 numBytes)
+BCheckBox::KeyDown(const char* bytes, int32 numBytes)
 {
 	if (*bytes == B_ENTER || *bytes == B_SPACE) {
 		if (!IsEnabled())
@@ -200,7 +198,7 @@ BCheckBox::KeyDown(const char *bytes, int32 numBytes)
 
 
 void
-BCheckBox::MouseDown(BPoint point)
+BCheckBox::MouseDown(BPoint where)
 {
 	if (!IsEnabled())
 		return;
@@ -221,9 +219,9 @@ BCheckBox::MouseDown(BPoint point)
 		do {
 			snooze(40000);
 
-			GetMouse(&point, &buttons, true);
+			GetMouse(&where, &buttons, true);
 
-			bool inside = bounds.Contains(point);
+			bool inside = bounds.Contains(where);
 			if (fOutlined != inside) {
 				fOutlined = inside;
 				Invalidate();
@@ -244,12 +242,12 @@ BCheckBox::MouseDown(BPoint point)
 
 
 void
-BCheckBox::MouseUp(BPoint point)
+BCheckBox::MouseUp(BPoint where)
 {
 	if (!IsTracking())
 		return;
 
-	bool inside = Bounds().Contains(point);
+	bool inside = Bounds().Contains(where);
 
 	if (fOutlined != inside) {
 		fOutlined = inside;
@@ -269,12 +267,13 @@ BCheckBox::MouseUp(BPoint point)
 
 
 void
-BCheckBox::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+BCheckBox::MouseMoved(BPoint where, uint32 code,
+	const BMessage* dragMessage)
 {
 	if (!IsTracking())
 		return;
 
-	bool inside = Bounds().Contains(point);
+	bool inside = Bounds().Contains(where);
 
 	if (fOutlined != inside) {
 		fOutlined = inside;
@@ -370,15 +369,15 @@ BCheckBox::SetValue(int32 value)
 
 
 status_t
-BCheckBox::Invoke(BMessage *message)
+BCheckBox::Invoke(BMessage* message)
 {
 	return BControl::Invoke(message);
 }
 
 
-BHandler *
-BCheckBox::ResolveSpecifier(BMessage *message, int32 index,
-	BMessage *specifier, int32 what, const char *property)
+BHandler*
+BCheckBox::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
 {
 	return BControl::ResolveSpecifier(message, index, specifier, what,
 		property);
@@ -386,7 +385,7 @@ BCheckBox::ResolveSpecifier(BMessage *message, int32 index,
 
 
 status_t
-BCheckBox::GetSupportedSuites(BMessage *message)
+BCheckBox::GetSupportedSuites(BMessage* message)
 {
 	return BControl::GetSupportedSuites(message);
 }
