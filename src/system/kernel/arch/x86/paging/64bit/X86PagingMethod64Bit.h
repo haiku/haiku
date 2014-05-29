@@ -1,4 +1,5 @@
 /*
+ * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
@@ -6,6 +7,8 @@
 #ifndef KERNEL_ARCH_X86_PAGING_64BIT_X86_PAGING_METHOD_64BIT_H
 #define KERNEL_ARCH_X86_PAGING_64BIT_X86_PAGING_METHOD_64BIT_H
 
+
+#include <atomic>
 
 #include <KernelExport.h>
 
@@ -84,13 +87,15 @@ public:
 									uint64* entry, phys_addr_t physicalAddress,
 									uint32 attributes, uint32 memoryType,
 									bool globalPage);
-	static	uint64				SetTableEntry(uint64* entry, uint64 newEntry);
-	static	uint64				SetTableEntryFlags(uint64* entry, uint64 flags);
+	static	void				SetTableEntry(uint64_t* entry,
+									uint64_t newEntry);
+	static	uint64_t			SetTableEntryFlags(uint64_t* entryPointer,
+									uint64_t flags);
 	static	uint64				TestAndSetTableEntry(uint64* entry,
 									uint64 newEntry, uint64 oldEntry);
-	static	uint64				ClearTableEntry(uint64* entry);
-	static	uint64				ClearTableEntryFlags(uint64* entry,
-									uint64 flags);
+	static	uint64_t			ClearTableEntry(uint64_t* entryPointer);
+	static	uint64_t			ClearTableEntryFlags(uint64_t* entryPointer,
+									uint64_t flags);
 
 	static	uint64				MemoryTypeToPageTableEntryFlags(
 									uint32 memoryType);
@@ -106,6 +111,10 @@ private:
 };
 
 
+static_assert(sizeof(std::atomic<uint64_t>) == sizeof(uint64_t),
+	"Non-trivial representation of atomic uint64_t.");
+
+
 /*static*/ inline X86PagingMethod64Bit*
 X86PagingMethod64Bit::Method()
 {
@@ -113,39 +122,43 @@ X86PagingMethod64Bit::Method()
 }
 
 
-/*static*/ inline uint64
-X86PagingMethod64Bit::SetTableEntry(uint64* entry, uint64 newEntry)
+/*static*/ inline void
+X86PagingMethod64Bit::SetTableEntry(uint64_t* entryPointer, uint64_t newEntry)
 {
-	return atomic_get_and_set64((int64*)entry, newEntry);
+	auto& entry = *reinterpret_cast<std::atomic<uint64_t>*>(entryPointer);
+	entry.store(newEntry, std::memory_order_relaxed);
+}
+
+
+/*static*/ inline uint64_t
+X86PagingMethod64Bit::SetTableEntryFlags(uint64_t* entryPointer, uint64_t flags)
+{
+	auto& entry = *reinterpret_cast<std::atomic<uint64_t>*>(entryPointer);
+	return entry.fetch_or(flags);
 }
 
 
 /*static*/ inline uint64
-X86PagingMethod64Bit::SetTableEntryFlags(uint64* entry, uint64 flags)
-{
-	return atomic_or64((int64*)entry, flags);
-}
-
-
-/*static*/ inline uint64
-X86PagingMethod64Bit::TestAndSetTableEntry(uint64* entry, uint64 newEntry,
-	uint64 oldEntry)
+X86PagingMethod64Bit::TestAndSetTableEntry(uint64* entry, uint64 newEntry, uint64 oldEntry)
 {
 	return atomic_test_and_set64((int64*)entry, newEntry, oldEntry);
 }
 
 
-/*static*/ inline uint64
-X86PagingMethod64Bit::ClearTableEntry(uint64* entry)
+/*static*/ inline uint64_t
+X86PagingMethod64Bit::ClearTableEntry(uint64_t* entryPointer)
 {
-	return SetTableEntry(entry, 0);
+	auto& entry = *reinterpret_cast<std::atomic<uint64_t>*>(entryPointer);
+	return entry.exchange(0);
 }
 
 
-/*static*/ inline uint64
-X86PagingMethod64Bit::ClearTableEntryFlags(uint64* entry, uint64 flags)
+/*static*/ inline uint64_t
+X86PagingMethod64Bit::ClearTableEntryFlags(uint64_t* entryPointer,
+	uint64_t flags)
 {
-	return atomic_and64((int64*)entry, ~flags);
+	auto& entry = *reinterpret_cast<std::atomic<uint64_t>*>(entryPointer);
+	return entry.fetch_and(~flags);
 }
 
 
