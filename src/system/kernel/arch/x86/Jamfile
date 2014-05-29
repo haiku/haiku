@@ -94,7 +94,6 @@ local archGenericSources =
 	pic.cpp
 
 	# paging
-	x86_physical_page_mapper.cpp
 	X86PagingMethod.cpp
 	X86PagingStructures.cpp
 	X86VMTranslationMap.cpp
