@@ -31,6 +31,10 @@ typedef uint32_t in_addr_t;
 #	else
 		extern unsigned int __swap_int32(unsigned int);	/* private */
 #	endif
+	static inline uint16_t __swap_int16(uint16_t arg)
+	{
+		return (arg >> 8) | (arg << 8);
+	}
 	extern uint16_t __swap_int16(uint16_t);	/* private */
 #	if BYTE_ORDER == LITTLE_ENDIAN
 #		define htonl(x) ((uint32_t)__swap_int32(x))
