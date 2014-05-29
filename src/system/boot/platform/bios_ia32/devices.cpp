@@ -409,6 +409,16 @@ compute_check_sum(BIOSDrive *drive, off_t offset)
 	return sum;
 }
 
+/**	Checks if the specified drive is usable for reading.
+ */
+
+static bool
+is_drive_readable(BIOSDrive *drive)
+{
+	char buffer;
+	return drive->ReadAt(NULL, 0, &buffer, sizeof(buffer)) > 0;
+}
+
 
 static void
 find_unique_check_sums(NodeList *devices)
@@ -532,7 +542,14 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 			continue;
 		}
 
-		devicesList->Add(drive);
+		// Only add usable drives
+		if (is_drive_readable(drive))
+			devicesList->Add(drive);
+		else {
+			dprintf("could not read from drive %" B_PRIu8 ", not adding\n", driveID);
+			delete drive;
+			continue;
+		}
 
 		if (drive->FillIdentifier() != B_OK)
 			identifierMissing = true;
