@@ -1330,11 +1330,11 @@ arch_debug_gdb_get_registers(char* buffer, size_t bufferSize)
 		switch (registers[i].type) {
 			case B_UINT64_TYPE:
 				result = snprintf(buffer, bufferSize, "%016" B_PRIx64,
-					B_HOST_TO_BENDIAN_INT64(registers[i].value));
+					(uint64)B_HOST_TO_BENDIAN_INT64(registers[i].value));
 				break;
 			case B_UINT32_TYPE:
 				result = snprintf(buffer, bufferSize, "%08" B_PRIx32,
-					B_HOST_TO_BENDIAN_INT32((uint32)registers[i].value));
+					(uint32)B_HOST_TO_BENDIAN_INT32((uint32)registers[i].value));
 				break;
 		}
 		if (result >= (int)bufferSize)

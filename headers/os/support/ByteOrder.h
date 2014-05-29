@@ -120,11 +120,7 @@ extern bool is_type_swapped(type_code type);
 /* Private implementations */
 extern double __swap_double(double arg);
 extern float  __swap_float(float arg);
-#if (defined(__INTEL__) || defined(__x86_64__)) && GCC_VERSION >= 40300
-#define __swap_int64(arg)	__builtin_bswap64(arg)
-#define __swap_int32(arg)	__builtin_bswap32(arg)
-#define __swap_int16(arg)	__builtin_bswap16(arg)
-#elif defined(__ARM__) && GCC_VERSION >= 40800
+#if __GNUC__ >= 4
 #define __swap_int64(arg)	__builtin_bswap64(arg)
 #define __swap_int32(arg)	__builtin_bswap32(arg)
 #define __swap_int16(arg)	__builtin_bswap16(arg)

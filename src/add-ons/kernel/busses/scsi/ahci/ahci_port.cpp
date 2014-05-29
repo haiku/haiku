@@ -819,8 +819,8 @@ AHCIPort::ScsiUnmap(scsi_ccb* request, scsi_unmap_parameter_list* unmapBlocks)
 dprintf("TRIM SCSI:\n");
 for (uint32 i = 0; i < scsiRangeCount; i++) {
 	dprintf("[%3" B_PRIu32 "] %" B_PRIu64 " : %" B_PRIu32 "\n", i,
-		B_BENDIAN_TO_HOST_INT64(unmapBlocks->blocks[i].lba),
-		B_BENDIAN_TO_HOST_INT32(unmapBlocks->blocks[i].block_count));
+		(uint64)B_BENDIAN_TO_HOST_INT64(unmapBlocks->blocks[i].lba),
+		(uint32)B_BENDIAN_TO_HOST_INT32(unmapBlocks->blocks[i].block_count));
 }
 
 	uint32 scsiIndex = 0;

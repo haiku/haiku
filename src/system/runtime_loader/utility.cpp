@@ -72,13 +72,14 @@ dprintf(const char *format, ...)
 	va_end(list);
 }
 
-
+#if __GNUC__ == 2
 extern "C" uint32
 __swap_int32(uint32 value)
 {
 	return value >> 24 | ((value >> 8) & 0xff00) | value << 24
 		| ((value << 8) & 0xff0000);
 }
+#endif
 
 
 // Copied from libroot/os/thread.c:
