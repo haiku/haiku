@@ -29,11 +29,6 @@ typedef enum {
 #	define ntohl(x) B_BENDIAN_TO_HOST_INT32(x)
 #	define htons(x) B_HOST_TO_BENDIAN_INT16(x)
 #	define ntohs(x) B_BENDIAN_TO_HOST_INT16(x)
-
-static inline uint16 __swap_int16(uint16 arg)
-{
-	return (arg >> 8) | (arg << 8);
-}
 #endif
 
 /* always swap macros */
@@ -128,9 +123,11 @@ extern float  __swap_float(float arg);
 #if __GNUC__ >= 4
 #define __swap_int64(arg)	__builtin_bswap64(arg)
 #define __swap_int32(arg)	__builtin_bswap32(arg)
+#define __swap_int16(arg)	__builtin_bswap16(arg)
 #else
 extern uint64 __swap_int64(uint64 arg);
 extern uint32 __swap_int32(uint32 arg);
+extern uint16 __swap_int16(uint16 arg);
 #endif
 
 #ifdef __cplusplus

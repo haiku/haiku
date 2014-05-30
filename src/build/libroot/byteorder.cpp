@@ -7,6 +7,12 @@
 
 #include <ByteOrder.h>
 
+uint16
+__swap_int16(uint16 value)
+{
+	return (value >> 8) | (value << 8);
+}
+
 uint32
 __swap_int32(uint32 value)
 {
