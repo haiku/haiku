@@ -45,6 +45,7 @@
 <li><a href="../hu/bugreports.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bugreports.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../ca/bugreports.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../pl/bugreports.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../en/bugreports.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -77,7 +78,7 @@
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="accout">获取Trac账户</a></h2>
-<p>为了提交任务单，您需要在<a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku的错误跟踪系统</a>中注册一个账户。
+<p>为了提交任务单，您需要在<a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku 的错误跟踪系统</a>中注册一个账户。
 <br />
 新建账户时，您需要<b>提供自己的电子邮箱</b> ，否则您将不具备基本的任务单修改权限。完成之后，您必须要保证<b>检查您的垃圾邮箱</b>，因为所有重要的验证邮件可能都会被发送到那里。</p>
 
@@ -88,8 +89,8 @@
 在确定它是一个独特的错误之后，您需要尽可能的找出有关的详细信息：</p>
 <ul>
 	<li><p>尝试在当前版本的Haiku系统中重现您的问题。  有许多用于测试的预编译镜像都是<a href="http://haiku-files.org/">可用的</a>。</p></li>
-	<li><p>包括基本的信息，例如以何种方式测试Haiku（利用真实的硬件，VMware，还是QEMU）。</p></li>
-	<li><p>给出您所运行系统的 <acronym title="Subversion, the source code management system we use">SVN</acronym> 发布版本。您可以在桌面栏菜单中的 '<i>About Haiku...</i>' 中找出相关信息。同时您还需要给出您所测试的Haiku的构建类型（gcc2，gcc4，gcc2hybird，gcc4hybird）。可下载的镜像都会给出相应的命名，这样您就应该知道如何自行编译。</p></li>
+	<li><p>包括基本的信息，例如以何种方式测试 Haiku（利用真实的硬件，VMware，还是 QEMU）。</p></li>
+	<li><p>给出您所运行系统的 <acronym title="Subversion, the source code management system we use">SVN</acronym> 发布版本。您可以在桌面栏菜单中的 '<i>关于 Haiku...</i>' 中找出相关信息。同时您还需要给出您所测试的 Haiku 的构建类型（gcc2，gcc4，gcc2hybird，gcc4hybird）。可下载的镜像都会给出相应的命名，这样您就应该知道如何自行编译。</p></li>
 	<li><p>描述您所遇到的问题。尽量把问题讲得精确和明白：详细的描述系统的行为反馈，和您期望的反馈。</p></li>
 	<li><p>描述出现该错误所需要的操作步骤。这将会有助于开发者重现该错误，并对其进行修复和完善。</p></li>
 	<li><p>附带你所掌握的尽可能多的信息。如果是一个GUI错误，或者其中的程序错误，尽量使用 <span class="key">PRINT</span> 键来截取当时的屏幕图像。</p></li>
@@ -97,11 +98,11 @@
 	
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">程序错误</a></h2>
-<p>如果程序发生崩溃，您需要从弹出的警告窗口中启动调试程序。它将会打开一个运行gdb（GNUdebugger）的终端窗口。输入<span class="cli">bt</span>，您将会创建一个有关调试信息的“回溯”，然后您需要把它完整的复制出来（包括您输入<span class="cli">bt</span>命令之前终端中显示的内容），附加到错误报告中。</p>
+<p>如果程序发生崩溃，您需要从弹出的警告窗口中启动调试程序。它将会打开一个运行gdb（GNUdebugger）的终端窗口。输入 <span class="cli">bt</span>，您将会创建一个有关调试信息的“回溯”，然后您需要把它完整的复制出来（包括您输入 <span class="cli">bt</span> 命令之前终端中显示的内容），附加到错误报告中。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">服务错误</a></h2>
-<p>当app server，registrar server或者input server等重要组件崩溃时，您将无法看到通常的崩溃警告。相反的，整个屏幕将会呈现白色，并且启动一个gdb会话，相关的输出信息直接在屏幕中进行显示。您可能还可以继续移动鼠标，这将会覆盖掉屏幕中的白色区域和gdb输出信息。仍在运行的程序 (例如，进程控制器或者桌面栏的时钟) 可能也会覆盖屏幕中的调试信息。
+<p>当 app server，registrar server 或者 input server 等重要组件崩溃时，您将无法看到通常的崩溃警告。相反的，整个屏幕将会呈现白色，并且启动一个 gdb 会话，相关的输出信息直接在屏幕中进行显示。您可能还可以继续移动鼠标，这将会覆盖掉屏幕中的白色区域和 gdb 输出信息。仍在运行的程序 (例如，进程控制器或者桌面栏的时钟) 可能也会覆盖屏幕中的调试信息。
 <br />
 除却所有显示的丑陋和操作的不便，它与软件出错基本一样。 最重要的是获取一个有关错误的回溯（使用 <span class="cli">bt</span> 命令）。如果不能够拷贝相关的文本，您可能还需要使用数码相机记录下相关的屏幕显示。</p>
 
@@ -115,13 +116,13 @@
 <li><p>系统无法实现正确引导。它可能自动重启，或停止在某个步骤（例如，某个启动图标）。对于后一种情况，可以尝试使用快捷键 <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>。</p></li>
 <li><p>整个系统或者部分硬件无法正确运行。例如，系统运行缓慢，出现错误，或者完全无法运行。如果某个硬件完全无法工作，首要的是检查Haiku目前是否支持该硬件（例如，在邮件列表或论坛中进行询问）。</p></li>
 </ul>
-<p>Note that while only the last point seems to indicate hardware relation, all the other symptoms could be caused by a bug in a hardware driver as well. If you have a suspicion what piece of hardware or corresponding driver might have to do with the problem, check whether removing/disabling the hardware or the driver makes a difference. For example, if you suspect Wifi you may find that your BIOS has an option to disable it. Or if not, you could blacklist the responsible Wifi driver from your Haiku installation (see <a href="../../../userguide/en/bootloader.html">Boot Loader</a>).</p>
+<p>需要注意的是，只有最后这种情况与硬件相关，而所有其他的问题也可能由硬件驱动中的错误引起。如果您对引起该问题的硬件或相关的驱动有所疑问，您可以检查删除/禁用该硬件或驱动是否会产生影响。例如，如果您怀疑无线网络有问题，您会发现 BIOS 中有可禁用它的选项。如果其中没有该选项，您可以从安装的 Haiku 中删除相关的无线网络驱动（参见 <a href="../../../userguide/en/bootloader.html">引导程序</a>）。</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">内核调试 - KDL</a></h3>
 <p>如果系统没有自动的进入内核调试状态，您也可以有意识的使用 <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> 快捷键手动进入。<br />
-需要注意的是，在内核调试状态，您的键盘可能会无法工作。PS/2键盘通常都能够正常工作；对于UHCI控制器连接的USB键盘，您至少需要使用快捷键进入内核调试状态一次，它才可用。但是对于USB OCHI，目前还未实现支持。</p>
-<p>KDL本身是shell中的一类。它可以执行命令，打印系统信息。下面是一些感兴趣的命令：</p>
+需要注意的是，在内核调试状态，您的键盘可能会无法工作。PS/2 键盘通常都能够正常工作；对于 UHCI 控制器连接的 USB 键盘，您至少需要使用快捷键进入内核调试状态一次，它才可用。但是对于 USB OCHI，目前还未实现支持。</p>
+<p>KDL 本身是 shell 中的一类。它可以执行命令，打印系统信息。下面是一些感兴趣的命令：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="cli">bt</span> (aka sc)</td><td> </td><td>打印回溯信息。如果系统自主进入内核调试状态，通常需要输入该命令。</td></tr>
 <tr><td><span class="cli">ints</span></td><td> </td><td>显示已处理和未处理的硬件中断。</td></tr>
@@ -134,8 +135,9 @@
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="syslog" name="syslog">系统日志</a></h3>
-<p><b>This is the preferred method for gaining information from a non-booting system.</b><br />
-The syslog (short for system log) contains valuable information about what has happened in your system, including the output of KDL sessions. It's usually a good idea to attach it to the kernel related Trac ticket. The syslog is written to the file <span class="path">/boot/system/var/log/syslog</span>. Since writing to a file requires a working system, the most recent output might not have made it to the syslog when a kernel problem occurs (particularly on spontaneous reboots or uncontinuable KDL sessions).</p>
+<p><b>这是从无法引导的系统中获取信息的首选方法。</b>
+<br />
+系统日志（syslog，system log 的缩写）中包含了关于系统问题的有用信息，包括 KDL 会话的输出信息 。通常将它附带到有关内核问题的报告中是个不错的主意。系统日志将会写入文件 <span class="path">/boot/system/var/log/syslog</span>。由于写入文件需要系统处于运行状态，因此当内核出现问题时（尤其是，系统自动重启，或者无法持续 KDL 会话），最新的输出信息可能无法写入日志文件。</p>
 <p>The option <span class="menu">Enable debug syslog</span> in the boot loader's <span class="menu">Debug menu</span> makes the syslog persistent. If the option <span class="menu">Save syslog from previous session during boot</span> is activated in the boot loader options (as it is by default), you'll find the syslog of your last session as <span class="path">/boot/system/var/log/previous_syslog</span>.<br />
 If you're not able to boot to get to the previous_syslog, you have to enter the boot loader menu by holding down <span class="key">SHIFT</span> while booting.<br />
 In the boot loader's <span class="menu">Debug menu</span> you should find the entries <span class="menu">Display syslog from previous session</span> and <span class="menu">Save syslog from previous session</span>. The former displays the syslog on screen, the latter allows you to save it as a file to disk. Note that at the moment only FAT32 volumes are supported for saving the file. If you want to use a USB stick, but have plugged it in too late so that it isn't recognized yet, you can reset the machine and re-enter the boot loader menu. Note: Don't accidentally boot any operating system or the data will be lost.</p>

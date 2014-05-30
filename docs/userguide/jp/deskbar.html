@@ -47,6 +47,7 @@
 <li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/deskbar.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../pl/deskbar.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -86,9 +87,9 @@
 <li><p><b>レプリカントを表示 (Show Replicants)</b> - 小さなウィジェットである<a href="gui.html#replicants">レプリカント</a>の表示  / 非表示を切り替えます。ドラッグ操作、削除、コンテキストメニューへのアクセスができます。</p></li>
 <li><p><b>マウント (Mount)</b> - デスクトップを右クリックした際に呼び出されるものと同様のオプションを提供します。(<a href="tracker.html#mounting-volumes">ボリュームのマウント</a>を参照してください)</p></li>
 <li><p><b>Deskbar の設定 (Deskbar Preferences)</b> - Deskbar を設定するためのパネルを開きます。(下を参照してください)</p></li>
-<li><p><b>シャットダウン… (Shutdown...)</b> - <span class="menu">再起動 (Restart System)</span> か<span class="menu">電源を切る (Power Off)</span> を選んで実行します。</p></li>
-<li><p><b>最近使ったドキュメント、フォルダー、アプリケーション (Recent Documents, Folders, Applications)</b> - 最近利用したドキュメント、フォルダー、アプリケーションの一覧です (下の <span class="menu"> Deskbar の設定</span> を参照してください)。</p></li>
-<li><p><b>Applications、Demos、Deskbar Applets、Preferences</b> - インストール済のアプリケーション、デモ、アプレットと設定の一覧です。<br />ほかのプログラム (またはどんなフォルダー、ドキュメント、クエリなど) へのリンクを追加するには、それらを <span class="path">~/config/settings/deskbar/menu/</span> に入れます。</p></li>
+<li><p><b>シャットダウン… (Shutdown...)</b> - <span class="menu">再起動 (Restart System)</span> か、<span class="menu">電源を切る (Power Off)</span> を選んで実行します。</p></li>
+<li><p><b>最近使ったドキュメント、フォルダー、アプリケーション (Recent Documents, Folders, Applications)</b> - 最近利用したドキュメント、フォルダー、アプリケーションの一覧です (下の <span class="menu"> Deskbar の設定</span>を参照してください)。</p></li>
+<li><p><b>Applications、Demos、Deskbar Applets、Preferences</b> - インストール済のアプリケーション、デモ、アプレットと設定の一覧です。<br />ほかのプログラム (またはフォルダー、ドキュメント、クエリなど) へのリンクを追加するには、それらを <span class="path">~/config/settings/deskbar/menu/</span> に入れます。</p></li>
 </ul>
 
 <h3>
@@ -109,7 +110,7 @@
 </table>
 
 <h4>メニュー (Menu)</h4>
-<p>Deskbar の最初のふたつのメニューは固定されていますが、ユーザーは<span class="menu">シャットダウン… (Shutdown...)</span> より下のメニューをカスタマイズできます。<br />
+<p>Deskbar の最初の 2 つのメニューは固定されていますが、ユーザーは、<span class="menu">シャットダウン… (Shutdown...)</span> より下のメニューをカスタマイズできます。<br />
 ここでは、Deskbar のメニューに表示する、最近利用したドキュメント、フォルダー、アプリケーションの数を指定できます。あるいは、それらを表示するかどうかを設定できます。<br />
 <span class="button">メニューの編集… (Edit Menu...)</span>  ボタンは <span class="path">~/config/settings/deskbar/menu/</span> フォルダーを開きます。そこには、Deskbar で表示されるファイルとフォルダーがあることに気づくでしょう。初期設定では、<span class="menu">アプリケーション (Applications)</span>、<span class="menu">デモ (Demos)</span>、<span class="menu">デスクトップアプレット (Deskbar Applets)</span>、<span class="menu">環境設定 (Preferences)</span> となっています。<br />
 アプリケーションへのリンクやドキュメント、クエリといった項目を追加または削除するには、単にこのフォルダーにコピー、削除するだけです。</p>
@@ -135,7 +136,7 @@
 <a id="list-of-apps" name="list-of-apps">実行中のプログラムの一覧</a></h2>
 <img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
 <p>特定の実行中アプリケーションを変更するには、Deskbar の中のアプリケーションの項目をクリックし、サブメニューからウィンドウの (1 つ) を選びます。右クリックでウィンドウやアプリケーション全体を最小化、あるいは閉じることができます。</p>
-<p>Deskbar の設定でエキスパンダーを有効にしている場合、アプリケーションのウィンドウの一覧を展開または折りたたみできます。</p>
+<p>Deskbar の設定でエキスパンダーを有効にしている場合、アプリケーションのウィンドウの一覧を展開または折りたためます。</p>
 <p>すべてのアプリケーションのウィンドウの前には、状態の情報を示すシンボルが付いています。明るいシンボルはウィンドウが可視であること、暗いものは最小化されていることを意味します。シンボルの前に引かれている 3 本線は、ウィンドウが現在のワークスペースにないことを示しています。</p>
 
 </div>

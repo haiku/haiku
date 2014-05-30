@@ -45,6 +45,7 @@
 <li><a href="../../hu/applications/installer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/installer.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../ca/applications/installer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../pl/applications/installer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -65,7 +66,7 @@
 </table>
 <p><br /></p>
 <p>Der Installer installiert (genauer: kopiert) Haiku auf einen Datenträger. Eine "Installation" im klassischen Sinn ist bei Haiku nicht notwendig. Das System muss nicht durch Installation an die vorhandene Hardware angepasst werden, sondern läuft mit identischem Dateiumfang auf allen (unterstützten) Systemen.<br />
-Beim Start des Installer werden zunächst wichtige Informationen angezeigt. Es sind aber keine juristischen Formulierungen eines Endbenutzer-Lizenzvertrages (EULA), sondern tatsächlich wichtige Informationen, die lesenswert sind:</p>
+Beim Start des Installer werden zunächst einige Informationen angezeigt. Es sind aber keine juristischen Formulierungen eines Endbenutzer-Lizenzvertrages (EULA), sondern tatsächlich wichtige Informationen, die lesenswert sind:</p>
 <ul>
 <li><p>Haiku ist noch im "Alpha"-Stadium. Es wird dringend angeraten, Sicherheitskopien von wichtigen Dateien zu machen; ein Datenverlust ist - obwohl nicht wahrscheinlich - nicht auszuschließen!</p></li>
 <li><p>Der Installer kann selbst noch keine neue Partition anlegen. Hierfür wird zusätzliche Software, wie die <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> benötigt. Erst wenn Haikus <acronym title="DriveSetup">Datenträgerverwaltung</acronym> vollkommen sicher ist, wird es möglich sein, während der Installation die Partitionen zu ändern.</p></li>
@@ -78,7 +79,7 @@ Beim Start des Installer werden zunächst wichtige Informationen angezeigt. Es s
 Das zweite Auswahlmenü bezeichnet das Ziel der Installation. Dieses Ziel, das bereits vor der dem Start von Installer existieren muss, wird durch die Installation vollständig überschrieben; eine nachträgliche Rettung von darin gespeicherten Daten ist nicht möglich.</p>
 <p>Durch einen Klick auf das Dreieck neben <i>Optionale Pakete einblenden</i> werden, so vorhanden, zusätzliche Programmpakete angeboten, die mitinstalliert werden können.</p>
 <p>Wie bereits erwähnt, wird die Zielpartition vollständig überschrieben. Man muss daher sicher sein, die richtige Partition gewählt zu haben. Über <span class="button">Partitionen einrichten...</span> wird das Programm <a href="drivesetup.html"><acronym title="DriveSetup">Datenträgerverwaltung</acronym></a> aufgerufen, in dem man eine Übersicht über die Partitionen erhält.</p>
-<p>Mit Klick auf <span class="button">Start</span> wird der eigentliche Installations-Prozess gestartet. Wie oben beschrieben, muss lediglich kopiert und nicht installiert werden. Wenn von einer bestehenden Haiku-Installation aus installiert wird, werden bis auf <span class="path">home/</span> und <span class="path">common/</span> alle Ordner übernommen und die Zielpartition startfähig gemacht.</p>
+<p>Mit Klick auf <span class="button">Start</span> wird der eigentliche Installations-Prozess gestartet, der den /home/ und den /system/ Ordner auf die Zielpartition kopiert und diese bootfähig macht.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tools" name="tools">Tools</a></h2>

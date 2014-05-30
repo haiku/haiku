@@ -44,6 +44,7 @@
 <li><a href="../hu/filesystem-layout.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/filesystem-layout.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../ca/filesystem-layout.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../pl/filesystem-layout.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../en/filesystem-layout.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -63,26 +64,27 @@
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
 <p>如果您重命名或者删除了系统级别的内容，那么系统将会弹出第二类警告。在此菜单上，“<span class="button">Rename</span>” 按钮只有在您按下 <span class="key">SHIFT</span> 键时才能够点击。</p>
-<p>Generally, there are two separate branches springing from the root folder of the boot volume:</p>
+<p>通常，在启动卷的根目录下有两个独立的分支文件夹：</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Contains system files and applications/packages shared by all users.</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>This is your personal folder where you keep your data and settings and the applications/packages that are <i>not</i> shared by all users.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>包含所有用户共享的系统文件和应用程序/软件包。</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>您的个人目录，用于保存个人数据和设置，以及 <i>不</i> 与其他用户共享的应用/软件包。</td></tr>
 </table>
-<p>As long as Haiku isn't multi-user, this distinction between shared and not-shared applications/packages has no apparent effect, as there's only one user with one home folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
+<p>现在，Haiku 还不是多用户系统，共享和非共享应用程序和软件包之间并没有明显的界限和效果，因为目前仅有单个用户和单个 home 文件夹。但是因为最终我们会提供多用户支持，现在开始时对这个有一个正确的理解会很有意义。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">系统文件夹 - <span class="path">/boot/system/</span></a></h2>
-<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
-Most of the folders inside <span class="path">/boot/system/</span> are read-only, which is sensible as they contain the files necessary for Haiku to function correctly and therefore have to be safe from (accidental) alteration. The only user-writable folders are:</p>
+<p>在原 BeOS 系统中，该文件夹命名为 <span class="path">/boot/beos/</span>。在一些老的文档中，您仍然可以找到它（例如 BeBook ）。
+<br />
+<span class="path">/boot/system/</span> 目录中的多数文件夹是只读的，而且它们都非常重要，因为它们包含了 Haiku 正常运行所必须的文件，所以它们的更新必须非常安全。其中用户可写的文件如下：</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>Contains cached files and the temporary folder linked to <span class="path">/tmp/</span>.</td></tr>
-<tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives).</td></tr>
-<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>Besides holding Haiku's system packages, you can add/remove packages shared by all users.</td></tr>
-<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Contains system-wide settings.</td></tr>
-<tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Contains logs like the syslog (important when troubleshooting) and is the default location for the swap file.</td></tr>
+<tr><td><span class="path">/boot/system/cache/</span></td><td> </td><td>包含了缓存文件以及链接到 <span class="path">/tmp/</span> 的临时目录。</td></tr>
+<tr><td class="onelinetop"><span class="path">/boot/system/non-packaged/</span></td><td> </td><td>包含了不属于 .hpkg 软件包（或者老的 BeOS 压缩档）的其他文件的文件系统结构。</td></tr>
+<tr><td><span class="path">/boot/system/packages/</span></td><td> </td><td>除了保存 Haiku 的系统软件包之外，您也可以添加/删除所有用户共享的软件包。</td></tr>
+<tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>包含系统级别的设置。</td></tr>
+<tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>包含日志文件，例如 syslog（在出错时非常重要），并且是 swap 文件的默认位置，</td></tr>
 </table>
-<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="applications.html">Installing applications</a>.</span></p>
+<p><span class="box-info">更多有关 <span class="path">packages</span> 和 <span class="path">non-packaged</span> 目录详细信息，请查阅 <a href="applications.html">应用程序安装</a>。</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -94,28 +96,28 @@ Files that you'd like to share with other users in a future multi-user environme
 <tr><td><span class="path">~/Desktop/</span></td><td style="width:10px;"> </td>
 <td>Holds the files of your desktop. Double-clicking won't open it, as it is already always visible. When your files happen to be obscured by open windows, just switch quickly to another <a href="workspaces.html">Workspace</a>. Of course, <a href="tracker.html#drill-down">drilling</a> down by right-clicking is also possible.</td></tr>
 <tr><td><span class="path">~/mail/</span></td><td style="width:10px;"> </td>
-<td>This is the default location for your mails.</td></tr>
+<td>您的邮件默认保存位置。</td></tr>
 <tr><td><span class="path">~/people/</span></td><td style="width:10px;"> </td>
-<td>This is the default location for you contact files, see <a href="applications/people.html">People</a>.</td></tr>
+<td>联系人文件默认保存位置，详情查看 <a href="applications/people.html">联系人</a>。</td></tr>
 <tr><td><span class="path">~/queries/</span></td><td style="width:10px;"> </td>
-<td><a href="queries.html">Queries</a> are stored here, by default temporarily for 7 days.</td></tr>
+<td><a href="queries.html">查询</a> 文件保存位置，默认临时保存一周时间。</td></tr>
 </table>
 
 <p>The folder <span class="path">/boot/home/config/</span> is special: just like <span class="path">/boot/system/</span> it's mostly under the control of the package management and therefore read-only. It too contains these similar user-writable folders:</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/config/packages/</span></td><td style="width:10px;"> </td>
-<td>Here you can add/remove packages that are <i>not</i> shared by all users.</td></tr>
+<td>该文件夹可供添加/删除 <i>不</i> 被其他用户共享的软件包。</td></tr>
 
 <tr><td class="onelinetop"><span class="path">~/config/non-packaged/</span></td><td> </td>
-<td>Contains a hierarchy for files that aren't part of a .hpkg (probably from old BeOS archives) and are <i>not</i> shared by all users.</td></tr>
+<td>该文件夹包含不属于 .hpkg （或者原有 BeOS 压缩档）的文件结构，并且 <i>不</i> 被其他用户共享。</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
 <td>该文件夹存放了所有程序的设置文件和一些系统配置文件。有些程序会将其设置文件存放在它们自己的子文件夹中，但是其他的则直接存放在这里。</td></tr>
 </table>
 
-<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="applications.html">Installing applications</a>.</span></p>
-<p>Here are some of the more interesting subfolders in <span class="path">~/config/settings/</span>:</p>
+<p><span class="box-info">更多有关 <span class="path">packages</span> 和 <span class="path">non-packaged</span> 目录详细信息，请查阅 <a href="applications.html">应用程序安装</a>。</span></p>
+<p>在 <span class="path">~/config/settings/</span> 中存在一些有意思的子文件夹：</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">boot/</span></td><td style="width:10px;"> </td>
@@ -125,24 +127,24 @@ Files that you'd like to share with other users in a future multi-user environme
 <td>该文件夹中的程序快捷方式，或者文档在每次启动时都自动开始运行。</td></tr>
 
 <tr><td><span class="path">beos_mime/</span></td><td> </td>
-<td>在这个<acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> 数据库中， Haiku跟踪保持了所有的 <a href="filetypes.html">文件类型</a> 和它们的设置情况。</td></tr>
+<td>在这个 <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> 数据库中， Haiku跟踪保持了所有的 <a href="filetypes.html">文件类型</a> 和它们的设置情况。</td></tr>
 
 <tr><td class="onelinetop"><span class="path">deskbar/menu/</span></td><td> </td>
-<td>Copied or linked to files/folders/queries in this folder appear in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>.</td></tr>
+<td>复制或链接到出现在 <a href="deskbar.html#deskbar-menu">桌面栏菜单</a> 中的文件/文件夹/查询。</td></tr>
 
 <tr><td class="onelinetop"><span class="path">kernel/drivers/</span></td><td> </td>
 <td>有一个设置文件可能比较有趣： <span class="cli">kernel</span> 提供了一些底层的配置，例如，禁用 <acronym title="Symmetric Multi Processing">SMP</acronym>，激活串行调试或者 允许高级电源管理。您只要将该配置行前的 “<tt>#</tt>” 注解符号删除即可。在操作时，要时刻小心！</td></tr>
 
 <tr><td><span class="path">Tracker/</span></td><td> </td>
 
-<td>除了用于 Tracker 的各种设置文件外，还有一些有趣的子文件夹：</td></tr>
+<td>除了用于 文件浏览器 的各种设置文件外，还有一些有趣的子文件夹：</td></tr>
 <tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>显示和编排所有的属性与您喜欢的窗口大小。每个新建的文件夹都将以它为模板。</td></tr>
 
 <tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>您可以为确定的文件类型定义查询结果的窗口布局。可以参阅 <a href="queries.html#result-window">查询：结果窗口</a> 主题。</td></tr>
 
-<tr><td align="right"><span class="path">Go/</span></td><td></td><td>把您最喜欢的路径的链接放置在这里，可以打开或者保存面板中对他们进行访问。可以参阅 <a href="gui.html#favorites-recent">Haiku's GUI: Favorites and recent folders</a> 主题。</td></tr>
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>把您最喜欢的路径的链接放置在这里，可以打开或者保存面板中对他们进行访问。可以参阅 <a href="gui.html#favorites-recent">Haiku 的图形用户界面：喜好和最近文件夹</a> 主题。</td></tr>
 
-<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>为任意的文件类型添加模板，它们就可以在Tracker的 <span class="menu">File | New...</span> 菜单中进行访问。 可以参阅<a href="tracker.html#working-with-files">Tracker：文件处理</a>主题。</td></tr>
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>为任意的文件类型添加模板，它们就可以在 文件浏览器的 <span class="menu">文件 | 新建...</span> 菜单中进行访问。 可以参阅<a href="tracker.html#working-with-files">文件浏览器：文件处理</a>主题。</td></tr>
 </table>
 
 </div>

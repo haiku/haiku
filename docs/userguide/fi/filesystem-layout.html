@@ -43,10 +43,11 @@
 <li><a href="../hu/filesystem-layout.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/filesystem-layout.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../ca/filesystem-layout.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../pl/filesystem-layout.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../en/filesystem-layout.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="bootloader.html">Alkukäynnistyslataaja</a> 
+ «  <a href="bootloader.html">Käynnistyslataaja</a> 
 ::  <a href="contents.html" class="uplink">Sisältö</a> 
 ::  <a href="gui.html">Haikun graafinen käyttöliittymä</a>  »
 </span></div>
@@ -54,7 +55,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h1>Tiedostojärjestelmäsijoittelu</h1>
 
@@ -62,7 +62,7 @@
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
 <p>Toinen hälytys ponnahtaa esiin, jos yrität nimetä uudelleen tai poistaa jotain järjestelmähierarkiasta. Tässä painiketta <span class="button">Nimeä uudelleen</span> on napsautettava vain, jos pidät <span class="button">VAIHTO</span>-näppäintä alhaalla.</p>
-<p>Yleensä alkulataustaltion juurihakemistosta erkanee kaksi haaraa:</p>
+<p>Yleensä käynnistystaltion juurihakemistosta erkanee kaksi haaraa:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/</span></td><td> </td><td>Sisältää järjestelmätiedostot ja kaikkien käyttäjien jakamat sovellukset/pakkaukset.</td></tr>
 <tr><td><span class="path">/boot/home/</span></td><td> </td><td>Tämä on henkilökohtainen kansiosi, jossa säilytät tietojasi ja asetuksiasi sekä sovelluksia/pakkauksia, joita <i>ei</i> jaeta muiden käyttäjien kanssa.</td></tr>
@@ -81,7 +81,7 @@ Useimmat kansion <span class="path">/boot/system/</span> sisällä olevat kansio
 <tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Sisältää järjestelmänlaajuisia asetuksia.</td></tr>
 <tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Sisältää lokitiedostoja kuten syslog (tärkeä vianjäljityksessä) ja on oletussijainti näennäismuistitiedostolle.</td></tr>
 </table>
-<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="applications.html">Installing applications</a>.</span></p>
+<p><span class="box-info">Katso lisätietoja kansioista <span class="path">packages</span> ja <span class="path">non-packaged</span> aiheesta <a href="applications.html">Sovellusten asentaminen</a>.</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -113,15 +113,15 @@ Ne tiedostot, jotka haluat tulevaisuudessa jakaa monikäyttäjäympäristössä 
 <td>Tämä kansio sisältää asetuksia kaikkiin sovelluksiin ja muutamia järjestelmän asetuksia. Jotkut sovellukset käsittelevät asetuksiaan omissa alikansioisssa, toiset laittavat yksinkertaisesti asetustiedostonsa tänne.</td></tr>
 </table>
 
-<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="applications.html">Installing applications</a>.</span></p>
+<p><span class="box-info">Katso lisätietoja kansioista <span class="path">packages</span> ja <span class="path">non-packaged</span> aiheesta <a href="applications.html">Sovellusten asentaminen</a>.</span></p>
 <p>Tässä on lisää kiinnostavia <span class="path">~/config/settings</span>-kansion alikansioita:</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">boot/</span></td><td style="width:10px;"> </td>
-<td>Tämä kansio on paikka <a href="bash-scripting.html#user-scripts">Käyttäjäskripteille</a>, jotka suoritetaan ennen alkulatausta tai sammuttamista tai niiden jälkeen.</td></tr>
+<td>Tämä kansio on paikka <a href="bash-scripting.html#user-scripts">Käyttäjäskripteille</a>, jotka suoritetaan ennen käynnistystä tai sammuttamista tai niiden jälkeen.</td></tr>
 
 <tr><td><span class="path">boot/launch/</span></td><td> </td>
-<td>Linkit ohjelmiin tai asiakirjoihin tässä kansiossa käynnistetään automaattisesti jokaisen alkulatauksen yhteydessä.</td></tr>
+<td>Linkit ohjelmiin tai asiakirjoihin tässä kansiossa käynnistetään automaattisesti jokaisen käynnistyksen yhteydessä.</td></tr>
 
 <tr><td><span class="path">beos_mime/</span></td><td> </td>
 <td>Tässä <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>-tietokannassa Haiku säilyttää kaikkien eri <a href="filetypes.html">tiedostotyyppien</a> jäljet ja niiden asetuksia.</td></tr>
@@ -149,7 +149,7 @@ Ne tiedostot, jotka haluat tulevaisuudessa jakaa monikäyttäjäympäristössä 
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="bootloader.html">Alkukäynnistyslataaja</a> 
+ «  <a href="bootloader.html">Käynnistyslataaja</a> 
 ::  <a href="contents.html" class="uplink">Sisältö</a> 
 ::  <a href="gui.html">Haikun graafinen käyttöliittymä</a>  »
 </span></div>

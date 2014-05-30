@@ -43,6 +43,7 @@
 <li><a href="../../hu/applications/installer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/installer.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../ca/applications/installer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../pl/applications/installer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,12 +55,13 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Asennusohjelma</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
-<tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
-<tr><td>Asetukset</td><td></td><td><i>ei mitään</i></td></tr>
+<tr><td>Työpöytäpalkki:</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
+<tr><td>Sijainti:</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
+<tr><td>Asetukset:</td><td></td><td><i>ei mitään</i></td></tr>
 </table>
 <p><br /></p>
 <p>Asennusohjelmaa käytetään Haikun kopioimiseksi toiselle taltiolle.<br />Käynnistettäessä se näyttää käynnistysikkunan tärkeillä tiedoilla.  Se ei ole järjetön EULA, jonka olet tottunut napsauttamaan pois silmänräpäyksessä, se ilmoittaa:</p>
@@ -74,7 +76,7 @@
 <p>Ensimmäisessä ponnahdusvalikossa valitset asennuksen lähteen. Se voi olla jo asennettu Haiku-järjestelmä tai voi tulla asennus-CD-levyltä tai USB-levyltä, jne.<br />Toinen ponnahdusvalikko määrittelee asennuksen kohteen. Tämä kohdeosio/taltio korvataan kokonaan ja se on laitettu syrjään GParted-ohjelman tapaisella osiointityökalulla.</p>
 <p>Pienen laajentajakäyttöliittymäkomponentin napsauttaminen avaa <i>Näytä valinnaiset pakkaukset</i>, jos niitä on käytettävissä, jotka voit valita asennettavaksi perus-Haikun lisäksi.</p>
 <p>Sinun pitäisi lopuksi tarkistaa, että poimit todella oikean kohteen ennen asennusprosessin aloittamista. Napsauta painiketta <span class="button">Aseta osiot...</span>, mikä käynnistää <a href="drivesetup.html">Levyasema-asetukset</a> ja sinulla on näkymä olemassaolevien taltioiden ja osioiden nimeämiseksi ja sijoittelemiseksi.</p>
-<p><span class="button">Aloita</span> käynnistää asennusproseduurin, joka perimmillään kopoi kaikki paitsi <span class="path">home/</span>- ja <span class="path">common/</span> -kansion kohdetaltiolle ja tekee siitä alkuladattavan.</p>
+<p><span class="button">Begin</span> starts the installation procedure, which basically copies the <span class="path">/home/</span> and <span class="path">/system/</span> folder onto the target volume and makes it bootable.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tools" name="tools">Työkalut</a></h2>

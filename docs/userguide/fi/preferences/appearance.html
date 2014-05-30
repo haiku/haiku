@@ -43,6 +43,7 @@
 <li><a href="../../hu/preferences/appearance.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/preferences/appearance.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../ca/preferences/appearance.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../pl/preferences/appearance.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../../en/preferences/appearance.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -53,13 +54,12 @@
 
 <div id="content">
 <div>
-<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Ulkoasuasetukset</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Työpöytäpalkki</td><td style="width:15px;"></td><td><span class="menu">Asetukset</span></td></tr>
-<tr><td>Sijainti</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
-<tr><td>Asetukset</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
+<tr><td>Työpöytäpalkki:</td><td style="width:15px;"></td><td><span class="menu">Asetukset</span></td></tr>
+<tr><td>Sijainti:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
+<tr><td>Asetukset:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
 <span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
 <p>Ulkoasuasetukset sallivat sinun vaihtaa joitakin Haikun visuaalisia muotoja.</p>
@@ -73,10 +73,10 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">Uusien kirjasimien asentaminen</a></h3>
-<p>New fonts that don't come as part of a regular .hpkg package, can be installed by copying them into a subfolder according to the font type (<tt>psfonts</tt> or <tt>ttfonts</tt>) into their respective <tt>non-packaged</tt> folder (see topic <a href="../filesystem-layout.html">Filesystem layout</a>). For TrueType fonts that would be:</p>
+<p>Uudet fontit, jotka eivät tule osana normaalia .hpkg-pakkausta, voidaan asentaa kopioimalla ne alikansioon fonttityypin mukaisesti (<tt>psfonts</tt> tai <tt>ttfonts</tt>) niiden vastaavaan <tt>non-packaged</tt>-kansioon (katso aihe <a href="../filesystem-layout.html">Tiedostojärjestelmasettelu</a>). TrueType-fonteille se olisi:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> fontit jokaiselle käyttäjälle.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> fontit vain sinulle itsellesi.</td></tr>
 </table>
 
 <h2>

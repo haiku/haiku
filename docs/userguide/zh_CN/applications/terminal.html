@@ -43,6 +43,7 @@
 <li><a href="../../hu/applications/terminal.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/terminal.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../ca/applications/terminal.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../pl/applications/terminal.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../../en/applications/terminal.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -62,12 +63,12 @@
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>设置：</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - 添加或者覆盖默认的 <span class="path">/boot/system/settings/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - 添加或者覆盖默认的 <span class="path">/boot/system/settings/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
 <p>终端是Haiku中具有用户界面的bash，即 Bourne Again Shell。</p>
-<p>请参考 <a href="../bash-scripting.html">脚本</a> 这一主题获取有关Shell的在线教程，同时也可以阅读<a href="cli-apps.html">Haiku的命令行程序</a>。在本文中，我们重点关注终端本身的使用。</p>
+<p>请参考 <a href="../bash-scripting.html">脚本</a> 这一主题获取有关 Shel l的在线教程，同时也可以阅读 <a href="cli-apps.html">Haiku 的命令行程序</a>。在本文中，我们重点关注终端本身的使用。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -108,12 +109,13 @@
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Bash的定制</a></h2>
-<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
-Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/settings/etc/</span>.</p>
+<p>bash 来自于 Unix，它具有无数的可定制的方式。对于用户来讲，有两个文件至关重要： <span class="cli">.profile</span> 和 <span class="cli">.inputrc</span> 。
+<br />
+这两个文件可以在 <span class="path">home/</span> 文件夹中予以创建， 然后将会添加到或者覆盖在 <span class="path">/boot/system/settings/etc/</span> 中系统默认定义的配置文件。</p>
 
 <h3>.profile</h3>
-<p>在您每次打开新的终端时， <span class="cli">.profile</span> 都会被载入程序。在该文件中，设置了所有影响到bash行为和外观的各种类型的设备接口和变量。你可以在网络上找到许多资源，它们将会给出所有可能性的详细介绍。</p>
-<p>Haiku/BeOS Tip Server提供了许多入门的技巧，例如：</p>
+<p>在您每次打开新的终端时， <span class="cli">.profile</span> 都会被载入程序。在该文件中，设置了所有影响到 bash 行为和外观的各种类型的设备接口和变量。你可以在网络上找到许多资源，它们将会给出所有可能性的详细介绍。</p>
+<p>Haiku/BeOS Tip Server 提供了许多入门的技巧，例如：</p>
 <ul>
 <li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">定制终端的提示信息</a></li>
 <li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">更多提示信息的定制</a></li>
@@ -128,13 +130,13 @@ Both files can be created in the <span class="path">home/</span> folder and add 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hints" name="hints">关于终端的提醒</a></h2>
-<ul><li><p>从Tracker窗口中拖拽文件或者文件夹到终端将会在光标的位置插入它的路径。而使用右键拖拽将会弹出一个右键菜单，显示附加的操作：</p>
+<ul><li><p>从文件浏览器窗口中拖拽文件或者文件夹到终端将会在光标的位置插入它的路径。而使用右键拖拽将会弹出一个右键菜单，显示附加的操作：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Insert Path</span></td><td> </td><td>插入一个文件的路径，与左键拖拽文件到终端类似。</td></tr>
-<tr><td><span class="menu">Change Directory</span></td><td> </td><td>切换到所拖拽文件所在的文件夹。</td></tr>
-<tr><td><span class="menu">Create Link Here</span></td><td> </td><td>在终端当前工作的目录为拖拽的文件创建链接。</td></tr>
-<tr><td><span class="menu">Move Here</span></td><td> </td><td>移动拖拽的文件到终端当前工作的目录。</td></tr>
-<tr><td><span class="menu">Copy Here</span></td><td> </td><td>复制拖拽的文件到终端当期工作的目录。</td></tr>
+<tr><td><span class="menu">插入路径</span></td><td> </td><td>插入一个文件的路径，与左键拖拽文件到终端类似。</td></tr>
+<tr><td><span class="menu">切换目录</span></td><td> </td><td>切换到所拖拽文件所在的文件夹。</td></tr>
+<tr><td><span class="menu">创建链接到这里</span></td><td> </td><td>在终端当前工作的目录为拖拽的文件创建链接。</td></tr>
+<tr><td><span class="menu">移动到这里</span></td><td> </td><td>移动拖拽的文件到终端当前工作的目录。</td></tr>
+<tr><td><span class="menu">复制到这里</span></td><td> </td><td>复制拖拽的文件到终端当期工作的目录。</td></tr>
 </table></li>
 <li><p>您可以使用<span class="cli">open <i>[filename]</i></span> 命令以首选程序打开任何的文件。该命令也作用于当前文件夹（"<span class="cli">.</span>"）和父文件夹（"<span class="cli">..</span>"），它们分别以Tracker窗口打开。所以，如果希望打开当前工作的目录，您可以输入：</p>
 <pre class="terminal">open .</pre>

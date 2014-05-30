@@ -44,6 +44,7 @@
 <li><a href="../hu/bootloader.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bootloader.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../ca/bootloader.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../pl/bootloader.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -64,7 +65,7 @@
 <p>为了进入引导程序选项，您需要在 Haiku 的启动进程开始前，持续按住 <span class="key">SHIFT</span> 键。如果已经安装了启动管理软件，您可以在进入 Haiku 启动调用之前开始按下 <span class="key">SHIFT</span> 键。如果Haiku是唯一的操作系统，您可以在 BIOS 中显示启动消息时就开始按下该按键。</p>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="options" name="options">Boot Loader Options</a></h2>
+<a id="options" name="options">引导管理器选项</a></h2>
 <p>进入选项之后，出现了下面四个菜单：</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b></td><td> </td><td>选择Haiku的安装介质。</td></tr>
@@ -111,7 +112,7 @@
 		Displays the debug info the boot loader has logged (press <span class="key">Q</span> to exit the log)</p>
 	<p><span class="menu">Add advanced debug option</span><br />
 		Allows advanced debugging options to be entered directly.</p></td></tr>
-<tr><td></td><td></td><td>If "<i>Enable debug syslog</i>" is activated, a warm reboot after a crash shows these additional options:</td></tr>
+<tr><td></td><td></td><td>如果激活了 "Enable debug syslog" ，那么在崩溃后，热启动后将提示如下附加选项：</td></tr>
 <tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
 		Saves the syslog from the previous Haiku session to /var/log/previous_syslog when booting.</p>
 	<p><span class="menu">Display syslog from previous session</span><br />
@@ -122,7 +123,7 @@
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
+<a id="troubleshooting" name="troubleshooting">错误检查</a></h2>
 <p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../welcome/en/bugreports.html">bug report</a> in any case.</p>
 <p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again to make things right by uninstalling the offending package again:</p>
 <ul>

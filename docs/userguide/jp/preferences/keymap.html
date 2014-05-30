@@ -44,6 +44,7 @@
 <li><a href="../../hu/preferences/keymap.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/preferences/keymap.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../ca/preferences/keymap.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../pl/preferences/keymap.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -79,12 +80,12 @@
 <img src="../images/prefs-images/keymap-modifiers.png" alt="keymap-modifiers.png" />
 <p>ここでは、キーをそれぞれの役割へ割り当てること、またはキーの役割を完全に無効にすることができます。同じキーに違う役割を割り当てることすらできますが、それは大体の場合、良い考えではありません。また、その場合、ポップアップメニュー横の小さな ！ で警告されます。 <br />
 <span class="button">修飾キーを設定 (Set modifier keys)</span> ボタンを押すと、変更を適用して、ウィンドウを閉じます。</p>
-<p>変更を終えたら、その結果を <span class="menu">ファイル | 名前をつけて保存… (File | Save as ...)</span> メニューから保存できます。変更したキーマップは <span class="path">~/config/settings/Keymap/</span> に保存されている場合のみユーザー定義の一覧に表示されます。そうでなければ、<span class="menu">ファイル | 開く… (File | Open...) </span>から手動で読み込む必要があります。
+<p>変更を終えたら、その結果を、<span class="menu">ファイル | 名前をつけて保存… (File | Save as ...)</span> メニューから保存できます。変更したキーマップは <span class="path">~/config/settings/Keymap/</span> に保存されている場合のみユーザー定義の一覧に表示されます。そうでなければ、<span class="menu">ファイル | 開く… (File | Open...) </span>から手動で読み込む必要があります。
 
 </p>
-<p>キーマップパネルと物理キーボードをより一致させるために、<span class="menu">Layout</span> メニューからいくつかの異なった設定が利用できます。</p>
+<p>キーマップパネルと物理キーボードをより一致させるために、<span class="menu">Layout</span> メニューからいくつかの設定が利用できます。</p>
 <p>画面キーボードで使われるフォントは、<span class="menu">フォント (Font)</span> メニューで変更できます。フォントがすべての文字と記号を含むとは限らないということに注意してください。</p>
-<p>キーマップの設定を始めた時点の設定に戻すために <span class="button">元に戻す (Revert)</span> ボタンもあります。 </p>
+<p>キーマップの設定を始めた時点の設定に戻すための、<span class="button">元に戻す (Revert)</span> ボタンもあります。 </p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -97,9 +98,9 @@
 (Shortcuts)</a> プリファレンスを使用します。</p>
 <p>設定を終えたら、ファイルを保存して、次のコマンドでシステムに変更したキーマップを読み込ませます。</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
-<p>このキーマップをキーマップパネルにインポートしたい場合は、まずファイルをバイナリ形式にコンパイルする必要があります: </p>
+<p>このキーマップをキーマップパネルにインポートする場合は、まずファイルをバイナリ形式にコンパイルする必要があります: </p>
 <pre class="terminal">keymap -c &lt; MyKeymap</pre>
-<p>これで生成される <span class="cli">keymap.out</span> を <span class="menu">開く… (Open...)</span> メニューから読み込むことができます。ちなみに、次のキーマップコマンドでもこのバイナリ形式を同様に読み込むことができます: <span class="cli">keymap -l &lt; keymap.out</span></p>
+<p>これで生成される <span class="cli">keymap.out</span> を <span class="menu">開く… (Open...)</span> メニューから読み込めます。ちなみに、次のキーマップコマンドでもこのバイナリ形式を同様に読み込めます: <span class="cli">keymap -l &lt; keymap.out</span></p>
 <p>これはダンプされたファイルです (整列されているキーの右端はこのページの見栄えをよくするために省かれています)。</p>
 
 <pre>#!/bin/keymap -s

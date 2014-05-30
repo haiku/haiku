@@ -44,6 +44,7 @@
 <li><a href="../../hu/applications/list-cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/list-cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../ca/applications/list-cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../pl/applications/list-cli-apps.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../../en/applications/list-cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -55,21 +56,20 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />所有命令行程序列表</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>位置：</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear in <span class="path">~/config/bin/</span> when installed from a .hpkg package. Otherwise you can put them into <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-Here's a list of all commandline applications that are shipped with Haiku. Each with only a short description of what it does, for more detailed information on its usage execute the command with the parameter <tt>--help</tt>.</p>
+<p>所有与 Haiku 集成的命令行程序放置在 <span class="path">/boot/system/bin</span>。您自己的或者额外安装的通过 .hpkg 安装的命令行程序应该放置于 <span class="path">~/config/bin</span>，而且，您也可以将他们放置在 <span class="path">~/config/non-packaged/bin/</span> 。所有这些位置是 PATH 变量的一部分，因此会自动被发现。<br />
+下面是与 Haiku 集成的所有命令行程序列表。每个程序都有一个简短的功能描述，关于用法的更多详细信息，请使用 <tt>--help</tt> 参数运行该命令。</p>
 <p><br /></p>
 <p>索引:   <a href="#A">A – E</a>   ::   <a href="#F"> F – J </a>   ::   <a href="#K"> K – O </a>   ::   <a href="#P"> P – S </a>   ::   <a href="#T"> T – Z </a></p>
 <p><br /></p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 <tr><td><tt>CortexAddOnHost</tt></td><td style="width:10px;"> </td><td>开启音频和视频附加组件的管理服务。</td></tr>
-<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>Language and keymap setup. </td></tr>
+<tr><td><tt>FirstBootPrompt</tt></td><td> </td><td>语言和键盘映射设置。 </td></tr>
 <tr><td><tt>[</tt></td><td> </td><td>比较文件之后，返回其真/假值。</td></tr>
 <tr><td colspan="3"><a id="A" name="A"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>A</h2></a></td></tr>
 <tr><td><tt>addattr</tt></td><td> </td><td>写入属性到文件，包括类型和相应值的转换。<a href="cli-apps.html">（Haiku 专用）</a></td></tr>
@@ -82,8 +82,8 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>bc</tt></td><td> </td><td>一个任意精度的计算机语言。</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>响铃。 </td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>查看 <tt>bzip2</tt> 说明。</td></tr>
-<tr><td><tt>bzip2</tt></td><td> </td><td>File compressor.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>C  -Compiler.</td></tr>
+<tr><td><tt>bzip2</tt></td><td> </td><td>文件压缩工具。</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>C 编译器。</td></tr>
 <tr><td><tt>cal</tt></td><td> </td><td>显示 计算器。 </td></tr>
 <tr><td><tt>cat</tt></td><td> </td><td>连接文件，并将其打印到标准输出。</td></tr>
 <tr><td><tt>catattr</tt></td><td> </td><td>打印文件的属性内容。 <a href="cli-apps.html">（Haiku 专用）</a></td></tr>
@@ -144,7 +144,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>fortune</tt></td><td> </td><td>打印一个随机，非常有趣的格言。</td></tr>
 <tr><td><tt>frcode</tt></td><td> </td><td>由 updatedb 调用，压缩文件名列表。</td></tr>
 <tr><td><tt>freetype-config</tt></td><td> </td><td>显示 FreeType 编辑和链接信息。</td></tr>
-<tr><td><tt>fstrim</tt></td><td> </td><td>Send a TRIM command to an SSD drive.</td></tr>
+<tr><td><tt>fstrim</tt></td><td> </td><td>发送 TRIM 命令到 SSD 设备。</td></tr>
 <tr><td><tt>ftp</tt></td><td> </td><td>文件传输程序。</td></tr>
 <tr><td><tt>ftpd</tt></td><td> </td><td>FTP 后台程序。</td></tr>
 <tr><td><tt>funzip</tt></td><td> </td><td>提取压缩档的首个项目到标准输出。</td></tr>
@@ -188,7 +188,7 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>listsem</tt></td><td> </td><td>列出指定组所保留的信号。</td></tr>
 <tr><td><tt>listusb</tt></td><td> </td><td>列出 USB 硬件设备。 </td></tr>
 <tr><td><tt>ln</tt></td><td> </td><td>创建一个文件链接。</td></tr>
-<tr><td><tt>locale</tt></td><td> </td><td>Shows the set preferred language, its LC_CTYPE and the preferred formatting.</td></tr>
+<tr><td><tt>locale</tt></td><td> </td><td>显示当前语言设置，LC_CTYPE 以及首选格式。</td></tr>
 <tr><td><tt>locate</tt></td><td> </td><td>定位一个文件。 </td></tr>
 <tr><td><tt>logger</tt></td><td> </td><td>发送系统日志消息。 </td></tr>
 <tr><td><tt>login</tt></td><td> </td><td>在系统上创建一个会话。</td></tr>
@@ -198,12 +198,12 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>mail2mbox</tt></td><td> </td><td>转换 BeOS 电子邮件文件为 Unix 邮箱文件。 </td></tr>
 <tr><td><tt>make</tt></td><td> </td><td>GNU make 套件。</td></tr>
 <tr><td><tt>makebootable</tt></td><td> </td><td>通过写入引导代码到头部的两个扇区，创建指定的 BFS 分区/可引导设备。</td></tr>
-<tr><td><tt>mbox2mail</tt></td><td> </td><td>转换 Unix邮箱文件 为 BeOS电子邮件文件。</td></tr>
+<tr><td><tt>mbox2mail</tt></td><td> </td><td>转换 Unix 邮箱文件 为 BeOS 电子邮件文件。</td></tr>
 <tr><td><tt>md5sum</tt></td><td> </td><td>打印或检验 MD5 校验码。</td></tr>
 <tr><td><tt>merge</tt></td><td> </td><td>三路文件合并。</td></tr>
 <tr><td><tt>message</tt></td><td> </td><td>打印一个平整的 BMessage 文件。</td></tr>
 <tr><td><tt>mimeset</tt></td><td> </td><td>设置文件的 mime 类型。 </td></tr>
-<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile dependency generator.</td></tr>
+<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile 依赖生成工具。</td></tr>
 <tr><td><tt>mkdir</tt></td><td> </td><td>创建一个目录。 </td></tr>
 <tr><td><tt>mkdos</tt></td><td> </td><td>初始化 FAT 分区。</td></tr>
 <tr><td><tt>mkfifo</tt></td><td> </td><td>创建已命名管道。 </td></tr>
@@ -224,16 +224,16 @@ Here's a list of all commandline applications that are shipped with Haiku. Each 
 <tr><td><tt>od</tt></td><td> </td><td>写入文件的清晰表述。</td></tr>
 <tr><td><tt>open</tt></td><td> </td><td>从 Shell 载入应用程序或者文档。 <a href="cli-apps.html">（Haiku 专用）</a></td></tr>
 <tr><td colspan="3"><a id="P" name="P"><h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>P</h2></a></td></tr>
-<tr><td><tt>package</tt></td><td> </td><td>Creates, inspects, or extracts a Haiku package.</td></tr>
-<tr><td><tt>package_repo</tt></td><td> </td><td>Creates or inspects a Haiku package repository file.</td></tr>
+<tr><td><tt>package</tt></td><td> </td><td>创建，检查，以及解压 Haiku 软件包。</td></tr>
+<tr><td><tt>package_repo</tt></td><td> </td><td>创建或者检查 Haiku 软件仓库文件。</td></tr>
 <tr><td><tt>passwd</tt></td><td> </td><td>修改用户密码。 </td></tr>
 <tr><td><tt>paste</tt></td><td> </td><td>打印每个文件中包含的连续行，并使用制表符将其分开。</td></tr>
 <tr><td><tt>patch</tt></td><td> </td><td>应用修改文件到原文件。 </td></tr>
 <tr><td><tt>pathchk</tt></td><td> </td><td>判断无效或者不可移植的文件名。 </td></tr>
 <tr><td><tt>pc</tt></td><td> </td><td>程序员计算器。</td></tr>
 <tr><td><tt>ping</tt></td><td> </td><td>发送 ICMP回应请求 到网络主机。 </td></tr>
-<tr><td><tt>pkg-config</tt></td><td> </td><td>Analyzes and configures a Haiku package.</td></tr>
-<tr><td><tt>pkgman</tt></td><td> </td><td>Manages packages and package repositories.</td></tr>
+<tr><td><tt>pkg-config</tt></td><td> </td><td>解析和配置 Haiku 软件包。</td></tr>
+<tr><td><tt>pkgman</tt></td><td> </td><td>管理软件包和软件仓库。</td></tr>
 <tr><td><tt>play</tt></td><td> </td><td>播放 CD 轨道。</td></tr>
 <tr><td><tt>playfile</tt></td><td> </td><td>播放音频文件。 </td></tr>
 <tr><td><tt>playsound</tt></td><td> </td><td>播放音频文件。</td></tr>

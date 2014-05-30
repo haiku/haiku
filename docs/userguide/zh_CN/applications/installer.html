@@ -44,6 +44,7 @@
 <li><a href="../../hu/applications/installer.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/installer.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../ca/applications/installer.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../pl/applications/installer.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -64,11 +65,11 @@
 <tr><td>设置：</td><td></td><td><i>none</i></td></tr>
 </table>
 <p><br /></p>
-<p>安装器用于将Haiku拷贝到其他的磁卷。<br />
+<p>安装器用于将 Haiku 拷贝到其他的磁卷。<br />
 在开始拷贝之前，会弹出一个显示重要信息的开始窗口。它不是毫无意义的你可以忽略的最终用户许可协议（EULA），它包括了如下的声明：</p>
 <ul>
 <li><p>这是测试质量的软件。一定要做好备份，否则要遭受无法预计的后果。</p></li>
-<li><p>安装器需要一个预备的分区。在 Haiku 的DriveSetup 足够成熟之前，您可能需要使用 <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> 或者一个类似的工具来处理分区任务。</p></li>
+<li><p>安装器需要一个预备的分区。在 Haiku 的 DriveSetup 足够成熟之前，您可能需要使用 <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> 或者一个类似的工具来处理分区任务。</p></li>
 <li>Haiku可以手动添加到 <a href="http://www.gnu.org/software/grub/manual/grub.html">GRUB</a> 启动管理器。具体的操作方法，请查阅 <a href="http://www.haiku-os.org/get-haiku/installation-guide">在线手册</a>。</li>
 </ul>
 <p><br /><br /></p>
@@ -78,7 +79,7 @@
 第二个弹出菜单用于确定安装的目标。目标分区或磁卷的数据将会被完全覆盖，因此之前就要使用分区工具将这些分区分出来，例如Gparted.</p>
 <p>点击小的展开空间<i>Show Optional Packages</i>，如果它可以使用，您就可以选择安装到基本的Haiku中。</p>
 <p>在开始安装进程之前，你应该检查一下是否选择了正确的目标。点击<span class="button">Setup partitions...</span>，打开 <a href="drivesetup.html">驱动安装器</a> ，然后查看可用的磁卷和分区的命名和层次结构。</p>
-<p>点击<span class="button">Begin</span> 开始安装进程。它将会把除了 <span class="path">home/</span> 和 <span class="path">common/</span> 文件夹之外的所有文件拷贝到目标磁卷中，使它变成可引导的分区。</p>
+<p>点击 <span class="button">开始</span> 启动安装进程。它将会把除了 <span class="path">/home/</span> 和 <span class="path">/sysem/</span> 文件夹之外的所有文件拷贝到目标磁卷中，使它变成可引导的分区。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tools" name="tools">工具</a></h2>

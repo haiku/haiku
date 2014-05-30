@@ -44,6 +44,7 @@
 <li><a href="../../hu/applications/cli-apps.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../../pt_BR/applications/cli-apps.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../../ca/applications/cli-apps.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../pl/applications/cli-apps.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -61,14 +62,14 @@
 <tr><td>位置:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
-<p>Haiku に標準装備されているすべてのコマンドラインアプリケーションは、<span class="path">/boot/system/bin/</span> の中にあります。ユーザー自身の、または追加でインストールしたコマンドラインアプリケーションは、 .hpkg パッケージからインストールされた場合、<span class="path">~/config/non-packaged/bin/</span> に現れるでしょう。これらの場所はすべて PATH 環境変数の一部なので、自動的に見つかります。<br />
-以下は、Haiku 固有のコマンドラインアプリケーションの完全なリストではありません。それは、経験を与えるには最も有用なわずかなものに単にハイライトをあてるだけです。<span class="path">bin/</span>フォルダーにあるものを自分自身で少し調査することを励まします。コマンドの使い方とさまざまなオプションについては、コマンドを—help 引数をつけて実行してください。
+<p>Haiku に標準装備されているすべてのコマンドラインアプリケーションは、<span class="path">/boot/system/bin/</span> の中にあります。ユーザー自身の、または追加でインストールしたコマンドラインアプリケーションは、.hpkg パッケージからインストールされた場合、<span class="path">~/config/non-packaged/bin/</span> に現れるでしょう。これらの場所はすべて PATH 環境変数の一部なので、自動的に見つかります。<br />
+以下は、Haiku 固有のコマンドラインアプリケーションの完全なリストではありません。それは、経験を与えるにはもっとも有用なわずかなものに単にハイライトをあてるだけです。<span class="path">bin/</span> フォルダーにあるものを自分自身で少し調査することを励まします。コマンドの使い方とさまざまなオプションについては、コマンドを —help 引数を付けて実行してください。
 </p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-attributes" name="cli-attributes">属性に関するコマンド: <span class="cli">listattr</span>, <span class="cli">catattr</span>、<span class="cli">addattr</span>、<span class="cli">rmattr</span>、<span class="cli">copyattr</span></a></h3>
 <p>これらのコマンドは、ファイルの属性を表示、出力、追加、および削除するために使用します。現在のところ、これらのメタデータは BFS で初期化されたボリュームでのみ使用できることに注意してください。BFS 以外のファイルシステムにファイルを移動させると、すべての属性が失われてしまいます!<br />
-これらすべてのコマンドについては、<a href="../attributes.html#attributes-terminal">ターミナルにおける属性</a>というトピックで解説しています。</p>
+これらすべてのコマンドについては、<a href="../attributes.html#attributes-terminal">ターミナルでの属性</a>というトピックで解説しています。</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-index" name="cli-index">インデックスに関するコマンド: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
@@ -77,7 +78,7 @@
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-scripting" name="cli-scripting">スクリプト処理に役立つコマンド</a></h3>
-<p>以下では、スクリプト処理 (<a href="../bash-scripting.html">Bash とスクリプト処理</a>のトピックも合わせてご覧ください) に対して特に便利なコマンドラインツールを紹介します。</p>
+<p>以下では、スクリプト処理 (<a href="../bash-scripting.html">Bash とスクリプト処理</a>のトピックも併せて参照ください) に対して特に便利なコマンドラインツールを紹介します。</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">alert</span> は既定のアイコンと説明文、および 3 つのボタンの付いた典型的な警告ウィンドウを表示します。このコマンドは、クリックされたボタンのタイトルと終了ステータス (0 から始まります) を返します。下の例は、次の 1 行で作成されます:</p>
@@ -91,7 +92,7 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> はアプリケーションやスレッドの開始および終了を待つのにピッタリの方法です。</p>
+		<td valign="top"><p><span class="cli">waitfor</span> はアプリケーションやスレッドの開始および終了を待つのにピッタリです。</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> は、検索 (Find) パネルのコマンドラインバージョンです。ちなみに、検索語句をすばやく生成するには、検索パネルでクエリを生成し、<span class="menu">式で検索 (by formula)</span> に切り替えて先頭と末尾にダブルクオート (<tt>"</tt>) を追加し、その文字列全体をターミナルまたはスクリプトの <span class="cli">query</span> コマンドの後に貼り付けます。</p></td></tr></table>
@@ -104,14 +105,14 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 		<td><p><span class="cli">checkfs</span> はファイルシステムのエラーをチェックするための重要なツールです。実行は単にボリューム名またはデバイス名を追加するだけです。すると、すべてのファイルを走査して、可能な場合は不整合を修復します。</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> を使用すると、任意のファイルやフォルダー、クエリ、アプリケーションのアイコンを Deskbar トレイにインストールできます。特別なアクションを実行するためにアイコンを右クリックしたときに表示されるコンテキストメニューを定義するためのオプションもあります。例として、次のようにいろいろなオプション (1 行目の "<tt>\</tt>" はターミナルでの改行を表します) を付けて、<span class="app">スクリーンショット (screenshot) </span> を Deskbar に追加してみましょう:</p>
+		<td valign="top"><p><span class="cli">desklink</span> を使用すると、任意のファイルやフォルダー、クエリ、アプリケーションのアイコンを Deskbar トレイにインストールできます。特別なアクションを実行するためにアイコンを右クリックしたときに表示されるコンテキストメニューを定義するためのオプションもあります。例として、次のようにいろいろなオプション (1 行目の "<tt>\</tt>" はターミナルでの改行を表します) を付けて、<span class="app">スクリーンショット (screenshot) </span> を Deskbar に追加してみましょう。</p>
 <pre class="terminal">desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=screenshot" /bin/screenshot
 </pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">diskimage</span> は、普通のファイルをディスクデバイスとして登録します。たとえば、 Haiku anyboot イメージを登録して、Tracker 中にマウントし、インストーラーのソースとして使う前にそこにあるファイルを編集、コピーまたは削除できます。</p>
+		<td valign="top"><p><span class="cli">diskimage</span> は、普通のファイルをディスクデバイスとして登録します。たとえば、Haiku anyboot イメージを登録して、Tracker 中にマウントし、インストーラーのソースとして使う前にそこにあるファイルを編集、コピーまたは削除できます。</p>
 </td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">open</span> は非常に便利な小さいツールです。このコマンドを使うと任意のファイルを適切なアプリケーションで開くことや、シグネチャーを用いることで正確なパスを知ることなしにアプリケーションを起動できます。このコマンドは URL や「仮想的な」ディレクトリを用いることさえできます。ディレクトリの場合は <tt>.</tt> で現在のディレクトリを、<tt>..</tt> で親ディレクトリを表すことができ、そのフォルダーを Tracker 内に開きます。</p>

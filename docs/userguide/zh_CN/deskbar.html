@@ -45,10 +45,11 @@
 <li><a href="../hu/deskbar.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/deskbar.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../ca/deskbar.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../pl/deskbar.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="tracker-add-ons.html">Tracker 附加组件</a> 
+ «  <a href="tracker-add-ons.html">文件浏览器附加组件</a> 
 ::  <a href="contents.html" class="uplink">内容</a> 
 ::  <a href="filetypes.html">文件类型</a>  »
 </span></div>
@@ -56,7 +57,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>索引</td></tr>
@@ -69,7 +69,7 @@
 
 <h1>桌面栏</h1>
 
-<p>桌面栏是默认放置在屏幕右上角的小面板，类似于windows的带着开始菜单的任务栏。它包含了桌面栏菜单，通过它您可以启动应用程序和首选项，时钟托盘和其他系统工具，以及底部运行中的程序列表。</p>
+<p>桌面栏是默认放置在屏幕右上角的小面板，类似于 windows 的带着开始菜单的任务栏。它包含了桌面栏菜单，通过它您可以启动应用程序和首选项，时钟托盘和其他系统工具，以及底部运行中的程序列表。</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
 <p>你通过把鼠标点击在系统托盘有纹饰的一侧，然后进行拖拽，把桌面栏移动到屏幕的任意角落或者展开放置在屏幕的顶部和底部边界；你也自己设计一个更紧凑的菜单布局，然后把它拖拽至桌面栏菜单。</p>
 
@@ -79,21 +79,22 @@
 <p>点击桌面栏顶部会打开一个菜单：</p>
 <img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
 <ul>
-<li><p><b>About This System...</b> - 展示了有关Haiku操作系统，Haiku项目的许可证和致谢名单等的基本信息。</p></li>
+<li><p><b>关于操作系统...</b> - 展示了有关 Haiku 操作系统，Haiku 项目的许可证和致谢名单等基本信息。</p></li>
 
-<li><p><b>Find...</b> - 打开 <a href="queries.html">查询</a> 会话框。</p></li>
-<li><p><b>Show Replicants</b> - 显示或者隐藏  <a href="gui.html#replicants">Replicant</a> 微控件，您可以对它进行随意的拖动，删除或者访问它的快捷菜单。</p></li>
-<li><p><b>Mount</b> - 提供了和右键点击桌面时相同的选项。（详细介绍请查阅 <a href="tracker.html#mounting-volumes">挂载磁卷</a>）。</p></li>
-<li><p><b>Deskbar Preferences...</b> - 打开桌面栏的首选项面板（详情见下面的介绍）。</p></li>
-<li><p><b>Shutdown</b> - 提供了<span class="menu">重启</span> 和 <span class="menu">关机</span> 选项。</p></li>
-<li><p><b>Recent Documents, Folders, Applications</b> - 显示最近打开的文档，文件夹和应用程序 (详情见下面的 <span class="menu">桌面栏首选项</span> 介绍)。</p></li>
-<li><p><b>Applications, Demos, Deskbar applets, Preferences</b> - List of installed applications, demos, applets and preferences.<br />You can add links to other programs (or any folder, document, query etc.) by putting them into <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
+<li><p><b>查询...</b> - 打开 <a href="queries.html">查询</a> 会话框。</p></li>
+<li><p><b>显示程序副本</b> - 显示或者隐藏  <a href="gui.html#replicants">程序副本</a> 微控件，您可以对它进行随意的拖动，删除或者访问它的快捷菜单。</p></li>
+<li><p><b>挂载</b> - 提供了和右键点击桌面时相同的选项。（详细介绍请查阅 <a href="tracker.html#mounting-volumes">挂载磁卷</a>）。</p></li>
+<li><p><b>桌面栏首选项...</b> - 打开桌面栏的首选项面板（详情见下面的介绍）。</p></li>
+<li><p><b>关机</b> - 提供了<span class="menu">重启</span> 和 <span class="menu">关机</span> 选项。</p></li>
+<li><p><b>最近文档，目录，应用</b> - 显示最近打开的文档，文件夹和应用程序 (详情见下面的 <span class="menu">桌面栏首选项</span> 介绍)。</p></li>
+<li><p><b>应用程序，演示，桌面栏小程序，首选项</b> - 分别列出了所有安装的应用程序，演示程序，小程序和首选项。
+<br />您也可以把其他的程序（或者任何其他的目录，文档，查询等） 放置到 <span class="path">~/config/settings/deskbar/menu/</span> ，将它们显示到菜单栏。</p></li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>桌面栏首选项</h3>
 <img src="images/deskbar-images/prefs-deskbar.png" alt="prefs-deskbar.png" />
-<p>The Deskbar preference panel is devided into three sections.</p>
+<p>桌面栏首选项面板分为三个部分。</p>
 
 <h4>应用程序
 </h4>
@@ -108,15 +109,15 @@
 </table>
 
 <h4>菜单</h4>
-<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
-Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
-The button <span class="button">Edit menu...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
-You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>桌面栏前面的几个菜单项是固定的，您可以自定义 <span class="menu">Shutdown...</span> 后面的菜单项。<br />。
+这里您可以设置桌面栏菜单中最新的文档，文件夹和程序的数量，或者您可以选择查看所有的最新信息。<br />
+<span class="button">Edit Menu...</span> 按钮用于打开文件夹 <span class="path">~/config/settings/deskbar/menu</span> 。在该文件夹下，您可以看到桌面栏中出现的所有文件和文件夹。默认设置下，这些包括： <span class="menu">应用程序</span>，<span class="menu">程序演示</span>，<span class="menu">桌面栏小程序</span>，以及 <span class="menu">首选项</span> 。<br />
+您可以通过向这些文件夹复制或者删除程序快捷式，文档，甚至查询来添加或者删除有关的入口。</p>
 <p>甚至，您也可以直接将文件，目录，或者保存的查询拖放到桌面栏。</p>
 
 <h4>窗口
 </h4>
-<p>Finally, the preferences for the Deskbar window.</p>
+<p>最后是，桌面栏窗口首选项。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="menu">置顶</span></td><td> </td><td>桌面栏位于所有窗口之上。</td></tr>
 <tr><td><span class="menu">自动提升</span></td><td> </td><td>如果桌面栏被鼠标点击，则置顶。</td></tr>
@@ -127,9 +128,9 @@ You can delete or add entries like links to applications, documents or even quer
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tray" name="tray">系统托盘</a></h2>
 <img src="images/deskbar-images/calendar.png" alt="calendar.png" />
-<p>在其他方面，系统托盘可以停靠时钟。在其上悬停鼠标将会在工具提示中显示当前日期。左键点击用于切换时间和日期，右键点击用于显示/隐藏时钟，或者启动 <a href="preferences/time.html">Time</a> 首选项对其进行相关设置。<br />
+<p>在其他方面，系统托盘可以停靠时钟。在其上悬停鼠标将会在工具提示中显示当前日期。左键点击用于切换时间和日期，右键点击用于显示/隐藏时钟，或者启动 <a href="preferences/time.html">时间</a> 首选项对其进行相关设置。<br />
 </p>
-<p>任何程序都可以在系统托盘上安装图标，从而为用户提供一个接口。 例如，当您有未读邮件时，邮件系统将会显示一个不同的标志，提供一个右键菜单用于创建或者检查新邮件。<span class="app">ProcessController(进程控制器) </span>也是个典型的例子，它同样在系统托盘中使用自己的图标来显示相关信息（CPU/内存的使用情况），并且还提供了右键菜单用于相关的操作。</p>
+<p>任何程序都可以在系统托盘上安装图标，从而为用户提供一个接口。 例如，当您有未读邮件时，邮件系统将会显示一个不同的标志，提供一个右键菜单用于创建或者检查新邮件。<span class="app">进程控制器</span>也是个典型的例子，它同样在系统托盘中使用自己的图标来显示相关信息（CPU/内存的使用情况），并且还提供了右键菜单用于相关的操作。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -144,7 +145,7 @@ You can delete or add entries like links to applications, documents or even quer
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="tracker-add-ons.html">Tracker 附加组件</a> 
+ «  <a href="tracker-add-ons.html">文件浏览器附加组件</a> 
 ::  <a href="contents.html" class="uplink">内容</a> 
 ::  <a href="filetypes.html">文件类型</a>  »
 </span></div>

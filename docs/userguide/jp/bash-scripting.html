@@ -44,6 +44,7 @@
 <li><a href="../hu/bash-scripting.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/bash-scripting.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../ca/bash-scripting.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../pl/bash-scripting.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
 <li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -64,22 +65,22 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bash" name="bash">Bash</a></h2>
-<p>そもそもスクリプトはそれを解釈するシェルに大きく依存するため、まずは Haiku で使用されている BASH に精通する必要があります。BASH は広く使用されているシェルであるため、オンライン上に資料が豊富に存在します。すばらしいドキュメントの 1 つに、Johan Jansson 氏の <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a> があります。</p>
+<p>スクリプトはそれを解釈するシェルに大きく依存するため、まずは Haiku で使用されている BASH に精通する必要があります。BASH は広く使用されているシェルなので、オンライン上に資料が豊富に存在します。すばらしいドキュメントの 1 つに、Johan Jansson 氏の <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a> があります。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="scripting-bible" name="scripting-bible">スクリプト処理のための必読書</a></h2>
-<p>シェル内で作業するためのいくつかの基礎を学んだあとは、スクリプト処理の世界にゆっくりと歩み出しましょう。このときも、本屋と同じくらい豊富なチュートリアルやリファレンスをオンライン上で見つけられるでしょう。Haiku にほぼピッタリの非常にすばらしい入門編に、オンラインで入手可能な Scot Hacker 氏による BeOS の必読書の <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) があります。</p>
+<p>シェル内で作業するためのいくつかの基礎を学んだあとは、スクリプト処理の世界にゆっくりと歩み出しましょう。この場合も、本屋と同じくらい豊富なチュートリアルやリファレンスをオンライン上で見つけられるでしょう。Haiku にほぼピッタリの非常にすばらしい入門書に、オンラインで入手可能な Scot Hacker 氏による BeOS Bible の <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) があります。</p>
 
 <h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Haiku におけるスクリプト</a></h2>
-<p>Haiku では、当然のことながらシステムもまたスクリプト処理を使用しています。起動とシャットダウンはスクリプト処理手続きの典型です。始めから定義されたこれら手続きは、特定のユーザースクリプトを用いてユーザーが拡張できます。<br />
-もしこれらユーザースクリプトがまだ存在しない場合は、手動でこれらファイルを作成する必要があります。ユーザースクリプトが存在する場合は、処理を実行したい場所に必要なコマンドを追加するだけで済みます。</p>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Haiku でのスクリプト</a></h2>
+<p>Haiku では、当然のことながらシステムもまたスクリプト処理を使用しています。起動とシャットダウンはスクリプト処理の典型です。始めから定義されたこれら手続きは、特定のユーザースクリプトを用いてユーザーが拡張できます。<br />
+もしこれらユーザースクリプトがまだ存在しない場合は、手動でこれらファイルを作成する必要があります。ユーザースクリプトが存在する場合は、処理を実行する場所に必要なコマンドを追加するだけで済みます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="userbootscript" name="userbootscript">UserBootscript</a></h3>
-<p>システムの起動プロセスが完了すると、<span class="path">/boot/home/config/boot/UserBootscript</span> が実行されます。たとえば次のように、システムが起動した直後に毎回いくつかのプログラムを自動起動させることができます:</p>
+<p>システムの起動プロセスが完了すると、<span class="path">/boot/home/config/boot/UserBootscript</span> が実行されます。たとえば次のように、システムが起動した直後にいくつかのプログラムを毎回自動起動させることができます:</p>
 <pre># ランチャーを起動する
 /boot/system/apps/LaunchBox &amp;
 
@@ -87,7 +88,7 @@
 /boot/system/apps/Workspaces &amp;</pre>
 <p>コマンドをバックグラウンドプロセスとして実行するために、コマンドの末尾は "<tt>&amp;</tt>" で終わらせることを覚えておいてください。そうしなければ、そのコマンドが完了するまで (この例では、起動したアプリケーションが再度閉じられるまで) スクリプトが停止してしまいます。</p>
 
-<p>システムの起動時にアプリケーションを起動させるための、上記とは違うシンプルな方法のひとつに、それらアプリケーションへのリンクを <span class="path">/boot/home/config/boot/launch</span> ディレクトリに置くという方法があります。この方法は、自動起動させたいアプリケーションを右クリックして、<span class="menu">指定先にリンクを作成 (Create Link)</span> にマウスカーソルを合わせたあと、前述のディレクトリへ<a href="tracker.html#navigating">ナビゲート</a>することで簡単に実現できます。</p>
+<p>システムの起動時にアプリケーションを起動させるための、上記とは違うシンプルな方法の 1 つに、それらアプリケーションへのリンクを <span class="path">/boot/home/config/boot/launch</span> ディレクトリに置くという方法があります。この方法は、自動起動させたいアプリケーションを右クリックして、<span class="menu">指定先にリンクを作成 (Create Link)</span> にマウスカーソルを合わせたあと、前述のディレクトリへ<a href="tracker.html#navigating">ナビゲート</a>することで簡単に実現できます。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
