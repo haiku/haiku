@@ -116,7 +116,6 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		fUseMSI(false),
 		fErstArea(-1),
 		fDcbaArea(-1),
-		fSpinlock(B_SPINLOCK_INITIALIZER),
 		fCmdCompSem(-1),
 		fFinishTransfersSem(-1),
 		fFinishThread(-1),
@@ -134,6 +133,8 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		fEventCcs(1),
 		fCmdCcs(1)
 {
+	B_INITIALIZE_SPINLOCK(&fSpinlock);
+
 	if (BusManager::InitCheck() < B_OK) {
 		TRACE_ERROR("bus manager failed to init\n");
 		return;
@@ -1782,6 +1783,7 @@ XHCI::HandleTransferComplete(xhci_trb *trb)
 		int64 offset = source - td->this_phy;
 		TRACE("HandleTransferComplete td %p offset %" B_PRId64 "\n", td,
 			offset);
+		(void)offset;
 		_UnlinkDescriptorForPipe(td, endpoint);
 
 		// add descriptor to finished list (to be processed and freed)
