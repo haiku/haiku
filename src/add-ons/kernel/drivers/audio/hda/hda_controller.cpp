@@ -55,6 +55,7 @@ static const struct {
 	{ PCI_VENDOR_INTEL, 0x0c0c, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x811b, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x080a, HDA_QUIRK_SNOOP },
+	{ PCI_VENDOR_INTEL, 0x0f04, HDA_QUIRK_SNOOP },
 	// Enable snooping for ATI and Nvidia, right now for all their hda-devices,
 	// but only based on guessing.
 	{ PCI_VENDOR_AMD, PCI_ALL_DEVICES, HDA_QUIRK_SNOOP },
