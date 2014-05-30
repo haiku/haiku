@@ -38,7 +38,7 @@ RemotePackageRepository HaikuPorts
 	freetype-2.5.2-2
 	freetype_devel-2.5.2-2
 	gawk-4.1.0-2
-	gcc-4.8.2_2014_01_28-2
+	gcc-4.8.3_2014_05_28-1
 	gettext-0.18.1.1-5
 	gettext_libintl-0.18.1.1-5
 	git-1.8.3.4-3
