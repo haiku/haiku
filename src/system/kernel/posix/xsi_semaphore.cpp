@@ -22,6 +22,7 @@
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
+#include <AutoDeleter.h>
 
 
 //#define TRACE_XSI_SEM
@@ -1088,11 +1089,11 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 		TRACE_ERROR(("xsi_semop: failed to allocate sembuf struct\n"));
 		return B_NO_MEMORY;
 	}
+       MemoryDeleter operationsDeleter(operations);
 
 	if (user_memcpy(operations, ops,
 		(sizeof(struct sembuf) * numOps)) < B_OK) {
 		TRACE_ERROR(("xsi_semop: user_memcpy failed\n"));
-		free(operations);
 		return B_BAD_ADDRESS;
 	}
 
@@ -1158,10 +1159,8 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 				if (operation != 0)
 					semaphore->Revert(operation);
 			}
-			if (result != 0) {
-				free(operations);
+                       if (result != 0)
 				return result;
-			}
 
 			// We have to wait: first enqueue the thread
 			// in the appropriate set waiting list, then
@@ -1248,6 +1247,5 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 			semaphore->SetPid(getpid());
 		}
 	}
-	free(operations);
 	return result;
 }
