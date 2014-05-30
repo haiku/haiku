@@ -1,0 +1,627 @@
+/*
+ * Copyright 2014 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Rect.h	 hrev47289
+ *		src/kits/interface/Rect.cpp	 hrev47289
+ */
+
+
+/*!
+	\file Rect.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BRect class definition.
+*/
+
+
+/*!
+	\class BRect
+	\ingroup interface
+	\ingroup libbe
+	\brief Defines a rectangular area aligned along pixel dimensions.
+
+	BRect's are used throughout the Interface Kit to define the frames
+	of windows, views, and bitmaps. BRect's are always oriented with
+	completely vertical and horizontal lines, they cannot be rotated.
+
+	A BRect must have a non-negative width and height to be valid, that is
+	the left value must be greater than or equal to the right value and the
+	bottom edge value be greater than or equal to the top value. You can test
+	whether or not a BRect is valid by calling IsValid(). Nothing prevents
+	you from creating an invalid BRect, but, using one to define an area can
+	produce unpredictable results.
+
+	A gotcha of using BRect's is that the starting point is 0, not 1, so
+	in order to create a BRect with a 32x32 pixel area you write:
+
+\code
+BRect(0, 0, 31, 31);
+\endcode
+
+	or if you have the width and height stored in a variable you subtract 1
+	like this:
+
+\code
+BRect(0, 0, width - 1, height -1);
+\endcode
+*/
+
+
+/*!
+	\var BRect::left
+	\brief The value of the rectangle's left edge.
+*/
+
+
+/*!
+	\var BRect::top
+	\brief The value of the rectangle's top edge.
+*/
+
+
+/*!
+	\var BRect::right
+	\brief The value of the rectangle's right edge.
+*/
+
+
+/*!
+	\var BRect::bottom
+	\brief The value of the rectangle's bottom edge.
+*/
+
+
+/*!
+	\fn inline BRect::BRect()
+	\brief Creates an empty BRect object with dimensions (0, 0, -1, -1).
+
+	 These dimensions are invalid, use Set() to provide valid dimensions.
+
+	 \sa BRect::Set()
+	 \sa BRect::IsValid()
+*/
+
+
+/*!
+	\fn inline BRect::BRect(float left, float top, float right, float bottom)
+	\brief Creates a new BRect object with the given dimensions.
+
+	\param left The left dimension.
+	\param top The top dimension.
+	\param right The right dimension.
+	\param bottom The bottom dimension.
+*/
+
+
+/*!
+	\fn inline BRect::BRect(const BRect& other)
+	\brief Creates a new BRect object as a copy of \a other.
+
+	\param other The BRect object to copy.
+*/
+
+
+/*!
+	\fn inline BRect::BRect(BPoint leftTop, BPoint rightBottom)
+	\brief Creates a new BRect object with its dimensions defined by the
+	       \a leftTop and \a rightBottom points.
+
+	\param leftTop The position to set the left top corner to.
+	\param rightBottom The position to set the bottom right corner to.
+*/
+
+
+/*!
+	\fn inline BRect::BRect(BPoint leftTop, BSize size)
+	\brief Creates a new BRect object with its dimensions defined by the
+	       \a leftTop point and \a size.
+
+	\param leftTop The position of the left top corner.
+	\param size The \a size of the rect defining its width and height.
+*/
+
+
+/*!
+	\fn inline BRect::BRect(float side)
+	\brief Creates a new BRect object setting the left and top dimensions
+	       to 0 and setting the right and bottom dimensions to \a side - 1.
+
+	\param side The dimension to set the right and bottom sides.
+*/
+
+
+/*!
+	\fn inline BRect& BRect::operator=(const BRect& other)
+	\brief Creates a new BRect object as a copy of \a other by overloading
+	       the = operator.
+
+	\param other The BRect object to copy.
+
+	\return The newly created BRect object.
+*/
+
+
+/*!
+	\fn inline bool BRect::IsValid() const
+	\brief Returns whether or not the BRect is valid.
+
+	A BRect is valid if its width and height are non-negative, that is its
+	right value is greater than or equal to its left value and its bottom value
+	is greater than or equal to its top value.
+
+	\return \c true if the BRect is valid, \c false if the BRect is invalid.
+*/
+
+
+/*!
+	\fn bool BRect::Intersects(BRect rect) const
+	\brief Returns whether or not the BRect and \a rect intersect.
+
+	\param rect The BRect to use to test for intersection.
+
+	\return \c true if the rectangles intersect, \a false otherwise.
+*/
+
+
+/*!
+	\fn bool BRect::Contains(BPoint point) const
+	\brief Returns whether or not the BRect contains \a point.
+
+	\param point The point to test.
+
+	\return \c true if the BRect contains \a point, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BRect::Contains(BRect rect) const
+	\brief Returns whether or not the BRect wholly contains \a rect.
+
+	\param rect The rectangle to test.
+
+	\return \c true if the BRect contains \a rect, \c false otherwise.
+*/
+
+
+/*!
+	\fn void BRect::PrintToStream() const
+	\brief Prints the BRect dimensions to standard output.
+
+	The format of the output looks like this:
+\verbatim
+	BRect(l:%.1f, t:%.1f, r:%.1f, b:%.1f).
+\endverbatim
+*/
+
+
+/*!
+	\fn inline int32 BRect::IntegerWidth() const
+	\brief Returns The width of the rectangle rounded using
+	       ceil(\a right - \a left).
+
+	\return The width of the rectangle as an int32.
+*/
+
+
+/*!
+	\fn inline float BRect::Width() const
+	\brief Returns the width of the rectangle.
+
+	\return The width of the rectangle as a float.
+*/
+
+
+/*!
+	\fn inline int32 BRect::IntegerHeight() const
+	\brief Returns The height of the rectangle rounded using
+	       ceil(\a bottom - \a top).
+
+	\return The height of the rectangle as an int32.
+*/
+
+
+/*!
+	\fn inline float BRect::Height() const
+	\brief Returns the height of the rectangle.
+
+	\return The height of the rectangle as a float.
+*/
+
+
+/*!
+	\fn inline BSize BRect::Size() const
+	\brief Returns the dimensions of the BRect.
+
+	\return The dimensions of the BRect as a BSize.
+*/
+
+
+/*!
+	\fn inline void BRect::Set(float left, float top, float right,
+		float bottom)
+	\brief Sets the dimensions of a BRect.
+
+	\param left The \a left dimension to set.
+	\param top The \a top dimension to set.
+	\param right The \a right dimension to set.
+	\param bottom The \a bottom dimension to set.
+*/
+
+
+/*!
+	\fn void BRect::SetLeftTop(const BPoint point)
+	\brief Sets the left top \a point of the BRect.
+
+	\param point The \a point to set.
+*/
+
+
+/*!
+	\fn void BRect::SetRightBottom(const BPoint point)
+	\brief Sets the right bottom \a point of the BRect.
+
+	\param point The \a point to set.
+*/
+
+
+/*!
+	\fn void BRect::SetLeftBottom(const BPoint point)
+	\brief Sets the left bottom \a point of the BRect.
+
+	\param point The \a point to set.
+*/
+
+
+/*!
+	\fn void BRect::SetRightTop(const BPoint point)
+	\brief Sets the right top \a point of the BRect.
+
+	\param point The \a point to set.
+*/
+
+
+/*!
+	\fn inline BPoint BRect::LeftTop() const
+	\brief Returns the left top point of the BRect.
+
+	\return The left top point as a BPoint.
+*/
+
+
+/*!
+	\fn inline BPoint BRect::RightBottom() const
+	\brief Returns the right bottom point of the BRect.
+
+	\return The right bottom point as a BPoint.
+*/
+
+
+/*!
+	\fn inline BPoint BRect::LeftBottom() const
+	\brief Returns the left bottom point of the BRect.
+
+	\return The left bottom point as a BPoint.
+*/
+
+
+/*!
+	\fn inline BPoint BRect::RightTop() const
+	\brief Returns the right top point of the BRect.
+
+	\return The left right point as a BPoint.
+*/
+
+
+/*!
+	\name Transformation methods
+
+	Positive values make the rectangle smaller, negative values make it larger.
+
+	The …Self() versions also return the transformed BRect when they are done.
+	The …Copy() versions transform a copy without changing the original.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BRect::InsetBy(BPoint point)
+	\brief Inset the BRect by the x and y coordinates of \a point.
+
+	\param point The \a point to use to inset the BRect.
+*/
+
+
+/*!
+	\fn void BRect::InsetBy(float dx, float dy)
+	\brief Inset the BRect by \a dx units in the horizontal direction and
+	       \a dy units in the vertical direction.
+
+	\param dx The horizontal distance to inset the BRect by.
+	\param dy The vertical distance to inset the BRect by.
+*/
+
+
+/*!
+	\fn BRect& BRect::InsetBySelf(BPoint point)
+	\brief Like BRect::InsetBy() but returns the transformed BRect.
+
+	\param point The \a point to use to inset the BRect.
+
+	\return The transformed BRect.
+
+	\sa BRect::InsetBy(BPoint point)
+*/
+
+
+/*!
+	\fn BRect& BRect::InsetBySelf(float dx, float dy)
+	\brief Like BRect::InsetBy() but returns the transformed BRect.
+
+	\param dx The horizontal distance to inset the BRect by.
+	\param dy The vertical distance to inset the BRect by.
+
+	\return The transformed BRect.
+
+	\sa BRect::InsetBy(float dx, float dy)
+*/
+
+
+/*!
+	\fn BRect BRect::InsetByCopy(BPoint point) const
+	\brief Like BRect::InsetBy() but returns a copy of the transformed BRect
+	       leaving the original unmodified.
+
+	\param point The \a point to use to inset the BRect.
+
+	\return A copy of the BRect after it has been transformed.
+
+	\sa BRect::InsetBy(BPoint point)
+*/
+
+
+/*!
+	\fn BRect BRect::InsetByCopy(float dx, float dy) const
+	\brief Like BRect::InsetBy() but returns a copy of the transformed BRect
+	       leaving the original unmodified.
+
+	\param dx The horizontal distance to inset the BRect by.
+	\param dy The vertical distance to inset the BRect by.
+
+	\return A copy of the BRect after it has been transformed.
+
+	\sa BRect::InsetBy(float dx, float dy)
+*/
+
+
+//! @}
+
+
+/*!
+	\name Translation methods
+
+	Positive values move the rectangle right and down, negative values move the
+	rectangle left and up.
+
+	The …Self() versions also return the translated BRect when they are done.
+	The …Copy() versions translate a copy without changing the original.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BRect::OffsetBy(BPoint point)
+	\brief Moves the BRect horizontally by the x value of \a point and
+	       vertically by y value of \a point without changing the size
+	       of the rectangle.
+
+	\param point The \a point to use to move the rectangle.
+*/
+
+
+/*!
+	\fn void BRect::OffsetBy(float dx, float dy)
+	\brief Moves the BRect horizontally by \a dx units and vertically by
+	       \a dy units point without changing the size of the rectangle.
+
+	\param dx The number of units the move the rectangle vertically.
+	\param dy The number of units the move the rectangle horizontally.
+*/
+
+
+/*!
+	\fn BRect& BRect::OffsetBySelf(BPoint point)
+	\brief Like BRect::OffsetBy() but returns the translated BRect.
+
+	\param point The \a point to use to move the rectangle.
+
+	\sa BRect::OffsetBy(BPoint point)
+*/
+
+
+/*!
+	\fn BRect& BRect::OffsetBySelf(float dx, float dy)
+	\brief Like BRect::OffsetBy() but returns the translated BRect.
+
+	\param dx The number of units the move the rectangle vertically.
+	\param dy The number of units the move the rectangle horizontally.
+
+	\return The translated BRect.
+
+	\sa BRect::OffsetBy(float dx, float dy)
+*/
+
+
+/*!
+	\fn BRect BRect::OffsetByCopy(BPoint point) const
+	\brief Like BRect::OffsetBy() but returns a copy of the translated
+	       BRect leaving the original unmodified.
+
+	\param point The \a point to use to move the rectangle.
+
+	\return A copy of the BRect after it has been translated.
+
+	\sa BRect::OffsetBy(BPoint point)
+*/
+
+
+/*!
+	\fn BRect BRect::OffsetByCopy(float dx, float dy) const
+	\brief Like BRect::OffsetBy() but returns a copy of the translated
+		  BRect leaving the original unmodified.
+
+	\param dx The number of units the move the rectangle vertically.
+	\param dy The number of units the move the rectangle horizontally.
+
+	\return A copy of the BRect after it has been translated.
+
+	\sa BRect::OffsetBy(float dx, float dy)
+*/
+
+
+/*!
+	\fn void BRect::OffsetTo(BPoint point)
+	\brief Move the BRect to the location specified by \a point.
+
+	\param point The location to move the BRect to.
+*/
+
+
+/*!
+	\fn void BRect::OffsetTo(float x, float y)
+	\brief Move the BRect to the point specified by the given \a x and \a y
+	       coordinates.
+
+	\param x The vertical coordinate of the point to move the BRect to.
+	\param y The horizontal coordinate of the point to move the BRect to.
+*/
+
+
+/*!
+	\fn BRect& BRect::OffsetToSelf(BPoint point)
+	\brief Like BRect::OffsetTo() but returns the translated BRect.
+
+	\param point The \a point to use to move the rectangle.
+
+	\return The translated BRect.
+
+	\sa BRect::OffsetTo(BPoint point)
+*/
+
+
+/*!
+	\fn BRect& BRect::OffsetToSelf(float x, float y)
+	\brief Like BRect::OffsetTo() but returns the translated BRect.
+
+	\param x The vertical coordinate of the point to move the BRect to.
+	\param y The horizontal coordinate of the point to move the BRect to.
+
+	\return The translated BRect.
+
+	\sa BRect::OffsetTo(float x, float y)
+*/
+
+
+/*!
+	\fn BRect BRect::OffsetToCopy(BPoint point) const
+	\brief Like BRect::OffsetTo() but returns a copy of the translated
+	       BRect leaving the original unmodified.
+
+	\param point The \a point to use to move the rectangle.
+
+	\return A copy of the BRect after it has been translated.
+
+	\sa BRect::OffsetTo(BPoint point)
+*/
+
+
+/*!
+	\fn BRect BRect::OffsetToCopy(float x, float y) const
+	\brief Like BRect::OffsetTo() but returns a copy of the translated
+		  BRect leaving the original unmodified.
+
+	\param x The number of units the move the rectangle vertically.
+	\param y The number of units the move the rectangle horizontally.
+
+	\return A copy of the BRect after it has been translated.
+
+	\sa BRect::OffsetTo(float x, float y)
+*/
+
+
+//! @}
+
+
+/*!
+	\name Comparison methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BRect::operator==(BRect other) const
+	\brief Returns whether or not two rectangles coincide exactly.
+
+	\param other The BRect to compare with.
+
+	\return \c true if the rectangles coincide, \c false otherwise.
+*/
+
+
+/*!
+	\fn bool BRect::operator!=(BRect other) const
+	\brief Returns whether or not two rectangles do NOT coincide exactly.
+
+	\param other The BRect to compare with.
+
+	\return \c true if the rectangles do NOT coincide, \c false otherwise.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Intersection and union methods
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BRect BRect::operator&(BRect other) const
+	\brief Returns a new BRect that is the intersection of the BRect and
+	       \a other.
+
+	The intersection of two rectangles is the area that they both share.
+
+	\param other The BRect to take the intersection of.
+
+	\return A new BRect that is the intersection of the BRect and \a other.
+*/
+
+
+/*!
+	\fn BRect BRect::operator|(BRect other) const
+	\brief Returns a new BRect that is the union of the BRect and \a other.
+
+	The union of two rectangles is the area that encloses both rectangles.
+
+	\param other The BRect to take the union of.
+
+	\return A new BRect that is the union of the BRect and \a other.
+*/
+
+
+//! @}
