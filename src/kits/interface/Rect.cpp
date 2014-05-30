@@ -12,34 +12,34 @@
 
 
 void
-BRect::SetLeftTop(const BPoint p)
+BRect::SetLeftTop(const BPoint point)
 {
-	left = p.x;
-	top = p.y;
+	left = point.x;
+	top = point.y;
 }
 
 
 void
-BRect::SetRightBottom(const BPoint p)
+BRect::SetRightBottom(const BPoint point)
 {
-	right = p.x;
-	bottom = p.y;
+	right = point.x;
+	bottom = point.y;
 }
 
 
 void
-BRect::SetLeftBottom(const BPoint p)
+BRect::SetLeftBottom(const BPoint point)
 {
-	left = p.x;
-	bottom = p.y;
+	left = point.x;
+	bottom = point.y;
 }
 
 
 void
-BRect::SetRightTop(const BPoint p)
+BRect::SetRightTop(const BPoint point)
 {
-	right = p.x;
-	top = p.y;
+	right = point.x;
+	top = point.y;
 }
 
 
@@ -180,9 +180,9 @@ BRect::OffsetToSelf(BPoint point)
 
 
 BRect&
-BRect::OffsetToSelf(float dx, float dy)
+BRect::OffsetToSelf(float x, float y)
 {
-	OffsetTo(dx, dy);
+	OffsetTo(x, y);
 	return *this;
 }
 
@@ -197,10 +197,10 @@ BRect::OffsetToCopy(BPoint point) const
 
 
 BRect
-BRect::OffsetToCopy(float dx, float dy) const
+BRect::OffsetToCopy(float x, float y) const
 {
 	BRect copy(*this);
-	copy.OffsetTo(dx, dy);
+	copy.OffsetTo(x, y);
 	return copy;
 }
 
@@ -213,33 +213,33 @@ BRect::PrintToStream() const
 
 
 bool
-BRect::operator==(BRect rect) const
+BRect::operator==(BRect other) const
 {
-	return left == rect.left && right == rect.right &&
-		top == rect.top && bottom == rect.bottom;
+	return left == other.left && right == other.right &&
+		top == other.top && bottom == other.bottom;
 }
 
 
 bool
-BRect::operator!=(BRect rect) const
+BRect::operator!=(BRect other) const
 {
-	return !(*this == rect);
+	return !(*this == other);
 }
 
 
 BRect
-BRect::operator&(BRect rect) const
+BRect::operator&(BRect other) const
 {
-	return BRect(max_c(left, rect.left), max_c(top, rect.top),
-		min_c(right, rect.right), min_c(bottom, rect.bottom));
+	return BRect(max_c(left, other.left), max_c(top, other.top),
+		min_c(right, other.right), min_c(bottom, other.bottom));
 }
 
 
 BRect
-BRect::operator|(BRect rect) const
+BRect::operator|(BRect other) const
 {
-	return BRect(min_c(left, rect.left), min_c(top, rect.top),
-		max_c(right, rect.right), max_c(bottom, rect.bottom));
+	return BRect(min_c(left, other.left), min_c(top, other.top),
+		max_c(right, other.right), max_c(bottom, other.bottom));
 }
 
 

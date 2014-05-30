@@ -38,10 +38,10 @@ public:
 			BPoint				LeftBottom() const;
 			BPoint				RightTop() const;
 
-			void				SetLeftTop(const BPoint leftTop);
-			void				SetRightBottom(const BPoint rightBottom);
-			void				SetLeftBottom(const BPoint leftBottom);
-			void				SetRightTop(const BPoint rightTop);
+			void				SetLeftTop(const BPoint point);
+			void				SetRightBottom(const BPoint point);
+			void				SetLeftBottom(const BPoint point);
+			void				SetRightTop(const BPoint point);
 
 	// Transformation
 			void				InsetBy(BPoint inset);
@@ -61,17 +61,17 @@ public:
 			BRect				OffsetByCopy(BPoint offset) const;
 			BRect				OffsetByCopy(float dx, float dy) const;
 			BRect&				OffsetToSelf(BPoint offset);
-			BRect&				OffsetToSelf(float dx, float dy);
+			BRect&				OffsetToSelf(float x, float y);
 			BRect				OffsetToCopy(BPoint offset) const;
-			BRect				OffsetToCopy(float dx, float dy) const;
+			BRect				OffsetToCopy(float x, float y) const;
 
 	// Comparison
-			bool				operator==(BRect r) const;
-			bool				operator!=(BRect r) const;
+			bool				operator==(BRect other) const;
+			bool				operator!=(BRect other) const;
 
 	// Intersection and union
-			BRect				operator&(BRect r) const;
-			BRect				operator|(BRect r) const;
+			BRect				operator&(BRect other) const;
+			BRect				operator|(BRect other) const;
 
 			bool				IsValid() const;
 			float				Width() const;
@@ -80,9 +80,9 @@ public:
 			int32				IntegerHeight() const;
 			BSize				Size() const;
 
-			bool				Intersects(BRect r) const;
-			bool				Contains(BPoint p) const;
-			bool				Contains(BRect r) const;
+			bool				Intersects(BRect rect) const;
+			bool				Contains(BPoint point) const;
+			bool				Contains(BRect rect) const;
 };
 
 
@@ -128,23 +128,23 @@ BRect::BRect()
 
 
 inline
-BRect::BRect(float l, float t, float r, float b)
+BRect::BRect(float left, float top, float right, float bottom)
 	:
-	left(l),
-	top(t),
-	right(r),
-	bottom(b)
+	left(left),
+	top(top),
+	right(right),
+	bottom(bottom)
 {
 }
 
 
 inline
-BRect::BRect(const BRect& r)
+BRect::BRect(const BRect& other)
 	:
-	left(r.left),
-	top(r.top),
-	right(r.right),
-	bottom(r.bottom)
+	left(other.left),
+	top(other.top),
+	right(other.right),
+	bottom(other.bottom)
 {
 }
 
@@ -183,23 +183,23 @@ BRect::BRect(float side)
 
 
 inline BRect&
-BRect::operator=(const BRect& from)
+BRect::operator=(const BRect& other)
 {
-	left = from.left;
-	top = from.top;
-	right = from.right;
-	bottom = from.bottom;
+	left = other.left;
+	top = other.top;
+	right = other.right;
+	bottom = other.bottom;
 	return *this;
 }
 
 
 inline void
-BRect::Set(float l, float t, float r, float b)
+BRect::Set(float left, float top, float right, float bottom)
 {
-	left = l;
-	top = t;
-	right = r;
-	bottom = b;
+	this->left = left;
+	this->top = top;
+	this->right = right;
+	this->bottom = bottom;
 }
 
 
