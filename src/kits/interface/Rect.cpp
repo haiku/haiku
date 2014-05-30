@@ -1,14 +1,18 @@
 /*
- * Copyright 2001-2012, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Frans van Nispen
+ *		John Scipione, jscipione@gmail.com
  */
 
-#include <stdio.h>
 
 #include <Rect.h>
+
+#include <algorithm>
+
+#include <stdio.h>
 
 
 void
@@ -230,16 +234,16 @@ BRect::operator!=(BRect other) const
 BRect
 BRect::operator&(BRect other) const
 {
-	return BRect(max_c(left, other.left), max_c(top, other.top),
-		min_c(right, other.right), min_c(bottom, other.bottom));
+	return BRect(std::max(left, other.left), std::max(top, other.top),
+		std::min(right, other.right), std::min(bottom, other.bottom));
 }
 
 
 BRect
 BRect::operator|(BRect other) const
 {
-	return BRect(min_c(left, other.left), min_c(top, other.top),
-		max_c(right, other.right), max_c(bottom, other.bottom));
+	return BRect(std::min(left, other.left), std::min(top, other.top),
+		std::max(right, other.right), std::max(bottom, other.bottom));
 }
 
 
