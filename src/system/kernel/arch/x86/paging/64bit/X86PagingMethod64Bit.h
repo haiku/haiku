@@ -25,7 +25,7 @@ class X86PhysicalPageMapper;
 struct vm_page_reservation;
 
 
-class X86PagingMethod64Bit : public X86PagingMethod {
+class X86PagingMethod64Bit final : public X86PagingMethod {
 public:
 								X86PagingMethod64Bit();
 	virtual						~X86PagingMethod64Bit();

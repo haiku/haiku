@@ -10,7 +10,7 @@
 #include "paging/X86PagingStructures.h"
 
 
-struct X86PagingStructures64Bit : X86PagingStructures {
+struct X86PagingStructures64Bit final : X86PagingStructures {
 								X86PagingStructures64Bit();
 	virtual						~X86PagingStructures64Bit();
 
