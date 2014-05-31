@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	1786411139
+1	french	x-vnd.Haiku-WebPositive	951661576
 Show home button	Settings Window		Afficher le bouton de la page d'accueil
 Username:	Authentication Panel		Utilisateur :
 Copy URL to clipboard	Download Window		Copier l'URL dans le presse-papiers
@@ -25,6 +25,7 @@ Window	WebPositive Window		Fenêtre
 Decrease size	WebPositive Window		Réduire la taille
 Serif font:	Settings Window		Police serif :
 Loading %url	WebPositive Window		Chargement de %url
+Download aborted	Download Window		Téléchargement interrompu
 Page source	WebPositive Window		Source de la page
 Next	WebPositive Window		Suivant
 Find next	WebPositive Window		Rechercher le suivant
@@ -85,14 +86,17 @@ Open blank page	Settings Window		Ouvrir une page blanche
 New tabs:	Settings Window		Nouvel onglet :
 Cancel	WebPositive Window		Annuler
 Open all	WebPositive Window		Tout ouvrir
+Hide bookmark bar	WebPositive Window		Cacher la barre de signets
 Proxy server requires authentication	Settings Window		Le serveur mandataire requiert une authentification
 Clear	URL Bar		Vider
 Cut	URL Bar		Couper
 Clear	WebPositive Window		Vider
+Script console	Console Window		Console de script
 Remove	Download Window		Enlever
 Find	WebPositive Window		Rechercher
 Find previous	WebPositive Window		Rechercher le précédent
 Settings	WebPositive Window		Réglages
+Script console	WebPositive Window		Console de script
 Proxy server address:	Settings Window		Adresse du serveur mandataire :
 Proxy server port:	Settings Window		Port du serveur mandataire :
 Bookmarks	WebPositive Window		Signets
@@ -106,6 +110,7 @@ Open start page	Settings Window		Ouvrir la page de départ
 Continue downloads	WebPositive		Continuer les téléchargements
 Cancel	Download Window		Annuler
 Open search page	Settings Window		Ouvrir la page de recherche
+Clear	Console Window		Vider
 Password:	Authentication Panel		Mot de passe :
 Back	WebPositive Window		Précédent
 New browser window	Download Window		Nouvelle fenêtre de navigation
@@ -134,6 +139,8 @@ Clone current page	Settings Window		Cloner la page actuelle
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Voulez vous ouvrir les %addedCount signets à la fois ?
 OK	Authentication Panel		OK
 Copy	URL Bar		Copier
+Download finished	Download Window		Téléchargement terminé
+Show bookmark bar	WebPositive Window		Afficher la barre de signets
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Gérer les signets
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Il existe déjà le signet « %bookmarkName » pour cette page.
