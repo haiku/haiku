@@ -31,8 +31,10 @@ if [ -z "$revision" -o "$lastBuiltRevision" != "$localRev" ]; then
 	# last reachable hrev-(haiku-revision-)tag
 	revision=`git describe --dirty --tags --match=hrev*`
 	if [ -z "$revision" ]; then
-		# failed to find any hrev tags, use short hash instead
-		revision=`git rev-parse --short HEAD`
+		# failed to find any hrev tags, bail out
+		echo "Error: you are using a Haiku clone without tags, please set"
+		echo "       the revision tag to use (e.g. HAIKU_REVISION=hrev43210)"
+		exit 1
 	elif echo "$revision" | grep -- '-' >/dev/null; then
 		# HEAD is not directly a changeset from Haiku's central repo, so we
 		# add the current branch name as additional info

@@ -373,7 +373,7 @@ rule DetermineHaikuRevision
 	# root directory, so it gets updated when the revision changes due to
 	# commits or merges.
 	local gitIndex = <haiku-rootdir-git>index ;
-	local revisionFile = <haiku-rootdir-git>haiku-revision ;
+	local revisionFile = <haiku-rootdir>haiku-revision ;
 	if ! [ on $(gitIndex) return $(HAIKU_GIT_REVISION_DETERMINED) ] {
 		HAIKU_GIT_REVISION_DETERMINED on $(gitIndex) = 1 ;
 		MakeLocate $(revisionFile) : $(HAIKU_BUILD_OUTPUT_DIR) ;
@@ -424,6 +424,12 @@ rule DetermineEffectiveHaikuRevision
 actions DetermineEffectiveHaikuRevision1
 {
 	revision=`sed -n 's,^\(hrev[0-9]*\).*,\1,p' "$(2:E=unknown-revision)"`
+	if [ -z "$revision" ]; then
+		echo "Error: unable to determine the effective Haiku revision."
+		echo "       If you are using a Haiku clone without tags, you can set"
+		echo "       the revision tag to use with e.g. HAIKU_REVISION=hrev43210"
+		exit 1
+	fi
 	echo "${revision:-0}" > "$(1)"
 }
 
