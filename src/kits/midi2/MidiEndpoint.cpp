@@ -119,7 +119,7 @@ BMidiEndpoint::Release()
 {
 	int32 old = atomic_add(&fRefCount, -1);
 
-	TRACE(("BMidiEndpoint::Release refCount is now %ld", old - 1))
+	TRACE(("BMidiEndpoint::Release refCount is now %" B_PRId32, old - 1))
 
 	if (old == 1) {
 		// If the reference count of a local endpoint drops to zero, 
@@ -146,7 +146,7 @@ BMidiEndpoint::Acquire()
 #endif
 	atomic_add(&fRefCount, 1);
 
-	TRACE(("BMidiEndpoint::Acquire refCount is now %ld", old + 1))
+	TRACE(("BMidiEndpoint::Acquire refCount is now %" B_PRId32, old + 1))
 
 	return B_OK;
 }

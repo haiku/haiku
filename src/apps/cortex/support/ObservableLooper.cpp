@@ -69,7 +69,7 @@ status_t ObservableLooper::release() {
 ObservableLooper::~ObservableLooper() {
 	if(CountTargets()) {
 		PRINT((
-			"*** ~ObservableLooper() '%s': %ld observers remain\n",
+			"*** ~ObservableLooper() '%s': %" B_PRId32 " observers remain\n",
 			Name(), CountTargets()));
 	}
 	if(m_executioner)

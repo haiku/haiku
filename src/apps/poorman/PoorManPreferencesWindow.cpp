@@ -128,7 +128,7 @@ PoorManPreferencesWindow::MessageReceived(BMessage* message)
 				fLoggingView->LogFileName()));
 			win->SetLogPath(fLoggingView->LogFileName());
 	
-			PRINT(("Pref Window: MaxConnections Slider: %ld\n", 
+			PRINT(("Pref Window: MaxConnections Slider: %" B_PRId32 "\n",
 				fAdvancedView->MaxSimultaneousConnections()));
 			server->SetMaxConns(fAdvancedView->MaxSimultaneousConnections());
 			win->SetMaxConnections(
@@ -167,7 +167,7 @@ PoorManPreferencesWindow::MessageReceived(BMessage* message)
 			break;
 		case MSG_PREF_ADV_SLD_MAX_CONNECTION:
 			fMaxConnections = fAdvancedView->MaxSimultaneousConnections();
-			PRINT(("Max Connections: %ld\n", fMaxConnections));
+			PRINT(("Max Connections: %" B_PRId32 "\n", fMaxConnections));
 			break;
 		default:
 			BWindow::MessageReceived(message);

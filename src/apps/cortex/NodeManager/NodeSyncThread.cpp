@@ -52,7 +52,7 @@ NodeSyncThread::~NodeSyncThread() {
 		err = kill_thread(m_thread);
 		if(err < B_OK)
 			PRINT((
-				"! ~NodeSyncThread(): kill_thread(%ld):\n"
+				"! ~NodeSyncThread(): kill_thread(%" B_PRId32 "):\n"
 				"  %s\n",
 				m_thread,
 				strerror(err)));
@@ -64,7 +64,7 @@ NodeSyncThread::~NodeSyncThread() {
 		err = delete_port(m_port);
 		if(err < B_OK)
 			PRINT((
-				"! ~NodeSyncThread(): delete_port(%ld):\n"
+				"! ~NodeSyncThread(): delete_port(%" B_PRId32 "):\n"
 				"  %s\n",
 				m_port,
 				strerror(err)));
@@ -173,8 +173,8 @@ void NodeSyncThread::_sync() {
 		
 		if(code != M_TRIGGER) {
 			PRINT((
-				"! NodeSyncThread::sync(): unknown message code %ld\n",
-				code));
+				"! NodeSyncThread::sync(): unknown message code %" B_PRId32
+					"\n", code));
 			continue;
 		}
 		

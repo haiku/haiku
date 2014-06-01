@@ -100,8 +100,9 @@ void dump_fd(int fd, struct file_descriptor* descriptor);
 void
 dump_fd(int fd,struct file_descriptor* descriptor)
 {
-	dprintf("fd[%d] = %p: type = %ld, ref_count = %ld, ops = %p, u.vnode = %p, "
-		"u.mount = %p, cookie = %p, open_mode = %lx, pos = %Ld\n",
+	dprintf("fd[%d] = %p: type = %" B_PRId32 ", ref_count = %" B_PRId32 ", ops "
+		"= %p, u.vnode = %p, u.mount = %p, cookie = %p, open_mode = %" B_PRIx32
+		", pos = %" B_PRId64 "\n",
 		fd, descriptor, descriptor->type, descriptor->ref_count,
 		descriptor->ops, descriptor->u.vnode, descriptor->u.mount,
 		descriptor->cookie, descriptor->open_mode, descriptor->pos);

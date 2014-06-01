@@ -94,8 +94,8 @@ static status_t
 packagefs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 	const char* parameters, ino_t* _rootID)
 {
-	FUNCTION("fsVolume: %p, device: \"%s\", flags: %#lx, parameters: \"%s\"\n",
-		fsVolume, device, flags, parameters);
+	FUNCTION("fsVolume: %p, device: \"%s\", flags: %#" B_PRIx32 ", parameters: "
+			"\"%s\"\n", fsVolume, device, flags, parameters);
 
 	// create a Volume object
 	Volume* volume = new(std::nothrow) Volume(fsVolume);
@@ -161,8 +161,8 @@ packagefs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* dir = (Node*)fsDir->private_node;
 
-	FUNCTION("volume: %p, dir: %p (%lld), entry: \"%s\"\n", volume, dir,
-		dir->ID(), entryName);
+	FUNCTION("volume: %p, dir: %p (%" B_PRId64 "), entry: \"%s\"\n", volume,
+		dir, dir->ID(), entryName);
 
 	if (!S_ISDIR(dir->Mode()))
 		return B_NOT_A_DIRECTORY;
@@ -218,7 +218,7 @@ packagefs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
 
-	FUNCTION("volume: %p, vnid: %lld\n", volume, vnid);
+	FUNCTION("volume: %p, vnid: %" B_PRId64 "\n", volume, vnid);
 
 	VolumeReadLocker volumeLocker(volume);
 	Node* node = volume->FindNode(vnid);
@@ -271,8 +271,8 @@ packagefs_io(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, request: %p\n", volume,
-		node, node->ID(), cookie, request);
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p, request: %p\n",
+		volume, node, node->ID(), cookie, request);
 	TOUCH(volume);
 
 	if (io_request_is_write(request))
@@ -294,8 +294,8 @@ packagefs_ioctl(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, operation: %" B_PRIu32
-		", buffer: %p, size: %zu\n", volume, node, node->ID(), cookie,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p, operation: %"
+		B_PRIu32 ", buffer: %p, size: %zu\n", volume, node, node->ID(), cookie,
 		operation, buffer, size);
 	TOUCH(cookie);
 
@@ -310,7 +310,8 @@ packagefs_read_symlink(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 ")\n", volume, node,
+		node->ID());
 	TOUCH(volume);
 
 	NodeReadLocker nodeLocker(node);
@@ -328,7 +329,8 @@ packagefs_access(fs_volume* fsVolume, fs_vnode* fsNode, int mode)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 ")\n", volume, node,
+		node->ID());
 	TOUCH(volume);
 
 	NodeReadLocker nodeLocker(node);
@@ -342,7 +344,8 @@ packagefs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 ")\n", volume, node,
+		node->ID());
 	TOUCH(volume);
 
 	NodeReadLocker nodeLocker(node);
@@ -385,8 +388,8 @@ packagefs_open(fs_volume* fsVolume, fs_vnode* fsNode, int openMode,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), openMode %#x\n", volume, node,
-		node->ID(), openMode);
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), openMode %#x\n",
+		volume, node, node->ID(), openMode);
 	TOUCH(volume);
 
 	NodeReadLocker nodeLocker(node);
@@ -427,7 +430,7 @@ packagefs_free_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 	Node* node = (Node*)fsNode->private_node;
 	FileCookie* cookie = (FileCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p\n", volume, node,
 		node->ID(), cookie);
 	TOUCH(volume);
 	TOUCH(node);
@@ -446,9 +449,9 @@ packagefs_read(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	Node* node = (Node*)fsNode->private_node;
 	FileCookie* cookie = (FileCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, offset: %lld, "
-		"buffer: %p, size: %lu\n", volume, node, node->ID(), cookie, offset,
-		buffer, *bufferSize);
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p, offset: %"
+		B_PRId64 ", buffer: %p, size: %" B_PRIuSIZE "\n", volume, node,
+		node->ID(), cookie, offset, buffer, *bufferSize);
 	TOUCH(volume);
 
 	if ((cookie->openMode & O_RWMASK) != O_RDONLY)
@@ -549,7 +552,8 @@ packagefs_open_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 ")\n", volume, node,
+		node->ID());
 	TOUCH(volume);
 
 	if (!S_ISDIR(node->Mode()))
@@ -586,7 +590,7 @@ packagefs_free_dir_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 	Node* node = (Node*)fsNode->private_node;
 	DirectoryCookie* cookie = (DirectoryCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p\n", volume, node,
 		node->ID(), cookie);
 	TOUCH(volume);
 	TOUCH(node);
@@ -606,7 +610,7 @@ packagefs_read_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	Node* node = (Node*)fsNode->private_node;
 	DirectoryCookie* cookie = (DirectoryCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p\n", volume, node,
 		node->ID(), cookie);
 	TOUCH(volume);
 	TOUCH(node);
@@ -670,7 +674,7 @@ packagefs_rewind_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 	Node* node = (Node*)fsNode->private_node;
 	DirectoryCookie* cookie = (DirectoryCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p\n", volume, node,
 		node->ID(), cookie);
 	TOUCH(volume);
 	TOUCH(node);
@@ -691,7 +695,8 @@ packagefs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 ")\n", volume, node,
+		node->ID());
 	TOUCH(volume);
 
 	status_t error = check_access(node, R_OK);
@@ -726,7 +731,7 @@ packagefs_free_attr_dir_cookie(fs_volume* fsVolume, fs_vnode* fsNode,
 	Node* node = (Node*)fsNode->private_node;
 	AttributeDirectoryCookie* cookie = (AttributeDirectoryCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p\n", volume, node,
 		node->ID(), cookie);
 	TOUCH(volume);
 	TOUCH(node);
@@ -745,7 +750,7 @@ packagefs_read_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	Node* node = (Node*)fsNode->private_node;
 	AttributeDirectoryCookie* cookie = (AttributeDirectoryCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p\n", volume, node,
 		node->ID(), cookie);
 	TOUCH(volume);
 	TOUCH(node);
@@ -761,7 +766,7 @@ packagefs_rewind_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 	Node* node = (Node*)fsNode->private_node;
 	AttributeDirectoryCookie* cookie = (AttributeDirectoryCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p\n", volume, node,
 		node->ID(), cookie);
 	TOUCH(volume);
 	TOUCH(node);
@@ -780,8 +785,8 @@ packagefs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), name: \"%s\", openMode %#x\n",
-		volume, node, node->ID(), name, openMode);
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), name: \"%s\", openMode "
+			"%#x\n", volume, node, node->ID(), name, openMode);
 	TOUCH(volume);
 
 	NodeReadLocker nodeLocker(node);
@@ -819,7 +824,7 @@ packagefs_free_attr_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 	Node* node = (Node*)fsNode->private_node;
 	AttributeCookie* cookie = (AttributeCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p\n", volume, node,
 		node->ID(), cookie);
 	TOUCH(volume);
 	TOUCH(node);
@@ -838,7 +843,7 @@ packagefs_read_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	Node* node = (Node*)fsNode->private_node;
 	AttributeCookie* cookie = (AttributeCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p\n", volume, node,
 		node->ID(), cookie);
 	TOUCH(volume);
 	TOUCH(node);
@@ -855,7 +860,7 @@ packagefs_read_attr_stat(fs_volume* fsVolume, fs_vnode* fsNode,
 	Node* node = (Node*)fsNode->private_node;
 	AttributeCookie* cookie = (AttributeCookie*)_cookie;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRId64 "), cookie: %p\n", volume, node,
 		node->ID(), cookie);
 	TOUCH(volume);
 	TOUCH(node);

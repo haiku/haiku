@@ -144,14 +144,14 @@ MouseSettings::_SaveSettings()
 void
 MouseSettings::Dump()
 {
-	printf("type:\t\t%ld button mouse\n", fSettings.type);
-	printf("map:\t\tleft = %lu : middle = %lu : right = %lu\n",
-		fSettings.map.button[0], fSettings.map.button[2],
+	printf("type:\t\t%" B_PRId32 " button mouse\n", fSettings.type);
+	printf("map:\t\tleft = %" B_PRIu32 " : middle = %" B_PRIu32 " : right = %"
+		B_PRIu32 "\n", fSettings.map.button[0], fSettings.map.button[2],
 		fSettings.map.button[1]);
-	printf("click speed:\t%Ld\n", fSettings.click_speed);
+	printf("click speed:\t%" B_PRId64 "\n", fSettings.click_speed);
 	printf("accel:\t\t%s\n", fSettings.accel.enabled ? "enabled" : "disabled");
-	printf("accel factor:\t%ld\n", fSettings.accel.accel_factor);
-	printf("speed:\t\t%ld\n", fSettings.accel.speed);
+	printf("accel factor:\t%" B_PRId32 "\n", fSettings.accel.accel_factor);
+	printf("speed:\t\t%" B_PRId32 "\n", fSettings.accel.speed);
 
 	const char *mode = "unknown";
 	switch (fMode) {

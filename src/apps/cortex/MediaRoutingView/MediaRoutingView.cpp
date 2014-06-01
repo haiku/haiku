@@ -591,7 +591,7 @@ void MediaRoutingView::MessageReceived(
 			status_t err = manager->roster->StartTimeSource(ref->node(), when);
 			if(err < B_OK) {
 				PRINT((
-					"! StartTimeSource(%ld): '%s'\n",
+					"! StartTimeSource(%" B_PRId32 "): '%s'\n",
 					ref->id(), strerror(err)));
 			}
 			break;
@@ -610,7 +610,7 @@ void MediaRoutingView::MessageReceived(
 			status_t err = manager->roster->StopTimeSource(ref->node(), when);
 			if(err < B_OK) {
 				PRINT((
-					"! StopTimeSource(%ld): '%s'\n",
+					"! StopTimeSource(%" B_PRId32 "): '%s'\n",
 					ref->id(), strerror(err)));
 			}
 			break;
@@ -1154,8 +1154,8 @@ status_t MediaRoutingView::importStateFor(
 		err = archive->FindMessage("panel", archiveIndex, &m);
 		if(err < B_OK) {
 			PRINT((
-				"!!! MediaRoutingView::importStateFor(): missing panel %ld\n",
-				archiveIndex));
+				"!!! MediaRoutingView::importStateFor(): missing panel %"
+					B_PRId32 "\n", archiveIndex));
 			continue;
 		}
 		
@@ -1217,7 +1217,7 @@ status_t MediaRoutingView::exportStateFor(
 		if(err < B_OK) {
 			PRINT((
 				"!!! MediaRoutingView::exportStateFor():\n"
-				"    no panel for node %ld\n",
+				"    no panel for node %" B_PRId32 "\n",
 				context->nodeAt(n)));
 			return B_BAD_VALUE;
 		}

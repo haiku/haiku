@@ -71,7 +71,7 @@ status_t NodeSetIOContext::addNode(
 				(*it).first.Length() &&
 				strcmp(key, (*it).first.String()) != 0) {
 				PRINT((
-					"!!! NodeSetIOContext::addNode(%ld, '%s'):\n"
+					"!!! NodeSetIOContext::addNode(%" B_PRId32 ", '%s'):\n"
 					"    found matching node with key '%s'!\n",
 					node, key, (*it).first.String()));
 			}

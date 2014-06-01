@@ -238,7 +238,7 @@ MidiServerApp::OnChangeEndpoint(BMessage* msg)
 	reply.AddInt32("midi:result", err);
 
 	if (SendReply(app, msg, &reply) && err == B_OK) {
-		TRACE(("Endpoint %ld (%p) changed", endp->id, endp))
+		TRACE(("Endpoint %" B_PRId32 " (%p) changed", endp->id, endp))
 
 		BMessage notify;
 		notify.what = MSG_ENDPOINT_CHANGED;
@@ -320,11 +320,13 @@ MidiServerApp::OnConnectDisconnect(BMessage* msg)
 
 	if (SendReply(app, msg, &reply) && err == B_OK) {
 		if (mustConnect) {
-			TRACE(("Connection made: %ld ---> %ld", prod->id, cons->id))
+			TRACE(("Connection made: %" B_PRId32 " ---> %" B_PRId32, prod->id,
+				cons->id))
 
 			prod->connections.AddItem(cons);
 		} else {
-			TRACE(("Connection broken: %ld -X-> %ld", prod->id, cons->id))
+			TRACE(("Connection broken: %" B_PRId32 " -X-> %" B_PRId32, prod->id,
+				cons->id))
 
 			prod->connections.RemoveItem(cons);
 		}
@@ -392,7 +394,7 @@ MidiServerApp::AddEndpoint(BMessage* msg, endpoint_t* endp)
 	ASSERT(endp != NULL)
 	ASSERT(!endpoints.HasItem(endp))
 
-	TRACE(("Endpoint %ld (%p) added", endp->id, endp))
+	TRACE(("Endpoint %" B_PRId32 " (%p) added", endp->id, endp))
 
 	endpoints.AddItem(endp);
 
@@ -412,7 +414,7 @@ MidiServerApp::RemoveEndpoint(app_t* app, endpoint_t* endp)
 	ASSERT(endp != NULL)
 	ASSERT(endpoints.HasItem(endp))
 
-	TRACE(("Endpoint %ld (%p) removed", endp->id, endp))
+	TRACE(("Endpoint %" B_PRId32 " (%p) removed", endp->id, endp))
 
 	endpoints.RemoveItem(endp);
 
@@ -502,7 +504,7 @@ MidiServerApp::WhichApp(BMessage* msg)
 			return app;
 	}
 
-	TRACE(("Application %ld is not registered", retadr.Team()))
+	TRACE(("Application %" B_PRId32 " is not registered", retadr.Team()))
 
 	return NULL;
 }
@@ -537,7 +539,7 @@ MidiServerApp::FindEndpoint(int32 id)
 		}
 	}
 
-	TRACE(("Endpoint %ld not found", id))
+	TRACE(("Endpoint %" B_PRId32 " not found", id))
 	return NULL;
 }
 
@@ -703,7 +705,8 @@ MidiServerApp::DumpApps()
 	for (int32 t = 0; t < CountApps(); ++t) {
 		app_t* app = AppAt(t);
 
-		printf("\tapp %ld (%p): team %ld\n", t, app, app->messenger.Team());
+		printf("\tapp %" B_PRId32 " (%p): team %" B_PRId32 "\n", t, app,
+			app->messenger.Team());
 	}
 
 	printf("*** END DumpApps\n");
@@ -720,8 +723,8 @@ MidiServerApp::DumpEndpoints()
 	for (int32 t = 0; t < CountEndpoints(); ++t) {
 		endpoint_t* endp = EndpointAt(t);
 
-		printf("\tendpoint %ld (%p):\n", t, endp);
-		printf("\t\tid %ld, name '%s', %s, %s, app %p\n", 
+		printf("\tendpoint %" B_PRId32 " (%p):\n", t, endp);
+		printf("\t\tid %" B_PRId32 ", name '%s', %s, %s, app %p\n",
 			endp->id, endp->name.String(),
 			endp->consumer ? "consumer" : "producer",
 			endp->registered ? "registered" : "unregistered",
@@ -729,12 +732,13 @@ MidiServerApp::DumpEndpoints()
 		printf("\t\tproperties: "); endp->properties.PrintToStream();
 
 		if (endp->consumer)
-			printf("\t\tport %ld, latency %Ld\n", endp->port, endp->latency);
+			printf("\t\tport %" B_PRId32 ", latency %" B_PRIdBIGTIME "\n",
+				endp->port, endp->latency);
 		else {
 			printf("\t\tconnections:\n");
 			for (int32 k = 0; k < CountConnections(endp); ++k) {
 				endpoint_t* cons = ConnectionAt(endp, k);
-				printf("\t\t\tid %ld (%p)\n", cons->id, cons);
+				printf("\t\t\tid %" B_PRId32 " (%p)\n", cons->id, cons);
 			}
 		}
 	}

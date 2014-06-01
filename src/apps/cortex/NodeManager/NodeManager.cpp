@@ -571,8 +571,8 @@ bool NodeManager::findRoute(
 	err = getNodeRef(nodeA, &ref);
 	if(err < B_OK) {
 		PRINT((
-			"!!! NodeManager::findRoute(%ld, %ld): no ref for node %ld\n",
-			nodeA, nodeB, nodeA));
+			"!!! NodeManager::findRoute(%" B_PRId32 ", %" B_PRId32
+			"): no ref for node %" B_PRId32 "\n", nodeA, nodeB, nodeA));
 		return false;
 	}
 
@@ -923,8 +923,8 @@ status_t NodeManager::splitGroup(
 	// ensure that no route exists from insideNode to outsideNode
 	if(findRoute(insideNode->id(), outsideNode->id())) {
 		PRINT((
-			"!!! NodeManager::splitGroup(): route exists from %ld to %ld\n",
-			insideNode->id(), outsideNode->id()));
+			"!!! NodeManager::splitGroup(): route exists from %" B_PRId32
+			" to %" B_PRId32 "\n", insideNode->id(), outsideNode->id()));
 		return B_NOT_ALLOWED;
 	}
 
@@ -936,8 +936,8 @@ status_t NodeManager::splitGroup(
 	}
 	if(oldGroup != outsideNode->group()) {
 		PRINT((
-			"!!! NodeManager::splitGroup(): mismatched groups for %ld and %ld\n",
-			insideNode->id(), outsideNode->id()));
+			"!!! NodeManager::splitGroup(): mismatched groups for %" B_PRId32
+			" and %" B_PRId32 "\n", insideNode->id(), outsideNode->id()));
 		return B_NOT_ALLOWED;
 	}
 
@@ -1193,10 +1193,10 @@ status_t NodeManager::connect(
 
 	D_METHOD((
 		"! creating connection:\n"
-		"  source id:    %ld\n"
-		"  source port:  %ld\n"
-		"  dest id:      %ld\n"
-		"  dest port:    %ld\n",
+		"  source id:    %" B_PRId32 "\n"
+		"  source port:  %" B_PRId32 "\n"
+		"  dest id:      %" B_PRId32 "\n"
+		"  dest port:    %" B_PRId32 "\n",
 		finalOutput.source.id, finalOutput.source.port,
 		finalInput.destination.id, finalInput.destination.port));
 
@@ -1316,7 +1316,7 @@ status_t NodeManager::disconnect(
 	if(connection.flags() & Connection::LOCKED) {
 		PRINT((
 			"NodeManager::disconnect(): connection locked:\n"
-			"  %ld:%s -> %ld:%s\n",
+			"  %" B_PRId32 ":%s -> %" B_PRId32 ":%s\n",
 			connection.sourceNode(),
 			connection.outputName(),
 			connection.destinationNode(),
@@ -1326,12 +1326,12 @@ status_t NodeManager::disconnect(
 
 	D_METHOD((
 		"! breaking connection:\n"
-		"  source node:  %ld\n"
-		"  source id:    %ld\n"
-		"  source port:  %ld\n"
-		"  dest node:    %ld\n"
-		"  dest id:      %ld\n"
-		"  dest port:    %ld\n",
+		"  source node:  %" B_PRId32 "\n"
+		"  source id:    %" B_PRId32 "\n"
+		"  source port:  %" B_PRId32 "\n"
+		"  dest node:    %" B_PRId32 "\n"
+		"  dest id:      %" B_PRId32 "\n"
+		"  dest port:    %" B_PRId32 "\n",
 		connection.sourceNode(),
 		connection.source().id, connection.source().port,
 		connection.destinationNode(),
@@ -1879,7 +1879,7 @@ void NodeManager::_removeGroup(
 	// precondition: group in set
 	if(it == m_nodeGroupSet.end()) {
 		PRINT((
-			"* NodeManager::_removeGroup(%ld): group not in set.\n",
+			"* NodeManager::_removeGroup(%" B_PRId32 "): group not in set.\n",
 			group->id()));
 		return;
 	}
@@ -1920,7 +1920,7 @@ inline status_t NodeManager::_handleNodesCreated(
 	}
 
 	D_METHOD((
-		"NodeManager::_handleNodesCreated(): %d nodes\n",
+		"NodeManager::_handleNodesCreated(): %" B_PRId32 " nodes\n",
 		count));
 
 	// * Create NodeRef instances for the listed nodes.
@@ -1952,7 +1952,8 @@ inline status_t NodeManager::_handleNodesCreated(
 		err = roster->GetNodeFor(id, &node);
 		if(err < B_OK) {
 			PRINT((
-				"* NodeManager::_handleNodesCreated(): roster->GetNodeFor(%ld) failed:\n"
+				"* NodeManager::_handleNodesCreated(): roster->GetNodeFor(%"
+					B_PRId32 ") failed:\n"
 				"  %s\n",
 				id, strerror(err)));
 			continue;
@@ -1990,7 +1991,8 @@ inline status_t NodeManager::_handleNodesCreated(
 			err = roster->ReleaseNode(node);
 			if(err < B_OK) {
 				PRINT((
-					"* NodeManager::_handleNodesCreated(): roster->ReleaseNode(%ld) failed:\n"
+					"* NodeManager::_handleNodesCreated(): roster->ReleaseNode(%"
+						B_PRId32 ") failed:\n"
 					"  %s\n",
 					id, strerror(err)));
 			}
@@ -2084,10 +2086,10 @@ inline status_t NodeManager::_handleNodesCreated(
 						"!!! NodeManager::_handleNodesCreated():\n"
 						"    input/output mismatch for connection\n"
 						"    '%s' (%s) -> '%s' (%s)\n"
-						"    input.source:        port %ld, ID %ld\n"
-						"    output.source:       port %ld, ID %ld\n"
-						"    input.destination:   port %ld, ID %ld\n"
-						"    output.destination:  port %ld, ID %ld\n\n",
+						"    input.source:        port %" B_PRId32 ", ID %" B_PRId32 "\n"
+						"    output.source:       port %" B_PRId32 ", ID %" B_PRId32 "\n"
+						"    input.destination:   port %" B_PRId32 ", ID %" B_PRId32 "\n"
+						"    output.destination:  port %" B_PRId32 ", ID %" B_PRId32 "\n\n",
 						sourceRef->name(), output.name,
 						destRef->name(), input.name,
 						input.source.port, input.source.id,
@@ -2175,7 +2177,8 @@ inline void NodeManager::_handleNodesDeleted(
 		err = getNodeRef(id, &ref);
 		if(err < B_OK) {
 			PRINT((
-				"* NodeManager::_handleNodesDeleted(): getNodeRef(%ld) failed\n"
+				"* NodeManager::_handleNodesDeleted(): getNodeRef(%" B_PRId32
+					") failed\n"
 				"  %s\n",
 				id, strerror(err)));
 			continue;
@@ -2336,7 +2339,7 @@ inline void NodeManager::_handleConnectionBroken(
 		if(err < B_OK) {
 			PRINT((
 				"* NodeManager::_handleConnectionBroken(): connection not found:\n"
-				"  %ld:%ld\n",
+				"  %" B_PRId32 ":%" B_PRId32 "\n",
 				source.port, source.id));
 
 			// add empty entry to message

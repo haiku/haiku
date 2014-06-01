@@ -582,7 +582,7 @@ status_t AudioFilterNode::Connected(
 	media_input*								outInput) {
 	
 	PRINT(("AudioFilterNode::Connected()\n"
-		"\tto source %ld\n", source.id));
+		"\tto source %" B_PRId32 "\n", source.id));
 	
 	// sanity check
 	if(destination != m_input.destination) {
@@ -613,13 +613,13 @@ void AudioFilterNode::Disconnected(
 
 	// sanity checks
 	if(m_input.source != source) {
-		PRINT(("\tsource mismatch: expected ID %ld, got %ld\n",
-			m_input.source.id, source.id));
+		PRINT(("\tsource mismatch: expected ID %" B_PRId32 ", got %" B_PRId32
+				"\n", m_input.source.id, source.id));
 		return;
 	}
 	if(destination != m_input.destination) {
-		PRINT(("\tdestination mismatch: expected ID %ld, got %ld\n",
-			m_input.destination.id, destination.id));
+		PRINT(("\tdestination mismatch: expected ID %" B_PRId32 ", got %"
+				B_PRId32 "\n", m_input.destination.id, destination.id));
 		return;
 	}
 
@@ -684,7 +684,7 @@ status_t AudioFilterNode::GetLatencyFor(
 	}
 	
 	*outLatency = m_downstreamLatency + m_processingLatency;
-	PRINT(("\treturning %Ld\n", *outLatency));
+	PRINT(("\treturning %" B_PRIdBIGTIME "\n", *outLatency));
 	*outTimeSource = TimeSource()->ID();
 	return B_OK;
 }
@@ -707,7 +707,8 @@ void AudioFilterNode::ProducerDataStatus(
 	int32												status,
 	bigtime_t										tpWhen) {
 
-	PRINT(("AudioFilterNode::ProducerDataStatus(%ld at %Ld)\n", status, tpWhen));
+	PRINT(("AudioFilterNode::ProducerDataStatus(%" B_PRId32 " at %"
+			B_PRIdBIGTIME ")\n", status, tpWhen));
 	
 	// sanity check
 	if(destination != m_input.destination) {
@@ -804,7 +805,7 @@ void AudioFilterNode::Connect(
 	if(err < B_OK) {
 		PRINT(("\t!!! FindLatencyFor(): %s\n", strerror(err)));
 	}
-	PRINT(("\tdownstream latency = %Ld\n", m_downstreamLatency));
+	PRINT(("\tdownstream latency = %" B_PRIdBIGTIME "\n", m_downstreamLatency));
 	
 //	// prepare the filter
 //	initFilter();
@@ -984,7 +985,7 @@ status_t AudioFilterNode::GetLatency(
 	
 	PRINT(("AudioFilterNode::GetLatency()\n"));
 	*outLatency = EventLatency() + SchedulingLatency();
-	PRINT(("\treturning %Ld\n", *outLatency));
+	PRINT(("\treturning %" B_PRIdBIGTIME "\n", *outLatency));
 	
 	return B_OK;
 }
@@ -1047,8 +1048,8 @@ void AudioFilterNode::LateNoticeReceived(
 	bigtime_t										tpWhen) {
 
 	PRINT(("AudioFilterNode::LateNoticeReceived()\n"
-		"\thowLate == %Ld\n"
-		"\twhen    == %Ld\n", howLate, tpWhen));
+		"\thowLate == %" B_PRIdBIGTIME "\n"
+		"\twhen    == %" B_PRIdBIGTIME "\n", howLate, tpWhen));
 		
 	if(source != m_output.source) {
 		PRINT(("\tBad source.\n"));
@@ -1362,7 +1363,7 @@ void AudioFilterNode::updateOperation() {
 	// do performance tests (what if I'm running? +++++)
 
 	m_processingLatency = calcProcessingLatency();
-	PRINT(("\tprocessing latency = %Ld\n", m_processingLatency));
+	PRINT(("\tprocessing latency = %" B_PRIdBIGTIME "\n", m_processingLatency));
 	
 	// store summed latency
 	SetEventLatency(m_downstreamLatency + m_processingLatency);
@@ -1435,7 +1436,7 @@ void AudioFilterNode::updateBufferGroup() {
 	// create buffer group
 	PRINT((
 		"##### AudioFilterNode::updateBufferGroup():\n"
-		"##### creating %ld buffers of size %ld\n",
+		"##### creating %" B_PRId32 " buffers of size %" B_PRIuSIZE "\n",
 		bufferCount, m_output.format.u.raw_audio.buffer_size));
 
 	m_bufferGroup = new BBufferGroup(

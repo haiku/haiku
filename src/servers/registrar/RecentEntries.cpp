@@ -312,17 +312,19 @@ RecentEntries::Save(FILE* file, const char *description, const char *tag)
 					fprintf(file, " \"%s\" %" B_PRId32, entry->sig.c_str(),
 						entry->index);
 				} else {
-					D(PRINT("WARNING: RecentEntries::Save(): The entry %ld "
-						"entries from the front of the compiled recent_entry* "
-						"list for the entry ref (%ld, %lld, '%s') was found to "
-						"be NULL\n", i, mapItem->first.device,
-						mapItem->first.directory, mapItem->first.name));
+					D(PRINT("WARNING: RecentEntries::Save(): The entry %"
+						B_PRId32 " entries from the front of the compiled "
+						"recent_entry* list for the entry ref (%" B_PRId32 ", %"
+						B_PRId64 ", '%s') was found to be NULL\n", i,
+						mapItem->first.device, mapItem->first.directory,
+						mapItem->first.name));
 				}
 			}
 			fprintf(file, "\n");
 		} else {
 			D(PRINT("WARNING: RecentEntries::Save(): entry_ref_to_path() "
-				"failed on the entry_ref (%ld, %lld, '%s') with error 0x%lx\n",
+				"failed on the entry_ref (%" B_PRId32", %" B_PRId64 ", '%s') "
+				"with error 0x%" B_PRIx32 "\n",
 				mapItem->first.device, mapItem->first.directory,
 				mapItem->first.name, outputError));
 		}

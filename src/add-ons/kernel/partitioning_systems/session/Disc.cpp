@@ -223,7 +223,7 @@ dump_full_table_of_contents(uchar* data, uint16 dataLength)
 		TRACE(("  pminutes = %d\n", entries[i].pminutes));
 		TRACE(("  pseconds = %d\n", entries[i].pseconds));
 		TRACE(("  pframes  = %d\n", entries[i].pframes));
-		TRACE(("  lba      = %lld\n",
+		TRACE(("  lba      = %" B_PRId64 "\n",
 			msf_to_lba(make_msf_address(entries[i].pminutes,
 			entries[i].pseconds, entries[i].pframes))));
 	}
@@ -286,8 +286,8 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar* buffer,
 		}
 	} else {
 		error = errno;
-		TRACE(("%s: scsi command failed with error 0x%lx\n", kModuleDebugName,
-			error));
+		TRACE(("%s: scsi command failed with error 0x%" B_PRIx32 "\n",
+			kModuleDebugName, error));
 	}
 
 	return error;
@@ -407,8 +407,8 @@ List::SortAndRemoveDuplicates()
 			} else if (item->index == next->index) {
 				// Duplicate indicies
 				TRACE(("%s: List::SortAndRemoveDuplicates: duplicate indicies "
-					"found (#%ld); keeping first instance\n", kModuleDebugName,
-					item->index));
+					"found (#%" B_PRId32 "); keeping first instance\n",
+					kModuleDebugName, item->index));
 				item->next = next->next;
 				delete next;
 				next = item->next;
@@ -563,7 +563,8 @@ Disc::Disc(int fd)
 		}
 	}
 
-	PRINT(("Setting init status to 0x%lx, `%s'\n", error, strerror(error)));
+	PRINT(("Setting init status to 0x%" B_PRIx32 ", `%s'\n", error,
+		strerror(error)));
 	fInitStatus = error;
 }
 
@@ -594,7 +595,7 @@ Disc::InitCheck()
 Session*
 Disc::GetSession(int32 index)
 {
-	DEBUG_INIT_ETC("Disc", ("index: %ld", index));
+	DEBUG_INIT_ETC("Disc", ("index: %" B_PRId32, index));
 	int32 counter = -1;
 	for (session* session = (struct session*)fSessionList->First(); session;
 			session = (struct session*)session->next) {
@@ -606,7 +607,8 @@ Disc::GetSession(int32 index)
 				// track with the end of session.
 				track* track = (struct track*)session->track_list.First();
 				if (track != NULL) {
-					PRINT(("found session #%ld info (audio session)\n", index));
+					PRINT(("found session #%" B_PRId32 " info (audio session)"
+							"\n", index));
 
 					off_t startLBA = track->start_lba;
 					off_t endLBA = session->end_lba;
@@ -623,8 +625,8 @@ Disc::GetSession(int32 index)
 					}
 					return result;
 				} else {
-					PRINT(("Error: session #%ld is an audio session with no "
-						"tracks!\n", index));
+					PRINT(("Error: session #%" B_PRId32 " is an audio session "
+						"with no tracks!\n", index));
 					return NULL;
 				}
 			}
@@ -633,13 +635,14 @@ Disc::GetSession(int32 index)
 					track; track = (struct track*)track->next) {
 				counter++;
 				if (counter == index) {
-					PRINT(("found session #%ld info (data session)\n", index));
+					PRINT(("found session #%" B_PRId32 " info (data session)\n",
+						index));
 
 					off_t startLBA = track->start_lba;
 					if (startLBA < 0) {
-						WARN(("%s: warning: invalid negative start LBA of %lld"
-							" for data track assuming 0\n", kModuleDebugName,
-							startLBA));
+						WARN(("%s: warning: invalid negative start LBA of %"
+							B_PRId64 " for data track assuming 0\n",
+							kModuleDebugName, startLBA));
 						startLBA = 0;
 					}
 
@@ -663,7 +666,7 @@ Disc::GetSession(int32 index)
 		}
 	}
 
-	PRINT(("no session #%ld found!\n", index));
+	PRINT(("no session #%" B_PRId32 " found!\n", index));
 	return NULL;
 }
 
@@ -676,10 +679,10 @@ Disc::Dump()
 	TRACE(("%s: Disc dump:\n", kModuleDebugName));
 	session* session = (struct session*)fSessionList->First();
 	while (session != NULL) {
-		TRACE(("session %ld:\n", session->index));
+		TRACE(("session %" B_PRId32 ":\n", session->index));
 		TRACE(("  first track hint: %d\n", session->first_track_hint));
 		TRACE(("  last track hint:  %d\n", session->last_track_hint));
-		TRACE(("  end_lba:          %lld\n", session->end_lba));
+		TRACE(("  end_lba:          %" B_PRId64 "\n", session->end_lba));
 		TRACE(("  control:          %d (%s session, copy %s)\n",
 			session->control, (session->control & kControlDataTrack
 				? "data" : "audio"),
@@ -688,8 +691,8 @@ Disc::Dump()
 		TRACE(("  adr:              %d\n", session->adr));
 		track* track = (struct track*)session->track_list.First();
 		while (track != NULL) {
-			TRACE(("  track %ld:\n", track->index));
-			TRACE(("    start_lba: %lld\n", track->start_lba));
+			TRACE(("  track %" B_PRId32 ":\n", track->index));
+			TRACE(("    start_lba: %" B_PRId64 "\n", track->start_lba));
 			track = (struct track*)track->next;
 		}
 		session = (struct session*)session->next;
@@ -790,7 +793,7 @@ status_t
 Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[],
 	uint32 count)
 {
-	DEBUG_INIT_ETC("Disc", ("entries: %p, count: %ld", entries, count));
+	DEBUG_INIT_ETC("Disc", ("entries: %p, count: %" B_PRIu32, entries, count));
 
 	for (uint32 i = 0; i < count; i++) {
 		// Find or create the appropriate session
@@ -858,13 +861,13 @@ Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[],
 						session->control = entries[i].control;
 						session->adr = entries[i].adr;
 					} else {
-						WARN(("%s: warning: illegal end lba %lld found for "
-							"session %d\n", kModuleDebugName, endLBA,
+						WARN(("%s: warning: illegal end lba %" B_PRId64 " found"
+							" for session %d\n", kModuleDebugName, endLBA,
 							sessionIndex));
 					}
 				} else {
 					WARN(("%s: warning: duplicate end lba values found for "
-						"session %d; using first value encountered: %lld",
+						"session %d; using first value encountered: %" B_PRId64,
 						kModuleDebugName, sessionIndex, session->end_lba));
 				}
 				break;
@@ -962,16 +965,16 @@ Disc::_CheckForErrorsAndWarnings() {
 		// missing end lba
 		if (!session->end_lba_is_set()) {
 			TRACE(("%s: Disc::_CheckForErrorsAndWarnings: error: no end of "
-				"session address for session #%ld\n", kModuleDebugName,
-				session->index));
+				"session address for session #%" B_PRId32 "\n",
+				kModuleDebugName, session->index));
 			return B_ERROR;
 		}
 
 		// empty track list
 		track* track = (struct track*)session->track_list.First();
 		if (track == NULL) {
-			TRACE(("%s: Disc::_CheckForErrorsAndWarnings: error: session #%ld "
-				"has no tracks\n", kModuleDebugName, session->index));
+			TRACE(("%s: Disc::_CheckForErrorsAndWarnings: error: session #%"
+				B_PRId32 "has no tracks\n", kModuleDebugName, session->index));
 			return B_ERROR;
 		}
 
@@ -981,9 +984,9 @@ Disc::_CheckForErrorsAndWarnings() {
 		if (session->first_track_hint_is_set()
 			&& session->first_track_hint != track->index) {
 			TRACE(("%s: Disc::_CheckForErrorsAndWarnings: warning: session "
-				"#%ld: first track hint (%d) doesn't match actual first track "
-				"(%ld)\n", kModuleDebugName, session->index,
-				session->first_track_hint, track->index));
+				"#%" B_PRId32 ": first track hint (%d) doesn't match actual "
+				"first track (%" B_PRId32 ")\n", kModuleDebugName,
+				session->index, session->first_track_hint, track->index));
 		}
 
 		// incorrect last track hint
@@ -991,16 +994,17 @@ Disc::_CheckForErrorsAndWarnings() {
 		if (session->last_track_hint_is_set() && last
 			&& session->last_track_hint != last->index) {
 			TRACE(("%s: Disc::_CheckForErrorsAndWarnings: warning: session "
-				"#%ld: last track hint (%d) doesn't match actual last track "
-				"(%ld)\n", kModuleDebugName, session->index,
-				session->last_track_hint, last->index));
+				"#%" B_PRId32 ": last track hint (%d) doesn't match actual "
+				"last track (%" B_PRId32 ")\n", kModuleDebugName,
+				session->index, session->last_track_hint, last->index));
 		}
 
 		// invalid session sequence
 		if (lastSessionIndex + 1 != session->index) {
 			TRACE(("%s: Disc::_CheckForErrorsAndWarnings: warning: index for "
-				"session #%ld is out of sequence (should have been #%ld)\n",
-				kModuleDebugName, session->index, lastSessionIndex));
+				"session #%" B_PRId32 " is out of sequence (should have been #%"
+				B_PRId32 ")\n",	kModuleDebugName, session->index,
+				lastSessionIndex));
 		}
 		lastSessionIndex = session->index;
 
@@ -1008,17 +1012,19 @@ Disc::_CheckForErrorsAndWarnings() {
 			// invalid track sequence
 			if (lastTrackIndex + 1 != track->index) {
 				TRACE(("%s: Disc::_CheckForErrorsAndWarnings: warning: index "
-					"for track #%ld is out of sequence (should have been "
-					"#%ld)\n", kModuleDebugName, track->index, lastTrackIndex));
+					"for track #%" B_PRId32 " is out of sequence (should have "
+					"been #%" B_PRId32 ")\n", kModuleDebugName, track->index,
+					lastTrackIndex));
 			}
 			lastTrackIndex = track->index;
 
 			// mismatched control
 			if (track->control != session->control) {
 				TRACE(("%s: Disc::_CheckForErrorsAndWarnings: warning: control "
-					"for track #%ld (%d, %s track, copy %s) does not match "
-					"control for parent session #%ld (%d, %s session, copy "
-					"%s)\n", kModuleDebugName, track->index, track->control,
+					"for track #%" B_PRId32 " (%d, %s track, copy %s) does not "
+					"match control for parent session #%" B_PRId32 " (%d, %s "
+					"session, copy %s)\n", kModuleDebugName, track->index,
+					track->control,
 					(track->control & kControlDataTrack ? "data" : "audio"),
 					(track->control & kControlCopyPermitted
 						? "permitted" : "prohibited"),
@@ -1031,9 +1037,10 @@ Disc::_CheckForErrorsAndWarnings() {
 			// mismatched adr
 			if (track->adr != session->adr) {
 				TRACE(("%s: Disc::_CheckForErrorsAndWarnings: warning: adr "
-					"for track #%ld (adr = %d) does not match adr for parent "
-					"session #%ld (adr = %d)\n", kModuleDebugName, track->index,
-					track->adr, session->index, session->adr));
+					"for track #%" B_PRId32 " (adr = %d) does not match adr "
+					"for parent session #%" B_PRId32 " (adr = %d)\n",
+					kModuleDebugName, track->index, track->adr, session->index,
+					session->adr));
 			}
 		}
 	}

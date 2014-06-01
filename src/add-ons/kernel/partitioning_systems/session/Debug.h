@@ -173,7 +173,7 @@ private:
 		}		
 	
 	#define REPORT_ERROR(error) {											\
-		LPRINT(("returning error 0x%lx, `%s'\n", error, strerror(error)));	\
+		LPRINT(("returning error 0x%" B_PRIx32 ", `%s'\n", error, strerror(error)));	\
 	}
 
 	#define RETURN_ERROR(error) { 		\
@@ -190,7 +190,7 @@ private:
 		} else if (_status == (status_t)B_OK) {						\
 			LPRINT(("returning B_OK\n"));							\
 		} else {													\
-			LPRINT(("returning 0x%lx = %ld\n", _status, _status));	\
+			LPRINT(("returning 0x%" B_PRIx32 " = %" B_PRId32 "\n", _status, _status));	\
 		}															\
 		return _status; 											\
 	}

@@ -39,9 +39,9 @@ standard_operations(int32 op, ...)
 static float
 identify_partition(int fd, partition_data *partition, void **cookie)
 {
-	DEBUG_INIT_ETC(NULL, ("fd: %d, id: %ld, offset: %Ld, "
-		"size: %Ld, block_size: %ld, flags: 0x%lx", fd,
-		partition->id, partition->offset, partition->size,
+	DEBUG_INIT_ETC(NULL, ("fd: %d, id: %" B_PRId32 ", offset: %" B_PRIdOFF ", "
+		"size: %" B_PRIdOFF ", block_size: %" B_PRId32 ", flags: 0x%" B_PRIx32,
+		fd, partition->id, partition->offset, partition->size,
 		partition->block_size, partition->flags));
 
 	device_geometry geometry;
@@ -70,9 +70,10 @@ identify_partition(int fd, partition_data *partition, void **cookie)
 static status_t
 scan_partition(int fd, partition_data *partition, void *cookie)
 {
-	DEBUG_INIT_ETC(NULL, ("fd: %d, id: %ld, offset: %Ld, size: %Ld, "
-		"block_size: %ld, cookie: %p", fd, partition->id, partition->offset,
-		partition->size, partition->block_size, cookie));
+	DEBUG_INIT_ETC(NULL, ("fd: %d, id: %" B_PRId32 ", offset: %" B_PRId64 ", "
+		"size: %" B_PRIdOFF ", block_size: %" B_PRId32 ", cookie: %p", fd,
+		partition->id, partition->offset, partition->size,
+		partition->block_size, cookie));
 
 	Disc *disc = static_cast<Disc*>(cookie);
 	partition->status = B_PARTITION_VALID;
@@ -100,7 +101,7 @@ scan_partition(int fd, partition_data *partition, void *cookie)
 		}
 		child->parameters = NULL;
 	}
-	PRINT(("error: 0x%lx, `%s'\n", error, strerror(error)));
+	PRINT(("error: 0x%" B_PRIx32 ", `%s'\n", error, strerror(error)));
 	RETURN(error);
 }
 

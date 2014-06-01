@@ -152,7 +152,8 @@ ToneProducer::GetParameterValue(int32 id, bigtime_t* last_change, void* value, s
 	default:
 		// Hmmm, we were asked for a parameter that we don't actually
 		// support.  Report an error back to the caller.
-		FPRINTF(stderr, "\terror - asked for illegal parameter %ld\n", id);
+		FPRINTF(stderr, "\terror - asked for illegal parameter %" B_PRId32 "\n",
+			id);
 		return B_ERROR;
 		break;
 	}
@@ -380,7 +381,7 @@ ToneProducer::PrepareToConnect(const media_source& what, const media_destination
 	if(format->u.raw_audio.channel_count == media_raw_audio_format::wildcard.channel_count) {
 		//format->u.raw_audio.channel_count = mPreferredFormat.u.raw_audio.channel_count;
 		format->u.raw_audio.channel_count = 1;
-		FPRINTF(stderr, "\tno channel count provided, suggesting %lu\n", format->u.raw_audio.channel_count);
+		FPRINTF(stderr, "\tno channel count provided, suggesting %" B_PRIu32 "\n", format->u.raw_audio.channel_count);
 	}
 	if(format->u.raw_audio.byte_order == media_raw_audio_format::wildcard.byte_order) {
 		format->u.raw_audio.byte_order = mPreferredFormat.u.raw_audio.byte_order;
@@ -451,7 +452,7 @@ ToneProducer::Connect(status_t error, const media_source& source, const media_de
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(mOutput.destination, &mLatency, &id);
-	FPRINTF(stderr, "\tdownstream latency = %Ld\n", mLatency);
+	FPRINTF(stderr, "\tdownstream latency = %" B_PRIdBIGTIME "\n", mLatency);
 
 	// Use a dry run to see how long it takes me to fill a buffer of data
 	bigtime_t start, produceLatency;
@@ -468,7 +469,8 @@ ToneProducer::Connect(status_t error, const media_source& source, const media_de
 	mInternalLatency += 20000LL;
 
 	delete [] data;
-	FPRINTF(stderr, "\tbuffer-filling took %Ld usec on this machine\n", mInternalLatency);
+	FPRINTF(stderr, "\tbuffer-filling took %" B_PRIdBIGTIME
+			" usec on this machine\n", mInternalLatency);
 	SetEventLatency(mLatency + mInternalLatency);
 
 	// reset our buffer duration, etc. to avoid later calculations
@@ -500,7 +502,8 @@ ToneProducer::Disconnect(const media_source& what, const media_destination& wher
 	}
 	else
 	{
-		FPRINTF(stderr, "\tDisconnect() called with wrong source/destination (%ld/%ld), ours is (%ld/%ld)\n",
+		FPRINTF(stderr, "\tDisconnect() called with wrong source/destination (%"
+				B_PRId32 "/%" B_PRId32 "), ours is (%" B_PRId32 "/%" B_PRId32 ")\n",
 			what.id, where.id, mOutput.source.id, mOutput.destination.id);
 	}
 }
@@ -533,7 +536,8 @@ ToneProducer::LateNoticeReceived(const media_source& what, bigtime_t how_much, b
 				mInternalLatency = 50000;
 			SetEventLatency(mLatency + mInternalLatency);
 
-			FPRINTF(stderr, "\tincreasing latency to %Ld\n", mLatency + mInternalLatency);
+			FPRINTF(stderr, "\tincreasing latency to %" B_PRIdBIGTIME "\n",
+				mLatency + mInternalLatency);
 		}
 		else
 		{
@@ -576,7 +580,8 @@ ToneProducer::SetPlayRate(int32 numer, int32 denom)
 status_t 
 ToneProducer::HandleMessage(int32 message, const void* data, size_t size)
 {
-	FPRINTF(stderr, "ToneProducer::HandleMessage(%ld = 0x%lx)\n", message, message);
+	FPRINTF(stderr, "ToneProducer::HandleMessage(%" B_PRId32 " = 0x%" B_PRIx32
+		")\n", message, message);
 	// HandleMessage() is where you implement any private message protocols
 	// that you want to use.  When messages are written to your node's control
 	// port that are not recognized by any of the node superclasses, they'll be
@@ -602,7 +607,8 @@ ToneProducer::LatencyChanged(
 	bigtime_t new_latency,
 	uint32 flags)
 {
-	PRINT(("ToneProducer::LatencyChanged(): %Ld\n", new_latency));
+	PRINT(("ToneProducer::LatencyChanged(): %" B_PRIdBIGTIME "\n",
+		new_latency));
 
 	// something downstream changed latency, so we need to start producing
 	// buffers earlier (or later) than we were previously.  Make sure that the
@@ -646,7 +652,8 @@ ToneProducer::NodeRegistered()
 void 
 ToneProducer::Start(bigtime_t performance_time)
 {
-	PRINT(("ToneProducer::Start(%Ld): now %Ld\n", performance_time, TimeSource()->Now()));
+	PRINT(("ToneProducer::Start(%" B_PRIdBIGTIME "): now %" B_PRIdBIGTIME "\n",
+		performance_time, TimeSource()->Now()));
 
 	// send 'data available' message
 	if(mOutput.destination != media_destination::null)
@@ -789,7 +796,7 @@ ToneProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness, bo
 				break;
 
 			default:
-				FPRINTF(stderr, "Hmmm... got a B_PARAMETER event for a parameter we don't have? (%ld)\n", param);
+				FPRINTF(stderr, "Hmmm... got a B_PARAMETER event for a parameter we don't have? (%" B_PRId32 ")\n", param);
 				break;
 			}
 		}
@@ -873,8 +880,10 @@ ToneProducer::AllocateBuffers()
 	size_t size = mOutput.format.u.raw_audio.buffer_size;
 	int32 count = int32(mLatency / BufferDuration() + 1 + 1);
 
-	FPRINTF(stderr, "\tlatency = %Ld, buffer duration = %Ld\n", mLatency, BufferDuration());
-	FPRINTF(stderr, "\tcreating group of %ld buffers, size = %lx\n", count, size);
+	FPRINTF(stderr, "\tlatency = %" B_PRIdBIGTIME ", buffer duration = %"
+			B_PRIdBIGTIME "\n", mLatency, BufferDuration());
+	FPRINTF(stderr, "\tcreating group of %" B_PRId32 " buffers, size = %"
+			B_PRIuSIZE "\n", count, size);
 	mBufferGroup = new BBufferGroup(size, count);
 }
 

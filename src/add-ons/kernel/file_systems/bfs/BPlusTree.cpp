@@ -1679,7 +1679,7 @@ BPlusTree::Insert(Transaction& transaction, const uint8* key, uint16 keyLength,
 		RETURN_ERROR(B_BAD_VALUE);
 #ifdef DEBUG
 	if (value < 0)
-		panic("tried to insert invalid value %Ld!\n", value);
+		panic("tried to insert invalid value %" B_PRId64 "!\n", value);
 #endif
 
 	ASSERT_WRITE_LOCKED_INODE(fStream);
@@ -2878,9 +2878,9 @@ TreeIterator::Dump()
 {
 	__out("TreeIterator at %p:\n", this);
 	__out("\tfTree = %p\n", fTree);
-	__out("\tfCurrentNodeOffset = %Ld\n", fCurrentNodeOffset);
+	__out("\tfCurrentNodeOffset = %" B_PRId64 "\n", fCurrentNodeOffset);
 	__out("\tfCurrentKey = %d\n", (int)fCurrentKey);
-	__out("\tfDuplicateNode = %Ld (%Ld, 0x%Lx)\n",
+	__out("\tfDuplicateNode = %" B_PRId64 " (%" B_PRId64 ", 0x%" B_PRIx64 ")\n",
 		bplustree_node::FragmentOffset(fDuplicateNode), fDuplicateNode,
 		fDuplicateNode);
 	__out("\tfDuplicate = %u\n", fDuplicate);

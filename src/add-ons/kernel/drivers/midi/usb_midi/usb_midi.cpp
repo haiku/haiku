@@ -123,7 +123,7 @@ create_device(const usb_device* dev, uint16 ifno)
 	{
 		int32 bc;
 		get_sem_count(sem, &bc);
-		DPRINTF_DEBUG((MY_ID "Allocated %ld write buffers\n", bc));
+		DPRINTF_DEBUG((MY_ID "Allocated %" B_PRId32 " write buffers\n", bc));
 	}
 
 
@@ -245,11 +245,11 @@ midi_usb_read_callback(void* cookie, status_t status,
 	midiDevice->bus_status = status;	/* B_USB_STATUS_* */
 	if (status != B_OK) {
 		/* request failed */
-		DPRINTF_DEBUG((MY_ID "bus status 0x%lx\n", status));
+		DPRINTF_DEBUG((MY_ID "bus status 0x%" B_PRIx32 "\n", status));
 		if (status == B_CANCELED || !midiDevice->active) {
 			/* cancelled: device is unplugged */
 			DPRINTF_DEBUG((MY_ID "midi_usb_read_callback: cancelled"
-				"(status=%lx active=%d -- deleting sem_cbs\n",
+				"(status=%" B_PRIx32 " active=%d -- deleting sem_cbs\n",
 				status, midiDevice->active));
 
 			// Free any read() still blocked on semaphore
@@ -294,7 +294,7 @@ midi_usb_write_callback(void* cookie, status_t status,
 
 	assert(cookie != NULL);
 	DPRINTF_DEBUG((MY_ID "midi_usb_write_callback()"
-		" status %ld length %ld  pkt %p cin %x\n",
+		" status %" B_PRId32 " length %" B_PRIuSIZE "  pkt %p cin %x\n",
 		status, actual_len, pkt, pkt->cin));
 	release_sem(midiDevice->sem_send); /* done with buffer */
 }
@@ -561,8 +561,8 @@ usb_midi_read(driver_cookie* cookie, off_t position,
 	if (midiDevice == NULL || !midiDevice->active)
 		return B_ERROR;	/* already unplugged */
 
-	DPRINTF_DEBUG((MY_ID "usb_midi_read: (%ld byte buffer at %lld cookie %p)"
-		"\n", *num_bytes, position, cookie));
+	DPRINTF_DEBUG((MY_ID "usb_midi_read: (%" B_PRIuSIZE " byte buffer at %"
+		B_PRIdOFF " cookie %p)\n", *num_bytes, position, cookie));
 	while (midiDevice && midiDevice->active) {
 		ZDPRINTF_DEBUG((MY_ID "waiting on acquire_sem_etc\n"));
 		err = acquire_sem_etc(cookie->sem_cb, 1,
@@ -633,8 +633,8 @@ usb_midi_write(driver_cookie* cookie, off_t position,
 	buff_lim = midiDevice->outMaxPkt * 3 / 4;
 		/* max MIDI bytes buffer space */
 
-	DPRINTF_DEBUG((MY_ID "MIDI write (%ld bytes at %lld)\n",
-		*num_bytes, position));
+	DPRINTF_DEBUG((MY_ID "MIDI write (%" B_PRIuSIZE " bytes at %" B_PRIdOFF
+		")\n", *num_bytes, position));
 	if (*num_bytes > 3 && midicode != 0xF0) {
 		DPRINTF_ERR((MY_ID "Non-SysEx packet of %ld bytes"
 			" -- too big to handle\n", *num_bytes));

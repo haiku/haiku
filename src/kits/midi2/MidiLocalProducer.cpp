@@ -41,7 +41,7 @@ void
 BMidiLocalProducer::Connected(BMidiConsumer* cons)
 {
 	ASSERT(cons != NULL)
-	TRACE(("Connected() %ld to %ld", ID(), cons->ID()))
+	TRACE(("Connected() %" B_PRId32 " to %" B_PRId32 "", ID(), cons->ID()))
 
 	// Do nothing.
 }
@@ -51,7 +51,7 @@ void
 BMidiLocalProducer::Disconnected(BMidiConsumer* cons)
 {
 	ASSERT(cons != NULL)
-	TRACE(("Disconnected() %ld from %ld", ID(), cons->ID()))
+	TRACE(("Disconnected() %" B_PRId32 " from %" B_PRId32 "", ID(), cons->ID()))
 
 	// Do nothing.
 }

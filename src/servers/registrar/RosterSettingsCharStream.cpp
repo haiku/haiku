@@ -295,7 +295,7 @@ RosterSettingsCharStream::GetString(char *result)
 	// NULL terminate regardless
 	result[resultPos] = '\0';
 
-	D(PRINT("error == 0x%lx, result == '%s'\n", error, result));
+	D(PRINT("error == 0x%" B_PRIx32 ", result == '%s'\n", error, result));
 
 	return error;
 }

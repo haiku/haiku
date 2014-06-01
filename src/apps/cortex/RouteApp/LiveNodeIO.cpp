@@ -119,7 +119,7 @@ status_t LiveNodeIO::getNode(
 			outNode);
 		if(err < B_OK) {
 			PRINT((
-				"!!! No node found named '%s' with kinds %Ld\n",
+				"!!! No node found named '%s' with kinds %" B_PRId64 "\n",
 				name(),
 				kind()));
 			return B_NAME_NOT_FOUND;

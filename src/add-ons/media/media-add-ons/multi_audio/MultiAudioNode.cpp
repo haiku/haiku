@@ -351,8 +351,9 @@ MultiAudioNode::NodeRegistered()
 				&& ( fDevice->Description().channels[i].designations & B_CHANNEL_LEFT ||
 					!(fDevice->Description().channels[i].designations & B_CHANNEL_SURROUND_BUS)))
 			) {
-			PRINT(("NodeRegistered() : creating an input for %li\n", i));
-			PRINT(("%ld\t%d\t0x%lx\t0x%lx\n",
+			PRINT(("NodeRegistered() : creating an input for %" B_PRIi32 "\n",
+				i));
+			PRINT(("%" B_PRId32 "\t%d\t0x%" B_PRIx32 "\t0x%" B_PRIx32 "\n",
 				fDevice->Description().channels[i].channel_id,
 				fDevice->Description().channels[i].kind,
 				fDevice->Description().channels[i].designations,
@@ -401,11 +402,13 @@ MultiAudioNode::NodeRegistered()
 				&& ( fDevice->Description().channels[i].designations & B_CHANNEL_LEFT ||
 					!(fDevice->Description().channels[i].designations & B_CHANNEL_SURROUND_BUS)))
 			) {
-			PRINT(("NodeRegistered() : creating an output for %li\n", i));
-			PRINT(("%ld\t%d\t0x%lx\t0x%lx\n",fDevice->Description().channels[i].channel_id,
-											fDevice->Description().channels[i].kind,
-											fDevice->Description().channels[i].designations,
-											fDevice->Description().channels[i].connectors));
+			PRINT(("NodeRegistered() : creating an output for %" B_PRIi32 "\n",
+				i));
+			PRINT(("%" B_PRId32 "\t%d\t0x%" B_PRIx32 "\t0x%" B_PRIx32 "\n",
+				fDevice->Description().channels[i].channel_id,
+				fDevice->Description().channels[i].kind,
+				fDevice->Description().channels[i].designations,
+				fDevice->Description().channels[i].connectors));
 
 			media_output *output = new media_output;
 
@@ -456,7 +459,8 @@ MultiAudioNode::NodeRegistered()
 		index++;
 	}
 
-	PRINT(("apply configuration in : %Ld\n", system_time() - start));
+	PRINT(("apply configuration in : %" B_PRIdBIGTIME "\n",
+		system_time() - start));
 }
 
 
@@ -569,7 +573,8 @@ MultiAudioNode::GetNextInput(int32* cookie, media_input* _input)
 	node_input *channel = (node_input *)fInputs.ItemAt(*cookie);
 	*_input = channel->fInput;
 	*cookie += 1;
-	PRINT(("input.format : %lu\n", channel->fInput.format.u.raw_audio.format));
+	PRINT(("input.format : %" B_PRIu32 "\n",
+		channel->fInput.format.u.raw_audio.format));
 	return B_OK;
 }
 
@@ -976,10 +981,11 @@ MultiAudioNode::Connect(status_t error, const media_source& source,
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(channel->fOutput.destination, &fLatency, &id);
-	PRINT(("\tdownstream latency = %Ld\n", fLatency));
+	PRINT(("\tdownstream latency = %" B_PRIdBIGTIME "\n", fLatency));
 
 	fInternalLatency = BufferDuration();
-	PRINT(("\tbuffer-filling took %Ld usec on this machine\n", fInternalLatency));
+	PRINT(("\tbuffer-filling took %" B_PRIdBIGTIME " usec on this machine\n",
+		fInternalLatency));
 	//SetEventLatency(fLatency + fInternalLatency);
 
 	// Set up the buffer group for our connection, as long as nobody handed us
@@ -1167,7 +1173,9 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 		// TODO: This seems like a very fragile mechanism to wait until
 		// the previous buffer for this channel has been processed...
 		if (channel->fBuffer != NULL) {
-			PRINT(("MultiAudioNode::HandleBuffer snoozing recycling channelId : %li, how_early:%Ld\n", channel->fChannelId, howEarly));
+			PRINT(("MultiAudioNode::HandleBuffer snoozing recycling channelId : %"
+					B_PRIi32 ", how_early:%" B_PRIdBIGTIME "\n",
+				channel->fChannelId, howEarly));
 			//channel->fBuffer->Recycle();
 			snooze(100);
 			if (channel->fBuffer != NULL)
@@ -1188,7 +1196,8 @@ MultiAudioNode::_HandleDataStatus(const media_timed_event* event,
 	bigtime_t lateness, bool realTimeEvent)
 {
 	//CALLED();
-	PRINT(("MultiAudioNode::HandleDataStatus status:%li, lateness:%Li\n", event->data, lateness));
+	PRINT(("MultiAudioNode::HandleDataStatus status:%" B_PRIi32
+			", lateness:%" B_PRIiBIGTIME "\n", event->data, lateness));
 	switch (event->data) {
 		case B_DATA_NOT_AVAILABLE:
 			break;
@@ -1219,7 +1228,8 @@ MultiAudioNode::_HandleSeek(const media_timed_event* event, bigtime_t lateness,
 	bool realTimeEvent)
 {
 	CALLED();
-	PRINT(("MultiAudioNode::HandleSeek(t=%lld,d=%li,bd=%lld)\n",
+	PRINT(("MultiAudioNode::HandleSeek(t=%" B_PRIdBIGTIME ",d=%" B_PRIi32
+			",bd=%" B_PRId64 ")\n",
 		event->event_time,event->data,event->bigdata));
 	return B_OK;
 }
@@ -1324,7 +1334,7 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 {
 	CALLED();
 
-	PRINT(("id : %li\n", id));
+	PRINT(("id : %" B_PRIi32 "\n", id));
 	BParameter* parameter = NULL;
 	for (int32 i = 0; i < fWeb->CountParameters(); i++) {
 		parameter = fWeb->ParameterAt(i);
@@ -1335,7 +1345,7 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 	if (parameter == NULL) {
 		// Hmmm, we were asked for a parameter that we don't actually
 		// support.  Report an error back to the caller.
-		PRINT(("\terror - asked for illegal parameter %ld\n", id));
+		PRINT(("\terror - asked for illegal parameter %" B_PRId32 "\n", id));
 		return B_ERROR;
 	}
 
@@ -1394,7 +1404,8 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 				}
 
 				for (uint32 i = 0; i < *size / sizeof(float); i++) {
-					PRINT(("GetParameterValue B_CONTINUOUS_PARAMETER value[%li] : %f\n", i, ((float*)value)[i]));
+					PRINT(("GetParameterValue B_CONTINUOUS_PARAMETER value[%"
+							B_PRIi32 "] : %f\n", i, ((float*)value)[i]));
 				}
 			} else if (parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
 				BDiscreteParameter* discrete = (BDiscreteParameter*)parameter;
@@ -1406,7 +1417,8 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
 				*size = sizeof(int32);
 
 				for (uint32 i = 0; i < *size / sizeof(int32); i++) {
-					PRINT(("GetParameterValue B_DISCRETE_PARAMETER value[%li] : %li\n", i, ((int32*)value)[i]));
+					PRINT(("GetParameterValue B_DISCRETE_PARAMETER value[%" B_PRIi32
+							"] : %" B_PRIi32 "\n", i, ((int32*)value)[i]));
 				}
 			}
 		}
@@ -1420,7 +1432,8 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 	const void* value, size_t size)
 {
 	CALLED();
-	PRINT(("id : %li, performance_time : %lld, size : %li\n", id, performanceTime, size));
+	PRINT(("id : %" B_PRIi32 ", performance_time : %" B_PRIdBIGTIME
+			", size : %" B_PRIuSIZE "\n", id, performanceTime, size));
 
 	BParameter* parameter = NULL;
 	for (int32 i = 0; i < fWeb->CountParameters(); i++) {
@@ -1547,7 +1560,8 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 
 	if (parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
 		for (uint32 i = 0; i < size / sizeof(float); i++) {
-			PRINT(("SetParameterValue B_CONTINUOUS_PARAMETER value[%li] : %f\n", i, ((float*)value)[i]));
+			PRINT(("SetParameterValue B_CONTINUOUS_PARAMETER value[%" B_PRIi32
+					"] : %f\n", i, ((float*)value)[i]));
 		}
 		info.item_count = 1;
 		values[0].id = control_id;
@@ -1560,7 +1574,8 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
 		}
 	} else if (parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
 		for (uint32 i = 0; i < size / sizeof(int32); i++) {
-			PRINT(("SetParameterValue B_DISCRETE_PARAMETER value[%li] : %li\n", i, ((int32*)value)[i]));
+			PRINT(("SetParameterValue B_DISCRETE_PARAMETER value[%" B_PRIi32
+					"] : %" B_PRIi32 "\n", i, ((int32*)value)[i]));
 		}
 
 		BDiscreteParameter* discrete = (BDiscreteParameter*)parameter;
@@ -1589,7 +1604,7 @@ MultiAudioNode::MakeParameterWeb()
 	CALLED();
 	BParameterWeb* web = new BParameterWeb;
 
-	PRINT(("MixControlInfo().control_count : %li\n",
+	PRINT(("MixControlInfo().control_count : %" B_PRIi32 "\n",
 		fDevice->MixControlInfo().control_count));
 
 	BParameterGroup* generalGroup = web->MakeGroup(B_TRANSLATE("General"));
@@ -1680,7 +1695,7 @@ MultiAudioNode::_ProcessGroup(BParameterGroup* group, int32 index,
 				i++;
 			}
 
-			PRINT(("num parameters : %ld\n", numParameters));
+			PRINT(("num parameters : %" B_PRId32 "\n", numParameters));
 			if (numParameters > 0) {
 				(group->ParameterAt(numParameters - 1))->AddOutput(
 					group->ParameterAt(numParameters));
@@ -1826,12 +1841,12 @@ MultiAudioNode::_OutputThread()
 			}
 		}
 
-		PRINT(("MultiAudioNode::RunThread: recorded_real_time : %Ld\n",
-			bufferInfo.recorded_real_time));
-		PRINT(("MultiAudioNode::RunThread: recorded_frames_count : %Ld\n",
-			bufferInfo.recorded_frames_count));
-		PRINT(("MultiAudioNode::RunThread: record_buffer_cycle : %li\n",
-			bufferInfo.record_buffer_cycle));
+		PRINT(("MultiAudioNode::RunThread: recorded_real_time : %" B_PRIdBIGTIME
+				"\n", bufferInfo.recorded_real_time));
+		PRINT(("MultiAudioNode::RunThread: recorded_frames_count : %"
+				B_PRId64 "\n", bufferInfo.recorded_frames_count));
+		PRINT(("MultiAudioNode::RunThread: record_buffer_cycle : %" B_PRIi32
+				"\n", bufferInfo.record_buffer_cycle));
 
 		for (int32 i = 0; i < fOutputs.CountItems(); i++) {
 			node_output* output = (node_output*)fOutputs.ItemAt(i);
@@ -2073,9 +2088,10 @@ MultiAudioNode::_AllocateBuffers(node_output &channel)
 	size_t size = channel.fOutput.format.u.raw_audio.buffer_size;
 	int32 count = int32(fLatency / BufferDuration() + 1 + 1);
 
-	PRINT(("\tlatency = %Ld, buffer duration = %Ld\n", fLatency,
-		BufferDuration()));
-	PRINT(("\tcreating group of %ld buffers, size = %lu\n", count, size));
+	PRINT(("\tlatency = %" B_PRIdBIGTIME ", buffer duration = %" B_PRIdBIGTIME
+			"\n", fLatency, BufferDuration()));
+	PRINT(("\tcreating group of %" B_PRId32 " buffers, size = %" B_PRIuSIZE
+			"\n", count, size));
 	channel.fBufferGroup = new BBufferGroup(size, count);
 }
 
@@ -2183,7 +2199,7 @@ MultiAudioNode::GetConfigurationFor(BMessage* message)
 			&& parameter->Type() != BParameter::B_DISCRETE_PARAMETER)
 			continue;
 
-		PRINT(("getting parameter %li\n", parameter->ID()));
+		PRINT(("getting parameter %" B_PRIi32 "\n", parameter->ID()));
 		size_t size = bufferSize;
 		while ((err = GetParameterValue(parameter->ID(), &lastChange, buffer,
 				&size)) == B_NO_MEMORY && bufferSize < 128 * 1024) {
@@ -2384,7 +2400,7 @@ MultiAudioNode::_UpdateInternalLatency(const media_format& format)
 			* format.u.raw_audio.channel_count)
 		/ ((int32)(format.u.raw_audio.frame_rate / 100));
 
-	PRINT(("  internal latency = %lld\n",fInternalLatency));
+	PRINT(("  internal latency = %" B_PRIdBIGTIME "\n", fInternalLatency));
 
 	SetEventLatency(fInternalLatency);
 }

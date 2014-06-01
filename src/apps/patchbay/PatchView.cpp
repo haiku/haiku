@@ -212,8 +212,8 @@ PatchView::HandleMidiEvent(BMessage* msg)
 				break;
 			}
 			
-			PRINT(("MIDI Roster Event B_MIDI_REGISTERED: id=%ld, type=%s\n",
-				id, type));
+			PRINT(("MIDI Roster Event B_MIDI_REGISTERED: id=%" B_PRId32
+					", type=%s\n", id, type));
 			if (strcmp(type, "producer") == 0)
 				AddProducer(id);
 			else if (strcmp(type, "consumer") == 0)
@@ -236,8 +236,8 @@ PatchView::HandleMidiEvent(BMessage* msg)
 				break;
 			}
 			
-			PRINT(("MIDI Roster Event B_MIDI_UNREGISTERED: id=%ld, type=%s\n",
-				id, type));
+			PRINT(("MIDI Roster Event B_MIDI_UNREGISTERED: id=%" B_PRId32
+					", type=%s\n", id, type));
 			if (strcmp(type, "producer") == 0)
 				RemoveProducer(id);
 			else if (strcmp(type, "consumer") == 0)
@@ -267,8 +267,8 @@ PatchView::HandleMidiEvent(BMessage* msg)
 				break;
 			}
 			
-			PRINT(("MIDI Roster Event B_MIDI_CHANGED_PROPERTIES: id=%ld, type=%s\n",
-				id, type));
+			PRINT(("MIDI Roster Event B_MIDI_CHANGED_PROPERTIES: id=%" B_PRId32
+					", type=%s\n", id, type));
 			if (strcmp(type, "producer") == 0)
 				UpdateProducerProps(id, &props);
 			else if (strcmp(type, "consumer") == 0)
@@ -295,8 +295,8 @@ PatchView::HandleMidiEvent(BMessage* msg)
 					" field not found in B_MIDI_CONNECTED\n"));
 				break;
 			}
-			PRINT(("MIDI Roster Event B_MIDI_CONNECTED: producer=%ld, consumer=%ld\n",
-				prod, cons));
+			PRINT(("MIDI Roster Event B_MIDI_CONNECTED: producer=%" B_PRId32
+					", consumer=%" B_PRId32 "\n", prod, cons));
 			Connect(prod, cons);
 		}
 		break;
@@ -315,13 +315,14 @@ PatchView::HandleMidiEvent(BMessage* msg)
 					" field not found in B_MIDI_DISCONNECTED\n"));
 				break;
 			}
-			PRINT(("MIDI Roster Event B_MIDI_DISCONNECTED: producer=%ld, consumer=%ld\n",
-				prod, cons));
+			PRINT(("MIDI Roster Event B_MIDI_DISCONNECTED: producer=%" B_PRId32
+					", consumer=%" B_PRId32 "\n", prod, cons));
 			Disconnect(prod, cons);
 		}
 		break;
 	default:
-		PRINT(("PatchView::HandleMidiEvent: unknown opcode %ld\n", op));
+		PRINT(("PatchView::HandleMidiEvent: unknown opcode %" B_PRId32 "\n",
+			op));
 		break;
 	}
 }

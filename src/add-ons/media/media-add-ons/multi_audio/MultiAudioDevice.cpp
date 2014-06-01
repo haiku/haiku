@@ -143,7 +143,8 @@ MultiAudioDevice::_InitDriver()
 
 	PRINT(("Friendly name:\t%s\nVendor:\t\t%s\n",
 		fDescription.friendly_name, fDescription.vendor_info));
-	PRINT(("%ld outputs\t%ld inputs\n%ld out busses\t%ld in busses\n",
+	PRINT(("%" B_PRId32 " outputs\t%" B_PRId32 " inputs\n%" B_PRId32
+			" out busses\t%" B_PRId32 " in busses\n",
 		fDescription.output_channel_count, fDescription.input_channel_count,
 		fDescription.output_bus_channel_count,
 		fDescription.input_bus_channel_count));
@@ -152,22 +153,23 @@ MultiAudioDevice::_InitDriver()
 
 	for (int32 i = 0; i < fDescription.output_channel_count
 			+ fDescription.input_channel_count; i++) {
-		PRINT(("%ld\t%d\t0x%lx\t0x%lx\n", fDescription.channels[i].channel_id,
+		PRINT(("%" B_PRId32 "\t%d\t0x%" B_PRIx32 "\t0x%" B_PRIx32 "\n",
+			fDescription.channels[i].channel_id,
 			fDescription.channels[i].kind,
 			fDescription.channels[i].designations,
 			fDescription.channels[i].connectors));
 	}
 	PRINT(("\n"));
 
-	PRINT(("Output rates\t\t0x%lx\n", fDescription.output_rates));
-	PRINT(("Input rates\t\t0x%lx\n", fDescription.input_rates));
+	PRINT(("Output rates\t\t0x%" B_PRIx32 "\n", fDescription.output_rates));
+	PRINT(("Input rates\t\t0x%" B_PRIx32 "\n", fDescription.input_rates));
 	PRINT(("Max CVSR\t\t%.0f\n", fDescription.max_cvsr_rate));
 	PRINT(("Min CVSR\t\t%.0f\n", fDescription.min_cvsr_rate));
-	PRINT(("Output formats\t\t0x%lx\n", fDescription.output_formats));
-	PRINT(("Input formats\t\t0x%lx\n", fDescription.input_formats));
-	PRINT(("Lock sources\t\t0x%lx\n", fDescription.lock_sources));
-	PRINT(("Timecode sources\t0x%lx\n", fDescription.timecode_sources));
-	PRINT(("Interface flags\t\t0x%lx\n", fDescription.interface_flags));
+	PRINT(("Output formats\t\t0x%" B_PRIx32 "\n", fDescription.output_formats));
+	PRINT(("Input formats\t\t0x%" B_PRIx32 "\n", fDescription.input_formats));
+	PRINT(("Lock sources\t\t0x%" B_PRIx32 "\n", fDescription.lock_sources));
+	PRINT(("Timecode sources\t0x%" B_PRIx32 "\n", fDescription.timecode_sources));
+	PRINT(("Interface flags\t\t0x%" B_PRIx32 "\n", fDescription.interface_flags));
 	PRINT(("Control panel string:\t\t%s\n", fDescription.control_panel));
 	PRINT(("\n"));
 
@@ -271,18 +273,22 @@ MultiAudioDevice::_GetBuffers()
 
 	for (int32 i = 0; i < fBufferList.return_playback_buffers; i++) {
 		for (int32 j = 0; j < fBufferList.return_playback_channels; j++) {
-			PRINT(("fBufferList.playback_buffers[%ld][%ld].base: %p\n",
+			PRINT(("fBufferList.playback_buffers[%" B_PRId32 "][%" B_PRId32
+					"].base: %p\n",
 				i, j, fBufferList.playback_buffers[i][j].base));
-			PRINT(("fBufferList.playback_buffers[%ld][%ld].stride: %li\n",
+			PRINT(("fBufferList.playback_buffers[%" B_PRId32 "][%" B_PRId32
+					"].stride: %li\n",
 				i, j, fBufferList.playback_buffers[i][j].stride));
 		}
 	}
 
 	for (int32 i = 0; i < fBufferList.return_record_buffers; i++) {
 		for (int32 j = 0; j < fBufferList.return_record_channels; j++) {
-			PRINT(("fBufferList.record_buffers[%ld][%ld].base: %p\n",
+			PRINT(("fBufferList.record_buffers[%" B_PRId32 "][%" B_PRId32
+					"].base: %p\n",
 				i, j, fBufferList.record_buffers[i][j].base));
-			PRINT(("fBufferList.record_buffers[%ld][%ld].stride: %li\n",
+			PRINT(("fBufferList.record_buffers[%" B_PRId32 "][%" B_PRId32
+					"].stride: %li\n",
 				i, j, fBufferList.record_buffers[i][j].stride));
 		}
 	}

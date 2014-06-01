@@ -751,8 +751,9 @@ MessageRunnerManager::_ScheduleEvent(RunnerInfo *info)
 		info->event->SetTime(info->time);
 		scheduled = fEventQueue->AddEvent(info->event);
 
-PRINT("runner %ld (%lld, %ld) rescheduled: %d, time: %lld, now: %lld\n",
-info->token, info->interval, info->count, scheduled, info->time, system_time());
+PRINT("runner %" B_PRId32 " (%" B_PRId64 ", %" B_PRId32 ") rescheduled: %d, "
+"time: %" B_PRId64 ", now: %" B_PRId64 "\n", info->token, info->interval,
+info->count, scheduled, info->time, system_time());
 	}
 	return scheduled;
 }

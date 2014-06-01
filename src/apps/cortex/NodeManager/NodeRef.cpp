@@ -356,7 +356,7 @@ bigtime_t NodeRef::calculateRecordingModeDelay() {
 		node(), &latency);
 
 	PRINT((
-		"  %Ld\n", latency));
+		"  %" B_PRIdBIGTIME "\n", latency));
 	
 	return latency; // +++++ stab in the dark 28sep99
 //	return maxBufferDur + latency;
@@ -669,7 +669,7 @@ status_t NodeRef::releaseNode() {
 		
 		if(err < B_OK) {
 			PRINT((
-				"!!! ReleaseNode(%ld) failed:\n"
+				"!!! ReleaseNode(%" B_PRId32 ") failed:\n"
 				"    %s\n",
 				m_info.node.node,
 				strerror(err)));
@@ -683,7 +683,8 @@ status_t NodeRef::releaseNode() {
 			err = AddOnHost::ReleaseInternalNode(m_info);
 			if(err < B_OK) {
 				PRINT((
-					"!!! AddOnHost::ReleaseInternalNode(%ld) failed:\n"
+					"!!! AddOnHost::ReleaseInternalNode(%" B_PRId32
+						") failed:\n"
 					"    %s\n",
 					m_info.node.node,
 					strerror(err)));
@@ -1498,7 +1499,8 @@ NodeRef::NodeRef(
 
 	if(err < B_OK) {
 		PRINT((
-			"!!! NodeRef(): BMediaRoster::GetLiveNodeInfo(%ld) failed:\n"
+			"!!! NodeRef(): BMediaRoster::GetLiveNodeInfo(%" B_PRId32
+				") failed:\n"
 			"    %s\n",
 			node.node,
 			strerror(err)));
@@ -1669,7 +1671,7 @@ status_t NodeRef::_setTimeSource(
 		
 	if(err < B_OK) {
 		PRINT((
-			"* NodeRef('%s')::_setTimeSource(%ld):\n"
+			"* NodeRef('%s')::_setTimeSource(%" B_PRId32 "):\n"
 			"  SetTimeSourceFor() failed: %s\n",
 			name(), timeSourceID, strerror(err)));
 	}
@@ -1709,7 +1711,8 @@ status_t NodeRef::_setRunMode(
 			node(), delay, m);
 		if(err < B_OK) {
 			PRINT((
-				"NodeRef('%s')::_setRunMode(): SetProducerRunModeDelay(%Ld) failed: %s\n",
+				"NodeRef('%s')::_setRunMode(): SetProducerRunModeDelay(%"
+					B_PRIdBIGTIME ") failed: %s\n",
 				name(), delay, strerror(err)));
 		}
 	} else {
@@ -1773,7 +1776,8 @@ status_t NodeRef::_preroll(
 
 		if(err < B_OK) {
 			PRINT((
-				"*** NodeRef('%s')::_preroll(%Ld): BMediaRoster::SeekNode():\n"
+				"*** NodeRef('%s')::_preroll(%" B_PRIdBIGTIME
+					"): BMediaRoster::SeekNode():\n"
 				"    %s\n",
 				name(), position, strerror(err)));
 			return err;
@@ -1788,7 +1792,8 @@ status_t NodeRef::_preroll(
 	
 	if(err < B_OK) {
 		PRINT((
-			"*** NodeRef('%s')::_preroll(%Ld): BMediaRoster::PrerollNode():\n"
+			"*** NodeRef('%s')::_preroll(%" B_PRIdBIGTIME
+				"): BMediaRoster::PrerollNode():\n"
 			"    %s\n",
 			name(), position, strerror(err)));
 		return err;
@@ -1811,7 +1816,7 @@ status_t NodeRef::_seek(
 	assert_locked(this);
 	
 	D_METHOD((
-		"NodeRef('%s')::_seek(to %Ld, at %Ld)\n",
+		"NodeRef('%s')::_seek(to %" B_PRIdBIGTIME ", at %" B_PRIdBIGTIME ")\n",
 		name(), position, when));
 	
 	if(m_flags & NO_SEEK)
@@ -1828,7 +1833,8 @@ status_t NodeRef::_seek(
 
 	if(err < B_OK) {
 		PRINT((
-			"*** NodeRef('%s')::_seek(to %Ld, at %Ld): BMediaRoster::SeekNode():\n"
+			"*** NodeRef('%s')::_seek(to %" B_PRIdBIGTIME ", at %"
+				B_PRIdBIGTIME "): BMediaRoster::SeekNode():\n"
 			"    %s\n",
 			name(), position, when, strerror(err)));
 		return err;
@@ -1900,7 +1906,7 @@ status_t NodeRef::_start(
 		
 	if(err < B_OK) {
 		PRINT((
-			"  * StartNode(%ld) failed: '%s'\n",
+			"  * StartNode(%" B_PRId32 ") failed: '%s'\n",
 			id(), strerror(err)));
 		return err;
 	}
@@ -1984,7 +1990,7 @@ status_t NodeRef::_roll(
 		m_group->m_transportState == NodeGroup::TRANSPORT_RUNNING ||
 		m_group->m_transportState == NodeGroup::TRANSPORT_STARTING);
 
-	D_ROSTER(("# roster->RollNode(%ld)\n", id()));
+	D_ROSTER(("# roster->RollNode(%" B_PRId32 ")\n", id()));
 	if(m_flags & NO_SEEK)
 		err = BMediaRoster::Roster()->RollNode(
 			node(),	start, stop);
@@ -1994,8 +2000,9 @@ status_t NodeRef::_roll(
 		
 	if(err < B_OK) {
 		PRINT((
-			"NodeRef('%s')::_roll(%Ld to %Ld, from %Ld)\n"
-			"!!! BMediaRoster::RollNode(%ld) failed: '%s'\n",
+			"NodeRef('%s')::_roll(%" B_PRIdBIGTIME " to %" B_PRIdBIGTIME
+				", from %" B_PRIdBIGTIME ")\n"
+			"!!! BMediaRoster::RollNode(%" B_PRId32 ") failed: '%s'\n",
 			name(), start, stop, position, id(), strerror(err)));
 		return err;
 	}

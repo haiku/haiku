@@ -81,7 +81,7 @@ status_t ObservableHandler::release() {
 ObservableHandler::~ObservableHandler() {
 	if(CountTargets()) {
 		PRINT((
-			"*** ~ObservableHandler() '%s': %ld observers remain\n",
+			"*** ~ObservableHandler() '%s': %" B_PRId32 " observers remain\n",
 			Name(), CountTargets()));
 	}
 }

@@ -743,7 +743,7 @@ void NodeGroup::MessageReceived(
 					runMode > BMediaNode::B_RECORDING) {
 					PRINT((
 						"* NodeGroup::MessageReceived(M_SET_RUN_MODE):\n"
-						"  invalid run mode (%ld)\n", runMode));
+						"  invalid run mode (%" B_PRIu32 ")\n", runMode));
 					break;
 				}
 				
@@ -1180,7 +1180,7 @@ status_t NodeGroup::_start() {
 
 	offset += s_rosterLatency;
 	PRINT((
-		"- offset: %Ld\n", offset));	
+		"- offset: %" B_PRIdBIGTIME "\n", offset));
 	
 	// * Seek all nodes (in case one or more failed to preroll)
 
@@ -1190,7 +1190,7 @@ status_t NodeGroup::_start() {
 		if(err < B_OK) {
 			PRINT((
 				"! NodeGroup('%s')::_start():\n"
-				"  ref('%s')->_seekStopped(%Ld) failed:\n"
+				"  ref('%s')->_seekStopped(%" B_PRIdBIGTIME ") failed:\n"
 				"  %s\n",
 				name(), (*it)->name(), m_startPosition,
 				strerror(err)));
@@ -1217,7 +1217,7 @@ status_t NodeGroup::_start() {
 		if(err < B_OK) {
 			PRINT((
 				"! NodeGroup('%s')::_start():\n"
-				"  ref('%s')->_start(%Ld) failed:\n"
+				"  ref('%s')->_start(%" B_PRIdBIGTIME ") failed:\n"
 				"  %s\n",
 				name(), (*it)->name(), when,
 				strerror(err)));
@@ -1306,7 +1306,7 @@ status_t NodeGroup::_roll() {
 
 		offset += s_rosterLatency;
 		PRINT((
-			"- offset: %Ld\n", offset));	
+			"- offset: %" B_PRIdBIGTIME "\n", offset));
 
 		ASSERT(m_timeSourceObj);
 		tpStart = m_timeSourceObj->Now() + offset;
@@ -1605,7 +1605,7 @@ void NodeGroup::_cycleThread() {
 			// +++++ adjust to compensate !!!
 			PRINT((
 				"*** NodeGroup::_cycleThread(): LATE\n"
-				"    by %Ld\n", -timeout));
+				"    by %" B_PRIdBIGTIME "\n", -timeout));
 		}
 		
 		// +++++ if timeout is very short, spin until the target time arrives
@@ -1658,7 +1658,8 @@ void NodeGroup::_cycleThread() {
 				
 			default:
 				PRINT((
-					"* NodeGroup::_cycleThread(): unknown message code '%ld'\n", code));
+					"* NodeGroup::_cycleThread(): unknown message code '%"
+						B_PRId32 "'\n", code));
 				break;
 		}
 	} // while(!done)

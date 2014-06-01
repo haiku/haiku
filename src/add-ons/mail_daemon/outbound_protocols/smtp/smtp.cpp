@@ -1025,14 +1025,14 @@ SMTPProtocol::SendCommand(const char *cmd)
 		int32 len = ReceiveResponse(fLog);
 
 		if (len <= 0) {
-			D(bug("SMTP: len == %ld\n", len));
+			D(bug("SMTP: len == %" B_PRId32 "\n", len));
 			return B_ERROR;
 		}
 
 		if (fLog.Length() > 4 && (fLog[3] == ' ' || fLog[3] == '-'))
 		{
 			int32 num = atol(fLog.String());
-			D(bug("ReplyNumber: %ld\n", num));
+			D(bug("ReplyNumber: %" B_PRId32 "\n", num));
 			if (num >= 500)
 				return B_ERROR;
 

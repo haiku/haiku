@@ -161,8 +161,8 @@ status_t __CORTEX_NAMESPACE__ _get_node_signature(
 	status_t err = manager->getNodeRef(node, &ref);
 	if(err < B_OK) {
 		PRINT((
-			"!!! ConnectionIO::_getNodeSignature(): node %ld not found\n",
-			node));
+			"!!! ConnectionIO::_getNodeSignature(): node %" B_PRId32
+			" not found\n", node));
 		return err;
 	}
 	
@@ -228,7 +228,7 @@ status_t __CORTEX_NAMESPACE__ _match_node_signature(
 		return err;
 	
 	for(int32 n = 0; n < count; ++n) {
-		PRINT(("# %ld\n", buffer[n].node.node));
+		PRINT(("# %" B_PRId32 "\n", buffer[n].node.node));
 		if((buffer[n].node.kind & kind) != kind) {
 			PRINT(("# - kind mismatch\n"));
 			continue;

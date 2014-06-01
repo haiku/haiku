@@ -334,7 +334,8 @@ Translate(	/*	required	*/
 		free(comment);
 	}
 	if (err < B_OK) {
-		dprintf(("read_ppm_header() error %s [%lx]\n", strerror(err), err));
+		dprintf(("read_ppm_header() error %s [%" B_PRIx32 "]\n", strerror(err),
+			err));
 		return err;
 	}
 	/* Check if we're configured to write ASCII format file. */
@@ -422,11 +423,11 @@ Translate(	/*	required	*/
 		hdr.dataSize = B_HOST_TO_BENDIAN_INT32(out_rowbytes*height);
 		dprintf(("rowBytes is %d, width %d, out_space %x, space %x\n", out_rowbytes, width, out_space, space));
 		err = outDestination->Write(&hdr, sizeof(hdr));
-		dprintf(("PPMTranslator: Write() returns %lx\n", err));
+		dprintf(("PPMTranslator: Write() returns %" B_PRIx32 "\n", err));
 #if DEBUG
 		{
 			BBitmap * map = new BBitmap(BRect(0,0,width-1,height-1), out_space);
-			printf("map rb = %ld\n", map->BytesPerRow());
+			printf("map rb = %" B_PRId32 "\n", map->BytesPerRow());
 			delete map;
 		}
 #endif

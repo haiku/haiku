@@ -603,11 +603,11 @@ BMidiRosterLooper::DumpEndpoints()
 		for (int32 t = 0; t < CountEndpoints(); ++t) {
 			BMidiEndpoint* endp = EndpointAt(t);
 
-			printf("\tendpoint %ld (%p):\n", t, endp);
+			printf("\tendpoint %" B_PRId32 " (%p):\n", t, endp);
 
 			printf(
-				"\t\tid %ld, name '%s', %s, %s, %s, %s, refcount %ld\n", 
-				endp->ID(), endp->Name(),
+				"\t\tid %" B_PRId32 ", name '%s', %s, %s, %s, %s, refcount %"
+				B_PRId32 "\n", endp->ID(), endp->Name(),
 				endp->IsConsumer() ? "consumer" : "producer", 
 				endp->IsRegistered() ? "registered" : "unregistered", 
 				endp->IsLocal() ? "local" : "remote", 
@@ -618,7 +618,7 @@ BMidiRosterLooper::DumpEndpoints()
 
 			if (endp->IsConsumer()) {
 				BMidiConsumer* cons = (BMidiConsumer*) endp;
-				printf("\t\tport %ld, latency %Ld\n", 
+				printf("\t\tport %" B_PRId32 ", latency %" B_PRIdBIGTIME "\n",
 						cons->fPort, cons->fLatency);
 			} else {
 				BMidiProducer* prod = (BMidiProducer*) endp;
@@ -626,7 +626,8 @@ BMidiRosterLooper::DumpEndpoints()
 					printf("\t\tconnections:\n");
 					for (int32 k = 0; k < prod->CountConsumers(); ++k) {
 						BMidiConsumer* cons = prod->ConsumerAt(k);
-						printf("\t\t\tid %ld (%p)\n", cons->ID(), cons);
+						printf("\t\t\tid %" B_PRId32 " (%p)\n", cons->ID(),
+							cons);
 					}
 					prod->UnlockProducer();
 				}

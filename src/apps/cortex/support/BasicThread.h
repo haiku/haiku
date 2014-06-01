@@ -115,7 +115,8 @@ public:					// operations
 		if(wait) {
 			status_t ret;
 			while(wait_for_thread(thread, &ret) == B_INTERRUPTED) {
-				PRINT(("stopping thread %ld: B_INTERRUPTED\n", thread));
+				PRINT(("stopping thread %" B_PRId32 ": B_INTERRUPTED\n",
+					thread));
 			}
 		}
 		
