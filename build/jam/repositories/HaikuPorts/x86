@@ -53,6 +53,8 @@ RemotePackageRepository HaikuPorts
 	git_svn-1.8.3.4-2
 	glu-9.0.0-3
 	glu_devel-9.0.0-3
+	gmp-6.0.0-1
+	gmp_devel-6.0.0-1
 	gperf-3.0.4-1
 	grep-2.14-5
 	groff-1.20.1-3
@@ -60,6 +62,7 @@ RemotePackageRepository HaikuPorts
 	gutenprint_devel-5.2.9-1
 	haikuwebkit-1.3.1-1
 	haikuwebkit_devel-1.3.1-1
+	help2man-1.44.1-1
 	htmldoc-1.8.27-3
 	icu-4.8.1.1-4
 	icu_devel-4.8.1.1-4
@@ -98,6 +101,8 @@ RemotePackageRepository HaikuPorts
 	libxml2_python-2.9.1-1
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
+	lz4-r117-1
+	lz4_devel-r117-1
 	m4-1.4.16-5
 	make-3.82-5
 	man-1.6g-3
@@ -115,17 +120,17 @@ RemotePackageRepository HaikuPorts
 	neon_devel-0.29.6-7
 	openjdk-1.7_2013_11_08-2
 	openssh-6.0p1-8
-	openssl-1.0.0j-5
-	openssl_devel-1.0.0j-5
+	openssl-1.0.0l-1
+	openssl_devel-1.0.0l-1
 	p7zip-9.20.1-4
 	pe-2.4.4_2014_05_29-1
-	perl-5.18.1-1
+	perl-5.18.2-2
 	pkgconfig-0.27.1-2
 	python-2.6.9-1
 	qrencode-3.3.0-1
 	qrencode_devel-3.3.0-1
-	readline-6.2-5
-	readline_devel-6.2-5
+	readline-6.3-2
+	readline_devel-6.3-2
 	ruby-1.9.1-2
 	ruby_devel-1.9.1-2
 	scons-2.2.0-2
@@ -133,15 +138,16 @@ RemotePackageRepository HaikuPorts
 	sharutils-4.14-1
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.4.1-1
-	sqlite_devel-3.8.4.1-1
+	sqlite-3.8.4.3-1
+	sqlite_devel-3.8.4.3-1
 	subversion-1.6.18-6
 	subversion_devel-1.6.18-6
 	tar-1.26-6
 	texinfo-4.13a-7
-	unrar-5.0.14-1
+	unrar-5.1.5-1
 	vision-0.9.7.r949-1
 	vim-7.4-1
+	wget-1.15-1
 	which-2.20-2
 	wpa_supplicant-2.0-3
 	xz_utils-5.0.4-1
@@ -227,6 +233,7 @@ RemotePackageRepository HaikuPorts
 	gettext
 	git
 	glu
+	gmp	
 	gperf
 	grep
 	groff
@@ -235,6 +242,7 @@ RemotePackageRepository HaikuPorts
 	icu
 	jam
 	jpeg
+	help2man
 	keymapswitcher
 	less
 	libedit
@@ -250,6 +258,7 @@ RemotePackageRepository HaikuPorts
 	libvpx
 	libxml2
 	libxslt
+	lz4	
 	m4
 	make
 	man
@@ -283,6 +292,7 @@ RemotePackageRepository HaikuPorts
 	unrar
 	vim
 	vision
+	wget
 	which
 	wpa_supplicant
 	yasm
