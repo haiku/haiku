@@ -34,7 +34,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	uname unchop unexpand unmount uniq unlink unzip unzipsfx
 	uptime urlwrapper useradd userdel
 	vdir version vmstat
-	waitfor watch wc wget whoami writembr@x86,x86_64 xres
+	waitfor watch wc whoami writembr@x86,x86_64 xres
 	yes
 	zdiff zforce zgrep zip zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ] ;

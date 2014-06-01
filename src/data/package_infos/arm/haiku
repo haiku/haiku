@@ -151,7 +151,6 @@ provides {
 	cmd:vdir
 	cmd:watch
 	cmd:wc
-	cmd:wget = 1.12
 	cmd:whoami
 	cmd:xres
 	cmd:yes
