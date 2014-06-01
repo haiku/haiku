@@ -6,9 +6,13 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	DEFINES += HAVE_TERMIOS_H=1 HAS_JUNK_EXTRA_FIELD_OPTION=1 ;
 }
 
+# avoid building host unzip with DEBUG, as that would pollute the build
+# with lots of unwanted output when unzip gets invoked.
+DEBUG = 0 ;
+
 USES_BE_API on <build>libunzip.a <build>unzip = true ;
 
-BuildPlatformStaticLibrary <build>libunzip.a : 
+BuildPlatformStaticLibrary <build>libunzip.a :
 	crc32.c
 	ttyio.c
 	crctab.c
