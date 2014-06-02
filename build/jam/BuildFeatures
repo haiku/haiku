@@ -385,6 +385,23 @@ if [ IsPackageAvailable qrencode_devel ] {
 }
 
 
+# tiff
+if [ IsPackageAvailable tiff_devel ] {
+	ExtractBuildFeatureArchives tiff :
+		file: base tiff
+			runtime: lib
+		file: devel tiff_devel
+			depends: base
+			library: $(developLibDir)/libtiff.so.3
+			headers: $(developHeadersDir) $(developHeadersDir)/tiff
+		;
+
+	EnableBuildFeatures tiff ;
+} else {
+	Echo "Tiff support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 
 # GPL add-ons
 if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {

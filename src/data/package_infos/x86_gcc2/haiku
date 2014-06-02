@@ -167,7 +167,6 @@ provides {
 	cmd:zipsplit
 	cmd:zmore
 	cmd:znew
-	lib:libtiff = 3.9.4 compat >= 3
 }
 
 requires {

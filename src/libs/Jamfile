@@ -21,7 +21,6 @@ SubInclude HAIKU_TOP src libs posix_error_mapper ;
 SubInclude HAIKU_TOP src libs print ;
 SubInclude HAIKU_TOP src libs stdc++ ;
 SubInclude HAIKU_TOP src libs termcap ;
-SubInclude HAIKU_TOP src libs tiff ;
 SubInclude HAIKU_TOP src libs udis86 ;
 SubInclude HAIKU_TOP src libs util ;
 

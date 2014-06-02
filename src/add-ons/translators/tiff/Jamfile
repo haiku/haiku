@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src add-ons translators tiff ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UseLibraryHeaders tiff ;
-
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 AddResources TIFFTranslator : TIFFTranslator.rdef ;
@@ -11,6 +9,8 @@ AddResources TIFFTranslator : TIFFTranslator.rdef ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		UseBuildFeatureHeaders tiff ;
+
 		Translator [ MultiArchDefaultGristFiles TIFFTranslator ] :
 			# [ FGristFiles $(tiff_files:S=$(SUFOBJ)) ]
 
@@ -19,11 +19,15 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			TIFFTranslator.cpp
 			TIFFView.cpp
 
-			: be libtiff.so translation 
+			: be translation 
 			[ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			[ BuildFeatureAttribute tiff : library ]
 			$(TARGET_LIBSUPC++) localestub
 			: true
 		;
+
+		Includes [ FGristFiles TIFFTranslator.cpp TIFFView.cpp ]
+			: [ BuildFeatureAttribute tiff : headers ] ;
 	}
 }
 

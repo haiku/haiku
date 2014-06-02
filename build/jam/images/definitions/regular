@@ -73,7 +73,6 @@ rule HaikuImageGetSystemLibs
 			libpackage.so
 			libscreensaver.so
 			libtextencoding.so libtracker.so libtranslation.so
-			libtiff.so
 		] ]
 		;
 }
