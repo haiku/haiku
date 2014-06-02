@@ -144,6 +144,9 @@ RemotePackageRepository HaikuPorts
 	subversion_devel-1.6.18-6
 	tar-1.26-6
 	texinfo-4.13a-7
+	tiff-3.9.6-1
+	tiff_devel-3.9.6-1
+	tiff_tools-3.9.6-1
 	unrar-5.1.5-1
 	vision-0.9.7.r949-1
 	vim-7.4-1
@@ -289,6 +292,7 @@ RemotePackageRepository HaikuPorts
 	tar
 	texi2html
 	texinfo
+	tiff
 	unrar
 	vim
 	vision

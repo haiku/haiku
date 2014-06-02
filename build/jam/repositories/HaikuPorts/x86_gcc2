@@ -207,6 +207,9 @@ RemotePackageRepository HaikuPorts
 	taglib_devel-1.7.2-1
 	tar-1.26-6
 	texinfo-4.13a-7
+	tiff-3.9.6-1
+	tiff_devel-3.9.6-1
+	tiff_tools-3.9.6-1
 	ubertuber-0.9.10-1
 	unrar-5.1.5-1
 	vim-7.4-1
@@ -543,6 +546,7 @@ RemotePackageRepository HaikuPorts
 	tar
 	texi2html
 	texinfo
+	tiff
 	ubertuber
 	unrar
 	vcmi_x86
