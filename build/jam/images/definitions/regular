@@ -110,7 +110,7 @@ SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
 	}@ # x86
 ] ;
 
-SYSTEM_ADD_ONS_TRANSLATORS +=
+SYSTEM_ADD_ONS_TRANSLATORS += [ FFilterByBuildFeatures
 	BMPTranslator
 	EXRTranslator
 	GIFTranslator
@@ -120,9 +120,9 @@ SYSTEM_ADD_ONS_TRANSLATORS +=
 	PCXTranslator PNGTranslator PPMTranslator PSDTranslator
 	RAWTranslator RTFTranslator
 	SGITranslator
-	TGATranslator TIFFTranslator
+	TGATranslator TIFFTranslator@tiff
 	WebPTranslator WonderBrushTranslator
-;
+] ;
 
 SYSTEM_ADD_ONS_MEDIA += [ FFilterByBuildFeatures
 	cortex_audioadapter.media_addon	cortex_flanger.media_addon
