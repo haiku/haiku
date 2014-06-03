@@ -173,7 +173,7 @@ namespace CppUnit {
  * removed by specializing the CppUnit::assertion_traits.
  */
 #define CPPUNIT_ASSERT_EQUAL(expected,actual)                     \
-  ( ::CppUnit::TestAssert::assertEquals( (expected),              \
+  ( ::CppUnit::TestAssert::assertEquals<typeof(expected)>( (expected), \
                                          (actual),                \
                                          CPPUNIT_SOURCELINE() ) )
 
@@ -196,7 +196,7 @@ namespace CppUnit {
  * removed by specializing the CppUnit::assertion_traits.
  */
 #define CPPUNIT_ASSERT_EQUAL_MESSAGE(message,expected,actual)     \
-  ( ::CppUnit::TestAssert::assertEquals( (expected),              \
+  ( ::CppUnit::TestAssert::assertEquals<typeof(expected)>( (expected),  \
                                          (actual),                \
                                          CPPUNIT_SOURCELINE(),    \
                                          (message) ) )
