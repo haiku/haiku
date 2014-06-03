@@ -1,6 +1,9 @@
 SubDir HAIKU_TOP src tests kits net url ;
 
-Application url_test
-	: url_test.cpp
+UnitTestLib servicekittest.so :
+	ServiceKitTestAddon.cpp
+
+	UrlTest.cpp
+
 	: be $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) $(TARGET_LIBSTDC++)
 	;
