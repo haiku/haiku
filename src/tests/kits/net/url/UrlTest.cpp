@@ -28,8 +28,8 @@ UrlTest::~UrlTest()
 }
 
 
-// Test if rebuild url are the same length of parsed one
-void UrlTest::LengthTest()
+// Test that parsing a valid URL and converting back to string doesn't alter it
+void UrlTest::ParseTest()
 {
 	int8 testIndex;
 	BUrl testUrl;
@@ -52,9 +52,10 @@ void UrlTest::LengthTest()
 	for (testIndex = 0; kTestLength[testIndex] != NULL; testIndex++)
 	{
 		NextSubTest();
-		testUrl.SetUrlString(kTestLength[testIndex]);
 
-		CPPUNIT_ASSERT(strlen(kTestLength[testIndex]) == strlen(testUrl.UrlString()));
+		testUrl.SetUrlString(kTestLength[testIndex]);
+		CPPUNIT_ASSERT_EQUAL(BString(kTestLength[testIndex]),
+			testUrl.UrlString());
 	}
 }
 
@@ -97,23 +98,24 @@ void UrlTest::ExplodeImplodeTest()
 		NextSubTest();
 		testUrl.SetUrlString(kTestExplode[testIndex].url);
 
-		CPPUNIT_ASSERT(BString(kTestExplode[testIndex].url)
-			== BString(testUrl.UrlString()));
-		CPPUNIT_ASSERT(BString(kTestExplode[testIndex].expected.protocol)
-			== BString(testUrl.Protocol()));
-		CPPUNIT_ASSERT(BString(kTestExplode[testIndex].expected.userName)
-			== BString(testUrl.UserName()));
-		CPPUNIT_ASSERT(BString(kTestExplode[testIndex].expected.password)
-			== BString(testUrl.Password()));
-		CPPUNIT_ASSERT(BString(kTestExplode[testIndex].expected.host)
-			== BString(testUrl.Host()));
-		CPPUNIT_ASSERT(kTestExplode[testIndex].expected.port == testUrl.Port());
-		CPPUNIT_ASSERT(BString(kTestExplode[testIndex].expected.path)
-			== BString(testUrl.Path()));
-		CPPUNIT_ASSERT(BString(kTestExplode[testIndex].expected.request)
-			== BString(testUrl.Request()));
-		CPPUNIT_ASSERT(BString(kTestExplode[testIndex].expected.fragment)
-			== BString(testUrl.Fragment()));
+		CPPUNIT_ASSERT_EQUAL(BString(kTestExplode[testIndex].url),
+			BString(testUrl.UrlString()));
+		CPPUNIT_ASSERT_EQUAL(BString(kTestExplode[testIndex].expected.protocol),
+			BString(testUrl.Protocol()));
+		CPPUNIT_ASSERT_EQUAL(BString(kTestExplode[testIndex].expected.userName),
+			BString(testUrl.UserName()));
+		CPPUNIT_ASSERT_EQUAL(BString(kTestExplode[testIndex].expected.password),
+			BString(testUrl.Password()));
+		CPPUNIT_ASSERT_EQUAL(BString(kTestExplode[testIndex].expected.host),
+			BString(testUrl.Host()));
+		CPPUNIT_ASSERT_EQUAL(kTestExplode[testIndex].expected.port,
+			testUrl.Port());
+		CPPUNIT_ASSERT_EQUAL(BString(kTestExplode[testIndex].expected.path),
+			BString(testUrl.Path()));
+		CPPUNIT_ASSERT_EQUAL(BString(kTestExplode[testIndex].expected.request),
+			BString(testUrl.Request()));
+		CPPUNIT_ASSERT_EQUAL(BString(kTestExplode[testIndex].expected.fragment),
+			BString(testUrl.Fragment()));
 	}
 }
 
@@ -123,8 +125,344 @@ UrlTest::PathOnly()
 {
 	BUrl test = "lol";
 	CPPUNIT_ASSERT(test.HasPath());
-	CPPUNIT_ASSERT(test.Path() == "lol");
-	CPPUNIT_ASSERT(test.UrlString() == "lol");
+	CPPUNIT_ASSERT_EQUAL(BString("lol"), test.Path());
+	CPPUNIT_ASSERT_EQUAL(BString("lol"), test.UrlString());
+}
+
+
+void
+UrlTest::RelativeUriTest()
+{
+	// http://skew.org/uri/uri%5Ftests.html
+	struct RelativeUrl {
+		const char* base;
+		const char* relative;
+		const char* absolute;
+	};
+
+	const RelativeUrl tests[] = {
+		{"http://example.com/path?query#frag", "",
+			"http://example.com/path?query"},
+		{"foo:a/b",			"../c",					"foo:c"},
+		{"foo:a",				"foo:.",				"foo:"},
+		{"zz:abc",				"/foo/../../../bar",	"zz:/bar"},
+		{"zz:abc",				"/foo/../bar",			"zz:/bar"},
+		{"zz:abc",				"foo/../../../bar",		"zz:bar"},
+		{"zz:abc",				"zz:.",					"zz:"},
+		{"http://a/b/c/d;p?q",	"/.",					"http://a/"},
+		{"http://a/b/c/d;p?q",	"/.foo",				"http://a/.foo"},
+		{"http://a/b/c/d;p?q",	".foo",					"http://a/b/c/.foo"},
+		{"http://a/b/c/d;p?q",	"g:h",					"g:h"},
+
+		{"http://a/b/c/d;p?q",	"g:h",					"g:h"},
+		{"http://a/b/c/d;p?q",	"g",					"http://a/b/c/g"},
+		{"http://a/b/c/d;p?q",	"./g",					"http://a/b/c/g"},
+		{"http://a/b/c/d;p?q",	"g/",					"http://a/b/c/g/"},
+		{"http://a/b/c/d;p?q",	"/g",					"http://a/g"},
+		{"http://a/b/c/d;p?q",	"//g",					"http://g"},
+		{"http://a/b/c/d;p?q",	"?y",					"http://a/b/c/d;p?y"},
+		{"http://a/b/c/d;p?q",	"g?y",					"http://a/b/c/g?y"},
+		{"http://a/b/c/d;p?q",	"#s",					"http://a/b/c/d;p?q#s"},
+		{"http://a/b/c/d;p?q",	"g#s",					"http://a/b/c/g#s"},
+		{"http://a/b/c/d;p?q",	"g?y#s",				"http://a/b/c/g?y#s"},
+		{"http://a/b/c/d;p?q",	";x",					"http://a/b/c/;x"},
+		{"http://a/b/c/d;p?q",	"g;x",					"http://a/b/c/g;x"},
+		{"http://a/b/c/d;p?q",	"g;x?y#s",				"http://a/b/c/g;x?y#s"},
+		{"http://a/b/c/d;p?q",	"",						"http://a/b/c/d;p?q"},
+		{"http://a/b/c/d;p?q",	".",					"http://a/b/c/"},
+		{"http://a/b/c/d;p?q",	"./",					"http://a/b/c/"},
+		{"http://a/b/c/d;p?q",	"..",					"http://a/b/"},
+		{"http://a/b/c/d;p?q",	"../",					"http://a/b/"},
+		{"http://a/b/c/d;p?q",	"../g",					"http://a/b/g"},
+		{"http://a/b/c/d;p?q",	"../..",				"http://a/"},
+		{"http://a/b/c/d;p?q",	"../../",				"http://a/"},
+		{"http://a/b/c/d;p?q",	"../../g",				"http://a/g"},
+
+		// Parsers must be careful in handling cases where there are more
+		// relative path ".." segments than there are hierarchical levels in the
+		// base URI's path. Note that the ".." syntax cannot be used to change
+		// the authority component of a URI.
+		{"http://a/b/c/d;p?q",	"../../../g",			"http://a/g"},
+		{"http://a/b/c/d;p?q",	"../../../../g",		"http://a/g"},
+
+		// Similarly, parsers must remove the dot-segments "." and ".." when
+		// they are complete components of a path, but not when they are only
+		// part of a segment.
+		{"http://a/b/c/d;p?q",	"/./g",					"http://a/g"},
+		{"http://a/b/c/d;p?q",	"/../g",				"http://a/g"},
+		{"http://a/b/c/d;p?q",	"g.",					"http://a/b/c/g."},
+		{"http://a/b/c/d;p?q",	".g",					"http://a/b/c/.g"},
+		{"http://a/b/c/d;p?q",	"g..",					"http://a/b/c/g.."},
+		{"http://a/b/c/d;p?q",	"..g",					"http://a/b/c/..g"},
+
+		// Less likely are cases where the relative URI reference uses
+		// unnecessary or nonsensical forms of the "." and ".." complete path
+		// segments.
+		{"http://a/b/c/d;p?q",	"./../g",				"http://a/b/g"},
+		{"http://a/b/c/d;p?q",	"./g/.",				"http://a/b/c/g/"},
+		{"http://a/b/c/d;p?q",	"g/./h",				"http://a/b/c/g/h"},
+		{"http://a/b/c/d;p?q",	"g/../h",				"http://a/b/c/h"},
+		{"http://a/b/c/d;p?q",	"g;x=1/./y",			"http://a/b/c/g;x=1/y"},
+		{"http://a/b/c/d;p?q",	"g;x=1/../y",			"http://a/b/c/y"},
+
+		// Some applications fail to separate the reference's query and/or
+		// fragment components from a relative path before merging it with the
+		// base path and removing dot-segments. This error is rarely noticed,
+		// since typical usage of a fragment never includes the hierarchy ("/")
+		// character, and the query component is not normally used within
+		// relative references.
+		{"http://a/b/c/d;p?q",	"g?y/./x",			"http://a/b/c/g?y/./x"},
+		{"http://a/b/c/d;p?q",	"g?y/../x",			"http://a/b/c/g?y/../x"},
+		{"http://a/b/c/d;p?q",	"g#s/./x",			"http://a/b/c/g#s/./x"},
+		{"http://a/b/c/d;p?q",	"g#s/../x",			"http://a/b/c/g#s/../x"},
+
+		// Some parsers allow the scheme name to be present in a relative URI
+		// reference if it is the same as the base URI scheme. This is
+		// considered to be a loophole in prior specifications of partial URI
+		// [RFC1630]. Its use should be avoided, but is allowed for backward
+		// compatibility.
+		{"http://a/b/c/d;p?q",	"http:g",			"http:g"},
+		{"http://a/b/c/d;p?q",	"http:",			"http:"},
+
+		{"http://a/b/c/d;p?q",	"./g:h",			"http://a/b/c/g:h"},
+		{"http://a/b/c/d;p?q",	"/a/b/c/./../../g",	"http://a/a/g"},
+
+		{"http://a/b/c/d;p?q=1/2",	"g",			"http://a/b/c/g"},
+		{"http://a/b/c/d;p?q=1/2",	"./g",			"http://a/b/c/g"},
+		{"http://a/b/c/d;p?q=1/2",	"g/",			"http://a/b/c/g/"},
+		{"http://a/b/c/d;p?q=1/2",	"/g",			"http://a/g"},
+		{"http://a/b/c/d;p?q=1/2",	"//g",			"http://g"},
+		{"http://a/b/c/d;p?q=1/2",	"?y",			"http://a/b/c/d;p?y"},
+		{"http://a/b/c/d;p?q=1/2",	"g?y",			"http://a/b/c/g?y"},
+		{"http://a/b/c/d;p?q=1/2",	"g?y/./x",		"http://a/b/c/g?y/./x"},
+		{"http://a/b/c/d;p?q=1/2",	"g?y/../x",		"http://a/b/c/g?y/../x"},
+		{"http://a/b/c/d;p?q=1/2",	"g#s",			"http://a/b/c/g#s"},
+		{"http://a/b/c/d;p?q=1/2",	"g#s/./x",		"http://a/b/c/g#s/./x"},
+		{"http://a/b/c/d;p?q=1/2",	"g#s/../x",		"http://a/b/c/g#s/../x"},
+		{"http://a/b/c/d;p?q=1/2",	"./",			"http://a/b/c/"},
+		{"http://a/b/c/d;p?q=1/2",	"../",			"http://a/b/"},
+		{"http://a/b/c/d;p?q=1/2",	"../g",			"http://a/b/g"},
+		{"http://a/b/c/d;p?q=1/2",	"../../",		"http://a/"},
+		{"http://a/b/c/d;p?q=1/2",	"../../g",		"http://a/g"},
+
+		{"http://a/b/c/d;p=1/2?q",	"g",			"http://a/b/c/d;p=1/g"},
+		{"http://a/b/c/d;p=1/2?q",	"./g",			"http://a/b/c/d;p=1/g"},
+		{"http://a/b/c/d;p=1/2?q",	"g/",			"http://a/b/c/d;p=1/g/"},
+		{"http://a/b/c/d;p=1/2?q",	"g?y",			"http://a/b/c/d;p=1/g?y"},
+		{"http://a/b/c/d;p=1/2?q",	";x",			"http://a/b/c/d;p=1/;x"},
+		{"http://a/b/c/d;p=1/2?q",	"g;x",			"http://a/b/c/d;p=1/g;x"},
+		{"http://a/b/c/d;p=1/2?q", "g;x=1/./y", "http://a/b/c/d;p=1/g;x=1/y"},
+		{"http://a/b/c/d;p=1/2?q",	"g;x=1/../y",	"http://a/b/c/d;p=1/y"},
+		{"http://a/b/c/d;p=1/2?q",	"./",			"http://a/b/c/d;p=1/"},
+		{"http://a/b/c/d;p=1/2?q",	"../",			"http://a/b/c/"},
+		{"http://a/b/c/d;p=1/2?q",	"../g",			"http://a/b/c/g"},
+		{"http://a/b/c/d;p=1/2?q",	"../../",		"http://a/b/"},
+		{"http://a/b/c/d;p=1/2?q",	"../../g",		"http://a/b/g"},
+
+		// Empty host and directory
+		{"fred:///s//a/b/c",	"g:h",					"g:h"},
+		{"fred:///s//a/b/c",	"g",					"fred:///s//a/b/g"},
+		{"fred:///s//a/b/c",	"./g",					"fred:///s//a/b/g"},
+		{"fred:///s//a/b/c",	"g/",					"fred:///s//a/b/g/"},
+		{"fred:///s//a/b/c",	"/g",					"fred:///g"},
+		{"fred:///s//a/b/c",	"//g",					"fred://g"},
+		{"fred:///s//a/b/c",	"//g/x",				"fred://g/x"},
+		{"fred:///s//a/b/c",	"///g",					"fred:///g"},
+		{"fred:///s//a/b/c",	"./",					"fred:///s//a/b/"},
+		{"fred:///s//a/b/c",	"../",					"fred:///s//a/"},
+		{"fred:///s//a/b/c",	"../g",					"fred:///s//a/g"},
+		{"fred:///s//a/b/c",	"../..",				"fred:///s//"},
+		{"fred:///s//a/b/c",	"../../g",				"fred:///s//g"},
+		{"fred:///s//a/b/c",	"../../../g",			"fred:///s/g"},
+		{"fred:///s//a/b/c",	"../../../g",			"fred:///s/g"},
+
+		{"http:///s//a/b/c",	"g:h",					"g:h"},
+		{"http:///s//a/b/c",	"g",					"http:///s//a/b/g"},
+		{"http:///s//a/b/c",	"./g",					"http:///s//a/b/g"},
+		{"http:///s//a/b/c",	"g/",					"http:///s//a/b/g/"},
+		{"http:///s//a/b/c",	"/g",					"http:///g"},
+		{"http:///s//a/b/c",	"//g",					"http://g"},
+		{"http:///s//a/b/c",	"//g/x",				"http://g/x"},
+		{"http:///s//a/b/c",	"///g",					"http:///g"},
+		{"http:///s//a/b/c",	"./",					"http:///s//a/b/"},
+		{"http:///s//a/b/c",	"../",					"http:///s//a/"},
+		{"http:///s//a/b/c",	"../g",					"http:///s//a/g"},
+		{"http:///s//a/b/c",	"../..",				"http:///s//"},
+		{"http:///s//a/b/c",	"../../g",				"http:///s//g"},
+		{"http:///s//a/b/c",	"../../../g",			"http:///s/g"},
+		{"http:///s//a/b/c",	"../../../g",			"http:///s/g"},
+
+		{"foo:xyz",				"bar:abc",				"bar:abc"},
+		{"http://example/x/y/z","../abc",				"http://example/x/abc"},
+		{"http://example2/x/y/z","http://example/x/abc","http://example/x/abc"},
+		{"http://ex/x/y/z",		"../r",					"http://ex/x/r"},
+		{"http://ex/x/y",		"q/r",					"http://ex/x/q/r"},
+		{"http://ex/x/y",		"q/r#s",				"http://ex/x/q/r#s"},
+		{"http://ex/x/y",		"q/r#s/t",				"http://ex/x/q/r#s/t"},
+		{"http://ex/x/y",		"ftp://ex/x/q/r",		"ftp://ex/x/q/r"},
+		{"http://ex/x/y",		"",						"http://ex/x/y"},
+		{"http://ex/x/y/",		"",						"http://ex/x/y/"},
+		{"http://ex/x/y/pdq",	"",						"http://ex/x/y/pdq"},
+		{"http://ex/x/y/",		"z/",					"http://ex/x/y/z/"},
+
+		{"file:/swap/test/animal.rdf", "#Animal",
+			"file:/swap/test/animal.rdf#Animal"},
+		{"file:/e/x/y/z",		"../abc",				"file:/e/x/abc"},
+		{"file:/example2/x/y/z","/example/x/abc",		"file:/example/x/abc"},
+		{"file:/e/x/y/z",		"../r",					"file:/e/x/r"},
+		{"file:/e/x/y/z",		"/r",					"file:/r"},
+		{"file:/e/x/y",			"q/r",					"file:/e/x/q/r"},
+		{"file:/e/x/y",			"q/r#s",				"file:/e/x/q/r#s"},
+		{"file:/e/x/y",			"q/r#",					"file:/e/x/q/r#"},
+		{"file:/e/x/y",			"q/r#s/t",				"file:/e/x/q/r#s/t"},
+		{"file:/e/x/y",			"ftp://ex/x/q/r",		"ftp://ex/x/q/r"},
+		{"file:/e/x/y",			"",						"file:/e/x/y"},
+		{"file:/e/x/y/",		"",						"file:/e/x/y/"},
+		{"file:/e/x/y/pdq",		"",						"file:/e/x/y/pdq"},
+		{"file:/e/x/y/",		"z/",					"file:/e/x/y/z/"},
+		{"file:/devel/WWW/2000/10/swap/test/reluri-1.n3",
+			"file://meetings.example.com/cal#m1",
+			"file://meetings.example.com/cal#m1"},
+		{"file:/home/connolly/w3ccvs/WWW/2000/10/swap/test/reluri-1.n3",
+			"file://meetings.example.com/cal#m1",
+			"file://meetings.example.com/cal#m1"},
+		{"file:/some/dir/foo",		"./#blort",		"file:/some/dir/#blort"},
+		{"file:/some/dir/foo",		"./#",			"file:/some/dir/#"},
+
+		{"http://example/x/abc.efg", "./",			"http://example/x/"},
+		{"http://example2/x/y/z", "//example/x/abc","http://example/x/abc"},
+		{"http://ex/x/y/z",			"/r",			"http://ex/r"},
+		{"http://ex/x/y",			"./q:r",		"http://ex/x/q:r"},
+		{"http://ex/x/y",			"./p=q:r",		"http://ex/x/p=q:r"},
+		{"http://ex/x/y?pp/qq",		"?pp/rr",		"http://ex/x/y?pp=rr"},
+		{"http://ex/x/y?pp/qq",		"y/z",			"http://ex/x/y/z"},
+
+		{"mailto:local", "local/qual@domain.org#frag",
+			"mailto:local/qual@domain.org#frag"},
+		{"mailto:local/qual1@domain1.org", "more/qual2@domain2.org#frag",
+			"mailto:local/more/qual2@domain2.org#frag"},
+
+		{"http://ex/x/y?q",		"y?q",			"http://ex/x/y?q"},
+		{"http://ex?p",			"x/y?q",		"http://ex/x/y?q"},
+		{"foo:a/b",				"c/d",			"foo:a/c/d"},
+		{"foo:a/b",				"/c/d",			"foo:/c/d"},
+		{"foo:a/b?c#d",			"",				"foo:a/b?c"},
+		{"foo:a",				"b/c",			"foo:b/c"},
+		{"foo:/a/y/z",			"../b/c",		"foo:/a/b/c"},
+		{"foo:a",				"./b/c",		"foo:b/c"},
+		{"foo:a",				"/./b/c",		"foo:/b/c"},
+		{"foo://a//b/c",		"../../d",		"foo://a/d"},
+		{"foo:a",				".",			"foo:"},
+		{"foo:a",				"..",			"foo:"},
+
+		{"http://example/x/y%2Fz", "abc",			"http://example/x/abc"},
+		{"http://example/a/x/y/z", "../../x%2Fabc", "http://example/a/x%2Fabc"},
+		{"http://example/a/x/y%2Fz", "../x%2Fabc", "http://example/a/x%2Fabc"},
+		{"http://example/x%2Fy/z", "abc", "http://example/x%2Fy/abc"},
+		{"http://ex/x/y", "q%3Ar", "http://ex/x/q%3Ar"},
+		{"http://example/x/y%2Fz", "/x%2Fabc", "http://example/x%2Fabc"},
+		{"http://example/x/y/z", "/x%2Fabc", "http://example/x%2Fabc"},
+
+		{"mailto:local1@domain1?query1", "local2@domain2",
+			"mailto:local2@domain2"},
+		{"mailto:local1@domain1", "local2@domain2?query2",
+			"mailto:local2@domain2?query2"},
+		{"mailto:local1@domain1?query1", "local2@domain2?query2",
+			"mailto:local2@domain2?query2"},
+		{"mailto:local@domain?query1", "?query2",
+			"mailto:local@domain?query2"},
+		{"mailto:?query1", "local2@domain2?query2",
+			"mailto:local2@domain2?query2"},
+		{"mailto:local1@domain1?query1", "?query2",
+			"mailto:local1@domain1?query2"},
+
+		{"foo:bar", "http://example/a/b?c/../d", "http://example/a/b?c/../d"},
+		{"foo:bar", "http://example/a/b#c/../d", "http://example/a/b#c/../d"},
+		{"http://example.org/base/uri", "http:this", "http:this"},
+		{"http:base", "http:this", "http:this"},
+		{"f:/a", ".//g", "f://g"},
+		{"f://example.org/base/a", "b/c//d/e", "f://example.org/base/b/c//d/e"},
+		{"mid:m@example.ord/c@example.org", "m2@example.ord/c2@example.org",
+			"mid:m@example.ord/m2@example.ord/c2@example.org"},
+		{"file:///C:/DEV/Haskell/lib/HXmlToolbox-3.01/examples/", "mini1.xml",
+			"file:///C:/DEV/Haskell/lib/HXmlToolbox-3.01/examples/mini1.xml"},
+		{"foo:a/y/z", "../b/c", "foo:a/b/c"},
+		{"foo:", "b", "foo:b"},
+		{"foo://a", "b", "foo://a/b"},
+		{"foo://a?q", "b", "foo://a/b"},
+		{"foo://a", "b?q", "foo://a/b?q"},
+		{"foo://a?r", "b?q", "foo://a/b?q"},
+	};
+
+	BString message(" Base: ");
+	for (unsigned int index = 0; index < sizeof(tests) / sizeof(RelativeUrl);
+		index++)
+	{
+		NextSubTest();
+
+		BUrl baseUrl(tests[index].base);
+
+		message.Truncate(7, true);
+		message << tests[index].base;
+		message << " Relative: ";
+		message << tests[index].relative;
+
+		CPPUNIT_ASSERT_EQUAL_MESSAGE(message.String(),
+			BString(tests[index].absolute),
+			BUrl(baseUrl, tests[index].relative).UrlString());
+	}
+}
+
+
+
+void
+UrlTest::IDNTest()
+{
+	// http://www.w3.org/2004/04/uri-rel-test.html
+	NextSubTest();
+	CPPUNIT_ASSERT_EQUAL(BUrl("http://www.w3.org").UrlString(),
+		BUrl("http://www.w%33.org").UrlString());
+	NextSubTest();
+	CPPUNIT_ASSERT_EQUAL(
+		BUrl("http://xn--rksmrgs-5wao1o.josefsson.org").UrlString(),
+		BUrl("http://r%C3%A4ksm%C3%B6rg%C3%A5s.josefsson.org").UrlString());
+	NextSubTest();
+	CPPUNIT_ASSERT_EQUAL(
+		BUrl("http://xn--rksmrgs-5wao1o.josefsson.org").UrlString(),
+		BUrl("http://%E7%B4%8D%E8%B1%86.w3.mag.keio.ac.jp").UrlString());
+	NextSubTest();
+	CPPUNIT_ASSERT_EQUAL(
+		BUrl("http://www.xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9b"
+			"ya3kc6lra.w3.mag.keio.ac.jp/").UrlString(),
+		BUrl("http://www.%E3%81%BB%E3%82%93%E3%81%A8%E3%81%86%E3%81%AB%E3%81%AA"
+			"%E3%81%8C%E3%81%84%E3%82%8F%E3%81%91%E3%81%AE%E3%82%8F%E3%81%8B%E3"
+			"%82%89%E3%81%AA%E3%81%84%E3%81%A9%E3%82%81%E3%81%84%E3%82%93%E3%82"
+			"%81%E3%81%84%E3%81%AE%E3%82%89%E3%81%B9%E3%82%8B%E3%81%BE%E3%81%A0"
+			"%E3%81%AA%E3%81%8C%E3%81%8F%E3%81%97%E3%81%AA%E3%81%84%E3%81%A8%E3"
+			"%81%9F%E3%82%8A%E3%81%AA%E3%81%84.w3.mag.keio.ac.jp/").UrlString());
+	NextSubTest();
+	CPPUNIT_ASSERT_EQUAL(
+		BUrl("http://xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9bya3k"
+			"c6lra.xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9bya3kc6"
+			"lra.xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3fg11amb5gzdb4wi9bya3kc6lr"
+			"a.w3.mag.keio.ac.jp/").UrlString(),
+		BUrl("http://%E3%81%BB%E3%82%93%E3%81%A8%E3%81%86%E3%81%AB%E3%81%AA%E3"
+			"%81%8C%E3%81%84%E3%82%8F%E3%81%91%E3%81%AE%E3%82%8F%E3%81%8B%E3%82"
+			"%89%E3%81%AA%E3%81%84%E3%81%A9%E3%82%81%E3%81%84%E3%82%93%E3%82%81"
+			"%E3%81%84%E3%81%AE%E3%82%89%E3%81%B9%E3%82%8B%E3%81%BE%E3%81%A0%E3"
+			"%81%AA%E3%81%8C%E3%81%8F%E3%81%97%E3%81%AA%E3%81%84%E3%81%A8%E3%81"
+			"%9F%E3%82%8A%E3%81%AA%E3%81%84.%E3%81%BB%E3%82%93%E3%81%A8%E3%81"
+			"%86%E3%81%AB%E3%81%AA%E3%81%8C%E3%81%84%E3%82%8F%E3%81%91%E3%81%AE"
+			"%E3%82%8F%E3%81%8B%E3%82%89%E3%81%AA%E3%81%84%E3%81%A9%E3%82%81%E3"
+			"%81%84%E3%82%93%E3%82%81%E3%81%84%E3%81%AE%E3%82%89%E3%81%B9%E3%82"
+			"%8B%E3%81%BE%E3%81%A0%E3%81%AA%E3%81%8C%E3%81%8F%E3%81%97%E3%81%AA"
+			"%E3%81%84%E3%81%A8%E3%81%9F%E3%82%8A%E3%81%AA%E3%81%84.%E3%81%BB"
+			"%E3%82%93%E3%81%A8%E3%81%86%E3%81%AB%E3%81%AA%E3%81%8C%E3%81%84%E3"
+			"%82%8F%E3%81%91%E3%81%AE%E3%82%8F%E3%81%8B%E3%82%89%E3%81%AA%E3%81"
+			"%84%E3%81%A9%E3%82%81%E3%81%84%E3%82%93%E3%82%81%E3%81%84%E3%81%AE"
+			"%E3%82%89%E3%81%B9%E3%82%8B%E3%81%BE%E3%81%A0%E3%81%AA%E3%81%8C%E3"
+			"%81%8F%E3%81%97%E3%81%AA%E3%81%84%E3%81%A8%E3%81%9F%E3%82%8A%E3%81"
+			"%AA%E3%81%84.w3.mag.keio.ac.jp/").UrlString());
 }
 
 
@@ -133,12 +471,16 @@ UrlTest::AddTests(BTestSuite& parent)
 {
 	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("UrlTest");
 
-	suite.addTest(new CppUnit::TestCaller<UrlTest>(
-		"UrlTest::LengthTest", &UrlTest::LengthTest));
+	suite.addTest(new CppUnit::TestCaller<UrlTest>("UrlTest::ParseTest",
+		&UrlTest::ParseTest));
 	suite.addTest(new CppUnit::TestCaller<UrlTest>(
 		"UrlTest::ExplodeImplodeTest", &UrlTest::ExplodeImplodeTest));
 	suite.addTest(new CppUnit::TestCaller<UrlTest>("UrlTest::PathOnly",
 		&UrlTest::PathOnly));
+	suite.addTest(new CppUnit::TestCaller<UrlTest>("UrlTest::RelativeUriTest",
+		&UrlTest::RelativeUriTest));
+	suite.addTest(new CppUnit::TestCaller<UrlTest>("UrlTest::IDNTest",
+		&UrlTest::IDNTest));
 
 	parent.addTest("UrlTest", &suite);
 }

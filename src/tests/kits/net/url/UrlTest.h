@@ -15,9 +15,11 @@ public:
 					UrlTest();
 	virtual			~UrlTest();
 
-			void	LengthTest();
+			void	ParseTest();
 			void	ExplodeImplodeTest();
 			void	PathOnly();
+			void	RelativeUriTest();
+			void	IDNTest();
 
 	static	void	AddTests(BTestSuite& suite);
 };
