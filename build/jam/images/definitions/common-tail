@@ -45,7 +45,6 @@ AddDirectoryToHaikuImage system var log ;
 
 
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackages ] ;
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalTestPackages ] ;
 
 
 #pragma mark - User/Group Setup
