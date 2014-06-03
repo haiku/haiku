@@ -4,14 +4,16 @@
  */
 
 
-#include <KernelExport.h>
-#include "intel_extreme.h"
 #include <string.h>
 
+#include <KernelExport.h>
 
-#define TRACE_BIOS 1
+#include "intel_extreme.h"
+
+
+#define TRACE_BIOS
 #ifdef TRACE_BIOS
-#       define TRACE(x) dprintf x
+#	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
@@ -98,19 +100,20 @@ struct lvds_bdb2_lfp_info {
 
 
 static struct vbios {
-	area_id area;
-	uint8* memory;
-	display_mode *shared_info;
+	area_id			area;
+	uint8*			memory;
+	display_mode*	shared_info;
 	struct {
-		uint16 hsync_start;
-		uint16 hsync_end;
-		uint16 hsync_total;
-		uint16 vsync_start;
-		uint16 vsync_end;
-		uint16 vsync_total;
-	} timings_common;
+		uint16		hsync_start;
+		uint16		hsync_end;
+		uint16		hsync_total;
+		uint16		vsync_start;
+		uint16		vsync_end;
+		uint16		vsync_total;
+	}				timings_common;
 
-	uint16_t ReadWord(off_t address) {
+	uint16_t ReadWord(off_t address)
+	{
 		return memory[address] | memory[address + 1] << 8;
 	}
 } vbios;
@@ -118,45 +121,40 @@ static struct vbios {
 
 /* TODO: move code to accelerant, if possible */
 
-/* this is reimplementation, Haiku uses BIOS call and gets most current panel
-info, we're, otherwise, digging in VBIOS memory and parsing VBT tables to get
-native panel timings. This will allow to get non-updated, PROM-programmed
-timings info when compensation mode is off on your machine */
+/*!	This is reimplementation, Haiku uses BIOS call and gets most current panel
+	info, we're, otherwise, digging in VBIOS memory and parsing VBT tables to
+	get native panel timings. This will allow to get non-updated,
+	PROM-programmed timings info when compensation mode is off on your machine.
+*/
 static bool
 get_bios(void)
 {
 	static const uint64_t kVBIOSAddress = 0xc0000;
-	static const size_t kVBIOSSize = 64 * 1024;
+	static const int kVBIOSSize = 64 * 1024;
 		// FIXME: is this the same for all cards?
-
-	int vbt_offset;
-	struct vbt_header *vbt;
 
 	/* !!!DANGER!!!: mapping of BIOS using legacy location for now,
 	hence, if panel mode will be set using info from VBT, it will
 	be taken from primary card's VBIOS */
-	vbios.area = map_physical_memory("VBIOS mapping",
-		kVBIOSAddress, kVBIOSSize, B_ANY_KERNEL_ADDRESS,
-		B_READ_AREA, (void**)&(vbios.memory));
+	vbios.area = map_physical_memory("VBIOS mapping", kVBIOSAddress,
+		kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_READ_AREA, (void**)&vbios.memory);
 
 	if (vbios.area < 0)
 		return false;
 
-	TRACE((DEVICE_NAME ": mapping VBIOS: 0x%x -> %p\n",
+	TRACE((DEVICE_NAME ": mapping VBIOS: 0x%" B_PRIx64 " -> %p\n",
 		kVBIOSAddress, vbios.memory));
 
-	vbt_offset = vbios.ReadWord(kVbtPointer);
-	if (vbt_offset >= kVBIOSSize) {
-		TRACE((DEVICE_NAME": bad VBT offset : 0x%x\n",
-			vbt_offset));
+	int vbtOffset = vbios.ReadWord(kVbtPointer);
+	if (vbtOffset >= kVBIOSSize) {
+		TRACE((DEVICE_NAME": bad VBT offset : 0x%x\n", vbtOffset));
 		delete_area(vbios.area);
 		return false;
 	}
 
-	vbt = (struct vbt_header *)(vbios.memory + vbt_offset);
+	struct vbt_header* vbt = (struct vbt_header*)(vbios.memory + vbtOffset);
 	if (memcmp(vbt->signature, "$VBT", 4) != 0) {
-		TRACE((DEVICE_NAME": bad VBT signature: %20s\n",
-			vbt->signature));
+		TRACE((DEVICE_NAME": bad VBT signature: %20s\n", vbt->signature));
 		delete_area(vbios.area);
 		return false;
 	}
@@ -172,30 +170,25 @@ feed_shared_info(uint8* data)
 
 	/* handle bogus h/vtotal values, if got such */
 	if (vbios.timings_common.hsync_end > vbios.timings_common.hsync_total) {
-		vbios.timings_common.hsync_total
-			= vbios.timings_common.hsync_end + 1;
+		vbios.timings_common.hsync_total = vbios.timings_common.hsync_end + 1;
 		bogus = true;
 		TRACE((DEVICE_NAME": got bogus htotal. Fixing\n"));
 	}
 	if (vbios.timings_common.vsync_end > vbios.timings_common.vsync_total) {
-		vbios.timings_common.vsync_total
-			= vbios.timings_common.vsync_end + 1;
+		vbios.timings_common.vsync_total = vbios.timings_common.vsync_end + 1;
 		bogus = true;
 		TRACE((DEVICE_NAME": got bogus vtotal. Fixing\n"));
 	}
-	/* */
+
 	if (bogus) {
 		TRACE((DEVICE_NAME": adjusted LFP modeline: x%d Hz,\t"
 			"%d %d %d %d   %d %d %d %d\n",
-				_PIXEL_CLOCK(data) / ((_H_ACTIVE(data) + _H_BLANK(data))
-					* (_V_ACTIVE(data) + _V_BLANK(data))),
-				_H_ACTIVE(data),
-				vbios.timings_common.hsync_start,
-				vbios.timings_common.hsync_end,
-				vbios.timings_common.hsync_total,
-				_V_ACTIVE(data), vbios.timings_common.vsync_start,
-				vbios.timings_common.vsync_end,
-				vbios.timings_common.vsync_total));
+			_PIXEL_CLOCK(data) / ((_H_ACTIVE(data) + _H_BLANK(data))
+				* (_V_ACTIVE(data) + _V_BLANK(data))),
+			_H_ACTIVE(data), vbios.timings_common.hsync_start,
+			vbios.timings_common.hsync_end, vbios.timings_common.hsync_total,
+			_V_ACTIVE(data), vbios.timings_common.vsync_start,
+			vbios.timings_common.vsync_end, vbios.timings_common.vsync_total));
 	}
 
 	/* TODO: add retrieved info to edid info struct, not fixed mode struct */
@@ -220,60 +213,58 @@ feed_shared_info(uint8* data)
 
 
 bool
-get_lvds_mode_from_bios(display_mode *shared_info)
+get_lvds_mode_from_bios(display_mode* sharedInfo)
 {
-	struct vbt_header *vbt;
-	struct bdb_header *bdb;
-	int vbt_offset, bdb_offset, bdb_block_offset, block_size;
-	int panel_type = -1;
-
 	if (!get_bios())
 		return false;
 
-	vbt_offset = vbios.ReadWord(kVbtPointer);
-	vbt = (struct vbt_header *)(vbios.memory + vbt_offset);
-	bdb_offset = vbt_offset + vbt->bdb_offset;
+	int vbtOffset = vbios.ReadWord(kVbtPointer);
+	struct vbt_header* vbt = (struct vbt_header*)(vbios.memory + vbtOffset);
+	int bdbOffset = vbtOffset + vbt->bdb_offset;
 
-	bdb = (struct bdb_header *)(vbios.memory + bdb_offset);
+	struct bdb_header* bdb = (struct bdb_header*)(vbios.memory + bdbOffset);
 	if (memcmp(bdb->signature, "BIOS_DATA_BLOCK ", 16) != 0) {
 		TRACE((DEVICE_NAME": bad BDB signature\n"));
 		delete_area(vbios.area);
 	}
 
 	TRACE((DEVICE_NAME": parsing BDB blocks\n"));
-	for (bdb_block_offset = bdb->header_size; bdb_block_offset < bdb->bdb_size;
-		bdb_block_offset += block_size) {
-		int start = bdb_offset + bdb_block_offset;
+	int blockSize;
+	int panelType = -1;
+
+	for (int bdbBlockOffset = bdb->header_size; bdbBlockOffset < bdb->bdb_size;
+			bdbBlockOffset += blockSize) {
+		int start = bdbOffset + bdbBlockOffset;
 
 		int id = vbios.memory[start];
-		block_size = vbios.ReadWord(start + 1) + 3;
+		blockSize = vbios.ReadWord(start + 1) + 3;
 		// TRACE((DEVICE_NAME": found BDB block type %d\n", id));
 		switch (id) {
 			case 40: // FIXME magic numbers
 			{
 				struct lvds_bdb1 *lvds1;
 				lvds1 = (struct lvds_bdb1 *)(vbios.memory + start);
-				panel_type = lvds1->panel_type;
+				panelType = lvds1->panel_type;
 				break;
 			}
 			case 41:
 			{
-				if (panel_type == -1)
+				if (panelType == -1)
 					break;
 				struct lvds_bdb2 *lvds2;
 				struct lvds_bdb2_lfp_info *lvds2_lfp_info;
 
 				lvds2 = (struct lvds_bdb2 *)(vbios.memory + start);
 				lvds2_lfp_info = (struct lvds_bdb2_lfp_info *)
-					(vbios.memory + bdb_offset
-					+ lvds2->panels[panel_type].lfp_info_offset);
+					(vbios.memory + bdbOffset
+					+ lvds2->panels[panelType].lfp_info_offset);
 				/* found bad one terminator */
 				if (lvds2_lfp_info->terminator != 0xffff) {
 					delete_area(vbios.area);
 					return false;
 				}
-				uint8_t* timing_data = vbios.memory + bdb_offset
-					+ lvds2->panels[panel_type].lfp_edid_dtd_offset;
+				uint8_t* timing_data = vbios.memory + bdbOffset
+					+ lvds2->panels[panelType].lfp_edid_dtd_offset;
 				TRACE((DEVICE_NAME": found LFP of size %d x %d "
 					"in BIOS VBT tables\n",
 					lvds2_lfp_info->x_res, lvds2_lfp_info->y_res));
@@ -293,7 +284,7 @@ get_lvds_mode_from_bios(display_mode *shared_info)
 				vbios.timings_common.vsync_total = _V_ACTIVE(timing_data)
 					+ _V_BLANK(timing_data);
 
-				vbios.shared_info = shared_info;
+				vbios.shared_info = sharedInfo;
 				return feed_shared_info(timing_data);
 			}
 		}
