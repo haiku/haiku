@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,8 @@
 #include <Accelerant.h>
 #include <Drivers.h>
 #include <PCI.h>
+
+#include <edid.h>
 
 
 #define VENDOR_ID_INTEL			0x8086
@@ -201,6 +203,9 @@ struct intel_shared_info {
 	DeviceType		device_type;
 	char			device_identifier[32];
 	struct pll_info	pll_info;
+
+	edid1_info		vesa_edid_info;
+	bool			has_vesa_edid_info;
 };
 
 //----------------- ioctl() interface ----------------

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Support for i915 chipset and up based on the X driver,
@@ -592,15 +592,21 @@ create_mode_list(void)
 		if (gInfo->shared_info->single_head_locked)
 			gInfo->head_mode = HEAD_MODE_A_ANALOG;
 	} else {
-		TRACE("getting EDID on port A (analog) failed : %s. "
+		TRACE("getting EDID on port A (analog) failed: %s. "
 			"Trying on port C (lvds)\n", strerror(error));
 		bus.cookie = (void*)INTEL_I2C_IO_C;
 		error = ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL);
 		if (error == B_OK) {
 			edid_dump(&gInfo->edid_info);
 			gInfo->has_edid = true;
+		} else if (gInfo->shared_info->has_vesa_edid_info) {
+			TRACE("getting EDID on port C failed: %s. Use VESA EDID info\n",
+				strerror(error));
+			memcpy(&gInfo->edid_info, &gInfo->shared_info->vesa_edid_info,
+				sizeof(edid1_info));
+			gInfo->has_edid = true;
 		} else {
-			TRACE("getting EDID on port C failed : %s\n",
+			TRACE("getting EDID on port C failed: %s\n",
 				strerror(error));
 
 			// We could not read any EDID info. Fallback to creating a list with

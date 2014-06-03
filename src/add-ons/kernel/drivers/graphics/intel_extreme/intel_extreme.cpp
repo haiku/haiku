@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,12 +14,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+
+#include <boot_item.h>
 #include <driver_settings.h>
 #include <util/kernel_cpp.h>
-#include "utility.h"
+
+#include <vesa_info.h>
 
 #include "driver.h"
 #include "power.h"
+#include "utility.h"
 
 
 #define TRACE_INTELEXTREME
@@ -393,6 +397,13 @@ intel_extreme_init(intel_info &info)
 		intel_allocate_memory(info, B_PAGE_SIZE, 0, B_APERTURE_NEED_PHYSICAL,
 			(addr_t*)&info.shared_info->cursor_memory,
 			&info.shared_info->physical_cursor_memory);
+	}
+
+	edid1_info* edidInfo = (edid1_info*)get_boot_item(VESA_EDID_BOOT_INFO,
+		NULL);
+	if (edidInfo != NULL) {
+		info.shared_info->has_vesa_edid_info = true;
+		memcpy(&info.shared_info->vesa_edid_info, edidInfo, sizeof(edid1_info));
 	}
 
 	init_interrupt_handler(info);
