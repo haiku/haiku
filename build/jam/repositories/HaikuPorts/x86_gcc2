@@ -388,6 +388,8 @@ RemotePackageRepository HaikuPorts
 	speex_x86_devel-1.2~rc1-2
 	sqlite_x86-3.8.0.2-1
 	sqlite_x86_devel-3.8.0.2-1
+	tiff_x86-4.0.2-4
+	tiff_x86_devel-4.0.2-4
 	vcmi_x86-0.94-1
 	xz_utils_x86-5.0.5-1
 	zlib_x86-1.2.8-3
