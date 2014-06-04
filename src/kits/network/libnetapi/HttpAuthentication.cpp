@@ -88,7 +88,7 @@ BHttpAuthentication::Initialize(const BString& wwwAuthenticate)
 	else {
 		wwwAuthenticate.CopyInto(authRequired, 0, firstSpace);
 		wwwAuthenticate.CopyInto(additionalData, firstSpace + 1,
-			wwwAuthenticate.Length());
+			wwwAuthenticate.Length() - (firstSpace + 1));
 	}
 
 	authRequired.ToLower();
@@ -102,17 +102,17 @@ BHttpAuthentication::Initialize(const BString& wwwAuthenticate)
 
 
 	while (additionalData.Length()) {
-		int32 firstColon = additionalData.FindFirst(',');
-		if (firstColon == -1)
-			firstColon = additionalData.Length();
+		int32 firstComma = additionalData.FindFirst(',');
+		if (firstComma == -1)
+			firstComma = additionalData.Length();
 
 		BString value;
-		additionalData.MoveInto(value, 0, firstColon);
+		additionalData.MoveInto(value, 0, firstComma);
 		additionalData.Remove(0, 1);
 		additionalData.Trim();
 
 		int32 equal = value.FindFirst('=');
-		if (equal == -1)
+		if (equal <= 0)
 			continue;
 
 		BString name;
@@ -120,9 +120,9 @@ BHttpAuthentication::Initialize(const BString& wwwAuthenticate)
 		value.Remove(0, 1);
 		name.ToLower();
 
-		if (value[0] == '"') {
+		if (value.Length() > 0 && value[0] == '"') {
 			value.Remove(0, 1);
-			value.Remove(value.Length()-1, 1);
+			value.Remove(value.Length() - 1, 1);
 		}
 
 		PRINT(("HttpAuth: name=%s, value=%s\n", name.String(),
@@ -287,13 +287,13 @@ BHttpAuthentication::Base64Encode(const BString& string)
 /*static*/ BString
 BHttpAuthentication::Base64Decode(const BString& string)
 {
-	BString base64Reverse(kBase64Symbols);
 	BString result;
 
-	// Invalid input
+	// Check for invalid input
 	if (string.Length() % 4 != 0)
-		return BString("");
+		return result;
 
+	BString base64Reverse(kBase64Symbols);
 
 	BString tmpString(string);
 	while (tmpString.Length()) {
@@ -373,25 +373,26 @@ BString
 BHttpAuthentication::_H(const BString& value) const
 {
 	MD5_CTX context;
-	static unsigned char hashResult[MD5_DIGEST_LENGTH];
+	uchar hashResult[MD5_DIGEST_LENGTH];
 	MD5_Init(&context);
 	MD5_Update(&context, (void *)(value.String()), value.Length());
 	MD5_Final(hashResult, &context);
 
 	BString result;
-	// TODO: This is slower than it needs to be. If we already know the
-	// final hash string length, we can use
-	// BString::LockBuffer(MD5_DIGEST_LENGTH * 2) to preallocate it.
-	// I am not making the change since I can not test it right now (stippi).
+	// Preallocate the string
+	char* resultChar = result.LockBuffer(MD5_DIGEST_LENGTH * 2);
 	for (int i = 0; i < MD5_DIGEST_LENGTH; i++) {
 		char c = ((hashResult[i] & 0xF0) >> 4);
 		c += (c > 9) ? 'a' - 10 : '0';
-		result << c;
+		resultChar[0] = c;
+		resultChar++;
 
 		c = hashResult[i] & 0x0F;
 		c += (c > 9) ? 'a' - 10 : '0';
-		result << c;
+		resultChar[0] = c;
+		resultChar++;
 	}
+	result.UnlockBuffer(MD5_DIGEST_LENGTH * 2);
 
 	return result;
 }
