@@ -1,10 +1,10 @@
 /*
- * Copyright 2003-2007, Haiku. All rights reserved.
+ * Copyright 2003-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  *	Authors:
- *		Stefano Ceccherini (burton666@libero.it)
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Stefano Ceccherini, burton666@libero.it
  */
 
 
@@ -22,9 +22,7 @@
 const static int32 kDataBlockSize = 8;
 
 
-/*! \brief Initializes a region. The region will have no rects,
-	and its fBounds will be invalid.
-*/
+// Initializes an empty region.
 BRegion::BRegion()
 	:
 	fCount(0),
@@ -36,23 +34,19 @@ BRegion::BRegion()
 }
 
 
-/*! \brief Initializes a region to be a copy of another.
-	\param region The region to copy.
-*/
-BRegion::BRegion(const BRegion& region)
+// Initializes a region to be a copy of another.
+BRegion::BRegion(const BRegion& other)
 	:
 	fCount(0),
 	fDataSize(0),
 	fBounds((clipping_rect){ 0, 0, 0, 0 }),
 	fData(NULL)
 {
-	*this = region;
+	*this = other;
 }
 
 
-/*!	\brief Initializes a region to contain a BRect.
-	\param rect The BRect to set the region to.
-*/
+// Initializes a region to contain a BRect.
 BRegion::BRegion(const BRect rect)
 	:
 	fCount(0),
@@ -67,22 +61,19 @@ BRegion::BRegion(const BRect rect)
 	fCount = 1;
 }
 
+
+// Initializes a region to contain a clipping_rect.
 // NOTE: private constructor
-/*!	\brief Initializes a region to contain a clipping_rect.
-	\param rect The clipping_rect to set the region to, already in
-	internal rect format.
-*/
 BRegion::BRegion(const clipping_rect& rect)
-	: fCount(1)
-	, fDataSize(1)
-	, fBounds(rect)
-	, fData(&fBounds)
+	:
+	fCount(1),
+	fDataSize(1),
+	fBounds(rect),
+	fData(&fBounds)
 {
 }
 
 
-/*!	\brief Frees the allocated memory.
-*/
 BRegion::~BRegion()
 {
 	if (fData != &fBounds)
@@ -90,36 +81,27 @@ BRegion::~BRegion()
 }
 
 
-// #pragma mark -
-
-
-/*!	\brief Modifies the region to be a copy of the given BRegion.
-	\param region the BRegion to copy.
-	\return This function always returns \c *this.
-*/
+// Modifies the region to be a copy of the given BRegion.
 BRegion&
-BRegion::operator=(const BRegion& region)
+BRegion::operator=(const BRegion& other)
 {
-	if (&region == this)
+	if (&other == this)
 		return *this;
 
 	// handle reallocation if we're too small to contain
-	// the other region
-	if (_SetSize(region.fDataSize)) {
-		memcpy(fData, region.fData, region.fCount * sizeof(clipping_rect));
+	// the other other
+	if (_SetSize(other.fDataSize)) {
+		memcpy(fData, other.fData, other.fCount * sizeof(clipping_rect));
 
-		fBounds = region.fBounds;
-		fCount = region.fCount;
+		fBounds = other.fBounds;
+		fCount = other.fCount;
 	}
 
 	return *this;
 }
 
 
-/*!	\brief Compares this region to another (by value).
-	\param other the BRegion to compare to.
-	\return \ctrue if the two regions are the same, \cfalse otherwise.
-*/
+// Compares this region to another (by value).
 bool
 BRegion::operator==(const BRegion& other) const
 {
@@ -133,9 +115,7 @@ BRegion::operator==(const BRegion& other) const
 }
 
 
-/*!	\brief Set the region to contain just the given BRect.
-	\param newBounds A BRect.
-*/
+// Set the region to contain just the given BRect.
 void
 BRegion::Set(BRect newBounds)
 {
@@ -143,9 +123,7 @@ BRegion::Set(BRect newBounds)
 }
 
 
-/*!	\brief Set the region to contain just the given clipping_rect.
-	\param newBounds A clipping_rect.
-*/
+//Set the region to contain just the given clipping_rect.
 void
 BRegion::Set(clipping_rect newBounds)
 {
@@ -162,12 +140,7 @@ BRegion::Set(clipping_rect newBounds)
 }
 
 
-// #pragma mark -
-
-
-/*! \brief Returns the bounds of the region.
-	\return A BRect which represents the bounds of the region.
-*/
+// Returns the bounds of the region.
 BRect
 BRegion::Frame() const
 {
@@ -176,9 +149,8 @@ BRegion::Frame() const
 }
 
 
-/*! \brief Returns the bounds of the region as a clipping_rect (which has integer coordinates).
-	\return A clipping_rect which represents the bounds of the region.
-*/
+// Returns the bounds of the region as a clipping_rect
+// (which has integer coordinates).
 clipping_rect
 BRegion::FrameInt() const
 {
@@ -187,6 +159,7 @@ BRegion::FrameInt() const
 }
 
 
+// Returns the rect contained in the region at the given index.
 BRect
 BRegion::RectAt(int32 index)
 {
@@ -194,11 +167,7 @@ BRegion::RectAt(int32 index)
 }
 
 
-/*! \brief Returns the regions's BRect at the given index.
-	\param index The index (zero based) of the wanted rectangle.
-	\return If the given index is valid, it returns the BRect at that index,
-		otherwise, it returns an invalid BRect.
-*/
+// Returns the rect contained in the region at the given index. (const)
 BRect
 BRegion::RectAt(int32 index) const
 {
@@ -212,6 +181,7 @@ BRegion::RectAt(int32 index) const
 }
 
 
+// Returns the clipping_rect contained in the region at the given index.
 clipping_rect
 BRegion::RectAtInt(int32 index)
 {
@@ -219,11 +189,7 @@ BRegion::RectAtInt(int32 index)
 }
 
 
-/*! \brief Returns the regions's clipping_rect at the given index.
-	\param index The index (zero based) of the wanted rectangle.
-	\return If the given index is valid, it returns the clipping_rect at that index,
-		otherwise, it returns an invalid clipping_rect.
-*/
+// Returns the clipping_rect contained in the region at the given index.
 clipping_rect
 BRegion::RectAtInt(int32 index) const
 {
@@ -237,9 +203,7 @@ BRegion::RectAtInt(int32 index) const
 }
 
 
-/*!	\brief Counts the region rects.
-	\return An int32 which is the total number of rects in the region.
-*/
+// Returns the number of rects contained in the region.
 int32
 BRegion::CountRects()
 {
@@ -247,9 +211,7 @@ BRegion::CountRects()
 }
 
 
-/*!	\brief Counts the region rects.
-	\return An int32 which is the total number of rects in the region.
-*/
+// Returns the number of rects contained in the region.
 int32
 BRegion::CountRects() const
 {
@@ -257,13 +219,7 @@ BRegion::CountRects() const
 }
 
 
-// #pragma mark -
-
-
-/*!	\brief Check if the region has any area in common with the given BRect.
-	\param rect The BRect to check the region against to.
-	\return \ctrue if the region has any area in common with the BRect, \cfalse if not.
-*/
+// Check if the region has any area in common with the given BRect.
 bool
 BRegion::Intersects(BRect rect) const
 {
@@ -271,27 +227,21 @@ BRegion::Intersects(BRect rect) const
 }
 
 
-/*!	\brief Check if the region has any area in common with the given clipping_rect.
-	\param rect The clipping_rect to check the region against to.
-	\return \ctrue if the region has any area in common with the clipping_rect, \cfalse if not.
-*/
+// Check if the region has any area in common with the given clipping_rect.
 bool
-BRegion::Intersects(clipping_rect rect) const
+BRegion::Intersects(clipping_rect clipping) const
 {
 	// cheap convert to internal rect format
-	rect.right ++;
-	rect.bottom ++;
+	clipping.right++;
+	clipping.bottom++;
 
-	int result = Support::XRectInRegion(this, rect);
+	int result = Support::XRectInRegion(this, clipping);
 
 	return result > Support::RectangleOut;
 }
 
 
-/*!	\brief Check if the region contains the given BPoint.
-	\param pt The BPoint to be checked.
-	\return \ctrue if the region contains the BPoint, \cfalse if not.
-*/
+// Check if the region contains the given BPoint.
 bool
 BRegion::Contains(BPoint point) const
 {
@@ -299,11 +249,7 @@ BRegion::Contains(BPoint point) const
 }
 
 
-/*!	\brief Check if the region contains the given coordinates.
-	\param x The \cx coordinate of the point to be checked.
-	\param y The \cy coordinate of the point to be checked.
-	\return \ctrue if the region contains the point, \cfalse if not.
-*/
+// Check if the region contains the given coordinates.
 bool
 BRegion::Contains(int32 x, int32 y)
 {
@@ -311,11 +257,7 @@ BRegion::Contains(int32 x, int32 y)
 }
 
 
-/*!	\brief Check if the region contains the given coordinates.
-	\param x The \cx coordinate of the point to be checked.
-	\param y The \cy coordinate of the point to be checked.
-	\return \ctrue if the region contains the point, \cfalse if not.
-*/
+// Check if the region contains the given coordinates.
 bool
 BRegion::Contains(int32 x, int32 y) const
 {
@@ -323,8 +265,7 @@ BRegion::Contains(int32 x, int32 y) const
 }
 
 
-/*!	\brief Prints the BRegion to stdout.
-*/
+// Prints the BRegion to stdout.
 void
 BRegion::PrintToStream() const
 {
@@ -339,9 +280,6 @@ BRegion::PrintToStream() const
 }
 
 
-// #pragma mark -
-
-
 void
 BRegion::OffsetBy(const BPoint& point)
 {
@@ -349,10 +287,8 @@ BRegion::OffsetBy(const BPoint& point)
 }
 
 
-/*!	\brief Offsets all region's rects, and bounds by the given values.
-	\param dh The horizontal offset.
-	\param dv The vertical offset.
-*/
+// Applies the given x and y offsets to each rect contained by
+// the region and recalculates the region's bounds.
 void
 BRegion::OffsetBy(int32 x, int32 y)
 {
@@ -370,8 +306,8 @@ BRegion::OffsetBy(int32 x, int32 y)
 }
 
 
-/*!	\brief Empties the region, so that it doesn't include any rect, and invalidates its bounds.
-*/
+// Empties the region, so that it doesn't include any rect, and invalidates
+// its bounds.
 void
 BRegion::MakeEmpty()
 {
@@ -380,12 +316,7 @@ BRegion::MakeEmpty()
 }
 
 
-// #pragma mark -
-
-
-/*!	\brief Modifies the region, so that it includes the given BRect.
-	\param rect The BRect to be included by the region.
-*/
+// Modifies the region, so that it includes the given BRect.
 void
 BRegion::Include(BRect rect)
 {
@@ -393,32 +324,28 @@ BRegion::Include(BRect rect)
 }
 
 
-/*!	\brief Modifies the region, so that it includes the given clipping_rect.
-	\param rect The clipping_rect to be included by the region.
-*/
+// Modifies the region, so that it includes the given clipping_rect.
 void
-BRegion::Include(clipping_rect rect)
+BRegion::Include(clipping_rect clipping)
 {
-	if (!valid_rect(rect))
+	if (!valid_rect(clipping))
 		return;
 
-	// convert to internal rect format
-	rect.right ++;
-	rect.bottom ++;
+	// convert to internal clipping format
+	clipping.right++;
+	clipping.bottom++;
 
 	// use private clipping_rect constructor which avoids malloc()
-	BRegion t(rect);
+	BRegion temp(clipping);
 
 	BRegion result;
-	Support::XUnionRegion(this, &t, &result);
+	Support::XUnionRegion(this, &temp, &result);
 
 	_AdoptRegionData(result);
 }
 
 
-/*!	\brief Modifies the region, so that it includes the area of the given region.
-	\param region The region to be included.
-*/
+// Modifies the region, so that it includes the area of the given region.
 void
 BRegion::Include(const BRegion* region)
 {
@@ -427,9 +354,6 @@ BRegion::Include(const BRegion* region)
 
 	_AdoptRegionData(result);
 }
-
-
-// #pragma mark -
 
 
 /*!	\brief Modifies the region, excluding the area represented by the given BRect.
@@ -442,33 +366,28 @@ BRegion::Exclude(BRect rect)
 }
 
 
-/*!	\brief Modifies the region, excluding the area represented by the given clipping_rect.
-	\param rect The clipping_rect to be excluded.
-*/
+// Modifies the region, excluding the area represented by the given clipping_rect.
 void
-BRegion::Exclude(clipping_rect rect)
+BRegion::Exclude(clipping_rect clipping)
 {
-	if (!valid_rect(rect))
+	if (!valid_rect(clipping))
 		return;
 
-	// convert to internal rect format
-	rect.right ++;
-	rect.bottom ++;
+	// convert to internal clipping format
+	clipping.right++;
+	clipping.bottom++;
 
 	// use private clipping_rect constructor which avoids malloc()
-	BRegion t(rect);
+	BRegion temp(clipping);
 
 	BRegion result;
-	Support::XSubtractRegion(this, &t, &result);
+	Support::XSubtractRegion(this, &temp, &result);
 
 	_AdoptRegionData(result);
 }
 
 
-/*!	\brief Modifies the region, excluding the area contained in the given
-		BRegion.
-	\param region The BRegion to be excluded.
-*/
+// Modifies the region, excluding the area contained in the given BRegion.
 void
 BRegion::Exclude(const BRegion* region)
 {
@@ -479,13 +398,8 @@ BRegion::Exclude(const BRegion* region)
 }
 
 
-// #pragma mark -
-
-
-/*!	\brief Modifies the region, so that it will contain just the area
-		in common with the given BRegion.
-	\param region the BRegion to intersect with.
-*/
+// Modifies the region, so that it will contain only the area in common
+// with the given BRegion.
 void
 BRegion::IntersectWith(const BRegion* region)
 {
@@ -496,13 +410,8 @@ BRegion::IntersectWith(const BRegion* region)
 }
 
 
-// #pragma mark -
-
-
-/*!	\brief Modifies the region, so that it will contain just the area
-		which both regions do not have in common.
-	\param region the BRegion to exclusively include.
-*/
+// Modifies the region, so that it will contain just the area which both
+// regions do not have in common.
 void
 BRegion::ExclusiveInclude(const BRegion* region)
 {
@@ -513,12 +422,10 @@ BRegion::ExclusiveInclude(const BRegion* region)
 }
 
 
-// #pragma mark -
+//	#pragma mark - BRegion private methods
 
 
-/*!	\brief Takes over the data of a region and marks that region empty.
-	\param region The region to adopt the data from.
-*/
+// Takes over the data of a region and marks that region empty.
 void
 BRegion::_AdoptRegionData(BRegion& region)
 {
@@ -540,15 +447,13 @@ BRegion::_AdoptRegionData(BRegion& region)
 }
 
 
-/*!	\brief Reallocate the memory in the region.
-	\param newSize The amount of rectangles that the region should be
-		able to hold.
-*/
+// Reallocate the memory in the region.
 bool
 BRegion::_SetSize(int32 newSize)
 {
 	// we never shrink the size
 	newSize = max_c(fDataSize, newSize);
+		// The amount of rectangles that the region should be able to hold.
 	if (newSize == fDataSize)
 		return true;
 
@@ -611,4 +516,3 @@ BRegion::_ConvertToInternal(const clipping_rect& rect) const
 	return (clipping_rect){ rect.left, rect.top,
 		rect.right + 1, rect.bottom + 1 };
 }
-
