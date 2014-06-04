@@ -31,7 +31,7 @@ UrlTest::~UrlTest()
 // Test that parsing a valid URL and converting back to string doesn't alter it
 void UrlTest::ParseTest()
 {
-	int8 testIndex;
+	uint8 testIndex;
 	BUrl testUrl;
 
 	const char* kTestLength[] =
@@ -49,7 +49,8 @@ void UrlTest::ParseTest()
 		"http:"
 	};
 
-	for (testIndex = 0; kTestLength[testIndex] != NULL; testIndex++)
+	for (testIndex = 0; testIndex < sizeof(kTestLength) / sizeof(const char*);
+		testIndex++)
 	{
 		NextSubTest();
 
@@ -58,6 +59,102 @@ void UrlTest::ParseTest()
 			testUrl.UrlString());
 	}
 }
+
+
+void UrlTest::TestIsValid()
+{
+	BUrl url("http:");
+	CPPUNIT_ASSERT_MESSAGE("Created with a scheme but no hierarchical segment.",
+		!url.IsValid());
+
+	url.SetHost("<invalid>");
+	CPPUNIT_ASSERT_MESSAGE("Set to an invalid host.", !url.IsValid());
+
+	url.SetUrlString("");
+	url.SetProtocol("\t \n");
+	CPPUNIT_ASSERT_MESSAGE("Set a protocol with whitespace", !url.IsValid());
+	url.SetProtocol("123");
+	CPPUNIT_ASSERT_MESSAGE("Set an all-digits protocol", !url.IsValid());
+
+	url.SetUserName("user");
+	CPPUNIT_ASSERT_MESSAGE("Retain invalid state on user change",
+		!url.IsValid());
+	url.SetPassword("pass");
+	CPPUNIT_ASSERT_MESSAGE("Retain invalid state on password change",
+		!url.IsValid());
+
+	url.SetProtocol("http");
+	url.SetFragment("fragment");
+	CPPUNIT_ASSERT_MESSAGE("Only protocol and fragment are set",
+		!url.IsValid());
+	url.SetFragment("fragment");
+	url.SetProtocol("http");
+	CPPUNIT_ASSERT_MESSAGE("Only protocol and fragment are set",
+		!url.IsValid());
+}
+
+
+void UrlTest::TestGettersSetters()
+{
+	BUrl url;
+	url.SetProtocol("http");
+	url.SetUserName("user");
+	url.SetPassword("password");
+	url.SetHost("example.com");
+	url.SetPort(8080);
+	url.SetPath("/path");
+	url.SetRequest("query=value");
+	url.SetFragment("fragment");
+
+	CPPUNIT_ASSERT_EQUAL(BString("http"), url.Protocol());
+	CPPUNIT_ASSERT_EQUAL(BString("user"), url.UserName());
+	CPPUNIT_ASSERT_EQUAL(BString("password"), url.Password());
+	CPPUNIT_ASSERT_EQUAL(BString("user:password"), url.UserInfo());
+	CPPUNIT_ASSERT_EQUAL(BString("example.com"), url.Host());
+	CPPUNIT_ASSERT_EQUAL(BString("user:password@example.com:8080"),
+		url.Authority());
+	CPPUNIT_ASSERT_EQUAL(8080, url.Port());
+	CPPUNIT_ASSERT_EQUAL(BString("/path"), url.Path());
+	CPPUNIT_ASSERT_EQUAL(BString("query=value"), url.Request());
+	CPPUNIT_ASSERT_EQUAL(BString("fragment"), url.Fragment());
+	CPPUNIT_ASSERT_EQUAL(BString(
+			"http://user:password@example.com:8080/path?query=value#fragment"),
+		url.UrlString());
+}
+
+
+void UrlTest::TestNullity()
+{
+	BUrl url;
+	url.SetProtocol("http");
+	url.SetHost("example.com");
+
+	CPPUNIT_ASSERT(url.HasAuthority());
+	CPPUNIT_ASSERT(url.HasHost());
+
+	CPPUNIT_ASSERT(!url.HasUserName());
+	CPPUNIT_ASSERT(!url.HasPassword());
+	CPPUNIT_ASSERT(!url.HasUserInfo());
+	CPPUNIT_ASSERT(!url.HasPort());
+	CPPUNIT_ASSERT(!url.HasPath());
+	CPPUNIT_ASSERT(!url.HasRequest());
+	CPPUNIT_ASSERT(!url.HasFragment());
+}
+
+
+void UrlTest::TestCopy()
+{
+	BUrl url1("http://example.com");
+	BUrl url2(url1);
+
+	url2.SetHost("www.example.com");
+
+	CPPUNIT_ASSERT_EQUAL(BString("www.example.com"), url2.Host());
+	CPPUNIT_ASSERT_EQUAL(BString("http://www.example.com"), url2.UrlString());
+	CPPUNIT_ASSERT_EQUAL(BString("example.com"), url1.Host());
+	CPPUNIT_ASSERT_EQUAL(BString("http://example.com"), url1.UrlString());
+}
+
 
 typedef struct
 {
@@ -85,7 +182,19 @@ const ExplodeTest	kTestExplode[] =
 		{ "http://user:pass@host:80/path?query#fragment",
 			{ "http",   "user",   "pass",   "host",	 80,   "/path",	  "query",   "fragment" } },
 		{ "http://www.host.tld/path?query#fragment",
-			{ "http",   "",        "", "www.host.tld",0,   "/path",	  "query",   "fragment" } }
+			{ "http",   "",        "", "www.host.tld",0,   "/path",	  "query",   "fragment" } },
+		{ "",
+			{ "",       "",        "", "",            0,   "",        "",        ""} },
+		{ "HTTP://example.com.:%38%30/%70a%74%68?a=%31#1%323",
+			{ "HTTP",   "",        "", "example.com.",80,  "/%70a%74%68","a=%31","1%323"} },
+		{ "ldap://[2001:db8::7]/c=GB?objectClass?one",
+			{ "ldap",   "",        "", "[2001:db8::7]",389,"/c=GB",   "objectClass?one", "" } },
+		{ "mailto:John.Doe@example.com",
+			{ "mailto", "",        "", "",            0,   "John.Doe@example.com", "", "" } },
+		{ "mailto:?to=addr1@an.example,addr2@an.example",
+			{ "mailto", "",        "", "",            0,   "",        "to=addr1@an.example,addr2@an.example", "" } },
+		{ "urn:oasis:names:specification:docbook:dtd:xml:4.1.2",
+			{ "urn",    "",        "", "",            0,   "oasis:names:specification:docbook:dtd:xml:4.1.2", "", "" } }
 	};
 
 void UrlTest::ExplodeImplodeTest()
@@ -143,11 +252,14 @@ UrlTest::RelativeUriTest()
 	const RelativeUrl tests[] = {
 		{"http://example.com/path?query#frag", "",
 			"http://example.com/path?query"},
-		{"foo:a/b",			"../c",					"foo:c"},
+		{"foo:a/b",			"../c",					"foo:/c"},
+			// foo:c would be more intuitive, and is what skew.org tests.
+			// However, foo:/c is what the RFC says we should get.
 		{"foo:a",				"foo:.",				"foo:"},
 		{"zz:abc",				"/foo/../../../bar",	"zz:/bar"},
 		{"zz:abc",				"/foo/../bar",			"zz:/bar"},
-		{"zz:abc",				"foo/../../../bar",		"zz:bar"},
+		{"zz:abc",				"foo/../../../bar",		"zz:/bar"},
+			// zz:bar would be more intuitive, ...
 		{"zz:abc",				"zz:.",					"zz:"},
 		{"http://a/b/c/d;p?q",	"/.",					"http://a/"},
 		{"http://a/b/c/d;p?q",	"/.foo",				"http://a/.foo"},
@@ -334,7 +446,7 @@ UrlTest::RelativeUriTest()
 		{"http://ex/x/y/z",			"/r",			"http://ex/r"},
 		{"http://ex/x/y",			"./q:r",		"http://ex/x/q:r"},
 		{"http://ex/x/y",			"./p=q:r",		"http://ex/x/p=q:r"},
-		{"http://ex/x/y?pp/qq",		"?pp/rr",		"http://ex/x/y?pp=rr"},
+		{"http://ex/x/y?pp/qq",		"?pp/rr",		"http://ex/x/y?pp/rr"},
 		{"http://ex/x/y?pp/qq",		"y/z",			"http://ex/x/y/z"},
 
 		{"mailto:local", "local/qual@domain.org#frag",
@@ -473,6 +585,14 @@ UrlTest::AddTests(BTestSuite& parent)
 
 	suite.addTest(new CppUnit::TestCaller<UrlTest>("UrlTest::ParseTest",
 		&UrlTest::ParseTest));
+	suite.addTest(new CppUnit::TestCaller<UrlTest>("UrlTest::TestIsValid",
+		&UrlTest::TestIsValid));
+	suite.addTest(new CppUnit::TestCaller<UrlTest>(
+		"UrlTest::TestGettersSetters", &UrlTest::TestGettersSetters));
+	suite.addTest(new CppUnit::TestCaller<UrlTest>("UrlTest::TestNullity",
+		&UrlTest::TestNullity));
+	suite.addTest(new CppUnit::TestCaller<UrlTest>("UrlTest::TestCopy",
+		&UrlTest::TestCopy));
 	suite.addTest(new CppUnit::TestCaller<UrlTest>(
 		"UrlTest::ExplodeImplodeTest", &UrlTest::ExplodeImplodeTest));
 	suite.addTest(new CppUnit::TestCaller<UrlTest>("UrlTest::PathOnly",

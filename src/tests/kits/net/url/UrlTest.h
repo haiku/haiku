@@ -16,6 +16,10 @@ public:
 	virtual			~UrlTest();
 
 			void	ParseTest();
+			void	TestIsValid();
+			void	TestGettersSetters();
+			void	TestNullity();
+			void	TestCopy();
 			void	ExplodeImplodeTest();
 			void	PathOnly();
 			void	RelativeUriTest();
