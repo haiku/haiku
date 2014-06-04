@@ -1,0 +1,362 @@
+/*
+ * Copyright 2014 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Stefano Ceccherini, burton666@libero.it
+ *		John Scipione, jscipione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/Region.h	 hrev47289
+ *		src/kits/interface/Region.cpp	 hrev47289
+ */
+
+
+/*!
+	\file Region.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BRegion class definition.
+*/
+
+
+/*!
+	\class BRegion
+	\ingroup interface
+	\ingroup libbe
+	\brief An area composed of rectangles.
+
+	The rectangles do not need to overlap. This class is useful for creating
+	clipping masks.
+
+	\warning BRegion is designed to be used with integral coordinates only.
+*/
+
+
+/*!
+	\fn BRegion::BRegion()
+	\brief Initializes an empty region. The region contains no rectangles,
+	       and its bounds are invalid.
+*/
+
+
+/*!
+	\fn BRegion::BRegion(const BRegion& other)
+	\brief Initializes a region as a copy of \a other.
+
+	\param other The region to copy.
+*/
+
+
+/*!
+	\fn BRegion::BRegion(const BRect rect)
+	\brief Initializes a region to contain a \a rect.
+
+	\param rect The BRect to add to the region.
+*/
+
+
+/*!
+	\fn BRegion::BRegion(const clipping_rect& rect)
+	\brief Initializes a region to contain a clipping_rect.
+
+	\param rect The clipping_rect to set the region to, already in
+	       internal rect format.
+*/
+
+
+/*!
+	\fn BRegion::~BRegion()
+	\brief Destroys the BRegion freeing any memory allocated by it.
+*/
+
+
+/*!
+	\fn BRegion& BRegion::operator=(const BRegion& other)
+	\brief Modifies the BRegion to be a copy of \a other.
+
+	\param other the BRegion to copy.
+
+	\return This method always returns \c *this.
+*/
+
+
+/*!
+	\fn bool BRegion::operator==(const BRegion& other) const
+	\brief Compares this region to \a other by value.
+
+	\param other the BRegion to compare to.
+
+	\return \c true if the regions are the same, \c false otherwise.
+*/
+
+
+/*!
+	\fn void BRegion::Set(BRect newBounds)
+	\brief Set the region to bounds of \a newBounds.
+
+	\param newBounds The BRect to set the bounds to.
+*/
+
+
+/*!
+	\fn void BRegion::Set(clipping_rect newBounds)
+	\brief Set the region to the bounds of \a clipping_rect.
+
+	\param newBounds The clipping_rect to set the bounds to.
+*/
+
+
+/*!
+	\fn BRect BRegion::Frame() const
+	\brief Returns the region's bounds.
+
+	\return A BRect which represents the region's bounds.
+*/
+
+
+/*!
+	\fn clipping_rect BRegion::FrameInt() const
+	\brief Returns the bounds of the region as a clipping_rect
+	       (which has integer coordinates).
+
+	\return The clipping_rect which represents the region's bounds.
+*/
+
+
+/*!
+	\fn BRect BRegion::RectAt(int32 index)
+	\brief Returns the rectangle contained in the region at the given \a index.
+
+	\param index The index of the BRect to retreive.
+
+	\return If the given index is valid, it returns the BRect at that index,
+		otherwise, it returns an invalid BRect.
+*/
+
+
+/*!
+	\fn BRect BRegion::RectAt(int32 index) const
+	\brief Returns the rectangle contained in the region at the given \a index.
+
+	\param index The index of the BRect to retreive. (zero based)
+
+	\return If the given index is valid, it returns the BRect at that index,
+		otherwise, it returns an invalid BRect.
+*/
+
+
+/*!
+	fn clipping_rect BRegion::RectAtInt(int32 index)
+	\brief Returns the clipping_rect contained in the region at the given
+	       \a index.
+
+	\param index The index of the clipping_rect to retrieve. (zero based)
+
+	\return If the given index is valid, it returns the clipping_rect at that
+	        index, otherwise, it returns an invalid clipping_rect.
+*/
+
+
+/*!
+	\fn clipping_rect BRegion::RectAtInt(int32 index) const
+	\brief Returns the clipping_rect contained in the region at the given
+	       \a index.
+
+	\param index The index of the clipping_rect to retrieve. (zero based)
+
+	\return If the given index is valid, it returns the clipping_rect at that
+	        index, otherwise, it returns an invalid clipping_rect.
+*/
+
+
+/*!
+	\fn int32 BRegion::CountRects()
+	\brief Returns the number of rectangles contained in the region.
+
+	\return The number of rectangles in the region as an int32.
+*/
+
+
+/*!
+	\fn int32 BRegion::CountRects() const
+	\brief Returns the number of rectangles contained in the region.
+
+	\return The number of rectangles in the region as an int32.
+*/
+
+
+/*!
+	\fn bool BRegion::Intersects(BRect rect) const
+	\brief Returns whether or not the region has any area in common with
+	       \a rect.
+
+	\param rect The BRect to check the region against.
+
+	\return \c true if the region has any area in common with the BRect,
+	        \c false if not.
+*/
+
+
+/*!
+	\fn bool BRegion::Intersects(clipping_rect clipping) const
+	\brief Returns whether or not the region has any area in common with
+	       \a clipping.
+
+	\param clipping The clipping_rect to check the region against.
+
+	\return \c true if the region has any area in common with the
+	        clipping_rect, \c false if not.
+*/
+
+
+/*!
+	\fn bool BRegion::Contains(BPoint point) const
+	\brief Returns whether or not if the region contains the given \a point.
+
+	\param point The \a point to check.
+
+	\return \c true if the region contains the \a point, \c false if not.
+*/
+
+
+/*!
+	\fn bool BRegion::Contains(int32 x, int32 y)
+	\brief Returns whether or not the region contains the given coordinates.
+
+	\param x The \c x coordinate of the point to check.
+	\param y The \c y coordinate of the point to check.
+
+	\return \c true if the region contains the point, \c false if not.
+*/
+
+
+/*!
+	\fn bool BRegion::Contains(int32 x, int32 y) const
+	\brief Return whether or not the region contains the given coordinates.
+
+	\param x The \c x coordinate of the point to check.
+	\param y The \c y coordinate of the point to check.
+
+	\return \c true if the region contains the point, \c false if not.
+*/
+
+
+/*!
+	\fn void BRegion::PrintToStream() const
+	\brief Prints each rect in the the BRegion to standard output.
+*/
+
+
+/*!
+	\fn void BRegion::OffsetBy(const BPoint& point)
+	\brief Applies the given offsets given by the x and y coordinates of
+	       \a point to each rectangle contained in the region and recalculates
+	       the region's bounds.
+
+	\param point The point to get the coordinates to offset by.
+*/
+
+
+/*!
+	\fn void BRegion::OffsetBy(int32 x, int32 y)
+	\brief Applies the given \a x and \a y offsets to each rectangle contained
+	       in the region and recalculates the region's bounds.
+
+	\param x The horizontal offset.
+	\param y The vertical offset.
+*/
+
+
+/*!
+	\fn void BRegion::MakeEmpty()
+	\brief Empties the region so that it doesn't containt any rects, and
+	       invalidates its bounds.
+*/
+
+
+/*!
+	\fn void BRegion::Include(BRect rect)
+	\brief Modifies the region so that it includes the given \a rect.
+
+	\param rect The BRect to include in the region.
+*/
+
+
+/*!
+	\fn void BRegion::Include(clipping_rect clipping)
+	\brief Modifies the region so that it includes the given \a clipping
+	       rectangle.
+
+	\param clipping The clipping_rect to include in the region.
+*/
+
+
+/*!
+	\fn void BRegion::Include(const BRegion* region)
+	\brief Modifies the region to include the area of the given \a region.
+
+	\param region The \a region to be included.
+*/
+
+
+/*!
+	\fn void BRegion::Exclude(BRect rect)
+	\brief Modifies the region excluding the area of the given \a rect.
+
+	\param rect The BRect to be excluded.
+*/
+
+
+/*!
+	\fn void BRegion::Exclude(clipping_rect clipping)
+	\brief Modifies the region excluding the area of the given \a clipping
+	       rectangle.
+
+	\param clipping The clipping_rect to be excluded.
+*/
+
+
+/*!
+	\fn void BRegion::Exclude(const BRegion* region)
+	\brief Modifies the region excluding the area contained by the given
+	      \a region.
+
+	\param region The BRegion to be excluded.
+*/
+
+
+/*!
+	\fn void BRegion::IntersectWith(const BRegion* region)
+	\brief Modifies the region, so that it will contain only the area
+		   in common with \a region.
+
+	\param region the BRegion to intersect with.
+*/
+
+
+/*!
+	\fn void BRegion::ExclusiveInclude(const BRegion* region)
+	\brief Modifies the region so that it contains only the area
+	       which the BRegion and \a region do NOT have in common.
+
+	\param region the BRegion to exclusively include.
+*/
+
+
+/*!
+	\fn void BRegion::_AdoptRegionData(BRegion& region)
+	\brief Takes over the data of \a region and empties it.
+
+	\param region The \a region to adopt data from.
+*/
+
+
+/*!
+	\fn bool BRegion::_SetSize(int32 newSize)
+	\brief Reallocate the memory in the region.
+
+	\param newSize The amount of rectangles that the region should be
+		able to hold.
+*/
