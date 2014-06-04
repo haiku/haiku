@@ -30,7 +30,8 @@ BUrl::BUrl(const char* url)
 	fPort(0),
 	fPath(),
 	fRequest(),
-	fHasAuthority(false)
+	fHasAuthority(false),
+	fHasFragment(false)
 {
 	SetUrlString(url);
 }
@@ -46,7 +47,8 @@ BUrl::BUrl(BMessage* archive)
 	fPort(0),
 	fPath(),
 	fRequest(),
-	fHasAuthority(false)
+	fHasAuthority(false),
+	fHasFragment(false)
 {
 	BString url;
 
@@ -68,7 +70,8 @@ BUrl::BUrl(const BUrl& other)
 	fPort(0),
 	fPath(),
 	fRequest(),
-	fHasAuthority(false)
+	fHasAuthority(false),
+	fHasFragment(false)
 {
 	*this = other;
 }
@@ -84,24 +87,26 @@ BUrl::BUrl(const BUrl& base, const BString& location)
 	fPort(0),
 	fPath(),
 	fRequest(),
-	fHasAuthority(false)
+	fHasAuthority(false),
+	fHasFragment(false)
 {
 	// This implements the algorithm in RFC3986, Section 5.2.
 
 	BUrl relative(location);
 	if (relative.HasProtocol()) {
 		SetProtocol(relative.Protocol());
-		SetAuthority(relative.Authority());
-		SetPath(relative.Path()); // TODO _RemoveDotSegments()
+		if (relative.HasAuthority())
+			SetAuthority(relative.Authority());
+		SetPath(relative.Path());
 		SetRequest(relative.Request());
 	} else {
 		if (relative.HasAuthority()) {
 			SetAuthority(relative.Authority());
-			SetPath(relative.Path()); // TODO _RemoveDotSegments()
+			SetPath(relative.Path());
 			SetRequest(relative.Request());
 		} else {
 			if (relative.Path().IsEmpty()) {
-				SetPath(base.Path());
+				_SetPathUnsafe(base.Path());
 				if (relative.HasRequest())
 					SetRequest(relative.Request());
 				else
@@ -110,22 +115,20 @@ BUrl::BUrl(const BUrl& base, const BString& location)
 				if (relative.Path()[0] == '/')
 					SetPath(relative.Path());
 				else {
-					BString path = base.Path();
-					// Remove last part of path (the file, if any) so we get the
-					// "current directory"
-					path.Truncate(path.FindLast('/') + 1);
-					path += relative.Path();
-					// TODO _RemoveDotSegments()
+					BString path = base._MergePath(relative.Path());
 					SetPath(path);
 				}
 				SetRequest(relative.Request());
 			}
-			SetAuthority(base.Authority());
+
+			if (base.HasAuthority())
+				SetAuthority(base.Authority());
 		}
 		SetProtocol(base.Protocol());
 	}
 
-	SetFragment(relative.Fragment());
+	if (relative.HasFragment())
+		SetFragment(relative.Fragment());
 }
 
 
@@ -139,7 +142,8 @@ BUrl::BUrl()
 	fPort(0),
 	fPath(),
 	fRequest(),
-	fHasAuthority(false)
+	fHasAuthority(false),
+	fHasFragment(false)
 {
 	_ResetFields();
 }
@@ -220,9 +224,80 @@ BUrl::SetPort(int port)
 BUrl&
 BUrl::SetPath(const BString& path)
 {
-	fPath = path;
-	fHasPath = true; // RFC says an empty path is still a path
-	fUrlStringValid = false;
+	// Implements RFC3986 section 5.2.4, "Remove dot segments"
+
+	// 1.
+	BString output;
+	BString input(path);
+
+	// 2.
+	while(!input.IsEmpty())
+	{
+		// 2.A.
+		if (input.StartsWith("./"))
+		{
+			input.Remove(0, 2);
+			continue;
+		}
+
+		if (input.StartsWith("../"))
+		{
+			input.Remove(0, 3);
+			continue;
+		}
+
+		// 2.B.
+		if (input.StartsWith("/./"))
+		{
+			input.Remove(0, 2);
+			continue;
+		}
+
+		if (input == "/.")
+		{
+			input.Remove(1, 1);
+			continue;
+		}
+
+		// 2.C.
+		if (input.StartsWith("/../"))
+		{
+			input.Remove(0, 3);
+			output.Truncate(output.FindLast('/'));
+			continue;
+		}
+
+		if (input == "/..")
+		{
+			input.Remove(1, 2);
+			output.Truncate(output.FindLast('/'));
+			continue;
+		}
+
+		// 2.D.
+		if (input == "." || input == "..")
+		{
+			break;
+		}
+
+		if (input == "/.")
+		{
+			input.Remove(1, 1);
+			continue;
+		}
+
+		// 2.E.
+		int slashpos = input.FindFirst('/', 1);
+		if (slashpos > 0) {
+			output.Append(input, slashpos);
+			input.Remove(0, slashpos);
+		} else {
+			output.Append(input);
+			break;
+		}
+	}
+
+	_SetPathUnsafe(output);
 	return *this;
 }
 
@@ -241,7 +316,7 @@ BUrl&
 BUrl::SetFragment(const BString& fragment)
 {
 	fFragment = fragment;
-	fHasFragment = !fFragment.IsEmpty();
+	fHasFragment = true;
 	fUrlStringValid = false;
 	return *this;
 }
@@ -657,9 +732,13 @@ BUrl::_ExplodeUrlString(const BString& url)
 		fHasProtocol = true;
 
 	// Authority (including user credentials, host, and port
-	url.CopyInto(fAuthority, match.GroupStartOffsetAt(3),
-		match.GroupEndOffsetAt(3) - match.GroupStartOffsetAt(3));
-	SetAuthority(fAuthority);
+	if (match.GroupEndOffsetAt(2) - match.GroupStartOffsetAt(2) > 0)
+	{
+		url.CopyInto(fAuthority, match.GroupStartOffsetAt(3),
+			match.GroupEndOffsetAt(3) - match.GroupStartOffsetAt(3));
+		SetAuthority(fAuthority);
+	} else
+		fHasAuthority = false;
 
 	// Path
 	url.CopyInto(fPath, match.GroupStartOffsetAt(4),
@@ -668,16 +747,56 @@ BUrl::_ExplodeUrlString(const BString& url)
 		fHasPath = true;
 
 	// Query
-	url.CopyInto(fRequest, match.GroupStartOffsetAt(6),
-		match.GroupEndOffsetAt(6) - match.GroupStartOffsetAt(6));
-	if (!fRequest.IsEmpty())
+	if (match.GroupEndOffsetAt(5) - match.GroupStartOffsetAt(5) > 0)
+	{
+		url.CopyInto(fRequest, match.GroupStartOffsetAt(6),
+			match.GroupEndOffsetAt(6) - match.GroupStartOffsetAt(6));
 		fHasRequest = true;
+	} else {
+		fRequest = "";
+		fHasRequest = false;
+	}
 
 	// Fragment
-	url.CopyInto(fFragment, match.GroupStartOffsetAt(8),
-		match.GroupEndOffsetAt(8) - match.GroupStartOffsetAt(8));
-	if (!fFragment.IsEmpty())
+	if (match.GroupEndOffsetAt(7) - match.GroupStartOffsetAt(7) > 0)
+	{
+		url.CopyInto(fFragment, match.GroupStartOffsetAt(8),
+			match.GroupEndOffsetAt(8) - match.GroupStartOffsetAt(8));
 		fHasFragment = true;
+	} else {
+		fFragment = "";
+		fHasFragment = false;
+	}
+}
+
+
+BString
+BUrl::_MergePath(const BString& relative) const
+{
+	// This implements RFC3986, Section 5.2.3.
+	if (HasAuthority() && fPath == "")
+	{
+		BString result("/");
+		result << relative;
+		return result;
+	}
+
+	BString result(fPath);
+	result.Truncate(result.FindLast("/") + 1);
+	result << relative;
+
+	return result;
+}
+
+
+// This sets the path without normalizing it. If fed with a path that has . or
+// .. segments, this would make the URL invalid.
+void
+BUrl::_SetPathUnsafe(const BString& path)
+{
+	fPath = path;
+	fHasPath = true; // RFC says an empty path is still a path
+	fUrlStringValid = false;
 }
 
 
@@ -690,10 +809,14 @@ BUrl::SetAuthority(const BString& authority)
 	fHasUserInfo = false;
 	fHasHost = false;
 
+	// An empty authority is still an authority, making it possible to have
+	// URLs such as file:///path/to/file.
+	// TODO however, there is no way to unset the authority once it is set...
+	// We may want to take a const char* parameter and allow NULL.
+	fHasAuthority = true;
 	if (fAuthority.IsEmpty())
 		return;
 
-	fHasAuthority = true;
 	int32 userInfoEnd = fAuthority.FindFirst('@');
 
 	// URL contains userinfo field
