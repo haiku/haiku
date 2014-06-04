@@ -105,7 +105,7 @@ BUrl::BUrl(const BUrl& base, const BString& location)
 				if (relative.HasRequest())
 					SetRequest(relative.Request());
 				else
-					SetRequest(Request());
+					SetRequest(base.Request());
 			} else {
 				if (relative.Path()[0] == '/')
 					SetPath(relative.Path());
