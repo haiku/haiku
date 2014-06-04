@@ -270,7 +270,7 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_x86_devel-0.10.2-3
 	freetype_x86-2.5.2-2
 	freetype_x86_devel-2.5.2-2
-	gcc_x86-4.8.2_2014_03_20-1
+	gcc_x86-4.8.3_2014_05_28-1
 	gettext_x86-0.18.1.1-5
 	gettext_x86_libintl-0.18.1.1-5
 	giflib_x86-5.0.5-2
@@ -321,8 +321,8 @@ RemotePackageRepository HaikuPorts
 	libsdl_x86_devel-1.2.15-5
 	libsdl2_x86-2.0.1-3
 	libsdl2_x86_devel-2.0.1-3
-	libsolv_x86-0.3.0_haiku_2013_10_01-1
-	libsolv_x86_devel-0.3.0_haiku_2013_10_01-1
+	libsolv_x86-0.3.0_haiku_2013_10_01-2
+	libsolv_x86_devel-0.3.0_haiku_2013_10_01-2
 	libtheora_x86-1.1.1-2
 	libtheora_x86_devel-1.1.1-2
 	libvorbis_x86-1.3.2-2
@@ -393,8 +393,8 @@ RemotePackageRepository HaikuPorts
 	tiff_x86_devel-3.9.6-2
 	vcmi_x86-0.94-1
 	xz_utils_x86-5.0.5-1
-	zlib_x86-1.2.8-3
-	zlib_x86_devel-1.2.8-3
+	zlib_x86-1.2.8-4
+	zlib_x86_devel-1.2.8-4
 	:
 	# source packages
 	ale
