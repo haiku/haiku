@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Haiku Inc. All rights reserved.
+ * Copyright 2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/Region.h	 hrev47289
- *		src/kits/interface/Region.cpp	 hrev47289
+ *		headers/os/interface/Region.h	 hrev47312
+ *		src/kits/interface/Region.cpp	 hrev47312
  */
 
 
@@ -58,10 +58,10 @@
 
 
 /*!
-	\fn BRegion::BRegion(const clipping_rect& rect)
+	\fn BRegion::BRegion(const clipping_rect& clipping)
 	\brief Initializes a region to contain a clipping_rect.
 
-	\param rect The clipping_rect to set the region to, already in
+	\param clipping The clipping_rect to set the region to, already in
 	       internal rect format.
 */
 

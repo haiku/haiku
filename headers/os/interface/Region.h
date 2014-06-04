@@ -83,7 +83,7 @@ private:
 	friend class Support;
 
 private:
-								BRegion(const clipping_rect& other);
+								BRegion(const clipping_rect& clipping);
 
 			void				_AdoptRegionData(BRegion& region);
 			bool				_SetSize(int32 newSize);

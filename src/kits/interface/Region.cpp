@@ -64,11 +64,11 @@ BRegion::BRegion(const BRect rect)
 
 // Initializes a region to contain a clipping_rect.
 // NOTE: private constructor
-BRegion::BRegion(const clipping_rect& rect)
+BRegion::BRegion(const clipping_rect& clipping)
 	:
 	fCount(1),
 	fDataSize(1),
-	fBounds(rect),
+	fBounds(clipping),
 	fData(&fBounds)
 {
 }
