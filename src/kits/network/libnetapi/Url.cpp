@@ -30,7 +30,7 @@ BUrl::BUrl(const char* url)
 	fPort(0),
 	fPath(),
 	fRequest(),
-	fHasAuthority(false),
+	fHasHost(false),
 	fHasFragment(false)
 {
 	SetUrlString(url);
@@ -47,7 +47,7 @@ BUrl::BUrl(BMessage* archive)
 	fPort(0),
 	fPath(),
 	fRequest(),
-	fHasAuthority(false),
+	fHasHost(false),
 	fHasFragment(false)
 {
 	BString url;
@@ -70,7 +70,7 @@ BUrl::BUrl(const BUrl& other)
 	fPort(0),
 	fPath(),
 	fRequest(),
-	fHasAuthority(false),
+	fHasHost(false),
 	fHasFragment(false)
 {
 	*this = other;
@@ -87,7 +87,7 @@ BUrl::BUrl(const BUrl& base, const BString& location)
 	fPort(0),
 	fPath(),
 	fRequest(),
-	fHasAuthority(false),
+	fHasHost(false),
 	fHasFragment(false)
 {
 	// This implements the algorithm in RFC3986, Section 5.2.
@@ -142,7 +142,7 @@ BUrl::BUrl()
 	fPort(0),
 	fPath(),
 	fRequest(),
-	fHasAuthority(false),
+	fHasHost(false),
 	fHasFragment(false)
 {
 	_ResetFields();
@@ -465,7 +465,7 @@ BUrl::HasProtocol() const
 bool
 BUrl::HasAuthority() const
 {
-	return fHasAuthority;
+	return fHasHost || fHasUserName;
 }
 
 
@@ -486,7 +486,7 @@ BUrl::HasPassword() const
 bool
 BUrl::HasUserInfo() const
 {
-	return fHasUserInfo;
+	return fHasUserName || fHasPassword;
 }
 
 
@@ -641,10 +641,8 @@ BUrl::operator=(const BUrl& other)
 	fHasProtocol		= other.fHasProtocol;
 	fHasUserName		= other.fHasUserName;
 	fHasPassword		= other.fHasPassword;
-	fHasUserInfo		= other.fHasUserInfo;
 	fHasHost			= other.fHasHost;
 	fHasPort			= other.fHasPort;
-	fHasAuthority		= other.fHasAuthority;
 	fHasPath			= other.fHasPath;
 	fHasRequest			= other.fHasRequest;
 	fHasFragment		= other.fHasFragment;
@@ -684,10 +682,8 @@ BUrl::_ResetFields()
 	fHasProtocol = false;
 	fHasUserName = false;
 	fHasPassword = false;
-	fHasUserInfo = false;
 	fHasHost = false;
 	fHasPort = false;
-	fHasAuthority = false;
 	fHasPath = false;
 	fHasRequest = false;
 	fHasFragment = false;
@@ -737,8 +733,12 @@ BUrl::_ExplodeUrlString(const BString& url)
 		url.CopyInto(fAuthority, match.GroupStartOffsetAt(3),
 			match.GroupEndOffsetAt(3) - match.GroupStartOffsetAt(3));
 		SetAuthority(fAuthority);
-	} else
-		fHasAuthority = false;
+	} else {
+		fHasHost = false;
+		fHasPort = false;
+		fHasUserName = false;
+		fHasPassword = false;
+	}
 
 	// Path
 	url.CopyInto(fPath, match.GroupStartOffsetAt(4),
@@ -806,14 +806,15 @@ BUrl::SetAuthority(const BString& authority)
 	fAuthority = authority;
 
 	fHasPort = false;
-	fHasUserInfo = false;
-	fHasHost = false;
+	fHasUserName = false;
+	fHasPassword = false;
 
 	// An empty authority is still an authority, making it possible to have
 	// URLs such as file:///path/to/file.
 	// TODO however, there is no way to unset the authority once it is set...
 	// We may want to take a const char* parameter and allow NULL.
-	fHasAuthority = true;
+	fHasHost = true;
+
 	if (fAuthority.IsEmpty())
 		return;
 
@@ -837,8 +838,6 @@ BUrl::SetAuthority(const BString& authority)
 		} else {
 			SetUserName(fUser);
 		}
-
-		fHasUserInfo = true;
 	}
 
 

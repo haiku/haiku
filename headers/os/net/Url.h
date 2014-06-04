@@ -89,6 +89,8 @@ public:
 private:
 			void				_ResetFields();
 			void				_ExplodeUrlString(const BString& urlString);
+			BString				_MergePath(const BString& relative) const;
+			void				_SetPathUnsafe(const BString& path);
 
 	static	BString				_DoUrlEncodeChunk(const BString& chunk, 
 									bool strict, bool directory = false);
@@ -121,10 +123,8 @@ private:
 			bool				fHasProtocol : 1;
 			bool				fHasUserName : 1;
 			bool				fHasPassword : 1;
-			bool				fHasUserInfo : 1;
 			bool				fHasHost : 1;
 			bool				fHasPort : 1;
-			bool				fHasAuthority : 1;
 			bool				fHasPath : 1;
 			bool				fHasRequest : 1;
 			bool				fHasFragment : 1;
