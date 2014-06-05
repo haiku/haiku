@@ -243,21 +243,32 @@ PieView::MouseDown(BPoint where)
 void
 PieView::MouseUp(BPoint where)
 {
-	// If the primary button was released and there was no dragging happening,
-	// just zoom in or out.
 	if (fClicked && !fDragging) {
+		// The primary mouse button was released and there's no dragging happening.
 		FileInfo* info = _FileAt(where);
 		if (info != NULL) {
-			if (info == fScanner->CurrentDir()) {
-				fScanner->ChangeDir(info->parent);
-				fLastWhere = where;
-				fUpdateFileAt = true;
-				Invalidate();
-			} else if (info->children.size() > 0) {
-				fScanner->ChangeDir(info);
-				fLastWhere = where;
-				fUpdateFileAt = true;
-				Invalidate();
+			BMessage* current = Window()->CurrentMessage();
+
+			uint32 modifiers;
+			if (current->FindInt32("modifiers", (int32*)&modifiers) != B_OK)
+				modifiers = 0;
+
+			if ((modifiers & B_COMMAND_KEY) != 0) {
+				// launch the app on command-click
+				_Launch(info);
+			} else {
+				// zoom in or out
+				if (info == fScanner->CurrentDir()) {
+					fScanner->ChangeDir(info->parent);
+					fLastWhere = where;
+					fUpdateFileAt = true;
+					Invalidate();
+				} else if (info->children.size() > 0) {
+					fScanner->ChangeDir(info);
+					fLastWhere = where;
+					fUpdateFileAt = true;
+					Invalidate();
+				}
 			}
 		}
 	}
