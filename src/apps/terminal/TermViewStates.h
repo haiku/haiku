@@ -37,7 +37,7 @@ public:
 	virtual void				MouseDown(BPoint where, int32 buttons,
 									int32 modifiers);
 	virtual void				MouseMoved(BPoint where, uint32 transit,
-									const BMessage* message, int32 modifiers);
+									const BMessage* dragMessage, int32 modifiers);
 	virtual void				MouseUp(BPoint where, int32 buttons);
 
 	virtual	void				WindowActivated(bool active);
@@ -71,7 +71,7 @@ public:
 	virtual void				MouseDown(BPoint where, int32 buttons,
 									int32 modifiers);
 	virtual void				MouseMoved(BPoint where, uint32 transit,
-									const BMessage* message, int32 modifiers);
+									const BMessage* dragMessage, int32 modifiers);
 
 	virtual	void				WindowActivated(bool active);
 
@@ -89,7 +89,7 @@ public:
 	virtual	bool				MessageReceived(BMessage* message);
 
 	virtual void				MouseMoved(BPoint where, uint32 transit,
-									const BMessage* message, int32 modifiers);
+									const BMessage* dragMessage, int32 modifiers);
 	virtual void				MouseUp(BPoint where, int32 buttons);
 
 private:
@@ -116,7 +116,7 @@ public:
 	virtual void				MouseDown(BPoint where, int32 buttons,
 									int32 modifiers);
 	virtual void				MouseMoved(BPoint where, uint32 transit,
-									const BMessage* message, int32 modifiers);
+									const BMessage* dragMessage, int32 modifiers);
 
 	virtual	void				WindowActivated(bool active);
 

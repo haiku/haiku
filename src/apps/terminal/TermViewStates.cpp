@@ -193,8 +193,10 @@ TermView::DefaultState::ModifiersChanged(int32 oldModifiers, int32 modifiers)
 void
 TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 {
-	int32 key, mod, rawChar;
-	BMessage *currentMessage = fView->Looper()->CurrentMessage();
+	int32 key;
+	int32 mod;
+	int32 rawChar;
+	BMessage* currentMessage = fView->Looper()->CurrentMessage();
 	if (currentMessage == NULL)
 		return;
 
@@ -378,7 +380,7 @@ TermView::DefaultState::MouseDown(BPoint where, int32 buttons, int32 modifiers)
 		return;
 	}
 
-	// Select Region
+	// select region
 	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
 		fView->fSelectState->Prepare(where, modifiers);
 		fView->_NextState(fView->fSelectState);
@@ -388,7 +390,7 @@ TermView::DefaultState::MouseDown(BPoint where, int32 buttons, int32 modifiers)
 
 void
 TermView::DefaultState::MouseMoved(BPoint where, uint32 transit,
-	const BMessage* message, int32 modifiers)
+	const BMessage* dragMessage, int32 modifiers)
 {
 	if (_CheckEnterHyperLinkState(modifiers))
 		return;
@@ -602,12 +604,9 @@ TermView::SelectState::MouseUp(BPoint where, int32 buttons)
 		|| fView->fReportNormalMouseEvent) {
 		TermPos clickPos = fView->_ConvertToTerminal(where);
 		fView->_SendMouseEvent(0, 0, clickPos.x, clickPos.y, false);
-	} else {
-		if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0
-			&& (fView->fMouseButtons & B_PRIMARY_MOUSE_BUTTON) != 0) {
-			fView->Copy(fView->fMouseClipboard);
-		}
-
+	} else if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0
+		&& (fView->fMouseButtons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+		fView->Copy(fView->fMouseClipboard);
 	}
 
 	fView->_NextState(fView->fDefaultState);
@@ -687,6 +686,7 @@ TermView::HyperLinkState::MouseDown(BPoint where, int32 buttons,
 	TermPos start;
 	TermPos end;
 	HyperLink link;
+
 	bool pathPrefixOnly = (modifiers & B_SHIFT_KEY) != 0;
 	if (!_GetHyperLinkAt(where, pathPrefixOnly, link, start, end))
 		return;
@@ -939,12 +939,14 @@ TermView::HyperLinkState::_UpdateHighlight()
 	_UpdateHighlight(where, fView->fModifiers);
 }
 
+
 void
 TermView::HyperLinkState::_UpdateHighlight(BPoint where, int32 modifiers)
 {
 	TermPos start;
 	TermPos end;
 	HyperLink link;
+
 	bool pathPrefixOnly = (modifiers & B_SHIFT_KEY) != 0;
 	if (_GetHyperLinkAt(where, pathPrefixOnly, link, start, end))
 		_ActivateHighlight(start, end);
@@ -960,6 +962,7 @@ TermView::HyperLinkState::_ActivateHighlight(const TermPos& start,
 	if (fHighlightActive) {
 		if (fHighlight.Start() == start && fHighlight.End() == end)
 			return;
+
 		_DeactivateHighlight();
 	}
 
@@ -1091,4 +1094,3 @@ TermView::HyperLinkMenuState::MessageReceived(BMessage* message)
 
 	return false;
 }
-
