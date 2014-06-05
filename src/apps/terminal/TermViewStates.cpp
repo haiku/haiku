@@ -966,10 +966,10 @@ TermView::HyperLinkState::_EntryExists(const BString& path,
 void
 TermView::HyperLinkState::_UpdateHighlight()
 {
-	BPoint where;
-	uint32 buttons;
-	fView->GetMouse(&where, &buttons, false);
-	_UpdateHighlight(where, fView->fModifiers);
+	if (fView == NULL)
+		return;
+
+	_UpdateHighlight(fView->fLastClickPoint, fView->fModifiers);
 }
 
 
