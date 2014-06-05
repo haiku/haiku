@@ -64,7 +64,7 @@ BUrlContext::AddAuthentication(const BUrl& url,
 	// authentication for the same domain.
 	if (authentication != previous) {
 		fAuthenticationMap->Put(hostHash, authentication);
-			// replaces the old one
+			// replaces the old one, or adds it in case previous == NULL
 		delete previous;
 	}
 }
