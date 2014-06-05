@@ -190,6 +190,7 @@ PieView::MessageReceived(BMessage* message)
 			if (fScanner != NULL)
 				fScanner->Cancel();
 			break;
+
 		case kBtnRescan:
 			if (fVolume != NULL) {
 				if (fScanner != NULL)
@@ -203,13 +204,13 @@ PieView::MessageReceived(BMessage* message)
 
 		case kScanDone:
 			fWindow->EnableRescan();
+			// fall-through
 		case kScanProgress:
 			Invalidate();
 			break;
 
 		default:
 			BView::MessageReceived(message);
-			break;
 	}
 }
 
@@ -217,8 +218,9 @@ PieView::MessageReceived(BMessage* message)
 void
 PieView::MouseDown(BPoint where)
 {
-	uint32 buttons;
 	BMessage* current = Window()->CurrentMessage();
+
+	uint32 buttons;
 	if (current->FindInt32("buttons", (int32*)&buttons) != B_OK)
 		buttons = B_PRIMARY_MOUSE_BUTTON;
 
@@ -226,7 +228,7 @@ PieView::MouseDown(BPoint where)
 	if (info == NULL || info->pseudo)
 		return;
 
-	if (buttons & B_PRIMARY_MOUSE_BUTTON) {
+	if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
 		fClicked = true;
 		fDragStart = where;
 		fClickedFile = info;
