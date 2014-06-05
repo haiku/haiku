@@ -381,6 +381,9 @@ BHttpAuthentication::_H(const BString& value) const
 	BString result;
 	// Preallocate the string
 	char* resultChar = result.LockBuffer(MD5_DIGEST_LENGTH * 2);
+	if (resultChar == NULL)
+		return BString();
+
 	for (int i = 0; i < MD5_DIGEST_LENGTH; i++) {
 		char c = ((hashResult[i] & 0xF0) >> 4);
 		c += (c > 9) ? 'a' - 10 : '0';
