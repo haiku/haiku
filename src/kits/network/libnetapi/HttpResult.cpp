@@ -102,7 +102,7 @@ BHttpResult::StatusText() const
 bool
 BHttpResult::HasHeaders() const
 {
-	return (fHeaders.CountHeaders() > 0);
+	return fHeaders.CountHeaders() > 0;
 }
 
 
@@ -112,6 +112,9 @@ BHttpResult::HasHeaders() const
 BHttpResult&
 BHttpResult::operator=(const BHttpResult& other)
 {
+	if (this == &other)
+		return *this;
+	
 	fUrl = other.fUrl;
 	fHeaders = other.fHeaders;
 	fStatusCode = other.fStatusCode;
