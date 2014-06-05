@@ -76,6 +76,7 @@ public:
 
 private:
 			void				_EraseData();
+			bool				_AddOrDeleteHeader(BHttpHeader* header);
 			
 private:
 			BList				fHeaderList;

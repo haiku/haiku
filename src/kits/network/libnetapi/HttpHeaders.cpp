@@ -147,12 +147,11 @@ BHttpHeaders::BHttpHeaders()
 }
 
 
-BHttpHeaders::BHttpHeaders(const BHttpHeaders& copy)
+BHttpHeaders::BHttpHeaders(const BHttpHeaders& other)
 	:
 	fHeaderList()
 {
-	for (int32 i = 0; i < copy.CountHeaders(); i++)
-		AddHeader(copy.HeaderAt(i).Name(), copy.HeaderAt(i).Value());
+	*this = other;
 }
 
 
@@ -215,7 +214,7 @@ BHttpHeaders::HasHeader(const char* name) const
 			return i;
 	}
 
-	return B_ERROR;
+	return -1;
 }
 
 
@@ -225,28 +224,14 @@ BHttpHeaders::HasHeader(const char* name) const
 bool
 BHttpHeaders::AddHeader(const char* line)
 {
-	BHttpHeader* heapHeader = new(std::nothrow) BHttpHeader(line);
-
-	if (heapHeader != NULL) {
-		fHeaderList.AddItem(heapHeader);
-		return true;
-	}
-
-	return false;
+	return _AddOrDeleteHeader(new(std::nothrow) BHttpHeader(line));
 }
 
 
 bool
 BHttpHeaders::AddHeader(const char* name, const char* value)
 {
-	BHttpHeader* heapHeader = new(std::nothrow) BHttpHeader(name, value);
-
-	if (heapHeader != NULL) {
-		fHeaderList.AddItem(heapHeader);
-		return true;
-	}
-
-	return false;
+	return _AddOrDeleteHeader(new(std::nothrow) BHttpHeader(name, value));
 }
 
 
@@ -314,4 +299,16 @@ BHttpHeaders::_EraseData()
 
 		delete header;
 	}
+}
+
+
+bool
+BHttpHeaders::_AddOrDeleteHeader(BHttpHeader* header)
+{
+	if (header != NULL) {
+		if (fHeaderList.AddItem(header))
+			return true;
+		delete header;
+	}
+	return false;
 }
