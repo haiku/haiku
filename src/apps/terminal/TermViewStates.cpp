@@ -1,13 +1,16 @@
 /*
- * Copyright 2001-2013, Haiku, Inc.
+ * Copyright 2004-2014, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
- * All rights reserved. Distributed under the terms of the MIT license.
+ * All rights reserved.
+ *
+ * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Stefano Ceccherini, stefano.ceccherini@gmail.com
  *		Kian Duffy, myob@users.sourceforge.net
  *		Y.Hayakawa, hida@sawada.riec.tohoku.ac.jp
+ *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@Clemens-Zeidler.de
  *		Siarzhuk Zharski, zharik@gmx.li
@@ -152,6 +155,9 @@ TermView::StandardBaseState::StandardBaseState(TermView* view)
 bool
 TermView::StandardBaseState::_StandardMouseMoved(BPoint where, int32 modifiers)
 {
+	if (fView == NULL)
+		return false;
+
 	if (!fView->fReportAnyMouseEvent && !fView->fReportButtonMouseEvent)
 		return false;
 
@@ -193,6 +199,9 @@ TermView::DefaultState::ModifiersChanged(int32 oldModifiers, int32 modifiers)
 void
 TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 {
+	if (fView == NULL || fView->Looper() == NULL)
+		return;
+
 	int32 key;
 	int32 mod;
 	int32 rawChar;
@@ -366,6 +375,9 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 void
 TermView::DefaultState::MouseDown(BPoint where, int32 buttons, int32 modifiers)
 {
+	if (fView == NULL)
+		return;
+
 	if (fView->fReportAnyMouseEvent || fView->fReportButtonMouseEvent
 		|| fView->fReportNormalMouseEvent || fView->fReportX10MouseEvent) {
 		TermPos clickPos = fView->_ConvertToTerminal(where);
@@ -402,7 +414,7 @@ TermView::DefaultState::MouseMoved(BPoint where, uint32 transit,
 void
 TermView::DefaultState::WindowActivated(bool active)
 {
-	if (active)
+	if (active && fView != NULL)
 		_CheckEnterHyperLinkState(fView->fModifiers);
 }
 
@@ -410,7 +422,8 @@ TermView::DefaultState::WindowActivated(bool active)
 bool
 TermView::DefaultState::_CheckEnterHyperLinkState(int32 modifiers)
 {
-	if ((modifiers & B_COMMAND_KEY) != 0 && fView->Window()->IsActive()) {
+	if ((modifiers & B_COMMAND_KEY) != 0 && fView != NULL
+		 && fView->Window() != NULL && fView->Window()->IsActive()) {
 		fView->_NextState(fView->fHyperLinkState);
 		return true;
 	}
@@ -435,6 +448,9 @@ TermView::SelectState::SelectState(TermView* view)
 void
 TermView::SelectState::Prepare(BPoint where, int32 modifiers)
 {
+	if (fView == NULL || fView->Window() == NULL)
+		return;
+
 	int32 clicks;
 	fView->Window()->CurrentMessage()->FindInt32("clicks", &clicks);
 
@@ -592,6 +608,9 @@ TermView::SelectState::MouseUp(BPoint where, int32 buttons)
 	fCheckMouseTracking = false;
 	fMouseTracking = false;
 
+	if (fView == NULL)
+		return;
+
 	if (fView->fAutoScrollRunner != NULL) {
 		delete fView->fAutoScrollRunner;
 		fView->fAutoScrollRunner = NULL;
@@ -616,6 +635,9 @@ TermView::SelectState::MouseUp(BPoint where, int32 buttons)
 void
 TermView::SelectState::_AutoScrollUpdate()
 {
+	if (fView == NULL)
+		return;
+
 	if (fMouseTracking && fView->fAutoScrollRunner != NULL
 		&& fView->fScrollBar != NULL) {
 		float value = fView->fScrollBar->Value();
@@ -652,6 +674,9 @@ TermView::HyperLinkState::HyperLinkState(TermView* view)
 void
 TermView::HyperLinkState::Entered()
 {
+	if (fView == NULL)
+		return;
+
 	ActiveProcessInfo activeProcessInfo;
 	if (fView->GetActiveProcessInfo(activeProcessInfo))
 		fCurrentDirectory = activeProcessInfo.CurrentDirectory();
@@ -672,6 +697,9 @@ TermView::HyperLinkState::Exited()
 void
 TermView::HyperLinkState::ModifiersChanged(int32 oldModifiers, int32 modifiers)
 {
+	if (fView == NULL)
+		return;
+
 	if ((modifiers & B_COMMAND_KEY) == 0)
 		fView->_NextState(fView->fDefaultState);
 	else
@@ -694,8 +722,10 @@ TermView::HyperLinkState::MouseDown(BPoint where, int32 buttons,
 	if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
 		link.Open();
 	} else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0) {
-		fView->fHyperLinkMenuState->Prepare(where, link);
-		fView->_NextState(fView->fHyperLinkMenuState);
+		if (fView != NULL) {
+			fView->fHyperLinkMenuState->Prepare(where, link);
+			fView->_NextState(fView->fHyperLinkMenuState);
+		}
 	}
 }
 
@@ -711,7 +741,7 @@ TermView::HyperLinkState::MouseMoved(BPoint where, uint32 transit,
 void
 TermView::HyperLinkState::WindowActivated(bool active)
 {
-	if (!active)
+	if (!active && fView != NULL)
 		fView->_NextState(fView->fDefaultState);
 }
 
@@ -733,7 +763,10 @@ TermView::HyperLinkState::ForegroundColor()
 rgb_color
 TermView::HyperLinkState::BackgroundColor()
 {
-	return fView->fTextBackColor;
+	if (fView != NULL)
+		return fView->fTextBackColor;
+
+	return make_color(255, 255, 255);
 }
 
 
@@ -967,6 +1000,9 @@ TermView::HyperLinkState::_ActivateHighlight(const TermPos& start,
 	}
 
 	fHighlight.SetRange(start, end);
+	if (fView == NULL)
+		return;
+
 	fView->_AddHighlight(&fHighlight);
 	BCursor cursor(B_CURSOR_ID_FOLLOW_LINK);
 	fView->SetViewCursor(&cursor);
@@ -977,7 +1013,7 @@ TermView::HyperLinkState::_ActivateHighlight(const TermPos& start,
 void
 TermView::HyperLinkState::_DeactivateHighlight()
 {
-	if (fHighlightActive) {
+	if (fHighlightActive && fView != NULL) {
 		fView->_RemoveHighlight(&fHighlight);
 		BCursor cursor(B_CURSOR_ID_SYSTEM_DEFAULT);
 		fView->SetViewCursor(&cursor);
@@ -1088,7 +1124,8 @@ TermView::HyperLinkMenuState::MessageReceived(BMessage* message)
 		}
 
 		case kMessageMenuClosed:
-			fView->_NextState(fView->fDefaultState);
+			if (fView != NULL)
+				fView->_NextState(fView->fDefaultState);
 			return true;
 	}
 
