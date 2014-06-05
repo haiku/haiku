@@ -23,7 +23,7 @@ class BHttpRequest : public BUrlRequest {
 public:
 								BHttpRequest(const BUrl& url,
 									bool ssl = false,
-									const char *protocolName = "HTTP",
+									const char* protocolName = "HTTP",
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL);
 								BHttpRequest(const BHttpRequest& other);
@@ -75,10 +75,10 @@ private:
 			void				_ParseHeaders();
 
 	// URL result parameters access
-			BPositionIO*			_ResultRawData();
-			BHttpHeaders&			_ResultHeaders();
-			void					_SetResultStatusCode(int32 statusCode);
-			BString&				_ResultStatusText();
+			BPositionIO*		_ResultRawData();
+			BHttpHeaders&		_ResultHeaders();
+			void				_SetResultStatusCode(int32 statusCode);
+			BString&			_ResultStatusText();
 
 private:
 			BAbstractSocket*	fSocket;
