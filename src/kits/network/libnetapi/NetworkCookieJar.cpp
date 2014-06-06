@@ -160,7 +160,16 @@ BNetworkCookieJar::AddCookie(BNetworkCookie* cookie)
 		delete cookie;
 	} else {
 		TRACE("Add cookie: %s\n", cookie->RawCookie(true).String());
-		list->AddItem(cookie);
+		// Keep the list sorted by path length (longest first). This makes sure
+		// that cookies for most specific paths are returned first when
+		// iterating the cookie jar.
+		int32 i;
+		for (i = 0; i < list->CountItems(); i++) {
+			BNetworkCookie* current = list->ItemAt(i);
+			if (current->Path().Length() < cookie->Path().Length())
+				break;
+		}
+		list->AddItem(cookie, i);
 	}
 
 	return B_OK;
