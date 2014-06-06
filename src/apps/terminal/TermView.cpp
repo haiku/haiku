@@ -1215,6 +1215,8 @@ TermView::DetachedFromWindow()
 {
 	be_clipboard->StopWatching(BMessenger(this));
 
+	 _NextState(fDefaultState);
+
 	delete fWinchRunner;
 	fWinchRunner = NULL;
 
