@@ -30,7 +30,14 @@ public:
 			void			HttpOnlyTest();
 			void			EncodingTest();
 			void			DomainTest();
-			void			PersistentTest();
+			void			PersistantTest();
+			void			OverwriteTest();
+			void			OrderTest();
+
+			void			ExpireParsingTest();
+			void			PathMatchingTest();
+			void			DomainMatchingTest();
+			void			MaxAgeParsingTest();
 
 	static	void			AddTests(BTestSuite& suite);
 

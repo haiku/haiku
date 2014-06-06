@@ -27,6 +27,9 @@ CookieTest::~CookieTest()
 }
 
 
+// #pragma mark - Positive functionality tests
+
+
 void
 CookieTest::SimpleTest()
 {
@@ -43,12 +46,12 @@ CookieTest::SimpleTest()
 	CPPUNIT_ASSERT(result == B_OK);
 
 	strftime(buffer, sizeof(buffer),
-		"testcookie2=present; expires=%A, %d-%b-%Y %H:%M:%S", now);
+		"testcookie2=present; expires=%A, %d-%b-%Y %H:%M:%S", now);
 	result = jar.AddCookie(buffer, url);
 	CPPUNIT_ASSERT(result == B_OK);
 
 	strftime(buffer, sizeof(buffer),
-		"testcookie3=present; expires=%A, %d-%b-%Y %H:%M:%S; path=/", now);
+		"testcookie3=present; expires=%A, %d-%b-%Y %H:%M:%S; path=/", now);
 	result = jar.AddCookie(buffer, url);
 	CPPUNIT_ASSERT(result == B_OK);
 
@@ -56,7 +59,7 @@ CookieTest::SimpleTest()
 	now = gmtime(&t);
 	strftime(buffer, sizeof(buffer),
 		"testcookie4=present; path=/; domain=www.chipchapin.com; "
-		"expires=%A, %d-%b-%Y %H:%M:%S", now);
+		"expires=%A, %d-%b-%Y %H:%M:%S", now);
 	result = jar.AddCookie(buffer, url);
 	CPPUNIT_ASSERT(result == B_OK);
 
@@ -337,7 +340,7 @@ CookieTest::DomainTest()
 
 
 void
-CookieTest::PersistentTest()
+CookieTest::PersistantTest()
 {
 	BNetworkCookieJar jar;
 	status_t result;
@@ -351,7 +354,7 @@ CookieTest::PersistentTest()
 	BUrl url("http://testsuites.opera.com/cookies/013.php");
 
 	strftime(buffer, sizeof(buffer),
-		"013-1=1; Expires=%a, %d-%b-%Y %H:%M:%S", now);
+		"013-1=1; Expires=%a, %d-%b-%Y %H:%M:%S", now);
 	result = jar.AddCookie(buffer, url);
 	CPPUNIT_ASSERT(result == B_OK);
 
@@ -387,6 +390,386 @@ CookieTest::PersistentTest()
 }
 
 
+void
+CookieTest::OverwriteTest()
+{
+	BNetworkCookieJar jar;
+	status_t result;
+
+	BUrl url("http://testsuites.opera.com/cookies/015/015.php");
+	result = jar.AddCookie("015-01=1", url);
+	CPPUNIT_ASSERT(result == B_OK);
+
+	url.SetUrlString("http://testsuites.opera.com/cookies/015-1.php");
+	result = jar.AddCookie("015-01=1", url);
+	result = jar.AddCookie("015-02=1", url);
+	CPPUNIT_ASSERT(result == B_OK);
+
+	url.SetUrlString("http://testsuites.opera.com/cookies/015/015-2.php");
+	result = jar.AddCookie("015-01=1", url);
+	result = jar.AddCookie("015-02=1", url);
+	CPPUNIT_ASSERT(result == B_OK);
+
+	url.SetUrlString("http://testsuites.opera.com/cookies/015/015-3.php");
+	BNetworkCookieJar::UrlIterator it = jar.GetUrlIterator(url);
+	int count = 0;
+
+	while (it.HasNext()) {
+		it.Next();
+		count++;
+	}
+
+	CPPUNIT_ASSERT_EQUAL(4, count);
+}
+
+
+void
+CookieTest::OrderTest()
+{
+	BNetworkCookieJar jar;
+	status_t result;
+
+	BUrl url("http://testsuites.opera.com/cookies/016.php");
+	result = jar.AddCookie("016-01=1", url);
+	CPPUNIT_ASSERT(result == B_OK);
+
+	url.SetUrlString("http://testsuites.opera.com/cookies/016/016-1.php");
+	result = jar.AddCookie("016-02=1", url);
+	CPPUNIT_ASSERT(result == B_OK);
+
+	url.SetUrlString("http://testsuites.opera.com/cookies/016/016-2.php");
+	BNetworkCookieJar::UrlIterator it = jar.GetUrlIterator(url);
+	int count = 0;
+
+	// Check that the cookie with the most specific path is sent first
+	while (it.HasNext()) {
+		BNetworkCookie* cookie = it.Next();
+		switch(count)
+		{
+			case 0:
+				CPPUNIT_ASSERT_EQUAL(BString("016-02"), cookie->Name());
+				break;
+			case 1:
+				CPPUNIT_ASSERT_EQUAL(BString("016-01"), cookie->Name());
+				break;
+		}
+		count++;
+	}
+
+	CPPUNIT_ASSERT_EQUAL(2, count);
+}
+
+
+// #pragma mark - Error handling and extended tests
+
+
+void
+CookieTest::ExpireParsingTest()
+{
+	BUrl url("http://testsuites.opera.com/cookies/301.php");
+	BNetworkCookie cookie;
+	status_t result;
+
+	BString bigData("301-16=1; Expires=\"");
+	for (int i = 0; i < 1500; i++)
+		bigData << "abcdefghijklmnopqrstuvwxyz";
+	bigData << "\";";
+
+	struct Test {
+		const char* cookieString;
+		bool canParse;
+		bool sessionOnly;
+		bool expired;
+	};
+
+	Test tests[] = {
+		{ "301-01=1; Expires=\"notAValidValue\";",
+			true, true, false }, // Obviously invalid date
+		{ "301-02=1; Expires=\"Wed, 08-Nov-2035 01:04:33\";",
+			true, false, false }, // Valid date
+		{ "301-03=1; Expires=\"Tue, 19-Jan-2038 03:14:06\";",
+			true, false, false }, // Valid date, after year 2038 time_t overflow
+		{ "301-04=1; Expires=\"Fri, 13-Dec-1901 20:45:51\";",
+			true, false, true }, // Valid date, in the past
+		{ "301-05=1; Expires=\"Thu, 33-Nov-2035 01:04:33\";",
+			true, true, false }, // Invalid day
+		{ "301-06=1; Expires=\"Wed, 08-Siz-2035 01:04:33\";",
+			true, true, false }, // Invalid month
+		{ "301-07=1; Expires=\"Wed, 08-Nov-9035 01:04:33\";",
+			true, false, false }, // Very far in the future
+			// NOTE: Opera testsuite considers it should be a session cookie.
+		{ "301-08=1; Expires=\"Wed, 08-Nov-2035 75:04:33\";",
+			true, true, false }, // Invalid hour
+		{ "301-09=1; Expires=\"Wed, 08-Nov-2035 01:75:33\";",
+			true, true, false }, // Invalid minute
+		{ "301-10=1; Expires=\"Wed, 08-Nov-2035 01:04:75\";",
+			true, true, false }, // Invalid second
+		{ "301-11=1; Expires=\"XXX, 08-Nov-2035 01:04:33\";",
+			true, true, false }, // Invalid weekday
+		{ "301-12=1; Expires=\"Thu, XX-Nov-2035 01:04:33\";",
+			true, true, false }, // Non-digit day
+		{ "301-13=1; Expires=\"Thu, 08-Nov-XXXX 01:04:33\";",
+			true, true, false }, // Non-digit year
+		{ "301-14=1; Expires=\"Thu, 08-Nov-2035 XX:XX:33\";",
+			true, true, false }, // Non-digit hour and minute
+		{ "301-15=1; Expires=\"Thu, 08-Nov-2035 01:04:XX\";",
+			true, true, false }, // Non-digit second
+		{ bigData.String(),
+			true, true, false }, // Very long invalid string
+			// NOTE: Opera doesn't register the cookie at all.
+		{ "301-17=1; Expires=\"Thu, 99999-Nov-2035 01:04:33\";",
+			true, true, false }, // Day with many digits
+		{ "301-18=1; Expires=\"Thu, 25-Nov-99999 01:04:33\";",
+			true, true, false }, // Year with many digits
+			// NOTE: Opera tests 301-17 twice and misses this test.
+		{ "301-19=1; Expires=\"Thu, 25-Nov-2035 99999:04:33\";",
+			true, true, false }, // Hour with many digits
+		{ "301-20=1; Expires=\"Thu, 25-Nov-2035 01:99999:33\";",
+			true, true, false }, // Minute with many digits
+		{ "301-21=1; Expires=\"Thu, 25-Nov-2035 01:04:99999\";",
+			true, true, false }, // Second with many digits
+		{ "301-22=1; Expires=\"99999999999999999999\";",
+			true, true, false }, // Huge number
+		{ "301-23=1; Expires=\"Fri, 13-Dec-101 20:45:51\";",
+			true, false, true }, // Very far in the past
+		{ "301-24=1; EXPiReS=\"Wed, 08-Nov-2035 01:04:33\";",
+			true, false, false }, // Case insensitive key parsing
+		{ "301-25=1; Expires=Wed, 08-Nov-2035 01:04:33\";",
+			true, true, false }, // Missing opening quote
+			// NOTE: unlike Opera, we accept badly quoted values for cookie
+			// attributes. This allows to handle unquoted values from the early
+			// cookie spec properly. However, a date with a quote inside it
+			// should not be accepted, so this will be a session cookie.
+		{ "301-26=1; Expires=\"Wed, 08-Nov-2035 01:04:33;",
+			true, true, false }, // Missing closing quote
+		{ "301-27=1; Expires:\"Wed, 08-Nov-2035 01:04:33\";",
+			true, true, false }, // Uses : instead of =
+			// NOTE: unlike Opera, we allow this as a cookie with a strange
+			// name and no value
+		{ "301-28=1; Expires;=\"Wed, 08-Nov-2035 01:04:33\";",
+			true, true, false }, // Extra ; after name
+		{ "301-29=1; Expired=\"Wed, 08-Nov-2035 01:04:33\";",
+			true, true, false }, // Expired instead of Expires
+		{ "301-30=1; Expires=\"Wed; 08-Nov-2035 01:04:33\";",
+			true, true, false }, // ; in value
+		{ "301-31=1; Expires=\"Wed,\\r\\n 08-Nov-2035 01:04:33\";",
+			true, true, false }, // escaped newline in value
+			// NOTE: Only here for completeness. This is what the Opera
+			// testsuite sends in test 31, but I suspect they were trying to
+			// test the following case.
+		{ "301-31b=1; Expires=\"Wed,\r\n 08-Nov-2035 01:04:33\";",
+			true, false, false }, // newline in value
+			// NOTE: This can't really happen when we get cookies from HTTP
+			// headers. It could happen when the cookie is set from meta html
+			// tags or from JS.
+	};
+
+	for (unsigned int i = 0; i < sizeof(tests) / sizeof(Test); i++)
+	{
+		NextSubTest();
+
+		result = cookie.ParseCookieString(tests[i].cookieString, url);
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("Cookie can be parsed",
+			tests[i].canParse, result == B_OK);
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("Cookie is session only",
+			tests[i].sessionOnly, cookie.IsSessionCookie());
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("Cookie has expired",
+			tests[i].expired, cookie.ShouldDeleteNow());
+	}
+}
+
+
+void
+CookieTest::PathMatchingTest()
+{
+	const BUrl url("http://testsuites.opera.com/cookies/302/302.php");
+	const BUrl url1("http://testsuites.opera.com/cookies/302-5.php");
+	const BUrl url2("http://testsuites.opera.com/cookies/302/302-3.php");
+	const BUrl url3("http://testsuites.opera.com/cookies/302/sub/302-4.php");
+	const BUrl url4("http://testsuites.opera.com/cookies/302-2/302-6.php");
+	BNetworkCookie cookie;
+	status_t result;
+
+	BString bigData("302-24=1; Path=\"/cookies/302/");
+	for (int i = 0; i < 1500; i++)
+		bigData << "abcdefghijklmnopqrstuvwxyz";
+	bigData << "\";";
+
+	struct Test {
+		const char* cookieString;
+		bool canSet;
+		bool url1;
+		bool url2;
+		bool url3;
+		bool url4;
+	};
+
+	const Test tests[] = {
+		{ "302-01=1; Path=\"/\"",
+			true, true, true, true, true },
+		{ "302-02=1; Path=\"/cookies\"",
+			true, true, true, true, true },
+		{ "302-03=1; Path=\"/cookies/\"",
+			true, true, true, true, true },
+		{ "302-04=1; Path=\"/cookies/302\"",
+			true, false, true, true, true },
+		{ "302-05=1; Path=\"/cookies/302/\"",
+			true, false, true, true, false },
+		{ "302-06=1; Path=\"/cookies/302/.\"",
+			false, false, false, false, false },
+		{ "302-07=1; Path=\"/cookies/302/../302\"",
+			false, false, false, false, false },
+		{ "302-08=1; Path=\"/cookies/302/../302-2\"",
+			false, false, false, false, false },
+		{ "302-09=1; Path=\"/side\"",
+			false, false, false, false, false },
+		{ "302-10=1; Path=\"/cookies/302-2\"",
+			true, false, false, false, true },
+		{ "302-11=1; Path=\"/cookies/302-2/\"",
+			true, false, false, false, true },
+		{ "302-12=1; Path=\"sub\"",
+			false, false, false, false, false },
+		{ "302-13=1; Path=\"sub/\"",
+			false, false, false, false, false },
+		{ "302-14=1; Path=\".\"",
+			false, false, false, false, false },
+		{ "302-15=1; Path=\"/cookies/302/sub\"",
+			true, false, false, true, false },
+		{ "302-16=1; Path=\"/cookies/302/sub/\"",
+			true, false, false, true, false },
+		{ "302-17=1; Path=\"/cookies/302/sub/..\"",
+			false, false, false, false, false },
+		{ "302-18=1; Path=/",
+			true, true, true, true, true },
+		{ "302-19=1; Path=/ /",
+			false, false, false, false, false },
+		{ "302-20=1; Path=\"/",
+			false, false, false, false, false },
+		{ "302-21=1; Path=/\"",
+			false, false, false, false, false },
+		{ "302-22=1; Path=\\/",
+			false, false, false, false, false },
+		{ "302-23=1; Path=\n/",
+			false, false, false, false, false },
+		{ bigData,
+			false, false, false, false, false },
+	};
+
+	for (unsigned int i = 0; i < sizeof(tests) / sizeof(Test); i++)
+	{
+		NextSubTest();
+
+		result = cookie.ParseCookieString(tests[i].cookieString, url);
+
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("Allowed to set cookie",
+			tests[i].canSet, result == B_OK);
+		CPPUNIT_ASSERT_EQUAL(tests[i].url1, cookie.IsValidForUrl(url1));
+		CPPUNIT_ASSERT_EQUAL(tests[i].url2, cookie.IsValidForUrl(url2));
+		CPPUNIT_ASSERT_EQUAL(tests[i].url3, cookie.IsValidForUrl(url3));
+		CPPUNIT_ASSERT_EQUAL(tests[i].url4, cookie.IsValidForUrl(url4));
+	}
+}
+
+
+void
+CookieTest::DomainMatchingTest()
+{
+	const BUrl setter("http://testsuites.opera.com/cookies/304.php");
+	const BUrl getter("http://testsuites.opera.com/cookies/304-1.php");
+
+	BString bigData("304-12=1; Domain=\"");
+	for (int i = 0; i < 1500; i++)
+		bigData << "abcdefghijklmnopqrstuvwxyz";
+	bigData << "\";";
+
+	struct Test {
+		const char* cookieString;
+		bool shouldMatch;
+	};
+
+	const Test tests[] = {
+		{ "304-01=1; Domain=\"opera.com\"", true },
+		{ "304-02=1; Domain=\".opera.com\"", true },
+		{ "304-03=1; Domain=\".com\"", false },
+		{ "304-04=1; Domain=\"pera.com\"", false },
+		{ "304-05=1; Domain=\"?pera.com\"", false },
+		{ "304-06=1; Domain=\"*.opera.com\"", false },
+		{ "304-07=1; Domain=\"300.300.300.300\"", false },
+		{ "304-08=1; Domain=\"123456123456123456\"", false },
+		{ "304-09=1; Domain=\"/opera.com\"", false },
+		{ "304-10=1; Domain=\"opera.com/\"", false },
+		{ "304-11=1; Domain=\"example.com\"", false },
+		{ bigData, false },
+		{ "304-13=1; Domain=\"opera com\"", false },
+		{ "304-14=1; Domain=opera.com\"", false },
+		{ "304-15=1; Domain=\"opera.com", false },
+		{ "304-16=1; Domain=opera.com", true },
+		{ "304-17=1; Domain=\"*.com\"", false },
+		{ "304-18=1; Domain=\"*opera.com\"", false },
+		{ "304-19=1; Domain=\"*pera.com\"", false },
+		{ "304-20=1; Domain=\"\"", false },
+		{ "304-21=1; Domain=\"\346\227\245\346\234\254\"", false },
+		{ "304-22=1; Domain=\"OPERA.COM\"", true },
+		{ "304-23=1; Domain=\"195.189.143.182\"", false },
+	};
+
+	for (unsigned int i = 0; i < sizeof(tests) / sizeof(Test); i++)
+	{
+		NextSubTest();
+
+		BNetworkCookie cookie(tests[i].cookieString, setter);
+		CPPUNIT_ASSERT_EQUAL(tests[i].shouldMatch,
+			cookie.IsValidForUrl(getter));
+	}
+}
+
+
+void
+CookieTest::MaxAgeParsingTest()
+{
+	const BUrl setter("http://testsuites.opera.com/cookies/305.php");
+
+	BString bigData("305-12=1; Max-Age=\"");
+	for (int i = 0; i < 1500; i++)
+		bigData << "abcdefghijklmnopqrstuvwxyz";
+	bigData << "\";";
+
+	struct Test {
+		const char* cookieString;
+		bool expired;
+	};
+
+	const Test tests[] = {
+		{ "305-01=1; Max-Age=\"notAValidValue\"", true },
+		{ "305-02=1; Max-Age=\"Wed, 08-Nov-2035 01:04:33\"", true },
+		{ "305-03=1; Max-Age=\"0\"", true },
+		{ "305-04=1; Max-Age=\"1\"", false },
+		{ "305-05=1; Max-Age=\"10000\"", false },
+		{ "305-06=1; Max-Age=\"-1\"", true },
+		{ "305-07=1; Max-Age=\"0.5\"", true },
+		{ "305-08=1; Max-Age=\"9999999999999999999999999\"", false },
+		{ "305-09=1; Max-Age=\"-9999999999999999999999999\"", true },
+		{ "305-10=1; Max-Age=\"+10000\"", false },
+		{ "305-11=1; Max-Age=\"Fri, 13-Dec-1901 20:45:52\"", true },
+		{ bigData, true },
+		{ "305-13=1; Max-Age=\"0+10000\"", true },
+		{ "305-14=1; Max-Age=\"10000+0\"", true },
+		{ "305-15=1; Max-Age=10000\"", true },
+		{ "305-16=1; Max-Age=\"10000", true },
+		{ "305-17=1; Max-Age=10000", false },
+		{ "305-18=1; Max-Age=100\"00", true },
+	};
+
+	for (unsigned int i = 0; i < sizeof(tests) / sizeof(Test); i++)
+	{
+		NextSubTest();
+
+		BNetworkCookie cookie(tests[i].cookieString, setter);
+		CPPUNIT_ASSERT_EQUAL(tests[i].expired, cookie.ShouldDeleteNow());
+	}
+}
+
+
 /* static */ void
 CookieTest::AddTests(BTestSuite& parent)
 {
@@ -413,7 +796,20 @@ CookieTest::AddTests(BTestSuite& parent)
 	suite.addTest(new CppUnit::TestCaller<CookieTest>("CookieTest::DomainTest",
 		&CookieTest::DomainTest));
 	suite.addTest(new CppUnit::TestCaller<CookieTest>(
-		"CookieTest::PersistentTest", &CookieTest::PersistentTest));
+		"CookieTest::PersistantTest", &CookieTest::PersistantTest));
+	suite.addTest(new CppUnit::TestCaller<CookieTest>(
+		"CookieTest::OverwriteTest", &CookieTest::OverwriteTest));
+	suite.addTest(new CppUnit::TestCaller<CookieTest>(
+		"CookieTest::OrderTest", &CookieTest::OrderTest));
+
+	suite.addTest(new CppUnit::TestCaller<CookieTest>(
+		"CookieTest::ExpireParsingTest", &CookieTest::ExpireParsingTest));
+	suite.addTest(new CppUnit::TestCaller<CookieTest>(
+		"CookieTest::PathMatchingTest", &CookieTest::PathMatchingTest));
+	suite.addTest(new CppUnit::TestCaller<CookieTest>(
+		"CookieTest::DomainMatchingTest", &CookieTest::DomainMatchingTest));
+	suite.addTest(new CppUnit::TestCaller<CookieTest>(
+		"CookieTest::MaxAgeParsingTest", &CookieTest::MaxAgeParsingTest));
 
 	parent.addTest("CookieTest", &suite);
 }
