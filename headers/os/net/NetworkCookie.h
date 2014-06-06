@@ -86,6 +86,9 @@ private:
 									BString& value,	int32 index);
 			BString				_DefaultPathForUrl(const BUrl& url);
 
+			bool				_CanBeSetFromUrl(const BUrl& url) const;
+			bool				_CanBeSetFromPath(const BString& path) const;
+
 private:
 	mutable	BString				fRawCookie;
 	mutable	bool				fRawCookieValid;
