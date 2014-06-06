@@ -87,7 +87,12 @@ BUrl::BUrl(const BUrl& base, const BString& location)
 	fPort(0),
 	fPath(),
 	fRequest(),
+	fAuthorityValid(false),
+	fUserInfoValid(false),
+	fHasUserName(false),
+	fHasPassword(false),
 	fHasHost(false),
+	fHasPort(false),
 	fHasFragment(false)
 {
 	// This implements the algorithm in RFC3986, Section 5.2.
