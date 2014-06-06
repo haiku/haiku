@@ -13,11 +13,12 @@
 #include <cstdio>
 
 
-static const char* 	kRfc1123Format			= "%a, %d %b %Y %H:%M:%S GMT";
-static const char* 	kCookieFormat			= "%a, %d-%b-%Y %H:%M:%S GMT";
-static const char* 	kRfc1036Format			= "%A, %d-%b-%y %H:%M:%S GMT";
-static const char* 	kAscTimeFormat			= "%a %d %b %H:%M:%S %Y";
-static const uint16	kTimetToStringMaxLength	= 128;
+static const char* kDateFormats[] = {
+	"%a, %d %b %Y %H:%M:%S GMT",
+	"%a, %d-%b-%Y %H:%M:%S GMT",
+	"%A, %d-%b-%y %H:%M:%S GMT",
+	"%a %d %b %H:%M:%S %Y"
+};
 
 using namespace BPrivate;
 
@@ -84,21 +85,24 @@ BHttpTime::Parse()
 	expireTime.tm_wday = 0;
 	expireTime.tm_yday = 0;
 	expireTime.tm_isdst = 0;
-		
-	if (fDateString[3] == ',') {
-		if (strptime(fDateString.String(), kRfc1123Format, &expireTime)
-				== NULL) {
-			strptime(fDateString.String(), kCookieFormat, &expireTime);
-			fDateFormat = B_HTTP_TIME_FORMAT_COOKIE;
-		} else
-			fDateFormat = B_HTTP_TIME_FORMAT_RFC1123;
-	} else if (fDateString[3] == ' ') {
-		strptime(fDateString.String(), kRfc1036Format, &expireTime);
-		fDateFormat = B_HTTP_TIME_FORMAT_RFC1036;
-	} else {
-		strptime(fDateString.String(), kAscTimeFormat, &expireTime);
-		fDateFormat = B_HTTP_TIME_FORMAT_ASCTIME;
+	
+	fDateFormat = B_HTTP_TIME_FORMAT_PARSED;
+	unsigned int i;
+	for (i = 0; i < sizeof(kDateFormats) / sizeof(const char*);
+		i++) {
+		const char* result = strptime(fDateString.String(), kDateFormats[i],
+			&expireTime);
+
+		// Make sure we parsed enough of the date string, not just a small
+		// part of it.
+		if (result != NULL && result > fDateString.String() + 24) {
+			fDateFormat = i;
+			break;
+		}
 	}
+
+	if (fDateFormat == B_HTTP_TIME_FORMAT_PARSED)
+		return 0;
 
 	BTime time(expireTime.tm_hour, expireTime.tm_min, expireTime.tm_sec);
 	BDate date(expireTime.tm_year + 1900, expireTime.tm_mon + 1,
@@ -123,27 +127,18 @@ BHttpTime::ToString(int8 format)
 	expirationTm.tm_yday = 0;
 	expirationTm.tm_isdst = 0;
 
-	char expirationString[kTimetToStringMaxLength + 1];
-	size_t strLength;
+	if (format == B_HTTP_TIME_FORMAT_PARSED)
+		format = fDateFormat;
+
+	if (format != B_HTTP_TIME_FORMAT_PARSED) {
+		static const uint16 kTimetToStringMaxLength = 128;
+		char expirationString[kTimetToStringMaxLength + 1];
+		size_t strLength;
 	
-	switch ((format == B_HTTP_TIME_FORMAT_PARSED)?fDateFormat:format) {
-		default:
-		case B_HTTP_TIME_FORMAT_RFC1123:
-			strLength = strftime(expirationString, kTimetToStringMaxLength,
-				kRfc1123Format, &expirationTm);
-			break;
-			
-		case B_HTTP_TIME_FORMAT_RFC1036:
-			strLength = strftime(expirationString, kTimetToStringMaxLength,
-				kRfc1036Format, &expirationTm);
-			break;
-		
-		case B_HTTP_TIME_FORMAT_ASCTIME:
-			strLength = strftime(expirationString, kTimetToStringMaxLength,
-				kAscTimeFormat, &expirationTm);
-			break;		
+		strLength = strftime(expirationString, kTimetToStringMaxLength,
+			kDateFormats[format], &expirationTm);
+	
+		expirationFinal.SetTo(expirationString, strLength);
 	}
-	
-	expirationFinal.SetTo(expirationString, strLength);	
 	return expirationFinal;
 }
