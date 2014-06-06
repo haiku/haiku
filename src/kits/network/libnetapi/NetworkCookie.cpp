@@ -161,7 +161,7 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 				SetMaxAge(-1); // cookie will expire immediately
 		} else if (name.ICompare("expires") == 0) {
 			if (value.IsEmpty()) {
-				result = B_BAD_VALUE;
+				// Will be a session cookie.
 				continue;
 			}
 			BDateTime parsed = BHttpTime(value).Parse();
@@ -187,11 +187,11 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 		}
 	}
 
-	if (!IsValidForUrl(url)) {
-		// Invalidate the cookie.
+	if (!_CanBeSetFromUrl(url))
+		result = B_NOT_ALLOWED;
+
+	if (result != B_OK)
 		_Reset();
-		return B_NOT_ALLOWED;
-	}
 
 	return result;
 }
@@ -221,14 +221,22 @@ BNetworkCookie::SetValue(const BString& value)
 
 
 status_t
-BNetworkCookie::SetPath(const BString& path)
+BNetworkCookie::SetPath(const BString& to)
 {
-	if (path[0] != '/')
+	fPath.Truncate(0);
+	fRawFullCookieValid = false;
+
+	// Limit the path to 4096 characters to not let the cookie jar grow huge.
+	if (to[0] != '/' || to.Length() > 4096)
 		return B_BAD_DATA;
 
-	// TODO: canonicalize the path
-	fPath = path;
-	fRawFullCookieValid = false;
+	// Check that there aren't any "." or ".." segments in the path.
+	if (to.EndsWith("/.") || to.EndsWith("/.."))
+		return B_BAD_DATA;
+	if (to.FindFirst("/../") >= 0 || to.FindFirst("/./") >= 0)
+		return B_BAD_DATA;
+
+	fPath = to;
 	return B_OK;
 }
 
@@ -286,14 +294,13 @@ BNetworkCookie::SetExpirationDate(BDateTime& expireDate)
 	if (!expireDate.IsValid()) {
 		fExpiration.SetTime_t(0);
 		fSessionCookie = true;
-		fExpirationStringValid = false;
-		fRawFullCookieValid = false;
 	} else {
 		fExpiration = expireDate;
 		fSessionCookie = false;
-		fExpirationStringValid = false;
-		fRawFullCookieValid = false;
 	}
+
+	fExpirationStringValid = false;
+	fRawFullCookieValid = false;
 
 	return *this;
 }
@@ -490,7 +497,6 @@ BNetworkCookie::IsValidForPath(const BString& path) const
 {
 	const BString& cookiePath = Path();
 	BString normalizedPath = path;
-
 	int slashPos = normalizedPath.FindLast('/');
 	if (slashPos != normalizedPath.Length() - 1)
 		normalizedPath.Truncate(slashPos + 1);
@@ -500,6 +506,34 @@ BNetworkCookie::IsValidForPath(const BString& path) const
 
 	// The cookie path must be a prefix of the path string
 	return normalizedPath.Compare(cookiePath, cookiePath.Length()) == 0;
+}
+
+
+bool
+BNetworkCookie::_CanBeSetFromUrl(const BUrl& url) const
+{
+	if (Secure() && url.Protocol() != "https")
+		return false;
+
+	if (url.Protocol() == "file")
+		return Domain() == "localhost" && _CanBeSetFromPath(url.Path());
+
+	return IsValidForDomain(url.Host()) && _CanBeSetFromPath(url.Path());
+}
+
+
+bool
+BNetworkCookie::_CanBeSetFromPath(const BString& path) const
+{
+	BString normalizedPath = path;
+	int slashPos = normalizedPath.FindLast('/');
+	normalizedPath.Truncate(slashPos);
+
+	if (Path().Compare(normalizedPath, normalizedPath.Length()) == 0)
+		return true;
+	else if (normalizedPath.Compare(Path(), Path().Length()) == 0)
+		return true;
+	return false;
 }
 
 
