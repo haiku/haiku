@@ -15,7 +15,7 @@ typedef enum {
 } ACTION;
 
 typedef struct entry {
-	char *keyr;
+	char *key;
 	void *data;
 } ENTRY;
 
