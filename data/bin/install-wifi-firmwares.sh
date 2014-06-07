@@ -147,7 +147,7 @@ function CleanTemporaryFiles()
 
 function PreFirmwareInstallation()
 {
-	echo "Installing firmware for ${driver} ..."
+	echo "Acquiring firmware for ${driver} ..."
 	mkdir -p "${tempFirmwareDir}/${driver}"
 	UnlinkDriver
 }
@@ -158,7 +158,7 @@ function PostFirmwareInstallation()
 	SetFirmwarePermissions
 	SymlinkDriver
 	CleanTemporaryFiles
-	echo "... firmware for ${driver} has been installed."
+	echo "... firmware for ${driver} will be installed."
 }
 
 
@@ -167,13 +167,14 @@ function InstallIpw2100()
 	driver='iprowifi2100'
 	PreFirmwareInstallation
 
-	# Extract contents.
+	# Prepare firmware archive for extraction.
 	local file='ipw2100-fw-1.3.tgz'
 	local url="${baseURL}/intel/${file}"
 	local dir="${tempFirmwareDir}/${driver}"
+	cp "${firmwareDir}/${driver}/${file}" "${dir}"
 	DownloadFileIfNotCached $url $file $dir
 
-	# Install the firmware & license file by extracting in place.
+	# Extract the firmware & license file in place.
 	cd "${tempFirmwareDir}/${driver}"
 	gunzip < "$file" | tar xf -
 
@@ -187,16 +188,16 @@ function InstallIprowifi2200()
 	driver='iprowifi2200'
 	PreFirmwareInstallation
 
-	# Extract contents.
+	# Prepare firmware archive for extraction.
 	local file='ipw2200-fw-3.1.tgz'
 	local url="${baseURL}/intel/${file}"
 	local dir="${tempFirmwareDir}/${driver}"
+	cp "${firmwareDir}/${driver}/${file}" "${dir}"
 	DownloadFileIfNotCached $url $file $dir
 
+	# Extract the firmware & license file.
 	cd "$tempDir"
 	gunzip < "${tempFirmwareDir}/${driver}/$file" | tar xf -
-
-	# Install the firmware & license file.
 	cd "${tempDir}/ipw2200-fw-3.1"
 	mv LICENSE.ipw2200-fw "${tempFirmwareDir}/${driver}/"
 	mv ipw2200-ibss.fw "${tempFirmwareDir}/${driver}/"
