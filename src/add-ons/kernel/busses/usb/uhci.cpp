@@ -2113,7 +2113,7 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 	else {
 		result->status |= TD_CONTROL_3_ERRORS;
 		if (direction == TD_TOKEN_IN
-			&& (pipe->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
+			&& (pipe->Type() & USB_OBJECT_CONTROL_PIPE) != 0)
 			result->status |= TD_CONTROL_SPD;
 	}
 	if (pipe->Speed() == USB_SPEED_LOWSPEED)
