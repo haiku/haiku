@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ScreenSaver	1801423325
+1	finnish	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Näytönsäästäjän lataus epäonnistui
 30 seconds	ScreenSaver		30 sekuntia
 Start screensaver	ScreenSaver		Käynnistä näytönsäästäjä
@@ -24,4 +24,5 @@ Blackness	ScreenSaver		Mustuus
 Use custom password	ScreenSaver		Käytä räätälöityä salasanaa
 Done	ScreenSaver		Valmis
 Confirm password:	ScreenSaver		Vahvista salasana:
+No preview available	PreviewView		Ei esikatselua saatavilla
 Use network password	ScreenSaver		Käytä verkkosalasanaa

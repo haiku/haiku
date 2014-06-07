@@ -1,13 +1,15 @@
-1	finnish	x-vnd.Haiku-SoundRecorder	3982150268
+1	finnish	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Silmukka
 Cannot find default audio hardware	RecorderWindow		Oletusäänilaitteen löytäminen epäonnistui
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Ei kyetä löytämään tilapäistä tiedostoa, joka luotiin säilyttämään uusi äänitys.
 Sample size:	RecorderWindow		Näytekoko:
 Nothing to play	RecorderWindow		Ei mitään soitettavaa
+None of the files appear to be audio files.	RecorderWindow		Mitkään tiedostoista eivät näytä olevan äänitiedostoja.
 Duration: 	RecorderWindow		Kesto: 
 File info	RecorderWindow		Tiedostotiedot
 Drop files here	SoundListView		Pudota tiedostot tänne
 Input	RecorderWindow		Syöte
+Some of the files don't appear to be audio files.	RecorderWindow		Jotkut tiedostot eivät tunnu olevan äänitiedostoja.
 Stop	RecorderWindow		Pysäytä
 Format:	RecorderWindow		Muoto:
 Sound List	RecorderWindow		Ääniluettelo
@@ -40,4 +42,5 @@ Channels: 	RecorderWindow		Kanavat:
 Save	RecorderWindow		Tallenna
 Sample rate: 	RecorderWindow		Näytetaajuus: 
 Cannot connect to media server	RecorderWindow		Mediapalvelimeen yhdistäminen epäonnistui
+The file doesn't appear to be an audio file.	RecorderWindow		Tiedosto ei vaikuta olevan äänitiedosto.
 File name:	RecorderWindow		Tiedostonimi:

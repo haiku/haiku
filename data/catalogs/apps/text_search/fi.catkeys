@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku.TextSearch	1180598828
+1	finnish	x-vnd.Haiku.TextSearch	2496563907
 %s: Not enough room to escape the filename.	Grepper		%s: Ei kylliksi tilaa tiedostonimen ohittamiseen.
 Trim to selection	GrepWindow		Leikkaa valintaan
 Follow symbolic links	GrepWindow		Seuraa symbolisia linkkejä
@@ -8,6 +8,7 @@ The unselected files will be removed from the list.	GrepWindow		Valitsemattomat 
 Set target…	GrepWindow		Aseta kohde...
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Valitse tiedostot, jotka haluat valittaviksi Seuraajassa.
 Open files in Pe	GrepWindow		Avaa tiedostot Pe-editorissa
+%appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		Kopioi teksti leikepöydälle
 Settings	GrepWindow		Asetukset
 Select all	GrepWindow		Valitse kaikki
@@ -31,3 +32,4 @@ Show files in Tracker	GrepWindow		Näytä tiedostot Seuraajassa
 Case-sensitive	GrepWindow		Kirjainkoosta riippuva
 Text files only	GrepWindow		Vain tekstitiedostot
 Show lines	GrepWindow		Näytä rivit
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

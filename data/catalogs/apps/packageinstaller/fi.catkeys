@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PackageInstaller	792037176
+1	finnish	x-vnd.Haiku-PackageInstaller	2033288398
 Install to:	PackageView		Asenna kohteeseen:
 OK	PackageView		Valmis
 Accept	PackageTextViewer		Hyväksy
@@ -12,12 +12,14 @@ There seems to be a file size mismatch in the package file. The package might be
 Error while installing the package\n	PackageView		Virhe asennettaessa pakettia\n
 Disclaimer	PackageTextViewer		Vastuuvapauslauseke
 %.1f GiB	PackageView		%.1f gibitavua
+%name% (%size% free)	PackageView		%name% (%size% vapaana)
 The installation of the package has been aborted.	PackageView		Paketin asennus on keskeytetty.
 Done	PackageInstall		Valmis
 All existing files will be replaced?	PackageView		Korvataanko kaikki olemassa olevat tiedostot?
 Preparing package	PackageInstall		Valmistellaan pakettia
 No package available.	PackageInfo		Pakettia ei ole saatavilla.
 none	PackageView		ei mitään
+Install %name%	PackageView		Asenna %name%
 Stop	PackageStatus		Pysäytä
 Other…	PackageView		Muut...
 No installation type selected	PackageView		Asennustyyppiä ei ole valittu
@@ -45,11 +47,14 @@ Decline	PackageTextViewer		Kieltäydy
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Tiedosto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
 All existing files will be skipped?	PackageView		Kaikki olemassaolevat tiedostot ohitetaan?
 Continue	PackageInfo		Jatka
+%index% of %total%	PackageInstall		%index% / %total%
 %.1f KiB	PackageView		%.1f kibitavua
 Abort	PackageInfo		Keskeytä
 PackageInstaller	System name		Pakettiasennus
 Abort	PackageInstall		Keskeytä
+%name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Jatka
+Begin	PackageView		Alku
 Replace	PackageView		Korvaa
 Installation progress	PackageView		Asennuksen eteneminen
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Pakettitiedoston lukeminen epäonnistui.\nYksi mahdollinen syy saattaa olla, että pyydetty tiedosto ei ole kelvollinen BeOS .pkg -paketti.

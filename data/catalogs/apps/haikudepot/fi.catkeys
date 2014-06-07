@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	4291855824
+1	finnish	x-vnd.Haiku-HaikuDepot	3398060443
 Name	PackageListView		Nimi
 Installed packages	Model		Asennetut paketit
 User modified packages	Model		Käyttäjän muokkaamat paketit
@@ -12,11 +12,14 @@ Description	PackageListView		Kuvaus
 Install	PackageManager		Asenna
 Tools	MainWindow		Työkalut
 HaikuDepot	System name		HaikuDepot
+Rate package…	PackageInfoView		Anna pakkaukselle arvosana...
 Uninstall	PackageManager		Poista asennus
 <no info>	PackageInfoView		<ei tietoja>
 An error occurred while initializing the package manager: %message%	MainWindow		Pakkaushallintaa alustettaessa tapahtui virhe: %message%
 Close	PackageManager		Sulje
 Status	PackageListView		Tila
+Available packages	Model		Käytettävissä olevat pakkaukset
+Your rating	System name		Arvosanasi
 Development	Model		Ohjelmakehitys
 Fatal error	PackageManager		Kriittinen virhe
 Ratings	PackageInfoView		Arvosanat
@@ -46,12 +49,14 @@ Close	MainWindow		Sulje
 Video	Model		Video
 An error occurred while refreshing the repository: %error%	MainWindow		Varastoa päivitettäessä tapahtui virhe: %error%
 All packages	FilterView		Kaikki pakkaukset
+Pending…	PackageListView		Odottaa...
 Depot	FilterView		Varasto
 Uninstalled	PackageListView		Poistetut asennukset
 Unknown	PackageListView		Tuntematon
 All depots	FilterView		Kaikki varastot
 Available	PackageListView		Käytettävissä
 n/a	PackageInfoView		–
+Send	RatePackageWindow		Lähetä
 Show develop packages	MainWindow		Näytä kehityspakkaukset
 Show	FilterView		Näytä
 Uninstalled packages	Model		Pakkaukset, joiden asennus on poistettu

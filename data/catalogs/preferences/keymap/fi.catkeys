@@ -1,39 +1,124 @@
-1	finnish	x-vnd.Haiku-Keymap	761976561
+1	finnish	x-vnd.Haiku-Keymap	439384761
+Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Vaihtonäppäin:
 Revert	Modifier keys window		Palauta
+Slovak	Keyboard Layout View		slovakialainen
+Hungarian	Keyboard Layout View		unkarilainen
+German	Keyboard Layout View		saksalainen
+Swiss-French	Keyboard Layout View		sveitsiläis-ranskalainen
+Warning: left and right key roles do not match	Modifier keys window		Varoitus: vasemman ja oikean näppäimen roolit eivät täsmää
+Belgian (comma)	Keyboard Layout View		belgialainen (pilkku)
+Scroll lock	Keyboard Layout View		Vierityslukko
+Belarusian (Mac)	Keyboard Layout View		valkovenäläinen (Mac)
+Greek	Keyboard Layout View		kreikkalainen
+Menu	Keyboard Layout View	Menu key	Valikko
+US	Keyboard Layout View		amerikkalainen
+Left control	Keyboard Layout View		Vasen control-näppäin
+Spanish	Keyboard Layout View		espanjalainen
+Ukrainian (Mac)	Keyboard Layout View		ukrainalainen (Mac)
+Belarusian	Keyboard Layout View		valkovenäläinen
+Italian	Keyboard Layout View		italialainen
+Polish (Typewriter)	Keyboard Layout View		puolalainen (Typewriter)
 Tilde trigger	Keymap window		Aaltoviivaliipaisin
 Grave trigger	Keymap window		Gravisliipaisin
 Role	Modifier keys window	As in the role of a modifier key	Rooli
+Caps lock	Keyboard Layout View		Vaihtolukko
 Select dead keys	Keymap window		Valitse kuolleet näppäimet
+Bulgarian (Cyrillic)	Keyboard Layout View		bulgarialainen (kyrillinen)
 Cancel	Modifier keys window		Peru
+Russian	Keyboard Layout View		venäläinen
+Icelandic	Keyboard Layout View		islantilainen
+Command	Keyboard Layout View	Command key	Komento
+Polish	Keyboard Layout View		puolalainen
+Serbian (Cyrillic)	Keyboard Layout View		serbialainen (kyrillinen)
+French	Keyboard Layout View		ranskalainen
+Faeroese	Keyboard Layout View		fäärsaarilainen
+Japanese	Keyboard Layout View		japanilainen
+Bulgarian (Phonetic)	Keyboard Layout View		bulgarialainen (foneettinen)
+Dvorak (programmer's)	Keyboard Layout View		Dvorak (ohjelmoijan)
+Estonian	Keyboard Layout View		eestiläinen
+Russian (Mac)	Keyboard Layout View		venäläinen (Mac)
 Defaults	Keymap window		Oletukset
 Quit	Keymap window		Poistu
+Dutch	Keyboard Layout View		hollantilainen
 Switch shortcut keys to Haiku mode	Keymap window		Vaihda pikanäppäimet Haiku-tilaan
 Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
+ISO-9995	Keyboard Layout View		ISO-9995
+Hebrew	Keyboard Layout View		heprealainen
 Diaeresis trigger	Keymap window		Treemaliipaisin
 Disabled	Modifier keys window	Do nothing	Poissa käytöstä
+Belarusian (Latin)	Keyboard Layout View		valkovenäläinen (latinalainen)
+Danish	Keyboard Layout View		tanskalainen
 Open…	Keymap window		Avaa…
+Russian (Typewriter)	Keyboard Layout View		venäläinen (kirjoituskone)
+Error: duplicate keys	Modifier keys window		Virhe: kaksinkertaiset avaimet
 System:	Keymap window		Järjestelmä:
+Lithuanian	Keyboard Layout View		liettualainen
+Finnish	Keyboard Layout View		suomalainen
+Svorak	Keyboard Layout View		Svorak
+Left command	Keyboard Layout View		Alt-näppäin
+Romanian	Keyboard Layout View		romanialainen
 Set modifier keys…	Keymap window		Aseta muuntonäppäimet...
 Option:	Modifier keys window	Option key role name	Valitsin:
+Czech (Mac)	Keyboard Layout View		tšekkiläinen (Mac)
+Control	Keyboard Layout View	Control key	Control-näppäin
+Left option	Keyboard Layout View		Vasen valitsin
+Portuguese	Keyboard Layout View		portugalilainen
+Right control	Keyboard Layout View		Oikea control-näppäin
+Belgian (point)	Keyboard Layout View		belgialainen (piste)
 Switch shortcut keys	Keymap window		Vaihda pikanäppäimiä
+Norwegian	Keyboard Layout View		norjalainen
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Vaihtonäppäin
 User:	Keymap window		Käyttäjä:
+Esperanto	Keyboard Layout View		esperanto
+Arabic (102)	Keyboard Layout View		arabialainen (102)
+United-Kingdom	Keyboard Layout View		isobritannialainen
+German (Mac)	Keyboard Layout View		saksalainen (Mac)
+Right option	Keyboard Layout View		Alt Gr-näppäin
+Right shift	Keyboard Layout View		Oikea vaihtonäppäin
 Key	Modifier keys window	As in a computer keyboard key	Näppäin
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl-näppäin
 Control:	Modifier keys window	Control key role name	Ohjain:
+Brazilian	Keyboard Layout View		brasilialainen
+Brazilian (ABNT2)	Keyboard Layout View		brasilialainen (ABNT2)
+French (Bépo)	Keyboard Layout View		ranskalainen (Bépo)
+Option	Keyboard Layout View	Option key	Valitsin
+US-International	Keyboard Layout View		US kansainvälinen
 Sample and clipboard:	Keymap window		Näyte ja leikepöytä:
+Swiss-German	Keyboard Layout View		sveitsiläissaksalainen
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-näppäin
 Layout	Keymap window		Ulkoasu
 Switch shortcut keys to Windows/Linux mode	Keymap window		Vaihda pikanäppäimet Windows/Linux -tilaan
+Albanian	Keyboard Layout View		albanialainen
+Right command	Keyboard Layout View		Oikea command-näppäin
 Revert	Keymap window		Palauta
 Command:	Modifier keys window	Command key role name	Komento:
+Latin-American	Keyboard Layout View		latinalaisamerikkalainen
+Spanish (Dvorak)	Keyboard Layout View		espanjalainen (Dvorak)
+Lithuanian (Standard)	Keyboard Layout View		liettualainen (vakio)
+Canadian-French	Keyboard Layout View		kanadalaisranskalainen
+Irish	Keyboard Layout View		irlantilainen
+Turkish (Type-F)	Keyboard Layout View		turkkilainen (Type-F)
+Slovene	Keyboard Layout View		sloveenilainen
+Turkish (Type-Q)	Keyboard Layout View		turkkilainen (Type-Q)
 Save as…	Keymap window		Tallenna nimellä…
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-näppäin
+Serbian (Latin)	Keyboard Layout View		serbialainen (latinalainen)
 File	Keymap window		Tiedosto
+Num lock	Keyboard Layout View		Numerolukko
+Swedish	Keyboard Layout View		ruotsalainen
+Macedonian	Keyboard Layout View		makedonialainen
 (Current)	Keymap window		(Nykyinen)
 Font	Keymap window		Kirjasin
 Keymap	System name		Näppäinkuvausasetukset
+French (Mac)	Keyboard Layout View		ranskalainen (Mac)
+Left shift	Keyboard Layout View		Vasen vaihtonäppäin
+Shift	Keyboard Layout View	Shift key	Vaihtonäppäin
+Ukrainian	Keyboard Layout View		ukrainalainen
+Croatian	Keyboard Layout View		kroatialainen
+Kazakh	Keyboard Layout View		kazakkilainen
+Czech	Keyboard Layout View		tšekkiläinen
 Set modifier keys	Modifier keys window		Aseta muuntonäppäimet
+Colemak	Keyboard Layout View		Colemak
 Modifier keys	Modifier keys window		Muuntonäppäimet
 Acute trigger	Keymap window		Akuuttiaksenttiliipaisin

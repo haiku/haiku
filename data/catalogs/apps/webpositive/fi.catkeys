@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	1786411139
+1	finnish	x-vnd.Haiku-WebPositive	951661576
 Show home button	Settings Window		Näytä aloitussivupainike
 Username:	Authentication Panel		Käyttäjätunnus:
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
@@ -25,6 +25,7 @@ Window	WebPositive Window		Ikkuna
 Decrease size	WebPositive Window		Pienennä kirjasinkokoa
 Serif font:	Settings Window		Pääteviivallinen kirjasin:
 Loading %url	WebPositive Window		Ladataan %url
+Download aborted	Download Window		Lataaminen keskeytettiin
 Page source	WebPositive Window		Sivulähde
 Next	WebPositive Window		Seuraava
 Find next	WebPositive Window		Etsi seuraava
@@ -85,14 +86,17 @@ Open blank page	Settings Window		Avaa tyhjä sivu
 New tabs:	Settings Window		Uudet välilehdet:
 Cancel	WebPositive Window		Peru
 Open all	WebPositive Window		Avaa kaikki
+Hide bookmark bar	WebPositive Window		Piilota kirjanmerkkipalkki
 Proxy server requires authentication	Settings Window		Välityspalvelin vaatii tunnistautumista
 Clear	URL Bar		Tyhjennä
 Cut	URL Bar		Leikkaa
 Clear	WebPositive Window		Tyhjennä
+Script console	Console Window		Skriptikonsoli
 Remove	Download Window		Poista
 Find	WebPositive Window		Etsi
 Find previous	WebPositive Window		Etsi edellinen
 Settings	WebPositive Window		Asetukset
+Script console	WebPositive Window		Skriptikonsoli
 Proxy server address:	Settings Window		Välityspalvelimen osoite:
 Proxy server port:	Settings Window		Välityspalvelimen portti:
 Bookmarks	WebPositive Window		Kirjanmerkit
@@ -106,6 +110,7 @@ Open start page	Settings Window		Avaa aloitussivu
 Continue downloads	WebPositive		Jatka latauksia
 Cancel	Download Window		Peru
 Open search page	Settings Window		Avaa etsintäsivu
+Clear	Console Window		Tyhjennä
 Password:	Authentication Panel		Salasana:
 Back	WebPositive Window		Takaisin
 New browser window	Download Window		Uusi selainikkuna
@@ -134,6 +139,8 @@ Clone current page	Settings Window		Kloonaa nykyinen sivu
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Haluatko avata kaikki %addedCount-kirjanmerkit kerralla?
 OK	Authentication Panel		Valmis
 Copy	URL Bar		Kopioi
+Download finished	Download Window		Lataus valmistui
+Show bookmark bar	WebPositive Window		Näytä kirjanmerkkipalkki
 OK	WebPositive Window		Valmis
 Manage bookmarks	WebPositive Window		Hallinnoi kirjanmerkkejä
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Kirjanmerkki (%bookmarkName) tälle sivulle on jo olemassa.

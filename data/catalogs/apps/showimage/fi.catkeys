@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	4011843330
+1	finnish	x-vnd.Haiku-ShowImage	4121021813
 Use as background…	Menus		Käytä taustana…
 File	Menus		Tiedosto
 Slide delay	Menus		Diaviive
@@ -53,6 +53,7 @@ Select all	Menus		Valitse kaikki
 Zoom factor in %:	PrintOptionsWindow		Rajaustekijä kohteessa %:
 Width:	PrintOptionsWindow		Leveys:
 Image	Menus		Kuva
+Move to Trash	Menus		Siirrä roskakoriin
 OK	Alerts		Valmis
 Rotate clockwise	Menus		Pyöritä myötäpäivään
 Job setup	PrintOptionsWindow		Työasetukset

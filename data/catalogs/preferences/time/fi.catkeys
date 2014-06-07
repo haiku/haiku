@@ -1,9 +1,10 @@
-1	finnish	x-vnd.Haiku-Time	2290715672
+1	finnish	x-vnd.Haiku-Time	3180389660
 GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
 OK	Time		Valmis
 Asia	Time		Aasia
 \nNow: 	Time		\nNyt:
 Africa	Time		Afrikka
+Reset to default server list	Time		Nollaa oletuspalvelinluettelo
 Stop	Time		Pysäytä
 Could not contact server	Time		Yhteydenotto palvelimeen epäonnistui
 Australia	Time		Australia
