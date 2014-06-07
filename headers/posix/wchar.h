@@ -94,7 +94,7 @@ extern size_t   wcrtomb(char *dest, wchar_t wc, mbstate_t *mbState);
 extern int		wcscasecmp(const wchar_t *wcs1, const wchar_t *wcs2);
 extern wchar_t	*wcscat(wchar_t *dest, const wchar_t *src);
 extern wchar_t	*wcschr(const wchar_t *wcs, wchar_t wc);
-#ifdef __USE_GNU
+#ifdef _GNU_SOURCE
 extern wchar_t	*wcschrnul(const wchar_t *wcs, wchar_t wc);
 #endif
 extern int      wcscmp(const wchar_t *wcs1, const wchar_t *wcs2);
@@ -141,7 +141,7 @@ extern wchar_t	*wmemchr(const wchar_t *wcs, wchar_t wc, size_t n);
 extern int		wmemcmp(const wchar_t *wcs1, const wchar_t *wcs2, size_t n);
 extern wchar_t	*wmemcpy(wchar_t *dest, const wchar_t *src, size_t n);
 extern wchar_t	*wmemmove(wchar_t *dest, const wchar_t *src, size_t n);
-#ifdef __USE_GNU
+#ifdef _GNU_SOURCE
 extern wchar_t	*wmempcpy(wchar_t *dest, const wchar_t *src, size_t n);
 #endif
 extern wchar_t	*wmemset(wchar_t *dest, wchar_t wc, size_t n);
