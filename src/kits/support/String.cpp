@@ -2595,10 +2595,13 @@ BString::_DoReplace(const char* findThis, const char* replaceWith,
 		|| fromOffset < 0 || fromOffset >= Length())
 		return *this;
 
+	int32 findLen = strlen(findThis);
+	if (findLen == 0)
+		return *this;
+
 	typedef int32 (BString::*TFindMethod)(const char*, int32, int32) const;
 	TFindMethod findMethod = ignoreCase
 		? &BString::_IFindAfter : &BString::_FindAfter;
-	int32 findLen = strlen(findThis);
 
 	if (!replaceWith)
 		replaceWith = "";
