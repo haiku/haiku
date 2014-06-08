@@ -509,6 +509,11 @@ list_interface(const char* name)
 	// get link level interface for this interface
 
 	BNetworkInterface interface(name);
+	if (!interface.Exists()) {
+		printf("Interface not found!\n");
+		return false;
+	}
+
 	BNetworkAddress linkAddress;
 	status_t status = interface.GetHardwareAddress(linkAddress);
 	if (status == B_OK) {
