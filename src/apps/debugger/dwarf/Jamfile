@@ -22,6 +22,7 @@ MergeObject Debugger_dwarf.o
 	DebugInfoEntry.cpp
 	DwarfExpressionEvaluator.cpp
 	DwarfFile.cpp
+	DwarfFileLoadingState.cpp
 	DwarfManager.cpp
 	DwarfTargetInterface.cpp
 	DwarfUtils.cpp

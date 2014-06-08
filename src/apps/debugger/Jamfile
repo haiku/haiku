@@ -100,6 +100,7 @@ Application Debugger :
 	DebuggerTeamDebugInfo.cpp
 	DwarfFunctionDebugInfo.cpp
 	DwarfImageDebugInfo.cpp
+	DwarfImageDebugInfoLoadingState.cpp
 	DwarfStackFrameDebugInfo.cpp
 	DwarfTeamDebugInfo.cpp
 	DwarfTypeFactory.cpp
@@ -109,9 +110,11 @@ Application Debugger :
 	FunctionInstance.cpp
 	GlobalTypeLookup.cpp
 	ImageDebugInfo.cpp
+	ImageDebugInfoLoadingState.cpp
 	ImageDebugInfoProvider.cpp
 	NoOpStackFrameDebugInfo.cpp
 	SpecificImageDebugInfo.cpp
+	SpecificImageDebugInfoLoadingState.cpp
 	SpecificTeamDebugInfo.cpp
 	StackFrameDebugInfo.cpp
 	TeamDebugInfo.cpp
