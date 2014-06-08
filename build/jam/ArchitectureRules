@@ -275,9 +275,6 @@ rule KernelArchitectureSetup architecture
 	local gccVersion = $(HAIKU_GCC_VERSION_$(architecture)) ;
 	local cpu = $(HAIKU_CPU_$(architecture)) ;
 
-	local debugBootLoader
-		= [ ConfigVar DEBUG : HAIKU_TOP src system boot loader ] ;
-
 	switch $(cpu) {
 		case ppc :
 			HAIKU_BOOT_PLATFORM ?= openfirmware ;
@@ -326,11 +323,7 @@ rule KernelArchitectureSetup architecture
 			HAIKU_BOOT_PLATFORM = bios_ia32 ;
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
-			if $(debugBootLoader) {
-				HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 350 ; # in kB
-			} else {
-				HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
-			}
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
 
 			# nasm is required for target arch x86
 			if ! $(HAIKU_NASM) {
@@ -342,11 +335,7 @@ rule KernelArchitectureSetup architecture
 			HAIKU_BOOT_PLATFORM = bios_ia32 ;
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
-			if $(debugBootLoader) {
-				HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 350 ; # in kB
-			} else {
-				HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
-			}
+			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
 
 			# x86_64 kernel source is under arch/x86.
 			HAIKU_KERNEL_ARCH = x86 ;
