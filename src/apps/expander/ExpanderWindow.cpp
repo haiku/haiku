@@ -8,6 +8,8 @@
 
 #include "ExpanderWindow.h"
 
+#include <algorithm>
+
 #include <Alert.h>
 #include <Box.h>
 #include <Button.h>
@@ -75,8 +77,8 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 		new BMessage(MSG_EXPAND));
 
 	BSize size = fDestButton->PreferredSize();
-	size.width = max_c(size.width, fSourceButton->PreferredSize().width);
-	size.width = max_c(size.width, fExpandButton->PreferredSize().width);
+	size.width = std::max(size.width, fSourceButton->PreferredSize().width);
+	size.width = std::max(size.width, fExpandButton->PreferredSize().width);
 
 	fDestButton->SetExplicitMaxSize(size);
 	fSourceButton->SetExplicitMaxSize(size);
@@ -689,13 +691,13 @@ ExpanderWindow::_ExpandListingText()
 	if (minWidth < Frame().Width() + delta) {
 		// set the Zoom limit as the minimal required size
 		SetZoomLimits(Frame().Width() + delta,
-			min_c(fSizeLimit + fListingText->TextRect().Height()
+			std::min(fSizeLimit + fListingText->TextRect().Height()
 				+ fLineHeight + B_H_SCROLL_BAR_HEIGHT + 1.0f,
 				maxHeight));
 	} else {
 		// set the zoom limit based on minimal window size allowed
 		SetZoomLimits(minWidth,
-			min_c(fSizeLimit + fListingText->TextRect().Height()
+			std::min(fSizeLimit + fListingText->TextRect().Height()
 				+ fLineHeight + B_H_SCROLL_BAR_HEIGHT + 1.0f,
 				maxHeight));
 	}
@@ -723,7 +725,7 @@ ExpanderWindow::_UpdateWindowSize(bool showContents)
 		minHeight = bottom + 5.0 * fLineHeight;
 		maxHeight = 32767.0;
 
-		bottom = max_c(fPreviousHeight, minHeight);
+		bottom = std::max(fPreviousHeight, minHeight);
 	} else {
 		minHeight = fSizeLimit;
 		maxHeight = fSizeLimit;
