@@ -14,6 +14,7 @@
 #include <Window.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <compat/sys/stat.h>
@@ -106,14 +107,6 @@ DirectoryFilePanel::SelectionChanged()
 {
 	Window()->Lock();
 
-	char label[64];
-	entry_ref ref;
-	GetPanelDirectory(&ref);
-	if (snprintf(label, sizeof(label),
-			B_TRANSLATE("Select '%s'"), ref.name) >= (int)sizeof(label)) {
-		strcpy(label + sizeof(label) - 5, B_UTF8_ELLIPSIS "'");
-	}
-
 	// Resize button so that the label fits
 	// maximum width is dictated by the window's size limits
 
@@ -123,7 +116,14 @@ DirectoryFilePanel::SelectionChanged()
 	maxWidth -= Window()->Bounds().Width() + 8 - fCurrentButton->Frame().right;
 
 	BRect oldBounds = fCurrentButton->Bounds();
+
+	char* label;
+	entry_ref ref;
+	GetPanelDirectory(&ref);
+	asprintf(&label, B_TRANSLATE("Select '%s'" B_UTF8_ELLIPSIS), ref.name);
 	fCurrentButton->SetLabel(label);
+	free(label);
+
 	float width;
 	float height;
 	fCurrentButton->GetPreferredSize(&width, &height);
