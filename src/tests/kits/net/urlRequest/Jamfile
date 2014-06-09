@@ -1,25 +1,5 @@
 SubDir HAIKU_TOP src tests kits net urlRequest ;
 
-Application urlRequest_test
-	: urlRequest_test.cpp
-	: be $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) $(TARGET_LIBSTDC++)
-	;
-
-Application urlAuth_test
-	: urlAuth_test.cpp
-	: be $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) $(TARGET_LIBSTDC++)
-	;
-
-Application urlUpload_test
-	: urlUpload_test.cpp
-	: be $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) $(TARGET_LIBSTDC++)
-	;
-
-Application urlAuthBasic_test
-	: urlAuthBasic_test.cpp
-	: be $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) $(TARGET_LIBSTDC++)
-	;
-
 Application urlProtocolListener_test
 	: urlProtocolListener_test.cpp
 	: be $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) $(TARGET_LIBSTDC++)

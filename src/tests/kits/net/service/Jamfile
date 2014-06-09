@@ -4,6 +4,7 @@ UnitTestLib servicekittest.so :
 	ServiceKitTestAddon.cpp
 
 	CookieTest.cpp
+	HttpTest.cpp
 	UrlTest.cpp
 
 	: be $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) $(TARGET_LIBSTDC++)
