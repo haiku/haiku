@@ -69,7 +69,7 @@ SimpleTest ScrollViewTest :
 	;
 
 SimpleTest AlertTest :
-	AlertTest.cpp
+	SimpleAlertTest.cpp
 	: be $(TARGET_LIBSUPC++)
 ;
 
