@@ -481,11 +481,6 @@ BNetworkCookie::IsValidForDomain(const BString& domain) const
 	if (IsHostOnly())
 		return domain == cookieDomain;
 
-	// FIXME prevent supercookies with a domain of ".com" or similar
-	// This is NOT as straightforward as relying on the last dot in the domain.
-	// Here's a list of TLD:
-	// https://github.com/rsimoes/Mozilla-PublicSuffix/blob/master/effective_tld_names.dat
-
 	// FIXME do not do substring matching on IP addresses. The RFCs disallow it.
 
 	// Otherwise, the domains must match exactly, or the domain must have a dot
@@ -516,13 +511,43 @@ BNetworkCookie::IsValidForPath(const BString& path) const
 bool
 BNetworkCookie::_CanBeSetFromUrl(const BUrl& url) const
 {
-	if (Secure() && url.Protocol() != "https")
-		return false;
-
 	if (url.Protocol() == "file")
 		return Domain() == "localhost" && _CanBeSetFromPath(url.Path());
 
-	return IsValidForDomain(url.Host()) && _CanBeSetFromPath(url.Path());
+	return _CanBeSetFromDomain(url.Host()) && _CanBeSetFromPath(url.Path());
+}
+
+
+bool
+BNetworkCookie::_CanBeSetFromDomain(const BString& domain) const
+{
+	// TODO: canonicalize both domains
+	const BString& cookieDomain = Domain();
+
+	int32 difference = domain.Length() - cookieDomain.Length();
+	if (difference < 0) {
+		// Setting a cookie on a subdomain is allowed.
+		const char* suffix = cookieDomain.String() + difference;
+		return (strcmp(suffix, domain.String()) == 0 && (difference == 0
+			|| cookieDomain[difference - 1] == '.'));
+	}
+
+	// If the cookie is host-only the domains must match exactly.
+	if (IsHostOnly())
+		return domain == cookieDomain;
+
+	// FIXME prevent supercookies with a domain of ".com" or similar
+	// This is NOT as straightforward as relying on the last dot in the domain.
+	// Here's a list of TLD:
+	// https://github.com/rsimoes/Mozilla-PublicSuffix/blob/master/effective_tld_names.dat
+
+	// FIXME do not do substring matching on IP addresses. The RFCs disallow it.
+
+	// Otherwise, the domains must match exactly, or the domain must have a dot
+	// character just before the common suffix.
+	const char* suffix = domain.String() + difference;
+	return (strcmp(suffix, cookieDomain.String()) == 0 && (difference == 0
+		|| domain[difference - 1] == '.'));
 }
 
 

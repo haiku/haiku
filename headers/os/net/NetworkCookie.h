@@ -87,6 +87,7 @@ private:
 			BString				_DefaultPathForUrl(const BUrl& url);
 
 			bool				_CanBeSetFromUrl(const BUrl& url) const;
+			bool				_CanBeSetFromDomain(const BString& path) const;
 			bool				_CanBeSetFromPath(const BString& path) const;
 
 private:
