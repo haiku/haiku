@@ -64,8 +64,7 @@ DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode,
 void
 DirectoryFilePanel::Show()
 {
-	if (fCurrentButton == NULL) {
-		Window()->Lock();
+	if (fCurrentButton == NULL && Window()->Lock()) {
 		BView* background = Window()->ChildAt(0);
 		BView* cancel = background->FindView("cancel button");
 
@@ -105,35 +104,37 @@ DirectoryFilePanel::Show()
 void
 DirectoryFilePanel::SelectionChanged()
 {
-	Window()->Lock();
-
 	// Resize button so that the label fits
 	// maximum width is dictated by the window's size limits
 
-	float dummy;
-	float maxWidth;
-	Window()->GetSizeLimits(&maxWidth, &dummy, &dummy, &dummy);
-	maxWidth -= Window()->Bounds().Width() + 8 - fCurrentButton->Frame().right;
+	if (Window()->Lock()) {
+		float dummy;
+		float maxWidth;
+		Window()->GetSizeLimits(&maxWidth, &dummy, &dummy, &dummy);
+		maxWidth -= Window()->Bounds().Width() + 8
+			- fCurrentButton->Frame().right;
 
-	BRect oldBounds = fCurrentButton->Bounds();
+		BRect oldBounds = fCurrentButton->Bounds();
 
-	char* label;
-	entry_ref ref;
-	GetPanelDirectory(&ref);
-	asprintf(&label, B_TRANSLATE("Select '%s'" B_UTF8_ELLIPSIS), ref.name);
-	fCurrentButton->SetLabel(label);
-	free(label);
+		char* label;
+		entry_ref ref;
+		GetPanelDirectory(&ref);
+		asprintf(&label, B_TRANSLATE("Select '%s'" B_UTF8_ELLIPSIS),
+			ref.name);
+		fCurrentButton->SetLabel(label);
+		free(label);
 
-	float width;
-	float height;
-	fCurrentButton->GetPreferredSize(&width, &height);
-	if (width > maxWidth)
-		width = maxWidth;
+		float width;
+		float height;
+		fCurrentButton->GetPreferredSize(&width, &height);
+		if (width > maxWidth)
+			width = maxWidth;
 
-	fCurrentButton->ResizeTo(width, oldBounds.Height());
-	fCurrentButton->MoveBy(oldBounds.Width() - width, 0);
+		fCurrentButton->ResizeTo(width, oldBounds.Height());
+		fCurrentButton->MoveBy(oldBounds.Width() - width, 0);
 
-	Window()->Unlock();
+		Window()->Unlock();
+	}
 
 	BFilePanel::SelectionChanged();
 }
