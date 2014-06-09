@@ -5,6 +5,9 @@
 #include <AutoDeleter.h>
 
 
+using std::nothrow;
+
+
 /*! \brief Converts the given unicode character to utf8.
 
 	\param c The unicode character.
