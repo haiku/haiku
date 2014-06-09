@@ -5,6 +5,7 @@
  */
 #include "ExpanderThread.h"
 
+
 #include <errno.h>
 #include <image.h>
 #include <signal.h>
@@ -15,11 +16,12 @@
 #include <Path.h>
 
 
-const char * ExpanderThreadName = "ExpanderThread";
+const char* ExpanderThreadName = "ExpanderThread";
 
 
-ExpanderThread::ExpanderThread(BMessage * refs_message, BMessenger * messenger)
-	:	GenericThread(ExpanderThreadName, B_NORMAL_PRIORITY, refs_message),
+ExpanderThread::ExpanderThread(BMessage* refs_message, BMessenger* messenger)
+	:
+	GenericThread(ExpanderThreadName, B_NORMAL_PRIORITY, refs_message),
 	fWindowMessenger(messenger),
 	fThreadId(-1),
 	fStdIn(-1),
@@ -28,7 +30,8 @@ ExpanderThread::ExpanderThread(BMessage * refs_message, BMessenger * messenger)
 	fExpanderOutput(NULL),
 	fExpanderError(NULL)
 {
-	SetDataStore(new BMessage(* refs_message));  // leak?
+	SetDataStore(new BMessage(*refs_message));
+		// leak?
 	// prevents bug with B_SIMPLE_DATA
 	// (drag&drop messages)
 }
@@ -44,15 +47,18 @@ status_t
 ExpanderThread::ThreadStartup()
 {
 	status_t status = B_OK;
-	entry_ref srcRef, destRef;
+	entry_ref srcRef;
+	entry_ref destRef;
 	BString cmd;
 
 	if ((status = GetDataStore()->FindRef("srcRef", &srcRef)) != B_OK)
 		return status;
+
 	if ((status = GetDataStore()->FindRef("destRef", &destRef)) == B_OK) {
 		BPath path(&destRef);
 		chdir(path.Path());
 	}
+
 	if ((status = GetDataStore()->FindString("cmd", &cmd)) != B_OK)
 		return status;
 
@@ -64,11 +70,11 @@ ExpanderThread::ThreadStartup()
 	cmd.ReplaceAll("%s", pathString.String());
 
 	int32 argc = 3;
-	const char ** argv = new const char * [argc + 1];
+	const char** argv = new const char * [argc + 1];
 
-	argv[0]	= strdup("/bin/sh");
-	argv[1]	= strdup("-c");
-	argv[2]	= strdup(cmd.String());
+	argv[0] = strdup("/bin/sh");
+	argv[1] = strdup("-c");
+	argv[2] = strdup(cmd.String());
 	argv[argc] = NULL;
 
 	fThreadId = PipeCommand(argc, argv, fStdIn, fStdOut, fStdErr);
@@ -82,17 +88,17 @@ ExpanderThread::ThreadStartup()
 	set_thread_priority(fThreadId, B_LOW_PRIORITY);
 
 	resume_thread(fThreadId);
-	
+
 	int flags = fcntl(fStdOut, F_GETFL, 0);
 	flags |= O_NONBLOCK;
 	fcntl(fStdOut, F_SETFL, flags);
 	flags = fcntl(fStdErr, F_GETFL, 0);
 	flags |= O_NONBLOCK;
 	fcntl(fStdErr, F_SETFL, flags);
-	
+
 	fExpanderOutput = fdopen(fStdOut, "r");
 	fExpanderError = fdopen(fStdErr, "r");
-		
+
 	return B_OK;
 }
 
@@ -102,29 +108,32 @@ ExpanderThread::ExecuteUnit(void)
 {
 	// read output and error from command
 	// send it to window
-	
+
 	BMessage message('outp');
 	bool outputAdded = false;
 	for (int32 i = 0; i < 50; i++) {
-		char *output_string = fgets(fExpanderOutputBuffer , LINE_MAX, fExpanderOutput);
-		if (!output_string)
+		char* output_string = fgets(fExpanderOutputBuffer , LINE_MAX,
+			fExpanderOutput);
+		if (output_string == NULL)
 			break;
+
 		message.AddString("output", output_string);
 		outputAdded = true;
 	}
 	if (outputAdded)
 		fWindowMessenger->SendMessage(&message);
+
 	if (feof(fExpanderOutput))
 		return EOF;
-	
-	char *error_string = fgets(fExpanderOutputBuffer , LINE_MAX, fExpanderError);
-	if (error_string != NULL
-		&& strcmp(error_string, "\n")) {
+
+	char* error_string = fgets(fExpanderOutputBuffer, LINE_MAX,
+		fExpanderError);
+	if (error_string != NULL && strcmp(error_string, "\n")) {
 		BMessage message('errp');
 		message.AddString("error", error_string);
 		fWindowMessenger->SendMessage(&message);
 	}
-	
+
 	// streams are non blocking, sleep every 100ms
 	snooze(100000);
 
@@ -154,7 +163,8 @@ ExpanderThread::ThreadShutdown(void)
 void
 ExpanderThread::ThreadStartupFailed(status_t status)
 {
-	fprintf(stderr, "ExpanderThread::ThreadStartupFailed() : %s\n", strerror(status));
+	fprintf(stderr, "ExpanderThread::ThreadStartupFailed() : %s\n",
+		strerror(status));
 
 	Quit();
 }
@@ -178,7 +188,8 @@ ExpanderThread::ExecuteUnitFailed(status_t status)
 void
 ExpanderThread::ThreadShutdownFailed(status_t status)
 {
-	fprintf(stderr, "ExpanderThread::ThreadShutdownFailed() %s\n", strerror(status));
+	fprintf(stderr, "ExpanderThread::ThreadShutdownFailed() %s\n",
+		strerror(status));
 }
 
 
@@ -190,7 +201,8 @@ ExpanderThread::ProcessRefs(BMessage *msg)
 
 
 thread_id
-ExpanderThread::PipeCommand(int argc, const char **argv, int &in, int &out, int &err, const char **envp)
+ExpanderThread::PipeCommand(int argc, const char** argv, int& in, int& out,
+	int& err, const char** envp)
 {
 	// This function written by Peter Folk <pfolk@uni.uiuc.edu>
 	// and published in the BeDevTalk FAQ
@@ -202,43 +214,45 @@ ExpanderThread::PipeCommand(int argc, const char **argv, int &in, int &out, int 
 
 	int filedes[2];
 	
-	/* Create new pipe FDs as stdout, stderr */
+	// create new pipe FDs as stdout, stderr
 	pipe(filedes);  dup2(filedes[1], 1); close(filedes[1]);
 	out = filedes[0]; // Read from out, taken from cmd's stdout
 	pipe(filedes);  dup2(filedes[1], 2); close(filedes[1]);
 	err = filedes[0]; // Read from err, taken from cmd's stderr
 
 	// taken from pty.cpp
-	// Create a tty for stdin, as utilities don't generally use stdin
+	// create a tty for stdin, as utilities don't generally use stdin
 	int master = posix_openpt(O_RDWR);
 	if (master < 0)
     	return -1;
 
 	int slave;
-	const char *ttyName;
+	const char* ttyName;
 	if (grantpt(master) != 0 || unlockpt(master) != 0
 		|| (ttyName = ptsname(master)) == NULL
 		|| (slave = open(ttyName, O_RDWR | O_NOCTTY)) < 0) {
 		close(master);
 		return -1;
 	}
-	
+
 	int pid = fork();
 	if (pid < 0) {
 		close(master);
 		close(slave);
 		return -1;
 	}
+
 	// child
 	if (pid == 0) {
 		close(master);
-		
+
 		setsid();
 		if (ioctl(slave, TIOCSCTTY, NULL) != 0)
 			return -1;
+
 		dup2(slave, 0); 
 		close(slave);
-		
+
 		// "load" command.
 		execv(argv[0], (char *const *)argv);
 
@@ -249,14 +263,14 @@ ExpanderThread::PipeCommand(int argc, const char **argv, int &in, int &out, int 
 	// parent
 	close (slave);
 	in = master;
-		
+
 	// Restore old FDs
 	close(1); dup(old_out); close(old_out);
 	close(2); dup(old_err); close(old_err);
 
-	/* Theoretically I should do loads of error checking, but
-	   the calls aren't very likely to fail, and that would 
-	   muddy up the example quite a bit.  YMMV. */
+	// Theoretically I should do loads of error checking, but
+	// the calls aren't very likely to fail, and that would
+	// muddy up the example quite a bit. YMMV.
 
 	return pid;
 }
@@ -265,8 +279,8 @@ ExpanderThread::PipeCommand(int argc, const char **argv, int &in, int &out, int 
 status_t
 ExpanderThread::SuspendExternalExpander()
 {
-	thread_info thread_info;
-	status_t status = get_thread_info(fThreadId, &thread_info);
+	thread_info info;
+	status_t status = get_thread_info(fThreadId, &info);
 
 	if (status == B_OK)
 		return send_signal(-fThreadId, SIGSTOP);
@@ -278,8 +292,8 @@ ExpanderThread::SuspendExternalExpander()
 status_t
 ExpanderThread::ResumeExternalExpander()
 {
-	thread_info thread_info;
-	status_t status = get_thread_info(fThreadId, &thread_info);
+	thread_info info;
+	status_t status = get_thread_info(fThreadId, &info);
 
 	if (status == B_OK)
 		return send_signal(-fThreadId, SIGCONT);
@@ -291,13 +305,14 @@ ExpanderThread::ResumeExternalExpander()
 status_t
 ExpanderThread::InterruptExternalExpander()
 {
-	thread_info thread_info;
-	status_t status = get_thread_info(fThreadId, &thread_info);
+	thread_info info;
+	status_t status = get_thread_info(fThreadId, &info);
 
 	if (status == B_OK) {
 		status = send_signal(-fThreadId, SIGINT);
 		WaitOnExternalExpander();
 	}
+
 	return status;
 }
 
@@ -305,8 +320,8 @@ ExpanderThread::InterruptExternalExpander()
 status_t
 ExpanderThread::WaitOnExternalExpander()
 {
-	thread_info thread_info;
-	status_t status = get_thread_info(fThreadId, &thread_info);
+	thread_info info;
+	status_t status = get_thread_info(fThreadId, &info);
 
 	if (status == B_OK)
 		return wait_for_thread(fThreadId, &status);

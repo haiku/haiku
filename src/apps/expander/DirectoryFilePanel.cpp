@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,13 +25,13 @@ DirectoryRefFilter::DirectoryRefFilter()
 
 
 bool
-DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node,
-	struct stat_beos *st, const char *filetype)
+DirectoryRefFilter::Filter(const entry_ref* ref, BNode* node,
+	struct stat_beos* stat, const char* mimeType)
 {
-	if (S_ISDIR(st->st_mode))
+	if (S_ISDIR(stat->st_mode))
 		return true;
 
-	if (S_ISLNK(st->st_mode)) {
+	if (S_ISLNK(stat->st_mode)) {
 		// Traverse symlinks
 		BEntry entry(ref, true);
 		return entry.IsDirectory();
@@ -41,17 +41,19 @@ DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node,
 }
 
 
-//	#pragma mark -
+//	#pragma mark - DirectoryFilePanel
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DirectoryFilePanel"
 
 
-DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode, BMessenger* target,
-		const entry_ref* startDirectory, uint32 nodeFlavors,
-		bool allowMultipleSelection, BMessage* message, BRefFilter* filter,
-		bool modal,	bool hideWhenDone)
-	: BFilePanel(mode, target, startDirectory, nodeFlavors,
+DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode,
+	BMessenger* target, const entry_ref* startDirectory, uint32 nodeFlavors,
+	bool allowMultipleSelection, BMessage* message, BRefFilter* filter,
+	bool modal, bool hideWhenDone)
+	:
+	BFilePanel(mode, target, startDirectory, nodeFlavors,
 		allowMultipleSelection, message, filter, modal, hideWhenDone),
 	fCurrentButton(NULL)
 {
@@ -108,22 +110,26 @@ DirectoryFilePanel::SelectionChanged()
 	entry_ref ref;
 	GetPanelDirectory(&ref);
 	if (snprintf(label, sizeof(label),
-		B_TRANSLATE("Select '%s'"), ref.name) >= (int)sizeof(label))
-			strcpy(label + sizeof(label) - 5, B_UTF8_ELLIPSIS "'");
+			B_TRANSLATE("Select '%s'"), ref.name) >= (int)sizeof(label)) {
+		strcpy(label + sizeof(label) - 5, B_UTF8_ELLIPSIS "'");
+	}
 
 	// Resize button so that the label fits
 	// maximum width is dictated by the window's size limits
 
-	float dummy, maxWidth;
+	float dummy;
+	float maxWidth;
 	Window()->GetSizeLimits(&maxWidth, &dummy, &dummy, &dummy);
 	maxWidth -= Window()->Bounds().Width() + 8 - fCurrentButton->Frame().right;
 
 	BRect oldBounds = fCurrentButton->Bounds();
 	fCurrentButton->SetLabel(label);
-	float width, height;
+	float width;
+	float height;
 	fCurrentButton->GetPreferredSize(&width, &height);
 	if (width > maxWidth)
 		width = maxWidth;
+
 	fCurrentButton->ResizeTo(width, oldBounds.Height());
 	fCurrentButton->MoveBy(oldBounds.Width() - width, 0);
 

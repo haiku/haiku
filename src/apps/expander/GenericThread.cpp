@@ -1,20 +1,24 @@
 // license: public domain
 // authors: jonas.sundstrom@kirilla.com
 
+
 #include "GenericThread.h"
 
 #include <string.h>
 
-GenericThread::GenericThread(const char * thread_name, int32 a_priority, BMessage * message)
+
+GenericThread::GenericThread(const char* threadName, int32 priority,
+	BMessage* message)
 	:
 	fThreadDataStore(message),
-	fThreadId(spawn_thread(private_thread_function, thread_name, a_priority, this)),
+	fThreadId(spawn_thread(private_thread_function, threadName, priority,
+		this)),
 	fExecuteUnit(create_sem(1, "ExecuteUnit sem")),
 	fQuitRequested(false),
 	fThreadIsPaused(false)
 {
 	if (fThreadDataStore == NULL)
-		fThreadDataStore	=	new BMessage();
+		fThreadDataStore = new BMessage();
 }
 
 
@@ -29,38 +33,39 @@ GenericThread::~GenericThread()
 status_t
 GenericThread::ThreadFunction(void)
 {
-	status_t  status  =  B_OK;
+	status_t status = B_OK;
 
-	status = ThreadStartup();	// Subclass and override this function
-	if (status != B_OK)
-	{
+	status = ThreadStartup();
+		// Subclass and override this function
+	if (status != B_OK) {
 		ThreadStartupFailed(status);
 		return (status);
-		// is this the right thing to do?
+			// is this the right thing to do?
 	}
 
-	while (1)
-	{
-		if (HasQuitBeenRequested())
-		{
-			status = ThreadShutdown();	// Subclass and override this function
-			if (status != B_OK)
-			{
+	while (1) {
+		if (HasQuitBeenRequested()) {
+			status = ThreadShutdown();
+				// Subclass and override this function
+			if (status != B_OK){
 				ThreadShutdownFailed(status);
 				return (status);
-				// what do we do?
+					// what do we do?
 			}
 
-			delete this;		// destructor
+			delete this;
+				// destructor
 			return B_OK;
 		}
 
 		BeginUnit();
 
-		status = ExecuteUnit();	// Subclass and override
+		status = ExecuteUnit();
+			// Subclass and override
 
+		// Subclass and override
 		if (status != B_OK)
-			ExecuteUnitFailed(status);  // Subclass and override
+			ExecuteUnitFailed(status);
 
 		EndUnit();
 	}
@@ -103,7 +108,7 @@ GenericThread::ThreadShutdown(void)
 
 
 void
-GenericThread::ThreadStartupFailed(status_t a_status)
+GenericThread::ThreadStartupFailed(status_t status)
 {
 	// This function is virtual.
 	// Subclass and override this function.
@@ -113,7 +118,7 @@ GenericThread::ThreadStartupFailed(status_t a_status)
 
 
 void
-GenericThread::ExecuteUnitFailed(status_t a_status)
+GenericThread::ExecuteUnitFailed(status_t status)
 {
 	// This function is virtual.
 	// Subclass and override this function.
@@ -123,7 +128,7 @@ GenericThread::ExecuteUnitFailed(status_t a_status)
 
 
 void
-GenericThread::ThreadShutdownFailed(status_t a_status)
+GenericThread::ThreadShutdownFailed(status_t status)
 {
 	// This function is virtual.
 	// Subclass and override this function.
@@ -135,64 +140,59 @@ GenericThread::ThreadShutdownFailed(status_t a_status)
 status_t
 GenericThread::Start(void)
 {
-	status_t	status	=	B_OK;
+	status_t status = B_OK;
 
-	if (IsPaused())
-	{
-		status	=	release_sem(fExecuteUnit);
+	if (IsPaused()) {
+		status = release_sem(fExecuteUnit);
 		if (status != B_OK)
 			return status;
 
-		fThreadIsPaused	=	false;
+		fThreadIsPaused = false;
 	}
 
-	status	=	resume_thread(fThreadId);
+	status = resume_thread(fThreadId);
 
 	return status;
 }
 
 
 int32
-GenericThread::private_thread_function(void * a_simple_thread_ptr)
+GenericThread::private_thread_function(void* pointer)
 {
-	status_t	status	=	B_OK;
-
-	status	=	((GenericThread *) a_simple_thread_ptr)-> ThreadFunction();
-
-	return (status);
+	return ((GenericThread*)pointer)->ThreadFunction();
 }
 
 
-BMessage *
+BMessage*
 GenericThread::GetDataStore(void)
 {
-	return	(fThreadDataStore);
+	return fThreadDataStore;
 }
 
 
 void
-GenericThread::SetDataStore(BMessage * message)
+GenericThread::SetDataStore(BMessage* message)
 {
 	fThreadDataStore  =  message;
 }
 
 
 status_t
-GenericThread::Pause(bool a_do_block, bigtime_t a_timeout)
+GenericThread::Pause(bool shouldBlock, bigtime_t timeout)
 {
-	status_t	status	=	B_OK;
+	status_t status = B_OK;
 
-	if (a_do_block)
-		status	=	acquire_sem(fExecuteUnit);
-	// thread will wait on semaphore
-	else
-		status	=	acquire_sem_etc(fExecuteUnit, 1, B_RELATIVE_TIMEOUT, a_timeout);
-	// thread will timeout
+	if (shouldBlock) {
+		// thread will wait on semaphore
+		status = acquire_sem(fExecuteUnit);
+	} else {
+		// thread will timeout
+		status = acquire_sem_etc(fExecuteUnit, 1, B_RELATIVE_TIMEOUT, timeout);
+	}
 
-	if (status == B_OK)
-	{
-		fThreadIsPaused	=	true;
-		return (B_OK);
+	if (status == B_OK) {
+		fThreadIsPaused = true;
+		return B_OK;
 	}
 
 	return status;
@@ -202,38 +202,40 @@ GenericThread::Pause(bool a_do_block, bigtime_t a_timeout)
 void
 GenericThread::Quit(void)
 {
-	fQuitRequested	=	true;
+	fQuitRequested = true;
 }
 
 
 bool
 GenericThread::HasQuitBeenRequested(void)
 {
-	return (fQuitRequested);
+	return fQuitRequested;
 }
 
 
 bool
 GenericThread::IsPaused(void)
 {
-	return (fThreadIsPaused);
+	return fThreadIsPaused;
 }
 
 
 status_t
 GenericThread::Suspend(void)
 {
-	return (suspend_thread(fThreadId));
+	return suspend_thread(fThreadId);
 }
 
 
 status_t
 GenericThread::Resume(void)
 {
-	release_sem(fExecuteUnit);		// to counteract Pause()
-	fThreadIsPaused	=	false;
+	release_sem(fExecuteUnit);
+		// to counteract Pause()
+	fThreadIsPaused = false;
 
-	return (resume_thread(fThreadId));	// to counteract Suspend()
+	return (resume_thread(fThreadId));
+		// to counteract Suspend()
 }
 
 
@@ -245,44 +247,44 @@ GenericThread::Kill(void)
 
 
 void
-GenericThread::ExitWithReturnValue(status_t a_return_value)
+GenericThread::ExitWithReturnValue(status_t returnValue)
 {
-	exit_thread(a_return_value);
+	exit_thread(returnValue);
 }
 
 
 status_t
-GenericThread::SetExitCallback(void(*a_callback)(void*), void * a_data)
+GenericThread::SetExitCallback(void (*callback)(void*), void* data)
 {
-	return (on_exit_thread(a_callback, a_data));
+	return (on_exit_thread(callback, data));
 }
 
 
 status_t
-GenericThread::WaitForThread(status_t * a_exit_value)
+GenericThread::WaitForThread(status_t* exitValue)
 {
-	return (wait_for_thread(fThreadId, a_exit_value));
+	return (wait_for_thread(fThreadId, exitValue));
 }
 
 
 status_t
-GenericThread::Rename(char * a_name)
+GenericThread::Rename(char* name)
 {
-	return (rename_thread(fThreadId, a_name));
+	return (rename_thread(fThreadId, name));
 }
 
 
 status_t
-GenericThread::SendData(int32 a_code, void * a_buffer, size_t a_buffer_size)
+GenericThread::SendData(int32 code, void* buffer, size_t size)
 {
-	return (send_data(fThreadId, a_code, a_buffer, a_buffer_size));
+	return (send_data(fThreadId, code, buffer, size));
 }
 
 
 int32
-GenericThread::ReceiveData(thread_id * a_sender, void * a_buffer, size_t a_buffer_size)
+GenericThread::ReceiveData(thread_id* sender, void* buffer, size_t size)
 {
-	return (receive_data(a_sender, a_buffer, a_buffer_size));
+	return (receive_data(sender, buffer, size));
 }
 
 
@@ -294,137 +296,138 @@ GenericThread::HasData(void)
 
 
 status_t
-GenericThread::SetPriority(int32 a_new_priority)
+GenericThread::SetPriority(int32 priority)
 {
-	return (set_thread_priority(fThreadId, a_new_priority));
+	return (set_thread_priority(fThreadId, priority));
 }
 
 
 void
-GenericThread::Snooze(bigtime_t a_microseconds)
+GenericThread::Snooze(bigtime_t delay)
 {
 	Suspend();
-	snooze(a_microseconds);
+	snooze(delay);
 	Resume();
 }
 
 
 void
-GenericThread::SnoozeUntil(bigtime_t a_microseconds, int a_timebase)
+GenericThread::SnoozeUntil(bigtime_t delay, int timeBase)
 {
 	Suspend();
-	snooze_until(a_microseconds, a_timebase);
+	snooze_until(delay, timeBase);
 	Resume();
 }
 
 
 status_t
-GenericThread::GetInfo(thread_info * thread_info)
+GenericThread::GetInfo(thread_info* info)
 {
-	return (get_thread_info(fThreadId, thread_info));
+	return get_thread_info(fThreadId, info);
 }
 
 
 thread_id
 GenericThread::GetThread(void)
 {
-	thread_info	t_thread_info;
-	GetInfo(& t_thread_info);
-	return (t_thread_info.thread);
+	thread_info info;
+	GetInfo(&info);
+	return info.thread;
 }
 
 
 team_id
 GenericThread::GetTeam(void)
 {
-	thread_info	t_thread_info;
-	GetInfo(& t_thread_info);
-	return (t_thread_info.team);
+	thread_info info;
+	GetInfo(&info);
+	return info.team;
 }
 
 
-char *
+char*
 GenericThread::GetName(void)
 {
-	thread_info	t_thread_info;
-	GetInfo(& t_thread_info);
-	return strdup(t_thread_info.name);
+	thread_info info;
+	GetInfo(&info);
+	return strdup(info.name);
 }
 
 
 thread_state
 GenericThread::GetState(void)
 {
-	thread_info	t_thread_info;
-	GetInfo(& t_thread_info);
-	return (t_thread_info.state);
+	thread_info info;
+	GetInfo(&info);
+	return info.state;
 }
 
 
 sem_id
 GenericThread::GetSemaphore(void)
 {
-	thread_info	t_thread_info;
-	GetInfo(& t_thread_info);
-	return (t_thread_info.sem);
+	thread_info info;
+	GetInfo(&info);
+	return info.sem;
 }
 
 
 int32
 GenericThread::GetPriority(void)
 {
-	thread_info	t_thread_info;
-	GetInfo(& t_thread_info);
-	return (t_thread_info.priority);
+	thread_info info;
+	GetInfo(&info);
+	return info.priority;
 }
 
 
 bigtime_t
 GenericThread::GetUserTime(void)
 {
-	thread_info	t_thread_info;
-	GetInfo(& t_thread_info);
-	return (t_thread_info.user_time);
+	thread_info info;
+	GetInfo(&info);
+	return info.user_time;
 }
 
 
 bigtime_t
 GenericThread::GetKernelTime(void)
 {
-	thread_info	t_thread_info;
-	GetInfo(& t_thread_info);
-	return (t_thread_info.kernel_time);
+	thread_info info;
+	GetInfo(&info);
+	return info.kernel_time;
 }
 
 
-void *
+void*
 GenericThread::GetStackBase(void)
 {
-	thread_info	t_thread_info;
-	GetInfo(& t_thread_info);
-	return (t_thread_info.stack_base);
+	thread_info info;
+	GetInfo(&info);
+	return info.stack_base;
 }
 
 
-void *
+void*
 GenericThread::GetStackEnd(void)
 {
-	thread_info	t_thread_info;
-	GetInfo(& t_thread_info);
-	return (t_thread_info.stack_end);
+	thread_info info;
+	GetInfo(&info);
+	return info.stack_end;
 }
 
 
 void
 GenericThread::BeginUnit(void)
 {
-	acquire_sem(fExecuteUnit); // thread can not be paused until it releases semaphore
+	acquire_sem(fExecuteUnit);
+		// thread can not be paused until it releases semaphore
 }
 
 
 void
 GenericThread::EndUnit(void)
 {
-	release_sem(fExecuteUnit); // thread can now be paused
+	release_sem(fExecuteUnit);
+		// thread can now be paused
 }
-

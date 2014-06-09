@@ -5,8 +5,8 @@
  * Authors:
  *		Jérôme Duval
  */
-#ifndef	_PASSWORDALERT_H
-#define	_PASSWORDALERT_H
+#ifndef _PASSWORD_ALERT_H
+#define _PASSWORD_ALERT_H
 
 
 #include <Bitmap.h>
@@ -15,19 +15,20 @@
 #include <Window.h>
 
 
-class PasswordAlert : public BWindow
-{
+class PasswordAlert : public BWindow {
 public:
-								PasswordAlert(const char* title, 
+								PasswordAlert(const char* title,
 									const char* text);
 	virtual						~PasswordAlert();
-			void				Go(BString &password);
-	virtual void				MessageReceived(BMessage* msg);
+
+			void				Go(BString& password);
+	virtual void				MessageReceived(BMessage* message);
+
 private:
 			BBitmap*			InitIcon();
 			BTextControl*		fTextControl;
 			sem_id				fAlertSem;
 };
 
-#endif	// _PASSWORDALERT_H
 
+#endif	// _PASSWORD_ALERT_H

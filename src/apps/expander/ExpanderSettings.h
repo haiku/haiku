@@ -25,34 +25,35 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
+#ifndef _EXPANDER_SETTINGS_H
+#define _EXPANDER_SETTINGS_H
 
-#ifndef _ExpanderSettings_h
-#define _ExpanderSettings_h
 
 #include <Message.h>
 #include <File.h>
 
 
-class BPath;
-
-
 static const uint32 kMsgExpanderSettings = 'Exst';
 
+
+class BPath;
+
 class ExpanderSettings {
-	public:
-		ExpanderSettings();
-		~ExpanderSettings();
+public:
+							ExpanderSettings();
+							~ExpanderSettings();
 
-		const BMessage &Message() const { return fMessage; }
-		void UpdateFrom(BMessage *message);
+			const			BMessage& Message() const { return fMessage; }
+			void			UpdateFrom(BMessage* message);
 
-		static status_t GetSettingsDirectoryPath(BPath& _path);
+	static	status_t		GetSettingsDirectoryPath(BPath& _path);
 
-	private:
-		status_t Open(BFile *file, int32 mode);
+private:
+			status_t		Open(BFile* file, int32 mode);
 
-		BMessage	fMessage;
-		bool		fUpdated;
+			BMessage		fMessage;
+			bool			fUpdated;
 };
 
-#endif /* _ExpanderSettings_h */
+
+#endif // _EXPANDER_SETTINGS_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Jérôme DUVAL. All rights reserved.
+ * Copyright 2004-2006, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,31 +22,32 @@ ExpanderApp::ExpanderApp()
 
 
 void
-ExpanderApp::ArgvReceived(int32 argc, char **argv)
+ExpanderApp::ArgvReceived(int32 argc, char** argv)
 {
-	BMessage* msg = NULL;
+	BMessage* message = NULL;
 	for (int32 i = 1; i < argc; i++) {
 		entry_ref ref;
 		status_t err = get_ref_for_path(argv[i], &ref);
 		if (err == B_OK) {
-			if (!msg) {
-				msg = new BMessage;
-				msg->what = B_REFS_RECEIVED;
+			if (message == NULL) {
+				message = new BMessage;
+				message->what = B_REFS_RECEIVED;
 			}
-			msg->AddRef("refs", &ref);
+			message->AddRef("refs", &ref);
 		}
 	}
-	if (msg)
-		RefsReceived(msg);
+
+	if (message != NULL)
+		RefsReceived(message);
 }
 
 
 void
-ExpanderApp::RefsReceived(BMessage* msg)
+ExpanderApp::RefsReceived(BMessage* message)
 {
 	BMessenger messenger(fWindow);
-	msg->AddBool("fromApp", true);
-	messenger.SendMessage(msg);
+	message->AddBool("fromApp", true);
+	messenger.SendMessage(message);
 }
 
 
@@ -57,13 +58,14 @@ ExpanderApp::UpdateSettingsFrom(BMessage* message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - main method
 
 
 int
-main(int, char **)
+main(int argc, char** argv)
 {
 	ExpanderApp theApp;
 	theApp.Run();
+
 	return 0;
 }

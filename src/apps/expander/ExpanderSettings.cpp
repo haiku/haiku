@@ -26,6 +26,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
+
+
 #include "ExpanderSettings.h"
 
 #include <ByteOrder.h>
@@ -36,6 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Path.h>
+
 
 //	Format of Expander_Settings
 //	1st byte :	unknown (0x1)
@@ -62,7 +65,7 @@ read_data(BFile& file, T& value)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - ExpanderSettings
 
 
 ExpanderSettings::ExpanderSettings()
@@ -84,7 +87,7 @@ ExpanderSettings::ExpanderSettings()
 		return;
 
 	// TODO: load/save settings as flattened BMessage - but not yet,
-	//		since that will break compatibility with R5's Expander
+	//       since that will break compatibility with R5's Expander
 
 	bool unknown;
 	bool automaticallyExpandFiles;
@@ -122,11 +125,14 @@ ExpanderSettings::ExpanderSettings()
 		fMessage.ReplaceBool("close_when_done", closeWhenDone);
 		if (destinationFolder == 0x66
 			|| destinationFolder == 0x63
-			|| destinationFolder == 0x65)
+			|| destinationFolder == 0x65) {
 			fMessage.ReplaceInt8("destination_folder", destinationFolder);
+		}
+
 		BEntry entry(&ref);
 		if (entry.Exists())
 			fMessage.ReplaceRef("destination_folder_use", &ref);
+
 		fMessage.ReplaceBool("open_destination_folder", openDestinationFolder);
 		fMessage.ReplaceBool("show_contents_listing", showContentsListing);
 	}
@@ -154,12 +160,12 @@ ExpanderSettings::~ExpanderSettings()
 
 	if (fMessage.FindPoint("window_position", &position) == B_OK
 		&& fMessage.FindBool("automatically_expand_files",
-				&automaticallyExpandFiles) == B_OK
+			&automaticallyExpandFiles) == B_OK
 		&& fMessage.FindBool("close_when_done", &closeWhenDone) == B_OK
 		&& fMessage.FindInt8("destination_folder", &destinationFolder) == B_OK
 		&& fMessage.FindRef("destination_folder_use", &ref) == B_OK
 		&& fMessage.FindBool("open_destination_folder",
-				&openDestinationFolder) == B_OK
+			&openDestinationFolder) == B_OK
 		&& fMessage.FindBool("show_contents_listing",
 			&showContentsListing) == B_OK) {
 		file.Write(&unknown, sizeof(unknown));
@@ -173,6 +179,7 @@ ExpanderSettings::~ExpanderSettings()
 		int32 nameSize = 0;
 		if (ref.name)
 			nameSize = strlen(ref.name);
+
 		file.Write(&nameSize, sizeof(nameSize));
 		file.Write(ref.name, nameSize);
 		file.Write(&openDestinationFolder, sizeof(openDestinationFolder));
@@ -191,7 +198,7 @@ ExpanderSettings::GetSettingsDirectoryPath(BPath& _path)
 
 
 status_t
-ExpanderSettings::Open(BFile *file, int32 mode)
+ExpanderSettings::Open(BFile* file, int32 mode)
 {
 	BPath path;
 	status_t error = GetSettingsDirectoryPath(path);
@@ -214,7 +221,7 @@ ExpanderSettings::Open(BFile *file, int32 mode)
 
 
 void
-ExpanderSettings::UpdateFrom(BMessage *message)
+ExpanderSettings::UpdateFrom(BMessage* message)
 {
 	bool automaticallyExpandFiles;
 	bool closeWhenDone;
@@ -247,8 +254,9 @@ ExpanderSettings::UpdateFrom(BMessage *message)
 		fMessage.ReplaceBool("open_destination_folder", openDestinationFolder);
 
 	if (message->FindBool("show_contents_listing",
-			&showContentsListing) == B_OK)
+			&showContentsListing) == B_OK) {
 		fMessage.ReplaceBool("show_contents_listing", showContentsListing);
+	}
 
 	fUpdated = true;
 }

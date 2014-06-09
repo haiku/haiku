@@ -26,14 +26,14 @@ static const char* const kUserRulesFileName = "rules";
 // #pragma mark - ExpanderRule
 
 
-ExpanderRule::ExpanderRule(const char* mimetype,
-	const BString& filenameExtension, const BString& listingCmd,
-	const BString& expandCmd)
+ExpanderRule::ExpanderRule(const char* mimeType,
+	const BString& filenameExtension, const BString& listingCommand,
+	const BString& expandCommand)
 	:
-	fMimeType(mimetype),
+	fMimeType(mimeType),
 	fFilenameExtension(filenameExtension),
-	fListingCmd(listingCmd),
-	fExpandCmd(expandCmd)
+	fListingCmd(listingCommand),
+	fExpandCmd(expandCommand)
 {
 }
 
@@ -82,11 +82,14 @@ ExpanderRules::MatchingRule(BString& fileName, const char* filetype)
 		ExpanderRule* rule = (ExpanderRule*)fList.ItemAt(i);
 		if (rule->MimeType().IsValid() && rule->MimeType() == filetype)
 			return rule;
-		int32 extPosition = fileName.FindLast(rule->FilenameExtension());
-		if (extPosition != -1
-			&& extPosition == (length - rule->FilenameExtension().Length()))
+
+		int32 extensionPosition = fileName.FindLast(rule->FilenameExtension());
+		if (extensionPosition != -1 && extensionPosition
+				== (length - rule->FilenameExtension().Length())) {
 			return rule;
+		}
 	}
+
 	return NULL;
 }
 
@@ -100,6 +103,7 @@ ExpanderRules::MatchingRule(const entry_ref* ref)
 	char type[B_MIME_TYPE_LENGTH];
 	nodeInfo.GetType(type);
 	BString fileName(ref->name);
+
 	return MatchingRule(fileName, type);
 }
 
@@ -123,7 +127,7 @@ ExpanderRules::_LoadRulesFiles()
 	};
 
 	for (size_t i = 0; i < sizeof(kDirectories) / sizeof(kDirectories[0]);
-		i++) {
+			i++) {
 		BDirectory directory;
 		if (find_directory(kDirectories[i], &path) != B_OK
 			|| path.Append(kRulesDirectoryPath) != B_OK
@@ -174,6 +178,7 @@ ExpanderRules::_LoadRulesFile(const char* path)
 			}
 			i++;
 		}
+
 		if (j == 4)
 			_AddRule(strings[0], strings[1], strings[2], strings[3]);
 	}
@@ -183,12 +188,15 @@ ExpanderRules::_LoadRulesFile(const char* path)
 
 
 bool
-ExpanderRules::_AddRule(const char* mimetype, const BString& filenameExtension,
-	const BString& listingCmd, const BString& expandCmd)
+ExpanderRules::_AddRule(const char* mimeType, const BString& filenameExtension,
+	const BString& listingCommand, const BString& expandCommand)
 {
-	ExpanderRule* rule = new(std::nothrow) ExpanderRule(mimetype,
-		filenameExtension, listingCmd, expandCmd);
-	if (rule == NULL || !fList.AddItem(rule)) {
+	ExpanderRule* rule = new(std::nothrow) ExpanderRule(mimeType,
+		filenameExtension, listingCommand, expandCommand);
+	if (rule == NULL)
+		return false;
+
+	if (!fList.AddItem(rule)) {
 		delete rule;
 		return false;
 	}
@@ -201,14 +209,15 @@ ExpanderRules::_AddRule(const char* mimetype, const BString& filenameExtension,
 
 
 RuleRefFilter::RuleRefFilter(ExpanderRules& rules)
-	: BRefFilter(),
+	:
+	BRefFilter(),
 	fRules(rules)
 {
 }
 
 
 bool
-RuleRefFilter::Filter(const entry_ref* ref, BNode* node, struct stat_beos* st,
+RuleRefFilter::Filter(const entry_ref* ref, BNode* node, struct stat_beos* stat,
 	const char* filetype)
 {
 	if (node->IsDirectory() || node->IsSymLink())

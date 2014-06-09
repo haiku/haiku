@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010 Haiku Inc.
+ * Copyright 2003-2010 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,17 +35,21 @@ public:
 
 	virtual void			Draw(BRect updateRect);
 
-			void			SetBitmap(BBitmap* Icon)	{ fIconBitmap = Icon; }
-			BBitmap*		Bitmap()					{ return fIconBitmap; }
+			void			SetBitmap(BBitmap* Icon) { fIconBitmap = Icon; }
+			BBitmap*		Bitmap() { return fIconBitmap; }
 
 private:
-		BBitmap*			fIconBitmap;
+			BBitmap*		fIconBitmap;
 };
+
+
+//	#pragma mark - PasswordAlert
 
 
 PasswordAlert::PasswordAlert(const char* title, const char* text)
 	:
-	BWindow(BRect(0, 0, 450, 45), title, B_MODAL_WINDOW, B_NOT_CLOSABLE | B_NOT_RESIZABLE),
+	BWindow(BRect(0, 0, 450, 45), title, B_MODAL_WINDOW,
+		B_NOT_CLOSABLE | B_NOT_RESIZABLE),
 	fTextControl(NULL),
 	fAlertSem(-1)
 {
@@ -57,23 +61,22 @@ PasswordAlert::PasswordAlert(const char* title, const char* text)
 	// Set up the text view
 	BRect textControlRect(kTextIconOffset, kTextTopOffset,
 		Bounds().right - 5, Bounds().bottom);
-	
-	fTextControl = new BTextControl(textControlRect, "_password_", text, NULL, new BMessage('pass'), 
-		B_FOLLOW_ALL);
+
+	fTextControl = new BTextControl(textControlRect, "_password_", text,
+		NULL, new BMessage('pass'), B_FOLLOW_ALL);
 	fTextControl->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fTextControl->TextView()->HideTyping(true);
 	fTextControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fTextControl->SetDivider(10 + fTextControl->StringWidth(text));
 
 	masterView->AddChild(fTextControl);
-	
-	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
-	BPoint pt;
-	pt.x = screenFrame.Width() / 2 - Bounds().Width() / 2;
-	pt.y = screenFrame.Height() / 2 - Bounds().Height() / 2;
 
-	if (screenFrame.Contains(pt))
-		MoveTo(pt);
+	BRect screenFrame = BScreen(B_MAIN_SCREEN_ID).Frame();
+	BPoint point;
+	point.x = screenFrame.Width() / 2 - Bounds().Width() / 2;
+	point.y = screenFrame.Height() / 2 - Bounds().Height() / 2;
+	if (screenFrame.Contains(point))
+		MoveTo(point);
 
 	fTextControl->MakeFocus();
 }
@@ -101,8 +104,9 @@ PasswordAlert::InitIcon()
 
 				// Load the raw icon data
 				size_t size;
-				const void* rawIcon =
-					resources.LoadResource(B_VECTOR_ICON_TYPE, iconName, &size);
+				const void* rawIcon
+					= resources.LoadResource(B_VECTOR_ICON_TYPE, iconName,
+						&size);
 
 				if (rawIcon != NULL) {
 					// Now build the bitmap
@@ -122,7 +126,7 @@ PasswordAlert::InitIcon()
 
 
 void
-PasswordAlert::Go(BString &password)
+PasswordAlert::Go(BString& password)
 {
 	fAlertSem = create_sem(0, "AlertSem");
 	if (fAlertSem < B_OK) {
@@ -131,23 +135,23 @@ PasswordAlert::Go(BString &password)
 	}
 
 	// Get the originating window, if it exists
-	BWindow* window =
-		dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
+	BWindow* window
+		= dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
 
 	Show();
 
 	// Heavily modified from TextEntryAlert code; the original didn't let the
 	// blocked window ever draw.
-	if (window) {
-		status_t err;
+	if (window != NULL) {
+		status_t result;
 		for (;;) {
 			do {
-				err = acquire_sem_etc(fAlertSem, 1, B_RELATIVE_TIMEOUT,
-									  kSemTimeOut);
+				result = acquire_sem_etc(fAlertSem, 1, B_RELATIVE_TIMEOUT,
+					kSemTimeOut);
 				// We've (probably) had our time slice taken away from us
-			} while (err == B_INTERRUPTED);
+			} while (result == B_INTERRUPTED);
 
-			if (err == B_BAD_SEM_ID) {
+			if (result == B_BAD_SEM_ID) {
 				// Semaphore was finally nuked in MessageReceived
 				break;
 			}
@@ -156,6 +160,7 @@ PasswordAlert::Go(BString &password)
 	} else {
 		// No window to update, so just hang out until we're done.
 		while (acquire_sem(fAlertSem) == B_INTERRUPTED) {
+			;
 		}
 	}
 
@@ -199,7 +204,7 @@ void
 TAlertView::Draw(BRect updateRect)
 {
 	// Here's the fun stuff
-	if (fIconBitmap) {
+	if (fIconBitmap != NULL) {
 		BRect stripeRect = Bounds();
 		stripeRect.right = kIconStripeWidth;
 		SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));

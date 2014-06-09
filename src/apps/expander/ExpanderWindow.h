@@ -1,13 +1,13 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2006 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jérôme Duval
- *		Karsten Heimrich <host.haiku@gmx.de>
+ *		Karsten Heimrich, host.haiku@gmx.de
  */
-#ifndef EXPANDER_WINDOW_H
-#define EXPANDER_WINDOW_H
+#ifndef _EXPANDER_WINDOW_H
+#define _EXPANDER_WINDOW_H
 
 
 #include <Window.h>
@@ -34,11 +34,11 @@ public:
 									const entry_ref* ref, BMessage* settings);
 	virtual						~ExpanderWindow();
 
-	virtual	void				MessageReceived(BMessage* msg);
+	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
 //			void				SetRef(const entry_ref* ref);
-			void				RefsReceived(BMessage* msg);
+			void				RefsReceived(BMessage* message);
 
 private:
 			void				_CreateMenuBar();
@@ -97,4 +97,5 @@ private:
 			float				fPreviousHeight;
 };
 
-#endif /* EXPANDER_WINDOW_H */
+
+#endif	// _EXPANDER_WINDOW_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012, Haiku. All rights reserved.
+ * Copyright 2004-2012 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,24 +7,34 @@
  *		Humdinger <humdingerb@gmail.com>
  */
 
+
+#include "ExpanderPreferences.h"
+
 #include <Box.h>
+#include <Button.h>
+#include <CheckBox.h>
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
+#include <Message.h>
 #include <Path.h>
+#include <RadioButton.h>
 #include <Screen.h>
 #include <StringView.h>
+#include <TextControl.h>
 
-#include "ExpanderPreferences.h"
+#include "DirectoryFilePanel.h"
 
-const uint32 MSG_OK			= 'mgOK';
-const uint32 MSG_CANCEL		= 'mCan';
-const uint32 MSG_LEAVEDEST	= 'mLed';
-const uint32 MSG_SAMEDIR	= 'mSad';
-const uint32 MSG_DESTUSE	= 'mDeu';
-const uint32 MSG_DESTTEXT	= 'mDet';
-const uint32 MSG_DESTSELECT = 'mDes';
+
+static const uint32 MSG_OK			= 'mgOK';
+static const uint32 MSG_CANCEL		= 'mCan';
+static const uint32 MSG_LEAVEDEST	= 'mLed';
+static const uint32 MSG_SAMEDIR		= 'mSad';
+static const uint32 MSG_DESTUSE		= 'mDeu';
+static const uint32 MSG_DESTTEXT	= 'mDet';
+static const uint32 MSG_DESTSELECT	= 'mDes';
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ExpanderPreferences"
@@ -33,8 +43,9 @@ const uint32 MSG_DESTSELECT = 'mDes';
 ExpanderPreferences::ExpanderPreferences(BMessage* settings)
 	:
 	BWindow(BRect(0, 0, 325, 305), B_TRANSLATE("Expander settings"),
-		B_FLOATING_WINDOW_LOOK,	B_FLOATING_APP_WINDOW_FEEL, B_NOT_RESIZABLE
-			| B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+		B_FLOATING_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
+		B_NOT_RESIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS),
 	fSettings(settings),
 	fUsePanel(NULL)
 {
@@ -169,23 +180,28 @@ ExpanderPreferences::_ReadSettings()
 	bool show_contents_listing;
 	if ((fSettings->FindBool("automatically_expand_files",
 			&automatically_expand_files) == B_OK)
-				&& automatically_expand_files)
+		&& automatically_expand_files) {
 		fAutoExpand->SetValue(B_CONTROL_ON);
+	}
 
-	if ((fSettings->FindBool("close_when_done", &close_when_done) == B_OK)
-			&& close_when_done)
+	if (fSettings->FindBool("close_when_done", &close_when_done) == B_OK
+		&& close_when_done) {
 		fCloseWindow->SetValue(B_CONTROL_ON);
+	}
 
-	if (fSettings->FindInt8("destination_folder", &destination_folder) == B_OK) {
+	if (fSettings->FindInt8("destination_folder", &destination_folder)
+			== B_OK) {
 		switch (destination_folder) {
 			case 0x63:
 				fSameDest->SetValue(B_CONTROL_ON);
 				break;
+
 			case 0x65:
 				fDestUse->SetValue(B_CONTROL_ON);
 				fDestText->SetEnabled(true);
 				fSelect->SetEnabled(true);
 				break;
+
 			case 0x66:
 				fLeaveDest->SetValue(B_CONTROL_ON);
 				break;
@@ -200,15 +216,17 @@ ExpanderPreferences::_ReadSettings()
 		}
 	}
 
-	if ((fSettings->FindBool("open_destination_folder",
-			&open_destination_folder) == B_OK)
-				&& open_destination_folder)
+	if (fSettings->FindBool("open_destination_folder",
+			&open_destination_folder) == B_OK
+		&& open_destination_folder) {
 		fOpenDest->SetValue(B_CONTROL_ON);
+	}
 
-	if ((fSettings->FindBool("show_contents_listing",
-			&show_contents_listing) == B_OK)
-				&& show_contents_listing)
+	if (fSettings->FindBool("show_contents_listing",
+			&show_contents_listing) == B_OK
+		&& show_contents_listing) {
 		fAutoShow->SetValue(B_CONTROL_ON);
+	}
 }
 
 
@@ -231,9 +249,9 @@ ExpanderPreferences::_WriteSettings()
 
 
 void
-ExpanderPreferences::MessageReceived(BMessage* msg)
+ExpanderPreferences::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case MSG_DESTSELECT:
 		{
 			if (!fUsePanel) {
@@ -245,6 +263,7 @@ ExpanderPreferences::MessageReceived(BMessage* msg)
 			fUsePanel->Show();
 			break;
 		}
+
 		case MSG_DIRECTORY:
 		{
 			entry_ref ref;
@@ -256,15 +275,17 @@ ExpanderPreferences::MessageReceived(BMessage* msg)
 			fUsePanel->Hide();
 			break;
 		}
+
 		case B_REFS_RECEIVED:
 		{
-			if (msg->FindRef("refs", 0, &fRef) == B_OK) {
+			if (message->FindRef("refs", 0, &fRef) == B_OK) {
 				BEntry entry(&fRef, true);
 				BPath path(&entry);
 				fDestText->SetText(path.Path());
 			}
 			break;
 		}
+
 		case MSG_LEAVEDEST:
 		case MSG_SAMEDIR:
 		{
@@ -272,6 +293,7 @@ ExpanderPreferences::MessageReceived(BMessage* msg)
 			fSelect->SetEnabled(false);
 			break;
 		}
+
 		case MSG_DESTUSE:
 		{
 			fDestText->SetEnabled(true);
@@ -279,26 +301,26 @@ ExpanderPreferences::MessageReceived(BMessage* msg)
 			fDestText->TextView()->MakeEditable(false);
 			break;
 		}
+
 		case B_KEY_DOWN:
 		{
 			int32 index;
-			if (msg->FindInt32("key", &index) == B_OK && index != 1)
+			if (message->FindInt32("key", &index) == B_OK && index != 1)
 				break;
-			// Falling through on ESC
 		}
+		// fall-through on ESC
 		case MSG_CANCEL:
 		{
 			_ReadSettings();
 			Hide();
 			break;
 		}
+
 		case MSG_OK:
 		{
 			_WriteSettings();
 			Hide();
 			break;
 		}
-		default:
-			break;
 	}
 }

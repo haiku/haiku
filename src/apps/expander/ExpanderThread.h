@@ -3,8 +3,9 @@
  * Distributed under the terms of the MIT License.
  * Original code from ZipOMatic by jonas.sundstrom@kirilla.com
  */
-#ifndef __EXPANDERTHREAD_H__
-#define __EXPANDERTHREAD_H__
+#ifndef _EXPANDER_THREAD_H
+#define _EXPANDER_THREAD_H
+
 
 #include <Message.h>
 #include <Volume.h>
@@ -16,45 +17,48 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern const char * ExpanderThreadName;
 
-class ExpanderThread : public GenericThread
-{
-	public:
-		ExpanderThread(BMessage *refs_message, BMessenger *messenger);
-		~ExpanderThread();
+extern const char* ExpanderThreadName;
 
-		status_t SuspendExternalExpander();
-		status_t ResumeExternalExpander();
-		status_t InterruptExternalExpander();
-		status_t WaitOnExternalExpander();
-		void PushInput(BString text);
 
-	private:
+class ExpanderThread : public GenericThread {
+public:
+								ExpanderThread(BMessage* refs_message,
+									BMessenger* messenger);
+								~ExpanderThread();
 
-		virtual status_t ThreadStartup();
-		virtual status_t ExecuteUnit();
-		virtual status_t ThreadShutdown();
+			status_t			SuspendExternalExpander();
+			status_t			ResumeExternalExpander();
+			status_t			InterruptExternalExpander();
+			status_t			WaitOnExternalExpander();
 
-		virtual void ThreadStartupFailed(status_t a_status);
-		virtual void ExecuteUnitFailed(status_t a_status);
-		virtual void ThreadShutdownFailed(status_t a_status);
+			void				PushInput(BString text);
 
-		status_t ProcessRefs(BMessage *	msg);
+private:
+	virtual	status_t			ThreadStartup();
+	virtual	status_t			ExecuteUnit();
+	virtual	status_t			ThreadShutdown();
 
-		thread_id PipeCommand(int argc, const char **argv,
-			int & in, int & out, int & err,
-			const char **envp = (const char **) environ);
+	virtual	void				ThreadStartupFailed(status_t a_status);
+	virtual	void				ExecuteUnitFailed(status_t a_status);
+	virtual	void				ThreadShutdownFailed(status_t a_status);
 
-		BMessenger * 	fWindowMessenger;
+			status_t			ProcessRefs(BMessage* message);
 
-		thread_id		fThreadId;
-		int				fStdIn;
-		int				fStdOut;
-		int				fStdErr;
-		FILE *			fExpanderOutput;
-		FILE *			fExpanderError;
-		char			fExpanderOutputBuffer[LINE_MAX];
+			thread_id			PipeCommand(int argc, const char** argv,
+									int& in, int& out, int& err,
+									const char** envp = (const char**)environ);
+
+			BMessenger*			fWindowMessenger;
+
+			thread_id			fThreadId;
+			int					fStdIn;
+			int					fStdOut;
+			int					fStdErr;
+			FILE*				fExpanderOutput;
+			FILE*				fExpanderError;
+			char				fExpanderOutputBuffer[LINE_MAX];
 };
 
-#endif // __EXPANDERTHREAD_H__
+
+#endif	// _EXPANDER_THREAD_H

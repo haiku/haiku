@@ -4,8 +4,8 @@
  */
 
 
-#ifndef _ExpanderRules_h
-#define _ExpanderRules_h
+#ifndef _EXPANDER_RULES_H
+#define _EXPANDER_RULES_H
 
 #include <File.h>
 #include <FilePanel.h>
@@ -18,8 +18,8 @@ class ExpanderRule {
 public:
 								ExpanderRule(const char* mimetype,
 									const BString& filenameExtension,
-									const BString& listingCmd,
-									const BString& expandCmd);
+									const BString& listingCommand,
+									const BString& expandCommand);
 
 			const BMimeType&	MimeType() const
 									{ return fMimeType; }
@@ -31,7 +31,7 @@ public:
 									{ return fExpandCmd; }
 
 private:
-			BMimeType 			fMimeType;
+			BMimeType			fMimeType;
 			BString 			fFilenameExtension;
 			BString 			fListingCmd;
 			BString 			fExpandCmd;
@@ -53,8 +53,8 @@ private:
 
 			bool				_AddRule(const char* mimetype,
 									const BString& filenameExtension,
-									const BString& listingCmd,
-									const BString& expandCmd);
+									const BString& listingCommand,
+									const BString& expandCommand);
 
 private:
 			BList				fList;
@@ -65,10 +65,12 @@ class RuleRefFilter : public BRefFilter {
 public:
 								RuleRefFilter(ExpanderRules& rules);
 			bool				Filter(const entry_ref* ref, BNode* node,
-									struct stat_beos* st, const char* filetype);
+									struct stat_beos* stat,
+									const char* filetype);
+
 protected:
 			ExpanderRules&		fRules;
 };
 
 
-#endif /* _ExpanderRules_h */
+#endif	// _EXPANDER_RULES_H

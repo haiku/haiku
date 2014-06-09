@@ -25,8 +25,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
-#ifndef _ExpanderApp_h
-#define _ExpanderApp_h
+#ifndef _EXPANDER_APP_H
+#define _EXPANDER_APP_H
 
 
 #include <Application.h>
@@ -37,17 +37,17 @@
 
 class ExpanderApp : public BApplication {
 public:
-							ExpanderApp();
+								ExpanderApp();
 
-	virtual	void			ArgvReceived(int32 argc, char** argv);
-	virtual	void			RefsReceived(BMessage* msg);
+	virtual	void				ArgvReceived(int32 argc, char** argv);
+	virtual	void				RefsReceived(BMessage* msg);
 
-			void			UpdateSettingsFrom(BMessage* message);
+			void				UpdateSettingsFrom(BMessage* message);
 
 			ExpanderSettings	fSettings;
 private:
-			ExpanderWindow*	fWindow;
+			ExpanderWindow*		fWindow;
 };
 
 
-#endif	// _ExpanderApp_h
+#endif	// _EXPANDER_APP_H
