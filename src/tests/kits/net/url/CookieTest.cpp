@@ -148,86 +148,18 @@ CookieTest::MaxSizeTest()
 	BNetworkCookieJar jar;
 	status_t result;
 
-	static const char* bigdata = "XXXXXXXX10XXXXXXXX20XXXXXXXX30XXXXXXXX40"
-		"XXXXXXXX50XXXXXXXX60XXXXXXXX70XXXXXXXX80XXXXXXXX90XXXXXXX100"
-		"XXXXXXX110XXXXXXX120XXXXXXX130XXXXXXX140XXXXXXX150XXXXXXX160"
-		"XXXXXXX170XXXXXXX180XXXXXXX190XXXXXXX200XXXXXXX210XXXXXXX220"
-		"XXXXXXX230XXXXXXX240XXXXXXX250XXXXXXX260XXXXXXX270XXXXXXX280"
-		"XXXXXXX290XXXXXXX300XXXXXXX310XXXXXXX320XXXXXXX330XXXXXXX340"
-		"XXXXXXX350XXXXXXX360XXXXXXX370XXXXXXX380XXXXXXX390XXXXXXX400"
-		"XXXXXXX410XXXXXXX420XXXXXXX430XXXXXXX440XXXXXXX450XXXXXXX460"
-		"XXXXXXX470XXXXXXX480XXXXXXX490XXXXXXX500XXXXXXX510XXXXXXX520"
-		"XXXXXXX530XXXXXXX540XXXXXXX550XXXXXXX560XXXXXXX570XXXXXXX580"
-		"XXXXXXX590XXXXXXX600XXXXXXX610XXXXXXX620XXXXXXX630XXXXXXX640"
-		"XXXXXXX650XXXXXXX660XXXXXXX670XXXXXXX680XXXXXXX690XXXXXXX700"
-		"XXXXXXX710XXXXXXX720XXXXXXX730XXXXXXX740XXXXXXX750XXXXXXX760"
-		"XXXXXXX770XXXXXXX780XXXXXXX790XXXXXXX800XXXXXXX810XXXXXXX820"
-		"XXXXXXX830XXXXXXX840XXXXXXX850XXXXXXX860XXXXXXX870XXXXXXX880"
-		"XXXXXXX890XXXXXXX900XXXXXXX910XXXXXXX920XXXXXXX930XXXXXXX940"
-		"XXXXXXX950XXXXXXX960XXXXXXX970XXXXXXX980XXXXXXX990XXXXXX1000"
-		"XXXXXX1010XXXXXX1020XXXXXX1030XXXXXX1040XXXXXX1050XXXXXX1060"
-		"XXXXXX1070XXXXXX1080XXXXXX1090XXXXXX1100XXXXXX1110XXXXXX1120"
-		"XXXXXX1130XXXXXX1140XXXXXX1150XXXXXX1160XXXXXX1170XXXXXX1180"
-		"XXXXXX1190XXXXXX1200XXXXXX1210XXXXXX1220XXXXXX1230XXXXXX1240"
-		"XXXXXX1250XXXXXX1260XXXXXX1270XXXXXX1280XXXXXX1290XXXXXX1300"
-		"XXXXXX1310XXXXXX1320XXXXXX1330XXXXXX1340XXXXXX1350XXXXXX1360"
-		"XXXXXX1370XXXXXX1380XXXXXX1390XXXXXX1400XXXXXX1410XXXXXX1420"
-		"XXXXXX1430XXXXXX1440XXXXXX1450XXXXXX1460XXXXXX1470XXXXXX1480"
-		"XXXXXX1490XXXXXX1500XXXXXX1510XXXXXX1520XXXXXX1530XXXXXX1540"
-		"XXXXXX1550XXXXXX1560XXXXXX1570XXXXXX1580XXXXXX1590XXXXXX1600"
-		"XXXXXX1610XXXXXX1620XXXXXX1630XXXXXX1640XXXXXX1650XXXXXX1660"
-		"XXXXXX1670XXXXXX1680XXXXXX1690XXXXXX1700XXXXXX1710XXXXXX1720"
-		"XXXXXX1730XXXXXX1740XXXXXX1750XXXXXX1760XXXXXX1770XXXXXX1780"
-		"XXXXXX1790XXXXXX1800XXXXXX1810XXXXXX1820XXXXXX1830XXXXXX1840"
-		"XXXXXX1850XXXXXX1860XXXXXX1870XXXXXX1880XXXXXX1890XXXXXX1900"
-		"XXXXXX1910XXXXXX1920XXXXXX1930XXXXXX1940XXXXXX1950XXXXXX1960"
-		"XXXXXX1970XXXXXX1980XXXXXX1990XXXXXX2000XXXXXX2010XXXXXX2020"
-		"XXXXXX2030XXXXXX2040XXXXXX2050XXXXXX2060XXXXXX2070XXXXXX2080"
-		"XXXXXX2090XXXXXX2100XXXXXX2110XXXXXX2120XXXXXX2130XXXXXX2140"
-		"XXXXXX2150XXXXXX2160XXXXXX2170XXXXXX2180XXXXXX2190XXXXXX2200"
-		"XXXXXX2210XXXXXX2220XXXXXX2230XXXXXX2240XXXXXX2250XXXXXX2260"
-		"XXXXXX2270XXXXXX2280XXXXXX2290XXXXXX2300XXXXXX2310XXXXXX2320"
-		"XXXXXX2330XXXXXX2340XXXXXX2350XXXXXX2360XXXXXX2370XXXXXX2380"
-		"XXXXXX2390XXXXXX2400XXXXXX2410XXXXXX2420XXXXXX2430XXXXXX2440"
-		"XXXXXX2450XXXXXX2460XXXXXX2470XXXXXX2480XXXXXX2490XXXXXX2500"
-		"XXXXXX2510XXXXXX2520XXXXXX2530XXXXXX2540XXXXXX2550XXXXXX2560"
-		"XXXXXX2570XXXXXX2580XXXXXX2590XXXXXX2600XXXXXX2610XXXXXX2620"
-		"XXXXXX2630XXXXXX2640XXXXXX2650XXXXXX2660XXXXXX2670XXXXXX2680"
-		"XXXXXX2690XXXXXX2700XXXXXX2710XXXXXX2720XXXXXX2730XXXXXX2740"
-		"XXXXXX2750XXXXXX2760XXXXXX2770XXXXXX2780XXXXXX2790XXXXXX2800"
-		"XXXXXX2810XXXXXX2820XXXXXX2830XXXXXX2840XXXXXX2850XXXXXX2860"
-		"XXXXXX2870XXXXXX2880XXXXXX2890XXXXXX2900XXXXXX2910XXXXXX2920"
-		"XXXXXX2930XXXXXX2940XXXXXX2950XXXXXX2960XXXXXX2970XXXXXX2980"
-		"XXXXXX2990XXXXXX3000XXXXXX3010XXXXXX3020XXXXXX3030XXXXXX3040"
-		"XXXXXX3050XXXXXX3060XXXXXX3070XXXXXX3080XXXXXX3090XXXXXX3100"
-		"XXXXXX3110XXXXXX3120XXXXXX3130XXXXXX3140XXXXXX3150XXXXXX3160"
-		"XXXXXX3170XXXXXX3180XXXXXX3190XXXXXX3200XXXXXX3210XXXXXX3220"
-		"XXXXXX3230XXXXXX3240XXXXXX3250XXXXXX3260XXXXXX3270XXXXXX3280"
-		"XXXXXX3290XXXXXX3300XXXXXX3310XXXXXX3320XXXXXX3330XXXXXX3340"
-		"XXXXXX3350XXXXXX3360XXXXXX3370XXXXXX3380XXXXXX3390XXXXXX3400"
-		"XXXXXX3410XXXXXX3420XXXXXX3430XXXXXX3440XXXXXX3450XXXXXX3460"
-		"XXXXXX3470XXXXXX3480XXXXXX3490XXXXXX3500XXXXXX3510XXXXXX3520"
-		"XXXXXX3530XXXXXX3540XXXXXX3550XXXXXX3560XXXXXX3570XXXXXX3580"
-		"XXXXXX3590XXXXXX3600XXXXXX3610XXXXXX3620XXXXXX3630XXXXXX3640"
-		"XXXXXX3650XXXXXX3660XXXXXX3670XXXXXX3680XXXXXX3690XXXXXX3700"
-		"XXXXXX3710XXXXXX3720XXXXXX3730XXXXXX3740XXXXXX3750XXXXXX3760"
-		"XXXXXX3770XXXXXX3780XXXXXX3790XXXXXX3800XXXXXX3810XXXXXX3820"
-		"XXXXXX3830XXXXXX3840XXXXXX3850XXXXXX3860XXXXXX3870XXXXXX3880"
-		"XXXXXX3890XXXXXX3900XXXXXX3910XXXXXX3920XXXXXX3930XXXXXX3940"
-		"XXXXXX3950XXXXXX3960XXXXXX3970XXXXXX3980XXXXXX3990XXXXXX4000"
-		"XXXXXX4010XXXXXX4020XXXXXX4030XXXXXX4040XXXXXX4050XXXXXX4060"
-		"XXXXXX4070XXXXXX4080XXXXXX4090XX";
-
 	BUrl url("http://testsuites.opera.com/cookies/006.php");
 	BString cookieString("006=");
-	cookieString << bigdata;
+	for (int i = 0; i < 128; i++) {
+		cookieString << "00xxxxxxxxxxxxxx16xxxxxxxxxxxxxx";
+	}
 	result = jar.AddCookie(cookieString, url);
 	CPPUNIT_ASSERT(result == B_OK);
 
 	url.SetUrlString("http://testsuites.opera.com/cookies/006-1.php");
 	BNetworkCookie* cookie = _GetCookie(jar, url, "006");
 	CPPUNIT_ASSERT(cookie != NULL);
-	CPPUNIT_ASSERT(cookie->Value() == bigdata);
+	CPPUNIT_ASSERT(cookie->Value().Length() == 4096);
 }
 
 
@@ -770,6 +702,86 @@ CookieTest::MaxAgeParsingTest()
 }
 
 
+void
+CookieTest::ExplodeTest()
+{
+	struct Test {
+		const char* cookieString;
+		const char*	url;
+		struct
+		{
+			bool		valid;
+			const char* name;
+			const char* value;
+			const char* domain;
+			const char* path;
+			bool 		secure;
+			bool 		httponly;
+			bool		session;
+			BDateTime	expire;
+		} expected;
+	};
+
+	Test tests[] = {
+	//     Cookie string      URL
+	//     ------------- -------------
+	//		   Valid     Name     Value	       Domain         Path      Secure  HttpOnly Session  Expiration
+	//       --------- -------- --------- ----------------- ---------  -------- -------- -------  ----------
+		// Normal cookies
+		{ "name=value", "http://www.example.com/path/path",
+			{  true,    "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } },
+		{ "name=value; domain=example.com; path=/; secure", "http://www.example.com/path/path",
+			{  true,    "name",  "value",   "example.com",   "/"    ,   true,    false,   true,   BDateTime() } },
+		{ "name=value; httponly; secure", "http://www.example.com/path/path",
+			{  true,    "name",  "value", "www.example.com", "/path",   true,    true,    true,   BDateTime() } },
+		{ "name=value; expires=Wed, 20-Feb-2013 20:00:00 UTC", "http://www.example.com/path/path",
+			{  true,    "name",  "value", "www.example.com", "/path",   false,   false,   false,
+				BDateTime(BDate(2013, 2, 20), BTime(20, 0, 0, 0)) } },
+		// Valid cookie with bad form
+		{ "name=  ;  domain   =example.com  ;path=/;  secure = yup  ; blahblah ;)", "http://www.example.com/path/path",
+			{  true,    "name",  "",   "example.com",   "/"    ,   true,    false,   true,   BDateTime() } },
+		// Invalid path
+		{ "name=value; path=invalid", "http://www.example.com/path/path",
+			{  false,    "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } },
+		// Setting for other subdomain (invalid)
+		{ "name=value; domain=subdomain.example.com", "http://www.example.com/path/path",
+			{  false,   "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } },
+		// Various invalid cookies
+		{ "name", "http://www.example.com/path/path",
+			{  false,   "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } },
+		{ "; domain=example.com", "http://www.example.com/path/path",
+			{  false,   "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } }
+	};
+	
+	BNetworkCookie cookie;
+
+	for (uint32 i = 0; i < (sizeof(tests) / sizeof(Test)); i++) {
+		NextSubTest();
+
+		BUrl url(tests[i].url);
+		cookie.ParseCookieString(tests[i].cookieString, url);
+
+		CPPUNIT_ASSERT(tests[i].expected.valid == cookie.IsValid());
+
+		if (!tests[i].expected.valid)
+			continue;
+
+		CPPUNIT_ASSERT_EQUAL(BString(tests[i].expected.name), cookie.Name());
+		CPPUNIT_ASSERT_EQUAL(BString(tests[i].expected.value), cookie.Value());
+		CPPUNIT_ASSERT_EQUAL(BString(tests[i].expected.domain),
+			cookie.Domain());
+		CPPUNIT_ASSERT_EQUAL(BString(tests[i].expected.path), cookie.Path());
+		CPPUNIT_ASSERT(tests[i].expected.secure == cookie.Secure());
+		CPPUNIT_ASSERT(tests[i].expected.httponly == cookie.HttpOnly());
+		CPPUNIT_ASSERT(tests[i].expected.session == cookie.IsSessionCookie());
+
+		if (!cookie.IsSessionCookie())
+			CPPUNIT_ASSERT_EQUAL(tests[i].expected.expire.Time_t(),
+				cookie.ExpirationDate());
+	}
+}
+
+
 /* static */ void
 CookieTest::AddTests(BTestSuite& parent)
 {
@@ -810,6 +822,8 @@ CookieTest::AddTests(BTestSuite& parent)
 		"CookieTest::DomainMatchingTest", &CookieTest::DomainMatchingTest));
 	suite.addTest(new CppUnit::TestCaller<CookieTest>(
 		"CookieTest::MaxAgeParsingTest", &CookieTest::MaxAgeParsingTest));
+	suite.addTest(new CppUnit::TestCaller<CookieTest>(
+		"CookieTest::ExplodeTest", &CookieTest::ExplodeTest));
 
 	parent.addTest("CookieTest", &suite);
 }

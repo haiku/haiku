@@ -39,6 +39,8 @@ public:
 			void			DomainMatchingTest();
 			void			MaxAgeParsingTest();
 
+			void			ExplodeTest();
+
 	static	void			AddTests(BTestSuite& suite);
 
 private:

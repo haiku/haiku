@@ -7,96 +7,9 @@
 #include <NetworkKit.h>
 #include <SupportKit.h>
 
-#ifdef ASSERT
-#undef ASSERT
-#endif
-
-#define REPORT(i, assert, line) cout << "ASSERT() failed at line " << line \
-									<< ": " <<  #assert << " (test #" << i << ")" << endl
-#define ASSERT(index, assertion) { if (!(assertion)) { REPORT(index, assertion, __LINE__ ); } }
-
 
 using std::cout;
 using std::endl;
-
-
-typedef struct {
-	const char* cookieString;
-	const char*	url;
-	struct
-	{
-		bool		valid;
-		const char* name;
-		const char* value;
-		const char* domain;
-		const char* path;
-		bool 		secure;
-		bool 		httponly;
-		bool		session;
-		BDateTime	expire;
-	} expected;
-} ExplodeTest;
-
-
-ExplodeTest kTestExplode[] =
-	//     Cookie string      URL
-	//     ------------- -------------
-	//		   Valid     Name     Value	       Domain         Path      Secure  HttpOnly Session  Expiration
-	//       --------- -------- --------- ----------------- ---------  -------- -------- -------  ----------
-	{
-		// Normal cookies
-		{ "name=value", "http://www.example.com/path/path",
-			{  true,    "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } },
-		{ "name=value; domain=example.com; path=/; secure", "http://www.example.com/path/path",
-			{  true,    "name",  "value",   "example.com",   "/"    ,   true,    false,   true,   BDateTime() } },
-		{ "name=value; httponly; secure", "http://www.example.com/path/path",
-			{  true,    "name",  "value", "www.example.com", "/path",   true,    true,    true,   BDateTime() } },
-		{ "name=value; expires=Wed, 20 Feb 2013 20:00:00 UTC", "http://www.example.com/path/path",
-			{  true,    "name",  "value", "www.example.com", "/path",   false,   false,   false,
-				BDateTime(BDate(2012, 2, 20), BTime(20, 0, 0, 0)) } },
-		// Valid cookie with bad form
-		{ "name=  ;  domain   =example.com  ;path=/;  secure = yup  ; blahblah ;)", "http://www.example.com/path/path",
-			{  true,    "name",  "",   "example.com",   "/"    ,   true,    false,   true,   BDateTime() } },
-		// Invalid path, default path should be used instead
-		{ "name=value; path=invalid", "http://www.example.com/path/path",
-			{  true,    "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } },
-		// Setting for other subdomain (invalid)
-		{ "name=value; domain=subdomain.example.com", "http://www.example.com/path/path",
-			{  false,   "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } },
-		// Various invalid cookies
-		{ "name", "http://www.example.com/path/path",
-			{  false,   "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } },
-		{ "; domain=example.com", "http://www.example.com/path/path",
-			{  false,   "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } }
-	};
-
-
-void explodeImplodeTest()
-{
-	uint32 testIndex;
-	BNetworkCookie cookie;
-
-	for (testIndex = 0; testIndex < (sizeof(kTestExplode) / sizeof(ExplodeTest)); testIndex++)
-	{
-		BUrl url(kTestExplode[testIndex].url);
-		cookie.ParseCookieStringFromUrl(kTestExplode[testIndex].cookieString, url);
-
-		ASSERT(testIndex, kTestExplode[testIndex].expected.valid == cookie.IsValid());
-
-		if (kTestExplode[testIndex].expected.valid) {
-			ASSERT(testIndex, BString(kTestExplode[testIndex].expected.name) == cookie.Name());
-			ASSERT(testIndex, BString(kTestExplode[testIndex].expected.value) == cookie.Value());
-			ASSERT(testIndex, BString(kTestExplode[testIndex].expected.domain) == cookie.Domain());
-			ASSERT(testIndex, BString(kTestExplode[testIndex].expected.path) == cookie.Path());
-			ASSERT(testIndex, kTestExplode[testIndex].expected.secure == cookie.Secure());
-			ASSERT(testIndex, kTestExplode[testIndex].expected.httponly == cookie.HttpOnly());
-			ASSERT(testIndex, kTestExplode[testIndex].expected.session == cookie.IsSessionCookie());
-
-			if (!cookie.IsSessionCookie())
-				ASSERT(testIndex, kTestExplode[testIndex].expected.expire.Time_t() == cookie.ExpirationDate());
-		}
-	}
-}
 
 
 void stressTest(int32 domainNumber, int32 totalCookies, char** flat, ssize_t* size)
@@ -172,10 +85,6 @@ void stressTest(int32 domainNumber, int32 totalCookies, char** flat, ssize_t* si
 int
 main(int, char**)
 {
-	cout << "Running explodeImplodeTest:" << endl;
-	explodeImplodeTest();
-	cout << endl << endl;
-
 	cout << "Running stressTest:" << endl;
 	char* flatJar;
 	ssize_t size;
