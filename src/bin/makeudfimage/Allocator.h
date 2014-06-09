@@ -28,11 +28,11 @@ public:
 	status_t InitCheck() const;
 	
 	status_t GetBlock(uint32 block);
-	status_t GetExtent(Udf::extent_address extent);
+	status_t GetExtent(extent_address extent);
 
 	status_t GetNextBlock(uint32 &block, uint32 minimumBlock = 0);
 	status_t GetNextExtent(uint32 length, bool contiguous,
-	                       Udf::extent_address &extent,
+	                       extent_address &extent,
 	                       uint32 minimumStartingBlock = 0);
 	                         
 	uint32 Length() const { return fLength; }
@@ -42,7 +42,7 @@ public:
 	
 	uint32 BlocksFor(off_t bytes);
 private:
-	list<Udf::extent_address> fChunkList;
+	list<extent_address> fChunkList;
 	uint32 fLength;	//!< Length of allocation so far, in blocks.
 	uint32 fBlockSize;
 	uint32 fBlockShift;

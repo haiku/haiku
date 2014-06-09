@@ -16,8 +16,6 @@
 
 #include "Array.h"
 
-#include <util/kernel_cpp.h>
-
 /*! \file UdfStructures.h
 
 	\brief UDF on-disk data structure declarations

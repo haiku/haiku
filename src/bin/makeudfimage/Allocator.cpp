@@ -24,7 +24,7 @@ Allocator::Allocator(uint32 blockSize)
 	, fBlockShift(0)
 	, fInitStatus(B_NO_INIT)
 {
-	status_t error = Udf::get_block_shift(BlockSize(), fBlockShift);
+	status_t error = get_block_shift(BlockSize(), fBlockShift);
 	if (!error)
 		fInitStatus = B_OK;
 }
@@ -44,7 +44,7 @@ Allocator::InitCheck() const
 status_t
 Allocator::GetBlock(uint32 block)
 {
-	Udf::extent_address extent(block, BlockSize());
+	extent_address extent(block, BlockSize());
 	return GetExtent(extent);
 }
 
@@ -56,7 +56,7 @@ Allocator::GetBlock(uint32 block)
 	              been allocated.
 */
 status_t
-Allocator::GetExtent(Udf::extent_address extent)
+Allocator::GetExtent(extent_address extent)
 {
 	status_t error = InitCheck();
 	if (!error) {
@@ -68,7 +68,7 @@ Allocator::GetExtent(Udf::extent_address extent)
 			// Add a new chunk to the end of the chunk list if
 			// necessary
 			if (offset > Length()) {
-				Udf::extent_address chunk(Length(), (offset-Length())<<BlockShift());
+				extent_address chunk(Length(), (offset-Length())<<BlockShift());
 				fChunkList.push_back(chunk);
 			}
 			// Adjust the tail
@@ -76,7 +76,7 @@ Allocator::GetExtent(Udf::extent_address extent)
 			return B_OK;
 		} else {
 			// Block is not past tail, so check the chunk list
-			for (list<Udf::extent_address>::iterator i = fChunkList.begin();
+			for (list<extent_address>::iterator i = fChunkList.begin();
 			       i != fChunkList.end();
 			         i++)
 			{
@@ -88,7 +88,7 @@ Allocator::GetExtent(Udf::extent_address extent)
 					if (chunkOffset < offset) {
 						// Orhpan before; add a new chunk in front
 						// of the current one
-						Udf::extent_address chunk(chunkOffset, (offset-chunkOffset)<<BlockShift());
+						extent_address chunk(chunkOffset, (offset-chunkOffset)<<BlockShift());
 						fChunkList.insert(i, chunk);
 					}
 					if ((offset+length) < (chunkOffset+chunkLength)) {
@@ -125,7 +125,7 @@ Allocator::GetNextBlock(uint32 &block, uint32 minimumBlock)
 {
 	status_t error = InitCheck();
 	if (!error) {
-		Udf::extent_address extent;
+		extent_address extent;
 		error = GetNextExtent(BlockSize(), true, extent, minimumBlock);
 		if (!error)
 			block = extent.location();
@@ -154,7 +154,7 @@ Allocator::GetNextBlock(uint32 &block, uint32 minimumBlock)
 */
 status_t
 Allocator::GetNextExtent(uint32 _length, bool contiguous,
-                         Udf::extent_address &extent,
+                         extent_address &extent,
 	                     uint32 minimumStartingBlock)
 {
 	DEBUG_INIT_ETC("Allocator", ("length: %lld, contiguous: %d", _length, contiguous));
@@ -163,7 +163,7 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
 	status_t error = InitCheck();
 	PRINT(("allocation length: %lu\n", Length()));
 	if (!error) {
-		for (list<Udf::extent_address>::iterator i = fChunkList.begin();
+		for (list<extent_address>::iterator i = fChunkList.begin();
 		       i != fChunkList.end();
 		         i++)
 		{
@@ -180,7 +180,7 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
 					uint32 newLength = chunkLength-difference;
 					if (length <= newLength) {
 						// new chunk is still long enough
-						Udf::extent_address newExtent(newOffset, _length);
+						extent_address newExtent(newOffset, _length);
 						if (GetExtent(newExtent) == B_OK) {
 							extent = newExtent;
 							return B_OK;
@@ -188,7 +188,7 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
 					} else if (!contiguous) {
 						// new chunk is too short, but we're allowed to
 						// allocate a shorter extent, so we'll do it.
-						Udf::extent_address newExtent(newOffset, newLength<<BlockShift());
+						extent_address newExtent(newOffset, newLength<<BlockShift());
 						if (GetExtent(newExtent) == B_OK) {
 							extent = newExtent;
 							return B_OK;
@@ -232,7 +232,7 @@ Allocator::GetNextExtent(uint32 _length, bool contiguous,
 				}
 			}
 			if (!error) {
-				Udf::extent_address newExtent(tail, isPartial ? length<<BlockShift() : _length);
+				extent_address newExtent(tail, isPartial ? length<<BlockShift() : _length);
 				if (GetExtent(newExtent) == B_OK) {
 					extent = newExtent;
 					return B_OK;

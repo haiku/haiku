@@ -10,13 +10,13 @@
 
 #include <stdio.h>
 
-
 #include "Array.h"
 #include "UdfDebug.h"
 
+#include <new.h>
 #include <string.h>
 
-#include <util/kernel_cpp.h>
+
 /*! \brief UdfString class that takes as input either a UTF8 string or a
 	CS0 unicode string and then provides access to said string in both
 	formats.

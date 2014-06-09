@@ -5,6 +5,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UsePublicHeaders add-ons/file_system ;			# For fsproto.h
 UsePrivateHeaders [ FDirName kernel util ] ;	# For kernel_cpp.h
+UsePrivateHeaders private shared ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems udf ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src bin makeudfimage ] ;
 

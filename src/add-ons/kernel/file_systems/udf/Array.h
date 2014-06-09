@@ -10,8 +10,6 @@
 #include "SupportDefs.h"
 #include "UdfDebug.h"
 
-#include <util/kernel_cpp.h>
-
 /*! \brief Slightly more typesafe static array type than built-in arrays,
 	with array length information stored implicitly (i.e. consuming no
 	physical space in the actual struct) via the \c arrayLength template

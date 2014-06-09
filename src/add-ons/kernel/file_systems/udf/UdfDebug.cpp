@@ -158,7 +158,7 @@ static void unindent(uint8 tabCount);
 #endif
 
 //! Used to keep the tls handle from being allocated more than once.
-vint32 tls_spinlock = 0;
+int32 tls_spinlock = 0;
 
 /*! \brief Used to flag whether the tls handle has been allocated yet.
 

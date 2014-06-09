@@ -22,8 +22,8 @@ AllocatorTest::Suite() {
 	CppUnit::TestSuite *suite = new CppUnit::TestSuite("Yo");
 	
 	// And our tests
-	suite->addTest(new CppUnit::TestCaller<AllocatorTest>("Udf::Allocator::BlockSize Test", &AllocatorTest::BlockSizeTest));
-	suite->addTest(new CppUnit::TestCaller<AllocatorTest>("Udf::Allocator::Partition Full Test", &AllocatorTest::PartitionFullTest));
+	suite->addTest(new CppUnit::TestCaller<AllocatorTest>("Allocator::BlockSize Test", &AllocatorTest::BlockSizeTest));
+	suite->addTest(new CppUnit::TestCaller<AllocatorTest>("Allocator::Partition Full Test", &AllocatorTest::PartitionFullTest));
 	
 	return suite;
 }
@@ -85,7 +85,7 @@ AllocatorTest::BlockSizeTest() {
 void
 AllocatorTest::PartitionFullTest() {
 	{
-		Udf::extent_address extent;
+		extent_address extent;
 		const uint32 blockSize = 2048;
 		Allocator allocator(blockSize);
 		CHK(allocator.InitCheck() == B_OK);
@@ -100,7 +100,7 @@ AllocatorTest::PartitionFullTest() {
     }
 	NextSubTest();
 	{
-		Udf::extent_address extent;
+		extent_address extent;
 		Allocator allocator(2048);
 		CHK(allocator.InitCheck() == B_OK);
 		CHK(allocator.GetNextExtent(ULONG_MAX-1, true, extent) == B_OK);
@@ -112,7 +112,7 @@ AllocatorTest::PartitionFullTest() {
     }
 	NextSubTest();
 	{
-		Udf::extent_address extent;
+		extent_address extent;
 		const uint32 blockSize = 2048;
 		Allocator allocator(blockSize);
 		CHK(allocator.InitCheck() == B_OK);
@@ -123,20 +123,20 @@ AllocatorTest::PartitionFullTest() {
 		CHK(allocator.GetExtent(extent) != B_OK);
 		CHK(allocator.GetBlock(13) != B_OK);
 		PhysicalPartitionAllocator partition(0, 0, allocator);
-		std::list<Udf::long_address> extents;
-    	std::list<Udf::extent_address> physicalExtents;
+		std::list<long_address> extents;
+    	std::list<extent_address> physicalExtents;
     	CHK(partition.GetNextExtents(1, extents, physicalExtents) == B_OK);
     }
 	NextSubTest();
 	{
-		Udf::extent_address extent;
+		extent_address extent;
 		const uint32 blockSize = 2048;
 		Allocator allocator(blockSize);
 		CHK(allocator.InitCheck() == B_OK);
 		CHK(allocator.GetNextExtent(ULONG_MAX, true, extent) == B_OK);
 		PhysicalPartitionAllocator partition(0, 0, allocator);
-		std::list<Udf::long_address> extents;
-    	std::list<Udf::extent_address> physicalExtents;
+		std::list<long_address> extents;
+    	std::list<extent_address> physicalExtents;
     	CHK(partition.GetNextExtents(1, extents, physicalExtents) != B_OK);
     }
 	NextSubTest();

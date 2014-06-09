@@ -12,7 +12,7 @@
 
 #include "PhysicalPartitionAllocator.h"
 
-Udf::extent_address PhysicalPartitionAllocator::dummyExtent;
+extent_address PhysicalPartitionAllocator::dummyExtent;
 
 PhysicalPartitionAllocator::PhysicalPartitionAllocator(uint16 number,
                                                        uint32 offset,
@@ -70,8 +70,8 @@ PhysicalPartitionAllocator::GetNextBlock(uint32 &block, uint32 &physicalBlock)
 status_t
 PhysicalPartitionAllocator::GetNextExtent(uint32 length,
 	                                      bool contiguous,
-                                          Udf::long_address &extent,
-                                          Udf::extent_address &physicalExtent)
+                                          long_address &extent,
+                                          extent_address &physicalExtent)
 {
 	status_t error = fAllocator.GetNextExtent(length, contiguous, physicalExtent, fOffset);
 	if (!error) {
@@ -96,8 +96,8 @@ PhysicalPartitionAllocator::GetNextExtent(uint32 length,
 	- error code: Failure.
 */
 status_t
-PhysicalPartitionAllocator::GetNextExtents(off_t length, std::list<Udf::long_address> &extents,
-	                                       std::list<Udf::extent_address> &physicalExtents)
+PhysicalPartitionAllocator::GetNextExtents(off_t length, std::list<long_address> &extents,
+	                                       std::list<extent_address> &physicalExtents)
 {
 	DEBUG_INIT_ETC("PhysicalPartitionAllocator", ("length: %lld", length));
 	extents.empty();
@@ -106,8 +106,8 @@ PhysicalPartitionAllocator::GetNextExtents(off_t length, std::list<Udf::long_add
 	// Allocate extents until we're done or we hit an error
 	status_t error = B_OK;
 	while (error == B_OK) {
-		Udf::long_address extent;
-		Udf::extent_address physicalExtent;
+		long_address extent;
+		extent_address physicalExtent;
 		uint32 chunkLength = length <= ULONG_MAX ? uint32(length) : ULONG_MAX; 
 		error = GetNextExtent(chunkLength, false, extent, physicalExtent);
 		if (!error) {
