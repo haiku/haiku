@@ -13,7 +13,7 @@
 #include "Array.h"
 #include "UdfDebug.h"
 
-#include <new.h>
+#include <new>
 #include <string.h>
 
 
