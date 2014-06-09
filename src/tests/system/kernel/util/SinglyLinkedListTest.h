@@ -11,10 +11,9 @@ public:
 	
 	void UserDefaultTest();	
 	void UserCustomTest();
-	void AutoTest();
 private:
-	template <class List>
-	void TestList(List &list, typename List::ValueType *values, int valueCount);
+	template <class List, class Element>
+	void TestList(List &list, Element *values, int valueCount);
 };
 
 #endif // _single_linked_list_test_h_

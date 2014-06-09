@@ -16,7 +16,7 @@
 // Class used for testing without offset
 class ItemWithout {
 	public:
-		DoublyLinked::Link fLink;
+		DoublyLinkedListLink<ItemWithout> fLink;
 		int32 value;
 };
 
@@ -24,7 +24,7 @@ class ItemWithout {
 class ItemWith {
 	public:
 		int32 value;
-		DoublyLinked::Link fLink;
+		DoublyLinkedListLink<ItemWith> fLink;
 };
 
 // Class used for testing without offset
@@ -32,7 +32,7 @@ class ItemVirtualWithout {
 	public:
 		virtual int32 Value();
 
-		DoublyLinked::Link fLink;
+		DoublyLinkedListLink<ItemVirtualWithout> fLink;
 		int32 value;
 };
 
@@ -42,7 +42,7 @@ class ItemVirtualWith {
 		virtual int32 Value();
 
 		int32 value;
-		DoublyLinked::Link fLink;
+		DoublyLinkedListLink<ItemVirtualWith> fLink;
 };
 
 
@@ -88,7 +88,7 @@ template <typename Item>
 void
 DoublyLinkedListTest::TestList()
 {
-	DoublyLinked::List<Item> list;
+	DoublyLinkedList<Item, DoublyLinkedListMemberGetLink<Item> > list;
 	int valueCount = 10;
 	Item items[valueCount];
 
@@ -106,7 +106,8 @@ DoublyLinkedListTest::TestList()
 	// count items in list
 
 	int count = 0;
-	DoublyLinked::Iterator<Item> iterator = list.Iterator();
+	DoublyLinkedList<Item, DoublyLinkedListMemberGetLink<Item> >::Iterator
+		iterator = list.GetIterator();
 	while (iterator.Next() != NULL)
 		count++;
 
@@ -114,7 +115,7 @@ DoublyLinkedListTest::TestList()
 
 	// test for equality
 
-	iterator = list.Iterator();
+	iterator = list.GetIterator();
 
 	int i = 0;
 	Item *item;
@@ -132,7 +133,7 @@ DoublyLinkedListTest::TestList()
 	
 	// remove every second
 	
-	iterator = list.Iterator();
+	iterator = list.GetIterator();
 	i = 0;
 	while ((item = iterator.Next()) != NULL) {
 		CHK(item->value == i + 1);
@@ -149,7 +150,7 @@ DoublyLinkedListTest::TestList()
 	// count again
 
 	count = 0;
-	iterator = list.Iterator();
+	iterator = list.GetIterator();
 	while (iterator.Next() != NULL)
 		count++;
 
