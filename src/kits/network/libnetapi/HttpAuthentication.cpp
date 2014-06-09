@@ -12,7 +12,11 @@
 #include <cstdlib>
 
 #include <cstdio>
+#if DEBUG > 0
 #define PRINT(x) printf x
+#else
+#define PRINT(x)
+#endif
 
 extern "C" {
 #ifdef OPENSSL_ENABLED
