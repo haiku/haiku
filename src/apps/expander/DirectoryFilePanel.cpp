@@ -119,10 +119,11 @@ DirectoryFilePanel::SelectionChanged()
 		char* label;
 		entry_ref ref;
 		GetPanelDirectory(&ref);
-		asprintf(&label, B_TRANSLATE("Select '%s'" B_UTF8_ELLIPSIS),
-			ref.name);
-		fCurrentButton->SetLabel(label);
-		free(label);
+		if (asprintf(&label, B_TRANSLATE("Select '%s'" B_UTF8_ELLIPSIS),
+				ref.name) != -1) {
+			fCurrentButton->SetLabel(label);
+			free(label);
+		}
 
 		float width;
 		float height;
