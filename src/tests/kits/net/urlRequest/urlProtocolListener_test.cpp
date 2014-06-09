@@ -7,12 +7,14 @@
 #include <Debug.h>
 #include <KernelKit.h>
 #include <NetworkKit.h>
+#include <UrlProtocolAsynchronousListener.h>
+#include <UrlProtocolListener.h>
 
 
 class TestSyncListener : public BUrlProtocolListener {
 public:
-	void	ConnectionOpened(BUrlProtocol* caller) {
-				printf("Thread<#%5d> ", find_thread(NULL));
+	void	ConnectionOpened(BUrlRequest* caller) {
+				printf("Thread<#%5d> ", (int)find_thread(NULL));
 				printf("TestSyncListener::ConnectionOpened(%p)\n", caller);
 			}
 };
@@ -25,8 +27,8 @@ public:
 			BUrlProtocolAsynchronousListener(transparent)
 			{ }
 			
-	void	ConnectionOpened(BUrlProtocol* caller) {
-				printf("Thread<#%5d> ", find_thread(NULL));
+	void	ConnectionOpened(BUrlRequest* caller) {
+				printf("Thread<#%5d> ", (int)find_thread(NULL));
 				printf("TestAsyncListener::ConnectionOpened(%p)\n", caller);
 			}
 };
@@ -53,7 +55,7 @@ public:
 			
 	void testListener(BUrlProtocolListener* listener)
 	{
-		listener->ConnectionOpened((BUrlProtocol*)0xdeadbeef);
+		listener->ConnectionOpened((BUrlRequest*)0xdeadbeef);
 	}
 	
 	
