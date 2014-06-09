@@ -1,8 +1,9 @@
 /*
- * Copyright 2010-2013 Haiku Inc. All rights reserved.
+ * Copyright 2010-2014 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *		Christophe Huriaux, c.huriaux@gmail.com
  *		Hamish Morrison, hamishm53@gmail.com
  */
@@ -121,7 +122,7 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 
 	// Parse the name and value of the cookie
 	index = _ExtractNameValuePair(string, name, value, index);
-	if (index == -1) {
+	if (index == -1 || value.Length() > 4096) {
 		// The set-cookie-string is not valid
 		return B_BAD_DATA;
 	}
@@ -154,9 +155,12 @@ BNetworkCookie::ParseCookieString(const BString& string, const BUrl& url)
 			}
 			// Validate the max-age value.
 			char* end = NULL;
+			errno = 0;
 			long maxAge = strtol(value.String(), &end, 10);
 			if (*end == '\0')
 				SetMaxAge((int)maxAge);
+			else if(errno == ERANGE && maxAge == LONG_MAX)
+				SetMaxAge(INT_MAX);
 			else
 				SetMaxAge(-1); // cookie will expire immediately
 		} else if (name.ICompare("expires") == 0) {
