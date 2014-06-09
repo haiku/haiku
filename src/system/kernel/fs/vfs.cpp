@@ -698,12 +698,13 @@ get_mount(dev_t id, struct fs_mount** _mount)
 		return B_BAD_VALUE;
 
 	struct vnode* rootNode = mount->root_vnode;
-	if (rootNode == NULL || rootNode->IsBusy() || rootNode->ref_count == 0) {
+	if (mount->unmounting || rootNode == NULL || rootNode->IsBusy()
+		|| rootNode->ref_count == 0) {
 		// might have been called during a mount/unmount operation
 		return B_BUSY;
 	}
 
-	inc_vnode_ref_count(mount->root_vnode);
+	inc_vnode_ref_count(rootNode);
 	*_mount = mount;
 	return B_OK;
 }
