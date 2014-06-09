@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src tests kits net url ;
+SubDir HAIKU_TOP src tests kits net service ;
 
 UnitTestLib servicekittest.so :
 	ServiceKitTestAddon.cpp

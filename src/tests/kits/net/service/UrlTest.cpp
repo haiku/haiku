@@ -185,7 +185,7 @@ const ExplodeTest	kTestExplode[] =
 			{ "http",   "",        "", "www.host.tld",0,   "/path",	  "query",   "fragment" } },
 		{ "",
 			{ "",       "",        "", "",            0,   "",        "",        ""} },
-		{ "HTTP://example.com.:%38%30/%70a%74%68?a=%31#1%323",
+		{ "HTTP://example.com.:80/%70a%74%68?a=%31#1%323",
 			{ "HTTP",   "",        "", "example.com.",80,  "/%70a%74%68","a=%31","1%323"} },
 		{ "ldap://[2001:db8::7]/c=GB?objectClass?one",
 			{ "ldap",   "",        "", "[2001:db8::7]",389,"/c=GB",   "objectClass?one", "" } },
@@ -531,6 +531,8 @@ void
 UrlTest::IDNTest()
 {
 	// http://www.w3.org/2004/04/uri-rel-test.html
+	// TODO these need to be manually UrlDecoded with ou API.
+	// We also need to decide wether to store them as UTF-8 or IDNA/punycode.
 	NextSubTest();
 	CPPUNIT_ASSERT_EQUAL(BUrl("http://www.w3.org").UrlString(),
 		BUrl("http://www.w%33.org").UrlString());
