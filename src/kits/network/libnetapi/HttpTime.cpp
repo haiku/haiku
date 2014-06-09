@@ -14,9 +14,9 @@
 
 
 static const char* kDateFormats[] = {
-	"%a, %d %b %Y %H:%M:%S GMT",
-	"%a, %d-%b-%Y %H:%M:%S GMT",
-	"%A, %d-%b-%y %H:%M:%S GMT",
+	"%a, %d %b %Y %H:%M:%S",
+	"%a, %d-%b-%Y %H:%M:%S",
+	"%A, %d-%b-%y %H:%M:%S",
 	"%a %d %b %H:%M:%S %Y"
 };
 
