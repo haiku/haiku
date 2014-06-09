@@ -47,4 +47,4 @@ Addon catalogTestAddOn
 	: be
 	;
 
-SubInclude HAIKU_TOP src tests kits locale number_format ;
+# SubInclude HAIKU_TOP src tests kits locale number_format ;
