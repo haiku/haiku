@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -198,6 +198,13 @@ CommandLineUserInterface::SynchronouslyAskUser(const char* title,
 	const char* choice3)
 {
 	return -1;
+}
+
+
+status_t
+CommandLineUserInterface::SynchronouslyAskUserForFile(entry_ref* _ref)
+{
+	return B_UNSUPPORTED;
 }
 
 

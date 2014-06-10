@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef USER_INTERFACE_H
@@ -67,6 +67,9 @@ public:
 									= 0;
 									// returns -1, if not implemented or user
 									// cannot be asked
+
+	virtual	status_t			SynchronouslyAskUserForFile(entry_ref* _ref)
+									= 0;
 };
 
 

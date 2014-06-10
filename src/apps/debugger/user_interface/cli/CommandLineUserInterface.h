@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -43,6 +43,7 @@ public:
 	virtual	int32				SynchronouslyAskUser(const char* title,
 									const char* message, const char* choice1,
 									const char* choice2, const char* choice3);
+	virtual	status_t			SynchronouslyAskUserForFile(entry_ref* _ref);
 
 			void				Run();
 									// Called by the main thread, when

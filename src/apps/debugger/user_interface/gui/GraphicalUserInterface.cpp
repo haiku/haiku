@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,16 +8,127 @@
 #include "GraphicalUserInterface.h"
 
 #include <Alert.h>
+#include <Autolock.h>
+#include <FilePanel.h>
+#include <Locker.h>
 
 #include "GuiTeamUiSettings.h"
+#include "MessageCodes.h"
 #include "TeamWindow.h"
 #include "Tracing.h"
+
+
+// #pragma mark - GraphicalUserInterface::FilePanelHandler
+
+
+class GraphicalUserInterface::FilePanelHandler : public BHandler {
+public:
+								FilePanelHandler();
+	virtual						~FilePanelHandler();
+
+			status_t			Init();
+
+	virtual	void				MessageReceived(BMessage* message);
+
+			status_t			WaitForPanel();
+
+			void				SetCurrentRef(entry_ref* ref);
+
+			BLocker&			Locker()
+									{ return fPanelLock; }
+
+private:
+			entry_ref*			fCurrentRef;
+			BLocker				fPanelLock;
+			sem_id				fPanelWaitSem;
+};
+
+
+GraphicalUserInterface::FilePanelHandler::FilePanelHandler()
+	:
+	BHandler("GuiPanelHandler"),
+	fCurrentRef(NULL),
+	fPanelLock(),
+	fPanelWaitSem(-1)
+{
+}
+
+
+GraphicalUserInterface::FilePanelHandler::~FilePanelHandler()
+{
+	if (fPanelWaitSem >= 0)
+		delete_sem(fPanelWaitSem);
+}
+
+
+status_t
+GraphicalUserInterface::FilePanelHandler::Init()
+{
+	fPanelWaitSem = create_sem(0, "FilePanelWaitSem");
+
+	if (fPanelWaitSem < 0)
+		return fPanelWaitSem;
+
+	return B_OK;
+}
+
+
+void
+GraphicalUserInterface::FilePanelHandler::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_USER_INTERFACE_FILE_CHOSEN:
+		{
+			entry_ref ref;
+			if (message->FindRef("refs", &ref) == B_OK
+				&& fCurrentRef != NULL) {
+				*fCurrentRef = ref;
+				fCurrentRef = NULL;
+			}
+			// fall through
+		}
+
+		case B_CANCEL:
+		{
+			release_sem(fPanelWaitSem);
+			break;
+		}
+
+		default:
+			BHandler::MessageReceived(message);
+			break;
+	}
+}
+
+
+status_t
+GraphicalUserInterface::FilePanelHandler::WaitForPanel()
+{
+	status_t result = B_OK;
+	do {
+		result = acquire_sem(fPanelWaitSem);
+	} while (result == B_INTERRUPTED);
+
+	return result;
+}
+
+
+void
+GraphicalUserInterface::FilePanelHandler::SetCurrentRef(entry_ref* ref)
+{
+	fCurrentRef = ref;
+}
+
+
+// #pragma mark - GraphicalUserInterface
 
 
 GraphicalUserInterface::GraphicalUserInterface()
 	:
 	fTeamWindow(NULL),
-	fTeamWindowMessenger(NULL)
+	fTeamWindowMessenger(NULL),
+	fFilePanelHandler(NULL),
+	fFilePanel(NULL)
 {
 }
 
@@ -25,6 +136,7 @@ GraphicalUserInterface::GraphicalUserInterface()
 GraphicalUserInterface::~GraphicalUserInterface()
 {
 	delete fTeamWindowMessenger;
+	delete fFilePanel;
 }
 
 
@@ -41,6 +153,13 @@ GraphicalUserInterface::Init(Team* team, UserInterfaceListener* listener)
 	try {
 		fTeamWindow = TeamWindow::Create(team, listener);
 		fTeamWindowMessenger = new BMessenger(fTeamWindow);
+		fFilePanelHandler = new FilePanelHandler();
+		status_t error = fFilePanelHandler->Init();
+		if (error != B_OK) {
+			ERROR("Error: Failed to create file panel semaphore!\n");
+			return error;
+		}
+		fTeamWindow->AddHandler(fFilePanelHandler);
 
 		// start the message loop
 		fTeamWindow->Hide();
@@ -131,4 +250,29 @@ GraphicalUserInterface::SynchronouslyAskUser(const char* title,
 	if (alert == NULL)
 		return 0;
 	return alert->Go();
+}
+
+
+status_t
+GraphicalUserInterface::SynchronouslyAskUserForFile(entry_ref* _ref)
+{
+	BAutolock lock(&fFilePanelHandler->Locker());
+
+	if (fFilePanel == NULL) {
+		BMessenger messenger(fFilePanelHandler);
+		BMessage* message = new(std::nothrow) BMessage(
+			MSG_USER_INTERFACE_FILE_CHOSEN);
+		if (message == NULL)
+			return B_NO_MEMORY;
+		ObjectDeleter<BMessage> messageDeleter(message);
+		fFilePanel = new(std::nothrow) BFilePanel(B_OPEN_PANEL,
+			&messenger, NULL, B_FILE_NODE, false, message);
+		if (fFilePanel == NULL)
+			return B_NO_MEMORY;
+		messageDeleter.Detach();
+	}
+
+	fFilePanelHandler->SetCurrentRef(_ref);
+	fFilePanel->Show();
+	return fFilePanelHandler->WaitForPanel();
 }
