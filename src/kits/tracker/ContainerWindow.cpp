@@ -1674,6 +1674,14 @@ BContainerWindow::MessageReceived(BMessage* message)
 							SetPathWatchingEnabled(settings.ShowNavigator()
 								|| settings.ShowFullPathInTitleBar());
 						}
+
+						if (!settings.SingleWindowBrowse()
+							&& dynamic_cast<BDeskWindow*>(this) == NULL
+							&& TargetModel()->IsDesktop()) {
+							// close the "Desktop" window, but not the Desktop
+							this->Quit();
+						}
+
 						SetSingleWindowBrowseShortcuts(
 							settings.SingleWindowBrowse());
 						break;
