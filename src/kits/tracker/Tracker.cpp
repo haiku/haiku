@@ -965,12 +965,13 @@ TTracker::OpenContainerWindow(Model* model, BMessage* originalRefsList,
 
 	uint32 workspace = (uint32)(1 << current_workspace());
 	int32 windowCount = 0;
-
-	while (window) {
-		// At least one window open, just pull to front
-		// make sure we don't jerk workspaces around
-		uint32 windowWorkspaces = window->Workspaces();
-		if (windowWorkspaces & workspace) {
+	while (window != NULL) {
+		if ((window->Workspaces() & workspace) != 0
+			&& (dynamic_cast<BDeskWindow*>(window) == NULL
+				|| !TrackerSettings().SingleWindowBrowse())) {
+			// We found at least one window that is open and is not Desktop
+			// or we're in spatial mode, activate it and make sure we don't
+			// jerk the workspaces around.
 			window->Activate();
 			someWindowActivated = true;
 		}
