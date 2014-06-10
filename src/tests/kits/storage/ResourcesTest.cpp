@@ -519,7 +519,7 @@ ResourcesTest::InitTest()
 		BResources resources;
 		// R5: A NULL file is B_OK!
 //		CPPUNIT_ASSERT( resources.SetTo(NULL, false) == B_BAD_VALUE );
-		CPPUNIT_ASSERT( resources.SetTo(NULL, false) == B_OK );
+		CPPUNIT_ASSERT( resources.SetTo((BFile*)NULL, false) == B_OK );
 	}
 }
 
@@ -923,7 +923,7 @@ ResourcesTest::ReadTest()
 		BResources resources;
 		// R5: A NULL file is B_OK!
 //		CPPUNIT_ASSERT( resources.SetTo(NULL, false) == B_BAD_VALUE );
-		CPPUNIT_ASSERT( resources.SetTo(NULL, false) == B_OK );
+		CPPUNIT_ASSERT( resources.SetTo((BFile*)NULL, false) == B_OK );
 		ReadBadResTest(resources, testResource1);
 	}
 	// bad args
