@@ -623,6 +623,9 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 			fUse48BitCommands, ataData.lba_sector_count,
 			ataData.lba48_sector_count, fSectorCount * fSectorSize);
 		if (fTrimSupported) {
+			if (fMaxTrimRangeBlocks == 0)
+				fMaxTrimRangeBlocks = 1;
+
 			bool deterministic = ataData.supports_deterministic_read_after_trim;
 			TRACE("trim supported, %" B_PRIu32 " ranges blocks, reads are "
 				"%sdeterministic%s.\n", fMaxTrimRangeBlocks,
