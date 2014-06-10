@@ -75,10 +75,10 @@ ArgvParser::ArgvParser(const char* name)
 
 ArgvParser::~ArgvParser()
 {
-	delete [] fBuffer;
+	delete[] fBuffer;
 
 	MakeArgvEmpty();
-	delete [] fCurrentArgv;
+	delete[] fCurrentArgv;
 
 	if (fFile)
 		fclose(fFile);

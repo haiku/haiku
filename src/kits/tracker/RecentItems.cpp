@@ -385,7 +385,7 @@ BRecentFilesList::~BRecentFilesList()
 	if (fTypeCount) {
 		for (int32 index = 0; index < fTypeCount; index++)
 			free(fTypes[index]);
-		delete [] fTypes;
+		delete[] fTypes;
 	}
 }
 

@@ -159,6 +159,8 @@ private:
 
 
 #define B_DESKTOP_DIR_NAME "Desktop"
+#define B_DISKS_DIR_NAME "Disks"
+#define B_TRASH_DIR_NAME "Trash"
 
 #ifndef _IMPEXP_TRACKER
 #define _IMPEXP_TRACKER

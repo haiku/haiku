@@ -269,8 +269,8 @@ BDirMenu::AddDisksIconToMenu(bool atEnd)
 	BMessage* message = new BMessage(fCommand);
 	message->AddRef(fEntryName.String(), model.EntryRef());
 
-	ModelMenuItem* item = new ModelMenuItem(&model,	B_TRANSLATE("Disks"),
-		message);
+	ModelMenuItem* item = new ModelMenuItem(&model,
+		B_TRANSLATE(B_DISKS_DIR_NAME), message);
 	if (atEnd)
 		AddItem(item);
 	else

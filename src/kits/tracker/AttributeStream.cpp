@@ -731,7 +731,7 @@ SelectiveAttributeTransformer::~SelectiveAttributeTransformer()
 {
 	for (int32 index = fTransformedBuffers.CountItems() - 1; index >= 0;
 			index--) {
-		delete [] fTransformedBuffers.ItemAt(index);
+		delete[] fTransformedBuffers.ItemAt(index);
 	}
 }
 
@@ -741,7 +741,7 @@ SelectiveAttributeTransformer::Rewind()
 {
 	for (int32 index = fTransformedBuffers.CountItems() - 1; index >= 0;
 			index--) {
-		delete [] fTransformedBuffers.ItemAt(index);
+		delete[] fTransformedBuffers.ItemAt(index);
 	}
 
 	fTransformedBuffers.MakeEmpty();
@@ -791,7 +791,7 @@ SelectiveAttributeTransformer::CopyAndApplyTransformer(const char* name,
 	}
 
 	if (!(fTransformFunc)(name, type, size, result, fTransformParams)) {
-		delete [] result;
+		delete[] result;
 		return NULL;
 	}
 

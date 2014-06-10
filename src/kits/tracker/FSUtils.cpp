@@ -106,6 +106,7 @@ enum ConflictCheckResult {
 	kNoConflicts
 };
 
+
 namespace BPrivate {
 
 #undef B_TRANSLATION_CONTEXT
@@ -195,6 +196,7 @@ static const char* kFindApplicationStr =
 	B_TRANSLATE_MARK("Would you like to find a suitable application "
 	"to open the file?");
 
+
 // Skip these attributes when copying in Tracker
 const char* kSkipAttributes[] = {
 	kAttrPoseInfo,
@@ -202,7 +204,7 @@ const char* kSkipAttributes[] = {
 };
 
 
-// #pragma mark -
+// #pragma mark - CopyLoopControl
 
 
 CopyLoopControl::~CopyLoopControl()
@@ -289,7 +291,7 @@ CopyLoopControl::PreserveAttribute(const char*)
 }
 
 
-// #pragma mark -
+// #pragma mark - TrackerCopyLoopControl
 
 
 TrackerCopyLoopControl::TrackerCopyLoopControl()
@@ -415,7 +417,7 @@ TrackerCopyLoopControl::SetSourceList(EntryList* list)
 }
 
 
-// #pragma mark -
+// #pragma mark - the rest
 
 
 static BNode*
@@ -1061,13 +1063,14 @@ MoveTask(BObjectList<entry_ref>* srcList, BEntry* destEntry, BList* pointList,
 	delete destEntry;
 
 	// delete file location list and all Points within
-	if (pointList) {
+	if (pointList != NULL) {
 		pointList->DoForEach(delete_point);
 		delete pointList;
 	}
 
 	return B_OK;
 }
+
 
 class FailWithAlert {
 	public:
@@ -1079,9 +1082,10 @@ class FailWithAlert {
 		}
 
 		FailWithAlert(status_t error, const char* string, const char* name)
-		:	fString(string),
-			fName(name),
-			fError(error)
+		:
+		fString(string),
+		fName(name),
+		fError(error)
 		{
 		}
 
@@ -1100,7 +1104,8 @@ class MoveError {
 
 		MoveError(status_t error)
 		:	fError(error)
-		{ }
+		{
+		}
 
 		status_t fError;
 };
@@ -1339,7 +1344,7 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 
 		CopyAttributes(loopControl, &srcFile, &destFile, buffer, bufsize);
 	} catch (...) {
-		delete [] buffer;
+		delete[] buffer;
 		throw;
 	}
 
@@ -1349,7 +1354,7 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 	destFile.SetModificationTime(srcStat->st_mtime);
 	destFile.SetCreationTime(srcStat->st_crtime);
 
-	delete [] buffer;
+	delete[] buffer;
 
 	if (!loopControl->ChecksumFile(&ref)) {
 		// File no good.  Remove and quit.
@@ -3443,9 +3448,10 @@ _TrackerLaunchDocuments(const entry_ref* /*doNotUse*/, const BMessage* refs,
 	BMessage copyOfRefs(*refs);
 
 	entry_ref documentRef;
-	if (copyOfRefs.FindRef("refs", &documentRef) != B_OK)
+	if (copyOfRefs.FindRef("refs", &documentRef) != B_OK) {
 		// nothing to launch, we are done
 		return;
+	}
 
 	status_t error = B_ERROR;
 	entry_ref app;
@@ -3732,23 +3738,25 @@ status_t
 FSLaunchUsing(const entry_ref* ref, BMessage* listOfRefs)
 {
 	BMessage temp(B_REFS_RECEIVED);
-	if (!listOfRefs) {
+	if (listOfRefs == NULL) {
 		ASSERT(ref);
 		temp.AddRef("refs", ref);
 		listOfRefs = &temp;
 	}
 	FSOpenWith(listOfRefs);
+
 	return B_OK;
 }
 
 status_t
 FSLaunchItem(const entry_ref* ref, BMessage* message, int32, bool async)
 {
-	if (message)
+	if (message != NULL)
 		message->what = B_REFS_RECEIVED;
 
 	status_t result = TrackerLaunch(ref, message, async, true);
 	delete message;
+
 	return result;
 }
 
@@ -3758,6 +3766,7 @@ FSLaunchItem(const entry_ref* ref, BMessage* message, int32 workspace)
 {
 	FSLaunchItem(ref, message, workspace, true);
 }
+
 
 // Get the original path of an entry in the trash
 status_t
@@ -3816,42 +3825,49 @@ FSGetOriginalPath(BEntry* entry, BPath* result)
 	err = parent.GetPath(&pathParent);
 	if (err != B_OK)
 		return err;
+
 	err = entry->GetPath(&path);
 	if (err != B_OK)
 		return err;
+
 	result->Append(path.Path() + strlen(pathParent.Path()) + 1);
 		// compute the new path by appending the offset of
 		// the item we are locating, to the original path
 		// of the parent
+
 	return B_OK;
 }
+
 
 directory_which
 WellKnowEntryList::Match(const node_ref* node)
 {
 	const WellKnownEntry* result = MatchEntry(node);
-	if (result)
+	if (result != NULL)
 		return result->which;
 
 	return (directory_which)-1;
 }
 
+
 const WellKnowEntryList::WellKnownEntry*
 WellKnowEntryList::MatchEntry(const node_ref* node)
 {
-	if (!self)
+	if (self == NULL)
 		self = new WellKnowEntryList();
 
 	return self->MatchEntryCommon(node);
 }
 
+
 const WellKnowEntryList::WellKnownEntry*
 WellKnowEntryList::MatchEntryCommon(const node_ref* node)
 {
 	uint32 count = entries.size();
-	for (uint32 index = 0; index < count; index++)
+	for (uint32 index = 0; index < count; index++) {
 		if (*node == entries[index].node)
 			return &entries[index];
+	}
 
 	return NULL;
 }

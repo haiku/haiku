@@ -150,10 +150,10 @@ CachedEntryIterator::CachedEntryIterator(BEntryList* iterator,
 
 CachedEntryIterator::~CachedEntryIterator()
 {
-	delete [] fEntryRefBuffer;
+	delete[] fEntryRefBuffer;
 	free(fDirentBuffer);
 	delete fSortedList;
-	delete [] fEntryBuffer;
+	delete[] fEntryBuffer;
 }
 
 

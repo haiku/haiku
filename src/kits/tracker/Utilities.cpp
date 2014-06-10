@@ -1238,8 +1238,8 @@ StringToScalar(const char* text)
 		// no suffix, try plain byte conversion
 		val = strtoll(buffer, &end, 10);
 	}
+	delete[] buffer;
 
-	delete [] buffer;
 	return val;
 }
 

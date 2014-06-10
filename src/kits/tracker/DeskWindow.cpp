@@ -245,10 +245,12 @@ BDeskWindow::Init(const BMessage*)
 	BPath path;
 	if (!BootedInSafeMode() && FSFindTrackerSettingsDir(&path) == B_OK) {
 		path.Append(kShelfPath);
-		close(open(path.Path(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH));
+		close(open(path.Path(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR
+			| S_IRGRP | S_IROTH));
 		if (get_ref_for_path(path.Path(), &ref) == B_OK)
 			fDeskShelf = new BShelf(&ref, fPoseView);
-		if (fDeskShelf)
+
+		if (fDeskShelf != NULL)
 			fDeskShelf->SetDisplaysZombies(true);
 	}
 	InitKeyIndices();
@@ -288,7 +290,8 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 		if (!update) {
 			BPath path;
 			if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-				BPathMonitor::StartWatching(path.Path(), B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
+				BPathMonitor::StartWatching(path.Path(),
+					B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
 				path.Append(kShortcutsSettings);
 				fShortcutsSettings = new char[strlen(path.Path()) + 1];
 				strcpy(fShortcutsSettings, path.Path());
@@ -316,6 +319,7 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 				BString command;
 				if (message.FindString("command", &command) != B_OK)
 					continue;
+
 				BPath path;
 				bool isInAddons = false;
 				if (find_directory(B_SYSTEM_ADDONS_DIRECTORY, &path)
@@ -353,7 +357,8 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 					continue;
 
 				uint32 modifiers = B_COMMAND_KEY;
-					// it's required by interface kit to at least have B_COMMAND_KEY
+					// it's required by interface kit to at least
+					// have B_COMMAND_KEY
 				int32 value;
 				if (message.FindInt32("mcidx", 0, &value) == B_OK)
 					modifiers |= (value != 0 ? B_SHIFT_KEY : 0);
@@ -370,6 +375,7 @@ BDeskWindow::ApplyShortcutPreferences(bool update)
 				if (item != NULL) {
 					if (item->key != '\0')
 						RemoveShortcut(item->key, item->modifiers);
+
 					item->key = shortcut[0];
 					item->modifiers = modifiers;
 					AddOneShortcut(&model, item->key, item->modifiers, this);

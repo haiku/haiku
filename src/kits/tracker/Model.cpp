@@ -344,27 +344,24 @@ Model::CompareFolderNamesFirst(const Model* compareModel) const
 const char*
 Model::Name() const
 {
-	static const char* kRootNodeName = B_TRANSLATE_MARK("Disks");
-	static const char* kTrashNodeName = B_TRANSLATE_MARK("Trash");
-	static const char* kDesktopNodeName = B_TRANSLATE_MARK("Desktop");
+	static const char* kRootNodeName = B_TRANSLATE_MARK(B_DISKS_DIR_NAME);
+	static const char* kTrashNodeName = B_TRANSLATE_MARK(B_TRASH_DIR_NAME);
+	static const char* kDesktopNodeName = B_TRANSLATE_MARK(B_DESKTOP_DIR_NAME);
 
 	switch (fBaseType) {
 		case kRootNode:
 			return B_TRANSLATE_NOCOLLECT(kRootNodeName);
 
 		case kVolumeNode:
-			if (fVolumeName)
+			if (fVolumeName != NULL)
 				return fVolumeName;
 			break;
+
 		case kTrashNode:
 			return B_TRANSLATE_NOCOLLECT(kTrashNodeName);
 
 		case kDesktopNode:
 			return B_TRANSLATE_NOCOLLECT(kDesktopNodeName);
-
-		default:
-			break;
-
 	}
 
 	if (fHasLocalizedName && gLocalizedNamePreferred)
@@ -517,6 +514,7 @@ Model::CloseNode()
 #ifdef CHECK_OPEN_MODEL_LEAKS
 	if (writableOpenModelList)
 		writableOpenModelList->RemoveItem(this);
+
 	if (readOnlyOpenModelList)
 		readOnlyOpenModelList->RemoveItem(this);
 #endif
@@ -655,7 +653,8 @@ Model::FinishSettingUpType()
 					fBaseType = kDesktopNode;
 			}
 
-			fMimeType = B_DIR_MIMETYPE;	// should use a shared string here
+			fMimeType = B_DIR_MIMETYPE;
+				// should use a shared string here
 			if (IsNodeOpen()) {
 				BNodeInfo info(fNode);
 				if (info.GetType(mimeString) == B_OK)
@@ -705,7 +704,8 @@ Model::FinishSettingUpType()
 		}
 
 		case kLinkNode:
-			fMimeType = B_LINK_MIMETYPE;	// should use a shared string here
+			fMimeType = B_LINK_MIMETYPE;
+				// should use a shared string here
 			break;
 
 		case kExecutableNode:

@@ -430,7 +430,7 @@ BPoseView::RestoreColumnState(AttributeStreamNode* node)
 				}
 				AddColumnList(&tempSortedList);
 			}
-			delete [] buffer;
+			delete[] buffer;
 		}
 	}
 	SetUpDefaultColumnsIfNeeded();
@@ -541,7 +541,7 @@ BPoseView::RestoreState(AttributeStreamNode* node)
 					fViewState = viewstate;
 				}
 			}
-			delete [] buffer;
+			delete[] buffer;
 		}
 	}
 
@@ -2972,7 +2972,7 @@ BPoseView::ReadExtendedPoseInfo(Model* model)
 	if (result == kReadAttrFailed
 		|| size > poseInfo->SizeWithHeadroom()
 		|| size < poseInfo->Size()) {
-		delete [] buffer;
+		delete[] buffer;
 		return NULL;
 	}
 
@@ -8047,8 +8047,9 @@ BPoseView::OpenSelection(BPose* clickedPose, int32* index)
 	if (settings.SingleWindowBrowse()
 		&& !singleWindowBrowsePose
 		&& fSelectionList->CountItems() == 1
-		&& !IsFilePanel())
+		&& !IsFilePanel()) {
 		singleWindowBrowsePose = fSelectionList->ItemAt(0);
+	}
 
 	// check if we can use the single window mode
 	if (settings.SingleWindowBrowse()

@@ -2329,7 +2329,7 @@ FindPanel::RestoreWindowState(const BNode* node)
 				}
 			}
 		}
-		delete [] buffer;
+		delete[] buffer;
 	}
 	// mark or unmark "All disks"
 	fVolMenu->ItemAt(0)->SetMarked(searchAllVolumes);

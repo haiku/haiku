@@ -215,15 +215,16 @@ protected:
 	class AttrNode {
 	public:
 		AttrNode(const char* name, uint32 type, off_t size, char* data)
-			:	fAttr(name, type, size),
-				fData(data)
-			{
-			}
+		:
+		fAttr(name, type, size),
+		fData(data)
+		{
+		}
 
 		~AttrNode()
-			{
-				delete [] fData;
-			}
+		{
+			delete[] fData;
+		}
 
 		AttributeInfo fAttr;
 		char* fData;

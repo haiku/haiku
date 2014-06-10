@@ -111,10 +111,8 @@ rgb_color ValueToColor(int32 value)
 
 int32 ColorToValue(rgb_color color)
 {
-	return	color.alpha << 24L
-			| color.red << 16L
-			| color.green << 8L
-			| color.blue;
+	return color.alpha << 24L | color.red << 16L | color.green << 8L
+		| color.blue;
 }
 
 
@@ -122,15 +120,17 @@ int32 ColorToValue(rgb_color color)
 
 
 TTrackerState::TTrackerState()
-	:	Settings("TrackerSettings", "Tracker"),
-		fInited(false),
-		fSettingsLoaded(false)
+	:
+	Settings("TrackerSettings", "Tracker"),
+	fInited(false),
+	fSettingsLoaded(false)
 {
 }
 
 
 TTrackerState::TTrackerState(const TTrackerState&)
-	:	Settings("", "")
+	:
+	Settings("", "")
 {
 	// Placeholder copy constructor to prevent others from accidentally using
 	// the default copy constructor.  Note, the DEBUGGER call is for the off
@@ -478,11 +478,13 @@ void
 TrackerSettings::RecentCounts(int32* applications, int32* documents,
 	int32* folders)
 {
-	if (applications)
+	if (applications != NULL)
 		*applications = gTrackerState.fRecentApplicationsCount->Value();
-	if (documents)
+
+	if (documents != NULL)
 		*documents = gTrackerState.fRecentDocumentsCount->Value();
-	if (folders)
+
+	if (folders != NULL)
 		*folders = gTrackerState.fRecentFoldersCount->Value();
 }
 

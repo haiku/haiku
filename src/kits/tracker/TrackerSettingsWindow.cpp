@@ -298,7 +298,8 @@ TrackerSettingsWindow::_HandleChangedSettingsView()
 
 
 SettingsItem::SettingsItem(const char* label, SettingsView* view)
-	: BStringItem(label),
+	:
+	BStringItem(label),
 	fSettingsView(view)
 {
 }
