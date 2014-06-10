@@ -44,7 +44,7 @@ endif
 
 #	SETTING: set the CFLAGS for each binary type
 	ifeq ($(strip $(TYPE)), DRIVER)
-		CFLAGS	+= -D_KERNEL_MODE=1 -no-fpic
+		CFLAGS	+= -D_KERNEL_MODE=1 -fno-pic
 	else
 		CFLAGS +=
 	endif
