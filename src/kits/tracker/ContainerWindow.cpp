@@ -62,6 +62,7 @@ All rights reserved.
 #include <string.h>
 #include <stdlib.h>
 
+#include <algorithm>
 #include <memory>
 
 #include "Attributes.h"
@@ -1142,15 +1143,16 @@ BContainerWindow::FrameResized(float, float)
 		// and we have resized over the bottom right corner of the extent
 		BPoint scroll(B_ORIGIN);
 		if (offsetX < 0 && PoseView()->Bounds().right > extent.right
-			&& Bounds().Width() > fPreviousBounds.Width())
-			scroll.x
-				= max_c(fPreviousBounds.Width() - Bounds().Width(), offsetX);
+			&& Bounds().Width() > fPreviousBounds.Width()) {
+			scroll.x = std::max(fPreviousBounds.Width() - Bounds().Width(),
+				offsetX);
+		}
 
 		if (offsetY < 0 && PoseView()->Bounds().bottom > extent.bottom
-			&& Bounds().Height() > fPreviousBounds.Height())
-			scroll.y
-				= max_c(fPreviousBounds.Height() - Bounds().Height(),
-					offsetY);
+			&& Bounds().Height() > fPreviousBounds.Height()) {
+			scroll.y = std::max(fPreviousBounds.Height() - Bounds().Height(),
+				offsetY);
+		}
 
 		if (scroll != B_ORIGIN)
 			PoseView()->ScrollBy(scroll.x, scroll.y);
