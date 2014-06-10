@@ -14,6 +14,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86_64 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) controllers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info loading_state_handlers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_managers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
@@ -112,12 +113,17 @@ Application Debugger :
 	ImageDebugInfo.cpp
 	ImageDebugInfoLoadingState.cpp
 	ImageDebugInfoProvider.cpp
+	ImageDebugLoadingStateHandler.cpp
+	ImageDebugLoadingStateHandlerRoster.cpp
 	NoOpStackFrameDebugInfo.cpp
 	SpecificImageDebugInfo.cpp
 	SpecificImageDebugInfoLoadingState.cpp
 	SpecificTeamDebugInfo.cpp
 	StackFrameDebugInfo.cpp
 	TeamDebugInfo.cpp
+
+	# debug_info/loading_state_handlers
+	DwarfLoadingStateHandler.cpp
 
 	# debugger_interface
 	DebugEvent.cpp

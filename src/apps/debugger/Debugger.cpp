@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +24,7 @@
 
 #include "CommandLineUserInterface.h"
 #include "GraphicalUserInterface.h"
+#include "ImageDebugLoadingStateHandlerRoster.h"
 #include "MessageCodes.h"
 #include "SettingsManager.h"
 #include "SignalSet.h"
@@ -209,6 +210,10 @@ global_init()
 		return error;
 
 	error = ValueHandlerRoster::CreateDefault();
+	if (error != B_OK)
+		return error;
+
+	error = ImageDebugLoadingStateHandlerRoster::CreateDefault();
 	if (error != B_OK)
 		return error;
 
@@ -402,6 +407,7 @@ Debugger::~Debugger()
 {
 	ValueHandlerRoster::DeleteDefault();
 	TypeHandlerRoster::DeleteDefault();
+	ImageDebugLoadingStateHandlerRoster::DeleteDefault();
 }
 
 
