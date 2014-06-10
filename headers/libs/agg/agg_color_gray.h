@@ -55,7 +55,7 @@ namespace agg
         gray8() {}
 
         //--------------------------------------------------------------------
-        gray8(unsigned v_, unsigned a_=base_mask) :
+        explicit gray8(unsigned v_, unsigned a_=base_mask) :
             v(int8u(v_)), a(int8u(a_)) {}
 
         //--------------------------------------------------------------------
@@ -242,7 +242,7 @@ namespace agg
         gray16() {}
 
         //--------------------------------------------------------------------
-        gray16(unsigned v_, unsigned a_=base_mask) :
+        explicit gray16(unsigned v_, unsigned a_=base_mask) :
             v(int16u(v_)), a(int16u(a_)) {}
 
         //--------------------------------------------------------------------
