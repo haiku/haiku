@@ -17,6 +17,7 @@ class BEntry;
 class BPath;
 
 struct entry_ref;
+struct node_ref;
 
 
 namespace BPrivate {
@@ -35,6 +36,8 @@ public:
 									const char* path = NULL);
 								Entry(const BEntry& entry);
 								Entry(const entry_ref& entryRef);
+								Entry(const node_ref& directoryRef,
+									const char* path = NULL);
 								~Entry();
 
 			status_t			GetPath(BPath& buffer, const char*& _path)
@@ -46,6 +49,7 @@ private:
 			const char*			fPath;
 			const BEntry*		fEntry;
 			const entry_ref*	fEntryRef;
+			const node_ref*		fDirectoryRef;
 };
 
 

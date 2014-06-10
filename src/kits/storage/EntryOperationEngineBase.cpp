@@ -19,18 +19,20 @@ BEntryOperationEngineBase::Entry::Entry(const char* path)
 	fDirectory(NULL),
 	fPath(path),
 	fEntry(NULL),
-	fEntryRef(NULL)
-
+	fEntryRef(NULL),
+	fDirectoryRef(NULL)
 {
 }
 
 
-BEntryOperationEngineBase::Entry::Entry(const BDirectory& directory, const char* path)
+BEntryOperationEngineBase::Entry::Entry(const BDirectory& directory,
+	const char* path)
 	:
 	fDirectory(&directory),
 	fPath(path),
 	fEntry(NULL),
-	fEntryRef(NULL)
+	fEntryRef(NULL),
+	fDirectoryRef(NULL)
 {
 }
 
@@ -40,7 +42,8 @@ BEntryOperationEngineBase::Entry::Entry(const BEntry& entry)
 	fDirectory(NULL),
 	fPath(NULL),
 	fEntry(&entry),
-	fEntryRef(NULL)
+	fEntryRef(NULL),
+	fDirectoryRef(NULL)
 {
 }
 
@@ -50,7 +53,20 @@ BEntryOperationEngineBase::Entry::Entry(const entry_ref& entryRef)
 	fDirectory(NULL),
 	fPath(NULL),
 	fEntry(NULL),
-	fEntryRef(&entryRef)
+	fEntryRef(&entryRef),
+	fDirectoryRef(NULL)
+{
+}
+
+
+BEntryOperationEngineBase::Entry::Entry(const node_ref& directoryRef,
+	const char* path)
+	:
+	fDirectory(NULL),
+	fPath(path),
+	fEntry(NULL),
+	fEntryRef(NULL),
+	fDirectoryRef(&directoryRef)
 {
 }
 
@@ -72,6 +88,11 @@ BEntryOperationEngineBase::Entry::GetPath(BPath& buffer, const char*& _path)
 		error = buffer.SetTo(fDirectory, fPath);
 	} else if (fEntryRef != NULL) {
 		error = buffer.SetTo(fEntryRef);
+	} else if (fDirectoryRef != NULL) {
+		BDirectory directory;
+		error = directory.SetTo(fDirectoryRef);
+		if (error == B_OK)
+			error = buffer.SetTo(&directory, fPath);
 	} else if (fPath != NULL) {
 		_path = fPath;
 		return B_OK;
