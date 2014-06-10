@@ -26,7 +26,9 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BDirectory", DirectoryTest::Suite());
 	suite->addTest("BEntry", EntryTest::Suite());
 	suite->addTest("BFile", FileTest::Suite());
+#if 0
 	suite->addTest("BMimeType", MimeTypeTest::Suite());
+#endif
 	suite->addTest("BNode", NodeTest::Suite());
 	suite->addTest("BNodeInfo", NodeInfoTest::Suite());
 	suite->addTest("BPath", PathTest::Suite());

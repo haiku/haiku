@@ -14,7 +14,7 @@ UnitTestLib libstoragetest.so
 		FindDirectoryTest.cpp
 		FileTest.cpp
 		MimeSnifferTest.cpp
-		MimeTypeTest.cpp
+		# MimeTypeTest.cpp
 		NodeInfoTest.cpp
 		NodeTest.cpp
 		PathTest.cpp
