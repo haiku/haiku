@@ -113,6 +113,19 @@ a:hover, a:active {
 	color: #ff4500; /* vermilion */
 }
 
+dl.since {
+	margin-top: 1em;
+}
+
+dl.since dt {
+	display: inline;
+	padding-right: 0.5em;
+}
+
+dl.since dd {
+	display: inline;
+}
+
 
 /* Some headers act as anchors, don't give them a hover effect */
 
