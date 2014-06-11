@@ -1,9 +1,9 @@
 /*
- * Copyright 2001-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Erik Jaesler (erik@cgsoftware.com)
+ *		Erik Jaesler, erik@cgsoftware.com
  */
 #ifndef _HANDLER_H
 #define _HANDLER_H
@@ -55,8 +55,8 @@ public:
 			void			UnlockLooper();
 
 	// Scripting
-	virtual BHandler*		ResolveSpecifier(BMessage* msg, int32 index,
-								BMessage* specifier, int32 form,
+	virtual BHandler*		ResolveSpecifier(BMessage* message, int32 index,
+								BMessage* specifier, int32 what,
 								const char* property);
 	virtual status_t		GetSupportedSuites(BMessage* data);
 
@@ -77,7 +77,8 @@ public:
 	virtual status_t		Perform(perform_code d, void* arg);
 
 	// Notifier calls
-	virtual	void 			SendNotices(uint32 what, const BMessage* notice = NULL);
+	virtual	void 			SendNotices(uint32 what,
+								const BMessage* notice = NULL);
 			bool			IsWatched() const;
 
 private:

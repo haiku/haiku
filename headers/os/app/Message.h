@@ -1,9 +1,9 @@
 /*
- * Copyright 2005-2012, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *	Michael Lotz <mmlr@mlotz.ch>
+ *		Michael Lotz, mmlr@mlotz.ch
  */
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
@@ -141,7 +141,7 @@ public:
 			status_t			AddString(const char* name, const char* string);
 			status_t			AddString(const char* name,
 									const BString& string);
-			status_t			AddStrings(const char *name,
+			status_t			AddStrings(const char* name,
 									const BStringList& list);
 			status_t			AddInt8(const char* name, int8 value);
 			status_t			AddUInt8(const char* name, uint8 value);

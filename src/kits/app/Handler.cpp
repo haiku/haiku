@@ -1,10 +1,10 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Erik Jaesler (erik@cgsoftware.com)
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Erik Jaesler, erik@cgsoftware.com
  */
 
 
@@ -86,7 +86,7 @@ static property_info sHandlerPropInfo[] = {
 	{}
 };
 
-bool FilterDeleter(void *filter);
+bool FilterDeleter(void* filter);
 
 namespace BPrivate {
 
@@ -103,7 +103,7 @@ class ObserverList {
 		bool IsEmpty();
 
 	private:
-		typedef map<uint32, vector<const BHandler *> > HandlerObserverMap;
+		typedef map<uint32, vector<const BHandler*> > HandlerObserverMap;
 		typedef map<uint32, vector<BMessenger> > MessengerObserverMap;
 
 		void _ValidateHandlers(uint32 what);
@@ -121,7 +121,7 @@ using namespace BPrivate;
 //	#pragma mark -
 
 
-BHandler::BHandler(const char *name)
+BHandler::BHandler(const char* name)
 	: BArchivable(),
 	fName(NULL)
 {
@@ -154,11 +154,11 @@ BHandler::~BHandler()
 }
 
 
-BHandler::BHandler(BMessage *data)
+BHandler::BHandler(BMessage* data)
 	: BArchivable(data),
 	fName(NULL)
 {
-	const char *name = NULL;
+	const char* name = NULL;
 
 	if (data)
 		data->FindString(kArchiveNameField, &name);
@@ -167,8 +167,8 @@ BHandler::BHandler(BMessage *data)
 }
 
 
-BArchivable *
-BHandler::Instantiate(BMessage *data)
+BArchivable*
+BHandler::Instantiate(BMessage* data)
 {
 	if (!validate_instantiation(data, "BHandler"))
 		return NULL;
@@ -178,20 +178,21 @@ BHandler::Instantiate(BMessage *data)
 
 
 status_t
-BHandler::Archive(BMessage *data, bool deep) const
+BHandler::Archive(BMessage* data, bool deep) const
 {
 	status_t status = BArchivable::Archive(data, deep);
 	if (status < B_OK)
 		return status;
 
-	if (!fName)
+	if (fName == NULL)
 		return B_OK;
+
 	return data->AddString(kArchiveNameField, fName);
 }
 
 
 void
-BHandler::MessageReceived(BMessage *message)
+BHandler::MessageReceived(BMessage* message)
 {
 	BMessage reply(B_REPLY);
 
@@ -202,8 +203,10 @@ BHandler::MessageReceived(BMessage *message)
 			BMessenger target;
 			uint32 what;
 			if (message->FindMessenger(kObserveTarget, &target) != B_OK
-				|| message->FindInt32(B_OBSERVE_WHAT_CHANGE, (int32*)&what) != B_OK)
+				|| message->FindInt32(B_OBSERVE_WHAT_CHANGE, (int32*)&what)
+					!= B_OK) {
 				break;
+			}
 
 			ObserverList* list = _ObserverList();
 			if (list != NULL) {
@@ -220,7 +223,7 @@ BHandler::MessageReceived(BMessage *message)
 			int32 cur;
 			BMessage specifier;
 			int32 form;
-			const char *prop;
+			const char* prop;
 
 			status_t err = message->GetCurrentSpecifier(&cur, &specifier,
 				&form, &prop);
@@ -257,7 +260,8 @@ BHandler::MessageReceived(BMessage *message)
 		}
 	}
 
-	// ToDo: there is some more work needed here (someone in the know should fill in)!
+	// ToDo: there is some more work needed here
+	// (someone in the know should fill in)!
 
 	if (fNextHandler) {
 		// we need to apply the next handler's filters here, too
@@ -278,7 +282,7 @@ BHandler::MessageReceived(BMessage *message)
 }
 
 
-BLooper *
+BLooper*
 BHandler::Looper() const
 {
 	return fLooper;
@@ -286,7 +290,7 @@ BHandler::Looper() const
 
 
 void
-BHandler::SetName(const char *name)
+BHandler::SetName(const char* name)
 {
 	if (fName != NULL) {
 		free(fName);
@@ -298,7 +302,7 @@ BHandler::SetName(const char *name)
 }
 
 
-const char *
+const char*
 BHandler::Name() const
 {
 	return fName;
@@ -306,9 +310,9 @@ BHandler::Name() const
 
 
 void
-BHandler::SetNextHandler(BHandler *handler)
+BHandler::SetNextHandler(BHandler* handler)
 {
-	if (!fLooper) {
+	if (fLooper == NULL) {
 		debugger("handler must belong to looper before setting NextHandler");
 		return;
 	}
@@ -318,7 +322,7 @@ BHandler::SetNextHandler(BHandler *handler)
 		return;
 	}
 
-	if (handler && fLooper != handler->Looper()) {
+	if (handler != NULL && fLooper != handler->Looper()) {
 		debugger("The handler and its NextHandler must have the same looper");
 		return;
 	}
@@ -327,7 +331,7 @@ BHandler::SetNextHandler(BHandler *handler)
 }
 
 
-BHandler *
+BHandler*
 BHandler::NextHandler() const
 {
 	return fNextHandler;
@@ -335,10 +339,10 @@ BHandler::NextHandler() const
 
 
 void
-BHandler::AddFilter(BMessageFilter *filter)
+BHandler::AddFilter(BMessageFilter* filter)
 {
 	BLooper* looper = fLooper;
-	if (looper && !looper->IsLocked()) {
+	if (looper != NULL && !looper->IsLocked()) {
 		debugger("Owning Looper must be locked before calling SetFilterList");
 		return;
 	}
@@ -346,7 +350,7 @@ BHandler::AddFilter(BMessageFilter *filter)
 	if (looper != NULL)
 		filter->SetLooper(looper);
 
-	if (!fFilters)
+	if (fFilters == NULL)
 		fFilters = new BList;
 
 	fFilters->AddItem(filter);
@@ -354,15 +358,15 @@ BHandler::AddFilter(BMessageFilter *filter)
 
 
 bool
-BHandler::RemoveFilter(BMessageFilter *filter)
+BHandler::RemoveFilter(BMessageFilter* filter)
 {
 	BLooper* looper = fLooper;
-	if (looper && !looper->IsLocked()) {
+	if (looper != NULL && !looper->IsLocked()) {
 		debugger("Owning Looper must be locked before calling SetFilterList");
 		return false;
 	}
 
-	if (fFilters != NULL && fFilters->RemoveItem((void *)filter)) {
+	if (fFilters != NULL && fFilters->RemoveItem((void*)filter)) {
 		filter->SetLooper(NULL);
 		return true;
 	}
@@ -375,7 +379,7 @@ void
 BHandler::SetFilterList(BList* filters)
 {
 	BLooper* looper = fLooper;
-	if (looper && !looper->IsLocked()) {
+	if (looper != NULL && !looper->IsLocked()) {
 		debugger("Owning Looper must be locked before calling SetFilterList");
 		return;
 	}
@@ -389,7 +393,7 @@ BHandler::SetFilterList(BList* filters)
 	 */
 
 	// TODO: Explore issues with using BObjectList
-	if (fFilters) {
+	if (fFilters != NULL) {
 		fFilters->DoForEach(FilterDeleter);
 		delete fFilters;
 	}
@@ -397,8 +401,8 @@ BHandler::SetFilterList(BList* filters)
 	fFilters = filters;
 	if (fFilters) {
 		for (int32 i = 0; i < fFilters->CountItems(); ++i) {
-			BMessageFilter *filter =
-				static_cast<BMessageFilter *>(fFilters->ItemAt(i));
+			BMessageFilter* filter =
+				static_cast<BMessageFilter*>(fFilters->ItemAt(i));
 			if (filter != NULL)
 				filter->SetLooper(looper);
 		}
@@ -406,7 +410,7 @@ BHandler::SetFilterList(BList* filters)
 }
 
 
-BList *
+BList*
 BHandler::FilterList()
 {
 	return fFilters;
@@ -416,7 +420,7 @@ BHandler::FilterList()
 bool
 BHandler::LockLooper()
 {
-	BLooper *looper = fLooper;
+	BLooper* looper = fLooper;
 	// Locking the looper also makes sure that the looper is valid
 	if (looper != NULL && looper->Lock()) {
 		// Have we locked the right looper? That's as far as the
@@ -435,7 +439,7 @@ BHandler::LockLooper()
 status_t
 BHandler::LockLooperWithTimeout(bigtime_t timeout)
 {
-	BLooper *looper = fLooper;
+	BLooper* looper = fLooper;
 	if (looper == NULL)
 		return B_BAD_VALUE;
 
@@ -460,26 +464,26 @@ BHandler::UnlockLooper()
 }
 
 
-BHandler *
-BHandler::ResolveSpecifier(BMessage *msg, int32 index,
-	BMessage *specifier, int32 form, const char *property)
+BHandler*
+BHandler::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
 {
 	// Straight from the BeBook
 	BPropertyInfo propertyInfo(sHandlerPropInfo);
-	if (propertyInfo.FindMatch(msg, index, specifier, form, property) >= 0)
+	if (propertyInfo.FindMatch(message, index, specifier, what, property) >= 0)
 		return this;
 
 	BMessage reply(B_MESSAGE_NOT_UNDERSTOOD);
 	reply.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
 	reply.AddString("message", "Didn't understand the specifier(s)");
-	msg->SendReply(&reply);
+	message->SendReply(&reply);
 
 	return NULL;
 }
 
 
 status_t
-BHandler::GetSupportedSuites(BMessage *data)
+BHandler::GetSupportedSuites(BMessage* data)
 {
 /**
 	@note	This is the output from the original implementation (calling
@@ -507,12 +511,12 @@ BMessage: what =  (0x0, or 0)
  */
 
 	status_t err = B_OK;
-	if (!data)
+	if (data == NULL)
 		err = B_BAD_VALUE;
 
-	if (!err) {
+	if (err != B_OK) {
 		err = data->AddString("suites", "suite/vnd.Be-handler");
-		if (!err) {
+		if (err != B_OK) {
 			BPropertyInfo propertyInfo(sHandlerPropInfo);
 			err = data->AddFlat("messages", &propertyInfo);
 		}
@@ -588,24 +592,24 @@ BHandler::StopWatching(BHandler* handler, uint32 what)
 
 
 status_t
-BHandler::StopWatchingAll(BHandler *handler)
+BHandler::StopWatchingAll(BHandler* handler)
 {
 	return StopWatching(handler, B_OBSERVER_OBSERVE_ALL);
 }
 
 
 status_t
-BHandler::Perform(perform_code d, void *arg)
+BHandler::Perform(perform_code d, void* arg)
 {
 	return BArchivable::Perform(d, arg);
 }
 
 
 void
-BHandler::SendNotices(uint32 what, const BMessage *msg)
+BHandler::SendNotices(uint32 what, const BMessage* notice)
 {
 	if (fObserverList != NULL)
-		fObserverList->SendNotices(what, msg);
+		fObserverList->SendNotices(what, notice);
 }
 
 
@@ -617,7 +621,7 @@ BHandler::IsWatched() const
 
 
 void
-BHandler::_InitData(const char *name)
+BHandler::_InitData(const char* name)
 {
 	SetName(name);
 
@@ -655,14 +659,17 @@ BHandler::operator=(const BHandler &)
 
 
 void
-BHandler::SetLooper(BLooper *looper)
+BHandler::SetLooper(BLooper* looper)
 {
 	fLooper = looper;
-	gDefaultTokens.SetHandlerTarget(fToken, looper ? looper->fDirectTarget : NULL);
+	gDefaultTokens.SetHandlerTarget(fToken,
+		looper ? looper->fDirectTarget : NULL);
 
-	if (fFilters) {
-		for (int32 i = 0; i < fFilters->CountItems(); i++)
-			static_cast<BMessageFilter *>(fFilters->ItemAtFast(i))->SetLooper(looper);
+	if (fFilters != NULL) {
+		for (int32 i = 0; i < fFilters->CountItems(); i++) {
+			static_cast<BMessageFilter*>(
+				fFilters->ItemAtFast(i))->SetLooper(looper);
+		}
 	}
 }
 
@@ -700,8 +707,8 @@ ObserverList::~ObserverList()
 void
 ObserverList::_ValidateHandlers(uint32 what)
 {
-	vector<const BHandler *>& handlers = fHandlerMap[what];
-	vector<const BHandler *>::iterator iterator = handlers.begin();
+	vector<const BHandler*>& handlers = fHandlerMap[what];
+	vector<const BHandler*>::iterator iterator = handlers.begin();
 
 	while (iterator != handlers.end()) {
 		BMessenger target(*iterator);
@@ -717,9 +724,10 @@ ObserverList::_ValidateHandlers(uint32 what)
 
 
 void
-ObserverList::_SendNotices(uint32 what, BMessage* message)
+ObserverList::_SendNotices(uint32 what, BMessage* notice)
 {
-	// first iterate over the list of handlers and try to make valid messengers out of them
+	// first iterate over the list of handlers and try to make valid
+	// messengers out of them
 	_ValidateHandlers(what);
 
 	// now send it to all messengers we know
@@ -732,20 +740,20 @@ ObserverList::_SendNotices(uint32 what, BMessage* message)
 			continue;
 		}
 
-		(*iterator).SendMessage(message);
+		(*iterator).SendMessage(notice);
 		iterator++;
 	}
 }
 
 
 status_t
-ObserverList::SendNotices(uint32 what, const BMessage* message)
+ObserverList::SendNotices(uint32 what, const BMessage* notice)
 {
-	BMessage *copy = NULL;
-	if (message) {
-		copy = new BMessage(*message);
+	BMessage* copy = NULL;
+	if (notice != NULL) {
+		copy = new BMessage(*notice);
 		copy->what = B_OBSERVER_NOTICE_CHANGE;
-		copy->AddInt32(B_OBSERVE_ORIGINAL_WHAT, message->what);
+		copy->AddInt32(B_OBSERVE_ORIGINAL_WHAT, notice->what);
 	} else
 		copy = new BMessage(B_OBSERVER_NOTICE_CHANGE);
 
@@ -755,12 +763,13 @@ ObserverList::SendNotices(uint32 what, const BMessage* message)
 	_SendNotices(B_OBSERVER_OBSERVE_ALL, copy);
 
 	delete copy;
+
 	return B_OK;
 }
 
 
 status_t
-ObserverList::Add(const BHandler *handler, uint32 what)
+ObserverList::Add(const BHandler* handler, uint32 what)
 {
 	if (handler == NULL)
 		return B_BAD_HANDLER;
@@ -802,7 +811,7 @@ ObserverList::Add(const BMessenger &messenger, uint32 what)
 
 
 status_t
-ObserverList::Remove(const BHandler *handler, uint32 what)
+ObserverList::Remove(const BHandler* handler, uint32 what)
 {
 	if (handler == NULL)
 		return B_BAD_HANDLER;
@@ -858,9 +867,8 @@ ObserverList::IsEmpty()
 
 
 bool
-FilterDeleter(void *_filter)
+FilterDeleter(void* _filter)
 {
-	delete static_cast<BMessageFilter *>(_filter);
+	delete static_cast<BMessageFilter*>(_filter);
 	return false;
 }
-

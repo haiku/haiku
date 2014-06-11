@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -115,7 +115,7 @@ BMessageFilter::FiltersAnyCommand() const
 }
 
 
-BLooper *
+BLooper*
 BMessageFilter::Looper() const
 {
 	return fLooper;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,7 +7,8 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/**	Queue for holding BMessages */
+
+// Queue for holding BMessages
 
 
 #include <MessageQueue.h>
@@ -18,9 +19,9 @@
 BMessageQueue::BMessageQueue()
 	:
 	fHead(NULL),
- 	fTail(NULL),
- 	fMessageCount(0),
- 	fLock("BMessageQueue Lock")
+	fTail(NULL),
+	fMessageCount(0),
+	fLock("BMessageQueue Lock")
 {
 }
 
@@ -32,7 +33,7 @@ BMessageQueue::~BMessageQueue()
 
 	BMessage* message = fHead;
 	while (message != NULL) {
-		BMessage *next = message->fQueueLink;
+		BMessage* next = message->fQueueLink;
 
 		delete message;
 		message = next;
@@ -111,7 +112,7 @@ BMessageQueue::IsEmpty() const
 }
 
 
-BMessage *
+BMessage*
 BMessageQueue::FindMessage(int32 index) const
 {
 	BAutolock _(fLock);
@@ -120,7 +121,7 @@ BMessageQueue::FindMessage(int32 index) const
 
 	if (index < 0 || index >= fMessageCount)
 		return NULL;
-	
+
 	for (BMessage* message = fHead; message != NULL; message = message->fQueueLink) {
 		// If the index reaches zero, then we have found a match.
 		if (index == 0)
@@ -133,7 +134,7 @@ BMessageQueue::FindMessage(int32 index) const
 }
 
 
-BMessage *
+BMessage*
 BMessageQueue::FindMessage(uint32 what, int32 index) const
 {
 	BAutolock _(fLock);
@@ -178,7 +179,7 @@ BMessageQueue::IsLocked() const
 }
 
 
-BMessage *
+BMessage*
 BMessageQueue::NextMessage()
 {
 	BAutolock _(fLock);
@@ -201,7 +202,7 @@ BMessageQueue::NextMessage()
 		fTail = NULL;
 	}
 
-    return head;
+	return head;
 }
 
 
@@ -213,10 +214,8 @@ BMessageQueue::IsNextMessage(const BMessage* message) const
 }
 
 
-/*!
-	\brief This method is only here for R5 binary compatibility!
-		It should be dropped as soon as possible (it misses the const qualifier).
-*/
+// This method is only here for R5 binary compatibility!
+// It should be dropped as soon as possible (it misses the const qualifier).
 bool
 BMessageQueue::IsLocked()
 {

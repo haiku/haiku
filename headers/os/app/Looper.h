@@ -1,9 +1,9 @@
 /*
- * Copyright 2001-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Erik Jaesler (erik@cgsoftware.com)
+ *		Erik Jaesler, erik@cgsoftware.com
  */
 #ifndef _LOOPER_H
 #define _LOOPER_H
@@ -30,7 +30,7 @@ class BLooper : public BHandler {
 public:
 							BLooper(const char* name = NULL,
 								int32 priority = B_NORMAL_PRIORITY,
-								int32 port_capacity
+								int32 portCapacity
 									= B_LOOPER_PORT_DEFAULT_CAPACITY);
 	virtual					~BLooper();
 
@@ -86,8 +86,8 @@ public:
 			sem_id			Sem() const;
 
 	// Scripting
-	virtual BHandler*		ResolveSpecifier(BMessage* msg, int32 index,
-								BMessage* specifier, int32 form,
+	virtual BHandler*		ResolveSpecifier(BMessage* message, int32 index,
+								BMessage* specifier, int32 what,
 								const char* property);
 	virtual status_t		GetSupportedSuites(BMessage* data);
 

@@ -1,11 +1,11 @@
 /*
- * Copyright 2001-2012, Haiku.
+ * Copyright 2001-2014 Haiku, inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Erik Jaesler (erik@cgsoftware.com)
- * 		Jerome Duval
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Jerome Duval
+ *		Erik Jaesler, erik@cgsoftware.com
  */
 
 
@@ -51,11 +51,11 @@
 using namespace BPrivate;
 
 
-BApplication *be_app = NULL;
+BApplication* be_app = NULL;
 BMessenger be_app_messenger;
 
 pthread_once_t sAppResourcesInitOnce = PTHREAD_ONCE_INIT;
-BResources *BApplication::sAppResources = NULL;
+BResources* BApplication::sAppResources = NULL;
 
 
 enum {
@@ -66,6 +66,7 @@ enum {
 	kLooperByName,
 	kApplication
 };
+
 
 static property_info sPropertyInfo[] = {
 	{
@@ -161,9 +162,10 @@ static property_info sPropertyInfo[] = {
 	{}
 };
 
+
 // argc/argv
 extern const int __libc_argc;
-extern const char * const *__libc_argv;
+extern const char* const *__libc_argv;
 
 
 // debugging
@@ -172,42 +174,116 @@ extern const char * const *__libc_argv;
 #define OUT	printf
 
 
-// prototypes of helper functions
-static const char* looper_name_for(const char *signature);
-static status_t check_app_signature(const char *signature);
+//	#pragma mark - static helper functions
+
+
+/*!
+	\brief Checks whether the supplied string is a valid application signature.
+
+	An error message is printed, if the string is no valid app signature.
+
+	\param signature The string to be checked.
+
+	\return A status code.
+	\retval B_OK \a signature is a valid app signature.
+	\retval B_BAD_VALUE \a signature is \c NULL or no valid app signature.
+*/
+static status_t
+check_app_signature(const char* signature)
+{
+	bool isValid = false;
+	BMimeType type(signature);
+
+	if (type.IsValid() && !type.IsSupertypeOnly()
+		&& BMimeType("application").Contains(&type)) {
+		isValid = true;
+	}
+
+	if (!isValid) {
+		printf("bad signature (%s), must begin with \"application/\" and "
+			   "can't conflict with existing registered mime types inside "
+			   "the \"application\" media type.\n", signature);
+	}
+
+	return (isValid ? B_OK : B_BAD_VALUE);
+}
+
+
+// Returns the looper name for a given signature.
+// Normally this is "AppLooperPort", but in case of the registrar it gets a
+// special name.
+static const char*
+looper_name_for(const char* signature)
+{
+	if (signature != NULL && !strcasecmp(signature, kRegistrarSignature))
+		return BPrivate::get_roster_port_name();
+
+	return "AppLooperPort";
+}
+
+
 #ifndef RUN_WITHOUT_REGISTRAR
-static void fill_argv_message(BMessage &message);
+// Fills the passed BMessage with B_ARGV_RECEIVED infos.
+static void
+fill_argv_message(BMessage &message)
+{
+	message.what = B_ARGV_RECEIVED;
+
+	int32 argc = __libc_argc;
+	const char* const *argv = __libc_argv;
+
+	// add argc
+	message.AddInt32("argc", argc);
+
+	// add argv
+	for (int32 i = 0; i < argc; i++) {
+		if (argv[i] != NULL)
+			message.AddString("argv", argv[i]);
+	}
+
+	// add current working directory
+	char cwd[B_PATH_NAME_LENGTH];
+	if (getcwd(cwd, B_PATH_NAME_LENGTH))
+		message.AddString("cwd", cwd);
+}
 #endif
 
 
-BApplication::BApplication(const char *signature)
-	: BLooper(looper_name_for(signature))
+//	#pragma mark - BApplication
+
+
+BApplication::BApplication(const char* signature)
+	:
+	BLooper(looper_name_for(signature))
 {
 	_InitData(signature, true, NULL);
 }
 
 
-BApplication::BApplication(const char *signature, status_t *_error)
-	: BLooper(looper_name_for(signature))
+BApplication::BApplication(const char* signature, status_t* _error)
+	:
+	BLooper(looper_name_for(signature))
 {
 	_InitData(signature, true, _error);
 }
 
 
-BApplication::BApplication(const char *signature, bool initGUI,
-		status_t *_error)
-	: BLooper(looper_name_for(signature))
+BApplication::BApplication(const char* signature, bool initGUI,
+	status_t* _error)
+	:
+	BLooper(looper_name_for(signature))
 {
 	_InitData(signature, initGUI, _error);
 }
 
 
-BApplication::BApplication(BMessage *data)
-	// Note: BeOS calls the private BLooper(int32, port_id, const char *)
+BApplication::BApplication(BMessage* data)
+	// Note: BeOS calls the private BLooper(int32, port_id, const char*)
 	// constructor here, test if it's needed
-	: BLooper(looper_name_for(NULL))
+	:
+	BLooper(looper_name_for(NULL))
 {
-	const char *signature = NULL;
+	const char* signature = NULL;
 	data->FindString("mime_sig", &signature);
 
 	_InitData(signature, true, NULL);
@@ -260,7 +336,7 @@ BApplication::~BApplication()
 }
 
 
-BApplication &
+BApplication&
 BApplication::operator=(const BApplication &rhs)
 {
 	return *this;
@@ -268,7 +344,7 @@ BApplication::operator=(const BApplication &rhs)
 
 
 void
-BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
+BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 {
 	DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 	// check whether there exists already an application
@@ -291,7 +367,7 @@ BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
 
 #ifndef RUN_WITHOUT_REGISTRAR
 	bool isRegistrar = signature
-		&& !strcasecmp(signature, kRegistrarSignature);
+		&& strcasecmp(signature, kRegistrarSignature) == 0;
 	// get team and thread
 	team_id team = Team();
 	thread_id thread = BPrivate::main_thread_for(team);
@@ -380,8 +456,9 @@ BApplication::_InitData(const char *signature, bool initGUI, status_t *_error)
 				BMessenger otherApp(NULL, otherTeam);
 				app_info otherAppInfo;
 				if (__libc_argc > 1
-					&& be_roster->GetRunningAppInfo(otherTeam, &otherAppInfo) == B_OK
-					&& !(otherAppInfo.flags & B_ARGV_ONLY)) {
+					&& be_roster->GetRunningAppInfo(otherTeam, &otherAppInfo)
+						== B_OK
+					&& (otherAppInfo.flags & B_ARGV_ONLY) != 0) {
 					// create an B_ARGV_RECEIVED message
 					BMessage argvMessage(B_ARGV_RECEIVED);
 					fill_argv_message(argvMessage);
@@ -457,8 +534,8 @@ DBG(OUT("BApplication::InitData() done\n"));
 }
 
 
-BArchivable *
-BApplication::Instantiate(BMessage *data)
+BArchivable*
+BApplication::Instantiate(BMessage* data)
 {
 	if (validate_instantiation(data, "BApplication"))
 		return new BApplication(data);
@@ -468,7 +545,7 @@ BApplication::Instantiate(BMessage *data)
 
 
 status_t
-BApplication::Archive(BMessage *data, bool deep) const
+BApplication::Archive(BMessage* data, bool deep) const
 {
 	status_t status = BLooper::Archive(data, deep);
 	if (status < B_OK)
@@ -520,9 +597,10 @@ BApplication::Quit()
 {
 	bool unlock = false;
 	if (!IsLocked()) {
-		const char *name = Name();
-		if (!name)
+		const char* name = Name();
+		if (name == NULL)
 			name = "no-name";
+
 		printf("ERROR - you must Lock the application object before calling "
 			   "Quit(), team=%" B_PRId32 ", looper=%s\n", Team(), name);
 		unlock = true;
@@ -551,6 +629,7 @@ BApplication::Quit()
 		// message dispatching loop and return from Run().
 		fTerminating = true;
 	}
+
 	// If we had to lock the object, unlock now.
 	if (unlock)
 		Unlock();
@@ -579,7 +658,7 @@ BApplication::ReadyToRun()
 
 
 void
-BApplication::MessageReceived(BMessage *message)
+BApplication::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_COUNT_PROPERTIES:
@@ -589,10 +668,13 @@ BApplication::MessageReceived(BMessage *message)
 			int32 index;
 			BMessage specifier;
 			int32 what;
-			const char *property = NULL;
-			if (message->GetCurrentSpecifier(&index, &specifier, &what, &property) < B_OK
-				|| !ScriptReceived(message, index, &specifier, what, property))
+			const char* property = NULL;
+			if (message->GetCurrentSpecifier(&index, &specifier, &what,
+					&property) < B_OK
+				|| !ScriptReceived(message, index, &specifier, what,
+					property)) {
 				BLooper::MessageReceived(message);
+			}
 			break;
 		}
 
@@ -619,13 +701,12 @@ BApplication::MessageReceived(BMessage *message)
 
 		default:
 			BLooper::MessageReceived(message);
-			break;
 	}
 }
 
 
 void
-BApplication::ArgvReceived(int32 argc, char **argv)
+BApplication::ArgvReceived(int32 argc, char** argv)
 {
 	// supposed to be implemented by subclasses
 }
@@ -639,7 +720,7 @@ BApplication::AppActivated(bool active)
 
 
 void
-BApplication::RefsReceived(BMessage *message)
+BApplication::RefsReceived(BMessage* message)
 {
 	// supposed to be implemented by subclasses
 }
@@ -650,16 +731,16 @@ BApplication::AboutRequested()
 {
 	thread_info info;
 	if (get_thread_info(Thread(), &info) == B_OK) {
-		BAlert *alert = new BAlert("_about_", info.name, "OK");
+		BAlert* alert = new BAlert("_about_", info.name, "OK");
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 	}
 }
 
 
-BHandler *
-BApplication::ResolveSpecifier(BMessage *message, int32 index,
-	BMessage *specifier, int32 what, const char *property)
+BHandler*
+BApplication::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
 {
 	BPropertyInfo propInfo(sPropertyInfo);
 	status_t err = B_OK;
@@ -677,7 +758,7 @@ BApplication::ResolveSpecifier(BMessage *message, int32 index,
 				if (what == B_REVERSE_INDEX_SPECIFIER)
 					index = CountWindows() - index;
 
-				BWindow *window = WindowAt(index);
+				BWindow* window = WindowAt(index);
 				if (window != NULL) {
 					message->PopSpecifier();
 					BMessenger(window).SendMessage(message);
@@ -688,18 +769,19 @@ BApplication::ResolveSpecifier(BMessage *message, int32 index,
 
 			case kWindowByName:
 			{
-				const char *name;
+				const char* name;
 				err = specifier->FindString("name", &name);
 				if (err != B_OK)
 					break;
 
 				for (int32 i = 0;; i++) {
-					BWindow *window = WindowAt(i);
+					BWindow* window = WindowAt(i);
 					if (window == NULL) {
 						err = B_NAME_NOT_FOUND;
 						break;
 					}
-					if (window->Title() != NULL && !strcmp(window->Title(), name)) {
+					if (window->Title() != NULL && !strcmp(window->Title(),
+							name)) {
 						message->PopSpecifier();
 						BMessenger(window).SendMessage(message);
 						break;
@@ -718,12 +800,13 @@ BApplication::ResolveSpecifier(BMessage *message, int32 index,
 				if (what == B_REVERSE_INDEX_SPECIFIER)
 					index = CountLoopers() - index;
 
-				BLooper *looper = LooperAt(index);
+				BLooper* looper = LooperAt(index);
 				if (looper != NULL) {
 					message->PopSpecifier();
 					BMessenger(looper).SendMessage(message);
 				} else
 					err = B_BAD_INDEX;
+
 				break;
 			}
 
@@ -733,18 +816,19 @@ BApplication::ResolveSpecifier(BMessage *message, int32 index,
 
 			case kLooperByName:
 			{
-				const char *name;
+				const char* name;
 				err = specifier->FindString("name", &name);
 				if (err != B_OK)
 					break;
 
 				for (int32 i = 0;; i++) {
-					BLooper *looper = LooperAt(i);
+					BLooper* looper = LooperAt(i);
 					if (looper == NULL) {
 						err = B_NAME_NOT_FOUND;
 						break;
 					}
-					if (looper->Name() != NULL && !strcmp(looper->Name(), name)) {
+					if (looper->Name() != NULL
+						&& strcmp(looper->Name(), name) == 0) {
 						message->PopSpecifier();
 						BMessenger(looper).SendMessage(message);
 						break;
@@ -813,7 +897,7 @@ BApplication::IsCursorHidden() const
 
 
 void
-BApplication::SetCursor(const void *cursorData)
+BApplication::SetCursor(const void* cursorData)
 {
 	BCursor cursor(cursorData);
 	SetCursor(&cursor, true);
@@ -822,7 +906,7 @@ BApplication::SetCursor(const void *cursorData)
 
 
 void
-BApplication::SetCursor(const BCursor *cursor, bool sync)
+BApplication::SetCursor(const BCursor* cursor, bool sync)
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_SET_CURSOR);
@@ -845,7 +929,7 @@ BApplication::CountWindows() const
 }
 
 
-BWindow *
+BWindow*
 BApplication::WindowAt(int32 index) const
 {
 	return _WindowAt(index, false);
@@ -865,10 +949,10 @@ BApplication::CountLoopers() const
 }
 
 
-BLooper *
+BLooper*
 BApplication::LooperAt(int32 index) const
 {
-	BLooper *looper = NULL;
+	BLooper* looper = NULL;
 	AutoLocker<BLooperList> listLock(gLooperList);
 	if (listLock.IsLocked())
 		looper = gLooperList.LooperAt(index);
@@ -885,7 +969,7 @@ BApplication::IsLaunching() const
 
 
 status_t
-BApplication::GetAppInfo(app_info *info) const
+BApplication::GetAppInfo(app_info* info) const
 {
 	if (be_app == NULL || be_roster == NULL)
 		return B_NO_INIT;
@@ -893,7 +977,7 @@ BApplication::GetAppInfo(app_info *info) const
 }
 
 
-BResources *
+BResources*
 BApplication::AppResources()
 {
 	if (sAppResources == NULL)
@@ -904,7 +988,7 @@ BApplication::AppResources()
 
 
 void
-BApplication::DispatchMessage(BMessage *message, BHandler *handler)
+BApplication::DispatchMessage(BMessage* message, BHandler* handler)
 {
 	if (handler != this) {
 		// it's not ours to dispatch
@@ -1025,9 +1109,9 @@ BApplication::SetPulseRate(bigtime_t rate)
 
 
 status_t
-BApplication::GetSupportedSuites(BMessage *data)
+BApplication::GetSupportedSuites(BMessage* data)
 {
-	if (!data)
+	if (data == NULL)
 		return B_BAD_VALUE;
 
 	status_t status = data->AddString("suites", "suite/vnd.Be-application");
@@ -1043,7 +1127,7 @@ BApplication::GetSupportedSuites(BMessage *data)
 
 
 status_t
-BApplication::Perform(perform_code d, void *arg)
+BApplication::Perform(perform_code d, void* arg)
 {
 	return BLooper::Perform(d, arg);
 }
@@ -1060,8 +1144,8 @@ void BApplication::_ReservedApplication8() {}
 
 
 bool
-BApplication::ScriptReceived(BMessage *message, int32 index,
-	BMessage *specifier, int32 what, const char *property)
+BApplication::ScriptReceived(BMessage* message, int32 index,
+	BMessage* specifier, int32 what, const char* property)
 {
 	BMessage reply(B_REPLY);
 	status_t err = B_BAD_SCRIPT_SYNTAX;
@@ -1091,19 +1175,23 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 						err = specifier->FindInt32("index", &index);
 						if (err != B_OK)
 							break;
+
 						if (what == B_REVERSE_INDEX_SPECIFIER)
 							index = CountWindows() - index;
+
 						err = B_BAD_INDEX;
-						BWindow *win = WindowAt(index);
-						if (!win)
+						BWindow* window = WindowAt(index);
+						if (window == NULL)
 							break;
-						BMessenger messenger(win);
+
+						BMessenger messenger(window);
 						err = reply.AddMessenger("result", messenger);
 						break;
 					}
+
 					case B_NAME_SPECIFIER:
 					{
-						const char *name;
+						const char* name;
 						err = specifier->FindString("name", &name);
 						if (err != B_OK)
 							break;
@@ -1129,27 +1217,31 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 						err = specifier->FindInt32("index", &index);
 						if (err != B_OK)
 							break;
+
 						if (what == B_REVERSE_INDEX_SPECIFIER)
 							index = CountLoopers() - index;
+
 						err = B_BAD_INDEX;
-						BLooper *looper = LooperAt(index);
-						if (!looper)
+						BLooper* looper = LooperAt(index);
+						if (looper == NULL)
 							break;
+
 						BMessenger messenger(looper);
 						err = reply.AddMessenger("result", messenger);
 						break;
 					}
+
 					case B_NAME_SPECIFIER:
 					{
-						const char *name;
+						const char* name;
 						err = specifier->FindString("name", &name);
 						if (err != B_OK)
 							break;
 						err = B_NAME_NOT_FOUND;
 						for (int32 i = 0; i < CountLoopers(); i++) {
-							BLooper *looper = LooperAt(i);
-							if (looper && looper->Name()
-								&& !strcmp(looper->Name(), name)) {
+							BLooper* looper = LooperAt(i);
+							if (looper != NULL && looper->Name()
+								&& strcmp(looper->Name(), name) == 0) {
 								BMessenger messenger(looper);
 								err = reply.AddMessenger("result", messenger);
 								break;
@@ -1157,6 +1249,7 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 						}
 						break;
 					}
+
 					case B_ID_SPECIFIER:
 					{
 						// TODO
@@ -1164,16 +1257,17 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 						break;
 					}
 				}
-			} else if (strcmp("Name", property) == 0) {
+			} else if (strcmp("Name", property) == 0)
 				err = reply.AddString("result", Name());
-			}
+
 			break;
+
 		case B_COUNT_PROPERTIES:
-			if (strcmp("Looper", property) == 0) {
+			if (strcmp("Looper", property) == 0)
 				err = reply.AddInt32("result", CountLoopers());
-			} else if (strcmp("Window", property) == 0) {
+			else if (strcmp("Window", property) == 0)
 				err = reply.AddInt32("result", CountWindows());
-			}
+
 			break;
 	}
 	if (err == B_BAD_SCRIPT_SYNTAX)
@@ -1185,6 +1279,7 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 	}
 	reply.AddInt32("error", err);
 	message->SendReply(&reply);
+
 	return true;
 }
 
@@ -1261,7 +1356,7 @@ BApplication::_ConnectToServer()
 	// 2) port_id - looper port for this BApplication
 	// 3) team_id - team identification field
 	// 4) int32 - handler ID token of the app
-	// 5) char * - signature of the regular app
+	// 5) char* - signature of the regular app
 
 	fServerLink->StartMessage(AS_CREATE_APP);
 	fServerLink->Attach<port_id>(fServerLink->ReceiverPort());
@@ -1301,6 +1396,7 @@ BApplication::_ConnectToServer()
 		return status;
 
 	fServerReadOnlyMemory = base;
+
 	return B_OK;
 }
 
@@ -1335,34 +1431,35 @@ BApplication::_ReconnectToServer()
 
 #if 0
 void
-BApplication::send_drag(BMessage *message, int32 vs_token, BPoint offset,
-	BRect dragRect, BHandler *replyTo)
+BApplication::send_drag(BMessage* message, int32 vs_token, BPoint offset,
+	BRect dragRect, BHandler* replyTo)
 {
 	// TODO: implement
 }
 
 
 void
-BApplication::send_drag(BMessage *message, int32 vs_token, BPoint offset,
-	int32 bitmapToken, drawing_mode dragMode, BHandler *replyTo)
+BApplication::send_drag(BMessage* message, int32 vs_token, BPoint offset,
+	int32 bitmapToken, drawing_mode dragMode, BHandler* replyTo)
 {
 	// TODO: implement
 }
 
 
 void
-BApplication::write_drag(_BSession_ *session, BMessage *message)
+BApplication::write_drag(_BSession_* session, BMessage* message)
 {
 	// TODO: implement
 }
 #endif
+
 
 bool
 BApplication::_WindowQuitLoop(bool quitFilePanels, bool force)
 {
 	int32 index = 0;
 	while (true) {
-		 BWindow *window = WindowAt(index);
+		 BWindow* window = WindowAt(index);
 		 if (window == NULL)
 		 	break;
 
@@ -1397,6 +1494,7 @@ BApplication::_WindowQuitLoop(bool quitFilePanels, bool force)
 			// we need to continue at the start of the list again - it
 			// might have changed
 	}
+
 	return true;
 }
 
@@ -1421,14 +1519,14 @@ BApplication::_QuitAllWindows(bool force)
 
 
 void
-BApplication::_ArgvReceived(BMessage *message)
+BApplication::_ArgvReceived(BMessage* message)
 {
 	ASSERT(message != NULL);
 
 	// build the argv vector
 	status_t error = B_OK;
 	int32 argc = 0;
-	char **argv = NULL;
+	char** argv = NULL;
 	if (message->FindInt32("argc", &argc) == B_OK && argc > 0) {
 		// allocate a NULL terminated array
 		argv = new(std::nothrow) char*[argc + 1];
@@ -1437,7 +1535,7 @@ BApplication::_ArgvReceived(BMessage *message)
 
 		// copy the arguments
 		for (int32 i = 0; error == B_OK && i < argc; i++) {
-			const char *arg = NULL;
+			const char* arg = NULL;
 			error = message->FindString("argv", i, &arg);
 			if (error == B_OK && arg) {
 				argv[i] = strdup(arg);
@@ -1482,7 +1580,7 @@ BApplication::_CountWindows(bool includeMenus) const
 	for (int32 i = 0; i < gLooperList.CountLoopers(); i++) {
 		BWindow* window = dynamic_cast<BWindow*>(gLooperList.LooperAt(i));
 		if (window != NULL && !window->fOffscreen && (includeMenus
-				|| dynamic_cast<BMenuWindow *>(window) == NULL)) {
+				|| dynamic_cast<BMenuWindow*>(window) == NULL)) {
 			count++;
 		}
 	}
@@ -1491,7 +1589,7 @@ BApplication::_CountWindows(bool includeMenus) const
 }
 
 
-BWindow *
+BWindow*
 BApplication::_WindowAt(uint32 index, bool includeMenus) const
 {
 	AutoLocker<BLooperList> listLock(gLooperList);
@@ -1502,7 +1600,7 @@ BApplication::_WindowAt(uint32 index, bool includeMenus) const
 	for (uint32 i = 0; i < count && index < count; i++) {
 		BWindow* window = dynamic_cast<BWindow*>(gLooperList.LooperAt(i));
 		if (window == NULL || (window != NULL && window->fOffscreen)
-			|| (!includeMenus && dynamic_cast<BMenuWindow *>(window) != NULL)) {
+			|| (!includeMenus && dynamic_cast<BMenuWindow*>(window) != NULL)) {
 			index++;
 			continue;
 		}
@@ -1547,81 +1645,3 @@ BApplication::_InitAppResources()
 
 	sAppResources = resources;
 }
-
-
-//	#pragma mark -
-
-
-/*!
-	\brief Checks whether the supplied string is a valid application signature.
-
-	An error message is printed, if the string is no valid app signature.
-
-	\param signature The string to be checked.
-	\return
-	- \c B_OK: \a signature is a valid app signature.
-	- \c B_BAD_VALUE: \a signature is \c NULL or no valid app signature.
-*/
-static status_t
-check_app_signature(const char *signature)
-{
-	bool isValid = false;
-	BMimeType type(signature);
-	if (type.IsValid() && !type.IsSupertypeOnly()
-		&& BMimeType("application").Contains(&type)) {
-		isValid = true;
-	}
-	if (!isValid) {
-		printf("bad signature (%s), must begin with \"application/\" and "
-			   "can't conflict with existing registered mime types inside "
-			   "the \"application\" media type.\n", signature);
-	}
-	return (isValid ? B_OK : B_BAD_VALUE);
-}
-
-
-/*!
-	\brief Returns the looper name for a given signature.
-
-	Normally this is "AppLooperPort", but in case of the registrar a
-	special name.
-
-	\return The looper name.
-*/
-static const char *
-looper_name_for(const char *signature)
-{
-	if (signature && !strcasecmp(signature, kRegistrarSignature))
-		return BPrivate::get_roster_port_name();
-	return "AppLooperPort";
-}
-
-
-/*!
-	\brief Fills the passed BMessage with B_ARGV_RECEIVED infos.
-*/
-#ifndef RUN_WITHOUT_REGISTRAR
-static void
-fill_argv_message(BMessage &message)
-{
-   	message.what = B_ARGV_RECEIVED;
-
-	int32 argc = __libc_argc;
-	const char * const *argv = __libc_argv;
-
-	// add argc
-	message.AddInt32("argc", argc);
-
-	// add argv
-	for (int32 i = 0; i < argc; i++) {
-		if (argv[i] != NULL)
-			message.AddString("argv", argv[i]);
-	}
-
-	// add current working directory
-	char cwd[B_PATH_NAME_LENGTH];
-	if (getcwd(cwd, B_PATH_NAME_LENGTH))
-		message.AddString("cwd", cwd);
-}
-#endif
-
