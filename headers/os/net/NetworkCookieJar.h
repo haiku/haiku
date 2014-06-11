@@ -91,7 +91,7 @@ private:
 
 class BNetworkCookieJar::Iterator {
 public:
-								Iterator(const BNetworkCookieJar* map);
+								Iterator(const Iterator& other);
 								~Iterator();
 
 			Iterator& 			operator=(const Iterator& other);
@@ -103,7 +103,7 @@ public:
 			void				RemoveDomain();
 
 private:
-								Iterator(const Iterator& other);
+								Iterator(const BNetworkCookieJar* map);
 
 			void 				_FindNext();
 
