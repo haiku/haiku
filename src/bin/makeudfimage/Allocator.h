@@ -10,10 +10,11 @@
 	Physical block allocator class declarations.
 */
 
-#ifndef _ALLOCATOR_H
-#define _ALLOCATOR_H
+#ifndef _UDF_ALLOCATOR_H
+#define _UDF_ALLOCATOR_H
 
 #include <list>
+using std::list;
 
 #include "UdfStructures.h"
 
@@ -49,4 +50,4 @@ private:
 	status_t fInitStatus;
 };
 
-#endif	// _ALLOCATOR_H
+#endif	// _UDF_ALLOCATOR_H
