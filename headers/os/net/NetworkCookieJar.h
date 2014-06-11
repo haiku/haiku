@@ -5,16 +5,28 @@
 #ifndef _B_NETWORK_COOKIE_JAR_H_
 #define _B_NETWORK_COOKIE_JAR_H_
 
+#include <pthread.h>
+
 #include <Archivable.h>
 #include <Flattenable.h>
 #include <Message.h>
-#include <ObjectList.h>
 #include <NetworkCookie.h>
+#include <ObjectList.h>
 #include <String.h>
 #include <Url.h>
 
 
-typedef BObjectList<BNetworkCookie> BNetworkCookieList;
+class BNetworkCookieList: public BObjectList<const BNetworkCookie> {
+public:
+								BNetworkCookieList();
+								~BNetworkCookieList();
+
+			status_t			LockForReading();
+			status_t			LockForWriting();
+			status_t			Unlock();
+private:
+			pthread_rwlock_t	fLock;
+};
 
 
 class BNetworkCookieJar : public BArchivable, public BFlattenable {
@@ -79,18 +91,19 @@ private:
 
 class BNetworkCookieJar::Iterator {
 public:
-								Iterator(const Iterator& other);
+								Iterator(const BNetworkCookieJar* map);
 								~Iterator();
 
-			bool 				HasNext() const;
-			BNetworkCookie*		Next();
-			BNetworkCookie*		NextDomain();
-			BNetworkCookie*		Remove();
-			void				RemoveDomain();
 			Iterator& 			operator=(const Iterator& other);
 
+			bool 				HasNext() const;
+	const	BNetworkCookie*		Next();
+	const	BNetworkCookie*		NextDomain();
+	const	BNetworkCookie*		Remove();
+			void				RemoveDomain();
+
 private:
-								Iterator(const BNetworkCookieJar* map);
+								Iterator(const Iterator& other);
 
 			void 				_FindNext();
 
@@ -101,26 +114,29 @@ private:
 			PrivateIterator*	fIterator;
 			BNetworkCookieList* fLastList;
 			BNetworkCookieList*	fList;
-			BNetworkCookie*		fElement;
-			BNetworkCookie*		fLastElement;
+	const	BNetworkCookie*		fElement;
+	const	BNetworkCookie*		fLastElement;
 			int32				fIndex;
 };
 
 
+// The copy constructor and assignment operator create new iterators for the
+// same cookie jar and url. Iteration will start over.
 class BNetworkCookieJar::UrlIterator {
 public:
 								UrlIterator(const UrlIterator& other);
 								~UrlIterator();
 
 			bool 				HasNext() const;
-			BNetworkCookie*		Next();
-			BNetworkCookie*		Remove();
+	const	BNetworkCookie*		Next();
+	const	BNetworkCookie*		Remove();
 			UrlIterator& 		operator=(const UrlIterator& other);
 
 private:
 								UrlIterator(const BNetworkCookieJar* map,
 									const BUrl& url);
 
+			void				_Initialize();
 			bool				_SuperDomain();
 			void 				_FindNext();
 			void				_FindDomain();
@@ -133,8 +149,8 @@ private:
 			PrivateIterator*	fIterator;
 			BNetworkCookieList*	fList;
 			BNetworkCookieList* fLastList;
-			BNetworkCookie*		fElement;
-			BNetworkCookie*		fLastElement;
+	const	BNetworkCookie*		fElement;
+	const	BNetworkCookie*		fLastElement;
 
 			int32				fIndex;
 			int32				fLastIndex;

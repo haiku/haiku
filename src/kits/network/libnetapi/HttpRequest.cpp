@@ -972,7 +972,7 @@ BHttpRequest::_SendHeaders()
 
 		BNetworkCookieJar::UrlIterator iterator
 			= fContext->GetCookieJar().GetUrlIterator(fUrl);
-		BNetworkCookie* cookie = iterator.Next();
+		const BNetworkCookie* cookie = iterator.Next();
 		if (cookie != NULL) {
 			while (true) {
 				cookieString << cookie->RawCookie(false);

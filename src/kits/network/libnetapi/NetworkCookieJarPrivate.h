@@ -5,10 +5,14 @@
 #ifndef _B_NETWORK_COOKIE_JAR_PRIVATE_H_
 #define _B_NETWORK_COOKIE_JAR_PRIVATE_H_
 
-typedef BPrivate::HashMap<HashString, BNetworkCookieList*> BNetworkCookieHashMap;
 
-struct BNetworkCookieJar::PrivateHashMap {
-	BNetworkCookieHashMap		fHashMap;
+#include <HashMap.h>
+
+
+typedef BPrivate::SynchronizedHashMap<HashString, BNetworkCookieList*>
+	BNetworkCookieHashMap;
+
+struct BNetworkCookieJar::PrivateHashMap : public BNetworkCookieHashMap {
 };
 
 struct BNetworkCookieJar::PrivateIterator {
