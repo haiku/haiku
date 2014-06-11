@@ -349,12 +349,12 @@ class BUnicodeChar {
 		static int32 DigitValue(uint32 c);
 		static unicode_east_asian_width EastAsianWidth(uint32 c);
 
-		static void ToUTF8(uint32 c, char **out);
-		static uint32 FromUTF8(const char **in);
-		static uint32 FromUTF8(const char *in);
+		static void ToUTF8(uint32 c, char** out);
+		static uint32 FromUTF8(const char** in);
+		static uint32 FromUTF8(const char* in);
 
-		static size_t UTF8StringLength(const char *str);
-		static size_t UTF8StringLength(const char *str, size_t maxLength);
+		static size_t UTF8StringLength(const char* string);
+		static size_t UTF8StringLength(const char* string, size_t maxLength);
 
 	private:
 		BUnicodeChar();
@@ -362,9 +362,9 @@ class BUnicodeChar {
 
 
 inline uint32
-BUnicodeChar::FromUTF8(const char *in)
+BUnicodeChar::FromUTF8(const char* in)
 {
-	const char *string = in;
+	const char* string = in;
 	return FromUTF8(&string);
 }
 

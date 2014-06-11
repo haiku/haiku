@@ -241,7 +241,7 @@ BUnicodeChar::EastAsianWidth(uint32 c)
 
 
 void
-BUnicodeChar::ToUTF8(uint32 c, char **out)
+BUnicodeChar::ToUTF8(uint32 c, char** out)
 {
 	int i = 0;
 	U8_APPEND_UNSAFE(*out, i, c);
@@ -250,7 +250,7 @@ BUnicodeChar::ToUTF8(uint32 c, char **out)
 
 
 uint32
-BUnicodeChar::FromUTF8(const char **in)
+BUnicodeChar::FromUTF8(const char** in)
 {
 	int i = 0;
 	uint32 c = 0;
@@ -262,11 +262,11 @@ BUnicodeChar::FromUTF8(const char **in)
 
 
 size_t
-BUnicodeChar::UTF8StringLength(const char *str)
+BUnicodeChar::UTF8StringLength(const char* string)
 {
 	size_t len = 0;
-	while (*str) {
-		FromUTF8(&str);
+	while (*string) {
+		FromUTF8(&string);
 		len++;
 	}
 	return len;
@@ -274,11 +274,11 @@ BUnicodeChar::UTF8StringLength(const char *str)
 
 
 size_t
-BUnicodeChar::UTF8StringLength(const char *str, size_t maxLength)
+BUnicodeChar::UTF8StringLength(const char* string, size_t maxLength)
 {
 	size_t len = 0;
-	while (len < maxLength && *str) {
-		FromUTF8(&str);
+	while (len < maxLength && *string) {
+		FromUTF8(&string);
 		len++;
 	}
 	return len;
