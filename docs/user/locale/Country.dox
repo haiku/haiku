@@ -33,6 +33,8 @@
 
 	Date, time, and number formatting also depends to some extent on the
 	language used so they are found in the BLocale class instead.
+
+	\since Haiku R1
 */
 
 
@@ -41,6 +43,8 @@
 	\brief Initialize a BCountry from a country code.
 
 	\param countryCode The country code to initialize from.
+
+	\since Haiku R1
 */
 
 
@@ -49,17 +53,27 @@
 	\brief Initialize a BCountry from another BCountry object.
 
 	\param other The BCountry object to initialize from.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BCountry& BCountry::operator=(const BCountry& other)
+	\brief Initialize a BCountry from another BCountry object by overloading
+	       the = operator.
+
+	\param other The BCountry object to initialize from.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BCountry::~BCountry()
 	\brief Destructor method.
+
+	\since Haiku R1
 */
 
 
@@ -74,6 +88,8 @@
 
 	\returns A status code, B_OK if everything went fine, or an error code
 	         otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -82,6 +98,8 @@
 	\brief Gets the ISO country code for the country.
 
 	\returns The ISO country code for the country.
+
+	\since Haiku R1
 */
 
 
@@ -98,4 +116,6 @@
 	\param result The BBitmap object to draw the flag into.
 
 	\returns \c B_OK if the drawing was successful.
+
+	\since Haiku R1
 */

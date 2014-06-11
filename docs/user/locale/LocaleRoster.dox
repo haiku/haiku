@@ -32,36 +32,48 @@
 	classes from the Locale Kit can be constructed on their own, but only the
 	Locale Roster allows you to do so while taking account of the user's locale
 	settings.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BLocaleRoster::BLocaleRoster()
 	\brief Constructor. Does nothing.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BLocaleRoster::~BLocaleRoster()
 	\brief Destructor. Does nothing.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BLocaleRoster* BLocaleRoster::Default()
 	\brief Returns default BLocalRoster.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BLocaleRoster::Refresh()
 	\brief Refreshes the BLocalRoster.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BLocaleRoster::GetDefaultTimeZone(BTimeZone* timezone) const
 	\brief Get the default timezone.
+
+	\since Haiku R1
 */
 
 
@@ -69,6 +81,8 @@
 	\fn status_t BLocaleRoster::GetLanguage(const char* languagecode,
 		BLanguage** _language) const
 	\brief Instantiate a language from its code.
+
+	\since Haiku R1
 */
 
 
@@ -79,33 +93,41 @@
 	This function fills in the given message with one or more language string
 	fields. They constitute the ordered list of user-selected languages to use
 	for string translation.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BLocaleRoster::GetAvailableLanguages(BMessage* message) const
 	\brief Fills \c message with 'language'-fields containing the language
-		ID(s) of all available languages.
+	       ID(s) of all available languages.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BLocaleRoster::GetAvailableCountries(BMessage* message) const
 	\brief Fills in the passed in \a message with one or more 'country'
-		string fields, containing the (ISO-639) code of each country.
+	       string fields, containing the (ISO-639) code of each country.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BLocaleRoster::GetAvailableTimeZones(BMessage* timeZones) const
 	\brief Fills in the passed in \a timeZones message with all time zone
-		strings for the locale.
+	       strings for the locale.
 
 	\returns A status code.
 	\retval B_OK Everything went well.
 	\retval B_BAD_VALUE A \c NULL \a timeZones message was passed in.
 	\retval B_ERROR An error occurred trying to retrieve the localized time zone
-		strings.
+	        strings.
+
+	\since Haiku R1
 */
 
 
@@ -113,14 +135,16 @@
 	\fn status_t BLocaleRoster::GetAvailableTimeZonesForCountry(
 		BMessage* timeZones, const char* countryCode) const
 	\brief Fills in the passed in \a timeZones message with one or more
-		time zone strings containing the time zones for the
-		country specified by \a countryCode for the locale.
+	       time zone strings containing the time zones for the
+	       country specified by \a countryCode for the locale.
 
 	\returns A status code.
 	\retval B_OK Everything went well.
 	\retval B_BAD_VALUE A \c NULL \a timeZones message was passed in.
 	\retval B_ERROR An error occurred trying to retrieve the localized time
-		zones most likely due to an invalid \a countryCode.
+	        zones most likely due to an invalid \a countryCode.
+
+	\since Haiku R1
 */
 
 
@@ -134,7 +158,9 @@
 	\retval B_BAD_VALUE A \c NULL or invalid \a countryCode was passed in.
 	\retval B_ERROR Error locking the default RosterData.
 	\retval B_NAME_NOT_FOUND The flag could not be found for the
-		\a countryCode.
+	        \a countryCode.
+
+	\since Haiku R1
 */
 
 
@@ -154,7 +180,9 @@
 	\retval B_BAD_VALUE A \c NULL or invalid \a languageCode was passed in.
 	\retval B_ERROR Error locking the default RosterData.
 	\retval B_NAME_NOT_FOUND The flag could not be found for the
-		default country's flag for the \a languageCode.
+	        default country's flag for the \a languageCode.
+
+	\since Haiku R1
 */
 
 
@@ -175,6 +203,8 @@
 	\retval B_OK Everything went well.
 	\retval B_BAD_VALUE A \c NULL \a languageList message was passed in.
 	\retval B_ERROR Error locking the default RosterData.
+
+	\since Haiku R1
 */
 
 
@@ -183,6 +213,8 @@
 	\brief Returns whether or not filesystem translation is preferred.
 
 	\returns \c B_ERROR if there was an error locking the default RosterData.
+
+	\since Haiku R1
 */
 
 
@@ -205,7 +237,9 @@
 	\returns A status code.
 	\retval B_OK: success
 	\retval B_ENTRY_NOT_FOUND: failure. Attribute not found, entry not found
-		in catalog, etc.
+	        in catalog, etc.
+
+	\since Haiku R1
 */
 
 
@@ -219,16 +253,18 @@
 	specify a fingerprint. The language will be selected from the user
 	preferences.
 
-	This function is used by the Locale Kit macros. 
+	This function is used by the Locale Kit macros.
 
 	\warning This function needs the calling image to be linked with
-		liblocalestub.a
+	         liblocalestub.a
 
 	\returns The catalog, if it was loaded successfully.
 
-	\param catalog The catalog to load. The pointer location is used to identify
-		the image for which to load the catalog.
-	\param catalogInitStatus the state of the catalog. This will be set to true
-		on the first call for a given catalog, and if already true the function
-		will do nothing on subsequent calls.
+	\param catalog The catalog to load. The pointer location is used to
+	       identify the image for which to load the catalog.
+	\param catalogInitStatus the state of the catalog. This will be set to
+	       true on the first call for a given catalog, and if already true
+	       the function will do nothing on subsequent calls.
+
+	\since Haiku R1
 */

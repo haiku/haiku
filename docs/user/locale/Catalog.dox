@@ -72,6 +72,8 @@
 	Note that french(France) will failback to french, but then directly to the
 	language in the source code. This avoids mixing 3 or more languages in the
 	same application if the catalogs are incomplete and avoids confusion.
+
+	\since Haiku R1
 */
 
 
@@ -80,6 +82,8 @@
 	\brief Construct an empty BCatalog object.
 
 	Should be followed by SetTo() method to set the catalog.
+
+	\since Haiku R1
 */
 
 
@@ -101,16 +105,20 @@
 
 	\param catalogOwner entry_ref for which to load a catalog.
 	\param language The language of the catalog to load. If \c NULL, the user
-		settings will be used.
+	       settings will be used.
 	\param fingerprint The fingerprint version-info for the catalog to load.
-		If \c 0, the fingerprint will not be checked,and any version of the
-		catalog will be loaded.
+	       If \c 0, the fingerprint will not be checked,and any version of the
+	       catalog will be loaded.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BCatalog::~BCatalog()
 	\brief Destroys the BCatalog object freeing memory used by it.
+
+	\since Haiku R1
 */
 
 
@@ -119,9 +127,9 @@
 		const char* context, const char* comment)
 	\brief Get a string from the catalog.
 
-	This method access the data of the catalog and reeturns you the translated
+	This method access the data of the catalog and returns you the translated
 	version of the string. You must pass it the context where the string is, as
-	the same string may appear somewhere else and need a differnet translation.
+	the same string may appear somewhere else and need a different translation.
 	The comment is optional. It is meant as an help to translators, when the
 	string alone is not helpful enough or there are special things to note.
 	The comment is also used as a way to uniquely identify a string, so if two
@@ -133,7 +141,9 @@
 	\param comment Supplementary comment for translators.
 
 	\returns The translated string, or the one passed as a parameter if no
-		translation was found.
+	         translation was found.
+
+	\since Haiku R1
 */
 
 
@@ -152,6 +162,8 @@
 	\param id The identifier of the string.
 
 	\returns The translated string if found, or an empty string.
+
+	\since Haiku R1
 */
 
 
@@ -173,7 +185,9 @@
 	\retval B_ERROR Unable to get an exclusive lock on data.
 	\retval B_NO_INIT Catalog is \c NULL.
 	\retval B_NAME_NOT_FOUND catalog with the specified \a name could not be
-		found.
+	        found.
+
+	\since Haiku R1
 */
 
 
@@ -187,6 +201,8 @@
 	Note the current catalog format doesn't allow storing custom data in
 	catalogs, so the only way to use this method is providing your own
 	catalog add-on for storing the data.
+
+	\since Haiku R1
 */
 
 
@@ -200,6 +216,8 @@
 	\param sig The string where to copy the signature.
 
 	\returns An error code.
+
+	\since Haiku R1
 */
 
 
@@ -216,6 +234,8 @@
 	\retval B_ERROR Could not get exclusive lock on catalog.
 	\retval B_BAD_VALUE \a lang is \c NULL.
 	\retval B_NO_INIT Catalog data is \c NULL.
+
+	\since Haiku R1
 */
 
 
@@ -233,6 +253,8 @@
 	\retval B_ERROR Could not get exclusive lock on catalog.
 	\retval B_BAD_VALUE \a fp is \c NULL.
 	\retval B_NO_INIT Catalog data is \c NULL.
+
+	\since Haiku R1
 */
 
 
@@ -245,10 +267,12 @@
 
 	\param catalogOwner The \c entry_ref of the catalog that you want to load.
 	\param language The language of the catalog to load. If \c NULL, the user
-		settings will be used.
+	       settings will be used.
 	\param fingerprint The fingerprint of the catalog you want to load.
 
 	\returns A status code, \c B_OK on success, \c B_ERROR on error.
+
+	\since Haiku R1
 */
 
 
@@ -260,6 +284,8 @@
 	\retval B_OK The catalog is initialized properly.
 	\retval B_ERROR Could not get exclusive lock on catalog.
 	\retval B_NO_INIT Catalog data is \c NULL.
+
+	\since Haiku R1
 */
 
 
@@ -268,4 +294,6 @@
 	\brief Gets the number of items in the catalog.
 
 	\returns the number of strings in the catalog or 0 on error.
+
+	\since Haiku R1
 */

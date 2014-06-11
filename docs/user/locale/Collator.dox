@@ -36,8 +36,10 @@
 	sorting.
 
 	\warning This class is not multithread-safe, as Compare() change the
-		ICUCollator (the strength). So if you want to use a BCollator from
-		more than one thread you need to protect it with a lock.
+	         ICUCollator (the strength). So if you want to use a BCollator
+	         from more than one thread you need to protect it with a lock.
+
+	\since Haiku R1
 */
 
 
@@ -46,9 +48,11 @@
 	\brief Construct a collator with the default locale and strength.
 
 	\attention The default collator should be constructed by the BLocale
-		instead since it is aware of the currently defined locale.
+	           instead since it is aware of the currently defined locale.
 
 	This constructor uses \c B_COLLATE_PRIMARY strength.
+
+	\since Haiku R1
 */
 
 
@@ -63,12 +67,14 @@
 
 	\param locale The \a locale to build the constructor for.
 	\param strength The collator class provide four level of \a strength.
-		\li \c B_COLLATE_PRIMARY doesn't differentiate e from é,
-		\li \c B_COLLATE_SECONDARY takes letter accents into account,
-		\li \c B_COLLATE_TERTIARY is case sensitive,
-		\li \c B_COLLATE_QUATERNARY is very strict. Most of the time you
-			shouldn't need to go this far.
+	       \li \c B_COLLATE_PRIMARY doesn't differentiate e from é,
+	       \li \c B_COLLATE_SECONDARY takes letter accents into account,
+	       \li \c B_COLLATE_TERTIARY is case sensitive,
+	       \li \c B_COLLATE_QUATERNARY is very strict. Most of the time you
+	              shouldn't need to go this far.
 	\param ignorePunctuation Ignore punctuation during sorting.
+
+	\since Haiku R1
 */
 
 
@@ -77,6 +83,8 @@
 	\brief Unarchive a collator from a message.
 
 	\param archive The message to unarchive the BCollator object from.
+
+	\since Haiku R1
 */
 
 
@@ -87,6 +95,8 @@
 	Copies a BCollator object from another BCollator object.
 
 	\param other The BCollator to copy from.
+
+	\since Haiku R1
 */
 
 
@@ -95,6 +105,8 @@
 	\brief Destructor method.
 
 	Deletes the BCollator object freeing the resources it consumes.
+
+	\since Haiku R1
 */
 
 
@@ -103,6 +115,8 @@
 	\brief Assignment operator.
 
 	\param other the BCollator object to assign from.
+
+	\since Haiku R1
 */
 
 
@@ -114,11 +128,13 @@
 	when calling other methods.
 
 	\param strength The collator class provide four level of \a strength.
-	 \li \c B_COLLATE_PRIMARY doesn't differentiate e from é,
-	 \li \c B_COLLATE_SECONDARY takes letter accents into account,
-	 \li \c B_COLLATE_TERTIARY is case sensitive,
-	 \li \c B_COLLATE_QUATERNARY is very strict. Most of the time you
-		 shouldn't need to go this far.
+	       \li \c B_COLLATE_PRIMARY doesn't differentiate e from é,
+	       \li \c B_COLLATE_SECONDARY takes letter accents into account,
+	       \li \c B_COLLATE_TERTIARY is case sensitive,
+	       \li \c B_COLLATE_QUATERNARY is very strict. Most of the time you
+	              shouldn't need to go this far.
+
+	\since Haiku R1
 */
 
 
@@ -127,6 +143,8 @@
 	\brief Get the current strength of this catalog.
 
 	\returns The current strength of the catalog.
+
+	\since Haiku R1
 */
 
 
@@ -136,16 +154,20 @@
 
 	This function enables or disables the handling of punctuation.
 
-	\param ignore Boolean indicating whether or not punctuation should
-		be ignored.
+	\param ignore Whether or not punctuation should be ignored.
+
+	\since Haiku R1
 */
+
 
 /*!
 	\fn bool BCollator::IgnorePunctuation() const
 	\brief Gets the behavior of the collator with regards to punctuation.
 
 	\returns \c true if the collator will take punctuation into account
-	when sorting, \c false otherwise.
+	         when sorting, \c false otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -166,6 +188,8 @@
 
 	\retval B_OK if everything went well.
 	\retval B_ERROR if an error occurred generating the sortkey.
+
+	\since Haiku R1
 */
 
 
@@ -182,9 +206,15 @@
 	\param s2 The second string to compare.
 	\param strength The \a strength to use for the string comparison.
 
+	\returns An integer value representing how the strings compare to each
+	         other.
 	\retval 0 if the strings are equal.
 	\retval <0 if s1 is less than s2.
 	\retval >0 if s1 is greater than s2.
+
+	\since Haiku R1
+
+	\since Haiku R1
 */
 
 
@@ -205,6 +235,8 @@
 	\param strength The \a strength to use for the string comparison.
 
 	\returns \c true if the strings are identical, \c false otherwise.
+
+	\since Haiku R1
 */
 
 
@@ -221,6 +253,8 @@
 	\param strength The \a strength to use for the string comparison.
 
 	\returns \c true if s1 is greater than, but not equal to, s2.
+
+	\since Haiku R1
 */
 
 
@@ -236,6 +270,8 @@
 	\param strength The \a strength to use for the string comparison.
 
 	\returns \c true if s1 is greater or equal than s2.
+
+	\since Haiku R1
 */
 
 
@@ -251,5 +287,7 @@
 	\param archive The message to restore the collator from.
 
 	\returns A pointer to a BArchivable object containing the BCollator or
-		\c NULL if an error occurred restoring the \a archive.
+	        \c NULL if an error occurred restoring the \a archive.
+
+	\since Haiku R1
 */

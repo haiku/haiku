@@ -29,6 +29,8 @@
 	BDurationFormat is a formatter for time intervals. A time interval is
 	defined by its start and end values, and the result is a string such as
 	"1 hour, 2 minutes, 28 seconds".
+
+	\since Haiku R1
 */
 
 
@@ -37,9 +39,11 @@
 	\brief Constructor.
 
 	\warning Creating a BDurationFormat is a costly operation. Most of the
-		time want to use the default one through the BLocale class.
+	         time want to use the default one through the BLocale class.
 
 	\param separator String appended between the duration elements.
+
+	\since Haiku R1
 */
 
 
@@ -48,12 +52,16 @@
 	\brief Copy Constructor.
 
 	\param other The BDurationFormat object to copy from.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BDurationFormat::~BDurationFormat()
 	\brief Destructor.
+
+	\since Haiku R1
 */
 
 
@@ -64,6 +72,8 @@
 	\param other The BDurationFormat object to copy from.
 
 	\returns The resulting BDurationFormat object.
+
+	\since Haiku R1
 */
 
 
@@ -72,6 +82,8 @@
 	\brief Replace the separator for this formatter.
 
 	\param separator The separator string to set.
+
+	\since Haiku R1
 */
 
 
@@ -82,6 +94,8 @@
 	\param locale The BLocale object to set.
 
 	\returns A status code, \c B_OK on success or an error code on error.
+
+	\since Haiku R1
 */
 
 
@@ -95,6 +109,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_NO_INIT Format object is \c NULL.
 	\retval B_ERROR Other errors.
+
+	\since Haiku R1
 */
 
 
@@ -116,4 +132,6 @@
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE Buffer was \c NULL.
 	\retval B_ERROR Formatting error.
+
+	\since Haiku R1
 */

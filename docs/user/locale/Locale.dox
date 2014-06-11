@@ -37,6 +37,8 @@
 	BLocale is also the class to use when you want to perform formatting
 	or parsing of dates, times, and numbers, in the natural language of
 	the user.
+
+	\since Haiku R1
 */
 
 
@@ -44,13 +46,19 @@
 	\fn BLocale::BLocale(const BLanguage* language,
 		const BFormattingConventions* conventions)
 	\brief Initializes a BLocale object corresponding to the passed in
-		\a language and \a conventions.
+	       \a language and \a conventions.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BLocale::BLocale(const BLocale& other)
-	\brief Initializes a BLocale object.
+	\brief Initializes a BLocale object as a copy of \a other.
+
+	\param other The BLocale object to initialize from.
+
+	\since Haiku R1
 */
 
 
@@ -60,17 +68,27 @@
 
 	Returns the collator in use for this locale, allowing you to use it
 	to sort a set of strings.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BLocale& BLocale::operator=(const BLocale& other)
+	\brief Initializes a BLocale object as a copy of \a other by overloading
+	       the = operator.
+
+	\param other The BLocale object to initialize from.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn BLocale::~BLocale()
 	\brief Destructor method.
+
+	\since Haiku R1
 */
 
 
@@ -84,6 +102,8 @@
 	\retval B_OK Everything went well.
 	\retval B_BAD_VALUE \c NULL \a collator object passed in.
 	\retval B_ERROR Unable to lock the BLocale. 
+
+	\since Haiku R1
 */
 
 
@@ -97,21 +117,26 @@
 	\retval B_OK Everything went well.
 	\retval B_BAD_VALUE \c NULL \a language object passed in.
 	\retval B_ERROR Unable to lock the BLocale. 
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BLocale::GetFormattingConventions(
 		BFormattingConventions* conventions) const
-	\brief Sets \a conventions object to the default formatting conventions
-		for the BLocale.
+	\brief Fills out \a conventions with the default formatting conventions
+	       for the BLocale.
 
-	\param conventions A pointer to a BFormattingConventions object to fill out.
+	\param conventions A pointer to a BFormattingConventions object to fill
+	       out.
 
 	\returns A status code.
 	\retval B_OK Everything went well.
 	\retval B_BAD_VALUE \c NULL \a conventions object passed in.
 	\retval B_ERROR Unable to lock the BLocale.
+
+	\since Haiku R1
 */
 
 
@@ -123,8 +148,10 @@
 
 	\internal Assumes a certain order of the string bases.
 
-	\returns a blank string in the case of an error or the string "UTF-8"
-		if there is \a id is set to \a B_CODESET.
+	\returns A blank string in the case of an error or the string "UTF-8"
+	         if there is \a id is set to \a B_CODESET.
+
+	\since Haiku R1
 */
 
 
@@ -136,6 +163,8 @@
 	If unable to lock the BLocale \a conventions is left untouched.
 
 	\param conventions The formatting convention to set.
+
+	\since Haiku R1
 */
 
 
@@ -146,6 +175,8 @@
 	If unable to lock the BLocale \a newCollator is left untouched.
 
 	\param newCollator The collator to set.
+
+	\since Haiku R1
 */
 
 
@@ -156,6 +187,8 @@
 	If unable to lock the BLocale \a newLanguage is left untouched.
 
 	\param newLanguage The code of the language to set to locale to.
+
+	\since Haiku R1
 */
 
 
@@ -163,13 +196,13 @@
 	\fn ssize_t BLocale::FormatDate(char* string, size_t maxSize, time_t time,
 		BDateFormatStyle style) const
 	\brief Fills in \a string with a formatted date up to \a maxSize bytes for
-		the given \a time and \a style for the locale.
+	       the given \a time and \a style for the locale.
 
 	\param string The string buffer to fill with the formatted date.
 	\param maxSize The size of the buffer.
 	\param time The time (in seconds since epoch) to format
 	\param style Specify the long format (with day name, full
-		month name) or the short format, 08/12/2010 or similar.
+	       month name) or the short format, 08/12/2010 or similar.
 
 	\returns The number of bytes written during the date formatting.
 	\retval B_ERROR Unable to lock the BLocale.
@@ -181,6 +214,8 @@
 		BTimeFormatStyle timeStyle) const
 	\sa BLocale::FormatTime(char* string, size_t maxSize, time_t time,
 		BTimeFormatStyle style) const
+
+	\since Haiku R1
 */
 
 
@@ -188,7 +223,7 @@
 	\fn status_t BLocale::FormatDate(BString *string, time_t time,
 		BDateFormatStyle style, const BTimeZone* timeZone) const
 	\brief Fills in \a string with a formatted date for the given
-		\a time, \a style, and \a timeZone for the locale.
+	       \a time, \a style, and \a timeZone for the locale.
 
 	\param string The string buffer to fill with the formatted date.
 	\param time The time (in seconds since epoch) to format
@@ -206,6 +241,8 @@
 		const BTimeZone* timeZone) const
 	\sa status_t BLocale::FormatTime(BString* string, time_t time,
 		BTimeFormatStyle style, const BTimeZone* timeZone) const
+
+	\since Haiku R1
 */
 
 
@@ -213,7 +250,7 @@
 	\fn status_t BLocale::FormatDate(BString* string, int*& fieldPositions,
 		int& fieldCount, time_t time, BDateFormatStyle style) const
 	\brief Fills in \a string with a formatted date for the given
-		\a time and \a style for the locale.
+	       \a time and \a style for the locale.
 
 	\param string The string buffer to fill with the formatted date.
 	\param fieldPositions ???
@@ -230,6 +267,8 @@
 
 	\sa BLocale::FormatTime(BString* string, int*& fieldPositions,
 		int& fieldCount, time_t time, BTimeFormatStyle style) const
+
+	\since Haiku R1
 */
 
 
@@ -247,7 +286,7 @@
 	\param fields Pointer to the fields object.
 	\param fieldCount The number of fields.
 	\param style Specify the long format (with day name, full
-		month name) or the short format, 08/12/2010 or similar.
+	       month name) or the short format, 08/12/2010 or similar.
 
 	\returns A status code.
 	\retval B_OK Everything went fine.
@@ -257,6 +296,8 @@
 
 	\sa BLocale::GetTimeFields(BDateElement*& fields, int& fieldCount,
 		BTimeFormatStyle style) const
+
+	\since Haiku R1
 */
 
 
@@ -277,6 +318,8 @@
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a startOfWeek is \c NULL.
 	\retval B_ERROR Unable to lock the BLocale or another error occurred.
+
+	\since Haiku R1
 */
 
 
@@ -285,7 +328,7 @@
 		time_t time, BDateFormatStyle dateStyle,
 		BTimeFormatStyle timeStyle) const
 	\brief Fills in \a string with a formatted datetime up to \a maxSize bytes
-		for the given \a time and \a style for the locale.
+	       for the given \a time and \a style for the locale.
 
 	\param target The string buffer to fill with the formatted datetime.
 	\param maxSize The size of the buffer.
@@ -302,6 +345,8 @@
 		BDateFormatStyle style) const
 	\sa BLocale::FormatTime(char* string, size_t maxSize, time_t time,
 		BTimeFormatStyle style) const
+
+	\since Haiku R1
 */
 
 
@@ -310,7 +355,7 @@
 		BDateFormatStyle dateStyle, BTimeFormatStyle timeStyle,
 		const BTimeZone* timeZone) const
 	\brief Fills in \a string with a formatted datetime for the given
-		\a time, \a timeStyle, and \a timeZone for the locale.
+	       \a time, \a timeStyle, and \a timeZone for the locale.
 
 	\param target The string buffer to fill with the formatted date.
 	\param time The time (in seconds since epoch) to format
@@ -327,6 +372,8 @@
 		BDateFormatStyle style, const BTimeZone* timeZone) const
 	\sa status_t BLocale::FormatTime(BString* string, time_t time,
 		BTimeFormatStyle style, const BTimeZone* timeZone) const
+
+	\since Haiku R1
 */
 
 
@@ -334,7 +381,7 @@
 	\fn ssize_t BLocale::FormatTime(char* string, size_t maxSize, time_t time,
 		BTimeFormatStyle style) const
 	\brief Fills in \a string with a formatted date up to \a maxSize bytes for
-		the given \a time and \a style for the locale.
+	       the given \a time and \a style for the locale.
 
 	\param string The string buffer to fill with the formatted time.
 	\param maxSize The size of the buffer.
@@ -351,6 +398,8 @@
 	\sa BLocale::FormatDateTime(char* target, size_t maxSize,
 		time_t time, BDateFormatStyle dateStyle,
 		BTimeFormatStyle timeStyle) const
+
+	\since Haiku R1
 */
 
 
@@ -358,7 +407,7 @@
 	\fn status_t BLocale::FormatTime(BString* string, time_t time,
 		BTimeFormatStyle style, const BTimeZone* timeZone) const
 	\brief Fills in \a string with a formatted time for the given
-		\a time, \a style, and \a timeZone for the locale.
+	       \a time, \a style, and \a timeZone for the locale.
 
 	\param string The string buffer to fill with the formatted date.
 	\param time The time (in seconds since epoch) to format
@@ -375,6 +424,8 @@
 	\sa BLocale::FormatDateTime(BString* target, time_t time,
 		BDateFormatStyle dateStyle, BTimeFormatStyle timeStyle,
 		const BTimeZone* timeZone) const
+
+	\since Haiku R1
 */
 
 
@@ -382,7 +433,7 @@
 	\fn status_t BLocale::FormatTime(BString* string, int*& fieldPositions,
 		int& fieldCount, time_t time, BTimeFormatStyle style) const
 	\brief Fills in \a string with a formatted time for the given
-		\a time and \a style for the locale.
+	       \a time and \a style for the locale.
 
 	\param string The string buffer to fill with the formatted time.
 	\param fieldPositions ???
@@ -398,6 +449,8 @@
 
 	\sa BLocale::FormatDate(BString* string, int*& fieldPositions,
 		int& fieldCount, time_t time, BDateFormatStyle style) const
+
+	\since Haiku R1
 */
 
 
@@ -424,6 +477,8 @@
 
 	\sa BLocale::GetDateFields(BDateElement*& fields, int& fieldCount,
 		BDateFormatStyle style) const
+
+	\since Haiku R1
 */
 
 
@@ -431,7 +486,7 @@
 	\fn ssize_t BLocale::FormatNumber(char* string, size_t maxSize,
 		double value) const
 	\brief Format the \c double \a value as a string and put the result
-		into \a string up to \a maxSize bytes in the current locale.
+	       into \a string up to \a maxSize bytes in the current locale.
 
 	\param string The string to put the formatted number into.
 	\param maxSize The maximum of bytes to copy into \a string.
@@ -440,20 +495,22 @@
 	\returns The length of the string created or an error status code.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
-		object.
+	        object.
 	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(char* string, size_t maxSize,
 		int32 value) const
 	\sa ssize_t BLocale::FormatMonetary(char* string, size_t maxSize,
 		double value) const
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BLocale::FormatNumber(BString* string, double value) const
 	\brief \brief Format the \c double \a value as a string and put the
-		result into \a string in the current locale.
+	       result into \a string in the current locale.
 
 	\param string The string to put the formatted number into.
 	\param value The number that you want to get a formatted version of.
@@ -462,11 +519,13 @@
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
-		object.
+	        object.
 	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(BString* string, int32 value) const
 	\sa BLocale::FormatMonetary(BString* string, double value) const
+
+	\since Haiku R1
 */
 
 
@@ -474,7 +533,7 @@
 	\fn ssize_t BLocale::FormatNumber(char* string, size_t maxSize,
 		int32 value) const
 	\brief Format the \c int32 \a value as a string and put the result
-		into \a string up to \a maxSize bytes in the current locale.
+	       into \a string up to \a maxSize bytes in the current locale.
 
 	\param string The string to put the formatted number into.
 	\param maxSize The maximum of bytes to copy into \a string.
@@ -483,20 +542,22 @@
 	\returns The length of the string created or an error status code.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat 
-		object.
+	        object.
 	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(char* string, size_t maxSize,
 		double value) const
 	\sa BLocale::FormatMonetary(char* string, size_t maxSize,
 		double value) const
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BLocale::FormatNumber(BString* string, int32 value) const
-	\brief \brief Format the \c int32 \a value as a string and put the result
-		into \a string in the current locale.
+	\brief Format the \c int32 \a value as a string and put the result
+	       into \a string in the current locale.
 
 	\param string The string to put the formatted number into.
 	\param value The number that you want to get a formatted version of.
@@ -505,11 +566,13 @@
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
-		object.
+	        object.
 	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(BString* string, double value) const
 	\sa BLocale::FormatMonetary(BString* string, double value) const
+
+	\since Haiku R1
 */
 
 
@@ -517,7 +580,7 @@
 	\fn ssize_t BLocale::FormatMonetary(char* string, size_t maxSize,
 		double value) const
 	\brief Format the \c double \a value as a monetary string and put the
-		result into \a string up to \a maxSize bytes in the current locale.
+	       result into \a string up to \a maxSize bytes in the current locale.
 
 	\param string The \a string to put the monetary formatted number into.
 	\param maxSize The maximum of bytes to copy into \a string.
@@ -526,18 +589,20 @@
 	\returns The length of the string created or an error status code.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
-		object.
+	        object.
 	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(char* string, size_t maxSize, double value) const
 	\sa BLocale::FormatNumber(char* string, size_t maxSize, int32 value) const
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t BLocale::FormatMonetary(BString* string, double value) const
-	\brief \brief Format the \c double \a value as a monetary string and put
-		the result into \a string in the current locale.
+	\brief Format the \c double \a value as a monetary string and put
+	       the result into \a string in the current locale.
 
 	\param string The \a string to put the monetary formatted number into.
 	\param value The number to format as a monetary \a value.
@@ -546,9 +611,11 @@
 	\retval B_OK Everything went fine.
 	\retval B_ERROR Unable to lock the BLocale.
 	\retval B_NO_MEMORY Ran out of memory while creating the NumberFormat
-		object.
+	        object.
 	\retval B_BAD_VALUE An error occurred while formatting the number.
 
 	\sa BLocale::FormatNumber(BString* string, double value) const
 	\sa BLocale::FormatNumber(BString* string, int32 value) const
+
+	\since Haiku R1
 */

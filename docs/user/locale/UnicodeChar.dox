@@ -39,6 +39,8 @@
 	Note all the function work with chars encoded in UTF-32. This is not the
 	most usual way to handle characters, but it is the fastest. To convert an
 	UTF-8 string to an UTF-32 character use the FromUTF8() method.
+
+	\since Haiku R1
 */
 
 
@@ -47,7 +49,9 @@
 	\brief Determine if \a c is alphabetic.
 
 	\returns \c true if the specified unicode character is an
-		alphabetic character.
+	         alphabetic character.
+
+	\since Haiku R1
 */
 
 
@@ -56,7 +60,9 @@
 	\brief Determine if \a c is alphanumeric.
 
 	\returns \c true if the specified unicode character is a
-		alphabetic or numeric character.
+	         alphabetic or numeric character.
+
+	\since Haiku R1
 */
 
 
@@ -65,7 +71,9 @@
 	\brief Determine if \a c is numeric.
 
 	\returns \c true if the specified unicode character is a
-		number character.
+	         number character.
+
+	\since Haiku R1
 */
 
 
@@ -74,7 +82,9 @@
 	\brief Determine if \a c is a hexadecimal digit.
 
 	\returns \c true if the specified unicode character is a
-		hexadecimal number character.
+	         hexadecimal number character.
+
+	\since Haiku R1
 */
 
 
@@ -83,7 +93,9 @@
 	\brief Determine if \a c is uppercase.
 
 	\returns \c true if the specified unicode character is an
-		uppercase character.
+	         uppercase character.
+
+	\since Haiku R1
 */
 
 
@@ -92,7 +104,9 @@
 	\brief Determine if \a c is lowercase.
 
 	\returns \c true if the specified unicode character is a
-		lowercase character.
+	         lowercase character.
+
+	\since Haiku R1
 */
 
 
@@ -105,9 +119,11 @@
 	as an empty space which can be stretched on-screen.
 
 	\returns \c true if the specified unicode character is some
-		kind of a space character.
+	         kind of a space character.
 
 	\sa IsWhitespace()
+
+	\since Haiku R1
 */
 
 
@@ -119,9 +135,11 @@
 	non-breakable spaces.
 
 	\returns \c true if the specified unicode character is a whitespace
-		character.
+	         character.
 
 	\sa IsSpace()
+
+	\since Haiku R1
 */
 
 
@@ -133,9 +151,11 @@
 	0x0 to 0x1F.
 
 	\returns \c true if the specified unicode character is a control
-		character.
+	         character.
 
 	\sa IsPrintable()
+
+	\since Haiku R1
 */
 
 
@@ -144,7 +164,9 @@
 	\brief Determine if \a c is punctuation character.
 
 	\returns \c true if the specified unicode character is a
-		punctuation character.
+	         punctuation character.
+
+	\since Haiku R1
 */
 
 
@@ -155,9 +177,11 @@
 	Printable characters are not control characters.
 
 	\returns \c true if the specified unicode character is a printable
-		character.
+	         character.
 
 	\sa IsControl()
+
+	\since Haiku R1
 */
 
 
@@ -168,7 +192,9 @@
 	Title case characters are a smaller version of normal uppercase letters.
 
 	\returns \c true if the specified unicode character is a title case
-		character.
+	         character.
+
+	\since Haiku R1
 */
 
 
@@ -180,6 +206,8 @@
 	For these codes this method will return \c false.
 
 	\returns \c true if the specified unicode character is defined.
+
+	\since Haiku R1
 */
 
 
@@ -190,7 +218,9 @@
 	\note IsBase() does not determine if a unicode character is distinct.
 
 	\returns \c true if the specified unicode character is a base
-		form character that can be used with a diacritic.
+	         form character that can be used with a diacritic.
+
+	\since Haiku R1
 */
 
 
@@ -199,6 +229,8 @@
 	\brief Gets the type of a character.
 
 	\returns A member of the \c unicode_char_category enum.
+
+	\since Haiku R1
 */
 
 
@@ -207,6 +239,8 @@
 	\brief Transforms \a c to lowercase.
 
 	\returns The lowercase version of the specified unicode character.
+
+	\since Haiku R1
 */
 
 
@@ -215,6 +249,8 @@
 	\brief Transforms \a c to uppercase.
 
 	\returns The uppercase version of the specified unicode character.
+
+	\since Haiku R1
 */
 
 
@@ -223,6 +259,8 @@
 	\brief Transforms \a c to title case.
 
 	\returns The title case version of the specified unicode character.
+
+	\since Haiku R1
 */
 
 
@@ -231,19 +269,23 @@
 	\brief Gets the numeric value \a c.
 
 	\returns The numeric version of the specified unicode character.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BUnicodeChar::ToUTF8(uint32 c, char **out)
+	\fn void BUnicodeChar::ToUTF8(uint32 c, char** out)
 	\brief Transform a character to UTF-8 encoding.
 
 	\returns The UTF-8 encoding of the specified unicode character.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn uint32 BUnicodeChar::FromUTF8(const char **in)
+	\fn uint32 BUnicodeChar::FromUTF8(const char** in)
 	\brief Transform a UTF-8 string to an UTF-32 character.
 
 	If the string contains multiple characters, only the fist one is used.
@@ -251,27 +293,35 @@
 	character for the following call.
 
 	\returns The UTF-32 encoded version of \a in.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn size_t BUnicodeChar::UTF8StringLength(const char *str)
+	\fn size_t BUnicodeChar::UTF8StringLength(const char* string)
 	\brief Counts the characters in the given \c NUL terminated string.
 
 	\returns the number of UTF-8 characters in the \c NUL terminated string.
 
 	\sa BString::CountChars()
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn size_t BUnicodeChar::UTF8StringLength(const char *str, size_t maxLength)
+	\fn size_t BUnicodeChar::UTF8StringLength(const char* string,
+		size_t maxLength)
 	\brief Counts the characters in the given string up to \a maxLength
 		characters.
 
-	The string does not need to be \c NUL terminated if you specify a
-	\a maxLength that is shorter than the maximum length of the string.
+	\param string does not need to be \c NUL terminated if you specify a
+	       \a maxLength that is shorter than the maximum length of the string.
+	\param maxLength The maximum length of the string in bytes.
 
 	\returns the number of UTF-8 characters in the \c NUL terminated string
-		up to \a maxLength characters.
+	         up to \a maxLength characters.
+
+	\since Haiku R1
 */
