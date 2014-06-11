@@ -44,7 +44,7 @@ public:
 	static	void			AddTests(BTestSuite& suite);
 
 private:
-			BNetworkCookie*	_GetCookie(BNetworkCookieJar& jar, const BUrl& url,
+	const	BNetworkCookie*	_GetCookie(BNetworkCookieJar& jar, const BUrl& url,
 								const char* name);
 };
 

@@ -87,7 +87,7 @@ CookieTest::StandardTest()
 	CPPUNIT_ASSERT(result == B_OK);
 
 	url.SetUrlString("http://testsuites.opera.com/cookies/001-1.php");
-	BNetworkCookie* cookie = _GetCookie(jar, url, "001");
+	const BNetworkCookie* cookie = _GetCookie(jar, url, "001");
 
 	CPPUNIT_ASSERT(cookie != NULL);
 
@@ -157,7 +157,7 @@ CookieTest::MaxSizeTest()
 	CPPUNIT_ASSERT(result == B_OK);
 
 	url.SetUrlString("http://testsuites.opera.com/cookies/006-1.php");
-	BNetworkCookie* cookie = _GetCookie(jar, url, "006");
+	const BNetworkCookie* cookie = _GetCookie(jar, url, "006");
 	CPPUNIT_ASSERT(cookie != NULL);
 	CPPUNIT_ASSERT(cookie->Value().Length() == 4096);
 }
@@ -183,7 +183,7 @@ CookieTest::MaxNumberTest()
 	for (int i = 1; i <= 20; i++)
 	{
 		cookieString.SetToFormat("007-%d", i);
-		BNetworkCookie* cookie = _GetCookie(jar, url, cookieString.String());
+		const BNetworkCookie* cookie = _GetCookie(jar, url, cookieString.String());
 		CPPUNIT_ASSERT(cookie != NULL);
 		CPPUNIT_ASSERT(cookie->Value() == "1");
 	}
@@ -205,7 +205,7 @@ CookieTest::UpdateTest()
 	CPPUNIT_ASSERT(result == B_OK);
 
 	url.SetUrlString("http://testsuites.opera.com/cookies/008-2.php");
-	BNetworkCookie* cookie = _GetCookie(jar, url, "008");
+	const BNetworkCookie* cookie = _GetCookie(jar, url, "008");
 	CPPUNIT_ASSERT(cookie != NULL);
 	CPPUNIT_ASSERT(cookie->Value() == "2");
 }
@@ -222,7 +222,7 @@ CookieTest::HttpOnlyTest()
 	CPPUNIT_ASSERT(result == B_OK);
 
 	url.SetUrlString("http://testsuites.opera.com/cookies/010-1.php");
-	BNetworkCookie* cookie = _GetCookie(jar, url, "010");
+	const BNetworkCookie* cookie = _GetCookie(jar, url, "010");
 	CPPUNIT_ASSERT(cookie != NULL);
 	CPPUNIT_ASSERT(cookie->Value() == "1");
 	CPPUNIT_ASSERT(cookie->HttpOnly());
@@ -241,7 +241,7 @@ CookieTest::EncodingTest()
 	CPPUNIT_ASSERT(result == B_OK);
 
 	url.SetUrlString("http://testsuites.opera.com/cookies/011-1.php");
-	BNetworkCookie* cookie = _GetCookie(jar, url, "011");
+	const BNetworkCookie* cookie = _GetCookie(jar, url, "011");
 	CPPUNIT_ASSERT(cookie != NULL);
 	CPPUNIT_ASSERT_EQUAL(
 		BString("UTF-8 \303\246\303\270\303\245 \346\227\245\346\234\254"),
@@ -262,7 +262,7 @@ CookieTest::DomainTest()
 	CPPUNIT_ASSERT(result != B_OK);
 
 	url.SetUrlString("http://testsuites.opera.com/cookies/012-1.php");
-	BNetworkCookie* cookie = _GetCookie(jar, url, "012-1");
+	const BNetworkCookie* cookie = _GetCookie(jar, url, "012-1");
 	CPPUNIT_ASSERT(cookie != NULL);
 	CPPUNIT_ASSERT(cookie->Value() == "1");
 
@@ -297,7 +297,7 @@ CookieTest::PersistantTest()
 
 	url.SetUrlString("http://testsuites.opera.com/cookies/013-1.php");
 
-	BNetworkCookie* cookie = _GetCookie(jar, url, "013-1");
+	const BNetworkCookie* cookie = _GetCookie(jar, url, "013-1");
 	CPPUNIT_ASSERT(cookie != NULL);
 	CPPUNIT_ASSERT(cookie->Value() == "1");
 	CPPUNIT_ASSERT(cookie->HasExpirationDate());
@@ -829,7 +829,7 @@ CookieTest::AddTests(BTestSuite& parent)
 }
 
 
-BNetworkCookie*
+const BNetworkCookie*
 CookieTest::_GetCookie(BNetworkCookieJar& jar, const BUrl& url,
 	const char* name)
 {
